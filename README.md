@@ -13,3 +13,6 @@ This is where updates and developments will be posted here. There is a issues se
 
 ---
 This is new so a lot of things will be ironed out over time. Organization of the issues and discussion. The access to pages and where things will be posted.
+
+## Discussions
+- To keep discussions relavant. Old or inactive discussion posts will be automatically closed after a week to a month depending on the post's content.
