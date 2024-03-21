@@ -11,8 +11,12 @@ This is where updates and developments will be posted here. There is a issues se
 3. Input **Title** & **Description**.
 4. Select a **Label** on the right to add context & organization.
 
----
-This is new so a lot of things will be ironed out over time. Organization of the issues and discussion. The access to pages and where things will be posted.
+## Active Developments
+To keep up to date with the active development. You can click the commits button to see additions and changes.
+![Where to check commits](https://github.com/HelixNebulaStudio/RiseOfTheDead/blob/main/commits.png?raw=true)
 
 ## Discussions
 - To keep discussions relavant. Old or inactive discussion posts will be automatically closed after a week to a month depending on the post's content.
+
+---
+This is new so a lot of things will be ironed out over time. Organization of the issues and discussion. The access to pages and where things will be posted.
