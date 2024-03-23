@@ -1,6 +1,6 @@
 # Rise of the Dead
 
-Well, for 1.6.2, Revived's 5th year anniversary. Looks like we're also getting new development board.
+Well, for 2.0.0, Revived's 5th year anniversary. Looks like we're also getting new development board.
 
 ## Info
 This is where updates and developments will be posted here. There is a issues section for user submission, see labels for what you can submit. The Discussion tab is a forum for discussion.
