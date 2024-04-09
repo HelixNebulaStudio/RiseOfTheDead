@@ -185,4 +185,3 @@ end
 shared.modPlayers = PlayerService;
 
 return PlayerService;
-

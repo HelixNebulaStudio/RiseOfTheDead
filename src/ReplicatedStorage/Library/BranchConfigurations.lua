@@ -729,4 +729,3 @@ Branches.NavLinks = {
 };
 
 return Branches;
-

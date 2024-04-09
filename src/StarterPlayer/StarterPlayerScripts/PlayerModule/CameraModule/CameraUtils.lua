@@ -234,4 +234,3 @@ function CameraUtils.ConvertCameraModeEnumToStandard(enumValue:
 end
 
 return CameraUtils
-
