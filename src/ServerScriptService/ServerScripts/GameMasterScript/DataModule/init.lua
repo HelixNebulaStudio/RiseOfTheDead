@@ -1,6 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
 local Data = {};
+setmetatable(Data, require(game.ReplicatedStorage.ParallelLibrary.DataModule))
+Data.Script = script;
 
 local CollectionService = game:GetService("CollectionService");
 
@@ -77,16 +79,6 @@ function Data:GetModCharacter()
 	end
 	
 	return require(localplayer.Character:WaitForChild("CharacterModule"));
-end
-
--- !outline: Data:IsSettingsLoaded()
-function Data:IsSettingsLoaded()
-	return script:GetAttribute("SettingsLoaded") == true;
-end
-
--- !outline: Data:GetSetting(key)
-function Data:GetSetting(key)
-	return script:GetAttribute("Settings"..key);
 end
 
 -- !outline: Data:SaveSettings()

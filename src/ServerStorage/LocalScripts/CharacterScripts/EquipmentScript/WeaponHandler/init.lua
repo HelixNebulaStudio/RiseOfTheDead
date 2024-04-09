@@ -958,7 +958,7 @@ function WeaponHandler:Equip(library, weaponId)
 				updateAmmoCounter();
 				if configurations.OnAmmoUpdate then configurations.OnAmmoUpdate(mainWeaponModel, modWeaponModule, properties.Ammo, properties.MaxAmmo); end
 				
-				if configurations.BulletEject and objectTable.CaseOutPoint and modData.Settings.DisableParticle3D ~= true then
+				if configurations.BulletEject and objectTable.CaseOutPoint and modData:GetSetting("DisableParticle3D") ~= true then
 					if configurations.BulletEjectDelayTime == nil then
 						task.spawn(ejectShell, objectTable);
 					end
@@ -1105,7 +1105,7 @@ function WeaponHandler:Equip(library, weaponId)
 								end
 								
 								if humanoid == nil or humanoid.Name ~= "NavMeshIgnore" then
-									if modData and modData.Settings.DisableParticle3D ~= true then
+									if modData and modData:GetSetting("DisableParticle3D") ~= true then
 										modParticleSprinkler:Emit{
 											Type=1;
 											Origin=CFrame.new(position);
@@ -2113,7 +2113,7 @@ function WeaponHandler:Equip(library, weaponId)
 
 		track:GetMarkerReachedSignal("ShellEject"):Connect(function(paramString)
 			local objectTable = paramString == "Left" and objects.Left or objects.Right;
-			if configurations.BulletEject and objectTable.CaseOutPoint and modData.Settings.DisableParticle3D ~= true then
+			if configurations.BulletEject and objectTable.CaseOutPoint and modData:GetSetting("DisableParticle3D") ~= true then
 				ejectShell(objectTable);
 			end
 		end)

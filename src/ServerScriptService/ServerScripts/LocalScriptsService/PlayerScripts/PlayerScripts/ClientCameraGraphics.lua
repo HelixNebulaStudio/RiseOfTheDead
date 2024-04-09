@@ -424,15 +424,6 @@ return function()
 		lastDbDespawnTick = tick();
 		
 		local maxDeadbodies = modData:GetSetting("MaxDeadbodies");
-
-		if maxDeadbodies == nil then
-			if modGlobalVars.IsMobile() then
-				maxDeadbodies = 0;
-			else
-				maxDeadbodies = 16;
-			end
-		end
-		
 		modDeadbodiesHandler:DespawnRequest(maxDeadbodies);
 	end)
 	

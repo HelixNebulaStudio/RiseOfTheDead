@@ -264,7 +264,7 @@ return function()
 			end
 		end
 		
-		if modData.Settings.NiceParticles then
+		if modData:GetSetting("NiceParticles") then
 			local children = child:GetChildren();
 			for a=1, #children do 
 				local particle = children[a];

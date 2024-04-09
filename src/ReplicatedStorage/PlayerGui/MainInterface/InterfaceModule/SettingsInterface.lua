@@ -620,7 +620,7 @@ function Interface.init(modInterface)
 						end
 						
 						local function update()
-							local settingVal = modData.Settings[config.SettingsKey];
+							local settingVal = modData:GetSetting(config.SettingsKey);
 							local settingIndex = tonumber(settingVal) or 0;
 							
 							button:SetAttribute("SettingIndex", settingIndex);
@@ -637,8 +637,6 @@ function Interface.init(modInterface)
 						update();
 						
 						button.MouseButton1Click:Connect(function()
-							local settingVal = modData.Settings[config.SettingsKey];
-							
 							local index = button:GetAttribute("SettingIndex");
 							if index+1 >= #toggleOptions then
 								index = 0;
@@ -677,7 +675,7 @@ function Interface.init(modInterface)
 				elseif elementInfo.TemplateName == "SliderOption" then
 					local button = elementInst:WaitForChild("Button");
 					
-					local settingVal = modData.Settings[config.SettingsKey];
+					local settingVal = modData:GetSetting(config.SettingsKey);
 					
 					if config.Type == "SoundGroup" then
 						config.SettingsKey = "Snd"..config.SoundGroupKey;
@@ -707,7 +705,7 @@ function Interface.init(modInterface)
 						
 					else
 						local rangeInfo = config.RangeInfo;
-						rangeInfo.Default = (settingVal or rangeInfo.Default);
+						rangeInfo.Default = (modData:GetSetting(config.SettingsKey) or rangeInfo.Default);
 						
 						modComponents.CreateSlider(Interface, {
 							Button=button;

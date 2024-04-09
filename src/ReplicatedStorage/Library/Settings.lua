@@ -549,15 +549,6 @@ baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 		Type="Toggle";
 	};
 });
---baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
---	TitleProperties={Text="Color Correction";};
---	DescProperties={Text="Improve color saturation with filters.";};
---	Config={
---		SettingsKey="FilterColors";
---		Type="Toggle";
---		RefreshGraphics=true;
---	};
---});
 baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 	TitleProperties={Text="Sun Rays";};
 	DescProperties={Text="Add sun rays from sun light with filters.";};
@@ -645,14 +636,6 @@ baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 		Type="Toggle";
 	};
 });
---baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
---	TitleProperties={Text="Use Fingerless Hands";};
---	DescProperties={Text="Use Roblox's fingerless hands";};
---	Config={
---		SettingsKey="UseOldHands";
---		Type="Toggle;Disabled;Enabled";
---	};
---});
 baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 	TitleProperties={Text="Use Zombie 1.0 Skin & Face";};
 	DescProperties={Text="Use Zombie 1.0's skin tone & face. Only shows for new spawns. (Model, clothing & animations aren't compatible)";};
