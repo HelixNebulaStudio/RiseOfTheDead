@@ -9,6 +9,8 @@ return function()
 	
 	local modData = require(localplayer:WaitForChild("DataModule"));
 
+	local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
+
 	local modVoxelSpace = require(game.ReplicatedStorage.Library.VoxelSpace);
 	local modTextureAnimations = require(game.ReplicatedStorage.Library.TextureAnimations);
 	local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
@@ -421,7 +423,16 @@ return function()
 		if lastDbDespawnTick and tick()-lastDbDespawnTick <= 1 then return end;
 		lastDbDespawnTick = tick();
 		
-		local maxDeadbodies = modData:GetSetting("MaxDeadbodies") or 16;
+		local maxDeadbodies = modData:GetSetting("MaxDeadbodies");
+
+		if maxDeadbodies == nil then
+			if modGlobalVars.IsMobile() then
+				maxDeadbodies = 0;
+			else
+				maxDeadbodies = 16;
+			end
+		end
+		
 		modDeadbodiesHandler:DespawnRequest(maxDeadbodies);
 	end)
 	
