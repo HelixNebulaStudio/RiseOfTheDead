@@ -260,7 +260,7 @@ return function(CutsceneSequence)
 				npcModule:ToggleInteractable(false);
 				
 				npcModule.Move:MoveTo(Vector3.new(2.737, 55.387, -192.427));
-				npcModule.Move.MoveToEnded:Wait();
+				npcModule.Move.MoveToEnded:Wait(10);
 				npcModule.Actions:Teleport(CFrame.new(2.737, 55.387, -192.427) * CFrame.Angles(0, math.rad(180), 0));
 
 				Debugger:Warn("Play crouch look");
