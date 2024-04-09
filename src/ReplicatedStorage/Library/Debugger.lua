@@ -18,10 +18,10 @@ local GuiDataRemote; local ClientLogRemote; local ClientReadyBind; local IsClien
 local Debugger = {}; 
 Debugger.__index = Debugger;
 
+Debugger.AcquirerModule = nil;
 Debugger.DevId = 16170943;
 Debugger.Friends = {};
 
-local cyclicCount = 0;
 local function concat(c, useKey, level)
 	level = level or 0;
 	if level > 4 then return tostring(c) end;
@@ -83,7 +83,9 @@ function Debugger:Require(module, printStat)
 	
 	local s, e;
 	if requireCache[moduleName] == nil then
-		delay(5, function() if not successful then self:Warn("Module("..module.Name..") require timed out. ".. (not s and e or "")); end end)
+		delay(5, function()
+			if not successful then
+				self:Warn("Module("..module.Name..") require timed out. ".. (not s and e or "")); end end)
 	end
 	
 	local r;
@@ -144,7 +146,6 @@ end
 	
 	Returns Debugger instance with properties Name and Disabled. Setting "Debugger.Disabled = true" will disable logging.
 **--]]
-local onNewCache, loadCount = {}, 0;
 function Debugger.new(src)
 	if typeof(src) == "string" then
 		warn("Deprecated parameter: "..debug.traceback())
@@ -272,17 +273,18 @@ function Debugger:Ray(ray, rayHit, rayPoint, rayNormal)
 		rayC.Archivable = false;
 		return rayA;
 	end
+	return;
 end
 
-function Debugger:Point(point, parent)
+function Debugger:Point(point: CFrame | Vector3, parent)
 	local a = Instance.new("Attachment");
-	a.WorldCFrame = typeof(point) == "CFrame" and point or CFrame.new(point);
+	a.WorldCFrame = typeof(point) == "CFrame" and point or CFrame.new(point :: Vector3);
 	a.Parent = parent or workspace.Terrain;
 	
 	return a;
 end
 
-function Debugger:PointPart(point)
+function Debugger:PointPart(point: CFrame | Vector3)
 	if point then
 		local A = Instance.new("Part");
 		A.Name = "A";
@@ -296,11 +298,12 @@ function Debugger:PointPart(point)
 		A.Size = Vector3.new(0.3, 0.3, 0.3);
 		A.Shape = Enum.PartType.Ball;
 		A.Color = colorsList[random:NextInteger(1, #colorsList)];
-		A.CFrame = typeof(point) == "CFrame" and point or CFrame.new(point);
+		A.CFrame = typeof(point) == "CFrame" and point or CFrame.new(point :: Vector3);
 		A.Archivable = false;
 		A.Parent = workspace;
 		return A;
 	end
+	return;
 end
 
 function Debugger:HudPrint(position, text)
@@ -333,6 +336,7 @@ function Debugger:Region(cframe, size)
 		A.Parent = workspace;
 		return A;
 	end
+	return;
 end
 
 
@@ -452,7 +456,7 @@ end
 	Message of the warning. Example: Debugger:WarnClient(player/{player; player2}, "Oh no!", "404");
 **--]]
 function Debugger:WarnClient(players, ...)
-	if RunService:IsClient() then Debugger:Log("WarnClient() can only be called by server.") return end;
+	if RunService:IsClient() then Debugger:Log("WarnClient() can only be called by server."); return end;
 	if self:IsParallel() then Debugger:Warn("Not called from main thread.", self.Script:GetFullName()); return end;
 	
 	local tuple = {...};
@@ -517,27 +521,6 @@ end
 **--]]
 function Debugger:FormatTable(input)
 	local cache = {};
-	local function sortAlpha(t)
-		table.sort(t, function(A, B)
-			local A = {A.Key:byte(1,5)};
-			local aSize = 0;
-			local B = {B.Key:byte(1,5)};
-			local bSize = 0;
-			for a=1, 5 do
-				if A[a] ~= nil then
-					aSize = aSize+A[a];
-				else
-					aSize = aSize+65;
-				end
-				if B[a] ~= nil then
-					bSize = bSize+B[a];
-				else
-					bSize = bSize+65;
-				end
-			end
-			return aSize < bSize;
-		end)
-	end
 	local function extract(t, index)
 		local syntax = string.rep("    ", index);
 		for key, value in pairs(t) do
@@ -587,6 +570,7 @@ end
 	
 	Player or a table of players to display debug data to. Leaving this null will display debug to all players.
 **--]]
+local UpdateDebuggerGui;
 function Debugger:Display(data, whitelist)
 	task.defer(function()
 		whitelist = whitelist and type(whitelist) ~= "table" and {whitelist} or whitelist;
@@ -639,7 +623,7 @@ function Debugger:ThreadTest(timeout, id)
 end
 
 function Debugger:CFrameLinkPart(targetPart: BasePart)
-	local part: BasePart = self:PointPart(targetPart.CFrame);
+	local part: Part = self:PointPart(targetPart.CFrame);
 	part.Shape = Enum.PartType.Block;
 	part.CanQuery = false;
 	part.Anchored = false;
@@ -713,7 +697,7 @@ function Debugger:InitMainThread()
 
 		local ListSizeMin = Vector2.new(300, 600);
 		local ListSizeMax = Vector2.new(1000, 1600);
-		function UpdateDebuggerGui(scriptName, data)
+		UpdateDebuggerGui = function(scriptName, data)
 			DebuggerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("DebuggerGui");
 			ListFrame = DebuggerGui and DebuggerGui:FindFirstChild("ListFrame");
 			if DebuggerGui == nil then
