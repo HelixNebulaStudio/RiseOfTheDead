@@ -1,0 +1,5 @@
+local TextColors = {};
+
+
+
+return TextColors;

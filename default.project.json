@@ -1,0 +1,12 @@
+{
+  "name": "ReviveEngine",
+  "tree": {
+    "$className": "DataModel",
+
+    "ServerStorage": {
+      "UniversalDataModel": {
+        "$path": "src"
+      }
+    }
+  }
+}

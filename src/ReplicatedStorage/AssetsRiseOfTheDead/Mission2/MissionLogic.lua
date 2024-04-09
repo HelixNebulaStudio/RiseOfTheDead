@@ -1,0 +1,57 @@
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+
+local MissionFunctions = {};
+local RunService = game:GetService("RunService");
+local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
+local modGuiHighlight = require(game.ReplicatedStorage.Library.UI.GuiHighlight);
+
+if RunService:IsClient() then
+	local modWaypoint = require(game.ReplicatedStorage.Library.Waypoint);
+	local modPlayers = require(game.ReplicatedStorage.Library.Players);
+
+	MissionFunctions.activeWaypoint = nil;
+	local player = game.Players.LocalPlayer;
+	local playerGui = player.PlayerGui;
+	
+	local compact = modConfigurations.CompactInterface;
+
+	function SetWaypoint(w)
+		if MissionFunctions.activeWaypoint ~= nil then
+			MissionFunctions.activeWaypoint.Cancel();
+			MissionFunctions.activeWaypoint = nil;
+		end
+		MissionFunctions.activeWaypoint = w;
+	end
+
+	function MissionFunctions.Checkpoint6()
+		Debugger:Warn("Checkpoint6");
+		local character = player.Character or player.CharacterAdded:Wait();
+		local rootPart = character:WaitForChild("HumanoidRootPart");
+		RunService.Heartbeat:Wait();
+
+		local highlight = modGuiHighlight.Set("MainInterface", "RatShopFrame", true);
+		highlight.Next("MainInterface", "Inventory", "MainList", "search:p250", "p250");
+		highlight.Next("MainInterface", "RatShopFrame", "PageFrame", "AmmoRefillOption");
+
+
+		if modBranchConfigs.IsWorld("TheWarehouse") then
+			SetWaypoint(modWaypoint.NewWaypoint(rootPart, workspace:WaitForChild("Interactables"):WaitForChild("ShopWaypoint") ));
+		else
+			SetWaypoint();
+		end;
+	end
+
+	function MissionFunctions.Checkpoint7()
+		Debugger:Warn("Checkpoint 7");
+		modGuiHighlight.Set();
+		SetWaypoint();
+	end
+
+	function MissionFunctions.Cancel()
+		modGuiHighlight.Set();
+		SetWaypoint();
+	end
+end
+
+return MissionFunctions;
