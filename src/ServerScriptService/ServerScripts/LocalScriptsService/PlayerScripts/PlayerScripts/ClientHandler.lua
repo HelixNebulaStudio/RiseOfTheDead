@@ -878,13 +878,13 @@ return function()
 					local quickButton = mainInterface.Windows[k].QuickButton
 					if quickButton then
 						quickButton.hotKey.Visible = not modConfigurations.DisableHotKeyLabels and UserInputService.KeyboardEnabled or false;
-						if modData.Settings.HideHotkey then
+						if modData:GetSetting("HideHotkey") == 1 then
 							quickButton.hotKey.Visible = false;
 						end
 					end
 					if mainInterface.Windows[k].CloseButtonLabel then
 						local hotKeyButton = mainInterface.Windows[k].CloseButtonLabel.Parent;
-						if modData.Settings.HideHotkey then
+						if modData:GetSetting("HideHotkey") == 1 then
 							hotKeyButton.Visible = false;
 						else
 							hotKeyButton.Visible = true;

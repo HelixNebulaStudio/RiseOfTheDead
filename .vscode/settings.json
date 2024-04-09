@@ -1,0 +1,7 @@
+{
+    "luau-lsp.sourcemap.autogenerate": true,
+    "luau-lsp.plugin.enabled": true,
+    "luau-lsp.plugin.port": 3667,
+    "luau-lsp.sourcemap.enabled": true,
+    "luau-lsp.sourcemap.rojoProjectFile": "sourcemap.project.json"
+}

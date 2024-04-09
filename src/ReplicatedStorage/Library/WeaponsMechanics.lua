@@ -4,7 +4,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Variables;
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
-local UserGameSettings = UserSettings():GetService("UserGameSettings");
 local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
 local modParticleSprinkler = require(game.ReplicatedStorage.Particles.ParticleSprinkler);
@@ -19,42 +18,21 @@ local moltenEffect = script:WaitForChild("MoltenBullethole");
 
 local muzzleLight = script.MuzzleLight;
 
-local qualityLevel = 10;
 local random = Random.new();
 
 local WeaponsMechanics = {};
 
---== Script;
-local function getQualityLevel()
-	local quality =  UserGameSettings.SavedQualityLevel;
-	if quality == Enum.SavedQualitySetting.QualityLevel1 then
-		qualityLevel = 1;
-	elseif quality == Enum.SavedQualitySetting.QualityLevel2 then
-		qualityLevel = 2;
-	elseif quality == Enum.SavedQualitySetting.QualityLevel3 then
-		qualityLevel = 3;
-	elseif quality == Enum.SavedQualitySetting.QualityLevel4 then
-		qualityLevel = 4;
-	elseif quality == Enum.SavedQualitySetting.QualityLevel5 then
-		qualityLevel = 5;
-	elseif quality == Enum.SavedQualitySetting.QualityLevel6 then
-		qualityLevel = 6;
-	elseif quality == Enum.SavedQualitySetting.QualityLevel7 then
-		qualityLevel = 7;
-	elseif quality == Enum.SavedQualitySetting.QualityLevel8 then
-		qualityLevel = 8;
-	elseif quality == Enum.SavedQualitySetting.QualityLevel9 then
-		qualityLevel = 9;
-	elseif quality == Enum.SavedQualitySetting.QualityLevel10  then
-		qualityLevel = 10;
-	end
+local localplayer: Player = game.Players.LocalPlayer;
+local modData;
+local function getModData()
+	if RunService:IsServer() then return end;
+	if modData then return modData end;
+	modData = localplayer and require(localplayer:WaitForChild("DataModule") :: any);
+	return modData;
 end
+getModData();
 
-getQualityLevel();
-UserGameSettings.Changed:Connect(function()
-	getQualityLevel();
-end)
-
+--== Script;
 WeaponsMechanics.EquipUpdateExperience = true;
 
 
@@ -96,10 +74,10 @@ end
 -- This applies after mods.
 -- !outline: function ApplyTraits(storageItem, weaponModule)
 function WeaponsMechanics.ApplyTraits(storageItem, weaponModule)
-	local modToolTweaks = require(game.ReplicatedStorage.Library.ToolTweaks);
-
 	if true then return end;
-	
+
+	local modToolTweaks = require(game.ReplicatedStorage.Library.ToolTweaks) :: any;
+
 	--Trait buffs;
 	local traitLib = modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId] and modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId].TraitStats;
 	local tweakId = storageItem.Values and storageItem.Values.Tweak;
@@ -176,9 +154,6 @@ end
 
 -- !outline: function ApplyPassiveMods(storageItem, attachmentStorage, weaponModule)
 function WeaponsMechanics.ApplyPassiveMods(storageItem, attachmentStorage, weaponModule)
-
-	local modified = false;
-	
 	local tweakValues = storageItem.Values and storageItem.Values.TweakValues or {};
 	
 	local upgradeLib = modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId];
@@ -238,7 +213,6 @@ function WeaponsMechanics.ApplyPassiveMods(storageItem, attachmentStorage, weapo
 		else
 			Debugger:Warn("Missing module for mod ("..modLib.Name.." Mod)");
 		end
-		modified = true;
 	end
 	
 	return weaponModule;
@@ -299,9 +273,23 @@ function WeaponsMechanics.ProcessModHooks(damageSource)
 	
 end
 
-
--- !outline: function CastHitscanRay(properties: {Origin:Vector3; Direction:Vector3; IncludeList:{any}; Range:number; MaxPierce:number})
-function WeaponsMechanics.CastHitscanRay(properties: {Origin:Vector3; Direction:Vector3; IncludeList:{any}; Range:number; MaxPierce:number})
+type HitscanRayProperties = {
+	Origin: Vector3;
+	Direction: Vector3; 
+	IncludeList: {any};
+	Range: number;
+	MaxPierce: number;
+	PenTable: unknown?;
+	OnCastFunc: () -> boolean;
+	PenReDirection: Vector3?;
+	OnPenFunc: ({
+		BasePart: Instance;
+		Position: Vector3;
+		Normal: Vector3;
+	}) -> nil;
+};
+-- !outline: function CastHitscanRay(properties: HitscanRayProperties)
+function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 	local origin = properties.Origin;
 	local direction = properties.Direction;
 	local includeList = properties.IncludeList;
@@ -400,6 +388,10 @@ function WeaponsMechanics.CastHitscanRay(properties: {Origin:Vector3; Direction:
 
 		end
 
+		if RunService:IsClient() then
+			modData = getModData();
+			if modData:IsMobile() then task.wait() end;
+		end
 	until distance <= 0 or penCount > maxPierce;
 	return newOrigin;
 end
@@ -423,9 +415,10 @@ end;
 
 -- !outline: function CreateBlood(obj, point, normal, camera)
 function WeaponsMechanics.CreateBlood(obj, point, normal, camera)
-	if qualityLevel < 6 then return; end
-	local modData = game.Players.LocalPlayer:FindFirstChild("DataModule") and require(game.Players.LocalPlayer.DataModule);
-	if modData and modData.Settings and modData.Settings.BloodParticle then return end;
+	if RunService:IsClient() then
+		modData = getModData();
+		if modData:GetSetting("BloodParticle") == 1 then return; end
+	end
 
 	if obj:GetAttribute("IsLiquid") == true then
 		return;
@@ -451,11 +444,17 @@ end;
 -- !outline: function ImpactSound(param)
 local surfaceSounds = script:WaitForChild("SurfaceSounds");
 function WeaponsMechanics.ImpactSound(param)
-	local modAudio = require(game.ReplicatedStorage.Library.Audio);
-	
-	local localplayer = game.Players.LocalPlayer;
-	local modData = localplayer and require(localplayer:WaitForChild("DataModule"));
-	
+	local use3DParticles = true;
+	local limitParticles = false;
+	if RunService:IsClient() then
+		modData = getModData();
+
+		if modData:GetSetting("DisableParticle3D") == 1 then
+			use3DParticles = false;
+		end
+		limitParticles = modData:GetSetting("LimitParticles") == 1;
+	end
+
 	local obj = param.BasePart;
 	local point = param.Point;
 	local normal = param.Normal or Vector3.new();
@@ -475,7 +474,8 @@ function WeaponsMechanics.ImpactSound(param)
 	if obj.Material == Enum.Material.Metal
 		or obj.Material == Enum.Material.CorrodedMetal
 		or obj.Material == Enum.Material.DiamondPlate then
-		if modData and modData.Settings.DisableParticle3D ~= true then
+
+		if use3DParticles then
 			local sparkCountRng = math.random(4, 7);
 			
 			local cache = modData.Cache;
@@ -504,7 +504,7 @@ function WeaponsMechanics.ImpactSound(param)
 			end
 		end
 		
-		if param.HideMolten ~= true then
+		if param.HideMolten ~= true and limitParticles ~= true then
 			local molten = moltenEffect:Clone();
 			molten.Lifetime = NumberRange.new(math.random(15, 25)/10);
 			molten.Parent = newAtt;
@@ -570,17 +570,21 @@ function WeaponsMechanics.ImpactSound(param)
 			game.Debris:AddItem(newAtt, new.TimeLength+0.1);
 		end
 	end
+
+	return;
 end
 
 
 -- !outline: function CreateBulletHole(obj, point, normal)
 function WeaponsMechanics.CreateBulletHole(obj, point, normal)
-	if qualityLevel < 3 then return; end
+	if RunService:IsClient() then
+		modData = getModData();
+
+		if modData:GetSetting("LimitParticles") == 1 then return; end
+	end
+
 	if obj == nil or point == nil or normal == nil then return end;
 	
-	local localplayer = game.Players.LocalPlayer;
-	local modData = localplayer and require(localplayer:WaitForChild("DataModule"));
-
 	if obj:GetAttribute("IsLiquid") == true then
 		return;
 	end
@@ -599,28 +603,24 @@ function WeaponsMechanics.CreateBulletHole(obj, point, normal)
 	bulletHole.CastShadow = false;
 	bulletHole.Massless = true;
 	
-	if qualityLevel > 8 then
-		local smoke = smokeEffect:Clone();
-		smoke.Parent = bulletHole;
-		if obj then
-			smoke.Color = ColorSequence.new(obj.Color)
-		end;
-		smoke.Transparency = NumberSequence.new(0, 1);
-		
-		if qualityLevel > 6 then
-			spawn(function()
-				for a=1, 8 do
-					smoke.Lifetime = NumberRange.new(0.5, random:NextNumber(1, 1.5));
-					smoke.Size = NumberSequence.new(random:NextNumber(0.3, 0.5), 0);
-					smoke.Acceleration = normal*random:NextNumber(18, 20);
-					smoke:Emit(3);
-					RunService.Heartbeat:Wait();
-				end
-			end)
+	local smoke = smokeEffect:Clone();
+	smoke.Parent = bulletHole;
+	if obj then
+		smoke.Color = ColorSequence.new(obj.Color)
+	end;
+	smoke.Transparency = NumberSequence.new(0, 1);
+	
+	spawn(function()
+		for a=1, 8 do
+			smoke.Lifetime = NumberRange.new(0.5, random:NextNumber(1, 1.5));
+			smoke.Size = NumberSequence.new(random:NextNumber(0.3, 0.5), 0);
+			smoke.Acceleration = normal*random:NextNumber(18, 20);
+			smoke:Emit(3);
+			RunService.Heartbeat:Wait();
 		end
-			
-		game.Debris:AddItem(smoke, 10);
-	end
+	end)
+		
+	game.Debris:AddItem(smoke, 10);
 	
 	local decal = Instance.new("Decal");
 	decal.Face = Enum.NormalId.Front;
@@ -628,17 +628,14 @@ function WeaponsMechanics.CreateBulletHole(obj, point, normal)
 	decal.Transparency = 0;
 	decal.Parent = bulletHole;
 	
-	if qualityLevel > 6 then
-		
-		spawn(function()
-			wait(5);
-			for a=0, 1, 1/5/5 do
-				decal.Transparency = a;
-				wait(1/5);
-			end
-			bulletHole:Destroy();
-		end)
-	end
+	spawn(function()
+		wait(5);
+		for a=0, 1, 1/5/5 do
+			decal.Transparency = a;
+			wait(1/5);
+		end
+		bulletHole:Destroy();
+	end)
 	
 	local weld = Instance.new("WeldConstraint");
 	bulletHole.Parent = workspace.CurrentCamera;
@@ -649,15 +646,22 @@ function WeaponsMechanics.CreateBulletHole(obj, point, normal)
 	weld.Part0 = obj;
 	weld.Part1 = bulletHole;
 	
-	--bulletHole.CFrame = CFrame.new(point, point+normal-normal*0.025);
 	game.Debris:AddItem(bulletHole, 10);
 end;
 
 
 -- !outline: function CreateMuzzle(muzzleOrigin, bulletOrigin, multiShot, allowGenerateMuzzle)
 function WeaponsMechanics.CreateMuzzle(muzzleOrigin, bulletOrigin, multiShot, allowGenerateMuzzle)
+	local limitParticles = false;
+	if RunService:IsClient() then
+		modData = getModData();
+
+		limitParticles = modData:GetSetting("LimitParticles") == 1;
+	end
+
 	multiShot = multiShot or 1;
 	if muzzleOrigin ~= nil and allowGenerateMuzzle ~= false then
+
 		local muzzle = muzzleEffect:Clone();
 		muzzle.Parent = muzzleOrigin;
 		muzzle.Size = NumberSequence.new({
@@ -665,14 +669,16 @@ function WeaponsMechanics.CreateMuzzle(muzzleOrigin, bulletOrigin, multiShot, al
 			NumberSequenceKeypoint.new(1, 0.4, 0);
 		});
 		muzzle:Emit(1);
-		if qualityLevel > 8 then
-			local smoke = smokeEffect:Clone();
-			smoke.Parent = bulletOrigin;
-			smoke.Enabled = true;
-			smoke:Emit(5);
-			game.Debris:AddItem(smoke, 5);
-		end
 		game.Debris:AddItem(muzzle, 2);
+
+		if limitParticles then return end;
+
+		local smoke = smokeEffect:Clone();
+		smoke.Parent = bulletOrigin;
+		smoke.Enabled = true;
+		smoke:Emit(5);
+		game.Debris:AddItem(smoke, 5);
+
 		local newMuzzleLight = muzzleLight:Clone();
 		newMuzzleLight.Parent = muzzleOrigin;
 		newMuzzleLight.Enabled = true;
@@ -683,6 +689,12 @@ end;
 
 -- !outline: function CreateTracer(bulletOrigin, targetPoint, camera, color)
 function WeaponsMechanics.CreateTracer(bulletOrigin, targetPoint, camera, color, suppressed)
+	
+	if RunService:IsClient() then
+		modData = getModData();
+		if modData:GetSetting("DisableBulletTracers") == 1 then return end;
+	end
+
 	local originPoint = bulletOrigin.WorldPosition;
 	
 	local displace = (targetPoint-originPoint);
@@ -711,7 +723,7 @@ function WeaponsMechanics.CreateTracer(bulletOrigin, targetPoint, camera, color,
 	newTracer.Attachment1 = attPointF;
 	
 	local colorA = color or Color3.fromRGB(255, 89, 0);
-	local colorbH, colorbS, colorbV = colorA:ToHSV();
+	local colorbH, _colorbS, colorbV = colorA:ToHSV();
 	newTracer.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromHSV(colorbH, 255/255, colorbV)),
 		ColorSequenceKeypoint.new(0.3, Color3.fromHSV(colorbH, 200/255, colorbV)),
@@ -751,45 +763,6 @@ function WeaponsMechanics.CreateTracer(bulletOrigin, targetPoint, camera, color,
 	end)
 	tracerTweenB:Play();
 	tracerTweenF:Play();
-	
-	-- Old
-	--local bulletInstance = Instance.new("Part");
-	--bulletInstance.Name = "BulletTracer";
-	--bulletInstance.Size = Vector3.new(0, 0, 0);
-	--bulletInstance.Anchored = true;
-	--bulletInstance.CanCollide = false;
-	--bulletInstance.Transparency = 1;
-	
-	--local trailAttachment1 = Instance.new("Attachment");
-	--trailAttachment1.Position = Vector3.new(0, 0, 0);
-	--trailAttachment1.Parent = workspace.Terrain;
-	
-	--local trailAttachment2 = Instance.new("Attachment");
-	--trailAttachment2.Position = Vector3.new(0, 0, 0);
-	--trailAttachment2.Parent = bulletInstance;
-	
-	--trailAttachment1.WorldPosition =  bulletOrigin.WorldPosition + Vector3.new(0, 0.1, 0);
-	
-	--local newTracer = tracerEffect:Clone();
-	--newTracer.Attachment0 = trailAttachment1;
-	--newTracer.Attachment1 = trailAttachment2;
-	--newTracer.Color = (color and ColorSequence.new(color)) or newTracer.Color;
-	--newTracer.Parent = bulletInstance;
-	
-	--local distance = (targetPoint-bulletOrigin.WorldPosition);
-	----local dir = distance.Unit;
-	--distance = (distance.X^2 + distance.Y^2 + distance.Z^2);
-	--bulletInstance.CFrame = CFrame.new(bulletOrigin.WorldPosition); --+ (dir * -10)
-	--bulletInstance.Parent = camera;
-	--local tracerTween = TweenService:Create(bulletInstance, TweenInfo.new(0.1 * math.clamp(distance/10000, 1, 10)), {CFrame = CFrame.new(targetPoint)});
-	--tracerTween.Completed:Connect(function(state)
-	--	if state == Enum.PlaybackState.Completed or state == Enum.PlaybackState.Cancelled then
-	--		bulletInstance:Destroy();
-	--	end
-	--end)
-	--tracerTween:Play();
-	--game.Debris:AddItem(trailAttachment1, 0.1);
-	--game.Debris:AddItem(bulletInstance, 0.1);
 end;
 
 
@@ -828,7 +801,7 @@ function WeaponsMechanics.DamageModification(weaponModule, shotCache, player: Pl
 	local classPlayer = player and shared.modPlayers.Get(player) or nil;
 
 	local configurations = weaponModule.Configurations;
-	local properties = weaponModule.Properties;
+	--local properties = weaponModule.Properties;
 	
 	local preModDamage = configurations.PreModDamage;
 	local damage = configurations.Damage;

@@ -358,7 +358,7 @@ function Interface.NewWindow(name, frame)
 				self:Close();
 			end
 		end)
-		if modData.Settings.HideHotkey then
+		if modData:GetSetting("HideHotkey") == 1 then
 			hotKeyButton.Visible = false;
 		else
 			hotKeyButton.Visible = true;
@@ -562,7 +562,7 @@ function Interface:ConnectQuickButton(obj, keyId)
 	end
 	
 	quickButton.hotKey.Visible = not modConfigurations.DisableHotKeyLabels and UserInputService.KeyboardEnabled or false;
-	if modData.Settings.HideHotkey or modConfigurations.CompactInterface then
+	if modData:GetSetting("HideHotkey") == 1 or modConfigurations.CompactInterface then
 		quickButton.hotKey.Visible = false;
 	end
 	Interface.RefreshQuickButton(quickButton, false);

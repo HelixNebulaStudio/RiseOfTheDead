@@ -91,8 +91,10 @@ function Settings.UpdateAutoPickup(pickupCache, config)
 	end
 end
 
-local function trueOrNil(value)
+local function booleanOrNil(value)
+	if value == nil then return nil end;
 	if value == true or value == 1 then return 1; end
+	return 0;
 end
 
 --==Keybinds;
@@ -106,7 +108,7 @@ local function ignoreMouseKeys(key)
 	return key;
 end
 
-Settings.Add("HideHotkey", trueOrNil)
+Settings.Add("HideHotkey", booleanOrNil)
 
 Settings.Add("KeySprint", keyCheck);
 Settings.Add("KeyCrouch", keyCheck);
@@ -150,7 +152,7 @@ end)
 --end)
 
 
-Settings.Add("ShowScrollbars", trueOrNil)
+Settings.Add("ShowScrollbars", booleanOrNil)
 Settings.Add("Notifications", function(value)
 	if value then
 		if value == 1 then
@@ -161,8 +163,8 @@ Settings.Add("Notifications", function(value)
 	end
 	return nil;
 end)
-Settings.Add("CombineHealthbars", trueOrNil)
-Settings.Add("ToggleCrouch", trueOrNil)
+Settings.Add("CombineHealthbars", booleanOrNil)
+Settings.Add("ToggleCrouch", booleanOrNil)
 Settings.Add("CompactInterface", function(value)
 	if value then
 		if value == true or value == 1 then
@@ -173,14 +175,14 @@ Settings.Add("CompactInterface", function(value)
 	end
 	return nil;
 end)
-Settings.Add("DisableAccessoryHud", trueOrNil)
-Settings.Add("DisableDamageIndicator", trueOrNil)
+Settings.Add("DisableAccessoryHud", booleanOrNil)
+Settings.Add("DisableDamageIndicator", booleanOrNil)
 
 --== Social;
-Settings.Add("InviteFriendsOnly", trueOrNil)
-Settings.Add("HideLevelIcon", trueOrNil)
-Settings.Add("HidePlayerTitle", trueOrNil)
-Settings.Add("CinematicMode", trueOrNil)
+Settings.Add("InviteFriendsOnly", booleanOrNil)
+Settings.Add("HideLevelIcon", booleanOrNil)
+Settings.Add("HidePlayerTitle", booleanOrNil)
+Settings.Add("CinematicMode", booleanOrNil)
 
 Settings.Add("Nickname", function(value, player)
 	if type(value) ~= "string" then value = tostring(value) end;
@@ -197,14 +199,14 @@ Settings.Add("Nickname", function(value, player)
 	return resultValue;
 end)
 
-Settings.Add("TradeFriendsOnly", trueOrNil)
-Settings.Add("DisabledTravelRequests", trueOrNil)
+Settings.Add("TradeFriendsOnly", booleanOrNil)
+Settings.Add("DisabledTravelRequests", booleanOrNil)
 
 --== Graphics;
-Settings.Add("DamageBubble", trueOrNil)
-Settings.Add("BloodParticle", trueOrNil)
+Settings.Add("DamageBubble", booleanOrNil)
+Settings.Add("BloodParticle", booleanOrNil)
 
-Settings.Add("DisableDeathRagdoll", trueOrNil)
+Settings.Add("DisableDeathRagdoll", booleanOrNil)
 Settings.Add("MaxDeadbodies", function(v)
 	return v and tonumber(v) and math.clamp(tonumber(v), 0, 64) or nil;
 end)
@@ -212,24 +214,25 @@ Settings.Add("DeadbodyDespawnTimer", function(v)
 	return v and tonumber(v) and math.clamp(tonumber(v), 0, 61) or nil;
 end)
 
-Settings.Add("ObjMats", trueOrNil)
+Settings.Add("ObjMats", booleanOrNil)
 
-Settings.Add("FilterColors", trueOrNil)
-Settings.Add("FilterSunRays", trueOrNil)
+Settings.Add("FilterColors", booleanOrNil)
+Settings.Add("FilterSunRays", booleanOrNil)
 
-Settings.Add("HideFarSmallObjects", trueOrNil)
-Settings.Add("LessDetail", trueOrNil)
+Settings.Add("HideFarSmallObjects", booleanOrNil)
+Settings.Add("LessDetail", booleanOrNil)
 
-Settings.Add("NiceParticles", trueOrNil)
-Settings.Add("ReduceMaxDebris", trueOrNil)
-Settings.Add("GlobalShadows", trueOrNil)
-Settings.Add("DisableSmallShadows", trueOrNil)
-Settings.Add("DisableTextureAnimation", trueOrNil)
-Settings.Add("DisableParticle3D", trueOrNil)
+Settings.Add("DisableBulletTracers", booleanOrNil)
+Settings.Add("LimitParticles", booleanOrNil)
+Settings.Add("ReduceMaxDebris", booleanOrNil)
+Settings.Add("GlobalShadows", booleanOrNil)
+Settings.Add("DisableSmallShadows", booleanOrNil)
+Settings.Add("DisableTextureAnimation", booleanOrNil)
+Settings.Add("DisableParticle3D", booleanOrNil)
 
 --==
---Settings.Add("UseOldHands", trueOrNil)
-Settings.Add("UseOldZombies", trueOrNil);
+--Settings.Add("UseOldHands", booleanOrNil)
+Settings.Add("UseOldZombies", booleanOrNil);
 
 --== Audio;
 local function volumeCheck(v)
@@ -558,12 +561,21 @@ baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 		RefreshGraphics=true;
 	};
 });
+
 baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
-	TitleProperties={Text="More Particles";};
-	DescProperties={Text="Disabling caps the particle limit for each particle effects.";};
+	TitleProperties={Text="Disable Bullet Tracers";};
+	DescProperties={Text="Disabling the trails that visualizes hitscan bullets.";};
 	Config={
-		SettingsKey="NiceParticles";
+		SettingsKey="DisableBulletTracers";
 		Type="Toggle";
+	};
+});
+baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
+	TitleProperties={Text="Limit Particles";};
+	DescProperties={Text="Hides or limits unimportant particles.";};
+	Config={
+		SettingsKey="LimitParticles";
+		Type="Toggle;Disabled;Enabled";
 	};
 });
 baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {

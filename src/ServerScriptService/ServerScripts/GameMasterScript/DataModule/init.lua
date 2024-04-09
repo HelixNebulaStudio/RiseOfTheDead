@@ -6,7 +6,7 @@ Data.Script = script;
 
 local CollectionService = game:GetService("CollectionService");
 
-local localplayer = game.Players.LocalPlayer;
+local localplayer: Player = game.Players.LocalPlayer;
 local modItemsLibrary = require(game.ReplicatedStorage:WaitForChild("Library", 60):WaitForChild("ItemsLibrary", 60));
 
 local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
@@ -70,6 +70,7 @@ end
 
 function Data:GetModCharacter()
 	local fiveSecTick = tick();
+	
 	while localplayer.Character == nil do
 		task.wait();
 		if tick()-fiveSecTick >= 5 then
@@ -78,7 +79,10 @@ function Data:GetModCharacter()
 		end
 	end
 	
-	return require(localplayer.Character:WaitForChild("CharacterModule"));
+	local character: Model? = localplayer.Character;
+	if character == nil then return end;
+	
+	return require(character:WaitForChild("CharacterModule") :: any);
 end
 
 -- !outline: Data:SaveSettings()

@@ -9,9 +9,12 @@ function Data:IsMobile()
 end
 
 local DefaultSettings = {
+	["DisableDeathRagdoll"] = (Data:IsMobile() and 1 or 0);
 	["MaxDeadbodies"] = (Data:IsMobile() and 0 or 16);
-	["DisableParticle3D"] = (Data:IsMobile() and true or nil);
-	["NiceParticles"] = (Data:IsMobile() and true or nil); -- limit particles;
+	["DisableParticle3D"] = (Data:IsMobile() and 1 or 0);
+	["LimitParticles"] = (Data:IsMobile() and 1 or 0); -- limit particles;
+	["DisableBulletTracers"] = (Data:IsMobile() and 1 or 0);
+	["BloodParticle"] = (Data:IsMobile() and 1 or 0);
 };
 
 -- !outline: Data:IsSettingsLoaded()
@@ -19,7 +22,6 @@ function Data:IsSettingsLoaded()
 	return self.Script:GetAttribute("SettingsLoaded") == true;
 end
 
---DisableParticle3D
 -- !outline: Data:GetSetting(key)
 function Data:GetSetting(key)
 	local settingsValue = self.Script:GetAttribute("Settings"..key);

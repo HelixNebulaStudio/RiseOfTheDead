@@ -205,36 +205,6 @@ function Cutscene.New(cutsceneName)
 end
 
 if RunService:IsClient() then
-	local function getQualityLevel()
-		local quality =  UserGameSettings.SavedQualityLevel;
-		if quality == Enum.SavedQualitySetting.QualityLevel1 then
-			Cutscene.QualityLevel = 1;
-		elseif quality == Enum.SavedQualitySetting.QualityLevel2 then
-			Cutscene.QualityLevel = 2;
-		elseif quality == Enum.SavedQualitySetting.QualityLevel3 then
-			Cutscene.QualityLevel = 3;
-		elseif quality == Enum.SavedQualitySetting.QualityLevel4 then
-			Cutscene.QualityLevel = 4;
-		elseif quality == Enum.SavedQualitySetting.QualityLevel5 then
-			Cutscene.QualityLevel = 5;
-		elseif quality == Enum.SavedQualitySetting.QualityLevel6 then
-			Cutscene.QualityLevel = 6;
-		elseif quality == Enum.SavedQualitySetting.QualityLevel7 then
-			Cutscene.QualityLevel = 7;
-		elseif quality == Enum.SavedQualitySetting.QualityLevel8 then
-			Cutscene.QualityLevel = 8;
-		elseif quality == Enum.SavedQualitySetting.QualityLevel9 then
-			Cutscene.QualityLevel = 9;
-		elseif quality == Enum.SavedQualitySetting.QualityLevel10  then
-			Cutscene.QualityLevel = 10;
-		end
-	end
-	
-	getQualityLevel();
-	UserGameSettings.Changed:Connect(function()
-		getQualityLevel();
-	end)
-
 	local activeCutscenes = {};
 	function remotePlayClientScene.OnClientInvoke(cutsceneName, sceneName)
 		Debugger:Log("client Play Cutscene ( "..cutsceneName..": "..sceneName.." )");
