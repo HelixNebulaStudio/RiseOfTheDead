@@ -77,7 +77,7 @@ function CutsceneSequence.new(cutscene)
 							remotePlayClientScene:InvokeClient(player, cutscene.Name, sceneName);
 							invoked = true;
 						end)
-						for a=1, 3, 0.1 do
+						for a=1, 5, 0.1 do
 							if not invoked then
 								task.wait(0.1);
 							else

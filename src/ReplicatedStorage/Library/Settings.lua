@@ -2,11 +2,9 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 ---
 local Settings = {};
 
-local TextService = game:GetService("TextService");
 local RunService = game:GetService("RunService");
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-local modPlayerTitlesLibrary = require(game.ReplicatedStorage.Library.PlayerTitlesLibrary);
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 
@@ -37,6 +35,7 @@ function Settings.Set(player, key, value)
 	if modData.Profile and modData.Profile.Settings then
 		modData.Profile.Settings[key] = modData.Settings[key];
 	end
+	modData:SetSetting(key, newVal);
 	
 	if oldVal ~= newVal then
 		Settings.OnChanged:Fire(key);
@@ -208,10 +207,10 @@ Settings.Add("BloodParticle", booleanOrNil)
 
 Settings.Add("DisableDeathRagdoll", booleanOrNil)
 Settings.Add("MaxDeadbodies", function(v)
-	return v and tonumber(v) and math.clamp(tonumber(v), 0, 64) or nil;
+	return v and tonumber(v) and math.clamp(tonumber(v) :: number, 0, 64) or nil;
 end)
 Settings.Add("DeadbodyDespawnTimer", function(v)
-	return v and tonumber(v) and math.clamp(tonumber(v), 0, 61) or nil;
+	return v and tonumber(v) and math.clamp(tonumber(v) :: number, 0, 61) or nil;
 end)
 
 Settings.Add("ObjMats", booleanOrNil)
@@ -236,7 +235,7 @@ Settings.Add("UseOldZombies", booleanOrNil);
 
 --== Audio;
 local function volumeCheck(v)
-	return v and tonumber(v) and math.clamp(tonumber(v), 0, 100) or nil;
+	return v and tonumber(v) and math.clamp(tonumber(v) :: number, 0, 100) or nil;
 end
 Settings.Add("SndAmbient", volumeCheck);
 Settings.Add("SndBackgroundMusic", volumeCheck);
@@ -300,7 +299,7 @@ Settings.Add("AutoPickupConfig", function(t)
 	for a=#t, 1, -1 do
 		local listItem = t[a];
 		local keyword = listItem.Keyword;
-		local listType = listItem.Mode;
+		--local listType = listItem.Mode;
 
 		local isSearchWord = keyword:sub(1,1) == "*";
 		if isSearchWord then
@@ -567,7 +566,7 @@ baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 	DescProperties={Text="Disabling the trails that visualizes hitscan bullets.";};
 	Config={
 		SettingsKey="DisableBulletTracers";
-		Type="Toggle";
+		Type="Toggle;Disabled;Enabled";
 	};
 });
 baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {

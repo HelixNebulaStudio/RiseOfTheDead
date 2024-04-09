@@ -34,4 +34,8 @@ function Data:GetSetting(key)
 	return settingsValue;
 end
 
+function Data:SetSetting(key, value)
+	self.Script:SetAttribute("Settings"..key, value);
+end
+
 return Data;

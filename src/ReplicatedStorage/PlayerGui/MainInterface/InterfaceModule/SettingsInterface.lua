@@ -8,7 +8,7 @@ local RunService = game:GetService("RunService");
 local UserInputService = game:GetService("UserInputService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = require(localPlayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
@@ -675,12 +675,11 @@ function Interface.init(modInterface)
 				elseif elementInfo.TemplateName == "SliderOption" then
 					local button = elementInst:WaitForChild("Button");
 					
-					local settingVal = modData:GetSetting(config.SettingsKey);
-					
 					if config.Type == "SoundGroup" then
 						config.SettingsKey = "Snd"..config.SoundGroupKey;
 						config.SoundGroup = game.SoundService:FindFirstChild(config.SoundGroupKey);
 						
+						local settingVal = modData:GetSetting(config.SettingsKey);
 						local rangeInfo = {Min=0; Max=100; Default=(settingVal or 50);};
 						modComponents.CreateSlider(Interface, {
 							Button=button;
@@ -704,8 +703,10 @@ function Interface.init(modInterface)
 						});
 						
 					else
+						local settingVal = modData:GetSetting(config.SettingsKey);
+
 						local rangeInfo = config.RangeInfo;
-						rangeInfo.Default = (modData:GetSetting(config.SettingsKey) or rangeInfo.Default);
+						rangeInfo.Default = (settingVal or rangeInfo.Default);
 						
 						modComponents.CreateSlider(Interface, {
 							Button=button;
