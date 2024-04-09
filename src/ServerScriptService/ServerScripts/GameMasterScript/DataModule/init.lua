@@ -1,25 +1,16 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
-local Data = {};
-setmetatable(Data, require(game.ReplicatedStorage.ParallelLibrary.DataModule))
-Data.Script = script;
+local dataMeta = require(game.ReplicatedStorage.ParallelLibrary.DataModule);
+local Data = setmetatable({Script = script;}, dataMeta);
 
 local CollectionService = game:GetService("CollectionService");
 
 local localplayer: Player = game.Players.LocalPlayer;
-local modItemsLibrary = require(game.ReplicatedStorage:WaitForChild("Library", 60):WaitForChild("ItemsLibrary", 60));
 
-local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
-local modTools = require(game.ReplicatedStorage.Library.Tools);
-local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
-local modSkillTreeLibrary = require(game.ReplicatedStorage.Library.SkillTreeLibrary);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 
-local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 local modEventSignal = require(game.ReplicatedStorage.Library:WaitForChild("EventSignal"));
-local ClientSquad = require(script:WaitForChild("ClientSquad"))(Data);
 
 local remotePlayerDataSync = modRemotesManager:Get("PlayerDataSync");
 local remotePlayerDataFetch = modRemotesManager:Get("PlayerDataFetch");
@@ -103,7 +94,6 @@ function Data:UpdateSettings(func)
 end
 
 
-local loggedError = false;
 function Data:GetInterfaceModule(tryFind)
 	local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui");
 	
@@ -190,6 +180,7 @@ function Data.GetItemById(id, onCharacterOnly)
 			end;
 		end
 	end
+	return;
 end
 
 function Data.GetStorageOfItem(id)
@@ -203,6 +194,7 @@ function Data.GetStorageOfItem(id)
 		return Data.Storages["Wardrobe"];
 		
 	end
+	return;
 end
 
 -- !outline: Data.UpdatePickupCache()
@@ -223,6 +215,8 @@ function Data.FindIndexFromStorage(storageId, index)
 			return storageItem;
 		end
 	end
+
+	return;
 end
 
 -- !outline: Data.FindIdFromStorages(id)
@@ -232,6 +226,7 @@ function Data.FindIdFromStorages(id)
 			return storage.Container[id];
 		end;
 	end
+	return;
 end
 
 -- !outline: Data.FindNameFromStorages(name)
@@ -243,6 +238,7 @@ function Data.FindNameFromStorages(name)
 			end
 		end
 	end
+	return;
 end
 
 -- !outline: Data.FindItemIdFromStorages(itemId)
@@ -254,6 +250,7 @@ function Data.FindItemIdFromStorages(itemId)
 			end
 		end
 	end
+	return;
 end
 
 -- !outline: Data.FindItemIdFromCharacter(itemId)
@@ -286,6 +283,7 @@ function Data.FindItemIdFromCharacter(itemId)
 			end
 		end
 	end
+	return;
 end
 
 -- !outline: Data.ListItemIdFromCharacter(itemId)
@@ -403,6 +401,8 @@ function Data.CountItemIdFromStorages(itemId)
 end
 
 function Data.GetAllMods()
+	local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+
 	local mods = {};
 	local storages = {Data.Storages.Inventory; Data.Storages["Safehouse Storage"]};
 	for storageId, storage in pairs(storages) do
@@ -457,6 +457,7 @@ function Data:GetFlag(flagId, fetch)
 			return flag;
 		end
 	end
+	return;
 end
 
 Data.Events = {};
@@ -497,6 +498,8 @@ end
 
 
 function Data:SetSquad(squad)
+	local ClientSquad = require(script:WaitForChild("ClientSquad"))(Data);
+	
 	if squad then
 		if Data.Squad == nil then
 			Data.Squad = ClientSquad.new();
@@ -515,6 +518,8 @@ function Data:SetSquad(squad)
 end
 
 function Data:GetBaseToolModule(itemId)
+	local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
+	local modTools = require(game.ReplicatedStorage.Library.Tools);
 	if modWeapons[itemId] then
 		return require(modWeapons[itemId].Module)(), "Weapon";
 		
@@ -522,6 +527,8 @@ function Data:GetBaseToolModule(itemId)
 		return require(modTools[itemId].Module)(), "Tool";
 		
 	end
+
+	return;
 end
 
 -- !outline: Data:GetItemClass(storageItemId, getShadowCopy)
@@ -529,8 +536,8 @@ function Data:GetItemClass(storageItemId, getShadowCopy)
 	local storageItem = Data.GetItemById(storageItemId); 
 	if storageItem == nil then return end;
 	
-	local player = localplayer;
-	
+	local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+
 	local itemValues = storageItem.Values;
 	local itemId = storageItem.ItemId;
 	local itemLib = modItemsLibrary:Find(itemId);
@@ -541,6 +548,9 @@ function Data:GetItemClass(storageItemId, getShadowCopy)
 
 	local attachmentStorage = Data.GetItemStorage(storageItemId);
 	
+	local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
+	local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
+
 	local function update(class)
 		if class.Reset then class:Reset(); end;
 		if modConfigurations.SkipRotDModding == true then return class; end;
@@ -576,6 +586,9 @@ function Data:GetItemClass(storageItemId, getShadowCopy)
 	end
 	
 	if itemLib.Type == modItemsLibrary.Types.Tool then
+		local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
+		local modTools = require(game.ReplicatedStorage.Library.Tools);
+
 		if modWeapons[itemId] then
 			classType = "Weapon";
 			classLib = modWeapons[itemId];
@@ -587,6 +600,8 @@ function Data:GetItemClass(storageItemId, getShadowCopy)
 		end
 		
 	elseif itemLib.Type == modItemsLibrary.Types.Clothing then
+		local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
+
 		classType = "Clothing";
 		classLib = modClothingLibrary:Find(itemId);
 		
@@ -601,6 +616,8 @@ function Data:GetItemClass(storageItemId, getShadowCopy)
 		end
 		
 	end
+	
+	return;
 end
 
 function Data:WaitForMissions()
@@ -621,17 +638,23 @@ function Data:GetMission(id)
 			end
 		end
 	end
+
+	return;
 end
 
 function Data:GetSkillTree(skillId)
 	local skilltree = Data.Profile.SkillTree.ActiveTree and Data.Profile.SkillTree.Trees[Data.Profile.SkillTree.ActiveTree];
 	
+	local modSkillTreeLibrary = require(game.ReplicatedStorage.Library.SkillTreeLibrary);
+
 	local lib = modSkillTreeLibrary:Find(skillId);
 	local pts = skilltree and skilltree.Data and skilltree.Data[skillId] or 0;
 	
 	if lib and pts then
 		return modSkillTreeLibrary:CalStats(lib, pts);
 	end
+
+	return;
 end
 
 

@@ -83,9 +83,12 @@ function Debugger:Require(module, printStat)
 	
 	local s, e;
 	if requireCache[moduleName] == nil then
+		local debugTracing = debug.traceback();
 		delay(5, function()
 			if not successful then
-				self:Warn("Module("..module.Name..") require timed out. ".. (not s and e or "")); end end)
+				self:Warn("Module("..module.Name..") require timed out. ".. (not s and e or ""),"\n",debugTracing);
+			end 
+		end)
 	end
 	
 	local r;

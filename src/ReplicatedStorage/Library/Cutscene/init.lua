@@ -13,14 +13,10 @@ Cutscene.ActiveCutscenes = {};
 local RunService = game:GetService("RunService");
 
 local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
-local remotePlayServerScene = remotes:WaitForChild("Cutscene"):WaitForChild("PlayServerScene");
 local remotePlayClientScene = remotes:WaitForChild("Cutscene"):WaitForChild("PlayClientScene");
 local remoteContinueScene = remotes:WaitForChild("Cutscene"):WaitForChild("ContinueScene");
 local remoteClientReady = remotes:WaitForChild("Cutscene"):WaitForChild("ClientReady");
 local bindPlayServerScene = remotes:WaitForChild("Cutscene"):WaitForChild("PlayServerScene");
-
-local localPlayer = game.Players.LocalPlayer;
-local UserGameSettings = UserSettings():GetService("UserGameSettings");
 
 local CutsceneSequence = {};
 
@@ -76,9 +72,23 @@ function CutsceneSequence.new(cutscene)
 				cutscene:ForEachPlayer(function(player)
 					completed[player.Name] = false;
 					local success, failedErr = pcall(function()
-						remotePlayClientScene:InvokeClient(player, cutscene.Name, sceneName);
+						local invoked = false;
+						task.spawn(function()
+							remotePlayClientScene:InvokeClient(player, cutscene.Name, sceneName);
+							invoked = true;
+						end)
+						for a=1, 3, 0.1 do
+							if not invoked then
+								task.wait(0.1);
+							else
+								break;
+							end
+						end
+						if not invoked then
+							error("Client failed to respond.");
+						end
 					end)
-					if not success then Debugger:Warn(sceneName," failed: ",failedErr) end;
+					if not success then Debugger:Warn("NewScene (",sceneName,") failed: ",failedErr) end;
 					completed[player.Name] = true;
 	
 					local c = true;
@@ -169,7 +179,11 @@ function Cutscene.New(cutsceneName)
 	local library = Cutscene.Scenes[cutsceneName];
 	if library == nil then Debugger:Warn("Cutscene.New (",cutsceneName,") does not exist."); return end;
 	
-	local cutscene = {Name=library.Name; File=library.File;};
+	local cutscene = {
+		Name=library.Name;
+		File=library.File;
+		Sequence=nil;
+	};
 	if cutscene.Sequence == nil then
 		local cutsceneSequence = Debugger:Require(cutscene.File)(CutsceneSequence.new(cutscene));
 		if cutsceneSequence == nil then
@@ -207,13 +221,21 @@ end
 if RunService:IsClient() then
 	local activeCutscenes = {};
 	function remotePlayClientScene.OnClientInvoke(cutsceneName, sceneName)
-		Debugger:Log("client Play Cutscene ( "..cutsceneName..": "..sceneName.." )");
-		if activeCutscenes[cutsceneName] == nil then
-			activeCutscenes[cutsceneName] = Cutscene.New(cutsceneName);
+		if RunService:IsStudio() then
+			Debugger:Warn("[Studio]","Play Cutscene ( "..cutsceneName..": "..sceneName.." )")
 		end
-		if activeCutscenes[cutsceneName] and activeCutscenes[cutsceneName].Sequence[sceneName] then
-			activeCutscenes[cutsceneName].Status = Cutscene.Status.Playing;
-			activeCutscenes[cutsceneName].Sequence[sceneName]();
+		local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+
+		local cutsceneObj = activeCutscenes[cutsceneName];
+		if cutsceneObj == nil then
+			cutsceneObj = Cutscene.New(cutsceneName);
+			activeCutscenes[cutsceneName] = cutsceneObj;
+		end
+		cutsceneObj.modData = modData;
+
+		if cutsceneObj and cutsceneObj.Sequence[sceneName] then
+			cutsceneObj.Status = Cutscene.Status.Playing;
+			cutsceneObj.Sequence[sceneName]();
 		else
 			Debugger:Warn("Cutscene>> Scene(",sceneName,") does not exist for (",cutsceneName,").");
 		end

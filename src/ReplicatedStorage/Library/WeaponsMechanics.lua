@@ -30,7 +30,6 @@ local function getModData()
 	modData = localplayer and require(localplayer:WaitForChild("DataModule") :: any);
 	return modData;
 end
-getModData();
 
 --== Script;
 WeaponsMechanics.EquipUpdateExperience = true;
@@ -233,7 +232,7 @@ function WeaponsMechanics.ProcessModHooks(damageSource)
 			storageItemOfMod = modStorage.FindIdFromStorages(modInfo.StorageItemID, dealer);
 
 		else
-			local modData = require(dealer:WaitForChild("DataModule"));
+			local modData = getModData();
 			storageItemOfMod = modData.GetItemById(modInfo.StorageItemID);
 
 		end
