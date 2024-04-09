@@ -330,6 +330,7 @@ return function()
 		RunService.Stepped:Connect(function()
 			if qualityLevel < 5 then return end;
 			if classPlayer == nil then return end;
+			if modGlobalVars.IsMobile() then return end;
 			
 			local isFirstPerson = player:GetAttribute("IsFirstPerson") or false;
 			
