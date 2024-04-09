@@ -22,7 +22,7 @@ if RunService:IsServer() then
 	modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 	
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 
@@ -496,7 +496,7 @@ return function(CutsceneSequence)
 					bmLight.Color = Color3.fromRGB(102, 199, 102);
 					bmLight.Material = Enum.Material.Neon;
 					
-					local bmPointLight: PointLight = bmLight:WaitForChild("_lightPoint"):WaitForChild("PointLight");
+					local bmPointLight: PointLight = bmLight:WaitForChild("_lightPoint"):WaitForChild("PointLight") :: PointLight;
 					bmPointLight.Enabled = true;
 
 				elseif stage == 7 then
@@ -597,67 +597,7 @@ return function(CutsceneSequence)
 							
 						end
 					end);
-					
-					--task.spawn(function()
-					--	local startTick = tick();
-					--	local lastTick = startTick;
-					--	local ratio = 1;
-					--	patrolBandit.PatienceTick = startTick;
-						
-					--	local chatCount = 0;
-					--	while mission.ProgressionPoint == 9 do
-					--		task.wait(0.1);
-					--		if lastTick ~= patrolBandit.PatienceTick then
-					--			lastTick = patrolBandit.PatienceTick;
-					--			chatCount = 0;
-					--			ratio = math.clamp(ratio - 0.05, 0.5, 1);
-					--		end
-					--		patrolBandit.Movement:Face(classPlayer:GetCFrame().Position);
-							
-					--		local patienceSec = math.ceil((tick()-patrolBandit.PatienceTick)*10)/10;
-					--		Debugger:Warn("Bandit patience",patienceSec);
-							
-					--		if patienceSec >= ratio*20 then
-					--			break;
-					--		elseif patienceSec >= ratio*15 then
-					--			if chatCount == 1 then
-					--				chatCount = 2;
-					--				if patrolBandit.PatienceTick == startTick then
-					--					patrolBandit.Chat(player, "Last warning, I will shoot!");
-					--				else
-					--					patrolBandit.Chat(player, "Well?!");
-					--				end
-									
-					--			end
-								
-					--		elseif patienceSec >= ratio*10 then
-					--			if chatCount == 0 then
-					--				chatCount = 1;
-					--				if patrolBandit.PatienceTick == startTick then
-					--					patrolBandit.Chat(player, "Hey! I'm talking to you!");
 
-					--				else
-					--					patrolBandit.Chat(player, "Answer me!");
-
-					--				end
-					--			end
-								
-					--		end
-					--	end
-
-					--	task.wait(3);
-					--	if mission.ProgressionPoint == 9 then
-					--		patrolBandit.Chat(player, "Okay, you asked for this!");
-							
-					--		modMission:Progress(player, missionId, function(mission)
-					--			if mission.ProgressionPoint <= 10 then
-					--				mission.ProgressionPoint = 10;
-					--			end
-					--		end);
-					--	end
-					--end)
-					
-					
 				elseif stage == 10 then
 
 					-- Bandit aggro-ed
@@ -797,7 +737,7 @@ return function(CutsceneSequence)
 			end
 		end
 		mission.Changed:Connect(OnChanged);
-		OnChanged(true, mission);
+		OnChanged(true);
 		
 		CutsceneSequence:NextScene("enableInterfaces");
 	end)
