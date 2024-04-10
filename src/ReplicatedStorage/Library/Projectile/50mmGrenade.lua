@@ -25,9 +25,7 @@ function Pool.new()
 		RayRadius=0.25;
 	}
 	
-	
 	function projectile:Activate()
-		Debugger:Warn("lifeTime", self.ArcTracerConfig.LifeTime);
 		Debugger.Expire(self.Prefab, self.ArcTracerConfig.LifeTime);
 	end
 		

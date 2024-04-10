@@ -107,7 +107,7 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 	params.MinDamage = params.MinDamage or 20;
 	params.DamageRatio = params.DamageRatio or nil;
 	params.ExplosionStun = params.ExplosionStun or 0.5;
-	params.ExplosionForce = params.ExplosionForce or 50;
+	params.ExplosionForce = params.ExplosionForce or 100;
 	params.Owner = params.Owner or nil;
 	params.DamageOrigin = position or params.DamageOrigin or nil;
 
@@ -194,10 +194,10 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 							local dir = (assemblyRootPart.Position-position).Unit;
 							--assemblyRootPart.Velocity = dir * params.ExplosionForce + Vector3.new(0, 40, 0);
 						
-							newDmgSrc.DamageForce = dir * assemblyRootPart.AssemblyMass * params.ExplosionForce;
+							newDmgSrc.DamageForce = dir * params.ExplosionForce;
 							newDmgSrc.DamagePosition = basePart.Position;
 
-							assemblyRootPart:ApplyImpulse(newDmgSrc.DamageForce);
+							assemblyRootPart:ApplyImpulse(newDmgSrc.DamageForce * assemblyRootPart.AssemblyMass);
 						end
 						
 						damagable:TakeDamagePackage(newDmgSrc);

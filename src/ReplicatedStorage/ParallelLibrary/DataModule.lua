@@ -35,6 +35,10 @@ function Data:GetSetting(key)
 end
 
 function Data:SetSetting(key, value)
+	if typeof(value) == "table" then
+		return;
+	end
+	
 	self.Script:SetAttribute("Settings"..key, value);
 end
 
