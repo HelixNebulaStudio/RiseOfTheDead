@@ -1,12 +1,16 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Player = {};
-local PlayerService = {};
+local PlayerService = {
+	Players = nil;
+	SkillTree = nil;
+	OnPlayerSpawn = nil;
+	OnPlayerDied = nil;
+};
 
 local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
 
-local tL = tick();
 local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
@@ -17,7 +21,6 @@ local modStatusLibrary = require(game.ReplicatedStorage.Library.StatusLibrary);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modCustomizeAppearance = require(game.ReplicatedStorage.Library.CustomizeAppearance);
 local modMapLibrary = require(game.ReplicatedStorage.Library.MapLibrary);
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 
@@ -133,7 +136,9 @@ function Player.new(playerInstance: Player)
 			classPlayer.StatusCycle:Disconnect();
 		end
 		
-		playerInstance.Character:Destroy();
+		if playerInstance.Character then
+			playerInstance.Character:Destroy();
+		end
 	end
 	
 	function meta:Kill(killReason)
@@ -268,7 +273,7 @@ function Player.new(playerInstance: Player)
 	function meta:TakeDamagePackage(damageSource)
 		local damage = damageSource.Damage;
 		local dealer = damageSource.Dealer;
-		local storageItem = damageSource.ToolStorageItem;
+		--local storageItem = damageSource.ToolStorageItem;
 		local hitPart = damageSource.TargetPart;
 		local damageType = damageSource.DamageType;
 		local damageCategory = damageSource.DamageCate or "Generic";
@@ -423,7 +428,7 @@ function Player.new(playerInstance: Player)
 				return;
 			end
 
-			local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
+			local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects :: DataModel);
 			if classPlayer.Properties.Freezing == nil and classPlayer.Properties.Burn == nil then
 				if classPlayer.Properties.TooHot and math.random(1, 2) == 1 then
 					modStatusEffects.Burn(playerInstance, math.clamp(classPlayer.Properties.TooHot.Amount-40, 0, 10), 5);
@@ -614,8 +619,8 @@ function Player.new(playerInstance: Player)
 	end
 	
 	function meta:RefreshHealRate()
-		local oldRate = classPlayer.Properties.HealRate;
-		local rate = 0;
+		local oldHealRate = classPlayer.Properties.HealRate;
+		local healRate = 0;
 		
 		local isDead = not classPlayer.IsAlive;
 		
@@ -627,30 +632,30 @@ function Player.new(playerInstance: Player)
 				classPlayer.Properties.HealSources[k] = nil;
 				
 			elseif healdata.Expires == nil or modSyncTime.GetTime() <= healdata.Expires then
-				rate = rate + healdata.Amount;
+				healRate = healRate + healdata.Amount;
 				
 			else
 				classPlayer.Properties.HealSources[k] = nil;
 			end
 		end
-		classPlayer.Properties.HealRate = rate;
-		if oldRate ~= rate and RunService:IsServer() then
+		classPlayer.Properties.HealRate = healRate;
+		if oldHealRate ~= healRate and RunService:IsServer() then
 			remotePlayerProperties:FireAllClients(classPlayer.Name, "SetProperties", "HealSources", classPlayer.Properties.HealSources);
 			remotePlayerProperties:FireAllClients(classPlayer.Name, "SetProperties", "HealRate", classPlayer.Properties.HealRate);
 		end
 		
 		-- Armor;
-		local rate = BaseArmorRate;
+		local armorRate = BaseArmorRate;
 		for k, srcdata in pairs(classPlayer.Properties.ArmorSources) do
 			if isDead and srcdata.ExpiresOnDeath then
 				classPlayer.Properties.ArmorSources[k] = nil;
 			elseif srcdata.Expires == nil or modSyncTime.GetTime() <= srcdata.Expires then
-				rate = rate + srcdata.Amount;
+				armorRate = armorRate + srcdata.Amount;
 			else
 				classPlayer.Properties.ArmorSources[k] = nil;
 			end
 		end
-		classPlayer.Properties.ArmorRate = rate;
+		classPlayer.Properties.ArmorRate = armorRate;
 		
 	end
 	
@@ -673,7 +678,10 @@ function Player.new(playerInstance: Player)
 	function meta.OnCharacterAdded(character: Model)
 		if character == nil then return end;
 		Debugger:Log("Character", playerInstance.Name,"spawned. ", character:GetFullName());
-		local cache = {};
+		local cache = {
+			ColdBreathParticles = nil;
+			WaterBubblesParticles = nil;
+		};
 		
 		character:SetAttribute("PlayerCharacter", playerInstance.Name);
 		
@@ -683,14 +691,8 @@ function Player.new(playerInstance: Player)
 		classPlayer.Head = character:WaitForChild("Head");
 		classPlayer.CharacterModule = require(character:WaitForChild("CharacterModule"));
 
-		local woundedDuration = modConfigurations.BaseWoundedDuration;
-
 		classPlayer.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false);
 		classPlayer.DeathDebounce = false;
-		
-		--if modConfigurations.DisableDeadHumanoidStateType or woundedDuration > 0 then
-		--	Debugger:Warn("DisableDeadHumanoidStateType");
-		--end
 		
 		local ragdollActive = false;
 		local function onStateChanged(oldState: Enum.HumanoidStateType, newState: Enum.HumanoidStateType)
@@ -1112,7 +1114,7 @@ function Player.new(playerInstance: Player)
 					
 					classPlayer.Humanoid:SetAttribute("IsSwimming", classPlayer.IsSwimming);
 					
-					local layerName, layerData = modMapLibrary:GetLayer(classPlayer.RootPart.Position);
+					local layerName, _layerData = modMapLibrary:GetLayer(classPlayer.RootPart.Position);
 					playerInstance:SetAttribute("Location", layerName);
 					
 				end
@@ -1122,7 +1124,7 @@ function Player.new(playerInstance: Player)
 					if classPlayer.IsSwimming then
 						local headpos = classPlayer.Head.Position + Vector3.new(0, 1, 0);
 						local headRegion = Region3.new(headpos, headpos):ExpandToGrid(4);
-						local mats, occs = workspace.Terrain:ReadVoxels(headRegion, 4);
+						local mats, _occs = workspace.Terrain:ReadVoxels(headRegion, 4);
 						headInMaterial = mats and mats[1][1][1] or nil;
 					end
 
@@ -1193,7 +1195,7 @@ function Player.new(playerInstance: Player)
 							end
 
 							if classPlayer.Properties.Wounded and classPlayer.Properties.Ragdoll ~= 1 then
-								local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
+								local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects :: ModuleScript);
 								
 								modStatusEffects.Ragdoll(playerInstance, true);
 							end
@@ -1451,6 +1453,7 @@ function Player.new(playerInstance: Player)
 			end
 			return obj;
 		end
+		return;
 	end
 	
 	function meta:SyncProperties(keys)
