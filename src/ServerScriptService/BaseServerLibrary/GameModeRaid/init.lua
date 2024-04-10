@@ -23,24 +23,17 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
-local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
-local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modDoors = require(game.ReplicatedStorage.Library.Doors);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 
-local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
 local remoteGameModeHud = modRemotesManager:Get("GameModeHud");
 local remoteDoorInteraction = modRemotesManager:Get("DoorInteraction");
 
-local environmentFolder = workspace:WaitForChild("Environment");
 local extractInteractable = script:WaitForChild("ExtractInteractable");
-
-local random = Random.new();
 --==
 -- modEventSignal.new("OnWaveChanged");
 
@@ -220,8 +213,6 @@ function Raid:Load()
 	self.Loaded = true;
 
 	task.spawn(function()
-		local modCommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
-
 		Debugger.AwaitShared("modCommandsLibrary");
 		shared.modCommandsLibrary:HookChatCommand("raid", {
 			Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
@@ -235,7 +226,7 @@ function Raid:Load()
 			Function = function(player, args)
 				local action = args[1];
 
-				local classPlayer = shared.modPlayers.Get(player);
+				--local classPlayer = shared.modPlayers.Get(player);
 				
 				if action == "drawexitpath" then
 
@@ -439,7 +430,6 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 		self.OnNpcSpawnHooked = modNpc.OnNpcSpawn:Connect(function(npcModule)
 			if modConfigurations.TargetableEntities[npcModule.Humanoid.Name] == nil then return end; -- Not enemy spawn;
 
-			local npcPrefab = npcModule.Prefab;
 			table.insert(self.EnemyModules, npcModule);
 
 			npcModule.Garbage:Tag(function()
@@ -640,12 +630,12 @@ function Raid:LoadSpawnPlatform(spawnPart)
 
 			local maxSpawns = math.ceil((worldSpaceSize.X * worldSpaceSize.Z)/512)+4; --16;
 			
-			local loadTimelapsed = tick();
 			while newSpawnCFrame == nil do
 				newSpawnCFrame = platformTopCf * CFrame.new(
-					random:NextNumber(-worldSpaceSize.X/2, worldSpaceSize.X/2), 
+					math.random(-worldSpaceSize.X/2 *100, worldSpaceSize.X/2 *100)/100, 
 					0, 
-					random:NextNumber(-worldSpaceSize.Z/2, worldSpaceSize.Z/2));
+					math.random(-worldSpaceSize.Z/2 *100, worldSpaceSize.Z/2 *100)/100
+				);
 
 				--self.Path:ComputeAsync(newSpawnCFrame.Position, platformTopCf.Position);
 				--if self.Path.Status == Enum.PathStatus.Success then
@@ -698,127 +688,6 @@ function Raid:Initialize(roomData)
 		end
 	end
 
-	local function onCharacterAdded(player, character)
-		clearCharacter(character);
-		table.insert(self.Characters, character);
-
-		local activeLoop = true;
-		local classPlayer = shared.modPlayers.Get(player);
-
-		local humanoid = character:WaitForChild("Humanoid");
-		classPlayer:OnNotIsAlive(function(character)
-			activeLoop = false;
-			
-			Debugger:Log(character.Name,"died");
-			shared.Notify(game.Players:GetPlayers(), character.Name .. " died!", "Negative");
-
-			clearCharacter(character);
-			Debugger:Log("Players alive",#self.Characters);
-
-			if #self.Characters <= 0 and self.Status == EnumStatus.InProgress then
-
-				self.Status = EnumStatus.Restarting;
-				
-				for a=#self.EnemyModules, 1, -1 do
-					game.Debris:AddItem(self.EnemyModules[a].Prefab, 0);
-					table.remove(self.EnemyModules, a);
-				end
-				
-				shared.Notify(game.Players:GetPlayers(), "Raid failed!", "Negative");
-				
-				for a=5, 1, -1 do
-					self:Hud{
-						Header="Raid failed!";
-						Status="Restarting in "..a.."..";
-						PlayMusic=false;
-					};
-					
-					shared.Notify(game.Players:GetPlayers(), "Restarting in "..a.."..", "Negative", "ModeRestarting");
-					task.wait(1);
-				end
-				
-				self:RespawnDead();
-				self:Start();
-
-			else
-				self:Hud{
-					Header="You died!";
-					Status="";
-				};
-
-			end
-		end)
-		
-		local wlInstances = {};
-		for part, _ in pairs(self.SpawnPlatforms) do
-			table.insert(wlInstances, part);
-		end
-		
-		local platformParam = OverlapParams.new();
-		platformParam.FilterDescendantsInstances = wlInstances;
-		platformParam.FilterType = Enum.RaycastFilterType.Include;
-
-		local rootPart = character:WaitForChild("HumanoidRootPart");
-		task.spawn(function()
-			while activeLoop do
-				
-				if self.Status == EnumStatus.InProgress then
-					local hitList = workspace:GetPartBoundsInRadius(rootPart.Position, Config.SpawnRadius, platformParam);
-					
-					for a=1, #hitList do
-						local spawnPlatformPart = hitList[a];
-
-						self:LoadSpawnPlatform(spawnPlatformPart);
-
-						local spawnPlatformInfo = self.SpawnPlatforms[spawnPlatformPart];
-						if spawnPlatformInfo.Load == 2 and spawnPlatformInfo.SpawnedAmbientZombies ~= true then
-							spawnPlatformInfo.SpawnedAmbientZombies = true;
-
-							for a=1, math.min(math.random(Config.MinSpawnCount, Config.MaxSpawnCount), #spawnPlatformInfo.Spawns) do
-								local spawnCf = spawnPlatformInfo.Spawns[a] * CFrame.Angles(0, math.rad(0, 360, 0), 0);
-								
-								if #self.EnemyModules > Config.EnemyCap then
-									for a=1, 4 do
-										local chosenNpcModule;
-										
-										for b=1, 3 do
-											chosenNpcModule = self.EnemyModules[math.random(1, #self.EnemyModules)]
-											if chosenNpcModule.BasicEnemy == true then break; end;
-										end
-										
-										if chosenNpcModule.BasicEnemy ~= true then continue end;
-										if chosenNpcModule.RootPart == nil then continue end;
-
-										local tooClose = false;
-										for _, player in pairs(game.Players:GetPlayers()) do
-											if player:DistanceFromCharacter(chosenNpcModule.RootPart.Position) <= 128 then
-												tooClose = true;
-												break;
-											end
-										end
-										
-										if not tooClose then
-											chosenNpcModule.Target = nil;
-											chosenNpcModule.RootPart.CFrame = spawnCf;
-										end
-									end
-									
-									
-								else
-									self:SpawnEnemy(self:PickEnemy(), {SpawnCFrame=spawnCf;});
-									
-								end
-							end
-						end
-					end
-					
-				end
-				
-				task.wait(1);
-			end
-		end)
-	end
-	
 	for a=1, #self.RoomData.Players do
 		task.delay(0.1, function()
 			local player;
@@ -827,9 +696,127 @@ function Raid:Initialize(roomData)
 				task.wait(1);
 			until player ~= nil;
 
-			player.CharacterAdded:Connect(function(character) onCharacterAdded(player, character) end);
-			
 			local classPlayer = shared.modPlayers.Get(player);
+			classPlayer.OnCharacterSpawn:Connect(function(character: Model)
+				Debugger:Warn("OnCharacterSpawn", player, character);
+
+				clearCharacter(character);
+				table.insert(self.Characters, character);
+
+				local activeLoop = true;
+				local classPlayer = shared.modPlayers.Get(player);
+
+				classPlayer:OnNotIsAlive(function(character)
+					activeLoop = false;
+					
+					shared.Notify(game.Players:GetPlayers(), character.Name .. " died!", "Negative");
+
+					clearCharacter(character);
+					Debugger:Warn(character.Name,"died", "Players alive",#self.Characters);
+
+					if #self.Characters <= 0 and self.Status == EnumStatus.InProgress then
+						self.Status = EnumStatus.Restarting;
+						
+						for a=#self.EnemyModules, 1, -1 do
+							game.Debris:AddItem(self.EnemyModules[a].Prefab, 0);
+							table.remove(self.EnemyModules, a);
+						end
+						
+						shared.Notify(game.Players:GetPlayers(), "Raid failed!", "Negative");
+						
+						for a=5, 1, -1 do
+							self:Hud{
+								Header="Raid failed!";
+								Status="Restarting in "..a.."..";
+								PlayMusic=false;
+							};
+							
+							shared.Notify(game.Players:GetPlayers(), "Restarting in "..a.."..", "Negative", "ModeRestarting");
+							task.wait(1);
+						end
+						
+						self:RespawnDead();
+						self:Start();
+
+					else
+						self:Hud{
+							Header="You died!";
+							Status="";
+						};
+
+					end
+				end)
+				
+				local wlInstances = {};
+				for part, _ in pairs(self.SpawnPlatforms) do
+					table.insert(wlInstances, part);
+				end
+				
+				local platformParam = OverlapParams.new();
+				platformParam.FilterDescendantsInstances = wlInstances;
+				platformParam.FilterType = Enum.RaycastFilterType.Include;
+
+				local rootPart = character:WaitForChild("HumanoidRootPart");
+				task.spawn(function()
+					while activeLoop do
+						
+						if self.Status == EnumStatus.InProgress then
+							local hitList = workspace:GetPartBoundsInRadius(rootPart.Position, Config.SpawnRadius, platformParam);
+							
+							for a=1, #hitList do
+								local spawnPlatformPart = hitList[a];
+
+								self:LoadSpawnPlatform(spawnPlatformPart);
+
+								local spawnPlatformInfo = self.SpawnPlatforms[spawnPlatformPart];
+								if spawnPlatformInfo.Load == 2 and spawnPlatformInfo.SpawnedAmbientZombies ~= true then
+									spawnPlatformInfo.SpawnedAmbientZombies = true;
+
+									for a=1, math.min(math.random(Config.MinSpawnCount, Config.MaxSpawnCount), #spawnPlatformInfo.Spawns) do
+										local spawnCf = spawnPlatformInfo.Spawns[a] * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
+										
+										if #self.EnemyModules > Config.EnemyCap then
+											for a=1, 4 do
+												local chosenNpcModule;
+												
+												for b=1, 3 do
+													chosenNpcModule = self.EnemyModules[math.random(1, #self.EnemyModules)]
+													if chosenNpcModule.BasicEnemy == true then break; end;
+												end
+												
+												if chosenNpcModule.BasicEnemy ~= true then continue end;
+												if chosenNpcModule.RootPart == nil then continue end;
+
+												local tooClose = false;
+												for _, player in pairs(game.Players:GetPlayers()) do
+													if player:DistanceFromCharacter(chosenNpcModule.RootPart.Position) <= 128 then
+														tooClose = true;
+														break;
+													end
+												end
+												
+												if not tooClose then
+													chosenNpcModule.Target = nil;
+													chosenNpcModule.RootPart.CFrame = spawnCf;
+												end
+											end
+											
+											
+										else
+											self:SpawnEnemy(self:PickEnemy(), {SpawnCFrame=spawnCf;});
+											
+										end
+									end
+								end
+							end
+							
+						end
+						
+						task.wait(1);
+					end
+				end)
+			end)
+			
 			if not classPlayer.IsAlive then 
 				classPlayer:Spawn();
 			end;
@@ -848,7 +835,7 @@ function Raid:Initialize(roomData)
 	end)
 
 	for a=1, 10 do
-		local waitMsg = ("Waiting for ("..#self.Players.."/"..#roomData.Players..") players.. ($t)"):gsub("$t", 10-a);
+		local waitMsg = ("Waiting for ("..#self.Players.."/"..#roomData.Players..") players.. ($t)"):gsub("$t", tostring(10-a));
 		shared.Notify(game.Players:GetPlayers(), waitMsg, "Inform", "waitForPlayers");
 
 		if #self.Players >= #self.RoomData.Players then
@@ -911,7 +898,7 @@ function Raid:Initialize(roomData)
 						
 						if player:DistanceFromCharacter(spawnAtt.WorldCFrame.Position) <= 128 then
 							self:SpawnEnemy(self:PickEnemy({IsHordeWave=true;}), {
-								SpawnCFrame=spawnAtt.WorldCFrame * CFrame.Angles(0, math.rad(0, 360), 0);
+								SpawnCFrame=spawnAtt.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
 								InfTargeting=true;
 							});
 							
