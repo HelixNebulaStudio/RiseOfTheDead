@@ -68,4 +68,8 @@ function Math.CFrameSpread(direction, maxSpreadAngle)
 	return cf.lookVector;
 end
 
+function Math.GaussianRandom() -- ~ -2.5 to ~ 2.5;
+	return math.sqrt(-2*math.log(1 - math.random()))*math.cos(2*math.pi*math.random());
+end
+
 return Math;
