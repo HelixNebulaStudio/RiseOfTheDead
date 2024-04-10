@@ -915,7 +915,7 @@ BlueprintLibrary.New{
 		{Type="Item"; ItemId="tacticalbowparts"; Amount=6;};
 	};
 	Category="Weapons";
-	Sources={"Obtainable from Mission: <b>Vindictive Treasure 3/3</b>"; "Obtainable from <b>Bandit's Market</b> Shop"};
+	Sources={"Obtainable from Mission: <b>Vindictive Treasure 3</b>"; "Obtainable from <b>Bandit's Market</b> Shop"};
 };
 
 BlueprintLibrary.New{

@@ -1478,11 +1478,10 @@ MissionLibrary.New{
 	};
 };
 
--- !outline: 40: Vindictive Treasure 1/3
 MissionLibrary.New{
 	MissionId=40;
 	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="Vindictive Treasure 1/3";
+	Name="Vindictive Treasure 1";
 	From="Victor";
 	Description="Victor needs your help with something.";
 	Persistent=true;
@@ -1522,11 +1521,10 @@ MissionLibrary.New{
 	};
 };
 
--- !outline: 41: Vindictive Treasure 2/3
 MissionLibrary.New{
 	MissionId=41;
 	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="Vindictive Treasure 2/3";
+	Name="Vindictive Treasure 2";
 	From="Victor";
 	Description="The cultists are hunting you down for what you have taken from them.";
 	Persistent=true;
@@ -1553,11 +1551,10 @@ MissionLibrary.New{
 	Markers={};
 };
 
--- !outline: 42: Vindictive Treasure 3/3
 MissionLibrary.New{
 	MissionId=42;
 	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="Vindictive Treasure 3/3";
+	Name="Vindictive Treasure 3";
 	From="Victor";
 	Description="Victor needs your help with something in the tombs.";
 	Persistent=true;
@@ -1596,7 +1593,7 @@ MissionLibrary.New{
 MissionLibrary.New{
 	MissionId=43;
 	MissionType = MissionLibrary.MissionTypes.Event;
-	Name="Missing Body 1/2";
+	Name="Missing Body 1";
 	Cutscene="Missing Body"; 
 	From="Jack Reap";
 	Description="A mysterious man needs your help searching for something..";
@@ -1629,7 +1626,7 @@ MissionLibrary.New{
 MissionLibrary.New{
 	MissionId=44;
 	MissionType = MissionLibrary.MissionTypes.Event;
-	Name="Missing Body 2/2";
+	Name="Missing Body 2";
 	Cutscene="Missing Body2"; 
 	From="Jack Reap";
 	Description="Did you see a ghost?! Investigate further.";
