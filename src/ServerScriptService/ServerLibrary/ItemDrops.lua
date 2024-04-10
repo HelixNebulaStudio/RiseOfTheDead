@@ -1,9 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
-
-local TweenService = game:GetService("TweenService");
 local CollectionService = game:GetService("CollectionService");
-local PhysicsService = game:GetService("PhysicsService");
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -13,7 +10,6 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modDropAppearance = require(game.ReplicatedStorage.Library.DropAppearance);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
-local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
 local modRatShopLibrary = require(game.ReplicatedStorage.Library.RatShopLibrary);
 local modGoldShopLibrary = require(game.ReplicatedStorage.Library.GoldShopLibrary);
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
@@ -23,7 +19,7 @@ local modCrateLibrary = require(game.ReplicatedStorage.Library.CrateLibrary);
 local ItemDrops = {};
 ItemDrops.Types = modGlobalVars.ItemDropsTypes;
 
-local remoteItemDropRemote = modRemotesManager:Get("ItemDropRemote");
+local _remoteItemDropRemote = modRemotesManager:Get("ItemDropRemote");
 
 local dropPrefabs = game.ServerStorage.PrefabStorage.ItemDrops;
 local itemPrefabs = game.ReplicatedStorage.Prefabs.Items;
@@ -32,7 +28,7 @@ local random = Random.new();
 --== Script;
 function ItemDrops.Info(itemId, isFullSearch)
 	local itemLib = modItemsLibrary:Find(itemId);
-	if itemLib == nil then Debugger:Log("Could not find itemlib for",itemId) return end;
+	if itemLib == nil then Debugger:Log("Could not find itemlib for",itemId); return end;
 	
 	local r = {};
 	local sourceText = {};
@@ -121,7 +117,7 @@ function ItemDrops.Info(itemId, isFullSearch)
 			local lib = indexedRewardsList[i];
 			local rewardId = lib.Id;
 			
-			if lib.IgnoreScan == true and isFullSearch ~= true then Debugger:Log("ignore rewardId", rewardId) continue end;
+			if lib.IgnoreScan == true and isFullSearch ~= true then Debugger:Log("ignore rewardId", rewardId); continue end;
 			
 			local rewards = lib.Rewards;
 			for a=1, #rewards do
@@ -194,7 +190,7 @@ function ItemDrops.Info(itemId, isFullSearch)
 end
 
 function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawn)
-	if modConfigurations.DisableItemDrops then warn("ItemDrops>> DisableItemDrops is enabled.") return end;
+	if modConfigurations.DisableItemDrops then warn("ItemDrops>> DisableItemDrops is enabled."); return end;
 	
 	local prefabName = itemDrop.Type or itemDrop.ItemId;
 	local newPrefab: Model = dropPrefabs:FindFirstChild(prefabName);
@@ -279,10 +275,7 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawn)
 		offset = Vector3.new(0, 1, 0);
 		
 	elseif itemDrop.Type == "Custom" then
-		local itemLib = modItemsLibrary:Find(itemDrop.ItemId);
-		
-		local primaryPart = newPrefab:WaitForChild("Base");
-		primaryPart.CollisionGroup = "Debris";
+		primaryPart = newPrefab:WaitForChild("Base");
 		
 		local itemIconLabel = newPrefab:WaitForChild("BillboardGui"):WaitForChild("ItemIcon");
 		itemIconLabel.Image = itemLib.Icon;
@@ -412,6 +405,7 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawn)
 			local body = newItemPrefab or newPrefab;
 
 			if itemDrop.Type == "Crate" then
+				assert(newPrefab.PrimaryPart);
 				body = newPrefab.PrimaryPart:WaitForChild("Body");
 				
 			end

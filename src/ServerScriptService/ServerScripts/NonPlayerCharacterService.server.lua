@@ -5,7 +5,6 @@ local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
 
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
@@ -159,7 +158,6 @@ function InitializeSpawner(spawnerModule)
 			npcModule.MapLayerName = layerName;
 			--Debugger:Log("layerName, layerData", modMapLibrary:GetLayer(cframe.Position));
 			
-			local enemyLevel = 1;
 			if self.OnSpawnConfigure then
 				local s, e = pcall(function()
 					self.OnSpawnConfigure(npc, npcModule);
@@ -169,9 +167,9 @@ function InitializeSpawner(spawnerModule)
 					error(e);
 				end
 				
-				if npcModule and npcModule.Configuration and npcModule.Configuration.Level then
-					enemyLevel = npcModule.Configuration.Level;
-				end
+				-- if npcModule and npcModule.Configuration and npcModule.Configuration.Level then
+				-- 	enemyLevel = npcModule.Configuration.Level;
+				-- end
 			end
 			
 			local humanoid: Humanoid = npcModule.Humanoid;

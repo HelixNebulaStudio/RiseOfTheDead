@@ -728,4 +728,7 @@ Branches.NavLinks = {
 
 };
 
+--==
+Branches.Wanderer = nil;
+
 return Branches;
