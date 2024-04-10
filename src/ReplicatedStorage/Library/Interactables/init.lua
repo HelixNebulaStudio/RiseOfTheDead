@@ -54,7 +54,6 @@ local player = game.Players.LocalPlayer;
 local modAudio = Debugger:Require(game.ReplicatedStorage.Library.Audio);
 local modItem = Debugger:Require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modBranchConfigs = Debugger:Require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modCollectiblesLibrary = Debugger:Require(game.ReplicatedStorage.Library.CollectiblesLibrary);
 local modRemotesManager = Debugger:Require(game.ReplicatedStorage.Library.RemotesManager);
 local modGameModeLibrary = Debugger:Require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modDoors = Debugger:Require(game.ReplicatedStorage.Library.Doors);
@@ -80,8 +79,6 @@ local bindLeavingBossArena = remotes.BossInterface.LeavingBossArena;
 local bindOpenLobbyInterface = remotes.LobbyInterface.OpenLobbyInterface;
 
 local ID = 1;
-local random = Random.new();
-local syncRequest = tick();
 
 Interactable.OnCancel = nil;
 -- Script;
@@ -197,7 +194,7 @@ end
 function Interactable:Sync(scr, players, data)
 	players = type(players) == "table" and players or {players};
 	if RunService:IsClient() then return end;
-	if scr.Parent == nil then Debugger:Warn(":Sync scr.Parent == nil.") return end;
+	if scr.Parent == nil then Debugger:Warn(":Sync scr.Parent == nil."); return end;
 	
 	local syncRange = data.SyncRange or 128;
 		
@@ -283,10 +280,10 @@ function Interactable.new()
 		
 		local library = {};
 		library.modCharacter = self.CharacterModule;
-		library.modData = require(player:WaitForChild("DataModule"));
+		library.modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 
 		library.interface = library.modData:GetInterfaceModule();
-		if library.interface == nil then Debugger:Warn("Missing library.interface") return end;
+		if library.interface == nil then Debugger:Warn("Missing library.interface"); return end;
 		
 		if self.InspectMode == true then
 			self.Disabled = "Disabled in Inspect Mode";
@@ -398,7 +395,7 @@ function Interactable.new()
 		if self.CanInteract == false then return end;
 		if self.Coop then return end;
 		
-		local modData = require(player:WaitForChild("DataModule"));
+		local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 		
 		local library = {};
 		library.modCharacter = self.CharacterModule;
@@ -579,7 +576,7 @@ function Interactable.Door(locked, label, premium)
 			if keyItemId then
 				local itemLib = modItem:Find(keyItemId);
 
-				local modData = require(player:WaitForChild("DataModule"));
+				local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 				if modData.FindItemIdFromCharacter(keyItemId) then
 					interact.Label = "Unlock with ".. (itemLib and itemLib.Name or "unknown item");
 					
@@ -851,7 +848,7 @@ function Interactable.Pickup(itemId, quantity)
 					sound = modAudio.Play("StorageItemPickup", nil, nil, false);
 				end
 			end
-			if sound then sound.PlaybackSpeed = random:NextNumber(0.7, 1.2); end;
+			if sound then sound.PlaybackSpeed = math.random(70, 120)/100; end;
 			
 		else
 			if interactObject.Parent ~= nil then
@@ -1161,7 +1158,7 @@ function Interactable.GameModeExit(name, stage, label)
 end
 
 function Interactable.Collectible(collectibleId, desc)
-	local lib = modCollectiblesLibrary:Find(collectibleId);
+	--local lib = modCollectiblesLibrary:Find(collectibleId);
 	local interact = Interactable.new();
 	local interactMeta = getmetatable(interact);
 	interactMeta.Label = desc;
@@ -1169,17 +1166,22 @@ function Interactable.Collectible(collectibleId, desc)
 	
 	interact.Type = Types.Collectible;
 	interact.Id = collectibleId;
-	
+	interact.PickupCooldown = nil;
 	
 	function interact:OnInteracted(library)
+		if self.PickupCooldown and tick()-self.PickupCooldown <= 1 then return end;
+		self.PickupCooldown = tick();
+
 		local interactObject = self.Object;
 		local objectParent = interactObject.Parent;
 		interactObject.Parent = game.ReplicatedStorage;
 		local invokeRequest = remotePickUpRequest:InvokeServer(interactObject, self.Script);
+
 		if invokeRequest == true then
 			interactObject:Destroy();
 			if self.OnSuccessfulPickup then self.OnSuccessfulPickup(self) end;
 			modAudio.Play("Collectible", nil, nil, false);
+
 		else
 			if interactObject.Parent ~= nil then
 				interactObject.Parent = objectParent;
@@ -1188,6 +1190,7 @@ function Interactable.Collectible(collectibleId, desc)
 				end
 				Debugger:Print("Failed to collect",self.ItemName," due to:", invokeRequest);
 			end
+
 		end
 	end
 	
@@ -1375,7 +1378,11 @@ function Interactable.CardGame(src)
 	
 	local lastFetch = tick()-2;
 	function interactMeta:OnTrigger(library)
-		local rPacket = {};
+		local rPacket = {
+			CanQueue = false;
+			CanSpectate = false;
+		};
+
 		if tick()-lastFetch >= 1 then
 			lastFetch = tick();
 			rPacket = remoteCardGame:InvokeServer("request", {Interactable=src;});
@@ -1435,7 +1442,7 @@ function Interactable.Seat(src)
 	function interact:OnInteracted(library)
 		library.interface.Object = self.Object;
 		
-		local returnPacket = remoteCharacterInteractions:InvokeServer("sit", {InteractableScript=src});
+		local _returnPacket = remoteCharacterInteractions:InvokeServer("sit", {InteractableScript=src});
 	end
 
 	return interact;
