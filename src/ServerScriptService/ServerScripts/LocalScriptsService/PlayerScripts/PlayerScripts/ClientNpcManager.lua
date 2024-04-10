@@ -55,8 +55,10 @@ return function()
 		
 	end)
 	
+	-- MARK: Deadbody Handler
 	local lastDbDespawnTick = tick();
 	CollectionService:GetInstanceAddedSignal("Deadbody"):Connect(function(prefab: Model)
+		if prefab:GetAttribute("Fake") then return end;
 		local thrsenHighlight = prefab:FindFirstChild("thrsenHighlight") :: Highlight ;
 		if thrsenHighlight then
 			thrsenHighlight:Destroy();
@@ -72,6 +74,34 @@ return function()
 
 		local maxDeadbodies = modData:GetSetting("MaxDeadbodies");
 		modDeadbodiesHandler:DespawnRequest(maxDeadbodies);
+		if maxDeadbodies <= 0 then return end;
+
+		prefab:RemoveTag("Deadbody");
+		prefab:WaitForChild("ParallelNpc"):Destroy();
+
+		local fakeBody = prefab:Clone();
+		fakeBody.Parent = workspace.Entities;
+		for _, bodyPart in pairs(fakeBody:GetChildren()) do
+			if not bodyPart:IsA("BasePart") then continue end;
+			local originalPart = prefab:FindFirstChild(bodyPart.Name) :: BasePart;
+
+			if originalPart then
+				bodyPart.AssemblyLinearVelocity = originalPart.AssemblyLinearVelocity;
+				bodyPart.AssemblyAngularVelocity = originalPart.AssemblyAngularVelocity;
+			end
+			
+			if bodyPart.Name == "HumanoidRootPart" then continue end;
+			bodyPart.CanCollide = true;
+		end
+		fakeBody:SetAttribute("Fake", true);
+		fakeBody:AddTag("Deadbody");
+		task.wait();
+		
+		prefab:Destroy();
+
+		if deadbodyDespawnTimer < 61 then
+			game.Debris:AddItem(fakeBody, deadbodyDespawnTimer);
+		end
 	end)
 	
 	local function CheckForPrefab(npc, npcPrefab)

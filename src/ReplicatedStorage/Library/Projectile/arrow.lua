@@ -7,16 +7,11 @@ local RunService = game:GetService("RunService");
 local Projectile = require(script.Parent.Projectile);
 
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 
 local projectilePrefab = script.Arrow;
 local random = Random.new();
-
-local remotes = game.ReplicatedStorage.Remotes;
-local bindIsInDuel = remotes.IsInDuel;
-
 --== Script;
 
 function Pool.new(owner)
@@ -47,6 +42,8 @@ function Pool.new(owner)
 			HitPart = hitObj;
 			FocusCharge = (self.Charge or 0);
 			Index=index;
+
+			CritOccured = nil;
 		};
 		index = index +1;
 		
@@ -178,6 +175,8 @@ function Pool.new(owner)
 
 			return true;
 		end
+
+		return;
 	end
 	
 	return projectile;
