@@ -167,13 +167,11 @@ end
 
 function ReplicationManager.DesyncFromServer(prefab: Instance, parent: Instance, players: {[number]: Player}?)
 	if not game:IsAncestorOf(prefab) then return end;
-	if players == nil then
-		players = game:GetService("Players"):GetPlayers();
-	end;
+	players = players or game:GetService("Players"):GetPlayers();
 
 	prefab.Parent = camera;
 
-	if players == nil then return end;
+	assert(players);
 	for a=1, #players do
 		task.spawn(function()
 			remoteReplication:InvokeClient(players[a], "desync", prefab, parent);
@@ -365,7 +363,7 @@ if RunService:IsClient() then
 			pcall(function()
 				prefab.Parent = parent;
 			end)
-			
+
 			return true;
 
 		end

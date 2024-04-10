@@ -1,7 +1,4 @@
 local RaycastUtil = {}
-
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-
 --==
 
 -- !outline RaycastUtil.ConeCast(packet)
@@ -79,7 +76,7 @@ end
 function RaycastUtil.EdgeCast(basePart, dir, rayParam)
 	local cframe = basePart.CFrame;
 	local orign = basePart.Position;
-	local size = basePart.Size;
+	local _size = basePart.Size;
 	local halfSize = basePart.Size/2;
 
 	local r = {};
@@ -110,7 +107,7 @@ function RaycastUtil.EdgeCast(basePart, dir, rayParam)
 end
 
 -- !outline RaycastUtil.IsHittable(origin: Vector3, range: number, targetObject)
-function RaycastUtil.GetHittable(origin: Vector3, range: number, targetObject, minPartSize: number)
+function RaycastUtil.GetHittable(origin: Vector3, range: number, targetObject, minPartSize: number?)
 	local hitParts = {};
 	local maxParts = 0;
 
@@ -118,7 +115,7 @@ function RaycastUtil.GetHittable(origin: Vector3, range: number, targetObject, m
 		local direction = (part.Position-origin).Unit;
 		
 		local ray = Ray.new(origin, direction*(range or 64));
-		local hit, point = workspace:FindPartOnRayWithWhitelist(ray, {workspace.Environment; workspace.Terrain; part}, true);
+		local hit, _point = workspace:FindPartOnRayWithWhitelist(ray, {workspace.Environment; workspace.Terrain; part}, true);
 		if hit and hit == part then
 			table.insert(hitParts, hit);
 			if maxParts < #hitParts then

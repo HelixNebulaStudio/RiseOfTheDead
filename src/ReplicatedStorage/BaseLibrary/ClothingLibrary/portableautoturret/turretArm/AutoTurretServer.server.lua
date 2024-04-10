@@ -18,16 +18,16 @@ local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEve
 local modToolService = require(game.ServerScriptService.ServerLibrary.ToolService);
 
 local turretArm: Model = script.Parent;
-local accessory: Accessory = turretArm.Parent;
-local character: Model = accessory.Parent;
+local accessory: Accessory = turretArm.Parent :: Accessory;
+local character: Model = accessory.Parent :: Model;
 local player: Player = game.Players:GetPlayerFromCharacter(character);
-local handlePoint: Attachment = turretArm:WaitForChild("Arm2"):WaitForChild("HandlePoint");
+local handlePoint: Attachment = turretArm:WaitForChild("Arm2"):WaitForChild("HandlePoint") :: Attachment;
 
 local accessorySiid = accessory:GetAttribute("StorageItemId");
 local accessoryStorageItem = modStorage.FindIdFromStorages(accessorySiid, player);
 
-local autoTurretClient: Script = turretArm:WaitForChild("AutoTurretClient");
-local targetValue: ObjectValue = autoTurretClient:WaitForChild("Target");
+local autoTurretClient: Script = turretArm:WaitForChild("AutoTurretClient") :: Script;
+local targetValue: ObjectValue = autoTurretClient:WaitForChild("Target") :: ObjectValue;
 
 local hydraulicRod = turretArm:WaitForChild("HydraulicRod");
 local arm1 = turretArm:WaitForChild("Arm1");
@@ -54,7 +54,7 @@ local TurretConfigs = patItemLib.GetTurretConfigs();
 local onlineLoop: boolean = false;
 local lastWeaponId: string = nil;
 local selectedTargets: {Model} = {};
-local activeWeaponModel: Model = nil;
+local activeWeaponModel: Model? = nil;
 
 local drainCost = 100;
 local drainRate = (60*60)/3
@@ -123,7 +123,7 @@ function TurretRuntime(storageItem)
 			local profile = shared.modProfile:Get(player);
 			local patStorage = modStorage.Get("portableautoturret", player);
 
-			local weaponStorageItem = patStorage:FindByIndex(1);
+			local _weaponStorageItem = patStorage:FindByIndex(1);
 			local batteryStorageItem = patStorage:FindByIndex(2);
 
 			if batteryStorageItem then
@@ -133,7 +133,7 @@ function TurretRuntime(storageItem)
 				
 				local skill = profile.SkillTree:GetSkill(player, "enecon");
 				if skill and skill.Points > 0 then
-					local level, skillStats = profile.SkillTree:CalStats(skill.Library, skill.Points);
+					local _level, skillStats = profile.SkillTree:CalStats(skill.Library, skill.Points);
 					local conserveRatio = 1-(skillStats.Percent.Value/100);
 
 					newDrainCost = newDrainCost * conserveRatio;
@@ -185,7 +185,7 @@ function TurretRuntime(storageItem)
 	local canCrowdFire;
 	
 	if #selectedTargets > 0 then
-		local computeCost = tick();
+		local _computeCost = tick();
 		for a=1, #selectedTargets do
 			local selectedTargetModel = selectedTargets[a];
 			
@@ -234,6 +234,7 @@ function TurretRuntime(storageItem)
 				elseif distSortMode == 2 then
 					return a.Dist > b.Dist;
 				end
+				return;
 			end)
 		end
 
@@ -248,6 +249,7 @@ function TurretRuntime(storageItem)
 				elseif healthSortMode == 2 then
 					return a.Health > b.Health;
 				end
+				return;
 			end)
 		end
 
@@ -262,6 +264,7 @@ function TurretRuntime(storageItem)
 				elseif speedSortMode == 2 then
 					return a.Speed < b.Speed;
 				end
+				return;
 			end)
 		end
 		
@@ -334,7 +337,7 @@ function TurretRuntime(storageItem)
 	local maistPercent = 1;
 	local skill = profile.SkillTree:GetSkill(player, "maist");
 	if skill and skill.Points > 0 then
-		local level, skillStats = profile.SkillTree:CalStats(skill.Library, skill.Points);
+		local _level, skillStats = profile.SkillTree:CalStats(skill.Library, skill.Points);
 
 		maistPercent = 1-(skillStats.Percent.Value/100);
 	end
@@ -417,8 +420,11 @@ function TurretRuntime(storageItem)
 
 	modAudio.Play("TurretTarget", turretArm.PrimaryPart);
 	
+	if activeWeaponModel.PrimaryPart == nil then return end;
+	local bulletOriginAtt: Attachment = activeWeaponModel.PrimaryPart:WaitForChild("BulletOrigin") :: Attachment;
+
 	while onlineLoop do
-		local origin = activeWeaponModel.PrimaryPart.BulletOrigin.WorldPosition;
+		local origin = bulletOriginAtt.WorldPosition;
 		
 		local targetHead = npcModule.Head;
 		local targetPos = targetPart.Position;

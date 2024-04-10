@@ -26,7 +26,7 @@ local turretArm = script.Parent;
 local hydraulicRoot = script.Parent:WaitForChild("Hydraulics");
 local hydraulicRod = script.Parent:WaitForChild("HydraulicRod");
 local arm1 = script.Parent:WaitForChild("Arm1");
-local arm2 = script.Parent:WaitForChild("Arm2");
+local _arm2 = script.Parent:WaitForChild("Arm2");
 
 local jointHarCf = CFrame.new(hydraulicRod:WaitForChild("JointHRA").CFrame.Position);
 local jointAa2Cf = CFrame.new(arm1:WaitForChild("JointAA2").CFrame.Position);
@@ -37,7 +37,7 @@ local rad120 = math.rad(120);
 local rad90 = math.rad(90);
 local rad80 = math.rad(80);
 local rad30 = math.rad(30);
-local rad1 = math.rad(1);
+local _rad1 = math.rad(1);
 
 local syncTick = tick();
 RunService.Heartbeat:Connect(function(delta: number)
@@ -117,7 +117,7 @@ end)
 if isOwner then
 	local debounce = tick()-1;
 
-	local modData = require(localPlayer:WaitForChild("DataModule"));
+	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 	local storageItem;
 	UserInputService.InputBegan:connect(function(inputObject, inputEvent)
