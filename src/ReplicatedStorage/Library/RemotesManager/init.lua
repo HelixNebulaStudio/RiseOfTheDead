@@ -75,6 +75,9 @@ function RemotesManager:Record(remoteName, callType, data)
 	end)
 end
 
+export type EventRemote = {
+};
+
 function RemotesManager:NewEventRemote(remoteInstance, debounceInterval)
 	local remoteName = type(remoteInstance) == "string" and remoteInstance or remoteInstance.Name;
 	if self.Remotes[remoteName] then
@@ -176,6 +179,10 @@ function RemotesManager:NewEventRemote(remoteInstance, debounceInterval)
 	return remote;
 end
 
+export type FunctionRemote = {
+
+};
+
 function RemotesManager:NewFunctionRemote(remoteInstance, debounceInterval)
 	local remoteName = type(remoteInstance) == "string" and remoteInstance or remoteInstance.Name;
 	if self.Remotes[remoteName] then
@@ -271,7 +278,7 @@ function RemotesManager:NewFunctionRemote(remoteInstance, debounceInterval)
 	return remote;
 end
 
-function RemotesManager:Get(name)
+function RemotesManager:Get(name) : EventRemote | FunctionRemote
 	if not isRemotesReady then bindWaitForRemotesReady:Wait(); end;
 	
 	local function get()
@@ -480,7 +487,7 @@ else
 	RemotesManager:NewFunctionRemote("GeneralUIRemote", 0.1).Secure = true;
 	RemotesManager:NewFunctionRemote("Replication");
 	RemotesManager:NewEventRemote("PlayAudio");
-	
+
 	--== Game;
 	RemotesManager:NewEventRemote("CharacterRemote").Secure = true;
 	RemotesManager:NewFunctionRemote("ToolHandler", 0.1);
@@ -777,8 +784,8 @@ else
 		});
 
 	end)
-	
-	
+
 end
+
 
 return RemotesManager;

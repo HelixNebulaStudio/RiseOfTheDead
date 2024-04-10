@@ -22,7 +22,7 @@ function Zombie.new(self)
 
 		self:KillNpc();
 		CollectionService:RemoveTag(prefab, "TargetableEntities");
-		prefab.Parent = workspace.Entities;
+		--prefab.Parent = workspace.Entities;
 
 		if players == nil then
 			local tagsList = modTagging.Tagged[prefab];

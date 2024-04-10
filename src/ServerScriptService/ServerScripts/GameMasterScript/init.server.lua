@@ -90,7 +90,7 @@ local remoteGeneralUIRemote = modRemotesManager:Get("GeneralUIRemote");
 
 local modEngineMode = modGlobalVars.EngineMode == "RiseOfTheDead" 
 	and require(script:WaitForChild("RiseOfTheDead")) 
-	or require(game.ServerScriptService:WaitForChild("ModEngine"));
+	or require(game.ServerScriptService:WaitForChild("ModEngine") :: ModuleScript);
 
 --== Script;
 Debugger:Log("Initializing server data script complete.");

@@ -1,19 +1,15 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
-local CollectionService = game:GetService("CollectionService");
-
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 local modEntityStatus = require(game.ReplicatedStorage.Library.EntityStatus);
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 local modPhysics = require(game.ReplicatedStorage.Library.Util.Physics);
 
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
-
-local remoteNpcManager = modRemotesManager:Get("NpcManager");
 
 local remotes = game.ReplicatedStorage.Remotes;
 local bindOnTalkedTo = remotes.Dialogue.OnTalkedTo;
@@ -91,26 +87,29 @@ function NpcComponent:LoadClientScript(players)
 end
 
 function NpcComponent:KillNpc()
-	local prefab: Model = self.Prefab;
 	local rootPart: BasePart = self.RootPart;
+	local prefab: Model = self.Prefab;
+	local humanoid: Humanoid = self.Humanoid;
 	
-	self.Humanoid.PlatformStand = true;
-	self.Humanoid.EvaluateStateMachine = false;
-	self.Humanoid:SetAttribute("IsDead", true);
+	humanoid.PlatformStand = true;
+	humanoid.EvaluateStateMachine = false;
+	humanoid.HealthDisplayDistance = 0;
+	humanoid:SetAttribute("IsDead", true);
 	self.IsDead = true;
 
-	--game.Debris:AddItem(self.Animator, 0);
 	if self.Animator then
 		for _, track: AnimationTrack in pairs(self.Animator:GetPlayingAnimationTracks()) do
 			track:Stop();
 		end
 	end
 	
-	if self.KillerPlayer then
-		self:SetNetworkOwner(self.KillerPlayer, true);
-	else
-		self:SetNetworkOwner("auto", true);
-	end
+	game.Debris:AddItem(prefab, 1);
+	-- if self.KillerPlayer then
+	-- 	self:SetNetworkOwner(self.KillerPlayer, true);
+	-- else
+	-- 	self:SetNetworkOwner("auto", true);
+	-- end
+	self:SetNetworkOwner(nil, true);
 
 	if self.BehaviorTree then
 		self.BehaviorTree.Disabled = true;
@@ -126,33 +125,76 @@ function NpcComponent:KillNpc()
 	end
 	
 	task.spawn(function()
-		if prefab == nil then return end;
-		
-		task.wait(1);
-		modPhysics.WaitForSleep(rootPart);
-		
-		if workspace:IsAncestorOf(rootPart) then
-			local bodyParts = rootPart:GetConnectedParts(true); 
-
-			for b=1, #bodyParts do
-				if self.Prefab:IsAncestorOf(bodyParts[b]) then continue end;
-				table.remove(bodyParts, b);
+		if rootPart then
+			for _, tag in pairs(rootPart:GetTags()) do
+				rootPart:RemoveTag(tag);
 			end
-			
-			for a=1, #bodyParts do
-				local bodyPart: BasePart = bodyParts[a];
+		end
 
-				bodyPart.Anchored = true;
-				bodyPart.CanCollide = false;
+		if prefab then
+			for _, tag in pairs(prefab:GetTags()) do
+				prefab:RemoveTag(tag);
+			end
+			prefab:AddTag("Deadbody");
+			prefab:SetAttribute("DeadbodyTick", tick());
+
+			task.delay(0.1, function()
+				modReplicationManager.DesyncFromServer(prefab, workspace.Entities);
+			end)
+		end
+		
+		if self.Wield then
+			for _, obj in pairs(self.Wield.Instances) do
+				if obj:IsA("Model") then
+					if obj.PrimaryPart then
+						local handle: BasePart = obj.PrimaryPart;
+						handle.Massless = false;
+						handle.CustomPhysicalProperties = PhysicalProperties.new(4, 0.5, 1, 0.3, 1);
+					end
+					for _, weaponPart in pairs(obj:GetChildren()) do
+						if weaponPart:IsA("BasePart") then
+							weaponPart.CanCollide = true;
+						end
+					end
+					obj.Parent = workspace.Debris;
+					game.Debris:AddItem(obj, 10);
+					
+				elseif obj:IsA("Motor6D") then
+					obj:Destroy();
+					
+				end
 			end
 		end
 	end)
+
+	-- task.spawn(function()
+	-- 	if prefab == nil then return end;
+		
+	-- 	task.wait(1);
+	-- 	modPhysics.WaitForSleep(rootPart);
+		
+	-- 	if workspace:IsAncestorOf(rootPart) then
+	-- 		local bodyParts = rootPart:GetConnectedParts(true); 
+
+	-- 		for b=1, #bodyParts do
+	-- 			if self.Prefab:IsAncestorOf(bodyParts[b]) then continue end;
+	-- 			table.remove(bodyParts, b);
+	-- 		end
+			
+	-- 		for a=1, #bodyParts do
+	-- 			local bodyPart: BasePart = bodyParts[a];
+
+	-- 			bodyPart.Anchored = true;
+	-- 			bodyPart.CanCollide = false;
+	-- 		end
+	-- 	end
+	-- end)
 end
 
 function NpcComponent:BreakJoint(motor: Motor6D)
 	if motor == nil then return end;
 
-	local part0 :BasePart, part1 :BasePart = motor.Part0, motor.Part1;
+	local part0 :BasePart, part1 :BasePart = motor.Part0 :: BasePart, motor.Part1 :: BasePart;
 	motor:Destroy();
 	if self.JointsDestroyed == nil then
 		self.JointsDestroyed = {};
@@ -212,53 +254,6 @@ function NpcComponent:Destroy()
 	if self.IsDestroyed then return end;
 	self.IsDestroyed = true;
 	
-	local rootPart: BasePart = self.RootPart;
-	local prefab: Model = self.Prefab;
-	local humanoid: Humanoid = self.Humanoid;
-	
-	task.spawn(function()
-		if rootPart then
-			for _, tag in pairs(rootPart:GetTags()) do
-				rootPart:RemoveTag(tag);
-			end
-		end
-
-		if prefab then
-			for _, tag in pairs(prefab:GetTags()) do
-				prefab:RemoveTag(tag);
-			end
-			prefab:AddTag("Deadbody");
-			prefab:SetAttribute("DeadbodyTick", tick());
-		end
-		
-		if humanoid then
-			humanoid.HealthDisplayDistance = 0;
-		end
-		
-		if self.Wield then
-			for _, obj in pairs(self.Wield.Instances) do
-				if obj:IsA("Model") then
-					if obj.PrimaryPart then
-						local handle: BasePart = obj.PrimaryPart;
-						handle.Massless = false;
-						handle.CustomPhysicalProperties = PhysicalProperties.new(4, 0.5, 1, 0.3, 1);
-					end
-					for _, weaponPart in pairs(obj:GetChildren()) do
-						if weaponPart:IsA("BasePart") then
-							weaponPart.CanCollide = true;
-						end
-					end
-					obj.Parent = workspace.Debris;
-					game.Debris:AddItem(obj, 10);
-					
-				elseif obj:IsA("Motor6D") then
-					obj:Destroy();
-					
-				end
-			end
-		end
-	end)
-
 	task.delay(10, function()
 		for key, _ in pairs(self) do
 			if SafeKeys[key] == nil then

@@ -50,10 +50,6 @@ return function()
 	local remoteStorageSync = modRemotesManager:Get("StorageSync");
 	local remoteStorageDestroy = modRemotesManager:Get("StorageDestroy");
 	
-	local remoteMailboxSync = remotes.Interface.MailboxSync;
-	local remoteMissionsSync = remotes.Interface.MissionsSync;
-	local remoteTogglePlayer = remotes.TogglePlayer;
-	local remoteSquadSync = modRemotesManager:Get("SquadSync");
 	local remoteBodyEquipmentsSync = modRemotesManager:Get("BodyEquipmentsSync");
 	local remoteInteractableSync = modRemotesManager:Get("InteractableSync");
 	local remoteInteractionUpdate = modRemotesManager:Get("InteractionUpdate");
@@ -68,7 +64,7 @@ return function()
 	local bindOpenLobbyInterface = remotes.LobbyInterface.OpenLobbyInterface;
 	
 	--
-	local modData = require(dataModule);
+	local modData = require(dataModule :: ModuleScript);
 	
 	LogService.MessageOut:Connect(function(message, messageType)
 		--Validate

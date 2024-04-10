@@ -7,7 +7,7 @@ return function()
 	local Lighting = game:GetService("Lighting");
 	local CollectionService = game:GetService("CollectionService");
 	
-	local modData = require(localplayer:WaitForChild("DataModule"));
+	local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 
 	local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
@@ -23,7 +23,8 @@ return function()
 
 	local CameraHandler = {};
 	CameraHandler.__index = CameraHandler;
-	
+	CameraHandler.PreviousLayerId = nil;
+
 	-- Camera priority level
 	-- 1 Character
 	-- 2 Cutscene
@@ -72,6 +73,7 @@ return function()
 	--== CameraEffects
 	local CameraEffects = {};
 	CameraEffects.__index = CameraEffects;
+	CameraEffects.Atmosphere = nil;
 
 	modData.CameraEffects = CameraEffects;
 	
@@ -347,7 +349,7 @@ return function()
 			local voxelPoint = graphicsChunks:GetOrDefault(voxelPos, {Groups={};});
 
 			local chunkObject = voxelPoint.Value;
-			local groupsList = chunkObject.Groups;
+			local _groupsList = chunkObject.Groups;
 			
 			if chunkObject.Groups[smallObject] == nil then
 				chunkObject.Groups[smallObject] = {};

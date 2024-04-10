@@ -63,23 +63,18 @@ local SeasonsConfigurations = {
 }
 
 workspace:SetAttribute("GlobalTemperature", 15);
-workspace:SetAttribute("DayOfYear", os.date("%j")-1);
+workspace:SetAttribute("DayOfYear", (tonumber(os.date("%j")) :: number) -1);
 -- Variables;
-local PhysicsService = game:GetService("PhysicsService");
 local TweenService = game:GetService("TweenService");
 local CollectionService = game:GetService("CollectionService");
 local Lighting = game.Lighting;
 
 
 local modConfigurations = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("Configurations"));
-local modPhysics = require(game.ServerScriptService.ServerLibrary.Physics);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modInteractable = require(game.ReplicatedStorage.Library.Interactables);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-local modTouchHandler = require(game.ReplicatedStorage.Library.TouchHandler);
-local modDamagable = Debugger:Require(game.ReplicatedStorage.Library.Damagable);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modWorldClipsHandler = require(game.ReplicatedStorage.Library.WorldClipsHandler);
 
 local folderClips = workspace:WaitForChild("Clips");
@@ -124,7 +119,7 @@ game.StarterPlayer.EnableMouseLockOption = false;
 --game.StarterPlayer.DevComputerMovementMode = Enum.DevComputerMovementMode.KeyboardMouse;
 --game.StarterPlayer.DevComputerCameraMovementMode = Enum.DevComputerCameraMovementMode.Classic;
 
-local isNight = nil;
+local isNight: boolean;
 if game.Lighting:FindFirstChild("PlaceholderSky") then
 	game.Lighting.PlaceholderSky:Destroy();
 end
@@ -172,9 +167,11 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 		if modSyncTime.IsDay and isNight ~= false then
 			isNight = false;
 			modOnGameEvents:Fire("OnDayTimeStart");
-		elseif not modSyncTime.IsDay and isNight ~= true then
+
+		elseif not modSyncTime.IsDay and isNight == false then
 			isNight = true;
 			modOnGameEvents:Fire("OnNightTimeStart");
+
 		end
 	end
 	
@@ -282,7 +279,7 @@ local function InitInteractable(interactableModule)
 		end
 	end
 	
-	local interactObj = require(interactableModule);
+	local _interactObj = require(interactableModule);
 end
 
 task.spawn(function()
@@ -385,10 +382,7 @@ for _, obj in pairs(workspace:GetDescendants()) do
 	end
 end
 
-
 task.spawn(function()
-	local modCommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
-
 	Debugger.AwaitShared("modCommandsLibrary");
 	shared.modCommandsLibrary:HookChatCommand("setdayofyear", {
 		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;

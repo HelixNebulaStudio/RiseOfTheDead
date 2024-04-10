@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local SyncTime = {};
+SyncTime.IsDay = nil;
 SyncTime.Weekdays = {
 	"Sunday";
 	"Monday";

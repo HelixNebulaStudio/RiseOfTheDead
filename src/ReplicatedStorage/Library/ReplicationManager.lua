@@ -15,6 +15,7 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local remoteSetClientProperties = modRemotesManager:Get("SetClientProperties");
 local remoteReplication = modRemotesManager:Get("Replication");
 
+local camera: Camera = workspace.CurrentCamera;
 local replicateFolder;
 --==
 
@@ -123,7 +124,7 @@ function ReplicateObj:IsAOwner(player: Player)
 	local proxyOwners = ReplicationManager.ProxyOwners[player.Name];
 	
 	if proxyOwners then
-		if proxyOwners == true then Debugger:Warn("Player (",player.Name,") is proxy owner of (",self.Prefab,")") return true end;
+		if proxyOwners == true then Debugger:Warn("Player (",player.Name,") is proxy owner of (",self.Prefab,")"); return true end;
 		
 		for a=1, #self.Owners do
 			if table.find(proxyOwners, self.Owners[a]) then
@@ -162,6 +163,22 @@ function ReplicationManager.SetClientParent(player, prefab, parent)
 		if WaitForReady(player) == false then return end;
 		remoteReplication:InvokeClient("sync", player, prefab, parent);
 	end)
+end
+
+function ReplicationManager.DesyncFromServer(prefab: Instance, parent: Instance, players: {[number]: Player}?)
+	if not game:IsAncestorOf(prefab) then return end;
+	if players == nil then
+		players = game:GetService("Players"):GetPlayers();
+	end;
+
+	prefab.Parent = camera;
+
+	if players == nil then return end;
+	for a=1, #players do
+		task.spawn(function()
+			remoteReplication:InvokeClient(players[a], "desync", prefab, parent);
+		end)
+	end
 end
 
 -- !outline: ReplicationManager.UnreplicateFrom(player, prefab)
@@ -302,8 +319,7 @@ end
 
 if RunService:IsClient() then
 	Debugger:Log("Initialized");
-	local localPlayer = game.Players.LocalPlayer;
-	
+
 	remoteSetClientProperties.OnClientEvent:Connect(function(setData)
 		local instances = typeof(setData.Instances) == "table" and setData.Instances or {setData.Instances};
 		
@@ -345,10 +361,15 @@ if RunService:IsClient() then
 			
 			return true;
 			
-		elseif action == "" then
+		elseif action == "desync" then
+			pcall(function()
+				prefab.Parent = parent;
+			end)
 			
-			
+			return true;
+
 		end
+		return;
 	end
 	
 	task.spawn(function()
