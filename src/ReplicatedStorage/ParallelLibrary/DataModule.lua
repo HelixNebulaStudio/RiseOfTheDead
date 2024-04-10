@@ -20,6 +20,7 @@ function Data:GetSetting(key)
 		DefaultSettings = {
 			["DisableDeathRagdoll"] = (Data:IsMobile() and 1 or 0);
 			["MaxDeadbodies"] = (Data:IsMobile() and 0 or 16);
+			["DeadbodyDespawnTimer"] = (Data:IsMobile() and 4 or 8);
 			["DisableParticle3D"] = (Data:IsMobile() and 1 or 0);
 			["LimitParticles"] = (Data:IsMobile() and 1 or 0); -- limit particles;
 			["DisableBulletTracers"] = (Data:IsMobile() and 1 or 0);

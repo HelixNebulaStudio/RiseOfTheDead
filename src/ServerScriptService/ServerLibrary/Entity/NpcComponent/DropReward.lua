@@ -25,7 +25,7 @@ function Component.new(Npc)
 		if resourceTable then
 			local itemDrop = modItemDrops.ChooseDrop(resourceTable);
 			if itemDrop then
-				modItemDrops.Spawn(itemDrop, cframe + offset + Vector3.new(random:NextNumber(-0.5, 0.5), 0, random:NextNumber(-0.5, 0.5)));
+				modItemDrops.Spawn(itemDrop, cframe + offset + Vector3.new(random:NextNumber(-0.5, 0.5), -1.5, random:NextNumber(-0.5, 0.5)));
 			end
 		end
 		
@@ -36,7 +36,7 @@ function Component.new(Npc)
 			if regionDropRewardLib then
 				local itemDrop = modItemDrops.ChooseDrop(regionDropRewardLib);
 				if itemDrop then
-					modItemDrops.Spawn(itemDrop, cframe + offset + Vector3.new(random:NextNumber(-0.5, 0.5), 0, random:NextNumber(-0.5, 0.5)));
+					modItemDrops.Spawn(itemDrop, cframe + offset + Vector3.new(random:NextNumber(-0.5, 0.5), -1.5, random:NextNumber(-0.5, 0.5)));
 				end
 			end
 		end

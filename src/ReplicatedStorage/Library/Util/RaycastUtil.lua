@@ -106,7 +106,6 @@ function RaycastUtil.EdgeCast(basePart, dir, rayParam)
 	return r;
 end
 
--- !outline RaycastUtil.IsHittable(origin: Vector3, range: number, targetObject)
 function RaycastUtil.GetHittable(origin: Vector3, range: number, targetObject, minPartSize: number?)
 	local hitParts = {};
 	local maxParts = 0;
@@ -141,5 +140,20 @@ function RaycastUtil.GetHittable(origin: Vector3, range: number, targetObject, m
 	return hitParts, maxParts;
 end
 
+local groundRayParams: RaycastParams;
+function RaycastUtil.GetGround(origin: Vector3, range: number?) : RaycastResult?
+	if groundRayParams == nil then
+		groundRayParams = RaycastParams.new();
+		groundRayParams.FilterType = Enum.RaycastFilterType.Include;
+		groundRayParams.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain;};
+	end
+
+	local r = range or 64;
+	local rayResult = workspace:Raycast(origin, -Vector3.yAxis * r, groundRayParams);
+	if rayResult then
+		return rayResult;
+	end
+	return nil;
+end
 
 return RaycastUtil;
