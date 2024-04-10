@@ -71,8 +71,6 @@ local Vars = {
 }
 Vars.EngineVersion = Vars.GameVersion.."."..Vars.GameBuild;
 
-local RunService = game:GetService("RunService");
-
 function Vars.IsCreator(player)
 	if player == nil then return false; end;
 	if player.UserId < 0 then
