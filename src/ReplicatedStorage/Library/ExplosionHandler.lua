@@ -63,8 +63,8 @@ function ExplosionHandler:Cast(position, params)
 				table.insert(hitResultLayer, hitParts[a]);
 			end
 		end
-		hitMarker=nil;
-		
+		table.clear(hitMarker);
+
 		table.insert(hitResultLayers, hitResultLayer);
 	end
 	
@@ -80,8 +80,23 @@ function ExplosionHandler:Cast(position, params)
 	return hitResultLayers;
 end
 
+export type ExplosionProcessPacket = {
+	Damage: number?;
+	MinDamage: number?;
+	MaxDamage: number?;
 
-function ExplosionHandler:Process(position, hitResultLayers, params)
+	DamageRatio: number?;
+	ExplosionStun: number?;
+	ExplosionForce: number?;
+	Owner: Player?;
+	DamageOrigin: Vector3?;
+	OnPartHit: ((packet: ExplosionProcessPacket, basePart: BasePart) -> nil)?;
+	HandleExplosion: boolean?;
+
+	TargetableEntities: {[any]:any}?;
+	StorageItem: {[any]:any}?;
+}
+function ExplosionHandler:Process(position, hitResultLayers, params: ExplosionProcessPacket)
 	params = params or {};
 	
 	-- Default values;
@@ -91,7 +106,8 @@ function ExplosionHandler:Process(position, hitResultLayers, params)
 	params.ExplosionStun = params.ExplosionStun or 0.5;
 	params.ExplosionForce = params.ExplosionForce or 50;
 	params.Owner = params.Owner or nil;
-	
+	params.DamageOrigin = params.DamageOrigin or nil;
+
 	params.OnPartHit = params.OnPartHit or nil;
 	params.HandleExplosion = params.HandleExplosion;
 	
@@ -102,7 +118,7 @@ function ExplosionHandler:Process(position, hitResultLayers, params)
 		
 		for _, basePart: BasePart in pairs(hitList) do
 			if params.OnPartHit then
-				params.OnPartHit(basePart);
+				params.OnPartHit(params, basePart);
 			end
 			
 			if params.HandleExplosion == false then continue end;
@@ -126,7 +142,7 @@ function ExplosionHandler:Process(position, hitResultLayers, params)
 					local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 					modTagging.Tag(targetModel, params.Owner and params.Owner.Character);
 
-					damage = (params.Damage/#fireFuncs);
+					damage = ((params.Damage or 1)/#fireFuncs);
 
 					local humanoid = typeof(damagable.HealthObj) == "Instance" and damagable.HealthObj:IsA("Humanoid") and damagable.HealthObj or nil;
 					
@@ -193,6 +209,25 @@ function ExplosionHandler:Process(position, hitResultLayers, params)
 		end
 		
 		wait();
+	end
+end
+
+function ExplosionHandler.GenericOnPartHit(packet: ExplosionProcessPacket, hitPart: BasePart)
+	if hitPart.Anchored then return end
+	if not workspace.Environment:IsAncestorOf(hitPart) then return end;
+
+	local rootModel = hitPart;
+	while rootModel:GetAttribute("DynamicPlatform") == nil do
+		rootModel = rootModel.Parent;
+		if rootModel == workspace or rootModel == game then break; end
+	end
+	if rootModel:GetAttribute("DynamicPlatform") then return end;
+
+	local origin = packet.DamageOrigin;
+	local assemblyRootPart: BasePart = hitPart:GetRootPart();
+	if assemblyRootPart and assemblyRootPart.Anchored ~= true then
+		local dir = (assemblyRootPart.Position-origin).Unit
+		assemblyRootPart:ApplyImpulse(dir * assemblyRootPart.AssemblyMass * 150);
 	end
 end
 

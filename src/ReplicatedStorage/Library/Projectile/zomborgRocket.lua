@@ -5,7 +5,6 @@ Pool.__index = Pool;
 local RunService = game:GetService("RunService");
 local Projectile = require(script.Parent.Projectile);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modExplosionHandler = require(game.ReplicatedStorage.Library.ExplosionHandler);
 
 local projectilePrefab = script.Rocket;
@@ -31,8 +30,6 @@ function Pool.new()
 	
 	local activated = false;
 	function projectile:OnContact(arcPoint)
-		local hitPart = arcPoint.Hit;
-		
 		if activated then return end;
 		activated = true;
 
@@ -60,28 +57,11 @@ function Pool.new()
 			local damage = self.Damage;
 
 			modExplosionHandler:Process(lastPosition, hitLayers, {
-				OnPartHit=function(hitPart)
-					if hitPart.Anchored then return end
-					if not workspace.Environment:IsAncestorOf(hitPart) then return end;
-
-
-					local rootModel = hitPart;
-					while rootModel:GetAttribute("DynamicPlatform") == nil do
-						rootModel = rootModel.Parent;
-						if rootModel == workspace or rootModel == game then break; end
-					end
-					if rootModel:GetAttribute("DynamicPlatform") then return end;
-					
-					
-					if hitPart.Parent == self.Owner then return end;
-					local assemblyRootPart = hitPart:GetRootPart();
-					if assemblyRootPart and assemblyRootPart.Anchored ~= true then
-						assemblyRootPart.Velocity = (assemblyRootPart.Position-lastPosition).Unit*30;
-					end
-				end;
-
 				Damage = damage;
 				ExplosionForce = 0;
+
+				DamageOrigin = lastPosition;
+				OnPartHit=modExplosionHandler.GenericOnPartHit;
 			});
 			
 		else

@@ -10,11 +10,6 @@ local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modExplosionHandler = require(game.ReplicatedStorage.Library.ExplosionHandler);
 
 local grenadePrefab = script.Grenade;
-local random = Random.new();
-
-local remotes = game.ReplicatedStorage.Remotes;
-local bindIsInDuel = remotes.IsInDuel;
-
 --== Script;
 function Pool.new()
 	local projectile = setmetatable({}, Projectile);
@@ -59,7 +54,7 @@ function Pool.new()
 			local lastPosition = self.Prefab.Position;
 			
 			local pointAtt = Debugger:Point(lastPosition);
-			modAudio.Play(random:NextInteger(1,2)==1 and "Explosion" or "Explosion2", pointAtt);
+			modAudio.Play(math.random(1,2)==1 and "Explosion" or "Explosion2", pointAtt);
 			local ex = Instance.new("Explosion");
 			ex.DestroyJointRadiusPercent = 0;
 			ex.BlastRadius = self.Configurations.ExplosionRadius or 20;
@@ -79,25 +74,6 @@ function Pool.new()
 			local damageRatio = self.Configurations.DamageRatio;
 
 			modExplosionHandler:Process(lastPosition, hitLayers, {
-				OnPartHit=function(hitPart)
-					if hitPart.Anchored then return end
-					if not workspace.Environment:IsAncestorOf(hitPart) then return end;
-
-
-					local rootModel = hitPart;
-					while rootModel:GetAttribute("DynamicPlatform") == nil do
-						rootModel = rootModel.Parent;
-						if rootModel == workspace or rootModel == game then break; end
-					end
-					if rootModel:GetAttribute("DynamicPlatform") then return end;
-
-
-					local assemblyRootPart = hitPart:GetRootPart();
-					if assemblyRootPart and assemblyRootPart.Anchored ~= true then
-						assemblyRootPart.Velocity = (assemblyRootPart.Position-lastPosition).Unit*30;
-					end
-				end;
-
 				Owner = self.Owner;
 				StorageItem = self.StorageItem;
 				TargetableEntities = projectile.TargetableEntities;
@@ -105,6 +81,9 @@ function Pool.new()
 				Damage = damage;
 				ExplosionStun = explosionStun;
 				DamageRatio = damageRatio;
+
+				DamageOrigin = lastPosition;
+				OnPartHit=modExplosionHandler.GenericOnPartHit;
 			});
 			
 		end)

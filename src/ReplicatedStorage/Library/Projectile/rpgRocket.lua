@@ -88,25 +88,6 @@ function Pool.new()
 		local damageRatio = self.Configurations.DamageRatio;
 		
 		modExplosionHandler:Process(lastPosition, hitLayers, {
-			OnPartHit=function(hitPart)
-				if hitPart.Anchored then return end
-				if not workspace.Environment:IsAncestorOf(hitPart) then return end;
-				
-				
-				local rootModel = hitPart;
-				while rootModel:GetAttribute("DynamicPlatform") == nil do
-					rootModel = rootModel.Parent;
-					if rootModel == workspace or rootModel == game then break; end
-				end
-				if rootModel:GetAttribute("DynamicPlatform") then return end;
-				
-				
-				local assemblyRootPart = hitPart:GetRootPart();
-				if assemblyRootPart and assemblyRootPart.Anchored ~= true then
-					assemblyRootPart.Velocity = (assemblyRootPart.Position-lastPosition).Unit*30;
-				end
-			end;
-			
 			Owner = self.Owner;
 			StorageItem = self.StorageItem;
 			TargetableEntities = projectile.TargetableEntities;
@@ -114,6 +95,9 @@ function Pool.new()
 			Damage = damage;
 			ExplosionStun = explosionStun;
 			DamageRatio = damageRatio;
+
+			DamageOrigin = lastPosition;
+			OnPartHit=modExplosionHandler.GenericOnPartHit;
 		});
 		
 	end

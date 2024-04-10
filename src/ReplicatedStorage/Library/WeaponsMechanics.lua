@@ -277,15 +277,15 @@ type HitscanRayProperties = {
 	Direction: Vector3; 
 	IncludeList: {any};
 	Range: number;
-	MaxPierce: number;
+	MaxPierce: number?;
 	PenTable: unknown?;
-	OnCastFunc: () -> boolean;
+	OnCastFunc: (() -> boolean)?;
 	PenReDirection: Vector3?;
-	OnPenFunc: ({
+	OnPenFunc: (({
 		BasePart: Instance;
 		Position: Vector3;
 		Normal: Vector3;
-	}) -> nil;
+	}) -> nil)?;
 };
 -- !outline: function CastHitscanRay(properties: HitscanRayProperties)
 function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)

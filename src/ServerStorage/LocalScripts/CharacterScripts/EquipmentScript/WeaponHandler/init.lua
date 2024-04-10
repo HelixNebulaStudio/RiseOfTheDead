@@ -5,7 +5,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local UserInputService = game:GetService("UserInputService");
 local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
-local TweenService = game:GetService("TweenService");
 
 local player = game.Players.LocalPlayer;
 local playerGui = player.PlayerGui;
@@ -16,7 +15,7 @@ local head = character:WaitForChild("Head");
 local humanoid = character:WaitForChild("Humanoid");
 local animator = humanoid:WaitForChild("Animator");
 
-local modData = require(player:WaitForChild("DataModule"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 
 local modWeaponMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
@@ -27,19 +26,16 @@ local modFlashlight = require(script.Parent:WaitForChild("Flashlight"));
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modArcTracing = require(game.ReplicatedStorage.Library.ArcTracing);
 local modParticleSprinkler = require(game.ReplicatedStorage.Particles.ParticleSprinkler);
-local modSyncVariable = require(game.ReplicatedStorage.Library.SyncVariable);
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
-local modGuiObjectTween = require(playerGui:WaitForChild("GuiObjectTween"));
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 
 local modRadialImage = require(game.ReplicatedStorage.Library.UI.RadialImage);
 local modStorageInterface = require(game.ReplicatedStorage.Library.UI.StorageInterface);
 
 --== Remotes;
-local remotes = game.ReplicatedStorage.Remotes;
 local prefabs = game.ReplicatedStorage.Prefabs.Objects;
 
 local remotePrimaryFire = modRemotesManager:Get("PrimaryFire");
@@ -56,7 +52,6 @@ local characterProperties = modCharacter.CharacterProperties;
 
 local random = Random.new();
 local spreadRandom = Random.new(player.UserId);
-local shotDebug = tick();
 local animationFiles = {};
 local reloadRadial;
 local lastAdsBool = false;
@@ -102,7 +97,11 @@ modConfigurations.OnChanged("DisableWeaponInterface", toggleWeaponInterface)
 modConfigurations.OnChanged("DisableHud", toggleWeaponInterface);
 
 function WeaponHandler:Equip(library, weaponId)
-	local cache = {};
+	local cache = {
+		FlipPlayingWeaponAnim = nil;
+		LastSprintAnimationCanPlay = nil;
+	};
+
 	for _, obj in pairs(playerGui:GetChildren()) do
 		if obj.Name == "WeaponInterface" then
 			obj:Destroy();
@@ -178,8 +177,7 @@ function WeaponHandler:Equip(library, weaponId)
 	local mainWeaponModel = rightWeaponModel or leftWeaponModel;
 	local mainHandle = mainWeaponModel:WaitForChild("Handle");
 	local bulletOrigin = (objects.Right and objects.Right.BulletOrigin) or (objects.Left and objects.Left.BulletOrigin);
-	local attachmentWeaponSights = (objects.Right and objects.Right.WeaponSights) or (objects.Left and objects.Left.WeaponSights);
-	
+
 	local infType = mainWeaponModel:GetAttribute("InfAmmo");
 	
 	local sightViewModel;
@@ -236,8 +234,6 @@ function WeaponHandler:Equip(library, weaponId)
 		end
 	end
 	
-	
-	local crosshairVariables = {spreadScale=4; crossLength=14;};
 	Equipped.RightHand.Data = {
 		Inaccuracy=(configurations.ModInaccuracy or configurations.Inaccuracy); 
 		LerpBody=true; 
@@ -789,7 +785,7 @@ function WeaponHandler:Equip(library, weaponId)
 					local arcPart = arcList[a];
 					local arcPoint = arcPoints[a];
 					
-					local order = math.clamp(1 - (a/#arcList * 0.7), 0.5, 1);
+					local _order = math.clamp(1 - (a/#arcList * 0.7), 0.5, 1);
 					arcPart.Parent = workspace.CurrentCamera;
 					arcPart.Size = Vector3.new(0.05, 0.05, arcPoint.Displacement);
 					arcPart.Transparency = 0;
@@ -805,7 +801,7 @@ function WeaponHandler:Equip(library, weaponId)
 				for _, obj in pairs(CollectionService:GetTagged("AdsTrajectory")) do
 					obj:Destroy();
 				end
-				arcList = {};
+				table.clear(arcList);
 			end
 		end
 		
@@ -827,7 +823,7 @@ function WeaponHandler:Equip(library, weaponId)
 			soundOrigin = camera;
 		end
 		
-		local sound = modAudio.PlayReplicated(id, camera, looped);
+		local sound = modAudio.PlayReplicated(id, soundOrigin, looped);
 		sound:SetAttribute("WeaponAudio", true);
 		
 		return sound;
@@ -853,13 +849,13 @@ function WeaponHandler:Equip(library, weaponId)
 			end
 		end
 	end
-	
+
+	local delta = 1/30;
 	local function fireProj()
 		if not equipped or unequiped then return end;
 		
 		local baseFr = 60/properties.Rpm;
 		local firerate = baseFr;
-		local delta = 1/30;
 		
 		if configurations.RapidFire then
 			local f = math.clamp((tick()-Equipped.RightHand.Data.RapidFireStart)/configurations.RapidFire, 0, 1);
@@ -923,7 +919,6 @@ function WeaponHandler:Equip(library, weaponId)
 		end
 
 		local values = storageItem.Values;
-		local threadTracker = 0;
 		task.spawn(function()
 			for k, v in pairs(objects) do
 				local objectTable = v;
@@ -1105,11 +1100,13 @@ function WeaponHandler:Equip(library, weaponId)
 								end
 								
 								if humanoid == nil or humanoid.Name ~= "NavMeshIgnore" then
-									if modData and modData:GetSetting("DisableParticle3D") ~= true then
+									if modData and modData:GetSetting("DisableParticle3D") ~= 1 and multiIndex == 1 then
 										modParticleSprinkler:Emit{
 											Type=1;
 											Origin=CFrame.new(position);
 											Velocity=normal;
+											MinSpawnCount=1;
+											MaxSpawnCount=4;
 										};
 									else
 										if humanoid and configurations.GenerateBloodEffect then
@@ -1138,10 +1135,12 @@ function WeaponHandler:Equip(library, weaponId)
 								end
 								if configurations.GeneratesBulletHoles and basePart.Transparency <= 0.9 then
 									task.spawn(function() 
-										modWeaponMechanics.CreateBulletHole(basePart, position, normal, camera);
+										modWeaponMechanics.CreateBulletHole(basePart, position, normal);
 									end)
 								end;
 							end
+
+							return;
 						end
 						
 						local rayWhitelist = CollectionService:GetTagged("TargetableEntities") or {};
@@ -1177,7 +1176,7 @@ function WeaponHandler:Equip(library, weaponId)
 									
 									if configurations.GeneratesBulletHoles and basePart.Transparency <= 0.9 then
 										task.spawn(function() 
-											modWeaponMechanics.CreateBulletHole(basePart, position, normal, camera);
+											modWeaponMechanics.CreateBulletHole(basePart, position, normal);
 										end)
 									end;
 									modWeaponMechanics.ImpactSound{
@@ -1232,7 +1231,7 @@ function WeaponHandler:Equip(library, weaponId)
 							local newDirection = (scanPoint-head.Position).Unit;
 							
 							local origin = head.Position;
-							local spreadedDirection = newDirection * arcTracerConfig.Velocity;
+							spreadedDirection = newDirection * arcTracerConfig.Velocity;
 							local bulletOrigin = objectTable.BulletOrigin.WorldPosition;
 
 							local rayPoint = modWeaponMechanics.CastHitscanRay{
@@ -1324,9 +1323,8 @@ function WeaponHandler:Equip(library, weaponId)
 			end
 		end)
 		
-		local baseFr = 60/properties.Rpm;
-		local firerate = baseFr;
-		local delta = 1/30;
+		-- local baseFr = 60/properties.Rpm;
+		-- local firerate = baseFr;
 		if configurations.RapidFire then
 			local f = math.clamp((tick()-Equipped.RightHand.Data.RapidFireStart)/configurations.RapidFire, 0, 1);
 			firerate = baseFr + f*(delta - baseFr);
@@ -1427,7 +1425,6 @@ function WeaponHandler:Equip(library, weaponId)
 			
 			local reloadYielded = false;
 			local reloadDuration = math.clamp(properties.ReloadSpeed-0.2, 0.05, 20);
-			local reloadStartTick = tick();
 			delay(reloadDuration, function()
 				if not reloadYielded then
 					bindReloadYield:Fire(1);
@@ -1459,7 +1456,6 @@ function WeaponHandler:Equip(library, weaponId)
 				end;
 				
 				if newAmmo < configurations.AmmoLimit and availableInvAmmo > 0 then
-					local ammoAfterMA = newAmmo;
 					local ammoToAdd = math.min(configurations.AmmoLimit-newAmmo, availableInvAmmo);
 					newAmmo = newAmmo + ammoToAdd;
 					availableInvAmmo = availableInvAmmo - ammoToAdd;
@@ -1734,7 +1730,6 @@ function WeaponHandler:Equip(library, weaponId)
 	
 	local function SpecialRequest()
 		Debugger:Warn("Special Request");
-		
 		return true;
 	end
 	
@@ -1748,7 +1743,7 @@ function WeaponHandler:Equip(library, weaponId)
 	Equipped.RightHand["KeyFire"] = PrimaryFireRequest;
 	Equipped.RightHand["KeyReload"] = ReloadRequest;
 	Equipped.RightHand["KeyInspect"] = InspectRequest;
-	--Equipped.RightHand["KeyToggleSpecial"] = SpecialRequest;
+	Equipped.RightHand["KeyToggleSpecial"] = SpecialRequest;
 	
 	local function ToggleSpecialRequest()
 		local modInfo = modWeaponModule.ModHooks.PrimaryEffectMod;
@@ -1793,6 +1788,8 @@ function WeaponHandler:Equip(library, weaponId)
 			inputData.PrimaryEffectMod = ToggleSpecialRequest();
 			return true;
 		end;
+
+		return;
 	end
 
 	if modWeaponModule.ModHooks.PrimaryEffectMod then
@@ -1846,14 +1843,12 @@ function WeaponHandler:Equip(library, weaponId)
 		for _, obj in pairs(CollectionService:GetTagged("AdsTrajectory")) do
 			obj:Destroy();
 		end
-		arcList = nil;
+		table.clear(arcList);
 		
 		if sightViewModel then
 			configurations.AimDownViewModel = sightViewModel.CFrame;
 		end
-		--if objects.Right and objects.Right.SightViewModel then
-		--	configurations.AimDownViewModel = objects.Right.SightViewModel.CFrame;
-		--end
+
 		characterProperties.UseViewModel = true;
 		scopeFrame.Visible = false;
 		
@@ -1889,10 +1884,6 @@ function WeaponHandler:Equip(library, weaponId)
 	if configurations.OnAmmoUpdate then configurations.OnAmmoUpdate(mainWeaponModel, modWeaponModule, properties.Ammo); end
 	
 	RunService:BindToRenderStep("WeaponRender", Enum.RenderPriority.Camera.Value, weaponRender);
-	
-	local function onWaistSignalReached(keyframe)
-		characterProperties.Joints.WaistY = math.rad(tonumber(keyframe));
-	end
 	
 	for key, animLib in pairs(animations) do
 		local animationId = "rbxassetid://"..(animations[key].OverrideId or animations[key].Id);
@@ -2211,7 +2202,7 @@ remoteReloadWeapon.OnClientEvent:Connect(function(paramPacket)
 	local modWeaponModule = modData:GetItemClass(paramPacket.Id);
 	local properties = modWeaponModule.Properties;
 
-	local unixTime = paramPacket.UnixTime;
+	local _unixTime = paramPacket.UnixTime;
 	
 	if paramPacket.MA then
 		properties.MaxAmmo = paramPacket.MA;

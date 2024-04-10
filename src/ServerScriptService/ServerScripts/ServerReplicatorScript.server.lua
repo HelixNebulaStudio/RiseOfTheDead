@@ -583,7 +583,11 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 		local victims, targetPoints = (shotdata.Victims or {}), {};
 				
 		local targetsPierceable = (properties.Piercing or 0);
-		local maxVictims = math.clamp(#victims, 0, (type(properties.Multishot) == "table" and (properties.Multishot.Max + targetsPierceable) or properties.Multishot + targetsPierceable));
+		local maxVictims = math.clamp(
+			#victims,
+			0, 
+			(type(properties.Multishot) == "table" and (properties.Multishot.Max + targetsPierceable) or properties.Multishot + targetsPierceable)
+		);
 		for a=1, maxVictims do
 			if shotdata.TargetPoints and shotdata.TargetPoints[a] then
 				table.insert(targetPoints, shotdata.TargetPoints[a]);
@@ -698,7 +702,7 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 							end
 							
 						elseif configurations.WeaponType == modAttributes.WeaponType.Shotgun then
-							newDamageSource.BreakJoint = true;
+							newDamageSource.BreakJoint = math.random(1, math.max(maxVictims, 2)) == 1;
 			
 						end
 

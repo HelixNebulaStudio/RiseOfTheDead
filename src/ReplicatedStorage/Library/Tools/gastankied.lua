@@ -1,19 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local PhysicsService = game:GetService("PhysicsService");
-local RunService = game:GetService("RunService");
-
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modExplosionHandler = require(game.ReplicatedStorage.Library.ExplosionHandler);
-
-local TargetableEntities = modConfigurations.TargetableEntities;
-
-local remotes = game.ReplicatedStorage.Remotes;
-local bindIsInDuel = remotes.IsInDuel;
-
-local random = Random.new();
 
 return function(handler)
 	local Structure = {};
@@ -28,7 +18,6 @@ return function(handler)
 	Structure.BlastForce = 100;
 	
 	function Structure:OnSpawn(prefab)
-		local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 		local player = self.Player;
 		local base = prefab.PrimaryPart;
 		
@@ -45,7 +34,7 @@ return function(handler)
 			local lastPosition = base.Position;
 			
 			modAudio.Play("ClockTick", base);
-			modAudio.Play(random:NextInteger(1, 2) == 1 and "Explosion" or "Explosion2", base);
+			modAudio.Play(math.random(1, 2) == 1 and "Explosion" or "Explosion2", base);
 			local ex = Instance.new("Explosion");
 			ex.DestroyJointRadiusPercent = 0;
 			ex.BlastRadius = Structure.Distance;
@@ -63,31 +52,16 @@ return function(handler)
 			});
 
 			modExplosionHandler:Process(lastPosition, hitLayers, {
-				OnPartHit=function(hitPart)
-					if hitPart.Anchored then return end
-					if not workspace.Environment:IsAncestorOf(hitPart) then return end;
-
-
-					local rootModel = hitPart;
-					while rootModel:GetAttribute("DynamicPlatform") == nil do
-						rootModel = rootModel.Parent;
-						if rootModel == workspace or rootModel == game then break; end
-					end
-					if rootModel:GetAttribute("DynamicPlatform") then return end;
-
-
-					local assemblyRootPart = hitPart:GetRootPart();
-					if assemblyRootPart and assemblyRootPart.Anchored ~= true then
-						assemblyRootPart.Velocity = (assemblyRootPart.Position-lastPosition).Unit*30;
-					end
-				end;
-
 				Owner = player;
 
 				DamageRatio = 0.24;
 				MinDamage = 120;
 				MaxDamage = 100000;
 				ExplosionStun = 10;
+				TargetableEntities = modConfigurations.TargetableEntities;
+
+				DamageOrigin = lastPosition;
+				OnPartHit=modExplosionHandler.GenericOnPartHit;
 			});
 			
 		end)
