@@ -210,7 +210,7 @@ Settings.Add("MaxDeadbodies", function(v)
 	return v and tonumber(v) and math.clamp(tonumber(v) :: number, 0, 64) or nil;
 end)
 Settings.Add("DeadbodyDespawnTimer", function(v)
-	return v and tonumber(v) and math.clamp(tonumber(v) :: number, 0, 61) or nil;
+	return v and tonumber(v) and math.clamp(tonumber(v) :: number, 1, 61) or nil;
 end)
 
 Settings.Add("ObjMats", booleanOrNil)
@@ -530,7 +530,7 @@ baseConfigInterface:Add("VisualsGraphics", "SliderOption", {
 	DescProperties={Text="The time until dead bodies are despawned.";};
 	Config={
 		SettingsKey="DeadbodyDespawnTimer";
-		RangeInfo={Min=0; Max=61; Default=61; ValueType="Flat";
+		RangeInfo={Min=1; Max=61; Default=61; ValueType="Flat";
 			DisplayValueFunc=function(v)
 				if v == 61 then
 					return "Disabled";

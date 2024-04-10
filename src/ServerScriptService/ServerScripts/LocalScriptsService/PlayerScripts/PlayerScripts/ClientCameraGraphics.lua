@@ -16,7 +16,6 @@ return function()
 	local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 	local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 	local modSettings = require(game.ReplicatedStorage.Library.Settings);
-	local modDeadbodiesHandler = require(game.ReplicatedStorage.Library.DeadbodiesHandler);
 	
 	--== Camera Handler
 	local camera = workspace.CurrentCamera;
@@ -413,21 +412,6 @@ return function()
 		end
 		
 	end);
-	
-	local lastDbDespawnTick = tick();
-	CollectionService:GetInstanceAddedSignal("Deadbody"):Connect(function(prefab)
-		local deadbodyDespawnTimer = modData:GetSetting("DeadbodyDespawnTimer") or 61;
-		
-		if deadbodyDespawnTimer < 61 then
-			game.Debris:AddItem(prefab, deadbodyDespawnTimer);
-		end
-		
-		if lastDbDespawnTick and tick()-lastDbDespawnTick <= 1 then return end;
-		lastDbDespawnTick = tick();
-		
-		local maxDeadbodies = modData:GetSetting("MaxDeadbodies");
-		modDeadbodiesHandler:DespawnRequest(maxDeadbodies);
-	end)
 	
 	return CameraEffects;
 end
