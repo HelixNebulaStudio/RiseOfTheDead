@@ -1,18 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modInteractables = require(game.ReplicatedStorage.Library.Interactables);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
 local skillKey = "resgat";
-return function(player, interactData)
+return function(player, interactData) -- :IsServer()
 	local interactObject = interactData.Object;
 	local interactModule = interactData.Script;
 	
-	Debugger:Warn("event interactData", interactData.ItemId);
-	
 	local profile = shared.modProfile:Get(player);
-	local classPlayer = shared.modPlayers.Get(player);
 	
 	local modSquadService = require(game.ServerScriptService.ServerLibrary.SquadService);
 	local squad = modSquadService.GetSquadByPlayer(player);
@@ -27,7 +22,7 @@ return function(player, interactData)
 		local squadmatePlayer = squadmateProfile.Player;
 
 		local skill = squadmateProfile.SkillTree:GetSkill(squadmatePlayer, skillKey);
-		local level, skillStats = profile.SkillTree:CalStats(skill.Library, skill.Points);
+		local _, skillStats = profile.SkillTree:CalStats(skill.Library, skill.Points);
 		local duration = skillStats.Cooldown.Value;
 
 		local classPlayer = shared.modPlayers.Get(squadmatePlayer);

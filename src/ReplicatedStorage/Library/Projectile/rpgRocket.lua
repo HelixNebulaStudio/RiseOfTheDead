@@ -81,8 +81,6 @@ function Pool.new()
 			Radius = self.Configurations.ExplosionRadius or 20;
 		});
 		
-		Debugger:Log("hitlist", hitLayers);
-		
 		local damage = self.Configurations.Damage;
 		local explosionStun = self.Configurations.ExplosionStun;
 		local damageRatio = self.Configurations.DamageRatio;

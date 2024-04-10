@@ -768,6 +768,8 @@ function Interactable.Pickup(itemId, quantity)
 	interact.ItemId = itemId;
 	interact.Quantity = quantity or 1;
 	
+	interact.PickupCooldown = nil;
+
 	function interact:SetQuantity(quantity)
 		self.Quantity = quantity or 1;
 		if self.Script then
@@ -782,6 +784,9 @@ function Interactable.Pickup(itemId, quantity)
 	end
 	
 	function interact:OnInteracted(library)
+		if self.PickupCooldown and tick()-self.PickupCooldown <= 1 then return end;
+		self.PickupCooldown = tick();
+
 		local interactObject = self.Object;
 		if not interactObject:IsDescendantOf(workspace) then return end;
 		
@@ -1166,12 +1171,8 @@ function Interactable.Collectible(collectibleId, desc)
 	
 	interact.Type = Types.Collectible;
 	interact.Id = collectibleId;
-	interact.PickupCooldown = nil;
 	
 	function interact:OnInteracted(library)
-		if self.PickupCooldown and tick()-self.PickupCooldown <= 1 then return end;
-		self.PickupCooldown = tick();
-
 		local interactObject = self.Object;
 		local objectParent = interactObject.Parent;
 		interactObject.Parent = game.ReplicatedStorage;

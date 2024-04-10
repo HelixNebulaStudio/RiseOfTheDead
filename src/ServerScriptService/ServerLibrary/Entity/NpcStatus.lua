@@ -1,7 +1,5 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Server only
-local RunService = game:GetService("RunService");
-
 local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
@@ -17,8 +15,8 @@ function MetaStatus:__index(key)
 	if key == "ClassName" then return "NpcStatus"; end
 	if MetaStatus[key] then return MetaStatus[key] end;
 	local r;
-	local s, e = pcall(function() r = Status.NpcModule.Humanoid[key]; end)
-	return s and Status.NpcModule.Humanoid[key] or nil;
+	local s, _e = pcall(function() r = Status.NpcModule.Humanoid[key]; end)
+	return s and r or nil;
 end
 
 function Status.Initialize(npcModule)
@@ -330,7 +328,7 @@ function MetaStatus:TakeDamagePackage(damageSource)
 			npcModule.DamageReduction = (npcModule.DamageReduction or 0) + activeDmg*0.05;
 
 
-			local part1: BasePart = motor.Part1;
+			local part1: BasePart = motor.Part1 :: BasePart;
 			
 			npcModule:BreakJoint(motor);
 			

@@ -96,7 +96,10 @@ export type ExplosionProcessPacket = {
 	TargetableEntities: {[any]:any}?;
 	StorageItem: {[any]:any}?;
 }
-function ExplosionHandler:Process(position, hitResultLayers, params: ExplosionProcessPacket)
+export type HitResultLayers = {
+	{[number]: BasePart}
+}
+function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultLayers, params: ExplosionProcessPacket)
 	params = params or {};
 	
 	-- Default values;
@@ -106,7 +109,7 @@ function ExplosionHandler:Process(position, hitResultLayers, params: ExplosionPr
 	params.ExplosionStun = params.ExplosionStun or 0.5;
 	params.ExplosionForce = params.ExplosionForce or 50;
 	params.Owner = params.Owner or nil;
-	params.DamageOrigin = params.DamageOrigin or nil;
+	params.DamageOrigin = position or params.DamageOrigin or nil;
 
 	params.OnPartHit = params.OnPartHit or nil;
 	params.HandleExplosion = params.HandleExplosion;
@@ -116,7 +119,7 @@ function ExplosionHandler:Process(position, hitResultLayers, params: ExplosionPr
 		
 		local fireFuncs = {};
 		
-		for _, basePart: BasePart in pairs(hitList) do
+		for _, basePart in pairs(hitList) do
 			if params.OnPartHit then
 				params.OnPartHit(params, basePart);
 			end
@@ -136,7 +139,6 @@ function ExplosionHandler:Process(position, hitResultLayers, params: ExplosionPr
 					if assemblyRootPart and assemblyRootPart.Anchored ~= true then
 						modStatusEffects.ApplyImpulse(player, Vector3.new(0, 220, 0));
 					end
-					
 					
 				elseif damagable:CanDamage(params.Owner) then --If hit can be damaged by owner
 					local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
@@ -184,15 +186,18 @@ function ExplosionHandler:Process(position, hitResultLayers, params: ExplosionPr
 							ToolStorageItem=params.StorageItem;
 							TargetPart=basePart;
 							DamageType="ExplosiveDamage";
+							BreakJoint=true;
 						}
 
-						local assemblyRootPart = player and targetModel.PrimaryPart or basePart:GetRootPart();
+						local assemblyRootPart: BasePart = player and targetModel.PrimaryPart or basePart:GetRootPart();
 						if assemblyRootPart and assemblyRootPart.Anchored ~= true and params.ExplosionForce > 0 then
 							local dir = (assemblyRootPart.Position-position).Unit;
-							assemblyRootPart.Velocity = dir * params.ExplosionForce + Vector3.new(0, 40, 0);
+							--assemblyRootPart.Velocity = dir * params.ExplosionForce + Vector3.new(0, 40, 0);
 						
-							newDmgSrc.DamageForce = dir * 500;
+							newDmgSrc.DamageForce = dir * assemblyRootPart.AssemblyMass * params.ExplosionForce;
 							newDmgSrc.DamagePosition = basePart.Position;
+
+							assemblyRootPart:ApplyImpulse(newDmgSrc.DamageForce);
 						end
 						
 						damagable:TakeDamagePackage(newDmgSrc);
