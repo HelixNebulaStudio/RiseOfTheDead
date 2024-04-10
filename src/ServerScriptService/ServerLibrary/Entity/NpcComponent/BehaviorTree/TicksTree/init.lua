@@ -87,6 +87,7 @@ return function(self)
 				local tickingSound = modAudio.Play("ZombieAttack3", self.RootPart);
 				tickingSound.Looped = true;
 				tickingSound.Volume = 0;
+				self.Garbage:Tag(tickingSound);
 				
 				task.spawn(function()
 					detonTime = self.Prefab:GetAttribute("DetonationTime");

@@ -7,7 +7,7 @@ DeadbodiesHandler.__index = DeadbodiesHandler;
 
 --==
 
-function DeadbodiesHandler:DespawnRequest(maxBodies: number)
+function DeadbodiesHandler:DespawnRequest(maxBodies: number?)
 	local deadbodiesList = CollectionService:GetTagged("Deadbody");
 
 	local groups = {};

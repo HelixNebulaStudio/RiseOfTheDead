@@ -1,9 +1,9 @@
 
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --
+if not workspace.Entity:IsAncestorOf(script) then return end;
+--
 local CollectionService = game:GetService("CollectionService");
-local PathfindingService = game:GetService("PathfindingService");
-local RunService = game:GetService("RunService");
 
 local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 local modDeadbodiesHandler = require(game.ReplicatedStorage.Library.DeadbodiesHandler);
@@ -63,6 +63,5 @@ CollectionService:GetInstanceAddedSignal("Deadbody"):Connect(function(newDeadbod
 	game.Debris:SetAttribute("LastClearDeadbodies", tick());
 
 	task.desynchronize();
-	
 	modDeadbodiesHandler:DespawnRequest();
 end)

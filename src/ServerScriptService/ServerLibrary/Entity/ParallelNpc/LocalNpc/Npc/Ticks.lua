@@ -79,7 +79,7 @@ function Ticks.new(localNpc)
 		if modParallelData:GetSetting("DisableDeathRagdoll") == 1 then return end;
 		
 		local explosionPoint = rootPart.Position + Vector3.new(math.random(-20,20)/100, -1, math.random(-20,20)/100);
-		for _, obj: BasePart in pairs(prefab:GetChildren()) do
+		for _, obj in pairs(prefab:GetChildren()) do
 			if not obj:IsA("BasePart") then continue end;
 
 			local dir = (obj.Position-explosionPoint).Unit;

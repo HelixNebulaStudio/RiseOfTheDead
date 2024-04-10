@@ -102,14 +102,6 @@ function NpcComponent:KillNpc()
 			track:Stop();
 		end
 	end
-	
-	game.Debris:AddItem(prefab, 1);
-	-- if self.KillerPlayer then
-	-- 	self:SetNetworkOwner(self.KillerPlayer, true);
-	-- else
-	-- 	self:SetNetworkOwner("auto", true);
-	-- end
-	self:SetNetworkOwner(nil, true);
 
 	if self.BehaviorTree then
 		self.BehaviorTree.Disabled = true;
@@ -135,12 +127,8 @@ function NpcComponent:KillNpc()
 			for _, tag in pairs(prefab:GetTags()) do
 				prefab:RemoveTag(tag);
 			end
-			prefab:AddTag("Deadbody");
 			prefab:SetAttribute("DeadbodyTick", tick());
-
-			task.delay(0.1, function()
-				modReplicationManager.DesyncFromServer(prefab, workspace.Entities);
-			end)
+			prefab:AddTag("Deadbody");
 		end
 		
 		if self.Wield then
@@ -169,28 +157,7 @@ function NpcComponent:KillNpc()
 		end
 	end)
 
-	-- task.spawn(function()
-	-- 	if prefab == nil then return end;
-		
-	-- 	task.wait(1);
-	-- 	modPhysics.WaitForSleep(rootPart);
-		
-	-- 	if workspace:IsAncestorOf(rootPart) then
-	-- 		local bodyParts = rootPart:GetConnectedParts(true); 
-
-	-- 		for b=1, #bodyParts do
-	-- 			if self.Prefab:IsAncestorOf(bodyParts[b]) then continue end;
-	-- 			table.remove(bodyParts, b);
-	-- 		end
-			
-	-- 		for a=1, #bodyParts do
-	-- 			local bodyPart: BasePart = bodyParts[a];
-
-	-- 			bodyPart.Anchored = true;
-	-- 			bodyPart.CanCollide = false;
-	-- 		end
-	-- 	end
-	-- end)
+	game.Debris:AddItem(prefab, 1);
 end
 
 function NpcComponent:BreakJoint(motor: Motor6D)

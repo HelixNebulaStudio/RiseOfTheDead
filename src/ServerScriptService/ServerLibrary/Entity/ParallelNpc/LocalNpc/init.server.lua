@@ -8,10 +8,10 @@ local remote = script.Parent:WaitForChild("NpcRemote");
 local actor = script:GetActor();
 if actor == nil then return end;
 
-local prefab = script.Parent.Parent;
+local prefab: Model = script.Parent.Parent :: Model;
 if not workspace:IsAncestorOf(prefab) then return end;
 local rootPart = prefab:WaitForChild("HumanoidRootPart");
-local humanoid: Humanoid = prefab:FindFirstChildWhichIsA("Humanoid");
+local humanoid: Humanoid = prefab:FindFirstChildWhichIsA("Humanoid") :: Humanoid;
 
 --
 local localNpc = {};
@@ -68,7 +68,7 @@ task.defer(function()
 	local skinColor = Color3.fromRGB(211, 190, 150);
 	local faceTexture = "rbxassetid://16307025188";
 	
-	prefab:WaitForChild("Head").TextureID = faceTexture;
+	(prefab:WaitForChild("Head") :: MeshPart).TextureID = faceTexture;
 
 	local bodyPartNames = {"LeftUpperArm"; "RightUpperArm"; "UpperTorso"; "LeftUpperLeg"; "RightUpperLeg"; 
 		"Head"; "LeftPinky"; "RightPinky"; "LeftMiddle"; "RightMiddle"; "LeftPoint"; "RightPoint"};
@@ -77,13 +77,14 @@ task.defer(function()
 		if not bodyPart:IsA("BasePart") then return end;
 		if table.find(bodyPartNames, bodyPart.Name) == nil then return end;
 		
-		prefab.Color = skinColor;
+		bodyPart.Color = skinColor;
 	end
 	prefab.ChildAdded:Connect(setBpColor);
 	
 	for _, partName in pairs(bodyPartNames) do
-		if prefab:FindFirstChild(partName) and prefab[partName]:IsA("BasePart") then
-			prefab[partName].Color = skinColor;
+		local bodyPart: BasePart = prefab:FindFirstChild(partName) :: BasePart;
+		if bodyPart and bodyPart:IsA("BasePart") then
+			bodyPart.Color = skinColor;
 		end
 	end
 	
