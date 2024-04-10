@@ -5,7 +5,6 @@ local RunService = game:GetService("RunService");
 local modCutscene = require(game.ReplicatedStorage.Library:WaitForChild("Cutscene")); -- required to wait for cutscene to be loaded first.
 local modDialogueLibrary = require(game.ReplicatedStorage.Library:WaitForChild("DialogueLibrary"));
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modMarkers = require(game.ReplicatedStorage.Library.Markers);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler);
@@ -109,18 +108,25 @@ function MissionLibrary.New(data)
 	end;
 end
 
-function Dialog(name, tag)
-	if RunService:IsServer() then return end;
+-- function Dialog(name, tag)
+-- 	if RunService:IsServer() then return end;
 
-	local _, index = modDialogueLibrary.GetByTag(name, tag);
-	if index then
-		return {Speaker=name; Tag=tag; Dialogue=modDialogueLibrary[name].Dialogues[index].Dialogue; Reply=modDialogueLibrary[name].Dialogues[index].Reply};
-	else
-		warn("MissionLibrary>>  Unknown dialog name or index. name:"..(name or "nil")..", tag:"..(tag or "nil").." Name Exist:"..tostring(modDialogueLibrary[name] ~= nil));
-		return {Speaker=name; Tag="nil"; Dialogue="Missing: index for "..name..", "..tag;};
-	end;
+-- 	local _, index = modDialogueLibrary.GetByTag(name, tag);
+-- 	if index then
+-- 		return {Speaker=name; Tag=tag; Dialogue=modDialogueLibrary[name].Dialogues[index].Dialogue; Reply=modDialogueLibrary[name].Dialogues[index].Reply};
+-- 	else
+-- 		warn("MissionLibrary>>  Unknown dialog name or index. name:"..(name or "nil")..", tag:"..(tag or "nil").." Name Exist:"..tostring(modDialogueLibrary[name] ~= nil));
+-- 		return {Speaker=name; Tag="nil"; Dialogue="Missing: index for "..name..", "..tag;};
+-- 	end;
+-- end
+
+local function getDayNumber() : number
+	return tonumber(os.date("%j")) :: number;
 end
 
+local function getHourNumber() : number
+	return tonumber(os.date("%H")) :: number;
+end
 
 local function loadLogicScript(moduleScript)
 	if not moduleScript:IsA("ModuleScript") then return end;
@@ -1237,7 +1243,7 @@ MissionLibrary.New{
 	SaveData={
 		Location=(function()
 			local list = {"Mall Safehouse", "Train Station Safehouse", "Community Safehouse"};
-			return list[math.fmod(os.date("%j"), #list) +1]; --list[math.random(1, #list)];
+			return list[math.fmod(getDayNumber(), #list) +1];
 		end);
 		Seed=(function()
 			return math.random(1, 100000);
@@ -1273,7 +1279,7 @@ MissionLibrary.New{
 	SaveData={
 		Location=function()
 			local list = {"Office"; "BanditOutpost"; "Tombs"; "Railways";};
-			return list[math.fmod(os.date("%j"), #list) +1];
+			return list[math.fmod(getDayNumber(), #list) +1];
 		end;
 	};
 	Checkpoint={
@@ -1296,19 +1302,20 @@ MissionLibrary.New{
 	PrintNote=function(missionInfo)
 		local noteText = "";
 
-		local shortestTime, mvpUserId = math.huge, nil;
-		for userId, playerData in pairs(missionInfo.Players) do
-			if playerData.Name == nil then continue end;
-			local missionData = playerData.MissionData;
-			if missionData == nil then continue end;
+		-- local shortestTime, mvpUserId = math.huge, nil;
+		-- for userId, playerData in pairs(missionInfo.Players) do
+		-- 	if playerData.Name == nil then continue end;
+		-- 	local missionData = playerData.MissionData;
+		-- 	if missionData == nil then continue end;
 
-			local timeLapsed = missionData.Timelapsed or math.huge;
-			if timeLapsed < shortestTime and timeLapsed <= 300 and timeLapsed > 0 then
-				shortestTime = timeLapsed;
-				mvpUserId = userId;
-			end
-		end
+		-- 	local timeLapsed = missionData.Timelapsed or math.huge;
+		-- 	if timeLapsed < shortestTime and timeLapsed <= 300 and timeLapsed > 0 then
+		-- 		shortestTime = timeLapsed;
+		-- 		mvpUserId = userId;
+		-- 	end
+		-- end
 		
+		local shortestTime = math.huge;
 		local mvpUsers = {};
 		for userId, playerData in pairs(missionInfo.Players) do
 			if playerData.Name == nil then continue end;
@@ -1746,7 +1753,7 @@ MissionLibrary.New{
 	SaveData={
 		Id=(function()
 			local list = {1;2;3;};
-			return list[math.fmod(os.date("%j"), #list) +1];
+			return list[math.fmod(getDayNumber(), #list) +1];
 		end);
 		Seed=(function()
 			return math.random(1, 100000);
@@ -2147,7 +2154,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Mission"; Id=62};
 		{Type="Mission"; Id=63};
-		{Type="Mission"; Id=72};
+		--{Type="Mission"; Id=72};
 		{Type="Mission"; Id=75};
 	};
 	Markers={
@@ -2220,18 +2227,18 @@ MissionLibrary.New{
 				table.insert(list, lib);
 			end
 			
-			local pickLib = list[math.fmod(os.date("%j"), #list) +1];
+			local pickLib = list[math.fmod(getDayNumber(), #list) +1];
 			mission.SaveData.WorldId = pickLib.WorldName;
 			
 			return pickLib.Name;
 		end;
 		RepairItemId=function()
 			local list = {"metal"; "wood"; "cloth"};
-			return list[math.fmod(os.date("%j"), #list) +1];
+			return list[math.fmod(getDayNumber(), #list) +1];
 		end;
 		RepairCost=function()
 			local list = {math.random(100, 150); math.random(20,35); math.random(150, 200);};
-			return list[math.fmod(os.date("%j"), #list) +1];
+			return list[math.fmod(getDayNumber(), #list) +1];
 		end;
 	};
 	Checkpoint={
@@ -2539,7 +2546,7 @@ MissionLibrary.New{
 		Kills=50;
 		WeaponType=function()
 			local list = {"Pistol"; "Rifle"; "Submachine gun"; "Shotgun"; "Sniper";};
-			return list[math.fmod(os.date("%j")*os.date("%H"), #list) +1];
+			return list[math.fmod(getDayNumber()*getHourNumber(), #list) +1];
 		end;
 	};
 	LogEntry={
@@ -2593,7 +2600,7 @@ MissionLibrary.New{
 	SaveData={
 		TargetPlace=function()
 			local list = {"Frank in Sunday's Safehouse"; "Diana in Underbridge Safehouse"};
-			return list[math.fmod(os.date("%j")*os.date("%H"), #list) +1];
+			return list[math.fmod(getDayNumber() * getHourNumber(), #list) +1];
 		end;
 	};
 	LogEntry={
