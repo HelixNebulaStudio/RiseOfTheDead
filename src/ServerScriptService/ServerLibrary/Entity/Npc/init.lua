@@ -372,19 +372,19 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	task.spawn(function()
 		task.wait(0.1);
 		
-		local rightArm: BasePart = npcPrefab:FindFirstChild("RightUpperArm");
-		local rightHand: BasePart = npcPrefab:FindFirstChild("RightHand");
-		local point: BasePart = npcPrefab:FindFirstChild("RightPoint");
-		if rightArm and rightHand and point then
-			local middle: BasePart = npcPrefab:FindFirstChild("RightMiddle");
-			local pinky: BasePart = npcPrefab:FindFirstChild("RightPinky");
+		local rightArm: BasePart = npcPrefab:FindFirstChild("RightUpperArm") :: BasePart;
+		local rightHand: BasePart = npcPrefab:FindFirstChild("RightHand") :: BasePart;
+		local rightPoint: BasePart = npcPrefab:FindFirstChild("RightPoint") :: BasePart;
+		if rightArm and rightHand and rightPoint then
+			local middle: BasePart = npcPrefab:FindFirstChild("RightMiddle") :: BasePart;
+			local pinky: BasePart = npcPrefab:FindFirstChild("RightPinky") :: BasePart;
 
 			local function updateHand()
-				point.Color = rightArm.Color;
+				rightPoint.Color = rightArm.Color;
 				middle.Color = rightArm.Color;
 				pinky.Color = rightArm.Color;
 
-				point.Transparency = rightHand.Transparency;
+				rightPoint.Transparency = rightHand.Transparency;
 				middle.Transparency = rightHand.Transparency;
 				pinky.Transparency = rightHand.Transparency;
 			end
@@ -393,19 +393,19 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 			updateHand()
 		end
 
-		local leftArm: BasePart = npcPrefab:FindFirstChild("LeftUpperArm");
-		local leftHand: BasePart = npcPrefab:FindFirstChild("LeftHand");
-		local point: BasePart = npcPrefab:FindFirstChild("LeftPoint");
-		if leftArm and leftHand and point then
-			local middle: BasePart = npcPrefab:FindFirstChild("LeftMiddle");
-			local pinky: BasePart = npcPrefab:FindFirstChild("LeftPinky");
+		local leftArm: BasePart = npcPrefab:FindFirstChild("LeftUpperArm") :: BasePart;
+		local leftHand: BasePart = npcPrefab:FindFirstChild("LeftHand") :: BasePart;
+		local leftPoint: BasePart = npcPrefab:FindFirstChild("LeftPoint") :: BasePart;
+		if leftArm and leftHand and leftPoint then
+			local middle: BasePart = npcPrefab:FindFirstChild("LeftMiddle") :: BasePart;
+			local pinky: BasePart = npcPrefab:FindFirstChild("LeftPinky") :: BasePart;
 
 			local function updateHand()
-				point.Color = leftArm.Color;
+				leftPoint.Color = leftArm.Color;
 				middle.Color = leftArm.Color;
 				pinky.Color = leftArm.Color;
 
-				point.Transparency = leftHand.Transparency;
+				leftPoint.Transparency = leftHand.Transparency;
 				middle.Transparency = leftHand.Transparency;
 				pinky.Transparency = leftHand.Transparency;
 			end
@@ -455,20 +455,24 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	
 	npcModule:SetNetworkOwner();
 	
-	task.spawn(function()
-		local npcPrefab = replicatedPrefabs.Npc:FindFirstChild(name);
-		if npcPrefab == nil then
-			npcPrefab = modPrefabManager:LoadPrefab(npcPrefabs[name], replicatedPrefabs.Npc, 600);
-		end
-		if #game.Players:GetPlayers() > 0 then
-			remoteNpcManager:FireAllClients("loadprefab", npcPrefab, npcPrefab);
-		end
-	end)
+	-- task.spawn(function()
+	-- 	local npcPrefab = replicatedPrefabs.Npc:FindFirstChild(name);
+	-- 	if npcPrefab == nil then
+	-- 		npcPrefab = modPrefabManager:LoadPrefab(npcPrefabs[name], replicatedPrefabs.Npc, 600);
+	-- 	end
+	-- 	if #game.Players:GetPlayers() > 0 then
+	-- 		remoteNpcManager:FireAllClients("loadprefab", npcPrefab, npcPrefab);
+	-- 	end
+	-- end)
 	
 	npcModule.Garbage:Tag(npcModule.Humanoid.Died:Connect(function()
 		if npcModule == nil then return end;
 		npcModule.IsDead = true;
 	end));
+	npcModule.Garbage:Tag(npcModule.RootPart.Destroying:Connect(function()
+		if npcModule == nil then return end;
+		npcModule:KillNpc();
+	end))
 	npcModule.Garbage:Tag(npcPrefab.Destroying:Connect(function()
 		if npcModule == nil then return end;
 		npcModule:KillNpc();
@@ -591,7 +595,6 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 			
 			npcModule = nil; -- IMPORTANT Need to clear strong ref;
 			table.clear(strongRef);
-			strongRef = nil;
 			
 			if autoRespawn then task.spawn(autoRespawn, name) end;
 		end)

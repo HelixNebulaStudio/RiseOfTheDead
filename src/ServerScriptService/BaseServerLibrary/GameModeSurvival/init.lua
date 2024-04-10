@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Players = game:GetService("Players");
+local RunService = game:GetService("RunService");
 
 --==
 local Survival = {};
@@ -804,12 +805,19 @@ function Survival:Initialize(roomData)
 	end
 
 	for a=1, #self.RoomData.Players do
+		local roomPlayerInfo = self.RoomData.Players[a];
+		Debugger:Warn("roomPlayerInfo", roomPlayerInfo);
+		
 		task.delay(0.1, function()
 			local player;
-			repeat
-				player = game.Players:FindFirstChild(self.RoomData.Players[a].Name);
-				task.wait(1);
-			until player ~= nil;
+			while player == nil do
+				player = game.Players:FindFirstChild(roomPlayerInfo.Name);
+				if player == nil then
+					task.wait(1);
+				end
+			end
+			
+			table.insert(self.Players, player);
 
 			local classPlayer = shared.modPlayers.Get(player);
 			classPlayer.OnCharacterSpawn:Connect(function(character: Model)
@@ -876,8 +884,6 @@ function Survival:Initialize(roomData)
 			if not classPlayer.IsAlive then 
 				classPlayer:Spawn();
 			end;
-
-			table.insert(self.Players, player);
 		end)
 	end
 	
@@ -890,7 +896,7 @@ function Survival:Initialize(roomData)
 		clearCharacter();
 	end)
 
-	for a=1, 10 do
+	for a=1, 30 do
 		local waitMsg = ("Waiting for ("..#self.Players.."/"..#roomData.Players..") players.. ($t)"):gsub("$t", tostring(10-a));
 		shared.Notify(game.Players:GetPlayers(), waitMsg, "Inform", "waitForPlayers");
 
@@ -898,6 +904,10 @@ function Survival:Initialize(roomData)
 			break;
 		else
 			task.wait(1);
+		end
+
+		if RunService:IsStudio() then
+			Debugger:Warn("Waiting for players (",a,")\nPlayers:", self.Players, "\nRoomPlayers:", roomData.Players);
 		end
 	end
 	

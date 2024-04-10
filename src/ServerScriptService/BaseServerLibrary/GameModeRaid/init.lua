@@ -3,9 +3,10 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local Config = {
 	EnemyCap=300;
 	
-	SpawnRadius=128;
+	SpawnPlatformRadius=128;
 	MinSpawnCount=2;
 	MaxSpawnCount=3;
+	HordeCycle=nil;
 }
 
 local Raid = {};
@@ -15,6 +16,7 @@ Raid.Active = nil;
 local EnumStatus = {Initialized=-1; Restarting=0; InProgress=1; Completed=2;};
 Raid.EnumStatus = EnumStatus;
 
+local RunService: RunService = game:GetService("RunService");
 local PathfindingService = game:GetService("PathfindingService");
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
@@ -33,6 +35,7 @@ local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
 local remoteGameModeHud = modRemotesManager:Get("GameModeHud");
 local remoteDoorInteraction = modRemotesManager:Get("DoorInteraction");
 
+local serverPrefabs = game.ServerStorage:WaitForChild("PrefabStorage"):WaitForChild("Objects");
 local extractInteractable = script:WaitForChild("ExtractInteractable");
 --==
 -- modEventSignal.new("OnWaveChanged");
@@ -76,7 +79,6 @@ function Raid:Load()
 
 	local mapWaveCollapse = shared.RaidMapWC;
 	if mapWaveCollapse then
-		
 		-- GenerateDynamicMap;
 		self.DynamicMap = {};
 		
@@ -147,9 +149,9 @@ function Raid:Load()
 		local mapTotalVec = nil;
 		local totalVecs = 0;
 		
-		for _, model in pairs(collapseMap:GetChildren()) do
-			if model:FindFirstChild("Layout") then
-				for _, child in pairs(model.Layout:GetChildren()) do
+		for _, tileModel in pairs(collapseMap:GetChildren()) do
+			if tileModel:FindFirstChild("Layout") then
+				for _, child in pairs(tileModel.Layout:GetChildren()) do
 					if child:FindFirstChild("Door") and child.Door:IsA("ModuleScript") then
 
 						local doorObject = modDoors:GetDoor(child);
@@ -157,7 +159,7 @@ function Raid:Load()
 						
 					elseif child.Name == "SpawnPlatform" then
 						self.SpawnPlatforms[child] = {
-							Name=model.Name;
+							Name=tileModel.Name;
 							Part=child;
 							Index=(child:GetAttribute("Index") or 999);
 							Spawns={};
@@ -210,6 +212,50 @@ function Raid:Load()
 		end
 		
 	end
+
+	self.GameDir = workspace.Environment:FindFirstChild("Game");
+	if workspace.Environment:FindFirstChild("Game") then
+		local gameDir: Folder = self.GameDir;
+
+		for _, object: Instance in pairs(gameDir:GetChildren()) do
+			if object.Name == "SpawnPlatforms" then
+				local spCount = 0;
+				for _, child in pairs(object:GetChildren()) do
+					spCount = spCount +1;
+					self.SpawnPlatforms[child] = {
+						Name="SpawnPlatform"..spCount;
+						Part=child;
+						Index=(child:GetAttribute("Index") or 999);
+						Spawns={};
+					};
+				end
+
+			elseif object.Name == "Doors" then
+				for _, child in pairs(object:GetChildren()) do
+					
+					if child:FindFirstChild("Door") and child.Door:IsA("ModuleScript") then
+						local doorObject = modDoors:GetDoor(child);
+						table.insert(self.Doors, doorObject);
+
+					elseif child.Name == "ExtractDoor" then
+						table.insert(self.ExtractDoors, child);
+						
+						local newInteractable = extractInteractable:Clone();
+						newInteractable.Name = "Interactable";
+						newInteractable.Parent = child;
+					end
+				end
+			
+			elseif object.Name == "HiddenSpawns" then
+				for _, obj in pairs(object:GetChildren()) do
+					if obj.Name == "HiddenSpawn" and obj:IsA("Attachment") then
+						table.insert(self.HiddenSpawns, obj);
+					end
+				end
+			end
+		end
+	end
+
 	self.Loaded = true;
 
 	task.spawn(function()
@@ -422,6 +468,7 @@ end
 
 
 function Raid:SpawnEnemy(npcName, paramPacket)
+	if self.EliminateCount >= self.EliminateGoal then return end;
 	paramPacket = paramPacket or {};
 
 	local spawnCf = paramPacket.SpawnCFrame;
@@ -508,8 +555,6 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 	return npcPrefab, newNpcModule;
 end
 
-
-local blockadeFolder = game.ReplicatedStorage.DefaultBlockades;
 function Raid:Start()
 	Debugger:Warn("Raid:Start");
 
@@ -537,11 +582,14 @@ function Raid:Start()
 	self.Difficulty = math.clamp(highestLevel, 1, math.huge);
 	--
 	
-	for a=1, #self.DynamicMap do
-		local dynamicMapPart = self.DynamicMap[a];
-		dynamicMapPart.Color = Color3.fromRGB(90, 90, 90);
-	end
+	if self.DynamicMap then
+		for a=1, #self.DynamicMap do
+			local dynamicMapPart = self.DynamicMap[a];
+			dynamicMapPart.Color = Color3.fromRGB(90, 90, 90);
+		end
 
+	end
+	
 	--
 	local destructibleObjs = {};
 	
@@ -563,14 +611,17 @@ function Raid:Start()
 			end
 		end
 		
-		local new = blockadeFolder[blockadeId]:Clone();
-		new.Name = "Blockade";
-		new:PivotTo(doorObject.Prefab:GetPivot());
-		new.Parent = doorObject.Prefab;
-		
-		local destructibleObj = require(new:WaitForChild("Destructible"));
-		destructibleObj.Enabled = false;
-		table.insert(destructibleObjs, destructibleObj);
+		local blockadeFolder = serverPrefabs:FindFirstChild("DefaultBlockades");
+		if blockadeFolder then
+			local new = blockadeFolder[blockadeId]:Clone();
+			new.Name = "Blockade";
+			new:PivotTo(doorObject.Prefab:GetPivot());
+			new.Parent = doorObject.Prefab;
+			
+			local destructibleObj = require(new:WaitForChild("Destructible"));
+			destructibleObj.Enabled = false;
+			table.insert(destructibleObjs, destructibleObj);
+		end
 	end
 	
 	local spawnPlatformCount = 0;
@@ -579,12 +630,35 @@ function Raid:Start()
 		spawnPlatformCount = spawnPlatformCount +1;
 	end
 	
+	-- MARK: Initializing Config;
+	if self.Objective.MaxSpawnCount then
+		Config.MaxSpawnCount = self.Objective.MaxSpawnCount;
+	end
+	if self.Objective.MinSpawnCount then
+		Config.MinSpawnCount = self.Objective.MinSpawnCount;
+	end
+	if self.Objective.EnemyCap then
+		Config.EnemyCap = self.Objective.EnemyCap;
+	end
+	if self.Objective.HordeCycle then
+		Config.HordeCycle = self.Objective.HordeCycle;
+	end
+	if self.Objective.SpawnPlatformRadius then
+		Config.SpawnPlatformRadius = self.Objective.SpawnPlatformRadius
+	end
+
+
 	local minTotalZombieCount = spawnPlatformCount * Config.MinSpawnCount;
 	
 	self.EliminateCount = 0;
 	self.EliminateGoal = math.min(Config.EnemyCap, math.max(1, math.floor(minTotalZombieCount*0.98)));
-	
+
+	if self.Objective.EliminateGoal then
+		self.EliminateGoal = self.Objective.EliminateGoal;
+	end
+
 	if self.Objective.Id == "Eliminate" then
+		
 	end
 
 	for a=5, 1, -1 do
@@ -629,12 +703,15 @@ function Raid:LoadSpawnPlatform(spawnPart)
 			local newSpawnCFrame;
 
 			local maxSpawns = math.ceil((worldSpaceSize.X * worldSpaceSize.Z)/512)+4; --16;
-			
+			if RunService:IsStudio() then
+				Debugger:Warn("[Studio] LoadSpawnPlatform maxSpawns", maxSpawns);
+			end
+
 			while newSpawnCFrame == nil do
 				newSpawnCFrame = platformTopCf * CFrame.new(
-					math.random(-worldSpaceSize.X/2 *100, worldSpaceSize.X/2 *100)/100, 
+					math.random((-worldSpaceSize.X/2) *100, (worldSpaceSize.X/2) *100)/100, 
 					0, 
-					math.random(-worldSpaceSize.Z/2 *100, worldSpaceSize.Z/2 *100)/100
+					math.random((-worldSpaceSize.Z/2) *100, (worldSpaceSize.Z/2) *100)/100
 				);
 
 				--self.Path:ComputeAsync(newSpawnCFrame.Position, platformTopCf.Position);
@@ -761,7 +838,7 @@ function Raid:Initialize(roomData)
 					while activeLoop do
 						
 						if self.Status == EnumStatus.InProgress then
-							local hitList = workspace:GetPartBoundsInRadius(rootPart.Position, Config.SpawnRadius, platformParam);
+							local hitList = workspace:GetPartBoundsInRadius(rootPart.Position, Config.SpawnPlatformRadius, platformParam);
 							
 							for a=1, #hitList do
 								local spawnPlatformPart = hitList[a];
@@ -855,9 +932,12 @@ function Raid:Initialize(roomData)
 		self.DoorsOpened = self.DoorsOpened +1;
 		
 		Debugger:Warn("#self.Doors Opened (".. self.DoorsOpened .."/".. #self.Doors ..")");
-		--shared.Notify(game.Players:GetPlayers(), "Doors opened: ".. (self.DoorsOpened.."/"..#self.Doors) , "Inform");
 		
 		shared.HordeTimer = shared.HordeTimer - math.random(20, 40);
+		if doorObject.TriggerHorde == true then
+			shared.HordeTimer = tick();
+		end
+
 		
 		local nearbyNpcModules = modNpc.EntityScan(doorObject.Prefab:GetPivot().Position, 64, 32);
 		for a=1, #nearbyNpcModules do
@@ -869,26 +949,32 @@ function Raid:Initialize(roomData)
 
 	self:Start();
 	
+	local lastHordeScream = tick();
 	task.spawn(function()
 		while true do
 			while self.Status ~= EnumStatus.InProgress do task.wait() end;
 			repeat
 				wait(1);
 				
-				--Debugger:Display{
-				--	HordeTimer=math.ceil((shared.HordeTimer -tick()));
-				--}
+				if RunService:IsStudio() then
+					Debugger:Display{
+						HordeTimer=math.ceil((shared.HordeTimer -tick()));
+					}
+				end
 			until tick() >= shared.HordeTimer;
 			--
 			while self.Status ~= EnumStatus.InProgress do task.wait(1) end;
 
-			modAudio.Play("HordeGrowl", workspace);
+			if tick()-lastHordeScream > 180 then
+				lastHordeScream = tick();
+				modAudio.Play("HordeGrowl", workspace).PlaybackSpeed = math.random(90,110)/100;
+			end
 			self.Wave = self.Wave +1;
 			
 			local hordeZombieCount = #self.Characters * 25;
 			hordeZombieCount = math.max(math.min(hordeZombieCount, Config.EnemyCap-#self.EnemyModules), 0);
 			
-			if hordeZombieCount > 0 then
+			if hordeZombieCount > 0 and self.EliminateCount < self.EliminateGoal then
 				for a=1, hordeZombieCount do
 					local targetChar = self.Characters[math.random(1, #self.Characters)];
 					local player = game.Players:GetPlayerFromCharacter(targetChar);
@@ -911,7 +997,12 @@ function Raid:Initialize(roomData)
 			end
 			
 			--
-			shared.HordeTimer = tick()+ math.random(150, 200);
+			local hordeCycle = math.random(150, 200);
+			if Config.HordeCycle then
+				hordeCycle = Config.HordeCycle;
+			end
+
+			shared.HordeTimer = tick()+hordeCycle;
 		end
 	end)
 end
