@@ -1,14 +1,11 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
 local localPlayer = game.Players.LocalPlayer;
 
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
-local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modMarkers = require(game.ReplicatedStorage.Library.Markers);
 local modLeaderboardService = require(game.ReplicatedStorage.Library.LeaderboardService);
@@ -17,9 +14,10 @@ local modLeaderboardInterface = require(game.ReplicatedStorage.Library.UI.Leader
 local templateEndScreen = script:WaitForChild("templateEndScreen");
 local templateName = script:WaitForChild("templateName");
 local templateScore = script:WaitForChild("templateScore");
-local bossHealthBarTemplate = script:WaitForChild("bossHealth");
 
 local ModeHudClass = require(script.Parent);
+
+local survivalFailTrack: Sound?;
 --==
 return function(...)
 	local modeHud = ModeHudClass.new(...);
@@ -29,7 +27,6 @@ return function(...)
 
 	local deathScreen = modeHud.Interface.MainInterface:WaitForChild("DeathScreen");
 	
-	local bossSoundtrack;
 	local activeLeaderboard;
 	local endScreen;
 	
@@ -44,8 +41,6 @@ return function(...)
 
 		local statusTag = self.MainFrame.statusTag;
 		local waveTag = self.MainFrame.waveTag;
-		local hpBarsList = self.MainFrame.bossHealthBars;
-		local bossNameTag = self.MainFrame.bossName;
 
 		local waveObjectiveTag = self.MainFrame.waveObjectiveTag;
 		local waveHazardTag = self.MainFrame.waveHazardTag;
@@ -72,9 +67,20 @@ return function(...)
 		end
 		if data.SurvivalFailed == true then
 			if typeof(stageLib.SurvivalFailedTrack) == "table" then
-				modAudio.Play(stageLib.SurvivalFailedTrack[math.random(1, #stageLib.SurvivalFailedTrack)], script.Parent);
+				survivalFailTrack = modAudio.Play(stageLib.SurvivalFailedTrack[math.random(1, #stageLib.SurvivalFailedTrack)], script.Parent);
 			else
-				modAudio.Play(stageLib.SurvivalFailedTrack, script.Parent);
+				survivalFailTrack = modAudio.Play(stageLib.SurvivalFailedTrack, script.Parent);
+			end
+			game.Debris:AddItem(survivalFailTrack, 60);
+		else
+			if survivalFailTrack and game:IsAncestorOf(survivalFailTrack) then
+				local track = survivalFailTrack;
+				survivalFailTrack = nil;
+				
+				game.Debris:AddItem(track, 5);
+				TweenService:Create(track, TweenInfo.new(5), {
+					Volume=0;
+				}):Play();
 			end
 		end
 		if data.BossKilled == true then

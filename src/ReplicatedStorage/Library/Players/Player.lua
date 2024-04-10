@@ -54,7 +54,7 @@ function Player.new(playerInstance: Player)
 	meta.ClassName = "PlayerClass";
 	meta.OnHealthChanged = modEventSignal.new("OnHealthChanged");
 	meta.OnIsAliveChanged = modEventSignal.new("OnIsAliveChanged");
-	meta.OnCharacterChanged = modEventSignal.new("OnCharacterChanged");
+	meta.OnCharacterSpawn = modEventSignal.new("OnCharacterSpawn");
 	meta.Died = modEventSignal.new("PlayerClassOnDied");
 	meta.OnDamageTaken = modEventSignal.new("OnDamageTaken");
 	
@@ -926,7 +926,7 @@ function Player.new(playerInstance: Player)
 		-- Fire events;
 		onHealthChangedServer();
 		classPlayer.OnIsAliveChanged:Fire(classPlayer.IsAlive);
-		classPlayer.OnCharacterChanged:Fire(classPlayer.Character);
+		classPlayer.OnCharacterSpawn:Fire(classPlayer.Character :: Model);
 		
 		if RunService:IsServer() then
 			--playerInstance.ReplicationFocus = classPlayer.RootPart;
@@ -1480,7 +1480,7 @@ function Player.new(playerInstance: Player)
 		
 		self.OnHealthChanged:Destroy();
 		self.OnIsAliveChanged:Destroy();
-		self.OnCharacterChanged:Destroy();
+		self.OnCharacterSpawn:Destroy();
 		self.Died:Destroy();
 		self.OnDamageTaken:Destroy();
 		

@@ -732,7 +732,7 @@ function Survival:Start()
 		modStatusEffects.FullHeal(player);
 	end
 
-	Debugger:Log("Respawn all!");
+	Debugger:Warn("Respawn all!");
 	self:RespawnDead();
 	for a=1, 20, 0.5 do
 		self:Hud{
@@ -803,67 +803,6 @@ function Survival:Initialize(roomData)
 		end
 	end
 
-	local function onCharacterAdded(player, character)
-		clearCharacter(character);
-		table.insert(self.Characters, character);
-
-		local classPlayer = shared.modPlayers.Get(player);
-
-		classPlayer:OnNotIsAlive(function(character)
-			Debugger:Warn(character.Name,"died");
-			shared.Notify(game.Players:GetPlayers(), character.Name .. " died!", "Negative");
-
-			clearCharacter(character);
-			Debugger:Warn("Players alive",#self.Characters);
-
-			if #self.Characters <= 0 and self.Status == EnumStatus.InProgress then
-				self.Status = EnumStatus.Restarting;
-				
-				for a=#self.EnemyModules, 1, -1 do
-					game.Debris:AddItem(self.EnemyModules[a].Prefab, 0);
-					table.remove(self.EnemyModules, a);
-				end
-				table.clear(self.Modifier);
-				
-				for a=#self.JobsList, 1, -1 do
-					local job = self.JobsList[a];
-
-					task.spawn(function()
-						job.Task(job);
-					end);
-				end
-				table.clear(self.JobsList);
-				
-				self:Hud{
-					LastWave=self.Wave;
-					StatsCount=self.StatsCount;
-				};
-				
-				shared.Notify(game.Players:GetPlayers(), "Survival failed at wave ".. self.Wave .."!", "Negative");
-				
-				for a=30, 1, -1 do
-					self:Hud{
-						Header="Survival failed!";
-						Status="Restarting in "..a.."..";
-						SurvivalFailed=a==30;
-					};
-					
-					shared.Notify(game.Players:GetPlayers(), "Restarting in "..a.."..", "Negative", "ModeRestarting");
-					task.wait(1);
-				end
-				
-				self:Start();
-
-			else
-				self:Hud{
-					Header="You died!";
-					Status="";
-				};
-
-			end
-		end)
-	end
-	
 	for a=1, #self.RoomData.Players do
 		task.delay(0.1, function()
 			local player;
@@ -872,9 +811,68 @@ function Survival:Initialize(roomData)
 				task.wait(1);
 			until player ~= nil;
 
-			player.CharacterAdded:Connect(function(character) onCharacterAdded(player, character) end);
-			
 			local classPlayer = shared.modPlayers.Get(player);
+			classPlayer.OnCharacterSpawn:Connect(function(character: Model)
+				Debugger:Warn("OnCharacterSpawn", player, character);
+	
+				clearCharacter(character);
+				table.insert(self.Characters, character);
+
+				classPlayer:OnNotIsAlive(function(character)
+					shared.Notify(game.Players:GetPlayers(), character.Name .. " died!", "Negative");
+		
+					clearCharacter(character);
+					Debugger:Warn(character.Name,"died", "Players alive",#self.Characters);
+		
+					if #self.Characters <= 0 and self.Status == EnumStatus.InProgress then
+						self.Status = EnumStatus.Restarting;
+						Debugger:Warn("Status set restarting..");
+						
+						for a=#self.EnemyModules, 1, -1 do
+							game.Debris:AddItem(self.EnemyModules[a].Prefab, 0);
+							table.remove(self.EnemyModules, a);
+						end
+						table.clear(self.Modifier);
+						
+						for a=#self.JobsList, 1, -1 do
+							local job = self.JobsList[a];
+		
+							task.spawn(function()
+								job.Task(job);
+							end);
+						end
+						table.clear(self.JobsList);
+						
+						self:Hud{
+							LastWave=self.Wave;
+							StatsCount=self.StatsCount;
+						};
+						
+						shared.Notify(game.Players:GetPlayers(), "Survival failed at wave ".. self.Wave .."!", "Negative");
+						
+						for a=30, 1, -1 do
+							self:Hud{
+								Header="Survival failed!";
+								Status="Restarting in "..a.."..";
+								SurvivalFailed=a==30;
+							};
+							
+							shared.Notify(game.Players:GetPlayers(), "Restarting in "..a.."..", "Negative", "ModeRestarting");
+							task.wait(1);
+						end
+						
+						self:Start();
+		
+					else
+						self:Hud{
+							Header="You died!";
+							Status="";
+						};
+		
+					end
+				end)
+			end)
+
 			if not classPlayer.IsAlive then 
 				classPlayer:Spawn();
 			end;
