@@ -474,7 +474,7 @@ function WeaponsMechanics.ImpactSound(param)
 		or obj.Material == Enum.Material.CorrodedMetal
 		or obj.Material == Enum.Material.DiamondPlate then
 
-		if use3DParticles then
+		if use3DParticles and RunService:IsClient() then
 			local sparkCountRng = math.random(4, 7);
 			
 			local cache = modData.Cache;
