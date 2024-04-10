@@ -12,16 +12,13 @@ local modColorsLibrary = Debugger:Require(game.ReplicatedStorage.Library.ColorsL
 local modSkinsLibrary = Debugger:Require(game.ReplicatedStorage.Library:WaitForChild("SkinsLibrary"));
 local modProjectile = Debugger:Require(game.ReplicatedStorage.Library.Projectile);
 local modWeaponAttributes = Debugger:Require(game.ReplicatedStorage.Library.WeaponsAttributes);
-local modAudio = Debugger:Require(game.ReplicatedStorage.Library.Audio);
 local modDropAppearance = Debugger:Require(game.ReplicatedStorage.Library.DropAppearance);
 local modRemotesManager = Debugger:Require(game.ReplicatedStorage.Library.RemotesManager);
-local modGarbageHandler = Debugger:Require(game.ReplicatedStorage.Library.GarbageHandler);
 local modConfigurations = Debugger:Require(game.ReplicatedStorage.Library.Configurations);
 local modItemSkinWear = Debugger:Require(game.ReplicatedStorage.Library.ItemSkinWear);
 local modTools = Debugger:Require(game.ReplicatedStorage.Library.Tools);
 
 local modProfile = Debugger:Require(game.ServerScriptService.ServerLibrary.Profile);
-local modMission = Debugger:Require(game.ServerScriptService.ServerLibrary.Mission);
 local modOnGameEvents = Debugger:Require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modAnalytics = Debugger:Require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 
@@ -33,13 +30,10 @@ local remotes = game.ReplicatedStorage.Remotes;
 local remoteToolHandler = modRemotesManager:Get("ToolHandler");
 local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler");
 local remoteToolPrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
-local remoteReloadWeapon = modRemotesManager:Get("ReloadWeapon");
 
 shared.EquipmentSystem = {};
-local bindServerEquipPlayer = remotes.Inventory.ServerEquipPlayer;
 local bindServerUnequipPlayer = remotes.Inventory.ServerUnequipPlayer;
 
-local debounce = {};
 --== Script
 
 local function OnPlayerAdded(player)
@@ -145,7 +139,7 @@ function unequipTool(player, returnPacket)
 						local prefabName = holsterLib.PrefabName;
 						if prefabName == weaponModel.Name and player.Character:FindFirstChild(prefabName.."Holster", true) == nil then
 							local attachment = player.Character:FindFirstChild(attachmentName, true);
-							local motorName = attachmentName.."Motor";
+							local _motorName = attachmentName.."Motor";
 							
 							local motor = modGearAttachments:CreateAttachmentMotor(attachment);
 							if motor then
@@ -228,6 +222,8 @@ function unequipTool(player, returnPacket)
 	end
 	
 	Debugger:Log("Unequip");
+
+	return;
 end
 
 local function equipTool(player, paramPacket)
@@ -284,7 +280,7 @@ local function equipTool(player, paramPacket)
 			local toolLib = modWeapons[itemId] or modTools[itemId];
 			
 			if toolLib == nil then warn("Attempt to find toolLib with key, "..(itemId or "nil")); end;
-			if humanoid.Health <= 0 and toolLib.WoundEquip ~= true then Debugger:Warn("Player(",player.Name,") attempt to equip when wounded.") return end;
+			if humanoid.Health <= 0 and toolLib.WoundEquip ~= true then Debugger:Warn("Player(",player.Name,") attempt to equip when wounded."); return end;
 			
 			if itemProperties.Equippable and toolLib then
 				local toolModule = profile:GetItemClass(id, mockEquip);
@@ -326,9 +322,10 @@ local function equipTool(player, paramPacket)
 						motor = toolLib.Module[weldName]:Clone();
 						
 					end
-					
+					assert(motor, "Missing ToolGrip");
+
 					local toolModelName = prefabName;
-					if weldName == "RightToolGrip" and weldName ~= "ToolGrip" then
+					if weldName == "RightToolGrip" then
 						toolModelName = "Right"..prefabName;
 
 					elseif weldName == "LeftToolGrip" then
@@ -467,6 +464,7 @@ local function equipTool(player, paramPacket)
 		end
 		
 		Debugger:Log("Equip");
+		return;
 	end
 	
 	if profile.EquippedTools.ID == nil then
@@ -523,11 +521,11 @@ local function toolHandler(player, action, paramPacket)
 		
 	elseif action == "get" then
 		local profile = modProfile:Find(player.Name);
-		local lastStorageItem = profile and profile.EquippedTools and profile.EquippedTools.StorageItem;
-		local lastId = profile and profile.EquippedTools and profile.EquippedTools.ID;
-		
+
 		return profile and profile.EquippedTools;
 	end
+
+	return;
 end
 
 shared.EquipmentSystem.ToolHandler = toolHandler;
@@ -563,7 +561,6 @@ remoteToolInputHandler.OnEvent:Connect(function(player, packet)
 	local siid = packet.SiId;
 	
 	local profile = modProfile:Get(player);
-	local playerSave = profile:GetActiveSave();
 	local inventory = profile.ActiveInventory;
 
 	local id = siid or profile.EquippedTools.ID;
@@ -616,62 +613,12 @@ remoteToolInputHandler.OnEvent:Connect(function(player, packet)
 
 end)
 
-
---remoteToolInputHandler.OnServerEvent:Connect(function(player, inputType, inputData, ...)
---	local character = player.Character;
---	if character == nil then Debugger:Warn("Missing Character"); return end;
-
---	local profile = modProfile:Get(player);
---	local playerSave = profile:GetActiveSave();
---	local inventory = profile.ActiveInventory;
-	
---	local id = profile.EquippedTools.ID;
---	local toolModels = profile.EquippedTools.WeaponModels;
-	
---	local storageItem = inventory and inventory:Find(id);
---	if id == "MockStorageItem" then
---		storageItem = profile.MockStorageItem;
---	end
-	
---	if toolModels == nil or #toolModels <= 0 then return end;
-	
---	for a=1, #toolModels do
---		if not toolModels[a]:IsDescendantOf(character) then
---			Debugger:Warn("Tool is no longer a descendant of player (",player.Name,").");
---			return 
---		end 
---	end;
-	
---	if storageItem == nil then Debugger:Warn("StorageItem(",id,") does not exist."); return end;
---	local itemid = storageItem.ItemId;
-	
---	local toolLib;
---	if modWeapons[itemid] then
---		toolLib = modWeapons[itemid];
-		
---	elseif modTools[itemid] then
---		toolLib = modTools[itemid];
-		
---	end
-	
---	local handler = profile:GetToolHandler(storageItem, toolLib, toolModels);
---	if handler and inputType == "input" and handler.OnInputEvent then
---		handler:OnInputEvent(inputData);
---	end
-	
---	if modConfigurations.RemoveForceFieldOnWeaponFire then
---		local forcefield = character:FindFirstChildWhichIsA("ForceField") or nil;
---		if forcefield then forcefield:Destroy() end;
---	end
---end)
-
 remoteToolPrimaryFire.OnServerEvent:Connect(function(player, id, isActive, ...)
 	--Debugger:Warn("Using deprecated old remoteToolPrimaryFire", id, isActive, debug.traceback());
 	local character = player.Character;
 	if character == nil then Debugger:Warn("Missing Character"); return end;
 
 	local profile = modProfile:Get(player);
-	local playerSave = profile:GetActiveSave();
 	local inventory = profile.ActiveInventory;
 	local toolModels = profile.EquippedTools.WeaponModels;
 
