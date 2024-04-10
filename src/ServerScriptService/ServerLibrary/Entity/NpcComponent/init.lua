@@ -156,7 +156,9 @@ function NpcComponent:KillNpc()
 							weaponPart.CanCollide = true;
 						end
 					end
-					obj.Parent = workspace.Debris;
+					if game:IsAncestorOf(obj) then
+						obj.Parent = workspace.Debris;
+					end
 					game.Debris:AddItem(obj, 10);
 					
 				elseif obj:IsA("Motor6D") then

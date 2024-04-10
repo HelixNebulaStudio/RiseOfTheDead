@@ -1,22 +1,21 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local Players = game:GetService("Players");
 
+--==
 local Survival = {};
 Survival.__index = Survival;
 
 local EnumStatus = {Initialized=-1; Restarting=0; InProgress=1; Completed=2;};
 Survival.EnumStatus = EnumStatus;
 
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modInteractables = require(game.ReplicatedStorage.Library.Interactables);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
-local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
@@ -28,8 +27,8 @@ local remoteGameModeHud = modRemotesManager:Get("GameModeHud");
 local StageElements = game.ServerStorage:WaitForChild("StageElements");
 
 
-local Objectives = {};
-local Hazards = {};
+-- local Objectives = {};
+-- local Hazards = {};
 local Modifiers = {};
 --==
 Survival.OnWaveChanged = modEventSignal.new("OnWaveChanged");
@@ -131,8 +130,6 @@ function Survival:Load()
 	end);
 	
 	task.spawn(function()
-		local modCommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
-
 		Debugger.AwaitShared("modCommandsLibrary");
 		shared.modCommandsLibrary:HookChatCommand("survival", {
 			Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
@@ -265,7 +262,7 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 		self.OnNpcSpawnHooked = modNpc.OnNpcSpawn:Connect(function(npcModule)
 			if modConfigurations.TargetableEntities[npcModule.Humanoid.Name] == nil then return end; -- Not enemy spawn;
 			
-			local npcPrefab = npcModule.Prefab;
+			--local npcPrefab = npcModule.Prefab;
 			table.insert(self.EnemyModules, npcModule);
 			
 			npcModule.Garbage:Tag(function()
@@ -332,7 +329,7 @@ function Survival:CompleteWave()
 	self:RespawnDead();
 	task.wait(1);
 	
-	local wavesLapsedSinceSupply = self.LastSupplyWave-self.Wave; --(math.random(1, 10) == 1 and wavesLapsedSinceSupply > 4) or wavesLapsedSinceSupply >= 15
+	--local wavesLapsedSinceSupply = self.LastSupplyWave-self.Wave; --(math.random(1, 10) == 1 and wavesLapsedSinceSupply > 4) or wavesLapsedSinceSupply >= 15
 	if self.Wave == 1 or self.ResupplyEnabled then
 		self.ResupplyEnabled = false;
 		self.LastSupplyWave = self.Wave;
@@ -709,8 +706,9 @@ function Survival:RespawnDead()
 	end
 end
 
+-- MARK: Survival:Start()
 function Survival:Start()
-	Debugger:Log("start game");
+	Debugger:Warn("start game");
 	self.Status = EnumStatus.InProgress;
 	self.Wave = 1;
 	self.CompletedOnce = false;
@@ -725,7 +723,6 @@ function Survival:Start()
 		if playerProfile then
 			local playerSave = playerProfile:GetActiveSave();
 			local playerLevel = playerSave and playerSave:GetStat("Level") or 1;
-			--local focusLevel = modGlobalVars.GetLevelToFocus(playerLevel);
 			if playerLevel > self.PeekPlayerLevel then
 				self.PeekPlayerLevel = playerLevel;
 			end
@@ -789,16 +786,18 @@ function Survival:Start()
 	end
 end
 
+-- MARK: Survival:Initialize(roomData)
 function Survival:Initialize(roomData)
 	self.RoomData = roomData;
 	self.Players = {};
 	self.IsHard = roomData.IsHard == true;
 	
-	local function clearCharacter(character)
+	local function clearCharacter(character: Model?)
 		for a=#self.Characters, 1, -1 do
 			local char = self.Characters[a];
-			local player = game.Players:GetPlayerFromCharacter(char);
-			if player == nil or (character and char.Name == character.Name) then
+			local player = Players:GetPlayerFromCharacter(char);
+
+			if player == nil or char == character then
 				table.remove(self.Characters, a);
 			end
 		end
@@ -810,16 +809,14 @@ function Survival:Initialize(roomData)
 
 		local classPlayer = shared.modPlayers.Get(player);
 
-		local humanoid = character:WaitForChild("Humanoid");
 		classPlayer:OnNotIsAlive(function(character)
-			Debugger:Log(character.Name,"died");
+			Debugger:Warn(character.Name,"died");
 			shared.Notify(game.Players:GetPlayers(), character.Name .. " died!", "Negative");
 
 			clearCharacter(character);
-			Debugger:Log("Players alive",#self.Characters);
+			Debugger:Warn("Players alive",#self.Characters);
 
 			if #self.Characters <= 0 and self.Status == EnumStatus.InProgress then
-
 				self.Status = EnumStatus.Restarting;
 				
 				for a=#self.EnemyModules, 1, -1 do
@@ -896,7 +893,7 @@ function Survival:Initialize(roomData)
 	end)
 
 	for a=1, 10 do
-		local waitMsg = ("Waiting for ("..#self.Players.."/"..#roomData.Players..") players.. ($t)"):gsub("$t", 10-a);
+		local waitMsg = ("Waiting for ("..#self.Players.."/"..#roomData.Players..") players.. ($t)"):gsub("$t", tostring(10-a));
 		shared.Notify(game.Players:GetPlayers(), waitMsg, "Inform", "waitForPlayers");
 
 		if #self.Players >= #self.RoomData.Players then
