@@ -1,41 +1,27 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
-local joinButtonEmptyPos = UDim2.new(0.5, 0, 0.925, 0);
-local joinButtonPos = UDim2.new(0.5, 0, 0.82, 0);
-
 local newLobbyAsPublic = true;
 local hardModeCreate = false;
 
 --== Variables;
-local RunService = game:GetService("RunService");
 local UserInputService = game:GetService("UserInputService");
-local TextService = game:GetService("TextService");
-local TweenService = game:GetService("TweenService");
 local SoundService = game:GetService("SoundService");
 
---local camera = workspace.CurrentCamera;
-local localplayer = game.Players.LocalPlayer;
-local character = localplayer.Character; --or localplayer.CharacterAdded:Wait()
-local rootPart = character:WaitForChild("HumanoidRootPart");
+local localPlayer = game.Players.LocalPlayer;
 
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 
-local prefabStorage = game.ReplicatedStorage.Prefabs;
-
-local modData = require(localplayer:WaitForChild("DataModule"));
-local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
-local modGuiTween = require(script.Parent.Parent.GuiObjectTween);
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modLeaderboardService = require(game.ReplicatedStorage.Library.LeaderboardService);
 
 local modLeaderboardInterface = require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
+local modGuiTween = require(game.ReplicatedStorage.Library.UI.GuiObjectTween);
+local modGuiObjectPlus = require(game.ReplicatedStorage.Library.UI.GuiObjectPlus);
 local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface);
 
 
@@ -48,7 +34,7 @@ local bindOpenLobbyInterface = remotes.LobbyInterface.OpenLobbyInterface;
 local bindLeavingBossArena = remotes.BossInterface.LeavingBossArena;
 
 local mainInterface = script.Parent.Parent.MainInterface;
-local modInterface = require(mainInterface:WaitForChild("InterfaceModule"));
+local modInterface = require(mainInterface:WaitForChild("InterfaceModule") :: ModuleScript);
 
 local lobbyInterface = script.Parent;
 local mainFrame = script.Parent:WaitForChild("Interface");
@@ -60,8 +46,16 @@ local verticalListTemplate = script:WaitForChild("VerticalList");
 local templateUIRatio = script:WaitForChild("UIAspectRatioConstraint");
 local templateLine = script:WaitForChild("line");
 
-local gameLobby = {};
-local lobbyInfo = {};
+local gameLobby = {
+	Type = nil;
+	Stage = nil;
+	BossName = nil;
+	Lobbies = {};
+};
+local lobbyInfo = {
+	StageLib = nil;
+	GameLib = nil;
+};
 
 local readyIndicators = {};
 
@@ -75,7 +69,6 @@ local refreshStatus = false;
 local enumRequests = modGameModeLibrary.RequestEnums;
 
 local cameraLight = nil;
-local random = Random.new();
 local branchColor = modBranchConfigs.BranchColor
 local currentWeekDay = modSyncTime.GetWeekDay();
 
@@ -101,6 +94,7 @@ local function getIndicator(name)
 		if readyIndicators[a].Name ~= name then continue end;
 		return readyIndicators[a];
 	end
+	return;
 end
 
 local function removeIndicator(name)
@@ -130,6 +124,7 @@ local function GetRoom(id)
 			return gameLobby.Lobbies[a], a;
 		end
 	end
+	return;
 end
 
 local function GetPlayerRoom(player)
@@ -141,6 +136,7 @@ local function GetPlayerRoom(player)
 			end
 		end
 	end
+	return;
 end
 
 local function UpdateButtons(roomId)
@@ -162,7 +158,7 @@ local function UpdateButtons(roomId)
 		UpdateInformation(room);
 	end)
 	
-	local playerRoom, playerData = GetPlayerRoom(localplayer);
+	local playerRoom, playerData = GetPlayerRoom(localPlayer);
 	if playerRoom == nil then -- when player not in a lobby;
 		mainFrame.JoinButton.Visible = #room.Players < lobbyInfo.StageLib.MaxPlayers
 		and (room.State == 1 or (lobbyInfo.StageLib.SingleArena and room.State == 2))
@@ -271,10 +267,12 @@ local function SetRoom(room)
 end
 
 function ChangeRoom(increase)
-	if debounce then return end debounce = true;
+	if debounce then return end 
+	debounce = true;
+
 	local change = increase and 1 or -1;
 	
-	local room, roomIndex = GetRoom(roomId);
+	local _room, roomIndex = GetRoom(roomId);
 	
 	if roomIndex+change <= #gameLobby.Lobbies and roomIndex+change >= 1 then
 		SetRoom(gameLobby.Lobbies[roomIndex+change]);
@@ -283,7 +281,7 @@ function ChangeRoom(increase)
 end
 
 function Update()
-	local currentRoom, roomIndex = GetRoom(roomId);
+	local currentRoom, _roomIndex = GetRoom(roomId);
 	if currentRoom then
 		if currentRoom.State == 1 then
 			mainFrame.LobbyInfo.Text = "Waiting for players..";
@@ -353,7 +351,6 @@ end
 
 local linesList = {};
 local itemButtonList = {};
-local hintshown = nil;
 local unlockHardModeButton = nil;
 
 function UpdateInformation(room)
@@ -395,8 +392,6 @@ function UpdateInformation(room)
 		gridLayout.CellSize = UDim2.new(0, 50, 0, 50);
 		
 		for a=1, #crateList do
-			local itemLib = modItemsLibrary:Find(crateList[a]);
-			
 			local itemButtonObject = itemButtonList[crateList[a]] or modItemInterface.newItemButton(crateList[a]);
 			local newItemButton = itemButtonObject.ImageButton;
 			if itemButtonList[crateList[a]] == nil then
@@ -493,7 +488,6 @@ function UpdateInformation(room)
 				
 				for b=1, #list do
 					local rewardInfo = list[b];
-					local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
 					
 					local itemButtonObject = itemButtonList[rewardInfo.ItemId..b] or modItemInterface.newItemButton(rewardInfo.ItemId);
 					local newItemButton = itemButtonObject.ImageButton;
@@ -553,7 +547,8 @@ function UpdateInformation(room)
 						if unlockHardModeButton == nil then
 							unlockHardModeButton = templateUnlockHardmode:Clone();
 							unlockHardModeButton.MouseButton1Click:Connect(function()
-								if debounce then return end debounce = true;
+								if debounce then return end 
+								debounce = true;
 								modInterface:PlayButtonClick();
 								LeaveLobbyMenu();
 
@@ -780,20 +775,13 @@ bindOpenLobbyInterface.Event:Connect(function(lobbyData) --cleared max depth che
 	end
 end)
 
-local classPlayer = shared.modPlayers.Get(localplayer);
+local classPlayer = shared.modPlayers.Get(localPlayer);
 classPlayer:OnNotIsAlive(function(character)
 	if not mainFrame.Visible then return end;
 	LeaveLobbyMenu();
 end)
 
---character:WaitForChild("Humanoid").Died:Connect(function()
---	if not mainFrame.Visible then return end;
---	LeaveLobbyMenu();
-	
---end)
-
-modGuiTween.FadeTween(lobbyInterface.Transition, modGuiTween.FadeDirection.Out, TweenInfo.new(0.25));
-local modGuiObjectPlus = require(game.ReplicatedStorage.Library.UI.GuiObjectPlus);
+modGuiTween.FadeTween(lobbyInterface.Transition, modGuiTween.FadeDirection.Out, TweenInfo.new(0));
 
 for _, button in pairs(lobbyInterface:GetDescendants()) do
 	if button:IsA("ImageButton") and button.Name ~= "CreateFrame" then
@@ -809,15 +797,20 @@ for _, button in pairs(lobbyInterface:GetDescendants()) do
 		
 		if button.Name == "ExitMenu" then
 			button.MouseButton1Click:Connect(function()
-				if debounce then return end debounce = true;
+				if debounce then return end 
+				debounce = true;
+				
 				modInterface:PlayButtonClick();
 				LeaveLobbyMenu();
+				
 				debounce = false;
 			end)
 			
 		elseif button.Name == "JoinButton" then
 			button.MouseButton1Click:Connect(function()
-				if debounce then return end debounce = true;
+				if debounce then return end 
+				debounce = true;
+				
 				modInterface:PlayButtonClick();
 				
 				button.Visible = false;
@@ -837,7 +830,8 @@ for _, button in pairs(lobbyInterface:GetDescendants()) do
 			
 		elseif button.Name == "LeaveButton" then
 			button.MouseButton1Click:Connect(function()
-				if debounce then return end debounce = true;
+				if debounce then return end
+				debounce = true;
 				modInterface:PlayButtonClick();
 				
 				button.Visible = false;
@@ -850,13 +844,13 @@ for _, button in pairs(lobbyInterface:GetDescendants()) do
 				mainFrame.ExitMenu.Visible = true;
 				--mainFrame.CreateRoom.Visible = lobbyInfo.StageLib.SingleArena ~= true;
 				
-				local localLobby = GetPlayerRoom(localplayer);
+				local localLobby = GetPlayerRoom(localPlayer);
 				if localLobby == nil or roomId == localLobby.Id then
 					mainFrame.JoinButton.Visible = true;
 					mainFrame.JoinButton.ImageColor3 = Color3.fromRGB(100, 100, 100);
 				end
 				
-				removeIndicator(localplayer.Name);
+				removeIndicator(localPlayer.Name);
 				
 				remoteGameModeRequest:InvokeServer(enumRequests.LeaveRoom);
 				checkButtonHighlight(mainFrame.ExitMenu);
@@ -870,7 +864,9 @@ for _, button in pairs(lobbyInterface:GetDescendants()) do
 				if not mainFrame.CreateFrame.Visible and UserInputService.TouchEnabled then
 					mainFrame.CreateFrame.Visible = true;
 				else
-					if debounce then return end debounce = true;
+					if debounce then return end 
+					debounce = true;
+					
 					mainFrame.CreateFrame.Visible = false;
 					button.Visible = false;
 					
@@ -921,7 +917,9 @@ for _, button in pairs(lobbyInterface:GetDescendants()) do
 			
 		elseif button.Name == "ReadyButton" then
 			button.MouseButton1Click:Connect(function()
-				if debounce then return end debounce = true;
+				if debounce then return end 
+				debounce = true;
+
 				modInterface:PlayButtonClick();
 				
 				button.Visible = false;
@@ -931,7 +929,7 @@ for _, button in pairs(lobbyInterface:GetDescendants()) do
 				local room = GetRoom(roomId);
 				if room then
 					for a=1, #room.Players do
-						if room.Players[a].Name == localplayer.Name then
+						if room.Players[a].Name == localPlayer.Name then
 							room.Players[a].Ready = true;
 						end
 					end
@@ -947,17 +945,17 @@ for _, button in pairs(lobbyInterface:GetDescendants()) do
 			
 		elseif button.Name == "UnreadyButton" then
 			button.MouseButton1Click:Connect(function()
-				if debounce then return end debounce = true;
+				if debounce then return end
+				debounce = true;
 				modInterface:PlayButtonClick();
 				button.Visible = false;
 				
-				--mainFrame.ReadyButton.Visible = lobbyInfo.StageLib.SingleArena ~= true;
 				mainFrame.ReadyButton.ImageColor3 = Color3.fromRGB(100, 100, 100);
 				
 				local room = GetRoom(roomId);
 				if room then
 					for a=1, #room.Players do
-						if room.Players[a].Name == localplayer.Name then
+						if room.Players[a].Name == localPlayer.Name then
 							room.Players[a].Ready = false;
 						end
 					end

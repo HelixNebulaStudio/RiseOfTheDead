@@ -200,7 +200,7 @@ function GenericUICheckbox:Clone()
 	return new;
 end
 
-function Interface:PlayButtonClick(pitch)
+function Interface:PlayButtonClick(pitch: number?)
 	modAudio.Play("ButtonSound", nil, nil, false).PlaybackSpeed = pitch or 1;
 end
 
