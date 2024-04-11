@@ -3,15 +3,15 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localplayer = game.Players.LocalPlayer;
 
 local RunService = game:GetService("RunService");
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modCharacter = modData:GetModCharacter();
 
 local prefab = script:WaitForChild("Prefab").Value; 
-local humanoid = prefab:WaitForChild("Zombie");
+local humanoid: Humanoid = prefab:WaitForChild("Zombie");
+local animator: Animator = humanoid:WaitForChild("Animator") :: Animator;
 local rootPart = prefab:WaitForChild("HumanoidRootPart");
 
-local random = Random.new();
 --== Script;
 local parentChangeSignal, runLoop;
 parentChangeSignal = prefab:GetPropertyChangedSignal("Parent"):Connect(function()
@@ -29,15 +29,13 @@ end
 runLoop = RunService.Heartbeat:Connect(function()
 end)
 
-local wingsAnimation = humanoid:LoadAnimation(script:WaitForChild("Fly"));
+local wingsAnimation = animator:LoadAnimation(script:WaitForChild("Fly"));
 wingsAnimation:Play();
 
-modAudio.Play("WingsCore", rootPart);
+local wingsCoreSound = modAudio.Play("WingsCore", rootPart);
 
---wait(0.5)
---for _, obj in pairs(helicopterModel:GetDescendants()) do
---	if obj.Name == "BodyPosition" 
---	or obj.Name == "BodyGyro" then
---		obj:Destroy();
---	end
---end
+humanoid:GetAttributeChangedSignal("IsDead"):Connect(function()
+	if not humanoid:GetAttribute("IsDead") then return end;
+	wingsAnimation:Stop();
+	wingsCoreSound:Destroy();
+end)

@@ -36,7 +36,7 @@ function Get(id)
 	end
 end
 
-function Play(id, parent, looped, pitch, volume)
+function Play(id, parent, looped, pitch, volume) : Sound?
 	if id == nil then return end;
 	local audioInstance = Library[id];
 	
@@ -82,6 +82,7 @@ function Play(id, parent, looped, pitch, volume)
 	else
 		warn("Audio missing (",id,").");
 	end
+	return;
 end
 
 function PlayReplicated(id, parent, looped, pitch, volume)

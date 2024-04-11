@@ -83,7 +83,9 @@ return function(npc, spawnPoint)
 
 		self.BodyPosition = self.RootPart:WaitForChild("BodyPosition");
 		self.BodyGyro = self.RootPart:WaitForChild("BodyGyro");
-		
+		self.Garbage:Tag(self.BodyPosition);
+		self.Garbage:Tag(self.BodyGyro);
+
 		local initT = math.floor(tick());
 		local seed = 0.12345;
 		local offset = Vector3.new();

@@ -21,6 +21,7 @@ local bindIsInDuel = remotes.IsInDuel;
 local touchHandler = modTouchHandler.new("PoisonIvy", 1);
 function touchHandler:OnPlayerTouch(player, basePart, part)
 	local npcModel = basePart.Parent;
+	if npcModel == nil then return end;
 	
 	local modNpcStatus = npcModel:FindFirstChild("NpcStatus") and require(npcModel.NpcStatus);
 	modAudio.Play(random:NextInteger(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", basePart);
