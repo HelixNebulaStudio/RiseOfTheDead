@@ -1,20 +1,24 @@
---local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Services;
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 
 --==
-local LayeredVariable = {};
-LayeredVariable.__index = LayeredVariable;
-LayeredVariable.ClassName = "LayeredVariable";
+local LayeredVariable = {
+	ClassName = "LayeredVariable";
 
-function LayeredVariable.new(defaultValue)
-	local self = {
-		Table={};
-		Dirty=false;
-		Changed = modEventSignal.new("LayeredVariableChanged");
-	};
-	
-	setmetatable(self, LayeredVariable);
+	Table = {};
+	Dirty = false;
+	Changed = modEventSignal.new();
+};
+LayeredVariable.__index = LayeredVariable;
+export type LayeredVariable = typeof(LayeredVariable);
+
+function LayeredVariable.new(defaultValue) : LayeredVariable
+	local self = setmetatable({}, LayeredVariable);
+	self.Table = {};
+	self.Dirty=false;
+	self.Changed = modEventSignal.new("LayeredVariableChanged");
+
 	self:Set("default", defaultValue, 0);
 	
 	return self;
@@ -63,6 +67,7 @@ function LayeredVariable:Has(id)
 			return self.Table[a];
 		end
 	end
+	return;
 end
 
 function LayeredVariable:Get()

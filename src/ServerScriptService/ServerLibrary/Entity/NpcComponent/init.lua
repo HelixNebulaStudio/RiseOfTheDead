@@ -409,27 +409,38 @@ function NpcComponent:GetHealth(valueType: string, bodyPart: BasePart)
 end
 --==
 
+-- MARK: NpcModule Type
 export type NpcModule = {
-    Name: string;
-    IsDead: boolean;
+	Name: string;
+	IsDead: boolean;
 
-    Prefab: Model | Actor;
-    RootPart: BasePart;
-    Head: BasePart;
-    Humanoid: Humanoid;
+	Prefab: Model | Actor;
+	RootPart: BasePart;
+	Head: BasePart;
+	Humanoid: Humanoid;
 
-    Actor: Actor?;
+	Actor: Actor?;
 	ActorEvent: BindableEvent;
 
 	PathAgent: {[any]: any};
 
-    Think: modEventSignal.EventSignal;
+	Think: modEventSignal.EventSignal;
 	Garbage: modGarbageHandler.GarbageHandler;
 
 	EntityStatus: modEntityStatus.EntityStatus;
-};
 
-return function(self: NpcModule)
+	Properties: {};
+	JointRotations: {
+		WaistRot: modLayeredVariable.LayeredVariable;
+		NeckRot: modLayeredVariable.LayeredVariable;
+	};
+
+	LastDamageTaken: number;
+
+	[any]: any;
+} | typeof(NpcComponent);
+
+return function(self) : NpcModule
 	self.Name = self.Prefab.Name;
 	self.Head = self.Prefab:FindFirstChild("Head") :: BasePart;
 	self.Humanoid = self.Prefab:FindFirstChildWhichIsA("Humanoid") :: Humanoid;
@@ -462,10 +473,14 @@ return function(self: NpcModule)
 			Walkway = isHuman and 0.5 or 0.75;
 			Slowpath = isHuman and 2 or nil;
 			DoorPortal = isHuman and 1 or nil;
-		}
+		};
 	};
 	
 	self.Garbage = modGarbageHandler.new();
+
+	if self.Properties == nil then
+		self.Properties = {};
+	end
 	self.EntityStatus = modEntityStatus.new(self.Properties);
 	
 	self.LastDamageTaken = tick();
@@ -491,14 +506,6 @@ return function(self: NpcModule)
 		end
 	end)
 	
-	--if self.Properties and self.Properties.WalkSpeed then
-	--	local wsMeta = {};
-	--	wsMeta.__index = wsMeta;
-	--	wsMeta.Min = self.Properties.WalkSpeed.Min;
-	--	wsMeta.Max = self.Properties.WalkSpeed.Max;
-	--	self.Properties.WalkSpeed = setmetatable({}, wsMeta);
-	--end
-	
 	setmetatable(self, NpcComponent);
 	-- initialized;
 	self.Garbage:Tag(function()
@@ -518,7 +525,6 @@ return function(self: NpcModule)
 	
 	if self.Prefab:GetAttribute("HasRagdoll") == true then
 		self:AddComponent("Ragdoll")();
-		self.Ragdoll = nil;
 	end
 	
 	return self;

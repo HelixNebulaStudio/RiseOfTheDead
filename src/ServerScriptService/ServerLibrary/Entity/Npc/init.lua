@@ -1,21 +1,14 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local Npc = {};
 
-local random = Random.new();
 --== Script;
-
-local PhysicsService = game:GetService("PhysicsService");
 local CollectionService = game:GetService("CollectionService");
 local RunService = game:GetService("RunService");
 
 local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
-local modPhysics = require(game.ServerScriptService.ServerLibrary.Physics);
 local modNpcAnimator = require(game.ServerScriptService.ServerLibrary.Entity.NpcAnimator);
-local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
-local modPrefabManager = require(game.ServerScriptService.ServerLibrary.PrefabManager);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
-local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
@@ -38,9 +31,6 @@ setmetatable(modNpcModules, {__index=searchCustom});
 
 local npcStatusModulePrefab = game.ServerScriptService.ServerLibrary.Entity.NpcStatus;
 
-local remoteNpcManager = modRemotesManager:Get("NpcManager");
-
-local replicatedPrefabs = game.ReplicatedStorage.Prefabs;
 local parallelNpcTemplate = script.Parent:WaitForChild("ParallelNpc");
 local npcPrefabs = game.ServerStorage.PrefabStorage.Npc;
 
@@ -142,6 +132,7 @@ Npc.GetPlayerNpc = function(player, name, condition)
 			end
 		end
 	end
+	return;
 end
 
 Npc.GetPlayerNpcList = function(player)
@@ -167,6 +158,7 @@ Npc.GetNpcModule = function(prefab)
 			return npcModule;
 		end;
 	end
+	return;
 end
 
 Npc.Get = function(id)
@@ -176,6 +168,7 @@ Npc.Get = function(id)
 			return npcModule;
 		end;
 	end
+	return;
 end
 
 local debugBox = Instance.new("Part");
@@ -292,7 +285,7 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	local rootPart = npcPrefab:WaitForChild("HumanoidRootPart");
 	rootPart:SetAttribute("IgnoreWeaponRay", true);
 	
-	local cframe = cframe or rootPart.CFrame;
+	cframe = cframe or rootPart.CFrame;
 	npcPrefab:PivotTo(cframe);
 	
 	
@@ -611,8 +604,13 @@ function Npc.GetCFrameFromPlatform(platform)
 	local pointMin = Vector3.new(platform.Position.X-worldSpaceSize.X/2, platform.Position.Y+worldSpaceSize.Y/2, platform.Position.Z-worldSpaceSize.Z/2);
 	local pointMax = Vector3.new(platform.Position.X+worldSpaceSize.X/2, platform.Position.Y+worldSpaceSize.Y/2, platform.Position.Z+worldSpaceSize.Z/2);
 	
-	return CFrame.new(Vector3.new(random:NextNumber(pointMin.X, pointMax.X), pointMin.Y+2.1, random:NextNumber(pointMin.Z, pointMax.Z)))
-			* CFrame.Angles(0, math.rad(random:NextNumber(0, 360)), 0);	
+	return CFrame.new(
+		Vector3.new(
+			math.random(pointMin.X *100, pointMax.X *100)/100, 
+			pointMin.Y+2.1, 
+			math.random(pointMin.Z *100, pointMax.Z *100)/100
+		)
+	) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);	
 end
 
 
@@ -641,9 +639,12 @@ task.spawn(function()
 	while true do
 		for a=#Npc.NpcModules, 1, -1 do
 			if Npc.NpcModules[a] and Npc.NpcModules[a].Module and not Npc.NpcModules[a].Module.IsDead then
-				local fireThinkS, fireThinkE = pcall(function()
+				local fireThinkS, _fireThinkE = pcall(function()
 					Npc.NpcModules[a].Module.Think:Fire();
-				end) if not fireThinkS then Debugger:Warn("Failed to think", Npc.NpcModules[a].Module.Name) end;
+				end);
+				if not fireThinkS then
+					Debugger:Warn("Failed to think", Npc.NpcModules[a].Module.Name);
+				end;
 			end;
 		end
 		task.wait(30);

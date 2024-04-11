@@ -181,6 +181,8 @@ function Component.new(Npc)
 				ballSocket:Destroy();
 			end)
 		end)
+
+		Npc.Ragdoll = nil;
 	end
 end
 
