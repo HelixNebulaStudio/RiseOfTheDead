@@ -168,10 +168,22 @@ end
 function ReplicationManager.DesyncFromServer(prefab: Instance, parent: Instance, players: {[number]: Player}?)
 	if not game:IsAncestorOf(prefab) then return end;
 	players = players or game:GetService("Players"):GetPlayers();
-
-	prefab.Parent = camera;
-
 	assert(players);
+
+	pcall(function()
+		local primaryPart: BasePart;
+		if prefab:IsA("BasePart") then
+			primaryPart = prefab;
+		elseif prefab:IsA("Model") then
+			primaryPart = prefab.PrimaryPart :: BasePart;
+		end
+
+		if primaryPart:CanSetNetworkOwnership() then
+			primaryPart:SetNetworkOwner(players[1] :: Player);
+		end
+	end)
+	prefab.Parent = replicateFolder;
+
 	for a=1, #players do
 		task.spawn(function()
 			remoteReplication:InvokeClient(players[a], "desync", prefab, parent);

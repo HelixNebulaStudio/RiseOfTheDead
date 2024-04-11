@@ -1,12 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
+local RunService = game:GetService("RunService");
+
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 local modEntityStatus = require(game.ReplicatedStorage.Library.EntityStatus);
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 local modPhysics = require(game.ReplicatedStorage.Library.Util.Physics);
 
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
@@ -116,6 +117,8 @@ function NpcComponent:KillNpc()
 		end)
 	end
 	
+	self:SetNetworkOwner("auto", true);
+
 	task.spawn(function()
 		if rootPart then
 			for _, tag in pairs(rootPart:GetTags()) do
@@ -129,6 +132,7 @@ function NpcComponent:KillNpc()
 			end
 			prefab:SetAttribute("DeadbodyTick", tick());
 			prefab:AddTag("Deadbody");
+			prefab.Parent = workspace.Entities;
 		end
 		
 		if self.Wield then
@@ -157,7 +161,7 @@ function NpcComponent:KillNpc()
 		end
 	end)
 
-	game.Debris:AddItem(prefab, 1);
+	--game.Debris:AddItem(prefab, 1);
 end
 
 function NpcComponent:BreakJoint(motor: Motor6D)
@@ -284,7 +288,6 @@ function NpcComponent:SetNetworkOwner(value, lock)
 		if not rootPart:CanSetNetworkOwnership() then return end;
 
 		if v == "auto" then
-			
 			local players = game.Players:GetPlayers();
 			if #players > 0 then
 				local closestDist, closestPlayer = math.huge, nil;
@@ -295,6 +298,10 @@ function NpcComponent:SetNetworkOwner(value, lock)
 						closestPlayer = players[a];
 					end
 				end
+				
+				if RunService:IsStudio() then
+					Debugger:Warn(self.Name, "SetNetworkOwner:", closestPlayer);
+				end
 				rootPart:SetNetworkOwner(closestPlayer);
 				
 			else
@@ -303,13 +310,15 @@ function NpcComponent:SetNetworkOwner(value, lock)
 			end
 			
 		else
+			if RunService:IsStudio() then
+				Debugger:Warn(self.Name, "SetNetworkOwner:", v);
+			end
 			rootPart:SetNetworkOwner(v);
 
 		end
 	end
 
 	if not workspace:IsAncestorOf(rootPart) then return end;
-	if self.IsDead then return end;
 	if self.IsDestroyed then return end;
 
 	setNO(value);
