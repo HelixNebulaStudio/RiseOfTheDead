@@ -11,7 +11,10 @@ local CharacterModule = {
 	Character=script.Parent;
 	Humanoid=script.Parent:WaitForChild("Humanoid");
 	
-	TouchButtons={};
+	TouchButtons={
+		SpaceActionButton = nil;
+		CtrlActionButton = nil;
+	};
 	CharacterProperties={
 		State = Enum.HumanoidStateType.None;
 

@@ -4,7 +4,6 @@ local RemotesManager = {};
 RemotesManager.__index = RemotesManager;
 
 local RunService = game:GetService("RunService");
-local HttpService = game:GetService("HttpService");
 
 local modRemotePacketSizeCounter = require(script.RemotePacketSizeCounter);
 local modBridgeNet = require(game.ReplicatedStorage:WaitForChild("Dependencies"):WaitForChild("BridgeNet2"));
@@ -210,7 +209,7 @@ function RemotesManager:NewFunctionRemote(remoteInstance, debounceInterval)
 
 				local p = {...};
 				local r;
-				local invokeS, invokeE = pcall(function()
+				local _invokeS, _invokeE = pcall(function()
 					r = {remote.Remote:InvokeClient(unpack(p))};
 				end)
 				
@@ -506,7 +505,6 @@ else
 	RemotesManager:NewEventBridge("PlayerDataSync");
 	RemotesManager:NewFunctionRemote("PlayerDataFetch").Secure = true;
 	
-	
 	RemotesManager:NewEventRemote("GoldStatSync");
 	RemotesManager:NewEventRemote("MasterySync");
 	RemotesManager:NewFunctionRemote("RequestPublicProfile", 0.5);
@@ -691,7 +689,6 @@ if RunService:IsClient() then
 else
 	-- Server;
 	task.spawn(function()
-		local modCommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
 		Debugger.AwaitShared("modCommandsLibrary");
 		
 		

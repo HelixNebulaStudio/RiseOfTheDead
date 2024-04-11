@@ -32,18 +32,15 @@ end)
 
 rootPart.Anchored = false;
 
-local otherCharacter = workspace:FindFirstChild("Characters");
-
 local walkSurfaceTag = Instance.new("StringValue"); walkSurfaceTag.Name = "WalkingSurface"; walkSurfaceTag.Parent = head;
 local UserGameSettings = UserSettings():GetService("UserGameSettings");
 
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modCharacter = require(character:WaitForChild("CharacterModule"));
 modCharacter.Character = character;
-local modSettings = localPlayer:FindFirstChild("SettingsModule") ~= nil and require(localPlayer.SettingsModule) or nil;
-local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
+local modSettings = localPlayer:FindFirstChild("SettingsModule") ~= nil and require(localPlayer.SettingsModule :: ModuleScript) or nil;
+local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 local modSpectateManager = require(game.ReplicatedStorage.Library.SpectateManager);
@@ -57,7 +54,6 @@ local bodyGyro = Instance.new("BodyGyro", rootPart); bodyGyro.MaxTorque = Vector
 local animations = {};
 
 local UserInputService = game:GetService("UserInputService");
-local ContextActionService = game:GetService("ContextActionService");
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 local SoundService = game:GetService("SoundService");
@@ -111,12 +107,10 @@ local touchInputVariables = {lastTouch=tick();};
 
 local currentThirdPerson = true;
 local xLeftDeltaAddition, xRightDeltaAddition = false, false;
-local uiVariables = {previousHealth=humanoid.MaxHealth; previousMaxHealth=humanoid.MaxHealth;};
+
 local mathAtan2 = math.atan2; local mathClamp = math.clamp; local newNoise = math.noise; local random = Random.new();
-local appearanceData = {};
 
 local environmentOnly = {workspace:WaitForChild("Environment"); workspace.Terrain};
-local environmentAndInteractable = {workspace:FindFirstChild("Environment"); workspace:FindFirstChild("Interactables");};
 local environmentCollidable = {workspace:FindFirstChild("Environment"); workspace:FindFirstChild("Clips"); workspace:FindFirstChild("Interactables"); workspace:FindFirstChild("Entity"); workspace.Terrain};
 local isCharCamEnabled = false; 
 
@@ -124,8 +118,11 @@ local EditModeTag = false;
 
 local CameraSubject = {IsClientSubject=true; Character=character; RootPart=rootPart; Head=head;};
 local Cache = {
-	JumpPressCount=0;
+	JumpPressCount = 0;
 	OldTerrainWaterTransparency = workspace.Terrain.WaterTransparency;
+	AntiGravityForce = nil;
+	ViewModelErr = nil;
+	OldState = nil;
 };
 
 local CollisionModel={
@@ -195,12 +192,12 @@ end)
 
 local updateCharacterTransparency = function() end;
 
-pcall(function()
-	local camMod = require(game.Players.LocalPlayer.PlayerScripts.PlayerModule.CameraModule)
-	if camMod.activeTransparencyController and camMod.activeTransparencyController.Enable then
-		camMod.activeTransparencyController:Enable(false);
-	end
-end)
+-- pcall(function()
+-- 	local camMod = require(game.Players.LocalPlayer.PlayerScripts.PlayerModule.CameraModule)
+-- 	if camMod.activeTransparencyController and camMod.activeTransparencyController.Enable then
+-- 		camMod.activeTransparencyController:Enable(false);
+-- 	end
+-- end)
 
 
 local function onHumanoidStateChanged(oldState, newState)
@@ -291,7 +288,7 @@ function onCameraSubjectUpdate()
 		end
 
 	elseif subject and subject:IsA("VehicleSeat") then
-		local occupant = subject.Occupant;
+		local _occupant = subject.Occupant;
 
 		local vehiclePrefab = nil;
 		if subject.Parent:FindFirstChild("Vehicle") and subject.Parent.Vehicle:IsA("ModuleScript") then
@@ -564,7 +561,7 @@ local function crouchRequest(value)
 				slideSound = head:FindFirstChild("BodySlide");
 			end
 			dustParticle.Enabled = true;
-			slideDirection = Vector3.new(rootPart.CFrame.lookVector.X, 0, rootPart.CFrame.lookVector.Z);
+			slideDirection = Vector3.new(rootPart.CFrame.LookVector.X, 0, rootPart.CFrame.LookVector.Z);
 			oldSlideMomentum = slideDirection*characterProperties.SlideSpeed;
 			characterProperties.IsSliding = true;
 		end
@@ -850,7 +847,7 @@ UserInputService.InputEnded:Connect(function(inputObject, gameProcessedEvent)
 end)
 
 local function characterMoving(speed)
-	local state = humanoid:GetState();
+	local _state = humanoid:GetState();
 	characterProperties.MoveSpeed = speed;
 	characterProperties.IsMoving = speed > 1;
 
@@ -1628,6 +1625,7 @@ local ragdollActive = true;
 
 Cache.LastHeadUnderwater = tick();
 Cache.OneSecTick = tick();
+Cache.LowestFps = math.huge;
 RunService.Heartbeat:Connect(function(step)
 	lerp(0,0,0);
 	loadInterface();
@@ -1733,7 +1731,7 @@ RunService.Heartbeat:Connect(function(step)
 			
 		else
 			local pointRay = currentCamera:ViewportPointToRay(mousePosition.X, mousePosition.Y);
-			local rayHit, rayPoint = workspace:FindPartOnRayWithWhitelist(Ray.new(pointRay.Origin, pointRay.Direction*128), environmentOnly, true);
+			local _, rayPoint = workspace:FindPartOnRayWithWhitelist(Ray.new(pointRay.Origin, pointRay.Direction*128), environmentOnly, true);
 			mouseProperties.Direction = (rayPoint - mouseProperties.Focus.p).unit;
 			
 		end
@@ -1746,7 +1744,7 @@ RunService.Heartbeat:Connect(function(step)
 			end
 		end
 		
-		characterProperties.PlayerVelocity = rootPart.AssemblyLinearVelocity.magnitude;
+		characterProperties.PlayerVelocity = rootPart.AssemblyLinearVelocity.Magnitude;
 
 		if characterProperties.PlayerVelocity >= 100 then
 			remoteCharacterRemote:FireServer(5, characterProperties.PlayerVelocity);
@@ -1866,7 +1864,7 @@ RunService.Heartbeat:Connect(function(step)
 		end
 		
 		if characterProperties.IsSwimming then
-			local swimSpeed = (characterProperties.SwimSpeed or 12);
+			local _swimSpeed = (characterProperties.SwimSpeed or 12);
 			if not characterProperties.ActionKeySpaceDown and characterProperties.ActionKeyCtrlDown and rootPart.AssemblyLinearVelocity.Y > -12 then
 				rootPart:ApplyImpulse(Vector3.new(0, -25, 0));
 				
@@ -2037,8 +2035,8 @@ RunService.Heartbeat:Connect(function(step)
 	
 	if characterProperties.AllowLerpBody then
 		local lerpS, lerpE = pcall(function()
-			local neckCFrameAngles, waistCFrameAngles, rArmCFrameAngles, lArmCFrameAngles;
-			local cameraDirection = rootPart.CFrame:vectorToObjectSpace(currentCamera.CFrame.lookVector)
+			local neckCFrameAngles, waistCFrameAngles;
+			local cameraDirection = rootPart.CFrame:VectorToObjectSpace(currentCamera.CFrame.lookVector)
 			local radians = mathAtan2(cameraDirection.X, -cameraDirection.Z); 
 			if radians > 2 or radians < -2 then 
 				radians = mathAtan2(cameraDirection.X, cameraDirection.Z) 
@@ -2112,7 +2110,9 @@ RunService.Heartbeat:Connect(function(step)
 					local viewModelHeight = lerp(prevViewModelHeight, characterProperties.IsSliding and 2.1 or characterProperties.IsCrouching and 1.1 or -0.4, 0.15);
 					prevViewModelHeight = viewModelHeight;
 					
-					local waistToCamCFrame = (rootPart.CFrame * CFrame.new(0, -viewModelHeight, 0)):toObjectSpace(CFrame.new(character.LowerTorso.CFrame.p) * CFrame.Angles(0, math.rad(rootPart.Orientation.Y), 0) * CFrame.new(originaldata.WaistC1.p));
+					local waistToCamCFrame = (rootPart.CFrame * CFrame.new(0, -viewModelHeight, 0)):ToObjectSpace(
+						CFrame.new(character.LowerTorso.CFrame.p) * CFrame.Angles(0, math.rad(rootPart.Orientation.Y), 0) * CFrame.new(originaldata.WaistC1.p)
+					);
 					if characterProperties.IsWounded then
 						character.UpperTorso.Waist.C1 = waistToCamCFrame;
 						
@@ -2144,6 +2144,12 @@ RunService.Heartbeat:Connect(function(step)
 	if (tick()-motorUpdateCooldown) > 0.5 and characterProperties.IsAlive then
 		motorUpdateCooldown = tick();
 		
+		local tickFps = Debugger.ClientFps;
+		local newLowestFps = nil;
+		if tickFps < Cache.LowestFps then
+			Cache.LowestFps = tickFps;
+			newLowestFps = tickFps;
+		end
 		remoteCharacterRemote:FireServer(1, {
 			Waist={
 				Motor=upperTorso.Waist;
@@ -2158,7 +2164,8 @@ RunService.Heartbeat:Connect(function(step)
 				Properties={
 					C0 = prevdata.NeckC0;
 				}
-			}
+			};
+			LowestFps=newLowestFps;
 		})
 	end
 	

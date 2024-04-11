@@ -93,6 +93,8 @@ function Player.new(playerInstance: Player)
 	classPlayer.LastDamageTaken = tick()-15;
 	classPlayer.LastDamageDealt = tick()-15;
 	classPlayer.IsUnderWater = false;
+
+	classPlayer.LowestFps = 999;
 	--==
 	
 	function meta:Spawn()

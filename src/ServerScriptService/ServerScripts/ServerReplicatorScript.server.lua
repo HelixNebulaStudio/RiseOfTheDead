@@ -91,6 +91,10 @@ remoteCharacterRemote.OnServerEvent:Connect(function(player, action, paramPacket
 	elseif action == 1 and t-(classPlayer.MotorCooldown or 0) >= 0.4 then -- 1 updatebodymotors
 		classPlayer.MotorCooldown = t;
 		
+		if paramPacket.LowestFps then
+			classPlayer.LowestFps = math.clamp(tonumber(paramPacket.LowestFps) :: number, 1, 999);
+		end
+
 		for _, oPlayer in pairs(game.Players:GetPlayers()) do
 			if oPlayer ~= player then
 				local distance = modPlayers.GetPlayerToPlayerDistanceCache(player, oPlayer);
