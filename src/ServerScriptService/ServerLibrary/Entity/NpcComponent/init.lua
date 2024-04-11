@@ -444,7 +444,7 @@ return function(self) : NpcModule
 	self.Name = self.Prefab.Name;
 	self.Head = self.Prefab:FindFirstChild("Head") :: BasePart;
 	self.Humanoid = self.Prefab:FindFirstChildWhichIsA("Humanoid") :: Humanoid;
-	self.RootPart = self.Humanoid:FindFirstChild("RootPart") :: BasePart;
+	self.RootPart = self.Humanoid.RootPart :: BasePart;
 
 	self.Actor = self.Prefab:GetActor();
 	self.Think = modEventSignal.new(self.Name.."Think");

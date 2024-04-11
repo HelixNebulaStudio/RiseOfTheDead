@@ -251,12 +251,6 @@ Npc.AttractEnemies = function(character, range, func)
 	return enemies;
 end
 
-local templateSpawnSrc = game.ServerScriptService.ServerScripts:WaitForChild("NpcEngine");
-
-Npc.Spawn = function(name, cframe, preloadCallback, customNpcModule)
-	return templateSpawnSrc.Function:Invoke(name, cframe, preloadCallback, customNpcModule);
-end
-
 --[[**
 	Spawns a NPC of name.
 	@param name <String> Name of the NPC.
@@ -596,6 +590,14 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	return npcPrefab;
 end
 
+local templateSpawnSrc = game.ServerScriptService.ServerScripts:WaitForChild("NpcEngine");
+Npc.Spawn = function(name, cframe, preloadCallback, customNpcModule)
+	if RunService:IsStudio() then
+		return Npc.DoSpawn(name, cframe, preloadCallback, customNpcModule);
+	else
+		return templateSpawnSrc.Function:Invoke(name, cframe, preloadCallback, customNpcModule);
+	end
+end
 
 function Npc.GetCFrameFromPlatform(platform)
 	local worldSpaceSize = platform.CFrame:vectorToWorldSpace(platform.Size);

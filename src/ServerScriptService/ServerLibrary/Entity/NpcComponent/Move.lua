@@ -241,6 +241,10 @@ function Move.new(self)
 	moveObject.MoveId = 0;
 	moveObject.MoveToEnded = modEventSignal.new("MoveToEnded");
 	
+	if self.IsDead then
+		Debugger:Warn("Dead", self.Name);
+		return;
+	end
 	local rootRigAttachment = self.RootPart:WaitForChild("RootRigAttachment");
 
 	local linVel: LinearVelocity = Instance.new("LinearVelocity");
