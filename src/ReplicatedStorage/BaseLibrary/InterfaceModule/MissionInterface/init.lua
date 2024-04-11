@@ -9,7 +9,7 @@ local TextService = game:GetService("TextService");
 local TweenService = game:GetService("TweenService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = require(localPlayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
@@ -53,6 +53,7 @@ local templatePassReward = script:WaitForChild("PassReward");
 local templateLockedLabel = script:WaitForChild("LockedLabel");
 
 local firstSync=false;
+
 modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
 	if action ~= "sync" then return end;
 	

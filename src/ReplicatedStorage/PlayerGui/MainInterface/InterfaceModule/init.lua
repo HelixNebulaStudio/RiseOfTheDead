@@ -30,7 +30,7 @@ local remoteStorageService = modRemotesManager:Get("StorageService");
 local remotePlayerDataSync = modRemotesManager:Get("PlayerDataSync");
 
 
-if script == nil then Debugger:Log("Load cancelled.") return {}; end;
+if script == nil then Debugger:Log("Load cancelled."); return {}; end;
 --== Variables;
 local Interface = {};
 Interface.__index = Interface;
@@ -77,7 +77,6 @@ function Interface:Bind(id, func)
 	Debugger:Log("BindFuncs",id);
 end
 
-local callDebounce = {};
 function Interface:CallBind(id, ...)
 	local param = {...};
 
@@ -120,10 +119,10 @@ end
 Interface:ToggleGameBlinds(true, 0.5);
 
 
-local modData = require(localPlayer:WaitForChild("DataModule", 30));
+local modData = require(localPlayer:WaitForChild("DataModule", 30) :: ModuleScript);
 modData.modInterface = Interface;
 
-local modChatRoomInterface = require(localPlayer.PlayerGui:WaitForChild("ChatInterface"):WaitForChild("ChatRoomInterface"));
+local modChatRoomInterface = require(localPlayer.PlayerGui:WaitForChild("ChatInterface"):WaitForChild("ChatRoomInterface") :: ModuleScript);
 modData.modChatRoomInterface = modChatRoomInterface;
 
 for a=1, 10*60 do
@@ -172,7 +171,6 @@ Interface.Templates = {
 	ScrollingFrame = script:WaitForChild("templateScrollingFrame");
 }
 
-local initialize = false;
 local tweenSpeed = 0.3;
 
 local menuBlur = script:WaitForChild("MenuBlur");
@@ -299,6 +297,7 @@ function Interface.NewWindow(name, frame)
 		if self.QuickButton then Interface.RefreshQuickButton(self.QuickButton, self.Visible); end
 		self.OnWindowToggle:Fire(true, ...);
 		
+		return;
 	end
 	
 	function Window:Close(...)
@@ -463,6 +462,8 @@ function Interface:IsVisible(name)
 	else
 		Debugger:Warn("Window named (",name,") does not exist.");
 	end
+	
+	return false;
 end
 
 -- !outline: Interface:GetWindow(name)
@@ -637,6 +638,7 @@ function Interface:NewDropdownList(options, newButtonTemplate)
 	local dropdownObj = {};
 	dropdownObj.OptionButtons = {};
 	dropdownObj.ScrollFrame = Interface.Templates.ScrollingFrame:Clone();
+	dropdownObj.Destroyed = false;
 	
 	function dropdownObj:Destroy()
 		if dropdownObj.Destroyed then return end;
