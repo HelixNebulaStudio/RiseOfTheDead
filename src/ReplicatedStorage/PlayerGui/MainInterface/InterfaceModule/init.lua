@@ -462,7 +462,7 @@ function Interface:IsVisible(name)
 	else
 		Debugger:Warn("Window named (",name,") does not exist.");
 	end
-	
+
 	return false;
 end
 
@@ -775,6 +775,10 @@ function Interface:RequestData(hierarchyKey)
 		[modRemotesManager.Ref("Action")] = "request";
 		[modRemotesManager.Ref("HierarchyKey")] = hierarchyKey;
 	};
+end
+
+function Interface:Get(interfaceName: string)
+	return self["mod"..interfaceName];
 end
 
 

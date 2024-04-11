@@ -2,21 +2,17 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
 
 --== Variables;
-local Interface = {};
-
 local RunService = game:GetService("RunService");
 local TextService = game:GetService("TextService");
 local TweenService = game:GetService("TweenService");
 
 local localPlayer = game.Players.LocalPlayer;
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modMissionsLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
@@ -37,8 +33,6 @@ local remotes = game.ReplicatedStorage.Remotes;
 local remotePinMission = remotes.Interface.PinMission;
 
 local remoteMissionRemote = modRemotesManager:Get("MissionRemote");
-local remoteBattlepassRemote = modRemotesManager:Get("BattlepassRemote");
-local remoteBattlepassRemote = modRemotesManager:Get("BattlepassRemote");
 
 local windowFrameTemplate = script:WaitForChild("MissionMenu");
 local missionPinHudTemplate = script:WaitForChild("MissionPinHud");
@@ -53,21 +47,22 @@ local templatePassReward = script:WaitForChild("PassReward");
 local templateLockedLabel = script:WaitForChild("LockedLabel");
 
 local firstSync=false;
+--==
+local Interface = {
+	UpdateBattlePass = function() end;
+	Update = function() end;
+};
 
 modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
 	if action ~= "sync" then return end;
 	
 	if hierarchyKey == "BattlePassSave" then
-		if Interface.modMissionInterface.UpdateBattlePass then
-			Interface.modMissionInterface.UpdateBattlePass();
-		end
+		Interface.UpdateBattlePass();
 	end
 	
 	if hierarchyKey == "GameSave/Missions" then
 		firstSync=true;
-		if Interface.modMissionInterface and Interface.modMissionInterface.Update then
-			Interface.modMissionInterface.Update();
-		end
+		Interface.Update();
 	end
 end)
 
@@ -89,6 +84,9 @@ local bpColors = {
 function Interface.init(modInterface)
 	setmetatable(Interface, modInterface);
 	
+	Interface.UpdateBattlePass = function() end;
+	Interface.Update = function() end;
+
 	local branchColor = modBranchConfigs.BranchColor
 
 	local windowFrame = windowFrameTemplate:Clone();
@@ -2113,8 +2111,6 @@ function Interface.init(modInterface)
 	
 	local yearToday = os.date("%Y", unixTime);
 	local yearEnd = battlepassLib and os.date("%Y", battlepassLib.EndUnixTime) or 0;
-	
-	Interface.UpdateBattlePass = function() end;
 	
 	local leftFrameSizeXAnchor = 0.3;
 	local rightFrameSizeXAnchor = 1-leftFrameSizeXAnchor;

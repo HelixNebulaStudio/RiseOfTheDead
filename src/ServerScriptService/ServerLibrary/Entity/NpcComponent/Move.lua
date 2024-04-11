@@ -1,7 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Script;
 
-local PathfindingService = game:GetService("PathfindingService");
 local TweenService = game:GetService("TweenService");
 local CollectionService = game:GetService("CollectionService");
 
@@ -73,6 +72,7 @@ function Move:LookAt(point: Vector3 | BasePart)
 	if typeof(point) == "Instance" and point:IsA("BasePart") then
 		point = point.Position;
 	end
+	assert(typeof(point) == "Vector3");
 	
 	local waistMotor = self.Npc.Prefab and self.Npc.Prefab:FindFirstChild("UpperTorso") and self.Npc.Prefab.UpperTorso:FindFirstChild("Waist");
 	if self.WaistMotorC1 == nil then
@@ -120,7 +120,7 @@ function Move:Follow(target: Vector3 | BasePart, maxFollowDist: number, minFollo
 	if self.Destroyed then return end;
 	if self.Npc.RootPart == nil or self.Npc.IsDead then return end;
 	if self.Npc.Humanoid.PlatformStand then return end;
-	if target == nil then Debugger:Warn("Move:Follow Target nil", self.Npc.Name) return end
+	if target == nil then Debugger:Warn("Move:Follow Target nil", self.Npc.Name); return end
 	
 	self.MoveId = self.MoveId + 1;
 	self.IsMoving = true;
@@ -241,12 +241,13 @@ function Move.new(self)
 	moveObject.MoveId = 0;
 	moveObject.MoveToEnded = modEventSignal.new("MoveToEnded");
 	
+	local rootRigAttachment = self.RootPart:WaitForChild("RootRigAttachment");
 
 	local linVel: LinearVelocity = Instance.new("LinearVelocity");
 	linVel.Name = "FlyLinearVelocity";
 	linVel.Enabled = false;
 	linVel.ForceLimitsEnabled = false;
-	linVel.Attachment0 = self.RootPart.RootRigAttachment;
+	linVel.Attachment0 = rootRigAttachment;
 	linVel.Parent = self.RootPart;
 
 	local alignOri: AlignOrientation = Instance.new("AlignOrientation");
@@ -254,7 +255,7 @@ function Move.new(self)
 	alignOri.Enabled = false;
 	alignOri.Responsiveness = 100;
 	alignOri.Mode = Enum.OrientationAlignmentMode.OneAttachment;
-	alignOri.Attachment0 = self.RootPart.RootRigAttachment;
+	alignOri.Attachment0 = rootRigAttachment;
 	alignOri.Parent = self.RootPart;
 	
 	moveObject.LinearVelocity = linVel;
