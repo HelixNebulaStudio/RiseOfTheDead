@@ -287,7 +287,9 @@ type HitscanRayProperties = {
 		Normal: Vector3;
 	}) -> nil)?;
 };
+
 -- !outline: function CastHitscanRay(properties: HitscanRayProperties)
+-- MARK: CastHitscanRay()
 function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 	local origin = properties.Origin;
 	local direction = properties.Direction;
@@ -330,7 +332,7 @@ function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 
 		local canPenetrate = rayBasePart and rayBasePart:GetAttribute("IgnoreWeaponRay") == true or false;
 
-		if rayBasePart and not canPenetrate then -- test obj for penetration;
+		if rayBasePart and not canPenetrate and Debugger.ClientFps > 45 then -- test obj for penetration;
 			local maxPenLength = penTable[rayBasePart.Material] or penTable["Others"] or 0;
 			if maxPenLength > 0 then
 				if penReDirection then
@@ -387,10 +389,6 @@ function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 
 		end
 
-		if RunService:IsClient() then
-			modData = getModData();
-			if modData:IsMobile() then task.wait() end;
-		end
 	until distance <= 0 or penCount > maxPierce;
 	return newOrigin;
 end

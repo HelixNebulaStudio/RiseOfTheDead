@@ -58,6 +58,7 @@ return function()
 	-- MARK: Deadbody Handler
 	local lastDbDespawnTick = tick();
 	CollectionService:GetInstanceAddedSignal("Deadbody"):Connect(function(prefab: Model)
+		local humanoid = prefab:FindFirstAncestorWhichIsA("Humanoid") :: Humanoid;
 		local parallelNpc = prefab:FindFirstChild("ParallelNpc");
 		if parallelNpc then
 			parallelNpc:Destroy();
@@ -68,16 +69,17 @@ return function()
 			thrsenHighlight:Destroy();
 		end
 
-		local deadbodyDespawnTimer = modData:GetSetting("DeadbodyDespawnTimer") or 61;
+		local deadbodyDespawnTimer = modData:GetSetting("DeadbodyDespawnTimer");
+		local maxDeadbodies = modData:GetSetting("MaxDeadbodies");
+
 		if deadbodyDespawnTimer < 61 then
 			game.Debris:AddItem(prefab, deadbodyDespawnTimer);
 		end
 		
-		if lastDbDespawnTick and tick()-lastDbDespawnTick <= 1 then return end;
-		lastDbDespawnTick = tick();
-
-		local maxDeadbodies = modData:GetSetting("MaxDeadbodies");
-		modDeadbodiesHandler:DespawnRequest(maxDeadbodies);
+		if lastDbDespawnTick == nil or tick()-lastDbDespawnTick > 1 then
+			lastDbDespawnTick = tick();
+			modDeadbodiesHandler:DespawnRequest(maxDeadbodies);
+		end
 	end)
 	
 	local function CheckForPrefab(npc, npcPrefab)

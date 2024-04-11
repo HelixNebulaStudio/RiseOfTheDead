@@ -21,6 +21,7 @@ function Component.new(Npc)
 			ragHead.CFrame = CFrame.new(0, 1.105, 0) * CFrame.Angles(0, 0, 90);
 
 			local neckBallSocket = Instance.new("BallSocketConstraint");
+			neckBallSocket.Enabled = false;
 			neckBallSocket.LimitsEnabled = true;
 			neckBallSocket.MaxFrictionTorque = 100;
 			neckBallSocket.TwistLimitsEnabled = true;
@@ -50,6 +51,7 @@ function Component.new(Npc)
 			ragLowerTorso.CFrame = CFrame.new(0, -0.869, 0) * CFrame.Angles(0, 180, -90);
 
 			local waistBallSocket = Instance.new("BallSocketConstraint");
+			waistBallSocket.Enabled = false;
 			waistBallSocket.LimitsEnabled = true;
 			waistBallSocket.MaxFrictionTorque = 100;
 			waistBallSocket.TwistLimitsEnabled = true;
@@ -79,6 +81,7 @@ function Component.new(Npc)
 			ragRightUpperArm.CFrame = CFrame.new(1.037, 0.64, 0.025) * CFrame.Angles(0, 0, 0);
 
 			local ballSocket = Instance.new("BallSocketConstraint");
+			ballSocket.Enabled = false;
 			ballSocket.LimitsEnabled = true;
 			ballSocket.MaxFrictionTorque = 50;
 			ballSocket.TwistLimitsEnabled = true;
@@ -108,6 +111,7 @@ function Component.new(Npc)
 			ragLeftUpperArm.CFrame = CFrame.new(-1.016, 0.64, 0.025) * CFrame.Angles(0, 0, 0);
 
 			local ballSocket = Instance.new("BallSocketConstraint");
+			ballSocket.Enabled = false;
 			ballSocket.LimitsEnabled = true;
 			ballSocket.MaxFrictionTorque = 50;
 			ballSocket.TwistLimitsEnabled = true;
@@ -137,6 +141,7 @@ function Component.new(Npc)
 			ragLeftUpperLeg.CFrame = CFrame.new(-0.443, -0.293, 0) * CFrame.Angles(0, 180, -90);
 
 			local ballSocket = Instance.new("BallSocketConstraint");
+			ballSocket.Enabled = false;
 			ballSocket.LimitsEnabled = true;
 			ballSocket.MaxFrictionTorque = 50;
 			ballSocket.TwistLimitsEnabled = true;
@@ -166,6 +171,7 @@ function Component.new(Npc)
 			ragRightUpperLeg.CFrame = CFrame.new(0.452, -0.293, 0) * CFrame.Angles(0, 180, -90);
 
 			local ballSocket = Instance.new("BallSocketConstraint");
+			ballSocket.Enabled = false;
 			ballSocket.LimitsEnabled = true;
 			ballSocket.MaxFrictionTorque = 50;
 			ballSocket.TwistLimitsEnabled = true;

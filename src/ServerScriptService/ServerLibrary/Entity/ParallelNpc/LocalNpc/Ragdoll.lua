@@ -27,7 +27,6 @@ function Ragdoll.new(parallelNpc)
 		local ragJoints = {};
 		local bodyParts = {};
 		
-		local ragEnabled = false;
 		for _, obj in pairs(prefab:GetDescendants()) do
 			if obj:IsA("Motor6D") and obj:GetAttribute("RagdollJoint") == true then
 				table.insert(ragJoints, obj);

@@ -132,7 +132,10 @@ function NpcComponent:KillNpc()
 			end
 			prefab:SetAttribute("DeadbodyTick", tick());
 			prefab:AddTag("Deadbody");
-			prefab.Parent = workspace.Entities;
+			task.delay(0.5, function()
+				if not workspace.Entity:IsAncestorOf(prefab) then return end;
+				prefab.Parent = workspace.Entities;
+			end)
 		end
 		
 		if self.Wield then

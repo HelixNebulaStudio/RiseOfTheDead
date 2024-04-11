@@ -96,8 +96,10 @@ return function(self)
 	end)
 
 	local arcTracer = modArcTracing.new();
-	arcTracer.RayRadius = 2;
-	arcTracer.Acceleration = Vector3.new(0, -workspace.Gravity, 0);
+	arcTracer.DebugArc = false;
+	arcTracer.RayRadius = 0.5;
+	arcTracer.Acceleration = Vector3.new(0, -workspace.Gravity+90, 0);
+	arcTracer.Delta = 1/7;
 	
 	tree:Hook("ThrowZombie", function()
 		local rightHand: BasePart = self.Prefab:FindFirstChild("RightHand");
@@ -235,8 +237,12 @@ return function(self)
 		
 		self.PlayAnimation("ThrowCore", 0.3);
 
-		self:SetNetworkOwner(nil);
-		throwNpcModule:SetNetworkOwner(nil);
+		if not self.IsDead then
+			self:SetNetworkOwner(nil);
+		end
+		if not self.IsDead then
+			throwNpcModule:SetNetworkOwner(nil);
+		end
 		
 		throwNpcModule.RootPart.Massless = true;
 		throwNpcModule.Humanoid.PlatformStand = true;
@@ -258,15 +264,13 @@ return function(self)
 		task.wait(0.8);
 		if cancel() then return modLogicTree.Status.Failure; end;
 		
-		--arcTracer.DebugArc = true;
-		arcTracer.Delta = 1/4;
 		arcTracer.RayWhitelist = CollectionService:GetTagged("PlayerCharacters");
 		table.insert(arcTracer.RayWhitelist, workspace.Environment);
 
 		local origin = self.RootPart.Position;
 		local targetPoint = targetRootPart.CFrame.Position + Vector3.new(0,5,0);
 
-		local speed = 20;
+		local speed = 50;
 		local duration = dist/speed;
 		duration = math.clamp(duration, 0.5, 3);
 		local velocity = arcTracer:GetVelocityByTime(origin, targetPoint, duration);
@@ -288,10 +292,14 @@ return function(self)
 			local downAng = CFrame.Angles(-math.pi/2, 0, 0);
 			local lastVelocity: Vector3;
 			throwNpcModule.Move:Fly(arcPoints, arcTracer.Delta, function(index, arcPoint)
+				if index >= (#arcPoints-1) then return true; end;
+
 				throwNpcModule.Humanoid.PlatformStand = true;
 				arcPoint.AlignCFrame = arcPoint.AlignCFrame * downAng;
-				stunStatus.Expires=tick()+1;
+				stunStatus.Expires=tick()+0.2;
 				lastVelocity = arcPoint.Velocity;
+
+				return;
 			end);
 
 			throwNpcModule.SetAggression = 3;
