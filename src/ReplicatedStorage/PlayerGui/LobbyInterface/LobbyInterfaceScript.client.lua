@@ -282,70 +282,70 @@ end
 
 function Update()
 	local currentRoom, _roomIndex = GetRoom(roomId);
-	if currentRoom then
-		if currentRoom.State == 1 then
-			mainFrame.LobbyInfo.Text = "Waiting for players..";
-		
-		elseif currentRoom.State == 2 then
-			mainFrame.LobbyInfo.Text = "This room is starting in "..math.floor(math.clamp((currentRoom.StartTime or modSyncTime.GetTime()+5)-modSyncTime.GetTime(), 0, 60)).." seconds.";
-		
-		elseif currentRoom.State == 3 then
-			if lobbyInfo.StageLib.WorldId then
-				mainFrame.LobbyInfo.Text = "Traveling to "..lobbyInfo.StageLib.WorldId.."..";
-				
-			elseif currentRoom.StartTime then
-				local clock = os.date("*t", modSyncTime.GetTime()-currentRoom.StartTime);
-				if clock ~= nil then
-					mainFrame.LobbyInfo.Text = "In battle for: "..(clock.min > 0 and clock.min..":"..clock.sec.." minutes." or clock.sec.." seconds.");
-				end
-				
-			end
-		
-		elseif currentRoom.State == 4 and currentRoom.EndTime then
-			mainFrame.LobbyInfo.Text = "Room is closing in "..math.floor(math.clamp(currentRoom.EndTime-modSyncTime.GetTime(), 0, 15)).." seconds..";
-		
-		elseif currentRoom.State == 5 then
-			mainFrame.LobbyInfo.Text = "Room is closed..";
-			
-		else
-			mainFrame.LobbyInfo.Text = "";
-		end
-		
-		UpdateButtons(roomId);
-		
-		local updated = {};
-		if currentRoom.State <= 2 and lobbyInfo.StageLib.SingleArena ~= true then
-			for a=1, #currentRoom.Players do
-				local playerData = currentRoom.Players[a];
-				local LobbyPosition = playerData.LobbyPosition;
-				
-				if LobbyPosition then
-					local indicator = getIndicator(playerData.Name)
-					if indicator == nil then
-						indicator = newIndicator(playerData.Name);
-					end
+	if currentRoom == nil then
+		mainFrame.LobbyInfo.Text = "";
+		return;
+	end
 
-					pcall(function()
-						indicator.Object.CFrame = LobbyPosition.WorldCFrame * CFrame.Angles(math.rad(-90), 0, 0); --CFrame.new(LobbyPosition.WorldPosition) * rotCf;
-						indicator.Object.Parent = workspace.Debris;
-						indicator.Object.Color = playerData.Ready and branchColor or unreadyColor;
-						indicator.Object.Attachment.SpotLight.Color = playerData.Ready and branchColor or unreadyColor;
-					end)
-				end
-				updated[playerData.Name] = true;
+	if currentRoom.State == 1 then
+		mainFrame.LobbyInfo.Text = "Waiting for players..";
+	
+	elseif currentRoom.State == 2 then
+		mainFrame.LobbyInfo.Text = "This room is starting in "..math.floor(math.clamp((currentRoom.StartTime or modSyncTime.GetTime()+5)-modSyncTime.GetTime(), 0, 60)).." seconds.";
+	
+	elseif currentRoom.State == 3 then
+		if lobbyInfo.StageLib.WorldId then
+			mainFrame.LobbyInfo.Text = "Traveling to "..lobbyInfo.StageLib.WorldId.."..";
+			
+		elseif currentRoom.StartTime then
+			local clock = os.date("*t", modSyncTime.GetTime()-currentRoom.StartTime);
+			if clock ~= nil then
+				mainFrame.LobbyInfo.Text = "In battle for: "..(clock.min > 0 and clock.min..":"..clock.sec.." minutes." or clock.sec.." seconds.");
 			end
+			
 		end
-		
-		for a=#readyIndicators, 1, -1 do
-			if updated[readyIndicators[a].Name] == nil then
-				readyIndicators[a].Destroyed = true;
-				game.Debris:AddItem(readyIndicators[a].Object, 0);
-				table.remove(readyIndicators, a);
-			end
-		end
+	
+	elseif currentRoom.State == 4 and currentRoom.EndTime then
+		mainFrame.LobbyInfo.Text = "Room is closing in "..math.floor(math.clamp(currentRoom.EndTime-modSyncTime.GetTime(), 0, 15)).." seconds..";
+	
+	elseif currentRoom.State == 5 then
+		mainFrame.LobbyInfo.Text = "Room is closed..";
 		
 	else
 		mainFrame.LobbyInfo.Text = "";
+	end
+	
+	UpdateButtons(roomId);
+	
+	local updated = {};
+	if currentRoom.State <= 2 and lobbyInfo.StageLib.SingleArena ~= true then
+		for a=1, #currentRoom.Players do
+			local playerData = currentRoom.Players[a];
+			local LobbyPosition = playerData.LobbyPosition;
+			
+			if LobbyPosition then
+				local indicator = getIndicator(playerData.Name)
+				if indicator == nil then
+					indicator = newIndicator(playerData.Name);
+				end
+
+				pcall(function()
+					indicator.Object.CFrame = LobbyPosition.WorldCFrame * CFrame.Angles(math.rad(-90), 0, 0); --CFrame.new(LobbyPosition.WorldPosition) * rotCf;
+					indicator.Object.Parent = workspace.Debris;
+					indicator.Object.Color = playerData.Ready and branchColor or unreadyColor;
+					indicator.Object.Attachment.SpotLight.Color = playerData.Ready and branchColor or unreadyColor;
+				end)
+			end
+			updated[playerData.Name] = true;
+		end
+	end
+	
+	for a=#readyIndicators, 1, -1 do
+		if updated[readyIndicators[a].Name] == nil then
+			readyIndicators[a].Destroyed = true;
+			game.Debris:AddItem(readyIndicators[a].Object, 0);
+			table.remove(readyIndicators, a);
+		end
 	end
 end
 
@@ -516,31 +516,9 @@ function UpdateInformation(room)
 						hasHardLoot = true;
 						newItemButton.ImageColor3 = Color3.fromRGB(255, 60, 60);
 
-						--if unlockHardModeButton == nil then
-						--	unlockHardModeButton = templateUnlockHardmode:Clone();
-						--	unlockHardModeButton.MouseButton1Click:Connect(function()
-						--		if debounce then return end debounce = true;
-						--		modInterface:PlayButtonClick();
-						--		LeaveLobbyMenu();
-								
-						--		modInterface:OpenWindow("GoldMenu", "SummonsItems");
-						--		debounce = false;
-						--	end)
-							
-						--end
-						--if unlockHardModeButton then
-						--	unlockHardModeButton.Parent = newParent;
-						--end
-						
 					else
-						--if lobbyInfo.StageLib.HardModeEnabled ~= true or isHardMode then
-						--	if unlockHardModeButton then
-						--		game.Debris:AddItem(unlockHardModeButton, 0);
-						--		unlockHardModeButton = nil;
-						--	end
-						--end
-						
 						itemButtonObject:Update();
+
 					end
 					
 					if hasHardLoot and lobbyInfo.StageLib.HardModeItem then
@@ -681,7 +659,14 @@ bindOpenLobbyInterface.Event:Connect(function(lobbyData) --cleared max depth che
 	gameLobby = lobbyData;
 	hardModeCreate = false;
 	
-	task.spawn(function() remoteGameModeRequest:InvokeServer(enumRequests.OpenInterface, gameLobby.Type, gameLobby.Stage); end);
+	task.spawn(function()
+		local joinSuccessOrReason = remoteGameModeRequest:InvokeServer(enumRequests.OpenInterface, gameLobby.Type, gameLobby.Stage);
+		if joinSuccessOrReason ~= true then
+			Debugger:Warn("Failed to join game room. Reason:", joinSuccessOrReason);
+			task.wait(1);
+			LeaveLobbyMenu(true);
+		end
+	end)
 	
 	local gameLib = modGameModeLibrary.GetGameMode(gameLobby.Type);
 	local stageLib = gameLib and modGameModeLibrary.GetStage(gameLobby.Type, gameLobby.Stage);

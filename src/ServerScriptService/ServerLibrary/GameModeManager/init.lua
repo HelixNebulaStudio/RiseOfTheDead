@@ -459,30 +459,30 @@ function GameModeManager:Initialize(gameType, gameStage)
 	return gameTable;
 end
 
-function GameModeManager:TpLobbyBox(gameTable, player)
+function GameModeManager:TpLobbyBox(gameManager, player)
 	local classPlayer = modPlayers.Get(player);
-	local rootPart = classPlayer:GetCharacterChild("HumanoidRootPart");
-	if rootPart then
-		if gameTable.SingleArena then
-			local lobbyBox = workspace.Environment:FindFirstChild("BossLobby");
-			if lobbyBox then
-				rootPart.Anchored = true;
-				shared.modAntiCheatService:Teleport(player, lobbyBox.PrimaryPart.CFrame);
-			end
-			
-		else
-			for a=1, #self.Lobbies do
-				local room = self.Lobbies[a];
-				if room and room.LobbyPrefab then
-					local roomCFrame = room.LobbyPrefab:GetPivot() * CFrame.new(0, -6, 0);
+	local rootPart = classPlayer.RootPart;
 
-					rootPart.Anchored = true;
-					shared.modAntiCheatService:Teleport(player, roomCFrame);
-					break;
-				end
-			end
+	if gameManager.SingleArena then
+		local lobbyBox = workspace.Environment:FindFirstChild("BossLobby");
+		if lobbyBox then
+			rootPart.Anchored = true;
+			shared.modAntiCheatService:Teleport(player, lobbyBox.PrimaryPart.CFrame);
 		end
-		
+
+	else
+		for a=1, #self.Lobbies do
+			local room = self.Lobbies[a];
+			if room == nil or room.LobbyPrefab == nil or not workspace:IsAncestorOf(room.LobbyPrefab) then continue end;
+
+			local roomCFrame = room.LobbyPrefab:GetPivot() * CFrame.new(0, -6, 0);
+
+			rootPart.Anchored = true;
+			shared.modAntiCheatService:Teleport(player, roomCFrame);
+
+			break;
+		end
+
 	end
 end
 
@@ -592,9 +592,8 @@ function remoteGameModeLobbies.OnServerInvoke(player, interactObject, interactMo
 		Debugger:Log("handler", handler, "interactData", interactData, " handler.InteractData", handler.InteractData ~= nil);
 		
 	else
-		
 		if interactObject == nil or interactModule == nil then return end;
-		if player:DistanceFromCharacter(interactObject.Position) > 20 then return end;
+		if player:DistanceFromCharacter(interactObject.Position) > 32 then return end;
 		
 		interactData = shared.saferequire(player, interactModule);
 	end
@@ -670,27 +669,22 @@ end
 
 function GameModeManager:ConnectPlayer(player, gameType, gameStage)
 	local classPlayer = modPlayers.Get(player);
-	local gameTable = GameModeManager:GetActive(gameType, gameStage);
-	if gameTable then
-		gameTable.MenuRoom:AddPlayer(player);
-		gameTable:Refresh();
-		
-		local rootPart = classPlayer:GetCharacterChild("HumanoidRootPart");
-		if rootPart then
-			local profile = shared.modProfile:Get(player);
-			profile.BossDoorCFrame = rootPart.CFrame;
-			
-			GameModeManager:TpLobbyBox(gameTable, player);
-			
-			if workspace.StreamingEnabled then
-				for a=1, #gameTable.Lobbies do
-					if gameTable.Lobbies[a].LobbyPrefab and gameTable.Lobbies[a].LobbyPrefab.PrimaryPart then
-						player:RequestStreamAroundAsync(gameTable.Lobbies[a].LobbyPrefab.PrimaryPart.Position);
-					end
-				end
-			end
-		end
-	end
+
+	local gameManager = GameModeManager:GetActive(gameType, gameStage);
+	if gameManager == nil then return end;
+
+	local rootPart = classPlayer.RootPart;
+	if rootPart == nil then return end;
+
+	local joinSuccess = gameManager.MenuRoom:AddPlayer(player);
+	gameManager:Refresh();
+
+	local profile = shared.modProfile:Get(player);
+	profile.BossDoorCFrame = rootPart.CFrame;
+
+	GameModeManager:TpLobbyBox(gameManager, player);
+
+	return joinSuccess;
 end
 
 function GameModeManager:DisconnectPlayer(player, exitTeleport)
@@ -770,7 +764,7 @@ function remoteGameModeRequest.OnServerInvoke(player, requestEnum, ...)
 			Debugger:WarnClient(player, "Invalid game room.");
 			return;
 		end
-		GameModeManager:ConnectPlayer(player, gameType, gameStage);
+		return GameModeManager:ConnectPlayer(player, gameType, gameStage);
 		
 	elseif requestEnum == enumRequests.CloseInterface then
 

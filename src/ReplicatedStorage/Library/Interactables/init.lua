@@ -1082,7 +1082,7 @@ function Interactable.GameMode(name, stage, label)
 	end
 	
 	function interact:OnInteracted(library)
-		task.delay(0.5, function()
+		task.delay(1, function()
 			library.interface:ToggleGameBlinds(true, 0.5);
 		end)
 		library.interface:ToggleGameBlinds(false, 0.5);
@@ -1090,6 +1090,9 @@ function Interactable.GameMode(name, stage, label)
 		local timeLapse = tick();
 		local lobbyData = remoteGameModeLobbies:InvokeServer(self.Object, self.Script, {StageSelect=self.Random == true and self.Stage or nil;});
 		task.wait(math.clamp(0.5-(tick()-timeLapse), 0, 0.5));
+
+		if lobbyData == nil then return; end
+
 		bindOpenLobbyInterface:Fire(lobbyData);
 	end
 	
