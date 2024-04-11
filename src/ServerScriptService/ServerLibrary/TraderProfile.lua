@@ -24,7 +24,12 @@ function TraderProfile:Load(rawData)
 	end
 	
 	task.spawn(function()
-		goldDatabase:SetAsync(tostring(self.Player.UserId), self.Gold);
+		local s, e = pcall(function()
+			goldDatabase:SetAsync(tostring(self.Player.UserId), self.Gold);
+		end)
+		if not s then
+			Debugger:Warn("Handled Exception:",e);
+		end
 	end)
 	
 	self:LoadTrades();
