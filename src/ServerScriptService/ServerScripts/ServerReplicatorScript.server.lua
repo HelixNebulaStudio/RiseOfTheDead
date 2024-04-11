@@ -740,8 +740,8 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 							newDamageSource.DamageType = newDamageSource.DamageType or shotCache.CritOccured;
 							newDamageSource.IsCritDamage = shotCache.CritOccured == "Crit";
 							
-							local dir = (humanoid.RootPart.Position-clientRootPart.Position).Unit;
 							local targetRootPart: BasePart = humanoid.RootPart;
+							local dir = (targetRootPart.Position-clientRootPart.Position).Unit;
 
 							local killImpulseForce = configurations.KillImpulseForce or 5;
 							

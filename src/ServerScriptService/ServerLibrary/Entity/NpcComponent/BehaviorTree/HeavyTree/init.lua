@@ -96,7 +96,7 @@ return function(self)
 	end)
 
 	local arcTracer = modArcTracing.new();
-	arcTracer.RayRadius = 1;
+	arcTracer.RayRadius = 2;
 	arcTracer.Acceleration = Vector3.new(0, -workspace.Gravity, 0);
 	
 	tree:Hook("ThrowZombie", function()
@@ -143,8 +143,8 @@ return function(self)
 		end
 		table.sort(sortedNpcModules, function(a, b) return a.SortValue < b.SortValue; end);
 		
-		
 		local throwNpcModule = sortedNpcModules[1] and sortedNpcModules[1].NpcModule or nil;
+		table.clear(sortedNpcModules);
 
 		local newGrip, stunStatus, throwDiedConn;
 		
@@ -242,6 +242,8 @@ return function(self)
 		throwNpcModule.Humanoid.PlatformStand = true;
 		
 		newGrip = script:WaitForChild("ThrowGrip"):Clone();
+		throwNpcModule.Garbage:Tag(newGrip);
+		self.Garbage:Tag(newGrip);
 		newGrip.Parent = rightHand;
 		newGrip.Part0 = rightHand;
 		newGrip.Part1 = throwNpcModule.RootPart;
@@ -264,7 +266,7 @@ return function(self)
 		local origin = self.RootPart.Position;
 		local targetPoint = targetRootPart.CFrame.Position + Vector3.new(0,5,0);
 
-		local speed = 5;
+		local speed = 20;
 		local duration = dist/speed;
 		duration = math.clamp(duration, 0.5, 3);
 		local velocity = arcTracer:GetVelocityByTime(origin, targetPoint, duration);

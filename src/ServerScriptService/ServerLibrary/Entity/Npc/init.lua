@@ -181,7 +181,7 @@ local function onEntityRootPartChanged()
 end
 CollectionService:GetInstanceAddedSignal("EntityRootPart"):Connect(onEntityRootPartChanged);
 
-function Npc.EntityScan(origin, radius, maxRootpart)
+function Npc.EntityScan(origin, radius, maxRootpart) : {[number]: modNpcComponent.NpcModule}
 	local scannedTargets = {};
 	if radius <= 0 then return scannedTargets; end;
 	

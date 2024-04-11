@@ -130,7 +130,7 @@ function Pool.new(owner)
 			local targetModel = arcPoint.Hit.Parent;
 			local humanoid = targetModel and targetModel:FindFirstChildWhichIsA("Humanoid");
 			if humanoid then
-				modAudio.Play(random:NextInteger(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", self.Prefab.Position).MaxDistance = 1024;
+				modAudio.Play(random:NextInteger(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", self.Prefab.Position).RollOffMaxDistance = 1024;
 			end
 
 		end
