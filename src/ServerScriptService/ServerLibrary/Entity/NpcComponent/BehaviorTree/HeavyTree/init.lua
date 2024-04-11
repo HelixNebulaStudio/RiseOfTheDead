@@ -1,15 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modLogicTree = require(game.ReplicatedStorage.Library.LogicTree);
 
-local TweenService = game:GetService("TweenService");
 local CollectionService = game:GetService("CollectionService");
 
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-
 local modArcTracing = require(game.ReplicatedStorage.Library.ArcTracing);
-
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modRegion = require(game.ReplicatedStorage.Library.Region);
 
 return function(self)
 	local tree = modLogicTree.new{
@@ -23,6 +17,7 @@ return function(self)
 	local targetHumanoid, targetRootPart: BasePart;
 	local cache = {};
 	cache.AttackCooldown = tick();
+	cache.LastThrowZombie = nil;
 
 	tree:Hook("StatusLogic", self.StatusLogic);
 	
@@ -106,8 +101,8 @@ return function(self)
 	
 	tree:Hook("ThrowZombie", function()
 		local rightHand: BasePart = self.Prefab:FindFirstChild("RightHand");
-		if rightHand == nil or rightHand.AssemblyRootPart ~= self.RootPart then 
-			return modLogicTree.Status.Failure;
+		if rightHand == nil or rightHand.AssemblyRootPart ~= self.RootPart then
+			return tree.Failure;
 		end;
 		
 		if cache.LastThrowZombie and tick()-cache.LastThrowZombie <= 5 then return modLogicTree.Status.Failure end;
@@ -201,9 +196,9 @@ return function(self)
 			cancel(true);
 		end)
 		
-		local duration = 5;
+		local stunDuration = 5;
 		stunStatus = throwNpcModule.EntityStatus:GetOrDefault("Stun", {
-			Expires=tick()+duration;
+			Expires=tick()+stunDuration;
 		});
 		
 		throwNpcModule.Move:Follow(self.RootPart);
@@ -289,19 +284,19 @@ return function(self)
 			throwNpcModule.RootPart.Massless = false;
 			
 			local downAng = CFrame.Angles(-math.pi/2, 0, 0);
-			local velocity: Vector3;
+			local lastVelocity: Vector3;
 			throwNpcModule.Move:Fly(arcPoints, arcTracer.Delta, function(index, arcPoint)
 				throwNpcModule.Humanoid.PlatformStand = true;
 				arcPoint.AlignCFrame = arcPoint.AlignCFrame * downAng;
 				stunStatus.Expires=tick()+1;
-				velocity = arcPoint.Velocity;
+				lastVelocity = arcPoint.Velocity;
 			end);
 
 			throwNpcModule.SetAggression = 3;
 			task.spawn(function()
 				throwNpcModule.RootPart.Massless = false;
-				if velocity then
-					throwNpcModule.RootPart:ApplyImpulse(velocity);
+				if lastVelocity then
+					throwNpcModule.RootPart:ApplyImpulse(lastVelocity);
 				end
 				
 				task.wait(0.3);
