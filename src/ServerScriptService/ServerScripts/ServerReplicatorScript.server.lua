@@ -94,6 +94,10 @@ remoteCharacterRemote.OnServerEvent:Connect(function(player, action, paramPacket
 		if paramPacket.LowestFps then
 			classPlayer.LowestFps = math.clamp(tonumber(paramPacket.LowestFps) :: number, 1, 999);
 		end
+		if paramPacket.AvgFps then
+			classPlayer.AverageFps = math.clamp(paramPacket.AvgFps, 1, 999);
+		end
+
 
 		for _, oPlayer in pairs(game.Players:GetPlayers()) do
 			if oPlayer ~= player then

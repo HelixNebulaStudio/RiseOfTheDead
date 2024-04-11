@@ -2150,6 +2150,8 @@ RunService.Heartbeat:Connect(function(step)
 			Cache.LowestFps = tickFps;
 			newLowestFps = tickFps;
 		end
+		Cache.AvgFps = math.round(((Cache.AvgFps or tickFps) + tickFps)/2);
+		
 		remoteCharacterRemote:FireServer(1, {
 			Waist={
 				Motor=upperTorso.Waist;
@@ -2166,6 +2168,7 @@ RunService.Heartbeat:Connect(function(step)
 				}
 			};
 			LowestFps=newLowestFps;
+			AvgFps=Cache.AvgFps;
 		})
 	end
 	

@@ -95,6 +95,7 @@ function Player.new(playerInstance: Player)
 	classPlayer.IsUnderWater = false;
 
 	classPlayer.LowestFps = 999;
+	classPlayer.AverageFps = 999;
 	--==
 	
 	function meta:Spawn()

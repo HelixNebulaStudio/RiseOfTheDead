@@ -60,13 +60,6 @@ function PlayerService.RefreshPlayers()
 	end
 end
 
-function PlayerService.GetPlayerInstance(object)
-	local player = game.Players:FindFirstChild(object);
-	if player and player.Character == object then
-		return player;
-	end
-end
-
 function PlayerService.GetPlayerToPlayerDistanceCache(playerA, playerB)
 	local classPlayerA = PlayerService.Get(playerA);
 	local classPlayerB = PlayerService.Get(playerB);
@@ -128,7 +121,7 @@ function PlayerService.OnPlayerAdded(playerInstance)
 end
 
 function PlayerService.OnPlayerRemoving(playerInstance)
-	local player = PlayerService:Get(playerInstance);
+	local player = PlayerService.Get(playerInstance);
 	if player then
 		wait(1);
 		task.delay(player.IsTeleporting and 10 or 2, function()
@@ -183,5 +176,79 @@ else
 end
 
 shared.modPlayers = PlayerService;
+
+if RunService:IsServer() then
+	task.spawn(function()
+		Debugger.AwaitShared("modCommandsLibrary");
+		local modCommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
+
+		shared.modCommandsLibrary:HookChatCommand("players", {
+			Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+			Description = [[ClassPlayer commands.
+				/players status [name] [key] -- prints all statuses.
+				/players fps [name] -- Notifies player's fps info.
+			]];
+
+			RequiredArgs = 0;
+			UsageInfo = "/players [status/fps]";
+			Function = function(speaker, args)
+				local action = args[1];
+
+				if action == "status" then
+					local playerName = args[2];
+					local player = speaker;
+			
+					if playerName then
+						local matches = modCommandHandler.MatchName(playerName);
+						if #matches == 1 then
+							player = matches[1];
+			
+						elseif #matches > 1 then
+							shared.modCommandsLibrary.GenericOutputs.MultipleMatch(speaker, matches);
+							return;
+						elseif #matches < 1 then
+							table.insert(args, 2, "");
+						end
+					end
+			
+					local lookupkey = args[3];
+					
+					local classPlayer = PlayerService.Get(player);
+					
+					Debugger:Warn("Player (",player,") status:");
+					for k, v in pairs(classPlayer.Properties) do
+						if lookupkey and k ~= lookupkey then continue end;
+						Debugger:Warn("Key (",k,"):",Debugger:Stringify(v));
+					end
+
+				elseif action == "fps" then
+
+					local playerName = args[2];
+					local player = speaker;
+			
+					if playerName then
+						local matches = modCommandHandler.MatchName(playerName);
+						if #matches == 1 then
+							player = matches[1];
+			
+						elseif #matches > 1 then
+							shared.modCommandsLibrary.GenericOutputs.MultipleMatch(speaker, matches);
+							return;
+						elseif #matches < 1 then
+							table.insert(args, 2, "");
+						end
+					end
+
+					local classPlayer = PlayerService.Get(player);
+
+					shared.Notify(speaker, "Player ("..player.Name..") Lowest: "..classPlayer.LowestFps.." Avg: "..classPlayer.AverageFps, "Inform");
+
+				end
+
+				return true;
+			end;
+		});
+	end)
+end
 
 return PlayerService;

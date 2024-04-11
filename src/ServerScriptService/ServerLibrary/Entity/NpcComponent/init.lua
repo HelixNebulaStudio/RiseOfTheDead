@@ -299,9 +299,6 @@ function NpcComponent:SetNetworkOwner(value, lock)
 					end
 				end
 				
-				if RunService:IsStudio() then
-					Debugger:Warn(self.Name, "SetNetworkOwner:", closestPlayer);
-				end
 				rootPart:SetNetworkOwner(closestPlayer);
 				
 			else
@@ -310,9 +307,6 @@ function NpcComponent:SetNetworkOwner(value, lock)
 			end
 			
 		else
-			if RunService:IsStudio() then
-				Debugger:Warn(self.Name, "SetNetworkOwner:", v);
-			end
 			rootPart:SetNetworkOwner(v);
 
 		end

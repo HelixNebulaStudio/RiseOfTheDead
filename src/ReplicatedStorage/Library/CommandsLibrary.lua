@@ -313,7 +313,7 @@ Commands["item"] = {
 		if itemLib then
 			present(itemLib.Id);
 		elseif matchCount == 1 then
-			present(next(tagMatches));
+			present((next(tagMatches)));
 		elseif matchCount > 1 then
 			shared.Notify(speaker, "========== Similar Results ==========", "Inform");
 			shared.Notify(speaker, modCommandHandler.FormList(tagMatches), "Inform");
@@ -461,7 +461,7 @@ Commands["info"] = {
 				elseif #search <= 0 then
 					shared.Notify(speaker, "No blueprint id contains: "..args[2], "Inform");
 				else
-					local bpLib = modBlueprintLibrary:Get(search[1]);
+					local bpLib = modBlueprintLibrary.Get(search[1]);
 					shared.Notify(speaker, "========== Blueprint: "..search[1].." ==========", "Inform");
 					shared.Notify(speaker, modCommandHandler.FormList(bpLib), "Inform");
 					
@@ -534,45 +534,6 @@ Commands["spawnitem"] = {
 		return true;
 	end;
 };
-
-Commands["playerstatus"] = {
-	Permission = PermissionLevel.DevBranch;
-	Description = "Prints player statuses into console.";
-
-	UsageInfo = "/playerstatus [name] [key]";
-	Function = function(speaker, args)
-
-
-		local playerName = args[2];
-		local player = speaker;
-
-		if playerName then
-			local matches = modCommandHandler.MatchName(playerName);
-			if #matches == 1 then
-				player = matches[1];
-
-			elseif #matches > 1 then
-				GenericOutputs.MultipleMatch(speaker, matches);
-				return;
-			elseif #matches < 1 then
-				table.insert(args, 2, "");
-			end
-		end
-
-		local lookupkey = args[3];
-		
-		local classPlayer = modPlayers.Get(player);
-		
-		Debugger:Warn("Player (",player,") status:");
-		for k, v in pairs(classPlayer.Properties) do
-			if lookupkey and k ~= lookupkey then continue end;
-			Debugger:Warn("Key (",k,"):",Debugger:Stringify(v));
-		end
-
-		return true;
-	end;
-};
-	
 
 Commands["term"] = {
 	Permission = PermissionLevel.DevBranch;
@@ -2239,7 +2200,7 @@ Commands["rolldroptable"] = {
 			local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 			local rewardsLib = modRewardsLibrary:Find(tableId);
 			
-			if rewardsLib and rewardsLib.Hidden and not HasPermissions(player, {Permission=PermissionLevel.Staff}) then
+			if rewardsLib and rewardsLib.Hidden and not HasPermissions(player, {Permission=PermissionLevel.Admin}) then
 				rewardsLib = nil;
 			end
 			
