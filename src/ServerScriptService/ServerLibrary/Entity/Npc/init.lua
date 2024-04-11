@@ -8,7 +8,6 @@ local PhysicsService = game:GetService("PhysicsService");
 local CollectionService = game:GetService("CollectionService");
 local RunService = game:GetService("RunService");
 
-
 local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
 local modPhysics = require(game.ServerScriptService.ServerLibrary.Physics);
 local modNpcAnimator = require(game.ServerScriptService.ServerLibrary.Entity.NpcAnimator);

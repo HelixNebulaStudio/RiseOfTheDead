@@ -1,15 +1,33 @@
---local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local EventSignal = {};
-EventSignal.__index = EventSignal
-EventSignal.ClassName = "EventSignal"
+type EventSignalClass = {
+	__index: EventSignalClass;
+	ClassName: string;
 
-function EventSignal.new(name)
+	new: (name: string) -> EventSignal;
+	Fire: (...any) -> nil;
+	Wait: (timeout: number) -> ...any;
+	Connect: (self: EventSignal, () -> nil) -> (() -> nil);
+	Disconnect: (self: EventSignal, () -> nil) -> nil;
+	Once: (self: EventSignal, () -> nil) -> (() -> nil);
+	Destroy: (self: EventSignal) -> nil;
+	DisconnectAll: (self: EventSignal) -> nil;
+};
+
+type EventSignalObject = {
+	Name: string?;
+};
+
+local EventSignal: EventSignalClass = {} :: EventSignalClass;
+EventSignal.__index = EventSignal;
+EventSignal.ClassName = "EventSignal";
+
+function EventSignal.new(name: string?)
 	local self = {
 		Name = name;
 	};
 	
-	setmetatable(self, EventSignal);
+	setmetatable(self :: EventSignalObject, EventSignal);
 	return self;
 end
 
@@ -26,7 +44,7 @@ function EventSignal:Fire(...)
 	end
 end
 
-function EventSignal:Wait(timeOut)
+function EventSignal:Wait(timeOut) : ...any
 	local Thread = coroutine.running()
 	
 	local ran = false;
@@ -47,14 +65,14 @@ function EventSignal:Wait(timeOut)
 	return coroutine.yield()
 end
 
-function EventSignal:Connect(Function)
+function EventSignal:Connect(Function) : () -> nil
 	table.insert(self, Function);
 	return function()
 		self:Disconnect(Function);
 	end
 end
 
-function EventSignal:Disconnect(Function)
+function EventSignal:Disconnect(Function) : nil
 	local Length = #self
 
 	for index = Length, 1, -1 do
@@ -63,9 +81,11 @@ function EventSignal:Disconnect(Function)
 			break;
 		end
 	end
+
+	return;
 end
 
-function EventSignal:Once(Function)
+function EventSignal:Once(Function) : () -> nil
 	local func;
 	
 	func = function(...)
@@ -76,17 +96,21 @@ function EventSignal:Once(Function)
 	table.insert(self, func);
 	return function()
 		self:Disconnect(func);
+		return;
 	end
 end
 
-function EventSignal:Destroy()
+function EventSignal:Destroy() : nil
 	table.clear(self);
+	return;
 end
 
-function EventSignal:DisconnectAll()
+function EventSignal:DisconnectAll() : nil
 	for index = 1, #self do
 		self[index] = nil;
 	end
+	return;
 end
 
+export type EventSignal = typeof(setmetatable({} :: EventSignalObject, {} :: EventSignalClass));
 return EventSignal;

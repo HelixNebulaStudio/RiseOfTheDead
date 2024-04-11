@@ -409,11 +409,31 @@ function NpcComponent:GetHealth(valueType: string, bodyPart: BasePart)
 end
 --==
 
-return function(self)
+export type NpcModule = {
+    Name: string;
+    IsDead: boolean;
+
+    Prefab: Model | Actor;
+    RootPart: BasePart;
+    Head: BasePart;
+    Humanoid: Humanoid;
+
+    Actor: Actor?;
+	ActorEvent: BindableEvent;
+
+	PathAgent: {[any]: any};
+
+    Think: modEventSignal.EventSignal;
+	Garbage: modGarbageHandler.GarbageHandler;
+
+	EntityStatus: modEntityStatus.EntityStatus;
+};
+
+return function(self: NpcModule)
 	self.Name = self.Prefab.Name;
-	self.Head = self.Prefab.Head;
-	self.Humanoid = self.Prefab:FindFirstChildWhichIsA("Humanoid");
-	self.RootPart = self.Humanoid.RootPart;
+	self.Head = self.Prefab:FindFirstChild("Head") :: BasePart;
+	self.Humanoid = self.Prefab:FindFirstChildWhichIsA("Humanoid") :: Humanoid;
+	self.RootPart = self.Humanoid:FindFirstChild("RootPart") :: BasePart;
 
 	self.Actor = self.Prefab:GetActor();
 	self.Think = modEventSignal.new(self.Name.."Think");

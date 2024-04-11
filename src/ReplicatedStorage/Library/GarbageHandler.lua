@@ -1,5 +1,17 @@
-local GarbageHandler = {};
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
+type GarbageHandlerClass = {
+	__index: GarbageHandlerClass;
+	ClassName: string;
+};
+
+type GarbageHandlerObject = {
+	Trash: {};
+};
+--
+local GarbageHandler = {} :: GarbageHandlerClass;
 GarbageHandler.__index = GarbageHandler;
+GarbageHandler.ClassName = "GarbageHandler";
 
 GarbageHandler.Destructors = {
 	["function"] = function(item)
@@ -56,11 +68,14 @@ function GarbageHandler:Destruct()
 	table.clear(self.Trash);
 end
 
-function GarbageHandler.new()
-	local self = {Trash={};};
+function GarbageHandler.new() : GarbageHandlerObject
+	local self = {
+		Trash={};
+	};	
 	
-	setmetatable(self, GarbageHandler);
+	setmetatable(self :: GarbageHandlerObject, GarbageHandler);
 	return self;
 end
 
+export type GarbageHandler = typeof(setmetatable({} :: GarbageHandlerObject, {} :: GarbageHandlerClass));
 return GarbageHandler;

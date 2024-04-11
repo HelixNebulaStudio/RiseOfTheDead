@@ -4,16 +4,12 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 -- Variables;
 local RunService = game:GetService("RunService");
 local SoundService = game:GetService("SoundService");
-local localPlayer = game.Players.LocalPlayer;
-
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local remotePlayAudio = modRemotesManager:Get("PlayAudio");
 
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local moddedSelf = modModEngineService:GetModule(script.Name);
 
-
 local Library = {};
+local proxySound = Instance.new("Sound");
 -- Script;
 
 local soundFiles = script:GetChildren();
@@ -34,10 +30,11 @@ function Get(id)
 	if audioInstance ~= nil then
 		return audioInstance;
 	end
+	return;
 end
 
-function Play(id, parent, looped, pitch, volume) : Sound?
-	if id == nil then return end;
+function Play(id, parent, looped, pitch, volume) : Sound
+	if id == nil then return proxySound; end;
 	local audioInstance = Library[id];
 	
 	if typeof(id) == "Instance" and id:IsA("Sound") then
@@ -47,7 +44,7 @@ function Play(id, parent, looped, pitch, volume) : Sound?
 	if audioInstance ~= nil then
 		if parent == nil then
 			if RunService:IsClient() then
-				local loop = audioInstance.Looped;
+				local _loop = audioInstance.Looped;
 				audioInstance.Looped = true;
 				SoundService:PlayLocalSound(audioInstance);
 				audioInstance.Looped = false;
@@ -80,18 +77,17 @@ function Play(id, parent, looped, pitch, volume) : Sound?
 			return newSound;
 		end
 	else
-		warn("Audio missing (",id,").");
+		Debugger:Warn("Audio missing (",id,").");
 	end
-	return;
+	return proxySound;
 end
 
 function PlayReplicated(id, parent, looped, pitch, volume)
-	if RunService:IsServer() then error("Audio>>  Failed to play audio from server. Use Play() instead.") return end;
+	if RunService:IsServer() then error("Audio>>  Failed to play audio from server. Use Play() instead."); return end;
 	local audioInstance = Library[id];
 	if audioInstance ~= nil then
 		if parent == nil then
 			SoundService:PlayLocalSound(audioInstance);
-			--remotePlayAudio:FireServer(audioInstance);
 			return audioInstance;
 		else
 			local newSound = audioInstance:Clone();
@@ -100,11 +96,12 @@ function PlayReplicated(id, parent, looped, pitch, volume)
 			newSound.Volume = volume or newSound.Volume;
 			if looped ~= nil and looped then newSound.Looped = true; end
 			newSound:Play();
-			--remotePlayAudio:FireServer(audioInstance, parent, pitch, volume);
+			
 			newSound.Ended:Connect(function() RunService.Stepped:Wait(); newSound:Destroy() end);
 			return newSound;
 		end
 	end
+	return;
 end
 
 function Load(child, soundGroupName)

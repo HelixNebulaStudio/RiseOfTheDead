@@ -3,8 +3,19 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modScheduler = require(game.ReplicatedStorage.Library.Scheduler);
 
 --==
-local EntityStatus = {};
+type EntityStatusClass = {
+	__index: EntityStatusClass;
+	ClassName: string;
+};
+
+type EntityStatusObject = {
+	List: {};
+	ActiveJob: nil;
+};
+
+local EntityStatus = {} :: EntityStatusClass;
 EntityStatus.__index = EntityStatus;
+EntityStatus.ClassName = "EntityStatus";
 
 EntityStatus.Scheduler = modScheduler.new("EntityStatus");
 EntityStatus.Scheduler.Rate = 1/15;
@@ -13,8 +24,6 @@ function EntityStatus.new(preData)
 	local self = {
 		List = {};
 		ActiveJob = nil;
-		
-		
 	};
 	
 	if preData then
@@ -23,7 +32,7 @@ function EntityStatus.new(preData)
 		end
 	end
 	
-	setmetatable(self, EntityStatus);
+	setmetatable(self :: EntityStatusObject, EntityStatus);
 	return self;
 end
 
@@ -77,4 +86,5 @@ function EntityStatus:Process()
 	end
 end
 
+export type EntityStatus = typeof(setmetatable({} :: EntityStatusObject, {} :: EntityStatusClass));
 return EntityStatus;

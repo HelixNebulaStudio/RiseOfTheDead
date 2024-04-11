@@ -137,6 +137,9 @@ return function(self)
 			if groundCframe then
 				flashCylinder(groundCframe);
 			end
+			if self.IsDead then
+				break;
+			end
 		end
 		
 		groundCframe = modAoeHighlight:Ray(targetRootPart.Position + Vector3.yAxis*4, Vector3.new(0, -16, 0));

@@ -1,13 +1,10 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local random = Random.new();
 
 local ZombieModule = script.Parent.Zombie;
 --== Modules
 local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 -- Note; Function called for each zombie before zombie parented to workspace;
 return function(npc, spawnPoint)
@@ -45,6 +42,7 @@ return function(npc, spawnPoint)
 		};
 		
 		DropRewardOffset = Vector3.new(0, 2, 0);
+		DespawnPrefab = 30;
 	};
 	
 	--== Initialize;
@@ -83,6 +81,7 @@ return function(npc, spawnPoint)
 					Amount = amount;
 				};
 			end
+			return;
 		end
 		
 		
@@ -99,7 +98,7 @@ return function(npc, spawnPoint)
 			self.JawPrefabs[a].Parent = nil;
 		end
 		
-		
+		self.RootPart.CanCollide = false;
 		self.Think:Fire();
 		coroutine.yield();
 		task.spawn(function()

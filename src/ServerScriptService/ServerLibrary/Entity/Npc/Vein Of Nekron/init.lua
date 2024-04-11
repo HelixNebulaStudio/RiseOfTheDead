@@ -72,6 +72,7 @@ return function(npc, spawnPoint)
 		self.BaseMaxHealth = self.Humanoid.MaxHealth;
 
 		self.Humanoid.MaxHealth = self.BaseHealth;
+		self.RootPart.CanCollide = false;
 
 		function self.CustomHealthbar.OnDamaged(healthObj, amount, fromPlayer, storageItem, bodyPart)
 			if bodyPart == nil then return end;
