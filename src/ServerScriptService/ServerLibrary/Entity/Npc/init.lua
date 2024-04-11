@@ -10,8 +10,8 @@ local modNpcAnimator = require(game.ServerScriptService.ServerLibrary.Entity.Npc
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
+local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
 
 local modNpcModules = {};
 for _, npcMod in pairs(game.ServerScriptService.ServerLibrary.Entity.Npc:GetChildren()) do
@@ -26,6 +26,7 @@ local function searchCustom(t, k)
 		modNpcModules[npcMod.Name] = Debugger:Require(npcMod);
 		return modNpcModules[npcMod.Name];
 	end
+	return;
 end
 setmetatable(modNpcModules, {__index=searchCustom});
 
@@ -135,18 +136,19 @@ Npc.GetPlayerNpc = function(player, name, condition)
 	return;
 end
 
-Npc.GetPlayerNpcList = function(player)
-	local list = {};
+Npc.GetPlayerNpcList = function(player) : {modNpcComponent.NpcModule}
+	local list: {modNpcComponent.NpcModule} = {};
 	for a=#Npc.PlayerNpcs, 1, -1 do
 		local npcModule = Npc.PlayerNpcs[a] and Npc.PlayerNpcs[a].Module;
 		if npcModule and npcModule.Owner == player then
 			table.insert(list, npcModule);
 		end
 	end
+
 	return list;
 end
 
-Npc.GetNpcModule = function(prefab)
+Npc.GetNpcModule = function(prefab) : modNpcComponent.NpcModule?
 	local npcStatus = prefab:FindFirstChild("NpcStatus") and require(prefab.NpcStatus);
 	if npcStatus then
 		return npcStatus:GetModule();
@@ -161,7 +163,7 @@ Npc.GetNpcModule = function(prefab)
 	return;
 end
 
-Npc.Get = function(id)
+Npc.Get = function(id) : modNpcComponent.NpcModule?
 	for a=#Npc.NpcModules, 1, -1  do
 		local npcModule = Npc.NpcModules[a] and Npc.NpcModules[a].Module;
 		if npcModule and npcModule.Id == id then
@@ -171,12 +173,6 @@ Npc.Get = function(id)
 	return;
 end
 
-local debugBox = Instance.new("Part");
-debugBox.Anchored = true;
-debugBox.Transparency = 0.5;
-debugBox.Color = Color3.fromRGB(85, 255, 255);
-debugBox.CanCollide = false;
-
 local npcScanOverlapParam = OverlapParams.new();
 npcScanOverlapParam.FilterType = Enum.RaycastFilterType.Include;
 
@@ -184,7 +180,6 @@ local function onEntityRootPartChanged()
 	npcScanOverlapParam.FilterDescendantsInstances = CollectionService:GetTagged("EntityRootPart");
 end
 CollectionService:GetInstanceAddedSignal("EntityRootPart"):Connect(onEntityRootPartChanged);
---CollectionService:GetInstanceRemovedSignal("EntityRootPart"):Connect(onEntityRootPartChanged);
 
 function Npc.EntityScan(origin, radius, maxRootpart)
 	local scannedTargets = {};
@@ -197,9 +192,9 @@ function Npc.EntityScan(origin, radius, maxRootpart)
 	for a=1, #targets do
 		local targetEntity = targets[a].Parent;
 		if targetEntity then
-			local modNpcModule = Npc.GetNpcModule(targetEntity);
-			if modNpcModule and modNpcModule.IgnoreScan ~= true then
-				table.insert(scannedTargets, modNpcModule);
+			local npcModule = Npc.GetNpcModule(targetEntity);
+			if npcModule and npcModule.IgnoreScan ~= true then
+				table.insert(scannedTargets, npcModule);
 			end
 		end
 	end

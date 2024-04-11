@@ -943,7 +943,9 @@ function Raid:Initialize(roomData)
 		for a=1, #nearbyNpcModules do
 			local npcModule = nearbyNpcModules[a];
 
-			npcModule.OnTarget(player);
+			if npcModule.OnTarget then
+				npcModule.OnTarget(player);
+			end
 		end
 	end);
 
