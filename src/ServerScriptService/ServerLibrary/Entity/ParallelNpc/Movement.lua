@@ -2,8 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --
 local RunService = game:GetService("RunService");
 local PathfindingService = game:GetService("PathfindingService");
-local CollectionService =  game:GetService("CollectionService");
-local SharedTableRegistry = game:GetService("SharedTableRegistry");
 
 local modRegion = require(game.ReplicatedStorage.Library.Region);
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
@@ -98,6 +96,10 @@ function Movement.new(parallelNpc)
 			local s, e = pcall(function()
 				path:ComputeAsync(rootPartPos, targetPos);
 			end)
+			if not s then
+				Debugger:Warn("Handled Exception:", e);
+			end
+
 			if parallelNpc.IsDead then return end;
 			if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("genpath") end;
 
@@ -196,7 +198,7 @@ function Movement.new(parallelNpc)
 			moveSpeed:Remove("Pathfinding");
 			if self.PersistFollowTarget == false then
 
-				local isNextToTarget = IsInRange(rootPart.Position, self.TargetPosition, 3);
+				local isNextToTarget = IsInRange(rootPart.Position, self.TargetPosition, 1);
 				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("nextToTarget", isNextToTarget) end;
 				
 				if isNextToTarget then
@@ -239,7 +241,7 @@ function Movement.new(parallelNpc)
 		end
 
 		if self.LastFaceSetTick 
-			and tick()-self.LastFaceSetTick <= 1 
+			and tick()-self.LastFaceSetTick <= 0
 			and self.FacePosition 
 			and self.FacePosition ~= rootPart.Position
 			and humanoid.PlatformStand ~= true then
@@ -284,7 +286,7 @@ function Movement.new(parallelNpc)
 			if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("#wp <= 0") end;
 			
 		else
-			if self.LastTargetPosition == nil or not IsInRange(self.TargetPosition, self.LastTargetPosition, 4) then -- Target position moved;
+			if self.LastTargetPosition == nil or not IsInRange(self.TargetPosition, self.LastTargetPosition, 2) then -- Target position moved;
 				local ltpIsNil = self.LastTargetPosition == nil;
 				self.LastTargetPosition = self.TargetPosition;
 				self.Recompute = true;
@@ -300,7 +302,7 @@ function Movement.new(parallelNpc)
 		local isInMaxFollowDist = IsInRange(rootPart.Position, self.TargetPosition, maxFDist) and math.abs(rootPart.Position.Y-self.TargetPosition.Y) < 8;
 		local isNextToTarget = IsInRange(rootPart.Position, self.TargetPosition, minFDist);
 		
-		if isInMaxFollowDist then
+		if isInMaxFollowDist and self.MaxFollowDist then
 			if dumbFollow and tick() <= dumbFollow then
 				return;
 			end
@@ -364,7 +366,7 @@ function Movement.new(parallelNpc)
 				lastStuckTick = nil;
 			end
 
-			if IsInRange(self.LastRootPosition, rootPart.Position, 2) then
+			if IsInRange(self.LastRootPosition, rootPart.Position, 1) then
 				self.Recompute = true;
 				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("detected stuck") end;
 				lastStuckTick = tick();
@@ -455,7 +457,7 @@ function Movement.new(parallelNpc)
 
 		self.FaceSpeed = packet.FaceSpeed;
 		
-		self.LastFaceSetTick = tick()+(packet.Duration or 0);
+		self.LastFaceSetTick = tick()+(packet.Duration or 1);
 	end)
 	
 
