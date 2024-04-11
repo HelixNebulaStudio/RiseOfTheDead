@@ -1,16 +1,10 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local RunService = game:GetService("RunService");
-local TweenService = game:GetService("TweenService");
 local UserInputService = game:GetService("UserInputService");
 
 local localPlayer = game.Players.LocalPlayer;
 
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
-local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
-local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 
 --==
 local ModeHud = {};
@@ -98,7 +92,7 @@ function ModeHud:GetAlive()
 end
 
 function ModeHud:IsSpectating()
-	local modData = require(localPlayer:WaitForChild("DataModule"));
+	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	local modCharacter = modData:GetModCharacter();
 
 	if modCharacter then

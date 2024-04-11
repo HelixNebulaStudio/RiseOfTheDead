@@ -4,15 +4,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Variables;
 local Interface = {};
 
-local RunService = game:GetService("RunService");
-
-local localPlayer = game.Players.LocalPlayer;
-local modData = require(localPlayer:WaitForChild("DataModule"));
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modMarkers = require(game.ReplicatedStorage.Library.Markers);
 

@@ -2,8 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local TweenService = game:GetService("TweenService");
 
-local localPlayer = game.Players.LocalPlayer;
-
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
 
@@ -14,16 +12,13 @@ return function(...)
 	
 	modeHud.Soundtrack = nil;
 	
-	local prevData;
 	function modeHud:Update(data)
-		prevData = data;
-		
 		local gameType = data.Type;
 		local gameStage = data.Stage;
 		local room = data.Room;
 
 		local gameLib = modGameModeLibrary.GetGameMode(gameType);
-		local stageLib = gameLib and modGameModeLibrary.GetStage(gameType, gameStage);
+		local _stageLib = gameLib and modGameModeLibrary.GetStage(gameType, gameStage);
 
 		local bossNameTag = self.MainFrame.bossName;
 		local statusTag = self.MainFrame.status;
@@ -41,21 +36,10 @@ return function(...)
 			end
 
 		elseif room.State == 4 then
-			if data.EndTime then
-				statusTag.Text = "Room is closing in "..math.clamp(math.floor(data.EndTime-modSyncTime.GetTime()), 0, 30).." seconds..";
-			end
-
-		end
-		
-	end
-	
-	modeHud.Garbage:Tag(modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
-		local data = prevData;
-		local statusTag = modeHud.MainFrame.status;
-
-		if data.Room.State >= 4 then
-			if data.EndTime then
-				statusTag.Text = "Room is closing in "..math.clamp(math.floor(data.EndTime-modSyncTime.GetTime()), 0, 30).." seconds..";
+			if room.EndTime then
+				local timeRemaining = math.floor(room.EndTime - modSyncTime.GetTime());
+				statusTag.Text = "Room is closing in "..math.clamp(timeRemaining, 0, 30).." seconds..";
+				
 				if modeHud.Soundtrack then
 					local sound = modeHud.Soundtrack;
 					modeHud.Soundtrack = nil;
@@ -63,10 +47,10 @@ return function(...)
 					Debugger.Expire(sound, 5);
 				end
 			end
-		end
 
-		modeHud:Update(data);
-	end))
+		end
+		
+	end
 	
 	return modeHud;
 end
