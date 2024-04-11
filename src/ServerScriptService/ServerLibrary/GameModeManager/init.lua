@@ -1,5 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Variables;
+
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
@@ -8,30 +9,27 @@ local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modLeaderboardService = require(game.ReplicatedStorage.Library.LeaderboardService);
-local modGameLogService = require(game.ReplicatedStorage.Library.GameLogService);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 
 local modMatchMaking = require(game.ServerScriptService.ServerLibrary.MatchMaking);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local GameModeManager = {};
+GameModeManager.Load = nil;
 GameModeManager.Games = {};
 GameModeManager.MenuRooms = {};
 GameModeManager.Lobbies = {};
 GameModeManager.IsGameWorld = nil;
 GameModeManager.GameWorldInfo = nil;
 GameModeManager.Active = nil;
+GameModeManager.StudioData = nil;
+GameModeManager.TeleportDataLoaded = nil;
 
 local RunService = game:GetService("RunService");
-
-local remotes = game.ReplicatedStorage.Remotes;
-local bindServerUnequipPlayer = remotes.Inventory.ServerUnequipPlayer;
 
 local remoteGameModeLobbies = modRemotesManager:Get("GameModeLobbies");
 local remoteGameModeUpdate = modRemotesManager:Get("GameModeUpdate");
@@ -46,7 +44,6 @@ local enumRoomStates = modGameModeLibrary.RoomStatesEnums;
 local PrefabStorages = game.ServerStorage:WaitForChild("PrefabStorage") 
 local lobbyPrefabs = PrefabStorages:WaitForChild("LobbyRooms");
 
-local maxGameRooms = 6;
 local endingDuration = 15;
 
 local loaded = false;
@@ -116,6 +113,7 @@ function GameModeManager:GetPlayerMenuRoom(player)
 			return menuRoomData.GameTable;
 		end;
 	end
+	return;
 end
 
 function GameModeManager:RemovePlayerFromMenuRoom(player)
@@ -133,6 +131,7 @@ function GameModeManager:GetPlayerLobby(player)
 			end
 		end
 	end
+	return;
 end
 
 function GameModeManager:Initialize(gameType, gameStage)
@@ -282,7 +281,7 @@ function GameModeManager:Initialize(gameType, gameStage)
 				if room.State == enumRoomStates.Idle then
 					if stageLib.SingleArena then
 						room:SetState(enumRoomStates.Intermission);
-						local canStart = true;
+
 						room.StartTime = modSyncTime.GetTime() + (gameTable.StageLib.ReadyLength or modGameModeLibrary.DefaultReadyLength);
 						if RunService:IsStudio() then
 							room.StartTime = modSyncTime.GetTime() + 5;
@@ -297,7 +296,6 @@ function GameModeManager:Initialize(gameType, gameStage)
 						
 						local canStart = true;
 						repeat
-							
 							local hardEnabled = false;
 							for a=1, #room.Players do
 								local player = room.Players[a].Instance;
@@ -390,6 +388,7 @@ function GameModeManager:Initialize(gameType, gameStage)
 				return self.Lobbies[a];
 			end
 		end
+		return;
 	end
 	
 	function meta:GetIdRoom(id)
@@ -398,6 +397,7 @@ function GameModeManager:Initialize(gameType, gameStage)
 				return self.Lobbies[a];
 			end
 		end
+		return;
 	end
 
 	function meta:HasEmptyRoom(excludeId)
@@ -540,6 +540,7 @@ function GameModeManager:JoinRoom(player, gameTable, room)
 		
 		return gameTable;
 	end
+	return;
 end
 
 function GameModeManager:Assign(player, gameType, gameStage)
@@ -566,7 +567,6 @@ function remoteGameModeLobbies.OnServerInvoke(player, interactObject, interactMo
 		local id = tostring(interactModule);
 		
 		local profile = shared.modProfile:Get(player);
-		local playerSave = profile:GetActiveSave();
 		local inventory = profile.ActiveInventory;
 		local storageItem = inventory and inventory:Find(id);
 		local toolModels = profile.EquippedTools.WeaponModels;
@@ -699,7 +699,7 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 	local classPlayer = modPlayers.Get(player);
 	if classPlayer == nil then return end;
 	
-	local oldMenuRoom = GameModeManager:GetPlayerMenuRoom(player);
+	local _oldMenuRoom = GameModeManager:GetPlayerMenuRoom(player);
 	GameModeManager:RemovePlayerFromMenuRoom(player);
 	
 	local rootPart = classPlayer.RootPart;
@@ -897,6 +897,8 @@ function remoteGameModeRequest.OnServerInvoke(player, requestEnum, ...)
 		
 		return gameTable, room.Id;
 	end
+
+	return;
 end
 
 function remoteGameModeExit.OnServerInvoke(player, action, interactModule)
