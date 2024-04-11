@@ -7,7 +7,7 @@ EventSignal.ClassName = "EventSignal";
 
 type EventSignalObject = {
 	Name: string?;
-	Functions: {[number]: any};
+	Functions: {[number]: (...any)->(...any)};
 }
 export type EventSignal = typeof(setmetatable({} :: EventSignalObject, EventSignal));
 
