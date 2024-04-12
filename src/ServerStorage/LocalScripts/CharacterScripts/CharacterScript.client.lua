@@ -124,7 +124,7 @@ local Cache = {
 	ViewModelErr = nil;
 	OldState = nil;
 
-	CrouchScanSkip = tick();
+	CrouchCheckCooldown = tick();
 };
 
 local CollisionModel={
@@ -1244,10 +1244,8 @@ local function renderStepped(camera, deltaTime)
 	local upCollisionRay = Ray.new(rootPoint.Position, Vector3.new(0, upOffset, 0));
 	local upRayHit, upRayEnd;
 
-	if Cache.CrouchScanSkip > renderTick then
-	elseif modData:IsMobile() or Debugger.ClientFps <= 30 then
-		Cache.CrouchScanSkip = renderTick+ (modData:IsMobile() and 0.2 or 0) + (Debugger.ClientFps <= 30 and 0.3 or 0);
-	else
+	if renderTick > Cache.CrouchCheckCooldown then
+		Cache.CrouchCheckCooldown = renderTick + 0.2;
 		upRayHit, upRayEnd = crouchToggleCheck(rootPart.CFrame, true);
 	end
 
