@@ -404,7 +404,7 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	end)
 	
 	if preloadCallback then 
-		preloadCallback(npcPrefab, npcModule);
+		preloadCallback(npcPrefab, npcModule :: modNpcComponent.NpcModule);
 		task.spawn(function()
 			Npc.OnNpcSpawn:Fire(npcModule);
 
@@ -586,7 +586,7 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 end
 
 local templateSpawnSrc = game.ServerScriptService.ServerScripts:WaitForChild("NpcEngine");
-Npc.Spawn = function(name, cframe, preloadCallback, customNpcModule)
+Npc.Spawn = function(name: string, cframe: CFrame, preloadCallback: (prefab: (Model | Actor), npcModule: modNpcComponent.NpcModule) -> (Model | Actor), customNpcModule)
 	if RunService:IsStudio() then
 		return Npc.DoSpawn(name, cframe, preloadCallback, customNpcModule);
 	else

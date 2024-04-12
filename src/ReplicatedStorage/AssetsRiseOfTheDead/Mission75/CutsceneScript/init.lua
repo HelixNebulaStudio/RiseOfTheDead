@@ -507,8 +507,10 @@ return function(CutsceneSequence)
 					local missionCache = modEvents:GetEvent(player, "MissionCache");
 					local banditsAllied = missionCache and missionCache.Value and missionCache.Value.BanditsAllied == true;
 					
+					task.wait(math.random(3, 4));
 					-- patrol bandit
-					modNpc.Spawn("Bandit", CFrame.new(549.916, 136.42, -1237.638), function(npc, npcModule)
+					local patrolBanditSpawn = CFrame.new(498.821, 136.42, -1123.854) * CFrame.Angles(0, math.rad(-165), 0);
+					modNpc.Spawn("Bandit", patrolBanditSpawn, function(npc, npcModule)
 						npcModule.Owner = player;
 						patrolBandit = npcModule;
 						
@@ -537,12 +539,12 @@ return function(CutsceneSequence)
 					end, require(game.ServerStorage.PrefabStorage.CustomNpcModules.CutsceneHuman));
 					
 					Debugger:Warn("walking to point");
-					patrolBandit.Interactable.Parent = nil;
-					patrolBandit.Movement:Move(Vector3.new(498.82, 136.42, -1119.558)):Wait();
+					patrolBandit:ToggleInteractable(false);
+					patrolBandit.Movement:Move(Vector3.new(498.82, 136.42, -1119.558)):Wait(1);
 					
 					Debugger:Warn("walking to point2");
 					
-					patrolBandit.Interactable.Parent = patrolBandit.Prefab;
+					patrolBandit:ToggleInteractable(true);
 					CutsceneSequence:NextScene("BanditScout");
 					patrolBandit.Chat(player, "What the?! Who are you?!");
 					patrolBandit.Wield.Equip("ak47");
@@ -598,7 +600,7 @@ return function(CutsceneSequence)
 
 					-- Bandit aggro-ed
 					mission.SaveData.FightBandits = true;
-					patrolBandit.Interactable.Parent = nil;
+					patrolBandit:ToggleInteractable(false);
 					
 					patrolBandit.Follow(classPlayer.RootPart, 10);
 					
