@@ -20,7 +20,6 @@ local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 local modToolTweaks = require(game.ReplicatedStorage.Library.ToolTweaks);
 local modItemSkinWear = require(game.ReplicatedStorage.Library.ItemSkinWear);
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modColorsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ColorsLibrary"));
 local modSkinsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("SkinsLibrary"));
 
@@ -42,7 +41,6 @@ local templateProgressBar = script:WaitForChild("progressBar");
 ItemInterface.ItemBarsCache = {};
 ItemInterface.ItemValueSync = {};
 --== Formatting
-local h2O, h2C = modRichFormatter.Headers.H2O, modRichFormatter.Headers.H2C;
 local h3O, h3C = modRichFormatter.Headers.H3O, modRichFormatter.Headers.H3C;
 ItemInterface.Headers = modRichFormatter.Headers;
 
@@ -52,7 +50,7 @@ local colorNumberText = modRichFormatter.ColorNumberText;
 
 --==
 function ItemInterface.ProcessSyncHooks(specifiedId)
-	local modData = require(localPlayer:WaitForChild("DataModule"));
+	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 	for id, funcList in pairs(ItemInterface.ItemValueSync) do
 		if specifiedId ~= nil and id ~= specifiedId then continue end;
@@ -226,7 +224,7 @@ end
 
 function ItemInterface:DefaultUpdateItemButton(storageItemData)
 	local playerGui = localPlayer:WaitForChild("PlayerGui");
-	local modData = require(localPlayer:WaitForChild("DataModule"));
+	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	local serverUnixTime = modSyncTime.GetTime();
 	
 	if storageItemData and self.ItemId ~= storageItemData.ItemId then
@@ -526,8 +524,8 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 					end
 				end
 			end
-			for a=a, 4 do
-				local iconLabel = self.ImageButton:FindFirstChild("AttachmentIcon"..a);
+			for b=a, 4 do
+				local iconLabel = self.ImageButton:FindFirstChild("AttachmentIcon"..b);
 				if iconLabel then iconLabel.Image = ""; end
 			end
 			if a > 1 then
@@ -538,8 +536,8 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 	
 	if self.DimOut ~= nil and self.DimOut ~= false then
 		local dimVal = tonumber(self.DimOut) or 0.235294;
-		local h, s, v = itemButtonColor:ToHSV();
-		local c = Color3.fromHSV(0, 0, dimVal);
+		local h, s, _v = itemButtonColor:ToHSV();
+		local c = Color3.fromHSV(h, s, dimVal);
 
 		self.ImageButton.ImageColor3 = c;
 		for _, obj in pairs(self.ImageButton:GetDescendants()) do
@@ -572,7 +570,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 	local itemLib = modItemsLibrary:Find(itemId);
 	if itemLib == nil then return end;
 	
-	local modData = require(localPlayer:WaitForChild("DataModule"));
+	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 	local defaultFrame = self.Frame:WaitForChild("default");
 	local nameTag = self.Frame:WaitForChild("NameTag");
@@ -783,6 +781,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 				
 			else
 				itemDesc = itemDesc..h3O.."\nWeapon: "..h3C.. colorStringText("none");
+
 			end
 			
 			local patBatteryStorageItem = modData.FindIndexFromStorage(itemId, 2);
@@ -815,9 +814,9 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 				
 				for id, item in pairs(modData.Storages[storageItemData.ID].Container) do
 					if first then itemDesc = itemDesc..h3O.."\nAttached: "..h3C end;
-					local itemLib = modItemsLibrary:Find(item.ItemId);
-					if itemLib then
-						itemDesc = itemDesc..(not first and ", " or "")..colorStringText(itemLib.Name);
+					local attachedItemLib = modItemsLibrary:Find(item.ItemId);
+					if attachedItemLib then
+						itemDesc = itemDesc..(not first and ", " or "")..colorStringText(attachedItemLib.Name);
 						first = false;
 					else
 						Debugger:Log("Missing item lib for description (",item.ItemId,")");
@@ -843,6 +842,11 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 				itemDesc = itemDesc..h3O.."\nSlaughterfest: "..h3C..colorStringText("Wearing this into slaughterfest will yield 10% more candies when killing players!");
 			end
 			
+			if classType == "Weapon" then
+				itemDesc = itemDesc..h3O.."\nAmmo: "..h3C.. colorNumberText((itemValues.A or "Full").."/"..(itemValues.MA or "Full"));
+			end
+
+
 			itemDesc = itemDesc.."\n";
 		end
 		
@@ -876,7 +880,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 				local upgradesLayout = modUpgradesFrame.UIListLayout;
 				local newUpgradeLabel = upgradesLayout.upgradeLabel:Clone();
 				newUpgradeLabel.LayoutOrder = a*2;
-				newUpgradeLabel.Text = upgradeInfo.Name..(" ($lvl/$maxlvl)"):gsub("$lvl", math.min(upgradeLvl,maxLvl)):gsub("$maxlvl", maxLvl);
+				newUpgradeLabel.Text = upgradeInfo.Name..(" ($lvl/$maxlvl)"):gsub("$lvl", tostring(math.min(upgradeLvl,maxLvl))):gsub("$maxlvl", maxLvl);
 				newUpgradeLabel.Parent = modUpgradesFrame;
 				local newLevelList = upgradesLayout.UpgradeLevelList:Clone();
 				newLevelList.LayoutOrder = a*2+1;

@@ -73,8 +73,8 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 			
 			tierOfMod = storageItemOfMod.Values.Tier or modLib.Tier;
 			
-			if tierOfItem > tierOfMod then
-				titleTag.Text = modLib.Name..' <font color="rgb(221, 97, 97)">(Inferior Tier)</font>';
+			if tierOfItem < tierOfMod then
+				titleTag.Text = modLib.Name..' <font color="rgb(221, 97, 97)">(Incompatible Tier)</font>';
 			end
 		end
 
@@ -354,9 +354,9 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 					if itemLib.Tier then
 						levelSlot.ImageColor3 = tierColor;
 						
-						if tierOfItem and tierOfItem > tierOfMod then
+						if tierOfItem and tierOfItem < tierOfMod then
 							local disabledImageLabel = levelSlot:WaitForChild("Disabled");
-							local tierDiff = (tierOfItem-tierOfMod);
+							local tierDiff = (tierOfMod-tierOfItem);
 							local disablePoint = upgradeMaxLevel-tierDiff;
 							
 							if c > disablePoint then

@@ -65,7 +65,7 @@ local canReactivate = tick();
 
 local halfPi = math.pi/2;
 local lastSec = tick();
-function TurretRuntime(storageItem)
+function TurretRuntime(weaponStorageItem)
 	if activeWeaponModel == nil then return end;
 	task.wait(0.1);
 	
@@ -110,8 +110,8 @@ function TurretRuntime(storageItem)
 	hydraulicRod.JointHRA.CFrame  = jointHarCf * CFrame.Angles(hydraulicPitch, 0, 0);
 	arm1.JointAA2.CFrame = jointAa2Cf * CFrame.Angles(armPitch, 0, 0);
 	
+	weaponStorageItem:Sync({"A"; "MA"});
 	--==
-	
 	local configValues = accessoryStorageItem:GetValues("Config") or {};
 	
 	local isSec = tick()-lastSec >= 3;
@@ -126,6 +126,7 @@ function TurretRuntime(storageItem)
 			local _weaponStorageItem = patStorage:FindByIndex(1);
 			local batteryStorageItem = patStorage:FindByIndex(2);
 
+			local noBattery = false;
 			if batteryStorageItem then
 				local powVal = batteryStorageItem:GetValues("Power");
 				
@@ -144,14 +145,22 @@ function TurretRuntime(storageItem)
 					batteryStorageItem:SetValues("Power", powVal);
 				else
 					patStorage:Remove(batteryStorageItem.ID, 1);
-					shared.Notify(player, "Your Portable Auto Turret battery is depleted.", "Inform");
-
-					modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
-					accessoryStorageItem:SetValues("Online", false):Sync{"Online"};
-
-					task.wait(0.2);
-					Update();
+					noBattery = true;
 				end
+
+			else
+				noBattery = true;
+
+			end
+
+			if noBattery == true then
+				shared.Notify(player, "Your Portable Auto Turret battery is depleted.", "Inform");
+
+				modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
+				accessoryStorageItem:SetValues("Online", false):Sync{"Online"};
+
+				task.wait(0.2);
+				Update();
 			end
 		end)
 	end
@@ -328,10 +337,10 @@ function TurretRuntime(storageItem)
 	end;
 	
 
-	local itemValues = storageItem.Values;
+	local itemValues = weaponStorageItem.Values;
 
 	local profile = shared.modProfile:Get(player);
-	local toolModule = profile:GetItemClass(storageItem.ID);
+	local toolModule = profile:GetItemClass(weaponStorageItem.ID);
 
 
 	local maistPercent = 1;
@@ -358,7 +367,7 @@ function TurretRuntime(storageItem)
 		modAudio.Play(toolModule.Audio.Empty.Id, turretArm.PrimaryPart);
 
 		local reloadPacket = {
-			StorageItem = storageItem;
+			StorageItem = weaponStorageItem;
 			ToolModel = activeWeaponModel;
 			ToolModule = toolModule;
 
@@ -435,7 +444,7 @@ function TurretRuntime(storageItem)
 		
 
 		local firePacket = {
-			StorageItem = storageItem;
+			StorageItem = weaponStorageItem;
 			ToolModel = activeWeaponModel;
 			ToolModule = toolModule;
 
@@ -481,6 +490,7 @@ function TurretRuntime(storageItem)
 		end
 
 		firerate = math.clamp(firerate, configurations.RapidFireMax or delta, 999);
+		weaponStorageItem:Sync({"A"; "MA"});
 		task.wait(firerate);
 		
 		if sortForToxicMod == 2 and checkForRecompute then

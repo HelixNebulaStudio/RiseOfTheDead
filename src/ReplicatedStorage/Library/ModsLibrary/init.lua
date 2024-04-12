@@ -62,9 +62,9 @@ function ModsLibrary.GetLayer(upgradeKey, packet)
 	end
 	
 	local modTier = values.Tier or modLib.BaseTier;
-	
-	local tierDiff = packet.ItemTier > modTier and (packet.ItemTier-modTier) or 0;
-	
+	--local tierDiff = packet.ItemTier > modTier and (packet.ItemTier-modTier) or 0;
+	local tierDiff = packet.ItemTier < modTier and (modTier-packet.ItemTier) or 0;
+
 	layerPacket.MaxLevel = math.max(upgradeInfo.MaxLevel-tierDiff, 0);
 	layerPacket.Level = math.clamp((values[upgradeKey] or 0), 0, layerPacket.MaxLevel);
 	
