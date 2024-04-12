@@ -36,6 +36,8 @@ return function(npc, spawnPoint)
 			ExperiencePool=30;
 			ResourceDrop=modRewardsLibrary:Find("zombie");
 		};
+		
+		Detectable = false;
 	};
 	
 	local rayParam = RaycastParams.new();
