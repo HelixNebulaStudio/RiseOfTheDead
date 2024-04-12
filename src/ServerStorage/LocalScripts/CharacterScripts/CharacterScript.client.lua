@@ -396,7 +396,10 @@ local function toggleCameraMode(value)
 	end
 end
 
+local checkCounter = 0;
 local function crouchToggleCheck(rootPoint, uncrouch)
+	checkCounter = checkCounter +1;
+
 	local upCollisionRay = Ray.new(rootPoint.p, rootPoint.upVector*4);
 	local upCollisionHit, upHitPos = workspace:FindPartOnRayWithWhitelist(upCollisionRay, environmentOnly, true);
 
@@ -1205,8 +1208,13 @@ local function renderStepped(camera, deltaTime)
 	camera.FieldOfView = lerp(lastFOV, characterProperties.FieldOfView or characterProperties.BaseFieldOfView, 0.2);
 	lastFOV = camera.FieldOfView;
 
+	local defaultSensitivity = mouseProperties.DefaultSensitivity;
+	if modData:IsMobile() then
+		defaultSensitivity = defaultSensitivity * 1.5;
+	end
+
 	local zoomSensitivityDiff = camera.FieldOfView / characterProperties.BaseFieldOfView;
-	mouseProperties.Sensitivity = mouseProperties.DefaultSensitivity * zoomSensitivityDiff;
+	mouseProperties.Sensitivity = defaultSensitivity * zoomSensitivityDiff;
 
 	if xLeftDeltaAddition and not xRightDeltaAddition then
 		local add = math.rad(3);
@@ -1231,9 +1239,12 @@ local function renderStepped(camera, deltaTime)
 
 	local upOffset = 4;
 	local upCollisionRay = Ray.new(rootPoint.Position, Vector3.new(0, upOffset, 0));
-	--local upRayHit, upRayEnd = workspace:FindPartOnRayWithWhitelist(upCollisionRay, environmentOnly, true);
+	local upRayHit, upRayEnd;
 
-	local upRayHit, upRayEnd = crouchToggleCheck(rootPart.CFrame, true);
+	if (modData:IsMobile() and math.fmod(checkCounter, 3) ~= 0) or (Debugger.ClientFps <= 30 and math.fmod(checkCounter, 2) ~= 0) then
+	else
+		upRayHit, upRayEnd = crouchToggleCheck(rootPart.CFrame, true);
+	end
 
 	if characterProperties.ThirdPersonCamera then
 		characterProperties.BaseFieldOfView = 70;
@@ -1459,10 +1470,18 @@ local function resetCameraEffects()
 end
 resetCameraEffects();
 
-RunService.Stepped:Connect(function()
+local steppedSkip = tick();
+RunService.Stepped:Connect(function(total, delta)
+	local stepTick = tick();
 	characterProperties.IsAlive = character:GetAttribute("IsAlive") == true;
-	lerp(0,0,0);
-	
+
+	if Debugger.ClientFps <= 30 then
+		steppedSkip = stepTick+delta;
+	elseif Debugger.ClientFps <= 15 then
+		steppedSkip = stepTick+(delta*2);
+	end
+	if steppedSkip > stepTick then return end;
+
 	local rootCframe = rootPart.CFrame;
 	
 	if characterProperties.IsAlive then
@@ -1627,7 +1646,7 @@ Cache.LastHeadUnderwater = tick();
 Cache.OneSecTick = tick();
 Cache.LowestFps = math.huge;
 RunService.Heartbeat:Connect(function(step)
-	lerp(0,0,0);
+	local beatTick = tick();
 	loadInterface();
 	if modCharacter.CharacterProperties.CharacterCameraEnabled ~= isCharCamEnabled then
 		isCharCamEnabled = modCharacter.CharacterProperties.CharacterCameraEnabled;
@@ -1644,8 +1663,8 @@ RunService.Heartbeat:Connect(function(step)
 	mouseProperties.FlinchInacc = lerp(mouseProperties.FlinchInacc, 0, 0.05);
 	if math.abs(mouseProperties.FlinchInacc) < 0.1 then mouseProperties.FlinchInacc = 0 end;
 	
-	if tick()-Cache.OneSecTick >= 1 then
-		Cache.OneSecTick = tick();
+	if beatTick-Cache.OneSecTick >= 1 then
+		Cache.OneSecTick = beatTick;
 		
 		local newState = humanoid:GetState();
 		if Cache.OldState == nil then
@@ -1676,7 +1695,7 @@ RunService.Heartbeat:Connect(function(step)
 	end
 	
 	if Cache.StopSwimmingTimer then
-		if tick()-Cache.StopSwimmingTimer >= 0.6 then
+		if beatTick-Cache.StopSwimmingTimer >= 0.6 then
 			if characterProperties.IsSwimming ~= true then -- no longer swimming
 				remoteCharacterRemote:FireServer(4, false);
 				Cache.StopSwimmingTimer = nil;
@@ -1787,20 +1806,20 @@ RunService.Heartbeat:Connect(function(step)
 					MaxTorque = Vector3.new(0, math.huge, 0);
 				};
 				slideForce.MaxForce = Vector3.new(40000, 0, 40000);
-				slideForce.Velocity = oldSlideMomentum:Lerp(Vector3.new(),mathClamp((tick()-slideBeginTick)/6, 0, 1));
+				slideForce.Velocity = oldSlideMomentum:Lerp(Vector3.new(),mathClamp((beatTick-slideBeginTick)/6, 0, 1));
 				oldSlideMomentum = slideForce.Velocity;
 				
 				-- characterProperties.BodyForce:Set("slide", Vector3.new(0, 20, 0), 1, 1);
 
 				if Cache.lastSlide == nil then
-					Cache.lastSlide = tick();
+					Cache.lastSlide = beatTick;
 				end
 			end
 			characterProperties.SlideVelocity = slideForce.Velocity;
 			
 			if characterProperties.State == Enum.HumanoidStateType.FallingDown
 				or Cache.lastSlide == nil
-				or (tick()-Cache.lastSlide) >= 1
+				or (beatTick-Cache.lastSlide) >= 1
 				or (rootPart.AssemblyLinearVelocity*Vector3.new(1, 0, 1)).Magnitude <= 5 
 				or humanoid.Sit 
 				or humanoid.PlatformStand 
@@ -2061,8 +2080,14 @@ RunService.Heartbeat:Connect(function(step)
 			end
 			
 			local rootCFrame = rootPart.CFrame;
-			local wallCollisionRay = Ray.new(rootCFrame.Position, rootCFrame.LookVector * (mouseY >0 and -6 or 6));
-			local wallRayHit, wallRayEnd = workspace:FindPartOnRayWithWhitelist(wallCollisionRay, environmentOnly, true);
+			local wallCollisionRay, wallRayHit, wallRayEnd;
+			if modData:IsMobile() then
+
+			else
+				wallCollisionRay = Ray.new(rootCFrame.Position, rootCFrame.LookVector * (mouseY >0 and -6 or 6));
+				wallRayHit, wallRayEnd = workspace:FindPartOnRayWithWhitelist(wallCollisionRay, environmentOnly, true);
+			end
+
 			
 			if wallRayHit then
 				local dist = (wallRayEnd-rootCFrame.Position).Magnitude;
@@ -2133,7 +2158,11 @@ RunService.Heartbeat:Connect(function(step)
 				prevdata.NeckC0 = head.Neck.C0;
 			end
 		end)
-		if not lerpS and RunService:IsStudio() then warn(lerpE) end;
+
+		if not lerpS and RunService:IsStudio() then 
+			warn(lerpE) 
+		end;
+
 	else
 		character.UpperTorso.Waist.C1 = originaldata.WaistC1;
 		if character.Head then
@@ -2141,8 +2170,8 @@ RunService.Heartbeat:Connect(function(step)
 		end
 	end
 	
-	if (tick()-motorUpdateCooldown) > 0.5 and characterProperties.IsAlive then
-		motorUpdateCooldown = tick();
+	if (beatTick-motorUpdateCooldown) > 0.5 and characterProperties.IsAlive then
+		motorUpdateCooldown = beatTick;
 		
 		local tickFps = Debugger.ClientFps;
 		local newLowestFps = nil;
@@ -2182,7 +2211,7 @@ RunService.Heartbeat:Connect(function(step)
 		walkSurfaceTag.Value = surfaceType or "";
 		
 		if surfaceType == "Slippery" then
-			local vec = Vector3.new(math.sin(tick()), 0, math.cos(tick())) * 200;
+			local vec = Vector3.new(math.sin(beatTick), 0, math.cos(beatTick)) * 200;
 			
 			rootPart:ApplyImpulse(vec);
 		end
@@ -2191,8 +2220,8 @@ RunService.Heartbeat:Connect(function(step)
 		walkSurfaceTag.Value = "";
 	end
 	
-	if tick()-heartbeatSecTick >= 1 then
-		heartbeatSecTick = tick();
+	if beatTick-heartbeatSecTick >= 1 then
+		heartbeatSecTick = beatTick;
 		
 		if (rootPart.CFrame.Position-lastMovablePos.p).Magnitude >= 16 then
 			unstuckPos = lastMovablePos;

@@ -18,6 +18,8 @@ local GuiDataRemote; local ClientLogRemote; local ClientReadyBind; local IsClien
 local Debugger = {}; 
 Debugger.__index = Debugger;
 
+
+Debugger.ClientFps = 60;
 Debugger.AcquirerModule = nil;
 Debugger.DevId = 16170943;
 Debugger.Friends = {};
@@ -679,10 +681,8 @@ end
 
 function Debugger:InitMainThread()
 	Debugger.MainThread = true;
-	
-	if RunService:IsClient() then
 
-		Debugger.ClientFps = 0;
+	if RunService:IsClient() then
 		local fpsCounter, lastTick =0, tick();
 		local function getFps()
 			fpsCounter = fpsCounter +1;

@@ -1100,7 +1100,7 @@ function WeaponHandler:Equip(library, weaponId)
 								end
 								
 								if humanoid == nil or humanoid.Name ~= "NavMeshIgnore" then
-									if modData and modData:GetSetting("DisableParticle3D") ~= 1 and multiIndex == 1 then
+									if modData and modData:GetSetting("DisableParticle3D") ~= 1 and multiIndex == 1 and Debugger.ClientFps > 45 then
 										modParticleSprinkler:Emit{
 											Type=1;
 											Origin=CFrame.new(position);
@@ -1109,7 +1109,7 @@ function WeaponHandler:Equip(library, weaponId)
 											MaxSpawnCount=4;
 										};
 									else
-										if humanoid and configurations.GenerateBloodEffect then
+										if humanoid and configurations.GenerateBloodEffect and Debugger.ClientFps > 25 then
 											modWeaponMechanics.CreateBlood(basePart, position, (mouseProperties.Focus.p-position).unit, camera);
 										end;
 									end
@@ -1282,6 +1282,13 @@ function WeaponHandler:Equip(library, weaponId)
 						
 						
 					end
+
+					if Debugger.ClientFps <= 30 then
+						task.wait();
+						if  Debugger.ClientFps <= 15 then
+							task.wait();
+						end
+					end 
 				end
 				
 				if configurations.FocusDuration > 0 then

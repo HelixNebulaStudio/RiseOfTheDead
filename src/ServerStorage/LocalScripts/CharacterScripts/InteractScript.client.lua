@@ -1,7 +1,5 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
-local function lerp(a, b, t) return a * (1-t) + (b*t); end
-
 local interactionRange = 15;
 local interactRadialConfig = '{"version":1,"size":128,"count":256,"columns":8,"rows":8,"images":["rbxassetid://4744240077", "rbxassetid://4744242814", "rbxassetid://4744244749", "rbxassetid://4744244960"]}';
 
@@ -9,15 +7,13 @@ local interactRadialConfig = '{"version":1,"size":128,"count":256,"columns":8,"r
 local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
-local playerGui = localPlayer:WaitForChild("PlayerGui");
-local modData = require(localPlayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modEmotes = require(game.ReplicatedStorage.Library.EmotesLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local modRadialImage = require(game.ReplicatedStorage.Library.UI.RadialImage);
 
@@ -38,7 +34,6 @@ end
 if not workspace:IsAncestorOf(animator) then return end;
 
 local modCharacter = modData:GetModCharacter();
-local mouseProperties = modCharacter.MouseProperties;
 local characterProperties = modCharacter.CharacterProperties;
 
 local UserInputService = game:GetService("UserInputService");
@@ -49,8 +44,6 @@ local mousePosition = UserInputService:GetMouseLocation();
 
 local modInteractable = require(game.ReplicatedStorage.Library.Interactables);
 local interactablesFolder = workspace.Interactables;
-local entitiesFolder = workspace.Entity;
-local interactionAnimations = modInteractable.InteractionAnimations
 local interactableObjects = interactablesFolder:GetChildren();
 
 
@@ -61,7 +54,7 @@ local cooldownInteract = tick();
 local cooldownDistanceCheck = tick();
 local holdDuration = nil;
 local oldIndicatorPosition = nil;
-local functionCancelInteraction = nil;
+local ActivateInteract;
 
 local interactAnimTracks = {};
 
@@ -155,14 +148,22 @@ local function canInteract()
 	return v;
 end
 
+local heartbeatSkip = tick();
 local autoTriggerDelay = tick();
 local maxDist = 32;
 -- !outline: signal RunService.Heartbeat
 RunService.Heartbeat:Connect(function(delta)
-	lerp(0,0,0);
 	loadInterface();
 	
 	local beatTick = tick();
+
+	if Debugger.ClientFps <= 30 then
+		heartbeatSkip = beatTick+delta;
+	elseif Debugger.ClientFps <= 15 then
+		heartbeatSkip = beatTick+(delta*2);
+	end
+	if heartbeatSkip > beatTick then return end;
+
 	mousePosition = UserInputService:GetMouseLocation();
 	
 	if not hideIndicator and canInteract() and characterProperties.IsAlive then
@@ -237,7 +238,7 @@ RunService.Heartbeat:Connect(function(delta)
 						characterProperties.ActiveInteract = newInteraction;
 						characterProperties.ActiveInteract.Object = rayHit;
 						
-						local screenPoint, inFront = camera:WorldToViewportPoint(rayHit.Position);
+						local screenPoint, _inFront = camera:WorldToViewportPoint(rayHit.Position);
 						oldIndicatorPosition = Vector2.new(screenPoint.X, screenPoint.Y);
 						
 						if interactableModule and interactableModule.Parent ~= rayHit and interactableModule.Parent ~= nil then
@@ -401,7 +402,10 @@ RunService.Heartbeat:Connect(function(delta)
 					
 					if not touchEnabled or interactProcess.Visible == false then
 						if oldIndicatorPosition == nil then oldIndicatorPosition = Vector2.new(screenPoint.X, screenPoint.Y); end;
-						local lerpVecPos = oldIndicatorPosition:Lerp(Vector2.new(screenPoint.X, screenPoint.Y), 0.5);
+						local lerpVecPos = Vector2.new(screenPoint.X, screenPoint.Y);
+						if Debugger.ClientFps > 30 then
+							lerpVecPos = oldIndicatorPosition:Lerp(Vector2.new(screenPoint.X, screenPoint.Y), 0.5);
+						end
 						oldIndicatorPosition = lerpVecPos;
 
 						interactIndicator.Position = UDim2.new(0, lerpVecPos.X, 0, lerpVecPos.Y);

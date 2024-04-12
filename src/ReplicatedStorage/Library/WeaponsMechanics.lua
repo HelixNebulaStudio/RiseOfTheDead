@@ -388,7 +388,7 @@ function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 			distance = 0;
 
 		end
-
+		
 	until distance <= 0 or penCount > maxPierce;
 	return newOrigin;
 end
@@ -472,7 +472,7 @@ function WeaponsMechanics.ImpactSound(param)
 		or obj.Material == Enum.Material.CorrodedMetal
 		or obj.Material == Enum.Material.DiamondPlate then
 
-		if use3DParticles and RunService:IsClient() then
+		if use3DParticles and RunService:IsClient() and Debugger.ClientFps >= 30 then
 			local sparkCountRng = math.random(4, 7);
 			
 			local cache = modData.Cache;
@@ -556,7 +556,7 @@ function WeaponsMechanics.ImpactSound(param)
 		pitchMin, pitchMax = 0.9, 1.1;
 	end
 	
-	if surfaceSoundId then
+	if surfaceSoundId and Debugger.ClientFps >= 30 then
 		local new = surfaceSounds:FindFirstChild(surfaceSoundId);
 		if new then
 			new = new:Clone();
@@ -591,6 +591,8 @@ function WeaponsMechanics.CreateBulletHole(obj, point, normal)
 		Point = point;
 		Normal = normal;
 	}
+
+	if Debugger.ClientFps <= 30 then return end;
 	local bulletHole = Instance.new("Part");
 	bulletHole.Name = "BulletHole";
 	bulletHole.Transparency = 1;

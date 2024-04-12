@@ -46,7 +46,7 @@ local lastBubbleInfo = {
 	LastTick = tick();
 };
 
-local localplayer, modData;
+local localPlayer, modData;
 function InfoBubbles.Spawn(packet)
 	if modConfigurations.DisableInfoBubbles then return end;
 	
@@ -163,10 +163,13 @@ function InfoBubbles.Spawn(packet)
 	end
 	lastBubbleInfo.LastTick = tick();
 
-	local spread = math.clamp(lastBubbleInfo.Index/8, 0, 3);
 	local lifespan = 1 - math.clamp(lastBubbleInfo.Index/8, 0, 0.5);
-	TweenService:Create(att, TweenInfo.new(lifespan, Enum.EasingStyle.Quart), {WorldPosition=(att.WorldPosition 
-		+ Vector3.new(random:NextNumber(-3 - spread, 3 + spread), 3 + spread, random:NextNumber(-3 - spread, 3 + spread)))}):Play();
+
+	if Debugger.ClientFps >= 30 then
+		local spread = math.clamp(lastBubbleInfo.Index/8, 0, 3);
+		TweenService:Create(att, TweenInfo.new(lifespan, Enum.EasingStyle.Quart), {WorldPosition=(att.WorldPosition 
+			+ Vector3.new(random:NextNumber(-3 - spread, 3 + spread), 3 + spread, random:NextNumber(-3 - spread, 3 + spread)))}):Play();
+	end
 	game.Debris:AddItem(att, lifespan);
 	
 end
@@ -181,23 +184,25 @@ if RunService:IsClient() then
 	spawnPart.CanCollide = false;
 	spawnPart.Parent = workspace.CurrentCamera;
 	
-	localplayer = game.Players.LocalPlayer;
+	localPlayer = game.Players.LocalPlayer;
 	
 	if script:GetAttribute("ClientConnected") ~= true then
 		script:SetAttribute("ClientConnected", true);
 
 		remoteCreateInfoBubble.OnClientEvent:Connect(function(packet)
-			if localplayer:GetAttribute("CinematicMode") then return end;
-			if localplayer:GetAttribute("DisableHud") then return end;
+			if localPlayer:GetAttribute("CinematicMode") then return end;
+			if localPlayer:GetAttribute("DisableHud") then return end;
 
 			local bubbleType = packet.Type;
-			modData = require(localplayer:WaitForChild("DataModule"));
-			if modData and modData.Settings and modData.Settings.DamageBubble == 1 then -- and bubbleType and bubbleType:match("Damage")
-				return
+			modData = require(localPlayer:WaitForChild("DataModule"));
+			if modData and modData:GetSetting("DamageBubble") == 1 then
+				return;
 			end;
 
+			if Debugger.ClientFps <= 20 then return end;
+			
 			packet.SpawnPart = spawnPart;
-			InfoBubbles.Spawn(packet)
+			InfoBubbles.Spawn(packet);
 		end)
 	end
 end
