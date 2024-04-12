@@ -18,7 +18,7 @@ local remotes = game.ReplicatedStorage.Remotes;
 --local remoteSelectDialogue = remotes.Dialogue.SelectDialogue;
 local remoteMissionCheckFunction = remotes.Interface.MissionCheckFunction;
 
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modGuiObjectTween = require(script.Parent.Parent.Parent:WaitForChild("GuiObjectTween"));
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modMissionLibrary = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("MissionLibrary"));
@@ -59,11 +59,12 @@ local NpcName, NpcModel;
 local camera = workspace.CurrentCamera;
 
 local lastExpireTime;
+local window;
 --== Script;
 function Interface.init(modInterface)
 	setmetatable(Interface, modInterface);
 	
-	local window = Interface.NewWindow("Dialogue", dialogueFrame);
+	window = Interface.NewWindow("Dialogue", dialogueFrame);
 	window.CompactFullscreen = true;
 	
 	if modConfigurations.CompactInterface then
@@ -161,6 +162,20 @@ function Interface:OnDialogue(dialogPacket)
 	NpcName = dialogPacket.Name;
 	NpcModel = dialogPacket.Prefab;
 	
+	local humanoid = NpcModel and NpcModel:FindFirstChildWhichIsA("Humanoid");
+
+	if humanoid then
+		task.spawn(function()
+			while window.Visible do
+				task.wait(0.1);
+				if humanoid:GetAttribute("IsDead") or not workspace:IsAncestorOf(humanoid) then
+					Interface:CloseWindow("Dialogue");
+					break;
+				end
+			end
+		end)
+	end
+
 	messageFrame.NameTag.Text = NpcName;
 	self:SetDialogueText("");
 	

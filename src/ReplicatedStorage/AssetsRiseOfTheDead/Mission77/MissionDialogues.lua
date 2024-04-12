@@ -30,11 +30,11 @@ Dialogues["Mysterious Engineer"].Dialogues = function()
 		{Tag="bofb_startNo"; Dialogue="Yeah... never mind.";
 			Face="Happy"; Reply="Hahaha, understandable. I wouldn't want to go in that thing either."};
 		{Tag="bofb_startYes"; Dialogue="You know what, I'll go.";
-			Face="Surprise"; Reply="Wait, you serious?..\n\nIn that case, bring Vexlings, with those little vexs, it'll have a reason to swallow you. They eat their spawns for some reason."};
+			Face="Surprise"; Reply="Wait, you serious?..\n\nIn that case, bring Vexlings, with those little vexs, it'll have a reason to swallow you. They eat their spawns for some reason. And also a gas mask!"};
 		
 
 		{Tag="bofb_1how"; Dialogue="Ummm.. So how do I get eaten by the Elder Vexeron again?";
-			Face="Happy"; Reply="Bring Vexlings, it won't swallow you without it."};
+			Face="Happy"; Reply="Bring Vexlings, it won't swallow you without it. And also a gas mask, it's literally toxic in there!"};
 		
 		{Tag="bofb_4init";
 			Face="Confident"; Reply="I can't believe you actually did it..";};

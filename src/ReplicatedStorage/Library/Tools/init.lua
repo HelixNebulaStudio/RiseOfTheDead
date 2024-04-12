@@ -101,17 +101,17 @@ end
 --	};
 --}
 
-AddTool{
-	ItemId="advmedkit";
-	Type="HealTool";
-	Animations={
-		Core={Id=5011163984;};
-		Use={Id=5011194350;};
-		UseOthers={Id=5011194350;};
-	};
-	Audio={
-	};
-}
+-- AddTool{
+-- 	ItemId="advmedkit";
+-- 	Type="HealTool";
+-- 	Animations={
+-- 		Core={Id=5011163984;};
+-- 		Use={Id=5011194350;};
+-- 		UseOthers={Id=5011194350;};
+-- 	};
+-- 	Audio={
+-- 	};
+-- }
 
 --== Food
 --AddTool{

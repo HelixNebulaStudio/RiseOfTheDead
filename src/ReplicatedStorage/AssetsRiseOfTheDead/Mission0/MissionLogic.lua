@@ -26,7 +26,7 @@ if RunService:IsServer() then
 		end
 		
 		mission.Changed:Connect(OnChanged);
-		OnChanged(true, mission);
+		OnChanged(true);
 	end
 end
 

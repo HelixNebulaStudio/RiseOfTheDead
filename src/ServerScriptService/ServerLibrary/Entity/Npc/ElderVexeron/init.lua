@@ -1,19 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local random = Random.new();
-
-local RunService = game:GetService("RunService");
-local CollectionService = game:GetService("CollectionService");
-
-local remotes = game.ReplicatedStorage.Remotes;
-local remoteCameraShakeAndZoom = remotes.CameraShakeAndZoom;
 
 local ZombieModule = script.Parent.Zombie;
 --== Modules
-local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modExperience = require(game.ServerScriptService.ServerLibrary.Experience);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
+
+local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
 local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
+local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local modVexSpitter = require(script:WaitForChild("VexSpitter"));
 
@@ -141,6 +135,7 @@ return function(npc, spawnPoint)
 				
 				return true;
 			end
+			return;
 		end
 
 		self.CustomHealthbar.OnDeath:Connect(function(name, healthInfo)
@@ -158,8 +153,8 @@ return function(npc, spawnPoint)
 				bodyPart:ClearAllChildren();
 				bodyPart.CanCollide = true;
 				game.Debris:AddItem(bodyPart, 10);
-				modAudio.Play("TicksZombieExplode", workspace).PlaybackSpeed = random:NextNumber(0.35, 0.4);
-				modAudio.Play("VexeronPain", bodyPart).PlaybackSpeed = random:NextNumber(0.35, 0.4);
+				modAudio.Play("TicksZombieExplode", workspace).PlaybackSpeed = math.random(35, 40)/100;
+				modAudio.Play("VexeronPain", bodyPart).PlaybackSpeed = math.random(35, 40)/100;
 				
 				task.spawn(function()
 					local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
@@ -225,12 +220,8 @@ return function(npc, spawnPoint)
 			if not isEnemy then return end;
 			
 			if player.Character:FindFirstChild("vexling") and player:DistanceFromCharacter(self.VexBody.Position) <= 50 then
-				local profile = shared.modProfile:Get(player);
-				if profile.Cache.Mission77_EnterElderVex then
-					profile.Cache.Mission77_EnterElderVex(self);
-					
-					self.OnEatPlayer();
-				end
+				modOnGameEvents:Fire("OnEatenByVexeron", player, self);
+				self.OnEatPlayer();
 				return;
 			end
 			
@@ -252,7 +243,6 @@ return function(npc, spawnPoint)
 		self.Garbage:Tag(self.BodyMovers.BodyVelocity:GetPropertyChangedSignal("P"):Connect(self.UpdateVelocity));
 		self.Garbage:Tag(self.BodyMovers.BodyGyro:GetPropertyChangedSignal("CFrame"):Connect(self.UpdateVelocity));
 
-		local PhysicsService = game:GetService("PhysicsService");
 		for _, v in next, self.Prefab:GetDescendants() do
 			if v:IsA("BasePart") then
 				v.CollisionGroup = "CollisionOff";
@@ -288,11 +278,9 @@ return function(npc, spawnPoint)
 		until self.IsDead or dist < 25;
 	end
 
-	local hasAttacked = false;
-
 	local attackCooldown = tick();
 	local spawnSpitterCooldown = tick()+5;
-	local isAttacking = false;
+	
 	function self.Update()
 		if self.IsDead or self.Humanoid.RootPart == nil then return false; end;
 		
@@ -305,7 +293,7 @@ return function(npc, spawnPoint)
 				Debugger:Log("Waking up");
 				
 				self.Prefab:SetAttribute("IsSnoozing", false);
-				modAudio.Play("VexeronGrowl", self.RootPart).PlaybackSpeed = random:NextNumber(0.35, 0.4);
+				modAudio.Play("VexeronGrowl", self.RootPart).PlaybackSpeed = math.random(35, 40)/100;
 				self.SnoozeState = 0;
 				self.Properties.MovementSpeed = 15;--30;
 				--self.Properties.AttackDamage = 100;
@@ -347,7 +335,7 @@ return function(npc, spawnPoint)
 				if self.VexBodies then
 					
 					for a=1, #self.Enemies do
-						local targetRootPart = self.Enemies[a] and self.Enemies[a].RootPart;
+						local enemyRootPart = self.Enemies[a] and self.Enemies[a].RootPart;
 
 						if #self.VexSpitter < 5 then
 							
@@ -359,7 +347,7 @@ return function(npc, spawnPoint)
 							self.SpitterCount = self.SpitterCount +1;
 							vexSpitterObject.SpitterHead.Name = vexSpitterObject.SpitterHead.Name .. self.SpitterCount;
 							
-							local spitterHeadHealthObj = self.CustomHealthbar:Create(vexSpitterObject.SpitterHead.Name, 4000, vexSpitterObject.SpitterHead);
+							self.CustomHealthbar:Create(vexSpitterObject.SpitterHead.Name, 4000, vexSpitterObject.SpitterHead);
 						end
 
 						if #self.VexSpitter > 0 then
@@ -369,9 +357,9 @@ return function(npc, spawnPoint)
 								vexSpitter = self.VexSpitter[math.random(1, #self.VexSpitter)];
 								
 								if vexSpitter and vexSpitter.SpitterHead then
-									local targetDistance = (targetRootPart.Position - self.RootPart.Position).Magnitude;
+									local targetDistance = (enemyRootPart.Position - self.RootPart.Position).Magnitude;
 									if targetDistance <= 350 then
-										vexSpitter:FireProj(targetRootPart);
+										vexSpitter:FireProj(enemyRootPart);
 										
 										break;
 									end
@@ -403,6 +391,12 @@ return function(npc, spawnPoint)
 				else
 					self.PointTo(targetPoint);
 				end
+			end
+
+			local targetPlayer = game:GetService("Players"):GetPlayerFromCharacter(targetRootPart and targetRootPart.Parent);
+			if targetPlayer and targetPlayer.Character:FindFirstChild("vexling") and targetPlayer:DistanceFromCharacter(self.VexBody.Position) <= 30 then
+				modOnGameEvents:Fire("OnEatenByVexeron", targetPlayer, self);
+				self.OnEatPlayer();
 			end
 
 		end

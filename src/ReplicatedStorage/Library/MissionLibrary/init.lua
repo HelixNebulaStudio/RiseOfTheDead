@@ -2783,7 +2783,7 @@ MissionLibrary.New{
 	--World={"TheHarbor"; "DoubleCross"; "Safehome"};
 	Checkpoint={
 		{Text="Get eaten by Elder Vexeron";};
-		{Text="Search for the missing blueprint pieces";};
+		{Text="Search for the missing blueprint pieces $PieceFound/2.";};
 		{Text="Exit Elder Vexeron at the end";};
 		{Text="Talk to the Mysterious Engineer about the last piece";};
 		{Text="Do the \"Sunken Salvages\" board mission when available";};
@@ -2794,6 +2794,7 @@ MissionLibrary.New{
 	};
 	StartRequirements={
 	};
+	SaveData={PieceFound=0;};
 	GuideText="Talk to Mysterious Engineer";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
