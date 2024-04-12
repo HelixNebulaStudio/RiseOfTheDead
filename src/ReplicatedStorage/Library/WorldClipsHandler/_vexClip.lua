@@ -5,8 +5,8 @@ local CollectionService = game:GetService("CollectionService");
 
 local modTouchHandler = require(game.ReplicatedStorage.Library.TouchHandler);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
+local modAudio = require(game.ReplicatedStorage.Library.Audio);
 
 local clipTouchHandler = modTouchHandler.new("VexClips", 2);
 
@@ -29,12 +29,6 @@ function clipTouchHandler:OnHumanoidTouch(humanoid, basePart, touchPart)
 		local classPlayer = shared.modPlayers.Get(player);
 		
 		modStatusEffects.VexBile(player, 5);
-		
-		--classPlayer:SetProperties("VexBile", {
-		--	ExpiresOnDeath=true;
-		--	Expires=modSyncTime.GetTime()+5.5;
-		--	Duration=10.5;
-		--});
 		
 		local gasMaskProtection = classPlayer:GetBodyEquipment("GasMask");
 		if gasMaskProtection then
@@ -59,6 +53,8 @@ function clipTouchHandler:OnHumanoidTouch(humanoid, basePart, touchPart)
 				Dealer=self.Prefab;
 				DamageType="IgnoreArmor";
 			};
+
+			modAudio.Play("BurnTick"..math.random(1, 3), self.Prefab.PrimaryPart).PlaybackSpeed = math.random(50,70)/100;
 			
 			damagable:TakeDamagePackage(newDmgSrc);
 		end
