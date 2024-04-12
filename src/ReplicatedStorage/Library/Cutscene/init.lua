@@ -231,11 +231,13 @@ if RunService:IsClient() then
 			cutsceneObj = Cutscene.New(cutsceneName);
 			activeCutscenes[cutsceneName] = cutsceneObj;
 		end
-		cutsceneObj.modData = modData;
 
-		if cutsceneObj and cutsceneObj.Sequence[sceneName] then
+		local cutsceneSequence = cutsceneObj and cutsceneObj.Sequence;
+		if cutsceneSequence[sceneName] then
 			cutsceneObj.Status = Cutscene.Status.Playing;
-			cutsceneObj.Sequence[sceneName]();
+
+			cutsceneSequence.modData = modData;
+			cutsceneSequence[sceneName]();
 		else
 			Debugger:Warn("Cutscene>> Scene(",sceneName,") does not exist for (",cutsceneName,").");
 		end
