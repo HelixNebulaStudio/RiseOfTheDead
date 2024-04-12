@@ -960,7 +960,7 @@ function Raid:Initialize(roomData)
 				
 				if RunService:IsStudio() then
 					Debugger:Display{
-						HordeTimer=math.ceil((shared.HordeTimer -tick()));
+						["Studio HordeTimer"]=math.ceil((shared.HordeTimer -tick()));
 					}
 				end
 			until tick() >= shared.HordeTimer;
