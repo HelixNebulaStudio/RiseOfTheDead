@@ -312,6 +312,7 @@ library:Add{
 		
 		{Index=2; ItemId="walkietalkiebp";  Chance=commodityChance;};
 		{Index=2; ItemId="pistolammomagmod";  Chance=modBpChance;};
+		{Index=2; ItemId="flinchcushioning"; Chance=modBpChance;};
 		
 		{Index=3; ItemId="dualp250bp";  Chance=weaponBpChance;};
 		{Index=3; ItemId="pickaxe";  Chance=3/10;};
@@ -700,7 +701,6 @@ library:Add{
 
 		{Index=2; ItemId="explosives"; Recyclable=true; Quantity=1; Chance=1/3;};
 		{Index=2; ItemId="smgdeadeyemod"; Recyclable=true; Quantity=1; Chance=1/3;};
-		{Index=2; ItemId="flinchcushioning"; Recyclable=true; Quantity=1; Chance=1/3;};
 		{Index=2; ItemId="chainsawbp"; Recyclable=true; Quantity=1; Chance=1;};
 	};
 };
