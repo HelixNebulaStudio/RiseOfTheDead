@@ -698,7 +698,7 @@ library:Add{
 	Rewards={
 		{Index=1; ItemId="battery"; Quantity={Min=1; Max=3}; Chance=1;};
 
-		{Index=2; ItemId="explosives"; Recyclable=true; Quantity=1; Chance=1;};
+		{Index=2; ItemId="explosives"; Recyclable=true; Quantity=1; Chance=1/3;};
 		{Index=2; ItemId="smgdeadeyemod"; Recyclable=true; Quantity=1; Chance=1/3;};
 		{Index=2; ItemId="flinchcushioning"; Recyclable=true; Quantity=1; Chance=1/3;};
 		{Index=2; ItemId="chainsawbp"; Recyclable=true; Quantity=1; Chance=1;};
