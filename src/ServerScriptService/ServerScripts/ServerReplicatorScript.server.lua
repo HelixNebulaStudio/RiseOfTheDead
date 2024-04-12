@@ -418,17 +418,7 @@ bindPrimaryFire.Event:Connect(function(character, weaponModule, shotdata, target
 								Debugger:Warn("Can't damage", targetModel);
 							end
 						end
-						--if humanoid and dmgMulti then
-						--	humanoid = (targetModel:FindFirstChild("NpcStatus") and require(targetModel.NpcStatus)) or humanoid;
 
-							
-						--	--humanoid:TakeDamage(damage, character, nil, targetObject);
-							
-						--elseif targetModel:FindFirstChild("Destructible") then
-						--	local destructibleObject = require(targetModel.Destructible);
-						--	destructibleObject:TakeDamage(damage);
-							
-						--end
 					end
 				end
 				

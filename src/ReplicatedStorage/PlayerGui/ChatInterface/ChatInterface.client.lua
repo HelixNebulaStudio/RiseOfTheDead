@@ -674,7 +674,7 @@ UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
 					end
 				end
 				
-				inputBox.Text = "/"..cmdMatchs[matchIndexTab];
+				inputBox.Text = "/"..tostring(cmdMatchs[matchIndexTab]);
 				inputBox.CursorPosition = #inputBox.Text+1
 				matchIndexTab = matchIndexTab +1;
 				if matchIndexTab > #cmdMatchs then

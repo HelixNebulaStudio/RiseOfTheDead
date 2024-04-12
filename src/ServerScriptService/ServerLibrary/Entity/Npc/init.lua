@@ -434,7 +434,7 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	end
 	npcPrefab.Parent = workspace.Entity;
 	
-	npcModule:SetNetworkOwner();
+	npcModule:SetNetworkOwner(nil);
 	
 	-- task.spawn(function()
 	-- 	local npcPrefab = replicatedPrefabs.Npc:FindFirstChild(name);

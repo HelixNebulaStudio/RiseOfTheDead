@@ -931,6 +931,36 @@ function Player.new(playerInstance: Player)
 		classPlayer.OnIsAliveChanged:Fire(classPlayer.IsAlive);
 		classPlayer.OnCharacterSpawn:Fire(classPlayer.Character :: Model);
 		
+		local function processStatusLoop(id, status, tickPack)
+			if type(status) ~= "table" then return end;
+			local lib = modStatusLibrary:Find(id);
+			local statusClass = lib and lib.Module and require(lib.Module);
+			
+			local sync = false;
+			if statusClass and statusClass.OnTick then
+				sync = statusClass.OnTick(classPlayer, status, tickPack);
+				
+			elseif status.OnTick then
+				sync = status.OnTick(classPlayer, status, tickPack);
+				
+			end
+			
+			if (not classPlayer.IsAlive and status.ExpiresOnDeath) or (status.Expires and modSyncTime.GetTime() >= status.Expires) then
+				if status.OnExpire then
+					status:OnExpire();
+				end
+				
+				if statusClass and statusClass.OnExpire then
+					statusClass.OnExpire(classPlayer, status);
+				end;
+
+				classPlayer.Properties[id] = nil;
+
+			end
+
+			return sync;
+		end
+
 		if RunService:IsServer() then
 			--playerInstance.ReplicationFocus = classPlayer.RootPart;
 			CollectionService:AddTag(classPlayer.RootPart, "PlayerRootParts");
@@ -1217,44 +1247,20 @@ function Player.new(playerInstance: Player)
 				
 				classPlayer.Humanoid:SetAttribute("Oxygen", classPlayer.Properties.Oxygen);
 				
-				
 				local isPlayerInvisible = false;
 				for id, status in pairs(classPlayer.Properties) do
-					--Status loop
-					if type(status) == "table" then
-						local lib = modStatusLibrary:Find(id);
-						local statusClass = lib and lib.Module and require(lib.Module);
-						
-						if status.Invisible then isPlayerInvisible = true; end
-						
-						local sync = false;
-						if statusClass and statusClass.OnTick then
-							sync = statusClass.OnTick(classPlayer, status, tickPack);
-							
-						elseif status.OnTick then
-							sync = status.OnTick(classPlayer, status, tickPack);
-							
-						end
-						
-						if not classPlayer.IsAlive and status.ExpiresOnDeath then
-							classPlayer.Properties[id] = nil;
-							
-						elseif status.Expires and modSyncTime.GetTime() >= status.Expires then
-							if status.OnExpire then
-								status:OnExpire();
-							end
-							
-							classPlayer.Properties[id] = nil;
-							if statusClass and statusClass.OnExpire then
-								statusClass.OnExpire(classPlayer, status);
-							end;
-							
-						end
-						
-						if sync then
-							classPlayer:SyncProperty(id);
-						end;
-					end
+					if type(status) ~= "table" then continue end;
+					-- MARK: Server Status loop
+					local sync = false;
+
+					sync = processStatusLoop(id, status, tickPack);
+
+					if sync then
+						classPlayer:SyncProperty(id);
+					end;
+
+					--
+					if status.Invisible then isPlayerInvisible = true; end
 				end
 				
 				if classPlayer.Properties.IsInvisible ~= isPlayerInvisible and playerInstance.Character then
@@ -1382,34 +1388,9 @@ function Player.new(playerInstance: Player)
 				tickPack.s5 = s5;
 				
 				for id, status in pairs(classPlayer.Properties) do
-					--Status loop
-					if type(status) == "table" then
-						local lib = modStatusLibrary:Find(id);
-						local statusClass = lib and lib.Module and require(lib.Module);
-						
-						if statusClass and statusClass.OnTick then
-							statusClass.OnTick(classPlayer, status, tickPack);
-							
-						elseif status.OnTick then
-							status.OnTick(classPlayer, status, tickPack);
-							
-						end
-						
-						if not classPlayer.IsAlive and status.ExpiresOnDeath then
-							classPlayer.Properties[id] = nil;
-
-						elseif status.Expires and modSyncTime.GetTime() >= status.Expires then
-							if status.OnExpire then
-								status:OnExpire();
-							end
-							classPlayer.Properties[id] = nil;
-							if statusClass and statusClass.OnExpire then
-								statusClass.OnExpire(classPlayer, status)
-							end;
-
-						end
-
-					end
+					if type(status) ~= "table" then continue end;
+					-- MARK: Client Status loop
+					processStatusLoop(id, status, tickPack);
 				end
 				
 			end)

@@ -59,7 +59,7 @@ function Damagable.NewDamagable(model)
 			return Damagable.new(model, classPlayer, classPlayer.Humanoid);
 		end
 
-		local npcStatus = model:FindFirstChild("NpcStatus") and require(model.NpcStatus);
+		local npcStatus = model:FindFirstChild("NpcStatus") and require(model.NpcStatus :: ModuleScript);
 		if npcStatus then
 			return Damagable.new(model, npcStatus, npcStatus:GetHumanoid());
 		end
@@ -70,11 +70,10 @@ function Damagable.NewDamagable(model)
 		end
 
 		while model:GetAttribute("DestructibleParent") do model = model.Parent; end
-		local destructible = model:FindFirstChild("Destructible") and require(model.Destructible);
+		local destructible = model:FindFirstChild("Destructible") and require(model.Destructible :: ModuleScript);
 		if destructible then
 			return Damagable.new(model, destructible, destructible);
 		end
-		
 		
 	else
 		local humanoid = model:FindFirstChildWhichIsA("Humanoid");
@@ -97,12 +96,16 @@ function Damagable.NewDamagable(model)
 						return destructibleModule:GetAttribute("MaxHealth");
 						
 					end
+					
+					return;
 				end;
 			})
 			
 			return Damagable.new(model, destructibleProxy, destructibleProxy);
 		end
 	end
+
+	return;
 end
 
 function Damagable:CanDamage(attacker)
