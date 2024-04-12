@@ -1246,7 +1246,7 @@ local function renderStepped(camera, deltaTime)
 
 	if Cache.CrouchScanSkip > renderTick then
 	elseif modData:IsMobile() or Debugger.ClientFps <= 30 then
-		Cache.CrouchScanSkip = renderTick+ (modData:IsMobile() and 0.2) + (Debugger.ClientFps <= 30 and 0.3);
+		Cache.CrouchScanSkip = renderTick+ (modData:IsMobile() and 0.2 or 0) + (Debugger.ClientFps <= 30 and 0.3 or 0);
 	else
 		upRayHit, upRayEnd = crouchToggleCheck(rootPart.CFrame, true);
 	end
