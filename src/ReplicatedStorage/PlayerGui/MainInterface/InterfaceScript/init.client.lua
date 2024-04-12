@@ -97,7 +97,7 @@ local function updateOmniLabel()
 	local upTime = modSyncTime.ToString(os.time()-modSyncTime.GetUpTime());
 	
 	if modGlobalVars.EngineMode == "RiseOfTheDead" then
-		vText = "$fps fps\t"..(upTime.."\tRevived "..modGlobalVars.GameVersion.." Beta")
+		vText = "$fps fps\t"..(upTime.."\tRevived "..modGlobalVars.GameVersion.." Beta "..(modData:IsMobile() and "M" or ""))
 	else
 		vText = modGlobalVars.ModeVerLabel:gsub("$UpTime", upTime);
 	end

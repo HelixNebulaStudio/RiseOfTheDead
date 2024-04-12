@@ -199,7 +199,7 @@ if RunService:IsClient() then
 				return;
 			end;
 
-			if Debugger.ClientFps <= 20 then return end;
+			if Debugger.ClientFps <= 5 then return end;
 			
 			packet.SpawnPart = spawnPart;
 			InfoBubbles.Spawn(packet);

@@ -123,6 +123,8 @@ local Cache = {
 	AntiGravityForce = nil;
 	ViewModelErr = nil;
 	OldState = nil;
+
+	CrouchScanSkip = tick();
 };
 
 local CollisionModel={
@@ -1118,6 +1120,7 @@ end)
 
 
 local function renderStepped(camera, deltaTime)
+	local renderTick = tick();
 	if not workspace:IsAncestorOf(character) then return; end
 	loadInterface();
 	characterProperties.IsSpectating = (not CameraSubject.IsClientSubject or (not game.Players.CharacterAutoLoads and not characterProperties.IsAlive)) and modConfigurations.SpectateEnabled;
@@ -1241,7 +1244,9 @@ local function renderStepped(camera, deltaTime)
 	local upCollisionRay = Ray.new(rootPoint.Position, Vector3.new(0, upOffset, 0));
 	local upRayHit, upRayEnd;
 
-	if (modData:IsMobile() and math.fmod(checkCounter, 3) ~= 0) or (Debugger.ClientFps <= 30 and math.fmod(checkCounter, 2) ~= 0) then
+	if Cache.CrouchScanSkip > renderTick then
+	elseif modData:IsMobile() or Debugger.ClientFps <= 30 then
+		Cache.CrouchScanSkip = renderTick+ (modData:IsMobile() and 0.2) + (Debugger.ClientFps <= 30 and 0.3);
 	else
 		upRayHit, upRayEnd = crouchToggleCheck(rootPart.CFrame, true);
 	end
@@ -1251,7 +1256,13 @@ local function renderStepped(camera, deltaTime)
 		local newCamOffsetX = oldCamOffsetX;
 		local sideOffsets = 3.5;
 		local originCollisionRay = Ray.new(rootPoint.p, rootPoint.rightVector* (characterProperties.LeftSideCamera and -sideOffsets or sideOffsets));
-		local originRayHit, originRayEnd = workspace:FindPartOnRayWithWhitelist(originCollisionRay, environmentOnly, true);
+
+		local originRayHit, originRayEnd;
+		if modData:IsMobile() then
+		else
+			originRayHit, originRayEnd = workspace:FindPartOnRayWithWhitelist(originCollisionRay, environmentOnly, true);
+		end
+		 
 		newCamOffsetX = originRayHit ~= nil and ((originRayEnd-originCollisionRay.Origin)/(originCollisionRay.Direction.unit)).X or sideOffsets;
 		if oldCamOffsetX < newCamOffsetX then newCamOffsetX = lerp(oldCamOffsetX, newCamOffsetX, 0.2); end
 		oldCamOffsetX = newCamOffsetX;
@@ -1265,7 +1276,11 @@ local function renderStepped(camera, deltaTime)
 			newCamOffsetY = newCamOffsetY-2.5;
 		end
 
-		newCamOffsetY = lerp(oldCamOffsetY, newCamOffsetY, 0.2);
+		if modData:IsMobile() then
+		else
+			newCamOffsetY = lerp(oldCamOffsetY, newCamOffsetY, 0.2);
+		end
+		
 		oldCamOffsetY = newCamOffsetY;
 
 		local originOffset = cameraOriginOffset;
@@ -1391,7 +1406,11 @@ local function renderStepped(camera, deltaTime)
 					+ viewModel:VectorToObjectSpace(rootPart.CFrame:VectorToObjectSpace(rootPart.AssemblyLinearVelocity/200*characterProperties.VelocitySrength));
 
 
-				prevViewModel = prevViewModel:lerp(characterProperties.ViewModelPivot, 0.2);
+				if modData:IsMobile() then
+					prevViewModel = characterProperties.ViewModelPivot;
+				else
+					prevViewModel = prevViewModel:lerp(characterProperties.ViewModelPivot, 0.2);
+				end
 				local viewModelPivot = cameraCFrame * prevViewModel;
 				
 				character.RightUpperArm.RightShoulder.C0 = upperTorso.CFrame:ToObjectSpace(viewModelPivot * CFrame.new(1.25, 0, 0));
@@ -1462,11 +1481,6 @@ local function resetCameraEffects()
 	if modData.Blur then
 		modData.Blur.Size = 2;
 	end
-	--if modData.ColorCorrection then
-	--	modData.ColorCorrection.Brightness = 0;
-	--	modData.ColorCorrection.Contrast = 0;
-	--	modData.ColorCorrection.Saturation = 0.2;
-	--end
 end
 resetCameraEffects();
 
@@ -1656,9 +1670,9 @@ RunService.Heartbeat:Connect(function(step)
 	mouseProperties.XAngOffset = lerp(mouseProperties.XAngOffset, 0,  math.clamp( (mouseProperties.XAngOffset/1)*0.3 , 0.05, 0.3) );
 	mouseProperties.YAngOffset = lerp(mouseProperties.YAngOffset, 0, math.clamp( (mouseProperties.YAngOffset/1)*0.3 , 0.05, 0.3) );
 	mouseProperties.ZAngOffset = lerp(mouseProperties.ZAngOffset, 0, math.clamp( (mouseProperties.ZAngOffset/1)*0.3 , 0.05, 0.3) );
-	if math.abs(mouseProperties.XAngOffset) < 0.0001 then mouseProperties.XAngOffset = 0 end;
-	if math.abs(mouseProperties.YAngOffset) < 0.0001 then mouseProperties.YAngOffset = 0 end;
-	if math.abs(mouseProperties.ZAngOffset) < 0.0001 then mouseProperties.ZAngOffset = 0 end;
+	if math.abs(mouseProperties.XAngOffset) < 0.001 then mouseProperties.XAngOffset = 0 end;
+	if math.abs(mouseProperties.YAngOffset) < 0.001 then mouseProperties.YAngOffset = 0 end;
+	if math.abs(mouseProperties.ZAngOffset) < 0.001 then mouseProperties.ZAngOffset = 0 end;
 	
 	mouseProperties.FlinchInacc = lerp(mouseProperties.FlinchInacc, 0, 0.05);
 	if math.abs(mouseProperties.FlinchInacc) < 0.1 then mouseProperties.FlinchInacc = 0 end;
@@ -2081,7 +2095,7 @@ RunService.Heartbeat:Connect(function(step)
 			
 			local rootCFrame = rootPart.CFrame;
 			local wallCollisionRay, wallRayHit, wallRayEnd;
-			if modData:IsMobile() then
+			if modData:IsMobile() or Debugger.ClientFps <= 30 then
 
 			else
 				wallCollisionRay = Ray.new(rootCFrame.Position, rootCFrame.LookVector * (mouseY >0 and -6 or 6));

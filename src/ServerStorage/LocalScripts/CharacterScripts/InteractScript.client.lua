@@ -157,12 +157,12 @@ RunService.Heartbeat:Connect(function(delta)
 	
 	local beatTick = tick();
 
+	if heartbeatSkip > beatTick then return end;
 	if Debugger.ClientFps <= 30 then
 		heartbeatSkip = beatTick+delta;
 	elseif Debugger.ClientFps <= 15 then
 		heartbeatSkip = beatTick+(delta*2);
 	end
-	if heartbeatSkip > beatTick then return end;
 
 	mousePosition = UserInputService:GetMouseLocation();
 	

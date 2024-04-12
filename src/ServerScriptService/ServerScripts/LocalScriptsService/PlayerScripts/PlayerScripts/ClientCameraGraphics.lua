@@ -3,20 +3,14 @@ return function()
 	local localplayer = game.Players.LocalPlayer;
 	
 	local RunService = game:GetService("RunService");
-	local UserInputService = game:GetService("UserInputService");
 	local Lighting = game:GetService("Lighting");
-	local CollectionService = game:GetService("CollectionService");
 	
 	local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
-
-	local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 	local modVoxelSpace = require(game.ReplicatedStorage.Library.VoxelSpace);
 	local modTextureAnimations = require(game.ReplicatedStorage.Library.TextureAnimations);
 	local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
-	local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-	local modSettings = require(game.ReplicatedStorage.Library.Settings);
-	
+
 	--== Camera Handler
 	local camera = workspace.CurrentCamera;
 
@@ -157,7 +151,16 @@ return function()
 		end
 	end)
 	
-	RunService.RenderStepped:Connect(function()
+	local skipRender = tick();
+	RunService.RenderStepped:Connect(function(delta)
+		local renderTick = tick();
+		if skipRender > renderTick then
+			return;
+		end
+		if modData:IsMobile() then
+			skipRender = renderTick + (delta*2);
+		end
+
 		colorCorrection.Brightness = CameraEffects.Brightness:Get();
 		colorCorrection.Contrast = CameraEffects.Contrast:Get();
 		colorCorrection.Saturation = CameraEffects.Saturation:Get();
@@ -203,19 +206,17 @@ return function()
 	end)
 	
 	function CameraEffects:RefreshGraphics()
-		--colorCorrection.Enabled = modData.Settings.FilterColors ~= 1;
-		
 		if game.Lighting:FindFirstChild("SunRays") then
-			game.Lighting.SunRays.Enabled = modData.Settings.FilterSunRays ~= 1;
+			game.Lighting.SunRays.Enabled = modData:GetSetting("FilterSunRays") ~= 1;
 		end
 
-		if modData.Settings.GlobalShadows == nil then
+		if modData:GetSetting("GlobalShadows") == nil then
 			game.Lighting.GlobalShadows = true;
 		else
 			game.Lighting.GlobalShadows = false;
 		end
 
-		if modData.Settings.LessDetail == 1 then
+		if modData:GetSetting("LessDetail") == 1 then
 			task.spawn(function()
 				if workspace:FindFirstChild("Environment") and workspace.Environment:FindFirstChild("ExtraDetail") then
 					for _, obj in pairs(workspace.Environment.ExtraDetail:GetChildren()) do
@@ -293,14 +294,14 @@ return function()
 			end
 			
 			local isSmallObj = object.Size.X <= 5 and object.Size.Y <= 5 and object.Size.Z <= 5;
-			if modData.Settings.DisableSmallShadows == 1 and isSmallObj then
+			if modData:GetSetting("DisableSmallShadows") == 1 and isSmallObj then
 				object.CastShadow = false;
 			end
-			if modData.Settings.ObjMats == 1 then
+			if modData:GetSetting("ObjMats") == 1 then
 				object.Material = Enum.Material.SmoothPlastic;
 			end
 			
-			if modData.Settings.HideFarSmallObjects ~= 1 or object.Anchored ~= true then continue end;
+			if modData:GetSetting("HideFarSmallObjects") ~= 1 or object.Anchored ~= true then continue end;
 			
 			local isDynamicPlatform = false;
 			local parCheck = object.Parent;
@@ -368,7 +369,7 @@ return function()
 		if tick()-lastUpdateChunks < 1 then return end;
 		lastUpdateChunks = tick();
 
-		if modData.Settings.HideFarSmallObjects ~= 1 then return end;
+		if modData:GetSetting("HideFarSmallObjects") ~= 1 then return end;
 
 		local camVoxelPos = modVoxelSpace:GetVoxelPosition(camera.CFrame.Position/voxelSize);
 		

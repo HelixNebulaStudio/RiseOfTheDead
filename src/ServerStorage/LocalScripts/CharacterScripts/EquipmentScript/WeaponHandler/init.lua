@@ -953,7 +953,7 @@ function WeaponHandler:Equip(library, weaponId)
 				updateAmmoCounter();
 				if configurations.OnAmmoUpdate then configurations.OnAmmoUpdate(mainWeaponModel, modWeaponModule, properties.Ammo, properties.MaxAmmo); end
 				
-				if configurations.BulletEject and objectTable.CaseOutPoint and modData:GetSetting("DisableParticle3D") ~= true then
+				if configurations.BulletEject and objectTable.CaseOutPoint and modData:GetSetting("DisableParticle3D") ~= 1 then
 					if configurations.BulletEjectDelayTime == nil then
 						task.spawn(ejectShell, objectTable);
 					end
@@ -2111,7 +2111,7 @@ function WeaponHandler:Equip(library, weaponId)
 
 		track:GetMarkerReachedSignal("ShellEject"):Connect(function(paramString)
 			local objectTable = paramString == "Left" and objects.Left or objects.Right;
-			if configurations.BulletEject and objectTable.CaseOutPoint and modData:GetSetting("DisableParticle3D") ~= true then
+			if configurations.BulletEject and objectTable.CaseOutPoint and modData:GetSetting("DisableParticle3D") ~= 1 then
 				ejectShell(objectTable);
 			end
 		end)
