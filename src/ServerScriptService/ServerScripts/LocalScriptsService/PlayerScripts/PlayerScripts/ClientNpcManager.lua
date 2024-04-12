@@ -58,7 +58,7 @@ return function()
 	-- MARK: Deadbody Handler
 	local lastDbDespawnTick = tick();
 	CollectionService:GetInstanceAddedSignal("Deadbody"):Connect(function(prefab: Model)
-		local humanoid = prefab:FindFirstAncestorWhichIsA("Humanoid") :: Humanoid;
+		--local humanoid = prefab:FindFirstChildWhichIsA("Humanoid") :: Humanoid;
 		local parallelNpc = prefab:FindFirstChild("ParallelNpc");
 		if parallelNpc then
 			parallelNpc:Destroy();
@@ -80,6 +80,9 @@ return function()
 			lastDbDespawnTick = tick();
 			modDeadbodiesHandler:DespawnRequest(maxDeadbodies);
 		end
+	end)
+	task.delay(5, function()
+		modDeadbodiesHandler:DespawnRequest(modData:GetSetting("MaxDeadbodies"));
 	end)
 	
 	local function CheckForPrefab(npc, npcPrefab)

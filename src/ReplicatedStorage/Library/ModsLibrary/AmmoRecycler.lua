@@ -47,7 +47,7 @@ if RunService:IsServer() then
 		local roll = math.random(0, 1000)/1000;
 		if roll > dmgRecyclerValue then return end;
 		
-		local weaponModel = profile.EquippedTools.WeaponModels[1];
+		local weaponModel = profile.EquippedTools.WeaponModels and profile.EquippedTools.WeaponModels[1];
 		
 		if weaponModel and weaponModel.PrimaryPart then
 			local sound: Sound = modAudio.Play("AmmoFeed", weaponModel.PrimaryPart)

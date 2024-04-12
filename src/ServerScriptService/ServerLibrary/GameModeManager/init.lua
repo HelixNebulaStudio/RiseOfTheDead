@@ -676,7 +676,9 @@ function GameModeManager:ConnectPlayer(player, gameType, gameStage)
 	local rootPart = classPlayer.RootPart;
 	if rootPart == nil then return end;
 
-	local joinSuccess = gameManager.MenuRoom:AddPlayer(player);
+	local joinSuccess = gameManager.MenuRoom:CanAddPlayer(player);
+
+	gameManager.MenuRoom:AddPlayer(player);
 	gameManager:Refresh();
 
 	local profile = shared.modProfile:Get(player);

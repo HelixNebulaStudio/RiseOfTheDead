@@ -1090,7 +1090,7 @@ remoteEnterCampaign.OnServerEvent:Connect(function(player, followName)
 	end
 
 	if not isGameOnline then
-		if profile.GroupRank < 100 then
+		if profile == nil or (profile.GroupRank or 0) < 100 then
 			remotePromptWarning:FireClient(player, "Servers are currently under maintenance, please wait.", true);
 			return;
 		else

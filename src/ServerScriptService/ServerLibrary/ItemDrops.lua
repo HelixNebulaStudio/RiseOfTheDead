@@ -189,7 +189,7 @@ function ItemDrops.Info(itemId, isFullSearch)
 	return r;
 end
 
-function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawn)
+function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 	if modConfigurations.DisableItemDrops then warn("ItemDrops>> DisableItemDrops is enabled."); return end;
 	
 	local prefabName = itemDrop.Type or itemDrop.ItemId;
@@ -210,6 +210,7 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawn)
 	if newPrefab == nil then Debugger:Warn("Couldn't find item prefab for (",prefabName,")"); return end;
 	
 	newPrefab = newPrefab:Clone();
+	newPrefab:AddTag("ItemDrop");
 	
 	for a=1, 60 do if newPrefab.PrimaryPart then break; else task.wait() end end;
 	local primaryPart = newPrefab.PrimaryPart;
@@ -312,16 +313,9 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawn)
 	newPrefab.Destroying:Connect(function()
 		interactData:Destroy();
 	end)
-	--local parentChangeSignal;
-	--parentChangeSignal = newPrefab:GetPropertyChangedSignal("Parent"):Connect(function()
-	--	if newPrefab.Parent ~= nil then return end;
-	--	parentChangeSignal:Disconnect();
-	--	interactData:Destroy();
-	--	--interactData = nil;
-	--end)
-	
-	if despawn ~= false then
-		Debugger.Expire(newPrefab, tonumber(despawn) or 60);
+
+	if despawnTime ~= false then
+		Debugger.Expire(newPrefab, tonumber(despawnTime) or 60);
 	end
 	
 	if itemDrop.StorageItem then
@@ -339,7 +333,7 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawn)
 	interactData.OnPickUp = function(player)
 		local players = game.Players:GetPlayers();
 		deathTimer = deathTimer-(60/#players);
-		if despawn ~= false and deathTimer <= 0 then
+		if despawnTime ~= false and deathTimer <= 0 then
 			newPrefab:Destroy();
 		end
 	end;
@@ -456,6 +450,7 @@ function ItemDrops.ChooseDrop(rewardsLib)
 		Quantity=(winner.Quantity and (type(winner.Quantity) ~= "table" and winner.Quantity or random:NextInteger(winner.Quantity.Min, winner.Quantity.Max)) or 1);
 		OnceOnly=winner.OnceOnly;
 		Values=winner.Values;
+		Chance=rewards.Chance;
 	};
 end
 

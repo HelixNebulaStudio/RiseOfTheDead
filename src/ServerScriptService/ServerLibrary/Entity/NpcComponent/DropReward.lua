@@ -1,7 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local random = Random.new();
-
-local RunService = game:GetService("RunService");
+--==
+local CollectionService = game:GetService("CollectionService");
 
 local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
@@ -18,14 +17,18 @@ function Component.new(Npc)
 		local offset = self.DropRewardOffset or Vector3.zero;
 		local resourceTable = self.Configuration and self.Configuration.ResourceDrop or nil;
 		
-		if RunService:IsStudio() then
-			Debugger:Log(self.Name," dropped ",resourceTable and resourceTable.Id or nil);
-		end
-		
+		local itemDropCount = CollectionService:GetTagged("ItemDrop");
+
 		if resourceTable then
 			local itemDrop = modItemDrops.ChooseDrop(resourceTable);
 			if itemDrop then
-				modItemDrops.Spawn(itemDrop, cframe + offset + Vector3.new(random:NextNumber(-0.5, 0.5), -1.5, random:NextNumber(-0.5, 0.5)));
+				local despawnTime = 60;
+				modItemDrops.Spawn(
+					itemDrop,
+					cframe + offset + Vector3.new(math.random(-50, 50)/100 , -1.5, math.random(-50, 50)/100),
+					nil,
+					despawnTime
+				);
 			end
 		end
 		
@@ -36,7 +39,7 @@ function Component.new(Npc)
 			if regionDropRewardLib then
 				local itemDrop = modItemDrops.ChooseDrop(regionDropRewardLib);
 				if itemDrop then
-					modItemDrops.Spawn(itemDrop, cframe + offset + Vector3.new(random:NextNumber(-0.5, 0.5), -1.5, random:NextNumber(-0.5, 0.5)));
+					modItemDrops.Spawn(itemDrop, cframe + offset + Vector3.new(math.random(-50, 50)/100, -1.5, math.random(-50, 50)/100));
 				end
 			end
 		end

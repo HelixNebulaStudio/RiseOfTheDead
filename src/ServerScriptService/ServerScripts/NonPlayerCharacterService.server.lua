@@ -266,12 +266,18 @@ function InitializeSpawner(spawnerModule)
 		
 		self.IsSpawning = true;
 		
+		local naturalSpawnLimit = modConfigurations.NaturalSpawnLimit;
 		task.spawn(function()
 			local minCount = math.max(self.MinAmount or 1, self.MinAmount == nil and math.floor(defaultMaxAmount/2) or 0);
 			local maxCount = math.max(self.MaxSpawnSpaceAmount, defaultMaxAmount, minCount)
 			self.MaxAmount = math.clamp(math.ceil(playerCount * (defaultMaxAmount/4)), minCount, maxCount);
 
 			local respawnAmt = (self.MaxAmount - #self.Active);
+
+			if #modNpc.NpcModules > naturalSpawnLimit then
+				respawnAmt = 0;
+			end
+
 			if respawnAmt > 0 then
 				for a=1, respawnAmt do
 					self:Activate();

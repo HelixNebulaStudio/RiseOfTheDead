@@ -21,7 +21,7 @@ function DeadbodiesHandler:DespawnRequest(maxBodies: number?)
 
 	for name, list in pairs(groups) do
 		table.sort(list, function(model)
-			return model:GetAttribute("DeadbodyTick") < model:GetAttribute("DeadbodyTick");
+			return (model:GetAttribute("DeadbodyTick") or 0) < (model:GetAttribute("DeadbodyTick") or 1);
 		end)
 		while #list > (maxBodies or 64) do
 			local prefab = table.remove(list, 1);
@@ -32,6 +32,7 @@ function DeadbodiesHandler:DespawnRequest(maxBodies: number?)
 				task.desynchronize();
 			else
 				prefab:Destroy();
+				task.wait();
 			end
 		end
 	end

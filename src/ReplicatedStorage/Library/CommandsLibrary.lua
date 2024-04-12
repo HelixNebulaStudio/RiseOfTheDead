@@ -1017,7 +1017,7 @@ Commands["npcstats"] = {
 	UsageInfo = "/npcstats";
 	Function = function(player, args)
 		local moduleNpc = game.ServerScriptService.ServerLibrary.Entity.Npc;
-
+	
 		for k,v in pairs(moduleNpc:GetAttributes()) do
 			print(k,v);
 			shared.Notify(player, k.." = "..tostring(v), "Inform");

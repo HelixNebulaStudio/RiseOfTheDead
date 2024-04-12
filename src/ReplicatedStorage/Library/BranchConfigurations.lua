@@ -403,6 +403,7 @@ function Branches.GetInteractableLocation(interactableName)
 	if interactPart and info then
 		return info.In, interactPart.Position;
 	end
+	return;
 end
 
 function Branches.GetWorldOfSpawn(spawnId)
@@ -411,6 +412,7 @@ function Branches.GetWorldOfSpawn(spawnId)
 			return worldName;
 		end
 	end
+	return;
 end
 
 function Branches.GetWorldDisplayName(name)
@@ -424,12 +426,15 @@ function Branches.GetWorldName(placeId)
 		end
 	end
 	warn(script.Name..">>  Unable to find matching world with id:(",placeId,").");
+
+	return;
 end
 
 function Branches.GetWorldId(name)
 	if Branches.CurrentBranch.Worlds[name] then
 		return Branches.CurrentBranch.Worlds[name];
 	end
+	return;
 end
 
 function Branches.GetWorld()
@@ -511,6 +516,7 @@ elseif Branches.WorldInfo.Type == Branches.WorldTypes.General or Branches.WorldI
 		modConfigurations.Set("SpawnProtectionTimer", 120);
 		modConfigurations.Set("DisableMapItems", false);
 		modConfigurations.Set("ExpireDeployables", true);
+		modConfigurations.Set("NaturalSpawnLimit", 200);
 		
 	else
 		modConfigurations.Set("SpectateEnabled", true);

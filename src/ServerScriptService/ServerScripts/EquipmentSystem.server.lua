@@ -322,7 +322,7 @@ local function equipTool(player, paramPacket)
 						motor = toolLib.Module[weldName]:Clone();
 						
 					end
-					assert(motor, "Missing ToolGrip");
+					assert(motor, "Missing ToolGrip for "..itemId);
 
 					local toolModelName = prefabName;
 					if weldName == "RightToolGrip" then

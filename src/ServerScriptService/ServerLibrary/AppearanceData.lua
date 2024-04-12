@@ -6,11 +6,9 @@ local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modAppearanceLibrary = require(game.ReplicatedStorage.Library.AppearanceLibrary);
 local modCustomizeAppearance = require(game.ReplicatedStorage.Library.CustomizeAppearance);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
-local modMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
-local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary.ClothingProperties);
 
 local modPrefabManager = require(game.ServerScriptService.ServerLibrary.PrefabManager);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
@@ -20,7 +18,6 @@ local AppearanceData = {};
 AppearanceData.__index = AppearanceData;
 
 local remoteBodyEquipmentsSync = modRemotesManager:Get("BodyEquipmentsSync");
-local cosmeticsPrefabs = game.ServerStorage:WaitForChild("PrefabStorage"):WaitForChild("Cosmetics");
 
 --== Script;
 function AppearanceData.new(player, saveData)
@@ -42,7 +39,6 @@ function AppearanceData:Update(storage)
 	local modProfile = shared.modProfile;
 	local profile = modProfile:Get(self.Player);
 	local classPlayer = modPlayers.Get(self.Player);
-	local playerProperties = classPlayer.Properties;
 	local bodyEquipmentsModule = {};
 	
 	local wardrobeStorage = modStorage.Get("Wardrobe", self.Player);
@@ -103,7 +99,7 @@ function AppearanceData:Update(storage)
 		local clothingPackage = modClothingLibrary:Find(storageItem.ItemId);
 		if clothingPackage and clothingPackage.NewToolLib then
 			local clothingClass = profile:GetItemClass(storageItemId);
-			local clothingClassMeta = getmetatable(clothingClass);
+			local _clothingClassMeta = getmetatable(clothingClass);
 
 			if clothingClass then
 				classPlayer.ClothingPropertiesCache[storageItemId] = clothingClass;
@@ -249,7 +245,6 @@ function AppearanceData:Update(storage)
 		end
 	end
 	
-	local character = self.Player.Character;
 	if character == nil then return end;
 	
 	local accessoryPrefabs = modCustomizeAppearance.RefreshIndex(character);
@@ -283,7 +278,7 @@ function AppearanceData:SetEquip(group, packageId, storageItem)
 	
 	if exist then return end;
 	
-	local accessoryData, accessoryGroup = modAppearanceLibrary:Get(group, packageId);
+	local accessoryData, _accessoryGroup = modAppearanceLibrary:Get(group, packageId);
 	if accessoryData == nil then Debugger:Warn("Accessory "..packageId.." ("..group..") does not exist."); end
 
 	local prefabGroup = modAppearanceLibrary:GetPrefabGroup(group, packageId);

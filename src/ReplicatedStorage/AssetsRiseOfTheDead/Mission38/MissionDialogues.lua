@@ -4,60 +4,113 @@ local RunService = game:GetService("RunService");
 
 --=
 local Dialogues = {
+	Patrick={};
+	Robert={};
 	Rachel={};
 };
 
-local missionId = 75;
+local missionId = 38;
 --==
+
+-- !outline: Patrick Dialogues
+Dialogues.Patrick.Dialogues = function()
+	return {
+		{CheckMission=missionId; Tag="notRight_start1"; Face="Disgusted";
+			Dialogue="I will avenge him.";
+			Reply="Alright, well, don't let your emotions get to you."};
+		{CheckMission=missionId; Tag="notRight_start2"; Face="Disgusted";
+			Dialogue="He was a good man.";
+			Reply="Salute to that.."};
+	};
+end
+
+-- !outline: Robert Dialogues
+Dialogues.Robert.Dialogues = function()
+	return {
+		{Tag="notRight_fast"; Face="Surprise";
+			Dialogue="Uhhh.. How were you running so fast?!";
+			Reply="Whaat? I was?"};
+		{Tag="notRight_where"; Face="Question";
+			Dialogue="And where did you disapeared to?!";
+			Reply="I was.. I err.. I heard a cry for help from another community."};
+		{Tag="notRight_bandits"; Face="Joyful";
+			Dialogue="We thought the bandits got to you!!";
+			Reply="Oh err.. They didn't. Heh heh, I got away."};
+		{Tag="notRight_worried"; Face="Worried";
+			Dialogue="We were worried sick!";
+			Reply="Oh.. sorry. Stay here, this is a nice place."};
+	};
+end
 
 -- !outline: Rachel Dialogues
 Dialogues.Rachel.Dialogues = function()
 	return {
-		{Tag="medbre_init";
-			Face="Worried"; Reply="Stan saved my life, I was trapped and he heard me cried for help. I miss him so much..";};
-
-		{CheckMission=missionId; Tag="medbre_start"; Dialogue="Hey, it's okay. I have some news about Stan.";
-			Face="Worried"; Reply="News.. about Stan?";
-			FailResponses = {
-				{Reply="Hold on, I'm quite busy right now.."};
-			};	
-		};
-		{Tag="medbre_start2"; Dialogue="Yes, so apparently Stan is still alive.";
-			Face="Disbelief"; Reply="..."};
+		{Tag="notRight_stan"; Face="Disgusted";
+			Dialogue="I'm sorry, but.. but Stan was murdered by the bandits.";
+			Reply="I can't believe it has come to this.."};
 	};
 end
 
 if RunService:IsServer() then
+	-- !outline: Patrick Handler
+	Dialogues.Patrick.DialogueHandler = function(player, dialog, data, mission)
+		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+
+		if mission.Type == 2 then -- Available
+			dialog:SetInitiate("I am really sorry for what happen to Stan. I did not expect that.", "Disgusted");
+			dialog:AddChoice("notRight_start1", function(dialog)
+				modMission:StartMission(player, missionId);
+			end)
+			dialog:AddChoice("notRight_start2", function(dialog)
+				modMission:StartMission(player, missionId);
+			end)
+
+		end
+	end
+
+	-- !outline: Robert Handler
+	Dialogues.Robert.DialogueHandler = function(player, dialog, data, mission)
+		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+
+		if mission.Type == 1 then -- Active
+			dialog:SetInitiate("Oh.. Err.. Hey, $PlayerName", "Surprise");
+			if mission.ProgressionPoint == 6 then
+				modMission:Progress(player, missionId, function(mission)
+					if mission.ProgressionPoint < 7 then mission.ProgressionPoint = 7; end;
+				end)
+			end
+
+			dialog:AddChoice("notRight_fast", function(dialog)
+				dialog:AddChoice("notRight_where", function(dialog)
+					dialog:AddChoice("notRight_bandits", function(dialog)
+						dialog:AddChoice("notRight_worried", function(dialog)
+							modMission:CompleteMission(player, missionId);
+						end)
+					end)
+				end)
+			end)
+		end
+	end
+	
 	-- !outline: Rachel Handler
 	Dialogues.Rachel.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 
-		if mission.Type == 2 then -- Available;
-			dialog:SetInitiateTag("medbre_init");
+		if mission.Type == 1 then -- Active
+			dialog:SetInitiate("Umm, $PlayerName. Where's Stan?", "Worried");
 
-			dialog:AddChoice("medbre_start", function(dialog)
-				modMission:StartMission(player, missionId);
-				
-				modMission:CompleteMission(player, 75);
-				
-				modMission:Progress(player, missionId, function(mission)
-					if mission.ProgressionPoint <= 1 then
-						mission.ProgressionPoint = 1;
-					end
-				end);
-			end)
-			
-			
-		elseif mission.Type == 1 then -- Active
 			if mission.ProgressionPoint == 1 then
-				
+				dialog:AddChoice("notRight_stan", function(dialog)
+					modMission:Progress(player, missionId, function(mission)
+						if mission.ProgressionPoint < 2 then
+							mission.ProgressionPoint = 2;
+						end;
+					end)
+				end)
 			end
-			
-		elseif mission.Type == 4 then -- Failed
-			
+
 		end
 	end
-
 end
 
 

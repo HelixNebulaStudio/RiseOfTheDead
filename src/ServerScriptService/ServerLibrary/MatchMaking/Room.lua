@@ -54,7 +54,7 @@ function Room:IsFull()
 end
 
 function Room:CanAddPlayer(player)
-	if player == nil then Debugger:Warn("Missing player."); return end;
+	if player == nil then Debugger:Warn("Missing player."); return "Missing Player"; end;
 	if self:IsReady() then
 		return "Room starting";
 	elseif self:IsFull() then

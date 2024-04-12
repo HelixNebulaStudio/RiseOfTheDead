@@ -1487,20 +1487,13 @@ RunService.Stepped:Connect(function(total, delta)
 	local stepTick = tick();
 	characterProperties.IsAlive = character:GetAttribute("IsAlive") == true;
 
-	if Debugger.ClientFps <= 30 then
-		steppedSkip = stepTick+delta;
-	elseif Debugger.ClientFps <= 15 then
-		steppedSkip = stepTick+(delta*2);
-	end
-	if steppedSkip > stepTick then return end;
-
 	local rootCframe = rootPart.CFrame;
 	
 	if characterProperties.IsAlive then
 		local activeBodyForce = characterProperties.BodyForce:Get();
 		if activeBodyForce then
 			charBodyForce.Enabled = true;
-			charBodyForce.Force = activeBodyForce + Vector3.new(0, workspace.Gravity * rootPart:GetMass(), 0);
+			charBodyForce.Force = activeBodyForce + Vector3.new(0, workspace.Gravity * rootPart.AssemblyMass, 0);
 		else
 			charBodyForce.Enabled = false;
 		end
@@ -1508,6 +1501,14 @@ RunService.Stepped:Connect(function(total, delta)
 		charBodyForce.Enabled = false;
 	end
 	
+
+	if Debugger.ClientFps <= 30 then
+		steppedSkip = stepTick+delta;
+	elseif Debugger.ClientFps <= 15 then
+		steppedSkip = stepTick+(delta*2);
+	end
+	if steppedSkip > stepTick then return end;
+
 	local rayDir = Vector3.new(0, -16, 0);
 	
 	local feetY = rootCframe.p.Y-2

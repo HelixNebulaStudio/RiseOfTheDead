@@ -830,7 +830,9 @@ function Profile:Load(loadOverwrite)
 				
 				if not loaded then
 					self[key] = data;
-					Debugger:Log("key",key,"setload");
+					if RunService:IsStudio() then
+						Debugger:Log("[Studio] key",key,"setload");
+					end
 				end
 				
 			end

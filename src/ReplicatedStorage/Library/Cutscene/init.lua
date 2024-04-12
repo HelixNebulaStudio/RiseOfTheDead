@@ -233,10 +233,19 @@ if RunService:IsClient() then
 		end
 
 		local cutsceneSequence = cutsceneObj and cutsceneObj.Sequence;
-		if cutsceneSequence[sceneName] then
+		if cutsceneSequence and cutsceneSequence[sceneName] then
 			cutsceneObj.Status = Cutscene.Status.Playing;
 
 			cutsceneSequence.modData = modData;
+			
+			local modInterface = modData:GetInterfaceModule();
+			while modInterface == nil do
+				modInterface = modData:GetInterfaceModule();
+				task.wait();
+			end
+			
+			cutsceneSequence.modInterface = modInterface;
+
 			cutsceneSequence[sceneName]();
 		else
 			Debugger:Warn("Cutscene>> Scene(",sceneName,") does not exist for (",cutsceneName,").");

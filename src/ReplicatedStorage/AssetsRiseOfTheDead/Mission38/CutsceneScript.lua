@@ -15,7 +15,7 @@ if RunService:IsServer() then
 	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 

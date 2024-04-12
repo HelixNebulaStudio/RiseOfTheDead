@@ -96,6 +96,7 @@ Configurations.Set("SpawnProtectionTimer", 10);
 Configurations.Set("ExpireDeployables", false);
 
 Configurations.Set("WithererSpawnLogic", false);
+Configurations.Set("NaturalSpawnLimit", 999);
 
 --== Events;
 local Months = {"January"; "Feburary"; "March"; "April"; "May"; "June"; "July"; "August"; "September"; "October"; "November"; "December";};
