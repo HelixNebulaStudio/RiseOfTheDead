@@ -3,9 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 
-local remoteInteractionUpdate = modRemotesManager:Get("InteractionUpdate");
 --=
 local Dialogues = {
 	Rachel={};
@@ -15,7 +13,9 @@ local Dialogues = {
 };
 
 local missionId = 75;
-local cache = {};
+local cache = {
+	SecondBribe=nil;
+};
 
 --==
 
@@ -66,7 +66,7 @@ Dialogues.Rachel.Dialogues = function()
 		{Tag="medbre_final"; 
 			Face="Happy"; Reply="So how did it go?";};
 		{Tag="medbre_insights"; Dialogue="Here's the insight Dr. Deniski written. *Gives report*";
-			Face="Skeptical"; Reply="Fasinating.. We might have a breakthrough here, but I'll need some time to figure out the chemistry.."};
+			Face="Skeptical"; Reply="fascinating.. We might have a breakthrough here, but I'll need some time to figure out the chemistry.."};
 		{Tag="medbre_end"; Dialogue="Sure, if you need anything let me know!";
 			Face="Confident"; Reply="Come back after a while and I'll let you know what I need."};
 	};
@@ -98,7 +98,7 @@ Dialogues["Dr. Deniski"].Dialogues = function()
 		{Tag="medbre_init";
 			Face="Confident"; Reply="привет, my friend..\n\nThat means hello, haha!";};
 		{Tag="medbre_showReport"; Dialogue="Hey doc, I have some blood reports of infector blood and need some insight on it. Maybe you could help us?\n\n*Shows reports*";
-			Face="Suspicious"; Reply="Oh sure.. Hmmm... Very interesting..\nSo it's parasites, but they are in like a hibernation state because they aren't multiplying much..\nAnd during this state, they seem to be producing some kind of regenerative enzymes byproduct.."};
+			Face="Suspicious"; Reply="Oh sure.. Hmmm... Very interesting..\nSo they are parasites, but they are in like a hibernating state because they aren't multiplying much..\nAnd during this state, they seem to be producing some kind of regenerative enzymes byproduct.."};
 		{Tag="medbre_showReport"; Dialogue="...";
 			Face="Joyful"; Reply="Haha, don't worry. I'll write it down, this is definately huge discover!\n\n*Writing up summary report*"};
 		{Tag="medbre_showReport2"; Dialogue="Wait, but how does this compare to zombie blood?";
@@ -334,30 +334,56 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 			local playerSave = shared.modProfile:Get(player):GetActiveSave();
 
 			if cache.SecondBribe then
+				local bribeCost = 5000;
 				dialog:SetInitiate("You know what.. Another $5'000 and I'll leave you alone.");
-				dialog:AddDialog({
-					Face="Hehe";
-					Dialogue=".. *Give $5'000 to bandit*";
-					Reply="Alright, haha, see you next time.";
-				}, function(dialog)
-					dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
-					
-					patrolBanditNpcModule.Interactable.Parent = nil;
 
-					playerSave:AddStat("Money", -10000);
-					
-					task.wait(4);
-					patrolBanditNpcModule.Movement:Move(Vector3.new(508.548, 136.42, -1184.096));
-					task.wait(4);
-					patrolBanditNpcModule:TeleportHide();
-
-					modMission:Progress(player, missionId, function(mission)
-						if mission.ProgressionPoint <= 11 then
-							mission.ProgressionPoint = 11;
-						end
+				if playerSave:GetStat("Money") >= bribeCost then
+					dialog:AddDialog({
+						Face="Hehe";
+						Dialogue=".. *Give $5'000 to bandit*";
+						Reply="Alright, haha, see you next time.";
+					}, function(dialog)
+						dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
+						
+						patrolBanditNpcModule:ToggleInteractable(false);
+	
+						playerSave:AddStat("Money", -bribeCost);
+						
+						task.wait(4);
+						patrolBanditNpcModule.Movement:Move(Vector3.new(508.548, 136.42, -1184.096));
+						task.wait(4);
+						patrolBanditNpcModule:TeleportHide();
+	
+						modMission:Progress(player, missionId, function(mission)
+							if mission.ProgressionPoint <= 11 then
+								mission.ProgressionPoint = 11;
+							end
+						end);
 					end);
-				end);
 
+				else
+					dialog:AddDialog({
+						Face="Serious";
+						Dialogue=".. I don't have any more money.";
+						Reply="Ugh.. fine.";
+					}, function(dialog)
+						dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
+						
+						patrolBanditNpcModule:ToggleInteractable(false);
+	
+						task.wait(4);
+						patrolBanditNpcModule.Movement:Move(Vector3.new(508.548, 136.42, -1184.096));
+						task.wait(4);
+						patrolBanditNpcModule:TeleportHide();
+	
+						modMission:Progress(player, missionId, function(mission)
+							if mission.ProgressionPoint <= 11 then
+								mission.ProgressionPoint = 11;
+							end
+						end);
+					end)
+				end
+				
 				return;
 			end
 			
@@ -444,7 +470,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 								Dialogue="Not sure, it's probably unimportant..";
 								Reply=".. Alright.. I'll leave you to it..";
 							}, function(dialog)
-								patrolBanditNpcModule.Interactable.Parent = nil;
+								patrolBanditNpcModule:ToggleInteractable(false);
 								patrolBanditNpcModule.Movement:Move(Vector3.new(508.548, 136.42, -1184.096));
 								task.wait(3);
 								
@@ -509,32 +535,34 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 						}, function(dialog)
 							dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
 							
-							dialog:AddDialog({
-								Face="Serious";
-								Dialogue="Fine, here.. *Give $10'000 to bandit*";
-								Reply="Alright, you get 5 minutes!";
-							}, function(dialog)
-								playerSave:AddStat("Money", -10000);
+							local bribeCost = 10000;
+							if playerSave:GetStat("Money") >= bribeCost then
+								dialog:AddDialog({
+									Face="Serious";
+									Dialogue="Fine, here.. *Give $10'000 to bandit*";
+									Reply="Alright, you get 5 minutes!";
+								}, function(dialog)
+									playerSave:AddStat("Money", -bribeCost);
+	
+									local patrolBanditNpcModule = dialog:GetNpcModule();
+									patrolBanditNpcModule:ToggleInteractable(false);
+									
+									cache.SecondBribe = true;
+									task.wait(4);
+									patrolBanditNpcModule.Movement:Move(Vector3.new(508.548, 136.42, -1184.096));
+									task.wait(4)
+									patrolBanditNpcModule.Chat(player, "Wait.. You know what..", nil, 128);
+									patrolBanditNpcModule.Movement:Move(Vector3.new(507.441, 136.42, -1112.584));
+									
+									task.wait(4);
+									patrolBanditNpcModule:ToggleInteractable(true);
+									
+									shared.OnDialogueHandler(player, "talk", {
+										NpcModel=patrolBanditNpcModule.Prefab;
+									});
+								end);
+							end
 
-								local patrolBanditNpcModule = dialog:GetNpcModule();
-								patrolBanditNpcModule.Interactable.Parent = nil;
-								
-								cache.SecondBribe = true;
-								task.wait(4);
-								patrolBanditNpcModule.Movement:Move(Vector3.new(508.548, 136.42, -1184.096));
-								task.wait(4)
-								patrolBanditNpcModule.Chat(player, "Wait.. You know what..", nil, 128);
-								patrolBanditNpcModule.Movement:Move(Vector3.new(507.441, 136.42, -1112.584));
-								
-								task.wait(4);
-								patrolBanditNpcModule.Interactable.Parent = patrolBanditNpcModule.RootPart;
-								
-								shared.OnDialogueHandler(player, "talk", {
-									NpcModel=patrolBanditNpcModule.Prefab;
-								});
-								--remoteInteractionUpdate:FireClient(player, patrolBanditNpcModule.Interactable, patrolBanditNpcModule.RootPart, "interact");
-							end);
-							
 							dialog:AddDialog({
 								Face="Frustrated";
 								Dialogue="Noo way, that's too much!";
