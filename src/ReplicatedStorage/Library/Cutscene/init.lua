@@ -12,6 +12,8 @@ Cutscene.ActiveCutscenes = {};
 
 local RunService = game:GetService("RunService");
 
+local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+
 local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
 local remotePlayClientScene = remotes:WaitForChild("Cutscene"):WaitForChild("PlayClientScene");
 local remoteContinueScene = remotes:WaitForChild("Cutscene"):WaitForChild("ContinueScene");
@@ -65,6 +67,7 @@ function CutsceneSequence.new(cutscene)
 	function sequenceMeta:NewScene(sceneName, sceneFunc)
 		if RunService:IsServer() then
 			sequence[sceneName] = function()
+				if modBranchConfigs.IsWorld("MainMenu") then return end;
 				if #cutscene.Players <= 0 then Debugger:Warn("No players in cutscene:",cutscene); return end;
 				local completed = {};
 				local allComplete = false;
