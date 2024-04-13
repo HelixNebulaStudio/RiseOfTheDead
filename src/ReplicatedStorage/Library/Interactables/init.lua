@@ -964,6 +964,9 @@ function Interactable.Storage(moduleScript, storageId, storageName, configuratio
 			lastInvoke = tick();
 			
 			local storage = remoteOpenStorageRequest:InvokeServer(self.Object, self.Script);
+			if typeof(storage) ~= "table" then
+				Debugger:Warn("Fail to load storage:", storage);
+			end
 			if storage then library.modData.SetStorage(storage); end
 			
 			if library.modData.Storages[self.StorageId] == nil then
