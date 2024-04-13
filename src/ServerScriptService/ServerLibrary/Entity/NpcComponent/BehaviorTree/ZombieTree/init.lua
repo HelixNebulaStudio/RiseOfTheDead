@@ -154,7 +154,7 @@ return function(self)
 					if self.HordeAttack == true then
 						docileDuration = 0;
 
-					elseif modVector:InCenter(self.RootPart.Position, self.Target:GetPivot().Position, 15) then
+					elseif modVector:InCenter(self.RootPart.Position, self.Target:GetPivot().Position, 8) then
 						docileDuration = math.random(0, 30)/100;
 						
 					end
