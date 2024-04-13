@@ -226,13 +226,18 @@ return function(self)
 			self.Wield.ToolModule.Properties.Ammo = self.Wield.ToolModule.Configurations.AmmoLimit-3;
 			self.Wield.ToolModule.Properties.MaxAmmo = self.Wield.ToolModule.Configurations.MaxAmmoLimit;
 			task.wait(1);
+			if self.IsDead then return tree.Failure end;
 			self.Wield.ReloadRequest();
 			task.wait(self.Wield.ToolModule.Properties.ReloadSpeed);
+			if self.IsDead then return tree.Failure end;
 			self.Wield.ReloadRequest();
 			task.wait(self.Wield.ToolModule.Properties.ReloadSpeed);
+			if self.IsDead then return tree.Failure end;
 			self.Wield.ReloadRequest();
 			task.wait(self.Wield.ToolModule.Properties.ReloadSpeed);
+			if self.IsDead then return tree.Failure end;
 			task.wait(2);
+			if self.IsDead then return tree.Failure end;
 			
 			self.Wield.ToolModule.Properties.Ammo = self.Wield.ToolModule.Configurations.AmmoLimit;
 			self.Wield.ToolModule.Properties.MaxAmmo = self.Wield.ToolModule.Configurations.MaxAmmoLimit;
