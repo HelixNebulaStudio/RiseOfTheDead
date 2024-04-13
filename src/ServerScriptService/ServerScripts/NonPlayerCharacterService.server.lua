@@ -258,13 +258,13 @@ function InitializeSpawner(spawnerModule)
 		self.Position = spawnArea.Position;
 	end
 	
-	spawnerObject.IsSpawning = false;
+	spawnerObject.IsSpawning = tick()-1;
 	spawnerObject.RequestSpawn = function(self)
-		if self.IsSpawning then return end;
+		if self.IsSpawning > tick() then return end;
 		local playerCount = #game.Players:GetPlayers();
 		if playerCount <= 0 and spawnerObject.ForceMin ~= true then return end;
 		
-		self.IsSpawning = true;
+		self.IsSpawning = tick()+1;
 		
 		local naturalSpawnLimit = modConfigurations.NaturalSpawnLimit or 999;
 		task.spawn(function()
@@ -282,11 +282,11 @@ function InitializeSpawner(spawnerModule)
 				for a=1, respawnAmt do
 					self:Activate();
 					task.wait();
+					self.IsSpawning = tick()+1;
 					if #modNpc.NpcModules > naturalSpawnLimit then break; end;
 				end
 			end;
 			
-			self.IsSpawning = false;
 		end)
 	end
 	
