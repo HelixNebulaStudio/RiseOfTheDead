@@ -15,7 +15,7 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local remoteSetClientProperties = modRemotesManager:Get("SetClientProperties");
 local remoteReplication = modRemotesManager:Get("Replication");
 
-local camera: Camera = workspace.CurrentCamera;
+local _camera: Camera = workspace.CurrentCamera;
 local replicateFolder;
 --==
 

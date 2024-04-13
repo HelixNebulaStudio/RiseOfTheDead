@@ -25,6 +25,8 @@ return function(self)
 	
 	local targetHumanoid, targetRootPart: BasePart;
 	local cache = {};
+	cache.LastLeap = nil;
+	cache.LeapFailCounter = nil;
 	cache.AttackCooldown = tick();
 	
 	local linVel: LinearVelocity = Instance.new("LinearVelocity");
@@ -138,7 +140,7 @@ return function(self)
 	--arcTracer.DebugArc = true;
 	arcTracer.RayRadius = 1;
 	arcTracer.Acceleration = Vector3.new(0, -workspace.Gravity, 0);
-	arcTracer.Delta = 1/6;
+	arcTracer.Delta = 1/7;
 	
 	local downAng = CFrame.Angles(-math.pi/2, 0, 0);
 	
@@ -168,7 +170,11 @@ return function(self)
 		local velocity = arcTracer:GetVelocityByTime(origin, targetPoint, duration);
 
 		local angle = Vector3.yAxis:Angle(velocity);
-		if angle >= 1 or angle <= 0.1 then cache.LeapFailCounter = cache.LeapFailCounter +1; return modLogicTree.Status.Failure end;
+		if angle >= 1.3 or angle <= 0.1 then cache.LeapFailCounter = cache.LeapFailCounter +1; return modLogicTree.Status.Failure end;
+		
+		local velMagnitude = velocity.Magnitude;
+		if velMagnitude > 200 then return tree.Failure end;
+
 		cache.LeapFailCounter = 0;
 
 		self.Move:SetMoveSpeed("set", "leap", 0, 9);

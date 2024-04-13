@@ -97,7 +97,7 @@ function Movement.new(parallelNpc)
 				path:ComputeAsync(rootPartPos, targetPos);
 			end)
 			if not s then
-				Debugger:Warn("Handled Exception:", e);
+				Debugger:Warn("Handled Exception:", prefab, e);
 			end
 
 			if parallelNpc.IsDead then return end;
