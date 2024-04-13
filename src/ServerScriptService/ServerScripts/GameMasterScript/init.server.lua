@@ -596,8 +596,7 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 	--== Opening virtual storage;
 	local storageItem = interactObject;
 	if typeof(storageItem) == "table" and storageItem.ItemId then
-		Debugger:Log("Requesting for item's storage.");
-		
+
 		local usableItemLib = modUsableItems:Find(storageItem.ItemId);
 		if usableItemLib.PortableStorage then
 			local profile = modProfile:Get(player);
@@ -610,7 +609,7 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 			
 			--local cacheStorages = profile:GetCacheStorages();
 			--local storage = storageId and (modStorage.Get(storageId, player) or cacheStorages and cacheStorages[storageId]);
-			if storageId == nil then Debugger:Warn("Missing storage id", storageConfig) return end;
+			if storageId == nil then Debugger:Warn("Missing storage id", storageConfig); return end;
 			
 			local storage = modStorage.Get(storageId);
 			if storage then
@@ -634,7 +633,6 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 					storage:Loop(function(storageItem)
 						local attachmentStorage = modStorage.Get(storageItem.ID, player);
 						if attachmentStorage then
-							Debugger:Warn("Syncing attachment storage", storageItem.ID);
 							attachmentStorage:Sync();
 						end
 					end)
@@ -676,7 +674,7 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 	
 	--== Opening physical storage;
 	if interactObject == nil or interactModule == nil then
-		Debugger:Warn(player.Name,", invalid interact object.");
+		Debugger:Warn(player.Name,", invalid storage interact object.");
 		return "Invalid interact object.";
 	end
 	

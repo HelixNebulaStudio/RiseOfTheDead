@@ -635,7 +635,7 @@ function Player.new(playerInstance: Player)
 				classPlayer.Properties.HealSources[k] = nil;
 				
 			elseif healdata.Expires == nil or modSyncTime.GetTime() <= healdata.Expires then
-				healRate = healRate + healdata.Amount;
+				healRate = healRate + (healdata.Amount or 0);
 				
 			else
 				classPlayer.Properties.HealSources[k] = nil;
@@ -653,7 +653,7 @@ function Player.new(playerInstance: Player)
 			if isDead and srcdata.ExpiresOnDeath then
 				classPlayer.Properties.ArmorSources[k] = nil;
 			elseif srcdata.Expires == nil or modSyncTime.GetTime() <= srcdata.Expires then
-				armorRate = armorRate + srcdata.Amount;
+				armorRate = armorRate + (srcdata.Amount or 0);
 			else
 				classPlayer.Properties.ArmorSources[k] = nil;
 			end

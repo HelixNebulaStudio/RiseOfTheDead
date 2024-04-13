@@ -104,7 +104,6 @@ function Scheduler:SortSchedule()
 	end)
 	if not s then
 		Debugger:Warn(e);
-		Debugger:L(self.Queue);
 	end
 end
 
@@ -163,7 +162,6 @@ return Scheduler;
 --	end)
 --	if not s then
 --		Debugger:Warn(e);
---		Debugger:L(self.Queue);
 --	end
 --end
 

@@ -1438,8 +1438,6 @@ function Storage:Insert(item, emptyIndex)
 	end)
 	
 	if self.Player then
-		Debugger:L("Insert",new, " => ", new.Index);
-
 		if new.Properties.SyncOnAdd then
 			new:Sync();
 		end
@@ -1873,7 +1871,6 @@ function Storage:SetIndex(player, id, target)
 				local storageItemB = self:FindByIndex(target.Index);
 				
 				if storageItemB == nil then
-					Debugger:L("SetIndex UpdateIndex",storageItem.Index, " => ", target.Index);
 					storageItem.Index = target.Index;
 					self:Changed();
 					self:Sync(player);
@@ -1896,7 +1893,6 @@ function Storage:SetIndex(player, id, target)
 					end
 					
 					if storageItemB == nil then -- Empty slot;
-						Debugger:L("SetIndex Transfer",{ID=id; Index=storageItem.Index}, " => ", {Player=player; Id=target.Id; Index=target.Index});
 						self:Transfer(player, {ID=id; Index=storageItem.Index}, {Player=player; Id=target.Id; Index=target.Index});
 						
 					else
@@ -1946,7 +1942,6 @@ function Storage:SwapIndex(player, itemA, itemB)
 	if self.Debounce then self:Notify("red", "Failed to swap items."); return {self:Shrink();}; end;
 	self.Debounce = true;
 	
-	Debugger:L("SwapIndex Transfer",{ID=storageItemA.ID; Index=storageItemA.Index}, " & ", {Id=itemB.Id; ID=storageItemB.ID; Index=storageItemB.Index});
 	self:Transfer(player, {ID=storageItemA.ID; Index=storageItemA.Index}, {Id=itemB.Id; ID=storageItemB.ID; Index=storageItemB.Index});
 	
 	self.Debounce = false;

@@ -375,30 +375,11 @@ function Debugger:Log(...)
 end
 
 Debugger.Print = Debugger.Log;
-
-function Debugger:L(...)
-	if self:CheckDisable() then return end;
+function Debugger:StudioLog(...)
 	if not RunService:IsStudio() then return end;
-	if self.Script == nil then return end;
-	
-	if self.Script:GetAttribute("ReleaseLogs") == nil then
-		self.Logs = {};
-		self.Script:SetAttribute("ReleaseLogs", false);
-		self.Script:GetAttributeChangedSignal("ReleaseLogs"):Connect(function()
-			if self.Script:GetAttribute("ReleaseLogs") == true then
-				self.Script:SetAttribute("ReleaseLogs", false);
-				for a=1, #self.Logs do
-					self:Log(self.Logs[a]);
-				end
-			end
-		end)
-	end
-	
-	if #self.Logs >= 10 then
-		table.remove(self.Logs, 1);
-	end
-	table.insert(self.Logs, 1, Debugger:Stringify(...));
+	self:Log("[Studio]", ...);
 end
+
 
 --[[**
 	Log warning;
@@ -434,6 +415,11 @@ function Debugger:Warn(...)
 		end
 		self:WarnClient(players, a);
 	end)
+end
+
+function Debugger:StudioWarn(...)
+	if not RunService:IsStudio() then return end;
+	self:Warn("[Studio]", ...);
 end
 
 --[[**
