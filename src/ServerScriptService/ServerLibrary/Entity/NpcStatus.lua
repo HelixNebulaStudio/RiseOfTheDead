@@ -181,7 +181,11 @@ function MetaStatus:TakeDamagePackage(damageSource)
 			end
 		end
 
-		npcModule.OnDamaged(amount, dealer, storageItem, hitPart, damageType);
+		if damageSource.IsPat then
+			npcModule.OnDamaged(amount, dealer, nil, hitPart, damageType);
+		else
+			npcModule.OnDamaged(amount, dealer, storageItem, hitPart, damageType);
+		end
 		
 	end
 

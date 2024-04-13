@@ -436,6 +436,8 @@ function TurretRuntime(weaponStorageItem)
 		local origin = bulletOriginAtt.WorldPosition;
 		
 		local targetHead = npcModule.Head;
+		if targetHead == nil then break; end;
+		
 		local targetPos = targetPart.Position;
 		if targetPos.Y < (targetHead.Position.Y-0.5) then
 			targetPos = targetPos + Vector3.new(0, math.random(0, 150)/100, 0);
@@ -529,6 +531,7 @@ end
 
 
 function Update()
+	accessoryStorageItem = modStorage.FindIdFromStorages(accessorySiid, player);
 	local weaponStorageItemID = accessory:GetAttribute("WeaponStorageItemID");
 	
 	local isWeaponChanged = lastWeaponId ~= weaponStorageItemID;

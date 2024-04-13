@@ -57,6 +57,8 @@ function ToolService.PrimaryFireWeapon(firePacket)
 		Player = firePacket.Player;
 		ReplicateToShotOwner = firePacket.ReplicateToShotOwner;
 		FocusCharge = firePacket.FocusCharge;
+
+		IsPat = firePacket.IsPAT;
 	};
 	
 	
@@ -358,6 +360,8 @@ function ToolService.ProcessWeaponShot(shotPacket)
 		ToolStorageItem = storageItem;
 		ToolModel = toolModel;
 		ToolModule = toolModule;
+
+		IsPat = shotPacket.IsPAT;
 	};
 	
 
@@ -503,80 +507,8 @@ function ToolService.ProcessWeaponShot(shotPacket)
 						end
 
 					elseif configurations.WeaponType == modAttributes.WeaponType.Shotgun then
-						if damage < humanoid.Health then
-							local motor = targetObject and targetObject:FindFirstChildWhichIsA("Motor6D") or nil;
+						newDamageSource.BreakJoint = math.random(1, math.max(maxVictims, 3)) == 1;
 
-							local exludeList = {
-								Root=true;
-								Waist=true;
-								Neck=true;
-								LeftHip=true;
-								RightHip=true;
-								ToolGrip = true;
-							};
-
-							local leftWieldJoints = {
-								LeftShoulder=true;
-								LeftElbow=true;
-								LeftWrist=true;
-							};
-							local rightWieldJoints = {
-								RightShoulder=true;
-								RightElbow=true;
-								RightWrist=true;
-							};
-
-							if npcModule.Wield then
-								if npcModule.Wield.Instances.LeftWeld then
-									exludeList.LeftShoulder = math.random(1, 16) ~= 1;
-									exludeList.LeftElbow = math.random(1, 16) ~= 1;
-									exludeList.LeftWrist = math.random(1, 16) ~= 1;
-								end
-								if npcModule.Wield.Instances.RightWeld then
-									exludeList.RightShoulder = math.random(1, 16) ~= 1;
-									exludeList.RightElbow = math.random(1, 16) ~= 1;
-									exludeList.RightWrist = math.random(1, 16) ~= 1;
-								end
-							end
-
-							if npcModule.JointsStrength then
-								for key, value in pairs(npcModule.JointsStrength) do
-									exludeList[key] = math.random(1, value) ~= 1;
-								end
-							end
-
-							if npcModule.Properties.BasicEnemy and motor 
-								and exludeList[motor.Name] == nil then
-								if npcModule.Wield then
-									if (leftWieldJoints[motor.Name] and npcModule.Wield.Instances.LeftWeld)
-										or (rightWieldJoints[motor.Name] and npcModule.Wield.Instances.RightWeld) then
-
-										npcModule.Wield.Unequip();
-									end
-								end
-								if npcModule.JointsDestroyed then
-									npcModule.JointsDestroyed[motor.Name] = true;
-								end
-								local activeDmg = (npcModule.Properties.AttackDamage or 0) - (npcModule.DamageReduction or 0);
-								npcModule.DamageReduction = (npcModule.DamageReduction or 0) + activeDmg*0.05;
-								local part1 = motor.Part1;
-								motor:Destroy();
-								if part1 then
-									local jointPart = Instance.new("Part");
-									if jointPart:CanSetNetworkOwnership() then jointPart:SetNetworkOwner(nil) end;
-									game.Debris:AddItem(jointPart, 5);
-									local weld = Instance.new("Motor6D");
-									jointPart.Parent = workspace.Debris;
-									jointPart.Size = Vector3.new(2, 2, 2);
-									jointPart.Transparency = 1;
-									jointPart.CFrame = part1.CFrame;
-									weld.Parent = jointPart;
-									weld.Part0 = part1;
-									weld.Part1 = jointPart;
-									jointPart.Velocity = jointPart.Velocity + direction*40;
-								end;
-							end
-						end
 					end
 
 					if npcModule.WeakPoint and shotPacket.Player and profile then
