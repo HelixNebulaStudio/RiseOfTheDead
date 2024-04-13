@@ -113,6 +113,34 @@ return function(npc, spawnPoint)
 			self:AddComponent("AntiSit");
 		end)
 
+		if game:GetService("RunService"):IsStudio() then
+			self.BaseArmor = 100;
+			self:AddComponent("ArmorSystem");
+
+			local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
+			local banditarmorLib = modClothingLibrary:Find("banditarmor");
+			for _, accessory in pairs(banditarmorLib.Accessories) do
+				local newAccessory: Accessory = accessory:Clone();
+
+				self.ArmorSystem.OnArmorChanged:Connect(function()
+					if self.ArmorSystem.Armor > 0 then return end;
+					local handle = newAccessory:FindFirstChildWhichIsA("BasePart");
+					if handle then 
+						local cf = handle.CFrame;
+						handle.Parent = workspace.Debris;
+						handle.CanCollide = true;
+						handle.CFrame = cf;
+					end;
+					game.Debris:AddItem(handle, 10);
+					newAccessory:Destroy();
+
+				end)
+
+				newAccessory.Parent = npc;
+			end
+
+		end
+
 		repeat until not self.Update();
 	end
 	

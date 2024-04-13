@@ -627,7 +627,6 @@ return function(CutsceneSequence)
 								npcModule.Properties.TargetableDistance = 4096;
 								npcModule.Properties.WalkSpeed={Min=8; Max=16};
 								npcModule.OnTarget(player);
-								npcModule.BaseArmor = 100;
 
 								npcModule.Properties.WeaponId = weapons[math.random(1, #weapons)];
 
@@ -656,9 +655,25 @@ return function(CutsceneSequence)
 								end);
 								
 								
+								npcModule.BaseArmor = 100;
 								local banditarmorLib = modClothingLibrary:Find("banditarmor");
 								for _, accessory in pairs(banditarmorLib.Accessories) do
-									accessory:Clone().Parent = npc;
+									local newAccessory = accessory:Clone();
+									
+									npcModule.ArmorSystem.OnArmorChanged:Connect(function()
+										if npcModule.ArmorSystem.Armor > 0 then return end;
+										local handle = newAccessory:FindFirstChildWhichIsA("BasePart");
+										if handle then 
+											local cf = handle.CFrame;
+											handle.Parent = workspace.Debris;
+											handle.CanCollide = true;
+											handle.CFrame = cf;
+										end;
+										game.Debris:AddItem(handle, 10);
+										newAccessory:Destroy();
+									end)
+
+									newAccessory.Parent = npc;
 								end
 								
 							end);

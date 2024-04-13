@@ -1,7 +1,9 @@
 local Interactable = require(game.ReplicatedStorage.Library.Interactables);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
-local Door = Interactable.GameModeExit("Raid", "Abandoned Bunker", "Extract");
+local gameMode = script:GetAttribute("GameMode");
+local stageMode = script:GetAttribute("Stage");
+
+local Door = Interactable.GameModeExit(gameMode, stageMode, "Extract");
 Door.Enabled = true;
 
 return Door;

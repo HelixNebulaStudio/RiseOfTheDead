@@ -159,13 +159,13 @@ function GameController:StartStage(stage)
 			if not self.Players[a]:IsDescendantOf(game.Players) then
 				table.remove(self.Players, a);
 			else
-				if modMission:Progress(self.Players[a], 12) then
-					modMission:Progress(self.Players[a], 12, function(mission)
-						if mission.ProgressionPoint < 5 then
-							mission.ProgressionPoint = 5;
-						end;
-					end)
-				end	
+				-- if modMission:Progress(self.Players[a], 12) then
+				-- 	modMission:Progress(self.Players[a], 12, function(mission)
+				-- 		if mission.ProgressionPoint < 5 then
+				-- 			mission.ProgressionPoint = 5;
+				-- 		end;
+				-- 	end)
+				-- end	
 				remoteSetHeadIcon:FireClient(self.Players[a], 1, "Mason", "Mission");
 				local masonModule = modNpc.GetPlayerNpc(self.Players[a], "Mason");
 				if masonModule ~= nil then
@@ -374,26 +374,26 @@ function GameController:Start()
 				highestLevel = focusLevel;
 			end
 		end
-		if modMission:Progress(player, 12) then
-			modMission:Progress(player, 12, function(mission)
-				if mission.ProgressionPoint < 4 then
-					mission.ProgressionPoint = 4;
-				end;
-			end)
-			spawn(function()
-				repeat
-					local masonModule = modNpc.GetPlayerNpc(player, "Mason");
-					if masonModule and #GameController.Enemies > 0 and masonModule.Target == nil then
-						for a=1, #GameController.Enemies do
-							local npcmodEnemy = GameController.Enemies[1];
-							if npcmodEnemy.Prefab:IsDescendantOf(workspace) and masonModule.IsInVision(npcmodEnemy.RootPart) then
-								masonModule.Target = npcmodEnemy.Prefab;
-							end
-						end
-					end
-				until not wait(1);
-			end)
-		end
+		-- if modMission:Progress(player, 12) then
+		-- 	modMission:Progress(player, 12, function(mission)
+		-- 		if mission.ProgressionPoint < 4 then
+		-- 			mission.ProgressionPoint = 4;
+		-- 		end;
+		-- 	end)
+		-- 	spawn(function()
+		-- 		repeat
+		-- 			local masonModule = modNpc.GetPlayerNpc(player, "Mason");
+		-- 			if masonModule and #GameController.Enemies > 0 and masonModule.Target == nil then
+		-- 				for a=1, #GameController.Enemies do
+		-- 					local npcmodEnemy = GameController.Enemies[1];
+		-- 					if npcmodEnemy.Prefab:IsDescendantOf(workspace) and masonModule.IsInVision(npcmodEnemy.RootPart) then
+		-- 						masonModule.Target = npcmodEnemy.Prefab;
+		-- 					end
+		-- 				end
+		-- 			end
+		-- 		until not wait(1);
+		-- 	end)
+		-- end
 		modStatusEffects.FullHeal(player);
 	end
 	

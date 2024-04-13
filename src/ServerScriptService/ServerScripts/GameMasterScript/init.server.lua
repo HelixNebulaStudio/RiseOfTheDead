@@ -675,10 +675,15 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 	end
 	
 	--== Opening physical storage;
-	if interactObject == nil or interactModule == nil then Debugger:Warn(player.Name,", invalid interact object."); return "Invalid interact object."; end
+	if interactObject == nil or interactModule == nil then
+		Debugger:Warn(player.Name,", invalid interact object.");
+		return "Invalid interact object.";
+	end
 	
 	local interactData = shared.saferequire(player, interactModule);
-	if interactData == nil then return "Invalid interact object." end;
+	if interactData == nil then
+		return "Invalid interact object.";
+	end;
 	
 	interactData.Script = interactModule;
 	if interactData.Type ~= modInteractables.Types.Storage then return "Interactable is not a storage." end;
@@ -706,7 +711,7 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 		local storageId = interactData.StorageId..(storagePage and "#p"..storagePage or "");
 		if storageId == nil then
 			Debugger:Warn("Missing storage id", interactData);
-			return;
+			return "Missing storage";
 		end
 
 		local defaultSize = storageConfig.Size or 1;

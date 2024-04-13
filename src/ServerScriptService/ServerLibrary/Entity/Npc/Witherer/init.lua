@@ -38,6 +38,7 @@ return function(npc, spawnPoint)
 		};
 		
 		Detectable = false;
+		DespawnPrefab = 10;
 	};
 	
 	local rayParam = RaycastParams.new();

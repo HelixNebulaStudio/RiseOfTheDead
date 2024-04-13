@@ -200,9 +200,14 @@ return function(players, zombie)
 			withererSpawnData.Counter = 0;
 
 			local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
-			modNpc.Spawn("Witherer", CFrame.new(deathPosition), function(npc, withererNpcModule)
-				withererNpcModule.Configuration.Level = config.Level;
-			end)
+
+			local witherList = modNpc.ListEntities("Witherer");
+			if #witherList <= 5 then
+				modNpc.Spawn("Witherer", CFrame.new(deathPosition), function(npc, withererNpcModule)
+					withererNpcModule.Configuration.Level = config.Level;
+				end)
+			end
+			
 		end
 	end
 end;

@@ -284,14 +284,14 @@ return function(CutsceneSequence)
 				masonModule.Move:SetMoveSpeed("set", "default", 12);
 				
 				masonModule.Wield.Equip("revolver454");
-				pcall(function()
-					masonModule.Wield.ToolModule.Configurations.MinBaseDamage = 80;
-				end);
 				
 				masonModule.Actions:FollowOwner(function()
 					if masonModule.Target then
 						local enemyHumanoid = masonModule.Target:FindFirstChildWhichIsA("Humanoid");
 						if enemyHumanoid and enemyHumanoid.Health > 0 and enemyHumanoid.RootPart and masonModule.IsInVision(enemyHumanoid.RootPart) then
+							pcall(function()
+								masonModule.Wield.ToolModule.Configurations.MinBaseDamage = math.max(80, enemyHumanoid.MaxHealth*0.3);
+							end);
 							masonModule.Wield.SetEnemyHumanoid(enemyHumanoid);
 							masonModule.Move:Face(enemyHumanoid.RootPart);
 							masonModule.Wield.PrimaryFireRequest();

@@ -42,7 +42,7 @@ bindSpawn.Name = "SpawnNpc";
 bindSpawn.Parent = script;
 
 Npc.NpcBaseModules = modNpcModules;
-Npc.NpcModules = {};
+Npc.NpcModules = {} :: {{Module:modNpcComponent.NpcModule; Prefab:Actor|Model}};
 Npc.PlayerNpcs = {};
 
 Npc.OnNpcSpawn = modEventSignal.new("OnNpcSpawn");
@@ -171,6 +171,22 @@ Npc.Get = function(id) : modNpcComponent.NpcModule?
 		end;
 	end
 	return;
+end
+
+function Npc.ListEntities(name: string, func: ((modNpcComponent.NpcModule)->boolean)?) : {modNpcComponent.NpcModule}
+	local list = {};
+
+	for a=1, #Npc.NpcModules do
+		local aNpcModule = Npc.NpcModules[a] and Npc.NpcModules[a].Module;
+		if aNpcModule.Name == name then
+			table.insert(list, aNpcModule);
+
+		elseif func ~= nil and func(aNpcModule) == true then
+			table.insert(list, aNpcModule);
+		end
+	end
+
+	return list;
 end
 
 local npcScanOverlapParam = OverlapParams.new();
@@ -501,10 +517,8 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	CollectionService:AddTag(rootPart, "EntityRootPart");
 
 	modNpcAnimator(npcModule);
-	
 	if npcModule.BaseArmor then
 		npcModule:AddComponent("ArmorSystem");
-		npcModule.ArmorSystem:Refresh();
 	end
 	
 	if npcModule.Initialize then
@@ -610,7 +624,6 @@ function Npc.GetCFrameFromPlatform(platform)
 	) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);	
 end
 
-
 function Npc.init(entity)
 	setmetatable(Npc, entity);
 end
@@ -635,7 +648,8 @@ end)
 task.spawn(function()
 	while true do
 		for a=#Npc.NpcModules, 1, -1 do
-			if Npc.NpcModules[a] and Npc.NpcModules[a].Module and not Npc.NpcModules[a].Module.IsDead then
+			local npcModule: modNpcComponent.NpcModule = Npc.NpcModules[a] and Npc.NpcModules[a].Module;
+			if npcModule and not npcModule.IsDead and math.random(1, 2) == 1 then
 				local fireThinkS, _fireThinkE = pcall(function()
 					Npc.NpcModules[a].Module.Think:Fire();
 				end);
@@ -644,7 +658,7 @@ task.spawn(function()
 				end;
 			end;
 		end
-		task.wait(30);
+		task.wait(15);
 	end
 end)
 

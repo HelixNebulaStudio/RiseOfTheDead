@@ -31,6 +31,7 @@ local modAudio = require(game.ReplicatedStorage.Library.Audio);
 
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
+local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local remoteGameModeHud = modRemotesManager:Get("GameModeHud");
 local remoteDoorInteraction = modRemotesManager:Get("DoorInteraction");
@@ -207,6 +208,8 @@ function Raid:Load()
 			
 			local newInteractable = extractInteractable:Clone();
 			newInteractable.Name = "Interactable";
+			newInteractable:SetAttribute("GameMode", self.ModeType);
+			newInteractable:SetAttribute("Stage", self.ModeStage);
 			newInteractable.Parent = extractDoors[a].Prefab;
 			
 		end
@@ -241,6 +244,8 @@ function Raid:Load()
 						table.insert(self.ExtractDoors, child);
 						
 						local newInteractable = extractInteractable:Clone();
+						newInteractable:SetAttribute("GameMode", self.ModeType);
+						newInteractable:SetAttribute("Stage", self.ModeStage);
 						newInteractable.Name = "Interactable";
 						newInteractable.Parent = child;
 					end
@@ -323,7 +328,10 @@ function Raid:CompleteRaid()
 	task.wait(1);
 
 	self:DropReward();
-
+	
+	if self.OnComplete then
+		self.OnComplete(self.Players);
+	end
 end
 
 function Raid:RespawnDead()
@@ -577,9 +585,13 @@ function Raid:Start()
 		end
 		
 		modStatusEffects.FullHeal(player);
+	end		
+	if self.OnStart then
+		self.OnStart(self.Players);
 	end
 
 	self.Difficulty = math.clamp(highestLevel, 1, math.huge);
+	Debugger:Warn("Difficulty", self.Difficulty);
 	--
 	
 	if self.DynamicMap then

@@ -1,4 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
+local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 
 --== Script;
 local ArmorSystem = {};
@@ -9,11 +11,17 @@ function ArmorSystem.new(Npc)
 		BaseArmor = Npc.BaseArmor;
 		Armor = Npc.BaseArmor;
 		MaxArmor = Npc.BaseArmor;
+
+		OnArmorChanged = modEventSignal.new("OnArmorChanged");
 	};
 	
 	function self:Refresh()
+		local oldArmor = Npc.Humanoid:GetAttribute("Armor");
+		local oldMaxArmor = Npc.Humanoid:GetAttribute("MaxArmor");
 		Npc.Humanoid:SetAttribute("Armor", self.Armor);
 		Npc.Humanoid:SetAttribute("MaxArmor", self.MaxArmor);
+
+		self.OnArmorChanged:Fire(oldArmor, oldMaxArmor);
 	end
 	
 	function self:AddArmor(amount)
@@ -21,7 +29,12 @@ function ArmorSystem.new(Npc)
 		self:Refresh();
 	end
 	
+	Npc.Garbage:Tag(function()
+		self.OnArmorChanged:Destroy();
+	end);
 	setmetatable(self, ArmorSystem);
+
+	self:Refresh();
 	return self;
 end
 

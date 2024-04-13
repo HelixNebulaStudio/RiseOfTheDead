@@ -444,7 +444,9 @@ export type NpcModule = {
 	LastDamageTaken: number;
 
 	[any]: any;
-} | typeof(NpcComponent);
+} & typeof(NpcComponent);
+
+--& typeof(NpcComponent);
 
 return function(self) : NpcModule
 	self.Name = self.Prefab.Name;
