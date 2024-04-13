@@ -41,7 +41,6 @@ local modPlayerTitlesLibrary = Debugger:Require(game.ReplicatedStorage.Library.P
 local modPseudoRandom = Debugger:Require(game.ReplicatedStorage.Library.PseudoRandom);
 local modItemsLibrary = Debugger:Require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modSyncTime = Debugger:Require(game.ReplicatedStorage.Library.SyncTime);
-local modItemUnlockablesLibrary = Debugger:Require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
 local modJsonValidator = Debugger:Require(game.ReplicatedStorage.Library.JsonValidator);
 local modSerializer = require(game.ReplicatedStorage.Library.Serializer);
 local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
@@ -49,10 +48,6 @@ local modTableManager = require(game.ReplicatedStorage.Library.TableManager);
 local modBitFlags = require(game.ReplicatedStorage.Library.BitFlags);
 
 local FirebaseService = Debugger:Require(game.ServerScriptService.ServerLibrary.FirebaseService);
-local Mission = Debugger:Require(game.ServerScriptService.ServerLibrary.Mission);
-local Storage = Debugger:Require(game.ServerScriptService.ServerLibrary.Storage);
-local modMailObject = Debugger:Require(game.ServerScriptService.ServerLibrary.MailObject);
---local modCosmetics = Debugger:Require(game.ServerScriptService.ServerLibrary.Cosmetics);
 local modGameSave = Debugger:Require(game.ServerScriptService.ServerLibrary.GameSave);
 local modFlags = require(game.ServerScriptService.ServerLibrary.Flags);
 local modSkillTree = Debugger:Require(game.ServerScriptService.ServerLibrary.SkillTree);
@@ -64,7 +59,6 @@ local modItemUnlockables = Debugger:Require(game.ServerScriptService.ServerLibra
 local modSafehomeData = Debugger:Require(game.ServerScriptService.ServerLibrary.SafehomeData);
 local modBattlePassSave = Debugger:Require(game.ServerScriptService.ServerLibrary.BattlePassSave);
 local modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
-local modFactions = require(game.ServerScriptService.ServerLibrary.Factions);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 
 local remotes = game.ReplicatedStorage.Remotes;
@@ -139,7 +133,7 @@ function Profile:GetLastOnline(userId)
 	end
 	
 	local lastOnline = -1;
-	local getOnlineS, getOnlineE = pcall(function()
+	local _, _ = pcall(function()
 		local lastOnlineData = MemoryStoreService:GetSortedMap("LastOnline");
 		lastOnline = lastOnlineData:GetAsync(userKey);
 	end)
@@ -148,7 +142,7 @@ function Profile:GetLastOnline(userId)
 end
 
 function Profile:GetLiveProfile(userId)
-	local unixTime = DateTime.now().UnixTimestamp;
+	local _unixTime = DateTime.now().UnixTimestamp;
 	
 	local userKey;
 	if userId then
@@ -168,7 +162,8 @@ function Profile:GetLiveProfile(userId)
 	local getAccessCodeS, getAccessCodeE = pcall(function()
 		local accessCodeData = MemoryStoreService:GetSortedMap("AccessCode");
 		liveProfile.AccessCode = accessCodeData:GetAsync(userKey);
-	end) if not getAccessCodeS then Debugger:Warn(":GetLiveProfile getAccessCodeE:",getAccessCodeE) end;
+	end)
+	if not getAccessCodeS then Debugger:Warn(":GetLiveProfile getAccessCodeE:",getAccessCodeE) end;
 	
 	return liveProfile;
 end
@@ -330,7 +325,7 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 		local key = tostring(profile.UserId);
 		if liveProfileDatabase:Get(key) == nil then
 			liveProfileDatabase:Publish(key, function(rawData)
-				if rawData ~= nil then Debugger:Warn("Player (",profile.Player,") live profile already exist.", rawData) return end;
+				if rawData ~= nil then Debugger:Warn("Player (",profile.Player,") live profile already exist.", rawData); return end;
 				
 				return liveProfileSerializer:Serialize(LiveProfile.new(key));
 			end)
@@ -602,7 +597,7 @@ function Profile.LoadRaw(userId)
 	userId = tostring(userId);
 	
 	local rawData;
-	local s, e = pcall(function()
+	local _, _ = pcall(function()
 		local encodedData = profileDatabase.Datastore:GetAsync(userId);
 		rawData = type(encodedData) == "string" and HttpService:JSONDecode(encodedData) or encodedData;
 	end)
@@ -685,18 +680,18 @@ function Profile:Load(loadOverwrite)
 			rawData = loadOverwrite;
 		end
 	end)
-	if not loadS then
+	if not loadS or not decodeS then
 		remotePromptWarning:FireClient(self.Player, "Failed to load save data from Roblox, please try reconnecting...");
 		shared.Notify(self.Player, "Failed to load save data from Roblox, please try reconnecting...", "Negative");
 		
 		Debugger:WarnClient(self.Player, "Please send the message below to the developer to assist you.");
-		Debugger:WarnClient(self.Player, "Failed to load data ("..loadKey.."), Error: "..loadE);
-		modAnalytics:ReportError("Load Profile Error", loadE);
+		Debugger:WarnClient(self.Player, "Failed to load data ("..loadKey.."), Error: "..(loadE or decodeE));
+		modAnalytics:ReportError("Load Profile Error", (loadE or decodeE));
 		return;
 	end
 
 	local dataExpired = false;
-	local isPremium = rawData and rawData.Premium or false;
+	local _isPremium = rawData and rawData.Premium or false;
 	if self.UserId > 0 and rawData and rawData.LastOnline
 		and modBranchConfigs.IsWorld("MainMenu") and modBranchConfigs.CurrentBranch.Name == "Dev" 
 		and rawData.LastOnline+691200 <= modSyncTime.TimeOfEndOfWeek() then -- rawData.LastOnline+86400 <= dayEndTick();
@@ -735,8 +730,8 @@ function Profile:Load(loadOverwrite)
 		--	rawData.DailyStats = {};
 		--end
 		
-		local lastOnline = rawData.LastOnline;
-		local firstOnline = rawData.FirstOnline;
+		local _lastOnline = rawData.LastOnline;
+		local _firstOnline = rawData.FirstOnline;
 		local timelapsed = (os.time() - (rawData.FirstOnline or 0))
 		
 		if timelapsed >= dayInSec then
@@ -910,7 +905,7 @@ function Profile:Save(override, force)
 		end
 	end
 	
-	local saveStart = tick();
+	local _saveStart = tick();
 	Debugger:WarnClient(self.Player, "Saving data..");
 	
 	Profile.OnProfileSave:Fire(self.Player, self);
@@ -946,7 +941,7 @@ function Profile:Save(override, force)
 	
 	local dataToEncode = override or self;
 	local encodedData
-	local parseS, parseE = pcall(function()
+	local parseS, _ = pcall(function()
 		encodedData = HttpService:JSONEncode(dataToEncode);
 	end)
 	if not parseS then
@@ -954,7 +949,7 @@ function Profile:Save(override, force)
 			local ver = modGlobalVars.GameVersion.."."..modGlobalVars.GameBuild;
 			local vSuccess, validatorErrLog = modJsonValidator:Check(dataToEncode);
 			if not vSuccess then
-				modAnalytics:ReportError("Load Profile JSON Error", validatorErrLog);
+				modAnalytics:ReportError(ver.."Load Profile JSON Error", validatorErrLog);
 			end
 		end)
 		return;
@@ -1000,11 +995,13 @@ function Profile:Save(override, force)
 	
 	self:GetPolicy();
 	self:UpdateTrustLevel();
+
+	return;
 end
 
 function Profile:Unload()
 	local playerName = self.Name;
-	local playerUserId = self.UserId;
+	local _playerUserId = self.UserId;
 	self.Loaded = false;
 	
 	local playerSave = self:GetActiveSave();
@@ -1055,19 +1052,20 @@ function Profile:ActivateSave()
 
 	local _, erMsg = pcall(function()
 		if self.Player then
-			local date = os.date("*t", self:GetActiveSave().LastSave);
+			local _lastSaveData = os.date("*t", self:GetActiveSave().LastSave);
 			--shared.Notify(self.Player, "Loaded last save data from "..date.day.." "..month[date.month]..", "..date.year.." ("..(date.hour > 12 and date.hour -12 or date.hour)..":"..date.min..":"..date.sec..").", "Inform");
 
 			if self.ShadowBan == -1 then
 				shared.Notify(self.Player, "Permanent shadow ban.", "Negative");
 
 			elseif self.ShadowBan > 0 then
-				local date = os.date("*t", self.ShadowBan);
-				shared.Notify(self.Player, "Shadow banned until "..date.day.." "..month[date.month]..", "..date.year.." ("..(date.hour > 12 and date.hour -12 or date.hour)..":"..date.min..":"..date.sec..").", "Negative");
+				local banDate = os.date("*t", self.ShadowBan);
+				shared.Notify(self.Player, "Shadow banned until "..banDate.day.." "..month[banDate.month]..", "..banDate.year.." ("..(banDate.hour > 12 and banDate.hour -12 or banDate.hour)..":"..banDate.min..":"..banDate.sec..").", "Negative");
 
 			end
 		end
-	end) if erMsg then warn("Warning:",erMsg); end;
+	end)
+	if erMsg then warn("Warning:",erMsg); end;
 
 	self:Sync("ActiveSave");
 	self:Sync("ShadowBan");
@@ -1279,6 +1277,7 @@ function Profile:SyncPublic(caller)
 		
 		return publicData;
 	end
+	return;
 end
 
 function Profile:NewID()
@@ -1298,7 +1297,7 @@ local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechan
 function Profile:GetItemClass(storageItemId, getShadowCopy)
 	local playerSave = self:GetActiveSave(); 
 	
-	local storageItem, itemStorage = playerSave:FindItemFromStorages(storageItemId);
+	local storageItem, _itemStorage = playerSave:FindItemFromStorages(storageItemId);
 	if storageItemId == "MockStorageItem" then
 		storageItem = self.MockStorageItem;
 		
@@ -1306,7 +1305,7 @@ function Profile:GetItemClass(storageItemId, getShadowCopy)
 	
 	if storageItem == nil then return end;
 	
-	local player = storageItem.Player;
+	local _player = storageItem.Player;
 
 	local itemValues = storageItem.Values;
 	local itemId = storageItem.ItemId;
@@ -1381,6 +1380,8 @@ function Profile:GetItemClass(storageItemId, getShadowCopy)
 			return update(self.ItemClassesCache[storageItemId]), classType;
 		end
 	end
+
+	return;
 end
 
 
@@ -1534,6 +1535,8 @@ function Profile:RefreshPlayerTitle()
 		titleTag.Parent = self.Player;
 	end
 	titleTag.Value = id;
+
+	return;
 end
 
 function Profile:UpdateTrustLevel()
@@ -1575,7 +1578,7 @@ function Profile:UpdateTrustLevel()
 		trustTable.IsPremium = true;
 	end
 	
-	local timeSinceFirstJoin = os.time()-self.FirstJoined;
+	local _timeSinceFirstJoin = os.time()-self.FirstJoined;
 	if os.time()-self.FirstJoined >= 2592000 then 
 		level = level +5;
 		trustTable.MonthlyPlayer = true;
@@ -1666,18 +1669,10 @@ function remoteRequestPublicProfile.OnServerInvoke(player, targetName)
 	if profile then
 		return profile:SyncPublic(player);
 	end
+	return;
 end
 
-game.Players.PlayerRemoving:Connect(function(player)
-	local playerUserId = player.UserId;
-	
-	
-end)
-
-
 task.spawn(function()
-	local modCommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
-
 	Debugger.AwaitShared("modCommandsLibrary");
 	shared.modCommandsLibrary:HookChatCommand("togglehardmode", {
 		Permission = shared.modCommandsLibrary.PermissionLevel.Admin;
