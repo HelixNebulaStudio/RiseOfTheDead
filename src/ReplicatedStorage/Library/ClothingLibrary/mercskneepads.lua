@@ -9,6 +9,7 @@ function attirePackage.NewToolLib(handler)
 	toolLib.Warmth = 1;
 
 	toolLib.BaseHotEquipSlots = 1;
+	toolLib.HotEquipSlots = toolLib.BaseHotEquipSlots;
 	toolLib.EquipTimeReduction = 0.4;
 	
 	return modClothingProperties.new(toolLib);

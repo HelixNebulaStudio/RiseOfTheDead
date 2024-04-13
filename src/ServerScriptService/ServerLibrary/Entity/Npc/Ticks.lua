@@ -7,13 +7,7 @@ local ZombieModule = script.Parent.Zombie;
 --== Modules
 local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
-local modPlayers = require(game.ReplicatedStorage.Library.Players);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
-
-local explosionEffectPrefab = script:WaitForChild("ExplosionEffect");
-local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.In, -1, false, 0);
 
 -- Note; Function called for each zombie before zombie parented to workspace;
 return function(npc, spawnPoint)
