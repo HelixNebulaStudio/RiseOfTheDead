@@ -620,9 +620,9 @@ function AntiCheatService:Teleport(player, cframe)
 	end
 	local rootPart = classPlayer.RootPart;
 	
-	if rootPart.Anchored ~= true and workspace:IsAncestorOf(rootPart) then
-		rootPart:SetNetworkOwner(nil);
-	end
+	-- if rootPart.Anchored ~= true and workspace:IsAncestorOf(rootPart) then
+	-- 	rootPart:SetNetworkOwner(nil);
+	-- end
 	table.insert(playerCase.CFrameLog, cframe);
 
 	playerCase.TeleportCframeBuffer = cframe;
@@ -630,11 +630,11 @@ function AntiCheatService:Teleport(player, cframe)
 	
 	rootPart.CFrame = cframe;
 	
-	task.delay(0, function()
+	task.delay(0.1, function()
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true);
-		if rootPart.Anchored ~= true and workspace:IsAncestorOf(rootPart) and rootPart.AssemblyRootPart == rootPart then
-			rootPart:SetNetworkOwner(player);
-		end
+		-- if rootPart.Anchored ~= true and workspace:IsAncestorOf(rootPart) and rootPart.AssemblyRootPart == rootPart then
+		-- 	rootPart:SetNetworkOwner(player);
+		-- end
 	end)
 end
 
