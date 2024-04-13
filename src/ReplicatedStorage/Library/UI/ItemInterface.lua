@@ -835,7 +835,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 				itemDesc = itemDesc..h3O.."\nWarmth: "..h3C.. colorNumberText(itemClass.Warmth.."°C");
 			end
 			if itemClass.FlinchProtection then
-				itemDesc = itemDesc..h3O.."\nFlinch Protection: "..h3C.. colorNumberText((itemClass.FlinchProtection*100).."%");
+				itemDesc = itemDesc..h3O.."\nFlinch Protection: "..h3C.. colorNumberText(math.ceil(itemClass.FlinchProtection*100).."%");
 			end
 			
 			if itemClass.Slaughterfest then

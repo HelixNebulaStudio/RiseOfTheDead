@@ -50,7 +50,17 @@ local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 Debugger.AwaitShared("modPlayers");
 local classPlayer = shared.modPlayers.Get(localPlayer);
 
-local bodyGyro = Instance.new("BodyGyro", rootPart); bodyGyro.MaxTorque = Vector3.new(0, 0, 0); bodyGyro.P = 25000;
+local rootRigAttachment = rootPart:WaitForChild("RootRigAttachment");
+
+local alignRotation = Instance.new("AlignOrientation");
+alignRotation.Name = "BodyOrientation";
+alignRotation.ReactionTorqueEnabled = true;
+alignRotation.Enabled = false;
+alignRotation.Mode = Enum.OrientationAlignmentMode.OneAttachment;
+alignRotation.Attachment0 = rootRigAttachment;
+alignRotation.Responsiveness = 100;
+alignRotation.Parent = rootPart;
+
 local animations = {};
 
 local UserInputService = game:GetService("UserInputService");
@@ -163,6 +173,7 @@ characterProperties.SwimSpeed = characterProperties.DefaultSwimSpeed;
 characterProperties.SprintSpeed = characterProperties.DefaultSprintSpeed;
 
 local charBodyForce = Instance.new("VectorForce");
+charBodyForce.Name = "BodyForce";
 charBodyForce.ApplyAtCenterOfMass = true;
 charBodyForce.RelativeTo = Enum.ActuatorRelativeTo.World;
 charBodyForce.Attachment0 = rootPart:WaitForChild("RootRigAttachment");
@@ -341,39 +352,35 @@ local function getCharacterMass()
 	return mass;
 end
 
-local function setGyro(data)	
-	local gyroCf = bodyGyro.CFrame;
-	local gyroMaxTorque = bodyGyro.MaxTorque;
-	local gyroP = bodyGyro.P;
-	
+local function setAlignRot(data)
+	local enabled = data.Enabled;
+	local cframe = data.CFrame;
+
 	if characterProperties.InteractGyro and characterProperties.InteractAlpha > 0 then
 		local dist = (characterProperties.InteractGyro.Position-rootPart.Position).Magnitude;
 		local d = 1-math.clamp((dist/12), 0, 1);
 		
 		if d > 0 then
-			gyroCf = characterProperties.InteractGyro;
-			gyroMaxTorque = d * Vector3.new(0, 10000, 0);
-			gyroP = 25000;
+			cframe = characterProperties.InteractGyro;
+			enabled = true;
 		else
 			characterProperties.InteractGyro = nil;
 		end
 	else
 		if data.CFrame then
-			gyroCf = data.CFrame;
+			cframe = data.CFrame;
 		end
-
-		if data.MaxTorque then
-			gyroMaxTorque = data.MaxTorque;
-		end
-
-		if data.P then
-			gyroP = data.P;
+		if data.Enabled then
+			enabled = data.Enabled;
 		end
 	end
 	
-	bodyGyro.CFrame = gyroCf;
-	bodyGyro.MaxTorque = gyroMaxTorque;
-	bodyGyro.P = gyroP;
+	if cframe ~= nil then
+		alignRotation.CFrame = cframe;
+	end
+	if enabled ~= nil then
+		alignRotation.Enabled = enabled;
+	end
 end
 
 local function toggleCameraMode(value)
@@ -390,9 +397,9 @@ local function toggleCameraMode(value)
 	end
 	humanoid.AutoRotate = true;
 	
-	setGyro{
-		MaxTorque=Vector3.new(0, 0, 0);
-	};
+	setAlignRot{
+		Enabled = false;
+	}
 	if not characterProperties.ThirdPersonCamera then
 		UserInputService.MouseBehavior = Enum.MouseBehavior.Default;
 	end
@@ -935,8 +942,8 @@ function stopSliding(delayTime)
 		slideForce.MaxForce = Vector3.new(0, 0, 0);
 		characterProperties.SlideVelocity = Vector3.zero;
 		
-		setGyro{
-			MaxTorque=Vector3.new(0, 0, 0);
+		setAlignRot{
+			Enabled=false;
 		};
 		characterMoving(1.1);
 	end)
@@ -1099,9 +1106,9 @@ RunService:BindToRenderStep("OffCamRender", Enum.RenderPriority.Input.Value, fun
 		if characterProperties.FreecamState == 1 then
 			rootPoint = CFrame.new(CameraSubject.RootPart.CFrame.p) * CFrame.Angles(0, (mouseProperties.X + mouseProperties.XAngOffset), 0);
 			
-			setGyro{
-				CFrame = rootPoint;
-				MaxTorque = Vector3.new(math.huge, math.huge, math.huge);
+			setAlignRot{
+				Enabled=true;
+				CFrame=rootPoint;
 			};
 		end
 		
@@ -1122,10 +1129,9 @@ end)
 local function renderStepped(camera, deltaTime)
 	local renderTick = tick();
 	if not workspace:IsAncestorOf(character) then return; end
-	loadInterface();
 	characterProperties.IsSpectating = (not CameraSubject.IsClientSubject or (not game.Players.CharacterAutoLoads and not characterProperties.IsAlive)) and modConfigurations.SpectateEnabled;
 
-	rootPoint = CFrame.new(CameraSubject.RootPart.CFrame.p) * CFrame.Angles(0, (mouseProperties.X + mouseProperties.XAngOffset), 0); --Yaw <>
+	rootPoint = CFrame.new(CameraSubject.RootPart.CFrame.Position) * CFrame.Angles(0, (mouseProperties.X + mouseProperties.XAngOffset), 0); --Yaw <>
 	zoom = characterProperties.ZoomLevel or 8;
 
 	if CameraSubject.RootPart == nil then return; end;
@@ -1154,15 +1160,15 @@ local function renderStepped(camera, deltaTime)
 			if mouseProperties.MouseLocked then
 				humanoid.AutoRotate = false;
 				if characterProperties.IsSwimming or Cache.AntiGravityForce then
-					setGyro{
-						CFrame = camera.CFrame;
-						MaxTorque = Vector3.new(math.huge, math.huge, math.huge);
+					setAlignRot{
+						Enabled=true;
+						CFrame=camera.CFrame;
 					};
 
 				elseif not humanoid.Sit and not humanoid.PlatformStand then -- and not humanoid.Jump
-					setGyro{
-						CFrame = rootPoint;
-						MaxTorque = Vector3.new(0, math.huge, 0);
+					setAlignRot{
+						Enabled=true;
+						CFrame=rootPoint;
 					};
 
 				end
@@ -1187,20 +1193,21 @@ local function renderStepped(camera, deltaTime)
 			if characterProperties.CanMove then
 				if characterProperties.BodyLockToCam then 
 					humanoid.AutoRotate = false;
-					setGyro{
-						CFrame = rootPoint;
+
+					setAlignRot{
+						CFrame=rootPoint;
 					};
 					if not humanoid.Sit and not humanoid.PlatformStand and not humanoid.Jump then
-						setGyro{
-							MaxTorque = Vector3.new(0, math.huge, 0);
+						setAlignRot{
+							Enabled=true;
 						};
 
 					end
 
 				else
 					humanoid.AutoRotate = true;
-					setGyro{
-						MaxTorque = Vector3.new(0, 0, 0);
+					setAlignRot{
+						Enabled=false;
 					};
 
 				end
@@ -1306,9 +1313,7 @@ local function renderStepped(camera, deltaTime)
 
 		camera.CFrame = mouseProperties.CameraSmoothing == 0 and newCameraCFrame or oldCameraCFrame:lerp(newCameraCFrame, mouseProperties.CameraSmoothing);
 		oldCameraCFrame = camera.CFrame;
-		setGyro{
-			P = 25000;
-		};
+
 		pcall(function()
 			character.LeftUpperArm.LeftShoulder.C0 = originaldata.LeftShoulderC0;
 			character.RightUpperArm.RightShoulder.C0 = originaldata.RightShoulderC0;
@@ -1351,9 +1356,6 @@ local function renderStepped(camera, deltaTime)
 				cameraCFrame = cameraCFrame * CFrame.new(0, 2.4+0.6-prevHipHeight, 0)
 			end
 
-			--if characterProperties.IsSwimming then
-			--	cameraCFrame = cameraCFrame * CFrame.Angles(1.570, 0, 0);
-			--end
 			cameraCFrame = cameraCFrame * CFrame.Angles((mouseProperties.Y + mouseProperties.YAngOffset)-(characterProperties.Joints.WaistX*0.01), 0, 0) --Pitch
 
 			if characterProperties.IsRagdoll and not characterProperties.CanAction then
@@ -1364,10 +1366,6 @@ local function renderStepped(camera, deltaTime)
 			camera.CFrame = cameraCFrame * CFrame.new(cameraOriginOffset.X/2, cameraOriginOffset.Y/2, 0);
 			camera.Focus = oldCameraCFrame;
 			oldCameraCFrame = camera.CFrame;
-
-			setGyro{
-				P = 0;
-			};
 
 			local s, e = pcall(function()
 				local waistY = characterProperties.CanMove and characterProperties.Joints.WaistY or 0;
@@ -1810,20 +1808,17 @@ RunService.Heartbeat:Connect(function(step)
 			if animations["slide"] then animations["slide"]:Play(); end
 			characterProperties.WalkSpeed:Set("default", 0);
 			
-			setGyro{
+			setAlignRot{
 				CFrame = CFrame.new(rootPart.CFrame.Position, rootPart.CFrame.Position+slideDirection);
 			};
-			
 			if not humanoid.Sit and not humanoid.PlatformStand and not humanoid.Jump then
-				setGyro{
-					MaxTorque = Vector3.new(0, math.huge, 0);
+				setAlignRot{
+					Enabled=true;
 				};
 				slideForce.MaxForce = Vector3.new(40000, 0, 40000);
 				slideForce.Velocity = oldSlideMomentum:Lerp(Vector3.new(),mathClamp((beatTick-slideBeginTick)/6, 0, 1));
 				oldSlideMomentum = slideForce.Velocity;
 				
-				-- characterProperties.BodyForce:Set("slide", Vector3.new(0, 20, 0), 1, 1);
-
 				if Cache.lastSlide == nil then
 					Cache.lastSlide = beatTick;
 				end
@@ -2264,17 +2259,6 @@ classPlayer:OnNotIsAlive(function(character)
 	UserInputService.MouseBehavior = Enum.MouseBehavior.Default;
 	mouseProperties.MouseLocked = false;
 	
-	--for a=0, 2, 0.1 do
-	--	characterProperties.IsAlive = character:GetAttribute("IsAlive") == true;
-	--	if not characterProperties.IsAlive then
-	--		break;
-	--	else
-	--		task.wait(0.1);
-	--	end
-	--end
-	--if characterProperties.IsAlive then Debugger:Warn("Character is still alive.") return end;
-	--Debugger:Warn("classPlayer.Died:Once characterProperties.IsAlive=",characterProperties.IsAlive);
-	
 	stopSliding();
 	characterProperties.IsCrouching = false;
 	characterProperties.IsWalking = false;
@@ -2459,17 +2443,11 @@ end)
 
 
 task.spawn(function()
-	for a=1, 10 do
-		task.wait(1);
-		if shared.ClientCommands then
-			break;
-		end
-	end
+	Debugger.AwaitShared("ClientCommands");
 	
-	if shared.ClientCommands == nil then return end;
-	
+	local msgTxt = "";
 	local messagePacket = {
-		Message = "";
+		Message = msgTxt;
 		Presist = false;
 		MessageColor=Color3.fromRGB(85, 255, 255);
 	};
@@ -2477,18 +2455,23 @@ task.spawn(function()
 	shared.ClientCommands["checkbodymovers"] = function(channelId, args)
 		local room = shared.ChatRoomInterface:GetRoom(channelId);
 		
+		msgTxt = "";
 		for _, obj in pairs(rootPart:GetChildren()) do
-			if obj:IsA("BodyMover") then
+			if not obj:IsA("Constraint") and not obj:IsA("BodyMover") then continue end;
+			
+			msgTxt = msgTxt.."\n"..obj.Name..": ";
+			
+			if obj:IsA("Constraint") then
+				msgTxt = msgTxt.."Enabled: "..tostring(obj.Enabled).." Active: "..tostring(obj.Active);
 
-				messagePacket.Message = obj.Name..": ";
-				
-				if obj:IsA("BodyGyro") then
-					messagePacket.Message = messagePacket.Message.."MaxTorque: "..tostring(obj.MaxTorque) .. " P:"..obj.P;
-				end
-				
-				shared.ChatRoomInterface:NewMessage(room, messagePacket);
+			elseif obj:IsA("BodyGyro") then
+				msgTxt = msgTxt.."MaxTorque: "..tostring(obj.MaxTorque) .. " P:"..obj.P;
 
 			end
+			
+			messagePacket.Message = msgTxt;
+			shared.ChatRoomInterface:NewMessage(room, messagePacket);
+
 		end
 	end
 end)
