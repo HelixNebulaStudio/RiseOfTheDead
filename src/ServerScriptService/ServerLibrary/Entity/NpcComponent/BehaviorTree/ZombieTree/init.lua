@@ -149,7 +149,7 @@ return function(self)
 
 				local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 				if modBranchConfigs.WorldInfo.PublicWorld then
-					docileDuration = (docileDuration or 1) + math.random(0,300)/100;
+					docileDuration = (docileDuration or 0.5) + math.random(0,100)/100;
 
 					if self.HordeAttack == true then
 						docileDuration = 0;

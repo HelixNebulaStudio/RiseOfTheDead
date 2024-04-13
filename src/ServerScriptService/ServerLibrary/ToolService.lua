@@ -58,7 +58,7 @@ function ToolService.PrimaryFireWeapon(firePacket)
 		ReplicateToShotOwner = firePacket.ReplicateToShotOwner;
 		FocusCharge = firePacket.FocusCharge;
 
-		IsPat = firePacket.IsPAT;
+		IsPat = firePacket.IsPat;
 	};
 	
 	
@@ -148,7 +148,7 @@ function ToolService.PrimaryFireWeapon(firePacket)
 
 			local newInaccuracy = configurations.BaseInaccuracy;
 			
-			if firePacket.IsPAT then
+			if firePacket.IsPat then
 				if accRatio == nil then
 					accRatio = math.clamp(modMath.MapNum(newInaccuracy, 2, 20, 0, 1), 0, 1);
 					accRate = 1-math.pow(accRatio, 1/2);
@@ -361,7 +361,7 @@ function ToolService.ProcessWeaponShot(shotPacket)
 		ToolModel = toolModel;
 		ToolModule = toolModule;
 
-		IsPat = shotPacket.IsPAT;
+		IsPat = shotPacket.IsPat;
 	};
 	
 
@@ -657,7 +657,7 @@ function ToolService.ReloadWeapon(packet)
 	local magazinePart = packet.ToolModel:FindFirstChild("Magazine");
 	
 	local reloadTime = math.clamp(properties.ReloadSpeed-0.2, 0.05, 40);
-	if packet.IsPAT then
+	if packet.IsPat then
 		reloadTime = reloadTime * 3;
 		
 		if magazinePart then

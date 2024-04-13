@@ -371,7 +371,7 @@ function TurretRuntime(weaponStorageItem)
 			ToolModel = activeWeaponModel;
 			ToolModule = toolModule;
 
-			IsPAT = true;
+			IsPat = true;
 		};
 		autoTurretClient:SetAttribute("Mode", 4);
 
@@ -464,7 +464,7 @@ function TurretRuntime(weaponStorageItem)
 				Rat = true;
 			};
 
-			IsPAT = true;
+			IsPat = true;
 			MaistPercent = maistPercent;
 		};
 		

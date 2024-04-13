@@ -80,6 +80,19 @@ return function()
 			lastDbDespawnTick = tick();
 			modDeadbodiesHandler:DespawnRequest(maxDeadbodies);
 		end
+
+		if modData:GetSetting("DisableDeathRagdoll") == 1 then return end;
+		if maxDeadbodies <= 0 then return end;
+
+		local humanoidRootPart = prefab:FindFirstChild("HumanoidRootPart") :: BasePart;
+		humanoidRootPart:GetPropertyChangedSignal("Anchored"):Once(function()
+			for _, part in pairs(prefab:GetChildren()) do
+				if not part:IsA("BasePart") then continue end;
+				if part.Name == "HumanoidRootPart" then continue end;
+				part.Anchored = false;
+				part.CanCollide = true;
+			end
+		end)
 	end)
 	task.delay(5, function()
 		modDeadbodiesHandler:DespawnRequest(modData:GetSetting("MaxDeadbodies"));

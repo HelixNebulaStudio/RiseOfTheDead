@@ -139,6 +139,13 @@ function NpcComponent:KillNpc()
 				if not workspace.Entity:IsAncestorOf(prefab) then return end;
 				prefab.Parent = workspace.Entities;
 			end)
+			task.delay(5, function()
+				for _, obj in pairs(prefab:GetChildren()) do
+					if not obj:IsA("BasePart") or obj.AssemblyRootPart == nil then continue end;
+					obj.AssemblyRootPart.Anchored = true;
+					obj.CanCollide = false;
+				end
+			end)
 		end
 		
 		if self.Wield then
