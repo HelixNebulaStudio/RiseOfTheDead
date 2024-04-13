@@ -531,7 +531,7 @@ function GameModeManager:JoinRoom(player, gameTable, room)
 		
 		local rootPart = classPlayer:GetCharacterChild("HumanoidRootPart");
 		if rootPart then
-			shared.modAntiCheatService:Teleport(player, CFrame.new(playerData.LobbyPosition.WorldPosition + Vector3.new(0, 2, 0))
+			shared.modAntiCheatService:Teleport(player, CFrame.new(playerData.LobbyPosition.WorldPosition + Vector3.new(0, 2.3, 0))
 				* (playerData.LobbyPosition.CFrame - playerData.LobbyPosition.CFrame.p));
 
 			--rootPart.Anchored = false;
