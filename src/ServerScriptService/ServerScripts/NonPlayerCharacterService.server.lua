@@ -266,7 +266,7 @@ function InitializeSpawner(spawnerModule)
 		
 		self.IsSpawning = true;
 		
-		local naturalSpawnLimit = modConfigurations.NaturalSpawnLimit;
+		local naturalSpawnLimit = modConfigurations.NaturalSpawnLimit or 999;
 		task.spawn(function()
 			local minCount = math.max(self.MinAmount or 1, self.MinAmount == nil and math.floor(defaultMaxAmount/2) or 0);
 			local maxCount = math.max(self.MaxSpawnSpaceAmount, defaultMaxAmount, minCount)
@@ -282,6 +282,7 @@ function InitializeSpawner(spawnerModule)
 				for a=1, respawnAmt do
 					self:Activate();
 					task.wait();
+					if #modNpc.NpcModules > naturalSpawnLimit then break; end;
 				end
 			end;
 			
