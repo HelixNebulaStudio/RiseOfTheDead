@@ -1,13 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local RunService = game:GetService("RunService");
-
-
---local modEmotes = require(game.ReplicatedStorage.Library.EmotesLibrary);
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
-
-local dirAnimations = script:WaitForChild("Animations");
 
 --== AnimGroup
 local AnimGroup = {};
@@ -68,9 +62,9 @@ local AnimationController = {};
 AnimationController.__index = AnimationController;
 
 --==
-function AnimationController.new(animator: Animator, rig: Model)
+function AnimationController.new(animator: Animator, rig: Model?)
 	local self = {
-		Name=(rig and rig.Name or animator.Parent.Parent.Name);
+		Name=(rig and rig.Name or animator.Parent and animator.Parent.Parent and animator.Parent.Parent.Name);
 		Rig=rig;
 		Animator=animator;
 		
@@ -121,7 +115,7 @@ function AnimationController:LoadAnimation(categoryId, animList, animModule)
 		self.LoadedAnim[animation] = categoryId;
 
 		local track: AnimationTrack = self.Animator:LoadAnimation(animation);
-		local priority = animation:GetAttribute("AnimationPriority") or 0;
+		local _priority = animation:GetAttribute("AnimationPriority") or 0;
 		local chance = animation:GetAttribute("Chance") or 1;
 		
 		local trackData = {
@@ -177,9 +171,7 @@ function AnimationController:LoadAnimation(categoryId, animList, animModule)
 		end
 	end
 	
-	local tracksGroup = self.Tracks[categoryId];
-	
-	
+	local _tracksGroup = self.Tracks[categoryId];
 	
 	return firstTrackData;
 end
@@ -251,7 +243,10 @@ function AnimationController:Play(categoryId, paramPacket)
 	paramPacket = paramPacket or {};
 	
 	local tracksGroup = self.Tracks[categoryId];
-	if tracksGroup == nil then Debugger:Warn("Play missing animation (",self.Name,")", categoryId) return end;
+	if tracksGroup == nil then
+		Debugger:Warn("Play missing animation (",self.Name,")", categoryId);
+		return;
+	end;
 	
 	local animId = paramPacket.AnimId;
 	local trackData = nil;

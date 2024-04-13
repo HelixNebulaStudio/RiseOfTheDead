@@ -1010,7 +1010,7 @@ Commands["editmode"] = {
 
 --== Server
 Commands["npcstats"] = {
-	Permission = PermissionLevel.Admin;
+	Permission = PermissionLevel.DevBranch;
 	Description = "List npc module attributes.";
 
 	RequiredArgs = 0;
@@ -1018,11 +1018,30 @@ Commands["npcstats"] = {
 	Function = function(player, args)
 		local moduleNpc = game.ServerScriptService.ServerLibrary.Entity.Npc;
 	
-		for k,v in pairs(moduleNpc:GetAttributes()) do
-			print(k,v);
-			shared.Notify(player, k.." = "..tostring(v), "Inform");
+		local total = 0;
+		local countTable = {};
+
+		for a=1, #modNpc.NpcModules do
+			local aNpcModule = modNpc.NpcModules[a] and modNpc.NpcModules[a].Module;
+			local npcName = aNpcModule.Name;
+
+			total = total +1;
+			if countTable[npcName] == nil then
+				local key = string.gsub(npcName, " ", "");
+				key = string.gsub(key, "%.", "");
+				countTable[npcName] = {SpawnCount=moduleNpc:GetAttribute(key)};
+			end
+			countTable[npcName].ActiveCount = (countTable[npcName].ActiveCount or 0) + 1;
+
 		end
-		
+
+		shared.Notify(player, `Total: {total} / { moduleNpc:GetAttribute("ActiveNpcs") } ` , "Inform");
+		for name, countInfo in pairs(countTable) do
+			local txt = `{name}: {countInfo.ActiveCount} / { countInfo.SpawnCount }`
+			print(txt);
+			shared.Notify(player, txt , "Inform");
+		end
+
 		return true;
 	end;
 };

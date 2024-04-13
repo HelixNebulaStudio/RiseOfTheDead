@@ -1,12 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local random = Random.new();
 local animationLibrary = game.ReplicatedStorage.Prefabs.Animations;
-
-local RunService = game:GetService("RunService");
 
 local modEmotes = require(game.ReplicatedStorage.Library.EmotesLibrary);
 local modAnimationController = require(game.ReplicatedStorage.Library.AnimationController);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modRegion = require(game.ReplicatedStorage.Library.Region);
 
 local function lerp(a, b, t) return a * (1-t) + (b*t); end
@@ -38,6 +34,7 @@ return function(self)
 		if baseAnimFolder and baseAnimFolder:FindFirstChild(animCategoryName) then
 			return baseAnimFolder[animCategoryName];
 		end
+		return;
 	end
 	
 	--local animationsPrefabs = animationLibrary:FindFirstChild(npcName) or animationLibrary:FindFirstChild(self.Humanoid.Name);
@@ -151,6 +148,7 @@ return function(self)
 		if getFirst and #getFirst > 0 then
 			return getFirst[1].Track;
 		end
+		return;
 	end
 	
 	
@@ -272,7 +270,7 @@ return function(self)
 
 		while self.CurrentSpeed > 0 do
 			task.wait(1);
-			if modRegion:InRegion(self.RootPart.AssemblyLinearVelocity, Vector3.zero, 1) then
+			if self.RootPart == nil or modRegion:InRegion(self.RootPart.AssemblyLinearVelocity, Vector3.zero, 1) then
 				movementUpdate(0);
 				self.CurrentSpeed = 0;
 				break;

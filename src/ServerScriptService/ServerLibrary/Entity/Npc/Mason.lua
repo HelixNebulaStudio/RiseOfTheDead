@@ -58,6 +58,7 @@ return function(npc, spawnPoint)
 					task.wait(0.5);
 					self.PlayAnimation("SearchAnim");
 				else
+					if self.IsDead then return end;
 					self.PlayAnimation("shrug2");
 				end
 				
@@ -69,6 +70,7 @@ return function(npc, spawnPoint)
 					task.wait(0.5);
 					self.PlayAnimation("InspectAnim");
 				else
+					if self.IsDead then return end;
 					self.PlayAnimation("shrug2");
 				end
 				

@@ -194,7 +194,7 @@ function ModEngine.OnPlayerAdded(player: Player)
 		--end)
 	end
 	
-	Debugger:Log("profile.PolicyData", profile.PolicyData);
+	Debugger:StudioLog("profile.PolicyData", profile.PolicyData);
 	
 	local classPlayer = modPlayers.Get(player);
 	
