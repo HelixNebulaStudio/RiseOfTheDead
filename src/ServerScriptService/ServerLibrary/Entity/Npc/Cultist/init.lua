@@ -95,7 +95,7 @@ return function(npc, spawnPoint)
 				local enemyRootPart = self.Enemy.Humanoid.RootPart;
 				self.Logic:SetState("Aggro");
 
-				self.Move:Follow(enemyRootPart, 0.5);
+				self.Move:Follow(enemyRootPart);
 
 				self.Enemy.Distance = (self.RootPart.CFrame.p - enemyRootPart.CFrame.p).Magnitude;
 				repeat
@@ -111,7 +111,7 @@ return function(npc, spawnPoint)
 							self.Enemy = nil;
 						end
 						if self.Humanoid and self.Humanoid.RootPart and self.Enemy and self.Enemy.Humanoid then
-							self.Move:Follow(enemyRootPart, 0.5);
+							self.Move:Follow(enemyRootPart);
 							self.Move:LookAt(enemyRootPart.Position);
 							self.Enemy.Distance = (self.Humanoid.RootPart.CFrame.p - enemyRootPart.CFrame.p).Magnitude;
 						else

@@ -31,19 +31,21 @@ return function(CutsceneSequence)
 			local classPlayer = modPlayers.Get(player);
 			local profile = modProfile:Get(player);
 			
+			local isOldMission = (os.time()-mission.StartTime) >= (3600*72);
 			while player:IsDescendantOf(game.Players) do
 				wait(mission.Type ~= 3 and 35 or math.random(600, 900));
-				if player:IsDescendantOf(game.Players) then
-					if mission.ProgressionPoint <= 2
-					or (mission.Type == 1 and mission.ProgressionPoint == 4
-					or mission.ProgressionPoint == 5) then
-						
-						if profile and profile.LastDoorCFrame and classPlayer and classPlayer.IsAlive and classPlayer.Properties.InBossBattle == nil then
-							modNpc.Spawn("Cultist", profile.LastDoorCFrame, function(npc, npcModule)
-								npcModule.Properties.TargetableDistance = 4096;
-								npcModule.OnTarget(player);
-							end);
-						end
+				if not player:IsDescendantOf(game.Players) then continue end;
+				if isOldMission and math.random(1, 6) == 1 then continue end;
+
+				if mission.ProgressionPoint <= 2
+				or (mission.Type == 1 and mission.ProgressionPoint == 4
+				or mission.ProgressionPoint == 5) then
+					
+					if profile and profile.LastDoorCFrame and classPlayer and classPlayer.IsAlive and classPlayer.Properties.InBossBattle == nil then
+						modNpc.Spawn("Cultist", profile.LastDoorCFrame, function(npc, npcModule)
+							npcModule.Properties.TargetableDistance = 4096;
+							npcModule.OnTarget(player);
+						end);
 					end
 				end
 			end
