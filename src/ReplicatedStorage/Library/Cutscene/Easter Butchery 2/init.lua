@@ -167,7 +167,9 @@ return function(CutsceneSequence)
 							cultist1Module.Owner = player;
 						end);
 						
-						cultist1Module.Movement:Move(Vector3.new(-160.850769, 2.70417881, 2.4058733)):Wait(3);
+						cultist1Module.Move:MoveTo(Vector3.new(-160.850769, 2.70417881, 2.4058733));
+						cultist1Module.Move.MoveToEnded:Wait(3);
+						
 						bunnymanModule.Movement:Move(Vector3.new(-170.911606, 2.70417905, 2.40587401)):Wait(5);
 						wait(1);
 						cultist1Module.Chat(cultist1Module.Owner, "Hey, wait a minute.. You aren't cultists.. What do you want?!");
