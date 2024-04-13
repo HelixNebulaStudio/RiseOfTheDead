@@ -243,7 +243,8 @@ if RunService:IsServer() then
 							
 							Debugger:Warn("onSunkenSalvagesSpawn");
 							
-							local newPrefab, interactData = modCrates.Spawn("raresunkencrate", spawnCframe, {player}, {});
+							--Whitelist
+							local newPrefab, interactData = modCrates.Spawn("raresunkencrate", spawnCframe, {player}, {}, true);
 							
 							local storageId = interactData.StorageId;
 

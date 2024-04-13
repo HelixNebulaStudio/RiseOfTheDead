@@ -686,15 +686,21 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 	interactData.Script = interactModule;
 	if interactData.Type ~= modInteractables.Types.Storage then return "Interactable is not a storage." end;
 	if not interactData:CheckDebounce(player.Name) then return "Interactable is on cooldown." end; -- Debugger:Warn(player.Name,", interactable is on cooldown.");
-	if interactObject == nil or player:DistanceFromCharacter(interactObject.Position) > 20 then Debugger:Warn(player.Name,", Too far from object."); return "Too far from object."; end;
+	if interactObject == nil or player:DistanceFromCharacter(interactObject.Position) > 20 then
+		Debugger:Warn(player.Name,", Too far from object."); 
+		return "Too far from object.";
+	end;
 
 	if interactObject and interactData then
-		Debugger:Log("Requesting for physical storage.");
-		
+		Debugger:Warn(player,"Requesting for physical storage.", interactData);
+
 		local profile = modProfile:Get(player);
 		local gameSave = profile:GetActiveSave();
 		
-		if interactData.Whitelist and interactData.Whitelist[player.Name] == nil then Debugger:Warn(player.Name,", Interact object locked.."); return "Interact object locked."; end
+		if interactData.Whitelist and interactData.Whitelist[player.Name] == nil then
+			Debugger:Warn(player.Name,", Interact object locked..");
+			return "Interact object locked.";
+		end
 		
 		if interactData.LevelRequired and interactData.LevelRequired > (gameSave:GetStat("Level") or 0) then
 			Debugger:Warn(player.Name,", underleveled.");
