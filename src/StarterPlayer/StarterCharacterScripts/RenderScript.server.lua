@@ -32,7 +32,7 @@ local function link(side)
 	local middleFinger: BasePart = character:WaitForChild(side.."Middle");
 	local pinkyFinger: BasePart = character:WaitForChild(side.."Pinky");
 
-	local handOld: BasePart = character:WaitForChild(side.."HandOld");
+	local handOld: MeshPart = character:WaitForChild(side.."HandOld");
 	
 	local function updateColor()
 		local shirt: Shirt = character:FindFirstChildWhichIsA("Shirt");
