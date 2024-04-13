@@ -73,6 +73,12 @@ local remoteHudNotification = modRemotesManager:Get("HudNotification");
 local remotePromptWarning = remotes.Interface.PromptWarning;
 
 local random = Random.new();
+
+local hardModeBitFlag = modBitFlags.new();
+hardModeBitFlag:AddFlag("Slow", 1);
+hardModeBitFlag:AddFlag("LongerLoad", 2);
+hardModeBitFlag:AddFlag("KickLoad", 3);
+
 --== Script;
 local profileDatabase = FirebaseService:GetFirebase("Profiles");
 local dataSizeDatabase = DataStoreService:GetOrderedDataStore("DataSize");
@@ -168,12 +174,6 @@ function Profile:GetLiveProfile(userId)
 	return liveProfile;
 end
 
-local hardModeBitFlag = modBitFlags.new();
-hardModeBitFlag:AddFlag("Slow", 1);
-hardModeBitFlag:AddFlag("LongerLoad", 2);
-hardModeBitFlag:AddFlag("KickLoad", 3);
-
-
 function Profile.new(player) -- Contains player to game statistics. Not character save data.
 	local playerName = player.Name;
 	local profile = Profile.Profiles[playerName];
@@ -210,7 +210,7 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 		profileMeta.HardModeBitFlag = hardModeBitFlag;
 		
 		function profileMeta:GetHardMode(tag)
-			return hardModeBitFlag:Test(tag, self.HardMode);
+			return hardModeBitFlag:Test(tag, self.HardMode or 0);
 		end
 		function profileMeta:SetHardMode(tag, value)
 			self.HardMode = hardModeBitFlag:Set(self.HardMode, tag, value);
@@ -804,7 +804,7 @@ function Profile:Load(loadOverwrite)
 			elseif key == "HardMode" then
 				self[key] = data;
 				
-				if self:GetHardMode("Slow") then
+				if data > 0 then
 					local hmList = self.HardModeBitFlag:List(self.HardMode);
 					for tag, v in pairs(hmList) do
 						if v == true then

@@ -205,7 +205,7 @@ function ModEngine.OnPlayerAdded(player: Player)
 			break;
 		else
 			if (tick()-arTick) >= 10 then
-				Debugger:Warn("Init spawn waiting for AutoRespawn attribute (",player,").");
+				Debugger:StudioWarn("Init spawn waiting for AutoRespawn attribute (",player,").");
 				arTick = tick();
 			end
 		end
