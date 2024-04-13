@@ -92,6 +92,7 @@ return function(self)
 				task.spawn(function()
 					detonTime = self.Prefab:GetAttribute("DetonationTime");
 					while workspace:GetServerTimeNow() <= detonTime do
+						if self.Prefab:GetAttribute("DetonationTime") == nil then return end;
 						local timeLeft = self.Prefab:GetAttribute("DetonationTime")-workspace:GetServerTimeNow();
 						
 						timeLeft = duration-math.clamp(timeLeft, 0, duration);

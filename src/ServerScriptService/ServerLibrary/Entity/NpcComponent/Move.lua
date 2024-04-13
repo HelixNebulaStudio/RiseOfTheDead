@@ -120,7 +120,7 @@ function Move:Follow(target: Vector3 | BasePart, maxFollowDist: number, minFollo
 	if self.Destroyed then return end;
 	if self.Npc.RootPart == nil or self.Npc.IsDead then return end;
 	if self.Npc.Humanoid.PlatformStand then return end;
-	if target == nil then Debugger:Warn("Move:Follow Target nil", self.Npc.Name); return end
+	if target == nil then return end; -- Debugger:Warn("Move:Follow Target nil", self.Npc.Name);
 	
 	self.MoveId = self.MoveId + 1;
 	self.IsMoving = true;

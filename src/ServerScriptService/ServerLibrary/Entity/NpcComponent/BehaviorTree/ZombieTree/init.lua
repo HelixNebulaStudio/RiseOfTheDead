@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modLogicTree = require(game.ReplicatedStorage.Library.LogicTree);
 
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modRegion = require(game.ReplicatedStorage.Library.Region);
+local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 
 return function(self)
 	local tree = modLogicTree.new{
@@ -56,7 +56,7 @@ return function(self)
 		
 		cache.TargetPosition = targetRootPart.CFrame.p;
 		
-		local isInRange = modRegion:InRegion(self.RootPart.Position, self.Target:GetPivot().Position, self.Properties.AttackRange);
+		local isInRange = modVector:InCenter(self.RootPart.Position, self.Target:GetPivot().Position, self.Properties.AttackRange);
 		if isInRange and (tick() > cache.AttackCooldown) then
 			return modLogicTree.Status.Success;
 		end
@@ -142,18 +142,26 @@ return function(self)
 			return modLogicTree.Status.Success; 
 		end
 
-		local isInRange = modRegion:InRegion(self.RootPart.Position, self.Target:GetPivot().Position, math.random(20, 40));
+		local isInRange = modVector:InCenter(self.RootPart.Position, self.Target:GetPivot().Position, math.random(20, 40));
 		if isInRange then
 			if cache.TriggerHostileTick == nil then
 				local docileDuration = self.DocileDuration;
 
 				local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-				if not modBranchConfigs.WorldInfo.PublicWorld then
-					task.wait(math.random(0, 30)/100);
-					return modLogicTree.Status.Success;
-					
-				else
+				if modBranchConfigs.WorldInfo.PublicWorld then
 					docileDuration = (docileDuration or 1) + math.random(0,300)/100;
+
+					if self.HordeAttack == true then
+						docileDuration = 0;
+
+					elseif modVector:InCenter(self.RootPart.Position, self.Target:GetPivot().Position, 15) then
+						docileDuration = math.random(0, 30)/100;
+						
+					end
+
+				else
+					task.wait(math.random(0, 30)/100);
+					return tree.Success;
 					
 				end
 				

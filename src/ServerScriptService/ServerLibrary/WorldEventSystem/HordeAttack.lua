@@ -1,15 +1,12 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
 local WorldEventSystem = {};
 local HordeAttack = {}
 local AttackLocations = {};
 local LocationsList = {};
 
-local RunService = game:GetService("RunService");
-
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modPlayers = require(game.ReplicatedStorage.Library.Players);
 
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 
@@ -79,6 +76,7 @@ function HordeAttack.Start()
 		
 		if groundHit == nil then return end;
 		
+		npcModule.HordeAttack = true;
 		npcModule.FakeSpawnPoint = CFrame.new(groundPoint);
 		
 		npcModule.Configuration.DefaultResourceDrop = npcModule.Configuration.ResourceDrop;
@@ -106,7 +104,7 @@ function HordeAttack.Start()
 		end
 	end
 	
-	local playersAlive = game.Players:GetPlayers();
+	local _playersAlive = game.Players:GetPlayers();
 	
 	modNpc.OnNpcSpawn:Connect(UpdateNpc);
 	
@@ -116,6 +114,7 @@ function HordeAttack.Start()
 	
 	local function announceTimeLeft()
 		if complete then return end;
+		
 		local timeLeft = startTime - os.time();
 		if timeLeft > 60 then
 			shared.Notify(game.Players:GetPlayers(), "The Horde Attack will end in "..math.ceil(timeLeft/60).." minutes!", "Defeated");
@@ -134,10 +133,12 @@ function HordeAttack.Start()
 		modNpc.OnNpcSpawn:Disconnect(UpdateNpc);
 		
 		for a=1, #modNpc.NpcModules do
-			if HordeTypes[modNpc.NpcModules[a].Module.Name] then
-				modNpc.NpcModules[a].Module.FakeSpawnPoint = nil;
-				if modNpc.NpcModules[a].Module.Configuration.DefaultResourceDrop then
-					modNpc.NpcModules[a].Module.Configuration.ResourceDrop = modNpc.NpcModules[a].Module.Configuration.DefaultResourceDrop;
+			local npcModule = modNpc.NpcModules[a].Module;
+			if HordeTypes[npcModule.Name] then
+				npcModule.FakeSpawnPoint = nil;
+				if npcModule.Configuration.DefaultResourceDrop then
+					npcModule.Configuration.ResourceDrop = npcModule.Configuration.DefaultResourceDrop;
+					npcModule.HordeAttack = true;
 				end
 			end
 		end
