@@ -592,6 +592,7 @@ if Branches.WorldName == "BioXResearch" then
 	modConfigurations.Set("BaseWoundedDuration", 10);
 	modConfigurations.Set("SpectateEnabled", true);
 	modConfigurations.Set("DisableMapItems", false);
+	--modConfigurations.Set("NaturalSpawnLimit", 10);
 	
 elseif Branches.WorldName == "Safehome" then
 	modConfigurations.Set("DisableSafehomeMenu", false);
