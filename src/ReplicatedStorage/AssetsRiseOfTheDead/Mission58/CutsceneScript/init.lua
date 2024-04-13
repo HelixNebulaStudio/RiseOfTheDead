@@ -353,7 +353,7 @@ return function(CutsceneSequence)
 			zarkModule:TeleportHide();
 
 			local patrickModule;
-			modNpc.Spawn("Patrick", CFrame.new(4.555336, 2.63293743, 91.5086823, 0.358367682, 0, -0.933580518, 0, 1, 0, 0.933580518, 0, 0.358367682), function(npc, npcModule)
+			modNpc.Spawn("Patrick", CFrame.new(4.555336, 3, 91.5086823, 0.358367682, 0, -0.933580518, 0, 1, 0, 0.933580518, 0, 0.358367682), function(npc, npcModule)
 				npcModule.Owner = player;
 				patrickModule = npcModule;
 			end, modNpc.NpcBaseModules.BasicNpcModule);
@@ -585,7 +585,7 @@ return function(CutsceneSequence)
 						patrickModule.Move:HeadTrack(revasModule.Head);
 						patrickModule.Move:MoveTo(Vector3.new(-0.717552722, -10.0268211, 35.5515823));
 						task.spawn(function()
-							patrickModule.Move.MoveToEnded:Wait();
+							patrickModule.Move.MoveToEnded:Wait(15);
 							task.wait(0.1);
 							patrickModule.Move:Face(revasModule.RootPart);
 						end)

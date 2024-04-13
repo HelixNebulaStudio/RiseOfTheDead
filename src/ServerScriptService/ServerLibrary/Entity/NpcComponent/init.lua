@@ -12,6 +12,9 @@ local modPhysics = require(game.ReplicatedStorage.Library.Util.Physics);
 
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 
+local npcHidden = game.ServerStorage.PrefabStorage:WaitForChild("Objects"):WaitForChild("NpcHidden"); -- for :TeleportHide();
+npcHidden.Parent = workspace;
+
 local remotes = game.ReplicatedStorage.Remotes;
 local bindOnTalkedTo = remotes.Dialogue.OnTalkedTo;
 
