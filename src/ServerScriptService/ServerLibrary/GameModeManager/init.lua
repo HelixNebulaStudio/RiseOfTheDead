@@ -236,6 +236,11 @@ function GameModeManager:Initialize(gameType, gameStage)
 						task.spawn(function()
 							local player = room.Players[a] and room.Players[a].Instance;
 							if player then
+								local classPlayer = modPlayers.Get(player);
+								if classPlayer and classPlayer.RootPart then
+									classPlayer.RootPart.Anchored = false;
+								end
+
 								modMission:Progress(player, 7, function(mission)
 									if mission.ProgressionPoint < 3 then mission.ProgressionPoint = 3; end;
 								end)
@@ -529,7 +534,7 @@ function GameModeManager:JoinRoom(player, gameTable, room)
 			shared.modAntiCheatService:Teleport(player, CFrame.new(playerData.LobbyPosition.WorldPosition + Vector3.new(0, 2, 0))
 				* (playerData.LobbyPosition.CFrame - playerData.LobbyPosition.CFrame.p));
 
-			rootPart.Anchored = false;
+			--rootPart.Anchored = false;
 			
 			local hardItemId = gameTable.StageLib.HardModeItem;
 			if hardItemId and rootPart.Parent:FindFirstChild(hardItemId) and rootPart.Parent[hardItemId]:FindFirstChild("Handle") then
