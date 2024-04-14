@@ -1,29 +1,29 @@
 local localPlayer = game.Players.LocalPlayer;
 local character = script.Parent;
 
-local upperTorso: MeshPart = character:WaitForChild("UpperTorso");
-local leftUpperArm: MeshPart = character:WaitForChild("LeftUpperArm");
-local rightUpperArm: MeshPart = character:WaitForChild("RightUpperArm");
+-- local upperTorso: MeshPart = character:WaitForChild("UpperTorso");
+-- local leftUpperArm: MeshPart = character:WaitForChild("LeftUpperArm");
+-- local rightUpperArm: MeshPart = character:WaitForChild("RightUpperArm");
 
-local leftUpperLeg: MeshPart = character:WaitForChild("LeftUpperLeg");
-local rightUpperLeg: MeshPart = character:WaitForChild("RightUpperLeg");
+-- local leftUpperLeg: MeshPart = character:WaitForChild("LeftUpperLeg");
+-- local rightUpperLeg: MeshPart = character:WaitForChild("RightUpperLeg");
 
-local function characterUpdate(obj)
-	if obj:IsA("Shirt") then
-		upperTorso.TextureID = obj.ShirtTemplate;
-		leftUpperArm.TextureID = obj.ShirtTemplate;
-		rightUpperArm.TextureID = obj.ShirtTemplate;
-		obj.Parent = nil;
+-- local function characterUpdate(obj)
+-- 	if obj:IsA("Shirt") then
+-- 		upperTorso.TextureID = obj.ShirtTemplate;
+-- 		leftUpperArm.TextureID = obj.ShirtTemplate;
+-- 		rightUpperArm.TextureID = obj.ShirtTemplate;
+-- 		obj.Parent = nil;
 		
-	elseif obj:IsA("Pants") then
-		leftUpperLeg.TextureID = obj.PantsTemplate;
-		rightUpperLeg.TextureID = obj.PantsTemplate;
-		obj.Parent = nil;
-	end
-end
+-- 	elseif obj:IsA("Pants") then
+-- 		leftUpperLeg.TextureID = obj.PantsTemplate;
+-- 		rightUpperLeg.TextureID = obj.PantsTemplate;
+-- 		obj.Parent = nil;
+-- 	end
+-- end
 
---character.ChildAdded:Connect(characterUpdate)
---character.ChildRemoved:Connect(characterUpdate)
+-- --character.ChildAdded:Connect(characterUpdate)
+-- --character.ChildRemoved:Connect(characterUpdate)
 
 local function link(side)
 	local hand: BasePart = character:WaitForChild(side.."Hand");
@@ -44,6 +44,9 @@ local function link(side)
 		
 		handOld.Color = newColor;
 		
+		local player = game:GetService("Players"):GetPlayerFromCharacter(character);
+		if player ~= localPlayer then return end;
+
 		local useOldHands = localPlayer:GetAttribute("UseOldHands");
 		
 		if hand:GetAttribute("HideHands") == true then
@@ -106,11 +109,3 @@ end
 
 link("Left");
 link("Right");
-
-
---if character:FindFirstChild("Shirt") then
---	characterUpdate(character.Shirt);
---end
---if character:FindFirstChild("Pants") then
---	characterUpdate(character.Pants);
---end

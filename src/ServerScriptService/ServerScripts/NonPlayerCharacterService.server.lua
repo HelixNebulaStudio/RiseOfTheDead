@@ -75,9 +75,7 @@ task.spawn(function()
 end)
 
 local SpawnTypeSpacing = {
-	Zombie=3;
-	Ticks=6;
-	Leaper=4;
+	Zombie=8;
 }
 
 function InitializeSpawner(spawnerModule)
@@ -161,7 +159,6 @@ function InitializeSpawner(spawnerModule)
 			local modMapLibrary = require(game.ReplicatedStorage.Library.MapLibrary);
 			local layerName = modMapLibrary:GetLayer(cframe.Position);
 			npcModule.MapLayerName = layerName;
-			--Debugger:Log("layerName, layerData", modMapLibrary:GetLayer(cframe.Position));
 			
 			if self.OnSpawnConfigure then
 				local s, e = pcall(function()
@@ -192,19 +189,6 @@ function InitializeSpawner(spawnerModule)
 					end
 				end
 			end)
-			--npc.Destroying:Connect(function()
-			--	npcModule = nil;
-
-			--	task.wait(self.RespawnTimer);
-
-			--	for a=#self.Active, 1, -1 do
-			--		if self.Active[a].Parent == nil then
-			--			table.remove(self.Active, a);
-			--		end
-			--	end
-
-			--	--globalScheduler:Resume(self.ActiveTask, true);
-			--end)
 			
 			CollectionService:AddTag(npc:WaitForChild("HumanoidRootPart"), "SpawnerRootParts");
 		end, customNpcModule);
@@ -248,10 +232,10 @@ function InitializeSpawner(spawnerModule)
 		self.HumanoidInfo = prefab:FindFirstChildWhichIsA("Humanoid");
 		
 		local spawnAreaSize = spawnArea.Size;
-		local spawnSpace = Vector2.new(spawnAreaSize.X,spawnAreaSize.Z)/Vector2.new(self.SpawnSize.X, self.SpawnSize.Z);
+		local spawnSpace = Vector2.new(spawnAreaSize.X,spawnAreaSize.Z) / Vector2.new(self.SpawnSize.X, self.SpawnSize.Z);
 
-		local spawnTypeSpacing = SpawnTypeSpacing[self.SpawnType] or 2;
-		self.MaxSpawnSpaceAmount = math.ceil(math.ceil(spawnSpace.X) * math.ceil(spawnSpace.Y) /spawnTypeSpacing);
+		local spawnTypeSpacing = SpawnTypeSpacing[self.SpawnType] or 32;
+		self.MaxSpawnSpaceAmount = math.ceil(math.ceil(spawnSpace.X) * math.ceil(spawnSpace.Y) / math.pow(spawnTypeSpacing,2) );
 		
 		-- Initialize spawn region
 		local worldSpaceSize = spawnArea.CFrame:vectorToWorldSpace(spawnArea.Size);
@@ -265,6 +249,7 @@ function InitializeSpawner(spawnerModule)
 		self.Position = spawnArea.Position;
 	end
 	
+
 	spawnerObject.IsSpawning = tick()-1;
 	spawnerObject.RequestSpawn = function(self)
 		if self.IsSpawning > tick() then return end;
@@ -275,9 +260,17 @@ function InitializeSpawner(spawnerModule)
 		
 		local naturalSpawnLimit = modConfigurations.NaturalSpawnLimit or 999;
 		task.spawn(function()
+			if workspace:GetAttribute("PlayerCount") then
+				playerCount = workspace:GetAttribute("PlayerCount");
+			else
+				playerCount = math.max(playerCount, 3);
+			end
+
 			local minCount = math.max(self.MinAmount or 1, self.MinAmount == nil and math.floor(defaultMaxAmount/2) or 0);
 			local maxCount = math.max(self.MaxSpawnSpaceAmount, defaultMaxAmount, minCount)
-			self.MaxAmount = math.clamp(math.ceil(playerCount * (defaultMaxAmount/4)), minCount, maxCount);
+			local setCount = math.ceil(playerCount/game.Players.MaxPlayers * (maxCount-minCount));
+
+			self.MaxAmount = math.clamp(setCount, minCount, maxCount);
 
 			local respawnAmt = (self.MaxAmount - #self.Active);
 

@@ -912,7 +912,6 @@ function Interface.Update()
 	local players = game.Players:GetPlayers();
 	local totalFriends = 0;
 	local onlineFriends = 0;
-	local totalPlayers = #players;
 	
 	local updated = {};
 	
@@ -949,7 +948,7 @@ function Interface.Update()
 			updated[player.Name] = true;
 		end
 	end
-	serverTabLabel.Text = "Players Online ("..#players.."/"..totalPlayers..")";
+	serverTabLabel.Text = "Players Online ("..#players.."/".. game.Players.MaxPlayers ..")";
 	
 	--== Friends;
 	local friendsTab = list:FindFirstChild("FriendsTab");
