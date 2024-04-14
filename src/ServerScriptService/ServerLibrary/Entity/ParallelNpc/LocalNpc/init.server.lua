@@ -4,7 +4,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local modParallelData = require(game.ReplicatedStorage.ParallelLibrary:WaitForChild("DataModule"));
 
-local remote = script.Parent:WaitForChild("NpcRemote");
+local remote = script.Parent:WaitForChild("NpcRemote") :: RemoteEvent;
 local actor = script:GetActor();
 if actor == nil then return end;
 
@@ -22,7 +22,8 @@ localNpc.Humanoid = humanoid;
 
 local localNpcModule = script:WaitForChild("Npc"):FindFirstChild(prefab.Name) and require(script.Npc[prefab.Name]) or nil;
 if localNpcModule then
-	localNpcModule.new(localNpc);
+	local component = localNpcModule.new(localNpc);
+	localNpc[prefab.Name] = component;
 end
 
 for _, componentModule in pairs(script:GetChildren()) do
@@ -50,13 +51,16 @@ remote.OnClientEvent:Connect(function(action, ...)
 	if action == "ApplyImpulseAtPosition" then
 		local targetPart: BasePart, force, position = ...;
 		targetPart:ApplyImpulseAtPosition(force, position);
-		
+		return;
 	end
 	
 	local component = localNpc[action];
-	if component and component.OnRemoteEvent then
-		component:OnRemoteEvent(...);
+	if component == nil or component.OnRemoteEvent == nil then
+		Debugger:StudioWarn("Missing OnRemoteEvent for", action, ...);
+		return;
 	end
+
+	component:OnRemoteEvent(...);
 end)
 
 task.defer(function()

@@ -88,6 +88,20 @@ function Ticks.new(localNpc)
 		end
 	end)
 	
+	function self:OnRemoteEvent(action, packet)
+		if action == "Detonate" then
+			local effectMesh = packet[1];
+			local newEffect = effectMesh.Parent;
+			local speed = packet[2];
+			local range = packet[3];
+
+			Debugger.Expire(newEffect, speed);
+			local duration = speed +0.3;
+			TweenService:Create(effectMesh, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale = Vector3.new(range,range,range)}):Play();
+			TweenService:Create(newEffect, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Transparency = 0.8}):Play();
+		end
+	end
+
 	return self;
 end
 

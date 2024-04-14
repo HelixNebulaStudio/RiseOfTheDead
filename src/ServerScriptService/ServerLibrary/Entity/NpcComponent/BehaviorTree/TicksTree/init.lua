@@ -122,17 +122,16 @@ return function(self)
 		self.Detonated = true;
 		
 		if self.IsDead then return end;
-		self.Humanoid:SetAttribute("DisableRagdoll", true);
 		
 		local newEffect = explosionEffectPrefab:Clone();
-		newEffect.CFrame = self.Head.CFrame;
 		local effectMesh = newEffect:WaitForChild("Mesh");
+		newEffect.CFrame = self.Head.CFrame;
 		newEffect.Parent = workspace.Debris;
 		local speed = 0.5;
 		local range = 60;
-		TweenService:Create(effectMesh, TweenInfo.new(speed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale = Vector3.new(range,range,range)}):Play();
-		TweenService:Create(newEffect, TweenInfo.new(speed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Transparency = 0.8}):Play();
-		Debugger.Expire(newEffect, speed+0.1);
+
+		self.Remote:FireAllClients("Ticks", "Detonate", {effectMesh, speed, range});
+		Debugger.Expire(newEffect, 1);
 		
 		local damage = self.Properties.AttackDamage * (1-math.clamp(self.GetTargetDistance(), 0, 30)/30);
 		if damage >= 1  then
