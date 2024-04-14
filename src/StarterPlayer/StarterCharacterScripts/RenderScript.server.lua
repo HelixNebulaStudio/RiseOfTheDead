@@ -1,3 +1,5 @@
+if not workspace:IsAncestorOf(script) then return end;
+
 local localPlayer = game.Players.LocalPlayer;
 local character = script.Parent;
 
