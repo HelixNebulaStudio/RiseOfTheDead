@@ -29,7 +29,7 @@ function Animate.new(parallelNpc)
 	local prefab: Actor = self.ParallelNpc.Prefab;
 	local humanoid: Humanoid = self.ParallelNpc.Humanoid;
 	local rootPart: BasePart = self.ParallelNpc.RootPart;
-	local animator: Animator = humanoid:WaitForChild("Animator");
+	local animator: Animator = humanoid:WaitForChild("Animator") :: Animator;
 	
 	if prefab:GetAttribute("ClientSideAnimations") ~= true then return end;
 	if prefab:HasTag("Deadbody") then return end;

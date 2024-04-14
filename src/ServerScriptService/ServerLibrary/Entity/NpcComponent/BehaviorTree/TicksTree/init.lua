@@ -130,7 +130,7 @@ return function(self)
 		local speed = 0.5;
 		local range = 60;
 
-		self.Remote:FireAllClients("Ticks", "Detonate", {effectMesh, speed, range});
+		self.Remote:FireAllClients("Ticks", "detonate", {effectMesh, speed, range});
 		Debugger.Expire(newEffect, 1);
 		
 		local damage = self.Properties.AttackDamage * (1-math.clamp(self.GetTargetDistance(), 0, 30)/30);

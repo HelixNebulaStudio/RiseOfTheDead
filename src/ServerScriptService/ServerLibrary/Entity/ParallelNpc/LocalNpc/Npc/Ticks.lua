@@ -89,7 +89,7 @@ function Ticks.new(localNpc)
 	end)
 	
 	function self:OnRemoteEvent(action, packet)
-		if action == "Detonate" then
+		if action == "detonate" then
 			local effectMesh = packet[1];
 			local newEffect = effectMesh.Parent;
 			local speed = packet[2];
