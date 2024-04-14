@@ -701,6 +701,7 @@ library:Add{
 
 		{Index=2; ItemId="explosives"; Recyclable=true; Quantity=1; Chance=1/3;};
 		{Index=2; ItemId="smgdeadeyemod"; Recyclable=true; Quantity=1; Chance=1/3;};
+		{Index=2; ItemId="ticksnaretrapbp"; Recyclable=true; Quantity=1; Chance=1/3;};
 		{Index=2; ItemId="chainsawbp"; Recyclable=true; Quantity=1; Chance=1;};
 	};
 };
