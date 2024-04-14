@@ -217,8 +217,8 @@ function NpcComponent:BreakJoint(motor: Motor6D)
 				end
 			end
 			
-			task.wait(1);
-			modPhysics.WaitForSleep(assemblyRoot);
+			task.wait(5);
+			--modPhysics.WaitForSleep(assemblyRoot);
 			
 			if workspace:IsAncestorOf(assemblyRoot) then
 				for _, bodyPart :BasePart in pairs(connParts) do

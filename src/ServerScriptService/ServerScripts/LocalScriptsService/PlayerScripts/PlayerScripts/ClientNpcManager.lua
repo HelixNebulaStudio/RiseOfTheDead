@@ -85,6 +85,7 @@ return function()
 		if maxDeadbodies <= 0 then return end;
 
 		local humanoidRootPart = prefab:FindFirstChild("HumanoidRootPart") :: BasePart;
+		if humanoidRootPart == nil then return end;
 		humanoidRootPart:GetPropertyChangedSignal("Anchored"):Once(function()
 			for _, part in pairs(prefab:GetChildren()) do
 				if not part:IsA("BasePart") then continue end;

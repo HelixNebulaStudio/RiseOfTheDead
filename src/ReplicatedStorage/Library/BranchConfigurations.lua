@@ -516,7 +516,7 @@ elseif Branches.WorldInfo.Type == Branches.WorldTypes.General or Branches.WorldI
 		modConfigurations.Set("SpawnProtectionTimer", 120);
 		modConfigurations.Set("DisableMapItems", false);
 		modConfigurations.Set("ExpireDeployables", true);
-		modConfigurations.Set("NaturalSpawnLimit", 100);
+		modConfigurations.Set("NaturalSpawnLimit", 75);
 		
 	else
 		modConfigurations.Set("SpectateEnabled", true);
