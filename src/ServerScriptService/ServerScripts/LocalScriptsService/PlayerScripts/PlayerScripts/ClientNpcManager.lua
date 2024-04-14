@@ -88,8 +88,9 @@ return function()
 		humanoidRootPart:GetPropertyChangedSignal("Anchored"):Once(function()
 			for _, part in pairs(prefab:GetChildren()) do
 				if not part:IsA("BasePart") then continue end;
-				if part.Name == "HumanoidRootPart" then continue end;
 				part.Anchored = false;
+				
+				if part.Name == "HumanoidRootPart" then continue end;
 				part.CanCollide = true;
 			end
 		end)
