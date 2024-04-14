@@ -264,6 +264,9 @@ function InitializeSpawner(spawnerModule)
 				playerCount = workspace:GetAttribute("PlayerCount");
 			else
 				playerCount = math.max(playerCount, 3);
+				if modBranchConfigs.CurrentBranch.Name == "Dev" then
+					playerCount = game.Players.MaxPlayers;
+				end
 			end
 
 			local minCount = math.max(self.MinAmount or 1, self.MinAmount == nil and math.floor(defaultMaxAmount/2) or 0);
