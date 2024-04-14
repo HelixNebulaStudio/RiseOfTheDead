@@ -136,60 +136,60 @@ end
 --	};
 --}
 
-AddTool{
-	ItemId="gingerbreadman";
-	Type="FoodTool";
-	Animations={
-		Core={Id=3296519824;};
-		Use={Id=4534092581;};
-	};
-	Audio={
-	};
-}
+-- AddTool{
+-- 	ItemId="gingerbreadman";
+-- 	Type="FoodTool";
+-- 	Animations={
+-- 		Core={Id=3296519824;};
+-- 		Use={Id=4534092581;};
+-- 	};
+-- 	Audio={
+-- 	};
+-- }
 
-AddTool{
-	ItemId="eggnog";
-	Type="FoodTool";
-	Animations={
-		Core={Id=3296519824;};
-		Use={Id=4534077346;};
-	};
-	Audio={
-	};
-}
+-- AddTool{
+-- 	ItemId="eggnog";
+-- 	Type="FoodTool";
+-- 	Animations={
+-- 		Core={Id=3296519824;};
+-- 		Use={Id=4534077346;};
+-- 	};
+-- 	Audio={
+-- 	};
+-- }
 
-AddTool{
-	ItemId="chocobar";
-	Type="FoodTool";
-	Animations={
-		Core={Id=3296519824;};
-		Use={Id=5795297695;};
-	};
-	Audio={
-	};
-}
+-- AddTool{
+-- 	ItemId="chocobar";
+-- 	Type="FoodTool";
+-- 	Animations={
+-- 		Core={Id=3296519824;};
+-- 		Use={Id=5795297695;};
+-- 	};
+-- 	Audio={
+-- 	};
+-- }
 
-AddTool{
-	ItemId="gumball";
-	Type="FoodTool";
-	Animations={
-		Core={Id=3296519824;};
-		Use={Id=6122752703;};
-	};
-	Audio={
-	};
-}
+-- AddTool{
+-- 	ItemId="gumball";
+-- 	Type="FoodTool";
+-- 	Animations={
+-- 		Core={Id=3296519824;};
+-- 		Use={Id=6122752703;};
+-- 	};
+-- 	Audio={
+-- 	};
+-- }
 
-AddTool{
-	ItemId="cannedfish";
-	Type="FoodTool";
-	Animations={
-		Core={Id=6961217852;};
-		Use={Id=6961218719;};
-	};
-	Audio={
-	};
-}
+-- AddTool{
+-- 	ItemId="cannedfish";
+-- 	Type="FoodTool";
+-- 	Animations={
+-- 		Core={Id=6961217852;};
+-- 		Use={Id=6961218719;};
+-- 	};
+-- 	Audio={
+-- 	};
+-- }
 
 AddTool{
 	ItemId="annihilationsoda";
