@@ -285,6 +285,7 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	if basePrefab == nil then return end;
 	
 	local npcPrefab: Actor = basePrefab:Clone();
+	npcPrefab.ModelStreamingMode = Enum.ModelStreamingMode.PersistentPerPlayer;
 	npcPrefab.Name = name;
 	
 	local rootPart = npcPrefab:WaitForChild("HumanoidRootPart");

@@ -170,6 +170,8 @@ function GameMode:Start(room)
 			npcModule.NetworkOwners = players;
 			
 			for _, player in pairs(players) do
+				npc:AddPersistentPlayer(player);
+
 				modMission:Progress(player, 7, function(mission)
 					if mission.ProgressionPoint == 3 then
 						local npcs = modNpc.GetPlayerNpcList(player);
