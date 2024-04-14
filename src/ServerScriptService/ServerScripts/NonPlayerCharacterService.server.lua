@@ -180,7 +180,7 @@ function InitializeSpawner(spawnerModule)
 
 				npcModule = nil;
 
-				task.wait(self.RespawnTimer);
+				task.wait(self.RespawnTimer or 10);
 
 				for a=#self.Active, 1, -1 do
 					local npcModule = self.Active[a];
