@@ -542,7 +542,11 @@ function ga:PlayerJoined(Player)
 		if PlayerData.OwnedGamepasses == nil then --player is new (or is playing after SDK update)
 			PlayerData.OwnedGamepasses = {}
 			for _, id in ipairs(state._availableGamepasses) do
-				if MKT:UserOwnsGamePassAsync(Player.UserId, id) then
+				local ownGP = false;
+				pcall(function()
+					ownGP = MKT:UserOwnsGamePassAsync(Player.UserId, id);
+				end)
+				if ownGP then
 					table.insert(PlayerData.OwnedGamepasses, id)
 				end
 			end
@@ -553,7 +557,11 @@ function ga:PlayerJoined(Player)
 			--build a list of the game passes a user owns
 			local currentlyOwned = {}
 			for _, id in ipairs(state._availableGamepasses) do
-				if MKT:UserOwnsGamePassAsync(Player.UserId, id) then
+				local ownGP = false;
+				pcall(function()
+					ownGP = MKT:UserOwnsGamePassAsync(Player.UserId, id);
+				end)
+				if ownGP then
 					table.insert(currentlyOwned, id)
 				end
 			end
