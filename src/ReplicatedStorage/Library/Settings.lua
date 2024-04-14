@@ -7,6 +7,7 @@ local RunService = game:GetService("RunService");
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
+local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local modConfigInterface = require(game.ReplicatedStorage.Library.UI.ConfigInterface);
 
@@ -530,10 +531,13 @@ baseConfigInterface:Add("VisualsGraphics", "SliderOption", {
 	DescProperties={Text="The time until dead bodies are despawned.";};
 	Config={
 		SettingsKey="DeadbodyDespawnTimer";
-		RangeInfo={Min=1; Max=61; Default=61; ValueType="Flat";
+		RangeInfo={Min=1; Max=61; Default=16; ValueType="Flat";
 			DisplayValueFunc=function(v)
 				if v == 61 then
-					return "Disabled";
+					if modBranchConfigs.CurrentBranch.Name == "Dev" then
+						return "Disabled";
+					end
+					return "60s";
 				else
 					return v.."s";
 				end

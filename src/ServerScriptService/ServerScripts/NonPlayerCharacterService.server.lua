@@ -74,6 +74,11 @@ task.spawn(function()
 	end
 end)
 
+local SpawnTypeSpacing = {
+	Zombie=3;
+	Ticks=6;
+	Leaper=4;
+}
 
 function InitializeSpawner(spawnerModule)
 	local spawnArea = {};
@@ -244,7 +249,9 @@ function InitializeSpawner(spawnerModule)
 		
 		local spawnAreaSize = spawnArea.Size;
 		local spawnSpace = Vector2.new(spawnAreaSize.X,spawnAreaSize.Z)/Vector2.new(self.SpawnSize.X, self.SpawnSize.Z);
-		self.MaxSpawnSpaceAmount = math.ceil(math.ceil(spawnSpace.X) * math.ceil(spawnSpace.Y) /2);
+
+		local spawnTypeSpacing = SpawnTypeSpacing[self.SpawnType] or 2;
+		self.MaxSpawnSpaceAmount = math.ceil(math.ceil(spawnSpace.X) * math.ceil(spawnSpace.Y) /spawnTypeSpacing);
 		
 		-- Initialize spawn region
 		local worldSpaceSize = spawnArea.CFrame:vectorToWorldSpace(spawnArea.Size);

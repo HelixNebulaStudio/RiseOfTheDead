@@ -15,6 +15,7 @@ return function()
 	
 	local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 	local modDeadbodiesHandler = require(game.ReplicatedStorage.Library.DeadbodiesHandler);
+	local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 
@@ -72,7 +73,7 @@ return function()
 		local deadbodyDespawnTimer = modData:GetSetting("DeadbodyDespawnTimer");
 		local maxDeadbodies = modData:GetSetting("MaxDeadbodies");
 
-		if deadbodyDespawnTimer < 61 then
+		if modBranchConfigs.CurrentBranch.Name == "Live" or deadbodyDespawnTimer < 61 then
 			game.Debris:AddItem(prefab, deadbodyDespawnTimer);
 		end
 		
@@ -96,8 +97,13 @@ return function()
 			end
 		end)
 	end)
-	task.delay(5, function()
-		modDeadbodiesHandler:DespawnRequest(modData:GetSetting("MaxDeadbodies"));
+	task.spawn(function()
+		for _, prefab: Model in pairs(CollectionService:GetTagged("Deadbody")) do
+			if workspace:IsAncestorOf(prefab) then
+				prefab:Destroy();
+			end
+			task.wait();
+		end
 	end)
 	
 	local function CheckForPrefab(npc, npcPrefab)
