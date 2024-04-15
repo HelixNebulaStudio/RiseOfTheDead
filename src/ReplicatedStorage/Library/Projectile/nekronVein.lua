@@ -52,6 +52,9 @@ function Pool.new(owner)
 				game.Debris:AddItem(linkObjects[a], 5);
 				linkObjects[a].Color = Color3.fromRGB(48, 30, 30);
 				linkObjects[a].Anchored = false;
+				if linkObjects[a]:FindFirstChild("CollisionShape") then
+					linkObjects[a].CollisionShape.CanCollide = true;
+				end
 				linkObjects[a] = nil;
 			end
 			linkObjects = {};
@@ -204,6 +207,11 @@ function Pool.new(owner)
 					if trapPlayer then
 						self.Rope.Locked = false;
 						projectilePoint.Object = model.HumanoidRootPart;
+						for a=1, #linkObjects do
+							if linkObjects[a]:FindFirstChild("CollisionShape") then
+								linkObjects[a].CollisionShape.CanCollide = false;
+							end
+						end
 					end
 					
 				else
