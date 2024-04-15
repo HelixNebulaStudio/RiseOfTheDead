@@ -142,6 +142,7 @@ local CollisionModel={
 	Crouch={C0=CFrame.new(0, 0.2, -0.5); Size=Vector3.new(2, 1.5, 2.4);};
 	Wounded={C0=CFrame.new(0, -0.5, -1.2); Size=Vector3.new(2, 2, 2.6);};
 	Swimming={C0=CFrame.new(0, 0.8, 0); Size=Vector3.new(2, 5, 1);};
+	AntiGravity={C0=CFrame.new(0, 1.6, 0); Size=Vector3.new(2, 5, 1.5);};
 }
 --== Script;
 game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false);
@@ -1925,14 +1926,19 @@ RunService.Heartbeat:Connect(function(step)
 			characterProperties.JumpPower:Remove("swimming");
 		end
 		
+		if Cache.AntiGravityForce then
+			collisionModelId = "AntiGravity";
+		end
 		if characterProperties.IsAlive then
 			local collisionModel = CollisionModel[collisionModelId];
 			
 			local collisionSize = character:GetAttribute("CollisionSize") or collisionModel.Size;
 			local collisionC0 = character:GetAttribute("CollisionC0") and CFrame.new(character:GetAttribute("CollisionC0")) or collisionModel.C0;
 			
-			collisionRootPart.Size = collisionRootPart.Size:Lerp(collisionSize, 0.5);
-			collisionRootMotor.C0 = collisionRootMotor.C0:Lerp(collisionC0, 0.5);
+			collisionRootPart.Size = collisionSize;
+			collisionRootMotor.C0 = collisionC0;
+			-- collisionRootPart.Size = collisionRootPart.Size:Lerp(collisionSize, 0.5);
+			-- collisionRootMotor.C0 = collisionRootMotor.C0:Lerp(collisionC0, 0.5);
 			
 		else
 			collisionRootPart.Size = Vector3.new(2, 2, 1);
@@ -2132,6 +2138,9 @@ RunService.Heartbeat:Connect(function(step)
 				
 			else
 				waistCFrameAngles = CFrame.Angles(0, waistY, 0) * CFrame.Angles(mathClamp(-mouseY, -0.6, 1.1)+mathClamp(waistX-0.1, -0.87, 0.87), 0, 0);
+			end
+			if humanoid.PlatformStand == true then
+				waistCFrameAngles = CFrame.Angles(0, waistY, 0);
 			end
 			-- WaistY = Left/Right
 			-- WaistX = Front/Back
