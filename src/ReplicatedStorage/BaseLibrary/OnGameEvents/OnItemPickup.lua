@@ -11,6 +11,5 @@ return function(player: Player, interactData) -- IsServer();
 
 		local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 		modOnGameEvents:Fire("OnResourceGatherers", player, interactData);
-		Debugger:Warn("OnResourceGatherers");
 	end
 end;

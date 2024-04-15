@@ -277,7 +277,7 @@ function InitializeSpawner(spawnerModule)
 
 			local respawnAmt = (self.MaxAmount - #self.Active);
 
-			if #modNpc.ListEntities(self.SpawnType) > naturalSpawnLimit then
+			if #modNpc.ListEntities(self.SpawnType) > naturalSpawnLimit and #self.Active > minCount then
 				respawnAmt = 0;
 			end
 

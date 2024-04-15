@@ -692,7 +692,7 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 	end;
 
 	if interactObject and interactData then
-		Debugger:Warn(player,"Requesting for physical storage.", interactData);
+		Debugger:Warn(player,"Requesting for physical storage.", interactData.StorageId);
 
 		local profile = modProfile:Get(player);
 		local gameSave = profile:GetActiveSave();

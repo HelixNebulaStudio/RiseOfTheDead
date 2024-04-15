@@ -15,7 +15,9 @@ return function(player, damageSource)
 
 	if damageSource and damageSource.Damage > 0 and damageSource.DamageType ~= "Heal" then
 		local classPlayer = shared.modPlayers.Get(player);
-		classPlayer.LastDamageDealt = tick();
+		if classPlayer then
+			classPlayer.LastDamageDealt = tick();
+		end
 	end
 	
 	if humanoid.Name == "Zombie" and damageSource.Killed == true and npcModule.IsDead ~= true then

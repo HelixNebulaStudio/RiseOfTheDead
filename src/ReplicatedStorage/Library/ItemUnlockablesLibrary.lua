@@ -50,7 +50,7 @@ function library.UpdateSkin(prefab, skinId)
 					handle.TextureID = skinLib.Textures[jointName];
 
 				elseif handle:IsA("MeshPart") then
-					handle.TextureID = skinLib.Textures["Handle"];
+					handle.TextureID = skinLib.Textures["Handle"] or "";
 
 				elseif not handle:IsA("MeshPart") then
 					local mesh = handle:FindFirstChild("SpecialMesh");
