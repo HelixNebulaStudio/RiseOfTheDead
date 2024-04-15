@@ -44,7 +44,16 @@ local ReplicateTypes = {In=1; Out=2;};
 local ReplicateObj = {};
 ReplicateObj.__index = ReplicateObj;
 
-function ReplicateObj.new(prefab)
+type ReplicateObjectObject = {
+	Index: number;
+	ReplicateType: number;
+	Prefab: Model;
+	Owners: {};
+}
+export type ReplicateObject = typeof(setmetatable({} :: ReplicateObjectObject, ReplicateObj));
+
+function ReplicateObj.new(prefab: Model) : ReplicateObject
+	assert(prefab:IsA("Model"), "Replicate object is not a model.", prefab:GetFullName());
 	ReplicationManager.ObjectIndexCount = ReplicationManager.ObjectIndexCount +1;
 	
 	local self = {
@@ -55,6 +64,7 @@ function ReplicateObj.new(prefab)
 	}
 	
 	if RunService:IsServer() then
+		prefab.ModelStreamingMode = Enum.ModelStreamingMode.Atomic;
 		self.ParentValue = Instance.new("ObjectValue");
 		self.ParentValue.Name = self.Index;
 		self.ParentValue.Parent = script;
@@ -70,7 +80,7 @@ function ReplicateObj:Destroy()
 	CollectionService:RemoveTag(self.Prefab, "ReplicateObject");
 end
 
-function ReplicateObj.Get(prefab, newIfNil)
+function ReplicateObj.Get(prefab: Model, newIfNil: boolean)
 	if newIfNil == true then
 		if ReplicationManager.ReplicationObjList[prefab] == nil then
 			ReplicationManager.ReplicationObjList[prefab] = ReplicateObj.new(prefab);
@@ -97,9 +107,11 @@ function ReplicateObj:Update()
 	end;
 end
 
-function ReplicateObj:AddOwner(player)
+function ReplicateObj:AddOwner(player: Player)
 	if self:IsAOwner(player) then return end;
+
 	table.insert(self.Owners, player.Name);
+	self.Prefab:AddPersistentPlayer(player);
 	
 	self:Update();
 end
@@ -293,7 +305,7 @@ function ReplicationManager:SetClientProperties(players, list)
 end
 
 
-local function OnClientReplicateObjectUpdate(prefab: Instance)
+local function OnClientReplicateObjectUpdate(prefab: Model)
 	if prefab == nil then return end;
 	
 	local function load()
