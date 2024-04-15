@@ -313,16 +313,15 @@ function Update()
 		mainFrame.LobbyInfo.Text = "";
 	end
 	
+	local specialTxt = "";
 	if currentRoom.MapStorageItem then
 		local itemValues = currentRoom.MapStorageItem.Values;
 
-		local specialTxt = "";
 		if itemValues.Seed then
 			specialTxt = specialTxt.."Seed: ".. itemValues.Seed;
 		end
-
-		mainFrame.SpecialData.Text = specialTxt;
 	end
+	mainFrame.SpecialData.Text = specialTxt;
 	
 	local hostPlayerData = currentRoom.Players[1];
 	if hostPlayerData and hostPlayerData.LobbyPosition then
