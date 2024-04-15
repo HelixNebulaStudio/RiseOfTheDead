@@ -345,28 +345,44 @@ factionsDatabase:OnUpdateRequest("sendjoinrequest", function(requestPacket)
 		end
 
 	else
-		local joinRequestsCount = 0;
-		for memberUserId, requestData in pairs(factionGroup.JoinRequests) do
-			local requestAge = unixTimestamp - (requestData.LastSent or 0);
+		-- local joinRequestsCount = 0;
+		-- for memberUserId, requestData in pairs(factionGroup.JoinRequests) do
+		-- 	local requestAge = unixTimestamp - (requestData.LastSent or 0);
 			
-			if requestAge <= shared.Const.OneDaySecs*30 then
-				joinRequestsCount = joinRequestsCount+1;
+		-- 	if requestAge <= shared.Const.OneDaySecs*30 then
+		-- 		joinRequestsCount = joinRequestsCount+1;
 				
-			else
-				factionGroup.JoinRequests[memberUserId] = nil;
+		-- 	else
+		-- 		factionGroup.JoinRequests[memberUserId] = nil;
 				
-			end
-		end;
+		-- 	end
+		-- end;
 		
-		if joinRequestsCount >= 16 then
-			requestPacket.FailMsg = "Faction is full";
-			return factionGroup;
+		-- if joinRequestsCount >= 16 then
+		-- 	requestPacket.FailMsg = "Join requests queue is full.";
+		-- 	return factionGroup;
+		-- end
+
+		if requestPacket.Publish then
+			local joinRequestsCount = 0;
+			for memberUserId, requestData in pairs(factionGroup.JoinRequests) do
+				joinRequestsCount = joinRequestsCount+1;
+			end
+
+			if joinRequestsCount > 16 then
+				for a=1, (joinRequestsCount-16) do
+					factionGroup.JoinRequests[(next(factionGroup.JoinRequests))] = nil;
+				end
+			end
 		end
 
-		factionGroup.JoinRequests[tostring(userId)] = {LastSent=unixTimestamp; Name=playerName;};
+		factionGroup.JoinRequests[tostring(userId)] = {
+			LastSent=unixTimestamp;
+			Name=playerName;
+		};
 		factionGroup:Log("sentjoinrequest", {playerName});
 	end
-	Debugger:Warn("factionGroup.JoinRequests", factionGroup.JoinRequests);
+	Debugger:StudioWarn("factionGroup.JoinRequests", factionGroup.JoinRequests);
 	
 	return factionGroup;
 end)
