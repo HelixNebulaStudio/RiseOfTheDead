@@ -31,14 +31,16 @@ function StatusClass.OnTick(classPlayer, status)
 	else
 		if properties.HealSources[script.Name] == nil and humanoid.Health < humanoid.MaxHealth then
 			local duration = 5;
+
+			local nekrosHealAmount = (classPlayer:GetBodyEquipment("ModNekrosisHeal") or 0)/10;
 			local healSrc = {
-				Amount=classPlayer:GetBodyEquipment("ModNekrosisHeal");
+				Amount=nekrosHealAmount;
 				Expires=modSyncTime.GetTime() + duration;
 				Duration=duration;
 			};
 			
 			classPlayer:SetHealSource(script.Name, healSrc);
-			status.Amount = healSrc.Amount;
+			status.Amount = nekrosHealAmount;
 			status.Visible = true;
 			sync = true;
 			
