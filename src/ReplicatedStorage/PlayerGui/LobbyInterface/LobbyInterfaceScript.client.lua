@@ -329,7 +329,8 @@ function Update()
 
 		local screenPoint, _ = camera:WorldToViewportPoint(hostPosition);
 		mainFrame.HostIcon.Visible = true;
-		mainFrame.HostIcon.Position = UDim2.new(0, screenPoint.X, 0, screenPoint.Y+16);
+		mainFrame.HostIcon.ImageColor3 = branchColor;
+		mainFrame.HostIcon.Position = UDim2.new(0, screenPoint.X, 0, screenPoint.Y+30);
 
 	else
 		mainFrame.HostIcon.Visible = false;
