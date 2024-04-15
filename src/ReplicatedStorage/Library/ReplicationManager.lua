@@ -47,13 +47,12 @@ ReplicateObj.__index = ReplicateObj;
 type ReplicateObjectObject = {
 	Index: number;
 	ReplicateType: number;
-	Prefab: Model;
+	Prefab: Instance;
 	Owners: {};
 }
 export type ReplicateObject = typeof(setmetatable({} :: ReplicateObjectObject, ReplicateObj));
 
-function ReplicateObj.new(prefab: Model) : ReplicateObject
-	assert(prefab:IsA("Model"), "Replicate object is not a model.", prefab:GetFullName());
+function ReplicateObj.new(prefab: Instance) : ReplicateObject
 	ReplicationManager.ObjectIndexCount = ReplicationManager.ObjectIndexCount +1;
 	
 	local self = {
@@ -64,7 +63,9 @@ function ReplicateObj.new(prefab: Model) : ReplicateObject
 	}
 	
 	if RunService:IsServer() then
-		prefab.ModelStreamingMode = Enum.ModelStreamingMode.Atomic;
+		if prefab:IsA("Model") then
+			prefab.ModelStreamingMode = Enum.ModelStreamingMode.Atomic;
+		end
 		self.ParentValue = Instance.new("ObjectValue");
 		self.ParentValue.Name = self.Index;
 		self.ParentValue.Parent = script;
@@ -111,7 +112,9 @@ function ReplicateObj:AddOwner(player: Player)
 	if self:IsAOwner(player) then return end;
 
 	table.insert(self.Owners, player.Name);
-	self.Prefab:AddPersistentPlayer(player);
+	if self.Prefab:IsA("Model") then
+		self.Prefab:AddPersistentPlayer(player);
+	end
 	
 	self:Update();
 end

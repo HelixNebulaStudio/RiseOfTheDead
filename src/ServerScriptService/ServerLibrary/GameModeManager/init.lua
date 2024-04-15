@@ -670,10 +670,12 @@ function remoteGameModeLobbies.OnServerInvoke(player, interactObject, interactMo
 	if gameTable == nil then gameTable = GameModeManager:Initialize(gameType, gameStage); end;
 	
 	local classPlayer = modPlayers.Get(player);
-	if classPlayer.GameModeAccess == nil then
-		classPlayer.GameModeAccess = {};
+	if classPlayer then
+		if classPlayer.GameModeAccess == nil then
+			classPlayer.GameModeAccess = {};
+		end
+		classPlayer.GameModeAccess[gameType..":"..gameStage] = true; 
 	end
-	classPlayer.GameModeAccess[gameType..":"..gameStage] = true; 
 	
 	gameTable = GameModeManager:GetActive(gameType, gameStage);
 	gameTable.IsGameWorld = GameModeManager.IsGameWorld;
