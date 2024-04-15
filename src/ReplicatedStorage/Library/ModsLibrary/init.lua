@@ -302,8 +302,8 @@ Add{
 	Name="Pistol Magazine";
 	Desc=GenericDescs.AmmoMag;
 	Icon="rbxassetid://3551129663";
-	BaseTier=2;
-	Tier=2;
+	BaseTier=1;
+	Tier=1;
 	Upgrades={
 		{DataTag="M"; Name="Magazine Size"; Syntax="Upgrade Magazine Size"; ValueType="Normal"; ValueDp=0; MaxLevel=9; BaseCost=3; MaxCost=30; BaseValue=1; MaxValue=10; TweakBonus=10; Scaling=ModsLibrary.ScalingStyle.Linear;};
 	};
@@ -320,8 +320,8 @@ Add{
 	Name="Pistol Automatic Trigger";
 	Desc="Switch <b>TriggerMode</b> from <b>Semi-automatic</b> to <b>Full-automatic</b>.";
 	Icon="rbxassetid://4523393772";
-	BaseTier=2;
-	Tier=2;
+	BaseTier=1;
+	Tier=1;
 	Upgrades={};
 	Stackable=false;
 	Type={"Pistol"};
@@ -335,8 +335,8 @@ Add{
 	Name="Pistol Happy Trigger";
 	Desc=GenericDescs.HappyAuto;
 	Icon="rbxassetid://4573247953";
-	BaseTier=2;
-	Tier=2;
+	BaseTier=1;
+	Tier=1;
 	Upgrades={
 		{DataTag="AC"; Name="Ammo Capacity"; Syntax="Upgrade Ammo Capacity"; MaxLevel=6; BaseCost=6; MaxCost=60; BaseValue=0.3; MaxValue=2; TweakBonus=1; Scaling=ModsLibrary.ScalingStyle.NaturalCurve; Rate=1;};
 	};
@@ -421,8 +421,8 @@ Add{
 	Name="Submachine Gun Skullcracker";
 	Desc=GenericDescs.Skullcracker;
 	Icon="http://www.roblox.com/asset/?id=4824432272";
-	BaseTier=2;
-	Tier=2;
+	BaseTier=1;
+	Tier=1;
 	Upgrades={
 		{DataTag="HSM"; Name="Headshot Multiplier"; Syntax="Upgrade Headshot Multiplier"; ValueType="Normal"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.05; MaxValue=3; TweakBonus=2; Scaling=ModsLibrary.ScalingStyle.NaturalCurve;};
 	};
@@ -614,8 +614,8 @@ Add{
 	Name="Shotgun Slug Rounds";
 	Desc="Increases accuracy by 80% and set multishot to 3 plus an additional <b>Piercing</b>. <b>Damage</b> is rescaled to (Base max multishot)/3.";
 	Icon="http://www.roblox.com/asset/?id=5045673615";
-	BaseTier=4;
-	Tier=4;
+	BaseTier=1;
+	Tier=1;
 	Upgrades={
 		{DataTag="P"; Name="Piercing"; Syntax="Add Piercing"; ValueType="Normal"; MaxLevel=1; BaseCost=20; MaxCost=20; BaseValue=0; MaxValue=1; TweakBonus=1; Scaling=ModsLibrary.ScalingStyle.Linear;};
 	};
@@ -857,8 +857,8 @@ Add{
 	Name="Sniper Piercing Bullets";
 	Desc="Adds <b>Piercing</b> to pierce through enemies, every next enemy pierced will do 75% of the damage.";
 	Icon="http://www.roblox.com/asset/?id=4523408866";
-	BaseTier=2;
-	Tier=2;
+	BaseTier=1;
+	Tier=1;
 	Upgrades={
 		{DataTag="PB"; Name="Piercing"; Syntax="Upgrade Piercing"; ValueType="Normal"; MaxLevel=5; BaseCost=10; MaxCost=50; BaseValue=0; MaxValue=5; TweakBonus=1; Scaling=ModsLibrary.ScalingStyle.Linear;};
 	};
@@ -908,8 +908,8 @@ Add{
 	Name="Focus Rate";
 	Desc="Decrease the time to focus by reducing <b>Focus Time</b>.";
 	Icon="rbxassetid://4404542465";
-	BaseTier=3;
-	Tier=3;
+	BaseTier=1;
+	Tier=1;
 	Upgrades={
 		{DataTag="SF"; Name="Focus Rate"; Syntax="Upgrade Focus Rate"; MaxLevel=10; BaseCost=5; MaxCost=30; BaseValue=0.4; MaxValue=0.8; TweakBonus=0.1; Scaling=ModsLibrary.ScalingStyle.NaturalCurve;};
 	};
@@ -1030,8 +1030,8 @@ Add{
 	Name="Pyrotechnic Everlast";
 	Desc="Increase burning duration of lingering flames while increasing ammo cost per shot.";
 	Icon="http://www.roblox.com/asset/?id=4938813087";
-	BaseTier=2;
-	Tier=2;
+	BaseTier=1;
+	Tier=1;
 	Upgrades={
 		{DataTag="BD"; Name="Duration"; Syntax="Increase Duration"; ValueType="Normal"; Suffix="s"; MaxLevel=9; BaseCost=9; MaxCost=90; BaseValue=3; MaxValue=30; TweakBonus=10; Scaling=ModsLibrary.ScalingStyle.Linear;};
 	};
@@ -1048,8 +1048,8 @@ Add{
 	Name="Flamethrower Flame Burst";
 	Desc="Converts projectile from liquid flame to gas flame. Increases multi shot to <b>3, x4 impact damage, x0.5 burn tick damage</b>. Burn time last for 25 seconds and can be extended with <b>Everlast</b>.";
 	Icon="http://www.roblox.com/asset/?id=14286986692";
-	BaseTier=2;
-	Tier=2;
+	BaseTier=1;
+	Tier=1;
 	Upgrades={
 	};
 	Stackable=false;
@@ -1186,8 +1186,8 @@ Add{
 	Name="Bow Deadweight";
 	Desc="Allows projectiles to pierce enemies at the cost of projectile speed. Also adds <b>Damage</b> based on <b>Premod Damage</b>.";
 	Icon="http://www.roblox.com/asset/?id=13257333197";
-	BaseTier=4;
-	Tier=4;
+	BaseTier=2;
+	Tier=2;
 	Upgrades={
 		{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.03; MaxValue=0.25; TweakBonus=0.1; Scaling=ModsLibrary.ScalingStyle.NaturalCurve;};
 		{DataTag="W"; Name="Piercing"; Syntax="Increase Piercing"; ValueType="Normal"; MaxLevel=7; BaseCost=10; MaxCost=100; BaseValue=1; MaxValue=8; TweakBonus=1; Scaling=ModsLibrary.ScalingStyle.Linear;};
