@@ -157,11 +157,6 @@ function CustomizeAppearance.AttachAccessory(character, accessoryPrefab, accesso
 									end
 								end
 
-							elseif accessoryData.UseOldHands then
-								accessory:SetAttribute("UseOldHands", true);
-								if player and player:GetAttribute("UseOldHands") == nil then
-									player:SetAttribute("UseOldHands", 2);
-								end
 							end
 							
 						end
@@ -239,16 +234,7 @@ function CustomizeAppearance.RemoveAccessory(character, accessoryName)
 					end
 				end
 			end
-			
-			if accessory:GetAttribute("UseOldHands") then
-				if player and player:GetAttribute("UseOldHands") == 2 then
-					if player:GetAttribute("SettingsUseOldHands") then
-						player:SetAttribute("UseOldHands", 1);
-					else
-						player:SetAttribute("UseOldHands", nil);
-					end
-				end
-			end
+
 		end
 	end
 	

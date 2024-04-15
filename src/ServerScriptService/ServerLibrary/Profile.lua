@@ -1455,15 +1455,6 @@ function Profile:RefreshSettings(update)
 	self:RefreshPlayerTitle();
 	self:Sync("Settings");
 	
-	if self.Settings.UseOldHands == 1 then
-		self.Player:SetAttribute("SettingsUseOldHands", true);
-		self.Player:SetAttribute("UseOldHands", 1);
-		
-	elseif self.Player:GetAttribute("UseOldHands") == 1 then
-		self.Player:SetAttribute("SettingsUseOldHands", nil);
-		self.Player:SetAttribute("UseOldHands", nil);
-	end
-	
 	modSettings.UpdateAutoPickup(self.Cache.PickupCache, self.Settings.AutoPickupConfig or {});
 end
 

@@ -231,7 +231,6 @@ Settings.Add("DisableTextureAnimation", booleanOrNil)
 Settings.Add("DisableParticle3D", booleanOrNil)
 
 --==
---Settings.Add("UseOldHands", booleanOrNil)
 Settings.Add("UseOldZombies", booleanOrNil);
 
 --== Audio;

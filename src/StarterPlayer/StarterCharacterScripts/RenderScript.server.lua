@@ -37,8 +37,6 @@ local function link(side)
 	local handOld: MeshPart = character:WaitForChild(side.."HandOld");
 	
 	local function updateColor()
-		local shirt: Shirt = character:FindFirstChildWhichIsA("Shirt");
-		
 		local newColor = hand.Color;
 		indexFinger.Color = newColor;
 		middleFinger.Color = newColor;
@@ -49,8 +47,6 @@ local function link(side)
 		local player = game:GetService("Players"):GetPlayerFromCharacter(character);
 		if player ~= localPlayer then return end;
 
-		local useOldHands = localPlayer:GetAttribute("UseOldHands");
-		
 		if hand:GetAttribute("HideHands") == true then
 			hand.Transparency = 1;
 			hand:SetAttribute("DefaultTransparency", 1);
@@ -64,22 +60,6 @@ local function link(side)
 			handOld.Transparency = 1;
 			handOld:SetAttribute("DefaultTransparency", 1);
 			
-		elseif useOldHands and useOldHands > 0 then
-			hand.Transparency = 1;
-			hand:SetAttribute("DefaultTransparency", 1);
-			indexFinger.Transparency = 1;
-			indexFinger:SetAttribute("DefaultTransparency", 1);
-			middleFinger.Transparency = 1;
-			middleFinger:SetAttribute("DefaultTransparency", 1);
-			pinkyFinger.Transparency = 1;
-			pinkyFinger:SetAttribute("DefaultTransparency", 1);
-			
-			handOld.Transparency = 0;
-			handOld:SetAttribute("DefaultTransparency", 0);
-			if shirt then
-				handOld.TextureID = shirt.ShirtTemplate;
-			end
-
 		else
 			hand.Transparency = 0;
 			hand:SetAttribute("DefaultTransparency", 0);
@@ -94,17 +74,11 @@ local function link(side)
 			handOld:SetAttribute("DefaultTransparency", 1);
 			
 		end
-		
-		--if shirt then
-		--	indexFinger.TextureID = shirt.ShirtTemplate;
-		--	middleFinger.TextureID = shirt.ShirtTemplate;
-		--	pinkyFinger.TextureID = shirt.ShirtTemplate;
-		--end
+
 	end
 	
 	hand:GetPropertyChangedSignal("Color"):Connect(updateColor);
 	hand:GetAttributeChangedSignal("HideHands"):Connect(updateColor);
-	localPlayer:GetAttributeChangedSignal("UseOldHands"):Connect(updateColor);
 	
 	updateColor();
 end

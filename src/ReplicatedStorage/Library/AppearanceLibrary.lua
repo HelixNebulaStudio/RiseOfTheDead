@@ -484,15 +484,6 @@ Appearance.ArmGroup = {
 };
 
 Appearance.HandGroup = {
-	--["ArmWraps"]={
-	--	Name="ArmWraps";
-	--	AssetId=4749912501;
-	--	Store=Appearance.EnumStore.Free;
-	--	Tier=Appearance.EnumTier.Tier1;
-	--	ListOrder=1;
-	--	Accessories={"LH"; "RH"; "LLA"; "RLA"; "LUA"; "RUA"; "LI"; "LM"; "LP"; "RI"; "RM"; "RP";};
-	--	--UseOldHands=true;
-	--};
 	["vexgloves"]={
 		Name="vexgloves";
 		AssetId=4749912501;
