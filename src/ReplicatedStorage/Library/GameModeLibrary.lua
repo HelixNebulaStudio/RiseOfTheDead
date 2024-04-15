@@ -38,7 +38,7 @@ GameModeLibrary.GameModes={
 				Index=1;
 				MaxPlayers=3;
 				TitleImage="http://www.roblox.com/asset/?id=1978092491";
-				Description="This zombie seems to be a prisoner who escaped from prison. His left arm is missing but his right arm is as hard as a rock. I wonder why this zombie is different from the others.";
+				Description="A prisoner zombie.. His right arm appears to be wrapped around with chains, maybe he can shackle me with those chains. But I wonder why this zombie is different from the others.";
 				
 				CrateId="prisoner";
 				RewardsId="prisoner";
