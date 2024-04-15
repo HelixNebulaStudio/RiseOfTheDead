@@ -312,6 +312,18 @@ function Update()
 		mainFrame.LobbyInfo.Text = "";
 	end
 	
+	if currentRoom.MapStorageItem then
+		local itemValues = currentRoom.MapStorageItem.Values;
+
+		local specialTxt = "";
+		if itemValues.Seed then
+			specialTxt = specialTxt.."Seed: ".. itemValues.Seed;
+		end
+
+		mainFrame.SpecialData.Text = specialTxt;
+	end
+	
+
 	UpdateButtons(roomId);
 	
 	local updated = {};

@@ -49,7 +49,7 @@ function toolPackage.NewToolLib(handler)
 		local player = game.Players.LocalPlayer;
 		local classPlayer = shared.modPlayers.Get(player);
 
-		local modData = require(player:WaitForChild("DataModule"));
+		local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 		local modInterface = modData:GetInterfaceModule();
 		
 		if classPlayer.Properties.InBossBattle or modConfigurations.DisableMapItems  then

@@ -466,7 +466,7 @@ GameModeLibrary.GameModes={
 				TitleImage="http://www.roblox.com/asset/?id=13496701772";
 				RewardsId="abandonedbunkercrate";
 				Soundtrack="Soundtrack:Into The Abyss";
-				MapItemId="";
+				MapItemId="abandonedbunkermap";
 			};
 			
 		};

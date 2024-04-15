@@ -34,19 +34,6 @@ function GameMode:Start(room)
 		return;
 	end
 	
-	if self.GameTable.StageLib.MapItemId and #room.Players > 0 then
-		local hostPlayer = room.Players[1].Instance;
-		teleportData.HostPlayerName = hostPlayer.Name;
-
-		local profile = shared.modProfile:Get(hostPlayer);
-		local equippedTools = profile and profile.EquippedTools or nil;
-		local storageItem = equippedTools and equippedTools.StorageItem or nil;
-		
-		if storageItem then
-			teleportData.MapStorageItem = storageItem;
-		end
-	end
-	
 	local accessCode = modServerManager:CreatePrivateServer(self.GameTable.StageLib.WorldId);
 	modServerManager:TeleportToPrivateServer(self.GameTable.StageLib.WorldId, accessCode, room:GetInstancePlayers(), teleportData);
 end

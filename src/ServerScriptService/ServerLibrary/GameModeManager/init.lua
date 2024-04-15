@@ -358,6 +358,22 @@ function GameModeManager:Initialize(gameType, gameStage)
 				end
 			end
 			
+			if #room.Players > 0 then
+				local hostPlayer = room.Players[1].Instance;
+
+				local profile = shared.modProfile:Get(hostPlayer);
+				local equippedTools = profile and profile.EquippedTools or nil;
+				local storageItem = equippedTools and equippedTools.StorageItem or nil;
+				
+				if storageItem and storageItem.ItemId == stageLib.MapItemId then
+					room.MapStorageItem = storageItem;
+				end
+
+			else
+				room.MapStorageItem = nil;
+				
+			end
+
 			gameTable:Sync();
 			roomMeta.LastPlayerChanged = tick();
 			gameTable:Refresh();
@@ -455,7 +471,6 @@ function GameModeManager:Initialize(gameType, gameStage)
 					lobbyPrefab:AddPersistentPlayer(playerData.Instance);
 				end
 			end
-			
 		end
 		for a, _ in ipairs(self.RoomSpots) do
 			if self.RoomSpots[a].State == enumRoomStates.Close then
@@ -548,8 +563,8 @@ function GameModeManager:JoinRoom(player, gameTable, room)
 		
 		local rootPart = classPlayer:GetCharacterChild("HumanoidRootPart");
 		if rootPart then
-			shared.modAntiCheatService:Teleport(player, CFrame.new(playerData.LobbyPosition.WorldPosition + Vector3.new(0, 2.3, 0))
-				* (playerData.LobbyPosition.CFrame - playerData.LobbyPosition.CFrame.p));
+			shared.modAntiCheatService:Teleport(player, CFrame.new(playerData.LobbyPosition.WorldPosition + Vector3.new(0, 1.35, 0))
+				* (playerData.LobbyPosition.CFrame - playerData.LobbyPosition.CFrame.Position));
 
 			local hardItemId = gameTable.StageLib.HardModeItem;
 			if hardItemId and rootPart.Parent:FindFirstChild(hardItemId) and rootPart.Parent[hardItemId]:FindFirstChild("Handle") then
@@ -581,6 +596,7 @@ function remoteGameModeLobbies.OnServerInvoke(player, interactObject, interactMo
 	
 	local interactData;
 	
+
 	if interactObject == "StorageItem" then
 		if modConfigurations.DisableMapItems then return end;
 
@@ -608,8 +624,7 @@ function remoteGameModeLobbies.OnServerInvoke(player, interactObject, interactMo
 		if handler and handler.InteractData then
 			interactData = handler.InteractData;
 		end
-		
-		Debugger:Log("handler", handler, "interactData", interactData, " handler.InteractData", handler.InteractData ~= nil);
+		--Debugger:Log("handler", handler, "interactData", interactData, " handler.InteractData", handler.InteractData ~= nil);
 		
 	else
 		if interactObject == nil or interactModule == nil then return end;
