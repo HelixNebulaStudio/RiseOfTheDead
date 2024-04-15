@@ -16,7 +16,7 @@ function Mod.Activate(packet)
 		value = value + math.ceil(tweakVal);
 	end
 
-	module.ArcTracerConfig.Bounce = 1;
+	module.ArcTracerConfig.MaxBounce = 1;
 	module.ArcTracerConfig.LifeTime = 3;
 	module.ArcTracerConfig.Velocity = 175;
 

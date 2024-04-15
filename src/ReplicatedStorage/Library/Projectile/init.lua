@@ -155,6 +155,7 @@ function Projectile.Simulate(projectile, origin, velocity, rayWhitelist)
 		if (arcPoint.Hit or arcPoint.LastPoint) and projectile.OnContact then
 			return projectile:OnContact(arcPoint);
 		end
+		return;
 		
 	end, function()
 		prefab:SetAttribute("SyncMotion");

@@ -6,8 +6,8 @@ function Ricochet.OnStepped(projectile, arcPoint, radius)
 	if arcPoint.Hit == nil or arcPoint.Hit.CanCollide == false or arcPoint.Material == Enum.Material.Water then return end;
 
 	local overlapParams = OverlapParams.new();
-	overlapParams.FilterType = Enum.RaycastFilterType.Whitelist;
-	overlapParams.MaxParts = 8;
+	overlapParams.FilterType = Enum.RaycastFilterType.Include;
+	overlapParams.MaxParts = 4;
 	overlapParams.FilterDescendantsInstances = CollectionService:GetTagged("Enemies");
 	
 	local cache = projectile.Cache;
@@ -24,7 +24,7 @@ function Ricochet.OnStepped(projectile, arcPoint, radius)
 		local closestRootPart = nil;
 		local closestDist = math.huge;
 		for a=1, #rootParts do
-			if cache.CacheRootParts[rootParts[a]] and tick()-cache.CacheRootParts[rootParts[a]] <= 1 then continue end;
+			if cache.CacheRootParts[rootParts[a]] and tick()-cache.CacheRootParts[rootParts[a]] <= 0.5 then continue end;
 
 			local dist = (rootParts[a].Position - impactPoint).Magnitude;
 

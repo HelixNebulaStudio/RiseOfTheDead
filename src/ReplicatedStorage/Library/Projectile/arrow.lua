@@ -25,17 +25,15 @@ function Pool.new(owner)
 		LifeTime=10;
 		Bounce=0;
 		Acceleration=Vector3.new(0, -workspace.Gravity/16, 0);
+		RayRadius=0.1;
 	};
 	
 	function projectile:Activate()
 	end	
 
 	local hitOnce = {};
-	local activated = false;
 	local index = 1;
 	function projectile:ProjectileDamage(hitObj)
-		if activated then return end;
-
 		local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 
 		local shotCache = {
@@ -109,8 +107,6 @@ function Pool.new(owner)
 		if arcPoint.Hit == nil then return end;
 
 		if RunService:IsServer() then
-			if self.Prefab:CanSetNetworkOwnership() then self.Prefab:SetNetworkOwner(nil) end;
-			task.wait();
 			if self.ProjectileDamage then self:ProjectileDamage(arcPoint.Hit); end
 
 			if impactSndTick == nil or tick()-impactSndTick > 0.2 then
@@ -148,7 +144,7 @@ function Pool.new(owner)
 		end
 
 
-		if stickArrow then -- not arcPoint.Hit.Anchored and
+		if stickArrow then
 			Debugger.Expire(self.Prefab);
 			if arcPoint.Client then return true end; --Client's arcPoint
 

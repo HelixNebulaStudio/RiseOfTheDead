@@ -7,16 +7,10 @@ local RunService = game:GetService("RunService");
 local Projectile = require(script.Parent.Projectile);
 
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 
 local projectilePrefab = script.Arrow;
-local random = Random.new();
-
-local remotes = game.ReplicatedStorage.Remotes;
-local bindIsInDuel = remotes.IsInDuel;
-
 --== Script;
 
 function Pool.new(owner)
@@ -29,23 +23,23 @@ function Pool.new(owner)
 		LifeTime=8;
 		Bounce=0;
 		Acceleration=Vector3.new(0, -workspace.Gravity/24, 0);
+		RayRadius=0.1;
 	};
 	
 	function projectile:Activate()
 	end	
 	
 	local hitOnce = {};
-	local activated = false;
 	local index = 1;
 	function projectile:ProjectileDamage(hitObj)
-		if activated then return end;
-		
 		local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 
 		local shotCache = {
 			HitPart = hitObj;
 			FocusCharge = (self.Charge or 0);
 			Index=index;
+
+			CritOccured = nil;
 		};
 		index = index +1;
 		
@@ -117,8 +111,6 @@ function Pool.new(owner)
 		if arcPoint.Hit == nil then return end;
 		
 		if RunService:IsServer() then
-			if self.Prefab:CanSetNetworkOwnership() then self.Prefab:SetNetworkOwner(nil) end;
-			task.wait();
 			if self.ProjectileDamage then self:ProjectileDamage(arcPoint.Hit); end
 			
 			if impactSndTick == nil or tick()-impactSndTick > 0.2 then
@@ -138,7 +130,7 @@ function Pool.new(owner)
 			local targetModel = arcPoint.Hit.Parent;
 			local humanoid = targetModel and targetModel:FindFirstChildWhichIsA("Humanoid");
 			if humanoid then
-				modAudio.Play(random:NextInteger(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", self.Prefab.Position).MaxDistance = 1024;
+				modAudio.Play(math.random(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", self.Prefab.Position).RollOffMaxDistance = 1024;
 			end
 			
 		end
@@ -183,6 +175,8 @@ function Pool.new(owner)
 			
 			return true;
 		end
+
+		return;
 	end
 	
 	return projectile;
