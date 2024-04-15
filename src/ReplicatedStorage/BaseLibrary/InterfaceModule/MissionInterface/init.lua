@@ -2994,6 +2994,10 @@ function Interface.init(modInterface)
 		end
 	end)
 	
+	Interface.Garbage:Tag(function()
+		Interface.Update = function() end;
+	end)
+
 	return Interface;
 end;
 
