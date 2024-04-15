@@ -67,8 +67,9 @@ function ColorsLibary.ApplyAppearance(weaponModel, itemValues)
 	if itemValues == nil then return end;
 	local itemId = weaponModel:GetAttribute("ItemId") or weaponModel.Name;
 	
+	local modelName = string.find(itemId, "dual") ~= nil and (string.gsub(itemId, "dual", "")) or itemId;
 	local itemPrefabs = game.ReplicatedStorage.Prefabs.Items;
-	local baseItemModel = itemPrefabs:FindFirstChild(itemId);
+	local baseItemModel = itemPrefabs:FindFirstChild(modelName);
 	
 	local prefix = weaponModel.Name:sub(1,4) == "Left" and "L-" or weaponModel.Name:sub(1,5) == "Right" and "R-" or nil;
 	if itemValues.Colors then

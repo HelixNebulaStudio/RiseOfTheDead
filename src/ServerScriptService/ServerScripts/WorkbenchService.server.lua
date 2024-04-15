@@ -804,16 +804,16 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 	if not IsInWorkbenchRange(player, interactPart) then return end;
 	local profile = modProfile:Get(player);
 	local activeSave = profile:GetActiveSave();
-	--local inventory = profile.ActiveInventory;
-	--local storageItem = inventory ~= nil and inventory:Find(id) or nil;
 	local storageItem, storage = activeSave:FindItemFromStorages(id);
 	
 	if storageItem == nil then return end;
 
+	local itemId = storageItem.ItemId;
+	local modelName = string.find(itemId, "dual") ~= nil and (string.gsub(itemId, "dual", "")) or itemId;
 	local itemPrefabs = game.ReplicatedStorage.Prefabs.Items;
-	local baseItemModel = itemPrefabs:FindFirstChild(storageItem.ItemId);
+	local baseItemModel = itemPrefabs:FindFirstChild(modelName);
 	
-	local customizeLib = modWorkbenchLibrary.ItemAppearance[storageItem.ItemId];
+	local customizeLib = modWorkbenchLibrary.ItemAppearance[itemId];
 	local partName;
 	
 	if action ~= 9 then
@@ -827,7 +827,6 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 		else
 			customizeLib = customizeLib.ToolGrip;
 		end
-		--if customizeLib[partName] == nil then Debugger:Warn("Player(",player.Name,") attempt to modify invalid part."); return end;
 		if baseItemModel:FindFirstChild(partName) == nil then Debugger:Warn("Player(",player.Name,") attempt to modify invalid part."); return end;
 	end
 	
