@@ -125,7 +125,7 @@ return function(npc, spawnPoint)
 		end
 		
 		if self.Wield.Targetable.Humanoid == nil then
-			self.Wield.Targetable.Humanoid = 1;
+			self.Wield.Targetable.Humanoid = 0.01;
 		end
 		self.Wield.Targetable.Bandit = 0.1;
 		
