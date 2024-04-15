@@ -8,6 +8,7 @@ local UserInputService = game:GetService("UserInputService");
 local SoundService = game:GetService("SoundService");
 
 local localPlayer = game.Players.LocalPlayer;
+local camera: Camera = workspace.CurrentCamera;
 
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
@@ -321,6 +322,19 @@ function Update()
 		end
 
 		mainFrame.SpecialData.Text = specialTxt;
+	end
+	
+	local hostPlayerData = currentRoom.Players[1];
+	if hostPlayerData and hostPlayerData.LobbyPosition then
+		local hostPosition: Vector3 = hostPlayerData.LobbyPosition.WorldPosition;
+
+		local screenPoint, _ = camera:WorldToViewportPoint(hostPosition);
+		mainFrame.HostIcon.Visible = true;
+		mainFrame.HostIcon.Position = UDim2.new(0, screenPoint.X, 0, screenPoint.Y+16);
+
+	else
+		mainFrame.HostIcon.Visible = false;
+		
 	end
 	
 
