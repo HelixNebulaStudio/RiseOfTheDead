@@ -238,9 +238,6 @@ end
 local function SetRoom(room)
 	if room == nil then return end;
 	local function setCamPoint()
-		while room.LobbyPrefab and room.LobbyPrefab.PrimaryPart == nil do
-			task.wait();
-		end
 		lobbyCameraPoint = room.LobbyPrefab and room.LobbyPrefab.PrimaryPart and room.LobbyPrefab.PrimaryPart:WaitForChild("CameraPoint");
 	end
 	if room.Id == roomId then 
@@ -684,16 +681,7 @@ bindOpenLobbyInterface.Event:Connect(function(lobbyData) --cleared max depth che
 	mainFrame.Rewards.Visible = rewardsId ~= nil;
 	mainFrame.RewardsButton.Visible = rewardsId ~= nil;
 	
-	local roomSet = false;
-	for a=1, #gameLobby.Lobbies do
-		local room = gameLobby.Lobbies[a];
-		if room.State == 1 and #room.Players < room.MaxPlayers then
-			SetRoom(room);
-			roomSet = true;
-			break;
-		end
-	end
-	if not roomSet then SetRoom(gameLobby.Lobbies[#gameLobby.Lobbies]) end;
+	UpdateGameLobby(gameLobby);
 	
 	refreshStatus = true;
 	

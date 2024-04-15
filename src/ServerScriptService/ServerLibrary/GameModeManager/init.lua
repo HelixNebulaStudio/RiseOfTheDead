@@ -14,6 +14,7 @@ local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytic
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modLeaderboardService = require(game.ReplicatedStorage.Library.LeaderboardService);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
+local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
 local modMatchMaking = require(game.ServerScriptService.ServerLibrary.MatchMaking);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
@@ -196,18 +197,16 @@ function GameModeManager:Initialize(gameType, gameStage)
 		room.MaxPlayers = stageLib.MaxPlayers;
 		meta.IdCounter = meta.IdCounter +1;
 		
-		function roomMeta:SetState(stateEnum)
-			if self.State == stateEnum then return end;
-			self.State = stateEnum;
-			gameTable:Sync();
-			self.OnStateChanged:Fire();
-		end
-		
-		local newLobbyPrefab = lobbyPrefabs:FindFirstChild(self.Stage.."Lobby") and lobbyPrefabs[self.Stage.."Lobby"]:Clone() or nil;
+		local newLobbyPrefab: Model = lobbyPrefabs:FindFirstChild(self.Stage.."Lobby") and lobbyPrefabs[self.Stage.."Lobby"]:Clone() or nil;
 		if newLobbyPrefab == nil then
 			newLobbyPrefab = lobbyPrefabs:WaitForChild("TemplateLobby"):Clone();
 		end
 		if newLobbyPrefab then
+			if stageLib.SingleArena ~= true then
+				newLobbyPrefab.ModelStreamingMode = Enum.ModelStreamingMode.PersistentPerPlayer;
+			else
+				newLobbyPrefab.ModelStreamingMode = Enum.ModelStreamingMode.Persistent;
+			end
 			newLobbyPrefab.Parent = workspace.Environment;
 			
 			local spotIndex = 0;
@@ -220,12 +219,19 @@ function GameModeManager:Initialize(gameType, gameStage)
 			end
 			
 			if stageLib.SingleArena ~= true then
-				local cf = newLobbyPrefab:GetPrimaryPartCFrame() * CFrame.new(0, (newLobbyPrefab:GetExtentsSize().Y + 50)*spotIndex, 0);
-				newLobbyPrefab:SetPrimaryPartCFrame(cf);
+				local cf = newLobbyPrefab:GetPivot() * CFrame.new(0, (newLobbyPrefab:GetExtentsSize().Y + 50)*spotIndex, 0);
+				newLobbyPrefab:PivotTo(cf);
 			end
 			
 			room.LobbyPrefab = newLobbyPrefab;
 			table.insert(roomMeta.Prefabs, newLobbyPrefab);
+		end
+		
+		function roomMeta:SetState(stateEnum)
+			if self.State == stateEnum then return end;
+			self.State = stateEnum;
+			gameTable:Sync();
+			self.OnStateChanged:Fire();
 		end
 		
 		local function StartRoom(canStart)
@@ -419,27 +425,37 @@ function GameModeManager:Initialize(gameType, gameStage)
 	
 	function meta:Refresh()
 		for a=#self.Lobbies, 1, -1 do
-			for b=#self.Lobbies[a].Players, 1, -1 do
-				local playerData = self.Lobbies[a].Players[b];
+			local lobbyData = self.Lobbies[a];
+			for b=#lobbyData.Players, 1, -1 do
+				local playerData = lobbyData.Players[b];
 				if playerData.Instance == nil or not playerData.Instance:IsDescendantOf(game.Players) then
-					table.remove(self.Lobbies[a].Players, b);
+					table.remove(lobbyData.Players, b);
 				end
 			end
 			
-			if self.Lobbies[a].State == enumRoomStates.Close then
+			if lobbyData.State == enumRoomStates.Close then
 				table.remove(self.Lobbies, a);
 				
 			elseif stageLib.SingleArena then
-				if #self.Lobbies[a].Players <= 0 and self.Lobbies[a].State >= enumRoomStates.InProgress then
-					self.Lobbies[a]:SetState(enumRoomStates.Ending);
+				if #lobbyData.Players <= 0 and lobbyData.State >= enumRoomStates.InProgress then
+					lobbyData:SetState(enumRoomStates.Ending);
 				end
 				
 			elseif not stageLib.SingleArena then
-				if #self.Lobbies[a].Players <= 0 and self.Lobbies[a].State ~= enumRoomStates.Idle then
-					self.Lobbies[a]:SetState(enumRoomStates.Ending);
+				if #lobbyData.Players <= 0 and lobbyData.State ~= enumRoomStates.Idle then
+					lobbyData:SetState(enumRoomStates.Ending);
 				end
 				
 			end
+			
+			local lobbyPrefab: Model = self.LobbyPrefab;
+			for b=1, #lobbyData.Players do
+				local playerData = lobbyData.Players[b];
+				if lobbyPrefab then
+					lobbyPrefab:AddPersistentPlayer(playerData.Instance);
+				end
+			end
+			
 		end
 		for a, _ in ipairs(self.RoomSpots) do
 			if self.RoomSpots[a].State == enumRoomStates.Close then
@@ -450,6 +466,7 @@ function GameModeManager:Initialize(gameType, gameStage)
 		if not self:HasEmptyRoom() then
 			self:NewRoom();
 		end
+		
 	end
 	
 	table.insert(GameModeManager.MenuRooms, {MenuRoom=meta.MenuRoom; GameTable=gameTable;});
@@ -534,8 +551,6 @@ function GameModeManager:JoinRoom(player, gameTable, room)
 			shared.modAntiCheatService:Teleport(player, CFrame.new(playerData.LobbyPosition.WorldPosition + Vector3.new(0, 2.3, 0))
 				* (playerData.LobbyPosition.CFrame - playerData.LobbyPosition.CFrame.p));
 
-			--rootPart.Anchored = false;
-			
 			local hardItemId = gameTable.StageLib.HardModeItem;
 			if hardItemId and rootPart.Parent:FindFirstChild(hardItemId) and rootPart.Parent[hardItemId]:FindFirstChild("Handle") then
 				room:SetHard(true);
@@ -780,7 +795,13 @@ function remoteGameModeRequest.OnServerInvoke(player, requestEnum, ...)
 			local room = gameTable:GetPlayerRoom(player);
 			if room then
 				room:RemovePlayer(player);
+
+				local lobbyPrefab: Model = room.LobbyPrefab;
+				if lobbyPrefab then
+					lobbyPrefab:RemovePersistentPlayer(player);
+				end
 			end
+			
 		end
 
 		GameModeManager:DisconnectPlayer(player);
@@ -1007,6 +1028,14 @@ end)
 local modEngineCore = require(game.ReplicatedStorage.EngineCore);
 modEngineCore:ConnectOnPlayerAdded(script, function(player)
 	GameModeManager:Purge(player);
+end);
+
+modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
+	for gameType, _ in pairs(GameModeManager.Games) do
+		for gameStage, gameTable in pairs(GameModeManager.Games[gameType]) do
+			gameTable:Sync();
+		end
+	end
 end);
 
 return GameModeManager;
