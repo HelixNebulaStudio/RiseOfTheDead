@@ -215,7 +215,7 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 	for a=1, 60 do if newPrefab.PrimaryPart then break; else task.wait() end end;
 	local primaryPart = newPrefab.PrimaryPart;
 	
-	local newItemPrefab;
+	local newItemPrefab: Model;
 	local offset = Vector3.new(0, 0, 0);
 
 	local itemLib = modItemsLibrary:Find(itemDrop.ItemId);
@@ -242,8 +242,10 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 		end;
 		
 		newItemPrefab = prefabObject:Clone();
+		assert(newItemPrefab.PrimaryPart, "PrefabObject likely missing default PrimaryPart.");
+		
 		newItemPrefab.PrimaryPart.Anchored = true;
-		newItemPrefab:SetPrimaryPartCFrame(primaryPart.CFrame);
+		newItemPrefab:PivotTo(primaryPart.CFrame);
 		newItemPrefab.Parent = primaryPart;
 		
 		if setPrefabColor then
