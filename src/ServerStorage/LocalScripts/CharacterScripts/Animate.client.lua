@@ -1,6 +1,6 @@
 task.wait();
 local Character = script.Parent;
-local Humanoid = Character:WaitForChild("Humanoid");
+local Humanoid = Character:WaitForChild("Humanoid") :: Humanoid;
 local Animator = Humanoid:WaitForChild("Animator");
 local pose = "Standing"
 
@@ -659,6 +659,7 @@ function onGettingUp()
 end
 
 function onFreeFall()
+	if Humanoid.RootPart and Humanoid.RootPart.Anchored then return end;
 	if (jumpAnimTime <= 0) then
 		playAnimation("fall", fallTransitionTime, Humanoid)
 	end

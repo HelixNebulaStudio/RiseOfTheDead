@@ -563,7 +563,7 @@ function GameModeManager:JoinRoom(player, gameTable, room)
 		
 		local rootPart = classPlayer:GetCharacterChild("HumanoidRootPart");
 		if rootPart then
-			local lobbyPoint = CFrame.new(playerData.LobbyPosition.WorldPosition + Vector3.new(0, 1.35, 0)) * playerData.LobbyPosition.WorldCFrame.Rotation;
+			local lobbyPoint = CFrame.new(playerData.LobbyPosition.WorldPosition + Vector3.new(0, 2.35, 0)) * playerData.LobbyPosition.WorldCFrame.Rotation;
 			shared.modAntiCheatService:Teleport(player, lobbyPoint);
 
 			local hardItemId = gameTable.StageLib.HardModeItem;
