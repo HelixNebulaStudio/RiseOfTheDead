@@ -214,6 +214,11 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 	
 	for a=1, 60 do if newPrefab.PrimaryPart then break; else task.wait() end end;
 	local primaryPart = newPrefab.PrimaryPart;
+	for _, obj in pairs(primaryPart:GetDescendants()) do
+		if not obj:IsA("BasePart") then continue end;
+		obj.CanCollide = false;
+		obj.CanQuery = false;
+	end
 	
 	local newItemPrefab: Model;
 	local offset = Vector3.new(0, 0, 0);
