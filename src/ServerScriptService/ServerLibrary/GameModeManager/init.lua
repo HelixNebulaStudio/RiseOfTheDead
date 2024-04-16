@@ -463,14 +463,6 @@ function GameModeManager:Initialize(gameType, gameStage)
 				end
 				
 			end
-			
-			local lobbyPrefab: Model = self.LobbyPrefab;
-			for b=1, #lobbyData.Players do
-				local playerData = lobbyData.Players[b];
-				if lobbyPrefab then
-					lobbyPrefab:AddPersistentPlayer(playerData.Instance);
-				end
-			end
 		end
 		for a, _ in ipairs(self.RoomSpots) do
 			if self.RoomSpots[a].State == enumRoomStates.Close then
@@ -482,6 +474,24 @@ function GameModeManager:Initialize(gameType, gameStage)
 			self:NewRoom();
 		end
 		
+		for a=1, #self.Lobbies do
+			local lobbyData = self.Lobbies[a];
+
+			local lobbyPrefab: Model = self.LobbyPrefab;
+			if lobbyPrefab == nil then continue end;
+
+			if a == 1 then
+				lobbyPrefab.ModelStreamingMode = Enum.ModelStreamingMode.Persistent;
+			else
+				lobbyPrefab.ModelStreamingMode = Enum.ModelStreamingMode.PersistentPerPlayer;
+
+				for b=1, #lobbyData.Players do
+					local playerData = lobbyData.Players[b];
+					if playerData == nil or playerData.Instance == nil or not game.Players:IsAncestorOf(playerData.Instance) then continue end;
+					lobbyPrefab:AddPersistentPlayer(playerData.Instance);
+				end
+			end
+		end
 	end
 	
 	table.insert(GameModeManager.MenuRooms, {MenuRoom=meta.MenuRoom; GameTable=gameTable;});
@@ -682,7 +692,9 @@ function remoteGameModeLobbies.OnServerInvoke(player, interactObject, interactMo
 	if stageLib == nil then Debugger:Warn("Game door missing stageLib."); return end;
 	
 	local gameTable = GameModeManager:GetActive(gameType, gameStage);
-	if gameTable == nil then gameTable = GameModeManager:Initialize(gameType, gameStage); end;
+	if gameTable == nil then
+		gameTable = GameModeManager:Initialize(gameType, gameStage);
+	end;
 	
 	local classPlayer = modPlayers.Get(player);
 	if classPlayer then

@@ -60,6 +60,8 @@ function Interface.init(modInterface)
 			end
 
 		end
+		
+		Interface.UpdateGameHud();
 	end))
 	
 	Interface.Garbage:Tag(modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()

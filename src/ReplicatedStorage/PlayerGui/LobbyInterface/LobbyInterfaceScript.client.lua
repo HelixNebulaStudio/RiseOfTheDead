@@ -711,6 +711,8 @@ bindOpenLobbyInterface.Event:Connect(function(lobbyData) --cleared max depth che
 	
 	refreshStatus = true;
 	
+	Debugger:Warn("gameLobby", gameLobby);
+
 	modData.CameraHandler:Bind("lobbycamera", {
 		RenderStepped=function(camera)
 			if lobbyCameraPoint then
