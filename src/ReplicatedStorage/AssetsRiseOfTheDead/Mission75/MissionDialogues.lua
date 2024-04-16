@@ -294,8 +294,8 @@ if RunService:IsServer() then
 						if not hasSpace then
 							shared.Notify(player, "Inventory is full!", "Negative");
 							return;
-						end
-;
+						end;
+						
 						inventory:Add("samplereport", {Values={
 							Name=inventory.RegisterItemName("Dr. Deniski's Report Insights");
 							Result=false;

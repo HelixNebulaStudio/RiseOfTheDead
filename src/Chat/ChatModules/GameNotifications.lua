@@ -39,9 +39,12 @@ local function Run(ChatService)
 		if modBranchConfigs.WorldName ~= "MainMenu" then return end;
 		channelServer = ChatService:GetChannel(ChatSettings.GeneralChannelName);
 		if channelServer == nil then warn(script.Name..">>  No Server Channel."); return end;
+
 		if type(player) == "table" then
 			for a, p in pairs(player) do
 				local chatSpeaker = ChatService:GetSpeaker(p.Name);
+				if chatSpeaker == nil then continue end;
+				
 				local messageData = NotificationsLibrary[class] and NotificationsLibrary[class](message, player) or nil;
 
 
