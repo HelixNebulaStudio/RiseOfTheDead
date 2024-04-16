@@ -86,7 +86,7 @@ library:Add{
 	Name="Bloaters";
 	Rewards={
 		{Type=ItemDropTypes.Glass; Quantity={Min=10; Max=12}; Chance=1/4;};
-		{Type=ItemDropTypes.Tool; ItemId="stickygrenade"; Chance=1/50;};
+		{Type=ItemDropTypes.Blueprint; ItemId="stickygrenadebp"; Chance=1/50;};
 		{Type=ItemDropTypes.Igniter; Quantity={Min=1; Max=1}; Chance=1/100;};
 	};
 };
@@ -667,7 +667,7 @@ library:Add{
 	Level=240;
 	Rewards={
 		{Index=1; ItemId="cannedfish"; Quantity={Min=1; Max=2}; Chance=1;};
-		{Index=1; ItemId="stickygrenade"; Quantity=1; Chance=1;};
+		{Index=1; ItemId="mk2grenade"; Quantity=1; Chance=1;};
 		
 		{Index=2; ItemId="thornmod"; Recyclable=true; Quantity=1; Chance=1;};
 		{Index=2; ItemId="vexling"; Recyclable=true; Quantity={Min=1; Max=2}; Chance=1;};

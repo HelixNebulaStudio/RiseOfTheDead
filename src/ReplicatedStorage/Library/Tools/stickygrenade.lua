@@ -3,8 +3,8 @@ return function()
 	
 	Tool.Configurations = {
 		ExplosionRadius = 35;
-		DamageRatio = 0.05;
-		MinDamage = 100;
+		DamageRatio = 0.1;
+		MinDamage = 200;
 		
 		Velocity = 160;
 		ProjectileBounce = 0;

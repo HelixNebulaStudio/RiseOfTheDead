@@ -63,6 +63,7 @@ end
 
 WorkbenchLibrary.CategorySorting = {
 	["Medical Supplies"]=1;
+	["Tools"]=2;
 	["Keys"]=10;
 	["Resource Packages"]=20;
 	["Commodities"]=30;

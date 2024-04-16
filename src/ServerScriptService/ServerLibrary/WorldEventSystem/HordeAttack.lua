@@ -90,8 +90,6 @@ function HordeAttack.Start()
 			{Type=modGlobalVars.ItemDropsTypes.Blueprint; ItemId="metalbarricadebp"; Chance=1/10;});
 			
 		table.insert(npcModule.Configuration.ResourceDrop.Rewards, 
-			{Type=modGlobalVars.ItemDropsTypes.Tool; ItemId="stickygrenade"; Chance=1/32;});
-		table.insert(npcModule.Configuration.ResourceDrop.Rewards, 
 			{Type=modGlobalVars.ItemDropsTypes.Tool; ItemId="mk2grenade"; Chance=1/32;});
 			
 		zombies = zombies+1;

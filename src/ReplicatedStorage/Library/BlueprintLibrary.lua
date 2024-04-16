@@ -27,6 +27,7 @@ function BlueprintLibrary:FindByName(name)
 			return data;
 		end
 	end
+	return;
 end
 
 function BlueprintLibrary:Loop(func)
@@ -128,7 +129,7 @@ end
 
 local hourSec = 3600;
 local daySec = hourSec*24;
---== Tools;
+--== MARK: Tools
 BlueprintLibrary.New{
 	Id="medkitbp";
 	Name="Medkit Blueprint";
@@ -155,7 +156,20 @@ BlueprintLibrary.New{
 	Category="Medical Supplies";
 };
 
---== Mods;
+BlueprintLibrary.New{
+	Id="stickygrenadebp";
+	Name="Sticky Grenade Blueprint";
+	Product="stickygrenade";
+	Amount=1;
+	Duration=5;
+	Requirements={
+		{Type="Item"; ItemId="mk2grenade"; Amount=1;};
+		{Type="Item"; ItemId="adhesive"; Amount=5;};
+	};
+	Category="Tools";
+};
+
+--== MARK: Mods
 BlueprintLibrary.New{
 	Id="pistoldamagebp";
 	Name="Pistol Damage Mod Blueprint";
@@ -526,7 +540,7 @@ BlueprintLibrary.New{
 	Category="Ammo Capacity Mods";
 };
 
---== Edged Melee Mods;
+--== MARK: Edged Melee Mods
 BlueprintLibrary.New{
 	Id="edgeddamagebp";
 	Name="Edged Melee Damage Mod Blueprint";
@@ -570,7 +584,7 @@ BlueprintLibrary.New{
 	Category="Damage Mods";
 };
 
---== Special mod;
+--== MARK: Special mod
 
 BlueprintLibrary.New{
 	Id="incendiarybp";
@@ -642,7 +656,7 @@ BlueprintLibrary.New{
 
 
 
---== Weapons;
+--== MARK: Weapons
 
 BlueprintLibrary.New{
 	Id="cz75bp";
@@ -1062,7 +1076,7 @@ BlueprintLibrary.New{
 };
 
 
---== Melee;
+--== MARK: Melee
 BlueprintLibrary.New{
 	Id="chainsawbp";
 	Name="Chainsaw Blueprint";
@@ -1081,7 +1095,7 @@ BlueprintLibrary.New{
 };
 
 
---== Clothing;
+--== MARK: Clothing
 BlueprintLibrary.New{
 	Id="brownbeltbp";
 	Name="Tactical Belt Blueprint";
@@ -1258,7 +1272,7 @@ BlueprintLibrary.New{
 };
 
 
---== Commodity;
+--== MARK: Commodity
 BlueprintLibrary.New{
 	Id="chargerbp";
 	Name="Charger Blueprint";
@@ -1418,7 +1432,7 @@ BlueprintLibrary.New{
 };
 
 
---== Summons;
+--== MARK: Summons
 BlueprintLibrary.New{
 	Id="nekronparticulatecachebp";
 	Name="Nekron Particulate Cache Blueprint";
@@ -1433,7 +1447,7 @@ BlueprintLibrary.New{
 };
 
 
---== Structures;
+--== MARK: Structures
 BlueprintLibrary.New{
 	Id="metalbarricadebp";
 	Name="Metal Barricade Blueprint";
@@ -1526,7 +1540,7 @@ BlueprintLibrary.New{
 	Category="Structures";
 };
 
---== Resource Packages;
+--== MARK: Resource Packages
 
 local resourcePackagesLib = Lib:ListByKeyValue("ResourceItemId", function(v) return v ~= nil; end);
 for a=1, #resourcePackagesLib do
@@ -1549,7 +1563,7 @@ for a=1, #resourcePackagesLib do
 end
 
 
---== Resources;
+--== MARK: Resources
 BlueprintLibrary.New{
 	Id="t1keybp";
 	Name="Tier 1 Key Blueprint";
