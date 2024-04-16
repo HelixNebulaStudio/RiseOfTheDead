@@ -381,7 +381,7 @@ end
 
 
 function StorageInterface:UseItem(Table)
-	if Table == nil then Debugger:Warn("Attempt to equip nothing.") return; end;
+	if Table == nil then Debugger:Warn("Attempt to equip nothing."); return; end;
 	local modInterface = modData:GetInterfaceModule();
 	
 	local usableItemLib = modUsableItems:Find(Table.Item.ItemId);
@@ -389,7 +389,7 @@ function StorageInterface:UseItem(Table)
 		usableItemLib:Use(Table.Item);
 		if currentOptionFrame ~= nil then currentOptionFrame.Visible = false; end
 
-	elseif Table.Properties.Equippable then
+	elseif Table.Properties and Table.Properties.Equippable then
 		if Table.Item.Values.IsEquipped == nil then
 			modInterface:CloseWindow("Inventory");
 		end
@@ -771,7 +771,6 @@ function SlotItem:Update(storageItemId)
 	
 	self.Item = modData.Storages[interface.StorageId].Container[self.ID];
 	self.Properties = modItem:Find(self.Item.ItemId);
-
 	self.Item.Properties = self.Properties;
 	
 	self.Index = self.Item.Index;
@@ -779,7 +778,7 @@ function SlotItem:Update(storageItemId)
 	self.Button.Position = UDim2.new(0, self.Button.AbsolutePosition.X-self.Slot.Frame.AbsolutePosition.X, 0, self.Button.AbsolutePosition.Y-self.Slot.Frame.AbsolutePosition.Y);
 	self.Button.Active = true;
 
-	if self.Button.Parent == nil then Debugger:Warn("Attempt to assign deleted button,", self.Index,"=>",self.Slot.Frame) return end;
+	if self.Button.Parent == nil then Debugger:Warn("Attempt to assign deleted button,", self.Index,"=>",self.Slot.Frame); return end;
 	self.Button.Parent = self.Slot.Frame;
 	
 	if CurrentDragging == self then --lastDraged==self and tick()-lastDraggingTick <= 0.22
