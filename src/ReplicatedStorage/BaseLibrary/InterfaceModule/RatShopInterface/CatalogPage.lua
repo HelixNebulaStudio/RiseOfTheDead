@@ -314,7 +314,7 @@ function PageInterface:Load(interface)
 						end
 						
 						if itemLib.Tags then
-							descText = descText.. modItemInterface.Headers.H3O.. "\nTags: "..modItemInterface.Headers.H3C.."\n"
+							descText = descText.. modItemInterface.Headers.H3O.. "\n\nTags: "..modItemInterface.Headers.H3C.."\n"
 							descText = descText.. modRichFormatter.RichFontSize("[".. 
 								table.concat(itemLib.Tags, ", ")..", ".. 
 								itemLib.Id .."]", 12);
