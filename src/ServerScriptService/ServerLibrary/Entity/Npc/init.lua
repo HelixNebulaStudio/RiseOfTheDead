@@ -448,6 +448,7 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	
 	if npcModule.Owner then
 		table.insert(Npc.PlayerNpcs, strongRef);
+		npcPrefab:AddPersistentPlayer(npcModule.Owner);
 	end
 	npcPrefab.Parent = workspace.Entity;
 	

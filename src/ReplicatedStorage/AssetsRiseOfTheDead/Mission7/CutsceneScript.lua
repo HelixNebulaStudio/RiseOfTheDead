@@ -19,7 +19,7 @@ if RunService:IsServer() then
 	modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
 	
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 

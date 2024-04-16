@@ -64,7 +64,7 @@ function ReplicateObj.new(prefab: Instance) : ReplicateObject
 	
 	if RunService:IsServer() then
 		if prefab:IsA("Model") then
-			prefab.ModelStreamingMode = Enum.ModelStreamingMode.Atomic;
+			prefab.ModelStreamingMode = Enum.ModelStreamingMode.PersistentPerPlayer;
 		end
 		self.ParentValue = Instance.new("ObjectValue");
 		self.ParentValue.Name = self.Index;
@@ -81,7 +81,7 @@ function ReplicateObj:Destroy()
 	CollectionService:RemoveTag(self.Prefab, "ReplicateObject");
 end
 
-function ReplicateObj.Get(prefab: Model, newIfNil: boolean)
+function ReplicateObj.Get(prefab: Instance, newIfNil: boolean)
 	if newIfNil == true then
 		if ReplicationManager.ReplicationObjList[prefab] == nil then
 			ReplicationManager.ReplicationObjList[prefab] = ReplicateObj.new(prefab);
@@ -172,7 +172,7 @@ function ReplicateObj:Load()
 end
 
 --==
--- !outline: ReplicationManager.SetClientParent(player, prefab, parent)
+-- MARK: !outline: ReplicationManager.SetClientParent(player, prefab, parent)
 function ReplicationManager.SetClientParent(player, prefab, parent)
 	task.spawn(function()
 		if WaitForReady(player) == false then return end;
@@ -246,7 +246,7 @@ function ReplicationManager.ReplicateOnlyTo(player, prefab)
 	ReplicationManager.ReplicateOut({player}, prefab);
 end
 
-function ReplicationManager.ReplicateOut(players, prefab) -- Replicates prefab out of workspace of non-owners;
+function ReplicationManager.ReplicateOut(players, prefab: Instance) -- Replicates prefab out of workspace of non-owners;
 	if prefab == nil then Debugger:Warn("Prefab is nil."); return end;
 	players = typeof(players) == "table" and players or {players};
 
@@ -308,7 +308,7 @@ function ReplicationManager:SetClientProperties(players, list)
 end
 
 
-local function OnClientReplicateObjectUpdate(prefab: Model)
+local function OnClientReplicateObjectUpdate(prefab: Instance)
 	if prefab == nil then return end;
 	
 	local function load()
@@ -319,11 +319,12 @@ local function OnClientReplicateObjectUpdate(prefab: Model)
 
 		local isOwner = repObj:IsAOwner(game.Players.LocalPlayer);
 		
+		local prefab = repObj.Prefab;
 		if repObj.ReplicateType == ReplicateTypes.In then
-			repObj.Prefab.Parent = isOwner and repObj.ParentValue.Value or replicateFolder;
+			prefab.Parent = isOwner and repObj.ParentValue.Value or replicateFolder;
 
 		elseif repObj.ReplicateType == ReplicateTypes.Out then
-			repObj.Prefab.Parent = isOwner and repObj.ParentValue.Value or replicateFolder;
+			prefab.Parent = isOwner and repObj.ParentValue.Value or replicateFolder;
 
 		end
 	end

@@ -38,7 +38,7 @@ return function(npc, spawnPoint)
 		self.Move.SetDefaultWalkSpeed = 18+math.floor(level/10);
 		self.Move:Init();
 		
-		self.Humanoid.MaxHealth = math.max(100 + 50*level, 100);
+		self.Humanoid.MaxHealth = level == 0 and 50 or math.max(100 + 50*level, 100);
 		self.Humanoid.Health = self.Humanoid.MaxHealth;
 
 		self.Properties.AttackDamage = 5 + (level/2);
