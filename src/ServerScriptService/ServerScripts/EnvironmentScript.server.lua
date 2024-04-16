@@ -256,7 +256,9 @@ modOnGameEvents:ConnectEvent("OnDayTimeStart", function()
 	end
 	if enabledCount <= 0 then
 		local _, adGui = next(adGuis);
-		adGui.Enabled = true;
+		if adGui then
+			adGui.Enabled = true;
+		end
 	end
 end)
 
