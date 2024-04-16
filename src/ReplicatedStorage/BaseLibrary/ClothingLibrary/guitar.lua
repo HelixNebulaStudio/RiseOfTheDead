@@ -1,7 +1,6 @@
 local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
 
 local attirePackage = {
-	Name="BackGuitar";
 	GroupName="MiscGroup";
 	UniversalVanity = true;
 }

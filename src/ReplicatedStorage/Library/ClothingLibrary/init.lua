@@ -89,6 +89,10 @@ function library.LoadToolModule(module)
 			local packageInfo = {
 				Name=variantId;
 				GroupName=groupName;
+
+				UniversalVanity = clothingPackage.UniversalVanity;
+				HideHands = clothingPackage.HideHands;
+				HideFacewear = clothingPackage.HideFacewear;
 			};
 			
 			if package:IsA("Accessory") then
