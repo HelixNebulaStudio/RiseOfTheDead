@@ -19,59 +19,52 @@ Appearance.Tiers = {
 
 
 Appearance.BodyGroup = {
-	["divingsuit"]={
-		Name="divingsuit";
-		AssetId=1744585941;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Accessories={"UT"; "LT"; "LUA"; "RUA"; "LLA"; "RLA"; "LUL"; "LLL"; "RUL"; "RLL";}
-	};
+	-- ["divingsuit"]={
+	-- 	Name="divingsuit";
+	-- 	AssetId=1744585941;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- 	Accessories={"UT"; "LT"; "LUA"; "RUA"; "LLA"; "RLA"; "LUL"; "LLL"; "RUL"; "RLL";}
+	-- };
 }
 
 Appearance.MiscGroup = {
-	["SurvivorsBackpack"]={
-		Name="SurvivorsBackpack";
-		AssetId=1744585941;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-	};
-	["dufflebag"]={
-		Name="dufflebag";
-		AssetId=1744585941;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-	};
-	["BackGuitar"]={
-		Name="BackGuitar";
-		AssetId=1744585941;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-	};
-	--["ammopouch"]={
-	--	Name="ammopouch";
-	--	AssetId=1;
-	--	Store=Appearance.EnumStore.Free;
-	--	Tier=Appearance.EnumTier.Tier1;
-	--	ListOrder=1;
-	--};
-	["inflatablebuoy"]={
-		Name="inflatablebuoy";
-		AssetId=1744585941;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-	};
-	["watch"]={
-		Name="watch";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
+	-- ["SurvivorsBackpack"]={
+	-- 	Name="SurvivorsBackpack";
+	-- 	AssetId=1744585941;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- };
+	-- ["dufflebag"]={
+	-- 	Name="dufflebag";
+	-- 	AssetId=1744585941;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- };
+	-- ["BackGuitar"]={
+	-- 	Name="BackGuitar";
+	-- 	AssetId=1744585941;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- };
+	-- ["inflatablebuoy"]={
+	-- 	Name="inflatablebuoy";
+	-- 	AssetId=1744585941;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- };
+	-- ["watch"]={
+	-- 	Name="watch";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 }
 
 Appearance.HairGroup = {
@@ -218,165 +211,164 @@ Appearance.HeadGroup = {
 		Tier=Appearance.EnumTier.Tier1;
 		ListOrder=20;
 	};
-	["Bunny Man's Head"]={
-		Name="Bunny Man's Head";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
-	["Gas Mask"]={
-		Name="Gas Mask";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
-	["Nekron Mask"]={
-		Name="Nekron Mask";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
-	["Mellow Cowboy"]={
-		Name="Mellow Cowboy";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
-	["Cultist Hood"]={
-		Name="Cultist Hood";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-		HideHair=true;
-	};
-	["OnyxHound Hoodie Hood"]={
-		Name="OnyxHound Hoodie Hood";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-		HideHair=true;
-	};
+	-- ["Bunny Man's Head"]={
+	-- 	Name="Bunny Man's Head";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
+	-- ["Gas Mask"]={
+	-- 	Name="Gas Mask";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
+	-- ["Nekron Mask"]={
+	-- 	Name="Nekron Mask";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
+	-- ["Mellow Cowboy"]={
+	-- 	Name="Mellow Cowboy";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
+	-- ["Cultist Hood"]={
+	-- 	Name="Cultist Hood";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- 	HideHair=true;
+	-- };
+	-- ["OnyxHound Hoodie Hood"]={
+	-- 	Name="OnyxHound Hoodie Hood";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- 	HideHair=true;
+	-- };
 	
-	["Disguise Kit"]={
-		Name="Disguise Kit";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-		HideFacewear=true;
-	};
+	-- ["Disguise Kit"]={
+	-- 	Name="Disguise Kit";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- 	HideFacewear=true;
+	-- };
 
-	["nvg"]={
-		Name="nvg";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-		HideFacewear=true;
-	};
+	-- ["nvg"]={
+	-- 	Name="nvg";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 	
-	["santahat"]={
-		Name="santahat";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
+	-- ["santahat"]={
+	-- 	Name="santahat";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 
-	["greensantahat"]={
-		Name="greensantahat";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
+	-- ["greensantahat"]={
+	-- 	Name="greensantahat";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 
-	["Straw Hat"]={
-		Name="Straw Hat";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
+	-- ["Straw Hat"]={
+	-- 	Name="Straw Hat";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 
-	["ZriceraSkull"]={
-		Name="ZriceraSkull";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
+	-- ["ZriceraSkull"]={
+	-- 	Name="ZriceraSkull";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 	
-	["hazmathood"]={
-		Name="hazmathood";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
+	-- ["hazmathood"]={
+	-- 	Name="hazmathood";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 	
-	["tophat"]={
-		Name="tophat";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
+	-- ["tophat"]={
+	-- 	Name="tophat";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 	
-	["clownmask"]={
-		Name="clownmask";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
+	-- ["clownmask"]={
+	-- 	Name="clownmask";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 	
-	["balaclava"]={
-		Name="balaclava";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
+	-- ["balaclava"]={
+	-- 	Name="balaclava";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 	
-	["divinggoggles"]={
-		Name="divinggoggles";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
+	-- ["divinggoggles"]={
+	-- 	Name="divinggoggles";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 
-	["skullmask"]={
-		Name="skullmask";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
+	-- ["skullmask"]={
+	-- 	Name="skullmask";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 
-	["maraudersmask"]={
-		Name="maraudersmask";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-	};
+	-- ["maraudersmask"]={
+	-- 	Name="maraudersmask";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- };
 
-	["clothbagmask"]={
-		Name="clothbagmask";
-		AssetId=376524487;
-		Store=Appearance.EnumStore.Marketplace;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=6;
-		HideHair=true;
-	};
+	-- ["clothbagmask"]={
+	-- 	Name="clothbagmask";
+	-- 	AssetId=376524487;
+	-- 	Store=Appearance.EnumStore.Marketplace;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=6;
+	-- 	HideHair=true;
+	-- };
 };
 
 
@@ -389,14 +381,14 @@ Appearance.ChestGroup = {
 		ListOrder=1;
 		Accessories={"UT"; "LT"; "LUA"; "RUA";}
 	};
-	["Grey Tshirt"]={
-		Name="Grey Tshirt";
-		AssetId=1744913038;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Accessories={"UT"; "LT"; "LUA"; "RUA";}
-	};
+	-- ["Grey Tshirt"]={
+	-- 	Name="Grey Tshirt";
+	-- 	AssetId=1744913038;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- 	Accessories={"UT"; "LT"; "LUA"; "RUA";}
+	-- };
 	["Green Camo Tshirt"]={
 		Name="Green Camo Tshirt";
 		AssetId=1745105880;
@@ -413,14 +405,14 @@ Appearance.ChestGroup = {
 		ListOrder=1;
 		Accessories={"UT"; "LT"; "LUA"; "RUA"; "LLA"; "RLA";}
 	};
-	["Prisoner's Shirt"]={
-		Name="Prisoner's Shirt";
-		AssetId=2017492911;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Accessories={"UT"; "LT"; "LUA"; "RUA";}
-	};
+	-- ["Prisoner's Shirt"]={
+	-- 	Name="Prisoner's Shirt";
+	-- 	AssetId=2017492911;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- 	Accessories={"UT"; "LT"; "LUA"; "RUA";}
+	-- };
 	["Black Suit"]={
 		Name="Black Suit";
 		AssetId=4756706792;
@@ -429,54 +421,54 @@ Appearance.ChestGroup = {
 		ListOrder=1;
 		Accessories={"UT"; "LT"; "LUA"; "RUA"; "LLA"; "RLA";}
 	};
-	["Scientist Coat"]={
-		Name="Scientist Coat";
-		AssetId=4762779943;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Accessories={"UT"; "LT"; "LUA"; "RUA"; "LLA"; "RLA";}
-	};
-	["OnyxHound Hoodie"]={
-		Name="OnyxHound Hoodie";
-		AssetId=4770134863;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Accessories={"UT"; "LT"; "LUA"; "RUA"; "LLA"; "RLA";}
-	};
-	["Plank Armor"]={
-		Name="Plank Armor";
-		AssetId=4756706792;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Accessories={"UT";}
-	};
-	["Scrap Armor"]={
-		Name="Scrap Armor";
-		AssetId=4756706792;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Accessories={"UT";}
-	};
+	-- ["Scientist Coat"]={
+	-- 	Name="Scientist Coat";
+	-- 	AssetId=4762779943;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- 	Accessories={"UT"; "LT"; "LUA"; "RUA"; "LLA"; "RLA";}
+	-- };
+	-- ["OnyxHound Hoodie"]={
+	-- 	Name="OnyxHound Hoodie";
+	-- 	AssetId=4770134863;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- 	Accessories={"UT"; "LT"; "LUA"; "RUA"; "LLA"; "RLA";}
+	-- };
+	-- ["Plank Armor"]={
+	-- 	Name="Plank Armor";
+	-- 	AssetId=4756706792;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- 	Accessories={"UT";}
+	-- };
+	-- ["Scrap Armor"]={
+	-- 	Name="Scrap Armor";
+	-- 	AssetId=4756706792;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- 	Accessories={"UT";}
+	-- };
 
-	["Xmas Sweater"]={
-		Name="Xmas Sweater";
-		AssetId=4770134863;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Accessories={"UT"; "LT"; "LUA"; "RUA"; "LLA"; "RLA";}
-	};
+	-- ["Xmas Sweater"]={
+	-- 	Name="Xmas Sweater";
+	-- 	AssetId=4770134863;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- 	Accessories={"UT"; "LT"; "LUA"; "RUA"; "LLA"; "RLA";}
+	-- };
 	
-	["highvisjacket"]={
-		Name="highvisjacket";
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		Accessories={"UT"; "LT"; "LUA"; "RUA"; "LLA"; "RLA";}
-	}
+	-- ["highvisjacket"]={
+	-- 	Name="highvisjacket";
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	Accessories={"UT"; "LT"; "LUA"; "RUA"; "LLA"; "RLA";}
+	-- }
 };
 
 Appearance.ArmGroup = {
@@ -484,25 +476,25 @@ Appearance.ArmGroup = {
 };
 
 Appearance.HandGroup = {
-	["vexgloves"]={
-		Name="vexgloves";
-		AssetId=4749912501;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Accessories={"LH"; "RH";};
-		HideHands=true;
-	};
+	-- ["vexgloves"]={
+	-- 	Name="vexgloves";
+	-- 	AssetId=4749912501;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- 	Accessories={"LH"; "RH";};
+	-- 	HideHands=true;
+	-- };
 };
 
 Appearance.WaistGroup = {
-	["Brown Belt"]={
-		Name="Brown Belt";
-		AssetId=1744585941;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-	};
+	-- ["Brown Belt"]={
+	-- 	Name="Brown Belt";
+	-- 	AssetId=1744585941;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- };
 };
 
 Appearance.LegGroup = {
@@ -538,22 +530,14 @@ Appearance.LegGroup = {
 		ListOrder=1;
 		Accessories={"LLL"; "LUL"; "RLL"; "RUL";}
 	};
-	["Prisoner's Pants"]={
-		Name="Prisoner's Pants";
-		AssetId=4762780173;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Accessories={"LLL"; "LUL"; "RLL"; "RUL";}
-	};
-	--["mercskneepads"]={
-	--	Name="mercskneepads";
-	--	AssetId=4762780173;
-	--	Store=Appearance.EnumStore.Free;
-	--	Tier=Appearance.EnumTier.Tier1;
-	--	ListOrder=1;
-	--	Accessories={"LUL"; "RUL";}
-	--};
+	-- ["Prisoner's Pants"]={
+	-- 	Name="Prisoner's Pants";
+	-- 	AssetId=4762780173;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- 	Accessories={"LLL"; "LUL"; "RLL"; "RUL";}
+	-- };
 };
 
 Appearance.FootGroup = {
@@ -579,32 +563,19 @@ Appearance.FootGroup = {
 			{Name="RightFootAttachment"; Orientation=Vector3.new(0, 0, 0); Position=Vector3.new(0.056, -0.318, 0.158)};
 		};
 	};
-	["Brown Leather Boots"]={
-		Name="Brown Leather Boots";
-		AssetId=1733157469;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Attachments={
-			{Name="LeftFootAttachment"; PrefabName="Foot"; Orientation=Vector3.new(0, -178, 0); Position=Vector3.new(0.06, -0.374, -0.185)};
-			{Name="LeftLowerLegAttachment"; PrefabName="LowerLeg"; Orientation=Vector3.new(0, -178, 0); Position=Vector3.new(0.003, -0.202, -0.011)};
-			{Name="RightFootAttachment"; PrefabName="Foot"; Orientation=Vector3.new(0, -178, 0); Position=Vector3.new(-0.06, -0.374, -0.15)};
-			{Name="RightLowerLegAttachment"; PrefabName="LowerLeg"; Orientation=Vector3.new(0, -178, 0); Position=Vector3.new(-0.002, -0.202, 0.02)};
-		};
-	};
-	["Military Boots"]={
-		Name="Military Boots";
-		AssetId=1733157469;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Attachments={
-			{Name="LeftFootAttachment"; PrefabName="Foot"; Orientation=Vector3.new(0, 180, 0); Position=Vector3.new(0.058, -0.255, -0.116)};
-			{Name="LeftLowerLegAttachment"; PrefabName="LowerLeg"; Orientation=Vector3.new(0, 180, 0); Position=Vector3.new(0, 0.14, -0.019)};
-			{Name="RightFootAttachment"; PrefabName="Foot"; Orientation=Vector3.new(0, 180, 0); Position=Vector3.new(-0.052, -0.255, -0.112)};
-			{Name="RightLowerLegAttachment"; PrefabName="LowerLeg"; Orientation=Vector3.new(0, 180, 0); Position=Vector3.new(0, 0.14, -0.019)};
-		};
-	};
+	-- ["Brown Leather Boots"]={
+	-- 	Name="Brown Leather Boots";
+	-- 	AssetId=1733157469;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- 	Attachments={
+	-- 		{Name="LeftFootAttachment"; PrefabName="Foot"; Orientation=Vector3.new(0, -178, 0); Position=Vector3.new(0.06, -0.374, -0.185)};
+	-- 		{Name="LeftLowerLegAttachment"; PrefabName="LowerLeg"; Orientation=Vector3.new(0, -178, 0); Position=Vector3.new(0.003, -0.202, -0.011)};
+	-- 		{Name="RightFootAttachment"; PrefabName="Foot"; Orientation=Vector3.new(0, -178, 0); Position=Vector3.new(-0.06, -0.374, -0.15)};
+	-- 		{Name="RightLowerLegAttachment"; PrefabName="LowerLeg"; Orientation=Vector3.new(0, -178, 0); Position=Vector3.new(-0.002, -0.202, 0.02)};
+	-- 	};
+	-- };
 	["Oxford Shoes"]={
 		Name="Oxford Shoes";
 		AssetId=1733157469;
@@ -617,17 +588,17 @@ Appearance.FootGroup = {
 		};
 	};
 
-	["divingfins"]={
-		Name="divingfins";
-		AssetId=1738802962;
-		Store=Appearance.EnumStore.Free;
-		Tier=Appearance.EnumTier.Tier1;
-		ListOrder=1;
-		Attachments={
-			{Name="LeftFootAttachment"; Orientation=Vector3.new(0, 0, 0); Position=Vector3.new(-0.05, -0.285, 0.71)};
-			{Name="RightFootAttachment"; Orientation=Vector3.new(0, 0, 0); Position=Vector3.new(0.05, -0.285, 0.71)};
-		};
-	};
+	-- ["divingfins"]={
+	-- 	Name="divingfins";
+	-- 	AssetId=1738802962;
+	-- 	Store=Appearance.EnumStore.Free;
+	-- 	Tier=Appearance.EnumTier.Tier1;
+	-- 	ListOrder=1;
+	-- 	Attachments={
+	-- 		{Name="LeftFootAttachment"; Orientation=Vector3.new(0, 0, 0); Position=Vector3.new(-0.05, -0.285, 0.71)};
+	-- 		{Name="RightFootAttachment"; Orientation=Vector3.new(0, 0, 0); Position=Vector3.new(0.05, -0.285, 0.71)};
+	-- 	};
+	-- };
 	
 };
 
@@ -643,6 +614,8 @@ local cosmeticGroups = {
 };
 
 function Appearance:Get(group, name)
+	warn("AppearanceLibrary>>  Using deprecated method.", group, name, debug.traceback());
+
 	if name == "DefaultHair" or name == "Hidden" then return end;
 	if group and Appearance[group] and Appearance[group][name] then
 		return Appearance[group][name], group;
@@ -654,6 +627,7 @@ function Appearance:Get(group, name)
 			end
 		end
 	end
+	return;
 end
 
 --local folderCosmetics, folderModCosmetics;

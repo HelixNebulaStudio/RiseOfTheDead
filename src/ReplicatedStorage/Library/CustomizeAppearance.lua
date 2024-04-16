@@ -73,11 +73,7 @@ function CustomizeAppearance.ToggleAccessory(character, name, visible)
 end
 
 function CustomizeAppearance.AttachAccessory(character, accessoryPrefab, accessoryData, accessoryGroup, storageItem)
-	if accessoryData == nil or accessoryGroup == nil then
-		accessoryData, accessoryGroup = modAppearanceLibrary:Get(accessoryGroup, accessoryPrefab.Name);
-	end
-
-	local player = game.Players:GetPlayerFromCharacter(character);
+	local _player = game.Players:GetPlayerFromCharacter(character);
 	
 	local itemValues = storageItem and storageItem.Values or {};
 	local clothingStyle = itemValues.StyleIndex or 1;
@@ -375,12 +371,25 @@ function CustomizeAppearance.LoadAccessory(data)
 end
 
 function CustomizeAppearance.AddAccessory(character, accessoryName, accessoryGroup)
-	local accessoryData, accessoryGroup = modAppearanceLibrary:Get(accessoryGroup, accessoryName);
+	local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
+
+	local clothingLib = modClothingLibrary:Find(accessoryName);
+	local accessoryData = clothingLib.AccessoryData[accessoryName];
+	
 	local newAccessories = CustomizeAppearance.LoadAccessory(accessoryData);
 	CustomizeAppearance.RemoveAccessory(character, accessoryName);
 	
 	for a=1, #newAccessories do
 		CustomizeAppearance.AttachAccessory(character, newAccessories[a], accessoryData, accessoryName);
+	end
+end
+
+function CustomizeAppearance.ClientAddAccessory(character, accessoryData, accessoryGroup)
+	local newAccessories = CustomizeAppearance.LoadAccessory(accessoryData);
+	CustomizeAppearance.RemoveAccessory(character, accessoryData.Name);
+	
+	for a=1, #newAccessories do
+		CustomizeAppearance.AttachAccessory(character, newAccessories[a], accessoryData, accessoryData.Name);
 	end
 end
 

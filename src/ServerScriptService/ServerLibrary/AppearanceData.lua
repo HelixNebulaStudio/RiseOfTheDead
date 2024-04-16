@@ -285,7 +285,10 @@ function AppearanceData:SetEquip(group, packageId, storageItem)
 	
 	if exist then return end;
 	
-	local accessoryData, _accessoryGroup = modAppearanceLibrary:Get(group, packageId);
+	local itemId = storageItem.ItemId;
+	local clothingLib = modClothingLibrary:Find(itemId);
+
+	local accessoryData = clothingLib.AccessoryData[packageId];
 	if accessoryData == nil then Debugger:Warn("Accessory "..packageId.." ("..group..") does not exist."); end
 
 	local prefabGroup = modAppearanceLibrary:GetPrefabGroup(group, packageId);

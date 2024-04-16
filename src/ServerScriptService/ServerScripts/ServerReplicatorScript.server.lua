@@ -33,6 +33,7 @@ local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary)
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
+local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
 
 local toolHandlers = game.ServerScriptService.ServerLibrary.ToolHandlers;
 
@@ -954,16 +955,17 @@ function remoteDisguiseKitRemote.OnServerInvoke(player, id, action, disguiseId)
 	end
 end
 
-local folderCosmetics = game.ServerStorage.PrefabStorage.Cosmetics;
-function remoteEquipCosmetics.OnServerInvoke(player, category, assetName, force)
-	local cosmeticsGroup = modAppearanceLibrary[category];
-	local cosmeticTable = cosmeticsGroup[assetName];
 
-	if cosmeticTable then
-		local prefabGroup = modAppearanceLibrary:GetPrefabGroup(category, cosmeticTable.Name);
-		modPrefabManager:LoadPrefab(prefabGroup, game.ReplicatedStorage.Prefabs.Cosmetics);
-		return cosmeticTable.Name, "Loaded";
-	end
+function remoteEquipCosmetics.OnServerInvoke(player, itemId, packageId)
+	local clothingLibrary = modClothingLibrary:Find(itemId);
+
+	local accessoryData = clothingLibrary and clothingLibrary.AccessoryData and clothingLibrary.AccessoryData[packageId];
+	if accessoryData == nil then return end;
+	
+	local prefabGroup = modAppearanceLibrary:GetPrefabGroup(clothingLibrary.GroupName, packageId);
+	modPrefabManager:LoadPrefab(prefabGroup, game.ReplicatedStorage.Prefabs.Cosmetics);
+
+	return accessoryData;
 end
 
 local modMapLibrary = require(game.ReplicatedStorage.Library.MapLibrary);

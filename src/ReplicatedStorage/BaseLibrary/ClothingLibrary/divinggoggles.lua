@@ -1,21 +1,18 @@
 local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
 
 local attirePackage = {
-	GroupName="HandGroup";
+	GroupName="HeadGroup";
 }
 
 function attirePackage.NewToolLib(handler)
 	local toolLib = {};
 
-	toolLib.BaseAdditionalStamina = 20;
-	toolLib.AdditionalStamina = toolLib.BaseAdditionalStamina;
+	toolLib.GasProtection = 0.2;
 	toolLib.Warmth = 2;
-
-
-	local clothing = modClothingProperties.new(toolLib);
-	return clothing;
+	toolLib.UnderwaterVision = 0.1;
+	toolLib.HasFlinchProtection = true;
+	
+	return modClothingProperties.new(toolLib);
 end
-
--- roughness texture : rbxassetid://16987783721
 
 return attirePackage;

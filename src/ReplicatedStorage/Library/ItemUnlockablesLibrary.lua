@@ -109,9 +109,8 @@ function library.UpdateSkin(prefab, skinId)
 end
 
 function library.UpdateTexture(prefab, textureId)
-
 	local handle = prefab:FindFirstChild("Handle");
-	local jointName = prefab:GetAttribute("ClothingJoint");
+	local _jointName = prefab:GetAttribute("ClothingJoint");
 	
 	if handle then
 		if handle:IsA("MeshPart") then
@@ -132,6 +131,8 @@ function library.UpdateTexture(prefab, textureId)
 			end
 		end
 	end
+
+	return;
 end
 
 --== greytshirt

@@ -5,10 +5,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local CharacterAppearance = {};
 CharacterAppearance.__index = CharacterAppearance;
 
-local PhysicsService = game:GetService("PhysicsService");
 local InsertService = game:GetService("InsertService");
 
-local modPhysics = require(game.ServerScriptService.ServerLibrary.Physics);
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modAppearanceLibrary = require(game.ReplicatedStorage.Library.AppearanceLibrary);
@@ -240,12 +238,7 @@ function OnPlayerAdded(player)
 					newFace = faceDecal;
 				end
 			else
-				if characterApperance[a]:IsA("Accessory") or characterApperance[a]:IsA("Folder") then
-					local accessoryData, accessoryGroup = modAppearanceLibrary:Get(characterApperance[a].Name);
-					modCustomizeAppearance.AttachAccessory(character, characterApperance[a]:Clone(), accessoryData, accessoryGroup);
-				else
-					player:LoadCharacterAppearance(characterApperance[a]:Clone());
-				end
+				player:LoadCharacterAppearance(characterApperance[a]:Clone());
 			end
 		end
 		if newFace == nil then

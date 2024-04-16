@@ -8,10 +8,10 @@ local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
 local modColorsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ColorsLibrary"));
-local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
 local modCustomizeAppearance = require(game.ReplicatedStorage.Library:WaitForChild("CustomizeAppearance"));
+local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 
 local remoteEquipCosmetics = game.ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("AppearanceEditor"):WaitForChild("EquipCosmetics");
@@ -22,15 +22,16 @@ local camera = workspace.CurrentCamera;
 local diplayPortFrameTemplate = script:WaitForChild("DisplayPort");
 local itemPrefabs = game.ReplicatedStorage.Prefabs:WaitForChild("Items");
 
-local defaultCFrame = CFrame.new();
-
-local modInterface;
-
 local ItemViewport = {};
 ItemViewport.__index = ItemViewport;
 ItemViewport.Counter = 0;
+
+type ItemViewportObject = {
+	[any]: any;
+}
+export type ItemViewport = typeof(setmetatable({} :: ItemViewportObject, ItemViewport));
 --== Script;
-function ItemViewport.new()
+function ItemViewport.new() : ItemViewport
 	ItemViewport.Counter = ItemViewport.Counter+1;
 	
 	local self = {
@@ -63,11 +64,9 @@ function ItemViewport.new()
 
 	self.Garbage:Tag(self.Frame.InputBegan:Connect(function(inputObject, gameProcessed)
 		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
-			local mousePosition = UserInputService:GetMouseLocation();
 			self.OrbitTick = nil;
 			
 		elseif inputObject.UserInputType == Enum.UserInputType.MouseButton2 then
-			local mousePosition = UserInputService:GetMouseLocation();
 			self.PanTick = nil;
 			
 		end
@@ -80,12 +79,13 @@ function ItemViewport.new()
 			self.PanTick = tick();
 		end
 	end));
+	
+	setmetatable(self, ItemViewport);
 
 	self.Frame:WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
 		self:Destroy();
 	end)
-	
-	setmetatable(self, ItemViewport);
+
 	return self;
 end
 
@@ -139,7 +139,6 @@ function ItemViewport:RefreshDisplay()
 	end
 	
 	local spin = true;
-	local lastAngle = CFrame.Angles(0, 0, 0);
 	local rate = 180/(camera.ViewportSize.X/camera.ViewportSize.Y);
 	local OnClickX, OnClickY;
 	local orX, orY, orZ = 0, 0, 0;
@@ -186,12 +185,10 @@ function ItemViewport:RefreshDisplay()
 			end
 		end
 		self.Angles = self.Angles:lerp(self.Rotor.CFrame, 0.4);
-		lastAngle = self.Angles;
 		
 		for a=1, #self.DisplayModels do
 			local prefab = self.DisplayModels[a].Prefab;
 			if prefab and prefab.PrimaryPart then
-				local placementTag = prefab:FindFirstChild("CFraming");
 				if prefab:FindFirstChild("CFraming") then self.DisplayModels[a].Offset = prefab.CFraming.Value end;
 				local prefabCFrame = self.Camera.CFrame*self.Offset*self.Angles;
 				prefab:SetPrimaryPartCFrame(prefabCFrame*(self.DisplayModels[a].Offset or CFrame.identity) + self.Camera.CFrame.lookVector*self.Zoom);
@@ -200,7 +197,7 @@ function ItemViewport:RefreshDisplay()
 	end)
 end
 
-function ItemViewport:SetDisplay(storageItem)
+function ItemViewport:SetDisplay(storageItem, yielFunc)
 	self:Clear();
 	local itemId = storageItem.ItemId;
 	local itemValues = storageItem.Values;
@@ -213,23 +210,28 @@ function ItemViewport:SetDisplay(storageItem)
 		local characterModel = starterCharacter:Clone();
 		
 		self.Zoom = 7;
-		
 		task.spawn(function()
-			local accessoryName, actionType = remoteEquipCosmetics:InvokeServer(clothingLib.GroupName, clothingLib.Name);
+			local packageId = itemValues.ItemUnlock or itemId;
+			
+			local accessoryData, _actionType = remoteEquipCosmetics:InvokeServer(itemId, packageId);
 			
 			if self.OnDisplay ~= storageItem.ID then
 				self:RefreshDisplay();
 				return;
 			end
 			
-			if accessoryName then
-				modCustomizeAppearance.AddAccessory(characterModel, accessoryName, clothingLib.GroupName);
+			if accessoryData then
+				modCustomizeAppearance.ClientAddAccessory(characterModel, accessoryData, clothingLib.GroupName);
 			else
 				Debugger:Warn("Could not load accessory:",clothingLib.Name);
 			end
 
 			table.insert(self.DisplayModels, {Prefab=characterModel;});
 			self:RefreshDisplay();
+
+			if yielFunc then
+				yielFunc(self);
+			end
 		end)
 		
 	elseif itemDisplayLib then

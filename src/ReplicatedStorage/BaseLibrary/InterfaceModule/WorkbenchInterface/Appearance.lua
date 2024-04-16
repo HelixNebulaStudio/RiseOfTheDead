@@ -177,6 +177,10 @@ function Workbench.new(itemId, library, storageItem)
 								end
 								canPreview = false;
 								
+								if unlockItemLib.PackageId then
+									
+								end
+
 								for a=1, 10, 0.1 do
 									storageItem = modData.GetItemById(storageItem.ID);
 									ItemValues = storageItem.Values;
@@ -205,6 +209,10 @@ function Workbench.new(itemId, library, storageItem)
 								Debugger:Log("Skin locked.");
 								
 								return;
+							end
+							
+							if unlockItemLib.PackageId then
+								-- switch clothing accessory
 							end
 							
 							local oldActiveId = ItemValues.ItemUnlock;
