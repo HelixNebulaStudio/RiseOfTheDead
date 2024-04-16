@@ -227,6 +227,39 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 	end
 end)
 
+local ImmersiveAdsFallbacks = {
+	"rbxassetid://17168888828";
+	"rbxassetid://17168888531";
+	"rbxassetid://17168888199";
+	"rbxassetid://17168887742";
+	"rbxassetid://17168887449";
+	"rbxassetid://17168887099";
+	"rbxassetid://17168886891";
+	"rbxassetid://17168886730";
+	"rbxassetid://17168886527";
+	"rbxassetid://17168886366";
+}
+
+modOnGameEvents:ConnectEvent("OnDayTimeStart", function()
+	local adGuis = CollectionService:GetTagged("AdGuis");
+	local enabledCount = 0;
+	for _, adGui: AdGui in pairs(adGuis) do
+		adGui.FallbackImage = ImmersiveAdsFallbacks[math.random(1, #ImmersiveAdsFallbacks)];
+		adGui.Enabled = math.random(1, 8) == 1;
+
+		if adGui.Enabled then 
+			enabledCount = enabledCount + 1;
+		end
+		if enabledCount <= 3 then
+			adGui.Enabled = math.random(1, 2) == 1;
+		end
+	end
+	if enabledCount <= 0 then
+		local _, adGui = next(adGuis);
+		adGui.Enabled = true;
+	end
+end)
+
 local function loadClipping(object)
 	if object:IsA("BasePart") then
 		
