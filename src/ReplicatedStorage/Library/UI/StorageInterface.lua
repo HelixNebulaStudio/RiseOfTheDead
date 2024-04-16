@@ -25,8 +25,9 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modBranchConfigurations = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
-local modItemInterface = require(game.ReplicatedStorage.Library.UI:WaitForChild("ItemInterface"));
 
+local modItemInterface = require(game.ReplicatedStorage.Library.UI:WaitForChild("ItemInterface"));
+local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
 
 local quantityFrame = script:WaitForChild("QuantityFrame");
 local optionFrame = script:WaitForChild("OptionsFrame");
@@ -118,16 +119,14 @@ function StorageInterface.SetQuickTarget(interface)
 end
 
 function StorageInterface.GetEmptyInventorySlotData(TableB)
-	local modInterface = modData:GetInterfaceModule();
-	
-	for k, _ in pairs(modInterface.StorageInterfaces) do
-		if modInterface.StorageInterfaces[k].StorageId == "Inventory" then
-			local slotData = modInterface.StorageInterfaces[k]:GetEmptySlotData(TableB);
-			if slotData then
-				return slotData;
-			end
+	local inventoryInterface = StorageInterface.GetInterfaceWithStorageId("Inventory");
+	if inventoryInterface then
+		local slotData = inventoryInterface:GetEmptySlotData(TableB);
+		if slotData then
+			return slotData;
 		end
 	end
+	return;
 end
 
 function StorageInterface.GetInterfaceWithStorageId(storageId)
@@ -138,6 +137,7 @@ function StorageInterface.GetInterfaceWithStorageId(storageId)
 			return interface;
 		end
 	end
+	return;
 end
 --== DescriptionFrame;
 
@@ -238,32 +238,38 @@ function StorageInterface:BeginDragItem(slotItem)
 	self:ToggleDescriptionFrame(false);
 	StorageInterface.CloseOptionMenus();
 
-	if StorageInterface.LeftShiftDown and quickTargetInterface and quickTargetInterface.MainFrame and quickTargetInterface.MainFrame.Visible then
-		if storageId == "Inventory" then
+	local isTargetInterfaceVisible = quickTargetInterface and quickTargetInterface.MainFrame and modComponents.IsTrulyVisible(quickTargetInterface.MainFrame);
+	if StorageInterface.LeftShiftDown and isTargetInterfaceVisible then
+		if storageId == "Inventory" then -- Shift Click from inventory
 			local emptySlotData = quickTargetInterface:GetEmptySlotData(slotItem);
 			CurrentSlot = emptySlotData;
 			self:StopDragItem(slotItem);
 
-		else
-			local emptySlotData = StorageInterface.GetEmptyInventorySlotData(slotItem);
-
-			if emptySlotData == nil then
-				local storage = modData.Storages.Inventory;
-				if storage and storage.LinkedStorages then
-					for a=1, #storage.LinkedStorages do
-						local storageId = storage.LinkedStorages[a].StorageId;
-
-						local linkedInterface = StorageInterface.GetInterfaceWithStorageId(storageId);
-						if linkedInterface then
-							emptySlotData = linkedInterface:GetEmptySlotData(slotItem);
-							if emptySlotData then break; end;
+		else -- Shift Click from external storage
+			local inventoryInterface = StorageInterface.GetInterfaceWithStorageId("Inventory");
+			local isInvInterfaceVisible = inventoryInterface and inventoryInterface.MainFrame and modComponents.IsTrulyVisible(inventoryInterface.MainFrame);
+			
+			if isInvInterfaceVisible then
+				local emptySlotData = StorageInterface.GetEmptyInventorySlotData(slotItem);
+	
+				if emptySlotData == nil then
+					local storage = modData.Storages.Inventory;
+					if storage and storage.LinkedStorages then
+						for a=1, #storage.LinkedStorages do
+							local storageId = storage.LinkedStorages[a].StorageId;
+	
+							local linkedInterface = StorageInterface.GetInterfaceWithStorageId(storageId);
+							if linkedInterface then
+								emptySlotData = linkedInterface:GetEmptySlotData(slotItem);
+								if emptySlotData then break; end;
+							end
 						end
 					end
 				end
+	
+				CurrentSlot = emptySlotData;
+				self:StopDragItem(slotItem);
 			end
-
-			CurrentSlot = emptySlotData;
-			self:StopDragItem(slotItem);
 		end
 		
 	elseif CurrentDragging == nil then
