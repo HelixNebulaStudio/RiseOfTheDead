@@ -1,14 +1,11 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 
-local random = Random.new();
 --== Server Variables;
 if RunService:IsServer() then
 	modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
@@ -19,13 +16,10 @@ if RunService:IsServer() then
 	
 end
 
-local remotes = game.ReplicatedStorage.Remotes;
-local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");
-
 --== Script;
 return function(CutsceneSequence)
 	if not modBranchConfigs.IsWorld("Safehome") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
-	if workspace:GetAttribute("FactionHeadquarters") ~= nil then Debugger:Warn("Is faction world") return end;
+	if workspace:GetAttribute("FactionHeadquarters") ~= nil then Debugger:Warn("Is faction world"); return end;
 
 	local spawnCf = CFrame.new(109.12, 2.55, -79.31) * CFrame.Angles(0, math.pi/2, 0);
 	CutsceneSequence:Initialize(function()
@@ -86,19 +80,24 @@ return function(CutsceneSequence)
 					end
 					mission.SaveData.NpcName = newNpcName;
 
-					Debugger:Log("Chosen NPC:", newNpcName, " mission.SaveData.NpcName", mission.SaveData.NpcName);
+					Debugger:Warn("Chosen NPC:", newNpcName, " mission.SaveData.NpcName", mission.SaveData.NpcName);
 					local survivorNpcModule = modNpc.GetPlayerNpc(player, newNpcName);
 
 					if survivorNpcModule == nil then
-						local npc = modNpc.Spawn(newNpcName, spawnCf, function(npc, npcModule)
+						modNpc.Spawn(newNpcName, spawnCf, function(npc, npcModule)
 							npcModule.Owner = player;
 							survivorNpcModule = npcModule;
 						end);
 					end
 
-					survivorNpcModule.Actions:Teleport(spawnCf);
-					remoteSetHeadIcon:FireAllClients(0, newNpcName, "HideAll");
-					remoteSetHeadIcon:FireAllClients(1, newNpcName, "Mission");
+					survivorNpcModule:Teleport(spawnCf);
+
+					task.spawn(function()
+						local remotes = game.ReplicatedStorage.Remotes;
+						local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");
+						remoteSetHeadIcon:FireAllClients(0, newNpcName, "HideAll");
+						remoteSetHeadIcon:FireAllClients(1, newNpcName, "Mission");
+					end)
 					
 					
 				elseif mission.ProgressionPoint == 2 then
@@ -111,7 +110,7 @@ return function(CutsceneSequence)
 			end
 		end
 		mission.Changed:Connect(OnChanged);
-		OnChanged(true, mission);
+		OnChanged(true);
 	end)
 	
 	return CutsceneSequence;

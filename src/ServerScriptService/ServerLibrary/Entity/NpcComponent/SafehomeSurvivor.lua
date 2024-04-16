@@ -1,9 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
+--==
 local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
-
-local random = Random.new();
 
 local Human = {};
 
@@ -11,7 +8,7 @@ function Human.new(self)
 	repeat until shared.modProfile ~= nil;
 	
 	local player = self.Owner;
-	if player == nil then Debugger:Log("Missing owner.") return end;
+	if player == nil then Debugger:Log("Missing owner."); return end;
 	
 	local profile = shared.modProfile:Get(player);
 	local safehomeData = profile.Safehome;
@@ -19,27 +16,11 @@ function Human.new(self)
 	local npcLib = modNpcProfileLibrary:Find(self.Name);
 
 	local npcData = safehomeData:GetNpc(self.Name);
-	--local npcData = safehomeData.Npc[self.Name];
-	--if npcData == nil then
-	--	local npcPropertiesMeta = modNpcProfileLibrary:GetProperties(self.Name);
-		
-	--	npcData = setmetatable({}, npcPropertiesMeta);
-		
-	--	safehomeData.Npc[self.Name] = npcData;
-		
-	--else
-	--	local npcPropertiesMeta = modNpcProfileLibrary:GetProperties(self.Name);
-	--	setmetatable(npcData, npcPropertiesMeta);
-	--end
 	
 	self:AddComponent("ObjectScan");
 	
 	self.NpcData = npcData;
 	
-	--if npcData.CalculateHappiness == nil then
-	--	Debugger:Warn("Missing NPC Survivor profile.");
-	--end
-	--npcData:CalculateHappiness();
 	shared.modSafehomeService.RefreshNpcStats();
 	
 	Debugger:Log("load npcData", npcData);

@@ -12,7 +12,7 @@ return function(player, dialog, data, mission)
 	local ownerPlayer = modServerManager.PrivateWorldCreator;
 	local isOwner = ownerPlayer == player;
 	
-	if not isOwner then
+	if not isOwner then 
 		dialog:SetInitiate("I'm so glad "..ownerPlayer.Name.." rescued me..", "Excited");
 		return;
 	end
@@ -39,7 +39,8 @@ return function(player, dialog, data, mission)
 				modEvents:NewEvent(player, {Id="acceptedFirstSurvivor";});
 			end)
 
-			if modEvents:GetEvent(player, "acceptedFirstSurvivor") then
+			local acceptedFirstSurvivor = modEvents:GetEvent(player, "acceptedFirstSurvivor");
+			if acceptedFirstSurvivor then
 				dialog:AddChoice("shelter_decline", function(dialog)
 					modMission:CompleteMission(player, 55);
 
