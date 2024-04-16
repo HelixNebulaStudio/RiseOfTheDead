@@ -127,7 +127,7 @@ library:Add{
 
 --== Crate Rewards;
 
--- !outline: sundaysGift : 20
+-- MARK: !outline: sundaysGift : 20
 library:Add{
 	Id="sundaysGift";
 	Level=20;
@@ -137,7 +137,7 @@ library:Add{
 	};
 };
 
--- !outline: underbridgeGift : 50
+-- MARK: !outline: underbridgeGift : 50
 library:Add{
 	Id="underbridgeGift";
 	Level=50;
@@ -147,7 +147,7 @@ library:Add{
 	};
 };
 
--- !outline: mallGift : 150
+-- MARK: !outline: mallGift : 150
 library:Add{
 	Id="mallGift";
 	Level=150;
@@ -157,7 +157,7 @@ library:Add{
 	};
 };
 
--- !outline: clinicGift : 250
+-- MARK: !outline: clinicGift : 250
 library:Add{
 	Id="clinicGift";
 	Level=250;
@@ -167,7 +167,7 @@ library:Add{
 	};
 };
 
--- !outline: residentialGift : 300
+-- MARK: !outline: residentialGift : 300
 library:Add{
 	Id="residentialGift";
 	Level=300;
@@ -177,7 +177,7 @@ library:Add{
 	};
 };
 
--- !outline: harborGift : 380
+-- MARK: !outline: harborGift : 380
 library:Add{
 	Id="harborGift";
 	Level=380;
@@ -192,7 +192,7 @@ local weaponBpChance = 3/4;
 local componentChance = 1/3;
 local commodityChance = 1/3;
 
--- !outline: prisoner : 1
+-- MARK: !outline: prisoner : 1
 library:Add{
 	Id="prisoner";
 	Level=1;
@@ -213,7 +213,7 @@ library:Add{
 	};
 };
 
--- !outline: tanker : 10
+-- MARK: !outline: tanker : 10
 library:Add{
 	Id="tanker";
 	Level=10;
@@ -232,7 +232,7 @@ library:Add{
 	};
 };
 
--- !outline: fumes : 20
+-- MARK: !outline: fumes : 20
 library:Add{
 	Id="fumes";
 	Level=20;
@@ -250,7 +250,7 @@ library:Add{
 	};
 };
 
--- !outline: corrosive : 40
+-- MARK: !outline: corrosive : 40
 library:Add{
 	Id="corrosive";
 	Level=40;
@@ -266,7 +266,7 @@ library:Add{
 	};
 };
 
--- !outline: zpider : 60
+-- MARK: !outline: zpider : 60
 library:Add{
 	Id="zpider";
 	Level=60;
@@ -283,7 +283,7 @@ library:Add{
 	};
 };
 
--- !outline: shadow : 80
+-- MARK: !outline: shadow : 80
 library:Add{
 	Id="shadow";
 	Level=80;
@@ -301,7 +301,7 @@ library:Add{
 	};
 };
 
--- !outline: zomborg : 110
+-- MARK: !outline: zomborg : 110
 library:Add{
 	Id="zomborg";
 	Level=110;
@@ -319,7 +319,7 @@ library:Add{
 	};
 };
 
--- !outline: billies : 160
+-- MARK: !outline: billies : 160
 library:Add{
 	Id="billies";
 	Level=160;
@@ -337,7 +337,7 @@ library:Add{
 	};
 };
 
--- !outline: hectorshot : 180
+-- MARK: !outline: hectorshot : 180
 library:Add{
 	Id="hectorshot";
 	Level=180;
@@ -356,7 +356,7 @@ library:Add{
 	};
 };
 
--- !outline: zomborgprime : 280
+-- MARK: !outline: zomborgprime : 280
 library:Add{
 	Id="zomborgprime";
 	Level=280;
@@ -382,7 +382,7 @@ library:Add{
 
 --==Extreme;
 
--- !outline: zricera : 100
+-- MARK: !outline: zricera : 100
 library:Add{
 	Id="zricera";
 	Level=100;
@@ -400,7 +400,7 @@ library:Add{
 	};
 };
 
--- !outline: vexeron : 200
+-- MARK: !outline: vexeron : 200
 library:Add{
 	Id="vexeron";
 	Level=200;
@@ -425,7 +425,7 @@ library:Add{
 	};
 };
 
--- !outline: mothena : 300
+-- MARK: !outline: mothena : 300
 library:Add{
 	Id="mothena";
 	Level=300;
@@ -442,7 +442,7 @@ library:Add{
 	};
 };
 
--- !outline: banditheli : 400
+-- MARK: !outline: banditheli : 400
 library:Add{
 	Id="banditheli";
 	Level=400;
@@ -460,7 +460,7 @@ library:Add{
 	};
 };
 
--- !outline: veinofnekron : 500
+-- MARK: !outline: veinofnekron : 500
 library:Add{
 	Id="veinofnekron";
 	Level=500;
@@ -477,12 +477,13 @@ library:Add{
 
 --==Raid
 
--- !outline: factorycrate : 5
+-- MARK: !outline: factorycrate : 5
 library:Add{
 	Id="factorycrate";
 	Level=5;
 	Rewards={
 		{Index=1; ItemId="cannedbeans"; Quantity={Min=1; Max=2}; Chance=1;};
+
 		{Index=2; ItemId="rifledamagebp"; Recyclable=true;  Chance=1;};
 		{Index=2; ItemId="riflefireratebp"; Recyclable=true;  Chance=1;};
 		{Index=2; ItemId="sniperfocusrate"; Recyclable=true;  Chance=1;};
@@ -491,7 +492,7 @@ library:Add{
 };
 
 
--- !outline: officecrate : 30
+-- MARK: !outline: officecrate : 30
 library:Add{
 	Id="officecrate";
 	Level=30;
@@ -507,7 +508,7 @@ library:Add{
 	};
 };
 
--- !outline: tombschest : 120
+-- MARK: !outline: tombschest : 120
 library:Add{
 	Id="tombschest";
 	Level=120;
@@ -524,7 +525,7 @@ library:Add{
 	};
 };
 
--- !outline: railwayscrate : 260
+-- MARK: MARK: !outline: railwayscrate : 260
 library:Add{
 	Id="railwayscrate";
 	Level=260;
@@ -539,7 +540,7 @@ library:Add{
 	};
 };
 
--- !outline: banditcrate : 160
+-- MARK: !outline: banditcrate : 160
 library:Add{
 	Id="banditcrate";
 	Level=160;
@@ -548,14 +549,14 @@ library:Add{
 		
 		{Index=1; ItemId="plankarmorbp"; Recyclable=true;  Chance=1;};
 		{Index=1; ItemId="pointdamagebp"; Recyclable=true;  Chance=1;};
-		{Index=1; ItemId="warmongerscalesmod"; Recyclable=true;  Chance=1/3;}; --armorpointsmod
+		{Index=1; ItemId="armorpointsmod"; Recyclable=true;  Chance=1/3;};
 		{Index=1; ItemId="hmgrapidfiremod"; Recyclable=true;  Chance=1/3;};
 		
 		{Index=2; ItemId="nvg"; Recyclable=true;  Chance=1/100;};
 	};
 };
 
--- !outline: hbanditcrate : 360
+-- MARK: !outline: hbanditcrate : 360
 library:Add{
 	Id="hbanditcrate";
 	Level=360;
@@ -563,7 +564,7 @@ library:Add{
 		{Index=1; ItemId="scraparmorbp"; Recyclable=true; Chance=1;};
 
 		{Index=1; ItemId="fireaxe"; Recyclable=true; Chance=1;};
-		{Index=1; ItemId="warmongerscalesmod"; Recyclable=true; Chance=1/3;}; --armorpointsmod
+		{Index=1; ItemId="warmongerscalesmod"; Recyclable=true; Chance=1/3;};
 		{Index=1; ItemId="hmgrapidfiremod"; Recyclable=true; Chance=1/3;};
 		{Index=1; ItemId="walkietalkiebp"; Chance=commodityChance;};
 
@@ -571,7 +572,7 @@ library:Add{
 	};
 };
 
--- !outline: abandonedbunkercrate : 460
+-- MARK: !outline: abandonedbunkercrate : 460
 library:Add{
 	Id="abandonedbunkercrate";
 	Level=460;
@@ -597,7 +598,7 @@ library:Add{
 
 --== Survival;
 
--- !outline: sectorfcrate : 50
+-- MARK: !outline: sectorfcrate : 50
 library:Add{
 	Id="sectorfcrate";
 	Level=50;
@@ -615,7 +616,7 @@ library:Add{
 	};
 };
 
--- !outline: ucsectorfcrate : 220
+-- MARK: !outline: ucsectorfcrate : 220
 library:Add{
 	Id="ucsectorfcrate";
 	Level=220;
@@ -630,7 +631,7 @@ library:Add{
 	};
 };
 
--- !outline: prisoncrate : 140
+-- MARK: !outline: prisoncrate : 140
 library:Add{
 	Id="prisoncrate";
 	Level=140;
@@ -646,7 +647,7 @@ library:Add{
 	};
 };
 
--- !outline: nprisoncrate : 320
+-- MARK: !outline: nprisoncrate : 320
 library:Add{
 	Id="nprisoncrate";
 	Level=320;
@@ -661,7 +662,7 @@ library:Add{
 	};
 };
 
--- !outline: sectordcrate : 240
+-- MARK: !outline: sectordcrate : 240
 library:Add{
 	Id="sectordcrate";
 	Level=240;
@@ -669,14 +670,14 @@ library:Add{
 		{Index=1; ItemId="cannedfish"; Quantity={Min=1; Max=2}; Chance=1;};
 		{Index=1; ItemId="mk2grenade"; Quantity=1; Chance=1;};
 		
-		{Index=2; ItemId="thornmod"; Recyclable=true; Quantity=1; Chance=1;};
+		{Index=2; ItemId="healthmod"; Recyclable=true; Quantity=1; Chance=1;};
 		{Index=2; ItemId="vexling"; Recyclable=true; Quantity={Min=1; Max=2}; Chance=1;};
 		{Index=2; ItemId="vexgloves"; Recyclable=true; Quantity=1; Chance=0.5;};
 	};
 };
 
 
--- !outline: ucsectordcrate : 420
+-- MARK: !outline: ucsectordcrate : 420
 library:Add{
 	Id="ucsectordcrate";
 	Level=420;
@@ -692,7 +693,7 @@ library:Add{
 
 
 --== Coop;
--- !outline: genesiscrate : 220
+-- MARK: !outline: genesiscrate : 220
 library:Add{
 	Id="genesiscrate";
 	Level=220;
@@ -706,7 +707,7 @@ library:Add{
 	};
 };
 
--- !outline: ggenesiscrate : 440
+-- MARK: !outline: ggenesiscrate : 440
 library:Add{
 	Id="ggenesiscrate";
 	Level=440;
@@ -721,7 +722,7 @@ library:Add{
 };
 
 
--- !outline: sunkenchest : 300
+-- MARK: !outline: sunkenchest : 300
 library:Add{
 	Id="sunkenchest";
 	Level=300;
@@ -737,7 +738,7 @@ library:Add{
 	};
 };
 
--- !outline: zenithcrate : maxlevel
+-- MARK: !outline: zenithcrate : maxlevel
 library:Add{
 	Id="zenithcrate";
 	Level=modGlobalVars.MaxLevels;
