@@ -9,12 +9,10 @@ local Interface = {};
 local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = require(localPlayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -25,7 +23,6 @@ local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface
 local modStorageInterface = require(game.ReplicatedStorage.Library.UI.StorageInterface);
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
-local remotes = game.ReplicatedStorage.Remotes;
 local remoteTradeRequest = modRemotesManager:Get("TradeRequest");
 	
 local windowFrameTemplate = script:WaitForChild("TradeMenu");
@@ -209,6 +206,7 @@ function Interface.init(modInterface)
 				return false;
 			end
 		end
+		return;
 	end);
 
 	Interface:RequestData("Trader/Gold");
@@ -230,7 +228,7 @@ function Interface.init(modInterface)
 				if Interface.TradeSession == nil then return end;
 				local button = buttonTable.Button;
 				local properties = buttonTable.Properties;
-				local isPremium = Interface.TradeSession.PremiumTrade;
+				local _isPremium = Interface.TradeSession.PremiumTrade;
 				
 				local isComputerSession = Interface.TradeSession.ComputerSession;
 				
@@ -258,6 +256,7 @@ function Interface.init(modInterface)
 			Interface.modInventoryInterface.HotbarInterface:Update();
 			localStorageInterface:Update();
 			otherStorageInterface:Update();
+			modStorageInterface.SetQuickTarget();
 
 		else
 			Interface:Freeze(false);
@@ -273,6 +272,7 @@ function Interface.init(modInterface)
 			Interface.modInventoryInterface.PremiumInterface:Update();
 			Interface.modInventoryInterface.HotbarInterface:Update();
 			modStorageInterface.SetQuickTarget();
+			
 		end
 	end)
 	
@@ -300,7 +300,7 @@ function Interface.init(modInterface)
 		if Interface.TradeSession == nil then return end;
 		local state = Interface.TradeSession.State;
 		
-		local storage = modData.Storages.TradingStorage;
+		local _storage = modData.Storages.TradingStorage;
 		itemButtonCaches = {};
 
 		local localData, otherData;
@@ -518,8 +518,8 @@ function Interface.init(modInterface)
 			color[4] = ColorSequenceKeypoint.new(1, colorC);
 		end
 		confirmGradient.Color = ColorSequence.new(color);
-
-		modStorageInterface.SetQuickTarget(localStorageInterface);
+		
+		modStorageInterface.SetQuickTarget();
 
 		otherStorageInterface.StorageId = otherData.Name.."Trade";
 		otherStorageInterface.ViewOnly = true;
@@ -764,7 +764,7 @@ function Interface.init(modInterface)
 		button.InputBegan:Connect(function(inputObject)
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
 				isButtonDown = true;
-				local state = Interface.TradeSession and Interface.TradeSession.State;
+				local _state = Interface.TradeSession and Interface.TradeSession.State;
 
 				local colorA, colorB = Color3.fromRGB(255, 255, 255), Color3.fromRGB(200, 200, 200);
 				local color = {
@@ -934,7 +934,6 @@ function Interface.init(modInterface)
 			cancelButton.buttonText.Text = "Remove items!";
 			Interface:OpenWindow("Trade");
 
-			modStorageInterface.SetQuickTarget(localStorageInterface);
 			localStorageInterface:Update();
 		end
 	end)
@@ -979,7 +978,7 @@ function Interface.init(modInterface)
 	end));
 	
 	Interface.Garbage:Tag(function()
-		itemButtonList = nil;
+		table.clear(itemButtonList);
 		itemButtonCaches = nil;
 		itemToolTip:Destroy();
 	end)
