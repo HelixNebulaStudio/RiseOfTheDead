@@ -283,6 +283,7 @@ function Interface.init(modInterface)
 			if toggleWearDebounce then return end;
 			toggleWearDebounce = true;
 			local setWear = remoteToggleClothing:InvokeServer(Table.Interface.StorageId, Table.ID);
+			--local noWearTag = storageItem.Values and storageItem.Values.NoWear;
 			toggleWearDebounce = false;
 		end;
 		Order=7;

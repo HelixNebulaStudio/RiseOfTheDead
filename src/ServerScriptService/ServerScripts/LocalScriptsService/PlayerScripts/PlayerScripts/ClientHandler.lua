@@ -576,7 +576,7 @@ return function()
 
 			for k, v in pairs(values) do
 				localStorageItem.Values[k] = v;
-
+				
 				if k == "MA" or (k == "A" and v == nil) then
 					modData.OnAmmoUpdate:Fire(storageItemId);
 					
@@ -590,6 +590,10 @@ return function()
 						modData.UpdateProgressionBar((itemValues.E or 0)/math.max(itemValues.EG or 0, 100), "WeaponLevel", itemValues.L);
 					end
 				end
+			end
+			for k, v in pairs(localStorageItem.Values) do -- del no existent keys;
+				if values[k] then continue end;
+				localStorageItem.Values[k] = nil;
 			end
 			if storageId ~= "MockStorageItem" then
 				modStorageInterface.UpdateStorages({localStorage}, storageItemId);

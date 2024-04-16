@@ -448,6 +448,7 @@ function StorageInterface:GetSlotWithID(storageItemID)
 			return self.Slots[a];
 		end
 	end
+	return;
 end
 
 function StorageInterface.WithdrawalOnlyCheck(interface, slotItemA, slotItemB)
@@ -892,6 +893,7 @@ function StorageInterface:NewButton(id)
 
 	local function OpenOptionMenu(generateOnly)
 		if CurrentDragging then return end;
+		slotItem.Item = modData.Storages[slotItem.Interface.StorageId].Container[slotItem.ID];
 		RunService:UnbindFromRenderStep("DeleteConfirm");
 
 		if currentQuanFrame then currentQuanFrame:Destroy(); currentQuanFrame=nil; end
@@ -904,7 +906,7 @@ function StorageInterface:NewButton(id)
 		currentOptionFrame.Parent = self.MainFrame;
 		currentOptionFrame.MouseMoved:Connect(function() mouseInOptionFrame = tick(); end)
 
-		currentOptionFrame.EquipOption.Visible = false;
+		currentOptionFrame.EquipOption.Visible = false; 
 		currentOptionFrame.UnequipOption.Visible = false;
 		currentOptionFrame.SplitOption.Visible = false;
 		
