@@ -19,6 +19,7 @@ function ClothingProperties.new(clothing)
 	end
 	
 	clothing.RegisteredProperties = {};
+	clothing.ActiveProperties = {};
 	clothing.RegisteredTypes = {};
 	
 	setmetatable(self, clothing);
@@ -45,6 +46,7 @@ end
 
 function ClothingProperties:RegisterPlayerProperty(k, v)
 	self.RegisteredProperties[k] = v;
+	self.ActiveProperties[k] = true;
 end
 
 function ClothingProperties:RegisterTypes(modLib, storageItem)
@@ -81,6 +83,7 @@ function ClothingProperties:Reset()
 	for k, _ in pairs(self.RegisteredTypes) do
 		self.RegisteredTypes[k] = nil;
 	end
+	table.clear(self.ActiveProperties);
 end
 
 function ClothingProperties:ApplySeed(storageItem)

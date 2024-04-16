@@ -8,7 +8,9 @@ function Mod.Activate(packet)
 	local modStorageItem = packet.ModStorageItem;
 	
 	local info = modModsLibrary.Get(packet.ItemId);
-	if module:RegisterTypes(info, modStorageItem) then return end;
+	if module:RegisterTypes(info, modStorageItem) then
+		return;
+	end;
 	
 	local apLayerInfo = modModsLibrary.GetLayer("AP", packet);
 	local apValue, apTweakVal = apLayerInfo.Value, apLayerInfo.TweakValue;
@@ -29,22 +31,6 @@ function Mod.Activate(packet)
 		AddAr = arValue;
 		Visible = false;
 	});
-	
-	--local storageItem, module = paramPacket.ModStorageItem, paramPacket.WeaponModule;
-	
-	--local info = modModsLibrary.Get(storageItem.ItemId);
-	--if module:RegisterTypes(info, storageItem) then return end;
-	
-	--local values = storageItem.Values;
-
-	--local addArmorPoints = modModsLibrary.Linear(info.Upgrades[1].BaseValue, info.Upgrades[1].MaxValue, values["AP"], info.Upgrades[1].MaxLevel, info.Upgrades[1].Rate);
-	--local addArmorRate = modModsLibrary.Linear(info.Upgrades[2].BaseValue, info.Upgrades[2].MaxValue, values["AR"], info.Upgrades[2].MaxLevel, info.Upgrades[2].Rate);
-	
-	--module:RegisterPlayerProperty("PacifistsAmulet", {
-	--	AddAp = addArmorPoints;
-	--	AddAr = addArmorRate;
-	--	Visible = false;
-	--});
 end
 
 return Mod;

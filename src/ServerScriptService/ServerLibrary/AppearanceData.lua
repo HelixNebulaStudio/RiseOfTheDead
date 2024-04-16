@@ -215,9 +215,16 @@ function AppearanceData:Update(storage)
 
 		if clothingClass.RegisteredProperties then
 			for k, v in pairs(clothingClass.RegisteredProperties) do
-				if storage.Container[oId] then continue end;
+				if storage.Container[oId] then
+					-- Clothing still equipped;
+					if clothingClass.ActiveProperties[k] == nil then -- Active Properties no longer active; e.g. mod removable;
+						classPlayer:SetProperties(k, nil);
+					end
+
+					continue;
+				end; 
 				
-				classPlayer:SetProperties(k);
+				classPlayer:SetProperties(k, nil);
 			end
 		end
 		

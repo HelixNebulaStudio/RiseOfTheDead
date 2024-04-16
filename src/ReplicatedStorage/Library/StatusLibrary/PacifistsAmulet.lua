@@ -76,7 +76,9 @@ function StatusClass.OnTick(classPlayer, status, tickPack)
 		return sync;
 	else
 		
-	end;
+	end
+
+	return;
 end
 
 function StatusClass.OnExpire(classPlayer, status)
