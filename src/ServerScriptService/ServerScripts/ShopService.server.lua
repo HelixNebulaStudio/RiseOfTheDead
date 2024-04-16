@@ -293,7 +293,7 @@ function remoteGoldShopPurchase.OnServerInvoke(player, key)
 		local productType = productInfo.Product.Type;
 		
 		if productType == "ThirdParty" then
-			Debugger:Log("productInfo", productInfo);
+			--Debugger:Log("productInfo", productInfo);
 			local assetId = productInfo.Product.Id;
 			local itemId = productInfo.Product.ItemId;
 			
