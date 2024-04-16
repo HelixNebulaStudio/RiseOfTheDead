@@ -1524,22 +1524,6 @@ Add{
 	Module=script.ThornPlating;
 	Category="Rare Mods";
 };
---Add{
---	Id="thornmod";
---	Name="Chest Thorn Plating";
---	Desc="When attacked, attacker takes damage. Reflected damage is not lethal and will leave the enemy at 1 health.";
---	Icon="http://www.roblox.com/asset/?id=5720010211";
---	BaseTier=1;
---	Tier=1;
---	Upgrades={
---		{DataTag="R"; Name="Damage"; Syntax="Increase Damage"; ValueType="Normal"; MaxLevel=10; BaseCost=11; MaxCost=110; BaseValue=50; MaxValue=7500; Scaling=ModsLibrary.ScalingStyle.NaturalCurve;};
---	};
---	Stackable=true;
---	Type={"Chest"};
---	EffectTrigger=ModsLibrary.EffectTrigger.Passive;
---	Module=script.ThornPlating;
---	Category="Rare Mods";
---};
 
 Add{
 	Id="healthmod";

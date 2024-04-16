@@ -621,6 +621,20 @@ GoldShopLibrary.Products:Add{
 };
 
 GoldShopLibrary.Products:Add{
+	Id="thornmod";
+	Icon="";
+	TitleText="Chest Thorns Mod";
+	Desc="Mod for chest-based clothing. When taking melee damage, attacker takes reflected damage based on a percent of their health. Reflected damage only affects basic enemeis. Minimum reflected damage is 10.";
+	Product={
+		Type="Gold";
+		Price=1950;
+		ItemId="thornmod";
+	};
+	
+	Trader={Buy=true; Sell=true;};
+};
+
+GoldShopLibrary.Products:Add{
 	Id="barbedwooden";
 	Icon="";
 	TitleText="Barbed Wooden Fence";
