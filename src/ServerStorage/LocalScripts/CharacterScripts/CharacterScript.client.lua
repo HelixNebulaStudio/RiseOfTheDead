@@ -284,6 +284,8 @@ function onCameraSubjectUpdate()
 		else
 			local subjectModel = subject.Parent;
 			local subjectRootPart = subjectModel:FindFirstChild("HumanoidRootPart");
+			if subjectRootPart == nil then return end;
+			
 			local subjectHead = subjectModel:FindFirstChild("Head");
 			SoundService:SetListener(Enum.ListenerType.ObjectCFrame, subjectRootPart);
 
