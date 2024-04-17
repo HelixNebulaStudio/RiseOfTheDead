@@ -4,6 +4,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local modParallelData = require(game.ReplicatedStorage.ParallelLibrary:WaitForChild("DataModule"));
 
+if script.Parent == nil then return end;
+
 local remote = script.Parent:WaitForChild("NpcRemote") :: RemoteEvent;
 local actor = script:GetActor();
 if actor == nil then return end;
