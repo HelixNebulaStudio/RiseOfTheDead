@@ -13,6 +13,7 @@ local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild(
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibrary);
+local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
 
 local modColorsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ColorsLibrary"));
 local modSkinsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("SkinsLibrary"));
@@ -35,10 +36,10 @@ local selectedColor3 = Color3.fromRGB(163, 255, 130);
 local firstSync = false;
 function Workbench.new(itemId, library, storageItem)
 	local itemDisplay = Interface.WorkbenchItemDisplay;
-	while #itemDisplay.DisplayModels == 0 and itemDisplay.OnDisplay == storageItem.ID do
+	while #itemDisplay.DisplayModels == 0 and itemDisplay.OnDisplayID == storageItem.ID do
 		task.wait();
 	end
-	if itemDisplay.OnDisplay ~= storageItem.ID then return end;
+	if itemDisplay.OnDisplayID ~= storageItem.ID then return end;
 	
 	if firstSync == false then
 		firstSync = true;
@@ -90,6 +91,7 @@ function Workbench.new(itemId, library, storageItem)
 		
 		local unlockableLib = modItemUnlockablesLibrary:Find(itemId);
 		if unlockableLib then
+			local clothingLib = modClothingLibrary:Find(itemId);
 			local itemUnlockables = modItemUnlockablesLibrary:ListByKeyValue("ItemId", itemId);
 			if itemUnlockables then
 				local function setCharacterAccessories(unlockId)
@@ -177,10 +179,6 @@ function Workbench.new(itemId, library, storageItem)
 								end
 								canPreview = false;
 								
-								if unlockItemLib.PackageId then
-									
-								end
-
 								for a=1, 10, 0.1 do
 									storageItem = modData.GetItemById(storageItem.ID);
 									ItemValues = storageItem.Values;
@@ -188,6 +186,11 @@ function Workbench.new(itemId, library, storageItem)
 									wait(0.1);
 								end
 								
+								if unlockItemLib.PackageId or unlockItemLib.DefaultPackage then
+									-- switch viewport accessory
+									itemDisplay:SetDisplay(storageItem);
+								end
+
 								for b=1, #refreshButtonFuncs do
 									if type(refreshButtonFuncs[b]) == "function" then
 										refreshButtonFuncs[b]();
@@ -206,13 +209,9 @@ function Workbench.new(itemId, library, storageItem)
 							end;
 							
 							if ItemValues.SkinLocked then
-								Debugger:Log("Skin locked.");
+								Debugger:Warn("Skin locked.");
 								
 								return;
-							end
-							
-							if unlockItemLib.PackageId then
-								-- switch clothing accessory
 							end
 							
 							local oldActiveId = ItemValues.ItemUnlock;
@@ -228,6 +227,20 @@ function Workbench.new(itemId, library, storageItem)
 								ItemValues = storageItem.Values;
 								if ItemValues.ItemUnlock ~= oldActiveId then break; end;
 								wait(0.1);
+							end
+							
+							if unlockItemLib.PackageId or unlockItemLib.DefaultPackage then
+								-- switch viewport accessory
+								itemDisplay:SetDisplay(storageItem, function()
+									for a=1, #itemDisplay.DisplayModels do
+										local prefab = itemDisplay.DisplayModels[a].Prefab;
+
+										for _, obj in pairs(prefab:GetChildren()) do
+											modItemUnlockablesLibrary.UpdateSkin(obj, ItemValues.ItemUnlock);
+										end
+									end
+								end);
+
 							end
 							
 							for b=1, #refreshButtonFuncs do

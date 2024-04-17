@@ -39,7 +39,8 @@ function ItemViewport.new() : ItemViewport
 		Frame = diplayPortFrameTemplate:Clone();
 		
 		Active=true;
-		OnDisplay = nil;
+		OnDisplayID = nil;
+		OnDisplayPackageId = nil;
 		DisplayModels = {};
 		Camera = nil;
 		Zoom = 2;
@@ -197,11 +198,11 @@ function ItemViewport:RefreshDisplay()
 	end)
 end
 
-function ItemViewport:SetDisplay(storageItem, yielFunc)
+function ItemViewport:SetDisplay(storageItem, yieldFunc)
 	self:Clear();
 	local itemId = storageItem.ItemId;
 	local itemValues = storageItem.Values;
-	self.OnDisplay = storageItem.ID;
+	self.OnDisplayID = storageItem.ID;
 	
 	local itemDisplayLib = modWorkbenchLibrary.ItemAppearance[itemId];
 	local clothingLib = modClothingLibrary:Find(itemId);
@@ -215,7 +216,12 @@ function ItemViewport:SetDisplay(storageItem, yielFunc)
 			
 			local accessoryData, _actionType = remoteEquipCosmetics:InvokeServer(itemId, packageId);
 			
-			if self.OnDisplay ~= storageItem.ID then
+			local isSameModel = self.OnDisplayID ~= storageItem.ID;
+			if self.OnDisplayPackageId ~= packageId then
+				isSameModel = false;
+			end
+
+			if isSameModel then
 				self:RefreshDisplay();
 				return;
 			end
@@ -229,8 +235,8 @@ function ItemViewport:SetDisplay(storageItem, yielFunc)
 			table.insert(self.DisplayModels, {Prefab=characterModel;});
 			self:RefreshDisplay();
 
-			if yielFunc then
-				yielFunc(self);
+			if yieldFunc then
+				yieldFunc(self);
 			end
 		end)
 		
@@ -284,7 +290,8 @@ function ItemViewport:Clear()
 		game.Debris:AddItem(self.DisplayModels[a].Prefab, 0);
 	end
 	self.DisplayModels = {};
-	self.OnDisplay = nil;
+	self.OnDisplayID = nil;
+	self.OnDisplayPackageId = nil;
 	self.Frame.ItemIcon.Image = "";
 	self.Frame.ItemIcon.Visible = false;
 end

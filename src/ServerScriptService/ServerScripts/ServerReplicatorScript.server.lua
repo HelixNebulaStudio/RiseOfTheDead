@@ -34,6 +34,7 @@ local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCal
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
+local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
 
 local toolHandlers = game.ServerScriptService.ServerLibrary.ToolHandlers;
 
@@ -958,6 +959,9 @@ end
 
 function remoteEquipCosmetics.OnServerInvoke(player, itemId, packageId)
 	local clothingLibrary = modClothingLibrary:Find(itemId);
+
+	local itemUnlockableLib = modItemUnlockablesLibrary:Find(packageId);
+	packageId = itemUnlockableLib and itemUnlockableLib.PackageId or itemId;
 
 	local accessoryData = clothingLibrary and clothingLibrary.AccessoryData and clothingLibrary.AccessoryData[packageId];
 	if accessoryData == nil then return end;

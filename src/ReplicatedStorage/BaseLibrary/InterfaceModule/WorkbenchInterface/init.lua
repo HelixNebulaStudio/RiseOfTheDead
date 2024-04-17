@@ -132,7 +132,7 @@ function Interface.init(modInterface)
 			local itemId = selectedSlot.Item.ItemId;
 			local itemLib = modItemLibrary:Find(itemId);
 
-			if newItemDisplay.OnDisplay ~= selectedSlot.Item.ID then
+			if newItemDisplay.OnDisplayID ~= selectedSlot.Item.ID then
 				remoteStorageItemSync:FireServer("update", selectedSlot.Item.ID);
 				newItemDisplay:SetDisplay(selectedSlot.Item);
 			end

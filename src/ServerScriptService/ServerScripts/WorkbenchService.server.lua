@@ -836,13 +836,13 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 				if appearId == 0 then
 					local itemSkin = storageItem.Values.Colors or {};
 					itemSkin[partKey] = nil;
-					storage:SetValues(id, {Colors=itemSkin;});
+					storageItem:SetValues("Colors", itemSkin);
 				else
 					local colorLibrary = modColorsLibrary.Get(appearId);
 					if colorLibrary and profile.ColorPacks[colorLibrary.Pack] then
 						local itemSkin = storageItem.Values.Colors or {};
 						itemSkin[partKey] = appearId;
-						storage:SetValues(id, {Colors=itemSkin;});
+						storageItem:SetValues("Colors", itemSkin);
 						profile:AddPlayPoints(1);
 					else
 						Debugger:Warn("Color does not exist or color pack is locked.",colorLibrary == nil," Unlocked:",profile.ColorPacks[colorLibrary.Pack]);
@@ -854,14 +854,14 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 					
 					local itemSkin = storageItem.Values.Textures or {};
 					itemSkin[partKey] = storageItem.Values.LockedPattern and 0 or nil;
-					storage:SetValues(id, {Textures=itemSkin;});
+					storageItem:SetValues("Textures", itemSkin);
 					
 				else
 					local textureLibrary = modSkinsLibrary.Get(appearId);
 					if textureLibrary and profile.SkinsPacks[textureLibrary.Pack] then
 						local itemSkin = storageItem.Values.Textures or {};
 						itemSkin[partKey] = appearId;
-						storage:SetValues(id, {Textures=itemSkin;});
+						storageItem:SetValues("Textures", itemSkin);
 						profile:AddPlayPoints(1);
 						
 					else
@@ -877,19 +877,19 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 					partAlpha[partKey] = true;
 				end
 				
-				storage:SetValues(id, {PartAlpha=partAlpha;});
+				storageItem:SetValues("PartAlpha", partAlpha);
 				profile:AddPlayPoints(1);
 				
 			elseif action == 3 then --== Clear Color;
 				local itemSkin = storageItem.Values.Colors or {};
 				itemSkin[partKey] = nil;
-				storage:SetValues(id, {Colors=itemSkin;});
+				storageItem:SetValues("Colors", itemSkin);
 				profile:AddPlayPoints(1);
 				
 			elseif action == 4 then --== Clear Texture;
 				local itemSkin = storageItem.Values.Textures or {};
 				itemSkin[partKey] = nil;
-				storage:SetValues(id, {Textures=itemSkin;});
+				storageItem:SetValues("Textures", itemSkin);
 				profile:AddPlayPoints(1);
 
 			elseif action == 5 then --== Clear All;
@@ -902,7 +902,9 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 				local partAlpha = storageItem.Values.PartAlpha or {};
 				partAlpha[partKey] = nil;
 				
-				storage:SetValues(id, {Colors=itemColors; Textures=itemTextures; PartAlpha=partAlpha;});
+				storageItem:SetValues("Colors", itemColors);
+				storageItem:SetValues("Textures", itemTextures);
+				storageItem:SetValues("PartAlpha", partAlpha);
 				profile:AddPlayPoints(1);
 				
 				
@@ -926,19 +928,20 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 							isUnlocked = true;
 						end
 						if isUnlocked then
-							storage:SetValues(id, {ItemUnlock=appearId;});
+							storageItem:SetValues("ItemUnlock", appearId);
 						end
 					else
-						storage:DeleteValues(id, "ItemUnlock");
+						storageItem:DeleteValues("ItemUnlock");
 					end
 				else
-					storage:DeleteValues(id, "ItemUnlock");
+					storageItem:DeleteValues("ItemUnlock");
 				end
 				
 				activeSave.AppearanceData:Update(activeSave.Clothing);
 			end
 			activeSave:AwardAchievement("fimyst");
 			
+			storageItem:Sync();
 			
 			-- Refresh weapon skin;
 			if player.Character then

@@ -93,6 +93,8 @@ function ItemUnlockablesLibrary:Init(library)
 		Id="leathergloves";
 		ItemId="leathergloves";
 		Name="Default";
+		DefaultPackage=true;
+		
 		SurfaceAppearance={
 			ColorMap="rbxassetid://16987783752";
 		};
@@ -117,6 +119,7 @@ function ItemUnlockablesLibrary:Init(library)
 		Id="leatherglovesred";
 		ItemId="leathergloves";
 		Name="Red";
+		DefaultPackage=true;
 
 		SurfaceAppearance={
 			ColorMap="rbxassetid://16994290100";
@@ -251,7 +254,8 @@ function ItemUnlockablesLibrary:Init(library)
 		Id="nekrostrench";
 		ItemId="nekrostrench";
 		Name="Default";
-		
+		DefaultPackage=true;
+
 		SurfaceAppearance={
 			ColorMap="rbxassetid://14506983094";
 		};
