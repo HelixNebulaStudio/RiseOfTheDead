@@ -985,7 +985,7 @@ function Interface.init(modInterface)
 				mouseOnMemberFrame = false;
 			end
 			if mouseOnMemberFrame then
-				memberCountLabel.Text = "Members - "..factionData.MemberCount;
+				memberCountLabel.Text = "Members: "..factionData.MemberCount;
 				memberCountLabel.TextXAlignment = Enum.TextXAlignment.Left;
 				memberCountLabel.UIPadding.PaddingLeft = UDim.new(0, 10);
 				membersFrameExpandTween:Play();
