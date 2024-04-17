@@ -81,6 +81,10 @@ function library.UpdateSkin(prefab, skinId)
 							newEffect = Instance.new(values.Type);
 						end
 						
+						if newEffect:IsA("ParticleEmitter") then
+							newEffect.Shape = Enum.ParticleEmitterShape.Box;
+						end
+
 						newEffect.Name = "Effects";
 						newEffect:SetAttribute("EffectName", effectName);
 						
