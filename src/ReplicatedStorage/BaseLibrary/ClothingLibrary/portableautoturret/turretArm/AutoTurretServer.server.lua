@@ -572,6 +572,10 @@ function Update()
 		local handle = weaponModel:WaitForChild("Handle");
 		if handle:CanSetNetworkOwnership() then handle:SetNetworkOwner(player); end
 
+		for _, obj in pairs(weaponModel:GetDescendants()) do
+			obj:SetAttribute("FPIgnore", nil);
+		end
+
 		local rigidConstraint = Instance.new("RigidConstraint");
 		rigidConstraint.Attachment0 = handlePoint;
 		rigidConstraint.Attachment1 = handle:WaitForChild("GripPoint");
