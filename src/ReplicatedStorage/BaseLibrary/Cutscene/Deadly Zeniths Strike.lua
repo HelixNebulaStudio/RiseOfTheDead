@@ -109,7 +109,7 @@ return function(CutsceneSequence)
 					
 					if activeBossNpcModule then
 						activeBossNpcModule:Destroy();
-						game.Debris:AddItem(activeBossNpcModule.Prefab, 0);
+						Debugger.Expire(activeBossNpcModule.Prefab, 0);
 					end
 					
 					local bossSpawnCf = workspace:FindFirstChildWhichIsA("SpawnLocation").CFrame * CFrame.new(0, 10, 0);
@@ -218,7 +218,7 @@ return function(CutsceneSequence)
 					
 					if activeBossNpcModule then
 						activeBossNpcModule:Destroy();
-						game.Debris:AddItem(activeBossNpcModule.Prefab, 0);
+						Debugger.Expire(activeBossNpcModule.Prefab, 0);
 						activeBossNpcModule = nil;
 					end
 				end)

@@ -202,7 +202,7 @@ return function(CutsceneSequence)
 								end
 
 								npcModule.DeathPosition = npcModule.RootPart.CFrame.p;
-								game.Debris:AddItem(npc, 10);
+								Debugger.Expire(npc, 10);
 							end);
 
 							task.spawn(function()

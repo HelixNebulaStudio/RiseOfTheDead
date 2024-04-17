@@ -148,7 +148,7 @@ function Update()
 	if isWeaponChanged then
 		for _, obj in pairs(turretArm:GetChildren()) do
 			if obj:GetAttribute("TurretWeapon") ~= true then continue end;
-			game.Debris:AddItem(obj, 0);
+			Debugger.Expire(obj, 0);
 		end
 		activeWeaponModel = nil;
 		

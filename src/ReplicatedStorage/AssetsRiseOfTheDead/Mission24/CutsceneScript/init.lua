@@ -80,7 +80,7 @@ return function(CutsceneSequence)
 					end
 					
 				elseif mission.ProgressionPoint == 3 then
-					game.Debris:AddItem(mission.Cache.BeaniePrefab, 0);
+					Debugger.Expire(mission.Cache.BeaniePrefab, 0);
 
 				elseif mission.ProgressionPoint == 4 then
 					spawnEnemy()

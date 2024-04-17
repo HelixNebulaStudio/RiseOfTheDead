@@ -136,7 +136,7 @@ if RunService:IsServer() then
 
 				if npcModule then
 					dialog:AddChoice("qa2_caught", function(dialog)
-						game.Debris:AddItem(npcModule.Prefab, 0);
+						Debugger.Expire(npcModule.Prefab, 0);
 						modMission:Progress(player, missionId, function(mission)
 							if mission.ProgressionPoint == 8 then
 								mission.ProgressionPoint = 9;

@@ -457,7 +457,7 @@ return function(CutsceneSequence)
 					endSpawnLoop = true;
 				end
 				wait(2);
-				game.Debris:AddItem(zombiePrefab, 0);
+				Debugger.Expire(zombiePrefab, 0);
 			end);
 
 			task.spawn(function()
