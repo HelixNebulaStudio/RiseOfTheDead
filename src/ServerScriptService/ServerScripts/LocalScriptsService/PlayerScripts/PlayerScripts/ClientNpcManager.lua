@@ -86,7 +86,13 @@ return function()
 		local maxDeadbodies = modData:GetSetting("MaxDeadbodies");
 
 		if modBranchConfigs.CurrentBranch.Name == "Live" or deadbodyDespawnTimer < 61 then
-			game.Debris:AddItem(prefab, deadbodyDespawnTimer);
+			if deadbodyDespawnTimer > 5 then
+				task.delay(5, function()
+					game.Debris:AddItem(prefab, deadbodyDespawnTimer-5);
+				end)
+			else
+				game.Debris:AddItem(prefab, deadbodyDespawnTimer);
+			end
 		end
 		
 		if lastDbDespawnTick == nil or tick()-lastDbDespawnTick > 1 then

@@ -223,7 +223,9 @@ function WorldEvent.Start()
 							end
 						end
 						npcModule.DeathPosition = npcModule.RootPart.CFrame.p;
-						game.Debris:AddItem(npc, 10);
+
+						task.wait(5);
+						game.Debris:AddItem(npc, 5);
 					end);
 				end);
 				
