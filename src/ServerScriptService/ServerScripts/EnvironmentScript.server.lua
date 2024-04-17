@@ -240,26 +240,38 @@ local ImmersiveAdsFallbacks = {
 	"rbxassetid://17168886366";
 }
 
+local adGuiTemplate = script:WaitForChild("AdGui");
+local adGuiProxy = script:WaitForChild("AdGuiProxy");
 modOnGameEvents:ConnectEvent("OnDayTimeStart", function()
 	local adGuis = CollectionService:GetTagged("AdGuis");
-	local enabledCount = 0;
-	for _, adGui: AdGui in pairs(adGuis) do
-		adGui.FallbackImage = ImmersiveAdsFallbacks[math.random(1, #ImmersiveAdsFallbacks)];
-		adGui.Enabled = math.random(1, 8) == 1;
 
-		if adGui.Enabled then 
-			enabledCount = enabledCount + 1;
-		end
-		if enabledCount <= 3 then
-			adGui.Enabled = math.random(1, 2) == 1;
+	for _, adGui in pairs(adGuis) do
+		if adGui:IsA("AdGui") then
+			adGui.FallbackImage = ImmersiveAdsFallbacks[math.random(1, #ImmersiveAdsFallbacks)];
+			adGui.Enabled = math.random(1, 8) == 1;
+
+			if not adGui.Enabled then
+				local newProxy = adGuiProxy:Clone();
+				local imageLabel: ImageLabel = newProxy:WaitForChild("ImageLabel");
+				imageLabel.Image = adGui.FallbackImage;
+				newProxy.Parent = adGui.Parent;
+
+				adGui:Destroy();
+			end
+		elseif adGui:IsA("SurfaceGui") then
+			adGui.ImageLabel.Image = ImmersiveAdsFallbacks[math.random(1, #ImmersiveAdsFallbacks)];
+			adGui.Enabled = math.random(1, 8) == 1;
+
+			if not adGui.Enabled then
+				local newAdGui = adGuiTemplate:Clone();
+				newAdGui.FallbackImage = adGui.ImageLabel.Image;
+				newAdGui.Parent = adGui.Parent;
+
+				adGui:Destroy();
+			end
 		end
 	end
-	if enabledCount <= 0 then
-		local _, adGui = next(adGuis);
-		if adGui then
-			adGui.Enabled = true;
-		end
-	end
+
 end)
 
 local function loadClipping(object)
