@@ -91,6 +91,8 @@ function Ticks.new(localNpc)
 	function self:OnRemoteEvent(action, packet)
 		if action == "detonate" then
 			local effectMesh = packet[1];
+			if not workspace:IsAncestorOf(effectMesh) then return end; -- Probably not streamed in.
+
 			local newEffect = effectMesh.Parent;
 			local speed = packet[2];
 			local range = packet[3];
