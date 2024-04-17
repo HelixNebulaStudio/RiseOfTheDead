@@ -454,21 +454,12 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	
 	npcModule:SetNetworkOwner(nil);
 	
-	-- task.spawn(function()
-	-- 	local npcPrefab = replicatedPrefabs.Npc:FindFirstChild(name);
-	-- 	if npcPrefab == nil then
-	-- 		npcPrefab = modPrefabManager:LoadPrefab(npcPrefabs[name], replicatedPrefabs.Npc, 600);
-	-- 	end
-	-- 	if #game.Players:GetPlayers() > 0 then
-	-- 		remoteNpcManager:FireAllClients("loadprefab", npcPrefab, npcPrefab);
-	-- 	end
-	-- end)
-	
 	npcModule.Garbage:Tag(npcModule.Humanoid.Died:Connect(function()
 		if npcModule == nil then return end;
 		npcModule.IsDead = true;
 	end));
-	npcModule.Garbage:Tag(npcModule.RootPart.Destroying:Connect(function()
+	npcModule.Garbage:Tag(npcPrefab.ChildRemoved:Connect(function(child)
+		if child.Name ~= "HumanoidRootPart" then return end;
 		if npcModule == nil then return end;
 		npcModule:KillNpc();
 	end))
