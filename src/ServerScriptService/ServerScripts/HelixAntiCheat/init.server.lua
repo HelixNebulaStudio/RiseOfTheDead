@@ -5,13 +5,11 @@ repeat task.wait() until shared.MasterScriptInit == true;
 --== Variables;
 local Players = game.Players;
 local RunService = game:GetService("RunService");
-local PhysicsService = game:GetService("PhysicsService");
 local TextService = game:GetService("TextService");
 local MarketplaceService = game:GetService("MarketplaceService");
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modGameLogService = require(game.ReplicatedStorage.Library.GameLogService);
-local modRegion = require(game.ReplicatedStorage.Library.Region);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 
@@ -33,7 +31,7 @@ local remoteTinker = Instance.new("RemoteFunction"); remoteTinker.Name = "Tinker
 
 local HOURINSECS = 3600;
 local DAYINSECS = 86400;
-local SMALL_DECIMAL = 1e-3;
+
 
 local function IsAuthorized(player)
 	if modGlobalVars.IsCreator(player) then
@@ -146,7 +144,7 @@ AntiCheatService.__index = AntiCheatService;
 
 local function TinkerInvokeClient(player, action, ...)
 	local case = Case.Get(player.Name);
-	if case == nil then Debugger:Warn("Missing player case", player) return {}; end;
+	if case == nil then Debugger:Warn("Missing player case", player); return {}; end;
 	Debugger:Log("TinkerInvokeClient", player, action);
 	
 	case.LastInvoke = tick();
@@ -237,8 +235,6 @@ function AntiCheatService:GetAverageDistance(player, targetPos)
 	local cframeLog = case.CFrameLog;
 	if cframeLog == nil then return -3; end;
 	
-	local targetPosMag = targetPos.Magnitude;
-	
 	local avgDistance;
 	local logsCount = math.min(#cframeLog, 30);
 	local rangeMax, rangeMin = #cframeLog, #cframeLog-logsCount
@@ -265,7 +261,7 @@ function AntiCheatService:GetLastTeleport(player)
 	if player == nil then return 4 end;
 	
 	local case = Case.Get(player.Name);
-	if case == nil then Debugger:Warn("Missing player case", player) return 5; end;
+	if case == nil then Debugger:Warn("Missing player case", player); return 5; end;
 	
 	if case.LastIllegalMovement == nil then return 6; end;
 	
@@ -287,6 +283,8 @@ function AntiCheatService.saferequire(player, moduleScript)
 		LogToAnalytics("Player attempt to inject module id ("..tostring(moduleScript)..") to saferequire.")
 		LogToAdminConsole(player, player.UserId.." ("..player.Name.."Attempt to inject module id ("..tostring(moduleScript)..") to saferequire.");
 	end
+
+	return;
 end
 
 local censorNames = {
@@ -560,8 +558,6 @@ function Kick(player, reasonId)
 	player:Kick(reasonStr);
 end
 
-local function lerp(a, b, t) return a * (1-t) + (b*t); end
-
 function AntiCheatService:Teleport(player, cframe)
 	local position = cframe.Position;
 	
@@ -620,9 +616,6 @@ function AntiCheatService:Teleport(player, cframe)
 	end
 	local rootPart = classPlayer.RootPart;
 	
-	-- if rootPart.Anchored ~= true and workspace:IsAncestorOf(rootPart) then
-	-- 	rootPart:SetNetworkOwner(nil);
-	-- end
 	table.insert(playerCase.CFrameLog, cframe);
 
 	playerCase.TeleportCframeBuffer = cframe;
@@ -632,9 +625,6 @@ function AntiCheatService:Teleport(player, cframe)
 	
 	task.delay(0.1, function()
 		humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true);
-		-- if rootPart.Anchored ~= true and workspace:IsAncestorOf(rootPart) and rootPart.AssemblyRootPart == rootPart then
-		-- 	rootPart:SetNetworkOwner(player);
-		-- end
 	end)
 end
 
@@ -664,26 +654,17 @@ function OnPlayerAdded(player)
 		end
 		Debugger:Log("Initialized on character "..player.Name);
 		
-		local classPlayer = shared.modPlayers.Get(player);
+		local _classPlayer = shared.modPlayers.Get(player);
 		
 		table.clear(newCase.CFrameLog);
 		local cframeLog = newCase.CFrameLog;
-		
-		local oldGroundObject = nil;
-		local flyTimer = nil;
-		local flyTestInited = false;
-		
-		local lastMax = 0;
-		local threshold = 25;
-		local exceedingCount = 0;
-		local exceedBypassRate = 1;
 		
 		local tenSecTick = tick();
 		local loggedIllegalExceed = false;
 		
 		rootPart:GetPropertyChangedSignal("CFrame"):Connect(function()
 			table.insert(cframeLog, rootPart.CFrame);
-			Debugger:Log("Teleported", rootPart.CFrame)
+			Debugger:StudioLog("Teleported", rootPart.CFrame)
 		end)
 		
 		while workspace:IsAncestorOf(rootPart) do
@@ -703,89 +684,12 @@ function OnPlayerAdded(player)
 						LogToAnalytics("Player exceeded illegal limits.");
 					end)
 					
-					--if modBranchConfigs.CurrentBranch.Name ~= "Dev" then
-					--	Kick(player, 1);
-					--end
 				end
 				newCase.IllegalCount = 0;
 				
 				newCase.TotalTamperingCount = newCase.TotalTamperingCount + newCase.TamperingCount;
 				newCase.TamperingCount = 0;
 			end
-			
-			task.defer(function()
-				while #cframeLog >= 30 do table.remove(cframeLog, 1); end
-				
-				local newCframe = rootPart.CFrame;
-				local vel = rootPart.AssemblyLinearVelocity;
-
-				local lastCframe = cframeLog[#cframeLog];
-				table.insert(cframeLog, newCframe);
-
-				if lastCframe then
-					local posDelta = newCframe.Position-lastCframe.Position;
-					local velDelta = vel * delta;
-					
-					posDelta = Vector3.new(math.abs(posDelta.X), math.abs(posDelta.Y), math.abs(posDelta.Z));
-					velDelta = Vector3.new(math.abs(velDelta.X), math.abs(velDelta.Y), math.abs(velDelta.Z));
-
-					local exceedThreshold = math.max(
-						posDelta.X - velDelta.X,
-						posDelta.Y - velDelta.Y,
-						posDelta.Z - velDelta.Z
-					);
-					
-					if exceedThreshold > 1 then
-						Debugger:Log("exceedThreshold", exceedThreshold,"\nvelDelta",velDelta,"\nposDelta",posDelta);
-					end
-					
-					if exceedThreshold > threshold then
-						if exceedThreshold > lastMax then
-							lastMax = exceedThreshold;
-						end
-						
-						local timeSinceLastIllegalMovement = tick()-newCase.LastIllegalMovement;
-						if timeSinceLastIllegalMovement > 0.1 then
-							Debugger:Warn("Player (", player.Name ,") speed exceed limit ", exceedThreshold, " Max:", lastMax, "(".. exceedingCount .."/".. 3 ..")");
-							
-							newCase.IllegalCount = newCase.IllegalCount +1;
-							--if timeSinceLastIllegalMovement < exceedBypassRate then
-
-							--	exceedingCount = exceedingCount +1;
-							--	if exceedingCount % 3 == 0 then
-							--		TinkerInvokeClient(player, "setactive", "Terrorblade", true);
-							--		LogToAnalytics("Enabled Terrorblade.");
-							--	end
-
-							--	LogToAnalytics("Server Player exceed speed limit.");
-							--end
-
-							exceedBypassRate = math.clamp(exceedBypassRate +1, 2, 10);
-						end
-						
-						newCase.LastIllegalMovement = tick();
-					end
-				end
-				
-				if classPlayer.GroundPart ~= nil then
-					flyTestInited = true;
-					oldGroundObject = classPlayer.GroundPart.Name;
-				end
-				if flyTestInited and classPlayer.GroundPart == nil and math.abs(vel.Y) <= 0 
-					and not rootPart.Anchored and classPlayer.Properties.Ragdoll == 0 and not classPlayer.IsClimbing then
-					if flyTimer == nil then
-						flyTimer = tick();
-						
-					elseif tick()-flyTimer > 3 then
-						flyTimer = nil;
-
-						Debugger:Warn("Warning: "..player.Name.." flying detected. VelY: "..math.abs(vel.Y).." LastGround: "..tostring(oldGroundObject));
-					end
-				else
-					flyTimer = nil;
-				end
-				
-			end)
 		end
 	end
 	
@@ -855,10 +759,6 @@ end
 
 local modEngineCore = require(game.ReplicatedStorage.EngineCore);
 modEngineCore:ConnectOnPlayerAdded(script, OnPlayerAdded, 1)
---for _, player in pairs(game.Players:GetPlayers()) do
---	pcall(function() OnPlayerAdded(player) end)
---end;
---Players.PlayerAdded:Connect(OnPlayerAdded);
 
 Players.PlayerRemoving:Connect(function()
 	task.wait();
@@ -872,7 +772,7 @@ end)
 
 function remoteTinker.OnServerInvoke(player, keys, action, packet)
 	local case = Case.Get(player.Name);
-	if case == nil then Debugger:Warn("Missing player case", player) return false end;
+	if case == nil then Debugger:Warn("Missing player case", player); return false end;
 	
 	local validInvoke = case:TestKeys(keys);
 	

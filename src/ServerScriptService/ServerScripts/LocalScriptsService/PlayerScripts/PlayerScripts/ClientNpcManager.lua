@@ -60,6 +60,18 @@ return function()
 	local lastDbDespawnTick = tick();
 	CollectionService:GetInstanceAddedSignal("Deadbody"):Connect(function(prefab: Model)
 		--local humanoid = prefab:FindFirstChildWhichIsA("Humanoid") :: Humanoid;
+		if prefab == nil or not workspace:IsAncestorOf(prefab) then return end;
+
+		local disabledRagdoll = modData:GetSetting("DisableDeathRagdoll") == 1;
+		if disabledRagdoll then
+			for _, obj in pairs(prefab:GetDescendants()) do
+				if obj:IsA("Motor6D") and obj:GetAttribute("RagdollJoint") == true then
+					obj.Parent.BallSocketConstraint.Enabled = false;
+					obj.Enabled = true;
+				end
+			end
+		end
+
 		local parallelNpc = prefab:FindFirstChild("ParallelNpc");
 		if parallelNpc then
 			parallelNpc:Destroy();
@@ -93,6 +105,8 @@ return function()
 				part.Anchored = false;
 				
 				if part.Name == "HumanoidRootPart" then continue end;
+				if part:FindFirstChild("BallSocketConstraint") and (part.Name ~= "Head" and part.Name ~= "UpperTorso" and part.Name ~= "LowerTorso") then continue end;
+
 				part.CanCollide = true;
 			end
 		end)

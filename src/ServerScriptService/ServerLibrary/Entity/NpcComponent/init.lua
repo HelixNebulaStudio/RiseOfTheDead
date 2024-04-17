@@ -90,6 +90,36 @@ function NpcComponent:LoadClientScript(players)
 	end
 end
 
+function NpcComponent:RefreshRagdollJoints()
+	local prefab: Model = self.Prefab;
+	if prefab == nil then return end;
+
+	local ragdollEnabled = true;
+
+	local canRagdoll = prefab:GetAttribute("HasRagdoll") == true;
+	if canRagdoll then
+		for _, obj in pairs(prefab:GetDescendants()) do
+			if obj:IsA("Motor6D") and obj:GetAttribute("RagdollJoint") == true then
+				if obj == nil or not prefab:IsAncestorOf(obj) then continue end;
+				if obj.Parent == nil then continue end;
+
+				obj.Parent.BallSocketConstraint.Enabled = ragdollEnabled;
+				obj.Enabled = not ragdollEnabled;
+
+			elseif obj:IsA("BasePart") and obj.Parent == prefab then
+				if obj.Name == "CollisionRootPart" then continue end;
+				
+				if ragdollEnabled and obj.Name ~= "LeftUpperLeg" and obj.Name ~= "RightUpperLeg" and obj.Name ~= "HumanoidRootPart" then
+					obj.CanCollide = true;
+				else
+					obj.CanCollide = false;
+				end
+				
+			end
+		end
+	end
+end
+
 function NpcComponent:KillNpc()
 	local rootPart: BasePart = self.RootPart;
 	local prefab: Model = self.Prefab;
@@ -120,13 +150,15 @@ function NpcComponent:KillNpc()
 		end)
 	end
 	
-	self:SetNetworkOwner("auto", true);
+	self:SetNetworkOwner(nil, true);
 
 	task.spawn(function()
 		if rootPart then
 			for _, tag in pairs(rootPart:GetTags()) do
 				rootPart:RemoveTag(tag);
 			end
+			local physicSleepDisabler = Instance.new("BodyForce");
+			physicSleepDisabler.Parent = rootPart;
 		end
 
 		if prefab then
@@ -140,6 +172,7 @@ function NpcComponent:KillNpc()
 				prefab.Parent = workspace.Entities;
 			end)
 			task.delay(5, function()
+				rootPart.Anchored = true;
 				for _, obj in pairs(prefab:GetChildren()) do
 					if not obj:IsA("BasePart") or obj.AssemblyRootPart == nil then continue end;
 					obj.AssemblyRootPart.Anchored = true;
@@ -147,7 +180,8 @@ function NpcComponent:KillNpc()
 				end
 			end)
 		end
-		
+		self:RefreshRagdollJoints();
+
 		if self.Wield then
 			for _, obj in pairs(self.Wield.Instances) do
 				if obj:IsA("Model") then
@@ -182,6 +216,12 @@ function NpcComponent:BreakJoint(motor: Motor6D)
 
 	local part0 :BasePart, part1 :BasePart = motor.Part0 :: BasePart, motor.Part1 :: BasePart;
 	motor:Destroy();
+
+	local ragdollJoint = motor.Parent and motor.Parent:FindFirstAncestorWhichIsA("BallSocketConstraint");
+	if ragdollJoint then
+		ragdollJoint:Destroy();
+	end
+
 	if self.JointsDestroyed == nil then
 		self.JointsDestroyed = {};
 	end;
@@ -217,9 +257,11 @@ function NpcComponent:BreakJoint(motor: Motor6D)
 				end
 			end
 			
+			local physicSleepDisabler = Instance.new("BodyForce");
+			physicSleepDisabler.Parent = assemblyRoot;
+
 			task.wait(5);
-			--modPhysics.WaitForSleep(assemblyRoot);
-			
+
 			if workspace:IsAncestorOf(assemblyRoot) then
 				for _, bodyPart :BasePart in pairs(connParts) do
 					bodyPart.Anchored = true;

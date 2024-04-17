@@ -654,9 +654,9 @@ library:Add{
 	Rewards={
 		{Index=1; ItemId="motor"; Quantity={Min=1; Max=2}; Chance=1;};
 
-		{Index=2; ItemId="thornmod"; Recyclable=true; Quantity=1; Chance=1;};
-		{Index=2; ItemId="smgcritmultimod"; Recyclable=true; Quantity=1; Chance=0.5;};
-		{Index=2; ItemId="pyroeverlastmod"; Recyclable=true; Quantity=1; Chance=1/4;};
+		{Index=2; ItemId="smgcritmultimod"; Recyclable=true; Quantity=1; Chance=1;};
+		{Index=2; ItemId="thornmod"; Recyclable=true; Quantity=1; Chance=1/3;};
+		{Index=2; ItemId="pyroeverlastmod"; Recyclable=true; Quantity=1; Chance=1/3;};
 
 		{Index=3; ItemId="deaglebp"; Recyclable=true; Quantity=1; Chance=weaponBpChance;};
 	};

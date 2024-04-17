@@ -253,11 +253,11 @@ function MetaStatus:TakeDamagePackage(damageSource)
 			
 			if typeof(netown) == "Instance" and netown:IsA("Player") then
 				npcModule.KillerPlayer = netown;
-				npcModule:SetNetworkOwner(netown, true);
-				npcModule.Remote:FireClient(netown, "ApplyImpulseAtPosition", rootPart, dmgForce * rootPart.AssemblyMass, dmgPosition);
+				--npcModule:SetNetworkOwner(netown, true);
+				--npcModule.Remote:FireClient(netown, "ApplyImpulseAtPosition", rootPart, dmgForce * rootPart.AssemblyMass, dmgPosition);
 				
 			else
-				npcModule:SetNetworkOwner("auto", true);
+				--npcModule:SetNetworkOwner("auto", true);
 			end
 		end
 		

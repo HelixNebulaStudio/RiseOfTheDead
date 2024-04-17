@@ -820,13 +820,13 @@ function Profile:Load(loadOverwrite)
 				if typeof(self[key]) == "table" and self[key].Load then
 					self[key]:Load(data);
 					loaded = true;
-					Debugger:Log("key",key,"loaded");
+					Debugger:StudioLog("key",key,"loaded");
 				end
 				
 				if not loaded then
 					self[key] = data;
 					if RunService:IsStudio() then
-						Debugger:Log("[Studio] key",key,"setload");
+						Debugger:StudioLog("key",key,"setload");
 					end
 				end
 				
