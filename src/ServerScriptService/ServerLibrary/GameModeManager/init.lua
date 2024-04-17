@@ -757,7 +757,7 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 				if mission.ProgressionPoint == 4 then
 					local doorInstance = workspace.Interactables:FindFirstChild("securityRoomEntrance");
 					if doorInstance then
-						local destination = CFrame.new(doorInstance.Destination.WorldPosition + Vector3.new(0, 2.35, 0)) 
+						local destination = CFrame.new(doorInstance.Destination.WorldPosition + Vector3.new(0, 2.3, 0)) 
 							* CFrame.Angles(0, math.rad(doorInstance.Destination.WorldOrientation.Y-90), 0)
 						
 						shared.modAntiCheatService:Teleport(player, destination);
