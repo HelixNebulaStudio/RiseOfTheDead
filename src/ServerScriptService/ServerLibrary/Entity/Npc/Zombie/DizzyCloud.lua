@@ -75,12 +75,12 @@ function Zombie.new(self)
 					spawnPosition = spawnPosition:Lerp(obj.Position, 0.5);
 					startSize = cloudSize;
 					cloudSize = cloudSize +(baseSize/2);
-					game.Debris:AddItem(obj, 1);
+					Debugger:Expire(obj, 1);
 				end
 			end
 			
 			local newGasCloud = script:WaitForChild("dizzyCloud"):Clone();
-			game.Debris:AddItem(newGasCloud, duration or 10);
+			Debugger:Expire(newGasCloud, duration or 10);
 			
 			newGasCloud.Size = Vector3.new(startSize, startSize, startSize);
 			newGasCloud.Position = spawnPosition;
