@@ -223,12 +223,13 @@ end
 
 function StorageItem.IsStackable(storageItemA, storageItemB)
 	if storageItemA.ItemId ~= storageItemB.ItemId then return false end;
-	local stackable = storageItemA.Properties.Stackable;
+	local itemLibA = modItemsLibrary:Find(storageItemA.ItemId);
+	local stackable = itemLibA.Stackable;
 	
 	if stackable == false then return false end;
 	if storageItemA.Quantity == stackable or storageItemB.Quantity == stackable then return false end;
 	
-	local stackMatchList = storageItemA.Properties.StackMatch;
+	local stackMatchList = itemLibA.StackMatch;
 	if stackMatchList then
 		for a=1, #stackMatchList do
 			local key = stackMatchList[a];
