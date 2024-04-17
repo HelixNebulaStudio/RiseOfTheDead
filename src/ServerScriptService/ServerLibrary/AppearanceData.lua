@@ -89,7 +89,8 @@ function AppearanceData:Update(storage)
 				end;
 				table.insert(updated[finalClothingLib.GroupName], packageId);
 				
-				local list = self:SetEquip(finalClothingLib.GroupName, packageId, storageItem);
+				local accessoryData = finalClothingLib.AccessoryData[packageId];
+				local list = self:SetEquip(finalClothingLib.GroupName, accessoryData, storageItem);
 				if list and vanityItemId == nil then
 					newAccessoryPrefabs = list;
 				end
@@ -283,21 +284,17 @@ function AppearanceData:SetUnequip(group, packageId)
 	modCustomizeAppearance.RemoveAccessory(character, packageId);
 end
 
-function AppearanceData:SetEquip(group, packageId, storageItem)
+function AppearanceData:SetEquip(group, accessoryData, storageItem)
 	if self.Equipped[group] == nil then self.Equipped[group] = {} end;
 	local groupEquips = self.Equipped[group];
 	
+	local packageId = accessoryData.Name;
+
 	local exist = groupEquips[packageId] == true;
 	groupEquips[packageId] = true;
 	
 	if exist then return end;
 	
-	local itemId = storageItem.ItemId;
-	local clothingLib = modClothingLibrary:Find(itemId);
-
-	local accessoryData = clothingLib.AccessoryData[packageId];
-	if accessoryData == nil then Debugger:Warn("Accessory "..packageId.." ("..group..") does not exist."); end
-
 	local prefabGroup = modAppearanceLibrary:GetPrefabGroup(group, packageId);
 	if prefabGroup then
 		modPrefabManager:LoadPrefab(prefabGroup, game.ReplicatedStorage.Prefabs:FindFirstChild("Cosmetics"));
