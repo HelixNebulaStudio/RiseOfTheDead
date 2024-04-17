@@ -208,7 +208,9 @@ function StorageItem.new(index, itemId, data, player)
 end
 
 function StorageItem:Clone()
-	local data = {};
+	local data = {
+		Values = nil;
+	};
 	for k,v in pairs(self.Values) do
 		if data.Values == nil then data.Values = {}; end;
 		data.Values[k] = v;

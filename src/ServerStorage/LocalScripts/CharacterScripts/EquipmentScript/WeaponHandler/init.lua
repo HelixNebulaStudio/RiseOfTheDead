@@ -1888,7 +1888,9 @@ function WeaponHandler:Equip(library, weaponId)
 		);
 	end;
 	
-	if configurations.OnAmmoUpdate then configurations.OnAmmoUpdate(mainWeaponModel, modWeaponModule, properties.Ammo); end
+	if configurations.OnAmmoUpdate then
+		configurations.OnAmmoUpdate(mainWeaponModel, modWeaponModule, properties.Ammo);
+	end
 	
 	RunService:BindToRenderStep("WeaponRender", Enum.RenderPriority.Camera.Value, weaponRender);
 	
@@ -2148,7 +2150,7 @@ function WeaponHandler:Equip(library, weaponId)
 	characterProperties.HideCrosshair = true;
 	modCharacter.EquippedTool = mainWeaponModel;
 
-	delay(equipTime, function()
+	task.delay(equipTime, function()
 		if unequiped then return end;
 		updateValues();
 		updateAmmoCounter();

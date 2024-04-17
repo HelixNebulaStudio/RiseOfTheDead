@@ -119,8 +119,6 @@ function Data.SetStorage(refStorage)
 	if refStorage == nil then return end;
 	if refStorage.Id == nil then return end;
 	
-	Debugger:Log("Set Storage", refStorage.Id, {debug.traceback()});
-	
 	local storageId = refStorage.Id;
 	if Data.GameSave and Data.GameSave.Storages then
 		for id, _ in pairs(Data.GameSave.Storages) do
@@ -345,34 +343,7 @@ function Data.CountItemIdFromCharacter(itemId)
 		
 		c = c + item.Quantity;
 	end
-	--if Data.Storages["ammopouch"] then
-	--	for id, item in pairs(Data.Storages.ammopouch.Container) do
-	--		if item.ItemId == itemId then
-	--			c = c + item.Quantity;
-	--		end
-	--	end
-	--end
-	--if Data.Storages["Inventory"] then
-	--	for id, item in pairs(Data.Storages.Inventory.Container) do
-	--		if item.ItemId == itemId then
-	--			c = c + item.Quantity;
-	--		end
-	--	end
-	--end
-	--if Data.Storages["Clothing"] then
-	--	for id, item in pairs(Data.Storages.Clothing.Container) do
-	--		if item.ItemId == itemId then
-	--			c = c + item.Quantity;
-	--		end
-	--	end
-	--end
-	--if Data.Storages["Wardrobe"] then
-	--	for id, item in pairs(Data.Storages.Wardrobe.Container) do
-	--		if item.ItemId == itemId then
-	--			c = c + item.Quantity;
-	--		end
-	--	end
-	--end
+
 	return c;
 end
 

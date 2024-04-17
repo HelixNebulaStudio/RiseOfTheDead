@@ -36,7 +36,6 @@ local modFlashlight = require(script:WaitForChild("Flashlight"));
 local modWeaponHandler = require(script:WaitForChild("WeaponHandler"));
 local modToolMelee = require(script:WaitForChild("ToolHandlers"):WaitForChild("Melee"));
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
-local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 
 --== Remotes;
 local remotes = game.ReplicatedStorage.Remotes;

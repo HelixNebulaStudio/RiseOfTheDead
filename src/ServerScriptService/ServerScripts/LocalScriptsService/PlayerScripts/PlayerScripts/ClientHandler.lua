@@ -568,8 +568,7 @@ return function()
 				localStorageItem = modData.MockStorageItem;
 				
 			end
-			
-			
+
 			for k, v in pairs(properties) do
 				localStorageItem[k] = v;
 			end
@@ -591,10 +590,7 @@ return function()
 					end
 				end
 			end
-			for k, v in pairs(localStorageItem.Values) do -- del no existent keys;
-				if values[k] then continue end;
-				localStorageItem.Values[k] = nil;
-			end
+			
 			if storageId ~= "MockStorageItem" then
 				modStorageInterface.UpdateStorages({localStorage}, storageItemId);
 			end

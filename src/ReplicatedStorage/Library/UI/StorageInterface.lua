@@ -772,7 +772,7 @@ function SlotItem:Update(storageItemId)
 	
 	self.Item = modData.Storages[interface.StorageId].Container[self.ID];
 	self.Properties = modItem:Find(self.Item.ItemId);
-	self.Item.Properties = self.Properties;
+	--self.Item.Properties = self.Properties;
 	
 	self.Index = self.Item.Index;
 	self.Slot = interface.Slots[self.Index];
@@ -1523,7 +1523,6 @@ function StorageInterface.RefreshStorageItemId(storageItemId)
 	local modInterface = modData:GetInterfaceModule(true);
 	if modInterface == nil then return end;
 	
-
 	for index, interface in pairs(modInterface.StorageInterfaces) do
 		local slotItem = interface.Buttons[storageItemId];
 		if slotItem == nil then continue end;
