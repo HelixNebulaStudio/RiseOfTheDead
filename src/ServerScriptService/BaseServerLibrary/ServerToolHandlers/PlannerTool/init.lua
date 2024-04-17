@@ -210,6 +210,7 @@ function remoteEngineersPlanner.OnServerInvoke(player, storageItem, action, ...)
 					end
 					obj.Transparency = (obj.Name == "Hitbox" or obj.Name == "Collider") and 1 or 0.5;
 					obj.Color = Color3.fromRGB(128, 183, 255);
+					obj.CanCollide = false;
 				end
 			end
 		end

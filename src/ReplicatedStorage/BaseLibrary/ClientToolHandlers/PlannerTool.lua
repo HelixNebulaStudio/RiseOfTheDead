@@ -306,6 +306,8 @@ function ToolHandler:Equip(storageItem, toolModels)
 		for _, obj in pairs(placementHighlight:GetDescendants()) do
 			if obj:IsA("Decal") or obj:IsA("Texture") then
 				obj:Destroy();
+			elseif obj:IsA("BasePart") then
+				obj.CanCollide = false;
 			end
 		end
 		highlightDescendants = placementHighlight:GetDescendants();
