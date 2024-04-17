@@ -163,7 +163,7 @@ return function(self)
 		
 		local tarVec = targetRootPart.AssemblyLinearVelocity;
 		local origin = self.RootPart.Position;
-		local targetPoint = targetRootPart.CFrame.Position + Vector3.new(0,2,0) + Vector3.new(math.clamp(tarVec.X,-30,30), 0, math.clamp(tarVec.Z,-30,30));
+		local targetPoint = targetRootPart.CFrame.Position + Vector3.new(0,5,0) + Vector3.new(math.clamp(tarVec.X,-30,30), 0, math.clamp(tarVec.Z,-30,30));
 		
 		local speed = 100;
 		local duration = math.clamp(dist/speed, 0.4, 1.6);
@@ -199,9 +199,13 @@ return function(self)
 			self.PlayAnimation("Leap", 0);
 			
 			self.Move:Fly(arcPoints, arcTracer.Delta, function(index, arcPoint)
+				if index >= (#arcPoints-1) then return true; end;
+
 				self.Humanoid.PlatformStand = true;
 				arcPoint.AlignCFrame = arcPoint.AlignCFrame * downAng;
 				cache.LastLeap = tick();
+
+				return;
 			end);
 			self.Humanoid.PlatformStand = false;
 		end
