@@ -169,9 +169,6 @@ function Player.new(playerInstance: Player)
 		if RunService:IsClient() and classPlayer.Character then
 			classPlayer.IsAlive = classPlayer.Character:GetAttribute("IsAlive");
 		end
-		--if classPlayer.Character then
-		--	classPlayer.Character:SetAttribute("IsAlive", classPlayer.IsAlive);
-		--end;
 		
 		self.Died:Fire(classPlayer.Character, killReason);
 		
@@ -345,26 +342,6 @@ function Player.new(playerInstance: Player)
 							classPlayer.Properties.ThornCooldown = tick();
 						end
 						
-						--if healthInfo.Health < damageReflection then
-						--	damageReflection = healthInfo.Health-1;
-						--end
-
-						--local npcModule = damagable.Object.ClassName == "NpcStatus" and damagable.Object.NpcModule;
-						--if npcModule and npcModule.ThornMultiplier then
-						--	damageReflection = damageReflection * npcModule.ThornMultiplier;
-						--end
-						--if damageReflection > 0 then
-						--	local newDmgSrc = modDamagable.NewDamageSource{
-						--		Damage=damageReflection;
-						--		Dealer=playerInstance;
-						--		TargetModel = npcModule.Prefab;
-						--		TargetPart = npcModule.RootPart;
-						--		DamageType = "Thorn";
-						--	}
-						--	damagable:TakeDamagePackage(newDmgSrc);
-
-						--	classPlayer.Properties.ThornCooldown = tick();
-						--end
 					end
 				end
 			end
@@ -681,6 +658,7 @@ function Player.new(playerInstance: Player)
 	function meta.OnCharacterAdded(character: Model)
 		if character == nil then return end;
 		Debugger:Log("Character", playerInstance.Name,"spawned. ", character:GetFullName());
+
 		local cache = {
 			ColdBreathParticles = nil;
 			WaterBubblesParticles = nil;
@@ -967,6 +945,11 @@ function Player.new(playerInstance: Player)
 			character:AddTag("PlayerCharacters");
 			modOnGameEvents:Fire("OnPlayerSpawn", playerInstance, character);
 			
+			character.ChildRemoved:Connect(function(child)
+				if child.Name ~= "HumanoidRootPart" then return end;
+				classPlayer:Kill("FallenIntoVoid");
+			end)
+
 			if cache.DivingMouthpiece == nil then
 				cache.DivingMouthpiece = game.ReplicatedStorage.Prefabs.Objects.DivingSuitMouthpiece:Clone();
 				cache.DivingMouthpiece.Parent = character;
@@ -1061,23 +1044,6 @@ function Player.new(playerInstance: Player)
 				if ms1000 then
 					-- Healing
 					classPlayer:RefreshHealRate();
-					--if classPlayer.Properties.HealRate > 0 then
-					--	classPlayer.Humanoid.Health = classPlayer.Humanoid.Health + classPlayer.Properties.HealRate;
-					--end
-					--classPlayer.Humanoid.Health = math.clamp(classPlayer.Humanoid.Health, 0, classPlayer.Humanoid.MaxHealth);
-					
-					-- Overheal;
-					--if classPlayer.Properties.ovehea then
-					--	classPlayer.Humanoid.MaxHealth = classPlayer.Properties.BaseHealth + classPlayer.Properties.OverHeal;
-						
-					--elseif classPlayer.Humanoid.MaxHealth > classPlayer.Properties.BaseHealth then
-					--	classPlayer.Humanoid.MaxHealth = classPlayer.Humanoid.MaxHealth - 1;
-					--	classPlayer.Humanoid.Health = math.clamp(classPlayer.Humanoid.Health, 0, classPlayer.Humanoid.MaxHealth);
-						
-					--else
-					--	classPlayer.Humanoid.MaxHealth = classPlayer.Properties.BaseHealth;
-						
-					--end
 					
 					if classPlayer.Properties.BodyEquipments then
 						if classPlayer.DoInitHealth then
