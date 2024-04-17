@@ -30,7 +30,7 @@ function Mod.Activate(packet)
 		AddAp = apValue;
 		AddAr = arValue;
 		Visible = false;
-	});
+	}, true);
 end
 
 return Mod;

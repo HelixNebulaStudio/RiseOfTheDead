@@ -1,3 +1,5 @@
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
 local RunService = game:GetService("RunService");
 --
 local ClothingProperties = {}
@@ -18,9 +20,9 @@ function ClothingProperties.new(clothing)
 		end
 	end
 	
-	clothing.RegisteredProperties = {};
-	clothing.ActiveProperties = {};
 	clothing.RegisteredTypes = {};
+	clothing.RegisteredProperties = {};
+	clothing.PreRegisteredProperties = {};
 	
 	setmetatable(self, clothing);
 	setmetatable(clothing, ClothingProperties);
@@ -36,7 +38,13 @@ function ClothingProperties.new(clothing)
 	
 	function clothing:GetKeys()
 		local keys = {};
-		for k, _ in pairs(clothing) do keys[k] = true end;
+		for k, _ in pairs(clothing) do
+			if k == "RegisteredTypes" then continue end;
+			if k == "RegisteredProperties" then continue end;
+			if k == "PreRegisteredProperties" then continue end;
+
+			keys[k] = true 
+		end;
 		for k, _ in pairs(self) do keys[k] = true end;
 		return pairs(keys);
 	end
@@ -44,10 +52,16 @@ function ClothingProperties.new(clothing)
 	return self;
 end
 
-function ClothingProperties:RegisterPlayerProperty(k, v)
+function ClothingProperties:RegisterPlayerProperty(k, v, isMod: boolean) -- This will never be called again server side due to caching.
 	self.RegisteredProperties[k] = v;
-	self.ActiveProperties[k] = true;
+
+	if isMod then
+		self.ActiveProperties[k] = v;
+	else
+		self.PreRegisteredProperties[k] = v;
+	end
 end
+
 
 function ClothingProperties:RegisterTypes(modLib, storageItem)
 	if storageItem then
@@ -83,8 +97,19 @@ function ClothingProperties:Reset()
 	for k, _ in pairs(self.RegisteredTypes) do
 		self.RegisteredTypes[k] = nil;
 	end
-	table.clear(self.ActiveProperties);
+	-- Note to self: This method clears after newToolLib and before mods.
+	self.ActiveProperties = {};
 end
+
+function ClothingProperties:PreMod()
+	for k, v in pairs(self.PreRegisteredProperties) do
+		self.ActiveProperties[k] = v;
+	end
+end
+
+function ClothingProperties:PostMod()
+end
+
 
 function ClothingProperties:ApplySeed(storageItem)
 	local itemValues = storageItem.Values;

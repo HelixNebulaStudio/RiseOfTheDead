@@ -1336,8 +1336,16 @@ function Profile:GetItemClass(storageItemId, getShadowCopy)
 			end
 		end
 		
+		if class.PreMod then
+			class:PreMod();
+		end
+
 		if attachmentStorage and next(attachmentStorage.Container) then
 			class = modWeaponsMechanics.ApplyPassiveMods(storageItem, attachmentStorage, class);
+		end
+
+		if class.PostMod then
+			class:PostMod();
 		end
 
 		if class.CalculateDps then class:CalculateDps(); end

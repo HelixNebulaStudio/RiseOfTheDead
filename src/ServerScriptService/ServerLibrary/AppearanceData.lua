@@ -39,7 +39,9 @@ function AppearanceData:Update(storage)
 	local modProfile = shared.modProfile;
 	local profile = modProfile:Get(self.Player);
 	local classPlayer = modPlayers.Get(self.Player);
-	local bodyEquipmentsModule = {};
+	local bodyEquipmentsModule = {
+		ActiveProperties = {};
+	};
 	
 	local wardrobeStorage = modStorage.Get("Wardrobe", self.Player);
 	
@@ -104,9 +106,8 @@ function AppearanceData:Update(storage)
 			if clothingClass then
 				classPlayer.ClothingPropertiesCache[storageItemId] = clothingClass;
 
-				if clothingClass.RegisteredProperties then -- Equip statuses;
-					for k, v in pairs(clothingClass.RegisteredProperties) do
-						
+				if clothingClass.ActiveProperties then -- Equip statuses;
+					for k, v in pairs(clothingClass.ActiveProperties) do
 						local newStatusTable = modGlobalVars.CloneTable(v);
 						
 						if modStatusEffects[k] then
@@ -119,7 +120,13 @@ function AppearanceData:Update(storage)
 
 				for k, _ in clothingClass:GetKeys() do
 					local v = clothingClass[k];
-					if k ~= "__index" and typeof(v) ~= "function" then
+					if k == "ActiveProperties" then
+						local finalValue = v;
+						for propertyK, propertyV in pairs(finalValue) do
+							bodyEquipmentsModule.ActiveProperties[propertyK] = propertyV;
+						end
+
+					elseif k ~= "__index" and typeof(v) ~= "function" then
 
 						local statInfo = modClothingLibrary.StatStruct[k] or {};
 						

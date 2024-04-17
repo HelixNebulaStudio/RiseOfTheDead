@@ -14,11 +14,13 @@ function attirePackage.NewToolLib(handler)
 	toolLib.BaseArmorPoints = 10;
 	
 	toolLib.Warmth = 7;
-	
+
 	local clothing = modClothingProperties.new(toolLib);
 	
 	if not modBranchConfigs.IsWorld("Slaughterfest") then
-		clothing:RegisterPlayerProperty("Nekrosis", {});
+		clothing:RegisterPlayerProperty("Nekrosis", {
+			Visible = false;
+		});
 	end
 	
 	return clothing;
