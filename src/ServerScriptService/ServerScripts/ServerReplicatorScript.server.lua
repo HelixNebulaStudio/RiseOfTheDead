@@ -605,7 +605,7 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 			-- shot handler;
 			if targetModel and (targetObject:IsDescendantOf(workspace) or targetObject:IsDescendantOf(game.ReplicatedStorage.Replicated)) then
 				local distance = client:DistanceFromCharacter(targetObject.Position);
-				if distance >= game.Lighting.FogEnd then return end;
+				if distance >= 512 then return end;
 				
 				local damagable = modDamagable.NewDamagable(targetModel);
 

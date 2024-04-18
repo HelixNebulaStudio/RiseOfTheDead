@@ -109,7 +109,7 @@ return function(CutsceneSequence)
 		if sceneRunning then Debugger:Log("Scene already running..") return end;
 		sceneRunning = true;
 
-		game.Lighting.FogEnd = 250;
+		game.Lighting:SetAttribute("FogEnd", 250);
 		pcall(function() game.Players.RespawnTime = 60; end);
 		
 		local players = CutsceneSequence:GetPlayers();
@@ -156,7 +156,7 @@ return function(CutsceneSequence)
 	
 	local playerAnimTracks = {};
 	CutsceneSequence:NewScene("playerSpawns", function()
-		game.Lighting.FogEnd = 250;
+		game.Lighting:SetAttribute("FogEnd", 250);
 		
 		modInterface:ToggleGameBlinds(false, 0);
 		
@@ -193,8 +193,8 @@ return function(CutsceneSequence)
 		modCharacter.MouseProperties.CameraSmoothing = 0.02;
 		
 		rootPart.Anchored = true;
-		game.Lighting.FogEnd = 0;
-		game.Lighting.FogStart = 0;
+		game.Lighting:SetAttribute("FogStart", 0);
+		game.Lighting:SetAttribute("FogEnd", 0);
 		
 		playerAnimTracks.Unconscious:Play();
 		task.wait(5);
@@ -202,8 +202,9 @@ return function(CutsceneSequence)
 		modInterface:ToggleGameBlinds(true, 10);
 		
 		TweenService:Create(blurEffect, TweenInfo.new(10), {Size = 15;}):Play();
-		TweenService:Create(game.Lighting, TweenInfo.new(60), {FogStart = 40;}):Play();
-		TweenService:Create(game.Lighting, TweenInfo.new(90), {FogEnd = 250;}):Play();
+		game.Lighting:SetAttribute("FogStart", 40);
+		game.Lighting:SetAttribute("FogEnd", 250);
+
 		task.wait(6);
 		task.spawn(function()
 			if CutsceneSequence.QualityLevel > 6 then

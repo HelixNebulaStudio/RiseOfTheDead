@@ -107,9 +107,6 @@ Lighting.GlobalShadows = true;
 --Lighting.Ambient = Color3.fromRGB(10, 10, 10);
 --Lighting.Brightness = 0;
 --Lighting.ClockTime = 3.1;
---Lighting.FogColor = Color3.fromRGB(0, 0, 0);
---Lighting.FogEnd = 400;
---Lighting.FogStart = 40;
 
 Lighting.EnvironmentDiffuseScale = 1;
 Lighting.EnvironmentSpecularScale = 0.5;
@@ -156,12 +153,12 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 			ClockTime = hourClock;
 			ExposureCompensation = -1+(0.1*range);
 			Brightness = LightingConfigurations.Properties.BaseBrightness*range;
-			FogEnd = 400+(LightingConfigurations.Properties.FogRange * range);
-			FogStart = 40+(160*range);
 			OutdoorAmbient = newOutDoorAmbient;
-			FogColor = Color3.fromRGB(0, 0, 0):Lerp(Color3.fromRGB(255, 255, 255), range);
 		}):Play();
 		
+		Lighting:SetAttribute("FogColor", Color3.fromRGB(0, 0, 0):Lerp(Color3.fromRGB(255, 255, 255), range));
+		Lighting:SetAttribute("FogStart", 40+(160*range));
+		Lighting:SetAttribute("FogEnd", 400+(LightingConfigurations.Properties.FogRange * range));
 		Lighting:SetAttribute("OutdoorAmbient", newOutDoorAmbient);
 		
 		if modSyncTime.IsDay and isNight ~= false then

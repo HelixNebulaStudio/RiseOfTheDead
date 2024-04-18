@@ -769,7 +769,7 @@ player.Chatted:Connect(function(message)
 	end
 end)
 
-game.Lighting.FogEnd = 250;
-game.Lighting.FogStart = 0;
+game.Lighting:SetAttribute("FogStart", 0);
+game.Lighting:SetAttribute("FogEnd", 250);
 ResetMenu();
 print("ClientMenu>>  Client interface initialized.");

@@ -64,9 +64,11 @@ return function()
 	modData.CameraHandler = CameraHandler;
 	
 	--== CameraEffects
-	local CameraEffects = {};
+	local CameraEffects = {
+		Atmosphere = nil;
+		Fog = nil;
+	};
 	CameraEffects.__index = CameraEffects;
-	CameraEffects.Atmosphere = nil;
 
 	modData.CameraEffects = CameraEffects;
 	
@@ -83,9 +85,36 @@ return function()
 	CameraEffects.Contrast = modLayeredVariable.new(0);
 	CameraEffects.Saturation = modLayeredVariable.new(0.2);
 	CameraEffects.TintColor = modLayeredVariable.new(Color3.fromRGB(255, 255, 255)); --255, 238, 230
-	--== CameraColorCorrection
+	--== MARK: CameraColorCorrection
 	
-	--== CameraAtmosphere
+	--== MARK: CameraFog
+	local camFog = CameraEffects.Fog;
+	if camFog == nil then
+		CameraEffects.Fog = {};
+		camFog = CameraEffects.Fog;
+	end
+
+	camFog.Enabled = modLayeredVariable.new(false);
+	camFog.FogColor = modLayeredVariable.new(nil);
+	camFog.FogStart = modLayeredVariable.new(nil);
+	camFog.FogEnd = modLayeredVariable.new(nil);
+	
+	function CameraEffects:SetFog(fogData: {FogColor: Color3?; FogStart: number?; FogEnd: number?}, id, priority, expireDuration)
+		camFog.Enabled:Set(id, true, priority, expireDuration);
+		
+		if fogData.FogColor then
+			camFog.FogColor:Set(id, fogData.FogColor, priority, expireDuration);
+		end
+		if fogData.FogStart then
+			camFog.FogStart:Set(id, fogData.FogStart, priority, expireDuration);
+		end
+		if fogData.FogEnd then
+			camFog.FogEnd:Set(id, fogData.FogEnd, priority, expireDuration);
+		end
+	end
+	--== CameraFog
+
+	--== MARK: CameraAtmosphere
 	local atmosName = "ClientCameraAtmosphere";
 	local atmosphere: Atmosphere = Lighting:FindFirstChild(atmosName);
 	if atmosphere == nil then 
@@ -110,7 +139,6 @@ return function()
 	camAtmosphere.Decay = modLayeredVariable.new(defaultAtmosphere and defaultAtmosphere.Decay or Color3.fromRGB(92, 60, 13));
 	camAtmosphere.Glare = modLayeredVariable.new(defaultAtmosphere and defaultAtmosphere.Glare or 0);
 	camAtmosphere.Haze = modLayeredVariable.new(defaultAtmosphere and defaultAtmosphere.Haze or 0);
-	--==
 	
 	function CameraEffects:SetAtmosphere(atmo: Atmosphere, id, priority, expireDuration)
 		camAtmosphere.Enabled:Set(id, true, priority, expireDuration);
@@ -151,6 +179,10 @@ return function()
 		end
 	end)
 	
+	--==
+
+
+
 	local skipRender = tick();
 	RunService.RenderStepped:Connect(function(delta)
 		local renderTick = tick();
@@ -166,6 +198,19 @@ return function()
 		colorCorrection.Saturation = CameraEffects.Saturation:Get();
 		colorCorrection.TintColor = CameraEffects.TintColor:Get();
 		
+		local camFogEnabled = camFog.Enabled:Get();
+		if camFogEnabled then
+			Lighting.FogColor = camFog.FogColor:Get() or Lighting:GetAttribute("FogColor");
+			Lighting.FogStart = camFog.FogStart:Get() or Lighting:GetAttribute("FogStart");
+			Lighting.FogEnd = camFog.FogEnd:Get() or Lighting:GetAttribute("FogEnd");
+
+		else
+			Lighting.FogColor = Lighting:GetAttribute("FogColor");
+			Lighting.FogStart = Lighting:GetAttribute("FogStart");
+			Lighting.FogEnd = Lighting:GetAttribute("FogEnd");
+
+		end
+
 		local atmosphereEnabledTable = camAtmosphere.Enabled:GetTable();
 		local atmosphereEnabled = atmosphereEnabledTable.Value;
 		

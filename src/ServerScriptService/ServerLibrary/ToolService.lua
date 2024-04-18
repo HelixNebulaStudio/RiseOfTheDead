@@ -391,7 +391,7 @@ function ToolService.ProcessWeaponShot(shotPacket)
 			
 			local distance = (targetObject.Position-toolHandle.Position).Magnitude;
 			local direction = (targetObject.Position-toolHandle.Position).Unit;
-			if distance >= game.Lighting.FogEnd then continue end;
+			if distance >= 400 then continue end;
 
 			local damagable = modDamagable.NewDamagable(targetModel);
 			if damagable == nil or not damagable:CanDamage(shotPacket.Player) then continue end;
