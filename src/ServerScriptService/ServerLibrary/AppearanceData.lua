@@ -333,6 +333,7 @@ function AppearanceData:GetAccessories(storageItemId)
 	end
 	
 	local list = {};
+	if character == nil then return list end;
 	
 	for _, accessory in pairs(character:GetChildren()) do
 		if accessory:GetAttribute("StorageItemId") == storageItemId then
