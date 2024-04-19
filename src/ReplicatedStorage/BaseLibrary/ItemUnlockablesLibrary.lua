@@ -5,6 +5,91 @@ ItemUnlockablesLibrary.__index = ItemUnlockablesLibrary;
 --== Script;
 function ItemUnlockablesLibrary:Init(library)
 
+	--== gasmask
+	library:Add{
+		Id="gasmask";
+		ItemId="gasmask";
+		Name="Default";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://6971951196";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="gasmaskwhite";
+		ItemId="gasmask";
+		Name="White";
+		DefaultPackage=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://7021561911";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="gasmaskblue";
+		ItemId="gasmask";
+		Name="Blue";
+		DefaultPackage=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://7021611834";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="gasmaskyellow";
+		ItemId="gasmask";
+		Name="Yellow";
+		DefaultPackage=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://7021613643";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="gasmaskunionjack";
+		ItemId="gasmask";
+		Name="The Union Jack";
+		DefaultPackage=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://7021629071";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="gasmaskxmas";
+		ItemId="gasmask";
+		Name="Christmas";
+		DefaultPackage=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://8402317276";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="gasmaskfumes";
+		ItemId="gasmask";
+		Name="Fumes";
+		PackageId="leatherglovessoviet";
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17190882093";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
 	--== hardhat
 	library:Add{
 		Id="hardhat";
