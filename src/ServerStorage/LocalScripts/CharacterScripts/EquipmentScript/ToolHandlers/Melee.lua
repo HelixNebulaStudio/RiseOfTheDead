@@ -15,7 +15,7 @@ local animator = humanoid:WaitForChild("Animator");
 local player = game.Players.LocalPlayer;
 
 --== Modules;
-local modData = require(player:WaitForChild("DataModule"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 local modInterface = modData:GetInterfaceModule();
 
@@ -26,13 +26,11 @@ local modConfigurations = require(game.ReplicatedStorage.Library.Configurations)
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modArcTracing = require(game.ReplicatedStorage.Library.ArcTracing);
-local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
 local modWeaponMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 --== Remotes;
-local remotes = game.ReplicatedStorage.Remotes;
 local remoteToolPrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
 local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler");
 
@@ -226,6 +224,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 	local victims = {};
 	local function onColliderTouch(hitPart)
 		local model = hitPart.Parent;
+		if model == nil then return end;
 
 		local npcStatus = model:FindFirstChild("NpcStatus");
 		local humanoid = hitPart.Parent:FindFirstChildWhichIsA("Humanoid") or hitPart.Parent.Parent:FindFirstChildWhichIsA("Humanoid");
@@ -603,7 +602,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 			local throwCharge = throwChargeValue > 0.05 and throwChargeValue or 0;
 			local rootVelocity = rootPart.Velocity;
 			
-			local arcPoints = arcTracer:GeneratePath(origin, direction * (configurations.Velocity + configurations.VelocityBonus * throwCharge)); --rootVelocity
+			--local arcPoints = arcTracer:GeneratePath(origin, direction * (configurations.Velocity + configurations.VelocityBonus * throwCharge)); --rootVelocity
 			
 			animations["Charge"]:Stop();
 			animations["Throw"]:Play(0.2);
@@ -699,7 +698,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 					local arcPart = arcList[a];
 					local arcPoint = arcPoints[a];
 					
-					local order = math.clamp(1 - (a/#arcList * 0.7), 0.5, 1);
+					--local order = math.clamp(1 - (a/#arcList * 0.7), 0.5, 1);
 					arcPart.Parent = workspace.CurrentCamera;
 					arcPart.Size = Vector3.new(0.05, 0.05, arcPoint.Displacement);
 					arcPart.Transparency = 0;
