@@ -39,7 +39,7 @@ function AppearanceData:Update(storage)
 	local modProfile = shared.modProfile;
 	local profile = modProfile:Get(self.Player);
 	local classPlayer = modPlayers.Get(self.Player);
-	local bodyEquipmentsModule = {
+	local bodyEquipmentsTable = {
 		ActiveProperties = {};
 	};
 	
@@ -106,6 +106,7 @@ function AppearanceData:Update(storage)
 
 			local maxHealth = storageItem:GetValues("MaxHealth");
 			if maxHealth ~= nil and (storageItem:GetValues("Health") or maxHealth) <= 0 then
+				Debugger:Warn("Broken", storageItem);
 				continue;
 			end
 			
@@ -129,14 +130,14 @@ function AppearanceData:Update(storage)
 					if k == "ActiveProperties" then
 						local finalValue = v;
 						for propertyK, propertyV in pairs(finalValue) do
-							bodyEquipmentsModule.ActiveProperties[propertyK] = propertyV;
+							bodyEquipmentsTable.ActiveProperties[propertyK] = propertyV;
 						end
 
 					elseif k ~= "__index" and typeof(v) ~= "function" then
 
 						local statInfo = modClothingLibrary.StatStruct[k] or {};
 						
-						local currentStatVal = bodyEquipmentsModule[k];
+						local currentStatVal = bodyEquipmentsTable[k];
 						local finalValue = v;
 
 						if statInfo.MergeType then
@@ -151,7 +152,7 @@ function AppearanceData:Update(storage)
 								finalValue = currentStatVal * (1-v);
 
 							elseif statInfo.MergeType == modClothingLibrary.MergeTypes.Largest then
-								currentStatVal = (bodyEquipmentsModule[k] or -math.huge);
+								currentStatVal = (bodyEquipmentsTable[k] or -math.huge);
 								
 								if v > currentStatVal then
 									finalValue = v;
@@ -160,7 +161,7 @@ function AppearanceData:Update(storage)
 								end
 
 							elseif statInfo.MergeType == modClothingLibrary.MergeTypes.Smallest then
-								currentStatVal = (bodyEquipmentsModule[k] or math.huge);
+								currentStatVal = (bodyEquipmentsTable[k] or math.huge);
 								if v < currentStatVal then
 									finalValue = v;
 								else
@@ -170,7 +171,7 @@ function AppearanceData:Update(storage)
 							end
 						end
 
-						bodyEquipmentsModule[k] = finalValue;
+						bodyEquipmentsTable[k] = finalValue;
 					end
 				end
 
@@ -219,7 +220,7 @@ function AppearanceData:Update(storage)
 		end
 	end;
 	
-	classPlayer:SetProperties("BodyEquipments", bodyEquipmentsModule);
+	classPlayer:SetProperties("BodyEquipments", bodyEquipmentsTable);
 	remoteBodyEquipmentsSync:FireClient(self.Player);
 	
 	-- Clear unequipped statuses
