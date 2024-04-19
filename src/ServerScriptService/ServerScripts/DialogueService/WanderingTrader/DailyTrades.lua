@@ -59,7 +59,16 @@ return function(player, dialog, data)
 	local buyIndex, sellIndex = {}, {};
 	local supplyList, demandList = {}, {};
 
-	local randomOfTheDay = Random.new(dayOfYear + os.date("%Y")/1000);
+	local daySeed = dayOfYear + (tonumber(os.date("%Y")) or 0)/1000;
+	local hourOfDay = tonumber(os.date("%H"));
+	
+	if hourOfDay > Random.new(daySeed):NextInteger(0, 23) then
+	else
+		dayOfYear = dayOfYear -1;
+	end
+	daySeed = dayOfYear + (tonumber(os.date("%Y")) or 0)/1000;
+
+	local randomOfTheDay = Random.new(daySeed);
 	local offers = randomOfTheDay:NextInteger(2, 4);
 	
 	
