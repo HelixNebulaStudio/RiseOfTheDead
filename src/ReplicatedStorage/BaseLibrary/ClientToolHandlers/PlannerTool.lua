@@ -8,12 +8,10 @@ local localPlayer = game.Players.LocalPlayer;
 local camera = workspace.CurrentCamera;
 
 --== Modules;
-local modData = require(localPlayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modInteractables = require(game.ReplicatedStorage.Library.Interactables);
@@ -27,20 +25,22 @@ local remoteEngineersPlanner = modRemotesManager:Get("EngineersPlanner");
 local remoteBlueprintHandler = modRemotesManager:Get("BlueprintHandler");
 
 --== Vars;
-local character, humanoid, modCharacter, modInterface, mouseProperties, characterProperties;
-
-local deg90 = math.pi/2;
-local rotations = 0;
-
-local Equipped;
-local animationFiles = {};
-
 local ToolHandler = {};
+local Equipped;
 
 local colorPlaceable, colorInvalid = Color3.fromRGB(131, 255, 135), Color3.fromRGB(255, 90, 93);
 --== Script;
 
 function ToolHandler:Equip(storageItem, toolModels)
+	local character = localPlayer.Character;
+	local modCharacter = require(character:WaitForChild("CharacterModule") :: ModuleScript);
+	local modInterface = modData:GetInterfaceModule();
+	local mouseProperties = modCharacter.MouseProperties;
+	local characterProperties = modCharacter.CharacterProperties;
+
+	local humanoid: Humanoid = character:WaitForChild("Humanoid");
+	local animator: Animator = humanoid:WaitForChild("Animator") :: Animator;
+
 	local itemId = storageItem.ItemId;
 	local itemLib = modItemsLibrary:Find(itemId);
 	
@@ -49,10 +49,10 @@ function ToolHandler:Equip(storageItem, toolModels)
 	
 	local toolModel = Equipped.RightHand.Prefab;
 	local handle = toolModel and toolModel:WaitForChild("Handle") or nil;
-	
-	local useTimer = tick();
 
-	local animator: Animator = humanoid:WaitForChild("Animator");
+	local animationFiles = {};
+	local useTimer = tick();
+	--
 	
 	local animations = Equipped.Animations;
 	for key, _ in pairs(toolLib.Animations) do
@@ -230,6 +230,12 @@ function ToolHandler:Equip(storageItem, toolModels)
 	local isPlaceable = false;
 
 	Equipped.RightHand.Unequip = function()
+		local itemPromptButton = modInterface.TouchControls:WaitForChild("ItemPrompt");
+		itemPromptButton.Visible = false;
+
+		modInterface:CloseWindow("EngineerPlannerWindow");
+		characterProperties.HideCrosshair = false;
+
 		characterProperties.ProxyInteractable = nil;
 		
 		if placementHighlight then placementHighlight:Destroy(); placementHighlight = nil; end;
@@ -431,14 +437,14 @@ function ToolHandler:Equip(storageItem, toolModels)
 			function buildInteractProxy:OnInteracted(library)
 				task.spawn(function()
 					buildInteractProxy.CanInteract = false;
-					local returnPacket = remoteEngineersPlanner:InvokeServer(storageItem, "build", planModel);
+					local _returnPacket = remoteEngineersPlanner:InvokeServer(storageItem, "build", planModel);
 					buildInteractProxy.CanInteract = true;
 				end)
 			end
 			
 			if mouseProperties.Mouse1Down and characterProperties.CanAction and tick()-placeDebounce > 0.2 then
 				placeDebounce = tick();
-				local returnPacket = remoteEngineersPlanner:InvokeServer(storageItem, "remove", planModel);
+				local _returnPacket = remoteEngineersPlanner:InvokeServer(storageItem, "remove", planModel);
 			end
 			return;
 			
@@ -510,22 +516,14 @@ function ToolHandler:Equip(storageItem, toolModels)
 		end
 		if mouseProperties.Mouse1Down and characterProperties.CanAction and isPlaceable and tick()-placeDebounce > 0.2 then
 			placeDebounce = tick();
-			local returnPacket = remoteEngineersPlanner:InvokeServer(storageItem, "place", activeItemId);
+			local _returnPacket = remoteEngineersPlanner:InvokeServer(storageItem, "place", activeItemId);
 		end
 	end)
 end
 
 function ToolHandler:Unequip(storageItem)
 	RunService:UnbindFromRenderStep(script.Name);
-	local itemPromptButton = modInterface.TouchControls:WaitForChild("ItemPrompt");
-	itemPromptButton.Visible = false;
-
-	--local modFlashlight = require(script.Parent.Parent:WaitForChild("Flashlight"));
-	--modFlashlight:Destroy();
-	
-	modInterface:CloseWindow("EngineerPlannerWindow");
 	modData.UpdateProgressionBar();
-	characterProperties.HideCrosshair = false;
 	
 	if Equipped.ToolConfig then
 		if Equipped.ToolConfig.ClientUnequip then
@@ -546,13 +544,6 @@ end
 function ToolHandler:Initialize(equipped)
 	if Equipped ~= nil then return end;
 	Equipped = equipped;
-	
-	character = localPlayer.Character;
-	humanoid = character:WaitForChild("Humanoid");
-	modCharacter = require(character:WaitForChild("CharacterModule"));
-	modInterface = modData:GetInterfaceModule();
-	mouseProperties = modCharacter.MouseProperties;
-	characterProperties = modCharacter.CharacterProperties;
 end
 
 return ToolHandler;
