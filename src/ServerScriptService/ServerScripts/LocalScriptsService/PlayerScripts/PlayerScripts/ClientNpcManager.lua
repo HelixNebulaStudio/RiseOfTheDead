@@ -112,7 +112,8 @@ return function()
 				
 				if part.Name == "HumanoidRootPart" then continue end;
 				if part:FindFirstChild("BallSocketConstraint") and (part.Name ~= "Head" and part.Name ~= "UpperTorso" and part.Name ~= "LowerTorso") then continue end;
-
+				if part.CanQuery == false then continue end;
+				
 				part.CanCollide = true;
 			end
 		end)

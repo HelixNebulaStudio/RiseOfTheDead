@@ -109,7 +109,7 @@ function NpcComponent:RefreshRagdollJoints()
 			elseif obj:IsA("BasePart") and obj.Parent == prefab then
 				if obj.Name == "CollisionRootPart" then continue end;
 				
-				if ragdollEnabled and obj.Name ~= "LeftUpperLeg" and obj.Name ~= "RightUpperLeg" and obj.Name ~= "HumanoidRootPart" then
+				if ragdollEnabled and obj.Name ~= "LeftUpperLeg" and obj.Name ~= "RightUpperLeg" and obj.Name ~= "HumanoidRootPart" and obj.CanQuery then
 					obj.CanCollide = true;
 				else
 					obj.CanCollide = false;
