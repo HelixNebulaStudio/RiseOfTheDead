@@ -300,7 +300,8 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		end
 
 		activeSave:AddStat("Money", -repairPrice);
-		storageItem:DeleteValues("Health"):Sync({"Health"});
+		storageItem:DeleteValues("Health");
+		storageItem:Sync({"Health"});
 
 		if repairPrice > 0 then
 			modAnalytics.RecordResource(player.UserId, repairPrice, "Sink", "Money", "Gameplay", "Repair");
