@@ -11,7 +11,8 @@ Component.__index = Component;
 function Component.new(Npc)
 	return function()
 		if Npc.Enemy == nil or Npc.Enemy.Character == nil then return end;
-		
+		if Npc.ThreatSenseHidden == true then return end;
+
 		task.spawn(function()
 			local player = game.Players:GetPlayerFromCharacter(Npc.Enemy.Character);
 			if player == nil then return end;

@@ -14,8 +14,16 @@ function Component.new(Npc)
 	setmetatable(self, Component);
 	return function(hitObject, targetHitFunc)
 		if Npc.IsDead then return end;
-		
-		if self.TargetGui == nil and math.random(1, 3) == 1 then
+		if Npc.WeakPointHidden then return end;
+
+		if self.WeakPointTarget == nil and math.random(1, 3) == 1 then
+			Npc.Garbage:Loop(function(index, trash)
+				if typeof(trash) == "Instance" and trash.Name == "WeakpointTarget" then
+					game.Debris:addItem(trash, 0);
+				end
+			end)
+			self.WeakPointTarget = nil;
+			
 			local prefabBodyParts = Npc.Prefab:GetChildren();
 			local count = 0;
 			
@@ -34,20 +42,20 @@ function Component.new(Npc)
 			if targetPart == nil then return end;
 			
 			local newTarget = templateTarget:Clone();
-			self.TargetGui = newTarget;
+			self.WeakPointTarget = newTarget;
 			
-			Npc.Garbage:Tag(newTarget);
-			
-			newTarget.Parent = targetPart;
 			newTarget.Adornee = targetPart;
+			newTarget.Parent = targetPart;
+
+			Npc.Garbage:Tag(newTarget);
 			CollectionService:AddTag(newTarget, "WeakPoints");
 			newTarget.Destroying:Connect(function()
-				self.TargetGui = nil;
+				self.WeakPointTarget = nil;
 			end)
 			
-		elseif self.TargetGui and self.TargetGui.Adornee == hitObject then
-			self.TargetGui:Destroy();
-			self.TargetGui = nil;
+		elseif self.WeakPointTarget and self.WeakPointTarget.Adornee == hitObject then
+			self.WeakPointTarget:Destroy();
+			self.WeakPointTarget = nil;
 			
 			targetHitFunc();
 			

@@ -42,8 +42,14 @@ return function(npc, spawnPoint)
 		self.Move:Init();
 
 		self.Garbage:Tag(self.Prefab:FindFirstChild("FumesEmitter", true));
-		self.Think:Fire();
-		coroutine.yield();
+
+		self.ThreatSenseHidden = true;
+		self.WeakPointHidden = true;
+
+		while self.IsDead ~= true do
+			self.Think:Fire();
+			task.wait(1);
+		end
 	end
 
 	--== Components;

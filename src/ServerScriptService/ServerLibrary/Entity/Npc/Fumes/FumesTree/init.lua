@@ -14,6 +14,8 @@ return function(self)
 	local cache = {};
 	cache.AttackCooldown = tick();
     cache.CloudState = 0;
+    cache.CloudPoint = nil;
+    cache.WanderTick = tick();
 
 	tree:Hook("StatusLogic", self.StatusLogic);
 
@@ -89,13 +91,14 @@ return function(self)
             cache.CloudState = 1;
 
             self.Move:Stop();
-            self.PlayAnimation("ChannelFumes");
             self.Move:Face(self.Target.PrimaryPart);
 
             local newFumeCloud: MeshPart = fumesCloud:Clone();
             newFumeCloud.CFrame = CFrame.new(self.RootPart.CFrame.Position) * CFrame.new(math.random(-16, 16), 0, math.random(-16, 16));
+            cache.CloudPoint = newFumeCloud.CFrame.Position;
 
             if self.HardMode then
+                newFumeCloud.Size = Vector3.new(100, 100, 100);
                 newFumeCloud:SetAttribute("GasDamage", 30);
             else
                 newFumeCloud:SetAttribute("GasDamage", 6);
@@ -104,10 +107,12 @@ return function(self)
             newFumeCloud.Parent = workspace.Entities;
             self.Garbage:Tag(newFumeCloud);
 
+            if self.PlayAnimation == nil then
+                return tree.Failure;
+            end
+            self.PlayAnimation("ChannelFumes");
+
         elseif cache.CloudState == 1 then
-            self.PlayAnimation("ChannelFumes", 0.5);
-            self.Move:Face(self.Target.PrimaryPart);
-            
             local cancelChanneling = false;
             if self.GetTargetDistance() > 180 then
                 cancelChanneling = true;
@@ -125,6 +130,28 @@ return function(self)
                 self.StopAnimation("ChannelFumes");
             end
 
+            if self.HardMode then
+                if tick() > cache.WanderTick then
+                    cache.WanderTick = tick()+math.random(50,100)/10;
+
+                    self.StopAnimation("ChannelFumes");
+                    self.Move:MoveTo(cache.CloudPoint + Vector3.new(math.random(-30, 30), 0, math.random(-30, 30)));
+
+                    return tree.Failure;
+                else
+                    local distFromCloud = (cache.CloudPoint-self.RootPart.Position).Magnitude;
+                    if distFromCloud > 45 then
+                        cache.WanderTick = tick()-0.1;
+                        return tree.Failure;
+                    end
+                end
+            end
+            
+            if self.Move.IsMoving == false then
+                self.PlayAnimation("ChannelFumes", 0.5);
+                self.Move:Face(self.Target.PrimaryPart);
+    
+            end
         end
 		return modLogicTree.Status.Failure;
 	end)
