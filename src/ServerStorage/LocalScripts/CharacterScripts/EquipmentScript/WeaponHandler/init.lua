@@ -1,4 +1,6 @@
-local WeaponHandler = {};
+local WeaponHandler = {
+	InstanceCache = nil;
+};
 
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Services;
