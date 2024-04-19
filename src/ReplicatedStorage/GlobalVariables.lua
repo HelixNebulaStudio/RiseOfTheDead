@@ -1,7 +1,7 @@
 local mxkhronosUserId = 16170943;
 local Vars = {
 	GameVersion="2.0.7";
-	GameBuild="17";
+	GameBuild="18";
 	
 	EngineMode="RiseOfTheDead";
 	ModeVerLabel = "$UpTime";

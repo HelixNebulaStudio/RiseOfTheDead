@@ -41,6 +41,7 @@ return function(npc, spawnPoint)
 		self.Humanoid.Health = self.Humanoid.MaxHealth;
 		self.Move:Init();
 
+		self.Garbage:Tag(self.Prefab:FindFirstChild("FumesEmitter", true));
 		self.Think:Fire();
 		coroutine.yield();
 	end

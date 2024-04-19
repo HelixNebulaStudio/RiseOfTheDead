@@ -448,7 +448,13 @@ library:Add{
 	Buff=true;
 };
 
-
+library:Add{
+	Id="FumesGas";
+	Icon="rbxassetid://17203237389";
+	Name="Fumes Gas";
+	Description="Taking health damage from Fumes bypassing your gas protection.";
+	Buff=false;
+}
 
 
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));

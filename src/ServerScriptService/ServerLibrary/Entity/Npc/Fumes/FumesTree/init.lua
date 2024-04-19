@@ -4,17 +4,16 @@ local modStatusEffects = Debugger:Require(game.ReplicatedStorage.Library.StatusE
 
 return function(self)
 	local tree = modLogicTree.new{
-		AggroSelect={"Or"; "AttackSequence"; "FollowTarget";};
-		Root={"Or"; "StatusLogic"; "SetAggressSequence"; "AggroSequence"; "SetAggressLevel0"; "Idle";};
-		AggroSequence={"And"; "HasTarget"; "AggroSelect";};
-		SetAggressSequence={"And"; "SetAggress";};
-		AttackSequence={"And"; "CanAttackTarget"; "Attack";};
-	};
+        Root={"Or"; "StatusLogic"; "AggroSequence"; "Idle";};
+        AttackSequence={"And"; "CanAttackTarget"; "Attack";};
+        AggroSequence={"And"; "HasTarget"; "AggroSelect";};
+        AggroSelect={"Or"; "FumesCloud"; "AttackSequence"; "FollowTarget";};
+    }
 	
 	local targetHumanoid, targetRootPart: BasePart;
 	local cache = {};
 	cache.AttackCooldown = tick();
-	cache.SprintCooldown = tick();
+    cache.CloudState = 0;
 
 	tree:Hook("StatusLogic", self.StatusLogic);
 
@@ -26,14 +25,19 @@ return function(self)
 			return modLogicTree.Status.Success;
 		end
 
+        if cache.CloudState == 1 then
+            tree:Call("FumesCloud");
+        end
+
 		return modLogicTree.Status.Failure;
 	end)
 
 	tree:Hook("FollowTarget", function()
 		targetRootPart = self.Target and self.Target.PrimaryPart;
 
+        if cache.CloudState == 1 then return tree.Failure; end;
 		self.Move:Follow(targetRootPart);
-        		
+
 		return modLogicTree.Status.Success;
 	end)
 
@@ -61,6 +65,9 @@ return function(self)
 			return modLogicTree.Status.Failure;
 		end;
 		
+        if cache.CloudState == 1 then
+            self.StopAnimation("ChannelFumes");
+        end
 		cache.AttackCooldown = tick() + (self.Properties.AttackSpeed * math.random(90, 110)/100);
 
 		if self.Wield.Handler then
@@ -72,6 +79,56 @@ return function(self)
 		return modLogicTree.Status.Success;
 	end)
 
+    local fumesCloud = game.ServerStorage.PrefabStorage.Objects:WaitForChild("fumesCloud");
+	tree:Hook("FumesCloud", function()
+		if cache.CloudState == 0 then
+            if self.GetTargetDistance() > 100 then
+                return tree.Failure;
+            end
+
+            cache.CloudState = 1;
+
+            self.Move:Stop();
+            self.PlayAnimation("ChannelFumes");
+            self.Move:Face(self.Target.PrimaryPart);
+
+            local newFumeCloud: MeshPart = fumesCloud:Clone();
+            newFumeCloud.CFrame = CFrame.new(self.RootPart.CFrame.Position) * CFrame.new(math.random(-16, 16), 0, math.random(-16, 16));
+
+            if self.HardMode then
+                newFumeCloud:SetAttribute("GasDamage", 30);
+            else
+                newFumeCloud:SetAttribute("GasDamage", 6);
+            end
+
+            newFumeCloud.Parent = workspace.Entities;
+            self.Garbage:Tag(newFumeCloud);
+
+        elseif cache.CloudState == 1 then
+            self.PlayAnimation("ChannelFumes", 0.5);
+            self.Move:Face(self.Target.PrimaryPart);
+            
+            local cancelChanneling = false;
+            if self.GetTargetDistance() > 180 then
+                cancelChanneling = true;
+            end
+
+            if cancelChanneling == true then
+                cache.CloudState = 0;
+
+                self.Garbage:Loop(function(a, trash)
+                    if typeof(trash) == "Instance" and trash.Name == "fumesCloud" then
+                        game.Debris:AddItem(trash, 0);
+                    end
+                end)
+
+                self.StopAnimation("ChannelFumes");
+            end
+
+        end
+		return modLogicTree.Status.Failure;
+	end)
+    
 	tree:Hook("SetAggressLevel0", function()
 		if self.AggressLevel ~= 0 then
 			self.AggressLevel = 0;

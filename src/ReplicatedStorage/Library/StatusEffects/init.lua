@@ -11,6 +11,7 @@ local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modEmotes = require(game.ReplicatedStorage.Library.EmotesLibrary);
+local modAudio = require(game.ReplicatedStorage.Library.Audio);
 
 local remotePlayerStatusEffect = modRemotesManager:Get("PlayerStatusEffect");
 
@@ -1253,6 +1254,83 @@ function StatusEffects.Chained(player, duration, position, anchorHealth, isHardM
 	end
 	
 	return newAnchor;
+end
+
+function StatusEffects.FumesGas(player, damage)
+	if RunService:IsClient() then return end
+	damage = damage or 5;
+	local classPlayer = modPlayers.GetByName(player.Name);
+
+	local statusTable = classPlayer.Properties.FumesGas;
+	if statusTable then
+		statusTable.LastRefresh = tick();
+		return;
+	end
+
+	statusTable = {
+		ExpiresOnDeath=true;
+		LastRefresh = tick();
+	}
+	
+	statusTable.OnTick=(function(classPlayer, status, tickPack)
+		if tickPack.ms100 ~= true then return end;
+
+		local lapse = tick()-status.LastRefresh;
+		
+		if lapse > 0.65 then
+			status.Expires=modSyncTime.GetTime();
+			classPlayer:SyncProperty("FumesGas");
+			return;
+		elseif lapse > 0.5 then
+			return;
+		end
+
+		if tickPack.ms500 ~= true then return end;
+
+		classPlayer:TakeDamagePackage(modDamagable.NewDamageSource{
+			Damage=damage;
+			DamageType="IgnoreArmor";
+			DamageCate="FumesGas";
+		});
+		
+		local player = classPlayer:GetInstance();
+		if player == nil then return end;
+
+		local profile = shared.modProfile:Get(player);
+		local saveData = profile:GetActiveSave();
+		if saveData.Clothing then
+			saveData.Clothing:Loop(function(storageItem)
+				local itemClass = profile:GetItemClass(storageItem.ID);
+
+				if itemClass and itemClass.GasProtection then
+					if storageItem.Values.MaxHealth == nil then
+						storageItem.Values.MaxHealth = 100;
+					end
+
+					local prevHealth = storageItem.Values.Health or 100;
+					storageItem.Values.Health = math.max(prevHealth-5, 0);
+					storageItem:Sync({"Health"; "MaxHealth"});
+
+					if prevHealth ~= storageItem.Values.Health then
+						if storageItem.Values.Health == 0 then
+							modAudio.Play("GasMaskBroken", classPlayer.Head);
+							saveData.AppearanceData:Update(saveData.Clothing);
+
+						elseif math.fmod(storageItem.Values.Health, 20) == 0 then
+							modAudio.Play("GasMaskBreaking"..math.random(1,3), classPlayer.Head).PlaybackSpeed = math.random(90,110)/100;
+							
+						end
+					end
+					
+					return true;
+				end
+
+				return;
+			end)
+		end
+	end);
+
+	classPlayer:SetProperties("FumesGas", statusTable);
 end
 
 
