@@ -346,7 +346,7 @@ library:Add{
 		{Index=1; ItemId="tires"; Quantity=1; Chance=1;};
 		
 		{Index=2; ItemId="walkietalkiebp";  Chance=commodityChance;};
-		{Index=2; ItemId="labcoatbp";  Chance=modBpChance;};
+		{Index=2; ItemId="labcoat";  Chance=modBpChance;};
 		{Index=2; ItemId="edgeddamagebp";  Chance=modBpChance;};
 		
 		{Index=3; ItemId="revolver454bp";  Chance=weaponBpChance;};

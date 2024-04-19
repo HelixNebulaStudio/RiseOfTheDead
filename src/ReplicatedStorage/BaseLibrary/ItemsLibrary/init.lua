@@ -198,7 +198,7 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="xmassweater"; Name="Xmas Sweater"; Tradable=super.Tradable.Tradable; Icon="rbxassetid://6126020940"; Tags={"Chest"; "Christmas"; "Frostivus"}; Description="Xmas Sweater.";});
 	new(clothingBase, {Id="prisonshirt"; Name="Prisoner's Shirt"; Icon="rbxassetid://5627570767"; Tags={"Chest"}; Description="The Prisoner's Shirt.";});
 	new(clothingBase, {Id="onyxhoodie"; Name="OnyxHound Hoodie"; Icon="rbxassetid://5642499590"; Tags={"Chest"}; Description="Rare OnyxHound Hoodie.";});
-	new(clothingBase, {Id="labcoat"; Name="Lab Coat"; Icon="rbxassetid://4978200934"; Tags={"Chest"}; Description="\"Education is what remains after one has forgotten everything he learned in school.\" ~ A.E. Also prevents consecutive tick explosion damage.";});
+	new(clothingBase, {Id="labcoat"; Name="Lab Coat"; Icon="rbxassetid://4978200934"; Tags={"Chest"}; Description="Protects you from unwanted chemicals and gases. <b>Passive:</b> If <b>Gas Protection</b> exist from other wearables, Lab Coat will grant you an additional 30% Gas Protection.";});
 	new(clothingBase, {Id="plankarmor"; Name="Plank Armor"; Icon="rbxassetid://5765969051"; Tags={"Chest"}; Description="Makeshift wooden plank armor.";});
 	new(clothingBase, {Id="scraparmor"; Name="Scrap Armor"; Icon="rbxassetid://6996766551"; Tags={"Chest"}; Description="Makeshift metal scrap armor.";});
 	new(clothingBase, {Id="highvisjacket"; Name="High Visibility Jacket"; Icon="rbxassetid://8488333823"; Tags={"Chest"}; Description="The high visibility jacket provides warmth and armor points.";});
