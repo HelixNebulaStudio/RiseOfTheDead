@@ -73,6 +73,13 @@ end
 function LayeredVariable:Get()
 	local t = self:GetTable();
 	if t == nil then return nil end;
+
+	if t.Expire and tick() > t.Expire then
+		self.Dirty = true;
+		t = self:GetTable();
+		if t == nil then return nil end;
+	end
+
 	return t.Value;
 end
 
