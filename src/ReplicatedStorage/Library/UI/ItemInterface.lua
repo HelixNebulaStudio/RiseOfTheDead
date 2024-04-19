@@ -750,6 +750,15 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 		if itemValues.Uses then
 			itemDesc = itemDesc..h3O.."\nUses: "..h3C.. colorNumberText(itemValues.Uses).." left";
 		end
+		if itemValues.Unlocked then
+			local unlockedList = {};
+			for k, v in pairs(itemValues.Unlocked) do
+				if v ~= nil and v ~= false then
+					table.insert(unlockedList, colorStringText(k));
+				end
+			end
+			itemDesc = itemDesc..h3O.."\nUnlocked: "..h3C.. table.concat(unlockedList, ", ");
+		end
 		
 		if itemValues.L then
 			itemDesc = itemDesc..h3O.."\nLevel: "..h3C.. colorNumberText(itemValues.L);
