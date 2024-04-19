@@ -771,7 +771,7 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 			
 		elseif modMission:Progress(player, 40) then
 			modMission:Progress(player, 40, function(mission)
-				if mission.ProgressionPoint == 2 then
+				if mission.ProgressionPoint >= 2 and mission.ProgressionPoint <= 4 then
 					local destination = CFrame.new(352.464, -30.64, 1885.59)
 					
 					mission.ProgressionPoint = 3;
