@@ -104,7 +104,8 @@ function AppearanceData:Update(storage)
 			local clothingClass = profile:GetItemClass(storageItemId);
 			local _clothingClassMeta = getmetatable(clothingClass);
 
-			if storageItem:GetValues("MaxHealth") ~= nil and storageItem:GetValues("Health") <= 0 then
+			local maxHealth = storageItem:GetValues("MaxHealth");
+			if maxHealth ~= nil and (storageItem:GetValues("Health") or maxHealth) <= 0 then
 				continue;
 			end
 			
