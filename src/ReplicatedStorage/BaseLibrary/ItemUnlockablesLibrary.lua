@@ -79,16 +79,31 @@ function ItemUnlockablesLibrary:Init(library)
 	};
 
 	library:Add{
-		Id="gasmaskfumes";
+		Id="gasmasksovietfumes";
 		ItemId="gasmask";
-		Name="Fumes";
-		PackageId="leatherglovessoviet";
+		Name="Fumes Soviet Style";
+		PackageId="gasmasksoviet";
 
 		SurfaceAppearance={
 			ColorMap="rbxassetid://17190882093";
 		};
 		SurfaceAppearanceParent=script;
 	};
+
+	library:Add{
+		Id="gasmaskfumes";
+		ItemId="gasmask";
+		Name="Fumes";
+		Icon="rbxassetid://17205785572";
+		DefaultPackage=true;
+		Unlocked="gasmasksovietfumes";
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17190882093";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
 
 	--== hardhat
 	library:Add{
