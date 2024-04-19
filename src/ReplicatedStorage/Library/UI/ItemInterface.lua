@@ -384,6 +384,10 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 						local barFill = itemValues.Health/itemValues.MaxHealth;
 						setBar(barFill);
 						
+						if itemValues.Health <= 0 then
+							itemButtonColor = Color3.fromRGB(140, 70, 70);
+						end
+
 					end
 				end
 

@@ -104,6 +104,10 @@ function AppearanceData:Update(storage)
 			local clothingClass = profile:GetItemClass(storageItemId);
 			local _clothingClassMeta = getmetatable(clothingClass);
 
+			if storageItem:GetValues("MaxHealth") ~= nil and storageItem:GetValues("Health") <= 0 then
+				continue;
+			end
+			
 			if clothingClass then
 				classPlayer.ClothingPropertiesCache[storageItemId] = clothingClass;
 
