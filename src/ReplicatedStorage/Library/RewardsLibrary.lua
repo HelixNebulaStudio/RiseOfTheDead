@@ -247,6 +247,8 @@ library:Add{
 		{Index=2; ItemId="chargerbp"; Quantity=1; Chance=commodityChance;};
 		
 		{Index=3; ItemId="mp7bp";  Chance=weaponBpChance;};
+
+		{Index=4; ItemId="gasmasksovietfumes"; HardMode=true; Chance=1;};
 	};
 };
 

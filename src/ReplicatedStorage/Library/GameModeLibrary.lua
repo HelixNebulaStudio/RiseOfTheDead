@@ -74,6 +74,7 @@ GameModeLibrary.GameModes={
 					["Fumes"]=Vector3.new(0.2, -1.1, 0);
 				};
 				Soundtrack="Soundtrack:The Boss";
+				HardModeEnabled=true;
 			};
 			["Corrosive"]={
 				Index=4;
