@@ -20,25 +20,21 @@ for a=0, 60 do
 end
 if not workspace:IsAncestorOf(animator) then return end;
 
-local modData = require(localPlayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 
 local toolHandlers = script:WaitForChild("ToolHandlers");
 
 local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
-local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 --== Handlers
-local modFlashlight = require(script:WaitForChild("Flashlight"));
 local modWeaponHandler = require(script:WaitForChild("WeaponHandler"));
-local modToolMelee = require(script:WaitForChild("ToolHandlers"):WaitForChild("Melee"));
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 
 --== Remotes;
-local remotes = game.ReplicatedStorage.Remotes;
 local bindCharacterInput = script:WaitForChild("CharacterInput");
 
 local remoteToolHandler = modRemotesManager:Get("ToolHandler");
@@ -73,7 +69,7 @@ end
 function equip(equipPacket, toolWelds)
 	local id = equipPacket and equipPacket.StorageItem and equipPacket.StorageItem.ID;
 	
-	if id == nil then Debugger:Warn("Failed to equip item, missing id.") return end;
+	if id == nil then Debugger:Warn("Failed to equip item, missing id."); return end;
 	if modCharacter.CharacterProperties.IsEquipped then return end;
 	
 	if equipPacket.MockEquip then
@@ -89,7 +85,6 @@ function equip(equipPacket, toolWelds)
 	--end
 	if equipmentItem then
 		local itemId = equipmentItem.ItemId;
-		local itemLib = modItemsLibrary:Find(itemId);
 		
 		for k, obj in pairs(instanceCache) do
 			if obj then obj:Destroy() end;
@@ -159,7 +154,7 @@ function Unequip(unequipPacket)
 	local storageItem = unequipPacket and unequipPacket.StorageItem or nil;
 	local id = storageItem and storageItem.ID or unequipPacket.Id;
 	
-	if id == nil then Debugger:Warn("Failed to unequip item, missing id.") return end;
+	if id == nil then Debugger:Warn("Failed to unequip item, missing id."); return end;
 	if not modCharacter.CharacterProperties.IsEquipped then return end;
 	if modCharacter.EquippedItem == nil or modCharacter.EquippedItem.ID ~= id then return end;
 	
@@ -171,7 +166,6 @@ function Unequip(unequipPacket)
 	
 	if equipmentItem then
 		local itemId = equipmentItem.ItemId;
-		local itemLib = modItemsLibrary:Find(itemId);
 		
 		modCharacter.MouseProperties.Mouse1Down = false;
 		modCharacter.MouseProperties.Mouse2Down = false;
@@ -241,7 +235,6 @@ function handleTool(returnPacket)
 	end
 end
 
-local equipDebounce = tick();
 modData.HandleTool = function(action, paramPacket)
 	if action == "local" then
 		handleTool(paramPacket);
