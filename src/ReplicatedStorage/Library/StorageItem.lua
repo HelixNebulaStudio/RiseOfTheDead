@@ -86,6 +86,7 @@ function StorageItem.new(index, itemId, data, player)
 			
 			local properties = {};
 			local values = {};
+			local delValues = {};
 			
 			for _, k in pairs(keys) do
 				if self[k] then
@@ -94,10 +95,14 @@ function StorageItem.new(index, itemId, data, player)
 				if self.Values[k] then
 					values[k] = self.Values[k];
 				end
+				if self.Values[k] == nil then
+					delValues[k] = true;
+				end
 			end
 			
 			packet.Properties = properties;
 			packet.Values = values;
+			packet.DelValues = delValues;
 			
 		else
 			packet.Action = "fullsync";

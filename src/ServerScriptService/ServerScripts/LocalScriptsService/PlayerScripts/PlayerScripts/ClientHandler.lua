@@ -17,24 +17,25 @@ return function()
 	local dataModule = localPlayer:WaitForChild("DataModule"); --script:WaitForChild("DataModule"):Clone(); dataModule.Parent = player;
 	local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 	local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler); modAssetHandler.init();
-	local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
-	local modPlayers = require(game.ReplicatedStorage.Library.Players);
 	local modRemotesManager = require(game.ReplicatedStorage:WaitForChild("Library", 60):WaitForChild("RemotesManager", 60));
-	local modReplicationManager = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("ReplicationManager"));
 	local modConfigurations = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("Configurations"));
-	local modBranchConfigurations = require(game.ReplicatedStorage.Library.BranchConfigurations);
-	local modInteractable = require(game.ReplicatedStorage.Library.Interactables);
 	local modColorsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ColorsLibrary"));
-	local modMissionLibrary = require(game.ReplicatedStorage.Library:WaitForChild("MissionLibrary"));
 	local modSkinsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("SkinsLibrary"));
-	local modCollectiblesLibrary = require(game.ReplicatedStorage.Library.CollectiblesLibrary);
 	local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
-	local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 	local modSettings = require(game.ReplicatedStorage.Library.Settings);
 	local modTableManager = require(game.ReplicatedStorage.Library.TableManager);
+	local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+
+	local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
+	local modPlayers = require(game.ReplicatedStorage.Library.Players);
+	local modReplicationManager = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("ReplicationManager"));
+	local modBranchConfigurations = require(game.ReplicatedStorage.Library.BranchConfigurations);
+	local modInteractable = require(game.ReplicatedStorage.Library.Interactables);
+	local modMissionLibrary = require(game.ReplicatedStorage.Library:WaitForChild("MissionLibrary"));
+	local modCollectiblesLibrary = require(game.ReplicatedStorage.Library.CollectiblesLibrary);
+	local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 	
 	local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
-	local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 	local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface);
 	local modStorageInterface = require(game.ReplicatedStorage.Library.UI.StorageInterface);
@@ -314,7 +315,7 @@ return function()
 
 	local function onCharacterAdded(character)
 		local modCharacter = modData:GetModCharacter();
-		local humanoid = character:WaitForChild("Humanoid");
+		local _humanoid = character:WaitForChild("Humanoid");
 
 		remotePlayerDataSync:Fire(playerDataSyncRequest);
 
@@ -450,9 +451,9 @@ return function()
 	end
 	
 	remoteInteractableSync.OnClientEvent:Connect(function(src, data)
-		if src == nil then Debugger:Log("Missing interactable module.") return end;
+		if src == nil then Debugger:Log("Missing interactable module."); return end;
 		if src.ClassName ~= "ModuleScript" then Debugger:Warn("Invalid src. Data:", data); return end;
-		if not game:IsAncestorOf(src) then Debugger:Warn("Interactable was destroyed.") return end;
+		if not game:IsAncestorOf(src) then Debugger:Warn("Interactable was destroyed."); return end;
 		
 		local interact = require(src);
 		if interact.OnSync then
@@ -494,7 +495,9 @@ return function()
 			local size = modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={packet};};
 			if size > 500 then
 				Debugger:Warn("[Studio] Key", storageId,storageItemId, "Size >500",size);
-			end
+			else
+				--Debugger:Warn("[Studio] Key", storageId,storageItemId, size); 
+			end 
 		end
 		
 		local action = packet.Action;
@@ -519,8 +522,8 @@ return function()
 				});
 
 				if rPacket.Storages then
-					for storageId, _ in pairs(rPacket.Storages) do
-						modData.SetStorage(rPacket.Storages[storageId]);
+					for sId, _ in pairs(rPacket.Storages) do
+						modData.SetStorage(rPacket.Storages[sId]);
 					end
 				end
 			end
@@ -555,6 +558,7 @@ return function()
 		elseif action == "synckeys" then
 			local properties = packet.Properties;
 			local values = packet.Values;
+			local delValues = packet.DelValues;
 
 			local localStorageItem, localStorage;
 			
@@ -573,7 +577,7 @@ return function()
 				localStorageItem[k] = v;
 			end
 
-			for k, v in pairs(values) do
+			local function updateValue(k, v)
 				localStorageItem.Values[k] = v;
 				
 				if k == "MA" or (k == "A" and v == nil) then
@@ -591,11 +595,17 @@ return function()
 				end
 			end
 			
+			for k, v in pairs(values) do
+				updateValue(k, v);
+			end
+			for k, _ in pairs(delValues) do
+				updateValue(k, nil);
+			end
+			
 			if storageId ~= "MockStorageItem" then
 				modStorageInterface.UpdateStorages({localStorage}, storageItemId);
 			end
 			
-			--Debugger:Warn("localStorageItem", localStorageItem);
 		end
 		
 		if modItemLibrary:HasTag(itemId, "Ammo") then
@@ -731,7 +741,6 @@ return function()
 			
 		elseif requestType == "tradesession" then
 			local tradeSessionData = ...;
-			local modInterface = GetInterfaceModule();
 			if modInterface then
 				modInterface.modTradeInterface.TradeSession = tradeSessionData;
 				modInterface.modTradeInterface.Update();
@@ -739,7 +748,6 @@ return function()
 			
 		elseif requestType == "syncgold" then
 			local tradeSessionData = ...;
-			local modInterface = GetInterfaceModule();
 			if modInterface then
 				local gold = tradeSessionData.Players[game.Players.LocalPlayer.Name].Gold;
 				modInterface.modTradeInterface.SyncLocalGold(gold);
@@ -747,7 +755,6 @@ return function()
 			
 		elseif requestType == "init" then
 			local tradeSessionData = ...;
-			local modInterface = GetInterfaceModule();
 			if modInterface and modInterface.modTradeInterface then
 				modInterface.modTradeInterface.TradeSession = tradeSessionData;
 				modInterface:OpenWindow("Trade");
@@ -755,7 +762,6 @@ return function()
 			
 		elseif requestType == "end" then
 			local tradeSessionData = ...;
-			local modInterface = GetInterfaceModule();
 			if modInterface then
 				modInterface.modTradeInterface.TradeSession = tradeSessionData;
 			end
