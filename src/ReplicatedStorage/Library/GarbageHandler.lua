@@ -51,6 +51,14 @@ function GarbageHandler:Untag(item)
 	end
 end
 
+function GarbageHandler:Loop(func: (index: number, trash: any)->boolean?)
+	local trash = self.Trash;
+	for a=#trash, 1, -1 do
+		local breakRequest = func(a, trash[a]);
+		if breakRequest == true then break; end;
+	end
+end
+
 function GarbageHandler:Destruct()
 	local trash = self.Trash;
 	for a=1, #trash do
