@@ -1478,10 +1478,8 @@ function StorageInterface.new(storageId, mainFrame, slotFrames)
 		self:AddContextOption({
 			Text="Debug";
 			Click=function(slotItem)
-				if RunService:IsStudio() then
-					Debugger:Warn("DebugClicked  Storage>>", modData.Storages[slotItem.Interface.StorageId]);
-				end
-				Debugger:Warn("DebugClicked  Item"..slotItem.ID..">>", game:GetService("HttpService"):JSONEncode(slotItem.Item));
+				Debugger:StudioWarn("DebugClicked  Storage>>", modData.Storages[slotItem.Interface.StorageId]);
+				Debugger:Warn("DebugClicked ("..storageId..") Item"..slotItem.ID..">>", game:GetService("HttpService"):JSONEncode(slotItem.Item));
 			end;
 			Order=999;
 		});
@@ -1516,7 +1514,7 @@ function StorageInterface.UpdateStorages(storages, storageItemId)
 		end
 	end
 
-	Debugger:Log("UpdateStorages", updateInterfaces);
+	--Debugger:StudioWarn("UpdateStorages", updateInterfaces);
 end
 
 function StorageInterface.RefreshStorageItemId(storageItemId)
