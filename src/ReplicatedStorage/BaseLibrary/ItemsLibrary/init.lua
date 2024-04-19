@@ -598,6 +598,7 @@ function ItemsLibrary:Init(super)
 	new(unlockableBase, {Id="gasmaskblue"; Icon="rbxassetid://7021573719"; Unlockable="Blue Gas Mask";});
 	new(unlockableBase, {Id="gasmaskyellow"; Icon="rbxassetid://7021576890"; Unlockable="Yellow Gas Mask";});
 	new(unlockableBase, {Id="gasmaskunionjack"; Icon="rbxassetid://7021608469"; Unlockable="Union Jack Gas Mask";});
+	new(unlockableBase, {Id="gasmasksovietfumes"; Icon="rbxassetid://17205637981"; Unlockable="Soviet Style Fumes Gas Mask";});
 
 	new(unlockableBase, {Id="scraparmorcopper"; Icon="rbxassetid://7021764853"; Unlockable="Copper Scrap Armor";});
 	new(unlockableBase, {Id="scraparmorbiox"; Icon="rbxassetid://8366924869"; Unlockable="BioX Scrap Armor";});
