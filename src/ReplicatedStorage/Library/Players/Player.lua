@@ -285,14 +285,26 @@ function Player.new(playerInstance: Player)
 			damage = -damage;
 		end
 		
-		if damage > 0 and damageCategory == "Melee" then
-			local hasTireArmor = classPlayer.Properties.TireArmor;
-			if hasTireArmor and hasTireArmor.Visible and math.random(1, 100) <= 73 then -- pseudo random
-				damage = math.max(1, damage-20);
-				modAudio.Play("TireArmorBlock", classPlayer.RootPart);
+		if damage > 0 then
+			if damageCategory == "Melee" then
+				local hasTireArmor = classPlayer.Properties.TireArmor;
+				if hasTireArmor and hasTireArmor.Visible and math.random(1, 100) <= 73 then -- pseudo random
+					damage = math.max(1, damage-20);
+					modAudio.Play("TireArmorBlock", classPlayer.RootPart);
+				end
+
+			elseif damageCategory == "FumesGas" then
+				local gasProtection = classPlayer:GetBodyEquipment("GasProtection");
+				local hasLabCoat = classPlayer:GetBodyEquipment("LabCoat");
+
+				if gasProtection then
+					gasProtection = hasLabCoat and gasProtection + 0.3 or gasProtection;
+					damage = damage * (1-gasProtection);
+				end
 			end
 		end
 		
+		--==
 		local initDamage = damage;
 		local armorDamage = damage;
 
