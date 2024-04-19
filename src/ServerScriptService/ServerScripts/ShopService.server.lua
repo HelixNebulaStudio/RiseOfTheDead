@@ -228,10 +228,6 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		if totalMags == mags then
 			storageItem:SetValues("A", weaponModule.Configurations.AmmoLimit);
 			storageItem:SetValues("MA", weaponModule.Configurations.MaxAmmoLimit);
-			--inventory:SetValues(id, {
-			--	["A"]=weaponModule.Configurations.AmmoLimit;
-			--	["MA"]=weaponModule.Configurations.MaxAmmoLimit;
-			--});
 		else
 			local currentAmmo = storageItem.Values["A"] or weaponModule.Configurations.AmmoLimit;
 			local currentMaxAmmo = storageItem.Values["MA"] or weaponModule.Configurations.MaxAmmoLimit;
@@ -239,15 +235,12 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 
 			if weaponModule.Configurations.AmmoLimit > currentAmmo then
 				remainingBullets = remainingBullets - (weaponModule.Configurations.AmmoLimit - currentAmmo);
-				--inventory:SetValues(id, {["A"]=weaponModule.Configurations.AmmoLimit});
 				storageItem:SetValues("A", weaponModule.Configurations.AmmoLimit);
 			end
 			if weaponModule.Configurations.MaxAmmoLimit > currentMaxAmmo then
 				if currentMaxAmmo+remainingBullets >= weaponModule.Configurations.MaxAmmoLimit then
-					--inventory:SetValues(id, {["MA"]=weaponModule.Configurations.MaxAmmoLimit});
 					storageItem:SetValues("MA", weaponModule.Configurations.MaxAmmoLimit);
 				else
-					--inventory:SetValues(id, {["MA"]=currentMaxAmmo+remainingBullets});
 					storageItem:SetValues("MA", currentMaxAmmo+remainingBullets);
 				end
 			end
@@ -278,7 +271,48 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		
 		return modShopLibrary.PurchaseReplies.Success;
 		
+	elseif action == "buyrepair" then
+		local storeObject, storageItemID = ...;
+
+		local inRange = IsInShopRange(player, storeObject); if inRange ~= nil then return inRange end;
+		
+		if shared.modAntiCheatService:GetLastTeleport(player) <= 3 then
+			return modShopLibrary.PurchaseReplies.TooFar; 
+		end;
+
+		local profile = modProfile:Get(player);
+		local activeSave = profile:GetActiveSave();
+
+		local storageItem, storage = modStorage.FindIdFromStorages(storageItemID, player);
+		if storage == nil then 
+			Debugger:Warn("BuyRepair>> Missing storage");
+			return modShopLibrary.PurchaseReplies.InvalidProduct;
+		end;
+		if storageItem == nil then 
+			Debugger:Warn("BuyRepair>> Missing storage");
+			return modShopLibrary.PurchaseReplies.InvalidProduct;
+		end;
+
+		local playerCurrency = activeSave and activeSave.GetStat and activeSave:GetStat("Money")
+		local repairPrice = modShopLibrary.RepairPrice[storageItem.ItemId];
+		if playerCurrency < repairPrice then
+			return modShopLibrary.PurchaseReplies.InsufficientCurrency;
+		end
+
+		activeSave:AddStat("Money", -repairPrice);
+		storageItem:DeleteValues("Health"):Sync({"Health"});
+
+		if repairPrice > 0 then
+			modAnalytics.RecordResource(player.UserId, repairPrice, "Sink", "Money", "Gameplay", "Repair");
+		end
+
+		local itemLib = modItemsLibrary:Find(storageItem.ItemId);
+		shared.Notify(player, itemLib.Name.." repaired.", "Info");
+		
+		return modShopLibrary.PurchaseReplies.Success;
+
 	end
+	return;
 end
 
 function remoteGoldShopPurchase.OnServerInvoke(player, key)

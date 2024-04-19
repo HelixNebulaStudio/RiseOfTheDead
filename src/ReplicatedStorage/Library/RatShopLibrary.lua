@@ -1,5 +1,7 @@
 local modLibraryManager = require(game.ReplicatedStorage.Library.LibraryManager);
-local ShopLibrary = {};
+local ShopLibrary = {
+	AmmunitionCurrency = nil;
+};
 
 --
 ShopLibrary.SellPrice = {
@@ -101,6 +103,13 @@ ShopLibrary.AmmunitionPrice = {
 	["rusty48"]=200;
 	["arelshiftcross"]=148;
 }
+
+ShopLibrary.RepairPrice = {
+	["disguisekit"]=200;
+	["divinggoggles"]=400;
+	["gasmask"]=1000;
+	["hazmathood"]=1000;
+};
 
 ShopLibrary.Pages = {
 	["Item Codex"]={

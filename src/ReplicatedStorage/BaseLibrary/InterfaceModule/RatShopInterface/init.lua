@@ -411,14 +411,14 @@ function Interface.init(modInterface)
 				weaponInfo:OnShopSelect(Interface, selectedItem);
 			end
 
+			local localplayerStats = modData.GetStats();
+
 			--== Ammo;
 			local hasAmmoData = (weaponInfo and ((selectedItem.Values.A and selectedItem.Values.A < weaponInfo.Configurations.AmmoLimit)
 				or (selectedItem.Values.MA and selectedItem.Values.MA < weaponInfo.Configurations.MaxAmmoLimit)));
 			
 			if hasAmmoData then
 				local ammoCurrency = modShopLibrary.AmmunitionCurrency or "Money";
-
-				local localplayerStats = modData.GetStats();
 				local localplayerCurrency = localplayerStats and localplayerStats[ammoCurrency] or 0;
 				local price, mags = modShopLibrary.CalculateAmmoPrice(selectedItem.ItemId, selectedItem.Values, weaponInfo.Configurations, localplayerCurrency, modData.Profile.Punishment == modGlobalVars.Punishments.AmmoCostPenalty);
 
@@ -463,6 +463,50 @@ function Interface.init(modInterface)
 				end)
 			end
 			
+			--== Repairable;
+			local repairPrice = modShopLibrary.RepairPrice[selectedItem.ItemId];
+			if repairPrice and selectedItem.Values and selectedItem.Values.Health and selectedItem.Values.MaxHealth and selectedItem.Values.Health <= selectedItem.Values.MaxHealth then
+				
+				Interface.NewListing(function(newListing)
+					newListing.Name = "RepairOption";
+					local infoBox = newListing:WaitForChild("infoFrame");
+					local descFrame = infoBox:WaitForChild("descFrame");
+
+					local purchaseButton = newListing:WaitForChild("purchaseButton");
+					local priceLabel = purchaseButton:WaitForChild("buttonText");
+					local iconButton = newListing:WaitForChild("iconButton");
+					local iconLabel = iconButton:WaitForChild("iconLabel");
+					local titleLabel = descFrame:WaitForChild("titleLabel");
+					local labelFrame = descFrame:WaitForChild("labelFrame");
+					local descLabel = labelFrame:WaitForChild("descLabel");
+
+					local priceTag = "$"..modFormatNumber.Beautify(repairPrice);
+					descLabel.Text = "<b>"..itemLib.Name.."</b>: Repair for "..priceTag;
+						
+					titleLabel.Text = "Repair Item";
+					priceLabel.Text = priceTag;
+					iconLabel.Image = "";
+
+					local purchaseRepairDebounce = false;
+					newListing.MouseButton1Click:Connect(function()
+						if purchaseRepairDebounce then return end;
+						purchaseRepairDebounce = true;
+						
+						local serverReply = localplayerStats and (localplayerStats.Money or 0) >= repairPrice 
+						and remoteShopService:InvokeServer("buyrepair", Interface.Object, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
+
+						if serverReply == modShopLibrary.PurchaseReplies.Success then
+							RunService.Heartbeat:Wait();
+							newListing:Destroy();
+
+						else
+							warn("Repair Purchase>> Error Code:"..serverReply);
+							descLabel.Text = string.gsub(modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply), "$Currency", "Money");
+						end
+						purchaseRepairDebounce = false;
+					end)
+				end)
+			end
 			
 			--== Can be sold;
 			local bpLib = modBlueprintLibrary.Get(selectedItem.ItemId);

@@ -130,15 +130,15 @@ function StorageItem.new(index, itemId, data, player)
 		return item.Values[key];
 	end
 	
-	function itemMeta:SetValues(key, value, sync)
+	function itemMeta:SetValues(key, value, syncFunc)
 		rawset(item.Values, key, value);
-		if sync then sync(); end
+		if syncFunc then syncFunc(); end
 		return self;
 	end
 	
-	function itemMeta:DeleteValues(key, sync)
+	function itemMeta:DeleteValues(key, syncFunc)
 		rawset(item.Values, key, nil);
-		if sync then sync(); end
+		if syncFunc then syncFunc(); end
 		return self;
 	end
 	

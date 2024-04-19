@@ -879,6 +879,7 @@ function Storage.FindIdFromStorages(id, player)
 			return storageItem, storage;
 		end
 	end
+	return nil;
 end
 
 --[[**
