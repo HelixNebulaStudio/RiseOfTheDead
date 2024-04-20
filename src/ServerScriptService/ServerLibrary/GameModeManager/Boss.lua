@@ -196,9 +196,6 @@ function GameMode:Start(room)
 				end
 			end
 			
-			--if bossLib.HealthPerPlayer then
-			--	npcModule.Humanoid.MaxHealth = npcModule.Humanoid.MaxHealth + ((#players-1) * bossLib.HealthPerPlayer);
-			--end
 			if npcModule.FullHealOnSpawn ~= false then
 				npcModule.Humanoid.Health = npcModule.Humanoid.MaxHealth;
 			end
@@ -265,12 +262,6 @@ function GameMode:Start(room)
 				end
 				
 				if npcModule.OnDeath then npcModule.OnDeath(players) end;
-				--local bodyParts = npc:GetDescendants();
-				--for a=1, #bodyParts do
-				--	if bodyParts[a]:IsA("BasePart") then
-				--		bodyParts[a]:Destroy();
-				--	end
-				--end
 			end);
 		end);
 	end

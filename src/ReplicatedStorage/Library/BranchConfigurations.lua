@@ -73,6 +73,7 @@ local Branches = {
 			--Small Worlds
 			Safehome=7005837755;
 			SectorE=5904157734;
+			Destructibles=17222878528;
 			
 			TheWarehouse=1642290020;
 			TheUnderground=1959581122;
@@ -181,6 +182,7 @@ Branches.WorldLibrary = {
 
 	-- Open world
 	Safehome={CanTravelTo=true; PrivateWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=10;};
+	Destructibles={CanTravelTo=true; PrivateWorld=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=10;};
 	
 	TheWarehouse={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=12; Icon="rbxassetid://5954340695"};
 	TheUnderground={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; Witherer=true; MaxPlayers=12; Icon="rbxassetid://5959082717"};

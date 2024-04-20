@@ -263,7 +263,6 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 		self.OnNpcSpawnHooked = modNpc.OnNpcSpawn:Connect(function(npcModule)
 			if modConfigurations.TargetableEntities[npcModule.Humanoid.Name] == nil then return end; -- Not enemy spawn;
 			
-			--local npcPrefab = npcModule.Prefab;
 			table.insert(self.EnemyModules, npcModule);
 			
 			npcModule.Garbage:Tag(function()

@@ -117,28 +117,33 @@ return function(npc, spawnPoint)
 		
 		local heliParts = heliPrefab:GetChildren();
 		for a=1, #heliParts do
-			if heliParts[a]:IsA("BasePart") then
-				heliParts[a]:SetNetworkOwner(nil);
+			local heliPart = heliParts[a];
+			if heliPart:IsA("BasePart") then
+				heliPart:SetNetworkOwner(nil);
 				
-				local partName = heliParts[a].Name;
+				local partName = heliPart.Name;
 				if partName == "TopCover" then
-					self.CustomHealthbar:Create(partName, self.HardMode and 25000 or 10000, heliParts[a]);
+					heliPart:AddTag("EntityDestructibles");
+					self.CustomHealthbar:Create(partName, self.HardMode and 25000 or 10000, heliPart);
 					
 				elseif (self.HardMode and partName == "TailHitbox") or partName == "TailPart" then
-					self.CustomHealthbar:Create(partName, self.HardMode and 25000 or 25000, heliParts[a]);
+					heliPart:AddTag("EntityDestructibles");
+					self.CustomHealthbar:Create(partName, self.HardMode and 25000 or 25000, heliPart);
 					
 				elseif partName == "FrontTip" then
-					self.CustomHealthbar:Create(partName, self.HardMode and 50000 or 10000, heliParts[a]);
+					heliPart:AddTag("EntityDestructibles");
+					self.CustomHealthbar:Create(partName, self.HardMode and 50000 or 10000, heliPart);
 
 				elseif partName == "LLauncherHitbox" or partName == "RLauncherHitbox" then
-					self.CustomHealthbar:Create(partName, 40000, heliParts[a]);
+					heliPart:AddTag("EntityDestructibles");
+					self.CustomHealthbar:Create(partName, 40000, heliPart);
 					
 					
 				elseif partName == "RopePoint" then
-					heliParts[a]:SetNetworkOwner(nil);
+					heliPart:SetNetworkOwner(nil);
 
-				elseif heliParts[a].Name == "DeploySeatL" or heliParts[a].Name == "DeploySeatR" then
-					table.insert(self.Helicopter.DeploySeat, heliParts[a]);
+				elseif heliPart.Name == "DeploySeatL" or heliPart.Name == "DeploySeatR" then
+					table.insert(self.Helicopter.DeploySeat, heliPart);
 					
 				end
 				
@@ -672,6 +677,9 @@ return function(npc, spawnPoint)
 								selectedLaunchers = self.Helicopter.RightLaunchers or self.Helicopter.LeftLaunchers;
 							end
 							
+							if selectedLaunchers == nil then
+								return;
+							end
 							local pickLauncher = selectedLaunchers[math.random(1, #selectedLaunchers)];
 
 							local origin = pickLauncher.WorldCFrame;

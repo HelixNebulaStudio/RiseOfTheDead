@@ -133,7 +133,18 @@ function Destructibles:SetHealth(health, maxhealth)
 	end
 end
 
-function Destructibles.new(model, class)
+function Destructibles.new(src: ModuleScript, class)
+	local model = src.Parent;
+	
+	if not src:IsA("ModuleScript") then
+		Debugger:StudioWarn("Using deprecated param", src);
+		model = src;
+		local des = model:FindFirstChild("Destructible", true);
+		if des:IsA("ModuleScript") then
+			src = des;
+		end
+	end
+
 	local self = {
 		Enabled = true;
 		Destroyed = false;
@@ -167,6 +178,9 @@ function Destructibles.new(model, class)
 			navmeshIgnore.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff;
 			navmeshIgnore.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None;
 			navmeshIgnore.Parent = model;
+		end
+		if model.PrimaryPart then
+			model.PrimaryPart:AddTag("Destructibles");
 		end
 	end
 

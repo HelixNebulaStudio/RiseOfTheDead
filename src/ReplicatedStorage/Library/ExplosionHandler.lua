@@ -23,7 +23,7 @@ function ExplosionHandler:Cast(position, params)
 
 	params.Tags = params.Tags or {
 		{"EntityRootPart"; "PlayerRootParts"};
-		{"EnvironmentColliders"};
+		{"Destructibles"; "EntityDestructibles"}; --"EnvironmentColliders";
 	};
 	
 	
@@ -57,10 +57,13 @@ function ExplosionHandler:Cast(position, params)
 		local hitMarker = {};
 		local hitParts = workspace:GetPartBoundsInRadius(position, params.Radius, overlapParams);
 
-		for a=1, #hitParts do
-			if hitMarker[hitParts[a].Parent] == nil then
-				hitMarker[hitParts[a].Parent] = true;
-				table.insert(hitResultLayer, hitParts[a]);
+		for b=1, #hitParts do
+			if a == 1 and hitMarker[hitParts[b].Parent] == nil then
+				hitMarker[hitParts[b].Parent] = true;
+				table.insert(hitResultLayer, hitParts[b]);
+			elseif a >= 2 and hitMarker[hitParts[b]] == nil then
+				hitMarker[hitParts[b]] = true;
+				table.insert(hitResultLayer, hitParts[b]);
 			end
 		end
 		table.clear(hitMarker);
