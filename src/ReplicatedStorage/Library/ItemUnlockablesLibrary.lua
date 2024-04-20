@@ -5,39 +5,79 @@ local particlesFolder = game.ReplicatedStorage:WaitForChild("Particles");
 
 local library = modLibraryManager.new();
 
-function library.UpdateSkin(prefab, skinId)
+local surfGroupList = {
+	Torso = {
+		"UT";
+		"LT";
+		"LUA";
+		"LLA";
+		"RUA";
+		"RLA";
+		"LH";
+		"RH";
+		"LP";
+		"LI";
+		"LM";
+		"RP";
+		"RI";
+		"RM";
+	};
+	Legs = {
+		"LUL";
+		"LLL";
+		"RUL";
+		"RLL";
+		"LF";
+		"RF";
+	};
+};
+
+function library.UpdateSkin(accessory, skinId)
 	local skinLib = library:Find(skinId);
 	if skinLib then
-		local handle = prefab:FindFirstChild("Handle");
-		local jointName = prefab:GetAttribute("ClothingJoint");
+		local handle = accessory:FindFirstChild("Handle");
+		local jointName = accessory:GetAttribute("ClothingJoint");
 		
 		if skinLib.SurfaceAppearance and handle then
-			if handle:IsDescendantOf(workspace) then -- On Character;
-				for _, obj in pairs(handle:GetChildren()) do
-					if not obj:IsA("SurfaceAppearance") then continue end;
-					obj:Destroy();
-				end
+			for _, obj in pairs(handle:GetChildren()) do
+				if not obj:IsA("SurfaceAppearance") then continue end;
+				obj:Destroy();
+			end
+			
+			local saGroup;
+			if skinLib.SurfaceAppearanceParent then
+				saGroup = skinLib.SurfaceAppearanceParent:WaitForChild(skinLib.ItemId);
 				
-				local saGroup;
-				if skinLib.SurfaceAppearanceParent then
-					saGroup = skinLib.SurfaceAppearanceParent:WaitForChild(skinLib.ItemId);
-					
-				else
-					saGroup = script:WaitForChild(skinLib.ItemId);
-					
-				end
-				
-				local newSurf = saGroup:WaitForChild(skinId):Clone();
-				newSurf.Name = "SurfaceAppearance";
-				newSurf.Parent = handle;
-				
-				
-			else -- On Viewport;
-				Debugger.Expire(handle:FindFirstChild("SurfaceAppearance"), 0);
-				handle.TextureID = skinLib.SurfaceAppearance["ColorMap"];
+			else
+				saGroup = script:WaitForChild(skinLib.ItemId);
 				
 			end
 			
+			local templateSurf = saGroup:WaitForChild(skinId);
+
+			local function replaceSurf(surf)
+					local newSurf = surf:Clone();
+					newSurf.Name = "SurfaceAppearance";
+					newSurf.Parent = handle;
+					
+				-- if handle:IsDescendantOf(workspace) then -- On Character;
+				-- else -- On Viewport;
+				-- 	handle.TextureID = skinLib.SurfaceAppearance["ColorMap"];
+					
+				-- end
+			end
+
+			if templateSurf:IsA("Folder") then
+				for _, surf in pairs(templateSurf:GetChildren()) do
+					if (surfGroupList[surf.Name] and table.find(surfGroupList[surf.Name], jointName)) or surf.Name == jointName then
+						replaceSurf(surf);
+						break;
+					end
+				end
+			else
+				replaceSurf(templateSurf);
+			end
+
 		elseif handle then
 			Debugger.Expire(handle:FindFirstChild("SurfaceAppearance"), 0);
 			
@@ -62,7 +102,7 @@ function library.UpdateSkin(prefab, skinId)
 			
 		end
 		
-		for _, obj in pairs(prefab:GetDescendants()) do
+		for _, obj in pairs(accessory:GetDescendants()) do
 			if obj.Name == "Effects" then
 				obj:Destroy();
 			end
@@ -70,7 +110,7 @@ function library.UpdateSkin(prefab, skinId)
 		
 		if skinLib.Effects then
 			for partName, effectList in pairs(skinLib.Effects) do
-				local parent = prefab:FindFirstChild(partName);
+				local parent = accessory:FindFirstChild(partName);
 				if parent then
 					for effectName, values in pairs(effectList) do
 						local newEffect;
@@ -703,34 +743,6 @@ library:Add{
 	};
 };
 
-
---== divinggoggles
-library:Add{
-	Id="divinggoggles";
-	ItemId="divinggoggles";
-	Name="Default";
-	SurfaceAppearance={
-		ColorMap="rbxassetid://10332602803";
-	};
-};
-
-library:Add{
-	Id="divinggogglesyellow";
-	ItemId="divinggoggles";
-	Name="Yellow";
-	SurfaceAppearance={
-		ColorMap="rbxassetid://10333042522";
-	};
-};
-
-library:Add{
-	Id="divinggogglesred";
-	ItemId="divinggoggles";
-	Name="Red";
-	SurfaceAppearance={
-		ColorMap="rbxassetid://15008750665";
-	};
-};
 
 --== santahat
 library:Add{

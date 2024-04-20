@@ -230,6 +230,92 @@ function ItemUnlockablesLibrary:Init(library)
 		SurfaceAppearanceParent=script;
 	};
 	
+
+	--== MARK: divinggoggles
+	library:Add{
+		Id="divinggoggles";
+		ItemId="divinggoggles";
+		Name="Default";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://10332602803";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="divinggogglesyellow";
+		ItemId="divinggoggles";
+		Name="Yellow";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://10333042522";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="divinggogglesred";
+		ItemId="divinggoggles";
+		Name="Red";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://15008750665";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="divinggoggleswhite";
+		ItemId="divinggoggles";
+		Name="White";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17219382397";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
+
+	--== MARK: divingsuit
+	library:Add{
+		Id="divingsuit";
+		ItemId="divingsuit";
+		Name="Default";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://10332602803";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="divingsuitwhite";
+		ItemId="divingsuit";
+		Name="White";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://10333042522";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	--== MARK: divingsuit
+	library:Add{
+		Id="divingfins";
+		ItemId="divingfins";
+		Name="Default";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://10334654033";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="divingfinswhite";
+		ItemId="divingfins";
+		Name="White";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17219623512";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+
 	--== MARK: leathergloves
 	library:Add{
 		Id="leathergloves";

@@ -618,6 +618,7 @@ function ItemsLibrary:Init(super)
 	
 	new(unlockableBase, {Id="divinggogglesyellow"; Icon="rbxassetid://10333085751"; Unlockable="Yellow Diving Goggles";});
 	new(unlockableBase, {Id="divinggogglesred"; Icon="rbxassetid://15008018716"; Unlockable="Red Diving Goggles";});
+	new(unlockableBase, {Id="divinggoggleswhite"; Icon="rbxassetid://17219482453"; Unlockable="White Diving Goggles";});
 
 	new(unlockableBase, {Id="maraudersmaskblue"; Icon="rbxassetid://11269657288"; Unlockable="Blue Marauder's Mask"; Tags={"Slaughterfest";};});
 	new(unlockableBase, {Id="maraudersmaskrisingsun"; Icon="rbxassetid://17218272962"; Unlockable="Rising Sun Marauder's Mask";});
@@ -645,6 +646,13 @@ function ItemsLibrary:Init(super)
 	new(unlockableBase, {Id="tirearmorred"; Icon="rbxassetid://16791569263"; Unlockable="Red Tire Armor";});
 	
 	new(unlockableBase, {Id="mercskneepadscarbonfiberblack"; Icon="rbxassetid://17218761557"; Unlockable="Black Carbon Fiber Merc's Knee Pads";});
+
+	new(unlockableBase, {Id="divingsuitwhite"; Icon="rbxassetid://17219502385"; Unlockable="White Diving Suit";});
+
+	new(unlockableBase, {Id="divingfinswhite"; Icon="rbxassetid://17219506923"; Unlockable="White Diving Fins";});
+
+
+	
 
 	--==========================================================[[ ITEM UNLOCKABLES ]]==========================================================--
 	local skinPermBase = {
