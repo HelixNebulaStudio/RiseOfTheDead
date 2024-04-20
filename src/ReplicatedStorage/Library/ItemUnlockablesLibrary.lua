@@ -732,36 +732,6 @@ library:Add{
 	};
 };
 
-
---== divinggoggles
-library:Add{
-	Id="maraudersmask";
-	ItemId="maraudersmask";
-	Name="Default";
-	SurfaceAppearance={
-		ColorMap="rbxassetid://11269231309";
-	};
-};
-
-library:Add{
-	Id="maraudersmaskblue";
-	ItemId="maraudersmask";
-	Name="Blue";
-	SurfaceAppearance={
-		ColorMap="rbxassetid://11269776200";
-	};
-};
-
-library:Add{
-	Id="maraudersmaskcbspumpkins";
-	ItemId="maraudersmask";
-	Name="Cute But Scary Pumpkins";
-	SurfaceAppearance={
-		ColorMap="rbxassetid://15016807876";
-	};
-};
-
-
 --== santahat
 library:Add{
 	Id="santahat";

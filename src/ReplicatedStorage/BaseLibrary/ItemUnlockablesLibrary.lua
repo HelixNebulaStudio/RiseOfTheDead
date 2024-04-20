@@ -5,7 +5,7 @@ ItemUnlockablesLibrary.__index = ItemUnlockablesLibrary;
 --== Script;
 function ItemUnlockablesLibrary:Init(library)
 
-	--== gasmask
+	--== MARK: gasmask
 	library:Add{
 		Id="gasmask";
 		ItemId="gasmask";
@@ -105,7 +105,7 @@ function ItemUnlockablesLibrary:Init(library)
 	};
 	
 
-	--== hardhat
+	--== MARK: hardhat
 	library:Add{
 		Id="hardhat";
 		ItemId="hardhat";
@@ -136,7 +136,45 @@ function ItemUnlockablesLibrary:Init(library)
 		SurfaceAppearanceParent=script;
 	};
 
-	--== clothbagmask
+	
+	--== MARK: maraudersmask
+	library:Add{
+		Id="maraudersmask";
+		ItemId="maraudersmask";
+		Name="Default";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://11269231309";
+		};
+	};
+
+	library:Add{
+		Id="maraudersmaskblue";
+		ItemId="maraudersmask";
+		Name="Blue";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://11269776200";
+		};
+	};
+
+	library:Add{
+		Id="maraudersmaskcbspumpkins";
+		ItemId="maraudersmask";
+		Name="Cute But Scary Pumpkins";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://15016807876";
+		};
+	};
+
+	library:Add{
+		Id="maraudersmaskrisingsun";
+		ItemId="maraudersmask";
+		Name="Rising Sun";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17218253258";
+		};
+	};
+
+	--== MARK: clothbagmask
 	library:Add{
 		Id="clothbagmask";
 		ItemId="clothbagmask";
@@ -167,7 +205,7 @@ function ItemUnlockablesLibrary:Init(library)
 		SurfaceAppearanceParent=script;
 	};
 
-	--== clothbagmask
+	--== MARK: clothbagmask
 	library:Add{
 		Id="balaclava";
 		ItemId="balaclava";
@@ -188,7 +226,7 @@ function ItemUnlockablesLibrary:Init(library)
 		SurfaceAppearanceParent=script;
 	};
 	
-	--== leathergloves
+	--== MARK: leathergloves
 	library:Add{
 		Id="leathergloves";
 		ItemId="leathergloves";
@@ -277,7 +315,7 @@ function ItemUnlockablesLibrary:Init(library)
 		SurfaceAppearanceParent=script;
 	};
 	
-	--== armwraps
+	--== MARK: armwraps
 	library:Add{
 		Id="armwraps";
 		ItemId="armwraps";
@@ -315,7 +353,7 @@ function ItemUnlockablesLibrary:Init(library)
 	};
 	
 	
-	--== militaryboots
+	--== MARK: militaryboots
 	library:Add{
 		Id="militaryboots";
 		ItemId="militaryboots";
@@ -348,7 +386,7 @@ function ItemUnlockablesLibrary:Init(library)
 	
 	
 	
-	--== nekrostrench
+	--== MARK: nekrostrench
 
 	library:Add{
 		Id="nekrostrench";
@@ -388,7 +426,7 @@ function ItemUnlockablesLibrary:Init(library)
 	};
 	
 	
-	--== tirearmor
+	--== MARK: tirearmor
 	library:Add{
 		Id="tirearmor";
 		ItemId="tirearmor";

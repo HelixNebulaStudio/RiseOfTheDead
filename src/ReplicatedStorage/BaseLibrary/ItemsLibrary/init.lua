@@ -620,6 +620,7 @@ function ItemsLibrary:Init(super)
 	new(unlockableBase, {Id="divinggogglesred"; Icon="rbxassetid://15008018716"; Unlockable="Red Diving Goggles";});
 
 	new(unlockableBase, {Id="maraudersmaskblue"; Icon="rbxassetid://11269657288"; Unlockable="Blue Marauder's Mask"; Tags={"Slaughterfest";};});
+	new(unlockableBase, {Id="maraudersmaskrisingsun"; Icon="rbxassetid://17218272962"; Unlockable="Rising Sun Marauder's Mask";});
 
 	new(unlockableBase, {Id="watchyellow"; Icon="rbxassetid://13022192307"; Unlockable="Yellow Watch";});
 	
