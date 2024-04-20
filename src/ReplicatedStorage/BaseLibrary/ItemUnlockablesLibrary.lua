@@ -145,6 +145,7 @@ function ItemUnlockablesLibrary:Init(library)
 		SurfaceAppearance={
 			ColorMap="rbxassetid://11269231309";
 		};
+		SurfaceAppearanceParent=script;
 	};
 
 	library:Add{
@@ -154,6 +155,7 @@ function ItemUnlockablesLibrary:Init(library)
 		SurfaceAppearance={
 			ColorMap="rbxassetid://11269776200";
 		};
+		SurfaceAppearanceParent=script;
 	};
 
 	library:Add{
@@ -163,6 +165,7 @@ function ItemUnlockablesLibrary:Init(library)
 		SurfaceAppearance={
 			ColorMap="rbxassetid://15016807876";
 		};
+		SurfaceAppearanceParent=script;
 	};
 
 	library:Add{
@@ -170,8 +173,9 @@ function ItemUnlockablesLibrary:Init(library)
 		ItemId="maraudersmask";
 		Name="Rising Sun";
 		SurfaceAppearance={
-			ColorMap="rbxassetid://17218253258";
+			ColorMap="rbxassetid://17218739245";
 		};
+		SurfaceAppearanceParent=script;
 	};
 
 	--== MARK: clothbagmask
@@ -352,6 +356,37 @@ function ItemUnlockablesLibrary:Init(library)
 		};
 	};
 	
+	--== MARK: mercskneepads
+	library:Add{
+		Id="mercskneepads";
+		ItemId="mercskneepads";
+		Name="Default";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://11026319430";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="mercskneepadswinterfest";
+		ItemId="mercskneepads";
+		Name="Frostivus";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://11812673616";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="mercskneepadscarbonfiberblack";
+		ItemId="mercskneepads";
+		Name="Carbon Fiber Black";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17218604517";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
 	
 	--== MARK: militaryboots
 	library:Add{
@@ -387,7 +422,6 @@ function ItemUnlockablesLibrary:Init(library)
 	
 	
 	--== MARK: nekrostrench
-
 	library:Add{
 		Id="nekrostrench";
 		ItemId="nekrostrench";

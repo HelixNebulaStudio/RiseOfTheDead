@@ -644,7 +644,8 @@ function ItemsLibrary:Init(super)
 
 	new(unlockableBase, {Id="tirearmorred"; Icon="rbxassetid://16791569263"; Unlockable="Red Tire Armor";});
 	
-	
+	new(unlockableBase, {Id="mercskneepadscarbonfiberblack"; Icon="rbxassetid://17218761557"; Unlockable="Black Carbon Fiber Merc's Knee Pads";});
+
 	--==========================================================[[ ITEM UNLOCKABLES ]]==========================================================--
 	local skinPermBase = {
 		Type = super.Types.Usable;

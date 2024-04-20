@@ -751,26 +751,6 @@ library:Add{
 	};
 };
 
---== mercskneepads
-library:Add{
-	Id="mercskneepads";
-	ItemId="mercskneepads";
-	Name="Default";
-	SurfaceAppearance={
-		ColorMap="rbxassetid://11026319430";
-	};
-};
-
-library:Add{
-	Id="mercskneepadswinterfest";
-	ItemId="mercskneepads";
-	Name="Frostivus";
-	SurfaceAppearance={
-		ColorMap="rbxassetid://11812673616";
-	};
-};
-
-
 --== highvisjacket
 library:Add{
 	Id="highvisjacket";
