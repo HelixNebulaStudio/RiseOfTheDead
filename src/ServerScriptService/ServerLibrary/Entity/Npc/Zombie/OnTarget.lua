@@ -73,6 +73,7 @@ function Zombie.new(self)
 				
 				self.NextTarget();
 				task.wait(1);
+				if self.IsDead then return end;
 				
 				if math.random(1, 3) == 1 then
 					self.Think:Fire();
