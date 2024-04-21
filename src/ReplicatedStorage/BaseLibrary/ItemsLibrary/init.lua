@@ -680,7 +680,9 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="sr308slaughterwoods"; Icon="rbxassetid://16570530303"; SkinPerm="Slaughter Woods"; ToolItemId="sr308"; });
 	new(skinPermBase, {Id="vectorxpossession"; Icon="rbxassetid://15007719867"; SkinPerm="Possession"; ToolItemId="vectorx"; });
 	new(skinPermBase, {Id="sr308horde"; Icon="rbxassetid://16570534063"; SkinPerm="Horde"; ToolItemId="sr308"; });
-
+	new(skinPermBase, {Id="deaglecryogenics"; Icon="rbxassetid://17227806515"; SkinPerm="Cryogenics"; ToolItemId="deagle"; });
+	new(skinPermBase, {Id="flamethrowerblaze"; Icon="rbxassetid://17229367894"; SkinPerm="Blaze"; ToolItemId="flamethrower"; });
+	
 	
 	--==========================================================[[ SUMMONS ]]==========================================================--
 	local summonsBase = {

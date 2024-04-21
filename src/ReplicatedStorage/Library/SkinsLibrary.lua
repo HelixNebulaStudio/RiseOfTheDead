@@ -692,6 +692,7 @@ AddTexture{
 	Pack=SkinsLibrary.Packs.Full;
 	TextureData={
 		["rusty48"]={Id="rbxassetid://13822368962";};
+		["flamethrower"]={Id="rbxassetid://17229432117";};
 	};
 	IsUVTexture=true;
 };
@@ -727,6 +728,18 @@ AddTexture{
 	IsSurfaceAppearance=true;
 	IsUVTexture=true;
 };
+
+AddTexture{
+	Id=208;
+	Name="Cryogenics";
+	Pack=SkinsLibrary.Packs.Full;
+	TextureData={
+		["deagle"]={Id="rbxassetid://17227620804";};
+	};
+	IsSurfaceAppearance=true;
+	IsUVTexture=true;
+};
+
 
 
 

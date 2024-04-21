@@ -28,27 +28,31 @@ function UsableItems:Init(library)
 	
 	
 	--== Skin Permanent
+	-- MARK: arelshift
 	add{
 		Id="arelshiftcrossantique";
 		Type="SkinPerm";
 	};
 	
+	-- MARK: desolator
 	add{
 		Id="desolatorheavytoygun";
 		Type="SkinPerm";
 	};
 
+	-- MARK: czevo3asiimov
 	add{
 		Id="czevo3asiimov";
 		Type="SkinPerm";
 	};
 
+	-- MARK: rusty48
 	add{
 		Id="rusty48blaze";
 		Type="SkinPerm";
 	};
 	
-	-- sr308
+	-- MARK: sr308
 	add{
 		Id="sr308slaughterwoods";
 		Type="SkinPerm";
@@ -58,12 +62,24 @@ function UsableItems:Init(library)
 		Type="SkinPerm";
 	};
 
-
+	-- MARK: vectorx
 	add{
 		Id="vectorxpossession";
 		Type="SkinPerm";
 	};
 	
+	-- MARK: deagle
+	add{
+		Id="deaglecryogenics";
+		Type="SkinPerm";
+	};
+	
+	-- MARK: flamethrower
+	add{
+		Id="flamethrowerblaze";
+		Type="SkinPerm";
+	};
+
 end
 
 return UsableItems;
