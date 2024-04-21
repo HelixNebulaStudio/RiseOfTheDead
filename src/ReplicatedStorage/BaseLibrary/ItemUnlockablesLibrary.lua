@@ -566,6 +566,18 @@ function ItemUnlockablesLibrary:Init(library)
 		};
 		SurfaceAppearanceParent=script;
 	};
+	
+	library:Add{
+		Id="tirearmorgoldplating";
+		ItemId="tirearmor";
+		Name="Gold Plating";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17248585652";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	
 end
 
 return ItemUnlockablesLibrary;

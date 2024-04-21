@@ -644,8 +644,9 @@ function ItemsLibrary:Init(super)
 	new(unlockableBase, {Id="balaclavasuits"; Icon="rbxassetid://15032728733"; Unlockable="Suits Balaclava";});
 
 	new(unlockableBase, {Id="tirearmorred"; Icon="rbxassetid://16791569263"; Unlockable="Red Tire Armor";});
+	new(unlockableBase, {Id="tirearmorgoldplating"; Icon="rbxassetid://16791569263"; Unlockable="Gold Plating Tire Armor";});
 	
-	new(unlockableBase, {Id="mercskneepadscarbonfiberblack"; Icon="rbxassetid://17218761557"; Unlockable="Black Carbon Fiber Merc's Knee Pads";});
+	new(unlockableBase, {Id="mercskneepadscarbonfiberblack"; Icon="rbxassetid://17248627018"; Unlockable="Black Carbon Fiber Merc's Knee Pads";});
 
 	new(unlockableBase, {Id="divingsuitwhite"; Icon="rbxassetid://17219502385"; Unlockable="White Diving Suit";});
 
@@ -682,7 +683,6 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="sr308horde"; Icon="rbxassetid://16570534063"; SkinPerm="Horde"; ToolItemId="sr308"; });
 	new(skinPermBase, {Id="deaglecryogenics"; Icon="rbxassetid://17227806515"; SkinPerm="Cryogenics"; ToolItemId="deagle"; });
 	new(skinPermBase, {Id="flamethrowerblaze"; Icon="rbxassetid://17229367894"; SkinPerm="Blaze"; ToolItemId="flamethrower"; });
-	
 	
 	--==========================================================[[ SUMMONS ]]==========================================================--
 	local summonsBase = {
