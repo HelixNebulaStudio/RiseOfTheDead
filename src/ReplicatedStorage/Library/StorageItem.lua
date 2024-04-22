@@ -233,6 +233,7 @@ function StorageItem.IsStackable(storageItemA, storageItemB)
 	
 	if stackable == false then return false end;
 	if storageItemA.Quantity == stackable or storageItemB.Quantity == stackable then return false end;
+	if storageItemA.Name ~= storageItemB.Name then return false end
 	
 	local stackMatchList = itemLibA.StackMatch;
 	if stackMatchList then
