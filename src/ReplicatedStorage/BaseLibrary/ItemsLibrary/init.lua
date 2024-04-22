@@ -465,6 +465,7 @@ function ItemsLibrary:Init(super)
 		TradingTax=20;
 		Tags={"Misc Usable"};
 		Description="Unlock this specific color for appearance customization.";
+		StackMatch={"Color"};
 		OverlayIcons={
 			{Icon="rbxassetid://17252370736";}
 		};
