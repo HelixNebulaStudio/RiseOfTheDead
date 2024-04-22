@@ -2,7 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local Flags = {};
 Flags.__index = Flags;
 --== Variables;
-local RunService = game:GetService("RunService");
 
 --== Script;
 function Flags:Get(eventId, default)
@@ -15,6 +14,7 @@ function Flags:Get(eventId, default)
 	if default then
 		return self:Add(default);
 	end
+	return;
 end
 
 function Flags:Add(data)

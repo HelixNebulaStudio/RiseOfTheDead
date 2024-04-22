@@ -458,7 +458,23 @@ function ItemsLibrary:Init(super)
 		Stackable = 5;
 	}
 	new(usableBase, {Id="tomeoftweaks"; Name="Tome Of Tweaks"; Icon="rbxassetid://6122866034"; TradingTax=20; Tags={"Misc Usable"}; Description="10 Tips and tricks to tweak your weapon. Consuming this will grant you 10 tweak points.";});
-	
+	new(usableBase, {
+		Id="colorcustom";
+		Name="Custom Color";
+		Icon="rbxassetid://17252137439";
+		TradingTax=20;
+		Tags={"Misc Usable"};
+		Description="Unlock this specific color for appearance customization.";
+		OverlayIcons={
+			{Icon="rbxassetid://17252370736";}
+		};
+		OnInstantiate=function(storageItem)
+			local itemValues = storageItem.Values;
+			if itemValues.Color then return end;
+			itemValues.Color = Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255)):ToHex();
+		end;
+	});
+
 	local unlockPapers = {
 		Type = super.Types.Usable;
 		Tradable = super.Tradable.Tradable;

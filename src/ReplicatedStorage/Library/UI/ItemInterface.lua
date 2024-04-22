@@ -238,6 +238,22 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 	if self.ItemLib == nil then return end;
 	
 	self.ImageButton.Image = self.ItemLib.Icon or "rbxasset://textures/ui/GuiImagePlaceholder.png"
+
+	if self.ItemLib.OverlayIcons then
+		for a=1, #self.ItemLib.OverlayIcons do
+			local overlayData = self.ItemLib.OverlayIcons[a];
+
+			local newImage = self.ImageButton:FindFirstChild("Overlay".. a);
+			newImage = newImage or Instance.new("ImageLabel");
+			newImage.Name = "Overlay"..a;
+			newImage.Image = overlayData.Icon;
+			newImage.BackgroundTransparency = 1;
+			newImage.Size = UDim2.new(1, 0, 1, 0);
+			newImage.ZIndex = self.ImageButton.ZIndex;
+			newImage.Parent = self.ImageButton;
+		end
+	end
+
 	local itemButtonColor = modItemsLibrary.TierColors[self.ItemLib.Tier];
 	
 	local typeIconLabel = self.ImageButton:WaitForChild("TypeIcon");
@@ -328,6 +344,10 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 
 		end
 		
+		if itemValues.Color then
+			itemButtonColor = Color3.fromHex(itemValues.Color);
+		end
+
 		if storageItemID then -- Item is tied to storageItem and not proxy;
 			local itemBar = self.ImageButton:WaitForChild("itemBar");
 			
@@ -781,6 +801,10 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 			itemDesc = itemDesc..h3O.."\nSeed: "..h3C.. colorNumberText(itemValues.Seed);
 		end
 		
+		if itemValues.Color then
+			itemDesc = itemDesc..h3O.."\nColor: "..h3C..'<font color="#'..itemValues.Color..'"> #'..itemValues.Color..'</font>';
+		end
+
 		if itemValues.DescExtend then
 			itemDesc = itemDesc.. itemValues.DescExtend;
 		end

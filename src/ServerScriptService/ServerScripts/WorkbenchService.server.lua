@@ -837,15 +837,28 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 					local itemSkin = storageItem.Values.Colors or {};
 					itemSkin[partKey] = nil;
 					storageItem:SetValues("Colors", itemSkin);
+
 				else
+					Debugger:StudioWarn("Set appearid", appearId);
 					local colorLibrary = modColorsLibrary.Get(appearId);
-					if colorLibrary and profile.ColorPacks[colorLibrary.Pack] then
+					local unlocked = false;
+
+					local customColorsFlag = profile.Flags:Get("CustomColors");
+					if appearId:sub(1,1) == "#" and customColorsFlag and customColorsFlag.Unlocked and customColorsFlag.Unlocked[(string.gsub(appearId, "#", ""))] then
+						unlocked = true;
+					elseif profile.ColorPacks[colorLibrary.Pack] then
+						unlocked = true;
+					end
+
+					if colorLibrary and unlocked then
 						local itemSkin = storageItem.Values.Colors or {};
 						itemSkin[partKey] = appearId;
 						storageItem:SetValues("Colors", itemSkin);
 						profile:AddPlayPoints(1);
+
 					else
-						Debugger:Warn("Color does not exist or color pack is locked.",colorLibrary == nil," Unlocked:",profile.ColorPacks[colorLibrary.Pack]);
+						Debugger:Warn("Color does not exist or color pack is locked.");
+
 					end
 				end
 				

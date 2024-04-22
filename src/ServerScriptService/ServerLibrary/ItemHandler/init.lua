@@ -127,4 +127,30 @@ function ItemHandler:UnlockPapers(player, storageItem)
 	profile:Sync("Safehome/Homes/"..safehomeId);
 end
 
+function ItemHandler:UnlockCustomColor(player, storageItem)
+	local profile = modProfile:Get(player);
+	local flags = profile.Flags;
+	local activeSave = profile:GetActiveSave();
+	storageItem, storage = activeSave:FindItemFromStorages(storageItem.ID);
+
+	if storageItem == nil or storage == nil then return end;
+
+	local customColorsData = flags:Get("CustomColors", {
+		Id="CustomColors";
+		Unlocked={};
+	});
+	local colorHex = storageItem.Values.Color;
+
+	if customColorsData.Unlocked[colorHex] ~= nil then
+		shared.Notify(player,`You have already unlocked this color.`, "Negative");
+		return;
+	end
+
+	customColorsData.Unlocked[colorHex] = true;
+	flags:Sync();
+
+	shared.Notify(player, "Unlocked a new color!", "Reward");
+	storage:Remove(storageItem.ID, 1);
+end
+
 return ItemHandler;

@@ -1,18 +1,25 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Workbench = {};
-local Interface = {};
+local Interface = {
+	List = nil;
+	RequestData = nil;
+	WorkbenchItemDisplay = nil;
+	PlayButtonClick = nil;
+	Object = nil;
+	OpenWindow = nil;
+	ClearPages = nil;
+	RefreshNavigations = nil;
+	SetPage = nil;
+};
 
 local TweenService = game:GetService("TweenService");
 local UserInputService = game:GetService("UserInputService");
 local player = game.Players.LocalPlayer;
 
-local modData = require(player:WaitForChild("DataModule"));
-local modModsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ModsLibrary"));
-local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibrary);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
 
 local modColorsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ColorsLibrary"));
@@ -20,7 +27,7 @@ local modSkinsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("Ski
 local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
 
 
-local appearanceFrameTemplate = script:WaitForChild("AppearanceFrame");
+local _appearanceFrameTemplate = script:WaitForChild("AppearanceFrame");
 local appearanceListingTemplate = script:WaitForChild("AppearanceListing");
 local templateHintLabel = script:WaitForChild("HintLabel");
 
@@ -46,6 +53,7 @@ function Workbench.new(itemId, library, storageItem)
 
 		Interface:RequestData("ColorPacks");
 		Interface:RequestData("SkinsPacks");
+		modData:GetFlag("CustomColors", true);
 	end
 	
 	local listMenu = Interface.List.create();
@@ -270,7 +278,7 @@ function Workbench.new(itemId, library, storageItem)
 			end
 			table.sort(sortedAppearLib, function(a, b) return a:lower() < b:lower() end);
 			
-			for a=1, #sortedAppearLib do --for partName, partData in pairs(appearLib) do
+			for a=1, #sortedAppearLib do
 				local partName = sortedAppearLib[a];
 				
 				local refBasePart = basePrefab:FindFirstChild(partName);
@@ -377,127 +385,155 @@ function Workbench.new(itemId, library, storageItem)
 						local function loadPackList(packsList, listFrame)
 							local refreshButtonFuncs = {};
 							local canPreview = true;
-							for packIndex, packData in pairs(packsList) do
-								if packData.Owned then
-									local newPackFrame = packFrameTemplate:Clone();
-									local titleLabel = newPackFrame:WaitForChild("Title");
-									local stylesList = newPackFrame:WaitForChild("GridList");
-									local stylesListGridLayout = stylesList:WaitForChild("UIGridLayout");
 
-									titleLabel.Text = packData.Name;
-									newPackFrame.LayoutOrder = packData.LayoutOrder;
+							local customColors = modData:GetFlag("CustomColors");
+							if customColors and packsList == modColorsLibrary.Packs then
+								packsList.Custom = {Name="Custom Colors"; LayoutOrder=0; List={}; Owned=true; CustomColors=true;};
 
-									for a=1, #packData.List do
-										local styleButton = styleButtonTemplate:Clone();
-										local txrLabel = styleButton:WaitForChild("TextureLabel");
-										local selectedLabel = styleButton:WaitForChild("SelectedLabel");
-										
-										if packsList == modColorsLibrary.Packs then
-											stylesListGridLayout.CellSize = UDim2.new(0, 25, 0, 25);
-										end
-										
-										local function refreshButton()
-											if packsList == modColorsLibrary.Packs and activePartColor == packData.List[a].Id then
-												selectedLabel.Visible = true;
-												styleButton.ImageColor3 = selectedColor3;
-											elseif packsList == modSkinsLibrary.Packs and activePartTexture == packData.List[a].Id then
-												selectedLabel.Visible = true;
-												styleButton.ImageColor3 = selectedColor3;
-											else
-												selectedLabel.Visible = false;
-												styleButton.ImageColor3 = Color3.fromRGB(255, 255, 255);
-											end
-										end
-										table.insert(refreshButtonFuncs, refreshButton);
-										refreshButton();
+								local orderList = {};
 
-										local function previewStyle()
-											canPreview = true;
-											if packsList == modColorsLibrary.Packs then
-												modColorsLibrary.SetColor(itemPartSelected, packData.List[a].Id, false);
-											elseif packsList == modSkinsLibrary.Packs then
-												modSkinsLibrary.SetTexture(itemPartSelected, packData.List[a].Id, false);
-											end
-										end
-
-										styleButton.MouseEnter:Connect(previewStyle);
-										styleButton.MouseMoved:Connect(function()
-											if not canPreview then return end;
-											previewStyle()
-										end);
-
-										styleButton.MouseLeave:Connect(function()
-											revertPartColor();
-										end)
-
-										styleButton.MouseButton1Click:Connect(function()
-											Interface:PlayButtonClick();
-											if packsList == modColorsLibrary.Packs then
-												if activePartColor == packData.List[a].Id then
-													textureLabel.BackgroundColor3 = defaultPartColor;
-													remoteSetAppearance:FireServer(Interface.Object, 3, storageItem.ID, dataKey);
-													activePartColor = nil;
-													canPreview = false;
-												else
-													textureLabel.BackgroundColor3 = packData.List[a].Color;
-													remoteSetAppearance:FireServer(Interface.Object, 1, storageItem.ID, dataKey, packData.List[a].Id);
-													activePartColor = packData.List[a].Id;
-												end
-												modColorsLibrary.SetColor(itemPartSelected, activePartColor);
-
-											elseif packsList == modSkinsLibrary.Packs then
-												if activePartTexture == packData.List[a].Id then
-													remoteSetAppearance:FireServer(Interface.Object, 4, storageItem.ID, dataKey);
-													textureLabel.Image = "";
-													activePartTexture = nil;
-													canPreview = false;
-
-												else
-													if packData.List[a].Icon == nil then
-														remoteSetAppearance:FireServer(Interface.Object, 2, storageItem.ID, dataKey, packData.List[a].Id);
-														textureLabel.Image = packData.List[a].Image;
-														textureLabel.ImageColor3 = packData.List[a].Color;
-														textureLabel.TileSize = UDim2.new(packData.List[a].StudsPerTile.X, 0, packData.List[a].StudsPerTile.Y, 0);
-													else
-														textureLabel.Image = packData.List[a].Icon;
-													end
-													activePartTexture = packData.List[a].Id;
-												end
-												modSkinsLibrary.SetTexture(itemPartSelected, activePartTexture);
-
-											end
-											for b=1, #refreshButtonFuncs do
-												if type(refreshButtonFuncs[b]) == "function" then
-													refreshButtonFuncs[b]();
-												end
-											end
-											--Interface.RefreshNavigations();
-											--Interface.SetPage(listMenu.Menu);
-										end)
-
-										if packsList == modColorsLibrary.Packs then
-											txrLabel.BackgroundColor3 = packData.List[a].Color;
-											txrLabel.BackgroundTransparency = 0;
-											
-										elseif packsList == modSkinsLibrary.Packs then
-											if packData.List[a].Icon == nil then
-												txrLabel.Image = packData.List[a].Image;
-												txrLabel.BackgroundTransparency = 1;
-												txrLabel.ImageColor3 = packData.List[a].Color;
-												local scale = packData.List[a].StudsPerTile;
-												txrLabel.TileSize = UDim2.new(scale.X*5, 0, scale.Y*5, 0);
-											else
-												txrLabel.Image = packData.List[a].Icon;
-											end
-											
-										end
-										styleButton.LayoutOrder = packData.List[a].Order;
-										styleButton.Name = packData.List[a].Name;
-										styleButton.Parent = stylesList;
-										listMenuAppearance:AddSearchIndex(styleButton, {packData.List[a].Id; packData.List[a].Name;});
-									end
-									newPackFrame.Parent = listFrame;
+								for hex, _ in pairs(customColors.Unlocked) do
+									local color = Color3.fromHex(hex);
+									local h, s, v = color:ToHSV();
+									local hLayer = math.floor(h*255/10)*10;
+									table.insert(orderList, {Id=hex; Value=(hLayer*10000 + v*1000 + s*255);});
 								end
+								table.sort(orderList, function(a, b) 
+									return a.Value > b.Value;
+								end);
+
+								for a=1, #orderList do
+									local hex = orderList[a].Id;
+									local customId = "#"..hex;
+
+									local getColor = modColorsLibrary.Get(customId);
+									table.insert(packsList.Custom.List, getColor);
+								end
+							end
+
+							for packIndex, packData in pairs(packsList) do
+								if packData.Owned == nil or packData.Owned == false then continue end;
+
+								local newPackFrame = packFrameTemplate:Clone();
+								local titleLabel = newPackFrame:WaitForChild("Title");
+								local stylesList = newPackFrame:WaitForChild("GridList");
+								local stylesListGridLayout = stylesList:WaitForChild("UIGridLayout");
+
+								titleLabel.Text = packData.Name;
+								newPackFrame.LayoutOrder = packData.LayoutOrder;
+
+								for a=1, #packData.List do
+									local styleButton = styleButtonTemplate:Clone();
+									local txrLabel = styleButton:WaitForChild("TextureLabel");
+									local selectedLabel = styleButton:WaitForChild("SelectedLabel");
+									
+									if packsList == modColorsLibrary.Packs then
+										stylesListGridLayout.CellSize = UDim2.new(0, 25, 0, 25);
+									end
+									
+									local function refreshButton()
+										if packsList == modColorsLibrary.Packs and activePartColor == packData.List[a].Id then
+											selectedLabel.Visible = true;
+											styleButton.ImageColor3 = selectedColor3;
+										elseif packsList == modSkinsLibrary.Packs and activePartTexture == packData.List[a].Id then
+											selectedLabel.Visible = true;
+											styleButton.ImageColor3 = selectedColor3;
+										else
+											selectedLabel.Visible = false;
+											styleButton.ImageColor3 = Color3.fromRGB(255, 255, 255);
+										end
+									end
+									table.insert(refreshButtonFuncs, refreshButton);
+									refreshButton();
+
+									local function previewStyle()
+										canPreview = true;
+										if packsList == modColorsLibrary.Packs then
+											modColorsLibrary.SetColor(itemPartSelected, packData.List[a].Id, false);
+
+										elseif packsList == modSkinsLibrary.Packs then
+											modSkinsLibrary.SetTexture(itemPartSelected, packData.List[a].Id, false);
+
+										end
+									end
+
+									styleButton.MouseEnter:Connect(previewStyle);
+									styleButton.MouseMoved:Connect(function()
+										if not canPreview then return end;
+										previewStyle()
+									end);
+
+									styleButton.MouseLeave:Connect(function()
+										revertPartColor();
+									end)
+
+									styleButton.MouseButton1Click:Connect(function()
+										Interface:PlayButtonClick();
+										if packsList == modColorsLibrary.Packs then
+											if activePartColor == packData.List[a].Id then
+												textureLabel.BackgroundColor3 = defaultPartColor;
+												remoteSetAppearance:FireServer(Interface.Object, 3, storageItem.ID, dataKey);
+												activePartColor = nil;
+												canPreview = false;
+											else
+												textureLabel.BackgroundColor3 = packData.List[a].Color;
+												remoteSetAppearance:FireServer(Interface.Object, 1, storageItem.ID, dataKey, packData.List[a].Id);
+												activePartColor = packData.List[a].Id;
+											end
+											modColorsLibrary.SetColor(itemPartSelected, activePartColor);
+
+										elseif packsList == modSkinsLibrary.Packs then
+											if activePartTexture == packData.List[a].Id then
+												remoteSetAppearance:FireServer(Interface.Object, 4, storageItem.ID, dataKey);
+												textureLabel.Image = "";
+												activePartTexture = nil;
+												canPreview = false;
+
+											else
+												if packData.List[a].Icon == nil then
+													remoteSetAppearance:FireServer(Interface.Object, 2, storageItem.ID, dataKey, packData.List[a].Id);
+													textureLabel.Image = packData.List[a].Image;
+													textureLabel.ImageColor3 = packData.List[a].Color;
+													textureLabel.TileSize = UDim2.new(packData.List[a].StudsPerTile.X, 0, packData.List[a].StudsPerTile.Y, 0);
+												else
+													textureLabel.Image = packData.List[a].Icon;
+												end
+												activePartTexture = packData.List[a].Id;
+											end
+											modSkinsLibrary.SetTexture(itemPartSelected, activePartTexture);
+
+										end
+										for b=1, #refreshButtonFuncs do
+											if type(refreshButtonFuncs[b]) == "function" then
+												refreshButtonFuncs[b]();
+											end
+										end
+										--Interface.RefreshNavigations();
+										--Interface.SetPage(listMenu.Menu);
+									end)
+
+									if packsList == modColorsLibrary.Packs then
+										txrLabel.BackgroundColor3 = packData.List[a].Color;
+										txrLabel.BackgroundTransparency = 0;
+										
+									elseif packsList == modSkinsLibrary.Packs then
+										if packData.List[a].Icon == nil then
+											txrLabel.Image = packData.List[a].Image;
+											txrLabel.BackgroundTransparency = 1;
+											txrLabel.ImageColor3 = packData.List[a].Color;
+											local scale = packData.List[a].StudsPerTile;
+											txrLabel.TileSize = UDim2.new(scale.X*5, 0, scale.Y*5, 0);
+										else
+											txrLabel.Image = packData.List[a].Icon;
+										end
+										
+									end
+									styleButton.LayoutOrder = packData.List[a].Order or a;
+									styleButton.Name = packData.List[a].Name;
+									styleButton.Parent = stylesList;
+									listMenuAppearance:AddSearchIndex(styleButton, {packData.List[a].Id; packData.List[a].Name; "custom"});
+								end
+								newPackFrame.Parent = listFrame;
 							end
 						end
 						
@@ -558,6 +594,7 @@ function Workbench.new(itemId, library, storageItem)
 							listMenuAppearance:AddSearchIndex(styleButton, {"Clear";});
 							
 							local basicList = listMenuAppearance:NewBasicList();
+							basicList.Size = UDim2.new(1, 0, 0, 30);
 							listMenuAppearance:Add(basicList, 0);
 							styleButton.Parent = basicList.list;
 						end
@@ -631,18 +668,20 @@ function Workbench.new(itemId, library, storageItem)
 								listMenuAppearance:AddSearchIndex(styleButton, {"Visibility";});
 
 								local basicList = listMenuAppearance:NewBasicList();
+								basicList.Size = UDim2.new(1, 0, 0, 30);
 								listMenuAppearance:Add(basicList, 0);
 								styleButton.Parent = basicList.list;
 							end
 							
 						end
-							
 						
+
 						local categoryColors = modColorsLibrary.Packs;
 						local colorsList = listMenuAppearance:NewBasicList();
 						local newCateTab = listMenuAppearance:NewTab(colorsList);
 						newCateTab.titleLabel.Text = "Colors";
 						listMenuAppearance:Add(newCateTab, 4);
+
 						listMenuAppearance:Add(colorsList, 5);
 						loadPackList(categoryColors, colorsList.list);
 

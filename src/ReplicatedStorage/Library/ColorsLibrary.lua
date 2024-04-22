@@ -8,8 +8,8 @@ local ColorsLibary = {Library={}};
 
 --== Variables;
 ColorsLibary.Packs = {
-	Dull = {Name="Dull"; LayoutOrder=0; List={}; Owned=true;};
-	Lively = {Name="Lively"; LayoutOrder=0; List={};};
+	Dull = {Name="Dull"; LayoutOrder=1; List={}; Owned=true;};
+	Lively = {Name="Lively"; LayoutOrder=1; List={};};
 	Army = {Name="Army"; LayoutOrder=2; List={};};
 	EasterColors = {Name="EasterColors"; LayoutOrder=3; List={};};
 	Arctic = {Name="Arctic"; LayoutOrder=3; List={};}; 
@@ -30,6 +30,17 @@ end
 
 function ColorsLibary.Get(id)
 	id = tostring(id);
+
+	if id:sub(1,1) == "#" then
+		local hex = (string.gsub(id, "#", ""));
+		ColorsLibary.Library[id] = {
+			Id=id;
+			Pack="Custom";
+			Name=hex;
+			Color=Color3.fromHex(hex);
+		};
+	end
+
 	return ColorsLibary.Library[id];
 end
 
