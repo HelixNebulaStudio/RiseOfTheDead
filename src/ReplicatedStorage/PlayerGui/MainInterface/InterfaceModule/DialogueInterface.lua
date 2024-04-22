@@ -1,5 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local Interface = {};
+local Interface = {
+	CloseWindow = nil;
+	ToggleWindow = nil;
+	ItemViewport = nil;
+};
 Interface.InDialogue = false;
 
 local unevaluableAnswers = {
@@ -15,15 +19,12 @@ local TextService = game:GetService("TextService");
 local localplayer = game.Players.LocalPlayer;
 
 local remotes = game.ReplicatedStorage.Remotes;
---local remoteSelectDialogue = remotes.Dialogue.SelectDialogue;
 local remoteMissionCheckFunction = remotes.Interface.MissionCheckFunction;
 
 local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
-local modGuiObjectTween = require(script.Parent.Parent.Parent:WaitForChild("GuiObjectTween"));
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modMissionLibrary = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("MissionLibrary"));
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
-local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler);
 local modDialogueLibrary = require(game.ReplicatedStorage.Library.DialogueLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modFacesLibrary = require(game.ReplicatedStorage.Library.FacesLibrary);
@@ -41,22 +42,15 @@ local timerBar = dialogueFrame:WaitForChild("timerBar");
 local messageFrame = backgroundFrame:WaitForChild("MessageFrame");
 local questionsList = backgroundFrame:WaitForChild("QuestionList");
 
-local seperatorFrame = dialogueFrame:WaitForChild("SeperateFrame");
-
 local questionOption = questionsList:WaitForChild("questionOption");
 local questionInput = questionOption:WaitForChild("SearchFrame"):WaitForChild("SearchBar");
 
 local dialogueButtonTemplate = script:WaitForChild("dialogueButton");
 
 local loadedDialog;
-local messagePages = {};
-local currentPage = 1;
 local random = Random.new();
 
-local textcolorFadeSpeed = 0.5;
-
 local NpcName, NpcModel;
-local camera = workspace.CurrentCamera;
 
 local lastExpireTime;
 local window;
@@ -242,6 +236,7 @@ function Interface:OnDialogue(dialogPacket)
 			local missionLib = data.MissionId and modMissionLibrary.Get(data.MissionId) or nil;
 			
 			local function updateText()
+				serverTime = modSyncTime.GetTime();
 				unlockTime = dialogData and dialogData.ChoiceUnlockTime and (dialogData.ChoiceUnlockTime-serverTime) or nil;
 				
 				local newText = formatDialogues(data.Dialogue);
@@ -287,8 +282,22 @@ function Interface:OnDialogue(dialogPacket)
 				end
 			end
 			
-			updateText()
+			updateText();
+
+			task.spawn(function() 
+				if unlockTime then
+					local updateTextConn
+					updateTextConn = modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
+						if not newDialogue:IsDescendantOf(localplayer.PlayerGui) or unlockTime == nil or unlockTime <= 0 then
+							updateTextConn:Disconnect()
+							return;
+						end;
+						updateText();
+					end)
+				end
+			end)
 			
+
 			local diagIcon = newDialogue:WaitForChild("DialogueIcon");
 			
 			if data.Tag and data.Tag:find("general_") == nil then
@@ -332,17 +341,6 @@ function Interface:OnDialogue(dialogPacket)
 				local canStart, failReasons;
 				if data.CheckMission then
 					canStart, failReasons = remoteMissionCheckFunction:InvokeServer(data.CheckMission);
-				end
-				
-				if unlockTime then
-					local updateTextConn
-					updateTextConn = modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
-						if not newDialogue:IsDescendantOf(localplayer.PlayerGui) or unlockTime == nil or unlockTime <= 0 then
-							updateTextConn:Disconnect()
-							return;
-						end;
-						updateText();
-					end)
 				end
 				
 				local function onOptionClicked()
