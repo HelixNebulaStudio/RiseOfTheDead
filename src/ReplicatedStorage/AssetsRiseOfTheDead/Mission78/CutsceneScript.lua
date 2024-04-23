@@ -31,54 +31,56 @@ if RunService:IsServer() then
 		"I am the best survivor!";
 	};
 
-	modOnGameEvents:ConnectEvent("OnZombieDeath", function(npcModule)
-		local killerTags = modDamageTag:Get(npcModule.Prefab);
-
-		for a=1, #killerTags do
-			local tag = killerTags[a];
-			if tag.Player then 
-				modMission:Progress(tag.Player, missionId, function(mission)
-					if mission.ProgressionPoint == 3 then
-						local lydiaNpcModule = modNpc.GetPlayerNpc(tag.Player, "Lydia");
-						if lydiaNpcModule then
-							if mission.SaveData.PlayerKills == 4 then
-								lydiaNpcModule.Chat(lydiaNpcModule.Owner, "Hmm, I see..");
-							elseif mission.SaveData.PlayerKills == 2 then
-								lydiaNpcModule.Chat(lydiaNpcModule.Owner, "Okay, seems simple enough..");
-							end
-						end
-						
-						mission.SaveData.PlayerKills = math.max(mission.SaveData.PlayerKills -1, 0);
-						
-						if mission.SaveData.PlayerKills <= 0 then
-							mission.ProgressionPoint = 4;
-						end
-					end
-				end)
-
-			else
-				local lydiaNpcModule = modNpc.GetNpcModule(tag.Prefab);
-				if lydiaNpcModule.Name ~= "Lydia" then continue end;
+	if modBranchConfigs.IsWorld("Safehome") then
+		modOnGameEvents:ConnectEvent("OnZombieDeath", function(npcModule)
+			local killerTags = modDamageTag:Get(npcModule.Prefab);
 	
-				for _, player in pairs(game.Players:GetPlayers()) do
-					modMission:Progress(player, missionId, function(mission)
-						if mission.ProgressionPoint == 4 then
-							if mission.SaveData.LydiaKills > 0 then
-								lydiaNpcModule.Chat(lydiaNpcModule.Owner, killDialogues[math.random(1, #killDialogues)]);
+			for a=1, #killerTags do
+				local tag = killerTags[a];
+				if tag.Player then 
+					modMission:Progress(tag.Player, missionId, function(mission)
+						if mission.ProgressionPoint == 3 then
+							local lydiaNpcModule = modNpc.GetPlayerNpc(tag.Player, "Lydia");
+							if lydiaNpcModule then
+								if mission.SaveData.PlayerKills == 4 then
+									lydiaNpcModule.Chat(lydiaNpcModule.Owner, "Hmm, I see..");
+								elseif mission.SaveData.PlayerKills == 2 then
+									lydiaNpcModule.Chat(lydiaNpcModule.Owner, "Okay, seems simple enough..");
+								end
 							end
-							mission.SaveData.LydiaKills = math.max(mission.SaveData.LydiaKills -1, 0);
 							
-							if mission.SaveData.LydiaKills <= 0 then
-								mission.ProgressionPoint = 5;
+							mission.SaveData.PlayerKills = math.max(mission.SaveData.PlayerKills -1, 0);
+							
+							if mission.SaveData.PlayerKills <= 0 then
+								mission.ProgressionPoint = 4;
 							end
 						end
 					end)
-				end
-
-			end;
-		end
-	end);
-
+	
+				else
+					local lydiaNpcModule = modNpc.GetNpcModule(tag.Prefab);
+					if lydiaNpcModule.Name ~= "Lydia" then continue end;
+		
+					for _, player in pairs(game.Players:GetPlayers()) do
+						modMission:Progress(player, missionId, function(mission)
+							if mission.ProgressionPoint == 4 then
+								if mission.SaveData.LydiaKills > 0 then
+									lydiaNpcModule.Chat(lydiaNpcModule.Owner, killDialogues[math.random(1, #killDialogues)]);
+								end
+								mission.SaveData.LydiaKills = math.max(mission.SaveData.LydiaKills -1, 0);
+								
+								if mission.SaveData.LydiaKills <= 0 then
+									mission.ProgressionPoint = 5;
+								end
+							end
+						end)
+					end
+	
+				end;
+			end
+		end);
+	
+	end
 else
 	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
@@ -86,7 +88,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	--if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigs.IsWorld("Safehome") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
