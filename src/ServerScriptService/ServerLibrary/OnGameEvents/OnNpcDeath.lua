@@ -1,17 +1,17 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
-local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
 local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
-
-
-local random = Random.new();
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 --== When a npc dies;
-return function(players, npcModule)
-	players = players or {};
-	for _, player in pairs(players) do
+return function(npcModule)
+	local playerTags = modDamageTag:Get(npcModule.Prefab, "Player");
+
+	for _, playerTag in pairs(playerTags) do
+		local player = playerTag.Player;
 		local profile = modProfile:Get(player);
 		local activeSave = profile:GetActiveSave();
 		local inventory = activeSave.Inventory;
