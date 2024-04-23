@@ -11,9 +11,9 @@ local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechan
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
-local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local remotePrimaryFire = modRemotesManager:Get("PrimaryFire");
 --==

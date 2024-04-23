@@ -1,18 +1,16 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --
 local WorldEventSystem;
-local WorldEvent = {};
-
-
-local RunService = game:GetService("RunService");
+local WorldEvent = {
+	LastBreach = nil;
+};
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modSyncTime = Debugger:Require(game.ReplicatedStorage.Library.SyncTime);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
@@ -64,6 +62,7 @@ function WorldEvent.Initialize(worldEventsService)
 
 		local origin = model:GetPivot() * CFrame.new(0, math.random(-30, 30)/10, 0);
 
+		assert(model.PrimaryPart, `Missing primary part: {model:GetFullName()}`);
 		local newPart = Instance.new("Part");
 		newPart.Name = "Barricade";
 		newPart.Color = Color3.fromRGB(108, 88, 75);
@@ -91,10 +90,15 @@ function WorldEvent.Initialize(worldEventsService)
 		task.delay(math.random(380,650)/10, tryDmg)
 	end)
 
-	modOnGameEvents:ConnectEvent("OnZombieDeath", function(players, npcModule)
+	modOnGameEvents:ConnectEvent("OnZombieDeath", function(npcModule)
 		if npcModule.SafehomeBreach == nil then return end;
 		
-		for _, player in pairs(players) do
+		local playerTags = modDamageTag:Get(npcModule.Prefab, "Player");
+
+		for a=1, #playerTags do
+			local playerTag = playerTags[a];
+			local player = playerTag.Player;
+
 			modMission:Progress(player, 74, function(mission)
 				mission.ProgressionPoint = 2;
 			end)

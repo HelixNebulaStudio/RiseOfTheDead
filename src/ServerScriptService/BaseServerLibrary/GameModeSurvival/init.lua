@@ -17,6 +17,7 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
@@ -122,12 +123,16 @@ function Survival:Load()
 		obj.Transparency = 1;
 	end
 	
-	modOnGameEvents:ConnectEvent("OnZombieDeath", function(players, zombie)
-		for a=1, #players do
-			local playerName = players[a].Name;
+	modOnGameEvents:ConnectEvent("OnZombieDeath", function(npcModule)
+		local playerTags = modDamageTag:Get(npcModule.Prefab, "Player");
+
+		for a=1, #playerTags do
+			local playerTag = playerTags[a];
+			local player = playerTag.Player;
+
+			local playerName = player.Name;
 			self.StatsCount[playerName] = (self.StatsCount[playerName] or 0) + 1;
 		end
-
 	end);
 	
 	task.spawn(function()

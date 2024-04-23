@@ -10,6 +10,7 @@ local random = Random.new();
 
 --== When a npc dies;
 return function(players, npcModule)
+	players = players or {};
 	for _, player in pairs(players) do
 		local profile = modProfile:Get(player);
 		local activeSave = profile:GetActiveSave();

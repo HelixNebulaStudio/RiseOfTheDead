@@ -16,9 +16,17 @@ Tag.ClassName = "Tag";
 
 type TagObject = {
 	LastTag: number;
-    List: {};
+    List: TagList;
 }
 export type Tag = typeof(setmetatable({} :: TagObject, Tag));
+
+type TagList = {
+    [number]:{
+        Prefab:Model;
+        IsHeadshot:boolean?;
+        Player:Player?
+    };
+}
 
 function Tag.new() : Tag
     local self = {
@@ -85,6 +93,25 @@ function DamageTag.Tag(victimModel: Model, dealerModel: Model, isHead: boolean?)
         Prefab=dealerModel;
         IsHeadshot=isHead;
     };
+end
+
+function DamageTag:Get(victimModel: Model, filter: string?) : TagList
+	local tag = DamageTag.Tagged[victimModel];
+    
+    if filter then
+        local list: TagList = {};
+
+        for a=1, #tag.List do
+            local listItem = tag.List[a];
+
+            if filter == "Player" and listItem.Player then
+                table.insert(list, listItem);
+            end
+        end
+
+        return list;
+    end
+    return table.clone(tag.List);
 end
 
 modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()

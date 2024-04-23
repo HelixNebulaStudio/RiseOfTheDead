@@ -17,10 +17,11 @@ local chunkStats = modVoxelSpace.new();
 chunkStats.StepSize = 64;
 
 --== When a zombie dies;
-return function(players, zombie)
+return function(zombie)
 	local deathPosition = zombie.DeathPosition;
 	local config = zombie.Configuration;
-	
+
+	players = players or {};
 	for _, player in pairs(players) do
 		local profile = modProfile:Get(player);
 		local activeSave = profile:GetActiveSave();

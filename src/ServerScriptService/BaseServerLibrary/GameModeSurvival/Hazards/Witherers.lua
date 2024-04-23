@@ -23,9 +23,9 @@ end
 
 function Hazard:Begin()
 	self.Counter = 0;
-	self.OnZombieDeathDisconnect = modOnGameEvents:ConnectEvent("OnZombieDeath", function(players, zombie)
-		local deathPosition = zombie.DeathPosition;
-		local config = zombie.Configuration;
+	self.OnZombieDeathDisconnect = modOnGameEvents:ConnectEvent("OnZombieDeath", function(npcModule)
+		local deathPosition = npcModule.DeathPosition;
+		local config = npcModule.Configuration;
 
 		self.Counter = self.Counter+1;
 
