@@ -84,6 +84,7 @@ function DialogueLibrary.GetByTag(name, tag)
 		end
 	end
 	
+	return;
 end
 
 function DialogueLibrary.GetDialogues(name)

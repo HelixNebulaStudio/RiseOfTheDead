@@ -6,6 +6,7 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
+local modDialogueLibrary = require(game.ReplicatedStorage.Library.DialogueLibrary);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");
@@ -19,18 +20,29 @@ return function(player, dialog, data)
 	local npcData = safehomeData:GetNpc(npcName);
 	Debugger:StudioWarn("npcData", npcData);
 	if npcData == nil then return end
-	
-	if modBranchConfigs.CurrentBranch.Name == "Dev" then
-		dialog:AddChoice("shelter_report", function(dialog)
-			Debugger:Log("npcData", npcData);
+
+	local npcLevel = npcData.Level or 0;
+	local npcHappiness = npcData.Happiness or 0;
+	npcData:CalculateHappiness();
+
+	if modBranchConfigs.CurrentBranch.Name == "Dev" or player.UserId == 16170943 then
+		local dialogueData = modDialogueLibrary.GetByTag(npcName, "shelter_report");
+		local reportMsg = dialogueData and dialogueData.Reply or "Here you go..";
+
+		reportMsg = reportMsg ..`\n\nLevel: {npcLevel}\tHappiness: {npcHappiness}`;
+
+		local reportDialog = {
+			Face="Skeptical";
+			Dialogue=(modBranchConfigs.CurrentBranch.Name == "Dev" and "[Dev Branch]" or "[Dev]").." Status report";
+			Reply=reportMsg;
+		};
+		dialog:AddDialog(reportDialog, function(dialog)
 			npcData:CalculateHappiness();
 			Debugger:WarnClient(player, npcData);
 		end);
 	end
 	
 	local npcLib = modNpcProfileLibrary:Find(npcName);
-	local npcLevel = npcData.Level or 0;
-	local npcHappiness = npcData.Happiness or 0;
 	local levelUpTimer = npcLevel * 60;
 	
 	if modBranchConfigs.CurrentBranch.Name == "Dev" then
