@@ -6,6 +6,7 @@ local localPlayer = game.Players.LocalPlayer;
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local StatusClass = require(script.Parent.StatusClass).new();
 --==
@@ -13,8 +14,12 @@ local StatusClass = require(script.Parent.StatusClass).new();
 if RunService:IsServer() then
 	local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
-	modOnGameEvents:ConnectEvent("OnNpcDeath", function(players, npcModule)
-		for _, player in pairs(players) do
+	modOnGameEvents:ConnectEvent("OnNpcDeath", function(npcModule)
+		local playerTags = modDamageTag:Get(npcModule.Prefab, "Player");
+		for a=1, #playerTags do
+			local playerTag = playerTags[a];
+			local player = playerTag.Player;
+
 			local classPlayer = shared.modPlayers.Get(player);
 			
 			if classPlayer.Properties.Mending == nil then continue end;

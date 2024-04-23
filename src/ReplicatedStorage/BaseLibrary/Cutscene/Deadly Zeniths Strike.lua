@@ -18,7 +18,7 @@ if RunService:IsServer() then
 	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	modFactions = require(game.ServerScriptService.ServerLibrary.Factions);
 
-	modOnGameEvents:ConnectEvent("OnNpcDeath", function(players, npcModule)
+	modOnGameEvents:ConnectEvent("OnNpcDeath", function(npcModule)
 		local coopMission = npcModule.CoopId and modCoopMission:Get(npcModule.CoopId.GroupId, npcModule.CoopId.MissionId) or nil;
 		if coopMission == nil then return end;
 		
@@ -119,7 +119,7 @@ return function(CutsceneSequence)
 						npc:SetAttribute("Soundtrack", "Soundtrack:StadiumOfDreams");
 						npc:SetAttribute("EntityHudHealth", true);
 						
-						npc.Name = "Zenith "..pickBossName;
+						npc.Name = "Zenith ".. tostring(pickBossName);
 						
 						npcModule.Configuration.CrateId = "zenithcrate";
 						

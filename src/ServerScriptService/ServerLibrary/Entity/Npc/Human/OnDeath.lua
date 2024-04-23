@@ -2,19 +2,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 --== Modules
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
-local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
-local modExperience = require(game.ServerScriptService.ServerLibrary.Experience);
-local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
 
 local Human = {};
 
 function Human.new(self)
-	return function(players)
+	return function()
 		self:KillNpc();
-		--self.Prefab:BreakJoints();
 		
 		if self.Logic then self.Logic.Cancelled = true; end
 		self.DeathPosition = self.RootPart.CFrame.p;
@@ -28,10 +22,7 @@ function Human.new(self)
 			modAudio.Play("HumanDeath", self.RootPart);
 		end
 		
-		if players and #players > 0 then
-			modOnGameEvents:Fire("OnNpcDeath", players, self);
-		end
-		
+		modOnGameEvents:Fire("OnNpcDeath", self);
 	end
 end
 
