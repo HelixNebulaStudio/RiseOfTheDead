@@ -173,6 +173,14 @@ Npc.Get = function(id) : modNpcComponent.NpcModule?
 	return;
 end
 
+--[[
+	Npc.ListEntities()
+	
+	@param name string  Prefab of npc.
+	@param func? (npcModule)-> boolean Match function, return true to match. `nil` defaults as if func returns true.
+
+	@returns {modNpcComponent.NpcModule} List of npcModules.
+]]
 function Npc.ListEntities(name: string, func: ((modNpcComponent.NpcModule)->boolean)?) : {modNpcComponent.NpcModule}
 	local list = {};
 
