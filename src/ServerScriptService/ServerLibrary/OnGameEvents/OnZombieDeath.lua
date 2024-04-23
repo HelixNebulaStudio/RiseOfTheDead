@@ -1,13 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
 local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modVoxelSpace = require(game.ReplicatedStorage.Library.VoxelSpace);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
-local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
@@ -17,12 +17,14 @@ local chunkStats = modVoxelSpace.new();
 chunkStats.StepSize = 64;
 
 --== When a zombie dies;
-return function(zombie)
-	local deathPosition = zombie.DeathPosition;
-	local config = zombie.Configuration;
+return function(zombieNpcModule)
+	local deathPosition = zombieNpcModule.DeathPosition;
+	local config = zombieNpcModule.Configuration;
 
-	players = players or {};
-	for _, player in pairs(players) do
+	local playerTags = modDamageTag:Get(zombieNpcModule.Prefab, "Player");
+	for _, playerTag in pairs(playerTags) do
+		local player = playerTag.Player;
+
 		local profile = modProfile:Get(player);
 		local activeSave = profile:GetActiveSave();
 		local inventory = activeSave.Inventory;
@@ -47,7 +49,7 @@ return function(zombie)
 				end;
 			end)
 		end
-		if not modMission:IsComplete(player, 19) and (zombie.Name == "Ticks Zombie" or zombie.Name == "Ticks") then
+		if not modMission:IsComplete(player, 19) and (zombieNpcModule.Name == "Ticks Zombie" or zombieNpcModule.Name == "Ticks") then
 			modMission:Progress(player, 19, function(mission)
 				if mission.ProgressionPoint == 1 then
 					mission.SaveData.Kills = mission.SaveData.Kills -1;
@@ -57,7 +59,7 @@ return function(zombie)
 				end;
 			end)
 		end
-		if not modMission:IsComplete(player, 20) and zombie.Name == "Zpider" then
+		if not modMission:IsComplete(player, 20) and zombieNpcModule.Name == "Zpider" then
 			modMission:Progress(player, 20, function(mission)
 				if mission.ProgressionPoint == 1 then
 					mission.SaveData.Kills = mission.SaveData.Kills -1;
@@ -69,8 +71,8 @@ return function(zombie)
 		end
 		if not modMission:IsComplete(player, 21) then
 			local bossName;
-			if zombie.Name == "The Prisoner" or zombie.Name == "Tanker" or zombie.Name == "Fumes" then
-				bossName = zombie.Name;
+			if zombieNpcModule.Name == "The Prisoner" or zombieNpcModule.Name == "Tanker" or zombieNpcModule.Name == "Fumes" then
+				bossName = zombieNpcModule.Name;
 			end
 			if bossName then
 				modMission:Progress(player, 21, function(mission)
@@ -89,7 +91,7 @@ return function(zombie)
 			end)
 		end
 		
-		if modMission:Progress(player, 24) and zombie.Name == "Bandit Zombie" then
+		if modMission:Progress(player, 24) and zombieNpcModule.Name == "Bandit Zombie" then
 			modMission:Progress(player, 24, function(mission)
 				if mission.ProgressionPoint == 5 then
 					mission.ProgressionPoint = 6;
@@ -97,7 +99,7 @@ return function(zombie)
 			end)
 		end
 		
-		if modMission:Progress(player, 23) and zombie.Configuration.MissionTag == 23 then
+		if modMission:Progress(player, 23) and zombieNpcModule.Configuration.MissionTag == 23 then
 			modMission:Progress(player, 23, function(mission)
 				if mission.ProgressionPoint == 1 then
 					mission.SaveData.Kills = mission.SaveData.Kills -1;
@@ -108,7 +110,7 @@ return function(zombie)
 			end)
 		end
 		
-		if modMission:Progress(player, 25) and zombie.Configuration.SantaHat then
+		if modMission:Progress(player, 25) and zombieNpcModule.Configuration.SantaHat then
 			modMission:Progress(player, 25, function(mission)
 				if mission.SaveData.Kills > 0 then
 					mission.SaveData.Kills = mission.SaveData.Kills -1;
@@ -128,11 +130,10 @@ return function(zombie)
 			end
 		end
 
-		if zombie and zombie.JackReapZombie and zombie.Owner then
+		if zombieNpcModule and zombieNpcModule.JackReapZombie and zombieNpcModule.Owner then
 			modMission:Progress(player, 43, function(mission)
 				if mission.ProgressionPoint == 5 then
-					modMission:CompleteMission(zombie.Owner, 43);
-					--modItemDrops.Spawn({Type="Tool"; ItemId="jacksscythe";}, CFrame.new(zombie.DeathPosition), zombie.Owner);
+					modMission:CompleteMission(zombieNpcModule.Owner, 43);
 				end
 			end)
 
@@ -147,30 +148,6 @@ return function(zombie)
 			end
 			
 			if classPlayer.Properties.Lifesteal then
-				--local humanoid = classPlayer.Humanoid;
-				
-				--local healAmount = classPlayer.Properties.Lifesteal.Amount;
-				--local newHealth = humanoid.Health + healAmount;
-				--if newHealth > classPlayer.Properties.BaseHealth then
-				--	local amount = newHealth - classPlayer.Properties.BaseHealth;
-
-				--	local skill = profile.SkillTree:GetSkill(player, "ovehea");
-				--	local level, stats = profile.SkillTree:CalStats(skill.Library, skill.Points);
-				--	classPlayer.Properties.OverHealLimit = stats.Amount.Default + stats.Amount.Value;
-
-				--	classPlayer.Properties.OverHeal = math.clamp(amount, 0, classPlayer.Properties.OverHealLimit);
-
-				--	local overhealDuration = 20;
-				--	classPlayer:SetProperties("ovehea", {
-				--		Expires=modSyncTime.GetTime()+overhealDuration;
-				--		Duration=overhealDuration;
-				--		Amount=classPlayer.Properties.OverHealLimit;
-				--	});
-
-				--	humanoid.MaxHealth = classPlayer.Properties.BaseHealth + classPlayer.Properties.OverHeal;
-				--end
-				--humanoid.Health = newHealth;
-
 				local healAmount = classPlayer.Properties.Lifesteal.Amount;
 				
 				classPlayer:TakeDamagePackage(modDamagable.NewDamageSource{

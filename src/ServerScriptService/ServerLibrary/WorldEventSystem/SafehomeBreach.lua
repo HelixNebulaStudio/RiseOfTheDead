@@ -213,14 +213,12 @@ function WorldEvent.Start()
 				modNpc.Spawn("Zombie", spawnPointAtt.WorldCFrame * CFrame.new(0, 1.3, 0), function(npc, npcModule)
 					npcModule.SafehomeBreach = true;
 					npcModule.Properties.TargetableDistance = 320;
-					npcModule.OnTarget(game.Players:GetPlayers());
+					npcModule.OnTarget(closestPlayer);
 					
 					table.insert(WorldEvent.Enemies, npcModule);
 					npcModule.Configuration.Level = math.max(lowestLevel, 1);
 
-					local isAlive = true;
 					npcModule.Humanoid.Died:Connect(function()
-						isAlive = false;
 						for a=#WorldEvent.Enemies, 1, -1 do
 							if WorldEvent.Enemies[a] == npcModule then
 								table.remove(WorldEvent.Enemies, a);
