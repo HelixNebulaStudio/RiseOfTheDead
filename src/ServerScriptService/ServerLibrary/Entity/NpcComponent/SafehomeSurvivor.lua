@@ -5,6 +5,8 @@ local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLi
 local Human = {};
 
 function Human.new(self)
+	if shared.modSafehomeService == nil then return end;
+	
 	repeat until shared.modProfile ~= nil;
 	
 	local player = self.Owner;

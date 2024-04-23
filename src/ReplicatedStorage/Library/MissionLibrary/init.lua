@@ -2773,6 +2773,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 77 - Belly of the Beast
 MissionLibrary.New{
 	MissionId=77;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -2783,7 +2784,7 @@ MissionLibrary.New{
 	--World={"TheHarbor"; "DoubleCross"; "Safehome"};
 	Checkpoint={
 		{Text="Get eaten by Elder Vexeron";};
-		{Text="Search for the missing blueprint pieces $PieceFound/2.";};
+		{Text="Search for the missing blueprint pieces $PieceFound/2";};
 		{Text="Exit Elder Vexeron at the end";};
 		{Text="Talk to the Mysterious Engineer about the last piece";};
 		{Text="Do the \"Sunken Salvages\" board mission when available";};
@@ -2806,7 +2807,38 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
---The Enigmatic Exchange
+-- MARK: 78 - The Killer Hues
+MissionLibrary.New{
+	MissionId=78;
+	MissionType = MissionLibrary.MissionTypes.Side;
+	Name="The Killer Hues";
+	From="Lydia";
+	Description="Lydia wants to shoot some zombies but she doesn't have a gun.";
+	Persistent=true;
+	Checkpoint={
+		{Text="Give Lydia a weapon that you don't need";};
+		{Text="Look out for zombies breaching your safehome";};
+		{Text="Kill $PlayerKills zombies while Lydia watches you kill them.";};
+		{Text="Let Lydia kill $LydiaKills zombies";};
+		{Text="Kill the rest of the zombies";};
+		{Text="Talk to Lydia";};
+	};
+	LogEntry={
+	};
+	StartRequirements={
+	};
+	SaveData={
+		PlayerKills=5;
+		LydiaKills=10;
+	};
+	GuideText="Talk to Lydia";
+	Rewards={
+		{Type="Perks"; Amount=PerksReward.Side};
+	};
+	Markers={};
+	UseAssets=true;
+};
+
 
 -- Timed mission
 --MissionLibrary.New{

@@ -159,7 +159,12 @@ function Human.new(Npc)
 				Actions.IsFollowingOwner = onUpdate();
 				task.wait(0.1);
 			until Npc.IsDead or Npc.Humanoid.RootPart == nil or not Actions.IsFollowingOwner;
-			Npc.Follow();
+			
+			if not Npc.Prefab:IsA("Actor") then
+				Npc.Follow();
+			else
+				Npc.Move:Stop();
+			end
 		end);
 	end
 	

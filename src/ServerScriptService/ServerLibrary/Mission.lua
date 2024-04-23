@@ -88,7 +88,7 @@ function Mission:Progress(player, missionId, func: ((mission: {[any]:any})->bool
 	local mission = missionProfile and missionProfile:Get(missionId) or nil;
 	
 	if mission and mission.Type == Mission.MissionType.Active then
-		if mission and func then
+		if func then
 			local progressionPoint = mission.ProgressionPoint;
 			
 			local objectivesCompleted = 0;

@@ -661,9 +661,9 @@ function ItemsLibrary:Init(super)
 	new(unlockableBase, {Id="balaclavasuits"; Icon="rbxassetid://15032728733"; Unlockable="Suits Balaclava";});
 
 	new(unlockableBase, {Id="tirearmorred"; Icon="rbxassetid://16791569263"; Unlockable="Red Tire Armor";});
-	new(unlockableBase, {Id="tirearmorgoldplating"; Icon="rbxassetid://16791569263"; Unlockable="Gold Plating Tire Armor";});
+	new(unlockableBase, {Id="tirearmorgoldplating"; Icon="rbxassetid://17255685451"; Unlockable="Gold Plating Tire Armor";});
 	
-	new(unlockableBase, {Id="mercskneepadscarbonfiberblack"; Icon="rbxassetid://17248627018"; Unlockable="Black Carbon Fiber Merc's Knee Pads";});
+	new(unlockableBase, {Id="mercskneepadscarbonfiberblack"; Icon="rbxassetid://17218761557"; Unlockable="Black Carbon Fiber Merc's Knee Pads";});
 
 	new(unlockableBase, {Id="divingsuitwhite"; Icon="rbxassetid://17219502385"; Unlockable="White Diving Suit";});
 

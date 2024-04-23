@@ -13,6 +13,18 @@ local missionId = 0;
 -- !outline: Rachel Dialogues
 Dialogues.Rachel.Dialogues = function()
 	return {
+		{Tag="medbre_init";
+			Face="Worried"; Reply="Stan saved my life, I was trapped and he heard me cried for help. I miss him so much..";};
+
+		{CheckMission=missionId; Tag="medbre_start"; Dialogue="Hey, it's okay. I have some news about Stan.";
+			Face="Worried"; Reply="News.. about Stan?";
+			FailResponses = {
+				{Reply="You're too new here, come back once you're more familiar with the place."};
+			};
+		};
+		{Tag="medbre_start2"; Dialogue="Yes, so apparently Stan is still alive.";
+			Face="Disbelief"; Reply="..."};
+
 	};
 end
 

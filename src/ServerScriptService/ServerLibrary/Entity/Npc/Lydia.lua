@@ -1,6 +1,5 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local random = Random.new();
-
+--==
 local HumanModule = script.Parent.Human;
 --== Modules
 local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
@@ -31,8 +30,6 @@ return function(npc, spawnPoint)
 	
 	--== Components;
 	self:AddComponent("AvatarFace");
-	self:AddComponent("Follow");
-	self:AddComponent("Movement");
 	self:AddComponent("Wield");
 	self:AddComponent("IsInVision");
 	self:AddComponent(HumanModule.OnHealthChanged);

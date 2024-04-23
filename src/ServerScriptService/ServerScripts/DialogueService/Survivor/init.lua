@@ -17,6 +17,7 @@ return function(player, dialog, data)
 	local safehomeData = profile.Safehome;
 	
 	local npcData = safehomeData:GetNpc(npcName);
+	Debugger:StudioWarn("npcData", npcData);
 	if npcData == nil then return end
 	
 	if modBranchConfigs.CurrentBranch.Name == "Dev" then
@@ -32,12 +33,17 @@ return function(player, dialog, data)
 	local npcHappiness = npcData.Happiness or 0;
 	local levelUpTimer = npcLevel * 60;
 	
-	if modBranchConfigs.CurrentBranch.Name == "Dev" then levelUpTimer = 6; end;
+	if modBranchConfigs.CurrentBranch.Name == "Dev" then
+		levelUpTimer = 6;
+		if npcLevel == 0 then
+			npcLevel = 1;
+		end
+	end;
 	
 	if npcData.LevelUpTime == nil then return end
 	local unlockTime = npcData.LevelUpTime + (levelUpTimer);
 	
-	--============================= Medic Class 
+	--== MARK: Medic Class 
 	if npcLib.Class == "Medic" then
 		if npcLevel == 1 then
 			dialog:SetInitiateTag("shelter_lvl1_init");
@@ -107,7 +113,7 @@ return function(player, dialog, data)
 			
 		end
 
-	--============================= RAT	
+	--== MARK: RAT	
 	elseif npcLib.Class == "RAT" then
 		
 		if npcLevel == 1 then
@@ -187,7 +193,7 @@ return function(player, dialog, data)
 			
 		end
 
-	--============================= Recycler
+	--== MARK: Recycler
 	elseif npcLib.Class == "Recycler" then
 
 		if npcLevel == 1 then
@@ -267,7 +273,7 @@ return function(player, dialog, data)
 			
 		end
 		
-	--============================= FortuneTeller	
+	--== MARK: FortuneTeller	
 	elseif npcLib.Class == "FortuneTeller" then
 		
 		if npcLevel == 1 then
@@ -344,6 +350,7 @@ return function(player, dialog, data)
 			dialog:AddChoice("shelter_lvl4_choice2", nil, {ChoiceUnlockTime=unlockTime});
 			
 		elseif npcLevel == 5 then
+			if #modMission:GetNpcMissions(player, npcName) > 0 then return end;
 			dialog:SetInitiateTag("shelter_fortunetell");
 			
 		end

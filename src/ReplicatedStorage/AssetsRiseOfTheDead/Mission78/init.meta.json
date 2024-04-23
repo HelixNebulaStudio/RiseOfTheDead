@@ -1,0 +1,8 @@
+{
+  "ignoreUnknownInstances": true,
+  "properties": {
+    "Attributes": {
+      "MissionName":{"String": "The Killer Hues"}
+    }
+  }
+}
