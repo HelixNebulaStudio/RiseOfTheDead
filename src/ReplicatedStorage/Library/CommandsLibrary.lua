@@ -1247,6 +1247,12 @@ Commands["spawnentity"] = {
 						
 						table.insert(printTable, "HardMode Set");
 					end
+
+					if config.Owner == true then
+						npcModule.Owner = player;
+						
+						table.insert(printTable, "Owner Set");
+					end
 					
 					if config.Anchored == true then
 						table.insert(printTable, "Anchored Set");
