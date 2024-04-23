@@ -218,7 +218,16 @@ function Npc.EntityScan(origin, radius, maxRootpart) : {[number]: modNpcComponen
 	return scannedTargets;
 end
 
-Npc.AttractEnemies = function(character, range, func)
+--[[
+	Npc.AttractEnemies()
+	
+	@param character <Model> Prefab of npc.
+	@param range Range of detection.
+	@param func? (npcModule)-> boolean Match function, return true to attract. Defaultly returns true.
+
+	@returns {[number]: Model | Actor} List of npc prefab models.
+]]
+Npc.AttractEnemies = function(character: Model, range: number, func: ((npcModule: modNpcComponent.NpcModule)-> boolean)? ): {[number]: Model | Actor}
 	local humanoid = character and character:FindFirstChildWhichIsA("Humanoid") or nil;
 	local primaryPart = character and character.PrimaryPart or nil;
 	local forcefield = character and character:FindFirstChildWhichIsA("ForceField") or nil;

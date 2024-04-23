@@ -3,11 +3,8 @@ local Mission = {};
 --== Variables;
 
 local hours32Sec = 86400 + 43200;
-local hours20Sec = 72000;
 
 local RunService = game:GetService("RunService");
-
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
@@ -19,23 +16,18 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
-local modMailObject = require(game.ServerScriptService.ServerLibrary.MailObject);
 local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 
-local missionLibrary = game.ReplicatedStorage.Library.MissionLibrary;
 local remotes = game.ReplicatedStorage.Remotes;
 
 local remoteMissionRemote = modRemotesManager:Get("MissionRemote");
 local remoteHudNotification = modRemotesManager:Get("HudNotification");
-local remotePlayerDataSync = modRemotesManager:Get("PlayerDataSync");
 
-local remoteMissionsSync = remotes.Interface.MissionsSync;
 local remoteMissionCheckFunction = remotes.Interface.MissionCheckFunction;
 local remotePinMission = remotes.Interface.PinMission;
 local bindPlayServerScene = remotes.Cutscene.PlayServerScene;
 
-local random = Random.new();
 --== Script;
 Mission.MissionProfiles = {};
 
@@ -90,7 +82,7 @@ function Mission:IsAvailable(player, missionId)
 	return mission and mission.Type == Mission.MissionType.Available or false;
 end
 
-function Mission:Progress(player, missionId, func)
+function Mission:Progress(player, missionId, func: ((mission: {[any]:any})->boolean)?)
 	if player == nil then return end;
 	local missionProfile = self.GetMissions(player.Name);
 	local mission = missionProfile and missionProfile:Get(missionId) or nil;
@@ -122,6 +114,8 @@ function Mission:Progress(player, missionId, func)
 		end
 		return mission;
 	end
+
+	return;
 end
 
 function Mission:SetData(player, missionId, key, value)
@@ -146,10 +140,8 @@ function Mission:Pin(player, missionId, value)
 end
 
 function Mission:CanCompleteMission(player, missionId, announce)
-	local missionProfile = self.GetMissions(player.Name);
 	local profile = shared.modProfile:Get(player);
 	local activeInventory = profile.ActiveInventory;
-	local mission = missionProfile and missionProfile:Get(missionId) or nil;
 	local library = modMissionLibrary.Get(missionId);
 	
 	if library.Rewards then
@@ -168,6 +160,7 @@ function Mission:CanCompleteMission(player, missionId, announce)
 			return false;
 		end
 	end
+
 	return true;
 end
 
@@ -212,19 +205,19 @@ function Mission:CompleteMission(players, missionId, sync)
 			
 			local pinnedNextActive = false;
 			for b=1, #missionProfile do
-				local mission = missionProfile[b];
-				if mission.Type == Mission.MissionType.Active then
+				local bMission = missionProfile[b];
+				if bMission.Type == Mission.MissionType.Active then
 					pinnedNextActive = true;
-					missionProfile:Pin(mission.Id, true, false);
+					missionProfile:Pin(bMission.Id, true, false);
 					break;
 				end
 			end
 			
 			if library.LinkNextMission then
-				local mission = missionProfile:Get(library.LinkNextMission);
-				if mission and mission.Type ~= Mission.MissionType.Completed then
+				local nextMission = missionProfile:Get(library.LinkNextMission);
+				if nextMission and nextMission.Type ~= Mission.MissionType.Completed then
 					pinnedNextActive = true;
-					missionProfile:Pin(mission.Id, true, false);
+					missionProfile:Pin(nextMission.Id, true, false);
 					break;
 				end
 			end
@@ -323,11 +316,11 @@ function Mission:CompleteMission(players, missionId, sync)
 			
 			if not pinnedNextActive then
 				for b=1, #missionProfile do
-					local mission = missionProfile[b];
-					if mission.Type == Mission.MissionType.Available then
-						local library = modMissionLibrary.Get(mission.Id);
-						if library.MissionType == modMissionLibrary.MissionTypes.Core then
-							missionProfile:Pin(mission.Id, true, false);
+					local bMission = missionProfile[b];
+					if bMission.Type == Mission.MissionType.Available then
+						local bMissionLib = modMissionLibrary.Get(bMission.Id);
+						if bMissionLib.MissionType == modMissionLibrary.MissionTypes.Core then
+							missionProfile:Pin(bMission.Id, true, false);
 							break;
 						end
 					end
@@ -346,6 +339,8 @@ function Mission:CompleteMission(players, missionId, sync)
 			end
 		end
 	end
+
+	return;
 end
 
 function Mission:StartMission(player, missionId, func, sync, force)
@@ -471,7 +466,6 @@ function remoteMissionRemote.OnServerInvoke(player, actionId, missionId)
 		
 	elseif actionId == "Abort" then
 		local missionProfile = Mission.GetMissions(player.Name);
-		local mission = missionProfile:Get(missionId);
 
 		missionProfile:Failed(missionId, Mission.FailCauses.Abort);
 		missionProfile:Pin(missionId, false);
@@ -491,8 +485,8 @@ function remoteMissionRemote.OnServerInvoke(player, actionId, missionId)
 		
 		local hasActive = false;
 		for a=1, #listOfRepeatable do
-			local mission = listOfRepeatable[a];
-			if mission.Type == 1 then -- Active
+			local repeatableMission = listOfRepeatable[a];
+			if repeatableMission.Type == 1 then -- Active
 				hasActive = true;
 				break;
 			end
@@ -507,10 +501,14 @@ function remoteMissionRemote.OnServerInvoke(player, actionId, missionId)
 		
 		return returnPacket;
 	end
+
+	return;
 end
 
 function Mission.NewList(profile, syncFunc)
-	local listMeta = {};
+	local listMeta = {
+		PinCooldown = nil;
+	};
 	listMeta.__index = listMeta;
 	
 	local player = profile.Player;
@@ -531,7 +529,7 @@ function Mission.NewList(profile, syncFunc)
 		if input.StartTime == nil then input.StartTime = os.time() end;
 		
 		local addTimeLapse = os.time()-input.AddTime;
-		local startTimeLapse = os.time()-input.StartTime;
+		local _startTimeLapse = os.time()-input.StartTime;
 		if library.ExpireTime and addTimeLapse >= library.ExpireTime then return end;
 		--if library.Timer and startTimeLapse >= library.Timer then return end;
 		
@@ -786,6 +784,8 @@ function Mission.NewList(profile, syncFunc)
 				return self[a], a;
 			end
 		end
+
+		return;
 	end
 	
 	function listMeta:Destroy(mission)
@@ -1037,11 +1037,11 @@ function Mission.NewList(profile, syncFunc)
 		end
 		
 		for a=1, #list do
-			local mission = list[a];
-			if mission.Redo then
-				mission.Type = Mission.MissionType.Completed;
-				mission.Pinned = nil;
-				mission.Redo = nil;
+			local listMission = list[a];
+			if listMission.Redo then
+				listMission.Type = Mission.MissionType.Completed;
+				listMission.Pinned = nil;
+				listMission.Redo = nil;
 			end
 		end
 		
@@ -1054,13 +1054,13 @@ function Mission.NewList(profile, syncFunc)
 		if library.Objectives then
 			for objId, obj in pairs(library.Objectives) do
 				if obj.ItemIdOptions then
-					mission.SaveData.ItemId = obj.ItemIdOptions[random:NextInteger(1, #obj.ItemIdOptions)];
+					mission.SaveData.ItemId = obj.ItemIdOptions[math.random(1, #obj.ItemIdOptions)];
 				end
 				if obj.Amount then
 					mission.SaveData.Amount = obj.Amount;
 				end
 				if obj.AmountRange then
-					mission.SaveData.Amount = random:NextInteger(obj.AmountRange.Min, obj.AmountRange.Max);
+					mission.SaveData.Amount = math.random(obj.AmountRange.Min, obj.AmountRange.Max);
 				end
 			end
 		end
@@ -1192,6 +1192,8 @@ function Mission.NewList(profile, syncFunc)
 			playerSave.Inventory.OnChanged:Connect(function()
 				if listMeta.Player == nil then return true end;
 				listMeta:UpdateObjectives();
+
+				return;
 			end);
 		end
 		listMeta:UpdateObjectives();
@@ -1226,8 +1228,6 @@ end)
 
 
 task.spawn(function()
-	local modCommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
-
 	Debugger.AwaitShared("modCommandsLibrary");
 	shared.modCommandsLibrary:HookChatCommand("printmissioncache", {
 		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;

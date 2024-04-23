@@ -12,15 +12,10 @@ local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler);
 
 local modDialogues = require(game.ServerScriptService.ServerLibrary.DialogueSave);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
-local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
-
-local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
---local remoteSelectDialogue = remotes.Dialogue.SelectDialogue;
 
 local bindOnTalkedTo = game.ReplicatedStorage.Remotes.Dialogue.OnTalkedTo;
 local remoteDialogueHandler = modRemotesManager:Get("DialogueHandler");
 
-local random = Random.new();
 local Logic = {};
 local MissionDialogueModules = {};
 
@@ -158,7 +153,7 @@ function OnDialogue(player, npcModel, npcName, choice)
 							
 							if missionAssets and missionAssets:FindFirstChild("MissionDialogues") then
 								local missionDialogues = require(missionAssets.MissionDialogues);
-								local missionDialogueFunc = missionDialogues[npcName] and missionDialogues[npcName].DialogueHandler;
+								missionDialogueFunc = missionDialogues[npcName] and missionDialogues[npcName].DialogueHandler;
 								
 								if missionDialogueFunc then
 									missionDialogueFunc(player, dialog, npcDialogData, missionData);
@@ -179,6 +174,7 @@ function OnDialogue(player, npcModel, npcName, choice)
 	if npcDialogData then
 		return npcDialogData.Invoke(choice);
 	end
+	return;
 end
 
 --remoteSelectDialogue.OnServerInvoke = OnDialogue;
@@ -229,6 +225,7 @@ function OnDialogueHandler(player, action, packet)
 		end)
 	end;
 	
+	return;
 end
 
 shared.OnDialogueHandler = OnDialogueHandler;

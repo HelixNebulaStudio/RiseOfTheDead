@@ -18,8 +18,6 @@ return function(self)
 		AggroSequence={"And"; "HasTarget"; "AttackSelect";};
 	}
 	
-	local cache = {};
-	
 	self.FollowOwner = true;
 	self.FollowGap = 16;
 	
@@ -220,6 +218,8 @@ return function(self)
 		if self.TargetNpcModule == nil or properties.Ammo <= 0 then
 			self.Wield.ReloadRequest();
 		end
+
+		return tree.Failure;
 	end)
 	
 	return tree;

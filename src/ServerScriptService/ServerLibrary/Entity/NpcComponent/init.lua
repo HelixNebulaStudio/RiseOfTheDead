@@ -8,7 +8,6 @@ local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler)
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 local modEntityStatus = require(game.ReplicatedStorage.Library.EntityStatus);
-local modPhysics = require(game.ReplicatedStorage.Library.Util.Physics);
 
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 
@@ -208,7 +207,6 @@ function NpcComponent:KillNpc()
 		end
 	end)
 
-	--game.Debris:AddItem(prefab, 1);
 end
 
 function NpcComponent:BreakJoint(motor: Motor6D)
@@ -294,7 +292,6 @@ function NpcComponent:Destroy()
 				self[key] = nil;
 			end
 		end
-
 	end)
 
 	self:KillNpc();
@@ -494,8 +491,6 @@ export type NpcModule = {
 
 	[any]: any;
 } & typeof(NpcComponent);
-
---& typeof(NpcComponent);
 
 return function(self) : NpcModule
 	self.Name = self.Prefab.Name;
