@@ -9,6 +9,7 @@ local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 local Projectile = require(script.Parent.Projectile);
 
 local flamePrefab = script.Flame;
@@ -158,12 +159,10 @@ function Pool.new(owner)
 	function projectile:ProjectileDamage(damagable, hitPart)
 		if self.Owner and hitPart:IsDescendantOf(self.Owner) then return end;
 		
-		local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
-		
 	 	task.spawn(function()
 			if self.Owner then
 				if damagable:CanDamage(self.Owner) then
-					modTagging.Tag(damagable.Model, self.Owner and self.Owner:IsA("Player") and self.Owner.Character);
+					modDamageTag.Tag(damagable.Model, self.Owner and self.Owner:IsA("Player") and self.Owner.Character);
 					self:OnEnemyHit(hitPart, damagable, self.Owner, self.StorageItem);
 				end
 			else

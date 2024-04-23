@@ -16,9 +16,9 @@ local modArcTracing = require(game.ReplicatedStorage.Library.ArcTracing);
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 local modWeaponMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
-local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 
 
 local TargetableEntities = modConfigurations.TargetableEntities;
@@ -111,7 +111,7 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 		if self.Player and damagable:CanDamage(self.Player) == false then return end;
 		if self.NpcModule and damagable:CanDamage(self.NpcModule) == false then return end;
 		
-		modTagging.Tag(model, self.Character, (hitPart.Name == "Head" or hitPart:GetAttribute("IsHead") == true) and true or nil);
+		modDamageTag.Tag(model, self.Character, (hitPart.Name == "Head" or hitPart:GetAttribute("IsHead") == true) and true or nil);
 		
 		local newDmgSrc = modDamagable.NewDamageSource{
 			Damage=damage;

@@ -9,6 +9,7 @@ local Projectile = require(script.Parent.Projectile);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local projectilePrefab = script.Arrow;
 --== Script;
@@ -32,8 +33,6 @@ function Pool.new(owner)
 	local hitOnce = {};
 	local index = 1;
 	function projectile:ProjectileDamage(hitObj)
-		local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
-
 		local shotCache = {
 			HitPart = hitObj;
 			FocusCharge = (self.Charge or 0);
@@ -83,7 +82,7 @@ function Pool.new(owner)
 						self.DamageSource.DamageType = shotCache.CritOccured or self.DamageSource.DamageType;
 
 						modWeaponsMechanics.ProcessModHooks(self.DamageSource);
-						modTagging.Tag(model, self.Owner.Character);
+						modDamageTag.Tag(model, self.Owner.Character);
 
 						damagable:TakeDamagePackage(self.DamageSource);
 					end

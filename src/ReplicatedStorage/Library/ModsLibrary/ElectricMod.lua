@@ -8,6 +8,7 @@ local CollectionService = game:GetService("CollectionService");
 local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local remoteGenerateArcParticles = modRemotesManager:Get("GenerateArcParticles");
 
@@ -85,8 +86,6 @@ function Mod.Activate(packet)
 end
 
 if RunService:IsServer() then
-	local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
-	
 	local statusKey = script.Name;
 	function Mod.ActivateMod(damageSource)
 		local player = damageSource.Dealer;
@@ -116,7 +115,7 @@ if RunService:IsServer() then
 						
 						if targetsHit < propertiesOfMod.Targets then
 							task.delay(0.1, function()
-								modTagging.Tag(strikeModel, player.Character, strikePart.Name == "Head" and true or nil);
+								modDamageTag.Tag(strikeModel, player.Character, strikePart.Name == "Head" and true or nil);
 
 								local weaponDamage = toolModule.Configurations.PreModDamage;
 								local dmgRatio = math.clamp(propertiesOfMod.DamagePercent - 0.02*targetsHit, 0.05, 1);

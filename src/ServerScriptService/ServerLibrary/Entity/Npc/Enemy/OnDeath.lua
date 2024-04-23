@@ -1,44 +1,26 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--=
 local random = Random.new();
 
 --== Modules
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
+
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 local modExperience = require(game.ServerScriptService.ServerLibrary.Experience);
-local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
-local random = Random.new();
 
 local Enemy = {};
 
 function Enemy.new(self)
-	return function(players)
+	return function()
 		self:KillNpc();
-		--self.Prefab:BreakJoints();
-		--task.delay(2, function() self.Prefab:Destroy(); end)
-		
-		if players == nil then
-			local tagsList = modTagging.Tagged[self.Prefab];
-			if tagsList then
-				for a=#tagsList, 1, -1 do
-					local tagData = tagsList[a];
-					if tagData ~= nil and tagData.Tagger and tagData.Tagger.Parent ~= nil then
-						players = game.Players:GetPlayerFromCharacter(tagData.Tagger);
-						if players then break; end
-					end
-				end
-			end
-		end
-		
+
 		if self.Logic then self.Logic.Cancelled = true; end
 		self.DeathPosition = self.RootPart.CFrame.p;
 		self.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None;
 		if self.StopAllAnimations then self.StopAllAnimations(); end;
-		
-		players = type(players) == "table" and players or {players};
 		
 		if self.Configuration.Audio and self.Configuration.Audio.Death and self.Configuration.Audio.Death ~= false then
 			modAudio.Play(self.Configuration.Audio.Death, self.RootPart).PlaybackSpeed = random:NextNumber(1, 1.2);
@@ -47,15 +29,18 @@ function Enemy.new(self)
 			modAudio.Play("HumanDeath", self.RootPart);
 		end
 		
-		if self.DropReward and #players > 0 then
+		local playerTags = modDamageTag:Get(self.Prefab, "Player");
+
+		if self.DropReward and #playerTags > 0 then
 			self:DropReward(CFrame.new(self.DeathPosition) * CFrame.Angles(math.rad(random:NextNumber(0, 360)), math.rad(random:NextNumber(0, 360)), math.rad(random:NextNumber(0, 360))));
 		end
 		
-		if #players > 0 then
-			modOnGameEvents:Fire("OnNpcDeath", players, self);
-		end
-		for a=1, #players do
-			local player = players[a];
+		modOnGameEvents:Fire("OnNpcDeath", self);
+		
+		for a=1, #playerTags do
+			local playerTag = playerTags[a];
+			local player = playerTag.Player;
+
 			local playerSave = modProfile:Get(player):GetActiveSave();
 			if playerSave and playerSave.AddStat then
 				playerSave:AddStat("Kills", 1);
@@ -88,7 +73,6 @@ function Enemy.new(self)
 			local maxHealth = self.Humanoid.MaxHealth;
 			if self.Weapons and self.Weapons[player.Name] then
 				local weaponsPool = self.Weapons[player.Name];
-				local playerSave = modProfile:Get(player):GetActiveSave();
 				
 				for id, weaponData in pairs(weaponsPool) do
 					local damageRatio = math.clamp(weaponData.Damaged/maxHealth, 0, 1);
@@ -100,7 +84,6 @@ function Enemy.new(self)
 						storageItem:Sync({"L"; "E"; "EG"});
 					end
 					
-					--Debugger:Log(weaponData.Weapon.ItemId.." dealt "..math.floor(damageRatio*100).."% of the HP. +"..experienceGain.." experience out of "..self.Configuration.ExperiencePool..".");
 				end
 			end
 		end

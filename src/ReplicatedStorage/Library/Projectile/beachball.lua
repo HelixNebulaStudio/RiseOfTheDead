@@ -7,6 +7,7 @@ local CollectionService = game:GetService("CollectionService");
 
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 local Projectile = require(script.Parent.Projectile);
 
 local modProjectileRicochet = require(game.ReplicatedStorage.Library.Projectile.Mechanics.Ricochet);
@@ -43,8 +44,6 @@ function Pool.new(owner)
 	
 	local hitTracker = {};
 	function projectile:ProjectileDamage(hitObjects)
-		local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
-		
 		hitObjects = type(hitObjects) == "table" and hitObjects or {hitObjects};
 		for _, hitObj in pairs(hitObjects) do
 			local targetModel = hitObj.Parent;
@@ -63,7 +62,7 @@ function Pool.new(owner)
 						--== Duel
 					end
 					
-					modTagging.Tag(targetModel, self.Owner.Character);
+					modDamageTag.Tag(targetModel, self.Owner.Character);
 					humanoid = (targetModel:FindFirstChild("NpcStatus") and require(targetModel.NpcStatus)) or humanoid;
 					
 					if humanoid.ClassName == "NpcStatus" and not humanoid:CanTakeDamageFrom(self.Owner) then

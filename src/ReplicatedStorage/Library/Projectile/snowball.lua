@@ -9,6 +9,7 @@ local Projectile = require(script.Parent.Projectile);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local projectilePrefab = script.Snowball;
 local random = Random.new();
@@ -48,8 +49,6 @@ function Pool.new(owner)
 	
 	function projectile:OnContact(arcPoint)
 		if RunService:IsClient() then return end;
-		
-		local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 		
 		local hitPart = arcPoint.Hit;
 		local hitPosition = arcPoint.Point;
@@ -91,7 +90,7 @@ function Pool.new(owner)
 					local npcModule = npcStatus:GetModule();
 					local humanoid = npcStatus.NpcModule.Humanoid;
 
-					modTagging.Tag(npcModule.Prefab, self.Owner.Character);
+					modDamageTag.Tag(npcModule.Prefab, self.Owner.Character);
 					
 					if npcModule.Name == "Winter Treelum" then
 						local damage = math.clamp(humanoid.Health * 0.01, 45, Projectile.MaxDamage);

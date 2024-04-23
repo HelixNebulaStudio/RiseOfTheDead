@@ -8,6 +8,7 @@ local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 local Projectile = require(script.Parent.Projectile);
 
 local projectilePrefab = script.spear;
@@ -43,7 +44,6 @@ function Pool.new(owner)
 	local activated = false;
 	function projectile:ProjectileDamage(hitObj)
 		if activated then return end;
-		local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 
 		local damagable = modDamagable.NewDamagable(hitObj.Parent);
 		if damagable == nil then return end;
@@ -78,7 +78,7 @@ function Pool.new(owner)
 			}
 
 			if damagable:CanDamage(self.Owner) then
-				modTagging.Tag(model, self.Owner.Character);
+				modDamageTag.Tag(model, self.Owner.Character);
 				damagable:TakeDamagePackage(newDmgSrc);
 			end
 		end
@@ -99,7 +99,7 @@ function Pool.new(owner)
 				local targetModel = arcPoint.Hit.Parent;
 				local humanoid = targetModel and targetModel:FindFirstChildWhichIsA("Humanoid");
 				if humanoid then
-					modAudio.Play(random:NextInteger(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", self.Prefab).MaxDistance = 1024;
+					modAudio.Play(random:NextInteger(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", self.Prefab).RollOffMaxDistance = 1024;
 				end
 
 			end

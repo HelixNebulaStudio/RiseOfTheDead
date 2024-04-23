@@ -1,24 +1,17 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local random = Random.new();
 --==
 local Handler = {};
 Handler.__index = Handler;
 
 local RunService = game:GetService("RunService");
-local CollectionService = game:GetService("CollectionService");
 
 local modTools = require(game.ReplicatedStorage.Library.Tools);
-local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
-local modAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
-local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 
 local prefabsItems = game.ReplicatedStorage.Prefabs.Items;
 local toolHandlers = game.ServerScriptService.ServerLibrary.ToolHandlers;
 
-local dirRemotes = game.ReplicatedStorage.Remotes;
 --== Script;
 
 function Handler.new(npc, wield, toolItemId)
@@ -183,16 +176,6 @@ function Handler:Equip()
 			local damagable = modDamagable.NewDamagable(hitPart.Parent);
 			
 			if damagable then
-				--local model = damagable.Model;
-				
-				--local exist = self.Wield.VictimsList[model] ~= nil;
-				--self.Wield.VictimsList[model] = {Character=model; Damagable=damagable; HitPart=hitPart; HitTick=tick()};
-				
-				--if not exist and properties.Attacking then
-				--	self.Wield.ToolHandler:PrimaryAttack(damagable, hitPart);
-				--	modAudio.Play(audio.PrimaryHit.Id, self.Wield.Instances.RightModel.PrimaryPart, nil, audio.PrimaryHit.Pitch, audio.PrimaryHit.Volume);
-				--end
-
 				local model = damagable.Model;
 				local victim = self.Wield.VictimsList[model];
 

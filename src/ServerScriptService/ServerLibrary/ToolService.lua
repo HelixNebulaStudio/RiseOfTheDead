@@ -13,8 +13,7 @@ local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
-
-local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local remotePrimaryFire = modRemotesManager:Get("PrimaryFire");
 --==
@@ -131,7 +130,8 @@ function ToolService.PrimaryFireWeapon(firePacket)
 			multishot = ammoCost;
 		end
 		
-		shotPacket.ShotOrigin = toolHandle.BulletOrigin;
+		shotPacket.ShotOrigin = toolHandle:FindFirstChild("BulletOrigin");
+		assert(shotPacket.ShotOrigin, `Missing bullet origin: {toolHandle:GetFullName()}`);
 
 		if configurations.BulletMode == modAttributes.BulletModes.Hitscan then
 			shotPacket.TargetPoints = {};
@@ -297,6 +297,8 @@ function ToolService.ProcessWeaponShot(shotPacket)
 	
 	local storageItem = shotPacket.StorageItem;
 	local toolModel: Model = shotPacket.ToolModel;
+	assert(toolModel.PrimaryPart, `Missing tool primary part for:{toolModel:GetFullName()}`);
+
 	local toolHandle: BasePart = toolModel.PrimaryPart;
 	
 	local storageItemID = storageItem.ID;
@@ -351,6 +353,8 @@ function ToolService.ProcessWeaponShot(shotPacket)
 		Ammo = ammo;
 		CritProcs = 0;
 		FocusCharge = shotPacket.FocusCharge or 0;
+
+		CritOccured = nil;
 	};
 
 	local newDamageSource = modDamagable.NewDamageSource{
@@ -397,7 +401,7 @@ function ToolService.ProcessWeaponShot(shotPacket)
 			if damagable == nil or not damagable:CanDamage(shotPacket.Player) then continue end;
 			
 			if shotPacket.Player then
-				modTagging.Tag(targetModel, shotPacket.Player.Character, (targetObject.Name == "Head" or targetObject:GetAttribute("IsHead") == true) and true or nil);
+				modDamageTag.Tag(targetModel, shotPacket.Player.Character, (targetObject.Name == "Head" or targetObject:GetAttribute("IsHead") == true) and true or nil);
 			end
 
 			local preModDamage = configurations.PreModDamage;

@@ -177,8 +177,7 @@ function Pool.new(owner)
 		if activated then return end;
 		
 		local hitObj = arcPoint.Hit;
-		local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
-		
+
 		local damagable = modDamagable.NewDamagable(hitObj.Parent);
 		if damagable then
 			local model = damagable.Model;

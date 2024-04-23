@@ -4,9 +4,9 @@ local CollectionService = game:GetService("CollectionService");
 
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 local modTouchHandler = require(game.ReplicatedStorage.Library.TouchHandler);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 
 local fireTouchHandler = modTouchHandler.new("FireObjects", 1);
@@ -64,6 +64,7 @@ function Flammable:FireDamage(target, basePart, hitPart)
 	if fireOwner and player == fireOwner then
 
 	elseif damagable:CanDamage(fireOwner) then
+		modDamageTag.Tag(targetModel, fireOwner and fireOwner.Character);
 
 		local damage = 1;
 		
@@ -95,42 +96,6 @@ function Flammable:FireDamage(target, basePart, hitPart)
 			DamageType="FireDamage";
 		});
 	end
-	
-	
-	--local humanoid = targetModel and targetModel:FindFirstChildWhichIsA("Humanoid");
-	--local dmgMulti = humanoid and modConfigurations.TargetableEntities[humanoid.Name];
-	--local player = targetModel and game.Players:GetPlayerFromCharacter(targetModel);
-
-	--if fireOwner and targetModel then
-	--	--== Duel
-	--	local duelDmgMulti = bindIsInDuel:Invoke(fireOwner, humanoid.Parent.Name);
-	--	if duelDmgMulti then dmgMulti = duelDmgMulti end;
-	--	--== Duel
-	--end
-
-	--if humanoid and dmgMulti then
-	--	if fireOwner then modTagging.Tag(targetModel, fireOwner.Character); end;
-	--	humanoid = (targetModel:FindFirstChild("NpcStatus") and require(targetModel.NpcStatus)) or humanoid;
-		
-
-		
-	--	if fireOwner and humanoid.ClassName == "NpcStatus" and not humanoid:CanTakeDamageFrom(fireOwner) then
-	--		return;
-	--	end
-		
-	--	local npcModule = humanoid.ClassName == "NpcStatus" and humanoid:GetModule() or nil;
-		
-	--	local damage = math.clamp(humanoid.MaxHealth*0.01, 35, 20000);
-	--	damage = damage*dmgMulti;
-		
-	--	if npcModule and npcModule.Infector == true then
-	--		damage = humanoid.MaxHealth*0.05;
-	--	end
-
-	--	humanoid:TakeDamage(damage, fireOwner, self.StorageItem, part);
-		
-	--	if player then modStatusEffects.Burn(player, 35, 5); end;
-	--end
 end
 
 function fireTouchHandler:OnPlayerTouch(player, basePart, part)

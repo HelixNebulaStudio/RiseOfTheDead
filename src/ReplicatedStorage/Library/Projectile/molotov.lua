@@ -12,6 +12,7 @@ local modTouchHandler = require(game.ReplicatedStorage.Library.TouchHandler);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modAoeHighlight = require(game.ReplicatedStorage.Particles.AoeHighlight);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 local Projectile = require(script.Parent.Projectile);
 
 local projectilePrefab = script.molotov;
@@ -49,8 +50,6 @@ function Pool.new(owner)
 	end	
 	
 	function projectile:ProjectileDamage(hitPart)
-		local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
-
 		local targetModel = hitPart.Parent;
 		
 		local damagable = modDamagable.NewDamagable(targetModel);
@@ -60,6 +59,7 @@ function Pool.new(owner)
 			if self.Owner and player == self.Owner then
 				
 			elseif damagable:CanDamage(self.Owner) then
+				modDamageTag.Tag(targetModel, self.Owner and self.Owner.Character);
 				local damage = self.Configurations.Damage or 1;
 				
 				if damagable.Object.ClassName == "NpcStatus" then
@@ -85,46 +85,6 @@ function Pool.new(owner)
 				damagable:TakeDamagePackage(newDmgSrc);
 			end
 		end
-		--local humanoid = targetModel and targetModel:FindFirstChildWhichIsA("Humanoid");
-		--local dmgMulti = humanoid and self.TargetableEntities[humanoid.Name];
-		--local player = targetModel and game.Players:GetPlayerFromCharacter(targetModel);
-		
-		--if self.Owner and targetModel then
-		--	--== Duel
-		--	local duelDmgMulti = bindIsInDuel:Invoke(self.Owner, humanoid.Parent.Name);
-		--	if duelDmgMulti then dmgMulti = duelDmgMulti end;
-		--	--== Duel
-		--end
-		
-		--if humanoid and dmgMulti then
-		--	if self.Owner then modTagging.Tag(targetModel, self.Owner.Character); end;
-		--	humanoid = (targetModel:FindFirstChild("NpcStatus") and require(targetModel.NpcStatus)) or humanoid;
-			
-		--	if self.Owner and humanoid.ClassName == "NpcStatus" and not humanoid:CanTakeDamageFrom(self.Owner) then
-		--		return;
-		--	end
-			
-		--	local canDamage = false;
-		--	if self.NetworkOwners and player then
-		--		for a=1, #self.NetworkOwners do
-		--			if self.NetworkOwners[a] == player then
-		--				canDamage = true;
-		--				break;
-		--			end
-		--		end
-		--	else
-		--		canDamage = true;
-		--	end
-			
-		--	if canDamage then
-		--		local damage = self.Configurations.Damage or 1;
-		--		local damage = math.clamp(humanoid.MaxHealth*0.05, 35, 5000);
-		--		damage = damage*dmgMulti;
-				
-		--		humanoid:TakeDamage(damage, self.Owner, self.StorageItem, hitPart);
-		--		if player then modStatusEffects.Burn(player, 35, 5); end;
-		--	end
-		--end
 	end
 	
 	local tweenInfo = TweenInfo.new(5);

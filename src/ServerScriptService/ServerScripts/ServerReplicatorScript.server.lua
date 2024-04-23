@@ -35,11 +35,11 @@ local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
 local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local toolHandlers = game.ServerScriptService.ServerLibrary.ToolHandlers;
 
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
-local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
@@ -391,7 +391,7 @@ bindPrimaryFire.Event:Connect(function(character, weaponModule, shotdata, target
 							damage = damage * targetDamageMultiplier
 							
 							if damagable:CanDamage(character) then
-								modTagging.Tag(targetModel, character, (targetObject.Name == "Head" or targetObject:GetAttribute("IsHead") == true) and true or nil);
+								modDamageTag.Tag(targetModel, character, (targetObject.Name == "Head" or targetObject:GetAttribute("IsHead") == true) and true or nil);
 
 								task.spawn(function()
 									newDamageSource.Damage = damage;
@@ -680,7 +680,7 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 						return;
 					end
 					
-					modTagging.Tag(targetModel, client.Character, (targetObject.Name == "Head" or targetObject:GetAttribute("IsHead") == true) and true or nil);
+					modDamageTag.Tag(targetModel, client.Character, (targetObject.Name == "Head" or targetObject:GetAttribute("IsHead") == true) and true or nil);
 					
 					damage = damage * targetDamageMultiplier;
 					

@@ -10,11 +10,11 @@ local CollectionService = game:GetService("CollectionService");
 local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
 local modAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
-local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local prefabsItems = game.ReplicatedStorage.Prefabs.Items;
 
@@ -671,7 +671,7 @@ function Handler:ReplicateFire(shotData)
 						end
 						
 						if humanoid and dmgMulti then
-							modTagging.Tag(targetModel, self.Npc.Prefab, targetObject.Name == "Head" and true or nil);
+							modDamageTag.Tag(targetModel, self.Npc.Prefab, targetObject.Name == "Head" and true or nil);
 							damage = damage*dmgMulti;
 							
 							if self.Wield.OnWieldHit then

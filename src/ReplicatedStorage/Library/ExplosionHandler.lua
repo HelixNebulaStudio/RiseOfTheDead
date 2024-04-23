@@ -7,6 +7,7 @@ local CollectionService = game:GetService("CollectionService");
 
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 ExplosionHandler.Debug = false;
 
@@ -144,8 +145,7 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 					end
 					
 				elseif damagable:CanDamage(params.Owner) then --If hit can be damaged by owner
-					local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
-					modTagging.Tag(targetModel, params.Owner and params.Owner.Character);
+					modDamageTag.Tag(targetModel, params.Owner and params.Owner.Character);
 
 					damage = ((params.Damage or 1)/#fireFuncs);
 

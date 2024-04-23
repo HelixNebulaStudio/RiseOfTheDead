@@ -7,7 +7,6 @@ local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 local modExperience = require(game.ServerScriptService.ServerLibrary.Experience);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
 
 local Human = {};

@@ -8,6 +8,7 @@ local Projectile = require(script.Parent.Projectile);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modExplosionHandler = require(game.ReplicatedStorage.Library.ExplosionHandler);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 local random = Random.new();
 
 local remotes = game.ReplicatedStorage.Remotes;
@@ -42,8 +43,6 @@ function Pool.new()
 	end
 	
 	function projectile:ProjectileDamage(hitObjects, epicenter)
-		local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
-		
 		local enemyUnits = 0;
 		local fs = {};
 		
@@ -64,7 +63,7 @@ function Pool.new()
 						end
 						
 					elseif damagable:CanDamage(self.Owner) then
-						modTagging.Tag(targetModel, self.Owner and self.Owner.Character);
+						modDamageTag.Tag(targetModel, self.Owner and self.Owner.Character);
 						
 						local healthInfo = damagable:GetHealthInfo();
 						damage = healthInfo.MaxHealth*0.1;

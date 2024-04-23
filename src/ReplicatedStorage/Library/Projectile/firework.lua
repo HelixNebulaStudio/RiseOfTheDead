@@ -8,6 +8,7 @@ local CollectionService = game:GetService("CollectionService");
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 local Projectile = require(script.Parent.Projectile);
 
 local projectilePrefab = script.rocket;
@@ -44,8 +45,6 @@ function Pool.new(owner)
 	end	
 	
 	function projectile:ProjectileDamage(hitObjects)
-		local modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
-		
 		hitObjects = type(hitObjects) == "table" and hitObjects or {hitObjects};
 		for _, hitObj in pairs(hitObjects) do
 			local damagable = modDamagable.NewDamagable(hitObj.Parent);
@@ -67,7 +66,7 @@ function Pool.new(owner)
 				
 				if damage ~= 0 then
 					if damagable:CanDamage(self.Owner) then
-						modTagging.Tag(model, self.Owner.Character);
+						modDamageTag.Tag(model, self.Owner.Character);
 						
 						local newDmgSrc = modDamagable.NewDamageSource{
 							Damage=damage;

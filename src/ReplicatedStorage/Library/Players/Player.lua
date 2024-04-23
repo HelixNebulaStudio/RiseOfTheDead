@@ -23,6 +23,7 @@ local modCustomizeAppearance = require(game.ReplicatedStorage.Library.CustomizeA
 local modMapLibrary = require(game.ReplicatedStorage.Library.MapLibrary);
 local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local remotePlayerProperties = modRemotesManager:Get("PlayerProperties");
 local remoteDamagePacket = modRemotesManager:Get("DamagePacket");
@@ -39,7 +40,6 @@ if RunService:IsClient() then
 	
 else
 	modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-	modTagging = require(game.ServerScriptService.ServerLibrary.Tagging);
 end
 
 function Player.new(playerInstance: Player)
@@ -314,11 +314,11 @@ function Player.new(playerInstance: Player)
 					if typeof(dealer) == "table" then
 
 					elseif dealer:IsA("Player") then
-						modTagging.Tag(classPlayer.Character, dealer.Character, hitPart and hitPart.Name == "Head");
+						modDamageTag.Tag(classPlayer.Character, dealer.Character, hitPart and hitPart.Name == "Head");
 
 					elseif dealer:IsA("Model") then
 						local enemyPrefab = dealer;
-						modTagging.Tag(classPlayer.Character, enemyPrefab, hitPart and hitPart.Name == "Head");
+						modDamageTag.Tag(classPlayer.Character, enemyPrefab, hitPart and hitPart.Name == "Head");
 
 					end
 				end
