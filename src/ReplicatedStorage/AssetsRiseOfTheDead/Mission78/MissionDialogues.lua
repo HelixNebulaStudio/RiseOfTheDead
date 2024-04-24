@@ -171,7 +171,7 @@ if RunService:IsServer() then
 					tradingSession:Sync("tradesession", true);
 				end);
 				
-			elseif mission.ProgressionPoint == 5 then
+			elseif mission.ProgressionPoint == 6 then
 				dialog:SetInitiateTag("killhue_finInit");
 				dialog:AddChoice("killhue_fin1", function(dialog)
 					dialog:AddChoice("killhue_fin2", function(dialog)

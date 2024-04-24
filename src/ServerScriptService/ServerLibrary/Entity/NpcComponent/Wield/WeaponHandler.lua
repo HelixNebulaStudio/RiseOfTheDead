@@ -80,6 +80,7 @@ function Handler:Equip()
 			local cloneTool = prefabTool:Clone();
 			local handle = cloneTool:WaitForChild("Handle");
 			cloneTool.Parent = self.Npc.Prefab;
+			cloneTool:SetAttribute("ItemId", self.ItemId);
 			cloneTool:SetAttribute("InteractableParent", true);
 			
 			handle:SetNetworkOwner(nil);

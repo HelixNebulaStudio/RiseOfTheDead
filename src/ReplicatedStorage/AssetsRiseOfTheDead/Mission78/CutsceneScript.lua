@@ -31,7 +31,7 @@ if RunService:IsServer() then
 		"I am the best survivor!";
 	};
 
-	if modBranchConfigs.IsWorld("Safehome") then
+	if modBranchConfigs.IsWorld("Safehome") or modBranchConfigs.IsWorld("BioXResearch") then
 		modOnGameEvents:ConnectEvent("OnZombieDeath", function(npcModule)
 			local killerTags = modDamageTag:Get(npcModule.Prefab);
 	
@@ -53,18 +53,19 @@ if RunService:IsServer() then
 							
 							if mission.SaveData.PlayerKills <= 0 then
 								mission.ProgressionPoint = 4;
+								lydiaNpcModule.Chat(lydiaNpcModule.Owner, "Okay, let me give this a try..");
 							end
 						end
 					end)
 	
 				else
 					local lydiaNpcModule = modNpc.GetNpcModule(tag.Prefab);
-					if lydiaNpcModule.Name ~= "Lydia" then continue end;
+					if lydiaNpcModule == nil or lydiaNpcModule.Name ~= "Lydia" then continue end;
 		
 					for _, player in pairs(game.Players:GetPlayers()) do
 						modMission:Progress(player, missionId, function(mission)
 							if mission.ProgressionPoint == 4 then
-								if mission.SaveData.LydiaKills > 0 then
+								if lydiaNpcModule and mission.SaveData.LydiaKills > 0 then
 									lydiaNpcModule.Chat(lydiaNpcModule.Owner, killDialogues[math.random(1, #killDialogues)]);
 								end
 								mission.SaveData.LydiaKills = math.max(mission.SaveData.LydiaKills -1, 0);
@@ -88,7 +89,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("Safehome") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigs.IsWorld("Safehome") and not modBranchConfigs.IsWorld("BioXResearch") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
@@ -122,12 +123,8 @@ return function(CutsceneSequence)
 
 					modMission:Progress(player, missionId, function(mission)
 						if mission.ProgressionPoint == 2 then
-							if mission.SaveData.LydiaKills == nil then
-								mission.SaveData.LydiaKills = 10;
-							end
-							if mission.SaveData.PlayerKills == nil then
-								mission.SaveData.PlayerKills = 5;
-							end
+							mission.SaveData.LydiaKills = 10;
+							mission.SaveData.PlayerKills = 5;
 							mission.ProgressionPoint = 3;
 						end
 					end)
@@ -166,6 +163,7 @@ return function(CutsceneSequence)
 					pcall(function()
 						local dmg = math.clamp(100/(lydiaModule.Wield.ToolModule.Properties.Rpm/60), 5, 30);
 						lydiaModule.Wield.ToolModule.Configurations.MinBaseDamage = dmg;
+						lydiaModule.Wield.SetSkin(lydiaWeapon.Values);
 					end)
 
 					lydiaModule.Chat(lydiaModule.Owner, "Wow, it's quite heavy..");
@@ -213,9 +211,9 @@ return function(CutsceneSequence)
 						end
 
 						modMission:Progress(player, missionId, function(mission)
-							if mission.ProgressionPoint == 4 then
+							if mission.ProgressionPoint == 5 then
 								lydiaModule.Chat(lydiaModule.Owner, "Wow, that was fun!");
-								mission.ProgressionPoint = 5;
+								mission.ProgressionPoint = 6;
 							end
 						end)
 					end)

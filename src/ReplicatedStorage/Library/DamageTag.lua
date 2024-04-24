@@ -51,8 +51,12 @@ function Tag:Add(param)
     end
 
 	local player: Player = game.Players:GetPlayerFromCharacter(param.Prefab);
+    param.Player = player;
    
     if existIndex then
+        for k, v in pairs(param) do
+            self.List[existIndex][k] = v;
+        end
         self.List[existIndex], self.List[#self.List] = self.List[#self.List], self.List[existIndex];
 
     else
