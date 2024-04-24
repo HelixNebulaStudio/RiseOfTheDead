@@ -4,7 +4,7 @@ local modLibraryManager = require(game.ReplicatedStorage.Library.LibraryManager)
 
 local library = modLibraryManager.new();
 --==
-library.BuyLevelCost = 500;
+library.BuyLevelCost = 1000;
 library.PostRewardLvlFmod = 5;
 
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));

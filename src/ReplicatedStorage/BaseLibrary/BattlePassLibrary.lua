@@ -319,7 +319,7 @@ function BattlePassLibrary:Init(library)
 				Reward={
 					ItemId="colorcustom";
 					Data={Values={Color="ff3c3c";}};
-					ItemNameOverwrite = "RotD Red Color";
+					ItemNameOverwrite = "Rise of the Dead: Red Color";
 				};
 			});
 			leaf(27, {
@@ -386,7 +386,7 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="energydrink";};
 			});
 			leaf(90, {
-				Reward={ItemId="clothbagmask"; RequiresPremium=true;};
+				Reward={ItemId="fedora"; RequiresPremium=true;};
 			});
 			leaf(93, {
 				Reward={ItemId="liquidmetalpolish"; Quantity=3;};
