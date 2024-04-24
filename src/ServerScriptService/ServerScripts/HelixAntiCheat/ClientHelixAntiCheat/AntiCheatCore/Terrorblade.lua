@@ -15,7 +15,17 @@ return function(core)
 		local rootPart = character:WaitForChild("HumanoidRootPart");
 		local collisionRootPart = character:WaitForChild("CollisionRootPart");
 		
-		local modCharacter = require(character:WaitForChild("CharacterModule"));
+		local characterModule;
+		while workspace:IsAncestorOf(character) do
+			characterModule = character:FindFirstChild("CharacterModule");
+			if characterModule == nil then
+				task.wait(0.1);
+			end
+		end
+		if not workspace:IsAncestorOf(character) then return end;
+		if characterModule == nil then return end;
+
+		local modCharacter = require(characterModule);
 		local characterProperties = modCharacter.CharacterProperties;
 		
 		local lastCFrame, lastPos, lastVel;
