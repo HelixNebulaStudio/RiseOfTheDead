@@ -388,7 +388,7 @@ function Workbench.new(itemId, library, storageItem)
 
 							local customColors = modData:GetFlag("CustomColors");
 							if customColors and packsList == modColorsLibrary.Packs then
-								packsList.Custom = {Name="Custom Colors"; LayoutOrder=0; List={}; Owned=true; CustomColors=true;};
+								packsList.Custom = {Name="Lydia's Colors"; LayoutOrder=0; List={}; Owned=true; CustomColors=true;};
 
 								local orderList = {};
 

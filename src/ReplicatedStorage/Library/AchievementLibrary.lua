@@ -177,5 +177,15 @@ library:Add{
 	Hidden=true;
 }
 
+library:Add{
+	Id="bp5years"; -- Bp 5 years
+	Tier=Tiers.Bloodmetal;
+	BadgeId=531879295475986;
+	Announce="$PlayerName Completed: 5 Years Anniversary Mission Pass.";
+	Hidden=true;
+}
+
+
+
 library.Tiers = Tiers;
 return library;

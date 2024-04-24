@@ -763,54 +763,6 @@ library:Add{
 	};
 };
 
---== highvisjacket
-library:Add{
-	Id="highvisjacket";
-	ItemId="highvisjacket";
-	Name="Default";
-	Textures={
-		["LLA"]="rbxassetid://12653367270";
-		["LT"]="rbxassetid://12653367270";
-		["LH"]="rbxassetid://12653367270";
-		["LUA"]="rbxassetid://12653367270";
-		["RLA"]="rbxassetid://12653367270";
-		["RUA"]="rbxassetid://12653367270";
-		["UT"]="rbxassetid://12653367270";
-	};
-};
-
-library:Add{
-	Id="highvisjacketgalaxy";
-	ItemId="highvisjacket";
-	Icon="rbxassetid://12658731830";
-	Name="Galaxy";
-	Textures={
-		["LLA"]="rbxassetid://12653382051";
-		["LT"]="rbxassetid://12653382051";
-		["LH"]="rbxassetid://12653382051";
-		["LUA"]="rbxassetid://12653382051";
-		["RLA"]="rbxassetid://12653382051";
-		["RUA"]="rbxassetid://12653382051";
-		["UT"]="rbxassetid://12653382051";
-	};
-};
-
-library:Add{
-	Id="highvisjacketfallenleaves";
-	ItemId="highvisjacket";
-	Icon="rbxassetid://12963945448";
-	Name="Fallen Leaves";
-	Textures={
-		["LLA"]="rbxassetid://12964022505";
-		["LT"]="rbxassetid://12964022505";
-		["LH"]="rbxassetid://12964022505";
-		["LUA"]="rbxassetid://12964022505";
-		["RLA"]="rbxassetid://12964022505";
-		["RUA"]="rbxassetid://12964022505";
-		["UT"]="rbxassetid://12964022505";
-	};
-};
-
 
 --== cultisthood
 

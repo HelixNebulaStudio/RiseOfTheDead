@@ -77,6 +77,29 @@ function RewardsLibrary:Init(super)
 		};
 	};
 
+
+	super:Add{
+		Id="bp5years";
+		Rewards={
+			{ItemId="coal"; Quantity={Min=10; Max=15}; Chance=1;};
+			{ItemId="sulfur"; Quantity={Min=10; Max=15}; Chance=1;};
+			{ItemId="explosives"; Quantity=1; Chance=1;};
+			{ItemId="gold"; Quantity=20; Chance=1;};
+
+			{ItemId="colorcustom"; Quantity=1; Chance=0.5;};
+			{ItemId="divinggoggleswhite"; Quantity=1; Chance=0.5;};
+			{ItemId="mercskneepadscarbonfiberblack"; Quantity=1; Chance=0.5;};
+			{ItemId="sr308horde"; Quantity=1; Chance=0.5;};
+			{ItemId="fedorauvunwrapped"; Quantity=1; Chance=0.5;};
+			{ItemId="maraudersmaskrisingsun"; Quantity=1; Chance=0.5;};
+			{ItemId="militarybootsgold"; Quantity=1; Chance=0.5;};
+			{ItemId="nekrostrenchgreen"; Quantity=1; Chance=0.5;};
+			{ItemId="nekrostrenchblue"; Quantity=1; Chance=0.5;};
+
+			{ItemId="highvisjacketsuits"; Quantity=1; Chance=0.125;};
+		};
+	};
+
 end
 
 return RewardsLibrary;

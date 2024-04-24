@@ -136,7 +136,30 @@ function ItemUnlockablesLibrary:Init(library)
 		SurfaceAppearanceParent=script;
 	};
 
+
+	--== MARK: fedora
+	library:Add{
+		Id="fedora";
+		ItemId="fedora";
+		Name="Default";
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://14506983094";
+		};
+		SurfaceAppearanceParent=script;
+	};
 	
+	library:Add{
+		Id="fedorauvunwrapped";
+		ItemId="fedora";
+		Name="UV Unwrapped";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17275922615";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+
 	--== MARK: maraudersmask
 	library:Add{
 		Id="maraudersmask";
@@ -404,7 +427,20 @@ function ItemUnlockablesLibrary:Init(library)
 		};
 		SurfaceAppearanceParent=script;
 	};
-	
+
+	library:Add{
+		Id="leatherglovesultraviolet";
+		ItemId="leathergloves";
+		Name="Ultra Violet";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17275581702";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+
 	--== MARK: armwraps
 	library:Add{
 		Id="armwraps";
@@ -504,8 +540,79 @@ function ItemUnlockablesLibrary:Init(library)
 		};
 		SurfaceAppearanceParent=script;
 	};
+
+	library:Add{
+		Id="militarybootsgold";
+		ItemId="militaryboots";
+		Name="Gold";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17275081707";
+		};
+		SurfaceAppearanceParent=script;
+	};
 	
 	
+	--== MARK: highvisjacket
+	library:Add{
+		Id="highvisjacket";
+		ItemId="highvisjacket";
+		Name="Default";
+		Textures={
+			["LLA"]="rbxassetid://12653367270";
+			["LT"]="rbxassetid://12653367270";
+			["LH"]="rbxassetid://12653367270";
+			["LUA"]="rbxassetid://12653367270";
+			["RLA"]="rbxassetid://12653367270";
+			["RUA"]="rbxassetid://12653367270";
+			["UT"]="rbxassetid://12653367270";
+		};
+	};
+
+	library:Add{
+		Id="highvisjacketgalaxy";
+		ItemId="highvisjacket";
+		Icon="rbxassetid://12658731830";
+		Name="Galaxy";
+		Textures={
+			["LLA"]="rbxassetid://12653382051";
+			["LT"]="rbxassetid://12653382051";
+			["LH"]="rbxassetid://12653382051";
+			["LUA"]="rbxassetid://12653382051";
+			["RLA"]="rbxassetid://12653382051";
+			["RUA"]="rbxassetid://12653382051";
+			["UT"]="rbxassetid://12653382051";
+		};
+	};
+
+	library:Add{
+		Id="highvisjacketfallenleaves";
+		ItemId="highvisjacket";
+		Name="Fallen Leaves";
+		Textures={
+			["LLA"]="rbxassetid://12964022505";
+			["LT"]="rbxassetid://12964022505";
+			["LH"]="rbxassetid://12964022505";
+			["LUA"]="rbxassetid://12964022505";
+			["RLA"]="rbxassetid://12964022505";
+			["RUA"]="rbxassetid://12964022505";
+			["UT"]="rbxassetid://12964022505";
+		};
+	};
+
+	library:Add{
+		Id="highvisjacketsuits";
+		ItemId="highvisjacket";
+		Name="Suits";
+		Textures={
+			["LLA"]="rbxassetid://17275781912";
+			["LT"]="rbxassetid://17275781912";
+			["LH"]="rbxassetid://17275781912";
+			["LUA"]="rbxassetid://17275781912";
+			["RLA"]="rbxassetid://17275781912";
+			["RUA"]="rbxassetid://17275781912";
+			["UT"]="rbxassetid://17275781912";
+		};
+	};
 	
 	--== MARK: nekrostrench
 	library:Add{
@@ -541,6 +648,28 @@ function ItemUnlockablesLibrary:Init(library)
 		
 		SurfaceAppearance={
 			ColorMap="rbxassetid://14971087352";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="nekrostrenchblue";
+		ItemId="nekrostrench";
+		Name="Blue";
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17275838311";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="nekrostrenchgreen";
+		ItemId="nekrostrench";
+		Name="Green";
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17275843895";
 		};
 		SurfaceAppearanceParent=script;
 	};

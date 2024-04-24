@@ -260,8 +260,8 @@ function BattlePassSave:OnMissionComplete(mission)
 				end
 				
 			elseif requirementInfo.Type == "Mission" then
-				local mission = modMission:GetMission(self.Player, requirementInfo.Key);
-				if requirementInfo.Value == "Complete" and (mission == nil or mission.Type ~= 3) then
+				local rMission = modMission:GetMission(self.Player, requirementInfo.Key);
+				if requirementInfo.Value == "Complete" and (rMission == nil or rMission.Type ~= 3) then
 					canLevelUp = false;
 				end
 				
@@ -407,7 +407,9 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 			end
 
 			local itemLibrary = modItemsLibrary:Find(rewardInfo.ItemId);
-			activeInventory:Add(rewardInfo.ItemId, {Quantity=rewardQuantity;}, function(queueEvent, storageItem)
+			local rewardItemData = rewardInfo.Data or {};
+			rewardItemData.Quantity = rewardQuantity;
+			activeInventory:Add(rewardInfo.ItemId, rewardItemData, function(queueEvent, storageItem)
 				shared.Notify(player, "You recieved "..(rewardQuantity > 1 and rewardQuantity.." "..itemLibrary.Name or "a "..itemLibrary.Name).."!", "Reward");
 				
 				modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
@@ -519,11 +521,11 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		return returnPacket;
 		
 	end
+
+	return returnPacket;
 end
 
 task.spawn(function()
-	local modCommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
-
 	Debugger.AwaitShared("modCommandsLibrary");
 	shared.modCommandsLibrary:HookChatCommand("addmissionpasslevel", {
 		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
@@ -579,15 +581,17 @@ task.spawn(function()
 		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
 
 		RequiredArgs = 1;
-		UsageInfo = "/addmissionpassgoldpool gold";
+		UsageInfo = "/addmissionpassgoldpool gold [bpkey]";
 		Function = function(player, args)
 			local amt = tonumber(args[1]) or 250;
 
-			local goldPoolRp = goldPoolMem:UpdateRequest(modBattlePassLibrary.Active, "add", {
+			local bpKey = args[2] or modBattlePassLibrary.Active;
+
+			local goldPoolRp = goldPoolMem:UpdateRequest(bpKey, "add", {
 				Amount=amt;
 			});
 
-			shared.Notify(player, Debugger:Stringify("Status: ", goldPoolRp) , "Inform");
+			shared.Notify(player, "Bp:(".. bpKey ..")".. Debugger:Stringify("Status: ", goldPoolRp) , "Inform");
 			
 			return true;
 		end;

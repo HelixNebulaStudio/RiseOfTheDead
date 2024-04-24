@@ -26,9 +26,9 @@ local function leaf(index, data)
 end
 
 function BattlePassLibrary:Init(library)
-	library.Active = "";
+	library.Active = "bp5years";
 	
-	-- !Outline: BP Season 1
+	-- MARK: BP Season 1
 	library:Add{
 		Id="bpseason1";
 		EndUnixTime=1693526400;
@@ -149,7 +149,7 @@ function BattlePassLibrary:Init(library)
 		};
 	};
 	
-	-- !Outline: BP Halloween 1
+	-- MARK: BP Halloween 1
 	library:Add{
 		Id="bphalloween1";
 		EndUnixTime=1698796800;
@@ -270,6 +270,139 @@ function BattlePassLibrary:Init(library)
 			});
 		};
 	};
+
+	-- MARK: BP 5 Years Anniversary
+	library:Add{
+		Id="bp5years";
+		EndUnixTime=1722470400;
+
+		Title="5 Years Anniversary";
+		Icon="rbxassetid://17271606182";
+		Desc="Unlock the 5 Years Anniversary Pass to claim more rewards!";
+
+		PremiumPrice=250;
+		Price=500;
+
+		Tree = newTree{
+			leaf(0, {
+				Reward={
+					ItemId="wantedposter";
+					ItemNameOverwrite = "Lydia Wanted Poster";
+					ItemDescriptionOverwrite = "A poster for when you are looking for Lydia. This item can be given to Patrick to guarantee her as the next survivor in \"Another Survivor\".";
+					Data={Values={WantedNpc="Lydia";}};
+					PassOwner=true;
+				};
+			});
+			--
+			leaf(3, {
+				Reward={ItemId="metal"; Quantity=100;};
+			});
+			leaf(6, {
+				Reward={ItemId="divinggoggleswhite";};
+			});
+			leaf(9, {
+				Reward={ItemId="leatherglovesultraviolet"; RequiresPremium=true;};
+			});
+			leaf(12, {
+				Reward={ItemId="sr308horde";};
+			});
+			leaf(15, {
+				Reward={ItemId="ammobox";};
+			});
+			leaf(18, {
+				Reward={ItemId="tomeoftweaks"; PassOwner=true;};
+			});
+			leaf(21, {
+				Reward={ItemId="tirearmorred";};
+			});
+			leaf(24, {
+				Reward={
+					ItemId="colorcustom";
+					Data={Values={Color="ff3c3c";}};
+					ItemNameOverwrite = "RotD Red Color";
+				};
+			});
+			leaf(27, {
+				Reward={ItemId="tomeoftweaks"; RequiresPremium=true;};
+			});
+			leaf(30, {
+				Reward={ItemId="maraudersmask";};
+			});
+			leaf(33, {
+				Reward={ItemId="annihilationsoda";};
+			});
+			leaf(36, {
+				Reward={ItemId="militarybootsgold"; PassOwner=true;};
+			});
+			leaf(39, {
+				Reward={ItemId="mercskneepadscarbonfiberblack";};
+			});
+			leaf(42, {
+				Reward={ItemId="energydrink";};
+			});
+			leaf(45, {
+				Reward={ItemId="tomeoftweaks"; PassOwner=true;};
+			});
+			leaf(48, {
+				Reward={ItemId="maraudersmaskrisingsun";};
+			});
+			leaf(51, {
+				Reward={ItemId="woodpackage";};
+			});
+			leaf(54, {
+				Reward={ItemId="divingfinswhite"; RequiresPremium=true;};
+			});
+			leaf(57, {
+				Reward={ItemId="sandwich";};
+			});
+			leaf(60, {
+				Reward={ItemId="glasspackage";};
+			});
+			leaf(63, {
+				Reward={ItemId="divingsuitwhite"; PassOwner=true;};
+			});
+			leaf(66, {
+				Reward={ItemId="liquidmetalpolish"; Quantity=3;};
+			});
+			leaf(69, {
+				Reward={ItemId="fireworks"; Quantity=3;};
+			});
+			leaf(72, {
+				Reward={ItemId="tomeoftweaks"; RequiresPremium=true;};
+			});
+			leaf(75, {
+				Reward={ItemId="sandwich";};
+			});
+			leaf(78, {
+				Reward={ItemId="energydrink";};
+			});
+			leaf(81, {
+				Reward={ItemId="deaglecryogenics"; PassOwner=true;};
+			});
+			leaf(84, {
+				Reward={ItemId="fireworks"; Quantity=3;};
+			});
+			leaf(87, {
+				Reward={ItemId="energydrink";};
+			});
+			leaf(90, {
+				Reward={ItemId="clothbagmask"; RequiresPremium=true;};
+			});
+			leaf(93, {
+				Reward={ItemId="liquidmetalpolish"; Quantity=3;};
+			});
+			leaf(96, {
+				Reward={ItemId="flamethrowerblaze";};
+			});
+			leaf(99, {
+				Reward={ItemId="tirearmorgoldplating"; PassOwner=true;};
+			});
+			leaf(100, {
+				Reward={ItemId="gold"; Quantity=250;};
+			});
+		};
+	};
+	
 end
 
 

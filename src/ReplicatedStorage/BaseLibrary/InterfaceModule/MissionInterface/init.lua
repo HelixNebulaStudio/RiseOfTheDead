@@ -33,6 +33,7 @@ local remotes = game.ReplicatedStorage.Remotes;
 local remotePinMission = remotes.Interface.PinMission;
 
 local remoteMissionRemote = modRemotesManager:Get("MissionRemote");
+local remoteBattlepassRemote = modRemotesManager:Get("BattlepassRemote")
 
 local windowFrameTemplate = script:WaitForChild("MissionMenu");
 local missionPinHudTemplate = script:WaitForChild("MissionPinHud");
@@ -614,12 +615,12 @@ function Interface.init(modInterface)
 			end
 			
 			
-			local titleLabel:TextLabel = newEntry:WaitForChild("Title");
+			local titleLabel: TextLabel = newEntry:WaitForChild("Title") :: TextLabel;
 			local dbSuffix = " ("..lib.MissionId..")";
 			titleLabel.Text = lib.Name.. (modBranchConfigs.CurrentBranch.Name == "Dev" and dbSuffix or "");
 			
 			local npcLib = modNpcProfileLibrary:Find(lib.From);
-			local avatarLabel: ImageButton = newEntry:WaitForChild("Avatar");
+			local avatarLabel: ImageButton = newEntry:WaitForChild("Avatar") :: ImageButton;
 			if npcLib and npcLib.Avatar then
 				avatarLabel.Image = npcLib.Avatar;
 			end
@@ -2479,9 +2480,9 @@ function Interface.init(modInterface)
 									
 								end
 								
-								descText = descText.."\n\n"..h3("Name: ").. itemLib.Name;
+								descText = descText.."\n\n"..h3("Name: ").. (rewardInfo.ItemNameOverwrite or itemLib.Name);
 								descText = descText.."\n"..h3("Type: ").. itemLib.Type;
-								descText = descText.."\n"..h3("Description: ").. itemLib.Description;
+								descText = descText.."\n"..h3("Description: ").. (rewardInfo.ItemDescriptionOverwrite or itemLib.Description);
 								
 								descLabel.Text = descText;
 
@@ -2571,10 +2572,10 @@ function Interface.init(modInterface)
 							
 						end
 						
-						itemButtonObj:Update({
-							ItemId=rewardInfo.ItemId;
-							Quantity=rewardInfo.Quantity or 1;
-						});
+						local itemData = rewardInfo.Data or {};
+						itemData.ItemId = rewardInfo.ItemId;
+						itemData.Quantity = rewardInfo.Quantity or 1;
+						itemButtonObj:Update(itemData);
 					end
 				end
 

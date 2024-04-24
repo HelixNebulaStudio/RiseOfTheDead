@@ -2821,6 +2821,7 @@ MissionLibrary.New{
 		{Text="Kill $PlayerKills zombies while Lydia watches you kill them.";};
 		{Text="Let Lydia kill $LydiaKills zombies";};
 		{Text="Kill the rest of the zombies";};
+		
 		{Text="Talk to Lydia";};
 	};
 	LogEntry={

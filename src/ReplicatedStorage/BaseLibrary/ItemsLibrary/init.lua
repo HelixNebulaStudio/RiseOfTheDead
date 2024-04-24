@@ -576,6 +576,7 @@ function ItemsLibrary:Init(super)
 	new(instrumentBase, {Id="keytar"; Name="Keytar"; Tags={"Melee"}; Icon="rbxassetid://15338385507"; Description="A playable keyboard guitar while also being a melee weapon, also known as keytar instrument. Can play premade tunes or with keyboard/touch buttons.";});
 
 	--==========================================================[[ ITEM UNLOCKABLES ]]==========================================================--
+	-- MARK: Item Unlockables
 	local unlockableBase = {
 		Type = super.Types.Usable;
 		TypeIcon = "rbxassetid://12964393529";
@@ -599,6 +600,7 @@ function ItemsLibrary:Init(super)
 	new(unlockableBase, {Id="prisonpantsblue"; Icon="rbxassetid://6665650148"; Unlockable="Blue Prisoner's Pants";});
 	
 	new(unlockableBase, {Id="leatherglovesred"; Icon="rbxassetid://16994275555"; Unlockable="Red Leather Gloves";});
+	new(unlockableBase, {Id="leatherglovesultraviolet"; Icon="rbxassetid://17275591636"; Unlockable="Ultra Violet Leather Gloves";});
 	
 	new(unlockableBase, {Id="dufflebagstreetart"; Icon="rbxassetid://8828337700"; Unlockable="Street Art Duffle Bag";});
 	new(unlockableBase, {Id="dufflebagvintage"; Icon="rbxassetid://8828340427"; Unlockable="Vintage Duffle Bag";});
@@ -607,6 +609,7 @@ function ItemsLibrary:Init(super)
 
 	new(unlockableBase, {Id="militarybootsdesert"; Icon="rbxassetid://17022737460"; Unlockable="Desert Military Boots";});
 	new(unlockableBase, {Id="militarybootsforest"; Icon="rbxassetid://17022741672"; Unlockable="Forest Military Boots";});
+	new(unlockableBase, {Id="militarybootsgold"; Icon="rbxassetid://17275098172"; Unlockable="Gold Military Boots";});
 	
 	new(unlockableBase, {Id="plankarmormaple"; Icon="rbxassetid://6956453007"; Unlockable="Maple Plank Armor";});
 	new(unlockableBase, {Id="plankarmorash"; Icon="rbxassetid://6956453176"; Unlockable="Ash Plank Armor";});
@@ -669,7 +672,12 @@ function ItemsLibrary:Init(super)
 
 	new(unlockableBase, {Id="divingfinswhite"; Icon="rbxassetid://17219506923"; Unlockable="White Diving Fins";});
 
+	new(unlockableBase, {Id="highvisjacketsuits"; Icon="rbxassetid://17275772207"; Unlockable="Suits High Visibility Jacket";});
+	
+	new(unlockableBase, {Id="nekrostrenchblue"; Icon="rbxassetid://17275855245"; Unlockable="Blue Nekros Trench Coat";});
+	new(unlockableBase, {Id="nekrostrenchgreen"; Icon="rbxassetid://17275855405"; Unlockable="Green Nekros Trench Coat";});
 
+	new(unlockableBase, {Id="fedorauvunwrapped"; Icon="rbxassetid://17275939280"; Unlockable="UV Unwrapped Fedora";});
 	
 
 	--==========================================================[[ ITEM UNLOCKABLES ]]==========================================================--
@@ -797,7 +805,7 @@ function ItemsLibrary:Init(super)
 	new(unlockableBase, {Id="highvisjacketfallenleaves"; Icon="rbxassetid://12963945448"; Tags={"Easter"}; Unlockable="Fallen Leaves High Visibility Jacket";});
 	new(unlockableBase, {Id="scraparmorcherryblossom"; Icon="rbxassetid://12963959744"; Tags={"Easter"}; Unlockable="Cherry Blossom Scrap Armor";});
 	
-	
+
 	--==========================================================[[ META ]]==========================================================--
 	local metaBase = {
 		Type = super.Types.None;
