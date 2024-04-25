@@ -462,23 +462,6 @@ function WeaponHandler:Equip(library, weaponId)
 					modCharacter.DevViewModel = configurations.AimDownViewModel;
 				end
 				
-				--if objects.Right and objects.Right.SightViewModel then
-					
-				--	if lastAdsBool ~= characterProperties.AimDownSights then
-				--		objects.Right.SightViewModel.CFrame = configurations.AimDownViewModel;
-				--	end
-					
-				--	modWeaponModule.SetConfigurations("AimDownViewModel", objects.Right.SightViewModel.CFrame);
-				--	UserInputService.MouseIconEnabled = true;
-					
-				--	weaponInterface.EditPanel.Visible = editPanelVisible;
-				--	weaponInterface.EditPanel.AttachmentTag.Value = objects.Right.SightViewModel;
-				--	weaponInterface.EditPanel.AttachmentTag:SetAttribute("ADS", characterProperties.AimDownSights);
-					
-				--	modCharacter.DevViewModel = configurations.AimDownViewModel;
-				--end
-				
-				
 				lastAdsBool = true;
 			else
 				characterProperties.AimDownSights = false;
@@ -498,21 +481,21 @@ function WeaponHandler:Equip(library, weaponId)
 			characterProperties.SwayYStrength=1;
 			characterProperties.VelocitySrength=1;
 			
-			if objects.Right and objects.Right.SightViewModel then
-				
+			if sightViewModel then
 				if lastAdsBool ~= characterProperties.AimDownSights and configurations.HipFireViewModel then
-					objects.Right.SightViewModel.CFrame = configurations.HipFireViewModel;
+					sightViewModel.CFrame = configurations.HipFireViewModel;
 				end
 				
-				configurations.HipFireViewModel = objects.Right.SightViewModel.CFrame;
+				configurations.HipFireViewModel = sightViewModel.CFrame;
 				UserInputService.MouseIconEnabled = true;
 				
 				weaponInterface.EditPanel.Visible = editPanelVisible;
-				weaponInterface.EditPanel.AttachmentTag.Value = objects.Right.SightViewModel;
+				weaponInterface.EditPanel.AttachmentTag.Value = sightViewModel;
 				weaponInterface.EditPanel.AttachmentTag:SetAttribute("ADS", characterProperties.AimDownSights);
 				
 				modCharacter.DevViewModel = configurations.HipFireViewModel;
 			end
+			
 			lastAdsBool = false;
 		end
 		
@@ -1720,9 +1703,6 @@ function WeaponHandler:Equip(library, weaponId)
 			if sightViewModel then
 				editPanelVisible = not editPanelVisible;
 			end
-			--if objects.Right and objects.Right.SightViewModel then
-			--	editPanelVisible = not editPanelVisible;
-			--end
 			
 			local roll = random:NextInteger(1,10);
 			if loadedAnims["Inspect2"] and roll >= 7 then
