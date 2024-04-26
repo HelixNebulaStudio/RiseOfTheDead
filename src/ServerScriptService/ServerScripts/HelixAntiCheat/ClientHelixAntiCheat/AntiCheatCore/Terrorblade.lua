@@ -20,6 +20,8 @@ return function(core)
 			characterModule = character:FindFirstChild("CharacterModule");
 			if characterModule == nil then
 				task.wait(0.1);
+			else
+				break;
 			end
 		end
 		if not workspace:IsAncestorOf(character) then return end;

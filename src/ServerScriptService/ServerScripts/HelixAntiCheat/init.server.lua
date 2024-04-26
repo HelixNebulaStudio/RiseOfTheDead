@@ -643,7 +643,6 @@ function OnPlayerAdded(player)
 	
 	local function onCharacterAdded(character)
 		local rootPart = character:WaitForChild("HumanoidRootPart");
-		local humanoid = character:WaitForChild("Humanoid");
 		
 		for a=1, 60 do
 			if workspace:IsAncestorOf(rootPart) then
@@ -668,7 +667,7 @@ function OnPlayerAdded(player)
 		end)
 		
 		while workspace:IsAncestorOf(rootPart) do
-			local _, delta = RunService.Stepped:Wait();
+			RunService.Stepped:Wait();
 			
 			if tick()-tenSecTick >= 10 then
 				tenSecTick = tick();
@@ -934,6 +933,33 @@ task.spawn(function()
 			--elseif action == "lackclient" then
 			--	TinkerInvokeClient(speaker, "lackclient")
 				
+			elseif action == "trigger" then
+				local moduleId = args[2];
+				local userId = args[3];
+
+				local param = {};
+				for a=4, #args do
+					table.insert(param, args[a]);
+				end
+
+				if userId == nil then
+					userId = speaker.UserId;
+				end
+				
+				if coreLibraries[moduleId] == nil then
+					shared.Notify(player, "Module does not exist: ".. moduleId, "Inform");
+					return;
+				end
+				
+				local targetPlayer = game.Players:GetPlayerByUserId(userId);
+				if targetPlayer then
+					local rPacket = TinkerInvokeClient(targetPlayer, "trigger", moduleId, unpack(param));
+					shared.Notify(player, "Tinker Invoked to (".. targetPlayer.Name .."), Success: ".. tostring(rPacket.Active), "Inform");
+				end
+
+				
+				return;
+
 			end
 
 			return;

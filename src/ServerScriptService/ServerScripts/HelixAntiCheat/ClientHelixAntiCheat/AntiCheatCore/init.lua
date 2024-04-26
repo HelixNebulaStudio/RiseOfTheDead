@@ -3,6 +3,7 @@ local Core = {};
 --== Script;
 
 Core.Active = {};
+Core.Func = {};
 
 Core.Tinker = game.ReplicatedStorage.Remotes:WaitForChild("Tinker");
 
@@ -72,6 +73,13 @@ function Core.Tinker.OnClientInvoke(action, ...)
 		
 		rPacket.List = list;
 		
+	elseif action == "trigger" then
+		local moduleId = ...;
+
+		if Core.Func[moduleId] then
+			local funcValues = Core.Func[moduleId](select(2, ...));
+			rPacket.Values = funcValues;
+		end
 	end
 	
 	return rPacket;
