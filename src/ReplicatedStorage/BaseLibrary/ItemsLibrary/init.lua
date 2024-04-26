@@ -436,22 +436,25 @@ function ItemsLibrary:Init(super)
 		end;
 	};
 	
-	new(customizationPack, {Id="colorlively";Icon="rbxassetid://4788857933"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Lively";};});
-	new(customizationPack, {Id="colorarctic";Icon="rbxassetid://5065235473"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Arctic";};});
-	new(customizationPack, {Id="colorhellsfire";Icon="rbxassetid://5180692180"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Hellsfire";};});
-	new(customizationPack, {Id="colorturquoiseshades";Icon="rbxassetid://12163679259"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="TurquoiseShades";};});
-	new(customizationPack, {Id="colorsunset";Icon="rbxassetid://12163681091"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Sunset";};});
+	new(customizationPack, {Id="colorlively"; Icon="rbxassetid://4788857933"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Lively";};});
+	new(customizationPack, {Id="colorarctic"; Icon="rbxassetid://5065235473"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Arctic";};});
+	new(customizationPack, {Id="colorhellsfire"; Icon="rbxassetid://5180692180"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Hellsfire";};});
+	new(customizationPack, {Id="colorturquoiseshades"; Icon="rbxassetid://12163679259"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="TurquoiseShades";};});
+	new(customizationPack, {Id="colorsunset"; Icon="rbxassetid://12163681091"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Sunset";};});
 	
-	new(customizationPack, {Id="skinstreetart";Icon="rbxassetid://4788857679"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="StreetArt";};});
-	new(customizationPack, {Id="skinwireframe";Icon="rbxassetid://5065159425"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Wireframe";};});
-	new(customizationPack, {Id="skinwraps";Icon="rbxassetid://5065159623"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Wraps";};});
-	new(customizationPack, {Id="skinscaleplating";Icon="rbxassetid://5180744566"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="ScalePlating";};});
-	new(customizationPack, {Id="skincarbonfiber";Icon="rbxassetid://5635664589"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="CarbonFiber";};});
-	new(customizationPack, {Id="skinhexatiles";Icon="rbxassetid://6534859112"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Hexatiles";};});
-	new(customizationPack, {Id="skinoffline";Icon="rbxassetid://7866873305"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Offline";};});
-	new(customizationPack, {Id="skinice";Icon="rbxassetid://8532443079"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Ice";};});
-	new(customizationPack, {Id="skinwindtrails";Icon="rbxassetid://14250975612"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Windtrails";};});
+	new(customizationPack, {Id="skinstreetart"; Icon="rbxassetid://4788857679"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="StreetArt";};});
+	new(customizationPack, {Id="skinwireframe"; Icon="rbxassetid://5065159425"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Wireframe";};});
+	new(customizationPack, {Id="skinwraps"; Icon="rbxassetid://5065159623"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Wraps";};});
+	new(customizationPack, {Id="skinscaleplating"; Icon="rbxassetid://5180744566"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="ScalePlating";};});
+	new(customizationPack, {Id="skincarbonfiber"; Icon="rbxassetid://5635664589"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="CarbonFiber";};});
+	new(customizationPack, {Id="skinhexatiles"; Icon="rbxassetid://6534859112"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Hexatiles";};});
+	new(customizationPack, {Id="skinoffline"; Icon="rbxassetid://7866873305"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Offline";};});
+	new(customizationPack, {Id="skinice"; Icon="rbxassetid://8532443079"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Ice";};});
+	new(customizationPack, {Id="skinwindtrails"; Icon="rbxassetid://14250975612"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Windtrails";};});
+	new(customizationPack, {Id="skinfancy"; Icon="rbxassetid://17281999442"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Fancy";};});
 	
+	
+
 	local usableBase = {
 		Type = super.Types.Usable;
 		Tradable = super.Tradable.Tradable;

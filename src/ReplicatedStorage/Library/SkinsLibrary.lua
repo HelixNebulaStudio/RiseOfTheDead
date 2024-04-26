@@ -2,7 +2,6 @@ local SkinsLibrary = {Library={}};
 --== Libraries;
 local CollectionService = game:GetService("CollectionService");
 
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modTexturePackage = require(game.ReplicatedStorage.Library.TexturePackage);
 local modTextureAnimations = require(game.ReplicatedStorage.Library.TextureAnimations);
 
@@ -28,6 +27,7 @@ SkinsLibrary.Packs = { -- LayoutOrder: Order in display;
 	FestiveWrapping = {Name="FestiveWrapping"; LayoutOrder=57; List={}; Owned=false;};
 	Easter2023 = {Name="Easter2023"; LayoutOrder=58; List={}; Owned=false;};
 	CuteButScary = {Name="CuteButScary"; LayoutOrder=59; List={}; Owned=false;};
+	Fancy = {Name="Fancy"; LayoutOrder=60; List={}; Owned=false;};
 	
 	-- Locked
 	Full = {Name="Full"; LayoutOrder=98; List={}; Owned=false;};
@@ -98,6 +98,7 @@ function SkinsLibrary.GetByName(name)
 			return lib;
 		end
 	end
+	return;
 end
 
 function SkinsLibrary.Refresh()
@@ -616,6 +617,32 @@ NewTexture(199, SkinsLibrary.Packs.CuteButScary, "Ghosts RGB", {
 }, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
 
 
+--== Skin Pack: Fancy
+local FancyTypes = {
+	{""; Color3.fromRGB(255, 255, 255)};
+	{"Red"; Color3.fromRGB(255, 0, 0)};
+	{"Green"; Color3.fromRGB(0, 255, 0)};
+	{"Blue"; Color3.fromRGB(0, 0, 255)};
+};
+local FancyId = 300;
+for a=1, #FancyTypes do
+	FancyId = FancyId +1;
+	NewTexture(FancyId, SkinsLibrary.Packs.Fancy, FancyTypes[a][1].."Fancy", {
+		"rbxassetid://17282157675";
+	}, FancyTypes[a][2], Vector2.new(2, 2));
+	FancyId = FancyId +1;
+	NewTexture(FancyId, SkinsLibrary.Packs.Fancy, FancyTypes[a][1].."Fancy Inner Shadow", {
+		"rbxassetid://17282156952";
+	}, FancyTypes[a][2], Vector2.new(2, 2));
+	FancyId = FancyId +1;
+	NewTexture(FancyId, SkinsLibrary.Packs.Fancy, FancyTypes[a][1].."Fancy Glow", {
+		"rbxassetid://17282157229";
+	}, FancyTypes[a][2], Vector2.new(2, 2));
+	FancyId = FancyId +1;
+	NewTexture(FancyId, SkinsLibrary.Packs.Fancy, FancyTypes[a][1].."Fancy Bevel", {
+		"rbxassetid://17282157420";
+	}, FancyTypes[a][2], Vector2.new(2, 2));
+end
 
 
 --== Texture Pack: Special
