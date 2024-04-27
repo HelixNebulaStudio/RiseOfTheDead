@@ -239,18 +239,21 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 	
 	self.ImageButton.Image = self.ItemLib.Icon or "rbxasset://textures/ui/GuiImagePlaceholder.png"
 
-	if self.ItemLib.OverlayIcons then
+	if self.ItemLib.OverlayIcons and #self.ItemLib.OverlayIcons > 0 then
+		local overlayFrame = self.ImageButton.Overlays;
+		overlayFrame.ZIndex = self.ImageButton.ZIndex;
+
 		for a=1, #self.ItemLib.OverlayIcons do
 			local overlayData = self.ItemLib.OverlayIcons[a];
 
-			local newImage = self.ImageButton:FindFirstChild("Overlay".. a);
+			local newImage = overlayFrame:FindFirstChild("Overlay".. a);
 			newImage = newImage or Instance.new("ImageLabel");
 			newImage.Name = "Overlay"..a;
 			newImage.Image = overlayData.Icon;
 			newImage.BackgroundTransparency = 1;
 			newImage.Size = UDim2.new(1, 0, 1, 0);
-			newImage.ZIndex = self.ImageButton.ZIndex;
-			newImage.Parent = self.ImageButton;
+			newImage.ZIndex = overlayFrame.ZIndex;
+			newImage.Parent = overlayFrame;
 		end
 	end
 
