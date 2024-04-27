@@ -204,7 +204,19 @@ function remotePlayerDataFetch.OnServerInvoke(player, packet)
 			};
 		end
 		
+	elseif action == "npcdatafetch" then
+		local npcName = packet[modRemotesManager.Ref("Id")];
+
+		local safehomeData = profile.Safehome;
+		local npcData = safehomeData:GetNpc(npcName);
+		if npcData == nil then return end;
+
+		return {
+			[modRemotesManager.Ref("Data")]=npcData;
+		};
 	end
+
+	return;
 end
 
 remotePlayerDataSync.OnEvent:Connect(function(player, packet)
@@ -591,7 +603,7 @@ function remoteWorldTravelRequest.OnServerInvoke(player, travelType, data)
 	return success;
 end
 
--- !outline: remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interactModule, storagePage)
+-- MARK: remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interactModule, storagePage)
 function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interactModule, storagePage)
 	--== Opening virtual storage;
 	local storageItem = interactObject;
@@ -652,8 +664,7 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 				if activeSave.Storages[storageId] == nil then
 					activeSave.Storages[storageId] = modStorage.new(storageId, storageName, defaultSize, player);
 					newStorage = activeSave.Storages[storageId];
-					
-					newStorage:InitStorage(storageId);
+					newStorage:InitStorage();
 				end
 				newStorage = activeSave.Storages[storageId];
 				newStorage.Name = storageName;

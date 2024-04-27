@@ -3,6 +3,12 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local NpcProperties = {};
 NpcProperties.__index = NpcProperties;
 --==
+NpcProperties.StorageConfig = {
+	Persistent=true;
+	Size=5;
+	axSize=5;
+	Virtual=true;
+};
 
 NpcProperties.Level = 0;
 NpcProperties.LevelUpTime = os.time();

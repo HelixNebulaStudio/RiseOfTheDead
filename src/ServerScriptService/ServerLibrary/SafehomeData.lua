@@ -12,9 +12,13 @@ local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLi
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modSafehomesLibrary = require(game.ReplicatedStorage.Library.SafehomesLibrary);
+local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 
+local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
+local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
+local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local remoteSafehomeRequest = modRemotesManager:Get("SafehomeRequest");
 
@@ -54,6 +58,9 @@ function SafehomeData.new(player)
 end
 
 function SafehomeData:GetNpc(npcName)
+	local npcLib = modNpcProfileLibrary:Find(npcName);
+	if npcLib == nil then return end;
+
 	local npcData = self.Npc[npcName];
 	if npcData == nil then
 		local npcPropertiesMeta = modNpcProfileLibrary:GetProperties(npcName);
@@ -66,6 +73,88 @@ function SafehomeData:GetNpc(npcName)
 		setmetatable(npcData, npcPropertiesMeta);
 	end
 	
+	local storageConfig = table.clone(npcData.StorageConfig);
+	local storageId = npcName.."Storage";
+	storageConfig.Name = npcName.." Storage";
+	storageConfig.OwnerNpc = npcName;
+	
+	function storageConfig.InitStorage(storage)
+		storage:ConnectCheck(function(packet)
+			local dragStorageItem = packet.DragStorageItem;
+			local targetIndex: number = packet.TargetIndex;
+			
+			if targetIndex == 1 then -- primary weapon slot;
+				if modItemsLibrary:HasTag(dragStorageItem.ItemId, "Primary Weapon") then
+					packet.Allowed = true;
+				else
+					packet.FailMsg = "This slot is only for primary weapons.";
+					packet.Allowed = false;
+
+				end
+				
+			elseif targetIndex == 2 then -- secondary weapon slot;
+				if modItemsLibrary:HasTag(dragStorageItem.ItemId, "Secondary Weapon") then
+					packet.Allowed = true;
+				else
+					packet.FailMsg = "This slot is only for secondary weapons.";
+					packet.Allowed = false;
+
+				end
+
+			elseif targetIndex == 3 then -- melee weapon slot;
+				if modItemsLibrary:HasTag(dragStorageItem.ItemId, "Melee") then
+					packet.Allowed = true;
+				else
+					packet.FailMsg = "This slot is only for melee weapons.";
+					packet.Allowed = false;
+
+				end
+				
+			elseif targetIndex == 4 then -- clothing slot;
+				if modItemsLibrary:HasTag(dragStorageItem.ItemId, "Clothing") then
+					packet.Allowed = true;
+				else
+					packet.FailMsg = "This slot is only for melee weapons.";
+					packet.Allowed = false;
+
+				end
+
+			elseif targetIndex == 5 then -- misc slot;
+				packet.Allowed = true;
+
+			else
+				packet.Allowed = false;
+			end
+			
+			return packet;
+		end)
+
+		storage.OnChanged:Connect(function()
+			modOnGameEvents:Fire("OnStorageChanged", self.Player, storage);
+			
+			local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
+			local npcModule = modNpc.GetPlayerNpc(self.Player, npcName);
+			if npcModule then
+				local storageItemIndexList = storage:GetIndexDictionary();
+
+				local activeWeapon = storageItemIndexList[1] or storageItemIndexList[2];
+				if activeWeapon then
+					npcModule.Wield.Equip(activeWeapon.ItemId);
+					npcModule.Wield.SetSkin(activeWeapon.Values);
+					
+					npcModule.Wield:ToggleIdle();
+
+				else
+					npcModule.Wield.Unequip();
+
+				end
+			end
+		end);
+	end
+
+	local storage = modStorage:OpenStorage(self.Player, storageId, storageConfig);
+	storage:Sync(self.Player);
+
 	return npcData;
 end
 
@@ -78,7 +167,7 @@ function SafehomeData:Load(data)
 end
 
 function remoteSafehomeRequest.OnServerInvoke(player, actionId, packet)
-	Debugger:Log("remoteSafehomeRequest", player, actionId, packet);
+	Debugger:StudioWarn("remoteSafehomeRequest", player, actionId, packet);
 	
 	local ownerPlayer = shared.modSafehomeService and shared.modSafehomeService.OwnerPlayer;
 	local isOwner = ownerPlayer and player == ownerPlayer;
@@ -90,7 +179,20 @@ function remoteSafehomeRequest.OnServerInvoke(player, actionId, packet)
 	local traderProfile = profile.Trader;
 	local safehomeData = profile.Safehome;
 	
-	if actionId == "purchaseSafehome" then
+	
+	if actionId == "fetch" then
+		local oprofile = shared.modProfile:Get(ownerPlayer);
+
+		if oprofile then
+			return {ReplyCode=1; Data=oprofile.Safehome;};
+		end
+		if safehomeData then
+			return {ReplyCode=1; Data=safehomeData;};
+		end
+
+		return {ReplyCode=5;};
+		
+	elseif actionId == "purchaseSafehome" then
 		local safehomeId = packet.SafehomeId;
 		if safehomeId == nil then return {ReplyCode=5;} end;
 		
@@ -377,8 +479,8 @@ function remoteSafehomeRequest.OnServerInvoke(player, actionId, packet)
 						local newColor = randomColors[math.random(1, #randomColors)];
 						local tween = TweenService:Create(lightSources[a].Source, TweenInfo.new(math.random(50, 99)/100), {Color=newColor});
 						for b=1, #lightSources[a].LightObjects do
-							local tween = TweenService:Create(lightSources[a].LightObjects[b].Light, TweenInfo.new(math.random(50, 99)/100), {Color=newColor});
-							tween:Play();
+							local bTween = TweenService:Create(lightSources[a].LightObjects[b].Light, TweenInfo.new(math.random(50, 99)/100), {Color=newColor});
+							bTween:Play();
 						end
 						tween:Play();
 					end
@@ -388,20 +490,14 @@ function remoteSafehomeRequest.OnServerInvoke(player, actionId, packet)
 				for a=1, #lightSources do
 					local tween = TweenService:Create(lightSources[a].Source, TweenInfo.new(resetTime), {Color=lightSources[a].OriginalColor});
 					for b=1, #lightSources[a].LightObjects do
-						local tween = TweenService:Create(lightSources[a].LightObjects[b].Light, TweenInfo.new(resetTime), {Color=lightSources[a].LightObjects[b].OriginalColor});
-						tween:Play();
+						local bTween = TweenService:Create(lightSources[a].LightObjects[b].Light, TweenInfo.new(resetTime), {Color=lightSources[a].LightObjects[b].OriginalColor});
+						bTween:Play();
 					end
 					tween:Play();
 				end
 				partyLightsDebounce = false;
 			end)
 		end
-		
-	elseif actionId == "fetch" then
-		local oprofile = shared.modProfile:Get(ownerPlayer);
-		if oprofile == nil then return {ReplyCode=5;} end;
-		
-		return {ReplyCode=1; Data=oprofile.Safehome;};
 		
 	end
 	

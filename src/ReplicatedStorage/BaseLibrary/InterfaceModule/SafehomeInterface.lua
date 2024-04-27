@@ -7,7 +7,7 @@ local Interface = {};
 local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = require(localPlayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
@@ -99,9 +99,24 @@ function Interface.init(modInterface)
 		end
 	end))
 	
+	local safehomeData = modData and modData.Profile and modData.Profile.Safehome;
+	local lastFetch = tick();
+	local function fetchSafehomeData()
+		if tick()-lastFetch <= 0.5 then return end;
+		lastFetch = tick();
+
+		local rPacket = remoteSafehomeRequest:InvokeServer("fetch");
+		if rPacket == nil then return end;
+
+		if rPacket.Data then 
+			modData.Profile.Safehome = rPacket.Data; 
+			safehomeData = modData.Profile.Safehome; 
+		end
+	end
+
 	local debounce = false;
 	function Interface.Update()
-		local safehomeData = modData and modData.Profile and modData.Profile.Safehome;
+		safehomeData = modData and modData.Profile and modData.Profile.Safehome;
 		if safehomeData == nil then return end;
 		local homesData = safehomeData.Homes;
 		local page = Interface.Page;
@@ -310,10 +325,7 @@ function Interface.init(modInterface)
 			local newPage = templateStatsPage:Clone();
 
 			spawn(function()
-				local rPacket = remoteSafehomeRequest:InvokeServer("fetch");
-				if rPacket == nil then return end;
-
-				if rPacket.Data then modData.Profile.Safehome = rPacket.Data; safehomeData = modData.Profile.Safehome; end
+				fetchSafehomeData();
 
 				local foodbar = newPage:WaitForChild("FoodStat"):WaitForChild("Foodbar");
 				local foodLabel = newPage:WaitForChild("FoodStat"):WaitForChild("foodLabel");
@@ -340,10 +352,7 @@ function Interface.init(modInterface)
 			end
 
 			task.defer(function()
-				local rPacket = remoteSafehomeRequest:InvokeServer("fetch");
-				if rPacket == nil then return end;
-				if rPacket.Data then modData.Profile.Safehome = rPacket.Data; safehomeData = modData.Profile.Safehome; end
-
+				fetchSafehomeData();
 				local npcsData = safehomeData.Npc;
 
 				local newCapcity = templateNpcCapacity:Clone();
@@ -382,6 +391,12 @@ function Interface.init(modInterface)
 						.."Level: ".. tostring(npcLevel) .."\n"
 						.."Happiness: ".. tostring(data.Happiness) or ":)";
 
+					local inspectButton = new:WaitForChild("InspectButton");
+					inspectButton.MouseButton1Click:Connect(function()
+						Interface:PlayButtonClick();
+						modInterface:OpenWindow("NpcWindow", name);
+					end)
+					
 					local kickButton = new:WaitForChild("KickButton");
 					kickButton.MouseButton1Click:Connect(function()
 						Interface:PlayButtonClick();

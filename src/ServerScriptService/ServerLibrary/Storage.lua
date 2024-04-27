@@ -21,6 +21,7 @@ local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 local modProfile = shared.modProfile;
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modStorageHandler = require(game.ServerScriptService.ServerLibrary.StorageHandler);
+local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remoteStorageService = modRemotesManager:Get("StorageService");
@@ -53,7 +54,11 @@ local QueueEvents = {
 	Missing="Missing";
 }
 
-local Storage = {};
+local Storage = {
+	Get=nil;
+	RefreshItem=nil;
+	FindIdFromStorages=nil;
+};
 Storage.__index = Storage;
 Storage.ClassType = "Storage";
 Storage.PublicStorages = PublicStorages;
@@ -84,6 +89,7 @@ function Storage.new(id, name, size, owner)
 	storageMeta.OnDestroyConnections = {};
 	storageMeta.Player = owner;
 	storageMeta.Locked = false;
+	storageMeta.Initialized = false;
 	storageMeta.OnChanged = modEventSignal.new("OnStorageChanged");
 	storageMeta.OnAccess = modEventSignal.new("OnStorageAccess");
 	storageMeta.OnItemAdded = modEventSignal.new("OnStorageItemAdded");
@@ -252,7 +258,7 @@ function remoteSetSlot.OnServerInvoke(player, storageId, id, targetData)
 	
 	local targetStorage = Storage.Get(targetData.Id, player);
 	if targetStorage == nil then storage:Notify("red", "Missing target storage."); return {storage:Shrink();}; end;
-	if targetStorage.Locked then Debugger:Warn("Storage (",storage.Id,") locked."); return {storage:Shrink();}; end;
+	if targetStorage.Locked then Debugger:Warn("Storage (",targetStorage.Id,") locked."); return {storage:Shrink();}; end;
 	if targetStorage.ViewOnly then Debugger:Warn("Storage (",targetStorage.Id,") is view-only."); return {storage:Shrink();}; end;
 
 	if storage:RentalCheck() then Debugger:Warn("Storage (",storage.Id,") rent not paid."); return {storage:Shrink();}; end;
@@ -625,38 +631,50 @@ function remoteRenameItem.OnServerInvoke(player, action, id, customName)
 end
 
 
-function Storage:InitStorage(storageId)
+-- MARK: Storage:InitStorage()
+--[[
+	Initialize storage when instantiated and when loaded from save.
+
+	@returns nil
+]]
+function Storage:InitStorage()
+	local storageId = self.Id;
+	local storageValues = self.Values;
+
 	local usableItemLib = modUsableItems:Find(storageId);
-	if usableItemLib == nil then return end;
+	if usableItemLib then 
+		if usableItemLib.PortableStorage then
+			self:ConnectCheck(function(packet)
+				if usableItemLib.StorageCheck then
+					packet = usableItemLib.StorageCheck(packet);
+					return packet;
+				end
 	
-	if usableItemLib.PortableStorage then
-		self:ConnectCheck(function(packet)
-			if usableItemLib.StorageCheck then
-				packet = usableItemLib.StorageCheck(packet);
+				local psItemLib = modUsableItems:Find(packet.DragStorageItem.ItemId);
+				if psItemLib and psItemLib.PortableStorage then
+					
+					packet.Allowed = false;
+					packet.FailMsg = "You can't put storage("..packet.DragStorageItem.ItemId..") into another storage."
+					
+					return packet;
+				end
+	
+				packet.Allowed = true;
 				return packet;
-			end
+			end)
+		end
+		
+		if usableItemLib.ConnectChanged then
+			self.OnChanged:Connect(usableItemLib.ConnectChanged);
+		end
+		
+		if usableItemLib.InitStorage then
+			task.spawn(usableItemLib.InitStorage, self);
+		end
+		
+	end;
 
-			local psItemLib = modUsableItems:Find(packet.DragStorageItem.ItemId);
-			if psItemLib and psItemLib.PortableStorage then
-				
-				packet.Allowed = false;
-				packet.FailMsg = "You can't put storage("..packet.DragStorageItem.ItemId..") into another storage."
-				
-				return packet;
-			end
-
-			packet.Allowed = true;
-			return packet;
-		end)
-	end
-	
-	if usableItemLib.ConnectChanged then
-		self.OnChanged:Connect(usableItemLib.ConnectChanged);
-	end
-	
-	if usableItemLib.InitStorage then
-		task.spawn(usableItemLib.InitStorage, self);
-	end
+	if storageValues == nil then return end;
 end
 
 function Storage:RentalCheck()
@@ -790,12 +808,12 @@ function Storage.GetAuthorisedStorages(player)
 	return storages;
 end
 
---[[**
+--[[
 	Get player's storage of Id.
 	@param id string Id
 	@param player Player player
 	@returns Storage storage
-**--]]
+]]
 function Storage.Get(id, player)
 	if player == nil then 
 		return PublicStorages[id] 
@@ -864,12 +882,13 @@ function Storage.Validate(player, storageId, storageItemId)
 	return true;
 end
 
---[[**
+--[[
 	Find item with id from storages.
 	@param id string Id
 	@param player Player player
+
 	@returns StorageItem storageItem, Storage storage
-**--]]
+]]
 function Storage.FindIdFromStorages(id, player)
 	local storageList = player == nil and PublicStorages or Storage.GetPrivateStorages(player);
 	Debugger:Log("FindIdFromStorages(",id,player,") storageList", storageList);
@@ -882,12 +901,13 @@ function Storage.FindIdFromStorages(id, player)
 	return nil;
 end
 
---[[**
+--[[
 	Find item with itemId from storages.
 	@param itemId string itemId
 	@param player Player player
+
 	@returns StorageItem storageItem, Storage storage
-**--]]
+]]
 function Storage.FindItemIdFromStorages(itemId, player)
 	local storageList = player == nil and PublicStorages or Storage.GetPrivateStorages(player);
 	if player == nil then Debugger:Log("Finding itemId(",itemId,") from public storages."); end
@@ -897,14 +917,16 @@ function Storage.FindItemIdFromStorages(itemId, player)
 			return storageItem, storage;
 		end
 	end
+	return;
 end
 
---[[**
+--[[
 	List item with itemId from storages.
 	@param itemId string itemId
 	@param player Player player
+
 	@returns StorageItem storageItem, Storage storage
-**--]]
+]]
 function Storage.ListItemIdFromStorages(itemId, player, customStorages)
 	local storageList = player == nil and PublicStorages or Storage.GetPrivateStorages(player);
 	if player == nil then Debugger:Log("Listing itemId(",itemId,") from public storages."); end
@@ -2271,10 +2293,58 @@ function Storage:ListByIndexOrder()
 	return indexList;
 end
 
+function Storage:OpenStorage(player, storageId, storageConfig, packet)
+	packet = packet or {};
+	
+	local profile = shared.modProfile:Get(player);
+	local activeSave = profile:GetActiveSave();
+	if activeSave == nil then return; end;
+
+	local storage = Storage.Get(storageId, player);
+
+	--modOnGameEvents:Fire("OnStorageOpen", player, storageId);
+
+	local storageName = storageConfig.Name;
+	local defaultSize = storageConfig.Size;
+	local storagePage = packet.StoragePage or 1;
+	
+	if storage == nil then
+		if activeSave.Storages[storageId] == nil then
+			activeSave.Storages[storageId] = Storage.new(storageId, storageName, defaultSize, player);
+			storage = activeSave.Storages[storageId];
+
+			storage:InitStorage();
+		end
+		storage = activeSave.Storages[storageId];
+
+	end
+	
+	storage.Name = storageName;
+	storage.MaxPages = storageConfig.MaxPages;
+	storage.Page = storagePage;
+	storage.MaxSize = storageConfig.MaxSize;
+	storage.Size = math.clamp(activeSave.Storages[storageId].Size, defaultSize, storageConfig.MaxSize or activeSave.Storages[storageId].Size);
+	storage.Expandable = storageConfig.Expandable;
+	storage.Virtual = storageConfig.Virtual;
+
+	storage.Values.OwnerNpc = storageConfig.OwnerNpc;
+
+	if storageConfig.InitStorage then
+		if storage.Initialized ~= true then
+			storage.Initialized = true;
+			storageConfig.InitStorage(storage);
+		end
+	end
+
+	return storage;
+end
+
 
 local daySecs = 3600 * 24;
 function remoteStorageService.OnServerInvoke(player, packet)
-	local rPacket = {};
+	local rPacket = {
+		Storages=nil;
+	};
 	
 	local profile = shared.modProfile:Get(player);
 	
@@ -2333,6 +2403,7 @@ function remoteStorageService.OnServerInvoke(player, packet)
 			rPacket.Storages[storageId] = storage:Shrink();
 			
 		end
+		return;
 	end
 	
 	if packet.StorageIds then
