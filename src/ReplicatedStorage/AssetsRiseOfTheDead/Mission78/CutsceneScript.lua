@@ -80,7 +80,25 @@ if RunService:IsServer() then
 				end;
 			end
 		end);
-	
+		
+		modOnGameEvents:ConnectEvent("OnStorageChanged", function(player, storage)
+			modMission:Progress(player, missionId, function(mission)
+				if mission.Type == 1 and mission.ProgressionPoint == 1 and storage.Id == "LydiaStorage" then
+					local storageItemIndexList = storage:GetIndexDictionary();
+					
+					if storageItemIndexList[1] or storageItemIndexList[2] then
+						mission.ProgressionPoint = 2;
+						storage.Locked = true;
+
+						local lydiaNpcModule = modNpc.GetPlayerNpc(player, "Lydia");
+						if lydiaNpcModule then
+							lydiaNpcModule.Chat(lydiaNpcModule.Owner, "Yay, let's go zombies hunting!");
+						end
+					end
+				end
+			end)
+		end)
+		
 	end
 else
 	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
@@ -130,8 +148,6 @@ return function(CutsceneSequence)
 					end)
 					
 				elseif mission.ProgressionPoint == 3 then
-					Debugger:StudioWarn("npcData.Weapon", npcData and npcData.Weapon);
-
 					local hordeSpawnPart = workspace:FindFirstChild("HostileSpawnPart")
 					local spawnPoints = hordeSpawnPart:GetChildren();
 
@@ -155,21 +171,13 @@ return function(CutsceneSequence)
 						end
 					end)
 
-					local lydiaWeapon = npcData.Weapon;
-					local lydiaWeaponItemId = lydiaWeapon and lydiaWeapon.ItemId or "m9legacy";
-
-					lydiaModule.Wield.Equip(lydiaWeaponItemId);
-
-					pcall(function()
-						local dmg = math.clamp(100/(lydiaModule.Wield.ToolModule.Properties.Rpm/60), 5, 30);
-						lydiaModule.Wield.ToolModule.Configurations.MinBaseDamage = dmg;
-						lydiaModule.Wield.SetSkin(lydiaWeapon.Values);
-					end)
-
+					repeat task.wait() until lydiaModule.Wield.ToolModule ~= nil;
+					
 					lydiaModule.Chat(lydiaModule.Owner, "Wow, it's quite heavy..");
+					lydiaModule.Wield:ToggleIdle();
 					
 					lydiaModule.Actions:FollowOwner(function()
-						if mission.ProgressionPoint == 4 then
+						if mission.ProgressionPoint >= 4 then
 							local attractedEntities = modNpc.AttractEnemies(lydiaModule.Prefab, 32, function(npcModule)
 								return npcModule.Name == "Zombie" and npcModule.IsDead ~= true;
 							end);
@@ -180,6 +188,11 @@ return function(CutsceneSequence)
 								local isInVision = lydiaModule.IsInVision(pickEnemyPrefab.PrimaryPart);
 	
 								if isInVision and zombieNpcModule.IsDead ~= true then
+									pcall(function()
+										local dmg = math.clamp(100/(lydiaModule.Wield.ToolModule.Properties.Rpm/60), 5, 30);
+										lydiaModule.Wield.ToolModule.Configurations.MinBaseDamage = dmg;
+									end)
+
 									lydiaModule.Wield.SetEnemyHumanoid(zombieNpcModule.Humanoid);
 									lydiaModule.Move:Face(zombieNpcModule.Humanoid.RootPart);
 									lydiaModule.Wield.PrimaryFireRequest();
@@ -193,7 +206,7 @@ return function(CutsceneSequence)
 
 						end
 						
-						return mission.ProgressionPoint <= 4;
+						return mission.ProgressionPoint <= 6;
 					end)
 
 				elseif mission.ProgressionPoint == 5 then

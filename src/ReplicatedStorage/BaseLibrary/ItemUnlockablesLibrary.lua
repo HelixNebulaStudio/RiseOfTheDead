@@ -645,6 +645,7 @@ function ItemUnlockablesLibrary:Init(library)
 		Id="nekrostrenchhauntedpumpkin";
 		ItemId="nekrostrench";
 		Name="Haunted Pumpkin";
+		DefaultPackage=true;
 		
 		SurfaceAppearance={
 			ColorMap="rbxassetid://14971087352";
@@ -656,6 +657,7 @@ function ItemUnlockablesLibrary:Init(library)
 		Id="nekrostrenchblue";
 		ItemId="nekrostrench";
 		Name="Blue";
+		DefaultPackage=true;
 		
 		SurfaceAppearance={
 			ColorMap="rbxassetid://17275838311";
@@ -667,6 +669,7 @@ function ItemUnlockablesLibrary:Init(library)
 		Id="nekrostrenchgreen";
 		ItemId="nekrostrench";
 		Name="Green";
+		DefaultPackage=true;
 		
 		SurfaceAppearance={
 			ColorMap="rbxassetid://17275843895";
@@ -707,6 +710,107 @@ function ItemUnlockablesLibrary:Init(library)
 	};
 
 	
+	--== MARK: dufflebag
+	library:Add{
+		Id="dufflebag";
+		ItemId="dufflebag";
+		Name="Default";
+		Textures={
+			["Handle"]="rbxassetid://8827951970";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="dufflebageaster1";
+		ItemId="dufflebag";
+		Name="Easter Colors";
+		Textures={
+			["Handle"]="rbxassetid://8828356403";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="dufflebageaster2";
+		ItemId="dufflebag";
+		Name="Easter Stripes";
+		Textures={
+			["Handle"]="rbxassetid://8828358153";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="dufflebagstreetart";
+		ItemId="dufflebag";
+		Name="Street Art";
+		Textures={
+			["Handle"]="rbxassetid://8828360678";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="dufflebagvintage";
+		ItemId="dufflebag";
+		Name="Vintage";
+		Textures={
+			["Handle"]="rbxassetid://8828363019";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="dufflebagarticscape";
+		ItemId="dufflebag";
+		Name="Artic Scape";
+		Textures={
+			["Handle"]="rbxassetid://8828364639";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="dufflebagfirstaidgreen";
+		ItemId="dufflebag";
+		Name="Green First Aid";
+		Textures={
+			["Handle"]="rbxassetid://8828399132";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="dufflebaggalaxy";
+		ItemId="dufflebag";
+		Icon="rbxassetid://12658727687";
+		Name="Galaxy";
+		Textures={
+			["Handle"]="rbxassetid://12658706749";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="dufflebagorigins";
+		ItemId="dufflebag";
+		Name="Origins";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://13975329840";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="dufflebagfancy";
+		ItemId="dufflebag";
+		Name="Fancy";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17291191122";
+		};
+		SurfaceAppearanceParent=script;
+	};
 end
 
 return ItemUnlockablesLibrary;
