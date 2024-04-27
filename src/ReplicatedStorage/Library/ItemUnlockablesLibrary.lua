@@ -285,89 +285,6 @@ library:Add{
 	}
 };
 
---== dufflebag
-library:Add{
-	Id="dufflebag";
-	ItemId="dufflebag";
-	Name="Default";
-	Textures={
-		["Handle"]="rbxassetid://8827951970";
-	};
-};
-
-library:Add{
-	Id="dufflebageaster1";
-	ItemId="dufflebag";
-	Name="Easter Colors";
-	Textures={
-		["Handle"]="rbxassetid://8828356403";
-	}
-};
-
-library:Add{
-	Id="dufflebageaster2";
-	ItemId="dufflebag";
-	Name="Easter Stripes";
-	Textures={
-		["Handle"]="rbxassetid://8828358153";
-	}
-};
-
-library:Add{
-	Id="dufflebagstreetart";
-	ItemId="dufflebag";
-	Name="Street Art";
-	Textures={
-		["Handle"]="rbxassetid://8828360678";
-	}
-};
-
-library:Add{
-	Id="dufflebagvintage";
-	ItemId="dufflebag";
-	Name="Vintage";
-	Textures={
-		["Handle"]="rbxassetid://8828363019";
-	}
-};
-
-library:Add{
-	Id="dufflebagarticscape";
-	ItemId="dufflebag";
-	Name="Artic Scape";
-	Textures={
-		["Handle"]="rbxassetid://8828364639";
-	}
-};
-
-library:Add{
-	Id="dufflebagfirstaidgreen";
-	ItemId="dufflebag";
-	Name="Green First Aid";
-	Textures={
-		["Handle"]="rbxassetid://8828399132";
-	}
-};
-
-library:Add{
-	Id="dufflebaggalaxy";
-	ItemId="dufflebag";
-	Icon="rbxassetid://12658727687";
-	Name="Galaxy";
-	Textures={
-		["Handle"]="rbxassetid://12658706749";
-	}
-};
-
-library:Add{
-	Id="dufflebagorigins";
-	ItemId="dufflebag";
-	Name="Origins";
-	SurfaceAppearance={
-		ColorMap="rbxassetid://13975329840";
-	};
-};
-
 --== prisonshirt
 library:Add{
 	Id="prisonshirt";
@@ -743,6 +660,14 @@ library:Add{
 	};
 };
 
+library:Add{
+	Id="survivorsbackpackstreetart";
+	ItemId="survivorsbackpack";
+	Name="Street Art";
+	Textures={
+		["Handle"]="rbxassetid://17291375801";
+	};
+};
 
 --== santahat
 library:Add{

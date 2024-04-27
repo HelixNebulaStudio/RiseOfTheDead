@@ -71,34 +71,34 @@ function ItemsLibrary:Init(super)
 		SkinWear = true;
 		NonPremiumTax = 1000;
 	}
-	new(gunBase, {Id="p250"; Name="P250"; Icon="rbxassetid://17007248915"; Tags={"Pistol"}; Description="A handy pistol."; Sources={"Obtained from <b>Mason in The Beginning</b>";};});
-	new(gunBase, {Id="cz75"; Name="CZ75-Auto"; Icon="rbxassetid://17007239643"; Tags={"Pistol"}; Description="High fire-rate automatic pistol. Has built in <b>Damage Rev</b>, which does more damage the lower your ammo count is in your magazine.";});
-	new(gunBase, {Id="tec9"; Name="Tec-9"; Icon="rbxassetid://17007237750"; Tags={"Pistol"}; Description="High power, high firerate pistol. Has built in <b>Auto Trigger</b>, which sets the firing mode to automatic.";});
-	new(gunBase, {Id="dualp250"; Name="Dual P250"; Icon="rbxassetid://17007236263"; Tags={"Pistol"}; Description="Two handy pistols. Is a <b>Dual Wield</b> weapon.";});
-	new(gunBase, {Id="m9legacy"; Name="M9 Legacy"; Icon="rbxassetid://3296446616"; Tags={"Pistol"}; Description="A handy legacy pistol.";});
-	new(gunBase, {Id="revolver454"; Name="Revolver 454"; Icon="rbxassetid://2009719243"; Tags={"Pistol"}; Description="Also known as the Raging Bull 454, high power, high fire-rate revolver.";});
-	new(gunBase, {Id="deagle"; Name="Desert Eagle"; Icon="rbxassetid://16238188322"; Tags={"Pistol"}; Description="The hand cannon. Has built in <b>Focus Charge</b>, which does more damage if you charge your focus by aiming down sights.";}); --rbxassetid://5166288732 
+	new(gunBase, {Id="p250"; Name="P250"; Icon="rbxassetid://17007248915"; Tags={"Pistol"; "Secondary Weapon";}; Description="A handy pistol."; Sources={"Obtained from <b>Mason in The Beginning</b>";};});
+	new(gunBase, {Id="cz75"; Name="CZ75-Auto"; Icon="rbxassetid://17007239643"; Tags={"Pistol"; "Secondary Weapon";}; Description="High fire-rate automatic pistol. Has built in <b>Damage Rev</b>, which does more damage the lower your ammo count is in your magazine.";});
+	new(gunBase, {Id="tec9"; Name="Tec-9"; Icon="rbxassetid://17007237750"; Tags={"Pistol"; "Secondary Weapon";}; Description="High power, high firerate pistol. Has built in <b>Auto Trigger</b>, which sets the firing mode to automatic.";});
+	new(gunBase, {Id="dualp250"; Name="Dual P250"; Icon="rbxassetid://17007236263"; Tags={"Pistol"; "Secondary Weapon";}; Description="Two handy pistols. Is a <b>Dual Wield</b> weapon.";});
+	new(gunBase, {Id="m9legacy"; Name="M9 Legacy"; Icon="rbxassetid://3296446616"; Tags={"Pistol"; "Secondary Weapon";}; Description="A handy legacy pistol.";});
+	new(gunBase, {Id="revolver454"; Name="Revolver 454"; Icon="rbxassetid://2009719243"; Tags={"Pistol"; "Secondary Weapon";}; Description="Also known as the Raging Bull 454, high power, high fire-rate revolver.";});
+	new(gunBase, {Id="deagle"; Name="Desert Eagle"; Icon="rbxassetid://16238188322"; Tags={"Pistol"; "Secondary Weapon";}; Description="The hand cannon. Has built in <b>Focus Charge</b>, which does more damage if you charge your focus by aiming down sights.";}); --rbxassetid://5166288732 
 
-	new(gunBase, {Id="xm1014"; Name="XM1014"; Icon="rbxassetid://6523762932"; Tags={"Shotgun"}; Description="Quick fire-rate long barrel shotgun.";});
-	new(gunBase, {Id="sawedoff"; Name="Sawed-Off"; Icon="rbxassetid://17007247358"; Tags={"Shotgun"}; Description="Close range head remover with high multishot.";});
-	new(gunBase, {Id="mariner590"; Name="Mariner 590"; Icon="rbxassetid://17007243924"; Tags={"Shotgun"}; Description="Quick and high damage tactical shotgun.";});
-	new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"}; Description="Powerful hand made shotgun with built-in <b>Crit Receiver</b>.";});
+	new(gunBase, {Id="xm1014"; Name="XM1014"; Icon="rbxassetid://6523762932"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick fire-rate long barrel shotgun.";});
+	new(gunBase, {Id="sawedoff"; Name="Sawed-Off"; Icon="rbxassetid://17007247358"; Tags={"Shotgun"; "Primary Weapon";}; Description="Close range head remover with high multishot.";});
+	new(gunBase, {Id="mariner590"; Name="Mariner 590"; Icon="rbxassetid://17007243924"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick and high damage tactical shotgun.";});
+	new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"; "Primary Weapon";}; Description="Powerful hand made shotgun with built-in <b>Crit Receiver</b>.";});
 
-	new(gunBase, {Id="mp5"; Name="MP5"; Icon="rbxassetid://9960159062"; Tags={"Submachine gun"}; Description="Quick fire-rate sub-machine gun.";});
-	new(gunBase, {Id="mp7"; Name="MP7"; Icon="rbxassetid://9960161355"; Tags={"Submachine gun"}; Description="Good accuracy and damage sub-machine gun.";});
-	new(gunBase, {Id="czevo3"; Name="CZ-Scorpion EVO 3"; Icon="rbxassetid://4814129724"; Tags={"Submachine gun"}; Description="Extremely tactical sub-machine gun with a high base damage. Has built in <b>Damage Rev</b>, which does more damage the lower your ammo count is in your magazine.";});
-	new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine gun"}; NonPremiumTax = 4900; Description="Elite sub-machine gun with built-in <b>Crit Receiver</b> and suppressor.";});
+	new(gunBase, {Id="mp5"; Name="MP5"; Icon="rbxassetid://9960159062"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Quick fire-rate sub-machine gun.";});
+	new(gunBase, {Id="mp7"; Name="MP7"; Icon="rbxassetid://9960161355"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Good accuracy and damage sub-machine gun.";});
+	new(gunBase, {Id="czevo3"; Name="CZ-Scorpion EVO 3"; Icon="rbxassetid://4814129724"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Extremely tactical sub-machine gun with a high base damage. Has built in <b>Damage Rev</b>, which does more damage the lower your ammo count is in your magazine.";});
+	new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine gun"; "Primary Weapon";}; NonPremiumTax = 4900; Description="Elite sub-machine gun with built-in <b>Crit Receiver</b> and suppressor.";});
 
-	new(gunBase, {Id="m4a4"; Name="M4A4"; Icon="rbxassetid://5166150878"; Tags={"Rifle"}; Description="Military grade M4 rifle capable of high damage and long range shooting.";});
-	new(gunBase, {Id="ak47"; Name="AK-47"; Icon="rbxassetid://5166397129"; Tags={"Rifle"}; Description="High damage, high magazine capacity, and great fire-rate. Quite a noise maker.";});
-	new(gunBase, {Id="fnfal"; Name="FN FAL"; Icon="rbxassetid://17007249959"; Tags={"Rifle"}; Description="The FN FAL is a high damage rifle with a very high fire rate.";});
-	new(gunBase, {Id="sr308"; Name="SR-308"; Icon="rbxassetid://16570523670"; Tags={"Rifle"}; Description="Ergonomic Russian battle rifle. Built with a special type of receiver that has a chance to fire a critical shot.";});
+	new(gunBase, {Id="m4a4"; Name="M4A4"; Icon="rbxassetid://5166150878"; Tags={"Rifle"; "Primary Weapon";}; Description="Military grade M4 rifle capable of high damage and long range shooting.";});
+	new(gunBase, {Id="ak47"; Name="AK-47"; Icon="rbxassetid://5166397129"; Tags={"Rifle"; "Primary Weapon";}; Description="High damage, high magazine capacity, and great fire-rate. Quite a noise maker.";});
+	new(gunBase, {Id="fnfal"; Name="FN FAL"; Icon="rbxassetid://17007249959"; Tags={"Rifle"; "Primary Weapon";}; Description="The FN FAL is a high damage rifle with a very high fire rate.";});
+	new(gunBase, {Id="sr308"; Name="SR-308"; Icon="rbxassetid://16570523670"; Tags={"Rifle"; "Primary Weapon";}; Description="Ergonomic Russian battle rifle. Built with a special type of receiver that has a chance to fire a critical shot.";});
 	
-	new(gunBase, {Id="awp"; Name="AWP"; Icon="rbxassetid://5166454078"; Tags={"Sniper"}; Description="High Damage, high recoil and long ranged rifle.";});
-	new(gunBase, {Id="rec21"; Name="Rec-21"; Icon="rbxassetid://6532745901"; Tags={"Sniper"}; Description="High power, light weight tactical sniper rifle.";});
+	new(gunBase, {Id="awp"; Name="AWP"; Icon="rbxassetid://5166454078"; Tags={"Sniper"; "Primary Weapon";}; Description="High Damage, high recoil and long ranged rifle.";});
+	new(gunBase, {Id="rec21"; Name="Rec-21"; Icon="rbxassetid://6532745901"; Tags={"Sniper"; "Primary Weapon";}; Description="High power, light weight tactical sniper rifle.";});
 	
-	new(gunBase, {Id="minigun"; Name="Minigun"; Icon="rbxassetid://5175211604"; Tags={"Heavy machine gun"}; Description="It weighs fifty seven kilograms and fires two hundred dollar, custom-tooled cartridges at ten thousand rounds per minute. It costs four hundred thousand dollars to fire this weapon... for twelve seconds.";});
-	new(gunBase, {Id="desolatorheavy"; Name="Desolator Heavy"; Icon="rbxassetid://6244386293"; Tags={"Heavy machine gun"}; Description="Heavy machine gun that desolates your enemies. Design inspired by the negev LMG, the Desolator Heavy is a high power concentrated machine gun firing heavy rounds with built-in <b>Rapid Fire</b> enabled. Weapon accuracy will increase as the weapon warms up from firing.";});
+	new(gunBase, {Id="minigun"; Name="Minigun"; Icon="rbxassetid://5175211604"; Tags={"Heavy machine gun"; "Primary Weapon";}; Description="It weighs fifty seven kilograms and fires two hundred dollar, custom-tooled cartridges at ten thousand rounds per minute. It costs four hundred thousand dollars to fire this weapon... for twelve seconds.";});
+	new(gunBase, {Id="desolatorheavy"; Name="Desolator Heavy"; Icon="rbxassetid://6244386293"; Tags={"Heavy machine gun"; "Primary Weapon";}; Description="Heavy machine gun that desolates your enemies. Design inspired by the negev LMG, the Desolator Heavy is a high power concentrated machine gun firing heavy rounds with built-in <b>Rapid Fire</b> enabled. Weapon accuracy will increase as the weapon warms up from firing.";});
 	
 	new(gunBase, {Id="flamethrower"; Name="Flamethrower"; Icon="rbxassetid://17005466120"; Tags={"Incendiary"; "Launcher"}; Description="Burn zombies, burn!";});
 
@@ -609,6 +609,9 @@ function ItemsLibrary:Init(super)
 	new(unlockableBase, {Id="dufflebagvintage"; Icon="rbxassetid://8828340427"; Unlockable="Vintage Duffle Bag";});
 	new(unlockableBase, {Id="dufflebagarticscape"; Icon="rbxassetid://8828341507"; Unlockable="Artic Scape Duffle Bag";});
 	new(unlockableBase, {Id="dufflebagfirstaidgreen"; Icon="rbxassetid://8828351670"; Unlockable="Green First Aid Duffle Bag";});
+	new(unlockableBase, {Id="dufflebagfancy"; Icon="rbxassetid://17291182326"; Unlockable="Fancy Duffle Bag";});
+
+	new(unlockableBase, {Id="survivorsbackpackstreetart"; Icon="rbxassetid://17291367511"; Unlockable="Street Art Survivor's Backpack";});
 
 	new(unlockableBase, {Id="militarybootsdesert"; Icon="rbxassetid://17022737460"; Unlockable="Desert Military Boots";});
 	new(unlockableBase, {Id="militarybootsforest"; Icon="rbxassetid://17022741672"; Unlockable="Forest Military Boots";});
@@ -677,8 +680,8 @@ function ItemsLibrary:Init(super)
 
 	new(unlockableBase, {Id="highvisjacketsuits"; Icon="rbxassetid://17275772207"; Unlockable="Suits High Visibility Jacket";});
 	
-	new(unlockableBase, {Id="nekrostrenchblue"; Icon="rbxassetid://17275855245"; Unlockable="Blue Nekros Trench Coat";});
-	new(unlockableBase, {Id="nekrostrenchgreen"; Icon="rbxassetid://17275855405"; Unlockable="Green Nekros Trench Coat";});
+	new(unlockableBase, {Id="nekrostrenchblue"; Icon="rbxassetid://17291808230"; Unlockable="Blue Nekros Trench Coat";});
+	new(unlockableBase, {Id="nekrostrenchgreen"; Icon="rbxassetid://17291810059"; Unlockable="Green Nekros Trench Coat";});
 
 	new(unlockableBase, {Id="fedorauvunwrapped"; Icon="rbxassetid://17275939280"; Unlockable="UV Unwrapped Fedora";});
 	

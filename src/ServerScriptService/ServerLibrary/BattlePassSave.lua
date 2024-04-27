@@ -65,7 +65,7 @@ goldPoolMem:OnUpdateRequest("claim", function(requestPacket)
 	local inputValues = requestPacket.Values; 
 	
 	if poolData == nil then
-		requestPacket.FailMsg = "Gold is unavailable to claim at the moment. Error1";
+		requestPacket.FailMsg = "Gold is unavailable to claim at the moment.";
 		return nil;
 	end
 	
@@ -180,7 +180,6 @@ function BattlePassSave:AddLevel(bpId, addAmt)
 	addAmt = addAmt or 1;
 	local newLevel = passData.Level + addAmt;
 	passData.Level = newLevel;
-
 	
 	if passData.Level >= #treeList then
 		if passData.Completed == false then
@@ -209,6 +208,7 @@ function BattlePassSave:AddLevel(bpId, addAmt)
 						local rewardInfo = rewards[1];
 						
 						if rewardInfo then
+							rewardInfo.ExpireTime = workspace:GetServerTimeNow()+shared.Const.OneDaySecs;
 							passData.PostRewards[lvlStr] = rewardInfo;
 						end
 					end
@@ -217,9 +217,16 @@ function BattlePassSave:AddLevel(bpId, addAmt)
 			
 		end
 		
+		local serverTime = workspace:GetServerTimeNow();
+		for lvlStr, rewardInfo in pairs(passData.PostRewards) do
+			if rewardInfo.ExpireTime < serverTime then continue end;
+			passData.PostRewards[lvlStr] = nil;
+		end
+
 	else
-		
+		passData.LastLevelUpTime = workspace:GetServerTimeNow();
 		remoteHudNotification:FireClient(self.Player, "BattlePassLevelUp", {Level=passData.Level; HasRewards=(leafInfo.Reward ~= nil);});
+
 	end
 	self:Sync();
 	
@@ -323,9 +330,6 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		end
 
 		local price = bpLib.Price;
-		if profile.Premium then
-			price = bpLib.PremiumPrice;
-		end
 		local playerGold = traderProfile.Gold;
 
 		if playerGold < price then

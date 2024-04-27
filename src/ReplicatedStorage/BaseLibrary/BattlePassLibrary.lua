@@ -29,6 +29,7 @@ function BattlePassLibrary:Init(library)
 	library.Active = "bp5years";
 	
 	-- MARK: BP Season 1
+	--[[
 	library:Add{
 		Id="bpseason1";
 		EndUnixTime=1693526400;
@@ -148,8 +149,10 @@ function BattlePassLibrary:Init(library)
 			});
 		};
 	};
-	
+	]]
+
 	-- MARK: BP Halloween 1
+	--[[
 	library:Add{
 		Id="bphalloween1";
 		EndUnixTime=1698796800;
@@ -270,6 +273,7 @@ function BattlePassLibrary:Init(library)
 			});
 		};
 	};
+	]]
 
 	-- MARK: BP 5 Years Anniversary
 	library:Add{
@@ -280,8 +284,7 @@ function BattlePassLibrary:Init(library)
 		Icon="rbxassetid://17271606182";
 		Desc="Unlock the 5 Years Anniversary Pass to claim more rewards!";
 
-		PremiumPrice=250;
-		Price=500;
+		Price=1000;
 
 		Tree = newTree{
 			leaf(0, {
@@ -335,7 +338,7 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="militarybootsgold"; PassOwner=true;};
 			});
 			leaf(39, {
-				Reward={ItemId="mercskneepadscarbonfiberblack";};
+				Reward={ItemId="mercskneepads";};
 			});
 			leaf(42, {
 				Reward={ItemId="energydrink";};
@@ -365,10 +368,10 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="liquidmetalpolish"; Quantity=3;};
 			});
 			leaf(69, {
-				Reward={ItemId="fireworks"; Quantity=3;};
+				Reward={ItemId="tomeoftweaks";};
 			});
 			leaf(72, {
-				Reward={ItemId="tomeoftweaks"; RequiresPremium=true;};
+				Reward={ItemId="skinfancy"; RequiresPremium=true;};
 			});
 			leaf(75, {
 				Reward={ItemId="sandwich";};
@@ -380,13 +383,13 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="deaglecryogenics"; PassOwner=true;};
 			});
 			leaf(84, {
-				Reward={ItemId="fireworks"; Quantity=3;};
+				Reward={ItemId="skincarbonfiber";};
 			});
 			leaf(87, {
 				Reward={ItemId="energydrink";};
 			});
 			leaf(90, {
-				Reward={ItemId="fedora"; RequiresPremium=true;};
+				Reward={ItemId="dufflebagfancy"; RequiresPremium=true;};
 			});
 			leaf(93, {
 				Reward={ItemId="liquidmetalpolish"; Quantity=3;};
@@ -397,8 +400,87 @@ function BattlePassLibrary:Init(library)
 			leaf(99, {
 				Reward={ItemId="tirearmorgoldplating"; PassOwner=true;};
 			});
-			leaf(100, {
+			leaf(103, {
 				Reward={ItemId="gold"; Quantity=250;};
+			});
+			leaf(107, {
+				Reward={
+					ItemId="colorcustom";
+					Data={Values={Color="1b6a17";}};
+					ItemNameOverwrite = "Rise of the Dead: Green Color";
+				};
+			});
+			leaf(111, {
+				Reward={ItemId="gold"; Quantity=200; RequiresPremium=true;};
+			});
+			leaf(115, {
+				Reward={ItemId="ammobox";};
+			});
+			leaf(119, {
+				Reward={ItemId="skinfancy";};
+			});
+			leaf(123, {
+				Reward={ItemId="tomeoftweaks"; PassOwner=true;};
+			});
+			leaf(127, {
+				Reward={ItemId="liquidmetalpolish"; Quantity=3;};
+			});
+			leaf(131, {
+				Reward={ItemId="colorcustom"; Quantity=1;};
+			});
+			leaf(135, {
+				Reward={ItemId="gold"; Quantity=200; RequiresPremium=true;};
+			});
+			leaf(139, {
+				Reward={ItemId="fireworks"; Quantity=3;};
+			});
+			leaf(143, {
+				Reward={ItemId="annihilationsoda";};
+			});
+			leaf(147, {
+				Reward={ItemId="ziphoningserum"; Quantity=3; PassOwner=true;};
+			});
+			leaf(151, {
+				Reward={ItemId="mercskneepadscarbonfiberblack";};
+			});
+			leaf(155, {
+				Reward={ItemId="nekronparticulatecache"; Quantity=2;};
+			});
+			leaf(159, {
+				Reward={ItemId="gold"; Quantity=200; RequiresPremium=true;};
+			});
+			leaf(163, {
+				Reward={ItemId="nekronparticulatecache"; Quantity=2;};
+			});
+			leaf(167, {
+				Reward={ItemId="sandwich";};
+			});
+			leaf(171, {
+				Reward={ItemId="tomeoftweaks"; PassOwner=true;};
+			});
+			leaf(175, {
+				Reward={ItemId="survivorsbackpackstreetart";};
+			});
+			leaf(179, {
+				Reward={ItemId="energydrink";};
+			});
+			leaf(183, {
+				Reward={ItemId="gold"; Quantity=200; RequiresPremium=true;};
+			});
+			leaf(187, {
+				Reward={ItemId="annihilationsoda";};
+			});
+			leaf(191, {
+				Reward={ItemId="liquidmetalpolish"; Quantity=3;};
+			});
+			leaf(195, {
+				Reward={ItemId="tomeoftweaks"; PassOwner=true;};
+			});
+			leaf(199, {
+				Reward={ItemId="ziphoningserum"; Quantity=3;};
+			});
+			leaf(200, {
+				Reward={ItemId="gold"; Quantity=200;};
 			});
 		};
 	};

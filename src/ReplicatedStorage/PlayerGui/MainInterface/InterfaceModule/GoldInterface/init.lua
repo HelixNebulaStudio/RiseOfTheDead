@@ -300,15 +300,7 @@ function Interface:LoadProduct(productId)
 			end
 			
 		elseif productLib.Type == "Battlepass" then
-			
-			if modData.IsPremium then
-				purchaseText = modFormatNumber.Beautify(productLib.PremiumPrice).." Gold"..
-					('<font size="9">(NonPremium '.. modFormatNumber.Beautify(productLib.Price).." Gold)").."</font>";
-			else
-				purchaseText = modFormatNumber.Beautify(productLib.Price).." Gold"..
-					('<font size="9">(Premium '.. modFormatNumber.Beautify(productLib.PremiumPrice).." Gold)").."</font>";
-			end
-			
+			purchaseText = modFormatNumber.Beautify(productLib.Price).." Gold";
 			
 		end
 		
