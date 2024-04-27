@@ -65,7 +65,7 @@ if RunService:IsServer() then
 					for _, player in pairs(game.Players:GetPlayers()) do
 						modMission:Progress(player, missionId, function(mission)
 							if mission.ProgressionPoint == 4 then
-								if lydiaNpcModule and mission.SaveData.LydiaKills > 0 then
+								if lydiaNpcModule and mission.SaveData.LydiaKills > 0 and math.fmod(mission.SaveData.LydiaKills, 2) == 0 then
 									lydiaNpcModule.Chat(lydiaNpcModule.Owner, killDialogues[math.random(1, #killDialogues)]);
 								end
 								mission.SaveData.LydiaKills = math.max(mission.SaveData.LydiaKills -1, 0);

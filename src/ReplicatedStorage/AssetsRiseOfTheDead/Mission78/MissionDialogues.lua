@@ -47,10 +47,8 @@ Dialogues.Lydia.Dialogues = function()
 end
 
 if RunService:IsServer() then
-	local npcName = "Lydia";
 	-- MARK: Lydia Handler
 	Dialogues.Lydia.DialogueHandler = function(player, dialog, data, mission)
-		local modTradingService = require(game.ServerScriptService.ServerLibrary.TradingService);
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 		local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 
@@ -84,103 +82,6 @@ if RunService:IsServer() then
 						lydiaModule.Chat(lydiaModule.Owner, "I hope the gun is pretty. :3");
 					end
 				end, "Lydia");
-				
-				-- dialog:AddChoice("killhue_giveGun", function(dialog)
-				-- 	local tradingSession = modTradingService:NewComputerSession(player, npcName);
-				-- 	tradingSession:SetData(npcName, "HideGold", true);
-					
-				-- 	local npcTradeStorage = tradingSession.Storages[npcName];
-					
-				-- 	local failTrade = nil;
-				-- 	local weaponStorageItem = nil;
-				-- 	tradingSession:BindStateUpdate(function()
-				-- 		if tradingSession.State == 3 then
-				-- 			Debugger:Warn("Give Lydia", weaponStorageItem);
-							
-				-- 			local profile = shared.modProfile:Get(player);
-				-- 			local safehomeData = profile.Safehome;
-							
-				-- 			local npcData = safehomeData:GetNpc(npcName);
-				-- 			npcData.Weapon = weaponStorageItem;
-	
-				-- 			modMission:Progress(player, missionId, function(mission)
-				-- 				if mission.ProgressionPoint == 1 then
-				-- 					mission.ProgressionPoint = 2;
-				-- 				end
-				-- 			end)
-				-- 		end
-				-- 	end)
-					
-				-- 	tradingSession:BindConfirmSet(function(self, playerObj)
-				-- 		if playerObj.Confirm then
-				-- 			if weaponStorageItem  then
-				-- 				tradingSession:SetData(npcName, "Message", "Yay, let's go zombies hunting!");
-				-- 				tradingSession:SetConfirm(npcName, true);
-				-- 			end
-							
-				-- 			tradingSession:Sync("tradesession");
-	
-				-- 		else
-				-- 			tradingSession:SetConfirm(npcName, false);
-				-- 			if tradingSession.State == 2 then
-				-- 				tradingSession:SetData(npcName, "Message", "Hmm?");
-				-- 				tradingSession:Sync("tradesession");
-				-- 			end
-				-- 		end
-				-- 	end)
-					
-				-- 	local function processTrade(self, playerObj)
-				-- 		npcTradeStorage:Wipe();
-				-- 		weaponStorageItem = nil;
-						
-				-- 		local playerDeposits = tradingSession.Storages[player.Name];
-				-- 		local itemCount = playerDeposits:Loop(function(storageItem)
-				-- 			if modItemsLibrary:HasTag(storageItem.ItemId, "Gun") ~= true then
-				-- 				failTrade = "This doesn't look like a gun.";
-				-- 				return;
-				-- 			end
-							
-				-- 			if modItemsLibrary:HasTag(storageItem.ItemId, "Pistol")
-				-- 			or modItemsLibrary:HasTag(storageItem.ItemId, "Shotgun")
-				-- 			or modItemsLibrary:HasTag(storageItem.ItemId, "Submachine gun")
-				-- 			or modItemsLibrary:HasTag(storageItem.ItemId, "Rifle") then
-				-- 				weaponStorageItem = storageItem;
-				-- 				failTrade = nil;
-	
-				-- 			else
-				-- 				failTrade = "That gun looks cool, but it looks too complicated for me, can I have something simpler?";
-	
-				-- 			end
-				-- 		end);
-						
-				-- 		if itemCount >= 2 then
-				-- 			failTrade = "Why is there more than one items??";
-				-- 		end
-				-- 		if playerObj.Gold ~= 0 then
-				-- 			failTrade = "Why is there gold??";
-				-- 		end
-						
-				-- 		-- Evaluate;
-				-- 		if failTrade then
-				-- 			weaponStorageItem = nil;
-				-- 			tradingSession:SetData(npcName, "Message", failTrade);
-	
-				-- 		elseif weaponStorageItem == nil then
-				-- 			tradingSession:SetData(npcName, "Message", "I hope the gun is pretty. :3");
-	
-				-- 		elseif weaponStorageItem ~= nil then
-				-- 			tradingSession:SetData(npcName, "Message", "Ooo, that's a cool gun!");
-							
-				-- 		end
-	
-				-- 		tradingSession:Sync("tradesession");
-				-- 	end
-					
-				-- 	tradingSession:BindGoldUpdate(processTrade);
-				-- 	tradingSession:BindStorageUpdate(processTrade);
-	
-				-- 	tradingSession:Sync("tradesession", true);
-				-- end);
 				
 			elseif mission.ProgressionPoint == 6 then
 				dialog:SetInitiateTag("killhue_finInit");
