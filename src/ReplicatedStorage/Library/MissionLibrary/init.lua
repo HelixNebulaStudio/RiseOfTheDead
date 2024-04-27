@@ -147,8 +147,9 @@ local PerksReward = {
 	Normal=10;
 	Hard=25;
 };
-local factionMissionExpireTime = 3600*20;
+MissionLibrary.PerksReward = PerksReward;
 
+local factionMissionExpireTime = 3600*20;
 --===
 
 -- !outline: 1: Unconscious
@@ -653,6 +654,7 @@ MissionLibrary.New{
 	ObjectivesCompleteText="Return to Jesse with the $ItemName";
 	LogEntry={};
 	GuideText="Talk to Jesse to start";
+	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
 		{Type="Item"; ItemId="deagleparts"; Quantity=1;};
@@ -791,6 +793,7 @@ MissionLibrary.New{
 		--Dialog("Jane", "springkill_done");
 	};
 	GuideText="Talk to Jane to start";
+	Tier="Easy";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Easy};
 	};
@@ -973,6 +976,7 @@ MissionLibrary.New{
 		--Dialog("Diana", "blueprint_start");
 	};
 	GuideText="Talk to Diana to start";
+	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
 		{Type="Item"; ItemId="deagleparts"; Quantity=1;};
@@ -1257,6 +1261,7 @@ MissionLibrary.New{
 	LogEntry={
 	};
 	GuideText="Talk to Molly to start";
+	Tier="Hard";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Hard};
 	};
@@ -1763,6 +1768,7 @@ MissionLibrary.New{
 	LogEntry={
 	};
 	GuideText="Help the Stranger break out";
+	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
 	};
@@ -2036,6 +2042,7 @@ MissionLibrary.New{
 		{Type="SafehomeNpcLimit";};
 		{Type="Cooldown"; Value=(3600 * 4)};
 	};
+	Tier="Easy";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Easy};
 	};
@@ -2443,6 +2450,7 @@ MissionLibrary.New{
 	LogEntry={
 	};
 	GuideText="";
+	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
 	};
@@ -2471,6 +2479,7 @@ MissionLibrary.New{
 	LogEntry={
 	};
 	GuideText="";
+	Tier="Hard";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Hard};
 	};
@@ -2496,6 +2505,7 @@ MissionLibrary.New{
 	LogEntry={
 	};
 	GuideText="";
+	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
 	};
@@ -2521,6 +2531,7 @@ MissionLibrary.New{
 	LogEntry={
 	};
 	GuideText="";
+	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
 	};
@@ -2549,6 +2560,7 @@ MissionLibrary.New{
 	LogEntry={
 	};
 	GuideText="";
+	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
 	};
@@ -2573,6 +2585,7 @@ MissionLibrary.New{
 	LogEntry={
 	};
 	GuideText="";
+	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
 	};
@@ -2603,6 +2616,7 @@ MissionLibrary.New{
 	LogEntry={
 	};
 	GuideText="";
+	Tier="Hard";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Hard};
 		{Type="Item"; ItemId="deagleparts"; Quantity=1;};
@@ -2693,6 +2707,7 @@ MissionLibrary.New{
 	LogEntry={
 	};
 	GuideText="";
+	Tier="Hard";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Hard};
 	};
@@ -2764,6 +2779,7 @@ MissionLibrary.New{
 	LogEntry={
 	};
 	GuideText="Talk to Rachel to start";
+	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
 	};
@@ -2816,7 +2832,7 @@ MissionLibrary.New{
 	Description="Lydia wants to shoot some zombies but she doesn't have a gun.";
 	Persistent=true;
 	Checkpoint={
-		{Text="Give Lydia a weapon that you don't need";};
+		{Text="Talk to Lydia and give her a weapon";};
 		{Text="Look out for zombies breaching your safehome";};
 		{Text="Kill $PlayerKills zombies while Lydia watches you kill them.";};
 		{Text="Let Lydia kill $LydiaKills zombies";};

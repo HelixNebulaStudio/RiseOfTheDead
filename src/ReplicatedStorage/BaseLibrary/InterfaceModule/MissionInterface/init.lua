@@ -28,6 +28,8 @@ local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCal
 
 local modGuiObjectTween = require(game.ReplicatedStorage.Library.UI.GuiObjectTween);
 local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface);
+local modRadialImage = require(game.ReplicatedStorage.Library.UI.RadialImage);
+local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remotePinMission = remotes.Interface.PinMission;
@@ -47,6 +49,18 @@ local templateRMissionButton = script:WaitForChild("RMissionButton");
 local templatePassReward = script:WaitForChild("PassReward");
 local templateLockedLabel = script:WaitForChild("LockedLabel");
 
+local timerRadialBar = script:WaitForChild("radialBar");
+timerRadialBar.AnchorPoint = Vector2.new(0, 1);
+timerRadialBar.Position = UDim2.new(0, 0, 1, 0);
+timerRadialBar.Size = UDim2.new(0, 18, 0, 18);
+timerRadialBar.ZIndex = 3;
+
+local timerRadialConfig = '{"version":1,"size":128,"count":128,"columns":8,"rows":8,"images":["rbxassetid://10606346824","rbxassetid://10606347195"]}';
+local BarColors = {
+	Green=Color3.fromRGB(27, 106, 23);
+	Yellow=Color3.fromRGB(163, 143, 27);
+	Red=Color3.fromRGB(118, 54, 54);
+}
 local firstSync=false;
 --==
 local Interface = {
@@ -66,6 +80,12 @@ modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
 		Interface.Update();
 	end
 end)
+
+local boardMissionColors = {
+	Easy = Color3.fromRGB(100, 100, 100);
+	Normal = Color3.fromRGB(51, 102, 204);
+	Hard = Color3.fromRGB(101, 59, 169);
+};
 
 local bpColors = {
 	CurrentNormal = Color3.fromRGB(135, 255, 135);
@@ -1050,7 +1070,9 @@ function Interface.init(modInterface)
 	
 	local repeatableMissionList = {};
 	local levelSlotsInfo = {};
-	local finalSlotInfo = {};
+	local finalSlotInfo = {
+		Slot=nil;
+	};
 	
 	local pinRequestDebounce = false;
 	function Interface.Update()
@@ -1582,7 +1604,7 @@ function Interface.init(modInterface)
 							end
 							
 							if checkpointInfo.Notify == true and missionPinHud.Visible and notifyPinnedMission then
-								spawn(notifyPinnedMission, true);
+								task.spawn(notifyPinnedMission, true);
 							end
 							
 						elseif book.Progression and missionData.ProgressionPoint and book.Progression[missionData.ProgressionPoint] then
@@ -1675,9 +1697,6 @@ function Interface.init(modInterface)
 					if pinnedMissionName ~= book.Name then
 						pinnedMissionName = book.Name;
 
-						--if camera.ViewportSize.X >= 800 then
-						--end
-						local lastText = nil;
 						notifyPinnedMission = function(checkpointNotify)
 							local mainGui = missionPinHud.Parent;
 							if mainGui == nil then return end;
@@ -1799,13 +1818,16 @@ function Interface.init(modInterface)
 
 							local newButton = obj;
 
+							local color: Color3 = boardMissionColors[obj:GetAttribute("Tier")] or Color3.fromRGB(100, 100, 100);
+							local h, s, v = color:ToHSV();
+
 							if hasActiveRepeatableMission then
 								newButton.AutoButtonColor = false;
-								newButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50);
+								newButton.BackgroundColor3 = Color3.fromHSV(h, s, v*0.5);
 
 							else
 								newButton.AutoButtonColor = true;
-								newButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
+								newButton.BackgroundColor3 = color;
 
 							end
 
@@ -1821,6 +1843,7 @@ function Interface.init(modInterface)
 					end)
 
 
+					-- MARK: Board Missions Rendering
 					for a=1, #repeatableMissionList do
 						local missionData = repeatableMissionList[a].Data;
 						if missionData.Type == 1 or missionData.Type == 3 then continue end;
@@ -1834,12 +1857,14 @@ function Interface.init(modInterface)
 
 						titleLabel.Text = missionLib.Name;
 						descLabel.Text = missionLib.Description;
+						newButton:SetAttribute("Tier", missionLib.Tier);
 						
 						local rewardStrList = {};
 						for b=1, #missionLib.Rewards do
 							local rewardInfo = missionLib.Rewards[b];
 							if rewardInfo.Type == "Perks" then
 								table.insert(rewardStrList, rewardInfo.Amount.." Perks");
+
 							elseif rewardInfo.Type == "Item" then
 								local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
 								if itemLib then
@@ -2232,16 +2257,7 @@ function Interface.init(modInterface)
 							descLabel.Text = battlepassLib.Desc;
 
 							local price = battlepassLib.Price;
-							if modData.IsPremium then
-								price = battlepassLib.PremiumPrice;
-								claimButton.Text = "Unlock for ".. modFormatNumber.Beautify(battlepassLib.PremiumPrice) 
-									.. " Gold"..'<font size="9">\n(Non-Premium '.. battlepassLib.Price .." Gold)</font>";
-
-							else
-								claimButton.Text = "Unlock for ".. modFormatNumber.Beautify(battlepassLib.Price) 
-									.. " Gold"..'<font size="9">\n(Premium '.. battlepassLib.PremiumPrice .." Gold)</font>";
-								
-							end
+							claimButton.Text = "Unlock for ".. modFormatNumber.Beautify(battlepassLib.Price) .." Gold";
 
 							local  claimText = claimButton.Text;
 							claimButton.TextScaled = false;
@@ -2436,7 +2452,7 @@ function Interface.init(modInterface)
 									titleStr = titleStr.." (Premium)";
 									
 								end
-								titleLabel.Text = titleStr.."</font>\n<b>".. itemLib.Name .."</b>";
+								titleLabel.Text = titleStr.."</font>\n<b>".. (rewardInfo.ItemNameOverwrite or itemLib.Name) .."</b>";
 								
 								local contentFrame = passRewardFrame:WaitForChild("Frame");
 								local claimButton = contentFrame:WaitForChild("ClaimButton");
@@ -2703,6 +2719,7 @@ function Interface.init(modInterface)
 								titleStr = titleStr.." (Mission Pass)";
 								descText = "Requires Mission Pass!\n"..descText;
 							end
+							descText = descText.. modRichFormatter.RichFontSize("\n\nReward drops will expire after 24 hours.", 12);
 							titleLabel.Text = titleStr;
 							
 							local groups = modDropRateCalculator.Calculate(rewardsLib);
@@ -2799,6 +2816,28 @@ function Interface.init(modInterface)
 								end
 								
 								return r;
+							end
+
+							local radialBarLabel = timerRadialBar:Clone();
+							radialBarLabel.Parent = itemButtonObj.ImageButton;
+
+							local radialBar = modRadialImage.new(timerRadialConfig, radialBarLabel);
+							local itemUpdateFunc = itemButtonObj.Update;
+
+							itemButtonObj.Update = function(self, storageItemData)
+								itemUpdateFunc(self, storageItemData);
+								if rewardInfo.ExpireTime == nil then return end;
+								local timeRemaining = rewardInfo.ExpireTime - workspace:GetServerTimeNow();
+								local timeLeftRatio = timeRemaining/shared.Const.OneDaySecs;
+								radialBar:UpdateLabel(timeLeftRatio);
+
+								if timeRemaining <= (3600*4) then
+									radialBarLabel.ImageColor3 = BarColors.Yellow;
+								elseif timeRemaining <= 3600 then
+									radialBarLabel.ImageColor3 = BarColors.Red;
+								else
+									radialBarLabel.ImageColor3 = BarColors.Green;
+								end
 							end
 
 							itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
@@ -2908,19 +2947,21 @@ function Interface.init(modInterface)
 							newGlow.Parent = itemButtonObj.ImageButton;
 							lvlSlotInfo.GlowLabel = newGlow;
 							itemButtonObj.DimOut = nil;
+							itemButtonObj.ImageButton.radialBar.Visible = true;
 
 
 						elseif claimState == "Claimed" then
 							game.Debris:AddItem(itemButtonObj.ImageButton:FindFirstChild("LockLabel"), 0);
 							game.Debris:AddItem(lvlSlotInfo.GlowLabel, 0);
 							itemButtonObj.DimOut = true;
+							itemButtonObj.ImageButton.radialBar.Visible = false;
 
 						end
 
-						itemButtonObj:Update({
-							ItemId=rewardInfo.ItemId;
-							Quantity=tonumber(rewardInfo.Quantity) or 1;
-						});
+						local itemData = rewardInfo.Data or {};
+						itemData.ItemId = rewardInfo.ItemId;
+						itemData.Quantity = rewardInfo.Quantity or 1;
+						itemButtonObj:Update(itemData);
 
 						lvlSlot.ImageColor3 = bpColors.CurrentPassOwner;
 						lvlSlot.Parent = battlePassContent;
