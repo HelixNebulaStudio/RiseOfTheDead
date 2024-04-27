@@ -85,6 +85,10 @@ function OnDialogue(player, npcModel, npcName, choice)
 				end;
 			end
 			
+			--[[
+				dialog:AddDialog(dialogue, func, data)
+				@param dialogue {}
+			]]
 			function dialog:AddDialog(dialogue, func, data)
 				local choiceInfo = {Dialogue=dialogue; Data=data; Func=func;};
 				table.insert(dialog.Choices, choiceInfo);

@@ -3,11 +3,12 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local random = Random.new();
 
 --== Variables;
-local SaveData = {};
+local SaveData = {
+	TradingService=nil;
+};
 SaveData.__index = SaveData;
 
 local BadgeService = game:GetService("BadgeService");
-local HttpService = game:GetService("HttpService");
 
 local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
 local modSkillTreeLibrary = require(game.ReplicatedStorage.Library.SkillTreeLibrary);
@@ -15,9 +16,6 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modAchievementLibrary = require(game.ReplicatedStorage.Library.AchievementLibrary);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
-local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
-local modUsableItems = require(game.ReplicatedStorage.Library.UsableItems);
-local modTableManager = require(game.ReplicatedStorage.Library.TableManager);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
@@ -26,7 +24,6 @@ local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 local modBlueprints = require(game.ServerScriptService.ServerLibrary.Blueprints);
 local modDialogues = require(game.ServerScriptService.ServerLibrary.DialogueSave);
-local modMailObject = require(game.ServerScriptService.ServerLibrary.MailObject);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modWorkbenchData = require(game.ServerScriptService.ServerLibrary.WorkbenchData);
 local modAppearanceData = require(game.ServerScriptService.ServerLibrary.AppearanceData);
@@ -34,12 +31,8 @@ local modStatisticProfile = require(game.ServerScriptService.ServerLibrary.Stati
 local modStatusSave = require(game.ServerScriptService.ServerLibrary.StatusSave);
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 
-local remotePlayerDataSync = modRemotesManager:Get("PlayerDataSync");
 local remoteMasterySync = modRemotesManager:Get("MasterySync");
 local remoteHudNotification = modRemotesManager:Get("HudNotification");
-
-local remotes = game.ReplicatedStorage.Remotes;
-local remoteMailboxSync = remotes.Interface.MailboxSync;
 
 local libAuthTree = modSkillTreeLibrary.Authority:GetSorted();
 local libEnduTree = modSkillTreeLibrary.Endurance:GetSorted();
@@ -72,15 +65,6 @@ function SaveData.new(profile)
 			
 		end
 		
-		--local syncData = modTableManager.GetDataHierarchy(self, hierarchyKey);
-		--Debugger:Warn("hierarchyKey", hierarchyKey, "syncData", #game:GetService("HttpService"):JSONEncode(syncData),debug.traceback());
-		--remotePlayerDataSync:Fire(self.Player, {
-		--	[modRemotesManager.Ref("Action")] = "sync";
-		--	[modRemotesManager.Ref("Data")] = syncData;
-		--	[modRemotesManager.Ref("HierarchyKey")] = ("GameSave"..(hierarchyKey and "/"..hierarchyKey or ""));
-		--});
-		
-		--remotePlayerDataSync:FireClient(player, "sync", newData, "GameSave"..(hierarchyKey and "/"..hierarchyKey or ""));
 	end;
 	dataMeta.AppearanceData = modAppearanceData.new(player, data);
 	
@@ -140,6 +124,7 @@ function SaveData.new(profile)
 						end
 						
 					end
+					return;
 				end)
 				
 				if denyMsg ~= nil then
@@ -211,10 +196,10 @@ function SaveData:Load(rawData, isPrimarySave)
 
 			if key == "Stats" then
 				for k, v in pairs(data) do
-					if k:match("Kills") and k:match("LevelKills-") == nil and k ~= "Kills" and k ~= "ZombieKills" and k ~= "HumanKills" then
-						--self.Statistics:SetStat("KillTracker", k, v);
-					elseif k == "Perks" or k == "Money" then
+					if k == "Perks" or k == "Money" then
 						self.Stats[k] = math.clamp(v, 0, math.huge);
+					elseif k:match("Kills") and k:match("LevelKills-") == nil and k ~= "Kills" and k ~= "ZombieKills" and k ~= "HumanKills" then
+						--self.Statistics:SetStat("KillTracker", k, v);
 					else
 						self.Stats[k] = v;
 					end
@@ -232,7 +217,7 @@ function SaveData:Load(rawData, isPrimarySave)
 					end
 					
 					local newStorage = modStorage.new(id, (rawStorage.Name or id), rawStorage.Size, self.Player):Load(rawStorage);
-					newStorage:InitStorage(id);
+					newStorage:InitStorage();
 
 					local items = newStorage:Loop();
 					if items > 0 or rawStorage.Expandable or (rawStorage.Values and next(rawStorage.Values)) then -- This saves upgraded storages and ignores empty storages.
@@ -412,6 +397,7 @@ function SaveData:FindItemFromStorages(id)
 			return storage.Container[id], storage;
 		end;
 	end
+	return;
 end
 
 function SaveData:CalculateLevel()

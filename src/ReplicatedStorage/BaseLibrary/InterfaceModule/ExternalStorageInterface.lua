@@ -10,10 +10,8 @@ local uiGradientSequence = {
 --== Variables;
 local Interface = {};
 
-local UserInputService = game:GetService("UserInputService");
-
 local localplayer = game.Players.LocalPlayer;
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));

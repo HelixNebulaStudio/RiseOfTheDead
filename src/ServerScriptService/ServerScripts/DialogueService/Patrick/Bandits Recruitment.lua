@@ -15,15 +15,7 @@ return function(player, dialog, data, mission)
 						modMission:StartMission(player, 63);
 					end)
 				end)
-				
-				--local newDialog = {
-				--	Face="Surprise";
-				--	Dialogue="Hear anything about the Bandits or the Rats?";
-				--	Reply="Yes, in fact, the Bandits has been recruiting lately. They are looking for the one who helped them during the cargo ship disaster.";
-				--};
-				
-				--dialog:AddDialog(newDialog, function(dialog)
-				--end);
+
 			end);
 
 		end

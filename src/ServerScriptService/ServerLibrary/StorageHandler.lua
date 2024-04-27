@@ -3,7 +3,9 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 
 --==
-local StorageHandler = {}
+local StorageHandler = {
+	OnNewStorage = nil;
+}
 
 local moddedSelf = modModEngineService:GetServerModule(script.Name);
 if moddedSelf then

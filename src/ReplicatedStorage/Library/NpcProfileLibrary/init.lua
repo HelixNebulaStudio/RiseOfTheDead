@@ -111,6 +111,7 @@ function library:GetProperties(name)
 		lib.Properties=require(module);
 		return lib.Properties;
 	end
+	return;
 end
 
 return library;

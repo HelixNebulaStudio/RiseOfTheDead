@@ -12,7 +12,7 @@ UsablePreset.PortableStorage = {StorageId="portableautoturret"; Persistent=true;
 
 function UsablePreset:Use(storageItem)
 	local player = game.Players.LocalPlayer;
-	local modData = require(player:WaitForChild("DataModule"));
+	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 	
 	local storage = remoteOpenStorageRequest:InvokeServer(storageItem);
 	if storage and type(storage) == "table" then
