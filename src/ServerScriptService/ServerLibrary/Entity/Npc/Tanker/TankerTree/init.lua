@@ -12,8 +12,9 @@ local remoteCameraShakeAndZoom = remotes.CameraShakeAndZoom;
 return function(self)
 	local tree = modLogicTree.new{
 		Root={"Or"; "StatusLogic"; "AggroSequence"; "Idle";};
-		AggroSelect={"Or"; "RebarSlam"; "RebarTornado"; "FollowTarget";};
+		AggroSelect={"Or"; "RebarSlam"; "RebarTornado"; "AttackSequence"; "FollowTarget";};
 		AggroSequence={"And"; "HasTarget"; "AggroSelect";};
+		AttackSequence={"And"; "CanAttackTarget"; "Attack"};
 	}
 	
 	--==
@@ -82,7 +83,7 @@ return function(self)
 				local floorRayResult = workspace:Raycast(origin, -Vector3.yAxis*4, raycastPreset);
 				
 				if floorRayResult then
-					local rayPos, rayNorm = floorRayResult.Position, floorRayResult.Normal;
+					local rayPos, _rayNorm = floorRayResult.Position, floorRayResult.Normal;
 
 					local particlePacket = {
 						Type=1;
@@ -105,7 +106,7 @@ return function(self)
 					newPrefab:PivotTo(CFrame.lookAt(rayPos, rayPos + dir) * CFrame.Angles(0, math.rad(90), 0))
 					newPrefab.Parent = workspace.Environment;
 					
-					local fencePart: BasePart = newPrefab:WaitForChild("Fence");
+					local fencePart = newPrefab:WaitForChild("Fence") :: BasePart;
 					fencePart.CollisionGroup = "PlayerClips";
 					Debugger.Expire(newPrefab, self.HardMode and 35 or 20);
 					
@@ -133,7 +134,7 @@ return function(self)
 				local dir = disp.Unit;
 				local dist = Vector3.new(disp.X, disp.Y*4, disp.Z).Magnitude;
 				
-				local damageRange = (self.HardMode and 16 or 12);
+				local damageRange = (self.HardMode and 32 or 12);
 				local dmgScaling = modMath.MapNum(math.clamp(dist, 0, damageRange), 
 					0, (self.HardMode and 32 or 24), 
 					(self.HardMode and 200 or 45), (self.HardMode and 95 or 25)
@@ -211,7 +212,7 @@ return function(self)
 							remoteCameraShakeAndZoom:FireClient(enemyPlayer, 10, 5, 0.5, 0.01, true);
 
 							if self.HardMode then
-								local dir = (enemyPrefab:GetPivot().Position-self.RootPart.Position).Unit;
+								--local dir = (enemyPrefab:GetPivot().Position-self.RootPart.Position).Unit;
 								modStatusEffects.Slowness(enemyPlayer, 5, 0.5);
 							end
 						end
@@ -230,7 +231,7 @@ return function(self)
 		if track:GetAttribute("LoopConn") == nil then
 			track:SetAttribute("LoopConn", true);
 			
-			local d=0.4167;
+			local _d=0.4167;
 			local isSpinning = false;
 			track:GetMarkerReachedSignal("Event"):Connect(function(paramString)
 				if paramString == "SpinStart" then
@@ -272,36 +273,31 @@ return function(self)
 	
 	
 	
-	--tree:Hook("CanAttackTarget", function()
+	tree:Hook("CanAttackTarget", function()
 
-	--	cache.TargetPosition = targetRootPart.CFrame.Position;
+		cache.TargetPosition = targetRootPart.CFrame.Position;
 
-	--	if (self.GetTargetDistance() <= self.Properties.AttackRange) and (tick() > cache.AttackCooldown) then
-	--		return modLogicTree.Status.Success;
-	--	end
+		if (self.GetTargetDistance() <= self.Properties.AttackRange) and (tick() > cache.AttackCooldown) then
+			return modLogicTree.Status.Success;
+		end
 
-	--	return modLogicTree.Status.Failure;
-	--end)
+		return modLogicTree.Status.Failure;
+	end)
 
-	--tree:Hook("Attack", function()
-	--	local relativeCframe = self.RootPart.CFrame:ToObjectSpace(CFrame.new(cache.TargetPosition));
+	tree:Hook("Attack", function()
+		local relativeCframe = self.RootPart.CFrame:ToObjectSpace(CFrame.new(cache.TargetPosition));
 
-	--	local dirAngle = math.deg(math.atan2(relativeCframe.X, -relativeCframe.Z));
-	--	if math.abs(dirAngle) > 40 then
-	--		cache.AttackCooldown = tick() + math.random(10, 20)/100;
-	--		return modLogicTree.Status.Failure;
-	--	end;
+		local dirAngle = math.deg(math.atan2(relativeCframe.X, -relativeCframe.Z));
+		if math.abs(dirAngle) > 40 then
+			cache.AttackCooldown = tick() + math.random(10, 20)/100;
+			return modLogicTree.Status.Failure;
+		end;
 
-	--	cache.AttackCooldown = tick() + (self.Properties.AttackSpeed * math.random(90, 110)/100);
-
-	--	if self.Wield.Handler then
-	--		self.Wield.PrimaryFireRequest();
-	--	else
-	--		self.BasicAttack2(targetHumanoid);
-	--	end
-
-	--	return modLogicTree.Status.Success;
-	--end)
+		cache.AttackCooldown = tick() + (self.Properties.AttackSpeed * math.random(90, 110)/100);
+		self.BasicAttack2(targetHumanoid);
+		
+		return modLogicTree.Status.Success;
+	end)
 	
 	
 	
