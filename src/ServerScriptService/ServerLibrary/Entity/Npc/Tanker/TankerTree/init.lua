@@ -171,12 +171,12 @@ return function(self)
 		end
 		cache.RebarSpinCooldown = tick()+20;
 
-		self.Move:Follow(targetRootPart, 4);
+		self.Move:Follow(targetRootPart, 0.5);
 		
 		self.Wield.PlayAnim("SpinAttack");
 		local spinDuration = self.HardMode and math.random(9, 12) or 5;
 		
-		self.Move:SetMoveSpeed("set", "sprint", self.HardMode and 22 or 18, 2, (spinDuration-2));
+		self.Move:SetMoveSpeed("set", "sprint", self.HardMode and 26 or 22, 2, (spinDuration-2));
 
 		local toolModel = self.Wield.Instances[1];
 		local collider = toolModel.Collider;
@@ -304,7 +304,7 @@ return function(self)
 	tree:Hook("FollowTarget", function()
 		targetRootPart = self.Target and self.Target.PrimaryPart;
 
-		self.Move:Follow(targetRootPart, 4);
+		self.Move:Follow(targetRootPart, 0.5);
 		
 		if cache.NextAction == "" then
 			cache.NextAction = "RebarSlam";

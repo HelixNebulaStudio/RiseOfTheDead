@@ -29,12 +29,12 @@ return function(npc, spawnPoint)
 		
 		if self.HardMode then
 			self.Humanoid.MaxHealth = math.max(123000 + 4000*level, 100);
-			self.Properties.AttackDamage = 60;
+			self.Properties.AttackDamage = 80;
 			self.Move.SetDefaultWalkSpeed = 16;
 			
 		else
 			self.Humanoid.MaxHealth = math.max(8000 + 2000*level, 100);
-			self.Properties.AttackDamage = 30;
+			self.Properties.AttackDamage = 40;
 			self.Move.SetDefaultWalkSpeed = 10;
 			
 		end

@@ -17,7 +17,7 @@ return function(npc, spawnPoint)
 		
 		Properties = {
 			AttackSpeed = 2.3;
-			AttackDamage = 10;
+			AttackDamage = 20;
 			AttackRange = 8;
 		};
 
@@ -34,19 +34,23 @@ return function(npc, spawnPoint)
 		
 		if self.HardMode then
 			self.Humanoid.MaxHealth = math.max(200000 + 5000*level, 100);
-			self.Properties.AttackDamage = 30;
+			self.Properties.AttackDamage = 50;
 			self.Move.SetDefaultWalkSpeed = 14;
 			
 		else
 			self.Humanoid.MaxHealth = math.max(5000 + 1500*level, 100);
-			self.Properties.AttackDamage = 10;
+			self.Properties.AttackDamage = 20;
 			self.Move.SetDefaultWalkSpeed = 8;
 			
 		end
 		self.Humanoid.Health = self.Humanoid.MaxHealth;
 		self.Move:Init();
 		
+		self.Wield.Targetable.Humanoid = 1;
+		self.Wield.Targetable.Bandit = 1;
+		self.Wield.Targetable.Rat = 1;
 		self.Wield.Equip("tankerrebar");
+
 		
 		self.Think:Fire();
 		coroutine.yield();
