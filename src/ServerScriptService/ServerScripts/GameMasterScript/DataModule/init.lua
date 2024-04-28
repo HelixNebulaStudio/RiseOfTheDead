@@ -467,6 +467,12 @@ function Data:GetEvent(id, fetch)
 	--end
 end
 
+function Data:RequestData(hierarchyKey)
+	remotePlayerDataSync:Fire{
+		[modRemotesManager.Ref("Action")] = "request";
+		[modRemotesManager.Ref("HierarchyKey")] = hierarchyKey;
+	};
+end
 
 function Data:SetSquad(squad)
 	local ClientSquad = require(script:WaitForChild("ClientSquad"))(Data);

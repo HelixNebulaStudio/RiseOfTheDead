@@ -538,8 +538,8 @@ function Interface.init(modInterface)
 			
 			remoteWorkbenchInteract:FireServer(visible);
 			if visible then
-				Interface:RequestData("GameSave/Workbench");
-				Interface:RequestData("GameSave/Blueprints");
+				modData:RequestData("GameSave/Workbench");
+				modData:RequestData("GameSave/Blueprints");
 				
 				Interface.ClearSelection();
 				Interface.RefreshNavigations();
@@ -574,7 +574,7 @@ function Interface.init(modInterface)
 				end)
 			end
 
-			Interface:RequestData("ItemUnlockables");
+			modData:RequestData("ItemUnlockables");
 		end)
 	end)
 	

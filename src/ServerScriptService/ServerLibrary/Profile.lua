@@ -1151,34 +1151,6 @@ function Profile:Sync(hierarchyKey, paramPacket)
 		remotePlayerDataSync:Fire(self.Player, paramPacket);
 	end
 	
-	--if hierarchyKey == nil then
-	--	--Debugger:Warn("Player DataSync", tostring(hierarchyKey), "DataSize#"..#HttpService:JSONEncode(self));
-	--	--Debugger:Warn("Deprecated end use of sync all", debug.traceback());
-	--	--remotePlayerDataSync:Fire(self.Player, {
-	--	--	[modRemotesManager.Ref("Action")] = "sync";
-	--	--	[modRemotesManager.Ref("Data")] = self;
-	--	--});
-	--	--remotePlayerDataSync:FireClient(self.Player, "sync", self);
-
-	--	if self.Trader then
-	--		--self.Trader:SyncGold();
-	--	end
-	--	self:RefreshPlayerTitle();
-
-	--else
-	--	local data = modTableManager.GetDataHierarchy(self, hierarchyKey);
-		
-	--	Debugger:Warn("Player DataSync", tostring(hierarchyKey), typeof(data) == "table" and "DataSize#"..#HttpService:JSONEncode(data) or tostring(data), debug.traceback());
-		
-	--	remotePlayerDataSync:Fire(self.Player, {
-	--		[modRemotesManager.Ref("Action")] = "sync";
-	--		[modRemotesManager.Ref("Data")] = data;
-	--		[modRemotesManager.Ref("HierarchyKey")] = hierarchyKey;
-	--	});
-	--	--remotePlayerDataSync:FireClient(self.Player, "sync", data, hierarchyKey);
-		
-	--end
-	
 	task.spawn(function()
 		local modPlayers = require(game.ReplicatedStorage.Library.Players);
 		local classPlayer = modPlayers.Get(self.Player);

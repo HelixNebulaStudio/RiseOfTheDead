@@ -209,7 +209,7 @@ function Interface.init(modInterface)
 		return;
 	end);
 
-	Interface:RequestData("Trader/Gold");
+	modData:RequestData("Trader/Gold");
 	window.OnWindowToggle:Connect(function(visible)
 		if visible then
 			Interface:HideAll{[window.Name]=true; ["Inventory"]=true;};

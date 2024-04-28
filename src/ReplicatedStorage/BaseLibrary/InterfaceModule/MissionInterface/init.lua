@@ -302,7 +302,7 @@ function Interface.init(modInterface)
 			Interface.RefreshMissionMap();
 			Interface.UpdateBattlePass();
 			
-			Interface:RequestData("GameSave/Missions");
+			modData:RequestData("GameSave/Missions");
 			
 		else
 			MissionDisplayFrame:ClearAllChildren();
@@ -311,7 +311,7 @@ function Interface.init(modInterface)
 		end
 	end)
 	if not firstSync then
-		Interface:RequestData("GameSave/Missions");
+		modData:RequestData("GameSave/Missions");
 	end
 	
 	

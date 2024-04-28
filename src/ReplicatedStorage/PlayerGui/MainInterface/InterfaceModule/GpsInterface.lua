@@ -109,7 +109,7 @@ function Interface.Update(toolH)
 		return;
 	end;
 
-	Interface:RequestData("GameSave/LastFastTravel");
+	modData:RequestData("GameSave/LastFastTravel");
 	local unlockedGps = storageItem.Values.Gps or {};
 
 	for _, obj in pairs(listFrame:GetChildren()) do

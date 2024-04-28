@@ -680,7 +680,7 @@ function Interface.init(modInterface)
 	window.OnWindowToggle:Connect(function(visible)
 		selectedId = nil;
 		if visible then
-			Interface:RequestData("GameSave/Masteries");
+			modData:RequestData("GameSave/Masteries");
 			
 			Interface:HideAll{[window.Name]=true;};
 			Interface.Update();

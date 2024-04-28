@@ -3,7 +3,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local Workbench = {};
 local Interface = {
 	List = nil;
-	RequestData = nil;
 	WorkbenchItemDisplay = nil;
 	PlayButtonClick = nil;
 	Object = nil;
@@ -51,8 +50,8 @@ function Workbench.new(itemId, library, storageItem)
 	if firstSync == false then
 		firstSync = true;
 
-		Interface:RequestData("ColorPacks");
-		Interface:RequestData("SkinsPacks");
+		modData:RequestData("ColorPacks");
+		modData:RequestData("SkinsPacks");
 		modData:GetFlag("CustomColors", true);
 	end
 	

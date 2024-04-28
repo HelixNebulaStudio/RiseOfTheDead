@@ -43,7 +43,7 @@ function Interface.init(modInterface)
 	window:SetOpenClosePosition(UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0.5, 0, -1.5, 0));
 	window.OnWindowToggle:Connect(function(visible)
 		if visible then
-			Interface:RequestData("Safehome");
+			modData:RequestData("Safehome");
 			Interface:HideAll{[window.Name]=true};
 			Interface:ToggleInteraction(false);
 			Interface.Update();

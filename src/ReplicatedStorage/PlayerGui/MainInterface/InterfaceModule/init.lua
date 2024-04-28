@@ -769,14 +769,6 @@ function Interface.HandleStorage(action, request, storageIds)
 	end
 end
 
-
-function Interface:RequestData(hierarchyKey)
-	remotePlayerDataSync:Fire{
-		[modRemotesManager.Ref("Action")] = "request";
-		[modRemotesManager.Ref("HierarchyKey")] = hierarchyKey;
-	};
-end
-
 function Interface:Get(interfaceName: string)
 	return self["mod"..interfaceName];
 end
