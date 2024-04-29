@@ -8,7 +8,6 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local modMarkers = require(game.ReplicatedStorage.Library.Markers);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler);
-local modNpcProfileLibrary = Debugger:Require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 
 local MissionLibrary = {};
 local library = {};
@@ -75,8 +74,6 @@ function MissionLibrary.New(data)
 			missionDialogues = require(gameAssets.MissionDialogues);
 			
 			for npcName, pack in pairs(missionDialogues) do
-				local npcLib = modNpcProfileLibrary:Find(npcName);
-				if npcLib == nil then continue end;
 				if pack.Dialogues == nil then continue end;
 				
 				modDialogueLibrary.AddDialogues(npcName, pack.Dialogues(), {

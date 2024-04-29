@@ -15,6 +15,8 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
 
+local modNpcTasksLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcTasksLibrary);
+
 local modStorageInterface = require(game.ReplicatedStorage.Library.UI.StorageInterface);
 
 local remotePlayerDataFetch = modRemotesManager:Get("PlayerDataFetch");
@@ -36,6 +38,8 @@ function Interface.init(modInterface)
 	local viewportFrame = leftFrame:WaitForChild("ViewportFrame")
 	local rightScrollFrame: ScrollingFrame = mainFrame:WaitForChild("RightScrollFrame");
 	local tasksTitle: TextLabel = mainFrame:WaitForChild("TasksTitle");
+	local newTaskFrame = rightScrollFrame:WaitForChild("newTaskButton") :: Frame;
+	local newTaskButton = newTaskFrame:WaitForChild("Button") :: TextButton;
 
 	local window = Interface.NewWindow("NpcWindow", windowFrame);
 	window.CompactFullscreen = true;
@@ -161,6 +165,10 @@ function Interface.init(modInterface)
 		end
 	end
 
+	newTaskButton.MouseButton1Click:Connect(function()
+		Interface:PlayButtonClick();
+	end)
+	
 	Interface.Garbage:Tag(modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
 		if action ~= "sync" then return end;
 		

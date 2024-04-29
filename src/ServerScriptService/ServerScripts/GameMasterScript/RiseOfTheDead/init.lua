@@ -15,7 +15,9 @@ local modConfigurations = require(game.ReplicatedStorage.Library.Configurations)
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modItemSkinWear = require(game.ReplicatedStorage.Library.ItemSkinWear);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
+local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
+
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modMailObject = require(game.ServerScriptService.ServerLibrary.MailObject);

@@ -30,7 +30,6 @@ local modUsableItems = Debugger:Require(game.ReplicatedStorage.Library.UsableIte
 local modCutscene = Debugger:Require(game.ReplicatedStorage.Library.Cutscene);
 local modRewardsLibrary = Debugger:Require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modWorkbenchLibrary = Debugger:Require(game.ReplicatedStorage.Library.WorkbenchLibrary);
-local modNpcProfileLibrary = Debugger:Require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modMissionLibrary = Debugger:Require(game.ReplicatedStorage.Library.MissionLibrary);
 local modGpsLibrary = Debugger:Require(game.ReplicatedStorage.Library.GpsLibrary);
 local modLeaderboardService = Debugger:Require(game.ReplicatedStorage.Library.LeaderboardService);

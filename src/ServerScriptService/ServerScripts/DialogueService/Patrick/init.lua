@@ -74,10 +74,9 @@ return function(player, dialog, data)
 			Dialogue="Who's wanted posters are we putting up?";
 		}
 		
-
-		local modNpcProfiles = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
-		local npcLib = modNpcProfiles:Find(wantedPoster.Name);
-		local nameRich = '<font face="ArialBold" color="#'.. modNpcProfiles.ClassColors[npcLib.Class]:ToHex() ..'">'.. wantedPoster.Name ..'</font>';
+		local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
+		local npcLib = modNpcProfileLibrary:Find(wantedPoster.Name);
+		local nameRich = '<font face="ArialBold" color="#'.. modNpcProfileLibrary.ClassColors[npcLib.Class]:ToHex() ..'">'.. wantedPoster.Name ..'</font>';
 		
 		dialogPacket.Reply = "I've been putting up ".. nameRich .."'s wanted posters.";
 		dialog:AddDialog(dialogPacket, function(dialog)
@@ -104,9 +103,9 @@ return function(player, dialog, data)
 				
 				local wantedNpc = storageItem.Values and storageItem.Values.WantedNpc;
 				if wantedNpc then
-					local modNpcProfiles = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
-					local npcLib = modNpcProfiles:Find(wantedNpc);
-					local nameRich = '<font face="ArialBold" color="#'.. modNpcProfiles.ClassColors[npcLib.Class]:ToHex() ..'">'.. wantedNpc ..'</font>';
+					local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
+					local npcLib = modNpcProfileLibrary:Find(wantedNpc);
+					local nameRich = '<font face="ArialBold" color="#'.. modNpcProfileLibrary.ClassColors[npcLib.Class]:ToHex() ..'">'.. wantedNpc ..'</font>';
 					list[a].NameRich = nameRich;
 					availablePosters[wantedNpc] = list[a];
 				end

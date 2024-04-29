@@ -794,9 +794,9 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 			itemDesc = itemDesc..h3O.."\nStats: "..h3C.. colorNumberText(itemValues.CardGameStats);
 		end
 		if itemValues.WantedNpc then
-			local modNpcProfiles = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
-			local npcLib = modNpcProfiles:Find(itemValues.WantedNpc);
-			itemName = '<font face="ArialBold" color="#'.. modNpcProfiles.ClassColors[npcLib.Class]:ToHex() ..'">'.. itemValues.WantedNpc ..'</font> Wanted Poster';
+			local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
+			local npcLib = modNpcProfileLibrary:Find(itemValues.WantedNpc);
+			itemName = '<font face="ArialBold" color="#'.. modNpcProfileLibrary.ClassColors[npcLib.Class]:ToHex() ..'">'.. itemValues.WantedNpc ..'</font> Wanted Poster';
 			itemDesc = itemDesc..h3O.."\nWanted: "..h3C.. itemValues.WantedNpc;
 		end
 		if itemValues.Seed then
