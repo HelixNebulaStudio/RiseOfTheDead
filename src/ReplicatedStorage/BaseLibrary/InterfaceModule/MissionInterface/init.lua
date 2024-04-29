@@ -17,14 +17,15 @@ local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandle
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modMissionsLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
-local modHeadIcons = require(game.ReplicatedStorage.Library.HeadIcons);
 local modMarkers = require(game.ReplicatedStorage.Library.Markers);
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modTableManager = require(game.ReplicatedStorage.Library.TableManager);
 local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
+
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
+local modHeadIcons = require(game.ReplicatedStorage.BaseLibrary.HeadIcons);
 
 local modGuiObjectTween = require(game.ReplicatedStorage.Library.UI.GuiObjectTween);
 local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface);

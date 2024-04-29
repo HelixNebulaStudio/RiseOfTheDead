@@ -3,10 +3,10 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 
@@ -22,7 +22,7 @@ if RunService:IsServer() then
 	modRaid = require(game.ServerScriptService.ServerLibrary.GameModeManager.Raid);
 	
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 
@@ -128,7 +128,7 @@ return function(CutsceneSequence)
 				end
 			end
 			mission.Changed:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
 		end)
 		
 		
@@ -482,7 +482,7 @@ return function(CutsceneSequence)
 				end
 			end
 			mission.Changed:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
 		end)
 
 		CutsceneSequence:NewScene("enableInterfaces", function()
@@ -651,7 +651,7 @@ return function(CutsceneSequence)
 				end
 			end
 			mission.Changed:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
 		end)
 
 		CutsceneSequence:NewScene("teleportToHostage", function()

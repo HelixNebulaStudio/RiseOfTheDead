@@ -7,15 +7,16 @@ local Interface = {};
 local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = require(localPlayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
+
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modGoldShopLibrary = require(game.ReplicatedStorage.Library.GoldShopLibrary);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 
@@ -59,7 +60,9 @@ function Interface.init(modInterface)
 	window:AddCloseButton(windowFrame);
 	
 	local itemMarketList;
-	local cache = {};
+	local cache = {
+		TopDonor = nil;
+	};
 	
 	window.OnWindowToggle:Connect(function(visible, toolHandler)
 		if visible then

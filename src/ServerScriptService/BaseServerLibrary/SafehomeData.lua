@@ -8,11 +8,12 @@ local TweenService = game:GetService("TweenService");
 
 local audioModule = game.ReplicatedStorage.Library.Audio;
 
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modSafehomesLibrary = require(game.ReplicatedStorage.Library.SafehomesLibrary);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);

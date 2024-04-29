@@ -36,7 +36,7 @@ Dialogues.Lydia.Dialogues = function()
 		{Tag="killhue_finInit";
 			Face="Joyful"; Reply="That was really fun, thanks for letting me learn and shoot some zombies!";};
 		{Tag="killhue_fin1"; Dialogue="You did pretty good! Now you can defend yourself with the gun.";
-			Face="Suspicious"; Reply="Mhm! Hmmmm, Something does bother me. Nothing too important but.."};
+			Face="Suspicious"; Reply="Mhm! Hmmmm, something still bothers me. It's not too important but.."};
 		{Tag="killhue_fin2"; Dialogue="..? What's bothering you?";
 			Face="Oops"; Reply="The colors of the gun.. Hahah! I like to decorate the things I have.."};
 		{Tag="killhue_fin3"; Dialogue="Ohh";

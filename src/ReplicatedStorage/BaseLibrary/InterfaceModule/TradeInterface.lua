@@ -17,7 +17,8 @@ local modConfigurations = require(game.ReplicatedStorage.Library.Configurations)
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
+
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 
 local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface);
 local modStorageInterface = require(game.ReplicatedStorage.Library.UI.StorageInterface);

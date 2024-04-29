@@ -206,7 +206,7 @@ return function(CutsceneSequence)
 
 						end
 						
-						return mission.ProgressionPoint <= 6;
+						return mission.ProgressionPoint <= 6 and mission.Type == 1;
 					end)
 
 				elseif mission.ProgressionPoint == 5 then

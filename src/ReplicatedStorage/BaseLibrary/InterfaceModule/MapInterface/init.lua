@@ -24,7 +24,7 @@ local TweenService = game:GetService("TweenService");
 local UserInputService = game:GetService("UserInputService");
 
 local localplayer = game.Players.LocalPlayer;
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modSettings = require(game.ReplicatedStorage.Library.Settings);
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
@@ -32,12 +32,13 @@ local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("R
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modMapLibrary = require(game.ReplicatedStorage.Library:WaitForChild("MapLibrary"));
 local modInteractables = require(game.ReplicatedStorage.Library.Interactables);
-local modNpcProfileLibrary = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("NpcProfileLibrary"));
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modItem = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modGpsLibrary = require(game.ReplicatedStorage.Library.GpsLibrary);
+
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 
 local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface);
 
@@ -269,7 +270,9 @@ function Interface.init(modInterface)
 			updateObjInfo();
 			table.insert(frameData.Update, updateObjInfo);
 			
-			local layerAlphaPacket = {};
+			local layerAlphaPacket = {
+				Active = nil;
+			};
 			local objectType = objInfo.Type;
 			
 			if objectType == "Wall" then

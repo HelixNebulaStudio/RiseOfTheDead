@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 --== Variables;
 local modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);

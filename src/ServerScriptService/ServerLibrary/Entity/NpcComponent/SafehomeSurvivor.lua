@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 
 local Human = {};
 

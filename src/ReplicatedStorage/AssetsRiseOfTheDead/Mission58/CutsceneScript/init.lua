@@ -5,11 +5,13 @@ local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
+
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
+
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modCharacterInteractions = require(game.ReplicatedStorage.Library.CharacterInteractions);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 
@@ -1270,7 +1272,7 @@ return function(CutsceneSequence)
 				end
 			end
 			mission.Changed:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
 		end)
 
 		CutsceneSequence:NewScene("enableInterfaces", function()
@@ -1392,7 +1394,7 @@ return function(CutsceneSequence)
 			end
 
 			mission.Changed:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
 		end)
 		
 	end

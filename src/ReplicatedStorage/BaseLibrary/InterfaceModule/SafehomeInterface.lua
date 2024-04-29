@@ -10,11 +10,12 @@ local localPlayer = game.Players.LocalPlayer;
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
+
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modSafehomesLibrary = require(game.ReplicatedStorage.Library.SafehomesLibrary);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);

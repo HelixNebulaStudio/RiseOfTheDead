@@ -56,7 +56,6 @@ local modBlueprints = Debugger:Require(game.ServerScriptService.ServerLibrary.Bl
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modAnalyticsProfile = Debugger:Require(game.ServerScriptService.ServerLibrary.AnalyticsProfile);
 local modItemUnlockables = Debugger:Require(game.ServerScriptService.ServerLibrary.ItemUnlockables);
-local modSafehomeData = Debugger:Require(game.ServerScriptService.ServerLibrary.SafehomeData);
 local modBattlePassSave = Debugger:Require(game.ServerScriptService.ServerLibrary.BattlePassSave);
 local modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
@@ -298,6 +297,8 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 		if modGlobalVars.EngineMode == "RiseOfTheDead" then
 			profile.ItemUnlockables = modItemUnlockables.new(player);
 			profile.Trader = modTraderProfile.new(player);
+			
+			local modSafehomeData = require(game.ServerScriptService.BaseServerLibrary.SafehomeData);
 			profile.Safehome = modSafehomeData.new(player);
 			profile.BattlePassSave = modBattlePassSave.new(profile, function() profile:Sync("BattlePassSave"); end);
 			

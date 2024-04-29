@@ -15,7 +15,6 @@ local modSerializer = require(game.ReplicatedStorage.Library.Serializer);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modLeaderboardService = require(game.ReplicatedStorage.Library.LeaderboardService);
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
@@ -48,11 +47,32 @@ local takenFactionTags = {
 	["developer"]=true;
 	["devoloper"]=true;
 	["devs"]=true;
+
+	["survivor"]=true;
+	["survivors"]=true;
+	["medic"]=true;
+	["medics"]=true;
+	["rat"]=true;
+	["rats"]=true;
+	["bandit"]=true;
+	["bandits"]=true;
+	["military"]=true;
+	["militaries"]=true;
+	["enemy"]=true;
+	["enemies"]=true;
+	["hidden"]=true;
+	["hiddens"]=true;
+	["biox"]=true;
+	["bioxs"]=true;
+	["rouge"]=true;
+	["rouges"]=true;
+	["trader"]=true;
+	["traders"]=true;
+	["recycler"]=true;
+	["recyclers"]=true;
+	["tomgreyman"]=true;
+	["tomgreymen"]=true;
 };
-for class, _ in pairs(modNpcProfileLibrary.ClassColors) do
-	takenFactionTags[class:lower()] = true;
-	takenFactionTags[class:lower().."s"] = true;
-end
 
 modRewardsLibrary:Add{
 	Id="factionMissions";

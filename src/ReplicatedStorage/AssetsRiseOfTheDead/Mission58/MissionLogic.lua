@@ -2,8 +2,9 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
+
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local missionId = 58;
@@ -83,7 +84,7 @@ if RunService:IsServer() then
 		end
 		
 		mission.Changed:Connect(OnChanged);
-		OnChanged(true, mission);
+		OnChanged(true);
 	end
 	
 else

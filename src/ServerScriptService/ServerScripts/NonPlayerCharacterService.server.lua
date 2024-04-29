@@ -7,7 +7,6 @@ local CollectionService = game:GetService("CollectionService");
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 
 local modNpc = Debugger:Require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
@@ -318,10 +317,9 @@ function onDayChanged()
 				table.insert(spawnWorldList, {Id=worldId; Nav=worldNav});
 			end
 			
-			local wandererList = {};
-			for _, id in pairs(modNpcProfileLibrary:ListByKeyValue("Class", "Trader")) do
-				table.insert(wandererList, id);
-			end
+			local wandererList = {
+				"Icarus";
+			};
 			
 			local spawnWorld = spawnWorldList[math.fmod(day, #spawnWorldList)+1];
 			if modBranchConfigs.CurrentBranch.Name == "Dev" or modBranchConfigs.IsWorld("BioXResearch") then

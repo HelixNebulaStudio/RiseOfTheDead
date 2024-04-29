@@ -6,9 +6,9 @@ local HeadIcons = {};
 local localplayer = game.Players.LocalPlayer;
 local TweenService = game:GetService("TweenService");
 
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
-local modNpcProfileLibrary = require(game.ReplicatedStorage.Library.NpcProfileLibrary);
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 
 local missionIconPrefab = game.ReplicatedStorage:WaitForChild("Prefabs"):WaitForChild("Objects"):WaitForChild("MissionIcon");
 local healIconPrefab = game.ReplicatedStorage:WaitForChild("Prefabs"):WaitForChild("Objects"):WaitForChild("HealIcon");

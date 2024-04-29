@@ -1,4 +1,7 @@
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
 local modLibraryManager = require(game.ReplicatedStorage.Library.LibraryManager);
+
 local library = modLibraryManager.new();
 library.ClassColors = {
 	Survivor=Color3.fromRGB(84, 141, 166);
@@ -18,6 +21,9 @@ library.ClassColors = {
 	TomGreyman=Color3.fromRGB(208, 208, 208);
 }
 
+
+
+--==
 library:Add{Id="Mason"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641265681";};
 library:Add{Id="Stephanie"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641528330";};
 library:Add{Id="Nick"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641641112";};
