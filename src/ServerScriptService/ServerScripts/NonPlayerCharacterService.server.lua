@@ -327,7 +327,7 @@ function onDayChanged()
 			end
 			
 			if spawnWorld.Nav then
-				local spawnWanderer = wandererList[math.fmod(day, #wandererList)+1];
+				local spawnWandererName = wandererList[math.fmod(day, #wandererList)+1];
 				local spawnNavId = nil;
 				
 				for navLocation, info in pairs(spawnWorld.Nav) do
@@ -337,7 +337,7 @@ function onDayChanged()
 					end
 				end
 				
-				Debugger:Log("Wanderer (",spawnWanderer,") Spawn World:",spawnWorld.Id, " Spawn safehouse:", spawnWorld.Nav[spawnNavId]);
+				Debugger:Log("Wanderer (",spawnWandererName,") Spawn World:",spawnWorld.Id, " Spawn safehouse:", spawnWorld.Nav[spawnNavId]);
 				
 				for a=#modNpc.NpcModules, 1, -1 do
 					local npcModule = modNpc.NpcModules[a] and modNpc.NpcModules[a].Module;
@@ -355,14 +355,14 @@ function onDayChanged()
 					local spawnCFrame = CFrame.new(doorInstance.Destination.WorldPosition + Vector3.new(0, 2.35, 0)) 
 						* CFrame.Angles(0, math.rad(doorInstance.Destination.WorldOrientation.Y-90), 0);
 					
-					modNpc.Spawn(spawnWanderer.Id, spawnCFrame, function(npc, npcModule)
+					modNpc.Spawn(spawnWandererName, spawnCFrame, function(npc, npcModule)
 						npcModule.CurrentNav = spawnNavId;
 						
 					end, modNpc.NpcBaseModules.WanderingTrader);
 				end
 
 				modBranchConfigs.Wanderer = {
-					Name=spawnWanderer.Id;
+					Name=spawnWandererName;
 					WorldId=spawnWorld.Id;
 				};
 				

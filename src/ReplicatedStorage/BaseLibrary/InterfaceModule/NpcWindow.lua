@@ -23,6 +23,7 @@ local remotePlayerDataFetch = modRemotesManager:Get("PlayerDataFetch");
 
 local windowFrameTemplate = script:WaitForChild("NpcWindow");
 local equipmentsStorageTemplate = script:WaitForChild("Equipments");
+local taskListingTemplate = script:WaitForChild("taskListing");
 
 --== Script;
 function Interface.init(modInterface)
@@ -33,13 +34,16 @@ function Interface.init(modInterface)
 	local windowFrame = windowFrameTemplate:Clone();
 	windowFrame.Parent = modInterface.MainInterface;
 
-	local mainFrame = windowFrame:WaitForChild("MainFrame");
+	local mainFrame = windowFrame:WaitForChild("MainFrame") :: ScrollingFrame;
 	local leftFrame = mainFrame:WaitForChild("LeftFrame");
 	local viewportFrame = leftFrame:WaitForChild("ViewportFrame")
 	local rightScrollFrame: ScrollingFrame = mainFrame:WaitForChild("RightScrollFrame");
-	local tasksTitle: TextLabel = mainFrame:WaitForChild("TasksTitle");
-	local newTaskFrame = rightScrollFrame:WaitForChild("newTaskButton") :: Frame;
-	local newTaskButton = newTaskFrame:WaitForChild("Button") :: TextButton;
+	
+	local activeTasksPage = rightScrollFrame:WaitForChild("ActiveTasksPage") :: Frame;
+	local newTaskButton = activeTasksPage:WaitForChild("newTaskButton"):WaitForChild("Button") :: TextButton;
+
+	local assignTaskPage = rightScrollFrame:WaitForChild("TaskOptionsPage");
+	local taskPageCloseButton = assignTaskPage:WaitForChild("AssignTaskTitle"):WaitForChild("closeButton") :: TextButton;
 
 	local window = Interface.NewWindow("NpcWindow", windowFrame);
 	window.CompactFullscreen = true;
@@ -53,15 +57,17 @@ function Interface.init(modInterface)
 
 		leftFrame.Size = UDim2.new(1, 0, 0, 360);
 
-		tasksTitle.Position = UDim2.new(1, 0, 0, 360);
-		tasksTitle.TextXAlignment = Enum.TextXAlignment.Left;
-		tasksTitle.Size = UDim2.new(1, 0, 0, 30);
-
 		rightScrollFrame.AnchorPoint = Vector2.new(0, 0);
-		rightScrollFrame.Position = UDim2.new(0, 0, 0, 390);
-		rightScrollFrame.Size = UDim2.new(1, 0, 0, -30);
+		rightScrollFrame.Position = UDim2.new(0, 0, 0, 360);
+		rightScrollFrame.Size = UDim2.new(1, 0, 0, 0);
 		rightScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.None;
 		rightScrollFrame.AutomaticSize = Enum.AutomaticSize.Y;
+
+		local uiListLayout = Instance.new("UIListLayout");
+		uiListLayout.Parent = mainFrame;
+		uiListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			mainFrame.CanvasSize = UDim2.new(0, 0, 0, uiListLayout.AbsoluteContentSize.Y+100);
+		end)
 
 	else
 		window:SetOpenClosePosition(UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0.5, 0, -1.5, 0));
@@ -159,16 +165,73 @@ function Interface.init(modInterface)
 		local npcStorage = modData.Storages[activeNpcName.."Storage"];
 		Debugger:StudioWarn("Storage", npcStorage);
 
-		
 		if activeStorageInterface then
 			activeStorageInterface:Update();
 		end
 	end
 
+	local activePage = nil;
+	function Interface.RefreshPage()
+		local currentPage = activePage or "ActiveTasksPage";
+
+		for _, obj in pairs(rightScrollFrame:GetChildren()) do
+			if not obj:IsA("GuiObject") then continue end;
+			
+			obj.Visible = obj.Name == currentPage;
+		end
+	end
+
+	rightScrollFrame:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(function()
+		for _, obj in pairs(rightScrollFrame:GetChildren()) do
+			if not obj:IsA("GuiObject") then continue end;
+			obj.Size = UDim2.new(1, rightScrollFrame.AbsoluteCanvasSize.Y>rightScrollFrame.AbsoluteSize.Y and -rightScrollFrame.ScrollBarThickness or 0, 0, 0);
+		end
+	end)
+
 	newTaskButton.MouseButton1Click:Connect(function()
 		Interface:PlayButtonClick();
+		activePage = "TaskOptionsPage";
+		Interface.RefreshPage();
+
+		for _, obj in pairs(assignTaskPage:GetChildren()) do
+			if obj:IsA("Frame") then obj:Destroy() end;
+		end
+		if activeNpcName == nil then return end;
+		local tasksList = modNpcTasksLibrary:GetTasks(activeNpcName);
+
+		for a=1, #tasksList do
+			local taskLib = tasksList[a];
+
+			local newListing = taskListingTemplate:Clone() :: Frame;
+			local listButton = newListing:WaitForChild("listButton") :: TextButton;
+			local titleLabel = newListing:WaitForChild("Title");
+			titleLabel.Text = taskLib.Name;
+
+			local detailsFrame = newListing:WaitForChild("DetailsFrame");
+			listButton.MouseButton1Click:Connect(function()
+				local prevVisible = detailsFrame.Visible;
+
+				for _, obj in pairs(assignTaskPage:GetChildren()) do
+					if obj:IsA("Frame") then
+						obj.DetailsFrame.Visible = false;
+					end;
+				end
+
+				if prevVisible == true then return end;
+				detailsFrame.Visible = true;
+			end)
+
+			newListing.LayoutOrder = a;
+			newListing.Parent = assignTaskPage;
+		end
 	end)
-	
+
+	taskPageCloseButton.MouseButton1Click:Connect(function()
+		Interface:PlayButtonClick();
+		activePage = nil;
+		Interface.RefreshPage();
+	end)
+
 	Interface.Garbage:Tag(modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
 		if action ~= "sync" then return end;
 		
