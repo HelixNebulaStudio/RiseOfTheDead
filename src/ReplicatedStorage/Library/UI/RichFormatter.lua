@@ -21,6 +21,7 @@ end
 
 local color = Color3.fromRGB(89, 163, 89);
 local goldPremiumFont = '<font color="rgb(255, 205, 79)">';
+local perksColor = '<font color="rgb(135, 169, 255)">'
 local failFont = '<font color="rgb(163, 89, 89)">';
 local successFont = '<font color="rgb(89, 163, 89)">';
 
