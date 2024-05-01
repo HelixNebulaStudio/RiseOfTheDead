@@ -15,34 +15,8 @@ local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytic
 local remoteHudNotification = modRemotesManager:Get("HudNotification");
 
 local baseExp = 100;
-local goalExp = 4300; --5500
+local goalExp = 4000;
 
---[[
-	Average zombie kill rate base weapon: 1.6s
-	
-	local baseExp = 100;
-	local goalExp = 4300;
-	
-	local random = Random.new();
-	local function CalculateExpGoal(itemLevel)
-		local rate = math.clamp(itemLevel/20, 0, 1)^2;
-		local goal = goalExp* rate^(1 + 0.05*(itemData and itemData.Tier or 1));
-		local rngOffset = goal*0.5;
-		print("Exp goal",goal,"rngOffset",rngOffset);
-		return math.ceil(100 + goal + (math.fmod(itemLevel, 2) == 0 and rngOffset or -rngOffset));
-	end
-	
-	local t = 0;
-	for a=0, 20 do
-		local goal = CalculateExpGoal(a);
-		local kills = goal/20;
-		t = t+(kills*1.6);
-		print("Level",a," Goal:",goal," Kills:", kills," Time:",kills*1.6);
-	end
-	print("Time to max weapon:",t,"s or ",t/60,"mins");
---]]
-
-local random = Random.new();
 --== Script;
 function Experience.CalculateExpGoal(itemLevel, weaponLib)
 	if weaponLib == nil then return end;

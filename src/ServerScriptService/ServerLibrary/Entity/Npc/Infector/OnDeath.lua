@@ -41,25 +41,6 @@ function Zombie.new(self)
 			if playerSave and playerSave.AddStat then
 				playerSave:AddStat("Kills", 1);
 			end
-			
-			local maxHealth = self.Humanoid.MaxHealth;
-			if self.Weapons and self.Weapons[player.Name] then
-				local weaponsPool = self.Weapons[player.Name];
-				
-				for id, weaponData in pairs(weaponsPool) do
-					local damageRatio = math.clamp(weaponData.Damaged/maxHealth, 0, 1);
-					local expPool = 100;
-					
-					local experienceGain = math.floor(damageRatio * expPool);
-					modExperience.Add(weaponData.Weapon, experienceGain, self.Name);
-
-					local storageItem = playerSave and playerSave.Inventory:Find(id) or nil;
-					if storageItem then
-						storageItem:Sync({"L"; "E"; "EG"});
-					end
-					
-				end
-			end
 		end
 	end
 end
