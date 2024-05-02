@@ -673,6 +673,8 @@ function Raid:Start()
 		
 	end
 
+	shared.HordeTimer = tick()+300;
+
 	for a=5, 1, -1 do
 		self:Hud({
 			Status="Raid is starting in "..a.."s.."
@@ -685,7 +687,6 @@ function Raid:Start()
 		destructibleObj.Enabled = true;
 	end
 
-	shared.HordeTimer = tick()+300;
 	self.Status = EnumStatus.InProgress;
 
 	self:Hud({
