@@ -9,6 +9,7 @@ local modNpcTasksLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcTasksLi
 
 local modColorPicker = require(game.ReplicatedStorage.Library.UI.ColorPicker);
 
+local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 
 local remoteNpcData = modRemotesManager:Get("NpcData");
@@ -43,7 +44,7 @@ function NpcTaskData:NewTask(npcName, taskPacket)
     local taskLib = modNpcTasksLibrary:Find(taskId);
     if taskLib == nil then 
         rPacket.FailMsg = "Invalid task id.";
-        return;
+        return rPacket;
     end;
 
     for a=1, #npcTasks do
@@ -58,6 +59,20 @@ function NpcTaskData:NewTask(npcName, taskPacket)
         return rPacket;
     end
 
+    -- Check task requirements;
+    for a=1, #taskLib.Requirements do
+        local requireData = taskLib.Requirements[a];
+
+        if requireData.Type == "Mission" then
+            local missionData = modMission:GetMission(self.Player, requireData.Id);
+            if requireData.Completed and (missionData == nil or missionData.Type ~= 3) then
+                rPacket.FailMsg = "Failed requirements.";
+                return rPacket;
+            end
+        end
+    end
+
+    -- Check task values;
     local inputValues =  taskPacket.Values;
     local taskValues = {};
 
@@ -165,6 +180,9 @@ function remoteNpcData.OnServerInvoke(player: Player, action: string, npcName: s
             rPacket.Data = npcTaskData:GetTasks(npcName);
 
             return rPacket;
+        else
+
+            return newTaskRPacket;
         end
 
     elseif action == "completetask" then

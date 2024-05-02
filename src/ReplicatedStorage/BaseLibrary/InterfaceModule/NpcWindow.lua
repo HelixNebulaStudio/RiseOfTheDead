@@ -413,7 +413,6 @@ function Interface.init(modInterface)
 							colorPickerObj.Frame.Visible = true;
 					
 							function colorPickerObj:OnColorSelect(selectColor: Color3, selectColorId: string)
-								Debugger:StudioWarn("selectColor", selectColor);
 								Interface:PlayButtonClick();
 								colorPickerObj.Frame.Visible = false;
 								pickButton.BackgroundColor3 = selectColor;
@@ -466,7 +465,14 @@ function Interface.init(modInterface)
 					
 					activePage = nil;
 					Interface.RefreshPage();
+				else
+					assignButton.Text = rPacket.FailMsg;
+
 				end
+
+				task.wait(0.6);
+				assignButton.Text = "Assign";
+
 				debounce = false;
 			end)
 
