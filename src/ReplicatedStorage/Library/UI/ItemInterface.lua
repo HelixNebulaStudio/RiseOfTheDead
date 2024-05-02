@@ -610,6 +610,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 	local itemName = itemLib.Name;
 	local itemLibIcon = itemLib.Icon;
 	local itemDesc = "";
+	local itemColor = modItemsLibrary.TierColors[itemLib.Tier];
 	
 	local frameHeight = 0;
 	
@@ -696,6 +697,10 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 		
 		local itemValues = storageItemData.Values or {};
 		
+		if itemValues.Color then
+			itemColor = Color3.fromHex(itemValues.Color);
+		end
+
 		if isCustomName then
 			itemDesc = h3O.."Name:"..h3C.." ".. colorStringText(itemLib.Name) .."\n"..itemDesc;
 		end
@@ -1030,7 +1035,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 	nameTag.Text = itemName;
 	
 	itemIcon.Image = itemLibIcon;
-	itemIcon.ImageColor3 = modItemsLibrary.TierColors[itemLib.Tier];
+	itemIcon.ImageColor3 = itemColor;
 	
 	quantityLabel.Text = storageItemData and storageItemData.Quantity > 1 and "x"..storageItemData.Quantity or "";
 	
