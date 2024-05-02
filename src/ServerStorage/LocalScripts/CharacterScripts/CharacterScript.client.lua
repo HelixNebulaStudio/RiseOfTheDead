@@ -1183,13 +1183,15 @@ local function renderStepped(camera, deltaTime)
 			UserInputService.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition;
 		end
 		--== Gui;
-		mainInterface.Crosshair:TweenSizeAndPosition(crosshairGui.zoomSize, crosshairGui.zoomPosition, crosshairGui.easingDirection, crosshairGui.easingStyle, 0.1, false);
-
+		if mainInterface and mainInterface.Crosshair then
+			mainInterface.Crosshair:TweenSizeAndPosition(crosshairGui.zoomSize, crosshairGui.zoomPosition, crosshairGui.easingDirection, crosshairGui.easingStyle, 0.1, false);	
+		end
 
 	else
 		--== Gui;
-		mainInterface.Crosshair:TweenSizeAndPosition(crosshairGui.defaultSize, crosshairGui.defaultPosition, crosshairGui.easingDirection, crosshairGui.easingStyle, 0.1, false);
-
+		if mainInterface and mainInterface.Crosshair then
+			mainInterface.Crosshair:TweenSizeAndPosition(crosshairGui.defaultSize, crosshairGui.defaultPosition, crosshairGui.easingDirection, crosshairGui.easingStyle, 0.1, false);	
+		end
 		--== Camera;
 
 		if CameraSubject.IsClientSubject then
@@ -1501,14 +1503,6 @@ RunService.Stepped:Connect(function(total, delta)
 	else
 		charBodyForce.Enabled = false;
 	end
-	
-
-	if Debugger.ClientFps <= 30 then
-		steppedSkip = stepTick+delta;
-	elseif Debugger.ClientFps <= 15 then
-		steppedSkip = stepTick+(delta*2);
-	end
-	if steppedSkip > stepTick then return end;
 
 	local rayDir = Vector3.new(0, -16, 0);
 	
