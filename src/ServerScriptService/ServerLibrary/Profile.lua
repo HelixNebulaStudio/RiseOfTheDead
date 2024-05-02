@@ -669,7 +669,7 @@ function Profile:Load(loadOverwrite)
 			Debugger:Log("Fetched profile player (",self.Player,") data: ", encodedData and #encodedData or "nil", "Took:",math.round((tick()-fetchTick)*100)/100,"s");
 		end)
 		
-		if loadS then
+		if loadS or not game.Players:IsAncestorOf(self.Player) then
 			break;
 		else
 			local retryDelay = 2^a;
@@ -677,6 +677,7 @@ function Profile:Load(loadOverwrite)
 			task.wait(retryDelay); 
 		end;
 	end
+	if not game.Players:IsAncestorOf(self.Player) then return end;
 	
 	decodeS, decodeE = pcall(function()
 		rawData = type(encodedData) == "string" and HttpService:JSONDecode(encodedData) or nil;

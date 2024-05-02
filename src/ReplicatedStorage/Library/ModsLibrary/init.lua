@@ -1,11 +1,9 @@
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 --
 local colorBoolText = modRichFormatter.ColorBoolText;
 local colorStringText = modRichFormatter.ColorStringText;
-local colorNumberText = modRichFormatter.ColorNumberText;
 
 local PlaceholderIcon = "rbxassetid://16029038219";
 
