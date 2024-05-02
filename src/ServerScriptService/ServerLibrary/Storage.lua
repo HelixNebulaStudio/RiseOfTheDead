@@ -137,7 +137,6 @@ function Storage.new(id, name, size, owner)
 			if firstInQueue.Type == 1 then -- Add;
 				local function newItemToStorage(a)
 					local event, insert = storage:Insert(a or firstInQueue);
-					--coroutine.wrap(function() if a.Callback ~= nil then a.Callback(event, insert); end end)();
 					if a.Callback ~= nil then
 						task.spawn(function()
 							a.Callback(event, insert);
@@ -147,7 +146,9 @@ function Storage.new(id, name, size, owner)
 				
 				if firstInQueue.Stackable then
 					local quantityLeftover = tonumber(firstInQueue.Data.Quantity);
-					local compatibleItems = storage:ListByItemId(firstInQueue.ItemId);
+					local compatibleItems = storage:ListByItemId(firstInQueue.ItemId, function(matchStorageItem)
+						return modStorageItem.IsStackable(firstInQueue, matchStorageItem) ~= false;
+					end);
 					table.sort(compatibleItems, function(A, B) return A.Index < B.Index end);
 					
 					for a=1, #compatibleItems do
@@ -168,11 +169,6 @@ function Storage.new(id, name, size, owner)
 									end)
 								end
 								
-								--coroutine.wrap(function()
-								--	if firstInQueue.Callback ~= nil then 
-								--		firstInQueue.Callback(newQuantity == quantityLeftover and QueueEvents.Success or QueueEvents.Remainding, compatibleItem:Clone({Quantity=newQuantity;})); 
-								--	end
-								--end)();
 								quantityLeftover = quantityLeftover - newQuantity;
 							end
 						end
@@ -1662,12 +1658,7 @@ function Storage:Add(itemId, data, callback)
 	data.Values = data.Values or {};
 	
 	local itemProperties = modItemsLibrary:Find(itemId); if itemProperties == nil then Debugger:Print(itemId," does not exist."); return; end;
-	
-	if itemProperties.Stackable then
-		table.insert(self.Queue, {Type=1; ItemId=itemId; Stackable=itemProperties.Stackable; Data=data; Callback=callback;});
-	else
-		table.insert(self.Queue, {Type=1; ItemId=itemId; Data=data; Callback=callback;});
-	end
+	table.insert(self.Queue, {Type=1; ItemId=itemId; Name=itemProperties.Name; Data=data; Values=data.Values; Callback=callback; Stackable=itemProperties.Stackable;});
 	self.Queue:flush();
 end
 
