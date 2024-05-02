@@ -13,7 +13,6 @@ local Human = {};
 local ChatService = game:GetService("Chat");
 
 local bubbleFrame = script:WaitForChild("Bubble");
-local modNpcProfileLibrary = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("NpcProfileLibrary"));
 
 function Human.new(self)
 	local selfBubble = bubbleFrame:Clone();
@@ -66,13 +65,14 @@ function Human.new(self)
 				end
 			end
 			
+			local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 			local npcLib = modNpcProfileLibrary:Find(self.Name);
 			if npcLib and modNpcProfileLibrary.ClassColors[npcLib.Class] then
 				local nc = modNpcProfileLibrary.ClassColors[npcLib.Class];
 				local classColor = "rgb("..math.floor(nc.R*255)..","..math.floor(nc.G*255)..","..math.floor(nc.B*255)..")";
 				shared.Notify(targets, '<b><font size="16" color="'..classColor..'">'..self.Name..'</font></b>: '..message, "Message");
 			else
-				shared.Notify(targets, '<b><font size="16" color="#ddcbb2">'..self.Name..'</font></b>: '..message, "Message");
+				shared.Notify(targets, '<b><font size="16" color="'.. (chatColor or '#ddcbb2') ..'">'..self.Name..'</font></b>: '..message, "Message");
 			end
 		end
 	end
