@@ -1,89 +1,171 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local UserInputService = game:GetService("UserInputService");
 
-local templatePicker = script:WaitForChild("ColorPicker");
-local templateOption = script:WaitForChild("ColorOption");
+local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
+
+local colorPaletteTemplate = script:WaitForChild("ColorPicker");
+local colorOptionTemplate = script:WaitForChild("ColorOption");
+local selectTemplate = script:WaitForChild("SelectTemplate");
 --==
 local ColorPicker = {};
 ColorPicker.__index = ColorPicker;
 
-ColorPicker.ColorIndex = {};
-
-for a=1, 365 do
-	local bC = BrickColor.new(a);
-	if bC.Name == "Medium stone grey" and a ~= 194 then
-		continue;
-	end
-	
-	table.insert(ColorPicker.ColorIndex, bC);
-end
-
-for a=1001, 1032 do
-	local bC = BrickColor.new(a);
-	if bC.Name == "Medium stone grey" then continue end;
-	table.insert(ColorPicker.ColorIndex, bC);
-end
-
-for a=1, #ColorPicker.ColorIndex do
-	local brickColor = ColorPicker.ColorIndex[a];
-	local new = templateOption:Clone();
-	
-	new.BackgroundColor3 = brickColor.Color;
-	new.LayoutOrder = a;
-	new.Parent = templatePicker:WaitForChild("Top"):WaitForChild("ScrollingFrame");
-end
-
+ColorPicker.LastColors = {};
 --==
+function ColorPicker:Destroy()
+	Debugger.Expire(self.Frame);
+	Debugger.Expire(self.SelectLabel);
+end
 
-function ColorPicker.new()
-	local self = {
-		Frame = templatePicker:Clone();
-	};
+function ColorPicker.new(mainInterface)
+	local self = {};
+	function self.SelectFunc() end;
+	function self:OnColorSelect(color: Color3, colorId: string?) end;
+
+	self.HighlightLoop = false;
+
+	self.Frame = colorPaletteTemplate:Clone();
+	self.SelectLabel = selectTemplate:Clone();
 	
-	local activeColor = self.Frame:WaitForChild("Bottom"):WaitForChild("ActiveColor");
-	local textInput = self.Frame.Bottom:WaitForChild("TextInput");
-	
-	local scrollFrame = self.Frame.Top:WaitForChild("ScrollingFrame");
-	
-	for _, obj in pairs(scrollFrame:GetChildren()) do
-		if obj:IsA("TextButton") then
-			
-			local brickColor = ColorPicker.ColorIndex[obj.LayoutOrder];
-			obj.MouseMoved:Connect(function()
-				activeColor.BackgroundColor3 = brickColor.Color;
-				textInput.Text = brickColor.Color:ToHex();
-			end)
-			
-			obj.MouseButton1Click:Connect(function()
-				if self.OnColorSelect then
-					self:OnColorSelect(brickColor.Color);
-				end
-			end)
+	local contentFrame = self.Frame:WaitForChild("Content") :: TextButton;
+	local colorPaletteImage = contentFrame:WaitForChild("ColorPalette");
+
+	local advanceFrame = contentFrame:WaitForChild("Advance");
+	local lastColorsFrame = advanceFrame:WaitForChild("LastColors");
+
+	local activeColor = advanceFrame:WaitForChild("ActiveColor");
+	local colorInput = activeColor:WaitForChild("TextInput") :: TextBox;
+
+	self.Frame:GetPropertyChangedSignal("Visible"):Connect(function()
+		if self.Frame.Visible ~= true then return end;
+		if self.HighlightLoop then return end
+		self.HighlightLoop = true;
+
+		for _, obj in pairs(lastColorsFrame:GetChildren()) do
+			if not obj:IsA("GuiObject") then continue end;
+			obj:Destroy();
 		end
-	end
-	
-	textInput.FocusLost:Connect(function(enterPressed)
-		activeColor.BackgroundColor3 = Color3.fromHex(textInput.Text);
-		if enterPressed then
-			if self.OnColorSelect then
-				self:OnColorSelect(activeColor.BackgroundColor3);
+
+		for a=1, math.min(#ColorPicker.LastColors, 12) do
+			local colorLabel = ColorPicker.LastColors[a] :: ImageLabel;
+
+			local new = colorOptionTemplate:Clone() :: ImageButton;
+			new.ImageColor3 = colorLabel.ImageColor3;
+			new.MouseButton1Click:Connect(function()
+				self:OnColorSelect(colorLabel.ImageColor3, colorLabel.Name);
+			end)
+
+			new.Parent = lastColorsFrame;
+		end
+
+		local colorsPaletteTable = {};
+		for _, obj in pairs(colorPaletteImage:GetChildren()) do
+			if obj:IsA("ImageLabel") then
+				table.insert(colorsPaletteTable, {
+					Point = obj.AbsolutePosition + (obj.AbsoluteSize/2);
+					Label = obj;
+				});
 			end
 		end
+		
+		self.SelectFunc = function()
+			local mousePosition = UserInputService:GetMouseLocation() + Vector2.new(0, -58);
+		
+			local closestLabel, closestDist = nil, math.huge;
+			
+			for a=1, #colorsPaletteTable do
+				local point = colorsPaletteTable[a].Point;
+				local label = colorsPaletteTable[a].Label;
+				
+				local dist = (point-mousePosition).Magnitude;
+				if dist < closestDist then
+					closestLabel = label;
+					closestDist = dist;
+				end
+			end
+			
+			if closestDist <= 19 then
+				activeColor.BackgroundColor3 = closestLabel.ImageColor3;
+				colorInput.PlaceholderText = string.upper("#"..closestLabel.ImageColor3:ToHex());
+				self.SelectLabel.Parent = closestLabel;
+				
+			else
+				self.SelectLabel.Parent = nil;
+				closestLabel = nil;
+				
+			end
+
+			return closestLabel;
+		end;
+
+		while self.HighlightLoop do
+			self.SelectFunc();
+			task.wait();
+			if not self.Frame.Visible then break; end
+		end
+
+		self.HighlightLoop = false;
 	end)
-	
-	activeColor.MouseButton1Click:Connect(function()
-		if self.OnColorSelect then
-			self:OnColorSelect(activeColor.BackgroundColor3);
+
+	contentFrame.MouseButton1Click:Connect(function()
+		local selectLabel = self.SelectFunc();
+		if selectLabel then
+			while #ColorPicker.LastColors >= 12 do
+				table.remove(ColorPicker.LastColors, 1);
+			end
+			local existIndex = nil;
+			for a=1, #ColorPicker.LastColors do
+				if ColorPicker.LastColors[a].Name == selectLabel.Name then
+					existIndex = a;
+					break;
+				end
+			end
+			if existIndex then
+				ColorPicker.LastColors[existIndex], ColorPicker.LastColors[#ColorPicker.LastColors] = ColorPicker.LastColors[#ColorPicker.LastColors], ColorPicker.LastColors[existIndex];
+			else
+				table.insert(ColorPicker.LastColors, selectLabel);
+			end
+
+			self:OnColorSelect(selectLabel.ImageColor3, selectLabel.Name);
 		end
 	end)
-	
+
+	setmetatable(self, ColorPicker);
+
 	local touchCloseButton = self.Frame:WaitForChild("touchCloseButton"):WaitForChild("closeButton");
 	touchCloseButton.MouseButton1Click:Connect(function()
 		self.Frame.Visible = false;
 	end)
-	
-	setmetatable(self, ColorPicker);
+
 	return self;
+end
+
+local approvedColors = {
+	["#323232"]=true;
+	["#4b4b4b"]=true;
+	["#969696"]=true;
+	["#c8c8c8"]=true;
+	["#ffffff"]=true;
+};
+function ColorPicker.GetColor(tag, allowCustomColors) : Color3?
+	tag = tostring(tag);
+
+	if tonumber(tag) then
+		return BrickColor.new(tag).Color;
+	elseif tag:sub(1,1) == "#" then
+		if allowCustomColors ~= true and approvedColors[string.lower(tag)] ~= true then
+			return;
+		end
+		return Color3.fromHex(tag);
+	end
+
+	return;
+end
+
+function ColorPicker.GetBackColor(color) : Color3
+	local h, s, v = color:ToHSV();
+	return Color3.fromHSV(h, s, v > 0.5 and math.max(v-0.5, 0) or math.min(v+0.5, 1));
 end
 
 function ColorPicker.GradientLerp(color1, color2, alpha)
