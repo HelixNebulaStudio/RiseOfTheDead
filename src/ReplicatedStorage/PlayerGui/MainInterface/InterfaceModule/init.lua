@@ -743,7 +743,7 @@ end
 function Interface.SetPositionWithPadding(guiObject, position, padding)
 	padding = padding or 5;
 
-	local targetPos = position or UserInputService:GetMouseLocation();
+	local targetPos = position or (UserInputService:GetMouseLocation() + Vector2.new(0, -36));
 
 	local parentPos = guiObject.Parent:IsA("GuiObject") and guiObject.Parent.AbsolutePosition or Vector2.zero;
 	local frameSize = guiObject.AbsoluteSize;
@@ -752,7 +752,11 @@ function Interface.SetPositionWithPadding(guiObject, position, padding)
 	local posX = targetPos.X+frameSize.X+(padding*2) > vpSize.X-10 and targetPos.X-frameSize.X-padding or targetPos.X;
 	local posY = targetPos.Y+frameSize.Y+(padding*2) > vpSize.Y-10 and targetPos.Y-frameSize.Y+padding or targetPos.Y;
 
-	guiObject.Position = UDim2.new(0, posX - parentPos.X, 0, posY - parentPos.Y-36);
+	guiObject.Position = UDim2.new(0, 
+		math.clamp(posX - parentPos.X, 10, vpSize.X-frameSize.X-10), 
+		0, 
+		math.clamp(posY - parentPos.Y, 10, vpSize.Y-frameSize.Y-10)
+	);
 end
 
 function Interface.HandleStorage(action, request, storageIds)

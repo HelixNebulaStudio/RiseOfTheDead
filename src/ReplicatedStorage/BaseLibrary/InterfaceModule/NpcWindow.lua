@@ -8,23 +8,25 @@ local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
-local modPlayers = require(game.ReplicatedStorage.Library.Players);
+local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
+local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
 
 local modNpcTasksLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcTasksLibrary);
 
 local modStorageInterface = require(game.ReplicatedStorage.Library.UI.StorageInterface);
+local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
 
 local remotePlayerDataFetch = modRemotesManager:Get("PlayerDataFetch");
+local remoteNpcData = modRemotesManager:Get("NpcData");
 
 local windowFrameTemplate = script:WaitForChild("NpcWindow");
 local equipmentsStorageTemplate = script:WaitForChild("Equipments");
 local taskListingTemplate = script:WaitForChild("taskListing");
 
+local taskDetailTemplates = script:WaitForChild("TaskDetails");
 --== Script;
 function Interface.init(modInterface)
 	setmetatable(Interface, modInterface);
@@ -40,6 +42,7 @@ function Interface.init(modInterface)
 	local rightScrollFrame: ScrollingFrame = mainFrame:WaitForChild("RightScrollFrame");
 	
 	local activeTasksPage = rightScrollFrame:WaitForChild("ActiveTasksPage") :: Frame;
+	local tasksTitle = activeTasksPage:WaitForChild("TasksTitle") :: TextLabel;
 	local newTaskButton = activeTasksPage:WaitForChild("newTaskButton"):WaitForChild("Button") :: TextButton;
 
 	local assignTaskPage = rightScrollFrame:WaitForChild("TaskOptionsPage");
@@ -80,6 +83,7 @@ function Interface.init(modInterface)
 		Interface:CloseWindow("NpcWindow");
 	end)
 
+	local taskProcessObjects = {};
 	window.OnWindowToggle:Connect(function(visible, npcName)
 		if equipmentsFrame then
 			equipmentsFrame:Destroy();
@@ -89,6 +93,12 @@ function Interface.init(modInterface)
 			equipmentsFrame = equipmentsStorageTemplate:Clone();
 			equipmentsFrame.Parent = leftFrame;
 
+			if activeNpcName ~= npcName then
+				for k, obj in pairs(taskProcessObjects) do
+					obj:Destroy();
+				end
+				table.clear(taskProcessObjects);
+			end
 			activeNpcName = npcName;
 			
 			if activeNpcName then
@@ -98,6 +108,10 @@ function Interface.init(modInterface)
 				}
 				if packet then
 					local data = packet[modRemotesManager.Ref("Data")];
+					if data == nil then return end;
+
+					local npcData = data.NpcData;
+					local npcTasks = data.NpcTasks;
 
 					local safehomeData = modData and modData.Profile and modData.Profile.Safehome;
 					if modData.Profile == nil then return end;
@@ -108,7 +122,17 @@ function Interface.init(modInterface)
 						modData.Profile.Safehome.Npc = {};
 					end
 					
-					modData.Profile.Safehome.Npc[activeNpcName] = data;
+					modData.Profile.Safehome.Npc[activeNpcName] = npcData;
+
+					local tasksData = modData and modData.Profile and modData.Profile.NpcTaskData;
+					if tasksData == nil then
+						modData.Profile.NpcTaskData = {};
+					end
+					if modData.Profile.NpcTaskData.Npc == nil then
+						modData.Profile.NpcTaskData.Npc = {};
+					end
+					modData.Profile.NpcTaskData.Npc[activeNpcName] = npcTasks;
+
 				end
 
 				local equipmentSlots = {};
@@ -149,28 +173,153 @@ function Interface.init(modInterface)
 			Interface:HideAll{[window.Name]=true; ["Inventory"]=true;};
 			Interface:OpenWindow("Inventory");
 			Interface.Update();
-
 		end
 	end)
+
+	local activePage = nil;
 
 	function Interface.Update()
 		if activeNpcName == nil then window:Close(); return end;
 
-		local safehomeData = modData.Profile.Safehome;
-		local npcData = safehomeData.Npc[activeNpcName];
-
+		local npcData = modData.Profile.Safehome.Npc[activeNpcName];
 		if npcData == nil then window:Close(); return end;
-		Debugger:StudioWarn(activeNpcName, npcData);
-
-		local npcStorage = modData.Storages[activeNpcName.."Storage"];
-		Debugger:StudioWarn("Storage", npcStorage);
+		--local npcStorage = modData.Storages[activeNpcName.."Storage"];
 
 		if activeStorageInterface then
 			activeStorageInterface:Update();
 		end
 	end
 
-	local activePage = nil;
+	function Interface.RefreshActiveTasksPage()
+		if activeTasksPage.Visible == false then return end;
+		local npcTasks = modData.Profile.NpcTaskData and modData.Profile.NpcTaskData.Npc and modData.Profile.NpcTaskData.Npc[activeNpcName];
+		if npcTasks == nil then return end;
+
+		local t = modSyncTime.GetTime();
+
+		--Debugger:StudioWarn("npcTasks", npcTasks); -- {1:{"Id":scavengeColorCustoms "StartTime":1714420666 "Values":{}}}
+		tasksTitle.Text = `Tasks ({#npcTasks}/1)`;
+		local updatedFlag = {};
+		for a=1, #npcTasks do
+			local taskData = npcTasks[a];
+
+			local taskLib = modNpcTasksLibrary:Find(taskData.Id);
+
+			local taskProcessObj = taskProcessObjects[taskData.Id];
+			updatedFlag[taskData.Id] = true;
+			if taskProcessObj == nil or taskProcessObj.Button == nil then
+				taskProcessObjects[taskData.Id] = modComponents.CreateProgressListing(Interface, {
+					Id = taskData.Id;
+					Parent = activeTasksPage;
+				});
+				taskProcessObj = taskProcessObjects[taskData.Id];
+
+				taskProcessObj.SkipCost.Perks = taskLib.SkipCost.Perks;
+				taskProcessObj.SkipCost.Gold = taskLib.SkipCost.Gold;
+
+				taskProcessObj.OnSkipYes = function(packet: {Currency: string; YesLabel: TextLabel})
+					local rPacket = remoteNpcData:InvokeServer("skiptask", activeNpcName, {
+						Id = taskLib.Id;
+						Currency= packet.Currency;
+					});
+					
+					if rPacket.Success then
+						modData.Profile.NpcTaskData.Npc[activeNpcName] = rPacket.Data;
+						
+						activePage = nil;
+						Interface.RefreshPage();
+
+					elseif rPacket.FailMsg then
+						packet.YesLabel.Text = rPacket.FailMsg;
+						task.wait(0.4);
+					end
+				end
+
+				taskProcessObj.OnSkipNo = function()
+				end
+
+				taskProcessObj.ReopenWindow = function()
+					window:Open(activeNpcName);
+				end
+
+				local completeDebounce = false;
+				taskProcessObj.OnComplete = function(packet: {Button: TextButton})
+					if completeDebounce then return end;
+					completeDebounce = true;
+
+					local rPacket = remoteNpcData:InvokeServer("completetask", activeNpcName, {
+						Id = taskLib.Id;
+					});
+					Debugger:StudioWarn("rPacket", rPacket);
+
+					if rPacket.Success then
+						modData.Profile.NpcTaskData.Npc[activeNpcName] = rPacket.Data;
+						
+						activePage = nil;
+						Interface.RefreshPage();
+					elseif rPacket.FailMsg then
+						packet.Button.Text = rPacket.FailMsg;
+						task.wait(0.4);
+					end
+
+					completeDebounce = false;
+				end
+
+				local cancelDebounce = false;
+				taskProcessObj.OnCancel = function(packet: {Button: TextButton})
+					if cancelDebounce then return end;
+					cancelDebounce = true;
+
+					local rPacket = remoteNpcData:InvokeServer("canceltask", activeNpcName, {
+						Id = taskLib.Id;
+					});
+					Debugger:StudioWarn("rPacket", rPacket);
+
+					if rPacket.Success then
+						modData.Profile.NpcTaskData.Npc[activeNpcName] = rPacket.Data;
+						
+						activePage = nil;
+						Interface.RefreshPage();
+					elseif rPacket.FailMsg then
+						packet.Button.Text = rPacket.FailMsg;
+						task.wait(0.4);
+					end
+
+					cancelDebounce = false;
+				end;
+			end
+
+			local timeLeft = (taskData.EndTime)-t;
+			local duration = taskData.EndTime - taskData.StartTime;
+			local buildPercent = math.clamp(1-(timeLeft/duration), 0, 1);
+
+			taskData.Title = taskLib.Name; 
+			taskData.ProgressLabel = timeLeft > 0 and modSyncTime.ToString(timeLeft or 0) or "Complete";
+			taskData.ProgressValue = buildPercent;
+
+			local descText = `    <b>Task:</b> {taskLib.Description}\n`;
+			for key, valueData in pairs(taskLib.Values) do
+				local taskValueStr = taskData.Values[key];
+				if valueData.Type == "ColorPicker" then
+					local color = Color3.fromHex(taskValueStr);
+					local backColor = Interface.ColorPicker.GetBackColor(color) :: Color3;
+
+					taskValueStr = `<stroke color="#{backColor:ToHex()}" joins="miter" thickness="2"><font color="#{taskValueStr}">#{taskValueStr}</font></stroke>`;
+				end
+				descText = descText..`\n<b>{valueData.Title or key}:</b> {taskValueStr}`;
+			end
+			 
+			taskData.DescText = descText;
+			taskProcessObj:Update(taskData);
+		end
+
+		for k, obj in pairs(taskProcessObjects) do
+			if updatedFlag[k] == true then continue end;
+			obj:Destroy();
+			taskProcessObjects[k] = nil;
+		end
+	end
+
 	function Interface.RefreshPage()
 		local currentPage = activePage or "ActiveTasksPage";
 
@@ -178,6 +327,10 @@ function Interface.init(modInterface)
 			if not obj:IsA("GuiObject") then continue end;
 			
 			obj.Visible = obj.Name == currentPage;
+
+			if obj.Visible and Interface["Refresh"..obj.Name] then
+				Interface["Refresh"..obj.Name]();
+			end
 		end
 	end
 
@@ -198,31 +351,138 @@ function Interface.init(modInterface)
 		end
 		if activeNpcName == nil then return end;
 		local tasksList = modNpcTasksLibrary:GetTasks(activeNpcName);
+		local taskDataList = modData.Profile.NpcTaskData.Npc[activeNpcName] or {};
 
 		for a=1, #tasksList do
 			local taskLib = tasksList[a];
 
+			local taskData = nil;
+			for a=1, #taskDataList do
+				if taskDataList[a].Id == taskLib.Id then
+					taskData = taskDataList[a];
+					break;
+				end
+			end
+
+			if taskData then
+				continue;
+			end
+
+			local taskValues = {};
+
 			local newListing = taskListingTemplate:Clone() :: Frame;
+			newListing.LayoutOrder = a;
+			newListing.Parent = assignTaskPage;
+
 			local listButton = newListing:WaitForChild("listButton") :: TextButton;
 			local titleLabel = newListing:WaitForChild("Title");
 			titleLabel.Text = taskLib.Name;
 
 			local detailsFrame = newListing:WaitForChild("DetailsFrame");
 			listButton.MouseButton1Click:Connect(function()
+				Interface:PlayButtonClick();
 				local prevVisible = detailsFrame.Visible;
 
 				for _, obj in pairs(assignTaskPage:GetChildren()) do
 					if obj:IsA("Frame") then
 						obj.DetailsFrame.Visible = false;
+
+						for _, obj in pairs(obj.DetailsFrame:GetChildren()) do
+							if obj:GetAttribute("TaskValueKey") == nil then continue end;
+							obj:Destroy();
+						end
 					end;
 				end
 
 				if prevVisible == true then return end;
+
+				for key, valueData in pairs(taskLib.Values) do
+					local type = valueData.Type;
+					local template = taskDetailTemplates:FindFirstChild(type);
+					if template == nil then Debugger:Warn("Missing task values:", key); continue end;
+
+					local new = template:Clone();
+					if type == "ColorPicker" then
+						local colorPickerObj = Interface.ColorPicker;
+
+						local pickButton = new:WaitForChild("pickButton") :: TextButton;
+						pickButton.MouseButton1Click:Connect(function()
+							Interface:PlayButtonClick();
+
+							Interface.SetPositionWithPadding(colorPickerObj.Frame, pickButton.AbsolutePosition);
+							colorPickerObj.Frame.Visible = true;
+					
+							function colorPickerObj:OnColorSelect(selectColor: Color3, selectColorId: string)
+								Debugger:StudioWarn("selectColor", selectColor);
+								Interface:PlayButtonClick();
+								colorPickerObj.Frame.Visible = false;
+								pickButton.BackgroundColor3 = selectColor;
+
+								pickButton.TextColor3 = Interface.ColorPicker.GetBackColor(selectColor);
+
+								taskValues[key] = selectColorId;
+							end
+						end)
+
+						new.Destroying:Connect(function()
+							colorPickerObj.Frame.Visible = false;
+						end)
+					end
+					new:SetAttribute("TaskValueKey", key);
+					new.Parent = detailsFrame;
+				end
+
 				detailsFrame.Visible = true;
 			end)
 
-			newListing.LayoutOrder = a;
-			newListing.Parent = assignTaskPage;
+			local debounce = false;
+			local assignButton = detailsFrame:WaitForChild("startButton") :: TextButton;
+			assignButton.MouseButton1Click:Connect(function()
+				if debounce then return end;
+				debounce = true;
+
+				Interface:PlayButtonClick();
+
+				for key, valueData in pairs(taskLib.Values) do
+					if taskValues[key] == nil and valueData.CanNil ~= true then
+						if valueData.Type == "ColorPicker" then
+							assignButton.Text = "Please pick a color!";
+						end
+
+						debounce = false;
+						return;
+					end
+				end
+				assignButton.Text = "Assigning..";
+
+
+				local rPacket = remoteNpcData:InvokeServer("assigntask", activeNpcName, {
+					Id=taskLib.Id;
+					Values=taskValues;
+				});
+
+				if rPacket.Success then
+					modData.Profile.NpcTaskData.Npc[activeNpcName] = rPacket.Data;
+					
+					activePage = nil;
+					Interface.RefreshPage();
+				end
+				debounce = false;
+			end)
+
+			local descLabel = detailsFrame:WaitForChild("DescLabel") :: TextLabel;
+			local descTxt = "";
+
+			descTxt = descTxt..`    <b>Task:</b> {taskLib.Description}\n\n    <b>Duration:</b> {modSyncTime.ToString(taskLib.Duration)}\n\n    <b>Requirements:</b> `;
+
+			for key, requireData in pairs(taskLib.Requirements) do
+				if requireData.Type == "Mission" then
+					local missionLib = modMissionLibrary.Get(requireData.Id);
+					descTxt = descTxt..`\n        - {requireData.Type}: {missionLib.Name}`;
+				end
+			end
+			
+			descLabel.Text = descTxt;
 		end
 	end)
 
@@ -239,7 +499,13 @@ function Interface.init(modInterface)
 			Interface.Update();
 		end
 	end));
-	
+
+	Interface.Garbage:Tag(modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
+		if window.Visible == true then
+			Interface.RefreshPage();
+		end
+	end))
+
 	return Interface;
 end;
 

@@ -21,6 +21,7 @@ function library:GetTasks(npcName)
     return library.NpcTasks[npcName];
 end
 
+local genericSkipCost = {Perks=25; Gold=700;};
 -- MARK: Lydia
 library:Add{
     Id="scavengeColorCustoms";
@@ -29,52 +30,21 @@ library:Add{
     Requirements={
         {Type="Mission"; Id=78; Completed=true;};
     };
-    Duration=3600;
-    NpcsList = {"Lydia";};
-};
-
-library:Add{
-    Id="scavengeColorCustoms2";
-    Name="Scavenge Custom Colors 2";
-	Description="Scavenge for a Custom Color unlockable of your choosing.";
-    Requirements={
-        {Type="Mission"; Id=78; Completed=true;};
+    Values={
+        Color={Type="ColorPicker"; Title="Scavenging Color"};
+    };
+    Rewards={
+        {
+            Type="Item"; 
+            ItemId="colorcustom";
+            SetItemValues=function(itemValues, taskData)
+                itemValues.Color = taskData.Values.Color;
+            end;
+        };
     };
     Duration=3600;
     NpcsList = {"Lydia";};
-};
-
-library:Add{
-    Id="scavengeColorCustoms3";
-    Name="Scavenge Custom Colors 3";
-	Description="Scavenge for a Custom Color unlockable of your choosing.";
-    Requirements={
-        {Type="Mission"; Id=78; Completed=true;};
-    };
-    Duration=3600;
-    NpcsList = {"Lydia";};
-};
-
-library:Add{
-    Id="scavengeColorCustoms4";
-    Name="Scavenge Custom Colors 4";
-	Description="Scavenge for a Custom Color unlockable of your choosing.";
-    Requirements={
-        {Type="Mission"; Id=78; Completed=true;};
-    };
-    Duration=3600;
-    NpcsList = {"Lydia";};
-};
-
-library:Add{
-    Id="scavengeColorCustoms5";
-    Name="Scavenge Custom Colors 5";
-	Description="Scavenge for a Custom Color unlockable of your choosing.";
-    Requirements={
-        {Type="Mission"; Id=78; Completed=true;};
-    };
-    Duration=3600;
-    NpcsList = {"Lydia";};
+    SkipCost = genericSkipCost;
 };
 
 return library;

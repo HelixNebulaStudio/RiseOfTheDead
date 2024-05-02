@@ -210,8 +210,13 @@ function remotePlayerDataFetch.OnServerInvoke(player, packet)
 		local npcData = safehomeData:GetNpc(npcName);
 		if npcData == nil then return end;
 
+		profile:Sync("NpcTaskData/Npc/"..npcName);
+
 		return {
-			[modRemotesManager.Ref("Data")]=npcData;
+			[modRemotesManager.Ref("Data")]={
+				NpcData=npcData;
+				NpcTasks=profile.NpcTaskData:GetTasks(npcName);
+			};
 		};
 	end
 

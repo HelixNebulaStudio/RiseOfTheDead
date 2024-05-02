@@ -301,6 +301,9 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 			local modSafehomeData = require(game.ServerScriptService.BaseServerLibrary.SafehomeData);
 			profile.Safehome = modSafehomeData.new(player);
 			profile.BattlePassSave = modBattlePassSave.new(profile, function() profile:Sync("BattlePassSave"); end);
+
+			local modNpcTaskData = require(game.ServerScriptService.BaseServerLibrary.NpcTaskData);
+			profile.NpcTaskData = modNpcTaskData.new(player);
 			
 			--== Faction Integration
 			profile.Faction = {

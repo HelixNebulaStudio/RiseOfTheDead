@@ -58,20 +58,24 @@ function SafehomeData.new(player)
 	return self;
 end
 
-function SafehomeData:GetNpc(npcName)
+--[[
+	SafehomeData:GetNpc(npcName: string)
+
+	@alert npcData metatable is shared serverside 
+
+	@param npcName Name of npc.
+]]
+function SafehomeData:GetNpc(npcName: string)
 	local npcLib = modNpcProfileLibrary:Find(npcName);
 	if npcLib == nil then return end;
 
 	local npcData = self.Npc[npcName];
 	if npcData == nil then
-		local npcPropertiesMeta = modNpcProfileLibrary:GetProperties(npcName);
-
-		npcData = setmetatable({}, npcPropertiesMeta);
+		npcData = setmetatable({}, modNpcProfileLibrary:GetProperties(npcName));
 		self.Npc[npcName] = npcData;
 
 	else
-		local npcPropertiesMeta = modNpcProfileLibrary:GetProperties(npcName);
-		setmetatable(npcData, npcPropertiesMeta);
+		setmetatable(npcData, modNpcProfileLibrary:GetProperties(npcName));
 	end
 	
 	local storageConfig = table.clone(npcData.StorageConfig);
@@ -156,6 +160,10 @@ function SafehomeData:GetNpc(npcName)
 	local storage = modStorage:OpenStorage(self.Player, storageId, storageConfig);
 	storage:Sync(self.Player);
 
+	npcData.GetStorage = function()
+		return storage;
+	end
+
 	return npcData;
 end
 
@@ -168,7 +176,7 @@ function SafehomeData:Load(data)
 end
 
 function remoteSafehomeRequest.OnServerInvoke(player, actionId, packet)
-	Debugger:StudioWarn("remoteSafehomeRequest", player, actionId, packet);
+	--Debugger:StudioWarn("remoteSafehomeRequest", player, actionId, packet);
 	
 	local ownerPlayer = shared.modSafehomeService and shared.modSafehomeService.OwnerPlayer;
 	local isOwner = ownerPlayer and player == ownerPlayer;
