@@ -578,112 +578,6 @@ function ItemsLibrary:Init(super)
 	new(instrumentBase, {Id="guitar"; Name="Guitar"; Type=super.Types.Clothing; Icon="rbxassetid://6297059208"; Description="A playable guitar instrument. Can play premade tunes or with keyboard/touch buttons.";});
 	new(instrumentBase, {Id="keytar"; Name="Keytar"; Tags={"Melee"}; Icon="rbxassetid://15338385507"; Description="A playable keyboard guitar while also being a melee weapon, also known as keytar instrument. Can play premade tunes or with keyboard/touch buttons.";});
 
-	--==========================================================[[ ITEM UNLOCKABLES ]]==========================================================--
-	-- MARK: Item Unlockables
-	local unlockableBase = {
-		Type = super.Types.Usable;
-		TypeIcon = "rbxassetid://12964393529";
-		
-		Tradable = super.Tradable.Tradable;
-		Tags = {"Item Unlockable"};
-		OnAdd = function(data)
-			local unlockable = data.Unlockable;
-			if unlockable then
-				data.Name = unlockable.." Unlockable";
-				data.Description = "Right click to unlocks "..unlockable.." for appearance customization.";
-			end
-		end;
-	};
-	
-	new(unlockableBase, {Id="greytshirtcamo"; Icon="rbxassetid://6665474794"; Unlockable="Camo Tshirt";});
-	new(unlockableBase, {Id="greytshirticyblue"; Icon="rbxassetid://8532617699"; Unlockable="Icy Blue Tshirt";});
-	new(unlockableBase, {Id="greytshirticyred"; Icon="rbxassetid://8532659745"; Unlockable="Icy Red Tshirt";});
-	
-	new(unlockableBase, {Id="prisonshirtblue"; Icon="rbxassetid://6665649672"; Unlockable="Blue Prisoner's Shirt";});
-	new(unlockableBase, {Id="prisonpantsblue"; Icon="rbxassetid://6665650148"; Unlockable="Blue Prisoner's Pants";});
-	
-	new(unlockableBase, {Id="leatherglovesred"; Icon="rbxassetid://16994275555"; Unlockable="Red Leather Gloves";});
-	
-	new(unlockableBase, {Id="dufflebagstreetart"; Icon="rbxassetid://8828337700"; Unlockable="Street Art Duffle Bag";});
-	new(unlockableBase, {Id="dufflebagvintage"; Icon="rbxassetid://8828340427"; Unlockable="Vintage Duffle Bag";});
-	new(unlockableBase, {Id="dufflebagarticscape"; Icon="rbxassetid://8828341507"; Unlockable="Artic Scape Duffle Bag";});
-	new(unlockableBase, {Id="dufflebagfirstaidgreen"; Icon="rbxassetid://8828351670"; Unlockable="Green First Aid Duffle Bag";});
-	new(unlockableBase, {Id="dufflebagfancy"; Icon="rbxassetid://17291182326"; Unlockable="Fancy Duffle Bag";});
-
-	new(unlockableBase, {Id="survivorsbackpackstreetart"; Icon="rbxassetid://17291367511"; Unlockable="Street Art Survivor's Backpack";});
-
-	new(unlockableBase, {Id="militarybootsdesert"; Icon="rbxassetid://17022737460"; Unlockable="Desert Military Boots";});
-	new(unlockableBase, {Id="militarybootsforest"; Icon="rbxassetid://17022741672"; Unlockable="Forest Military Boots";});
-	new(unlockableBase, {Id="militarybootsgold"; Icon="rbxassetid://17275098172"; Unlockable="Gold Military Boots";});
-	
-	new(unlockableBase, {Id="plankarmormaple"; Icon="rbxassetid://6956453007"; Unlockable="Maple Plank Armor";});
-	new(unlockableBase, {Id="plankarmorash"; Icon="rbxassetid://6956453176"; Unlockable="Ash Plank Armor";});
-
-	new(unlockableBase, {Id="gasmaskwhite"; Icon="rbxassetid://7021688682"; Unlockable="White Gas Mask";});
-	new(unlockableBase, {Id="gasmaskblue"; Icon="rbxassetid://7021573719"; Unlockable="Blue Gas Mask";});
-	new(unlockableBase, {Id="gasmaskyellow"; Icon="rbxassetid://7021576890"; Unlockable="Yellow Gas Mask";});
-	new(unlockableBase, {Id="gasmaskunionjack"; Icon="rbxassetid://7021608469"; Unlockable="Union Jack Gas Mask";});
-	new(unlockableBase, {Id="gasmasksovietfumes"; Icon="rbxassetid://17205637981"; Unlockable="Soviet Style Fumes Gas Mask";});
-
-	new(unlockableBase, {Id="scraparmorcopper"; Icon="rbxassetid://7021764853"; Unlockable="Copper Scrap Armor";});
-	new(unlockableBase, {Id="scraparmorbiox"; Icon="rbxassetid://8366924869"; Unlockable="BioX Scrap Armor";});
-	new(unlockableBase, {Id="scraparmormissingtextures"; Icon="rbxassetid://15241479939"; Unlockable="Missing Textures Scrap Armor";});
-
-	new(unlockableBase, {Id="tophatgrey"; Icon="rbxassetid://7647922681"; Unlockable="Grey Top Hat"; Tags={"Slaughterfest";};});
-	new(unlockableBase, {Id="tophatpurple"; Icon="rbxassetid://7647923912"; Unlockable="Purple Top Hat"; Tags={"Slaughterfest";};});
-	new(unlockableBase, {Id="tophatred"; Icon="rbxassetid://7647948217"; Unlockable="Red Top Hat"; Tags={"Slaughterfest";};});
-	new(unlockableBase, {Id="tophatgold"; Icon="rbxassetid://7647949358"; Unlockable="Gold Top Hat"; Tags={"Slaughterfest";};});
-	
-	new(unlockableBase, {Id="clownmaskus"; Icon="rbxassetid://8367268572"; Unlockable="Star Spangled Banner Clown Mask"; Tags={"Slaughterfest";};});
-	new(unlockableBase, {Id="clownmaskmissjoyful"; Icon="rbxassetid://11269655306"; Unlockable="Miss Joyful Clown Mask"; Tags={"Slaughterfest";};});
-	
-	new(unlockableBase, {Id="disguisekitwhite"; Icon="rbxassetid://8379064603"; Unlockable="White Disguise Kit";});
-	
-	new(unlockableBase, {Id="zriceraskullinferno"; Icon="rbxassetid://8378956341"; Unlockable="Inferno Zricera Skull";});
-	
-	new(unlockableBase, {Id="divinggogglesyellow"; Icon="rbxassetid://10333085751"; Unlockable="Yellow Diving Goggles";});
-	new(unlockableBase, {Id="divinggogglesred"; Icon="rbxassetid://15008018716"; Unlockable="Red Diving Goggles";});
-
-	new(unlockableBase, {Id="maraudersmaskblue"; Icon="rbxassetid://11269657288"; Unlockable="Blue Marauder's Mask"; Tags={"Slaughterfest";};});
-	new(unlockableBase, {Id="maraudersmaskrisingsun"; Icon="rbxassetid://17218272962"; Unlockable="Rising Sun Marauder's Mask";});
-
-	new(unlockableBase, {Id="watchyellow"; Icon="rbxassetid://13022192307"; Unlockable="Yellow Watch";});
-	
-	new(unlockableBase, {Id="armwrapsrat"; Icon="rbxassetid://13021422822"; Unlockable="R.A.T. Arm Wraps";});
-	new(unlockableBase, {Id="armwrapsmissingtextures"; Icon="rbxassetid://13207932009"; Unlockable="Missing Textures Arm Wraps";});
-	
-	new(unlockableBase, {Id="inflatablebuoyrat"; Icon="rbxassetid://13021723780"; Unlockable="R.A.T. Inflatable Buoy";});
-	
-	new(unlockableBase, {Id="brownbeltwhite"; Icon="rbxassetid://13021951870"; Unlockable="White Tactical Belt";});
-	
-	new(unlockableBase, {Id="vexglovesinferno"; Icon="rbxassetid://13974365409"; Unlockable="Inferno Vexeron Gloves";});
-	
-	new(unlockableBase, {Id="hardhatorigins"; Icon="rbxassetid://13974944299"; Unlockable="Origins Hard Hat";});
-	new(unlockableBase, {Id="dufflebagorigins"; Icon="rbxassetid://13975619757"; Unlockable="Origins Duffle Bag";});
-	
-	new(unlockableBase, {Id="clothbagmasksuits"; Icon="rbxassetid://13985408173"; Unlockable="Suits Cloth Bag Mask";});
-
-	new(unlockableBase, {Id="cultisthoodnekros"; Icon="rbxassetid://14970995011"; Unlockable="Nekros Cultist Hood";});
-
-	new(unlockableBase, {Id="balaclavasuits"; Icon="rbxassetid://15032728733"; Unlockable="Suits Balaclava";});
-
-	new(unlockableBase, {Id="tirearmorred"; Icon="rbxassetid://16791569263"; Unlockable="Red Tire Armor";});
-	new(unlockableBase, {Id="tirearmorgoldplating"; Icon="rbxassetid://17255685451"; Unlockable="Gold Plating Tire Armor";});
-	
-	new(unlockableBase, {Id="mercskneepadscarbonfiberblack"; Icon="rbxassetid://17218761557"; Unlockable="Black Carbon Fiber Merc's Knee Pads";});
-
-	new(unlockableBase, {Id="divingsuitwhite"; Icon="rbxassetid://17219502385"; Unlockable="White Diving Suit";});
-
-	new(unlockableBase, {Id="divingfinswhite"; Icon="rbxassetid://17219506923"; Unlockable="White Diving Fins";});
-
-	new(unlockableBase, {Id="highvisjacketsuits"; Icon="rbxassetid://17275772207"; Unlockable="Suits High Visibility Jacket";});
-	
-	new(unlockableBase, {Id="nekrostrenchblue"; Icon="rbxassetid://17291808230"; Unlockable="Blue Nekros Trench Coat";});
-	new(unlockableBase, {Id="nekrostrenchgreen"; Icon="rbxassetid://17291810059"; Unlockable="Green Nekros Trench Coat";});
-
-	new(unlockableBase, {Id="fedorauvunwrapped"; Icon="rbxassetid://17275939280"; Unlockable="UV Unwrapped Fedora";});
-	
-
 	--==========================================================[[ SKIN PERM ]]==========================================================--
 	local skinPermBase = {
 		Type = super.Types.Usable;
@@ -714,11 +608,132 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="deaglecryogenics"; Icon="rbxassetid://17227806515"; SkinPerm="Cryogenics"; TargetItemId="deagle"; });
 	new(skinPermBase, {Id="flamethrowerblaze"; Icon="rbxassetid://17229367894"; SkinPerm="Blaze"; TargetItemId="flamethrower"; });
 	
-	-- divinggoggles
-	new(skinPermBase, {Id="divinggoggleswhite"; Icon="rbxassetid://17219482453"; SkinPerm="White"; TargetItemId="divinggoggles";});
+	--== Clothing Skin Perms;
+	-- armwraps
+	new(skinPermBase, {Id="armwrapsrat"; Icon="rbxassetid://13021422822"; SkinPerm="R.A.T."; TargetItemId="armwraps"; });
+	new(skinPermBase, {Id="armwrapsmissingtextures"; Icon="rbxassetid://13207932009"; SkinPerm="Missing Textures"; TargetItemId="armwraps"; });
+	
+	-- balaclava
+	new(skinPermBase, {Id="balaclavasuits"; Icon="rbxassetid://15032728733"; SkinPerm="Suits"; TargetItemId="balaclava"; });
 
+	-- brownbelt
+	new(skinPermBase, {Id="brownbeltwhite"; Icon="rbxassetid://13021951870"; SkinPerm="White"; TargetItemId="brownbelt"; });
+	
+	-- clothbagmask
+	new(skinPermBase, {Id="clothbagmasksuits"; Icon="rbxassetid://13985408173"; SkinPerm="Suits"; TargetItemId="clothbagmask"; });
+
+	-- cultisthood
+	new(skinPermBase, {Id="cultisthoodnekros"; Icon="rbxassetid://14970995011"; SkinPerm="Nekros"; TargetItemId="cultisthood"; });
+
+	-- clownmask
+	new(skinPermBase, {Id="clownmaskus"; Icon="rbxassetid://8367268572"; SkinPerm="Star Spangled Banner"; TargetItemId="clownmask"; Tags={"Slaughterfest";};});
+	new(skinPermBase, {Id="clownmaskmissjoyful"; Icon="rbxassetid://11269655306"; SkinPerm="Miss Joyful"; TargetItemId="clownmask"; Tags={"Slaughterfest";};});
+	
+	-- disguisekit
+	new(skinPermBase, {Id="disguisekitwhite"; Icon="rbxassetid://8379064603"; SkinPerm="White"; TargetItemId="disguisekit"; });
+
+	-- divinggoggles
+	new(skinPermBase, {Id="divinggoggleswhite"; Icon="rbxassetid://17219482453"; SkinPerm="White"; TargetItemId="divinggoggles"; });
+	new(skinPermBase, {Id="divinggogglesyellow"; Icon="rbxassetid://10333085751"; SkinPerm="Yellow"; TargetItemId="divinggoggles"; });
+	new(skinPermBase, {Id="divinggogglesred"; Icon="rbxassetid://15008018716"; SkinPerm="Red"; TargetItemId="divinggoggles"; });
+
+	-- divingsuit
+	new(skinPermBase, {Id="divingsuitwhite"; Icon="rbxassetid://17219502385"; SkinPerm="White"; TargetItemId="divingsuit"; });
+
+	-- divingfins
+	new(skinPermBase, {Id="divingfinswhite"; Icon="rbxassetid://17219506923"; SkinPerm="White"; TargetItemId="divingfins"; });
+
+	-- dufflebag
+	new(skinPermBase, {Id="dufflebagstreetart"; Icon="rbxassetid://8828337700"; SkinPerm="Street Art"; TargetItemId="dufflebag"; });
+	new(skinPermBase, {Id="dufflebagvintage"; Icon="rbxassetid://8828340427"; SkinPerm="Vintage"; TargetItemId="dufflebag"; });
+	new(skinPermBase, {Id="dufflebagarticscape"; Icon="rbxassetid://8828341507"; SkinPerm="Artic Scape"; TargetItemId="dufflebag"; });
+	new(skinPermBase, {Id="dufflebagfirstaidgreen"; Icon="rbxassetid://8828351670"; SkinPerm="Green First Aid"; TargetItemId="dufflebag"; });
+	new(skinPermBase, {Id="dufflebagorigins"; Icon="rbxassetid://13975619757"; SkinPerm="Origins"; TargetItemId="dufflebag"; });
+	new(skinPermBase, {Id="dufflebagfancy"; Icon="rbxassetid://17291182326"; SkinPerm="Fancy"; TargetItemId="dufflebag"; });
+
+	-- fedora
+	new(skinPermBase, {Id="fedorauvunwrapped"; Icon="rbxassetid://17275939280"; SkinPerm="UV Unwrapped"; TargetItemId="fedora"; });
+	
+	-- greytshirt
+	new(skinPermBase, {Id="greytshirtcamo"; Icon="rbxassetid://6665474794"; SkinPerm="Camo"; TargetItemId="greytshirt"; });
+	new(skinPermBase, {Id="greytshirticyblue"; Icon="rbxassetid://8532617699"; SkinPerm="Icy Blue"; TargetItemId="greytshirt"; });
+	new(skinPermBase, {Id="greytshirticyred"; Icon="rbxassetid://8532659745"; SkinPerm="Icy Red"; TargetItemId="greytshirt"; });
+	
+	-- gasmask
+	new(skinPermBase, {Id="gasmaskwhite"; Icon="rbxassetid://7021688682"; SkinPerm="White"; TargetItemId="gasmask"; });
+	new(skinPermBase, {Id="gasmaskblue"; Icon="rbxassetid://7021573719"; SkinPerm="Blue"; TargetItemId="gasmask"; });
+	new(skinPermBase, {Id="gasmaskyellow"; Icon="rbxassetid://7021576890"; SkinPerm="Yellow"; TargetItemId="gasmask"; });
+	new(skinPermBase, {Id="gasmaskunionjack"; Icon="rbxassetid://7021608469"; SkinPerm="Union Jack"; TargetItemId="gasmask"; });
+	new(skinPermBase, {Id="gasmasksovietfumes"; Icon="rbxassetid://17205637981"; SkinPerm="Soviet Style Fumes"; TargetItemId="gasmask"; });
+
+	-- hardhat
+	new(skinPermBase, {Id="hardhatorigins"; Icon="rbxassetid://13974944299"; SkinPerm="Origins"; TargetItemId="hardhat"; });
+	
+	-- highvisjacket
+	new(skinPermBase, {Id="highvisjacketsuits"; Icon="rbxassetid://17275772207"; SkinPerm="Suits"; TargetItemId="highvisjacket"; });
+
+	-- inflatablebuoy
+	new(skinPermBase, {Id="inflatablebuoyrat"; Icon="rbxassetid://13021723780"; SkinPerm="R.A.T."; TargetItemId="inflatablebuoy"; });
+	
 	-- leathergloves
+	new(skinPermBase, {Id="leatherglovesred"; Icon="rbxassetid://16994275555"; SkinPerm="Red"; TargetItemId="leathergloves";});
 	new(skinPermBase, {Id="leatherglovesultraviolet"; Icon="rbxassetid://17275591636"; SkinPerm="Ultra Violet"; TargetItemId="leathergloves"; });
+
+	-- maraudersmask
+	new(skinPermBase, {Id="maraudersmaskblue"; Icon="rbxassetid://11269657288"; SkinPerm="Blue"; TargetItemId="maraudersmask"; Tags={"Slaughterfest";};});
+	new(skinPermBase, {Id="maraudersmaskrisingsun"; Icon="rbxassetid://17218272962"; SkinPerm="Rising Sun"; TargetItemId="maraudersmask"; });
+
+	-- militaryboots
+	new(skinPermBase, {Id="militarybootsdesert"; Icon="rbxassetid://17022737460"; SkinPerm="Desert"; TargetItemId="militaryboots"; });
+	new(skinPermBase, {Id="militarybootsforest"; Icon="rbxassetid://17022741672"; SkinPerm="Forest"; TargetItemId="militaryboots"; });
+	new(skinPermBase, {Id="militarybootsgold"; Icon="rbxassetid://17275098172"; SkinPerm="Gold"; TargetItemId="militaryboots"; });
+
+	-- mercskneepads
+	new(skinPermBase, {Id="mercskneepadscarbonfiberblack"; Icon="rbxassetid://17218761557"; SkinPerm="Black Carbon Fiber"; TargetItemId="mercskneepads"; });
+
+	-- nekrostrench
+	new(skinPermBase, {Id="nekrostrenchblue"; Icon="rbxassetid://17291808230"; SkinPerm="Blue"; TargetItemId="nekrostrench";});
+	new(skinPermBase, {Id="nekrostrenchgreen"; Icon="rbxassetid://17291810059"; SkinPerm="Green"; TargetItemId="nekrostrench";});
+
+	-- prisonshirt
+	new(skinPermBase, {Id="prisonshirtblue"; Icon="rbxassetid://6665649672"; SkinPerm="Blue"; TargetItemId="prisonshirt"; });
+
+	-- prisonpants
+	new(skinPermBase, {Id="prisonpantsblue"; Icon="rbxassetid://6665650148"; SkinPerm="Blue"; TargetItemId="prisonpants"; });
+	
+	-- plankarmor
+	new(skinPermBase, {Id="plankarmormaple"; Icon="rbxassetid://6956453007"; SkinPerm="Maple"; TargetItemId="plankarmor"; });
+	new(skinPermBase, {Id="plankarmorash"; Icon="rbxassetid://6956453176"; SkinPerm="Ash"; TargetItemId="plankarmor"; });
+
+	-- tirearmor
+	new(skinPermBase, {Id="tirearmorred"; Icon="rbxassetid://16791569263"; SkinPerm="Red"; TargetItemId="tirearmor"; });
+	new(skinPermBase, {Id="tirearmorgoldplating"; Icon="rbxassetid://17255685451"; SkinPerm="Gold Plating"; TargetItemId="tirearmor"; });
+	
+	-- tophat
+	new(skinPermBase, {Id="tophatgrey"; Icon="rbxassetid://7647922681"; SkinPerm="Grey"; TargetItemId="tophat"; Tags={"Slaughterfest";};});
+	new(skinPermBase, {Id="tophatpurple"; Icon="rbxassetid://7647923912"; SkinPerm="Purple"; TargetItemId="tophat"; Tags={"Slaughterfest";};});
+	new(skinPermBase, {Id="tophatred"; Icon="rbxassetid://7647948217"; SkinPerm="Red"; TargetItemId="tophat"; Tags={"Slaughterfest";};});
+	new(skinPermBase, {Id="tophatgold"; Icon="rbxassetid://7647949358"; SkinPerm="Gold"; TargetItemId="tophat"; Tags={"Slaughterfest";};});
+	
+	-- scraparmor
+	new(skinPermBase, {Id="scraparmorcopper"; Icon="rbxassetid://7021764853"; SkinPerm="Copper"; TargetItemId="scraparmor"; });
+	new(skinPermBase, {Id="scraparmorbiox"; Icon="rbxassetid://8366924869"; SkinPerm="BioX"; TargetItemId="scraparmor"; });
+	new(skinPermBase, {Id="scraparmormissingtextures"; Icon="rbxassetid://15241479939"; SkinPerm="Missing Textures"; TargetItemId="scraparmor"; });
+
+	-- survivorsbackpack
+	new(skinPermBase, {Id="survivorsbackpackstreetart"; Icon="rbxassetid://17291367511"; SkinPerm="Street Art"; TargetItemId="survivorsbackpack"; });
+
+	-- vexgloves
+	new(skinPermBase, {Id="vexglovesinferno"; Icon="rbxassetid://13974365409"; SkinPerm="Inferno"; TargetItemId="vexgloves";});
+
+	-- watch
+	new(skinPermBase, {Id="watchyellow"; Icon="rbxassetid://13022192307"; SkinPerm="Yellow"; TargetItemId="watch";});
+	
+	-- zriceraskull
+	new(skinPermBase, {Id="zriceraskullinferno"; Icon="rbxassetid://8378956341"; SkinPerm="Inferno"; TargetItemId="zriceraskull";});
+	
+
+	
 
 	--==========================================================[[ SUMMONS ]]==========================================================--
 	local summonsBase = {
@@ -757,9 +772,9 @@ function ItemsLibrary:Init(super)
 	new(crateBase, {Id="easteregg2021"; Name="Easter Egg 2021"; Icon="rbxassetid://4836173098"; Tags={"Easter"}; TradingTax=0; Stackable=20; Description="Happy Easter, open it and see what you get!";});
 	new(toolBase, {Id="chippyplush"; Name="Chippy Plush"; Icon="rbxassetid://6648333467"; Tags={"Easter"}; Description="Chips and squeaks but with a sinister tone.";});
 	
-	new(unlockableBase, {Id="dufflebageaster1"; Icon="rbxassetid://8828333941"; Tags={"Easter"}; Unlockable="Easter Colors Duffle Bag";});
-	new(unlockableBase, {Id="dufflebageaster2"; Icon="rbxassetid://8828335887"; Tags={"Easter"}; Unlockable="Easter Stripes Duffle Bag";});
-	new(unlockableBase, {Id="bunnymanheadbenefactor"; Icon="rbxassetid://6665870074"; Tags={"Easter"}; Unlockable="The Benefactor Bunny Man's Head"; Sources={"Obtained from <b>The Bunny Man in Mission: Easter Butchery 2</b>";};});
+	new(skinPermBase, {Id="dufflebageaster1"; Icon="rbxassetid://8828333941"; SkinPerm="Easter Colors"; TargetItemId="dufflebag"; Tags={"Easter"};});
+	new(skinPermBase, {Id="dufflebageaster2"; Icon="rbxassetid://8828335887"; SkinPerm="Easter Stripes"; TargetItemId="dufflebag"; Tags={"Easter"};});
+	new(skinPermBase, {Id="bunnymanheadbenefactor"; Icon="rbxassetid://6665870074"; SkinPerm="The Benefactor"; TargetItemId="bunnymanhead"; Tags={"Easter"}; Sources={"Obtained from <b>The Bunny Man in Mission: Easter Butchery 2</b>";};});
 	
 	-- Summer 2020
 	new(toolBase, {Id="beachball"; Name="Beachball"; Icon="rbxassetid://5441513828"; Tags={"Summer"}; Description="Does 100 damage on hit.";});
@@ -774,12 +789,12 @@ function ItemsLibrary:Init(super)
 	
 	
 	-- Halloween 2023
-	new(unlockableBase, {Id="nekrostrenchhauntedpumpkin"; Icon="rbxassetid://14971117747"; Unlockable="Haunted Pumpkin Nekros Trench Coat";});
-	new(unlockableBase, {Id="skullmaskgold"; Icon="rbxassetid://15007587410"; Unlockable="Gold Skull Mask";});
 	new(customizationPack, {Id="skincutebutscary"; Name="Cute But Scary Pack"; Icon="rbxassetid://15016488348"; Tags={"Skin Pack"; "Slaughterfest";}; UnlockPack={Type="Skin"; Id="CuteButScary";};});
-	new(unlockableBase, {Id="clothbagmaskcbsskulls"; Icon="rbxassetid://15016732739"; Unlockable="Cute But Scary Skulls Cloth Bag Mask";});
-	new(unlockableBase, {Id="armwrapscbsghosts"; Icon="rbxassetid://15016755235"; Unlockable="Cute But Scary Ghosts Arm Wraps";});
-	new(unlockableBase, {Id="maraudersmaskcbspumpkins"; Icon="rbxassetid://15016821671"; Unlockable="Cute But Scary Pumpkins Marauder's Mask"; Tags={"Slaughterfest";};});
+	new(skinPermBase, {Id="nekrostrenchhauntedpumpkin"; Icon="rbxassetid://14971117747"; SkinPerm="Haunted Pumpkin"; TargetItemId="nekrostrench"; Tags={"Slaughterfest";}; });
+	new(skinPermBase, {Id="skullmaskgold"; Icon="rbxassetid://15007587410"; SkinPerm="Gold"; TargetItemId="skullmask"; Tags={"Slaughterfest";}; });
+	new(skinPermBase, {Id="clothbagmaskcbsskulls"; Icon="rbxassetid://15016732739"; SkinPerm="Cute But Scary Skulls"; TargetItemId="clothbagmask"; Tags={"Slaughterfest";}; });
+	new(skinPermBase, {Id="armwrapscbsghosts"; Icon="rbxassetid://15016755235"; SkinPerm="Cute But Scary Ghosts"; TargetItemId="armwraps"; Tags={"Slaughterfest";}; });
+	new(skinPermBase, {Id="maraudersmaskcbspumpkins"; Icon="rbxassetid://15016821671"; SkinPerm="Cute But Scary Pumpkins"; TargetItemId="maraudersmask"; Tags={"Slaughterfest";}; });
 	
 	-- Christmas 2019
 	
@@ -793,18 +808,18 @@ function ItemsLibrary:Init(super)
 
 	-- Christmas 2021
 	new(crateBase, {Id="xmaspresent2021"; Name="Christmas Present 2021"; Icon="rbxassetid://8402074470"; Tags={"Christmas"; "Frostivus"}; TradingTax=0; Description="Merry Christmas, open it and see what you get!";});
-	new(unlockableBase, {Id="disguisekitxmas"; Icon="rbxassetid://8379062918"; Tags={"Christmas"; "Frostivus"}; Unlockable="Christmas Disguise Kit";});
-	new(unlockableBase, {Id="leatherglovesxmasred"; Icon="rbxassetid://17032671301"; Tags={"Christmas"; "Frostivus"}; Unlockable="Christmas Red Leather Gloves";});
-	new(unlockableBase, {Id="leatherglovesxmasgreen"; Icon="rbxassetid://17032671567"; Tags={"Christmas"; "Frostivus"}; Unlockable="Christmas Green Leather Gloves";});
-	new(unlockableBase, {Id="leatherglovesxmasrgb"; Icon="rbxassetid://17032671890"; Tags={"Christmas"; "Frostivus"}; Unlockable="Christmas Rainbow Leather Gloves";});
-	new(unlockableBase, {Id="gasmaskxmas"; Icon="rbxassetid://8402308646"; Tags={"Christmas"; "Frostivus"}; Unlockable="Christmas Gas Mask";});
+	new(skinPermBase, {Id="disguisekitxmas"; Icon="rbxassetid://8379062918"; SkinPerm="Christmas"; TargetItemId="disguisekit"; Tags={"Christmas"; "Frostivus"}; });
+	new(skinPermBase, {Id="leatherglovesxmasred"; Icon="rbxassetid://17032671301"; SkinPerm="Christmas Red"; TargetItemId="leathergloves"; Tags={"Christmas"; "Frostivus"};});
+	new(skinPermBase, {Id="leatherglovesxmasgreen"; Icon="rbxassetid://17032671567"; SkinPerm="Christmas Green"; TargetItemId="leathergloves"; Tags={"Christmas"; "Frostivus"};});
+	new(skinPermBase, {Id="leatherglovesxmasrgb"; Icon="rbxassetid://17032671890"; SkinPerm="Christmas Rainbow"; TargetItemId="leathergloves"; Tags={"Christmas"; "Frostivus"};});
+	new(skinPermBase, {Id="gasmaskxmas"; Icon="rbxassetid://8402308646"; SkinPerm="Christmas"; TargetItemId="gasmask"; Tags={"Christmas"; "Frostivus"};});
 
 	-- Christmas 2022
 	new(crateBase, {Id="xmaspresent2022"; Name="Christmas Present 2022"; Icon="rbxassetid://11787305747"; Tags={"Christmas"; "Frostivus"}; TradingTax=0; Description="Merry Christmas, open it and see what you get!";});
-	new(unlockableBase, {Id="santahatwinterfest"; Icon="rbxassetid://11812491624"; Unlockable="Frostivus Santa Hat"; Tags={"Christmas"; "Frostivus";};});
-	new(unlockableBase, {Id="mercskneepadswinterfest"; Icon="rbxassetid://11812666419"; Unlockable="Frostivus Merc's Knee Pads"; Tags={"Christmas"; "Frostivus";};});
-	new(unlockableBase, {Id="xmassweatergreen"; Icon="rbxassetid://11863066782"; Unlockable="Xmas Sweater Green & Red"; Tags={"Christmas"; "Frostivus";};});
-	new(unlockableBase, {Id="xmassweateryellow"; Icon="rbxassetid://11863078091"; Unlockable="Xmas Sweater Yellow & Blue"; Tags={"Christmas"; "Frostivus";};});
+	new(skinPermBase, {Id="santahatwinterfest"; Icon="rbxassetid://11812491624"; SkinPerm="Frostivus"; TargetItemId="leathergloves"; Tags={"Christmas"; "Frostivus";};});
+	new(skinPermBase, {Id="mercskneepadswinterfest"; Icon="rbxassetid://11812666419"; SkinPerm="Frostivus"; TargetItemId="mercskneepads"; Tags={"Christmas"; "Frostivus";};});
+	new(skinPermBase, {Id="xmassweatergreen"; Icon="rbxassetid://11863066782"; SkinPerm="Xmas Sweater"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
+	new(skinPermBase, {Id="xmassweateryellow"; Icon="rbxassetid://11863078091"; SkinPerm="Xmas Sweater"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
 	
 	-- Christmas 2023
 	new(crateBase, {Id="xmaspresent2023"; Name="Christmas Present 2023"; Icon="rbxassetid://15565768345"; Tags={"Christmas"; "Frostivus"}; TradingTax=0; Description="Merry Christmas 2023!\n\n<i>\"I hope you're having a great holiday, I know RotD is lacking updates this winter and because of having to deal with a lot of irl things, there won't be a full winterfest update.\n\nI hope you'll enjoy this end of the year gift of a random cosmetic!\n~Khronos\"</i>\n\nOpen it and see what you get!";});
@@ -812,9 +827,9 @@ function ItemsLibrary:Init(super)
 	-- Easter 2023
 	new(crateBase, {Id="easteregg2023"; Name="Easter Egg 2023"; Icon="rbxassetid://12961679377"; Tags={"Easter"}; TradingTax=0; Description="Happy Easter, open it and see what you get!";});
 	new(customizationPack, {Id="skineaster2023"; Name="Easter Skins 2023 Pack"; Icon="rbxassetid://12963885465"; Tags={"Skin Pack"; "Easter"}; UnlockPack={Type="Skin"; Id="EasterSkins2023";};});
-	new(unlockableBase, {Id="hardhatcherryblossom"; Icon="rbxassetid://12963903837"; Tags={"Easter"}; Unlockable="Cherry Blossom Hard Hat";});
-	new(unlockableBase, {Id="highvisjacketfallenleaves"; Icon="rbxassetid://12963945448"; Tags={"Easter"}; Unlockable="Fallen Leaves High Visibility Jacket";});
-	new(unlockableBase, {Id="scraparmorcherryblossom"; Icon="rbxassetid://12963959744"; Tags={"Easter"}; Unlockable="Cherry Blossom Scrap Armor";});
+	new(skinPermBase, {Id="hardhatcherryblossom"; Icon="rbxassetid://12963903837"; SkinPerm="Cherry Blossom"; TargetItemId="hardhat"; Tags={"Easter"};});
+	new(skinPermBase, {Id="highvisjacketfallenleaves"; Icon="rbxassetid://12963945448"; Unlockable="Fallen Leaves"; TargetItemId="highvisjacket"; Tags={"Easter"};});
+	new(skinPermBase, {Id="scraparmorcherryblossom"; Icon="rbxassetid://12963959744"; Unlockable="Cherry Blossom"; TargetItemId="scraparmor"; Tags={"Easter"};});
 	
 
 	--==========================================================[[ META ]]==========================================================--
