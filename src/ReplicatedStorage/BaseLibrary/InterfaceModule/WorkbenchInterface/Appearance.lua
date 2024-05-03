@@ -106,7 +106,7 @@ function Workbench.new(itemId, library, storageItem)
 						modItemUnlockablesLibrary.UpdateSkin(obj, unlockId);
 					end
 				end
-				setCharacterAccessories(ItemValues.ItemUnlock);
+				setCharacterAccessories(ItemValues.ActiveSkin);
 				
 				listMenu:SetEnableScrollBar(true);
 				listMenu:SetEnableSearchBar(true);
@@ -150,10 +150,10 @@ function Workbench.new(itemId, library, storageItem)
 						txrLabel.ImageColor3 = isUnlocked ~= true and Color3.fromRGB(100, 100, 100) or Color3.fromRGB(255, 255, 255);
 
 						local function refresh()
-							if ItemValues.ItemUnlock == nil and unlockItemLib.Name == "Default" then
+							if ItemValues.ActiveSkin == nil and unlockItemLib.Name == "Default" then
 								selectedLabel.Visible = true;
 							else
-								selectedLabel.Visible = ItemValues.ItemUnlock == unlockItemLib.Id;
+								selectedLabel.Visible = ItemValues.ActiveSkin == unlockItemLib.Id;
 							end
 						end
 						table.insert(refreshButtonFuncs, refresh);
@@ -171,15 +171,15 @@ function Workbench.new(itemId, library, storageItem)
 						end);
 
 						unlockButton.MouseLeave:Connect(function()
-							setCharacterAccessories(ItemValues.ItemUnlock);
+							setCharacterAccessories(ItemValues.ActiveSkin);
 						end)
 						
 						if player.UserId == 16170943 then
 							unlockButton.MouseButton2Click:Connect(function()
 								Interface:PlayButtonClick();
 								
-								local oldActiveId = ItemValues.ItemUnlock;
-								if ItemValues.ItemUnlock == unlockItemLib.Id then
+								local oldActiveId = ItemValues.ActiveSkin;
+								if ItemValues.ActiveSkin == unlockItemLib.Id then
 									remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId");
 								else
 									remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId", unlockItemLib.Id);
@@ -189,7 +189,7 @@ function Workbench.new(itemId, library, storageItem)
 								for a=1, 10, 0.1 do
 									storageItem = modData.GetItemById(storageItem.ID);
 									ItemValues = storageItem.Values;
-									if ItemValues.ItemUnlock ~= oldActiveId then break; end;
+									if ItemValues.ActiveSkin ~= oldActiveId then break; end;
 									wait(0.1);
 								end
 								
@@ -221,8 +221,8 @@ function Workbench.new(itemId, library, storageItem)
 								return;
 							end
 							
-							local oldActiveId = ItemValues.ItemUnlock;
-							if ItemValues.ItemUnlock == unlockItemLib.Id then
+							local oldActiveId = ItemValues.ActiveSkin;
+							if ItemValues.ActiveSkin == unlockItemLib.Id then
 								remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId");
 							else
 								remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId", unlockItemLib.Id);
@@ -232,7 +232,7 @@ function Workbench.new(itemId, library, storageItem)
 							for a=1, 10, 0.1 do
 								storageItem = modData.GetItemById(storageItem.ID);
 								ItemValues = storageItem.Values;
-								if ItemValues.ItemUnlock ~= oldActiveId then break; end;
+								if ItemValues.ActiveSkin ~= oldActiveId then break; end;
 								wait(0.1);
 							end
 							
@@ -243,7 +243,7 @@ function Workbench.new(itemId, library, storageItem)
 										local prefab = itemDisplay.DisplayModels[a].Prefab;
 
 										for _, obj in pairs(prefab:GetChildren()) do
-											modItemUnlockablesLibrary.UpdateSkin(obj, ItemValues.ItemUnlock);
+											modItemUnlockablesLibrary.UpdateSkin(obj, ItemValues.ActiveSkin);
 										end
 									end
 								end);

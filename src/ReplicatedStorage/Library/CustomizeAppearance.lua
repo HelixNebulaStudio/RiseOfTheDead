@@ -171,11 +171,11 @@ function CustomizeAppearance.AttachAccessory(character, accessoryPrefab, accesso
 				if storageItem.VanityMeta then
 					modItemUnlockablesLibrary.UpdateSkin(accessory, storageItem.VanityMeta);
 					
-				elseif storageItem.Values and storageItem.Values.ItemUnlock then
-					local unlockableItemLib = modItemUnlockablesLibrary:Find(storageItem.Values.ItemUnlock);
+				elseif storageItem.Values and storageItem.Values.ActiveSkin then
+					local unlockableItemLib = modItemUnlockablesLibrary:Find(storageItem.Values.ActiveSkin);
 
 					if unlockableItemLib and unlockableItemLib.ItemId == storageItem.ItemId then
-						modItemUnlockablesLibrary.UpdateSkin(accessory, storageItem.Values.ItemUnlock);
+						modItemUnlockablesLibrary.UpdateSkin(accessory, storageItem.Values.ActiveSkin);
 					end
 					
 				else

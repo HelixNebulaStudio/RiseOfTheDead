@@ -47,7 +47,7 @@ function ItemMarket:Add(logTime, storageItem, gold, traderNames, avgGold)
 	
 	local itemValues = {};
 	if storageItem.Values then
-		local importantKeys = {"ItemUnlock"; "SkinWearId"; "Tweak";};
+		local importantKeys = {"SkinWearId"; "Tweak"; "ActiveSkin"; "Skins"; "Color"; "Seed";};
 		
 		for a=1, #importantKeys do
 			local key = importantKeys[a];

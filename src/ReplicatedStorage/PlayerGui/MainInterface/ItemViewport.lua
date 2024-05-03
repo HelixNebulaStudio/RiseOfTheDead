@@ -212,7 +212,7 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 		
 		self.Zoom = 7;
 		task.spawn(function()
-			local packageId = itemValues.ItemUnlock or itemId;
+			local packageId = itemValues.ActiveSkin or itemId;
 			
 			local accessoryData, _actionType = remoteEquipCosmetics:InvokeServer(itemId, packageId);
 			

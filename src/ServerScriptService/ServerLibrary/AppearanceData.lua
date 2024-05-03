@@ -60,7 +60,7 @@ function AppearanceData:Update(storage)
 				modStorage.RefreshItem(self.Player, storageItem.Vanity);
 				
 				storageItem.VanityItemId = vanityItem.ItemId;
-				storageItem.VanitySkinId = vanityItem.Values.ItemUnlock;
+				storageItem.VanitySkinId = vanityItem.Values.ActiveSkin;
 				storageItem.VanityMeta = storageItem.VanitySkinId or storageItem.VanityItemId;
 			end
 		end

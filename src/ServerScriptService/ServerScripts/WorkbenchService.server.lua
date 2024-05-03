@@ -680,14 +680,13 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 					local unlockableItemLib = modItemUnlockablesLibrary:Find(appearId);
 
 					if unlockableItemLib and unlockableItemLib.ItemId == storageItem.ItemId then
-						local itemId = unlockableItemLib.ItemId;
-						
-						local unlockableData = profile.ItemUnlockables[itemId] or {};
-						
-						local isUnlocked = unlockableData[unlockableItemLib.Id];
+
+						local unlockedSkins = storageItem:GetValues("Skins") or {};
+						local isUnlocked = unlockedSkins[unlockableItemLib.Id];
+
 						if unlockableItemLib.Name == "Default" or unlockableItemLib.Unlocked == true then
 							isUnlocked = true;
-						elseif typeof(unlockableItemLib.Unlocked) == "string" and unlockableData[unlockableItemLib.Unlocked] == true then
+						elseif typeof(unlockableItemLib.Unlocked) == "string" and unlockedSkins[unlockableItemLib.Unlocked] then
 							isUnlocked = true;
 						end
 						
@@ -695,13 +694,13 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 							isUnlocked = true;
 						end
 						if isUnlocked then
-							storageItem:SetValues("ItemUnlock", appearId);
+							storageItem:SetValues("ActiveSkin", appearId);
 						end
 					else
-						storageItem:DeleteValues("ItemUnlock");
+						storageItem:DeleteValues("ActiveSkin");
 					end
 				else
-					storageItem:DeleteValues("ItemUnlock");
+					storageItem:DeleteValues("ActiveSkin");
 				end
 				
 				activeSave.AppearanceData:Update(activeSave.Clothing);

@@ -2412,7 +2412,7 @@ Commands["give"] = {
 	Info = function(speaker)
 		shared.Notify(speaker, "========== /give Examples ==========", "Inform");
 		shared.Notify(speaker, 'Give 5 metal scraps to yourself: /give metal 5', "Inform");
-		shared.Notify(speaker, 'Give backpack with skin: /give survivorsbackpack 1 [[{"Name":"Galaxy Backpack","Values":{"ItemUnlock":"survivorsbackpackgalaxy"}}]]', "Inform");
+		shared.Notify(speaker, 'Give backpack with skin: /give survivorsbackpack 1 [[{"Name":"Galaxy Backpack","Values":{"ActiveSkin":"survivorsbackpackgalaxy"}}]]', "Inform");
 		shared.Notify(speaker, 'Give a placable spotlight: /give placeitem 1 [[{"Values":{"PickUpItemId":"spotlight"}}]]', "Inform");
 	end;
 	Function = function(speaker, args)

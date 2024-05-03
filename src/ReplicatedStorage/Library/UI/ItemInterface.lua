@@ -322,21 +322,6 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 
 		end
 
-		if itemValues.ItemUnlock then
-			local unlockableItemLib = modItemUnlockablesLibrary:Find(itemValues.ItemUnlock);
-
-			if unlockableItemLib and unlockableItemLib.ItemId == itemId then
-				if unlockableItemLib and unlockableItemLib.Icon then
-					itemIcon = unlockableItemLib.Icon;
-				end
-
-				local unlockItemLib = modItemsLibrary:Find(itemValues.ItemUnlock);
-				if unlockItemLib then
-					itemIcon = unlockItemLib.Icon;
-				end
-			end
-		end
-
 		if itemValues.ActiveSkin then
 			local permType = nil;
 			local permLib = modItemUnlockablesLibrary:Find(itemValues.ActiveSkin);
@@ -737,22 +722,6 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 			end
 		end
 		
-		if itemValues.ItemUnlock then
-			local unlockableItemLib = modItemUnlockablesLibrary:Find(itemValues.ItemUnlock);
-			if unlockableItemLib and unlockableItemLib.ItemId == itemId then
-				itemDesc = itemDesc..h3O.."\nSkin: "..h3C.. colorStringText(unlockableItemLib.Name);
-				
-				if unlockableItemLib.Icon then
-					itemLibIcon = unlockableItemLib.Icon;
-				end
-
-				local unlockItemLib = modItemsLibrary:Find(itemValues.ItemUnlock);
-				if unlockItemLib then
-					itemLibIcon = unlockItemLib.Icon;
-				end
-			end
-		end
-
 		if itemValues.ActiveSkin then
 			local permType = nil;
 			local permLib = modItemUnlockablesLibrary:Find(itemValues.ActiveSkin);
