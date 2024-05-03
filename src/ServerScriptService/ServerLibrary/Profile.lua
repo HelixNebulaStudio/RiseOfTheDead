@@ -866,7 +866,11 @@ function Profile:Load(loadOverwrite)
 	self.Loaded = true;
 	self.Offline = false;
 	self.SaveIndex = self.SaveIndex +1;
-	
+
+	if self.GameSave then
+		self.GameSave:Loaded();
+	end
+
 	self:SyncAuthSeed();
 	self:GetPolicy();
 	

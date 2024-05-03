@@ -318,46 +318,57 @@ function SaveData:Load(rawData, isPrimarySave)
 			end)
 			self.Events:Add({Id="itemCodex1"});
 		end
-
-		local skinPermUpdate = self.Events:Get("skinPermUpdate1");
-		if skinPermUpdate == nil then
-			self.Events:Add({Id="skinPermUpdate1"});
-
-			local function updateItem(storageItem)
-				local itemId = storageItem.ItemId;
-				local itemUnlockables = self.Profile.ItemUnlockables;
-
-				local unlockedSkins = {};
-
-				-- Clothing
-				local oldItemUnlockables = itemUnlockables[itemId];
-				for skinId, _ in pairs(oldItemUnlockables) do
-					table.insert(unlockedSkins, skinId);
-				end
-
-				-- Tools
-				if storageItem:GetValues("LockedPattern") then
-					table.insert(unlockedSkins, storageItem:GetValues("LockedPattern"));
-					storageItem:SetValues("ActiveSkin", unlockedSkins[#unlockedSkins]);
-				end
-
-				if storageItem:GetValues("ItemUnlock") then
-					storageItem:SetValues("ActiveSkin", storageItem:GetValues("ItemUnlock"));
-				end
-
-				storageItem:SetValues("Skins", unlockedSkins);
-			end
-
-			self.Inventory:Loop(updateItem);
-			self.Clothing:Loop(updateItem);
-			self.Wardrobe:Loop(updateItem)
-			for id, _ in pairs(self.Storages) do
-				self.Storages[id]:Loop(updateItem);
-			end
-		end
 	end
 	
 	return self;
+end
+
+function SaveData:Loaded()
+	local skinPermUpdate = self.Events:Get("skinPermUpdate1");
+	if skinPermUpdate == nil then
+		self.Events:Add({Id="skinPermUpdate1"});
+
+		local function updateItem(storageItem)
+			local itemId = storageItem.ItemId;
+			local itemUnlockables = self.Profile.ItemUnlockables;
+
+			local unlockedSkins = {};
+
+			-- Clothing
+			local oldItemUnlockables = itemUnlockables[itemId] or {};
+			for skinId, _ in pairs(oldItemUnlockables) do
+				table.insert(unlockedSkins, skinId);
+			end
+
+			-- Tools
+			local lockedPattern = storageItem:GetValues("LockedPattern");
+			if lockedPattern then
+				if table.find(unlockedSkins, lockedPattern) == nil then
+					table.insert(unlockedSkins, lockedPattern);
+				end
+				storageItem:SetValues("ActiveSkin", lockedPattern);
+			end
+
+			local itemUnlock = storageItem:GetValues("ItemUnlock");
+			if itemUnlock then
+				if table.find(unlockedSkins, itemUnlock) == nil then
+					table.insert(unlockedSkins, itemUnlock);
+				end
+				storageItem:SetValues("ActiveSkin", itemUnlock);
+			end
+
+			if #unlockedSkins >0 then
+				storageItem:SetValues("Skins", unlockedSkins);
+			end
+		end
+
+		self.Inventory:Loop(updateItem);
+		self.Clothing:Loop(updateItem);
+		self.Wardrobe:Loop(updateItem)
+		for id, _ in pairs(self.Storages) do
+			self.Storages[id]:Loop(updateItem);
+		end
+	end
 end
 
 function SaveData:GetStat(key)

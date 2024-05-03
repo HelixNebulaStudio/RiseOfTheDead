@@ -119,14 +119,15 @@ function Workbench.new(itemId, library, storageItem)
 
 				local refreshButtonFuncs = {};
 				
-				local unlockableData = modData.Profile and modData.Profile.ItemUnlockables[itemId] or {};
+				local unlockableData = ItemValues.Skins or {};
+				--modData.Profile and modData.Profile.ItemUnlockables[itemId] or {};
 				for b=1, #itemUnlockables do
 					local unlockItemLib = itemUnlockables[b];
 					
-					local isUnlocked = unlockableData[unlockItemLib.Id];
+					local isUnlocked = table.find(unlockableData, unlockItemLib.Id);
 					if unlockItemLib.Name == "Default" or unlockItemLib.Unlocked == true then
 						isUnlocked = true;
-					elseif typeof(unlockItemLib.Unlocked) == "string" and unlockableData[unlockItemLib.Unlocked] == true then
+					elseif typeof(unlockItemLib.Unlocked) == "string" and table.find(unlockableData, unlockItemLib.Unlocked) then
 						isUnlocked = true;
 					end
 					
@@ -146,8 +147,8 @@ function Workbench.new(itemId, library, storageItem)
 						txrLabel.Image = unlockableIcon or "";
 						titleLabel.Text = unlockItemLib.Name;
 						unlockButton.LayoutOrder = unlockItemLib.Name == "Default" and 0 or unlockItemLib.LayoutOrder or 1;
-						unlockButton.LayoutOrder = isUnlocked ~= true and unlockButton.LayoutOrder + 999 or unlockButton.LayoutOrder;
-						txrLabel.ImageColor3 = isUnlocked ~= true and Color3.fromRGB(100, 100, 100) or Color3.fromRGB(255, 255, 255);
+						unlockButton.LayoutOrder = isUnlocked and unlockButton.LayoutOrder or unlockButton.LayoutOrder + 999;
+						txrLabel.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 
 						local function refresh()
 							if ItemValues.ActiveSkin == nil and unlockItemLib.Name == "Default" then
@@ -209,7 +210,7 @@ function Workbench.new(itemId, library, storageItem)
 						unlockButton.MouseButton1Click:Connect(function()
 							Interface:PlayButtonClick();
 
-							if isUnlocked ~= true then 
+							if isUnlocked == nil then
 								Interface:OpenWindow("GoldMenu", unlockItemLib.Id);
 								
 								return
