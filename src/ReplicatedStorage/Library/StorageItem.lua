@@ -14,6 +14,14 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 
 local remoteStorageItemSync = modRemotesManager:Get("StorageItemSync");
 
+type StorageItemObject = {
+	ItemId: string;
+	Name: string?;
+	Quantity: number | boolean;
+	Values: {[any]: any};
+}
+export type StorageItem = typeof(setmetatable({} :: StorageItemObject, StorageItem));
+
 --== Script;
 function StorageItem.new(index, itemId, data, player)
 	local itemMeta = setmetatable({}, StorageItem);

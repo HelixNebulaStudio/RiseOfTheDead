@@ -603,7 +603,6 @@ function ItemsLibrary:Init(super)
 	new(unlockableBase, {Id="prisonpantsblue"; Icon="rbxassetid://6665650148"; Unlockable="Blue Prisoner's Pants";});
 	
 	new(unlockableBase, {Id="leatherglovesred"; Icon="rbxassetid://16994275555"; Unlockable="Red Leather Gloves";});
-	new(unlockableBase, {Id="leatherglovesultraviolet"; Icon="rbxassetid://17275591636"; Unlockable="Ultra Violet Leather Gloves";});
 	
 	new(unlockableBase, {Id="dufflebagstreetart"; Icon="rbxassetid://8828337700"; Unlockable="Street Art Duffle Bag";});
 	new(unlockableBase, {Id="dufflebagvintage"; Icon="rbxassetid://8828340427"; Unlockable="Vintage Duffle Bag";});
@@ -644,7 +643,6 @@ function ItemsLibrary:Init(super)
 	
 	new(unlockableBase, {Id="divinggogglesyellow"; Icon="rbxassetid://10333085751"; Unlockable="Yellow Diving Goggles";});
 	new(unlockableBase, {Id="divinggogglesred"; Icon="rbxassetid://15008018716"; Unlockable="Red Diving Goggles";});
-	new(unlockableBase, {Id="divinggoggleswhite"; Icon="rbxassetid://17219482453"; Unlockable="White Diving Goggles";});
 
 	new(unlockableBase, {Id="maraudersmaskblue"; Icon="rbxassetid://11269657288"; Unlockable="Blue Marauder's Mask"; Tags={"Slaughterfest";};});
 	new(unlockableBase, {Id="maraudersmaskrisingsun"; Icon="rbxassetid://17218272962"; Unlockable="Rising Sun Marauder's Mask";});
@@ -686,35 +684,42 @@ function ItemsLibrary:Init(super)
 	new(unlockableBase, {Id="fedorauvunwrapped"; Icon="rbxassetid://17275939280"; Unlockable="UV Unwrapped Fedora";});
 	
 
-	--==========================================================[[ ITEM UNLOCKABLES ]]==========================================================--
+	--==========================================================[[ SKIN PERM ]]==========================================================--
 	local skinPermBase = {
 		Type = super.Types.Usable;
 		TypeIcon = "rbxassetid://12964393529";
+		Stackable = 5;
 
 		Tradable = super.Tradable.Tradable;
 		Tags = {"Skin Perm"};
 		OnAdd = function(data)
 			local skinPerm = data.SkinPerm;
 			if skinPerm then
-				local itemLib = super:Find(data.ToolItemId);
+				local itemLib = super:Find(data.TargetItemId);
 				
 				data.Name = skinPerm.." ".. itemLib.Name .." Skin-Perm";
 				data.Description = "Right click to apply "..skinPerm.." skin permanent to a ".. itemLib.Name ..".";
 			end
 		end;
-		TradingTax=10;
+		TradingTax=100;
 	};
 	
-	new(skinPermBase, {Id="arelshiftcrossantique"; Icon="rbxassetid://13768313905"; SkinPerm="Antique"; ToolItemId="arelshiftcross"; });
-	new(skinPermBase, {Id="desolatorheavytoygun"; Icon="rbxassetid://13787997600"; SkinPerm="Toy Gun"; ToolItemId="desolatorheavy"; });
-	new(skinPermBase, {Id="czevo3asiimov"; Icon="rbxassetid://13810605651"; SkinPerm="Asiimov"; ToolItemId="czevo3"; });
-	new(skinPermBase, {Id="rusty48blaze"; Icon="rbxassetid://13822423304"; SkinPerm="Blaze"; ToolItemId="rusty48"; });
-	new(skinPermBase, {Id="sr308slaughterwoods"; Icon="rbxassetid://16570530303"; SkinPerm="Slaughter Woods"; ToolItemId="sr308"; });
-	new(skinPermBase, {Id="vectorxpossession"; Icon="rbxassetid://15007719867"; SkinPerm="Possession"; ToolItemId="vectorx"; });
-	new(skinPermBase, {Id="sr308horde"; Icon="rbxassetid://16570534063"; SkinPerm="Horde"; ToolItemId="sr308"; });
-	new(skinPermBase, {Id="deaglecryogenics"; Icon="rbxassetid://17227806515"; SkinPerm="Cryogenics"; ToolItemId="deagle"; });
-	new(skinPermBase, {Id="flamethrowerblaze"; Icon="rbxassetid://17229367894"; SkinPerm="Blaze"; ToolItemId="flamethrower"; });
+	new(skinPermBase, {Id="arelshiftcrossantique"; Icon="rbxassetid://13768313905"; SkinPerm="Antique"; TargetItemId="arelshiftcross"; });
+	new(skinPermBase, {Id="desolatorheavytoygun"; Icon="rbxassetid://13787997600"; SkinPerm="Toy Gun"; TargetItemId="desolatorheavy"; });
+	new(skinPermBase, {Id="czevo3asiimov"; Icon="rbxassetid://13810605651"; SkinPerm="Asiimov"; TargetItemId="czevo3"; });
+	new(skinPermBase, {Id="rusty48blaze"; Icon="rbxassetid://13822423304"; SkinPerm="Blaze"; TargetItemId="rusty48"; });
+	new(skinPermBase, {Id="sr308slaughterwoods"; Icon="rbxassetid://16570530303"; SkinPerm="Slaughter Woods"; TargetItemId="sr308"; });
+	new(skinPermBase, {Id="vectorxpossession"; Icon="rbxassetid://15007719867"; SkinPerm="Possession"; TargetItemId="vectorx"; });
+	new(skinPermBase, {Id="sr308horde"; Icon="rbxassetid://16570534063"; SkinPerm="Horde"; TargetItemId="sr308"; });
+	new(skinPermBase, {Id="deaglecryogenics"; Icon="rbxassetid://17227806515"; SkinPerm="Cryogenics"; TargetItemId="deagle"; });
+	new(skinPermBase, {Id="flamethrowerblaze"; Icon="rbxassetid://17229367894"; SkinPerm="Blaze"; TargetItemId="flamethrower"; });
 	
+	-- divinggoggles
+	new(skinPermBase, {Id="divinggoggleswhite"; Icon="rbxassetid://17219482453"; SkinPerm="White"; TargetItemId="divinggoggles";});
+
+	-- leathergloves
+	new(skinPermBase, {Id="leatherglovesultraviolet"; Icon="rbxassetid://17275591636"; SkinPerm="Ultra Violet"; TargetItemId="leathergloves"; });
+
 	--==========================================================[[ SUMMONS ]]==========================================================--
 	local summonsBase = {
 		Type = super.Types.Tool;

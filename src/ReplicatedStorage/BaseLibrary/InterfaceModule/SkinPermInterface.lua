@@ -7,7 +7,7 @@ local Interface = {};
 local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = require(localPlayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
@@ -61,7 +61,7 @@ function Interface.init(modInterface)
 			selectedItem = slot.Item;
 
 			local skinPermItemLib = modItemsLibrary:Find(skinPermItem.ItemId);
-			if selectedItem.ItemId ~= skinPermItemLib.ToolItemId then
+			if selectedItem.ItemId ~= skinPermItemLib.TargetItemId then
 				selectItemButton.DimOut = true;
 				applyButton.BackgroundColor3 = Color3.fromRGB(81, 107, 79);
 				
@@ -83,7 +83,7 @@ function Interface.init(modInterface)
 	local debounce = false;
 	applyButton.MouseButton1Click:Connect(function()
 		local skinPermItemLib = modItemsLibrary:Find(skinPermItem.ItemId);
-		if selectedItem.ItemId ~= skinPermItemLib.ToolItemId then
+		if selectedItem.ItemId ~= skinPermItemLib.TargetItemId then
 			return;
 		end
 
@@ -135,12 +135,12 @@ function Interface.init(modInterface)
 			titleLabel.Text = "Apply ".. skinPermItemLib.SkinPerm .." Skin Permanent";
 			
 			for id, buttonTable in pairs(defaultInterface.Buttons) do
-				if buttonTable.Item.ItemId == skinPermItemLib.ToolItemId then continue end;
+				if buttonTable.Item.ItemId == skinPermItemLib.TargetItemId then continue end;
 				buttonTable.ItemButtonObject.DimOut = true;
 				buttonTable.ItemButtonObject:Update(buttonTable.Item);
 			end
 			for id, buttonTable in pairs(premiumInterface.Buttons) do
-				if buttonTable.Item.ItemId == skinPermItemLib.ToolItemId then continue end;
+				if buttonTable.Item.ItemId == skinPermItemLib.TargetItemId then continue end;
 				buttonTable.ItemButtonObject.DimOut = true;
 				buttonTable.ItemButtonObject:Update(buttonTable.Item);
 			end

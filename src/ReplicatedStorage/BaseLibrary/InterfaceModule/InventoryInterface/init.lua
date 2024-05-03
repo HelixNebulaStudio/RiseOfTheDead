@@ -10,7 +10,7 @@ local RunService = game:GetService("RunService");
 local UserInputService = game:GetService("UserInputService");
 local TweenService = game:GetService("TweenService");
 
-local modData = require(localPlayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modItem = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
