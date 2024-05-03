@@ -6,14 +6,12 @@ PageInterface.__index = PageInterface;
 local localplayer = game.Players.LocalPlayer;
 
 local TextService = game:GetService("TextService");
-local HttpService = game:GetService("HttpService");
 
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modCrateLibrary = require(game.ReplicatedStorage.Library.CrateLibrary);
-local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
 
 local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface);
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
@@ -104,10 +102,8 @@ function PageInterface:Load(interface)
 		local indexedList = modItemsLibrary.Library:GetIndexList();
 		for i=1, #indexedList do
 			local itemLib = indexedList[i];
-			local itemId = itemLib.Id;
 
 			local tags = itemLib.Tags;
-			
 			if table.find(tags, "HideFromCodex") then
 				continue;
 			end
@@ -127,7 +123,7 @@ function PageInterface:Load(interface)
 	if itemToolTip then itemToolTip:Destroy(); end
 	itemToolTip = modItemInterface.newItemTooltip();
 	
-	local modData = require(localplayer:WaitForChild("DataModule"));
+	local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 	local itemCodexPacket = modData:GetFlag("ItemCodex");
 	local itemUnlockFlag = itemCodexPacket and itemCodexPacket.Data or {};
 	
@@ -150,9 +146,9 @@ function PageInterface:Load(interface)
 		if catInfo == nil and typeInfo then
 			newTab = tabTemplate:Clone();
 			local titleLabel = newTab:WaitForChild("titleLabel");
-			local semiCollapseSign = newTab:WaitForChild("semiCollapseSign");
-			local collapseSign = newTab:WaitForChild("collapseSign");
-			local expandSign = newTab:WaitForChild("expandSign");
+			local _semiCollapseSign = newTab:WaitForChild("semiCollapseSign");
+			local _collapseSign = newTab:WaitForChild("collapseSign");
+			local _expandSign = newTab:WaitForChild("expandSign");
 			
 			titleLabel.Text = typeInfo.Title or itemTag;
 			
@@ -207,8 +203,6 @@ function PageInterface:Load(interface)
 					function itemToolTip:CustomUpdate(itemId)
 						local itemLib = modItemsLibrary:Find(itemId);
 						if itemLib == nil then return end;
-
-						local modData = require(localplayer:WaitForChild("DataModule"));
 
 						local defaultFrame = self.Frame:WaitForChild("default");
 						local nameTag = self.Frame:WaitForChild("NameTag");
