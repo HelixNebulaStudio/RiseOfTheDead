@@ -591,8 +591,9 @@ function ItemsLibrary:Init(super)
 			if skinPerm then
 				local itemLib = super:Find(data.TargetItemId);
 				
+				data.TargetName = itemLib.Name;
 				data.Name = skinPerm.." ".. itemLib.Name .." Skin-Perm";
-				data.Description = "Right click to apply "..skinPerm.." skin permanent to a ".. itemLib.Name ..".";
+				data.Description = "Right click to unlock "..skinPerm.." skin permanent to a ".. itemLib.Name ..". You can always change the skin permanent in the workbench to other unlocked skins on a workbench.";
 			end
 		end;
 		TradingTax=100;
