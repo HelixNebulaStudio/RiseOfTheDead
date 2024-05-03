@@ -8,7 +8,6 @@ local RunService = game:GetService("RunService");
 local TextService = game:GetService("TextService");
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
 local StorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
@@ -514,16 +513,8 @@ end)
 function Storage.RefreshItem(player, storageItemId, sync)
 	local storageItem, storage = Storage.FindIdFromStorages(storageItemId, player);
 	if storageItem and storage then
-
 		local itemValues = storageItem.Values;
 
-		if itemValues.ItemUnlock then
-			local unlockableItemLib = modItemUnlockablesLibrary:Find(itemValues.ItemUnlock);
-			if unlockableItemLib == nil or unlockableItemLib.ItemId ~= storageItem.ItemId then
-				storage:DeleteValues(storageItemId, "ItemUnlock");
-			end
-		end
-		
 		if sync == true then
 			if storageItem.Changed then
 				storageItem.Changed(storage);
@@ -2051,10 +2042,6 @@ function Storage:Use(player, id, ...)
 	
 	local itemId = storageItem.ItemId;
 	local handlerModule = itemHandlerModule:FindFirstChild(itemId);
-	
-	if modItemUnlockablesLibrary:Find(itemId) then
-		handlerModule = itemHandlerModule:FindFirstChild("ItemUnlockableTemplate");
-	end
 	
 	local usableItemLib = modUsableItems:Find(storageItem.ItemId);
 	if handlerModule == nil and usableItemLib and usableItemLib.Use then
