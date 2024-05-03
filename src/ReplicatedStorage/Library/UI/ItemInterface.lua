@@ -741,6 +741,30 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 				itemDesc = itemDesc..h3O.."\nSkin-Permanent: "..h3C.. colorStringText(permLib.Name);
 			end
 		end
+
+		if itemValues.Skins then
+			local skinNames = {};
+			for a=1, #itemValues.Skins do
+				local skinId = itemValues.Skins[a];
+				local skinName = nil;
+
+				local skinLib = modItemUnlockablesLibrary:Find(skinId);
+				if skinLib then
+					skinName = skinLib.Name;
+				else
+					skinLib = modSkinsLibrary.Get(skinId);
+					if skinLib then
+						skinName = skinLib.Name;
+					end
+				end
+
+				if skinName then
+					table.insert(skinNames, `\n    - {skinName}`);
+				end
+			end
+
+			itemDesc = itemDesc..h3O.."\nSkins:"..h3C.. colorStringText(table.concat(skinNames, ""));
+		end
 		
 		if itemValues.Tweak and itemValues.TweakValues then
 			local tweakValues = itemValues.TweakValues;
