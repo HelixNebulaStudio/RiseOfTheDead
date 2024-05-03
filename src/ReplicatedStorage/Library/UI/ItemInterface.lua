@@ -694,6 +694,27 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 		itemDesc = itemDesc..h3O.."\nTime:"..h3C.." "..colorNumberText(game.Lighting.TimeOfDay);
 	end
 	
+	if modItemsLibrary:HasTag(itemId, "Skin Perm") then
+		local skinLib = modItemUnlockablesLibrary:Find(itemId);
+		if skinLib then
+			local skinNames = {};
+			table.insert(skinNames, `{skinLib.Name} {itemLib.TargetName}`);
+
+			if skinLib.BundleList then
+				for k, bundleSkinLib in pairs(skinLib.BundleList) do
+					table.insert(skinNames, `{bundleSkinLib.Name} {itemLib.TargetName}`);
+				end
+			end
+
+			itemDesc = itemDesc..h3O.."\nUnlocks:"..h3C..colorStringText("\n    - "..table.concat(skinNames, "\n    - "));
+		else
+			skinLib = modSkinsLibrary.GetByName(itemLib.SkinPerm);
+
+			if skinLib then
+				itemDesc = itemDesc..h3O.."\nUnlocks: "..h3C..colorStringText(`{skinLib.Name} {itemLib.TargetName}`);
+			end
+		end
+	end
 	
 	if storageItemData then
 		local isCustomName = storageItemData.Name ~= itemLib.Name;
@@ -743,6 +764,8 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 		end
 
 		if itemValues.Skins then
+			table.sort(itemValues.Skins);
+
 			local skinNames = {};
 			for a=1, #itemValues.Skins do
 				local skinId = itemValues.Skins[a];
@@ -751,6 +774,11 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 				local skinLib = modItemUnlockablesLibrary:Find(skinId);
 				if skinLib then
 					skinName = skinLib.Name;
+					if skinLib.BundleList then
+						for k, bundleSkinLib in pairs(skinLib.BundleList) do
+							skinName = skinName..` & {bundleSkinLib.Name}`;
+						end
+					end
 				else
 					skinLib = modSkinsLibrary.Get(skinId);
 					if skinLib then
@@ -763,7 +791,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 				end
 			end
 
-			itemDesc = itemDesc..h3O.."\nSkins:"..h3C.. colorStringText(table.concat(skinNames, ""));
+			itemDesc = itemDesc..h3O.."\nSkins:"..h3C.. modRichFormatter.RichFontSize(colorStringText(table.concat(skinNames)), 10);
 		end
 		
 		if itemValues.Tweak and itemValues.TweakValues then

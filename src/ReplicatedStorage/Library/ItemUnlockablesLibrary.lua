@@ -32,6 +32,18 @@ local surfGroupList = {
 	};
 };
 
+library:SetOnAdd(function(data)
+	if typeof(data.Unlocked) ~= "string" then return end;
+	local baseLib = library:Find(data.Unlocked);
+	
+	if baseLib.BundleList == nil then
+		baseLib.BundleList = {};
+	end
+
+	baseLib.BundleList[data.Id] = data;
+end)
+
+
 function library.UpdateSkin(accessory, skinId)
 	local skinLib = library:Find(skinId);
 	if skinLib then
