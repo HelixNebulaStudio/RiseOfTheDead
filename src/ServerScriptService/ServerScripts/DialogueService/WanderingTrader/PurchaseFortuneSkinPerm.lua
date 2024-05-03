@@ -26,12 +26,16 @@ return function(player, dialog, data)
 			};
 
 			if itemDisplayLib then
-				if storageItem.Values.LockedPattern == nil then
+				local modSkinPerm = require(game.ReplicatedStorage.BaseLibrary.UsableItems.Generics.SkinPerm);
+				local fortuneSkinId = 106;
+
+				if not modSkinPerm:HasSkinPermanent(storageItem, fortuneSkinId) then
 					dialogPacket.Reply="Here you go! The fortune skin permanent is now on your tool.";
 					dialog:AddDialog(dialogPacket, function(dialog)
 
 						traderProfile:AddGold(-fortuneSkinCost);
-						inventory:SetValues(equippedToolID, {LockedPattern=106});
+
+						modSkinPerm:AddSkinPermanent(storageItem, fortuneSkinId);
 
 						task.spawn(function()
 							modAnalytics.RecordResource(player.UserId, fortuneSkinCost, "Sink", "Gold", "Purchase", "fortunepatternperm");
@@ -84,7 +88,7 @@ return function(player, dialog, data)
 				InspectItem={
 					ID=storageItem.ID;
 					ItemId=storageItem.ItemId;
-					Values={LockedPattern=106;}; -- SkinWearId=372273;
+					Values={ActiveSkin=106;}; -- SkinWearId=372273;
 				}
 			}, function(dialog)
 				purchase1mPattern(dialog)

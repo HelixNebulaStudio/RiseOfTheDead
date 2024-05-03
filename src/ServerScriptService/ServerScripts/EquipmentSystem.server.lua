@@ -398,38 +398,6 @@ local function equipTool(player, paramPacket)
 					
 				end
 
-				task.spawn(function() -- Converting old weapon skins to new LockedPatterns;
-					if storageItem.Values.LockedPattern then return end;
-					
-					local isSpecial;
-					if storageItem.Values.Textures then
-						for partKey, skinLibId in pairs(storageItem.Values.Textures) do
-							local skinLib = modSkinsLibrary.Get(skinLibId);
-							if skinLib and skinLib.Pack == "Special" then
-								isSpecial = skinLibId;
-								break;
-							end
-						end
-					end
-
-					if isSpecial then
-						inventory:SetValues(storageItem.ID, {LockedPattern=isSpecial});
-						inventory:DeleteValues(storageItem.ID, {"SkinLocked"});
-						
-						if newModels[1] then
-							local newTool = newModels[1];
-							local valsTextures = {};
-							for _, part in pairs(newTool:GetChildren()) do
-								if storageItem.Values.Textures[part.Name] == nil then
-									valsTextures[part.Name]=0;
-								end
-							end
-							inventory:SetValues(storageItem.ID, {Textures=valsTextures});
-						end
-					end
-				end)
-
-				
 				modOnGameEvents:Fire("OnToolEquipped", player, storageItem);
 				
 				storageItem:SetValues("IsEquipped", true):Sync();

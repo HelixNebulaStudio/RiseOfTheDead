@@ -2,31 +2,49 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
 local modSkinsLibrary = require(game.ReplicatedStorage.Library.SkinsLibrary);
+local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
 
 local UsablePreset = require(game.ReplicatedStorage.Library.UsableItems.UsablePreset).new();
 
 if RunService:IsClient() then
 	function UsablePreset:Use(storageItem)
 		local player = game.Players.LocalPlayer;
-		local modData = require(player:WaitForChild("DataModule"));
+		local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 
 		local modInterface = modData:GetInterfaceModule();
 		modInterface:OpenWindow("SkinPerm", storageItem);
 	end
 	
 else
+
+	function UsablePreset:HasSkinPermanent(storageItem, skinId)
+		local unlockedSkins = storageItem:GetValues("Skins") or {};
+
+		return table.find(unlockedSkins, skinId) ~= nil;
+	end
+
+	function UsablePreset:AddSkinPermanent(storageItem, skinId)
+		local unlockedSkins = storageItem:GetValues("Skins") or {};
+
+		if table.find(unlockedSkins, skinId) == nil then
+			table.insert(unlockedSkins, skinId);
+		end
+
+		storageItem:SetValues("ActiveSkin", skinId);
+		storageItem:SetValues("Skins", unlockedSkins);
+		storageItem:Sync({"ActiveSkin"; "Skins"});
+	end
+
 	function UsablePreset:Use(player, storageItem, packet)
 		local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 		
 		local profile = shared.modProfile:Get(player);
 		
 		local skinPermStorageItem, storage = modStorage.FindIdFromStorages(storageItem.ID, player);
-		
-		local targetStorageItem = packet.TargetStorageItem;
+		local targetStorageItem, _ = modStorage.FindIdFromStorages(packet.TargetStorageItem.ID, player);
 		
 		local returnPacket = {};
 		
@@ -35,42 +53,61 @@ else
 			returnPacket.FailMsg = "Missing Target Item";
 			return returnPacket;
 			
-		elseif targetStorageItem.Values and targetStorageItem.Values.LockedPattern ~= nil then
-			returnPacket.Success = false;
-			returnPacket.FailMsg = "Item already has skin permanent";
-			return returnPacket;
-			
 		end
 
 		local skinPermItemLib = modItemsLibrary:Find(skinPermStorageItem.ItemId);
-		if skinPermItemLib.ToolItemId ~= targetStorageItem.ItemId then
+		if skinPermItemLib.TargetItemId ~= targetStorageItem.ItemId then
 			returnPacket.Success = false;
 			returnPacket.FailMsg = "Incompatible item";
 			return returnPacket;
 		end
 		
-		local skinLib = modSkinsLibrary.GetByName(skinPermItemLib.SkinPerm)
-		if skinLib == nil then
+		local permType = nil;
+		local permLib = modItemUnlockablesLibrary:Find(skinPermItemLib.Id);
+		if permLib then
+			permType = "Clothing";
+		else
+			permLib = modSkinsLibrary.GetByName(skinPermItemLib.SkinPerm)
+			if permLib then
+				permType = "Tool";
+			end
+		end
+		
+		if permType == nil then
 			returnPacket.Success = false;
 			returnPacket.FailMsg = "Skin unavailable";
 			return returnPacket;
 		end
-		
-		storage:SetValues(targetStorageItem.ID, {LockedPattern=skinLib.Id});
 
+		if self:HasSkinPermanent(targetStorageItem, permLib.Id) then
+			returnPacket.Success = false;
+			returnPacket.FailMsg = "Skin is already unlocked on item.";
+			return returnPacket;
+		end
+		self:AddSkinPermanent(targetStorageItem, permLib.Id);
+
+		
 		task.spawn(function()
-			if profile.EquippedTools.WeaponModels == nil then return end;
-			
-			for a=1, #profile.EquippedTools.WeaponModels do
-				if not profile.EquippedTools.WeaponModels[a]:IsA("Model") then continue end;
+			if permType == "Clothing" then
+				local profile = shared.modProfile:Get(player);
+				local activeSave = profile:GetActiveSave();
+				activeSave.AppearanceData:Update(activeSave.Clothing);
+
+			elseif permType == "Tool" then
+				if profile.EquippedTools.WeaponModels == nil then return end;
 				
-				modColorsLibrary.ApplyAppearance(profile.EquippedTools.WeaponModels[a], storageItem.Values);
+				for a=1, #profile.EquippedTools.WeaponModels do
+					if not profile.EquippedTools.WeaponModels[a]:IsA("Model") then continue end;
+					
+					modColorsLibrary.ApplyAppearance(profile.EquippedTools.WeaponModels[a], storageItem.Values);
+				end
+
 			end
 		end)
+
 		returnPacket.Success = true;
-		
 		storage:Remove(skinPermStorageItem.ID, 1);
-		shared.Notify(player, skinPermItemLib.Name.." has been applied to your tool.", "Reward");
+		shared.Notify(player, `{skinPermItemLib.Name} has been applied to your {skinPermItemLib.TargetItemId}.`, "Reward");
 		
 		return returnPacket;
 	end

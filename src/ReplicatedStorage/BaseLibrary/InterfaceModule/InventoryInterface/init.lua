@@ -182,14 +182,14 @@ function Interface.init(modInterface)
 			if Table.Item.Fav then
 				return false;
 			end
-			if Table.Item.Values.LockedPattern == nil then
+			if Table.Item.Values.ActiveSkin == nil then
 				return false;
 			end
 
 			local modSkinsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("SkinsLibrary"));
-			local lib = modSkinsLibrary.Get(Table.Item.Values.LockedPattern);
+			local lib = modSkinsLibrary.Get(Table.Item.Values.ActiveSkin);
 
-			if lib.CanClear == false then
+			if lib == nil or lib.CanClear == false then
 				return false;
 			end
 			

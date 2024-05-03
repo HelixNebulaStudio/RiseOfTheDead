@@ -134,7 +134,7 @@ task.spawn(function()
 						
 					elseif index == 3 then
 						local itemValues = {
-							LockedPattern=104;
+							ActiveSkin=104;
 							SkinWearId=568833;
 						};
 						inventory:Add("rusty48", {Values=itemValues}, function(event, insert)

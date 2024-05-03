@@ -115,7 +115,7 @@ function ColorsLibary.ApplyAppearance(weaponModel, itemValues)
 		end
 	end
 	
-	if itemValues.LockedPattern then
+	if itemValues.ActiveSkin then
 		local itemDisplayLib = modWorkbenchLibrary.ItemAppearance[itemId];
 		
 		local appearLib = itemDisplayLib[(prefix == "R-" and "Right" or prefix == "L-" and "Left" or "").."ToolGrip"];
@@ -129,7 +129,7 @@ function ColorsLibary.ApplyAppearance(weaponModel, itemValues)
 				local part = weaponModel:FindFirstChild(partName);
 				if part == nil then continue end;
 				if texturedParts[part] then continue end;
-				modSkinsLibrary.SetTexture(part, itemValues.LockedPattern);
+				modSkinsLibrary.SetTexture(part, itemValues.ActiveSkin);
 			end
 		end
 		

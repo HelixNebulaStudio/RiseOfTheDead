@@ -145,9 +145,7 @@ function Storage.new(id, name, size, owner)
 				
 				if firstInQueue.Stackable then
 					local quantityLeftover = tonumber(firstInQueue.Data.Quantity);
-					local compatibleItems = storage:ListByItemId(firstInQueue.ItemId, function(matchStorageItem)
-						return modStorageItem.IsStackable(firstInQueue, matchStorageItem) ~= false;
-					end);
+					local compatibleItems = storage:ListStackable(firstInQueue);
 					table.sort(compatibleItems, function(A, B) return A.Index < B.Index end);
 					
 					for a=1, #compatibleItems do
@@ -499,8 +497,8 @@ remoteItemActionHandler.OnServerEvent:Connect(function(player, storageId, id, ac
 			clothingStorage.OnChanged:Fire();
 			
 		elseif action == "delpat" then
-			storageItem:SetValues("LockedPattern", nil);
-			storageItem:Sync({"LockedPattern"});
+			storageItem:SetValues("ActiveSkin", nil);
+			storageItem:Sync({"ActiveSkin"});
 			
 		end
 		storageItem:Sync();
@@ -1198,11 +1196,11 @@ function Storage:FindByIndex(index)
 	return r;
 end
 
---[[**
+--[[
 	Get storageItem of name.
 	@param name string Name
 	@returns StorageItem item
-**--]]
+]]
 function Storage:FindByItemId(itemId)
 	local list = self:ListByItemId(itemId);
 	local r = nil;
@@ -1211,6 +1209,20 @@ function Storage:FindByItemId(itemId)
 		r = list[1];
 	end
 	return r;
+end
+
+--[[
+	Storage:ListStackable(matchStorageItem)
+	@param matchStorageItem StorageItem
+]]
+function Storage:ListStackable(matchStorageItem: modStorageItem.StorageItem) : {[number]: modStorageItem.StorageItem}
+	local list = {};
+	self:Loop(function(loopStorageItem)
+		if modStorageItem.IsStackable(matchStorageItem, loopStorageItem) then
+			table.insert(list, self.Container[loopStorageItem.ID]);
+		end
+	end)
+	return list;
 end
 
 
@@ -1465,14 +1477,23 @@ end
 function Storage:SpaceCheck(items)
 	local cacheContainer = {};
 	
-	local function listCacheItemId(itemId)
-		local matchingItems = self:ListByItemId(itemId); -- i list
+	local function listCacheItemId(itemId, itemValues)
+		itemValues = itemValues or {};
+
+		local itemLib = modItemsLibrary:Find(itemId);
+		local matchingItems = self:ListStackable({
+			ItemId = itemId;
+			Name = itemLib.Name;
+			Values = itemValues;
+		});
+
 		local list = {};
 		for a=1, #matchingItems do
 			local cacheItem = matchingItems[a];
 			cacheContainer[cacheItem.Index] = cacheItem:Clone();
 			table.insert(list, cacheContainer[cacheItem.Index]);
 		end
+
 		return list;
 	end
 
@@ -1500,7 +1521,7 @@ function Storage:SpaceCheck(items)
 		if itemProperties then
 			if itemProperties.Stackable then
 				local quantityRemaining = itemQuantity;
-				local matchingItems = listCacheItemId(itemId);
+				local matchingItems = listCacheItemId(itemId, item.Data.Values);
 				for b=1, #matchingItems do
 					local stackAvailable = itemProperties.Stackable-matchingItems[b].Quantity;
 					if stackAvailable > 0 then
@@ -1546,14 +1567,23 @@ end
 function Storage:FitStackableItem(item)
 	local cacheContainer = {};
 
-	local function listCacheItemId(itemId)
-		local matchingItems = self:ListByItemId(itemId); -- i list
+	local function listCacheItemId(itemId, itemValues)
+		itemValues = itemValues or {};
+
+		local itemLib = modItemsLibrary:Find(itemId);
+		local matchingItems = self:ListStackable({
+			ItemId = itemId;
+			Name = itemLib.Name;
+			Values = itemValues;
+		});
+
 		local list = {};
 		for a=1, #matchingItems do
 			local cacheItem = matchingItems[a];
 			cacheContainer[cacheItem.Index] = cacheItem:Clone();
 			table.insert(list, cacheContainer[cacheItem.Index]);
 		end
+		
 		return list;
 	end
 
@@ -1588,7 +1618,7 @@ function Storage:FitStackableItem(item)
 	
 	if itemProperties then
 		if itemProperties.Stackable then
-			local matchingItems = listCacheItemId(itemId);
+			local matchingItems = listCacheItemId(itemId, item.Data.Values);
 			
 			for b=1, #matchingItems do
 				local stackAvailable = itemProperties.Stackable-matchingItems[b].Quantity;

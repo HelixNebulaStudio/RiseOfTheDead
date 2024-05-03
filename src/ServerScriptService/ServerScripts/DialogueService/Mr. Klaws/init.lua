@@ -63,7 +63,7 @@ return function(player, dialog, data)
 		end
 	end
 	
-	--== LockedPattern
+	--== ActiveSkin
 	local presentsRequired = 2;
 	local total, itemList = inventory:ListQuantity("xmaspresent2022", presentsRequired);
 	local aaMissions = modMission:GetNpcMissions(player, script.Name);
@@ -83,11 +83,13 @@ return function(player, dialog, data)
 		local itemDisplayLib = storageItem and modWorkbenchLibrary.ItemAppearance[storageItem.ItemId];
 		
 		if itemDisplayLib then
-			
-			if storageItem.Values.LockedPattern == nil then
+			local modSkinPerm = require(game.ReplicatedStorage.BaseLibrary.UsableItems.Generics.SkinPerm);
+			local winterFestSkinId = 105;
+
+			if not modSkinPerm:HasSkinPermanent(storageItem, winterFestSkinId) then
 				dialogPacket.Reply="Hope you like it, I've given it a pattern. Oh, and you need to remove any textures before it's visible.";
 				dialog:AddDialog(dialogPacket, function(dialog)
-					inventory:SetValues(equippedToolID, {LockedPattern=105});
+					modSkinPerm:AddSkinPermanent(storageItem, winterFestSkinId);
 
 					for a=1, #profile.EquippedTools.WeaponModels do
 						if profile.EquippedTools.WeaponModels[a]:IsA("Model") then
@@ -99,12 +101,12 @@ return function(player, dialog, data)
 					for a=1, #itemList do
 						inventory:Remove(itemList[a].ID, itemList[a].Quantity);
 						shared.Notify(player, presentsRequired.." Christmas Presents 2022 removed from your Inventory.", "Negative");
-
+						
 					end
 				end);
 				
 			else
-				dialogPacket.Reply="The tool you equipped already has a skin permanent.";
+				dialogPacket.Reply="The tool you equipped already has the skin permanent.";
 				dialog:AddDialog(dialogPacket);
 				
 			end

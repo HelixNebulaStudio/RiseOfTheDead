@@ -75,7 +75,7 @@ function AppearanceData:Update(storage)
 			if noWearTag ~= true then
 				local packageId = finalClothingLib.Name;
 				
-				local itemUnlock = storageItem.VanitySkinId or storageItem:GetValues("ItemUnlock");
+				local itemUnlock = storageItem.VanitySkinId or storageItem:GetValues("ActiveSkin");
 				if itemUnlock then
 					local unlockableItemLib = modItemUnlockablesLibrary:Find(itemUnlock);
 					
@@ -205,11 +205,13 @@ function AppearanceData:Update(storage)
 				if storageItem.VanityMeta then
 					modItemUnlockablesLibrary.UpdateSkin(accessory, storageItem.VanityMeta);
 					
-				elseif storageItem.Values and storageItem.Values.ItemUnlock then
-					local unlockableItemLib = modItemUnlockablesLibrary:Find(storageItem.Values.ItemUnlock);
+				elseif storageItem.Values and storageItem.Values.ActiveSkin then
+					local itemUnlock = storageItem.VanitySkinId or storageItem:GetValues("ActiveSkin");
+
+					local unlockableItemLib = modItemUnlockablesLibrary:Find(itemUnlock);
 
 					if unlockableItemLib and unlockableItemLib.ItemId == storageItem.ItemId then
-						modItemUnlockablesLibrary.UpdateSkin(accessory, storageItem.Values.ItemUnlock);
+						modItemUnlockablesLibrary.UpdateSkin(accessory, itemUnlock);
 					end
 
 				else

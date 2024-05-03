@@ -237,7 +237,7 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 	if self.ItemLib == nil then self.ItemLib = modItemsLibrary:Find(itemId); end;
 	if self.ItemLib == nil then return end;
 	
-	self.ImageButton.Image = self.ItemLib.Icon or "rbxasset://textures/ui/GuiImagePlaceholder.png"
+	local itemIcon = self.ItemLib.Icon or "rbxasset://textures/ui/GuiImagePlaceholder.png";
 
 	if self.ItemLib.OverlayIcons and #self.ItemLib.OverlayIcons > 0 then
 		local overlayFrame = self.ImageButton.Overlays;
@@ -327,14 +327,34 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 
 			if unlockableItemLib and unlockableItemLib.ItemId == itemId then
 				if unlockableItemLib and unlockableItemLib.Icon then
-					self.ImageButton.Image = unlockableItemLib.Icon;
+					itemIcon = unlockableItemLib.Icon;
 				end
 
 				local unlockItemLib = modItemsLibrary:Find(itemValues.ItemUnlock);
 				if unlockItemLib then
-					self.ImageButton.Image = unlockItemLib.Icon;
+					itemIcon = unlockItemLib.Icon;
 				end
 			end
+		end
+
+		if itemValues.ActiveSkin then
+			local permType = nil;
+			local permLib = modItemUnlockablesLibrary:Find(itemValues.ActiveSkin);
+			if permLib then
+				permType = "Clothing";
+				
+				local unlockItemLib = modItemsLibrary:Find(itemValues.ActiveSkin);
+				itemIcon = permLib.Icon or unlockItemLib.Icon or itemIcon;
+
+			else
+				permLib = modSkinsLibrary.Get(itemValues.ActiveSkin);
+				if permLib then
+					permType = "Tool";
+				end
+			end
+
+			if permType then
+			end;
 		end
 
 		if storageItemData.Fav and self.HideFavIcon ~= true then
@@ -591,6 +611,7 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 		
 	end
 	
+	self.ImageButton.Image = itemIcon;
 end
 
 function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
@@ -730,14 +751,26 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 					itemLibIcon = unlockItemLib.Icon;
 				end
 			end
-			
 		end
-		if itemValues.LockedPattern then
-			local lib = modSkinsLibrary.Get(itemValues.LockedPattern);
+
+		if itemValues.ActiveSkin then
+			local permType = nil;
+			local permLib = modItemUnlockablesLibrary:Find(itemValues.ActiveSkin);
+			if permLib then
+				permType = "Clothing";
+
+			else
+				permLib = modSkinsLibrary.Get(itemValues.ActiveSkin);
+				if permLib then
+					permType = "Tool";
+				end
+			end
 			
-			itemName = string.gsub(itemName, lib.Name, "");
-			itemName = '<font color="rgb(136, 105, 191)">'..lib.Name..'</font> '..itemName;
-			itemDesc = itemDesc..h3O.."\nSkin-Permanent: "..h3C.. colorStringText(lib.Name);
+			if permType ~= nil then
+				itemName = string.gsub(itemName, permLib.Name, "");
+				itemName = '<font color="rgb(136, 105, 191)">'..permLib.Name..'</font> '..itemName;
+				itemDesc = itemDesc..h3O.."\nSkin-Permanent: "..h3C.. colorStringText(permLib.Name);
+			end
 		end
 		
 		if itemValues.Tweak and itemValues.TweakValues then
@@ -963,7 +996,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 			local names = {};
 			
 			for partName, textureId in pairs(itemValues.Textures) do
-				if itemValues.LockedPattern and textureId == itemValues.LockedPattern then continue end;
+				if itemValues.ActiveSkin and textureId == itemValues.ActiveSkin then continue end;
 				local lib = modSkinsLibrary.Get(textureId);
 				if lib then
 					local packName = colorStringText(lib.Pack..":"..lib.Name);
