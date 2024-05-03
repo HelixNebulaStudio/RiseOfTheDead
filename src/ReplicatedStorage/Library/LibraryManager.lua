@@ -62,6 +62,21 @@ function LibraryManager:ListByKeyValue(key, valueOrFunc)
 	return list;
 end
 
+--[[
+	LibraryManager:ListByMatchFunc(key, matchFunc)
+	@param matchFunc function (item) -> boolean
+]]
+function LibraryManager:ListByMatchFunc(matchFunc)
+	local list = {};
+	for k, v in pairs(self.Library) do
+		if self.Library[k] and matchFunc(self.Library[k]) == true then
+			table.insert(list, self.Library[k]);
+		end
+	end
+	return list;
+end
+
+
 function LibraryManager:GetKeys()
 	return self.Keys;
 end
