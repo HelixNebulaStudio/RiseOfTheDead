@@ -10,6 +10,7 @@ function GoldShopLibrary.Products:GetProduct(id)
 			return self.Library[productId];
 		end
 	end
+	return;
 end
 
 --[[
@@ -286,7 +287,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="EquipmentSkins";
 	};
 	
-	Trader={Buy=true; Sell=false;};
+	Trader={Buy=false; Sell=false;};
 };
 
 GoldShopLibrary.Products:Add{
@@ -303,7 +304,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="EquipmentSkins";
 	};
 	
-	Trader={Buy=true; Sell=false;};
+	Trader={Buy=false; Sell=false;};
 };
 
 GoldShopLibrary.Products:Add{
@@ -320,7 +321,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="EquipmentSkins";
 	};
 	
-	Trader={Buy=true; Sell=false;};
+	Trader={Buy=false; Sell=false;};
 };
 
 GoldShopLibrary.Products:Add{
@@ -337,7 +338,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="EquipmentSkins";
 	};
 	
-	Trader={Buy=true; Sell=false;};
+	Trader={Buy=false; Sell=false;};
 };
 
 GoldShopLibrary.Products:Add{
@@ -354,7 +355,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="EquipmentSkins";
 	};
 	
-	Trader={Buy=true; Sell=false;};
+	Trader={Buy=false; Sell=false;};
 };
 
 GoldShopLibrary.Products:Add{
@@ -371,7 +372,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="EquipmentSkins";
 	};
 	
-	Trader={Buy=true; Sell=false;};
+	Trader={Buy=false; Sell=false;};
 };
 
 GoldShopLibrary.Products:Add{
@@ -388,7 +389,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="EquipmentSkins";
 	};
 
-	Trader={Buy=true; Sell=false;};
+	Trader={Buy=false; Sell=false;};
 };
 
 GoldShopLibrary.Products:Add{
@@ -405,7 +406,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="EquipmentSkins";
 	};
 
-	Trader={Buy=true; Sell=false;};
+	Trader={Buy=false; Sell=false;};
 };
 
 GoldShopLibrary.Products:Add{
@@ -422,7 +423,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="EquipmentSkins";
 	};
 	
-	Trader={Buy=true; Sell=false;};
+	Trader={Buy=false; Sell=false;};
 };
 
 GoldShopLibrary.Products:Add{
@@ -439,7 +440,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="EquipmentSkins";
 	};
 	
-	Trader={Buy=true; Sell=false;};
+	Trader={Buy=false; Sell=false;};
 };
 
 GoldShopLibrary.Products:Add{
@@ -456,7 +457,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="EquipmentSkins";
 	};
 	
-	Trader={Buy=true; Sell=false;};
+	Trader={Buy=false; Sell=false;};
 };
 
 GoldShopLibrary.Products:Add{
@@ -473,7 +474,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="EquipmentSkins";
 	};
 	
-	Trader={Buy=true; Sell=false;};
+	Trader={Buy=false; Sell=false;};
 };
 
 --== Equipment Appearance;
@@ -1664,25 +1665,6 @@ GoldShopLibrary.Pages = {
 			LoadLimited=true;
 		};
 		
-		--{Type="Product"; Id="premium"; Order=3;};
-		--{
-		--	Type="Page";
-		--	Id="ItemsPage";
-		--	Icon="http://www.roblox.com/asset/?id=4997111675";
-		--	TitleImage="http://www.roblox.com/asset/?id=5815642857";
-		--	Desc="• Want to spend your hard earned gold?\n• These are some popular items, they are obtainable but if you want them instantly, it comes at a price.";
-		--};
-		
-		--{
-		--	Type="Page";
-		--	Id="EquipmentSkinsPage";
-		--	Icon="http://www.roblox.com/asset/?id=4738354959";
-		--	TitleImage="http://www.roblox.com/asset/?id=4738833812";
-		--	Desc="• More options to customize how your equipment looks!\n• Different collections with different styles.\n• Make your equipments stand out!";
-		--};
-		
-		--{Type="Product"; Id="portableWorkbench"};
-		--{Type="Product"; Id="vipTraveler"};
 	};
 	
 	GoldPage = {
@@ -1741,24 +1723,24 @@ GoldShopLibrary.Pages = {
 		};
 		{
 			Type="Page";
-			Id="SkinPerms";
+			Id="WeaponSkins";
 			Icon="rbxassetid://13768313905";
-			TitleImage="rbxassetid://13810444149";
+			TitleText="Weapon Skins";
 			Desc="• Premade skins that can be applied to your tools and weapons and still be customizable!";
 		};
 		{
 			Type="Page";
-			Id="ItemUnlockables";
+			Id="ClothingSkins";
 			Icon="rbxassetid://6660922252";
-			TitleImage="rbxassetid://6660951493";
-			Desc="• Special unlockables for items such as skins, appearances and others!";
+			TitleText="Clothing Skins";
+			Desc="• Special skin set for your clothing!";
 		};
 		{
 			Type="Page";
 			Id="EquipmentSprayPage";
 			Icon="http://www.roblox.com/asset/?id=5065159425";
-			TitleImage="http://www.roblox.com/asset/?id=4738833812";
-			Desc="• Colors and skin packs for customizing your items!";
+			TitleText="Customization Sprays";
+			Desc="• Colors and skins pack for customizing your items even more!";
 		};
 	};
 	
@@ -1791,7 +1773,7 @@ GoldShopLibrary.Pages = {
 		{Type="Product"; Id="nekronparticulatecache"};
 	};
 	
-	SkinPerms = {
+	WeaponSkins = {
 		{Type="Product"; Id="arelshiftcrossantique"};
 		{Type="Product"; Id="desolatorheavytoygun"};
 		{Type="Product"; Id="czevo3asiimov"};
@@ -1813,7 +1795,7 @@ GoldShopLibrary.Pages = {
 		{Type="Product"; Id="colorsunset"};
 	};
 	
-	ItemUnlockables = {
+	ClothingSkins = {
 		{Type="Product"; Id="greytshirtcamo"};
 		
 		{Type="Product"; Id="dufflebagstreetart"};

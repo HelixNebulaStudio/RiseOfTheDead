@@ -2,7 +2,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
 
 --== Variables;
-local Interface = {};
+local Interface = {
+	OpenWindow = nil;
+	CloseWindow = nil;
+	LoadPage = nil;
+	PlayButtonClick = nil;
+	PromptWarning = nil;
+};
 
 local SoundService = game:GetService("SoundService");
 local RunService = game:GetService("RunService");
@@ -11,7 +17,7 @@ local TweenService = game:GetService("TweenService");
 local MarketplaceService = game:GetService("MarketplaceService");
 
 local localplayer = game.Players.LocalPlayer;
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
@@ -378,7 +384,9 @@ function Interface:LoadProduct(productId)
 	
 	local debounce = false;
 	purchaseButton.MouseButton1Click:Connect(function()
-		if debounce then return end debounce = true;
+		if debounce then return end
+		debounce = true;
+
 		Interface:PlayButtonClick();
 		if modBranchConfigs.CurrentBranch.Name == "Live" or RunService:IsStudio() or not productLib.Disabled or modGlobalVars.IsCreator(localplayer) or localplayer.UserId == productLib.CreatorId then
 			if productLib.Type == "GamePass" then
