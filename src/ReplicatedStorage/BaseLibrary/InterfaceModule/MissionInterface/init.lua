@@ -2168,7 +2168,7 @@ function Interface.init(modInterface)
 		local bpButtonFunc;
 
 		--== MARK: Mission Pass
-		modData:RequestData("BattlePassSave/"..activeBpId);
+		modData:RequestData("BattlePassSave/Passes/"..activeBpId);
 
 		table.clear(levelSlotsInfo)
 		function Interface.UpdateBattlePass()
@@ -2176,7 +2176,7 @@ function Interface.init(modInterface)
 
 			local function refreshData()
 				battlePassData = modData.Profile and modData.Profile.BattlePassSave or nil;
-				seasonData = battlePassData and battlePassData.Passes[activeBpId] or {Claim={}; Level=0;};
+				seasonData = battlePassData and battlePassData.Passes and battlePassData.Passes[activeBpId] or {Claim={}; Level=0;};
 				return battlePassData, seasonData;
 			end
 			refreshData();
@@ -2791,13 +2791,13 @@ function Interface.init(modInterface)
 							local info = {};
 
 							info.LevelSlot = templateLevelSlot:Clone();
-							info.LevelSlot.LayoutOrder = lvl;
 
 							levelSlotsInfo[lvl] = info;
 							lvlSlotInfo = info;
 						end
 
 						local lvlSlot = lvlSlotInfo.LevelSlot;
+						lvlSlot.LayoutOrder = tonumber(lvl);
 						
 						if lvlSlotInfo.ItemButton == nil then
 							local itemButtonObj = modItemInterface.newItemButton(rewardInfo.ItemId);

@@ -1,16 +1,15 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local random = Random.new();
-
-local TweenService = game:GetService("TweenService");
-
+--==
 local ZombieModule = script.Parent.Zombie;
---== Modules
-local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
 
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
+local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
 
--- Note; Function called for each zombie before zombie parented to workspace;
+local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
+--==
+
 return function(npc, spawnPoint)
+	--== Configurations;
 	local self = modNpcComponent{
 		Prefab = npc;
 		SpawnPoint = spawnPoint;
@@ -19,10 +18,10 @@ return function(npc, spawnPoint)
 		
 		Properties = {
 			BasicEnemy=true;
-			WalkSpeed={Min=35; Max=35};
 			AttackRange=40;
-			AttackDamage=20;
 			TargetableDistance=200;
+
+			AttackDamage=nil;
 		};
 		
 		Configuration = {
@@ -46,18 +45,11 @@ return function(npc, spawnPoint)
 		
 		self.RandomClothing(self.Name, false);
 		
+
 		local ticksModel = self.Prefab:WaitForChild("ExplosiveTickBlobs");
-		local tickBlobs = self.Prefab:WaitForChild("ExplosiveTickBlobs"):GetChildren();
+		local tickBlobs = ticksModel:GetChildren();
 		
-		local function shuffleArray(array)
-			if array == nil then return end;
-			local n=#array
-			for i=1,n-1 do
-				local l= random:NextInteger(i,n)
-				array[i],array[l]=array[l],array[i]
-			end
-		end
-		shuffleArray(tickBlobs);
+		modTables.Shuffle(tickBlobs);
 		for a=1, #tickBlobs do
 			if a > 10 then
 				game.Debris:AddItem(tickBlobs[a], 0);
@@ -76,6 +68,7 @@ return function(npc, spawnPoint)
 			end
 		end
 		
+
 		self.Think:Fire();
 		coroutine.yield();
 	end
@@ -90,13 +83,12 @@ return function(npc, spawnPoint)
 	self:AddComponent(ZombieModule.OnDamaged);
 	self:AddComponent(ZombieModule.OnTarget);
 	
-	--== NPC Logic;
+	--== Signals;
 	self.Garbage:Tag(self.Think:Connect(function()
 		self.BehaviorTree:RunTree("TicksTree", true);
 		self.Humanoid:SetAttribute("AggressLevel", self.AggressLevel);
 	end));
 	
-	--== Connections;
 	self.Garbage:Tag(self.Humanoid.HealthChanged:Connect(self.OnHealthChanged));
 	self.Garbage:Tag(self.Humanoid.Died:Connect(function(...)
 		game.Debris:AddItem(self.Prefab:FindFirstChild("Blobs"), 0);

@@ -199,9 +199,10 @@ function BattlePassSave:AddLevel(bpId, addAmt)
 		if newLevel >= #treeList and rewardsLib then
 			
 			for lvl=(currentLevel+1), newLevel do
-				local postLvls = lvl-#treeList;
+				-- local postLvls = lvl-#treeList;
+				if lvl < #treeList then continue end;
 
-				local isFmodLvl = math.fmod(postLvls, modBattlePassLibrary.PostRewardLvlFmod);
+				local isFmodLvl = math.fmod(lvl, modBattlePassLibrary.PostRewardLvlFmod);
 				if isFmodLvl == 0 then
 					local lvlStr = tostring(lvl);
 					if passData.PostRewards[lvlStr] == nil then
