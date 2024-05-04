@@ -204,6 +204,7 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="highvisjacket"; Name="High Visibility Jacket"; Icon="rbxassetid://8488333823"; Tags={"Chest"}; Description="The high visibility jacket provides warmth and armor points.";});
 	new(clothingBase, {Id="nekrostrench"; Name="Nekros Trench Coat"; Icon="rbxassetid://14423236705"; Tags={"Chest"}; Description="Trench coat covered in dried Nekron leather, scales and veins. <b>Passive:</b> +2HP/s, The passive will be disabled for 15s if you take any damage.";});
 	new(clothingBase, {Id="tirearmor"; Name="Tire Armor"; Icon="rbxassetid://16791518600"; Tags={"Chest"}; Description="Tire armor, made with tires. <b>Passive:</b> When equipping a melee, grants a 60% chance to block 20 damage from melee attacks. Reduced minimum damage is capped at 1 damage.";});
+	new(clothingBase, {Id="apron"; Name="Apron"; Icon="rbxassetid://17381982131"; Tags={"Chest"}; Description="The butcher's apron.";});
 
 	-- Pants
 	new(clothingBase, {Id="prisonpants"; Name="Prisoner's Pants"; Icon="rbxassetid://5627737032"; Tags={"Legs"}; Description="The Prisoner's Pants.";});
@@ -573,7 +574,7 @@ function ItemsLibrary:Init(super)
 		Tradable = super.Tradable.Tradable;
 		Tags = {"Instrument"};
 	};
-
+	
 	new(instrumentBase, {Id="flute"; Name="Flute"; Icon="rbxassetid://6134172781"; Description="A playable flute instrument similar to Carlos's. Can play premade tunes or with keyboard/touch buttons.";});
 	new(instrumentBase, {Id="guitar"; Name="Guitar"; Type=super.Types.Clothing; Icon="rbxassetid://6297059208"; Description="A playable guitar instrument. Can play premade tunes or with keyboard/touch buttons.";});
 	new(instrumentBase, {Id="keytar"; Name="Keytar"; Tags={"Melee"}; Icon="rbxassetid://15338385507"; Description="A playable keyboard guitar while also being a melee weapon, also known as keytar instrument. Can play premade tunes or with keyboard/touch buttons.";});
@@ -842,6 +843,7 @@ function ItemsLibrary:Init(super)
 	
 	new(metaBase, {Id="gold"; Name="Gold"; Icon="rbxassetid://4734610249"; Description="Gold, the currency of protagonists."; Tags={"Unobtainable"};});
 	new(crateBase, {Id="unknowncrate"; Name="Unknown Crate"; Icon="rbxassetid://10980446265"; Description="Recycler's unknown crate."; Type=super.Types.None; Tags={"Unobtainable"};});
+	new(metaBase, {Id="unknowngift"; Name="Unknown Gift"; Icon="rbxassetid://17379694659"; Description="An unknown gift."; Tags={"Unobtainable"};});
 	
 	
 	--==========================================================[[ DEV ]]==========================================================--
