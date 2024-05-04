@@ -13,7 +13,6 @@ function attirePackage.NewToolLib(handler)
 	toolLib.ModArmorPoints = 10;
 	toolLib.Warmth = -4;
 	
-	
 	return modClothingProperties.new(toolLib);
 end
 
