@@ -2,25 +2,26 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local ZombieModule = script.Parent.Zombie;
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 
 local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
+--==
 
--- Note; Function called for each zombie before zombie parented to workspace;
 return function(npc, spawnPoint)
+	--== Configurations;
 	local self = modNpcComponent{
 		Prefab = npc;
-		SpawnPoint = spawnPoint; -- CFrame;
+		SpawnPoint = spawnPoint;
 		
 		AggressLevel = -1;
 		
 		Properties = {
 			BasicEnemy=true;
 			AttackSpeed=2;
-			AttackDamage=10;
 			AttackRange=5;
 			TargetableDistance=50;
+
+			AttackDamage=nil;
 		};
 
 		Configuration = {
@@ -31,7 +32,7 @@ return function(npc, spawnPoint)
 		};
 	};
 
-	--== Initialize;	
+	--== Initialize;
 	function self.Initialize()
 		local level = math.max(self.Configuration.Level-1, 0);
 		
@@ -50,8 +51,8 @@ return function(npc, spawnPoint)
 		coroutine.yield();
 	end
 
+
 	--== Components;
-	
 	self:AddComponent("AntiSit");
 	self:AddComponent("WeakPoint");
 	self:AddComponent("DropReward");
@@ -64,7 +65,8 @@ return function(npc, spawnPoint)
 	self:AddComponent(ZombieModule.Idle);
 	self:AddComponent(ZombieModule.NekronMask);
 
-	--== NPC Logic;
+
+	--== Signals;
 	self.Garbage:Tag(self.Think:Connect(function()
 		self.BehaviorTree:RunTree("ZombieTree", true);
 		self.Humanoid:SetAttribute("AggressLevel", self.AggressLevel);
