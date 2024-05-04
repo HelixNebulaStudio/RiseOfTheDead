@@ -42,6 +42,8 @@ return function(npc, spawnPoint)
 		self.Humanoid.MaxHealth = math.max(100 + 40*level, 100);
 		self.Humanoid.Health = self.Humanoid.MaxHealth;
 		
+		self.Properties.AttackDamage = 10 + (level/10);
+
 		self.RandomClothing(self.Name);
 		self.NekronMask();
 
