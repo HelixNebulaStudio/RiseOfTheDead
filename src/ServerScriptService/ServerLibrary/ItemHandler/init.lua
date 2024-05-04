@@ -24,10 +24,10 @@ function ItemHandler:Use(player, storageItem)
 	Debugger:Log(player.Name,"attempt to server use",storageItem.ItemId);
 end
 
-function ItemHandler:ConsumeTomeOfTweaks(player, storageItem)
+function ItemHandler:ConsumeTomeOfTweaks(player, inputStorageItem)
 	local profile = modProfile:Get(player);
 	local activeSave = profile:GetActiveSave();
-	local storageItem, storage = activeSave:FindItemFromStorages(storageItem.ID);
+	local storageItem, storage = activeSave:FindItemFromStorages(inputStorageItem.ID);
 
 	if storageItem == nil or storage == nil then return end;
 	activeSave:AddStat("TweakPoints", 10);
@@ -37,10 +37,10 @@ function ItemHandler:ConsumeTomeOfTweaks(player, storageItem)
 	storage:Remove(storageItem.ID, 1);
 end
 
-function ItemHandler:UnlockPack(player, storageItem)
+function ItemHandler:UnlockPack(player, inputStorageItem)
 	local profile = modProfile:Get(player);
 	local activeSave = profile:GetActiveSave();
-	local storageItem, storage = activeSave:FindItemFromStorages(storageItem.ID);
+	local storageItem, storage = activeSave:FindItemFromStorages(inputStorageItem.ID);
 	
 	if storageItem == nil or storage == nil then return end;
 	
@@ -68,10 +68,10 @@ function ItemHandler:UnlockPack(player, storageItem)
 	end
 end
 
-function ItemHandler:ItemUnlockable(player, storageItem)
+function ItemHandler:ItemUnlockable(player, inputStorageItem)
 	local profile = modProfile:Get(player);
 	local activeSave = profile:GetActiveSave();
-	local storageItem, storage = activeSave:FindItemFromStorages(storageItem.ID);
+	local storageItem, storage = activeSave:FindItemFromStorages(inputStorageItem.ID);
 
 	if storageItem == nil or storage == nil then return end;
 	
@@ -79,16 +79,11 @@ function ItemHandler:ItemUnlockable(player, storageItem)
 	local modItemUnlockLib = modItemUnlockablesLibrary:Find(unlockKey);
 	
 	if modItemUnlockLib then
-		local itemLib = modItemsLibrary:Find(unlockKey);
 		local itemId = modItemUnlockLib.ItemId;
 		
-		if profile.ItemUnlockables[itemId] and profile.ItemUnlockables[itemId][unlockKey] ~= nil then
-			shared.Notify(player, "You have already unlocked: "..itemLib.Name, "Negative");
-			return;
-		end
-		
-		profile.ItemUnlockables:Set(itemId, unlockKey, true);
+		profile.ItemUnlockables:Add(itemId, unlockKey, 1);
 		profile.ItemUnlockables:Alert(itemId, unlockKey);
+
 		storage:Remove(storageItem.ID, 1);
 
 		profile:Sync("ItemUnlockables/"..itemId);
@@ -96,10 +91,10 @@ function ItemHandler:ItemUnlockable(player, storageItem)
 
 end
 
-function ItemHandler:UnlockPapers(player, storageItem)
+function ItemHandler:UnlockPapers(player, inputStorageItem)
 	local profile = modProfile:Get(player);
 	local activeSave = profile:GetActiveSave();
-	local storageItem, storage = activeSave:FindItemFromStorages(storageItem.ID);
+	local storageItem, storage = activeSave:FindItemFromStorages(inputStorageItem.ID);
 
 	if storageItem == nil or storage == nil then return end;
 	local itemLib = storageItem.Properties;
@@ -127,11 +122,11 @@ function ItemHandler:UnlockPapers(player, storageItem)
 	profile:Sync("Safehome/Homes/"..safehomeId);
 end
 
-function ItemHandler:UnlockCustomColor(player, storageItem)
+function ItemHandler:UnlockCustomColor(player, inputStorageItem)
 	local profile = modProfile:Get(player);
 	local flags = profile.Flags;
 	local activeSave = profile:GetActiveSave();
-	storageItem, storage = activeSave:FindItemFromStorages(storageItem.ID);
+	local storageItem, storage = activeSave:FindItemFromStorages(inputStorageItem.ID);
 
 	if storageItem == nil or storage == nil then return end;
 

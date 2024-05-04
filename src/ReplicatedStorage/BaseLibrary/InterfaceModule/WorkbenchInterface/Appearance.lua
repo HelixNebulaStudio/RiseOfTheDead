@@ -10,6 +10,7 @@ local Interface = {
 	ClearPages = nil;
 	RefreshNavigations = nil;
 	SetPage = nil;
+	PromptQuestion = nil;
 };
 
 local TweenService = game:GetService("TweenService");
@@ -120,7 +121,7 @@ function Workbench.new(itemId, library, storageItem)
 				local refreshButtonFuncs = {};
 				
 				local unlockableData = ItemValues.Skins or {};
-				--modData.Profile and modData.Profile.ItemUnlockables[itemId] or {};
+				local chargesData = modData.Profile and modData.Profile.ItemUnlockables[itemId] or {};
 				for b=1, #itemUnlockables do
 					local unlockItemLib = itemUnlockables[b];
 					
@@ -132,10 +133,12 @@ function Workbench.new(itemId, library, storageItem)
 					end
 					
 					if unlockItemLib.Hidden ~= true then
+						-- MARK: New UnlockableButton 
 						local unlockButton = unlockButtonTemplate:Clone();
 						local txrLabel = unlockButton:WaitForChild("TextureLabel");
 						local selectedLabel = unlockButton:WaitForChild("SelectedLabel");
 						local titleLabel = unlockButton:WaitForChild("TitleLabel");
+						local chargeLabel = unlockButton:WaitForChild("ChargesLabel");
 
 						local unlockableIcon = unlockItemLib.Icon;
 						
@@ -150,6 +153,11 @@ function Workbench.new(itemId, library, storageItem)
 						unlockButton.LayoutOrder = isUnlocked and unlockButton.LayoutOrder or unlockButton.LayoutOrder + 999;
 						txrLabel.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 
+						local hasCharges = chargesData[unlockItemLib.Id] and chargesData[unlockItemLib.Id] > 0
+						if hasCharges then
+							chargeLabel.Text = `Charges: {chargesData[unlockItemLib.Id]}`;
+						end
+						
 						local function refresh()
 							if ItemValues.ActiveSkin == nil and unlockItemLib.Name == "Default" then
 								selectedLabel.Visible = true;
@@ -209,6 +217,40 @@ function Workbench.new(itemId, library, storageItem)
 						
 						unlockButton.MouseButton1Click:Connect(function()
 							Interface:PlayButtonClick();
+
+							if isUnlocked == nil and hasCharges then
+
+								-- MARK: Use charge;
+								
+								local promptWindow = Interface:PromptQuestion("Apply Skin?",
+									`Are you sure you want to apply {itemLib.Name}? This will consume a charge.`, 
+									"Use Charge", "Cancel", itemLib.Icon);
+								local YesClickedSignal, NoClickedSignal;
+								
+								local applyDebounce = tick();
+								YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
+									if tick()-applyDebounce <= 0.2 then return end;
+									applyDebounce = tick();
+									
+									Interface:PlayButtonClick();
+									promptWindow.Frame.Yes.buttonText.Text = "Applying...";
+									
+									remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId", unlockItemLib.Id);
+
+									promptWindow:Close();
+									YesClickedSignal:Disconnect();
+									NoClickedSignal:Disconnect();
+								end);
+								
+								NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
+									Interface:PlayButtonClick();
+									promptWindow:Close();
+									YesClickedSignal:Disconnect();
+									NoClickedSignal:Disconnect();
+								end);
+
+								return;
+							end
 
 							if isUnlocked == nil then
 								Interface:OpenWindow("GoldMenu", unlockItemLib.Id);

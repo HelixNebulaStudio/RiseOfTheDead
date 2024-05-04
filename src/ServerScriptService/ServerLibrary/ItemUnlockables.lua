@@ -26,18 +26,23 @@ function ItemUnlockables.new(player)
 end
 
 function ItemUnlockables:Load(data)
-	for k, v in pairs(data) do
-		self[k] = v;
+	for itemId, unlockables in pairs(data) do
+		for unlockableId, v in pairs(unlockables) do
+			if v == true then
+				unlockables[unlockableId] = 2;
+			end
+		end
+		self[itemId] = unlockables;
 	end
 	return self;
 end
 
-function ItemUnlockables:Set(itemId, key, value)
+function ItemUnlockables:Add(itemId, key, value)
 	if self[itemId] == nil then
 		self[itemId] = {};
 	end
 	
-	self[itemId][key] = value;
+	self[itemId][key] = (self[itemId][key] or 0) + (value or 1);
 end
 
 function ItemUnlockables:Alert(itemId, key)
@@ -45,9 +50,12 @@ function ItemUnlockables:Alert(itemId, key)
 	local itemLib = modItemsLibrary:Find(itemId);
 	
 	if modItemUnlockableLib and itemLib then
-		local unlockedName = "Item Unlockable: "..modItemUnlockableLib.Name.." "..itemLib.Name;
+		-- local unlockedName = "Item Unlockable: "..modItemUnlockableLib.Name.." "..itemLib.Name;
 
-		remoteHudNotification:FireClient(self.Player, "Unlocked", {Name=unlockedName;});
+		-- remoteHudNotification:FireClient(self.Player, "Unlocked", {Name=unlockedName;});
+
+		local skinName = modItemUnlockableLib.Name.." "..itemLib.Name;
+		shared.Notify(self.Player, `Added a {skinName} charge to your workbench. Charges: {tostring(self[itemId][key])}`, "Reward");
 	end
 end
 

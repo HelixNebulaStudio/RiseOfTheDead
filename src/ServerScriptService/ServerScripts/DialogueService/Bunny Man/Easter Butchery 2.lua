@@ -62,7 +62,7 @@ return function(player, dialog, data, mission)
 						modMission:CompleteMission(player, 50);
 
 						local profile = modProfile:Get(player);
-						profile.ItemUnlockables:Set("bunnymanhead", "bunnymanheadbenefactor", true);
+						profile.ItemUnlockables:Add("bunnymanhead", "bunnymanheadbenefactor", 1);
 						profile.ItemUnlockables:Alert("bunnymanhead", "bunnymanheadbenefactor");
 						
 						profile:Sync("ItemUnlockables/bunnymanhead/"..profile.ItemUnlockables["bunnymanhead"]);

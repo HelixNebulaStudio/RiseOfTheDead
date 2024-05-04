@@ -567,6 +567,8 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 	local itemPrefabs = game.ReplicatedStorage.Prefabs.Items;
 	local baseItemModel = itemPrefabs:FindFirstChild(modelName);
 	
+	local itemLib = modItemsLibrary:Find(itemId);
+
 	local customizeLib = modWorkbenchLibrary.ItemAppearance[itemId];
 	local partName;
 	
@@ -682,14 +684,35 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 					if unlockableItemLib and unlockableItemLib.ItemId == storageItem.ItemId then
 
 						local unlockedSkins = storageItem:GetValues("Skins") or {};
-						local isUnlocked = unlockedSkins[unlockableItemLib.Id];
+						local isUnlocked = table.find(unlockedSkins, unlockableItemLib.Id)
 
 						if unlockableItemLib.Name == "Default" or unlockableItemLib.Unlocked == true then
 							isUnlocked = true;
-						elseif typeof(unlockableItemLib.Unlocked) == "string" and unlockedSkins[unlockableItemLib.Unlocked] then
+						elseif typeof(unlockableItemLib.Unlocked) == "string" and table.find(unlockedSkins, unlockableItemLib.Id) then
 							isUnlocked = true;
 						end
 						
+						if isUnlocked == nil then
+							local consumedCharge = false;
+							
+							if profile.ItemUnlockables and profile.ItemUnlockables[itemId] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] > 0 then
+								profile.ItemUnlockables[itemId][unlockableItemLib.Id] = profile.ItemUnlockables[itemId][unlockableItemLib.Id] -1;
+								profile:Sync(`ItemUnlockables/{itemId}/{unlockableItemLib.Id}`);
+								consumedCharge = true;
+							end
+							if not consumedCharge then
+								shared.Notify(player, `You have no more charges for {unlockableItemLib.Name} {itemLib.Name}.`, "Negative");
+								debounceCache[player.Name]=nil;
+								return;
+
+							else
+								table.insert(unlockedSkins, unlockableItemLib.Id);
+								storageItem:SetValues("Skins", unlockedSkins);
+
+								isUnlocked = true;
+							end
+						end
+
 						if player.UserId == 16170943 then
 							isUnlocked = true;
 						end
