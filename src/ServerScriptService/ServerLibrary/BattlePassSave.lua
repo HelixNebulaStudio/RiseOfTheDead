@@ -193,6 +193,8 @@ function BattlePassSave:AddLevel(bpId, addAmt)
 		
 		self.Profile:RefreshPlayerTitle();
 
+		local serverTime = workspace:GetServerTimeNow();
+
 		local rewardsLib = modRewardsLibrary:Find(bpId);
 		if newLevel >= #treeList and rewardsLib then
 			
@@ -208,7 +210,7 @@ function BattlePassSave:AddLevel(bpId, addAmt)
 						local rewardInfo = rewards[1];
 						
 						if rewardInfo then
-							rewardInfo.ExpireTime = workspace:GetServerTimeNow()+shared.Const.OneDaySecs;
+							rewardInfo.ExpireTime = serverTime+shared.Const.OneDaySecs;
 							passData.PostRewards[lvlStr] = rewardInfo;
 						end
 					end
@@ -217,9 +219,8 @@ function BattlePassSave:AddLevel(bpId, addAmt)
 			
 		end
 		
-		local serverTime = workspace:GetServerTimeNow();
 		for lvlStr, rewardInfo in pairs(passData.PostRewards) do
-			if rewardInfo.ExpireTime < serverTime then continue end;
+			if serverTime <= rewardInfo.ExpireTime then continue end;
 			passData.PostRewards[lvlStr] = nil;
 		end
 

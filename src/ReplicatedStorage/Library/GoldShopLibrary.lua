@@ -555,9 +555,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="militaryboots";
-	Icon="";
-	TitleText="Military Boots";
-	Desc="Military grade boots. Reduces slows, stuns and tied up duration debuff by 20%.";
 	Product={
 		Type="Gold";
 		Price=2950;
@@ -581,9 +578,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="energydrink";
-	Icon="";
-	TitleText="Xp Energy Drink";
-	Desc="Enaaargy! The energy drink to double your experience gain for the next hour.";
 	Product={
 		Type="Gold";
 		Price=250;
@@ -595,9 +589,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="healthmod";
-	Icon="";
-	TitleText="Chest Health Points Mod";
-	Desc="Mod for chest-based clothing to increase your max health points.";
 	Product={
 		Type="Gold";
 		Price=1950;
@@ -609,9 +600,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="armorpointsmod";
-	Icon="";
-	TitleText="Chest Armor Points Mod";
-	Desc="Mod for chest-based clothing to increase your max armor points.";
 	Product={
 		Type="Gold";
 		Price=1950;
@@ -623,9 +611,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="thornmod";
-	Icon="";
-	TitleText="Chest Thorns Mod";
-	Desc="Mod for chest-based clothing. When taking melee damage, attacker takes reflected damage based on a percent of their health. Reflected damage only affects basic enemeis. Minimum reflected damage is 10.";
 	Product={
 		Type="Gold";
 		Price=1950;
@@ -637,9 +622,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="barbedwooden";
-	Icon="";
-	TitleText="Barbed Wooden Fence";
-	Desc="Placable barbed wooden fence that does 1% damage per second to enemies when touched.";
 	Product={
 		Type="Gold";
 		Price=490;
@@ -649,9 +631,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="boombox";
-	Icon="";
-	TitleText="Boombox";
-	Desc="Used to annoy your neighbors. Press [E] to add custom tracks.";
 	Product={
 		Type="Gold";
 		Price=2950;
@@ -661,9 +640,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="disguisekit";
-	Icon="";
-	TitleText="Disguise Kit";
-	Desc="Disguise yourself as anything. Right-click to open disguse menu.";
 	Product={
 		Type="Gold";
 		Price=2950;
@@ -676,9 +652,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="minigun";
-	Icon="";
-	TitleText="Minigun";
-	Desc="It weighs fifty seven kilograms and fires two hundred dollar, custom-tooled cartridges at ten thousand rounds per minute. It costs four hundred thousand dollars to fire this weapon... for twelve seconds.";
 	Product={
 		Type="Gold";
 		Price=4990;
@@ -688,9 +661,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="grenadelauncher";
-	Icon="";
-	TitleText="Grenade Launcher";
-	Desc="High damage, explosion does area-of-effect damage and overall an amazing killing machine.";
 	Product={
 		Type="Gold";
 		Price=8950;
@@ -700,9 +670,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="voodoodoll";
-	Icon="";
-	TitleText="Voodoo Doll";
-	Desc="Creepy little voodoo doll that mimic players or characters.";
 	Product={
 		Type="Gold";
 		Price=1950;
@@ -712,9 +679,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="flute";
-	Icon="";
-	TitleText="Flute";
-	Desc="A playable flute instrument. Can play pre-made tunes or with keyboard buttons [A-J,W,E,T,Y,U]. Change octaves with [Shift] & [Ctrl].";
 	Product={
 		Type="Gold";
 		Price=4990;
@@ -724,9 +688,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="guitar";
-	Icon="";
-	TitleText="Guitar";
-	Desc="A playable guitar instrument. Can play pre-made tunes or with keyboard buttons [A-J,W,E,T,Y,U]. Change octaves with [Shift] & [Ctrl].";
 	Product={
 		Type="Gold";
 		Price=4990;
@@ -737,9 +698,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="keytar";
-	Icon="";
-	TitleText="Keytar";
-	Desc="A playable guitar instrument. Can play pre-made tunes or with keyboard buttons [A-J,W,E,T,Y,U]. Change octaves with [Shift] & [Ctrl].";
 	Product={
 		Type="Gold";
 		Price=4990;
@@ -750,7 +708,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="nvg";
-	Icon="";
 	Product={
 		Type="Gold";
 		Price=2950;
@@ -762,9 +719,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="gasmask";
-	Icon="";
-	TitleText="Gas Mask";
-	Desc="Hudda hudda huuh! Reduce effects and damage from gas clouds and toxic damages.";
 	Product={
 		Type="Gold";
 		Price=2950;
@@ -776,9 +730,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="fireworks";
-	Icon="";
-	TitleText="Fireworks";
-	Desc="Fireworks lighting up the skies for the new year!";
 	Product={
 		Type="Gold";
 		Price=50;
@@ -790,9 +741,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="entityleash";
-	Icon="";
-	TitleText="Entity Leash";
-	Desc="Used to leash an entity. It hooks on to a target and lock it's limbs with electrical signals.";
 	Product={
 		Type="Gold";
 		Price=2800;
@@ -803,9 +751,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="dufflebagstreetart";
-	Icon="";
-	TitleText="Street Art Duffle Bag Unlockable";
-	Desc="Bring a part of the street with you anywhere!";
 	Product={
 		Type="Gold";
 		Price=1000;
@@ -817,9 +762,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="greytshirtcamo";
-	Icon="";
-	TitleText="Camo Shirt Unlockable";
-	Desc="Camo your Tshirt with this hexcamo pattern!";
 	Product={
 		Type="Gold";
 		Price=1000;
@@ -831,9 +773,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="leatherglovesred";
-	Icon="";
-	TitleText="Red Leather Gloves Unlockable";
-	Desc="Leather Gloves made with Red Leather!";
 	Product={
 		Type="Gold";
 		Price=1000;
@@ -845,9 +784,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="prisonshirtblue";
-	Icon="";
-	TitleText="Blue Prisoner's Shirt Unlockable";
-	Desc="Blue Prisoner factions?!";
 	Product={
 		Type="Gold";
 		Price=1000;
@@ -859,9 +795,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="prisonpantsblue";
-	Icon="";
-	TitleText="Blue Prisoner's Pants Unlockable";
-	Desc="Blue Prisoner factions?!";
 	Product={
 		Type="Gold";
 		Price=1000;
@@ -873,9 +806,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="dufflebagvintage";
-	Icon="";
-	TitleText="Vintage Duffle Bag Unlockable";
-	Desc="Vintage classy fashion that feels like designer skin.";
 	Product={
 		Type="Gold";
 		Price=1000;
@@ -888,9 +818,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="dufflebagarticscape";
-	Icon="";
-	TitleText="Artic Scape Duffle Bag Unlockable";
-	Desc="Artic scape with maze of snow.";
 	Product={
 		Type="Gold";
 		Price=1000;
@@ -902,9 +829,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="plankarmormaple";
-	Icon="";
-	TitleText="Plank Armor Maple Unlockable";
-	Desc="Maple wood plank armor.";
 	Product={
 		Type="Gold";
 		Price=1000;
@@ -916,9 +840,6 @@ GoldShopLibrary.Products:Add{
 
 GoldShopLibrary.Products:Add{
 	Id="plankarmorash";
-	Icon="";
-	TitleText="Plank Armor Ash Unlockable";
-	Desc="Ash wood plank armor";
 	Product={
 		Type="Gold";
 		Price=1000;

@@ -28,6 +28,12 @@ end
 function BattlePassLibrary:Init(library)
 	library.Active = "bp5years";
 	
+	library.GiftShop = {
+		{ItemId="rusty48blaze"; Cost=500;};
+		{ItemId="dufflebagorigins"; Cost=1000;};
+		{ItemId="vexglovesinferno"; Cost=1000;};
+	};
+
 	-- MARK: BP Season 1
 	--[[
 	library:Add{

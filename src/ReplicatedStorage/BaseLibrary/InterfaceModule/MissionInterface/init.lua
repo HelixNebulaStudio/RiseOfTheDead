@@ -31,6 +31,7 @@ local modGuiObjectTween = require(game.ReplicatedStorage.Library.UI.GuiObjectTwe
 local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface);
 local modRadialImage = require(game.ReplicatedStorage.Library.UI.RadialImage);
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
+local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remotePinMission = remotes.Interface.PinMission;
@@ -2165,7 +2166,10 @@ function Interface.init(modInterface)
 		
 		local testLvl;
 		local bpButtonFunc;
-		
+
+		--== MARK: Mission Pass
+		modData:RequestData("BattlePassSave/"..activeBpId);
+
 		table.clear(levelSlotsInfo)
 		function Interface.UpdateBattlePass()
 			local battlePassData, seasonData;
@@ -2657,7 +2661,8 @@ function Interface.init(modInterface)
 				lvlSlot.Parent = battlePassContent;
 			end
 			
-				
+			--== MARK: Post Rewards
+
 			local rewardsLib = modRewardsLibrary:Find(activeBpId);
 			if rewardsLib then
 				local postRewardInfo = "rewardlib";
@@ -2704,7 +2709,7 @@ function Interface.init(modInterface)
 							local contentFrame = passRewardFrame:WaitForChild("Frame");
 							local claimButton = contentFrame:WaitForChild("ClaimButton");
 							local slotFrame = contentFrame:WaitForChild("Slot");
-							local descLabel = contentFrame:WaitForChild("Description");
+							local descLabel = contentFrame:WaitForChild("Description") :: TextLabel;
 							local scrollFrame = contentFrame:WaitForChild("ScrollFrame");
 							
 							slotFrame.Visible = false;
@@ -2712,15 +2717,17 @@ function Interface.init(modInterface)
 							scrollFrame.Visible = true;
 							descLabel.Size = UDim2.new(1, 0, 1, 0);
 							
-							local descText = "Unlock a reward every ".. modBattlePassLibrary.PostRewardLvlFmod .. " levels.";
-							
-							local str = "\nPossible Rewards: ".."\n";
-							
+							local descText = "";
 							if seasonData.Owned ~= true then
 								titleStr = titleStr.." (Mission Pass)";
 								descText = "Requires Mission Pass!\n"..descText;
 							end
-							descText = descText.. modRichFormatter.RichFontSize("\n\nReward drops will expire after 24 hours.", 12);
+
+							descText = descText.. modRichFormatter.RichFontSize(`Unlock a reward every {modBattlePassLibrary.PostRewardLvlFmod} levels.`, 20);
+							
+							local str = "\nPossible Rewards: \n";
+							
+							descText = descText.. modRichFormatter.RichFontSize("\nReward drops will expire after 24 hours.", 11);
 							titleLabel.Text = titleStr;
 							
 							local groups = modDropRateCalculator.Calculate(rewardsLib);
@@ -2757,6 +2764,7 @@ function Interface.init(modInterface)
 
 							descText = descText.."\n\n"..str;
 							descLabel.Text = descText;
+							descLabel.LineHeight = 1.2;
 							
 						end)
 
@@ -2859,9 +2867,24 @@ function Interface.init(modInterface)
 								end
 								
 								local contentFrame = passRewardFrame:WaitForChild("Frame");
-								local claimButton = contentFrame:WaitForChild("ClaimButton");
+								local claimButton = contentFrame:WaitForChild("ClaimButton") :: TextButton;
 								local slotFrame = contentFrame:WaitForChild("Slot");
 								local descLabel = contentFrame:WaitForChild("Description");
+
+								claimButton.AnchorPoint = Vector2.new(1, 1);
+								claimButton.Position = UDim2.new(1, 0, 1, 0);
+
+								local holdDownScrapObj = modComponents.CreateHoldDownButton(Interface, {
+									Text = "<b>Trade in for Gift Shop Token</b>";
+									Color = Color3.fromRGB(165, 140, 75);
+								})
+	
+								local holdDownScrapButton: TextButton = holdDownScrapObj.Button;
+								holdDownScrapButton.AnchorPoint = Vector2.new(0, 1);
+								holdDownScrapButton.Position = UDim2.new(0, 0, 1, 0);
+								holdDownScrapButton.Size = UDim2.new(0.5, -10, 0, 30);
+								holdDownScrapButton.TextSize = 16;
+								holdDownScrapButton.Parent = contentFrame;
 
 								local cloneItemButton = itemButtonObj.ImageButton:Clone();
 								cloneItemButton.Parent = slotFrame;
@@ -2876,6 +2899,11 @@ function Interface.init(modInterface)
 								descText = descText.."\n\n"..h3("Name: ").. itemLib.Name;
 								descText = descText.."\n"..h3("Type: ").. itemLib.Type;
 								descText = descText.."\n"..h3("Description: ").. itemLib.Description;
+
+								if rewardInfo.ExpireTime then
+									local timeLeft = rewardInfo.ExpireTime-workspace:GetServerTimeNow();
+									descText = descText.."\n\n"..h3("Expires: ").. modSyncTime.ToString(timeLeft);
+								end
 
 								descLabel.Text = descText;
 
@@ -2972,11 +3000,84 @@ function Interface.init(modInterface)
 				end
 			end
 
+			--== MARK: Gift Shop
+			local giftShop = "giftshop";
+			local lvlSlotInfo = levelSlotsInfo[giftShop];
+
+			if lvlSlotInfo == nil then
+				local info = {};
+
+				info.LevelSlot = templateLevelSlot:Clone();
+				info.LevelSlot.LayoutOrder = 9999-1;
+				info.LevelSlot.Size = UDim2.new(0, 120, 1, 0);
+
+				levelSlotsInfo[giftShop] = info;
+				lvlSlotInfo = info;
+				
+				if lvlSlotInfo.ItemButton == nil then
+					local itemButtonObj = modItemInterface.newItemButton("unknowngift");
+					
+					local aspectRatioConstraint = Instance.new("UIAspectRatioConstraint");
+					aspectRatioConstraint.Parent = itemButtonObj.ImageButton;
+
+					itemButtonObj.ImageButton.AnchorPoint = Vector2.new(0.5, 0.5);
+					itemButtonObj.ImageButton.Position = UDim2.new(0.5, 0, 0.5, 0);
+					itemButtonObj.ImageButton.Size = UDim2.new(0, 100, 0, 100);
+					itemButtonObj.ImageButton.Rotation = 1;
+					itemButtonObj.ImageButton.Parent = info.LevelSlot;
+
+					lvlSlotInfo.ItemButton = itemButtonObj;
+					
+					itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
+						refreshData();
+						Interface:PlayButtonClick();
+
+						MissionDisplayFrame:ClearAllChildren();
+						previousId = nil;
+
+						local passRewardFrame = templatePassReward:Clone();
+						passRewardFrame.Parent = MissionDisplayFrame;
+
+						local titleLabel = passRewardFrame:WaitForChild("Title");
+						local titleStr = "<b>Gift Shop!</b>";
+						titleLabel.TextColor3 = bpColors.CurrentPremium;
+
+						local contentFrame = passRewardFrame:WaitForChild("Frame");
+						local claimButton = contentFrame:WaitForChild("ClaimButton");
+						local slotFrame = contentFrame:WaitForChild("Slot");
+						local descLabel = contentFrame:WaitForChild("Description");
+						local scrollFrame = contentFrame:WaitForChild("ScrollFrame");
+						
+						slotFrame.Visible = false;
+						claimButton.Visible = false;
+						scrollFrame.Visible = true;
+						descLabel.Size = UDim2.new(1, 0, 1, 0);
+						
+						local descText = "Trade in your rewards for past mission pass rewards!";
+
+						if modData.IsPremium ~= true then
+							titleStr = titleStr.." (Premium)";
+							descText = "Requires Premium!\n"..descText;
+						end
+
+						titleLabel.Text = titleStr;
+						descLabel.Text = descText;
+					end)
+
+					itemButtonObj:Update();
+				end
+				
+				lvlSlotInfo.LevelSlot.ImageColor3 = bpColors.Premium;
+				info.LevelSlot.Parent = battlePassContent;
+			end
+
+
+			--== MARK: Final Level 
 			if seasonLevel > treeCount then
 				if finalSlotInfo.Slot == nil then
 					finalSlotInfo.Slot = templateLevelSlot:Clone();
 					finalSlotInfo.Slot.Size = UDim2.new(0, 160, 1, 0);
-					finalSlotInfo.Slot.LayoutOrder = 99999;
+					finalSlotInfo.Slot.LayoutOrder = 9999;
 
 					local finalLabel = Instance.new("TextLabel");
 					finalLabel.RichText = true;

@@ -423,7 +423,14 @@ function Components.CreateHoldDownButton(mainInterface, paramPacket)
 	self.Button = holdDownButtonTemplate:Clone() :: TextButton;
 	self.Button.Text = paramPacket.Text;
 
-	local progressBar = self.Button:WaitForChild("Bar");
+	local progressBar = self.Button:WaitForChild("Bar") :: Frame;
+
+	if paramPacket.Color then
+		local color: Color3 = paramPacket.Color;
+		local h,s,v = color:ToHSV();
+		self.Button.BackgroundColor3 = color;
+		progressBar.BackgroundColor3 = Color3.fromHSV(h, s+0.4, v+0.4);
+	end
 
 	local buttonDebounce = false;
 	local initTick;
