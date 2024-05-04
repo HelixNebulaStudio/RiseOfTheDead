@@ -50,7 +50,6 @@ return function(npc, spawnPoint)
 	end
 
 	--== Components;
-	
 	self:AddComponent("AntiSit");
 	self:AddComponent("WeakPoint");
 	self:AddComponent("DropReward");

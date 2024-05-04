@@ -95,4 +95,6 @@ return function(npc, spawnPoint)
 		self.OnDeath(...);
 	end));
 	
-return self end
+	
+	return self;
+end
