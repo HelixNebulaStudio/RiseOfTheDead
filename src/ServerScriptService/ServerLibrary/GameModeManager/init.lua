@@ -691,11 +691,6 @@ function remoteGameModeLobbies.OnServerInvoke(player, interactObject, interactMo
 	end
 	if stageLib == nil then Debugger:Warn("Game door missing stageLib."); return end;
 	
-	local gameTable = GameModeManager:GetActive(gameType, gameStage);
-	if gameTable == nil then
-		gameTable = GameModeManager:Initialize(gameType, gameStage);
-	end;
-	
 	local classPlayer = modPlayers.Get(player);
 	if classPlayer then
 		if classPlayer.GameModeAccess == nil then
@@ -703,6 +698,11 @@ function remoteGameModeLobbies.OnServerInvoke(player, interactObject, interactMo
 		end
 		classPlayer.GameModeAccess[gameType..":"..gameStage] = true; 
 	end
+	
+	local gameTable = GameModeManager:GetActive(gameType, gameStage);
+	if gameTable == nil then
+		gameTable = GameModeManager:Initialize(gameType, gameStage);
+	end;
 	
 	gameTable = GameModeManager:GetActive(gameType, gameStage);
 	gameTable.IsGameWorld = GameModeManager.IsGameWorld;
@@ -806,15 +806,10 @@ end
 
 function remoteGameModeRequest.OnServerInvoke(player, requestEnum, ...)
 	if remoteGameModeRequest:Debounce(player) then return end;
-	local classPlayer = modPlayers.Get(player);
 	
 	if requestEnum == enumRequests.OpenInterface then
 		local gameType, gameStage = ...;
 		
-		if classPlayer.GameModeAccess == nil or classPlayer.GameModeAccess[gameType..":"..gameStage] ~= true then
-			Debugger:WarnClient(player, "Invalid game room.");
-			return;
-		end
 		return GameModeManager:ConnectPlayer(player, gameType, gameStage);
 		
 	elseif requestEnum == enumRequests.CloseInterface then
@@ -846,6 +841,8 @@ function remoteGameModeRequest.OnServerInvoke(player, requestEnum, ...)
 			return;
 		end
 		
+		local gameType, gameStage = gameTable.Type, gameTable.Stage;
+		
 		local playerRoom = gameTable:GetPlayerRoom(player);
 		if playerRoom  then
 			Debugger:WarnClient(player, "Player already in room id: "..playerRoom.Id..".");
@@ -860,6 +857,12 @@ function remoteGameModeRequest.OnServerInvoke(player, requestEnum, ...)
 			return
 		end
 
+		local classPlayer = modPlayers.Get(player);
+		if classPlayer.GameModeAccess == nil or classPlayer.GameModeAccess[gameType..":"..gameStage] ~= true then
+			Debugger:WarnClient(player, `Invalid game room. {gameType}:{gameStage}`);
+			return;
+		end
+		
 		return GameModeManager:JoinRoom(player, gameTable, room);
 		
 	elseif requestEnum == enumRequests.LeaveRoom then

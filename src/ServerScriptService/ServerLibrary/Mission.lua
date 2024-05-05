@@ -500,6 +500,27 @@ function remoteMissionRemote.OnServerInvoke(player, actionId, missionId)
 		Mission:StartMission(player, missionId);
 		
 		return returnPacket;
+
+	elseif actionId == "MissionBoardSkip" then
+		local returnPacket = {};
+		
+		local missionProfile = Mission.GetMissions(player.Name);
+		local mission = missionProfile:Get(missionId);
+		
+		if mission == nil or mission.Type == 1 or mission.Type == 3 then
+			returnPacket.FailMsg = mission == nil and "Invalid mission" or "Mission already active or completed";
+			shared.Notify(player, `Skipping mission failed: {returnPacket.FailMsg}`, "Negative");
+			return returnPacket;
+		end
+
+		local missionLib = modMissionLibrary.Get(missionId);
+		missionProfile:Destroy(mission);
+		shared.Notify(player, `Skipping mission, {missionLib.Name}.`, "Inform");
+
+		missionProfile:Sync();
+		
+		returnPacket.Success = true;
+		return returnPacket;
 	end
 
 	return;

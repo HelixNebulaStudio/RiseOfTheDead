@@ -3,8 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local toolPackage = {
 	Type="FoodTool";
 	Animations={
-		Core={Id=3296519824;};
-		Use={Id=4534092581;};
+		Core={Id=17145574614;};
+		Use={Id=17145576789;};
 	};
 };
 

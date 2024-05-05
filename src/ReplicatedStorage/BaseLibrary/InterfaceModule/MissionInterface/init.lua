@@ -130,12 +130,9 @@ function Interface.init(modInterface)
 	
 	local LeftFrame = windowFrame:WaitForChild("LeftBackground");
 	local MissionListFrame = LeftFrame:WaitForChild("MissionList");
-	local missionListLayout = MissionListFrame:WaitForChild("UIListLayout");
 	local missionListPadding = LeftFrame:WaitForChild("UIPadding");
 	local PinnedMissionFrame = windowFrame:WaitForChild("PinnedBackground");
 
-	local listOptionsFrame = windowFrame:WaitForChild("listOption");
-	
 	local missionPinHud = missionPinHudTemplate:Clone();
 	missionPinHud.Parent = modInterface.MainInterface;
 	
@@ -147,7 +144,6 @@ function Interface.init(modInterface)
 	local pinnedTasklist = missionPinHud:WaitForChild("Tasklist");
 	local taskTemplate = script:WaitForChild("Task");
 
-	local missionCategoryListingTemplate = script:WaitForChild("MissionCategoryListing");
 	local missionListingTemplate = script:WaitForChild("MissionListing");
 
 	local notifyMissionFrame = script:WaitForChild("NotifyMission");
@@ -167,7 +163,6 @@ function Interface.init(modInterface)
 
 	local RightFrame = windowFrame:WaitForChild("RightBackground");
 	local MissionDisplayFrame = RightFrame;
-	local missionProgression = windowFrame:WaitForChild("progressionFrame")
 
 	local camera = workspace.CurrentCamera;
 	
@@ -185,18 +180,16 @@ function Interface.init(modInterface)
 	end
 
 	---
-	local previousId = nil;
 	local missionListings = {};
 	local tabAndLists = {};
 	local titleLabels = {};
-	local pinnedMissionName, pinnedMissionStartTime, notifyPinnedMission, newPinNotification;
+	local pinnedMissionName, notifyPinnedMission, newPinNotification;
 	local activeMissionLogic = {};
 	local lastProgressionPoint = nil;
 	local lastIncompleteFlag = nil;
 
 	local missionMarkerColor = Color3.fromRGB(251, 255, 0);
-	local markForSave = false;
-	
+
 	---
 	local function cancelAllMissionFunctions()
 		for _, m in pairs(activeMissionLogic) do
@@ -213,6 +206,8 @@ function Interface.init(modInterface)
 				return missionData;
 			end
 		end
+
+		return;
 	end
 
 	local function loadObjectiveDescription(mission, objName, obj)
@@ -238,6 +233,7 @@ function Interface.init(modInterface)
 				return obj;
 			end
 		end
+		return;
 	end
 	
 	local hideComplete = modData.Settings and modData.Settings["HideCM"] == 1;
@@ -709,7 +705,7 @@ function Interface.init(modInterface)
 	
 	function Interface.Select(id)
 		MissionDisplayFrame:ClearAllChildren();
-		previousId = id;
+		
 		if id == nil then return end
 		local data = getMissionData(id);
 		local book = modMissionsLibrary.Get(id);
@@ -745,7 +741,7 @@ function Interface.init(modInterface)
 						debounce = true;
 						Interface:PlayButtonClick();
 
-						local r = remoteMissionRemote:InvokeServer("Redo", id);
+						local _r = remoteMissionRemote:InvokeServer("Redo", id);
 
 						promptWindow:Close();
 						YesClickedSignal:Disconnect();
@@ -787,7 +783,7 @@ function Interface.init(modInterface)
 						debounce = true;
 						Interface:PlayButtonClick();
 
-						local r = remoteMissionRemote:InvokeServer("Abort", id);
+						local _r = remoteMissionRemote:InvokeServer("Abort", id);
 
 						promptWindow:Close();
 						YesClickedSignal:Disconnect();
@@ -809,8 +805,7 @@ function Interface.init(modInterface)
 
 			local taskLabel = menu:WaitForChild("tasksLabel");
 			local taskList = menu:WaitForChild("TaskBackground"):WaitForChild("TaskList");
-			local taskLayout = taskList:WaitForChild("UIListLayout");
-
+			
 			local logList = menu:WaitForChild("LogBackground"):WaitForChild("LogList");
 			local logLayout = logList:WaitForChild("UIListLayout");
 
@@ -821,8 +816,8 @@ function Interface.init(modInterface)
 				for a=1, #book.Checkpoint do
 					local checkpointInfo = book.Checkpoint[a];
 
-					local taskLabel = taskListingTemplate:Clone();
-					local label = taskLabel:WaitForChild("TaskLabel");
+					local newTaskLabel = taskListingTemplate:Clone();
+					local label = newTaskLabel:WaitForChild("TaskLabel");
 					label.Text = checkpointInfo.Text;
 					
 					if data.SaveData then
@@ -847,10 +842,10 @@ function Interface.init(modInterface)
 						pointColor = Color3.fromRGB(180, 60, 60);
 					end
 					
-					local completionBox = taskLabel:WaitForChild("CompletionBox");
+					local completionBox = newTaskLabel:WaitForChild("CompletionBox");
 					completionBox.BackgroundColor3 = pointColor;
 					
-					taskLabel.Parent = taskList;
+					newTaskLabel.Parent = taskList;
 				end
 
 
@@ -859,8 +854,8 @@ function Interface.init(modInterface)
 				for a=1, #book.Progression do
 					local progressionPointInfo = book.Progression[a];
 
-					local taskLabel = taskListingTemplate:Clone();
-					local label = taskLabel:WaitForChild("TaskLabel");
+					local newTaskLabel = taskListingTemplate:Clone();
+					local label = newTaskLabel:WaitForChild("TaskLabel");
 					label.Text = typeof(progressionPointInfo) == "table" and progressionPointInfo.ActiveText or progressionPointInfo;
 
 					if data.SaveData then
@@ -885,19 +880,17 @@ function Interface.init(modInterface)
 						pointColor = Color3.fromRGB(180, 60, 60);
 					end
 
-					local completionBox = taskLabel:WaitForChild("CompletionBox");
+					local completionBox = newTaskLabel:WaitForChild("CompletionBox");
 					completionBox.BackgroundColor3 = pointColor;
 					
-					taskLabel.Parent = taskList;
+					newTaskLabel.Parent = taskList;
 				end
-				--taskList.CanvasSize = UDim2.new(0, 0, 0, taskLayout.AbsoluteContentSize.Y);
-				--taskList.CanvasPosition = Vector2.new(0, 9999);
 
 			elseif book.Objectives or data.Type == 3 then
 				taskLabel.Text = "Objectives:";
 				for objName, obj in pairs(book.Objectives) do
-					local taskLabel = taskListingTemplate:Clone();
-					local label = taskLabel:WaitForChild("TaskLabel");
+					local newTaskLabel = taskListingTemplate:Clone();
+					local label = newTaskLabel:WaitForChild("TaskLabel");
 
 					label.Text = loadObjectiveDescription(data, objName, obj);
 
@@ -920,10 +913,10 @@ function Interface.init(modInterface)
 						pointColor = Color3.fromRGB(180, 180, 180);
 					end
 					
-					local completionBox = taskLabel:WaitForChild("CompletionBox");
+					local completionBox = newTaskLabel:WaitForChild("CompletionBox");
 					completionBox.BackgroundColor3 = pointColor;
 					
-					taskLabel.Parent = taskList;
+					newTaskLabel.Parent = taskList;
 				end
 
 			end
@@ -1079,13 +1072,12 @@ function Interface.init(modInterface)
 	local pinRequestDebounce = false;
 	function Interface.Update()
 		hideComplete = modData.Settings and modData.Settings["HideCM"] == 1;
-		local maxActiveMissions = modData.Profile and modData.Profile.Premium and 5 or 3;
+		local _maxActiveMissions = modData.Profile and modData.Profile.Premium and 5 or 3;
 
-		--if modData.GameSave == nil or modData.GameSave.Missions == nil then return end;
 		local missionsList = modTableManager.GetDataHierarchy(modData.Profile, "GameSave/Missions") or {};
 
 		local missionTypesList = {};
-		for typeKey, _ in pairs(missionTypeOrder) do --modMissionsLibrary.MissionTypes
+		for typeKey, _ in pairs(missionTypeOrder) do
 			missionTypesList[typeKey] = {};
 		end
 		
@@ -1787,11 +1779,9 @@ function Interface.init(modInterface)
 					hourlyMissionListing.ImageColor3 = Color3.fromRGB(100, 100, 100);
 				end)
 
-				hourlyMissionListing.MouseButton1Click:Connect(function()
-					Interface:PlayButtonClick();
-
+				-- MARK: loadBoardMissions()
+				local function loadBoardMissions()
 					MissionDisplayFrame:ClearAllChildren();
-					previousId = nil;
 
 					local missionBoard = templateMissionBoard:Clone();
 					missionBoard.Parent = MissionDisplayFrame;
@@ -1856,6 +1846,24 @@ function Interface.init(modInterface)
 						local titleLabel = newButton:WaitForChild("Title");
 						local descLabel = newButton:WaitForChild("Desc");
 						local rewardLabel = newButton:WaitForChild("Reward");
+
+						local skipHoldDownObj = modComponents.CreateHoldDownButton(Interface, {
+							Text="";
+						});
+						local skipHoldButton = skipHoldDownObj.Button;
+						skipHoldButton.AnchorPoint = Vector2.new(1, 0);
+						skipHoldButton.BackgroundColor3 = Color3.fromRGB(120, 57, 57);
+						skipHoldButton.Position = UDim2.new(1, -5, 0, 5);
+						skipHoldButton.Size = UDim2.new(0, 15, 0, 15);
+						skipHoldButton.Parent = newButton;
+
+						skipHoldDownObj.OnHoldDownConfirm = function()
+							local r = remoteMissionRemote:InvokeServer("MissionBoardSkip", missionData.Id);
+
+							if r and r.Success then
+								Debugger.Expire(newButton);
+							end
+						end;
 
 						titleLabel.Text = missionLib.Name;
 						descLabel.Text = missionLib.Description;
@@ -1925,7 +1933,12 @@ function Interface.init(modInterface)
 
 					end
 					refreshActiveRepeatable();
+				end
 
+				hourlyMissionListing.MouseButton1Click:Connect(function()
+					Interface:PlayButtonClick();
+
+					loadBoardMissions();
 				end)
 			end
 
@@ -1948,7 +1961,7 @@ function Interface.init(modInterface)
 		end
 		
 		-- General Missions;
-		for typeKey, missionsList in pairs(missionTypesList) do
+		for typeKey, typeMissions in pairs(missionTypesList) do
 			local typeIndex = modMissionsLibrary.MissionTypes[typeKey];
 			local typeOrder = missionTypeOrder[typeKey];
 
@@ -1956,12 +1969,12 @@ function Interface.init(modInterface)
 
 			local completedCount = 0;
 			local missionsOfType = modMissionsLibrary.CountMissions({[typeIndex]=true;});
-			for a=1, #missionsList do
-				local missionData = missionsList[a].Data;
+			for a=1, #typeMissions do
+				local missionData = typeMissions[a].Data;
 				if missionData.Type == 3 then
 					completedCount = completedCount +1;
 				end
-				createListing(missionsList[a], newTab, newList);
+				createListing(typeMissions[a], newTab, newList);
 			end
 			local allComplete = completedCount == missionsOfType;
 			newTab.titleLabel.Text = (allComplete and "" or "• ")..typeKey.." missions ("..completedCount.."/"..missionsOfType..")";
@@ -2067,16 +2080,8 @@ function Interface.init(modInterface)
 		end
 	end
 
-	--Interface.Garbage:Tag(windowFrame:GetPropertyChangedSignal("Visible"):Connect(function()
-	--	if windowFrame.Visible then
-	--		Interface.Update();
-	--		Interface.Select(previousId);
-	--	end;
-	--	countAvailableMissions();
-	--end));
-
 	Interface.Garbage:Tag(pinnedTitleTag:GetPropertyChangedSignal("Text"):Connect(function()
-		if modConfigurations.DisablePinnedMission then missionPinHud.Visible = false; Debugger:Warn("Pinned Mission Disabled") return end;
+		if modConfigurations.DisablePinnedMission then missionPinHud.Visible = false; Debugger:Warn("Pinned Mission Disabled"); return end;
 		if pinnedTitleTag.Text:len() > 0 then
 			missionPinHud.Visible = true;
 			modGuiObjectTween.FadeTween(missionPinHud, modGuiObjectTween.FadeDirection.In, TweenInfo.new(2));
@@ -2164,7 +2169,6 @@ function Interface.init(modInterface)
 		
 		hintLabel.Text = "Mission Pass: ".. daysLeft .." Days Left";
 		
-		local testLvl;
 		local bpButtonFunc;
 
 		--== MARK: Mission Pass
@@ -2185,8 +2189,6 @@ function Interface.init(modInterface)
 			local treeList = battlepassLib.Tree;
 			local treeCount = #treeList;
 
-			testLvl = math.random(1, 35);
-			
 			local totalDist = 0;
 			
 			for lvl=0, treeCount do
@@ -2234,7 +2236,6 @@ function Interface.init(modInterface)
 							Interface:PlayButtonClick();
 
 							MissionDisplayFrame:ClearAllChildren();
-							previousId = nil;
 
 							local passRewardFrame = templatePassReward:Clone();
 							passRewardFrame.Parent = MissionDisplayFrame;
@@ -2264,7 +2265,6 @@ function Interface.init(modInterface)
 							local price = battlepassLib.Price;
 							claimButton.Text = "Unlock for ".. modFormatNumber.Beautify(battlepassLib.Price) .." Gold";
 
-							local  claimText = claimButton.Text;
 							claimButton.TextScaled = false;
 							claimButton.Position = UDim2.new(0.5, 0, 1, -40);
 							claimButton.Size = UDim2.new(0.6, 0, 0, 40);
@@ -2440,7 +2440,6 @@ function Interface.init(modInterface)
 								Interface:PlayButtonClick();
 
 								MissionDisplayFrame:ClearAllChildren();
-								previousId = nil;
 
 								local passRewardFrame = templatePassReward:Clone();
 								passRewardFrame.Parent = MissionDisplayFrame;
@@ -2697,7 +2696,6 @@ function Interface.init(modInterface)
 							Interface:PlayButtonClick();
 
 							MissionDisplayFrame:ClearAllChildren();
-							previousId = nil;
 
 							local passRewardFrame = templatePassReward:Clone();
 							passRewardFrame.Parent = MissionDisplayFrame;
@@ -2732,7 +2730,6 @@ function Interface.init(modInterface)
 							
 							local groups = modDropRateCalculator.Calculate(rewardsLib);
 
-							local multiSlot = #groups > 1;
 							for a=1, #groups do
 
 								for b=1, #groups[a] do
@@ -2785,21 +2782,21 @@ function Interface.init(modInterface)
 				local postRewards = seasonData.PostRewards;
 				if seasonLevel > treeCount then
 					for lvl, rewardInfo in pairs(postRewards) do
-						local lvlSlotInfo = levelSlotsInfo[lvl];
+						local postLvlSlotInfo = levelSlotsInfo[lvl];
 
-						if lvlSlotInfo == nil then
+						if postLvlSlotInfo == nil then
 							local info = {};
 
 							info.LevelSlot = templateLevelSlot:Clone();
 
 							levelSlotsInfo[lvl] = info;
-							lvlSlotInfo = info;
+							postLvlSlotInfo = info;
 						end
 
-						local lvlSlot = lvlSlotInfo.LevelSlot;
+						local lvlSlot = postLvlSlotInfo.LevelSlot;
 						lvlSlot.LayoutOrder = tonumber(lvl);
 						
-						if lvlSlotInfo.ItemButton == nil then
+						if postLvlSlotInfo.ItemButton == nil then
 							local itemButtonObj = modItemInterface.newItemButton(rewardInfo.ItemId);
 							local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
 
@@ -2811,9 +2808,9 @@ function Interface.init(modInterface)
 							itemButtonObj.ImageButton.Size = UDim2.new(0, 50, 0, 50);
 							itemButtonObj.ImageButton.Parent = lvlSlot;
 
-							lvlSlotInfo.ItemButton = itemButtonObj;
+							postLvlSlotInfo.ItemButton = itemButtonObj;
 
-							lvlSlotInfo.GetClaimState = function(l)
+							postLvlSlotInfo.GetClaimState = function(l)
 								refreshData();
 								seasonLevel = seasonData.Level;
 
@@ -2854,7 +2851,6 @@ function Interface.init(modInterface)
 								Interface:PlayButtonClick();
 
 								MissionDisplayFrame:ClearAllChildren();
-								previousId = nil;
 
 								local passRewardFrame = templatePassReward:Clone();
 								passRewardFrame.Parent = MissionDisplayFrame;
@@ -2907,7 +2903,7 @@ function Interface.init(modInterface)
 
 								descLabel.Text = descText;
 
-								if lvlSlotInfo.GetClaimState(lvl) ~= "CanClaim" then return end;
+								if postLvlSlotInfo.GetClaimState(lvl) ~= "CanClaim" then return end;
 
 								claimButton.Visible = true;
 
@@ -2923,7 +2919,7 @@ function Interface.init(modInterface)
 										return;
 									end
 									refreshData();
-									if lvlSlotInfo.GetClaimState(lvl) ~= "CanClaim" then return end;
+									if postLvlSlotInfo.GetClaimState(lvl) ~= "CanClaim" then return end;
 
 									claimButton.Text = "Claiming...";
 									local r = remoteBattlepassRemote:InvokeServer("claimpostreward", lvl);
@@ -2938,7 +2934,7 @@ function Interface.init(modInterface)
 										end
 
 									elseif r.Success == true then
-										game.Debris:AddItem(lvlSlotInfo.GlowLabel, 0);
+										game.Debris:AddItem(postLvlSlotInfo.GlowLabel, 0);
 										itemButtonObj.DimOut = true;
 										itemButtonObj:Update();
 										
@@ -2962,9 +2958,9 @@ function Interface.init(modInterface)
 							end)
 						end
 
-						local itemButtonObj = lvlSlotInfo.ItemButton;
+						local itemButtonObj = postLvlSlotInfo.ItemButton;
 
-						local claimState = lvlSlotInfo.GetClaimState(lvl);
+						local claimState = postLvlSlotInfo.GetClaimState(lvl);
 
 						if claimState == "CanClaim" then
 							game.Debris:AddItem(itemButtonObj.ImageButton:FindFirstChild("LockLabel"), 0);
@@ -2974,14 +2970,14 @@ function Interface.init(modInterface)
 							newGlow.ImageColor3 = Color3.fromRGB(255, 255, 255);
 							newGlow.ImageTransparency = 0.6;
 							newGlow.Parent = itemButtonObj.ImageButton;
-							lvlSlotInfo.GlowLabel = newGlow;
+							postLvlSlotInfo.GlowLabel = newGlow;
 							itemButtonObj.DimOut = nil;
 							itemButtonObj.ImageButton.radialBar.Visible = true;
 
 
 						elseif claimState == "Claimed" then
 							game.Debris:AddItem(itemButtonObj.ImageButton:FindFirstChild("LockLabel"), 0);
-							game.Debris:AddItem(lvlSlotInfo.GlowLabel, 0);
+							game.Debris:AddItem(postLvlSlotInfo.GlowLabel, 0);
 							itemButtonObj.DimOut = true;
 							itemButtonObj.ImageButton.radialBar.Visible = false;
 
@@ -3033,7 +3029,6 @@ function Interface.init(modInterface)
 						Interface:PlayButtonClick();
 
 						MissionDisplayFrame:ClearAllChildren();
-						previousId = nil;
 
 						local passRewardFrame = templatePassReward:Clone();
 						passRewardFrame.Parent = MissionDisplayFrame;

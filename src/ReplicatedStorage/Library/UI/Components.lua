@@ -425,6 +425,11 @@ function Components.CreateHoldDownButton(mainInterface, paramPacket)
 
 	local progressBar = self.Button:WaitForChild("Bar") :: Frame;
 
+	local holdDuration = 1;
+	if paramPacket.Duration then
+		holdDuration = paramPacket.Duration;
+	end
+
 	if paramPacket.Color then
 		local color: Color3 = paramPacket.Color;
 		local h,s,v = color:ToHSV();
@@ -436,7 +441,6 @@ function Components.CreateHoldDownButton(mainInterface, paramPacket)
 	local initTick;
 	local buttonDown = false;
 	
-	local holdDuration = 1;
 	self.Button.InputBegan:Connect(function(inputObject, gameProcessed)
 		if gameProcessed then return end;
 		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
