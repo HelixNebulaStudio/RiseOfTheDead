@@ -34,16 +34,17 @@ return function(npc, spawnPoint)
 
 	--== Initialize;
 	function self.Initialize()
-		local level = math.max(self.Configuration.Level-1, 0);
+		local level = math.max(self.Configuration.Level, 0);
 		
-		self.Move.SetDefaultWalkSpeed = 18+math.floor(level/10);
-		self.Move:Init();
-		
-		self.Humanoid.MaxHealth = level == 0 and 50 or math.max(100 + 50*level, 100);
+		self.Humanoid.MaxHealth = math.max(50 + 50*level, 50);
 		self.Humanoid.Health = self.Humanoid.MaxHealth;
 
 		self.Properties.AttackDamage = 5 + (level/2);
-		
+
+		self.Move.SetDefaultWalkSpeed = 18 + math.floor(level/10);
+		self.Move:Init();
+		--
+
 		self.RandomClothing(self.Name);
 		self.NekronMask();
 
