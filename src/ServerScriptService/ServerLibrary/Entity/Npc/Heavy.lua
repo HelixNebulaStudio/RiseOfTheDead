@@ -2,26 +2,26 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local ZombieModule = script.Parent.Zombie;
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 
 local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
+--==
 
--- Note; Function called for each zombie before zombie parented to workspace;
 return function(npc, spawnPoint)
+	--== Configurations;
 	local self = modNpcComponent{
 		Prefab = npc;
-		SpawnPoint = spawnPoint; -- CFrame;
+		SpawnPoint = spawnPoint;
 		
 		AggressLevel = 0;
 		
 		Properties = {
 			BasicEnemy=true;
-			WalkSpeed={Min=8; Max=12};
 			AttackSpeed=2.3;
-			AttackDamage=10;
 			AttackRange=4;
 			TargetableDistance=50;
+
+			AttackDamage=nil;
 		};
 
 		Configuration = {
@@ -34,16 +34,18 @@ return function(npc, spawnPoint)
 
 	--== Initialize;	
 	function self.Initialize()
-		local level = math.max(self.Configuration.Level-1, 0);
+		local level = math.max(self.Configuration.Level, 0);
 
-		self.Move.SetDefaultWalkSpeed = 10+math.floor(level/15);
-		self.Move:Init();
-		self.Immunity = 0.8;
-		
-		self.Humanoid.MaxHealth = math.max(200 + 100*level, 100);
+		self.Humanoid.MaxHealth = math.max(100 + 100*level, 100);
 		self.Humanoid.Health = self.Humanoid.MaxHealth;
 
 		self.Properties.AttackDamage = 30 + 3*level;
+
+		self.Immunity = 0.8;
+
+		self.Move.SetDefaultWalkSpeed = 10+math.floor(level/15);
+		self.Move:Init();
+		--
 		
 		self.RandomClothing(self.Name, false);
 		self.NekronMask();
@@ -53,7 +55,6 @@ return function(npc, spawnPoint)
 	end
 
 	--== Components;
-	
 	self:AddComponent("AntiSit");
 	self:AddComponent("WeakPoint");
 	self:AddComponent("DropReward");
@@ -67,7 +68,7 @@ return function(npc, spawnPoint)
 	self:AddComponent(ZombieModule.Idle);
 	self:AddComponent(ZombieModule.NekronMask);
 
-	--== NPC Logic;
+	--== Signals;
 	self.Garbage:Tag(self.Think:Connect(function()
 		self.BehaviorTree:RunTree("HeavyTree", true);
 		self.Humanoid:SetAttribute("AggressLevel", self.AggressLevel);

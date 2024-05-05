@@ -34,17 +34,18 @@ return function(npc, spawnPoint)
 	
 	--== Initialize;
 	function self.Initialize()
-		local level = math.max(self.Configuration.Level-1, 0);
+		local level = math.max(self.Configuration.Level, 0);
+		
+		self.Humanoid.MaxHealth = math.max(50*level, 50);
+		self.Humanoid.Health = self.Humanoid.MaxHealth;
+
+		self.Properties.AttackDamage = 30 + (1*level);
 		
 		self.Move.SetDefaultWalkSpeed = 35;
 		self.Move:Init();
-		
-		self.Humanoid.MaxHealth = math.max(50 + 50*level);
-		self.Humanoid.Health = self.Humanoid.MaxHealth;
-		self.Properties.AttackDamage = 30 + (1*level);
+		--
 		
 		self.RandomClothing(self.Name, false);
-		
 
 		local ticksModel = self.Prefab:WaitForChild("ExplosiveTickBlobs");
 		local tickBlobs = ticksModel:GetChildren();

@@ -1,20 +1,17 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local random = Random.new();
-
-local TweenService = game:GetService("TweenService");
-
+--==
 local ZombieModule = script.Parent.Zombie;
---== Modules
+
+local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
+local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
+
 local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
-local modPlayers = require(game.ReplicatedStorage.Library.Players);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
-
 local dripEmitter = script:WaitForChild("SporeDripEmitter");
--- Note; Function called for each zombie before zombie parented to workspace;
+--==
+
 return function(npc, spawnPoint)
+	--== Configurations;
 	local self = modNpcComponent{
 		Prefab = npc;
 		SpawnPoint = spawnPoint;
@@ -23,11 +20,11 @@ return function(npc, spawnPoint)
 		
 		Properties = {
 			BasicEnemy=true;
-			WalkSpeed={Min=15; Max=15};
 			AttackSpeed=2;
-			AttackDamage=5;
 			AttackRange=7;
 			TargetableDistance=100;
+			
+			AttackDamage=nil;
 		};
 		
 		Configuration = {
@@ -40,30 +37,23 @@ return function(npc, spawnPoint)
 	
 	--== Initialize;
 	function self.Initialize()
-		local level = math.max(self.Configuration.Level-1, 0);
+		local level = math.max(self.Configuration.Level, 0);
+
+		self.Humanoid.MaxHealth = math.max(0 + 100*level, 100);
+		self.Humanoid.Health = self.Humanoid.MaxHealth;
+		
+		self.Properties.AttackDamage = 30 + 2*level;
 
 		self.Move.SetDefaultWalkSpeed = 10;
 		self.Move:Init();
 		
-		self.Humanoid.MaxHealth = math.max(50 + 100*level);
-		self.Humanoid.Health = self.Humanoid.MaxHealth;
-		
-		self.Properties.AttackDamage = 30 + 2*level;
 		
 		self.RandomClothing(self.Name, false);
 		
 		local sporesModel = self.Prefab:WaitForChild("Spores");
 		local sporesParts = sporesModel:GetChildren();
 		
-		local function shuffleArray(array)
-			if array == nil then return end;
-			local n=#array
-			for i=1,n-1 do
-				local l= random:NextInteger(i,n)
-				array[i],array[l]=array[l],array[i]
-			end
-		end
-		shuffleArray(sporesParts);
+		modTables.Shuffle(sporesParts);
 		for a=1, #sporesParts do
 			if a > 10 then
 				game.Debris:AddItem(sporesParts[a], 0);
@@ -98,13 +88,12 @@ return function(npc, spawnPoint)
 	self:AddComponent(ZombieModule.HeavyAttack1);
 	self:AddComponent(ZombieModule.DizzyCloud);
 	
-	--== NPC Logic;
+	--== Signals;
 	self.Garbage:Tag(self.Think:Connect(function()
 		self.BehaviorTree:RunTree("BloaterTree", true);
 		self.Humanoid:SetAttribute("AggressLevel", self.AggressLevel);
 	end));
 	
-	--== Connections;
 	self.Garbage:Tag(self.Humanoid.HealthChanged:Connect(self.OnHealthChanged));
 	self.Garbage:Tag(self.Humanoid.Died:Connect(function(...)
 		game.Debris:AddItem(self.Prefab:FindFirstChild("Spores"), 0);
@@ -112,4 +101,6 @@ return function(npc, spawnPoint)
 		self.DizzyCloud(math.clamp(self.Configuration.Level, 10, 30));
 	end));
 	
-return self end
+
+	return self;
+end

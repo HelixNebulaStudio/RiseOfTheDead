@@ -1,19 +1,15 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local random = Random.new();
-
-local TweenService = game:GetService("TweenService");
-
+--==
 local ZombieModule = script.Parent.Zombie;
---== Modules
-local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
-local modPlayers = require(game.ReplicatedStorage.Library.Players);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
+local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
 
--- Note; Function called for each zombie before zombie parented to workspace;
+local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
+--==
+
 return function(npc, spawnPoint)
+	--== Configurations;
 	local self = modNpcComponent{
 		Prefab = npc;
 		SpawnPoint = spawnPoint;
@@ -23,9 +19,10 @@ return function(npc, spawnPoint)
 		Properties = {
 			BasicEnemy=true;
 			AttackSpeed=0.5;
-			AttackDamage=30;
 			AttackRange=8;
 			TargetableDistance=70;
+
+			AttackDamage=nil;
 		};
 		
 		Configuration = {
@@ -38,15 +35,16 @@ return function(npc, spawnPoint)
 	
 	--== Initialize;
 	function self.Initialize()
-		local level = math.max(self.Configuration.Level-1, 0);
+		local level = math.max(self.Configuration.Level, 0);
 
-		self.Move.SetDefaultWalkSpeed = 15+math.floor(level/10);
-		self.Move:Init();
-		
 		self.Humanoid.MaxHealth = math.max(100 + 100*level, 200);
 		self.Humanoid.Health = self.Humanoid.MaxHealth;
 
-		self.Properties.AttackDamage = 10 + 0.35*level;
+		self.Properties.AttackDamage = 10 + level/3;
+
+		self.Move.SetDefaultWalkSpeed = 15+math.floor(level/10);
+		self.Move:Init();
+		--
 
 		self.JointsDestroyed = {};
 		self.JointsStrength = {
@@ -62,27 +60,16 @@ return function(npc, spawnPoint)
 		local driedFleshModel = self.Prefab:WaitForChild("DriedNekronFlesh");
 		local fleshParts = driedFleshModel:GetChildren();
 		
-		local function shuffleArray(array)
-			if array == nil then return end;
-			local n=#array
-			for i=1,n-1 do
-				local l= random:NextInteger(i,n)
-				array[i],array[l]=array[l],array[i]
-			end
-		end
-		shuffleArray(fleshParts);
+		modTables.Shuffle(fleshParts);
 		for a=1, #fleshParts do
 			if a > 3 then
-				game.Debris:AddItem(fleshParts[a], 0);
-				
+				Debugger.Expire(fleshParts[a], 0);
 			else
 				local part = fleshParts[a];
 				part.Transparency = 0;
-				
 			end
 		end
 		
-
 		function self.CustomHealthbar:OnDamaged(amount, fromPlayer: Player, storageItem, bodyPart)
 			if bodyPart == nil then return end;
 			
@@ -90,7 +77,8 @@ return function(npc, spawnPoint)
 				self:TakeDamage(bodyPart.Parent.Name, amount);
 				return true;
 			end
-			
+
+			return;
 		end
 		
 		local shieldPrefix = {"Left"; "Right"};
@@ -137,17 +125,17 @@ return function(npc, spawnPoint)
 	self:AddComponent(ZombieModule.BasicAttack2);
 	self:AddComponent(ZombieModule.HeavyAttack1);
 	
-	--== NPC Logic;
+	--== Signals;
 	self.Garbage:Tag(self.Think:Connect(function()
 		self.BehaviorTree:RunTree("GrowlerTree", true);
 		self.Humanoid:SetAttribute("AggressLevel", self.AggressLevel);
 	end));
 	
-	--== Connections;
 	self.Garbage:Tag(self.Humanoid.HealthChanged:Connect(self.OnHealthChanged));
 	self.Garbage:Tag(self.Humanoid.Died:Connect(function(...)
 		game.Debris:AddItem(self.Prefab:FindFirstChild("DriedNekronFlesh"), 0);
 		self.OnDeath(...);
 	end));
 	
-return self end
+	return self;
+end

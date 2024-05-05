@@ -2,16 +2,16 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local ZombieModule = script.Parent.Zombie;
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 
 local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
+--==
 
--- Note; Function called for each zombie before zombie parented to workspace;
 return function(npc, spawnPoint)
+	--== Configurations;
 	local self = modNpcComponent{
 		Prefab = npc;
-		SpawnPoint = spawnPoint; -- CFrame;
+		SpawnPoint = spawnPoint;
 		
 		AggressLevel = 0;
 		
@@ -19,7 +19,8 @@ return function(npc, spawnPoint)
 			BasicEnemy=true;
 			AttackSpeed = 2;
 			AttackRange = 5;
-			AttackDamage = 20;
+
+			AttackDamage = nil;
 		};
 
 		Configuration = {
@@ -34,16 +35,16 @@ return function(npc, spawnPoint)
 
 	--== Initialize;	
 	function self.Initialize()
-		local level = math.max(self.Configuration.Level-1, 0);
-		self.Properties.AttackDamage = 20 + 2*level;
+		local level = math.max(self.Configuration.Level, 0);
 		
-		self.Move:Init();
-		
-		self.Humanoid.MaxHealth = math.max(200 + 200*level, 200);
+		self.Humanoid.MaxHealth = math.max(200*level, 200);
 		self.Humanoid.Health = self.Humanoid.MaxHealth;
 		
+		self.Properties.AttackDamage = 20 + 2*level;
 		self.MeleeImmunity = 1;
 
+		self.Move:Init();
+		
 		self.UpperTorso = self.Prefab:WaitForChild("UpperTorso");
 		self.LowerTorsoJoint = self.Prefab:WaitForChild("LowerTorso"):WaitForChild("Root");
 		
@@ -52,7 +53,6 @@ return function(npc, spawnPoint)
 	end
 
 	--== Components;
-	
 	self:AddComponent("AntiSit");
 	self:AddComponent("WeakPoint");
 	self:AddComponent("DropReward");
@@ -63,7 +63,7 @@ return function(npc, spawnPoint)
 	self:AddComponent(ZombieModule.OnTarget);
 	self:AddComponent(ZombieModule.BasicAttack2);
 
-	--== NPC Logic;
+	--== Signals;
 	self.Garbage:Tag(self.Think:Connect(function()
 		self.BehaviorTree:RunTree("TendrilsTree", true);
 		self.Humanoid:SetAttribute("AggressLevel", self.AggressLevel);

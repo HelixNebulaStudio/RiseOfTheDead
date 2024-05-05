@@ -1,27 +1,23 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local random = Random.new();
-
+--==
 local ZombieModule = script.Parent.Zombie;
---== Modules
+
 local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
-local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+--==
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
-
--- Note; Function called for each zombie before zombie parented to workspace;
 return function(npc, spawnPoint)
+	--== Configurations;
 	local self = modNpcComponent{
 		Prefab = npc;
 		SpawnPoint = spawnPoint;
 		
 		Properties = {
 			BasicEnemy=true;
-			WalkSpeed={Min=14; Max=16};
 			AttackSpeed=1;
-			AttackDamage=30;
 			AttackRange=8;
 			TargetableDistance=70;
+
+			AttackDamage=nil;
 		};
 		
 		Configuration = {
@@ -34,19 +30,18 @@ return function(npc, spawnPoint)
 	
 	--== Initialize;
 	function self.Initialize()
-		local level = math.max(self.Configuration.Level-1, 0);
+		local level = math.max(self.Configuration.Level, 0);
 
+		self.Humanoid.MaxHealth = math.max(2000*level, 0);
+		self.Humanoid.Health = self.Humanoid.MaxHealth;
+
+		self.Properties.AttackDamage = 25 + 2*level;
+		
 		self.Move.SetDefaultWalkSpeed = 15;
 		self.Move:Init();
 
 		self.Prefab:SetAttribute("EntityHudHealth", true);
 		
-		self.Humanoid.MaxHealth = 1000 + 2000*level;
-		self.Humanoid.Health = self.Humanoid.MaxHealth;
-		self.Properties.AttackDamage = 25 + 2*level;
-		
-		self.Properties.AttackCooldown = tick();
-
 		self.Think:Fire();
 		coroutine.yield();
 	end
@@ -62,7 +57,7 @@ return function(npc, spawnPoint)
 	self:AddComponent(ZombieModule.BasicAttack1);
 	
 	
-	--== Connections;
+	--== Signals;
 	self.Garbage:Tag(self.Think:Connect(function()
 		self.BehaviorTree:RunTree("DrSinisterTree", true);
 	end));
