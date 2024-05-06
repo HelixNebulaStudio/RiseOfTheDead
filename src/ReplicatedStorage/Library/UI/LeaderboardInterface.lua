@@ -59,6 +59,9 @@ function LeaderboardInterface.new(keyTable, defaultAb)
 	local optionFrame = newLeaderboard:WaitForChild("options");
 	local tableLayout = optionFrame:WaitForChild("UITableLayout");
 	local allTimeTopButton = optionFrame:WaitForChild("allTimeOption"):WaitForChild("allTimeTop");
+	local yearlyTopButton = optionFrame:WaitForChild("yearlyOption"):WaitForChild("yearlyTop");
+	local seasonlyTopButton = optionFrame:WaitForChild("seasonlyOption"):WaitForChild("seasonlyTop");
+	local monthlyTopButton = optionFrame:WaitForChild("monthlyOption"):WaitForChild("monthlyTop");
 	local weeklyTopButton = optionFrame:WaitForChild("weeklyOption"):WaitForChild("weeklyTop");
 	local dailyTopButton = optionFrame:WaitForChild("dailyOption"):WaitForChild("dailyTop");
 	
@@ -68,11 +71,26 @@ function LeaderboardInterface.new(keyTable, defaultAb)
 
 	local function refresh()
 		tableLayout.Padding = UDim2.new(0, 6, 0, 0);
+
 		if activeBoard == "Daily" then
-			hintLabel.Text = "Daily board resets in "..modSyncTime.ToString(modSyncTime.TimeOfEndOfDay()-modSyncTime.GetTime());
+			local timeLeft = modSyncTime.TimeOfEndOfDay()-modSyncTime.GetTime();
+			hintLabel.Text = "Daily board resets in "..modSyncTime.ToString(timeLeft);
 			
 		elseif activeBoard == "Weekly" then
-			hintLabel.Text = "Weekly board resets in "..modSyncTime.ToString(modSyncTime.TimeOfEndOfWeek()-modSyncTime.GetTime());
+			local timeLeft = modSyncTime.TimeOfEndOfWeek()-modSyncTime.GetTime();
+			hintLabel.Text = "Weekly board resets in "..modSyncTime.ToString(timeLeft);
+			
+		elseif activeBoard == "Monthly" then
+			local timeLeft = modSyncTime.TimeOfEndOfMonth()-modSyncTime.GetTime();
+			hintLabel.Text = "Monthly board resets in "..modSyncTime.ToString(timeLeft);
+
+		elseif activeBoard == "Seasonly" then
+			local timeLeft = modSyncTime.TimeOfEndOfSeason()-modSyncTime.GetTime();
+			hintLabel.Text = "Seasonly board resets in "..modSyncTime.ToString(timeLeft);
+
+		elseif activeBoard == "Yearly" then
+			local timeLeft = modSyncTime.TimeOfEndOfYear()-modSyncTime.GetTime();
+			hintLabel.Text = "Yearly board resets in "..modSyncTime.ToString(timeLeft);
 			
 		else
 			hintLabel.Text = "";
@@ -112,7 +130,6 @@ function LeaderboardInterface.new(keyTable, defaultAb)
 			local posTag = new:WaitForChild("posFrame"):WaitForChild("posTag");
 			local valueTag = new:WaitForChild("valueFrame"):WaitForChild("valueTag");
 			
-			
 			nameTag.Text = isDevBranch and "[Failed to Load]" or name:sub(1, 1):upper()..name:sub(2, #name);
 			if avatar then
 				avatarTag.Image = avatar;
@@ -150,10 +167,50 @@ function LeaderboardInterface.new(keyTable, defaultAb)
 			activeBoard = "AllTime";
 			loadLeaderboard(modLeaderboardService:GetTable(keyTable.AllTimeTableKey));
 		end)
+		activeBoard = "AllTime";
 	else
 		allTimeTopButton.Parent.Visible = false;
 	end
 	
+	if keyTable.YearlyTableKey then
+		yearlyTopButton.Parent.Visible = true;
+		yearlyTopButton.MouseButton1Click:Connect(function()
+			loadingKey = loadingKey +1;
+			modInterface:PlayButtonClick();
+			activeBoard = "Yearly";
+			loadLeaderboard(modLeaderboardService:GetTable(keyTable.YearlyTableKey)); 
+		end)
+		activeBoard = "Yearly";
+	else
+		yearlyTopButton.Parent.Visible = false;
+	end
+
+	if keyTable.SeasonlyTableKey then
+		seasonlyTopButton.Parent.Visible = true;
+		seasonlyTopButton.MouseButton1Click:Connect(function()
+			loadingKey = loadingKey +1;
+			modInterface:PlayButtonClick();
+			activeBoard = "Seasonly";
+			loadLeaderboard(modLeaderboardService:GetTable(keyTable.SeasonlyTableKey)); 
+		end)
+		activeBoard = "Seasonly";
+	else
+		seasonlyTopButton.Parent.Visible = false;
+	end
+
+	if keyTable.MonthlyTableKey then
+		monthlyTopButton.Parent.Visible = true;
+		monthlyTopButton.MouseButton1Click:Connect(function()
+			loadingKey = loadingKey +1;
+			modInterface:PlayButtonClick();
+			activeBoard = "Monthly";
+			loadLeaderboard(modLeaderboardService:GetTable(keyTable.MonthlyTableKey)); 
+		end)
+		activeBoard = "Monthly";
+	else
+		monthlyTopButton.Parent.Visible = false;
+	end
+
 	if keyTable.WeeklyTableKey then
 		weeklyTopButton.Parent.Visible = true;
 		weeklyTopButton.MouseButton1Click:Connect(function()
@@ -162,6 +219,7 @@ function LeaderboardInterface.new(keyTable, defaultAb)
 			activeBoard = "Weekly";
 			loadLeaderboard(modLeaderboardService:GetTable(keyTable.WeeklyTableKey)); 
 		end)
+		activeBoard = "Weekly";
 	else
 		weeklyTopButton.Parent.Visible = false;
 	end
@@ -174,6 +232,7 @@ function LeaderboardInterface.new(keyTable, defaultAb)
 			activeBoard = "Daily";
 			loadLeaderboard(modLeaderboardService:GetTable(keyTable.DailyTableKey));
 		end)
+		activeBoard = "Daily";
 	else
 		dailyTopButton.Parent.Visible = false;
 	end
@@ -188,10 +247,22 @@ function LeaderboardInterface.new(keyTable, defaultAb)
 	spawn(function()
 		if keyTable.DailyTableKey then
 			loadLeaderboard(modLeaderboardService:GetTable(keyTable.DailyTableKey));
+			
 		elseif keyTable.WeeklyTableKey then
 			loadLeaderboard(modLeaderboardService:GetTable(keyTable.WeeklyTableKey));
+
+		elseif keyTable.MonthlyTableKey then
+			loadLeaderboard(modLeaderboardService:GetTable(keyTable.MonthlyTableKey));
+
+		elseif keyTable.SeasonlyTableKey then
+			loadLeaderboard(modLeaderboardService:GetTable(keyTable.SeasonlyTableKey));
+
+		elseif keyTable.YearlyTableKey then
+			loadLeaderboard(modLeaderboardService:GetTable(keyTable.YearlyTableKey));
+
 		elseif keyTable.AllTimeTableKey then
 			loadLeaderboard(modLeaderboardService:GetTable(keyTable.AllTimeTableKey));
+
 		end
 	end)
 	
@@ -205,6 +276,15 @@ function LeaderboardInterface.new(keyTable, defaultAb)
 		if activeBoard == "AllTime" and keyTable.AllTimeTableKey then
 			loadLeaderboard(modLeaderboardService:GetTable(keyTable.AllTimeTableKey));
 			
+		elseif activeBoard == "Yearly" and keyTable.YearlyTableKey then
+			loadLeaderboard(modLeaderboardService:GetTable(keyTable.YearlyTableKey));
+			
+		elseif activeBoard == "Seasonly" and keyTable.SeasonlyTableKey then
+			loadLeaderboard(modLeaderboardService:GetTable(keyTable.SeasonlyTableKey));
+			
+		elseif activeBoard == "Monthly" and keyTable.MonthlyTableKey then
+			loadLeaderboard(modLeaderboardService:GetTable(keyTable.MonthlyTableKey));
+
 		elseif activeBoard == "Weekly" and keyTable.WeeklyTableKey then
 			loadLeaderboard(modLeaderboardService:GetTable(keyTable.WeeklyTableKey));
 			

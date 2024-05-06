@@ -347,9 +347,9 @@ function Interface.init(modInterface)
 			if newLeaderboard == nil then
 				newLeaderboard = modLeaderboardInterface.new({
 					StatName="Faction Score";
-					--AllTimeTableKey="AllTime".. modLeaderboardService.FactionBoardKey;
+					SeasonlyTableKey="Seasonly".. modLeaderboardService.FactionBoardKey;
+					MonthlyTableKey="Monthly".. modLeaderboardService.FactionBoardKey;
 					WeeklyTableKey="Weekly".. modLeaderboardService.FactionBoardKey;
-					DailyTableKey="Daily".. modLeaderboardService.FactionBoardKey;
 				});
 				newLeaderboard.Frame.BackgroundTransparency = 1;
 				newLeaderboard.Frame.Parent = centerFrame;

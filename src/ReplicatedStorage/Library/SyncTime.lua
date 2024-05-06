@@ -34,6 +34,21 @@ if RunService:IsServer() then
 	SyncTime.EndOfWeek.Name = "EndOfWeek";
 	SyncTime.EndOfWeek.Value = os.time();
 	SyncTime.EndOfWeek.Parent = game.ReplicatedStorage
+	
+	SyncTime.EndOfMonth = Instance.new("IntValue");
+	SyncTime.EndOfMonth.Name = "EndOfMonth";
+	SyncTime.EndOfMonth.Value = os.time();
+	SyncTime.EndOfMonth.Parent = game.ReplicatedStorage
+	
+	SyncTime.EndOfSeason = Instance.new("IntValue");
+	SyncTime.EndOfSeason.Name = "EndOfSeason";
+	SyncTime.EndOfSeason.Value = os.time();
+	SyncTime.EndOfSeason.Parent = game.ReplicatedStorage
+
+	SyncTime.EndOfYear = Instance.new("IntValue");
+	SyncTime.EndOfYear.Name = "EndOfYear";
+	SyncTime.EndOfYear.Value = os.time();
+	SyncTime.EndOfYear.Parent = game.ReplicatedStorage
 
 	SyncTime.TimeOffset = Instance.new("IntValue");
 	SyncTime.TimeOffset.Name = "TimeOffset";
@@ -71,11 +86,18 @@ if RunService:IsServer() then
 			SyncTime.WeekDay.Value = SyncTime.Weekdays[os.date("*t", unixTime).wday];
 
 			local t = os.date("!*t", unixTime);
+			local smonth = (4 - ((t.month+1) % 4)); 
+			t.month = (12 - t.month);
+			t.day = (31 - t.day);
 			t.wday = (8 - t.wday) % 7;
 			t.hour, t.min, t.sec = 23 - t.hour, 59 - t.min, 59 - t.sec;
 
-			SyncTime.EndOfDay.Value = unixTime+t.hour*3600+t.min*60+t.sec; --  - (3600*2) test offset
-			SyncTime.EndOfWeek.Value = unixTime+(t.wday)*86400+t.hour*3600+t.min*60+t.sec;
+			SyncTime.EndOfDay.Value = unixTime+t.hour*3600+t.min*60+t.sec;
+			SyncTime.EndOfWeek.Value = unixTime+(t.wday*86400)+t.hour*3600+t.min*60+t.sec;
+			
+			SyncTime.EndOfMonth.Value = unixTime+(t.day*86400)+(t.hour*3600)+(t.min*60)+(t.sec);
+			SyncTime.EndOfSeason.Value = unixTime+(smonth*2678400)+(t.day*86400)+(t.hour*3600)+(t.min*60)+(t.sec);
+			SyncTime.EndOfYear.Value = unixTime+(t.month*2678400)+(t.day*86400)+(t.hour*3600)+(t.min*60)+(t.sec);
 		end
 	end)
 end
@@ -97,6 +119,21 @@ end
 function SyncTime.TimeOfEndOfWeek()
 	SyncTime.EndOfWeek = SyncTime.EndOfWeek or game.ReplicatedStorage:FindFirstChild("EndOfWeek");
 	return SyncTime.EndOfWeek.Value;
+end
+
+function SyncTime.TimeOfEndOfMonth()
+	SyncTime.EndOfMonth = SyncTime.EndOfMonth or game.ReplicatedStorage:FindFirstChild("EndOfMonth");
+	return SyncTime.EndOfMonth.Value;
+end
+
+function SyncTime.TimeOfEndOfSeason()
+	SyncTime.EndOfSeason = SyncTime.EndOfSeason or game.ReplicatedStorage:FindFirstChild("EndOfSeason");
+	return SyncTime.EndOfSeason.Value;
+end
+
+function SyncTime.TimeOfEndOfYear()
+	SyncTime.EndOfYear = SyncTime.EndOfYear or game.ReplicatedStorage:FindFirstChild("EndOfYear");
+	return SyncTime.EndOfYear.Value;
 end
 
 function SyncTime.GetUpTime()
@@ -137,7 +174,41 @@ function SyncTime.ToString(s)
 	if s < 3600 then
 		return string.format("%02i:%02i", s/60%60, s%60);
 	end
-	return string.format("%02i:%02i:%02i", s/(3600), s/60%60, s%60);
+	if s/(3600) <= 24 then
+		return string.format("%02i:%02i:%02i", s/(3600), s/60%60, s%60);
+	end
+	return string.format("%02id:%02i:%02i:%02i", math.floor(s/3600/24), (s/(3600)) % 24, s/60%60, s%60);
 end
+
+task.spawn(function()
+	if RunService:IsClient() then return end;
+
+	Debugger.AwaitShared("modCommandsLibrary");
+	shared.modCommandsLibrary:HookChatCommand("synctime", {
+		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+
+		RequiredArgs = 0;
+		UsageInfo = "/synctime [endtimes]";
+		Function = function(player, args)
+			local action = args[1];
+			
+			if action == "endtimes" then
+
+				local function warnNotify(...)
+					Debugger:Warn(...);
+					shared.Notify(player, Debugger:Stringify(...), "Inform");
+				end
+
+				warnNotify("EoD", DateTime.fromUnixTimestamp(SyncTime.EndOfDay.Value):ToIsoDate());
+				warnNotify("EoW", DateTime.fromUnixTimestamp(SyncTime.EndOfWeek.Value):ToIsoDate());
+				warnNotify("EoM", DateTime.fromUnixTimestamp(SyncTime.EndOfMonth.Value):ToIsoDate());
+				warnNotify("EoS", DateTime.fromUnixTimestamp(SyncTime.EndOfSeason.Value):ToIsoDate());
+				warnNotify("EoY", DateTime.fromUnixTimestamp(SyncTime.EndOfYear.Value):ToIsoDate());
+			end
+			
+			return true;
+		end;
+	});
+end)
 
 return SyncTime;

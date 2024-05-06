@@ -69,34 +69,33 @@ local library = {
 local factionBoardKey = "FactionMissionScore"
 LeaderboardService.FactionBoardKey = factionBoardKey;
 
---library["AllTime"..factionBoardKey]={
---	LookUpKey="Factions";
---	Folder="AllTimeStats";
---	RanksLimit=100;
+library["Seasonly"..factionBoardKey]={
+	LookUpKey="Factions";
+	Folder="SeasonlyStats";
 
---	DatastoreName="L_AllTime_"..factionBoardKey;
---	DatastoreId="L_AllTime_"..factionBoardKey;
---	DataKey=factionBoardKey;
---};
+	DatastoreName="L_Seasonly_"..factionBoardKey;
+	DatastoreId="L_Seasonly_"..factionBoardKey;
+	RanksLimit=10;
+	DataKey=factionBoardKey;
+};
+library["Monthly"..factionBoardKey]={
+	LookUpKey="Factions";
+	Folder="MonthlyStats";
+
+	DatastoreName="L_Monthly_"..factionBoardKey;
+	DatastoreId="L_Monthly_"..factionBoardKey;
+	RanksLimit=25;
+	DataKey=factionBoardKey;
+};
 library["Weekly"..factionBoardKey]={
 	LookUpKey="Factions";
 	Folder="WeeklyStats";
 
 	DatastoreName="L_Weekly_"..factionBoardKey;
 	DatastoreId="L_Weekly_"..factionBoardKey;
-	RanksLimit=25;
+	RanksLimit=50;
 	DataKey=factionBoardKey;
 };
-library["Daily"..factionBoardKey]={
-	LookUpKey="Factions";
-	Folder="DailyStats";
-
-	DatastoreName="L_Daily_"..factionBoardKey;
-	DatastoreId="L_Daily_"..factionBoardKey;
-	RanksLimit=25;
-	DataKey=factionBoardKey;
-};
-
 
 
 local uploadTimer = 120;
@@ -116,13 +115,24 @@ end
 
 
 function LeaderboardService.UpdateDatastoreScopes(lbTable)
-	local dayEndTick = modSyncTime.TimeOfEndOfDay()
-	local weekEndTick = modSyncTime.TimeOfEndOfWeek()
-	
-	if lbTable.Folder == "WeeklyStats" then
+	if lbTable.Folder == "YearlyStats" then
+		local yearEndTick = modSyncTime.TimeOfEndOfYear();
+		lbTable.DatastoreId = lbTable.DatastoreName.."/"..yearEndTick;
+		
+	elseif lbTable.Folder == "SeasonlyStats" then
+		local seasonEndTick = modSyncTime.TimeOfEndOfSeason();
+		lbTable.DatastoreId = lbTable.DatastoreName.."/"..seasonEndTick;
+		
+	elseif lbTable.Folder == "MonthlyStats" then
+		local monthEndTick = modSyncTime.TimeOfEndOfMonth();
+		lbTable.DatastoreId = lbTable.DatastoreName.."/"..monthEndTick;
+		
+	elseif lbTable.Folder == "WeeklyStats" then
+		local weekEndTick = modSyncTime.TimeOfEndOfWeek();
 		lbTable.DatastoreId = lbTable.DatastoreName.."/"..weekEndTick;
 		
 	elseif lbTable.Folder == "DailyStats" then 
+		local dayEndTick = modSyncTime.TimeOfEndOfDay();
 		lbTable.DatastoreId = lbTable.DatastoreName.."/"..dayEndTick;
 		
 	end
@@ -298,9 +308,6 @@ function LeaderboardService.Init(libOverwrite)
 	LeaderboardService.Initialized = true;
 	
 	if libOverwrite then
-		--for key, value in pairs(library) do
-		--	library[key] = nil;
-		--end
 		for key, _ in pairs(libOverwrite) do
 			library[key] = libOverwrite[key];
 		end
@@ -342,6 +349,9 @@ function LeaderboardService.Init(libOverwrite)
 			
 			local keyTable = {
 				"AllTime"..statKey;
+				"Yearly"..statKey;
+				"Seasonly"..statKey;
+				"Monthly"..statKey;
 				"Weekly"..statKey;
 				"Daily"..statKey;
 			}
@@ -386,6 +396,9 @@ function LeaderboardService:SubmitToBoard(leaderKey, boardKey, values)
 
 	local keyTable = {
 		"AllTime"..statKey;
+		"Yearly"..statKey;
+		"Seasonly"..statKey;
+		"Monthly"..statKey;
 		"Weekly"..statKey;
 		"Daily"..statKey;
 	}
