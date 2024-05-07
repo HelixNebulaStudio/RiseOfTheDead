@@ -296,6 +296,7 @@ function AppearanceData:SetEquip(group, accessoryData, storageItem)
 	if self.Equipped[group] == nil then self.Equipped[group] = {} end;
 	local groupEquips = self.Equipped[group];
 	
+	assert(accessoryData, "Missiong accessoryData, maybe package is missing PackageVariant attribute.");
 	local packageId = accessoryData.Name;
 
 	local exist = groupEquips[packageId] == true;
