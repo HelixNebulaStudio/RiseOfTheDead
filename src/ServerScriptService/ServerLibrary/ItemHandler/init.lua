@@ -1,11 +1,14 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
+
+local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modColorsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ColorsLibrary"));
 local modSkinsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("SkinsLibrary"));
-local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+
+local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
+local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 
 local ItemHandler = {};
 ItemHandler.__index = ItemHandler;
@@ -35,6 +38,33 @@ function ItemHandler:ConsumeTomeOfTweaks(player, inputStorageItem)
 	modAnalytics.RecordResource(player.UserId, 10, "Source", "TweakPoints", "Gameplay", "TomeOfTweaks");
 	
 	storage:Remove(storageItem.ID, 1);
+end
+
+function ItemHandler:ConsumeMpBook(player, inputStorageItem)
+	local profile = modProfile:Get(player);
+	local activeSave = profile:GetActiveSave();
+	local storageItem, storage = activeSave:FindItemFromStorages(inputStorageItem.ID);
+
+	if storageItem == nil or storage == nil then return end;
+
+	local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
+	local activeId = modBattlePassLibrary.Active;
+	if activeId == nil then
+		shared.Notify(player, "No active mission pass available.", "Negative");
+		return;
+	end;
+
+	local battlePassSave = profile.BattlePassSave;
+	local passData = battlePassSave:GetPassData(activeId);
+	if passData == nil then
+		shared.Notify(player, "No active mission pass data.", "Negative");
+		return;
+	end
+
+	shared.Notify(player, "You have recieved a level to your mission pass.", "Reward");
+	storage:Remove(storageItem.ID, 1);
+
+	battlePassSave:AddLevel(activeId);
 end
 
 function ItemHandler:UnlockPack(player, inputStorageItem)

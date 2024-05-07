@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
+local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
 local ItemsLibrary = {};
 ItemsLibrary.__index = ItemsLibrary;
@@ -462,6 +463,16 @@ function ItemsLibrary:Init(super)
 		Stackable = 5;
 	}
 	new(usableBase, {Id="tomeoftweaks"; Name="Tome Of Tweaks"; Icon="rbxassetid://6122866034"; TradingTax=20; Tags={"Misc Usable"}; Description="10 Tips and tricks to tweak your weapon. Consuming this will grant you 10 tweak points.";});
+	new(usableBase, {Id="mpbook"; Name="Latest Grinding Guide Publication"; Icon="rbxassetid://17419949268"; TradingTax=1000; Tags={"Misc Usable"};
+		Stackable = false;
+		OnAdd = function(data)
+			local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
+			local battlepassLib = modBattlePassLibrary:Find(modBattlePassLibrary.Active);
+			if battlepassLib then
+				data.Description = `Levels up your <b>{modRichFormatter.ColorRobuxText("Mission Pass: "..battlepassLib.Title)}</b> by 1 level.\n\nOpen your missions menu to see your mission pass progress.`;
+			end
+		end
+	});
 	new(usableBase, {
 		Id="colorcustom";
 		Name="Custom Color";

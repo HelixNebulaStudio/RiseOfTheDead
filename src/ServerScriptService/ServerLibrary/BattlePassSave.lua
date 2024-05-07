@@ -231,7 +231,7 @@ function BattlePassSave:AddTokens(bpId, addAmt)
 	
 end
 
-function BattlePassSave:AddLevel(bpId, addAmt)
+function BattlePassSave:AddLevel(bpId, addAmt, majorAlert)
 	local passData = self:GetPassData(bpId);
 	local bpLib = modBattlePassLibrary:Find(bpId);
 
@@ -244,6 +244,7 @@ function BattlePassSave:AddLevel(bpId, addAmt)
 	local newLevel = passData.Level + addAmt;
 	passData.Level = newLevel;
 	
+	local newRewardAdded = false;
 	if passData.Level >= #treeList then
 		if passData.Completed == false then
 			passData.Completed = true;
@@ -275,6 +276,7 @@ function BattlePassSave:AddLevel(bpId, addAmt)
 						if rewardInfo then
 							rewardInfo.ExpireTime = serverTime+shared.Const.OneDaySecs;
 							passData.PostRewards[lvlStr] = rewardInfo;
+							newRewardAdded = true;
 						end
 					end
 				end
@@ -286,12 +288,14 @@ function BattlePassSave:AddLevel(bpId, addAmt)
 			if serverTime <= rewardInfo.ExpireTime then continue end;
 			passData.PostRewards[lvlStr] = nil;
 		end
-
+		
 	else
 		passData.LastLevelUpTime = workspace:GetServerTimeNow();
-		remoteHudNotification:FireClient(self.Player, "BattlePassLevelUp", {Level=passData.Level; HasRewards=(leafInfo.Reward ~= nil);});
+		newRewardAdded = leafInfo.Reward ~= nil
 
 	end
+	
+	remoteHudNotification:FireClient(self.Player, "BattlePassLevelUp", {Level=passData.Level; HasRewards=newRewardAdded;});
 	self:Sync();
 	
 end
