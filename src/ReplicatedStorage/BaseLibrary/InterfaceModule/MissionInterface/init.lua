@@ -2441,6 +2441,7 @@ function Interface.init(modInterface)
 							end
 							
 							itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
+								if itemButtonObj.DimOut then return end;
 								refreshData();
 								Interface:PlayButtonClick();
 
@@ -2852,6 +2853,7 @@ function Interface.init(modInterface)
 							end
 
 							itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
+								if itemButtonObj.DimOut then return end;
 								if workspace:GetAttribute("IsDev") == true then
 									Debugger:Warn(`Level {lvl} RewardInfo`,rewardInfo);
 								end
