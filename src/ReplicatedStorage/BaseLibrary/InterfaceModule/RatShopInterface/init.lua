@@ -661,9 +661,9 @@ function Interface.init(modInterface)
 			end
 
 			--== MARK: Exchange Gift Shop Tokens
-			local isSkinPerm = modItemsLibrary:HasTag(itemLib.Id, "Skin Perm");
+			local isExchangable = modItemsLibrary:HasTag(itemLib.Id, "Skin Perm") or modItemsLibrary:HasTag(itemLib.Id, "Color Pack") or modItemsLibrary:HasTag(itemLib.Id, "Skin Pack");
 			local activeBpId = modBattlePassLibrary.Active;
-			if activeBpId and #activeBpId > 0 and isSkinPerm then
+			if activeBpId and #activeBpId > 0 and isExchangable then
 				local battlepassLib = modBattlePassLibrary:Find(activeBpId);
 				
 
@@ -690,8 +690,8 @@ function Interface.init(modInterface)
 						if exchangeItemDebounce then return end;
 						exchangeItemDebounce = true;
 
-						local promptWindow = Interface:PromptQuestion(`Exchange {itemLib.Name}`,
-							`Are you sure you want to exchange 1 {itemLib.Name} for {tokenReward} token.`, 
+						local promptWindow = Interface:PromptQuestion(`Exchange <b>{itemLib.Name}</b>`,
+							`Are you sure you want to exchange 1 <b>{itemLib.Name}</b> for <b>{tokenReward}</b> token.`, 
 							"Exchange", "Cancel", battlepassLib.Icon);
 						local YesClickedSignal, NoClickedSignal;
 
@@ -710,14 +710,14 @@ function Interface.init(modInterface)
 							if serverReply == modShopLibrary.PurchaseReplies.Success then
 								promptWindow.Frame.Yes.buttonText.Text = "Exchanged!";
 								wait(0.5);
-								Interface:OpenWindow("Missions", "giftshop");
+								Interface:OpenWindow("RatShopWindow");
 							else
 								warn("Exchange Item>> Error Code:"..tostring(serverReply));
 								promptWindow.Frame.Yes.buttonText.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply));
 							end
 
 							promptWindow:Close();
-							Interface:OpenWindow("Missions", "giftshop");
+							Interface:OpenWindow("RatShopWindow");
 							YesClickedSignal:Disconnect();
 							NoClickedSignal:Disconnect();
 						end);
@@ -758,8 +758,8 @@ function Interface.init(modInterface)
 							if exchangeItemDebounce then return end;
 							exchangeItemDebounce = true;
 	
-							local promptWindow = Interface:PromptQuestion(`Exchange {itemLib.Name}`,
-								`Are you sure you want to exchange {selectedItem.Quantity} {itemLib.Name} for {tokenReward} token.`, 
+							local promptWindow = Interface:PromptQuestion(`Exchange <b>{itemLib.Name}</b>`,
+								`Are you sure you want to exchange {selectedItem.Quantity} <b>{itemLib.Name}</b> for <b>{tokenReward}</b> token.`, 
 								"Exchange", "Cancel", battlepassLib.Icon);
 							local YesClickedSignal, NoClickedSignal;
 	

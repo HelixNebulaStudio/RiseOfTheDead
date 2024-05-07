@@ -329,13 +329,20 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 
 		local storageItem, storage = modStorage.FindIdFromStorages(storageItemID, player);
 		if storage == nil then 
-			Debugger:Warn("BuyRepair>> Missing storage");
+			Debugger:Warn("ExchangeForTokens>> Missing storage");
 			return modShopLibrary.PurchaseReplies.InvalidProduct;
 		end;
 		if storageItem == nil then 
-			Debugger:Warn("BuyRepair>> Missing storage");
+			Debugger:Warn("ExchangeForTokens>> Missing storage");
 			return modShopLibrary.PurchaseReplies.InvalidProduct;
 		end;
+
+		local itemId = storageItem.ItemId;
+		local isExchangable = modItemsLibrary:HasTag(itemId, "Skin Perm") or modItemsLibrary:HasTag(itemId, "Color Pack") or modItemsLibrary:HasTag(itemId, "Skin Pack");
+		if not isExchangable then
+			Debugger:Warn("ExchangeForTokens>> Missing storage");
+			return modShopLibrary.PurchaseReplies.InvalidProduct;
+		end
 
 		local battlePassSave = profile.BattlePassSave;
 		local activeId = modBattlePassLibrary.Active;

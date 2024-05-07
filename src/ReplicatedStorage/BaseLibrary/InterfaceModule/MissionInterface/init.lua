@@ -3246,7 +3246,6 @@ function Interface.init(modInterface)
 				lvlSlotInfo.ItemButton.ImageButton:SetAttribute("FireClick", not lvlSlotInfo.ItemButton.ImageButton:GetAttribute("FireClick") );
 			end
 
-
 			--== MARK: Final Level 
 			if seasonLevel > treeCount then
 				if finalSlotInfo.Slot == nil then
