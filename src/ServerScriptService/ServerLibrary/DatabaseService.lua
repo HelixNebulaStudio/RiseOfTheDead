@@ -5,16 +5,11 @@ local MemoryStoreService = game:GetService("MemoryStoreService");
 local HttpService = game:GetService("HttpService");
 local RunService = game:GetService("RunService");
 
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modSerializer = require(game.ReplicatedStorage.Library.Serializer);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modGameLogService = require(game.ReplicatedStorage.Library.GameLogService);
 local modTableManager = require(game.ReplicatedStorage.Library.TableManager);
 
-local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
-
 local CacheFlushQueue: MemoryStoreQueue = MemoryStoreService:GetQueue("Cache", 60);
-local lastProcessCacheTick = tick();
 local cacheMemPool = (1024*32);
 
 local LocalCacheQueue = {};
@@ -25,9 +20,7 @@ local DatabaseService = {};
 DatabaseService.__index = DatabaseService;
 DatabaseService.Active = {};
 
-local oneHourSecs = 3600;
 local oneDaySecs = 86400;
-local oneMonthSecs = 86400*30;
 
 local devBranchPrefix = modBranchConfigs.CurrentBranch.Name == "Dev" and "dev_" or "";
 --== Script;
@@ -121,6 +114,8 @@ function DatabaseService:AddCache(key, funcId, values)
 		Debugger:Log(":AddCache ",(cachePacket and cachePacket.F or "newCache nil line:130")," (", self.Scope,"/",key ,") successful.");
 		return cachePacket;
 	end
+
+	return;
 end
 
 
@@ -139,8 +134,8 @@ end
 
 
 function DatabaseService:Publish(key, updateFunc)
-	local unixTime = DateTime.now().UnixTimestampMillis;
-	local rawData, dsKeyInfo;
+	local _unixTime = DateTime.now().UnixTimestampMillis;
+	local rawData, _dsKeyInfo;
 	
 	local isDataLocked = false;
 	local loopCount = 1;
@@ -192,7 +187,7 @@ function DatabaseService:Publish(key, updateFunc)
 		if #pulledCache > 0 or updateFunc then
 			
 			local saveS, saveE = TryFunction("PublishStore", function()
-				rawData, dsKeyInfo = self.DataStore:UpdateAsync(key, function(rawData, dsKeyInfo)
+				rawData, _dsKeyInfo = self.DataStore:UpdateAsync(key, function(rawData, dsKeyInfo)
 					local reqId = math.random(100000, 999999);
 					for a=1, #pulledCache do
 						local cacheFuncId = pulledCache[a].F;
@@ -207,6 +202,7 @@ function DatabaseService:Publish(key, updateFunc)
 							requestPacket.RawData = rawData;
 							requestPacket.Values = pulledCache[a].V;
 							requestPacket.Publish = true;
+							requestPacket.FailMsg = nil;
 
 							local callbackFinished = false;
 							local funcS, funcE = pcall(function()
@@ -218,7 +214,8 @@ function DatabaseService:Publish(key, updateFunc)
 								set = callbackFunc(requestPacket);
 								callbackFinished = true;
 
-							end) if not funcS then Debugger:Warn(":Cache (",cacheFuncId,") failed:", funcE, pulledCache[a]); end;
+							end)
+							if not funcS then Debugger:Warn(":Cache (",cacheFuncId,") failed:", funcE, pulledCache[a]); end;
 
 							if requestPacket.FailMsg ~= nil then
 								requestPacket.Success = false;
@@ -238,13 +235,16 @@ function DatabaseService:Publish(key, updateFunc)
 						rawData = updateFunc(rawData, dsKeyInfo);
 					end
 
-					if rawData == nil then Debugger:Log(":Read (",self.Scope,"/",key,")") return nil end;
+					if rawData == nil then
+						Debugger:Log(":Read (",self.Scope,"/",key,")") 
+						return nil 
+					end;
 					return rawData, self.UserIds[key];
 				end)
 			end)
 			
 			if not saveS then 
-				Debugger:Warn(":Published Failed (",self.Scope,"/",key,") TrySave 3 times, aborting..");
+				Debugger:Warn(":Published Failed (",self.Scope,"/",key,") TrySave 3 times, aborting..", saveE);
 				return nil;
 			end;
 			
@@ -262,12 +262,10 @@ function DatabaseService:Publish(key, updateFunc)
 				
 			end
 		end
+		
 	end
 
-	--if self.Serializer then
-	--	return self.Serializer:Deserialize(rawData), dsKeyInfo;
-	--end;
-	--return rawData, dsKeyInfo;
+	return;
 end
 
 function DatabaseService:AddLocalCacheQueue(newScope, newKey)
@@ -296,8 +294,6 @@ function DatabaseService:AddLocalCacheQueue(newScope, newKey)
 end
 
 function DatabaseService:ProcessLocalCacheQueue()
-	local processedScopeKeys = {};
-
 	if typeof(LocalCacheQueue) == "table" then
 		local currTimeMs = DateTime.now().UnixTimestampMillis;
 
@@ -417,6 +413,8 @@ function DatabaseService:UpdateRequest(key, callbackId, values)
 	
 	local requestPacket = {};
 	requestPacket.Key = key;
+	requestPacket.Success = nil;
+	requestPacket.FailMsg = nil;
 	
 	local newCache;
 	if cacheSize >= cacheMemPool or #cacheList > 32 then
@@ -495,6 +493,8 @@ function DatabaseService:Get(key, requestPacket)
 				
 				local proxyRequestPacket = {};
 				proxyRequestPacket.Key = key;
+				proxyRequestPacket.FailMsg = nil;
+
 				if requestPacket and requestPacket.CacheId == cacheList[a].I then
 					proxyRequestPacket = requestPacket;
 				end
@@ -595,8 +595,8 @@ function DatabaseService.new(scope)
 	
 	self:OnUpdateRequest("default", function(requestPacket)
 		Debugger:Log("Using (default) callback. RequestPacket:", requestPacket);
-		local rawData = requestPacket.RawData;
-		local dataObject = requestPacket.Data;
+		local _rawData = requestPacket.RawData;
+		local _dataObject = requestPacket.Data;
 		local inputValues = requestPacket.Values;
 
 		return inputValues;
@@ -645,8 +645,6 @@ end)
 
 
 task.spawn(function()
-	local modCommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
-	
 	Debugger.AwaitShared("modCommandsLibrary");
 	
 	local demoDatabase = DatabaseService:GetDatabase("DevDemo");
