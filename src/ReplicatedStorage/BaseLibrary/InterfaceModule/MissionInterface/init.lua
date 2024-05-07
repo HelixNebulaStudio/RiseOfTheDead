@@ -190,6 +190,7 @@ function Interface.init(modInterface)
 
 	local missionMarkerColor = Color3.fromRGB(251, 255, 0);
 
+	local itemToolTip = modItemInterface.newItemTooltip();
 	---
 	local function cancelAllMissionFunctions()
 		for _, m in pairs(activeMissionLogic) do
@@ -307,6 +308,7 @@ function Interface.init(modInterface)
 			modData:RequestData("GameSave/Missions");
 			
 		else
+			itemToolTip.Frame.Visible = false;
 			MissionDisplayFrame:ClearAllChildren();
 			modData:SaveSettings();
 
@@ -2442,6 +2444,7 @@ function Interface.init(modInterface)
 							
 							itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
 								if itemButtonObj.DimOut then return end;
+								itemToolTip.Frame.Visible = false;
 								refreshData();
 								Interface:PlayButtonClick();
 
@@ -2473,6 +2476,12 @@ function Interface.init(modInterface)
 								cloneItemButton.Size = UDim2.new(1, 0, 1, 0);
 								cloneItemButton.Parent = slotFrame;
 								
+								itemToolTip:BindHoverOver(cloneItemButton, function()
+									itemToolTip.Frame.Parent = windowFrame;
+									itemToolTip:Update(itemLib.Id);
+									itemToolTip:SetPosition(cloneItemButton);
+								end);
+
 								local function h3(txt)
 									return '<b><font size="18">' .. txt .. '</font></b>'
 								end
@@ -2698,6 +2707,7 @@ function Interface.init(modInterface)
 						lvlSlotInfo.ItemButton = itemButtonObj;
 						
 						itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
+							itemToolTip.Frame.Visible = false;
 							refreshData();
 							Interface:PlayButtonClick();
 
@@ -2749,6 +2759,11 @@ function Interface.init(modInterface)
 											local itemButtonObject = modItemInterface.newItemButton(lib.Id);
 											local newItemButton = itemButtonObject.ImageButton;
 											
+											itemToolTip:BindHoverOver(newItemButton, function()
+												itemToolTip.Frame.Parent = windowFrame;
+												itemToolTip:Update(lib.Id);
+												itemToolTip:SetPosition(newItemButton);
+											end);
 											
 											newItemButton.Parent = scrollFrame;
 
@@ -2811,9 +2826,9 @@ function Interface.init(modInterface)
 
 							itemButtonObj.ImageButton.AnchorPoint = Vector2.new(0.5, 0.5);
 							itemButtonObj.ImageButton.Position = UDim2.new(0.5, 0, 0.5, 0);
-							itemButtonObj.ImageButton.Size = UDim2.new(0, 50, 0, 50);
+							itemButtonObj.ImageButton.Size = UDim2.new(1, 0, 1, 0);
 							itemButtonObj.ImageButton.Parent = lvlSlot;
-
+							
 							postLvlSlotInfo.ItemButton = itemButtonObj;
 
 							postLvlSlotInfo.GetClaimState = function(l)
@@ -2841,7 +2856,7 @@ function Interface.init(modInterface)
 								if rewardInfo.ExpireTime == nil then return end;
 								local timeRemaining = rewardInfo.ExpireTime - workspace:GetServerTimeNow();
 								local timeLeftRatio = timeRemaining/shared.Const.OneDaySecs;
-								radialBar:UpdateLabel(timeLeftRatio);
+								radialBar:UpdateLabel(math.max(timeLeftRatio, 0.1));
 
 								if timeRemaining <= (3600*4) then
 									radialBarLabel.ImageColor3 = BarColors.Yellow;
@@ -2858,6 +2873,7 @@ function Interface.init(modInterface)
 									Debugger:Warn(`Level {lvl} RewardInfo`,rewardInfo);
 								end
 
+								itemToolTip.Frame.Visible = false;
 								refreshData();
 								Interface:PlayButtonClick();
 
@@ -2949,6 +2965,12 @@ function Interface.init(modInterface)
 								
 								local cloneItemButton = itemButtonObj.ImageButton:Clone();
 								cloneItemButton.Parent = slotFrame;
+
+								itemToolTip:BindHoverOver(cloneItemButton, function()
+									itemToolTip.Frame.Parent = windowFrame;
+									itemToolTip:Update(rewardInfo.ItemId);
+									itemToolTip:SetPosition(cloneItemButton);
+								end); 
 
 								local function h3(txt)
 									return '<b><font size="18">' .. txt .. '</font></b>'
@@ -3116,6 +3138,7 @@ function Interface.init(modInterface)
 					lvlSlotInfo.ItemButton = itemButtonObj;
 					
 					local function loadGiftShop()
+						itemToolTip.Frame.Visible = false;
 						refreshData();
 						Interface:PlayButtonClick();
 
@@ -3170,6 +3193,13 @@ function Interface.init(modInterface)
 							giftItemButtonObj:Update();
 
 							newButton.Parent = scrollFrame;
+
+							itemToolTip:BindHoverOver(giftItemButtonObj.ImageButton, function()
+								itemToolTip.Frame.Parent = windowFrame;
+								itemToolTip:Update(shopLib.ItemId);
+								itemToolTip:SetPosition(giftItemButtonObj.ImageButton);
+							end);
+							
 
 							local tradeCost = shopLib.Cost;
 							costLabel.Text = `{tradeCost} Tokens`;
