@@ -616,6 +616,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 	elseif action == "purchasegiftshop" then
 		local itemId = ...;
 
+		local itemLib = modItemsLibrary:Find(itemId);
 		local shopLib = nil;
 		for a=1, #modBattlePassLibrary.GiftShop do
 			if modBattlePassLibrary.GiftShop[a].ItemId == itemId then
@@ -631,12 +632,11 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 
 		local hasSpace = activeInventory:SpaceCheck{{ItemId=itemId; Data={Quantity=1};}};
 		if not hasSpace then
-			shared.Notify(player, "Not enough inventory space to receive mission reward.", "Negative");
+			shared.Notify(player, `Not enough inventory space to receive {itemLib.Name} gift shop.`, "Negative");
 			returnPacket.FailMsg = "No inventory space.";
 			return returnPacket;
 		end
 
-		local itemLib = modItemsLibrary:Find(itemId);
 		activeInventory:Add(itemId, {Quantity=1;}, function()
 			shared.Notify(player, `You received a {itemLib.Name}.`, "Reward");
 		end);

@@ -35,10 +35,10 @@ function BattlePassLibrary:Init(library)
 		{ItemId="armwrapsrat"; Cost=5;};
 		{ItemId="tophatgold"; Cost=5;};
 		{ItemId="rusty48blaze"; Cost=10;};   
-		{ItemId="skincutebutscary"; Cost=10;};
 		{ItemId="dufflebagorigins"; Cost=10;};
 		{ItemId="vexglovesinferno"; Cost=20;};
 		{ItemId="zriceraskullinferno"; Cost=20;};
+		{ItemId="survivorsoutpostunlockpapers"; Cost=40;};
 	};
 
 	-- MARK: BP Season 1
