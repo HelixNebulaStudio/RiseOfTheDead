@@ -20,10 +20,11 @@ local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local goldPoolMem = modDatabaseService:GetDatabase("BpGoldPool");
 local goldPoolSerializer = modSerializer.new();
 
+local giftShopMem = modDatabaseService:GetDatabase("BpGiftShop");
+local giftShopSerializer = modSerializer.new();
 
 local remoteHudNotification = modRemotesManager:Get("HudNotification");
 local remoteBattlepassRemote = modRemotesManager:Get("BattlepassRemote");
-
 
 --== GoldPool;
 local GoldPoolData = {};
@@ -90,6 +91,55 @@ goldPoolMem:OnUpdateRequest("add", function(requestPacket)
 end);
 
 
+-- GiftShopData
+local GiftShopData = {};
+GiftShopData.__index = GiftShopData;
+GiftShopData.ClassType = "GiftShopData";
+
+function GiftShopData.new()
+	local meta = {};
+	meta.__index = meta;
+	local self = {};
+
+	setmetatable(self, meta);
+	setmetatable(meta, GiftShopData);
+	return self;
+end
+
+function GiftShopData:OnDeserialize(rawData)
+	for k, v in pairs(rawData) do
+		self[k] = v;
+	end
+end
+
+giftShopSerializer:AddClass(GiftShopData.ClassType, GiftShopData.new);	--For saving and loading classes.
+giftShopMem:BindSerializer(giftShopSerializer);
+
+-- GiftShopMem
+giftShopMem:OnUpdateRequest("add", function(requestPacket)
+	local shopData = requestPacket.Data or GiftShopData.new();
+	local inputValues = requestPacket.Values or {}; 
+
+	for a=1, #modBattlePassLibrary.GiftShop do
+		local shopLib = modBattlePassLibrary.GiftShop[a];
+
+		if shopData[shopLib.ItemId] == nil then
+			shopData[shopLib.ItemId] = {};
+		end
+
+		local data = shopData[shopLib.ItemId];
+
+		data.Count = (data.Count or 0);
+
+		if inputValues.ItemId == shopLib.ItemId then
+			data.Count = data.Count + 1;
+		end
+	end
+
+	return shopData;
+end);
+
+
 --== Script;
 function BattlePassSave.new(profile, syncFunc)
 	local meta = {
@@ -148,6 +198,7 @@ function BattlePassSave.newPassData()
 		Level = 0;
 		Claim = {};
 		PostRewards = {};
+		Tokens = 0;
 	}
 	
 	return passData;
@@ -166,6 +217,18 @@ function BattlePassSave:GetPassData(bpId)
 		self.Passes[bpId] = BattlePassSave.newPassData();
 	end
 	return self.Passes[bpId];
+end
+
+function BattlePassSave:AddTokens(bpId, addAmt)
+	local passData = self:GetPassData(bpId);
+	if passData == nil then return end;
+
+	addAmt = addAmt or 1;
+
+	passData.Tokens = passData.Tokens + addAmt;
+
+	self:Sync();
+	
 end
 
 function BattlePassSave:AddLevel(bpId, addAmt)
@@ -199,7 +262,6 @@ function BattlePassSave:AddLevel(bpId, addAmt)
 		if newLevel >= #treeList and rewardsLib then
 			
 			for lvl=(currentLevel+1), newLevel do
-				-- local postLvls = lvl-#treeList;
 				if lvl < #treeList then continue end;
 
 				local isFmodLvl = math.fmod(lvl, modBattlePassLibrary.PostRewardLvlFmod);
@@ -526,6 +588,69 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		
 		return returnPacket;
 		
+
+	elseif action == "tradeinreward" then
+		local claimLvl = ...;
+		
+		local lvlStr = tostring(claimLvl);
+		local rewardInfo = passData.PostRewards[lvlStr];
+		
+		if passData.PostRewards[lvlStr] == nil then
+			returnPacket.FailMsg = "Already traded in";
+			return returnPacket;
+		end
+
+		if rewardInfo.ItemId == "gold" then
+			returnPacket.FailMsg = "Can not trade in gold";
+			return returnPacket;
+		end
+
+		local tokenReward = rewardInfo.TokensAmount or 1;
+		battlePassSave:AddTokens(activeId, tokenReward);
+		profile:AddPlayPoints(tokenReward/10);
+		
+		passData.PostRewards[lvlStr] = nil;
+		returnPacket.Success = true;
+		battlePassSave:Sync();
+
+	elseif action == "purchasegiftshop" then
+		local itemId = ...;
+
+		local shopLib = nil;
+		for a=1, #modBattlePassLibrary.GiftShop do
+			if modBattlePassLibrary.GiftShop[a].ItemId == itemId then
+				shopLib = modBattlePassLibrary.GiftShop[a]; 
+				break;
+			end
+		end
+
+		if shopLib == nil then
+			returnPacket.FailMsg = "Invalid gift shop item.";
+			return returnPacket;
+		end
+
+		local hasSpace = activeInventory:SpaceCheck{{ItemId=itemId; Data={Quantity=1};}};
+		if not hasSpace then
+			shared.Notify(player, "Not enough inventory space to receive mission reward.", "Negative");
+			returnPacket.FailMsg = "No inventory space.";
+			return returnPacket;
+		end
+
+		local itemLib = modItemsLibrary:Find(itemId);
+		activeInventory:Add(itemId, {Quantity=1;}, function()
+			shared.Notify(player, `You received a {itemLib.Name}.`, "Reward");
+		end);
+
+		local tokensCost = shopLib.Cost;
+		battlePassSave:AddTokens(activeId, -tokensCost);
+		profile:AddPlayPoints(tokensCost/10);
+
+		giftShopMem:UpdateRequest(activeId, "add", {
+			ItemId=itemId;
+		});
+		
+		returnPacket.Success = true;
+		battlePassSave:Sync();
 	end
 
 	return returnPacket;
@@ -533,71 +658,80 @@ end
 
 task.spawn(function()
 	Debugger.AwaitShared("modCommandsLibrary");
-	shared.modCommandsLibrary:HookChatCommand("addmissionpasslevel", {
+
+	shared.modCommandsLibrary:HookChatCommand("missionpass", {
 		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
 
 		RequiredArgs = 0;
-		UsageInfo = "/addmissionpasslevel [levels]";
+		UsageInfo = "/missionpass [addlvl/addtokens/del/addgoldpool] ...";
+		Description = [[Missionpass commands:
+			/missionpass addlvl lvl
+			    	Adds levels to mission pass.
+
+			/missionpass addtokens amount
+					Adds gift shop tokens.
+
+			/missionpass del mpId
+					delete mission pass data. mpId = mission pass id (nil = list mp ids)
+
+			/missionpass addgoldpool mpId amount
+					Adds gold into the mission pass gold pool. (nil = 0, checks gold pool)
+
+		]];
 		Function = function(player, args)
 			local profile = shared.modProfile:Get(player);
-			
-			profile.BattlePassSave:AddLevel(modBattlePassLibrary.Active, args[1]);
-			profile.BattlePassSave:Sync();
-			
-			return true;
-		end;
-	});
-	
-	shared.modCommandsLibrary:HookChatCommand("delmissionpass", {
-		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
 
-		RequiredArgs = 0;
-		UsageInfo = "/delmissionpass [mpId]";
-		Function = function(player, args)
-			local profile = shared.modProfile:Get(player);
-			
-			local mpId = args[1];
-			
-			if mpId == nil then
-				local ids = {};
-				for id, _ in pairs(profile.BattlePassSave.Passes) do
-					table.insert(ids, id);
-				end
-				
-				shared.Notify(player, "Which mission pass do you want to delete? List: ".. table.concat(ids, ", "), "Inform");
-				
-			else
-				if profile.BattlePassSave.Passes[mpId] == nil then
-					shared.Notify(player, "Mission pass ".. mpId .." does not exist.", "Inform");
+			local action = args[1];
 
+			if action == "addlvl" then
+				local lvl = args[2] or 1;
+
+				profile.BattlePassSave:AddLevel(modBattlePassLibrary.Active, lvl);
+				profile.BattlePassSave:Sync();
+
+			elseif action == "addtokens" then
+				local amt = args[2] or 1;
+
+				profile.BattlePassSave:AddTokens(modBattlePassLibrary.Active, amt); 
+				profile.BattlePassSave:Sync();
+
+			elseif action == "del" then
+
+				local mpId = args[2] or modBattlePassLibrary.Active;
+
+				if mpId == nil then
+					local ids = {};
+					for id, _ in pairs(profile.BattlePassSave.Passes) do
+						table.insert(ids, id);
+					end
+					
+					shared.Notify(player, "Which mission pass do you want to delete? List: ".. table.concat(ids, ", "), "Inform");
 					
 				else
-					profile.BattlePassSave.Passes[mpId] = nil;
-					profile.BattlePassSave:Sync();
-					
+					if profile.BattlePassSave.Passes[mpId] == nil then
+						shared.Notify(player, "Mission pass ".. mpId .." does not exist.", "Inform");
+	
+						
+					else
+						profile.BattlePassSave.Passes[mpId] = nil;
+						profile.BattlePassSave:Sync();
+						
+					end
 				end
-				
+
+
+			elseif action == "addgoldpool" then
+
+				local mpId = args[2] or modBattlePassLibrary.Active;
+				local amt = args[3] or 0;
+
+				local goldPoolRp = goldPoolMem:UpdateRequest(mpId, "add", {
+					Amount=amt;
+				});
+	
+				shared.Notify(player, "Mp:(".. mpId ..")".. Debugger:Stringify("Status: ", goldPoolRp) , "Inform");
 			end
-
-			return true;
-		end;
-	});
-
-	shared.modCommandsLibrary:HookChatCommand("addmissionpassgoldpool", {
-		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
-
-		RequiredArgs = 1;
-		UsageInfo = "/addmissionpassgoldpool gold [bpkey]";
-		Function = function(player, args)
-			local amt = tonumber(args[1]) or 250;
-
-			local bpKey = args[2] or modBattlePassLibrary.Active;
-
-			local goldPoolRp = goldPoolMem:UpdateRequest(bpKey, "add", {
-				Amount=amt;
-			});
-
-			shared.Notify(player, "Bp:(".. bpKey ..")".. Debugger:Stringify("Status: ", goldPoolRp) , "Inform");
+			
 			
 			return true;
 		end;

@@ -66,7 +66,7 @@ local BarColors = {
 local firstSync=false;
 --==
 local Interface = {
-	UpdateBattlePass = function() end;
+	UpdateBattlePass = function(action) end;
 	Update = function() end;
 };
 
@@ -107,7 +107,7 @@ local bpColors = {
 function Interface.init(modInterface)
 	setmetatable(Interface, modInterface);
 	
-	Interface.UpdateBattlePass = function() end;
+	Interface.UpdateBattlePass = function(action) end;
 	Interface.Update = function() end;
 
 	local branchColor = modBranchConfigs.BranchColor
@@ -293,12 +293,16 @@ function Interface.init(modInterface)
 
 	end
 	
-	window.OnWindowToggle:Connect(function(visible)
+	window.OnWindowToggle:Connect(function(visible, action)
 		if visible then
-			Interface:HideAll{[window.Name]=true;};
+			if action == "giftshop" then
+				Interface:HideAll{[window.Name]=true; ["Inventory"]=true;};
+			else
+				Interface:HideAll{[window.Name]=true;};
+			end
 			Interface.Update();
 			Interface.RefreshMissionMap();
-			Interface.UpdateBattlePass();
+			Interface.UpdateBattlePass(action);
 			
 			modData:RequestData("GameSave/Missions");
 			
@@ -2175,7 +2179,7 @@ function Interface.init(modInterface)
 		modData:RequestData("BattlePassSave/Passes/"..activeBpId);
 
 		table.clear(levelSlotsInfo)
-		function Interface.UpdateBattlePass()
+		function Interface.UpdateBattlePass(action)
 			local battlePassData, seasonData;
 
 			local function refreshData()
@@ -2186,6 +2190,7 @@ function Interface.init(modInterface)
 			refreshData();
 			
 			local seasonLevel = seasonData.Level;
+			local seasonTokens = seasonData.Tokens or 0;
 			local treeList = battlepassLib.Tree;
 			local treeCount = #treeList;
 
@@ -2847,6 +2852,10 @@ function Interface.init(modInterface)
 							end
 
 							itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
+								if workspace:GetAttribute("IsDev") == true then
+									Debugger:Warn(`Level {lvl} RewardInfo`,rewardInfo);
+								end
+
 								refreshData();
 								Interface:PlayButtonClick();
 
@@ -2867,21 +2876,75 @@ function Interface.init(modInterface)
 								local slotFrame = contentFrame:WaitForChild("Slot");
 								local descLabel = contentFrame:WaitForChild("Description");
 
-								claimButton.AnchorPoint = Vector2.new(1, 1);
-								claimButton.Position = UDim2.new(1, 0, 1, 0);
-
-								local holdDownScrapObj = modComponents.CreateHoldDownButton(Interface, {
-									Text = "<b>Trade in for Gift Shop Token</b>";
-									Color = Color3.fromRGB(165, 140, 75);
-								})
+								if rewardInfo.ItemId ~= "gold" then
+									claimButton.AnchorPoint = Vector2.new(1, 1);
+									claimButton.Position = UDim2.new(1, 0, 1, 0);
 	
-								local holdDownScrapButton: TextButton = holdDownScrapObj.Button;
-								holdDownScrapButton.AnchorPoint = Vector2.new(0, 1);
-								holdDownScrapButton.Position = UDim2.new(0, 0, 1, 0);
-								holdDownScrapButton.Size = UDim2.new(0.5, -10, 0, 30);
-								holdDownScrapButton.TextSize = 16;
-								holdDownScrapButton.Parent = contentFrame;
+									local holdDownScrapObj = modComponents.CreateHoldDownButton(Interface, {
+										Text = `<b>Trade in for {rewardInfo.TokensAmount or "1"} Gift Shop Tokens</b>`;
+										Color = Color3.fromRGB(165, 140, 75);
+									})
+	
+									local holdDownScrapButton: TextButton = holdDownScrapObj.Button;
+									holdDownScrapButton.AnchorPoint = Vector2.new(0, 1);
+									holdDownScrapButton.Position = UDim2.new(0, 0, 1, 0);
+									holdDownScrapButton.Size = UDim2.new(0.5, -10, 0, 30);
+									holdDownScrapButton.TextSize = 16;
+									holdDownScrapButton.Parent = contentFrame;
 
+									local noteLabel = Instance.new("TextLabel");
+									noteLabel.Text = "";
+									noteLabel.AnchorPoint = Vector2.new(0, 1);
+									noteLabel.Position = UDim2.new(0, 0, 1, -40);
+									noteLabel.BackgroundTransparency = 1;
+									noteLabel.TextColor3 = Color3.fromRGB(200, 200, 200);
+									noteLabel.TextSize = 9;
+									noteLabel.Size = UDim2.new(1, 0, 0, 20);
+									if modItemsLibrary:HasTag(itemLib.Id, "Skin Perm") then
+										noteLabel.Text = "* Once claimed, each skin permanents can only be traded for 1 gift shop token in Rat shop.";
+									else
+										noteLabel.Text = "* Once claimed, this is no longer tradable for gift shop tokens.";
+									end
+									noteLabel.Parent = contentFrame;
+
+									local lastMoved = tick();
+									claimButton.MouseMoved:Connect(function()
+										noteLabel.TextTransparency = 0;
+										lastMoved = tick();
+										task.wait(1);
+										if tick()-lastMoved < 1 then return end;
+										TweenService:Create(noteLabel, TweenInfo.new(1), {TextTransparency=1}):Play();
+									end)
+		
+									holdDownScrapObj.OnHoldDownConfirm = function()
+										holdDownScrapButton.Text = "Trading in...";
+										local r = remoteBattlepassRemote:InvokeServer("tradeinreward", lvl);
+										if r.FailMsg then
+											
+											
+										elseif r.Success == true then
+											game.Debris:AddItem(postLvlSlotInfo.GlowLabel, 0);
+											itemButtonObj.DimOut = true;
+											itemButtonObj:Update();
+											
+											task.delay(3, function()
+												lvlSlot.ClipsDescendants = true;
+												lvlSlot.AutomaticSize = Enum.AutomaticSize.None;
+												lvlSlot:TweenSize(UDim2.new(0, 0, 1, 0));
+												
+												task.wait(1);
+												game.Debris:AddItem(lvlSlot, 0);
+												levelSlotsInfo[lvl] = nil;
+												itemButtonObj:Destroy();
+											end)
+	
+											holdDownScrapButton.Visible = false;
+											claimButton.Visible = false;
+										end
+									end;
+
+								end
+								
 								local cloneItemButton = itemButtonObj.ImageButton:Clone();
 								cloneItemButton.Parent = slotFrame;
 
@@ -3003,7 +3066,7 @@ function Interface.init(modInterface)
 			if lvlSlotInfo == nil then
 				local info = {};
 
-				info.LevelSlot = templateLevelSlot:Clone();
+				info.LevelSlot = templateLevelSlot:Clone() :: ImageLabel;
 				info.LevelSlot.LayoutOrder = 9999-1;
 				info.LevelSlot.Size = UDim2.new(0, 120, 1, 0);
 
@@ -3016,20 +3079,45 @@ function Interface.init(modInterface)
 					local aspectRatioConstraint = Instance.new("UIAspectRatioConstraint");
 					aspectRatioConstraint.Parent = itemButtonObj.ImageButton;
 
-					itemButtonObj.ImageButton.AnchorPoint = Vector2.new(0.5, 0.5);
-					itemButtonObj.ImageButton.Position = UDim2.new(0.5, 0, 0.5, 0);
+					itemButtonObj.ImageButton.AnchorPoint = Vector2.new(0, 0.5);
+					itemButtonObj.ImageButton.Position = UDim2.new(0, 0, 0.5, 0);
 					itemButtonObj.ImageButton.Size = UDim2.new(0, 100, 0, 100);
 					itemButtonObj.ImageButton.Rotation = 1;
 					itemButtonObj.ImageButton.Parent = info.LevelSlot;
 
+					info.LevelSlot.AutomaticSize = Enum.AutomaticSize.X;
+
+					local tokenLabel = Instance.new("TextLabel");
+					tokenLabel.RichText = true;
+					tokenLabel.AutomaticSize = Enum.AutomaticSize.X;
+					tokenLabel.Font = Enum.Font.Arial;
+					tokenLabel.TextColor3 = Color3.fromRGB(255,255,255);
+					tokenLabel.BackgroundTransparency = 1;
+					tokenLabel.TextScaled = true;
+					tokenLabel.Size = UDim2.new(0, 0, 1, 0);
+					tokenLabel.Position = UDim2.new(0, 100, 0, 0);
+					tokenLabel.Parent = info.LevelSlot;
+					lvlSlotInfo.Label = tokenLabel;
+
+					local padding = Instance.new("UIPadding");
+					padding.PaddingLeft = UDim.new(0, 0);
+					padding.PaddingRight = UDim.new(0, 15);
+					padding.PaddingTop = UDim.new(0, 15);
+					padding.PaddingBottom = UDim.new(0, 15);
+					padding.Parent = tokenLabel;
+
+					local slotPadding = Instance.new("UIPadding");
+					slotPadding.PaddingLeft = UDim.new(0, 10);
+					slotPadding.PaddingRight = UDim.new(0, 10);
+					slotPadding.Parent = info.LevelSlot;
+
 					lvlSlotInfo.ItemButton = itemButtonObj;
 					
-					itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
+					local function loadGiftShop()
 						refreshData();
 						Interface:PlayButtonClick();
 
 						MissionDisplayFrame:ClearAllChildren();
-
 						local passRewardFrame = templatePassReward:Clone();
 						passRewardFrame.Parent = MissionDisplayFrame;
 
@@ -3048,7 +3136,7 @@ function Interface.init(modInterface)
 						scrollFrame.Visible = true;
 						descLabel.Size = UDim2.new(1, 0, 1, 0);
 						
-						local descText = "Trade in your rewards for past mission pass rewards!";
+						local descText = "Trade in your rewards for past mission pass rewards! You can also trade in skin permanents in the Rat shop. Accumulated Tokens will only be usable during current mission pass.";
 
 						if modData.IsPremium ~= true then
 							titleStr = titleStr.." (Premium)";
@@ -3057,13 +3145,105 @@ function Interface.init(modInterface)
 
 						titleLabel.Text = titleStr;
 						descLabel.Text = descText;
+
+						local uiGridLayout = scrollFrame:WaitForChild("UIGridLayout") :: UIGridLayout;
+						uiGridLayout.CellPadding = UDim2.new(0, 10, 0, 10);
+						uiGridLayout.CellSize = UDim2.new(0, 120, 0, 120);
+						uiGridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center;
+
+						scrollFrame.Size = UDim2.new(1, 0, 1, -50);
+
+						local giftShopRewards = modBattlePassLibrary.GiftShop;
+						local giftShopButtonTemplate = script:WaitForChild("GiftShopButton");
+
+						for a=1, #giftShopRewards do
+							local shopLib = giftShopRewards[a];
+
+							local newButton = giftShopButtonTemplate:Clone() :: TextButton;
+							local slotLabel = newButton:WaitForChild("ItemSlot");
+							local costLabel = newButton:WaitForChild("Title") :: TextLabel;
+
+							local giftItemButtonObj = modItemInterface.newItemButton(shopLib.ItemId);
+							giftItemButtonObj.ImageButton.Parent = slotLabel;
+							giftItemButtonObj:Update();
+
+							newButton.Parent = scrollFrame;
+
+							local tradeCost = shopLib.Cost;
+							costLabel.Text = `{tradeCost} Tokens`;
+
+							local itemLib = modItemsLibrary:Find(shopLib.ItemId);
+							local function onButtonClick()
+								Interface:PlayButtonClick();
+
+								if tradeCost == nil then
+									costLabel.TextColor3 = Color3.fromRGB(200, 50, 50);
+									TweenService:Create(costLabel, TweenInfo.new(1), {
+										TextColor3 = Color3.fromRGB(255, 255, 255);
+									}):Play();
+									return;
+								end
+
+								seasonTokens = seasonData.Tokens or 0;
+								if seasonTokens < tradeCost then
+									lvlSlotInfo.Label.TextColor3 = Color3.fromRGB(200, 50, 50);
+									TweenService:Create(lvlSlotInfo.Label, TweenInfo.new(1), {
+										TextColor3 = Color3.fromRGB(255, 255, 255);
+									}):Play();
+									return;
+								end
+
+								local promptWindow = Interface:PromptQuestion(`Trade For {itemLib.Name}`, 
+									`Are you sure you would like to trade in <b>{modFormatNumber.Beautify(tradeCost)} Tokens</b> for a {itemLib.Name}`, "Trade", "Cancel", itemLib.Icon);
+								local YesClickedSignal, NoClickedSignal;
+			
+								local debounce = false;
+								YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
+									if debounce then return end;
+									debounce = true;
+									Interface:PlayButtonClick();
+			
+									local _r = remoteBattlepassRemote:InvokeServer("purchasegiftshop", shopLib.ItemId);
+									Interface:OpenWindow("Inventory");
+									Interface:OpenWindow("Missions", "giftshop");
+
+									promptWindow:Close();
+									YesClickedSignal:Disconnect();
+									NoClickedSignal:Disconnect();
+								end);
+								NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
+									if debounce then return end;
+									Interface:PlayButtonClick();
+									promptWindow:Close();
+									Interface:OpenWindow("Missions", "giftshop");
+									YesClickedSignal:Disconnect();
+									NoClickedSignal:Disconnect();
+								end);
+							end
+							
+							giftItemButtonObj.ImageButton.MouseButton1Click:Connect(onButtonClick);
+							newButton.MouseButton1Click:Connect(onButtonClick);
+						end
+					end
+
+					lvlSlotInfo.Label.InputBegan:Connect(function(inputObject)
+						if (inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch) 
+							and inputObject.UserInputState == Enum.UserInputState.Begin then
+							loadGiftShop();
+						end
 					end)
+					itemButtonObj.ImageButton.MouseButton1Click:Connect(loadGiftShop);
+					itemButtonObj.ImageButton:GetAttributeChangedSignal("FireClick"):Connect(loadGiftShop);
 
 					itemButtonObj:Update();
 				end
-				
+
 				lvlSlotInfo.LevelSlot.ImageColor3 = bpColors.Premium;
 				info.LevelSlot.Parent = battlePassContent;
+			end
+			lvlSlotInfo.Label.Text = "<b>".. modFormatNumber.Beautify(seasonTokens or 0) .." Tokens</b>";
+			if action == "giftshop" then
+				lvlSlotInfo.ItemButton.ImageButton:SetAttribute("FireClick", not lvlSlotInfo.ItemButton.ImageButton:GetAttribute("FireClick") );
 			end
 
 
@@ -3082,7 +3262,7 @@ function Interface.init(modInterface)
 					finalLabel.BackgroundTransparency = 1;
 					finalLabel.TextScaled = true;
 					finalLabel.TextStrokeColor3 = Color3.fromRGB(255,255,255);
-					finalLabel.TextStrokeTransparency = 0.6;
+					finalLabel.TextStrokeTransparency = 1;
 					
 					local padding = Instance.new("UIPadding");
 					padding.PaddingLeft = UDim.new(0, 10);

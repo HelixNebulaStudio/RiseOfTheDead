@@ -77,7 +77,6 @@ function RewardsLibrary:Init(super)
 		};
 	};
 
-
 	super:Add{
 		Id="bp5years";
 		Rewards={
@@ -86,17 +85,17 @@ function RewardsLibrary:Init(super)
 			{ItemId="explosives"; Quantity=1; Chance=1;};
 			{ItemId="gold"; Quantity=20; Chance=1;};
 
-			{ItemId="colorcustom"; Quantity=1; Chance=0.5;};
-			{ItemId="divinggoggleswhite"; Quantity=1; Chance=0.5;};
-			{ItemId="mercskneepadscarbonfiberblack"; Quantity=1; Chance=0.5;};
-			{ItemId="sr308horde"; Quantity=1; Chance=0.5;};
-			{ItemId="fedorauvunwrapped"; Quantity=1; Chance=0.5;};
-			{ItemId="maraudersmaskrisingsun"; Quantity=1; Chance=0.5;};
-			{ItemId="militarybootsgold"; Quantity=1; Chance=0.5;};
-			{ItemId="nekrostrenchgreen"; Quantity=1; Chance=0.5;};
-			{ItemId="nekrostrenchblue"; Quantity=1; Chance=0.5;};
+			{ItemId="colorcustom"; Quantity=1; Chance=0.5; TokensAmount=2;};
+			{ItemId="divinggoggleswhite"; Quantity=1; Chance=0.5; TokensAmount=2;};
+			{ItemId="mercskneepadscarbonfiberblack"; Quantity=1; Chance=0.5; TokensAmount=2;};
+			{ItemId="sr308horde"; Quantity=1; Chance=0.5; TokensAmount=2;};
+			{ItemId="fedorauvunwrapped"; Quantity=1; Chance=0.5; TokensAmount=2;};
+			{ItemId="maraudersmaskrisingsun"; Quantity=1; Chance=0.5; TokensAmount=2;};
+			{ItemId="militarybootsgold"; Quantity=1; Chance=0.5; TokensAmount=2;};
+			{ItemId="nekrostrenchgreen"; Quantity=1; Chance=0.5; TokensAmount=2;};
+			{ItemId="nekrostrenchblue"; Quantity=1; Chance=0.5; TokensAmount=2;};
 
-			{ItemId="highvisjacketsuits"; Quantity=1; Chance=0.125;};
+			{ItemId="highvisjacketsuits"; Quantity=1; Chance=0.125; TokensAmount=4;};
 		};
 	};
 

@@ -4189,7 +4189,7 @@ Commands["dataget"] = {
 		local mem = modDatabaseService:GetDatabase(storeId);
 		
 		local storeValue = mem:Get(storeKey);
-		shared.Notify(player, Debugger:Stringify(storeId..":/"..storeKey.." Get=",tostring(storeValue)," ("..typeof(storeValue)..")"), "Inform")
+		shared.Notify(player, Debugger:Stringify(storeId..":/"..storeKey.." Get=",Debugger:Stringify(storeValue)," ("..typeof(storeValue)..")"), "Inform")
 		Debugger:Log(":Dataget",storeValue);
 
 		return true;

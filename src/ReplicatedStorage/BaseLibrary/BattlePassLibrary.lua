@@ -29,9 +29,16 @@ function BattlePassLibrary:Init(library)
 	library.Active = "bp5years";
 	
 	library.GiftShop = {
-		{ItemId="rusty48blaze"; Cost=500;};
-		{ItemId="dufflebagorigins"; Cost=1000;};
-		{ItemId="vexglovesinferno"; Cost=1000;};
+		{ItemId="apron"; Cost=4;};
+		{ItemId="militarybootsforest"; Cost=5;};
+		{ItemId="hardhatorigins"; Cost=5;};
+		{ItemId="armwrapsrat"; Cost=5;};
+		{ItemId="tophatgold"; Cost=5;};
+		{ItemId="rusty48blaze"; Cost=10;};   
+		{ItemId="skincutebutscary"; Cost=10;};
+		{ItemId="dufflebagorigins"; Cost=10;};
+		{ItemId="vexglovesinferno"; Cost=20;};
+		{ItemId="zriceraskullinferno"; Cost=20;};
 	};
 
 	-- MARK: BP Season 1
@@ -106,7 +113,7 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="rusty48blaze"; RequiresPremium=true;};
 			});
 			leaf(57, {
-				Reward={ItemId="armwrapsrat";};
+				Reward={ItemId="armwrapsrat";}; 
 			});
 			leaf(60, {
 				Reward={ItemId="glasspackage";};
@@ -124,7 +131,7 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="tomeoftweaks"; RequiresPremium=true;};
 			});
 			leaf(75, {
-				Reward={ItemId="hardhatorigins";};
+				Reward={ItemId="hardhatorigins";}; 
 			});
 			leaf(78, {
 				Reward={ItemId="energydrink";};

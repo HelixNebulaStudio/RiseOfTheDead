@@ -35,7 +35,9 @@ local isCommunityServer = game.ServerScriptService:FindFirstChild("CommunityServ
 --== Script;
 
 function IsInShopRange(player, storeObject)
-	if game.ReplicatedStorage.Library:FindFirstChild("CustomShopLibrary") then modShopLibrary = require(game.ReplicatedStorage.Library.CustomShopLibrary); end
+	if game.ReplicatedStorage.Library:FindFirstChild("CustomShopLibrary") then
+		modShopLibrary = require(game.ReplicatedStorage.Library.CustomShopLibrary);
+	end
 	if storeObject then
 		if storeObject:IsDescendantOf(workspace) and player:DistanceFromCharacter(storeObject.Position) <= 17 then
 			return nil;
@@ -56,7 +58,7 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		r.SourceText = nil;
 		return r;
 		
-	elseif action == "sellitem" then
+	elseif action == "sellitem" then -- MARK: sellitem
 		local storeObject, id, amt = ...;
 
 		amt = shared.IsNan(amt) and 1 or amt;
@@ -116,7 +118,7 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 			return modShopLibrary.PurchaseReplies.InvalidItem;
 		end
 		
-	elseif action == "buyitem" then
+	elseif action == "buyitem" then -- MARK: buyitem
 		local storeObject, productId = ...;
 
 		local inRange = IsInShopRange(player, storeObject); if inRange ~= nil then return inRange end;
@@ -164,7 +166,7 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 			return modShopLibrary.PurchaseReplies.InsufficientCurrency;
 		end
 		
-	elseif action == "buyammo" then
+	elseif action == "buyammo" then -- MARK: buyammo
 		local storeObject, id, storageId = ...;
 
 		local inRange = IsInShopRange(player, storeObject); if inRange ~= nil then return inRange end;
@@ -271,7 +273,7 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		
 		return modShopLibrary.PurchaseReplies.Success;
 		
-	elseif action == "buyrepair" then
+	elseif action == "buyrepair" then -- MARK: buyrepair
 		local storeObject, storageItemID = ...;
 
 		local inRange = IsInShopRange(player, storeObject); if inRange ~= nil then return inRange end;
@@ -309,6 +311,51 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 
 		local itemLib = modItemsLibrary:Find(storageItem.ItemId);
 		shared.Notify(player, itemLib.Name.." repaired.", "Info");
+		
+		return modShopLibrary.PurchaseReplies.Success;
+
+	elseif action == "exchangefortoken" then -- MARK: exchangefortoken
+		local storeObject, storageItemID, amt = ...;
+		amt = shared.IsNan(amt) and 1 or amt;
+
+		local inRange = IsInShopRange(player, storeObject); if inRange ~= nil then return inRange end;
+		
+		if shared.modAntiCheatService:GetLastTeleport(player) <= 3 then
+			return modShopLibrary.PurchaseReplies.TooFar; 
+		end;
+
+		local profile = modProfile:Get(player);
+		local inventory = profile.ActiveInventory;
+
+		local storageItem, storage = modStorage.FindIdFromStorages(storageItemID, player);
+		if storage == nil then 
+			Debugger:Warn("BuyRepair>> Missing storage");
+			return modShopLibrary.PurchaseReplies.InvalidProduct;
+		end;
+		if storageItem == nil then 
+			Debugger:Warn("BuyRepair>> Missing storage");
+			return modShopLibrary.PurchaseReplies.InvalidProduct;
+		end;
+
+		local battlePassSave = profile.BattlePassSave;
+		local activeId = modBattlePassLibrary.Active;
+
+		local passData = battlePassSave:GetPassData(activeId);
+		if passData == nil then
+			shared.Notify(player, `No available mission pass.`, "Negative");
+			return modShopLibrary.PurchaseReplies.ShopClosed;
+		end
+
+		local tokenValue = 1;
+		local exchangeAmt = math.clamp(amt or 1, 1, storageItem.Quantity);
+		local totalTokens = exchangeAmt * tokenValue;
+
+		inventory:Remove(storageItem.ID, exchangeAmt, function()
+			shared.Notify(player, `Exchanged {exchangeAmt} {storageItem.Properties.Name} for {totalTokens} Gift Shop Tokens!`, "Reward");
+		end);
+
+		battlePassSave:AddTokens(activeId, totalTokens);
+		profile:AddPlayPoints(totalTokens/10);
 		
 		return modShopLibrary.PurchaseReplies.Success;
 

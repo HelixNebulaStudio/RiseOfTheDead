@@ -7,7 +7,7 @@ local Interface = {};
 local RunService = game:GetService("RunService");
 
 local localplayer = game.Players.LocalPlayer;
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
@@ -60,8 +60,7 @@ function Interface.init(modInterface)
 	
 	local typesFrame = shopFrame:WaitForChild("ShopTypes");
 	local pageFrame = shopFrame:WaitForChild("PageFrame");
-	local pageFrameListLayout = pageFrame:WaitForChild("UIListLayout");
-	
+
 	Interface.PageFrame = pageFrame;
 	Interface.SelectedSlot = nil;
 	
@@ -359,7 +358,7 @@ function Interface.init(modInterface)
 					newOptButton.Size = UDim2.new(1, 0, 0, 30);
 
 					local cataButtonB = newOptButton:WaitForChild("Button");
-					local cataLabel = cataButtonB:WaitForChild("TextLabel");
+					local cataLabelB = cataButtonB:WaitForChild("TextLabel");
 					local imageIcon = cataButtonB:WaitForChild("ImageIcon");
 
 					if activeShopType == "Bandits" then
@@ -383,7 +382,7 @@ function Interface.init(modInterface)
 					end
 					
 					cataButtonB.Size = UDim2.new(1, -20, 1, 0);
-					cataLabel.Text = optInfo.Title;
+					cataLabelB.Text = optInfo.Title;
 					imageIcon.Image = optInfo.Icon or "";
 					newOptButton.LayoutOrder = newCataButton.LayoutOrder + a;
 					newOptButton.Parent = typesFrame;
@@ -413,7 +412,7 @@ function Interface.init(modInterface)
 
 			local localplayerStats = modData.GetStats();
 
-			--== Ammo;
+			--== MARK: Ammo
 			local hasAmmoData = (weaponInfo and ((selectedItem.Values.A and selectedItem.Values.A < weaponInfo.Configurations.AmmoLimit)
 				or (selectedItem.Values.MA and selectedItem.Values.MA < weaponInfo.Configurations.MaxAmmoLimit)));
 			
@@ -463,7 +462,7 @@ function Interface.init(modInterface)
 				end)
 			end
 			
-			--== Repairable;
+			--== MARK: Repairable
 			local repairPrice = modShopLibrary.RepairPrice[selectedItem.ItemId];
 			if repairPrice and selectedItem.Values and selectedItem.Values.Health and selectedItem.Values.MaxHealth and selectedItem.Values.Health <= selectedItem.Values.MaxHealth then
 				
@@ -508,7 +507,7 @@ function Interface.init(modInterface)
 				end)
 			end
 			
-			--== Can be sold;
+			--== MARK: Can be sold
 			local bpLib = modBlueprintLibrary.Get(selectedItem.ItemId);
 			local price = modShopLibrary.SellPrice[selectedItem.ItemId]
 				or bpLib and (bpLib.SellPrice or (bpLib.Tier and modShopLibrary.SellPrice["Tier"..bpLib.Tier])) or nil;
@@ -582,7 +581,7 @@ function Interface.init(modInterface)
 				end)
 				
 				
-				--== Sell all;
+				--== MARK:  Sell all
 				if selectedItem.Quantity > 1 then
 					Interface.NewListing(function(newListing)
 						local infoBox = newListing:WaitForChild("infoFrame");
@@ -660,6 +659,150 @@ function Interface.init(modInterface)
 				end
 				
 			end
+
+			--== MARK: Exchange Gift Shop Tokens
+			local isSkinPerm = modItemsLibrary:HasTag(itemLib.Id, "Skin Perm");
+			local activeBpId = modBattlePassLibrary.Active;
+			if activeBpId and #activeBpId > 0 and isSkinPerm then
+				local battlepassLib = modBattlePassLibrary:Find(activeBpId);
+				
+
+				Interface.NewListing(function(newListing)
+					local infoBox = newListing:WaitForChild("infoFrame");
+					local descFrame = infoBox:WaitForChild("descFrame");
+
+					local purchaseButton = newListing:WaitForChild("purchaseButton");
+					local priceLabel = purchaseButton:WaitForChild("buttonText");
+					local iconButton = newListing:WaitForChild("iconButton");
+					local iconLabel = iconButton:WaitForChild("iconLabel");
+					local titleLabel = descFrame:WaitForChild("titleLabel");
+					local labelFrame = descFrame:WaitForChild("labelFrame");
+					local descLabel = labelFrame:WaitForChild("descLabel");
+
+					local tokenReward = 1;
+					descLabel.Text = `Exchange {itemLib.Name} for <b>{tokenReward}</b> Mission Pass's Gift Shop Token`;
+					titleLabel.Text = `Exchange {tokenReward} Token`;
+					priceLabel.Text = `{tokenReward} Token`;
+					iconLabel.Image = battlepassLib.Icon;
+
+					local exchangeItemDebounce = false;
+					newListing.MouseButton1Click:Connect(function()
+						if exchangeItemDebounce then return end;
+						exchangeItemDebounce = true;
+
+						local promptWindow = Interface:PromptQuestion(`Exchange {itemLib.Name}`,
+							`Are you sure you want to exchange 1 {itemLib.Name} for {tokenReward} token.`, 
+							"Exchange", "Cancel", battlepassLib.Icon);
+						local YesClickedSignal, NoClickedSignal;
+
+						YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
+							Interface:PlayButtonClick();
+
+							promptWindow.Frame.Yes.buttonText.Text = "Exchanging item..";
+							if selectedItem.Fav then
+								promptWindow.Frame.Yes.buttonText.Text = "Can't exchange favorited.";
+								exchangeItemDebounce = false;
+								Interface:OpenWindow("RatShopWindow");
+								return
+							end;
+
+							local serverReply = remoteShopService:InvokeServer("exchangefortoken", Interface.Object, storageItemID);
+							if serverReply == modShopLibrary.PurchaseReplies.Success then
+								promptWindow.Frame.Yes.buttonText.Text = "Exchanged!";
+								wait(0.5);
+								Interface:OpenWindow("Missions", "giftshop");
+							else
+								warn("Exchange Item>> Error Code:"..tostring(serverReply));
+								promptWindow.Frame.Yes.buttonText.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply));
+							end
+
+							promptWindow:Close();
+							Interface:OpenWindow("Missions", "giftshop");
+							YesClickedSignal:Disconnect();
+							NoClickedSignal:Disconnect();
+						end);
+						NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
+							Interface:PlayButtonClick();
+							promptWindow:Close();
+							Interface:OpenWindow("RatShopWindow");
+							YesClickedSignal:Disconnect();
+							NoClickedSignal:Disconnect();
+						end);
+
+						exchangeItemDebounce = false;
+					end)
+				end)
+
+				--== MARK: Exchange all for Gift Shop Tokens
+				if selectedItem.Quantity > 1 then
+					Interface.NewListing(function(newListing)
+						local infoBox = newListing:WaitForChild("infoFrame");
+						local descFrame = infoBox:WaitForChild("descFrame");
+	
+						local purchaseButton = newListing:WaitForChild("purchaseButton");
+						local priceLabel = purchaseButton:WaitForChild("buttonText");
+						local iconButton = newListing:WaitForChild("iconButton");
+						local iconLabel = iconButton:WaitForChild("iconLabel");
+						local titleLabel = descFrame:WaitForChild("titleLabel");
+						local labelFrame = descFrame:WaitForChild("labelFrame");
+						local descLabel = labelFrame:WaitForChild("descLabel");
+	
+						local tokenReward = 1 * selectedItem.Quantity;
+						descLabel.Text = `Exchange <b>{itemLib.Name}</b> for <b>{tokenReward}</b> Mission Pass's Gift Shop Token`;
+						titleLabel.Text = `Exchange {tokenReward} Token`;
+						priceLabel.Text = `{tokenReward} Token`;
+						iconLabel.Image = battlepassLib.Icon;
+	
+						local exchangeItemDebounce = false;
+						newListing.MouseButton1Click:Connect(function()
+							if exchangeItemDebounce then return end;
+							exchangeItemDebounce = true;
+	
+							local promptWindow = Interface:PromptQuestion(`Exchange {itemLib.Name}`,
+								`Are you sure you want to exchange {selectedItem.Quantity} {itemLib.Name} for {tokenReward} token.`, 
+								"Exchange", "Cancel", battlepassLib.Icon);
+							local YesClickedSignal, NoClickedSignal;
+	
+							YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
+								Interface:PlayButtonClick();
+	
+								promptWindow.Frame.Yes.buttonText.Text = "Exchanging items..";
+								if selectedItem.Fav then
+									promptWindow.Frame.Yes.buttonText.Text = "Can't exchange favorited.";
+									exchangeItemDebounce = false;
+									Interface:OpenWindow("RatShopWindow");
+									return
+								end;
+	
+								local serverReply = remoteShopService:InvokeServer("exchangefortoken", Interface.Object, storageItemID, selectedItem.Quantity);
+								if serverReply == modShopLibrary.PurchaseReplies.Success then
+									promptWindow.Frame.Yes.buttonText.Text = "Exchanged!";
+									wait(0.5);
+									Interface:OpenWindow("RatShopWindow");
+								else
+									warn("Exchange Item>> Error Code:"..tostring(serverReply));
+									promptWindow.Frame.Yes.buttonText.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply));
+								end
+	
+								promptWindow:Close();
+								Interface:OpenWindow("RatShopWindow");
+								YesClickedSignal:Disconnect();
+								NoClickedSignal:Disconnect();
+							end);
+							NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
+								Interface:PlayButtonClick();
+								promptWindow:Close();
+								Interface:OpenWindow("RatShopWindow");
+								YesClickedSignal:Disconnect();
+								NoClickedSignal:Disconnect();
+							end);
+	
+							exchangeItemDebounce = false;
+						end)
+					end)
+				end
+			end
+
 		end
 
 		if modConfigurations.CompactInterface then
