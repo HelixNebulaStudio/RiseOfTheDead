@@ -465,13 +465,21 @@ function ItemsLibrary:Init(super)
 	new(usableBase, {Id="tomeoftweaks"; Name="Tome Of Tweaks"; Icon="rbxassetid://6122866034"; TradingTax=20; Tags={"Misc Usable"}; Description="10 Tips and tricks to tweak your weapon. Consuming this will grant you 10 tweak points.";});
 	new(usableBase, {Id="mpbook"; Name="Latest Grinding Guide Publication"; Icon="rbxassetid://17419949268"; TradingTax=1000; Tags={"Misc Usable"};
 		Stackable = false;
+		DestroyOnExpire=true;
 		OnAdd = function(data)
 			local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
 			local battlepassLib = modBattlePassLibrary:Find(modBattlePassLibrary.Active);
 			if battlepassLib then
-				data.Description = `Levels up your <b>{modRichFormatter.ColorRobuxText("Mission Pass: "..battlepassLib.Title)}</b> by 1 level.\n\nOpen your missions menu to see your mission pass progress.`;
+				data.Description = `Levels up your <b>{modRichFormatter.ColorRobuxText("Mission Pass: "..battlepassLib.Title)}</b> by 1 level.\n\nOpen your missions menu to see your mission pass progress.\n\nThis item expires 24 hours after receiving.`;
 			end
-		end
+		end;
+		OnInstantiate=function(storageItem)
+			local itemValues = storageItem.Values;
+			if itemValues.Expire then return end;
+			itemValues.Expire = (math.ceil(workspace:GetServerTimeNow()) + shared.Const.OneDaySecs);
+			itemValues.ExpireLength = shared.Const.OneDaySecs;
+		end;
+		Sources={"Obtained during a Mission Pass by general gameplay.";};
 	});
 	new(usableBase, {
 		Id="colorcustom";

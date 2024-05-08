@@ -507,10 +507,18 @@ remoteItemActionHandler.OnServerEvent:Connect(function(player, storageId, id, ac
 	end
 end)
 
-function Storage.RefreshItem(player, storageItemId, sync)
-	local storageItem, storage = Storage.FindIdFromStorages(storageItemId, player);
+function Storage.RefreshItem(player, storageItemID, sync)
+	local storageItem, storage = Storage.FindIdFromStorages(storageItemID, player);
 	if storageItem and storage then
 		local itemValues = storageItem.Values;
+
+		local itemLib = storageItem.Properties;
+
+		if itemLib.DestroyOnExpire and itemValues.Expire and workspace:GetServerTimeNow() > itemValues.Expire then
+			storage:Remove(storageItemID);
+			storage:Sync();
+			return;
+		end
 
 		if sync == true then
 			if storageItem.Changed then

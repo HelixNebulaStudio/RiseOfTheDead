@@ -372,10 +372,12 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 						spawn(function()
 							while ItemInterface.ItemBarsCache[storageItemID] do
 								wait(1);
-								local timeLeft = itemValues.Expire - serverUnixTime;
+								local timeLeft = itemValues.Expire - modSyncTime.GetTime();
 								local barFill = math.clamp(timeLeft/itemValues.ExpireLength, 0, 1);
 								setBar(barFill);
-								if barFill <= 0 then remoteStorageItemSync:FireServer("update", storageItemID); end
+								if barFill <= 0 then
+									remoteStorageItemSync:FireServer("update", storageItemID);
+								end
 
 								if not self.ImageButton:IsDescendantOf(playerGui) then
 									ItemInterface.ItemBarsCache[storageItemID] = nil;
@@ -603,6 +605,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 	local itemLib = modItemsLibrary:Find(itemId);
 	if itemLib == nil then return end;
 	
+	local serverUnixTime = modSyncTime.GetTime();
 	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 	local defaultFrame = self.Frame:WaitForChild("default");
@@ -1034,6 +1037,12 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 		end
 		if #appearanceData > 0 then
 			itemDesc = itemDesc..h3O.."\nAppearance: "..h3C.."\n".. table.concat(appearanceData, "\n");
+		end
+
+		
+		if itemValues.Expire and itemValues.ExpireLength then
+			local timeLeft = itemValues.Expire - serverUnixTime;
+			itemDesc = itemDesc..h3O.."\nExpires: "..h3C.. modSyncTime.ToString(timeLeft);
 		end
 	end;
 	

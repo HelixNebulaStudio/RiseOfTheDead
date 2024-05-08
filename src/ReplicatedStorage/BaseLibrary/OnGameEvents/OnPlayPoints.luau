@@ -68,5 +68,6 @@ return function(profile, points: number?, reason: string?)
 
         modEvents:NewEvent(player, dropPacket);
 
+        
     end
 end;
