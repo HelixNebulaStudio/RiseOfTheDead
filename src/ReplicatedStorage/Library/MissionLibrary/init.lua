@@ -2759,6 +2759,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 76 - Ziphoning Serum
 MissionLibrary.New{
 	MissionId=76;
 	MissionType = MissionLibrary.MissionTypes.Repeatable;
@@ -2850,6 +2851,31 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	Markers={};
+	UseAssets=true;
+};
+
+-- MARK: 79 - Javelineer Prodigy
+MissionLibrary.New{
+	MissionId=79;
+	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	Name="Javelineer Prodigy";
+	Description="Kill enemies with throwing weapons.";
+	Timer=RepeatableTime; 
+	Persistent=true;
+	Checkpoint={
+		{Text="Get $Kills Kills with a throwing weapon excluding explosives and flammables";};
+	};
+	SaveData={
+		Kills=20;
+	};
+	GuideText="";
+	Tier="Normal";
+	Rewards={
+		{Type="Perks"; Amount=PerksReward.Normal};
+	};
+	AddRequirements={
+		{Type="Level"; Value=30};
+	};
 	UseAssets=true;
 };
 

@@ -57,24 +57,6 @@ if RunService:IsServer() then
 		
 		storageItem:SetValues("MA", newMaxAmmo);
 		storageItem:Sync({"MA"});
-		
-		
-		--if ammoRecyclerRandom:FairCrit(storageItemID or "", dmgRecyclerMaxChance) then
-		--	remoteReloadWeapon:FireClient(player, {Id=storageItemID; MA=newMaxAmmo; UnixTime=DateTime.now().UnixTimestampMillis; AR=true;});
-		--	profile.ActiveInventory:SetValues(storageItemID, {MA=newMaxAmmo;});
-		--end
-
-		--if profile.EquippedTools.AmmoRecyclerBulletCounter == nil then
-		--	profile.EquippedTools.AmmoRecyclerBulletCounter = 0;
-		--end
-		--profile.EquippedTools.AmmoRecyclerBulletCounter = profile.EquippedTools.AmmoRecyclerBulletCounter + 1;
-		--local remainder = math.fmod(profile.EquippedTools.AmmoRecyclerBulletCounter, dmgRecyclerValue);
-		
-		--if remainder == 0 then
-		--	storageItem:SetValues("MA", newMaxAmmo);
-		--	storageItem:Sync({"MA"});
-		--	--remoteReloadWeapon:FireClient(player, {Id=storageItemID; MA=newMaxAmmo; UnixTime=DateTime.now().UnixTimestampMillis; AR=true;});
-		--end
 	end)
 end
 

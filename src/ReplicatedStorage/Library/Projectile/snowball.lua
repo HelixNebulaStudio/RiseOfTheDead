@@ -125,12 +125,11 @@ function Pool.new(owner)
 
 				end
 			end
-			
-			
+
 			return true -- break arctrace;
 		end
 		
-		--Debugger:Log("hitPart", hitPart, debug.traceback());
+		return;
 	end
 	
 	return projectile;
