@@ -95,13 +95,8 @@ local modEngineMode = modGlobalVars.EngineMode == "RiseOfTheDead"
 Debugger:Log("Initializing server data script complete.");
 workspace:SetAttribute("Version", modGlobalVars.GameVersion.."."..modGlobalVars.GameBuild .. " (".. modBranchConfigs.CurrentBranch.Name ..")");
 
--- Load World Script;
---local worldScripts = game.ServerScriptService.WorldScripts;
---local worldScript = worldScripts:FindFirstChild(modBranchConfigs.GetWorld());
---if worldScript then worldScript.Disabled = false; else Debugger:Log("WorldId(",modBranchConfigs.GetWorld(),") does not have world script."); end
 
 function OnPlayerAdded(player)
-	--player:SetAttribute("GameMasterPlayerAdded", true);
 	Debugger:Log("OnPlayerAdded>> ", player);
 	
 	local dataModule = script:WaitForChild("DataModule"):Clone();
@@ -124,8 +119,6 @@ function OnPlayerAdded(player)
 	end
 	
 	player.CharacterAdded:Connect(onCharacterAdded);
-	--if player.Character then modEngineMode.OnCharacterAdded(player, player.Character); end;
-	
 	
 	-- Load OnPlayerAdded
 	modAnalytics:SyncRemoteConfigs(player);
@@ -134,6 +127,41 @@ function OnPlayerAdded(player)
 	if player.Character and not firstLoad then
 		onCharacterAdded(player.Character);
 	end
+	
+	task.spawn(function()
+		local followedPlayer = game.Players:GetPlayerByUserId(player.FollowUserId);
+		local referrer: Player;
+		if player.FollowUserId ~= 0 and followedPlayer then
+			referrer = followedPlayer;
+		else
+			local oldestFirstJoin = os.time();
+			for _, otherPlayer: Player in pairs(game.Players:GetPlayers()) do
+				if otherPlayer == player then continue end;
+
+				local isFriend = false;
+				pcall(function()
+					isFriend = otherPlayer:IsFriendsWith(player.UserId);
+				end)
+				if not isFriend then continue end;
+
+				local otherProfile = modProfile:Get(otherPlayer);
+				if otherProfile.FirstJoined < oldestFirstJoin then
+					oldestFirstJoin = otherProfile.FirstJoined;
+					referrer = otherPlayer;
+				end
+			end
+		end
+
+		local referrerProfile = modProfile:Get(referrer);
+		if #referrerProfile.ReferralList < 8 and table.find(referrerProfile.ReferralList, player.UserId) == nil then
+			table.insert(referrerProfile.ReferralList, player.UserId);
+		end
+
+		local profile = modProfile:Get(player);
+		if table.find(profile.ReferralList, referrer.UserId) == nil then
+			table.insert(profile.ReferralList, referrer.UserId);
+		end
+	end)
 end
 
 

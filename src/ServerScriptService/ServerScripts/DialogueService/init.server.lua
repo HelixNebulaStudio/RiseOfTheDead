@@ -178,22 +178,14 @@ function OnDialogue(player, npcModel, npcName, choice)
 	if npcDialogData then
 		return npcDialogData.Invoke(choice);
 	end
+
+	local profile = shared.modProfile:Get(player);
+	if profile then
+		profile:AddPlayPoints(3);
+	end
+
 	return;
 end
-
---remoteSelectDialogue.OnServerInvoke = OnDialogue;
-
---remoteNpcDialogue.OnServerEvent:Connect(function(player, npcModel, cmd)
---	if npcModel == nil then Debugger:Log("Missing npcmodel.") return end;
---	if npcModel:FindFirstChild("NpcStatus") == nil then return end;
---	local npcStatus = require(npcModel.NpcStatus);
---	local npcModule = npcStatus:GetModule();
-	
---	if cmd == "close" and npcModule.AvatarFace then
---		npcModule.AvatarFace:DialogSet(nil, player);
---	end
---end)
-
 
 -- !outline: OnDialogueHandler(player, action, packet)
 function OnDialogueHandler(player, action, packet)

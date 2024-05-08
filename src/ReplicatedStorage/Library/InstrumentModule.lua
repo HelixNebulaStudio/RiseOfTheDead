@@ -99,6 +99,10 @@ function Instrument.new(instrument, handle, notePart)
 		LastOctave = 12;
 		
 		NoteStepTime = Instrument.InstrumentSounds[instrument].TimeLength/36;
+
+		Destroy = nil;
+		SpawnNote = nil;
+		Replicate = nil;
 	};
 	
 	local instrumentLib = Instrument.InstrumentLibrary[self.Instrument];
@@ -220,57 +224,7 @@ function Instrument:Sync(notesChanged)
 			self.Notes[noteId] = false;
 		end
 	end)
-	
-	--local notesChanged = false;
-	--for _, note in pairs(Instrument.Notes) do
-	--	if notes[note.Name] ~= nil then
-	--		if not notesChanged and self.Handle:IsDescendantOf(workspace) and self.Handle:FindFirstChild("musicParticle") then
-	--			self.Handle.musicParticle:Emit(1);
-	--		end
-	--		notesChanged = true;
-	--		self.Notes[note.Name] = notes[note.Name];
-	--	else
-	--		self.Notes[note.Name] = false;
-	--	end
-	--end
-	
-	--task.delay(5, function()
-	--	if tick()-self.LastSync < 5 then return end;
-
-	--	for _, note in pairs(Instrument.Notes) do
-	--		self.Notes[note.Name] = false;
-	--	end
-	--end)
 end
-
---function Instrument:GetNoteSound(instructmentSound, noteName)
---	local noteSound = self.NoteSounds[noteName];
-	
---	if noteSound == nil then
---		self.NoteSounds[noteName] = instructmentSound:Clone();
---		noteSound = self.NoteSounds[noteName];
---		noteSound.Name = noteName;
-		
---		if self.Player == game.Players.LocalPlayer then
---			noteSound.Parent = workspace;
---		else
---			noteSound.Parent = self.Handle;
---		end
-		
---		noteSound.SoundGroup = game.SoundService:FindFirstChild("InstrumentMusic");
---		noteSound:SetAttribute("Volume", noteSound.Volume);
-		
---		noteSound:SetAttribute("SoundOwner", self.Player and self.Player.Name or nil);
---		CollectionService:AddTag(noteSound, "PlayerNoiseSounds");
-
---		local octave = self.IsShiftDown and 24 or self.IsCtrlDown and 0 or 12;
---		local noteStartTime = self.NoteStepTime * (Instrument.NoteIndex[noteName] + octave);
-
---		noteSound.TimePosition = noteStartTime;
---	end
-	
---	return noteSound;
---end
 
 function Instrument:GetInputNote(inputObject)
 	for a=1, #Instrument.Notes do
@@ -308,6 +262,8 @@ function Instrument:GetInputNote(inputObject)
 
 		end
 	end
+
+	return;
 end
 
 function Instrument:SpawnNote(noteName, octave)
@@ -343,54 +299,6 @@ end
 function Instrument:ProcessInputBegan(inputObject)
 	if not self.Handle:IsDescendantOf(workspace) then return end;
 	
-	--if inputObject.KeyCode == note.KeyCode then
-	--	if not notesChanged and self.Handle:IsDescendantOf(workspace) and self.Handle:FindFirstChild("musicParticle") then
-	--		self.Handle.musicParticle:Emit(1);
-	--	end
-		
-	--	notesChanged = true;
-	--	self.Notes[noteName] = true;
-
-	--	local instrumentLib = Instrument.InstrumentLibrary[self.Instrument];
-	--	if instrumentLib then
-	--		self.NoteSounds[noteName] = instrumentLib.NoteSounds[noteName]:Clone();
-	--		local noteSound = self.NoteSounds[noteName];
-			
-	--		if self.Player == game.Players.LocalPlayer then
-	--			noteSound.Parent = workspace;
-	--		else
-	--			noteSound.Parent = self.Handle;
-	--		end
-			
-	--		noteSound.SoundGroup = game.SoundService:FindFirstChild("InstrumentMusic");
-
-	--		noteSound:SetAttribute("SoundOwner", self.Player and self.Player.Name or nil);
-	--		CollectionService:AddTag(noteSound, "PlayerNoiseSounds");
-
-	--		local octave = self.IsShiftDown and 24 or self.IsCtrlDown and 0 or 12;
-	--		if octave ~= 12 then
-	--			local newPitchShift = Instance.new("PitchShiftSoundEffect");
-	--			newPitchShift.Octave = octave/12;
-	--			newPitchShift.Parent = noteSound;
-	--		end
-			
-	--		noteSound:Play();
-			
-	--	else
-	--		local instructmentSound = Instrument.InstrumentSounds[self.Instrument];
-	--		local noteSound = self:GetNoteSound(instructmentSound, noteName);
-
-	--		local octave = self.IsShiftDown and 24 or self.IsCtrlDown and 0 or 12;
-	--		local noteStartTime = self.NoteStepTime * (Instrument.NoteIndex[noteName] + octave);
-
-	--		noteSound.Volume = 1;
-	--		noteSound.TimePosition = noteStartTime;
-	--		if not noteSound.Playing then
-	--			noteSound:Resume();
-	--		end
-	--	end
-	--end
-	
 	local activeNoteInfo = self:GetInputNote(inputObject);
 
 	if activeNoteInfo == nil then return end; 
@@ -411,20 +319,6 @@ end
 
 function Instrument:ProcessInputEnded(inputObject)
 	if not self.Handle:IsDescendantOf(workspace) then return end;
-	
-	--local notesChanged = false;
-	--for a=1, #Instrument.Notes do
-	--	local note = Instrument.Notes[a];
-	--	local noteName = note.Name;
-
-	--	if inputObject.KeyCode == note.KeyCode then
-	--		notesChanged = true;
-	--		self.Notes[noteName] = false;
-
-	--	end
-	--end
-	
-	--if notesChanged then self:Replicate(); end;
 	
 	local activeNoteInfo = self:GetInputNote(inputObject);
 	if activeNoteInfo == nil then return end;

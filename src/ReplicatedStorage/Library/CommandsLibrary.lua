@@ -3052,7 +3052,7 @@ Commands["geteventflag"] = {
 			end
 
 			shared.Notify(speaker, "Event ("..eventId..") for ("..player.Name..")= ".. HttpService:JSONEncode(eventPacket) , "Inform");
-			Debugger:Log("/geteventflag =", eventPacket);
+			Debugger:Warn("/geteventflag =", eventPacket);
 		end
 		return true;
 	end;

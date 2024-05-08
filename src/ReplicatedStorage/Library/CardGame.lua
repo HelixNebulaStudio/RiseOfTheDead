@@ -7,7 +7,6 @@ local RunService = game:GetService("RunService");
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
 local remoteCardGame = modRemotesManager:Get("CardGame");
 
@@ -187,6 +186,15 @@ function Lobby:NextTurn()
 	elseif #self.Players == 1 then
 		local player = self.Players[1].Player;
 		
+		task.spawn(function()
+			local profile = shared.modProfile:Get(player);
+			if profile then
+				local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+				modOnGameEvents:Fire("OnFotlWon", player);
+				profile:AddPlayPoints(10);
+			end
+		end)
+
 		self:UpdateStats(player, true);
 		
 		self:Broadcast(player.Name.." has won the game!", {SndId="WestStyleVictory"});
@@ -552,6 +560,13 @@ function Lobby:PlayAction(player, packet)
 		
 	end
 	
+	task.spawn(function()
+		local profile = shared.modProfile:Get(player);
+		if profile then
+			profile:AddPlayPoints(4);
+		end
+	end)
+
 	self:Changed(true);
 	self:NextTurn();
 end
@@ -659,7 +674,6 @@ function Lobby:Changed(sync)
 							end
 						end
 					end
-					
 				end
 			end)
 			
@@ -957,12 +971,6 @@ if RunService:IsServer() then
 		return rPacket;
 	end
 	
-	
-	--modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
-	--	for a=#CardGame.Lobbies, 1, -1 do
-	--		CardGame.Lobbies[a]:Changed(true);
-	--	end
-	--end)
 end
 
 Debugger:Log("Initialized CardGame");

@@ -37,7 +37,7 @@ function MissionLibrary.GetTypeKey(i)
 	return typesIndexToKey[i];
 end
 
-function MissionLibrary.Get(id: string)
+function MissionLibrary.Get(id: number)
 	return library[id];
 end
 
