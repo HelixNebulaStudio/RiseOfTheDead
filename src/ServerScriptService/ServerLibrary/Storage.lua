@@ -20,7 +20,6 @@ local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 local modProfile = shared.modProfile;
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modStorageHandler = require(game.ServerScriptService.ServerLibrary.StorageHandler);
-local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remoteStorageService = modRemotesManager:Get("StorageService");

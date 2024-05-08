@@ -59,7 +59,6 @@ local modAnalyticsProfile = Debugger:Require(game.ServerScriptService.ServerLibr
 local modItemUnlockables = Debugger:Require(game.ServerScriptService.ServerLibrary.ItemUnlockables);
 local modBattlePassSave = Debugger:Require(game.ServerScriptService.ServerLibrary.BattlePassSave);
 local modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
-local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remotePlayerDataSync = modRemotesManager:Get("PlayerDataSync");
@@ -578,6 +577,7 @@ function Profile:AddPlayPoints(points: number?, reason: string?)
 		playPointsStats.Hour = 0;
 	end
 		
+	local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	modOnGameEvents:Fire("OnPlayPoints", self, points, reason);
 end
 

@@ -10,8 +10,6 @@ return function(profile, points: number?, reason: string?)
 
     local playPointsStats = profile.Cache.PlayPoints;
     if playPointsStats and points > 1 then
-        Debugger:StudioWarn("playPointsStats", points, reason);
-
         local activeId = modBattlePassLibrary.Active;
         if activeId == nil then return end;
         
