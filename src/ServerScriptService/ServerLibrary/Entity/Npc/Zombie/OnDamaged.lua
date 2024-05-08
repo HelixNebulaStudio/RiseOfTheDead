@@ -1,7 +1,5 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local random = Random.new();
-
+--==
 local Zombie = {};
 
 function Zombie.new(self)
@@ -16,7 +14,12 @@ function Zombie.new(self)
 			if attacker and attacker.Name and attacker == game.Players:FindFirstChild(attacker.Name) then
 				if self.Weapons[attacker.Name] == nil then self.Weapons[attacker.Name] = {} end;
 				if weaponItem then
-					if self.Weapons[attacker.Name][weaponItem.ID] == nil then self.Weapons[attacker.Name][weaponItem.ID] = {Damaged=0; Weapon=weaponItem} end;
+					if self.Weapons[attacker.Name][weaponItem.ID] == nil then 
+						self.Weapons[attacker.Name][weaponItem.ID] = {
+							Damaged=0; 
+							Weapon=weaponItem
+						};
+					end;
 					self.Weapons[attacker.Name][weaponItem.ID].Damaged = self.Weapons[attacker.Name][weaponItem.ID].Damaged + amount;
 				end
 			end
@@ -31,8 +34,7 @@ function Zombie.new(self)
 			end
 			
 			if self.OnTarget then
-				task.spawn(self.OnTarget, attacker)
-				--self.OnTarget(attacker);
+				task.spawn(self.OnTarget, attacker);
 			end
 		else
 			Debugger:Log("Attacker (",attacker.Name,") dealt 0 damage with a (",weaponItem and weaponItem.ItemId or "nil",")");

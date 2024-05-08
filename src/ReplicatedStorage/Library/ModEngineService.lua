@@ -70,10 +70,11 @@ function ModEngineService:GetServerModule(name, parent, timeOut)
 		local moduleScript = Debugger:YieldDir(ModEngineService.ModServerLibrary, name, timeOut);
 		if moduleScript then
 			return require(moduleScript);
-			
 		end
+
 	else
 		return self:GetBaseServerModule(name);
+
 	end
 end
 

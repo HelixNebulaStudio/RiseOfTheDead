@@ -152,6 +152,10 @@ function OnPlayerAdded(player)
 			end
 		end
 
+		if referrer == nil then
+			return;
+		end
+
 		local referrerProfile = modProfile:Get(referrer);
 		if #referrerProfile.ReferralList < 8 and table.find(referrerProfile.ReferralList, player.UserId) == nil then
 			table.insert(referrerProfile.ReferralList, player.UserId);

@@ -50,7 +50,7 @@ function OnGameEvents:Invoke(eventId, player, ...)
 end
 
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
-local moddedSelf = modModEngineService:GetModule(script.Name);
+local moddedSelf = modModEngineService:GetServerModule(script.Name);
 if moddedSelf then
 	moddedSelf:Init(OnGameEvents);
 end
