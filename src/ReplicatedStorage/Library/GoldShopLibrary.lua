@@ -15,6 +15,13 @@ end
 
 --[[
 	849095628 = Portable Workbench
+
+
+	-- MARK: Trader Tag Notes
+	Trader={
+		Buy=true;  -- Buy from Npc
+		Sell=true; -- Sell to Npc
+	};
 --]]
 
 GoldShopLibrary.Products:Add{
@@ -1387,7 +1394,7 @@ GoldShopLibrary.Products:Add{
 	};
 	LimitedId="gs_survivorsoutpostunlockpapers";
 
-	Trader={Buy=true; Sell=true;};
+	Trader={Buy=true; Sell=false;};
 };
 
 GoldShopLibrary.Products:Add{
