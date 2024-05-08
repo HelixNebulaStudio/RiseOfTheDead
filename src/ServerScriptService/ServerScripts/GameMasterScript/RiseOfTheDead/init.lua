@@ -74,7 +74,11 @@ function ModEngine.OnPlayerAdded(player: Player)
 			end
 			if profile then profile:SyncMastery(); end
 			
+			profile:AddPlayPoints(1, "Idle:AutoSave");
 			task.wait(60);
+			if not game.Players:IsAncestorOf(player) then
+				break;
+			end
 		until modProfile:Find(player.Name) == nil;
 		
 		inventory.OnItemAdded:Destroy();
@@ -151,45 +155,6 @@ function ModEngine.OnPlayerAdded(player: Player)
 	end
 
 	if modBranchConfigs.WorldInfo.PublicWorld then
-		if not profile.ReferredBy and profile.TrustLevel > 0 then
-			local referrer;
-			local followedPlayer = game.Players:GetPlayerByUserId(player.FollowUserId);
-			if player.FollowUserId ~= 0 and followedPlayer then
-				referrer = followedPlayer;
-			else
-				local oldestFirstJoin = os.time();
-				local onlinePlayers = game.Players:GetPlayers();
-				for _, otherPlayer in pairs(onlinePlayers) do
-					local isFriend = false;
-					pcall(function()
-						isFriend = otherPlayer:IsFriendsWith(player.UserId);
-					end)
-					if otherPlayer ~= player and isFriend then
-						local otherProfile = modProfile:Get(otherPlayer);
-						if otherProfile.FirstJoined < oldestFirstJoin then
-							oldestFirstJoin = otherProfile.FirstJoined;
-							referrer = otherPlayer;
-						end
-					end
-				end
-			end
-			if referrer then
-				local referrerProfile = modProfile:Get(referrer);
-				if #referrerProfile.ReferralList < 5 then
-					local referrerSaveData = referrerProfile and referrerProfile:GetActiveSave();
-					if referrerSaveData and referrerSaveData.NewMail then
-						profile.ReferredBy = referrer.UserId;
-						table.insert(referrerProfile.ReferralList, player.UserId);
-						referrerSaveData:NewMail(modMailObject.new(modMailObject.Enum.Referral, {Name=player.Name;}));
-						if #referrerProfile.ReferralList >= 5 then
-							referrerSaveData:NewMail(modMailObject.new(modMailObject.Enum.ReferralComplete, {}));
-						end
-						referrerSaveData:SyncMail();
-					end
-				end
-			end
-		end
-		
 		--task.spawn(function()
 		--	local sfc22 = require(script.ShortFilmReward22);
 		--	sfc22.Player(player, profile);

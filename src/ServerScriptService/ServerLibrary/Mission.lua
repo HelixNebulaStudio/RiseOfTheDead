@@ -271,10 +271,11 @@ function Mission:CompleteMission(players, missionId, sync)
 						Mission:AddMission(player, reward.Id);
 					end
 				end
-				playerSave:AddStat("TweakPoints", 3);
 				profile:AddPlayPoints(120);
+
+				playerSave:AddStat("TweakPoints", 1);
 				if tweakPointsNotifed == false then
-					shared.Notify(player, "You recieved 3 Tweak Points for completing "..library.Name..".", "Reward");
+					shared.Notify(player, `You recieved 1 Tweak Points for completing {library.Name}.`, "Reward");
 				end
 				
 				if unlockedMission then

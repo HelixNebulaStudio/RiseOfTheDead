@@ -40,11 +40,13 @@ function Enemy.new(self)
 		for a=1, #playerTags do
 			local playerTag = playerTags[a];
 			local player = playerTag.Player;
+			local profile = modProfile:Get(player);
 
 			local playerSave = modProfile:Get(player):GetActiveSave();
 			if playerSave and playerSave.AddStat then
 				playerSave:AddStat("Kills", 1);
 				playerSave:AddStat("HumanKills", 1);
+				profile:AddPlayPoints(3);
 				
 				local moneyReward = random:NextInteger(self.Configuration.MoneyReward.Min, self.Configuration.MoneyReward.Max) + 2*(self.Configuration.Level-1);
 				playerSave:AddStat("Money", moneyReward);

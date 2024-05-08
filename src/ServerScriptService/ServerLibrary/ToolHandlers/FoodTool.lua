@@ -37,6 +37,7 @@ function ToolHandler:OnPrimaryFire(...)
 				local profile = modProfile:Get(self.Player);
 				local playerSave = profile:GetActiveSave();
 				local inventory = profile.ActiveInventory;
+				profile:AddPlayPoints(3);
 				
 				local itemLib = modItemsLibrary:Find(self.StorageItem.ItemId);
 				local configurations = self.ToolConfig.Configurations;

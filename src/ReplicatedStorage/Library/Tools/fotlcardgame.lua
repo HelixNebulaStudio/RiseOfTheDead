@@ -65,7 +65,7 @@ return function()
 		if self.MockItem then return end;
 		
 		local player = game.Players.LocalPlayer;
-		local modData = require(player:WaitForChild("DataModule"));
+		local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 		local modInterface = modData:GetInterfaceModule();
 
 		modInterface:OpenWindow("CardGameWindow");

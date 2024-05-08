@@ -108,6 +108,8 @@ function Crates.Spawn(id, cframe, whitelist, content, visibleToWhitelistOnly)
 						end)
 					end
 				end
+
+				profile:AddPlayPoints(10);
 			end
 		end
 		

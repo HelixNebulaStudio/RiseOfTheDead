@@ -1137,6 +1137,7 @@ remoteInstrumentRemote.OnEvent:Connect(function(player, packet)
 	local profile = modProfile:Get(player);
 	local activeSave = profile:GetActiveSave();
 	local storageItem, storage = modStorage.FindIdFromStorages(storageItemId, player);
+	profile:AddPlayPoints(4);
 	
 	local character = player.Character;
 	if character == nil then Debugger:Warn("Missing Character"); return end;

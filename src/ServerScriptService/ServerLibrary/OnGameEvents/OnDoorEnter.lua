@@ -136,28 +136,5 @@ return function(player, interactData)
 		end
 	end
 	
-	if modEvents:GetEvent(player, "tweakpoints") == nil then
-		modEvents:NewEvent(player, {Id="tweakpoints"});
-		
-		local countComplete = 0;
-		for a=1, #activeSave.Missions do
-			local mission = activeSave.Missions[a];
-			local lib = modMissionLibrary.Get(mission.Id);
-			if mission and lib and mission.MissionType ~= 4 and mission.Type == 3 then
-				countComplete = countComplete +1;
-			end
-		end
-		
-		if countComplete > 0 then
-			local modMailObject = require(game.ServerScriptService.ServerLibrary.MailObject);
-			activeSave:NewMail(modMailObject.new(modMailObject.Enum.TweakPoints, {Amount=countComplete;}));
-			activeSave:SyncMail();
-		end
-	end
-	
-	--[TestMission]
-	if modMission:Progress(player, 99) then
-		modMission:CompleteMission(player, 99);
-	end;
 	bindOnDoorEnter:Fire(player, interactData);
 end;

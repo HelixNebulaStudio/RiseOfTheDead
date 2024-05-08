@@ -46,6 +46,7 @@ local modSerializer = require(game.ReplicatedStorage.Library.Serializer);
 local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 local modTableManager = require(game.ReplicatedStorage.Library.TableManager);
 local modBitFlags = require(game.ReplicatedStorage.Library.BitFlags);
+local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 
 local FirebaseService = Debugger:Require(game.ServerScriptService.ServerLibrary.FirebaseService);
 local modGameSave = Debugger:Require(game.ServerScriptService.ServerLibrary.GameSave);
@@ -58,7 +59,7 @@ local modAnalyticsProfile = Debugger:Require(game.ServerScriptService.ServerLibr
 local modItemUnlockables = Debugger:Require(game.ServerScriptService.ServerLibrary.ItemUnlockables);
 local modBattlePassSave = Debugger:Require(game.ServerScriptService.ServerLibrary.BattlePassSave);
 local modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
-local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
+local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remotePlayerDataSync = modRemotesManager:Get("PlayerDataSync");
@@ -526,8 +527,58 @@ function Profile:AwardPremium(temp)
 	self:Sync("Premium");
 end
 
-function Profile:AddPlayPoints(points)
-	self.PlayPoints = math.ceil(self.PlayPoints + math.clamp(points, 0, 3600));
+function Profile:AddPlayPoints(points: number?, reason: string?)
+	points = math.ceil(math.clamp(points or 1, 0, 3600));
+	self.PlayPoints = math.ceil(self.PlayPoints + points);
+	
+	local playPointsStats = self.Cache.PlayPoints or {
+		Session=0;
+
+		Minute=0;
+		AvgMinute=nil;
+		MinuteTick = tick()+60;
+
+		Minute5=0;
+		AvgMinute5=nil;
+		Minute5Tick = tick()+300;
+
+		Hour=0;
+		AvgHour=nil;
+		HourTick = tick()+3600;
+	};
+	if self.Cache.PlayPoints == nil then
+		self.Cache.PlayPoints = playPointsStats;
+	end
+
+	playPointsStats.Session = playPointsStats.Session + points;
+	playPointsStats.Minute = playPointsStats.Minute + points;
+	playPointsStats.Minute5 = playPointsStats.Minute5 + points;
+	playPointsStats.Hour = playPointsStats.Hour + points;
+
+	local currTick = tick();
+	if currTick > playPointsStats.MinuteTick then
+		playPointsStats.MinuteTick = currTick+60;
+
+		playPointsStats.AvgMinute = ((playPointsStats.AvgMinute or playPointsStats.Minute) + playPointsStats.Minute)/2;
+		playPointsStats.Minute = 0;
+	end
+
+	if currTick > playPointsStats.Minute5Tick then
+		playPointsStats.Minute5Tick = currTick+300;
+
+		playPointsStats.AvgMinute5 = ((playPointsStats.AvgMinute5 or playPointsStats.Minute5) + playPointsStats.Minute5)/2;
+		playPointsStats.Minute5 = 0;
+
+	end
+	
+	if currTick > playPointsStats.HourTick then
+		playPointsStats.HourTick = currTick+3600;
+
+		playPointsStats.AvgHour = ((playPointsStats.AvgHour or playPointsStats.Hour) + playPointsStats.Hour)/2;
+		playPointsStats.Hour = 0;
+	end
+		
+	modOnGameEvents:Fire("OnPlayPoints", self, points, reason);
 end
 
 function Profile:Refresh()
@@ -1655,6 +1706,53 @@ end
 
 task.spawn(function()
 	Debugger.AwaitShared("modCommandsLibrary");
+	local modCommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
+
+	shared.modCommandsLibrary:HookChatCommand("profile", {
+		Permission = shared.modCommandsLibrary.PermissionLevel.Admin;
+		Description = [[Profile commands.
+		/profile playpoints [playerName]
+		]];
+
+		RequiredArgs = 0;
+		UsageInfo = "/profile action ...";
+		Function = function(speaker: Player, args: {[number]: any})
+			local player = speaker;
+
+			local action = args[1];
+
+			if action == "playpoints" then
+				local playerName = args[2];
+				
+				if playerName and tonumber(playerName) == nil then
+					local matches = modCommandHandler.MatchName(playerName);
+					if #matches == 1 then
+						player = matches[1];
+						
+					elseif #matches > 1 then
+						shared.Notify(speaker, `Multiple matches: {Debugger:Stringify(matches)}`, "Inform");
+						return;
+						
+					elseif #matches < 1 then
+						table.insert(args, 2, "");
+					end
+				else
+					table.insert(args, 2, "");
+				end
+				
+				local playerProfile = Profile:Get(player);
+				local playPointsStats =  playerProfile.Cache.PlayPoints or {};
+
+				shared.Notify(player, `== {player.Name} Player Points`, `Inform`);
+				shared.Notify(player, `Minute {playPointsStats.Minute} Avg {playPointsStats.AvgMinute}`, `Inform`);
+				shared.Notify(player, `Minute5 {playPointsStats.Minute5} Avg {playPointsStats.AvgMinute5}`, `Inform`);
+				shared.Notify(player, `Hour {playPointsStats.Hour} Avg {playPointsStats.AvgHour}`, `Inform`);
+			end
+
+			return true;
+		end;
+	});
+
 	shared.modCommandsLibrary:HookChatCommand("togglehardmode", {
 		Permission = shared.modCommandsLibrary.PermissionLevel.Admin;
 		Description = [[Hardmode commands.
