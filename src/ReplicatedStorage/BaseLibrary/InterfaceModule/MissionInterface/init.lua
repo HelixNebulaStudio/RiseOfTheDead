@@ -766,7 +766,7 @@ function Interface.init(modInterface)
 				newRedoButton.Parent = MissionDisplayFrame;
 			end
 
-			if book.MissionType == modMissionsLibrary.MissionTypes.Repeatable then
+			if book.MissionType == modMissionsLibrary.MissionTypes.Board then
 				if data.AddTime and book.ExpireTime then
 					local timeLapsed = book.ExpireTime-math.clamp(os.time()-data.AddTime, 0, book.ExpireTime);
 					descTag.Text = descTag.Text.."\n".."Refreshes: "..(modSyncTime.ToString(timeLapsed));
@@ -972,7 +972,7 @@ function Interface.init(modInterface)
 				Interface.RefreshMissionMap();
 			end)
 			
-			if book.MissionType == modMissionsLibrary.MissionTypes.Repeatable then
+			if book.MissionType == modMissionsLibrary.MissionTypes.Board then
 				if data.AddTime and book.ExpireTime then
 					local timeLapsed = book.ExpireTime-math.clamp(os.time()-data.AddTime, 0, book.ExpireTime);
 					descTag.Text = descTag.Text.."\n".."Refreshes: "..(modSyncTime.ToString(timeLapsed));
@@ -1271,7 +1271,7 @@ function Interface.init(modInterface)
 
 				local missionTypeIcon = newListing:WaitForChild("MissionType");
 
-				if missionInfo.Lib.MissionType == modMissionsLibrary.MissionTypes.Repeatable then
+				if missionInfo.Lib.MissionType == modMissionsLibrary.MissionTypes.Board then
 					missionTypeIcon.Image = "rbxassetid://13870681338";
 					missionTypeIcon.Visible = true;
 

@@ -222,7 +222,7 @@ function Mission:CompleteMission(players, missionId, sync)
 				end
 			end
 			
-			if library.Rewards and (library.MissionType == modMissionLibrary.MissionTypes.Repeatable or modEvents:GetEvent(player, "MRID"..missionId) == nil) then
+			if library.Rewards and (library.MissionType == modMissionLibrary.MissionTypes.Board or modEvents:GetEvent(player, "MRID"..missionId) == nil) then
 				
 				modEvents:NewEvent(player, {Id="MRID"..missionId;});
 				
@@ -482,7 +482,7 @@ function remoteMissionRemote.OnServerInvoke(player, actionId, missionId)
 			return returnPacket;
 		end
 		
-		local listOfRepeatable = missionProfile:GetCatTypes(modMissionLibrary.MissionTypes.Repeatable);
+		local listOfRepeatable = missionProfile:GetCatTypes(modMissionLibrary.MissionTypes.Board);
 		
 		local hasActive = false;
 		for a=1, #listOfRepeatable do
@@ -555,9 +555,9 @@ function Mission.NewList(profile, syncFunc)
 		if library.ExpireTime and addTimeLapse >= library.ExpireTime then return end;
 		--if library.Timer and startTimeLapse >= library.Timer then return end;
 		
-		if library.MissionType == modMissionLibrary.MissionTypes.Repeatable and input.Type == Mission.MissionType.Completed then
+		if library.MissionType == modMissionLibrary.MissionTypes.Board and input.Type == Mission.MissionType.Completed then
 			local timeSinceCompletion = os.time()-(input.CompletionTime or 0);
-			if timeSinceCompletion >= modMissionLibrary.RepeatableMissionCooldown then
+			if timeSinceCompletion >= modMissionLibrary.BoardMissionStockTimer then
 				Debugger:Warn("Remove old repeatable mission ", library.Name);
 				return;
 			end

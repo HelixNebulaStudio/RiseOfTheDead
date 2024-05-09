@@ -12,19 +12,18 @@ local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler);
 local MissionLibrary = {};
 local library = {};
 
-local RepeatableTime = 3600;
-local RestockTimer = 3600;
+local BoardTimeLimit = 3600;
+local BoardRestockTimer = 3600;
 if modBranchConfigs.CurrentBranch.Name == "Dev" then
-	RestockTimer = 10;
+	BoardRestockTimer = 10;
 end;
-
-MissionLibrary.RepeatableMissionCooldown = RestockTimer;
+MissionLibrary.BoardMissionStockTimer = BoardRestockTimer;
 
 MissionLibrary.MissionTypes = {
 	Core=1;
 	Side=2;
 	Secret=3;
-	Repeatable=4;
+	Board=4;
 	Premium=5;
 	Event=6;
 	Faction=7;
@@ -37,6 +36,11 @@ function MissionLibrary.GetTypeKey(i)
 	return typesIndexToKey[i];
 end
 
+--[[
+	MissionLibrary.Get(id: number)
+	Gets the mission library of mission id.
+	@param id number
+]]
 function MissionLibrary.Get(id: number)
 	return library[id];
 end
@@ -54,7 +58,7 @@ function MissionLibrary.CountMissions(types)
 				c = c +1;
 			end
 		elseif lib.MissionType == MissionLibrary.MissionTypes.Core
-		or lib.MissionType == MissionLibrary.MissionTypes.Side then
+			or lib.MissionType == MissionLibrary.MissionTypes.Side then
 			c = c +1;
 		end
 	end
@@ -105,18 +109,6 @@ function MissionLibrary.New(data)
 	end;
 end
 
--- function Dialog(name, tag)
--- 	if RunService:IsServer() then return end;
-
--- 	local _, index = modDialogueLibrary.GetByTag(name, tag);
--- 	if index then
--- 		return {Speaker=name; Tag=tag; Dialogue=modDialogueLibrary[name].Dialogues[index].Dialogue; Reply=modDialogueLibrary[name].Dialogues[index].Reply};
--- 	else
--- 		warn("MissionLibrary>>  Unknown dialog name or index. name:"..(name or "nil")..", tag:"..(tag or "nil").." Name Exist:"..tostring(modDialogueLibrary[name] ~= nil));
--- 		return {Speaker=name; Tag="nil"; Dialogue="Missing: index for "..name..", "..tag;};
--- 	end;
--- end
-
 local function getDayNumber() : number
 	return tonumber(os.date("%j")) :: number;
 end
@@ -149,7 +141,7 @@ MissionLibrary.PerksReward = PerksReward;
 local factionMissionExpireTime = 3600*20;
 --===
 
--- !outline: 1: Unconscious
+-- MARK: 1 - Unconscious
 MissionLibrary.New{
 	MissionId=1;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -165,14 +157,12 @@ MissionLibrary.New{
 		{Text="Equip the P250 by clicking the pistol OR pressing [1]"; Notify=true;};
 		{Text="Defend off the zombies"; Notify=true;};
 	};
-	LogEntry={};
 	GuideText="";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 	};
 	Markers={
 		[2]={World="TheBeginning"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
-		--[3]={Label="Pistol"; Target=Vector3.new(-4.326, 58.697, -209.996); Type=modMarkers.MarkerTypes.Waypoint;};
 		[4]={Label="Careful, Zombies"; Target=Vector3.new(4.307, 53.68, -150.452); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
 	CanRedo={
@@ -182,7 +172,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 2: Where am I
+-- MARK: 2 - Where am I
 MissionLibrary.New{
 	MissionId=2;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -205,7 +195,6 @@ MissionLibrary.New{
 		{Text="Return to Nick";};
 	};
 	SaveData={Kills=10;};
-	LogEntry={};
 	GuideText="";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
@@ -226,7 +215,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 3: Stephanie's Book
+-- MARK: 3 - Stephanie's Book
 MissionLibrary.New{
 	MissionId=3;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -234,13 +223,11 @@ MissionLibrary.New{
 	From="Stephanie";
 	Description="Stephanie is searching for a book, help her look for it.";
 	Persistent=true;
-	--Cutscene="Stephanie's Book";
 	World="TheWarehouse";
 	Objectives={
 		["BookSearch"]={Index=1; Description="Search for the book in the warehouse"; Type="RequireItem"; ItemId="oddbluebook"};
 	};
 	ObjectivesCompleteText="Return the book to Stephanie";
-	LogEntry={};
 	GuideText="Talk to Stephanie to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -252,7 +239,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 4: Lend A Hand
+-- MARK: 4 - Lend A Hand
 MissionLibrary.New{
 	MissionId=4;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -265,7 +252,6 @@ MissionLibrary.New{
 		["ArmSearch"]={Index=1; Description="Kill some zombies to look for a zombie arm"; Type="RequireItem"; ItemId="zombiearm"};
 	};
 	ObjectivesCompleteText="Return the zombie arm to Dr. Deniski";
-	LogEntry={};
 	GuideText="Talk to Dr. Deniski to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -277,7 +263,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 5: Time To Upgrade
+-- MARK: 5 - Time To Upgrade
 MissionLibrary.New{
 	MissionId=5;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -297,7 +283,6 @@ MissionLibrary.New{
 		{Text="Add the mod to your weapon using the workbench";};
 		{Text="Upgrade the mod's damage by selecting the mod on the workbench";};
 	};
-	LogEntry={};
 	GuideText="Talk to Mason to learn how to upgrade your weapons";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
@@ -316,7 +301,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 6: First Rescue
+-- MARK: 6 - First Rescue
 MissionLibrary.New{
 	MissionId=6;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -324,14 +309,12 @@ MissionLibrary.New{
 	From="Robert";
 	Description="You found Robert trapped inside Bloxmart and you want to get him out.";
 	Persistent=true;
-	--Cutscene="First Rescue";
 	World="TheWarehouse";
 	Checkpoint={
 		{Text="Destroy the wooden barricade";};
 		{Text="Bring Robert back to the safehouse";};
 	};
 	SaveData={HP=5;};
-	LogEntry={};
 	GuideText="Someone is screaming for help in Bloxmart, go check it out";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
@@ -348,7 +331,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 7: The Prisoner
+-- MARK: 7 - The Prisoner
 MissionLibrary.New{
 	MissionId=7;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -367,14 +350,13 @@ MissionLibrary.New{
 		{Text="Exit the security room";};
 		{Text="Run!"; Notify=true;};
 	};
-	LogEntry={};
 	GuideText="Help Robert get back to his safehouse";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Mission"; Id=11};
-		{Type="Mission"; Id=46;}; -- Warming Up
-		{Type="Mission"; Id=40;}; -- VT part 1
-		{Type="Mission"; Id=43;}; -- Horror Show
+		{Type="Mission"; Id=46;};
+		{Type="Mission"; Id=40;};
+		{Type="Mission"; Id=43;};
 	};
 	StartRequirements={
 		Level=3;
@@ -390,7 +372,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 8: Bandage Up
+-- MARK: 8 - Bandage Up
 MissionLibrary.New{
 	MissionId=8;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -402,7 +384,6 @@ MissionLibrary.New{
 	Checkpoint={
 		{Text="Build the Medkit from the Workbench";};
 	};
-	LogEntry={};
 	GuideText="Talk to Dr. Deniski to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -416,7 +397,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 9: Special Mods
+-- MARK: 9 - Special Mods
 MissionLibrary.New{
 	MissionId=9;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -428,7 +409,6 @@ MissionLibrary.New{
 	Checkpoint={
 		{Text="Build the Incendiary Rounds mod using the workbench";};
 	};
-	LogEntry={};
 	GuideText="Talk to Stephanie to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -443,7 +423,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 10: Infected
+-- MARK: 10 - Infected
 MissionLibrary.New{
 	MissionId=10;
 	MissionType = MissionLibrary.MissionTypes.Secret;
@@ -451,13 +431,11 @@ MissionLibrary.New{
 	From="Jefferson";
 	Description="You found Jefferson wounded outside the warehouse. You insisted on helping him.";
 	Persistent=true;
-	--Cutscene="InfectedJefferson";
 	World="TheWarehouse";
 	Objectives={
 		["BioticsSearch"]={Index=1; Description="Search for antibiotics in Sunday's"; Type="RequireItem"; ItemId="antibiotics"};
 	};
 	ObjectivesCompleteText="Return the antibiotics to Jefferson";
-	LogEntry={};
 	StartRequirements={
 		MissionCompleted={7};
 	};
@@ -467,7 +445,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 11: Radio Signal
+-- MARK: 11 - Radio Signal
 MissionLibrary.New{
 	MissionId=11;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -480,12 +458,11 @@ MissionLibrary.New{
 		{Text="Repair the satellite on the roof";};
 		{Text="Return back to Jane";};
 	};
-	LogEntry={};
 	GuideText="Talk to Jane to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Mission"; Id=27};
-		{Type="Mission"; Id=49}; -- Navigation
+		{Type="Mission"; Id=49};
 	};
 	StartRequirements={
 		Level=5;
@@ -498,7 +475,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 12: Factory Raid
+-- MARK: 12 - Factory Raid
 MissionLibrary.New{
 	MissionId=12;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -506,7 +483,6 @@ MissionLibrary.New{
 	From="Mason";
 	Description="The warehouse is starting to run low on supplies, Mason needs your help on restocking them.";
 	Persistent=true;
-	--Cutscene="Factory Raid";
 	World={"TheWarehouse", "Factory"};
 	Checkpoint={
 		{Text="Talk to Mason";};
@@ -517,7 +493,6 @@ MissionLibrary.New{
 
 		{Text="Return to the warehouse";};
 	};
-	LogEntry={};
 	GuideText="Talk to Mason to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
@@ -541,6 +516,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 13 - Crowd Control
 MissionLibrary.New{
 	MissionId=13;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -564,6 +540,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 14 - Pigeon Post
 MissionLibrary.New{
 	MissionId=14;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -577,7 +554,6 @@ MissionLibrary.New{
 		"Talk to Jane";
 		"Return to Nick";
 	};
-	LogEntry={};
 	GuideText="Talk to Nick to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -587,6 +563,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 15 - Chain Reaction
 MissionLibrary.New{
 	MissionId=15;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -612,6 +589,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 16 - A Good Deal
 MissionLibrary.New{
 	MissionId=16;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -635,21 +613,19 @@ MissionLibrary.New{
 	};
 };
 
--- !outline: 17: Restock
+-- MARK: 17 - Restock
 MissionLibrary.New{
 	MissionId=17;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Restock";
-	--From="Jesse";
 	Description="Jesse needs to restock some components in the shop.";
-	Timer=RepeatableTime; 
+	Timer=BoardTimeLimit; 
 	Persistent=true;
 	World="TheWarehouse";
 	Objectives={
 		["Search"]={Index=1; Description="Find $Amount $ItemName for Jesse"; Type="RequireItem"; ItemIdOptions={"metalpipes"; "igniter"; "gastank"}; AmountRange={Min=1; Max=3};};
 	};
 	ObjectivesCompleteText="Return to Jesse with the $ItemName";
-	LogEntry={};
 	GuideText="Talk to Jesse to start";
 	Tier="Normal";
 	Rewards={
@@ -662,7 +638,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 18: A New Community
+-- MARK: 18 - A New Community
 MissionLibrary.New{
 	MissionId=18;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -712,6 +688,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 19 - Ticking Mess
 MissionLibrary.New{
 	MissionId=19;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -725,11 +702,6 @@ MissionLibrary.New{
 		"Return to Wilson";
 	};
 	SaveData={Kills=50;};
-	LogEntry={
-		--Dialog("Wilson", "tickhunting_sure");
-		--Dialog("Wilson", "tickhunting_yeah");
-		--Dialog("Wilson", "tickhunting_return");
-	};
 	GuideText="Talk to Wilson to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -742,6 +714,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 20 - Eight Legs
 MissionLibrary.New{
 	MissionId=20;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -755,11 +728,6 @@ MissionLibrary.New{
 		"Return to Erik";
 	};
 	SaveData={Kills=1;};
-	LogEntry={
-		--Dialog("Erik", "eightlegs_sure");
-		--Dialog("Erik", "eightlegs_yeah");
-		--Dialog("Erik", "eightlegs_return");
-	};
 	GuideText="Talk to Erik to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -769,13 +737,13 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 21 - Spring Killing
 MissionLibrary.New{
 	MissionId=21;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Spring Killing";
-	--From="Jane";
 	Description="Jane wants you to clear out all the bosses in W.D. Warehouse.";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
 	World="TheWarehouse";
 	Objectives={
@@ -784,11 +752,6 @@ MissionLibrary.New{
 		["Fumes"]={Index=3; Description="Kill Fumes"; Type="Kill";};
 	};
 	ObjectivesCompleteText="Return to Jane";
-	LogEntry={
-		--{Speaker="Jane"; Reply="Hey, you up for some killing?"};
-		--Dialog("Jane", "springkill_yes");
-		--Dialog("Jane", "springkill_done");
-	};
 	GuideText="Talk to Jane to start";
 	Tier="Easy";
 	Rewards={
@@ -799,6 +762,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 22 - The Backup Plan
 MissionLibrary.New{
 	MissionId=22;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -813,11 +777,6 @@ MissionLibrary.New{
 		"Enter the maintenance room";
 		"Search the wooden crate";
 		"Return to Carlson with the items";
-	};
-	LogEntry={
-		--{Speaker="Carlson"; Reply="Hey, err.. $PlayerName was it?"};
-		--Dialog("Carlson", "thebackup_help");
-		--Dialog("Carlson", "thebackup_thekey");
 	};
 	GuideText="Talk to Carlson to start";
 	Rewards={
@@ -836,6 +795,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 23 - Sniper's Nest
 MissionLibrary.New{
 	MissionId=23;
 	MissionType = MissionLibrary.MissionTypes.Premium;
@@ -849,12 +809,6 @@ MissionLibrary.New{
 		"Return back to Lennon";
 	};
 	SaveData={Kills=25;};
-	LogEntry={
-		--{Speaker="Lennon"; Reply="Kiddddo, ehhh can you help me out?"};
-		--Dialog("Lennon", "snipernest_help");
-		--Dialog("Lennon", "snipernest_many");
-		--Dialog("Lennon", "snipernest_done");
-	};
 	GuideText="Talk to Lennon to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -870,7 +824,7 @@ MissionLibrary.New{
 	};
 };
 
--- !outline: 24: Missing In Action
+-- MARK: 24 - Missing In Action
 MissionLibrary.New{
 	MissionId=24;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -878,7 +832,6 @@ MissionLibrary.New{
 	From="Jane";
 	Description="Robert went missing after leaving the Underbridge safehouse, you need to help search for him.";
 	Persistent=true;
-	--Cutscene="Missing In Action";
 	World="TheUnderground";
 	Checkpoint={
 		{Text="Talk to Lennon to ask about Robert";};
@@ -888,24 +841,6 @@ MissionLibrary.New{
 		{Text="Kill the Bandit Zombie";};
 
 		{Text="Return to Jane";};
-	};
-	LogEntry={
-		--{Speaker="Jane"; Reply="So did you find them? The survivors in the sewers?"};
-		--Dialog("Jane", "mia_yes");
-		--Dialog("Jane", "mia_bridge");
-		--Dialog("Jane", "mia_warn");
-		
-		--{Speaker="Lennon"; Reply="Hmmmmmmm, huh? Oh it's you!"};
-		--Dialog("Lennon", "mia_clue");
-		--Dialog("Lennon", "mia_thanks");
-		
-		--Dialog("Carlson", "mia_seen");
-		--Dialog("Carlson", "mia_thanks");
-		
-		--{Speaker="Bandit Zombie"; Reply="It got me... arrggggggg.. errerrr.."};
-		
-		--Dialog("Jane", "mia_no");
-		--Dialog("Jane", "mia_zombie");
 	};
 	GuideText="Talk to Jane to start";
 	Rewards={
@@ -928,6 +863,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 25 - Christmas Rampage
 MissionLibrary.New{
 	MissionId=25;
 	MissionType = MissionLibrary.MissionTypes.Event;
@@ -940,7 +876,6 @@ MissionLibrary.New{
 		"Return to Mr. Klaws";
 	};
 	SaveData={Kills=30;};
-	LogEntry={};
 	GuideText="Talk to Mr. Klaws";
 	RewardText="Rewarded +20 Perks and Christmas Skins Pack";
 	AddRequirements={
@@ -949,29 +884,23 @@ MissionLibrary.New{
 	LinkNextMission=57;
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
-		{Type="Mission"; Id=57}; -- Mr. Klaw's Workshop
+		{Type="Mission"; Id=57};
 	};
 };
 
--- !outline: 26: Blueprint Demands
+-- MARK: 26 - Blueprint Demands
 MissionLibrary.New{
 	MissionId=26;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Blueprint Demands";
-	--From="Diana";
 	Description="Diana is almost out of blueprints in the shop and needs you to get some more.";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
-	--Cutscene="Blueprint Demands";
 	World="TheUnderground";
 	Objectives={
 		["Search"]={Index=1; Description="Find a $ItemName for Diana"; Type="RequireItem"; ItemIdOptions={"m4a4bp", "awpbp", "minigunbp"}; Amount=1;};
 	};
 	ObjectivesCompleteText="Return to Diana with the $ItemName";
-	LogEntry={
-		--{Speaker="Diana"; Reply="$PlayerName, I got another job for you."};
-		--Dialog("Diana", "blueprint_start");
-	};
 	GuideText="Talk to Diana to start";
 	Tier="Normal";
 	Rewards={
@@ -984,7 +913,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
--- !outline: 27: Focus Levels
+-- MARK: 27 - Focus Levels
 MissionLibrary.New{
 	MissionId=27;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -997,10 +926,6 @@ MissionLibrary.New{
 		{Text="Open your social menu by pressing [G]";};
 		{Text="Kill zombies according to your focus levels to earn a perk";};
 	};
-	LogEntry={
-		--Dialog("Mason", "focusLevels_request");
-		--Dialog("Mason", "focusLevels_okay");
-	};
 	GuideText="Talk to Mason";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -1009,6 +934,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 28 - Safety Safehouse
 MissionLibrary.New{
 	MissionId=28;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -1026,11 +952,6 @@ MissionLibrary.New{
 		["addWall4"]={Index=4; Description="Build a metal wall";};
 	};
 	ObjectivesCompleteText="Return to Carlson";
-	LogEntry={
-		--{Speaker="Carlson"; Reply="$PlayerName, do you have time to help with fortifying the safehouse?"};
-		--Dialog("Carlson", "safetysafehouse_goodGotTime");
-		--Dialog("Carlson", "safetysafehouse_start");
-	};
 	GuideText="Talk to Carlson to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -1047,7 +968,7 @@ MissionLibrary.New{
 	};
 };
 
--- !outline: 29: Lab Assistant
+-- MARK: 29 - Lab Assistant
 MissionLibrary.New{
 	MissionId=29;
 	MissionType = MissionLibrary.MissionTypes.Premium;
@@ -1055,13 +976,11 @@ MissionLibrary.New{
 	From="Hilbert";
 	Description="You found a dead scientist with a blue note.";
 	Persistent=true;
-	--Cutscene="Lab Assistant";
 	World="TheUnderground";
 	Checkpoint={
 		{Text="Ask Lennon to see if he knew Hilbert";};
 		{Text="Ask Dr. Deniski about the note";};
 	};
-	LogEntry={};
 	GuideText="Search the dead body to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -1077,6 +996,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 30 - Poke The Bear
 MissionLibrary.New{
 	MissionId=30;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -1098,17 +1018,6 @@ MissionLibrary.New{
 		{Text="Bribe Patrick with some Canned Beans";};
 		{Text="Talk to Stan";};
 		
-	};
-	LogEntry={
-		--Dialog("Stan", "pokeTheBear_who");
-		--Dialog("Stan", "pokeTheBear_help");
-		--Dialog("Stan", "pokeTheBear_sure");
-		--Dialog("Stan", "pokeTheBear_mall");
-		--Dialog("Stan", "pokeTheBear_mallInfo");
-		--Dialog("Patrick", "pokeTheBear_start");
-		--Dialog("Patrick", "pokeTheBear_bribe");
-		--Dialog("Patrick", "pokeTheBear_bribe");
-		--Dialog("Stan", "pokeTheBear_wait");
 	};
 	GuideText="Talk to Stan";
 	Rewards={
@@ -1133,6 +1042,7 @@ MissionLibrary.New{
 	CanRedo={};
 };
 
+-- MARK: 31 - Bunny Man's Eggs
 MissionLibrary.New{
 	MissionId=31;
 	MissionType = MissionLibrary.MissionTypes.Event;
@@ -1144,7 +1054,6 @@ MissionLibrary.New{
 		["EggHunt"]={Index=1; Description="Bunny Man wants $Amount Easter Eggs"; Type="RequireItem"; ItemId="easteregg2023"; Amount=3;};
 	};
 	ObjectivesCompleteText="Return the $ItemName to Bunny Man";
-	LogEntry={};
 	GuideText="Talk to Bunny Man";
 	AddRequirements={
 		{Type="SpecialEvent"; Value="Easter"};
@@ -1156,6 +1065,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 32 - Easter Butchery
 MissionLibrary.New{
 	MissionId=32;
 	MissionType = MissionLibrary.MissionTypes.Event;
@@ -1168,7 +1078,6 @@ MissionLibrary.New{
 		"Complete Bunny Man's challenge";
 		"Talk to Bunny Man";
 	};
-	LogEntry={};
 	GuideText="Talk to Bunny Man";
 	AddRequirements={
 		{Type="SpecialEvent"; Value="Easter"};
@@ -1179,7 +1088,7 @@ MissionLibrary.New{
 	};
 };
 
--- !outline: 33: Awoken The Bear
+-- MARK: 33 - Awoken The Bear
 MissionLibrary.New{
 	MissionId=33;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -1206,7 +1115,6 @@ MissionLibrary.New{
 		{Text="Talk to Patrick";};
 		{Text="Escape the Bandit Outpost";};
 	};
-	LogEntry={};
 	GuideText="Talk to Stan";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
@@ -1231,15 +1139,14 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 34 - Escort
 MissionLibrary.New{
 	MissionId=34;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Escort";
-	--From="Molly";
 	Description="Molly wants you to escort a stranger to a location. Protect them at all costs.";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
-	--World="TheMall";
 	Cutscene="Escort";
 	SaveData={
 		Location=(function()
@@ -1269,6 +1176,7 @@ MissionLibrary.New{
 	BoardPickFreq=5;
 };
 
+-- MARK: 35 - Food Airdrop
 MissionLibrary.New{
 	MissionId=35;
 	MissionType = MissionLibrary.MissionTypes.Faction;
@@ -1301,25 +1209,12 @@ MissionLibrary.New{
 		SuccessfulAgents=1;
 	};
 	QuotaLimit=16;
-	PrintNote=function(missionInfo)
+	PrintNote=function(missionPacket)
 		local noteText = "";
 
-		-- local shortestTime, mvpUserId = math.huge, nil;
-		-- for userId, playerData in pairs(missionInfo.Players) do
-		-- 	if playerData.Name == nil then continue end;
-		-- 	local missionData = playerData.MissionData;
-		-- 	if missionData == nil then continue end;
-
-		-- 	local timeLapsed = missionData.Timelapsed or math.huge;
-		-- 	if timeLapsed < shortestTime and timeLapsed <= 300 and timeLapsed > 0 then
-		-- 		shortestTime = timeLapsed;
-		-- 		mvpUserId = userId;
-		-- 	end
-		-- end
-		
 		local shortestTime = math.huge;
 		local mvpUsers = {};
-		for userId, playerData in pairs(missionInfo.Players) do
+		for userId, playerData in pairs(missionPacket.Players) do
 			if playerData.Name == nil then continue end;
 			local missionData = playerData.MissionData;
 			if missionData == nil then continue end;
@@ -1341,6 +1236,7 @@ MissionLibrary.New{
 	end;
 };
 
+-- MARK: 36 - Calming Tunes
 MissionLibrary.New{
 	MissionId=36;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -1354,8 +1250,6 @@ MissionLibrary.New{
 	};
 	ObjectivesCompleteText="Return to Erik with the music box";
 	SaveData={};
-	LogEntry={
-	};
 	GuideText="Talk to Erik to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -1365,6 +1259,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 37 - Joseph's Lettuce
 MissionLibrary.New{
 	MissionId=37;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -1399,7 +1294,7 @@ MissionLibrary.New{
 	};
 };
 
--- !outline: 38: Something's Not Right
+-- MARK: 38 - Something's Not Right
 MissionLibrary.New{
 	MissionId=38;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -1407,7 +1302,6 @@ MissionLibrary.New{
 	From="Patrick";
 	Description="You have unfinished bussiness after what happened at the Bandit Camp.";
 	Persistent=true;
-	--Cutscene="Something's Not Right";
 	World={"TheMall", "TheUnderground", "TheResidentials"};
 	Checkpoint={
 		{Text="Head to the train station safehouse to talk to Rachel";};
@@ -1418,8 +1312,6 @@ MissionLibrary.New{
 
 		{Text="Talk to Robert";};
 		{Text="Talk to Robert";};
-	};
-	LogEntry={
 	};
 	GuideText="Talk to Patrick";
 	Rewards={
@@ -1445,6 +1337,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 39 - Spiking Up
 MissionLibrary.New{
 	MissionId=39;
 	MissionType=MissionLibrary.MissionTypes.Side;
@@ -1462,8 +1355,6 @@ MissionLibrary.New{
 		["addWall5"]={Index=5; Description="Build a spiked fence";};
 	};
 	ObjectivesCompleteText="Return to Danny";
-	LogEntry={
-	};
 	GuideText="Talk to Danny to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -1480,6 +1371,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 40 - Vindictive Treasure 1
 MissionLibrary.New{
 	MissionId=40;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -1500,8 +1392,6 @@ MissionLibrary.New{
 		"Return to Victor";
 	};
 	SaveData={};
-	LogEntry={
-	};
 	GuideText="Talk to Victor to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -1523,6 +1413,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 41 - Vindictive Treasure 2
 MissionLibrary.New{
 	MissionId=41;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -1539,8 +1430,6 @@ MissionLibrary.New{
 		"Pick up the cultist hood";
 	};
 	SaveData={Kills=5;};
-	LogEntry={
-	};
 	GuideText="Kill a cultist to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -1553,6 +1442,7 @@ MissionLibrary.New{
 	Markers={};
 };
 
+-- MARK: 42 - Vindictive Treasure 3
 MissionLibrary.New{
 	MissionId=42;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -1591,7 +1481,7 @@ MissionLibrary.New{
 	};
 };
 
-
+-- MARK: 43 - Missing Body 1
 MissionLibrary.New{
 	MissionId=43;
 	MissionType = MissionLibrary.MissionTypes.Event;
@@ -1609,7 +1499,6 @@ MissionLibrary.New{
 	};
 	World={"TheWarehouse"; "TheMall"};
 	SaveData={};
-	LogEntry={};
 	GuideText="Talk to Jack Reap";
 	AddRequirements={
 		{Type="SpecialEvent"; Value="Halloween"};
@@ -1625,6 +1514,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 44 - Missing Body 2
 MissionLibrary.New{
 	MissionId=44;
 	MissionType = MissionLibrary.MissionTypes.Event;
@@ -1641,7 +1531,6 @@ MissionLibrary.New{
 	};
 	World={"TheWarehouse"; "TheResidentials";};
 	SaveData={};
-	LogEntry={};
 	GuideText="Go to the office and read the note";
 	AddRequirements={
 		{Type="SpecialEvent"; Value="Halloween"};
@@ -1654,6 +1543,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 45 - Mike's Lucky Coin
 MissionLibrary.New{
 	MissionId=45;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -1670,7 +1560,6 @@ MissionLibrary.New{
 	};
 	World={"Prison";};
 	SaveData={};
-	LogEntry={};
 	GuideText="Talk to Mike";
 	AddRequirements={
 		{Type="Mission"; Id=38};
@@ -1686,7 +1575,7 @@ MissionLibrary.New{
 	};
 };
 
-
+-- MARK: 46 - Warming Up
 MissionLibrary.New{
 	MissionId=46;
 	MissionType = MissionLibrary.MissionTypes.Event;
@@ -1700,7 +1589,6 @@ MissionLibrary.New{
 		"Talk to Mr. Klaws";
 	};
 	SaveData={};
-	LogEntry={};
 	GuideText="Talk to Mr. Klaws";
 	AddRequirements={
 		{Type="SpecialEvent"; Value="Christmas"};
@@ -1708,10 +1596,11 @@ MissionLibrary.New{
 	LinkNextMission=25;
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
-		{Type="Mission"; Id=25;}; -- Christmas Rampage
+		{Type="Mission"; Id=25;};
 	};
 };
 
+-- MARK: 47 - Sound of Music
 MissionLibrary.New{
 	MissionId=47;
 	MissionType = MissionLibrary.MissionTypes.Premium;
@@ -1726,8 +1615,6 @@ MissionLibrary.New{
 		"Talk to Carlos";
 	};
 	SaveData={};
-	LogEntry={
-	};
 	GuideText="Talk to Carlos to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
@@ -1740,13 +1627,13 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 48 - Coming To The Rescue
 MissionLibrary.New{
 	MissionId=48;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Coming To The Rescue";
-	--From="Stranger";
 	Description="A stranger is trapped somewhere in W.D. Mall and needs your help.";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
 	Cutscene="Coming To The Rescue";
 	SaveData={
@@ -1761,8 +1648,6 @@ MissionLibrary.New{
 	Progression={
 		"Find the stranded Stranger somewhere in W.D. Mall";
 		"Bring the Stranger back to a safehouse";
-	};
-	LogEntry={
 	};
 	GuideText="Help the Stranger break out";
 	Tier="Normal";
@@ -1779,7 +1664,7 @@ MissionLibrary.New{
 	CanFastTravelWhenActive={2};
 };
 
--- !outline: 49: Navigation
+-- MARK: 49 - Navigation
 MissionLibrary.New{
 	MissionId=49;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -1788,22 +1673,12 @@ MissionLibrary.New{
 	Description="Mason needs help searching for a book.";
 	Persistent=true;
 	World="TheWarehouse";
-	--Cutscene="Navigation";
 	Checkpoint={
 		{Text="Purchase a GPS from the shop";};
 		{Text="Open your inventory and use (Right Click / Touch hold) the GPS to guide you to the office";};
 		{Text="Navigate to the office and unlock it on the GPS";};
 		{Text="Pick up the Vehicle Repair Manual";};
 		{Text="Give the manual to Mason";};
-	};
-	--Progression={
-	--	"Purchase a GPS from the shop";
-	--	"Open your inventory and use (Right Click / Touch hold) the GPS to guide you to the office";
-	--	"Navigate to the office and unlock it on the GPS";
-	--	"Pick up the Vehicle Repair Manual";
-	--	"Give the manual to Mason";
-	--};
-	LogEntry={
 	};
 	GuideText="Talk to Mason";
 	Rewards={
@@ -1818,6 +1693,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 50 - Easter Butchery 2
 MissionLibrary.New{
 	MissionId=50;
 	MissionType = MissionLibrary.MissionTypes.Event;
@@ -1838,7 +1714,6 @@ MissionLibrary.New{
 		"Fight off the cultists";
 		"Talk to Bunny Man";
 	};
-	LogEntry={};
 	GuideText="Talk to Bunny Man";
 	AddRequirements={
 		{Type="SpecialEvent"; Value="Easter"};
@@ -1851,6 +1726,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 51 - Quarantine Assessment
 MissionLibrary.New{
 	MissionId=51;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -1870,7 +1746,6 @@ MissionLibrary.New{
 		"Talk to Wilson";
 	};
 	SaveData={};
-	LogEntry={};
 	GuideText="Talk to Wilson";
 	AddRequirements={
 		{Type="Mission"; Id=19};
@@ -1892,6 +1767,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 52 - The Investigation
 MissionLibrary.New{
 	MissionId=52;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -1925,8 +1801,6 @@ MissionLibrary.New{
 		"Molly heals Joseph";
 		"Talk to Joseph";
 	};
-	LogEntry={
-	};
 	GuideText="Talk to Joseph";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
@@ -1947,7 +1821,7 @@ MissionLibrary.New{
 	CanRedo={};
 };
 
--- !outline: 53: Quarantine Assessment 2
+-- MARK: 53 - Quarantine Assessment 2
 MissionLibrary.New{
 	MissionId=53;
 	MissionType = MissionLibrary.MissionTypes.Premium;
@@ -1969,7 +1843,6 @@ MissionLibrary.New{
 		{Text="Talk to Wilson";};
 	};
 	SaveData={};
-	LogEntry={};
 	GuideText="Talk to Wilson";
 	AddRequirements={
 		{Type="Mission"; Id=51};
@@ -1985,6 +1858,7 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 54 - Home Sweet Home
 MissionLibrary.New{
 	MissionId=54;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -1992,7 +1866,6 @@ MissionLibrary.New{
 	From="Mason";
 	Description="Mason found a place and needs your help scavenging it.";
 	World={"Safehome";};
-	--Cutscene="Safehome";
 	Persistent=true;
 	Checkpoint={
 		{Text="Talk to Mason to head out";};
@@ -2002,7 +1875,6 @@ MissionLibrary.New{
 		{Text="Talk to Mason";};
 	};
 	SaveData={};
-	LogEntry={};
 	GuideText="Talk to Mason";
 	AddRequirements={
 		{Type="Mission"; Id=12};
@@ -2018,20 +1890,20 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 55 - Another Survivor
 MissionLibrary.New{
 	MissionId=55;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Another Survivor";
 	Description="A survivor has arrive at your safehome.";
 	World={"Safehome";};
 	Cutscene="Another Survivor";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
 	Progression={
 		"Talk to the survivor";
 	};
 	SaveData={};
-	LogEntry={};
 	GuideText="Go to your Safehome";
 	AddRequirements={
 		{Type="Mission"; Id=38};
@@ -2049,7 +1921,7 @@ MissionLibrary.New{
 	SkipDestroyIfAddRequirementsNotMet=true;
 };
 
--- !outline: 56: End Of The Line
+-- MARK: 56 - End Of The Line
 MissionLibrary.New{
 	MissionId=56;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -2068,8 +1940,6 @@ MissionLibrary.New{
 		
 		{Text="Complete Genesis";};
 	};
-	LogEntry={
-	};
 	GuideText="Talk to Joseph";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
@@ -2084,6 +1954,7 @@ MissionLibrary.New{
 	CanRedo={};
 };
 
+-- MARK: 57 - Mr. Klaw's Workshop
 MissionLibrary.New{
 	MissionId=57;
 	MissionType = MissionLibrary.MissionTypes.Event;
@@ -2097,22 +1968,19 @@ MissionLibrary.New{
 		"Return the book back to Mr. Klaws";
 	};
 	SaveData={};
-	LogEntry={};
 	GuideText="Talk to Mr. Klaws";
 	AddRequirements={
 		{Type="SpecialEvent"; Value="Christmas"};
 	};
-	--LinkNextMission=25;
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	Markers={
 		[2]={World="KlawsWorkshop"; Label="Mr. Klaw's Journal"; Target=Vector3.new(-19.151, 103.838, -224.87); Type=modMarkers.MarkerTypes.Waypoint;};
-		
 	};
 };
 
--- !outline: 58: Double Cross
+-- MARK: 58 - Double Cross
 MissionLibrary.New{
 	MissionId=58;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -2121,7 +1989,6 @@ MissionLibrary.New{
 	Description="Patrick has some bad news";
 	Persistent=true;
 	World={"TheHarbor"; "DoubleCross"; "Safehome"};
-
 	Checkpoint={
 		{Text="Talk to Caitlin";};
 		{Text="Waiting for Revas's Response";};
@@ -2145,8 +2012,6 @@ MissionLibrary.New{
 		{Text="Talk to Patrick";};	--World Safehome
 		{Text="Get Patrick a medkit";};
 	};
-	LogEntry={
-	};
 	StartRequirements={
 		MissionCompleted={56};
 	};
@@ -2155,7 +2020,6 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Mission"; Id=62};
 		{Type="Mission"; Id=63};
-		--{Type="Mission"; Id=72};
 		{Type="Mission"; Id=75};
 	};
 	Markers={
@@ -2165,15 +2029,8 @@ MissionLibrary.New{
 	CanRedo={};
 	UseAssets=true;
 }
---(function(data)
---	if modBranchConfigs.CurrentBranch.Name ~= "Dev" then return end;
-	
---	table.insert(data.Rewards, {Type="Mission"; Id=62});
---	table.insert(data.Rewards, {Type="Mission"; Id=63});
-	
---	Debugger:Log("Rewards", data.Rewards);
---end)
 
+-- MARK: 59 - Horde Clearance
 MissionLibrary.New{
 	MissionId=59;
 	MissionType = MissionLibrary.MissionTypes.Faction;
@@ -2204,7 +2061,7 @@ MissionLibrary.New{
 	QuotaLimit=16;
 };
 
-
+-- MARK: 60 - Reconnaissance Duty
 MissionLibrary.New{
 	MissionId=60;
 	MissionType = MissionLibrary.MissionTypes.Faction;
@@ -2262,7 +2119,7 @@ MissionLibrary.New{
 	CanFastTravelWhenActive={2};
 };
 
-
+-- MARK: 61 - Ammo Manufacturing
 MissionLibrary.New{
 	MissionId=61;
 	MissionType = MissionLibrary.MissionTypes.Faction;
@@ -2272,10 +2129,10 @@ MissionLibrary.New{
 	From="Faction";
 	Description="Use some material to manufacture ammunition to increase faction's Ammo supply.";
 	Persistent=true;
-	SaveData={};
 	Checkpoint={
 		{Text="Craft Patrick an Ammo Box. Check Bandit's Market for Ammo Box Blueprint.";};
 	};
+	SaveData={};
 	GuideText="Start by faction";
 	FactionCosts={
 		{Type="Resource"; Per="Player"; Id="Food"; Value=0.1;};
@@ -2291,7 +2148,7 @@ MissionLibrary.New{
 	QuotaLimit=16;
 };
 
-
+-- MARK: 62 - Rats Recruitment
 MissionLibrary.New{
 	MissionId=62;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -2323,8 +2180,6 @@ MissionLibrary.New{
 	Objectives={
 		["Objective1"]={Index=1; Description="$Amount Nekron Particulate Cache"; Type="RequireItem"; ItemId="nekronparticulatecache"; Amount=2;};
 	};
-	LogEntry={
-	};
 	StartRequirements={
 		MissionCompleted={58};
 	};
@@ -2351,6 +2206,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 63 - Bandits Recruitment
 MissionLibrary.New{
 	MissionId=63;
 	MissionType = MissionLibrary.MissionTypes.Core;
@@ -2379,8 +2235,6 @@ MissionLibrary.New{
 	Objectives={
 		["Objective1"]={Index=1; Description="$Amount Nekron Particulate Cache"; Type="RequireItem"; ItemId="nekronparticulatecache"; Amount=2;};
 	};
-	LogEntry={
-	};
 	StartRequirements={
 		MissionCompleted={58};
 	};
@@ -2406,6 +2260,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 64 - Joseph's Crossbow
 MissionLibrary.New{
 	MissionId=64;
 	MissionType = MissionLibrary.MissionTypes.Secret;
@@ -2416,8 +2271,6 @@ MissionLibrary.New{
 	World={"TheResidentials";};
 	Checkpoint={
 		{Text="Figure out how to build Joseph's Crossbow";};
-	};
-	LogEntry={
 	};
 	StartRequirements={
 		Level=500;
@@ -2431,21 +2284,19 @@ MissionLibrary.New{
 	AddRequirements={};
 };
 
+-- MARK: 65 - Eternal Inferno
 MissionLibrary.New{
 	MissionId=65;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Eternal Inferno";
-	--From="Joseph";
 	Description="Joseph wants to see the effects of killing zombies with fire.";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
 	World="TheResidentials";
 	Checkpoint={
 		{Text="Kill $Kills zombies with Fire Damage";};
 	};
 	SaveData={Kills=100;};
-	LogEntry={
-	};
 	GuideText="";
 	Tier="Normal";
 	Rewards={
@@ -2456,13 +2307,13 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 66 - Monorail
 MissionLibrary.New{
 	MissionId=66;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Monorail";
-	--From="Nate";
 	Description="Nate has been going to Sector D but he needs help with the monorail inside.";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
 	Checkpoint={
 		{Text="Objectives"; CompleteText="Well done"; Objectives={"CompleteSurvival", "ActivateMonorail"};};
@@ -2473,8 +2324,6 @@ MissionLibrary.New{
 	};
 	CompleteAfterObjectives=true; -- complete if all objectives are done.
 	SaveData={};
-	LogEntry={
-	};
 	GuideText="";
 	Tier="Hard";
 	Rewards={
@@ -2483,24 +2332,22 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
-	BoardPickFreq=5;
+	BoardPickFreq=8;
 };
 
+-- MARK: 67 - Capital Gains
 MissionLibrary.New{
 	MissionId=67;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Capital Gains";
-	--From="Lewis";
 	Description="Help Lewis stabilize the economy by selling some things.";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
 	World="TheResidentials";
 	Checkpoint={
 		{Text="Sell items in the shop: $$Money/$$MaxMoney";};
 	};
 	SaveData={Money=0; MaxMoney=10000;};
-	LogEntry={
-	};
 	GuideText="";
 	Tier="Normal";
 	Rewards={
@@ -2511,13 +2358,13 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 68 - Sunken Salvages
 MissionLibrary.New{
 	MissionId=68;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Sunken Salvages";
-	--From="Cooper";
 	Description="Some cargo has been loss during the shipping, Cooper needs you to look for them in the sea.";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
 	World="TheHarbor";
 	Cutscene="Sunken Salvages";
@@ -2525,8 +2372,6 @@ MissionLibrary.New{
 		{Text="Search for $SalvagesLeft more sunken salvages in W.D Harbor.";};
 	};
 	SaveData={SalvagesLeft=3;};
-	LogEntry={
-	};
 	GuideText="";
 	Tier="Normal";
 	Rewards={
@@ -2537,12 +2382,13 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 69 - Reserved Weapons
 MissionLibrary.New{
 	MissionId=69;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Reserved Weapons";
 	Description="Get an amount of zombie kills with a type of weapon";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
 	Checkpoint={
 		{Text="Kill $Kills zombies with a $WeaponType";};
@@ -2554,8 +2400,6 @@ MissionLibrary.New{
 			return list[math.fmod(getDayNumber()*getHourNumber(), #list) +1];
 		end;
 	};
-	LogEntry={
-	};
 	GuideText="";
 	Tier="Normal";
 	Rewards={
@@ -2566,12 +2410,13 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 70 - Anti Immunity
 MissionLibrary.New{
 	MissionId=70;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Anti Immunity";
 	Description="Kill zombies that have immunity with a melee weapon";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
 	Checkpoint={
 		{Text="Kill $Kills immune zombies with melee";};
@@ -2579,8 +2424,6 @@ MissionLibrary.New{
 	SaveData={
 		Kills=10;
 	};
-	LogEntry={
-	};
 	GuideText="";
 	Tier="Normal";
 	Rewards={
@@ -2591,15 +2434,14 @@ MissionLibrary.New{
 	};
 };
 
--- !outline: 71: High Value Package
+-- MARK: 71 - High Value Package
 MissionLibrary.New{
 	MissionId=71;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="High Value Package";
 	Description="Help deliver a high value package.";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
-	--Cutscene="High Value Package";
 	Checkpoint={
 		{Text="Pick up the package from Greg near the Harbor Docks.";};
 		{Text="Bring the package to $TargetPlace.";};
@@ -2609,8 +2451,6 @@ MissionLibrary.New{
 			local list = {"Frank in Sunday's Safehouse"; "Diana in Underbridge Safehouse"};
 			return list[math.fmod(getDayNumber() * getHourNumber(), #list) +1];
 		end;
-	};
-	LogEntry={
 	};
 	GuideText="";
 	Tier="Hard";
@@ -2626,35 +2466,30 @@ MissionLibrary.New{
 	UseAssets=true;
 };
 
+-- MARK: 72 - Weapons Expert
 --MissionLibrary.New{
 --	MissionId=72;
 --	MissionType = MissionLibrary.MissionTypes.Core;
 --	Name="Weapons Expert";
---	From="Patrick";
---	Description="Patrick lets you know that a lone wanderer has stopped by your safehome while you're gone.";
+--	From="Niko";
+--	Description="Niko teaches you how to tweak your weapons.";
 --	Persistent=true;
---	--World={"TheHarbor"; "DoubleCross"; "Safehome"};
 --	Cutscene="Weapons Expert";
---	Progression={
---		"Talk to Caitlin";
---	};
---	LogEntry={
+--	Checkpoint={
 --	};
 --	StartRequirements={
---		MissionCompleted={58};
+--		MissionCompleted={};
 --	};
---	GuideText="Talk to Patrick";
+--	GuideText="";
 --	Rewards={
 --		{Type="Perks"; Amount=PerksReward.Core};
 --	};
 --	Markers={
---		--[1]={World="TheHarbor"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
---		--[4]={World="TheHarbor"; Label="Revas's Office"; Target=Vector3.new(-290.606, 107.853, 243.741); Type=modMarkers.MarkerTypes.Waypoint;};
 --	};
 --	CanRedo={};
 --};
 
-
+-- MARK: 73 - Deadly Zeniths Strike
 MissionLibrary.New{
 	MissionId=73;
 	MissionType = MissionLibrary.MissionTypes.Faction;
@@ -2689,20 +2524,19 @@ MissionLibrary.New{
 	QuotaLimit=10;
 };
 
+-- MARK: 74 - Breach by the Dead
 MissionLibrary.New{
 	MissionId=74;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Breach by the Dead";
 	Description="Help defend a safehouse from a breach.";
-	Timer=RepeatableTime;
+	Timer=BoardTimeLimit;
 	Persistent=true;
 	Checkpoint={
 		{Text="Look for a safehouse which is getting breached right now, there may or may not be one right now.";};
 		{Text="Keep killing zombies and barricade walls until the safehouse breach is over.";};
 	};
 	SaveData={};
-	LogEntry={
-	};
 	GuideText="";
 	Tier="Hard";
 	Rewards={
@@ -2713,6 +2547,7 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 75 - Medical Breakthrough
 MissionLibrary.New{
 	MissionId=75;
 	MissionType = MissionLibrary.MissionTypes.Side;
@@ -2720,7 +2555,6 @@ MissionLibrary.New{
 	From="Rachel";
 	Description="Rachel has an epiphany about Stan and the possibility of his blood.";
 	Persistent=true;
-	--World={"TheHarbor"; "DoubleCross"; "Safehome"};
 	Cutscene="Medical Breakthrough";
 	Checkpoint={
 		{Text="Talk to Rachel to pick up the blood samples";};
@@ -2743,8 +2577,6 @@ MissionLibrary.New{
 		{Text="Talk to Dr. Deniski in Warehouse Safehouse";};
 		{Text="Return to Rachel with Dr. Deniski's insights";};
 	};
-	LogEntry={
-	};
 	StartRequirements={
 		MissionCompleted={8;};
 	};
@@ -2753,8 +2585,6 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	Markers={
-		--[1]={World="TheHarbor"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
-		--[4]={World="TheHarbor"; Label="Revas's Office"; Target=Vector3.new(-290.606, 107.853, 243.741); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
 	UseAssets=true;
 };
@@ -2762,10 +2592,10 @@ MissionLibrary.New{
 -- MARK: 76 - Ziphoning Serum
 MissionLibrary.New{
 	MissionId=76;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Ziphoning Serum";
 	Description="Rachel requires some items to create some Ziphoning Serum.";
-	Timer=RepeatableTime; 
+	Timer=BoardTimeLimit; 
 	Persistent=true;
 	Checkpoint={
 		{Text="Objectives"; CompleteText="Trade the items with Rachel"; Objectives={"Item1"; "Item2"};};
@@ -2773,8 +2603,6 @@ MissionLibrary.New{
 	Objectives={
 		["Item1"]={Index=1; Description="$Amount Nekron Scales"; Type="RequireItem"; ItemId="nekronscales"; Amount=6;};
 		["Item2"]={Index=2; Description="$Amount Nekron Particulate"; Type="RequireItem"; ItemId="nekronparticulate"; Amount=3;};
-	};
-	LogEntry={
 	};
 	GuideText="Talk to Rachel to start";
 	Tier="Normal";
@@ -2795,7 +2623,6 @@ MissionLibrary.New{
 	From="Mysterious Engineer";
 	Description="You found a piece of blueprint from the SunkenShip Chest, ask the Mysterious Engineer about it.";
 	Persistent=true;
-	--World={"TheHarbor"; "DoubleCross"; "Safehome"};
 	Checkpoint={
 		{Text="Get eaten by Elder Vexeron";};
 		{Text="Search for the missing blueprint pieces $PieceFound/2";};
@@ -2814,10 +2641,7 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
-	Markers={
-		--[1]={World="TheHarbor"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
-		--[4]={World="TheHarbor"; Label="Revas's Office"; Target=Vector3.new(-290.606, 107.853, 243.741); Type=modMarkers.MarkerTypes.Waypoint;};
-	};
+	Markers={};
 	UseAssets=true;
 };
 
@@ -2838,8 +2662,6 @@ MissionLibrary.New{
 		
 		{Text="Talk to Lydia";};
 	};
-	LogEntry={
-	};
 	StartRequirements={
 	};
 	SaveData={
@@ -2857,10 +2679,10 @@ MissionLibrary.New{
 -- MARK: 79 - Javelineer Prodigy
 MissionLibrary.New{
 	MissionId=79;
-	MissionType = MissionLibrary.MissionTypes.Repeatable;
+	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Javelineer Prodigy";
 	Description="Kill enemies with throwing weapons.";
-	Timer=RepeatableTime; 
+	Timer=BoardTimeLimit; 
 	Persistent=true;
 	Checkpoint={
 		{Text="Get $Kills Kills with a throwing weapon excluding explosives and flammables";};
@@ -2880,36 +2702,17 @@ MissionLibrary.New{
 };
 
 
--- Timed mission
---MissionLibrary.New{
---	MissionId=99;
---	Name="TestMission";
---	From="Mason";
---	Description="Test mission.";
---	Timer=30;
---	Persistent=false;
---	Progression={
---		"Enter a door"
---	};
---	LogEntry={
---	};
---	GuideText="Talk to Mason to start";
---	Rewards={
---		{Type="Money"; Amount=20};
---	};
---};
-
+-- MARK: 666 - TestMission
 MissionLibrary.New{
 	MissionId=666;
 	MissionType = MissionLibrary.MissionTypes.Unreleased;
 	Name="TestMission";
 	From="Mason";
 	Description="Test mission.";
+	Timer=30;
 	Persistent=false;
-	Progression={
-		"Enter a door"
-	};
-	LogEntry={
+	Checkpoint={
+		{Text="Enter a door";};
 	};
 	GuideText="Talk to Mason to start";
 	Rewards={

@@ -252,10 +252,10 @@ function OnPlayerAdded(player)
 
 				for _, mission in pairs(missionProfile) do
 					if mission == nil then continue end;
-					if mission.CatType ~= modMissionLibrary.MissionTypes.Repeatable then continue end;
+					if mission.CatType ~= modMissionLibrary.MissionTypes.Board then continue end;
 					if mission.Type ~= 3 then continue end;
 
-					local isExpired = unixTime-(mission.CompletionTime or 0) >= modMissionLibrary.RepeatableMissionCooldown;
+					local isExpired = unixTime-(mission.CompletionTime or 0) >= modMissionLibrary.BoardMissionStockTimer;
 					if isExpired then
 						missionProfile:Destroy(mission);
 						doSync = true;
@@ -268,10 +268,10 @@ function OnPlayerAdded(player)
 				local maxBoardMissions = 6;
 				
 				local timelaspedSinceLastAdd = unixTime - missionMetaData.LastAddUnixTime;
-				local addCount = math.min(math.floor( (timelaspedSinceLastAdd) / modMissionLibrary.RepeatableMissionCooldown ), maxBoardMissions);
+				local addCount = math.min(math.floor( (timelaspedSinceLastAdd) / modMissionLibrary.BoardMissionStockTimer ), maxBoardMissions);
 				
 				local availRepetablesMissions = 0;
-				for _, missionData in pairs(missionProfile:GetCatTypes(modMissionLibrary.MissionTypes.Repeatable)) do
+				for _, missionData in pairs(missionProfile:GetCatTypes(modMissionLibrary.MissionTypes.Board)) do
 					if missionData.Type == 2 then
 						availRepetablesMissions = availRepetablesMissions +1;
 					end
@@ -293,7 +293,7 @@ function OnPlayerAdded(player)
 				
 				local maxPickFreq = 1;
 				for id, missionLib in pairs(modMissionLibrary.List()) do
-					if missionLib.MissionType ~= modMissionLibrary.MissionTypes.Repeatable then continue end;
+					if missionLib.MissionType ~= modMissionLibrary.MissionTypes.Board then continue end;
 					table.insert(missionIdsList, missionLib);
 					if missionLib.BoardPickFreq and missionLib.BoardPickFreq > maxPickFreq then
 						maxPickFreq = missionLib.BoardPickFreq;
@@ -366,7 +366,7 @@ function OnPlayerAdded(player)
 			
 	--		local survivorMission = false;
 	--		for id, missionLib in pairs(modMissionLibrary.List()) do
-	--			if missionLib.MissionType == modMissionLibrary.MissionTypes.Repeatable and missionProfile:CanAdd(id) then
+	--			if missionLib.MissionType == modMissionLibrary.MissionTypes.Board and missionProfile:CanAdd(id) then
 	--				if id == 55 then
 	--					survivorMission = true;
 	--				end
