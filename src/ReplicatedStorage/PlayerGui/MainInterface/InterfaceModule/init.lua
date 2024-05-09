@@ -754,9 +754,9 @@ function Interface.SetPositionWithPadding(guiObject, position, padding)
 	local posY = targetPos.Y+frameSize.Y+(padding*2) > vpSize.Y-10 and targetPos.Y-frameSize.Y+padding or targetPos.Y;
 
 	guiObject.Position = UDim2.new(0, 
-		math.clamp(posX - parentPos.X, 10, vpSize.X-frameSize.X-10), 
+		math.clamp(posX - parentPos.X, 10, math.max(vpSize.X-frameSize.X-10, 11)), 
 		0, 
-		math.clamp(posY - parentPos.Y, 10, vpSize.Y-frameSize.Y-10)
+		math.clamp(posY - parentPos.Y, 10, math.max(vpSize.Y-frameSize.Y-10, 11))
 	);
 end
 

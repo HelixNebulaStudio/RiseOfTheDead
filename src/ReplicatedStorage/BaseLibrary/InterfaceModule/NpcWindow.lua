@@ -411,7 +411,13 @@ function Interface.init(modInterface)
 						pickButton.MouseButton1Click:Connect(function()
 							Interface:PlayButtonClick();
 
-							Interface.SetPositionWithPadding(colorPickerObj.Frame, pickButton.AbsolutePosition);
+							if modConfigurations.CompactInterface then
+								Interface:CloseWindow("Inventory");
+								colorPickerObj.Frame.Position = UDim2.new(0, 0, 0, 0);
+								colorPickerObj.Frame.Size = UDim2.new(0.5, 0, 1, 0);
+							else
+								Interface.SetPositionWithPadding(colorPickerObj.Frame, pickButton.AbsolutePosition);
+							end
 							colorPickerObj.Frame.Visible = true;
 					
 							function colorPickerObj:OnColorSelect(selectColor: Color3, selectColorId: string)
