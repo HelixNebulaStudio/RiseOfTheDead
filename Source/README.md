@@ -4,4 +4,4 @@ The files in this folder are hard links to the source code used in Rise of the D
 
 These are made available to make game documentation easier for people working on wikis and guides regardless of where you post and gives you the most up to date information.
 
-These are mostly raw values so some numbers may not be intelligible on face value and you may need to refer back to the game to translate them, however, any changes to them will still be documented here.
+These are mostly raw values so some numbers may not be intelligible at face value and you may need to refer back to the game to translate them, however, any changes to them will still be documented here.
