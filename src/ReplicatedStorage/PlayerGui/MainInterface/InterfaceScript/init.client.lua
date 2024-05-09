@@ -5,13 +5,11 @@ repeat task.wait(); until script.Parent.Enabled == true;
 --== Variables;
 local RunService = game:GetService("RunService");
 local StarterGui = game:GetService("StarterGui");
+local GuiService = game:GetService("GuiService");
 local UserInputService = game:GetService("UserInputService");
 local ContextActionService = game:GetService("ContextActionService");
 local TweenService = game:GetService("TweenService");
-local TeleportService = game:GetService("TeleportService");
-local ChatService = game:GetService("Chat");
 local CollectionService = game:GetService("CollectionService");
-local ContentProvider = game:GetService("ContentProvider");
 
 local camera = workspace.CurrentCamera;
 local localPlayer = game.Players.LocalPlayer;
@@ -22,8 +20,8 @@ local remotes = game.ReplicatedStorage:WaitForChild("Remotes", 10);
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations", 10));
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 
-local modData = require(localPlayer:WaitForChild("DataModule"));
-local modCharacter = require(character:WaitForChild("CharacterModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+local modCharacter = require(character:WaitForChild("CharacterModule") :: ModuleScript);
 
 Debugger:Log("InterfaceModule loading.");
 local modInterface = require(script.Parent.InterfaceModule);
@@ -52,7 +50,6 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 
 local branchColor = modBranchConfigs.BranchColor;
-local modGuiObjectTween = require(script.Parent.Parent.GuiObjectTween);
 
 local remotePromptWarning = remotes.Interface.PromptWarning;
 local remoteContinueScene = remotes.Cutscene.ContinueScene;
@@ -546,13 +543,6 @@ NewConfigSync("DisableCutsceneNext", script.Parent.CutsceneNextButton)
 NewConfigSync("DisableExperiencebar", script.Parent.ProgressionBar)
 NewConfigSync("DisableGeneralStats", script.Parent.GeneralStats)
 
---NewConfigSync("DisableReportMenu", modInterface.NavBarFrame.ReportMenu, {script.Parent.ReportMenu});
---NewConfigSync("DisableMasteryMenu", modInterface.NavBarFrame.MasteryMenu, {script.Parent.MasteryFrame});
---NewConfigSync("DisableSocialMenu", modInterface.NavBarFrame.SocialMenu, {script.Parent.SocialMenu});
---NewConfigSync("DisableGoldMenu", script.Parent.GoldStats, {script.Parent.GoldMenuFrame});
---NewConfigSync("DisableSettingsMenu", modInterface.NavBarFrame.Settings, {});
-
-
 remoteContinueScene.OnClientEvent:Connect(function(disabled)
 	modConfigurations.Set("DisableCutsceneNext", disabled); 
 end)
@@ -602,6 +592,15 @@ if not modConfigurations.DisableUpdateLogs then
 		modInterface:ToggleWindow("UpdateWindow", true);
 	end
 end
+
+local function updateTopbarGuiObjects()
+	local height = GuiService.TopbarInset.Height;
+	local minX = GuiService.TopbarInset.Min.X;
+	modInterface.NavBarFrame.Position = UDim2.new(0, minX+14, 0, 4);
+	modInterface.NavBarFrame.Size = UDim2.new(0, 32, 0, height);
+end
+GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(updateTopbarGuiObjects);
+updateTopbarGuiObjects();
 
 Debugger:Log("Loaded main user interface..");
 

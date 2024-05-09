@@ -50,6 +50,8 @@ Interface.ColorPicker.Frame.Parent = Interface.MainInterface;
 Interface.DropdownList = modDropdownList.new();
 Interface.DropdownList.Frame.Parent = Interface.MainInterface;
 
+Interface.NavBarFrame = nil;
+
 Interface.ItemViewport = modItemViewport;
 
 Interface.modCharacter = nil;
@@ -105,7 +107,7 @@ Interface.Garbage:Tag(function()
 end)
 
 -- !outline: Interface:ToggleGameBlinds(openBlinds, duration)
-function Interface:ToggleGameBlinds(openBlinds, duration)
+function Interface:ToggleGameBlinds(openBlinds: boolean, duration: number)
 	duration = duration or 2;
 	if openBlinds then
 		if blindsFrame.BackgroundTransparency >= 0.95 then return end;
@@ -117,7 +119,6 @@ function Interface:ToggleGameBlinds(openBlinds, duration)
 	TweenService:Create(blindsFrame, TweenInfo.new(duration), {BackgroundTransparency = openBlinds and 1 or 0;}):Play();
 end
 Interface:ToggleGameBlinds(true, 0.5);
-
 
 local modData = require(localPlayer:WaitForChild("DataModule", 30) :: ModuleScript);
 modData.modInterface = Interface;

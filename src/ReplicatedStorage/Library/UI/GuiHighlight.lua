@@ -4,6 +4,7 @@ local GuiHighlight = {}
 
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
+local GuiService = game:GetService("GuiService");
 
 if RunService:IsServer() then return GuiHighlight end;
 
@@ -309,7 +310,7 @@ function GuiHighlight.Set(...)
 						visibleExist = true;
 						activeHighlighter.Visible = visible;
 						activeHighlighter.Size = UDim2.new(0, guiObject.AbsoluteSize.X+24, 0, guiObject.AbsoluteSize.Y+24);
-						activeHighlighter.Position = UDim2.new(0, guiObject.AbsolutePosition.X-12, 0, guiObject.AbsolutePosition.Y+45); --23
+						activeHighlighter.Position = UDim2.new(0, guiObject.AbsolutePosition.X-12, 0, guiObject.AbsolutePosition.Y+GuiService.TopbarInset.Height-12);
 						
 						break;
 					end

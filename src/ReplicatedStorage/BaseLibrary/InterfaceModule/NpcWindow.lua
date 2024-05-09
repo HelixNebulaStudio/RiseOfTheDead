@@ -36,6 +36,7 @@ function Interface.init(modInterface)
 	local windowFrame = windowFrameTemplate:Clone();
 	windowFrame.Parent = modInterface.MainInterface;
 
+	local titleLabel = windowFrame:WaitForChild("TitleFrame"):WaitForChild("Title");
 	local mainFrame = windowFrame:WaitForChild("MainFrame") :: ScrollingFrame;
 	local leftFrame = mainFrame:WaitForChild("LeftFrame");
 	local viewportFrame = leftFrame:WaitForChild("ViewportFrame")
@@ -100,6 +101,7 @@ function Interface.init(modInterface)
 				table.clear(taskProcessObjects);
 			end
 			activeNpcName = npcName;
+			titleLabel.Text = npcName;
 			
 			if activeNpcName then
 				local packet = remotePlayerDataFetch:InvokeServer{

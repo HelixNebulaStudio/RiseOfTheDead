@@ -70,7 +70,7 @@ function ColorPicker.new(mainInterface)
 		end
 		
 		self.SelectFunc = function()
-			local mousePosition = UserInputService:GetMouseLocation() + Vector2.new(0, -58);
+			local mousePosition = UserInputService:GetMouseLocation() + Vector2.new(0, -game.GuiService.TopbarInset.Height);
 		
 			local closestLabel, closestDist = nil, math.huge;
 			
