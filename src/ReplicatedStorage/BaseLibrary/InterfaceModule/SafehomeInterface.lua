@@ -112,6 +112,8 @@ function Interface.init(modInterface)
 		if rPacket.Data then 
 			modData.Profile.Safehome = rPacket.Data; 
 			safehomeData = modData.Profile.Safehome; 
+
+			Debugger:Warn("safehomeData", safehomeData);
 		end
 	end
 

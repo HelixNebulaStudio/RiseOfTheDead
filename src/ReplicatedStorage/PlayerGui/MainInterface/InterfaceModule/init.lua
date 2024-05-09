@@ -10,11 +10,11 @@ local localPlayer = game.Players.LocalPlayer;
 local playerGui = localPlayer:WaitForChild("PlayerGui");
 local camera = workspace.CurrentCamera;
 
+local modItemViewport = require(script.Parent:WaitForChild("ItemViewport"));
 local modAudio = require(game.ReplicatedStorage.Library:WaitForChild("Audio"));
 local modEventSignal = require(game.ReplicatedStorage.Library:WaitForChild("EventSignal"));
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
-local modItemViewport = require(script.Parent.ItemViewport);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 

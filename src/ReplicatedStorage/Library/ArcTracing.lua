@@ -1,3 +1,4 @@
+--!native
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local ArcTracing = {};

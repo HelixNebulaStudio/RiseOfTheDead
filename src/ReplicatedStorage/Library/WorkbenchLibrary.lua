@@ -595,6 +595,9 @@ WorkbenchLibrary.ItemUpgrades={
 	["tirearmor"]={
 		Type={"Chest"};
 	};
+	["apron"]={
+		Type={"Chest"};
+	};
 	
 	-- Gloves
 	["leathergloves"]={

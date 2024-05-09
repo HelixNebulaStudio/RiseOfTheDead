@@ -1109,7 +1109,7 @@ function Interface.init(modInterface)
 					Lib=book;
 				});
 				
-			elseif typeKey == "Repeatable" then
+			elseif typeKey == "Board" then
 				table.insert(repeatableMissionList, {
 					Data=missionsList[a];
 					Lib=book;
@@ -1458,9 +1458,6 @@ function Interface.init(modInterface)
 					for mType, id in pairs(modMissionsLibrary.MissionTypes) do
 						if book.MissionType == id then
 							missionTypeTitle = mType;
-							if mType == "Repeatable" then
-								missionTypeTitle = "Board";
-							end
 							break;
 						end
 					end
@@ -1762,7 +1759,7 @@ function Interface.init(modInterface)
 				if missionData.Type == 1 or missionData.Type == 3 then continue end;
 				countRepeatableMissions = countRepeatableMissions +1;
 			end
-			local repeatableTab, repeatableList = newMissionList("Repeatable", 0); -- {ForceExpand=true;}
+			local repeatableTab, repeatableList = newMissionList("Board", 0); -- {ForceExpand=true;}
 			repeatableTab:WaitForChild("titleLabel").Text = "Missions Board: ".. countRepeatableMissions;
 
 			local hourlyMissionListing = repeatableList:FindFirstChild("hourlyMission");
