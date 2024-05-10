@@ -31,7 +31,7 @@ function ZSharp.Load(zSS, zEnv)
 	
 	function Audio:Play(soundName: string)
 		local sound = modAudio.Play(soundName, workspace); 
-		local newZSound = zEnv.new("ZSound", sound);
+		local newZSound = zEnv.new("Sound", sound);
 		return newZSound;
 	end
 
@@ -42,7 +42,7 @@ function ZSharp.Load(zSS, zEnv)
 		local newSound = sound:Clone();
 		newSound.Parent = workspace;
 		
-		local newZSound = zEnv.new("ZSound", sound);
+		local newZSound = zEnv.new("Sound", sound);
 		return newZSound;
 	end
 	

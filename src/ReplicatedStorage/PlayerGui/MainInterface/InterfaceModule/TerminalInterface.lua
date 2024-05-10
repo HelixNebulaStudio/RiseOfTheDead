@@ -74,6 +74,8 @@ local function closeActiveApp(toggleClass)
 	if className == toggleClass then
 		return true;
 	end
+
+	return;
 end
 
 local isFullScreen = false;
@@ -340,6 +342,7 @@ cmdsList = {
 			
 			runButton.MouseButton1Click:Connect(function()
 				local s, e = pcall(function()
+					modZSharpScript.Clean();
 					modZSharpScript.Run({
 						Name=newTextEditor.ActiveDocument or "unknown";
 						Source=newTextEditor:GetSource();

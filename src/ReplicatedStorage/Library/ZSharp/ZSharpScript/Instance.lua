@@ -5,13 +5,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local ZSharp = {};
 
 function ZSharp.Load(ZSharpScript, zEnv)
-	zEnv.ZInstance = ZSharpScript.ZInstance;
-	zEnv.new = ZSharpScript.newZInstance;
+	zEnv.Instance = ZSharpScript.Instance;
+	zEnv.new = ZSharpScript.newInstance;
 
 	ZSharpScript.Sandbox = function(data, instanceCast)
 		if typeof(data) == "function" then
 			if instanceCast then
-				return ZSharpScript.newZInstance(instanceCast, function(...)
+				return ZSharpScript.newInstance(instanceCast, function(...)
 					local args = ZSharpScript.Sandbox({...});
 					return data(args);
 				end);
@@ -30,14 +30,14 @@ function ZSharp.Load(ZSharpScript, zEnv)
 
 			if instanceCast then
 				n.ClassName = instanceCast;
-				return ZSharpScript.newZInstance(instanceCast, n);
+				return ZSharpScript.newInstance(instanceCast, n);
 			end
 
 			return n;
 
 		elseif typeof(data) == "userdata" and data.ClassName then
-			local class = ZSharpScript.Classes["Z"..data.ClassName];
-			return class and ZSharpScript.newZInstance("Z"..data.ClassName, data) or nil;
+			local class = ZSharpScript.Classes[data.ClassName];
+			return class and ZSharpScript.newInstance(data.ClassName, data) or nil;
 
 		elseif typeof(data) == "string" or typeof(data) == "number" or typeof(data) == "boolean"  then
 			return data;
@@ -55,20 +55,20 @@ function ZSharp.Init(ZSharpScript)
 	ZSharpScript.InstanceLink = InstanceLink;
 	
 	
-	local ZInstanceMeta = {};
-	ZInstanceMeta.__index = ZInstanceMeta;
-	ZInstanceMeta.__metatable = "The metatable is locked";
+	local InstanceMeta = {};
+	InstanceMeta.__index = InstanceMeta;
+	InstanceMeta.__metatable = "The metatable is locked";
 
-	local ZInstance = setmetatable({}, ZInstanceMeta);
-	ZInstance.ClassName = "ZInstance";
-	ZInstance.ClassList = {};
+	local Instance = setmetatable({}, InstanceMeta);
+	Instance.ClassName = "Instance";
+	Instance.ClassList = {};
 	
 
-	ZInstanceMeta.hintGet = "Get an existing instance.";
-	ZInstanceMeta.descGet= [[Get an existing instance by name.
-		<b>ZInstance:Get</b>(name: <i>string</i>): <i>ZInstance</i>
+	InstanceMeta.hintGet = "Get an existing instance.";
+	InstanceMeta.descGet= [[Get an existing instance by name.
+		<b>Instance:Get</b>(name: <i>string</i>): <i>Instance</i>
 	]];
-	function ZInstance:Get(name: string)
+	function Instance:Get(name: string)
 		for obj, inst in pairs(ZSharpScript.Instances) do
 			if obj.Name == name then
 				return obj;
@@ -78,13 +78,13 @@ function ZSharp.Init(ZSharpScript)
 	end
 	
 
-	ZInstanceMeta.hintList = "Get a list of instances.";
-	ZInstanceMeta.descList = [[Get a list of instances by name or matching name patterns.
+	InstanceMeta.hintList = "Get a list of instances.";
+	InstanceMeta.descList = [[Get a list of instances by name or matching name patterns.
 		if search is false, pattern is be used to match instances name. 
 		if search is true, pattern will be used in string.match to match instance names.
-		<b>ZInstance:List</b>(pattern: <i>string?</i>, search: boolean?): <i>ZInstance</i>
+		<b>Instance:List</b>(pattern: <i>string?</i>, search: boolean?): <i>Instance</i>
 	]];
-	function ZInstance:List(pattern: string?, search: boolean?)
+	function Instance:List(pattern: string?, search: boolean?)
 		local r = {};
 		
 		for obj, inst in pairs(ZSharpScript.Instances) do
@@ -106,13 +106,13 @@ function ZSharp.Init(ZSharpScript)
 	end
 	
 
-	ZInstanceMeta.hintDestroyList = "Destroy a list of instances.";
-	ZInstanceMeta.descDestroyList = [[Destroy a list of instances by name or matching name patterns.
+	InstanceMeta.hintDestroyList = "Destroy a list of instances.";
+	InstanceMeta.descDestroyList = [[Destroy a list of instances by name or matching name patterns.
 		if search is false, pattern is be used to match instances name. 
 		if search is true, pattern will be used in string.match to match instance names.
-		<b>ZInstance:List</b>(pattern: <i>string?</i>, search: boolean?): <i>ZInstance</i>
+		<b>Instance:List</b>(pattern: <i>string?</i>, search: boolean?): <i>Instance</i>
 	]];
-	function ZInstance:DestroyList(pattern: string, search: boolean)
+	function Instance:DestroyList(pattern: string, search: boolean)
 		local r = self:List(pattern, search);
 		for a=1, #r do
 			r[a]:Destroy();
@@ -120,9 +120,9 @@ function ZSharp.Init(ZSharpScript)
 	end
 	
 	
-	--- MARK: ZSound
-	ZSharpScript.Classes["ZSound"] = {
-		ClassName = "ZSound";
+	--- MARK: Sound
+	ZSharpScript.Classes["Sound"] = {
+		ClassName = "Sound";
 		SoundId = "";
 		Volume = 0.5;
 		PlaybackSpeed = 1;
@@ -134,7 +134,7 @@ function ZSharp.Init(ZSharpScript)
 			instance:Stop();
 		end;
 	};
-	function InstanceLink.ZSound(sound: Sound)
+	function InstanceLink.Sound(sound: Sound)
 		if sound == nil then
 			sound = Instance.new("Sound");
 		end
@@ -142,18 +142,18 @@ function ZSharp.Init(ZSharpScript)
 	end
 	
 
-	-- MARK: ZPlayer
-	ZSharpScript.Classes["ZPlayer"] = {
-		ClassName = "ZPlayer";
+	-- MARK: Player
+	ZSharpScript.Classes["Player"] = {
+		ClassName = "Player";
 		UserId = 0;
 	};
 
 
-	-- MARK: ZSignal
-	ZSharpScript.Classes["ZSignal"] = {
-		ClassName = "ZSignal";
+	-- MARK: Signal
+	ZSharpScript.Classes["Signal"] = {
+		ClassName = "Signal";
 	};
-	function InstanceLink.ZSignal(func, private)
+	function InstanceLink.Signal(func, private)
 		private.OnDestroy = func;
 
 		local new = newproxy(true);
@@ -163,24 +163,38 @@ function ZSharp.Init(ZSharpScript)
 	end
 
 
-	-- MARK: ZInstance
+	-- MARK: Thread
+	ZSharpScript.Classes["Thread"] = {
+		ClassName = "Thread";
+	};
+	function InstanceLink.Thread(func, private)
+		private.OnDestroy = func;
+
+		local new = newproxy(true);
+		local meta = getmetatable(new);
+		meta.__index = {};
+		return new;
+	end
+
+
+	-- MARK: Instance
 	for key, _ in pairs(ZSharpScript.Classes) do
 		local proxy = newproxy(true);
 		local meta = getmetatable(proxy);
 		meta.__metatable = "The metatable is locked";
 		meta.ClassName = key;
 		
-		ZInstance.ClassList[key] = proxy;
+		Instance.ClassList[key] = proxy;
 	end
 	
 
-	ZSharpScript.ZInstance = ZInstance;
-	ZSharpScript.newZInstance = function(className: string, instance: Instance?)
+	ZSharpScript.Instance = Instance;
+	ZSharpScript.newInstance = function(className: string, instance: Instance?)
 		if className == nil then
 			error("Missing class name for new()");
 		end
 		if ZSharpScript.Classes[className] == nil then
-			error("Class name does not exist for new(".. className ..")");
+			error(`Class name does not exist for new({className})`);
 		end
 		if getfenv(1).Instance == nil and instance then
 			instance = nil;
@@ -199,8 +213,8 @@ function ZSharp.Init(ZSharpScript)
 		instance = InstanceLink[className] and InstanceLink[className](instance, private) or instance;
 		assert(typeof(instance) == "userdata", `Invalid instance for {className}`);
 
-		if instance.Name ~= instance.ClassName then
-			private.Name = instance.Name.."#"..ZSharpScript.InstanceCounter;
+		if instance.Name and instance.Name ~= instance.ClassName then
+			private.Name = `{instance.Name}#{ZSharpScript.InstanceCounter}`;
 		end
 		
 		meta.__metatable = "The metatable is locked";
@@ -229,7 +243,7 @@ function ZSharp.Init(ZSharpScript)
 				return private[k];
 			end
 			if class[k] == nil then
-				error(k.." is not a valid member of "..class.ClassName);
+				error(`{k} is not a valid member of {class.ClassName}`);
 			end
 
 			return instance[k];
@@ -238,10 +252,10 @@ function ZSharp.Init(ZSharpScript)
 		function meta.__newindex(_, k, v)
 			local class = ZSharpScript.Classes[private.ClassName];
 			if class[k] == nil then
-				error(k.." is not a valid member of "..class.ClassName);
+				error(`{k} is not a valid member of {class.ClassName}`);
 			end
 			if k == "Id" or k == "ClassName" then
-				error("Can not modify Instance.".. k ..".");
+				error(`Can not modify Instance {k}.`);
 			end
 			
 			instance[k] = v;
@@ -255,7 +269,7 @@ function ZSharp.Init(ZSharpScript)
 			local properties = ...;
 
 			if typeof(properties) ~= "table" then
-				error("Invalid initialize for ".. private.ClassName);
+				error(`Invalid initialize for {private.ClassName}`);
 				return;
 			end
 

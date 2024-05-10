@@ -24,8 +24,16 @@ for _, src in pairs(script:GetChildren()) do
 	end
 end
 
+function ZSharpScript.Clean()
+	for k, obj in pairs(ZSharpScript.Instances) do
+		if obj.Destroy then
+			obj:Destroy();
+		end
+	end
+end
+
 function ZSharpScript.Run(zscriptPacket)
-	local zEnv = {};
+	local zEnv = {Self=nil;};
 	
 	for _, src in pairs(script:GetChildren()) do
 		if not src:IsA("ModuleScript") then continue end;
@@ -48,6 +56,12 @@ function ZSharpScript.Run(zscriptPacket)
 	local loadFunction, loadFailReason;
 		
 	local s, e = pcall(function()
+		zscriptPacket.Thread = coroutine.running();
+		ZSharpScript.newInstance("Thread", function()
+			table.clear(zEnv);
+			--coroutine.close(zscriptPacket.Thread);
+			--task.cancel(zscriptPacket.Thread);
+		end);
 		if RunService:IsServer() then
 			loadFunction, loadFailReason = loadstring(zscriptPacket.Source);
 			if loadFunction then
@@ -78,7 +92,7 @@ function ZSharpScript.Run(zscriptPacket)
 		
 		local s, e = pcall(function()
 			errStr = errStr:sub(0, math.max(i-1, 0))..errStr:sub(j, #errStr);
-			errStr = string.gsub(errStr, "compiled%-lua", zEnv.ScriptName);
+			errStr = string.gsub(errStr, "compiled%-lua", zEnv.ScriptName or "~");
 		end)
 		if not s then
 			Debugger:Warn("ZSharpScript Error",e)
@@ -91,11 +105,11 @@ function ZSharpScript.Run(zscriptPacket)
 	
 	if s and loadFailReason then
 		errMsg = extractError(loadFailReason);
-		error("Compile: "..errMsg, 0);
+		error("Compile: "..tostring(errMsg), 0);
 		
 	elseif not s and e then
 		errMsg = extractError(e);
-		error("Execution: "..errMsg, 0);
+		error("Execution: "..tostring(errMsg), 0);
 		
 	end
 end
