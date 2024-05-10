@@ -141,6 +141,7 @@ return {
 		["Audio"] = true;
 		
 		["TweenService"] = true;
+		["EventService"] = true;
 	},
 
 	libraries = {

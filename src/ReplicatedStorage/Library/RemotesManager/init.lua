@@ -467,12 +467,14 @@ if RunService:IsClient() then
 else
 	--==== Server Side;
 	do -- Identifiers
+		RemotesManager.NewRef("Key");
 		RemotesManager.NewRef("Action");
 		RemotesManager.NewRef("Data");
 		RemotesManager.NewRef("HierarchyKey");
 		RemotesManager.NewRef("Id");
 		RemotesManager.NewRef("Index");
 		RemotesManager.NewRef("Type");
+		RemotesManager.NewRef("Arguments");
 	end
 	
 	--== Debug;
@@ -486,6 +488,7 @@ else
 	RemotesManager:NewFunctionRemote("GeneralUIRemote", 0.1).Secure = true;
 	RemotesManager:NewFunctionRemote("Replication");
 	RemotesManager:NewEventRemote("PlayAudio");
+	RemotesManager:NewEventBridge("EventService");
 
 	--== Game;
 	RemotesManager:NewEventRemote("CharacterRemote").Secure = true;

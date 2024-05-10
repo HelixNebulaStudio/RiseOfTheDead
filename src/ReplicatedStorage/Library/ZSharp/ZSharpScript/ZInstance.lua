@@ -7,6 +7,45 @@ local ZSharp = {};
 function ZSharp.Load(ZSharpScript, zEnv)
 	zEnv.ZInstance = ZSharpScript.ZInstance;
 	zEnv.new = ZSharpScript.newZInstance;
+
+	ZSharpScript.Sandbox = function(data, instanceCast)
+		if typeof(data) == "function" then
+			if instanceCast then
+				return ZSharpScript.newZInstance(instanceCast, function(...)
+					local args = ZSharpScript.Sandbox({...});
+					return data(args);
+				end);
+			end
+
+			return function(...)
+				local args = ZSharpScript.Sandbox({...});
+				return data(unpack(args));
+			end;
+
+		elseif typeof(data) == "table" then
+			local n = table.clone(data);
+			for k, v in pairs(n) do
+				n[ZSharpScript.Sandbox(k)] = ZSharpScript.Sandbox(v);
+			end
+
+			if instanceCast then
+				n.ClassName = instanceCast;
+				return ZSharpScript.newZInstance(instanceCast, n);
+			end
+
+			return n;
+
+		elseif typeof(data) == "userdata" and data.ClassName then
+			local class = ZSharpScript.Classes["Z"..data.ClassName];
+			return class and ZSharpScript.newZInstance("Z"..data.ClassName, data) or nil;
+
+		elseif typeof(data) == "string" or typeof(data) == "number" or typeof(data) == "boolean"  then
+			return data;
+
+		end
+
+		return nil;
+	end
 end
 
 function ZSharp.Init(ZSharpScript)
@@ -20,22 +59,15 @@ function ZSharp.Init(ZSharpScript)
 	ZInstanceMeta.__index = ZInstanceMeta;
 	ZInstanceMeta.__metatable = "The metatable is locked";
 
-	ZInstanceMeta.hintGet = "Get an existing instance.";
-	ZInstanceMeta.descGet= [[Get an existing instance by name.
-		<b>ZInstance:Get</b>(name: <i>string</i>): <i>ZInstance</i>
-	]];
-
-	ZInstanceMeta.hintList = "Get a list of instances.";
-	ZInstanceMeta.descList = [[Get a list of instances by name or matching name patterns.
-		if search is false, pattern is be used to matche instances name. 
-		if search is true, pattern will be used in string.match to match instance names.
-		<b>ZInstance:List</b>(pattern: <i>string?</i>, search: boolean?): <i>ZInstance</i>
-	]];
-	
 	local ZInstance = setmetatable({}, ZInstanceMeta);
 	ZInstance.ClassName = "ZInstance";
 	ZInstance.ClassList = {};
 	
+
+	ZInstanceMeta.hintGet = "Get an existing instance.";
+	ZInstanceMeta.descGet= [[Get an existing instance by name.
+		<b>ZInstance:Get</b>(name: <i>string</i>): <i>ZInstance</i>
+	]];
 	function ZInstance:Get(name: string)
 		for obj, inst in pairs(ZSharpScript.Instances) do
 			if obj.Name == name then
@@ -45,6 +77,13 @@ function ZSharp.Init(ZSharpScript)
 		return nil;
 	end
 	
+
+	ZInstanceMeta.hintList = "Get a list of instances.";
+	ZInstanceMeta.descList = [[Get a list of instances by name or matching name patterns.
+		if search is false, pattern is be used to match instances name. 
+		if search is true, pattern will be used in string.match to match instance names.
+		<b>ZInstance:List</b>(pattern: <i>string?</i>, search: boolean?): <i>ZInstance</i>
+	]];
 	function ZInstance:List(pattern: string?, search: boolean?)
 		local r = {};
 		
@@ -66,6 +105,13 @@ function ZSharp.Init(ZSharpScript)
 		return r;
 	end
 	
+
+	ZInstanceMeta.hintDestroyList = "Destroy a list of instances.";
+	ZInstanceMeta.descDestroyList = [[Destroy a list of instances by name or matching name patterns.
+		if search is false, pattern is be used to match instances name. 
+		if search is true, pattern will be used in string.match to match instance names.
+		<b>ZInstance:List</b>(pattern: <i>string?</i>, search: boolean?): <i>ZInstance</i>
+	]];
 	function ZInstance:DestroyList(pattern: string, search: boolean)
 		local r = self:List(pattern, search);
 		for a=1, #r do
@@ -73,8 +119,9 @@ function ZSharp.Init(ZSharpScript)
 		end
 	end
 	
-	---
-	local ZSound = {
+	
+	--- MARK: ZSound
+	ZSharpScript.Classes["ZSound"] = {
 		ClassName = "ZSound";
 		SoundId = "";
 		Volume = 0.5;
@@ -87,9 +134,6 @@ function ZSharp.Init(ZSharpScript)
 			instance:Stop();
 		end;
 	};
-	
-	ZSharpScript.Classes.ZSound = ZSound;
-
 	function InstanceLink.ZSound(sound: Sound)
 		if sound == nil then
 			sound = Instance.new("Sound");
@@ -97,8 +141,29 @@ function ZSharp.Init(ZSharpScript)
 		return sound;
 	end
 	
-	
-	---
+
+	-- MARK: ZPlayer
+	ZSharpScript.Classes["ZPlayer"] = {
+		ClassName = "ZPlayer";
+		UserId = 0;
+	};
+
+
+	-- MARK: ZSignal
+	ZSharpScript.Classes["ZSignal"] = {
+		ClassName = "ZSignal";
+	};
+	function InstanceLink.ZSignal(func, private)
+		private.OnDestroy = func;
+
+		local new = newproxy(true);
+		local meta = getmetatable(new);
+		meta.__index = {};
+		return new;
+	end
+
+
+	-- MARK: ZInstance
 	for key, _ in pairs(ZSharpScript.Classes) do
 		local proxy = newproxy(true);
 		local meta = getmetatable(proxy);
@@ -108,9 +173,9 @@ function ZSharp.Init(ZSharpScript)
 		ZInstance.ClassList[key] = proxy;
 	end
 	
-	
+
 	ZSharpScript.ZInstance = ZInstance;
-	ZSharpScript.newZInstance = function(className: string, instance: Instance)
+	ZSharpScript.newZInstance = function(className: string, instance: Instance?)
 		if className == nil then
 			error("Missing class name for new()");
 		end
@@ -123,21 +188,23 @@ function ZSharp.Init(ZSharpScript)
 		end
 		ZSharpScript.InstanceCounter = ZSharpScript.InstanceCounter+1;
 		
-		local class = ZSharpScript.Classes[className];
-		instance = InstanceLink[className](instance);
-		
 		local new = newproxy(true);
 		local meta = getmetatable(new);
 		local private = {
 			ClassName = className;
 			Name = className.."#"..ZSharpScript.InstanceCounter;
 		};
+
+		local class = ZSharpScript.Classes[className];
+		instance = InstanceLink[className] and InstanceLink[className](instance, private) or instance;
+		assert(typeof(instance) == "userdata", `Invalid instance for {className}`);
+
+		if instance.Name ~= instance.ClassName then
+			private.Name = instance.Name.."#"..ZSharpScript.InstanceCounter;
+		end
 		
 		meta.__metatable = "The metatable is locked";
 		
-		--for k, v in pairs(class) do
-		--	private[k] = v;
-		--end
 		for k, func in pairs(class) do
 			if typeof(func) ~= "function" then continue end;
 			
@@ -147,7 +214,10 @@ function ZSharp.Init(ZSharpScript)
 		end
 		
 		function private.Destroy()
-			Debugger.Expire(instance, 0);
+			if private.OnDestroy then
+				private.OnDestroy();
+			end
+			Debugger.Expire(instance);
 			ZSharpScript.Instances[new] = nil;
 		end
 		
@@ -171,7 +241,7 @@ function ZSharp.Init(ZSharpScript)
 				error(k.." is not a valid member of "..class.ClassName);
 			end
 			if k == "Id" or k == "ClassName" then
-				error("Can not modify Instance ".. k ..".");
+				error("Can not modify Instance.".. k ..".");
 			end
 			
 			instance[k] = v;
@@ -196,9 +266,11 @@ function ZSharp.Init(ZSharpScript)
 			return new;
 		end;
 		
-		instance.Destroying:Connect(function()
-			new:Destroy();
-		end)
+		if instance.Destroying then
+			instance.Destroying:Connect(function()
+				new:Destroy();
+			end)
+		end
 		ZSharpScript.Instances[new] = instance;
 		return new;
 	end;

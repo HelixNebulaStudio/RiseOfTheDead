@@ -348,13 +348,13 @@ end
 ClientCommands["term"] = function(channelId, args)
 	local room = ChatRoomInterface:GetRoom(channelId);
 
-	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 
 	local termCmd = args[1] or "";
 	
 	if modInterface.Windows.TerminalWindow then
-		modInterface:ToggleWindow("TerminalWindow", termCmd);
+		modInterface:ToggleWindow("TerminalWindow", nil, termCmd);
 
 	end
 

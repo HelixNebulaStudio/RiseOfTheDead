@@ -9,7 +9,7 @@ local RunService = game:GetService("RunService");
 local UserInputService = game:GetService("UserInputService");
 
 local localplayer = game.Players.LocalPlayer;
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
@@ -454,7 +454,7 @@ end
 
 function Interface.ProcessCmd(inputText)
 	if proccessingCmd then return end;
-	
+
 	local cmd, args = modCommandHandler.ProcessMessage("/"..inputText);
 	if cmd == nil then return end;
 	local cmdId = cmd:sub(2, #cmd):lower();
@@ -560,17 +560,19 @@ function Interface.init(modInterface)
 			
 				Interface.Println("Welcome to the Revive's Executable Console (R.E.C.) terminal:\n\nCommands: Type 'help' into terminal for list of commands.\n");
 				
-				Debugger:Log("activeInteractData", activeInteractData);
-				
 				Interface.Update();
 				
 				spawn(function()
-					repeat until not window.Visible or Interface.Object == nil or not Interface.Object:IsDescendantOf(workspace) or Interface.modCharacter.Player:DistanceFromCharacter(Interface.Object.Position) >= 16 or not wait(0.5);
+					repeat until not window.Visible 
+						or Interface.Object == nil 
+						or not Interface.Object:IsDescendantOf(workspace) 
+						or Interface.modCharacter.Player:DistanceFromCharacter(Interface.Object.Position) >= 16 
+						or not wait(0.5);
 					window:Close();
 				end)
 					
 			else
-				if runProgram == "none" then
+				if #runProgram <= 0 or runProgram == "none" then
 					inputBox:CaptureFocus();
 					Interface.Println("Welcome to the Revive's Executable Console (R.E.C.) terminal:\n\nCommands: Type 'help' into terminal for list of commands.\n");
 					Interface.Update();
