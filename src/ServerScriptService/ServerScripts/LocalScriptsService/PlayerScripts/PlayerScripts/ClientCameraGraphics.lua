@@ -10,6 +10,8 @@ return function()
 	local modVoxelSpace = require(game.ReplicatedStorage.Library.VoxelSpace);
 	local modTextureAnimations = require(game.ReplicatedStorage.Library.TextureAnimations);
 	local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
+	local modWeatherService = require(game.ReplicatedStorage.Library.WeatherService);
+	local modScreenRain = require(game.ReplicatedStorage.Library.ScreenRain);
 
 	--== Camera Handler
 	local camera = workspace.CurrentCamera;
@@ -180,8 +182,6 @@ return function()
 	end)
 	
 	--==
-
-
 
 	local skipRender = tick();
 	RunService.RenderStepped:Connect(function(delta)

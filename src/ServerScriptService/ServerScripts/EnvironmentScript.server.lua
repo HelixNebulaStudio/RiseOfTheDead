@@ -69,13 +69,14 @@ local TweenService = game:GetService("TweenService");
 local CollectionService = game:GetService("CollectionService");
 local Lighting = game.Lighting;
 
-
 local modConfigurations = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("Configurations"));
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modInteractable = require(game.ReplicatedStorage.Library.Interactables);
-local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modWorldClipsHandler = require(game.ReplicatedStorage.Library.WorldClipsHandler);
+local modWeatherService = require(game.ReplicatedStorage.Library.WeatherService);
+
+local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local folderClips = workspace:WaitForChild("Clips");
 local folderInteractables = workspace:WaitForChild("Interactables");
@@ -113,8 +114,6 @@ Lighting.EnvironmentSpecularScale = 0.5;
 
 game.SoundService.RespectFilteringEnabled = true;
 game.StarterPlayer.EnableMouseLockOption = false;
---game.StarterPlayer.DevComputerMovementMode = Enum.DevComputerMovementMode.KeyboardMouse;
---game.StarterPlayer.DevComputerCameraMovementMode = Enum.DevComputerCameraMovementMode.Classic;
 
 local isNight: boolean;
 if game.Lighting:FindFirstChild("PlaceholderSky") then
@@ -222,6 +221,8 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 			
 		end
 	end
+
+	modWeatherService:OnTick();
 end)
 
 local ImmersiveAdsFallbacks = {
