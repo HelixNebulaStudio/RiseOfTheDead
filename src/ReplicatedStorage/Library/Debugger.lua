@@ -62,7 +62,7 @@ function Debugger.AwaitShared(key)
 end
 
 function Debugger.Expire(obj: Instance, t: number?)
-	if obj == nil then return end;
+	if obj == nil or typeof(obj) ~= "Instance" then return end;
 	task.delay(t or 0, function()
 		if game:IsAncestorOf(obj) then
 			obj:Destroy();
