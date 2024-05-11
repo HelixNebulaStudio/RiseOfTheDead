@@ -2,6 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
 local remoteEventService = modRemotesManager:Get("EventService");
 
@@ -176,6 +177,10 @@ function EventService:GetHandlerKeys()
 end
 
 if RunService:IsServer() then
+    modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
+        EventService:ReplicateInvoke("OnClockTick", game.Players:GetPlayers(), modSyncTime.GetTime());
+	end)
+
 else
     remoteEventService.OnEvent:Connect(function(packet)
 		local key = packet[modRemotesManager.Ref("Key")];

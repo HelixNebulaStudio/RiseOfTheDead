@@ -104,7 +104,6 @@ return {
 		["Faces"] = false,
 		["File"] = false,
 		["FloatCurveKey"] = false,
-		["Instance"] = false,
 		["NumberRange"] = false,
 		["NumberSequence"] = false,
 		["NumberSequenceKeypoint"] = false,
@@ -133,15 +132,18 @@ return {
 		["new"] = true;
 		["log"] = true;
 		["help"] = true;
-		["Self"] = true;
 
 		["ScriptName"] = true;
-		["ZInstance"] = true;
-		["ZSound"] = true;
+		["Instance"] = true;
+		["Sound"] = true;
+		["Player"] = true;
+		["Signal"] = true;
+		["Terminal"] = true;
+		["Thread"] = true;
+
 		["Audio"] = true;
-		
-		["TweenService"] = true;
 		["EventService"] = true;
+		["TweenService"] = true;
 	},
 
 	libraries = {
