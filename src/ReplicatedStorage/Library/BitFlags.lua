@@ -38,7 +38,8 @@ function BitFlags:AddFlag(tag, name)
 	return self.Flags[tag];
 end
 
--- bitString: string of bits e.g. 010010010; 
+-- bitString: string of bits e.g. 010010010;
+-- decimals gets converted to bitstring.
 
 function BitFlags:Test(tag, bitString) -- basically :Get()
 	return bit32.btest(bitString, self.Flags[tag]);
@@ -66,5 +67,19 @@ function BitFlags:List(bitString)
 	
 	return r;
 end
+
+--[[
+	Usage:
+
+	local clientBitString = 2; -- bin = 0b0000_0010
+
+	local ActionPermissions = modBitFlags.new();
+	ActionPermissions:AddFlag("CanActionA", "Flag Label Action A");
+	ActionPermissions:AddFlag("CanActionB", "Flag Label Action B");
+
+	print(ActionPermissions:Test("CanActionA", clientBitString)); -- false;
+	print(ActionPermissions:Test("CanActionB", clientBitString)); -- true;
+
+]]
 
 return BitFlags;
