@@ -5,7 +5,7 @@ local modEventService = require(game.ReplicatedStorage.Library.EventService);
 --
 local ZSharp = {};
 
-function ZSharp.Load(zSS, zEnv)
+function ZSharp.Load(zss, zEnv)
 	local EventServiceMeta = {};
 	EventServiceMeta.__index = EventServiceMeta;
 	EventServiceMeta.__metatable = "The metatable is locked";
@@ -26,7 +26,7 @@ function ZSharp.Load(zSS, zEnv)
 	}
 	]];
 	function EventService:Invoke(key: string, ...): modEventService.EventPacket
-		return zSS.Sandbox(modEventService:Invoke(key, ...));
+		return zss.Sandbox(modEventService:Invoke(key, ...));
 	end
 
 
@@ -35,7 +35,7 @@ function ZSharp.Load(zSS, zEnv)
 	<b>EventService:OnInvoked</b>(key: <i>string</i>, func: (event: EventPacket, ...any) -> nil, position: <i>number?</i>): <i>() -> nil</i>
 	]];
 	function EventService:OnInvoked(key: string, func: (event: modEventService.EventPacket, ...any) -> nil, position: number?): () -> nil
-		return zSS.Sandbox(modEventService:OnInvoked(key, zSS.Sandbox(func), position), "ZSignal");
+		return zss.Sandbox(modEventService:OnInvoked(key, zss.Sandbox(func), position), "Signal");
 	end
 
 

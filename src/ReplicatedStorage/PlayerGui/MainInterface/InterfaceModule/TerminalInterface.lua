@@ -2,14 +2,18 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
 
 --== Variables;
-local Interface = {};
+local Interface = {
+	CloseWindow=nil;
+	modCharacter=nil;
+	ToggleWindow=nil;
+};
 Interface.TerminalCache = {};
 
 local RunService = game:GetService("RunService");
 local UserInputService = game:GetService("UserInputService");
 
-local localplayer = game.Players.LocalPlayer;
-local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
+local localPlayer = game.Players.LocalPlayer;
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
@@ -28,8 +32,6 @@ local scrollFrame = termFrame:WaitForChild("ScrollingFrame");
 
 local templateTerminalLabel = script:WaitForChild("terminalLabel");
 local defaultFontSize = templateTerminalLabel.TextSize;
-
-local codeFrame = script.Parent.Parent:WaitForChild("Code");
 
 local hexPairList = {};
 local hexConvert = {[10]="A"; [11]="B"; [12]="C"; [13]="D"; [14]="E"; [15]="F"};
@@ -312,9 +314,11 @@ cmdsList = {
 			for a=1, #args do
 				args[a] = tostring(args[a]);
 			end
+
 			modZSharpScript.Run({
 				Name="terminal.zs";
 				Source=tostring(table.concat(args, " ") or "");
+				Terminal=activeInteractData; 
 			})
 		end;
 	};
@@ -323,7 +327,7 @@ cmdsList = {
 		Desc = "Open/Close ZS Code";
 		Run=function()
 			if closeActiveApp("ZSCode") then return end;
-			
+
 			local newTextEditor = modTextEditor.new();
 			newTextEditor:OnOpen(Interface);
 			newTextEditor:ToggleMenu(true)
@@ -346,10 +350,11 @@ cmdsList = {
 					modZSharpScript.Run({
 						Name=newTextEditor.ActiveDocument or "unknown";
 						Source=newTextEditor:GetSource();
+						Terminal=activeInteractData;
 					})
 				end)
 				if not s then
-					Interface.Println("Failed: <font color='rgb(143, 81, 81)'>".. tostring(e) .."</font>");
+					Interface.Println(`Failed: <font color='rgb(143, 81, 81)'>{e}</font>`);
 				end
 			end)
 		
@@ -538,6 +543,9 @@ function Interface.init(modInterface)
 			Interface:ToggleInteraction(false);
 
 			activeInteractData = Interface.InteractData;
+			if activeInteractData then
+				activeInteractData.UserId = localPlayer.UserId;
+			end
 			
 			Interface.TerminalCmds = {};
 			for a=1, #cmdsList do
@@ -586,6 +594,7 @@ function Interface.init(modInterface)
 			end
 			
 		else
+			activeInteractData = nil;
 			toggleFullScreen(false);
 			inputBox:ReleaseFocus();
 			delay(0.3, function()

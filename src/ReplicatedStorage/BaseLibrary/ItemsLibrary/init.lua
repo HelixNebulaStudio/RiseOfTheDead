@@ -257,8 +257,8 @@ function ItemsLibrary:Init(super)
 		end;
 	};
 
-	new(crateBase, {Id="factorycrate"; Icon="rbxassetid://14312691944"; GameMode={Mode="Raid"; Stage="Factory"}}); --4696383140
-	new(crateBase, {Id="officecrate"; Icon="rbxassetid://14312329063"; GameMode={Mode="Raid"; Stage="Office"}}); --4696383140
+	new(crateBase, {Id="factorycrate"; Icon="rbxassetid://14312691944"; GameMode={Mode="Raid"; Stage="Factory"}});
+	new(crateBase, {Id="officecrate"; Icon="rbxassetid://14312329063"; GameMode={Mode="Raid"; Stage="Office"}});
 	new(crateBase, {Id="sectorfcrate"; Icon="rbxassetid://4818954646"; GameMode={Mode="Survival"; Stage="Sector F"}});
 	new(crateBase, {Id="ucsectorfcrate"; Icon="rbxassetid://4873382562"; GameMode={Mode="Survival"; Stage="Sector F"; HardPrefix="Unclassified"}});
 	new(crateBase, {Id="tombschest"; Icon="rbxassetid://5520269296"; GameMode={Mode="Raid"; Stage="Tombs"}});

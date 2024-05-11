@@ -1,5 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --
+local RunService = game:GetService("RunService");
 
 --
 local ZSharp = {};
@@ -119,65 +120,19 @@ function ZSharp.Init(ZSharpScript)
 		end
 	end
 	
-	
-	--- MARK: Sound
-	ZSharpScript.Classes["Sound"] = {
-		ClassName = "Sound";
-		SoundId = "";
-		Volume = 0.5;
-		PlaybackSpeed = 1;
-		
-		Play = function(instance: Sound)
-			instance:Play();
-		end;
-		Stop = function(instance: Sound)
-			instance:Stop();
-		end;
-	};
-	function InstanceLink.Sound(sound: Sound)
-		if sound == nil then
-			sound = Instance.new("Sound");
+
+	for _, obj in pairs(script:GetChildren()) do
+		if not obj:IsA("ModuleScript") then continue end;
+		local zInstance = require(obj);
+		local className = obj.Name;
+
+		zInstance.Class.ClassName = className;
+		ZSharpScript.Classes[className] = zInstance.Class;
+		if zInstance.Link then
+			InstanceLink[className] = zInstance.Link;
 		end
-		return sound;
-	end
-	
-
-	-- MARK: Player
-	ZSharpScript.Classes["Player"] = {
-		ClassName = "Player";
-		UserId = 0;
-	};
-
-
-	-- MARK: Signal
-	ZSharpScript.Classes["Signal"] = {
-		ClassName = "Signal";
-	};
-	function InstanceLink.Signal(func, private)
-		private.OnDestroy = func;
-
-		local new = newproxy(true);
-		local meta = getmetatable(new);
-		meta.__index = {};
-		return new;
 	end
 
-
-	-- MARK: Thread
-	ZSharpScript.Classes["Thread"] = {
-		ClassName = "Thread";
-	};
-	function InstanceLink.Thread(func, private)
-		private.OnDestroy = func;
-
-		local new = newproxy(true);
-		local meta = getmetatable(new);
-		meta.__index = {};
-		return new;
-	end
-
-
-	-- MARK: Instance
 	for key, _ in pairs(ZSharpScript.Classes) do
 		local proxy = newproxy(true);
 		local meta = getmetatable(proxy);
@@ -186,7 +141,6 @@ function ZSharp.Init(ZSharpScript)
 		
 		Instance.ClassList[key] = proxy;
 	end
-	
 
 	ZSharpScript.Instance = Instance;
 	ZSharpScript.newInstance = function(className: string, instance: Instance?)
@@ -210,7 +164,7 @@ function ZSharp.Init(ZSharpScript)
 		};
 
 		local class = ZSharpScript.Classes[className];
-		instance = InstanceLink[className] and InstanceLink[className](instance, private) or instance;
+		instance = InstanceLink[className] and InstanceLink[className](ZSharpScript, instance, private) or instance;
 		assert(typeof(instance) == "userdata", `Invalid instance for {className}`);
 
 		if instance.Name and instance.Name ~= instance.ClassName then
@@ -235,6 +189,16 @@ function ZSharp.Init(ZSharpScript)
 			ZSharpScript.Instances[new] = nil;
 		end
 		
+		function private.KeyValues()
+			local keyValues = {};
+			for k, v in pairs(class) do
+				keyValues[k] = instance[k];
+			end
+			for k, v in pairs(private) do
+				keyValues[k] = v;
+			end
+			return keyValues;
+		end
 		
 		function meta.__index(_, k)
 			local class = ZSharpScript.Classes[private.ClassName];

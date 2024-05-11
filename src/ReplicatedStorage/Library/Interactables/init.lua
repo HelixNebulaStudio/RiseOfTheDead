@@ -1463,12 +1463,10 @@ function Interactable.Terminal()
 
 	interact.Type = Types.Terminal
 	interact.IndicatorPresist = false;
+	interact.ItemRequired = "rcetablet";
 
 	function interactMeta:OnTrigger(library)
-		local equippedItem = library.modCharacter.EquippedItem;
-		if equippedItem == nil or equippedItem.ItemId ~= "rcetablet" then
-			interact.Label = interactMeta.Label.." (Requires RCE Tablet to hijack)";
-		else
+		if interact.ItemRequired == "rcetablet" then
 			interact.Label = "Hijack with RCE Tablet";
 		end
 	end

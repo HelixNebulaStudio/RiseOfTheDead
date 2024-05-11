@@ -14,6 +14,7 @@ ZSharpScript.ConsoleOutput = modEventSignal.new("OnConsoleOutput");
 
 ZSharpScript.Instances = {};
 ZSharpScript.InstanceCounter = 0;
+ZSharpScript.newInstance = nil;
 --==
 for _, src in pairs(script:GetChildren()) do
 	if not src:IsA("ModuleScript") then continue end;
@@ -30,10 +31,11 @@ function ZSharpScript.Clean()
 			obj:Destroy();
 		end
 	end
+	table.clear(ZSharpScript.Instances);
 end
 
 function ZSharpScript.Run(zscriptPacket)
-	local zEnv = {Self=nil;};
+	local zEnv = {};
 	
 	for _, src in pairs(script:GetChildren()) do
 		if not src:IsA("ModuleScript") then continue end;
@@ -41,27 +43,23 @@ function ZSharpScript.Run(zscriptPacket)
 
 		obj.Load(ZSharpScript, zEnv);
 	end
-	
+
 	zEnv.ScriptName = zscriptPacket.Name;
-	
-	if zscriptPacket.Self then
-		for k, v in pairs(zscriptPacket.Self) do
-			if zEnv.Self == nil then
-				zEnv.Self = {};
-			end
-			zEnv.Self[k] = v;
-		end
-	end
 	
 	local loadFunction, loadFailReason;
 		
 	local s, e = pcall(function()
 		zscriptPacket.Thread = coroutine.running();
 		ZSharpScript.newInstance("Thread", function()
+			-- kill thread
 			table.clear(zEnv);
-			--coroutine.close(zscriptPacket.Thread);
-			--task.cancel(zscriptPacket.Thread);
 		end);
+		if zscriptPacket.Terminal then
+			local terminal = ZSharpScript.newInstance("Terminal", zscriptPacket.Terminal);
+			if zscriptPacket.Terminal.PreRun then
+				zscriptPacket.Terminal.PreRun(ZSharpScript, zEnv, terminal);
+			end
+		end
 		if RunService:IsServer() then
 			loadFunction, loadFailReason = loadstring(zscriptPacket.Source);
 			if loadFunction then
