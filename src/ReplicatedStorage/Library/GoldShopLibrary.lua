@@ -755,6 +755,17 @@ GoldShopLibrary.Products:Add{
 	};
 };
 
+GoldShopLibrary.Products:Add{
+	Id="tophat";
+	Product={
+		Type="Gold";
+		Price=8950;
+		ItemId="tophat";
+	};
+	Trader={Buy=true; Sell=true;};
+};
+
+--== Skins
 
 GoldShopLibrary.Products:Add{
 	Id="dufflebagstreetart";
@@ -1748,6 +1759,9 @@ GoldShopLibrary.Pages = {
 		{Type="Product"; Id="clownmaskus"};
 	};
 	
+	SearchItems = {
+		{Type="Product"; Id="tophat"};
+	};
 
 
 	LimitedPage = {
