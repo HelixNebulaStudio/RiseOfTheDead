@@ -34,6 +34,7 @@ return function()
 	local modMissionLibrary = require(game.ReplicatedStorage.Library:WaitForChild("MissionLibrary"));
 	local modCollectiblesLibrary = require(game.ReplicatedStorage.Library.CollectiblesLibrary);
 	local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+	local modEventService = require(game.ReplicatedStorage.Library.EventService);
 	
 	local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 
@@ -614,70 +615,6 @@ return function()
 		
 		modItemInterface.ProcessSyncHooks(storageItemId);
 	end)
-	
-	--remoteItemValuesSync.OnClientEvent:Connect(function(storageId, id, key, value)
-	--	if modData.Storages[storageId] == nil or modData.Storages[storageId].Container[id] == nil then return end
-	--	local storageItem = modData.Storages[storageId].Container[id];
-		
-	--	storageItem.Values[key] = value;
-	--	modStorageInterface.UpdateStorages({modData.Storages[storageId]}, id);
-		
-	--	if key == "MA" or (key == "A" and value == nil) then
-	--	end
-		
-	--	if (key == "E" or key == "EG") and not modConfigurations.DisableExperiencebar then
-	--		local itemValues = storageItem.Values;
-			
-	--		modData.UpdateProgressionBar((itemValues.E or 0)/math.max(itemValues.EG or 0, 100), "WeaponLevel", itemValues.L);
-	--	end
-	--end)
-	
-	--remoteItemSync.OnClientEvent:Connect(function(storageId, id, itemData)
-	--	if modData.Storages[storageId] == nil then
-	--		local rPacket = remoteStorageService:InvokeServer({
-	--			Action="RequestStorage";
-	--			StorageIds={storageId};
-	--			Request=true;
-	--		});
-			
-	--		if rPacket.Storages then
-	--			for storageId, _ in pairs(rPacket.Storages) do
-	--				modData.SetStorage(rPacket.Storages[storageId]);
-	--			end
-	--		end
-	--	end
-		
-	--	if modData.Storages[storageId] then
-	--		if itemData then
-	--			-- Updated item.
-	--			local existingItem = modData.Storages[storageId].Container[id];
-	--			if existingItem then
-	--				for k, v in pairs(itemData) do
-	--					existingItem[k] = itemData[k];
-	--				end
-	--				for k, v in pairs(existingItem) do
-	--					if itemData[k] == nil then
-	--						existingItem[k] = nil;
-	--					end
-	--				end
-	--			else
-	--				modData.Storages[storageId].Container[id] = itemData;
-	--			end
-	--		else
-	--			-- Deleted item.
-	--			--Debugger:Warn("Item deleted, no follow up action");
-	--			--if modData.Storages[storageId].Container[id] 
-	--			--	and modData.Storages[storageId].Container[id].Values 
-	--			--	and modData.Storages[storageId].Container[id].Values.IsEquipped then
-	--			--	--modData.Binds.CharacterUnequip:Fire(id);
-	--			--	modData.HandleTool("local", {Unequip={Id=id;}});
-	--			--end
-	--			--modData.Storages[storageId].Container[id] = nil;
-	--		end
-			
-	--		modStorageInterface.UpdateStorages({modData.Storages[storageId]});
-	--	end
-	--end)
 	
 	remoteDuelRequest.OnClientEvent:Connect(function(requestType, ...)
 		local modInterface = GetInterfaceModule();
