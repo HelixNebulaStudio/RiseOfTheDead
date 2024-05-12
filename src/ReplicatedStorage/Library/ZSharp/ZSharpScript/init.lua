@@ -15,6 +15,7 @@ ZSharpScript.ConsoleOutput = modEventSignal.new("OnConsoleOutput");
 ZSharpScript.Instances = {};
 ZSharpScript.InstanceCounter = 0;
 ZSharpScript.newInstance = nil;
+
 --==
 for _, src in pairs(script:GetChildren()) do
 	if not src:IsA("ModuleScript") then continue end;
@@ -50,10 +51,6 @@ function ZSharpScript.Run(zscriptPacket)
 		
 	local s, e = pcall(function()
 		zscriptPacket.Thread = coroutine.running();
-		ZSharpScript.newInstance("Thread", function()
-			-- kill thread
-			table.clear(zEnv);
-		end);
 		if zscriptPacket.Terminal then
 			local terminal = ZSharpScript.newInstance("Terminal", zscriptPacket.Terminal);
 			if zscriptPacket.Terminal.PreRun then

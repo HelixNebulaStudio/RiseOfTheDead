@@ -50,18 +50,18 @@ function ItemHandler:ConsumeMpBook(player, inputStorageItem)
 	local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
 	local activeId = modBattlePassLibrary.Active;
 	if activeId == nil then
-		shared.Notify(player, "No active mission pass available.", "Negative");
+		shared.Notify(player, "No active event pass available.", "Negative");
 		return;
 	end;
 
 	local battlePassSave = profile.BattlePassSave;
 	local passData = battlePassSave:GetPassData(activeId);
 	if passData == nil then
-		shared.Notify(player, "No active mission pass data.", "Negative");
+		shared.Notify(player, "No active event pass data.", "Negative");
 		return;
 	end
 
-	shared.Notify(player, "You have recieved a level to your mission pass.", "Reward");
+	shared.Notify(player, "You have recieved a level to your event pass.", "Reward");
 	storage:Remove(storageItem.ID, 1);
 
 	battlePassSave:AddLevel(activeId);

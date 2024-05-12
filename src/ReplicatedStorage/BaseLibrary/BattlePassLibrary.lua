@@ -49,7 +49,7 @@ function BattlePassLibrary:Init(library)
 
 		Title="Apocalypse Origins";
 		Icon="rbxassetid://13890447995";
-		Desc="Unlock the Apocalypse Origin Mission Pass to claim more rewards!";
+		Desc="Unlock the Apocalypse Origin Event Pass to claim more rewards!";
 		
 		PremiumPrice=1250;
 		Price=2490;
@@ -295,7 +295,7 @@ function BattlePassLibrary:Init(library)
 
 		Title="5 Years Anniversary";
 		Icon="rbxassetid://17271606182";
-		Desc="Unlock the 5 Years Anniversary Pass to claim more rewards!";
+		Desc="Unlock the 5 Years Anniversary Event Pass to claim more rewards!";
 
 		Price=1000;
 

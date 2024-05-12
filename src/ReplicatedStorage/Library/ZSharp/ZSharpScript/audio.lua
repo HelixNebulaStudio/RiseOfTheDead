@@ -10,6 +10,7 @@ function ZSharp.Load(zSS, zEnv)
 	local AudioMeta = {};
 	AudioMeta.__index = AudioMeta;
 	AudioMeta.__metatable = "The metatable is locked";
+	AudioMeta.hint = "Create and play sounds existing in Revive Engine.";
 	
 	AudioMeta.hintPlay = "Plays an Sound.";
 	AudioMeta.descPlay = [[Plays an Audio.

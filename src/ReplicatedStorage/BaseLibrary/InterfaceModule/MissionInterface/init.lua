@@ -2161,7 +2161,7 @@ function Interface.init(modInterface)
 		RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, 0);
 		RightFrame.Position = UDim2.new(1, 0, 1, 0);
 		
-		hintLabel.Text = "Mission Pass has ended";
+		hintLabel.Text = "Event Pass has ended";
 		
 	else
 		BottomFrame.Visible = true;
@@ -2170,11 +2170,11 @@ function Interface.init(modInterface)
 		RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, -60);
 		RightFrame.Position = UDim2.new(1, 0, 1, -60);
 		
-		hintLabel.Text = "Mission Pass: ".. daysLeft .." Days Left";
+		hintLabel.Text = "Event Pass: ".. daysLeft .." Days Left";
 		
 		local bpButtonFunc;
 
-		--== MARK: Mission Pass
+		--== MARK: Event Pass
 		modData:RequestData("BattlePassSave/Passes/"..activeBpId);
 
 		table.clear(levelSlotsInfo)
@@ -2245,7 +2245,7 @@ function Interface.init(modInterface)
 							passRewardFrame.Parent = MissionDisplayFrame;
 
 							local titleLabel = passRewardFrame:WaitForChild("Title");
-							titleLabel.Text =  '<font size="14">'.."Mission Pass</font>\n<b>".. battlepassLib.Title .."</b>";
+							titleLabel.Text =  '<font size="14">'.."Event Pass</font>\n<b>".. battlepassLib.Title .."</b>";
 
 							local contentFrame = passRewardFrame:WaitForChild("Frame");
 							local claimButton = contentFrame:WaitForChild("ClaimButton");
@@ -2286,8 +2286,8 @@ function Interface.init(modInterface)
 								Interface:PlayButtonClick();
 
 								local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. price.." Gold</font></b>";
-								local promptWindow = Interface:PromptQuestion("Unlock Mission Pass for ".. goldTxt.. "?",
-									"Are you sure you want to unlock Mission Pass: ".. battlepassLib.Title .. " for "..goldTxt.."?", 
+								local promptWindow = Interface:PromptQuestion("Unlock Event Pass for ".. goldTxt.. "?",
+									"Are you sure you want to unlock Event Pass: ".. battlepassLib.Title .. " for "..goldTxt.."?", 
 									"Purchase", "Cancel");
 								local YesClickedSignal, NoClickedSignal;
 
@@ -2334,8 +2334,8 @@ function Interface.init(modInterface)
 								local price = modBattlePassLibrary.BuyLevelCost * lvlAmt;
 								
 								local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. price.." Gold</font></b>";
-								local promptWindow = Interface:PromptQuestion("Level up Mission Pass for ".. goldTxt.. "?",
-									"Are you sure you want to level up Mission Pass by ".. lvlAmt .." for "..goldTxt.."?", 
+								local promptWindow = Interface:PromptQuestion("Level up Event Pass for ".. goldTxt.. "?",
+									"Are you sure you want to level up Event Pass by ".. lvlAmt .." for "..goldTxt.."?", 
 									"Level Up", "Cancel");
 								local YesClickedSignal, NoClickedSignal;
 
@@ -2455,7 +2455,7 @@ function Interface.init(modInterface)
 
 								if rewardInfo.PassOwner then
 									titleLabel.TextColor3 = bpColors.CurrentPassOwner
-									titleStr = titleStr.." (Mission Pass)";
+									titleStr = titleStr.." (Event Pass)";
 									
 								elseif rewardInfo.RequiresPremium then
 									titleLabel.TextColor3 = bpColors.CurrentPremium;
@@ -2524,7 +2524,7 @@ function Interface.init(modInterface)
 								
 								local requiresMP = seasonData.Owned ~= true and rewardInfo.PassOwner == true
 								if requiresMP then
-									claimButton.Text = "Requires Mission Pass";
+									claimButton.Text = "Requires Event Pass";
 								end
 								
 								if rewardInfo.RequiresPremium == true and modData.IsPremium == false then
@@ -2543,7 +2543,7 @@ function Interface.init(modInterface)
 									claimButton.Text = "Claiming...";
 									local r = remoteBattlepassRemote:InvokeServer("claim", lvl);
 									if r.FailMsg then
-										if r.FailMsg == "Requires Mission Pass" then
+										if r.FailMsg == "Requires Event Pass" then
 											bpButtonFunc();
 											
 										elseif r.FailMsg == "Requires Premium" then
@@ -2730,8 +2730,8 @@ function Interface.init(modInterface)
 							
 							local descText = "";
 							if seasonData.Owned ~= true then
-								titleStr = titleStr.." (Mission Pass)";
-								descText = "Requires Mission Pass!\n"..descText;
+								titleStr = titleStr.." (Event Pass)";
+								descText = "Requires Event Pass!\n"..descText;
 							end
 
 							descText = descText.. modRichFormatter.RichFontSize(`Unlock a reward every {modBattlePassLibrary.PostRewardLvlFmod} levels.`, 20);
@@ -2993,7 +2993,7 @@ function Interface.init(modInterface)
 
 								local requiresMP = seasonData.Owned ~= true;
 								if requiresMP then
-									claimButton.Text = "Requires Mission Pass";
+									claimButton.Text = "Requires Event Pass";
 								end
 
 								local  claimText = claimButton.Text;
@@ -3008,7 +3008,7 @@ function Interface.init(modInterface)
 									claimButton.Text = "Claiming...";
 									local r = remoteBattlepassRemote:InvokeServer("claimpostreward", lvl);
 									if r.FailMsg then
-										if r.FailMsg == "Requires Mission Pass" then
+										if r.FailMsg == "Requires Event Pass" then
 											bpButtonFunc();
 
 										else
@@ -3158,7 +3158,7 @@ function Interface.init(modInterface)
 						scrollFrame.Visible = true;
 						descLabel.Size = UDim2.new(1, 0, 1, 0);
 						
-						local descText = "Trade in your rewards for past mission pass rewards! You can also trade in skin permanents in the Rat shop. Accumulated Tokens will only be usable during current mission pass.";
+						local descText = "Trade in your rewards for past event pass rewards! You can also trade in skin permanents in the Rat shop. Accumulated Tokens will only be usable during current event pass.";
 
 						if modData.IsPremium ~= true then
 							titleStr = titleStr.." (Premium)";

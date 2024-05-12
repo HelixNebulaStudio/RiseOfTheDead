@@ -6,7 +6,8 @@ return {
 
 		local new = newproxy(true);
 		local meta = getmetatable(new);
-		meta.__index = {};
+		meta.__index = private;
+		meta.__newindex = private;
 		return new;
 	end;
 }

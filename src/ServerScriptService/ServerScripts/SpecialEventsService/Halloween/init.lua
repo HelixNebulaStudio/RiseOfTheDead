@@ -194,7 +194,7 @@ function remoteHalloween.OnServerInvoke(player, packet)
 		candyData.Candy = candyData.Candy + candiesToSubmit;
 		profile.Cache.SubmitHalloweenCandyCache = (profile.Cache.SubmitHalloweenCandyCache or 0) + candiesToSubmit;
 
-		shared.Notify(player, "Mission Pass: Slaughter Fest levelled up by "..bpLevelsAdd.."!", "Inform");
+		shared.Notify(player, "Event Pass: Slaughter Fest levelled up by "..bpLevelsAdd.."!", "Inform");
 		profile.BattlePassSave:AddLevel(modBattlePassLibrary.Active, bpLevelsAdd);
 		profile.BattlePassSave:Sync();
 		

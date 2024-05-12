@@ -165,7 +165,7 @@ library:Add{
 	Id="bpseason1"; -- Bp season 1
 	Tier=Tiers.Bloodmetal;
 	BadgeId=2147850756;
-	Announce="$PlayerName Completed: Apocalypse Origins Mission Pass.";
+	Announce="$PlayerName Completed: Apocalypse Origins Event Pass.";
 	Hidden=true;
 }
 
@@ -173,7 +173,7 @@ library:Add{
 	Id="bphalloween1"; -- Bp halloween 1
 	Tier=Tiers.Bloodmetal;
 	BadgeId=2152862689;
-	Announce="$PlayerName Completed: Slaughter Fest 2023 Mission Pass.";
+	Announce="$PlayerName Completed: Slaughter Fest 2023 Event Pass.";
 	Hidden=true;
 }
 
@@ -181,7 +181,7 @@ library:Add{
 	Id="bp5years"; -- Bp 5 years
 	Tier=Tiers.Bloodmetal;
 	BadgeId=531879295475986;
-	Announce="$PlayerName Completed: 5 Years Anniversary Mission Pass.";
+	Announce="$PlayerName Completed: 5 Years Anniversary Event Pass.";
 	Hidden=true;
 }
 

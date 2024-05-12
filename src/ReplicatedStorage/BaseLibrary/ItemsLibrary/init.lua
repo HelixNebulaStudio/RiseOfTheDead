@@ -470,7 +470,7 @@ function ItemsLibrary:Init(super)
 			local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
 			local battlepassLib = modBattlePassLibrary:Find(modBattlePassLibrary.Active);
 			if battlepassLib then
-				data.Description = `Levels up your <b>{modRichFormatter.ColorRobuxText("Mission Pass: "..battlepassLib.Title)}</b> by 1 level.\n\nOpen your missions menu to see your mission pass progress.\n\nThis item expires 24 hours after receiving.`;
+				data.Description = `Levels up your <b>{modRichFormatter.ColorRobuxText("Event Pass: "..battlepassLib.Title)}</b> by 1 level.\n\nOpen your missions menu to see your event pass progress.\n\nThis item expires 24 hours after receiving.`;
 			end
 		end;
 		OnInstantiate=function(storageItem)
@@ -479,7 +479,7 @@ function ItemsLibrary:Init(super)
 			itemValues.Expire = (math.ceil(workspace:GetServerTimeNow()) + shared.Const.OneDaySecs);
 			itemValues.ExpireLength = shared.Const.OneDaySecs;
 		end;
-		Sources={"Obtained during a Mission Pass by general gameplay.";};
+		Sources={"Obtained during a Event Pass by general gameplay.";};
 	});
 	new(usableBase, {
 		Id="colorcustom";

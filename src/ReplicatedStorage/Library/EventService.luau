@@ -1,26 +1,62 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
+
+local modBitFlags = require(game.ReplicatedStorage.Library.BitFlags);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
 local remoteEventService = modRemotesManager:Get("EventService");
 
---== MARK: EventPacket;
+local EventHandlerPermissions = modBitFlags.new();
+EventHandlerPermissions:AddFlag("CanInvoke", "Client can invoke");
+EventHandlerPermissions:AddFlag("CanListen", "Client can listen to event")
+EventHandlerPermissions:AddFlag("CanCancel", "Client can cancel event");
+
+local EventSource = {
+    Server = 1;
+    Client = 2;
+};
+
+local localPlayer = game.Players.LocalPlayer;
+
 local EventPacket = {};
-EventPacket.__index = EventPacket;
+local EventHandler = {};
+local EventService = {};
+
+--== MARK: EventPacket;
+EventPacket.__index = function(t, k)
+    if k == "Player" then
+        return t.Players and t.Players[1];
+    end
+    return t[k];
+end;
+EventPacket.__metatable = "The metatable is locked";
+EventPacket.__newindex = function(t, k, v)
+    if k == "Players" then
+        rawset(t, k, v);
+
+        return;
+    end
+
+    error(`Attempt modify locked values by setting k({k}) = v({v}).`);
+end;
 
 type EventPacketObject = {
 	Cancelled: boolean;
     Completed: boolean;
 
+    Player: Player?;
     Players: {[number]: Player}?;
 }
 export type EventPacket = typeof(setmetatable({} :: EventPacketObject, EventPacket));
 
 
-function EventPacket.new() : EventPacket
+function EventPacket.new(key: string, eventSource: number) : EventPacket
     local self = {
+        Key = key;
+        Source = eventSource;
+
         Cancelled = false;
         Completed = false;
 
@@ -33,15 +69,30 @@ end
 
 function EventPacket:SetCancelled(value: boolean)
     if self.Completed then
-        Debugger:Warn(`Failed to set cancel on completed event.\nStackTrace: {debug.traceback()}`);
+        Debugger:Warn(`Failed to set cancel on completed event ({self.Key}).`);
         return;
     end
 
-    self.Cancelled = true;
+    if RunService:IsClient() then
+        if self.Source == EventSource.Server then
+            Debugger:Warn(`Client has no authority to cancel event from received server ({self.Key}).`);
+
+        else
+            local eventHandler = EventService:GetHandler(self.Key);
+        
+            if eventHandler == nil or eventHandler:HasPermissions(localPlayer, "CanCancel") == false then
+                Debugger:Warn(`Player ({localPlayer}) does not have permission:CanCancel to listen to event ({self.Key}).`);
+                return;
+            end
+
+        end
+    end
+
+    rawset(self, "Cancelled", value);
 end
 
+
 --== MARK: EventHandler;
-local EventHandler = {};
 EventHandler.__index = EventHandler;
 
 type EventHandlerObject = {
@@ -50,6 +101,9 @@ type EventHandlerObject = {
         StackTrace: string;
         Function: (event: EventPacket, ...any) -> nil;
     }};
+    
+    HandlerBitString: number | string;
+    ClientsBitString: {[Player]: number | string};
 }
 export type EventHandler = typeof(setmetatable({} :: EventHandlerObject, EventHandler));
 
@@ -58,6 +112,12 @@ function EventHandler.new(key: string): EventHandler
     local self = {
         Key = key;
         Listeners = {};
+
+        ReplicateToClients = false;
+        ReplicateToServer = false;
+
+        HandlerBitString = 0;
+        ClientsBitString = {};
     };
 
     setmetatable(self, EventHandler);
@@ -81,27 +141,51 @@ function EventHandler:AddListener(func, position)
     end;
 end
 
+function EventHandler:SetPermissions(flagTag: string, value: boolean)
+    self.HandlerBitString = EventHandlerPermissions:Set(self.HandlerBitString, flagTag, value);
+end
+
+function EventHandler:HasPermissions(flagTag: string, player: Player?): boolean
+    local eventFlag = EventHandlerPermissions:Test(flagTag, self.HandlerBitString);
+
+    local clientBitString = player and self.ClientsBitString[player];
+    if clientBitString == nil then return eventFlag; end
+
+    local clientFlag = EventHandlerPermissions:Test(flagTag, clientBitString);
+    return eventFlag and clientFlag;
+end
+
+function EventHandler:SetPlayerPermissions(player: Player, flagTag: string, value: boolean)
+    local clientBitString = self.ClientsBitString[player] or 0;
+    clientBitString = EventHandlerPermissions:Set(clientBitString, flagTag, value);
+    self.ClientsBitString[player] = clientBitString;
+end
+
+
 --== MARK: EventService
-local EventService = {};
 EventService.__index = EventService;
+EventService.EventSource = EventSource;
 EventService.Handlers = {};
 
-function EventService:GetHandler(key: string): EventHandler
-    if self.Handlers[key] == nil then
+
+function EventService:GetHandler(key: string, defaultIfNil: boolean?): EventHandler
+    if self.Handlers[key] == nil and defaultIfNil == true then
         self.Handlers[key] = EventHandler.new(key);
     end
     return self.Handlers[key];
 end
 
---[[
-    EventService:Invoke(key: string, ...): EventPacket
-    @return EventPacket
-    @param key string | Key of event.
-    @param ... ...any | Parameters of event.
-]]
-function EventService:Invoke(key: string, ...): EventPacket
-    local eventHandler = EventService:GetHandler(key);
-    local event = EventPacket.new();
+function EventService:ServerInvoke(key: string, players: Player? | {Player}?, ...): EventPacket
+    assert(RunService:IsServer(), `Can not call ServerInvoke ({key}) from client.`);
+
+    local eventSource = EventSource.Server;    
+    if typeof(players) == "Instance" and players:IsA("Player") then
+        eventSource = EventSource.Client;
+    end
+
+    local eventHandler = EventService:GetHandler(key, true);
+    local event = EventPacket.new(key, eventSource);
+    event.Players = typeof(players) == "table" and players or typeof(players) == "Instance" and {players} or nil;
 
     for pos, listener in pairs(eventHandler.Listeners) do
         listener.Function(event, ...);
@@ -110,31 +194,7 @@ function EventService:Invoke(key: string, ...): EventPacket
             break;
         end
     end
-    event.Completed = true;
-
-    return event;
-end
-
---[[
-    EventService:Invoke(key: string, ...): EventPacket
-    @return EventPacket
-    @param key string | Key of event.
-    @param players {[number]: Player} | List of players to replicate to.
-    @param ... ...any | Parameters of event.
-]]
-function EventService:ReplicateInvoke(key: string, players: {[number]: Player}, ...): EventPacket
-    local eventHandler = EventService:GetHandler(key);
-    local event = EventPacket.new();
-    event.Players = players;
-
-    for pos, listener in pairs(eventHandler.Listeners) do
-        listener.Function(event, ...);
-
-        if event.Cancelled then
-            break;
-        end
-    end
-    event.Completed = true;
+    rawset(event, "Completed", true);
 
     if not event.Cancelled then
         local packet = {
@@ -142,27 +202,64 @@ function EventService:ReplicateInvoke(key: string, players: {[number]: Player}, 
             [modRemotesManager.Ref("Arguments")] = {...};
         };
 
-        for a=1, #event.Players do
-            local player = event.Players[a];
-            if not game.Players:IsAncestorOf(player) then continue end;
+        if eventSource == EventSource.Server then
+            if event.Players then
+                for _, player in pairs(event.Players) do
+                    if eventHandler:HasPermissions("CanListen", player) then
+                        remoteEventService:Fire(player, packet);
+                    end
+                end
+            end
+            
+        elseif RunService:IsClient() and eventSource == EventSource.Client then
+            remoteEventService:Fire(packet);
 
-            remoteEventService:Fire(player, packet);
         end
+       
     end
 
     return event;
 end
 
---[[
-    EventService:OnInvoked(key: string, func: (event: {}, ...any) -> nil, position: number?): () -> nil
-    @return `() -> nil` Disconnects invoke handler.
-    @param key string | Key of event.
-    @param func (event, ...) -> nil | Function that gets called when event is handled.
-    @param position number? | Priority of the listener connected.
-]]
-function EventService:OnInvoked(key: string, func: (event: EventPacket, ...any) -> nil, position: number?): () -> nil
-    local eventHandler = EventService:GetHandler(key);
 
+function EventService:ClientInvoke(key: string, player: Player?, ...): EventPacket
+    assert(RunService:IsClient(), `Can not call ClientInvoke ({key}) from server.`);
+
+    local eventSource = EventSource.Client;
+    if typeof(player) == "nil" then
+        eventSource = EventSource.Server;
+    end
+
+    local eventHandler = EventService:GetHandler(key, true);
+    local event = EventPacket.new(key, eventSource);
+
+    for pos, listener in pairs(eventHandler.Listeners) do
+        listener.Function(event, ...);
+
+        if event.Cancelled then
+            break;
+        end
+    end
+    rawset(event, "Completed", true);
+
+    if not event.Cancelled then
+        local packet = {
+            [modRemotesManager.Ref("Key")] = key;
+            [modRemotesManager.Ref("Arguments")] = {...};
+        };
+
+        if eventSource == EventSource.Client then
+            remoteEventService:Fire(packet);
+
+        end
+       
+    end
+
+    return event;
+end
+
+function EventService:OnInvoked(key: string, func: (event: EventPacket, ...any) -> nil, position: number?): () -> nil
+    local eventHandler = EventService:GetHandler(key, true);
     return eventHandler:AddListener(func, position);
 end
 
@@ -176,20 +273,49 @@ function EventService:GetHandlerKeys()
     return list;
 end
 
+
 if RunService:IsServer() then
+    game.Players.PlayerRemoving:Connect(function(player)
+        for key, eventHandler: EventHandler in pairs(EventService.Handlers) do
+            eventHandler.ClientsBitString[player] = nil;
+        end
+    end)
+
+    remoteEventService.OnEvent:Connect(function(player, packet)
+		local key = packet[modRemotesManager.Ref("Key")];
+		local args = packet[modRemotesManager.Ref("Arguments")] or {};
+
+        if key == nil or key ~= key then Debugger:Warn(`Invalid event key ({key}).`); return end;
+
+        local eventHandler = EventService:GetHandler(key);
+        if eventHandler == nil then Debugger:Warn(`Invalid event handler ({key}).`); return end;
+
+        if eventHandler:HasPermissions("CanInvoke", player) == false then
+            Debugger:Warn(`Player ({player}) does not have permission:CanInvoke to invoke event ({key})`);
+            return;
+        end
+
+        EventService:ServerInvoke(key, player, unpack(args));
+    end)
+
+
+    local onClockTickEventHandler = EventService:GetHandler("OnClockTick", true);
+    onClockTickEventHandler:SetPermissions("CanListen", true);
+
     modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
-        EventService:ReplicateInvoke("OnClockTick", game.Players:GetPlayers(), modSyncTime.GetTime());
+        EventService:ServerInvoke("OnClockTick", game.Players:GetPlayers(), modSyncTime.GetTime());
 	end)
 
 else
     remoteEventService.OnEvent:Connect(function(packet)
 		local key = packet[modRemotesManager.Ref("Key")];
-		local args = packet[modRemotesManager.Ref("Arguments")];
+		local args = packet[modRemotesManager.Ref("Arguments")] or {};
 
-        EventService:Invoke(key, unpack(args));
+        EventService:ClientInvoke(key, nil, unpack(args));
     end)
 
 end
+
 
 return EventService;
 

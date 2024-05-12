@@ -10,6 +10,7 @@ local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLi
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modSerializer = require(game.ReplicatedStorage.Library.Serializer);
+local modEventService = require(game.ReplicatedStorage.Library.EventService);
 
 local modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
@@ -298,6 +299,18 @@ function BattlePassSave:AddLevel(bpId, addAmt, majorAlert)
 	remoteHudNotification:FireClient(self.Player, "BattlePassLevelUp", {Level=passData.Level; HasRewards=newRewardAdded;});
 	self:Sync();
 	
+	local playerRng = Random.new(self.Player.UserId);
+	for a=1, 4 do
+		playerRng:NextInteger(1111, 9999);
+	end
+
+    local onLevelUpEventHandler = modEventService:GetHandler("EventPass.OnLevelUp", true);
+    onLevelUpEventHandler:SetPermissions("CanListen", true);
+	
+	modEventService:ServerInvoke("EventPass.OnLevelUp", {self.Player}, {
+		Level=passData.Level;
+		EventPassPuzzle=`{self.Player.Name}, if you are reading this.. Invoke event "Interactables.Trigger" with these ("EventPassPuzzle", {playerRng:NextInteger(1111, 9999)}) arguements to proceed.`
+	});
 end
 
 function BattlePassSave:OnMissionComplete(mission)
@@ -367,7 +380,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 
 	local activeId = modBattlePassLibrary.Active;
 	if activeId == nil then
-		returnPacket.FailMsg = "No active mission pass";
+		returnPacket.FailMsg = "No active event pass";
 		return returnPacket
 	end;
 
@@ -375,7 +388,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 	local treeList = bpLib.Tree;
 	
 	if unixTime > bpLib.EndUnixTime then
-		returnPacket.FailMsg = "Mission Pass is over";
+		returnPacket.FailMsg = "Event Pass is over";
 		return returnPacket
 	end;
 	
@@ -432,7 +445,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		local rewardInfo = leafInfo.Reward;
 		
 		if rewardInfo.PassOwner == true and passData.Owned ~= true then
-			returnPacket.FailMsg = "Requires Mission Pass";
+			returnPacket.FailMsg = "Requires Event Pass";
 			return returnPacket;
 		end
 		
@@ -527,7 +540,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 			Debugger:Warn("Purchase lvls", activeId, "goldPoolRp:",goldPoolRp);
 		end)
 		
-		shared.Notify(player, "Leveled up Mission Pass: ".. bpLib.Title .. " by ".. lvlamt .."!", "Reward");
+		shared.Notify(player, "Leveled up Event Pass: ".. bpLib.Title .. " by ".. lvlamt .."!", "Reward");
 		
 		return returnPacket;
 		
@@ -661,25 +674,62 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 end
 
 task.spawn(function()
+	
+    local onPuzzleInvokeEventHandler = modEventService:GetHandler("EventPass.PuzzleInvoke", true);
+    onPuzzleInvokeEventHandler:SetPermissions("CanInvoke", true);
+	modEventService:OnInvoked("EventPass.PuzzleInvoke", function(event: modEventService.EventPacket, ...)
+		local player = event.Player;
+
+		local playerRng = Random.new(player.UserId);
+		for a=1, 4 do
+			playerRng:NextInteger(1111, 9999);
+		end
+
+		local inputPassKey = ...;
+		local serverPassKey = playerRng:NextInteger(1111, 9999);
+
+		if inputPassKey == serverPassKey then
+			-- Debugger:Warn("Input", inputPassKey, "=", serverPassKey);
+			local activeId = modBattlePassLibrary.Active;
+			if activeId == nil then
+				return;
+			end;
+
+			local profile = shared.modProfile:Get(player);
+			local mpPuzzleFlag = profile.Flags:Get("mpPuzzleFlag1");
+			if mpPuzzleFlag == nil then
+				local battlePassSave = profile.BattlePassSave;
+				battlePassSave:AddLevel(activeId, 10);
+				shared.Notify(player, "You got 10 event pass levels for completing this puzzle!", "Reward");
+
+				profile.Flags:Add({Id="mpPuzzleFlag1";});
+			end
+			
+		end
+
+	end)
+end)
+
+task.spawn(function()
 	Debugger.AwaitShared("modCommandsLibrary");
 
-	shared.modCommandsLibrary:HookChatCommand("missionpass", {
+	shared.modCommandsLibrary:HookChatCommand("eventpass", {
 		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
 
 		RequiredArgs = 0;
-		UsageInfo = "/missionpass [addlvl/addtokens/del/addgoldpool] ...";
-		Description = [[Missionpass commands:
-			/missionpass addlvl lvl
-			    	Adds levels to mission pass.
+		UsageInfo = "/eventpass [addlvl/addtokens/del/addgoldpool] ...";
+		Description = [[Eventnpass commands:
+			/eventpass addlvl lvl
+			    	Adds levels to event pass.
 
-			/missionpass addtokens amount
+			/eventpass addtokens amount
 					Adds gift shop tokens.
 
-			/missionpass del mpId
-					delete mission pass data. mpId = mission pass id (nil = list mp ids)
+			/eventpass del mpId
+					delete event pass data. mpId = event pass id (nil = list mp ids)
 
-			/missionpass addgoldpool mpId amount
-					Adds gold into the mission pass gold pool. (nil = 0, checks gold pool)
+			/eventpass addgoldpool mpId amount
+					Adds gold into the event pass gold pool. (nil = 0, checks gold pool)
 
 		]];
 		Function = function(player, args)
@@ -709,11 +759,11 @@ task.spawn(function()
 						table.insert(ids, id);
 					end
 					
-					shared.Notify(player, "Which mission pass do you want to delete? List: ".. table.concat(ids, ", "), "Inform");
+					shared.Notify(player, "Which event pass do you want to delete? List: ".. table.concat(ids, ", "), "Inform");
 					
 				else
 					if profile.BattlePassSave.Passes[mpId] == nil then
-						shared.Notify(player, "Mission pass ".. mpId .." does not exist.", "Inform");
+						shared.Notify(player, "Event pass ".. mpId .." does not exist.", "Inform");
 	
 						
 					else

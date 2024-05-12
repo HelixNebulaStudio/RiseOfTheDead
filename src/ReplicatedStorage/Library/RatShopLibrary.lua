@@ -293,9 +293,9 @@ ShopLibrary.Pages = {
 			{
 				Type="Page";
 				Id="MissionPassLbPage";
-				Title="Mission Pass";
+				Title="Event Pass";
 				Icon="rbxassetid://2938848546";
-				Desc="• Leaderboard for the mission pass levels!";
+				Desc="• Leaderboard for the event pass levels!";
 			};
 			{
 				Type="Page";

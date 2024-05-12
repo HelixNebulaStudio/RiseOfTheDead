@@ -55,7 +55,7 @@ local library = {
 		DatastoreId="L_Daily_GoldDonor";
 		Folder="DailyStats";
 	};
-	--- mission pass leaderboard
+	--- event pass leaderboard
 	AllTimeMp={
 		DataKey="AllTimeMp";
 		DatastoreName="L_AllTime_MpLevel";

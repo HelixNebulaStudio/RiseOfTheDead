@@ -680,7 +680,7 @@ function Interface.init(modInterface)
 					local descLabel = labelFrame:WaitForChild("descLabel");
 
 					local tokenReward = 1;
-					descLabel.Text = `Exchange {itemLib.Name} for <b>{tokenReward}</b> Mission Pass's Gift Shop Token`;
+					descLabel.Text = `Exchange {itemLib.Name} for <b>{tokenReward}</b> Event Pass's Gift Shop Token`;
 					titleLabel.Text = `Exchange {tokenReward} Token`;
 					priceLabel.Text = `{tokenReward} Token`;
 					iconLabel.Image = battlepassLib.Icon;
@@ -748,7 +748,7 @@ function Interface.init(modInterface)
 						local descLabel = labelFrame:WaitForChild("descLabel");
 	
 						local tokenReward = 1 * selectedItem.Quantity;
-						descLabel.Text = `Exchange <b>{itemLib.Name}</b> for <b>{tokenReward}</b> Mission Pass's Gift Shop Token`;
+						descLabel.Text = `Exchange <b>{itemLib.Name}</b> for <b>{tokenReward}</b> Event Pass's Gift Shop Token`;
 						titleLabel.Text = `Exchange {tokenReward} Token`;
 						priceLabel.Text = `{tokenReward} Token`;
 						iconLabel.Image = battlepassLib.Icon;

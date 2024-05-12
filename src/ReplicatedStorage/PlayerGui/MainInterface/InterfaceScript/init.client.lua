@@ -200,12 +200,12 @@ local function MajorNotification(Type, notificationData)
 				
 			elseif Type == "BattlePassLevelUp" then
 				titleImage.Image = "rbxassetid://2048330360";
-				titleText = "Mission Pass leveled up to ".. values.Level .."!".. (values.HasRewards and " Check your missions menu for rewards!" or "");
+				titleText = "Event Pass leveled up to ".. values.Level .."!".. (values.HasRewards and " Check your missions menu for rewards!" or "");
 				modAudio.Play("Collectible");
 				
 			elseif Type == "BattlePassComplete" then
 				titleImage.Image = "rbxassetid://2740686675";
-				titleText = "You have completed Mission Pass: ".. values.Title .."!";
+				titleText = "You have completed Event Pass: ".. values.Title .."!";
 				modAudio.Play("Ascended");
 
 				

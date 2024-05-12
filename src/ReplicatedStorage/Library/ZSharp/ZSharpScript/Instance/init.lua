@@ -11,21 +11,22 @@ function ZSharp.Load(ZSharpScript, zEnv)
 
 	ZSharpScript.Sandbox = function(data, instanceCast)
 		if typeof(data) == "function" then
+			local func = data;
 			if instanceCast then
 				return ZSharpScript.newInstance(instanceCast, function(...)
 					local args = ZSharpScript.Sandbox({...});
-					return data(args);
+					return func(unpack(args or {}));
 				end);
 			end
 
 			return function(...)
 				local args = ZSharpScript.Sandbox({...});
-				return data(unpack(args));
+				return func(unpack(args or {}));
 			end;
 
 		elseif typeof(data) == "table" then
-			local n = table.clone(data);
-			for k, v in pairs(n) do
+			local n = {};
+			for k, v in pairs(data) do
 				n[ZSharpScript.Sandbox(k)] = ZSharpScript.Sandbox(v);
 			end
 
@@ -36,10 +37,34 @@ function ZSharp.Load(ZSharpScript, zEnv)
 
 			return n;
 
-		elseif typeof(data) == "userdata" and data.ClassName then
+		elseif (typeof(data) == "userdata" or typeof(data) == "Instance") and data.ClassName then
 			local class = ZSharpScript.Classes[data.ClassName];
 			return class and ZSharpScript.newInstance(data.ClassName, data) or nil;
 
+		elseif typeof(data) == "string" or typeof(data) == "number" or typeof(data) == "boolean"  then
+			return data;
+
+		end
+
+		return nil;
+	end
+
+	ZSharpScript.UnSandbox = function(data)
+		if typeof(data) == "userdata" or typeof(data) == "Instance" then
+			if data.ClassName == "Player" then
+				local player = game:GetService("Players"):GetPlayerByUserId(data.UserId);
+				return player;
+			end
+
+		elseif typeof(data) == "table" then
+			local n = {};
+			for k, v in pairs(data) do
+				local nK = ZSharpScript.UnSandbox(k);
+				if nK == nil then continue end;
+				
+				n[nK] = ZSharpScript.UnSandbox(v);
+			end
+			
 		elseif typeof(data) == "string" or typeof(data) == "number" or typeof(data) == "boolean"  then
 			return data;
 
@@ -54,6 +79,8 @@ function ZSharp.Init(ZSharpScript)
 	ZSharpScript.Classes = Classes;
 	local InstanceLink = {};
 	ZSharpScript.InstanceLink = InstanceLink;
+	local UniqueInstance = {};
+	ZSharpScript.UniqueInstance = UniqueInstance;
 	
 	
 	local InstanceMeta = {};
@@ -103,6 +130,9 @@ function ZSharp.Init(ZSharpScript)
 			end
 		end
 		
+		table.sort(r, function(a, b)
+			return a.Name > b.Name;
+		end)
 		return r;
 	end
 	
@@ -126,10 +156,15 @@ function ZSharp.Init(ZSharpScript)
 		local zInstance = require(obj);
 		local className = obj.Name;
 
+		zInstance.Class.Name = className;
 		zInstance.Class.ClassName = className;
+
 		ZSharpScript.Classes[className] = zInstance.Class;
 		if zInstance.Link then
 			InstanceLink[className] = zInstance.Link;
+		end
+		if zInstance.Unique then
+			UniqueInstance[className] = zInstance.Unique;
 		end
 	end
 
@@ -154,21 +189,32 @@ function ZSharp.Init(ZSharpScript)
 			instance = nil;
 			Debugger:Warn("Attempt to preset Instance");
 		end
-		ZSharpScript.InstanceCounter = ZSharpScript.InstanceCounter+1;
 		
-		local new = newproxy(true);
+		local new;
+		local class = ZSharpScript.Classes[className];
+		if UniqueInstance[className] then
+			new = UniqueInstance[className](ZSharpScript, instance);
+			if new then
+				return new;
+			end
+		end
+
+		ZSharpScript.InstanceCounter = ZSharpScript.InstanceCounter+1;
+
+		new = newproxy(true);
 		local meta = getmetatable(new);
 		local private = {
 			ClassName = className;
-			Name = className.."#"..ZSharpScript.InstanceCounter;
+			Id = ZSharpScript.InstanceCounter;
+			Name = className;
 		};
 
-		local class = ZSharpScript.Classes[className];
-		instance = InstanceLink[className] and InstanceLink[className](ZSharpScript, instance, private) or instance;
-		assert(typeof(instance) == "userdata", `Invalid instance for {className}`);
+		local linkFunction = InstanceLink[className];
+		instance = linkFunction and linkFunction(ZSharpScript, instance, private) or instance;
+		assert(typeof(instance) == "Instance" or typeof(instance) == "userdata", `Invalid instance({instance}) typeof({typeof(instance)}) for {className}`);
 
 		if instance.Name and instance.Name ~= instance.ClassName then
-			private.Name = `{instance.Name}#{ZSharpScript.InstanceCounter}`;
+			private.Name = instance.Name;
 		end
 		
 		meta.__metatable = "The metatable is locked";
@@ -185,19 +231,25 @@ function ZSharp.Init(ZSharpScript)
 			if private.OnDestroy then
 				private.OnDestroy();
 			end
-			Debugger.Expire(instance);
+			if InstanceLink[className] then
+				Debugger.Expire(instance);
+			end
 			ZSharpScript.Instances[new] = nil;
 		end
 		
-		function private.KeyValues()
-			local keyValues = {};
-			for k, v in pairs(class) do
-				keyValues[k] = instance[k];
+		if RunService:IsStudio() then
+			function private.KeyValues()
+	
+				local keyValues = {};
+				for k, v in pairs(class) do
+					keyValues[k] = instance[k];
+				end
+				for k, v in pairs(private) do
+					keyValues[k] = v;
+				end
+	
+				return keyValues;
 			end
-			for k, v in pairs(private) do
-				keyValues[k] = v;
-			end
-			return keyValues;
 		end
 		
 		function meta.__index(_, k)
@@ -216,7 +268,7 @@ function ZSharp.Init(ZSharpScript)
 		function meta.__newindex(_, k, v)
 			local class = ZSharpScript.Classes[private.ClassName];
 			if class[k] == nil then
-				error(`{k} is not a valid member of {class.ClassName}`);
+				error(`{k} is not a valid member of {class.ClassName} to set.`);
 			end
 			if k == "Id" or k == "ClassName" then
 				error(`Can not modify Instance {k}.`);
@@ -226,7 +278,7 @@ function ZSharp.Init(ZSharpScript)
 		end;
 
 		function meta.__tostring(_)
-			return private.ClassName;
+			return private.Name;
 		end;
 
 		function meta.__call(_, ...)

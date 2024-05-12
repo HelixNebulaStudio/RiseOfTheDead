@@ -27,14 +27,14 @@ library:Add{
 	Id="survivorsoutpost";
 	Name="Survivor's Outpost";
 	Image="http://www.roblox.com/asset/?id=13898399031";
-	UnlockHint="Unlocked from Mission Pass: Apocalypse Origins";
+	UnlockHint="Unlocked from Event Pass: Apocalypse Origins";
 };
 
 library:Add{
 	Id="slaughterwoods";
 	Name="Slaughter Woods";
 	Image="http://www.roblox.com/asset/?id=14991850441";
-	UnlockHint="Unlocked from Mission Pass: Slaughter Fest 2023";
+	UnlockHint="Unlocked from Event Pass: Slaughter Fest 2023";
 };
 
 

@@ -3,6 +3,7 @@ return {
 		UserId = 0;
 		HackInfo = {};
     };
+	
     Link=function(zss, t, private)
 		local m = {};
 		for k, v in pairs(t) do

@@ -349,7 +349,7 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 
 		local passData = battlePassSave:GetPassData(activeId);
 		if passData == nil then
-			shared.Notify(player, `No available mission pass.`, "Negative");
+			shared.Notify(player, `No available event pass.`, "Negative");
 			return modShopLibrary.PurchaseReplies.ShopClosed;
 		end
 

@@ -43,6 +43,10 @@ function ZSharp.Load(zSS, zEnv)
 				local hintV;
 				pcall(function()
 					hintV = t["hint"..key];
+
+					if hintV == nil then
+						hintV = t[key].hint;
+					end
 				end)
 				hintV = hintV or "Missing hint.";
 
@@ -69,6 +73,10 @@ function ZSharp.Load(zSS, zEnv)
 					local descV;
 					pcall(function()
 						descV = currEnv["desc"..dir];
+
+						if descV == nil then
+							descV = currEnv[dir].desc;
+						end
 					end)
 					descV = descV or "Missing description.";
 
