@@ -37,11 +37,12 @@ if RunService:IsServer() then
 
 
 		local coopMission = modCoopMission:Get(factionTag, missionId);
-		if coopMission == nil then Debugger:Warn("No coop mission OnPlayerDied") return end;
+		if coopMission == nil then Debugger:Warn("No coop mission OnPlayerDied"); return end;
 		
 		if coopMission.Type == 1 and coopMission.CheckPoint == 2 then
 			Debugger:Warn("Fail coopMission", coopMission);
 			coopMission:Fail(player.Name.." died fighting Prime "..coopMission.SaveData.BossName);
+			coopMission:Destroy();
 		end
 	end)
 end

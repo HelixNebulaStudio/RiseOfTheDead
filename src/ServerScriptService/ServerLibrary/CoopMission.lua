@@ -1,7 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
-local modStateVariable = require(game.ReplicatedStorage.Library.StateVariable);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 
 
@@ -89,10 +88,10 @@ function CoopMission:GetPlayers()
 end
 
 function CoopMission:Destroy()
-	local group = self.Groups[self.GroupId];
+	local group = CoopMission.Groups[self.GroupId];
 	if group == nil then return end;
 	
-	group[self.Id] = nil;
+	CoopMission.Groups[self.GroupId][self.Id] = nil;
 	
 	self.Changed:Destroy();
 	self.OnPlayerAdded:Destroy();

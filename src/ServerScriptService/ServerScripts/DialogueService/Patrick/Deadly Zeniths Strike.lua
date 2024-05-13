@@ -63,16 +63,7 @@ return function(player, dialog, data, mission)
 		Debugger:Warn("Completed dps");
 		
 	elseif coopMission.Type == 4 then
-		--dialog:SetInitiateTag("dps_retry");
-		--dialog:AddChoice("dps_restart", function(dialog)
-		--	coopMission:Progress(function()
-		--		coopMission.Type = 1;
-		--		modAudio.Play("HordeGrowl");
-		--		coopMission.CheckPoint = 2;
 
-		--	end)
-		--end)
-		
 	end
 	
 end
