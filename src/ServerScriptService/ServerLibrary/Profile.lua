@@ -272,11 +272,20 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 
 		--== Leaderboard
 		profile.LeaderstatsTimer = unixTime-120;
+
 		profile.AllTimeStats = {};
+		profile.YearlyStats = {};
+		profile.SeasonlyStats = {};
+		profile.MonthlyStats = {};
 		profile.WeeklyStats = {};
 		profile.DailyStats = {};
+
+		profile.YearEndTime = 0;
+		profile.SeasonEndTime = 0;
+		profile.MonthEndTime = 0;
 		profile.WeekEndTime = 0;
 		profile.DayEndTime = 0;
+		
 
 		profile.PolicyData = {
 			ArePaidRandomItemsRestricted = true;
@@ -764,12 +773,35 @@ function Profile:Load(loadOverwrite)
 	end
 	
 	if rawData and rawData.LastOnline then
+		local yearEndTime = modSyncTime.TimeOfEndOfYear();
+		if yearEndTime ~= rawData.YearEndTime then
+			if rawData.YearEndTime ~= 0 then
+				rawData.YearlyStats = {};
+			end
+			rawData.YearEndTime = yearEndTime;
+		end
+
+		local seasonEndTime = modSyncTime.TimeOfEndOfSeason();
+		if seasonEndTime ~= rawData.SeasonEndTime then
+			if rawData.SeasonEndTime ~= 0 then
+				rawData.SeasonlyStats = {};
+			end
+			rawData.SeasonEndTime = seasonEndTime;
+		end
+
+		local monthEndTime = modSyncTime.TimeOfEndOfMonth();
+		if monthEndTime ~= rawData.MonthEndTime then
+			if rawData.MonthEndTime ~= 0 then
+				rawData.MonthlyStats = {};
+			end
+			rawData.MonthEndTime = monthEndTime;
+		end
+
 		local weekEndTime = modSyncTime.TimeOfEndOfWeek();
 		if weekEndTime ~= rawData.WeekEndTime then
 			if rawData.WeekEndTime ~= 0 then
 				rawData.WeeklyStats = {};
 			end
-			getmetatable(self).WeekRollOver = true;
 			rawData.WeekEndTime = weekEndTime;
 		end
 		local dayEndTime = modSyncTime.TimeOfEndOfDay();
@@ -777,15 +809,8 @@ function Profile:Load(loadOverwrite)
 			if rawData.DayEndTime ~= 0 then
 				rawData.DailyStats = {};
 			end
-			getmetatable(self).DayRollOver = true;
 			rawData.DayEndTime = dayEndTime;
 		end
-		--if rawData.LastOnline+691200 <= modSyncTime.TimeOfEndOfWeek() then
-		--	rawData.WeeklyStats = {};
-		--end
-		--if rawData.LastOnline+86400 <= modSyncTime.TimeOfEndOfDay() then
-		--	rawData.DailyStats = {};
-		--end
 		
 		local _lastOnline = rawData.LastOnline;
 		local _firstOnline = rawData.FirstOnline;
