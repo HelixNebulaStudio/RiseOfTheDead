@@ -1,9 +1,12 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --
+local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
+local modZSharpLexer = require(game.ReplicatedStorage.Library.ZSharp.ZSharpLexer);
+
 local ZSharp = {};
 
 function ZSharp.Load(zSS, zEnv)
-	local function outputConsole(...)
+	local function outputConsole(prefix, ...)
 		print(...);
 		
 		local toStringify = {};
@@ -12,17 +15,20 @@ function ZSharp.Load(zSS, zEnv)
 		end
 		local str = table.concat(toStringify, " ");
 		
-		zSS.ConsoleOutput:Fire(str);
+		zSS.ConsoleOutput:Fire(`{modRichFormatter.Color("255, 142, 58", prefix)}{modZSharpLexer.buildStr(str, true)}`);
+
 	end
 	
 	zEnv.log = function(...)
 		local str = Debugger:Stringify(...);
 		local logPrefix = zEnv.ScriptName..">>  ";
+
 		outputConsole(logPrefix, str);
 	end
 	
 	zEnv.print = function(...)
 		local logPrefix = zEnv.ScriptName..">>  ";
+		
 		outputConsole(logPrefix, ...);
 	end
 	
@@ -50,7 +56,7 @@ function ZSharp.Load(zSS, zEnv)
 				end)
 				hintV = hintV or "Missing hint.";
 
-				str = str.."\n   <b>"..key.."</b>: ".. "<i>".. typeof(v) .."</i>"..(hintV and "    -- "..hintV or "");
+				str = str.."\n   <b>"..key.."</b>: ".. "<i>".. typeof(v) .."</i>"..(hintV and modRichFormatter.ColorCommentText("    -- "..hintV) or "");
 			end
 			
 			table.clear(sorted);
@@ -80,12 +86,12 @@ function ZSharp.Load(zSS, zEnv)
 					end)
 					descV = descV or "Missing description.";
 
-					outputConsole("zss.help>>  \nFunction:", currDir," \[\[\n   ",descV,"\n\]\]\n");
+					outputConsole("zss.help>>  ", "\nFunction:", currDir," \[\[\n   ",descV,"\n\]\]\n");
 					
 					return;
 					
 				elseif currEnv[dir] == nil then
-					outputConsole("zss.help>>  Unknown library (".. currDir ..").");
+					outputConsole("zss.help>>  ", "Unknown library (".. currDir ..").");
 					return;
 					
 				else
@@ -93,7 +99,7 @@ function ZSharp.Load(zSS, zEnv)
 				end
 			end
 			
-			outputConsole("zss.help>>  \nLibrary:", currDir,"= {",printTable(currEnv),"\n}\n");
+			outputConsole("zss.help>>  ", "\nLibrary:", currDir,"= {",printTable(currEnv),"\n}\n");
 
 			return;
 		end
@@ -103,8 +109,8 @@ function ZSharp.Load(zSS, zEnv)
 		
 		helpStr = helpStr.."\n\n<b>getfenv():</b> -- Available keys in this environment.";
 		
-		local envStr = printTable(zEnv);		
-		outputConsole("zss.help>>  \n",helpStr..envStr,"\n\nUse the <b>help</b>(path: <i>string</i>) function to see more. E.g. help(\"Audio.Play\")\n");
+		local envStr = printTable(zEnv);
+		outputConsole("zss.help>>  ", "\n",helpStr..envStr,"\n\nUse the <b>help</b>(path: <i>string</i>) function to see more. E.g. help(\"Audio.Play\")\n");
 	end
 end
 

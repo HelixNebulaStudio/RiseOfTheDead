@@ -25,6 +25,9 @@ local modZSharpScript = require(game.ReplicatedStorage.Library.ZSharp.ZSharpScri
 local modTextEditor = require(game.ReplicatedStorage.Library.Terminal:WaitForChild("ZSCode"));
 local modHackingMinigame = require(game.ReplicatedStorage.Library.Terminal:WaitForChild("LockHydra"));
 
+local modZSharpLexer = require(game.ReplicatedStorage.Library.ZSharp.ZSharpLexer);
+local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
+
 local terminalFrame = script.Parent.Parent:WaitForChild("Terminal");
 local termFrame = terminalFrame:WaitForChild("Frame");
 local inputBox: TextBox = termFrame:WaitForChild("TextInput");
@@ -143,49 +146,6 @@ cmdsList = {
 			Interface.Println("\n");
 		end
 	};
-	-- {
-	-- 	CmdId = "scan";
-	-- 	Usage = "scan [deviceId]";
-	-- 	Desc = "Scan device for information.";
-	-- 	Run=function(args)
-	-- 		local hackInfo = activeInteractData and activeInteractData.HackInfo;
-			
-	-- 		if hackInfo then
-	-- 			local dId = args[1];
-				
-	-- 			if dId == nil then
-	-- 				Interface.Println("Device information:\n"..
-	-- 					"\n<b>Name</b>:"..fillspace("Name:", 28)..hackInfo.Name..
-	-- 					"\n<b>Authentication Level</b>:"..fillspace("Authentication Level:", 28)..hackInfo.AuthenticationLevel..
-	-- 					"\n<b>Connected Devices</b>:\n" --Debugger:Stringify()
-	-- 				);
-					
-	-- 				for id, data in pairs(hackInfo.ConnectedDevices) do
-	-- 					Interface.Println("    [\"<b>"..id.."</b>\"]="..Debugger:Stringify(data));
-	-- 				end
-	-- 			else
-	-- 				local deviceData = hackInfo.ConnectedDevices[dId];
-	-- 				if deviceData then
-	-- 					Interface.Println("Connected Devices:\n"..
-	-- 						"\n<b>Id</b>:"..fillspace("Id:", 28)..dId..
-	-- 						"\n<b>Name</b>:"..fillspace("Name:", 28)..deviceData.Name..
-	-- 						"\n<b>Authentication Level</b>:"..fillspace("Authentication Level:", 28)..hackInfo.AuthenticationLevel..
-	-- 						"\n<b>LastAccess</b>:"..fillspace("LastAccess:", 28)..deviceData.LastAccess..
-	-- 						"\n<b>Security Protocol</b>:"..fillspace("Security Protocol:", 28)..deviceData.SecProto..
-	-- 						(deviceData.AuthBypass and "\n<b>Auth Bypass</b>:"..fillspace("Auth Bypass:", 28)..deviceData.AuthBypass or "")
-	-- 					);
-	-- 				else
-	-- 					Interface.Println("Could not scan device \""..dId.."\".");
-	-- 				end
-	-- 			end
-				
-				
-	-- 			Interface.Println("\n");
-	-- 		else
-	-- 			Interface.Println("Access is denied.");
-	-- 		end
-	-- 	end
-	-- };
 	{
 		CmdId = "size";
 		Usage = "size [size]";
@@ -204,114 +164,6 @@ cmdsList = {
 			Interface.Println("\n");
 		end
 	};
-	-- {
-	-- 	CmdId = "login";
-	-- 	Usage = "login deviceId username password";
-	-- 	Desc = "Login a connected device.";
-	-- 	Run=function(args)
-	-- 		local hackInfo = activeInteractData and activeInteractData.HackInfo;
-			
-	-- 		if hackInfo == nil then
-	-- 			Interface.Println("No device found.");
-	-- 			return;
-	-- 		end
-
-	-- 		if hackInfo.Logon == true then
-	-- 			Interface.Println("You are already logged in as Eugene B.");
-	-- 			return;
-	-- 		end
-
-	-- 		if hackInfo then
-	-- 			local dId = args[1] or "";
-	-- 			if dId then
-	-- 				local deviceData = hackInfo.ConnectedDevices[dId];
-	-- 				if deviceData then
-	-- 					local inputUser = args[2] or "";
-	-- 					local inputPass = args[3] or "";
-						
-	-- 					if #inputUser > 0 then
-	-- 						local potentialUserNames = {["admin"]=true; ["root"]=true; ["default"]=true;};
-							
-	-- 						if string.lower(inputUser) == "guest" then
-	-- 							if deviceData.GuestAccess then
-	-- 								Interface.Println("Access granted.");
-									
-	-- 							else
-	-- 								Interface.Println("Guest Access is not enabled.");
-									
-	-- 							end
-	-- 						elseif potentialUserNames[string.lower(inputUser)] then
-	-- 							Interface.Println("Access is denied.");
-								
-	-- 						elseif deviceData.LastAccess and string.lower(deviceData.LastAccess) == string.lower(inputUser) then
-	-- 							if deviceData.AuthBypass then
-	-- 								Interface.Println("Access granted.");
-									
-									
-	-- 							else
-	-- 								Interface.Println("Access is denied.");
-									
-	-- 							end
-	-- 						end
-	-- 					else
-							
-	-- 						Interface.Println("Invalid login username \""..inputUser.."\".");
-	-- 					end
-						
-	-- 				else
-	-- 					Interface.Println("Could not find device id \""..dId.."\".");
-						
-	-- 				end
-	-- 			else
-	-- 				Interface.Println("Invalid device id \""..dId.."\".");
-					
-	-- 			end
-	-- 		end
-			
-	-- 		Interface.Println("\n");
-	-- 	end
-	-- };
-	-- {
-	-- 	CmdId = "256pass";
-	-- 	Usage = "256pass deviceId";
-	-- 	Desc = "256-bit keypass encryption destroyer. Can be used to break into any 256-bit based authentication system.";
-	-- 	Run=function(args)
-	-- 		local hackInfo = activeInteractData and activeInteractData.HackInfo;
-			
-	-- 		if hackInfo then
-	-- 			if hackInfo.Logon == true then
-	-- 				Interface.Println("This device is already authenticated, 256pass is unnecessary.");
-	-- 				return;
-	-- 			end
-				
-	-- 			local dId = args[1];
-	-- 			if dId then
-	-- 				local deviceData = hackInfo.ConnectedDevices[dId];
-	-- 				if deviceData then
-	-- 					for y=1, 20 do
-	-- 						local prHexTxt = "";
-	-- 						for x=1, 16 do
-	-- 							prHexTxt = prHexTxt.." "..hexPairList[math.random(1, #hexPairList)];
-	-- 						end
-	-- 						Interface.Println(prHexTxt);
-	-- 						termWait(0.5);
-	-- 					end
-	-- 					Interface.Println("\n256-bit keypass encryption destroyed for device id \""..dId.."\".\n");
-	-- 					hackInfo.ConnectedDevices[dId].AuthBypass = "Enabled";
-						
-	-- 				else
-	-- 					Interface.Println("Could not find device id \""..dId.."\".");
-						
-	-- 				end
-	-- 			else
-	-- 				Interface.Println("Invalid device id \""..dId.."\".");
-					
-	-- 			end
-	-- 		end
-			
-	-- 		Interface.Println("\n");
-	-- 	end
-	-- };
 	{
 		CmdId = "run";
 		Desc = "Runs a script in z-sharp script";
@@ -461,6 +313,17 @@ cmdsList = {
 
 
 --== Script;
+function Interface.PrintlnLexer(...)
+	if terminalFrame.Visible == false then return end;
+	
+	local new = templateTerminalLabel:Clone();
+	new.Text = modZSharpLexer.buildStr(Debugger:Stringify(...), true);
+	new.ZIndex = activeOutputFrame.ZIndex;
+	new.Parent = activeOutputFrame;
+	
+	activeOutputFrame.CanvasPosition = Vector2.new(0, 99999);
+end
+
 function Interface.Println(...)
 	if terminalFrame.Visible == false then return end;
 	
@@ -518,9 +381,6 @@ function Interface:AddCommand(cmdLib)
 	Interface.TerminalCmds[cmdLib.CmdId] = cmdLib;
 end
 
---if modConfigurations.CompactInterface then
---	terminalFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton").Visible = true;
---end
 terminalFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
 	Interface:CloseWindow("TerminalWindow");
 end)
@@ -583,7 +443,7 @@ function Interface.init(modInterface)
 			if runProgram == nil then
 				inputBox:CaptureFocus();
 			
-				Interface.Println("Welcome to the Revive's Executable Console (R.E.C.) terminal:\n\nCommands: Type 'help' into terminal for list of commands.\n");
+				Interface.Println("Welcome to the Revive Executable Console (R.E.C.) terminal:\n\nCommands: Type 'help' into terminal for list of commands.\n");
 				
 				Interface.Update();
 				
@@ -599,7 +459,7 @@ function Interface.init(modInterface)
 			else
 				if #runProgram <= 0 or runProgram == "none" then
 					inputBox:CaptureFocus();
-					Interface.Println("Welcome to the Revive's Executable Console (R.E.C.) terminal:\n\nCommands: Type 'help' into terminal for list of commands.\n");
+					Interface.Println("Welcome to the Revive Executable Console (R.E.C.) terminal:\n\nCommands: Type 'help' into terminal for list of commands.\n");
 					Interface.Update();
 					
 				else
@@ -686,6 +546,13 @@ function Interface.init(modInterface)
 		Interface.Println(str);
 	end))
 	
+	task.spawn(function()
+		while Debugger.LogRemote == nil do task.wait(); end;
+		Debugger.LogRemote.OnClientEvent:Connect(function(str)
+			Interface.Println(modRichFormatter.Color("255, 142, 58", "Server>>  "), modZSharpLexer.buildStr(str, true));
+		end)
+	end)
+
 	return Interface;
 end;
 

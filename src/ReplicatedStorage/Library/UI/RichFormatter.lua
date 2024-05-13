@@ -67,4 +67,12 @@ function RichFormatter.RichFontSize(text, size)
 	return '<font size="'..size..'">'.. text ..'</font>';
 end
 
+function RichFormatter.Color(color, text)
+	return `<font color="rgb({color})">{text}</font>`;
+end
+
+function RichFormatter.ColorCommentText(text)
+	return '<font color="#2b4f1b">'..text..'</font>';
+end
+
 return RichFormatter;

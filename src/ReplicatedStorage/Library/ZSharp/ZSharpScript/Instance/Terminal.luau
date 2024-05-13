@@ -1,7 +1,6 @@
 return {
     Class={
 		UserId = 0;
-		HackInfo = {};
     };
 	
     Link=function(zss, t, private)

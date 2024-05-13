@@ -291,7 +291,7 @@ function BattlePassLibrary:Init(library)
 	-- MARK: BP 5 Years Anniversary
 	library:Add{
 		Id="bp5years";
-		EndUnixTime=1722470400;
+		EndUnixTime=1722556799;
 
 		Title="5 Years Anniversary";
 		Icon="rbxassetid://17271606182";

@@ -10,28 +10,6 @@ TextEditor.ClassName = "ZSCode";
 --==
 
 local color = Color3.fromRGB(128,128,128)
-local function syntaxHighlight(token, src)
-	src = string.gsub(src,"&","&amp;");
-	src = string.gsub(src,"<","&lt;");
-	src = string.gsub(src,">","&gt;");
-	src = string.gsub(src,'"',"&quot;");
-	src = string.gsub(src,"'","&apos;");
-	
-	if token == "keyword" then
-		return '<font color="#377ca1">'..src..'</font>';
-	elseif token == "number" then
-		return '<font color="#7ac28f">'..src..'</font>';
-	elseif token == "builtin" then
-		return '<font color="#6fbca9">'..src..'</font>';
-	elseif token == "string" then
-		return '<font color="#da8e75">'..src..'</font>';
-	elseif token == "comment" then
-		return '<font color="#2b4f1b">'..src..'</font>';
-	elseif token == ";" then
-		return '<font color="#808080">'..src..'</font>';
-	end
-	return src;
-end
 
 function TextEditor.new()
 	local self = {
@@ -44,7 +22,7 @@ function TextEditor.new()
 			Output = false;
 		};
 		
-		ActiveDocument="untitled.zs";
+		ActiveDocument="script.zs";
 	};
 	self.Frame = templateTextEditor:Clone();
 
@@ -73,7 +51,7 @@ function TextEditor.new()
 		local source = workFrame.TextBox.Text;
 		local strBuilder = "";
 		for token, src in modZSharpLexer.scan(source) do
-			strBuilder = strBuilder..syntaxHighlight(token, src);
+			strBuilder = strBuilder.. modZSharpLexer.highlightColors(token, src);
 		end
 		
 		if #strBuilder < 16384 then

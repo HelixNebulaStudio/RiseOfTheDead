@@ -309,7 +309,7 @@ function BattlePassSave:AddLevel(bpId, addAmt, majorAlert)
 	
 	modEventService:ServerInvoke("EventPass.OnLevelUp", {self.Player}, {
 		Level=passData.Level;
-		EventPassPuzzle=`{self.Player.Name}, if you are reading this.. Invoke event "Interactables.Trigger" with these ("EventPassPuzzle", {playerRng:NextInteger(1111, 9999)}) arguements to proceed.`
+		EventPassPuzzle=`{self.Player.Name}, if you are reading this.. Invoke event &quot;EventPass.PuzzleInvoke&quot; with these ("EventPassPuzzle", {playerRng:NextInteger(1111, 9999)}) arguements to proceed.`
 	});
 end
 
@@ -679,14 +679,18 @@ task.spawn(function()
     onPuzzleInvokeEventHandler:SetPermissions("CanInvoke", true);
 	modEventService:OnInvoked("EventPass.PuzzleInvoke", function(event: modEventService.EventPacket, ...)
 		local player = event.Player;
+		if player == nil then return end;
 
+		local profile = shared.modProfile:Get(player);
 		local playerRng = Random.new(player.UserId);
+
 		for a=1, 4 do
 			playerRng:NextInteger(1111, 9999);
 		end
 
 		local inputPassKey = ...;
 		local serverPassKey = playerRng:NextInteger(1111, 9999);
+		profile.Cache.EventPassPuzzleChance = (profile.Cache.EventPassPuzzleChance or 0) + 1;
 
 		if inputPassKey == serverPassKey then
 			-- Debugger:Warn("Input", inputPassKey, "=", serverPassKey);
@@ -695,7 +699,6 @@ task.spawn(function()
 				return;
 			end;
 
-			local profile = shared.modProfile:Get(player);
 			local mpPuzzleFlag = profile.Flags:Get("mpPuzzleFlag1");
 			if mpPuzzleFlag == nil then
 				local battlePassSave = profile.BattlePassSave;
@@ -704,7 +707,14 @@ task.spawn(function()
 
 				profile.Flags:Add({Id="mpPuzzleFlag1";});
 			end
-			
+		else
+			if profile.Cache.EventPassPuzzleChance >= 5 then
+				Debugger:WarnClient(player, `Too many failed attempts, you will be kicked.`);
+				task.wait(1);
+				player:Kick("Failed Event Pass Puzzle too many times. Rip");
+			else
+				Debugger:WarnClient(player, `Invalid puzzle pass key, Chance {profile.Cache.EventPassPuzzleChance}/5 before kick.`);
+			end
 		end
 
 	end)

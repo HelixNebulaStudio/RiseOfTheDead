@@ -795,6 +795,7 @@ function Debugger:InitMainThread()
 			end
 			repeat ClientLogRemote = script:FindFirstChild("ClientLogRemote"); until ClientLogRemote ~= nil or tick()-waitForTick >= 5 or not RunService.Heartbeat:Wait();
 			if ClientLogRemote then
+				Debugger.LogRemote = ClientLogRemote;
 				ClientLogRemote.OnClientEvent:Connect(function(message)
 					warn("From Server>>  ",message);
 					if Debugger:IsParallel() then

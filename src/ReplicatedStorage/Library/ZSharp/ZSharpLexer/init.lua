@@ -246,4 +246,42 @@ function lexer.navigator()
 	return nav
 end
 
+function lexer.highlightColors(token, src, dataTypeOnly)
+	src = string.gsub(src,"&","&amp;");
+	src = string.gsub(src,"<","&lt;");
+	src = string.gsub(src,">","&gt;");
+	src = string.gsub(src,'"',"&quot;");
+	src = string.gsub(src,"'","&apos;");
+	
+	if dataTypeOnly == nil or dataTypeOnly == false then
+		if token == "keyword" then
+			return '<font color="#377ca1">'..src..'</font>';
+		elseif token == "builtin" then
+			return '<font color="#6fbca9">'..src..'</font>';
+		elseif token == ";" then
+			return '<font color="#808080">'..src..'</font>';
+		end
+	end
+	if token == "number" then
+		return '<font color="#7ac28f">'..src..'</font>';
+	elseif token == "string" then
+		return '<font color="#da8e75">'..src..'</font>';
+	elseif token == "comment" then
+		return '<font color="#2b4f1b">'..src..'</font>';
+	elseif token == "keyword" and (src == "true" or src == "false") then
+		return '<font color="#377ca1">'..src..'</font>';
+	end
+
+	return src;
+end
+
+function lexer.buildStr(str, dataTypeOnly)
+	local strBuilder = "";
+	for token, src in lexer.scan(str) do
+		strBuilder = strBuilder.. lexer.highlightColors(token, src, dataTypeOnly);
+	end
+	
+	return strBuilder;
+end
+
 return lexer

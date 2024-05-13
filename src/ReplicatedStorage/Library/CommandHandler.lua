@@ -52,67 +52,15 @@ function CommandHandler.ProcessMessage(message)
 		local args = regroupArgs(argsRaw, '"', '"');
 		args = regroupArgs(args, "{", "}");
 		args = regroupArgs(args, "[[", "]]");
-		
-		--local cacheArgs = {};
-		--local joinArg = "";
-		
-		--local openQuote = false;
-		--for a=1, #argsRaw do
-		--	local str = argsRaw[a];
-		--	local len = #str;
-			
-		--	if openQuote then
-				
-		--		joinArg = joinArg.." "..str;
-				
-		--		if str:sub(len,len) == '"' then
-		--			openQuote = false;
-		--			table.insert(cacheArgs, joinArg);
-		--			joinArg = "";
-		--		end
-				
-		--	elseif str:sub(1,1) == '"' and str:sub(len,len) ~= '"' then
-		--		openQuote = true;
-		--		joinArg = str;
-				
-		--	else
-		--		table.insert(cacheArgs, argsRaw[a]);
-				
-		--	end
-		--end
-		
-		--local args = {};
-		
-		--local openSqrBracket = false;
-		--for a=1, #cacheArgs do
-		--	local str = cacheArgs[a];
-		--	local len = #str;
-			
-		--	if openSqrBracket then
-				
-		--		joinArg = joinArg.." "..str;
-				
-		--		if str:sub(len-1,len) == ']]' then
-		--			openSqrBracket = false;
-		--			table.insert(args, joinArg);
-		--			joinArg = "";
-		--		end
-		--	elseif str:sub(1,2) == '[[' and str:sub(len-1,len) ~= ']]' then
-		--		openSqrBracket = true;
-		--		joinArg = str;
-				
-		--	else
-		--		table.insert(args, cacheArgs[a]);
-				
-		--	end
-		--end
-		
+
 		for a=1, #args do
 			args[a] = CommandHandler.EvalString(args[a]);
 		end
 		
 		return cmd, args;
 	end
+	
+	return nil;
 end
 
 function CommandHandler.GetPlayerFromString(str, notifyPlayer)
