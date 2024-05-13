@@ -191,7 +191,7 @@ function Lobby:NextTurn()
 			if profile then
 				local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 				modOnGameEvents:Fire("OnFotlWon", player);
-				profile:AddPlayPoints(10);
+				profile:AddPlayPoints(30, "Gameplay:Minigame:Fotl");
 			end
 		end)
 
@@ -563,7 +563,7 @@ function Lobby:PlayAction(player, packet)
 	task.spawn(function()
 		local profile = shared.modProfile:Get(player);
 		if profile then
-			profile:AddPlayPoints(4);
+			profile:AddPlayPoints(4, "Gameplay:Minigame:Fotl");
 		end
 	end)
 

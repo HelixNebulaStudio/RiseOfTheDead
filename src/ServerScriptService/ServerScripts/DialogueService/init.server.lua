@@ -181,7 +181,7 @@ function OnDialogue(player, npcModel, npcName, choice)
 
 	local profile = shared.modProfile:Get(player);
 	if profile then
-		profile:AddPlayPoints(3);
+		profile:AddPlayPoints(3, "Gameplay:Dialogue");
 	end
 
 	return;

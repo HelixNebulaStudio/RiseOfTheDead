@@ -116,10 +116,6 @@ function LiveProfile:IsOnline()
 	return true;
 end
 
---function LiveProfile:AddTask()
-	
---end
-
 liveProfileSerializer:AddClass(LiveProfile.ClassType, LiveProfile.new);
 liveProfileDatabase:BindSerializer(liveProfileSerializer);
 --==
@@ -474,7 +470,7 @@ function Profile:Unlock(category, key, value)
 	remoteHudNotification:FireClient(self.Player, "Unlocked", {Name=unlockedName;});
 	
 	self:UpdateTrustLevel();
-	self:AddPlayPoints(60);
+	self:AddPlayPoints(200, "Gameplay:Unlock");
 	
 	self:Sync(category.."/"..key);
 end
@@ -488,7 +484,7 @@ function Profile:UnlockCollectible(id)
 	end
 	self.Collectibles[id] = true;
 	self:UpdateTrustLevel();
-	self:AddPlayPoints(60);
+	self:AddPlayPoints(600, "Gameplay:Unlock");
 	
 	self:Sync("Collectibles");
 end
@@ -534,7 +530,7 @@ function Profile:AwardPremium(temp)
 	shared.Notify(game.Players, randomMessages[random:NextInteger(1, #randomMessages)], "OnPremium");
 	remoteHudNotification:FireClient(self.Player, "PremiumAward");
 	self:UpdateTrustLevel();
-	self:AddPlayPoints(3600);
+	self:AddPlayPoints(3600, "Gameplay:Unlock");
 	
 	self:Sync("Premium");
 end

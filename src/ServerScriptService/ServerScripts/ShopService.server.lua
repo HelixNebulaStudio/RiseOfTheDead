@@ -109,7 +109,7 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 					end
 				end
 
-				profile:AddPlayPoints(sellPrice/1000);
+				profile:AddPlayPoints(sellPrice/1000, "Source:Money");
 				return modShopLibrary.PurchaseReplies.Success;
 			else
 				return modShopLibrary.PurchaseReplies.InvalidItem;
@@ -160,7 +160,7 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 				modAnalytics.RecordResource(player.UserId, price, "Sink", currency, "Purchase", itemLib.Id);
 			end
 
-			profile:AddPlayPoints(price/1000);
+			profile:AddPlayPoints(price/1000, "Sink:Money");
 			return modShopLibrary.PurchaseReplies.Success;
 		else
 			return modShopLibrary.PurchaseReplies.InsufficientCurrency;
@@ -266,7 +266,7 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 			end)
 		end
 
-		profile:AddPlayPoints(price/1000);
+		profile:AddPlayPoints(price/1000, "Sink:Money");
 		
 		local itemLib = modItemsLibrary:Find(storageItem.ItemId);
 		shared.Notify(player, itemLib.Name.." ammunition refilled.", "Info");
@@ -362,7 +362,7 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		end);
 
 		battlePassSave:AddTokens(activeId, totalTokens);
-		profile:AddPlayPoints(totalTokens/10);
+		profile:AddPlayPoints(totalTokens/10, "Source:Reward");
 		
 		return modShopLibrary.PurchaseReplies.Success;
 
@@ -417,7 +417,7 @@ function remoteGoldShopPurchase.OnServerInvoke(player, key)
 			if userOwnGamePass == true then
 				if profile.Purchases[productKey] ~= 1 then
 					shared.Notify(player, "Thank you for purchasing " ..itemLib.Name.. ". It can now be claimed from the gold shop at anytime", "Reward");
-					profile:AddPlayPoints(marketInfo.PriceInRobux/100);
+					profile:AddPlayPoints(marketInfo.PriceInRobux/100, "Sink:Robux");
 					
 					profile.Purchases[productKey] = 1;
 				end
@@ -498,7 +498,7 @@ function remoteGoldShopPurchase.OnServerInvoke(player, key)
 					end);
 
 					traderProfile:AddGold(-price);
-					profile:AddPlayPoints(price/100);
+					profile:AddPlayPoints(price/100, "Sink:Gold");
 					modAnalytics.RecordResource(player.UserId, price, "Sink", "Gold", "Purchase", itemId);
 				end
 
@@ -556,7 +556,7 @@ function MarketplaceService.ProcessReceipt(receiptInfo)
 	profile.Purchases[productKey] = profile.Purchases[productKey] +1;
 	
 	Debugger:Log("ProcessReceipt Successful",receiptInfo);
-	profile:AddPlayPoints(receiptInfo.CurrencySpent/10);
+	profile:AddPlayPoints(receiptInfo.CurrencySpent, `Source:{productData.Perks and "Perks" or "Gold"}`);
 	profile:Save();
 	
 	PurchaseHistory:SetAsync(purchaseKey, true);

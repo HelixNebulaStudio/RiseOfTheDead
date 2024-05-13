@@ -69,7 +69,6 @@ return function(player, damageSource)
 			isThrowableWeapon = true;
 		end
 
-		Debugger:Warn("isThrowableWeapon storageItem.ItemId", storageItem.ItemId, isThrowableWeapon);
 		local mission = modMission:GetMission(player, 79);
 		if mission and mission.Type == 1 and isThrowableWeapon then
 			modMission:Progress(player, 79, function(mission)

@@ -439,9 +439,9 @@ function PickUpRequest(player, interactObject, interactModule)
 						
 						local rewardsList = modRewardsLibrary:Find(interactData.ItemId);
 						if rewardsList and rewardsList.Level then
-							profile:AddPlayPoints(120);
+							profile:AddPlayPoints(120, "Source:Reward");
 						else
-							profile:AddPlayPoints(1);
+							profile:AddPlayPoints(2, "Source:Reward");
 						end
 						
 						modStorage.OnItemSourced:Fire(nil, storageItem, storageItem.Quantity);
@@ -543,7 +543,7 @@ function remoteGoldDonate.OnServerInvoke(player, id)
 		modLeaderboardService.Update();
 		
 		shared.Notify(player, "Successfully donated to the development of the game!", "Reward");
-		profile:AddPlayPoints(donateAmount/100);
+		profile:AddPlayPoints(donateAmount, "Sink:Gold");
 		return 0;
 	end
 	
@@ -980,7 +980,7 @@ function remoteUpgradeStorage.OnServerInvoke(player, storageId)
 			storage.Size = newSize;
 			storage.OnChanged:Fire(storage);
 			
-			profile:AddPlayPoints(cost);
+			profile:AddPlayPoints(cost, "Sink:Perks");
 			return storage:Shrink();
 		else
 			return 2;

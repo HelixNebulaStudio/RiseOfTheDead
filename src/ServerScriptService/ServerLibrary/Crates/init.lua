@@ -109,7 +109,7 @@ function Crates.Spawn(id, cframe, whitelist, content, visibleToWhitelistOnly)
 					end
 				end
 
-				profile:AddPlayPoints(10);
+				profile:AddPlayPoints(10, "Source:Reward");
 			end
 		end
 		

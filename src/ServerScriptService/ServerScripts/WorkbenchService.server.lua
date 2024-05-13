@@ -307,24 +307,24 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		end
 
 		local itemId = activeBp.ItemId;
-		local blueprintLibrary = modBlueprintLibrary.Get(itemId);
+		local bpLib = modBlueprintLibrary.Get(itemId);
 
-		if not inventory:SpaceCheck{{ItemId=blueprintLibrary.Product; Data={Quantity=(blueprintLibrary.Amount or 1)};}} then
+		if not inventory:SpaceCheck{{ItemId=bpLib.Product; Data={Quantity=(bpLib.Amount or 1)};}} then
 			rPacket.FailCode = modWorkbenchLibrary.BlueprintReplies.InventoryFull;
 			return rPacket;
 		end
 		
-		local itemLib = modItemsLibrary:Find(blueprintLibrary.Product);
-		inventory:Add(blueprintLibrary.Product, {Quantity=(blueprintLibrary.Amount or 1);}, function(event, storageItem)
+		local itemLib = modItemsLibrary:Find(bpLib.Product);
+		inventory:Add(bpLib.Product, {Quantity=(bpLib.Amount or 1);}, function(event, storageItem)
 			shared.Notify(player, string.gsub("You recieved a $Item.", "$Item", itemLib.Name), "Reward");
 			modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
 		end);
 
-		modOnGameEvents:Fire("OnItemBuilt", player, blueprintLibrary);
+		modOnGameEvents:Fire("OnItemBuilt", player, bpLib);
 
 		userWorkbench:RemoveProcess(buildIndex);
 		userBlueprints:UnlockBlueprint(itemId);
-		profile:AddPlayPoints(60);
+		profile:AddPlayPoints(bpLib.Duration or 60, "Gameplay:Workbench");
 		
 		rPacket.Success = true;
 		return rPacket;
@@ -610,7 +610,7 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 						local itemSkin = storageItem.Values.Colors or {};
 						itemSkin[partKey] = appearId;
 						storageItem:SetValues("Colors", itemSkin);
-						profile:AddPlayPoints(1);
+						profile:AddPlayPoints(2, "Gameplay:Workbench");
 
 					else
 						Debugger:Warn("Color does not exist or color pack is locked.");
@@ -631,7 +631,7 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 						local itemSkin = storageItem.Values.Textures or {};
 						itemSkin[partKey] = appearId;
 						storageItem:SetValues("Textures", itemSkin);
-						profile:AddPlayPoints(1);
+						profile:AddPlayPoints(2, "Gameplay:Workbench");
 						
 					else
 						Debugger:Warn("Texture does not exist or color pack is locked.",textureLibrary == nil," Unlocked:",profile.SkinsPacks[textureLibrary.Pack]);
@@ -647,19 +647,19 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 				end
 				
 				storageItem:SetValues("PartAlpha", partAlpha);
-				profile:AddPlayPoints(1);
+				profile:AddPlayPoints(2, "Gameplay:Workbench");
 				
 			elseif action == 3 then --== Clear Color;
 				local itemSkin = storageItem.Values.Colors or {};
 				itemSkin[partKey] = nil;
 				storageItem:SetValues("Colors", itemSkin);
-				profile:AddPlayPoints(1);
+				profile:AddPlayPoints(2, "Gameplay:Workbench");
 				
 			elseif action == 4 then --== Clear Texture;
 				local itemSkin = storageItem.Values.Textures or {};
 				itemSkin[partKey] = nil;
 				storageItem:SetValues("Textures", itemSkin);
-				profile:AddPlayPoints(1);
+				profile:AddPlayPoints(2, "Gameplay:Workbench");
 
 			elseif action == 5 then --== Clear All;
 				local itemColors = storageItem.Values.Colors or {};
@@ -674,7 +674,7 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 				storageItem:SetValues("Colors", itemColors);
 				storageItem:SetValues("Textures", itemTextures);
 				storageItem:SetValues("PartAlpha", partAlpha);
-				profile:AddPlayPoints(1);
+				profile:AddPlayPoints(2, "Gameplay:Workbench");
 				
 				
 			elseif action == 9 then --== UnlockableSet;
@@ -790,7 +790,7 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 			activeSave:AwardAchievement("nekron");
 		end
 
-		profile:AddPlayPoints(10);
+		profile:AddPlayPoints(10, "Gameplay:Workbench");
 
 		--inventory:SyncValues(id, "Tweak");
 		storageItem:Sync({"Tweak"});
@@ -886,7 +886,7 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 			storageItem:Sync({"TweakValues"; "Tweak"; "TweakPivot";});
 			
 			
-			profile:AddPlayPoints(10);
+			profile:AddPlayPoints(10, "Gameplay:Workbench");
 			
 		elseif action == 4 then -- Tweak
 			if storageItem.Values.Tweak == nil then return modWorkbenchLibrary.PurchaseReplies.Failed; end;
@@ -1016,7 +1016,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 					PlayProcessSound=true;
 				};
 				
-				profile:AddPlayPoints(10);
+				profile:AddPlayPoints(10, "Gameplay:Workbench");
 				
 				return modWorkbenchLibrary.DeconstructModReplies.Success;
 				
@@ -1038,7 +1038,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 
 					PlayProcessSound=true;
 				};
-				profile:AddPlayPoints(10);
+				profile:AddPlayPoints(10, "Gameplay:Workbench");
 				
 				inventory:Remove(storageItemId, 1, function()
 					shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.Name), "Negative");
@@ -1151,7 +1151,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			end
 			
 			userWorkbench:RemoveProcess(index);
-			profile:AddPlayPoints(10);
+			profile:AddPlayPoints(10, "Gameplay:Workbench");
 			return modWorkbenchLibrary.DeconstructModReplies.Success;
 		end
 		
@@ -1303,7 +1303,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 				
 				PlayProcessSound=true;
 			};
-			profile:AddPlayPoints(polishCost);
+			profile:AddPlayPoints(polishCost, "Sink:Perks");
 
 			inventory:Remove(storageItemId, 1, function()
 				shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.Name), "Negative");
@@ -1363,7 +1363,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			end);
 
 			userWorkbench:RemoveProcess(index);
-			profile:AddPlayPoints(10);
+			profile:AddPlayPoints(10, "Gameplay:Workbench");
 			return modWorkbenchLibrary.PolishToolReplies.Success;
 		end
 

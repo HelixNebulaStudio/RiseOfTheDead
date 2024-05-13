@@ -35,7 +35,7 @@ function ToolHandler:OnPrimaryFire(...)
 			local configurations = self.ToolConfig;
 			local prefab = typeof(configurations.Prefab) == "string" and prefabsItems[configurations.Prefab] or configurations.Prefab;
 			local prefabSize = prefab:GetExtentsSize();
-			profile:AddPlayPoints(4);
+			profile:AddPlayPoints(4, "Gameplay:Use");
 			
 			local lapsed = tick() - self.LastFire;
 			if lapsed >= configurations.BuildDuration-0.5 and lapsed <= configurations.BuildDuration+0.5 then

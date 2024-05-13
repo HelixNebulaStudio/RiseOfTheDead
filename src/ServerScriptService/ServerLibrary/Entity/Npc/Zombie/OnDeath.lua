@@ -53,7 +53,7 @@ function Zombie.new(self)
 			if playerSave and playerSave.AddStat then
 				playerSave:AddStat("Kills", 1);
 				playerSave:AddStat("ZombieKills", 1);
-				profile:AddPlayPoints(3);
+				profile:AddPlayPoints(3, "Gameplay:Kill");
 
 				local moneyReward = math.random(config.MoneyReward.Min, config.MoneyReward.Max) + (config.Level-1);
 				playerSave:AddStat("Money", moneyReward);

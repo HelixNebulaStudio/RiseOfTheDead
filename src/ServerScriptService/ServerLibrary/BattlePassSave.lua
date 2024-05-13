@@ -422,7 +422,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		battlePassSave:AddLevel(activeId);
 		
 		traderProfile:AddGold(-price);
-		profile:AddPlayPoints(price/100);
+		profile:AddPlayPoints(price/10, "Sink:Gold");
 		modAnalytics.RecordResource(player.UserId, price, "Sink", "Gold", "Purchase", activeId);
 		returnPacket.Success = true;
 		
@@ -478,7 +478,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 			end
 			
 			traderProfile:AddGold(rewardQuantity);
-			profile:AddPlayPoints(rewardQuantity/100);
+			profile:AddPlayPoints(rewardQuantity/100, "Source:Reward");
 			modAnalytics.RecordResource(player.UserId, rewardQuantity, "Source", "Gold", "Gameplay", activeId);
 			shared.Notify(player, "You recieved "..rewardQuantity.." Gold!", "Reward");
 			
@@ -529,7 +529,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		battlePassSave:AddLevel(activeId, lvlamt);
 
 		traderProfile:AddGold(-price);
-		profile:AddPlayPoints(price/100);
+		profile:AddPlayPoints(price/10, "Sink:Gold");
 		modAnalytics.RecordResource(player.UserId, price, "Sink", "Gold", "Purchase", activeId.."Lvls");
 		returnPacket.Success = true;
 
@@ -577,7 +577,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 			end
 
 			traderProfile:AddGold(rewardQuantity);
-			profile:AddPlayPoints(rewardQuantity/100);
+			profile:AddPlayPoints(rewardQuantity/100, "Source:Reward");
 			modAnalytics.RecordResource(player.UserId, rewardQuantity, "Source", "Gold", "Gameplay", activeId);
 			shared.Notify(player, "You recieved "..rewardQuantity.." Gold!", "Reward");
 			
@@ -624,7 +624,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 
 		local tokenReward = rewardInfo.TokensAmount or 1;
 		battlePassSave:AddTokens(activeId, tokenReward);
-		profile:AddPlayPoints(tokenReward/10);
+		profile:AddPlayPoints(tokenReward/10, "Source:Reward");
 		
 		passData.PostRewards[lvlStr] = nil;
 		returnPacket.Success = true;
@@ -660,7 +660,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 
 		local tokensCost = shopLib.Cost;
 		battlePassSave:AddTokens(activeId, -tokensCost);
-		profile:AddPlayPoints(tokensCost/10);
+		profile:AddPlayPoints(tokensCost/10, "Sink:Gold");
 
 		giftShopMem:UpdateRequest(activeId, "add", {
 			ItemId=itemId;

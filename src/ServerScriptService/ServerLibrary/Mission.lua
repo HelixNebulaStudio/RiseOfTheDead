@@ -271,7 +271,7 @@ function Mission:CompleteMission(players, missionId, sync)
 						Mission:AddMission(player, reward.Id);
 					end
 				end
-				profile:AddPlayPoints(120);
+				profile:AddPlayPoints(120, "Gameplay:Mission");
 
 				playerSave:AddStat("TweakPoints", 1);
 				if tweakPointsNotifed == false then
