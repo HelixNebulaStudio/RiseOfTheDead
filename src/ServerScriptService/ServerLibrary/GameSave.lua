@@ -427,6 +427,9 @@ function SaveData:AddStat(key, amount, force)
 		
 		self.Profile.DailyStats.ZombieKills = (self.Profile.DailyStats.ZombieKills or 0) + amount;
 		self.Profile.WeeklyStats.ZombieKills = (self.Profile.WeeklyStats.ZombieKills or 0) + amount;
+		self.Profile.MonthlyStats.ZombieKills = (self.Profile.MonthlyStats.ZombieKills or 0) + amount;
+		self.Profile.SeasonlyStats.ZombieKills = (self.Profile.SeasonlyStats.ZombieKills or 0) + amount;
+		self.Profile.YearlyStats.ZombieKills = (self.Profile.YearlyStats.ZombieKills or 0) + amount;
 		
 	end
 	

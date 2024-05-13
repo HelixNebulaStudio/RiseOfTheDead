@@ -38,6 +38,9 @@ function PageInterface:Load(interface)
 	local keyTable = {
 		StatName="Gold";
 		AllTimeTableKey="AllTimeGoldDonor";
+		YearlyTableKey="YearlyGoldDonor";
+		SeasonlyTableKey="SeasonlyGoldDonor";
+		MonthlyTableKey="MonthlyGoldDonor";
 		WeeklyTableKey="WeeklyGoldDonor";
 		DailyTableKey="DailyGoldDonor";
 	};

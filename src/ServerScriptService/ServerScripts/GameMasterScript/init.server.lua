@@ -535,6 +535,9 @@ function remoteGoldDonate.OnServerInvoke(player, id)
 
 		profile.DailyStats.GoldDonor = (profile.DailyStats.GoldDonor or 0) + donateAmount;
 		profile.WeeklyStats.GoldDonor = (profile.WeeklyStats.GoldDonor or 0) + donateAmount;
+		profile.MonthlyStats.GoldDonor = (profile.MonthlyStats.GoldDonor or 0) + donateAmount;
+		profile.SeasonlyStats.GoldDonor = (profile.SeasonlyStats.GoldDonor or 0) + donateAmount;
+		profile.YearlyStats.GoldDonor = (profile.YearlyStats.GoldDonor or 0) + donateAmount;
 		profile.AllTimeStats.GoldDonor = (profile.AllTimeStats.GoldDonor or 0) + donateAmount;
 		
 		modLeaderboardService.Update();

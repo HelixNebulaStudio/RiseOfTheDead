@@ -99,7 +99,7 @@ function GameMode:WorldLoad(modeData)
 							profile.WeeklyStats["LW_"..modeKey] = math.max((profile.WeeklyStats["LW_"..modeKey] or 0), wave);
 							profile.MonthlyStats["LM_"..modeKey] = math.max((profile.MonthlyStats["LM_"..modeKey] or 0), wave);
 							profile.SeasonlyStats["LS_"..modeKey] = math.max((profile.SeasonlyStats["LS_"..modeKey] or 0), wave);
-							-- profile.AllTimeStats["LAT_"..modeKey] = math.max((profile.AllTimeStats["LAT_"..modeKey] or 0), wave);
+							profile.AllTimeStats["LAT_"..modeKey] = math.max((profile.AllTimeStats["LAT_"..modeKey] or 0), wave);
 							
 							modLeaderboardService:SubmitPlayerToBoard(player);
 						end)

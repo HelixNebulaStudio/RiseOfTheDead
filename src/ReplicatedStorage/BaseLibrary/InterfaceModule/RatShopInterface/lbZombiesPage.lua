@@ -10,6 +10,9 @@ function PageInterface:Load(interface)
 	local keyTable = {
 		StatName="Zombie Kills";
 		AllTimeTableKey="AllTimeZombieKills";
+		YearlyTableKey="YearlyZombieKills";
+		SeasonlyTableKey="SeasonlyZombieKills";
+		MonthlyTableKey="MonthlyZombieKills";
 		WeeklyTableKey="WeeklyZombieKills";
 		DailyTableKey="DailyZombieKills";
 	};
