@@ -313,6 +313,7 @@ function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 	raycastParams.CollisionGroup = "Raycast";
 
 	local prevDist = nil;
+	local breakC = 0;
 	repeat
 		raycastParams.FilterDescendantsInstances = includeList;
 
@@ -394,8 +395,14 @@ function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 			prevDist = distance;
 		else
 			if prevDist == distance then
-				Debugger:Warn("Breaking hitscan ray before potential crash.");
-				break;
+				breakC = breakC +1;
+
+				if breakC > 3 then
+					Debugger:Warn("Breaking hitscan ray before potential crash.");
+					break;
+				end;
+			else
+				breakC = 0;
 			end
 			prevDist = distance;
 		end
