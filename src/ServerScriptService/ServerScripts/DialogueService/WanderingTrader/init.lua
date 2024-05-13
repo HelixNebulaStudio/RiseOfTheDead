@@ -47,7 +47,10 @@ return function(player, dialog, data)
 	local npcLevel = npcData.Level or 0;
 	local levelUpTimer = npcLevel * 60
 	
-	if modBranchConfigs.CurrentBranch.Name == "Dev" then levelUpTimer = 10; end;
+	if modBranchConfigs.CurrentBranch.Name == "Dev" then
+		levelUpTimer = 10;
+		Debugger:StudioWarn("npcData", npcData);
+	end;
 	
 	if npcData.LevelUpTime == nil then return end
 	local unlockTime = npcData.LevelUpTime + (levelUpTimer);

@@ -399,7 +399,14 @@ function AntiCheatService:Filter(value, player, filterNames, filterGibberish)
 				if #word > 6 and #word < 14 then
 					local r = shared.modAntiCheatService:GetStrRandomness(word, true, true);
 					if r < 0 then
-						value = string.gsub(value, word, string.rep("#", #word));
+						local s, _ = pcall(function()
+							local v = value;
+							v = v:gsub("%(", ""):gsub("%)", "");
+							value = string.gsub(v, word, string.rep("#", #word));
+						end)
+						if not s then
+							value = string.rep("#", #value);
+						end
 					end
 				end
 			end
