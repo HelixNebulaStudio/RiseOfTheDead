@@ -221,10 +221,12 @@ function Workbench.new(itemId, library, storageItem)
 							if isUnlocked == nil and hasCharges then
 
 								-- MARK: Use charge;
+								local name = itemLib and itemLib.Name or `{unlockItemLib.ItemId}:{unlockItemLib.Name}`;
+								local icon = itemLib and itemLib.Icon or unlockItemLib.Icon;
 								
 								local promptWindow = Interface:PromptQuestion("Apply Skin?",
-									`Are you sure you want to apply {itemLib.Name}? This will consume a charge.`, 
-									"Use Charge", "Cancel", itemLib.Icon);
+									`Are you sure you want to apply {name}? This will consume a charge.`, 
+									"Use Charge", "Cancel", icon);
 								local YesClickedSignal, NoClickedSignal;
 								
 								local applyDebounce = tick();

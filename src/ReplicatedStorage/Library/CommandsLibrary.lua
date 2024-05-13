@@ -63,6 +63,7 @@ local PermissionLevel = {
 	Moderator=4;
 	Admin=5;
 	GameTester=6;
+	DevBranchFree=7;
 };
 
 local Commands = {};
@@ -93,9 +94,20 @@ local function HasPermissions(player, cmdLib)
 		
 	elseif cmdLib.Permission == PermissionLevel.DevBranch then
 		if isCreator then return true; end
-		if modBranchConfigs.CurrentBranch.Name == "Dev" then return true end;
+		if modBranchConfigs.CurrentBranch.Name ~= "Dev" then return false end;
+		if player:GetAttribute("DbTinkerCmds") == true then return true end;
+
+		if RunService:IsServer() then
+			local cmdKey = cmdLib.CmdKey;
+			shared.Notify(player, `Tinkering Commands is required for {(cmdKey and "/"..cmdKey or "this command")}.`, "Negative");
+		end
 		return false;
 		
+	elseif cmdLib.Permission == PermissionLevel.DevBranchFree then
+		if isCreator then return true; end
+		if modBranchConfigs.CurrentBranch.Name == "Dev" then return true end;
+		return false;
+
 	elseif cmdLib.Permission == PermissionLevel.GameTester then
 		if isCreator then return true; end
 		return modGlobalVars.IsTester(player);
@@ -827,7 +839,7 @@ Commands["printsettings"] = {
 };
 
 Commands["resetdata"] = {
-	Permission = PermissionLevel.DevBranch;
+	Permission = PermissionLevel.DevBranchFree;
 	Description = "Completely resets player save data.";
 	
 	UsageInfo = "/resetdata [full]";
@@ -858,30 +870,6 @@ Commands["resetdata"] = {
 	end;
 };
 
---== Staff;
---== Modding;
-
---Commands["loadmod"] = {
---	Permission = PermissionLevel.DevBranch;
---	Description = "Load a mod into the game.";
-	
---	RequiredArgs = 0;
---	UsageInfo = "/loadmod modId";
---	Function = function(speaker, args)
---		local modId = args[1] or "premade";
-		
---		shared.Notify(speaker, "Loading in modId,"..modId.."..", "Inform");
---		local success = modModdingService:FetchMod(speaker, modId);
---		if success then
---			modModdingService:LoadMod(speaker, modId);
---		else
---			shared.Notify(speaker, "Failed to fetch mod, check console.", "Negative");
---		end
-		
---		return true;
---	end;
---};
-
 Commands["editmode"] = {
 	Permission = PermissionLevel.DevBranch;
 	Description = "Adds edit mode tag into player.";
@@ -904,109 +892,6 @@ Commands["editmode"] = {
 		return true;
 	end;
 };
-
---== Admin;
-
---- deprecated, moved to ModerationSystem module.
-
---Commands["punish"] = {
---	Permission = PermissionLevel.Admin;
---	Description = "Set player punishment.";
-	
---	RequiredArgs = 2;
---	UsageInfo = "/punish playerName punishmentId";
---	Function = function(speaker, args)
---		local target = nil;
-		
---		local matches = modCommandHandler.MatchName(args[1]);
---		if #matches > 1 then
---			GenericOutputs.MultipleMatch(speaker, matches);
---			return false;
---		elseif #matches < 1 then
---			GenericOutputs.NoMatch(speaker, args[1]);
---			return false;
---		else
---			target = matches[1];
---		end
-		
---		local profile = shared.modProfile:Get(target);
---		local punishmentId = tonumber(args[2]);
-		
---		if punishmentId then
---			if punishmentId == 0 then
---				profile.Punishment = 0;
-				
---				shared.Notify(target, "Your punishment has been removed.", "Positive");
---				shared.Notify(speaker, "Player ("..target.Name..") punishment is set to: none", "Positive");
---			elseif modGlobalVars.Punishments[punishmentId] then
---				local punishmentStr = modGlobalVars.Punishments[punishmentId];
-				
---				profile.Punishment = punishmentId;
-				
---				shared.Notify(target, "You have been punished, "..punishmentStr, "Negative");
---				shared.Notify(speaker, "Player ("..target.Name..") punishment is set to: "..punishmentStr, "Negative");
---			else
---				shared.Notify(speaker, "Unknown punishment id.", "Negative");
---			end
---		else
---			shared.Notify(speaker, "Invalid punishment id.", "Negative");
---		end
---		return true;
---	end;
---};
-
---Commands["globalmute"] = {
---	Permission = PermissionLevel.Admin;
---	Description = "Mutes a player.";
-	
---	RequiredArgs = 1;
---	UsageInfo = "/globalmute playerName [duration]";
---	Function = function(speaker, args)
---		local targetName = args[1];
-		
---		local matches = modCommandHandler.MatchName(args[1]);
---		if #matches == 1 then
---			targetName = matches[1].Name;
---		end
-		
---		local duration = args[2] or 3600;
-		
---		if shared.ChatService then
---			shared.ChatService.ReportsCache[targetName] = 5;
---			shared.ChatService:SetGlobalMute(targetName, os.time()+duration);
---			shared.Notify(speaker, "Globally muted "..targetName.." for "..duration.." sec(s).", "Inform");
---		end
-		
---		return true;
---	end;
---};
-
---Commands["checkglobalmute"] = {
---	Permission = PermissionLevel.Admin;
---	Description = "Checks a player's mute duration.";
-	
---	RequiredArgs = 1;
---	UsageInfo = "/checkglobalmute playerName";
---	Function = function(speaker, args)
---		local targetName = args[1];
-		
---		local matches = modCommandHandler.MatchName(args[1]);
---		if #matches == 1 then
---			targetName = matches[1].Name;
---		end
-		
---		if shared.ChatService then
---			local muteTime = shared.ChatService:CheckGlobalMuted(targetName);
---			if muteTime then
---				shared.Notify(speaker, targetName.." is muted for "..muteTime-os.time().." sec(s).", "Inform");
---			else
---				shared.Notify(speaker, targetName.." is not muted.", "Inform");
---			end
---		end
-		
---		return true;
---	end;
---};
 
 --== Server
 Commands["npcstats"] = {
@@ -1577,7 +1462,7 @@ Commands["heal"] = {
 
 --== Teleport
 Commands["joinplayer"] = {
-	Permission = PermissionLevel.DevBranch;
+	Permission = PermissionLevel.DevBranchFree;
 	Description = "Travel to a player on a different server.";
 	
 	RequiredArgs = 1;
@@ -1931,7 +1816,7 @@ Commands["goto"] = {
 };
 
 Commands["travel"] = {
-	Permission = PermissionLevel.DevBranch;
+	Permission = PermissionLevel.DevBranchFree;
 	Description = "Travel to world.";
 	
 	RequiredArgs = 0;
@@ -4302,7 +4187,7 @@ Commands["setrc"] = {
 
 
 Commands["loadmainsave"] = {
-	Permission = PermissionLevel.DevBranch;
+	Permission = PermissionLevel.DevBranchFree;
 	Description = "Attempts to load your save from main branch.";
 
 	RequiredArgs = 0;

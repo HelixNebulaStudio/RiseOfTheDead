@@ -278,7 +278,7 @@ library:Add{
 
 library:Add{
 	Id="bpseason1";
-	Title="Apocalypse Origins";
+	Title="Apocalypse Origins Completionist";
 	Unlock=UnlockMethods.Achievement;
 	TitleStyle=TitleStyle.Bloodmetal;
 	BpLevels=true;
@@ -286,10 +286,25 @@ library:Add{
 
 library:Add{
 	Id="bphalloween1";
-	Title="Slaughter Fest 2023";
+	Title="Slaughter Fest 2023 Completionist";
 	Unlock=UnlockMethods.Achievement;
 	TitleStyle=TitleStyle.Bloodmetal;
 	BpLevels=true;
+};
+
+library:Add{
+	Id="bp5years";
+	Title="Anniversary 5 Completionist";
+	Unlock=UnlockMethods.Achievement;
+	TitleStyle=TitleStyle.Bloodmetal;
+	BpLevels=true;
+};
+
+library:Add{
+	Id="dbtinker";
+	Title="The Tinkerer";
+	Unlock=UnlockMethods.Achievement;
+	TitleStyle=TitleStyle.Gold;
 };
 
 

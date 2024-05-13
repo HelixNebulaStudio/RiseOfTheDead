@@ -75,8 +75,9 @@ function Scheduler:Resume(job, remove)
 	local results = table.pack(coroutine.resume(job.Routine, table.unpack(job.Arguments, 1, job.Arguments.n)));
 	
 	if not results[1] then
+		local traceStack = debug.traceback();
 		task.spawn(function()
-			error("Scheduler("..self.Name..") Error: "..tostring(results[2]));
+			error(`Scheduler({self.Name}) Error: {tostring(results[2])}`);
 		end)
 	end
 

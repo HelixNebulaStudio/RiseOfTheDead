@@ -174,6 +174,10 @@ function Profile:GetLiveProfile(userId)
 	return liveProfile;
 end
 
+export type Profile = {
+	UserId: number;
+	[any]: any;
+};
 function Profile.new(player) -- Contains player to game statistics. Not character save data.
 	local playerName = player.Name;
 	local profile = Profile.Profiles[playerName];
@@ -351,7 +355,7 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 	return profile;
 end
 
-function Profile:Get(player)
+function Profile:Get(player): Profile?
 	if player == nil or typeof(player) ~= "Instance" or not player:IsA("Player") then
 		return;
 	end;
@@ -648,6 +652,34 @@ function Profile:Refresh()
 				if BadgeService:IsLegal(BadgeLibrary.Welcome) and not BadgeService:UserHasBadge(player.UserId, BadgeLibrary.Welcome) then
 					BadgeService:AwardBadge(player.UserId, BadgeLibrary.Welcome);
 				end
+
+				local dBTinker = MarketplaceService:PlayerOwnsAsset(player, 54092940) or MarketplaceService:UserOwnsGamePassAsync(userId, 812036174);
+				if dBTinker then
+					local key = "passTinker";
+					self.GamePass.DbTinker = true;
+
+					if modBranchConfigs.CurrentBranch.Name == "Dev" then
+						player:SetAttribute("DbTinkerCmds", true);
+					end
+
+					local dbTinkerBadgeId = 3689379645649221;
+					if modBranchConfigs.CurrentBranch.Name == "Live" then
+						if BadgeService:IsLegal(dbTinkerBadgeId) and not BadgeService:UserHasBadge(player.UserId, dbTinkerBadgeId) then
+							BadgeService:AwardBadge(player.UserId, dbTinkerBadgeId);
+						end
+					end
+					
+					if not modBranchConfigs.IsWorld("MainMenu") then
+						if self.Purchases[key] == nil then
+							self.Purchases[key] = 1;
+
+							self.ItemUnlockables:Add("hardhat", "hardhatsilver", 1);
+							task.delay(5, function()
+								self.ItemUnlockables:Alert("hardhat", "hardhatsilver", " for unlocking Tinkering Commands");
+							end)
+						end
+					end
+				end
 			end)
 			if not s then
 				warn("Profile:Refresh() "..e)
@@ -760,9 +792,9 @@ function Profile:Load(loadOverwrite)
 	local _isPremium = rawData and rawData.Premium or false;
 	if self.UserId > 0 and rawData and rawData.LastOnline
 		and modBranchConfigs.IsWorld("MainMenu") and modBranchConfigs.CurrentBranch.Name == "Dev" 
-		and rawData.LastOnline+691200 <= modSyncTime.TimeOfEndOfWeek() then -- rawData.LastOnline+86400 <= dayEndTick();
-		Debugger:WarnClient(self.Player, "Your save data has expired. It is now wiped.");
-		remotePromptWarning:FireClient(self.Player, "Your dev branch save data has expired, it is now wiped.");
+		and rawData.LastOnline+691200 <= modSyncTime.TimeOfEndOfWeek() then
+		Debugger:WarnClient(self.Player, "Your save data has expired. It is now wiped. Use /loadmainsave to reload.");
+		remotePromptWarning:FireClient(self.Player, "Your dev branch save data has expired. Use /loadmainsave to reload.");
 		rawData = nil;
 		dataExpired = true;
 	end
@@ -1289,6 +1321,9 @@ function Profile:SyncPublic(caller)
 		end
 		if self.GamePass.VipTraveler then
 			activeSave:AwardAchievement("theeng", false);
+		end
+		if self.GamePass.DbTinker then
+			activeSave:AwardAchievement("dbtinker", false);
 		end
 		
 		for k, v in pairs(activeSave.Stats) do

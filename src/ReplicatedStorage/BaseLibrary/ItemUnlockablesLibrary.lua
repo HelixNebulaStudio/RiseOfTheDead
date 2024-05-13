@@ -135,7 +135,18 @@ function ItemUnlockablesLibrary:Init(library)
 		};
 		SurfaceAppearanceParent=script;
 	};
-
+	
+	library:Add{
+		Id="hardhatsilver";
+		ItemId="hardhat";
+		Name="Silver";
+		Icon="rbxassetid://17485221629";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17484511066";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
 
 	--== MARK: fedora
 	library:Add{

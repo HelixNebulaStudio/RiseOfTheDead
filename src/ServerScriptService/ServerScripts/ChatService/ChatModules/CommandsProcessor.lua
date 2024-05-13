@@ -19,6 +19,7 @@ local function Run(ChatService)
 			local cmdLib = Commands[cmdKey];
 			
 			if cmdLib then
+				cmdLib.CmdKey = cmdKey;
 				if not CommandsLibrary.HasPermissions(speaker, cmdLib) then 
 					ChatService:SendMessage(speaker, channelId, 
 						"Insufficient permissions.", 

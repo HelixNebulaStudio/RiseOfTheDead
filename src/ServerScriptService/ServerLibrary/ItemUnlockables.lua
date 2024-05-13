@@ -45,7 +45,7 @@ function ItemUnlockables:Add(itemId, key, value)
 	self[itemId][key] = (self[itemId][key] or 0) + (value or 1);
 end
 
-function ItemUnlockables:Alert(itemId, key)
+function ItemUnlockables:Alert(itemId, key, reason)
 	local modItemUnlockableLib = modItemUnlockablesLibrary:Find(key);
 	local itemLib = modItemsLibrary:Find(itemId);
 	
@@ -55,7 +55,7 @@ function ItemUnlockables:Alert(itemId, key)
 		-- remoteHudNotification:FireClient(self.Player, "Unlocked", {Name=unlockedName;});
 
 		local skinName = modItemUnlockableLib.Name.." "..itemLib.Name;
-		shared.Notify(self.Player, `Added a {skinName} charge to your workbench. Charges: {tostring(self[itemId][key])}`, "Reward");
+		shared.Notify(self.Player, `Added a {skinName} charge to your workbench{reason or ""}. Charges: {tostring(self[itemId][key])}`, "Reward");
 	end
 end
 

@@ -101,6 +101,7 @@ end
 
 function DamageTag:Get(victimModel: Model, filter: string?) : TagList
 	local tag = DamageTag.Tagged[victimModel];
+    if tag == nil then return {} end;
     
     if filter then
         local list: TagList = {};

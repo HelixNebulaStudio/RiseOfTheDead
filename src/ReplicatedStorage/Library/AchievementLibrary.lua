@@ -185,6 +185,13 @@ library:Add{
 	Hidden=true;
 }
 
+library:Add{
+	Id="dbtinker"; -- dbtinker
+	Tier=Tiers.Gold;
+	BadgeId=3689379645649221;
+	Announce="Achievement Unlocked: Unlocked development branch commands.";
+	Hidden=true;
+}
 
 
 library.Tiers = Tiers;
