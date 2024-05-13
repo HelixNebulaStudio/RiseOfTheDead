@@ -291,10 +291,11 @@ return function(CutsceneSequence)
 							local count = 0;
 							repeat
 								local dist = (classPlayer.RootPart.Position-position).Magnitude;
-								if dist <= 2 then
+								if dist <= 4 then
 									modMission:Progress(player, missionId, function(mission)
 										if mission.ProgressionPoint < 7 then mission.ProgressionPoint = 7; end;
 									end)
+
 								elseif dist >= (initMag + 5) then
 									if tick()- shoutCD >= 5 then
 										jasonModule.Wield.LoadRequest();
@@ -317,8 +318,8 @@ return function(CutsceneSequence)
 										end
 									end
 								end 
-								wait(0.2);
-								initMag = initMag -0.2;
+								task.wait(0.1);
+								initMag = initMag -0.1;
 							until mission.ProgressionPoint ~= 6;
 						end)
 
