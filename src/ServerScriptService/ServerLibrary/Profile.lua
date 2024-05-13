@@ -677,6 +677,14 @@ function Profile:Refresh()
 							task.delay(5, function()
 								self.ItemUnlockables:Alert("hardhat", "hardhatsilver", " for unlocking Tinkering Commands");
 							end)
+							
+							local donateAmount = 10000;
+							self.DailyStats.GoldDonor = (self.DailyStats.GoldDonor or 0) + donateAmount;
+							self.WeeklyStats.GoldDonor = (self.WeeklyStats.GoldDonor or 0) + donateAmount;
+							self.MonthlyStats.GoldDonor = (self.MonthlyStats.GoldDonor or 0) + donateAmount;
+							self.SeasonlyStats.GoldDonor = (self.SeasonlyStats.GoldDonor or 0) + donateAmount;
+							self.YearlyStats.GoldDonor = (self.YearlyStats.GoldDonor or 0) + donateAmount;
+							self.AllTimeStats.GoldDonor = (self.AllTimeStats.GoldDonor or 0) + donateAmount;
 						end
 					end
 				end
