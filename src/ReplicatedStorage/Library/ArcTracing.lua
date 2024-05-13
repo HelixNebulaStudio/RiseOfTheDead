@@ -97,22 +97,13 @@ function ArcTracing:GeneratePath(origin, velocity, arcFunc)
 		end
 
 		if debugBreaks then
-			--local pointPart = Debugger:PointPart(origin);
-			--pointPart.Name = "Origin";
-			--pointPart.Transparency = self.RayRadius and 0.8 or 0;
-			--pointPart.Size = self.RayRadius and Vector3.new(self.RayRadius, self.RayRadius, self.RayRadius) or pointPart.Size;
-			
 			if raycastResult then
 				local pointPart = Debugger:PointPart(raycastResult.Position);
 				pointPart.Name = "Point";
-				--pointPart.Transparency = self.RayRadius and 0.8 or 0;
-				--pointPart.Size = self.RayRadius and Vector3.new(self.RayRadius, self.RayRadius, self.RayRadius) or pointPart.Size;
-
-				local pointPart = Debugger:PointPart(origin + (rayCastDir.Unit * raycastResult.Distance));
-				pointPart.Name = "Distance";
-				--pointPart.Transparency = self.RayRadius and 0.8 or 0;
-				--pointPart.Size = self.RayRadius and Vector3.new(self.RayRadius, self.RayRadius, self.RayRadius) or pointPart.Size;
-					
+				
+				local pointPart2 = Debugger:PointPart(origin + (rayCastDir.Unit * raycastResult.Distance));
+				pointPart2.Name = "Distance";
+				
 			end
 
 			local dist = (origin-rayPoint).Magnitude--rayCastDir.Magnitude

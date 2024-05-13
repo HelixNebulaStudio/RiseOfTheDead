@@ -76,7 +76,7 @@ return function(player, dialog, data)
 					end
 					
 					npcData:SetLevel(1);
-				end)
+				end, {Loop=true;})
 				
 			else
 				dialog:AddChoice("trader_lvl0_decline");

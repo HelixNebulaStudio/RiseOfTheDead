@@ -21,14 +21,10 @@ function Pool.new(owner)
 		Velocity=100;
 		LifeTime=20;
 		Bounce=0;
-	};
 	
-	--projectile.Configurations = {
-	--	DamagePercent=1;
-	--	ProjectileVelocity=100;
-	--	ProjectileLifeTime=20;
-	--	ProjectileBounce=0;
-	--};
+		IgnoreEntities=true;
+		AddIncludeTags={"TargetableEntities"};
+	};
 	
 	function projectile:Activate()
 		task.delay(self.Configurations.DetonateTimer, function()
@@ -80,6 +76,7 @@ function Pool.new(owner)
 	function projectile:OnContact(arcPoint)
 		if arcPoint.Hit and not arcPoint.Hit.Anchored then
 			modAudio.Play("GrenadeBounce", self.Prefab);
+
 			self.Prefab.Anchored = false;
 			if RunService:IsServer() then
 				if self.Prefab:CanSetNetworkOwnership() then self.Prefab:SetNetworkOwner(nil) end;
@@ -95,7 +92,11 @@ function Pool.new(owner)
 			
 			local worldCf = CFrame.new(hitPoint, hitPoint - arcPoint.Direction);
 			weld.C1 = hitPart.CFrame:ToObjectSpace(worldCf);
+
+			return true;
 		end
+
+		return;
 	end
 	
 	return projectile;

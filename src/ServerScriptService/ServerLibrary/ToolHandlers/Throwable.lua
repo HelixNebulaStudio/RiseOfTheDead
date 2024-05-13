@@ -56,23 +56,12 @@ function ToolHandler:OnPrimaryFire(...)
 		projectileObject.TargetableEntities = TargetableEntities;
 		projectileObject.StorageItem = self.StorageItem;
 		
-		--if RunService:IsStudio() then
-		--	projectileObject.Prefab:ClearAllChildren();
-		--	if projectileObject.Prefab:IsA("MeshPart") then
-		--		projectileObject.Prefab.TextureID = "";
-		--	end
-		--	projectileObject.Prefab.Color = Color3.fromRGB(134, 76, 76);
-		--	projectileObject.Prefab.Material = Enum.Material.SmoothPlastic;
-		--	projectileObject.Prefab.Transparency = 0.3;
-			
-		--else
-		--	modReplicationManager.UnreplicateFrom(self.Player, projectileObject.Prefab);
-			
-		--end
-		
 		if projectileObject.Prefab:CanSetNetworkOwnership() then projectileObject.Prefab:SetNetworkOwner(nil); end
 
-		modProjectile.ServerSimulate(projectileObject, origin, direction * (configurations.Velocity + (configurations.VelocityBonus or 0) * throwCharge)+ rootVelocity);
+		modProjectile.ServerSimulate(
+			projectileObject, 
+			origin, 
+			direction * (configurations.Velocity + (configurations.VelocityBonus or 0) * throwCharge)+ rootVelocity);
 		
 		if configurations.ConsumeOnThrow then
 			inventory:Remove(self.StorageItem.ID, 1);

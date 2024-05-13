@@ -141,7 +141,6 @@ function Interface:DialogueInteract(modInteractable)
 		NpcName=modInteractable.NpcName;
 		NpcModel=npcModel;
 	});
-	--remoteSelectDialogue:InvokeServer(npcModel, NpcName); -- INVOCATION;
 	
 	Interface:OnDialogue(dialogPacket);
 end
@@ -375,7 +374,6 @@ function Interface:OnDialogue(dialogPacket)
 					end
 					
 					if data.CheckMission == nil or canStart == true then
-						
 						local dP = remoteDialogueHandler:InvokeServer("oldconverse", {
 							NpcName = NpcName;
 							NpcModel = NpcModel;
@@ -383,10 +381,8 @@ function Interface:OnDialogue(dialogPacket)
 							
 							SelectIndex = index;
 						});
-							--remoteSelectDialogue:InvokeServer(npcModel, NpcName, index);
-						if RunService:IsStudio() then
-							Debugger:Warn("[Studio] dialogPacket", dP);
-						end
+						
+						Debugger:StudioWarn("dialogPacket", dP);
 						
 						dialogPacket = dP;
 						loadedDialog = modDialogueLibrary.LoadDialog(NpcName, dP);

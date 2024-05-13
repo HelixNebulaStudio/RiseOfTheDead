@@ -116,8 +116,8 @@ if RunService:IsServer() then
 		local playerSave = profile:GetActiveSave();
 		local inventory = playerSave.Inventory;
 		
-		local function dialogTakeSample(tag)
-			dialog:AddChoice(tag, function(dialog)
+		local function dialogTakeSample(sampleTag)
+			dialog:AddChoice(sampleTag, function(dialog)
 				local hasSpace = inventory:SpaceCheck{{ItemId="bloodsample"}};
 				if not hasSpace then
 					shared.Notify(player, "Inventory is full!", "Negative");
