@@ -296,7 +296,10 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 	end
 	
 	local hardMode = paramPacket.HardChance and math.random(0, 1000)/1000 <= paramPacket.HardChance or false;
-	
+	if paramPacket.HardChance then
+		Debugger:StudioWarn("Hardmode chance:",paramPacket.HardChance);
+	end
+
 	local newNpcModule;
 	local npcPrefab = modNpc.Spawn(npcName, spawnCf, function(npcPrefab, npcModule)
 		self.EnemiesSpawned = self.EnemiesSpawned + 1;
@@ -308,11 +311,11 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 			npcModule.HardMode = true;
 		end
 		
+		npcModule.NetworkOwners = game.Players:GetPlayers();
 		npcModule.Configuration.Level = math.max(npcModule.Configuration.Level + level + math.random(-2, 0), 1);
 		npcModule.ForgetEnemies = false;
 		npcModule.AutoSearch = true;
 		npcModule.Properties.TargetableDistance = 4096;
-		npcModule.NetworkOwners = game.Players:GetPlayers();
 		
 		if npcName == "Pathoroth" then
 			local newHealth = 4000 * math.max(math.ceil(self.Wave/2), 1);

@@ -59,7 +59,7 @@ function Objective:Begin()
 	
 	local bossPrefab, npcModule = self.Controller:SpawnEnemy(pickBossName, {
 		SpawnCFrame = Objective.BossSpawns[math.random(1, #Objective.BossSpawns)].CFrame;
-		HardChance = pickBossData.HardChance;
+		HardChance = pickBossData.HardChance; 
 	})
 
 	local newHealth = 200000 * math.max(math.ceil(self.Controller.Wave/5), 1);

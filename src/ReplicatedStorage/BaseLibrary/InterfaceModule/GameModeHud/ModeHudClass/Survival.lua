@@ -148,6 +148,10 @@ return function(...)
 						for key, data in pairs(stageLib.LeaderboardKeyTable) do
 							if data.Folder == "AllTimeStats" then
 								keyTable.AllTimeTableKey = key;
+							elseif data.Folder == "SeasonlyStats" then
+								keyTable.SeasonlyTableKey = key;
+							elseif data.Folder == "MonthlyStats" then
+								keyTable.MonthlyTableKey = key;
 							elseif data.Folder == "WeeklyStats" then
 								keyTable.WeeklyTableKey = key;
 							elseif data.Folder == "DailyStats" then

@@ -544,11 +544,23 @@ for gamemode, _ in pairs(GameModeLibrary.GameModes) do
 			stageLib.LeaderboardKeyTable = {};
 			
 			local modeKey = stageName..dataKey;
-			stageLib.LeaderboardKeyTable["AllTime"..modeKey]={
-				DatastoreName="LAT_"..modeKey;
-				DatastoreId="LAT_"..modeKey;
-				Folder="AllTimeStats";
-				DataKey="LAT_"..modeKey;
+			-- stageLib.LeaderboardKeyTable["AllTime"..modeKey]={
+			-- 	DatastoreName="LAT_"..modeKey;
+			-- 	DatastoreId="LAT_"..modeKey;
+			-- 	Folder="AllTimeStats";
+			-- 	DataKey="LAT_"..modeKey;
+			-- };
+			stageLib.LeaderboardKeyTable["Seasonly"..modeKey]={
+				DatastoreName="LS_"..modeKey;
+				DatastoreId="LS_"..modeKey;
+				Folder="SeasonlyStats";
+				DataKey="LS_"..modeKey;
+			};
+			stageLib.LeaderboardKeyTable["Monthly"..modeKey]={
+				DatastoreName="LM_"..modeKey;
+				DatastoreId="LM_"..modeKey;
+				Folder="MonthlyStats";
+				DataKey="LM_"..modeKey;
 			};
 			stageLib.LeaderboardKeyTable["Weekly"..modeKey]={
 				DatastoreName="LW_"..modeKey;
@@ -556,12 +568,12 @@ for gamemode, _ in pairs(GameModeLibrary.GameModes) do
 				Folder="WeeklyStats";
 				DataKey="LW_"..modeKey;
 			};
-			stageLib.LeaderboardKeyTable["Daily"..modeKey]={
-				DatastoreName="LD_"..modeKey;
-				DatastoreId="LD_"..modeKey;
-				Folder="DailyStats";
-				DataKey="LD_"..modeKey;
-			};
+			-- stageLib.LeaderboardKeyTable["Daily"..modeKey]={
+			-- 	DatastoreName="LD_"..modeKey;
+			-- 	DatastoreId="LD_"..modeKey;
+			-- 	Folder="DailyStats";
+			-- 	DataKey="LD_"..modeKey;
+			-- };
 		end
 		
 		if stageLib.SurvivalFailedTrack and typeof(stageLib.SurvivalFailedTrack) == "string" then
