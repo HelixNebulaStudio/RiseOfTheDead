@@ -307,7 +307,7 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 			while currWave == self.Wave do
 				task.wait(1);
 			end
-			Debugger.Expire(npcPrefab);
+			npcModule:KillNpc();
 		end)
 		self.EnemiesSpawned = self.EnemiesSpawned + 1;
 		newNpcModule = npcModule;
