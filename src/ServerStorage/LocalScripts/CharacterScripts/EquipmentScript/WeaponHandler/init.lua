@@ -1614,11 +1614,16 @@ function WeaponHandler:Equip(library, weaponId)
 						if configurations.RapidFire then
 							Equipped.RightHand.Data.RapidFireStart = tick();
 						end
+						local c = 0;
 						repeat
 							if fireProj() ~= true then
-								task.wait();
+								task.wait(1/60);
 							end
 							if not characterProperties.CanAction then break; end;
+							c = c +1;
+							if math.fmod(c, 300) == 0 then
+								break;
+							end;
 						until not mouseProperties.Mouse1Down or unequiped;
 						
 						if Equipped.RightHand.Data.loopPrimaryFireAnim then

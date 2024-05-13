@@ -193,6 +193,7 @@ function Vars.CleanTextInput(text)
 	
 	text = text:gsub("[\r\n]", "`n");
 	local hasNewLines = false;
+	local c = 0;
 	repeat
 		hasNewLines = false;
 		if text:sub(1, 2) == "`n" then
@@ -203,6 +204,8 @@ function Vars.CleanTextInput(text)
 			text = text:sub(1, #text-2);
 			hasNewLines = true;
 		end
+		c = c + 1;
+		if c > 1000 then break; end;
 	until not hasNewLines;
 	text = text:gsub("`n", "\n");
 	

@@ -312,6 +312,7 @@ function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 	raycastParams.IgnoreWater = true
 	raycastParams.CollisionGroup = "Raycast";
 
+	local prevDist = nil;
 	repeat
 		raycastParams.FilterDescendantsInstances = includeList;
 
@@ -389,7 +390,17 @@ function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 
 		end
 		
+		if prevDist == nil then
+			prevDist = distance;
+		else
+			if prevDist == distance then
+				Debugger:Warn("Breaking hitscan ray before potential crash.");
+				break;
+			end
+			prevDist = distance;
+		end
 	until distance <= 0 or penCount > maxPierce;
+
 	return newOrigin;
 end
 
