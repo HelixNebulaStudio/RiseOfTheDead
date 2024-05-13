@@ -78,9 +78,13 @@ function FactionGroup.new()
 	};
 
 	self[scoreboardKey] = 0;
+	self["S_"..scoreboardKey] = 0;
+	self["M_"..scoreboardKey] = 0;
 	self["W_"..scoreboardKey] = 0;
 	self["D_"..scoreboardKey] = 0;
 	
+	self.SeasonEndTime = 0;
+	self.MonthEndTime = 0;
 	self.WeekEndTime = 0;
 	self.DayEndTime = 0;
 	
@@ -93,8 +97,24 @@ function FactionGroup.new()
 end
 
 function FactionGroup:AddScore(amount)
-	if self[scoreboardKey] == nil then Debugger:Log("Missing scoreboard Key", scoreboardKey) return end;
+	if self[scoreboardKey] == nil then Debugger:Log("Missing scoreboard Key", scoreboardKey); return end;
 	
+	local seasonEndTime = modSyncTime.TimeOfEndOfSeason();
+	if seasonEndTime ~= self.SeasonEndTime then
+		if self.SeasonEndTime ~= 0 then
+			self["S_"..scoreboardKey] = 0;
+		end
+		self.SeasonEndTime = seasonEndTime;
+	end
+
+	local monthEndTime = modSyncTime.TimeOfEndOfMonth();
+	if monthEndTime ~= self.MonthEndTime then
+		if self.MonthEndTime ~= 0 then
+			self["M_"..scoreboardKey] = 0;
+		end
+		self.MonthEndTime = monthEndTime;
+	end
+
 	local weekEndTime = modSyncTime.TimeOfEndOfWeek();
 	if weekEndTime ~= self.WeekEndTime then
 		if self.WeekEndTime ~= 0 then
@@ -111,6 +131,8 @@ function FactionGroup:AddScore(amount)
 	end
 	
 	self[scoreboardKey] = self[scoreboardKey] + amount;
+	self["S_"..scoreboardKey] = self["S_"..scoreboardKey] + amount;
+	self["M_"..scoreboardKey] = self["M_"..scoreboardKey] + amount;
 	self["W_"..scoreboardKey] = self["W_"..scoreboardKey] + amount;
 	self["D_"..scoreboardKey] = self["D_"..scoreboardKey] + amount;
 end

@@ -226,6 +226,8 @@ function Factions.SubmitLeaderboard(factionGroup)
 		local lbKey = modLeaderboardService.FactionBoardKey;
 
 		modLeaderboardService:SubmitToBoard(lbKey, factionGroup.Tag, {
+			SeasonlyStats=(factionGroup["S_"..lbKey] or 0);
+			MonthlyStats=(factionGroup["M_"..lbKey] or 0);
 			WeeklyStats=(factionGroup["W_"..lbKey] or 0);
 			DailyStats=(factionGroup["D_"..lbKey] or 0);
 		});
