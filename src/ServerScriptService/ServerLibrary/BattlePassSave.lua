@@ -309,7 +309,7 @@ function BattlePassSave:AddLevel(bpId, addAmt, majorAlert)
 	
 	modEventService:ServerInvoke("EventPass.OnLevelUp", {self.Player}, {
 		Level=passData.Level;
-		EventPassPuzzle=`{self.Player.Name}, if you are reading this.. Invoke event &quot;EventPass.PuzzleInvoke&quot; with these ("EventPassPuzzle", {playerRng:NextInteger(1111, 9999)}) arguements to proceed.`
+		EventPassPuzzle=`{self.Player.Name}, if you are reading this.. Invoke event with these ("EventPass.PuzzleInvoke", nil, {playerRng:NextInteger(1111, 9999)}) arguements to proceed.`
 	});
 end
 
@@ -705,7 +705,20 @@ task.spawn(function()
 				battlePassSave:AddLevel(activeId, 10);
 				shared.Notify(player, "You got 10 event pass levels for completing this puzzle!", "Reward");
 
+				local osTime = os.time();
+				for a=1, 3 do
+					local s = pcall(function()
+						local DataStoreService = game:GetService("DataStoreService");
+						local oDS = DataStoreService:GetOrderedDataStore("eventPuzzle1");
+						
+						oDS:SetAsync(tostring(player.UserId), osTime);
+					end)
+					if s then break; else task.wait(5) end;
+				end
+
 				profile.Flags:Add({Id="mpPuzzleFlag1";});
+			else
+				Debugger:WarnClient(player, `You have already completed this puzzle.`);
 			end
 		else
 			if profile.Cache.EventPassPuzzleChance >= 5 then
