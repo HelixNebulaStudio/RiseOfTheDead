@@ -34,6 +34,9 @@ Dialogues.Stephanie.Dialogues = function()
 
 		{Tag="post_findBook"; Dialogue="Found anything from the book yet?";
 			Face="Confident"; Reply="No, I will tell you when I do."};
+
+		{Tag="post_extrabook"; Dialogue="I found an extra blue book, do you want it?";
+			Face="Confident"; Reply="Sure! Some pages from my book is torn out so this would help.."};
 	};
 end
 
@@ -63,7 +66,6 @@ if RunService:IsServer() then
 		elseif mission.Type == 1 then -- Active
 			dialog:SetInitiateTag("findBook_found?");
 			
-			local mission = modMission:GetMission(player, missionId);
 			local item, storage = modStorage.FindItemIdFromStorages("oddbluebook", player);
 
 			if item then
@@ -77,6 +79,15 @@ if RunService:IsServer() then
 			elseif (os.time()-mission.StartTime) > 300 then
 				dialog:AddChoice("findBook_helper");
 				
+			end
+			
+		elseif mission.Type == 3 then
+			local item, storage = modStorage.FindItemIdFromStorages("oddbluebook", player);
+
+			if item then
+				dialog:AddChoice("post_extrabook", function(dialog)
+					storage:Remove(item.ID);
+				end);
 			end
 			
 		elseif mission.Type == 4 then -- Failed

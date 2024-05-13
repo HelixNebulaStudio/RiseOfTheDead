@@ -72,6 +72,11 @@ function ReplicateObj.new(prefab: Instance) : ReplicateObject
 	end
 	
 	setmetatable(self, ReplicateObj);
+
+	prefab.Destroying:Connect(function()
+		self:Destroy();
+	end)
+
 	return self;
 end
 
@@ -212,7 +217,7 @@ function ReplicationManager.UnreplicateFrom(player, prefab)
 	ReplicationManager.SetClientParent(player, prefab, nil) -- Set prefab parent to nil on client;
 end
 
-function ReplicationManager.GetReplicated(player, prefabName)
+function ReplicationManager.GetReplicated(player, prefabName): {Model}
 	local prefabList = {};
 	
 	for _, prefab in pairs(replicateFolder:GetChildren()) do

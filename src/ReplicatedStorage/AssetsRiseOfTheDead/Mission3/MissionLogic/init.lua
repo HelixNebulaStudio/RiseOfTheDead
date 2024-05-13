@@ -23,15 +23,17 @@ if RunService:IsServer() then
 			
 			local item = modStorage.FindItemIdFromStorages("oddbluebook", player);
 			if item == nil then
-				local prefab = script:WaitForChild("OddBlueBook"):Clone();
-				modReplicationManager.ReplicateIn(player, prefab, workspace.Interactables);
+				if modReplicationManager.GetReplicated(player, "OddBlueBook") == nil then
+					local prefab = script:WaitForChild("OddBlueBook"):Clone();
+					modReplicationManager.ReplicateIn(player, prefab, workspace.Interactables);
+				end
 			end
 			
 			mission.Changed:Disconnect(OnChanged);
 		end
 		
 		mission.Changed:Connect(OnChanged);
-		OnChanged(true, mission);
+		OnChanged(true);
 	end
 end
 
