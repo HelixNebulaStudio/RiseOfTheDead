@@ -300,8 +300,15 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 		Debugger:StudioWarn("Hardmode chance:",paramPacket.HardChance);
 	end
 
+	local currWave = self.Wave;
 	local newNpcModule;
 	local npcPrefab = modNpc.Spawn(npcName, spawnCf, function(npcPrefab, npcModule)
+		task.spawn(function()
+			while currWave == self.Wave do
+				task.wait(1);
+			end
+			Debugger.Expire(npcPrefab);
+		end)
 		self.EnemiesSpawned = self.EnemiesSpawned + 1;
 		newNpcModule = npcModule;
 		
