@@ -110,28 +110,7 @@ function GameMode:Start(room)
 	
 	local bossLevel = math.clamp(highestFocusLevel, 1, math.huge);
 	Debugger:Warn("Boss started with level:", bossLevel);
-	
-	if bossArena:FindFirstChild("AntiNoclip") then
-		local function noclipDamage(part)
-			if part.Name ~= "HumanoidRootPart" then return end;
-			local humanoid = part.Parent and part.Parent:FindFirstChild("Humanoid");
-			if humanoid == nil then return end;
-			local player = humanoid.Parent and game.Players:FindFirstChild(humanoid.Parent.Name);
-			if player == nil then return end;
-			for a=1, #players do
-				if player == players[a] then
-					humanoid.Health = 0;
-					break;
-				end
-			end
-		end
-		for _, obj in pairs(bossArena.AntiNoclip:GetChildren()) do
-			if obj:IsA("BasePart") then
-				obj.Touched:Connect(noclipDamage);
-			end
-		end
-	end
-	
+		
 	for a=1, #players do
 		local classPlayer = modPlayers.Get(players[a]);
 		classPlayer:SetProperties("InBossBattle", self.GameTable.Stage);

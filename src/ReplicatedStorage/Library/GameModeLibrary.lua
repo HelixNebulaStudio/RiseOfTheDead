@@ -322,7 +322,7 @@ GameModeLibrary.GameModes={
 				WaveStartTrack="SectorFWaveStart";
 				WaveEndTrack="SectorFWaveEnd";
 				
-				LeaderboardDataKey="EWaves";
+				LeaderboardDataKey="Waves";
 				
 				HardModeEnabled=true;
 			};
@@ -339,7 +339,7 @@ GameModeLibrary.GameModes={
 				WaveStartTrack="PrisonWaveStart";
 				WaveEndTrack="PrisonWaveEnd";
 				
-				LeaderboardDataKey="EWaves";
+				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
 			};
@@ -356,7 +356,7 @@ GameModeLibrary.GameModes={
 				WaveStartTrack="SectorDWaveStart";
 				WaveEndTrack="SectorDWaveEnd";
 				
-				LeaderboardDataKey="EWaves";
+				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
 			};

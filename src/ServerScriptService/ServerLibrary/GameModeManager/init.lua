@@ -202,11 +202,6 @@ function GameModeManager:Initialize(gameType, gameStage)
 			newLobbyPrefab = lobbyPrefabs:WaitForChild("TemplateLobby"):Clone();
 		end
 		if newLobbyPrefab then
-			if stageLib.SingleArena ~= true then
-				newLobbyPrefab.ModelStreamingMode = Enum.ModelStreamingMode.PersistentPerPlayer;
-			else
-				newLobbyPrefab.ModelStreamingMode = Enum.ModelStreamingMode.Persistent;
-			end
 			newLobbyPrefab.Parent = workspace.Environment;
 			
 			local spotIndex = 0;
@@ -480,17 +475,6 @@ function GameModeManager:Initialize(gameType, gameStage)
 			local lobbyPrefab: Model = self.LobbyPrefab;
 			if lobbyPrefab == nil then continue end;
 
-			if a == 1 then
-				lobbyPrefab.ModelStreamingMode = Enum.ModelStreamingMode.Persistent;
-			else
-				lobbyPrefab.ModelStreamingMode = Enum.ModelStreamingMode.PersistentPerPlayer;
-
-				for b=1, #lobbyData.Players do
-					local playerData = lobbyData.Players[b];
-					if playerData == nil or playerData.Instance == nil or not game.Players:IsAncestorOf(playerData.Instance) then continue end;
-					lobbyPrefab:AddPersistentPlayer(playerData.Instance);
-				end
-			end
 		end
 	end
 	
@@ -518,12 +502,12 @@ function GameModeManager:TpLobbyBox(gameManager, player)
 		end
 
 	else
-		for a=1, #self.Lobbies do
-			local room = self.Lobbies[a];
+		for a=1, #gameManager.Lobbies do
+			local room = gameManager.Lobbies[a];
 			if room == nil or room.LobbyPrefab == nil or not workspace:IsAncestorOf(room.LobbyPrefab) then continue end;
 
 			local roomCFrame = room.LobbyPrefab:GetPivot() * CFrame.new(0, -6, 0);
-
+			
 			rootPart.Anchored = true;
 			shared.modAntiCheatService:Teleport(player, roomCFrame);
 
@@ -819,11 +803,6 @@ function remoteGameModeRequest.OnServerInvoke(player, requestEnum, ...)
 			local room = gameTable:GetPlayerRoom(player);
 			if room then
 				room:RemovePlayer(player);
-
-				local lobbyPrefab: Model = room.LobbyPrefab;
-				if lobbyPrefab then
-					lobbyPrefab:RemovePersistentPlayer(player);
-				end
 			end
 			
 		end

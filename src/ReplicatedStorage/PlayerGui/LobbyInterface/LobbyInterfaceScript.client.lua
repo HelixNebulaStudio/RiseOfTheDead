@@ -633,6 +633,7 @@ function LeaveLobbyMenu(skipRequest)
 	modCharacter.CharacterProperties.AllowLerpBody = true;
 	
 	modData.CameraHandler:Unbind("lobbycamera");
+	lobbyCameraPoint = nil;
 	clearIndicators();
 
 	modInterface:ToggleGameBlinds(true, 0.5);
@@ -711,7 +712,6 @@ bindOpenLobbyInterface.Event:Connect(function(lobbyData) --cleared max depth che
 	UpdateGameLobby(gameLobby);
 	
 	refreshStatus = true;
-	
 	
 	modData.CameraHandler:Bind("lobbycamera", {
 		RenderStepped=function(camera)
