@@ -31,14 +31,14 @@ function BattlePassLibrary:Init(library)
 	library.GiftShop = {
 		{ItemId="apron"; Cost=4;};
 		{ItemId="militarybootsforest"; Cost=5;};
-		{ItemId="hardhatorigins"; Cost=5;};
-		{ItemId="armwrapsrat"; Cost=5;};
-		{ItemId="tophatgold"; Cost=5;};
-		{ItemId="rusty48blaze"; Cost=10;};   
-		{ItemId="dufflebagorigins"; Cost=10;};
-		{ItemId="vexglovesinferno"; Cost=20;};
-		{ItemId="zriceraskullinferno"; Cost=20;};
-		{ItemId="survivorsoutpostunlockpapers"; Cost=40;};
+		{ItemId="armwrapsrat"; Cost=10;};
+		{ItemId="hardhatorigins"; Cost=25;};
+		{ItemId="tophatgold"; Cost=25;};
+		{ItemId="rusty48blaze"; Cost=25;};   
+		{ItemId="dufflebagorigins"; Cost=50;};
+		{ItemId="vexglovesinferno"; Cost=50;};
+		{ItemId="zriceraskullinferno"; Cost=50;};
+		{ItemId="survivorsoutpostunlockpapers"; Cost=100;};
 	};
 
 	-- MARK: BP Season 1
