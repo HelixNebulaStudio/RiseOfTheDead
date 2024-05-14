@@ -57,15 +57,15 @@ function toolPackage.NewToolLib(handler)
 			local npcModule = npcStatus:GetModule();
 			if npcModule.IsDead then return end;
 
+			local leashedStatus = npcModule.EntityStatus:GetOrDefault("Leashed");
+			if leashedStatus then return end;
+			
 			if useCount <= 0 then return end;
 			useCount = useCount -1;
 
-			ropePart.Transparency = useCount <= 0 and 0 or 1;
-
-			local leashedStatus = npcModule.EntityStatus:GetOrDefault("Leashed");
-			if leashedStatus then return end;
 			npcModule.EntityStatus:Apply("Leashed", true);
-			
+			ropePart.Transparency = useCount <= 0 and 1 or 0;
+
 			local furthestNail, furthestDist = nil, 0;
 			for _, nailAtt in pairs(nailAtts) do
 				local dist = (hitPart.Position-nailAtt.WorldCFrame.Position).Magnitude;
