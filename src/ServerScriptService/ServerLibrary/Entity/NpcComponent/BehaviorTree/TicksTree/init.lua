@@ -136,7 +136,7 @@ return function(self)
 		if damage >= 1  then
 			task.spawn(function()
 				local hitLayers = modExplosionHandler:Cast(detonatePosition, {
-					Radius = 16;
+					Radius = 20;
 				});
 
 				modExplosionHandler:Process(detonatePosition, hitLayers, {
