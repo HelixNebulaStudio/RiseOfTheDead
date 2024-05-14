@@ -39,11 +39,12 @@ function toolPackage.NewToolLib(handler)
 		modAudio.Play("Repair", prefab.PrimaryPart);
 
 		local player: Player = handler.Player;
-		local collider: BasePart = prefab:WaitForChild("Collider");
-		local ropePart: BasePart = prefab:WaitForChild("Rope");
+		local collider = prefab:WaitForChild("Collider") :: BasePart;
+		local ropePart = prefab:WaitForChild("Rope") :: BasePart;
 
-		local activeLeash = nil;
-		local useCount = 10;
+		local activeLeashes = {};
+		
+		local useCount = 5;
 		collider.Touched:Connect(function(hitPart)
 			local targetModel = hitPart.Parent;
 			if targetModel == nil then return end;
@@ -51,16 +52,19 @@ function toolPackage.NewToolLib(handler)
 
 			local damagable = modDamagable.NewDamagable(targetModel);
 			if damagable == nil or not damagable:CanDamage(player) then return end;
-			if activeLeash then return end;
-
+			
 			local npcStatus = damagable.Object;
 			local npcModule = npcStatus:GetModule();
 			if npcModule.IsDead then return end;
 
+			if useCount <= 0 then return end;
+			useCount = useCount -1;
+
+			ropePart.Transparency = useCount <= 0 and 0 or 1;
+
 			local leashedStatus = npcModule.EntityStatus:GetOrDefault("Leashed");
 			if leashedStatus then return end;
 			npcModule.EntityStatus:Apply("Leashed", true);
-			
 			
 			local furthestNail, furthestDist = nil, 0;
 			for _, nailAtt in pairs(nailAtts) do
@@ -72,27 +76,27 @@ function toolPackage.NewToolLib(handler)
 				end
 			end
 			
-			ropePart.Transparency = 1;
-			
 			local att = Instance.new("Attachment");
 			att.Parent = hitPart;
 			
 			local newLeash = Instance.new("RopeConstraint");
 			newLeash.Parent = hitPart;
 			newLeash.Visible = true;
-			activeLeash = newLeash;
+			
 			newLeash.Length = 4;
 			newLeash.Attachment0 = furthestNail;
 			newLeash.Attachment1 = att;
+			table.insert(activeLeashes, newLeash);
 			
 			newLeash.Destroying:Connect(function()
-				useCount = useCount -1;
-				if useCount <= 0 then
+				for a=#activeLeashes, 1, -1 do
+					local leash = activeLeashes[a];
+					if leash == newLeash then
+						table.remove(activeLeashes, a);
+					end
+				end
+				if #activeLeashes <= 0 then
 					game.Debris:AddItem(prefab, 1);
-					
-				else
-					ropePart.Transparency = 0;
-					activeLeash = nil;
 				end
 			end)
 			

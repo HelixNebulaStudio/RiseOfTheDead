@@ -1,8 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modLogicTree = require(game.ReplicatedStorage.Library.LogicTree);
 
-local TweenService = game:GetService("TweenService");
-
+local modExplosionHandler = require(game.ReplicatedStorage.Library.ExplosionHandler);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modRegion = require(game.ReplicatedStorage.Library.Region);
 
@@ -78,8 +77,6 @@ return function(self)
 		
 		local detonTime = self.Prefab:GetAttribute("DetonationTime");
 		if detonTime == nil then
-			--local dist = self.GetTargetDistance();
-			--if dist <= 100 then
 			if modRegion:InRegion(self.RootPart.Position, self.Target:GetPivot().Position, 30) then
 				local duration = 4;
 				self.Prefab:SetAttribute("DetonationTime", workspace:GetServerTimeNow()+duration);
@@ -105,7 +102,6 @@ return function(self)
 
 					game.Debris:AddItem(tickingSound, 0);
 					if self.IsDead then return end;
-					modAudio.Play("TicksZombieExplode", self.RootPart.Position).PlaybackSpeed = math.random(100,120)/100;
 					tree:Call("Detonate");
 				end)
 			end
@@ -122,6 +118,7 @@ return function(self)
 		self.Detonated = true;
 		
 		if self.IsDead then return end;
+		modAudio.Play("TicksZombieExplode", self.RootPart.Position).PlaybackSpeed = math.random(100,120)/100;
 		
 		local newEffect = explosionEffectPrefab:Clone();
 		local effectMesh = newEffect:WaitForChild("Mesh");
@@ -133,30 +130,70 @@ return function(self)
 		self.Remote:FireAllClients("Ticks", "detonate", {effectMesh, speed, range});
 		Debugger.Expire(newEffect, 1);
 		
-		local damage = self.Properties.AttackDamage * (1-math.clamp(self.GetTargetDistance(), 0, 30)/30);
+		local detonatePosition = self.RootPart.Position;
+
+		local damage = self.Properties.AttackDamage * (1-math.clamp(self.GetTargetDistance() or 15, 0, 30)/30);
 		if damage >= 1  then
 			task.spawn(function()
-				if game.Players:FindFirstChild(targetHumanoid.Parent.Name) then
-					local classPlayer = shared.modPlayers.Get(game.Players[targetHumanoid.Parent.Name]);
+				local hitLayers = modExplosionHandler:Cast(detonatePosition, {
+					Radius = 24;
+				});
 
-					if classPlayer then
-						local gasProtection = classPlayer:GetBodyEquipment("GasProtection");
-						if gasProtection then
-							damage = damage * (1-gasProtection);
+				modExplosionHandler:Process(detonatePosition, hitLayers, {
+					Owner = self.Owner;
+					StorageItem = self.StorageItem;
+					TargetableEntities = {
+						Zombie=1;
+						Bandit=1;
+						Cultist=1;
+						Rat=1;
+					};
+
+					Damage = damage;
+					ExplosionStun = 1;
+					ExplosionStunThreshold = 0;
+
+					DamageOrigin = detonatePosition;
+					OnDamagableHit = function(damagable, damage)
+						if damagable.Object.ClassName == "NpcStatus" then
+							local npcModule = damagable.Object:GetModule();
+							local healthInfo = damagable:GetHealthInfo();
+							if npcModule.Properties and npcModule.Properties.BasicEnemy then
+								damage = healthInfo.MaxHealth * 0.2;
+								task.spawn(function()
+									if npcModule == self then return end;
+									if npcModule.IsDead then return end;
+									if npcModule.Name ~= "Ticks" then return end;
+
+									npcModule.BehaviorTree:RunTreeLeaf("TicksTree", "Detonate");
+								end)
+
+							else
+								damage = healthInfo.MaxHealth * 0.05;
+							end
+							
+						elseif damagable.Object.ClassName == "PlayerClass" then
+							local classPlayer = damagable.Object;
+
+							local gasProtection = classPlayer:GetBodyEquipment("GasProtection");
+							if gasProtection then
+								damage = damage * (1-gasProtection);
+							end
+
+							if classPlayer.Properties.tickre then
+								return;
+							end
+
+							local tickRepellent = classPlayer:GetBodyEquipment("TickRepellent");
+							if tickRepellent then
+								classPlayer:SetProperties("tickre", {Expires=workspace:GetServerTimeNow()+tickRepellent; Duration=tickRepellent; Amount=tickRepellent;});
+							end
+
 						end
 
-						if classPlayer.Properties.tickre then
-							return;
-						end
-
-						local tickRepellent = classPlayer:GetBodyEquipment("TickRepellent");
-						if tickRepellent then
-							classPlayer:SetProperties("tickre", {Expires=workspace:GetServerTimeNow()+tickRepellent; Duration=tickRepellent; Amount=tickRepellent;});
-						end
+						self:DamageTarget(targetHumanoid.Parent, damage);
 					end
-				end
-
-				self:DamageTarget(targetHumanoid.Parent, damage);
+				});
 			end)
 		end
 

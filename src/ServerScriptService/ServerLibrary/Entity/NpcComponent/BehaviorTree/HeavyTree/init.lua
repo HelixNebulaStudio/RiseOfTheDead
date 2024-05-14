@@ -107,7 +107,7 @@ return function(self)
 			return tree.Failure;
 		end;
 		
-		if cache.LastThrowZombie and tick()-cache.LastThrowZombie <= 5 then return modLogicTree.Status.Failure end;
+		if cache.LastThrowZombie and tick()-cache.LastThrowZombie <= 7 then return modLogicTree.Status.Failure end;
 		cache.LastThrowZombie = tick();
 		
 		local maxRange = 16;

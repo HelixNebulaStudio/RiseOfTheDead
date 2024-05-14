@@ -266,7 +266,8 @@ function MetaStatus:TakeDamagePackage(damageSource)
 			if amount <= humanoid.MaxHealth*0.05 then return end; --math.random(10, 20)/100
 
 			local dealerRootPart: BasePart = dealer;
-			if dealer:IsA("Player") then
+			if dealer == nil then
+			elseif dealer:IsA("Player") then
 				local classPlayer = shared.modPlayers.Get(dealer);
 				dealerRootPart  = classPlayer and classPlayer.RootPart;
 				

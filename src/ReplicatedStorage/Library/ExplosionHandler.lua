@@ -23,7 +23,7 @@ function ExplosionHandler:Cast(position, params)
 	params.CollisionGroup = params.CollisionGroup or "Raycast";
 
 	params.Tags = params.Tags or {
-		{"EntityRootPart"; "PlayerRootParts"};
+		{"EntityRootPart"; "PlayerRootParts"}; -- HitLayer 1
 		{"Destructibles"; "EntityDestructibles"}; --"EnvironmentColliders";
 	};
 	
@@ -91,10 +91,13 @@ export type ExplosionProcessPacket = {
 
 	DamageRatio: number?;
 	ExplosionStun: number?;
+	ExplosionStunThreshold: number?;
 	ExplosionForce: number?;
+
 	Owner: Player?;
 	DamageOrigin: Vector3?;
 	OnPartHit: ((packet: ExplosionProcessPacket, basePart: BasePart) -> nil)?;
+	OnDamagableHit: ((damagable: {any}, damage: number)->boolean)?;
 	HandleExplosion: boolean?;
 
 	TargetableEntities: {[any]:any}?;
@@ -153,7 +156,7 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 					
 					if params.ExplosionStun then
 						local healthInfo = damagable:GetHealthInfo();
-						if healthInfo.Armor <= 0 and damage > healthInfo.MaxHealth*0.23 and humanoid then
+						if healthInfo.Armor <= 0 and damage > healthInfo.MaxHealth*(params.ExplosionStunThreshold or 0.23) and humanoid then
 							damagable.HealthObj.PlatformStand = true;
 							task.delay(params.ExplosionStun, function()
 								damagable.HealthObj.PlatformStand = false;
@@ -173,16 +176,16 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 						damage = math.min(params.MaxDamage, damage);
 					end
 					
-					if damagable.Object.ClassName == "NpcStatus" then
-						Debugger:Log("targetModel", targetModel.Name..(targetModel:GetAttribute("EntityId") or "##"), "damage", damage);
-					end
-
 					if params.TargetableEntities and humanoid then
 						local dmgRatio = (params.TargetableEntities[humanoid.Name] or 0);
 						damage = damage * dmgRatio;
 					end
 					
 					if damage > 0 then
+						if params.OnDamagableHit and params.OnDamagableHit(damagable, damage) then
+							return;
+						end
+
 						local newDmgSrc = modDamagable.NewDamageSource{
 							Damage=damage;
 							Dealer=params.Owner;
@@ -195,8 +198,7 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 						local assemblyRootPart: BasePart = player and targetModel.PrimaryPart or basePart:GetRootPart();
 						if assemblyRootPart and assemblyRootPart.Anchored ~= true and params.ExplosionForce > 0 then
 							local dir = (assemblyRootPart.Position-position).Unit;
-							--assemblyRootPart.Velocity = dir * params.ExplosionForce + Vector3.new(0, 40, 0);
-						
+							
 							newDmgSrc.DamageForce = dir * params.ExplosionForce;
 							newDmgSrc.DamagePosition = basePart.Position;
 
@@ -219,6 +221,7 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 		wait();
 	end
 end
+
 
 function ExplosionHandler.GenericOnPartHit(packet: ExplosionProcessPacket, hitPart: BasePart)
 	if hitPart.Anchored then return end

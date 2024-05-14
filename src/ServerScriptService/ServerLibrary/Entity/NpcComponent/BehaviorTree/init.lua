@@ -35,6 +35,14 @@ function Component:StopTree()
 	--end;
 end
 
+function Component:RunTreeLeaf(treeName, leafName)
+	if self.Trees[treeName] == nil then
+		return;
+	end
+
+	self.Trees[treeName]:Call(leafName);
+end
+
 function Component:RunTree(treeObj, isRoot)
 	if self.Disabled then return end;
 	
