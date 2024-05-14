@@ -136,7 +136,7 @@ return function(self)
 		if damage >= 1  then
 			task.spawn(function()
 				local hitLayers = modExplosionHandler:Cast(detonatePosition, {
-					Radius = 24;
+					Radius = 16;
 				});
 
 				modExplosionHandler:Process(detonatePosition, hitLayers, {
@@ -165,6 +165,7 @@ return function(self)
 									if npcModule.IsDead then return end;
 									if npcModule.Name ~= "Ticks" then return end;
 
+									task.wait(math.random(50, 250)/1000);
 									npcModule.BehaviorTree:RunTreeLeaf("TicksTree", "Detonate");
 								end)
 
@@ -191,7 +192,7 @@ return function(self)
 
 						end
 
-						self:DamageTarget(targetHumanoid.Parent, damage);
+						self:DamageTarget(damagable.Model, damage);
 					end
 				});
 			end)
