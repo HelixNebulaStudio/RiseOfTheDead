@@ -340,7 +340,7 @@ function ItemsLibrary:Init(super)
 	new(structureBase, {Id="gastankied"; Name="Gas Tank IED"; Icon="rbxassetid://4494205256"; Description="A Improvised Explosive Device made with circuit boards, wires and some gas tanks. Does 24% Max Health (Max 100k damage) as damage and has an explosion stun of 10s.";});
 	new(structureBase, {Id="barbedwooden"; Name="Barbed Wooden Fence"; Icon="rbxassetid://5803776520"; Description="Placable barbed wooden fence that does 1% damage per second to enemies and slows them to 4 units/s when touched.";});
 	new(structureBase, {Id="snowman"; Name="Snowman"; Icon="rbxassetid://6122031351"; Description="Place-able snowman that baits the zombies with in a 64 unit radius. Not realistic enough to fool bosses though.";});
-	new(structureBase, {Id="ticksnaretrap"; Name="Tick Snare Trap"; Icon="rbxassetid://16334398743"; Description="A snare trap that leashes a Tick that runs over it. Killing the leashed Tick resets the trap. It can leash up the 10 times.";});
+	new(structureBase, {Id="ticksnaretrap"; Name="Tick Snare Trap"; Icon="rbxassetid://16334398743"; Description="A snare trap that leashes a Tick that runs over it. It can leash up to 5 Ticks before it is used up.";});
 	new(structureBase, {Id="barbedmetal"; Name="Barbed Metal Fence"; Icon="rbxassetid://16521233112"; Description="Placable barbed metal fence that does 1% damage per second to enemies and slows them to 2 units/s when touched.";});
 
 	--==========================================================[[ Medical ]]==========================================================--
