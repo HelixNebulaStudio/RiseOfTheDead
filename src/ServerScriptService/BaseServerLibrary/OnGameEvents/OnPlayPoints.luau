@@ -84,6 +84,12 @@ return function(profile, points: number?, reason: string?)
             elseif reason == "Gameplay:Unlock" then
                 reasonStr = " from unlocking something new";
 
+            elseif reason == "Gameplay:Kill:Zombie" then
+                reasonStr = " from killing zombies";
+
+            elseif reason == "Gameplay:Kill:Enemies" then
+                reasonStr = " from killing enemies";
+
             elseif reason == "Gameplay:Kill" then
                 reasonStr = " from killing";
 

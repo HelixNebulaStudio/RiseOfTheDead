@@ -707,12 +707,12 @@ bindOpenLobbyInterface.Event:Connect(function(lobbyData) --cleared max depth che
 	mainFrame.Rewards.Visible = rewardsId ~= nil;
 	mainFrame.RewardsButton.Visible = rewardsId ~= nil;
 	
+	Debugger:Warn("gameLobby", gameLobby);
 	UpdateGameLobby(gameLobby);
 	
 	refreshStatus = true;
 	
-	Debugger:Warn("gameLobby", gameLobby);
-
+	
 	modData.CameraHandler:Bind("lobbycamera", {
 		RenderStepped=function(camera)
 			if lobbyCameraPoint then
@@ -751,6 +751,9 @@ bindOpenLobbyInterface.Event:Connect(function(lobbyData) --cleared max depth che
 		for key, data in pairs(stageLib.LeaderboardKeyTable) do
 			if data.Folder == "AllTimeStats" then
 				keyTable.AllTimeTableKey = key;
+
+			elseif data.Folder == "YearlyStats" then
+				keyTable.YearlyTableKey = key;
 
 			elseif data.Folder == "SeasonlyStats" then
 				keyTable.SeasonlyTableKey = key;

@@ -550,6 +550,12 @@ for gamemode, _ in pairs(GameModeLibrary.GameModes) do
 			-- 	Folder="AllTimeStats";
 			-- 	DataKey="LAT_"..modeKey;
 			-- };
+			stageLib.LeaderboardKeyTable["Yearly"..modeKey]={
+				DatastoreName="LY_"..modeKey;
+				DatastoreId="LY_"..modeKey;
+				Folder="YearlyStats";
+				DataKey="LY_"..modeKey;
+			};
 			stageLib.LeaderboardKeyTable["Seasonly"..modeKey]={
 				DatastoreName="LS_"..modeKey;
 				DatastoreId="LS_"..modeKey;
