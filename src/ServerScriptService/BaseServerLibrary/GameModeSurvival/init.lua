@@ -210,6 +210,7 @@ end
 
 function Survival:PickEnemy()
 	if self.CurrentWaveEnemyPool == nil or self.CurrentWaveEnemyPool.Wave ~= self.Wave then
+		-- Generate a enemy pool table per wave.
 		local validList = {};
 
 		for a=1, #self.EnemiesList do
@@ -246,6 +247,11 @@ function Survival:PickEnemy()
 	end
 
 	if self.CurrentWaveEnemyPool then
+
+		if self.HazardType == "TicksGalore" then
+			return "Ticks";
+		end
+
 		local pickTable = self.CurrentWaveEnemyPool.PickTable;
 		local roll = math.random(0, self.CurrentWaveEnemyPool.TotalChance);
 		for a=1, #pickTable do
@@ -307,6 +313,7 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 			while currWave == self.Wave do
 				task.wait(1);
 			end
+			if npcModule.IsDead then return end;
 			npcModule:KillNpc();
 		end)
 		self.EnemiesSpawned = self.EnemiesSpawned + 1;
@@ -368,60 +375,10 @@ function Survival:CompleteWave()
 	};
 end
 
-function Survival:StartWave(wave)
-	self.Status = EnumStatus.InProgress;
-
-	self:Hud{
-		PlayWaveStart=true;
-		StatsCount=false;
-	}
-	
-	if wave == 1 then
-		if self.IntroMessage then
-			shared.Notify(game.Players:GetPlayers(), self.IntroMessage, "Positive");
-		end
-
-		if modBranchConfigs.CurrentBranch.Name == "Dev" then
-			-- Dev branch
-			local function printChatCalculator(title, list)
-				shared.Notify(game.Players:GetPlayers(), "Dev-branch Info: ".. title .." Table:", "Inform");
-				--local groups = modDropRateCalculator.Calculate({Id="objectives"; Rewards=list;}, {HardMode=self.IsHard});
-				--for a=1, #groups do
-				--	local chance = 0;
-				--	for b=1, #groups[a] do
-				--		local rewardInfo = groups[a][b];
-				--		chance = chance + rewardInfo.Chance;
-
-				--		shared.Notify(game.Players:GetPlayers(), a..": "..rewardInfo.Type..": ".. math.ceil((rewardInfo.Chance/groups[a].TotalChance)*100000)/1000 .."%", "Inform");
-				--	end
-				--	if chance <= groups[a].TotalChance then
-				--		shared.Notify(game.Players:GetPlayers(), a..": nothing: ".. math.ceil(( (groups[a].TotalChance-chance) /groups[a].TotalChance)*100000)/1000 .."%", "Inform");
-				--	end
-				--end
-				
-				for a=1, #list do
-					local name = list[a].Type;
-					local fmod = (list[a].Fmod or 1);
-					local startWave = (list[a].StartWave or 1);
-					shared.Notify(game.Players:GetPlayers(), a..": "..name..": Every "..fmod.." wave"..(startWave > 1 and " after ".. startWave.." waves" or ""), "Inform");
-				end
-				
-				shared.Notify(game.Players:GetPlayers(), "- - - - - - - - - - - - -", "Inform");
-			end
-
-			printChatCalculator("Objectives", self.ObjectivesList);
-			printChatCalculator("Hazards", self.HazardsList);
-		end
-		
-		if self.OnStart then
-			self.OnStart(self.Players);
-		end
-	end
-
-	--===
-	self.EnemiesSpawned = 0;
+function Survival:GetNextWaveInfo(wave)
+	local random = Random.new(wave);
 	local pickObjective, pickHazard;
-	
+
 	if wave < #self.ObjectivesList then
 		pickObjective = self.ObjectivesList[math.fmod(wave-1, #self.ObjectivesList)+1];
 		if math.fmod(wave, 2) == 0 then
@@ -453,22 +410,36 @@ function Survival:StartWave(wave)
 				end
 			end
 			
-			Debugger:Log("Available ",(list == self.ObjectivesList and "Objectives" or "Hazards"), optionsList, " largestFmod", largestFmod);
-			
 			if #optionsList <= 0 then return nil end;
-			return optionsList[math.random(1, #optionsList)];
+			return optionsList[random:NextInteger(1, #optionsList)], largestFmod;
 		end
 		
 		pickObjective = roll(self.ObjectivesList);
 		
+		if RunService:IsStudio() then
+			local list = {};
+			for a=1, #self.ObjectivesList do
+				table.insert(list, `{self.ObjectivesList[a].Type}`);
+			end
+			Debugger:Warn("Objectives",list);
+		end
+		
 		if self.Wave > 5 then
 			local rngMax = self.Wave > 20 and 1 or self.Wave > 15 and 2 or self.Wave > 10 and 3 or 4;
 
-			if math.random(1, rngMax) == 1 then
+			if random:NextInteger(1, rngMax) == 1 then
 				pickHazard = roll(self.HazardsList);
 			end
 		end;
 		
+		if RunService:IsStudio() then
+			local list = {};
+			for a=1, #self.HazardsList do
+				table.insert(list, `{self.HazardsList[a].Type}`);
+			end
+			Debugger:Warn("Hazards",list);
+		end
+
 	end
 
 	for a=1, #self.ObjectivesList do
@@ -493,9 +464,53 @@ function Survival:StartWave(wave)
 		pickObjective = self.SetObjective;
 		self.SetObjective = nil;
 	end
-	--===
+
+	return pickObjective, pickHazard;
+end
+
+function Survival:StartWave(wave)
+	self.Status = EnumStatus.InProgress;
+
+	self:Hud{
+		PlayWaveStart=true;
+		StatsCount=false;
+	}
 	
-	--Debugger:Log("pickObjective", pickObjective, "pickHazard", pickHazard);
+	if wave == 1 then
+		if self.IntroMessage then
+			shared.Notify(game.Players:GetPlayers(), self.IntroMessage, "Positive");
+		end
+
+		if modBranchConfigs.CurrentBranch.Name == "Dev" then
+			-- Dev branch
+			local function printChatCalculator(title, list)
+				shared.Notify(game.Players:GetPlayers(), "Dev-branch Info: ".. title .." Table:", "Inform");
+				
+				for a=1, #list do
+					local name = list[a].Type;
+					local fmod = (list[a].Fmod or 1);
+					local startWave = (list[a].StartWave or 1);
+					shared.Notify(game.Players:GetPlayers(), a..": "..name..": Every "..fmod.." wave"..(startWave > 1 and " after ".. startWave.." waves" or ""), "Inform");
+				end
+				
+				shared.Notify(game.Players:GetPlayers(), "- - - - - - - - - - - - -", "Inform");
+			end
+
+			printChatCalculator("Objectives", self.ObjectivesList);
+			printChatCalculator("Hazards", self.HazardsList);
+		end
+		
+		if self.OnStart then
+			self.OnStart(self.Players);
+		end
+	end
+
+	--===
+	self.EnemiesSpawned = 0;
+	local pickObjective, pickHazard;
+	
+	pickObjective, pickHazard = self:GetNextWaveInfo(wave);
+	--===
 	
 	local newObjective = pickObjective.Class.new();
 	local newHazard = pickHazard and pickHazard.Class.new() or nil;
@@ -676,13 +691,15 @@ function Survival:StartWave(wave)
 			
 			local breakLength = math.clamp(10 + (self.ActiveSupCrate and 20 or 0), 10, 30);
 
-			shared.Notify(game.Players:GetPlayers(), "Next wave starts in "..breakLength.." seconds..", "Defeated");
+			--shared.Notify(game.Players:GetPlayers(), "Next wave starts in "..breakLength.." seconds..", "Defeated");
 
+			local nextObj, nextHaz = self:GetNextWaveInfo(wave+1);
+			local nextWaveStr = (nextObj and nextObj.Class.Title or "")..(nextHaz and "("..nextHaz.Class.Title..")" or "");
 			for a=breakLength, 1, -1 do
 				if a == 1 then self:RespawnDead(); end
 				task.wait(1);
 				self:Hud{
-					Status="Next wave starts in "..a.."s.."
+					Status=`Wave {wave+1}: {nextWaveStr} starts in {a}s..`;
 				};
 				if self.Status ~= EnumStatus.InProgress then break; end
 			end
