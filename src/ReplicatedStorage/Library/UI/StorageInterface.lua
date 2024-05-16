@@ -521,6 +521,9 @@ function SlotItem:ActivateDelete(mousePosition)
 	currentQuanFrame.DeleteConfirm.Visible = true;
 	currentQuanFrame.Title.Text = "Delete "..self.Properties.Name;
 
+	local minQuantity = 1;
+	local maxQuantity = self.Item.Quantity;
+	
 	if self.Properties.Stackable then
 		currentQuanFrame.QuantityInput.Text = 1;
 		currentQuanFrame.QuantityInput.Visible = true;
@@ -532,7 +535,6 @@ function SlotItem:ActivateDelete(mousePosition)
 
 		currentQuanFrame.SliderBar.BackgroundColor3 = modBranchConfigurations.BranchColor;
 
-		local minQuantity = 1; local maxQuantity = self.Item.Quantity;
 		local powerRatio = maxQuantity > 10 and 1.4 or maxQuantity > 50 and 1.5 or maxQuantity > 100 and 1.75 or 1.15;
 
 		local function StartQuantitySlider()
@@ -611,7 +613,9 @@ function SlotItem:ActivateDelete(mousePosition)
 					interface.SyncLabel.Visible = true;
 					RunService:UnbindFromRenderStep("DeleteConfirm");
 
-					modData.HandleTool("local", {Unequip={Id=self.ID;}});
+					if removeQuantity >= maxQuantity then
+						modData.HandleTool("local", {Unequip={Id=self.ID;}});
+					end
 
 					local replyedStorages = remoteRemoveItem:InvokeServer(interface.StorageId, self.ID, removeQuantity);
 					interface.SyncLabel.Visible = false;

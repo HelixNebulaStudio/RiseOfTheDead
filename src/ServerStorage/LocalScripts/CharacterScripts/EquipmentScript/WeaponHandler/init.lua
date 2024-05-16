@@ -1675,6 +1675,11 @@ function WeaponHandler:Equip(library, weaponId)
 	end
 	
 	local function PrimaryFireRequest()
+		if equipped and not unequiped then
+			if mainWeaponModel == nil or not character:IsAncestorOf(mainWeaponModel) then
+				modData.HandleTool("unequip", {Id=modCharacter.EquippedItem.ID;});
+			end
+		end
 		spawn(function()
 			if not characterProperties.CanAction then return end;
 			if properties.Reloading then

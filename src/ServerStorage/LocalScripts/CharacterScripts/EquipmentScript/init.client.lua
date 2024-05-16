@@ -29,6 +29,7 @@ local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
+local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 
 --== Handlers
 local modWeaponHandler = require(script:WaitForChild("WeaponHandler"));
@@ -42,6 +43,7 @@ local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler");
 
 local BaseEquipped = {LeftHand={}; RightHand={}; Animations={};};
 local Equipped = modGlobalVars.CloneTable(BaseEquipped);
+Equipped.Garbage = modGarbageHandler.new();
 
 local instanceCache = {};
 --== Script;
@@ -80,9 +82,6 @@ function equip(equipPacket, toolWelds)
 	
 	local equipmentItem = modData.GetItemById(id);
 	
-	--if equipPacket.MockEquip then
-	--	equipmentItem = equipPacket.StorageItem;
-	--end
 	if equipmentItem then
 		local itemId = equipmentItem.ItemId;
 		
@@ -111,17 +110,29 @@ function equip(equipPacket, toolWelds)
 			end;
 		end
 		
-		if localPlayer.Character:FindFirstChild("EditMode") then
-			for a=1, #toolModels do
-				local handle = toolModels[a].PrimaryPart;
+		for a=1, #toolModels do
+			local toolModel = toolModels[a] :: Model;
+			local handle = toolModel.PrimaryPart;
+
+			if localPlayer.Character:FindFirstChild("EditMode") then
 				if handle:FindFirstChild("SightViewModel") == nil then
 					local new = Instance.new("Attachment");
 					new.Name = "SightViewModel";
 					new.Parent = handle;
 				end
 			end
+
+			Equipped.Garbage:Tag(character.ChildRemoved:Connect(function(child)
+				if child ~= toolModel then return end;
+				Debugger:Warn("Unequip clientside");
+				modData.HandleTool("local", {Unequip={
+					Id=modCharacter.EquippedItem.ID;
+					StorageItem = equipmentItem;
+				};});
+			end));
 		end
 		
+
 		if modWeapons[itemId] then 
 			modWeaponHandler:Equip(modWeapons[itemId], id);
 		end
@@ -158,7 +169,7 @@ function Unequip(unequipPacket)
 	if not modCharacter.CharacterProperties.IsEquipped then return end;
 	if modCharacter.EquippedItem == nil or modCharacter.EquippedItem.ID ~= id then return end;
 	
-	local equipmentItem = modData.GetItemById(id);
+	local equipmentItem = modData.GetItemById(id) or storageItem;
 	
 	if storageItem and storageItem.MockItem == true then
 		equipmentItem = storageItem;
@@ -170,7 +181,9 @@ function Unequip(unequipPacket)
 		modCharacter.MouseProperties.Mouse1Down = false;
 		modCharacter.MouseProperties.Mouse2Down = false;
 		
-		if modWeapons[itemId] then modWeaponHandler:Unequip(id); end
+		if modWeapons[itemId] then
+			modWeaponHandler:Unequip(id);
+		end
 		if modTools[itemId] then 
 			local handler = getToolHandler(itemId);
 			
@@ -184,11 +197,13 @@ function Unequip(unequipPacket)
 			for k, v in pairs(Equipped.LeftHand) do Equipped.LeftHand[k] = nil; end;
 			for k, v in pairs(Equipped.RightHand) do Equipped.RightHand[k] = nil; end;
 			for k, v in pairs(Equipped) do
-				if BaseEquipped[k] == nil then
+				if BaseEquipped[k] == nil and k ~= "Garbage" then
 					Equipped[k] = nil;
 				end
 			end
 		end
+
+		Equipped.Garbage:Destruct();
 		
 		modCharacter.CharacterProperties.IsEquipped = false;
 		modCharacter.CharacterProperties.HideCrosshair = false;

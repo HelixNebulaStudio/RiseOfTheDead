@@ -10,7 +10,7 @@ local animator = humanoid:WaitForChild("Animator");
 local player = game.Players.LocalPlayer;
 
 --== Modules;
-local modData = require(player:WaitForChild("DataModule"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 local modInterface = modData:GetInterfaceModule();
 

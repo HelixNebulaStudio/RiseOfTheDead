@@ -11,7 +11,7 @@ local localPlayer = game.Players.LocalPlayer;
 local camera = workspace.CurrentCamera;
 
 --== Modules;
-local modData = require(localPlayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 local modInterface = modData:GetInterfaceModule();
 
