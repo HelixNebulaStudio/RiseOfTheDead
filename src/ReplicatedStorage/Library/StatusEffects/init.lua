@@ -286,7 +286,7 @@ function StatusEffects.ForceField(player, duration)
 			local new = Instance.new("ForceField");
 			new.Name = "ForcefieldStatus";
 			new.Parent = classPlayer.Character;
-			game.Debris:AddItem(new, statusTable.Duration);
+			Debugger.Expire(new, statusTable.Duration);
 		end
 	end
 end
@@ -319,7 +319,7 @@ function StatusEffects.TiedUp(player, duration)
 			newRope.Parent = classPlayer.Character;
 			joint.Part0 = newRope;
 			joint.Part1 = rootPart;
-			game.Debris:AddItem(newRope, statusTable.Duration);
+			Debugger.Expire(newRope, statusTable.Duration);
 		end
 		
 	else
@@ -1169,9 +1169,6 @@ function StatusEffects.Chained(player, duration, position, anchorHealth, isHardM
 	
 	position = position or rootPart.Position;
 	
-	--local shackleAtt = Debugger:Point(position);
-	--game.Debris:AddItem(shackleAtt, duration);
-	
 	local newAnchor = script.ChainAnchors:Clone();
 	local anchorAtt = newAnchor:WaitForChild("Base"):WaitForChild("AnchorAtt");
 	local tarRpValue: ObjectValue = newAnchor:WaitForChild("Base"):WaitForChild("TargetRootPart");
@@ -1183,7 +1180,7 @@ function StatusEffects.Chained(player, duration, position, anchorHealth, isHardM
 	newRope.Visible = false;
 	newRope:SetAttribute("FPIgnore", true);
 	newRope.Parent = rootPart;
-	game.Debris:AddItem(newRope, duration);
+	Debugger.Expire(newRope, duration);
 
 	local newChains = script.Chains:Clone();
 	newChains.Attachment0 = anchorAtt;
@@ -1192,7 +1189,7 @@ function StatusEffects.Chained(player, duration, position, anchorHealth, isHardM
 		newChains.Color = ColorSequence.new(Color3.new(0.243137, 0.196078, 0.196078), Color3.new(0.243137, 0.168627, 0.168627));
 	end
 	newChains.Parent = rootPart;
-	game.Debris:AddItem(newChains, duration);
+	Debugger.Expire(newChains, duration);
 	
 	local statusTable = classPlayer.Properties.Chained or {};
 	
@@ -1205,7 +1202,7 @@ function StatusEffects.Chained(player, duration, position, anchorHealth, isHardM
 	
 	classPlayer:SetProperties("Chained", statusTable);
 	
-	game.Debris:AddItem(newAnchor, duration);
+	Debugger.Expire(newAnchor, duration);
 	newAnchor:PivotTo(CFrame.new(position));
 	
 	tarRpValue.Value = rootPart;
