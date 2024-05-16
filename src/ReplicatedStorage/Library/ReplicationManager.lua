@@ -247,7 +247,7 @@ end
 
 
 function ReplicationManager.ReplicateOnlyTo(player, prefab)
-	Debugger:Warn("Deprecated method ReplicateOnlyTo", debug.traceback());
+	Debugger:Warn("Deprecated method ReplicateOnlyTo, use ReplicateOut", debug.traceback());
 	ReplicationManager.ReplicateOut({player}, prefab);
 end
 

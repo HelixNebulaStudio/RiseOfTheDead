@@ -63,9 +63,9 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, 60);
 		if mission == nil then return end;
 
-		Debugger:Log("mission.SaveData", mission.SaveData);
+		Debugger:StudioLog("mission.SaveData", mission.SaveData);
 		local profile = shared.modProfile:Get(player);
-		Debugger:Log("profile.Faction", profile.Faction);
+		Debugger:StudioLog("profile.Faction", profile.Faction);
 
 		local factionTag = tostring(profile.Faction.Tag);
 		local factionTitle = profile.Faction.FactionTitle;
@@ -147,9 +147,9 @@ return function(CutsceneSequence)
 					end
 					
 					local spawnName = spawnLocations[math.random(1, #spawnLocations)];
-					local enemySpawnPart = workspace:FindFirstChild(spawnName);
+					local enemySpawnPart = workspace:FindFirstChild(spawnName) or workspace:FindFirstChildWhichIsA("SpawnLocation");
 					
-					Debugger:Log("spawnLocations", spawnLocations, "enemySpawnPart",enemySpawnPart);
+					Debugger:StudioLog("spawnLocations", spawnLocations, "enemySpawnPart",enemySpawnPart);
 					
 					--Pick faction
 					local enemyFacInfo = {Icon="9890634236";};
@@ -163,7 +163,7 @@ return function(CutsceneSequence)
 							end
 						end
 						
-						Debugger:Log("Pick random faction ", list);
+						Debugger:StudioLog("Pick random faction ", list);
 						local pick = #list > 0 and globalFactionMetaList.List[list[math.random(1, #list)]] or nil;
 						if pick == nil then
 							Debugger:Warn("Use placeholder faction data");
@@ -173,7 +173,7 @@ return function(CutsceneSequence)
 								Icon="7702620744";
 							};
 						end
-						Debugger:Log("Picked ",pick);
+						Debugger:StudioLog("Picked ",pick);
 						enemyFacInfo.Tag = pick.Tag;
 						enemyFacInfo.Title = pick.Title;
 						enemyFacInfo.Icon = pick.Icon;
@@ -182,9 +182,6 @@ return function(CutsceneSequence)
 					
 					local enemyBanner = game.ReplicatedStorage.Prefabs.Items.factionbanner:Clone();
 					enemyBanner:SetAttribute("SpawnTick", tick());
-					player.Destroying:Connect(function()
-						game.Debris:AddItem(enemyBanner, 5);
-					end)
 
 					local primaryPart = enemyBanner:WaitForChild("Handle");
 					primaryPart.Anchored = true;
@@ -209,6 +206,7 @@ return function(CutsceneSequence)
 					enemyBanner:PivotTo(CFrame.new(pos) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0));
 					enemyBanner.Name = "Enemy faction banner";
 					enemyBanner.Parent = workspace.Environment;
+					modReplicationManager.ReplicateOut({player}, enemyBanner);
 
 					local bannerDestructible = require(enemyBanner:WaitForChild("Destructible"));
 					
@@ -222,21 +220,24 @@ return function(CutsceneSequence)
 						bannerDestructible.Enabled = true;
 					end)
 					
-					bannerDestructible.OnDestroy = function(self)
+					local function onEnemyBannerDestroy()
+						if mission.Type ~= 1 then return end;
+
 						shared.Notify(player, "Enemy faction banner was destroyed.", "Inform");
 						Debugger:Warn("Destroyed faction banner ", enemyFacInfo);
 
 						mission.SaveData.FactionData = {
 							EnemyTag = enemyFacInfo.Tag;
-						--	Timelapsed = os.time()-mission.StartTime;
 						};
 						
 						if game.Players:IsAncestorOf(player) then
 							modMission:CompleteMission(player, 60);
 						end
 					end
-						
+					enemyBanner.Destroying:Connect(onEnemyBannerDestroy);
+					bannerDestructible.OnDestroy = onEnemyBannerDestroy;
 					bannerDestructible.Enabled = true;
+
 					
 				end
 			elseif mission.Type == 3 then -- OnComplete
@@ -245,7 +246,7 @@ return function(CutsceneSequence)
 			end
 		end
 		mission.Changed:Connect(OnChanged);
-		OnChanged(true, mission);
+		OnChanged(true);
 	end)
 	
 	return CutsceneSequence;
