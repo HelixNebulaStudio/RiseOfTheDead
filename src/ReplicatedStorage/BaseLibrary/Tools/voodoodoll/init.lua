@@ -1,12 +1,19 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== 
-local modNpcProfileLibrary = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("NpcProfileLibrary"));
+--==
+local toolPackage = {
+	Type="RoleplayTool";
+	Animations={
+		Core={Id=4843250039;};
+		Use={Id=4706454123};
+	};
+}; 
 
-return function()
-	local Tool = {};
-	Tool.IsActive = false;
-	
-	function Tool:OnEquip()
+
+function toolPackage.NewToolLib(handler)
+	local toolLib = {};
+	toolLib.IsActive = false;
+
+	function toolLib:OnEquip()
 		self.CustomAssets = {};
 		
 		local character = self.Prefabs[1];
@@ -14,7 +21,7 @@ return function()
 		Debugger.Expire(character:FindFirstChild("Pants"), 0);
 	end
 	
-	function Tool:OnPrimaryFire(isActive)
+	function toolLib:OnPrimaryFire(isActive)
 		if isActive then
 			local character = self.Prefabs[1];
 			
@@ -30,6 +37,8 @@ return function()
 			local pick = players[math.random(1, #players)];
 			
 			if pick == "npc" or pick:FindFirstChild("Appearance") == nil then
+				local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
+
 				local npcName = modNpcProfileLibrary:GetRandom().Id;
 				local npcPrefabs = game.ServerStorage.PrefabStorage.Npc;
 				new = npcPrefabs:FindFirstChild(npcName) and npcPrefabs[npcName]:Clone();
@@ -59,5 +68,9 @@ return function()
 		end
 	end
 	
-	return Tool;
-end;
+	toolLib.__index = toolLib;
+	setmetatable(toolLib, handler);
+	return toolLib;
+end
+
+return toolPackage;

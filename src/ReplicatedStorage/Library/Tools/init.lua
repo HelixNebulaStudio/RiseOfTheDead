@@ -595,17 +595,6 @@ AddTool{
 }
 
 AddTool{
-	ItemId="voodoodoll";
-	Type="RoleplayTool";
-	Animations={
-		Core={Id=4843250039;};
-		Use={Id=4706454123};
-	};
-	Audio={
-	};
-}
-
-AddTool{
 	ItemId="boombox";
 	Type="RoleplayTool";
 	Animations={

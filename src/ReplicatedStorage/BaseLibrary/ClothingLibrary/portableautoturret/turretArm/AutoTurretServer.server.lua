@@ -19,6 +19,7 @@ local modToolService = require(game.ServerScriptService.ServerLibrary.ToolServic
 
 local turretArm: Model = script.Parent;
 local accessory: Accessory = turretArm.Parent :: Accessory;
+local accessoryHandle = accessory:WaitForChild("Handle") :: BasePart;
 local character: Model = accessory.Parent :: Model;
 local player: Player = game.Players:GetPlayerFromCharacter(character);
 local handlePoint: Attachment = turretArm:WaitForChild("Arm2"):WaitForChild("HandlePoint") :: Attachment;
@@ -34,6 +35,9 @@ local arm1 = turretArm:WaitForChild("Arm1");
 local jointHarCf = CFrame.new(hydraulicRod:WaitForChild("JointHRA").CFrame.Position);
 local jointAa2Cf = CFrame.new(arm1:WaitForChild("JointAA2").CFrame.Position);
 
+local vec3Scale = accessoryHandle.Size/accessoryHandle:GetAttribute("DefaultSize");
+local scale = (vec3Scale.X+vec3Scale.Y+vec3Scale.Z)/3;
+turretArm:ScaleTo(math.clamp(scale, 0.1, 1));
 
 local prefabsItems = game.ReplicatedStorage.Prefabs.Items;
 
@@ -531,6 +535,7 @@ end
 
 
 function Update()
+	if accessory.Parent and accessory.Parent.Name == "voodoodoll" then return end;
 	accessoryStorageItem = modStorage.FindIdFromStorages(accessorySiid, player);
 	local weaponStorageItemID = accessory:GetAttribute("WeaponStorageItemID");
 	

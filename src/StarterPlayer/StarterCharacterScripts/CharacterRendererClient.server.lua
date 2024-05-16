@@ -10,12 +10,7 @@ local function link(side)
 	local middleFinger: BasePart = character:WaitForChild(side.."Middle");
 	local pinkyFinger: BasePart = character:WaitForChild(side.."Pinky");
 
-	local function updateColor()
-		local newColor = hand.Color;
-		indexFinger.Color = newColor;
-		middleFinger.Color = newColor;
-		pinkyFinger.Color = newColor;
-		
+	local function updateVisual()
 		local player = game:GetService("Players"):GetPlayerFromCharacter(character);
 		if player ~= localPlayer then return end;
 
@@ -43,10 +38,8 @@ local function link(side)
 
 	end
 	
-	hand:GetPropertyChangedSignal("Color"):Connect(updateColor);
-	hand:GetAttributeChangedSignal("HideHands"):Connect(updateColor);
-	
-	updateColor();
+	hand:GetAttributeChangedSignal("HideHands"):Connect(updateVisual);
+	updateVisual();
 end
 
 link("Left");
