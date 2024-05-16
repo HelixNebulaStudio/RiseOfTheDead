@@ -111,7 +111,7 @@ function Interface.init(modInterface)
 				allLabel.Text = math.max(math.ceil(health + armor), 0).."/"..math.floor(maxPool);
 				
 			else
-				healthBars.label.Text = math.max(math.ceil(health), 0).."/"..math.floor(maxHealth);
+				healthBars.label.Text = math.max(math.ceil(health), 0).."/"..math.ceil(maxHealth);
 				armorBars.label.Text = math.max(math.floor(armor), 0).."/"..math.floor(maxArmor);
 				allLabel.Text = "";
 				

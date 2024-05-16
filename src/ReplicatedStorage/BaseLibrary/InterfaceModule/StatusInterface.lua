@@ -6,11 +6,10 @@ local Interface = {};
 Interface.__index = Interface;
 
 local RunService = game:GetService("RunService");
-local TextService = game:GetService("TextService");
 
 local localplayer = game.Players.LocalPlayer;
 
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 
 local modStatusLibrary = require(game.ReplicatedStorage.Library.StatusLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
@@ -19,7 +18,6 @@ local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
 local modRadialImage = require(game.ReplicatedStorage.Library.UI.RadialImage);
 
-local branchColor = modBranchConfigs.BranchColor
 local radialConfig = '{"version":1,"size":128,"count":128,"columns":8,"rows":8,"images":["rbxassetid://4467212179","rbxassetid://4467212459"]}';
 
 --== Script;

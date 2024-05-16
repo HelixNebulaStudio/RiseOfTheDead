@@ -815,20 +815,13 @@ function Player.new(playerInstance: Player)
 				overchargeHealth = overchargeHealth + v;
 			end
 			
-			--if classPlayer.Properties.ovehea then
-			--	overchargeHealth = overchargeHealth + classPlayer.Properties.OverHeal;
-			--end
-			
 			local baseHealth = classPlayer.Properties.BaseHealth;
 			
 			if overchargeHealth > 0 then
 				classPlayer.Humanoid.MaxHealth = baseHealth + modHealthPoints + overchargeHealth;
 
-			elseif modHealthPoints > 0 and classPlayer.Humanoid.MaxHealth > baseHealth + modHealthPoints then
-				classPlayer.Humanoid.MaxHealth = math.clamp(classPlayer.Humanoid.MaxHealth - 1, baseHealth, baseHealth + modHealthPoints);
-
-			elseif classPlayer.Humanoid.MaxHealth > baseHealth + modHealthPoints then
-				classPlayer.Humanoid.MaxHealth = classPlayer.Humanoid.MaxHealth - 1;
+			elseif classPlayer.Humanoid.MaxHealth > baseHealth + (modHealthPoints or 0) then
+				classPlayer.Humanoid.MaxHealth = classPlayer.Humanoid.MaxHealth - 0.1;
 
 			else
 				classPlayer.Humanoid.MaxHealth = (baseHealth + modHealthPoints + overchargeHealth);
