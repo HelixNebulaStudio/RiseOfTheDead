@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modScheduler = require(game.ReplicatedStorage.Library.Scheduler);
+local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 
 --==
 local EntityStatus = {};
@@ -15,6 +16,7 @@ function EntityStatus.new(preData)
 	local self = {
 		List = {};
 		ActiveJob = nil;
+		OnProcess = modEventSignal.new("OnEntityStatusProcess");
 	};
 	
 	if preData then
@@ -45,7 +47,8 @@ end
 function EntityStatus:Process()
 	local currTick = tick();
 	local earliestExpireTime = nil;
-	
+	local processed = false;
+
 	for k, v in pairs(self.List) do
 		if typeof(v) ~= "table" then continue end;
 		
@@ -56,6 +59,7 @@ function EntityStatus:Process()
 					status.OnExpire();
 				end
 				self.List[k] = nil;
+				processed = true;
 				
 			elseif (earliestExpireTime == nil or v.Expires < earliestExpireTime) then
 				earliestExpireTime = v.Expires;
@@ -74,6 +78,20 @@ function EntityStatus:Process()
 			self:Process();
 		end, earliestExpireTime);
 		
+	end
+	if processed then
+		self.OnProcess:Fire();
+	end
+end
+
+function EntityStatus:Destroy()
+	if self.ActiveJob then
+		self.Scheduler:Unschedule(self.ActiveJob);
+		self.ActiveJob = nil;
+	end;
+	if self.OnProcess then
+		self.OnProcess:Destroy();
+		self.OnProcess = nil;
 	end
 end
 

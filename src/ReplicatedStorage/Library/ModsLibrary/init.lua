@@ -1286,30 +1286,6 @@ Add{
 	Color=Color3.fromRGB(255, 238, 0);
 }
 
---Add{
---	Id="frostmod";
---	Name="Frostbite";
---	Desc="Enemies affected by frostbite dropped below 10% of their health will shatter and die. Slow enemies and applies a stack of frost and every stack adds more slow. On the 5th stack, the enemy will be stunned for the duration, duration may depend on enemies' stun resistance.";
---	Icon="rbxassetid://3576197517";
---	Tier=1;
---	Upgrades={
---		{DataTag="S"; Name="Slow"; Syntax="Increase Slowness"; MaxLevel=10; BaseCost=20; MaxCost=200; BaseValue=0.2; MaxValue=0.9; Scaling=ModsLibrary.ScalingStyle.NaturalCurve;};
---		{DataTag="T"; Name="Duration"; Syntax="Increase Duration"; ValueType="Normal"; Suffix="s"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=2; MaxValue=30; TweakBonus=10; Scaling=ModsLibrary.ScalingStyle.NaturalCurve;};
---	};
---	Stackable=false;
---	Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow";};
-	
---	EffectTrigger=ModsLibrary.EffectTrigger.Passive;
---	ActivationDuration=60;
---	CooldownDuration=30;
-	
---	Module=script.FrostMod;
---	Category="Elemental Mods";
---	Layer=199;
-
---	Element="Ice";
---	Color=Color3.fromRGB(0, 213, 255); 
---}
 Add{
 	Id="frostmod";
 	Name="Frostbite";
@@ -1427,6 +1403,25 @@ Add{
 	Category="Rare Mods";
 };
 
+Add{
+	Id="bluntknockoutmod";
+	Name="Blunt Melee Knockout";
+	Desc="Stuns an enemy for a duration.";
+	Icon="rbxassetid://17509658822";
+	BaseTier=2;
+	Tier=2;
+	Upgrades={
+		{DataTag="D"; Name="Duration"; Syntax="Upgrade Duration"; ValueType="Normal"; Suffix="s"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.5; MaxValue=5.5; Scaling=ModsLibrary.ScalingStyle.Linear;};
+	};
+	Stackable=false;
+	Type={"Blunt Melee"};
+	EffectTrigger=ModsLibrary.EffectTrigger.Passive;
+	Module=script.MeleeKnockout;
+	Category="Rare Mods";
+};
+
+
+
 --== Pointed Melee Mods;
 Add{
 	Id="pointdamagemod";
@@ -1444,26 +1439,6 @@ Add{
 	Module=script.MeleeDamage;
 	Category="Damage Mods";
 };
-
-
-
---Add{
---	Id="edgedcostmod";
---	Name="Edged Melee Stamina Cost";
---	Desc="";
---	Icon="http://www.roblox.com/asset/?id=4978532013";
---	Tier=1;
---	Upgrades={
---		{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.1; MaxValue=5; Scaling=ModsLibrary.ScalingStyle.NaturalCurve;};
---	};
---	Stackable=true;
---	Type={"Edged Melee"};
---	EffectTrigger=ModsLibrary.EffectTrigger.Passive;
---	Module=script.MeleeDamage;
---	Category="Damage Mods";
---};
-
-
 
 
 --== Clothing Mods;
@@ -1567,7 +1542,7 @@ Add{
 	BaseTier=1;
 	Tier=1;
 	Upgrades={
-		{DataTag="AP"; Name="Armor Points"; Syntax="Upgrade Armor Points"; ValueType="Normal"; Suffix="AP"; MaxLevel=5; BaseCost=10; MaxCost=100; BaseValue=0; MaxValue=100; Scaling=ModsLibrary.ScalingStyle.Linear;};
+		{DataTag="AP"; Name="Armor Points"; Syntax="Upgrade Armor Points"; ValueType="Normal"; Suffix="ap"; MaxLevel=5; BaseCost=10; MaxCost=100; BaseValue=0; MaxValue=100; Scaling=ModsLibrary.ScalingStyle.Linear;};
 		{DataTag="AR"; Name="Armor Rate"; Syntax="Upgrade Armor Rate"; ValueType="Normal"; MaxLevel=5; Suffix="ap/s"; BaseCost=10; MaxCost=100; BaseValue=0; MaxValue=10; Scaling=ModsLibrary.ScalingStyle.Linear;};
 	};
 	Stackable={

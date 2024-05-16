@@ -547,8 +547,8 @@ baseConfigInterface:Add("VisualsGraphics", "SliderOption", {
 
 
 baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
-	TitleProperties={Text="Death Ragdoll";};
-	DescProperties={Text="Enemies ragdoll on death.";};
+	TitleProperties={Text="Enemy Ragdoll";};
+	DescProperties={Text="Enemies ragdolls during death or stun.";};
 	Config={
 		SettingsKey="DisableDeathRagdoll";
 		Type="Toggle";

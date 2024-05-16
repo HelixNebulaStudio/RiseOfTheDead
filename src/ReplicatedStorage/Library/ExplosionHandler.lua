@@ -154,14 +154,19 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 
 					local humanoid = typeof(damagable.HealthObj) == "Instance" and damagable.HealthObj:IsA("Humanoid") and damagable.HealthObj or nil;
 					
-					if params.ExplosionStun then
-						local healthInfo = damagable:GetHealthInfo();
-						if healthInfo.Armor <= 0 and damage > healthInfo.MaxHealth*(params.ExplosionStunThreshold or 0.23) and humanoid then
-							damagable.HealthObj.PlatformStand = true;
-							task.delay(params.ExplosionStun, function()
-								damagable.HealthObj.PlatformStand = false;
-							end)
+					if damagable.Object.ClassName == "NpcStatus" then
+						if params.ExplosionStun then
+							local healthInfo = damagable:GetHealthInfo();
+							if healthInfo.Armor <= 0 and damage > healthInfo.MaxHealth*(params.ExplosionStunThreshold or 0.23) and humanoid then
+								local npcModule = damagable.Object:GetModule();
+
+								npcModule.EntityStatus:GetOrDefault("explosionRagdoll", {
+									Ragdoll=true;
+									Expires=tick()+params.ExplosionStun;
+								});
+							end
 						end
+
 					end
 
 					if params.DamageRatio then

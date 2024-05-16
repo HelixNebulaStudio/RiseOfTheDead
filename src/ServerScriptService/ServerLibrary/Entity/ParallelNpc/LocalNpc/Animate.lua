@@ -133,6 +133,7 @@ function Animate.new(parallelNpc)
 	
 	local movingSpeedThreshold = 0.1;
 	humanoid.Running:Connect(function(speed)
+		if humanoid.PlatformStand then return end;
 		self.CurrentSpeed = speed;
 		
 		if speed > movingSpeedThreshold then
@@ -171,6 +172,11 @@ function Animate.new(parallelNpc)
 			self.IsClimbing = false;
 			self.IsSwimming = true;
 			
+		elseif newState == Enum.HumanoidStateType.PlatformStanding then
+			self.IsClimbing = false;
+			self.IsClimbing = false;
+			self.CurrentSpeed = 0;
+
 		end
 		
 		movementUpdate(self.CurrentSpeed);

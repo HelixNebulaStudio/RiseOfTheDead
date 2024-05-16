@@ -38,6 +38,9 @@ function StatusLogic.new(self)
 			if status.SlowValue and (slowValue == nil or status.SlowValue < slowValue) then
 				slowValue = status.SlowValue;
 			end
+			if status.Ragdoll then
+				ragdollStatus = status;
+			end
 			if status.Hijacked then
 				hijackedStatus = status;
 			end
@@ -61,7 +64,7 @@ function StatusLogic.new(self)
 			if self.Humanoid:GetAttribute("Ragdoll") ~= true then
 				self.Humanoid:SetAttribute("Ragdoll", true);
 				self.Move:SetMoveSpeed("set", "ragdoll", 0, 20);
-				self:SetNetworkOwner("auto");
+				self.Humanoid.PlatformStand = true;
 				
 			end
 			
@@ -71,7 +74,7 @@ function StatusLogic.new(self)
 			if self.Humanoid:GetAttribute("Ragdoll") == true then
 				self.Humanoid:SetAttribute("Ragdoll", false);
 				self.Move:SetMoveSpeed("remove", "ragdoll");
-				self:SetNetworkOwner(nil);
+				self.Humanoid.PlatformStand = false;
 				
 			end
 			

@@ -51,6 +51,8 @@ local statTemplates = {
 		{Category="Configurations"; Tag="Damage"; Text="<b>Damage:</b>    $stat"; Type="3dp"};
 		{Category="Configurations"; Tag="PrimaryAttackSpeed"; Text="<b>Attack Speed:</b>    $stat"; Type="3dp"};
 		{Category="Configurations"; Tag="Knockback"; Text="<b>Knockback:</b>    $stat"; Type="2dp"};
+		{Category="Configurations"; Tag="KnockoutDuration"; Text="<b>Knockout Duration:</b>    $stats"; Type="2dp"};
+		
 		{Category="Configurations"; Tag="StaminaCost"; Text="<b>Stamina Cost:</b>    $stat"; Type="2dp"};
 
 		{Category="Configurations"; Tag="HeavyAttackMultiplier"; Text="<b>Heavy Attack Multiplier:</b>    $stat%"; Type="percent"};
@@ -227,6 +229,9 @@ local mouseOverDescription = {
 	};
 	Knockback={
 		Desc="The velocity the target will be knocked back. \n\n(Higher is better)";
+	};
+	KnockoutDuration={
+		Desc="The duration of zombies being disabled. \n\n(Higher is better)";
 	};
 	RapidFire={
 		Desc="Seconds it takes to reach max fire rate. Increases rate of fire the longer you fire until it reaches rate fire cap.\n\n(Lower is better)";

@@ -6,17 +6,19 @@ local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 function Mod.Activate(packet)
 	local module = packet.WeaponModule;
 
-	local layerInfo = modModsLibrary.GetLayer("KB", packet);
+	local layerInfo = modModsLibrary.GetLayer("D", packet);
 	local value, tweakVal = layerInfo.Value, layerInfo.TweakValue;
 	
 	if tweakVal then
 		value = value + tweakVal;
 	end
 	
-	local baseKnockback = module.Configurations.BaseKnockback or 0;
-	local additional = baseKnockback * value;
+	local baseKnockoutDuration = module.Configurations.BaseKnockoutDuration or 0;
+	local new = baseKnockoutDuration + value;
 
-	module.Configurations.Knockback = (module.Configurations.Knockback or baseKnockback) + additional;
+	if module.Configurations.KnockoutDuration == nil or module.Configurations.KnockoutDuration < new then
+		module.Configurations.KnockoutDuration = new;
+	end
 end
 
 return Mod;

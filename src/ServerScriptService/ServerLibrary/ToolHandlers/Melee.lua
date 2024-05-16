@@ -3,16 +3,11 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 --== Modules;
-local modTools = require(game.ReplicatedStorage.Library.Tools);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
-local modArcTracing = require(game.ReplicatedStorage.Library.ArcTracing);
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 local modWeaponMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
@@ -72,12 +67,6 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 		if damageRatio then 
 			damage = damage * damageRatio;
 			
-			--local disarmStatus = damagableObj:GetEffect("DisarmCooldown");
-			--if disarmStatus == nil or tick()-disarmStatus > 0 then
-			--	damagableObj:SetEffect("Disarm", tick()+1);
-			--	damagableObj:SetEffect("DisarmCooldown", tick()+5);
-			--end
-			
 			if self.Player and damagableObj:CanTakeDamageFrom(self.Player) then
 				
 				if npcModule and npcModule.KnockbackResistant == nil then
@@ -85,8 +74,21 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 					if knockbackStrength and damage > 0 then
 						local rootPart = model.PrimaryPart;
 						local playerRootPart = self.Character and self.Character.PrimaryPart;
-						if rootPart == nil or playerRootPart == nil then return end
-						rootPart.Velocity = (playerRootPart.CFrame.LookVector * knockbackStrength) + Vector3.new(0, 40, 0);
+						if rootPart and playerRootPart then
+							rootPart.Velocity = (playerRootPart.CFrame.LookVector * knockbackStrength) + Vector3.new(0, 40, 0);
+						end
+					end
+
+					local knockoutDuration = configurations.KnockoutDuration or configurations.BaseKnockoutDuration;
+					if knockoutDuration and damage > 0 then
+						local healthInfo = damagable:GetHealthInfo();
+						if healthInfo.Armor <= 0 then
+							npcModule.EntityStatus:GetOrDefault("meleeKnockout", {
+								Ragdoll=true;
+								Expires=tick()+knockoutDuration;
+							});
+							
+						end
 					end
 				end
 			end
@@ -217,11 +219,8 @@ function ToolHandler:OnPrimaryFire(...)
 	if humanoid and humanoid.Health > 0 and self.Attacking ~= true then
 		
 		if attackType == "Throw" then
-			local attackType, origin, direction, throwCharge, rootVelocity = ...;
+			local _, origin, direction, throwCharge, rootVelocity = ...;
 			if origin == nil or direction == nil or throwCharge == nil or rootVelocity == nil then return end;
-			local character = self.Character;
-			local humanoid = character and character:FindFirstChild("Humanoid");
-			local rootPart = humanoid and humanoid.RootPart;
 			
 			local configurations = self.ToolConfig.Configurations;
 			local _, handle = next(self.Prefabs);
@@ -229,13 +228,13 @@ function ToolHandler:OnPrimaryFire(...)
 			
 			if humanoid and humanoid.Health > 0 then
 				
-				if typeof(origin) ~= "Vector3" then Debugger:Warn("Origin is not vector3") return end;
-				if typeof(direction) ~= "Vector3" then Debugger:Warn("Direction is not vector3") return end;
-				if typeof(throwCharge) ~= "number" then Debugger:Warn("ThrowCharge is not a number") return end;
-				if typeof(rootVelocity) ~= "Vector3" then Debugger:Warn("RootVelocity is not vector3") return end;
+				if typeof(origin) ~= "Vector3" then Debugger:Warn("Origin is not vector3"); return end;
+				if typeof(direction) ~= "Vector3" then Debugger:Warn("Direction is not vector3"); return end;
+				if typeof(throwCharge) ~= "number" then Debugger:Warn("ThrowCharge is not a number"); return end;
+				if typeof(rootVelocity) ~= "Vector3" then Debugger:Warn("RootVelocity is not vector3"); return end;
 				
 				local distanceFromHandle = (handle.Position - origin).Magnitude;
-				if distanceFromHandle > 10 then Debugger:Warn("Too far from handle.") return end;
+				if distanceFromHandle > 10 then Debugger:Warn("Too far from handle."); return end;
 				
 				local itemLib = modItemsLibrary:Find(self.StorageItem.ItemId);
 				
@@ -246,7 +245,6 @@ function ToolHandler:OnPrimaryFire(...)
 				
 				throwCharge = math.clamp(throwCharge, 0, 1);
 				direction = direction.Unit;
-				--rootVelocity = rootVelocity.Unit * math.clamp(rootVelocity.Magnitude, 0, 60);
 				
 				local projectileObject = modProjectile.Fire(configurations.ProjectileId, CFrame.new(origin, origin + direction), Vector3.new(), nil, self.Player, self.ToolConfig);
 				projectileObject.TargetableEntities = TargetableEntities;

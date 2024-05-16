@@ -89,11 +89,18 @@ function NpcComponent:LoadClientScript(players)
 	end
 end
 
+function NpcComponent:IsRagdolling()
+	local ragdollEnabled = self.Humanoid:GetAttribute("Ragdoll") == true;
+	if self.IsDead then ragdollEnabled = true end;
+
+	return ragdollEnabled;
+end
+
 function NpcComponent:RefreshRagdollJoints()
 	local prefab: Model = self.Prefab;
 	if prefab == nil then return end;
 
-	local ragdollEnabled = true;
+	local ragdollEnabled = self:IsRagdolling();
 
 	local canRagdoll = prefab:GetAttribute("HasRagdoll") == true;
 	if canRagdoll then
@@ -534,6 +541,10 @@ return function(self) : NpcModule
 		self.Properties = {};
 	end
 	self.EntityStatus = modEntityStatus.new(self.Properties);
+	self.EntityStatus.OnProcess:Connect(function()
+		if self.IsDead then return end;
+		self.Think:Fire();
+	end)
 	
 	self.LastDamageTaken = tick();
 	
@@ -558,6 +569,10 @@ return function(self) : NpcModule
 		end
 	end)
 	
+	self.Humanoid.StateChanged:Connect(function()
+		self:RefreshRagdollJoints();
+	end)
+
 	setmetatable(self, NpcComponent);
 	-- initialized;
 	self.Garbage:Tag(function()

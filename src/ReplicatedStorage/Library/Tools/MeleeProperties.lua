@@ -8,7 +8,6 @@ function MeleeConfigurations:Reset()
 	self.Configurations.Knockback = self.Configurations.BaseKnockback;
 	self.Configurations.Damage = self.Configurations.BaseDamage;
 	
-	
 end
 
 function MeleeConfigurations.new(modMelee)

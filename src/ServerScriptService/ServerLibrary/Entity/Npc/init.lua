@@ -231,9 +231,9 @@ end
 	
 	@param character <Model> Prefab of npc.
 	@param range Range of detection.
-	@param func? (npcModule)-> boolean Match function, return true to attract. Defaultly returns true.
+	@param func `(npcModule)->boolean?` Match function, return true to attract. Defaultly returns true.
 
-	@returns {[number]: Model | Actor} List of npc prefab models.
+	@return List of npc prefab models.
 ]]
 Npc.AttractEnemies = function(character: Model, range: number, func: ((npcModule: modNpcComponent.NpcModule)-> boolean)? ): {[number]: Model | Actor}
 	local humanoid = character and character:FindFirstChildWhichIsA("Humanoid") or nil;
@@ -285,7 +285,7 @@ end
 	@param cframe <CFrame> Spawn location of NPC.
 	@param preloadCallback <Function> Function(Model npc, NpcModule npcModule) called after NPC Module has been loaded.
 	@param customNpcModule <NpcModule:Object> Load in a custom NPC Module for the NPC.
-	@returns Model npc Returns NPC's character model.
+	@return Model npc Returns NPC's character model.
 **--]]
 Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	if name == "Ticks Zombie" then
