@@ -125,7 +125,7 @@ return function(self)
 			local burpSpeed = 10 + (level/25);
 			local velocity = modMath.CFrameSpread(aimDir, 5) * (burpSpeed+ math.random(0,2));
 
-			local projectileObject = modProjectile.Fire("confusionGas", CFrame.new(origin));
+			local projectileObject = modProjectile.Fire("burpgas", CFrame.new(origin));
 			projectileObject.Owner = self.Prefab;
 			
 			modProjectile.ServerSimulate(projectileObject, origin, velocity, {CollectionService:GetTagged("PlayerCharacters")});

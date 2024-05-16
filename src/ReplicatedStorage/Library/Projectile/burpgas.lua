@@ -30,6 +30,9 @@ function Pool.new(owner)
 		Acceleration=Vector3.new(0, -0.2, 0);
 		KeepAcceleration = true;
 		RayRadius=1.5;
+		
+		IgnoreEntities=true;
+		AddIncludeTags={"PlayerCharacters"};
 	};
 	
 	function projectile:Activate()
@@ -62,25 +65,7 @@ function Pool.new(owner)
 			modStatusEffects.Dizzy(player, 3, "bloater");
 		end
 		
-			
 		return true;
-		--if arcPoint.Hit and not arcPoint.Hit.Anchored then
-		--	self.Prefab.Anchored = false;
-		--	if RunService:IsServer() then
-		--		if self.Prefab:CanSetNetworkOwnership() then self.Prefab:SetNetworkOwner(nil) end;
-		--	end
-			
-		--	local hitPart, hitPoint = arcPoint.Hit, arcPoint.Point;
-		--	local weld = Instance.new("Motor6D");
-		--	weld.Name = "stick";
-		--	weld.Parent = self.Prefab;
-			
-		--	weld.Part0 = self.Prefab;
-		--	weld.Part1 = hitPart;
-			
-		--	local worldCf = CFrame.new(hitPoint, hitPoint - arcPoint.Direction);
-		--	weld.C1 = hitPart.CFrame:ToObjectSpace(worldCf);
-		--end
 	end
 	
 	return projectile;
