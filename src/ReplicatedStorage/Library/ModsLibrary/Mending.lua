@@ -14,7 +14,8 @@ function Mod.Activate(packet)
 	end
 	
 	module:RegisterPlayerProperty("Mending", {
-		Time=value;
+		Visible = false;
+		Time = value;
 	}, true);
 end
 

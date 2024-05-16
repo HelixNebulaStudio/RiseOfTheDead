@@ -10,6 +10,7 @@ library.MergeTypes = {
 	Smallest="Smallest";
 };
 
+
 library.GroupSettings = {
 	ChestGroup = {
 		Overlappable = false;
@@ -29,6 +30,7 @@ library.StatStruct = {
 	Warmth={MergeType=library.MergeTypes.Add;};
 	AdditionalStamina={MergeType=library.MergeTypes.Add;};
 	EquipTimeReduction={MergeType=library.MergeTypes.Multiply;};
+	HotEquipSlots={MergeType=library.MergeTypes.Largest;};
 	
 	UnderwaterVision={MergeType=library.MergeTypes.Largest;};
 	
@@ -36,6 +38,7 @@ library.StatStruct = {
 	OxygenRecoveryRate={MergeType=library.MergeTypes.Largest;};
 	FlinchProtection={MergeType=library.MergeTypes.Largest;};
 };
+
 
 library:SetOnAdd(function(data)
 	if data.NewToolLib then return end;

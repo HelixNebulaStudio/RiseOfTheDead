@@ -46,8 +46,8 @@ function AppearanceData:Update(storage)
 	local wardrobeStorage = modStorage.Get("Wardrobe", self.Player);
 	
 	local updated = {};
-	for storageItemId, _ in pairs(storage.Container) do
-		local storageItem = storage.Container[storageItemId];
+	for storageItemID, _ in pairs(storage.Container) do
+		local storageItem = storage.Container[storageItemID];
 		
 		local vanityItem;
 		if storageItem.Vanity then
@@ -101,7 +101,7 @@ function AppearanceData:Update(storage)
 		--== Clothing Functions
 		local clothingPackage = modClothingLibrary:Find(storageItem.ItemId);
 		if clothingPackage and clothingPackage.NewToolLib then
-			local clothingClass = profile:GetItemClass(storageItemId);
+			local clothingClass = profile:GetItemClass(storageItemID);
 			local _clothingClassMeta = getmetatable(clothingClass);
 
 			local maxHealth = storageItem:GetValues("MaxHealth");
@@ -111,7 +111,7 @@ function AppearanceData:Update(storage)
 			end
 			
 			if clothingClass then
-				classPlayer.ClothingPropertiesCache[storageItemId] = clothingClass;
+				classPlayer.ClothingPropertiesCache[storageItemID] = clothingClass;
 
 				if clothingClass.ActiveProperties then -- Equip statuses;
 					for k, v in pairs(clothingClass.ActiveProperties) do
@@ -194,8 +194,8 @@ function AppearanceData:Update(storage)
 	local character = self.Player.Character;
 	if character then
 		for _, accessory in pairs(character:GetChildren()) do
-			local storageItemId = accessory:GetAttribute("StorageItemId");
-			local storageItem = storageItemId and storage.Container[storageItemId];
+			local storageItemID = accessory:GetAttribute("StorageItemId");
+			local storageItem = storageItemID and storage.Container[storageItemID];
 			
 			if storageItem then
 				if accessory:GetAttribute("StorageIndex") then
@@ -272,11 +272,11 @@ function AppearanceData:Update(storage)
 	
 	local accessoryPrefabs = modCustomizeAppearance.RefreshIndex(character);
 	
-	for storageItemId, prefabsList in pairs(accessoryPrefabs) do
-		local clothingClass = classPlayer.ClothingPropertiesCache[storageItemId];
+	for storageItemID, prefabsList in pairs(accessoryPrefabs) do
+		local clothingClass = classPlayer.ClothingPropertiesCache[storageItemID];
 		
 		if clothingClass and clothingClass.RefreshPrefabs then
-			clothingClass:RefreshPrefabs(storageItemId, prefabsList);
+			clothingClass:RefreshPrefabs(storageItemID, prefabsList);
 		end
 	end
 end
@@ -334,7 +334,7 @@ function AppearanceData:SetEquip(group, accessoryData, storageItem)
 	return accessories;
 end
 
-function AppearanceData:GetAccessories(storageItemId)
+function AppearanceData:GetAccessories(storageItemID)
 	local character = self.Player.Character;
 	while character == nil and game.Players:IsAncestorOf(self.Player) do
 		character = self.Player.Character;
@@ -345,7 +345,7 @@ function AppearanceData:GetAccessories(storageItemId)
 	if character == nil then return list end;
 	
 	for _, accessory in pairs(character:GetChildren()) do
-		if accessory:GetAttribute("StorageItemId") == storageItemId then
+		if accessory:GetAttribute("StorageItemId") == storageItemID then
 			table.insert(list, accessory);
 		end
 	end
