@@ -119,13 +119,18 @@ function StorageInterface.SetQuickTarget(interface)
 end
 
 function StorageInterface.GetEmptyInventorySlotData(TableB)
-	local inventoryInterface = StorageInterface.GetInterfaceWithStorageId("Inventory");
-	if inventoryInterface then
-		local slotData = inventoryInterface:GetEmptySlotData(TableB);
+	local modInterface = modData:GetInterfaceModule();
+
+	for index, interface in pairs(modInterface.StorageInterfaces) do
+		if interface.StorageId ~= "Inventory" then continue end;
+		if interface.PremiumOnly == true and modData.IsPremium ~= true then continue end;
+
+		local slotData = interface:GetEmptySlotData(TableB);
 		if slotData then
 			return slotData;
 		end
 	end
+
 	return;
 end
 

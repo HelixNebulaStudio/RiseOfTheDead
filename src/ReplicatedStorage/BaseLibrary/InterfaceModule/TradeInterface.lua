@@ -326,12 +326,6 @@ function Interface.init(modInterface)
 		otfObjects.NameLabel.Text = (otherData.Premium and modRichFormatter.GoldText(otherData.Name) or otherData.Name)..
 			(npcLib and " (" ..npcLib.Class..")" or "");
 		
-		--tradeFeeLabel.Text = ("Trade Fee: $$Fee"):gsub("$Fee", Interface.TradeSession.Fee);
-		--tradeFeeLabel.TextColor3 = localData.Money >= Interface.TradeSession.Fee and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(125, 60, 60);
-		--localTraderRep.Text = ("Trading Reputation: $Rep%"):gsub("$Rep", math.floor(localData.Rep*100));
-		--localTraderRep.TextColor3 = localData.Rep > 0 and Color3.fromRGB(120, 255, 136) or localData.Rep < 0 and Color3.fromRGB(255, 84, 84) or Color3.fromRGB(255, 255, 255);
-		--localTraderPremium.Text = "Total Gold Tax: "..goldHeaderTag.. modFormatNumber.Beautify(localData.GoldTax) .."G </font>";
-
 		ltfObjects.AvatarLabel.Image = localAvatar;
 
 		if Interface.TradeSession.ComputerSession ~= true then
@@ -520,7 +514,7 @@ function Interface.init(modInterface)
 		end
 		confirmGradient.Color = ColorSequence.new(color);
 		
-		modStorageInterface.SetQuickTarget();
+		modStorageInterface.SetQuickTarget(localStorageInterface);
 
 		otherStorageInterface.StorageId = otherData.Name.."Trade";
 		otherStorageInterface.ViewOnly = true;
