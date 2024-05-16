@@ -2601,7 +2601,7 @@ MissionLibrary.New{
 		{Text="Objectives"; CompleteText="Trade the items with Rachel"; Objectives={"Item1"; "Item2"};};
 	};
 	Objectives={
-		["Item1"]={Index=1; Description="$Amount Nekron Scales"; Type="RequireItem"; ItemId="nekronscales"; Amount=6;};
+		["Item1"]={Index=1; Description="$Amount Nekron Scales"; Type="RequireItem"; ItemId="nekronscales"; Amount=8;};
 		["Item2"]={Index=2; Description="$Amount Nekron Particulate"; Type="RequireItem"; ItemId="nekronparticulate"; Amount=3;};
 	};
 	GuideText="Talk to Rachel to start";
