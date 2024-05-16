@@ -416,7 +416,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 			
 			attackTime = math.max(attackTime, 0.1);
 			nextAttackTick = tick()+attackTime;
-			wait(attackTime);
+			task.wait(attackTime);
 			
 			characterProperties.Joints.WaistY = configurations.WaistRotation;
 			

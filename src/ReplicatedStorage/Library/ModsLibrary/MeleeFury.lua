@@ -14,16 +14,6 @@ function Mod.Activate(packet)
 	end
 	
 	module.MeleeFury = value;
-	
-	
-	--local modStorageItem, module = paramPacket.ModStorageItem, paramPacket.WeaponModule;
-	
-	--local info = ModsLibrary.Get(modStorageItem.ItemId);
-	--local values = modStorageItem.Values;
-
-	--local muti = ModsLibrary.NaturalInterpolate(info.Upgrades[1].BaseValue, info.Upgrades[1].MaxValue, values["AS"], info.Upgrades[1].MaxLevel);
-
-	--module.MeleeFury = muti;
 end
 
 return Mod;

@@ -178,8 +178,8 @@ function ToolHandler:OnToolEquip(toolModule)
 				
 				if damagable then
 					local model = damagable.Model;
+
 					local victim = self.VictimsList[model];
-					
 					if victim then
 						victim.HitTick=tick();
 					else
@@ -206,11 +206,12 @@ function ToolHandler:OnToolUnequip()
 	self.Equipped = false;
 	self.Attacking = nil;
 	if self.MeleeTag then self.MeleeTag:Destroy() end;
-	self.VictimsList = {};
+	table.clear(self.VictimsList);
 	self.Colliders = nil;
 end
 
 function ToolHandler:OnPrimaryFire(...)
+	local classPlayer = shared.modPlayers.Get(self.Player);
 	local character = self.Character;
 	local humanoid = character and character:FindFirstChild("Humanoid");
 	local attackType = ...;
@@ -278,8 +279,8 @@ function ToolHandler:OnPrimaryFire(...)
 				
 				if damagable then
 					local model = damagable.Model;
+
 					local victim = self.VictimsList[model];
-					
 					if victim then
 						victim.HitTick=tick();
 					else
@@ -298,17 +299,33 @@ function ToolHandler:OnPrimaryFire(...)
 				end
 			end
 			
-			for hitModel, _ in pairs(self.VictimsList) do
-				local hitInfo = self.VictimsList[hitModel];
-				
-				if hitInfo and hitInfo.HitTick >= self.PrimaryFireTick then
+			for hitModel, hitInfo in pairs(self.VictimsList) do
+				if hitInfo.HitTick >= self.PrimaryFireTick then
 					hitInfo.Hit = true;
 					self:PrimaryAttack(hitInfo.Damagable, hitInfo.HitPart);
 				end
 			end
-			task.wait(configurations.PrimaryAttackSpeed);
+			
+			local attackTime = configurations.PrimaryAttackSpeed;
+			local playerBodyEquipments = classPlayer.Properties and classPlayer.Properties.BodyEquipments;
+			
+			if playerBodyEquipments and modConfigurations.DisableGearMods ~= true then
+				if playerBodyEquipments.MeleeFury then
+					local meleeFuryBonus = 5 * playerBodyEquipments.MeleeFury;
+					if meleeFuryBonus > 0 then
+						attackTime = attackTime * (1-math.clamp(meleeFuryBonus, 0, 1));
+					end
+				end
+			end
+			
+			attackTime = math.max(attackTime, 0.1);
+			task.wait(attackTime);
+
 			self.Attacking = nil;
-			self.VictimsList = {};
+			for hitModel, hitInfo in pairs(self.VictimsList) do
+				if hitInfo.Hit ~= true then continue end;
+				hitInfo.Hit = nil;
+			end
 			
 		end
 	end
