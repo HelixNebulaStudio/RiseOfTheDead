@@ -1388,7 +1388,7 @@ GoldShopLibrary.Products:Add{
 	Desc="While player is in the air, reload time is reduced to zero. Compatiable with Rocket tools such as AT4 Rocket Launcher.";
 	Product={
 		Type="Gold";
-		Price=2950;
+		Price=4990;
 		ItemId="rocketmanmod";
 	};
 	LimitedId="gs_rocketmanmod";
@@ -1555,6 +1555,31 @@ GoldShopLibrary.Products:Add{
 	Trader={Buy=true; Sell=true;};
 };
 
+GoldShopLibrary.Products:Add{
+	Id="bluntknockoutmod";
+	Product={
+		Type="Gold";
+		Price=4990;
+		ItemId="bluntknockoutmod";
+		New=true;
+	};
+
+	Trader={Buy=true; Sell=true;};
+};
+
+GoldShopLibrary.Products:Add{
+	Id="apron";
+	Product={
+		Type="Gold";
+		Price=4990;
+		ItemId="apron";
+		New=true;
+	};
+
+	Trader={Buy=true; Sell=true;};
+};
+
+
 --=== CONTENT PAGES
 
 GoldShopLibrary.Pages = {
@@ -1684,6 +1709,8 @@ GoldShopLibrary.Pages = {
 	};
 	
 	NewItems = {
+		{Type="Product"; Id="apron"};
+		{Type="Product"; Id="bluntknockoutmod"};
 		{Type="Product"; Id="portableautoturret"};
 		{Type="Product"; Id="engineersplanner"};
 		{Type="Product"; Id="ticksnaretrapbp"};

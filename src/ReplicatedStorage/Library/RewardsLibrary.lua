@@ -672,6 +672,7 @@ library:Add{
 		{Index=1; ItemId="cannedfish"; Quantity={Min=1; Max=2}; Chance=1;};
 		{Index=1; ItemId="mk2grenade"; Quantity=1; Chance=1;};
 		
+		{Index=2; ItemId="bluntknockoutmod"; Recyclable=true; Quantity=1; Chance=1;};
 		{Index=2; ItemId="healthmod"; Recyclable=true; Quantity=1; Chance=1;};
 		{Index=2; ItemId="vexling"; Recyclable=true; Quantity={Min=1; Max=2}; Chance=1;};
 		{Index=2; ItemId="vexgloves"; Recyclable=true; Quantity=1; Chance=0.5;};
@@ -748,8 +749,8 @@ library:Add{
 		{Index=1; ItemId="ziphoningserum"; Quantity=1; Chance=1;};
 		{Index=1; ItemId="mendingmod"; Quantity=1; Chance=1;};
 		
-		{Index=1; ItemId="armwrapsmissingtextures"; Quantity=1; Chance=1/100;};
-		{Index=1; ItemId="scraparmormissingtextures"; Quantity=1; Chance=1/100;};
+		{Index=2; ItemId="armwrapsmissingtextures"; Quantity=1; Chance=1/100;};
+		{Index=2; ItemId="scraparmormissingtextures"; Quantity=1; Chance=1/100;};
 	};
 };
 
