@@ -21,7 +21,9 @@ return function(self)
 	}
 	
 	local targetHumanoid, targetRootPart: BasePart;
-	local cache = {};
+	local cache = {
+		LastBurp = nil;
+	};
 	cache.AttackCooldown = tick();
 
 	tree:Hook("StatusLogic", self.StatusLogic);
@@ -129,8 +131,10 @@ return function(self)
 			modProjectile.ServerSimulate(projectileObject, origin, velocity, {CollectionService:GetTagged("PlayerCharacters")});
 			
 			task.wait(math.random(500,700)/1000);
+			if self.IsDead then break end;
 		end
-		
+		if self.IsDead then return tree.Failure; end;
+
 		task.wait(math.random(250,350)/1000);
 		self.Move:SetMoveSpeed("remove", "burp");
 
