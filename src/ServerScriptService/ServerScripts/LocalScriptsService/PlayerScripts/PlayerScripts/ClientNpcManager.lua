@@ -59,7 +59,6 @@ return function()
 	-- MARK: Deadbody Handler
 	local lastDbDespawnTick = tick();
 	CollectionService:GetInstanceAddedSignal("Deadbody"):Connect(function(prefab: Model)
-		--local humanoid = prefab:FindFirstChildWhichIsA("Humanoid") :: Humanoid;
 		if prefab == nil or not workspace:IsAncestorOf(prefab) then return end;
 
 		local disabledRagdoll = modData:GetSetting("DisableDeathRagdoll") == 1;
@@ -86,13 +85,8 @@ return function()
 		local maxDeadbodies = modData:GetSetting("MaxDeadbodies");
 
 		if modBranchConfigs.CurrentBranch.Name == "Live" or deadbodyDespawnTimer < 61 then
-			if deadbodyDespawnTimer > 5 then
-				task.delay(5, function()
-					game.Debris:AddItem(prefab, deadbodyDespawnTimer-5);
-				end)
-			else
-				game.Debris:AddItem(prefab, deadbodyDespawnTimer);
-			end
+			-- Has despawn timer;
+			Debugger.Expire(prefab, deadbodyDespawnTimer);
 		end
 		
 		if lastDbDespawnTick == nil or tick()-lastDbDespawnTick > 1 then
@@ -120,10 +114,7 @@ return function()
 	end)
 	task.spawn(function()
 		for _, prefab: Model in pairs(CollectionService:GetTagged("Deadbody")) do
-			if workspace:IsAncestorOf(prefab) then
-				prefab:Destroy();
-			end
-			task.wait();
+			Debugger.Expire(prefab);
 		end
 	end)
 	

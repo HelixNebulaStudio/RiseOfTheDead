@@ -68,7 +68,7 @@ if RunService:IsServer() then
 					local npcTradeStorage = tradingSession.Storages[npcName];
 					
 					local requiredItems = {
-						{ItemId="nekronscales"; Quantity=6; };
+						{ItemId="nekronscales"; Quantity=8; };
 						{ItemId="nekronparticulate"; Quantity=3;};
 					};
 					
