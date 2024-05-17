@@ -30,7 +30,7 @@ function Component.new(Npc)
 	Wield.Controls = {
 		Mouse1Down = false; 
 	}
-	Wield.AllowShooting = true;
+	Wield.AllowShooting = false;
 	Wield.ReloadCoolDown = tick();
 	Wield.Handler = nil;
 	Wield.Audio = {};

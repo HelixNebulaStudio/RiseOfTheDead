@@ -225,15 +225,18 @@ function Handler:Equip()
 	self.AnimGroup:Play("Core");
 	self:PlayLoad();
 
+	task.delay(1, function()
+		self.Wield.AllowShooting = true;
+		if self.Wield.ToolModule then
+			self.Wield.ToolModule.Properties.CanPrimaryFire = true;
+		end
+	end);
+
 	local audio = self.Wield.ToolModule.Audio;
 	if audio then
 		modAudio.Play(audio.Load.Id, self.Npc.RootPart);
 	end
 	
-	delay(self.Wield.ToolModule.Configurations.EquipLoadTime+0.5, function()
-		self.Wield.AllowShooting = true;
-		if self.Wield.ToolModule then self.Wield.ToolModule.Properties.CanPrimaryFire = true; end
-	end);
 end
 
 function Handler:PlayLoad()
@@ -277,7 +280,6 @@ function Handler:Unequip()
 	self.AnimGroup:Destroy();
 	
 	self.Wield.ToolModule = nil;
-	self.Wield.AllowShooting = true;
 end
 
 function Handler:PrimaryFire(direction)
@@ -491,6 +493,8 @@ function Handler:FireWeapon(direction)
 									table.insert(shotData.Victims, {Object=basePart; Index=index;});
 								end
 							end
+
+							return;
 						end
 						
 						local whitelist = {workspace.Environment; workspace.Terrain};
@@ -558,6 +562,10 @@ function Handler:FireWeapon(direction)
 					self:ToggleIdle(false);
 				end
 				
+				if model.Handle == nil or model.Handle:GetRootPart() == nil or model.Handle:GetRootPart().Name ~= "HumanoidRootPart" then
+					self.Wield.AllowShooting = false;
+					return;
+				end
 				self:ReplicateFire(shotData);
 			end
 		end
@@ -638,11 +646,12 @@ function Handler:Reload()
 end
 
 function Handler:ReplicateFire(shotData)
-	if self.Npc.Prefab == nil then Debugger:Warn("Character missing.") return end;
+	if self.Npc.Prefab == nil then Debugger:Warn("Character missing."); return end;
+	
 	local humanoid = self.Npc.Prefab:FindFirstChildWhichIsA("Humanoid") or nil;
 	if humanoid == nil or humanoid.Health <= 0 then return end;
 	local rootPart = humanoid.RootPart;
-	if rootPart == nil then Debugger:Warn("Character missing RootPart.") return end;
+	if rootPart == nil then Debugger:Warn("Character missing RootPart."); return end;
 	
 	if self.Wield.ToolModule then
 		local audio = self.Wield.ToolModule.Audio;
@@ -738,7 +747,7 @@ end
 
 function Handler:PrimaryFireRequest(direction)
 	if self.Wield.ToolModule == nil then return end;
-	if not self.Wield.AllowShooting then return end;
+	if self.Wield.AllowShooting ~= true then return end;
 	task.spawn(function()
 		local properties = self.Wield.ToolModule.Properties;
 		local configurations = self.Wield.ToolModule.Configurations;

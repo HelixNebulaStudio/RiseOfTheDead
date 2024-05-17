@@ -169,7 +169,7 @@ return function(npc, spawnPoint)
 	
 	function self.Update()
 		if self.IsDead or self.Humanoid.RootPart == nil then return false end;
-		if self.Disabled then wait(0.1) return true end;
+		if self.Disabled then wait(0.1); return true end;
 		
 		local maxFollowDist = random:NextNumber(self.Properties.AttackRange.Min, self.Properties.AttackRange.Max);
 		
