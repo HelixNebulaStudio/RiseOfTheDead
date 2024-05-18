@@ -763,6 +763,7 @@ function Raid:Initialize(roomData)
 	repeat task.wait() until self.Loaded == true;
 	
 	modConfigurations.Set("InfTargeting", false);
+	modConfigurations.Set("NpcThinkCycle", 1);
 	
 	self.RoomData = roomData;
 	self.Players = {};

@@ -86,7 +86,7 @@ function Movement.new(parallelNpc)
 			local rootPartPos = rootPart.Position;
 			local targetPos = self.TargetPosition;
 			
-			if IsInRange(rootPartPos, targetPos, 4) then 
+			if IsInRange(rootPartPos, targetPos, 4) and rootPartPos.Y > targetPos.Y then 
 				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("rpp == tp") end;
 				
 				dumbFollow = tick();

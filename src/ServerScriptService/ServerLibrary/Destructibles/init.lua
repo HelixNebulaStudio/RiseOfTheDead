@@ -20,7 +20,7 @@ function Destructibles:TakeDamagePackage(damageSource)
 	local hitPart = damageSource.TargetPart;
 	local damageType = damageSource.DamageType;
 	
-	if not self.Enabled then Debugger:Log(self.Prefab," Distructible not enabled.") return false end;
+	if not self.Enabled then Debugger:Log(self.Prefab," Distructible not enabled."); return false end;
 
 	if self.DamagableBy then
 		if dealer == nil then return end;
@@ -34,6 +34,11 @@ function Destructibles:TakeDamagePackage(damageSource)
 	if self.DamageModifier then
 		damage, dealer, storageItem, hitPart, damageType = self:DamageModifier(damage, dealer, storageItem, hitPart, damageType);
 	end
+
+	if self.DamageCap then
+		damage = math.min(damage, self.DamageCap);
+	end
+	damage = math.min(damage, self.Health);
 
 	self:SetHealth(self.Health - (damage or 0));
 

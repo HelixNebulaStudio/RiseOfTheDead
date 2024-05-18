@@ -658,8 +658,9 @@ end)
 task.spawn(function()
 	while true do
 		for a=#Npc.NpcModules, 1, -1 do
-			local npcModule: modNpcComponent.NpcModule = Npc.NpcModules[a] and Npc.NpcModules[a].Module;
-			if npcModule and not npcModule.IsDead and math.random(1, 2) == 1 then
+			local npcModule = Npc.NpcModules[a] and Npc.NpcModules[a].Module;
+
+			if npcModule and npcModule.IsDead ~= true then
 				local fireThinkS, _fireThinkE = pcall(function()
 					Npc.NpcModules[a].Module.Think:Fire();
 				end);
@@ -667,8 +668,10 @@ task.spawn(function()
 					Debugger:Warn("Failed to think", Npc.NpcModules[a].Module.Name);
 				end;
 			end;
+
 		end
-		task.wait(15);
+
+		task.wait(modConfigurations.NpcThinkCycle or 15);
 	end
 end)
 

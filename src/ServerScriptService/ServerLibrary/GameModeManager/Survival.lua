@@ -54,6 +54,7 @@ function GameMode:WorldLoad(modeData)
 	local gamemodeModule = game.ServerScriptService:FindFirstChild("ModeWorldScript") or script:FindFirstChild(gameStage)
 	if gamemodeModule then
 		modConfigurations.Set("InfTargeting", true);
+		modConfigurations.Set("NpcThinkCycle", 1);
 
 		local gameController = require(gamemodeModule);
 		shared.GameController = gameController;

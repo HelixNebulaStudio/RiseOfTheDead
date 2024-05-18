@@ -95,6 +95,7 @@ Configurations.Set("DayLapseDuration", 1200);
 Configurations.Set("SpawnProtectionTimer", 10);
 Configurations.Set("ExpireDeployables", false);
 
+Configurations.Set("NpcThinkCycle", 15);
 Configurations.Set("WithererSpawnLogic", false);
 Configurations.Set("NaturalSpawnLimit", 999);
 
