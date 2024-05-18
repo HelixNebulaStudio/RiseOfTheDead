@@ -168,23 +168,20 @@ function ItemInterface.newItemTooltip()
 	end
 	
 	function meta:SetPosition(guiObject)
+		local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+		local modInterface = modData:GetInterfaceModule();
+
 		local padding = 5;
-		
-		local vpSize = workspace.CurrentCamera.ViewportSize;
-		
+
 		local targetPos = guiObject.AbsolutePosition;
 		local targetSize = guiObject.AbsoluteSize;
 
-		local parentPos = self.Frame.Parent:IsA("GuiObject") and self.Frame.Parent.AbsolutePosition or Vector2.zero;
-		local descSize = self.Frame.AbsoluteSize;
-		
-		local posX = targetPos.X+descSize.X+(padding*2) > vpSize.X-10 and -descSize.X-padding or targetSize.X+padding;
-		local posY = targetPos.Y+descSize.Y+(padding*2) > vpSize.Y-10 and -descSize.Y+targetSize.Y or 0;
-		
-		posX = targetPos.X-parentPos.X+posX;
-		posY = targetPos.Y-parentPos.Y+posY;
-		
-		self.Frame.Position = UDim2.new(0, posX, 0, posY);
+		local vpSize = workspace.CurrentCamera.ViewportSize;
+
+		if targetPos.X <= vpSize.X/2 then
+			targetPos = targetPos + Vector2.new(targetSize.X, 0);
+		end
+		modInterface.SetPositionWithPadding(self.Frame, targetPos, padding);
 	end
 	
 	function meta:BindHoverOver(guiObject, onToggle)

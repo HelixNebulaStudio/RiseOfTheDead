@@ -15,7 +15,7 @@ function Mod.Activate(packet)
 	
 
 	local frLayerInfo = ModsLibrary.GetLayer("FR", packet);
-	local frlevel, frValue, frTweak = frLayerInfo.Level, frLayerInfo.Value, frLayerInfo.TweakValue;
+	local _frlevel, frValue, frTweak = frLayerInfo.Level, frLayerInfo.Value, frLayerInfo.TweakValue;
 	
 	if frTweak then
 		frValue = frValue + math.floor(frTweak*10)/10;

@@ -74,7 +74,7 @@ function Movement.new(parallelNpc)
 		if self.SmartNpc then return end;
 
 		local rootPartPos = getRootPos();
-		if rootPartPos.Y < self.TargetPosition.Y then return end;
+		if self.TargetPosition and rootPartPos.Y < self.TargetPosition.Y then return end;
 
 		dumbFollow = tick() + (add or 0);
 	end

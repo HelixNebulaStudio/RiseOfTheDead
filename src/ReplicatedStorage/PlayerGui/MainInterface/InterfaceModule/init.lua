@@ -744,12 +744,19 @@ end
 function Interface.SetPositionWithPadding(guiObject, position, padding)
 	padding = padding or 5;
 
-	local targetPos = position or (UserInputService:GetMouseLocation() + Vector2.new(0, -36));
+	local targetPos = position or (UserInputService:GetMouseLocation() + Vector2.new(0, -game.GuiService.TopbarInset.Height));
 
 	local parentPos = guiObject.Parent:IsA("GuiObject") and guiObject.Parent.AbsolutePosition or Vector2.zero;
 	local frameSize = guiObject.AbsoluteSize;
 	
 	local vpSize = camera.ViewportSize;
+	
+	if targetPos.X <= vpSize.X/2 then
+		targetPos = targetPos;
+	else
+		targetPos = targetPos + Vector2.new(-frameSize.X, 0);
+	end
+
 	local posX = targetPos.X+frameSize.X+(padding*2) > vpSize.X-10 and targetPos.X-frameSize.X-padding or targetPos.X;
 	local posY = targetPos.Y+frameSize.Y+(padding*2) > vpSize.Y-10 and targetPos.Y-frameSize.Y+padding or targetPos.Y;
 
