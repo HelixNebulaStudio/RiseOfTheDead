@@ -66,8 +66,16 @@ function Movement.new(parallelNpc)
 		return modRegion:InRegion(posA, posB, range);
 	end
 	
+	local function getRootPos()
+		return rootPart.Position + Vector3.new(0, -1, 0);
+	end
+
 	local function doDumbFollow(add)
 		if self.SmartNpc then return end;
+
+		local rootPartPos = getRootPos();
+		if rootPartPos.Y < self.TargetPosition.Y then return end;
+
 		dumbFollow = tick() + (add or 0);
 	end
 	
@@ -83,7 +91,7 @@ function Movement.new(parallelNpc)
 		task.spawn(function()
 			local path: Path = self.Path;
 			
-			local rootPartPos = rootPart.Position;
+			local rootPartPos = getRootPos();
 			local targetPos = self.TargetPosition;
 			
 			if IsInRange(rootPartPos, targetPos, 4) and rootPartPos.Y > targetPos.Y then 
@@ -198,7 +206,7 @@ function Movement.new(parallelNpc)
 			moveSpeed:Remove("Pathfinding");
 			if self.PersistFollowTarget == false then
 
-				local isNextToTarget = IsInRange(rootPart.Position, self.TargetPosition, 1);
+				local isNextToTarget = IsInRange(getRootPos(), self.TargetPosition, 1);
 				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("nextToTarget", isNextToTarget) end;
 				
 				if isNextToTarget then
@@ -232,6 +240,8 @@ function Movement.new(parallelNpc)
 			return 
 		end;
 		
+		local rootPosition = getRootPos();
+
 		local walkSpeed = math.clamp(moveSpeed:Get(), 0, 64);
 		humanoid.WalkSpeed = walkSpeed;
 
@@ -265,8 +275,8 @@ function Movement.new(parallelNpc)
 		end
 
 		if self.PauseTick and tick() <= self.PauseTick then
-			if not IsInRange(humanoid.WalkToPoint, rootPart.Position, 1) then
-				humanoid:MoveTo(rootPart.Position);
+			if not IsInRange(humanoid.WalkToPoint, getRootPos(), 1) then
+				humanoid:MoveTo(getRootPos());
 			end
 			return;
 		end
@@ -299,8 +309,8 @@ function Movement.new(parallelNpc)
 		local minFDist = (self.MinFollowDist or 0)
 		local maxFDist = math.max(minFDist, self.MaxFollowDist or 0)+4;
 		
-		local isInMaxFollowDist = IsInRange(rootPart.Position, self.TargetPosition, maxFDist) and math.abs(rootPart.Position.Y-self.TargetPosition.Y) < 8;
-		local isNextToTarget = IsInRange(rootPart.Position, self.TargetPosition, minFDist);
+		local isInMaxFollowDist = IsInRange(rootPosition, self.TargetPosition, maxFDist) and math.abs(rootPosition.Y-self.TargetPosition.Y) < 8;
+		local isNextToTarget = IsInRange(rootPosition, self.TargetPosition, minFDist);
 		
 		if isInMaxFollowDist and self.MaxFollowDist then
 			if dumbFollow and tick() <= dumbFollow then
@@ -308,7 +318,7 @@ function Movement.new(parallelNpc)
 			end
 			
 			if isNextToTarget then
-				local awayDir = (rootPart.Position-self.TargetPosition).Unit;
+				local awayDir = (rootPosition-self.TargetPosition).Unit;
 				local displaceScaler = ( minFDist+ (maxFDist-minFDist)/2);
 				local newPos = self.TargetPosition + awayDir*displaceScaler;
 				
@@ -317,7 +327,7 @@ function Movement.new(parallelNpc)
 				
 			else
 				dumbFollow = nil;
-				humanoid:MoveTo(rootPart.Position);
+				humanoid:MoveTo(rootPosition);
 				
 			end
 			return;
@@ -327,7 +337,7 @@ function Movement.new(parallelNpc)
 		if dumbFollow and tick()-dumbFollow <= 2 then
 			humanoid:MoveTo(self.TargetPosition);
 			if math.random(1, 64) == 1 then
-				local heightDif = self.TargetPosition.Y-rootPart.Position.Y;
+				local heightDif = self.TargetPosition.Y-rootPosition.Y;
 				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("Try jump", heightDif) end;
 				if heightDif > 8 then
 					humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
@@ -349,7 +359,7 @@ function Movement.new(parallelNpc)
 			local walkToPoint = self.NextWaypoint.Position;
 			humanoid:MoveTo(walkToPoint);
 			
-			if self.NextWaypoint.Action == Enum.PathWaypointAction.Jump and IsInRange(rootPart.Position, walkToPoint, math.max(humanoid.WalkSpeed/2, 4)) then
+			if self.NextWaypoint.Action == Enum.PathWaypointAction.Jump and IsInRange(rootPosition, walkToPoint, math.max(humanoid.WalkSpeed/2, 4)) then
 				humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
 			end
 
@@ -366,13 +376,13 @@ function Movement.new(parallelNpc)
 				lastStuckTick = nil;
 			end
 
-			if IsInRange(self.LastRootPosition, rootPart.Position, 1) then
+			if IsInRange(self.LastRootPosition, rootPosition, 1) then
 				self.Recompute = true;
 				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("detected stuck") end;
 				lastStuckTick = tick();
 			end
 
-			self.LastRootPosition = rootPart.Position;
+			self.LastRootPosition = rootPosition;
 			
 		elseif isNextToTarget then
 			self:MoveEnded("arrived")
@@ -416,7 +426,7 @@ function Movement.new(parallelNpc)
 		self.PersistFollowTarget = packet.Follow == true;
 		self.MaxFollowDist = packet.MaxFollowDist;
 		self.MinFollowDist = packet.MinFollowDist;
-		self.LastRootPosition = rootPart.Position;
+		self.LastRootPosition = getRootPos();
 
 		if prefab:GetAttribute("DebugMove") == true then
 			Debugger:Warn("Move Target", packet.Target, typeof(packet.Target)) 
@@ -432,7 +442,9 @@ function Movement.new(parallelNpc)
 			end
 			
 			self.TargetPart = packet.Target;
-			self.TargetPosition = self.TargetPart.Position;
+			if self.TargetPosition == nil then
+				self.TargetPosition = self.TargetPart.Position;
+			end
 		end
 		
 		self.MoveId = packet.MoveId;
@@ -468,7 +480,7 @@ function Movement.new(parallelNpc)
 		self.MinFollowDist = nil;
 		self.PauseTick = nil;
 		
-		humanoid:MoveTo(rootPart.Position);
+		humanoid:MoveTo(getRootPos());
 		
 		self:MoveEnded("stop");
 	end)
