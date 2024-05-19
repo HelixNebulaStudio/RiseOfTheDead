@@ -948,11 +948,11 @@ function remoteGameModeExit.OnServerInvoke(player, action, interactModule)
 	
 	local interactObject = action;
 	
-	if interactObject == nil or interactModule == nil then return end;
-	if player:DistanceFromCharacter(interactObject.Position) > 20 then return end;
+	if interactObject == nil or interactModule == nil then Debugger:StudioWarn("Missing valid interactable."); return end;
+	if player:DistanceFromCharacter(interactObject.Position) > 20 then Debugger:StudioWarn("Player too far from interactable."); return end;
 	
 	local interactData = shared.saferequire(player, interactModule);
-	if interactData == nil then return end;
+	if interactData == nil then Debugger:StudioWarn("Missing interactable data."); return end;
 	
 	if GameModeManager.GameWorldInfo == nil then
 		Debugger:Warn("Exiting non-game world.")

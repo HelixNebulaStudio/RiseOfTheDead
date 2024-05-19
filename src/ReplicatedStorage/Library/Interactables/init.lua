@@ -1112,7 +1112,7 @@ function Interactable.GameModeExit(name, stage, label)
 	interact.Name = name;
 	interact.Stage = stage;
 	interact.Label = label;
-	interact.Enabled = false;
+	interact.Enabled = true;
 	
 	function interact:OnInteracted(library)
 		if name == "Raid" and workspace:GetAttribute("GameModeComplete") == true then
