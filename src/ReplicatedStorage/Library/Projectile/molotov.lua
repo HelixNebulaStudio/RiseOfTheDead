@@ -7,7 +7,6 @@ local TweenService = game:GetService("TweenService");
 local CollectionService = game:GetService("CollectionService");
 
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 local modTouchHandler = require(game.ReplicatedStorage.Library.TouchHandler);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modAoeHighlight = require(game.ReplicatedStorage.Particles.AoeHighlight);
@@ -16,12 +15,7 @@ local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 local Projectile = require(script.Parent.Projectile);
 
 local projectilePrefab = script.molotov;
-local templateFireRegion = script.fireRegion;
 local templateFireParticles = script:WaitForChild("Fire2");
-local random = Random.new();
-
-local remotes = game.ReplicatedStorage.Remotes;
-local bindIsInDuel = remotes.IsInDuel;
 
 --== Script;
 
@@ -33,19 +27,20 @@ function Pool.new(owner)
 	projectile.ArcTracerConfig = {
 		LifeTime=30;
 		Bounce=0;
+
 		IgnoreEntities=false;
 		IgnoreWater=false;
 	};
 	
-	projectile.Configurations = {
-		ProjectileLifeTime=30;
-		ProjectileBounce=0;
-		IgnoreEntities=false;
-		IgnoreWater=false;
-	};
+	-- projectile.Configurations = {
+	-- 	ProjectileLifeTime=30;
+	-- 	ProjectileBounce=0;
+	-- 	IgnoreEntities=false;
+	-- 	IgnoreWater=false;
+	-- };
 	
 	function projectile:Activate()
-		Debugger.Expire(self.Prefab, self.Configurations.ProjectileLifeTime);
+		Debugger.Expire(self.Prefab, self.ArcTracerConfig.LifeTime);
 		modAudio.Play("Fire", self.Prefab, true); 
 	end	
 	
@@ -60,7 +55,7 @@ function Pool.new(owner)
 				
 			elseif damagable:CanDamage(self.Owner) then
 				modDamageTag.Tag(targetModel, self.Owner and self.Owner.Character);
-				local damage = self.Configurations.Damage or 1;
+				local damage = self.ArcTracerConfig.Damage or 1;
 				
 				if damagable.Object.ClassName == "NpcStatus" then
 					local healthInfo = damagable:GetHealthInfo();
@@ -153,6 +148,8 @@ function Pool.new(owner)
 		
 		TweenService:Create(hitbox, tweenInfo, {Size=Vector3.new(10, 20, 20)}):Play();
 		TweenService:Create(newZone, tweenInfo, {Size=Vector3.new(21, 21, 2)}):Play();
+
+		return true;
 	end
 	
 	return projectile;

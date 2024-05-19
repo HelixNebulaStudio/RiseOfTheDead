@@ -68,10 +68,10 @@ return function(npc, spawnPoint)
 		end)
 		
 		if self.Seat.Name == "Stand1" then
-			self.SetAnimation("Sitting", {script.Gunmen1});
+			self.SetAnimation("Sit", {script.Gunmen1});
 			
 		elseif self.Seat.Name == "Stand2" then
-			self.SetAnimation("Sitting", {script.Gunmen2});
+			self.SetAnimation("Sit", {script.Gunmen2});
 			
 		end
 		
@@ -108,7 +108,7 @@ return function(npc, spawnPoint)
 	function self.Update()
 		if not self.Seat:IsDescendantOf(workspace.Entity) then self.Humanoid.Health = 0; return false end;
 		if self.IsDead or self.Humanoid.RootPart == nil then return false end;
-		self.PlayAnimation("Sitting");
+		self.PlayAnimation("Sit");
 		
 		self.NextTarget();
 		if self.Enemy and self.Enemy.Humanoid and self.Enemy.Humanoid.RootPart and self.Enemy.Humanoid.Health > 0 then

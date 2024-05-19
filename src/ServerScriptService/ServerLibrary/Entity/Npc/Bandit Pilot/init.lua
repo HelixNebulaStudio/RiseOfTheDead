@@ -1,8 +1,5 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local random = Random.new();
-
-local RunService = game:GetService("RunService");
-local PhysicsService = game:GetService("PhysicsService");
+--==
 local TweenService = game:GetService("TweenService");
 
 local BanditModule = script.Parent.Bandit;
@@ -240,8 +237,6 @@ return function(npc, spawnPoint)
 			local healthInfo = self.Healths[bodyPart.Name];
 			if healthInfo then
 				
-				
-				
 				self:TakeDamage(bodyPart.Name, amount);
 
 				local part = healthInfo.BasePart;
@@ -255,6 +250,8 @@ return function(npc, spawnPoint)
 					return true;
 				end
 			end
+
+			return;
 		end
 		
 		local debrisParts;
@@ -392,7 +389,9 @@ return function(npc, spawnPoint)
 						
 						local deathDebounce = false;
 						humanoid.Died:Connect(function()
-							if deathDebounce then return end deathDebounce = true;
+							if deathDebounce then return end 
+							deathDebounce = true;
+
 							game.Debris:AddItem(banditNpc, 3);
 							for a=#gunmenModules, 1, -1 do
 								if gunmenModules[a] == banditNpcModule then
@@ -408,7 +407,7 @@ return function(npc, spawnPoint)
 								banditNpcModule:Destroy();
 							end
 						end));
-						
+
 						-- Sit on heli;
 						banditNpcModule.Seat = self.Helicopter.GunmenSeats[a];
 					end, modBanditGunmen);
@@ -554,7 +553,7 @@ return function(npc, spawnPoint)
 				self.isCircling = false;
 				
 				for _, gunmenModule in pairs(self.GunmenModules) do
-					gunmenModule:KillNpc();
+					Debugger.Expire(gunmenModule.Prefab);
 				end
 				table.clear(self.GunmenModules);
 			end
@@ -595,7 +594,9 @@ return function(npc, spawnPoint)
 
 						local deathDebounce = false;
 						banditNpcModule.Humanoid.Died:Connect(function()
-							if deathDebounce then return end deathDebounce = true;
+							if deathDebounce then return end
+							deathDebounce = true;
+
 							game.Debris:AddItem(banditNpc, 3);
 						end)
 
@@ -753,7 +754,7 @@ return function(npc, spawnPoint)
 						local projectileObject = modProjectile.Fire("molotov", origin, Vector3.new());
 						projectileObject.TargetableEntities = {Humanoid=1; Zombie=1; Bandit=1; Rat=1;};
 						projectileObject.NetworkOwners = self.NetworkOwners;
-						projectileObject.Configurations.IgnoreEntities = true;
+						projectileObject.ArcTracerConfig.IgnoreEntities = true;
 						
 						if projectileObject.Prefab:CanSetNetworkOwnership() then projectileObject.Prefab:SetNetworkOwner(nil); end
 						
