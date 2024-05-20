@@ -9,10 +9,11 @@ local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariabl
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modSyncTime = Debugger:Require(game.ReplicatedStorage.Library.SyncTime);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
+local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 
 local remoteHudNotification = modRemotesManager:Get("HudNotification");
@@ -117,7 +118,12 @@ function WorldEvent.Start()
 	local endTime = startTime + duration;
 	
 	remoteHudNotification:FireAllClients("Breach", {});
-	shared.Notify(game.Players:GetPlayers(), "A safehouse got breached! Quicky barricade the walls and kill the horde.", "Defeated");
+
+	if modBranchConfigs.IsWorld("Safehome") then
+		shared.Notify(game.Players:GetPlayers(), "Your safehome is getting breached! Quickly fight off the horde and refortify.", "Defeated");
+	else
+		shared.Notify(game.Players:GetPlayers(), "A safehouse got breached! Quickly fight off the horde and refortify.", "Defeated");
+	end
 
 
 	local function announceTimeLeft()

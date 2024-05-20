@@ -222,9 +222,6 @@ function Handler:Equip()
 		end)
 	end
 
-	self.AnimGroup:Play("Core");
-	self:PlayLoad();
-
 	task.delay(1, function()
 		self.Wield.AllowShooting = true;
 		if self.Wield.ToolModule then
@@ -232,11 +229,8 @@ function Handler:Equip()
 		end
 	end);
 
-	local audio = self.Wield.ToolModule.Audio;
-	if audio then
-		modAudio.Play(audio.Load.Id, self.Npc.RootPart);
-	end
-	
+	self.AnimGroup:Play("Core");
+	self:PlayLoad();
 end
 
 function Handler:PlayLoad()
@@ -244,7 +238,9 @@ function Handler:PlayLoad()
 		self.AnimGroup:Play("Load");
 		
 		local audio = self.Wield.ToolModule.Audio;
-		modAudio.Play(audio.Load.Id, self.Npc.RootPart);
+		if audio.Load then
+			modAudio.Play(audio.Load.Id, self.Npc.RootPart);
+		end
 	end
 end
 
@@ -747,7 +743,8 @@ end
 
 function Handler:PrimaryFireRequest(direction)
 	if self.Wield.ToolModule == nil then return end;
-	if self.Wield.AllowShooting ~= true then return end;
+	if self.Wield.AllowShooting == false then return end;
+
 	task.spawn(function()
 		local properties = self.Wield.ToolModule.Properties;
 		local configurations = self.Wield.ToolModule.Configurations;

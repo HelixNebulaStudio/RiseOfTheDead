@@ -227,6 +227,12 @@ function remoteSafehomeRequest.OnServerInvoke(player, actionId, packet)
 		
 		
 	elseif actionId == "setSafehome" then
+		local mission78 = modMission:GetMission(player, 78);
+		if mission78 and mission78.Type == 1 and mission78.ProgressionPoint >= 2 then
+			shared.Notify(player, "Can not switch safehome during The Killer Hues.", "Negative");
+			return {ReplyCode=4;};
+		end
+
 		local factionGroup = shared.modSafehomeService and shared.modSafehomeService.FactionGroupCache;
 		
 		if factionGroup then

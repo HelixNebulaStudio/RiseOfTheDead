@@ -155,11 +155,13 @@ return function(CutsceneSequence)
 						while mission.ProgressionPoint <= 4 do
 							local pickSpawnAtt = spawnPoints[math.random(1, #spawnPoints)];
 
-							modNpc.Spawn("Zombie", pickSpawnAtt.WorldCFrame, function(npcPrefab, npcModule)
+							modNpc.Spawn("Zombie", pickSpawnAtt.WorldCFrame * CFrame.new(0, 1.35, 0), function(npcPrefab, npcModule)
+
 								npcModule.InfTargeting = true;
+								npcModule.SetAggression = 2;
 
 								if mission.ProgressionPoint == 3 then
-									npcModule.OnTarget({player});
+									npcModule.OnTarget(player);
 
 								else
 									npcModule.OnTarget({lydiaModule.Prefab; player});
