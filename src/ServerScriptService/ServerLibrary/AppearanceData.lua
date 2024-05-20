@@ -106,7 +106,6 @@ function AppearanceData:Update(storage)
 
 			local maxHealth = storageItem:GetValues("MaxHealth");
 			if maxHealth ~= nil and (storageItem:GetValues("Health") or maxHealth) <= 0 then
-				Debugger:Warn("Broken", storageItem);
 				continue;
 			end
 			

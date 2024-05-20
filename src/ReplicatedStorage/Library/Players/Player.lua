@@ -177,12 +177,18 @@ function Player.new(playerInstance: Player)
 		end
 	end
 	
-	function meta:SetProperties(k, v)
+
+	function meta:SetProperties(key, v)
 		if playerInstance.Parent == nil then return end;
+		local statusId = key;
+
+		if typeof(v) == "table" and v.UniqueId then
+			statusId = string.gsub(key, v.UniqueId, "");
+		end
 		
 		if RunService:IsServer() then
 			if v then
-				local statusLib = modStatusLibrary:Find(k);
+				local statusLib = modStatusLibrary:Find(statusId);
 				local statusResistance = classPlayer.Properties.StatusResistance;
 				
 				if statusResistance and statusLib and statusLib.Buff == false and v.Duration and v.Expires and statusLib.Tags then
@@ -195,16 +201,16 @@ function Player.new(playerInstance: Player)
 					end
 				end
 			end
-			if k == "Ragdoll" then
+			if key == "Ragdoll" then
 				classPlayer.Character:SetAttribute("Ragdoll", v);
 			end
 		end
 		
-		local oldPropertyValue = classPlayer.Properties[k];
-		classPlayer.Properties[k] = v;
+		local oldPropertyValue = classPlayer.Properties[key];
+		classPlayer.Properties[key] = v;
 		
 		if RunService:IsServer() then
-			remotePlayerProperties:FireAllClients(classPlayer.Name, "SetProperties", k, v);
+			remotePlayerProperties:FireAllClients(classPlayer.Name, "SetProperties", key, v);
 			
 			if typeof(v) == "table" and v.PresistUntilExpire and v.Expires then
 				local profile = shared.modProfile:Get(playerInstance);
@@ -215,12 +221,12 @@ function Player.new(playerInstance: Player)
 			end
 		end
 		
-		local lib = modStatusLibrary:Find(k);
+		local lib = modStatusLibrary:Find(statusId);
 		local statusClass = lib and lib.Module and require(lib.Module);
 		
 		if statusClass then
 			if oldPropertyValue == nil and v ~= nil and statusClass.OnApply then
-				statusClass.OnApply(classPlayer, classPlayer.Properties[k])
+				statusClass.OnApply(classPlayer, classPlayer.Properties[key])
 				
 			elseif oldPropertyValue ~= nil and v == nil and statusClass.OnExpire then
 				statusClass.OnExpire(classPlayer, oldPropertyValue);
@@ -228,6 +234,7 @@ function Player.new(playerInstance: Player)
 		end
 	end
 	
+
 	function meta:SyncProperty(k)
 		if playerInstance.Parent == nil then return end;
 		if RunService:IsServer() then

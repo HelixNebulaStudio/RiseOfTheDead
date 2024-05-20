@@ -11,6 +11,7 @@ local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariabl
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modGoldShopLibrary = require(game.ReplicatedStorage.Library.GoldShopLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
 local remoteStorageItemSync = modRemotesManager:Get("StorageItemSync");
 
@@ -256,6 +257,29 @@ function StorageItem.IsStackable(storageItemA, storageItemB)
 	end
 
 	return stackable;
+end
+
+function StorageItem.PopupItemStatus(statusId, storageItem)
+	local classPlayer = shared.modPlayers.Get(storageItem.Player);
+	if classPlayer == nil then return end
+
+	local itemLib = storageItem.Properties;
+
+	local itemDmgStatus = {
+		UniqueId = storageItem.ID;
+		Icon = itemLib.Icon;
+		Expires= modSyncTime.GetTime() + 3;
+	};
+
+	if statusId == "ItemHealth" then
+		itemDmgStatus.Alpha = storageItem.Values.Health / storageItem.Values.MaxHealth;
+
+		itemDmgStatus.IconColor = storageItem.Values.Health > 0 and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 82, 82);
+		itemDmgStatus.Desc = storageItem.Values.Health > 0 and `Your {itemLib.Name} is taking damage.` or `Your {itemLib.Name} is broken.`;
+	end
+
+	local statusKey = statusId..itemDmgStatus.UniqueId;
+	classPlayer:SetProperties(statusKey, itemDmgStatus);
 end
 
 return StorageItem;

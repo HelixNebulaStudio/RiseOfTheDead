@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
 local modLogicTree = require(game.ReplicatedStorage.Library.LogicTree);
-local modStatusEffects = Debugger:Require(game.ReplicatedStorage.Library.StatusEffects);
 
 return function(self)
 	local tree = modLogicTree.new{

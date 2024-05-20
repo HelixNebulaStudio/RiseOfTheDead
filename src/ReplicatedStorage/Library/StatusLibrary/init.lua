@@ -456,6 +456,13 @@ library:Add{
 	Buff=false;
 }
 
+library:Add{
+	Id="ItemHealth";
+	Icon="rbxasset://textures/ui/GuiImagePlaceholder.png";
+	Name="Item Health Hud";
+	Description="$Desc";
+	Buff=false;
+}
 
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local moddedSelf = modModEngineService:GetModule(script.Name);

@@ -12,6 +12,8 @@ local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modEmotes = require(game.ReplicatedStorage.Library.EmotesLibrary);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
+local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 
 local remotePlayerStatusEffect = modRemotesManager:Get("PlayerStatusEffect");
 
@@ -1296,34 +1298,48 @@ function StatusEffects.FumesGas(player, damage)
 		local profile = shared.modProfile:Get(player);
 		local saveData = profile:GetActiveSave();
 		if saveData.Clothing then
-			saveData.Clothing:Loop(function(storageItem)
-				local itemClass = profile:GetItemClass(storageItem.ID);
+			local clothingList = saveData.Clothing:ListByIndexOrder();
 
-				if itemClass and itemClass.GasProtection then
-					if storageItem.Values.MaxHealth == nil then
-						storageItem.Values.MaxHealth = 100;
-					end
+			local dmgTaken = false;
+			for a=1, #clothingList do
+				local storageItem = clothingList[a];
+				local siid = storageItem.ID;
 
-					local prevHealth = storageItem.Values.Health or 100;
-					storageItem.Values.Health = math.max(prevHealth-5, 0);
-					storageItem:Sync({"Health"; "MaxHealth"});
+				local itemClass = profile:GetItemClass(siid);
+				if itemClass == nil or itemClass.GasProtection == nil then continue end;
 
-					if prevHealth ~= storageItem.Values.Health then
-						if storageItem.Values.Health == 0 then
-							modAudio.Play("GasMaskBroken", classPlayer.Head);
-							saveData.AppearanceData:Update(saveData.Clothing);
+				local itemLib = modItemsLibrary:Find(storageItem.ItemId);
+				if itemLib == nil then continue end;
 
-						elseif math.fmod(storageItem.Values.Health, 20) == 0 then
-							modAudio.Play("GasMaskBreaking"..math.random(1,3), classPlayer.Head).PlaybackSpeed = math.random(90,110)/100;
-							
-						end
-					end
-					
-					return true;
+				if storageItem.Values.MaxHealth == nil then
+					storageItem.Values.MaxHealth = 100;
 				end
 
-				return;
-			end)
+				local prevHealth = storageItem.Values.Health or 100;
+				if prevHealth <= 0 then
+					modStorageItem.PopupItemStatus("ItemHealth", storageItem);
+					continue;
+				end;
+				
+				if dmgTaken then continue end;
+				dmgTaken = true;
+
+				storageItem.Values.Health = math.max(prevHealth-3, 0);
+				storageItem:Sync({"Health"; "MaxHealth"});
+
+				if prevHealth ~= storageItem.Values.Health then
+					if storageItem.Values.Health == 0 then
+						modAudio.Play("GasMaskBroken", classPlayer.Head);
+						saveData.AppearanceData:Update(saveData.Clothing);
+
+					elseif math.fmod(storageItem.Values.Health, 20) == 0 then
+						modAudio.Play("GasMaskBreaking"..math.random(1,3), classPlayer.Head).PlaybackSpeed = math.random(90,110)/100;
+						
+					end
+				end
+				
+				modStorageItem.PopupItemStatus("ItemHealth", storageItem);
+			end
 		end
 	end);
 

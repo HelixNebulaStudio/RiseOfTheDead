@@ -55,14 +55,19 @@ function Interface.init(modInterface)
 		menu.Size = UDim2.new(0.5, 0, 0.05, 0);
 	end
 	
-	local function newStatus(lib, srcTable, id)
-		local status = listings[lib.Id] or {};
-		listings[lib.Id] = status;
+	local function newStatus(lib, srcTable, key)
+		local statusId = lib.Id;
+
+		local status = listings[key] or {};
+		listings[key] = status;
+
+		local statusData = srcTable[key];
+
 		if status.Button == nil then
 			status.Button = templateStatusItem:Clone();
 			status.Button.MouseMoved:Connect(function()
-				for id, obj in pairs(listings) do
-					obj.Info.Visible = id == lib.Id;
+				for k, obj in pairs(listings) do
+					obj.Info.Visible = k == key;
 				end
 			end)
 			status.Button.MouseLeave:Connect(function()
@@ -70,7 +75,7 @@ function Interface.init(modInterface)
 			end)
 			status.Button.MouseButton1Click:Connect(function()
 				if modBranchConfigs.CurrentBranch.Name == "Dev" then
-					Debugger:Warn("Status id:",id,"table:", srcTable[id]);
+					Debugger:Warn("Status id:",key,"table:", statusData);
 				end
 			end)
 			
@@ -86,19 +91,27 @@ function Interface.init(modInterface)
 			status.Button.radialBar.ImageColor3 = lib.Buff and Color3.fromRGB(27, 106, 23) or Color3.fromRGB(255, 60, 60);
 		end
 		
-		local src = srcTable[id];
 		
 		local alpha = 1;
-		if type(src) == "table" then
-			
-			if src.Alpha then
-				alpha = src.Alpha;
+		if type(statusData) == "table" then
+			if statusData.Icon then
+				status.Icon.Image = statusData.Icon;
+			end
+			if statusData.IconColor then
+				status.Icon.ImageColor3 = statusData.IconColor;
+			end
+			if statusData.Name then
+				status.Title.Text = lib.Name;
+			end
 
-			elseif src.Duration and src.EndTime then
-				alpha = (src.EndTime-smoothTime)/src.Duration;
+			if statusData.Alpha then
+				alpha = statusData.Alpha;
+
+			elseif statusData.Duration and statusData.EndTime then
+				alpha = (statusData.EndTime-smoothTime)/statusData.Duration;
 				
-			elseif src.Duration and src.Expires then
-				alpha = (src.Expires-smoothTime)/src.Duration;
+			elseif statusData.Duration and statusData.Expires then
+				alpha = (statusData.Expires-smoothTime)/statusData.Duration;
 				
 			end
 		end
@@ -108,8 +121,8 @@ function Interface.init(modInterface)
 		
 		local statusVisible = true;--alpha >= 0.001;
 		
-		if typeof(src) == "table" then
-			if src.Visible == false then
+		if typeof(statusData) == "table" then
+			if statusData.Visible == false then
 				statusVisible = false;
 			end
 		end
@@ -117,7 +130,7 @@ function Interface.init(modInterface)
 		status.Button.Visible = statusVisible;
 		
 		if lib.QuantityLabel then
-			local stat = src[lib.QuantityLabel];
+			local stat = statusData[lib.QuantityLabel];
 			local str = stat;
 			local v = tonumber(stat);
 			
@@ -135,13 +148,14 @@ function Interface.init(modInterface)
 		end
 		
 		local descStr = lib.Description;
-		if type(src) == "table" then
-			if src.Duration and src.Expires then
-				local timeRatio = (src.Expires-smoothTime)/src.Duration;
-				descStr = descStr.. " ("..modSyncTime.ToString(timeRatio * src.Duration)..")"
+		if type(statusData) == "table" then
+			if statusData.Duration and statusData.Expires then
+				local timeRatio = (statusData.Expires-smoothTime)/statusData.Duration;
+				descStr = descStr.. " ("..modSyncTime.ToString(timeRatio * statusData.Duration)..")";
+				
 			end
 			
-			for k, v in pairs(src) do
+			for k, v in pairs(statusData) do
 				if typeof(v) == "string" or typeof(v) == "number" then
 					if lib.DescProcess and lib.DescProcess[k] then
 						v = lib.DescProcess[k](v);
@@ -177,13 +191,22 @@ function Interface.init(modInterface)
 				end
 			end
 		end
-		for id, src in pairs(classPlayer.Properties) do
-			local lib = modStatusLibrary:Find(id);
+
+		for key, src in pairs(classPlayer.Properties) do
+			local statusId = key;
+			if type(src) == "table" then
+				if src.UniqueId then
+					statusId = string.gsub(key, src.UniqueId, "");
+				end
+			end
+
+			local lib = modStatusLibrary:Find(statusId);
 			if lib then
-				destroy[id] = false;
-				newStatus(lib, classPlayer.Properties, id);
+				destroy[key] = false;
+				newStatus(lib, classPlayer.Properties, key);
 			end
 		end
+
 		for id, shouldDestroy in pairs(destroy) do
 			if shouldDestroy and listings[id] then
 				if listings[id].Button then listings[id].Button:Destroy() end;
