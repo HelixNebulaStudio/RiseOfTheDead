@@ -307,6 +307,12 @@ function Player.new(playerInstance: Player)
 				if gasProtection then
 					gasProtection = hasLabCoat and gasProtection + 0.3 or gasProtection;
 					damage = damage * (1-gasProtection);
+					
+					if hasLabCoat then
+						self:SetProperties("LabCoat", {
+							Expires=modSyncTime.GetTime() + 2;
+						});
+					end
 				end
 			end
 		end

@@ -464,6 +464,14 @@ library:Add{
 	Buff=false;
 }
 
+library:Add{
+	Id="LabCoat";
+	Icon="rbxassetid://4978200934";
+	Name="LabCoat";
+	Description="Your Lab Coat adds 30% extra gas protection to gas damages.";
+	Buff=true;
+}
+
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local moddedSelf = modModEngineService:GetModule(script.Name);
 if moddedSelf then moddedSelf:Init(library); end
