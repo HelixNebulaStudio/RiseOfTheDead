@@ -1675,6 +1675,10 @@ function WeaponHandler:Equip(library, weaponId)
 	end
 	
 	local function PrimaryFireRequest()
+		if loadedAnims["Idle"] then
+			loadedAnims["Idle"]:Stop();
+		end
+
 		if equipped and not unequiped then
 			if mainWeaponModel == nil or not character:IsAncestorOf(mainWeaponModel) then
 				modData.HandleTool("unequip", {Id=modCharacter.EquippedItem.ID;});
@@ -1696,6 +1700,10 @@ function WeaponHandler:Equip(library, weaponId)
 	
 	local function ReloadRequest()
 		if not equipped or unequiped then return end;
+		if loadedAnims["Idle"] then
+			loadedAnims["Idle"]:Stop();
+		end
+		
 		if not properties.Reloading then 
 			reload();
 		else 
@@ -1707,6 +1715,10 @@ function WeaponHandler:Equip(library, weaponId)
 	end;
 	
 	local function InspectRequest() 
+		if loadedAnims["Idle"] then
+			loadedAnims["Idle"]:Stop();
+		end
+
 		if not properties.Reloading and not properties.IsPrimaryFiring then
 			Equipped.RightHand.Data.LerpBody = false;
 			
@@ -1728,6 +1740,10 @@ function WeaponHandler:Equip(library, weaponId)
 	end
 	
 	local function SpecialRequest()
+		if loadedAnims["Idle"] then
+			loadedAnims["Idle"]:Stop();
+		end
+
 		Debugger:Warn("Special Request");
 		return true;
 	end
@@ -1743,6 +1759,15 @@ function WeaponHandler:Equip(library, weaponId)
 	Equipped.RightHand["KeyReload"] = ReloadRequest;
 	Equipped.RightHand["KeyInspect"] = InspectRequest;
 	Equipped.RightHand["KeyToggleSpecial"] = SpecialRequest;
+	Equipped.RightHand["KeyWalk"] = function()
+		if loadedAnims["Idle"] then
+			if loadedAnims["Idle"].IsPlaying then
+				loadedAnims["Idle"]:Stop();
+			else
+				loadedAnims["Idle"]:Play();
+			end
+		end
+	end
 	
 	local function ToggleSpecialRequest()
 		local modInfo = modWeaponModule.ModHooks.PrimaryEffectMod;

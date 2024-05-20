@@ -113,6 +113,7 @@ Settings.Add("HideHotkey", booleanOrNil)
 Settings.Add("KeySprint", keyCheck);
 Settings.Add("KeyCrouch", keyCheck);
 Settings.Add("KeyJump", keyCheck);
+Settings.Add("KeyWalk", keyCheck);
 Settings.Add("KeyCamSide", keyCheck);
 Settings.Add("KeyInteract", keyCheck);
 
