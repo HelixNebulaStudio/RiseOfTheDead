@@ -65,7 +65,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Sprint={Id=16355110604};
 	Empty={Id=16355093013;};
 	Unequip={Id=16838914873};
-	Idle={Id=16678346842;};
+	Idle={Id=17557546311;};
 	
 } or { -- Main
 	Core={Id=16355090581;};
@@ -77,7 +77,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Sprint={Id=16355110604};
 	Empty={Id=16355093013;};
 	Unequip={Id=16838914873};
-	Idle={Id=16678346842;};
+	Idle={Id=17557546311;};
 	
 };
 

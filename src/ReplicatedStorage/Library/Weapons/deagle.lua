@@ -69,7 +69,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Inspect={Id=16238150963;};
 	Empty={Id=16238147889;};
 	Sprint={Id=16184602077};
-	Idle={Id=9851976016;};
+	Idle={Id=17557221759;};
 	Unequip={Id=16838903122};
 	
 } or {
@@ -81,7 +81,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Inspect={Id=16678413893;};
 	Empty={Id=16678416286;};
 	Sprint={Id=16678418213};
-	Idle={Id=16678418213;};
+	Idle={Id=17557221759;};
 	Unequip={Id=16838903122};
 	
 };

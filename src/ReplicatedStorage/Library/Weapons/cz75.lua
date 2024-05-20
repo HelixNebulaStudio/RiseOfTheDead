@@ -95,7 +95,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Sprint={Id=16184602077};
 	Empty={Id=16184556763;};
 	Unequip={Id=16838903122};
-	Idle={Id=16678418213;};
+	Idle={Id=17557280528;};
 
 	CustomReload={Id=16636386784;};
 	CustomLoad={Id=16636398550;};
@@ -110,7 +110,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Sprint={Id=16184602077};
 	Empty={Id=16184556763;};
 	Unequip={Id=16838903122};
-	Idle={Id=16678418213;};
+	Idle={Id=17557280528;};
 
 	CustomReload={Id=16636386784;};
 	CustomLoad={Id=16636398550;};

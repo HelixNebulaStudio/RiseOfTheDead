@@ -63,7 +63,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Empty={Id=16790810563;};
 	Unequip={Id=7142108329};
 	TacticalReload={Id=16790818790;};
-	Idle={Id=16678346842;};
+	Idle={Id=17557221759;};
 	
 } or {
 	Core={Id=16790808976;};
@@ -74,7 +74,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Empty={Id=16790810563;};
 	Unequip={Id=7142108329};
 	TacticalReload={Id=16790818790;};
-	Idle={Id=16678346842;};
+	Idle={Id=17557221759;};
 	
 };
 
