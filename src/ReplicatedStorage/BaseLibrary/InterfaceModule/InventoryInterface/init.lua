@@ -304,6 +304,7 @@ function Interface.init(modInterface)
 		if visible then
 			Interface.HandleStorage("OpenStorage" ,true);
 			Interface.Update();
+
 		else
 			Interface.DefaultInterface:ToggleDescriptionFrame(false, nil, 0.3);
 			modStorageInterface.CloseOptionMenus();
@@ -427,12 +428,25 @@ function Interface.init(modInterface)
 
 		local storageIds = {};
 		
-		for id, storageItem in pairs(modData.Storages["Inventory"].Container) do
-			table.insert(storageIds, id);
+		local function getRequestSid(storageContainer)
+			if storageContainer == nil then return end;
+
+			for id, storageItem in pairs(storageContainer) do
+				table.insert(storageIds, id);
+
+				local usableItemLib = modUsableItems:Find(storageItem.ItemId);
+				if usableItemLib and usableItemLib.PortableStorage then
+					local storageConfig = usableItemLib.PortableStorage;
+					local storageId = storageConfig and storageConfig.StorageId or nil;
+
+					if storageId then
+						table.insert(storageIds, storageId);
+					end
+				end
+			end
 		end
-		for id, storageItem in pairs(modData.Storages["Clothing"].Container) do
-			table.insert(storageIds, id);
-		end
+		getRequestSid(modData.Storages["Inventory"].Container);
+		getRequestSid(modData.Storages["Clothing"].Container);
 		
 		Interface.HandleStorage("RequestStorage", true, storageIds);
 		

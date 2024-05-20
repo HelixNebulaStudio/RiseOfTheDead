@@ -2371,7 +2371,10 @@ function remoteStorageService.OnServerInvoke(player, packet)
 		
 		local storage = Storage.Get(storageId, player);
 		
-		if storage == nil then return end;
+		if storage == nil then
+			Debugger:StudioWarn("Request for Storage (",storageId,") does not exist.");
+			return;
+		end;
 		
 		if action == "OpenStorage" then
 			storage.OnAccess:Fire(true);
@@ -2410,7 +2413,7 @@ function remoteStorageService.OnServerInvoke(player, packet)
 			end
 			
 		elseif action == "RequestStorage" then
-			
+			Debugger:StudioWarn("Requesting Storage(",storageId,")");
 		end
 		
 		if packet.Request == true then
@@ -2422,8 +2425,8 @@ function remoteStorageService.OnServerInvoke(player, packet)
 	end
 	
 	if packet.StorageIds then
-		for _, storageId in pairs(packet.StorageIds) do
-			process(storageId);
+		for _, sId in pairs(packet.StorageIds) do
+			process(sId);
 		end
 		
 	else

@@ -1263,7 +1263,6 @@ function StorageInterface:Update(storage, storageItemId)
 	
 	RefreshPremium();
 	
-
 	for id, bt in pairs(self.Buttons) do
 		local storageItem = storage.Container[id];
 		local oldStorageItem = bt.Item;
