@@ -100,23 +100,12 @@ return function(CutsceneSequence)
 					end
 				elseif mission.Type == 3 then -- OnComplete
 					robertModule:TeleportHide();
-					CutsceneSequence:NextScene("updateJoseph");
 					
 				end
 			end
 			mission.Changed:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
 		end)
-		
-		CutsceneSequence:NewScene("updateJoseph", function()
-			local josephPrefab = workspace.Entity:WaitForChild("Joseph");
-			josephPrefab:WaitForChild("Bandage"):WaitForChild("Handle").Transparency = 0;
-			josephPrefab:WaitForChild("LeftLowerArm").Transparency = 1;
-			josephPrefab:WaitForChild("LeftHand").Transparency = 1;
-			josephPrefab:WaitForChild("LeftPoint").Transparency = 1;
-			josephPrefab:WaitForChild("LeftMiddle").Transparency = 1;
-			josephPrefab:WaitForChild("LeftPinky").Transparency = 1;
-		end);
 		
 	elseif modBranchConfigs.IsWorld("TheInvestigation") then
 		local waterBarrels = workspace.Environment:WaitForChild("CutsceneBarrels");

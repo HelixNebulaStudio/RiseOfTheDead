@@ -1,10 +1,10 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local localplayer = game.Players.LocalPlayer;
-
-local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
-
 local robertPrefab = script:WaitForChild("Prefab").Value;
+if not workspace:IsAncestorOf(robertPrefab) then return end;
+
+local localplayer = game.Players.LocalPlayer;
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 
 local function updateVisual()
     pcall(function()

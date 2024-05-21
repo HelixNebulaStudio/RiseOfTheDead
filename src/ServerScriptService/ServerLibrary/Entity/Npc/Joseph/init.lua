@@ -17,6 +17,7 @@ return function(npc, spawnPoint)
 	};
 	
 	--== Initialize;
+	self:SetClientScript(script:WaitForChild("JosephClient"));
 	function self.Initialize()
 		self.Humanoid.WalkSpeed = 6;
 		self.Humanoid.JumpPower = 50;
