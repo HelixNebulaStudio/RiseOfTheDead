@@ -245,14 +245,20 @@ function GameMode:Start(room)
 		end);
 	end
 	
-	for a=1, #players do
-		remoteGameModeHud:FireClient(players[a], {
-			Action="Open";
-			Type="Boss";
-			Stage=self.GameTable.Stage;
-			Room=room;
-		});
-	end
+	task.spawn(function()
+		task.wait(0.5);
+		for i=1, 3 do
+			for a=1, #players do
+				remoteGameModeHud:FireClient(players[a], {
+					Action="Open";
+					Type="Boss";
+					Stage=self.GameTable.Stage;
+					Room=room;
+				});
+			end
+			task.wait(1);
+		end
+	end)
 	
 	task.spawn(function()
 		local arenaCFrame = bossArena:GetPrimaryPartCFrame();
@@ -286,6 +292,7 @@ function GameMode:Start(room)
 				shared.Notify(room:GetInstancePlayers(), "Times up! You could not defeat "..self.GameTable.Stage.." in time.", "Negative");
 				room:SetState(modGameModeLibrary.RoomStatesEnums.Ending);
 			end
+
 			task.wait(0.5);
 		end
 		room.OnPlayersChanged:Fire();
