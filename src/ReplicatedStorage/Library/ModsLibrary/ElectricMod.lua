@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local Mod = {};
+local Mod = {ActivateMod=nil;};
 
 local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
@@ -56,33 +56,6 @@ function Mod.Activate(packet)
 		Activate=Mod.ActivateMod;
 	}, info);
 	
-	--local modStorageItem, toolModule = paramPacket.ModStorageItem, paramPacket.WeaponModule;
-	
-	--local info = ModsLibrary.Get(modStorageItem.ItemId);
-	--local values = modStorageItem.Values;
-	
-	--local damagePercent = ModsLibrary.NaturalInterpolate(info.Upgrades[1].BaseValue, info.Upgrades[1].MaxValue, values["D"], info.Upgrades[1].MaxLevel);
-
-	--if paramPacket.TweakStat and info.Upgrades[1].TweakBonus then
-	--	local bonusDmg = info.Upgrades[1].TweakBonus * math.abs(paramPacket.TweakStat/100);
-
-	--	damagePercent = damagePercent + bonusDmg;
-	--end
-	
-	
-	--local targets = ModsLibrary.Linear(info.Upgrades[2].BaseValue, info.Upgrades[2].MaxValue, values["T"], info.Upgrades[2].MaxLevel);
-	--targets = math.ceil(targets);
-	
-	--toolModule.Configurations.Element = info.Element;
-	--toolModule.Configurations.PropertiesOfMod = {
-	--	Targets = targets;
-	--	DamagePercent = damagePercent;
-	--}
-	
-	--toolModule:SetPrimaryModHook({
-	--	StorageItemID=modStorageItem.ID; 
-	--	Activate=Mod.ActivateMod;
-	--}, info);
 end
 
 if RunService:IsServer() then

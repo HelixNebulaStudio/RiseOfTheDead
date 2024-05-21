@@ -23,7 +23,8 @@ if RunService:IsServer() then
 			
 			local item = modStorage.FindItemIdFromStorages("oddbluebook", player);
 			if item == nil then
-				if modReplicationManager.GetReplicated(player, "OddBlueBook") == nil then
+				local oddBlueReplicated = modReplicationManager.GetReplicated(player, "OddBlueBook");
+				if oddBlueReplicated == nil or #oddBlueReplicated <= 0 then
 					local prefab = script:WaitForChild("OddBlueBook"):Clone();
 					modReplicationManager.ReplicateIn(player, prefab, workspace.Interactables);
 				end

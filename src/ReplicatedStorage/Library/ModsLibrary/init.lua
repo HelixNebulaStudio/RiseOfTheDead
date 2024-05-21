@@ -1264,7 +1264,7 @@ Add{
 Add{
 	Id="electricmod";
 	Name="Electric Charge";
-	Desc="Electrocute nearby enemies and deal an additional <b>Damage</b> based on the weapon's <b>Premod Damage</b> as electric damage.";
+	Desc="Electrocute nearby enemies and deal an additional <b>Damage</b> based on the weapon's <b>Premod Damage</b> as electric damage. For every enemies hit, damage percent is reduced by 2%.";
 	Icon="rbxassetid://3576196956";
 	BaseTier=1;
 	Tier=1;

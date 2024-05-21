@@ -347,7 +347,7 @@ function Interface:OnDialogue(dialogPacket)
 						self:SetDialogueText(data.Reply);
 						
 						local faceInfo = data.Face and modFacesLibrary:Find(data.Face);
-						if faceInfo and NpcModel:FindFirstChild("Head") and NpcModel.Head:FindFirstChild("face") then
+						if faceInfo and NpcModel and NpcModel:FindFirstChild("Head") and NpcModel.Head:FindFirstChild("face") then
 							NpcModel.Head.face.Texture = faceInfo.Texture;
 						end
 						if data.ReplyFunction then data.ReplyFunction(dialogPacket) end;

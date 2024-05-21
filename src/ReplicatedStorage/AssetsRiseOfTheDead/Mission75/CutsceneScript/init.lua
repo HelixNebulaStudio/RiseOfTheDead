@@ -9,6 +9,7 @@ local modEntity = require(game.ReplicatedStorage.Library.Entity);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 
 --== Variables;
 local missionId = 75;
@@ -330,14 +331,6 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, missionId);
 		if mission == nil then return end;
 			
-		--local jesseModule = modNpc.GetPlayerNpc(player, "Jesse");
-		--if jesseModule == nil then
-		--	local npc = modNpc.Spawn("Jesse", nil, function(npc, npcModule)
-		--		npcModule.Owner = player;
-		--		jesseModule = npcModule;
-		--	end);
-		--	modReplicationManager.ReplicateOut(player, npc);
-		--end
 		
 		local classPlayer = shared.modPlayers.Get(player);
 		classPlayer.OnDamageTaken:Connect(function(dmg)
@@ -363,6 +356,7 @@ return function(CutsceneSequence)
 			
 			storageItem.Values.Health = math.max(storageItem.Values.Health-dmg, 0);
 			storageItem:Sync({"Health"});
+			modStorageItem.PopupItemStatus("ItemHealth", storageItem);
 			
 			if storageItem.Values.Health <= 0 then
 				inventory:Remove(storageItemId);
@@ -656,6 +650,8 @@ return function(CutsceneSequence)
 								
 								
 								npcModule.BaseArmor = 100;
+								npcModule:AddComponent("ArmorSystem");
+
 								local banditarmorLib = modClothingLibrary:Find("banditarmor");
 								for _, accessory in pairs(banditarmorLib.Accessories) do
 									local newAccessory = accessory:Clone();
