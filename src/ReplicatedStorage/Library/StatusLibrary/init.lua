@@ -296,7 +296,7 @@ library:Add{
 	Id="NightVision";
 	Icon="rbxassetid://6008673515";
 	Name="Night Vision Mode";
-	Description="The environment is much brighter.";
+	Description="Dark areas are lit up in green.";
 	Buff=true;
 };
 

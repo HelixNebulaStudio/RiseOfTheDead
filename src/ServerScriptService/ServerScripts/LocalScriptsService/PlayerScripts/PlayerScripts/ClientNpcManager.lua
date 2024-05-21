@@ -61,7 +61,20 @@ return function()
 	CollectionService:GetInstanceAddedSignal("Deadbody"):Connect(function(prefab: Model)
 		if prefab == nil or not workspace:IsAncestorOf(prefab) then return end;
 
+		local deadbodyDespawnTimer = modData:GetSetting("DeadbodyDespawnTimer");
+		local maxDeadbodies = modData:GetSetting("MaxDeadbodies");
 		local disabledRagdoll = modData:GetSetting("DisableDeathRagdoll") == 1;
+
+		if maxDeadbodies <= 0 then 
+			Debugger.Expire(prefab);
+			return 
+		end;
+
+		if modBranchConfigs.CurrentBranch.Name == "Live" or deadbodyDespawnTimer < 61 then
+			-- Has despawn timer;
+			Debugger.Expire(prefab, deadbodyDespawnTimer);
+		end
+
 		if disabledRagdoll then
 			for _, obj in pairs(prefab:GetDescendants()) do
 				if obj:IsA("Motor6D") and obj:GetAttribute("RagdollJoint") == true then
@@ -81,14 +94,6 @@ return function()
 			thrsenHighlight:Destroy();
 		end
 
-		local deadbodyDespawnTimer = modData:GetSetting("DeadbodyDespawnTimer");
-		local maxDeadbodies = modData:GetSetting("MaxDeadbodies");
-
-		if modBranchConfigs.CurrentBranch.Name == "Live" or deadbodyDespawnTimer < 61 then
-			-- Has despawn timer;
-			Debugger.Expire(prefab, deadbodyDespawnTimer);
-		end
-		
 		if lastDbDespawnTick == nil or tick()-lastDbDespawnTick > 1 then
 			lastDbDespawnTick = tick();
 			modDeadbodiesHandler:DespawnRequest(maxDeadbodies);

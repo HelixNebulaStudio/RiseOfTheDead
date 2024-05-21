@@ -183,7 +183,6 @@ return function(self)
 		if self.FollowLinkedUnits ~= false then
 			self.Move:SetMoveSpeed("set", "walk", 10, 1);
 			self.Move:Follow(cache.LinkedUnits[math.random(1, #cache.LinkedUnits)].PrimaryPart);
-			--self.Follow(cache.LinkedUnits[math.random(1, #cache.LinkedUnits)].PrimaryPart, 8);
 		end
 		
 		return modLogicTree.Status.Success;
