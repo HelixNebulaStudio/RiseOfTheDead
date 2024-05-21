@@ -36,9 +36,7 @@ if RunService:IsServer() then
 
 							mission.StartTime = os.time();
 							mission.Timer = 300;
-							--mission.SaveData.FactionData = {
-							--	Timelapsed = os.time()-mission.StartTime;
-							--}
+							
 						end
 					end)
 				end
@@ -70,6 +68,7 @@ return function(CutsceneSequence)
 		local factionTag = tostring(profile.Faction.Tag);
 		local factionTitle = profile.Faction.FactionTitle;
 		local factionIcon = profile.Faction.FactionIcon;
+		local factionColor = profile.Faction.FactionColor;
 		
 		local gpsLib = modGpsLibrary:FindByKeyValue("Name", mission.SaveData.Location);
 		
@@ -97,10 +96,17 @@ return function(CutsceneSequence)
 					local primaryPart = factionbannerPrefab:WaitForChild("Handle");
 					primaryPart.Anchored = true;
 
+					Debugger:StudioWarn("factionColor", factionColor);
+
 					local bannerPart = factionbannerPrefab:WaitForChild("banner");
 					for _, decal in pairs(bannerPart:GetChildren()) do
 						if decal:IsA("Decal") then
 							decal.Texture = "rbxassetid://".. factionIcon;
+						end
+					end
+					for _, obj in pairs(factionbannerPrefab:GetChildren()) do
+						if obj.Name == "flag" then
+							obj.Color = Color3.fromHex(factionColor);
 						end
 					end
 					
@@ -171,12 +177,14 @@ return function(CutsceneSequence)
 								Tag="apex";
 								Title="Apex Legion";
 								Icon="7702620744";
+								Color="ff3c3c";
 							};
 						end
 						Debugger:StudioLog("Picked ",pick);
 						enemyFacInfo.Tag = pick.Tag;
 						enemyFacInfo.Title = pick.Title;
 						enemyFacInfo.Icon = pick.Icon;
+						enemyFacInfo.Color = pick.Color;
 					end
 					--
 					
@@ -195,7 +203,7 @@ return function(CutsceneSequence)
 					
 					for _, obj in pairs(enemyBanner:GetChildren()) do
 						if obj.Name == "flag" then
-							obj.Color = Color3.fromRGB(109, 65, 65);
+							obj.Color = Color3.fromHex(enemyFacInfo.Color);
 						end
 					end
 

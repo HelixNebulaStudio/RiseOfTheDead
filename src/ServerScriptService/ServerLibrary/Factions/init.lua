@@ -1814,6 +1814,7 @@ function Factions.InvokeHandler(player, action, ...)
 		if factionGroup then
 			factionProfile.FactionTitle = factionGroup.Title;
 			factionProfile.FactionIcon = factionGroup.Icon;
+			factionProfile.FactionColor = factionGroup.Color;
 			
 			if (profile.FactionRefresh == nil or unixTime-profile.FactionRefresh >= 290) and unixTime-factionGroup.LastUpdate >= 300 then
 				profile.FactionRefresh = unixTime;

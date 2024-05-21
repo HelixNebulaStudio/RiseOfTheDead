@@ -150,6 +150,12 @@ function Interface:OnDialogue(dialogPacket)
 		if child:IsA("TextButton") and child.Name ~= "questionOption" then child:Destroy() end; 
 	end
 	
+	if dialogPacket == nil then
+		Debugger:Warn("Missing dialogue data.");
+		Interface:CloseWindow("Dialogue");
+		return;
+	end
+
 	Interface.InDialogue = true;
 	
 	NpcName = dialogPacket.Name;

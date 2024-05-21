@@ -318,6 +318,7 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 			profile.Faction = {
 				FactionTitle="n/a";
 				FactionIcon="9890634236";
+				FactionColor="c8c8c8";
 			}
 			
 		else
