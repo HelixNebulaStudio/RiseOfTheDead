@@ -13,6 +13,7 @@ function Room.new()
 	local self = {
 		MaxPlayers = 4;
 		Players = {};
+		Values = {};
 	};
 	
 	setmetatable(self, meta);

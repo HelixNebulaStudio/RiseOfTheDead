@@ -313,15 +313,18 @@ function Update()
 		mainFrame.LobbyInfo.Text = "";
 	end
 	
-	local specialTxt = "";
+	local descText = {};
 	if currentRoom.MapStorageItem then
 		local itemValues = currentRoom.MapStorageItem.Values;
 
 		if itemValues.Seed then
-			specialTxt = specialTxt.."Seed: ".. itemValues.Seed;
+			table.insert(descText, "Seed: ".. itemValues.Seed);
 		end
 	end
-	mainFrame.SpecialData.Text = specialTxt;
+	for k, v in pairs(currentRoom.Values) do
+		table.insert(descText, `{k}: {tostring(v)}`);
+	end
+	mainFrame.SpecialData.Text = table.concat(descText, "  |  ");
 	
 	local hostPlayerData = currentRoom.Players[1];
 	if hostPlayerData and hostPlayerData.LobbyPosition then
