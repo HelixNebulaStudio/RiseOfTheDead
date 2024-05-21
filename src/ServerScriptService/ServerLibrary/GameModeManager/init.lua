@@ -1,6 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Variables;
 
+local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
+
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
@@ -364,10 +366,28 @@ function GameModeManager:Initialize(gameType, gameStage)
 					room.MapStorageItem = storageItem;
 				end
 
+				local highestFocusLevel = 0;
+				for a=1, #room.Players do
+					local player = room.Players[a].Instance;
+					local playerProfile = shared.modProfile:Get(player);
+					if playerProfile then
+						local playerSave = playerProfile:GetActiveSave();
+						local playerLevel = playerSave and playerSave:GetStat("Level") or 1;
+						local focusLevel = modGlobalVars.GetLevelToFocus(playerLevel);
+						if focusLevel > highestFocusLevel then
+							highestFocusLevel = focusLevel;
+						end
+					end
+				end
+				local lobbyLevel = math.clamp(highestFocusLevel, 1, math.huge);
+				room.Values.Level = lobbyLevel;
+
 			else
 				room.MapStorageItem = nil;
+				room.Values.Level = nil;
 				
 			end
+
 
 			gameTable:Sync();
 			roomMeta.LastPlayerChanged = tick();

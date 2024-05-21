@@ -54,7 +54,6 @@ local remotes = game.ReplicatedStorage.Remotes;
 local remoteConVarService = modRemotesManager:Get("ConVarService");
 local bindPlayServerScene = remotes.Cutscene.PlayServerScene;
 
-local updatedServerCode;
 local Cache = {Group={};};
 local PermissionLevel = {
 	All=1;
@@ -855,11 +854,8 @@ Commands["resetdata"] = {
 			DataStoreService:GetDataStore("Profiles"):RemoveAsync(tostring(profile.UserId));
 			
 			local worldName = "MainMenu";
-			if updatedServerCode == nil then
-				updatedServerCode = modServerManager:CreatePrivateServer(worldName);
-			end;
-			
-			modServerManager:TeleportToPrivateServer(worldName, updatedServerCode, {player});
+			local newAccessCode = modServerManager:CreatePrivateServer(worldName);
+			modServerManager:TeleportToPrivateServer(worldName, newAccessCode, {player});
 			
 		else
 			profile:ResetSave();
@@ -1509,59 +1505,6 @@ Commands["forcejoinplayer"] = {
 	end;
 };
 
-Commands["newserver"] = {
-	Permission = PermissionLevel.DevBranch;
-	Description = "Teleport to a player to a new server.";
-	
-	RequiredArgs = 0;
-	UsageInfo = "/newserver [playerName/*]";
-	Function = function(speaker, args)
-		local player = speaker;
-		local teleportOthers = false;
-		
-		if #args == 1 then
-			if HasPermissions(player, {Permission = PermissionLevel.Admin}) then
-
-				if args[1] == "*" then
-					teleportOthers = true;
-					
-				else
-					local matches = modCommandHandler.MatchName(args[1]);
-					if #matches > 1 then
-						GenericOutputs.MultipleMatch(player, matches);
-						return false;
-					elseif #matches < 1 then
-						GenericOutputs.NoMatch(player, args[1]);
-						return false;
-					else
-						player = matches[1];
-					end
-					
-				end
-				
-			else
-				shared.Notify(player, "You don't have permission to teleport others.", "Negative");
-			end
-		end
-		
-		if player then
-			shared.Notify(player, "Teleporting to updated server.", "Inform");
-			local worldName = modBranchConfigs.GetWorldName(game.PlaceId);
-			if updatedServerCode == nil then
-				updatedServerCode = modServerManager:CreatePrivateServer(worldName);
-			end;
-			local teleportPlayers = {player};
-			
-			if teleportOthers == true then
-				teleportPlayers = game.Players:GetPlayers();
-			end
-			
-			modServerManager:TeleportToPrivateServer(worldName, updatedServerCode, teleportPlayers);
-		end
-		return true;
-	end;
-};
-
 Commands["tp"] = {
 	Permission = PermissionLevel.DevBranch;
 	Description = "Teleport to a player or location.";
@@ -1832,10 +1775,14 @@ Commands["travel"] = {
 				local newServer = args[2] == true;
 				if newServer then
 					shared.Notify(player, "Teleporting to updated server.", "Inform");
-					if updatedServerCode == nil then
-						updatedServerCode = modServerManager:CreatePrivateServer(worldName);
+					if modServerManager.NewServerAccessCode == nil then
+						modServerManager.NewServerAccessCode = modServerManager:CreatePrivateServer(worldName);
 					end;
-					modServerManager:TeleportToPrivateServer(worldName, updatedServerCode, {player});
+
+					local teleportData = modServerManager:CreateTeleportData();
+					teleportData.PrivateServerOwnerId = player.UserId;
+
+					modServerManager:TeleportToPrivateServer(worldName, modServerManager.NewServerAccessCode, {player}, teleportData);
 					
 				else
 					shared.Notify(speaker, "Traveling to "..worldName, "Inform");

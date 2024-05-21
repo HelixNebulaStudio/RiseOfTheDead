@@ -192,32 +192,32 @@ Branches.WorldLibrary = {
 	
 	--== Game Modes;
 	-- Raid;
-	Factory={CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=1;};
-	Office={CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=6;};
-	BanditOutpost={CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=6;};
-	Tombs={CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=6;};
-	Railways={CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=6;};
-	AbandonedBunker={CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=6;};
+	Factory={GameMode=true; CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=1;};
+	Office={GameMode=true; CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=6;};
+	BanditOutpost={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=6;};
+	Tombs={GameMode=true; CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=6;};
+	Railways={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=6;};
+	AbandonedBunker={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=6;};
 	
 	-- Survival;
-	SectorF={CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
-	Prison={CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
-	SectorD={CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	SectorF={GameMode=true; CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	Prison={GameMode=true; CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	SectorD={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
 	
 	-- Coop;
-	Genesis={CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
-	SunkenShip={CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	Genesis={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	SunkenShip={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
 	
 	--== Events;
 	EasterButchery={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=1;};
-	HalloweenBasement={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=8;};
-	KlawsWorkshop={AC=true; CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	HalloweenBasement={GameMode=true; CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=8;};
+	KlawsWorkshop={GameMode=true; AC=true; CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
 	Slaughterfest={NoPrivateServers=true; CanTravelTo=true; PublicWorld=true; FreeTravels=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.Slaughterfest; MaxPlayers=16;};
 	
 	--== CommunityMaps;
-	CommunityWaySide={CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
-	CommunityFissionBay={CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
-	CommunityRooftops={CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	CommunityWaySide={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	CommunityFissionBay={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	CommunityRooftops={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
 	
 	--==
 	Default={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=32;};

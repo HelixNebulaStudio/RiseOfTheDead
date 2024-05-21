@@ -134,7 +134,7 @@ return function(self)
 		local canAttackTarget = tree:Call("CanAttackTarget") == modLogicTree.Status.Success;
 		if not canAttackTarget and tick()-cache.SprintCooldown > 6 then
 			cache.SprintCooldown = tick();
-			self.Move:SetMoveSpeed("set", "sprint", 22, 2, self.HardMode and 3 or 1.5);
+			self.Move:SetMoveSpeed("set", "sprint", self.HardMode and 26 or 22, 2, self.HardMode and 3 or 1.5);
 		end
 
 		return modLogicTree.Status.Failure;

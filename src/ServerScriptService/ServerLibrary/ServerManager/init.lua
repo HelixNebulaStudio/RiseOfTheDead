@@ -1,8 +1,5 @@
-local ServerManager = {};
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Configurations;
-
---== Dependencies;
+--==
 local RunService = game:GetService("RunService");
 local TeleportService = game:GetService("TeleportService");
 local MessagingService = game:GetService("MessagingService");
@@ -18,6 +15,12 @@ local modOnGameEvents = Debugger:Require(game.ServerScriptService.ServerLibrary.
 local modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 
+--==
+local ServerManager = {
+	PrivateWorldCreator=nil;
+	TravelToPlayer=nil;
+};
+
 ServerManager.OnPlayerTravel = modEventSignal.new("OnPlayerTravel");
 --== Variables;
 local loadingGui = script:WaitForChild("TravelLoadingScreen");
@@ -26,6 +29,7 @@ local loadingGui = script:WaitForChild("TravelLoadingScreen");
 local remoteTravelRequest = modRemotesManager:Get("TravelRequest");
 
 ServerManager.AccessCode = nil;
+ServerManager.NewServerAccessCode = nil;
 ServerManager.Kicked = {};
 
 ServerManager.RegionCode = "?";
@@ -78,7 +82,7 @@ function ServerManager.OnPlayerAdded(player)
 		if teleportData.ShadowBanned then
 			ServerManager.ShadowBanned = true;
 		end
-		if game.PrivateServerId ~= "" and teleportData.PrivateServerOwnerId and teleportData.GameMode == nil then
+		if game.PrivateServerId ~= "" and teleportData.PrivateServerOwnerId then
 			ServerManager.PrivateServerOwnerId = teleportData.PrivateServerOwnerId;
 		end
 	end
@@ -435,7 +439,7 @@ function ServerManager:CreateTeleportData()
 	if ServerManager.PrivateServerOwnerId then
 		teleportData.PrivateServerOwnerId = ServerManager.PrivateServerOwnerId;
 	end
-	
+
 	return teleportData;
 end
 
@@ -466,7 +470,11 @@ function ServerManager:Teleport(player, worldName, teleportData)
 		
 	elseif ServerManager:GetPrivateServerOwnerId() ~= nil and worldLib.NoPrivateServers ~= true then -- Join/create new private server;
 		local accessCode = ServerManager.PrivateCache and ServerManager.PrivateCache.WorldCodes and ServerManager.PrivateCache.WorldCodes[worldName];
-		if accessCode == nil then
+		
+		if worldLib.GameMode == true then
+			accessCode = ServerManager:CreatePrivateServer(worldName);
+
+		elseif accessCode == nil then
 			local newAccessCode = ServerManager:CreatePrivateServer(worldName);
 			
 			ServerManager:UpdatePrivateServer(ServerManager.PrivateServerOwnerId, function(storedData)
@@ -547,9 +555,7 @@ function ServerManager:TeleportToPlaceInstance(worldName, jobId, player, telepor
 	TeleportService:TeleportToPlaceInstance(placeId, jobId, player, nil, teleportData);
 end
 
---	local newLoadingScreen = loadingGui:Clone();
---	newLoadingScreen.Enabled = true;
---	newLoadingScreen.Parent = player.PlayerGui;
+
 function ServerManager:Travel(player, worldName, teleportData)
 	if ServerManager:IsUpdating(player) then return end;
 	local placeId = modBranchConfigs.GetWorldId(worldName);
@@ -663,6 +669,8 @@ task.spawn(function()
 		Permission = shared.modCommandsLibrary.PermissionLevel.Admin;
 		Description = [[Server commands.
 		/server getregion
+		/server owner
+		/server privateid
 		]];
 
 		RequiredArgs = 0;
@@ -674,14 +682,78 @@ task.spawn(function()
 			if action == "getregion" then
 				shared.Notify(player, "Server region code: "..ServerManager.RegionCode, "Inform");
 				
-			elseif action == "" then
+			elseif action == "owner" then
+				shared.Notify(player, `Server OwnerId:{ServerManager:GetPrivateServerOwnerId()}`, "Inform");
 				
+			elseif action == "privateid" then
+				shared.Notify(player, `Server PrivateId:{game.PrivateServerId}`, "Inform");
 				
+			else
+				shared.Notify(player, `Invalid action: {action}`, "Negative");
+
 			end
 			
 			return true;
 		end;
 	});
+
+	shared.modCommandsLibrary:HookChatCommand("newserver", {
+		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+		Description = "Teleport to a player to a new server.";
+		
+		RequiredArgs = 0;
+		UsageInfo = "/newserver [playerName/*]";
+		Function = function(speaker, args)
+			local player = speaker;
+			local teleportOthers = false;
+			
+			if #args == 1 then
+				if shared.modCommandsLibrary.HasPermissions(player, {Permission = shared.modCommandsLibrary.PermissionLevel.Admin}) then
+	
+					if args[1] == "*" then
+						teleportOthers = true;
+						
+					else
+						local matches = modCommandHandler.MatchName(args[1]);
+						if #matches > 1 then
+							shared.modCommandsLibrary.GenericOutputs.MultipleMatch(player, matches);
+							return false;
+						elseif #matches < 1 then
+							shared.modCommandsLibrary.GenericOutputs.NoMatch(player, args[1]);
+							return false;
+						else
+							player = matches[1];
+						end
+						
+					end
+					
+				else
+					shared.Notify(player, "You don't have permission to teleport others.", "Negative");
+				end
+			end
+			
+			if player then
+				shared.Notify(player, "Teleporting to updated server.", "Inform");
+
+				local worldName = modBranchConfigs.GetWorldName(game.PlaceId);
+				if ServerManager.NewServerAccessCode == nil then
+					ServerManager.NewServerAccessCode = ServerManager:CreatePrivateServer(worldName);
+				end;
+				local teleportPlayers = {player};
+				
+				if teleportOthers == true then
+					teleportPlayers = game.Players:GetPlayers();
+				end
+
+				local teleportData = ServerManager:CreateTeleportData();
+				teleportData.PrivateServerOwnerId = player.UserId;
+				
+				ServerManager:TeleportToPrivateServer(worldName, ServerManager.NewServerAccessCode, teleportPlayers, teleportData);
+			end
+			return true;
+		end;
+	});
+
 end)
 
 
