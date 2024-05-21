@@ -7,6 +7,7 @@ local LocationsList = {};
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 
@@ -69,8 +70,11 @@ function HordeAttack.Start()
 		local randomPoint = Vector3.new(
 			random:NextNumber(randomRegion.Min.X, randomRegion.Max.X),
 			randomRegion.Max.Y,
-			random:NextNumber(randomRegion.Min.Z, randomRegion.Max.Z));
+			random:NextNumber(randomRegion.Min.Z, randomRegion.Max.Z)
+		);
 
+		if modVector.DistanceSqrdXZ(npcModule.SpawnPoint.Position, randomPoint) > math.pow(250, 2) then return end;
+		
 		local groundRay = Ray.new(randomPoint, Vector3.new(0, -20, 0));
 		local groundHit, groundPoint = workspace:FindPartOnRayWithWhitelist(groundRay, {workspace.Environment; workspace.Terrain}, true);
 		

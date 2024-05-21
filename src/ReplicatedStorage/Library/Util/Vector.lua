@@ -14,6 +14,10 @@ function Vector.ClampVector3(vec: Vector3, min, max)
 	)
 end
 
+function Vector.DistanceSqrdXZ(vecA: Vector3, vecB: Vector3)
+	return (vecA.X-vecB.X)^2 + (vecA.Z-vecB.Z)^2;
+end
+
 function Vector.DistanceSqrd(vecA: Vector3, vecB: Vector3)
 	return (vecA.X-vecB.X)^2 + (vecA.Y-vecB.Y)^2 + (vecA.Z-vecB.Z)^2;
 end
