@@ -7,7 +7,10 @@ local modData = require(localplayer:WaitForChild("DataModule"));
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modCharacter = modData:GetModCharacter();
 
-local bossModel = script:WaitForChild("Prefab").Value; 
+local prefabObjVal = script:WaitForChild("Prefab");
+while prefabObjVal.Value == nil do task.wait() end;
+
+local bossModel = prefabObjVal.Value;
 local humanoid = bossModel:WaitForChild("Zombie");
 local rootPart = bossModel:WaitForChild("HumanoidRootPart");
 

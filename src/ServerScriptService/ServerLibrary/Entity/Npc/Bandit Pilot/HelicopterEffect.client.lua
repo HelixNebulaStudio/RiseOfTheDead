@@ -7,16 +7,9 @@ local modData = require(localplayer:WaitForChild("DataModule"));
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modCharacter = modData:GetModCharacter();
 
-local prefabTag = script:WaitForChild("Prefab");
-local pilotPrefab = prefabTag.Value;
-for a=1, 20 do
-	pilotPrefab = prefabTag.Value;
-	if pilotPrefab then
-		break;
-	else
-		wait(1);
-	end
-end
+local prefabObjVal = script:WaitForChild("Prefab");
+while prefabObjVal.Value == nil do task.wait() end;
+local pilotPrefab = prefabObjVal.Value;
 
 local helicopterModel = pilotPrefab:WaitForChild("Helicopter");
 local animationController = helicopterModel:WaitForChild("AnimationController");

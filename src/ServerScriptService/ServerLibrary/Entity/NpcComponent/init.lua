@@ -80,7 +80,9 @@ function NpcComponent:LoadClientScript(players)
 			clientEffects:SetAttribute("EntityId", self.Prefab:GetAttribute("EntityId"));
 			local prefabTag = clientEffects:WaitForChild("Prefab");
 			prefabTag.Value = self.Prefab;
-			clientEffects.Parent = player.Character;
+			task.defer(function()
+				clientEffects.Parent = player.Character;
+			end)
 
 			self.Prefab.Destroying:Connect(function()
 				game.Debris:AddItem(clientEffects, 0);

@@ -143,6 +143,7 @@ return function(self)
 					Owner = self.Owner;
 					StorageItem = self.StorageItem;
 					TargetableEntities = {
+						Humanoid=1;
 						Zombie=1;
 						Bandit=1;
 						Cultist=1;
@@ -157,6 +158,8 @@ return function(self)
 					OnDamagableHit = function(damagable, damage)
 						if damagable.Object.ClassName == "NpcStatus" then
 							local npcModule = damagable.Object:GetModule();
+							if npcModule.Prefab == self.Prefab then return end;
+							
 							local healthInfo = damagable:GetHealthInfo();
 							if npcModule.Properties and npcModule.Properties.BasicEnemy then
 								damage = healthInfo.MaxHealth * 0.2;
