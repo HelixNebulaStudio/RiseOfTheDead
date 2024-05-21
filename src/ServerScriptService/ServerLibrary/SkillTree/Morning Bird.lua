@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== 
-local Skill = {Library=nil;};
+local Skill = {Library=nil; CalStats=nil;};
 Skill.__index = Skill;
 --==
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
@@ -14,7 +14,7 @@ function Skill:Trigger(profile, triggerType, points, ...)
 		local level, stats = Skill:CalStats(Skill.Library, points);
 		local duration = math.ceil(stats.Time.Value*60);
 		classPlayer:SetHealSource(Skill.Library.Id, {
-			Amount=stats.Heal.Value;
+			Amount=(stats.Heal.Value/10);
 			Expires=modSyncTime.GetTime() + duration;
 			Duration=duration;
 		});
