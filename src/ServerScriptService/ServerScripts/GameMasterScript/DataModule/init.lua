@@ -627,6 +627,7 @@ function Data:GetMission(id)
 	return;
 end
 
+
 function Data:GetSkillTree(skillId)
 	local skilltree = Data.Profile.SkillTree.ActiveTree and Data.Profile.SkillTree.Trees[Data.Profile.SkillTree.ActiveTree];
 	

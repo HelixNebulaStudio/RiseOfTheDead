@@ -159,11 +159,6 @@ return function(CutsceneSequence)
 					dallasModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
-				
-				local hair = robertModule.Prefab:WaitForChild("Hair");
-				hair.Handle.Transparency = 0;
-				local robloxUBeanie = robertModule.Prefab:WaitForChild("RobloxUBeanie");
-				robloxUBeanie.Handle.Transparency = 1
 			end
 			
 			local josephModule = modNpc.GetPlayerNpc(player, "Joseph");

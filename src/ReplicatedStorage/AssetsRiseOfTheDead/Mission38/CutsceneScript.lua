@@ -52,12 +52,6 @@ return function(CutsceneSequence)
 							-- rbxassetid://141728515 original face
 							local face = robertModule.Prefab.Head:WaitForChild("face");
 							face.Texture = "rbxassetid://5195838286";
-
-							local hair = robertModule.Prefab:WaitForChild("Hair");
-							hair.Handle.Transparency = 0;
-
-							local robloxUBeanie = robertModule.Prefab:WaitForChild("RobloxUBeanie");
-							robloxUBeanie.Handle.Transparency = 1;
 						end)
 						robertModule.Actions:WaitForOwner(40);
 						modMission:Progress(player, missionId, function(mission)
@@ -145,14 +139,6 @@ return function(CutsceneSequence)
 						robertModule.Move:Face(Vector3.new(1126.967, 58.25, -70.092));
 						
 						spawn(function()
-							-- rbxassetid://141728515 original face
-
-							local hair = robertModule.Prefab:WaitForChild("Hair");
-							hair.Handle.Transparency = 0;
-
-							local robloxUBeanie = robertModule.Prefab:WaitForChild("RobloxUBeanie");
-							robloxUBeanie.Handle.Transparency = 1;
-
 							local face = robertModule.Prefab.Head:WaitForChild("face");
 							face.Texture = "rbxassetid://5195838286";
 						end)
@@ -163,14 +149,6 @@ return function(CutsceneSequence)
 
 					elseif mission.ProgressionPoint == 6 then
 						spawn(function()
-							-- rbxassetid://141728515 original face
-
-							local hair = robertModule.Prefab:WaitForChild("Hair");
-							hair.Handle.Transparency = 0;
-
-							local robloxUBeanie = robertModule.Prefab:WaitForChild("RobloxUBeanie");
-							robloxUBeanie.Handle.Transparency = 1;
-
 							local face = robertModule.Prefab.Head:WaitForChild("face");
 							face.Texture = "rbxassetid://5195838286";
 						end)
@@ -224,13 +202,10 @@ return function(CutsceneSequence)
 					local hair = robertModule.Prefab:WaitForChild("Hair");
 					hair.Handle.Transparency = 0;
 
-					local robloxUBeanie = robertModule.Prefab:WaitForChild("RobloxUBeanie");
-					robloxUBeanie.Handle.Transparency = 1
-
 				end
 			end
 			mission.Changed:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
 		end)
 
 	end

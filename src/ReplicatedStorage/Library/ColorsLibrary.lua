@@ -118,7 +118,7 @@ function ColorsLibary.ApplyAppearance(weaponModel, itemValues)
 	if itemValues.ActiveSkin then
 		local itemDisplayLib = modWorkbenchLibrary.ItemAppearance[itemId];
 		
-		local appearLib = itemDisplayLib[(prefix == "R-" and "Right" or prefix == "L-" and "Left" or "").."ToolGrip"];
+		local appearLib = itemDisplayLib and itemDisplayLib[(prefix == "R-" and "Right" or prefix == "L-" and "Left" or "").."ToolGrip"];
 		if appearLib then
 			for _, baseItemPart in pairs(baseItemModel:GetChildren()) do
 				if not baseItemPart:IsA("BasePart") then continue end;

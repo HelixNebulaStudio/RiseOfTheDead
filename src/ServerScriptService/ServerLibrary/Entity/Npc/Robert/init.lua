@@ -21,6 +21,7 @@ return function(npc, spawnPoint)
 	};
 	
 	--== Initialize;
+	self:SetClientScript(script:WaitForChild("RobertClient"));
 	function self.Initialize()
 		self.Move.SetDefaultWalkSpeed = 10;
 		self.Move:Init();
