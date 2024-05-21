@@ -177,11 +177,8 @@ function OnPlayerAdded(player)
 		local barricade;
 		if missionFirstRescue == nil or missionFirstRescue.Type < 3 then
 			
-			local replist = modReplicationManager.GetReplicated(player, "bloxmartBlockage");
-			if #replist > 0 then
-				barricade = replist[1];
-				
-			else
+			barricade = modReplicationManager.GetReplicated(player, "bloxmartBlockage")[1];
+			if barricade == nil then
 				Debugger:Warn("New barracade for "..player.Name);
 				barricade = Prefabs:WaitForChild("bloxmartBlockage"):Clone();
 

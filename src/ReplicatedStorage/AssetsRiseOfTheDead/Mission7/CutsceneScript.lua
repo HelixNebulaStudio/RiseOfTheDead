@@ -68,8 +68,9 @@ return function(CutsceneSequence)
 				robertModule.Move:SetMoveSpeed("set", "default", 10);
 				robertModule.Humanoid.JumpPower = 0;
 				
-				robertModule.Move:MoveTo(Vector3.new(15.68, 57.66, 42.31));
+				robertModule.Move:MoveTo(Vector3.new(13, 57.5, 39.3));
 				robertModule.Move.MoveToEnded:Wait(15);
+				robertModule.Move:Stop();
 				
 				robertModule.Actions:Teleport(CFrame.new(15.6800423, 57.6597404, 42.3099594, 1, 0, 0, 0, 1, 0, 0, 0, 1));
 				
@@ -106,8 +107,8 @@ return function(CutsceneSequence)
 					if face then face.Texture = "rbxassetid://277939506" end;
 					wait(0.5)
 					
-					robertModule.Move:MoveTo(Vector3.new(59.34, 57.7, -28.03));
-					robertModule.Move.MoveToEnded:Wait(20);
+					robertModule.Move:MoveTo(Vector3.new(58.482, 57.7, -28.756));
+					robertModule.Move.MoveToEnded:Wait(10);
 					
 					-- Run to Warehouse Exit;
 					robertModule.Actions:WaitForOwner(30);
@@ -115,7 +116,7 @@ return function(CutsceneSequence)
 
 					-- Run to Fence Door;
 					robertModule.Move:MoveTo(Vector3.new(107.235, 57.7, -30.3));
-					robertModule.Move.MoveToEnded:Wait(20);
+					robertModule.Move.MoveToEnded:Wait(5);
 					
 					robertModule.Actions:WaitForOwner(30);
 					robertModule.Actions:EnterDoor("warehouseFenceExit");

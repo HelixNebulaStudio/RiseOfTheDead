@@ -47,6 +47,7 @@ function Movement.new(parallelNpc)
 	local humanoid: Humanoid = self.ParallelNpc.Humanoid;
 	local rootPart: BasePart = self.ParallelNpc.RootPart;
 	local moveSpeed = self.ParallelNpc.MoveSpeed;
+	local prefabHeight = prefab:GetExtentsSize().Y;
 
 	local stuckTick = tick();
 	local lastStuckTick = nil;
@@ -63,6 +64,10 @@ function Movement.new(parallelNpc)
 		--local dist = (posA-posB).Magnitude;
 		--if pDist == true then Debugger:Warn("dist", dist) end;
 		--return dist <= range;
+		if math.abs(posA.Y-posB.Y) > (prefabHeight/2) then return false end;
+
+		posA = Vector3.new(posA.X, 0, posA.Z);
+		posB = Vector3.new(posB.X, 0, posB.Z);
 		return modRegion:InRegion(posA, posB, range);
 	end
 	
@@ -94,7 +99,7 @@ function Movement.new(parallelNpc)
 			local rootPartPos = getRootPos();
 			local targetPos = self.TargetPosition;
 			
-			if IsInRange(rootPartPos, targetPos, 4) and rootPartPos.Y > targetPos.Y then 
+			if IsInRange(rootPartPos, targetPos, 2) and rootPartPos.Y > targetPos.Y then 
 				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("rpp == tp") end;
 				
 				dumbFollow = tick();
@@ -296,7 +301,7 @@ function Movement.new(parallelNpc)
 			if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("#wp <= 0") end;
 			
 		else
-			if self.LastTargetPosition == nil or not IsInRange(self.TargetPosition, self.LastTargetPosition, 2) then -- Target position moved;
+			if self.LastTargetPosition == nil or not modRegion:InRegion(self.TargetPosition, self.LastTargetPosition, 2) then -- Target position moved;
 				local ltpIsNil = self.LastTargetPosition == nil;
 				self.LastTargetPosition = self.TargetPosition;
 				self.Recompute = true;
