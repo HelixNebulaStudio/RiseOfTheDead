@@ -108,8 +108,6 @@ NpcClothing.StrangerPants = {
 	{Id="rbxassetid://382537949"};
 	{Id="rbxassetid://382537805"};
 	{Id="rbxassetid://382538502"};
-
-	{Id="rbxassetid://398633811"};
 };
 
 NpcClothing.StrangerFaces = {

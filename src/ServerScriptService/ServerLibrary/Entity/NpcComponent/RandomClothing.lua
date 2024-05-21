@@ -1,6 +1,5 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
---local modClothing = require(game.ServerScriptService.ServerLibrary.Clothing);
 local modNpcClothing = require(game.ServerScriptService.ServerLibrary.NpcClothing);
 
 local NpcRandomClothing = {};
@@ -9,9 +8,7 @@ local ShirtParts = {
 	"UpperTorso"; "LowerTorso"; 
 	"LeftUpperArm"; "RightUpperArm"; 
 	"LeftLowerArm"; "RightLowerArm"; 
-	"LeftHand"; "RightHand"; 
-	--"LeftPoint"; "LeftMiddle"; "LeftPinky";
-	--"RightPoint"; "RightPoint"; "RightPinky";
+	"LeftHand"; "RightHand";
 };
 local PantsParts = {
 	"LeftUpperLeg"; "RightUpperLeg"; 
@@ -24,8 +21,8 @@ function NpcRandomClothing.new(self)
 		local oldShirt = self.Prefab:FindFirstChildWhichIsA("Shirt");
 		local oldPants = self.Prefab:FindFirstChildWhichIsA("Pants");
 		
-		local rngShirt = modNpcClothing:GetShirt(npcName, self.Seed);
-		local rngPants = modNpcClothing:GetPants(npcName, self.Seed);
+		local rngShirt = self.PresetShirt or modNpcClothing:GetShirt(npcName, self.Seed);
+		local rngPants = self.PresetPants or modNpcClothing:GetPants(npcName, self.Seed);
 
 		local rngSkinColor = modNpcClothing:GetSkinColor(npcName, self.Seed);
 		self.Head.Color = rngSkinColor;
