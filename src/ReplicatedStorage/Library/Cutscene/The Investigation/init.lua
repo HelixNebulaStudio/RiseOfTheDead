@@ -53,6 +53,7 @@ return function(CutsceneSequence)
 				local npc = modNpc.Spawn("Robert", nil, function(npc, npcModule)
 					npcModule.Owner = player;
 					robertModule = npcModule;
+					robertModule.EntityStatus.Disabled = true;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
 			end
@@ -125,6 +126,7 @@ return function(CutsceneSequence)
 					npcModule.Owner = player;
 					npcModule.Prefab:SetAttribute("LookAtClient", false);
 					robertModule = npcModule;
+					robertModule.EntityStatus.Disabled = true;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
 			end
@@ -367,7 +369,7 @@ return function(CutsceneSequence)
 						wait(0.2);
 						dallasModule.Wield.ReloadRequest();
 						nateModule.Humanoid.PlatformStand = true;
-						--nateModule.Humanoid:ChangeState(Enum.HumanoidStateType.Physics);
+						
 						nateModule.RootPart:ApplyImpulse(Vector3.new(0, 500, 1000));
 						nateModule.Wield.Unequip();
 						nateModule.AvatarFace:Set("Unconscious");
@@ -526,7 +528,8 @@ return function(CutsceneSequence)
 						
 						robertModule.Move:MoveTo(Vector3.new(-16.408, 162.593, -48.561));
 						wait(1.5);
-						robertModule.Actions:Teleport(CFrame.new(38.07024, 176.987366, -44.433876, -1, 0, 0, 0, 1, 0, 0, 0, -1));
+						robertModule:TeleportHide();
+						--robertModule.Actions:Teleport(CFrame.new(38.07024, 176.987366, -44.433876, -1, 0, 0, 0, 1, 0, 0, 0, -1));
 						
 						wait(3);
 						shared.Notify(player, "*Helicopter lands upstairs..*", "Message");

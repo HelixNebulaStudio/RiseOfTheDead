@@ -2,9 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Variables;
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
-local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
-local modBlueprints = require(game.ServerScriptService.ServerLibrary.Blueprints);
-
 
 --==
 return function(player, dialog, data, mission)

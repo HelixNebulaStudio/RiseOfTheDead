@@ -150,6 +150,7 @@ if RunService:IsServer() then
 								frostStack.LastStackTick = tick();
 								
 								task.spawn(function()
+									
 									local damagable = modDamagable.NewDamagable(npcModule.Prefab);
 									if damagable == nil or not damagable:CanDamage(player) then return end;
 									if damagable.Object.ClassName ~= "NpcStatus" then return end;
@@ -281,6 +282,7 @@ if RunService:IsServer() then
 				DamagePool=0;
 				
 				CompleteTick=tick()+freezeDuration;
+				UpdateEffects=(function() end);
 			});
 			
 			Mod.NewFrostStack(enemyNpcModule, newFrostStack, damageSource, player);
@@ -295,6 +297,8 @@ if RunService:IsServer() then
 	
 	
 	function Mod.NewFrostStack(npcModule, frostStack, damageSource, player)
+		if frostStack == nil then return end;
+
 		local frostMeta = {};
 		frostMeta.__index = frostMeta;
 		frostMeta.Player = player;
@@ -398,7 +402,6 @@ if RunService:IsServer() then
 		
 		
 		local entityStatus = npcModule.EntityStatus;
-		
 		local isBasicEnemy = npcModule and npcModule.Properties and npcModule.Properties.BasicEnemy == true;
 
 		local maxHealth = npcModule:GetHealth("MaxHealth", targetPart);

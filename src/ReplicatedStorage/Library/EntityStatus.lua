@@ -17,6 +17,7 @@ function EntityStatus.new(preData)
 		List = {};
 		ActiveJob = nil;
 		OnProcess = modEventSignal.new("OnEntityStatusProcess");
+		Disabled = false;
 	};
 	
 	if preData then
@@ -30,6 +31,7 @@ function EntityStatus.new(preData)
 end
 
 function EntityStatus:GetOrDefault(k, v)
+	if self.Disabled then return end;
 	if self.List[k] then return self.List[k] end;
 	if v == nil then return end;
 	
@@ -38,6 +40,8 @@ function EntityStatus:GetOrDefault(k, v)
 end
 
 function EntityStatus:Apply(k, v)
+	if self.Disabled then return end;
+	
 	self.List[k] = v;
 	
 	self:Process();

@@ -40,6 +40,7 @@ return function(CutsceneSequence)
 							local npc = modNpc.Spawn("Robert", CFrame.new(345.23999, 8.55466652, -7.92925215, 1, 0, 0, 0, 1, 0, 0, 0, 1), function(npc, npcModule)
 								npcModule.Owner = player;
 								robertModule = npcModule;
+								robertModule.EntityStatus.Disabled = true;
 							end);
 							modReplicationManager.ReplicateOut(player, npc);
 						end
@@ -94,7 +95,7 @@ return function(CutsceneSequence)
 				end
 			end
 			mission.Changed:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
 		end)
 
 	elseif modBranchConfigs.IsWorld("TheResidentials") then
@@ -111,6 +112,7 @@ return function(CutsceneSequence)
 					local npc = modNpc.Spawn("Robert", CFrame.new(1127.07922, 57.5696716, -108.439293, -1, 0, 0, 0, 1, 0, 0, 0, -1), function(npc, npcModule)
 						npcModule.Owner = player;
 						robertModule = npcModule;
+						robertModule.EntityStatus.Disabled = true;
 					end);
 					robertModule.SetAnimation("LookBack", {script.LookbackAnim});
 					robertModule.AvatarFace.Default = "rbxassetid://141728515";

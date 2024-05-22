@@ -4,10 +4,6 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 
-local FirebaseService = require(game.ServerScriptService.ServerLibrary.FirebaseService);
-local missionDatastore = FirebaseService:GetFirebase("CommunityMissions");
-
-
 --==
 return function(player, dialog, data, mission)
 	if modBranchConfigs.IsWorld("TheInvestigation") then return end;

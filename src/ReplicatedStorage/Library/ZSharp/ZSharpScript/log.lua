@@ -15,7 +15,7 @@ function ZSharp.Load(zSS, zEnv)
 		end
 		local str = table.concat(toStringify, " ");
 		
-		zSS.ConsoleOutput:Fire(`{modRichFormatter.Color("255, 142, 58", prefix)}{modZSharpLexer.buildStr(str, true)}`);
+		zSS.ConsoleOutput:Fire(`{modRichFormatter.Color(Color3.fromRGB(255, 142, 58):ToHex(), prefix)}{modZSharpLexer.buildStr(str, true)}`);
 
 	end
 	

@@ -549,7 +549,7 @@ function Interface.init(modInterface)
 	task.spawn(function()
 		while Debugger.LogRemote == nil do task.wait(); end;
 		Debugger.LogRemote.OnClientEvent:Connect(function(str)
-			Interface.Println(modRichFormatter.Color("255, 142, 58", "Server>>  "), modZSharpLexer.buildStr(str, true));
+			Interface.Println(modRichFormatter.Color(Color3.fromRGB(255, 142, 58):ToHex(), "Server>>  "), modZSharpLexer.buildStr(str, true));
 		end)
 	end)
 

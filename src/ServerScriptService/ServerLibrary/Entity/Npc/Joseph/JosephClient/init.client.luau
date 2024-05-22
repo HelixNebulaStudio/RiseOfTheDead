@@ -8,8 +8,8 @@ local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 
 local function updateVisual()
     pcall(function()
-        local mission58 = modData:GetMission(58); -- The Investigation
-        if mission58 and mission58.Type == 3 then
+        local mission52 = modData:GetMission(52); -- The Investigation
+        if mission52 and mission52.Type == 3 then
 			prefab:WaitForChild("Bandage"):WaitForChild("Handle").Transparency = 0;
 			prefab:WaitForChild("LeftLowerArm").Transparency = 1;
 			prefab:WaitForChild("LeftHand").Transparency = 1;

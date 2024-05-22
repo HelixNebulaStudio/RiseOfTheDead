@@ -19,6 +19,7 @@ local remotes = game.ReplicatedStorage:WaitForChild("Remotes", 10);
 
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations", 10));
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
+local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = require(character:WaitForChild("CharacterModule") :: ModuleScript);
@@ -93,8 +94,9 @@ local function updateOmniLabel()
 	local vText = "";
 	local upTime = modSyncTime.ToString(os.time()-modSyncTime.GetUpTime());
 	
+	local branchText = modRichFormatter.Color(modBranchConfigs.BranchColor:ToHex() , modBranchConfigs.CurrentBranch.Name);
 	if modGlobalVars.EngineMode == "RiseOfTheDead" then
-		vText = "$fps fps\t"..(upTime.."\tRevived "..modGlobalVars.GameVersion.." Beta "..(modData:IsMobile() and "M" or ""))
+		vText = "$fps fps\t"..(upTime.."\tRevived "..modGlobalVars.GameVersion.." "..branchText.." "..(modData:IsMobile() and "M" or ""))
 	else
 		vText = modGlobalVars.ModeVerLabel:gsub("$UpTime", upTime);
 	end

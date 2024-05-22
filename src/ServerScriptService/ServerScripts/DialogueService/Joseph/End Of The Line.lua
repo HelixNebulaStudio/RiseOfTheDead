@@ -5,9 +5,6 @@ local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 local modBlueprints = require(game.ServerScriptService.ServerLibrary.Blueprints);
 
-local FirebaseService = require(game.ServerScriptService.ServerLibrary.FirebaseService);
-local missionDatastore = FirebaseService:GetFirebase("CommunityMissions");
-
 --==
 return function(player, dialog, data, mission)
 	
