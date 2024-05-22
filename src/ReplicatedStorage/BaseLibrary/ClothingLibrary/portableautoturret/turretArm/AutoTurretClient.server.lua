@@ -123,6 +123,7 @@ if isOwner then
 	UserInputService.InputBegan:connect(function(inputObject, inputEvent)
 		if UserInputService:GetFocusedTextBox() ~= nil then return end;
 		if modKeyBindsHandler:Match(inputObject, "KeyTogglePat") then
+			if turretArm.Parent == nil or turretArm.Parent.Parent ~= character then return end;
 
 			if tick()-debounce <= 1 then return end;
 			debounce = tick();
