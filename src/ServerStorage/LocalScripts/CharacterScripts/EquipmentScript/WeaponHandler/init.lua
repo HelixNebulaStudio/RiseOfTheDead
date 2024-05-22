@@ -995,11 +995,6 @@ function WeaponHandler:Equip(library, weaponId)
 					return cf.lookVector;
 				end
 				
-				if configurations.ShakeCamera and modCharacter.CameraShakeAndZoom and Equipped.RightHand.Data.Inaccuracy then
-					--modCharacter.CameraShakeAndZoom(Equipped.RightHand.Data.Inaccuracy/2, 1, properties.FireRate);
-					--modCharacter.CameraShakeAndZoom(1, 1, math.clamp(Equipped.RightHand.Data.Inaccuracy/20, 0.3, 2));
-				end
-				
 				modWeaponMechanics.CreateMuzzle(objectTable.MuzzleOrigin, objectTable.BulletOrigin, multishot, configurations.GenerateMuzzle);
 			
 				shotData.ShotOrigin = objectTable.BulletOrigin;
@@ -1032,7 +1027,6 @@ function WeaponHandler:Equip(library, weaponId)
 						newInaccuracy = newInaccuracy - inaccuracyDeduction;
 					end
 					local spreadedDirection = spread(shotData.Direction, math.max(newInaccuracy, 0), multiIndex);
-					
 					
 					if configurations.BulletMode == modAttributes.BulletModes.Hitscan then
 						
@@ -1264,16 +1258,8 @@ function WeaponHandler:Equip(library, weaponId)
 							table.insert(shotData.Projectiles, pdata);
 							
 						end
-						
-						
 					end
 
-					if Debugger.ClientFps <= 30 then
-						task.wait();
-						if  Debugger.ClientFps <= 15 then
-							task.wait();
-						end
-					end 
 				end
 				
 				if configurations.FocusDuration > 0 then
