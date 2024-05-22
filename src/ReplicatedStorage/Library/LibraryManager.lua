@@ -110,7 +110,7 @@ function LibraryManager.new()
 		Sorted = {};
 		Index = {};
 		Library = {};
-		Keys = {};
+		Keys = {} :: {string};
 		Size = 0;
 	};
 	

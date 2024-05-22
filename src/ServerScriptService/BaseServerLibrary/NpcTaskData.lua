@@ -6,6 +6,8 @@ local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 local modNpcTasksLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcTasksLibrary);
+local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
+local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 
 local modColorPicker = require(game.ReplicatedStorage.Library.UI.ColorPicker);
 
@@ -31,6 +33,7 @@ export type NpcTaskData = typeof(setmetatable( npcTaskDataObject , NpcTaskData))
 --==
 
 function NpcTaskData:NewTask(npcName, taskPacket)
+    local npcData = self:GetNpcData(npcName);
     local npcTasks = self:GetTasks(npcName);
     local maxTasks = 1;
 
@@ -54,11 +57,23 @@ function NpcTaskData:NewTask(npcName, taskPacket)
         end
     end
 
-    if table.find(taskLib.NpcsList, npcName) == nil then
+    if modNpcTasksLibrary.NpcTasks[npcName] == nil then
         rPacket.FailMsg = "Invalid npc task.";
         return rPacket;
     end
 
+    local npcTaskExist = false;
+    for a=1, #modNpcTasksLibrary.NpcTasks[npcName] do
+        if modNpcTasksLibrary.NpcTasks[npcName][a].Id == taskId then
+            npcTaskExist = true;
+            break;
+        end
+    end
+    if not npcTaskExist then
+        rPacket.FailMsg = "Invalid npc task.";
+        return rPacket;
+    end
+    
     -- Check task requirements;
     for a=1, #taskLib.Requirements do
         local requireData = taskLib.Requirements[a];
@@ -69,6 +84,22 @@ function NpcTaskData:NewTask(npcName, taskPacket)
                 rPacket.FailMsg = "Failed requirements.";
                 return rPacket;
             end
+
+        elseif requireData.Type == "Stat" then
+            if npcData == nil then
+                rPacket.FailMsg = "Failed requirements.";
+                return rPacket;
+            end
+
+            if requireData.Id == "Happiness" and npcData.Happiness < requireData.Value then
+                rPacket.FailMsg = "Failed requirements.";
+                return rPacket;
+
+            elseif requireData.Id == "Hunger" and npcData.Hunger < requireData.Value then
+                rPacket.FailMsg = "Failed requirements.";
+                return rPacket;
+            end
+            
         end
     end
 
@@ -139,6 +170,13 @@ function NpcTaskData:Load(rawData)
 	return self;
 end
 
+function NpcTaskData:GetNpcData(npcName)
+    local profile = shared.modProfile:Get(self.Player);
+    local safehomeData = profile.Safehome;
+    
+    return safehomeData:GetNpc(npcName);
+end
+
 function NpcTaskData.new(player) : NpcTaskData
 	local meta = {
 		Player = player;
@@ -205,6 +243,29 @@ function remoteNpcData.OnServerInvoke(player: Player, action: string, npcName: s
             return rPacket;
         end
 
+        -- Check fail factors;
+        local taskFailed = nil;
+        for a=1, #taskLib.FailFactors do
+            local failFactor = taskLib.FailFactors[a];
+
+            if failFactor.Type == "Stat" then
+                if failFactor.Id == "Hunger" and npcData.Hunger < failFactor.Value then
+                    taskFailed = "Failed due to Hunger";
+                    break;
+                end
+            end
+        end
+        if taskFailed then
+            table.remove(npcTaskData.Npc[npcName], taskIndex);
+        
+            rPacket.Success = true;
+            rPacket.TaskFailed = taskFailed;
+            rPacket.Data = npcTaskData:GetTasks(npcName);
+    
+            return rPacket;
+        end
+        
+        -- MARK: Task Succeed
         local list = {};
 		for a=1, #taskLib.Rewards do
 			local rewardData = taskLib.Rewards[a];
@@ -213,34 +274,43 @@ function remoteNpcData.OnServerInvoke(player: Player, action: string, npcName: s
                 local itemValues = {};
                 rewardData.SetItemValues(itemValues, taskData);
 				table.insert(list, {ItemId=rewardData.ItemId; Data={Quantity=qty; Values=itemValues;};});
+
+            elseif rewardData.Type == "ItemDrop" then
+                local rewardsList = modRewardsLibrary:Find(rewardData.RewardId);
+                local rewardsData = modDropRateCalculator.RollDrop(rewardsList, player);
+
+                for a=1, #rewardsData do
+                    local rewardInfo = rewardsData[a];
+                    table.insert(list, {ItemId=rewardInfo.ItemId; Data={Quantity=rewardInfo.Quantity; Values={};};});
+                end
 			end
 		end
-		local hasSpace = playerInventory:SpaceCheck(list);
-		if not hasSpace then
-			rPacket.FailMsg = "Inventory full!";
-            return rPacket;
-		end
 
-		for a=1, #taskLib.Rewards do
-			local rewardData = taskLib.Rewards[a];
-			if rewardData.Type == "Item" then
-                local qty = rewardData.Quantity or 1;
-                local itemValues = {};
-                rewardData.SetItemValues(itemValues, taskData);
-                
-                local itemLibrary = modItemsLibrary:Find(rewardData.ItemId);
+        local hasSpace = playerInventory:SpaceCheck(list);
+        if not hasSpace then
+            rPacket.FailMsg = "Inventory full!";
+            return rPacket;
+        end
+
+        if #list > 0 then
+            for a=1, #list do
+                local addItem = list[a];
+
+                local itemLibrary = modItemsLibrary:Find(addItem.ItemId);
                 playerInventory:Add(
-                    rewardData.ItemId, 
-                    {Quantity=qty; Values=itemValues}, 
+                    addItem.ItemId, 
+                    addItem.Data, 
                     function(queueEvent, storageItem)
-                        shared.Notify(player, `You recieved {(qty > 1 and qty.." "..itemLibrary.Name or "a "..itemLibrary.Name)} from {npcName}.`, "Reward");
+                        local itemTxt = addItem.Data.Quantity > 1 and `{addItem.Data.Quantity} {itemLibrary.Name}` or `a {itemLibrary.Name}`;
+                        shared.Notify(player, `You recieved {itemTxt} from {npcName}.`, "Reward");
                         shared.modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
                     end
                 );
 
-                Debugger:StudioWarn("Reward:", rewardData.ItemId, "itemValues", itemValues);
-			end
-		end
+                Debugger:StudioWarn("Reward:", addItem);
+            end
+        end
+
 
         table.remove(npcTaskData.Npc[npcName], taskIndex);
         

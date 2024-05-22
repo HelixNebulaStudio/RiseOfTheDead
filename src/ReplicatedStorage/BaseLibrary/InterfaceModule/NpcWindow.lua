@@ -40,6 +40,7 @@ function Interface.init(modInterface)
 	local mainFrame = windowFrame:WaitForChild("MainFrame") :: ScrollingFrame;
 	local leftFrame = mainFrame:WaitForChild("LeftFrame");
 	local viewportFrame = leftFrame:WaitForChild("ViewportFrame")
+	local npcStatsLabel = viewportFrame:WaitForChild("ViewportLabel");
 	local rightScrollFrame: ScrollingFrame = mainFrame:WaitForChild("RightScrollFrame");
 	
 	local activeTasksPage = rightScrollFrame:WaitForChild("ActiveTasksPage") :: Frame;
@@ -190,6 +191,17 @@ function Interface.init(modInterface)
 		if activeStorageInterface then
 			activeStorageInterface:Update();
 		end
+
+		local npcTasks = modData.Profile.NpcTaskData and modData.Profile.NpcTaskData.Npc and modData.Profile.NpcTaskData.Npc[activeNpcName];
+		
+		local npcStatsText = {};
+		table.insert(npcStatsText, `Happiness: { string.format("%.1f", math.clamp(npcData.Happiness or 0, 0, 1) *100) }%`);
+		table.insert(npcStatsText, `Hunger: { string.format("%.1f", math.clamp(npcData.Hunger or 0, 0, 1) *100) }%\n`);
+		table.insert(npcStatsText, `Max Health: { string.format("%.0f", math.max(npcData.Health or 0, 0)) } hp`);
+		table.insert(npcStatsText, `Max Armor: { string.format("%.0f", math.max(npcData.Armor or 0, 0)) } ap`);
+		table.insert(npcStatsText, `Status: {npcTasks and #npcTasks > 0 and "Busy" or "Idle"}`);
+
+		npcStatsLabel.Text = table.concat(npcStatsText, "\n");
 	end
 
 	function Interface.RefreshActiveTasksPage()
@@ -256,12 +268,19 @@ function Interface.init(modInterface)
 
 					if rPacket.Success then
 						modData.Profile.NpcTaskData.Npc[activeNpcName] = rPacket.Data;
+
+						if rPacket.TaskFailed then
+							packet.Button.Text = rPacket.TaskFailed;
+							task.wait(1);
+						end
 						
 						activePage = nil;
 						Interface.RefreshPage();
+
 					elseif rPacket.FailMsg then
 						packet.Button.Text = rPacket.FailMsg;
 						task.wait(0.4);
+
 					end
 
 					completeDebounce = false;
@@ -487,12 +506,47 @@ function Interface.init(modInterface)
 			local descLabel = detailsFrame:WaitForChild("DescLabel") :: TextLabel;
 			local descTxt = "";
 
-			descTxt = descTxt..`    <b>Task:</b> {taskLib.Description}\n\n    <b>Duration:</b> {modSyncTime.ToString(taskLib.Duration)}\n\n    <b>Requirements:</b> `;
+			descTxt = descTxt..`    <b>Task:</b> {taskLib.Description}\n\n    <b>Duration:</b> {modSyncTime.ToString(taskLib.Duration)}`;
 
-			for key, requireData in pairs(taskLib.Requirements) do
-				if requireData.Type == "Mission" then
-					local missionLib = modMissionLibrary.Get(requireData.Id);
-					descTxt = descTxt..`\n        - {requireData.Type}: {missionLib.Name}`;
+			--[[
+				> &gt;
+				< &lt
+			]]
+
+			if #taskLib.Requirements > 0 then
+				descTxt = descTxt..`\n\n    <b>Requirements:</b> `
+				for key, requireData in pairs(taskLib.Requirements) do
+					if requireData.Type == "Mission" then
+						local missionLib = modMissionLibrary.Get(requireData.Id);
+						descTxt = descTxt..`\n        - {requireData.Type}: {missionLib.Name}`;
+	
+					elseif requireData.Type == "Stat" then
+						local v = requireData.Value;
+						if requireData.Id == "Happiness" then
+							descTxt = descTxt..`\n        - {requireData.Id}: &gt;{ string.format("%.1f", v*100) }%`;
+	
+						elseif requireData.Id == "Hunger" then
+							descTxt = descTxt..`\n        - {requireData.Id}: &gt;{ string.format("%.1f", v*100) }%`;
+	
+						end
+					end
+				end
+			end
+			
+			if #taskLib.FailFactors > 0 then
+				descTxt = descTxt..`\n\n    <b>Fail Chances:</b> `
+				for key, failFactor in pairs(taskLib.FailFactors) do
+					if failFactor.Type == "Stat" then
+						local v = failFactor.Value;
+	
+						if failFactor.Id == "Hunger" then
+							descTxt = descTxt..`\n        - {failFactor.Id}: &lt;{ string.format("%.1f", v*100) }%`;
+
+						elseif failFactor.Id == "Health" then
+							descTxt = descTxt..`\n        - {failFactor.Id}: &lt;{ string.format("%.1f", v*100) }%`;
+
+						end
+					end
 				end
 			end
 			

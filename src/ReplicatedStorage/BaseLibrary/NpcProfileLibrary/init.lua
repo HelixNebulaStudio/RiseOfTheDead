@@ -85,20 +85,20 @@ library:Add{Id="Bandit"; Class="Bandit";};
 
 
 --== Safehome
-library:Add{Id="Kat"; Class="Medic"; World="Safehome";};
-library:Add{Id="Nicole"; Class="Medic"; World="Safehome";};
-library:Add{Id="Sullivan"; Class="Medic"; World="Safehome";};
-library:Add{Id="Jackson"; Class="Medic"; World="Safehome";};
-library:Add{Id="Rachel"; Class="Medic"; World="TheUnderground"; Avatar="rbxassetid://15944916590";};
+library:Add{Id="Kat"; Class="Medic"; World="Safehome"; SafehomeNpc=true;};
+library:Add{Id="Nicole"; Class="Medic"; World="Safehome"; SafehomeNpc=true;};
+library:Add{Id="Sullivan"; Class="Medic"; World="Safehome"; SafehomeNpc=true;};
+library:Add{Id="Jackson"; Class="Medic"; World="Safehome"; SafehomeNpc=true;};
+library:Add{Id="Rachel"; Class="Medic"; World="TheUnderground"; Avatar="rbxassetid://15944916590"; SafehomeNpc=true;};
 
-library:Add{Id="Zoey"; Class="RAT"; World="Safehome";};
-library:Add{Id="Jackie"; Class="RAT"; World="Safehome";};
-library:Add{Id="Berry"; Class="RAT"; World="Safehome";};
+library:Add{Id="Zoey"; Class="RAT"; World="Safehome"; SafehomeNpc=true;};
+library:Add{Id="Jackie"; Class="RAT"; World="Safehome"; SafehomeNpc=true;};
+library:Add{Id="Berry"; Class="RAT"; World="Safehome"; SafehomeNpc=true;};
 
-library:Add{Id="Scarlett"; Class="Recycler"; World="Safehome";};
-library:Add{Id="Rafael"; Class="Recycler"; World="Safehome";};
+library:Add{Id="Scarlett"; Class="Recycler"; World="Safehome"; SafehomeNpc=true;};
+library:Add{Id="Rafael"; Class="Recycler"; World="Safehome"; SafehomeNpc=true;};
 
-library:Add{Id="Lydia"; Class="FortuneTeller"; World="Safehome";};
+library:Add{Id="Lydia"; Class="FortuneTeller"; World="Safehome"; SafehomeNpc=true;};
 
 
 --== Wanderer

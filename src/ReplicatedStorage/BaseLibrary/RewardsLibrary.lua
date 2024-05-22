@@ -35,6 +35,21 @@ function RewardsLibrary:Init(super)
 		};
 	};
 
+
+	super:Add{
+		Id="npctask:foodscavenge";
+		Rewards={
+			{Index=1; ItemId="cannedbeans"; Quantity={Min=3; Max=6}; Chance=1;};
+			{Index=1; ItemId="chocobar"; Quantity={Min=3; Max=6}; Chance=1;};
+			{Index=1; ItemId="cannedfish"; Quantity=1; Chance=1/4;};
+			{Index=1; ItemId="sandwich"; Quantity=1; Chance=1/4;};
+			{Index=1; ItemId="bloxycola"; Quantity=1; Chance=1/8;};
+			{Index=1; ItemId="annihilationsoda"; Quantity=1; Chance=1/8;};
+			{Index=1; ItemId="energydrink"; Quantity=1; Chance=1/16;};
+		};
+	};
+
+
 	super:Add{
 		Id="bpseason1";
 		Rewards={

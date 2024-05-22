@@ -1,5 +1,6 @@
 local modLibraryManager = require(game.ReplicatedStorage.Library.LibraryManager);
 --==
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 local library = modLibraryManager.new();
 
 library.NpcTasks = {};
@@ -7,13 +8,32 @@ library.NpcTasks = {};
 library:SetOnAdd(function(data)
     local npcsList = data.NpcsList;
 
-    for a=1, #npcsList do
-        local npcName = npcsList[a];
+    local function add(npcName)
         if library.NpcTasks[npcName] == nil then
             library.NpcTasks[npcName] = {};
         end
 
-        table.insert(library.NpcTasks[npcName], data);
+        if table.find(library.NpcTasks[npcName], data) == nil then
+            table.insert(library.NpcTasks[npcName], data);
+        end
+    end
+
+    local listType = npcsList[1];
+    
+    if listType == "x" then
+        for a=1, #modNpcProfileLibrary.Keys do
+            local npcName = modNpcProfileLibrary.Keys[a];
+            local npcLib = modNpcProfileLibrary:Find(npcName);
+            if npcLib.SafehomeNpc ~= true then continue end;
+            if table.find(npcsList, npcName) then continue end;
+
+            add(npcName);
+        end
+
+    else
+        for a=1, #npcsList do
+            add(npcsList[a]);
+        end
     end
 end)
 
@@ -68,9 +88,10 @@ library:Add{
         };
     };
     Duration=3600;
-    NpcsList = {"Kat"; "Nicole"; "Sullivan"; "Jackson"; "Rachel"; "Zoey"; "Jackie"; "Berry"; "Scarlett"; "Rafael";};
+    NpcsList = {"x";};
     SkipCost = genericSkipCost;
 };
+
 
 return library;
 
