@@ -81,7 +81,6 @@ library:Add{Id="Walter"; Class="Military"; World="TheWarehouse";};
 library:Add{Id="Mysterious Engineer"; Class="Rouge"; World="SunkenShip"; Avatar="rbxassetid://16537592997";};
 
 
-
 library:Add{Id="Bandit"; Class="Bandit";};
 
 
@@ -100,6 +99,7 @@ library:Add{Id="Scarlett"; Class="Recycler"; World="Safehome";};
 library:Add{Id="Rafael"; Class="Recycler"; World="Safehome";};
 
 library:Add{Id="Lydia"; Class="FortuneTeller"; World="Safehome";};
+
 
 --== Wanderer
 library:Add{Id="Icarus"; Class="Trader"; Avatar="rbxassetid://13192700114"};

@@ -307,9 +307,11 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 			profile.ItemUnlockables = modItemUnlockables.new(player);
 			profile.Trader = modTraderProfile.new(player);
 			
+
 			local modSafehomeData = require(game.ServerScriptService.BaseServerLibrary.SafehomeData);
-			profile.Safehome = modSafehomeData.new(player);
+			profile.Safehome = modSafehomeData.new(player); profile.Safehome:Init();
 			profile.BattlePassSave = modBattlePassSave.new(profile, function() profile:Sync("BattlePassSave"); end);
+			
 
 			local modNpcTaskData = require(game.ServerScriptService.BaseServerLibrary.NpcTaskData);
 			profile.NpcTaskData = modNpcTaskData.new(player);

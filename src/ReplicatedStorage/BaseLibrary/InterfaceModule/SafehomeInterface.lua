@@ -111,9 +111,7 @@ function Interface.init(modInterface)
 
 		if rPacket.Data then 
 			modData.Profile.Safehome = rPacket.Data; 
-			safehomeData = modData.Profile.Safehome; 
-
-			Debugger:Warn("safehomeData", safehomeData);
+			safehomeData = modData.Profile.Safehome;
 		end
 	end
 
@@ -390,9 +388,13 @@ function Interface.init(modInterface)
 					local npcLevel = data.Level or 0;
 
 					titleLabel.Text = name;
-					statsLabel.Text = "Class: "..npcLib.Class.."\n"
-						.."Level: ".. tostring(npcLevel) .."\n"
-						.."Happiness: ".. tostring(data.Happiness) or ":)";
+
+					local statsText = {};
+					table.insert(statsText, `Level: {tostring(npcLevel)}`);
+					table.insert(statsText, `Hunger: { string.format("%.1f", math.clamp(data.Hunger or 0, 0, 1) *100) }%`);
+					table.insert(statsText, `Happiness: { string.format("%.1f", math.clamp(data.Happiness or 0, 0, 1) *100) }%`);
+
+					statsLabel.Text = "Class: "..npcLib.Class.."\n"..table.concat(statsText, "\n");
 
 					local inspectButton = new:WaitForChild("InspectButton");
 					inspectButton.MouseButton1Click:Connect(function()

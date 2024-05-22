@@ -17,7 +17,6 @@ local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfi
 
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
-local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
@@ -43,6 +42,7 @@ local isSoundPlaying = false;
 function SafehomeData.new(player)
 	local meta = {
 		Player=player;
+		UpdateFoodSupply=function()end;
 	};
 	meta.__index=meta;
 	
@@ -61,9 +61,8 @@ end
 --[[
 	SafehomeData:GetNpc(npcName: string)
 
-	@alert npcData metatable is shared serverside 
-
 	@param npcName Name of npc.
+	@return npcData metatable is shared serverside 
 ]]
 function SafehomeData:GetNpc(npcName: string)
 	local npcLib = modNpcProfileLibrary:Find(npcName);
@@ -175,6 +174,87 @@ function SafehomeData:Load(data)
 	return self;
 end
 
+function SafehomeData:Init()
+	local activeNpcs = 0;
+	for name, npcData in pairs(self.Npc) do
+		if npcData == nil or npcData.Active ~= true then continue end;
+		activeNpcs = activeNpcs +1;
+	end
+
+	local updateFoodSupply = function()
+		Debugger:StudioWarn("Update Food Supply");
+		local freezerStorage = shared.modStorage.Get("Freezer", self.Player);
+		if freezerStorage == nil then return end;
+
+		local freezerSize = freezerStorage.Size;
+		local foodSupply = 0;
+
+		local orderedFoodList = {};
+		freezerStorage:Loop(function(storageItem)
+			local itemLib = modItemsLibrary:Find(storageItem.ItemId);
+			if itemLib and itemLib.Type == modItemsLibrary.Types.Food then
+				foodSupply = foodSupply + storageItem.Quantity;
+				table.insert(orderedFoodList, storageItem);
+			end
+		end)
+		self.FoodSupply = foodSupply;
+		self.MaxFoodSupply = freezerSize*10;
+
+		table.sort(orderedFoodList, function(a, b) return a.Index > b.Index end);
+		
+
+		if self.LastFoodUpdate == nil then self.LastFoodUpdate = os.time(); end
+		local timelapseSec = os.time()-self.LastFoodUpdate;
+		if timelapseSec < 60 then return end;
+		self.LastFoodUpdate = os.time();
+
+		local minsPassed = math.ceil(timelapseSec/60);
+		
+		for npcName, _ in pairs(self.Npc) do
+			if self.Npc[npcName].Active == nil then continue end;
+			local npcData = self:GetNpc(npcName);
+
+			local hungerR = npcData.HungerRate/1440;
+			local hungerV = npcData.Hunger or 0;
+			npcData.Hunger = math.clamp(hungerV - (hungerR * minsPassed), 0, 1);
+
+			Debugger:StudioWarn(`{npcName} new hunger: {npcData.Hunger}`);
+
+			for a=1, 3 do
+				if npcData.Hunger > 0.7 then break; end;
+				if foodSupply <= 0 then break; end;
+
+				local storageItem = orderedFoodList[1];
+				if storageItem == nil or storageItem.Quantity <= 0 then break end;
+
+				freezerStorage:Remove(storageItem.ID, 1);
+				npcData.Hunger = math.clamp(hungerV +(math.random(250,300)/1000), 0, 1);
+				Debugger:StudioWarn(`{npcName} eats: {npcData.Hunger}`);
+
+				if storageItem.Quantity <= 0 then
+					table.remove(orderedFoodList, 1);
+				end
+			end
+		end
+
+		self:RefreshStats();
+	end
+
+	local meta = getmetatable(self);
+	meta.UpdateFoodSupply = updateFoodSupply;
+end
+
+function SafehomeData:RefreshStats()
+	for npcName,_ in pairs(self.Npc) do
+		if self.Npc[npcName].Active == nil then continue end;
+		local npcData = self:GetNpc(npcName);
+
+		if npcData.CalculateHappiness then
+			npcData:CalculateHappiness();
+		end
+	end
+end
+
 function remoteSafehomeRequest.OnServerInvoke(player, actionId, packet)
 	--Debugger:StudioWarn("remoteSafehomeRequest", player, actionId, packet);
 	
@@ -196,9 +276,10 @@ function remoteSafehomeRequest.OnServerInvoke(player, actionId, packet)
 			return {ReplyCode=1; Data=oprofile.Safehome;};
 		end
 		if safehomeData then
+			safehomeData.UpdateFoodSupply();
 			return {ReplyCode=1; Data=safehomeData;};
 		end
-
+		
 		return {ReplyCode=5;};
 		
 	elseif actionId == "purchaseSafehome" then

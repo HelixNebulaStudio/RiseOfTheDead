@@ -13,9 +13,9 @@ NpcProperties.StorageConfig = {
 NpcProperties.Level = 0;
 NpcProperties.LevelUpTime = os.time();
 
-NpcProperties.Happiness = 0;
-NpcProperties.Hunger = 0;
-NpcProperties.HungerRate = 0.1;
+NpcProperties.Happiness = 1;
+NpcProperties.Hunger = 1;
+NpcProperties.HungerRate = 0.3; -- % cost per day.
 --==
 function NpcProperties.new(data)
 	local self = data or {};
@@ -27,9 +27,10 @@ function NpcProperties.new(data)
 end
 
 function NpcProperties:CalculateHappiness()
-	local happiness = 0 - self.Hunger;
-	
-	self.Happiness = math.clamp(happiness, -10, 10);
+	self.Hunger = math.clamp(self.Hunger, 0, 1);
+
+	local happiness = self.Hunger;
+	self.Happiness = math.clamp(happiness, 0, 1);
 end
 
 function NpcProperties:SetLevel(level)

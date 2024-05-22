@@ -22,13 +22,17 @@ function library:GetTasks(npcName)
 end
 
 local genericSkipCost = {Perks=25; Gold=700;};
--- MARK: Lydia
+--==
 library:Add{
     Id="scavengeColorCustoms";
     Name="Scavenge Custom Colors";
 	Description="Scavenge for a Custom Color unlockable of your choosing.";
     Requirements={
         {Type="Mission"; Id=78; Completed=true;};
+        {Type="Stat"; Id="Happiness"; Value=0.5;};
+    };
+    FailFactors={
+        {Type="Stat"; Id="Hunger"; Value=0.1; Weight=1;};
     };
     Values={
         Color={Type="ColorPicker"; Title="Scavenging Color"};
@@ -44,6 +48,27 @@ library:Add{
     };
     Duration=3600;
     NpcsList = {"Lydia";};
+    SkipCost = genericSkipCost;
+};
+
+--
+library:Add{
+    Id="scavengeFood";
+    Name="Scavenge Food";
+	Description="Scavenge for food for your safehome.";
+    Requirements={
+        {Type="Stat"; Id="Hunger"; Value=0.5;};
+    };
+    FailFactors={};
+    Values={};
+    Rewards={
+        {
+            Type="ItemDrop";
+            RewardId="npctask:foodscavenge";
+        };
+    };
+    Duration=3600;
+    NpcsList = {"Kat"; "Nicole"; "Sullivan"; "Jackson"; "Rachel"; "Zoey"; "Jackie"; "Berry"; "Scarlett"; "Rafael";};
     SkipCost = genericSkipCost;
 };
 

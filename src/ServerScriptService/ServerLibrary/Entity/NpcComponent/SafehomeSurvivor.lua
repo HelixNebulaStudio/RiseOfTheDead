@@ -23,7 +23,7 @@ function Human.new(self)
 	
 	self.NpcData = npcData;
 	
-	shared.modSafehomeService.RefreshNpcStats();
+	safehomeData:RefreshStats();
 	
 	Debugger:Log("load npcData", npcData);
 	
