@@ -580,8 +580,8 @@ function DatabaseService.new(scope)
 	local self = {
 		Scope=scope;
 		DataStore = DataStoreService:GetDataStore(scope);
-		CachePool = MemoryStoreService:GetSortedMap(scope.."Cache");
-		DataLocks = MemoryStoreService:GetSortedMap(scope.."Locks");
+		CachePool = MemoryStoreService:GetHashMap(scope.."Cache");
+		DataLocks = MemoryStoreService:GetHashMap(scope.."Locks");
 		
 		RequestCallbacks = {};
 		
@@ -686,6 +686,11 @@ task.spawn(function()
 			/db flush
 			
 			/db demoadd [A/B]
+
+			--== Admin
+			/db get storeId storeKey
+			/db set storeId storeKey storeValue
+			/db clear storeId storeKey
 		]];
 
 		RequiredArgs = 0;
@@ -719,7 +724,57 @@ task.spawn(function()
 				demoDatabase:Publish(demoKey);
 				shared.Notify(player, "Publishing demo", "Inform");
 				
+			elseif action == "get" then
+				if not shared.modCommandsLibrary.HasPermissions(player, {Permission = shared.modCommandsLibrary.PermissionLevel.Admin}) then
+					shared.Notify(player, "Insufficient Permissions", "Negative");
+					return;
+				end
+				local storeId = args[2];
+				local storeKey = args[3];
+				
+				local mem = DatabaseService:GetDatabase(storeId);
+				
+				local storeValue = mem:Get(storeKey);
+				shared.Notify(player, Debugger:Stringify(storeId..":/"..storeKey.." Get=",Debugger:Stringify(storeValue)," ("..typeof(storeValue)..")"), "Inform")
+				Debugger:Log(":Dataget",storeValue);
+
+			elseif action == "set" then
+				if not shared.modCommandsLibrary.HasPermissions(player, {Permission = shared.modCommandsLibrary.PermissionLevel.Admin}) then
+					shared.Notify(player, "Insufficient Permissions", "Negative");
+					return;
+				end
+				local storeId = args[2];
+				local storeKey = args[3];
+				local storeValue = args[4];
+
+				if storeValue ~= nil then
+					local mem = DatabaseService:GetDatabase(storeId);
+					
+					local returnPacket = mem:UpdateRequest(storeKey, "default", storeValue);
+					Debugger:Log("Set default_reqfunc(".. storeId ..":/".. storeKey ..")", returnPacket);
+					
+					shared.Notify(player, storeId..":/"..storeKey.." Set="..tostring(storeValue).." ("..typeof(storeValue)..")", "Inform");
+				else
+					shared.Notify(player, storeId..":/"..storeKey.." Failed to set as nil.", "Negative");
+				end
+
+			elseif action == "clear" then
+				if not shared.modCommandsLibrary.HasPermissions(player, {Permission = shared.modCommandsLibrary.PermissionLevel.Admin}) then
+					shared.Notify(player, "Insufficient Permissions", "Negative");
+					return;
+				end
+
+				local storeId = args[2];
+				local storeKey = args[3];
+
+				local mem = DatabaseService:GetDatabase(storeId);
+				mem:RemoveAsync(storeKey);
+				
+				shared.Notify(player, storeId..":/"..storeKey.." Cleared.", "Inform");
+
+
 			else
+
 				shared.Notify(player, "Database Cache Size: "..(#HttpService:JSONEncode(DatabaseService:GetCache())), "Inform");
 			end
 

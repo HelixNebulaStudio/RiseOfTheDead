@@ -8,8 +8,8 @@ local MemoryStoreService = game:GetService("MemoryStoreService");
 local modLibraryManager = require(game.ReplicatedStorage.Library.LibraryManager);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 
-RedeemService.MemStore = MemoryStoreService:GetSortedMap("RedeemCodes");
-RedeemService.ClaimCache = MemoryStoreService:GetSortedMap("ClaimCache");
+RedeemService.MemStore = MemoryStoreService:GetHashMap("RedeemCodes");
+RedeemService.ClaimCache = MemoryStoreService:GetHashMap("ClaimCache");
 
 local oneDaySec = 86400;
 local oneMonthSec = 2592000;
@@ -36,7 +36,7 @@ modRewardsLibrary:Add{
 
 
 -- Clear Claim Cache: 
--- game:GetService("MemoryStoreService"):GetSortedMap("ClaimCache"):RemoveAsync("16170943:Halloween2021");
+-- game:GetService("MemoryStoreService"):GetHashMap("ClaimCache"):RemoveAsync("16170943:Halloween2021");
 -- /setredeemcode Halloween2021 2021
 -- /listredeemcodes
 

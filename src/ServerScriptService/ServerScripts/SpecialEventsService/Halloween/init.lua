@@ -8,7 +8,7 @@ local Keys = {
 }
 
 local MemoryStoreService = game:GetService("MemoryStoreService");
-local halloweenMemory = MemoryStoreService:GetSortedMap(Keys.MemMap);
+local halloweenMemory = MemoryStoreService:GetHashMap(Keys.MemMap);
 
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));

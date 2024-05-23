@@ -54,7 +54,6 @@ local modEvents = Debugger:Require(game.ServerScriptService.ServerLibrary.Events
 modPlayers.SkillTree = Debugger:Require(game.ServerScriptService.ServerLibrary.SkillTree);
 local modAnalytics = Debugger:Require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modCharacterAppearance = Debugger:Require(game.ServerScriptService.ServerLibrary.CharacterAppearance);
-local modMemoryMap = Debugger:Require(game.ServerScriptService.ServerLibrary.MemoryMap);
 local modEconomyAnalytics = Debugger:Require(game.ServerScriptService.ServerLibrary.EconomyAnalytics);
 
 
@@ -197,12 +196,15 @@ Players.PlayerRemoving:Connect(function(player)
 	profile:Unload();
 	task.spawn(function()
 		local onlineSetS, onlineSetE = pcall(function()
-			local lastOnlineData = MemoryStoreService:GetSortedMap("LastOnline");
+			local lastOnlineData = MemoryStoreService:GetHashMap("LastOnline");
 			lastOnlineData:RemoveAsync(tostring(player.UserId));
 
-			local accessCodeData = MemoryStoreService:GetSortedMap("AccessCode");
+			local accessCodeData = MemoryStoreService:GetHashMap("AccessCode");
 			accessCodeData:RemoveAsync(tostring(player.UserId));
 		end)
+		if not onlineSetS then
+			Debugger:Warn("PlayerRemoving>>  ",onlineSetE);
+		end
 	end)
 end)
 
@@ -1343,10 +1345,10 @@ task.spawn(function()
 		local players = game.Players:GetPlayers();
 		for _, player in pairs(players) do
 			local onlineSetS, onlineSetE = pcall(function()
-				local lastOnlineData = MemoryStoreService:GetSortedMap("LastOnline");
+				local lastOnlineData = MemoryStoreService:GetHashMap("LastOnline");
 				lastOnlineData:SetAsync(tostring(player.UserId), DateTime.now().UnixTimestamp, 61);
 
-				local accessCodeData = MemoryStoreService:GetSortedMap("AccessCode");
+				local accessCodeData = MemoryStoreService:GetHashMap("AccessCode");
 
 				if modServerManager.AccessCode then
 					accessCodeData:SetAsync(tostring(player.UserId), modServerManager.AccessCode, 61);

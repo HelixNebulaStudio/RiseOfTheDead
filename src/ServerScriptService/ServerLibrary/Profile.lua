@@ -136,7 +136,7 @@ function Profile:GetLastOnline(userId)
 	
 	local lastOnline = -1;
 	local _, _ = pcall(function()
-		local lastOnlineData = MemoryStoreService:GetSortedMap("LastOnline");
+		local lastOnlineData = MemoryStoreService:GetHashMap("LastOnline");
 		lastOnline = lastOnlineData:GetAsync(userKey);
 	end)
 	
@@ -162,7 +162,7 @@ function Profile:GetLiveProfile(userId)
 	liveProfile.LastOnline = self:GetLastOnline(userKey);
 	liveProfile.AccessCode = nil;
 	local getAccessCodeS, getAccessCodeE = pcall(function()
-		local accessCodeData = MemoryStoreService:GetSortedMap("AccessCode");
+		local accessCodeData = MemoryStoreService:GetHashMap("AccessCode");
 		liveProfile.AccessCode = accessCodeData:GetAsync(userKey);
 	end)
 	if not getAccessCodeS then Debugger:Warn(":GetLiveProfile getAccessCodeE:",getAccessCodeE) end;
