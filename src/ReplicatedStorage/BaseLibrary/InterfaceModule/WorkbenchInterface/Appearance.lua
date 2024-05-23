@@ -260,12 +260,6 @@ function Workbench.new(itemId, library, storageItem)
 								return
 							end;
 							
-							if ItemValues.SkinLocked then
-								Debugger:Warn("Skin locked.");
-								
-								return;
-							end
-							
 							local oldActiveId = ItemValues.ActiveSkin;
 							if ItemValues.ActiveSkin == unlockItemLib.Id then
 								remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId");

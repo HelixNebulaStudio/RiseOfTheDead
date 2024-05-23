@@ -116,7 +116,6 @@ task.spawn(function()
 					if index == 1 then
 						local itemValues = {
 							ItemUnlock="highvisjacketgalaxy";
-							SkinLocked=true;
 						};
 						inventory:Add("highvisjacket", {Values=itemValues}, function(event, insert)
 							shared.Notify(player, "You received a High Visibility Jacket Galaxy.", "Reward");
@@ -125,7 +124,6 @@ task.spawn(function()
 					elseif index == 2 then
 						local itemValues = {
 							ItemUnlock="dufflebaggalaxy";
-							SkinLocked=true;
 						};
 						inventory:Add("dufflebag", {Values=itemValues}, function(event, insert)
 							shared.Notify(player, "You received a Duffle Bag Galaxy.", "Reward");

@@ -822,11 +822,6 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 			end
 		end
 
-		if itemValues.SkinLocked then
-			itemDesc = itemDesc..h3O.."\nSkin-Locked: "..h3C..colorBoolText(itemValues.SkinLocked == true);
-		end
-		
-		
 		if itemValues.Power then
 			itemDesc = itemDesc..h3O.."\nBattery: "..h3C.. colorNumberText(string.format("%.2f", itemValues.Power).."%");
 		end

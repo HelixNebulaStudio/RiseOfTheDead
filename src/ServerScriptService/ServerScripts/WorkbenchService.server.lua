@@ -586,165 +586,161 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 		if baseItemModel:FindFirstChild(partName) == nil then Debugger:Warn("Player(",player.Name,") attempt to modify invalid part."); return end;
 	end
 	
-	if storageItem then
-		if storageItem.Values.SkinLocked ~= true then
-			if action == 1 then --== Color;
-				if appearId == 0 then
-					local itemSkin = storageItem.Values.Colors or {};
-					itemSkin[partKey] = nil;
-					storageItem:SetValues("Colors", itemSkin);
+	if storageItem == nil then return end;
 
-				else
-					Debugger:StudioWarn("Set appearid", appearId);
-					local colorLibrary = modColorsLibrary.Get(appearId);
-					local unlocked = false;
+	if action == 1 then --== Color;
+		if appearId == 0 then
+			local itemSkin = storageItem.Values.Colors or {};
+			itemSkin[partKey] = nil;
+			storageItem:SetValues("Colors", itemSkin);
 
-					local customColorsFlag = profile.Flags:Get("CustomColors");
-					if appearId:sub(1,1) == "#" and customColorsFlag and customColorsFlag.Unlocked and customColorsFlag.Unlocked[(string.gsub(appearId, "#", ""))] then
-						unlocked = true;
-					elseif profile.ColorPacks[colorLibrary.Pack] then
-						unlocked = true;
-					end
+		else
+			Debugger:StudioWarn("Set appearid", appearId);
+			local colorLibrary = modColorsLibrary.Get(appearId);
+			local unlocked = false;
 
-					if colorLibrary and unlocked then
-						local itemSkin = storageItem.Values.Colors or {};
-						itemSkin[partKey] = appearId;
-						storageItem:SetValues("Colors", itemSkin);
-						profile:AddPlayPoints(2, "Gameplay:Workbench");
+			local customColorsFlag = profile.Flags:Get("CustomColors");
+			if appearId:sub(1,1) == "#" and customColorsFlag and customColorsFlag.Unlocked and customColorsFlag.Unlocked[(string.gsub(appearId, "#", ""))] then
+				unlocked = true;
+			elseif profile.ColorPacks[colorLibrary.Pack] then
+				unlocked = true;
+			end
 
-					else
-						Debugger:Warn("Color does not exist or color pack is locked.");
-
-					end
-				end
-				
-			elseif action == 2 then --== Details;
-				if appearId == 0 then
-					
-					local itemSkin = storageItem.Values.Textures or {};
-					itemSkin[partKey] = storageItem.Values.ActiveSkin and 0 or nil;
-					storageItem:SetValues("Textures", itemSkin);
-					
-				else
-					local textureLibrary = modSkinsLibrary.Get(appearId);
-					if textureLibrary and profile.SkinsPacks[textureLibrary.Pack] then
-						local itemSkin = storageItem.Values.Textures or {};
-						itemSkin[partKey] = appearId;
-						storageItem:SetValues("Textures", itemSkin);
-						profile:AddPlayPoints(2, "Gameplay:Workbench");
-						
-					else
-						Debugger:Warn("Texture does not exist or color pack is locked.",textureLibrary == nil," Unlocked:",profile.SkinsPacks[textureLibrary.Pack]);
-					end
-				end
-
-			elseif action == 6 then --== Toggle Visibility;
-				local partAlpha = storageItem.Values.PartAlpha or {};
-				if partAlpha[partKey] == true then
-					partAlpha[partKey] = nil;
-				else
-					partAlpha[partKey] = true;
-				end
-				
-				storageItem:SetValues("PartAlpha", partAlpha);
-				profile:AddPlayPoints(2, "Gameplay:Workbench");
-				
-			elseif action == 3 then --== Clear Color;
+			if colorLibrary and unlocked then
 				local itemSkin = storageItem.Values.Colors or {};
-				itemSkin[partKey] = nil;
+				itemSkin[partKey] = appearId;
 				storageItem:SetValues("Colors", itemSkin);
 				profile:AddPlayPoints(2, "Gameplay:Workbench");
-				
-			elseif action == 4 then --== Clear Texture;
-				local itemSkin = storageItem.Values.Textures or {};
-				itemSkin[partKey] = nil;
-				storageItem:SetValues("Textures", itemSkin);
-				profile:AddPlayPoints(2, "Gameplay:Workbench");
 
-			elseif action == 5 then --== Clear All;
-				local itemColors = storageItem.Values.Colors or {};
-				itemColors[partKey] = nil;
-				
-				local itemTextures = storageItem.Values.Textures or {};
-				itemTextures[partKey] = nil;
+			else
+				Debugger:Warn("Color does not exist or color pack is locked.");
 
-				local partAlpha = storageItem.Values.PartAlpha or {};
-				partAlpha[partKey] = nil;
-				
-				storageItem:SetValues("Colors", itemColors);
-				storageItem:SetValues("Textures", itemTextures);
-				storageItem:SetValues("PartAlpha", partAlpha);
-				profile:AddPlayPoints(2, "Gameplay:Workbench");
-				
-				
-			elseif action == 9 then --== UnlockableSet;
-				if appearId and appearId ~= storageItem.ItemId then
-					local unlockableItemLib = modItemUnlockablesLibrary:Find(appearId);
-
-					if unlockableItemLib and unlockableItemLib.ItemId == storageItem.ItemId then
-
-						local unlockedSkins = storageItem:GetValues("Skins") or {};
-						local isUnlocked = table.find(unlockedSkins, unlockableItemLib.Id)
-
-						if unlockableItemLib.Name == "Default" or unlockableItemLib.Unlocked == true then
-							isUnlocked = true;
-						elseif typeof(unlockableItemLib.Unlocked) == "string" and table.find(unlockedSkins, unlockableItemLib.Id) then
-							isUnlocked = true;
-						end
-						
-						if isUnlocked == nil then
-							local consumedCharge = false;
-							
-							if profile.ItemUnlockables and profile.ItemUnlockables[itemId] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] > 0 then
-								profile.ItemUnlockables[itemId][unlockableItemLib.Id] = profile.ItemUnlockables[itemId][unlockableItemLib.Id] -1;
-								profile:Sync(`ItemUnlockables/{itemId}/{unlockableItemLib.Id}`);
-								consumedCharge = true;
-							end
-							if not consumedCharge then
-								shared.Notify(player, `You have no more charges for {unlockableItemLib.Name} {itemLib.Name}.`, "Negative");
-								debounceCache[player.Name]=nil;
-								return;
-
-							else
-								table.insert(unlockedSkins, unlockableItemLib.Id);
-								storageItem:SetValues("Skins", unlockedSkins);
-
-								isUnlocked = true;
-							end
-						end
-
-						if player.UserId == 16170943 then
-							isUnlocked = true;
-						end
-						if isUnlocked then
-							storageItem:SetValues("ActiveSkin", appearId);
-						end
-					else
-						storageItem:DeleteValues("ActiveSkin");
-					end
-				else
-					storageItem:DeleteValues("ActiveSkin");
-				end
-				
-				activeSave.AppearanceData:Update(activeSave.Clothing);
 			end
-			activeSave:AwardAchievement("fimyst");
-			
-			storageItem:Sync();
-			
-			-- Refresh weapon skin;
-			if player.Character then
-				for _, obj in pairs(player.Character:GetChildren()) do
-					if obj:GetAttribute("StorageItemId") == id then
-						modColorsLibrary.ApplyAppearance(obj, storageItem.Values);
-					end
-				end
-			end
+		end
+		
+	elseif action == 2 then --== Details;
+	
+		if appearId == 0 then
+			local itemSkin = storageItem.Values.Textures or {};
+			itemSkin[partKey] = storageItem.Values.ActiveSkin and 0 or nil;
+			storageItem:SetValues("Textures", itemSkin);
 			
 		else
-			Debugger:Warn("Skin locked for ", id);
+			local textureLibrary = modSkinsLibrary.Get(appearId);
+			if textureLibrary and profile.SkinsPacks[textureLibrary.Pack] then
+				local itemSkin = storageItem.Values.Textures or {};
+				itemSkin[partKey] = appearId;
+				storageItem:SetValues("Textures", itemSkin);
+				profile:AddPlayPoints(2, "Gameplay:Workbench");
+				
+			else
+				Debugger:Warn("Texture does not exist or color pack is locked.",textureLibrary == nil," Unlocked:",profile.SkinsPacks[textureLibrary.Pack]);
+			end
+		end
+
+	elseif action == 6 then --== Toggle Visibility;
+		local partAlpha = storageItem.Values.PartAlpha or {};
+		if partAlpha[partKey] == true then
+			partAlpha[partKey] = nil;
+		else
+			partAlpha[partKey] = true;
+		end
+		
+		storageItem:SetValues("PartAlpha", partAlpha);
+		profile:AddPlayPoints(2, "Gameplay:Workbench");
+		
+	elseif action == 3 then --== Clear Color;
+		local itemSkin = storageItem.Values.Colors or {};
+		itemSkin[partKey] = nil;
+		storageItem:SetValues("Colors", itemSkin);
+		profile:AddPlayPoints(2, "Gameplay:Workbench");
+		
+	elseif action == 4 then --== Clear Texture;
+		local itemSkin = storageItem.Values.Textures or {};
+		itemSkin[partKey] = nil;
+		storageItem:SetValues("Textures", itemSkin);
+		profile:AddPlayPoints(2, "Gameplay:Workbench");
+
+	elseif action == 5 then --== Clear All;
+		local itemColors = storageItem.Values.Colors or {};
+		itemColors[partKey] = nil;
+		
+		local itemTextures = storageItem.Values.Textures or {};
+		itemTextures[partKey] = nil;
+
+		local partAlpha = storageItem.Values.PartAlpha or {};
+		partAlpha[partKey] = nil;
+		
+		storageItem:SetValues("Colors", itemColors);
+		storageItem:SetValues("Textures", itemTextures);
+		storageItem:SetValues("PartAlpha", partAlpha);
+		profile:AddPlayPoints(2, "Gameplay:Workbench");
+		
+		
+	elseif action == 9 then --== UnlockableSet;
+		if appearId and appearId ~= storageItem.ItemId then
+			local unlockableItemLib = modItemUnlockablesLibrary:Find(appearId);
+
+			if unlockableItemLib and unlockableItemLib.ItemId == storageItem.ItemId then
+
+				local unlockedSkins = storageItem:GetValues("Skins") or {};
+				local isUnlocked = table.find(unlockedSkins, unlockableItemLib.Id)
+
+				if unlockableItemLib.Name == "Default" or unlockableItemLib.Unlocked == true then
+					isUnlocked = true;
+				elseif typeof(unlockableItemLib.Unlocked) == "string" and table.find(unlockedSkins, unlockableItemLib.Id) then
+					isUnlocked = true;
+				end
+				
+				if isUnlocked == nil then
+					local consumedCharge = false;
+					
+					if profile.ItemUnlockables and profile.ItemUnlockables[itemId] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] > 0 then
+						profile.ItemUnlockables[itemId][unlockableItemLib.Id] = profile.ItemUnlockables[itemId][unlockableItemLib.Id] -1;
+						profile:Sync(`ItemUnlockables/{itemId}/{unlockableItemLib.Id}`);
+						consumedCharge = true;
+					end
+					if not consumedCharge then
+						shared.Notify(player, `You have no more charges for {unlockableItemLib.Name} {itemLib.Name}.`, "Negative");
+						debounceCache[player.Name]=nil;
+						return;
+
+					else
+						table.insert(unlockedSkins, unlockableItemLib.Id);
+						storageItem:SetValues("Skins", unlockedSkins);
+
+						isUnlocked = true;
+					end
+				end
+
+				if player.UserId == 16170943 then
+					isUnlocked = true;
+				end
+				if isUnlocked then
+					storageItem:SetValues("ActiveSkin", appearId);
+				end
+			else
+				storageItem:DeleteValues("ActiveSkin");
+			end
+		else
+			storageItem:DeleteValues("ActiveSkin");
+		end
+		
+		activeSave.AppearanceData:Update(activeSave.Clothing);
+	end
+	activeSave:AwardAchievement("fimyst");
+	
+	storageItem:Sync();
+	
+	-- Refresh weapon skin;
+	if player.Character then
+		for _, obj in pairs(player.Character:GetChildren()) do
+			if obj:GetAttribute("StorageItemId") == id then
+				modColorsLibrary.ApplyAppearance(obj, storageItem.Values);
+			end
 		end
 	end
+
 	debounceCache[player.Name]=nil;
 end)
 
