@@ -60,9 +60,9 @@ function ItemsLibrary:Init(super)
 	new(componentsBase, {Id="rope"; Name="Rope"; Icon="rbxassetid://13265271329"; Description="Useful for tying things together.";});
 	new(componentsBase, {Id="tires"; Name="Tires"; Icon="rbxassetid://16836806362"; Description="Sturdy looking tires..";});
 	
-	new(componentsBase, {Id="tier2augment"; Name="Tier 2 Augment"; TradingTax = 50; Icon="rbxassetid://16903224330"; Description="An augment to upgrade mods to tier 2."; });
-	new(componentsBase, {Id="tier3augment"; Name="Tier 3 Augment"; TradingTax = 100; Icon="rbxassetid://16903249001"; Description="An augment to upgrade mods to tier 3."; });
-	new(componentsBase, {Id="tier4augment"; Name="Tier 4 Augment"; TradingTax = 200; Icon="rbxassetid://16910121022"; Description="An augment to upgrade mods to tier 4."; });
+	-- new(componentsBase, {Id="tier2augment"; Name="Tier 2 Augment"; TradingTax = 50; Icon="rbxassetid://16903224330"; Description="An augment to upgrade mods to tier 2."; });
+	-- new(componentsBase, {Id="tier3augment"; Name="Tier 3 Augment"; TradingTax = 100; Icon="rbxassetid://16903249001"; Description="An augment to upgrade mods to tier 3."; });
+	-- new(componentsBase, {Id="tier4augment"; Name="Tier 4 Augment"; TradingTax = 200; Icon="rbxassetid://16910121022"; Description="An augment to upgrade mods to tier 4."; });
 
 	--==========================================================[[ WEAPONS ]]==========================================================--
 	local gunBase = {
