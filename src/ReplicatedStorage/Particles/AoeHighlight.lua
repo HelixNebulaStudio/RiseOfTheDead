@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local AoeHighlight = {};
 
 local templateCylinderHighlight = script:WaitForChild("cylinder");
+local templateSphereHighlight = script:WaitForChild("sphere");
 
 local raycastPreset = RaycastParams.new();
 raycastPreset.FilterType = Enum.RaycastFilterType.Include;
@@ -26,5 +27,14 @@ function AoeHighlight:Ray(origin, direction)
 		return CFrame.lookAt(raycastResult.Position, rayPos + rayNorm);
 	end
 end
+
+function AoeHighlight.newSphere(lifetime)
+	local new = templateSphereHighlight:Clone();
+	
+	Debugger.Expire(new, lifetime or 10);
+	
+	return new;
+end
+
 
 return AoeHighlight;

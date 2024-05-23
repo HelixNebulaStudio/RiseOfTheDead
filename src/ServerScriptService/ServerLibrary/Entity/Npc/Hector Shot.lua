@@ -14,6 +14,7 @@ local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
+local modAoeHighlight = require(game.ReplicatedStorage.Particles.AoeHighlight);
 
 -- Note; Function called for each zombie before zombie parented to workspace;
 return function(npc, spawnPoint)
@@ -209,16 +210,23 @@ return function(npc, spawnPoint)
 			
 			self.Chat(self.NetworkOwners, self.LassoDialogues[math.random(1, #self.LassoDialogues)]);
 					
-			self.Indicator = script:WaitForChild("Indicator"):Clone();
-			self.Indicator.Parent = workspace.Entities;
-			self.Indicator.Position = self.RootPart.Position;
-			Debugger.Expire(self.Indicator, self.LassoTime);
+			self.Indicator = modAoeHighlight.newSphere(self.LassoTime);
+			self.Indicator.Parent = workspace.Debris;
+			task.spawn(function()
+				while self.Indicator.Parent == workspace.Debris do
+					self.Indicator.Position = self.RootPart.Position;
+					task.wait();
+				end
+			end)
+			
 			TweenService:Create(
 				self.Indicator,  
 				TweenInfo.new(self.LassoTime), 
 				{Size=Vector3.new(self.LassoRange*2, self.LassoRange*2, self.LassoRange*2)}
 			):Play();
-			wait(self.LassoTime);
+
+			task.wait(self.LassoTime);
+
 			if self.IsDead or self.Humanoid.RootPart == nil then return false end;
 			
 			self.Wield.Unequip();
@@ -227,7 +235,7 @@ return function(npc, spawnPoint)
 				local character = self.Enemies[a].Character;
 				local player = game.Players:FindFirstChild(character.Name);
 				
-				if player and character.PrimaryPart and self.Actions:DistanceFrom(character.PrimaryPart.Position) < self.LassoRange then
+				if player and character.PrimaryPart and self.Actions:DistanceFrom(character.PrimaryPart.Position) < (self.LassoRange-4) then
 					modStatusEffects.TiedUp(player, 5);
 					
 					table.insert(self.LassoVictims, character);
