@@ -573,17 +573,6 @@ AddTool{
 }
 
 AddTool{
-	ItemId="binoculars";
-	Type="RoleplayTool";
-	Animations={
-		Core={Id=4731631834;};
-		Use={Id=4731676746};
-	};
-	Audio={
-	};
-}
-
-AddTool{
 	ItemId="bunnyplush";
 	Type="RoleplayTool";
 	Animations={

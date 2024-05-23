@@ -1376,7 +1376,14 @@ local function renderStepped(camera, deltaTime)
 				local waistY = characterProperties.CanMove and characterProperties.Joints.WaistY or 0;
 				local swayY = ((math.sin(tick())/2-0.5)/50 * characterProperties.SwayYStrength);
 
-				local viewModel = characterProperties.UseViewModel and characterProperties.ViewModel or characterProperties.CustomViewModel or CFrame.new(0, -1, 0);
+				local viewModel = characterProperties.UseViewModel and characterProperties.ViewModel or nil;
+
+				if viewModel == nil and characterProperties.CustomViewModel then
+					viewModel = character:GetAttribute("CustomViewModel") or characterProperties.CustomViewModel;
+				end
+				if viewModel == nil then
+					viewModel = CFrame.new(0, -1, 0);
+				end
 
 				-- Having an attachment on the weapon for ADS does not work because of attachment cframe moving when adjusting pivot cframe.
 
