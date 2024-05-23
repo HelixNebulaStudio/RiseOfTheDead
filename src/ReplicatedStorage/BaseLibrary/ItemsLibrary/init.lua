@@ -849,8 +849,8 @@ function ItemsLibrary:Init(super)
 	new(crateBase, {Id="easteregg2023"; Name="Easter Egg 2023"; Icon="rbxassetid://12961679377"; Tags={"Easter"}; TradingTax=0; Description="Happy Easter, open it and see what you get!";});
 	new(customizationPack, {Id="skineaster2023"; Name="Easter Skins 2023 Pack"; Icon="rbxassetid://12963885465"; Tags={"Skin Pack"; "Easter"}; UnlockPack={Type="Skin"; Id="EasterSkins2023";};});
 	new(skinPermBase, {Id="hardhatcherryblossom"; Icon="rbxassetid://12963903837"; SkinPerm="Cherry Blossom"; TargetItemId="hardhat"; Tags={"Easter"};});
-	new(skinPermBase, {Id="highvisjacketfallenleaves"; Icon="rbxassetid://12963945448"; Unlockable="Fallen Leaves"; TargetItemId="highvisjacket"; Tags={"Easter"};});
-	new(skinPermBase, {Id="scraparmorcherryblossom"; Icon="rbxassetid://12963959744"; Unlockable="Cherry Blossom"; TargetItemId="scraparmor"; Tags={"Easter"};});
+	new(skinPermBase, {Id="highvisjacketfallenleaves"; Icon="rbxassetid://12963945448"; SkinPerm="Fallen Leaves"; TargetItemId="highvisjacket"; Tags={"Easter"};});
+	new(skinPermBase, {Id="scraparmorcherryblossom"; Icon="rbxassetid://12963959744"; SkinPerm="Cherry Blossom"; TargetItemId="scraparmor"; Tags={"Easter"};});
 	
 
 	--==========================================================[[ META ]]==========================================================--
