@@ -53,6 +53,7 @@ end
 
 
 function DatabaseService:GetCache(key)
+	if key == nil then return {}, 0 end;
 	local cacheList;
 	
 	local loadS, loadE = TryFunction("GetCache", function()
@@ -691,6 +692,7 @@ task.spawn(function()
 			/db get storeId storeKey
 			/db set storeId storeKey storeValue
 			/db clear storeId storeKey
+			/db list storeId pages
 		]];
 
 		RequiredArgs = 0;
@@ -736,7 +738,8 @@ task.spawn(function()
 				
 				local storeValue = mem:Get(storeKey);
 				shared.Notify(player, Debugger:Stringify(storeId..":/"..storeKey.." Get=",Debugger:Stringify(storeValue)," ("..typeof(storeValue)..")"), "Inform")
-				Debugger:Log(":Dataget",storeValue);
+				Debugger:Warn(":Dataget",storeValue);
+
 
 			elseif action == "set" then
 				if not shared.modCommandsLibrary.HasPermissions(player, {Permission = shared.modCommandsLibrary.PermissionLevel.Admin}) then
@@ -751,12 +754,13 @@ task.spawn(function()
 					local mem = DatabaseService:GetDatabase(storeId);
 					
 					local returnPacket = mem:UpdateRequest(storeKey, "default", storeValue);
-					Debugger:Log("Set default_reqfunc(".. storeId ..":/".. storeKey ..")", returnPacket);
+					Debugger:Warn("Set default_reqfunc(".. storeId ..":/".. storeKey ..")", returnPacket);
 					
 					shared.Notify(player, storeId..":/"..storeKey.." Set="..tostring(storeValue).." ("..typeof(storeValue)..")", "Inform");
 				else
 					shared.Notify(player, storeId..":/"..storeKey.." Failed to set as nil.", "Negative");
 				end
+
 
 			elseif action == "clear" then
 				if not shared.modCommandsLibrary.HasPermissions(player, {Permission = shared.modCommandsLibrary.PermissionLevel.Admin}) then
@@ -771,11 +775,40 @@ task.spawn(function()
 				mem:RemoveAsync(storeKey);
 				
 				shared.Notify(player, storeId..":/"..storeKey.." Cleared.", "Inform");
+				Debugger:Warn(storeId..":/"..storeKey.." Cleared.");
 
+			elseif action == "list" then
+				if not shared.modCommandsLibrary.HasPermissions(player, {Permission = shared.modCommandsLibrary.PermissionLevel.Admin}) then
+					shared.Notify(player, "Insufficient Permissions", "Negative");
+					return;
+				end
+				local storeId = args[2];
+				local pages = args[3] or 1;
+
+				local database = DatabaseService:GetDatabase(storeId);
+				local memPage = database.CachePool:ListItemsAsync(pages); 
+
+				for a=1, pages do
+					shared.Notify(player, storeId..":("..a..")", "Inform");
+					local currPage = memPage:GetCurrentPage();
+					local items = {};
+					for k, v in pairs(currPage) do
+						table.insert(items, `{k}={Debugger:Stringify(v)}`);
+					end
+					shared.Notify(player, storeId..": "..table.concat(items,"\n"), "Inform");
+					Debugger:Warn(storeId..": "..table.concat(items,"\n"));
+					if memPage.IsFinished then
+						break 
+					else
+						memPage:AdvanceToNextPageAsync();
+					end 
+				end
+				shared.Notify(player, storeId..":eof", "Inform");
+				Debugger:Warn(storeId..": end of file");
 
 			else
-
-				shared.Notify(player, "Database Cache Size: "..(#HttpService:JSONEncode(DatabaseService:GetCache())), "Inform");
+				shared.Notify(player, "Unknown action ("..action..")", "Inform");
+				--shared.Notify(player, "Database Cache Size: "..(#HttpService:JSONEncode(DatabaseService:GetCache(args[2]))), "Inform");
 			end
 
 			return;

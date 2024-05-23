@@ -498,7 +498,14 @@ function remoteMissionRemote.OnServerInvoke(player, actionId, missionId)
 			return returnPacket;
 		end
 		
-		Mission:StartMission(player, missionId);
+		local canStart, cantStartReasons = missionProfile:CanStart(missionId);
+		local cantStartReason = cantStartReasons[1] or "Mission could not be started";
+		if canStart then
+			Mission:StartMission(player, missionId);
+		else
+			returnPacket.FailMsg = cantStartReason;
+			shared.Notify(player, `Mission could not start: {returnPacket.FailMsg}`, "Negative");
+		end
 		
 		return returnPacket;
 
