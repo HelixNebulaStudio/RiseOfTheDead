@@ -212,6 +212,7 @@ function TurretRuntime(weaponStorageItem)
 			local entityStatus = npcModule.EntityStatus;
 			
 			if npcModule.Detectable == false then continue end;
+			if npcModule.SpawnTime and tick()-npcModule.SpawnTime <= 0.3 then continue end;
 			
 			if npcModule and npcModule.Properties and npcModule.Properties.BasicEnemy ~= true then
 				hitlistDict[selectedTargetModel.Name] = hitlistDict.Bosses;
