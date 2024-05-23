@@ -42,16 +42,6 @@ function MarkupFormatter.Format(essay)
 		end
 	end)
 	
-	--essay = string.gsub(essay, "| •", function(s)
-	--	return "\n        §".. s:sub(#s+3, #s);
-	--end)
-	--head = false;
-
-	--essay = string.gsub(essay, "•", function(s)
-	--	return "\n    "..s;
-	--end)
-	--head = false;
-
 	local function newheader(str, pat, func)
 		local lines = string.split(str, "\n");
 		for a=1, #lines do
@@ -63,6 +53,9 @@ function MarkupFormatter.Format(essay)
 		return table.concat(lines, "\n");
 	end
 
+	essay = newheader(essay, "---", function(lineText)
+		return `\n<s>{string.rep(" ", 128)}</s>`;
+	end)
 	essay = newheader(essay, "- ", function(lineText)
 		if #lineText <= 3 then
 			return '\n';
@@ -91,11 +84,6 @@ function MarkupFormatter.Format(essay)
 	essay = newheader(essay, "#", function(lineText)
 		return '<font size="32" color="rgb(255,255,255)">'.. lineText .. '</font>';
 	end)
-	
-	--essay = string.gsub(essay, "§", function(s)
-	--	return "•".. s:sub(#s+1, #s);
-	--end)
-	--head = false;
 	
 	return essay;
 end
