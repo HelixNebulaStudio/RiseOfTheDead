@@ -252,6 +252,10 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 		newItemPrefab.PrimaryPart.Anchored = true;
 		newItemPrefab:PivotTo(primaryPart.CFrame);
 		newItemPrefab.Parent = primaryPart;
+		for _, obj in pairs(newItemPrefab:GetDescendants()) do
+			if not obj:IsA("BasePart") then continue end;
+			obj.CanCollide = false;
+		end
 		
 		if setPrefabColor then
 			local h,s = setPrefabColor:ToHSV();
@@ -431,16 +435,6 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 			end
 		end
 	end
-	
-	--if not primaryPart.Anchored then
-	--	primaryPart.Anchored = true;
-		
-	--	Debugger:Log("Sim projectile")
-	--	local projectile = {};
-	--	projectile.Prefab = primaryPart;
-		
-	--	modProjectile.Simulate(projectile, primaryPart.Position, Vector3.new(), {workspace.Environment})
-	--end
 	
 	interactData:Sync();
 	return newPrefab, interactData;
