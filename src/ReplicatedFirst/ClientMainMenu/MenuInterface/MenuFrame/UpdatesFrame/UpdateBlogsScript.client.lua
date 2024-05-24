@@ -1,6 +1,5 @@
---== Configuration;
-
---== Variables;
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
 local HttpService = game:GetService("HttpService");
 local TextService = game:GetService("TextService");
 
@@ -17,14 +16,13 @@ local remoteApiRequest = modRemotesManager:Get("ApiRequest");
 local function refresh()
 	local modMarkupFormatter = require(game.ReplicatedStorage.Library.MarkupFormatter);
 	
-	local blogTable = remoteApiRequest:InvokeServer("updatelog") or {};
-	local success, message = false, "";
-	if blogTable.name ~= nil then
-		success, message = pcall(function()
-			textLabel.Text = modMarkupFormatter.Format(blogTable.desc);
-		end)
+	local updateLogText = remoteApiRequest:InvokeServer("updatelog");
+	local success, message = pcall(function()
+		textLabel.Text = modMarkupFormatter.Format(updateLogText);
+	end)
+	if not success then
+		Debugger:Warn("Failed to fetch update logs:",message);
 	end
-	
 end
 
 updatesFrame:GetPropertyChangedSignal("Visible"):Connect(function()

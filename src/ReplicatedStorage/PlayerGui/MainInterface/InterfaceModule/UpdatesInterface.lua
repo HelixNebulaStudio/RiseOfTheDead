@@ -60,12 +60,12 @@ function Interface.init(modInterface)
 end;
 
 function Interface.Update()
-	local blogTable = remoteApiRequest:InvokeServer("updatelog") or {};
-	local success, message = false, "";
-	if blogTable.name ~= nil then
-		success, message = pcall(function()
-			textLabel.Text = modMarkupFormatter.Format(blogTable.desc);
-		end)
+	local updateLogText = remoteApiRequest:InvokeServer("updatelog") or "";
+	local success, message = pcall(function()
+		textLabel.Text = modMarkupFormatter.Format(updateLogText);
+	end)
+	if not success then
+		Debugger:Warn("Failed to fetch update log:", message);
 	end
 end
 
