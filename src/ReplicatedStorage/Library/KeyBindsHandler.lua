@@ -162,4 +162,14 @@ function KeyBindsHandler:SetDefaultKey(windowName, keyCode)
 	KeyBindsHandler.DefaultKeybind[windowName]={Key=keyCode};
 end
 
+local debounce = {};
+function KeyBindsHandler:Debounce(keyId)
+	if debounce[keyId] == nil or tick()-debounce[keyId] >= 0.1 then
+		debounce[keyId] = tick();
+		return false;
+	end
+	
+	return true;
+end
+
 return KeyBindsHandler.new();

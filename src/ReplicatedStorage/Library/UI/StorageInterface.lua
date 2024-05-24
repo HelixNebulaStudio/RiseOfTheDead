@@ -11,7 +11,7 @@ local TextService = game:GetService("TextService");
 local player = game.Players.LocalPlayer;
 local playerGui = player:WaitForChild("PlayerGui");
 local camera = workspace.CurrentCamera;
-local modData = require(player:WaitForChild("DataModule"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
@@ -25,6 +25,7 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modBranchConfigurations = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
+local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 
 local modItemInterface = require(game.ReplicatedStorage.Library.UI:WaitForChild("ItemInterface"));
 local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
@@ -942,7 +943,11 @@ function StorageInterface:NewButton(id)
 				local buttonText = tostring(typeof(option.Text) == "function" and option.Text(slotItem) or option.Text);
 
 				if UserInputService.KeyboardEnabled and contextOptionFirstPass then
-					buttonText = buttonText.." [E]";
+					local keyString = tostring(modData.Settings["KeyInteract"] or "E");
+					if #keyString >= 5 then
+						keyString = string.gsub(keyString, "[^A-Z,0-9]", "")
+					end
+					buttonText = buttonText..` [{keyString}]`;
 					contextOptionFirstPass = false;
 				end
 
@@ -1561,17 +1566,16 @@ function StorageInterface.CloseInspectFrame()
 end
 
 UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
-	if inputObject.KeyCode == Enum.KeyCode.E then
+	if modKeyBindsHandler:Match(inputObject, "KeyInteract") then
 		local slotItem = StorageInterface.ActiveSlotItem;
 		if slotItem then
 			local interface = slotItem.Interface;
 			
+			if modKeyBindsHandler:Debounce("KeyInteract") then return end;
 			for a=1, #interface.ContextOptions do
 				local option = interface.ContextOptions[a];
-
 				if option.Check and option.Check(slotItem) == false then continue end;
 
-				Debugger:Log("ContextOptions", option);
 				option.Click(slotItem);
 				break;
 			end

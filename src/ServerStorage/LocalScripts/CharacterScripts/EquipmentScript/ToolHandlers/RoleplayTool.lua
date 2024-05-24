@@ -11,7 +11,7 @@ local animator: Animator = humanoid:WaitForChild("Animator");
 local player = game.Players.LocalPlayer;
 
 --== Modules;
-local modData = require(player:WaitForChild("DataModule"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 local modInterface = modData:GetInterfaceModule();
 
@@ -149,6 +149,10 @@ function ToolHandler:Equip(storageItem, toolModels)
 	function Equipped.ItemPromptRequest()
 		if not characterProperties.CanAction then return end;
 		if characterProperties.ActiveInteract ~= nil and characterProperties.ActiveInteract.CanInteract and characterProperties.ActiveInteract.Reachable then return end;
+		
+		task.wait(0.03);
+		if modKeyBindsHandler:Debounce("KeyInteract") then return end;
+
 		if toolConfig.ClientItemPrompt then
 			toolConfig:ClientItemPrompt();
 		end
