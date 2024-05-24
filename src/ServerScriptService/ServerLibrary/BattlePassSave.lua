@@ -149,11 +149,11 @@ function BattlePassSave.new(profile, syncFunc)
 		Sync = function(self)
 
 			local activeId = modBattlePassLibrary.Active;
-			local passData = self:GetPassData(activeId);
-			if passData then
-				profile.AllTimeStats.AllTimeMp = passData.Level or 0;
-			else
-				profile.AllTimeStats.AllTimeMp = 0;
+			if activeId then
+				local passData = self:GetPassData(activeId);
+				if passData then
+					profile.AllTimeStats[activeId] = passData.Level or 0;
+				end
 			end
 			
 			syncFunc();

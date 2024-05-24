@@ -7,9 +7,12 @@ local modLeaderboardInterface = require(game.ReplicatedStorage.Library.UI.Leader
 --==
 
 function PageInterface:Load(interface)
+	local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
+	local activeId = modBattlePassLibrary.Active;
+
 	local keyTable = {
-		StatName="Pass Level";
-		AllTimeTableKey="AllTimeMp";
+		StatName="Event Level";
+		AllTimeTableKey=activeId;
 	};
 	
 	modLeaderboardService.ClientSyncRequest();

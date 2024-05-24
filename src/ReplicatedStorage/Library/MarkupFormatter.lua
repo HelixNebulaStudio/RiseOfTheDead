@@ -74,11 +74,11 @@ function MarkupFormatter.Format(essay)
 	
 	
 	essay = newheader(essay, "###", function(lineText)
-		return '<font size="20" color="rgb(255,255,255)">'.. lineText .. '</font>';
+		return '\n\n<font size="20" color="rgb(255,255,255)">'.. lineText .. '</font>';
 	end)
 
 	essay = newheader(essay, "##", function(lineText)
-		return '<font size="24" color="rgb(255,255,255)">'.. lineText .. '</font>';
+		return '\n<font size="24" color="rgb(255,255,255)">'.. lineText .. '</font>';
 	end)
 	
 	essay = newheader(essay, "#", function(lineText)
