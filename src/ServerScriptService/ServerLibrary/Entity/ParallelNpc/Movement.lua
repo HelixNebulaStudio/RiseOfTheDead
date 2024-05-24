@@ -14,6 +14,7 @@ function Movement.new(parallelNpc)
 	local meta = {};
 	meta.__index = meta;
 	meta.ParallelNpc = parallelNpc;
+	meta.DebugMove = false;
 	
 	local self = {};
 	
@@ -88,7 +89,7 @@ function Movement.new(parallelNpc)
 	function self:ComputePathAsync()
 		local cTick = tick();
 		if computeDebounce and tick() <= computeDebounce then
-			if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("cpa debounce") end;
+			if self.DebugMove == true then Debugger:Warn("cpa debounce") end;
 			return 
 		end;
 		computeDebounce = cTick +1;
@@ -100,7 +101,7 @@ function Movement.new(parallelNpc)
 			local targetPos = self.TargetPosition;
 			
 			if IsInRange(rootPartPos, targetPos, 2) and rootPartPos.Y > targetPos.Y then 
-				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("rpp == tp") end;
+				if self.DebugMove == true then Debugger:Warn("rpp == tp") end;
 				
 				dumbFollow = tick();
 				return;
@@ -114,10 +115,10 @@ function Movement.new(parallelNpc)
 			end
 
 			if parallelNpc.IsDead then return end;
-			if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("genpath") end;
+			if self.DebugMove == true then Debugger:Warn("genpath") end;
 
 			if path.Status.Value >= 3 then
-				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("path failed", path.Status.Value) end;
+				if self.DebugMove == true then Debugger:Warn("path failed", path.Status.Value) end;
 				self.NextWaypoint = nil;
 				table.clear(self.Waypoints);
 
@@ -140,7 +141,7 @@ function Movement.new(parallelNpc)
 				end
 				if not hasJump then
 					doDumbFollow();
-					if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("dumbmove") end;
+					if self.DebugMove == true then Debugger:Warn("dumbmove") end;
 					return;
 				end
 			end
@@ -171,13 +172,13 @@ function Movement.new(parallelNpc)
 	end
 	
 	function self:MoveEnded(reason: string)
-		if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("Move ended", self.MoveId, "reason:",reason) end;
+		if self.DebugMove == true then Debugger:Warn("Move ended", self.MoveId, "reason:",reason) end;
 		if self.MoveId then
 			local moveId = self.MoveId;
 			self.MoveId = nil;
 
 			self.ParallelNpc.Event:Fire("moveToEnded", moveId, reason);
-			if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("moveToEnded Fire", self.MoveId) end;
+			if self.DebugMove == true then Debugger:Warn("moveToEnded Fire", self.MoveId) end;
 		end
 	end
 	
@@ -195,24 +196,24 @@ function Movement.new(parallelNpc)
 		end
 
 		if #self.Waypoints <= 0 then
-			if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("mtf #wp = 0") end;
+			if self.DebugMove == true then Debugger:Warn("mtf #wp = 0") end;
 			self.Recompute = true;
 			return;
 		end
 
 		if self.NextWaypointIndex <= #self.Waypoints then
-			if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("mtf unw",self.NextWaypointIndex,#self.Waypoints) end;
+			if self.DebugMove == true then Debugger:Warn("mtf unw",self.NextWaypointIndex,#self.Waypoints) end;
 			self:UpdateNextWaypoint();
 			lastStuckTick = nil;
 			
 		else
-			if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("mtf nomorepath",self.NextWaypointIndex,#self.Waypoints) end;
+			if self.DebugMove == true then Debugger:Warn("mtf nomorepath",self.NextWaypointIndex,#self.Waypoints) end;
 			
 			moveSpeed:Remove("Pathfinding");
 			if self.PersistFollowTarget == false then
 
 				local isNextToTarget = IsInRange(getRootPos(), self.TargetPosition, 1);
-				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("nextToTarget", isNextToTarget) end;
+				if self.DebugMove == true then Debugger:Warn("nextToTarget", isNextToTarget) end;
 				
 				if isNextToTarget then
 					self.TargetPart = nil;
@@ -229,7 +230,7 @@ function Movement.new(parallelNpc)
 			else
 				if (dumbFollow == nil or tick()-dumbFollow > 2.1) and self.SmartNpc ~= true then
 					doDumbFollow();
-					if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("df") end;
+					if self.DebugMove == true then Debugger:Warn("df") end;
 				end
 				
 			end
@@ -245,6 +246,8 @@ function Movement.new(parallelNpc)
 			return 
 		end;
 		
+		self.DebugMove = prefab:GetAttribute("DebugMove");
+
 		local rootPosition = getRootPos();
 
 		local walkSpeed = math.clamp(moveSpeed:Get(), 0, 64);
@@ -252,7 +255,6 @@ function Movement.new(parallelNpc)
 
 		if self.FacePart then
 			self.FacePosition = self.FacePart.Position;
-			--if prefab:GetAttribute("DebugMoveFace") == true then Debugger:Warn("set fp", self.FacePosition) end;
 		end
 
 		if self.LastFaceSetTick 
@@ -291,14 +293,14 @@ function Movement.new(parallelNpc)
 		end
 		
 		if self.TargetPosition == nil then 
-			--if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("tp == nil") end; 
+			--if self.DebugMove == true then Debugger:Warn("tp == nil") end; 
 			return 
 		end;	
 		
 		
 		if #self.Waypoints <= 0 then
 			self.Recompute = true;
-			if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("#wp <= 0") end;
+			if self.DebugMove == true then Debugger:Warn("#wp <= 0") end;
 			
 		else
 			if self.LastTargetPosition == nil or not modRegion:InRegion(self.TargetPosition, self.LastTargetPosition, 2) then -- Target position moved;
@@ -306,7 +308,7 @@ function Movement.new(parallelNpc)
 				self.LastTargetPosition = self.TargetPosition;
 				self.Recompute = true;
 				
-				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("tp ~= ltp, ltpIsNil", ltpIsNil) end;
+				if self.DebugMove == true then Debugger:Warn("tp ~= ltp, ltpIsNil", ltpIsNil) end;
 			end
 			
 		end
@@ -343,7 +345,7 @@ function Movement.new(parallelNpc)
 			humanoid:MoveTo(self.TargetPosition);
 			if math.random(1, 64) == 1 then
 				local heightDif = self.TargetPosition.Y-rootPosition.Y;
-				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("Try jump", heightDif) end;
+				if self.DebugMove == true then Debugger:Warn("Try jump", heightDif) end;
 				if heightDif > 8 then
 					humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
 				end
@@ -374,16 +376,16 @@ function Movement.new(parallelNpc)
 			if lastStuckTick and tick()-lastStuckTick <= 6.1 then
 				if moveSpeed:Get() > 0 then
 					humanoid.Jump = true;
-					if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("ls jump") end;
+					if self.DebugMove == true then Debugger:Warn("ls jump") end;
 				end
-				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("long stuck") end;
+				if self.DebugMove == true then Debugger:Warn("long stuck") end;
 			else
 				lastStuckTick = nil;
 			end
 
 			if IsInRange(self.LastRootPosition, rootPosition, 1) then
 				self.Recompute = true;
-				if prefab:GetAttribute("DebugMove") == true then Debugger:Warn("detected stuck") end;
+				if self.DebugMove == true then Debugger:Warn("detected stuck") end;
 				lastStuckTick = tick();
 			end
 
@@ -433,7 +435,7 @@ function Movement.new(parallelNpc)
 		self.MinFollowDist = packet.MinFollowDist;
 		self.LastRootPosition = getRootPos();
 
-		if prefab:GetAttribute("DebugMove") == true then
+		if self.DebugMove == true then
 			Debugger:Warn("Move Target", packet.Target, typeof(packet.Target)) 
 		end;
 		

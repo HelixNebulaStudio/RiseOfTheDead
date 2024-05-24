@@ -344,7 +344,7 @@ function SaveData:Loaded()
 			local lockedPattern = storageItem:GetValues("LockedPattern");
 			if lockedPattern then
 				if table.find(unlockedSkins, lockedPattern) == nil then
-					table.insert(unlockedSkins, lockedPattern);
+					table.insert(unlockedSkins, tostring(lockedPattern));
 				end
 				storageItem:SetValues("ActiveSkin", lockedPattern);
 			end
@@ -358,6 +358,9 @@ function SaveData:Loaded()
 			end
 
 			if #unlockedSkins >0 then
+				for a=1, #unlockedSkins do
+					unlockedSkins[a] = tostring(unlockedSkins[a]);
+				end
 				storageItem:SetValues("Skins", unlockedSkins);
 			end
 		end

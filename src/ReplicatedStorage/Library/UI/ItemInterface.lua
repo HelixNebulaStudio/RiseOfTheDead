@@ -764,6 +764,9 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 		end
 
 		if itemValues.Skins then
+			for a=1, #itemValues.Skins do
+				itemValues.Skins[a] = tostring(itemValues.Skins[a]);
+			end
 			table.sort(itemValues.Skins);
 
 			local skinNames = {};

@@ -33,6 +33,10 @@ else
 			table.insert(unlockedSkins, skinId);
 		end
 
+		for a=1, #unlockedSkins do
+			unlockedSkins[a] = tostring(unlockedSkins[a])
+		end
+
 		storageItem:SetValues("ActiveSkin", skinId);
 		storageItem:SetValues("Skins", unlockedSkins);
 		storageItem:Sync({"ActiveSkin"; "Skins"});

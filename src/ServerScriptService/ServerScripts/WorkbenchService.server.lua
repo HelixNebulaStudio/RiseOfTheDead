@@ -707,6 +707,10 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 
 					else
 						table.insert(unlockedSkins, unlockableItemLib.Id);
+
+						for a=1, #unlockedSkins do
+							unlockedSkins[a] = tostring(unlockedSkins[a]);
+						end
 						storageItem:SetValues("Skins", unlockedSkins);
 
 						isUnlocked = true;
