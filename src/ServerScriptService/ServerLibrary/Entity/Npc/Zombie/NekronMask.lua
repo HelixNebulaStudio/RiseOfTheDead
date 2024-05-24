@@ -1,4 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
+local RunService = game:GetService("RunService");
+
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local random = Random.new();
@@ -22,7 +25,11 @@ function Zombie.new(self)
 				end
 
 				local appearanceFolder = appearanceFolders[random:NextInteger(1, #appearanceFolders)];
-				if appearanceFolder and random:NextInteger(1, 100) <= math.clamp(#appearanceFolders*5, 5, 25) then
+				local rollSuccess = random:NextInteger(1, 100) <= math.clamp(#appearanceFolders*5, 5, 25);
+				if RunService:IsStudio() and math.random(1, 2) == 1 then
+					rollSuccess = true;
+				end
+				if appearanceFolder and rollSuccess then
 					self.NekronAppearance = appearanceFolder;
 				end
 			end
@@ -33,18 +40,37 @@ function Zombie.new(self)
 					if obj.Name ~= "Nekron Mask"
 						and obj.Name ~= "face"
 						and (self.FullNekron == true or atLeastThree <= 3 or random:NextInteger(1, 2) == 1) then
-						if obj:IsA("Shirt") and self.Prefab:FindFirstChildWhichIsA("Shirt") then
-							self.Prefab:FindFirstChildWhichIsA("Shirt").ShirtTemplate = obj.ShirtTemplate;
+						if obj:IsA("Shirt") then
+							self.PresetShirt = {Id=obj.ShirtTemplate};
+							if self.Prefab:FindFirstChildWhichIsA("Shirt") then
+								self.Prefab:FindFirstChildWhichIsA("Shirt").ShirtTemplate = obj.ShirtTemplate;
+							end
 
-						elseif obj:IsA("Pants") and self.Prefab:FindFirstChildWhichIsA("Pants") then
-							self.Prefab:FindFirstChildWhichIsA("Pants").PantsTemplate = obj.PantsTemplate;
+						elseif obj:IsA("Pants") then
+							self.PresetPants = {Id=obj.PantsTemplate};
+							if self.Prefab:FindFirstChildWhichIsA("Pants") then
+								self.Prefab:FindFirstChildWhichIsA("Pants").PantsTemplate = obj.PantsTemplate;
+							end
 
 						elseif obj:IsA("Accessory") then
-							obj:Clone().Parent = self.Prefab;
+							local newAccessory = obj:Clone();
+
+							local accAttachmentType = newAccessory:GetAttribute("Attachment");
+							if accAttachmentType ~= nil then
+								for _, obj in pairs(self.Prefab:GetChildren()) do
+									if obj:IsA("Accessory") and obj:GetAttribute("Attachment") == newAccessory:GetAttribute("Attachment") then
+										obj:Destroy();
+									end
+								end
+							end
+
+							newAccessory.Parent = self.Prefab;
 						end
 						atLeastThree = atLeastThree +1;
 					end
 				end
+
+				self:UpdateClothing();
 			end
 		end)
 	end

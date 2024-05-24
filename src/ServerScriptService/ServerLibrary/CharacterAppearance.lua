@@ -53,6 +53,15 @@ function CharacterAppearance:LoadAppearance(character)
 	
 	local apprearanceFolder = Instance.new("Folder");
 	apprearanceFolder.Name = "Appearance";
+
+	apprearanceFolder.ChildAdded:Connect(function(child)
+		if not child:IsA("Accessory") then return end;
+
+		local accAtt = child:WaitForChild("Handle"):FindFirstChildWhichIsA("Attachment");
+		if accAtt then
+			child:SetAttribute("Attachment", accAtt.Name);
+		end
+	end)
 	
 	local accessories = {};
 	
