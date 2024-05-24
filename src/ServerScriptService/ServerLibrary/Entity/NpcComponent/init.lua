@@ -477,6 +477,76 @@ function NpcComponent:GetHealth(valueType: string, bodyPart: BasePart)
 	end
 	return self.Humanoid.Health
 end
+
+local ShirtParts = {
+	"UpperTorso"; "LowerTorso"; 
+	"LeftUpperArm"; "RightUpperArm"; 
+	"LeftLowerArm"; "RightLowerArm"; 
+	"LeftHand"; "RightHand";
+};
+local PantsParts = {
+	"LeftUpperLeg"; "RightUpperLeg"; 
+	"LeftLowerLeg"; "RightLowerLeg";
+	"LeftFoot"; "RightFoot";
+};
+function NpcComponent:UpdateClothing()
+	local oldShirt = self.Prefab:FindFirstChildWhichIsA("Shirt");
+	local oldPants = self.Prefab:FindFirstChildWhichIsA("Pants");
+	
+
+	if self.PresetSkinColor then
+		self.Head.Color = self.PresetSkinColor;
+	end
+
+	for a=1, #ShirtParts do
+		local part = self.Prefab:FindFirstChild(ShirtParts[a]);
+		
+		if self.PresetSkinColor then
+			part.Color = self.PresetSkinColor;
+		end
+		
+		if self.PresetShirt == nil then continue end;
+		if oldShirt then
+			oldShirt.ShirtTemplate = self.PresetShirt.Id;
+		else
+			part.TextureID = self.PresetShirt.Id;
+		end
+	end
+	for a=1, #PantsParts do
+		local part = self.Prefab:FindFirstChild(PantsParts[a]);
+		if self.PresetSkinColor then
+			part.Color = self.PresetSkinColor;
+		end
+		
+		if self.PresetPants == nil then continue end;
+		if oldPants then
+			oldPants.PantsTemplate = self.PresetPants.Id;
+		else
+			part.TextureID = self.PresetPants.Id;
+		end
+	end
+	
+	if self.PresetSkinColor then
+		if self.Prefab:FindFirstChild("RightPoint") then
+			self.Prefab.RightPoint.Color = self.PresetSkinColor;
+		end
+		if self.Prefab:FindFirstChild("RightMiddle") then
+			self.Prefab.RightMiddle.Color = self.PresetSkinColor;
+		end
+		if self.Prefab:FindFirstChild("RightPinky") then
+			self.Prefab.RightPinky.Color = self.PresetSkinColor;
+		end
+		if self.Prefab:FindFirstChild("LeftPoint") then
+			self.Prefab.LeftPoint.Color = self.PresetSkinColor;
+		end
+		if self.Prefab:FindFirstChild("LeftMiddle") then
+			self.Prefab.LeftMiddle.Color = self.PresetSkinColor;
+		end
+		if self.Prefab:FindFirstChild("LeftPinky") then
+			self.Prefab.LeftPinky.Color = self.PresetSkinColor;
+		end
+	end
+end
 --==
 
 -- MARK: NpcModule Type

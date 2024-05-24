@@ -693,8 +693,8 @@ function Survival:StartWave(wave)
 
 			--shared.Notify(game.Players:GetPlayers(), "Next wave starts in "..breakLength.." seconds..", "Defeated");
 
-			local nextObj, nextHaz = self:GetNextWaveInfo(wave+1);
-			local nextWaveStr = (nextObj and nextObj.Class.Title or "")..(nextHaz and "("..nextHaz.Class.Title..")" or "");
+			local nextObj, nextHaz = self:GetNextWaveInfo(wave);
+			local nextWaveStr = (nextObj and nextObj.Class.Title or "")..(nextHaz and "("..nextHaz.Class.Title..")" or "(No Hazards)");
 			for a=breakLength, 1, -1 do
 				if a == 1 then self:RespawnDead(); end
 				task.wait(1);

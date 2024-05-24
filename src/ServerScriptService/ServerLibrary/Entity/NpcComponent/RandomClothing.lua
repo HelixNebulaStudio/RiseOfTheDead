@@ -4,70 +4,18 @@ local modNpcClothing = require(game.ServerScriptService.ServerLibrary.NpcClothin
 
 local NpcRandomClothing = {};
 
-local ShirtParts = {
-	"UpperTorso"; "LowerTorso"; 
-	"LeftUpperArm"; "RightUpperArm"; 
-	"LeftLowerArm"; "RightLowerArm"; 
-	"LeftHand"; "RightHand";
-};
-local PantsParts = {
-	"LeftUpperLeg"; "RightUpperLeg"; 
-	"LeftLowerLeg"; "RightLowerLeg";
-	"LeftFoot"; "RightFoot";
-};
-
 function NpcRandomClothing.new(self)
 	return function(npcName, addHair)
-		local oldShirt = self.Prefab:FindFirstChildWhichIsA("Shirt");
-		local oldPants = self.Prefab:FindFirstChildWhichIsA("Pants");
-		
-		local rngShirt = self.PresetShirt or modNpcClothing:GetShirt(npcName, self.Seed);
-		local rngPants = self.PresetPants or modNpcClothing:GetPants(npcName, self.Seed);
+		if self.PresetShirt == nil then
+			self.PresetShirt = modNpcClothing:GetShirt(npcName, self.Seed);
+		end
+		if self.PresetPants == nil then
+			self.PresetPants = modNpcClothing:GetPants(npcName, self.Seed);
+		end
 
-		local rngSkinColor = modNpcClothing:GetSkinColor(npcName, self.Seed);
-		self.Head.Color = rngSkinColor;
-		
-		for a=1, #ShirtParts do
-			local part = self.Prefab:FindFirstChild(ShirtParts[a]);
-			part.Color = rngSkinColor;
-			
-			if oldShirt then
-				oldShirt.ShirtTemplate = rngShirt.Id;
-			else
-				part.TextureID = rngShirt.Id;
-			end
+		if self.PresetSkinColor == nil then
+			self.PresetSkinColor = modNpcClothing:GetSkinColor(npcName, self.Seed);
 		end
-		for a=1, #PantsParts do
-			local part = self.Prefab:FindFirstChild(PantsParts[a]);
-			part.Color = rngSkinColor;
-			
-
-			if oldPants then
-				oldPants.PantsTemplate = rngPants.Id;
-			else
-				part.TextureID = rngPants.Id;
-			end
-		end
-		
-		if self.Prefab:FindFirstChild("RightPoint") then
-			self.Prefab.RightPoint.Color = rngSkinColor;
-		end
-		if self.Prefab:FindFirstChild("RightMiddle") then
-			self.Prefab.RightMiddle.Color = rngSkinColor;
-		end
-		if self.Prefab:FindFirstChild("RightPinky") then
-			self.Prefab.RightPinky.Color = rngSkinColor;
-		end
-		if self.Prefab:FindFirstChild("LeftPoint") then
-			self.Prefab.LeftPoint.Color = rngSkinColor;
-		end
-		if self.Prefab:FindFirstChild("LeftMiddle") then
-			self.Prefab.LeftMiddle.Color = rngSkinColor;
-		end
-		if self.Prefab:FindFirstChild("LeftPinky") then
-			self.Prefab.LeftPinky.Color = rngSkinColor;
-		end
-		
 		
 		if addHair ~= false then
 			local rngHair, rngHairColor = modNpcClothing:GetHair(npcName, self.Seed);
@@ -88,6 +36,7 @@ function NpcRandomClothing.new(self)
 		end
 			
 		self.RandomClothing = nil;
+		self:UpdateClothing();
 	end
 end
 

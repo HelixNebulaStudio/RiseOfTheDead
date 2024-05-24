@@ -24,9 +24,6 @@ return function(self)
 	local cache = {};
 	cache.AttackCooldown = tick();
 	
-	cache.IdleCooldown = tick();
-	cache.IdleWalkCooldown = tick();
-	cache.IdleGrowlCooldown = tick();
 	cache.TriggerHostileTick = nil;
 	cache.HasTargetTick = nil;
 	
@@ -91,7 +88,7 @@ return function(self)
 			spawnPoint = self.FakeSpawnPoint.Position;
 		end
 		
-		if (self.RootPart.Position-spawnPoint).Magnitude >= 16 then
+		if (self.RootPart.Position-spawnPoint).Magnitude >= 24 then
 			self.Move:MoveTo(spawnPoint);
 			
 		else
