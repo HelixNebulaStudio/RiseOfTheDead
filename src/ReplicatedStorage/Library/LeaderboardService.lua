@@ -55,14 +55,6 @@ local library = {
 		DatastoreId="L_Daily_GoldDonor";
 		Folder="DailyStats";
 	};
-	--- event pass leaderboard
-	AllTimeMp={
-		DataKey="AllTimeMp";
-		DatastoreName="L_AllTime_MpLevel";
-		DatastoreId="L_AllTime_MpLevel";
-		RanksLimit=100;
-		Folder="AllTimeStats";
-	};
 }
 
 --== For faction
@@ -96,7 +88,6 @@ library["Weekly"..factionBoardKey]={
 	RanksLimit=50;
 	DataKey=factionBoardKey;
 };
-
 
 local uploadTimer = 120;
 local playerDataCache = {};

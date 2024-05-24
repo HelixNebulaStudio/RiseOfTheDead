@@ -11,4 +11,17 @@ local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild(
 local moddedSelf = modModEngineService:GetModule(script.Name);
 if moddedSelf then moddedSelf:Init(library); end
 
+if library.Active then
+	local modLeaderboardService = require(game.ReplicatedStorage.Library.LeaderboardService);
+
+	modLeaderboardService.Library[library.Active]={
+		DataKey=library.Active;
+		DatastoreName=`L_{library.Active}_MpLevel`;
+		DatastoreId=`L_{library.Active}_MpLevel`;
+		RanksLimit=100;
+		Folder="AllTimeStats";
+	};
+	
+end
+
 return library;

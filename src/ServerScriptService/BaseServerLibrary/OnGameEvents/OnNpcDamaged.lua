@@ -61,6 +61,7 @@ return function(player, damageSource)
 		
 	end
 
+	if storageItem == nil then return end; -- Missing Dealer StorageItem
 	if (humanoid.Name == "Zombie" or humanoid.Name == "Bandit" or humanoid.Name == "Rat") and damageSource.Killed == true and npcModule.IsDead ~= true then
 
 		local throwableWeaponList = {"beachball"; "pickaxe"; "broomspear"; "snowballs"};
