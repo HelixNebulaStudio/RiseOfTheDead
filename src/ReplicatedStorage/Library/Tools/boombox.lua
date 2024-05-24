@@ -120,7 +120,7 @@ return function()
 	
 	function Tool:ClientUnequip()
 		local player = game.Players.LocalPlayer;
-		local modData = require(player:WaitForChild("DataModule"));
+		local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 		local modInterface = modData:GetInterfaceModule();
 		
 		modInterface:CloseWindow("BoomboxWindow");
@@ -128,7 +128,7 @@ return function()
 	
 	function Tool:ClientItemPrompt()
 		local player = game.Players.LocalPlayer;
-		local modData = require(player:WaitForChild("DataModule"));
+		local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 		local modInterface = modData:GetInterfaceModule();
 		
 		if modInterface:IsVisible("BoomboxWindow") then return end;

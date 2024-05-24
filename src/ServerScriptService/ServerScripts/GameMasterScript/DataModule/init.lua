@@ -644,7 +644,7 @@ function Data:GetSkillTree(skillId)
 end
 
 
-Data.PlayerNoise = {};
+Data.MutePlayerNoise = {};
 
 function Data.RefreshPlayerNoise(playerName)
 	local sounds = CollectionService:GetTagged("PlayerNoiseSounds");
@@ -653,18 +653,14 @@ function Data.RefreshPlayerNoise(playerName)
 		if player == game.Players.LocalPlayer then continue end;
 		if player.Name ~= playerName then continue end;
 		
-		if Data.PlayerNoise[player.Name] == nil then
-			for a=1, #sounds do
-				local sound = sounds[a];
+		local shouldMute = Data.MutePlayerNoise[playerName] == true;
 
-				sound.Volume = sound:GetAttribute("Volume") or 1;
-			end
-		else
-			for a=1, #sounds do
-				local sound = sounds[a];
+		for a=1, #sounds do
+			local sound = sounds[a];
+			local soundOwner = sound:GetAttribute("SoundOwner");
+			if soundOwner ~= playerName then continue end;
 
-				sound.Volume = 0;
-			end
+			sound.Volume = shouldMute and 0 or sound:GetAttribute("Volume") or 1;
 		end
 	end
 
@@ -685,61 +681,27 @@ CollectionService:GetInstanceAddedSignal("PlayerNoiseSounds"):Connect(function(s
 	if ownerName == nil then Debugger:Log("Missing ownerName", sound:GetFullName()); sound.Volume = 0; return end;
 	if ownerName == game.Players.LocalPlayer.Name then return end;
 	
-	if sound:GetAttribute("MusicNote") and Data.PlayerNoise[ownerName] then
+	local shouldMute = Data.MutePlayerNoise[ownerName] == true;
+
+	if sound:GetAttribute("MusicNote") and shouldMute then
 		sound.Volume = 0;
 		game.Debris:AddItem(sound, 0);
 	end
 	
 	local onChangeConn;
 	local function onChange()
-		if CollectionService:HasTag(sound, "PlayerNoiseSounds") == false then
+		if not CollectionService:HasTag(sound, "PlayerNoiseSounds") then
 			onChangeConn:Disconnect();
-			Debugger:Log("PlayerNoiseSounds tag removed");
 			return;
 		end
-		if Data.PlayerNoise[ownerName] == nil then
-			sound.Volume = sound:GetAttribute("Volume") or 1;
-
-		else
-			sound.Volume = 0;
-
-		end
+		
+		sound.Volume = shouldMute and 0 or sound:GetAttribute("Volume") or 1;
 	end
 	onChangeConn = sound:GetPropertyChangedSignal("Playing"):Connect(onChange);
-	
+	onChange();
+
 end)
 
-Data.BoomboxMutes = {};
-function Data.RefreshBoomboxMutes()
-	task.spawn(function()
-		local list = CollectionService:GetTagged("Boombox");
-		for a=1, #list do
-			local prefab = list[a];
-			if prefab and prefab:IsDescendantOf(workspace) and prefab.PrimaryPart then
-				local owner = prefab.Parent.Name;
-				if Data.BoomboxMutes[owner] then
-					local boomboxSound = prefab.PrimaryPart:FindFirstChild("boomboxSound");
-
-					if boomboxSound then
-						boomboxSound.Volume = 0;
-					end
-				else
-					local boomboxSound = prefab.PrimaryPart:FindFirstChild("boomboxSound");
-
-					if boomboxSound then
-						boomboxSound.Volume = 0.5;
-					end
-				end
-			end
-		end
-	end)
-end
-
-Data.RefreshBoomboxMutes();
-CollectionService:GetInstanceAddedSignal("Boombox"):Connect(function()
-	task.wait();
-	Data.RefreshBoomboxMutes();
-end)
 
 Debugger:Warn("Initialize");
 return Data;

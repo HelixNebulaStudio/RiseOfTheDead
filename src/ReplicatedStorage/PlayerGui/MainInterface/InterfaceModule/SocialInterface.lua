@@ -690,33 +690,19 @@ local function UpdateListing(data)
 						end
 					end)
 				newOptionButton(
-					targetName ~= localplayer.Name and modData.PlayerNoise[targetName] == nil,
+					targetName ~= localplayer.Name and modData.MutePlayerNoise[targetName] == nil,
 					"Mute Noise",
 					function()
-						modData.PlayerNoise[targetName] = true;
+						modData.MutePlayerNoise[targetName] = true;
 						modData.RefreshPlayerNoise(targetName);
 					end)
 				newOptionButton(
-					targetName ~= localplayer.Name and modData.PlayerNoise[targetName] ~= nil,
+					targetName ~= localplayer.Name and modData.MutePlayerNoise[targetName] ~= nil,
 					"Unmute Noises",
 					function()
-						modData.PlayerNoise[targetName] = nil;
+						modData.MutePlayerNoise[targetName] = nil;
 						modData.RefreshPlayerNoise(targetName);
 					end)
-				--newOptionButton(
-				--	targetName ~= localplayer.Name and modData.BoomboxMutes[targetName] == nil,
-				--	"Mute Noise",
-				--	function()
-				--		modData.BoomboxMutes[targetName] = true;
-				--		modData.RefreshBoomboxMutes();
-				--end)
-				--newOptionButton(
-				--	targetName ~= localplayer.Name and modData.BoomboxMutes[targetName] ~= nil,
-				--	"Unmute Noises",
-				--	function()
-				--		modData.BoomboxMutes[targetName] = nil;
-				--		modData.RefreshBoomboxMutes();
-				--end)
 				
 				
 				local targetWorldName = modBranchConfigs.GetWorld();

@@ -21,6 +21,8 @@ function toolPackage.NewToolLib(handler)
 			local prefab = self.Prefabs[a];
 			
 			local fartSound = prefab.PrimaryPart:FindFirstChild("fartsound");
+			fartSound:SetAttribute("SoundOwner", self.Player and self.Player.Name or nil);
+			game:GetService("CollectionService"):AddTag(fartSound, "PlayerNoiseSounds");
 			fartSound.PlaybackSpeed = math.random(90, 110)/100;
 			fartSound:Play();
 		end

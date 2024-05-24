@@ -31,6 +31,9 @@ function toolPackage.NewToolLib(handler)
 			end
 			
 			local chickenSnd = chickenScreams[math.random(1, #chickenScreams)];
+			chickenSnd:SetAttribute("SoundOwner", self.Player and self.Player.Name or nil);
+			game:GetService("CollectionService"):AddTag(chickenSnd, "PlayerNoiseSounds");
+			
 			chickenSnd.PlaybackSpeed = math.random(90, 110)/100;
 			chickenSnd:Play();
 		end
