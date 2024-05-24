@@ -499,7 +499,7 @@ function remoteMissionRemote.OnServerInvoke(player, actionId, missionId)
 		end
 		
 		local canStart, cantStartReasons = missionProfile:CanStart(missionId);
-		local cantStartReason = cantStartReasons[1] or "Mission could not be started";
+		local cantStartReason = cantStartReasons and cantStartReasons[1] or "Mission could not be started";
 		if canStart then
 			Mission:StartMission(player, missionId);
 		else
