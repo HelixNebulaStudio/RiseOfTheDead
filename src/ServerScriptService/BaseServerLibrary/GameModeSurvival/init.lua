@@ -6,6 +6,7 @@ local RunService = game:GetService("RunService");
 --==
 local Survival = {};
 Survival.__index = Survival;
+Survival.Seed = nil;
 
 local EnumStatus = {Initialized=-1; Restarting=0; InProgress=1; Completed=2;};
 Survival.EnumStatus = EnumStatus;
@@ -376,7 +377,7 @@ function Survival:CompleteWave()
 end
 
 function Survival:GetNextWaveInfo(wave)
-	local random = Random.new(wave);
+	local random = Random.new(self.Seed);
 	local pickObjective, pickHazard;
 
 	if wave < #self.ObjectivesList then
@@ -393,7 +394,7 @@ function Survival:GetNextWaveInfo(wave)
 			local largestFmod = 0;
 			
 			for a=1, #list do
-				if math.fmod(self.Wave, (list[a].Fmod or 1)) == 0 then
+				if math.fmod(wave, (list[a].Fmod or 1)) == 0 then
 					if list[a].Fmod > largestFmod then
 						largestFmod = list[a].Fmod;
 					end
@@ -416,30 +417,14 @@ function Survival:GetNextWaveInfo(wave)
 		
 		pickObjective = roll(self.ObjectivesList);
 		
-		if RunService:IsStudio() then
-			local list = {};
-			for a=1, #self.ObjectivesList do
-				table.insert(list, `{self.ObjectivesList[a].Type}`);
-			end
-			Debugger:Warn("Objectives",list);
-		end
-		
-		if self.Wave > 5 then
-			local rngMax = self.Wave > 20 and 1 or self.Wave > 15 and 2 or self.Wave > 10 and 3 or 4;
+		if wave > 5 then
+			local rngMax = wave > 20 and 1 or wave > 15 and 2 or wave > 10 and 3 or 4;
 
 			if random:NextInteger(1, rngMax) == 1 then
 				pickHazard = roll(self.HazardsList);
 			end
 		end;
 		
-		if RunService:IsStudio() then
-			local list = {};
-			for a=1, #self.HazardsList do
-				table.insert(list, `{self.HazardsList[a].Type}`);
-			end
-			Debugger:Warn("Hazards",list);
-		end
-
 	end
 
 	for a=1, #self.ObjectivesList do
@@ -606,6 +591,7 @@ function Survival:StartWave(wave)
 	
 	for a=#self.EnemyModules, 1, -1 do
 		game.Debris:AddItem(self.EnemyModules[a].Prefab, 0);
+		self.EnemyModules[a]:KillNpc();
 		table.remove(self.EnemyModules, a);
 	end
 	
@@ -691,15 +677,14 @@ function Survival:StartWave(wave)
 			
 			local breakLength = math.clamp(10 + (self.ActiveSupCrate and 20 or 0), 10, 30);
 
-			--shared.Notify(game.Players:GetPlayers(), "Next wave starts in "..breakLength.." seconds..", "Defeated");
-
-			local nextObj, nextHaz = self:GetNextWaveInfo(wave);
-			local nextWaveStr = (nextObj and nextObj.Class.Title or "")..(nextHaz and "("..nextHaz.Class.Title..")" or "(No Hazards)");
+			local nextWave = wave+1;
+			local nextObj, nextHaz = self:GetNextWaveInfo(nextWave);
+			local nextWaveStr = (nextObj and nextObj.Class.Title or "")..(nextHaz and " ("..nextHaz.Class.Title..")" or " (No Hazards)");
 			for a=breakLength, 1, -1 do
 				if a == 1 then self:RespawnDead(); end
 				task.wait(1);
 				self:Hud{
-					Status=`Wave {wave+1}: {nextWaveStr} starts in {a}s..`;
+					Status=`Wave {nextWave}: {nextWaveStr} starts in {a}s..`;
 				};
 				if self.Status ~= EnumStatus.InProgress then break; end
 			end
@@ -823,6 +808,7 @@ function Survival:Initialize(roomData)
 	self.RoomData = roomData;
 	self.Players = {};
 	self.IsHard = roomData.IsHard == true;
+	self.Seed = math.random(1111, 9999);
 	
 	local function clearCharacter(character: Model?)
 		for a=#self.Characters, 1, -1 do
