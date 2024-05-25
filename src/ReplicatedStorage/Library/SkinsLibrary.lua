@@ -113,6 +113,8 @@ function SkinsLibrary.SetTexture(part, id, generateTag)
 	for _, c in pairs(part:GetChildren()) do
 		if c:IsA("Texture") and c.Name == "SkinTexture" then
 			c:Destroy();
+		elseif c:IsA("SurfaceAppearance") and c:GetAttribute("SkinId") then
+			c:Destroy();
 		end
 	end
 	part:SetAttribute("SkinId", nil);
@@ -144,6 +146,7 @@ function SkinsLibrary.SetTexture(part, id, generateTag)
 			
 			if surfApp then
 				local newSurfApp = surfApp:Clone();
+				newSurfApp:SetAttribute("SkinId", id);
 				newSurfApp.Parent = part;
 			end
 			

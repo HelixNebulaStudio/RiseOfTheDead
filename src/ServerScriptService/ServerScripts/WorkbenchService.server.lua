@@ -678,56 +678,80 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 		
 		
 	elseif action == 9 then --== UnlockableSet;
-		if appearId and appearId ~= storageItem.ItemId then
-			local unlockableItemLib = modItemUnlockablesLibrary:Find(appearId);
+		Debugger:StudioWarn("partKey", partKey);
+		if partKey == "UnlockableId" then
+			if appearId and appearId ~= storageItem.ItemId then
+				local unlockableItemLib = modItemUnlockablesLibrary:Find(appearId);
+				if unlockableItemLib and unlockableItemLib.ItemId == storageItem.ItemId then
+					local unlockedSkins = storageItem:GetValues("Skins") or {};
+					local isUnlocked = table.find(unlockedSkins, unlockableItemLib.Id)
 
-			if unlockableItemLib and unlockableItemLib.ItemId == storageItem.ItemId then
-
-				local unlockedSkins = storageItem:GetValues("Skins") or {};
-				local isUnlocked = table.find(unlockedSkins, unlockableItemLib.Id)
-
-				if unlockableItemLib.Name == "Default" or unlockableItemLib.Unlocked == true then
-					isUnlocked = true;
-				elseif typeof(unlockableItemLib.Unlocked) == "string" and table.find(unlockedSkins, unlockableItemLib.Unlocked) then
-					isUnlocked = true;
-				end
-				
-				if isUnlocked == nil then
-					local consumedCharge = false;
-					
-					if profile.ItemUnlockables and profile.ItemUnlockables[itemId] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] > 0 then
-						profile.ItemUnlockables[itemId][unlockableItemLib.Id] = profile.ItemUnlockables[itemId][unlockableItemLib.Id] -1;
-						profile:Sync(`ItemUnlockables/{itemId}/{unlockableItemLib.Id}`);
-						consumedCharge = true;
-					end
-					if not consumedCharge then
-						shared.Notify(player, `You have no more charges for {unlockableItemLib.Name} {itemLib.Name}.`, "Negative");
-						debounceCache[player.Name]=nil;
-						return;
-
-					else
-						table.insert(unlockedSkins, unlockableItemLib.Id);
-
-						for a=1, #unlockedSkins do
-							unlockedSkins[a] = tostring(unlockedSkins[a]);
-						end
-						storageItem:SetValues("Skins", unlockedSkins);
-
+					if unlockableItemLib.Name == "Default" or unlockableItemLib.Unlocked == true then
+						isUnlocked = true;
+					elseif typeof(unlockableItemLib.Unlocked) == "string" and table.find(unlockedSkins, unlockableItemLib.Unlocked) then
 						isUnlocked = true;
 					end
+					
+					if isUnlocked == nil then
+						local consumedCharge = false;
+						
+						if profile.ItemUnlockables and profile.ItemUnlockables[itemId] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] > 0 then
+							profile.ItemUnlockables[itemId][unlockableItemLib.Id] = profile.ItemUnlockables[itemId][unlockableItemLib.Id] -1;
+							profile:Sync(`ItemUnlockables/{itemId}/{unlockableItemLib.Id}`);
+							consumedCharge = true;
+						end
+						if not consumedCharge then
+							shared.Notify(player, `You have no more charges for {unlockableItemLib.Name} {itemLib.Name}.`, "Negative");
+							debounceCache[player.Name]=nil;
+							return;
+
+						else
+							table.insert(unlockedSkins, unlockableItemLib.Id);
+
+							for a=1, #unlockedSkins do
+								unlockedSkins[a] = tostring(unlockedSkins[a]);
+							end
+							storageItem:SetValues("Skins", unlockedSkins);
+
+							isUnlocked = true;
+						end
+					end
+
+					if player.UserId == 16170943 then
+						isUnlocked = true;
+					end
+					if isUnlocked then
+						storageItem:SetValues("ActiveSkin", appearId);
+					end
+				else
+					storageItem:DeleteValues("ActiveSkin");
 				end
 
-				if player.UserId == 16170943 then
-					isUnlocked = true;
-				end
-				if isUnlocked then
-					storageItem:SetValues("ActiveSkin", appearId);
-				end
 			else
 				storageItem:DeleteValues("ActiveSkin");
+
 			end
-		else
-			storageItem:DeleteValues("ActiveSkin");
+			
+		elseif partKey == "WeaponSkinId" then
+			local unlockedSkins = storageItem:GetValues("Skins") or {};
+
+			if appearId == nil then
+				storageItem:DeleteValues("ActiveSkin");
+				return;
+			end
+
+			local isUnlocked = false;
+			for a=1, #unlockedSkins do
+				if tostring(unlockedSkins[a]) == tostring(appearId) then
+					isUnlocked = true;
+					break;
+				end
+			end
+			
+			if isUnlocked then
+				storageItem:SetValues("ActiveSkin", appearId);
+			end
+			
 		end
 		
 		activeSave.AppearanceData:Update(activeSave.Clothing);

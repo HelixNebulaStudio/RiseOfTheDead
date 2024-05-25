@@ -782,11 +782,13 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 							skinName = skinName..` & {bundleSkinLib.Name}`;
 						end
 					end
+
 				else
 					skinLib = modSkinsLibrary.Get(skinId);
 					if skinLib then
 						skinName = skinLib.Name;
 					end
+					
 				end
 
 				if skinName then
