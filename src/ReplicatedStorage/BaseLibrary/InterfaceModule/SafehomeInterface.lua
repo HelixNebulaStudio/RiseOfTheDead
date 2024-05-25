@@ -408,7 +408,7 @@ function Interface.init(modInterface)
 
 						local promptWindow = Interface:PromptQuestion(
 							"Kick Survivor", 
-							"Are you sure you want to kick "..name.." from the safehome?"
+							`Are you sure you want to kick {name} from the safehome?`
 						);
 						local YesClickedSignal, NoClickedSignal;
 
@@ -425,7 +425,7 @@ function Interface.init(modInterface)
 								promptWindow.Frame.Yes.buttonText.Text = "Kicked!";
 
 							else
-								promptWindow.Frame.Yes.buttonText.Text = "Please try again!";
+								promptWindow.Frame.Yes.buttonText.Text = rPacket.FailMsg or "Please try again!";
 
 							end
 							wait(1);
