@@ -686,6 +686,8 @@ bindOpenLobbyInterface.Event:Connect(function(lobbyData) --cleared max depth che
 	gameLobby = lobbyData;
 	hardModeCreate = false;
 	
+	Debugger:StudioWarn("gameLobby", gameLobby);
+	
 	task.spawn(function()
 		local joinSuccessOrReason = remoteGameModeRequest:InvokeServer(enumRequests.OpenInterface, gameLobby.Type, gameLobby.Stage);
 		if joinSuccessOrReason ~= true then
@@ -711,7 +713,6 @@ bindOpenLobbyInterface.Event:Connect(function(lobbyData) --cleared max depth che
 	mainFrame.Rewards.Visible = rewardsId ~= nil;
 	mainFrame.RewardsButton.Visible = rewardsId ~= nil;
 	
-	Debugger:Warn("gameLobby", gameLobby);
 	UpdateGameLobby(gameLobby);
 	
 	refreshStatus = true;

@@ -595,13 +595,18 @@ end
 function GameModeManager:Assign(player, gameType, gameStage)
 	local gameTable = GameModeManager:GetActive(gameType, gameStage);
 	if gameTable == nil then gameTable = GameModeManager:Initialize(gameType, gameStage); end;
+	if gameTable == nil then return end;
 	
-	if gameTable then
-		local lobbyData = GameModeManager:GetActive(gameType, gameStage);
-		remoteGameModeAssign:FireClient(player, lobbyData);
-		
-		GameModeManager:ConnectPlayer(player, gameType, gameStage);
+	local classPlayer = modPlayers.Get(player);
+	if classPlayer then
+		if classPlayer.GameModeAccess == nil then
+			classPlayer.GameModeAccess = {};
+		end
+		classPlayer.GameModeAccess[gameType..":"..gameStage] = true; 
 	end
+	
+	local lobbyData = GameModeManager:GetActive(gameType, gameStage);
+	remoteGameModeAssign:FireClient(player, lobbyData);
 end
 
 function remoteGameModeLobbies.OnServerInvoke(player, interactObject, interactModule, paramPacket)
@@ -1068,5 +1073,44 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 		end
 	end
 end);
+
+task.spawn(function()
+	Debugger.AwaitShared("modCommandsLibrary");
+
+	shared.modCommandsLibrary:HookChatCommand("gamemode", {
+		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+
+		RequiredArgs = 0;
+		UsageInfo = "/gamemode action";
+		Description = [[Game mode commands:
+			/gamemode join modeId stageId
+
+				e.g. /gamemode join Raid Tombs
+		]];
+		Function = function(player, args)
+			local profile = shared.modProfile:Get(player);
+
+			local action = args[1];
+
+			if action == "join" then
+				local gameId = args[2];
+				local stageId = args[3];
+
+				GameModeManager:Assign(player, gameId, stageId);
+
+				local gameTable = GameModeManager:GetActive(gameId, stageId);
+				if gameTable == nil then
+					shared.Notify(player, `Could not load {gameId}:{stageId}`, "Negative");
+					return;
+				end
+				shared.Notify(player, `Attempting to join {gameId}:{stageId}`, "Inform");
+			end
+			
+			return true;
+		end;
+	});
+	
+
+end)
 
 return GameModeManager;
