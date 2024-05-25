@@ -60,7 +60,7 @@ local Properties={
 local Animations=workspace:GetAttribute("IsDev") and {
 	Core={Id=16500420231;};
 	PrimaryFire={Id=16500425509; FocusWeight=0.05};
-	Reload={Id=16500428622;};
+	Reload={Id=16649850922;};
 	TacticalReload={Id=16500432869;};
 	Load={Id=16500423928;};
 	Inspect={Id=16500417502;};
