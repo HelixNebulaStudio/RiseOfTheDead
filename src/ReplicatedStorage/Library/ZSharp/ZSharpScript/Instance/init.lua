@@ -27,7 +27,9 @@ function ZSharp.Load(ZSharpScript, zEnv)
 		elseif typeof(data) == "table" then
 			local n = {};
 			for k, v in pairs(data) do
-				n[ZSharpScript.Sandbox(k)] = ZSharpScript.Sandbox(v);
+				local newK = ZSharpScript.Sandbox(k);
+				if newK == nil then continue end;
+				n[newK] = ZSharpScript.Sandbox(v);
 			end
 
 			if instanceCast then
@@ -39,7 +41,11 @@ function ZSharp.Load(ZSharpScript, zEnv)
 
 		elseif (typeof(data) == "userdata" or typeof(data) == "Instance") and data.ClassName then
 			local class = ZSharpScript.Classes[data.ClassName];
-			return class and ZSharpScript.newInstance(data.ClassName, data) or nil;
+			if class == nil then
+				return nil;
+			end
+
+			return ZSharpScript.newInstance(data.ClassName, data);
 
 		elseif typeof(data) == "string" or typeof(data) == "number" or typeof(data) == "boolean"  then
 			return data;

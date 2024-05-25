@@ -6,7 +6,9 @@ return {
     Link=function(zss, t, private)
 		local m = {};
 		for k, v in pairs(t) do
-			m[zss.Sandbox(k)] = zss.Sandbox(v);
+			local newK = zss.Sandbox(k);
+			if newK == nil then continue end;
+			m[newK] = zss.Sandbox(v);
 		end
 
 		local new = newproxy(true);

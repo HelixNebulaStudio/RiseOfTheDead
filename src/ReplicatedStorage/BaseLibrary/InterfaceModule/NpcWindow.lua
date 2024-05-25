@@ -221,12 +221,19 @@ function Interface.init(modInterface)
 
 			local taskProcessObj = taskProcessObjects[taskData.Id];
 			updatedFlag[taskData.Id] = true;
+
+			if taskProcessObj and taskProcessObj.StartTime ~= taskData.StartTime then
+				taskProcessObj:Destroy();
+				taskProcessObj = nil;
+			end
+
 			if taskProcessObj == nil or taskProcessObj.Button == nil then
 				taskProcessObjects[taskData.Id] = modComponents.CreateProgressListing(Interface, {
 					Id = taskData.Id;
 					Parent = activeTasksPage;
 				});
 				taskProcessObj = taskProcessObjects[taskData.Id];
+				taskProcessObj.StartTime = taskData.StartTime;
 
 				taskProcessObj.SkipCost.Perks = taskLib.SkipCost.Perks;
 				taskProcessObj.SkipCost.Gold = taskLib.SkipCost.Gold;
@@ -447,6 +454,7 @@ function Interface.init(modInterface)
 								pickButton.TextColor3 = Interface.ColorPicker.GetBackColor(selectColor);
 
 								taskValues[key] = selectColorId;
+								Debugger:StudioWarn("Selected color:", selectColorId);
 							end
 						end)
 
@@ -481,7 +489,7 @@ function Interface.init(modInterface)
 				end
 				assignButton.Text = "Assigning..";
 
-
+				Debugger:StudioWarn("Submit Values:", taskValues);
 				local rPacket = remoteNpcData:InvokeServer("assigntask", activeNpcName, {
 					Id=taskLib.Id;
 					Values=taskValues;
