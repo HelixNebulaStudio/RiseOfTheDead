@@ -18,6 +18,16 @@ function ZSharp.Load(zSS, zEnv)
 		zSS.ConsoleOutput:Fire(`{modRichFormatter.Color(Color3.fromRGB(255, 142, 58):ToHex(), prefix)}{modZSharpLexer.buildStr(str, true)}`);
 
 	end
+
+	local function outputConsoleNoFormat(prefix, ...)
+		local toStringify = {};
+		for _, v in pairs({...}) do
+			table.insert(toStringify, tostring(v));
+		end
+		local str = table.concat(toStringify, " ");
+		
+		zSS.ConsoleOutput:Fire(`{modRichFormatter.Color(Color3.fromRGB(255, 142, 58):ToHex(), prefix)}{str}`);
+	end
 	
 	zEnv.log = function(...)
 		local str = Debugger:Stringify(...);
@@ -86,12 +96,12 @@ function ZSharp.Load(zSS, zEnv)
 					end)
 					descV = descV or "Missing description.";
 
-					outputConsole("zss.help>>  ", "\nFunction:", currDir," \[\[\n   ",descV,"\n\]\]\n");
+					outputConsoleNoFormat("zss.help>>  ", "\nFunction:", currDir," \[\[\n   ",descV,"\n\]\]\n");
 					
 					return;
 					
 				elseif currEnv[dir] == nil then
-					outputConsole("zss.help>>  ", "Unknown library (".. currDir ..").");
+					outputConsoleNoFormat("zss.help>>  ", "Unknown library (".. currDir ..").");
 					return;
 					
 				else
@@ -99,7 +109,7 @@ function ZSharp.Load(zSS, zEnv)
 				end
 			end
 			
-			outputConsole("zss.help>>  ", "\nLibrary:", currDir,"= {",printTable(currEnv),"\n}\n");
+			outputConsoleNoFormat("zss.help>>  ", "\nLibrary:", currDir,"= {",printTable(currEnv),"\n}\n");
 
 			return;
 		end
@@ -110,7 +120,7 @@ function ZSharp.Load(zSS, zEnv)
 		helpStr = helpStr.."\n\n<b>getfenv():</b> -- Available keys in this environment.";
 		
 		local envStr = printTable(zEnv);
-		outputConsole("zss.help>>  ", "\n",helpStr..envStr,"\n\nUse the <b>help</b>(path: <i>string</i>) function to see more. E.g. help(\"Audio.Play\")\n");
+		outputConsoleNoFormat("zss.help>>  ", "\n",helpStr..envStr,"\n\nUse the <b>help</b>(path: <i>string</i>) function to see more. E.g. help(\"Audio.Play\")\n");
 	end
 end
 

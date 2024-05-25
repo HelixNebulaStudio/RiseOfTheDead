@@ -12,10 +12,9 @@ return {
         end;
     };
 
-    Link=function(zss, sound: Sound)
-        if sound == nil then
-            sound = Instance.new("Sound");
+	Constructor=function(zss, public, private, instance)
+        if private.__instance == nil then
+            private.__instance = Instance.new("Sound");
         end
-        return sound;
     end;
 }

@@ -1,13 +1,20 @@
 return {
 	Class={
+		Name = "";
 		UserId = 0;
 	};
-	Unique=function(zss, instance)
-		for obj, _ in pairs(zss.Instances) do
-			if obj.ClassName == instance.ClassName and obj.UserId == instance.UserId then
-				return obj;
-			end
-		end
+
+	Constructor=function(zss, public, private, instance)
+		local staticUserdata = zss.Instance:MatchList(function(userdata)
+			local match = userdata.ClassName == private.ClassName and userdata.UserId == instance.UserId;
+			local breakSearch = true;
+			return match, breakSearch;
+		end)[1];
+		if staticUserdata then return staticUserdata end;
+
+		public.UserId = instance.UserId;
+		public.Name = instance.Name;
+
 		return;
-	end
+	end;
 }

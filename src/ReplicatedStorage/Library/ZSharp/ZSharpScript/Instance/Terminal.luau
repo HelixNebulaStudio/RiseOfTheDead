@@ -2,18 +2,17 @@ return {
     Class={
 		UserId = 0;
     };
-	
-    Link=function(zss, t, private)
-		local m = {};
-		for k, v in pairs(t) do
-			local newK = zss.Sandbox(k);
-			if newK == nil then continue end;
-			m[newK] = zss.Sandbox(v);
-		end
 
-		local new = newproxy(true);
-		local meta = getmetatable(new);
-		meta.__index = m;
-		return new;
-    end
+	Constructor=function(zss, public, private, instance)
+		local staticUserdata = zss.Instance:MatchList(function(userdata)
+			local match = userdata.ClassName == private.ClassName and userdata.UserId == instance.UserId;
+			local breakSearch = true;
+			return match, breakSearch;
+		end)[1];
+		if staticUserdata then return staticUserdata end;
+
+		public.UserId = instance.UserId;
+
+		return;
+	end;
 };

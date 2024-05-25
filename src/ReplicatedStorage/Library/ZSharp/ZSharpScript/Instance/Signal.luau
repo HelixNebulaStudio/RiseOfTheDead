@@ -10,4 +10,8 @@ return {
 		meta.__newindex = private;
 		return new;
 	end;
+
+	Constructor=function(zss, public, private, func)
+		private.OnDestroy = func;
+    end;
 }

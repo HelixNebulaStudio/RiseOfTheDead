@@ -212,6 +212,7 @@ cmdsList = {
 				end)
 				if not s then
 					Interface.Println(`Failed: <font color='rgb(143, 81, 81)'>{e}</font>`);
+					Debugger:Warn(e);
 				end
 			end)
 		

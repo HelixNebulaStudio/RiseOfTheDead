@@ -27,9 +27,13 @@ for _, src in pairs(script:GetChildren()) do
 end
 
 function ZSharpScript.Clean()
-	for k, obj in pairs(ZSharpScript.Instances) do
-		if obj.Destroy then
-			obj:Destroy();
+	for id, userdata in pairs(ZSharpScript.Instances) do
+		if typeof(userdata) == "Instance" then
+			Debugger:StudioWarn("Unexpected instance", userdata:GetFullName())
+			continue;
+		end
+		if userdata.Destroy then
+			userdata:Destroy();
 		end
 	end
 	table.clear(ZSharpScript.Instances);
