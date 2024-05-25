@@ -688,7 +688,7 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 
 				if unlockableItemLib.Name == "Default" or unlockableItemLib.Unlocked == true then
 					isUnlocked = true;
-				elseif typeof(unlockableItemLib.Unlocked) == "string" and table.find(unlockedSkins, unlockableItemLib.Id) then
+				elseif typeof(unlockableItemLib.Unlocked) == "string" and table.find(unlockedSkins, unlockableItemLib.Unlocked) then
 					isUnlocked = true;
 				end
 				
