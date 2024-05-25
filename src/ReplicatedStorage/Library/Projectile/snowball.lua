@@ -101,6 +101,7 @@ function Pool.new(owner)
 							ToolStorageItem=self.StorageItem;
 							TargetPart=hitPart;
 							DamageType="FrostDamage";
+							DamageCate=modDamagable.DamageCategory.Projectile;
 						});
 						
 					else
@@ -110,6 +111,7 @@ function Pool.new(owner)
 							ToolStorageItem=self.StorageItem;
 							TargetPart=hitPart;
 							DamageType="FrostDamage";
+							DamageCate=modDamagable.DamageCategory.Projectile;
 						});
 						
 					end
@@ -121,6 +123,7 @@ function Pool.new(owner)
 						ToolStorageItem=self.StorageItem;
 						TargetPart=hitPart;
 						DamageType="FrostDamage";
+						DamageCate=modDamagable.DamageCategory.Projectile;
 					});
 
 				end

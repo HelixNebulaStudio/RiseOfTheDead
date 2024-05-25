@@ -15,6 +15,14 @@ local bindIsInDuel = remotes.IsInDuel;
 local remoteTryHookEntity = modRemotesManager:Get("TryHookEntity");
 --==
 Damagable.Dealer = {};
+Damagable.DamageCategory = {
+	Generic="Generic";
+	Melee="Melee";
+	AoE="Area Of Effect";
+	Projectile="Projectile";
+
+	FumesGas="Fumes Gas";
+}
 
 --==
 local DamageSource = {};
@@ -59,7 +67,8 @@ function Damagable.NewDamagable(model)
 			return Damagable.new(model, classPlayer, classPlayer.Humanoid);
 		end
 
-		local npcStatus = model:FindFirstChild("NpcStatus") and require(model.NpcStatus :: ModuleScript);
+		local npcStatus = model:FindFirstChild("NpcStatus");
+		npcStatus = npcStatus and require(npcStatus) or nil;
 		if npcStatus then
 			return Damagable.new(model, npcStatus, npcStatus:GetHumanoid());
 		end
@@ -70,7 +79,9 @@ function Damagable.NewDamagable(model)
 		end
 
 		while model:GetAttribute("DestructibleParent") do model = model.Parent; end
-		local destructible = model:FindFirstChild("Destructible") and require(model.Destructible :: ModuleScript);
+		
+		local destructible = model:FindFirstChild("Destructible");
+		destructible = destructible and require(destructible) or nil;
 		if destructible then
 			return Damagable.new(model, destructible, destructible);
 		end
@@ -264,7 +275,8 @@ function Damagable:GetHealthChangedSignal()
 		return self.Object.Humanoid.HealthChanged;
 		
 	end
-	
+
+	return;
 end
 
 function Damagable:GetHealthInfo()

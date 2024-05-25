@@ -71,6 +71,7 @@ function Pool.new(owner)
 				ToolStorageItem=self.StorageItem;
 				TargetModel = model;
 				TargetPart=hitObj;
+				DamageCate=modDamagable.DamageCategory.Projectile;
 			}
 
 			if damagable:CanDamage(self.Owner) then

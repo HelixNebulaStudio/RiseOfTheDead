@@ -121,7 +121,7 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 			ToolStorageItem=self.StorageItem;
 			IsMeleeDamage=true;
 			TargetPart=hitPart;
-			DamageCate="Melee";
+			DamageCate=modDamagable.DamageCategory.Melee;
 		}
 		if self.Player == nil then
 			newDmgSrc.Dealer = self.Character;
@@ -249,6 +249,7 @@ function ToolHandler:OnPrimaryFire(...)
 				
 				local projectileObject = modProjectile.Fire(configurations.ProjectileId, CFrame.new(origin, origin + direction), Vector3.new(), nil, self.Player, self.ToolConfig);
 				projectileObject.TargetableEntities = TargetableEntities;
+				projectileObject.StorageItem = self.StorageItem;
 				
 				local velocity = direction * (configurations.Velocity + (configurations.VelocityBonus or 0) * throwCharge);
 				

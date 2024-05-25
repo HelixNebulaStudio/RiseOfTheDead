@@ -1289,7 +1289,7 @@ function StatusEffects.FumesGas(player, damage)
 		classPlayer:TakeDamagePackage(modDamagable.NewDamageSource{
 			Damage=damage;
 			DamageType="IgnoreArmor";
-			DamageCate="FumesGas";
+			DamageCate=modDamagable.DamageCategory.FumesGas;
 		});
 		
 		local player = classPlayer:GetInstance();

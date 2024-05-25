@@ -76,6 +76,7 @@ function Pool.new(owner)
 					ToolStorageItem=self.StorageItem;
 					TargetPart=hitPart;
 					DamageType="FireDamage";
+					DamageCate=modDamagable.DamageCategory.AoE;
 				}
 				damagable:TakeDamagePackage(newDmgSrc);
 			end

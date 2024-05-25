@@ -1,23 +1,17 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local Pool = {};
-Pool.__index = Pool;
---== Variables;
+--==
 local RunService = game:GetService("RunService");
 
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
-local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 local Projectile = require(script.Parent.Projectile);
 
 local projectilePrefab = script.spear;
-local random = Random.new();
 
-local remotes = game.ReplicatedStorage.Remotes;
-local bindIsInDuel = remotes.IsInDuel;
-
---== Script;
+local Pool = {};
+Pool.__index = Pool;
+--==
 
 function Pool.new(owner)
 	local projectile = setmetatable({}, Projectile);
@@ -75,6 +69,7 @@ function Pool.new(owner)
 				ToolStorageItem=self.StorageItem;
 				TargetModel = model;
 				TargetPart=hitObj;
+				DamageCate=modDamagable.DamageCategory.Projectile;
 			}
 
 			if damagable:CanDamage(self.Owner) then
@@ -83,47 +78,48 @@ function Pool.new(owner)
 			end
 		end
 
-		modAudio.Play(random:NextInteger(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", self.Prefab);
+		modAudio.Play(math.random(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", self.Prefab);
 		
 	end
 
 	function projectile:OnContact(arcPoint)
-		if arcPoint.Hit then
-			if RunService:IsServer() then
-				
-				if self.Prefab:CanSetNetworkOwnership() then self.Prefab:SetNetworkOwner(nil) end;
-				task.wait()
-				if self.ProjectileDamage then self:ProjectileDamage(arcPoint.Hit); end
-				
-			else
-				local targetModel = arcPoint.Hit.Parent;
-				local humanoid = targetModel and targetModel:FindFirstChildWhichIsA("Humanoid");
-				if humanoid then
-					modAudio.Play(random:NextInteger(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", self.Prefab).RollOffMaxDistance = 1024;
-				end
-
+		if arcPoint.Hit == nil then return end;
+		
+		if RunService:IsServer() then
+			if self.Prefab:CanSetNetworkOwnership() then self.Prefab:SetNetworkOwner(nil) end;
+			task.wait()
+			if self.ProjectileDamage then self:ProjectileDamage(arcPoint.Hit); end
+			
+		else
+			local targetModel = arcPoint.Hit.Parent;
+			local humanoid = targetModel and targetModel:FindFirstChildWhichIsA("Humanoid");
+			if humanoid then
+				modAudio.Play(math.random(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", self.Prefab).RollOffMaxDistance = 1024;
 			end
 
-			if not arcPoint.Hit.Anchored then
-				if arcPoint.Client then return true end;
-				
-				self.Prefab.Anchored = false;
-				self.Prefab.Massless = true;
-				local hitPart, hitPoint = arcPoint.Hit, arcPoint.Point;
-
-				local weld = Instance.new("Motor6D");
-				weld.Name = "arrow";
-				weld.Parent = self.Prefab;
-
-				weld.Part0 = self.Prefab;
-				weld.Part1 = hitPart;
-
-				local worldCf = CFrame.new(hitPoint, hitPoint + arcPoint.Direction);
-				weld.C1 = hitPart.CFrame:ToObjectSpace(worldCf);
-
-				return true;
-			end
 		end
+
+		if not arcPoint.Hit.Anchored then
+			if arcPoint.Client then return true end;
+			
+			self.Prefab.Anchored = false;
+			self.Prefab.Massless = true;
+			local hitPart, hitPoint = arcPoint.Hit, arcPoint.Point;
+
+			local weld = Instance.new("Motor6D");
+			weld.Name = "arrow";
+			weld.Parent = self.Prefab;
+
+			weld.Part0 = self.Prefab;
+			weld.Part1 = hitPart;
+
+			local worldCf = CFrame.new(hitPoint, hitPoint + arcPoint.Direction);
+			weld.C1 = hitPart.CFrame:ToObjectSpace(worldCf);
+
+			return true;
+		end
+
+		return;
 	end
 	
 	return projectile;

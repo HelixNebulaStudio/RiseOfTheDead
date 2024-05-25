@@ -3,6 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 --== When a npc takes damage;
 return function(player, damageSource)
+	local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
+
 	local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 	local modSkillTree = require(game.ServerScriptService.ServerLibrary.SkillTree);
 	local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
@@ -62,7 +64,8 @@ return function(player, damageSource)
 	end
 
 	if storageItem == nil then return end; -- Missing Dealer StorageItem
-	if (humanoid.Name == "Zombie" or humanoid.Name == "Bandit" or humanoid.Name == "Rat") and damageSource.Killed == true and npcModule.IsDead ~= true then
+	if (humanoid.Name == "Zombie" or humanoid.Name == "Bandit" or humanoid.Name == "Rat") and damageSource.Killed == true and npcModule.IsDead ~= true
+		and damageSource.DamageCate == modDamagable.DamageCategory.Projectile then
 
 		local throwableWeaponList = {"beachball"; "pickaxe"; "broomspear"; "snowballs"};
 		local isThrowableWeapon = false;

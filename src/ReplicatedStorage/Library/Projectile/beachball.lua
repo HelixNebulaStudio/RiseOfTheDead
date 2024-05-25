@@ -55,6 +55,7 @@ function Pool.new(owner)
 				Dealer=self.Owner;
 				ToolStorageItem=self.StorageItem;
 				TargetPart=hitPart;
+				DamageCate=modDamagable.DamageCategory.Projectile;
 			});
 		end
 	end

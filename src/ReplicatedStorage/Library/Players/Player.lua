@@ -283,7 +283,7 @@ function Player.new(playerInstance: Player)
 		--local storageItem = damageSource.ToolStorageItem;
 		local hitPart = damageSource.TargetPart;
 		local damageType = damageSource.DamageType;
-		local damageCategory = damageSource.DamageCate or "Generic";
+		local damageCategory = damageSource.DamageCate or modDamagable.DamageCategory.Generic;
 		
 		if damage == nil then return end;
 		if self.Humanoid == nil then return end;
@@ -293,14 +293,14 @@ function Player.new(playerInstance: Player)
 		end
 		
 		if damage > 0 then
-			if damageCategory == "Melee" then
+			if damageCategory == modDamagable.DamageCategory.Melee then
 				local hasTireArmor = classPlayer.Properties.TireArmor;
 				if hasTireArmor and hasTireArmor.Visible and math.random(1, 100) <= 73 then -- pseudo random
 					damage = math.max(1, damage-20);
 					modAudio.Play("TireArmorBlock", classPlayer.RootPart);
 				end
 
-			elseif damageCategory == "FumesGas" then
+			elseif damageCategory == modDamagable.DamageCategory.FumesGas then
 				local gasProtection = classPlayer:GetBodyEquipment("GasProtection");
 				local hasLabCoat = classPlayer:GetBodyEquipment("LabCoat");
 
@@ -352,7 +352,7 @@ function Player.new(playerInstance: Player)
 						local healthInfo = damagable:GetHealthInfo();
 						
 						
-						if damageCategory == "Melee" and npcModule and npcModule.Properties and npcModule.Properties.BasicEnemy then
+						if damageCategory == modDamagable.DamageCategory.Melee and npcModule and npcModule.Properties and npcModule.Properties.BasicEnemy then
 							local reflectedDmg = math.max(healthInfo.Health * damageReflection, 10);
 							
 							local newDmgSrc = modDamagable.NewDamageSource{
