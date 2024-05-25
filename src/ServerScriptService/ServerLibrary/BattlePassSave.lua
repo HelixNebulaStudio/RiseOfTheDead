@@ -688,10 +688,16 @@ task.spawn(function()
 			playerRng:NextInteger(1111, 9999);
 		end
 
+		if profile.Cache.EventPassPuzzleDebounce and tick()-profile.Cache.EventPassPuzzleDebounce <= 1 then
+			Debugger:WarnClient(player, `Please wait a second before you attempt the puzzle again.`);
+			return;
+		end
+		profile.Cache.EventPassPuzzleDebounce = tick();
+
 		local inputPassKey = ...;
 		local serverPassKey = playerRng:NextInteger(1111, 9999);
 		profile.Cache.EventPassPuzzleChance = (profile.Cache.EventPassPuzzleChance or 0) + 1;
-
+		
 		if inputPassKey == serverPassKey then
 			-- Debugger:Warn("Input", inputPassKey, "=", serverPassKey);
 			local activeId = modBattlePassLibrary.Active;
@@ -706,17 +712,20 @@ task.spawn(function()
 				shared.Notify(player, "You got 10 event pass levels for completing this puzzle!", "Reward");
 
 				local osTime = os.time();
-				for a=1, 3 do
-					local s = pcall(function()
-						local DataStoreService = game:GetService("DataStoreService");
-						local oDS = DataStoreService:GetOrderedDataStore("eventPuzzle1");
-						
-						oDS:SetAsync(tostring(player.UserId), osTime);
-					end)
-					if s then break; else task.wait(5) end;
-				end
+				profile.Flags:Add({Id="mpPuzzleFlag1"; TimeSolved=osTime;});
 
-				profile.Flags:Add({Id="mpPuzzleFlag1";});
+				task.spawn(function()
+					for a=1, 3 do
+						local s = pcall(function()
+							local DataStoreService = game:GetService("DataStoreService");
+							local oDS = DataStoreService:GetOrderedDataStore("eventPuzzle1");
+							
+							oDS:SetAsync(tostring(player.UserId), osTime);
+						end)
+						if s then break; else task.wait(5) end;
+					end
+				end)
+
 			else
 				Debugger:WarnClient(player, `You have already completed this puzzle.`);
 			end

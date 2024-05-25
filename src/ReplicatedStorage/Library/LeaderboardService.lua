@@ -148,6 +148,12 @@ function LeaderboardService.Update(sync)
 		local playerName = player.Name;
 		local profile = modProfile:Find(playerName);
 
+		local shadowBanned = false;
+		if profile ~= nil and profile.Loaded then
+			shadowBanned = profile and profile.ShadowBan and profile.ShadowBan == -1 or profile.ShadowBan > os.time();
+		end
+		if shadowBanned then continue end;
+
 		if profile then
 			local avatar = "https://www.roblox.com/headshot-thumbnail/image?userId=1&width=420&height=420&format=png";
 			pcall(function()
@@ -400,7 +406,7 @@ function LeaderboardService:SubmitToBoard(leaderKey, boardKey, values)
 		if info == nil then continue end;
 		
 		local boardValue = values[info.Folder];
-		if boardValue == nil then Debugger:Log("No values to submit for ", info, values) continue end;
+		if boardValue == nil then Debugger:Log("No values to submit for ", info, values); continue end;
 		
 		LeaderboardService.UpdateDatastoreScopes(info);
 
@@ -442,6 +448,12 @@ function LeaderboardService:SubmitPlayerToBoard(player)
 			Debugger:Log("Leaderboard submission disabled for user 16170943");
 			return;
 		end;
+		
+		local shadowBanned = false;
+		if profile ~= nil and profile.Loaded then
+			shadowBanned = profile and profile.ShadowBan and profile.ShadowBan == -1 or profile.ShadowBan > os.time();
+		end
+		if shadowBanned then return end;
 		
 		for statKey, info in pairs(library) do
 			if info.LookUpKey == nil or info.LookUpKey == "Player" then
