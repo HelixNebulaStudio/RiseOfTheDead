@@ -555,7 +555,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 			return returnPacket;
 		end
 		
-		local quantity = 1
+		local quantity = rewardInfo.Quantity;
 		if typeof(rewardInfo.Quantity) == "table" then
 			quantity = math.random(rewardInfo.Quantity.Min, rewardInfo.Quantity.Max);
 		else

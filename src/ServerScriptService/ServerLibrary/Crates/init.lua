@@ -85,7 +85,7 @@ function Crates.Spawn(id, cframe, whitelist, content, visibleToWhitelistOnly)
 				for b=1, #content do
 					local rewardInfo = content[b];
 					local itemId = rewardInfo.ItemId;
-					local quantity = typeof(rewardInfo.Quantity) == "table" and random:NextInteger(rewardInfo.Quantity.Min, rewardInfo.Quantity.Max) or rewardInfo.Quantity;
+					local quantity = rewardInfo.DropQuantity;
 					local itemLib = modItemsLibrary:Find(itemId);
 					
 					storages[storageId]:Add(itemId, {Quantity=quantity;}, function(event, remains)

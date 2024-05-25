@@ -281,7 +281,9 @@ function remoteNpcData.OnServerInvoke(player: Player, action: string, npcName: s
 
                 for a=1, #rewardsData do
                     local rewardInfo = rewardsData[a];
-                    table.insert(list, {ItemId=rewardInfo.ItemId; Data={Quantity=rewardInfo.Quantity; Values={};};});
+
+                    Debugger:StudioWarn("rewardInfo", rewardInfo);
+                    table.insert(list, {ItemId=rewardInfo.ItemId; Data={Quantity=rewardInfo.DropQuantity; Values={};};});
                 end
 			end
 		end

@@ -442,15 +442,15 @@ end
 
 function ItemDrops.ChooseDrop(rewardsLib)
 	local rewards = modDropRateCalculator.RollDrop(rewardsLib);
-	local winner = #rewards > 0 and rewards[1] or nil;
-	if winner == nil then return end;
+	local rewardInfo = #rewards > 0 and rewards[1] or nil;
+	if rewardInfo == nil then return end;
 	
 	return {
-		ItemId=winner.ItemId;
-		Type=winner.Type;
-		Quantity=(winner.Quantity and (type(winner.Quantity) ~= "table" and winner.Quantity or random:NextInteger(winner.Quantity.Min, winner.Quantity.Max)) or 1);
-		OnceOnly=winner.OnceOnly;
-		Values=winner.Values;
+		ItemId=rewardInfo.ItemId;
+		Type=rewardInfo.Type;
+		Quantity=rewardInfo.DropQuantity;
+		OnceOnly=rewardInfo.OnceOnly;
+		Values=rewardInfo.Values;
 		Chance=rewards.Chance;
 	};
 end

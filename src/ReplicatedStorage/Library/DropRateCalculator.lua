@@ -93,6 +93,13 @@ function DropRateCalculator.RollDrop(rewardLib, player, criteria)
 		for b=1, #groups[a] do
 			local rewardInfo = groups[a][b];
 			if rewardInfo.Min < aRoll and aRoll <= rewardInfo.Max then
+
+				if typeof(rewardInfo.Quantity) == "table" then
+					rewardInfo.DropQuantity = Random.new(rolls*10000):NextInteger(rewardInfo.Quantity.Min, rewardInfo.Quantity.Max);
+				else
+					rewardInfo.DropQuantity = rewardInfo.Quantity or 1;
+				end
+
 				table.insert(drops, rewardInfo);
 				break;
 			end
