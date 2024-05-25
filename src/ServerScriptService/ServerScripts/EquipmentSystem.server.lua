@@ -132,7 +132,7 @@ function unequipTool(player, returnPacket)
 					end
 					game.Debris:AddItem(weaponModel, returnPacket.ToolSwap and 0 or 0.6);
 					modGearAttachments:DestroyAttachments(weaponModel);
-					Debugger:Log("Destroy toolModel");
+					Debugger:StudioWarn("Destroy toolModel");
 					
 				elseif handler and handler.ToolConfig.Holster then
 					for attachmentName, holsterLib in pairs(handler.ToolConfig.Holster) do

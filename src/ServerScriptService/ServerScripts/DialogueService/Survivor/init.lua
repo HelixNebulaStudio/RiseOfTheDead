@@ -356,6 +356,15 @@ return function(player, dialog, data)
 						
 						remoteSetHeadIcon:FireAllClients(0, npcName, "HideAll");
 						shared.Notify(player, "You now have a new Fortune Teller in your safehome.", "Reward");
+						
+						task.spawn(function()
+							task.wait(0.4);
+							local missionProfile = modMission.GetMissions(player.Name);
+							local mission78 = missionProfile:Get(78);
+							if mission78 == nil and npcName == "Lydia" then
+								missionProfile:Add(78);
+							end
+						end)
 					end
 				end, {ChoiceUnlockTime=unlockTime});
 			end
@@ -369,12 +378,4 @@ return function(player, dialog, data)
 		
 	end
 	
-	
-	--if os.time()-npcData.Active >= 3600 then
-	--	dialog:AddChoice("shelter_leave", function(dialog)
-	--		dialog:AddChoice("shelter_leavec", function(dialog)
-	--			npcData.Active = nil;
-	--		end)
-	--	end)
-	--end
 end

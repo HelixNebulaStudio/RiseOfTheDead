@@ -125,9 +125,10 @@ function equip(equipPacket, toolWelds)
 
 			Equipped.Garbage:Tag(character.ChildRemoved:Connect(function(child)
 				if child ~= toolModel then return end;
-				if id ~= modCharacter.EquippedItem.ID then return end;
-				
-				Debugger:Warn("Tool destroyed unequip", child);
+				task.wait(0.6);
+				if modCharacter.EquippedItem == nil then return end;
+				if modCharacter.EquippedItem and id ~= modCharacter.EquippedItem.ID then return end;
+
 				modData.HandleTool("local", {Unequip={
 					Id=modCharacter.EquippedItem.ID;
 					StorageItem = equipmentItem;
