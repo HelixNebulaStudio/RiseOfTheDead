@@ -184,6 +184,7 @@ return function(self)
 								damage = damage * (1-gasProtection);
 							end
 
+							Debugger:StudioWarn("damage", damage)
 							if classPlayer.Properties.tickre then
 								return;
 							end
@@ -196,6 +197,8 @@ return function(self)
 						end
 
 						self:DamageTarget(damagable.Model, damage);
+
+						return true;
 					end
 				});
 			end)
