@@ -168,14 +168,6 @@ return function()
 		end
 		
 		if modData.GameSave then
-			--if modData.GameSave.Storages then
-			--	for id, _ in pairs(modData.GameSave.Storages) do
-			--		local storage = modData.GameSave.Storages[id];
-			--		modData.SetStorage(storage);
-			--		modStorageInterface.UpdateStorages({storage});
-			--	end
-			--end
-			
 			task.spawn(function()
 				local modInterface = GetInterfaceModule();
 				
@@ -422,7 +414,13 @@ return function()
 		end
 		
 		modData.SetStorage(storage);
-		modStorageInterface.UpdateStorages({storage});
+
+		local storageUpdateList = {storage.Id};
+		local _, parentStorage = modData.FindIdFromStorages(storage.Id);
+		if parentStorage then
+			table.insert(storageUpdateList, parentStorage.Id);
+		end
+		modStorageInterface.QueueRefreshStorage(storageUpdateList);
 	end)
 	
 	remoteBodyEquipmentsSync.OnClientEvent:Connect(function()
@@ -553,7 +551,7 @@ return function()
 					
 				end
 
-				modStorageInterface.UpdateStorages({modData.Storages[storageId]});
+				modStorageInterface.QueueRefreshStorage({storageId});
 			end
 			
 		elseif action == "synckeys" then

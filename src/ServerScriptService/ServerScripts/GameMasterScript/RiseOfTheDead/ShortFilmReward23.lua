@@ -8,7 +8,7 @@ local Rewards = {
 	Others={Index=1;};
 };
 
-local participantIds = {
+local participantIds = { --29 ppl
 	--exo
 	{UserId=86976526; Reward=Rewards.First};
 	{UserId=568638188; Reward=Rewards.First};

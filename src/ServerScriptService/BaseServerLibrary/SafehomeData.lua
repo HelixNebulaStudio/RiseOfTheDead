@@ -157,8 +157,6 @@ function SafehomeData:GetNpc(npcName: string)
 	end
 
 	local storage = modStorage:OpenStorage(self.Player, storageId, storageConfig);
-	storage:Sync(self.Player);
-
 	npcData.GetStorage = function()
 		return storage;
 	end
@@ -416,6 +414,13 @@ function remoteSafehomeRequest.OnServerInvoke(player, actionId, packet)
 		local npcData = safehomeData:GetNpc(npcName);
 		if npcData == nil or npcData.Active == nil then return {ReplyCode=5; Data=safehomeData;} end;
 		
+		local npcStorage = npcData.GetStorage();
+
+		if npcStorage and npcStorage:Loop() > 0 then
+			shared.Notify(player, `You should remove the items from {npcName} before kicking them.`, "Negative");
+			return {ReplyCode=5; FailMsg=`Remove {npcName}'s items first`;}
+		end
+
 		npcData.Active = nil;
 		
 		if modBranchConfigs.IsWorld("Safehome") and isOwner then

@@ -244,6 +244,18 @@ function remotePlayerDataFetch.OnServerInvoke(player, packet)
 		local npcData = safehomeData:GetNpc(npcName);
 		if npcData == nil then return end;
 
+
+		local npcStorage = npcData.GetStorage();
+		if npcStorage then
+			npcStorage:Loop(function(storageItem)
+				local attachmentStorage = modStorage.Get(storageItem.ID, player);
+				if attachmentStorage then
+					attachmentStorage:Sync();
+				end
+			end)
+			npcStorage:Sync();
+		end
+
 		profile:Sync("NpcTaskData/Npc/"..npcName);
 
 		return {

@@ -395,6 +395,8 @@ function Interface.init(modInterface)
 			
 			Interface.InventoryVisibleChanged(window.Visible);
 			updateWarmth();
+			modStorageInterface.QueueRefreshStorage();
+			
 		else
 			modStorageInterface.CloseInspectFrame()
 			clothingToggleMenu.Visible = false;

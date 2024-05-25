@@ -567,11 +567,6 @@ function SaveData:SetMasteries(key, amount)
 	self:CalculateLevel();
 end
 
-function SaveData:ResetInventory()
-	self.Inventory = modStorage.new("Inventory", "Inventory", 30, self.Player);
-	self.Inventory:Sync();
-end
-
 function SaveData:NewMail(mailObject)
 	table.insert(self.Mailbox, mailObject);
 end

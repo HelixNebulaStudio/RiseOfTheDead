@@ -1541,6 +1541,39 @@ function StorageInterface.RefreshStorageItemId(storageItemId)
 	end
 end
 
+local refreshQueue = {};
+local isRefreshing = false;
+function StorageInterface.QueueRefreshStorage(storageIds)
+	if storageIds then
+		for a=1, #storageIds do
+			local storageId = storageIds[a];
+			local i = table.find(refreshQueue, storageId);
+			if i then
+				refreshQueue[i], refreshQueue[#refreshQueue] = refreshQueue[#refreshQueue], refreshQueue[i];
+			else
+				table.insert(refreshQueue, storageId);
+			end
+		end
+	end
+
+	if isRefreshing then return end;
+	isRefreshing = true;
+	task.delay(1, function()
+		isRefreshing = false;
+	end)
+	task.spawn(function()
+		while isRefreshing do
+			local storageId = table.remove(refreshQueue, 1);
+			if storageId == nil then break end;
+
+			local storage = modData.GetStorage(storageId);
+			StorageInterface.UpdateStorages({storage});
+			task.wait();
+		end
+		isRefreshing = false;
+	end)
+end
+
 if UserInputService.TouchEnabled then
 	UserInputService.InputEnded:Connect(function (input, gameProcessed)
 		if input.UserInputType == Enum.UserInputType.Touch and CurrentDragging then
@@ -1580,7 +1613,6 @@ UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
 				break;
 			end
 		end
-		
 	end
 end)
 

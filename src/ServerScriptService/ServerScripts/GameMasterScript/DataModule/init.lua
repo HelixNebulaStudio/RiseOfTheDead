@@ -221,7 +221,7 @@ end
 function Data.FindIdFromStorages(id)
 	for name, storage in pairs(Data.Storages) do
 		if storage.Container[id] then
-			return storage.Container[id];
+			return storage.Container[id], storage;
 		end;
 	end
 	return;
