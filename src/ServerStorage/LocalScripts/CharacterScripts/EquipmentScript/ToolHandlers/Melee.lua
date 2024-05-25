@@ -868,54 +868,56 @@ function ToolHandler:Initialize(equipped)
 	Equipped = equipped;
 end
 
-spawn(function()
-	repeat
-		if classPlayer == nil then
-			classPlayer = modPlayers.Get(player);
-		end
-		if classPlayer == nil then
-			task.wait(1);
-			continue;
-		end
-		
-		local playerBodyEquipments = classPlayer.Properties and classPlayer.Properties.BodyEquipments;
-
-		Stats.RecoveryRecoveryRate = nil;
-		Stats.RecoveryRecoveryDelay = nil;
-		
-		if classPlayer.Properties.isBloxyRush then
-			Stats.RecoveryRecoveryRate = 30;
-			Stats.RecoveryRecoveryDelay = 1;
-		end
-
-		local additionalStamina = playerBodyEquipments and playerBodyEquipments.AdditionalStamina;
-		if modConfigurations.DisableGearMods then
-			additionalStamina = nil;
-		end
-		
-		if additionalStamina then
-			Stats.MaxStamina = BaseStats.MaxStamina + additionalStamina;
-		else
-			Stats.MaxStamina = nil;
-		end
-		
-		local delta = wait(0.1);
-		local rate = delta * Stats.RecoveryRecoveryRate;
-		if Stats.LastDrain == nil or (tick()-Stats.LastDrain) > Stats.RecoveryRecoveryDelay then
-			Stats.Stamina = math.clamp(Stats.Stamina + rate, 0, Stats.MaxStamina);
-			Stats.SubStamina = 0;
-		end
-		
-		if Equipped then
-			if Equipped.Throwable and characterProperties.IsFocused then
-				modData.UpdateProgressionBar(throwChargeValue, "Throw");
-				
-			else
-				modData.UpdateProgressionBar(Stats.Stamina/Stats.MaxStamina, "MeleeStamina");
-				
+function ToolHandler:InitStaminaSystem()
+	task.spawn(function()
+		repeat
+			if classPlayer == nil then
+				classPlayer = modPlayers.Get(player);
 			end
-		end
-	until not workspace:IsAncestorOf(character);
-end)
+			if classPlayer == nil then
+				task.wait(1);
+				continue;
+			end
+			
+			local playerBodyEquipments = classPlayer.Properties and classPlayer.Properties.BodyEquipments;
+	
+			Stats.RecoveryRecoveryRate = nil;
+			Stats.RecoveryRecoveryDelay = nil;
+			
+			if classPlayer.Properties.isBloxyRush then
+				Stats.RecoveryRecoveryRate = 30;
+				Stats.RecoveryRecoveryDelay = 1;
+			end
+	
+			local additionalStamina = playerBodyEquipments and playerBodyEquipments.AdditionalStamina;
+			if modConfigurations.DisableGearMods then
+				additionalStamina = nil;
+			end
+			
+			if additionalStamina then
+				Stats.MaxStamina = BaseStats.MaxStamina + additionalStamina;
+			else
+				Stats.MaxStamina = nil;
+			end
+			
+			local delta = wait(0.1);
+			local rate = delta * Stats.RecoveryRecoveryRate;
+			if Stats.LastDrain == nil or (tick()-Stats.LastDrain) > Stats.RecoveryRecoveryDelay then
+				Stats.Stamina = math.clamp(Stats.Stamina + rate, 0, Stats.MaxStamina);
+				Stats.SubStamina = 0;
+			end
+			
+			if Equipped then
+				if Equipped.Throwable and characterProperties.IsFocused then
+					modData.UpdateProgressionBar(throwChargeValue, "Throw");
+					
+				else
+					modData.UpdateProgressionBar(Stats.Stamina/Stats.MaxStamina, "MeleeStamina");
+					
+				end
+			end
+		until not workspace:IsAncestorOf(character);
+	end)
+end
 
 return ToolHandler;

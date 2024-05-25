@@ -33,6 +33,7 @@ local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler)
 
 --== Handlers
 local modWeaponHandler = require(script:WaitForChild("WeaponHandler"));
+local modMeleeHandler = require(script.ToolHandlers:WaitForChild("Melee")); modMeleeHandler:InitStaminaSystem();
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 
 --== Remotes;
