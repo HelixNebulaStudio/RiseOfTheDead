@@ -1574,14 +1574,19 @@ function Profile:RefreshPlayerTitle()
 	local nameDisplay = rootPart and rootPart:FindFirstChild("NameDisplay");
 	if nameDisplay == nil then return end;
 	
-	rootPart.NameDisplay.Status.LevelIcon.Visible = self.Settings.HideLevelIcon ~= 1;
+	local titleLabel = nameDisplay.Status.tagFrame.TitleTag;
+	local levelLabel = rootPart.NameDisplay.Status.LevelIcon.LevelTag;
 	
+	rootPart.NameDisplay.Status.LevelIcon.Visible = self.Settings.HideLevelIcon ~= 1;
+	rootPart.NameDisplay.Status.tagFrame.TitleTag.Visible = self.Settings.HidePlayerTitle ~= 1;
+	rootPart.NameDisplay.Status.LevelIcon.LevelTag.Visible = self.Settings.HideIconLevels ~= 1;
+
 	rootPart.NameDisplay.Status.tagFrame.NameTag.Text = self.Settings.Nickname or self.Player.DisplayName;
 	
-	rootPart.NameDisplay.Status.tagFrame.TitleTag.Visible = self.Settings.HidePlayerTitle ~= 1;
 	
-	rootPart.NameDisplay.Status.LevelIcon.LevelTag.Text = playerSave:GetStat("Level");
-	
+	local titleText = ""
+	local levelText = playerSave:GetStat("Level");
+
 	local id = self.TitleId;
 	
 	if id == "" and self.GroupRank and self.GroupRank > 1 then
@@ -1595,11 +1600,10 @@ function Profile:RefreshPlayerTitle()
 	if id == "" then
 		nameDisplay.Status.tagFrame.TitleTag.Text = "";
 	else
-		local titleLabel = nameDisplay.Status.tagFrame.TitleTag;
 		local titleLib = modPlayerTitlesLibrary:Find(id);
 		
 		if titleLib then
-			local titleText = titleLib.Title;
+			titleText = titleLib.Title;
 			
 			if titleLib.TitleStyle then
 				if titleLib.TitleStyle.TextColor3 then
@@ -1615,7 +1619,7 @@ function Profile:RefreshPlayerTitle()
 			
 			if titleLib.BpLevels then
 				local passData = self.BattlePassSave:GetPassData(titleLib.Id);
-				if passData and passData.Level then
+				if passData and passData.Level and self.Settings.AchievementTitleLevels ~= 1 then
 					titleText = titleText.." Level ".. modFormatNumber.Beautify(passData.Level);
 				end
 			end
@@ -1624,9 +1628,14 @@ function Profile:RefreshPlayerTitle()
 		else
 			self.TitleId = "";
 			titleLabel.Text = "";
+			
 		end
 	end
 	
+	titleLabel.Text = titleText;
+	levelLabel.Text = levelText;
+
+
 	local titleTag = self.Player:FindFirstChild("PlayerTitleTag");
 	if titleTag == nil then
 		titleTag = Instance.new("StringValue");

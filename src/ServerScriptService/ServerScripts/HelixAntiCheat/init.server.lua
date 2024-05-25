@@ -348,7 +348,7 @@ function AntiCheatService:GetStrRandomness(str, checkNum, checkSpecial) -- > 0.3
 	return r;
 end
 
-local bannedWords = {"urinate";};
+local bannedWords = {"urinate"; "wagner"};
 function AntiCheatService:Filter(value, player, filterNames, filterGibberish)
 	if value == nil then return ""; end;
 	

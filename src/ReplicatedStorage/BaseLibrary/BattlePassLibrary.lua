@@ -42,7 +42,6 @@ function BattlePassLibrary:Init(library)
 	};
 
 	-- MARK: BP Season 1
-	--[[
 	library:Add{
 		Id="bpseason1";
 		EndUnixTime=1693526400;
@@ -162,10 +161,8 @@ function BattlePassLibrary:Init(library)
 			});
 		};
 	};
-	]]
 
 	-- MARK: BP Halloween 1
-	--[[
 	library:Add{
 		Id="bphalloween1";
 		EndUnixTime=1698796800;
@@ -286,7 +283,6 @@ function BattlePassLibrary:Init(library)
 			});
 		};
 	};
-	]]
 
 	-- MARK: BP 5 Years Anniversary
 	library:Add{

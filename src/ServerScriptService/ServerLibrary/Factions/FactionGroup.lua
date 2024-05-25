@@ -306,8 +306,8 @@ end
 
 
 function FactionGroup:AcceptJoinRequest(userId, factionUser)
-	if self.JoinRequests[userId] == nil then Debugger:Warn("Missing join request for ", userId) return end;
-	if factionUser == nil then Debugger:Warn("Missing userObj", userId) return end;
+	if self.JoinRequests[userId] == nil then Debugger:Warn("Missing join request for ", userId); return end;
+	if factionUser == nil then Debugger:Warn("Missing userObj", userId); return end;
 
 	factionUser.Tag = self.Tag;
 	self:SetMember(factionUser);

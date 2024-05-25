@@ -107,6 +107,10 @@ local function ignoreMouseKeys(key)
 	end
 	return key;
 end
+local function numOrNil(value)
+	if value == nil then return nil end;
+	return tonumber(value);
+end
 
 Settings.Add("HideHotkey", booleanOrNil)
 
@@ -140,19 +144,6 @@ Settings.Add("ZoomLevel", function(value)
 	return math.clamp(math.floor(value), 2, 20);
 end)
 
---Settings.Add("ViewModelX", function(value)
---	return value and math.clamp(value, -0.5, 1.2) or nil;
---end)
-
---Settings.Add("ViewModelY", function(value)
---	return value and math.clamp(value, -1.3, -0.8) or nil;
---end)
-
---Settings.Add("ViewModelZ", function(value)
---	return value and math.clamp(value, -0.5, 0.6) or nil;
---end)
-
-
 Settings.Add("ShowScrollbars", booleanOrNil)
 Settings.Add("Notifications", function(value)
 	if value then
@@ -184,6 +175,10 @@ Settings.Add("InviteFriendsOnly", booleanOrNil)
 Settings.Add("HideLevelIcon", booleanOrNil)
 Settings.Add("HidePlayerTitle", booleanOrNil)
 Settings.Add("CinematicMode", booleanOrNil)
+
+Settings.Add("HideIconLevels", booleanOrNil)
+Settings.Add("AchievementTitleLevels", booleanOrNil)
+
 
 Settings.Add("Nickname", function(value, player)
 	if type(value) ~= "string" then value = tostring(value) end;
@@ -415,8 +410,8 @@ baseConfigInterface:Add("SocialsRequests", "ToggleOption", {
 -- SocialsRoleplay;
 baseConfigInterface:Add("Right", "Page", {Id="SocialsRoleplay";});
 baseConfigInterface:Add("SocialsRoleplay", "ToggleOption", {
-	TitleProperties={Text="Level Badge";};
-	DescProperties={Text="Show your level badge.";};
+	TitleProperties={Text="Level Icon";};
+	DescProperties={Text="Show your level icon.";};
 	Config={
 		SettingsKey="HideLevelIcon"; 
 		Type="Toggle";
@@ -427,6 +422,14 @@ baseConfigInterface:Add("SocialsRoleplay", "ToggleOption", {
 	DescProperties={Text="Show your character name.";};
 	Config={
 		SettingsKey="HidePlayerTitle"; 
+		Type="Toggle";
+	};
+});
+baseConfigInterface:Add("SocialsRoleplay", "ToggleOption", {
+	TitleProperties={Text="Achievement Title Levels";};
+	DescProperties={Text="Adds achievement level to player title.";};
+	Config={
+		SettingsKey="AchievementTitleLevels";
 		Type="Toggle";
 	};
 });
