@@ -18,7 +18,6 @@ return function(player, dialog, data)
 	local safehomeData = profile.Safehome;
 	
 	local npcData = safehomeData:GetNpc(npcName);
-	Debugger:StudioWarn("npcData", npcData);
 	if npcData == nil then return end
 
 	local npcLevel = npcData.Level or 0;

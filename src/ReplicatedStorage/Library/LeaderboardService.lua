@@ -23,6 +23,24 @@ local library = {
 		DatastoreId="L_AllTime_ZombieKills";
 		RanksLimit=100;
 	};
+	YearlyZombieKills={
+		DataKey="ZombieKills";
+		DatastoreName="L_Yearly_ZombieKills";
+		DatastoreId="L_Yearly_ZombieKills";
+		Folder="YearlyStats";
+	};
+	SeasonlyZombieKills={
+		DataKey="ZombieKills";
+		DatastoreName="L_Seasonly_ZombieKills";
+		DatastoreId="L_Seasonly_ZombieKills";
+		Folder="SeasonlyStats";
+	};
+	MonthlyZombieKills={
+		DataKey="ZombieKills";
+		DatastoreName="L_Monthly_ZombieKills";
+		DatastoreId="L_Monthly_ZombieKills";
+		Folder="MonthlyStats";
+	};
 	WeeklyZombieKills={
 		DataKey="ZombieKills"; --Weekly seperate store stat val;
 		DatastoreName="L_Weekly_ZombieKills";
@@ -42,6 +60,24 @@ local library = {
 		DatastoreId="L_AllTime_GoldDonor";
 		RanksLimit=100;
 		Folder="AllTimeStats";
+	};
+	YearlyGoldDonor={
+		DataKey="GoldDonor";
+		DatastoreName="L_Yearly_GoldDonor";
+		DatastoreId="L_Yearly_GoldDonor";
+		Folder="YearlyStats";
+	};
+	SeasonlyGoldDonor={
+		DataKey="GoldDonor";
+		DatastoreName="L_Seasonly_GoldDonor";
+		DatastoreId="L_Seasonly_GoldDonor";
+		Folder="SeasonlyStats";
+	};
+	MonthlyGoldDonor={
+		DataKey="GoldDonor";
+		DatastoreName="L_Monthly_GoldDonor";
+		DatastoreId="L_Monthly_GoldDonor";
+		Folder="MonthlyStats";
 	};
 	WeeklyGoldDonor={
 		DataKey="GoldDonor";
