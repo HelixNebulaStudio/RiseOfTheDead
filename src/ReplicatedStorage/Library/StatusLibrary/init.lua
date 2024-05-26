@@ -369,6 +369,7 @@ library:Add{
 	Icon="rbxassetid://14423236705";
 	Name="Nekrosis";
 	Description="You are healing from Nekrosis, +$Amount hp/s.";
+	DescProcess={["Amount"]=function(v) return v*10; end};
 	Module=script.Nekrosis;
 	Buff=true;
 	Cleansable=true;
