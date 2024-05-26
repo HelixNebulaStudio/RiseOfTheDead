@@ -198,9 +198,9 @@ function ZSharp.Init(ZSharpScript)
 	end
 
 	ZSharpScript.Instance = Instance;
-	ZSharpScript.newInstance = function(className: string, instance: Instance?)
-		if getfenv(1).Instance == nil and instance then -- instance should be nil in sandbox.
-			instance = nil;
+	ZSharpScript.newInstance = function(className: string, value)
+		if getfenv(1).Instance == nil and value then -- instance should be nil in sandbox.
+			value = nil;
 		end
 
 		if className == nil then
@@ -226,10 +226,10 @@ function ZSharp.Init(ZSharpScript)
 		local private = {
 			Id = id;
 			ClassName = className;
-			__instance = instance;
+			__instance = typeof(value) == "Instance" and value or nil;
 		};
 
-		local staticUserdata = Constructors[className](ZSharpScript, public, private, instance);
+		local staticUserdata = Constructors[className](ZSharpScript, public, private, value);
 		if staticUserdata then
 			return staticUserdata;
 		end
@@ -273,7 +273,7 @@ function ZSharp.Init(ZSharpScript)
 				error(`{k} is not a valid member of {className}`);
 			end
 
-			return instance and instance[k];
+			return private.__instance and private.__instance[k];
 		end;
 	
 		function public.__newindex(_, k, v)
@@ -285,8 +285,8 @@ function ZSharp.Init(ZSharpScript)
 				error(`{k} is not a valid member of {className} to set.`);
 			end
 			
-			if instance then
-				instance[k] = v;
+			if private.__instance then
+				private.__instance[k] = v;
 			end
 		end;
 
@@ -299,8 +299,8 @@ function ZSharp.Init(ZSharpScript)
 			if private.OnDestroy then
 				private.OnDestroy();
 			end
-			if instance then
-				Debugger.Expire(instance);
+			if private.__instance then
+				Debugger.Expire(private.__instance);
 			end
 			ZSharpScript.Instances[id] = nil;
 		end
@@ -309,15 +309,15 @@ function ZSharp.Init(ZSharpScript)
 			function public.KeyValues()
 				local keyValues = {};
 				for k, v in pairs(baseClass) do
-					keyValues[k] = public[k] or private[k] or instance and instance[k];
+					keyValues[k] = public[k] or private[k] or private.__instance and private.__instance[k];
 				end
 				
 				return keyValues;
 			end
 		end
 
-		if instance and instance.Destroying then
-			instance.Destroying:Connect(function()
+		if private.__instance and private.__instance.Destroying then
+			private.__instance.Destroying:Connect(function()
 				userdata:Destroy();
 			end)
 		end
@@ -326,7 +326,6 @@ function ZSharp.Init(ZSharpScript)
 		
 		ZSharpScript.Instances[id] = userdata;
 		return userdata;
-
 	end;
 end
 
