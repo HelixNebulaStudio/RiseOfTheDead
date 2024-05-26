@@ -237,7 +237,9 @@ function StatusEffects.Dizzy(player, duration, dizzyType)
 			cameraEffects.TintColor:Set("bloater", Color3.fromRGB(221, 178, 117), 1);
 		end
 		
-		modCharacter.CameraShakeAndZoom(5, 0, duration*2, 0, true);
+		if modCharacter.CameraShakeAndZoom then
+			modCharacter.CameraShakeAndZoom(5, 0, duration*2, 0, true);
+		end
 		
 		TweenService:Create(modCharacter.StatusBlur, 
 			TweenInfo.new(tonumber(duration+0.5), Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
