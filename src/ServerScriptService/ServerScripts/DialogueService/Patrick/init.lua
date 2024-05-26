@@ -112,26 +112,20 @@ return function(player, dialog, data)
 			end
 
 			for npcName, info in pairs(availablePosters) do
+				if table.find(npcNames, npcName) then continue end;
+
 				local dialogPacket = {
 					Face="Happy";
 					Dialogue= "Give ".. info.NameRich .."'s Wanted Poster";
 					Reply="I'll get right to it and put up these ".. info.NameRich .."'s Wanted Poster";
 				}
 				
-				if table.find(npcNames, npcName) ~= nil then
-					dialogPacket.Reply = info.NameRich .." is already in your safehome..";
-					dialog:AddDialog(dialogPacket);
-					
-				else
-					dialog:AddDialog(dialogPacket, function(dialog)
-						modEvents:NewEvent(player, {Id="wantedPoster"; Name=npcName;});
-						info.Storage:Remove(info.Item.ID);
-						shared.Notify(player, "A ".. npcName .." wanted poster has been given to Patrick.", "Inform");
+				dialog:AddDialog(dialogPacket, function(dialog)
+					modEvents:NewEvent(player, {Id="wantedPoster"; Name=npcName;});
+					info.Storage:Remove(info.Item.ID);
+					shared.Notify(player, "A ".. npcName .." wanted poster has been given to Patrick.", "Inform");
 
-					end)
-					
-				end
-				
+				end)
 			end
 		end);
 	end
