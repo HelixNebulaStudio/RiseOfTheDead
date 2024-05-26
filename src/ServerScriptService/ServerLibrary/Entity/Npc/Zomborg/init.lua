@@ -3,7 +3,6 @@ local random = Random.new();
 
 local TweenService = game:GetService("TweenService");
 local RunService = game:GetService("RunService");
-local PhysicsService = game:GetService("PhysicsService");
 
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 
@@ -190,7 +189,7 @@ return function(npc, spawnPoint)
 		end
 		if self.Arena then
 			if self.IsDead then return end;
-			local objs = self.Arena.Physics:GetChildren();
+			local objs = self.Arena.Scene.Physics:GetChildren();
 			for a=1, #objs do
 				local o = objs[a]:IsA("BasePart") and objs[a] or objs[a].PrimaryPart;
 				if o:CanSetNetworkOwnership() then
