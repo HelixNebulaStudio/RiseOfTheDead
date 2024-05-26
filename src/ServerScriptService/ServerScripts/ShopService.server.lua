@@ -305,6 +305,9 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		storageItem:DeleteValues("Health");
 		storageItem:Sync({"Health"});
 
+		local playerSave = profile:GetActiveSave();
+		playerSave.AppearanceData:Update(playerSave.Clothing);
+
 		if repairPrice > 0 then
 			modAnalytics.RecordResource(player.UserId, repairPrice, "Sink", "Money", "Gameplay", "Repair");
 		end

@@ -1317,7 +1317,7 @@ function StatusEffects.FumesGas(player, damage)
 					storageItem.Values.MaxHealth = 100;
 				end
 
-				local prevHealth = storageItem.Values.Health or 100;
+				local prevHealth = storageItem:GetValues("Health") or 100;
 				if prevHealth <= 0 then
 					modStorageItem.PopupItemStatus("ItemHealth", storageItem);
 					continue;
@@ -1326,10 +1326,9 @@ function StatusEffects.FumesGas(player, damage)
 				if dmgTaken then continue end;
 				dmgTaken = true;
 
-				storageItem.Values.Health = math.max(prevHealth-(damage/2), 0);
-				storageItem:Sync({"Health"; "MaxHealth"});
+				storageItem:TakeDamage(damage/2);
 
-				if prevHealth ~= storageItem.Values.Health then
+				if prevHealth ~= storageItem:GetValues("Health") then
 					if storageItem.Values.Health == 0 then
 						modAudio.Play("GasMaskBroken", classPlayer.Head);
 						saveData.AppearanceData:Update(saveData.Clothing);
