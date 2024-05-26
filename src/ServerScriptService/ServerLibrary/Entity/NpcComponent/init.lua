@@ -1,5 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-
+--==
+local CollectionService = game:GetService("CollectionService");
 local RunService = game:GetService("RunService");
 
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
@@ -650,17 +651,8 @@ return function(self) : NpcModule
 		end
 	end)
 	
-	self.Humanoid.StateChanged:Connect(function()
-		self:RefreshRagdollJoints();
-	end)
-
 	setmetatable(self, NpcComponent);
-	-- initialized;
-	self.Garbage:Tag(function()
-		for _, jointLV in pairs(self.JointRotations) do
-			jointLV:Destroy();
-		end
-	end)
+	--== Initialize;
 	
 	self:AddComponent("Move");
 	self:AddComponent("ThreatSense");
@@ -675,5 +667,56 @@ return function(self) : NpcModule
 		self:AddComponent("Ragdoll")();
 	end
 	
+	--== Signals;
+	self.Garbage:Tag(function()
+		for _, jointLV in pairs(self.JointRotations) do
+			jointLV:Destroy();
+		end
+	end)
+
+	local waterCheckTick, lastInWaterTick = nil, nil;
+	self.Think:Connect(function()
+		if waterCheckTick and waterCheckTick > tick() then return end;
+		waterCheckTick = tick()+ (self.Target and 1 or 5);
+
+		local min = self.RootPart.Position - (4 * Vector3.one)
+		local max = self.RootPart.Position + (4 * Vector3.one)
+		local region = Region3.new(min,max):ExpandToGrid(1);
+		local material = workspace.Terrain:ReadVoxels(region,4)[1][1][1];
+
+		if material == Enum.Material.Water then
+			lastInWaterTick = tick();
+
+			if self.IsSwimming then return end;
+			self.IsSwimming = true;
+
+			task.spawn(function()
+				if self.WaterBodyVelocity == nil then
+					self.WaterBodyVelocity = Instance.new("BodyVelocity");
+				end
+				self.WaterBodyVelocity.Name = "FloatVelocity";
+				self.WaterBodyVelocity.MaxForce = Vector3.new(0, 500 * self.RootPart:GetMass(), 0);
+				self.WaterBodyVelocity.Parent = self.RootPart;
+
+				while self.IsSwimming and self.IsDead ~= true and tick()-lastInWaterTick <= 1 do
+					self.WaterBodyVelocity.Velocity = Vector3.new(0, self.Humanoid.WalkToPoint.Y > 0 and self.Humanoid.WalkSpeed or -self.Humanoid.WalkSpeed, 0);
+
+					task.wait(1);
+				end
+				self.IsSwimming = false;
+
+				if self.WaterBodyVelocity then 
+					game.Debris:AddItem(self.WaterBodyVelocity, 0);
+					self.WaterBodyVelocity = nil;
+				end;
+			end)
+		end
+	end)
+
+	self.Garbage:Tag(self.Humanoid.StateChanged:Connect(function(new, old)
+		self:RefreshRagdollJoints();
+	end))
+
+
 	return self;
 end

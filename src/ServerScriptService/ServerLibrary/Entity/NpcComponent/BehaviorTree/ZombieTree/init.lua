@@ -98,11 +98,11 @@ return function(self)
 		
 		if self.Move.IsMoving == false then
 			
-			if math.random(1, 10) == 1 then
+			if math.random(1, 20) == 1 then
 				self.PlayAnimation("Idle");
 				modAudio.Play("ZombieIdle"..math.random(1,4), self.RootPart).PlaybackSpeed = math.random(80, 120)/100;
 				
-			elseif math.random(1, 10) == 2 then
+			elseif math.random(1, 40) == 1 then
 				self.Move:MoveTo(spawnPoint + Vector3.new(
 					(math.random(1, 2) == 1 and 1 or -1) * math.random(4, 16),
 					0,
