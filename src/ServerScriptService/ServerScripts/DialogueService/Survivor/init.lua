@@ -18,7 +18,7 @@ return function(player, dialog, data)
 	local safehomeData = profile.Safehome;
 	
 	local npcData = safehomeData:GetNpc(npcName);
-	if npcData == nil then return end
+	if npcData == nil then Debugger:WarnClient(player, `Missing npcData. ({npcName})`); return end
 
 	local npcLevel = npcData.Level or 0;
 	local npcHappiness = npcData.Happiness or 0;
@@ -51,7 +51,7 @@ return function(player, dialog, data)
 		end
 	end;
 	
-	if npcData.LevelUpTime == nil then return end
+	if npcData.LevelUpTime == nil then Debugger:WarnClient(player, `Missing npc LevelUpTime. ({npcName})`); return end
 	local unlockTime = npcData.LevelUpTime + (levelUpTimer);
 	
 	--== MARK: Medic Class 
@@ -375,6 +375,9 @@ return function(player, dialog, data)
 			
 		end
 		
+	else
+		Debugger:WarnClient(player, `No dialogue for npc class {npcLib.Class}. ({npcName})`);
+
 	end
 	
 end

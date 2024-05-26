@@ -61,11 +61,7 @@ return function(player, dialog, data, mission)
 					dialog:AddChoice("eb2_end2", function(dialog)
 						modMission:CompleteMission(player, 50);
 
-						local profile = modProfile:Get(player);
-						profile.ItemUnlockables:Add("bunnymanhead", "bunnymanheadbenefactor", 1);
-						profile.ItemUnlockables:Alert("bunnymanhead", "bunnymanheadbenefactor");
-						
-						profile:Sync("ItemUnlockables/bunnymanhead/"..profile.ItemUnlockables["bunnymanhead"]);
+						-- MARK: To do: bunnymanheadbenefactor
 					end)
 				end)
 				
@@ -95,11 +91,15 @@ return function(player, dialog, data, mission)
 				data:Set("World", modBranchConfigs.WorldName);
 				modServerManager:Travel(player, "EasterButchery");
 			end)
+
 		else
+			-- MARK: TODO: add obtain bunnymanheadbenefactor
+
 			dialog:AddChoice("reborn_home", function(dialog)
 				local worldName = data:Get("World") or "TheResidentials";
 				modServerManager:Travel(player, worldName);
 			end)
+
 		end
 		
 	end

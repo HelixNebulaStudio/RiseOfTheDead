@@ -678,7 +678,6 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 		
 		
 	elseif action == 9 then --== UnlockableSet;
-		Debugger:StudioWarn("partKey", partKey);
 		if partKey == "UnlockableId" then
 			if appearId and appearId ~= storageItem.ItemId then
 				local unlockableItemLib = modItemUnlockablesLibrary:Find(appearId);
@@ -693,27 +692,16 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 					end
 					
 					if isUnlocked == nil then
-						local consumedCharge = false;
-						
-						if profile.ItemUnlockables and profile.ItemUnlockables[itemId] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] > 0 then
+						if profile.ItemUnlockables and profile.ItemUnlockables[itemId] and profile.ItemUnlockables[itemId][unlockableItemLib.Id] then
 							profile.ItemUnlockables[itemId][unlockableItemLib.Id] = profile.ItemUnlockables[itemId][unlockableItemLib.Id] -1;
-							profile:Sync(`ItemUnlockables/{itemId}/{unlockableItemLib.Id}`);
-							consumedCharge = true;
-						end
-						if not consumedCharge then
-							shared.Notify(player, `You have no more charges for {unlockableItemLib.Name} {itemLib.Name}.`, "Negative");
-							debounceCache[player.Name]=nil;
-							return;
-
-						else
+							isUnlocked = true;
+							
 							table.insert(unlockedSkins, unlockableItemLib.Id);
 
 							for a=1, #unlockedSkins do
 								unlockedSkins[a] = tostring(unlockedSkins[a]);
 							end
 							storageItem:SetValues("Skins", unlockedSkins);
-
-							isUnlocked = true;
 						end
 					end
 

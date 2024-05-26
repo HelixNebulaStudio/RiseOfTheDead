@@ -53,12 +53,37 @@ return function(player, dialog, data)
 				local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 				modAnalytics:ReportError("Mason", "Cupcake claimed");
 			end)
-
-			--local modGameLogService = require(game.ReplicatedStorage.Library.GameLogService);
-			--modGameLogService:Log(target.UserId.." ("..target.Name.."): ".. msg, script.Name);
 		end);
 	end
 
+	local hardhatsilver = modEvents:GetEvent(player, "freeHardhatsilver");
+	if hardhatsilver == nil then
+		dialog:SetInitiate("Hey $PlayerName, I have something for you.");
+
+		local dialogPacket = {
+			Face="Happy";
+			Dialogue="What is it?";
+		}
+
+		local inventory = playerSave.Inventory;
+		local hasSpace = inventory:SpaceCheck{
+			{ItemId="hardhatsilver"; Data={Quantity=1}; };
+		};
+
+		if hasSpace then
+			dialogPacket.Reply="Sure, here you go.";
+		else
+			dialogPacket.Reply="You're going to need more space in your inventory.";
+		end
+
+		dialog:AddDialog(dialogPacket, function(dialog)
+			inventory:Add("hardhatsilver", {Quantity=1;}, function(queueEvent, storageItem)
+				modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+			end);
+			shared.Notify(player, "You recieved a Hard Hat Silver from Mason for unlocking Tinkering Commands achievement.", "Reward");
+			modEvents:NewEvent(player, {Id="freeHardhatsilver"});
+		end);
+	end
 	
 	if modMission:Progress(player, 54) then return end;
 	if modMission:IsComplete(player, 2) then

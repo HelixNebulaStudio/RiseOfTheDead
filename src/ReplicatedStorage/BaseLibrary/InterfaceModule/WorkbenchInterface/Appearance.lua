@@ -151,13 +151,14 @@ function Workbench.new(itemId, library, storageItem)
 						titleLabel.Text = unlockItemLib.Name;
 						unlockButton.LayoutOrder = unlockItemLib.Name == "Default" and 0 or unlockItemLib.LayoutOrder or 1;
 						unlockButton.LayoutOrder = isUnlocked and unlockButton.LayoutOrder or unlockButton.LayoutOrder + 999;
+						unlockButton.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 						txrLabel.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 
-						local hasCharges = chargesData[unlockItemLib.Id] and chargesData[unlockItemLib.Id] > 0
+						local hasCharges = chargesData[unlockItemLib.Id] ~= nil;
 						if hasCharges then
-							chargeLabel.Text = `Charges: {chargesData[unlockItemLib.Id]}`;
+							chargeLabel.Text = `∞`;
 						end
-						
+
 						local function refresh()
 							if ItemValues.ActiveSkin == nil and unlockItemLib.Name == "Default" then
 								selectedLabel.Visible = true;
@@ -219,14 +220,14 @@ function Workbench.new(itemId, library, storageItem)
 							Interface:PlayButtonClick();
 
 							if isUnlocked == nil and hasCharges then
-
-								-- MARK: Use charge;
+								-- MARK: Use infinite;
+								
 								local name = itemLib and itemLib.Name or `{unlockItemLib.ItemId}:{unlockItemLib.Name}`;
 								local icon = itemLib and itemLib.Icon or unlockItemLib.Icon;
 								
 								local promptWindow = Interface:PromptQuestion("Apply Skin?",
-									`Are you sure you want to apply {name}? This will consume a charge.`, 
-									"Use Charge", "Cancel", icon);
+									`You are about to apply {name}?`, 
+									"Apply", "Cancel", icon);
 								local YesClickedSignal, NoClickedSignal;
 								
 								local applyDebounce = tick();

@@ -612,8 +612,8 @@ function ItemsLibrary:Init(super)
 				local itemLib = super:Find(data.TargetItemId);
 				
 				data.TargetName = itemLib.Name;
-				data.Name = skinPerm.." ".. itemLib.Name .." Skin-Perm";
-				data.Description = "Right click to unlock "..skinPerm.." skin permanent to a ".. itemLib.Name ..". You can always change the skin permanent in the workbench to other unlocked skins on a workbench.";
+				data.Name = skinPerm.." ".. itemLib.Name .." Skin";
+				data.Description = "Right click to apply "..skinPerm.." skin to one ".. itemLib.Name ..". You can always customize to another unlocked skin on that item.";
 			end
 		end;
 		TradingTax=100;
@@ -691,6 +691,7 @@ function ItemsLibrary:Init(super)
 
 	-- hardhat
 	new(skinPermBase, {Id="hardhatorigins"; Icon="rbxassetid://13974944299"; SkinPerm="Origins"; TargetItemId="hardhat"; });
+	new(skinPermBase, {Id="hardhatsilver"; Icon="rbxassetid://17485221629"; SkinPerm="Silver"; TargetItemId="hardhat"; });
 	
 	-- highvisjacket
 	new(skinPermBase, {Id="highvisjacketsuits"; Icon="rbxassetid://17275772207"; SkinPerm="Suits"; TargetItemId="highvisjacket"; });

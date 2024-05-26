@@ -38,6 +38,8 @@ function ItemUnlockables:Load(data)
 end
 
 function ItemUnlockables:Add(itemId, key, value)
+	Debugger:Warn("deprecated ItemUnlockables:Add("..itemId..", "..key..", "..value..")");
+	if true then return end;
 	if self[itemId] == nil then
 		self[itemId] = {};
 	end
