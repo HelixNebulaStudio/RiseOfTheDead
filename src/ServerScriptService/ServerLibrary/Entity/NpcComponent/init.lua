@@ -395,8 +395,13 @@ function NpcComponent:SendActorMessage(...)
 	self.Prefab:SendMessage(...);
 end
 
-function NpcComponent:DamageTarget(model, damage, character, dmgSrc, dmgCate)
-	if self.Humanoid == nil or self.Humanoid.Health <= 0 or self.IsDead then return end;
+function NpcComponent:DamageTarget(model, damage, character, dmgSrc, dmgCate, dmgAfterDeath)
+	local canDmgTarget = self.Humanoid and self.Humanoid.Health > 0 and (self.IsDead ~= true);
+	if dmgAfterDeath then
+		canDmgTarget = true;
+	end
+
+	if not canDmgTarget then return end;
 	local player = game.Players:GetPlayerFromCharacter(character);
 
 	if self.NetworkOwners then

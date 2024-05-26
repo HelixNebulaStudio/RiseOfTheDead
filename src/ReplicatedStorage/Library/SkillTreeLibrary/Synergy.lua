@@ -23,7 +23,7 @@ library:Add{
 	Name="Meet the Medic";
 	Link="reqback";
 
-	Description="When you heal someone else, you also heal by $Percent%.";
+	Description="When you heal someone else, you also heal yourself by $Percent%.";
 	Stats={
 		Percent={Base=60; Max=110};
 	};

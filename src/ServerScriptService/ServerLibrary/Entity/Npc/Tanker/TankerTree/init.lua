@@ -149,7 +149,7 @@ return function(self)
 				
 				if dmgScaling > (self.HardMode and 95 or 25) then
 					if enemyPlayer then
-						self:DamageTarget(enemyPlayer.Character, self.HardMode and 200 or 45, nil, nil, "Melee");
+						self:DamageTarget(enemyPlayer.Character, self.HardMode and 200 or 45, nil, nil, modDamagable.DamageCategory.Melee);
 					end
 
 					modStatusEffects.Throw(enemyPlayer, dir);

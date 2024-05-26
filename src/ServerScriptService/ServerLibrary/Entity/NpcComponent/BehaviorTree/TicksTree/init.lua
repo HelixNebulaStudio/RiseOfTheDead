@@ -156,9 +156,10 @@ return function(self)
 
 					DamageOrigin = detonatePosition;
 					OnDamagableHit = function(damagable, damage)
+						if damagable.Model == self.Prefab then return true end;
+
 						if damagable.Object.ClassName == "NpcStatus" then
 							local npcModule = damagable.Object:GetModule();
-							if npcModule.Prefab == self.Prefab then return end;
 							
 							local healthInfo = damagable:GetHealthInfo();
 							if npcModule.Properties and npcModule.Properties.BasicEnemy then
@@ -184,9 +185,8 @@ return function(self)
 								damage = damage * (1-gasProtection);
 							end
 
-							Debugger:StudioWarn("damage", damage)
 							if classPlayer.Properties.tickre then
-								return;
+								return true;
 							end
 
 							local tickRepellent = classPlayer:GetBodyEquipment("TickRepellent");
@@ -196,7 +196,7 @@ return function(self)
 
 						end
 
-						self:DamageTarget(damagable.Model, damage);
+						self:DamageTarget(damagable.Model, damage, nil, nil, nil, true);
 
 						return true;
 					end
