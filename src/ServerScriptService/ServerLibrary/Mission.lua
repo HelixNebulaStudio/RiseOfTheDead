@@ -239,7 +239,7 @@ function Mission:CompleteMission(players, missionId, sync)
 							local perkAmount = reward.Amount;
 							
 							playerSave:AddStat("Perks", perkAmount);
-							shared.Notify(player, ("You recieved $Amount Perks and 3 Tweak Points for completing $Name."):gsub("$Amount", perkAmount):gsub("$Name", library.Name), "Reward");
+							shared.Notify(player, ("You recieved $Amount Perks and 1 Tweak Points for completing $Name."):gsub("$Amount", perkAmount):gsub("$Name", library.Name), "Reward");
 							tweakPointsNotifed = true;
 							
 							if library.MissionType == 1 then
