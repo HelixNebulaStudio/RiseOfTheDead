@@ -1,6 +1,6 @@
 local mxkhronosUserId = 16170943;
 local Vars = {
-	GameVersion="2.1.1";
+	GameVersion="2.1.3";
 	GameBuild="16";
 	
 	EngineMode="RiseOfTheDead";

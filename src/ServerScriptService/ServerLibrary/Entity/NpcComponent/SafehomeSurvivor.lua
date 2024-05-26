@@ -44,12 +44,23 @@ function Human.new(self)
 		if npcData.Level == 0 then --======================= LEVEL 0
 			local npcSpot = shared.modSafehomeService.GetNpcSpot(self.Name);
 			
-			self.Movement:Move(npcSpot.WorldPosition):Wait();
-			task.wait(0.1);
-			self.Movement:Face(self.RootPart.Position + npcSpot.WorldCFrame.LookVector);
-			self.Chat(game.Players:GetPlayers(), "shelter_new");
-			
 			npcData:SetLevel(1);
+
+			if self.Prefab:IsA("Actor") then
+				self.Move:MoveTo(npcSpot.WorldPosition);
+				self.Move.MoveToEnded:Wait(15);
+				self.Move:Stop();
+				self.Move:Face(self.RootPart.Position + npcSpot.WorldCFrame.LookVector);
+				self.Chat(game.Players:GetPlayers(), "shelter_new");
+				
+			else
+				self.Movement:Move(npcSpot.WorldPosition):Wait();
+				task.wait(0.1);
+				self.Movement:Face(self.RootPart.Position + npcSpot.WorldCFrame.LookVector);
+				self.Chat(game.Players:GetPlayers(), "shelter_new");
+
+			end
+			
 			
 		elseif npcData.Level == 2 then --======================= LEVEL 2
 			

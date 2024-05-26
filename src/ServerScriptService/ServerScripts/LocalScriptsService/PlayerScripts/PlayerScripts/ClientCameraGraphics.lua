@@ -448,9 +448,7 @@ return function()
 						if prefabData == nil then continue end;
 
 						smallObject.Parent = nil;
-						if RunService:IsStudio() then
-							Debugger:Warn("Hide instance (", smallObject,")");
-						end
+						Debugger:StudioWarn("Hide small instance (", smallObject,")");
 					end
 
 				end
