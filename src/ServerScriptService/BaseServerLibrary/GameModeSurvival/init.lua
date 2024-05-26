@@ -19,6 +19,7 @@ local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
+local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
@@ -607,8 +608,6 @@ function Survival:StartWave(wave)
 		local function spawnReward()
 			local rewardDropsList = {self.StageLib.RewardsId};
 			
-			Debugger:Warn("Spawn Reward", rewardDropsList);
-			
 			local spawnCFrame = workspace:FindFirstChildWhichIsA("SpawnLocation");
 			if spawnCFrame then
 				spawnCFrame = spawnCFrame.CFrame * CFrame.new(0, 2, 0);
@@ -630,13 +629,25 @@ function Survival:StartWave(wave)
 			
 			local pickRewardId = rewardDropsList[math.fmod(self.Wave-1, #rewardDropsList)+1];
 			
-			local lootPrefab = modItemDrops.Spawn({Type="Tool"; ItemId=pickRewardId}, spawnCFrame, self.Players, false);
+			local bonusQuantity = math.floor(self.Wave/9);
+			local quantity = math.clamp(1 + bonusQuantity, 1, 5);
+
+			local lootPrefab = modItemDrops.Spawn({Type="Tool"; ItemId=pickRewardId; Quantity=quantity;}, spawnCFrame, self.Players, false);
 			self.LootPrefab = lootPrefab;
 			
+			local dropStr = "A reward package has dropped!";
+			
+			local itemLib = modItemLibrary:Find(pickRewardId);
+			if quantity > 1 then
+				dropStr = `{quantity} {itemLib and itemLib.Name or "reward package"} has dropped!`;
+			else
+				dropStr = `A {itemLib and itemLib.Name or "reward package"} has dropped!`;
+			end
+
 			self:Hud{
-				Status="A reward package has dropped!";
+				Status=dropStr;
 			};
-			shared.Notify(game.Players:GetPlayers(), "A reward package has dropped!", "Reward");
+			shared.Notify(game.Players:GetPlayers(), dropStr, "Reward");
 		end
 		
 		
