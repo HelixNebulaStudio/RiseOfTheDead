@@ -198,13 +198,15 @@ function StorageItem.new(index, itemId, data, player)
 	end
 	
 	function itemMeta:TakeDamage(damage)
-		local initHealth = self:GetValues("Health");
+		if self:GetValues("MaxHealth") == nil then
+			self:SetValues("MaxHealth", 100);
+		end
+
+		local initHealth = self:GetValues("Health") or 100;
 		local newHealth = math.max(initHealth-(damage/2), 0);
 		self:SetValues("Health", newHealth);
 
-		if initHealth ~= newHealth then
-			self:Sync({"Health"; "MaxHealth"});
-		end
+		self:Sync({"Health"; "MaxHealth"});
 	end
 
 	if itemMeta.Properties and itemMeta.Properties.OnInstantiate then
