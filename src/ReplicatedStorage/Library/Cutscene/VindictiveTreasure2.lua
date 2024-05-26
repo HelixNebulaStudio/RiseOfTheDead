@@ -35,8 +35,7 @@ return function(CutsceneSequence)
 			while player:IsDescendantOf(game.Players) do
 				wait(mission.Type ~= 3 and 35 or math.random(600, 900));
 				if not player:IsDescendantOf(game.Players) then continue end;
-				if isOldMission and math.random(1, 10) == 1 then continue end;
-				Debugger:Warn("IsOldMission", (os.time()-mission.StartTime));
+				if isOldMission and math.random(1, 4) >= 2 then continue end;
 
 				if mission.ProgressionPoint <= 2
 				or (mission.Type == 1 and mission.ProgressionPoint == 4

@@ -348,7 +348,28 @@ function AntiCheatService:GetStrRandomness(str, checkNum, checkSpecial) -- > 0.3
 	return r;
 end
 
-local bannedWords = {"urinate"; "wagner"};
+local bannedWords = {"urinate"; "wagner"; "apex"};
+function AntiCheatService:CensorWords(text)
+	for a=1, #bannedWords do
+		local keyword = bannedWords[a];
+
+		local nextPos = 1;
+		repeat
+			local ti, tj = string.find(string.lower(text), keyword, nextPos);
+			if ti then
+				local censorWord = text:sub(ti, tj);
+				text = string.gsub(text, censorWord, string.rep("#", #keyword));
+
+				nextPos = tj;
+			else
+				break;
+			end
+		until nextPos >= #text;
+	end
+
+	return text;
+end
+
 function AntiCheatService:Filter(value, player, filterNames, filterGibberish)
 	if value == nil then return ""; end;
 	
@@ -363,12 +384,7 @@ function AntiCheatService:Filter(value, player, filterNames, filterGibberish)
 	local filterS, filterE = pcall(function()
 		resultValue = TextService:FilterStringAsync(value, userId, Enum.TextFilterContext.PublicChat);
 		resultValue = resultValue:GetChatForUserAsync(userId);
-		
-		for a=1, #bannedWords do
-			local word = bannedWords[a];
-
-			resultValue = string.gsub(resultValue, word, string.rep("#", #word));
-		end
+		resultValue = AntiCheatService:CensorWords(resultValue);
 	end)
 	if not filterS then Debugger:Warn("Filter",value,"Error:",filterE); return failedResult end;
 	if type(resultValue) ~= "string" then return failedResult end;
@@ -416,7 +432,6 @@ function AntiCheatService:Filter(value, player, filterNames, filterGibberish)
 	return value;
 end
 
-
 function AntiCheatService:FilterNonChatStringForBroadcast(value, player)
 	if value == nil then return ""; end;
 
@@ -434,12 +449,7 @@ function AntiCheatService:FilterNonChatStringForBroadcast(value, player)
 	local filterS, filterE = pcall(function()
 		resultValue = TextService:FilterStringAsync(value, player.UserId, Enum.TextFilterContext.PublicChat);
 		resultValue = resultValue:GetChatForUserAsync(player.UserId);
-
-		for a=1, #bannedWords do
-			local word = bannedWords[a];
-
-			resultValue = string.gsub(resultValue, word, string.rep("#", #word));
-		end
+		resultValue = AntiCheatService:CensorWords(resultValue);
 	end)
 	if not filterS then Debugger:Warn("Filter",value,"Error:",filterE); return failedResult end;
 	if type(resultValue) ~= "string" then return failedResult end;

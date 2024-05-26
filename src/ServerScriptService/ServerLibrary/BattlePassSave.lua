@@ -647,6 +647,11 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 			return returnPacket;
 		end
 
+		if profile.Premium ~= true then
+			returnPacket.FailMsg = "Requires Premium.";
+			return returnPacket;
+		end
+
 		local hasSpace = activeInventory:SpaceCheck{{ItemId=itemId; Data={Quantity=1};}};
 		if not hasSpace then
 			shared.Notify(player, `Not enough inventory space to receive {itemLib.Name} gift shop.`, "Negative");
