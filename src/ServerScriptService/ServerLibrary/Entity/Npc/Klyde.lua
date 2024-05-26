@@ -126,7 +126,7 @@ return function(npc, spawnPoint)
 		if self.Enemy and self.Enemy.Humanoid and self.Enemy.Humanoid.Health > 0 then
 			self.Logic:SetState("Aggro");
 			
-			self.Movement:SetWalkSpeed("default", 32);
+			self.Movement:SetWalkSpeed("default", self.HardMode and 32 or 6);
 			self.Follow(self.Enemy.Humanoid.RootPart, followGap, 10);
 			
 			self.Enemy.Distance = (self.Humanoid.RootPart.CFrame.p - self.Enemy.Humanoid.RootPart.CFrame.p).Magnitude;
@@ -169,7 +169,7 @@ return function(npc, spawnPoint)
 			self.Logic:SetState("Idle");
 			
 			self.NextTarget();
-			self.Movement:SetWalkSpeed("default", 16);
+			self.Movement:SetWalkSpeed("default", self.HardMode and 16 or 6);
 			self.Follow();
 			self.Logic:Action("Idle");
 			
