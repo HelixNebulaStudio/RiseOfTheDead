@@ -532,6 +532,7 @@ function GameModeLibrary.GetStage(gamemode, name)
 		end
 		return GameModeLibrary.GameModes[gamemode].Stages[name];
 	end
+	return;
 end
 
 
@@ -555,18 +556,21 @@ for gamemode, _ in pairs(GameModeLibrary.GameModes) do
 				DatastoreId="LY_"..modeKey;
 				Folder="YearlyStats";
 				DataKey="LY_"..modeKey;
+				RanksLimit=100;
 			};
 			stageLib.LeaderboardKeyTable["Seasonly"..modeKey]={
 				DatastoreName="LS_"..modeKey;
 				DatastoreId="LS_"..modeKey;
 				Folder="SeasonlyStats";
 				DataKey="LS_"..modeKey;
+				RanksLimit=100;
 			};
 			stageLib.LeaderboardKeyTable["Monthly"..modeKey]={
 				DatastoreName="LM_"..modeKey;
 				DatastoreId="LM_"..modeKey;
 				Folder="MonthlyStats";
 				DataKey="LM_"..modeKey;
+				RanksLimit=50;
 			};
 			stageLib.LeaderboardKeyTable["Weekly"..modeKey]={
 				DatastoreName="LW_"..modeKey;
@@ -604,7 +608,3 @@ table.insert(Shuffle.WaveStartTrack, "ErrorWaveStart");
 table.insert(Shuffle.WaveEndTrack, "ErrorWaveEnd");
 
 return GameModeLibrary;
-
-
--- Set Lobby Camera;
--- local s = game:GetService("Selection"):Get()[1]; s.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(0, math.rad(90), 0); s.WorldPosition = workspace.CurrentCamera.CFrame.Position;
