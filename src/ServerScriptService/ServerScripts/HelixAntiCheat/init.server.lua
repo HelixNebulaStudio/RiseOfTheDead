@@ -348,7 +348,7 @@ function AntiCheatService:GetStrRandomness(str, checkNum, checkSpecial) -- > 0.3
 	return r;
 end
 
-local bannedWords = {"urinate"; "wagner"; "apex"};
+local bannedWords = {"urinate"; "wagner";};
 function AntiCheatService:CensorWords(text)
 	for a=1, #bannedWords do
 		local keyword = bannedWords[a];
@@ -384,11 +384,12 @@ function AntiCheatService:Filter(value, player, filterNames, filterGibberish)
 	local filterS, filterE = pcall(function()
 		resultValue = TextService:FilterStringAsync(value, userId, Enum.TextFilterContext.PublicChat);
 		resultValue = resultValue:GetChatForUserAsync(userId);
-		resultValue = AntiCheatService:CensorWords(resultValue);
 	end)
 	if not filterS then Debugger:Warn("Filter",value,"Error:",filterE); return failedResult end;
 	if type(resultValue) ~= "string" then return failedResult end;
 	if value ~= resultValue then return failedResult end;
+
+	resultValue = AntiCheatService:CensorWords(resultValue);
 	value = resultValue;
 	
 	if filterNames ~= false then
@@ -449,11 +450,12 @@ function AntiCheatService:FilterNonChatStringForBroadcast(value, player)
 	local filterS, filterE = pcall(function()
 		resultValue = TextService:FilterStringAsync(value, player.UserId, Enum.TextFilterContext.PublicChat);
 		resultValue = resultValue:GetChatForUserAsync(player.UserId);
-		resultValue = AntiCheatService:CensorWords(resultValue);
 	end)
 	if not filterS then Debugger:Warn("Filter",value,"Error:",filterE); return failedResult end;
 	if type(resultValue) ~= "string" then return failedResult end;
 	if value ~= resultValue then return failedResult end;
+
+	resultValue = AntiCheatService:CensorWords(resultValue);
 	value = resultValue;
 	
 	return value;
