@@ -1259,7 +1259,7 @@ end
 
 function StatusEffects.FumesGas(player, damage)
 	if RunService:IsClient() then return end
-	damage = damage or 5;
+	damage = damage or 6;
 	local classPlayer = modPlayers.GetByName(player.Name);
 
 	local statusTable = classPlayer.Properties.FumesGas;
@@ -1326,7 +1326,7 @@ function StatusEffects.FumesGas(player, damage)
 				if dmgTaken then continue end;
 				dmgTaken = true;
 
-				storageItem.Values.Health = math.max(prevHealth-3, 0);
+				storageItem.Values.Health = math.max(prevHealth-(damage/2), 0);
 				storageItem:Sync({"Health"; "MaxHealth"});
 
 				if prevHealth ~= storageItem.Values.Health then
