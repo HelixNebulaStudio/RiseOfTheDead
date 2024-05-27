@@ -40,6 +40,8 @@ return function(player, dialog, data)
 		end
 		
 		dialog:AddDialog(dialogPacket, function(dialog)
+			if not hasSpace then return end;
+			
 			inventory:Add("perkscupcake", {Quantity=1;}, function(queueEvent, storageItem)
 				modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
 			end);
@@ -77,6 +79,8 @@ return function(player, dialog, data)
 		end
 
 		dialog:AddDialog(dialogPacket, function(dialog)
+			if not hasSpace then return end;
+
 			inventory:Add("hardhatsilver", {Quantity=1;}, function(queueEvent, storageItem)
 				modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
 			end);
