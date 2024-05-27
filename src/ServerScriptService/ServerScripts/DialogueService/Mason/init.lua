@@ -57,7 +57,7 @@ return function(player, dialog, data)
 	end
 
 	local hardhatsilver = modEvents:GetEvent(player, "freeHardhatsilver");
-	if hardhatsilver == nil then
+	if hardhatsilver == nil and profile.GamePass.DbTinker then
 		dialog:SetInitiate("Hey $PlayerName, I have something for you.");
 
 		local dialogPacket = {

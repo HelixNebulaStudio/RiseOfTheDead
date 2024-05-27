@@ -672,11 +672,6 @@ function Profile:Refresh()
 						if self.Purchases[key] == nil then
 							self.Purchases[key] = 1;
 
-							-- self.ItemUnlockables:Add("hardhat", "hardhatsilver", 1);
-							-- task.delay(5, function()
-							-- 	self.ItemUnlockables:Alert("hardhat", "hardhatsilver", " for unlocking Tinkering Commands");
-							-- end)
-							
 							local donateAmount = 10000;
 							self.DailyStats.GoldDonor = (self.DailyStats.GoldDonor or 0) + donateAmount;
 							self.WeeklyStats.GoldDonor = (self.WeeklyStats.GoldDonor or 0) + donateAmount;
