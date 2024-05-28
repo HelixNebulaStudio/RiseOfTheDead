@@ -4,6 +4,8 @@ repeat task.wait() until shared.MasterScriptInit == true;
 
 local dayOfYearSet = nil;
 --== Configuration;
+local LiveWeatherCycle = {"fog"; "rain"};
+
 local LightingConfigurations = {
 	OutdoorAmbient = Color3.fromRGB(35, 41, 49);
 	NightOutdoorAmbient = Color3.fromRGB(25, 28, 34);
@@ -76,6 +78,8 @@ local modInteractable = require(game.ReplicatedStorage.Library.Interactables);
 local modWorldClipsHandler = require(game.ReplicatedStorage.Library.WorldClipsHandler);
 local modWeatherService = require(game.ReplicatedStorage.Library.WeatherService);
 
+local modWeatherLibrary = require(game.ReplicatedStorage.Library.WeatherLibrary);
+
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local folderClips = workspace:WaitForChild("Clips");
@@ -129,7 +133,16 @@ for _, obj in pairs(workspace:GetChildren()) do
 	end
 end
 
+local lastWeatherEvent = tick();
+
 modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
+	local unixSeed = (tonumber(os.date("%Y")) :: number)*100000000 
+	+ (tonumber(os.date("%j")) :: number)*100000 
+	+ (tonumber(os.date("%H")) :: number)*10000 
+	+ (tonumber(os.date("%M")) :: number)*100 
+	+ (tonumber(os.date("%S")) :: number)
+	workspace:SetAttribute("UnixSeed", unixSeed);
+
 	local osTime = workspace:GetAttribute("SetOsTime") or modBranchConfigs.WorldInfo.TimeCycleEnabled and modSyncTime.GetTime() or 0;
 	
 	if osTime then
@@ -219,6 +232,27 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 				
 			end
 			
+		end
+	end
+
+
+	if modBranchConfigs.CurrentBranch.Name == "Dev" then
+		LiveWeatherCycle = modWeatherLibrary:GetKeys();
+	end
+
+	local weatherRandom = Random.new(unixSeed);
+	if modConfigurations.DisableWeatherCycle ~= true 
+	and modWeatherService:GetActive() == nil
+	and tick() > lastWeatherEvent then
+		lastWeatherEvent = tick()+ weatherRandom:NextInteger(60, 600);
+
+		if weatherRandom:NextInteger(1, 3) == 1 then
+			local pickWeatherId = LiveWeatherCycle[weatherRandom:NextInteger(1, #LiveWeatherCycle)];
+			local pickWeatherDuration = weatherRandom:NextInteger(50, 150);
+	
+			modWeatherService:SetWeather({Id=pickWeatherId; Expire=pickWeatherDuration});
+	
+			Debugger:Warn("Weather", pickWeatherId, pickWeatherDuration);
 		end
 	end
 

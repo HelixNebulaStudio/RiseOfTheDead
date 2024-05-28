@@ -92,6 +92,7 @@ Configurations.Set("DisableMasterySkills", false);
 Configurations.Set("DisableWorldAd", false);
 
 Configurations.Set("DayLapseDuration", 1200);
+Configurations.Set("DisableWeatherCycle", false);
 Configurations.Set("SpawnProtectionTimer", 10);
 Configurations.Set("ExpireDeployables", false);
 

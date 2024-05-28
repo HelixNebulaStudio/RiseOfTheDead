@@ -18,7 +18,7 @@ onWeatherSetEventHandler:SetPermissions("CanListen", true);
 
 function WeatherService:OnTick()
     local activeWeather = WeatherService.WeatherLayers:Get();
-    if WeatherService.ActiveWeather and WeatherService.ActiveWeather.Id == activeWeather.Id then return end;
+    if WeatherService.ActiveWeather and WeatherService.ActiveWeather.Id == activeWeather.Id then return; end;
     WeatherService.ActiveWeather = activeWeather;
 
     if activeWeather.StartTick == nil then
@@ -41,7 +41,8 @@ function WeatherService:GetActive()
     if RunService:IsClient() then
         return HttpService:JSONDecode(script:GetAttribute("Active"));
     end
-    return;
+
+    return WeatherService.WeatherLayers:Get();
 end
 
 function WeatherService:SetWeather(packet)

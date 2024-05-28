@@ -185,11 +185,6 @@ return function()
 		-- MARK: CameraEffects
 		local activeEffect = cameraEffects:Get();
 
-		if tick()-logDebounce >= 5 then
-			logDebounce = tick();
-			Debugger:StudioWarn("ActiveEffect",activeEffect,"\nPreviousWeather",previousWeather);
-		end
-
 		if activeEffect and activeEffect.Atmosphere then
 			local effectAtmosphere = activeEffect.Atmosphere;
 			
@@ -233,7 +228,7 @@ return function()
 				modScreenRain.RainParticle = new;
 			end
 			modScreenRain:Enable();
-			
+
 			if activeEffect.EnableScreenRain == "Rain" then
 				modScreenRain.CanCreateDroplets = true;
 			else
