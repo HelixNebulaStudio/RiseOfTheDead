@@ -43,6 +43,8 @@ function Objective:Load()
 				return pickTable[a].Data.Name;
 			end
 		end
+
+		return;
 	end
 end
 
@@ -73,7 +75,7 @@ function Objective:Begin()
 			bossPrefab:SetAttribute("EntityHudHealth", true);
 			table.insert(bossList, bossPrefab);
 
-			npcModule.Humanoid.Died:Connect(function()
+			npcModule:Died(function()
 				game.Debris:AddItem(bossPrefab, 30);
 				for a=#Objective.BossNpcModules, 1, -1 do
 					if Objective.BossNpcModules[a] == npcModule then
@@ -91,7 +93,7 @@ function Objective:Begin()
 					BossKilled=true;
 					--LootPrefab=lootPrefab;
 				};
-			end);
+			end)
 			table.insert(Objective.BossNpcModules, npcModule);
 		end
 		

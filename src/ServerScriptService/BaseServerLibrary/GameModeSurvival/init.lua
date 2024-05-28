@@ -287,7 +287,7 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 				end
 			end)
 			
-			npcModule.Humanoid.Died:Connect(function()
+			npcModule:Died(function()
 				self.LastKilled = tick();
 				for a=#self.EnemyModules, 1, -1 do
 					if self.EnemyModules[a] == npcModule then
@@ -316,7 +316,7 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 				task.wait(1);
 			end
 			if npcModule.IsDead then return end;
-			npcModule:KillNpc();
+			npcModule:Destroy();
 		end)
 		self.EnemiesSpawned = self.EnemiesSpawned + 1;
 		newNpcModule = npcModule;
@@ -560,7 +560,7 @@ function Survival:StartWave(wave)
 		end)
 		
 		if tick()-waveStartTick >= 120 and #modNpc.NpcModules <= 0 then break; end;
-		if self.SkipWave then break; end;
+		if self.SkipWave then Debugger:Warn("Skip Wave"); break; end;
 	until self.Status ~= EnumStatus.InProgress;
 	
 	self.SkipWave = false;
@@ -592,7 +592,7 @@ function Survival:StartWave(wave)
 	
 	for a=#self.EnemyModules, 1, -1 do
 		game.Debris:AddItem(self.EnemyModules[a].Prefab, 0);
-		self.EnemyModules[a]:KillNpc();
+		self.EnemyModules[a]:Destroy();
 		table.remove(self.EnemyModules, a);
 	end
 	

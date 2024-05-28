@@ -484,6 +484,14 @@ function NpcComponent:GetHealth(valueType: string, bodyPart: BasePart)
 	return self.Humanoid.Health
 end
 
+function NpcComponent:Died(func)
+	if self.Humanoid == nil then return end;
+	return self.Humanoid:GetAttributeChangedSignal("IsDead"):Connect(function()
+		if self.Humanoid:GetAttribute("IsDead") ~= true then return end;
+		func();
+	end)
+end
+
 local ShirtParts = {
 	"UpperTorso"; "LowerTorso"; 
 	"LeftUpperArm"; "RightUpperArm"; 

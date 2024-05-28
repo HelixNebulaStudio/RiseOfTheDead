@@ -184,7 +184,7 @@ function GameMode:Start(room)
 			npcModule.OnTarget(players);
 			
 			npcModule.Humanoid.Died:Connect(function()
-				npcModule:KillNpc();
+				npcModule:Destroy();
 				task.delay(15, function() npc:Destroy(); end)
 				for a=#room.BossPrefabs, 1, -1 do
 					if room.BossPrefabs[a] == npc then
