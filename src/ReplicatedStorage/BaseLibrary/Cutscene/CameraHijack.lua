@@ -37,7 +37,7 @@ return function(CutsceneSequence)
 		
 		local sTick;
 		local duration = 6;
-		modData.CameraHandler:Bind("CameraHijack", {
+		modData.CameraClass:Bind("CameraHijack", {
 			RenderStepped=function(camera)
 				camera.Focus = focusCf
 				

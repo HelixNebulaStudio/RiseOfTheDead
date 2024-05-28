@@ -71,7 +71,8 @@ function NewTexture(id, pack, name, textureIds, color, tile, transparency, isMes
 	if SkinsLibrary.Library[id] then error("Texture ID("..id..") already exist!"); return end;
 	order = order+1;
 	local texturePackage = modTexturePackage.new(id, textureIds);
-	SkinsLibrary.Library[id] = {
+
+	local data = {
 		Id=id;
 		Pack=pack.Name;
 		Name=name;
@@ -84,7 +85,9 @@ function NewTexture(id, pack, name, textureIds, color, tile, transparency, isMes
 		IsMeshTexture=isMeshTexture==true;
 		Order=order;
 	};
+	SkinsLibrary.Library[id] = data;
 	table.insert(pack.List, SkinsLibrary.Library[id]);
+	return data;
 end
 
 function SkinsLibrary.Get(id)
@@ -206,15 +209,18 @@ function SkinsLibrary.SetTexture(part, id, generateTag)
 end
 
 --== Texture Pack: Basic
-NewTexture(1, SkinsLibrary.Packs.Basic, "Red Grids", "rbxassetid://2686209243", Color3.fromRGB(72, 49, 49), Vector2.new(0.1, 0.1));
-NewTexture(2, SkinsLibrary.Packs.Basic, "Green Grids", "rbxassetid://2686209243", Color3.fromRGB(59, 72, 49), Vector2.new(0.1, 0.1));
-NewTexture(3, SkinsLibrary.Packs.Basic, "Blue Grids", "rbxassetid://2686209243", Color3.fromRGB(44, 54, 72), Vector2.new(0.1, 0.1));
-NewTexture(4, SkinsLibrary.Packs.Basic, "Red Dots", "rbxassetid://2686209162", Color3.fromRGB(72, 49, 49), Vector2.new(0.05, 0.05));
-NewTexture(5, SkinsLibrary.Packs.Basic, "Green Dots", "rbxassetid://2686209162", Color3.fromRGB(59, 72, 49), Vector2.new(0.05, 0.05));
-NewTexture(6, SkinsLibrary.Packs.Basic, "Blue Dots", "rbxassetid://2686209162", Color3.fromRGB(44, 54, 72), Vector2.new(0.05, 0.05));
-NewTexture(7, SkinsLibrary.Packs.Basic, "Red Checkers", "rbxassetid://2692783156", Color3.fromRGB(72, 49, 49), Vector2.new(0.1, 0.1));
-NewTexture(8, SkinsLibrary.Packs.Basic, "Green Checkers", "rbxassetid://2692783156", Color3.fromRGB(59, 72, 49), Vector2.new(0.1, 0.1));
-NewTexture(9, SkinsLibrary.Packs.Basic, "Blue Checkers", "rbxassetid://2692783156", Color3.fromRGB(44, 54, 72), Vector2.new(0.1, 0.1));
+local basicConvert = function(lib)
+
+end
+NewTexture(1, SkinsLibrary.Packs.Basic, "Red Grids", "rbxassetid://2686209243", Color3.fromRGB(72, 49, 49), Vector2.new(0.1, 0.1)).Convert = basicConvert;
+NewTexture(2, SkinsLibrary.Packs.Basic, "Green Grids", "rbxassetid://2686209243", Color3.fromRGB(59, 72, 49), Vector2.new(0.1, 0.1)).Convert = basicConvert;
+NewTexture(3, SkinsLibrary.Packs.Basic, "Blue Grids", "rbxassetid://2686209243", Color3.fromRGB(44, 54, 72), Vector2.new(0.1, 0.1)).Convert = basicConvert;
+NewTexture(4, SkinsLibrary.Packs.Basic, "Red Dots", "rbxassetid://2686209162", Color3.fromRGB(72, 49, 49), Vector2.new(0.05, 0.05)).Convert = basicConvert;
+NewTexture(5, SkinsLibrary.Packs.Basic, "Green Dots", "rbxassetid://2686209162", Color3.fromRGB(59, 72, 49), Vector2.new(0.05, 0.05)).Convert = basicConvert;
+NewTexture(6, SkinsLibrary.Packs.Basic, "Blue Dots", "rbxassetid://2686209162", Color3.fromRGB(44, 54, 72), Vector2.new(0.05, 0.05)).Convert = basicConvert;
+NewTexture(7, SkinsLibrary.Packs.Basic, "Red Checkers", "rbxassetid://2692783156", Color3.fromRGB(72, 49, 49), Vector2.new(0.1, 0.1)).Convert = basicConvert;
+NewTexture(8, SkinsLibrary.Packs.Basic, "Green Checkers", "rbxassetid://2692783156", Color3.fromRGB(59, 72, 49), Vector2.new(0.1, 0.1)).Convert = basicConvert;
+NewTexture(9, SkinsLibrary.Packs.Basic, "Blue Checkers", "rbxassetid://2692783156", Color3.fromRGB(44, 54, 72), Vector2.new(0.1, 0.1)).Convert = basicConvert;
 
 --== Texture Pack: Camo
 NewTexture(11, SkinsLibrary.Packs.Camo, "Red Camo", "rbxassetid://4386335941", Color3.fromRGB(72, 49, 49), Vector2.new(1, 1));
@@ -681,7 +687,7 @@ NewTexture(108, SkinsLibrary.Packs.Special, "Cherry Blossom", {
 	{Id="rbxassetid://12960941945"; ZIndex=1; StudTileUV=Vector2.new(1, 1); Color=Color3.fromRGB(254, 231, 255);};
 });
 
-
+NewTexture(109, SkinsLibrary.Packs.Special, "Dev Textures", "rbxassetid://17633873288", Color3.fromRGB(255, 255, 255), Vector2.new(4, 4));
 
 --== Skin Pack: Full
 AddTexture{

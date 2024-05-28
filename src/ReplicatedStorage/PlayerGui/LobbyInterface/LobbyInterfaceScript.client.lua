@@ -635,7 +635,7 @@ function LeaveLobbyMenu(skipRequest)
 	modCharacter.CharacterProperties.CanAction = true;
 	modCharacter.CharacterProperties.AllowLerpBody = true;
 	
-	modData.CameraHandler:Unbind("lobbycamera");
+	modData.CameraClass:Unbind("lobbycamera");
 	lobbyCameraPoint = nil;
 	clearIndicators();
 
@@ -717,7 +717,7 @@ bindOpenLobbyInterface.Event:Connect(function(lobbyData) --cleared max depth che
 	
 	refreshStatus = true;
 	
-	modData.CameraHandler:Bind("lobbycamera", {
+	modData.CameraClass:Bind("lobbycamera", {
 		RenderStepped=function(camera)
 			if lobbyCameraPoint then
 				local cf = CFrame.new(lobbyCameraPoint.WorldPosition) * (lobbyCameraPoint.CFrame - lobbyCameraPoint.CFrame.p);

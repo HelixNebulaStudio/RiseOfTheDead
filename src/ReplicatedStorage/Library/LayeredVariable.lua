@@ -70,6 +70,15 @@ function LayeredVariable:Has(id)
 	return;
 end
 
+function LayeredVariable:Find(id)
+	for a=1, #self.Table do
+		if self.Table[a].Id == id then
+			return self.Table[a];
+		end
+	end
+	return;
+end
+
 function LayeredVariable:Get()
 	local t = self:GetTable();
 	if t == nil then return nil end;
@@ -86,7 +95,7 @@ end
 function LayeredVariable:Set(id, value, priority, expireDuration)
 	local exist = false;
 	
-	if expireDuration then task.delay(expireDuration, function() self.Dirty = true; end); end
+	--if expireDuration then task.delay(expireDuration, function() self.Dirty = true; end); end
 	
 	for a=1, #self.Table do
 		local tab = self.Table[a];

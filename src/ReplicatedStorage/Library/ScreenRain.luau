@@ -232,6 +232,10 @@ end
 local ScreenRain = {
 	Enabled = false,
 	_activeUpdater = false,
+
+	RainParticle = nil;
+	RainVisible = false;
+	CanCreateDroplets = true;
 }
 
 function ScreenRain:Enable(settings)
@@ -279,15 +283,21 @@ function ScreenRain:Enable(settings)
 			debug.profileend()
 
 			debug.profilebegin("Droplet Creation")
-			if self.Enabled and GlassGraphics and CameraCF.LookVector.Y > -0.4 and not UnderObject(CameraCF.Position) then
-				accumulatedChance += (now - lastCheck) * Settings.Rate
+			local isUnderObject = UnderObject(CameraCF.Position);
+			if self.Enabled and GlassGraphics and not isUnderObject then
+				self.RainVisible = true;
 
-				for _ = 1, math.floor(accumulatedChance) do
-					CreateDroplet()
+				if CameraCF.LookVector.Y > -0.4 and self.CanCreateDroplets then
+					accumulatedChance += (now - lastCheck) * Settings.Rate
+	
+					for _ = 1, math.floor(accumulatedChance) do
+						CreateDroplet()
+					end
 				end
 
 				accumulatedChance %= 1
 			else
+				self.RainVisible = false;
 				accumulatedChance %= 1
 			end
 			debug.profileend()

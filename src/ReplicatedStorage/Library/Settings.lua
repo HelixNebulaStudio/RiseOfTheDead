@@ -198,7 +198,7 @@ end)
 Settings.Add("TradeFriendsOnly", booleanOrNil)
 Settings.Add("DisabledTravelRequests", booleanOrNil)
 
---== Graphics;
+--MARK: Graphics;
 Settings.Add("DamageBubble", booleanOrNil)
 Settings.Add("BloodParticle", booleanOrNil)
 
@@ -225,6 +225,7 @@ Settings.Add("GlobalShadows", booleanOrNil)
 Settings.Add("DisableSmallShadows", booleanOrNil)
 Settings.Add("DisableTextureAnimation", booleanOrNil)
 Settings.Add("DisableParticle3D", booleanOrNil)
+Settings.Add("DisableWeatherParticles", booleanOrNil)
 
 --==
 Settings.Add("UseOldZombies", booleanOrNil);
@@ -651,6 +652,14 @@ baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 	DescProperties={Text="Particles that interact with the environment such as metal sparks, bullet shells, flesh chunks, etc..";};
 	Config={
 		SettingsKey="DisableParticle3D";
+		Type="Toggle";
+	};
+});
+baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
+	TitleProperties={Text="Weather Particles";};
+	DescProperties={Text="Particles of rain or snow.";};
+	Config={
+		SettingsKey="DisableWeatherParticles";
 		Type="Toggle";
 	};
 });

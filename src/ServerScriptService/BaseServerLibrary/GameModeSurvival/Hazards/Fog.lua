@@ -3,8 +3,9 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local Hazard = {};
 Hazard.__index = Hazard;
 
-Hazard.Title = "Fog";
+Hazard.Title = "Heavy Fog";
 
+local modWeatherService = require(game.ReplicatedStorage.Library.WeatherService);
 local TweenService = game:GetService("TweenService");
 
 Hazard.Controller = nil;
@@ -18,21 +19,6 @@ function Hazard.new()
 end
 
 function Hazard:Load()
-	self.Atmosphere = game.ReplicatedStorage:FindFirstChild("ServerAtmosphere");
-	
-	local function setFogAmbient()
-		local h, s, v = game.Lighting.OutdoorAmbient:ToHSV();
-		self.Atmosphere.Color = Color3.fromHSV(129/255, 43/255, math.min(227/255, v));
-	end
-	if self.Atmosphere == nil then
-		self.Atmosphere = script:WaitForChild("ServerAtmosphere"):Clone();
-		
-		setFogAmbient();
-		self.Atmosphere.Parent = game.ReplicatedStorage;
-	end
-	
-	game.Lighting:GetPropertyChangedSignal("OutdoorAmbient"):Connect(setFogAmbient)
-
 	Hazard.Spawns = {};
 	local fogSpawns = self.Controller.StageElements:FindFirstChild("FogSpawns");
 	if fogSpawns then
@@ -46,11 +32,9 @@ end
 function Hazard:Begin()
 	local config = self.Controller.FogConfig;
 	
-	TweenService:Create(self.Atmosphere, TweenInfo.new(10), {
-		Density=config.Density or 0.8;
-		Offset=0.2;
-		Haze=2.5;
-	}):Play();
+	modWeatherService:SetWeather({
+		Id="heavyfog";
+	});
 	
 	self.LastSpawnTick = tick();
 	self.HazardSpawns = {};
@@ -86,14 +70,8 @@ function Hazard:Tick()
 end
 
 function Hazard:End()
-	task.spawn(function()
-		TweenService:Create(self.Atmosphere, TweenInfo.new(10), {
-			Density=0.3;
-			Offset=0.3;
-			Haze=0;
-		}):Play();
-		
-	end)
+	modWeatherService:ClearWeather("heavyfog");
+	
 end
 
 return Hazard;

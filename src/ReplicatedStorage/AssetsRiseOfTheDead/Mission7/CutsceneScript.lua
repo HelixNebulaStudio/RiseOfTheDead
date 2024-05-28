@@ -312,7 +312,7 @@ return function(CutsceneSequence)
 		modCharacter.CharacterProperties.CharacterCameraEnabled = false;
 		modCharacter.MouseProperties.CameraSmoothing = 0.01;
 
-		modData.CameraHandler:Bind("LobbyCamera", {
+		modData.CameraClass:Bind("LobbyCamera", {
 			RenderStepped=function(camera)
 				camera.CFrame = CFrame.new(270.571594, 63.6824913, 125.062851, 0.796943724, 0.0513714477, -0.601865232, -0, 0.99637723, 0.0850445181, 0.604053617, -0.0677756965, 0.794056535);
 				camera.Focus = CFrame.new(271.77533, 63.5124016, 123.474731, 1, 0, 0, 0, 1, 0, 0, 0, 1);

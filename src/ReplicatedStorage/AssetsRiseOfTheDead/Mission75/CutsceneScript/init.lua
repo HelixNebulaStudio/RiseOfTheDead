@@ -757,7 +757,7 @@ return function(CutsceneSequence)
 	end);
 
 	CutsceneSequence:NewScene("BanditScout", function()
-		CutsceneSequence.modData.CameraHandler:Bind("BanditCam", {
+		CutsceneSequence.modData.CameraClass:Bind("BanditCam", {
 			RenderStepped=function(camera)
 				camera.CFrame = CFrame.new(517.524658, 142.722305, -1105.28735, 0.604053557, -0.177485421, 0.776928782, 7.4505806e-09, 0.974885404, 0.222707585, -0.796943784, -0.134527311, 0.588882923);
 				camera.Focus = CFrame.new(515.97052, 142.27681, -1106.46533, 1, 0, 0, 0, 1, 0, 0, 0, 1);

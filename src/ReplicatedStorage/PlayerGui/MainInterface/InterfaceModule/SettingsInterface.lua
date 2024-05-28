@@ -648,7 +648,7 @@ function Interface.init(modInterface)
 							update();
 							
 							if config.RefreshGraphics then
-								modData.CameraEffects:RefreshGraphics()
+								modData.CameraClass:RefreshGraphics()
 							end
 						end)
 					end
@@ -737,7 +737,7 @@ function Interface.init(modInterface)
 	if Interface.InitRefreshGraphics == nil then
 		Interface.InitRefreshGraphics = true;
 
-		modData.CameraEffects:RefreshGraphics();
+		modData.CameraClass:RefreshGraphics();
 	end
 
 	Interface.Garbage:Tag(modData.OnDataEvent:Connect(function(action, hierarchyKey, data)

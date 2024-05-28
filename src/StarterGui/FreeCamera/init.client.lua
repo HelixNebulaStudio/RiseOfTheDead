@@ -328,7 +328,7 @@ local function EnterFreecam()
 	end
 	--RS:BindToRenderStep("Freecam", Enum.RenderPriority.Camera.Value, UpdateFreecam)
 	
-	modData.CameraHandler:Bind("freecam", {
+	modData.CameraClass:Bind("freecam", {
 		RenderStepped = UpdateFreecam;
 		CameraType = Enum.CameraType.Scriptable;
 	}, 3);
@@ -350,7 +350,7 @@ local function ExitFreecam()
 	UIS.MouseIconEnabled = true
 	UIS.MouseBehavior = Enum.MouseBehavior.Default
 	Maid:Sweep()
-	modData.CameraHandler:Unbind("freecam");
+	modData.CameraClass:Unbind("freecam");
 	--RS:UnbindFromRenderStep("Freecam")
 	
 	--local hum, hrp = GetChar()
@@ -413,7 +413,7 @@ UIS.InputBegan:Connect(function(input, processed)
 	end
 end)
 
-local activeCameraLayer = modData.CameraHandler.RenderLayers:GetTable();
+local activeCameraLayer = modData.CameraClass.RenderLayers:GetTable();
 
 if activeCameraLayer.Id == "freecam" then
 	EnterFreecam();

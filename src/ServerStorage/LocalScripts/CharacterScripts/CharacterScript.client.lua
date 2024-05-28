@@ -321,11 +321,11 @@ function onCameraSubjectUpdate()
 	end
 	
 	
-	local cameraEffects = modData.CameraEffects;
+	local cameraEffects = modData.CameraClass;
 	task.spawn(function()
 		while cameraEffects == nil do
 			task.wait();
-			cameraEffects = modData.CameraEffects;
+			cameraEffects = modData.CameraClass;
 		end
 
 		if not CameraSubject.IsClientSubject then
@@ -1098,7 +1098,8 @@ toggleCameraMode();
 
 
 RunService:BindToRenderStep("OffCamRender", Enum.RenderPriority.Input.Value, function(delta)
-	local activeCameraLayer = modData.CameraHandler.RenderLayers:GetTable();
+	if modData.CameraClass == nil then return end;
+	local activeCameraLayer = modData.CameraClass.RenderLayers:GetTable();
 	
 	if activeCameraLayer.Id == "freecam" then
 		pcall(function()
@@ -1471,7 +1472,7 @@ local function renderStepped(camera, deltaTime)
 	
 end 
 
-modData.CameraHandler:Bind("default", {
+modData.CameraClass:Bind("default", {
 	RenderStepped = renderStepped;
 	CameraType = Enum.CameraType.Scriptable;
 });
@@ -1612,7 +1613,7 @@ RunService.Stepped:Connect(function(total, delta)
 		characterProperties.SwimSpeed = classPlayer:GetBodyEquipment("SwimmingSpeed") or characterProperties.DefaultSwimSpeed;
 		characterProperties.SprintSpeed = classPlayer:GetBodyEquipment("SprintingSpeed") or characterProperties.DefaultSprintSpeed;
 		
-		local cameraEffects = modData.CameraEffects;
+		local cameraEffects = modData.CameraClass;
 		local isKnockedOut = classPlayer.Properties.KnockedOut ~= nil;
 		if isKnockedOut then
 			if characterProperties.IsKnockedOut ~= isKnockedOut then

@@ -12,20 +12,38 @@ return function()
 	local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 	local modWeatherService = require(game.ReplicatedStorage.Library.WeatherService);
 	local modScreenRain = require(game.ReplicatedStorage.Library.ScreenRain);
+	local modWeatherLibrary = require(game.ReplicatedStorage.Library.WeatherLibrary);
 
+	local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
+
+	local particlesFolder = game.ReplicatedStorage.Particles;
 	--== Camera Handler
 	local camera = workspace.CurrentCamera;
 
-	local CameraHandler = {};
-	CameraHandler.__index = CameraHandler;
-	CameraHandler.PreviousLayerId = nil;
+	--MARK: CameraParticles
+	local cameraParticlePart = Instance.new("Part");
+	cameraParticlePart.Name = "CameraParticlePart";
+	cameraParticlePart.Anchored = true;
+	cameraParticlePart.CanCollide = false;
+	cameraParticlePart.CanQuery = false;
+	cameraParticlePart.Size = Vector3.new(200, 0, 200);
+	cameraParticlePart.Transparency = 1;
+	cameraParticlePart.Parent = camera;
+	
+	RunService.Heartbeat:Connect(function()
+		cameraParticlePart.CFrame = CFrame.new(camera.CFrame.X, camera.CFrame.Y+100, camera.CFrame.Z);
+	end)
+
+	local CameraClass = {};
+	CameraClass.__index = CameraClass;
+	CameraClass.PreviousLayerId = nil;
 
 	-- Camera priority level
 	-- 1 Character
 	-- 2 Cutscene
 	-- 3 Freecam
 
-	CameraHandler.RenderLayers = modLayeredVariable.new({});
+	CameraClass.RenderLayers = modLayeredVariable.new({});
 	
 	local RenderLayer = {
 		FieldOfView = 70;
@@ -33,22 +51,22 @@ return function()
 	};
 	RenderLayer.__index = RenderLayer;
 	
-	function CameraHandler:Bind(layerId, bindInput, priority, expire)
+	function CameraClass:Bind(layerId, bindInput, priority, expire)
 		setmetatable(bindInput, RenderLayer);
-		CameraHandler.RenderLayers:Set(layerId, bindInput, priority, expire);
+		CameraClass.RenderLayers:Set(layerId, bindInput, priority, expire);
 	end
 	
-	function CameraHandler:Unbind(layerId)
-		CameraHandler.RenderLayers:Remove(layerId);
+	function CameraClass:Unbind(layerId)
+		CameraClass.RenderLayers:Remove(layerId);
 	end
 	
 	local totalDelta = 0;
-	RunService:BindToRenderStep("CameraHandler", Enum.RenderPriority.Camera.Value-1, function(delta)
-		local layer = CameraHandler.RenderLayers:GetTable();
+	RunService:BindToRenderStep("CameraClass", Enum.RenderPriority.Camera.Value-1, function(delta)
+		local layer = CameraClass.RenderLayers:GetTable();
 		local activeRenderLayer = layer.Value;
 		
-		if layer.Id ~= CameraHandler.PreviousLayerId then
-			CameraHandler.PreviousLayerId = layer.Id;
+		if layer.Id ~= CameraClass.PreviousLayerId then
+			CameraClass.PreviousLayerId = layer.Id;
 			
 			Debugger:Log("CameraLayer changed", layer.Id);
 		end
@@ -63,18 +81,17 @@ return function()
 		end
 	end)
 	
-	modData.CameraHandler = CameraHandler;
 	
-	--== CameraEffects
-	local CameraEffects = {
-		Atmosphere = nil;
-		Fog = nil;
-	};
-	CameraEffects.__index = CameraEffects;
 
-	modData.CameraEffects = CameraEffects;
-	
-	--== CameraColorCorrection
+	local function setFogAmbient()
+		local _, _, v = game.Lighting.OutdoorAmbient:ToHSV();
+		CameraClass.AtmosphereColor = Color3.fromHSV(129/255, 43/255, math.min(227/255, v));
+	end
+	setFogAmbient();
+	game.Lighting:GetPropertyChangedSignal("OutdoorAmbient"):Connect(setFogAmbient)
+
+
+	--== MARK: CameraColorCorrection
 	local ccName = "ClientCameraColorCorrection";
 	local colorCorrection: ColorCorrectionEffect = camera:FindFirstChild(ccName);
 	if colorCorrection == nil then 
@@ -83,40 +100,21 @@ return function()
 		colorCorrection.Parent = camera;
 	end;
 
-	CameraEffects.Brightness = modLayeredVariable.new(0);
-	CameraEffects.Contrast = modLayeredVariable.new(0);
-	CameraEffects.Saturation = modLayeredVariable.new(0.2);
-	CameraEffects.TintColor = modLayeredVariable.new(Color3.fromRGB(255, 255, 255)); --255, 238, 230
-	--== MARK: CameraColorCorrection
+	CameraClass.Brightness = modLayeredVariable.new(0);
+	CameraClass.Contrast = modLayeredVariable.new(0);
+	CameraClass.Saturation = modLayeredVariable.new(0.2);
+	CameraClass.TintColor = modLayeredVariable.new(Color3.fromRGB(255, 255, 255)); --255, 238, 230
 	
-	--== MARK: CameraFog
-	local camFog = CameraEffects.Fog;
-	if camFog == nil then
-		CameraEffects.Fog = {};
-		camFog = CameraEffects.Fog;
-	end
 
-	camFog.Enabled = modLayeredVariable.new(false);
-	camFog.FogColor = modLayeredVariable.new(nil);
-	camFog.FogStart = modLayeredVariable.new(nil);
-	camFog.FogEnd = modLayeredVariable.new(nil);
-	
-	function CameraEffects:SetFog(fogData: {FogColor: Color3?; FogStart: number?; FogEnd: number?}, id, priority, expireDuration)
-		camFog.Enabled:Set(id, true, priority, expireDuration);
-		
-		if fogData.FogColor then
-			camFog.FogColor:Set(id, fogData.FogColor, priority, expireDuration);
-		end
-		if fogData.FogStart then
-			camFog.FogStart:Set(id, fogData.FogStart, priority, expireDuration);
-		end
-		if fogData.FogEnd then
-			camFog.FogEnd:Set(id, fogData.FogEnd, priority, expireDuration);
-		end
-	end
-	--== CameraFog
+	--== MARK: CameraEffectSystem
+	CameraClass.EffectsPriority = {
+		Sky=1;
+		Weather=3;
+		Environment=6;
+		Ability=9;
+	}
+	CameraClass.Effects = modLayeredVariable.new();
 
-	--== MARK: CameraAtmosphere
 	local atmosName = "ClientCameraAtmosphere";
 	local atmosphere: Atmosphere = Lighting:FindFirstChild(atmosName);
 	if atmosphere == nil then 
@@ -125,132 +123,165 @@ return function()
 		atmosphere.Parent = script;
 	end;
 	
-	local camAtmosphere = CameraEffects.Atmosphere;
-	if camAtmosphere == nil then
-		CameraEffects.Atmosphere = {};
-		camAtmosphere = CameraEffects.Atmosphere;
-	end
-	
 	local defaultAtmosphere: Atmosphere = game.Lighting:FindFirstChild("DefaultAtmosphere");
-	
-	camAtmosphere.Enabled = modLayeredVariable.new(defaultAtmosphere and true or false);
-	camAtmosphere.Density = modLayeredVariable.new(defaultAtmosphere and defaultAtmosphere.Density or 0.395);
-	camAtmosphere.Offset = modLayeredVariable.new(defaultAtmosphere and defaultAtmosphere.Offset or 0);
-
-	camAtmosphere.Color = modLayeredVariable.new(defaultAtmosphere and defaultAtmosphere.Color or Color3.fromRGB(199, 170, 107));
-	camAtmosphere.Decay = modLayeredVariable.new(defaultAtmosphere and defaultAtmosphere.Decay or Color3.fromRGB(92, 60, 13));
-	camAtmosphere.Glare = modLayeredVariable.new(defaultAtmosphere and defaultAtmosphere.Glare or 0);
-	camAtmosphere.Haze = modLayeredVariable.new(defaultAtmosphere and defaultAtmosphere.Haze or 0);
-	
-	function CameraEffects:SetAtmosphere(atmo: Atmosphere, id, priority, expireDuration)
-		camAtmosphere.Enabled:Set(id, true, priority, expireDuration);
-		
-		camAtmosphere.Density:Set(id, atmo.Density, priority, expireDuration);
-		camAtmosphere.Offset:Set(id, atmo.Offset, priority, expireDuration);
-
-		camAtmosphere.Color:Set(id, atmo.Color, priority, expireDuration);
-		camAtmosphere.Decay:Set(id, atmo.Decay, priority, expireDuration);
-		camAtmosphere.Glare:Set(id, atmo.Glare, priority, expireDuration);
-		camAtmosphere.Haze:Set(id, atmo.Haze, priority, expireDuration);
+	if defaultAtmosphere then
+		CameraClass.Effects:Set("sky", {
+			Atmosphere = {
+				Density=defaultAtmosphere.Density;
+				Offset=defaultAtmosphere.Offset;
+				Color=defaultAtmosphere.Color;
+				Decay=defaultAtmosphere.Decay;
+				Glare=defaultAtmosphere.Glare;
+				Haze=defaultAtmosphere.Haze;
+			};
+		}, CameraClass.EffectsPriority.Sky);
+		game.Debris:AddItem(defaultAtmosphere, 0);
 	end
-	
-	function CameraEffects:ClearAtmosphere(id)
-		camAtmosphere.Enabled:Remove(id);
 
-		camAtmosphere.Density:Remove(id);
-		camAtmosphere.Offset:Remove(id);
-
-		camAtmosphere.Color:Remove(id);
-		camAtmosphere.Decay:Remove(id);
-		camAtmosphere.Glare:Remove(id);
-		camAtmosphere.Haze:Remove(id);
-	end
-	
-	local serverAtmosphere;
-	game.ReplicatedStorage.ChildAdded:Connect(function(child)
-		if child:IsA("Atmosphere") and child.Name == "ServerAtmosphere" then
-			serverAtmosphere = child;
-		else
-			task.wait();
-			serverAtmosphere = game.ReplicatedStorage:FindFirstChild("ServerAtmosphere");
-		end
-	end)
-	game.ReplicatedStorage.ChildRemoved:Connect(function(child)
-		if child == serverAtmosphere then
-			serverAtmosphere = nil;
-		end
-	end)
-	
-	--==
-
-	local skipRender = tick();
+	local previousWeather = nil;
+	local logDebounce = tick();
 	RunService.RenderStepped:Connect(function(delta)
-		local renderTick = tick();
-		if skipRender > renderTick then
-			return;
-		end
-		if modData:IsMobile() then
-			skipRender = renderTick + (delta*2);
-		end
+		colorCorrection.Brightness = CameraClass.Brightness:Get();
+		colorCorrection.Contrast = CameraClass.Contrast:Get();
+		colorCorrection.Saturation = CameraClass.Saturation:Get();
+		colorCorrection.TintColor = CameraClass.TintColor:Get();
 
-		colorCorrection.Brightness = CameraEffects.Brightness:Get();
-		colorCorrection.Contrast = CameraEffects.Contrast:Get();
-		colorCorrection.Saturation = CameraEffects.Saturation:Get();
-		colorCorrection.TintColor = CameraEffects.TintColor:Get();
-		
-		local camFogEnabled = camFog.Enabled:Get();
-		if camFogEnabled then
-			Lighting.FogColor = camFog.FogColor:Get() or Lighting:GetAttribute("FogColor");
-			Lighting.FogStart = camFog.FogStart:Get() or Lighting:GetAttribute("FogStart");
-			Lighting.FogEnd = camFog.FogEnd:Get() or Lighting:GetAttribute("FogEnd");
+		local cameraEffects = CameraClass.Effects;
+
+		-- MARK: WeatherEffects;
+		local activeWeather = modWeatherService:GetActive();
+		local weatherId = activeWeather and activeWeather.Id;
+
+		local weatherLib = weatherId and modWeatherLibrary:Find(weatherId) or nil;
+		if weatherLib and weatherLib.CameraEffect then
+			local weatherEffect = cameraEffects:Find("weather");
+			local weatherEffectValue = weatherEffect and weatherEffect.Value or {};
+			
+			if weatherEffectValue.Id ~= weatherId then
+				previousWeather = modTables.DeepClone(weatherEffectValue);
+				if previousWeather then previousWeather.EndTick = tick() end;
+			end
+
+			weatherEffectValue.Id = weatherId;
+			for k, v in pairs(weatherLib.CameraEffect) do
+				weatherEffectValue[k] = v;
+			end
+
+			if weatherEffect == nil then
+				cameraEffects:Set("weather", weatherEffectValue, CameraClass.EffectsPriority.Weather);
+			end
 
 		else
-			Lighting.FogColor = Lighting:GetAttribute("FogColor");
-			Lighting.FogStart = Lighting:GetAttribute("FogStart");
-			Lighting.FogEnd = Lighting:GetAttribute("FogEnd");
+			local weatherEffect = cameraEffects:Find("weather");
+			if weatherEffect and weatherEffect.Value then
+				previousWeather = modTables.DeepClone(weatherEffect and weatherEffect.Value);
+				if previousWeather then previousWeather.EndTick = tick() end;
+			end
+
+			cameraEffects:Remove("weather");
 
 		end
 
-		local atmosphereEnabledTable = camAtmosphere.Enabled:GetTable();
-		local atmosphereEnabled = atmosphereEnabledTable.Value;
-		
-		if serverAtmosphere and serverAtmosphere.Parent == game.ReplicatedStorage and atmosphereEnabledTable.Order <= 1 then
-			atmosphere.Density = serverAtmosphere.Density;
-			atmosphere.Offset = serverAtmosphere.Offset;
+		-- MARK: CameraEffects
+		local activeEffect = cameraEffects:Get();
 
-			atmosphere.Color = serverAtmosphere.Color;
-			atmosphere.Decay = serverAtmosphere.Decay;
-			atmosphere.Glare = serverAtmosphere.Glare;
-			atmosphere.Haze = serverAtmosphere.Haze;
-			atmosphereEnabled = true;
+		if tick()-logDebounce >= 5 then
+			logDebounce = tick();
+			Debugger:StudioWarn("ActiveEffect",activeEffect,"\nPreviousWeather",previousWeather);
+		end
+
+		if activeEffect and activeEffect.Atmosphere then
+			local effectAtmosphere = activeEffect.Atmosphere;
 			
-		elseif atmosphereEnabled == true then
-			atmosphere.Density = camAtmosphere.Density:Get();
-			atmosphere.Offset = camAtmosphere.Offset:Get();
+			atmosphere.Density = effectAtmosphere.Density or atmosphere.Density;
+			atmosphere.Offset = effectAtmosphere.Offset or atmosphere.Offset;
 
-			atmosphere.Color = camAtmosphere.Color:Get();
-			atmosphere.Decay = camAtmosphere.Decay:Get();
-			atmosphere.Glare = camAtmosphere.Glare:Get();
-			atmosphere.Haze = camAtmosphere.Haze:Get();
-			
-		end
-		
-		if atmosphere.Parent == nil then
-			atmosphere = Instance.new("Atmosphere");
-			atmosphere.Parent = script;
-			atmosphere.Name = atmosName;
-		end
-		
-		if atmosphereEnabled == true and atmosphere.Parent ~= Lighting then
+			atmosphere.Color = (effectAtmosphere.UseAmbientColor and CameraClass.AtmosphereColor) or effectAtmosphere.Color or atmosphere.Color;
+			atmosphere.Decay = effectAtmosphere.Decay or atmosphere.Decay;
+			atmosphere.Glare = effectAtmosphere.Glare or atmosphere.Glare;
+			atmosphere.Haze = effectAtmosphere.Haze or atmosphere.Haze;
+
 			atmosphere.Parent = Lighting;
-			
-		elseif atmosphereEnabled == false and atmosphere.Parent ~= script then
+		else
 			atmosphere.Parent = script;
+
+		end
+
+		local fogColor = Lighting:GetAttribute("FogColor");
+		local fogStart = Lighting:GetAttribute("FogStart");
+		local fogEnd = Lighting:GetAttribute("FogEnd");
+		if activeEffect and activeEffect.Fog then
+			local effectFog = activeEffect.Fog;
+
+			fogColor = effectFog.Color or fogColor;
+			fogStart = effectFog.Start or fogStart;
+			fogEnd = effectFog.End or fogEnd;
+		end
+
+		Lighting.FogColor = fogColor;
+		Lighting.FogStart = fogStart;
+		Lighting.FogEnd = fogEnd;
+
+		if activeEffect and activeEffect.EnableScreenRain then
+			local weatherParticleName = "Weather"..activeEffect.EnableScreenRain;
+			if modScreenRain.RainParticle == nil or modScreenRain.RainParticle.Name ~= weatherParticleName then
+				if modScreenRain.RainParticle then
+					game.Debris:AddItem(modScreenRain.RainParticle, 0);
+				end
+				local new = particlesFolder:WaitForChild(weatherParticleName):Clone();
+				new.Parent = cameraParticlePart;
+				modScreenRain.RainParticle = new;
+			end
+			modScreenRain:Enable();
 			
+			if activeEffect.EnableScreenRain == "Rain" then
+				modScreenRain.CanCreateDroplets = true;
+			else
+				modScreenRain.CanCreateDroplets = false;
+			end
+			
+		else
+			modScreenRain:Disable();
+
+		end
+
+		if modScreenRain.RainParticle then
+			if modData:GetSetting("DisableWeatherParticles") ~= 1 then
+				modScreenRain.RainParticle.Enabled = modScreenRain.RainVisible;
+			else
+				modScreenRain.RainParticle.Enabled = false;
+			end
 		end
 	end)
+
+	function CameraClass:SetFog(fogData: {FogColor: Color3?; FogStart: number?; FogEnd: number?}, id, priority, expireDuration)
+		CameraClass.Effects:Set(id, {
+			Fog=fogData;
+		}, priority, expireDuration);
+	end
 	
-	function CameraEffects:RefreshGraphics()
+	function CameraClass:SetAtmosphere(atmo: Atmosphere, id, priority, expireDuration)
+		local atmosphereData = {
+			Density=atmo.Density;
+			Offset=atmo.Offset;
+			Color=atmo.Color;
+			Decay=atmo.Decay;
+			Glare=atmo.Glare;
+			Haze=atmo.Haze;
+		};
+
+		CameraClass.Effects:Set(id, {
+			Atmosphere=atmosphereData;
+		}, priority, expireDuration);
+	end
+	
+	function CameraClass:ClearAtmosphere(id)
+		CameraClass.Effects:Remove(id);
+	end
+	
+
+	
+	function CameraClass:RefreshGraphics()
 		if game.Lighting:FindFirstChild("SunRays") then
 			game.Lighting.SunRays.Enabled = modData:GetSetting("FilterSunRays") ~= 1;
 		end
@@ -275,6 +306,9 @@ return function()
 		modTextureAnimations.Update();
 	end
 	
+	modData.CameraClass = CameraClass;
+	
+	--== MARK: Graphics Chunks
 	local graphicsChunks = modVoxelSpace.new();
 	
 	local overlapParam = OverlapParams.new();
@@ -457,5 +491,5 @@ return function()
 		
 	end);
 	
-	return CameraEffects;
+	return CameraClass;
 end
