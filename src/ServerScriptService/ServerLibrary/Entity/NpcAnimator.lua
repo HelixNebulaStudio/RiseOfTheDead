@@ -5,8 +5,6 @@ local modEmotes = require(game.ReplicatedStorage.Library.EmotesLibrary);
 local modAnimationController = require(game.ReplicatedStorage.Library.AnimationController);
 local modRegion = require(game.ReplicatedStorage.Library.Region);
 
-local function lerp(a, b, t) return a * (1-t) + (b*t); end
-
 return function(self)
 	if self.Humanoid == nil then Debugger:Warn("NpcAnimator>>  ",self.Name,"is missing humanoid."); return end;
 

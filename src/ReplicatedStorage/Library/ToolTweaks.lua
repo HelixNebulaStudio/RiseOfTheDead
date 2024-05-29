@@ -9,6 +9,8 @@ local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 
+local modMath = require(game.ReplicatedStorage.Library.Util.Math)
+
 if RunService:IsServer() then
 	modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 	modPseudoRandom = require(game.ReplicatedStorage.Library.PseudoRandom);
@@ -120,7 +122,6 @@ function ToolTweaks.LoadGraph(graphSeed, styleDir)
 	local function MapNum(x, inMin, inMax, outMin, outMax)
 		return (x - inMin)*(outMax - outMin)/(inMax - inMin) + outMin
 	end
-	local function lerp(a, b, t) return a * (1-t) + (b*t); end
 
 	local seed = graphSeed;
 	local data = {};
@@ -217,7 +218,7 @@ function ToolTweaks.LoadGraph(graphSeed, styleDir)
 		
 		for i=1, range do
 			local t = TweenService:GetValue(math.clamp(i/range, 0, 1), activeStyle, activeDirection);
-			local v = lerp(lastPoint.Y, currPoint.Y, t);
+			local v = modMath.Lerp(lastPoint.Y, currPoint.Y, t);
 			
 			table.insert(data, {
 				Value = (v * 100);

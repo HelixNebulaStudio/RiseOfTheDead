@@ -1,6 +1,3 @@
---== Configuration;
-local function lerp(a, b, t) return a * (1-t) + (b*t); end
-
 --== Variables;
 local localPlayer = game.Players.LocalPlayer;
 local currentCamera = workspace.CurrentCamera;
@@ -46,6 +43,7 @@ local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariabl
 local modSpectateManager = require(game.ReplicatedStorage.Library.SpectateManager);
 
 local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
+local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 
 Debugger.AwaitShared("modPlayers");
 local classPlayer = shared.modPlayers.Get(localPlayer);
@@ -972,7 +970,7 @@ function CameraShakeAndZoom(shakeStrength, zoomStrength, duration, smoothing, di
 		end
 		repeat
 			local lerpAlpha = (math.clamp((tick() - startTick), 0, halfDuration)/halfDuration);
-			additionalZoom = lerp(oldZoom, zoomStrength, 0.2);
+			additionalZoom = modMath.Lerp(oldZoom, zoomStrength, 0.2);
 			oldZoom = additionalZoom;
 			local offset = Vector3.new(newNoise(tickX, 0), newNoise(0, tickY), 0)*0.5*shakeStrength*(1-lerpAlpha);
 			cameraOriginOffset = offset;
@@ -984,7 +982,7 @@ function CameraShakeAndZoom(shakeStrength, zoomStrength, duration, smoothing, di
 		startTick = tick();
 		repeat
 			local lerpAlpha = (math.clamp((tick() - startTick), 0, halfDuration)/halfDuration);
-			additionalZoom = lerp(oldZoom, 0, 0.05);
+			additionalZoom = modMath.Lerp(oldZoom, 0, 0.05);
 			oldZoom = additionalZoom;
 			cameraOriginOffset = oldShakeOffset:lerp(Vector3.new(), lerpAlpha);
 			oldShakeOffset = cameraOriginOffset;
@@ -1221,7 +1219,7 @@ local function renderStepped(camera, deltaTime)
 			characterProperties.IsFocused = false;
 		end
 	end
-	camera.FieldOfView = lerp(lastFOV, characterProperties.FieldOfView or characterProperties.BaseFieldOfView, 0.2);
+	camera.FieldOfView = modMath.Lerp(lastFOV, characterProperties.FieldOfView or characterProperties.BaseFieldOfView, 0.2);
 	lastFOV = camera.FieldOfView;
 
 	local defaultSensitivity = mouseProperties.DefaultSensitivity;
@@ -1275,7 +1273,7 @@ local function renderStepped(camera, deltaTime)
 		end
 		 
 		newCamOffsetX = originRayHit ~= nil and ((originRayEnd-originCollisionRay.Origin)/(originCollisionRay.Direction.unit)).X or sideOffsets;
-		if oldCamOffsetX < newCamOffsetX then newCamOffsetX = lerp(oldCamOffsetX, newCamOffsetX, 0.2); end
+		if oldCamOffsetX < newCamOffsetX then newCamOffsetX = modMath.Lerp(oldCamOffsetX, newCamOffsetX, 0.2); end
 		oldCamOffsetX = newCamOffsetX;
 
 		local newCamOffsetY = oldCamOffsetY;
@@ -1289,7 +1287,7 @@ local function renderStepped(camera, deltaTime)
 
 		if modData:IsMobile() then
 		else
-			newCamOffsetY = lerp(oldCamOffsetY, newCamOffsetY, 0.2);
+			newCamOffsetY = modMath.Lerp(oldCamOffsetY, newCamOffsetY, 0.2);
 		end
 		
 		oldCamOffsetY = newCamOffsetY;
@@ -1347,7 +1345,7 @@ local function renderStepped(camera, deltaTime)
 				hipHeight = 2.5;
 			end
 
-			hipHeight = lerp(prevHipHeight, hipHeight, 0.2);
+			hipHeight = modMath.Lerp(prevHipHeight, hipHeight, 0.2);
 			prevHipHeight = hipHeight;
 
 			local cameraCFrame = rootPoint;
@@ -1464,11 +1462,11 @@ local function renderStepped(camera, deltaTime)
 	characterProperties.ViewModelSwayPitch = math.rad(math.clamp(mouseDelta.Y * (characterProperties.IsFocused and 0.05 or 0.5), -5, 5));
 	characterProperties.ViewModelSwayYaw = math.rad(math.clamp(mouseDelta.X * (characterProperties.IsFocused and 0.05 or 0.5), -2.5, 2.5));
 
-	characterProperties.ViewModelSwayX = lerp(characterProperties.ViewModelSwayX, 0, 0.1);
-	characterProperties.ViewModelSwayY = lerp(characterProperties.ViewModelSwayY, 0, 0.1);
-	characterProperties.ViewModelSwayRoll = lerp(characterProperties.ViewModelSwayRoll, 0, 0.1);
-	characterProperties.ViewModelSwayPitch = lerp(characterProperties.ViewModelSwayPitch, 0, 0.1);
-	characterProperties.ViewModelSwayYaw = lerp(characterProperties.ViewModelSwayYaw, 0, 0.1);
+	characterProperties.ViewModelSwayX = modMath.Lerp(characterProperties.ViewModelSwayX, 0, 0.1);
+	characterProperties.ViewModelSwayY = modMath.Lerp(characterProperties.ViewModelSwayY, 0, 0.1);
+	characterProperties.ViewModelSwayRoll = modMath.Lerp(characterProperties.ViewModelSwayRoll, 0, 0.1);
+	characterProperties.ViewModelSwayPitch = modMath.Lerp(characterProperties.ViewModelSwayPitch, 0, 0.1);
+	characterProperties.ViewModelSwayYaw = modMath.Lerp(characterProperties.ViewModelSwayYaw, 0, 0.1);
 	
 end 
 
@@ -1669,14 +1667,14 @@ RunService.Heartbeat:Connect(function(step)
 		characterProperties.RefreshTransparency = true;
 	end
 	
-	mouseProperties.XAngOffset = lerp(mouseProperties.XAngOffset, 0,  math.clamp( (mouseProperties.XAngOffset/1)*0.3 , 0.05, 0.3) );
-	mouseProperties.YAngOffset = lerp(mouseProperties.YAngOffset, 0, math.clamp( (mouseProperties.YAngOffset/1)*0.3 , 0.05, 0.3) );
-	mouseProperties.ZAngOffset = lerp(mouseProperties.ZAngOffset, 0, math.clamp( (mouseProperties.ZAngOffset/1)*0.3 , 0.05, 0.3) );
+	mouseProperties.XAngOffset = modMath.Lerp(mouseProperties.XAngOffset, 0,  math.clamp( (mouseProperties.XAngOffset/1)*0.3 , 0.05, 0.3) );
+	mouseProperties.YAngOffset = modMath.Lerp(mouseProperties.YAngOffset, 0, math.clamp( (mouseProperties.YAngOffset/1)*0.3 , 0.05, 0.3) );
+	mouseProperties.ZAngOffset = modMath.Lerp(mouseProperties.ZAngOffset, 0, math.clamp( (mouseProperties.ZAngOffset/1)*0.3 , 0.05, 0.3) );
 	if math.abs(mouseProperties.XAngOffset) < 0.001 then mouseProperties.XAngOffset = 0 end;
 	if math.abs(mouseProperties.YAngOffset) < 0.001 then mouseProperties.YAngOffset = 0 end;
 	if math.abs(mouseProperties.ZAngOffset) < 0.001 then mouseProperties.ZAngOffset = 0 end;
 	
-	mouseProperties.FlinchInacc = lerp(mouseProperties.FlinchInacc, 0, 0.05);
+	mouseProperties.FlinchInacc = modMath.Lerp(mouseProperties.FlinchInacc, 0, 0.05);
 	if math.abs(mouseProperties.FlinchInacc) < 0.1 then mouseProperties.FlinchInacc = 0 end;
 	
 	if beatTick-Cache.OneSecTick >= 1 then
@@ -1802,7 +1800,7 @@ RunService.Heartbeat:Connect(function(step)
 				animations["woundedIdle"]:Play();
 			end
 
-			characterProperties.WalkSpeed:Set("default", lerp(characterProperties.NewWalkSpeed, characterProperties.WoundedSpeed, 0.6));
+			characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, characterProperties.WoundedSpeed, 0.6));
 			characterProperties.NewWalkSpeed = humanoid.WalkSpeed;
 			collisionModelId = "Wounded";
 			if characterProperties.IsSliding then
@@ -1848,7 +1846,7 @@ RunService.Heartbeat:Connect(function(step)
 			animations["crouchWalk"]:Stop();
 			characterProperties.IsCrouching = false;
 			
-			characterProperties.WalkSpeed:Set("default", lerp(characterProperties.NewWalkSpeed, characterProperties.SwimSpeed, 0.6));
+			characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, characterProperties.SwimSpeed, 0.6));
 			characterProperties.NewWalkSpeed = humanoid.WalkSpeed;
 			collisionModelId = "Swimming";
 			
@@ -1856,7 +1854,7 @@ RunService.Heartbeat:Connect(function(step)
 			animations["woundedIdle"]:Stop();
 			
 			if characterProperties.CustomWalkSpeed then
-				characterProperties.WalkSpeed:Set("custom", lerp(characterProperties.NewWalkSpeed, characterProperties.CustomWalkSpeed, 0.6), 1);
+				characterProperties.WalkSpeed:Set("custom", modMath.Lerp(characterProperties.NewWalkSpeed, characterProperties.CustomWalkSpeed, 0.6), 1);
 				characterProperties.NewWalkSpeed = humanoid.WalkSpeed;
 				animations["crouchIdle"]:Stop();
 			else
@@ -1867,7 +1865,7 @@ RunService.Heartbeat:Connect(function(step)
 			
 			if characterProperties.IsCrouching then
 				collisionModelId = "Crouch";
-				characterProperties.WalkSpeed:Set("default", lerp(characterProperties.NewWalkSpeed, characterProperties.CrouchSpeed * adsMulti, 0.6));
+				characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, characterProperties.CrouchSpeed * adsMulti, 0.6));
 				characterProperties.NewWalkSpeed = humanoid.WalkSpeed;
 				if not characterProperties.CrouchKeyDown then crouchToggleCheck(rootPart.CFrame, true); end
 				
@@ -1876,19 +1874,19 @@ RunService.Heartbeat:Connect(function(step)
 				end
 				
 			elseif characterProperties.IsWalking then
-				characterProperties.WalkSpeed:Set("default", lerp(characterProperties.NewWalkSpeed, characterProperties.WalkingSpeed * adsMulti, 0.6));
+				characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, characterProperties.WalkingSpeed * adsMulti, 0.6));
 				characterProperties.NewWalkSpeed = humanoid.WalkSpeed;
 				animations["crouchIdle"]:Stop();
 				animations["crouchWalk"]:Stop();
 				
 			elseif characterProperties.IsSprinting then
-				characterProperties.WalkSpeed:Set("default", lerp(characterProperties.NewWalkSpeed, characterProperties.SprintSpeed * adsMulti, 0.6));
+				characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, characterProperties.SprintSpeed * adsMulti, 0.6));
 				characterProperties.NewWalkSpeed = humanoid.WalkSpeed;
 				animations["crouchIdle"]:Stop();
 				animations["crouchWalk"]:Stop();
 				
 			else
-				characterProperties.WalkSpeed:Set("default", lerp(characterProperties.NewWalkSpeed, characterProperties.DefaultWalkSpeed * adsMulti, 0.6));
+				characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, characterProperties.DefaultWalkSpeed * adsMulti, 0.6));
 				characterProperties.NewWalkSpeed = humanoid.WalkSpeed;
 				animations["crouchIdle"]:Stop();
 				animations["crouchWalk"]:Stop();
@@ -2047,13 +2045,13 @@ RunService.Heartbeat:Connect(function(step)
 				workspace.Terrain:SetAttribute("DefaultWaterTransparency", workspace.Terrain.WaterTransparency);
 			end
 			
-			workspace.Terrain.WaterTransparency = lerp(Cache.OldTerrainWaterTransparency, characterProperties.UnderwaterVision or 0.01, 0.1);
+			workspace.Terrain.WaterTransparency = modMath.Lerp(Cache.OldTerrainWaterTransparency, characterProperties.UnderwaterVision or 0.01, 0.1);
 			Cache.OldTerrainWaterTransparency = workspace.Terrain.WaterTransparency;
 			
 		else
 			game.SoundService.AmbientReverb = characterProperties.AmbientReverb:Get();
 			
-			workspace.Terrain.WaterTransparency = lerp(Cache.OldTerrainWaterTransparency, workspace.Terrain:GetAttribute("DefaultWaterTransparency") or 0.3, 0.1);
+			workspace.Terrain.WaterTransparency = modMath.Lerp(Cache.OldTerrainWaterTransparency, workspace.Terrain:GetAttribute("DefaultWaterTransparency") or 0.3, 0.1);
 			Cache.OldTerrainWaterTransparency = workspace.Terrain.WaterTransparency;
 			
 		end
@@ -2061,7 +2059,7 @@ RunService.Heartbeat:Connect(function(step)
 		game.SoundService.AmbientReverb = characterProperties.AmbientReverb:Get();
 
 		if Cache.OldTerrainWaterTransparency then
-			workspace.Terrain.WaterTransparency = lerp(Cache.OldTerrainWaterTransparency, workspace.Terrain:GetAttribute("DefaultWaterTransparency") or 0.3, 0.1);
+			workspace.Terrain.WaterTransparency = modMath.Lerp(Cache.OldTerrainWaterTransparency, workspace.Terrain:GetAttribute("DefaultWaterTransparency") or 0.3, 0.1);
 			Cache.OldTerrainWaterTransparency = workspace.Terrain.WaterTransparency;
 			
 		end
@@ -2153,7 +2151,7 @@ RunService.Heartbeat:Connect(function(step)
 				if characterProperties.FirstPersonCamera and not characterProperties.IsRagdoll then
 					prevdata.WaistC1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistCFrameAngles, 0.1);
 					
-					local viewModelHeight = lerp(prevViewModelHeight, characterProperties.IsSliding and 2.1 or characterProperties.IsCrouching and 1.1 or -0.4, 0.15);
+					local viewModelHeight = modMath.Lerp(prevViewModelHeight, characterProperties.IsSliding and 2.1 or characterProperties.IsCrouching and 1.1 or -0.4, 0.15);
 					prevViewModelHeight = viewModelHeight;
 					
 					local waistToCamCFrame = (rootPart.CFrame * CFrame.new(0, -viewModelHeight, 0)):ToObjectSpace(
@@ -2222,7 +2220,7 @@ RunService.Heartbeat:Connect(function(step)
 		})
 	end
 	
-	characterProperties.Joints.WaistX = lerp(prevdata.WaistX, 0, 0.3);
+	characterProperties.Joints.WaistX = modMath.Lerp(prevdata.WaistX, 0, 0.3);
 	prevdata.WaistX = characterProperties.Joints.WaistX;
 	
 	local floorPart = characterProperties.GroundObject;

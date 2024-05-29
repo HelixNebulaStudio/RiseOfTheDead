@@ -161,7 +161,6 @@ return function()
 	local screenParticles = {};
 	CameraClass.ScreenParticles = screenParticles;
 
-	local function lerp(a, b, t) return a * (1-t) + (b*t); end
 	local previousWeather = nil;
 	local ceilingCheck = tick();
 	RunService.RenderStepped:Connect(function(delta)
@@ -222,10 +221,10 @@ return function()
 			local previousAtmosphere = previousWeather and previousWeather.Atmosphere or {};
 
 			local density = (CameraClass.UnderRoof and effectAtmosphere.DensityIndoors) or effectAtmosphere.Density or atmosphere.Density;
-			atmosphere.Density = lerp(atmosphere.Density, density, 0.1);
+			atmosphere.Density = modMath.Lerp(atmosphere.Density, density, 0.1);
 
 			local offset = effectAtmosphere.Offset or atmosphere.Offset;
-			atmosphere.Offset = lerp(previousAtmosphere.Offset or 0, offset, tweenRatio);
+			atmosphere.Offset = modMath.Lerp(previousAtmosphere.Offset or 0, offset, tweenRatio);
 
 			local color = (effectAtmosphere.UseAmbientColor and CameraClass.AtmosphereColor) or effectAtmosphere.Color or atmosphere.Color;
 			atmosphere.Color = (previousAtmosphere.Color or color):Lerp(color, tweenRatio);
@@ -234,10 +233,10 @@ return function()
 			atmosphere.Decay = (previousAtmosphere.Decay or decay):Lerp(decay, tweenRatio);
 
 			local glaze = effectAtmosphere.Glare or atmosphere.Glare;
-			atmosphere.Glare = lerp(previousAtmosphere.Glare or glaze, glaze, tweenRatio);
+			atmosphere.Glare = modMath.Lerp(previousAtmosphere.Glare or glaze, glaze, tweenRatio);
 
 			local haze = effectAtmosphere.Haze or atmosphere.Haze;
-			atmosphere.Haze = lerp(previousAtmosphere.Haze or 0, haze, tweenRatio);
+			atmosphere.Haze = modMath.Lerp(previousAtmosphere.Haze or 0, haze, tweenRatio);
 
 			atmosphere.Parent = Lighting;
 
@@ -258,16 +257,16 @@ return function()
 		end
 
 		if atmosphere.Parent == script then
-			sky.SunAngularSize = lerp(sky.SunAngularSize, 32, 0.1);
-			sky.MoonAngularSize = lerp(sky.MoonAngularSize, 11, 0.1);
+			sky.SunAngularSize = modMath.Lerp(sky.SunAngularSize, 32, 0.1);
+			sky.MoonAngularSize = modMath.Lerp(sky.MoonAngularSize, 11, 0.1);
 
 		else
 			local sunDirection = Lighting:GetSunDirection();
 			local angleToHorizon = Vector3.yAxis:Angle(sunDirection);
 			
 			local scale = modMath.MapNum(atmosphere.Haze, 3, 1.5, 0, 1) * modMath.MapNum(angleToHorizon, 0.45, 0.74, 1, 0);
-			sky.SunAngularSize = lerp(sky.SunAngularSize, math.clamp(scale, 0, 1) * 32, 0.1);
-			sky.MoonAngularSize = lerp(sky.MoonAngularSize, math.clamp(scale, 0, 1) * 11, 0.1);
+			sky.SunAngularSize = modMath.Lerp(sky.SunAngularSize, math.clamp(scale, 0, 1) * 32, 0.1);
+			sky.MoonAngularSize = modMath.Lerp(sky.MoonAngularSize, math.clamp(scale, 0, 1) * 11, 0.1);
 
 		end
 
@@ -284,12 +283,12 @@ return function()
 		end
 
 		Lighting.FogColor = Lighting.FogColor:Lerp(fogColor, 0.1);
-		Lighting.FogStart = lerp(Lighting.FogStart, fogStart, 0.1);
-		Lighting.FogEnd = lerp(Lighting.FogEnd, fogEnd, 0.1);
+		Lighting.FogStart = modMath.Lerp(Lighting.FogStart, fogStart, 0.1);
+		Lighting.FogEnd = modMath.Lerp(Lighting.FogEnd, fogEnd, 0.1);
 
 
 		local sunRayIntensity = Lighting:GetAttribute("SunRaysIntensity");
-		sunRays.Intensity = lerp(sunRayIntensity or 0.1, activeEffect and activeEffect.SunRaysIntensity or sunRayIntensity, tweenRatio);
+		sunRays.Intensity = modMath.Lerp(sunRayIntensity or 0.1, activeEffect and activeEffect.SunRaysIntensity or sunRayIntensity, tweenRatio);
 
 		local isUnderRoof = CameraClass.UnderRoof;
 		if tick()-ceilingCheck > 0.2 then

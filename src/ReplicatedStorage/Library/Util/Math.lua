@@ -53,8 +53,15 @@ function Math.MapNum(x, inMin, inMax, outMin, outMax, clampOutput)
 end
 
 
-function Math.Lerp(a, b, t)
-	return a * (1-t) + (b*t);
+function Math.Lerp(a, b, t, snap)
+	snap = snap or 0.0001;
+	local c = a * (1-t) + (b*t);
+	if c-snap <= a then
+		c = a;
+	elseif c+snap >= b then
+		c = b;
+	end
+	return c;
 end
 
 function Math.CFrameSpread(direction, maxSpreadAngle)

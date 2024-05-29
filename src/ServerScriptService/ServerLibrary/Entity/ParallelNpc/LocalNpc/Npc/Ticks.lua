@@ -52,13 +52,15 @@ function Ticks.new(localNpc)
 				local newSize = math.random(50,150)/100;
 				TweenService:Create(obj, tweenInfo, {
 					Size=Vector3.new(newSize, newSize, newSize);
+					Transparency=1;
 				}):Play();
 				
 			else
-				local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In);
+				local tweenInfo = TweenInfo.new(0.8, Enum.EasingStyle.Linear, Enum.EasingDirection.In);
 
 				TweenService:Create(obj, tweenInfo, {
-					Size=obj:GetAttribute("DefaultSize") ;
+					Size=obj:GetAttribute("DefaultSize");
+					Transparency=1;
 				}):Play();
 				
 			end

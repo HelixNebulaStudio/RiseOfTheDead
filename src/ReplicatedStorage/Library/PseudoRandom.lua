@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 
 local PseudoRandom = {};
 PseudoRandom.Cache = {};
@@ -123,8 +124,6 @@ function PseudoRandom:NextInteger(player, key, min, max)
 	return failRandom:NextInteger(min, max);
 end
 
-local function lerp(a, b, t) return a * (1-t) + (b*t); end
-
 function PseudoRandom:PrdRandom(key, p)
 	key = key or "nil";
 	local random = self:GetRandom(key);
@@ -137,7 +136,7 @@ function PseudoRandom:PrdRandom(key, p)
 	local max = PseudoRandom.CValues[k] or 1;
 	
 	local t = math.fmod(p*100, 5)/5;
-	local c = lerp(min, max, 1-t);
+	local c = modMath.Lerp(min, max, 1-t);
 	
 	local hit = random:NextNumber(0, 1) <= c;
 	

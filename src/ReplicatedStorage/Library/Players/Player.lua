@@ -25,6 +25,8 @@ local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariabl
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
+local modMath = require(game.ReplicatedStorage.Library.Util.Math);
+
 local remotePlayerProperties = modRemotesManager:Get("PlayerProperties");
 local remoteDamagePacket = modRemotesManager:Get("DamagePacket");
 
@@ -32,8 +34,6 @@ local BaseHealth = 100;
 local BaseMaxArmor = 0;
 local BaseArmorRate = 0.1;
 
-
-local function lerp(a, b, t) return a * (1-t) + (b*t); end
 
 if RunService:IsClient() then
 	localPlayer = game.Players.LocalPlayer;
@@ -296,7 +296,7 @@ function Player.new(playerInstance: Player)
 			if damageCategory == modDamagable.DamageCategory.Melee then
 				local hasTireArmor = classPlayer.Properties.TireArmor;
 				if hasTireArmor and hasTireArmor.Visible and math.random(1, 100) <= 73 then -- pseudo random
-					damage = math.max(1, damage-20);
+					damage = math.max(1, damage-40);
 					modAudio.Play("TireArmorBlock", classPlayer.RootPart);
 				end
 
@@ -1077,7 +1077,7 @@ function Player.new(playerInstance: Player)
 					if math.abs(newTempOffset-cache.LastWarmthOffset) <=0.1 then
 						cache.LastWarmthOffset = newTempOffset;
 					else
-						cache.LastWarmthOffset = lerp(cache.LastWarmthOffset, classPlayer.Properties.TemperatureOffset:Get(), 0.4);
+						cache.LastWarmthOffset = modMath.Lerp(cache.LastWarmthOffset, classPlayer.Properties.TemperatureOffset:Get(), 0.4);
 					end
 					playerWarmth = playerWarmth + cache.LastWarmthOffset;
 
