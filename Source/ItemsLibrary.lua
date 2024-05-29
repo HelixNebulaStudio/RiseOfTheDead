@@ -204,8 +204,8 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="scraparmor"; Name="Scrap Armor"; Icon="rbxassetid://6996766551"; Tags={"Chest"}; Description="Makeshift metal scrap armor.";});
 	new(clothingBase, {Id="highvisjacket"; Name="High Visibility Jacket"; Icon="rbxassetid://8488333823"; Tags={"Chest"}; Description="The high visibility jacket provides warmth and armor points.";});
 	new(clothingBase, {Id="nekrostrench"; Name="Nekros Trench Coat"; Icon="rbxassetid://14423236705"; Tags={"Chest"}; Description="Trench coat covered in dried Nekron leather, scales and veins. <b>Passive:</b> +2HP/s, The passive will be disabled for 15s if you take any damage.";});
-	new(clothingBase, {Id="tirearmor"; Name="Tire Armor"; Icon="rbxassetid://16791518600"; Tags={"Chest"}; Description="Tire armor, made with tires. <b>Passive:</b> When equipping a melee, grants a 60% chance to block 20 damage from melee attacks. Reduced minimum damage is capped at 1 damage.";});
-	new(clothingBase, {Id="apron"; Name="Apron"; Icon="rbxassetid://17381982100"; Tags={"Chest"}; Description="The butcher's apron. <b>Passive:</b> Splash effects from enemies are reflected by 200%, Ticks' damage to surrounding enemies takes twice the damage and stun duration.";});
+	new(clothingBase, {Id="tirearmor"; Name="Tire Armor"; Icon="rbxassetid://16791518600"; Tags={"Chest"}; Description="Tire armor, made with tires. <b>Passive:</b> When equipping a melee, grants a 60% chance to block 40 damage from melee attacks. Reduced damage minimum does not go below 1 damage.";});
+	new(clothingBase, {Id="apron"; Name="Apron"; Icon="rbxassetid://17381982100"; Tags={"Chest"}; Description="The butcher's apron. <b>Passive:</b> Splash effects from enemies are reflected by 200%, Ticks' detonation does twice the damage and stun duration to surrounding enemies.";});
 
 	-- Pants
 	new(clothingBase, {Id="prisonpants"; Name="Prisoner's Pants"; Icon="rbxassetid://5627737032"; Tags={"Legs"}; Description="The Prisoner's Pants.";});
