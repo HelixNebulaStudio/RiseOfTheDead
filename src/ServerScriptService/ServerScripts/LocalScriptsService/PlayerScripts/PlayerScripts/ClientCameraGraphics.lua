@@ -169,6 +169,8 @@ return function()
 			sky = Lighting:FindFirstChildWhichIsA("Sky");
 		end
 		
+		local rootPart = localplayer and localplayer.Character and localplayer.Character.PrimaryPart;
+
 		colorCorrection.Brightness = CameraClass.Brightness:Get();
 		colorCorrection.Contrast = CameraClass.Contrast:Get();
 		colorCorrection.Saturation = CameraClass.Saturation:Get();
@@ -219,8 +221,8 @@ return function()
 			local effectAtmosphere = activeEffect.Atmosphere;
 			local previousAtmosphere = previousWeather and previousWeather.Atmosphere or {};
 
-			local density = effectAtmosphere.Density or atmosphere.Density;
-			atmosphere.Density = lerp(previousAtmosphere.Density or 0.3, density, tweenRatio);
+			local density = (CameraClass.UnderRoof and effectAtmosphere.DensityIndoors) or effectAtmosphere.Density or atmosphere.Density;
+			atmosphere.Density = lerp(atmosphere.Density, density, 0.1);
 
 			local offset = effectAtmosphere.Offset or atmosphere.Offset;
 			atmosphere.Offset = lerp(previousAtmosphere.Offset or 0, offset, tweenRatio);
@@ -267,7 +269,6 @@ return function()
 			sky.SunAngularSize = lerp(sky.SunAngularSize, math.clamp(scale, 0, 1) * 32, 0.1);
 			sky.MoonAngularSize = lerp(sky.MoonAngularSize, math.clamp(scale, 0, 1) * 11, 0.1);
 
-			
 		end
 
 		
@@ -282,9 +283,9 @@ return function()
 			fogEnd = effectFog.End or fogEnd;
 		end
 
-		Lighting.FogColor = fogColor;
-		Lighting.FogStart = fogStart;
-		Lighting.FogEnd = fogEnd;
+		Lighting.FogColor = Lighting.FogColor:Lerp(fogColor, 0.1);
+		Lighting.FogStart = lerp(Lighting.FogStart, fogStart, 0.1);
+		Lighting.FogEnd = lerp(Lighting.FogEnd, fogEnd, 0.1);
 
 
 		local sunRayIntensity = Lighting:GetAttribute("SunRaysIntensity");
@@ -294,7 +295,7 @@ return function()
 		if tick()-ceilingCheck > 0.2 then
 			ceilingCheck = tick();
 
-			isUnderRoof = modRaycastUtil.GetCeiling(camera.CFrame.Position, 256) ~= nil;
+			isUnderRoof = modRaycastUtil.GetCeiling(rootPart.CFrame.Position, 256) ~= nil;
 			CameraClass.UnderRoof = isUnderRoof;
 		end
 
@@ -313,14 +314,13 @@ return function()
 
 					TweenService:Create(new, TweenInfo.new(5), {Rate = defaultRate}):Play();
 
-					if new:GetAttribute("OutdoorsOnly") then
-						task.spawn(function()
-							while workspace:IsDescendantOf(new) do
-								task.wait();
-								new.Enabled = not CameraClass.UnderRoof;
-							end
-						end)
+				else
+					local particle = screenParticles[particleData.Id];
+					
+					if particle:GetAttribute("OutdoorsOnly") then
+						particle.Enabled = not CameraClass.UnderRoof;
 					end
+
 				end
 
 				existParticle[particleData.Id] = true;

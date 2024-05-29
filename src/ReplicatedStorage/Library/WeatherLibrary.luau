@@ -73,6 +73,7 @@ library:Add{
             UseAmbientColor=true;
             
             Density=0.8;
+            DensityIndoors=0.6;
             Offset=0.2;
             Haze=2.5;
         };
@@ -91,6 +92,7 @@ library:Add{
             UseAmbientColor=true;
             
             Density=0.7;
+            DensityIndoors=0.5;
             Offset=0.5;
             Haze=3;
         };

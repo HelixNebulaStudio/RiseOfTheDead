@@ -4,7 +4,7 @@ repeat task.wait() until shared.MasterScriptInit == true;
 
 local dayOfYearSet = nil;
 --== Configuration;
-local LiveWeatherCycle = {"fog"; "rain"};
+local LiveWeatherCycle = {"fog"; "rain"; "heavyrain"};
 
 local LightingConfigurations = {
 	OutdoorAmbient = Color3.fromRGB(35, 41, 49);
