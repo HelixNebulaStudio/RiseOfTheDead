@@ -715,7 +715,7 @@ function CardGame.NewLobby(player)
 	lobby:SetPlayerType(player, "Players");
 	
 	Debugger:Log("New lobby ", lobby);
-	shared.Notify(player, "New lobby created for Fall of the Living.", "Inform");
+	shared.Notify(player, "[FotL] New lobby created for Fall of the Living.", "Inform");
 	
 	table.insert(CardGame.Lobbies, lobby);
 	
@@ -790,7 +790,7 @@ if RunService:IsServer() then
 			local playerLobby = CardGame.GetLobby(player);
 			if playerLobby and playerLobby.Host == player then
 				
-				shared.Notify(player, "You are currently hosting a lobby, leave current lobby in order to join another.", "Negative");
+				shared.Notify(player, "[FotL] You are currently hosting a lobby, leave current lobby in order to join another.", "Negative");
 				return rPacket;
 			end
 			
@@ -799,7 +799,7 @@ if RunService:IsServer() then
 			if hostLobby == nil then Debugger:Warn("Host does not have a lobby") return rPacket end;
 			
 			hostLobby:Join(player);
-			shared.Notify(player, "Join request sent to ".. hostPlayer.Name ..".", "Inform");
+			shared.Notify(player, "[FotL] Join request sent to ".. hostPlayer.Name ..".", "Inform");
 			
 		elseif action == "acceptrequest" then
 			local acceptPlayer = packet.AcceptPlayer;
@@ -812,8 +812,8 @@ if RunService:IsServer() then
 				rPacket.Success = true;
 				
 			else
-				shared.Notify(acceptPlayer, "The lobby is full!", "Inform");
-				shared.Notify(player, "The lobby is full!", "Inform");
+				shared.Notify(acceptPlayer, "[FotL] The lobby is full!", "Inform");
+				shared.Notify(player, "[FotL] The lobby is full!", "Inform");
 				
 			end
 
@@ -834,11 +834,11 @@ if RunService:IsServer() then
 			
 			Debugger:Log("lobby", lobby);
 			if #lobby.Players > 5 then
-				shared.Notify(player, "The lobby is overloaded!", "Inform");
+				shared.Notify(player, "[FotL] The lobby is overloaded!", "Inform");
 				return rPacket;
 			end
 			if #lobby.Players < 2 then
-				shared.Notify(player, "Needs more players", "Inform");
+				shared.Notify(player, "[FotL] Needs more players", "Inform");
 				return rPacket;
 			end
 			
