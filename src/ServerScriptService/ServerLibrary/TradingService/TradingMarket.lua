@@ -36,7 +36,7 @@ function ItemMarket:Add(logTime, storageItem, gold, traderNames, avgGold)
 	local listSize = self.Key == "market:all" and 250 or 10;
 	
 	while #self.List > 0 do
-		if #self.List > listSize or self.List[1].Time < (DateTime.now().UnixTimestamp-weekSec) or self.List[1].ItemId == nil then
+		if (#self.List > listSize and self.List[1].Time < (DateTime.now().UnixTimestamp-weekSec)) or self.List[1].ItemId == nil then
 			table.remove(self.List, 1);
 		else
 			break;
