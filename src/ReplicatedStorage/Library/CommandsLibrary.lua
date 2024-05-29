@@ -1808,6 +1808,7 @@ Commands["time"] = {
 
 		/time set (0-1200)  -- set and freeze time to a number from 0 - 1200. 
 		/time offset [number]	-- offset current time.
+		/time setdaynightcycle [number]  -- set the cycle length in seconds [60, inf].
 	]];
 	Function = function(speaker, args)
 		local action = args[1];
@@ -1825,6 +1826,11 @@ Commands["time"] = {
 		elseif action == "offset" then
 			modSyncTime.SetOffset(seconds or 0);
 			shared.Notify(speaker, "Time offset by "..modSyncTime.TimeOffset.Value.."s.", "Inform");
+
+		elseif action == "setdaynightcycle" then
+			local cycleLength = math.max(tonumber(args[2]) or 1200, 60);
+			modConfigurations.DayLapseDuration = cycleLength
+			shared.Notify(speaker, "Set daynight cycle to "..cycleLength.."s.", "Inform");
 
 		else
 			shared.Notify(speaker, "Invalid /time action.", "Negative");
