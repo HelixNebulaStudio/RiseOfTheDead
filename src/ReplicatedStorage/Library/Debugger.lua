@@ -1,19 +1,7 @@
---[[
-	--== Summary
-	Debugger Debugger.new( String name )
-	void Debugger:Log( Tuple ... )
-	void Debugger:Warn( Tuple ... )
-	void Debugger:Print( Tuple ... )
-	String Debugger:FormatTable( Table t )
-	void Debugger:Display( Table data, Table whitelist )
-	BasePart Debugger:Ray( Ray ray , Vector3 rayHit , Vector3 rayPoint , Vector3 rayNormal)
-]]
-
---== Configurations;
 local TupleSeperator = " "; -- Try: "/" "\t" "\n"
 
 --== Script;
-local Print=print; local Warn=warn; local String=tostring; local Type=typeof; local Pairs=pairs; local random = Random.new(); local Http = game:GetService("HttpService"); local RunService = game:GetService("RunService"); local TextService = game:GetService("TextService");
+local random = Random.new(); local Http = game:GetService("HttpService"); local RunService = game:GetService("RunService"); local TextService = game:GetService("TextService");
 local GuiDataRemote; local ClientLogRemote; local ClientReadyBind; local IsClientReady = false; local rayInfo, rayInstance; local colorsList = {Color3.fromRGB(196, 40, 28); Color3.fromRGB(13, 105, 172); Color3.fromRGB(245, 205, 48); Color3.fromRGB(75, 151, 75); Color3.fromRGB(170, 0, 170); Color3.fromRGB(218, 133, 65); Color3.fromRGB(18, 238, 212);};
 local Debugger = {}; 
 Debugger.__index = Debugger;
@@ -30,7 +18,7 @@ local function concat(c, useKey, level)
 	
 	local d="";
 	local index = 1;
-	for i, b in Pairs(c) do
+	for i, b in pairs(c) do
 		local bName;
 		pcall(function() 
 			if typeof(b) == "Instance" then
@@ -38,11 +26,11 @@ local function concat(c, useKey, level)
 			end
 		end)
 		d=d..(index==1 and "" or (TupleSeperator or " "))..(useKey and (
-			Type(i) == "string" and '"'..i..'"' or String(i))..":" or "")..(
-			Type(b)=="table" and "{"..concat(b, true, level+1).."}" or 
-			Type(b)=="boolean" and String(b) or 
-			Type(b)=="userdata" and ((bName or typeof(b)).." "..String(b)) or 
-			String(b or "nil"))
+				typeof(i) == "string" and '"'..i..'"' or tostring(i))..":" or "")..(
+				typeof(b)=="table" and "{"..concat(b, true, level+1).."}" or 
+				typeof(b)=="boolean" and tostring(b) or 
+				typeof(b)=="userdata" and ((bName or typeof(b)).." "..tostring(b)) or 
+			tostring(b or "nil"))
 		index = index +1;
 	end;
 	return d;
@@ -70,10 +58,10 @@ function Debugger.Expire(obj: Instance, t: number?)
 	end)
 end
 
---[[**
+--[[
 	Requires modules with timeout;
 	@param module ModuleScript
-**--]]
+]]
 local requireCache = {};
 local requireCount = 0;
 function Debugger:Require(module, printStat)
@@ -142,7 +130,7 @@ function Debugger.PrintLoadTimes()
 	print(str);
 end
 
---[[**
+--[[
 	Enable Debugger on to script.
 	@param name string
 	
@@ -150,7 +138,7 @@ end
 	@returns Debugger
 	
 	Returns Debugger instance with properties Name and Disabled. Setting "Debugger.Disabled = true" will disable logging.
-**--]]
+]]
 function Debugger.new(src)
 	if typeof(src) == "string" then
 		warn("Deprecated parameter: "..debug.traceback())
@@ -171,7 +159,7 @@ function Debugger.new(src)
 	return setmetatable(self, Debugger);
 end
 
---[[**
+--[[
 	Visualize a ray. If rayHit is nil, the shown ray will be greyed out.
 	@param ray Ray
 	
@@ -185,7 +173,9 @@ end
 	@param rayNormal Vector3
 	
 	The normal of the end point of the ray. (Optional)
-**--]]
+
+	@return Instance
+]]
 function Debugger:Ray(ray, rayHit, rayPoint, rayNormal)
 	if rayInstance == nil then
 		local A = Instance.new("Part"); A.Name = "A";
@@ -369,7 +359,7 @@ function Debugger:Log(...)
 		else
 			a=a..concat({...});
 		end;
-		Print(a);
+		print(a);
 		
 	end
 end
@@ -396,7 +386,7 @@ function Debugger:Warn(...)
 		a=a..concat({...});
 	end;
 	
-	Warn(a);
+	warn(a);
 	
 	if RunService:IsClient() then return end;
 	if workspace:GetAttribute("IsDev") ~= true then return end;
@@ -422,12 +412,12 @@ function Debugger:StudioWarn(...)
 	self:Warn("[Studio]", ...);
 end
 
---[[**
+--[[
 	Stringify message;
 	@param ... Tuple
 	
 	Stringify a message.
-**--]]
+]]
 function Debugger:Stringify(...)
 	local a = "";
 	if #{...} <= 0 then
@@ -438,14 +428,14 @@ function Debugger:Stringify(...)
 	return a;
 end
 
---[[**
+--[[
 	Log warning to client console;
 	@param player/table Player or list of players
 	
 	@param ... Tuple
 	
 	Message of the warning. Example: Debugger:WarnClient(player/{player; player2}, "Oh no!", "404");
-**--]]
+]]
 function Debugger:WarnClient(players, ...)
 	if RunService:IsClient() then Debugger:Log("WarnClient() can only be called by server."); return end;
 	if self:IsParallel() then Debugger:Warn("Not called from main thread.", self.Script:GetFullName()); return end;
@@ -501,15 +491,15 @@ function Debugger:YieldDir(parent, name, timeOut)
 	return moduleScript;
 end
 
---[[**
+--[[
 	Format table into string;
 	@param input table
 	
 	Table that you want to format into a string.
-	@returns string
+	@return string
 	
 	Returns the formatted table in string.
-**--]]
+]]
 function Debugger:FormatTable(input)
 	local cache = {};
 	local function extract(t, index)
@@ -525,7 +515,7 @@ function Debugger:FormatTable(input)
 		end
 	end
 	local function indentifier(v)
-		local r = String(v);
+		local r = tostring(v);
 		if type(v) == "string" then
 			return ('"$Var"'):gsub("$Var", r);
 		elseif type(v) == "boolean" then
@@ -541,9 +531,9 @@ function Debugger:FormatTable(input)
 		local linkSyntax = " = ";
 		local key = cache[a].Key;
 		local value = cache[a].Value;
-		if String(cache[a].Value) == "}" then
+		if tostring(cache[a].Value) == "}" then
 			linkSyntax = "";
-		elseif String(cache[a].Value) == "{" then
+		elseif tostring(cache[a].Value) == "{" then
 		else
 			value = indentifier(cache[a].Value);
 		end
@@ -552,7 +542,7 @@ function Debugger:FormatTable(input)
 	return output;
 end
 
---[[**
+--[[
 	Display debug;
 	@param data table
 	
@@ -560,7 +550,7 @@ end
 	@param whitelist Player/Players
 	
 	Player or a table of players to display debug data to. Leaving this null will display debug to all players.
-**--]]
+]]
 local UpdateDebuggerGui;
 function Debugger:Display(data, whitelist)
 	task.defer(function()
