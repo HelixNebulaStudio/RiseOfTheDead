@@ -339,7 +339,7 @@ return function()
 		end
 
 
-		if activeEffect and activeEffect.EnableScreenRain and not isUnderRoof then
+		if activeEffect and activeEffect.EnableScreenRain and not isUnderRoof and weatherParticlesEnabled then
 			modScreenRain:Enable({
 				Rate = activeEffect.ScreenRainRate or 5;
 			});

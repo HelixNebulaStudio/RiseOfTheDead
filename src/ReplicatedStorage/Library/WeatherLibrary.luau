@@ -17,6 +17,8 @@ library:Add{
         };
         
         EnableScreenRain=true;
+        ScreenRainRate=5;
+
         ScreenParticles={
             {Id="WeatherRain"};
         };

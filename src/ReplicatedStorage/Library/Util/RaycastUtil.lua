@@ -61,8 +61,8 @@ function RaycastUtil.RingCast(orign, dir, points, radius, rayParam): {RaycastRes
 
 	points = points or 6;
 
-	for a = 0, points do
-		local ph = a/6 * math.pi *2
+	for a = 0, (points-1) do
+		local ph = a/points * math.pi *2
 		local x = math.cos(ph)
 		local z = math.sin(ph)
 
@@ -179,5 +179,83 @@ function RaycastUtil.GetCeiling(origin: Vector3, range: number?) : RaycastResult
 	return nil;
 end
 
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+function RaycastUtil.SplashCast(origin: Vector3, packet: {
+	Radius: number?; 
+	SpreadDepth: number?;  
+	RayParam: RaycastParams?;
+
+	MaxPitch: number?;
+
+	LoopFunc: (()->boolean)?;
+}) : {RaycastResult}
+
+
+	local yawPoints = 4;
+	local pitchPoints = 2;
+
+	packet = packet or {};
+	local rayParam = packet.RayParam or groundRayParams;
+	local radius = packet.Radius or 4; assert(radius);
+	local spreadDepth = packet.SpreadDepth or 2; assert(spreadDepth);
+
+	local maxPitch = packet.MaxPitch or (math.pi/2)
+
+	local endPoints = {};
+	
+	local function cast(lookCf, oVec, oDir, depth)
+		if depth <= 0 then return end;
+
+		--Debugger:Ray(Ray.new(oVec, oDir * radius)).BrickColor = BrickColor.random();
+
+		for a=0, (yawPoints-1) do
+			local r = a/yawPoints * math.pi*2;
+
+			for b=1, pitchPoints do
+				local ph = (b/pitchPoints)^(1/2) * maxPitch;
+				
+				local cf = lookCf;
+	
+				local spreadRollStart = r;
+				local deflection = ph;
+				
+				cf = cf * CFrame.Angles(0, 0, spreadRollStart); -- roll
+				cf = cf * CFrame.Angles(deflection, 0, 0); -- pitch
+		
+				local dir = cf.LookVector;
+				local rayResult = workspace:Raycast(origin, dir*radius, rayParam);
+
+				-- local debugRay = Debugger:Ray(Ray.new(origin, dir * radius));
+				-- debugRay.Color = rayResult and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0);
+				-- game.Debris:AddItem(debugRay, 0.5);
+
+				if rayResult then
+					cast(CFrame.lookAt(Vector3.zero, dir, rayResult.Normal), rayResult.Position +rayResult.Normal, dir, depth-1);
+					table.insert(endPoints, rayResult);
+				end
+			end
+		end
+	end
+	cast(CFrame.lookAt(Vector3.zero, -Vector3.yAxis), origin, -Vector3.yAxis, spreadDepth);
+
+	local results = {};
+	for a=1, #endPoints do
+		local rayResult: RaycastResult = endPoints[a];
+
+		local exist = false;
+		for b=1, #results do
+			if (results[b].Position == rayResult.Position) then
+				exist = true;
+				break;
+			end
+		end
+		if not exist then
+			table.insert(results, rayResult);
+		end
+
+	end
+	
+	return endPoints;
+end
 
 return RaycastUtil;
