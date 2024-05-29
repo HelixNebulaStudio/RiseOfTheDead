@@ -53,7 +53,7 @@ function Math.MapNum(x, inMin, inMax, outMin, outMax, clampOutput)
 end
 
 
-function Math.Lerp(a, b, t, snap)
+function Math.Lerp(a, b, t, snap: number?)
 	snap = snap or 0.0001;
 	local c = a * (1-t) + (b*t);
 	if c-snap <= a then
@@ -63,6 +63,23 @@ function Math.Lerp(a, b, t, snap)
 	end
 	return c;
 end
+
+--[[
+	Used instead of Lerp for delta sensitive lerping.
+	
+	@param decay number range [1,25] slow to fast
+]]
+function Math.DeltaLerp(a, b, decay, delta, snap: number?)
+	snap = snap or 0.0001;
+	local c = b+(a-b)*math.exp(-decay*delta);
+	if c-snap <= a then
+		c = a;
+	elseif c+snap >= b then
+		c = b;
+	end
+	return c;
+end
+
 
 function Math.CFrameSpread(direction, maxSpreadAngle)
 	maxSpreadAngle = math.clamp(maxSpreadAngle, 0, 90);
