@@ -241,8 +241,12 @@ function Movement.new(parallelNpc)
 	
 	
 	RunService.Stepped:Connect(function(t, delta)
-		if parallelNpc.IsDead then 
-			game.Debris:AddItem(bodyGyro, 0);
+		if parallelNpc.IsDead then
+			if bodyGyro then
+				game.Debris:AddItem(bodyGyro, 0);
+				bodyGyro = nil;
+			end
+
 			return 
 		end;
 		
@@ -374,7 +378,7 @@ function Movement.new(parallelNpc)
 			stuckTick = tick();
 			
 			if lastStuckTick and tick()-lastStuckTick <= 6.1 then
-				if moveSpeed:Get() > 0 then
+				if walkSpeed > 0 then
 					humanoid.Jump = true;
 					if self.DebugMove == true then Debugger:Warn("ls jump") end;
 				end
