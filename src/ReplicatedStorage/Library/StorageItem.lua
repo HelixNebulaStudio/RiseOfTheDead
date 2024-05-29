@@ -24,6 +24,22 @@ type StorageItemObject = {
 export type StorageItem = typeof(setmetatable({} :: StorageItemObject, StorageItem));
 
 --== Script;
+function StorageItem.Shrink(item)
+	local compressedItem = {};
+	compressedItem.ID = item.ID;
+	compressedItem.ItemId = item.ItemId;
+	compressedItem.Index = item.Index;
+	compressedItem.Quantity = item.Quantity;
+	compressedItem.Values = item.Values;
+	compressedItem.Fav = item.Fav;
+	compressedItem.Vanity = item.Vanity;
+	compressedItem.Name = item.Name;
+	compressedItem.DisplayName = item.DisplayName;
+	compressedItem.NonTradeable = item.NonTradeable;
+	
+	return compressedItem;
+end
+
 function StorageItem.new(index, itemId, data, player)
 	local itemMeta = setmetatable({}, StorageItem);
 	itemMeta.__index = itemMeta;
@@ -57,22 +73,7 @@ function StorageItem.new(index, itemId, data, player)
 		item.ItemId = itemId;
 	end
 	
-	function itemMeta:Shrink()
-		local compressedItem = {};
-		compressedItem.ID = item.ID;
-		compressedItem.ItemId = item.ItemId;
-		compressedItem.Index = item.Index;
-		compressedItem.Quantity = item.Quantity;
-		compressedItem.Values = item.Values;
-		compressedItem.Fav = item.Fav;
-		compressedItem.Vanity = item.Vanity;
-		compressedItem.Name = item.Name;
-		compressedItem.DisplayName = item.DisplayName;
-		compressedItem.NonTradeable = item.NonTradeable;
-		
-		return compressedItem;
-	end
-	
+	itemMeta.Shrink = StorageItem.Shrink;
 	
 	function itemMeta:SetStorageId(storageId)
 		rawset(itemMeta, "StorageId", storageId);

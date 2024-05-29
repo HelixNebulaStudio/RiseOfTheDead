@@ -56,9 +56,9 @@ end
 function Math.Lerp(a, b, t, snap: number?)
 	snap = snap or 0.0001;
 	local c = a * (1-t) + (b*t);
-	if c-snap <= a then
+	if math.abs(c-a) <= snap then
 		c = a;
-	elseif c+snap >= b then
+	elseif math.abs(c-b) <= snap then
 		c = b;
 	end
 	return c;
@@ -72,9 +72,9 @@ end
 function Math.DeltaLerp(a, b, decay, delta, snap: number?)
 	snap = snap or 0.0001;
 	local c = b+(a-b)*math.exp(-decay*delta);
-	if c-snap <= a then
+	if math.abs(c-a) <= snap then
 		c = a;
-	elseif c+snap >= b then
+	elseif math.abs(c-b) <= snap then
 		c = b;
 	end
 	return c;
