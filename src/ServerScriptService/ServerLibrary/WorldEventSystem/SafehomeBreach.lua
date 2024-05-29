@@ -113,7 +113,7 @@ function WorldEvent.Start()
 	WorldEventSystem.NextEventTick = modSyncTime.GetTime() + math.random(600, 900);
 	WorldEvent.LastBreach = tick();
 	
-	local duration = 240;
+	local duration = modBranchConfigs.IsWorld("TheWarehouse") and 120 or 240;
 	local startTime = modSyncTime.GetTime();
 	local endTime = startTime + duration;
 	
@@ -136,8 +136,10 @@ function WorldEvent.Start()
 			shared.Notify(game.Players:GetPlayers(), "The breach will end in "..math.floor(timeLeft).." seconds!", "Defeated");
 		end
 	end
-	delay(duration-180, announceTimeLeft);
-	delay(duration-120, announceTimeLeft);
+	if duration > 120 then
+		delay(duration-180, announceTimeLeft);
+		delay(duration-120, announceTimeLeft);
+	end
 	delay(duration-60, announceTimeLeft);
 
 	WorldEvent.Enemies = {};
@@ -224,16 +226,15 @@ function WorldEvent.Start()
 					table.insert(WorldEvent.Enemies, npcModule);
 					npcModule.Configuration.Level = math.max(lowestLevel, 1);
 
-					npcModule.Humanoid.Died:Connect(function()
+					npcModule:Died(function()
+						Debugger.Expire(npc, 5);
+
 						for a=#WorldEvent.Enemies, 1, -1 do
 							if WorldEvent.Enemies[a] == npcModule then
 								table.remove(WorldEvent.Enemies, a);
 							end
 						end
 						npcModule.DeathPosition = npcModule.RootPart.CFrame.p;
-
-						task.wait(5);
-						game.Debris:AddItem(npc, 5);
 					end);
 				end);
 				
