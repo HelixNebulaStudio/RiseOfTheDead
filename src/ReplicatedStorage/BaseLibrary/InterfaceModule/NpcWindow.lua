@@ -286,7 +286,7 @@ function Interface.init(modInterface)
 
 					elseif rPacket.FailMsg then
 						packet.Button.Text = rPacket.FailMsg;
-						task.wait(0.4);
+						task.wait(1);
 
 					end
 
@@ -310,7 +310,7 @@ function Interface.init(modInterface)
 						Interface.RefreshPage();
 					elseif rPacket.FailMsg then
 						packet.Button.Text = rPacket.FailMsg;
-						task.wait(0.4);
+						task.wait(1);
 					end
 
 					cancelDebounce = false;
