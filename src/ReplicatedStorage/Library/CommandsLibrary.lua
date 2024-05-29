@@ -1799,28 +1799,6 @@ Commands["travel"] = {
 	end;
 };
 
-Commands["offsettime"] = {
-	Permission = PermissionLevel.DevBranch;
-	Description = "Offsets time by x seconds.";
-	
-	RequiredArgs = 0;
-	UsageInfo = "/offsettime [seconds]";
-	Function = function(speaker, args)
-		local player = speaker;
-		
-		local seconds = #args> 0 and tonumber(args[1]) or 0;
-		modSyncTime.SetOffset(seconds);
-		shared.Notify(speaker, "Time offset set to "..modSyncTime.TimeOffset.Value.."s.", "Inform");
-		
-		return true;
-	end;
-};
-
-Commands["settime"] = {
-
-};
---SetOsTime
-
 Commands["time"] = {
 	Permission = PermissionLevel.DevBranch;
 	Description = "Offsets time by x seconds.";
@@ -1853,21 +1831,6 @@ Commands["time"] = {
 
 		end
 		
-		return true;
-	end;
-};
-
-Commands["position"] = {
-	Permission = PermissionLevel.DevBranch;
-	Description = "Prints player position.";
-	
-	RequiredArgs = 0;
-	UsageInfo = "/position";
-	Function = function(speaker, args)
-		local classPlayer = modPlayers.Get(speaker);
-		local rootPart = classPlayer.RootPart;
-		
-		shared.Notify(speaker, "Position: "..tostring(rootPart.Position).."", "Inform");
 		return true;
 	end;
 };
