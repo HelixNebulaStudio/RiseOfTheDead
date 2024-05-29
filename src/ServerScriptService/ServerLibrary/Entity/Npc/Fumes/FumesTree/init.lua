@@ -16,6 +16,7 @@ return function(self)
     cache.CloudState = 0;
     cache.CloudPoint = nil;
     cache.WanderTick = tick();
+    cache.StartTick = tick();
 
 	tree:Hook("StatusLogic", self.StatusLogic);
 
@@ -87,8 +88,12 @@ return function(self)
             if self.GetTargetDistance() > 100 then
                 return tree.Failure;
             end
+            if tick()-cache.StartTick <= 5 then
+                return tree.Failure;
+            end
 
             cache.CloudState = 1;
+            self.Immunity = 0;
 
             self.Move:Stop();
             self.Move:Face(self.Target.PrimaryPart);
@@ -128,6 +133,7 @@ return function(self)
                 end)
 
                 self.StopAnimation("ChannelFumes");
+                self.Immunity = 2;
             end
 
             if self.HardMode then

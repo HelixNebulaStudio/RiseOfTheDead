@@ -45,6 +45,7 @@ return function(npc, spawnPoint)
 
 		self.ThreatSenseHidden = true;
 		self.WeakPointHidden = true;
+		self.Immunity = 2;
 
 		while self.IsDead ~= true do
 			self.Think:Fire();

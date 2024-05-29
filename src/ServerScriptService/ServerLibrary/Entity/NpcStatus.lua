@@ -98,10 +98,10 @@ function MetaStatus:TakeDamagePackage(damageSource)
 	if immunity > 0 and damageType ~= "ToxicDamage" then
 		local initDmg = amount;
 
-		amount = amount * math.clamp(1-immunity, 0, 999);
+		amount = amount * math.clamp(1-immunity, -1, 999);
 		
 		local toxicModValue = npcModule.EntityStatus:GetOrDefault("ToxicMod");
-		if toxicModValue then
+		if toxicModValue and amount > 0 then
 			local newImmunity = math.max(immunity - toxicModValue, 0) ; --math.clamp(immunity*toxicModValue, 0, 1);
 			local toxicDamage = initDmg * (1-newImmunity) - amount;
 			
