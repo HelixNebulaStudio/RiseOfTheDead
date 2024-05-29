@@ -835,6 +835,17 @@ library:Add{
 	-- Interaction;
 };
 
+library:Add{
+	Id="orangejustice";
+	Name="Orange Justice";
+	LayoutOrder=library.Size;
+	AnimationId="rbxassetid://17654368799";
+	Looped=true;
+	Unlocked=true;
+	-- Rbx;
+};
+
+
 for id, lib in pairs(library:GetAll()) do
 	local new = Instance.new("Animation");
 	new.AnimationId = lib.AnimationId;
