@@ -156,4 +156,26 @@ function RaycastUtil.GetGround(origin: Vector3, range: number?) : RaycastResult?
 	return nil;
 end
 
+
+local ceilingRayParams: RaycastParams;
+function RaycastUtil.GetCeiling(origin: Vector3, range: number?) : RaycastResult?
+	if ceilingRayParams == nil then
+		ceilingRayParams = RaycastParams.new();
+		ceilingRayParams.FilterType = Enum.RaycastFilterType.Include;
+		ceilingRayParams.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain;};
+	end
+
+	local r = range or 256;
+	
+	local rayResult = workspace:Raycast(origin, Vector3.yAxis * r, ceilingRayParams);
+	if rayResult then
+		local worldSpaceSize = rayResult.Instance.CFrame:vectorToWorldSpace(rayResult.Instance.Size);
+		if rayResult.Distance > (math.abs(worldSpaceSize.X)+math.abs(worldSpaceSize.Z))/2 then return nil end;
+
+		return rayResult;
+	end
+	return nil;
+end
+
+
 return RaycastUtil;

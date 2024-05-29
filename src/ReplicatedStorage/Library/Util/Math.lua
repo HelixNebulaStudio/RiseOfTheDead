@@ -44,8 +44,12 @@ function Math.NumberToBinStr(x, fitString)
 end
 
 
-function Math.MapNum(x, inMin, inMax, outMin, outMax)
-	return (x - inMin)*(outMax - outMin)/(inMax - inMin) + outMin
+function Math.MapNum(x, inMin, inMax, outMin, outMax, clampOutput)
+	local v = (x - inMin)*(outMax - outMin)/(inMax - inMin) + outMin
+	if clampOutput then
+		v = math.clamp(v, outMin, outMax);
+	end
+	return v
 end
 
 

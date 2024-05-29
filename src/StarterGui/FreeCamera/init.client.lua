@@ -413,6 +413,9 @@ UIS.InputBegan:Connect(function(input, processed)
 	end
 end)
 
+while modData.CameraClass == nil do
+	task.wait();
+end
 local activeCameraLayer = modData.CameraClass.RenderLayers:GetTable();
 
 if activeCameraLayer.Id == "freecam" then

@@ -2,12 +2,17 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local WeatherService = {};
 
+local TweenService = game:GetService("TweenService");
 local RunService = game:GetService("RunService");
 local HttpService = game:GetService("HttpService");
 
 local modEventService = require(game.ReplicatedStorage.Library.EventService);
 local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 local modWeatherLibrary = require(game.ReplicatedStorage.Library.WeatherLibrary);
+local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
+local modAudio = require(game.ReplicatedStorage.Library.Audio);
+
+WeatherService.Garbage = modGarbageHandler.new();
 
 WeatherService.WeatherLayers = modLayeredVariable.new({});
 WeatherService.ActiveWeather = nil;
@@ -18,12 +23,10 @@ onWeatherSetEventHandler:SetPermissions("CanListen", true);
 
 function WeatherService:OnTick()
     local activeWeather = WeatherService.WeatherLayers:Get();
+    local activeWeatherId = activeWeather and activeWeather.Id or nil;
+    
     if WeatherService.ActiveWeather and WeatherService.ActiveWeather.Id == activeWeather.Id then return; end;
     WeatherService.ActiveWeather = activeWeather;
-
-    if activeWeather.StartTick == nil then
-        activeWeather.StartTick = workspace:GetServerTimeNow();
-    end
 
     for a=#WeatherService.WeatherLayers.Table, 1, -1 do
         local weatherLayer = WeatherService.WeatherLayers.Table[a];
@@ -34,7 +37,40 @@ function WeatherService:OnTick()
         end
     end
     
+    WeatherService.Garbage:Loop(function(index, trash)
+        if typeof(trash) == "Instance" and trash:IsA("Sound") then
+            local tweenInfo = TweenInfo.new(5);
+            local tween = TweenService:Create(trash, tweenInfo, {Volume = 0})
+            tween.Completed:connect(function(state)
+            	if state == Enum.PlaybackState.Completed then
+                    trash:Destroy();
+            	end
+            	tween:Destroy();
+            end)
+            tween:Play();
+            WeatherService.Garbage.Trash[index] = nil;
+        end
+    end)
+    WeatherService.Garbage:Destruct();
+
+    if activeWeather.StartTick == nil then
+        activeWeather.StartTick = workspace:GetServerTimeNow();
+    end
+
     script:SetAttribute("Active", HttpService:JSONEncode(activeWeather));
+
+    if activeWeatherId == nil then return end;
+    local weatherLib = modWeatherLibrary:Find(activeWeatherId);
+    if weatherLib and weatherLib.WeatherSounds then
+        for a=1, #weatherLib.WeatherSounds do
+            local soundData = weatherLib.WeatherSounds[a];
+            local sound = modAudio.Play(soundData.Id, workspace);
+            sound.Volume = 0;
+            sound:AddTag("WeatherSound");
+            WeatherService.Garbage:Tag(sound);
+            TweenService:Create(sound, TweenInfo.new(5), {Volume = 1}):Play();
+        end
+    end
 end
 
 function WeatherService:GetActive()

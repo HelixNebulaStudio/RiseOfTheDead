@@ -80,6 +80,8 @@ local modWeatherService = require(game.ReplicatedStorage.Library.WeatherService)
 
 local modWeatherLibrary = require(game.ReplicatedStorage.Library.WeatherLibrary);
 
+local modMath = require(game.ReplicatedStorage.Library.Util.Math);
+
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local folderClips = workspace:WaitForChild("Clips");
@@ -94,7 +96,6 @@ end
 local templateInteractableType = script:WaitForChild("InteractableType");
 
 local filterBlur = script:WaitForChild("Blur");
-local filterSunRays = script:WaitForChild("SunRays");
 
 local configFolder = game.Lighting:FindFirstChild("Configuration");
 if configFolder then
@@ -133,8 +134,16 @@ for _, obj in pairs(workspace:GetChildren()) do
 	end
 end
 
-local lastWeatherEvent = tick();
 
+local dawnStartColor = Color3.fromRGB(58, 25, 31);
+local dawnPeakColor = Color3.fromRGB(104, 30, 52);
+local dawnEndColor = Color3.fromRGB(154, 105, 124);
+
+local duskStartColor = Color3.fromRGB(166, 157, 153);
+local duskPeakColor = Color3.fromRGB(121, 69, 31);
+local duskEndColor = Color3.fromRGB(74, 60, 47);
+
+local lastWeatherEvent = tick();
 modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 	local unixSeed = (tonumber(os.date("%Y")) :: number)*100000000 
 	+ (tonumber(os.date("%j")) :: number)*100000 
@@ -154,13 +163,66 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 		range = range^(1/4);
 		-- range = [0,1];
 		
-		filterSunRays.Intensity = 0.05+(0.15*range);
+		Lighting:SetAttribute("SunRaysIntensity", math.clamp(0.05+(0.15*range), 0, 1));
 		
 		if hourClock <= 0.1 then
 			Lighting.ClockTime = hourClock;
 		end
 		
 		local newOutDoorAmbient = LightingConfigurations.NightOutdoorAmbient:Lerp(LightingConfigurations.DayOutdoorAmbient, range);
+		local newFogColor = Color3.fromRGB(0, 0, 0):Lerp(Color3.fromRGB(255, 255, 255), range);
+
+		if Lighting.ClockTime >= 18 then
+			local a = modMath.MapNum(Lighting.ClockTime, 18, 18.6, 0, 1, true);
+			newOutDoorAmbient = duskEndColor:Lerp(newOutDoorAmbient, a);
+			newFogColor = newOutDoorAmbient;
+			Lighting:SetAttribute("DuskDawnPeak", 0.5-(a/2));
+
+		elseif Lighting.ClockTime >= 17.6 then
+			local a = modMath.MapNum(Lighting.ClockTime, 17.6, 18, 0, 1, true);
+			newOutDoorAmbient = duskPeakColor:Lerp(duskEndColor, a);
+			newFogColor = newOutDoorAmbient;
+			Lighting:SetAttribute("DuskDawnPeak", 1-(a/2));
+
+		elseif Lighting.ClockTime >= 17.2 then
+			local a = modMath.MapNum(Lighting.ClockTime, 17.2, 17.6, 0, 1, true);
+			newOutDoorAmbient = duskStartColor:Lerp(duskPeakColor, a);
+			newFogColor = newOutDoorAmbient;
+			Lighting:SetAttribute("DuskDawnPeak", 0.5+(a/2));
+
+		elseif Lighting.ClockTime >= 16.6 then
+			local a = modMath.MapNum(Lighting.ClockTime, 16.6, 17.2, 0, 1, true);
+			newOutDoorAmbient = newOutDoorAmbient:Lerp(duskStartColor, a);
+			newFogColor = newOutDoorAmbient;
+			Lighting:SetAttribute("DuskDawnPeak", a/2);
+
+		elseif Lighting.ClockTime >= 6.8 then
+			local a = modMath.MapNum(Lighting.ClockTime, 6.8, 7.4, 0, 1, true);
+			newOutDoorAmbient = dawnEndColor:Lerp(newOutDoorAmbient, a);
+			newFogColor = newOutDoorAmbient;
+			Lighting:SetAttribute("DuskDawnPeak", 0.5-(a/2));
+
+		elseif Lighting.ClockTime >= 6.4 then
+			local a = modMath.MapNum(Lighting.ClockTime, 6.4, 6.8, 0, 1, true);
+			newOutDoorAmbient = dawnPeakColor:Lerp(dawnEndColor, a);
+			newFogColor = newOutDoorAmbient;
+			Lighting:SetAttribute("DuskDawnPeak", 1-(a/2));
+
+		elseif Lighting.ClockTime >= 6 then
+			local a = modMath.MapNum(Lighting.ClockTime, 6, 6.4, 0, 1, true);
+			newOutDoorAmbient = dawnStartColor:Lerp(dawnPeakColor, a);
+			newFogColor = newOutDoorAmbient;
+			Lighting:SetAttribute("DuskDawnPeak", 0.5+(a/2));
+
+		elseif Lighting.ClockTime >= 5.4 then
+			local a = modMath.MapNum(Lighting.ClockTime, 5.4, 6, 0, 1, true);
+			newOutDoorAmbient = newOutDoorAmbient:Lerp(dawnStartColor, a);
+			newFogColor = newOutDoorAmbient;
+			Lighting:SetAttribute("DuskDawnPeak", a/2);
+
+		end
+		
+
 		TweenService:Create(Lighting, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
 			ClockTime = hourClock;
 			ExposureCompensation = -1+(0.1*range);
@@ -168,10 +230,10 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 			OutdoorAmbient = newOutDoorAmbient;
 		}):Play();
 		
-		Lighting:SetAttribute("FogColor", Color3.fromRGB(0, 0, 0):Lerp(Color3.fromRGB(255, 255, 255), range));
+		Lighting:SetAttribute("OutdoorAmbient", newOutDoorAmbient);
+		Lighting:SetAttribute("FogColor", newFogColor);
 		Lighting:SetAttribute("FogStart", 40+(160*range));
 		Lighting:SetAttribute("FogEnd", 400+(LightingConfigurations.Properties.FogRange * range));
-		Lighting:SetAttribute("OutdoorAmbient", newOutDoorAmbient);
 		
 		if modSyncTime.IsDay and isNight ~= false then
 			isNight = false;
@@ -414,7 +476,6 @@ if folderInteractables then
 end;
 
 filterBlur:Clone().Parent = game.Lighting;
-filterSunRays:Clone().Parent = game.Lighting;
 
 local function onDebrisChildAdded(child)
 	if child:IsA("BasePart") then

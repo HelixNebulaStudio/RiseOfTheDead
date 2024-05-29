@@ -167,21 +167,6 @@ local function Cleanup(obj: Instance)
 	DropletPool:Return(obj)
 end
 
---Returns whether the given position is under cover
-local function UnderObject(pos, len)
-	len = len or 120
-
-	local hit, position = workspace:FindPartOnRayWithWhitelist(Ray.new(pos, UP_VEC * len), {
-        workspace.Environment;
-        workspace.Terrain;
-    })
-	if hit then
-		return hit.Transparency ~= 1 and true or UnderObject(position + UP_VEC, len - (pos - position).Magnitude)
-	else
-		return false
-	end
-end
-
 --Creates a random droplet on screen
 local function CreateDroplet()
 	local Scale = Settings.Size + (math.random((Settings.Size / 3) * -10, (Settings.Size / 3) * 10) / 10)
@@ -233,8 +218,6 @@ local ScreenRain = {
 	Enabled = false,
 	_activeUpdater = false,
 
-	RainParticle = nil;
-	RainVisible = false;
 	CanCreateDroplets = true;
 }
 
@@ -283,21 +266,15 @@ function ScreenRain:Enable(settings)
 			debug.profileend()
 
 			debug.profilebegin("Droplet Creation")
-			local isUnderObject = UnderObject(CameraCF.Position);
-			if self.Enabled and GlassGraphics and not isUnderObject then
-				self.RainVisible = true;
+			if self.Enabled and GlassGraphics and CameraCF.LookVector.Y > -0.4 then
+				accumulatedChance += (now - lastCheck) * Settings.Rate
 
-				if CameraCF.LookVector.Y > -0.4 and self.CanCreateDroplets then
-					accumulatedChance += (now - lastCheck) * Settings.Rate
-	
-					for _ = 1, math.floor(accumulatedChance) do
-						CreateDroplet()
-					end
+				for _ = 1, math.floor(accumulatedChance) do
+					CreateDroplet()
 				end
 
 				accumulatedChance %= 1
 			else
-				self.RainVisible = false;
 				accumulatedChance %= 1
 			end
 			debug.profileend()

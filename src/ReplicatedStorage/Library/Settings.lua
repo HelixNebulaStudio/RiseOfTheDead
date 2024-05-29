@@ -242,6 +242,7 @@ Settings.Add("SndNPC", volumeCheck);
 Settings.Add("SndUIEffects", volumeCheck);
 Settings.Add("SndWeaponEffects", volumeCheck);
 Settings.Add("SndZombies", volumeCheck);
+Settings.Add("SndWeather", volumeCheck);
 
 --== Menus;
 local function numCheck(v)
@@ -700,6 +701,12 @@ baseConfigInterface:Add("AudioSoundeffects", "SliderOption", {
 	DescProperties={Text="Zombie noises.";};
 	Config={SoundGroupKey="Zombies"; Type="SoundGroup"};
 });
+baseConfigInterface:Add("AudioSoundeffects", "SliderOption", {
+	TitleProperties={Text="Weather";};
+	DescProperties={Text="Weather sounds.";};
+	Config={SoundGroupKey="Weather"; Type="SoundGroup"};
+});
+
 -- AudioMusic;
 baseConfigInterface:Add("Right", "Page", {Id="AudioMusic";});
 baseConfigInterface:Add("AudioMusic", "SliderOption", {

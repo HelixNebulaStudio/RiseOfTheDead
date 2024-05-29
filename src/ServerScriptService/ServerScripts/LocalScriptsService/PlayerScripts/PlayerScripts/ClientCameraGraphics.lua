@@ -4,6 +4,8 @@ return function()
 	
 	local RunService = game:GetService("RunService");
 	local Lighting = game:GetService("Lighting");
+	local CollectionService = game:GetService("CollectionService");
+	local TweenService = game:GetService("TweenService");
 	
 	local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 
@@ -11,32 +13,35 @@ return function()
 	local modTextureAnimations = require(game.ReplicatedStorage.Library.TextureAnimations);
 	local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 	local modWeatherService = require(game.ReplicatedStorage.Library.WeatherService);
-	local modScreenRain = require(game.ReplicatedStorage.Library.ScreenRain);
 	local modWeatherLibrary = require(game.ReplicatedStorage.Library.WeatherLibrary);
+	local modScreenRain = require(game.ReplicatedStorage.Library.ScreenRain);
 
+	local modMath = require(game.ReplicatedStorage.Library.Util.Math)
+	local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 	local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
 
 	local particlesFolder = game.ReplicatedStorage.Particles;
 	--== Camera Handler
 	local camera = workspace.CurrentCamera;
-
 	--MARK: CameraParticles
 	local cameraParticlePart = Instance.new("Part");
 	cameraParticlePart.Name = "CameraParticlePart";
 	cameraParticlePart.Anchored = true;
 	cameraParticlePart.CanCollide = false;
 	cameraParticlePart.CanQuery = false;
-	cameraParticlePart.Size = Vector3.new(200, 0, 200);
+	cameraParticlePart.Size = Vector3.new(100, 0, 100);
 	cameraParticlePart.Transparency = 1;
 	cameraParticlePart.Parent = camera;
 	
 	RunService.Heartbeat:Connect(function()
-		cameraParticlePart.CFrame = CFrame.new(camera.CFrame.X, camera.CFrame.Y+100, camera.CFrame.Z);
+		local pos = camera.CFrame.Position + camera.CFrame.LookVector * 40;
+		cameraParticlePart.CFrame = CFrame.new(pos.X, pos.Y+16, pos.Z);
 	end)
 
 	local CameraClass = {};
 	CameraClass.__index = CameraClass;
 	CameraClass.PreviousLayerId = nil;
+	CameraClass.UnderRoof = false;
 
 	-- Camera priority level
 	-- 1 Character
@@ -105,6 +110,18 @@ return function()
 	CameraClass.Saturation = modLayeredVariable.new(0.2);
 	CameraClass.TintColor = modLayeredVariable.new(Color3.fromRGB(255, 255, 255)); --255, 238, 230
 	
+	--== MARK: Sky
+	local sky: Sky = Lighting:FindFirstChildWhichIsA("Sky");
+	
+	--== MARK: CameraSunRays
+	local srName = "ClientCameraSunRays";
+	local sunRays: SunRaysEffect = Lighting:FindFirstChild(srName);
+	if sunRays == nil then
+		sunRays = Instance.new("SunRaysEffect");
+		sunRays.Name = srName;
+		sunRays.Parent = Lighting;
+	end
+
 
 	--== MARK: CameraEffectSystem
 	CameraClass.EffectsPriority = {
@@ -120,6 +137,9 @@ return function()
 	if atmosphere == nil then 
 		atmosphere = Instance.new("Atmosphere");
 		atmosphere.Name = atmosName;
+		atmosphere.Density = 0;
+		atmosphere.Offset = 0;
+		atmosphere.Haze = 0;
 		atmosphere.Parent = script;
 	end;
 	
@@ -138,9 +158,17 @@ return function()
 		game.Debris:AddItem(defaultAtmosphere, 0);
 	end
 
+	local screenParticles = {};
+	CameraClass.ScreenParticles = screenParticles;
+
+	local function lerp(a, b, t) return a * (1-t) + (b*t); end
 	local previousWeather = nil;
-	local logDebounce = tick();
+	local ceilingCheck = tick();
 	RunService.RenderStepped:Connect(function(delta)
+		if sky == nil then
+			sky = Lighting:FindFirstChildWhichIsA("Sky");
+		end
+		
 		colorCorrection.Brightness = CameraClass.Brightness:Get();
 		colorCorrection.Contrast = CameraClass.Contrast:Get();
 		colorCorrection.Saturation = CameraClass.Saturation:Get();
@@ -182,26 +210,67 @@ return function()
 
 		end
 
+		local tweenRatio = previousWeather and previousWeather.EndTick and math.clamp((tick()-previousWeather.EndTick)/(weatherLib and weatherLib.FadeTime or 0.1), 0, 1) or 1;
+
 		-- MARK: CameraEffects
 		local activeEffect = cameraEffects:Get();
 
 		if activeEffect and activeEffect.Atmosphere then
 			local effectAtmosphere = activeEffect.Atmosphere;
-			
-			atmosphere.Density = effectAtmosphere.Density or atmosphere.Density;
-			atmosphere.Offset = effectAtmosphere.Offset or atmosphere.Offset;
+			local previousAtmosphere = previousWeather and previousWeather.Atmosphere or {};
 
-			atmosphere.Color = (effectAtmosphere.UseAmbientColor and CameraClass.AtmosphereColor) or effectAtmosphere.Color or atmosphere.Color;
-			atmosphere.Decay = effectAtmosphere.Decay or atmosphere.Decay;
-			atmosphere.Glare = effectAtmosphere.Glare or atmosphere.Glare;
-			atmosphere.Haze = effectAtmosphere.Haze or atmosphere.Haze;
+			local density = effectAtmosphere.Density or atmosphere.Density;
+			atmosphere.Density = lerp(previousAtmosphere.Density or 0.3, density, tweenRatio);
+
+			local offset = effectAtmosphere.Offset or atmosphere.Offset;
+			atmosphere.Offset = lerp(previousAtmosphere.Offset or 0, offset, tweenRatio);
+
+			local color = (effectAtmosphere.UseAmbientColor and CameraClass.AtmosphereColor) or effectAtmosphere.Color or atmosphere.Color;
+			atmosphere.Color = (previousAtmosphere.Color or color):Lerp(color, tweenRatio);
+
+			local decay = effectAtmosphere.Decay or atmosphere.Decay;
+			atmosphere.Decay = (previousAtmosphere.Decay or decay):Lerp(decay, tweenRatio);
+
+			local glaze = effectAtmosphere.Glare or atmosphere.Glare;
+			atmosphere.Glare = lerp(previousAtmosphere.Glare or glaze, glaze, tweenRatio);
+
+			local haze = effectAtmosphere.Haze or atmosphere.Haze;
+			atmosphere.Haze = lerp(previousAtmosphere.Haze or 0, haze, tweenRatio);
 
 			atmosphere.Parent = Lighting;
-		else
-			atmosphere.Parent = script;
 
+		else
+			local rate = 1/600;
+			if activeEffect and activeEffect.Fog then
+				rate = 1;
+			end
+
+			atmosphere.Density = math.max(atmosphere.Density - rate, 0.3);
+			atmosphere.Offset = atmosphere.Offset - rate;
+			atmosphere.Glare = atmosphere.Glare - rate*10;
+			atmosphere.Haze = atmosphere.Haze - rate*10;
+
+			if atmosphere.Density <= 0.31 and atmosphere.Offset <= 0 and atmosphere.Haze <= 0 then
+				atmosphere.Parent = script;
+			end
 		end
 
+		if atmosphere.Parent == script then
+			sky.SunAngularSize = lerp(sky.SunAngularSize, 32, 0.1);
+			sky.MoonAngularSize = lerp(sky.MoonAngularSize, 11, 0.1);
+
+		else
+			local sunDirection = Lighting:GetSunDirection();
+			local angleToHorizon = Vector3.yAxis:Angle(sunDirection);
+			
+			local scale = modMath.MapNum(atmosphere.Haze, 3, 1.5, 0, 1) * modMath.MapNum(angleToHorizon, 0.45, 0.74, 1, 0);
+			sky.SunAngularSize = lerp(sky.SunAngularSize, math.clamp(scale, 0, 1) * 32, 0.1);
+			sky.MoonAngularSize = lerp(sky.MoonAngularSize, math.clamp(scale, 0, 1) * 11, 0.1);
+
+			
+		end
+
+		
 		local fogColor = Lighting:GetAttribute("FogColor");
 		local fogStart = Lighting:GetAttribute("FogStart");
 		local fogEnd = Lighting:GetAttribute("FogEnd");
@@ -217,34 +286,72 @@ return function()
 		Lighting.FogStart = fogStart;
 		Lighting.FogEnd = fogEnd;
 
-		if activeEffect and activeEffect.EnableScreenRain then
-			local weatherParticleName = "Weather"..activeEffect.EnableScreenRain;
-			if modScreenRain.RainParticle == nil or modScreenRain.RainParticle.Name ~= weatherParticleName then
-				if modScreenRain.RainParticle then
-					game.Debris:AddItem(modScreenRain.RainParticle, 0);
-				end
-				local new = particlesFolder:WaitForChild(weatherParticleName):Clone();
-				new.Parent = cameraParticlePart;
-				modScreenRain.RainParticle = new;
-			end
-			modScreenRain:Enable();
 
-			if activeEffect.EnableScreenRain == "Rain" then
-				modScreenRain.CanCreateDroplets = true;
-			else
-				modScreenRain.CanCreateDroplets = false;
-			end
-			
-		else
-			modScreenRain:Disable();
+		local sunRayIntensity = Lighting:GetAttribute("SunRaysIntensity");
+		sunRays.Intensity = lerp(sunRayIntensity or 0.1, activeEffect and activeEffect.SunRaysIntensity or sunRayIntensity, tweenRatio);
 
+		local isUnderRoof = CameraClass.UnderRoof;
+		if tick()-ceilingCheck > 0.2 then
+			ceilingCheck = tick();
+
+			isUnderRoof = modRaycastUtil.GetCeiling(camera.CFrame.Position, 256) ~= nil;
+			CameraClass.UnderRoof = isUnderRoof;
 		end
 
-		if modScreenRain.RainParticle then
-			if modData:GetSetting("DisableWeatherParticles") ~= 1 then
-				modScreenRain.RainParticle.Enabled = modScreenRain.RainVisible;
+		local weatherParticlesEnabled = modData:GetSetting("DisableWeatherParticles") ~= 1;
+		local existParticle = {};
+		if activeEffect and activeEffect.ScreenParticles and weatherParticlesEnabled then
+			for a=1, #activeEffect.ScreenParticles do
+				local particleData = activeEffect.ScreenParticles[a];
+				
+				if screenParticles[particleData.Id] == nil then
+					local new: ParticleEmitter = particlesFolder:FindFirstChild(particleData.Id):Clone();
+					local defaultRate = new.Rate;
+					new.Rate = 0;
+					new.Parent = cameraParticlePart;
+					screenParticles[particleData.Id] = new;
+
+					TweenService:Create(new, TweenInfo.new(5), {Rate = defaultRate}):Play();
+
+					if new:GetAttribute("OutdoorsOnly") then
+						task.spawn(function()
+							while workspace:IsDescendantOf(new) do
+								task.wait();
+								new.Enabled = not CameraClass.UnderRoof;
+							end
+						end)
+					end
+				end
+
+				existParticle[particleData.Id] = true;
+			end
+		end
+		for k, particle in pairs(screenParticles) do
+			if existParticle[k] then continue end;
+
+			if not weatherParticlesEnabled then
+				particle:Destroy();
 			else
-				modScreenRain.RainParticle.Enabled = false;
+				Debugger.Expire(particle, 3);
+				TweenService:Create(particle, TweenInfo.new(3), {Rate = 0}):Play();
+			end
+			screenParticles[k] = nil;
+		end
+
+
+		if activeEffect and activeEffect.EnableScreenRain and not isUnderRoof then
+			modScreenRain:Enable({
+				Rate = activeEffect.ScreenRainRate or 5;
+			});
+		else
+			modScreenRain:Disable();
+		end
+
+		local weatherSounds = CollectionService:GetTagged("WeatherSound");
+		for a=1, #weatherSounds do
+			local eq = weatherSounds[a]:FindFirstChild("EqualizerSoundEffect");
+			if eq then
+				eq.Enabled = isUnderRoof;
 			end
 		end
 	end)
@@ -277,8 +384,8 @@ return function()
 
 	
 	function CameraClass:RefreshGraphics()
-		if game.Lighting:FindFirstChild("SunRays") then
-			game.Lighting.SunRays.Enabled = modData:GetSetting("FilterSunRays") ~= 1;
+		if sunRays then
+			sunRays.Enabled = modData:GetSetting("FilterSunRays") ~= 1;
 		end
 
 		if modData:GetSetting("GlobalShadows") == nil then
