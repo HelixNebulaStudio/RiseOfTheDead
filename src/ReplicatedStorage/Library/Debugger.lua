@@ -184,12 +184,14 @@ function Debugger:Ray(ray, rayHit, rayPoint, rayNormal)
 		A.Material = Enum.Material.Neon;
 		A.TopSurface = Enum.SurfaceType.Smooth;
 		A.BottomSurface = Enum.SurfaceType.Smooth;
+		A.CanQuery = false;
 		A.Locked = true;
 		A.Size = Vector3.new(0.2, 0.2, 0.2);
 		A.Shape = Enum.PartType.Ball;
 		local B = Instance.new("Part"); B.Name = "B";
 		B.Anchored = true;
 		B.CanCollide = false;
+		B.CanQuery = false;
 		B.Material = Enum.Material.Neon;
 		B.TopSurface = Enum.SurfaceType.Smooth;
 		B.BottomSurface = Enum.SurfaceType.Smooth;
@@ -200,6 +202,7 @@ function Debugger:Ray(ray, rayHit, rayPoint, rayNormal)
 		local C = Instance.new("Part"); C.Name = "C";
 		C.Anchored = true;
 		C.CanCollide = false;
+		C.CanQuery = false;
 		C.Material = Enum.Material.Neon;
 		C.TopSurface = Enum.SurfaceType.Smooth;
 		C.BottomSurface = Enum.SurfaceType.Smooth;
@@ -234,6 +237,8 @@ function Debugger:Ray(ray, rayHit, rayPoint, rayNormal)
 		local rayB = rayA:WaitForChild("B");
 		local rayC = rayB:WaitForChild("C");
 		
+		rayA:GetPropertyChangedSignal("Color"):Connect(function() rayB.Color = rayA.Color; rayC.Color = rayA.Color; end)
+
 		local rayOrigin, rayDirection = ray.Origin, ray.Direction;
 		rayA.CFrame = CFrame.new(rayOrigin);
 		if rayPoint == nil then rayPoint = rayOrigin+rayDirection; end
