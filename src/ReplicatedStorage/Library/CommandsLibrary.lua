@@ -1816,6 +1816,46 @@ Commands["offsettime"] = {
 	end;
 };
 
+Commands["settime"] = {
+
+};
+--SetOsTime
+
+Commands["time"] = {
+	Permission = PermissionLevel.DevBranch;
+	Description = "Offsets time by x seconds.";
+	
+	RequiredArgs = 0;
+	UsageInfo = [[/time [set/offset] [seconds]
+
+		/time set (0-1200)  -- set and freeze time to a number from 0 - 1200. 
+		/time offset [number]	-- offset current time.
+	]];
+	Function = function(speaker, args)
+		local action = args[1];
+		local seconds = tonumber(args[2]);
+
+		if action == "set" then
+			if seconds == nil then
+				workspace:SetAttribute("SetOsTime", nil);
+				shared.Notify(speaker, "Time unfreezed.", "Inform");
+			else
+				workspace:SetAttribute("SetOsTime", seconds);
+				shared.Notify(speaker, "Time freezed to "..seconds.."/".. modConfigurations.DayLapseDuration .." of day.", "Inform");
+			end
+			
+		elseif action == "offset" then
+			modSyncTime.SetOffset(seconds or 0);
+			shared.Notify(speaker, "Time offset by "..modSyncTime.TimeOffset.Value.."s.", "Inform");
+
+		else
+			shared.Notify(speaker, "Invalid /time action.", "Negative");
+
+		end
+		
+		return true;
+	end;
+};
 
 Commands["position"] = {
 	Permission = PermissionLevel.DevBranch;
