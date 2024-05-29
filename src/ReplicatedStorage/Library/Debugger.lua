@@ -350,12 +350,12 @@ function Debugger:CheckDisable(highPiority)
 	if highPiority ~= true and self.Script:GetAttribute("Debug") ~= true then return true end;
 	return false;
 end
---[[**
+--[[
 	Log message;
 	@param ... Tuple
 	
 	Message of the log. Example: Debugger:Log("Hello", "Again");
-**--]]
+]]
 function Debugger:Log(...)
 	if self:CheckDisable() then return end;
 	local a = (self.Name or script.Name)..">>  ";
@@ -381,12 +381,12 @@ function Debugger:StudioLog(...)
 end
 
 
---[[**
+--[[
 	Log warning;
 	@param ... Tuple
 	
 	Message of the warning. Example: Debugger:Warn("Oh no!", "404");
-**--]]
+]]
 function Debugger:Warn(...)
 	if self:CheckDisable(true) then return end;	
 	local a = (self.Name or script.Name)..">>  ";
