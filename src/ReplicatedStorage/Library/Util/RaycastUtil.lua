@@ -44,8 +44,13 @@ function RaycastUtil.ConeCast(packet)
 	return r;
 end
 
--- !outline RaycastUtil.RingCast(orign, dir, points, radius, rayParam)
-function RaycastUtil.RingCast(orign, dir, points, radius, rayParam)
+--[[
+	@param origin Vector3
+	@param dir Vector3
+	@param points number
+	@param radius number
+]]
+function RaycastUtil.RingCast(orign, dir, points, radius, rayParam): {RaycastResult}
 	local r = {};
 
 	local hitResult = workspace:Raycast(orign, dir, rayParam);
@@ -167,12 +172,9 @@ function RaycastUtil.GetCeiling(origin: Vector3, range: number?) : RaycastResult
 
 	local r = range or 256;
 	
-	local rayResult = workspace:Raycast(origin, Vector3.yAxis * r, ceilingRayParams);
-	if rayResult then
-		local worldSpaceSize = rayResult.Instance.CFrame:vectorToWorldSpace(rayResult.Instance.Size);
-		if rayResult.Distance > (math.abs(worldSpaceSize.X)+math.abs(worldSpaceSize.Z))/2 then return nil end;
-
-		return rayResult;
+	local rayResults = RaycastUtil.RingCast(origin, Vector3.yAxis * r, 2, 3, ceilingRayParams);
+	if #rayResults > 2 then
+		return rayResults;
 	end
 	return nil;
 end
