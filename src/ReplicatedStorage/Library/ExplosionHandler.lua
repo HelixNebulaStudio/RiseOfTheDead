@@ -23,7 +23,8 @@ function ExplosionHandler:Cast(position, params)
 	params.CollisionGroup = params.CollisionGroup or "Raycast";
 
 	params.Tags = params.Tags or {
-		{"EntityRootPart"; "PlayerRootParts"}; -- HitLayer 1
+		{"PlayerRootParts"}; -- 1
+		{"EntityRootPart"}; -- 2
 		{"Destructibles"; "EntityDestructibles"}; --"EnvironmentColliders";
 	};
 	

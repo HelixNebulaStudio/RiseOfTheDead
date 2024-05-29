@@ -134,12 +134,13 @@ return function(self)
 
 		local damage = self.Properties.AttackDamage * (1-math.clamp(self.GetTargetDistance() or 15, 0, 30)/30);
 		if damage >= 1  then
+			local splashReflectedValue = nil;
 			task.spawn(function()
 				local hitLayers = modExplosionHandler:Cast(detonatePosition, {
 					Radius = 20;
 				});
 
-				modExplosionHandler:Process(detonatePosition, hitLayers, {
+				local newExplosionProcessPacket = {
 					Owner = self.Owner;
 					StorageItem = self.StorageItem;
 					TargetableEntities = {
@@ -155,52 +156,65 @@ return function(self)
 					ExplosionStunThreshold = 0;
 
 					DamageOrigin = detonatePosition;
-					OnDamagableHit = function(damagable, damage)
-						if damagable.Model == self.Prefab then return true end;
+				};
+				
+				newExplosionProcessPacket.OnDamagableHit = function(damagable, damage)
+					if damagable.Model == self.Prefab then return true end;
 
-						if damagable.Object.ClassName == "NpcStatus" then
-							local npcModule = damagable.Object:GetModule();
-							
-							local healthInfo = damagable:GetHealthInfo();
-							if npcModule.Properties and npcModule.Properties.BasicEnemy then
-								damage = healthInfo.MaxHealth * 0.2;
-								task.spawn(function()
-									if npcModule == self then return end;
-									if npcModule.IsDead then return end;
-									if npcModule.Name ~= "Ticks" then return end;
+					if damagable.Object.ClassName == "NpcStatus" then
+						local npcModule = damagable.Object:GetModule();
+						
+						local healthInfo = damagable:GetHealthInfo();
+						if npcModule.Properties and npcModule.Properties.BasicEnemy then
+							damage = healthInfo.MaxHealth * 0.2;
 
-									task.wait(math.random(50, 250)/1000);
-									npcModule.BehaviorTree:RunTreeLeaf("TicksTree", "Detonate");
-								end)
-
-							else
-								damage = healthInfo.MaxHealth * 0.05;
+							if splashReflectedValue then
+								damage = damage*splashReflectedValue;
 							end
-							
-						elseif damagable.Object.ClassName == "PlayerClass" then
-							local classPlayer = damagable.Object;
+							task.spawn(function()
+								if npcModule == self then return end;
+								if npcModule.IsDead then return end;
+								if npcModule.Name ~= "Ticks" then return end;
 
-							local gasProtection = classPlayer:GetBodyEquipment("GasProtection");
-							if gasProtection then
-								damage = damage * (1-gasProtection);
-							end
+								task.wait(math.random(50, 250)/1000);
+								npcModule.BehaviorTree:RunTreeLeaf("TicksTree", "Detonate");
+							end)
 
-							if classPlayer.Properties.tickre then
-								return true;
-							end
+						else
+							damage = healthInfo.MaxHealth * 0.05;
+						end
+						
+					elseif damagable.Object.ClassName == "PlayerClass" then
+						local classPlayer = damagable.Object;
 
-							local tickRepellent = classPlayer:GetBodyEquipment("TickRepellent");
-							if tickRepellent then
-								classPlayer:SetProperties("tickre", {Expires=workspace:GetServerTimeNow()+tickRepellent; Duration=tickRepellent; Amount=tickRepellent;});
-							end
-
+						local gasProtection = classPlayer:GetBodyEquipment("GasProtection");
+						if gasProtection then
+							damage = damage * (1-gasProtection);
 						end
 
-						self:DamageTarget(damagable.Model, damage, nil, nil, nil, true);
+						local splashReflection = classPlayer:GetBodyEquipment("SplashReflection");
+						if splashReflection then
+							splashReflectedValue = splashReflection;
+							newExplosionProcessPacket.ExplosionStun = newExplosionProcessPacket.ExplosionStun*splashReflection;
+						end
+						
+						if classPlayer.Properties.tickre then
+							return true;
+						end
 
-						return true;
+						local tickRepellent = classPlayer:GetBodyEquipment("TickRepellent");
+						if tickRepellent then
+							classPlayer:SetProperties("tickre", {Expires=workspace:GetServerTimeNow()+tickRepellent; Duration=tickRepellent; Amount=tickRepellent;});
+						end
+
 					end
-				});
+
+					self:DamageTarget(damagable.Model, damage, nil, nil, nil, true);
+
+					return true;
+				end
+
+				modExplosionHandler:Process(detonatePosition, hitLayers, newExplosionProcessPacket);
 			end)
 		end
 

@@ -7,6 +7,7 @@ local attirePackage = {
 function attirePackage.NewToolLib(handler)
 	local toolLib = {};
 
+	toolLib.SplashReflection = 2;
 	toolLib.TickRepellent = 20;
 	
 	toolLib.BaseArmorPoints = 10;

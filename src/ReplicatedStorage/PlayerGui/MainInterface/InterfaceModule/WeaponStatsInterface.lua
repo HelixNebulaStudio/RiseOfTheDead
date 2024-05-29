@@ -143,6 +143,7 @@ local statTemplates = {
 		{Category="Warmth"; Text="<b>Warmth:</b>    $stat°C"; Type="int"};
 
 		{Category="FlinchProtection"; Text="<b>Flinch Protection:</b>    $stat%"; Type="percent"};
+		{Category="SplashReflection"; Text="<b>Splash Reflection:</b>    $stat%"; Type="percent"};
 		
 	}
 };
@@ -299,7 +300,10 @@ local mouseOverDescription = {
 	};
 	FlinchProtection={
 		Desc="Reduces the flinch strength when getting damaged.\n\n(Higher is better)";
-	}
+	};
+	SplashReflection={
+		Desc="Splash effects of enemies such as Ticks' Detonation are reflected."
+	};
 };
 
 local triggerModes = {"Semi-automatic"; "Bolt-action"; "Full-automatic"; "Burstfire"; "Spin-up";};
