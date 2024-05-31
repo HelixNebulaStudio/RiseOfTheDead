@@ -455,7 +455,7 @@ function NpcComponent:Teleport(cframe: CFrame, cfAngle: CFrame)
 end
 
 function NpcComponent:TeleportHide()
-	Debugger:Warn("TeleportHide> "..self.Name);
+	Debugger:StudioWarn("TeleportHide> "..self.Name, debug.traceback());
 	if self.Humanoid and self.Humanoid.SeatPart and self.Humanoid.SeatPart:FindFirstChild("SeatWeld") then 
 		self.Humanoid.SeatPart.SeatWeld:Destroy();
 	end

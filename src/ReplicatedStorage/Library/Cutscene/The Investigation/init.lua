@@ -36,7 +36,7 @@ if RunService:IsServer() then
 		end
 	end)
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 end
 
 --== Script;
@@ -875,8 +875,9 @@ return function(CutsceneSequence)
 					
 				end
 			end
+			
 			mission.Changed:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
 		end)
 		
 	else

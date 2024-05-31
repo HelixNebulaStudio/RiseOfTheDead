@@ -230,6 +230,16 @@ function OnPlayerAdded(player)
 				npcModule.Owner = player;
 			end));
 		end
+
+	elseif modBranchConfigs.IsWorld("TheResidentials") then
+		
+		local mission38 = missionProfile:Get(38); -- Something's Not Right
+		local mission52 = missionProfile:Get(52); -- The Investigation
+
+		if mission52.Type == 3 and mission38.Type == 1 and mission38.Redo ~= true then -- For some players softlocked with 52 completed.
+			modMission:CompleteMission(player, 38);
+		end
+
 	end
 	
 	if repeatableMissionsUnlocked and activeSave then

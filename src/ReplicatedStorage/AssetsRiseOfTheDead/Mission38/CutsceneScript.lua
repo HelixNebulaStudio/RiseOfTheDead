@@ -135,8 +135,9 @@ return function(CutsceneSequence)
 				if mission.Type == 2 then -- OnAvailable
 
 				elseif mission.Type == 1 then -- OnActive
+					local postCf = CFrame.new(1127.07922, 57.5696716, -108.439293, -1, 0, 0, 0, 1, 0, 0, 0, -1);
 					if mission.ProgressionPoint == 5 then
-						robertModule.Actions:Teleport(CFrame.new(Vector3.new(1127.07922, 57.5696716, -108.439293, -1, 0, 0, 0, 1, 0, 0, 0, -1)));
+						robertModule.Actions:Teleport(postCf);
 						robertModule.Move:SetMoveSpeed("set", "default", 15);
 						robertModule.Move:Face(Vector3.new(1126.967, 58.25, -70.092));
 						
@@ -150,6 +151,7 @@ return function(CutsceneSequence)
 						end)
 
 					elseif mission.ProgressionPoint == 6 then
+						robertModule.Actions:Teleport(postCf);
 						spawn(function()
 							local face = robertModule.Prefab.Head:WaitForChild("face");
 							face.Texture = "rbxassetid://5195838286";
@@ -157,6 +159,7 @@ return function(CutsceneSequence)
 						robertModule.PlayAnimation("LookBack");
 
 					elseif mission.ProgressionPoint == 7 then
+						robertModule.Actions:Teleport(postCf);
 						robertModule.StopAnimation("LookBack");
 						spawn(function()
 							-- rbxassetid://141728515 original face
