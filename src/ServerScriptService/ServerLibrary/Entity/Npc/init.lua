@@ -432,9 +432,9 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	
 	task.spawn(function()
 		local modNpcStatus = require(npcStatusModule);
-		npcModule.Status = modNpcStatus;
+		modNpcStatus:Initialize(npcModule);
 		
-		modNpcStatus.Initialize(npcModule);
+		npcModule.Status = modNpcStatus;
 	end)
 	
 	if preloadCallback then 

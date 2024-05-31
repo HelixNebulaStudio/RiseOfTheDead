@@ -67,7 +67,7 @@ function Damagable.NewDamagable(model)
 			return Damagable.new(model, classPlayer, classPlayer.Humanoid);
 		end
 
-		local npcStatus = model:FindFirstChild("NpcStatus");
+		local npcStatus = model:FindFirstChild("NpcStatus")
 		npcStatus = npcStatus and require(npcStatus) or nil;
 		if npcStatus then
 			return Damagable.new(model, npcStatus, npcStatus:GetHumanoid());

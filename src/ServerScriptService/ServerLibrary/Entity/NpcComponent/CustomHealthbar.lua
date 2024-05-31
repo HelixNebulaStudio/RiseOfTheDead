@@ -31,7 +31,7 @@ function CustomHealthbar:Create(name, maxHealth, adornee)
 	if adornee.Parent and adornee.Parent:FindFirstChild("NpcStatus") == nil then
 		local newLink = templateNpcStatusLink:Clone();
 		newLink.Parent = adornee.Parent;
-		require(newLink).Initialize(self.Npc);
+		require(newLink):Initialize(self.Npc);
 	end
 	
 	self.Npc.Garbage:Tag(function()

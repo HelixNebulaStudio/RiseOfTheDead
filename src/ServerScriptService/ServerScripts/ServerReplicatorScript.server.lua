@@ -373,10 +373,8 @@ bindPrimaryFire.Event:Connect(function(character, weaponModule, shotdata, target
 					if targetModel then
 						local damagable = modDamagable.NewDamagable(targetModel);
 
-
-						local npcStatusModule = targetModel:FindFirstChild("NpcStatus");
-
-						local humanoid = (npcStatusModule and require(npcStatusModule)) or targetModel:FindFirstChildWhichIsA("Humanoid");
+						local modNpcStatus = targetModel:FindFirstChild("NpcStatus") and require(targetModel.NpcStatus);
+						local humanoid = (modNpcStatus and modNpcStatus:GetHumanoid()) or targetModel:FindFirstChildWhichIsA("Humanoid");
 						local targetDamageMultiplier = humanoid and TargetableEntities[humanoid.Name];
 						
 						local damage = configurations.Damage;
@@ -609,9 +607,8 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 				
 				local damagable = modDamagable.NewDamagable(targetModel);
 
-				local npcStatusModule = targetModel:FindFirstChild("NpcStatus");
-				
-				local humanoid = (npcStatusModule and require(npcStatusModule)) or targetModel:FindFirstChildWhichIsA("Humanoid");
+				local modNpcStatus = targetModel:FindFirstChild("NpcStatus") and require(targetModel.NpcStatus);
+				local humanoid = modNpcStatus and modNpcStatus:GetHumanoid() or targetModel:FindFirstChildWhichIsA("Humanoid");
 				local targetDamageMultiplier = humanoid and TargetableEntities[humanoid.Name];
 				--
 				

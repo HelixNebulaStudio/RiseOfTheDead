@@ -60,7 +60,7 @@ function Pool.new(owner)
 		self.DamageSource.TargetPart = hitPart;
 		
 		if damagableObj.ClassName == "NpcStatus" then
-			local dmgMulti = self.TargetableEntities[damagableObj.Name];
+			local dmgMulti = self.TargetableEntities[damagable.HealthObj.Name];
 			
 			if dmgMulti and damagableObj:CanTakeDamageFrom(player) then
 				

@@ -80,7 +80,7 @@ function Flammable:FireDamage(target, basePart, hitPart)
 				
 			end
 
-			local dmgMulti = modConfigurations.TargetableEntities[damagable.Object.Name];
+			local dmgMulti = modConfigurations.TargetableEntities[damagable.HealthObj.Name];
 			damage = damage*dmgMulti;
 
 		elseif damagable.Object.ClassName == "PlayerClass" then

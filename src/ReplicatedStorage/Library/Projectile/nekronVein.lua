@@ -186,7 +186,7 @@ function Pool.new(owner)
 			local damage = math.clamp((self.Damage or 100), 1, math.huge);
 			
 			if damagableObj.ClassName == "NpcStatus" then
-				local dmgMulti = self.TargetableEntities[damagableObj.Name];
+				local dmgMulti = self.TargetableEntities[damagable.HealthObj.Name];
 				if dmgMulti then
 					damage = damage * dmgMulti;
 				else
