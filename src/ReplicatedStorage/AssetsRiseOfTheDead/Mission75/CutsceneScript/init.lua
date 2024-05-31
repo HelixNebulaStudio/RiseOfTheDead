@@ -356,7 +356,7 @@ return function(CutsceneSequence)
 			
 			storageItem.Values.Health = math.max(storageItem.Values.Health-dmg, 0);
 			storageItem:Sync({"Health"});
-			modStorageItem.PopupItemStatus("ItemHealth", storageItem);
+			modStorageItem.PopupItemStatus(storageItem);
 			
 			if storageItem.Values.Health <= 0 then
 				inventory:Remove(storageItemId);

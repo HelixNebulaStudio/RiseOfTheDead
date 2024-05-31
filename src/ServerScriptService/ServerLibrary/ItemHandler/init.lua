@@ -127,7 +127,7 @@ function ItemHandler:UnlockPapers(player, inputStorageItem)
 	local storageItem, storage = activeSave:FindItemFromStorages(inputStorageItem.ID);
 
 	if storageItem == nil or storage == nil then return end;
-	local itemLib = storageItem.Properties;
+	local itemLib = storageItem.Library;
 	
 	local safehomeData = profile.Safehome;
 	if safehomeData == nil then return end;

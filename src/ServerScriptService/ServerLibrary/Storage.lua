@@ -439,7 +439,7 @@ function remoteRemoveItem.OnServerInvoke(player, storageId, id, quantity)
 	if storageItem == nil then Debugger:Warn("StorageItem unknown."); return end;
 	
 	quantity = shared.IsNan(quantity) and 1 or quantity;
-	quantity = math.clamp(quantity, 1, storageItem.Properties.Stackable == false and 1 or storageItem.Properties.Stackable);
+	quantity = math.clamp(quantity, 1, storageItem.Library.Stackable == false and 1 or storageItem.Library.Stackable);
 
 	logRemoteUse(storage, "remoteRemoveItem");
 	return storage:Remove(id, quantity);
@@ -474,7 +474,7 @@ remoteItemActionHandler.OnServerEvent:Connect(function(player, storageId, id, ac
 				
 			else
 				
-				if clothingItem and clothingItem.Properties.Type == "Clothing" then
+				if clothingItem and clothingItem.Library.Type == "Clothing" then
 					local clothingLibA = modClothingLibrary:Find(clothingItem.ItemId);
 					local clothingLibB = modClothingLibrary:Find(vanityItem.ItemId);
 
@@ -512,7 +512,7 @@ function Storage.RefreshItem(player, storageItemID, sync)
 	if storageItem and storage then
 		local itemValues = storageItem.Values;
 
-		local itemLib = storageItem.Properties;
+		local itemLib = storageItem.Library;
 
 		if itemLib.DestroyOnExpire and itemValues.Expire and workspace:GetServerTimeNow() > itemValues.Expire then
 			storage:Remove(storageItemID);
@@ -598,7 +598,7 @@ function remoteRenameItem.OnServerInvoke(player, action, id, customName)
 			local playerGold = traderProfile and traderProfile.Gold;
 			
 			if #customName <= 0 then
-				storageItem.Name = nil;
+				storageItem.CustomName = nil;
 				storageItem:SetDisplayName(nil);
 				storageItem:Sync();
 				
@@ -606,7 +606,9 @@ function remoteRenameItem.OnServerInvoke(player, action, id, customName)
 				
 			else
 				if playerGold >= 50 then
-					storageItem.Name = filterName;
+					storageItem.CustomName = filterName;
+					storage:Filter(storageItem.ID);
+
 					traderProfile:AddGold(-50);
 					modAnalytics.RecordResource(player.UserId, 50, "Sink", "Gold", "Usage", "Rename Item");
 					storageItem:Sync();
@@ -709,7 +711,7 @@ function Storage:Check(packet)
 	end
 	
 	-- Overrule custom check;
-	local dragItemLib = packet.DragStorageItem.Properties;
+	local dragItemLib = packet.DragStorageItem.Library;
 	if dragItemLib.StorageIncludeList then
 		if table.find(dragItemLib.StorageIncludeList, self.Id) == nil then
 			packet.Allowed = false;
@@ -1087,54 +1089,62 @@ function Storage:Load(rawData)
 	if rawData == nil then error("Storage>>  Load is missing data."); end;
 	for key, value in pairs(self) do
 		local data = rawData[key] or self[key];
-		if self[key] ~= nil then
-			if key == "Container" then
-				local indexClaimed = {};
-				local reAddItem = {};
-				for _, valueData in pairs(data) do
-					local itemLib = modItemsLibrary:Find(valueData.ItemId);
-					if itemLib then
-						if valueData.Values and valueData.Values.IsEquipped then
-							valueData.Values.IsEquipped = nil;
+		if self[key] == nil then continue end;
+		
+		if key == "Container" then
+			local indexClaimed = {};
+			local reAddItem = {};
+
+			for _, valueData in pairs(data) do
+				local itemLib = modItemsLibrary:Find(valueData.ItemId);
+				if itemLib == nil then Debugger:Warn("Failed to load (",valueData.ItemId,")"); continue end;
+				
+				if valueData.Values and valueData.Values.IsEquipped then
+					valueData.Values.IsEquipped = nil;
+				end
+				if valueData.Index and indexClaimed[valueData.Index] == nil then
+					if valueData.ID ~= nil then
+						indexClaimed[valueData.Index] = true;
+						
+						if valueData.Name then
+							valueData.CustomName = valueData.Name;
 						end
-						if valueData.Index and indexClaimed[valueData.Index] == nil then
-							if valueData.ID ~= nil then
-								indexClaimed[valueData.Index] = true;
-								local storageItem = StorageItem.new(valueData.Index, valueData.ItemId, valueData, self.Player);
-								self:SetContainerItem(storageItem);
-							else
-								table.insert(reAddItem, {ValueData=valueData; Err="1"});
-							end
-						else
-							table.insert(reAddItem, {ValueData=valueData; Err="2"});
-						end
+						local storageItem = StorageItem.new(valueData.Index, valueData.ItemId, valueData, self.Player);
+						self:SetContainerItem(storageItem);
+
 					else
-						Debugger:Warn("Failed to load (",valueData.ItemId,")");
+						table.insert(reAddItem, {ValueData=valueData; Err="1"});
+
 					end
-				end
-				for a=1, #reAddItem do
-					local valueData = reAddItem[a].ValueData;
-					if valueData.ItemId then
-						local emptyIndex = self:FindEmpty();
-						if emptyIndex then
-							local storageItem = StorageItem.new(emptyIndex, valueData.ItemId, valueData, self.Player);
-							if storageItem.ID == nil then storageItem.ID = 10000+random:NextInteger(1,999) end;
-							storageItem:SetValues("Err", reAddItem[a].Err);
-							self:SetContainerItem(storageItem);
-						end
-					end
+				else
+					table.insert(reAddItem, {ValueData=valueData; Err="2"});
+
 				end
 				
-			elseif key == "Settings" then
-				for sK, sV in pairs(data) do
-					if self.Settings[sK] ~= nil then
-						self.Settings[sK] = sV;
-					end
-				end
-				
-			else
-				self[key] = data;
 			end
+			for a=1, #reAddItem do
+				local valueData = reAddItem[a].ValueData;
+				if valueData.ItemId then
+					local emptyIndex = self:FindEmpty();
+					if emptyIndex then
+						local storageItem = StorageItem.new(emptyIndex, valueData.ItemId, valueData, self.Player);
+						if storageItem.ID == nil then storageItem.ID = 10000+random:NextInteger(1,999) end;
+						storageItem:SetValues("Err", reAddItem[a].Err);
+						self:SetContainerItem(storageItem);
+
+					end
+				end
+			end
+			
+		elseif key == "Settings" then
+			for sK, sV in pairs(data) do
+				if self.Settings[sK] ~= nil then
+					self.Settings[sK] = sV;
+				end
+			end
+			
+		else
+			self[key] = data;
 		end
 	end
 	return self;
@@ -1147,7 +1157,7 @@ function Storage:Loop(callback)
 			local r = callback(storageItem);
 			if r ~= nil then break; end;
 		end
-		storageItem.Quantity = math.clamp(storageItem.Quantity, 1, storageItem.Properties.Stackable == false and 1 or storageItem.Properties.Stackable);
+		storageItem.Quantity = math.clamp(storageItem.Quantity, 1, storageItem.Library.Stackable == false and 1 or storageItem.Library.Stackable);
 		c=c+1;
 	end
 	return c;
@@ -1352,18 +1362,23 @@ end
 
 function Storage:Filter(id)
 	local storageItem = self.Container[id];
-	
-	if storageItem and table.find(Storage.RegisteredItemNames, storageItem.Name) ~= nil then
-		storageItem:SetDisplayName(storageItem.Name);
+	if storageItem == nil then return end;
+
+	if storageItem.CustomName == storageItem.Library.Name then
+		storageItem.CustomName = nil;
+		storageItem:SetDisplayName(nil);
+		return;
+	end
+
+	if table.find(Storage.RegisteredItemNames, storageItem.CustomName) ~= nil then
+		storageItem:SetDisplayName(storageItem.CustomName);
 		return;
 	end
 	
-	if storageItem and storageItem.Name and storageItem.Name ~= storageItem.Properties.Name then
-		storageItem.Name = tostring(storageItem.Name):sub(1,customNameMaxLen);
+	if storageItem.CustomName then
+		storageItem.CustomName = tostring(storageItem.CustomName):sub(1,customNameMaxLen);
 		
-		local filterName = shared.modAntiCheatService:Filter(storageItem.Name, self.Player, false, false);
-		
-		local actualItemName = storageItem.Properties.Name;
+		local filterName = shared.modAntiCheatService:Filter(storageItem.CustomName, self.Player, false, false);
 		
 		if modItemsLibrary.ItemNames[string.lower(filterName)] then
 			filterName = string.rep("#", #filterName);
@@ -1467,7 +1482,7 @@ function Storage:Insert(item, emptyIndex)
 	end)
 	
 	if self.Player then
-		if new.Properties.SyncOnAdd then
+		if new.Library.SyncOnAdd then
 			new:Sync();
 		end
 	end
@@ -1523,17 +1538,17 @@ function Storage:SpaceCheck(items)
 		item.Data = item.Data or {};
 		local itemQuantity = item.Data.Quantity or 1;
 		local itemId = item.ItemId;
-		local itemProperties = modItemsLibrary:Find(itemId);
+		local itemLib = modItemsLibrary:Find(itemId);
 		
-		if itemProperties then
-			if itemProperties.Stackable then
+		if itemLib then
+			if itemLib.Stackable then
 				local quantityRemaining = itemQuantity;
 				local matchingItems = listCacheItemId(itemId, item.Data.Values);
 				for b=1, #matchingItems do
-					local stackAvailable = itemProperties.Stackable-matchingItems[b].Quantity;
+					local stackAvailable = itemLib.Stackable-matchingItems[b].Quantity;
 					if stackAvailable > 0 then
 						if quantityRemaining >= stackAvailable then
-							matchingItems[b].Quantity = itemProperties.Stackable;
+							matchingItems[b].Quantity = itemLib.Stackable;
 							quantityRemaining = quantityRemaining-stackAvailable;
 							
 						else
@@ -1548,7 +1563,7 @@ function Storage:SpaceCheck(items)
 					repeat
 						local index = findEmpty();
 						if index == nil then return false; end;
-						local deduction = quantityRemaining >= itemProperties.Stackable and itemProperties.Stackable or quantityRemaining;
+						local deduction = quantityRemaining >= itemLib.Stackable and itemLib.Stackable or quantityRemaining;
 						cacheContainer[index] = StorageItem.new(index, itemId, {Quantity=deduction});
 						quantityRemaining = quantityRemaining - deduction;
 						
@@ -1613,7 +1628,7 @@ function Storage:FitStackableItem(item)
 	item.Data = item.Data or {};
 	local itemQuantity = item.Data.Quantity or 1;
 	local itemId = item.ItemId;
-	local itemProperties = modItemsLibrary:Find(itemId);
+	local itemLib = modItemsLibrary:Find(itemId);
 	local quantityRemaining = itemQuantity;
 	
 	local function addFitItem(quantity)
@@ -1623,15 +1638,15 @@ function Storage:FitStackableItem(item)
 		})
 	end
 	
-	if itemProperties then
-		if itemProperties.Stackable then
+	if itemLib then
+		if itemLib.Stackable then
 			local matchingItems = listCacheItemId(itemId, item.Data.Values);
 			
 			for b=1, #matchingItems do
-				local stackAvailable = itemProperties.Stackable-matchingItems[b].Quantity;
+				local stackAvailable = itemLib.Stackable-matchingItems[b].Quantity;
 				if stackAvailable > 0 then
 					if quantityRemaining >= stackAvailable then
-						matchingItems[b].Quantity = itemProperties.Stackable;
+						matchingItems[b].Quantity = itemLib.Stackable;
 						addFitItem(stackAvailable);
 						quantityRemaining = quantityRemaining-stackAvailable;
 						
@@ -1650,7 +1665,7 @@ function Storage:FitStackableItem(item)
 				repeat
 					local index = findEmpty();
 					if index then
-						local deduction = quantityRemaining >= itemProperties.Stackable and itemProperties.Stackable or quantityRemaining;
+						local deduction = quantityRemaining >= itemLib.Stackable and itemLib.Stackable or quantityRemaining;
 						cacheContainer[index] = StorageItem.new(index, itemId, {Quantity=deduction});
 						addFitItem(deduction);
 						quantityRemaining = quantityRemaining - deduction;
@@ -1685,8 +1700,10 @@ function Storage:Add(itemId, data, callback)
 	data.Quantity = data.Quantity or 1;
 	data.Values = data.Values or {};
 	
-	local itemProperties = modItemsLibrary:Find(itemId); if itemProperties == nil then Debugger:Print(itemId," does not exist."); return; end;
-	table.insert(self.Queue, {Type=1; ItemId=itemId; Name=itemProperties.Name; Data=data; Values=data.Values; Callback=callback; Stackable=itemProperties.Stackable;});
+	local itemLib = modItemsLibrary:Find(itemId);
+	if itemLib == nil then Debugger:StudioWarn(itemId," does not exist."); return; end;
+
+	table.insert(self.Queue, {Type=1; ItemId=itemId; Name=itemLib.Name; Data=data; Values=data.Values; Callback=callback; Stackable=itemLib.Stackable;});
 	self.Queue:flush();
 end
 
@@ -1697,7 +1714,7 @@ function Storage:Delete(id, quantity, callback)
 	if storageItem then
 		quantity = math.floor(quantity or storageItem.Quantity);
 		if shared.IsNan(quantity) then quantity = 1; end
-		local stackSize = storageItem.Properties.Stackable or 1;
+		local stackSize = storageItem.Library.Stackable or 1;
 		
 		if quantity <= storageItem.Quantity then
 			if storageItem.Quantity > quantity then
@@ -1928,7 +1945,7 @@ function Storage:SetIndex(player, id, target)
 				if storageB then
 					local storageItemB = storageB:FindByIndex(target.Index);
 
-					if storageItem.Properties.StorageWhitelist and storageItem.Properties.StorageWhitelist[storageB.Id] == nil then
+					if storageItem.Library.StorageWhitelist and storageItem.Library.StorageWhitelist[storageB.Id] == nil then
 						self:Notify("red", "Cannot move item to storage: "..storageB.Name);
 						self.Debounce = false;
 						return {self:Shrink(); (self.Id ~= targetStorage.Id and targetStorage:Shrink() or nil);};
@@ -1971,12 +1988,12 @@ function Storage:SwapIndex(player, itemA, itemB)
 	if self.Settings.WithdrawalOnly then self:Notify("red", "This storage is withdrawal only."); return {self:Shrink(); (storageB and self.Id ~= storageB.Id and storageB:Shrink() or nil);}; end;
 	if self.Settings.DepositOnly then self:Notify("red", "This storage is deposit only."); return {self:Shrink(); (storageB and self.Id ~= storageB.Id and storageB:Shrink() or nil);}; end;
 
-	if storageItemA.Properties.StorageWhitelist and storageItemA.Properties.StorageWhitelist[storageB.Id] == nil then
+	if storageItemA.Library.StorageWhitelist and storageItemA.Library.StorageWhitelist[storageB.Id] == nil then
 		self:Notify("red", "Cannot move item to storage: "..storageB.Name);
 		return {self:Shrink(); (storageB and self.Id ~= storageB.Id and storageB:Shrink() or nil);};
 	end
 	
-	if storageItemB.Properties.StorageWhitelist and storageItemB.Properties.StorageWhitelist[self.Id] == nil then
+	if storageItemB.Library.StorageWhitelist and storageItemB.Library.StorageWhitelist[self.Id] == nil then
 		self:Notify("red", "Cannot move item to storage: "..self.Name);
 		return {self:Shrink(); (storageB and self.Id ~= storageB.Id and storageB:Shrink() or nil);};
 	end
@@ -2012,10 +2029,10 @@ function Storage:Combine(player, itemA, itemB)
 	
 	if storageItemA and storageItemB and modStorageItem.IsStackable(storageItemA, storageItemB) then
 			
-		if storageItemB.Quantity+storageItemA.Quantity > storageItemB.Properties.Stackable then
+		if storageItemB.Quantity+storageItemA.Quantity > storageItemB.Library.Stackable then
 			-- Quantity transfer;
-			local remainder = (storageItemB.Properties.Stackable-storageItemB.Quantity);
-			storageItemB.Quantity = storageItemB.Properties.Stackable;
+			local remainder = (storageItemB.Library.Stackable-storageItemB.Quantity);
+			storageItemB.Quantity = storageItemB.Library.Stackable;
 			storageItemA.Quantity = storageItemA.Quantity-remainder;
 			
 			if self.ItemSpawn then
@@ -2063,7 +2080,7 @@ function Storage:Remove(id, quantity, callback)
 	quantity = math.floor(quantity or 1);
 	if shared.IsNan(quantity) or quantity <= 0 then self:Notify("red", "Failed to remove item."); return {self:Shrink();}; end;
 	
-	table.insert(self.Queue, {Type=-1; ID=id; Stackable=storageItem.Properties.Stackable; Quantity=quantity; Callback=callback;});
+	table.insert(self.Queue, {Type=-1; ID=id; Stackable=storageItem.Library.Stackable; Quantity=quantity; Callback=callback;});
 	
 	self.Queue:flush();
 	return {self:Shrink();};
@@ -2127,7 +2144,7 @@ function Storage:Split(player, id, quantity, target)
 			
 		else
 			local storageItemB = storageB:Find(target.ID);
-			if storageItemB and modStorageItem.IsStackable(storageItem, storageItemB) and storageItemB.Quantity+quantity <= storageItemB.Properties.Stackable then
+			if storageItemB and modStorageItem.IsStackable(storageItem, storageItemB) and storageItemB.Quantity+quantity <= storageItemB.Library.Stackable then
 				quantity = math.clamp(quantity, 1, storageItem.Quantity);
 				storageItem.Quantity = storageItem.Quantity-quantity;
 				storageItemB.Quantity = storageItemB.Quantity+quantity;

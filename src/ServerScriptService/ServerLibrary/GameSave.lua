@@ -103,14 +103,14 @@ function SaveData.new(profile)
 		end; -- true if swapping with item of same id
 		
 		if dragStorageItem then
-			if dragStorageItem.Properties.Type == modItemsLibrary.Types.Clothing then
+			if dragStorageItem.Library.Type == modItemsLibrary.Types.Clothing then
 				local clothingLibA = modClothingLibrary:Find(dragStorageItem.ItemId);
 				local groupSetting = modClothingLibrary.GroupSettings[clothingLibA.GroupName];
 				
 				local denyMsg;
 				
 				data.Clothing:Loop(function(containerItem)
-					local itemLib = containerItem.Properties;
+					local itemLib = containerItem.Library;
 					local clothingLibB = modClothingLibrary:Find(containerItem.ItemId);
 					
 					if dragStorageItem.ItemId == containerItem.ItemId then
@@ -156,7 +156,7 @@ function SaveData.new(profile)
 		if packet.DragStorage == data.Wardrobe then packet.Allowed = true; return packet; end;
 		if targetStorageItem and dragStorageItem.ItemId == targetStorageItem.ItemId then packet.Allowed = true; return packet; end;
 		if dragStorageItem then
-			if dragStorageItem.Properties.Type == modItemsLibrary.Types.Clothing then
+			if dragStorageItem.Library.Type == modItemsLibrary.Types.Clothing then
 				packet.Allowed = true;
 				return packet;
 			end

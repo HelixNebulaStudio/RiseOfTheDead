@@ -717,7 +717,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 	end
 	
 	if storageItemData then
-		local isCustomName = storageItemData.Name ~= itemLib.Name;
+		local isCustomName = storageItemData.CustomName;
 		if isCustomName then
 			itemName = storageItemData.DisplayName or itemName;
 		end
@@ -739,7 +739,8 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 		if storageItemData.Vanity then
 			local vanityItem = modData.GetItemById(storageItemData.Vanity);
 			if vanityItem then
-				itemDesc = itemDesc..h3O.."\nVanity: "..h3C.. colorStringText(vanityItem.Name);
+				local vanityItemLib = modItemsLibrary:Find(vanityItem.ItemId);
+				itemDesc = itemDesc..h3O.."\nVanity: "..h3C.. colorStringText(vanityItemLib.Name);
 			end
 		end
 		

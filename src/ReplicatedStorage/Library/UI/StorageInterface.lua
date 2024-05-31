@@ -191,13 +191,13 @@ function StorageInterface:UpdateSlotFrames(slotFrames)
 end
 
 function StorageInterface:GetEmptySlotData(bSelf)
-	if bSelf ~= nil and bSelf.Properties.Stackable then
+	if bSelf ~= nil and bSelf.Library.Stackable then
 		for a=self.StartIndex, self.EndIndex do
 			local aSelf = self.Slots[a].Table;
 			if aSelf ~= nil
-				and aSelf.Properties and aSelf.Properties.Stackable
+				and aSelf.Library and aSelf.Library.Stackable
 				and aSelf.Item.ItemId == bSelf.Item.ItemId
-				and (aSelf.Item.Quantity+bSelf.Item.Quantity) <= aSelf.Properties.Stackable then
+				and (aSelf.Item.Quantity+bSelf.Item.Quantity) <= aSelf.Library.Stackable then
 				
 				return self.Slots[a];
 			end
@@ -302,21 +302,21 @@ function StorageInterface:BeginDragItem(slotItem)
 			end);
 		end);
 		
-		if slotItem.Properties.Type == modItem.Types.Resource then
-			if slotItem.Properties.Name == "Metal Scraps" then
+		if slotItem.Library.Type == modItem.Types.Resource then
+			if slotItem.Library.Name == "Metal Scraps" then
 				modAudio.Play("StorageMetalPickup");
-			elseif slotItem.Properties.Name == "Glass Shards" then
+			elseif slotItem.Library.Name == "Glass Shards" then
 				modAudio.Play("StorageGlassPickup");
-			elseif slotItem.Properties.Name == "Wooden Parts" then
+			elseif slotItem.Library.Name == "Wooden Parts" then
 				modAudio.Play("StorageWoodPickup");
-			elseif slotItem.Properties.Name == "Cloth" then
+			elseif slotItem.Library.Name == "Cloth" then
 				modAudio.Play("StorageClothPickup");
 			end
-		elseif slotItem.Properties.Type == modItem.Types.Blueprint then
+		elseif slotItem.Library.Type == modItem.Types.Blueprint then
 			modAudio.Play("StorageBlueprintPickup");
-		elseif slotItem.Properties.Type == modItem.Types.Tool then
+		elseif slotItem.Library.Type == modItem.Types.Tool then
 			modAudio.Play("StorageWeaponPickup");
-		elseif slotItem.Properties.Type == modItem.Types.Clothing then
+		elseif slotItem.Library.Type == modItem.Types.Clothing then
 			modAudio.Play("StorageClothPickup");
 		else
 			modAudio.Play("StorageItemPickup");
@@ -363,21 +363,21 @@ function StorageInterface:StopDragItem(slotItem)
 		slotItem:SetSlot(CurrentSlot);
 		if not UserInputService.MouseEnabled then CurrentSlot = nil; end
 
-		if slotItem.Properties.Type == modItem.Types.Resource then
-			if slotItem.Properties.Name == "Metal Scraps" then
+		if slotItem.Library.Type == modItem.Types.Resource then
+			if slotItem.Library.Name == "Metal Scraps" then
 				modAudio.Play("StorageMetalDrop");
-			elseif slotItem.Properties.Name == "Glass Shards" then
+			elseif slotItem.Library.Name == "Glass Shards" then
 				modAudio.Play("StorageGlassDrop");
-			elseif slotItem.Properties.Name == "Wooden Parts" then
+			elseif slotItem.Library.Name == "Wooden Parts" then
 				modAudio.Play("StorageWoodDrop");
-			elseif slotItem.Properties.Name == "Cloth" then
+			elseif slotItem.Library.Name == "Cloth" then
 				modAudio.Play("StorageClothDrop");
 			end
-		elseif slotItem.Properties.Type == modItem.Types.Blueprint then
+		elseif slotItem.Library.Type == modItem.Types.Blueprint then
 			modAudio.Play("StorageBlueprintDrop");
-		elseif slotItem.Properties.Type == modItem.Types.Tool then
+		elseif slotItem.Library.Type == modItem.Types.Tool then
 			modAudio.Play("StorageWeaponDrop");
-		elseif slotItem.Properties.Type == modItem.Types.Clothing then
+		elseif slotItem.Library.Type == modItem.Types.Clothing then
 			modAudio.Play("StorageClothDrop");
 		else
 			modAudio.Play("StorageItemDrop");
@@ -395,7 +395,7 @@ function StorageInterface:UseItem(Table)
 		usableItemLib:Use(Table.Item);
 		if currentOptionFrame ~= nil then currentOptionFrame.Visible = false; end
 
-	elseif Table.Properties and Table.Properties.Equippable then
+	elseif Table.Library and Table.Library.Equippable then
 		if Table.Item.Values.IsEquipped == nil then
 			modInterface:CloseWindow("Inventory");
 		end
@@ -403,7 +403,7 @@ function StorageInterface:UseItem(Table)
 		if currentOptionFrame ~= nil then currentOptionFrame.Visible = false; end
 
 	else
-		modInterface:HintWarning("Cannot Equip "..Table.Properties.Name.."!");
+		modInterface:HintWarning("Cannot Equip "..Table.Library.Name.."!");
 		
 	end
 end
@@ -520,12 +520,12 @@ function SlotItem:ActivateDelete(mousePosition)
 
 	currentQuanFrame.Visible = true;
 	currentQuanFrame.DeleteConfirm.Visible = true;
-	currentQuanFrame.Title.Text = "Delete "..self.Properties.Name;
+	currentQuanFrame.Title.Text = "Delete "..self.Library.Name;
 
 	local minQuantity = 1;
 	local maxQuantity = self.Item.Quantity;
 	
-	if self.Properties.Stackable then
+	if self.Library.Stackable then
 		currentQuanFrame.QuantityInput.Text = 1;
 		currentQuanFrame.QuantityInput.Visible = true;
 		currentQuanFrame.LockedQuantityInput.Visible = false;
@@ -665,13 +665,13 @@ function SlotItem:SwapSlot(slotTableB)
 	if StorageInterface.DepositOnlyCheck(interface, aSelf, bSelf) or StorageInterface.WithdrawalOnlyCheck(interfaceB, aSelf, bSelf) then return end;
 	if modStorageItem.IsStackable(aSelf.Item, bSelf.Item) then
 		--Combine;
-		if (aSelf.Item.Quantity+bSelf.Item.Quantity) > aSelf.Properties.Stackable then
+		if (aSelf.Item.Quantity+bSelf.Item.Quantity) > aSelf.Library.Stackable then
 			-- Combine into B
 			aSelf.Button:TweenPosition(UDim2.new(), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.1, true);
 			bSelf.Button:TweenPosition(UDim2.new(), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.1, true);
 
-			local remainder = aSelf.Properties.Stackable-bSelf.Item.Quantity;
-			bSelf.QuantityLabel.Text = aSelf.Properties.Stackable;
+			local remainder = aSelf.Library.Stackable-bSelf.Item.Quantity;
+			bSelf.QuantityLabel.Text = aSelf.Library.Stackable;
 			aSelf.QuantityLabel.Text = aSelf.Item.Quantity-remainder;
 		else
 			-- Combine with B
@@ -781,8 +781,7 @@ function SlotItem:Update(storageItemId)
 	local interface = self.Interface;
 	
 	self.Item = modData.Storages[interface.StorageId].Container[self.ID];
-	self.Properties = modItem:Find(self.Item.ItemId);
-	--self.Item.Properties = self.Properties;
+	self.Library = modItem:Find(self.Item.ItemId);
 	
 	self.Index = self.Item.Index;
 	self.Slot = interface.Slots[self.Index];
@@ -816,7 +815,6 @@ function SlotItem:Update(storageItemId)
 		interface.CustomHighlight(self);
 	else
 		self.ViewOnly = nil;
-		--self.Button.ImageColor3 = modItem.TierColors[self.Properties and self.Properties.Tier or 0];
 	end
 
 	return self;
@@ -838,8 +836,8 @@ function StorageInterface:NewButton(id)
 	slotItem.Item = modData.Storages[slotItem.Interface.StorageId].Container[slotItem.ID];
 	slotItem.Index = slotItem.Item.Index;
 	
-	slotItem.Properties = modItem:Find(slotItem.Item.ItemId);
-	slotItem.Item.Properties = slotItem.Properties;
+	slotItem.Library = modItem:Find(slotItem.Item.ItemId);
+	slotItem.Item.Library = slotItem.Library;
 
 	slotItem.ItemButtonObject = modItemInterface.newItemButton(slotItem.Item.ItemId);
 	slotItem.ItemButtonObject:Update(slotItem.Item);
@@ -962,7 +960,7 @@ function StorageInterface:NewButton(id)
 			end))
 		end
 
-		if slotItem.Properties.Stackable and slotItem.Item.Quantity > 1 then
+		if slotItem.Library.Stackable and slotItem.Item.Quantity > 1 then
 			currentOptionFrame.SplitOption.Visible = true;
 
 		else
@@ -1069,7 +1067,7 @@ function StorageInterface:NewButton(id)
 								if CurrentSlot ~= nil then
 									if dropSlot == nil or dropSlot.Table == nil or (dropSlot.Table.ID ~= slotItem.ID 
 										and modStorageItem.IsStackable(dropSlot.Table.Item, slotItem.Item)
-										and dropSlot.Table.Item.Quantity+splitQuantity <= slotItem.Properties.Stackable) then
+										and dropSlot.Table.Item.Quantity+splitQuantity <= slotItem.Library.Stackable) then
 
 										fakeButton.Position = UDim2.new(0, fakeButton.AbsolutePosition.X-dropSlot.Frame.AbsolutePosition.X, 0, fakeButton.AbsolutePosition.Y-dropSlot.Frame.AbsolutePosition.Y);
 										fakeButton.Parent = dropSlot.Frame;
@@ -1085,21 +1083,21 @@ function StorageInterface:NewButton(id)
 										StorageInterface.UpdateStorages(replyedStorages);
 										Debugger.Expire(fakeButton, 0);
 
-										if slotItem.Properties.Type == modItem.Types.Resource then
-											if slotItem.Properties.Name == "Metal Scraps" then
+										if slotItem.Library.Type == modItem.Types.Resource then
+											if slotItem.Library.Name == "Metal Scraps" then
 												modAudio.Play("StorageMetalDrop", nil, nil, false);
-											elseif slotItem.Properties.Name == "Glass Shards" then
+											elseif slotItem.Library.Name == "Glass Shards" then
 												modAudio.Play("StorageGlassDrop", nil, nil, false);
-											elseif slotItem.Properties.Name == "Wooden Parts" then
+											elseif slotItem.Library.Name == "Wooden Parts" then
 												modAudio.Play("StorageWoodDrop", nil, nil, false);
-											elseif slotItem.Properties.Name == "Cloth" then
+											elseif slotItem.Library.Name == "Cloth" then
 												modAudio.Play("StorageClothDrop", nil, nil, false);
 											end
-										elseif slotItem.Properties.Type == modItem.Types.Blueprint then
+										elseif slotItem.Library.Type == modItem.Types.Blueprint then
 											modAudio.Play("StorageBlueprintDrop", nil, nil, false);
-										elseif slotItem.Properties.Type == modItem.Types.Tool then
+										elseif slotItem.Library.Type == modItem.Types.Tool then
 											modAudio.Play("StorageWeaponDrop", nil, nil, false);
-										elseif slotItem.Properties.Type == modItem.Types.Clothing then
+										elseif slotItem.Library.Type == modItem.Types.Clothing then
 											modAudio.Play("StorageClothDrop", nil, nil, false);
 										else
 											modAudio.Play("StorageItemDrop", nil, nil, false);
@@ -1173,7 +1171,7 @@ function StorageInterface:NewButton(id)
 		elseif input.UserInputType == Enum.UserInputType.Keyboard then
 			if isViewOnly then return end;
 			if input.KeyCode == Enum.KeyCode.Delete then
-				if slotItem.Item.Fav ~= true and slotItem.Properties.CanDelete == 0 then
+				if slotItem.Item.Fav ~= true and slotItem.Library.CanDelete == 0 then
 					OpenOptionMenu(true);
 					slotItem:ActivateDelete();
 					
@@ -1451,10 +1449,10 @@ function StorageInterface.new(storageId, mainFrame, slotFrames)
 				return false;
 			end
 			
-			local visible = slotItem.Properties.CanDelete == 0;
-			if slotItem.Properties.CanDelete > 0 then
+			local visible = slotItem.Library.CanDelete == 0;
+			if slotItem.Library.CanDelete > 0 then
 				local c = modData.CountItemIdFromStorages(slotItem.Item.ItemId);
-				visible = c > slotItem.Properties.CanDelete;
+				visible = c > slotItem.Library.CanDelete;
 			end
 
 			if slotItem.Item.Fav then

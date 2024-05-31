@@ -236,9 +236,9 @@ function TradeSessionObject:CheckConfirm()
 			if player then
 				if self.ComputerSession then
 					-- valid
-				elseif storageItem.Properties.Tradable == modItemsLibrary.Tradable.Tradable then
+				elseif storageItem.Library.Tradable == modItemsLibrary.Tradable.Tradable then
 					-- valid
-				elseif storageItem.Properties.Tradable == modItemsLibrary.Tradable.PremiumOnly then -- and self.PremiumTrade
+				elseif storageItem.Library.Tradable == modItemsLibrary.Tradable.PremiumOnly then -- and self.PremiumTrade
 					-- valid
 				else
 					validTrade = false;
@@ -248,7 +248,7 @@ function TradeSessionObject:CheckConfirm()
 					return false;
 				end
 				
-				if storageItem.Properties.Type == "Mod" then
+				if storageItem.Library.Type == "Mod" then
 					local hasValues = false;
 					if storageItem.Values then
 						for k, v in pairs(storageItem.Values) do
@@ -835,13 +835,13 @@ function TradingService:StartTrade(personAObj, personBObj)
 					packet.Allowed = false;
 					return packet;
 				end;
-				if dragStorageItem.Properties.Tradable == modItemsLibrary.Tradable.Nontradable then
+				if dragStorageItem.Library.Tradable == modItemsLibrary.Tradable.Nontradable then
 					packet.FailMsg = "Item "..dragStorageItem.ItemId.." is not tradable."
 					packet.Allowed = false;
 					return packet;
 					
-				elseif dragStorageItem.Properties.Tradable == modItemsLibrary.Tradable.Tradable 
-					or dragStorageItem.Properties.Tradable == modItemsLibrary.Tradable.PremiumOnly then
+				elseif dragStorageItem.Library.Tradable == modItemsLibrary.Tradable.Tradable 
+					or dragStorageItem.Library.Tradable == modItemsLibrary.Tradable.PremiumOnly then
 					
 					local storageOfItem = modStorage.Get(dragStorageItem.ID, playerObj.Player);
 					if storageOfItem and storageOfItem:Loop() > 0 then
@@ -873,10 +873,10 @@ function TradingService:StartTrade(personAObj, personBObj)
 					-- This player
 					local newTax = 0;
 					sessionMeta.Storages[pName]:Loop(function(storageItem)
-						local itemTax = storageItem.Properties.TradingTax or 0;
+						local itemTax = storageItem.Library.TradingTax or 0;
 						
-						if storageItem.Properties.Tradable == modItemsLibrary.Tradable.PremiumOnly and sessionObj.PremiumTrade ~= true then
-							itemTax = itemTax + (storageItem.Properties.NonPremiumTax or 50);
+						if storageItem.Library.Tradable == modItemsLibrary.Tradable.PremiumOnly and sessionObj.PremiumTrade ~= true then
+							itemTax = itemTax + (storageItem.Library.NonPremiumTax or 50);
 						end
 						
 						if itemTax > 0 then

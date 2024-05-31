@@ -196,7 +196,7 @@ function Interface.init(modInterface)
 			return false;
 		end
 
-		if slotTable.Properties.Type == "Mod" then
+		if slotTable.Library.Type == "Mod" then
 			local hasValues = false;
 			for k, v in pairs(slotTable.Item.Values) do
 				hasValues = true;
@@ -228,18 +228,18 @@ function Interface.init(modInterface)
 			local function buttonHighlight(buttonTable)
 				if Interface.TradeSession == nil then return end;
 				local button = buttonTable.Button;
-				local properties = buttonTable.Properties;
+				local itemLib = buttonTable.Library;
 				local _isPremium = Interface.TradeSession.PremiumTrade;
 				
 				local isComputerSession = Interface.TradeSession.ComputerSession;
 				
-				if isComputerSession and properties then
-					button.ImageColor3 = modItemsLibrary.TierColors[properties.Tier];
+				if isComputerSession and itemLib then
+					button.ImageColor3 = modItemsLibrary.TierColors[itemLib.Tier];
 					buttonTable.ViewOnly = nil;
 					
-				elseif properties and (properties.Tradable == modItemsLibrary.Tradable.Tradable 
-					or properties.Tradable == modItemsLibrary.Tradable.PremiumOnly) then
-					button.ImageColor3 = modItemsLibrary.TierColors[properties.Tier];
+				elseif itemLib and (itemLib.Tradable == modItemsLibrary.Tradable.Tradable 
+					or itemLib.Tradable == modItemsLibrary.Tradable.PremiumOnly) then
+					button.ImageColor3 = modItemsLibrary.TierColors[itemLib.Tier];
 					buttonTable.ViewOnly = nil;
 
 				else

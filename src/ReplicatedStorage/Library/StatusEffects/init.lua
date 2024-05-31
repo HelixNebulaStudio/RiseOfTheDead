@@ -1315,7 +1315,7 @@ function StatusEffects.FumesGas(player, damage)
 
 				local prevHealth = storageItem:GetValues("Health") or 100;
 				if prevHealth <= 0 then
-					modStorageItem.PopupItemStatus("ItemHealth", storageItem);
+					modStorageItem.PopupItemStatus(storageItem);
 					continue;
 				end;
 				
@@ -1336,7 +1336,7 @@ function StatusEffects.FumesGas(player, damage)
 					end
 				end
 				
-				modStorageItem.PopupItemStatus("ItemHealth", storageItem);
+				modStorageItem.PopupItemStatus(storageItem);
 			end
 		end
 	end);

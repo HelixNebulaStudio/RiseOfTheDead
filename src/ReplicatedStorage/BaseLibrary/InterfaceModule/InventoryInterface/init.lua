@@ -103,7 +103,7 @@ function Interface.init(modInterface)
 	Interface.ClothingInterface = modStorageInterface.new("Clothing", inventoryFrame, clothingSlots);
 	Interface.ClothingInterface.Name = "ClothingInterface";
 	Interface.ClothingInterface:ConnectDepositLimit(function(slotInterface, slotTable, slotTableB)
-		if slotTable.Properties.Type ~= modItem.Types.Clothing then
+		if slotTable.Library.Type ~= modItem.Types.Clothing then
 			if not slotInterface.WarnLabel.Visible then
 				slotInterface.WarnLabel.Text = "Clothing Only!"
 				slotInterface.WarnLabel.Visible = true;
@@ -120,7 +120,7 @@ function Interface.init(modInterface)
 	Interface.ClothingInterface:AddContextOption({
 		Text="Wardrobe";
 		Check=function(Table)
-			return Table.Properties.Type == "Clothing" and Table.Properties.CanVanity ~= false;
+			return Table.Library.Type == "Clothing" and Table.Library.CanVanity ~= false;
 		end;
 		Click=function(Table)
 			modInterface:OpenWindow("ExternalStorage", "Wardrobe", nil, Table.ID);
@@ -134,7 +134,7 @@ function Interface.init(modInterface)
 			return Table.Item.Values.IsEquipped == nil and "Equip" or "Unequip";
 		end;
 		Check=function(Table)
-			return Table.Properties.Equippable;
+			return Table.Library.Equippable;
 		end;
 		Click=function(Table)
 			if Table.Item.Values.IsEquipped == nil then
@@ -157,10 +157,10 @@ function Interface.init(modInterface)
 			if Table.Item.Fav then
 				return false;
 			end
-			if Table.Properties.Stackable or Table.Item.Quantity > 1 then
+			if Table.Library.Stackable or Table.Item.Quantity > 1 then
 				return false;
 			end
-			if Table.Properties.CanBeRenamed == false then
+			if Table.Library.CanBeRenamed == false then
 				return false;
 			end
 			return true;
@@ -242,10 +242,10 @@ function Interface.init(modInterface)
 	local useDebounce = false;
 	local usableContextOption = {
 		Text=function(Table)
-			return Table.Properties.Usable or "Use";
+			return Table.Library.Usable or "Use";
 		end;
 		Check=function(Table)
-			return Table.Properties.Type == "Usable" or Table.Properties.Usable ~= nil;
+			return Table.Library.Type == "Usable" or Table.Library.Usable ~= nil;
 		end;
 		Click=function(Table)
 			if useDebounce then return end;
@@ -277,7 +277,7 @@ function Interface.init(modInterface)
 			return noWearTag == nil and "Hide" or "Show";
 		end;
 		Check=function(Table)
-			return Table.Properties.Type == "Clothing" and Table.Properties.CanVanity ~= false;
+			return Table.Library.Type == "Clothing" and Table.Library.CanVanity ~= false;
 		end;
 		Click=function(Table)
 			if toggleWearDebounce then return end;

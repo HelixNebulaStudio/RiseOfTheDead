@@ -151,6 +151,7 @@ local function loadModule(moduleScript)
 end
 script.ChildAdded:Connect(loadModule);
 
+--Item:Add{Type = Item.Types.None; Id="nil"; Name="Nil"; Icon="rbxasset://textures/ui/GuiImagePlaceholder.png"; Description="Nil"; Stackable = false; Tradable = Item.Tradable.Nontradable; Tags={"Unobtainable"};};
 
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local moddedSelf = modModEngineService:GetModule(script.Name);

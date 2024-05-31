@@ -361,7 +361,7 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		local totalTokens = exchangeAmt * tokenValue;
 
 		inventory:Remove(storageItem.ID, exchangeAmt, function()
-			shared.Notify(player, `Exchanged {exchangeAmt} {storageItem.Properties.Name} for {totalTokens} Gift Shop Tokens!`, "Reward");
+			shared.Notify(player, `Exchanged {exchangeAmt} {storageItem.Library.Name} for {totalTokens} Gift Shop Tokens!`, "Reward");
 		end);
 
 		battlePassSave:AddTokens(activeId, totalTokens);

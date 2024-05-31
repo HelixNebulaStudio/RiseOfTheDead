@@ -226,7 +226,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		ConsumeBlueprintCost(player, fulfillment);
 		if bpStorageItem then
 			inventory:Remove(storageItemId, 1, function()
-				shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", bpStorageItem.Name), "Negative");
+				shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", bpStorageItem.Library.Name), "Negative");
 			end);
 		end
 		
@@ -1046,7 +1046,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 					T=duration;
 					Levels=levels;
 					Values=storageItem.Values;
-					ItemName=storageItem.Name;
+					ItemName=storageItem.CustomName;
 
 					PlayProcessSound=true;
 				};
@@ -1109,7 +1109,8 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			inventory:Add(itemId, {Values=values}, function(event, newStorageItem)
 				shared.Notify(player, "Your "..itemName.." has completed deconstructing.", "Reward");
 				
-				newStorageItem.Name = customName;
+				newStorageItem.CustomName = customName;
+				inventory:Filter(newStorageItem.ID);
 				newStorageItem:Sync();
 			end);
 			
@@ -1307,7 +1308,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 				ItemId=itemId;
 				T=duration;
 				Values=storageItem.Values;
-				ItemName=storageItem.Name;
+				ItemName=storageItem.CustomName;
 				
 				ChangeFloat=changeFloat;
 				NewSeed=seed;
@@ -1370,7 +1371,8 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 					
 				end
 
-				newStorageItem.Name = customName;
+				newStorageItem.CustomName = customName;
+				inventory:Filter(newStorageItem.ID);
 				newStorageItem:Sync();
 			end);
 
@@ -1388,8 +1390,9 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 				if inventory:SpaceCheck{{ItemId="liquidmetalpolish"; Data={Quantity=1;};}} then
 					local customName = processData.ItemName;
 					local productLib = modItemsLibrary:Find(processData.ItemId);
-					inventory:Add(processData.ItemId, {Quantity=1; Values=processData.Values}, function(event, insert)
-						insert.Name = customName;
+					inventory:Add(processData.ItemId, {Quantity=1; Values=processData.Values}, function(event, newStorageItem)
+						newStorageItem.CustomName = customName;
+						inventory:Filter(newStorageItem.ID);
 						shared.Notify(player, ("You recieved a $Item."):gsub("$Item", productLib.Name), "Reward");
 					end);
 

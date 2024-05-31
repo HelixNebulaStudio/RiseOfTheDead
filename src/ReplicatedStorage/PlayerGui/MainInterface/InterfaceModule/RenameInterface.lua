@@ -47,12 +47,7 @@ function Interface.init(modInterface)
 	window.OnWindowToggle:Connect(function(visible, storageItem)
 		if visible and storageItem then
 			activeStorageItem = modGlobalVars.CloneTable(storageItem);
-			local itemLib = modItemsLibrary:Find(activeStorageItem.ItemId);
-			if activeStorageItem.Name ~= itemLib.Name then
-				inputBox.Text = activeStorageItem.Name;
-			else
-				inputBox.Text = "";
-			end
+			inputBox.Text = activeStorageItem.CustomName or "";
 			Interface.Update();
 		end
 	end)
@@ -71,7 +66,7 @@ renameButton.MouseButton1Click:Connect(function()
 	local promptWindow;
 	local filteredName = not clearName and remoteRenameItem:InvokeServer("test", activeStorageItem.ID, inputBox.Text) or "";
 	if clearName then
-		promptWindow = Interface:PromptQuestion("Clear name for "..activeStorageItem.Name, "Are you sure you want to clear the name of the "..itemLib.Name.."?");
+		promptWindow = Interface:PromptQuestion("Clear name for "..activeStorageItem.CustomName, "Are you sure you want to clear the name of the "..itemLib.Name.."?");
 	else
 		promptWindow = Interface:PromptQuestion("Rename "..itemLib.Name, "Are you sure you want to rename the "..itemLib.Name.." to ("..filteredName..") for 50 Gold?");
 	end
@@ -133,11 +128,11 @@ function Interface.Update()
 	local itemLib = modItemsLibrary:Find(activeStorageItem.ItemId);
 	
 	if #inputBox.Text > 0 then
-		activeStorageItem.Name = inputBox.Text;
+		activeStorageItem.CustomName = inputBox.Text;
 		renameButton.buttonText.Text = "Rename";
 	else
-		activeStorageItem.Name = itemLib.Name;
-		renameButton.buttonText.Text = "Reset Name";
+		activeStorageItem.CustomName = nil;
+		renameButton.buttonText.Text = "Clear Custom Name";
 	end
 	activeStorageItem.Index = 1;
 	

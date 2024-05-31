@@ -53,11 +53,11 @@ return function(dialog)
 		
 		local playerDeposits = tradingSession.Storages[player.Name];
 		playerDeposits:Loop(function(storageItem)
-			if storageItem.Properties.Recyclable then
+			if storageItem.Library.Recyclable then
 				local qnty = (storageItem.Quantity or 1);
 				
-				for a=1, #storageItem.Properties.CrateList do
-					local crateKey = storageItem.Properties.CrateList[a];
+				for a=1, #storageItem.Library.CrateList do
+					local crateKey = storageItem.Library.CrateList[a];
 					crateIdList[crateKey] = (crateIdList[crateKey] or 0) + qnty;
 				end
 				recyclablesTotal = recyclablesTotal + qnty;
