@@ -40,6 +40,7 @@ function GoldPoolData.new()
 		Gain=0;
 		Claim=0;
 		Pool=0;
+		History={};
 	};
 
 	setmetatable(self, meta);
@@ -55,16 +56,24 @@ goldPoolMem:BindSerializer(goldPoolSerializer);
 goldPoolMem:OnUpdateRequest("gain", function(requestPacket)
 	local poolData = requestPacket.Data or GoldPoolData.new();
 	local inputValues = requestPacket.Values; 
+
+	local playerId = inputValues.UserId;
+	local amount = inputValues.Amount;
+
+	poolData.Gain = poolData.Gain + amount;
+	poolData.Pool = poolData.Pool + amount;
 	
-	poolData.Gain = poolData.Gain + inputValues.Amount;
-	poolData.Pool = poolData.Pool + inputValues.Amount;
-	
+	table.insert(poolData.History, {Action="gain"; Player=playerId; Amount=amount;});
+
 	return poolData;
 end);
 
 goldPoolMem:OnUpdateRequest("claim", function(requestPacket)
 	local poolData = requestPacket.Data;
 	local inputValues = requestPacket.Values; 
+
+	local playerId = inputValues.UserId;
+	local amount = inputValues.Amount;
 	
 	if poolData == nil then
 		requestPacket.FailMsg = "Gold is unavailable to claim at the moment.";
@@ -76,9 +85,16 @@ goldPoolMem:OnUpdateRequest("claim", function(requestPacket)
 		return nil;
 	end
 
-	poolData.Claim = poolData.Claim + inputValues.Amount;
-	poolData.Pool = poolData.Pool - inputValues.Amount;
+	if playerId == nil then
+		requestPacket.FailMsg = "Missing player id.";
+		return nil;
+	end
+
+	poolData.Claim = poolData.Claim + amount;
+	poolData.Pool = poolData.Pool - amount;
 	
+	table.insert(poolData.History, {Action="claim"; Player=playerId; Amount=amount;});
+
 	return poolData;
 end)
 
@@ -86,7 +102,16 @@ goldPoolMem:OnUpdateRequest("add", function(requestPacket)
 	local poolData = requestPacket.Data or GoldPoolData.new();
 	local inputValues = requestPacket.Values; 
 
-	poolData.Pool = poolData.Pool + inputValues.Amount;
+	local playerId = inputValues.UserId;
+	local amount = inputValues.Amount;
+
+	if amount == nil or amount == 0 then
+		return poolData;
+	end
+
+	poolData.Pool = poolData.Pool + amount;
+
+	table.insert(poolData.History, {Action="add"; Player=playerId; Amount=amount;});
 
 	return poolData;
 end);
@@ -375,6 +400,10 @@ end
 
 function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 	local returnPacket = {};
+	if remoteBattlepassRemote:Debounce(player) then 
+		returnPacket.FailMsg = "Too many actions";
+		return returnPacket
+	end;
 	
 	local unixTime = DateTime.now().UnixTimestamp;
 
@@ -404,6 +433,9 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		return returnPacket;
 	end
 
+	local actionLogsFlagKey = activeId.."Logs";
+	local actionLogsFlag = profile.Flags:Get(actionLogsFlagKey) or {Id=actionLogsFlagKey; Logs={};};
+	
 	if action == "purchase" then
 		if passData.Owned == true then
 			returnPacket.FailMsg = "BattlePass already owned";
@@ -428,10 +460,15 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		
 		task.spawn(function()
 			local goldPoolRp = goldPoolMem:UpdateRequest(activeId, "gain", {
+				UserId=player.UserId;
 				Amount=price;
 			});
 			Debugger:Warn("Purchase bp", activeId, "goldPoolRp:",goldPoolRp);
 		end)
+		table.insert(actionLogsFlag.Logs, {
+			Action="purchase";
+			Amount=price;
+		});
 		
 		return returnPacket;
 		
@@ -466,11 +503,18 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		local rewardQuantity = (rewardInfo.Quantity or 1);
 		
 		if rewardInfo.ItemId == "gold" then
+			
+			if profile:Debounce("claimgold") then
+				returnPacket.FailMsg = "Try again after a minute";
+				return returnPacket;
+			end
+			profile:Debounce("claimgold", 60);
 
 			local goldPoolRp = goldPoolMem:UpdateRequest(activeId, "claim", {
+				UserId=player.UserId;
 				Amount=rewardQuantity;
 			});
-			Debugger:Warn("Claim gold", activeId, "goldPoolRp:",goldPoolRp);
+			profile:Debounce("claimgold", 0.5);
 			
 			if goldPoolRp.FailMsg then
 				returnPacket.FailMsg = goldPoolRp.FailMsg;
@@ -481,6 +525,11 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 			profile:AddPlayPoints(rewardQuantity/100, "Source:Reward");
 			modAnalytics.RecordResource(player.UserId, rewardQuantity, "Source", "Gold", "Gameplay", activeId);
 			shared.Notify(player, "You recieved "..rewardQuantity.." Gold!", "Reward");
+			table.insert(actionLogsFlag.Logs, {
+				Action="claim";
+				ItemId="gold";
+				Amount=rewardQuantity;
+			});
 			
 		else
 			local hasSpace = activeInventory:SpaceCheck{
@@ -499,7 +548,12 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 				
 				modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
 			end);
-			
+			table.insert(actionLogsFlag.Logs, {
+				Action="claim";
+				ItemId=rewardInfo.ItemId;
+				Amount=rewardQuantity;
+			});
+
 		end
 		
 		table.insert(passData.Claim, claimLvl);
@@ -535,10 +589,15 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 
 		task.spawn(function()
 			local goldPoolRp = goldPoolMem:UpdateRequest(activeId, "gain", {
+				UserId=player.UserId;
 				Amount=price;
 			});
 			Debugger:Warn("Purchase lvls", activeId, "goldPoolRp:",goldPoolRp);
 		end)
+		table.insert(actionLogsFlag.Logs, {
+			Action="purchaselvls";
+			Amount=price;
+		});
 		
 		shared.Notify(player, "Leveled up Event Pass: ".. bpLib.Title .. " by ".. lvlamt .."!", "Reward");
 		
@@ -566,10 +625,17 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		
 		if rewardInfo.ItemId == "gold" then
 
+			if profile:Debounce("claimgold") then
+				returnPacket.FailMsg = "Try again after a minute";
+				return returnPacket;
+			end
+			profile:Debounce("claimgold", 60);
+
 			local goldPoolRp = goldPoolMem:UpdateRequest(activeId, "claim", {
+				UserId=player.UserId;
 				Amount=rewardQuantity;
 			});
-			Debugger:Warn("Claim gold", activeId, "goldPoolRp:",goldPoolRp);
+			profile:Debounce("claimgold", 0.5);
 
 			if goldPoolRp.FailMsg then
 				returnPacket.FailMsg = goldPoolRp.FailMsg;
@@ -580,6 +646,12 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 			profile:AddPlayPoints(rewardQuantity/100, "Source:Reward");
 			modAnalytics.RecordResource(player.UserId, rewardQuantity, "Source", "Gold", "Gameplay", activeId);
 			shared.Notify(player, "You recieved "..rewardQuantity.." Gold!", "Reward");
+			table.insert(actionLogsFlag.Logs, {
+				Action="claim";
+				ItemId="gold";
+				Amount=rewardQuantity;
+				IsPost=true;
+			});
 			
 		else
 			local hasSpace = activeInventory:SpaceCheck{
@@ -595,6 +667,11 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 				shared.Notify(player, "You recieved "..(rewardQuantity > 1 and rewardQuantity.." "..itemLibrary.Name or "a "..itemLibrary.Name).."!", "Reward");
 				modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
 			end);
+			table.insert(actionLogsFlag.Logs, {
+				Action="claim";
+				ItemId=rewardInfo.ItemId;
+				Amount=rewardQuantity;
+			});
 			
 		end
 		
@@ -629,6 +706,11 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		passData.PostRewards[lvlStr] = nil;
 		returnPacket.Success = true;
 		battlePassSave:Sync();
+		table.insert(actionLogsFlag.Logs, {
+			Action="tradeinreward";
+			ItemId=rewardInfo.ItemId;
+			Amount=tokenReward;
+		});
 
 	elseif action == "purchasegiftshop" then
 		local itemId = ...;
@@ -667,13 +749,23 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		battlePassSave:AddTokens(activeId, -tokensCost);
 		profile:AddPlayPoints(tokensCost/10, "Sink:Gold");
 
-		giftShopMem:UpdateRequest(activeId, "add", {
+		task.spawn(function()
+			giftShopMem:UpdateRequest(activeId, "add", {
+				ItemId=itemId;
+			});
+		end)
+		table.insert(actionLogsFlag.Logs, {
+			Action="claim";
 			ItemId=itemId;
+			Amount=tokensCost;
 		});
 		
 		returnPacket.Success = true;
 		battlePassSave:Sync();
 	end
+
+	Debugger:StudioWarn("Eventpass Action Log:", actionLogsFlag);
+	profile.Flags:Add(actionLogsFlag);
 
 	return returnPacket;
 end
@@ -817,10 +909,34 @@ task.spawn(function()
 				local amt = args[3] or 0;
 
 				local goldPoolRp = goldPoolMem:UpdateRequest(mpId, "add", {
+					UserId=player.UserId;
 					Amount=amt;
 				});
+
+				local goldPoolData = goldPoolRp.Data;
 	
-				shared.Notify(player, "Mp:(".. mpId ..")".. Debugger:Stringify("Status: ", goldPoolRp) , "Inform");
+				shared.Notify(player, `Mp:( {mpId} ) Claim: {goldPoolData.Claim} Gain: {goldPoolData.Gain} Pool: {goldPoolData.Pool}` , "Inform");
+				
+			elseif action == "printlogs" then
+				local bpId = args[2] or modBattlePassLibrary.Active;
+				local count = args[3] or 100;
+
+				local goldPoolData = goldPoolMem:Get(bpId);
+
+				if goldPoolData == nil then
+					shared.Notify(player, "nil", "Negative");
+					return;
+				end
+
+				local history = goldPoolData.History;
+
+				for a=#history, #history-count, -1 do
+					if history[a] == nil then break; end;
+
+					print(history[a]);
+				end
+				shared.Notify(player, "Printed logs", "Inform");
+
 			end
 			
 			

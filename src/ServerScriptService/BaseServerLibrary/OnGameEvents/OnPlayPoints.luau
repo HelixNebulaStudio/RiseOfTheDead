@@ -41,17 +41,11 @@ return function(profile, points: number?, reason: string?)
             LastDrop=os.time();
             NextDrop=os.time()+180;
             Drops=0;
-            SessionDrops=0;
         };
 
         if os.time() > dropPacket.NextDrop then
-            local timeSinceLastDrop = os.time()-dropPacket.LastDrop;
-
-            if timeSinceLastDrop >= (3600 * 8) then
-                dropPacket.SessionDrops = 0;
-            end
-
-            local dropDifficulty = dropPacket.SessionDrops
+            local oneHour = 3600;
+            local dropDifficulty = dropPacket.Drops;
             if dropDifficulty <= 3 then
                 dropPacket.NextDrop=os.time()+180;
 
@@ -61,8 +55,23 @@ return function(profile, points: number?, reason: string?)
             elseif dropDifficulty <= 10 then
                 dropPacket.NextDrop=os.time()+math.random(600-120, 600+120);
 
-            else
+            elseif dropDifficulty <= 20 then
                 dropPacket.NextDrop=os.time()+math.random(1200-240, 1200+240);
+
+            elseif dropDifficulty <= 40 then
+                dropPacket.NextDrop=os.time()+math.random(1800-300, 1800+300);
+
+            elseif dropDifficulty <= 80 then
+                dropPacket.NextDrop=os.time()+math.random(oneHour-600, oneHour+600);
+
+            elseif dropDifficulty <= 160 then
+                dropPacket.NextDrop=os.time()+math.random((oneHour*2)-1200, (oneHour*2)+1200);
+
+            elseif dropDifficulty <= 320 then
+                dropPacket.NextDrop=os.time()+math.random((oneHour*3)-2400, (oneHour*3)+2400);
+
+            elseif dropDifficulty <= 640 then
+                dropPacket.NextDrop=os.time()+math.random((oneHour*4)-4800, (oneHour*4)+4800);
 
             end
 
@@ -130,7 +139,6 @@ return function(profile, points: number?, reason: string?)
 			end);
 
             dropPacket.Drops = dropPacket.Drops +1;
-            dropPacket.SessionDrops = dropPacket.SessionDrops +1;
             dropPacket.LastDrop = os.time();
         end
 

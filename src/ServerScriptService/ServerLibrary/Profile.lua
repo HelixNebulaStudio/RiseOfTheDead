@@ -200,6 +200,7 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 			CasualRandom = modPseudoRandom.new();
 			PickupCache = {};
 		};
+		profileMeta.ActionDebounce = {};
 		profileMeta.PlaytimeTick = tick();
 		profileMeta.MockStorageItem = modStorageItem.new();
 		profileMeta.MockStorageItem.MockItem = true;
@@ -1739,6 +1740,39 @@ function Profile:UpdateTrustLevel()
 		self:AddPlayPoints(playPoints);
 	end
 	return trustTable;
+end
+
+-- MARK: Profile:Debounce
+function Profile:Debounce(actionId, value)
+	local currTick = tick();
+
+	actionId = actionId or "generic";
+	
+	if value ~= nil then
+		if typeof(value) == "boolean" and value == true then
+			self.ActionDebounce[actionId] = value;
+		elseif typeof(value) == "number" and value > 0 then
+			self.ActionDebounce[actionId] = currTick+value;
+		else
+			self.ActionDebounce[actionId] = nil;
+		end
+		return;
+	end
+
+	local debounceTime = nil;
+	if self.ActionDebounce[actionId] then
+		local debounceValue = self.ActionDebounce[actionId];
+		if typeof(debounceValue) == "boolean" and debounceValue == true then
+			debounceTime = currTick+99;
+		else
+			debounceTime = debounceValue;
+		end
+	end
+
+	if debounceTime == nil or tick() > debounceTime then
+		return false;
+	end
+	return true;
 end
 
 function remoteSetPlayerTitle.OnServerInvoke(player, id)

@@ -501,7 +501,7 @@ else
 	RemotesManager:NewFunctionRemote("EnterDoorRequest", 0.5).Secure = true;
 	RemotesManager:NewFunctionRemote("ItemDropRemote", 0.5);
 	RemotesManager:NewEventRemote("HudNotification");
-	RemotesManager:NewFunctionRemote("BattlepassRemote", 0.5);
+	RemotesManager:NewFunctionRemote("BattlepassRemote", 1);
 	
 	
 	--== DataControl;
