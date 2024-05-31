@@ -463,7 +463,7 @@ function ItemsLibrary:Init(super)
 		Stackable = 5;
 	}
 	new(usableBase, {Id="tomeoftweaks"; Name="Tome Of Tweaks"; Icon="rbxassetid://6122866034"; TradingTax=20; Tags={"Misc Usable"}; Description="10 Tips and tricks to tweak your weapon. Consuming this will grant you 10 tweak points.";});
-	new(usableBase, {Id="mpbook"; Name="Latest Grinding Guide Publication"; Icon="rbxassetid://17419949268"; TradingTax=1000; Tags={"Misc Usable"};
+	new(usableBase, {Id="mpbook"; Name="Latest Grinding Guide Publication"; Icon="rbxassetid://17419949268"; Tradable=super.Tradable.Nontradable; Tags={"Misc Usable"};
 		Stackable = false;
 		DestroyOnExpire=true;
 		OnAdd = function(data)
