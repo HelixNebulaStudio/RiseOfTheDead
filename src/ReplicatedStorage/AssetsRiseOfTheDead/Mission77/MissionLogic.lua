@@ -177,7 +177,7 @@ if RunService:IsServer() then
 							
 							local crateStorage = shared.modStorage.Get(storageId, player);
 							crateStorage:Add("blueprintpiece", {Values={
-								Name=shared.modStorage.RegisterItemName("Turret Blueprint Piece ".. a.."/2");
+								CustomName=shared.modStorage.RegisterItemName("Turret Blueprint Piece ".. a.."/2");
 								DescExtend=modRichFormatter.H3Text("\nMission: ").."There only seem to be two pieces of the blueprint inside Elder Vexeron.";
 							};});
 							crateStorage.OnChanged:Connect(function()
@@ -251,7 +251,7 @@ if RunService:IsServer() then
 							local crateStorage = shared.modStorage.Get(storageId, player);
 							
 							crateStorage:Add("blueprintpiece", {Values={
-								Name=shared.modStorage.RegisterItemName("Final Turret Blueprint Piece");
+								CustomName=shared.modStorage.RegisterItemName("Final Turret Blueprint Piece");
 								DescExtend=modRichFormatter.H3Text("\nMission: ").."Finally, now the Mysterious Engineer can help make something out of these schematics.";
 							};});
 							crateStorage.OnChanged:Connect(function()

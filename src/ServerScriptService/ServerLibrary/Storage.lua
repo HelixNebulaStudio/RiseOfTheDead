@@ -1783,7 +1783,6 @@ function Storage:InsertRequest(storageItem, ruleset)
 	local linkedStorages = self.LinkedStorages;
 	
 	if storageItem.ClassType == "StorageItem" then -- Insert unqiue items; --storageItem.ID or 
-		Debugger:Warn("InsertRequest unique", storageItem);
 		local function findAndInsert(storage)
 			local emptyIndex = storage:FindEmpty();
 

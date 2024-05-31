@@ -26,14 +26,9 @@ export type StorageItem = typeof(setmetatable({} :: StorageItemObject, StorageIt
 
 function StorageItem.new(index, itemId, data, player)
 	local meta = setmetatable({}, StorageItem);
-	function meta.__index (t, k)
-		if k == "Library" then
-			return modItemsLibrary:Find(t.ItemId);
-		end
+	meta.__index = meta;
 
-		return meta[k];
-	end;
-
+	meta.Library = modItemsLibrary:Find(itemId);
 	meta.Player = player;
 	meta.StorageId = nil;
 
@@ -63,7 +58,7 @@ function StorageItem.new(index, itemId, data, player)
 
 	meta.__newIndex = function(self, key, value)
 		if key == "CustomName" then
-			self.CustomName = value;
+			rawset(self, "CustomName", value);
 
 		elseif rawget(self, key) == nil then
 			Debugger:StudioWarn("Set raw meta", key);
@@ -71,15 +66,11 @@ function StorageItem.new(index, itemId, data, player)
 		end;
 	end;
 
-	if meta.OnInstantiate then
-		meta.OnInstantiate(self, data);
+	if meta.Library and meta.Library.OnInstantiate then
+		meta.Library.OnInstantiate(self, data);
 	end
 	
 	if data then
-		if data.Values and data.Values.Name then
-			self.Name = data.Values.Name
-			data.Values.Name = nil;
-		end
 		for valuesKey, valuesData in pairs(data.Values or {}) do 
 			self.Values[valuesKey] = valuesData;
 		end
@@ -253,6 +244,7 @@ end
 
 function StorageItem:Clone()
 	local data = {
+		CustomName = self.CustomName;
 		Values = nil;
 	};
 	for k,v in pairs(self.Values) do

@@ -2253,7 +2253,7 @@ Commands["give"] = {
 	Info = function(speaker)
 		shared.Notify(speaker, "========== /give Examples ==========", "Inform");
 		shared.Notify(speaker, 'Give 5 metal scraps to yourself: /give metal 5', "Inform");
-		shared.Notify(speaker, 'Give backpack with skin: /give survivorsbackpack 1 [[{"Name":"Galaxy Backpack","Values":{"ActiveSkin":"survivorsbackpackgalaxy"}}]]', "Inform");
+		shared.Notify(speaker, 'Give backpack with skin: /give survivorsbackpack 1 [[{"CustomName":"Galaxy Backpack","Values":{"ActiveSkin":"survivorsbackpackgalaxy"}}]]', "Inform");
 		shared.Notify(speaker, 'Give a placable spotlight: /give placeitem 1 [[{"Values":{"PickUpItemId":"spotlight"}}]]', "Inform");
 	end;
 	Function = function(speaker, args)
@@ -2298,7 +2298,7 @@ Commands["give"] = {
 		local quantity = math.max(tonumber(args[3]) or 1, 1);
 		local parsedArg4 = args[4];
 		local itemData = typeof(parsedArg4) == "table" and parsedArg4 or {};
-		Debugger:Log("/give>> ItemData ", itemData, " input:", args[4]);
+		Debugger:Warn("/give>> ItemData ", itemData, " input:", args[4]);
 		
 		if player and itemLib then
 			itemId = itemLib.Id;
@@ -2313,7 +2313,7 @@ Commands["give"] = {
 				
 				local storageItem = {ItemId=itemId; Quantity=quantity;};
 				if parsedArg4 then
-					storageItem = modStorageItem.new(nil, itemId, {Values=itemData;});
+					storageItem = modStorageItem.new(nil, itemId, {CustomName=itemData.CustomName; Values=itemData;});
 					storageItem.ID = profile:NewID();
 				end
 				
