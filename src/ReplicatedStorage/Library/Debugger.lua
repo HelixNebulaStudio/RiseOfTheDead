@@ -352,7 +352,7 @@ end
 	Message of the log. Example: Debugger:Log("Hello", "Again");
 ]]
 function Debugger:Log(...)
-	if self:CheckDisable() then return end;
+	if self:CheckDisable() and not RunService:IsStudio() then return end;
 	local a = (self.Name or script.Name)..">>  ";
 	if RunService:IsStudio() then
 		local args = {...};
