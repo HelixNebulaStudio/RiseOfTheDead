@@ -1,0 +1,7 @@
+{
+    "ignoreUnknownInstances": true,
+    "properties": {
+      "RunContext": "Client",
+      "Enabled": false
+    }
+  }

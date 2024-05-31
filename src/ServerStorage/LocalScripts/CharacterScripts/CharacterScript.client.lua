@@ -1470,6 +1470,7 @@ local function renderStepped(camera, deltaTime)
 	
 end 
 
+while modData.CameraClass == nil do task.wait() end;
 modData.CameraClass:Bind("default", {
 	RenderStepped = renderStepped;
 	CameraType = Enum.CameraType.Scriptable;

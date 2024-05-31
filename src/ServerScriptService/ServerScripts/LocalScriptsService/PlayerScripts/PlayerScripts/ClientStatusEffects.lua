@@ -5,7 +5,7 @@ return function()
 	
 	local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 	local modRemotesManager = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("RemotesManager"));
-	local modData = require(localplayer:WaitForChild("DataModule"));
+	local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 	local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 
 	local remotePlayerStatusEffect = modRemotesManager:Get("PlayerStatusEffect");
