@@ -97,8 +97,8 @@ function Interface.init(modInterface)
 
 	local centerFrame = frame:WaitForChild("Center");
 	local profileFrame = centerFrame:WaitForChild("ProfileFrame");
-	local profileNavBar: Frame = profileFrame:WaitForChild("ProfileNavBar");
-	local profileScrollFrame: ScrollingFrame = profileFrame:WaitForChild("ScrollFrame");
+	local profileNavBar = profileFrame:WaitForChild("ProfileNavBar");
+	local profileScrollFrame = profileFrame:WaitForChild("ScrollFrame");
 
 	local settingsFrame = centerFrame:WaitForChild("SettingsFrame");
 	local settingsNav = settingsFrame:WaitForChild("SettingsNav");
@@ -158,7 +158,9 @@ function Interface.init(modInterface)
 	local selectedUser = nil;
 
 	local roleConfigActive = "__new";
-	local roleConfigInput = {};
+	local roleConfigInput = {
+		Perm=nil;
+	};
 	local permButtons = {};
 	
 	if modConfigurations.CompactInterface then
@@ -1063,7 +1065,7 @@ function Interface.init(modInterface)
 		profileNavBar.leaveButton.Visible = isLocalPlayer;
 		
 		Debugger:Warn("selectedUser", selectedUser);
-		local statsFrame: Frame = profileScrollFrame.Stats;
+		local statsFrame = profileScrollFrame.Stats;
 		local statsLabel: TextLabel = statsFrame.StatsLabel;
 		
 		local statsStr = "";
@@ -1427,7 +1429,7 @@ function Interface.init(modInterface)
 			LayoutOrder=100;
 		});
 		for a=1, #rolesList do
-			rolesList[a].Size = UDim2.new(0, maxLengthSize+10, 0, 20);
+			rolesList[a].Size = UDim2.new(0, maxLengthSize+20, 0, 25);
 		end
 
 		setRoleDropdownList = Interface:NewDropdownList(rolesList)
@@ -1544,7 +1546,7 @@ function Interface.init(modInterface)
 			Interface:PlayButtonClick();
 			promptWindow.Frame.Yes.buttonText.Text = "Traveling...";
 
-			local travelReturn = remoteFactionService:InvokeServer("travelhq");
+			local _travelReturn = remoteFactionService:InvokeServer("travelhq");
 
 			promptWindow:Close();
 			promptWindow = nil;
@@ -1701,7 +1703,7 @@ function Interface.init(modInterface)
 		end
 	end))
 	Interface.Garbage:Tag(infoSettingsFrame.ColorInput:GetPropertyChangedSignal("Text"):Connect(function()
-		local s, e = pcall(function()
+		pcall(function()
 			infoSettingsFrame.ColorInput.ColorSample.BackgroundColor3 = Color3.fromHex(infoSettingsFrame.ColorInput.Text);
 		end)
 	end))
@@ -2032,7 +2034,7 @@ function Interface.init(modInterface)
 		roleConfigFrame.TitleInput.Text = roleConfigFrame.TitleInput.Text:sub(1, 40);
 	end)
 	roleConfigFrame.ColorInput:GetPropertyChangedSignal("Text"):Connect(function()
-		local s, e = pcall(function()
+		pcall(function()
 			roleConfigFrame.ColorInput.ColorSample.BackgroundColor3 = Color3.fromHex(roleConfigFrame.ColorInput.Text);
 		end)
 	end)

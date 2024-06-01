@@ -885,7 +885,7 @@ end
 ]]
 function Storage.FindIdFromStorages(id, player)
 	local storageList = player == nil and PublicStorages or Storage.GetPrivateStorages(player);
-	Debugger:Log("FindIdFromStorages(",id,player,") storageList", storageList);
+	--Debugger:StudioWarn("FindIdFromStorages(",id,player,") storageList", storageList);
 	for storageId, storage in pairs(storageList) do
 		local storageItem = storage:Find(id);
 		if storageItem then
