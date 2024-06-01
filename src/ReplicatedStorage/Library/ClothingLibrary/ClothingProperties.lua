@@ -70,15 +70,16 @@ function ClothingProperties:RegisterTypes(modLib, storageItem)
 	local exist = false;
 	
 	for k, v in pairs(modLib.Stackable) do
-		if self.RegisteredTypes[k] then
-			exist = true;
-			if storageItem then
-				if RunService:IsClient() then
-					storageItem.Values.StackConflict = k;
-				end
+		if self.RegisteredTypes[k] == nil then continue end;
+		exist = true;
+		
+		if storageItem then
+			if RunService:IsClient() then
+				storageItem.Values.StackConflict = k;
 			end
-			break;
 		end
+
+		break;
 	end
 
 	if exist then return true end;

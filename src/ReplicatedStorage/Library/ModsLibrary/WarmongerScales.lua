@@ -5,6 +5,10 @@ local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 
 function Mod.Activate(packet)
 	local module = packet.WeaponModule;
+	local storageItem = packet.ModStorageItem;
+
+	local info = modModsLibrary.Get(storageItem.ItemId);
+	if module:RegisterTypes(info, storageItem) then return end;
 
 	local hpkLayerInfo = modModsLibrary.GetLayer("HPK", packet);
 	local hpkValue, hpkTweakVal = hpkLayerInfo.Value, hpkLayerInfo.TweakValue;

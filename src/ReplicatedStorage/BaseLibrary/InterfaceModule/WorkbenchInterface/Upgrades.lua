@@ -505,6 +505,7 @@ function Workbench.new(itemId, library, storageItem)
 				end
 			end;
 			refreshCapcityLabel();
+
 			Interface:UpdateWindow("WeaponStats", storageItem);
 			Interface.modInventoryInterface.UpdateHotbarSize();
 		end
@@ -532,7 +533,6 @@ function Workbench.new(itemId, library, storageItem)
 				if type(success) ~= "number" then
 					modStorageInterface.UpdateStorages(success);
 					Interface:PlayUpgradeSound();
-					refreshEquippedMods();
 					
 				else
 					if success == 1 then
@@ -556,8 +556,13 @@ function Workbench.new(itemId, library, storageItem)
 					else
 						Interface:PromptWarning("Unknown error ("..tostring(success)..").");
 					end
-					refreshEquippedMods();
 				end
+				
+				for a=1, 2 do
+					refreshEquippedMods();
+					task.wait(0.1);
+				end
+
 				addModButtonDebounce = false;
 				modsListMenu:Destroy();
 				Interface.SetPage(listMenu.Menu);
