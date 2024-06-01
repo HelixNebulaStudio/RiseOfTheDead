@@ -1760,7 +1760,7 @@ function Interface.init(modInterface)
 				countRepeatableMissions = countRepeatableMissions +1;
 			end
 			local repeatableTab, repeatableList = newMissionList("Board", 0); -- {ForceExpand=true;}
-			repeatableTab:WaitForChild("titleLabel").Text = "Missions Board: ".. countRepeatableMissions;
+			repeatableTab:WaitForChild("titleLabel").Text = "Missions Board: "..countRepeatableMissions
 
 			local hourlyMissionListing = repeatableList:FindFirstChild("hourlyMission");
 			local titleLabel;
@@ -1784,6 +1784,14 @@ function Interface.init(modInterface)
 
 				-- MARK: loadBoardMissions()
 				local function loadBoardMissions()
+					countRepeatableMissions = 0;
+					for a=1, #repeatableMissionList do
+						local missionData = repeatableMissionList[a].Data;
+						if missionData.Type == 1 or missionData.Type == 3 then continue end;
+						countRepeatableMissions = countRepeatableMissions +1;
+					end
+					repeatableTab:WaitForChild("titleLabel").Text = "Missions Board: "..countRepeatableMissions
+
 					MissionDisplayFrame:ClearAllChildren();
 
 					local missionBoard = templateMissionBoard:Clone();
@@ -1806,7 +1814,6 @@ function Interface.init(modInterface)
 								hasActiveRepeatableMission = true;
 							end
 						end
-
 
 						for _, obj in pairs(listFrame:GetChildren()) do
 							if not obj:IsA("GuiObject") then continue end;

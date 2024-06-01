@@ -285,7 +285,6 @@ function ChatRoomInterface:NewMessage(room, messageData)
 	local nameString = messageData.Name;
 	
 	if nameString == "Game" then nameString = nil end;
-	Debugger:Log(":NewMessage ", room.Id, messageData);
 	
 	messageData.MsgTime = messageData.MsgTime or DateTime.now().UnixTimestampMillis;
 	

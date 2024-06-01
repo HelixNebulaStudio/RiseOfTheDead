@@ -81,7 +81,8 @@ function SaveData.new(profile)
 		Money = random:NextInteger(15,30);
 	};
 	
-	data.Missions = modMission.NewList(profile, function() data:Sync("Missions") end);
+	data.MissionsCounter = 0;
+	data.Missions = modMission.NewList(profile, data, function() data:Sync("Missions") end);
 	data.ActiveDailyMissionId = 0;
 	
 	data.Masteries = {};

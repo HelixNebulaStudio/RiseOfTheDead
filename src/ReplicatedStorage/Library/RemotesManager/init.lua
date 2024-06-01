@@ -108,9 +108,9 @@ function RemotesManager:NewEventRemote(remoteInstance, debounceInterval)
 				end)
 				
 				if inputWarn == 1 then
-					Debugger:Warn(remoteName,"receives input as moduelscript, is remote secure? ", param);
+					Debugger:StudioWarn(remoteName,"receives input as moduelscript, is remote secure? ", param);
 				elseif inputWarn == 2 then
-					Debugger:Warn(remoteName,"receives input as number, is remote secure? ", param);
+					Debugger:StudioWarn(remoteName,"receives input as number, is remote secure? ", param);
 				end
 			end
 			
@@ -240,9 +240,9 @@ function RemotesManager:NewFunctionRemote(remoteInstance, debounceInterval)
 						end)
 						
 						if inputWarn == 1 then
-							Debugger:Warn(remoteName,"receives input as moduelscript, is remote secure? ", param);
+							Debugger:StudioWarn(remoteName,"receives input as moduelscript, is remote secure? ", param);
 						elseif inputWarn == 2 then
-							Debugger:Warn(remoteName,"receives input as number, is remote secure? ", param);
+							Debugger:StudioWarn(remoteName,"receives input as number, is remote secure? ", param);
 						end
 					end
 				end)

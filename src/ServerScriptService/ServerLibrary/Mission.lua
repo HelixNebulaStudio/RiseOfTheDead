@@ -534,7 +534,7 @@ function remoteMissionRemote.OnServerInvoke(player, actionId, missionId)
 	return;
 end
 
-function Mission.NewList(profile, syncFunc)
+function Mission.NewList(profile, gameSave, syncFunc)
 	local listMeta = {
 		PinCooldown = nil;
 	};
@@ -582,8 +582,10 @@ function Mission.NewList(profile, syncFunc)
 		missionObjectMeta.Library = library;
 		missionObjectMeta.Changed = modEventSignal.new("OnMissionChanged");
 		
+		gameSave.MissionsCounter = gameSave.MissionsCounter +1;
 		local missionObject = setmetatable({
 			Id=input.Id;
+			Index=gameSave.MissionsCounter;
 			Type=input.Type or Mission.MissionType.Available;
 			Expiration=input.Expiration;
 			CompletionTime=input.CompletionTime;
@@ -819,7 +821,7 @@ function Mission.NewList(profile, syncFunc)
 	
 	function listMeta:Destroy(mission)
 		for a=#self, 1, -1 do
-			if self[a].StartTime == mission.StartTime then
+			if self[a] == mission or self[a].Index == mission.Index then --or self[a].StartTime == mission.StartTime
 				local lib = modMissionLibrary.Get(mission.Id);
 				if lib.EventFlags then
 					for a=1, #lib.EventFlags do
@@ -838,7 +840,6 @@ function Mission.NewList(profile, syncFunc)
 				self.OnMissionChanged:Fire(mission);
 				table.remove(self, a);
 				mission.Changed:Destroy();
-				Debugger:Log("Destroying mission (",mission.Id,") from",self.Player.Name, debug.traceback());
 				break;
 			end
 		end

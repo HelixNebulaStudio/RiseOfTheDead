@@ -16,7 +16,6 @@ local modReplicationManager = require(game.ReplicatedStorage.Library.Replication
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modPseudoRandom = require(game.ReplicatedStorage.Library.PseudoRandom);
 
 local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 
@@ -25,7 +24,6 @@ local remoteProgressMission = modRemotesManager:Get("ProgressMission");
 local Prefabs = game.ReplicatedStorage.Prefabs:WaitForChild("Objects");
 local missionLibraryScript = game.ReplicatedStorage.Library.MissionLibrary;
 
-local random = Random.new();
 --== Script;
 function OnPlayerAdded(player)
 	local missionProfile; 
@@ -137,7 +135,7 @@ function OnPlayerAdded(player)
 		
 		local canAdd, failReason = missionProfile:CanAdd(mission.Id, true);
 		if not canAdd then
-			Debugger:Warn("Destroying mission (", mission ,") failAddReason: ", failReason);
+			Debugger:StudioWarn("Destroying mission (", mission ,") failAddReason: ", failReason);
 			missionProfile:Destroy(mission);
 		end
 	end
@@ -335,16 +333,12 @@ function OnPlayerAdded(player)
 					if #fmodMissions > 0 then
 						local pickedId = fmodMissions[math.random(1, #fmodMissions)];
 						modMission:AddMission(player, pickedId);
-						if RunService:IsStudio() then
-							Debugger:Warn("[Studio] New board mission ", pickedId);
-						end
+						Debugger:StudioWarn("New board mission ", pickedId);
 						
 					elseif #pickableMissions > 0 then
 						local pickedId = pickableMissions[math.random(1, #pickableMissions)];
 						modMission:AddMission(player, pickedId);
-						if RunService:IsStudio() then
-							Debugger:Warn("[Studio] New board mission ", pickedId);
-						end
+						Debugger:StudioWarn("New board mission ", pickedId);
 						
 					else
 						missionAdded = false;

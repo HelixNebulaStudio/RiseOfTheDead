@@ -14,9 +14,9 @@ local library = {};
 
 local BoardTimeLimit = 3600;
 local BoardRestockTimer = 3600;
-if modBranchConfigs.CurrentBranch.Name == "Dev" then
-	BoardRestockTimer = 10;
-end;
+-- if modBranchConfigs.CurrentBranch.Name == "Dev" then
+-- 	BoardRestockTimer = 10;
+-- end;
 MissionLibrary.BoardMissionStockTimer = BoardRestockTimer;
 
 MissionLibrary.MissionTypes = {
