@@ -339,15 +339,17 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 			end
 		end)
 		
-		modInfoBubbles.Create{
-			Players=self:GetAttackers();
-			Position=hitPart.Position;
-			Value=amount;
-			Type=dmgType;
-
-			KillSnd=killMarkerSnd;
-			BreakSnd=breakArmor;
-		};
+		if hitPart then
+			modInfoBubbles.Create{
+				Players=self:GetAttackers();
+				Position=hitPart.Position;
+				Value=amount;
+				Type=dmgType;
+	
+				KillSnd=killMarkerSnd;
+				BreakSnd=breakArmor;
+			};
+		end
 
 	elseif amount <= -1 then
 		modInfoBubbles.Create{

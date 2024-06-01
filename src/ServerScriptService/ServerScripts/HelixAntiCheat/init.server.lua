@@ -145,8 +145,7 @@ AntiCheatService.__index = AntiCheatService;
 local function TinkerInvokeClient(player, action, ...)
 	local case = Case.Get(player.Name);
 	if case == nil then Debugger:Warn("Missing player case", player); return {}; end;
-	Debugger:Log("TinkerInvokeClient", player, action);
-	
+
 	case.LastInvoke = tick();
 	
 	local paramPacket = {...};

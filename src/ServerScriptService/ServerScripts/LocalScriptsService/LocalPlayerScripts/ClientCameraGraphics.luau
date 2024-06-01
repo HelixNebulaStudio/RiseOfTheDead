@@ -214,6 +214,7 @@ return function()
 
 		local tweenRatio = previousWeather and previousWeather.EndTick and math.clamp((tick()-previousWeather.EndTick)/(weatherLib and weatherLib.FadeTime or 0.1), 0, 1) or 1;
 
+		local densityDecay = 0.2;
 		-- MARK: CameraEffects
 		local activeEffect = cameraEffects:Get();
 
@@ -222,10 +223,10 @@ return function()
 			local previousAtmosphere = previousWeather and previousWeather.Atmosphere or {};
 
 			local density = (CameraClass.UnderRoof and effectAtmosphere.DensityIndoors) or effectAtmosphere.Density or atmosphere.Density;
-			atmosphere.Density = modMath.Lerp(atmosphere.Density, density, 0.1);
+			atmosphere.Density = modMath.DeltaLerp(atmosphere.Density, density, densityDecay, delta);
 
 			local offset = effectAtmosphere.Offset or atmosphere.Offset;
-			atmosphere.Offset = modMath.Lerp(previousAtmosphere.Offset or 0, offset, tweenRatio);
+			atmosphere.Offset = modMath.DeltaLerp(atmosphere.Offset, offset, densityDecay, delta);
 
 			local color = (effectAtmosphere.UseAmbientColor and CameraClass.AtmosphereColor) or effectAtmosphere.Color or atmosphere.Color;
 			atmosphere.Color = (previousAtmosphere.Color or color):Lerp(color, tweenRatio);
@@ -240,36 +241,30 @@ return function()
 			atmosphere.Haze = modMath.Lerp(previousAtmosphere.Haze or 0, haze, tweenRatio);
 
 			atmosphere.Parent = Lighting;
-
-		else
-			local rate = 1/600;
-			if activeEffect and activeEffect.Fog then
-				rate = 1;
-			end
-
-			atmosphere.Density = math.max(atmosphere.Density - rate, 0.3);
-			atmosphere.Offset = atmosphere.Offset - rate;
-			atmosphere.Glare = atmosphere.Glare - rate*10;
-			atmosphere.Haze = atmosphere.Haze - rate*10;
-
-			if atmosphere.Density <= 0.31 and atmosphere.Offset <= 0 and atmosphere.Haze <= 0 then
-				atmosphere.Parent = script;
-			end
-		end
-
-		if atmosphere.Parent == script then
-			sky.SunAngularSize = modMath.Lerp(sky.SunAngularSize, 32, 0.1);
-			sky.MoonAngularSize = modMath.Lerp(sky.MoonAngularSize, 11, 0.1);
-
-		else
-			local sunDirection = Lighting:GetSunDirection();
-			local angleToHorizon = Vector3.yAxis:Angle(sunDirection);
 			
-			local scale = modMath.MapNum(atmosphere.Haze, 3, 1.5, 0, 1) * modMath.MapNum(angleToHorizon, 0.45, 0.74, 1, 0);
-			sky.SunAngularSize = modMath.Lerp(sky.SunAngularSize, math.clamp(scale, 0, 1) * 32, 0.1);
-			sky.MoonAngularSize = modMath.Lerp(sky.MoonAngularSize, math.clamp(scale, 0, 1) * 11, 0.1);
+		elseif activeEffect and activeEffect.Fog then
+			atmosphere.Parent = script;
+			
+		else
+			if atmosphere.Density > 0.1 then
+				atmosphere.Parent = Lighting;
+				atmosphere.Density = modMath.DeltaLerp(atmosphere.Density, 0, densityDecay, delta);
+				atmosphere.Offset = modMath.DeltaLerp(atmosphere.Offset, 0, densityDecay, delta);
+				atmosphere.Glare = modMath.DeltaLerp(atmosphere.Glare, 0, densityDecay, delta);
+				atmosphere.Haze = modMath.DeltaLerp(atmosphere.Haze, 0, densityDecay+0.5, delta);
 
+			else
+				atmosphere.Parent = script;
+
+			end
+			
 		end
+
+
+		local noAtmosphere = atmosphere.Parent == script;
+		local scale = modMath.MapNum(atmosphere.Haze, 1, 2.5, 1, 0);
+		sky.SunAngularSize = modMath.Lerp(sky.SunAngularSize, math.clamp(scale, 0, 1) * (noAtmosphere and 32 or 22), 0.1);
+		sky.MoonAngularSize = modMath.Lerp(sky.MoonAngularSize, math.clamp(scale, 0, 1) * 11, 0.1);
 
 		
 		local fogColor = Lighting:GetAttribute("FogColor");
@@ -284,8 +279,8 @@ return function()
 		end
 
 		Lighting.FogColor = Lighting.FogColor:Lerp(fogColor, 0.1);
-		Lighting.FogStart = modMath.Lerp(Lighting.FogStart, fogStart, 0.1);
-		Lighting.FogEnd = modMath.Lerp(Lighting.FogEnd, fogEnd, 0.1);
+		Lighting.FogStart = modMath.DeltaLerp(Lighting.FogStart, fogStart, 25, delta);
+		Lighting.FogEnd = modMath.DeltaLerp(Lighting.FogEnd, fogEnd, 25, delta);
 
 
 		local sunRayIntensity = Lighting:GetAttribute("SunRaysIntensity");

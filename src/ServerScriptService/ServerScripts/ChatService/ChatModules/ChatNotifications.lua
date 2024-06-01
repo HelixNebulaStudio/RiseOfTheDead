@@ -29,6 +29,7 @@ local function Run(ChatService)
 				Font = messageData.ExtraData and messageData.ExtraData.Font or nil;
 				Presist = messageData.Presist;
 				Packet=packet;
+				Notify = true;
 			});
 			
 		
@@ -42,7 +43,7 @@ local function Run(ChatService)
 	
 	-- !outline: function    shared.Notify(...)
 	function shared.Notify(player, message, class, key, packet) -- In-Game
-		if modBranchConfigs.WorldName == "MainMenu" then return end;
+		--if modBranchConfigs.WorldName == "MainMenu" then return end;
 
 		if type(player) == "table" then
 			for a, p in pairs(player) do

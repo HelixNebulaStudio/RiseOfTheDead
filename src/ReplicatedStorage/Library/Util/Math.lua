@@ -47,20 +47,22 @@ end
 function Math.MapNum(x, inMin, inMax, outMin, outMax, clampOutput)
 	local v = (x - inMin)*(outMax - outMin)/(inMax - inMin) + outMin
 	if clampOutput then
-		v = math.clamp(v, outMin, outMax);
+		v = outMax > outMin and math.clamp(v, outMin, outMax) or math.clamp(v, outMax, outMin);
 	end
 	return v
 end
 
 
 function Math.Lerp(a, b, t, snap: number?)
-	snap = snap or 0.0001;
+	snap = snap or 0.001;
 	local c = a * (1-t) + (b*t);
-	if math.abs(c-a) <= snap then
-		c = a;
-	elseif math.abs(c-b) <= snap then
-		c = b;
-	end
+	-- if math.abs(b-a) <= snap then
+	-- 	if b > a then
+	-- 		c = b;
+	-- 	else
+	-- 		c = a;
+	-- 	end
+	-- end
 	return c;
 end
 
@@ -70,13 +72,15 @@ end
 	@param decay number range [1,25] slow to fast
 ]]
 function Math.DeltaLerp(a, b, decay, delta, snap: number?)
-	snap = snap or 0.0001;
+	snap = snap or 0.001;
 	local c = b+(a-b)*math.exp(-decay*delta);
-	if math.abs(c-a) <= snap then
-		c = a;
-	elseif math.abs(c-b) <= snap then
-		c = b;
-	end
+	-- if math.abs(b-a) <= snap then
+	-- 	if b > a then
+	-- 		c = b;
+	-- 	else
+	-- 		c = a;
+	-- 	end
+	-- end
 	return c;
 end
 

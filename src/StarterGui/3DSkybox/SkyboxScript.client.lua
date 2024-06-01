@@ -63,7 +63,8 @@ end)
 
 -- Starts a loop to keep updating the skybox camera.
 game:GetService("RunService").RenderStepped:Connect(function()
-	
+	Viewport.ImageColor3 = game.Lighting:GetAttribute("OutdoorAmbient");
+
 	local camPos = SKYBOX_ORIGIN	-- Sets the Skybox Camera's position to the SKYBOX_ORIGIN.
 	
 	-- Checks to see if SKYBOX_ALLOW_MOVEMENT is enabled.

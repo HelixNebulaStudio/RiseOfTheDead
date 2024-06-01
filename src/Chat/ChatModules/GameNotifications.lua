@@ -47,7 +47,6 @@ local function Run(ChatService)
 				
 				local messageData = NotificationsLibrary[class] and NotificationsLibrary[class](message, player) or nil;
 
-
 				local profile = modProfile:Find(p.Name);
 				local notifyMode = modConfigurations.ForceNotifyStyle or (profile and profile.Settings and profile.Settings.Notifications);
 
@@ -81,7 +80,6 @@ local function Run(ChatService)
 			for a, p in pairs(players) do
 				local chatSpeaker = ChatService:GetSpeaker(p.Name);
 				local messageData = NotificationsLibrary[class] and NotificationsLibrary[class](message, player) or nil;
-				--sendMessage(channelServer, chatSpeaker, messageData or {Message=message;});
 
 				local profile = modProfile:Find(p.Name);
 				local notifyMode = modConfigurations.ForceNotifyStyle or (profile and profile.Settings and profile.Settings.Notifications);

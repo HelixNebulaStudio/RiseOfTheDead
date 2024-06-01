@@ -3,28 +3,8 @@ local NotificationsLibrary = {
 		return {
 			Message=message;
 			ExtraData={
-				ChatColor=Color3.fromRGB(85, 255, 255); --119, 173, 221
+				ChatColor=Color3.fromRGB(85, 255, 255);
 				Font = Enum.Font.Arial;
-			};
-		}
-	end;
-	
-	["PickUp"]=function(message, player)
-		return {
-			Presist=false;
-			Message=message.." has been added to inventory.";
-			ExtraData={
-				ChatColor=Color3.fromRGB(255, 183, 0);
-			};
-		}
-	end;
-	
-	["PickUpCustom"]=function(message, player)
-		return {
-			Presist=false;
-			Message=message;
-			ExtraData={
-				ChatColor=Color3.fromRGB(255, 183, 0);
 			};
 		}
 	end;
@@ -54,6 +34,26 @@ local NotificationsLibrary = {
 			ExtraData={
 				ChatColor=Color3.fromRGB(149, 221, 115);
 				Font = Enum.Font.ArialBold;
+			};
+		}
+	end;
+	
+	["PickUp"]=function(message, player)
+		return {
+			Presist=false;
+			Message=message.." has been added to inventory.";
+			ExtraData={
+				ChatColor=Color3.fromRGB(255, 183, 0);
+			};
+		}
+	end;
+	
+	["PickUpCustom"]=function(message, player)
+		return {
+			Presist=false;
+			Message=message;
+			ExtraData={
+				ChatColor=Color3.fromRGB(255, 183, 0);
 			};
 		}
 	end;

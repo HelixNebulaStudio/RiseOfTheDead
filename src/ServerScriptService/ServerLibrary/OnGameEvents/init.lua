@@ -9,7 +9,7 @@ local OnGameEvents = {
 function OnGameEvents:GetEvent(eventId)
 	if self.Listeners[eventId] == nil then
 		local eventHandlerModule = script:FindFirstChild(eventId);
-		if eventHandlerModule == nil then Debugger:Log("There is no event handler for (",eventId,")"); return; end;
+		if eventHandlerModule == nil then return; end;
 		
 		self.Listeners[eventId] = require(eventHandlerModule);
 	end

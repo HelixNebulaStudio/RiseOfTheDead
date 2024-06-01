@@ -46,7 +46,6 @@ function ChatClient:NewMessage(channelId, messageData)
 		
 	else
 		local activeId = ChatClient.ActiveChannelId or "Server";
-		Debugger:Log("Active channel Id ", activeId);
 		ChatClient.OnNewMessage:Fire(activeId, messageData);
 		
 	end

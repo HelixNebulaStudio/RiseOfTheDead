@@ -3160,10 +3160,10 @@ function Interface.init(modInterface)
 						
 						local descText = "Trade in your rewards for past event pass rewards! You can also trade in skin permanents in the Rat shop. Accumulated Tokens will only be usable during current event pass.";
 
-						if modData.IsPremium ~= true then
-							titleStr = titleStr.." (Premium)";
-							descText = "Requires Premium!\n"..descText;
-						end
+						-- if modData.IsPremium ~= true then
+						-- 	titleStr = titleStr.." (Premium)";
+						-- 	descText = "Requires Premium!\n"..descText;
+						-- end
 
 						titleLabel.Text = titleStr;
 						descLabel.Text = descText;

@@ -450,7 +450,7 @@ function Components.CreateHoldDownButton(mainInterface, paramPacket)
 
 		RunService:BindToRenderStep("ButtonConfirmation", Enum.RenderPriority.Input.Value+1, function(delta)
 			local percent = math.clamp((tick()-initTick)/holdDuration, 0, 1);
-			progressBar.Size = UDim2.new(percent, 0, 1, 0);
+			progressBar.Size = UDim2.new(math.max(percent, 0.05), 0, 1, 0);
 
 			if percent >= 1 and not buttonDebounce then
 				buttonDebounce = true;

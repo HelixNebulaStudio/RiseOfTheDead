@@ -16,7 +16,7 @@ local TextService = game:GetService("TextService");
 local UserInputService = game:GetService("UserInputService");
 local ChatService = game:GetService("Chat");
 
-local modData = require(localPlayer:WaitForChild("DataModule"));
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modNotificationsLibrary = require(game.ReplicatedStorage.Library.NotificationsLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
@@ -292,6 +292,8 @@ function ChatRoomInterface:NewMessage(room, messageData)
 	local msgTime = tonumber(messageData.MsgTime);
 	local msgTimelapsed = msgTime-initTime;
 	
+	local notificationLib;
+	
 	if nameString then
 		if messageData.Bubble == nil and initTime-msgTime <= 5000 then
 			local speaker = game.Players:FindFirstChild(messageData.Name);
@@ -309,7 +311,7 @@ function ChatRoomInterface:NewMessage(room, messageData)
 		end
 	else
 		if messageData.Style then
-			local notificationLib = modNotificationsLibrary[messageData.Style];
+			notificationLib = modNotificationsLibrary[messageData.Style];
 
 			if notificationLib then
 				local newMsgData = notificationLib(msgString);
@@ -332,7 +334,7 @@ function ChatRoomInterface:NewMessage(room, messageData)
 
 	local msgLabel = templateMessageLabel:Clone();
 	local msgTimeLabel = msgLabel:WaitForChild("msgTimeLabel");
-	
+
 	msgFrame.LayoutOrder = msgTimelapsed/100;
 	
 	if not UserInputService.TouchEnabled then
@@ -434,6 +436,15 @@ function ChatRoomInterface:NewMessage(room, messageData)
 		msgLabel.Text = richMsgString;
 	end
 	
+	if messageData.Notify then
+		local systemHighlight = msgLabel:WaitForChild("systemHighlight");
+		systemHighlight.BackgroundColor3 = messageData.MessageColor;
+		systemHighlight.Visible = true;
+		local uiPadding = Instance.new("UIPadding");
+		uiPadding.PaddingLeft = UDim.new(0, 6);
+		uiPadding.Parent = msgLabel;
+	end
+
 	msgLabel.Parent = msgFrame;
 	msgFrame.Parent = room.Frame;
 	

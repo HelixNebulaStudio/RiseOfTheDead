@@ -97,7 +97,6 @@ function Interface:CallBind(id, ...)
 		end
 		if self.BindFuncs[id] then
 			self.BindFuncs[id](unpack(param));
-			Debugger:Log("CallBind", id);
 		end
 	end)
 end

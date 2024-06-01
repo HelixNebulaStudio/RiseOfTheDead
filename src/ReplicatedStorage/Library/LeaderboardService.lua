@@ -249,8 +249,6 @@ function LeaderboardService.LoadLeaderboard(statKey, lbTable, sync)
 		lbTable.LastGetSorted = tick();
 
 		local s, e = pcall(function()
-			Debugger:Log("Downloading leaderboard data for (",statKey,") using datastoreId (",datastoreScope,").");
-			
 			lbTable.Datastore = DataStoreService:GetOrderedDataStore(datastoreScope);
 			local pages = lbTable.Datastore:GetSortedAsync(false, lbTable.RanksLimit or 10);  -- 100 max
 			
