@@ -43,9 +43,23 @@ function Pool.new(owner)
 	
 	local particles: ParticleEmitter = projectile.Prefab:WaitForChild("Fire2");
 		
-	function projectile:OnEnemyHit(hitPart, damagable, player, weaponItem)
+	function projectile:Activate()
+		particles.LockedToPart = true;
+		task.spawn(function()
+			for a=1, 3 do
+				particles:Emit(3);
+				task.wait();
+				task.wait();
+			end
+		end)
+	end	
+
+
+	function projectile:OnEnemyHit(hitPart, direction, damagable, player, weaponItem)
 		local configurations = self.WeaponModule.Configurations;
 		local damage = configurations.Damage;
+		local knockbackForce = configurations.KnockbackForce or 1;
+		local damageForce = direction * knockbackForce;
 		
 		local damagableObj = damagable.Object;
 
@@ -54,13 +68,14 @@ function Pool.new(owner)
 		local owDmgMulti = itemValues.ImpactMulti;
 		local owDurMulti = itemValues.TickMulti;
 		
-		self.DamageSource.Damage = damage * (owDmgMulti or 4);
+		self.DamageSource.Damage = damage * (owDmgMulti or 5);
 		self.DamageSource.DamageType = "FireDamage";
 		self.DamageSource.TargetModel = damagable.Model;
 		self.DamageSource.TargetPart = hitPart;
 		
 		if damagableObj.ClassName == "NpcStatus" then
-			local dmgMulti = self.TargetableEntities[damagable.HealthObj.Name];
+			local humanoid = damagable.HealthObj;
+			local dmgMulti = self.TargetableEntities[humanoid.Name];
 			
 			if dmgMulti and damagableObj:CanTakeDamageFrom(player) then
 				
@@ -87,6 +102,10 @@ function Pool.new(owner)
 				if damage and damage > 0 then
 					damagable:TakeDamagePackage(self.DamageSource);
 				end
+				if humanoid.RootPart then
+					humanoid.RootPart:ApplyImpulseAtPosition(damageForce  * humanoid.RootPart.AssemblyMass, hitPart.Position);
+				end
+
 			end
 			
 		elseif damagableObj.ClassName == "Destructible" and damagableObj.Enabled then
@@ -107,17 +126,6 @@ function Pool.new(owner)
 		
 	end;
 
-	function projectile:Activate()
-		particles.LockedToPart = true;
-		task.spawn(function()
-			for a=1, 3 do
-				particles:Emit(3);
-				task.wait();
-				task.wait();
-			end
-		end)
-		
-	end	
 
 	local touched = {};
 	local activated = false;
@@ -139,7 +147,18 @@ function Pool.new(owner)
 				end
 				touched[model] = true;
 				
-				if projectile.ProjectileDamage then projectile:ProjectileDamage(damagable, hitPart); end
+				if self.Owner and hitPart:IsDescendantOf(self.Owner) then return end;
+		
+				task.spawn(function()
+				   if self.Owner then
+					   if damagable:CanDamage(self.Owner) then
+						   modDamageTag.Tag(damagable.Model, self.Owner and self.Owner:IsA("Player") and self.Owner.Character);
+						   self:OnEnemyHit(hitPart, arcPoint.Direction, damagable, self.Owner, self.StorageItem);
+					   end
+				   else
+					   self:OnEnemyHit(hitPart, arcPoint.Direction, damagable, nil, self.StorageItem);
+				   end
+			   end);
 			end
 		end
 		
@@ -154,21 +173,6 @@ function Pool.new(owner)
 			activated = true;
 			table.clear(touched);
 		end
-	end
-	
-	function projectile:ProjectileDamage(damagable, hitPart)
-		if self.Owner and hitPart:IsDescendantOf(self.Owner) then return end;
-		
-	 	task.spawn(function()
-			if self.Owner then
-				if damagable:CanDamage(self.Owner) then
-					modDamageTag.Tag(damagable.Model, self.Owner and self.Owner:IsA("Player") and self.Owner.Character);
-					self:OnEnemyHit(hitPart, damagable, self.Owner, self.StorageItem);
-				end
-			else
-				self:OnEnemyHit(hitPart, damagable, nil, self.StorageItem);
-			end
-		end);
 	end
 	
 	return projectile;
