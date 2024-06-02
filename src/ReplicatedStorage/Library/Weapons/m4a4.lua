@@ -60,8 +60,8 @@ local Properties={
 local Animations=workspace:GetAttribute("IsDev") and {
 	Core={Id=16500420231;};
 	PrimaryFire={Id=16500425509; FocusWeight=0.05};
-	Reload={Id=16649850922;};
-	TacticalReload={Id=16500432869;};
+	Reload={Id=17679997713;};
+	TacticalReload={Id=17679999338;};
 	Load={Id=16500423928;};
 	Inspect={Id=16500417502;};
 	Sprint={Id=16500430718};
@@ -72,8 +72,8 @@ local Animations=workspace:GetAttribute("IsDev") and {
 } or { -- Main
 	Core={Id=16649847370;};
 	PrimaryFire={Id=16649848801; FocusWeight=0.05};
-	Reload={Id=16649850922;};
-	TacticalReload={Id=16649852812;};
+	Reload={Id=17679997713;};
+	TacticalReload={Id=17679999338;};
 	Load={Id=16649854872;};
 	Inspect={Id=16649858201;};
 	Sprint={Id=16649860005};

@@ -76,8 +76,8 @@ local Properties={
 local Animations=workspace:GetAttribute("IsDev") and {
 	Core={Id=16269409429;};
 	PrimaryFire={Id=16269422738;};
-	Reload={Id=16633246993;};
-	Load={Id=16269420459;};
+	Reload={Id=17679174463;};
+	Load={Id=17679172170;};
 	Inspect={Id=16269418159;};
 	Sprint={Id=16184602077};
 	Unequip={Id=16838903122};
@@ -87,8 +87,8 @@ local Animations=workspace:GetAttribute("IsDev") and {
 } or {
 	Core={Id=16633243999;};
 	PrimaryFire={Id=16633245957;};
-	Reload={Id=16633246993;};
-	Load={Id=16633244902;};
+	Reload={Id=17679174463;};
+	Load={Id=17679172170;};
 	Inspect={Id=16633248424;};
 	Sprint={Id=16184602077};
 	Unequip={Id=16838903122};
