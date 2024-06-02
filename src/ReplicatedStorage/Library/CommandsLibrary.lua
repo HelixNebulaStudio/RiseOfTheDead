@@ -51,7 +51,6 @@ end
 
 
 local remotes = game.ReplicatedStorage.Remotes;
-local remoteConVarService = modRemotesManager:Get("ConVarService");
 local bindPlayServerScene = remotes.Cutscene.PlayServerScene;
 
 local Cache = {Group={};};
@@ -600,9 +599,7 @@ Commands["config"] = {
 		
 		if configId then
 			modConfigurations.Set(configId, value);
-			
-			local rP = remoteConVarService:InvokeClient(speaker, "setconfig", {configId; value;});
-			Debugger:Log("setconfig", rP);
+			Debugger:Log("client set deprecated");
 			
 		else
 			shared.Notify(speaker, "Unknown configId", "Negative");

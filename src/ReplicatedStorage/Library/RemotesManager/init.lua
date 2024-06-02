@@ -482,7 +482,6 @@ else
 	RemotesManager:NewEventBridge("TestRemote")
 	
 	--== Engine;
-	RemotesManager:NewFunctionRemote("ConVarService", 0);
 	RemotesManager:NewFunctionRemote("ApiRequest");
 	RemotesManager:NewEventRemote("SetClientProperties");
 	RemotesManager:NewFunctionRemote("GeneralUIRemote", 0.1).Secure = true;
