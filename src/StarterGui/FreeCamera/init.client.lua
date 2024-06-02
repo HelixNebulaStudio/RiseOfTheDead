@@ -16,6 +16,7 @@ local player = game.Players.LocalPlayer;
 local currentCamera = workspace.CurrentCamera;
 
 local modConfigurations = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("Configurations"));
+local modCameraGraphics = require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
 
 local character = player.Character or player.CharacterAdded:Wait();
 local rootPart = character:WaitForChild("HumanoidRootPart");
@@ -23,7 +24,7 @@ local humanoid = character:WaitForChild("Humanoid");
 local characterModule = character:WaitForChild("CharacterModule", 10);
 local modCharacter = require(characterModule);
 
-local modData = require(player:WaitForChild("DataModule"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 
 local RS  = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
@@ -328,7 +329,7 @@ local function EnterFreecam()
 	end
 	--RS:BindToRenderStep("Freecam", Enum.RenderPriority.Camera.Value, UpdateFreecam)
 	
-	modData.CameraClass:Bind("freecam", {
+	modCameraGraphics:Bind("freecam", {
 		RenderStepped = UpdateFreecam;
 		CameraType = Enum.CameraType.Scriptable;
 	}, 3);
@@ -350,7 +351,7 @@ local function ExitFreecam()
 	UIS.MouseIconEnabled = true
 	UIS.MouseBehavior = Enum.MouseBehavior.Default
 	Maid:Sweep()
-	modData.CameraClass:Unbind("freecam");
+	modCameraGraphics:Unbind("freecam");
 	--RS:UnbindFromRenderStep("Freecam")
 	
 	--local hum, hrp = GetChar()
@@ -413,10 +414,7 @@ UIS.InputBegan:Connect(function(input, processed)
 	end
 end)
 
-while modData.CameraClass == nil do
-	task.wait();
-end
-local activeCameraLayer = modData.CameraClass.RenderLayers:GetTable();
+local activeCameraLayer = modCameraGraphics.RenderLayers:GetTable();
 
 if activeCameraLayer.Id == "freecam" then
 	EnterFreecam();

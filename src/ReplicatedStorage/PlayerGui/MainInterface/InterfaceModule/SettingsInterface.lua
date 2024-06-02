@@ -11,6 +11,7 @@ local localPlayer = game.Players.LocalPlayer;
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
+local modCameraGraphics = require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
@@ -648,7 +649,7 @@ function Interface.init(modInterface)
 							update();
 							
 							if config.RefreshGraphics then
-								modData.CameraClass:RefreshGraphics()
+								modCameraGraphics:RefreshGraphics()
 							end
 						end)
 					end
@@ -737,7 +738,7 @@ function Interface.init(modInterface)
 	if Interface.InitRefreshGraphics == nil then
 		Interface.InitRefreshGraphics = true;
 
-		modData.CameraClass:RefreshGraphics();
+		modCameraGraphics:RefreshGraphics();
 	end
 
 	Interface.Garbage:Tag(modData.OnDataEvent:Connect(function(action, hierarchyKey, data)

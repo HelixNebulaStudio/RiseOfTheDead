@@ -174,11 +174,15 @@ Commands["testspawn"] = {
 };
 
 Commands["playcutscene"] = {
-	Permission = PermissionLevel.Admin;
+	Permission = PermissionLevel.DevBranch;
 	Description = "Plays a cutscene.";
 	
 	RequiredArgs = 1;
-	UsageInfo = "/playcutscene cutscene";
+	UsageInfo = [[/playcutscene cutscene
+
+		Cutscenes;
+		- CameraHijack
+	]];
 	Function = function(player, args)
 		bindPlayServerScene:Invoke({player}, args[1]);
 		shared.Notify(player, "Playing cutscene.", "Inform");

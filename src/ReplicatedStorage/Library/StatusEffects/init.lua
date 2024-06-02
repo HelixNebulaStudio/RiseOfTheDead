@@ -28,6 +28,10 @@ if RunService:IsServer() then
 			remotePlayerStatusEffect:FireClient(player, "isready");
 		end
 	end)
+
+else
+	modCameraGraphics = require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
+
 end
 --== Script;
 local function replicateStatus(player, ...)
@@ -214,8 +218,6 @@ function StatusEffects.Dizzy(player, duration, dizzyType)
 		local modCharacter = modData:GetModCharacter();
 		local classPlayer = modPlayers.Get(game.Players.LocalPlayer);
 
-		local cameraEffects = modData.CameraClass;
-		
 		local gasProtection = false;
 		if classPlayer then
 			gasProtection = classPlayer:GetBodyEquipment("GasProtection") ~= nil;
@@ -234,7 +236,7 @@ function StatusEffects.Dizzy(player, duration, dizzyType)
 		modCharacter.DizzyZAim = true;
 		
 		if dizzyType == "bloater" then
-			cameraEffects.TintColor:Set("bloater", Color3.fromRGB(221, 178, 117), 1);
+			modCameraGraphics.TintColor:Set("bloater", Color3.fromRGB(221, 178, 117), 1);
 		end
 		
 		if modCharacter.CameraShakeAndZoom then
@@ -253,7 +255,7 @@ function StatusEffects.Dizzy(player, duration, dizzyType)
 			repeat until modSyncTime.Clock.Value >= (classPlayer.Properties.Dizzy and classPlayer.Properties.Dizzy.Expires or modSyncTime.Clock.Value-1) or not RunService.Heartbeat:Wait();
 			
 			if dizzyType == "bloater" then
-				cameraEffects.TintColor:Remove("bloater");
+				modCameraGraphics.TintColor:Remove("bloater");
 			end
 			
 			if modCharacter then
@@ -1124,8 +1126,6 @@ function StatusEffects.VexBile(player, duration)
 		local modCharacter = modData:GetModCharacter();
 		local classPlayer = modPlayers.Get(game.Players.LocalPlayer);
 
-		local cameraClass = modData.CameraClass;
-
 		local gasProtection = false;
 		if classPlayer then
 			gasProtection = classPlayer:GetBodyEquipment("GasProtection") ~= nil;
@@ -1138,8 +1138,8 @@ function StatusEffects.VexBile(player, duration)
 		end
 
 		modCharacter.StatusBlur.Size = 10;
-		cameraClass.TintColor:Set("vexbile", Color3.fromRGB(255, 136, 96), 1);
-		cameraClass:SetAtmosphere(script.VexBileAtmosphere, "vexbile", cameraClass.EffectsPriority.Environment, duration+0.5);
+		modCameraGraphics.TintColor:Set("vexbile", Color3.fromRGB(255, 136, 96), 1);
+		modCameraGraphics:SetAtmosphere(script.VexBileAtmosphere, "vexbile", modCameraGraphics.EffectsPriority.Environment, duration+0.5);
 
 		spawn(function()
 			if classPlayer.Properties["isVexBile"] then return end;
@@ -1148,7 +1148,7 @@ function StatusEffects.VexBile(player, duration)
 			repeat until modSyncTime.Clock.Value >= (classPlayer.Properties.VexBile and classPlayer.Properties.VexBile.Expires or modSyncTime.Clock.Value-1) 
 				or not RunService.Heartbeat:Wait();
 
-				cameraClass.TintColor:Remove("vexbile");
+				modCameraGraphics.TintColor:Remove("vexbile");
 
 			if modCharacter then
 				if modCharacter.StatusBlur then

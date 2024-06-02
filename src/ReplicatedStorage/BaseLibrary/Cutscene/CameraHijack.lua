@@ -37,7 +37,8 @@ return function(CutsceneSequence)
 		
 		local sTick;
 		local duration = 6;
-		modData.CameraClass:Bind("CameraHijack", {
+		local modCameraGraphics = require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
+		modCameraGraphics:Bind("CameraHijack", {
 			RenderStepped=function(camera)
 				camera.Focus = focusCf
 				

@@ -13,6 +13,8 @@ local camera: Camera = workspace.CurrentCamera;
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 
+local modCameraGraphics = require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
+
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
@@ -635,7 +637,7 @@ function LeaveLobbyMenu(skipRequest)
 	modCharacter.CharacterProperties.CanAction = true;
 	modCharacter.CharacterProperties.AllowLerpBody = true;
 	
-	modData.CameraClass:Unbind("lobbycamera");
+	modCameraGraphics:Unbind("lobbycamera");
 	lobbyCameraPoint = nil;
 	clearIndicators();
 
@@ -717,7 +719,7 @@ bindOpenLobbyInterface.Event:Connect(function(lobbyData) --cleared max depth che
 	
 	refreshStatus = true;
 	
-	modData.CameraClass:Bind("lobbycamera", {
+	modCameraGraphics:Bind("lobbycamera", {
 		RenderStepped=function(camera)
 			if lobbyCameraPoint then
 				local cf = CFrame.new(lobbyCameraPoint.WorldPosition) * (lobbyCameraPoint.CFrame - lobbyCameraPoint.CFrame.p);

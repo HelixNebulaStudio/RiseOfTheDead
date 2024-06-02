@@ -9,7 +9,6 @@ local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
 --local PlayerScriptsScript = script:WaitForChild("PlayerScripts");
 local scriptsStorage = game.ServerStorage.LocalScripts;
 
-local localPlayerScripts = script:WaitForChild("LocalPlayerScripts");
 --== Script;
 function shared.ReloadCharacter(player)
 	local character = player.Character;
@@ -49,10 +48,6 @@ local function OnPlayerAdded(player)
 		end
 	end
 
-	local newPlayerScripts = localPlayerScripts:Clone();
-	newPlayerScripts.Parent = player;
-	newPlayerScripts.Enabled = true;
-	
 	local function OnCharacterAdded(character)
 		shared.ReloadCharacter(player);
 	end
@@ -64,4 +59,4 @@ local function OnPlayerAdded(player)
 end
 
 local modEngineCore = require(game.ReplicatedStorage.EngineCore);
-modEngineCore:ConnectOnPlayerAdded(script, OnPlayerAdded, 5);
+modEngineCore:ConnectOnPlayerAdded(script, OnPlayerAdded, 4);

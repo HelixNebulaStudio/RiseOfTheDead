@@ -38,6 +38,7 @@ modCharacter.Character = character;
 local modSettings = localPlayer:FindFirstChild("SettingsModule") ~= nil and require(localPlayer.SettingsModule :: ModuleScript) or nil;
 local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 
+local modCameraGraphics = require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 local modSpectateManager = require(game.ReplicatedStorage.Library.SpectateManager);
@@ -319,20 +320,14 @@ function onCameraSubjectUpdate()
 	end
 	
 	
-	local cameraEffects = modData.CameraClass;
 	task.spawn(function()
-		while cameraEffects == nil do
-			task.wait();
-			cameraEffects = modData.CameraClass;
-		end
-
 		if not CameraSubject.IsClientSubject then
-			cameraEffects.Saturation:Set("spectate", -0.5, 2);
-			cameraEffects.TintColor:Set("spectate", Color3.fromRGB(255, 224, 224), 2);
+			modCameraGraphics.Saturation:Set("spectate", -0.5, 2);
+			modCameraGraphics.TintColor:Set("spectate", Color3.fromRGB(255, 224, 224), 2);
 
 		else
-			cameraEffects.Saturation:Remove("spectate");
-			cameraEffects.TintColor:Remove("spectate");
+			modCameraGraphics.Saturation:Remove("spectate");
+			modCameraGraphics.TintColor:Remove("spectate");
 
 		end
 	end)
@@ -1096,8 +1091,7 @@ toggleCameraMode();
 
 
 RunService:BindToRenderStep("OffCamRender", Enum.RenderPriority.Input.Value, function(delta)
-	if modData.CameraClass == nil then return end;
-	local activeCameraLayer = modData.CameraClass.RenderLayers:GetTable();
+	local activeCameraLayer = modCameraGraphics.RenderLayers:GetTable();
 	
 	if activeCameraLayer.Id == "freecam" then
 		pcall(function()
@@ -1470,8 +1464,7 @@ local function renderStepped(camera, deltaTime)
 	
 end 
 
-while modData.CameraClass == nil do task.wait() end;
-modData.CameraClass:Bind("default", {
+modCameraGraphics:Bind("default", {
 	RenderStepped = renderStepped;
 	CameraType = Enum.CameraType.Scriptable;
 });
@@ -1612,7 +1605,6 @@ RunService.Stepped:Connect(function(total, delta)
 		characterProperties.SwimSpeed = classPlayer:GetBodyEquipment("SwimmingSpeed") or characterProperties.DefaultSwimSpeed;
 		characterProperties.SprintSpeed = classPlayer:GetBodyEquipment("SprintingSpeed") or characterProperties.DefaultSprintSpeed;
 		
-		local cameraEffects = modData.CameraClass;
 		local isKnockedOut = classPlayer.Properties.KnockedOut ~= nil;
 		if isKnockedOut then
 			if characterProperties.IsKnockedOut ~= isKnockedOut then
@@ -1623,9 +1615,9 @@ RunService.Stepped:Connect(function(total, delta)
 				end
 
 
-				cameraEffects.Saturation:Set("knockedout", -1, 3);
-				cameraEffects.Brightness:Set("knockedout", -0.1, 3);
-				cameraEffects.Contrast:Set("knockedout", 0.1, 3);
+				modCameraGraphics.Saturation:Set("knockedout", -1, 3);
+				modCameraGraphics.Brightness:Set("knockedout", -0.1, 3);
+				modCameraGraphics.Contrast:Set("knockedout", 0.1, 3);
 				
 				characterMoving(0);
 			end
@@ -1634,9 +1626,9 @@ RunService.Stepped:Connect(function(total, delta)
 			if characterProperties.IsKnockedOut ~= isKnockedOut then
 				characterProperties.IsKnockedOut = isKnockedOut;
 
-				cameraEffects.Saturation:Remove("knockedout", -1, 3);
-				cameraEffects.Brightness:Remove("knockedout", -0.1, 3);
-				cameraEffects.Contrast:Remove("knockedout", 0.1, 3);
+				modCameraGraphics.Saturation:Remove("knockedout", -1, 3);
+				modCameraGraphics.Brightness:Remove("knockedout", -0.1, 3);
+				modCameraGraphics.Contrast:Remove("knockedout", 0.1, 3);
 				
 				characterMoving(0);
 			end

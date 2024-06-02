@@ -1,29 +1,37 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-return function()
-	local localplayer = game.Players.LocalPlayer;
+local RunService = game:GetService("RunService");
+local Lighting = game:GetService("Lighting");
+local CollectionService = game:GetService("CollectionService");
+local TweenService = game:GetService("TweenService");
+
+local camera = workspace.CurrentCamera;
+local localplayer = game.Players.LocalPlayer;
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
+
+local modVoxelSpace = require(game.ReplicatedStorage.Library.VoxelSpace);
+local modTextureAnimations = require(game.ReplicatedStorage.Library.TextureAnimations);
+local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
+local modWeatherService = require(game.ReplicatedStorage.Library.WeatherService);
+local modWeatherLibrary = require(game.ReplicatedStorage.Library.WeatherLibrary);
+local modScreenRain = require(game.ReplicatedStorage.Library.ScreenRain);
+
+local modMath = require(game.ReplicatedStorage.Library.Util.Math)
+local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
+local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
+
+local particlesFolder = game.ReplicatedStorage:WaitForChild("Particles");
+
+local CameraClass = {};
+CameraClass.__index = CameraClass;
+CameraClass.__init = true;
+--==
+
+function CameraClass:Init()
+	if CameraClass.__init == nil then return end;
+	CameraClass.__init = nil;
 	
-	local RunService = game:GetService("RunService");
-	local Lighting = game:GetService("Lighting");
-	local CollectionService = game:GetService("CollectionService");
-	local TweenService = game:GetService("TweenService");
-	
-	local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
-
-	local modVoxelSpace = require(game.ReplicatedStorage.Library.VoxelSpace);
-	local modTextureAnimations = require(game.ReplicatedStorage.Library.TextureAnimations);
-	local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
-	local modWeatherService = require(game.ReplicatedStorage.Library.WeatherService);
-	local modWeatherLibrary = require(game.ReplicatedStorage.Library.WeatherLibrary);
-	local modScreenRain = require(game.ReplicatedStorage.Library.ScreenRain);
-
-	local modMath = require(game.ReplicatedStorage.Library.Util.Math)
-	local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
-	local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
-
-	local particlesFolder = game.ReplicatedStorage.Particles;
 	--== Camera Handler
-	local camera = workspace.CurrentCamera;
 	--MARK: CameraParticles
 	local cameraParticlePart = Instance.new("Part");
 	cameraParticlePart.Name = "CameraParticlePart";
@@ -39,8 +47,6 @@ return function()
 		cameraParticlePart.CFrame = CFrame.new(pos.X, pos.Y+16, pos.Z);
 	end)
 
-	local CameraClass = {};
-	CameraClass.__index = CameraClass;
 	CameraClass.PreviousLayerId = nil;
 	CameraClass.UnderRoof = false;
 
@@ -87,7 +93,7 @@ return function()
 		end
 	end)
 	
-	
+	--==
 
 	local function setFogAmbient()
 		local _, _, v = game.Lighting.OutdoorAmbient:ToHSV();
@@ -287,7 +293,7 @@ return function()
 		sunRays.Intensity = modMath.Lerp(sunRayIntensity or 0.1, activeEffect and activeEffect.SunRaysIntensity or sunRayIntensity, tweenRatio);
 
 		local isUnderRoof = CameraClass.UnderRoof;
-		if tick()-ceilingCheck > 0.2 then
+		if tick()-ceilingCheck > 0.2 and rootPart then
 			ceilingCheck = tick();
 
 			isUnderRoof = modRaycastUtil.GetCeiling(rootPart.CFrame.Position, 256) ~= nil;
@@ -376,8 +382,6 @@ return function()
 		CameraClass.Effects:Remove(id);
 	end
 	
-
-	
 	function CameraClass:RefreshGraphics()
 		if sunRays then
 			sunRays.Enabled = modData:GetSetting("FilterSunRays") ~= 1;
@@ -402,8 +406,6 @@ return function()
 		
 		modTextureAnimations.Update();
 	end
-	
-	modData.CameraClass = CameraClass;
 	
 	--== MARK: Graphics Chunks
 	local graphicsChunks = modVoxelSpace.new();
@@ -585,8 +587,8 @@ return function()
 				end
 			end
 		end
-		
 	end);
-	
-	return CameraClass;
+
 end
+
+return CameraClass;

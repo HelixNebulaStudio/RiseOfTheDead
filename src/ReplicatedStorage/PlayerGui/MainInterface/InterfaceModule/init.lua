@@ -822,10 +822,6 @@ local function interfaceRequire(module)
 	return r;
 end
 
-while modData.CameraClass == nil do
-	task.wait();
-end
-
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local moddedInterface = modModEngineService:GetModule(script.Name, nil, 5);
 if moddedInterface then
