@@ -69,7 +69,7 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 			
 			if self.Player and damagableObj:CanTakeDamageFrom(self.Player) then
 				
-				if npcModule and npcModule.KnockbackResistant == nil then
+				if npcModule and npcModule.KnockbackResistant == nil or npcModule.KnockbackResistant == 0 then
 					local knockbackStrength = configurations.Knockback or configurations.BaseKnockback;
 					if knockbackStrength and damage > 0 then
 						local rootPart = model.PrimaryPart;

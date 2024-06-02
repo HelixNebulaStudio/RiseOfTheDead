@@ -473,7 +473,7 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	
 	npcModule.Garbage:Tag(npcModule.Humanoid.Died:Connect(function()
 		if npcModule == nil then return end;
-		npcModule.IsDead = true;
+		npcModule:KillNpc();
 	end));
 	npcModule.Garbage:Tag(npcPrefab.ChildRemoved:Connect(function(child)
 		if child.Name ~= "HumanoidRootPart" then return end;

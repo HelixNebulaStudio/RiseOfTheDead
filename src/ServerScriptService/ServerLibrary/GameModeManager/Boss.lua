@@ -133,10 +133,10 @@ function GameMode:Start(room)
 	for npcName, _ in pairs(bossLib.Prefabs) do
 		newSpawnPoint = modNpc.GetCFrameFromPlatform(bossSpawnObject);
 		
-		modNpc.Spawn(npcName, newSpawnPoint, function(npc, npcModule)
-			table.insert(room.BossPrefabs, npc);
-			table.insert(room.Prefabs, npc);
-			npc:SetAttribute("EntityHudHealth", true);
+		modNpc.Spawn(npcName, newSpawnPoint, function(npcPrefab, npcModule)
+			table.insert(room.BossPrefabs, npcPrefab);
+			table.insert(room.Prefabs, npcPrefab);
+			npcPrefab:SetAttribute("EntityHudHealth", true);
 			
 			if npcModule.Configuration then
 				npcModule.Configuration.Level = math.max(bossLevel, 1);
@@ -149,13 +149,13 @@ function GameMode:Start(room)
 			npcModule.NetworkOwners = players;
 			
 			for _, player in pairs(players) do
-				npc:AddPersistentPlayer(player);
+				npcPrefab:AddPersistentPlayer(player);
 
 				modMission:Progress(player, 7, function(mission)
 					if mission.ProgressionPoint == 3 then
 						local npcs = modNpc.GetPlayerNpcList(player);
 						for a=1, #npcs do
-							npcs[a].Target = npc;
+							npcs[a].Target = npcPrefab;
 						end
 					end;
 				end)
@@ -184,10 +184,11 @@ function GameMode:Start(room)
 			npcModule.OnTarget(players);
 			
 			npcModule:Died(function()
-				npcModule:Destroy();
-				task.delay(15, function() npc:Destroy(); end)
+				Debugger:Warn("Boss defeated");
+				
+				task.delay(15, function() npcPrefab:Destroy(); end)
 				for a=#room.BossPrefabs, 1, -1 do
-					if room.BossPrefabs[a] == npc then
+					if room.BossPrefabs[a] == npcPrefab then
 						table.remove(room.BossPrefabs, a);
 					end
 				end
@@ -241,6 +242,15 @@ function GameMode:Start(room)
 				end
 				
 				if npcModule.OnDeath then npcModule.OnDeath(players) end;
+
+				local canRagdoll = npcPrefab:GetAttribute("HasRagdoll") == true;
+				if not canRagdoll then
+					for _, obj in pairs(npcPrefab:GetDescendants()) do
+						if obj:IsA("Motor6D") then
+							game.Debris:AddItem(obj, 0);
+						end
+					end
+				end
 			end);
 		end);
 	end

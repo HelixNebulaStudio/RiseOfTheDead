@@ -4,7 +4,6 @@ local TAGSIZEMIN, TAGSIZEMAX = 3, 10;
 
 local RunService = game:GetService("RunService");
 local HttpService = game:GetService("HttpService");
-local DataStoreService = game:GetService("DataStoreService");
 local MessagingService = game:GetService("MessagingService");
 local TextService = game:GetService("TextService");
 local TeleportService = game:GetService("TeleportService");
@@ -18,7 +17,6 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local modLeaderboardService = require(game.ReplicatedStorage.Library.LeaderboardService);
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
-local modPseudoRandom = require(game.ReplicatedStorage.Library.PseudoRandom);
 local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
 
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
@@ -92,6 +90,7 @@ local globalFactionMeta, lastMetaUpdate;
 
 --======= Factions
 local Factions = {};
+Factions.Action = nil;
 Factions.Database = factionsDatabase;
 
 local function refreshFaction(factionGroup)
@@ -179,7 +178,8 @@ function Factions.Get(tag)
 	
 	local s, e = pcall(function()
 		factionGroup = factionsDatabase:Get(tostring(tag));
-	end) if not s then Debugger:Warn("Failed to get: ", e); end;
+	end);
+	if not s then Debugger:Warn("Failed to get: ", e); end;
 	
 	return factionGroup;
 end
@@ -189,7 +189,8 @@ function Factions.GetUser(userId)
 	local factionUser;
 	local s, e = pcall(function()
 		factionUser = factionsDatabase:Get(tostring(userId));
-	end) if not s then Debugger:Warn("Failed to getUser: ", e); end;
+	end);
+	if not s then Debugger:Warn("Failed to getUser: ", e); end;
 
 	return factionUser;
 end
@@ -322,8 +323,8 @@ factionsDatabase:OnUpdateRequest("refresh", function(requestPacket)
 
 					local existCount = 0;
 
-					for a=1, #availableMission do
-						if availableMission[a].Id == rolledMission.Id then
+					for b=1, #availableMission do
+						if availableMission[b].Id == rolledMission.Id then
 							existCount = existCount +1;
 						end
 					end
@@ -356,35 +357,20 @@ factionsDatabase:OnUpdateRequest("sendjoinrequest", function(requestPacket)
 	local factionGroup = requestPacket.Data;
 	local values = requestPacket.Values;
 	
-	local userId = values.UserId;
+	local userId = tostring(values.UserId);
 	local playerName = values.PlayerName;
+	local forceJoin = values.ForceJoin == true;
 
-	if factionGroup.Owner == userId then
+	if factionGroup.Owner == userId or forceJoin then
 		factionGroup:AddMember({UserId=userId; Name=playerName; LastActive=unixTimestamp});
 		
-		if requestPacket.Publish then
+		if requestPacket.Publish and not forceJoin then
 			factionGroup:Notify(playerName.." has joined the faction.");
 		end
 
-	else
-		-- local joinRequestsCount = 0;
-		-- for memberUserId, requestData in pairs(factionGroup.JoinRequests) do
-		-- 	local requestAge = unixTimestamp - (requestData.LastSent or 0);
-			
-		-- 	if requestAge <= shared.Const.OneDaySecs*30 then
-		-- 		joinRequestsCount = joinRequestsCount+1;
-				
-		-- 	else
-		-- 		factionGroup.JoinRequests[memberUserId] = nil;
-				
-		-- 	end
-		-- end;
-		
-		-- if joinRequestsCount >= 16 then
-		-- 	requestPacket.FailMsg = "Join requests queue is full.";
-		-- 	return factionGroup;
-		-- end
+	elseif factionGroup.Members[userId] then
 
+	else
 		if requestPacket.Publish then
 			local joinRequestsCount = 0;
 			for memberUserId, requestData in pairs(factionGroup.JoinRequests) do
@@ -404,7 +390,6 @@ factionsDatabase:OnUpdateRequest("sendjoinrequest", function(requestPacket)
 		};
 		factionGroup:Log("sentjoinrequest", {playerName});
 	end
-	Debugger:StudioWarn("factionGroup.JoinRequests", factionGroup.JoinRequests);
 	
 	return factionGroup;
 end)
@@ -794,7 +779,7 @@ factionsDatabase:OnUpdateRequest("completemission", function(requestPacket)
 
 	local activeMission = missionData.Active[activeIndex];
 	local missionTimeLeft = activeMission and (activeMission.CompletionTick-unixTime) or nil;
-	if activeMission == nil or missionTimeLeft > 0 then Debugger:Log("missionTimeLeft", missionTimeLeft) return end
+	if activeMission == nil or missionTimeLeft > 0 then Debugger:Log("missionTimeLeft", missionTimeLeft); return end
 
 	local missionLib = modMissionLibrary.Get(activeMission.Id);
 	if missionLib == nil then return end;
@@ -808,7 +793,7 @@ factionsDatabase:OnUpdateRequest("completemission", function(requestPacket)
 			successCount = successCount +1;
 		end
 	end
-	local failCount = playerCount-successCount;
+	local _failCount = playerCount-successCount;
 
 	local successCriteria = missionLib.FactionSuccessCriteria;
 	local missionResult;
@@ -1281,7 +1266,7 @@ modMission.OnPlayerMission:Connect(function(player, mission, context)
 	}
 
 	local factionGroup = Factions.Get(actionPacket.FactionTag);
-	if factionGroup == nil then Debugger:Log("Player not in a faction.",player,mission,context) return; end;
+	if factionGroup == nil then Debugger:Log("Player not in a faction.",player,mission,context); return; end;
 
 	local missionData = factionGroup.Missions;
 	
@@ -1301,7 +1286,7 @@ modMission.OnPlayerMission:Connect(function(player, mission, context)
 		break;
 	end
 	
-	if activeIndex == nil then Debugger:Log("Could not find matching mission") return end;
+	if activeIndex == nil then Debugger:Log("Could not find matching mission"); return end;
 	
 	actionPacket.ActiveIndex = activeIndex;
 	actionPacket.StatusUpdate = mission.Type;
@@ -1561,7 +1546,6 @@ function Factions.InvokeHandler(player, action, ...)
 	local activeSave = profile:GetActiveSave();
 	local userId = tostring(player.UserId);
 
-	local missionsProfile = modMission.GetMissions(player.Name);
 	local factionProfile = profile.Faction;
 
 	local factionUser = Factions.GetUser(userId);
@@ -1604,11 +1588,11 @@ function Factions.InvokeHandler(player, action, ...)
 			end
 
 			for tag, v in pairs(list) do
-				local filtered = shared.modAntiCheatService:Filter(v.Title, player);
-				v.Title = tostring(filtered);
+				local titleFiltered = shared.modAntiCheatService:Filter(v.Title, player);
+				v.Title = tostring(titleFiltered);
 
-				local filtered = shared.modAntiCheatService:Filter(v.Tag, player);
-				v.Tag = tostring(filtered);
+				local tagFiltered = shared.modAntiCheatService:Filter(v.Tag, player);
+				v.Tag = tostring(tagFiltered);
 			end
 
 			return list;
@@ -1621,8 +1605,12 @@ function Factions.InvokeHandler(player, action, ...)
 			if returnPacket.Success then
 				local factionGroup = returnPacket.Data;
 
-				if factionGroup.Owner == userId then -- Rejoin;
-					shared.Notify(player, "Rejoining your own faction ("..targetFactionTag..")..", "Inform");
+				if factionGroup.Owner == userId or factionGroup.Members[userId] then -- Rejoin;
+					if factionGroup.Owner == userId then
+						shared.Notify(player, `Rejoining your own faction ( {targetFactionTag} )..`, "Inform");
+					else
+						shared.Notify(player, `You are already in the faction ( {targetFactionTag} )..`, "Inform");
+					end
 					
 					local setUserReturnPacket = factionsDatabase:UpdateRequest(userId, "user_setfaction", {
 						NewFactionTag=targetFactionTag;
@@ -1638,7 +1626,7 @@ function Factions.InvokeHandler(player, action, ...)
 					
 				else --
 					for memberUserId, memberData in pairs(factionGroup.Members) do
-						if factionGroup:HasPermission(memberUserId, "HandleJoinRequests") then
+						if factionGroup:HasPermission(memberUserId, "HandleJoinRequests") then -- Notify faction mods of new request.
 							Factions.SyncUser(memberUserId, {ReceiveJoinRequest=true;});
 						end
 					end
@@ -1912,20 +1900,20 @@ function Factions.InvokeHandler(player, action, ...)
 
 		local factionGroup = Factions.Get(factionTag);
 		
-		if factionGroup == nil then Debugger:Log("[select] Faction group doesn't exist:", factionTag) return end;
+		if factionGroup == nil then Debugger:Log("[select] Faction group doesn't exist:", factionTag); return end;
 		
 		local missionData = factionGroup.Missions.Active[mIndex];
-		if missionData == nil then Debugger:Log("[select] Selected unavailable mission:", mIndex) return end;
+		if missionData == nil then Debugger:Log("[select] Selected unavailable mission:", mIndex); return end;
 		
 
 		local missionTimeLeft = missionData.CompletionTick-unixTime;
-		if missionTimeLeft <= 0 then Debugger:Log("[select] Selected ended mission:", mIndex) return end;
+		if missionTimeLeft <= 0 then Debugger:Log("[select] Selected ended mission:", mIndex); return end;
 		
 		local playerMissionData = missionData.Players[userId];
-		if playerMissionData == nil then Debugger:Log("[select] Player is not in this mission:", userId, mIndex) return end;
+		if playerMissionData == nil then Debugger:Log("[select] Player is not in this mission:", userId, mIndex); return end;
 		
-		if playerMissionData.MissionStatus == 3 then Debugger:Log("[select] Player completed this mission:", userId, mIndex) return end;
-		if playerMissionData.MissionStatus == 4 then Debugger:Log("[select] Player failed this mission:", userId, mIndex) return end;
+		if playerMissionData.MissionStatus == 3 then Debugger:Log("[select] Player completed this mission:", userId, mIndex); return end;
+		if playerMissionData.MissionStatus == 4 then Debugger:Log("[select] Player failed this mission:", userId, mIndex); return end;
 		
 		local mission = modMission:GetMission(player, missionData.Id);
 		if mission == nil then
@@ -2055,7 +2043,6 @@ function Factions.InvokeHandler(player, action, ...)
 
 		local inputInput = settingsPacket.TitleInput;
 		local descInput = settingsPacket.DescInput;
-		local iconInput = settingsPacket.IconInput;
 		
 		if settingsPacket.ColorInput then
 			settingsPacket.ColorInput = Color3.fromHex(settingsPacket.ColorInput):ToHex();
@@ -2066,6 +2053,7 @@ function Factions.InvokeHandler(player, action, ...)
 			return rPacket;
 		end
 
+		local iconInput = settingsPacket.IconInput;
 		if #iconInput > 0 then
 			local productInfo = shared.modAntiCheatService:SafeProductInfo(iconInput, Enum.InfoType.Asset, player);
 
@@ -2332,6 +2320,8 @@ function Factions.InvokeHandler(player, action, ...)
 		return rPacket;
 
 	end
+
+	return;
 end
 
 --================
@@ -2440,11 +2430,13 @@ task.spawn(function()
 		Description = [[Factions commands.
 		/faction clearmission [index] [expireTime]
 		/faction addmission missionId
-		/faction print
+		/faction print tag
 		/faction submitlb
 		/faction metalist
 		/faction addgold amount
 		/faction addresource index amount
+		/faction join tag
+		/faction f funcName params
 		]];
 
 		RequiredArgs = 0;
@@ -2605,7 +2597,31 @@ task.spawn(function()
 					
 				end
 				
-				
+			elseif action == "join" then
+				local targetFactionTag = args[2];
+			
+				local senderName = player.Name;
+				local returnPacket = factionsDatabase:UpdateRequest(targetFactionTag, "sendjoinrequest", {UserId=userId; PlayerName=senderName; ForceJoin=true;});
+				if returnPacket.Success then
+					local factionGroup = returnPacket.Data;
+
+					shared.Notify(player, `Joining ( {targetFactionTag} )..`, "Inform");
+					local setUserReturnPacket = factionsDatabase:UpdateRequest(userId, "user_setfaction", {
+						NewFactionTag=targetFactionTag;
+						PlayerName=senderName;
+						Role=factionGroup:GetRole(userId);
+					});
+					if setUserReturnPacket.Success then
+						factionProfile.Tag = targetFactionTag;
+					else
+						Debugger:Warn("user_setfaction failed", setUserReturnPacket.FailMsg);
+					end
+					
+				else
+					Debugger:Warn("sendjoinrequest failed", returnPacket.FailMsg);
+				end
+
+
 			elseif action == "f" then
 				local funcName = args[2];
 				

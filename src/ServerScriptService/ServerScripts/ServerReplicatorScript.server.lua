@@ -607,8 +607,8 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 				
 				local damagable = modDamagable.NewDamagable(targetModel);
 
-				local modNpcStatus = targetModel:FindFirstChild("NpcStatus") and require(targetModel.NpcStatus);
-				local humanoid = modNpcStatus and modNpcStatus:GetHumanoid() or targetModel:FindFirstChildWhichIsA("Humanoid");
+				local npcStatus = targetModel:FindFirstChild("NpcStatus") and require(targetModel.NpcStatus);
+				local humanoid = npcStatus and npcStatus:GetHumanoid() or targetModel:FindFirstChildWhichIsA("Humanoid");
 				local targetDamageMultiplier = humanoid and TargetableEntities[humanoid.Name];
 				--
 				
@@ -673,7 +673,7 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 				newDamageSource.TargetPart=targetObject;
 				
 				if humanoid and targetDamageMultiplier then
-					if humanoid.ClassName == "NpcStatus" and not humanoid:CanTakeDamageFrom(client) then
+					if npcStatus.ClassName == "NpcStatus" and not npcStatus:CanTakeDamageFrom(client) then
 						return;
 					end
 					
@@ -685,8 +685,8 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 					damageSourceClone.Damage = damage;
 					modWeaponsMechanics.ProcessModHooks(damageSourceClone);
 					
-					if humanoid.ClassName == "NpcStatus" then
-						local npcModule = humanoid:GetModule();
+					if npcStatus.ClassName == "NpcStatus" then
+						local npcModule = npcStatus:GetModule();
 						
 						if configurations.WeaponType == modAttributes.WeaponType.Pistol then
 							
