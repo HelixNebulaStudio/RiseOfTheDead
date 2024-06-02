@@ -52,9 +52,10 @@ function Pool.new(owner)
 			local npcStatus = damagableObj;
 
 			local npcModule = npcStatus:GetModule();
+			local humanoid = npcModule.Humanoid;
 			local entityStatus = npcModule.EntityStatus;
 			
-			local dmgMulti = self.TargetableEntities[npcStatus.Name];
+			local dmgMulti = self.TargetableEntities[humanoid.Name];
 			
 			if dmgMulti and npcStatus:CanTakeDamageFrom(player) then
 				if entityStatus:GetOrDefault(statusKey) == nil then
@@ -68,8 +69,6 @@ function Pool.new(owner)
 							new.Name = "FlameModFire";
 							new.Parent = hit;
 						end
-						
-						local humanoid = npcStatus.NpcModule and npcStatus.NpcModule.Humanoid;
 						
 						local c = 0;
 						local laststacks = 0;
