@@ -821,7 +821,7 @@ function Mission.NewList(profile, gameSave, syncFunc)
 	
 	function listMeta:Destroy(mission)
 		for a=#self, 1, -1 do
-			if self[a] == mission or self[a].Index == mission.Index then --or self[a].StartTime == mission.StartTime
+			if self[a] == mission or (self[a].Index and mission.Index and self[a].Index == mission.Index) then
 				local lib = modMissionLibrary.Get(mission.Id);
 				if lib.EventFlags then
 					for a=1, #lib.EventFlags do
