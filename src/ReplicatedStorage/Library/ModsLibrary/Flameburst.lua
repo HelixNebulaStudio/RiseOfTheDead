@@ -17,7 +17,6 @@ function Mod.Activate(packet)
 	if module.Configurations.Flameburst == nil then
 		module.Configurations.Flameburst = true;
 
-		module.Properties.Multishot = 3;
 		module.Configurations.ModInaccuracy = 16;
 		module.Configurations.ProjectileId = "gasFlame";
 		module.Configurations.KnockbackForce = value or 5;

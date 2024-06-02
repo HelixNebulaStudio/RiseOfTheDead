@@ -39,6 +39,7 @@ function Pool.new(owner)
 		Acceleration=Vector3.new(0, 4, 0);
 		KeepAcceleration = true;
 		IgnoreEntities = false;
+		RayRadius=2;
 	};
 	
 	local particles: ParticleEmitter = projectile.Prefab:WaitForChild("Fire2");
@@ -59,7 +60,6 @@ function Pool.new(owner)
 		local configurations = self.WeaponModule.Configurations;
 		local damage = configurations.Damage;
 		local knockbackForce = configurations.KnockbackForce or 1;
-		local damageForce = direction * knockbackForce;
 		
 		local damagableObj = damagable.Object;
 
@@ -102,9 +102,7 @@ function Pool.new(owner)
 				if damage and damage > 0 then
 					damagable:TakeDamagePackage(self.DamageSource);
 				end
-				if humanoid.RootPart then
-					humanoid.RootPart:ApplyImpulseAtPosition(damageForce  * humanoid.RootPart.AssemblyMass, hitPart.Position);
-				end
+				damagableObj:ApplyImpulseForce(direction, knockbackForce, hitPart.Position);
 
 			end
 			

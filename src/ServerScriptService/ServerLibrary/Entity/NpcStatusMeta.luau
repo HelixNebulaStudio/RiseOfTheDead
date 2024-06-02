@@ -404,6 +404,19 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 	return true;
 end
 
+function NpcStatusMeta:ApplyImpulseForce(direction, force, impactPosition)
+	local npcModule = self.NpcModule;
+	local humanoid = npcModule.Humanoid;
+	local rootPart: BasePart = npcModule.RootPart;
+	if rootPart == nil then return end;
+	
+	local knockbackResistant = (npcModule.KnockbackResistant == true and 1 or npcModule.KnockbackResistant or 0);
+	knockbackResistant = 1-math.clamp(knockbackResistant, 0, 1);
+
+	local damageForce = direction * (force or knockbackResistant);
+	rootPart:ApplyImpulseAtPosition(damageForce * humanoid.RootPart.AssemblyMass, impactPosition or rootPart.Position);
+end
+
 function NpcStatusMeta:TakeDamage(amount, character, storageItem, bodyPart, damageType)
     Debugger:StudioWarn("deprecated No longer usable", debug.traceback());
     if true then return end;
@@ -416,6 +429,7 @@ function NpcStatusMeta:TakeDamage(amount, character, storageItem, bodyPart, dama
 		DamageType=damageType;
 	};
 end
+
 
 function NpcStatusMeta:GetAttackers()
 	local players = {};
@@ -434,5 +448,6 @@ function NpcStatusMeta:GetAttackers()
 	
 	return players;
 end
+
 
 return NpcStatusMeta;

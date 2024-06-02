@@ -1044,12 +1044,12 @@ Add{
 Add{
 	Id="flamethrowerflameburstmod";
 	Name="Flamethrower Flame Burst";
-	Desc="Converts projectile from liquid flame to gas flame. Increases multi shot to <b>3, x5 impact damage, x0.5 burn tick damage</b> and applys knockback on impact. Burn time last for 25 seconds and can be extended with <b>Everlast</b>.";
+	Desc="Converts projectile from liquid flame to gas flame. Increases impact damge by <b>x5 impact damage, x0.5 burn tick damage</b> and applys knockback on impact. Burn time last for 25 seconds and can be extended with <b>Everlast</b>.";
 	Icon="http://www.roblox.com/asset/?id=14286986692";
 	BaseTier=1;
 	Tier=1;
 	Upgrades={
-		{DataTag="F"; Name="Knockback Force"; Syntax="Increase Force"; ValueType="Normal"; Suffix=" units/s"; MaxLevel=5; BaseCost=10; MaxCost=100; BaseValue=25; MaxValue=100; TweakBonus=10; Scaling=ModsLibrary.ScalingStyle.Linear;};
+		{DataTag="F"; Name="Knockback Force"; Syntax="Increase Force"; ValueType="Normal"; Suffix=" units/s"; MaxLevel=5; BaseCost=10; MaxCost=100; BaseValue=25; MaxValue=75; TweakBonus=10; Scaling=ModsLibrary.ScalingStyle.Linear;};
 	};
 	Stackable=false;
 	Type={"Flamethrower"};
