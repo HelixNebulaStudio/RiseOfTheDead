@@ -91,10 +91,10 @@ return function(npc, spawnPoint)
 	end));
 	
 	self.Garbage:Tag(self.Humanoid.HealthChanged:Connect(self.OnHealthChanged));
-	self.Garbage:Tag(self.Humanoid.Died:Connect(function(...)
+	self.Humanoid.Died:Connect(function(...)
 		game.Debris:AddItem(self.Prefab:FindFirstChild("Blobs"), 0);
 		self.OnDeath(...);
-	end));
+	end);
 	
 	
 	return self;
