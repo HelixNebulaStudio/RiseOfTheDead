@@ -176,10 +176,11 @@ if RunService:IsServer() then
 							local storageId = interactData.StorageId;
 							
 							local crateStorage = shared.modStorage.Get(storageId, player);
-							crateStorage:Add("blueprintpiece", {Values={
+							crateStorage:Add("blueprintpiece", {
 								CustomName=shared.modStorage.RegisterItemName("Turret Blueprint Piece ".. a.."/2");
-								DescExtend=modRichFormatter.H3Text("\nMission: ").."There only seem to be two pieces of the blueprint inside Elder Vexeron.";
-							};});
+								Values={
+									DescExtend=modRichFormatter.H3Text("\nMission: ").."There only seem to be two pieces of the blueprint inside Elder Vexeron.";
+								};});
 							crateStorage.OnChanged:Connect(function()
 								if crateStorage:Loop() <= 0 then
 									if crateFound[a] ~= true then
@@ -250,10 +251,11 @@ if RunService:IsServer() then
 
 							local crateStorage = shared.modStorage.Get(storageId, player);
 							
-							crateStorage:Add("blueprintpiece", {Values={
+							crateStorage:Add("blueprintpiece", {
 								CustomName=shared.modStorage.RegisterItemName("Final Turret Blueprint Piece");
-								DescExtend=modRichFormatter.H3Text("\nMission: ").."Finally, now the Mysterious Engineer can help make something out of these schematics.";
-							};});
+								Values={
+									DescExtend=modRichFormatter.H3Text("\nMission: ").."Finally, now the Mysterious Engineer can help make something out of these schematics.";
+								};});
 							crateStorage.OnChanged:Connect(function()
 								if crateStorage:Loop() <= 0 then
 									modMission:Progress(player, missionId, function(mission)

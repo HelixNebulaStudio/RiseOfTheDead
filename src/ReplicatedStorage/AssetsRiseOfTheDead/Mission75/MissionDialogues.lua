@@ -128,15 +128,16 @@ if RunService:IsServer() then
 					modMission:StartMission(player, missionId);
 				end
 				
-				inventory:Add("bloodsample", {Values={
+				inventory:Add("bloodsample", {
 					CustomName=inventory.RegisterItemName("Stan's Blood Samples");
-					Health=100;
-					MaxHealth=100;
-				};}, function(queueEvent, storageItem)
-					mission.SaveData.SampleId = storageItem.ID;
-					mission.SaveData.MissionItems = {};
-					table.insert(mission.SaveData.MissionItems, storageItem.ID);
-				end);
+					Values={
+						Health=100;
+						MaxHealth=100;
+					};}, function(queueEvent, storageItem)
+						mission.SaveData.SampleId = storageItem.ID;
+						mission.SaveData.MissionItems = {};
+						table.insert(mission.SaveData.MissionItems, storageItem.ID);
+					end);
 				
 				modMission:Progress(player, missionId, function(mission)
 					mission.ProgressionPoint = 2;
@@ -296,12 +297,13 @@ if RunService:IsServer() then
 							return;
 						end;
 						
-						inventory:Add("samplereport", {Values={
+						inventory:Add("samplereport", {
 							CustomName=inventory.RegisterItemName("Dr. Deniski's Report Insights");
-							Result=false;
-						};}, function(queueEvent, storageItem)
-							mission.SaveData.ReportId = storageItem.ID;
-						end);
+							Values={
+								Result=false;
+							};}, function(queueEvent, storageItem)
+								mission.SaveData.ReportId = storageItem.ID;
+							end);
 						shared.Notify(player, "Dr. Deniski's Report Insights added to your inventory.", "Inform");
 						
 					end);

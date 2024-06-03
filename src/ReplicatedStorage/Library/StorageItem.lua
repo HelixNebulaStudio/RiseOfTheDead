@@ -198,6 +198,10 @@ function StorageItem:DeleteValues(key, syncFunc)
 	return self;
 end
 
+function StorageItem:GetCustomName()
+	return self.CustomName or self.Values.CustomName;
+end
+
 function StorageItem:SetFav(v)
 	if self.Fav == nil then
 		self.Fav = true;

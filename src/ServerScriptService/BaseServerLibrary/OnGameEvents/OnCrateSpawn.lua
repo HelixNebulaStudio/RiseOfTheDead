@@ -20,10 +20,12 @@ return function(cratePrefab, interactData, cratePlayers)
 		if mission then
 			if mission.Type == 2 then
 				if interactData.RefStorageId == "sunkenchest" then
-					crateStorage:Add("blueprintpiece", {Values={
+					crateStorage:Add("blueprintpiece", {
 						CustomName=shared.modStorage.RegisterItemName("Turret Blueprint Piece");
-						DescExtend=modRichFormatter.H3Text("\nMission: ").."Ask the Mysterious Engineer about this.";
-					};});
+						Values={
+							DescExtend=modRichFormatter.H3Text("\nMission: ").."Ask the Mysterious Engineer about this.";
+						};
+					});
 				end
 				
 			elseif mission.Type == 1 then

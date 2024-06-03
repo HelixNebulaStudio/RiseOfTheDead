@@ -100,13 +100,14 @@ return function(CutsceneSequence)
 				
 				bloodMachineInteractData.State = 4;
 				
-				inventory:Add("samplereport", {Values={
+				inventory:Add("samplereport", {
 					CustomName=modStorage.RegisterItemName("Stan's Blood Samples Report #1");
-					Result=false;
-					--DescExtend=h3O.."\nReport Status: "..h3C.."Negative";
-				};}, function(queueEvent, storageItem)
-					table.insert(mission.SaveData.MissionItems, storageItem.ID);
-				end);
+					Values={
+						Result=false;
+						--DescExtend=h3O.."\nReport Status: "..h3C.."Negative";
+					};}, function(queueEvent, storageItem)
+						table.insert(mission.SaveData.MissionItems, storageItem.ID);
+					end);
 				shared.Notify(player, "A sample report added to your inventory.", "Inform");
 				
 				modMission:Progress(player, missionId, function(mission)
@@ -170,12 +171,13 @@ return function(CutsceneSequence)
 				bloodMachineInteractData.ItemRequired = "bloodsample";
 				bloodMachineInteractData:Sync();
 
-				inventory:Add("samplereport", {Values={
+				inventory:Add("samplereport", {
 					CustomName=modStorage.RegisterItemName("Stan's Blood Samples Report #2");
-					Result=true;
-				};}, function(queueEvent, storageItem)
-					table.insert(mission.SaveData.MissionItems, storageItem.ID);
-				end);
+					Values={
+						Result=true;
+					};}, function(queueEvent, storageItem)
+						table.insert(mission.SaveData.MissionItems, storageItem.ID);
+					end);
 				shared.Notify(player, "Sample report #2 added to your inventory.", "Inform");
 
 			elseif state == 7 and bloodMachineInteractData.CanInteract then
@@ -227,12 +229,13 @@ return function(CutsceneSequence)
 				bloodMachineInteractData.ItemRequired = "bloodsample";
 				bloodMachineInteractData:Sync();
 
-				inventory:Add("samplereport", {Values={
+				inventory:Add("samplereport", {
 					CustomName=modStorage.RegisterItemName("Stan's Blood Samples Report #3");
-					Result=false;
-				};}, function(queueEvent, storageItem)
-					table.insert(mission.SaveData.MissionItems, storageItem.ID);
-				end);
+					Values={
+						Result=false;
+					};}, function(queueEvent, storageItem)
+						table.insert(mission.SaveData.MissionItems, storageItem.ID);
+					end);
 				shared.Notify(player, "Sample report #3 added to your inventory.", "Inform");
 
 			elseif state == 9 and bloodMachineInteractData.CanInteract then
@@ -284,12 +287,13 @@ return function(CutsceneSequence)
 				bloodMachineInteractData.ItemRequired = "";
 				bloodMachineInteractData:Sync();
 
-				inventory:Add("samplereport", {Values={
+				inventory:Add("samplereport", {
 					CustomName=modStorage.RegisterItemName("Stan's Blood Samples Report #4");
-					Result=true;
-				};}, function(queueEvent, storageItem)
-					table.insert(mission.SaveData.MissionItems, storageItem.ID);
-				end);
+					Values={
+						Result=true;
+					};}, function(queueEvent, storageItem)
+						table.insert(mission.SaveData.MissionItems, storageItem.ID);
+					end);
 				shared.Notify(player, "Sample report #4 added to your inventory.", "Inform");
 				
 				modMission:Progress(player, missionId, function(mission)

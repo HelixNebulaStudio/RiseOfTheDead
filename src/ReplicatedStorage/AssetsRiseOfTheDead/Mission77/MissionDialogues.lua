@@ -70,7 +70,7 @@ if RunService:IsServer() then
 		local inventory = profile.ActiveInventory;
 		
 		local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
-			return storageItem.CustomName == "Turret Blueprint Piece";
+			return storageItem:GetCustomName() == "Turret Blueprint Piece";
 		end);
 		
 		if mission.Type == 2 and #itemsList > 0 then -- Available;
