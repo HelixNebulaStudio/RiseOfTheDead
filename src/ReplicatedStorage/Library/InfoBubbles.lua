@@ -71,7 +71,7 @@ function InfoBubbles.Spawn(packet)
 		iconTag.ImageColor3 = Color3.fromRGB(162, 53, 53);
 		labelTag.TextColor3 = iconTag.ImageColor3;
 
-	elseif bubbleType == "ElectricityDamage" then
+	elseif bubbleType == "ElectricDamage" then
 		iconTag.Image = "rbxassetid://3576225217";
 		iconTag.ImageColor3 = Color3.fromRGB(162, 153, 52);
 		labelTag.TextColor3 = iconTag.ImageColor3;

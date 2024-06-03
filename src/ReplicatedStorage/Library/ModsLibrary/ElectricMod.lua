@@ -81,6 +81,9 @@ if RunService:IsServer() then
 
 					if humanoid.Health <= 0 then return end
 
+					local targetImmunity = npcStatus:GetImmunity("ElectricDamage");
+					if targetImmunity >= 1 then return end;
+
 					local hitTick = tick();
 					local statusTable = entityStatus:GetOrDefault(statusKey);
 					if statusTable == nil or hitTick-statusTable >= 1 then
@@ -95,7 +98,7 @@ if RunService:IsServer() then
 								local damage = math.max(weaponDamage*dmgRatio, 1);
 								
 								damageSource.Damage=damage;
-								damageSource.DamageType="ElectricityDamage";
+								damageSource.DamageType="ElectricDamage";
 								damagable:TakeDamagePackage(damageSource);
 
 								local targetPosition = strikePart.Position;

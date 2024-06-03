@@ -44,6 +44,29 @@ function NpcStatusMeta:CanTakeDamageFrom(player)
 	return false;
 end
 
+function NpcStatusMeta:GetImmunity(damageType, damageCate)
+	local npcModule = self.NpcModule;
+	local immunity = npcModule.Immunity or 0;
+
+	if damageType == "ExplosiveModel" then
+		damageType = nil;
+		immunity = 0;
+	end
+
+	if damageType == "FrostDamage" then immunity = 0 end;
+	
+	if npcModule.MeleeImmunity and npcModule.MeleeImmunity > 0 and damageCate == modDamagable.DamageCategory.Melee then
+		immunity = npcModule.MeleeImmunity;
+	end
+
+	local toxicModValue = npcModule.EntityStatus:GetOrDefault("ToxicMod");
+	if toxicModValue then
+		immunity = immunity-toxicModValue;
+	end
+
+	return immunity;
+end
+
 function NpcStatusMeta:TakeDamagePackage(damageSource)
 	if self.NpcModule.IsDead then return end;
 	
@@ -52,7 +75,8 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 	local storageItem = damageSource.ToolStorageItem;
 	local hitPart = damageSource.TargetPart;
 	local damageType = damageSource.DamageType;
-	
+	local damageCate = damageSource.DamageCate;
+
 	local dmgForce = damageSource.DamageForce or Vector3.zero;
 	local dmgPosition = damageSource.DamagePosition or (hitPart and hitPart.Position);
 
@@ -60,7 +84,6 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 	local immortality = npcModule.Immortal;
 	local humanoid = npcModule.Humanoid;
 	local rootPart: BasePart = npcModule.RootPart;
-	local immunity = npcModule.Immunity or 0;
 	
 	if damageType == "Heal" then
 		amount = -amount;
@@ -74,29 +97,17 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 
 	local initAmount = amount;
 	local player = dealer or (storageItem and storageItem.Player);
-	
-	if damageType == "ExplosiveModel" then
-		damageType = nil;
-		immunity = 0;
-	end
 
-	if damageType == "FrostDamage" then immunity = 0 end;
-	
-	if npcModule.MeleeImmunity and npcModule.MeleeImmunity > 0 and damageSource.IsMeleeDamage then
-		immunity = npcModule.MeleeImmunity;
-	end
-	
+	local immunity = self:GetImmunity(damageType, damageCate);
+
 	local toxicDmgTaken = false;
-	if immunity > 0 and damageType ~= "ToxicDamage" then
-		local initDmg = amount;
+	if damageType == nil and amount > 0 then
+		if immunity > 1 then -- invert damage (1, inf]
+			amount = amount * -immunity;
 
-		amount = amount * math.clamp(1-immunity, -1, 999);
-		
-		local toxicModValue = npcModule.EntityStatus:GetOrDefault("ToxicMod");
-		if toxicModValue and amount > 0 then
-			local newImmunity = math.max(immunity - toxicModValue, 0) ; --math.clamp(immunity*toxicModValue, 0, 1);
-			local toxicDamage = initDmg * (1-newImmunity) - amount;
-			
+		elseif immunity < 0 then -- extra damage [-inf, 0)
+			local toxicDamage = amount * (-immunity);
+
 			local newDmgSrc = modDamagable.NewDamageSource{
 				Damage=toxicDamage;
 				Dealer=dealer;
@@ -106,9 +117,15 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 			}
 			self:TakeDamagePackage(newDmgSrc);
 			toxicDmgTaken = true;
+
+		elseif immunity > 0 then -- reduced damage (0, 1]
+			amount = amount * (1-immunity);
+
 		end
+
 	end
 
+	
 	if initAmount > 0 and npcModule.CustomHealthbar and npcModule.CustomHealthbar.OnDamaged then
 		local returnPacket = npcModule.CustomHealthbar:OnDamaged(initAmount, dealer, storageItem, hitPart);
 		

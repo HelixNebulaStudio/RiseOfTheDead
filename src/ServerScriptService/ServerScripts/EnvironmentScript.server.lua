@@ -150,7 +150,7 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 	+ (tonumber(os.date("%H")) :: number)*10000 
 	+ (tonumber(os.date("%M")) :: number)*100 
 	+ (tonumber(os.date("%S")) :: number)
-	workspace:SetAttribute("UnixSeed", unixSeed);
+	workspace:SetAttribute("UnixSeed", string.reverse(unixSeed));
 
 	local osTime = workspace:GetAttribute("SetOsTime") or modBranchConfigs.WorldInfo.TimeCycleEnabled and modSyncTime.GetTime() or 0;
 	
@@ -306,7 +306,7 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 	if modConfigurations.DisableWeatherCycle ~= true 
 	and modWeatherService:GetActive() == nil
 	and tick() > lastWeatherEvent then
-		lastWeatherEvent = tick()+ weatherRandom:NextInteger(60, 600);
+		lastWeatherEvent = tick()+ weatherRandom:NextInteger(600, 3600);
 
 		if weatherRandom:NextInteger(1, 3) == 1 then
 			local pickWeatherId = LiveWeatherCycle[weatherRandom:NextInteger(1, #LiveWeatherCycle)];

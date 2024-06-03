@@ -56,22 +56,13 @@ return function(profile, points: number?, reason: string?)
                 dropPacket.NextDrop=os.time()+math.random(600-120, 600+120);
 
             elseif dropDifficulty <= 20 then
-                dropPacket.NextDrop=os.time()+math.random(1200-240, 1200+240);
+                dropPacket.NextDrop=os.time()+math.random(900-240, 900+240);
 
-            elseif dropDifficulty <= 40 then
-                dropPacket.NextDrop=os.time()+math.random(1800-300, 1800+300);
+            elseif dropDifficulty <= 200 then
+                dropPacket.NextDrop=os.time()+math.random(1200-480, 1200+480);
 
-            elseif dropDifficulty <= 80 then
-                dropPacket.NextDrop=os.time()+math.random(oneHour-600, oneHour+600);
-
-            elseif dropDifficulty <= 160 then
-                dropPacket.NextDrop=os.time()+math.random((oneHour*2)-1200, (oneHour*2)+1200);
-
-            elseif dropDifficulty <= 320 then
-                dropPacket.NextDrop=os.time()+math.random((oneHour*3)-2400, (oneHour*3)+2400);
-
-            elseif dropDifficulty <= 640 then
-                dropPacket.NextDrop=os.time()+math.random((oneHour*4)-4800, (oneHour*4)+4800);
+            else
+                dropPacket.NextDrop=os.time()+math.random(1200+960, (oneHour*4)+4800);
 
             end
 

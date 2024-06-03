@@ -51,11 +51,12 @@ function Pool.new(owner)
 		if damagableObj.ClassName == "NpcStatus" then
 			local npcStatus = damagableObj;
 
-			local npcModule = npcStatus:GetModule();
-			local humanoid = npcModule.Humanoid;
-			local entityStatus = npcModule.EntityStatus;
 			
+			local npcModule = damagableObj:GetModule();
+			local humanoid = npcModule.Humanoid;
 			local dmgMulti = self.TargetableEntities[humanoid.Name];
+			
+			local entityStatus = npcModule.EntityStatus;
 			
 			if dmgMulti and npcStatus:CanTakeDamageFrom(player) then
 				if entityStatus:GetOrDefault(statusKey) == nil then

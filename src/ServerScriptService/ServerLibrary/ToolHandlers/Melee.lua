@@ -62,7 +62,8 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 	
 	if damagableObj.ClassName == "NpcStatus" then
 		local npcModule = damagableObj:GetModule();
-		local damageRatio = self.TargetableEntities[damagable.HealthObj.Name];
+		local humanoid = npcModule.Humanoid;
+		local damageRatio = self.TargetableEntities[humanoid.Name];
 		
 		if damageRatio then 
 			damage = damage * damageRatio;
@@ -119,7 +120,6 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 			Damage=damage;
 			Dealer=self.Player;
 			ToolStorageItem=self.StorageItem;
-			IsMeleeDamage=true;
 			TargetPart=hitPart;
 			DamageCate=modDamagable.DamageCategory.Melee;
 		}

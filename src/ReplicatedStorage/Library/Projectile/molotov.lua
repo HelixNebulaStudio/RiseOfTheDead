@@ -58,11 +58,14 @@ function Pool.new(owner)
 				local damage = self.ArcTracerConfig.Damage or 1;
 				
 				if damagable.Object.ClassName == "NpcStatus" then
+					local npcModule = damagable.Object:GetModule();
+					local humanoid = npcModule.Humanoid;
+					local dmgMulti = self.TargetableEntities[humanoid.Name];
+
 					local healthInfo = damagable:GetHealthInfo();
 					
 					damage = math.clamp(healthInfo.MaxHealth*0.05, 35, 5000);
 					
-					local dmgMulti = self.TargetableEntities[damagable.HealthObj.Name];
 					damage = damage*dmgMulti;
 					
 				elseif damagable.Object.ClassName == "PlayerClass" then

@@ -93,6 +93,15 @@ function Objective:Begin()
 					BossKilled=true;
 					--LootPrefab=lootPrefab;
 				};
+
+				local canRagdoll = bossPrefab:GetAttribute("HasRagdoll") == true;
+				if not canRagdoll then
+					for _, obj in pairs(bossPrefab:GetDescendants()) do
+						if obj:IsA("Motor6D") then
+							game.Debris:AddItem(obj, 0);
+						end
+					end
+				end
 			end)
 			table.insert(Objective.BossNpcModules, npcModule);
 		end

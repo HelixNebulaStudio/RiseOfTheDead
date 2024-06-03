@@ -103,6 +103,9 @@ if RunService:IsServer() then
 				local npcModule = npcStatus:GetModule();
 				local entityStatus = npcModule.EntityStatus;
 				
+				local targetImmunity = npcStatus:GetImmunity("FireDamage");
+				if targetImmunity >= 1 then return end;
+
 				local stacks = entityStatus:GetOrDefault(script.Name);
 				if stacks == nil then
 					stacks = 0;
@@ -149,7 +152,7 @@ if RunService:IsServer() then
 					end)
 				else
 					entityStatus:Apply(script.Name, stacks+1);
-					
+
 				end
 
 			elseif damagable.Object.ClassName == "Destructible" then

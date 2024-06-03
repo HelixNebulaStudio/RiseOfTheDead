@@ -400,6 +400,8 @@ if RunService:IsServer() then
 		local npcModule = npcStatus:GetModule();
 		if npcModule == nil then return end;
 		
+		local targetImmunity = npcStatus:GetImmunity();
+		if targetImmunity >= 1 then return end;
 		
 		local entityStatus = npcModule.EntityStatus;
 		local isBasicEnemy = npcModule and npcModule.Properties and npcModule.Properties.BasicEnemy == true;
