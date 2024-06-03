@@ -268,6 +268,9 @@ function AntiCheatService:GetLastTeleport(player)
 end
 
 function AntiCheatService.saferequire(player, moduleScript)
+	if not game:IsAncestorOf(moduleScript) then
+		return;
+	end
 	if player and player:IsA("ModuleScript") then
 		Debugger:Warn("Missing player param.");
 		return;

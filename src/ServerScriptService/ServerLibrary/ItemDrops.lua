@@ -311,6 +311,10 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 	local interactData = require(prefabModule);
 	interactData.Script = prefabModule;
 	
+	prefabModule.Destroying:Connect(function()
+		table.clear(interactData);
+	end)
+
 	if itemDrop.OnceOnly then
 		local tag = Instance.new("BoolValue");
 		tag.Name = "OnceOnly";
