@@ -19,10 +19,13 @@ local ChatPermissionDatastore = DataStoreService:GetDataStore("ChatService");
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
 local modFactions = require(game.ServerScriptService.ServerLibrary.Factions);
+
+local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
 local remoteChatService = modRemotesManager:Get("ChatService");
 local remoteSubmitMessage = modRemotesManager:Get("SubmitMessage");
@@ -260,6 +263,7 @@ function remoteSubmitMessage.OnServerInvoke(player, channelId, text, filterTest,
 	end
 	if skipReplicate == true then playerCache.MsgFreebie = playerCache.MsgFreebie+1; return end;
 
+	filteredText = modRichFormatter.SanitizeRichText(filteredText);
 	
 	-- Messaging
 	local canUserChat = game.Chat:CanUserChatAsync(player.UserId);
@@ -403,6 +407,8 @@ function remoteSubmitMessage.OnServerInvoke(player, channelId, text, filterTest,
 		);
 		
 	end
+
+	return;
 end
 
 --== ChatService;

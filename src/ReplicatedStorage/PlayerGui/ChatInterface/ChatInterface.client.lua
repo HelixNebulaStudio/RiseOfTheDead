@@ -661,7 +661,7 @@ UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
 				RunService.Heartbeat:Wait();
 				
 				if matchIndexTab == nil then
-					matchIndexTab = 1;
+					matchIndexTab = shiftKeyDown and #cmdMatchs or 1;
 				end
 				
 				for _, obj in pairs(cmdFrame:GetChildren()) do
@@ -676,9 +676,11 @@ UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
 				
 				inputBox.Text = "/"..tostring(cmdMatchs[matchIndexTab]);
 				inputBox.CursorPosition = #inputBox.Text+1
-				matchIndexTab = matchIndexTab +1;
+				matchIndexTab = matchIndexTab + (shiftKeyDown and -1 or 1);
 				if matchIndexTab > #cmdMatchs then
-					matchIndexTab =1;
+					matchIndexTab = 1;
+				elseif matchIndexTab <= 0 then
+					matchIndexTab = #cmdMatchs;
 				end
 				
 			else

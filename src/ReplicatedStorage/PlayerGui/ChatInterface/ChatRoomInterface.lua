@@ -19,6 +19,7 @@ local ChatService = game:GetService("Chat");
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modNotificationsLibrary = require(game.ReplicatedStorage.Library.NotificationsLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
@@ -214,12 +215,6 @@ function ChatRoomInterface:NewMessage(room, messageData)
 		local nameString = messageData.Name;
 		local msgString = messageData.Message;
 		
-		-- msgString = string.gsub(msgString,"&","&amp;");
-		-- msgString = string.gsub(msgString,"<","&lt;");
-		-- msgString = string.gsub(msgString,">","&gt;");
-		-- msgString = string.gsub(msgString,'"',"&quot;");
-		-- msgString = string.gsub(msgString,"'","&apos;");
-
 		--chatkeywords Chat Keywords
 		local colonStart, colonEnd = 0, 0;
 		for a=1, 10 do
@@ -275,8 +270,6 @@ function ChatRoomInterface:NewMessage(room, messageData)
 				msgString = string.gsub(msgString, keyword, `<font color="#4fdab0">{math.random(0, 100)}</font>`);
 				isValidKeyword = true;
 				
-			--elseif string.find(text, "(%[%#(%a+)%]%(.+%))") then -- Hello [#abcdef](This will be colored) World
-
 			end
 			
 			if isValidKeyword then
@@ -292,6 +285,9 @@ function ChatRoomInterface:NewMessage(room, messageData)
 	local msgString = messageData.Message;
 	local nameString = messageData.Name;
 	
+	local modifiedMsgString, messageEmbeds = modRichFormatter.UnsanitizeRichText(msgString);
+	msgString = modifiedMsgString;
+
 	if nameString == "Game" then nameString = nil end;
 	
 	messageData.MsgTime = messageData.MsgTime or DateTime.now().UnixTimestampMillis;
@@ -311,7 +307,7 @@ function ChatRoomInterface:NewMessage(room, messageData)
 					local disableHud = game.Players.LocalPlayer:GetAttribute("DisableHud") == true;
 					if disableHud then return end;
 
-					ChatService:Chat(chatBubblePoint, messageData.Message, Enum.ChatColor.White);
+					ChatService:Chat(chatBubblePoint, msgString, Enum.ChatColor.White);
 				end)
 			end
 			messageData.Bubble = true;
@@ -456,6 +452,25 @@ function ChatRoomInterface:NewMessage(room, messageData)
 	
 	msgFrame.Visible = true;
 	msgFrame:SetAttribute("Visible", mainInputFrame.Visible);
+
+	task.defer(function()
+		local isCompact = modConfigurations.CompactInterface;
+		local imgMaxSize = isCompact and 20 or 40;
+		
+		local imgBuffer = 0;
+		for a=1, #messageEmbeds do
+			local embedData = messageEmbeds[a];
+			if embedData.Type == "Image" and imgBuffer <= 6 then
+				local imgLabel = Instance.new("ImageLabel");
+				imgLabel.BackgroundTransparency = 1;
+				imgLabel.Image = embedData.Image;
+				imgLabel.Size = UDim2.new(0, imgMaxSize, 0, imgMaxSize);
+				imgLabel.Position = UDim2.new(0, imgBuffer*imgMaxSize, 0, msgLabel.TextBounds.Y);
+				imgLabel.Parent = msgLabel;
+				imgBuffer=imgBuffer+1;
+			end
+		end
+	end)
 
 	local packet = messageData.Packet or {};
 	if packet.SndId then
