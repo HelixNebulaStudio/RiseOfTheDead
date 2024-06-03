@@ -45,7 +45,7 @@ return function(npc, spawnPoint)
 		end
 	end))
 	self.Humanoid.HealthChanged:Connect(self.OnHealthChanged);
-	self.Garbage:Tag(self.Humanoid.Died:Connect(self.OnDeath));
+	self.Humanoid.Died:Connect(self.OnDeath);
 
 	return self;
 end

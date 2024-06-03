@@ -29,12 +29,14 @@ return function(npc, spawnPoint)
 	self:AddComponent(HumanModule.OnDeath);
 	self:AddComponent(HumanModule.OnHealthChanged);
 
-	--== Connections;
+	--== Logic;
 	self.Garbage:Tag(self.Think:Connect(function()
 
 	end))
+
+	--== Signals
 	self.Humanoid.HealthChanged:Connect(self.OnHealthChanged);
-	self.Garbage:Tag(self.Humanoid.Died:Connect(self.OnDeath));
+	self.Humanoid.Died:Connect(self.OnDeath);
 
 	return self;
 end

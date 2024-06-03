@@ -297,7 +297,7 @@ return function(npc, spawnPoint)
 	
 	--== Connections;
 	self.Garbage:Tag(self.Humanoid.HealthChanged:Connect(self.OnHealthChanged));
-	self.Garbage:Tag(self.Humanoid.Died:Connect(self.OnDeath));
+	self.Humanoid.Died:Connect(self.OnDeath);
 	
 	self.Garbage:Tag(function()
 		for _, obj in pairs(self.RootsDebris) do
