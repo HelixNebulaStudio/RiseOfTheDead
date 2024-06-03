@@ -69,7 +69,9 @@ if RunService:IsServer() then
 		local profile = shared.modProfile:Get(player);
 		local inventory = profile.ActiveInventory;
 		
-		local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem) return storageItem.CustomName == "Turret Blueprint Piece"; end);
+		local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
+			return storageItem.CustomName == "Turret Blueprint Piece";
+		end);
 		
 		if mission.Type == 2 and #itemsList > 0 then -- Available;
 			dialog:SetInitiateTag("bofb_init");
@@ -150,23 +152,21 @@ if RunService:IsServer() then
 						end)
 					end)
 				end)
-				
-				
 			end
 			
 		elseif mission.Type == 3 then -- Complete
 
-			local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
+			local extraBpPieces = inventory:ListByItemId("blueprintpiece", function(storageItem)
 				return string.find(storageItem.CustomName, "Turret Blueprint Piece") ~= nil;
 			end);
-			if itemsList then
+			if extraBpPieces and #extraBpPieces > 0 then
 				dialog:AddDialog({
 					Face="Serious";
-					Dialogue="I found some extra blueprint pieces, I don't know how..";
+					Dialogue="I found some extra blueprint pieces, and I don't need them..";
 					Reply="I'll take those off your hands, thanks!";
 				}, function(dialog)
-					for a=1, #itemsList do
-						inventory:Remove(itemsList[a].ID);
+					for a=1, #extraBpPieces do
+						inventory:Remove(extraBpPieces[a].ID);
 					end
 				end)
 			end

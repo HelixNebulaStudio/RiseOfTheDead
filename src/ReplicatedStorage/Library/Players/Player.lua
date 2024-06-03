@@ -24,6 +24,7 @@ local modMapLibrary = require(game.ReplicatedStorage.Library.MapLibrary);
 local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
+local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 
@@ -57,6 +58,7 @@ function Player.new(playerInstance: Player)
 	meta.OnCharacterSpawn = modEventSignal.new("OnCharacterSpawn");
 	meta.Died = modEventSignal.new("PlayerClassOnDied");
 	meta.OnDamageTaken = modEventSignal.new("OnDamageTaken");
+	meta.Garbage = modGarbageHandler.new();
 	
 	classPlayer.Name = playerInstance.Name;
 	classPlayer.IsAlive = false;
@@ -1393,11 +1395,11 @@ function Player.new(playerInstance: Player)
 		if playerInstance.Character == nil then return end
 		local character = playerInstance.Character;
 		
-		character:GetAttributeChangedSignal("IsAlive"):Connect(function()
+		meta.Garbage:Tag(character:GetAttributeChangedSignal("IsAlive"):Connect(function()
 			if character:GetAttribute("IsAlive") == false then
 				func(character);
 			end
-		end)
+		end));
 	end
 	
 	function meta.OnPlayerTeleport(teleportState, placeId, spawnName)
@@ -1453,6 +1455,7 @@ function Player.new(playerInstance: Player)
 		self.OnDamageTaken:Destroy();
 		
 		self.Properties.TemperatureOffset:Destroy();
+		meta.Garbage:Destruct();
 
 		PlayerService.Players[self.Name] = nil;
 	end

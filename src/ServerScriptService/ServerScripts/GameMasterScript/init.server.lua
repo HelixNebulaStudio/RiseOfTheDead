@@ -365,10 +365,6 @@ function PickUpRequest(player, interactObject, interactModule)
 				shared.Notify(player, (pickedUpQuantity > 1 and itemLibrary.Name.." (".. pickedUpQuantity..")" or itemLibrary.Name), "PickUp")
 				
 				if interactData.OnPickUp then interactData.OnPickUp(player) end;
-				--modOnGameEvents:Fire("OnItemPickup", player, interactData, {
-				--	Storage=rPacket.Storage;
-				--	StorageItem=rPacket.StorageItem;
-				--});
 				
 			else
 				game.Debris:AddItem(interactModule.Parent, 0);

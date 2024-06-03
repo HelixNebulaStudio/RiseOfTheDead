@@ -340,6 +340,7 @@ modOnGameEvents:ConnectEvent("OnDayTimeStart", function()
 	local adGuis = CollectionService:GetTagged("AdGuis");
 
 	for _, adGui in pairs(adGuis) do
+		if not workspace:IsAncestorOf(adGui) then continue end;
 		if adGui:IsA("AdGui") then
 			adGui.FallbackImage = ImmersiveAdsFallbacks[math.random(1, #ImmersiveAdsFallbacks)];
 			adGui.Enabled = math.random(1, 8) == 1;
@@ -348,10 +349,13 @@ modOnGameEvents:ConnectEvent("OnDayTimeStart", function()
 				local newProxy = adGuiProxy:Clone();
 				local imageLabel: ImageLabel = newProxy:WaitForChild("ImageLabel");
 				imageLabel.Image = adGui.FallbackImage;
+				newProxy.Face = adGui.Face;
 				newProxy.Parent = adGui.Parent;
 
-				adGui:Destroy();
+				adGui:RemoveTag("AdGuis");
+				game.Debris:AddItem(adGui, 0);
 			end
+
 		elseif adGui:IsA("SurfaceGui") then
 			adGui.ImageLabel.Image = ImmersiveAdsFallbacks[math.random(1, #ImmersiveAdsFallbacks)];
 			adGui.Enabled = math.random(1, 8) == 1;
@@ -359,9 +363,11 @@ modOnGameEvents:ConnectEvent("OnDayTimeStart", function()
 			if not adGui.Enabled then
 				local newAdGui = adGuiTemplate:Clone();
 				newAdGui.FallbackImage = adGui.ImageLabel.Image;
+				newAdGui.Face = adGui.Face;
 				newAdGui.Parent = adGui.Parent;
 
-				adGui:Destroy();
+				adGui:RemoveTag("AdGuis");
+				game.Debris:AddItem(adGui, 0);
 			end
 		end
 	end

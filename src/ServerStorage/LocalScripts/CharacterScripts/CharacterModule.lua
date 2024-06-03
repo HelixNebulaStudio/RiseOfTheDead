@@ -232,6 +232,7 @@ script.Destroying:Connect(function()
 		if typeof(v) == "table" and v.ClassName == "EventSignal" then
 			v:Destroy();
 		end
+		CharacterModule[k] = nil;
 	end
 end)
 
