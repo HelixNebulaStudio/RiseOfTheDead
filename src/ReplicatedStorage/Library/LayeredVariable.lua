@@ -47,7 +47,7 @@ function LayeredVariable:Remove(id)
 	self.Changed:Fire();
 end
 
-function LayeredVariable:GetTable()
+function LayeredVariable:GetTable(recursive)
 	if self.Dirty then
 		for a=#self.Table, 1, -1 do
 			if self.Table[a].Expire and tick() > self.Table[a].Expire then
@@ -58,7 +58,18 @@ function LayeredVariable:GetTable()
 		table.sort(self.Table, function(a, b) return a.Order > b.Order; end);
 		self.Dirty = false;
 	end
-	return #self.Table > 0 and self.Table[1] or nil;
+	
+	local t = #self.Table > 0 and self.Table[1] or nil;
+	
+	if t and t.Expire and tick() > t.Expire then
+		self.Dirty = true;
+
+		if recursive ~= true then
+			t = self:GetTable(true);
+		end
+	end
+
+	return t;
 end
 
 function LayeredVariable:Has(id)
