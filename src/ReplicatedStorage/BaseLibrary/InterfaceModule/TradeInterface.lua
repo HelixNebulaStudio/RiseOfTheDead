@@ -345,6 +345,7 @@ function Interface.init(modInterface)
 				otherTraderFrame.Size = UDim2.new(1, 0, 0, 140);
 
 			end
+			otfObjects.GoldLabel.Visible = true;
 			tradeWarnLabel.Visible = true;
 			customPrompt.Visible = false;
 			
