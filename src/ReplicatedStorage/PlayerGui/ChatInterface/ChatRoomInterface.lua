@@ -214,6 +214,12 @@ function ChatRoomInterface:NewMessage(room, messageData)
 		local nameString = messageData.Name;
 		local msgString = messageData.Message;
 		
+		msgString = string.gsub(msgString,"&","&amp;");
+		msgString = string.gsub(msgString,"<","&lt;");
+		msgString = string.gsub(msgString,">","&gt;");
+		msgString = string.gsub(msgString,'"',"&quot;");
+		msgString = string.gsub(msgString,"'","&apos;");
+
 		--chatkeywords Chat Keywords
 		local colonStart, colonEnd = 0, 0;
 		for a=1, 10 do
@@ -266,9 +272,11 @@ function ChatRoomInterface:NewMessage(room, messageData)
 				
 			elseif string.lower(keyword) == "roll" then
 				
-				msgString = string.gsub(msgString, ";"..keyword, '<font color="rgb(79, 218, 176)">'.. math.random(0, 100) ..'</font>');
+				msgString = string.gsub(msgString, keyword, `<font color="#4fdab0">{math.random(0, 100)}</font>`);
 				isValidKeyword = true;
 				
+			--elseif string.find(text, "(%[%#(%a+)%]%(.+%))") then -- Hello [#abcdef](This will be colored) World
+
 			end
 			
 			if isValidKeyword then
@@ -425,7 +433,6 @@ function ChatRoomInterface:NewMessage(room, messageData)
 		end
 	end
 	if richNameString then
-		
 		if messageData.Style == "Announce" then
 			msgLabel.Text = [[<font face="ArialBold" size="22" color="rgb(255, 170, 0)">]]..msgString..[[  </font>]];
 		else
