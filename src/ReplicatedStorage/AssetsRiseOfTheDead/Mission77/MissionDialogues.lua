@@ -94,13 +94,6 @@ if RunService:IsServer() then
 				end)
 			end)
 			
-
-			--modMission:Progress(player, missionId, function(mission)
-			--	if mission.ProgressionPoint <= 1 then
-			--		mission.ProgressionPoint = 1;
-			--	end
-			--end);
-			
 			
 		elseif mission.Type == 1 then -- Active
 			if mission.ProgressionPoint == 1 then
@@ -161,6 +154,23 @@ if RunService:IsServer() then
 				
 			end
 			
+		elseif mission.Type == 3 then -- Complete
+
+			local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
+				return string.find(storageItem.Name, "Turret Blueprint Piece") ~= nil;
+			end);
+			if itemsList then
+				dialog:AddDialog({
+					Face="Serious";
+					Dialogue="I found some extra blueprint pieces, I don't know how..";
+					Reply="I'll take those off your hands, thanks!";
+				}, function(dialog)
+					for a=1, #itemsList do
+						inventory:Remove(itemsList[a].ID);
+					end
+				end)
+			end
+
 		elseif mission.Type == 4 then -- Failed
 			
 		end
