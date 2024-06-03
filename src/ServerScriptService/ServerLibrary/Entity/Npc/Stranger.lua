@@ -112,7 +112,7 @@ return function(npc, spawnPoint)
 	end));
 	
 	self.Garbage:Tag(self.Humanoid.HealthChanged:Connect(self.OnHealthChanged));
-	self.Garbage:Tag(self.Humanoid.Died:Connect(function()
+	self.Humanoid.Died:Connect(function()
 		if self.Owner then
 			
 			modMission:Progress(self.Owner, 34, function(mission)
@@ -129,6 +129,6 @@ return function(npc, spawnPoint)
 			game.Debris:AddItem(self.Prefab, 20);
 		end
 		self:KillNpc();
-	end));
+	end);
 	
 return self end

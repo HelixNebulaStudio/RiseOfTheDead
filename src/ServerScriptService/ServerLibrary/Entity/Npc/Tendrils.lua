@@ -71,12 +71,12 @@ return function(npc, spawnPoint)
 	end));
 
 	self.Garbage:Tag(self.Humanoid.HealthChanged:Connect(self.OnHealthChanged));
-	self.Garbage:Tag(self.Humanoid.Died:Connect(function()
+	self.Humanoid.Died:Connect(function()
 		self.OnDeath()
 		if self.TendrilRoot and self.TendrilRoot.Parent ~= nil then
 			game.Debris:AddItem(self.TendrilRoot.Parent, 0);
 		end
-	end));
+	end);
 	
 	
 	return self;

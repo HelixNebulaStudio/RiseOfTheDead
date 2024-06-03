@@ -400,13 +400,13 @@ return function(npc, spawnPoint)
 							end
 						end, modBanditGunmen);
 						
-						self.Garbage:Tag(self.Humanoid.Died:Connect(function()
+						self.Humanoid.Died:Connect(function()
 							humanoid.Health = 0;
 							game.Debris:AddItem(banditNpc, 1);
 							if banditNpcModule.Destroy then
 								banditNpcModule:Destroy();
 							end
-						end));
+						end);
 
 						-- Sit on heli;
 						banditNpcModule.Seat = self.Helicopter.GunmenSeats[a];
@@ -600,11 +600,11 @@ return function(npc, spawnPoint)
 							game.Debris:AddItem(banditNpc, 3);
 						end)
 
-						self.Garbage:Tag(self.Humanoid.Died:Connect(function()
+						self.Humanoid.Died:Connect(function()
 							banditNpcModule.Humanoid.Health = 0;
 							game.Debris:AddItem(banditNpc, 1);
 							banditNpcModule:Destroy();
-						end));
+						end);
 						
 						banditNpcModule.OnTarget(self.NetworkOwners or game.Players:GetPlayers());
 

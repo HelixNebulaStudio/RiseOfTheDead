@@ -302,7 +302,7 @@ return function(npc, spawnPoint)
 			end
 		end
 		
-		self.Garbage:Tag(self.Humanoid.Died:Connect(function()
+		self.Humanoid.Died:Connect(function()
 			self:KillNpc();
 			for a=1, #gunmenModules do
 				if gunmenModules[a] then
@@ -310,7 +310,7 @@ return function(npc, spawnPoint)
 					game.Debris:AddItem(gunmenModules[a].Prefab, 0);
 				end
 			end
-		end));
+		end);
 		
 		for _, v in next, self.Prefab:GetDescendants() do
 			if v:IsA("BasePart") then
