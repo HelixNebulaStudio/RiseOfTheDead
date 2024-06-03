@@ -2210,8 +2210,14 @@ function Storage:Shrink()
 
 	compressed.RentalUnlockTime = self.RentalUnlockTime;
 
-	for id, storageItem in pairs(self.Container) do
-		compressed.Container[id] = storageItem:Shrink();
+	for id, sI in pairs(self.Container) do
+		local storageItem = sI:Shrink();
+
+		if self.Values.HideSeeds then
+			storageItem.Values.Seed = nil;
+		end
+
+		compressed.Container[id] = storageItem;
 	end
 	return compressed;
 end

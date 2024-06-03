@@ -110,7 +110,7 @@ function StorageItem:Shrink()
 	compressedItem.ItemId = self.ItemId;
 	compressedItem.Index = self.Index;
 	compressedItem.Quantity = self.Quantity;
-	compressedItem.Values = self.Values;
+	compressedItem.Values = modTables.DeepClone(self.Values);
 	compressedItem.Fav = self.Fav;
 	compressedItem.Vanity = self.Vanity;
 	compressedItem.Name = self.Name;

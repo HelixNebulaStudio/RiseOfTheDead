@@ -99,6 +99,8 @@ return function(player, dialog, data)
 				end
 			end
 		end
+
+		return;
 	end
 
 	for a=1, #buyIndex do
@@ -193,6 +195,7 @@ return function(player, dialog, data)
 		if tradingSession == nil then return end;
 
 		local npcTradeStorage = tradingSession.Storages[npcName];
+		npcTradeStorage.Values.HideSeeds = true;
 		
 		tradingSession:SetData(npcName, "Demands", demandList);
 
@@ -346,6 +349,7 @@ return function(player, dialog, data)
 				for a=1, #supplyList do
 					local supplyInfo = supplyList[a];
 					npcTradeStorage:Insert{ItemId=supplyInfo.ItemId; Data={Values={GoldPrice=supplyInfo.Price;}}};
+					
 				end
 			end
 

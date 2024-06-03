@@ -17,6 +17,7 @@ local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 
+local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
 
 local goldPoolMem = modDatabaseService:GetDatabase("BpGoldPool");
 local goldPoolSerializer = modSerializer.new();
@@ -63,6 +64,9 @@ goldPoolMem:OnUpdateRequest("gain", function(requestPacket)
 	poolData.Gain = poolData.Gain + amount;
 	poolData.Pool = poolData.Pool + amount;
 	
+	if #poolData.History > 1000 then
+		modTables.Truncate(poolData.History, 10);
+	end
 	table.insert(poolData.History, {Action="gain"; Player=playerId; Amount=amount;});
 
 	return poolData;
@@ -93,6 +97,9 @@ goldPoolMem:OnUpdateRequest("claim", function(requestPacket)
 	poolData.Claim = poolData.Claim + amount;
 	poolData.Pool = poolData.Pool - amount;
 	
+	if #poolData.History > 1000 then
+		modTables.Truncate(poolData.History, 10);
+	end
 	table.insert(poolData.History, {Action="claim"; Player=playerId; Amount=amount;});
 
 	return poolData;
@@ -111,6 +118,9 @@ goldPoolMem:OnUpdateRequest("add", function(requestPacket)
 
 	poolData.Pool = poolData.Pool + amount;
 
+	if #poolData.History > 1000 then
+		modTables.Truncate(poolData.History, 10);
+	end
 	table.insert(poolData.History, {Action="add"; Player=playerId; Amount=amount;});
 
 	return poolData;

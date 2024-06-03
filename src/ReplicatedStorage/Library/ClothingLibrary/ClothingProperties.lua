@@ -116,6 +116,8 @@ function ClothingProperties:ApplySeed(storageItem)
 	local itemValues = storageItem.Values;
 	
 	local seed = itemValues.Seed;
+	if seed == nil or seed == 0 then return end;
+	
 	local randomTemplate = Random.new(seed);
 	
 	if self.HasFlinchProtection then

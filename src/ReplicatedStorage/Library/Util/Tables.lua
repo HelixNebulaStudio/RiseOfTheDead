@@ -62,4 +62,17 @@ function Tables.DeepClean(t)
 	end
 end
 
+function Tables.Truncate(t, amt, direction: number?)
+    direction = direction or 1;
+
+    for a=1, amt do
+        if #t <= 0 then break; end;
+        if direction == 1 then
+            table.remove(t, 1);
+        elseif direction == -1 then
+            table.remove(t, #t);
+        end
+    end
+end
+
 return Tables;

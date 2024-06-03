@@ -859,7 +859,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 			itemName = '<font face="ArialBold" color="#'.. modNpcProfileLibrary.ClassColors[npcLib.Class]:ToHex() ..'">'.. itemValues.WantedNpc ..'</font> Wanted Poster';
 			itemDesc = itemDesc..h3O.."\nWanted: "..h3C.. itemValues.WantedNpc;
 		end
-		if itemValues.Seed then
+		if itemValues.Seed and itemValues.Seed ~= 0 then
 			itemName = itemName.." #"..itemValues.Seed;
 			itemDesc = itemDesc..h3O.."\nSeed: "..h3C.. colorNumberText(itemValues.Seed);
 		end
