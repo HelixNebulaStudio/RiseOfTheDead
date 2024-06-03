@@ -285,7 +285,7 @@ function ChatRoomInterface:NewMessage(room, messageData)
 	local msgString = messageData.Message;
 	local nameString = messageData.Name;
 	
-	local modifiedMsgString, messageEmbeds = modRichFormatter.UnsanitizeRichText(msgString);
+	local modifiedMsgString, messageEmbeds = modRichFormatter.UnsanitizeRichText(msgString, nameString);
 	msgString = modifiedMsgString;
 
 	if nameString == "Game" then nameString = nil end;
@@ -454,6 +454,7 @@ function ChatRoomInterface:NewMessage(room, messageData)
 	msgFrame:SetAttribute("Visible", mainInputFrame.Visible);
 
 	task.defer(function()
+		if messageEmbeds == nil then return end;
 		local isCompact = modConfigurations.CompactInterface;
 		local imgMaxSize = isCompact and 20 or 40;
 		

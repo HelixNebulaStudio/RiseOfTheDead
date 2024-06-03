@@ -84,7 +84,7 @@ function RichFormatter.SanitizeRichText(text)
 	return text;
 end
 
-function RichFormatter.UnsanitizeRichText(text)
+function RichFormatter.UnsanitizeRichText(text, senderName)
 	local pattern = "(.-)&lt;([^%s]-)(.-)&gt;(.-)&lt;/(%2)&gt;(.-)";
 	local gmatch = string.gmatch(text, pattern);
 
@@ -170,12 +170,26 @@ function RichFormatter.UnsanitizeRichText(text)
 			buildStr = buildStr..`{preText}{table.concat(splitContent, " ")}{postText}`;
 
 		elseif openTag == "img" and closeTag == "img" then
-			local itemLib = require(game.ReplicatedStorage.Library.ItemsLibrary):Find(content);
-			if itemLib and itemLib.Icon then
-				table.insert(embeds, {
-					Type="Image";
-					Image=itemLib.Icon;
-				})
+
+			if content == "factionicon" then
+
+			else
+				local itemLib = require(game.ReplicatedStorage.Library.ItemsLibrary):Find(content);
+				if itemLib and itemLib.Icon then
+					table.insert(embeds, {
+						Type="Image";
+						Image=itemLib.Icon;
+					});
+				end
+
+				local npcLib = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary):Find(content);
+				if npcLib and npcLib.Avatar then
+					table.insert(embeds, {
+						Type="Image";
+						Image=npcLib.Avatar;
+					});
+				end
+
 			end
 			buildStr = buildStr..`{preText}{postText}`;
 

@@ -639,7 +639,7 @@ function Survival:StartWave(wave)
 			
 			local itemLib = modItemLibrary:Find(pickRewardId);
 			if quantity > 1 then
-				dropStr = `{quantity} {itemLib and itemLib.Name or "reward package"} has dropped!`;
+				dropStr = `{quantity} x {itemLib and itemLib.Name or "reward package"} has dropped!`;
 			else
 				dropStr = `A {itemLib and itemLib.Name or "reward package"} has dropped!`;
 			end
