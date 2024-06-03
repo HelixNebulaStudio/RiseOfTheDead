@@ -77,6 +77,7 @@ local color = {
 templateHighlighGradient.Color = ColorSequence.new(color);
 
 local clickDebounce;
+local scrollLocked = {};
 --== Script;
 
 local function getPromptPosition(targetParPos, targetPos, frameSize)
@@ -321,9 +322,35 @@ function StorageInterface:BeginDragItem(slotItem)
 		else
 			modAudio.Play("StorageItemPickup");
 		end
-		
+
+		if UserInputService.TouchEnabled then
+			local buttonParent;
+			for a=1, 3 do
+				if slotItem.Button == nil or slotItem.Button.Parent == nil then break; end
+				buttonParent = buttonParent or slotItem.Button.Parent;
+				if buttonParent == nil then break end;
+
+				if buttonParent:IsA("ScrollingFrame") and buttonParent.ScrollingEnabled then
+					table.insert(scrollLocked, buttonParent);
+					buttonParent:SetAttribute("ScrollLocked", true);
+					buttonParent.ScrollingEnabled = false;
+				end
+				buttonParent = buttonParent.Parent;
+			end
+		end
+
 		RunService:BindToRenderStep("DraggingItem", Enum.RenderPriority.Input.Value-1, function(delta)
-			if slotItem.Button == nil or slotItem.Button.Parent == nil then RunService:UnbindFromRenderStep("DraggingItem"); return; end;
+			if slotItem.Button == nil or slotItem.Button.Parent == nil then
+				RunService:UnbindFromRenderStep("DraggingItem");
+				for a=#scrollLocked, 1, -1 do
+					if scrollLocked[a] and playerGui:IsAncestorOf(scrollLocked[a]) then
+						local scrollFrame = scrollLocked[a];
+						scrollFrame.ScrollingEnabled = true;
+					end
+					table.remove(scrollLocked, a);
+				end
+				return;
+			end;
 			local s, e = pcall(function()
 				local mousePosition = UserInputService:GetMouseLocation();
 				slotItem.Button.Position = UDim2.new(0, 
@@ -352,6 +379,15 @@ function StorageInterface:StopDragItem(slotItem)
 	if dropDraggingHook then dropDraggingHook:Disconnect(); end
 	
 	RunService:UnbindFromRenderStep("DraggingItem");
+
+	for a=#scrollLocked, 1, -1 do
+		if scrollLocked[a] and playerGui:IsAncestorOf(scrollLocked[a]) then
+			local scrollFrame = scrollLocked[a];
+			scrollFrame.ScrollingEnabled = true;
+		end
+		table.remove(scrollLocked, a);
+	end
+
 	if slotItem.Button and slotItem.Button.Parent ~= nil then
 		slotItem.Button.ZIndex = 3;
 		for _,child in pairs(slotItem.Button:GetDescendants()) do
@@ -1149,6 +1185,7 @@ function StorageInterface:NewButton(id)
 	if UserInputService.TouchEnabled then
 		slotItem.Button.TouchLongPress:Connect(function()
 			if self.DisableContextMenu == true then return end;
+			modAudio.Play("ButtonSound", nil, nil, false);
 			OpenOptionMenu();
 		end)
 	end
