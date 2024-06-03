@@ -58,7 +58,7 @@ return function(CutsceneSequence)
 				if itemList and #itemList > 0 then
 					local listItem = itemList[1];
 					local storageItem = inventory:Find(listItem.ID);
-					local sampleName = storageItem and storageItem.Name or "n/a";
+					local sampleName = storageItem and storageItem.CustomName or "n/a";
 					
 					--inventory:Remove(listItem.ID, 1);
 					classPlayer:UnequipTools();
@@ -101,7 +101,7 @@ return function(CutsceneSequence)
 				bloodMachineInteractData.State = 4;
 				
 				inventory:Add("samplereport", {Values={
-					Name=modStorage.RegisterItemName("Stan's Blood Samples Report #1");
+					CustomName=modStorage.RegisterItemName("Stan's Blood Samples Report #1");
 					Result=false;
 					--DescExtend=h3O.."\nReport Status: "..h3C.."Negative";
 				};}, function(queueEvent, storageItem)
@@ -123,7 +123,7 @@ return function(CutsceneSequence)
 				if itemList and #itemList > 0 then
 					local listItem = itemList[1];
 					local storageItem = inventory:Find(listItem.ID);
-					local sampleName = storageItem and storageItem.Name or "n/a";
+					local sampleName = storageItem and storageItem.CustomName or "n/a";
 
 					classPlayer:UnequipTools();
 
@@ -171,7 +171,7 @@ return function(CutsceneSequence)
 				bloodMachineInteractData:Sync();
 
 				inventory:Add("samplereport", {Values={
-					Name=modStorage.RegisterItemName("Stan's Blood Samples Report #2");
+					CustomName=modStorage.RegisterItemName("Stan's Blood Samples Report #2");
 					Result=true;
 				};}, function(queueEvent, storageItem)
 					table.insert(mission.SaveData.MissionItems, storageItem.ID);
@@ -186,7 +186,7 @@ return function(CutsceneSequence)
 				if itemList and #itemList > 0 then
 					local listItem = itemList[1];
 					local storageItem = inventory:Find(listItem.ID);
-					local sampleName = storageItem and storageItem.Name or "n/a";
+					local sampleName = storageItem and storageItem.CustomName or "n/a";
 
 					classPlayer:UnequipTools();
 
@@ -228,7 +228,7 @@ return function(CutsceneSequence)
 				bloodMachineInteractData:Sync();
 
 				inventory:Add("samplereport", {Values={
-					Name=modStorage.RegisterItemName("Stan's Blood Samples Report #3");
+					CustomName=modStorage.RegisterItemName("Stan's Blood Samples Report #3");
 					Result=false;
 				};}, function(queueEvent, storageItem)
 					table.insert(mission.SaveData.MissionItems, storageItem.ID);
@@ -243,7 +243,7 @@ return function(CutsceneSequence)
 				if itemList and #itemList > 0 then
 					local listItem = itemList[1];
 					local storageItem = inventory:Find(listItem.ID);
-					local sampleName = storageItem and storageItem.Name or "n/a";
+					local sampleName = storageItem and storageItem.CustomName or "n/a";
 
 					classPlayer:UnequipTools();
 
@@ -285,7 +285,7 @@ return function(CutsceneSequence)
 				bloodMachineInteractData:Sync();
 
 				inventory:Add("samplereport", {Values={
-					Name=modStorage.RegisterItemName("Stan's Blood Samples Report #4");
+					CustomName=modStorage.RegisterItemName("Stan's Blood Samples Report #4");
 					Result=true;
 				};}, function(queueEvent, storageItem)
 					table.insert(mission.SaveData.MissionItems, storageItem.ID);

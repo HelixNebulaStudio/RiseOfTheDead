@@ -1011,7 +1011,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			if itemLib.Type == modItemsLibrary.Types.Mod and modLib then
 				local perks, isMaxed = modWorkbenchLibrary.CalculatePerksSpent(storageItem, modLib, profile.Premium);
 				inventory:Remove(storageItemId, 1, function()
-					shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.Name), "Negative");
+					shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.CustomName), "Negative");
 				end);
 				
 				local duration = modSyncTime.GetTime()+900;
@@ -1053,7 +1053,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 				profile:AddPlayPoints(10, "Gameplay:Workbench");
 				
 				inventory:Remove(storageItemId, 1, function()
-					shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.Name), "Negative");
+					shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.CustomName), "Negative");
 				end);
 				
 				return modWorkbenchLibrary.DeconstructModReplies.Success;
@@ -1319,7 +1319,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			profile:AddPlayPoints(polishCost, "Sink:Perks");
 
 			inventory:Remove(storageItemId, 1, function()
-				shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.Name), "Negative");
+				shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.CustomName), "Negative");
 			end);
 
 			return modWorkbenchLibrary.PolishToolReplies.Success;

@@ -129,7 +129,7 @@ if RunService:IsServer() then
 				end
 				
 				inventory:Add("bloodsample", {Values={
-					Name=inventory.RegisterItemName("Stan's Blood Samples");
+					CustomName=inventory.RegisterItemName("Stan's Blood Samples");
 					Health=100;
 					MaxHealth=100;
 				};}, function(queueEvent, storageItem)
@@ -213,7 +213,7 @@ if RunService:IsServer() then
 
 						local storageItem = inventory:Find(mission.SaveData.ReportId);
 						if storageItem then
-							local sampleName = storageItem and storageItem.Name or "n/a";
+							local sampleName = storageItem and storageItem.CustomName or "n/a";
 
 							inventory:Remove(storageItem.ID, 1);
 							shared.Notify(game.Players:GetPlayers(), sampleName.." removed from your Inventory.", "Negative");
@@ -297,7 +297,7 @@ if RunService:IsServer() then
 						end;
 						
 						inventory:Add("samplereport", {Values={
-							Name=inventory.RegisterItemName("Dr. Deniski's Report Insights");
+							CustomName=inventory.RegisterItemName("Dr. Deniski's Report Insights");
 							Result=false;
 						};}, function(queueEvent, storageItem)
 							mission.SaveData.ReportId = storageItem.ID;

@@ -214,11 +214,11 @@ function ChatRoomInterface:NewMessage(room, messageData)
 		local nameString = messageData.Name;
 		local msgString = messageData.Message;
 		
-		msgString = string.gsub(msgString,"&","&amp;");
-		msgString = string.gsub(msgString,"<","&lt;");
-		msgString = string.gsub(msgString,">","&gt;");
-		msgString = string.gsub(msgString,'"',"&quot;");
-		msgString = string.gsub(msgString,"'","&apos;");
+		-- msgString = string.gsub(msgString,"&","&amp;");
+		-- msgString = string.gsub(msgString,"<","&lt;");
+		-- msgString = string.gsub(msgString,">","&gt;");
+		-- msgString = string.gsub(msgString,'"',"&quot;");
+		-- msgString = string.gsub(msgString,"'","&apos;");
 
 		--chatkeywords Chat Keywords
 		local colonStart, colonEnd = 0, 0;

@@ -69,7 +69,7 @@ if RunService:IsServer() then
 		local profile = shared.modProfile:Get(player);
 		local inventory = profile.ActiveInventory;
 		
-		local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem) return storageItem.Name == "Turret Blueprint Piece"; end);
+		local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem) return storageItem.CustomName == "Turret Blueprint Piece"; end);
 		
 		if mission.Type == 2 and #itemsList > 0 then -- Available;
 			dialog:SetInitiateTag("bofb_init");
@@ -106,7 +106,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("bofb_4washed2", function(dialog)
 
 						local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
-							return storageItem.Name:sub(1,22) == "Turret Blueprint Piece";
+							return storageItem.CustomName:sub(1,22) == "Turret Blueprint Piece";
 						end);
 						
 						modMission:Progress(player, missionId, function(mission)
@@ -134,7 +134,7 @@ if RunService:IsServer() then
 							else
 								dialog:AddChoice("bofb_6take", function(dialog)
 									local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
-										return string.find(storageItem.Name, "Turret Blueprint Piece") ~= nil;
+										return string.find(storageItem.CustomName, "Turret Blueprint Piece") ~= nil;
 									end);
 									for a=1, #itemsList do
 										inventory:Remove(itemsList[a].ID);
@@ -157,7 +157,7 @@ if RunService:IsServer() then
 		elseif mission.Type == 3 then -- Complete
 
 			local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
-				return string.find(storageItem.Name, "Turret Blueprint Piece") ~= nil;
+				return string.find(storageItem.CustomName, "Turret Blueprint Piece") ~= nil;
 			end);
 			if itemsList then
 				dialog:AddDialog({
