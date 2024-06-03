@@ -1053,7 +1053,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 				profile:AddPlayPoints(10, "Gameplay:Workbench");
 				
 				inventory:Remove(storageItemId, 1, function()
-					shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.CustomName), "Negative");
+					shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.Name), "Negative");
 				end);
 				
 				return modWorkbenchLibrary.DeconstructModReplies.Success;
@@ -1319,7 +1319,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			profile:AddPlayPoints(polishCost, "Sink:Perks");
 
 			inventory:Remove(storageItemId, 1, function()
-				shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.CustomName), "Negative");
+				shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.Name), "Negative");
 			end);
 
 			return modWorkbenchLibrary.PolishToolReplies.Success;
