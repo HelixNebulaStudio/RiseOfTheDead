@@ -84,7 +84,9 @@ function Math.DeltaLerp(a, b, decay, delta, snap: number?)
 	return c;
 end
 
-
+--[[
+	@return LookVector of random direction by max spread angle.
+]]
 function Math.CFrameSpread(direction, maxSpreadAngle)
 	maxSpreadAngle = math.clamp(maxSpreadAngle, 0, 90);
 

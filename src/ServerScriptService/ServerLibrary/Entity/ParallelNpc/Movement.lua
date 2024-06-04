@@ -5,6 +5,7 @@ local PathfindingService = game:GetService("PathfindingService");
 
 local modRegion = require(game.ReplicatedStorage.Library.Region);
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
+local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 
 --
 local Movement = {}
@@ -60,7 +61,10 @@ function Movement.new(parallelNpc)
 	bodyGyro.MaxTorque = Vector3.new(0, 0, 0);
 	bodyGyro.Parent = rootPart;
 	
-	
+	local groundRayParams = RaycastParams.new();
+	groundRayParams.FilterType = Enum.RaycastFilterType.Include;
+	groundRayParams.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain;};
+
 	--
 	local function IsInRange(posA, posB, range, pDist)
 		--local dist = (posA-posB).Magnitude;
@@ -96,6 +100,7 @@ function Movement.new(parallelNpc)
 		computeDebounce = cTick +1;
 		
 		task.spawn(function()
+			task.synchronize();
 			local path: Path = self.Path;
 			
 			local rootPartPos = getRootPos();
@@ -119,18 +124,37 @@ function Movement.new(parallelNpc)
 			if self.DebugMove == true then Debugger:Warn("genpath") end;
 
 			if path.Status.Value >= 3 then
-				if self.DebugMove == true then Debugger:Warn("path failed", path.Status.Value) end;
-				self.NextWaypoint = nil;
-				table.clear(self.Waypoints);
+				task.desynchronize();
+				if self.DebugMove == true then Debugger:Warn("path fail approx") end;
+				local rayResults = modRaycastUtil.RingCast(self.TargetPosition, -Vector3.yAxis*16, 3, 4, groundRayParams);
+				task.synchronize();
 
-				doDumbFollow();
-				return;
+				for a=1, #rayResults do
+					pcall(function()
+						path:ComputeAsync(rootPartPos, rayResults[a].Position);
+					end)
+					if path.Status.Value <= 2 then
+						computeDebounce = cTick +3;
+						break;
+					end
+				end
+
+				if path.Status.Value >= 3 then
+					if self.DebugMove == true then Debugger:Warn("path failed", path.Status.Value) end;
+					self.NextWaypoint = nil;
+					table.clear(self.Waypoints);
+	
+					doDumbFollow();
+					return;
+				end
 			end
 
+			task.synchronize();
 			self.Waypoints = path:GetWaypoints();
 			
 			self.NextWaypointIndex = math.min(#self.Waypoints, 2);
 			self.NextWaypoint = nil;
+			task.desynchronize();
 			
 			if #self.Waypoints <= 2 then
 				local hasJump = false;
@@ -240,14 +264,50 @@ function Movement.new(parallelNpc)
 		
 	end)
 	
-	
-	RunService.Stepped:Connect(function(t, delta)
+
+	local walkSpeed = 0;
+	local humanoidAutoRotate = true;
+	local bodyGyroD = 500;
+	local moveToPoint = nil;
+	local jumpRequest = nil;
+
+	RunService.Stepped:Connect(function()
 		if parallelNpc.IsDead then
 			if bodyGyro then
 				game.Debris:AddItem(bodyGyro, 0);
 				bodyGyro = nil;
 			end
 
+			return 
+		end;
+
+		humanoid.WalkSpeed = walkSpeed;
+		humanoid.AutoRotate = humanoidAutoRotate;
+
+		if moveToPoint and humanoid.WalkToPoint ~= moveToPoint then
+			humanoid:MoveTo(moveToPoint);
+			if self.DebugMove then
+				Debugger:Warn("MoveTo", moveToPoint);
+			end
+		end
+
+		if jumpRequest then
+			humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
+			jumpRequest = nil;
+		end
+
+		if humanoidAutoRotate then
+			bodyGyro.MaxTorque = Vector3.new(0, 0, 0);
+		else
+			bodyGyro.MaxTorque = Vector3.new(0, math.huge, 0);
+			bodyGyro.D = bodyGyroD;
+			bodyGyro.P = 15000;
+			bodyGyro.CFrame = CFrame.lookAt(rootPart.Position, self.FacePosition);
+		end
+	end)
+
+	RunService.Stepped:ConnectParallel(function(t, delta)
+		if parallelNpc.IsDead then
 			return 
 		end;
 		
@@ -259,8 +319,7 @@ function Movement.new(parallelNpc)
 		end
 		deltaRootPos = rootPosition;
 
-		local walkSpeed = math.clamp(moveSpeed:Get(), 0, 64);
-		humanoid.WalkSpeed = walkSpeed;
+		walkSpeed = math.clamp(moveSpeed:Get(), 0, 64);
 
 		if self.FacePart then
 			self.FacePosition = self.FacePart.Position;
@@ -272,27 +331,22 @@ function Movement.new(parallelNpc)
 			and self.FacePosition ~= rootPart.Position
 			and humanoid.PlatformStand ~= true then
 			
-			local bodyGyroD = math.clamp(modMath.MapNum(self.FaceSpeed or walkSpeed, 10, 64, 500, 2000), 500, 2000);
+			bodyGyroD = math.clamp(modMath.MapNum(self.FaceSpeed or walkSpeed, 10, 64, 500, 2000), 500, 2000);
 			if self.FaceSpeed then self.FaceSpeed = nil; end
 			
-			humanoid.AutoRotate = false;
-			bodyGyro.MaxTorque = Vector3.new(0, math.huge, 0);
-			bodyGyro.D = bodyGyroD;
-			bodyGyro.P = 15000;
-			bodyGyro.CFrame = CFrame.lookAt(rootPart.Position, self.FacePosition);
+			humanoidAutoRotate = false;
 			
 		else
 			self.FacePart = nil;
 			self.FacePosition = nil;
 
-			bodyGyro.MaxTorque = Vector3.new(0, 0, 0);
-			humanoid.AutoRotate = true;
+			humanoidAutoRotate = true;
 			
 		end
 
 		if self.PauseTick and tick() <= self.PauseTick then
 			if not IsInRange(humanoid.WalkToPoint, getRootPos(), 1) then
-				humanoid:MoveTo(getRootPos());
+				moveToPoint = getRootPos();
 			end
 			return;
 		end
@@ -301,8 +355,7 @@ function Movement.new(parallelNpc)
 			self.TargetPosition = self.TargetPart.Position;
 		end
 		
-		if self.TargetPosition == nil then 
-			--if self.DebugMove == true then Debugger:Warn("tp == nil") end; 
+		if self.TargetPosition == nil then
 			return 
 		end;	
 		
@@ -338,12 +391,12 @@ function Movement.new(parallelNpc)
 				local displaceScaler = ( minFDist+ (maxFDist-minFDist)/2);
 				local newPos = self.TargetPosition + awayDir*displaceScaler;
 				
-				humanoid:MoveTo(newPos);
+				moveToPoint = newPos;
 				dumbFollow = tick() + math.random(5,15)/10;
 				
 			else
 				dumbFollow = nil;
-				humanoid:MoveTo(rootPosition);
+				moveToPoint = rootPosition;
 				
 			end
 			return;
@@ -351,12 +404,12 @@ function Movement.new(parallelNpc)
 		
 		
 		if dumbFollow and tick()-dumbFollow <= 2 then
-			humanoid:MoveTo(self.TargetPosition);
+			moveToPoint = self.TargetPosition;
 			if math.random(1, deltaPosChange <= 0.01 and 32 or 64) == 1 then
 				local heightDif = self.TargetPosition.Y-rootPosition.Y;
 				if self.DebugMove == true then Debugger:Warn("Try jump", heightDif) end;
 				if heightDif > 8 or deltaPosChange <= 0.001 then
-					humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
+					jumpRequest = true;
 				end
 			end
 			return;
@@ -366,7 +419,7 @@ function Movement.new(parallelNpc)
 			
 			self.Recompute = false;
 
-			humanoid:MoveTo(self.TargetPosition);
+			moveToPoint = self.TargetPosition
 			
 			self:ComputePathAsync();
 			return;
@@ -374,12 +427,13 @@ function Movement.new(parallelNpc)
 		
 		if self.NextWaypoint and not isNextToTarget then
 			local walkToPoint = self.NextWaypoint.Position;
-			humanoid:MoveTo(walkToPoint);
+			
+			moveToPoint = walkToPoint;
 			
 			if self.NextWaypoint.Action == Enum.PathWaypointAction.Jump 
 				and IsInRange(rootPosition, walkToPoint, math.max(humanoid.WalkSpeed/2, 4))
 				or deltaPosChange <= 0.001 then
-				humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
+				jumpRequest = true;
 			end
 
 			if tick()-stuckTick < 3 then return end;
@@ -387,7 +441,7 @@ function Movement.new(parallelNpc)
 			
 			if lastStuckTick and tick()-lastStuckTick <= 6.1 then
 				if walkSpeed > 0 then
-					humanoid.Jump = true;
+					jumpRequest = true;
 					if self.DebugMove == true then Debugger:Warn("ls jump") end;
 				end
 				if self.DebugMove == true then Debugger:Warn("long stuck") end;

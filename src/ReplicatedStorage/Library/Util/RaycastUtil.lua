@@ -179,7 +179,7 @@ function RaycastUtil.GetCeiling(origin: Vector3, range: number?) : RaycastResult
 	return nil;
 end
 
-local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 function RaycastUtil.SplashCast(origin: Vector3, packet: {
 	Radius: number?; 
 	SpreadDepth: number?;  
