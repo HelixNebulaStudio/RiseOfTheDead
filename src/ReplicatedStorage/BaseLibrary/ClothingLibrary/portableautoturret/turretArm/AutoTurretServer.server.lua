@@ -294,6 +294,8 @@ function TurretRuntime(weaponStorageItem)
 			local sTarget = sortedTargets[a];
 			
 			sTarget.Index = 0;
+
+			-- 2 = active;
 			if sortForToxicMod == 2 then
 				if sTarget.ToxicMod then
 					sTarget.Index = tieCount;
@@ -308,9 +310,9 @@ function TurretRuntime(weaponStorageItem)
 					checkForRecompute = true;
 				end
 			end
-			if shootToDebuffOnly then
-				if sTarget.ToxicMod
-					or (sTarget.FrostMod and sTarget.FrostMod.CompleteTick) then
+			if shootToDebuffOnly == 2 then
+				if sTarget.ToxicMod	
+				or (sTarget.FrostMod and sTarget.FrostMod.CompleteTick) then
 					table.remove(sortedTargets, a);
 				end
 			end
@@ -501,18 +503,21 @@ function TurretRuntime(weaponStorageItem)
 		task.wait(firerate);
 		
 		if sortForToxicMod == 2 and checkForRecompute then
-			if entityStatus:GetOrDefault("ToxicMod") then
+			local toxicMod = entityStatus:GetOrDefault("ToxicMod")
+			if toxicMod then
 				break;
 			end
 		end
 		if sortForFrostMod == 2 and checkForRecompute then
 			local frostMod = entityStatus:GetOrDefault("FrostMod");
-
 			if frostMod and frostMod.CompleteTick then
 				break;
 			end
 		end
-		
+		if shootToDebuffOnly == 2 then
+			break;
+		end
+
 		local breakRequest = false;
 		for a=1, #recomputeChecks do
 			breakRequest = recomputeChecks[a]();
