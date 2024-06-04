@@ -60,6 +60,7 @@ return function(npc, spawnPoint)
 	self:AddComponent("DropReward");
 	self:AddComponent("BehaviorTree");
 	self:AddComponent("RandomClothing");
+	self:AddComponent("IsInVision");
 	self:AddComponent(ZombieModule.OnDeath);
 	self:AddComponent(ZombieModule.OnHealthChanged);
 	self:AddComponent(ZombieModule.OnDamaged);

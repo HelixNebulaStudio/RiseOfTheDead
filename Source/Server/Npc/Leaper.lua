@@ -57,6 +57,7 @@ return function(npc, spawnPoint)
 	self:AddComponent("WeakPoint");
 	self:AddComponent("DropReward");
 	self:AddComponent("RandomClothing");
+	self:AddComponent("IsInVision");
 	self:AddComponent(ZombieModule.OnDeath);
 	self:AddComponent(ZombieModule.OnHealthChanged);
 	self:AddComponent(ZombieModule.OnDamaged);
