@@ -25,6 +25,7 @@ local Interface = {};
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 local TextService = game:GetService("TextService");
+local UserInputService = game:GetService("UserInputService");
 
 local localPlayer = game.Players.LocalPlayer;
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
@@ -2301,14 +2302,14 @@ function Interface.init(modInterface)
 				local statLabel = newStat:WaitForChild("StatLabel");
 				local iconLabel = newStat:WaitForChild("IconLabel");
 
-				statLabel.Text = statInfo.Value.."%";
 				iconLabel.Image = statInfo.Icon;
-				
-				local radialBarLabel = newStat:WaitForChild("radialBar")
+
+				local radialBarLabel: ImageLabel = newStat:WaitForChild("radialBar")
 				local radialBar = modRadialImage.new(radialConfig, radialBarLabel);
 
 				local statVal = resourceData[statInfo.Key]/100;
 				radialBar:UpdateLabel(statVal);
+				statLabel.Text = string.format("%.1f%%", statVal*100);
 				
 				if statVal <= 0.2 then
 					radialBarLabel.ImageColor3 = BarColors.Yellow;
@@ -2318,7 +2319,17 @@ function Interface.init(modInterface)
 					radialBarLabel.ImageColor3 = BarColors.Green;
 				end
 					
-
+				if UserInputService.TouchEnabled then
+					statLabel.Visible = true;
+				else
+					radialBarLabel.MouseEnter:Connect(function()
+						statLabel.Visible = true;
+					end)
+					radialBarLabel.MouseLeave:Connect(function()
+						statLabel.Visible = false;
+					end)
+				end
+			
 				newStat.Position = UDim2.new(0.1 + (a-1)*(0.2), 0, 0.5, 0);
 				newStat.Parent = centerResourceFrame.Content;
 			end
