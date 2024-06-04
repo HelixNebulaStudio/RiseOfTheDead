@@ -2143,7 +2143,17 @@ function WeaponHandler:Equip(library, weaponId)
 	
 	if selectedLoadAnim then
 		selectedLoadAnim:Play();
-		selectedLoadAnim:AdjustSpeed(selectedLoadAnim.Length/ math.max(equipTime-0.2, 0.2));
+		selectedLoadAnim:AdjustSpeed(0);
+		if selectedLoadAnim.Length <= 0 then
+			for a=1, 60 do
+				if selectedLoadAnim.Length > 0 then break; end;
+				task.wait();
+			end
+		end
+		if selectedLoadAnim.Length > 0 then
+			local animSpeed = math.clamp(configurations.EquipLoadTime/equipTime, 0.5, 2);
+			selectedLoadAnim:AdjustSpeed(animSpeed);
+		end
 	end
 	
 	if audio.Load then

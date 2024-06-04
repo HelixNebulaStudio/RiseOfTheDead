@@ -47,6 +47,7 @@ local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 local modTableManager = require(game.ReplicatedStorage.Library.TableManager);
 local modBitFlags = require(game.ReplicatedStorage.Library.BitFlags);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
+local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 
 local FirebaseService = Debugger:Require(game.ServerScriptService.ServerLibrary.FirebaseService);
 local modGameSave = Debugger:Require(game.ServerScriptService.ServerLibrary.GameSave);
@@ -184,23 +185,25 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 		
 		local profileMeta = setmetatable({}, {__index=Profile;});
 		profileMeta.__index = profileMeta;
+		profileMeta.Garbage = modGarbageHandler.new();
 		profileMeta.SaveCooldown = unixTime;
 		profileMeta.Loaded = false;
 		profileMeta.Player = player;
 		profileMeta.ActiveSave = nil;
+
 		profileMeta.EquippedTools = {};
 		profileMeta.Invitations = {};
 		profileMeta.TeleportData = {};
 		profileMeta.WeaponPropertiesCache = {};
 		profileMeta.ItemClassesCache = {};
 		profileMeta.ToolsCache = {};
-		profileMeta.Analytics = modAnalyticsProfile.new(player);
+		profileMeta.ActionDebounce = {};
+
 		profileMeta.Junk = {CacheInstances = {};};
 		profileMeta.Cache = {
 			CasualRandom = modPseudoRandom.new();
 			PickupCache = {};
 		};
-		profileMeta.ActionDebounce = {};
 		profileMeta.PlaytimeTick = tick();
 		profileMeta.MockStorageItem = modStorageItem.new();
 		profileMeta.MockStorageItem.MockItem = true;
@@ -209,6 +212,16 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 		profileMeta.MockStorageItem:SetStorageId("MockStorageItem");
 
 		profileMeta.HardModeBitFlag = hardModeBitFlag;
+		profileMeta.Analytics = modAnalyticsProfile.new(player);
+
+		profileMeta.Garbage:Tag(function()
+			table.clear(profileMeta.EquippedTools);
+			table.clear(profileMeta.Invitations);
+			table.clear(profileMeta.TeleportData);
+			table.clear(profileMeta.WeaponPropertiesCache);
+			table.clear(profileMeta.ItemClassesCache);
+			table.clear(profileMeta.ToolsCache);
+		end)
 		
 		function profileMeta:GetHardMode(tag)
 			return hardModeBitFlag:Test(tag, self.HardMode or 0);
@@ -217,7 +230,12 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 			self.HardMode = hardModeBitFlag:Set(self.HardMode, tag, value);
 		end
 		
-		local CacheStorage = setmetatable({}, {__newindex=function(t, k, v) rawset(t, k, v); delay(600, function() t[k]=nil; end) end});
+		local CacheStorage = setmetatable({}, {
+			__newindex=function(t, k, v)
+				rawset(t, k, v);
+				delay(600, function() t[k]=nil; end) 
+			end
+		});
 		
 		function profileMeta:GetCacheStorages()
 			return CacheStorage;
@@ -332,7 +350,11 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 			
 		end
 		
-		profileMeta.__newindex = function(self, key, value) if rawget(profile, key) == nil then profileMeta[key] = value; end; end;
+		profileMeta.__newindex = function(self, key, value) 
+			if rawget(profile, key) == nil then 
+				profileMeta[key] = value; 
+			end; 
+		end;
 		Profile.Profiles[playerName] = profile;
 	end
 	
@@ -1154,6 +1176,8 @@ function Profile:Unload()
 		self.MessageConnection:Disconnect();
 	end
 	
+	self.Garbage:Destruct();
+
 	Profile.Profiles[playerName] = nil;
 	modPseudoRandom.Cache[playerName] = nil;
 	self = nil;
