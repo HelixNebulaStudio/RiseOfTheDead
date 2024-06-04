@@ -123,7 +123,7 @@ function Movement.new(parallelNpc)
 			if parallelNpc.IsDead then return end;
 			if self.DebugMove == true then Debugger:Warn("genpath") end;
 
-			if path.Status.Value >= 3 then
+			if path.Status.Value >= 3 and self.TargetPosition then
 				task.desynchronize();
 				if self.DebugMove == true then Debugger:Warn("path fail approx") end;
 				local rayResults = modRaycastUtil.RingCast(self.TargetPosition, -Vector3.yAxis*16, 3, 4, groundRayParams);

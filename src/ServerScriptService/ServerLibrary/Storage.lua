@@ -176,7 +176,11 @@ function Storage.new(id, name, size, owner)
 						local newCount = math.ceil(quantityLeftover/firstInQueue.Stackable);
 						for a=1, newCount do
 							local newQuantity = (quantityLeftover-firstInQueue.Stackable) <= 0 and quantityLeftover or firstInQueue.Stackable;
-							local event, insert = storage:Insert({ItemId=firstInQueue.ItemId; Data={Quantity=newQuantity; Values=firstInQueue.Data.Values;};});
+							local event, insert = storage:Insert({ItemId=firstInQueue.ItemId; Data={
+								CustomName=firstInQueue.Data.CustomName;
+								Quantity=newQuantity; 
+								Values=firstInQueue.Data.Values;
+							};});
 							-- Insert new item;
 							
 							if firstInQueue.Callback ~= nil then
@@ -185,20 +189,22 @@ function Storage.new(id, name, size, owner)
 								end)
 							end
 							
-							--coroutine.wrap(function() if firstInQueue.Callback ~= nil then firstInQueue.Callback(event, insert); end end)();
 							quantityLeftover = quantityLeftover - newQuantity;
 						end
 					end
 				else
 					for a=1, firstInQueue.Data.Quantity do
 						-- Insert new non-stackable items.
-						newItemToStorage({ItemId=firstInQueue.ItemId; Data={Values=firstInQueue.Data.Values;}; Callback=firstInQueue.Callback;});
+						newItemToStorage({ItemId=firstInQueue.ItemId; Data={
+							CustomName=firstInQueue.Data.CustomName;
+							Values=firstInQueue.Data.Values;
+						}; Callback=firstInQueue.Callback;});
 					end
 				end
 				
 			elseif firstInQueue.Type == 2 then
 				local event, insert = storage:Insert(firstInQueue);
-				--coroutine.wrap(function() if firstInQueue.Callback ~= nil then firstInQueue.Callback(event, insert); end end)();
+				
 				if firstInQueue.Callback ~= nil then
 					task.spawn(function()
 						firstInQueue.Callback(event, insert);

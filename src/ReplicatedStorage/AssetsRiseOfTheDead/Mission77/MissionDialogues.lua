@@ -60,6 +60,8 @@ Dialogues["Mysterious Engineer"].Dialogues = function()
 end
 
 if RunService:IsServer() then
+	local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
+	
 	-- !outline: Mysterious Engineer Handler
 	Dialogues["Mysterious Engineer"].DialogueHandler = function(player, dialog, data, mission)
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
@@ -69,8 +71,9 @@ if RunService:IsServer() then
 		local profile = shared.modProfile:Get(player);
 		local inventory = profile.ActiveInventory;
 		
+		local blueprintDesc = modRichFormatter.H3Text("\nMission: ").."Ask the Mysterious Engineer about this.";
 		local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
-			return storageItem:GetCustomName() == "Turret Blueprint Piece";
+			return storageItem:GetCustomName() == "Turret Blueprint Piece" or storageItem:GetValues("DescExtend") == blueprintDesc;
 		end);
 		
 		if mission.Type == 2 and #itemsList > 0 then -- Available;
@@ -108,7 +111,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("bofb_4washed2", function(dialog)
 
 						local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
-							return storageItem.CustomName:sub(1,22) == "Turret Blueprint Piece";
+							return storageItem:GetCustomName() == "Turret Blueprint Piece";
 						end);
 						
 						modMission:Progress(player, missionId, function(mission)
@@ -156,17 +159,14 @@ if RunService:IsServer() then
 			
 		elseif mission.Type == 3 then -- Complete
 
-			local extraBpPieces = inventory:ListByItemId("blueprintpiece", function(storageItem)
-				return string.find(storageItem.CustomName, "Turret Blueprint Piece") ~= nil;
-			end);
-			if extraBpPieces and #extraBpPieces > 0 then
+			if itemsList and #itemsList > 0 then
 				dialog:AddDialog({
 					Face="Serious";
 					Dialogue="I found some extra blueprint pieces, and I don't need them..";
 					Reply="I'll take those off your hands, thanks!";
 				}, function(dialog)
-					for a=1, #extraBpPieces do
-						inventory:Remove(extraBpPieces[a].ID);
+					for a=1, #itemsList do
+						inventory:Remove(itemsList[a].ID);
 					end
 				end)
 			end
