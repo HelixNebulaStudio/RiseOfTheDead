@@ -30,6 +30,7 @@ function clipTouchHandler:OnHumanoidTouch(humanoid, basePart, touchPart)
 				local newDmgSrc = modDamagable.NewDamageSource{
 					Damage=(val * playerVel);
 					Dealer=self.Prefab;
+					TargetPart = touchPart;
 				}
 				damagable:TakeDamagePackage(newDmgSrc);
 			end

@@ -54,6 +54,7 @@ function Movement.new(parallelNpc)
 	local lastStuckTick = nil;
 	local forceRecomputeTick = tick();
 	local dumbFollow = nil;
+	local deltaPosChange, deltaRootPos = 0, nil;
 	
 	local bodyGyro = Instance.new("BodyGyro");
 	bodyGyro.MaxTorque = Vector3.new(0, 0, 0);
@@ -253,6 +254,10 @@ function Movement.new(parallelNpc)
 		self.DebugMove = prefab:GetAttribute("DebugMove");
 
 		local rootPosition = getRootPos();
+		if deltaRootPos then
+			deltaPosChange = (math.abs(deltaRootPos.X-rootPosition.X) + math.abs(deltaRootPos.Y-rootPosition.Y) + math.abs(deltaRootPos.Z-rootPosition.Z));
+		end
+		deltaRootPos = rootPosition;
 
 		local walkSpeed = math.clamp(moveSpeed:Get(), 0, 64);
 		humanoid.WalkSpeed = walkSpeed;
@@ -347,10 +352,10 @@ function Movement.new(parallelNpc)
 		
 		if dumbFollow and tick()-dumbFollow <= 2 then
 			humanoid:MoveTo(self.TargetPosition);
-			if math.random(1, 64) == 1 then
+			if math.random(1, deltaPosChange <= 0.01 and 32 or 64) == 1 then
 				local heightDif = self.TargetPosition.Y-rootPosition.Y;
 				if self.DebugMove == true then Debugger:Warn("Try jump", heightDif) end;
-				if heightDif > 8 then
+				if heightDif > 8 or deltaPosChange <= 0.001 then
 					humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
 				end
 			end
@@ -364,13 +369,16 @@ function Movement.new(parallelNpc)
 			humanoid:MoveTo(self.TargetPosition);
 			
 			self:ComputePathAsync();
+			return;
 		end
 		
 		if self.NextWaypoint and not isNextToTarget then
 			local walkToPoint = self.NextWaypoint.Position;
 			humanoid:MoveTo(walkToPoint);
 			
-			if self.NextWaypoint.Action == Enum.PathWaypointAction.Jump and IsInRange(rootPosition, walkToPoint, math.max(humanoid.WalkSpeed/2, 4)) then
+			if self.NextWaypoint.Action == Enum.PathWaypointAction.Jump 
+				and IsInRange(rootPosition, walkToPoint, math.max(humanoid.WalkSpeed/2, 4))
+				or deltaPosChange <= 0.001 then
 				humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
 			end
 
