@@ -50,7 +50,7 @@ function Tag:Add(param)
         end
     end
 
-	local player: Player = game.Players:GetPlayerFromCharacter(param.Prefab);
+	local player: Player = param.Prefab and game.Players:GetPlayerFromCharacter(param.Prefab);
     param.Player = player;
    
     if existIndex then

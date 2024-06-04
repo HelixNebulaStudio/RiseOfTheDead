@@ -267,7 +267,7 @@ function Pool.new(owner)
 	 	task.spawn(function()
 			if self.Owner then
 				if damagable:CanDamage(self.Owner) then
-					modDamageTag.Tag(damagable.Model, self.Owner and self.Owner:IsA("Player") and self.Owner.Character);
+					modDamageTag.Tag(damagable.Model, self.Owner and self.Owner:IsA("Player") and self.Owner.Character or self.Owner);
 					self:OnEnemyHit(hitPart, damagable, self.Owner, self.StorageItem);
 				end
 			else
