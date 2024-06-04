@@ -50,11 +50,11 @@ function clipTouchHandler:OnHumanoidTouch(humanoid, basePart, touchPart)
 			
 			local newDmgSrc = modDamagable.NewDamageSource{
 				Damage=val;
-				Dealer=self.Prefab;
+				Dealer=character.PrimaryPart;
 				DamageType="IgnoreArmor";
 			};
 
-			modAudio.Play("BurnTick"..math.random(1, 3), self.Prefab.PrimaryPart).PlaybackSpeed = math.random(50,70)/100;
+			modAudio.Play("BurnTick"..math.random(1, 3), character.PrimaryPart).PlaybackSpeed = math.random(50,70)/100;
 			
 			damagable:TakeDamagePackage(newDmgSrc);
 		end
