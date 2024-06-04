@@ -179,6 +179,10 @@ return function(npc, spawnPoint)
 			end));
 		end
 		
+		if game:GetService("RunService"):IsStudio() then
+			Debugger:Warn("Arena", self.Arena);
+		end
+
 		modAudio.Play("ZriceriaRoar", self.RootPart).Volume = 1;
 		modAudio.Play("Fire", self.RootPart, true).Volume = 3;
 		repeat until not self.Update();

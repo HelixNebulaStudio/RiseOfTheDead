@@ -91,7 +91,7 @@ function AnimationController.new(animator: Animator, rig: Model?)
 		
 		table.clear(self.LoadedAnim);
 		self.Garbage:Destruct();
-		table.clear(self);
+		table.clear(self :: any);
 	end)) 
 	
 	return self;
@@ -129,6 +129,8 @@ function AnimationController:LoadAnimation(categoryId, animList, animModule)
 			LoopStart = nil;
 			LoopEnd = nil;
 		};
+
+		self.Garbage:Tag(track);
 
 		if track.Looped == false then
 			self.Garbage:Tag(track.Stopped:Connect(function()

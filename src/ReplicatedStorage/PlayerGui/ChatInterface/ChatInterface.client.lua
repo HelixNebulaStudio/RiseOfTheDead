@@ -165,7 +165,7 @@ local function inputBoxChange()
 		end
 	end
 
-	if #inputBox.Text >= 200 or textBounds.Y > maxInputSize.Y then
+	if #inputBox.Text >= 256 or textBounds.Y > maxInputSize.Y then
 		inputBox.Text = lastInput;
 	else
 		lastInput = inputBox.Text;

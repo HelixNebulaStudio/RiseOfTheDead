@@ -223,7 +223,7 @@ function remoteSubmitMessage.OnServerInvoke(player, channelId, text, filterTest,
 	text = modGlobalVars.CleanTextInput(text);
 
 	local testText = text:gsub(" ", "")
-	testText = testText:gsub(string.byte(32), "")
+	testText = testText:gsub(string.char(32), "")
 	testText = testText:gsub("[\r\n]", "");
 	
 	if #testText <= 0 or #text >= 200 then return text; end;

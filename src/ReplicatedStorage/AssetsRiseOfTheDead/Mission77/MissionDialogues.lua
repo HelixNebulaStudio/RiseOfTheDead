@@ -111,7 +111,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("bofb_4washed2", function(dialog)
 
 						local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
-							return storageItem:GetCustomName() == "Turret Blueprint Piece";
+							return storageItem:GetCustomName() == "Turret Blueprint Piece" or storageItem:GetValues("DescExtend") == blueprintDesc;
 						end);
 						
 						modMission:Progress(player, missionId, function(mission)

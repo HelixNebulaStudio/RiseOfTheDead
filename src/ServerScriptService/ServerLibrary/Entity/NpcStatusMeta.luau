@@ -106,17 +106,23 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 			amount = amount * -immunity;
 
 		elseif immunity < 0 then -- extra damage [-inf, 0)
-			local toxicDamage = amount * (-immunity);
+			if storageItem and player and player:IsA("Player") then
+				local profile = shared.modProfile:Get(player);
+				local toolModule = profile:GetItemClass(storageItem.ID);
 
-			local newDmgSrc = modDamagable.NewDamageSource{
-				Damage=toxicDamage;
-				Dealer=dealer;
-				ToolStorageItem=storageItem;
-				TargetPart=hitPart;
-				DamageType="ToxicDamage";
-			}
-			self:TakeDamagePackage(newDmgSrc);
-			toxicDmgTaken = true;
+				local weaponDamage = toolModule.Configurations.PreModDamage;
+				local toxicDamage = (weaponDamage or 100) * (-immunity);
+	
+				local newDmgSrc = modDamagable.NewDamageSource{
+					Damage=toxicDamage;
+					Dealer=dealer;
+					ToolStorageItem=storageItem;
+					TargetPart=hitPart;
+					DamageType="ToxicDamage";
+				}
+				self:TakeDamagePackage(newDmgSrc);
+				toxicDmgTaken = true;
+			end
 
 		elseif immunity > 0 then -- reduced damage (0, 1]
 			amount = amount * (1-immunity);
@@ -262,11 +268,7 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 			
 			if typeof(netown) == "Instance" and netown:IsA("Player") then
 				npcModule.KillerPlayer = netown;
-				--npcModule:SetNetworkOwner(netown, true);
-				--npcModule.Remote:FireClient(netown, "ApplyImpulseAtPosition", rootPart, dmgForce * rootPart.AssemblyMass, dmgPosition);
 				
-			else
-				--npcModule:SetNetworkOwner("auto", true);
 			end
 		end
 		
