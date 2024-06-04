@@ -1,13 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local CollectionService = game:GetService("CollectionService");
-local PhysicsService = game:GetService("PhysicsService");
-local RunService = game:GetService("RunService");
 
-local remotes = game.ReplicatedStorage.Remotes;
-local remoteCameraShakeAndZoom = remotes.CameraShakeAndZoom;
-local modPlayers = require(game.ReplicatedStorage.Library.Players);
-local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 
 --==

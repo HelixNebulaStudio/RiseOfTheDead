@@ -1,7 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
 local random = Random.new();
-
-local RunService = game:GetService("RunService");
 
 local BanditModule = script.Parent.Bandit;
 local EnemyModule = script.Parent.Enemy;
@@ -9,9 +8,6 @@ local HumanModule = script.Parent.Human;
 --== Modules
 local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 
 -- Note; Function called for each zombie before zombie parented to workspace;
@@ -84,6 +80,7 @@ return function(npc, spawnPoint)
 		--== Chatter;
 		spawn(function()
 			repeat
+				if self.IsDead then return end;
 				if self.Speeches == nil then return end;
 				local players = {};
 				for a=1, #self.Enemies do

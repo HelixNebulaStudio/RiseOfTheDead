@@ -63,7 +63,7 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 	if damagableObj.ClassName == "NpcStatus" then
 		local npcModule = damagableObj:GetModule();
 		local humanoid = npcModule.Humanoid;
-		local damageRatio = self.TargetableEntities[humanoid.Name];
+		local damageRatio = humanoid and self.TargetableEntities[humanoid.Name];
 		
 		if damageRatio then 
 			damage = damage * damageRatio;

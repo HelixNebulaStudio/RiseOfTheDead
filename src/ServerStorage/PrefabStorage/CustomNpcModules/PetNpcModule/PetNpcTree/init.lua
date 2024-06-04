@@ -26,8 +26,6 @@ return function(self)
 	self.MeleeTarget = nil;
 	self.LastSwitchWeapon = tick()-10;
 	
-	local targetableEntities = modConfigurations.TargetableEntities;
-	
 	tree:Hook("FollowOwner", function()
 		if self.MeleeTarget and tick()-self.MeleeTarget <= 2 then
 			self.Move:SetMoveSpeed("set", "sprint", 25, 2, 2);
@@ -59,7 +57,9 @@ return function(self)
 	tree:Hook("HasTarget", function()
 		local ownerCharacter = self.Owner and self.Owner.Character;
 		
-		self.Wield.Targetable = targetableEntities;
+		for k, v in pairs(modConfigurations.TargetableEntities) do
+			self.Wield.Targetable[k] = v;
+		end
 		
 		local targetNpcModule;
 		
@@ -67,7 +67,7 @@ return function(self)
 			local npcModule = modNpc.NpcModules[a] and modNpc.NpcModules[a].Module;
 			if npcModule 
 				and npcModule.Humanoid 
-				and targetableEntities[npcModule.Humanoid.Name]
+				and self.Wield.Targetable[npcModule.Humanoid.Name]
 				and npcModule.IsDead ~= true
 				and (npcModule.Target == ownerCharacter or npcModule.Target == self.Prefab)
 				and self.IsInVision(npcModule.RootPart) then

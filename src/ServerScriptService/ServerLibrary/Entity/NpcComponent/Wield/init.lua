@@ -1,19 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local random = Random.new();
+--==
 
-local RunService = game:GetService("RunService");
-local CollectionService = game:GetService("CollectionService");
-
-local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
 local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
-local modSkinsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("SkinsLibrary"));
-local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-
-local prefabsItems = game.ReplicatedStorage.Prefabs.Items;
 
 local weaponHandler = require(script.WeaponHandler);
 local meleeHandler = require(script.MeleeHandler);

@@ -249,7 +249,7 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 		local killMarkerSnd;
 		if isLethal and npcModule.KilledMark == nil then
 			npcModule.KilledMark = true;
-			killMarkerSnd = (hitPart.Name == "Head" or hitPart:GetAttribute("IsHead") == true) and "KillHead" or "KillFlesh";
+			killMarkerSnd = (hitPart and hitPart.Name == "Head" or hitPart:GetAttribute("IsHead") == true) and "KillHead" or "KillFlesh";
 			
 			if dmgPosition then
 				rootPart:ApplyImpulseAtPosition(dmgForce * rootPart.AssemblyMass, dmgPosition);

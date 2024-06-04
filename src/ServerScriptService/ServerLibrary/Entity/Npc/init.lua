@@ -569,8 +569,7 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 				else
 					local memSize = #game:GetService("HttpService"):JSONEncode(t[1]);
 					if memSize >= 1024 then
-						modAnalytics:ReportError("Npc Memory Leak", name, "warning");
-
+						Debugger:Warn("Npc Memory Leak", name);
 						task.spawn(function()
 							modGlobalVars.DeepClearTable(t[1]);
 						end)

@@ -2,7 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 
 local PathfindingService = game:GetService("PathfindingService");
-local TweenService = game:GetService("TweenService");
 local random = Random.new();
 
 local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);

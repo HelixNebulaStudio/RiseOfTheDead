@@ -144,14 +144,8 @@ return function(self)
 	
 	local downAng = CFrame.Angles(-math.pi/2, 0, 0);
 	
-	tree:Hook("Leap", function()
-		if cache.LeapFailCounter == nil then
-			cache.LeapFailCounter = 0;
-		elseif cache.LeapFailCounter > 10 then
-			cache.LeapFailCounter = 0;
-		end
-		
-		if cache.LastLeap and tick()-cache.LastLeap <= 1+cache.LeapFailCounter then return modLogicTree.Status.Failure end;
+	tree:Hook("Leap", function()		
+		if cache.LastLeap and tick()-cache.LastLeap <= 5 then return modLogicTree.Status.Failure end;
 		cache.LastLeap = tick();
 		if self.Humanoid.FloorMaterial == Enum.Material.Air then return modLogicTree.Status.Failure end;
 
@@ -170,12 +164,11 @@ return function(self)
 		local velocity = arcTracer:GetVelocityByTime(origin, targetPoint, duration);
 
 		local angle = Vector3.yAxis:Angle(velocity);
-		if angle >= 1.3 or angle <= 0.1 then cache.LeapFailCounter = cache.LeapFailCounter +1; return modLogicTree.Status.Failure end;
+		if angle >= 1.3 or angle <= 0.1 then return tree.Failure end;
 		
 		local velMagnitude = velocity.Magnitude;
 		if velMagnitude > 200 then return tree.Failure end;
-
-		cache.LeapFailCounter = 0;
+		if not self.IsInVision(targetRootPart) then return tree.Failure end;
 
 		self.Move:SetMoveSpeed("set", "leap", 0, 9);
 		

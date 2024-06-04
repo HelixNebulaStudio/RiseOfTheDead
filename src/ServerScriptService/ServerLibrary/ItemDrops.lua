@@ -193,23 +193,23 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 	if modConfigurations.DisableItemDrops then warn("ItemDrops>> DisableItemDrops is enabled."); return end;
 	
 	local prefabName = itemDrop.Type or itemDrop.ItemId;
-	local newPrefab: Model = dropPrefabs:FindFirstChild(prefabName);
+	local dropPrefab: Model = dropPrefabs:FindFirstChild(prefabName);
 	
-	if itemDrop.Type == "Tool" and itemDrop.ItemId and newPrefab == nil then
+	if itemDrop.Type == "Tool" and itemDrop.ItemId and dropPrefab == nil then
 		local modTools = require(game.ReplicatedStorage.Library.Tools);
 		local toolLib = modTools[itemDrop.ItemId];
 		if toolLib and toolLib.Prefab then
-			newPrefab = toolLib.Prefab;
+			dropPrefab = toolLib.Prefab;
 		end
 	end
 	
-	if newPrefab == nil and itemDrop.ItemId then
-		newPrefab = dropPrefabs.Custom;
+	if dropPrefab == nil and itemDrop.ItemId then
+		dropPrefab = dropPrefabs.Custom;
 		itemDrop.Type = "Custom";
 	end
-	if newPrefab == nil then Debugger:Warn("Couldn't find item prefab for (",prefabName,")"); return end;
+	if dropPrefab == nil then Debugger:Warn("Couldn't find item prefab for (",prefabName,")"); return end;
 	
-	newPrefab = newPrefab:Clone();
+	local newPrefab = dropPrefab:Clone();
 	newPrefab:AddTag("ItemDrop");
 	
 	for a=1, 60 do if newPrefab.PrimaryPart then break; else task.wait() end end;
@@ -311,10 +311,6 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 	local interactData = require(prefabModule);
 	interactData.Script = prefabModule;
 	
-	prefabModule.Destroying:Connect(function()
-		table.clear(interactData);
-	end)
-
 	if itemDrop.OnceOnly then
 		local tag = Instance.new("BoolValue");
 		tag.Name = "OnceOnly";
@@ -327,6 +323,9 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 	
 	newPrefab.Destroying:Connect(function()
 		interactData:Destroy();
+		table.clear(interactData);
+		interactData = nil;
+		newPrefab = nil;
 	end)
 
 	if despawnTime ~= false then

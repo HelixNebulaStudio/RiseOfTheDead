@@ -64,11 +64,6 @@ local remoteInstrumentRemote = modRemotesManager:Get("InstrumentRemote");
 local remoteReviveInteract = modRemotesManager:Get("ReviveInteract");
 local remoteMysteryChest = modRemotesManager:Get("MysteryChest");
 
-
-local bindUpdateTargetableEntities = script:WaitForChild("UpdateTargetableEntities");
-local bindOnProjectileHit = dirRemotes.Weapons.OnProjectileHit;
-
-local activeProjectiles = {};
 local TargetableEntities = modConfigurations.TargetableEntities;
 local random = Random.new();
 
@@ -80,6 +75,8 @@ function IsInDuel(player, targetName)
 	if classPlayer.Properties.Pvp and classPlayer.Properties.Pvp.InDuel and classPlayer.Properties.Pvp.InDuel == player.Name then
 		return math.clamp(classPlayer.Properties.Pvp.DmgMultiplier or 1, 0.0001, 2);
 	end
+
+	return;
 end
 bindIsInDuel.OnInvoke = IsInDuel;
 

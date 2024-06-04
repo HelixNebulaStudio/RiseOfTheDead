@@ -14,6 +14,7 @@ local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
+local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
 
 local remotePrimaryFire = modRemotesManager:Get("PrimaryFire");
 --==
@@ -603,7 +604,7 @@ function ToolService.ProcessWeaponShot(shotPacket)
 				end
 			end
 
-			projectileObj.TargetableEntities = modConfigurations.TargetableEntities;
+			projectileObj.TargetableEntities = modTables.DeepClone(modConfigurations.TargetableEntities);
 
 			if projectileObj.Prefab:CanSetNetworkOwnership() then projectileObj.Prefab:SetNetworkOwner(nil); end
 

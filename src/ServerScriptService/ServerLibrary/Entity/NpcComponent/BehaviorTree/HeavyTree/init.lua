@@ -110,6 +110,8 @@ return function(self)
 		if cache.LastThrowZombie and tick()-cache.LastThrowZombie <= 7 then return modLogicTree.Status.Failure end;
 		cache.LastThrowZombie = tick();
 		
+		if not self.IsInVision(targetRootPart) then return modLogicTree.Status.Failure end;
+		
 		local maxRange = 16;
 		local maxScan = 16;
 		local rootPos = self.RootPart.Position;

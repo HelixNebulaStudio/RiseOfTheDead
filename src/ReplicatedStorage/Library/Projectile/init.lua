@@ -10,9 +10,6 @@ local CollectionService = game:GetService("CollectionService");
 local modArcTracing = require(game.ReplicatedStorage.Library.ArcTracing);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 
-local dirRemotes = game.ReplicatedStorage.Remotes;
-local bindIsInDuel = dirRemotes.IsInDuel;
-
 local remoteSimulateProjectile = modRemotesManager:Get("SimulateProjectile");
 local remoteClientProjectileHit = modRemotesManager:Get("ClientProjectileHit");
 
@@ -186,7 +183,7 @@ function Projectile.ClientSimulate(projectile, arcTracer, arcPoints, prefab)
 				task.spawn(function()
 					if arcPoint.Hit == nil then return end;
 					
-					local modInterface = require(game.Players.LocalPlayer.PlayerGui:WaitForChild("MainInterface"):WaitForChild("InterfaceModule"));
+					local modInterface = require(game.Players.LocalPlayer.PlayerGui:WaitForChild("MainInterface"):WaitForChild("InterfaceModule") :: ModuleScript);
 					modInterface.modEntityHealthHudInterface.TryHookEntity(arcPoint.Hit.Parent);
 				end)
 				
@@ -265,6 +262,8 @@ function Projectile.ServerSimulate(projectile, origin, velocity, rayWhitelist)
 				return projectile:OnContact(arcPoint, arcTracer);
 			end
 			task.wait(delta);
+
+			return;
 		end);
 		if projectile.OnComplete then
 			projectile:OnComplete();
