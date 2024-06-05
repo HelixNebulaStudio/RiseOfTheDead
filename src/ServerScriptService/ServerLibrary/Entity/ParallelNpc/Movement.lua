@@ -286,12 +286,9 @@ function Movement.new(parallelNpc)
 
 		if moveToPoint and humanoid.WalkToPoint ~= moveToPoint then
 			humanoid:MoveTo(moveToPoint);
-			if self.DebugMove then
-				Debugger:Warn("MoveTo", moveToPoint);
-			end
 		end
 
-		if jumpRequest then
+		if jumpRequest and walkSpeed > 0 then
 			humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
 			jumpRequest = nil;
 		end
