@@ -22,7 +22,7 @@ local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-local modCharacter = require(character:WaitForChild("CharacterModule") :: ModuleScript);
+local modCharacter = modData:GetModCharacter();
 
 Debugger:Log("InterfaceModule loading.");
 local modInterface = require(script.Parent.InterfaceModule);

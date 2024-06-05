@@ -33,8 +33,8 @@ local colorPlaceable, colorInvalid = Color3.fromRGB(131, 255, 135), Color3.fromR
 
 function ToolHandler:Equip(storageItem, toolModels)
 	local character = localPlayer.Character;
-	local modCharacter = require(character:WaitForChild("CharacterModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
+	local modCharacter = modData:GetModCharacter();
 	local mouseProperties = modCharacter.MouseProperties;
 	local characterProperties = modCharacter.CharacterProperties;
 

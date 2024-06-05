@@ -33,10 +33,9 @@ local walkSurfaceTag = Instance.new("StringValue"); walkSurfaceTag.Name = "Walki
 local UserGameSettings = UserSettings():GetService("UserGameSettings");
 
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local modCharacter = require(character:WaitForChild("CharacterModule"));
-modCharacter.Character = character;
 local modSettings = localPlayer:FindFirstChild("SettingsModule") ~= nil and require(localPlayer.SettingsModule :: ModuleScript) or nil;
 local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+local modCharacter = modData:GetModCharacter();
 
 local modCameraGraphics = require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
@@ -132,6 +131,7 @@ local Cache = {
 	AntiGravityForce = nil;
 	ViewModelErr = nil;
 	OldState = nil;
+	CameraSubjectUpdated = nil;
 
 	CrouchCheckCooldown = tick();
 };
@@ -154,7 +154,6 @@ local modKeyBindsHandler = require(game.ReplicatedStorage:WaitForChild("Library"
 modCharacter.Humanoid = humanoid;
 modCharacter.Player = localPlayer;
 modCharacter.PlayerGui = localPlayer.PlayerGui;
-modCharacter.Character = character;
 modCharacter.Head = head;
 modCharacter.RootPart = rootPart;
 
@@ -204,14 +203,6 @@ end)
 
 
 local updateCharacterTransparency = function() end;
-
--- pcall(function()
--- 	local camMod = require(game.Players.LocalPlayer.PlayerScripts.PlayerModule.CameraModule)
--- 	if camMod.activeTransparencyController and camMod.activeTransparencyController.Enable then
--- 		camMod.activeTransparencyController:Enable(false);
--- 	end
--- end)
-
 
 local function onHumanoidStateChanged(oldState, newState)
 	characterProperties.State = newState;
@@ -267,6 +258,7 @@ local function onHumanoidStateChanged(oldState, newState)
 	end
 end
 
+
 function onCameraSubjectUpdate()
 	local subject = currentCamera.CameraSubject;
 	Debugger:Warn("CameraSubject changed", subject);
@@ -319,24 +311,13 @@ function onCameraSubjectUpdate()
 		CameraSubject = {};
 	end
 	
-	
-	task.spawn(function()
-		if not CameraSubject.IsClientSubject then
-			modCameraGraphics.Saturation:Set("spectate", -0.5, 2);
-			modCameraGraphics.TintColor:Set("spectate", Color3.fromRGB(255, 224, 224), 2);
-
-		else
-			modCameraGraphics.Saturation:Remove("spectate");
-			modCameraGraphics.TintColor:Remove("spectate");
-
-		end
-	end)
-
 	if modInterface then modInterface:ToggleGameBlinds(true, 0.25); end
+	Cache.CameraSubjectUpdated = true;
 end
 
 currentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(onCameraSubjectUpdate);
 onCameraSubjectUpdate();
+
 
 local function getCharacterMass()
 	local mass = 0;
@@ -1648,6 +1629,7 @@ end)
 local lastMovablePos = rootPart.CFrame;
 local unstuckPos = rootPart.CFrame;
 local ragdollActive = true;
+local cameraSubjectUpdateTick;
 
 Cache.LastHeadUnderwater = tick();
 Cache.OneSecTick = tick();
@@ -1742,7 +1724,21 @@ RunService.Heartbeat:Connect(function(step)
 		characterProperties.IsWalking = false;
 		characterProperties.IsSprinting = false;
 	end
-	
+
+	if Cache.CameraSubjectUpdated then
+		Cache.CameraSubjectUpdated = nil;
+		
+		if CameraSubject.IsClientSubject then
+			modCameraGraphics.Saturation:Remove("spectate");
+			modCameraGraphics.TintColor:Remove("spectate");
+
+		else
+			modCameraGraphics.Saturation:Set("spectate", -0.5, 2);
+			modCameraGraphics.TintColor:Set("spectate", Color3.fromRGB(255, 224, 224), 2);
+
+		end
+	end
+
 	if CameraSubject.IsClientSubject then
 		mouseProperties.Focus = currentCamera.Focus;
 		local mousePosition = UserInputService:GetMouseLocation();

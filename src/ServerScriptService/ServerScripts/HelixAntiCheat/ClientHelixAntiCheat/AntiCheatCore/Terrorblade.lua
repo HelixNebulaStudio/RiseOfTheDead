@@ -27,7 +27,8 @@ return function(core)
 		if not workspace:IsAncestorOf(character) then return end;
 		if characterModule == nil then return end;
 
-		local modCharacter = require(characterModule);
+		local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+		local modCharacter = modData:GetModCharacter();
 		local characterProperties = modCharacter.CharacterProperties;
 		
 		local lastCFrame, lastPos, lastVel;

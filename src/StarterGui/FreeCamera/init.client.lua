@@ -21,10 +21,10 @@ local modCameraGraphics = require(game.ReplicatedStorage.PlayerScripts.CameraGra
 local character = player.Character or player.CharacterAdded:Wait();
 local rootPart = character:WaitForChild("HumanoidRootPart");
 local humanoid = character:WaitForChild("Humanoid");
-local characterModule = character:WaitForChild("CharacterModule", 10);
-local modCharacter = require(characterModule);
 
 local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+local modCharacter = modData:GetModCharacter();
+
 
 local RS  = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")

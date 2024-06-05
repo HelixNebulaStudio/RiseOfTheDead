@@ -236,7 +236,7 @@ function ToolHandler:Initialize(equipped)
 	
 	character = localPlayer.Character;
 	humanoid = character:WaitForChild("Humanoid");
-	modCharacter = require(character:WaitForChild("CharacterModule"));
+	modCharacter = modData:GetModCharacter();
 	modInterface = modData:GetInterfaceModule();
 	mouseProperties = modCharacter.MouseProperties;
 	characterProperties = modCharacter.CharacterProperties;

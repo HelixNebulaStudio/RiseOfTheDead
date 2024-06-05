@@ -26,7 +26,7 @@ local userPlayEmoteByIdAnimTrackReturn do
 	userPlayEmoteByIdAnimTrackReturn = success and value
 end
 
-local modCharacter = require(script.Parent:WaitForChild("CharacterModule"));
+
 local modEmotes = require(game.ReplicatedStorage.Library.EmotesLibrary);
 
 local AnimationSpeedDampeningObject = script:FindFirstChild("ScaleDampeningPercent")

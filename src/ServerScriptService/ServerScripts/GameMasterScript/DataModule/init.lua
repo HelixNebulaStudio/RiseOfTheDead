@@ -73,7 +73,22 @@ function Data:GetModCharacter()
 	local character: Model? = localplayer.Character;
 	if character == nil then return end;
 	
-	return require(character:WaitForChild("CharacterModule") :: any);
+	local characterModule = character:WaitForChild("CharacterModule") :: ModuleScript;
+	local modCharacter = require(characterModule);
+	if modCharacter.__init == false then 
+		modCharacter.__init = nil;
+
+		characterModule.Destroying:Once(function()
+			for k, v in pairs(modCharacter) do
+				if typeof(v) == "table" and v.ClassName == "EventSignal" then
+					v:Destroy();
+				end
+				modCharacter[k] = nil;
+			end
+		end)
+	end;
+
+	return modCharacter;
 end
 
 -- !outline: Data:SaveSettings()
