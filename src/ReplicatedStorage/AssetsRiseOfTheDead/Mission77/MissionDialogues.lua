@@ -71,9 +71,21 @@ if RunService:IsServer() then
 		local profile = shared.modProfile:Get(player);
 		local inventory = profile.ActiveInventory;
 		
-		local blueprintDesc = modRichFormatter.H3Text("\nMission: ").."Ask the Mysterious Engineer about this.";
+		local bpPiecesDesc = modRichFormatter.H3Text("\nMission: ").."Ask the Mysterious Engineer about this.";
+		local bp2PiecesDesc = modRichFormatter.H3Text("\nMission: ").."There only seem to be two pieces of the blueprint inside Elder Vexeron.";
+		local blueprintFinalDesc = modRichFormatter.H3Text("\nMission: ").."Finally, now the Mysterious Engineer can help make something out of these schematics.";
+
 		local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
-			return storageItem:GetCustomName() == "Turret Blueprint Piece" or storageItem:GetValues("DescExtend") == blueprintDesc;
+			local customName = storageItem:GetCustomName();
+			local extendedDesc = storageItem:GetValues("DescExtend");
+
+			return customName == "Turret Blueprint Piece" 
+				or customName == "Turret Blueprint Piece 1/2"
+				or customName == "Turret Blueprint Piece 2/2"
+				or customName == "Final Turret Blueprint Piece"
+				or extendedDesc == bpPiecesDesc
+				or extendedDesc == bp2PiecesDesc
+				or extendedDesc == blueprintFinalDesc;
 		end);
 		
 		if mission.Type == 2 and #itemsList > 0 then -- Available;
@@ -89,6 +101,7 @@ if RunService:IsServer() then
 								
 								for a=1, #itemsList do
 									inventory:Remove(itemsList[a].ID);
+									shared.Notify(player, `{itemsList[a]:GetCustomName() or itemsList[a].Library.Name} was removed from your Inventory.`, `Negative`);
 								end
 								
 								modMission:StartMission(player, missionId);
@@ -109,11 +122,6 @@ if RunService:IsServer() then
 
 				dialog:AddChoice("bofb_4washed", function(dialog)
 					dialog:AddChoice("bofb_4washed2", function(dialog)
-
-						local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
-							return storageItem:GetCustomName() == "Turret Blueprint Piece" or storageItem:GetValues("DescExtend") == blueprintDesc;
-						end);
-						
 						modMission:Progress(player, missionId, function(mission)
 							if mission.ProgressionPoint <= 5 then
 								mission.ProgressionPoint = 5;
@@ -122,6 +130,7 @@ if RunService:IsServer() then
 
 						for a=1, #itemsList do
 							inventory:Remove(itemsList[a].ID);
+							shared.Notify(player, `{itemsList[a]:GetCustomName() or itemsList[a].Library.Name} was removed from your Inventory.`, `Negative`);
 						end
 					end)
 				end)
@@ -138,11 +147,9 @@ if RunService:IsServer() then
 								
 							else
 								dialog:AddChoice("bofb_6take", function(dialog)
-									local itemsList = inventory:ListByItemId("blueprintpiece", function(storageItem)
-										return string.find(storageItem.CustomName, "Turret Blueprint Piece") ~= nil;
-									end);
 									for a=1, #itemsList do
 										inventory:Remove(itemsList[a].ID);
+										shared.Notify(player, `{itemsList[a]:GetCustomName() or itemsList[a].Library.Name} was removed from your Inventory.`, `Negative`);
 									end
 									
 									inventory:Add("portableautoturretbp");
@@ -167,6 +174,7 @@ if RunService:IsServer() then
 				}, function(dialog)
 					for a=1, #itemsList do
 						inventory:Remove(itemsList[a].ID);
+						shared.Notify(player, `{itemsList[a]:GetCustomName() or itemsList[a].Library.Name} was removed from your Inventory.`, `Negative`);
 					end
 				end)
 			end
