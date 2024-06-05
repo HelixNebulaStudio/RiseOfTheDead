@@ -46,6 +46,7 @@ return function(CutsceneSequence)
 					local newNpcName;
 
 					local wantedPoster = modEvents:GetEvent(player, "wantedPoster");
+					Debugger:WarnClient(player, "wantedPoster", wantedPoster);
 
 					if wantedPoster then
 						newNpcName = wantedPoster.Name;
