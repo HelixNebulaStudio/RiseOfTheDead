@@ -75,12 +75,12 @@ return function(npc, spawnPoint)
 				self.Prefab.PowerSource.Color = Color3.fromRGB(50, 50, 50);
 				self.Immunity = self.DisabledImmunity;
 				self.RocketBarrageDamage = 25;
-				self.StunTimer = 6;
+				self.StunTimer = 4;
 				
 			end
 		end)
 		
-		self.StunTimer = 3;
+		self.StunTimer = 2;
 		self.AutoSearch = true;
 		self.SetAnimation("Stun", {game.ReplicatedStorage.Library.StatusEffects.Stun});
 		
