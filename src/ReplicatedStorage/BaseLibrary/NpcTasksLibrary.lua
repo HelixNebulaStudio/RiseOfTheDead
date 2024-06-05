@@ -99,6 +99,7 @@ library:Add{
 	Description="Scavenge for components.";
     Requirements={
         {Type="Stat"; Id="Hunger"; Value=0.5;};
+        {Type="Item"; ItemId="advmedkit"; Amount=1;};
     };
     FailFactors={};
     Values={};

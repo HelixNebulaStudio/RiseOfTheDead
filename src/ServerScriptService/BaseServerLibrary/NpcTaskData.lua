@@ -33,6 +33,9 @@ export type NpcTaskData = typeof(setmetatable( npcTaskDataObject , NpcTaskData))
 --==
 
 function NpcTaskData:NewTask(npcName, taskPacket)
+    local profile = shared.modProfile:Get(self.Player);
+    local inventory = profile.ActiveInventory;
+
     local npcData = self:GetNpcData(npcName);
     local npcTasks = self:GetTasks(npcName);
     local maxTasks = 1;
@@ -100,6 +103,17 @@ function NpcTaskData:NewTask(npcName, taskPacket)
                 return rPacket;
             end
             
+        elseif requireData.Type == "Item" then
+            local itemId = requireData.ItemId;
+            local amount = requireData.Amount;
+
+            local itemLib = modItemsLibrary:Find(itemId);
+            
+            local total,_ = inventory:ListQuantity(itemId, amount);
+            if total <= 0 then
+                rPacket.FailMsg = `Requires {itemLib.Name} ({amount}).`;
+                return rPacket;
+            end
         end
     end
 
@@ -132,6 +146,25 @@ function NpcTaskData:NewTask(npcName, taskPacket)
     taskPacket.StartTime = os.time();
     taskPacket.EndTime = os.time() + duration;
     table.insert(npcTasks, taskPacket);
+
+    for a=1, #taskLib.Requirements do
+        local requireData = taskLib.Requirements[a];
+
+       if requireData.Type == "Item" then
+            local itemId = requireData.ItemId;
+            local amount = requireData.Amount;
+
+            local itemLib = modItemsLibrary:Find(itemId);
+            
+            local _, itemList = inventory:ListQuantity(itemId, amount);
+            if itemList then
+                for a=1, #itemList do
+                    inventory:Remove(itemList[a].ID, itemList[a].Quantity);
+                    shared.Notify(self.Player, `{itemLib.Name} ({ amount}) removed from your Inventory.`, "Negative");
+                end
+            end
+        end
+    end
 
     rPacket.Success = true;
     return rPacket;
@@ -303,7 +336,7 @@ function remoteNpcData.OnServerInvoke(player: Player, action: string, npcName: s
                     addItem.ItemId, 
                     addItem.Data, 
                     function(queueEvent, storageItem)
-                        local itemTxt = addItem.Data.Quantity > 1 and `{addItem.Data.Quantity} {itemLibrary.Name}` or `a {itemLibrary.Name}`;
+                        local itemTxt = `{itemLibrary.Name} ({addItem.Data.Quantity})`;
                         shared.Notify(player, `You recieved {itemTxt} from {npcName}.`, "Reward");
                         shared.modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
                     end
@@ -339,6 +372,33 @@ function remoteNpcData.OnServerInvoke(player: Player, action: string, npcName: s
         if os.time() >= taskData.EndTime or taskData.EndTime-os.time() <= 10 then
             rPacket.FailMsg = "Task is already complete.";
             return rPacket;
+        end
+
+        local itemsList = {};
+        for a=1, #taskLib.Requirements do
+            local requireData = taskLib.Requirements[a];
+    
+           if requireData.Type == "Item" then
+                local itemId = requireData.ItemId;
+                local amount = requireData.Amount;
+    
+				table.insert(itemsList, {ItemId=itemId; Data={Quantity=amount; Values={};};});
+            end
+        end
+
+        local hasSpace = playerInventory:SpaceCheck(itemsList);
+        if not hasSpace then
+            rPacket.FailMsg = "Inventory full to retrieve requirement items!";
+            return rPacket;
+        end
+        
+        for a=1, #itemsList do
+            local itemId = itemsList[a].ItemId;
+            local itemLib = modItemsLibrary:Find(itemId);
+
+            playerInventory:Add(itemId, itemsList[a].Data, function()
+                shared.Notify(player, `{itemLib.Name} ({itemsList[a].Data.Quantity}) has been returned to your Inventory.`, "PickUp");
+            end);
         end
 
         table.remove(npcTaskData.Npc[npcName], taskIndex);

@@ -13,6 +13,7 @@ local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("R
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
+local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local modNpcTasksLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcTasksLibrary);
 
@@ -537,6 +538,13 @@ function Interface.init(modInterface)
 							descTxt = descTxt..`\n        - {requireData.Id}: &gt;{ string.format("%.1f", v*100) }%`;
 	
 						end
+						
+					elseif requireData.Type == "Item" then
+						local itemId = requireData.ItemId;
+						local amount = requireData.Amount;
+
+						local itemLib = modItemsLibrary:Find(itemId);
+						descTxt = descTxt..`\n        - <b>{itemLib and itemLib.Name or itemId}</b> ({amount})`;
 					end
 				end
 			end
