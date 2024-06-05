@@ -53,7 +53,6 @@ function OnPlayerAdded(player)
 				if lib.Rewards[b].Type == "Mission" then
 					
 					local checkMission = missionProfile:Get(lib.Rewards[b].Id);
-					Debugger:Log("checkMission", lib.Rewards[b].Id, checkMission);
 					if checkMission == nil then
 						local reAddMission = missionProfile:Add(lib.Rewards[b].Id);
 						Debugger:Log("Missing mission, adding ", lib.Rewards[b].Id, reAddMission);

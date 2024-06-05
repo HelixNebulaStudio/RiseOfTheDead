@@ -145,7 +145,7 @@ function Objective:End()
 	local prefabDestroyed = self.PrefabsSpawned - #Objective.Prefabs;
 	if prefabDestroyed > 0 then
 		shared.Notify(game.Players:GetPlayers(), 
-			(#Objective.Prefabs <= 0 and "All" or prefabDestroyed) .." generators were destroyed, blackout effect for ".. prefabDestroyed .." waves."
+			(#Objective.Prefabs <= 0 and "All" or prefabDestroyed) .." generators were destroyed.\nBlackout will be in effect for ".. prefabDestroyed .." waves, disrupting senses."
 			, "Negative");
 			
 		modAudio.Play("LightsOff", workspace);
@@ -182,14 +182,14 @@ function Objective:End()
 
 					end
 				end
-				shared.Notify(game.Players:GetPlayers(), "Blackout is no longer in effect.", "Inform");
+				shared.Notify(game.Players:GetPlayers(), "[Blackout] is no longer in effect.", "Inform");
 			end;
 			Tick=function(job)
 				local wavesLeft = job.EndWave - self.Controller.Wave;
 				if wavesLeft <= 0 then return end;
 
 				Debugger:Log("Blackout Tick", wavesLeft);
-				shared.Notify(game.Players:GetPlayers(), "Blackout still in effect for ".. wavesLeft .." waves.", "Negative");
+				shared.Notify(game.Players:GetPlayers(), "[Blackout] still in effect for ".. wavesLeft .." waves.", "Important");
 			end;
 		})
 		
