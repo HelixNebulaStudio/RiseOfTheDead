@@ -330,7 +330,7 @@ function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 		end
 
 		local endPoint = rayPoint;
-		local endDistance = (newOrigin-endPoint).Magnitude;
+		local endDistance = raycastResult and raycastResult.Distance or distance;
 
 		local canPenetrate = rayBasePart and rayBasePart:GetAttribute("IgnoreWeaponRay") == true or false;
 
