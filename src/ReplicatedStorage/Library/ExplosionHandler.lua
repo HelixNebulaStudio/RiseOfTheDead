@@ -221,7 +221,7 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 
 		for f=1, #fireFuncs do
 			fireFuncs[f]();
-			if a > 1 then task.wait() end;
+			if a > 2 then task.wait() end;
 		end
 		
 		wait();
