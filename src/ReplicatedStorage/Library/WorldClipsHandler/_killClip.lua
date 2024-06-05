@@ -9,8 +9,10 @@ function WorldClip:Load(basePart)
 	basePart.Transparency = 1;
 	
 	basePart.Touched:Connect(function(hitPart: BasePart)
-		if hitPart.Parent == nil then return end;
-		local humanoid = hitPart.Parent:FindFirstChildWhichIsA("Humanoid");
+		local hitParent = hitPart.Parent
+		if hitParent == nil then return end;
+
+		local humanoid = hitParent:FindFirstChildWhichIsA("Humanoid");
 		if humanoid == nil then return end;
 		
 		if hitPart.AssemblyRootPart ~= humanoid.RootPart then return end;
