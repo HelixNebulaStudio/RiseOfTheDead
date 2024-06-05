@@ -87,10 +87,32 @@ library:Add{
             RewardId="npctask:foodscavenge";
         };
     };
-    Duration=3600;
+    Duration = shared.Const.Hour;
     NpcsList = {"x";};
     SkipCost = genericSkipCost;
 };
+
+--
+library:Add{
+    Id="scavengeComponents";
+    Name="Scavenge Components";
+	Description="Scavenge for components.";
+    Requirements={
+        {Type="Stat"; Id="Hunger"; Value=0.5;};
+    };
+    FailFactors={};
+    Values={};
+    Rewards={
+        {
+            Type="ItemDrop";
+            RewardId="npctask:componentscavenge";
+        };
+    };
+    Duration = shared.Const.Hour*2;
+    NpcsList = {"x";};
+    SkipCost = genericSkipCost;
+};
+
 
 
 return library;

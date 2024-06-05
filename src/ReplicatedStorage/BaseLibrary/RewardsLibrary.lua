@@ -48,6 +48,19 @@ function RewardsLibrary:Init(super)
 			{Index=1; ItemId="energydrink"; Quantity=1; Chance=1/16;};
 		};
 	};
+	
+
+	super:Add{
+		Id="npctask:componentscavenge";
+		Rewards={
+			{Index=1; ItemId="metalpipes"; Quantity={Min=1; Max=3}; Chance=1;};
+			{Index=1; ItemId="igniter"; Quantity={Min=1; Max=3}; Chance=1;};
+			{Index=1; ItemId="gastank"; Quantity={Min=1; Max=3}; Chance=1;};
+			{Index=1; ItemId="gears"; Quantity={Min=1; Max=3}; Chance=1;};
+			{Index=1; ItemId="battery"; Quantity=1; Chance=1/4;};
+			{Index=1; ItemId="liquidmetalpolish"; Quantity=1; Chance=1/16;};
+		};
+	};
 
 
 	super:Add{
