@@ -109,7 +109,7 @@ return function(npc, spawnPoint)
 		--self.CustomHealthbar.Healths.ImmunitySource.IsDead
 		
 		if self.EntityStatus:GetOrDefault("ElectricMod") ~= nil then
-			if self.Immunity > self.WeakenImmunity then
+			if self.Immunity and self.Immunity > self.WeakenImmunity then
 				self.Immunity = self.WeakenImmunity;
 			end
 		end
@@ -201,7 +201,13 @@ return function(npc, spawnPoint)
 			self.PlayAnimation("RocketBarrage");
 			if self.Enemies then
 				self.CanBlink = false;
-				for t=1, (self.Immunity > 1 and 12 or 8) do -- Learn rocket count
+
+				local rocketCount = 8;
+				if self.Immunity and self.Immunity > 1 then
+					rocketCount = 12;
+				end
+
+				for t=1, rocketCount do -- Learn rocket count
 					if self.IsDead or self.Stunned then break; end;
 					
 					for a=1, #self.Enemies do
