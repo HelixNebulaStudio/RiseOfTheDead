@@ -22,18 +22,18 @@ function Pool.new(owner)
 	projectile.TrustClientProjectile = true;
 
 	projectile.ArcTracerConfig = {
-		Velocity=100;
+		Velocity=10;
 		LifeTime=10;
 		Bounce=0;
 		AirSpin=math.rad(40);
 		RayRadius=1;
 	}
-	projectile.Configurations = {
-		ProjectileVelocity=100;
-		ProjectileLifeTime=10;
-		ProjectileBounce=0;
-		ProjectileAirSpin=math.rad(40);
-	};
+	-- projectile.Configurations = {
+	-- 	ProjectileVelocity=100;
+	-- 	ProjectileLifeTime=10;
+	-- 	ProjectileBounce=0;
+	-- 	ProjectileAirSpin=math.rad(40);
+	-- };
 	
 	function projectile:Activate()
 	end	

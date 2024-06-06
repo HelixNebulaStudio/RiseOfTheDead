@@ -58,9 +58,9 @@ function toolPackage.NewToolLib(handler)
 		ThrowDamagePercent = 0.04;
 
 		
-		Velocity = 100;
+		Velocity = 40;
+		VelocityBonus = 10;
 		ChargeDuration = 0.5;
-		VelocityBonus = 50;
 		ThrowStaminaCost = 25;
 
 		ThrowRate = 1;

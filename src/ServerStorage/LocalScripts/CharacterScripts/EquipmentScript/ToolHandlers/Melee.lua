@@ -30,6 +30,8 @@ local modWeaponMechanics = require(game.ReplicatedStorage.Library.WeaponsMechani
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 
+local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
+
 --== Remotes;
 local remoteToolPrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
 local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler");
@@ -565,6 +567,8 @@ function ToolHandler:Equip(storageItem, toolModels)
 		end
 	end
 	
+	local toggleTraj = false;
+
 	Equipped.Throwable = configurations.Throwable;
 	if configurations.Throwable then
 		local projRaycast = RaycastParams.new();
@@ -602,13 +606,13 @@ function ToolHandler:Equip(storageItem, toolModels)
 		end
 		
 		local function getImpactPoint() -- reasonable throw ranges [25, 80];
-			local velocity = (configurations.Velocity + configurations.VelocityBonus * throwChargeValue);
-
 			local rayWhitelist = CollectionService:GetTagged("TargetableEntities") or {};
 			table.insert(rayWhitelist, workspace.Environment);
 			table.insert(rayWhitelist, workspace.Characters);
 			table.insert(rayWhitelist, workspace.Terrain);
 			projRaycast.FilterDescendantsInstances = rayWhitelist;
+
+			local velocity = (configurations.Velocity + configurations.VelocityBonus * throwChargeValue);
 
 			local scanPoint = modWeaponMechanics.CastHitscanRay{
 				Origin = mouseProperties.Focus.p;
@@ -618,6 +622,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 			};
 
 			local newDirection = (scanPoint-head.Position).Unit;
+			local distance = (scanPoint-head.Position).Magnitude;
 
 			-- Gets where player can hit.
 			-- Get hitscan point from head using direction provided by crosshair hitscan.
@@ -625,8 +630,12 @@ function ToolHandler:Equip(storageItem, toolModels)
 				Origin = head.Position;
 				Direction = newDirection;
 				IncludeList = rayWhitelist;
-				Range = 60;
+				Range = distance;
 			};
+
+			if toggleTraj then
+				game.Debris:AddItem(Debugger:PointPart(impactPoint), 0.1);
+			end
 
 			return impactPoint;
 		end
@@ -653,7 +662,8 @@ function ToolHandler:Equip(storageItem, toolModels)
 			toolConfig.CanThrow = false;
 			
 			local throwCharge = throwChargeValue > 0.05 and throwChargeValue or 0;
-			
+			local impactPoint = getImpactPoint();
+
 			animations["Charge"]:Stop(0);
 			animations["Throw"]:Play(0);
 			
@@ -664,8 +674,6 @@ function ToolHandler:Equip(storageItem, toolModels)
 			Stats.Stamina = math.clamp(Stats.Stamina - throwStaminaCost, -BaseStats.RecoveryRecoveryRate, Stats.MaxStamina);
 
 			handle.Transparency = 1;
-
-			local impactPoint = getImpactPoint();
 			remoteToolPrimaryFire:FireServer(storageItem.ID, "Throw", handle.Position, impactPoint, throwCharge);
 			
 			if storageItem.Quantity > 1 and configurations.ConsumeOnThrow ~= true then
@@ -731,9 +739,14 @@ function ToolHandler:Equip(storageItem, toolModels)
 				reset()
 			end
 			
-			if mouseProperties.Mouse2Down and characterProperties.CanAction and characterProperties.IsEquipped and RunService:IsStudio() then
+			if mouseProperties.Mouse2Down and characterProperties.CanAction and characterProperties.IsEquipped and toggleTraj then
 				local impactPoint = getImpactPoint();
-				local velocityToImpact = arcTracer:GetVelocity(handle.Position, impactPoint);
+
+				local handlePoint: Vector3 = handle.Position;
+				local velocity = (configurations.Velocity + configurations.VelocityBonus * throwChargeValue);
+
+				local travelTime = (impactPoint-handlePoint).Magnitude/velocity;
+				local velocityToImpact = arcTracer:GetVelocityByTime(handlePoint, impactPoint, travelTime);
 
 				local arcPoints = arcTracer:GeneratePath(handle.Position, velocityToImpact);
 				if #arcList ~= #arcPoints then
@@ -816,9 +829,13 @@ function ToolHandler:Equip(storageItem, toolModels)
 		equipTime = equipTime * math.clamp(equipTimeReduction, 0, 1);
 	end
 	
-	if animations["Load"] then
-		animations["Load"]:AdjustSpeed(animations["Load"].Length/ (equipTime+0.2));
-		animations["Load"]:Play();
+	local selectedLoadAnim = animations["Load"];
+	if selectedLoadAnim then
+		selectedLoadAnim:Play();
+		if selectedLoadAnim.Length > 0 then
+			local animSpeed = math.clamp(configurations.EquipLoadTime/equipTime, 0.5, 2);
+			selectedLoadAnim:AdjustSpeed(animSpeed);
+		end
 	end
 	
 	if toolConfig.OnToolEquip then
@@ -839,6 +856,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 	
 	if RunService:IsStudio() then
 		Equipped.RightHand["KeyWalk"] = function()
+			toggleTraj = not toggleTraj;
 			local tracks = animator:GetPlayingAnimationTracks();
 			
 			Debugger:Warn("animator", tracks);

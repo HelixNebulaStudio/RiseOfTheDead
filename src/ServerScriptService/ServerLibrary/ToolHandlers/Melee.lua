@@ -13,6 +13,8 @@ local modWeaponMechanics = require(game.ReplicatedStorage.Library.WeaponsMechani
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
+local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
+
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 
 
@@ -261,16 +263,16 @@ function ToolHandler:OnPrimaryFire(...)
 				
 				if self.StorageItem and self.StorageItem.Quantity <= 0 then return end;
 				
-				throwCharge = math.clamp(throwCharge, 0, 1);
-
 				local projectileObject = modProjectile.Fire(configurations.ProjectileId, CFrame.new(origin), Vector3.new(), nil, self.Player, self.ToolConfig);
 				projectileObject.TargetableEntities = TargetableEntities;
 				projectileObject.StorageItem = self.StorageItem;
 				
-				local velocity = projectileObject.ArcTracer:GetVelocity(handle.Position, targetPoint);
+				throwCharge = math.clamp(throwCharge, 0, 1);
 				
-				--local velocity = projectileObject.ArcTracer:GetVelocity(origin, targetPoint);
-				--local velocity = direction * (configurations.Velocity + (configurations.VelocityBonus or 0) * throwCharge);
+				local velocityScalar = (configurations.Velocity + configurations.VelocityBonus * throwCharge);
+				local travelTime = (targetPoint-origin).Magnitude/velocityScalar;
+				Debugger:StudioWarn("travelTime",travelTime, "velocityScalar", velocityScalar);
+				local velocity = projectileObject.ArcTracer:GetVelocityByTime(origin, targetPoint, travelTime);
 				
 				modProjectile.ServerSimulate(projectileObject, origin, velocity);
 				

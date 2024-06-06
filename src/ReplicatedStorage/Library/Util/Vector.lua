@@ -36,4 +36,20 @@ function Vector:InCenter(position: Vector3, center: Vector3, radius: number)
 	return true;
 end
 
+function Vector.ClampMagnitude(vector, min, max)
+	return vector.Unit * math.clamp(vector.Magnitude, min, max);
+end
+
+function Vector.MagnitudeSqrd(v)
+	return (v.X)^2 + (v.Y)^2 + (v.Z)^2;
+end
+
+function Vector.PointBetweenAB(a, b, p)
+	local u = b-a; -- line between a to b;
+	local pq = p-a; -- line between p to a;
+	local w = pq - (u * pq:Dot(u)/Vector.MagnitudeSqrd(u)); -- orthogonal proj, point
+
+	return p-w;
+end
+
 return Vector;

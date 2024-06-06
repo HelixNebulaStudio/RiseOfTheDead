@@ -278,16 +278,28 @@ function ArcTracing:FollowPath(points, base, tween, arcFunc, onComplete)
 	end)
 end
 
-function ArcTracing:GetVelocity(origin, targetPoint)
+function ArcTracing:GetSteppedVelocityByTime(origin, targetPoint, travelTime)
+
+	local v = (targetPoint-origin)/travelTime;
+	v = v - (self.Acceleration/2 * travelTime^2) / travelTime
+	return v
+	
+	--[[ this works
+		--
 	local accDelta = self.Acceleration * self.Delta^2;
 	local acc = accDelta + (accDelta * 2);
-	return (targetPoint - origin - acc) / (2 * self.Delta);
+	return (targetPoint - origin - acc) / (self.Delta*2);
+		--
+	local acc = 3 * self.Acceleration * self.Delta^2;
+	return (targetPoint - origin - acc) / (self.Delta*2);
+		--
+	]]
 end
 
 function ArcTracing:GetVelocityByTime(origin, targetPoint, travelTime)
 	-- velocity = displacement / time
-	-- displacement = init_velocity*time  +  1/2*acceleration  +  time^2
-	-- init_velocity = targetPoint-origin
+	-- displacement = init_velocity*time  +  1/2*acceleration  *  time^2
+	
 	return (targetPoint - origin - self.Acceleration/2 * travelTime^2) / travelTime;
 end
 
