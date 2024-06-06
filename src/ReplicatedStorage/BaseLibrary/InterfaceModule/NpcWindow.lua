@@ -544,7 +544,7 @@ function Interface.init(modInterface)
 						local amount = requireData.Amount;
 
 						local itemLib = modItemsLibrary:Find(itemId);
-						descTxt = descTxt..`\n        - <b>{itemLib and itemLib.Name or itemId}</b> ({amount})`;
+						descTxt = descTxt..`\n        - {itemLib and itemLib.Name or itemId} ({amount})`;
 					end
 				end
 			end

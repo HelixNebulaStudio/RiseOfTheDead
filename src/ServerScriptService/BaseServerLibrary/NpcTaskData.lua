@@ -337,7 +337,7 @@ function remoteNpcData.OnServerInvoke(player: Player, action: string, npcName: s
                     addItem.Data, 
                     function(queueEvent, storageItem)
                         local itemTxt = `{itemLibrary.Name} ({addItem.Data.Quantity})`;
-                        shared.Notify(player, `You recieved {itemTxt} from {npcName}.`, "Reward");
+                        shared.Notify(player, `You recieved {itemTxt} from {npcName}.`, "PickUp");
                         shared.modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
                     end
                 );
