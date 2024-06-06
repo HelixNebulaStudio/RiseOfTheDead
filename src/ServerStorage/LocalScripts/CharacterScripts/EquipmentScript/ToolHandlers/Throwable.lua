@@ -100,7 +100,6 @@ function ToolHandler:Equip(storageItem, toolModels)
 		end
 	end
 	
-	characterProperties.HideCrosshair = true;
 	if toolConfig.UseViewmodel == false then
 		characterProperties.UseViewModel = false;
 	end

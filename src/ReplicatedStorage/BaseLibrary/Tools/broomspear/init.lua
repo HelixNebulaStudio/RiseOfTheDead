@@ -47,12 +47,13 @@ function toolPackage.NewToolLib(handler)
 
 		-- Throwable
 		Throwable = true;
-		DamagePercent = 0.02;
+		ThrowDamagePercent = 0.04;
 
 		Velocity = 200;
 		ProjectileBounce = 0;
-		ChargeDuration = 2;
+		ChargeDuration = 0.5;
 		VelocityBonus = 100;
+		ThrowStaminaCost = 25;
 
 		ThrowRate = 1;
 		ThrowWaistRotation=math.rad(35);

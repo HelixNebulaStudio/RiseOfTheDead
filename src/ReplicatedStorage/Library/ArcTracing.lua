@@ -9,12 +9,11 @@ ArcTracing.LifeTime=5;
 ArcTracing.Acceleration = Vector3.new(0, -workspace.Gravity, 0);
 ArcTracing.KeepAcceleration = false;
 ArcTracing.IsWeaponRay = true;
-
+ArcTracing.Delta = 1/15;
 ArcTracing.RayRadius = 0;
 
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
-local baseDelta = 1/15;
 
 function ArcTracing.new()
 	local self = {
@@ -30,7 +29,7 @@ function ArcTracing:GeneratePath(origin, velocity, arcFunc)
 	local distance = self.MaxRayDistance;
 	local points = {};
 	
-	local delta = self.Delta or baseDelta;
+	local delta = self.Delta;
 	local totalDelta = 0;
 	local sleepSpeed = 5^2;
 	local lifetime = math.max(self.LifeTime, 0.1);
@@ -76,6 +75,7 @@ function ArcTracing:GeneratePath(origin, velocity, arcFunc)
 		
 		totalDelta = totalDelta + delta;
 		velocity = velocity + self.Acceleration * delta
+
 		
 		local rayCastDir = velocity * delta;
 		local raycastResult;
@@ -106,7 +106,7 @@ function ArcTracing:GeneratePath(origin, velocity, arcFunc)
 				
 			end
 
-			local dist = (origin-rayPoint).Magnitude--rayCastDir.Magnitude
+			local dist = (origin-rayPoint).Magnitude
 			local directionPart = Debugger:PointPart(origin);
 			directionPart.Shape = Enum.PartType.Block;
 			local cf = CFrame.lookAt(origin, origin+rayCastDir);
@@ -140,7 +140,7 @@ function ArcTracing:GeneratePath(origin, velocity, arcFunc)
 		--	rayPoint = origin + (velocity * delta);
 		--end
 		
-		local displacement = (origin - rayPoint).Magnitude;
+		local displacement = raycastResult and raycastResult.Distance or (origin - rayPoint).Magnitude;
 		distance = distance - displacement;
 		
 		local arcPoint = {
@@ -158,6 +158,7 @@ function ArcTracing:GeneratePath(origin, velocity, arcFunc)
 		
 		table.insert(points, arcPoint);
 		origin = rayPoint;
+		
 		
 		local breakRequest = false;
 		if arcFunc then
@@ -239,7 +240,7 @@ end
 
 function ArcTracing:FollowPath(points, base, tween, arcFunc, onComplete)
 	task.spawn(function()
-		local tweenInfo = TweenInfo.new(baseDelta+0.01);
+		local tweenInfo = TweenInfo.new(self.Delta+0.01);
 		
 		base.Anchored = true;
 		
@@ -268,7 +269,7 @@ function ArcTracing:FollowPath(points, base, tween, arcFunc, onComplete)
 					break;
 				end
 			end
-			task.wait(baseDelta);
+			task.wait(self.Delta);
 		end
 		
 		if onComplete then
@@ -277,7 +278,16 @@ function ArcTracing:FollowPath(points, base, tween, arcFunc, onComplete)
 	end)
 end
 
+function ArcTracing:GetVelocity(origin, targetPoint)
+	local accDelta = self.Acceleration * self.Delta^2;
+	local acc = accDelta + (accDelta * 2);
+	return (targetPoint - origin - acc) / (2 * self.Delta);
+end
+
 function ArcTracing:GetVelocityByTime(origin, targetPoint, travelTime)
+	-- velocity = displacement / time
+	-- displacement = init_velocity*time  +  1/2*acceleration  +  time^2
+	-- init_velocity = targetPoint-origin
 	return (targetPoint - origin - self.Acceleration/2 * travelTime^2) / travelTime;
 end
 

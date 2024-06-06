@@ -1701,9 +1701,7 @@ RunService.Heartbeat:Connect(function(step)
 		mainInterface.Crosshair.Visible = false;
 		
 	elseif characterProperties.IsEquipped then
-		if characterProperties.HideCrosshair == true then
-			mainInterface.Crosshair.Visible = false;
-		end
+		mainInterface.Crosshair.Visible = not characterProperties.HideCrosshair;
 		
 		if not mouseProperties.MouseLocked then
 			UserInputService.MouseIconEnabled = true;

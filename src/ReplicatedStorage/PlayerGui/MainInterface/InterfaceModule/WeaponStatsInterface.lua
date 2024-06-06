@@ -49,11 +49,15 @@ local graphStatTemplates = {
 local statTemplates = {
 	Melee={
 		{Category="Configurations"; Tag="Damage"; Text="<b>Damage:</b>    $stat"; Type="3dp"};
+		{Category="Configurations"; Tag="ThrowDamagePercent"; Text="<b>Throw Damage Percent:</b>    $stat%"; Type="percent"};
+
 		{Category="Configurations"; Tag="PrimaryAttackSpeed"; Text="<b>Attack Speed:</b>    $stat"; Type="3dp"};
 		{Category="Configurations"; Tag="Knockback"; Text="<b>Knockback:</b>    $stat"; Type="2dp"};
 		{Category="Configurations"; Tag="KnockoutDuration"; Text="<b>Knockout Duration:</b>    $stats"; Type="2dp"};
 		
 		{Category="Configurations"; Tag="StaminaCost"; Text="<b>Stamina Cost:</b>    $stat"; Type="2dp"};
+		{Category="Configurations"; Tag="ThrowStaminaCost"; Text="<b>Throwing Stamina Cost:</b>    $stat"; Type="2dp"};
+		
 
 		{Category="Configurations"; Tag="HeavyAttackMultiplier"; Text="<b>Heavy Attack Multiplier:</b>    $stat%"; Type="percent"};
 		{Category="Configurations"; Tag="HeavyAttackSpeed"; Text="<b>Heavy Attack Speed:</b>    $stat"; Type="3dp"};
@@ -248,13 +252,21 @@ local mouseOverDescription = {
 	};
 	
 	--== Melee stats;
+	ThrowDamagePercent={
+		Desc="Throwing does percent max health damage on impact, minimal damage is half of melee's damage.\n\n(Higher is better)";
+	};
 	HeavyAttackMultiplier={
 		Desc="The damage muliplier for when charging your attacks with focus.\n\n(Higher is better)";
 	};
 	HeavyAttackSpeed={
 		Desc="The time it takes to max heavy attack charge with focus.\n\n(Lower is better)";
 	};
-	
+	StaminaCost={
+		Desc="The cost of stamina when swinging your melee.\n\n(Lower is better)";
+	};
+	ThrowStaminaCost={
+		Desc="The cost of stamina when throwing your melee, your melee can not be throw when you are out of stamina.\n\n(Lower is better)";
+	};
 	
 	--== Clothings stats;
 	HotEquipSlots={

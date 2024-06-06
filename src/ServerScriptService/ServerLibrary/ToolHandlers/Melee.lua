@@ -160,6 +160,9 @@ function ToolHandler:OnToolEquip(toolModule)
 	self.MeleeTag.Parent = self.Character;
 	self.ToolConfig = toolModule;
 
+	local configurations = self.ToolConfig.Configurations;
+	local attackTime = configurations.PrimaryAttackSpeed;
+
 	if self.Player then self.Character = self.Player.Character; end
 	
 	local colliders = {};
@@ -187,7 +190,7 @@ function ToolHandler:OnToolEquip(toolModule)
 						victim = self.VictimsList[model];
 					end
 
-					if self.Attacking and victim.Hit ~= true then
+					if (self.Attacking and tick()-self.Attacking <= attackTime) and victim.Hit ~= true then
 						victim.Hit = true;
 						self:PrimaryAttack(damagable, hitPart);
 					end
@@ -216,26 +219,40 @@ function ToolHandler:OnPrimaryFire(...)
 	local humanoid = character and character:FindFirstChild("Humanoid");
 	local attackType = ...;
 	
+	local configurations = self.ToolConfig.Configurations;
+
+	local attackTime = configurations.PrimaryAttackSpeed;
+	local playerBodyEquipments = classPlayer.Properties and classPlayer.Properties.BodyEquipments;
+	
+	if playerBodyEquipments and modConfigurations.DisableGearMods ~= true then
+		if playerBodyEquipments.MeleeFury then
+			local meleeFuryBonus = 5 * playerBodyEquipments.MeleeFury;
+			if meleeFuryBonus > 0 then
+				attackTime = attackTime * (1-math.clamp(meleeFuryBonus, 0, 1));
+			end
+		end
+	end
+	
+	attackTime = math.max(attackTime, 0.1);
+
 	self.AttackType = attackType;
-	if humanoid and humanoid.Health > 0 and self.Attacking ~= true then
+	if humanoid and humanoid.Health > 0 and (self.Attacking == nil or tick()-self.Attacking > attackTime) then
 		
 		if attackType == "Throw" then
-			local _, origin, direction, throwCharge, rootVelocity = ...;
-			if origin == nil or direction == nil or throwCharge == nil or rootVelocity == nil then return end;
+			local _, origin, targetPoint, throwCharge = ...;
+			if origin == nil or targetPoint == nil or throwCharge == nil then return end;
 			
-			local configurations = self.ToolConfig.Configurations;
 			local _, handle = next(self.Prefabs);
 			handle = handle.PrimaryPart;
 			
 			if humanoid and humanoid.Health > 0 then
 				
 				if typeof(origin) ~= "Vector3" then Debugger:Warn("Origin is not vector3"); return end;
-				if typeof(direction) ~= "Vector3" then Debugger:Warn("Direction is not vector3"); return end;
+				if typeof(targetPoint) ~= "Vector3" then Debugger:Warn("targetPoint is not vector3"); return end;
 				if typeof(throwCharge) ~= "number" then Debugger:Warn("ThrowCharge is not a number"); return end;
-				if typeof(rootVelocity) ~= "Vector3" then Debugger:Warn("RootVelocity is not vector3"); return end;
 				
 				local distanceFromHandle = (handle.Position - origin).Magnitude;
-				if distanceFromHandle > 10 then Debugger:Warn("Too far from handle."); return end;
+				if distanceFromHandle > 32 then Debugger:Warn("Too far from handle."); return end;
 				
 				local itemLib = modItemsLibrary:Find(self.StorageItem.ItemId);
 				
@@ -245,13 +262,15 @@ function ToolHandler:OnPrimaryFire(...)
 				if self.StorageItem and self.StorageItem.Quantity <= 0 then return end;
 				
 				throwCharge = math.clamp(throwCharge, 0, 1);
-				direction = direction.Unit;
-				
-				local projectileObject = modProjectile.Fire(configurations.ProjectileId, CFrame.new(origin, origin + direction), Vector3.new(), nil, self.Player, self.ToolConfig);
+
+				local projectileObject = modProjectile.Fire(configurations.ProjectileId, CFrame.new(origin), Vector3.new(), nil, self.Player, self.ToolConfig);
 				projectileObject.TargetableEntities = TargetableEntities;
 				projectileObject.StorageItem = self.StorageItem;
 				
-				local velocity = direction * (configurations.Velocity + (configurations.VelocityBonus or 0) * throwCharge);
+				local velocity = projectileObject.ArcTracer:GetVelocity(handle.Position, targetPoint);
+				
+				--local velocity = projectileObject.ArcTracer:GetVelocity(origin, targetPoint);
+				--local velocity = direction * (configurations.Velocity + (configurations.VelocityBonus or 0) * throwCharge);
 				
 				modProjectile.ServerSimulate(projectileObject, origin, velocity);
 				
@@ -269,9 +288,8 @@ function ToolHandler:OnPrimaryFire(...)
 			end
 			
 		else
-			self.Attacking = true;
+			self.Attacking = tick();
 			self.PrimaryFireTick = tick()-0.5;
-			local configurations = self.ToolConfig.Configurations;
 			
 			local function addVictim(hitPart)
 				if hitPart:IsDescendantOf(character) then return end;
@@ -307,19 +325,6 @@ function ToolHandler:OnPrimaryFire(...)
 				end
 			end
 			
-			local attackTime = configurations.PrimaryAttackSpeed;
-			local playerBodyEquipments = classPlayer.Properties and classPlayer.Properties.BodyEquipments;
-			
-			if playerBodyEquipments and modConfigurations.DisableGearMods ~= true then
-				if playerBodyEquipments.MeleeFury then
-					local meleeFuryBonus = 5 * playerBodyEquipments.MeleeFury;
-					if meleeFuryBonus > 0 then
-						attackTime = attackTime * (1-math.clamp(meleeFuryBonus, 0, 1));
-					end
-				end
-			end
-			
-			attackTime = math.max(attackTime, 0.1);
 			task.wait(attackTime);
 
 			self.Attacking = nil;

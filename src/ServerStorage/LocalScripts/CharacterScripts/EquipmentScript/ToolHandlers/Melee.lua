@@ -105,6 +105,8 @@ function ToolHandler:Equip(storageItem, toolModels)
 	local handle = toolModel and toolModel:WaitForChild("Handle") or nil;
 	local collider = toolModel and toolModel:WaitForChild("Collider") or nil;
 
+	local head = character:WaitForChild("Head");
+
 	local animations = Equipped.Animations;
 	for key, animLib in pairs(toolLib.Animations) do
 		local animationId = "rbxassetid://"..(animLib.OverrideId or animLib.Id);
@@ -137,7 +139,9 @@ function ToolHandler:Equip(storageItem, toolModels)
 		equipped = false;
 		unequiped = true;
 
+		characterProperties.HideCrosshair = false;
 		characterProperties.UseViewModel = true;
+
 		for key, _ in pairs(animations) do
 			animations[key]:Stop();
 		end
@@ -406,7 +410,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 			if infType ~= nil then
 				staminaCost = 0;
 			end
-			Stats.Stamina = math.clamp(Stats.Stamina - staminaCost, 0, Stats.MaxStamina);
+			Stats.Stamina = math.clamp(Stats.Stamina - staminaCost, -BaseStats.RecoveryRecoveryRate, Stats.MaxStamina);
 			
 			local attackTime = configurations.PrimaryAttackSpeed;
 			
@@ -487,7 +491,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 				if infType ~= nil then
 					staminaCost = 0;
 				end
-				Stats.Stamina = math.clamp(Stats.Stamina - staminaCost, 0, Stats.MaxStamina);
+				Stats.Stamina = math.clamp(Stats.Stamina - staminaCost, -BaseStats.RecoveryRecoveryRate, Stats.MaxStamina);
 			
 				local attackTime = configurations.PrimaryAttackSpeed;
 				nextAttackTick = tick()+attackTime;
@@ -563,6 +567,12 @@ function ToolHandler:Equip(storageItem, toolModels)
 	
 	Equipped.Throwable = configurations.Throwable;
 	if configurations.Throwable then
+		local projRaycast = RaycastParams.new();
+		projRaycast.FilterType = Enum.RaycastFilterType.Include;
+		projRaycast.IgnoreWater = true;
+		projRaycast.CollisionGroup = "Raycast";
+		projRaycast.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain;};
+		
 		local arcTracer = modArcTracing.new();
 		arcTracer.Bounce = configurations.ProjectileBounce;
 		arcTracer.LifeTime = configurations.ProjectileLifeTime;
@@ -572,11 +582,13 @@ function ToolHandler:Equip(storageItem, toolModels)
 		table.insert(arcTracer.RayWhitelist, workspace.Entity);
 		table.insert(arcTracer.RayWhitelist, workspace:FindFirstChild("Characters"));
 		local charactersList = CollectionService:GetTagged("PlayerCharacters");
-		if charactersList then for a=1, #charactersList do
-			if charactersList[a] ~= character then
-				table.insert(arcTracer.RayWhitelist, charactersList[a]);
-			end
-		end end
+		if charactersList then 
+			for a=1, #charactersList do
+				if charactersList[a] ~= character then
+					table.insert(arcTracer.RayWhitelist, charactersList[a]);
+				end
+			end 
+		end
 		
 		arcDisk = landPartTemplate:Clone();
 		
@@ -589,37 +601,72 @@ function ToolHandler:Equip(storageItem, toolModels)
 			throwChargeValue = 0;
 		end
 		
+		local function getImpactPoint() -- reasonable throw ranges [25, 80];
+			local velocity = (configurations.Velocity + configurations.VelocityBonus * throwChargeValue);
+
+			local rayWhitelist = CollectionService:GetTagged("TargetableEntities") or {};
+			table.insert(rayWhitelist, workspace.Environment);
+			table.insert(rayWhitelist, workspace.Characters);
+			table.insert(rayWhitelist, workspace.Terrain);
+			projRaycast.FilterDescendantsInstances = rayWhitelist;
+
+			local scanPoint = modWeaponMechanics.CastHitscanRay{
+				Origin = mouseProperties.Focus.p;
+				Direction = mouseProperties.Direction;
+				IncludeList = rayWhitelist;
+				Range = velocity;
+			};
+
+			local newDirection = (scanPoint-head.Position).Unit;
+
+			-- Gets where player can hit.
+			-- Get hitscan point from head using direction provided by crosshair hitscan.
+			local impactPoint = modWeaponMechanics.CastHitscanRay{
+				Origin = head.Position;
+				Direction = newDirection;
+				IncludeList = rayWhitelist;
+				Range = 60;
+			};
+
+			return impactPoint;
+		end
+
 		local function primaryThrow()
 			if storageItem.MockItem ~= true then
 				storageItem = modData.GetItemById(storageItem.ID);
 			end
 			if storageItem == nil then return end;
 			
+			local throwStaminaCost = (configurations.ThrowStaminaCost or 0);
+			local infType = toolModel:GetAttribute("InfAmmo");
+			if infType ~= nil then
+				throwStaminaCost = 0;
+			end
+			if Stats.Stamina <= 0 then 
+				animations["Charge"]:Stop(0);
+				animations["Throw"]:Play(0);
+				animations["Throw"]:AdjustSpeed(0.1);
+				return 
+			end;
+			Stats.LastDrain = tick();
+
 			toolConfig.CanThrow = false;
 			
-			local origin = handle.Position;
-			local direction = mouseProperties.Direction;
 			local throwCharge = throwChargeValue > 0.05 and throwChargeValue or 0;
-			local rootVelocity = rootPart.Velocity;
 			
-			--local arcPoints = arcTracer:GeneratePath(origin, direction * (configurations.Velocity + configurations.VelocityBonus * throwCharge)); --rootVelocity
-			
-			animations["Charge"]:Stop();
-			animations["Throw"]:Play(0.2);
+			animations["Charge"]:Stop(0);
+			animations["Throw"]:Play(0);
 			
 			if audio.Throw then
 				modAudio.PlayReplicated(audio.Throw.Id, handle);
 			end
 
+			Stats.Stamina = math.clamp(Stats.Stamina - throwStaminaCost, -BaseStats.RecoveryRecoveryRate, Stats.MaxStamina);
+
 			handle.Transparency = 1;
-			delay(0.05, function()
-				--local projectileId = Equipped.RightHand.Item.Values.CustomProj or configurations.ProjectileId;
-				--local projectile = modProjectile.Fire(projectileId, CFrame.new(origin, origin + direction), handle.Orientation, nil, player, toolConfig);
-				--local prefab = projectile.Prefab;
-				
-				--modProjectile.ClientSimulate(projectile, arcTracer, arcPoints);
-			end)
-			remoteToolPrimaryFire:FireServer(storageItem.ID, "Throw", origin, direction, throwCharge, rootVelocity);
+
+			local impactPoint = getImpactPoint();
+			remoteToolPrimaryFire:FireServer(storageItem.ID, "Throw", handle.Position, impactPoint, throwCharge);
 			
 			if storageItem.Quantity > 1 and configurations.ConsumeOnThrow ~= true then
 				--ToolHandler:Unequip(storageItem);
@@ -629,9 +676,10 @@ function ToolHandler:Equip(storageItem, toolModels)
 				toolConfig.CanThrow = true;
 			end
 		end
-		
+
 		RunService:BindToRenderStep("Throwable", Enum.RenderPriority.Character.Value, function()
 			if not characterProperties.IsFocused then
+				characterProperties.HideCrosshair = true;
 				arcDisk.Parent = nil;
 				for _, obj in pairs(CollectionService:GetTagged("ThrowableArc")) do
 					obj:Destroy();
@@ -639,11 +687,17 @@ function ToolHandler:Equip(storageItem, toolModels)
 				arcList = {};
 				
 				characterProperties.Joints.WaistY = configurations.WaistRotation;
-				animations["Charge"]:Stop();
+				if animations["Charge"].IsPlaying then
+					animations["Charge"]:Stop(0);
+					animations["Throw"]:Play(0);
+					animations["Throw"]:AdjustSpeed(0.3);
+				end
 				
 				initThrow = false;
-				reset()
+				reset();
 				return;
+			else
+				characterProperties.HideCrosshair = false;
 			end
 			
 			if modKeyBindsHandler:IsKeyDown("KeyFire") and characterProperties.CanAction and characterProperties.IsEquipped then
@@ -677,11 +731,11 @@ function ToolHandler:Equip(storageItem, toolModels)
 				reset()
 			end
 			
-			if mouseProperties.Mouse2Down and characterProperties.CanAction and characterProperties.IsEquipped then
-				local velocity = (configurations.Velocity + configurations.VelocityBonus * throwChargeValue); -- + rootPart.Velocity
-				velocity = math.clamp(velocity, 0, 1024);
-				local arcPoints = arcTracer:GeneratePath(handle.Position, mouseProperties.Direction * velocity);
-				
+			if mouseProperties.Mouse2Down and characterProperties.CanAction and characterProperties.IsEquipped and RunService:IsStudio() then
+				local impactPoint = getImpactPoint();
+				local velocityToImpact = arcTracer:GetVelocity(handle.Position, impactPoint);
+
+				local arcPoints = arcTracer:GeneratePath(handle.Position, velocityToImpact);
 				if #arcList ~= #arcPoints then
 					while #arcList <= #arcPoints do
 						local arcPart = arcPartTemplate:Clone();
@@ -838,7 +892,6 @@ function ToolHandler:Unequip(storageItem)
 	RunService.RenderStepped:Wait();
 	modFlashlight:Destroy();
 	modData.UpdateProgressionBar();
-	characterProperties.HideCrosshair = false;
 
 	if Equipped.ToolConfig then
 		if Equipped.ToolConfig.ClientUnequip then
@@ -903,18 +956,12 @@ function ToolHandler:InitStaminaSystem()
 			local delta = wait(0.1);
 			local rate = delta * Stats.RecoveryRecoveryRate;
 			if Stats.LastDrain == nil or (tick()-Stats.LastDrain) > Stats.RecoveryRecoveryDelay then
-				Stats.Stamina = math.clamp(Stats.Stamina + rate, 0, Stats.MaxStamina);
+				Stats.Stamina = math.clamp(Stats.Stamina + rate, -BaseStats.RecoveryRecoveryRate, Stats.MaxStamina);
 				Stats.SubStamina = 0;
 			end
 			
 			if Equipped then
-				if Equipped.Throwable and characterProperties.IsFocused then
-					modData.UpdateProgressionBar(throwChargeValue, "Throw");
-					
-				else
-					modData.UpdateProgressionBar(Stats.Stamina/Stats.MaxStamina, "MeleeStamina");
-					
-				end
+				modData.UpdateProgressionBar(math.clamp(Stats.Stamina/Stats.MaxStamina, 0, 1), "MeleeStamina");
 			end
 		until not workspace:IsAncestorOf(character);
 	end)

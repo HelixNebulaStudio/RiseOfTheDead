@@ -26,6 +26,7 @@ function Pool.new(owner)
 		LifeTime=10;
 		Bounce=0;
 		AirSpin=math.rad(40);
+		RayRadius=1;
 	}
 	projectile.Configurations = {
 		ProjectileVelocity=100;
@@ -50,8 +51,8 @@ function Pool.new(owner)
 		local healthInfo = damagable:GetHealthInfo();
 
 		local damage = math.clamp(
-			(self.Configurations.DamagePercent or 0.01) * healthInfo.MaxHealth, 
-			math.ceil(self.Configurations.Damage * 1.5), 
+			(self.Configurations.ThrowDamagePercent or 0.01) * healthInfo.MaxHealth, 
+			math.ceil(self.Configurations.Damage * 0.5), 
 			Projectile.MaxDamage);
 
 
@@ -88,39 +89,45 @@ function Pool.new(owner)
 	end
 
 	function projectile:OnContact(arcPoint)
-		if arcPoint.Hit then
-			if RunService:IsServer() then
-				if self.Prefab:CanSetNetworkOwnership() then self.Prefab:SetNetworkOwner(nil) end;
-				if self.ProjectileDamage then self:ProjectileDamage(arcPoint.Hit); end
-				
-			else
-				local targetModel = arcPoint.Hit.Parent;
-				local humanoid = targetModel and targetModel:FindFirstChildWhichIsA("Humanoid");
-				if humanoid then
-					modAudio.Play(random:NextInteger(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", self.Prefab).RollOffMaxDistance = 1024;
-				end
-			end
+		if arcPoint.Hit == nil then return end;
+
+		if RunService:IsServer() then
+			if self.ProjectileDamage then self:ProjectileDamage(arcPoint.Hit); end
 			
-			if not arcPoint.Hit.Anchored then
-				if arcPoint.Client then return true end;
-				
-				self.Prefab.Anchored = false;
-				self.Prefab.Massless = true;
-				local hitPart, hitPoint = arcPoint.Hit, arcPoint.Point;
-
-				local weld = Instance.new("Motor6D");
-				weld.Name = "stick";
-				weld.Parent = self.Prefab;
-
-				weld.Part0 = self.Prefab;
-				weld.Part1 = hitPart;
-
-				local worldCf = CFrame.new(hitPoint, hitPoint + arcPoint.Direction);
-				weld.C1 = hitPart.CFrame:ToObjectSpace(worldCf);
-
-				return true;
+		else
+			local targetModel = arcPoint.Hit.Parent;
+			local humanoid = targetModel and targetModel:FindFirstChildWhichIsA("Humanoid");
+			if humanoid then
+				modAudio.Play(random:NextInteger(1,2)==1 and "BulletBodyImpact" or "BulletBodyImpact2", self.Prefab).RollOffMaxDistance = 1024;
 			end
 		end
+		
+		Debugger.Expire(self.Prefab);
+		if arcPoint.Client then return true end; --Client's arcPoint
+
+		if RunService:IsServer() then
+			local debriProjectile: BasePart = self.Prefab:Clone();
+			
+			Debugger.Expire(debriProjectile, 30);
+			debriProjectile.Anchored = false;
+			debriProjectile.Massless = true;
+			local hitPart, hitPoint = arcPoint.Hit, arcPoint.Point;
+
+			local weld = Instance.new("Weld");
+			weld.Name = "projectileDebrisWeld";
+			weld.Parent = debriProjectile;
+
+			weld.Part0 = debriProjectile;
+			weld.Part1 = hitPart;
+
+			local worldCf = CFrame.new(hitPoint, hitPoint + arcPoint.Direction);
+			weld.C1 = hitPart.CFrame:ToObjectSpace(worldCf);
+
+			debriProjectile.Parent = workspace.Debris;
+		end
+
+		return true;
+
 	end
 	
 	return projectile;

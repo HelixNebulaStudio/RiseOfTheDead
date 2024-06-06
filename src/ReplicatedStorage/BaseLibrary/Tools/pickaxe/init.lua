@@ -48,7 +48,6 @@ function toolPackage.NewToolLib(handler)
 		PrimaryAttackAnimationSpeed=0.5;
 
 		HitRange=8;
-		--Knockback=100;
 
 		WaistRotation=math.rad(0);
 		StaminaCost = 25;
@@ -56,11 +55,13 @@ function toolPackage.NewToolLib(handler)
 
 		-- Throwable
 		Throwable = true;
-		DamagePercent = 0.025;
+		ThrowDamagePercent = 0.04;
 
+		
 		Velocity = 100;
-		ChargeDuration = 2;
+		ChargeDuration = 0.5;
 		VelocityBonus = 50;
+		ThrowStaminaCost = 25;
 
 		ThrowRate = 1;
 		ThrowWaistRotation=math.rad(0);

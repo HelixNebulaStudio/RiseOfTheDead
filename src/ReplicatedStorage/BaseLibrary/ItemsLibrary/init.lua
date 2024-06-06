@@ -128,8 +128,8 @@ function ItemsLibrary:Init(super)
 	new(meleeBase, {Id="naughtycane"; Name="Naughty Cane"; Icon="rbxassetid://5966504204"; Tags={"Blunt Melee"}; Description="Bad zombie! *bonk*";});
 	new(meleeBase, {Id="shovel"; Name="Shovel"; Icon="rbxassetid://8814526891"; Tags={"Blunt Melee"}; Description="A gardener's trusty shovel. Good for digging graves and maybe sand on the seabed.";});
 	
-	new(meleeBase, {Id="pickaxe"; Name="Pickaxe"; Icon="rbxassetid://5175332073"; Tags={"Pointed Melee"; "Throwable"}; Description="A construction grade pickaxe. Throwing does 2% of the enemies' max health on impact, minimal throw damage is half of weapon's damage. Does not consume on throw.";});
-	new(meleeBase, {Id="broomspear"; Name="Broom Spear"; Icon="rbxassetid://5120882769"; Tags={"Pointed Melee"; "Throwable"}; Description="Chipped out from a broom stick. Throwing does 2% of the enemies' max health on impact, minimal throw damage is half of weapon's damage. Does not consume on throw.";});
+	new(meleeBase, {Id="pickaxe"; Name="Pickaxe"; Icon="rbxassetid://5175332073"; Tags={"Pointed Melee"; "Throwable"}; Description="A construction grade pickaxe.";});
+	new(meleeBase, {Id="broomspear"; Name="Broom Spear"; Icon="rbxassetid://5120882769"; Tags={"Pointed Melee"; "Throwable"}; Description="Chipped out from a broom stick.";});
 	
 	new(meleeBase, {Id="fireaxe"; Name="Fire Axe"; Icon="rbxassetid://12865194088"; Tags={"Edged Melee"}; Description="Not exactly an axe on fire. 66% chance to ignite enemies for 5 seconds dealing 50 x Stack + 1% of enemy's Current Health.";});
 

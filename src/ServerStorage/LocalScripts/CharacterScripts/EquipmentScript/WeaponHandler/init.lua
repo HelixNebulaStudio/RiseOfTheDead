@@ -1200,6 +1200,8 @@ function WeaponHandler:Equip(library, weaponId)
 							table.insert(rayWhitelist, workspace.Terrain);
 							projRaycast.FilterDescendantsInstances = rayWhitelist;
 
+							-- Gets where player is aiming at;
+							-- Get hitscan point from crosshair
 							local scanPoint = modWeaponMechanics.CastHitscanRay{
 								Origin = mouseProperties.Focus.p;
 								Direction = mouseProperties.Direction;
@@ -1213,6 +1215,8 @@ function WeaponHandler:Equip(library, weaponId)
 							spreadedDirection = newDirection * arcTracerConfig.Velocity;
 							local bulletOrigin = objectTable.BulletOrigin.WorldPosition;
 
+							-- Gets where player can hit.
+							-- Get hitscan point from head using direction provided by crosshair hitscan.
 							local rayPoint = modWeaponMechanics.CastHitscanRay{
 								Origin = origin;
 								Direction = spreadedDirection;
@@ -1220,6 +1224,7 @@ function WeaponHandler:Equip(library, weaponId)
 								Range = arcTracerConfig.Velocity;
 							};
 							
+							-- Turn projectile landing point to direction from projectile origin.
 							local rayDisplacement, offsetDir;
 							if rayPoint then
 								rayDisplacement = (rayPoint-bulletOrigin);

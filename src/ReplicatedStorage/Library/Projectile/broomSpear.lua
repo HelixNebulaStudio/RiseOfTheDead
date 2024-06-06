@@ -23,7 +23,8 @@ function Pool.new(owner)
 		Velocity=200;
 		LifeTime=30;
 		Bounce=0;
-		RayRadius=0.2;
+		RayRadius=0.5;
+		Delta=1/60;
 	};
 	
 	projectile.Configurations = {
@@ -48,8 +49,8 @@ function Pool.new(owner)
 		local healthInfo = damagable:GetHealthInfo();
 
 		local damage = math.clamp(
-			(self.Configurations.DamagePercent or 0.01) * healthInfo.MaxHealth, 
-			math.ceil(self.Configurations.Damage * 1.5), 
+			(self.Configurations.ThrowDamagePercent or 0.01) * healthInfo.MaxHealth, 
+			math.ceil(self.Configurations.Damage * 0.5), 
 			Projectile.MaxDamage);
 		
 
@@ -89,8 +90,6 @@ function Pool.new(owner)
 		if arcPoint.Hit == nil then return end;
 		
 		if RunService:IsServer() then
-			if self.Prefab:CanSetNetworkOwnership() then self.Prefab:SetNetworkOwner(nil) end;
-			task.wait()
 			if self.ProjectileDamage then self:ProjectileDamage(arcPoint.Hit); end
 			
 		else
@@ -102,27 +101,31 @@ function Pool.new(owner)
 
 		end
 
-		if not arcPoint.Hit.Anchored then
-			if arcPoint.Client then return true end;
+		Debugger.Expire(self.Prefab);
+		if arcPoint.Client then return true end; --Client's arcPoint
+
+		if RunService:IsServer() then
+			local debriProjectile: BasePart = self.Prefab:Clone();
 			
-			self.Prefab.Anchored = false;
-			self.Prefab.Massless = true;
+			Debugger.Expire(debriProjectile, 30);
+			debriProjectile.Anchored = false;
+			debriProjectile.Massless = true;
 			local hitPart, hitPoint = arcPoint.Hit, arcPoint.Point;
 
-			local weld = Instance.new("Motor6D");
-			weld.Name = "arrow";
-			weld.Parent = self.Prefab;
+			local weld = Instance.new("Weld");
+			weld.Name = "projectileDebrisWeld";
+			weld.Parent = debriProjectile;
 
-			weld.Part0 = self.Prefab;
+			weld.Part0 = debriProjectile;
 			weld.Part1 = hitPart;
 
 			local worldCf = CFrame.new(hitPoint, hitPoint + arcPoint.Direction);
 			weld.C1 = hitPart.CFrame:ToObjectSpace(worldCf);
 
-			return true;
+			debriProjectile.Parent = workspace.Debris;
 		end
 
-		return;
+		return true;
 	end
 	
 	return projectile;

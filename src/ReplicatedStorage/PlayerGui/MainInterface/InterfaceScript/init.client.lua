@@ -485,7 +485,7 @@ function UpdateProgressionBar(progress, labelId, value)
 
 	elseif labelId == "MeleeStamina" then
 		if modData.MeleeStats then
-			progressionLabel.Text = "Melee Stamina: "..math.ceil(modData.MeleeStats.Stamina).."/"..math.ceil(modData.MeleeStats.MaxStamina);
+			progressionLabel.Text = "Melee Stamina: "..math.ceil(math.max(modData.MeleeStats.Stamina, 0)).."/"..math.ceil(modData.MeleeStats.MaxStamina);
 		end
 		
 	else
