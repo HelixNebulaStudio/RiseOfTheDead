@@ -1394,6 +1394,7 @@ WorkbenchLibrary.ItemAppearance={
 	["broomspear"]={
 		ToolGripModel="broomspear";
 		ToolGripOffset=CFrame.new();
+		ToolGrip={};
 	};
 	["jacksscythe"]={
 		ToolGripModel="jacksscythe";
@@ -1467,6 +1468,7 @@ WorkbenchLibrary.ItemAppearance={
 	["boomerang"]={
 		ToolGripModel="boomerang";
 		ToolGripOffset=CFrame.new();
+		ToolGrip={};
 	};
 	
 	

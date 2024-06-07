@@ -24,7 +24,6 @@ function ItemSkinWear.Generate(player, storageItem, action)
 	if itemDisplayLib == nil then Debugger:Log("itemDisplayLib nil", storageItem) return; end
 	if storageItem.Values.SkinWearId ~= nil then Debugger:Log("SkinWearId exist", storageItem); return; end
 	
-	
 	if action == "setideal" then
 		local closestFloat, closestSeed = math.huge, 0;
 		local seed, gen;
@@ -76,6 +75,7 @@ end
 
 function ItemSkinWear.LoadFloat(itemId, seed)
 	local returnPacket = {};
+	if seed == nil then return returnPacket end;
 	
 	local wearLib = ItemSkinWear.GetWearLib(itemId);
 	--local wearLib = {
