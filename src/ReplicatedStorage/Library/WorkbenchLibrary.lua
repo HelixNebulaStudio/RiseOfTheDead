@@ -1391,6 +1391,10 @@ WorkbenchLibrary.ItemAppearance={
 			--UpperHandle={	DefaultColor=Color3.fromRGB(188, 155, 93);};
 		};
 	};
+	["broomspear"]={
+		ToolGripModel="broomspear";
+		ToolGripOffset=CFrame.new();
+	};
 	["jacksscythe"]={
 		ToolGripModel="jacksscythe";
 		ToolGripOffset=CFrame.new(0, -1, 0) * CFrame.Angles(0, 0, 0);
@@ -1459,6 +1463,10 @@ WorkbenchLibrary.ItemAppearance={
 			--Rope={		DefaultColor=Color3.fromRGB(199, 172, 120);};
 			--RopeKnots={		DefaultColor=Color3.fromRGB(199, 172, 120);};
 		};
+	};
+	["boomerang"]={
+		ToolGripModel="boomerang";
+		ToolGripOffset=CFrame.new();
 	};
 	
 	

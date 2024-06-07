@@ -51,7 +51,6 @@ function toolPackage.NewToolLib(handler)
 
 		Velocity = 80;
 		VelocityBonus = 50;
-		ProjectileBounce = 0;
 		ChargeDuration = 0.2;
 		ThrowStaminaCost = 20;
 
