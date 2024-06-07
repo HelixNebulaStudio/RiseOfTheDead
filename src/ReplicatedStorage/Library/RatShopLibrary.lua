@@ -63,7 +63,7 @@ ShopLibrary.SellPrice = {
 	["vectorxparts"]=5000;
 	["rusty48parts"]=6000;
 	["arelshiftcrossparts"]=7000;
-	["deagleparts"]=5000;
+	["deagleparts"]=8000;
 	
 	--
 	["wantedposter"]=1000;

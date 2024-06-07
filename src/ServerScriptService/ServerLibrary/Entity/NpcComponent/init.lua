@@ -172,6 +172,7 @@ function NpcComponent:KillNpc()
 
 	task.spawn(function()
 		if rootPart then
+			rootPart:RemoveTag("Enemies");
 			for _, tag in pairs(rootPart:GetTags()) do
 				rootPart:RemoveTag(tag);
 			end

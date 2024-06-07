@@ -143,11 +143,12 @@ function ArcTracing:GeneratePath(origin, velocity, arcFunc)
 		local displacement = raycastResult and raycastResult.Distance or (origin - rayPoint).Magnitude;
 		distance = distance - displacement;
 		
+		local unitVel = velocity.Unit;
 		local arcPoint = {
 			Hit=rayHit;
 			Origin=origin;
 			Velocity=velocity;
-			Direction=velocity.Unit;
+			Direction=unitVel;
 			Point=rayPoint;
 			Displacement=displacement;
 			Normal=rayNormal;
@@ -166,8 +167,6 @@ function ArcTracing:GeneratePath(origin, velocity, arcFunc)
 		end
 		
 		if rayHit then
-			local unitVel = velocity.Unit;
-
 			origin = origin + rayNormal * 0.001;
 			
 			if passThrough then

@@ -130,7 +130,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 			animations[key].Priority = Enum.AnimationPriority.Action2;
 		end
 	end;
-	animations["Core"]:Play();
+	animations["Core"]:Play(0);
 	
 	characterProperties.HideCrosshair = false;
 	if toolConfig.UseViewmodel == false then
@@ -171,6 +171,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 	colliderOverlapParams.MaxParts = 4;
 	
 	local function onKeyFrameReached(keyframe)
+		Debugger:Warn("Using deprecated keyframe waist rotation.");
 		if keyframe:sub(1, 14) == "WaistRotation:" then
 			local waist = tonumber(keyframe:sub(15, #keyframe));
 			if waist then
@@ -189,34 +190,12 @@ function ToolHandler:Equip(storageItem, toolModels)
 			Debugger:Warn("[Dev] Set WaistRotation ", waist);
 		end
 	end
-	
-	
-	local function setWaistXMarker(paramString)
-		local waist = tonumber(paramString);
-		if waist then
-			characterProperties.Joints.WaistY = math.rad(waist);
-		end
-		if modBranchConfigs.CurrentBranch.Name == "Dev" then
-			Debugger:Warn("[Dev] Set WaistRotationX ", waist);
-		end
-	end
-	local function setWaistYMarker(paramString)
-		local waist = tonumber(paramString);
-		if waist then
-			characterProperties.Joints.WaistX = math.rad(waist);
-		end
-		if modBranchConfigs.CurrentBranch.Name == "Dev" then
-			Debugger:Warn("[Dev] Set WaistRotationY ", waist);
-		end
-	end
 
 	table.insert(Equipped.Connections, animations["PrimaryAttack"]:GetMarkerReachedSignal("SetWaist"):Connect(setWaistMarker));
-	table.insert(Equipped.Connections, animations["PrimaryAttack"]:GetMarkerReachedSignal("SetWaistX"):Connect(setWaistXMarker));
-	table.insert(Equipped.Connections, animations["PrimaryAttack"]:GetMarkerReachedSignal("SetWaistY"):Connect(setWaistYMarker));
+	table.insert(Equipped.Connections, animations["PrimaryAttack"]:GetMarkerReachedSignal("SetWaistX"):Connect(setWaistMarker));
 	if animations["PrimaryAttack2"] then
 		table.insert(Equipped.Connections, animations["PrimaryAttack2"]:GetMarkerReachedSignal("SetWaist"):Connect(setWaistMarker));
-		table.insert(Equipped.Connections, animations["PrimaryAttack2"]:GetMarkerReachedSignal("SetWaistX"):Connect(setWaistXMarker));
-		table.insert(Equipped.Connections, animations["PrimaryAttack2"]:GetMarkerReachedSignal("SetWaistY"):Connect(setWaistYMarker));
+		table.insert(Equipped.Connections, animations["PrimaryAttack2"]:GetMarkerReachedSignal("SetWaistX"):Connect(setWaistMarker));
 	end;
 	-- OLD
 	table.insert(Equipped.Connections, animations["PrimaryAttack"].KeyframeReached:Connect(onKeyFrameReached));
@@ -322,8 +301,8 @@ function ToolHandler:Equip(storageItem, toolModels)
 					local comboInfo = configurations.Combos[comboIndex];
 					local animationId = "ComboAttack"..comboIndex;
 					characterProperties.CanMove = false;
-					animations[animationId]:Play();
-					animations[animationId]:AdjustWeight(1, 0.05);
+					animations[animationId]:Play(0);
+					animations[animationId]:AdjustWeight(1,0);
 					animations[animationId]:AdjustSpeed(animations[animationId].Length / comboInfo.AnimationSpeed);
 					
 					local onAnimFinish
@@ -334,15 +313,15 @@ function ToolHandler:Equip(storageItem, toolModels)
 					return;
 				end
 				if animations["PrimaryAttack2"] and math.random(1, 2) == 1 then
-					animations["PrimaryAttack2"]:Play();
-					animations["PrimaryAttack2"]:AdjustWeight(1, 0.05);
+					animations["PrimaryAttack2"]:Play(0);
+					animations["PrimaryAttack2"]:AdjustWeight(1,0);
 					animations["PrimaryAttack2"]:AdjustSpeed(animations["PrimaryAttack2"].Length / configurations.PrimaryAttackAnimationSpeed);
 					
 					return;
 				end
 				
-				animations["PrimaryAttack"]:Play();
-				animations["PrimaryAttack"]:AdjustWeight(1, 0.05);
+				animations["PrimaryAttack"]:Play(0);
+				animations["PrimaryAttack"]:AdjustWeight(1,0);
 				animations["PrimaryAttack"]:AdjustSpeed(animations["PrimaryAttack"].Length / configurations.PrimaryAttackAnimationSpeed);
 				
 			end
@@ -479,7 +458,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 			repeat
 				if unequiped then return end;
 				remoteToolPrimaryFire:FireServer(storageItem.ID);
-				animations["PrimaryAttack"]:Play(0.3);
+				animations["PrimaryAttack"]:Play(0);
 				
 				Stats.LastDrain = tick();
 				animations["Inspect"]:Stop();
@@ -558,10 +537,10 @@ function ToolHandler:Equip(storageItem, toolModels)
 		if not properties.Attacking then
 			local roll = random:NextInteger(1,10);
 			if animations["Inspect2"] and roll >= 7 then
-				animations["Inspect2"]:Play();
+				animations["Inspect2"]:Play(0);
 				animations["Inspect2"].Stopped:Wait();
 			else
-				animations["Inspect"]:Play();
+				animations["Inspect"]:Play(0);
 				animations["Inspect"].Stopped:Wait();
 			end
 		end
@@ -831,7 +810,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 	
 	local selectedLoadAnim = animations["Load"];
 	if selectedLoadAnim then
-		selectedLoadAnim:Play();
+		selectedLoadAnim:Play(0);
 		if selectedLoadAnim.Length > 0 then
 			local animSpeed = math.clamp(configurations.EquipLoadTime/equipTime, 0.5, 2);
 			selectedLoadAnim:AdjustSpeed(animSpeed);

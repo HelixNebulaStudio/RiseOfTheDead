@@ -1348,6 +1348,9 @@ local function renderStepped(camera, deltaTime)
 
 			local s, e = pcall(function()
 				local waistY = characterProperties.CanMove and characterProperties.Joints.WaistY or 0;
+				if rootPart:GetAttribute("WaistY") then
+					waistY = math.rad(rootPart:GetAttribute("WaistY"));
+				end
 				local swayY = ((math.sin(tick())/2-0.5)/50 * characterProperties.SwayYStrength);
 
 				local viewModel = characterProperties.UseViewModel and characterProperties.ViewModel or nil;
@@ -1634,7 +1637,8 @@ local cameraSubjectUpdateTick;
 Cache.LastHeadUnderwater = tick();
 Cache.OneSecTick = tick();
 Cache.LowestFps = math.huge;
-RunService.Heartbeat:Connect(function(step)
+RunService.PreSimulation:Connect(function(step)
+--RunService.Heartbeat:Connect(function(step)
 	local beatTick = tick();
 	loadInterface();
 	if modCharacter.CharacterProperties.CharacterCameraEnabled ~= isCharCamEnabled then
@@ -2057,7 +2061,11 @@ RunService.Heartbeat:Connect(function(step)
 	
 	if characterProperties.AllowLerpBody then
 		local lerpS, lerpE = pcall(function()
-			local neckCFrameAngles, waistCFrameAngles;
+			local waistTransform = character.UpperTorso.Waist.Transform;
+			local waistC0 = CFrame.Angles(0, 0, 0);
+			local waistC1 = CFrame.Angles(0, 0, 0);
+
+			local neckCFrameAngles;
 			local cameraDirection = rootPart.CFrame:VectorToObjectSpace(currentCamera.CFrame.lookVector)
 			local radians = mathAtan2(cameraDirection.X, -cameraDirection.Z); 
 			if radians > 2 or radians < -2 then 
@@ -2091,12 +2099,10 @@ RunService.Heartbeat:Connect(function(step)
 				wallRayHit, wallRayEnd = workspace:FindPartOnRayWithWhitelist(wallCollisionRay, environmentOnly, true);
 			end
 
-			
 			if wallRayHit then
 				local dist = (wallRayEnd-rootCFrame.Position).Magnitude;
 				
 				local rotRatio = dist/6;
-				
 				mouseY = mouseY * rotRatio;
 			end
 			
@@ -2107,36 +2113,47 @@ RunService.Heartbeat:Connect(function(step)
 				mouseY = 0;
 			end
 
-			neckCFrameAngles = (characterProperties.IsWounded and CFrame.Angles(0, 0, mathClamp(-radians, -0.8, 0.8))
-				or CFrame.Angles(0, mathClamp(-radians+waistY-neckYcompensate, -1, 1), 0) )
-				* CFrame.Angles(mathClamp(mouseY, -0.4, 0.3)
-					+(characterProperties.IsCrouching and waistXcompensate or 0.15), 0, 0);
+
+			neckCFrameAngles = (characterProperties.IsWounded 
+				and CFrame.Angles(0, 0, mathClamp(-radians, -0.8, 0.8))
+				or CFrame.Angles(0, mathClamp(-radians+waistY-neckYcompensate, -1, 1), 0))
+					* CFrame.Angles(mathClamp(mouseY, -0.4, 0.3) + 0.15, 0, 0);
 			
 			if characterProperties.IsRagdoll and not Cache.AntiGravityForce then
-				waistCFrameAngles = CFrame.Angles(0, 0, 0);
+				-- ragdolling
+				waistC1 = CFrame.Angles(0, 0, 0);
 				
 			elseif characterProperties.IsWounded then
-				waistCFrameAngles = CFrame.Angles(0, 0, 0);
+				-- crawling
+				waistC1 = CFrame.Angles(0, 0, 0);
 				
 			elseif characterProperties.IsSliding then
-				waistCFrameAngles = CFrame.Angles(0, waistY, 0) * CFrame.Angles(mathClamp(waistX, -0.87, 0.87), 0, 0);
+				-- sliding
+				waistC1 = CFrame.Angles(0, waistY, 0) * CFrame.Angles(mathClamp(waistX, -0.87, 0.87), 0, 0);
 				
-			elseif characterProperties.IsCrouching then 
-				waistCFrameAngles = CFrame.Angles(0, waistY, 0) 
-					* CFrame.Angles(mathClamp(-mouseY, -0.5, 0.5)+mathClamp(waistX, -0.87, 0.87)+waistXcompensate, 0, 0);
-				
-			else
-				waistCFrameAngles = CFrame.Angles(0, waistY, 0) * CFrame.Angles(mathClamp(-mouseY, -0.6, 1.1)+mathClamp(waistX-0.1, -0.87, 0.87), 0, 0);
+			elseif characterProperties.IsCrouching then
+				-- crouching
+				waistC1 = CFrame.Angles(0, waistY, 0);
+					--* CFrame.Angles(mathClamp(-mouseY, -0.5, 0.5)+mathClamp(waistX, -0.87, 0.87)+waistXcompensate, 0, 0);
+				waistC0 = CFrame.Angles(mathClamp(mouseY, -0.7, 0.7), 0, 0);
+
+			else 
+				-- idle
+				waistC1 = CFrame.Angles(0, waistY, 0)
+					--* CFrame.Angles(mathClamp(-mouseY, -0.6, 1.1)+mathClamp(waistX-0.1, -0.87, 0.87), 0, 0);
+				waistC0 = CFrame.Angles(mathClamp(mouseY, -1, 1.1), 0, 0);
+
 			end
 			if humanoid.PlatformStand == true then
-				waistCFrameAngles = CFrame.Angles(0, waistY, 0);
+				waistC1 = CFrame.Angles(0, waistY, 0);
 			end
 			-- WaistY = Left/Right
 			-- WaistX = Front/Back
 			
-			if waistCFrameAngles ~= nil and character.UpperTorso.Waist then
+			if character.UpperTorso.Waist then
 				if characterProperties.FirstPersonCamera and not characterProperties.IsRagdoll then
-					prevdata.WaistC1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistCFrameAngles, 0.1);
+					-- First Person & not ragdoll
+					prevdata.WaistC1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1, 0.1);
 					
 					local viewModelHeight = modMath.Lerp(prevViewModelHeight, characterProperties.IsSliding and 2.1 or characterProperties.IsCrouching and 1.1 or -0.4, 0.15);
 					prevViewModelHeight = viewModelHeight;
@@ -2148,14 +2165,21 @@ RunService.Heartbeat:Connect(function(step)
 						character.UpperTorso.Waist.C1 = waistToCamCFrame;
 						
 					else
-						character.UpperTorso.Waist.C1 = waistToCamCFrame * CFrame.Angles(0, waistY, 0) * CFrame.Angles(-mathClamp(mouseY, -1, 1.5)+(characterProperties.IsCrouching and waistXcompensate or 0), 0, 0);
+						character.UpperTorso.Waist.C1 = waistToCamCFrame * CFrame.Angles(0, waistY, 0) * CFrame.Angles(-mathClamp(mouseY, -1, 1.5), 0, 0);
 						
 					end
 					
 				else
-					character.UpperTorso.Waist.C1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistCFrameAngles, 0.1);
+					-- Third Person Mode
+
+					-- Apply C1
+					character.UpperTorso.Waist.C1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1, 0.1);
 					prevdata.WaistC1 = character.UpperTorso.Waist.C1;
 					
+					-- Apply C0
+					Cache.WaistRotation = (Cache.WaistRotation or waistC0):Lerp(waistC0, 0.1);
+					character.UpperTorso.Waist.Transform = waistTransform * Cache.WaistRotation;
+
 				end
 			end
 			
@@ -2207,7 +2231,7 @@ RunService.Heartbeat:Connect(function(step)
 		})
 	end
 	
-	characterProperties.Joints.WaistX = modMath.Lerp(prevdata.WaistX, 0, 0.3);
+	characterProperties.Joints.WaistX = modMath.DeltaLerp(prevdata.WaistX, 0, 5, step);
 	prevdata.WaistX = characterProperties.Joints.WaistX;
 	
 	local floorPart = characterProperties.GroundObject;

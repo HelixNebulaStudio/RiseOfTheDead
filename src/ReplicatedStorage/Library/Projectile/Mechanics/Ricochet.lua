@@ -37,7 +37,7 @@ function Ricochet.OnStepped(projectile, arcPoint, radius)
 		end
 
 		if closestRootPart then
-			arcPoint.ReflectToPoint = closestRootPart.Position;
+			arcPoint.ReflectToPoint = closestRootPart.Position + Vector3.new(0, 1, 0);
 
 		end
 	end

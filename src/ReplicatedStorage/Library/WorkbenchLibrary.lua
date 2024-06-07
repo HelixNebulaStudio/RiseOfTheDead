@@ -492,6 +492,9 @@ WorkbenchLibrary.ItemUpgrades={
 			Wear={Min=0.000001; Max=0.4;};
 		};
 	};
+	["boomerang"]={
+		Type={"Pointed Melee"; "Melee"};
+	};
 	
 	--== Clothing
 	
