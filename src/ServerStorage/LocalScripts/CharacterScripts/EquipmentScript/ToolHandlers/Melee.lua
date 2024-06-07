@@ -652,14 +652,21 @@ function ToolHandler:Equip(storageItem, toolModels)
 
 			Stats.Stamina = math.clamp(Stats.Stamina - throwStaminaCost, -BaseStats.RecoveryRecoveryRate, Stats.MaxStamina);
 
-			handle.Transparency = 1;
+			for _, obj in pairs(toolModel:GetChildren()) do
+				if not obj:IsA("BasePart") then continue end;
+				if obj.Transparency >= 1 then continue end;
+				
+				obj.Transparency = 1;
+				task.delay(configurations.ThrowRate or 0.2, function()
+					obj.Transparency = 0;
+				end)
+			end
 			remoteToolPrimaryFire:FireServer(storageItem.ID, "Throw", handle.Position, impactPoint, throwCharge);
 			
 			if storageItem.Quantity > 1 and configurations.ConsumeOnThrow ~= true then
 				--ToolHandler:Unequip(storageItem);
 			else
 				wait(configurations.ThrowRate or 0.2);
-				handle.Transparency = 0;
 				toolConfig.CanThrow = true;
 			end
 		end

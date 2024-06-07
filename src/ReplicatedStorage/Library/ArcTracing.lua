@@ -173,9 +173,12 @@ function ArcTracing:GeneratePath(origin, velocity, arcFunc)
 				origin = rayPoint;
 				
 			elseif arcPoint.ReflectToPoint and self.BounceCount > 0 then
-				local newDir = (arcPoint.ReflectToPoint - rayPoint).Unit;
+				local distToReflectPoint = (arcPoint.ReflectToPoint - rayPoint).Magnitude;
+				local timeToPoint = distToReflectPoint / velocity.Magnitude;
+				velocity = self:GetVelocityByTime(origin, arcPoint.ReflectToPoint, timeToPoint);
 
-				velocity = newDir * velocity.Magnitude;
+				-- local newDir = (arcPoint.ReflectToPoint - rayPoint).Unit;
+				-- velocity = newDir * velocity.Magnitude;
 
 			else
 				if self.Bounce and self.BounceCount > 0 then
@@ -197,7 +200,7 @@ function ArcTracing:GeneratePath(origin, velocity, arcFunc)
 		end
 		
 		local arcSpeed = velocity:Dot(velocity);
-		
+
 		if arcSpeed < sleepSpeed and rayHit then
 			if passThrough then
 			else

@@ -17,6 +17,7 @@ function Ricochet.OnStepped(projectile, arcPoint, radius)
 	end
 
 	local impactPoint = arcPoint.Point;
+	local impactNormal = arcPoint.Normal;
 
 	local rootParts = workspace:GetPartBoundsInRadius(impactPoint, radius or 32, overlapParams);
 
@@ -24,6 +25,10 @@ function Ricochet.OnStepped(projectile, arcPoint, radius)
 		local closestRootPart = nil;
 		local closestDist = math.huge;
 		for a=1, #rootParts do
+			local rootPos = rootParts[a].Position + Vector3.new(0, 1.5, 0);
+			local rootDir = (rootPos - impactPoint).Unit;
+			local reflectAngle = impactNormal:Dot(rootDir);
+			if reflectAngle <= 0.1 then continue end;
 			if cache.CacheRootParts[rootParts[a]] and tick()-cache.CacheRootParts[rootParts[a]] <= 0.5 then continue end;
 
 			local dist = (rootParts[a].Position - impactPoint).Magnitude;

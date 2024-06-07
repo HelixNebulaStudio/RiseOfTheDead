@@ -41,8 +41,8 @@ function Pool.new(owner)
 		arcTracer.Bounce = arcTracer.Bounce -0.1;
 		if RunService:IsServer() then
 			local damagable = modDamagable.NewDamagable(arcPoint.Hit.Parent);
-			if damagable and hitCache[damagable] == nil then
-				hitCache[damagable] = damagable;
+			if damagable and hitCache[arcPoint.Hit.Parent] == nil then
+				hitCache[arcPoint.Hit.Parent] = true;
 				task.delay(5, function()
 					table.clear(hitCache);
 				end)
@@ -97,8 +97,6 @@ function Pool.new(owner)
 
 		end
 		
-		Debugger:Warn("arcTracer.Bounce", arcTracer.Bounce);
-
 		if arcTracer.MaxBounce > 0 and arcTracer.Bounce > 0 then return end;
 
 		Debugger.Expire(self.Prefab);
