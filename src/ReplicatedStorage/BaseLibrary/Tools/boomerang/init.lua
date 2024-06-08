@@ -37,20 +37,20 @@ function toolPackage.NewToolLib(handler)
 		EquipLoadTime=0.2;
 		BaseDamage=500;
 
-		PrimaryAttackSpeed=0.3;
+		PrimaryAttackSpeed=0.45;
 		PrimaryAttackAnimationSpeed=1;
 
 		HitRange=6;
 		WaistRotation=math.rad(0);
-		StaminaCost = 4;
+		StaminaCost = 8;
 		StaminaDeficiencyPenalty = 0.6;
 
 		-- Throwable
 		Throwable = true;
 		ThrowDamagePercent = 0.04;
 
-		Velocity = 80;
-		VelocityBonus = 50;
+		Velocity = 50;
+		VelocityBonus = 80;
 		ChargeDuration = 0.2;
 		ThrowStaminaCost = 20;
 
