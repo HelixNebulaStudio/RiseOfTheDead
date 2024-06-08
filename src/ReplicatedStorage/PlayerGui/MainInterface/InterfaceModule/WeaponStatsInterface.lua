@@ -49,23 +49,27 @@ local graphStatTemplates = {
 local statTemplates = {
 	Melee={
 		{Category="Configurations"; Tag="Damage"; Text="<b>Damage:</b>    $stat"; Type="3dp"};
-		{Category="Configurations"; Tag="ThrowDamagePercent"; Text="<b>Throw Damage Percent:</b>    $stat%"; Type="percent"};
-
 		{Category="Configurations"; Tag="PrimaryAttackSpeed"; Text="<b>Attack Speed:</b>    $stat"; Type="3dp"};
-		{Category="Configurations"; Tag="Knockback"; Text="<b>Knockback:</b>    $stat"; Type="2dp"};
-		{Category="Configurations"; Tag="KnockoutDuration"; Text="<b>Knockout Duration:</b>    $stats"; Type="2dp"};
-		
 		{Category="Configurations"; Tag="StaminaCost"; Text="<b>Stamina Cost:</b>    $stat"; Type="2dp"};
-		{Category="Configurations"; Tag="ThrowStaminaCost"; Text="<b>Throwing Stamina Cost:</b>    $stat"; Type="2dp"};
-		
-
-		{Category="Configurations"; Tag="HeavyAttackMultiplier"; Text="<b>Heavy Attack Multiplier:</b>    $stat%"; Type="percent"};
-		{Category="Configurations"; Tag="HeavyAttackSpeed"; Text="<b>Heavy Attack Speed:</b>    $stat"; Type="3dp"};
-		
 		{Category="Configurations"; Tag="HitRange"; Text="<b>Hit Range:</b>    $stat units"; Type="2dp"};
 
 		{Category="Configurations"; Tag="Dps"; Text="<b>DPS:</b>    $stat"; Type="3dp"; OrderOffset=99;};
-		
+		-- Heavy attacks melee;
+		{Category="Configurations"; Tag="HeavyAttackMultiplier"; Text="<b>Heavy Attack Multiplier:</b>    $stat%"; Type="percent"; OnlyExpand=true;};
+		{Category="Configurations"; Tag="HeavyAttackSpeed"; Text="<b>Heavy Attack Speed:</b>    $stat"; Type="3dp"; OnlyExpand=true;};
+
+		-- Blunt melee;
+		{Category="Configurations"; Tag="Knockback"; Text="<b>Knockback:</b>    $stat"; Type="2dp"; OnlyExpand=true;};
+		{Category="Configurations"; Tag="KnockoutDuration"; Text="<b>Knockout Duration:</b>    $stats"; Type="2dp"; OnlyExpand=true;};
+
+		-- Throwing melee;
+		{Category="Configurations"; Tag="ThrowDamagePercent"; Text="<b>Throw Damage Percent:</b>    $stat%"; Type="percent"; OnlyExpand=true;};
+		{Category="Configurations"; Tag="ThrowStaminaCost"; Text="<b>Throwing Stamina Cost:</b>    $stat"; Type="2dp"; OnlyExpand=true;};
+
+		{Category="Configurations"; Tag="Velocity"; Text="<b>Throw Velocity:</b>    $stat u/s"; Type="2dp"; OnlyExpand=true;};
+		{Category="Configurations"; Tag="VelocityBonus"; Text="<b>Charged Velocity Bonus:</b>    $stat u/s"; Type="2dp"; OnlyExpand=true;};
+		{Category="Configurations"; Tag="ChargeDuration"; Text="<b>Charge Time:</b>    $stats"; Type="2dp"; OnlyExpand=true;};
+
 		
 	};
 	Weapon={
@@ -251,7 +255,8 @@ local mouseOverDescription = {
 		Desc="The duration in which the enemy ragdolls. Enemies are only stunned if they take more than 40% of their max health as damage.\n\n(Higher is better)";
 	};
 	
-	--== Melee stats;
+
+	--MARK: Melee stats;
 	ThrowDamagePercent={
 		Desc="Throwing does percent max health damage on impact, minimal damage is half of melee's damage.\n\n(Higher is better)";
 	};
@@ -267,8 +272,18 @@ local mouseOverDescription = {
 	ThrowStaminaCost={
 		Desc="The cost of stamina when throwing your melee, your melee can not be throw when you are out of stamina.\n\n(Lower is better)";
 	};
+	Velocity={
+		Desc="The travel speed of your melee throws.\n\n(Higher is better)";
+	};
+	VelocityBonus={
+		Desc="The extra speed of your throws by charging.\n\n(Higher is better)";
+	};
+	ChargeDuration={
+		Desc="The time it takes to fully charge your throws.\n\n(Lower is better)";
+	};
 	
-	--== Clothings stats;
+
+	--MARK: Clothings stats;
 	HotEquipSlots={
 		Desc="The number of additional slots on your hotbar after the default 5.";
 	};
