@@ -29,7 +29,8 @@ library.GroupSettings = {
 library.StatStruct = {
 	Warmth={MergeType=library.MergeTypes.Add;};
 	AdditionalStamina={MergeType=library.MergeTypes.Add;};
-	EquipTimeReduction={MergeType=library.MergeTypes.Multiply;};
+
+	EquipTimeReduction={MergeType=library.MergeTypes.Largest;};
 	HotEquipSlots={MergeType=library.MergeTypes.Largest;};
 	
 	UnderwaterVision={MergeType=library.MergeTypes.Largest;};

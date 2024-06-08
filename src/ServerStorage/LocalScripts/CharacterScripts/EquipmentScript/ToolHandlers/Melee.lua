@@ -812,7 +812,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 	local equipTimeReduction = classPlayer:GetBodyEquipment("EquipTimeReduction");
 	local equipTime = configurations.EquipLoadTime;
 	if equipTimeReduction then
-		equipTime = equipTime * math.clamp(equipTimeReduction, 0, 1);
+		equipTime = equipTime * math.clamp(1-equipTimeReduction, 0, 1);
 	end
 	
 	local selectedLoadAnim = animations["Load"];
