@@ -21,6 +21,8 @@ return function(npc, spawnPoint)
 			MoneyReward={Min=15; Max=20};
 			ExperiencePool=40;
 		};
+		
+		Detectable = false;
 	};
 
 	--== Initialize;	
@@ -30,12 +32,14 @@ return function(npc, spawnPoint)
 		if self.HardMode then
 			self.Humanoid.MaxHealth = math.max(123000 + 4000*level, 100);
 			self.Properties.AttackDamage = 80;
-			self.Move.SetDefaultWalkSpeed = 16;
+			self.Move.SetDefaultWalkSpeed = 12;
+			self.FumesCloudSize = 90;
 			
 		else
 			self.Humanoid.MaxHealth = math.max(8000 + 2000*level, 100);
 			self.Properties.AttackDamage = 40;
-			self.Move.SetDefaultWalkSpeed = 10;
+			self.Move.SetDefaultWalkSpeed = 8;
+			self.FumesCloudSize = 70;
 			
 		end
 		self.Humanoid.Health = self.Humanoid.MaxHealth;
@@ -46,6 +50,18 @@ return function(npc, spawnPoint)
 		self.ThreatSenseHidden = true;
 		self.WeakPointHidden = true;
 		self.Immunity = 2;
+
+		function self.GetAttackers(players)
+			if self.FumesCloudPoint == nil then return end;
+			for a=#players, 1, -1 do
+				local player = players[a];
+				if typeof(player) == "Instance" and player:IsA("Player") then
+					if player:DistanceFromCharacter(self.FumesCloudPoint) > (self.FumesCloudSize)/2 then
+						table.remove(players, a);
+					end
+				end
+			end
+		end
 
 		while self.IsDead ~= true do
 			self.Think:Fire();

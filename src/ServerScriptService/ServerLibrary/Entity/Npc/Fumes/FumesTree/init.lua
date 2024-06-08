@@ -14,7 +14,6 @@ return function(self)
 	local cache = {};
 	cache.AttackCooldown = tick();
     cache.CloudState = 0;
-    cache.CloudPoint = nil;
     cache.WanderTick = tick();
     cache.StartTick = tick();
 
@@ -99,14 +98,30 @@ return function(self)
             self.Move:Face(self.Target.PrimaryPart);
 
             local newFumeCloud: MeshPart = fumesCloud:Clone();
-            newFumeCloud.CFrame = CFrame.new(self.RootPart.CFrame.Position) * CFrame.new(math.random(-16, 16), 0, math.random(-16, 16));
-            cache.CloudPoint = newFumeCloud.CFrame.Position;
+            local offsetCFrame = CFrame.new(math.random(-16, 16), 0, math.random(-16, 16));
+            newFumeCloud.CFrame = CFrame.new(self.RootPart.CFrame.Position) * offsetCFrame;
+            self.FumesCloudPoint = newFumeCloud.CFrame.Position;
 
             if self.HardMode then
-                newFumeCloud.Size = Vector3.new(100, 100, 100);
-                newFumeCloud:SetAttribute("GasDamage", 30);
+                newFumeCloud.Size = Vector3.new(self.FumesCloudSize, self.FumesCloudSize, self.FumesCloudSize);
+                newFumeCloud:SetAttribute("GasDamage", 40);
+
+                task.spawn(function()
+                    task.wait(3);
+                    while self.IsDead ~= true do
+                        local delta = game:GetService("RunService").Heartbeat:Wait();
+                        if not workspace:IsAncestorOf(newFumeCloud) then break end;
+
+                        local directionBias = cache.TargetPosition and (cache.TargetPosition-self.RootPart.Position).Unit or Vector3.zero;
+                        self.FumesCloudPoint = self.FumesCloudPoint + directionBias * 2 * delta;
+                        newFumeCloud.Position = newFumeCloud.Position:Lerp(self.FumesCloudPoint, 0.1);
+                    end
+                end)
+
             else
+                newFumeCloud.Size = Vector3.new(self.FumesCloudSize, self.FumesCloudSize, self.FumesCloudSize);
                 newFumeCloud:SetAttribute("GasDamage", 6);
+
             end
 
             newFumeCloud.Parent = workspace.Entities;
@@ -137,19 +152,14 @@ return function(self)
             end
 
             if self.HardMode then
-                if tick() > cache.WanderTick then
+                local distFromCloud = (self.FumesCloudPoint-self.RootPart.Position).Magnitude;
+                if tick() > cache.WanderTick or distFromCloud > 45 then
                     cache.WanderTick = tick()+math.random(50,100)/10;
 
                     self.StopAnimation("ChannelFumes");
-                    self.Move:MoveTo(cache.CloudPoint + Vector3.new(math.random(-30, 30), 0, math.random(-30, 30)));
+                    self.Move:MoveTo(self.FumesCloudPoint + Vector3.new(math.random(-35, 35), 0, math.random(-35, 35)));
 
                     return tree.Failure;
-                else
-                    local distFromCloud = (cache.CloudPoint-self.RootPart.Position).Magnitude;
-                    if distFromCloud > 45 then
-                        cache.WanderTick = tick()-0.1;
-                        return tree.Failure;
-                    end
                 end
             end
             

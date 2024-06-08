@@ -465,6 +465,10 @@ function NpcStatusMeta:GetAttackers()
 		end
 	end
 	
+	if self.NpcModule.GetAttackers then
+		self.NpcModule.GetAttackers(players);
+	end
+
 	return players;
 end
 
