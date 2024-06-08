@@ -138,7 +138,7 @@ local statTemplates = {
 		
 		{Category="HotEquipSlots"; Text="<b>Additional Hotbar Slots:</b>    $stat"; Type="int"};
 		
-		{Category="TickRepellent"; Text="<b>Tick Repellent:</b>    $stat"; Type="2dp"};
+		{Category="TickRepellent"; Text="<b>Ticks Protection:</b>    $stat"; Type="2dp"};
 		{Category="ModNekrosisHeal"; Text="<b>Nekrosis Heal:</b>    $stat hp/s"; Type="2dp"};
 		{Category="GasProtection"; Text="<b>Gas Protection:</b>    $stat%"; Type="percent"};
 		
@@ -148,8 +148,8 @@ local statTemplates = {
 		{Category="OxygenRecoveryIncrease"; Text="<b>Oxygen Recovery Increase:</b>    $stat%"; Type="percent"};
 		
 		
-		{Category="MoveImpairReduction"; Text="<b>Movement Impair Reduction:</b>    x$stat%"; Type="percent"};
-		{Category="EquipTimeReduction"; Text="<b>Equip Time Reduction:</b>    x$stat%"; Type="percent"};
+		{Category="MoveImpairReduction"; Text="<b>Movement Impair Reduction:</b>    $stat%"; Type="percent"};
+		{Category="EquipTimeReduction"; Text="<b>Equip Time Reduction:</b>    $stat%"; Type="percent"};
 		{Category="AdditionalStamina"; Text="<b>Stamina:</b>    +$stat"; Type="int"};
 		{Category="Warmth"; Text="<b>Warmth:</b>    $stat°C"; Type="int"};
 
@@ -524,10 +524,12 @@ function Interface.Update(storageItem)
 		newLabel.Text = infoText;
 		newLabel.Parent = statsList;
 		
-		local textBounds = game:GetService("TextService"):GetTextSize(infoText, newLabel.TextSize, newLabel.Font, Vector2.new(200, 64));
 		local sizeConstraint = Instance.new("UISizeConstraint");
-		sizeConstraint.MinSize = Vector2.new(200, math.max(15, textBounds.Y));
+		sizeConstraint.MinSize = Vector2.new(200, 15);
 		sizeConstraint.Parent = newLabel;
+		newLabel:GetPropertyChangedSignal("TextBounds"):Connect(function()
+			sizeConstraint.MinSize = newLabel.TextBounds;
+		end)
 		
 		if newShortHandLabel then
 			local strVal = statValue;
@@ -579,7 +581,13 @@ function Interface.Update(storageItem)
 	for a=1, #statsTemplate do
 		layoutOrder = a;
 		local info = statsTemplate[a];
-		local statValue = info.Category and (info.Tag and itemClass[info.Category] and itemClass[info.Category][info.Tag]) or nil;
+		local statValue = nil;
+		if info.Category and info.Tag then
+			statValue = itemClass[info.Category][info.Tag];
+
+		elseif info.Category then
+			statValue = itemClass[info.Category];
+		end
 		
 		if statValue ~= nil then
 			if typeof(statValue) ~= "table" or (statValue.Potential == nil and statValue.Tad == nil) then
@@ -595,6 +603,17 @@ function Interface.Update(storageItem)
 			local info = specialStatsTemplates[infoKey];
 			layoutOrder = layoutOrder +1;
 			createLabel(infoKey, info, statValue);
+		end
+	end
+
+	if itemClass.RegisteredProperties then
+		Debugger:Warn("itemClass.RegisteredProperties", itemClass.RegisteredProperties);
+		for k, v in pairs(itemClass.RegisteredProperties) do
+			createLabel(k, {
+				Text="<b>+ Passive:</b>    $stat"; 
+				Type="string";
+			}, k);
+			layoutOrder = layoutOrder +1;
 		end
 	end
 	

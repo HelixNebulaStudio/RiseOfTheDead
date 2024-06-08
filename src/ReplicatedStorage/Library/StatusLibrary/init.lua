@@ -212,7 +212,7 @@ library:Add{
 library:Add{
 	Id="tickre";
 	Icon="rbxassetid://4978159755";
-	Name="Tick Repellent";
+	Name="Tick Protection";
 	Description="You recently got damaged by a tick, thus will not take damage from another one until this expires.";
 	Buff=true;
 	Cleansable=true;

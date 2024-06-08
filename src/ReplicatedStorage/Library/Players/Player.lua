@@ -304,13 +304,13 @@ function Player.new(playerInstance: Player)
 
 			elseif damageCategory == modDamagable.DamageCategory.FumesGas then
 				local gasProtection = classPlayer:GetBodyEquipment("GasProtection");
-				local hasLabCoat = classPlayer:GetBodyEquipment("LabCoat");
+				local labCoatValue = classPlayer:GetBodyEquipment("LabCoat");
 
 				if gasProtection then
-					gasProtection = hasLabCoat and gasProtection + 0.3 or gasProtection;
+					gasProtection = labCoatValue and gasProtection + labCoatValue or gasProtection;
 					damage = damage * (1-gasProtection);
 					
-					if hasLabCoat then
+					if labCoatValue then
 						self:SetProperties("LabCoat", {
 							Expires=modSyncTime.GetTime() + 2;
 						});

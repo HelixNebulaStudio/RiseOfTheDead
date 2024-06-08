@@ -1322,7 +1322,7 @@ function StatusEffects.FumesGas(player, damage)
 				if dmgTaken then continue end;
 				dmgTaken = true;
 
-				storageItem:TakeDamage(damage/2);
+				storageItem:TakeDamage(5);
 
 				local newHealth = storageItem:GetValues("Health");
 				if prevHealth ~= newHealth then

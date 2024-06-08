@@ -19,7 +19,6 @@ local modUsableItems = require(game.ReplicatedStorage.Library.UsableItems);
 
 local modStorageInterface = require(game.ReplicatedStorage.Library.UI.StorageInterface);
 
-local remotes = game.ReplicatedStorage.Remotes;
 local remoteToggleDefaultAccessories = modRemotesManager:Get("ToggleDefaultAccessories");
 local remoteStorageService = modRemotesManager:Get("StorageService");
 local remoteItemActionHandler = modRemotesManager:Get("ItemActionHandler");
@@ -27,6 +26,87 @@ local remoteUseStorageItem = modRemotesManager:Get("UseStorageItem");
 local remoteToggleClothing = modRemotesManager:Get("ToggleClothing");
 
 --== Script;
+local BodyEquipmentStats = {
+	-- Defensive;
+	["ModArmorPoints"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="AAProtectArmor"; Text=`<b>Armor Points:</b> {value} AP`;}
+	end;
+	["ModHealthPoints"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="AAProtectHealth"; Text=`<b>Health Points:</b> {value} HP`;}
+	end;
+
+	["BulletProtection"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="AProtectBullet"; Text=`<b>Bullet Protection:</b> {string.format("%.1f", value*100)}%`;}
+	end;
+	["GasProtection"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		if bodyEquips.LabCoat then
+			value = value + bodyEquips.LabCoat;
+		end
+		return {SortKey="AProtectGas"; Text=`<b>Gas Protection:</b> {string.format("%.0f", value*100)}%`;}
+	end;
+	["FlinchProtection"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="AProtectFlinch"; Text=`<b>Flinch Protection:</b> {string.format("%.0f", value*100)}%`;}
+	end;
+	["TickRepellent"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="AProtectTicks"; Text=`<b>Ticks Protection:</b> {string.format("%.0f", value)}s`;}
+	end;
+
+	-- Status Resistance;
+	["MoveImpairReduction"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="BuffMoveIR"; Text=`<b>Move Impair Reduction:</b> {string.format("%.1f", value*100)}%`;}
+	end;
+
+	-- Enchancments;
+	["EquipTimeReduction"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="EnhanceEquipTimeReduction"; Text=`<b>Equip Time Reduction:</b> {string.format("%.0f", value*100)}%`;}
+	end;
+	["HotEquipSlots"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="EnhanceHS"; Text=`<b>Hotbar Slots:</b> {5+math.max(value, 0)}`;}
+	end;
+
+	-- Melee;
+	["AdditionalStamina"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="MeleeStamina"; Text=`<b>Additional Stamina:</b> {string.format("%.0f", value*100)}%`;}
+	end;
+
+	-- Offensive;
+	["SplashReflection"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="ReflectSplash"; Text=`<b>Splash Reflection:</b> {string.format("%.1f", value*100)}%`;}
+	end;
+	["DamageReflection"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="ReflectDamage"; Text=`<b>Damage Reflection:</b> {string.format("%.1f", value*100)}%`;}
+	end;
+
+	-- Swimming;
+	["OxygenDrainReduction"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="SwimOxygenD"; Text=`<b>Oxygen Drain Reduction:</b> {string.format("%.0f", value*100)}%`;}
+	end;
+	["OxygenRecoveryIncrease"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="SwimOxygenR"; Text=`<b>Oxygen Recovery Increase:</b> {string.format("%.1f", value*100)}%`;}
+	end;
+	["UnderwaterVision"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="SwimVision"; Text=`<b>Underwater Vision:</b> +{string.format("%.1f", value*100)}%`;}
+	end;
+	["SwimmingSpeed"] = function(bodyEquips, k)
+		local value = bodyEquips[k];
+		return {SortKey="SwimSpeed"; Text=`<b>Swimming Speed:</b> +{string.format("%.0f", value)} u/s`;}
+	end;
+};
 
 function Interface.init(modInterface)
 	setmetatable(Interface, modInterface);
@@ -45,7 +125,7 @@ function Interface.init(modInterface)
 	
 	local templateHotbarSlot = script:WaitForChild("hotbarSlot");
 	local templateTClothingOption = script:WaitForChild("toggleClothingOption");
-	local temperatureLabel;
+	local temperatureLabel, bodyEquipmentsFrame;
 	
 	local hotbarWindow = Interface.NewWindow("Hotbar", hotbarFrame);
 	hotbarWindow.Visible = true;
@@ -63,7 +143,16 @@ function Interface.init(modInterface)
 	if modConfigurations.CompactInterface then
 		--inventoryFrame = interfaceScreenGui:WaitForChild("MobileInventory");
 		inventorySlotLists = inventoryFrame:WaitForChild("Inventory");
-		temperatureLabel = inventorySlotLists:WaitForChild("ArmorTitle"):WaitForChild("temperatureLabel");
+
+		local armorTitleLabel: TextLabel = inventorySlotLists:WaitForChild("ArmorTitle");
+		temperatureLabel = armorTitleLabel:WaitForChild("temperatureLabel");
+		bodyEquipmentsFrame = armorTitleLabel:WaitForChild("BodyEquipmentStats");
+
+		Interface.Garbage:Tag(armorTitleLabel.InputBegan:Connect(function(inputObject)
+			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
+				bodyEquipmentsFrame.Visible = not bodyEquipmentsFrame.Visible;
+			end
+		end))
 		
 		--hotbarFrame.UIListLayout.FillDirection = Enum.FillDirection.Vertical;
 		hotbarFrame.AnchorPoint = Vector2.new(0.5, 1);
@@ -71,8 +160,19 @@ function Interface.init(modInterface)
 		hotbarFrame.Size = UDim2.new(0, 40, 0, 0);
 		
 		templateTClothingOption.Size = UDim2.new(1, 0, 0, 30);
+
 	else
-		temperatureLabel = inventoryFrame:WaitForChild("ArmorTitle"):WaitForChild("temperatureLabel");
+		local armorTitleLabel: TextLabel = inventoryFrame:WaitForChild("ArmorTitle");
+		temperatureLabel = armorTitleLabel:WaitForChild("temperatureLabel");
+		bodyEquipmentsFrame = armorTitleLabel:WaitForChild("BodyEquipmentStats");
+		
+		Interface.Garbage:Tag(armorTitleLabel.MouseEnter:Connect(function()
+			bodyEquipmentsFrame.Visible = true;
+		end))
+		Interface.Garbage:Tag(armorTitleLabel.MouseLeave:Connect(function()
+			bodyEquipmentsFrame.Visible = false;
+		end))
+		
 	end
 
 	local toggleClothingButton = inventoryFrame:WaitForChild("ToggleClothing");
@@ -382,6 +482,39 @@ function Interface.init(modInterface)
 	until classPlayer.Humanoid ~= nil;
 	local humanoid = classPlayer.Humanoid;
 	
+	local function updateBodyEquipments()
+		local classPlayer = shared.modPlayers.Get(localPlayer);
+		local playerBodyEquipments = classPlayer.Properties and classPlayer.Properties.BodyEquipments;
+		
+		local label = bodyEquipmentsFrame:WaitForChild("label");
+		local beStr = {};
+
+		for k, v in pairs(playerBodyEquipments) do
+			
+			if k == "Warmth" and playerBodyEquipments.Warmth then
+				local warmth = humanoid and humanoid:GetAttribute("Warmth") or 25;
+				table.insert(beStr, {SortKey="Warmth"; Text=`<b>Warmth:</b> {warmth} °C`;});
+
+			elseif k == "ActiveProperties" then
+				for activePassive, _ in pairs(v) do
+					table.insert(beStr, {SortKey="ZZPassive"; Text=`<b>+ Passive</b> {activePassive}`;});
+				end
+
+			elseif BodyEquipmentStats[k] then
+				table.insert(beStr, BodyEquipmentStats[k](playerBodyEquipments, k));
+				
+			end
+		end
+
+		table.sort(beStr, function(a, b) return a.SortKey < b.SortKey; end)
+		for a=1, #beStr do
+			beStr[a] = beStr[a].Text;
+		end
+
+		label.Text = table.concat(beStr, "\n");
+	end
+
+
 	local function updateWarmth()
 		local warmth = humanoid and humanoid:GetAttribute("Warmth") or 25;
 		temperatureLabel.Text = warmth.."°C";
@@ -463,6 +596,7 @@ function Interface.init(modInterface)
 		temperatureLabel.Text = "Env: "..(workspace:GetAttribute("GlobalTemperature") or 25).."°C"; 
 	end));
 	Interface.Garbage:Tag(temperatureLabel.MouseLeave:Connect(updateWarmth));
+	Interface.Garbage:Tag(bodyEquipmentsFrame:GetPropertyChangedSignal("Visible"):Connect(updateBodyEquipments));
 	
 	toggleClothingButton.MouseButton1Click:Connect(function()
 		Interface:PlayButtonClick();
