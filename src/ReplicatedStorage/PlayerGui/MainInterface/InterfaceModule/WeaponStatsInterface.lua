@@ -296,7 +296,7 @@ local mouseOverDescription = {
 		Desc="The time you will be invunerable to tick blursts after one already blurst.\n\n(In seconds)";
 	};
 	GasProtection={
-		Desc="The damage dealt from gas attacks are reduced by this percent.";
+		Desc="The damage dealt from gas attacks are reduced by this percent.\n\n(Sorted by Largest)";
 	};
 	ModArmorPoints={
 		Desc="Additional armor points added to your max armor.";

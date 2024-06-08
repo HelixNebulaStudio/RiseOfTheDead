@@ -38,6 +38,7 @@ library.StatStruct = {
 	OxygenDrainReduction={MergeType=library.MergeTypes.Largest;};
 	OxygenRecoveryRate={MergeType=library.MergeTypes.Largest;};
 	FlinchProtection={MergeType=library.MergeTypes.Largest;};
+	GasProtection={MergeType=library.MergeTypes.Largest;};
 };
 
 

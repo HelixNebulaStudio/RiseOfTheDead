@@ -1302,7 +1302,8 @@ function StatusEffects.FumesGas(player, damage)
 		if saveData.Clothing then
 			local clothingList = saveData.Clothing:ListByIndexOrder();
 
-			local dmgTaken = false;
+			local largestStorageItem, largestGasProtect = nil, 0;
+
 			for a=1, #clothingList do
 				local storageItem = clothingList[a];
 				local siid = storageItem.ID;
@@ -1318,10 +1319,17 @@ function StatusEffects.FumesGas(player, damage)
 					modStorageItem.PopupItemStatus(storageItem);
 					continue;
 				end;
-				
-				if dmgTaken then continue end;
-				dmgTaken = true;
 
+				if itemClass.GasProtection > largestGasProtect then
+					largestStorageItem = storageItem;
+					largestGasProtect = itemClass.GasProtection;
+				end
+			end
+
+			if largestStorageItem then
+				local storageItem = largestStorageItem;
+				local prevHealth = storageItem:GetValues("Health") or 100;
+				
 				storageItem:TakeDamage(5);
 
 				local newHealth = storageItem:GetValues("Health");

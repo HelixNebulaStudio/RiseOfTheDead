@@ -46,8 +46,16 @@ function AppearanceData:Update(storage)
 	local wardrobeStorage = modStorage.Get("Wardrobe", self.Player);
 	
 	local updated = {};
+	local sortedContainer = {};
 	for storageItemID, _ in pairs(storage.Container) do
 		local storageItem = storage.Container[storageItemID];
+		table.insert(sortedContainer, storageItem);
+	end
+	table.sort(sortedContainer, function(a, b) return (a.Index or 99) < (b.Index or 99) end)
+
+	for a=1, #sortedContainer do
+		local storageItem = sortedContainer[a];
+		local storageItemID = storageItem.ID;
 		
 		local vanityItem;
 		if storageItem.Vanity then
@@ -148,7 +156,7 @@ function AppearanceData:Update(storage)
 							elseif statInfo.MergeType == modClothingLibrary.MergeTypes.Multiply then
 								currentStatVal = (currentStatVal or 1);
 								
-								finalValue = currentStatVal * (1-v);
+								finalValue = currentStatVal * v;
 
 							elseif statInfo.MergeType == modClothingLibrary.MergeTypes.Largest then
 								currentStatVal = (bodyEquipmentsTable[k] or -math.huge);
@@ -168,6 +176,12 @@ function AppearanceData:Update(storage)
 								end
 								
 							end
+
+						else
+							if currentStatVal ~= nil then
+								finalValue = currentStatVal
+							end
+
 						end
 
 						bodyEquipmentsTable[k] = finalValue;
