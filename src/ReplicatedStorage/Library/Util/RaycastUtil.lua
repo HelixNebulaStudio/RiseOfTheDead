@@ -50,7 +50,10 @@ end
 	@param points number
 	@param radius number
 ]]
-function RaycastUtil.RingCast(orign, dir, points, radius, rayParam): {RaycastResult}
+function RaycastUtil.RingCast(orign, dir, points, radius, rayParam, options): {RaycastResult}
+	options = options or {};
+	options.CastChance = options.CastChance or nil;
+
 	local r = {};
 
 	local hitResult = workspace:Raycast(orign, dir, rayParam);
@@ -66,6 +69,9 @@ function RaycastUtil.RingCast(orign, dir, points, radius, rayParam): {RaycastRes
 		local x = math.cos(ph)
 		local z = math.sin(ph)
 
+		if options.CastChance and math.random(0, 1000)/1000 <= options.CastChance then
+			continue;
+		end
 		local pos = orign+Vector3.new(x, 0, z)*(radius or 1);
 
 		local hR = workspace:Raycast(pos, dir, rayParam);

@@ -126,7 +126,9 @@ function Movement.new(parallelNpc)
 			if path.Status.Value >= 3 and self.TargetPosition then
 				task.desynchronize();
 				if self.DebugMove == true then Debugger:Warn("path fail approx") end;
-				local rayResults = modRaycastUtil.RingCast(self.TargetPosition, -Vector3.yAxis*16, 3, 4, groundRayParams);
+				local rayResults = modRaycastUtil.RingCast(self.TargetPosition, -Vector3.yAxis*16, 3, 4, groundRayParams, {
+					CastChance = 0.45;
+				});
 				task.synchronize();
 
 				for a=1, #rayResults do
@@ -143,6 +145,7 @@ function Movement.new(parallelNpc)
 					if self.DebugMove == true then Debugger:Warn("path failed", path.Status.Value) end;
 					self.NextWaypoint = nil;
 					table.clear(self.Waypoints);
+					computeDebounce = cTick +5;
 	
 					doDumbFollow();
 					return;
