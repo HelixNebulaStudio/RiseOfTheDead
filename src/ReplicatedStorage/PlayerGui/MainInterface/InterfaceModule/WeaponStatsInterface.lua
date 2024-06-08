@@ -47,6 +47,7 @@ local graphStatTemplates = {
 }
 
 local statTemplates = {
+	--MARK: Melee stats;
 	Melee={
 		{Category="Configurations"; Tag="Damage"; Text="<b>Damage:</b>    $stat"; Type="3dp"};
 		{Category="Configurations"; Tag="PrimaryAttackSpeed"; Text="<b>Attack Speed:</b>    $stat"; Type="3dp"};
@@ -55,23 +56,24 @@ local statTemplates = {
 
 		{Category="Configurations"; Tag="Dps"; Text="<b>DPS:</b>    $stat"; Type="3dp"; OrderOffset=99;};
 		-- Heavy attacks melee;
-		{Category="Configurations"; Tag="HeavyAttackMultiplier"; Text="<b>Heavy Attack Multiplier:</b>    $stat%"; Type="percent"; OnlyExpand=true;};
-		{Category="Configurations"; Tag="HeavyAttackSpeed"; Text="<b>Heavy Attack Speed:</b>    $stat"; Type="3dp"; OnlyExpand=true;};
+		{Category="Configurations"; Tag="HeavyAttackMultiplier"; Text="<b>Heavy Attack Multiplier:</b>    $stat%"; Type="percent";};
+		{Category="Configurations"; Tag="HeavyAttackSpeed"; Text="<b>Heavy Attack Speed:</b>    $stat"; Type="3dp";};
 
 		-- Blunt melee;
-		{Category="Configurations"; Tag="Knockback"; Text="<b>Knockback:</b>    $stat"; Type="2dp"; OnlyExpand=true;};
-		{Category="Configurations"; Tag="KnockoutDuration"; Text="<b>Knockout Duration:</b>    $stats"; Type="2dp"; OnlyExpand=true;};
+		{Category="Configurations"; Tag="Knockback"; Text="<b>Knockback:</b>    $stat"; Type="2dp";};
+		{Category="Configurations"; Tag="KnockoutDuration"; Text="<b>Knockout Duration:</b>    $stats"; Type="2dp";};
 
 		-- Throwing melee;
-		{Category="Configurations"; Tag="ThrowDamagePercent"; Text="<b>Throw Damage Percent:</b>    $stat%"; Type="percent"; OnlyExpand=true;};
-		{Category="Configurations"; Tag="ThrowStaminaCost"; Text="<b>Throwing Stamina Cost:</b>    $stat"; Type="2dp"; OnlyExpand=true;};
+		{Category="Configurations"; Tag="ThrowDamagePercent"; Text="<b>Throw Damage Percent:</b>    $stat%"; Type="percent";};
+		{Category="Configurations"; Tag="ThrowStaminaCost"; Text="<b>Throwing Stamina Cost:</b>    $stat"; Type="2dp";};
 
-		{Category="Configurations"; Tag="Velocity"; Text="<b>Throw Velocity:</b>    $stat u/s"; Type="2dp"; OnlyExpand=true;};
-		{Category="Configurations"; Tag="VelocityBonus"; Text="<b>Charged Velocity Bonus:</b>    $stat u/s"; Type="2dp"; OnlyExpand=true;};
-		{Category="Configurations"; Tag="ChargeDuration"; Text="<b>Charge Time:</b>    $stats"; Type="2dp"; OnlyExpand=true;};
+		{Category="Configurations"; Tag="Velocity"; Text="<b>Throw Velocity:</b>    $stat u/s"; Type="2dp";};
+		{Category="Configurations"; Tag="VelocityBonus"; Text="<b>Charge Velocity Bonus:</b>    $stat u/s"; Type="2dp";};
+		{Category="Configurations"; Tag="ChargeDuration"; Text="<b>Charge Time:</b>    $stats"; Type="2dp";};
 
 		
 	};
+	--MARK: Weapon stats;
 	Weapon={
 		{Category="Properties"; Tag="Potential"; Text="<b>Mastery:</b>    $stat%"; Type="percent2dp"};
 
@@ -127,6 +129,7 @@ local statTemplates = {
 		
 		
 	};
+	--MARK: Clothing stats;
 	Clothing={
 		{Category="ModArmorPoints"; Text="<b>Armor Points:</b>    $stat"; Type="int"};
 		{Category="ModHealthPoints"; Text="<b>Health Points:</b>    $stat"; Type="int"};
@@ -161,6 +164,7 @@ local specialStatsTemplates = {
 }
 
 local mouseOverDescription = {
+	--MARK: Weapon desc;
 	Potential={
 		Desc="Weapon mastery scales the damage output. When your mastery is at 100%, you will deal 100% of the damage the weapon can output. At weapon level 0, the mastery will generally scale the DPS to roughly 100 DPS or higher.\n\n(Higher is better)";
 	};
@@ -256,7 +260,7 @@ local mouseOverDescription = {
 	};
 	
 
-	--MARK: Melee stats;
+	--MARK: Melee desc;
 	ThrowDamagePercent={
 		Desc="Throwing does percent max health damage on impact, minimal damage is half of melee's damage.\n\n(Higher is better)";
 	};
@@ -283,7 +287,7 @@ local mouseOverDescription = {
 	};
 	
 
-	--MARK: Clothings stats;
+	--MARK: Clothings desc;
 	HotEquipSlots={
 		Desc="The number of additional slots on your hotbar after the default 5.";
 	};
@@ -575,7 +579,7 @@ function Interface.Update(storageItem)
 	for a=1, #statsTemplate do
 		layoutOrder = a;
 		local info = statsTemplate[a];
-		local statValue = info.Category and (info.Tag and itemClass[info.Category] and itemClass[info.Category][info.Tag]) or itemClass[info.Category];
+		local statValue = info.Category and (info.Tag and itemClass[info.Category] and itemClass[info.Category][info.Tag]) or nil;
 		
 		if statValue ~= nil then
 			if typeof(statValue) ~= "table" or (statValue.Potential == nil and statValue.Tad == nil) then
@@ -776,12 +780,12 @@ function Interface.Update(storageItem)
 	
 	local workbenchUpgradesLib = modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId];
 	if workbenchUpgradesLib then
-		local conditionRange = workbenchUpgradesLib.SkinWear and workbenchUpgradesLib.SkinWear.Wear or {Min=0.000001; Max=0.999999;};
+		-- local conditionRange = workbenchUpgradesLib.SkinWear and workbenchUpgradesLib.SkinWear.Wear or {Min=0.000001; Max=0.999999;};
 		
-		layoutOrder = 9999;
-		local newLabel = createLabel("ToolCondition", {
-			Text="<b>Condition Range:</b>    $stat"; Type="rawnum";
-		}, conditionRange);
+		-- layoutOrder = 9999;
+		-- local newLabel = createLabel("ToolCondition", {
+		-- 	Text="<b>Condition Range:</b>    $stat"; Type="rawnum";
+		-- }, conditionRange);
 		
 	end
 end
