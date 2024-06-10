@@ -92,14 +92,14 @@ function Hazard:Tick()
 	self.JetSwooshSnd:Play();
 	
 	local timeToImpact = 2 - (timeLapsed * 1.2);
-	local impactRadius = 24;
+	local impactRadius = 26;
 
-	if self.Controller.Wave >= 10 then
-		local maxRadius = 64;
-		impactRadius = math.clamp(34 + (self.Controller.Wave-10), 34, maxRadius);
+	-- if self.Controller.Wave >= 10 then
+	-- 	local maxRadius = 64;
+	-- 	impactRadius = math.clamp(34 + (self.Controller.Wave-10), 34, maxRadius);
 		
-		timeToImpact = math.clamp((impactRadius/maxRadius*4) - (timeLapsed * 2), 2, 6);
-	end
+	-- 	timeToImpact = math.clamp((impactRadius/maxRadius*4) - (timeLapsed * 2), 2, 6);
+	-- end
 
 	local targetCFrame = groundCframe;
 	
