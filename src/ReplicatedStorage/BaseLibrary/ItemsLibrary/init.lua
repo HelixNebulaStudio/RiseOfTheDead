@@ -130,7 +130,7 @@ function ItemsLibrary:Init(super)
 	
 	new(meleeBase, {Id="pickaxe"; Name="Pickaxe"; Icon="rbxassetid://5175332073"; Tags={"Pointed Melee"; "Throwable"}; Description="A construction grade pickaxe.";});
 	new(meleeBase, {Id="broomspear"; Name="Broom Spear"; Icon="rbxassetid://5120882769"; Tags={"Pointed Melee"; "Throwable"}; Description="Chipped out from a broom stick.";});
-	new(meleeBase, {Id="boomerang"; Name="Boomerang"; Icon="rbxassetid://17763515915"; Tags={"Pointed Melee"; "Throwable"}; Description="A light weight sharp tip boomerang. Has built-in ricochet when thrown. (Will be obtainable from drops in the future).";});
+	new(meleeBase, {Id="boomerang"; Name="Boomerang"; Icon="rbxassetid://17763515915"; Tags={"Pointed Melee"; "Throwable"}; Description="A light weight sharp tip boomerang. Has built-in ricochet when thrown.";});
 	
 	new(meleeBase, {Id="fireaxe"; Name="Fire Axe"; Icon="rbxassetid://12865194088"; Tags={"Edged Melee"}; Description="Not exactly an axe on fire. 66% chance to ignite enemies for 5 seconds dealing 50 x Stack + 1% of enemy's Current Health.";});
 

@@ -1586,6 +1586,7 @@ GoldShopLibrary.Products:Add{
 		Price=4990;
 		ItemId="boomerang";
 		New=true;
+		Desc="A light weight sharp tip boomerang. Has built-in ricochet when thrown. \n\n\n<b>[Early Access]</b>  Will be obtainable from drops in the future.";
 	};
 };
 
@@ -1718,7 +1719,7 @@ GoldShopLibrary.Pages = {
 	};
 	
 	NewItems = {
-		-- {Type="Product"; Id="boomerang"};
+		{Type="Product"; Id="boomerang"};
 		{Type="Product"; Id="apron"};
 		{Type="Product"; Id="bluntknockoutmod"};
 		{Type="Product"; Id="portableautoturret"};
