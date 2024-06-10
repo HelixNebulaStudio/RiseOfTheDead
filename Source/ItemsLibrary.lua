@@ -177,7 +177,7 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="cultisthood"; Name="Cultist Hood"; Icon="rbxassetid://5550425398"; Tags={"Head"}; Description="Live in the shadows and pull the strings.."; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
 	new(clothingBase, {Id="onyxhoodiehood"; Name="OnyxHound Hoodie's Hood"; Icon="rbxassetid://5644700762"; Tags={"Head"}; Description="Ultra Rare OnyxHound Hood.";});
 	new(clothingBase, {Id="disguisekit"; Name="Disguise Kit"; Icon="rbxassetid://5783987908"; Tags={"Head"}; Usable="Disguise"; Description="Disguise yourself as anything available. Right-click to open disguse menu. To unlock new disguises, get kills in order to unlock. Unlock progress only saves on this item, so deleting this item will lose your disguise progression. Trading this item will also lose all kills saved in this item.";});
-	new(clothingBase, {Id="nvg"; Name="Night Vision Goggles"; Icon="rbxassetid://6008673515"; Tags={"Head"}; Description="Night vision goggles. Enhances visibility in the dark.";});
+	new(clothingBase, {Id="nvg"; Name="Night Vision Goggles"; Icon="rbxassetid://6008673515"; Tags={"Head"}; Description="Night vision goggles. <b>Passive:</b> Enhances visibility in the dark.";});
 	new(clothingBase, {Id="strawhat"; Name="Straw Hat"; Icon="rbxassetid://6416330399"; Tags={"Head"}; Description="It ain't much, but it's honest hard work.";});
 	new(clothingBase, {Id="zriceraskull"; Name="Zricera Skull"; Icon="rbxassetid://6806306800"; Tags={"Head"}; Description="Strength of a beast and shield of the skull.";});
 	new(clothingBase, {Id="hazmathood"; Name="Hazmat Hood"; Icon="rbxassetid://7021892111"; Tags={"Head"}; Description="Hazmat hood part of the hazmat suit.";});
