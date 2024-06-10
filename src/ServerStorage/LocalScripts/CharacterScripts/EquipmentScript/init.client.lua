@@ -162,7 +162,6 @@ function equip(equipPacket, toolWelds)
 	else
 		Debugger:Warn("Item (",id,") does not exist in inventory.");
 	end
-	Debugger:Log("Equip");
 end
 
 function Unequip(unequipPacket)
@@ -232,18 +231,14 @@ function Unequip(unequipPacket)
 			track:Stop();
 		end
 	end
-	
-	Debugger:Log("Unequip ", equipmentItem);
 end
 
 function handleTool(returnPacket)
 	if returnPacket.Unequip then
-		Debugger:Log("Unequip returnPacket",returnPacket);
 		Unequip(returnPacket.Unequip);
 	end
 	
 	if returnPacket.Equip then
-		Debugger:Log("Equip returnPacket",returnPacket);
 		local authSeed = returnPacket.Equip.AuthSeed;
 		
 		if modData.Profile.Cache == nil then modData.Profile.Cache = {}; end

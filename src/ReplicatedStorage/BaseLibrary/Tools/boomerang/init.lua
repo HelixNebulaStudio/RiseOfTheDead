@@ -3,18 +3,20 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local toolPackage = {
 	Type="Melee";
 	Animations=workspace:GetAttribute("IsDev") and {
-		Core={Id=17763509030;};
-		PrimaryAttack={Id=17767638647};
-		Inspect={Id=16923664864;};
-		Charge={Id=17766900927;};
-		Throw={Id=17766919300};
+		Core={Id=17791090952;};
+		PrimaryAttack={Id=17791092107};
+		PrimaryAttack2={Id=17791093356};
+		Inspect={Id=17791095270;};
+		Charge={Id=17791097278;};
+		Throw={Id=17791099691};
 		
 	} or {
-		Core={Id=17763509030;};
-		PrimaryAttack={Id=17767638647}; --17763711056
-		Inspect={Id=16923664864;};
-		Charge={Id=17766900927;};
-		Throw={Id=17766919300};
+		Core={Id=17791090952;};
+		PrimaryAttack={Id=17791092107};
+		PrimaryAttack2={Id=17791093356};
+		Inspect={Id=17791095270;};
+		Charge={Id=17791097278;};
+		Throw={Id=17791099691};
 		
 	};
 	Audio={
@@ -38,7 +40,7 @@ function toolPackage.NewToolLib(handler)
 		BaseDamage=500;
 
 		PrimaryAttackSpeed=0.45;
-		PrimaryAttackAnimationSpeed=1;
+		--PrimaryAttackAnimationSpeed=1;
 
 		HitRange=6;
 		WaistRotation=math.rad(0);

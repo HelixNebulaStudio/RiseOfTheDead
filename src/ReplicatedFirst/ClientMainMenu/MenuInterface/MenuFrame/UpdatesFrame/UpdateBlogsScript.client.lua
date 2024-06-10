@@ -1,3 +1,4 @@
+while shared.ReviveEngineLoaded ~= true do task.wait() end;
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local HttpService = game:GetService("HttpService");

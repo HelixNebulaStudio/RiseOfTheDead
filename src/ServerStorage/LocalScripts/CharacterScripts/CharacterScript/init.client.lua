@@ -44,6 +44,7 @@ local modSpectateManager = require(game.ReplicatedStorage.Library.SpectateManage
 
 local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
+local modBuffer = require(game.ReplicatedStorage.Library.Util.Buffer);
 
 Debugger.AwaitShared("modPlayers");
 local classPlayer = shared.modPlayers.Get(localPlayer);
@@ -110,13 +111,13 @@ local shakeAndZoomVars = { canOverrideShakeAndZoom = true; shakingAndZooming = f
 local mouseEnabled = UserInputService.MouseEnabled;
 local previouslyEquipped, prevCharInteracting = false, false;
 local touchInputVariables = {lastTouch=tick();};
---local originaldata = {NeckC0=CFrame.new(0, 0.834+0.25, 0); RightShoulderC0=CFrame.new(1.24997997, 0.70150870, 0.0607423); RightShoulderC1=CFrame.new(-0.06243264, 0.34678375, -0.02450211); LeftShoulderC0=CFrame.new(-1.249, 0.7015, 0.0607); LeftShoulderC1=CFrame.new(0.0625, 0.3467, -0.0245); WaistC1=CFrame.new(0, -0.904, 0.061); WaistC0=CFrame.new(0, 0.1128, 0.0487); WaistX=0; RightHipC0=CFrame.new(0.5, -0.38, 0.05); LeftHipC0=CFrame.new(-0.5, -0.38, 0.05)}; -- CFrame.new(0, -0.415, 0.06)
---local ShoulderPivot = {Left=CFrame.new(-1.25, 2.089, 0.049); Right=CFrame.new(1.25, 2.089, 0.049)};
 
 local currentThirdPerson = true;
 local xLeftDeltaAddition, xRightDeltaAddition = false, false;
 
 local mathAtan2 = math.atan2; local mathClamp = math.clamp; local newNoise = math.noise; local random = Random.new();
+local deg60 = math.pi/3;
+local deg45 = math.pi/4;
 
 local environmentOnly = {workspace:WaitForChild("Environment"); workspace.Terrain};
 local environmentCollidable = {workspace:FindFirstChild("Environment"); workspace:FindFirstChild("Clips"); workspace:FindFirstChild("Interactables"); workspace:FindFirstChild("Entity"); workspace.Terrain};
@@ -1045,6 +1046,7 @@ local rootPoint = CFrame.new();
 local startChar = game.StarterPlayer:WaitForChild("StarterCharacter");
 local originaldata = {
 	NeckC0=startChar.Head.Neck.C0;
+	NeckC1=startChar.Head.Neck.C1;
 	RightShoulderC0=startChar.RightUpperArm.RightShoulder.C0;
 	RightShoulderC1=startChar.RightUpperArm.RightShoulder.C1;
 	LeftShoulderC0=startChar.LeftUpperArm.LeftShoulder.C0;
@@ -1469,9 +1471,7 @@ local function resetCameraEffects()
 end
 resetCameraEffects();
 
-local steppedSkip = tick();
 RunService.Stepped:Connect(function(total, delta)
-	local stepTick = tick();
 	characterProperties.IsAlive = character:GetAttribute("IsAlive") == true;
 
 	local rootCframe = rootPart.CFrame;
@@ -1632,7 +1632,6 @@ end)
 local lastMovablePos = rootPart.CFrame;
 local unstuckPos = rootPart.CFrame;
 local ragdollActive = true;
-local cameraSubjectUpdateTick;
 
 Cache.LastHeadUnderwater = tick();
 Cache.OneSecTick = tick();
@@ -2059,23 +2058,26 @@ RunService.PreSimulation:Connect(function(step)
 
 	if not characterProperties.IsAlive then return end;
 	
+	local bodyBuffer = buffer.create(10);
+
 	if characterProperties.AllowLerpBody then
 		local lerpS, lerpE = pcall(function()
+			local neckTransform = head.Neck.Transform;
 			local waistTransform = character.UpperTorso.Waist.Transform;
-			local waistC0 = CFrame.Angles(0, 0, 0);
-			local waistC1 = CFrame.Angles(0, 0, 0);
+			local waistC0 = {X=0; Y=0; Z=0;};
+			local waistC1 = {X=0; Y=0; Z=0;};
 
-			local neckCFrameAngles;
 			local cameraDirection = rootPart.CFrame:VectorToObjectSpace(currentCamera.CFrame.lookVector)
-			local radians = mathAtan2(cameraDirection.X, -cameraDirection.Z); 
-			if radians > 2 or radians < -2 then 
-				radians = mathAtan2(cameraDirection.X, cameraDirection.Z) 
+			local camLookYaw = mathAtan2(cameraDirection.X, -cameraDirection.Z); 
+			if camLookYaw > 2 or camLookYaw < -2 then 
+				camLookYaw = mathAtan2(cameraDirection.X, cameraDirection.Z) 
 			end;
+			local neckPitchOffset = -0.2;
 			
 			local waistY = characterProperties.CanMove and characterProperties.Joints.WaistY or 0;
-			local waistX = characterProperties.CanMove and characterProperties.Joints.WaistX or 0;
-			local neckYcompensate = math.rad(waistY > 20 and 20 or waistY*0.333);
-			local waistXcompensate = characterProperties.IsEquipped and math.rad(-50) or 0;
+			-- local waistX = characterProperties.CanMove and characterProperties.Joints.WaistX or 0;
+			-- local neckYcompensate = math.rad(waistY > 20 and 20 or waistY*0.333);
+			-- local waistXcompensate = characterProperties.IsEquipped and math.rad(-50) or 0;
 			
 			local mouseY = (mouseProperties.Y + mouseProperties.YAngOffset);
 			if not characterProperties.CanMove then 
@@ -2107,54 +2109,75 @@ RunService.PreSimulation:Connect(function(step)
 			end
 			
 			if characterProperties.FirstPersonCamera and not characterProperties.CanMove then
-				radians = 0;
+				camLookYaw = 0;
 			end
 			if characterProperties.IsSwimming then
 				mouseY = 0;
 			end
 
-
-			neckCFrameAngles = (characterProperties.IsWounded 
-				and CFrame.Angles(0, 0, mathClamp(-radians, -0.8, 0.8))
-				or CFrame.Angles(0, mathClamp(-radians+waistY-neckYcompensate, -1, 1), 0))
-					* CFrame.Angles(mathClamp(mouseY, -0.4, 0.3) + 0.15, 0, 0);
+			-- neckCFrameAngles = (characterProperties.IsWounded and CFrame.Angles(0, 0, mathClamp(-camLookYaw, -0.8, 0.8))
+			-- 	or CFrame.Angles(0, mathClamp(-camLookYaw+waistY-neckYcompensate, -1, 1), 0))
+			-- 		* CFrame.Angles(mathClamp(mouseY, -0.4, 0.3) + 0.15, 0, 0);
 			
 			if characterProperties.IsRagdoll and not Cache.AntiGravityForce then
 				-- ragdolling
-				waistC1 = CFrame.Angles(0, 0, 0);
 				
 			elseif characterProperties.IsWounded then
 				-- crawling
-				waistC1 = CFrame.Angles(0, 0, 0);
 				
 			elseif characterProperties.IsSliding then
 				-- sliding
-				waistC1 = CFrame.Angles(0, waistY, 0) * CFrame.Angles(mathClamp(waistX, -0.87, 0.87), 0, 0);
+				--* CFrame.Angles(mathClamp(waistX, -0.87, 0.87), 0, 0)
+				--waistC1 = CFrame.Angles(0, waistY, 0) * CFrame.Angles(deg60, 0, 0);
+				waistC1.X = deg60;
+				waistC1.Y = waistY;
+				waistTransform = CFrame.new();
 				
 			elseif characterProperties.IsCrouching then
 				-- crouching
-				waistC1 = CFrame.Angles(0, waistY, 0);
-					--* CFrame.Angles(mathClamp(-mouseY, -0.5, 0.5)+mathClamp(waistX, -0.87, 0.87)+waistXcompensate, 0, 0);
-				waistC0 = CFrame.Angles(mathClamp(mouseY, -0.7, 0.7), 0, 0);
+				--waistC1 = CFrame.Angles(0, waistY, 0) * CFrame.Angles(characterProperties.IsEquipped and 0 or deg45, 0, 0);
+					-- --* CFrame.Angles(mathClamp(-mouseY, -0.5, 0.5)+mathClamp(waistX, -0.87, 0.87)+waistXcompensate, 0, 0);
+				--waistC0 = CFrame.Angles(mathClamp(mouseY, -0.7, 0.7), 0, 0);
+
+				waistC1.X = characterProperties.IsEquipped and 0 or deg45;
+				waistC1.Y = waistY;
+
+				waistC0.X = mathClamp(mouseY, -0.7, 0.7);
+
+				waistTransform = CFrame.new();
+				neckPitchOffset = characterProperties.IsEquipped and 0 or -deg45;
+
 
 			else 
 				-- idle
-				waistC1 = CFrame.Angles(0, waistY, 0)
-					--* CFrame.Angles(mathClamp(-mouseY, -0.6, 1.1)+mathClamp(waistX-0.1, -0.87, 0.87), 0, 0);
-				waistC0 = CFrame.Angles(mathClamp(mouseY, -1, 1.1), 0, 0);
+				-- waistC1 = CFrame.Angles(0, waistY, 0)
+				-- 	--* CFrame.Angles(mathClamp(-mouseY, -0.6, 1.1)+mathClamp(waistX-0.1, -0.87, 0.87), 0, 0);
+				-- waistC0 = CFrame.Angles(mathClamp(mouseY, -1, 1.1), 0, 0);
+
+				waistC1.Y = waistY;
+				waistC0.X = mathClamp(mouseY, -1, 1.1)
 
 			end
 			if humanoid.PlatformStand == true then
-				waistC1 = CFrame.Angles(0, waistY, 0);
+				--waistC1 = CFrame.Angles(0, waistY, 0);
+				waistC1.Y = waistY;
 			end
 			-- WaistY = Left/Right
 			-- WaistX = Front/Back
 			
+			local waistC0Cf = CFrame.Angles(waistC0.X, 0, 0);
+			local waistC1Cf = CFrame.Angles(0, waistC1.Y, 0) * CFrame.Angles(waistC1.X, 0, 0);
+
+			buffer.writei16(bodyBuffer, 0, math.round(waistC0.X*100));
+			buffer.writei16(bodyBuffer, 2, math.round(waistC1.Y*100));
+			buffer.writei16(bodyBuffer, 4, math.round(waistC1.X*100));
+			
 			if character.UpperTorso.Waist then
 				if characterProperties.FirstPersonCamera and not characterProperties.IsRagdoll then
 					-- First Person & not ragdoll
-					prevdata.WaistC1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1, 0.1);
-					
+					--prevdata.WaistC1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1, 0.1);
+					prevdata.WaistC1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1Cf, 0.1);
+
 					local viewModelHeight = modMath.Lerp(prevViewModelHeight, characterProperties.IsSliding and 2.1 or characterProperties.IsCrouching and 1.1 or -0.4, 0.15);
 					prevViewModelHeight = viewModelHeight;
 					
@@ -2165,27 +2188,49 @@ RunService.PreSimulation:Connect(function(step)
 						character.UpperTorso.Waist.C1 = waistToCamCFrame;
 						
 					else
-						character.UpperTorso.Waist.C1 = waistToCamCFrame * CFrame.Angles(0, waistY, 0) * CFrame.Angles(-mathClamp(mouseY, -1, 1.5), 0, 0);
-						
+						-- waistToCamCFrame * CFrame.Angles(0, waistY, 0) * CFrame.Angles(-mathClamp(mouseY, -1, 1.5), 0, 0);
+						character.UpperTorso.Waist.C1 = waistToCamCFrame * waistC1Cf;
+						character.UpperTorso.Waist.Transform = waistC0Cf;
+
 					end
 					
 				else
 					-- Third Person Mode
 
 					-- Apply C1
-					character.UpperTorso.Waist.C1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1, 0.1);
+					--character.UpperTorso.Waist.C1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1, 0.1);
+					character.UpperTorso.Waist.C1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1Cf, 0.1);
 					prevdata.WaistC1 = character.UpperTorso.Waist.C1;
 					
 					-- Apply C0
-					Cache.WaistRotation = (Cache.WaistRotation or waistC0):Lerp(waistC0, 0.1);
-					character.UpperTorso.Waist.Transform = waistTransform * Cache.WaistRotation;
+					--Cache.WaistC0 = (Cache.WaistC0 or waistC0):Lerp(waistC0, 0.1);
+					Cache.WaistC0 = (Cache.WaistC0 or waistC0Cf):Lerp(waistC0Cf, 0.1);
+					character.UpperTorso.Waist.Transform = waistTransform * Cache.WaistC0;
 
 				end
 			end
 			
-			if neckCFrameAngles ~= nil and character.Head then
-				head.Neck.C0 = prevdata.NeckC0:lerp(CFrame.new(originaldata.NeckC0.p) * neckCFrameAngles, 0.1);
-				prevdata.NeckC0 = head.Neck.C0;
+			local neckC0 = {X=0; Y=0; Z=0;};
+			local neckC1 = {X=0; Y=0; Z=0;};
+
+			neckC0.Y = math.clamp(-camLookYaw +waistY, -1, 1);
+			neckC1.X = math.clamp(-mouseY, -0.5, 0.4) + neckPitchOffset;
+
+			local neckC0Cf = CFrame.Angles(0, neckC0.Y, 0);
+			local neckC1Cf = CFrame.Angles(neckC1.X, 0, 0);
+			
+			buffer.writei16(bodyBuffer, 6, math.round(neckC0.Y*100));
+			buffer.writei16(bodyBuffer, 8, math.round(neckC1.X*100));
+
+			if character.Head then
+				-- Apply C1
+				head.Neck.C1 = prevdata.NeckC1:lerp(CFrame.new(originaldata.NeckC1.p) * neckC1Cf, 0.1);
+				prevdata.NeckC1 = head.Neck.C1;
+
+				-- Apply C0
+				Cache.NeckC0 = (Cache.NeckC0 or neckC0Cf):Lerp(neckC0Cf, 0.1);
+				head.Neck.Transform = neckTransform * Cache.NeckC0;
+				
 			end
 		end)
 
@@ -2200,6 +2245,7 @@ RunService.PreSimulation:Connect(function(step)
 		end
 	end
 	
+
 	if (beatTick-motorUpdateCooldown) > 0.5 and characterProperties.IsAlive then
 		motorUpdateCooldown = beatTick;
 		
@@ -2210,24 +2256,27 @@ RunService.PreSimulation:Connect(function(step)
 			newLowestFps = tickFps;
 		end
 		Cache.AvgFps = math.round(((Cache.AvgFps or tickFps) + tickFps)/2);
-		
+	
 		remoteCharacterRemote:FireServer(1, {
-			Waist={
-				Motor=upperTorso.Waist;
-				Position=originaldata.WaistC1;
-				Properties={
-					C1 = prevdata.WaistC1;
-				}
-			};
-			Neck={
-				Motor=head.Neck;
-				Position=originaldata.NeckC0;
-				Properties={
-					C0 = prevdata.NeckC0;
-				}
-			};
+			-- Waist={
+			-- 	Motor=upperTorso.Waist;
+			-- 	-- Position=originaldata.WaistC1;
+			-- 	-- Properties={
+			-- 	-- 	C1 = prevdata.WaistC1;
+			-- 	-- };
+			-- 	--B=modBuffer.newMotorToBuffer(upperTorso.Waist, true);
+			-- };
+			-- Neck={
+			-- 	Motor=head.Neck;
+			-- 	-- Position=originaldata.NeckC0;
+			-- 	-- Properties={
+			-- 	-- 	C0 = prevdata.NeckC0;
+			-- 	-- };
+			-- 	--B=modBuffer.newMotorToBuffer(head.Neck, true);
+			-- };
 			LowestFps=newLowestFps;
 			AvgFps=Cache.AvgFps;
+			B=bodyBuffer;
 		})
 	end
 	

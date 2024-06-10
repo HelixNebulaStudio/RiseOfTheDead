@@ -48,6 +48,7 @@ local modTableManager = require(game.ReplicatedStorage.Library.TableManager);
 local modBitFlags = require(game.ReplicatedStorage.Library.BitFlags);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
+local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 
 local FirebaseService = Debugger:Require(game.ServerScriptService.ServerLibrary.FirebaseService);
 local modGameSave = Debugger:Require(game.ServerScriptService.ServerLibrary.GameSave);
@@ -258,6 +259,8 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 		profile.TrustTable = {};
 		profile.OnlineStreak = 0;
 		
+		--== 
+		profile.CustomizationData = modCustomizationData.new(player);
 		
 		profile.Purchases = {};
 		profile.ColorPacks = {Dull=true;};
@@ -928,6 +931,9 @@ function Profile:Load(loadOverwrite)
 			elseif key == "PseudoRandom" then
 				self[key]:Load(data);
 				
+			elseif key == "CustomizationData" then
+				self[key]:Load(data);
+
 			elseif key == "Settings" then
 				for k, v in pairs(data) do
 					if modSettings[k] then

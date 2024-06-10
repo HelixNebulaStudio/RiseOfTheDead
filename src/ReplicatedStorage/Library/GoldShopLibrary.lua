@@ -1579,6 +1579,15 @@ GoldShopLibrary.Products:Add{
 	Trader={Buy=true; Sell=true;};
 };
 
+GoldShopLibrary.Products:Add{
+	Id="boomerang";
+	Product={
+		Type="Gold";
+		Price=4990;
+		ItemId="boomerang";
+		New=true;
+	};
+};
 
 --=== CONTENT PAGES
 
@@ -1709,6 +1718,7 @@ GoldShopLibrary.Pages = {
 	};
 	
 	NewItems = {
+		-- {Type="Product"; Id="boomerang"};
 		{Type="Product"; Id="apron"};
 		{Type="Product"; Id="bluntknockoutmod"};
 		{Type="Product"; Id="portableautoturret"};

@@ -74,6 +74,88 @@ function RemotesManager:Record(remoteName, callType, data)
 	end)
 end
 
+
+function RemotesManager:NewUnreliableEventRemote(instanceOrName)
+	local remoteName = type(instanceOrName) == "string" and instanceOrName or instanceOrName.Name;
+	if self.Remotes[remoteName] then
+		Debugger:Warn("Remote (",remoteName,") already exist.");
+		return self.Remotes[remoteName];
+	end
+	local remoteInstance: UnreliableRemoteEvent = type(instanceOrName) == "userdata" and instanceOrName or Instance.new("UnreliableRemoteEvent");
+	remoteInstance.Name = remoteName;
+
+	
+	local remote = {Remote=remoteInstance; DebounceInterval=0; DebounceList={}; Deprecated=false;};
+	local meta = {};
+	
+	if RunService:IsServer() then
+		remoteInstance.OnServerEvent:Connect(function(player, ...)
+			local param = {...};
+			
+			if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> OnServerEvent. (",...,")"); end;
+			RemotesManager:Record(remote.Remote.Name, "OnServerEvent", param);
+		end)
+	else
+		remoteInstance.OnClientEvent:Connect(function(...)
+			if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> OnClientEvent. (",...,")"); end;
+			RemotesManager:Record(remote.Remote.Name, "OnClientEvent", {...});
+		end)
+	end
+	
+	function meta.__index(t, k)
+		if k:lower() == "fireserver" then
+			return function(remoteTable, ...)
+				if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> Fired Server. (",...,")"); end;
+				RemotesManager:Record(remote.Remote.Name, "FireServer", {...});
+				if remote.Deprecated then
+					Debugger:Warn(remote.Remote.Name..">> Deprecated trace:", debug.traceback());
+				end
+				
+				remote.Remote:FireServer(...);
+			end
+		elseif k:lower() == "fireclient" then
+			return function(remoteTable, ...)
+				if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> Fired Client. (",...,")"); end;
+				RemotesManager:Record(remote.Remote.Name, "FireClient", {...});
+				if remote.Deprecated then
+					Debugger:Warn(remote.Remote.Name..">> Deprecated trace:", debug.traceback());
+				end
+				
+				remote.Remote:FireClient(...);
+			end
+		elseif k:lower() == "fireallclients" then
+			return function(remoteTable, ...)
+				if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> Fired All Client. (",...,")"); end;
+				RemotesManager:Record(remote.Remote.Name, "FireAllClients", {...});
+				if remote.Deprecated then
+					Debugger:Warn(remote.Remote.Name..">> Deprecated trace:", debug.traceback());
+				end
+				
+				remote.Remote:FireAllClients(...);
+			end
+		end
+		return meta[k] or remote.Remote[k];
+	end;
+	
+	function meta:Debounce(player, resetDebounce)
+		local playerName = player and player.Name or "nil";
+		if remote.DebounceList[playerName] and tick()-remote.DebounceList[playerName] < remote.DebounceInterval then
+			return true;
+		end
+		if resetDebounce == true then
+			remote.DebounceList[playerName] = nil;
+		else
+			remote.DebounceList[playerName] = tick();
+		end
+		return false;
+	end
+
+	self.Remotes[remoteName] = setmetatable(remote, meta);
+	remote.Remote.Parent = script;
+	
+	return remote;
+end
+
 export type EventRemote = {
 };
 
@@ -277,7 +359,7 @@ function RemotesManager:NewFunctionRemote(remoteInstance, debounceInterval)
 	return remote;
 end
 
-function RemotesManager:Get(name) : EventRemote | FunctionRemote
+function RemotesManager:Get(name) : EventRemote | FunctionRemote | UnreliableRemoteEvent
 	if not isRemotesReady then bindWaitForRemotesReady:Wait(); end;
 	
 	local function get()
@@ -442,6 +524,9 @@ if RunService:IsClient() then
 		elseif obj:IsA("RemoteFunction") then
 			RemotesManager:NewFunctionRemote(obj);
 			
+		elseif obj:IsA("UnreliableRemoteEvent") then
+			RemotesManager:NewUnreliableEventRemote(obj);
+
 		elseif obj:IsA("BoolValue") then
 			RemotesManager:NewEventBridge(obj.Name);
 			
@@ -490,7 +575,7 @@ else
 	RemotesManager:NewEventBridge("EventService");
 
 	--== Game;
-	RemotesManager:NewEventRemote("CharacterRemote").Secure = true;
+	RemotesManager:NewUnreliableEventRemote("CharacterRemote");
 	RemotesManager:NewFunctionRemote("ToolHandler", 0.1);
 	RemotesManager:NewEventRemote("NotifyPlayer");
 	RemotesManager:NewEventRemote("DamagePacket");

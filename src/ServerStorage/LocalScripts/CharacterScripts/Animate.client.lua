@@ -49,8 +49,8 @@ local animTable = {}
 local animNames = { 
 	idle = 	{	
 		
-				{ id = "http://www.roblox.com/asset/?id=507766666", weight = 1 },
-				{ id = "http://www.roblox.com/asset/?id=507766951", weight = 1 },
+				-- { id = "http://www.roblox.com/asset/?id=507766666", weight = 1 },
+				-- { id = "http://www.roblox.com/asset/?id=507766951", weight = 1 },
 				{ id = "http://www.roblox.com/asset/?id=12978286216", weight = 9 } --507766388
 			},
 	walk = 	{ 	

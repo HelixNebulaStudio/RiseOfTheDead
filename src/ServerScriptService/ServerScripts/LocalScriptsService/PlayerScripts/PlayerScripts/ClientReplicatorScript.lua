@@ -3,15 +3,12 @@ return function()
 	--== Configuration;
 	
 	--== Variables;
-	local RunService = game:GetService("RunService");
 	local TweenService = game:GetService("TweenService");
-	local CollectionService = game:GetService("CollectionService");
 	
 	local localPlayer = game.Players.LocalPlayer;
 	local camera = workspace.CurrentCamera;
 	
 	local modRemotesManager = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("RemotesManager"));
-	local dirRemotes = game.ReplicatedStorage.Remotes;
 	local remotePrimaryFire = modRemotesManager:Get("PrimaryFire");
 	local remoteInstrumentRemote = modRemotesManager:Get("InstrumentRemote");
 	local remoteCharacterRemote = modRemotesManager:Get("CharacterRemote");
@@ -19,22 +16,17 @@ return function()
 	local weaponsLibrary = game.ReplicatedStorage.Library.Weapons;
 	local weaponsMechanicsModule = game.ReplicatedStorage.Library.WeaponsMechanics;
 	
-	local modData = require(localPlayer:WaitForChild("DataModule"));
+	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	local modAudio = require(game.ReplicatedStorage.Library.Audio);
 	local modWeaponsLibrary = require(weaponsLibrary);
 	local modWeaponMechanics = require(weaponsMechanicsModule);
-	local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
+	local _modProjectile = require(game.ReplicatedStorage.Library.Projectile);
 	local modAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
-	local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 	local modArcParticles = require(game.ReplicatedStorage.Particles.ArcParticles);
 	local modInstrument = require(game.ReplicatedStorage.Library.InstrumentModule);
 	
-	local muzzleEffect = weaponsMechanicsModule.MuzzleFlash:Clone();
-	local tracerEffect = weaponsMechanicsModule.BulletTracer:Clone();
-	
-	local weaponReplications = {};
-	
-	local random = Random.new();
+	local modBuffer = require(game.ReplicatedStorage.Library.Util.Buffer);
+
 	--== Script;
 	local function replicatePrimaryFire(weaponItemId, weapon, data, skipAudio)
 		if weapon == nil then return end;
@@ -76,14 +68,14 @@ return function()
 							local originP = data.TargetPoints[a]-(targetDir*0.1);
 							local raycastResult = workspace:Raycast(originP, targetDir, raycastParams);
 							
-							local rayBasePart, rayPoint, rayNormal, rayMaterial;
+							local rayBasePart, rayPoint, rayNormal, _rayMaterial;
 							if raycastResult then
 								rayBasePart = raycastResult.Instance;
 								rayPoint = raycastResult.Position;
 								rayNormal = raycastResult.Normal;
-								rayMaterial = raycastResult.Material;
+								_rayMaterial = raycastResult.Material;
 								
-								modWeaponMechanics.CreateBulletHole(rayBasePart, rayPoint, rayNormal, camera);
+								modWeaponMechanics.CreateBulletHole(rayBasePart, rayPoint, rayNormal);
 							end
 						end; 
 					end
@@ -92,7 +84,7 @@ return function()
 					modWeaponMechanics.CreateMuzzle(muzzleOrigin, bulletOrigin, data.TargetPoints and #data.TargetPoints or 1);
 				end;
 			elseif weaponConfigurations.BulletMode == modAttributes.BulletModes.Projectile then
-				local projectile = data;
+				local _projectile = data;
 				if audio.PrimaryFire.Looped then
 					
 				else
@@ -208,28 +200,74 @@ return function()
 		if character == nil then return end;
 		
 		if action == 1 then -- 1 updatebodymotors
-			local joints = typeof(paramPacket) == "table" and paramPacket or {};
 
-			local jointsList = {"Waist"; "Neck"};
+			if paramPacket.B and typeof(paramPacket.B) == "buffer" then
+				local waistC0X = buffer.readi16(paramPacket.B, 0)/100;
+				local waistC1Y = buffer.readi16(paramPacket.B, 2)/100;
+				local waistC1X = buffer.readi16(paramPacket.B, 4)/100;
 
-			for _, key in pairs(jointsList) do
-				if joints[key] then
-					local data = joints[key];
-					local motor = data.Motor;
-					if motor ~= nil and motor:IsDescendantOf(character) and motor.Name == key then
-						local properties = {};
-						if data.Properties.C1 then
-							properties.C1 = CFrame.new(motor.C1.Position) * data.Properties.C1.Rotation;
-						end
-						if data.Properties.C0 then
-							properties.C0 = CFrame.new(motor.C0.Position) * data.Properties.C0.Rotation;
-						end
-						
-						local tween = TweenService:Create(motor, TweenInfo.new(0.6), properties);
-						tween:Play();
-					end
+				local waistMotor = character:FindFirstChild("Waist", true);
+				if waistMotor and waistMotor:IsA("Motor6D") then
+					local properties = {
+						C0 = CFrame.new(waistMotor.C0.Position) * CFrame.Angles(waistC0X, 0, 0);
+						C1 = CFrame.new(waistMotor.C1.Position) * CFrame.Angles(0, waistC1Y, 0) * CFrame.Angles(waistC1X, 0, 0);
+					};
+
+					TweenService:Create(waistMotor, TweenInfo.new(0.6), properties):Play();
+				end
+
+				local neckC0Y = buffer.readi16(paramPacket.B, 6)/100;
+				local neckC1X = buffer.readi16(paramPacket.B, 8)/100;
+
+				local neckMotor = character:FindFirstChild("Neck", true);
+				if neckMotor and neckMotor:IsA("Motor6D") then
+					local properties = {
+						C0 = CFrame.new(neckMotor.C0.Position) * CFrame.Angles(0, neckC0Y, 0);
+						C1 = CFrame.new(neckMotor.C1.Position) * CFrame.Angles(neckC1X, 0, 0);
+					};
+
+					TweenService:Create(neckMotor, TweenInfo.new(0.6), properties):Play();
 				end
 			end
+
+			-- local joints = typeof(paramPacket) == "table" and paramPacket or {};
+
+			-- local jointsList = {"Waist"; "Neck"};
+
+			-- for _, key in pairs(jointsList) do
+			-- 	if joints[key] then
+			-- 		local data = joints[key];
+			-- 		local motor = data.Motor;
+			-- 		if motor ~= nil and character:IsAncestorOf(motor) and motor.Name == key then
+			-- 			-- local properties = {};
+			-- 			-- if data.Properties.C1 then
+			-- 			-- 	properties.C1 = CFrame.new(motor.C1.Position) * data.Properties.C1.Rotation;
+			-- 			-- end
+			-- 			-- if data.Properties.C0 then
+			-- 			-- 	properties.C0 = CFrame.new(motor.C0.Position) * data.Properties.C0.Rotation;
+			-- 			-- end
+						
+			-- 			-- local tween = TweenService:Create(motor, TweenInfo.new(0.6), properties);
+			-- 			-- tween:Play();
+
+			-- 			if data.B then
+			-- 				local motorValues = modBuffer.readMotorBuffer(data.B);
+			-- 				local c0X, c0Y, c0Z = motorValues.C0:ToOrientation();
+			-- 				Debugger:StudioWarn(motor, "motorValues C0", c0X, c0Y, c0Z, "C1", motorValues.C1:ToOrientation());
+
+			-- 				local properties = {
+			-- 					Transform = motorValues.C0;
+			-- 					C1 = CFrame.new(motor.C1.Position) * motorValues.C1;
+			-- 				};
+
+			-- 				local tween = TweenService:Create(motor, TweenInfo.new(0.6), properties);
+			-- 				tween:Play();
+			-- 				-- motor.Transform = motorValues.C0;
+			-- 				-- motor.C1 = CFrame.new(motor.C1.Position) * motorValues.C1;
+			-- 			end
+			-- 		end
+			-- 	end
+			-- end
 		end
 	end)
 	

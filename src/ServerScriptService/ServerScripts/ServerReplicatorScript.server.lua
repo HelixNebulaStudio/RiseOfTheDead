@@ -92,12 +92,14 @@ remoteCharacterRemote.OnServerEvent:Connect(function(player, action, paramPacket
 		
 		if paramPacket.LowestFps then
 			classPlayer.LowestFps = math.clamp(tonumber(paramPacket.LowestFps) :: number, 1, 999);
+			paramPacket.LowestFps = nil;
 		end
 		if paramPacket.AvgFps then
 			classPlayer.AverageFps = math.clamp(paramPacket.AvgFps, 1, 999);
+			paramPacket.AvgFps = nil;
 		end
 
-
+		-- broadcast paramPacket;
 		for _, oPlayer in pairs(game.Players:GetPlayers()) do
 			if oPlayer ~= player then
 				local distance = modPlayers.GetPlayerToPlayerDistanceCache(player, oPlayer);
@@ -110,24 +112,17 @@ remoteCharacterRemote.OnServerEvent:Connect(function(player, action, paramPacket
 			end
 		end
 		
-		local joints = typeof(paramPacket) == "table" and paramPacket or {};
-		
-		if classPlayer.Mount then
-			if classPlayer.Mount.Passenger then
+		if paramPacket.B and typeof(paramPacket.B) == "buffer" then
+			local waistC1X = buffer.readi16(paramPacket.B, 4) /100;
+
+			if classPlayer.Mount and classPlayer.Mount.Passenger then
 				for passChar, info in pairs(classPlayer.Mount.Passenger) do
-					if info.Waist and joints.Waist then
+					if info.Waist then
 						local motor = info.Waist;
-						local data = joints.Waist;
 						
-						local properties = {};
-						if data.Properties.C1 then
-							local angX, angY, angZ = data.Properties.C1:ToEulerAnglesXYZ();
-							properties.C1 = CFrame.new(motor.C1.Position) * CFrame.Angles(angX+math.rad(-5), 0, 0);
-						end
-						--if data.Properties.C0 then
-						--	local angX, angY, angZ = data.Properties.C1:ToEulerAnglesXYZ();
-						--	properties.C0 = CFrame.new(motor.C0.Position) * CFrame.Angles(angX, 0, 0);
-						--end
+						local properties = {
+							C1 = CFrame.new(motor.C1.Position) * CFrame.Angles(waistC1X + math.rad(-5), 0, 0);
+						};
 						
 						local tween = TweenService:Create(info.Waist, TweenInfo.new(0.6), properties);
 						tween:Play();
@@ -135,6 +130,26 @@ remoteCharacterRemote.OnServerEvent:Connect(function(player, action, paramPacket
 				end
 			end
 		end
+
+		-- local joints = typeof(paramPacket) == "table" and paramPacket or {};
+		
+		-- if classPlayer.Mount and classPlayer.Mount.Passenger then
+		-- 	for passChar, info in pairs(classPlayer.Mount.Passenger) do
+		-- 		if info.Waist and joints.Waist then
+		-- 			local motor = info.Waist;
+		-- 			local data = joints.Waist;
+					
+		-- 			local properties = {};
+		-- 			if data.Properties.C1 then
+		-- 				local angX, angY, angZ = data.Properties.C1:ToEulerAnglesXYZ();
+		-- 				properties.C1 = CFrame.new(motor.C1.Position) * CFrame.Angles(angX+math.rad(-5), 0, 0);
+		-- 			end
+					
+		-- 			local tween = TweenService:Create(info.Waist, TweenInfo.new(0.6), properties);
+		-- 			tween:Play();
+		-- 		end
+		-- 	end
+		-- end
 		
 	elseif action == 2 then
 		local platformModel, groundPart = unpack(paramPacket);

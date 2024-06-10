@@ -130,7 +130,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 			animations[key].Priority = Enum.AnimationPriority.Action2;
 		end
 	end;
-	animations["Core"]:Play(0);
+	animations["Core"]:Play(0.5);
 	
 	characterProperties.HideCrosshair = false;
 	if toolConfig.UseViewmodel == false then
@@ -192,10 +192,10 @@ function ToolHandler:Equip(storageItem, toolModels)
 	end
 
 	table.insert(Equipped.Connections, animations["PrimaryAttack"]:GetMarkerReachedSignal("SetWaist"):Connect(setWaistMarker));
-	table.insert(Equipped.Connections, animations["PrimaryAttack"]:GetMarkerReachedSignal("SetWaistX"):Connect(setWaistMarker));
+	--table.insert(Equipped.Connections, animations["PrimaryAttack"]:GetMarkerReachedSignal("SetWaistX"):Connect(setWaistMarker));
 	if animations["PrimaryAttack2"] then
 		table.insert(Equipped.Connections, animations["PrimaryAttack2"]:GetMarkerReachedSignal("SetWaist"):Connect(setWaistMarker));
-		table.insert(Equipped.Connections, animations["PrimaryAttack2"]:GetMarkerReachedSignal("SetWaistX"):Connect(setWaistMarker));
+		--table.insert(Equipped.Connections, animations["PrimaryAttack2"]:GetMarkerReachedSignal("SetWaistX"):Connect(setWaistMarker));
 	end;
 	-- OLD
 	table.insert(Equipped.Connections, animations["PrimaryAttack"].KeyframeReached:Connect(onKeyFrameReached));
@@ -315,14 +315,18 @@ function ToolHandler:Equip(storageItem, toolModels)
 				if animations["PrimaryAttack2"] and math.random(1, 2) == 1 then
 					animations["PrimaryAttack2"]:Play(0);
 					animations["PrimaryAttack2"]:AdjustWeight(1,0);
-					animations["PrimaryAttack2"]:AdjustSpeed(animations["PrimaryAttack2"].Length / configurations.PrimaryAttackAnimationSpeed);
+					if configurations.PrimaryAttackAnimationSpeed then
+						animations["PrimaryAttack2"]:AdjustSpeed(animations["PrimaryAttack2"].Length / configurations.PrimaryAttackAnimationSpeed);
+					end
 					
 					return;
 				end
 				
 				animations["PrimaryAttack"]:Play(0);
 				animations["PrimaryAttack"]:AdjustWeight(1,0);
-				animations["PrimaryAttack"]:AdjustSpeed(animations["PrimaryAttack"].Length / configurations.PrimaryAttackAnimationSpeed);
+				if configurations.PrimaryAttackAnimationSpeed then
+					animations["PrimaryAttack"]:AdjustSpeed(animations["PrimaryAttack"].Length / configurations.PrimaryAttackAnimationSpeed);
+				end
 				
 			end
 			
@@ -783,16 +787,16 @@ function ToolHandler:Equip(storageItem, toolModels)
 		
 		if toolConfig.RoleplayStateWindow then
 			if animations["RoleplayCore"] then
-				animations["RoleplayCore"]:Play(0);
-				animations["Core"]:Stop(0);
+				animations["RoleplayCore"]:Play(0.5);
+				animations["Core"]:Stop(0.5);
 
 				task.spawn(function()
 					repeat task.wait(0.3) until not equipped or not modInterface:IsVisible(toolConfig.RoleplayStateWindow);
 					
 					if animations["RoleplayCore"] then
-						animations["RoleplayCore"]:Stop(0);
+						animations["RoleplayCore"]:Stop(0.5);
 					end
-					animations["Core"]:Play(0);
+					animations["Core"]:Play(0.5);
 				end)
 			end
 		end
