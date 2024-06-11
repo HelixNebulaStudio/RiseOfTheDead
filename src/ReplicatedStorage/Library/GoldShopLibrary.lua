@@ -1528,7 +1528,7 @@ GoldShopLibrary.Products:Add{
 	};
 	LimitedId="gs_abandonedbunkermap";
 
-	Trader={Buy=true; Sell=true;};
+	--Trader={Buy=true; Sell=true;};
 };
 
 GoldShopLibrary.Products:Add{

@@ -39,7 +39,7 @@ function Interface.init(modInterface)
 		local classPlayer = shared.modPlayers.Get(localplayer);
 		local playerCFrame = classPlayer:GetCFrame();
 		
-		local pivot : CFrame = playerCFrame:ToObjectSpace(CFrame.new(dmgPos));
+		local pivot : CFrame = dmgPos and playerCFrame:ToObjectSpace(CFrame.new(dmgPos)) or -Vector3.yAxis;
 		local dirRad = math.atan2(pivot.X, -pivot.Z);
 		
 		
@@ -95,7 +95,8 @@ function Interface.init(modInterface)
 		if dmgPos == nil then
 			local dealer = damageSource.Dealer;
 			if dealer == nil then return end;
-			
+			if typeof(dealer) ~= "Instance" then return end;
+
 			if dealer:IsA("Player") then
 				local model = dealer.Character;
 				dmgPos = model:GetPivot().Position;

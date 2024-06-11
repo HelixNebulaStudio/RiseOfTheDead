@@ -21,9 +21,21 @@ function Zombie.new(self)
 
 		self.NextTarget = function()
 			for a=#self.Enemies, 1, -1  do
-				if self.Enemies[a].Humanoid and self.Enemies[a].Humanoid.Health <= 0 then
-					table.remove(self.Enemies, a);
+				local enemy = self.Enemies[a]
+				if enemy.Character and workspace:IsAncestorOf(enemy.Character) then
+					continue;
 				end
+				if enemy.Humanoid and enemy.Humanoid.Health > 0 then
+					continue;
+				end
+				if enemy.Character and enemy.Character:FindFirstChild("NpcStatus") then
+					local npcModule = require(enemy.Character.NpcStatus):GetModule();
+					if npcModule.IsDead ~= true then
+						continue;
+					end
+				end
+				
+				table.remove(self.Enemies, a);
 			end
 			
 			if #self.Enemies <= 0 then self.Target = nil; return end;

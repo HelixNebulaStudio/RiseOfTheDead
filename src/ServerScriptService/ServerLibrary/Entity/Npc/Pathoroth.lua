@@ -318,35 +318,32 @@ return function(npc, spawnPoint)
 		
 		if self.OnTarget then self.OnTarget(character); end
 		
-		local player = game.Players:FindFirstChild(character.Name);
-		
-		if player and damageType ~= "Thorn" then
-			local damagable = modDamagable.NewDamagable(character);
-			if damagable and damagable.HealthObj and damagable.HealthObj.Health > 5 then
-				
-				local newDmgSrc = modDamagable.NewDamageSource{
-					Damage=3;
-					Dealer=self.Prefab;
-					DamageType="Thorn";
-				}
-				damagable:TakeDamagePackage(newDmgSrc); -- damage player;
-				
-				if damagable.Object and damagable.Object.RootPart then
-					modInfoBubbles.Create{
-						Players={player};
-						Position=damagable.Object.RootPart.Position;
-						Type="Status";
-						ValueString="Thorn!";
-					};
+		if character.Name then
+			local player = game.Players:FindFirstChild(character.Name);
+			
+			if player and damageType ~= "Thorn" then
+				local damagable = modDamagable.NewDamagable(character);
+				if damagable and damagable.HealthObj and damagable.HealthObj.Health > 5 then
+					
+					local newDmgSrc = modDamagable.NewDamageSource{
+						Damage=3;
+						Dealer=self.Prefab;
+						DamageType="Thorn";
+					}
+					damagable:TakeDamagePackage(newDmgSrc); -- damage player;
+					
+					if damagable.Object and damagable.Object.RootPart then
+						modInfoBubbles.Create{
+							Players={player};
+							Position=damagable.Object.RootPart.Position;
+							Type="Status";
+							ValueString="Thorn!";
+						};
+					end
 				end
 			end
 		end
-		----if self.MorphTarget and self.MorphTarget.Name == character.Name then
-		----end
-		--if amount > 0 then
-		--else
-		--	Debugger:Warn("Player (",character.Name,") dealt 0 damage with a (",weaponItem.ItemId,")");
-		--end
+		
 	end
 	
 	function self.Update()
