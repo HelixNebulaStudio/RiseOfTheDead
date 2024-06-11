@@ -17,7 +17,7 @@ if RunService:IsServer() then
 	storagePrefabs = game.ReplicatedStorage.Prefabs:WaitForChild("Objects");
 	
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 

@@ -487,7 +487,7 @@ MissionLibrary.New{
 	Checkpoint={
 		{Text="Talk to Mason";};
 		{Text="Follow Mason";};
-		{Text="Enter the factory door";};
+		{Text="Destroy the barricade to enter the factory door";};
 		{Text="Complete the factory raid";};
 		{Text="Talk to Mason";};
 

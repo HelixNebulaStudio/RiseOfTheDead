@@ -298,11 +298,16 @@ function Movement.new(parallelNpc)
 
 		if humanoidAutoRotate then
 			bodyGyro.MaxTorque = Vector3.new(0, 0, 0);
-		else
+
+		elseif self.FacePosition then
 			bodyGyro.MaxTorque = Vector3.new(0, math.huge, 0);
 			bodyGyro.D = bodyGyroD;
 			bodyGyro.P = 15000;
 			bodyGyro.CFrame = CFrame.lookAt(rootPart.Position, self.FacePosition);
+
+		else
+			bodyGyro.MaxTorque = Vector3.new(0, 0, 0);
+			
 		end
 	end)
 

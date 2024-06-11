@@ -24,6 +24,9 @@ local remoteProgressMission = modRemotesManager:Get("ProgressMission");
 local Prefabs = game.ReplicatedStorage.Prefabs:WaitForChild("Objects");
 local missionLibraryScript = game.ReplicatedStorage.Library.MissionLibrary;
 
+local serverPrefabs = game.ServerStorage:WaitForChild("PrefabStorage"):WaitForChild("Objects");
+local blockadeFolder = serverPrefabs:FindFirstChild("DefaultBlockades");
+
 --== Script;
 function OnPlayerAdded(player)
 	local missionProfile; 
@@ -170,11 +173,10 @@ function OnPlayerAdded(player)
 	end
 
 	if modBranchConfigs.IsWorld("TheWarehouse") then
-		local missionFirstRescue, mIndex = missionProfile:Get(6);
-		local barricade;
+		local missionFirstRescue, _mIndex = missionProfile:Get(6);
 		if missionFirstRescue == nil or missionFirstRescue.Type < 3 then
 			
-			barricade = modReplicationManager.GetReplicated(player, "bloxmartBlockage")[1];
+			local barricade = modReplicationManager.GetReplicated(player, "bloxmartBlockage")[1];
 			if barricade == nil then
 				Debugger:Warn("New barracade for "..player.Name);
 				barricade = Prefabs:WaitForChild("bloxmartBlockage"):Clone();
@@ -199,6 +201,28 @@ function OnPlayerAdded(player)
 			end;
 		end
 		
+		local missionFactoryRaid = missionProfile:Get(12);
+		if missionFactoryRaid == nil or (missionFactoryRaid.Type < 3 and missionFactoryRaid.ProgressionPoint < 4) then
+
+			Debugger:Warn("New factory blockade for "..player.Name);
+			
+			local blockade = blockadeFolder.BlockadeSingle:Clone();
+			local hitbox = blockade:WaitForChild("Base"):Clone();
+			hitbox.Size = Vector3.new(7, 11, 2);
+			hitbox.CanCollide = true;
+			hitbox.Parent = blockade;
+			blockade.Name = "FactoryBlockade";
+			blockade:PivotTo(CFrame.new(12.197, 60.155, 177.296) * CFrame.Angles(0, math.rad(90), 0));
+			modReplicationManager.ReplicateIn(player, blockade, workspace.Environment);
+			
+			local destructibleObj = require(blockade:WaitForChild("Destructible"));
+			destructibleObj.Enabled = false;
+			destructibleObj.NetworkOwners = {player};
+			
+			missionFactoryRaid.Cache.Blockade = blockade;
+		end
+
+
 		local jesseModule = modNpc.GetPlayerNpc(player, "Jesse");
 		if jesseModule == nil then
 			modReplicationManager.ReplicateOut(player, modNpc.Spawn("Jesse", nil, function(npc, npcModule)

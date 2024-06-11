@@ -550,6 +550,12 @@ function Interactable.Door(locked, label, premium)
 			interact.Label = nil;
 		end
 		
+		if self.Object and self.Object:FindFirstChild("Blockade") ~= nil then
+			interact.CanInteract = false;
+			interact.Label = "Door's blocked";
+			return;
+		end
+
 		local doorObject = modDoors:GetDoor(self.Object and self.Object.Parent);
 		if doorObject then
 			if not doorObject:HasAccess(player) then

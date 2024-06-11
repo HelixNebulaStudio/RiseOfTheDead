@@ -25,6 +25,7 @@ Dialogues.Mason.Dialogues = function()
 			Face="Confident"; Reply="Great, follow me.."};
 		{Tag="restock_notRefilled"; Dialogue="No"; 
 			Face="Surprise"; Reply="Alright, I'll wait."};
+
 		{Tag="restock_whatsInside"; Dialogue="What's inside?"; 
 			Face="Suspicious"; Reply="Base on the floor plan of the place, it's probably just a couple rooms with machines and crates."};
 		{Tag="restock_areYouGoing"; Dialogue="Are you going in with me?"; 
@@ -68,7 +69,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("restock_notRefilled");
 				
 			elseif stage == 3 or stage == 4 then
-				dialog:SetInitiate("What are you waiting for?");
+				dialog:SetInitiate("What are you waiting for?"..(mission.Cache.Blockade and " Help me destroy the barricade.. I heard you're pretty good at that." or ""));
 				dialog:AddChoice("restock_whatsInside");
 				dialog:AddChoice("restock_areYouGoing");
 				dialog:AddChoice("restock_turnBack");

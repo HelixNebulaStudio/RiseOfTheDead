@@ -4,6 +4,7 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
 
+local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 
@@ -16,7 +17,7 @@ if RunService:IsServer() then
 	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 
@@ -211,6 +212,24 @@ return function(CutsceneSequence)
 						end)
 
 					elseif mission.ProgressionPoint == 3 or mission.ProgressionPoint == 4 then
+
+						if mission.Cache.Blockade then
+							local profile = shared.modProfile:Get(player);
+							local playerSave = profile:GetActiveSave();
+							local playerLevel = playerSave and playerSave:GetStat("Level") or 1;
+							local focusLevel = modGlobalVars.GetLevelToFocus(playerLevel);
+							
+							local maxHealth = focusLevel *100;
+
+							local destructibleObj = require(mission.Cache.Blockade:FindFirstChild("Destructible"));
+							destructibleObj:SetHealth(maxHealth, maxHealth);
+							destructibleObj.Enabled = true;
+							destructibleObj.OnDestroySignal:Connect(function()
+								Debugger:StudioWarn("Factory Blockade destroyed");
+								mission.Cache.Blockade = nil;
+							end)
+						end
+
 						if firstRun then
 							if mission.ProgressionPoint == 4 then
 								masonModule.Actions:Teleport(CFrame.new(18.9, 57.7, 183) * (masonModule.RootPart.CFrame - masonModule.RootPart.CFrame.p));
@@ -230,6 +249,10 @@ return function(CutsceneSequence)
 							masonModule.Move:Face(Vector3.new(26, 58, 179));
 							
 							masonModule.Chat(masonModule.Owner, "Here it is. You first, haha!");
+							task.wait(2);
+							if mission.Cache.Blockade then
+								masonModule.Chat(masonModule.Owner, "Destroy the wooden barricades so we can go in.");
+							end
 							masonModule:ToggleInteractable(true);
 						end
 						
