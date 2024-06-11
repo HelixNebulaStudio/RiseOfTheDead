@@ -158,11 +158,11 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 					local knockbackResistance = 0;
 					if damagable.Object.ClassName == "NpcStatus" then
 						local npcModule = damagable.Object:GetModule();
-						knockbackResistance = npcModule.KnockbackResistant;
+						knockbackResistance = npcModule.KnockbackResistant or 0;
 
 						if params.ExplosionStun then
 							local healthInfo = damagable:GetHealthInfo();
-							if healthInfo.Armor <= 0 and damage > healthInfo.MaxHealth*(params.ExplosionStunThreshold or 0.23) and humanoid and knockbackResistance > 0 then
+							if healthInfo.Armor <= 0 and damage > healthInfo.MaxHealth*(params.ExplosionStunThreshold or 0.23) and humanoid and knockbackResistance < 1 then
 								npcModule.EntityStatus:GetOrDefault("explosionRagdoll", {
 									Ragdoll=true;
 									Expires=tick()+params.ExplosionStun;
