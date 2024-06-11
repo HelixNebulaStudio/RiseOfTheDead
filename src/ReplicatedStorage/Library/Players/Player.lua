@@ -723,19 +723,19 @@ function Player.new(playerInstance: Player)
 			
 		end
 		
-		character:GetAttributeChangedSignal("Ragdoll"):Connect(function()
+		meta.Garbage:Tag(character:GetAttributeChangedSignal("Ragdoll"):Connect(function()
 			classPlayer.CharacterModule.UpdateBodyObjects();
-		end)
+		end))
 		
-		classPlayer.Humanoid.StateChanged:Connect(onStateChanged);
+		meta.Garbage:Tag(classPlayer.Humanoid.StateChanged:Connect(onStateChanged));
 		onStateChanged(Enum.HumanoidStateType.Running, Enum.HumanoidStateType.Running);
 		PlayerService.OnPlayerSpawn:Fire(classPlayer);
 		
 		if RunService:IsClient() then
 			classPlayer:SyncIsAlive();
-			classPlayer.Character:GetAttributeChangedSignal("IsAlive"):Connect(function()
+			meta.Garbage:Tag(classPlayer.Character:GetAttributeChangedSignal("IsAlive"):Connect(function()
 				classPlayer:SyncIsAlive();
-			end)
+			end))
 			
 			if playerInstance == localPlayer then
 				-- Is local client;
@@ -914,15 +914,15 @@ function Player.new(playerInstance: Player)
 		classPlayer.BorrowedTime = nil;
 		
 		-- Connect signals;
-		classPlayer.Humanoid.HealthChanged:Connect(onHealthChangedServer);
-		classPlayer.Humanoid.Seated:Connect(function(active, seatPart)
+		meta.Garbage:Tag(classPlayer.Humanoid.HealthChanged:Connect(onHealthChangedServer));
+		meta.Garbage:Tag(classPlayer.Humanoid.Seated:Connect(function(active, seatPart)
 			if seatPart then
 				local weld = seatPart:FindFirstChild("SeatWeld");
 				if weld then
 					weld.C0 = CFrame.new(0, -1.1, 0) * CFrame.Angles(math.rad(-90), 0, 0);
 				end
 			end
-		end)
+		end))
 		
 		-- Fire events;
 		onHealthChangedServer();
@@ -965,10 +965,10 @@ function Player.new(playerInstance: Player)
 			character:AddTag("PlayerCharacters");
 			modOnGameEvents:Fire("OnPlayerSpawn", playerInstance, character);
 			
-			character.ChildRemoved:Connect(function(child)
+			meta.Garbage:Tag(character.ChildRemoved:Connect(function(child)
 				if child.Name ~= "HumanoidRootPart" then return end;
 				classPlayer:Kill("FallenIntoVoid");
-			end)
+			end))
 
 			if cache.DivingMouthpiece == nil then
 				cache.DivingMouthpiece = game.ReplicatedStorage.Prefabs.Objects.DivingSuitMouthpiece:Clone();
@@ -1495,12 +1495,6 @@ function Player.new(playerInstance: Player)
 	
 	meta.__index = meta;
 	
-	--RunService.Heartbeat:Connect(function()
-	--	Debugger:Display{
-	--		IsAlive=tostring(classPlayer.IsAlive);
-	--	}
-	--end)
-	
 	--== Connections;
 	classPlayer.Died:Connect(function(character)
 		if classPlayer.OnDeathServer then
@@ -1508,14 +1502,14 @@ function Player.new(playerInstance: Player)
 		end
 	end);
 	
-	playerInstance.OnTeleport:Connect(classPlayer.OnPlayerTeleport);
+	meta.Garbage:Tag(playerInstance.OnTeleport:Connect(classPlayer.OnPlayerTeleport));
 	
 	if playerInstance.Character then 
 		task.spawn(function()
 			classPlayer.OnCharacterAdded(playerInstance.Character);
 		end)
 	end;
-	playerInstance.CharacterAdded:Connect(classPlayer.OnCharacterAdded);
+	meta.Garbage:Tag(playerInstance.CharacterAdded:Connect(classPlayer.OnCharacterAdded));
 
 	if moddedSelf then moddedSelf:Init(classPlayer); end
 	
