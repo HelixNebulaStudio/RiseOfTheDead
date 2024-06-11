@@ -105,9 +105,22 @@ function GameMode:Start(room)
 			if focusLevel > highestFocusLevel then
 				highestFocusLevel = focusLevel;
 			end
+			
+			modMission:Progress(player, 7, function(mission)
+				if mission.ProgressionPoint <= 4 then 
+
+				end;
+			end)
 		end
 	end
-	
+	for _, player in pairs(players) do
+		modMission:Progress(player, 7, function(mission)
+			if mission.ProgressionPoint <= 4 and highestFocusLevel > 1 then 
+				highestFocusLevel = 1;
+			end;
+		end)
+	end
+
 	local bossLevel = math.clamp(highestFocusLevel, 1, math.huge);
 	Debugger:Warn("Boss started with level:", bossLevel);
 		
@@ -241,7 +254,7 @@ function GameMode:Start(room)
 					end)
 				end
 				
-				if npcModule.OnDeath then npcModule.OnDeath(players) end;
+				--if npcModule.OnDeath then npcModule.OnDeath(players) end;
 
 				local canRagdoll = npcPrefab:GetAttribute("HasRagdoll") == true;
 				if not canRagdoll then

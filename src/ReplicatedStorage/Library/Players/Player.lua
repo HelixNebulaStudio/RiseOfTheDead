@@ -1445,7 +1445,7 @@ function Player.new(playerInstance: Player)
 		return shared.EquipmentSystem.ToolHandler(playerInstance, "get");
 	end
 	
-	function meta:Destroy(t)
+	function meta:Destroy()
 		if self.StatusCycle then self.StatusCycle:Disconnect(); end
 		
 		self.OnHealthChanged:Destroy();
@@ -1456,6 +1456,12 @@ function Player.new(playerInstance: Player)
 		
 		self.Properties.TemperatureOffset:Destroy();
 		meta.Garbage:Destruct();
+
+		self.Character = nil;
+		self.Humanoid = nil;
+		self.RootPart = nil;
+		self.Head = nil;
+		self.CharacterModule = nil;
 
 		PlayerService.Players[self.Name] = nil;
 	end

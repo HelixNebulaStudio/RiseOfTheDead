@@ -285,5 +285,6 @@ return function(npc, spawnPoint)
 	
 	--== Connections;
 	self.Humanoid.HealthChanged:Connect(self.OnHealthChanged);
+	self.Humanoid.Died:Connect(self.OnDeath);
 	
 return self end

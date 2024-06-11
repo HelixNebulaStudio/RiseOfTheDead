@@ -52,7 +52,7 @@ local statTemplates = {
 		{Category="Configurations"; Tag="Damage"; Text="<b>Damage:</b>    $stat"; Type="3dp"};
 		{Category="Configurations"; Tag="PrimaryAttackSpeed"; Text="<b>Attack Speed:</b>    $stat"; Type="3dp"};
 		{Category="Configurations"; Tag="StaminaCost"; Text="<b>Stamina Cost:</b>    $stat"; Type="2dp"};
-		{Category="Configurations"; Tag="HitRange"; Text="<b>Hit Range:</b>    $stat units"; Type="2dp"};
+		{Category="Configurations"; Tag="HitRange"; Text="<b>Melee Range:</b>    $stat units"; Type="2dp"};
 
 		{Category="Configurations"; Tag="Dps"; Text="<b>DPS:</b>    $stat"; Type="3dp"; OrderOffset=99;};
 		-- Heavy attacks melee;

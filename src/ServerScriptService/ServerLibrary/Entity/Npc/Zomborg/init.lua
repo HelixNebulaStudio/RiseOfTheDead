@@ -283,5 +283,6 @@ return function(npc, spawnPoint)
 	
 	--== Connections;
 	self.Garbage:Tag(self.Humanoid.HealthChanged:Connect(self.OnHealthChanged));
+	self.Humanoid.Died:Connect(self.OnDeath);
 	
 return self end

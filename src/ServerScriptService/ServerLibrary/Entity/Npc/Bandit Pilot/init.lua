@@ -464,7 +464,7 @@ return function(npc, spawnPoint)
 		end
 		
 		self.Garbage:Tag(self.Prefab.Destroying:Connect(despawnHeavyGunmen))
-		self.Garbage:Tag(self.Humanoid.Died:Connect(despawnHeavyGunmen));
+		self.Humanoid.Died:Connect(despawnHeavyGunmen);
 		
 		self.Helicopter.LeftLaunchers = {};
 		self.Helicopter.RightLaunchers = {};
