@@ -429,7 +429,7 @@ function NpcStatusMeta:ApplyImpulseForce(direction, force, impactPosition)
 	local rootPart: BasePart = npcModule.RootPart;
 	if rootPart == nil then return end;
 	
-	local knockbackResistant = (npcModule.KnockbackResistant == true and 1 or npcModule.KnockbackResistant or 0);
+	local knockbackResistant = npcModule.KnockbackResistant or 0;
 	knockbackResistant = 1-math.clamp(knockbackResistant, 0, 1);
 
 	local damageForce = direction * (force or knockbackResistant);

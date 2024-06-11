@@ -155,12 +155,14 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 
 					local humanoid = typeof(damagable.HealthObj) == "Instance" and damagable.HealthObj:IsA("Humanoid") and damagable.HealthObj or nil;
 					
+					local knockbackResistance = 0;
 					if damagable.Object.ClassName == "NpcStatus" then
+						local npcModule = damagable.Object:GetModule();
+						knockbackResistance = npcModule.KnockbackResistant;
+
 						if params.ExplosionStun then
 							local healthInfo = damagable:GetHealthInfo();
-							if healthInfo.Armor <= 0 and damage > healthInfo.MaxHealth*(params.ExplosionStunThreshold or 0.23) and humanoid then
-								local npcModule = damagable.Object:GetModule();
-
+							if healthInfo.Armor <= 0 and damage > healthInfo.MaxHealth*(params.ExplosionStunThreshold or 0.23) and humanoid and knockbackResistance > 0 then
 								npcModule.EntityStatus:GetOrDefault("explosionRagdoll", {
 									Ragdoll=true;
 									Expires=tick()+params.ExplosionStun;
@@ -208,7 +210,9 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 							newDmgSrc.DamageForce = dir * params.ExplosionForce;
 							newDmgSrc.DamagePosition = basePart.Position;
 
-							assemblyRootPart:ApplyImpulse(newDmgSrc.DamageForce * assemblyRootPart.AssemblyMass);
+							if knockbackResistance < 1 then
+								assemblyRootPart:ApplyImpulse(newDmgSrc.DamageForce * assemblyRootPart.AssemblyMass * (1-knockbackResistance));
+							end
 						end
 						
 						damagable:TakeDamagePackage(newDmgSrc);

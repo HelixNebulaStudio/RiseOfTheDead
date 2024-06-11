@@ -29,17 +29,21 @@ return function(npc, spawnPoint)
 	function self.Initialize()
 		local level = self.Configuration.Level-1;
 		
+		self.Humanoid.HealthDisplayDistance = 0;
+		
 		if self.HardMode then
 			self.Humanoid.MaxHealth = math.max(123000 + 4000*level, 100);
 			self.Properties.AttackDamage = 80;
 			self.Move.SetDefaultWalkSpeed = 12;
 			self.FumesCloudSize = 90;
+			self.KnockbackResistant = 1;
 			
 		else
 			self.Humanoid.MaxHealth = math.max(8000 + 2000*level, 100);
 			self.Properties.AttackDamage = 40;
 			self.Move.SetDefaultWalkSpeed = 8;
 			self.FumesCloudSize = 70;
+			self.KnockbackResistant = 0.5;
 			
 		end
 		self.Humanoid.Health = self.Humanoid.MaxHealth;

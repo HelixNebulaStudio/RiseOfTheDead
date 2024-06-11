@@ -89,7 +89,7 @@ return function(npc, spawnPoint)
 			self.LassoTime = 1;
 			self.LassoCooldown = 5;
 			self.FieldOfView = 89;
-			self.KnockbackResistant = true;
+			self.KnockbackResistant = 1;
 		end
 		
 		repeat until not self.Update();

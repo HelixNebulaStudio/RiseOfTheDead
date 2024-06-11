@@ -44,7 +44,7 @@ return function(npc, spawnPoint)
 			CrateId="wintertreelum";
 		};
 		
-		KnockbackResistant = true;
+		KnockbackResistant = 1;
 		DespawnPrefab = 30;
 	};
 	

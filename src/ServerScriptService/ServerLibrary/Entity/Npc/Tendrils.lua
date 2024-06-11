@@ -30,7 +30,7 @@ return function(npc, spawnPoint)
 			ResourceDrop=modRewardsLibrary:Find("tendrils");
 		};
 		
-		KnockbackResistant = true;
+		KnockbackResistant = 1;
 	};
 
 	--== Initialize;	

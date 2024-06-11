@@ -59,7 +59,7 @@ return function(npc, spawnPoint)
 		if self.HardMode then
 			self.Humanoid.MaxHealth = 75000 + ((#self.NetworkOwners-1) * 33000);
 			self.Humanoid.Health = self.Humanoid.MaxHealth;
-			self.KnockbackResistant = true;
+			self.KnockbackResistant = 1;
 			self.Properties.AttackDamage = 20;
 		end
 		

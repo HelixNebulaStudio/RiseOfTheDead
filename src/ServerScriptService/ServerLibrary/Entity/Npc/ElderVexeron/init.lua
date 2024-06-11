@@ -38,7 +38,7 @@ return function(npc, spawnPoint)
 			VexeronLength = 8;
 		};
 		
-		KnockbackResistant = true;
+		KnockbackResistant = 1;
 	};
 
 	--== Initialize;
