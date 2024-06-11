@@ -360,5 +360,6 @@ return function(npc, spawnPoint)
 	--== Connections;
 	self.Garbage:Tag(self.Humanoid.HealthChanged:Connect(self.OnHealthChanged));
 	self.Garbage:Tag(self.Humanoid.Running:connect(function(speed) self.Properties.Speed = speed; end));
+	self.Humanoid.Died:Connect(self.OnDeath);
 	
 return self end
