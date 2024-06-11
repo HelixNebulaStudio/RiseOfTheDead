@@ -31,8 +31,17 @@ if RunService:IsServer() then
 		end)
 	end)
 	
+	modOnGameEvents:ConnectEvent("OnItemPickup", function(player, storageItem)
+		if storageItem == nil then return end;
+		if storageItem.ItemId ~= "p250" then return end;
+		
+		modMission:Progress(player, missionId, function(mission)
+			if mission.ProgressionPoint < 4 then mission.ProgressionPoint = 4; end;
+		end)
+	end)
+
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 
@@ -123,6 +132,9 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, missionId);
 		if mission == nil then return end;
 		
+		if mission.Type == 2 then
+			modMission:StartMission(player, missionId);
+		end
 
 		local classPlayer = shared.modPlayers.Get(player);
 		classPlayer:Spawn();
@@ -280,7 +292,7 @@ return function(CutsceneSequence)
 				npcModule.Move:SetMoveSpeed("set", "default", 13);
 				
 				npcModule.Move:MoveTo(Vector3.new(-3.35487795, 55.2862129, -212.686417));
-				npcModule.Move.MoveToEnded:Wait();
+				npcModule.Move.MoveToEnded:Wait(4);
 				
 				npcModule.Actions:Teleport(CFrame.new(-3.35487795, 55.2862129, -212.686417));
 				npcModule.Move:Face(classPlayer.RootPart);

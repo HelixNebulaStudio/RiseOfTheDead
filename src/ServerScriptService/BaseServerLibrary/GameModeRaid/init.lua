@@ -6,7 +6,9 @@ local Config = {
 	SpawnPlatformRadius=128;
 	MinSpawnCount=2;
 	MaxSpawnCount=3;
+
 	HordeCycle=nil;
+	HordeSpawnRate=nil;
 }
 
 local Raid = {};
@@ -652,13 +654,16 @@ function Raid:Start()
 	if self.Objective.EnemyCap then
 		Config.EnemyCap = self.Objective.EnemyCap;
 	end
-	if self.Objective.HordeCycle then
-		Config.HordeCycle = self.Objective.HordeCycle;
-	end
 	if self.Objective.SpawnPlatformRadius then
 		Config.SpawnPlatformRadius = self.Objective.SpawnPlatformRadius
 	end
-
+	if self.Objective.HordeCycle then
+		Config.HordeCycle = self.Objective.HordeCycle;
+	end
+	if self.Objective.HordeSpawnRate then
+		Config.HordeSpawnRate = self.Objective.HordeSpawnRate;
+	end
+	
 
 	local minTotalZombieCount = spawnPlatformCount * Config.MinSpawnCount;
 	
@@ -684,6 +689,8 @@ function Raid:Start()
 	
 	for a=1, #destructibleObjs do
 		local destructibleObj = destructibleObjs[a];
+		local maxHealth = self.Difficulty *100;
+		destructibleObj:SetHealth(maxHealth, maxHealth);
 		destructibleObj.Enabled = true;
 	end
 
@@ -1004,7 +1011,7 @@ function Raid:Initialize(roomData)
 								InfTargeting=true;
 							});
 							
-							task.wait(0.5);
+							task.wait(Config.HordeSpawnRate or 0.5);
 							break;
 						end
 					end

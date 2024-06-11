@@ -164,7 +164,7 @@ function OnPlayerAdded(player)
 	if mission78 == nil then
 		local safehomeData = profile.Safehome;
 		local npcData = safehomeData:GetNpc("Lydia");
-		if npcData and (npcData.Level or 0) >= 5 then
+		if npcData and ((npcData.Level or 0) >= 5) then
 			missionProfile:Add(78);
 		end
 	end

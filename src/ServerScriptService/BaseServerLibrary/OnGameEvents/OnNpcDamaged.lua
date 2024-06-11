@@ -67,7 +67,7 @@ return function(player, damageSource)
 	if (humanoid.Name == "Zombie" or humanoid.Name == "Bandit" or humanoid.Name == "Rat") and damageSource.Killed == true and npcModule.IsDead ~= true
 		and damageSource.DamageCate == modDamagable.DamageCategory.Projectile then
 
-		local throwableWeaponList = {"beachball"; "pickaxe"; "broomspear"; "snowballs"};
+		local throwableWeaponList = {"beachball"; "pickaxe"; "broomspear"; "snowballs"; "boomerang"};
 		local isThrowableWeapon = false;
 		if table.find(throwableWeaponList, storageItem.ItemId) then
 			isThrowableWeapon = true;

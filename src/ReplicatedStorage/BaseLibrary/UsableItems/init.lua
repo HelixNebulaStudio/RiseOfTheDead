@@ -37,66 +37,13 @@ function UsableItems:Init(library)
 
 	for a=1, #itemLibList do
 		local itemLib = itemLibList[a];
-		Debugger:StudioWarn("Load usable", itemLib.Id);
-
+		
 		add{
 			Id=itemLib.Id;
 			Type="SkinPerm";
 		}
 	end
-
-	-- -- MARK: arelshift
-	-- add{
-	-- 	Id="arelshiftcrossantique";
-	-- 	Type="SkinPerm";
-	-- };
 	
-	-- -- MARK: desolator
-	-- add{
-	-- 	Id="desolatorheavytoygun";
-	-- 	Type="SkinPerm";
-	-- };
-
-	-- -- MARK: czevo3asiimov
-	-- add{
-	-- 	Id="czevo3asiimov";
-	-- 	Type="SkinPerm";
-	-- };
-
-	-- -- MARK: rusty48
-	-- add{
-	-- 	Id="rusty48blaze";
-	-- 	Type="SkinPerm";
-	-- };
-	
-	-- -- MARK: sr308
-	-- add{
-	-- 	Id="sr308slaughterwoods";
-	-- 	Type="SkinPerm";
-	-- };
-	-- add{
-	-- 	Id="sr308horde";
-	-- 	Type="SkinPerm";
-	-- };
-
-	-- -- MARK: vectorx
-	-- add{
-	-- 	Id="vectorxpossession";
-	-- 	Type="SkinPerm";
-	-- };
-	
-	-- -- MARK: deagle
-	-- add{
-	-- 	Id="deaglecryogenics";
-	-- 	Type="SkinPerm";
-	-- };
-	
-	-- -- MARK: flamethrower
-	-- add{
-	-- 	Id="flamethrowerblaze";
-	-- 	Type="SkinPerm";
-	-- };
-
 end
 
 return UsableItems;

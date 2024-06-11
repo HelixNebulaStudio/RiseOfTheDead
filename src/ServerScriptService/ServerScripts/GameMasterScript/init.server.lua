@@ -432,12 +432,6 @@ function PickUpRequest(player, interactObject, interactModule)
 					end
 					
 					storage:Add(interactData.ItemId, addPacket, function(queueEvent, storageItem)
-						if interactObject.Name == "Mission1Pickup" then
-							modMission:Progress(player, 1, function(mission)
-								if mission.ProgressionPoint < 4 then mission.ProgressionPoint = 4; end;
-							end)
-						end
-						
 						modOnGameEvents:Fire("OnItemPickup", player, interactData, {
 							Storage=storage;
 							StorageItem=storageItem;
