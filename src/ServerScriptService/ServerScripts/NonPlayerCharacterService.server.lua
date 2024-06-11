@@ -130,7 +130,7 @@ function InitializeSpawner(spawnerModule)
 		--local spawnMin = targetPoint - targetCFrame:vectorToWorldSpace(self.SpawnSize/2) + Vector3.yAxis;
 		--local spawnMax = targetPoint + targetCFrame:vectorToWorldSpace(self.SpawnSize/2);
 		--local collisions = workspace:FindPartsInRegion3WithWhiteList(Region3.new(spawnMin, spawnMax), {workspace.Environment; workspace.Terrain}, 1);
-		local collisions = workspace:GetPartBoundsInBox(targetCFrame + Vector3.new(0, self.SpawnSize.Y/2+0.1, 0), self.SpawnSize, spaceCheckOverlapParam);
+		local collisions = workspace:GetPartBoundsInBox(targetCFrame + Vector3.new(0, self.SpawnSize.Y/2+0.2, 0), self.SpawnSize, spaceCheckOverlapParam);
 		
 		if #collisions > 0 then return nil end
 		return targetCFrame;
