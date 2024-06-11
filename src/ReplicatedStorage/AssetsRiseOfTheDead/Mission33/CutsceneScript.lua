@@ -495,11 +495,12 @@ return function(CutsceneSequence)
 
 		CutsceneSequence:NewScene("freezePlayer", function()
 			local modCharacter = modData:GetModCharacter();
+			local classPlayer = shared.modPlayers.Get(localPlayer);
+			local humanoid = classPlayer.Humanoid;
 
 			modCharacter.CharacterProperties.CanMove = false;
 			modCharacter.CharacterProperties.CanInteract = false;
 
-			local humanoid = modCharacter.Character.Humanoid;
 			local surrenderAnimation = humanoid:LoadAnimation(script:WaitForChild("Surrender"));
 			if surrenderAnimation then surrenderAnimation:Play(); end;
 
@@ -524,7 +525,9 @@ return function(CutsceneSequence)
 			local modInterface = modData:GetInterfaceModule();
 			local modCharacter = modData:GetModCharacter();
 
-			local head = modCharacter.Character.Head;
+			local classPlayer = shared.modPlayers.Get(localPlayer);
+			local head = classPlayer.Head;
+
 			modData.ToggleChat();
 			if head:FindFirstChild("face") ~= nil then
 				head.face.Parent = script;
@@ -537,7 +540,7 @@ return function(CutsceneSequence)
 			modCharacter.CharacterProperties.CanInteract = false;
 			modInterface:ToggleGameBlinds(false, 1);
 
-			local humanoid = modCharacter.Character.Humanoid;
+			local humanoid = classPlayer.Humanoid;
 			playerAnimTracks.Unconscious = humanoid:LoadAnimation(script:WaitForChild("Unconscious"));
 			playerAnimTracks.Unconscious:Play();
 		end);
@@ -658,7 +661,9 @@ return function(CutsceneSequence)
 		CutsceneSequence:NewScene("teleportToHostage", function()
 			local modInterface = modData:GetInterfaceModule();
 			local modCharacter = modData:GetModCharacter();
-			local rootPart = modCharacter.Character.HumanoidRootPart;
+			
+			local classPlayer = shared.modPlayers.Get(localPlayer);
+			local rootPart = classPlayer.RootPart;
 			
 			modInterface:ToggleGameBlinds(false, 0);
 			rootPart.CFrame = hostageSpawn.CFrame;

@@ -172,15 +172,17 @@ return function(CutsceneSequence)
 			end
 		end
 		mission.Changed:Connect(OnChanged);
-		OnChanged(true, mission);
+		OnChanged(true);
 	end)
 	
 	local blurEffect, wakeAnimation;
 	CutsceneSequence:NewScene("onPlayerSpawns", function()
 		local modCharacter = modData:GetModCharacter();
-		local head = modCharacter.Character:WaitForChild("Head");
-		local humanoid = modCharacter.Character.Humanoid;
-		local rootPart = modCharacter.Character.HumanoidRootPart;
+
+		local classPlayer = shared.modPlayers.Get(localPlayer);
+		local rootPart = classPlayer.RootPart;
+		local humanoid = classPlayer.Humanoid;
+		local head = classPlayer.Head;
 		local camera = workspace.CurrentCamera;
 
 		blurEffect = Instance.new("BlurEffect");
@@ -242,8 +244,11 @@ return function(CutsceneSequence)
 
 	CutsceneSequence:NewScene("wakeUp", function()
 		local modCharacter = modData:GetModCharacter();
-		local head = modCharacter.Character.Head;
-		local rootPart = modCharacter.Character.HumanoidRootPart;
+
+		local classPlayer = shared.modPlayers.Get(localPlayer);
+		local rootPart = classPlayer.RootPart;
+		local head = classPlayer.Head;
+		
 		local unconsciousAnimation = modCharacter:GetAnimation("Unconscious");
 
 		modInterface:ToggleGameBlinds(false, 1);

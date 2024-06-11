@@ -654,7 +654,7 @@ return function(CutsceneSequence)
 				end
 			end
 			mission.Changed:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
 		end)
 		
 		CutsceneSequence:NewScene("enableInterfaces", function()
@@ -669,9 +669,11 @@ return function(CutsceneSequence)
 		local blurEffect;
 		CutsceneSequence:NewScene("playerKnockout", function()
 			local modCharacter = modData:GetModCharacter();
-			local head = modCharacter.Character.Head;
-			local humanoid = modCharacter.Character.Humanoid;
-			local rootPart = modCharacter.Character.HumanoidRootPart;
+			local classPlayer = shared.modPlayers.Get(localPlayer);
+			local head = classPlayer.Head;
+			local humanoid = classPlayer.Humanoid;
+			local rootPart = classPlayer.RootPart;
+
 			local camera = workspace.CurrentCamera;
 			
 			blurEffect = Instance.new("BlurEffect");
@@ -719,9 +721,10 @@ return function(CutsceneSequence)
 		CutsceneSequence:NewScene("playerWake", function()
 			blurEffect.Size = 2;
 			local modCharacter = modData:GetModCharacter();
-			local head = modCharacter.Character.Head;
-			local rootPart = modCharacter.Character.HumanoidRootPart;
-			local humanoid = modCharacter.Character.Humanoid;
+			local classPlayer = shared.modPlayers.Get(localPlayer);
+			local head = classPlayer.Head;
+			local rootPart = classPlayer.RootPart;
+			
 			local unconsciousAnimation = modCharacter:GetAnimation("Unconscious");
 			
 			if head:FindFirstChild("newface") then head.newface:Destroy(); end

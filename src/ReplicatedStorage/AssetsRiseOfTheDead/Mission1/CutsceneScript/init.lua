@@ -169,9 +169,11 @@ return function(CutsceneSequence)
 			Debugger:Log("Waiting for character module..");
 			wait(0.1);
 		until modCharacter ~= nil;
-		local rootPart = modCharacter.Character.HumanoidRootPart;
-		local humanoid = modCharacter.Character.Humanoid;
-		local head = modCharacter.Character.Head;
+
+		local classPlayer = shared.modPlayers.Get(localPlayer);
+		local rootPart = classPlayer.RootPart;
+		local humanoid = classPlayer.Humanoid;
+		local head = classPlayer.Head;
 		modData.ToggleChat();
 		if head:FindFirstChild("face") ~= nil then
 			head.face.Parent = script;
@@ -505,8 +507,8 @@ return function(CutsceneSequence)
 		playerAnimTracks.Unconscious:Stop();
 		playerAnimTracks.UnconsciousWake:Play();
 
-		local modCharacter = modData:GetModCharacter();
-		local head = modCharacter.Character.Head;
+		local classPlayer = shared.modPlayers.Get(localPlayer);
+		local head = classPlayer.Head;
 		if head:FindFirstChild("unconsciousFace") then head.unconsciousFace:Destroy(); end
 		if script:FindFirstChild("face") then script.face.Parent = head; end;
 	end)
@@ -521,9 +523,8 @@ return function(CutsceneSequence)
 		end)
 		
 		local modCharacter = modData:GetModCharacter();
-		local head = modCharacter.Character.Head;
-		local rootPart = modCharacter.Character.HumanoidRootPart;
-		local humanoid = modCharacter.Character.Humanoid;
+		local classPlayer = shared.modPlayers.Get(localPlayer);
+		local rootPart = classPlayer.RootPart;
 		modCharacter.CharacterProperties.FirstPersonCamCFrame = nil;
 		
 		rootPart.Anchored = false;
@@ -671,7 +672,6 @@ return function(CutsceneSequence)
 
 	CutsceneSequence:NewScene("camShake", function()
 		local modCharacter = modData:GetModCharacter();
-		local humanoid = modCharacter.Character.Humanoid;
 		
 		playerAnimTracks.Unconscious:Play();
 		
