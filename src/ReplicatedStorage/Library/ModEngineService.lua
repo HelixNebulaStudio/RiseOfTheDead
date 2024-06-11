@@ -59,6 +59,8 @@ function ModEngineService:GetBaseModule(name, timeOut)
 			return require(moduleScript);
 		end
 	end
+
+	return;
 end
 
 --- Server
@@ -76,6 +78,8 @@ function ModEngineService:GetServerModule(name, parent, timeOut)
 		return self:GetBaseServerModule(name);
 
 	end
+
+	return;
 end
 
 function ModEngineService:GetBaseServerModule(name, parent, timeOut)
@@ -85,6 +89,8 @@ function ModEngineService:GetBaseServerModule(name, parent, timeOut)
 			return require(moduleScript);
 		end
 	end
+
+	return;
 end
 
 return ModEngineService;

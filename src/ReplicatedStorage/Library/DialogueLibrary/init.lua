@@ -6,6 +6,9 @@ local libMeta = {};
 local DialogueLibrary = setmetatable({}, libMeta);
 local dialogueModules = {};
 
+DialogueLibrary.Script = script;
+DialogueLibrary.Modules = dialogueModules;
+
 function libMeta:__index(name) -- loads if not loaded before
 	if dialogueModules[name] then
 		local loadMod = require(dialogueModules[name]);
@@ -125,5 +128,9 @@ end
 --		return dialogueTable;
 --	end
 --end
+
+local modModEngineService = require(game.ReplicatedStorage.Library.ModEngineService);
+local moddedSelf = modModEngineService:GetModule(script.Name);
+if moddedSelf then moddedSelf:Init(DialogueLibrary); end
 
 return DialogueLibrary;

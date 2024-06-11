@@ -19,6 +19,9 @@ local remoteDialogueHandler = modRemotesManager:Get("DialogueHandler");
 local Logic = {};
 local MissionDialogueModules = {};
 
+local modModEngineService = require(game.ReplicatedStorage.Library.ModEngineService);
+local modDialogueHandlers = modModEngineService:GetServerModule("DialogueHandlers");
+
 --== Script;
 function OnDialogue(player, npcModel, npcName, choice)
 	npcName = npcName or "nilName";
@@ -39,6 +42,19 @@ function OnDialogue(player, npcModel, npcName, choice)
 		
 	end
 	
+	if Logic[npcName] == nil and modDialogueHandlers.Script:FindFirstChild(npcName) then
+		local npcDialogueHandler = modDialogueHandlers.Script[npcName];
+
+		Logic[npcName] = require(npcDialogueHandler);
+
+		MissionDialogueModules[npcName] = {};
+		for _, module in pairs(npcDialogueHandler:GetChildren()) do
+			if module.ClassName ~= "ModuleScript" then continue end;
+			
+			MissionDialogueModules[npcName][module.Name] = require(module);
+		end
+	end
+
 	if Logic[npcName] == nil and script:FindFirstChild(npcName) then
 		Logic[npcName] = require(script[npcName]);
 		
@@ -145,6 +161,8 @@ function OnDialogue(player, npcModel, npcName, choice)
 				local missionProfile = modMission.GetMissions(player.Name);
 				if missionProfile then
 					for a=1, #missionProfile do
+						if MissionDialogueModules[npcName] == nil then continue end;
+						
 						local missionData = missionProfile[a];
 						local missionLib = missionData and modMissionLibrary.Get(missionData.Id);
 						
