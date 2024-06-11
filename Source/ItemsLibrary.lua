@@ -130,7 +130,7 @@ function ItemsLibrary:Init(super)
 	
 	new(meleeBase, {Id="pickaxe"; Name="Pickaxe"; Icon="rbxassetid://5175332073"; Tags={"Pointed Melee"; "Throwable"}; Description="A construction grade pickaxe.";});
 	new(meleeBase, {Id="broomspear"; Name="Broom Spear"; Icon="rbxassetid://5120882769"; Tags={"Pointed Melee"; "Throwable"}; Description="Chipped out from a broom stick.";});
-	new(meleeBase, {Id="boomerang"; Name="Boomerang"; Icon="rbxassetid://17763515915"; Tags={"Pointed Melee"; "Throwable"}; Description="A light weight sharp tip boomerang. Has built-in ricochet when thrown. (Will be obtainable from drops in the future).";});
+	new(meleeBase, {Id="boomerang"; Name="Boomerang"; Icon="rbxassetid://17763515915"; Tags={"Pointed Melee"; "Throwable"}; Description="A light weight sharp tip boomerang. Has built-in ricochet when thrown.";});
 	
 	new(meleeBase, {Id="fireaxe"; Name="Fire Axe"; Icon="rbxassetid://12865194088"; Tags={"Edged Melee"}; Description="Not exactly an axe on fire. 66% chance to ignite enemies for 5 seconds dealing 50 x Stack + 1% of enemy's Current Health.";});
 
@@ -406,7 +406,7 @@ function ItemsLibrary:Init(super)
 	new(foodBase, {Id="annihilationsoda"; Name="Annihilation Soda"; Icon="rbxassetid://10368377851"; Description="Gives you an additional 10% crit chance for 2 minutes, even for weapons without crit chance. Crit multiplier for weapons without crit is x1.5 damage.";});
 	new(foodBase, {Id="perkscupcake"; Name="Perks Cupcake"; Icon="rbxassetid://12806349482"; Tags={"Unobtainable";}; Description="Gives you 1000 perks.";});
 	new(foodBase, {Id="sandwich"; Name="Sandwich"; Icon="rbxassetid://14880936365"; Description="Gives you 7.5 health per second for 10 seconds.";});
-	new(foodBase, {Id="ziphoningserum"; Name="Ziphoning Serum"; Icon="rbxassetid://15936793820"; NonPremiumTax = 10; Description="Cleanse cleansable debuffs and gives you the Ziphoning buff for <b>3 minutes</b>.\nThe Ziphoning buff gives you <b>+1 hp/s</b> <i>(Increasable by Nekrosis Amplifier)</i> consumed from the ziphon health pool, the ziphon health pool only fills up when you do damage to enemies.";});
+	new(foodBase, {Id="ziphoningserum"; Name="Ziphoning Serum"; Icon="rbxassetid://17816751372"; NonPremiumTax = 10; Description="Cleanse cleansable debuffs and gives you the Ziphoning buff for <b>3 minutes</b>.\nThe Ziphoning buff gives you <b>+1 hp/s</b> <i>(Increasable by Nekrosis Amplifier)</i> consumed from the ziphon health pool, the ziphon health pool only fills up when you do damage to enemies.";});
 
 	--==========================================================[[ MISSION ]]==========================================================--
 	local missionBase = {

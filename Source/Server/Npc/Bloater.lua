@@ -95,11 +95,11 @@ return function(npc, spawnPoint)
 	end));
 	
 	self.Garbage:Tag(self.Humanoid.HealthChanged:Connect(self.OnHealthChanged));
-	self.Garbage:Tag(self.Humanoid.Died:Connect(function(...)
+	self.Humanoid.Died:Connect(function(...)
 		game.Debris:AddItem(self.Prefab:FindFirstChild("Spores"), 0);
 		self.OnDeath(...);
 		self.DizzyCloud(math.clamp(self.Configuration.Level, 10, 30));
-	end));
+	end);
 	
 
 	return self;
