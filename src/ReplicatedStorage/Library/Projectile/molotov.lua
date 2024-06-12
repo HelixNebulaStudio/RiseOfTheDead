@@ -30,6 +30,7 @@ function Pool.new(owner)
 
 		IgnoreEntities=false;
 		IgnoreWater=false;
+		Delta=1/60;
 	};
 	
 	-- projectile.Configurations = {

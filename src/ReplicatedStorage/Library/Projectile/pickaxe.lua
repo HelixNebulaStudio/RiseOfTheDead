@@ -27,6 +27,7 @@ function Pool.new(owner)
 		Bounce=0;
 		AirSpin=math.rad(40);
 		RayRadius=1;
+		Delta=1/60;
 	}
 	-- projectile.Configurations = {
 	-- 	ProjectileVelocity=100;

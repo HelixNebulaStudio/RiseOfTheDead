@@ -565,6 +565,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 		arcTracer.LifeTime = configurations.ProjectileLifeTime;
 		arcTracer.Acceleration = configurations.ProjectileAcceleration;
 		arcTracer.AirSpin = configurations.ProjectileAirSpin;
+		arcTracer.Delta = 1/60;
 		
 		table.insert(arcTracer.RayWhitelist, workspace.Entity);
 		table.insert(arcTracer.RayWhitelist, workspace:FindFirstChild("Characters"));
@@ -731,12 +732,13 @@ function ToolHandler:Equip(storageItem, toolModels)
 			
 			if mouseProperties.Mouse2Down and characterProperties.CanAction and characterProperties.IsEquipped and toggleTraj then
 				local impactPoint = getImpactPoint();
+				game.Debris:AddItem(Debugger:PointPart(impactPoint), 0.1);
 
 				local handlePoint: Vector3 = handle.Position;
 				local velocity = (configurations.Velocity + configurations.VelocityBonus * throwChargeValue);
 
 				local travelTime = (impactPoint-handlePoint).Magnitude/velocity;
-				local velocityToImpact = arcTracer:GetVelocityByTime(handlePoint, impactPoint, travelTime);
+				local velocityToImpact = arcTracer:GetSteppedVelocityByTime(handlePoint, impactPoint, travelTime);
 
 				local arcPoints = arcTracer:GeneratePath(handle.Position, velocityToImpact);
 				if #arcList ~= #arcPoints then

@@ -12,7 +12,7 @@ local animator = humanoid:WaitForChild("Animator");
 local player = game.Players.LocalPlayer;
 
 --== Modules;
-local modData = require(player:WaitForChild("DataModule"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 local modInterface = modData:GetInterfaceModule();
 
@@ -22,10 +22,9 @@ local modTools = require(game.ReplicatedStorage.Library.Tools);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modArcTracing = require(game.ReplicatedStorage.Library.ArcTracing);
-local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
+local modWeaponMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 
 --== Remotes;
-local remotes = game.ReplicatedStorage.Remotes;
 local remoteToolPrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
 
 --== Vars;
@@ -110,11 +109,10 @@ function ToolHandler:Equip(storageItem, toolModels)
 	Equipped.ToolConfig = toolConfig;
 	
 	local rootPart = modCharacter.RootPart;
+	local head = character.Head;
 	local mouseProperties = modCharacter.MouseProperties;
 	local configurations = toolConfig.Configurations;
 
-	local projectileId = Equipped.RightHand.Item.Values.CustomProj or configurations.ProjectileId;
-	
 	local arcList = {};
 	local arcTracer = modArcTracing.new();
 	arcTracer.Bounce = configurations.ProjectileBounce;
@@ -122,13 +120,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 	arcTracer.Acceleration = configurations.ProjectileAcceleration;
 	arcTracer.KeepAcceleration = configurations.ProjectileKeepAcceleration
 	arcTracer.IgnoreWater = configurations.IgnoreWater;
-	
-	local baseProjectile = modProjectile.Get(projectileId);
-	if baseProjectile.ArcTracerConfig then
-		for k, v in pairs(baseProjectile.ArcTracerConfig) do
-			arcTracer[k] = v;
-		end
-	end
+	arcTracer.Delta = 1/60;
 	
 	table.insert(arcTracer.RayWhitelist, workspace.Entity);
 	table.insert(arcTracer.RayWhitelist, workspace:FindFirstChild("Characters"));
@@ -177,6 +169,38 @@ function ToolHandler:Equip(storageItem, toolModels)
 		updateProgressionBar();
 	end
 	
+	local toggleTraj = false;
+	local function getImpactPoint(origin) -- reasonable throw ranges [25, 80];
+		local rayWhitelist = CollectionService:GetTagged("TargetableEntities") or {};
+		table.insert(rayWhitelist, workspace.Environment);
+		table.insert(rayWhitelist, workspace.Characters);
+		table.insert(rayWhitelist, workspace.Terrain);
+		projRaycast.FilterDescendantsInstances = rayWhitelist;
+
+		local velocity = (configurations.Velocity + configurations.VelocityBonus * throwChargeValue);
+
+		local scanPoint = modWeaponMechanics.CastHitscanRay{
+			Origin = mouseProperties.Focus.p;
+			Direction = mouseProperties.Direction;
+			IncludeList = rayWhitelist;
+			Range = velocity;
+		};
+
+		local newDirection = (scanPoint-origin).Unit;
+		local distance = (scanPoint-origin).Magnitude;
+
+		-- Gets where player can hit.
+		-- Get hitscan point from head using direction provided by crosshair hitscan.
+		local impactPoint = modWeaponMechanics.CastHitscanRay{
+			Origin = origin;
+			Direction = newDirection;
+			IncludeList = rayWhitelist;
+			Range = distance;
+		};
+
+		return impactPoint;
+	end
+
 	local throwOrigin = toolConfig.CustomThrowPoint and toolModel[toolConfig.CustomThrowPoint] or handle;
 	local function primaryThrow()
 		storageItem = modData.GetItemById(storageItem.ID);
@@ -184,38 +208,26 @@ function ToolHandler:Equip(storageItem, toolModels)
 		
 		toolConfig.CanThrow = false;
 		
-		local origin = throwOrigin.Position;
-		local direction = mouseProperties.Direction;
-		
-		if configurations.DirectionOffset then
-			direction = direction + configurations.DirectionOffset;
-			direction = direction.Unit;
-		end
-		
 		local throwCharge = throwChargeValue > 0.05 and throwChargeValue or 0;
-		local rootVelocity = rootPart.Velocity;
-		
-		local arcPoints = arcTracer:GeneratePath(origin, direction * (configurations.Velocity + (configurations.VelocityBonus or 0)* throwCharge)); --rootVelocity
+
+		local origin = handle.Position;
+		local impactPoint = getImpactPoint(head.Position);
+
 		animations["Throw"]:Play(0.1);
 		if audio.Throw then
 			modAudio.PlayReplicated(audio.Throw.Id, throwOrigin);
 		end
-		projectileId = Equipped.RightHand.Item.Values.CustomProj or configurations.ProjectileId;
 		
 		task.delay(0.05, function()
 			if animations["Reload"] == nil then
 				throwOrigin.Transparency = 1;
 			end
-			--local projectile = modProjectile.Fire(projectileId, CFrame.new(origin, origin + direction), throwOrigin.Orientation, nil, player, toolConfig);
-			--local prefab = projectile.Prefab;
-
-			--modProjectile.ClientSimulate(projectile, arcTracer, arcPoints);
 			
 			if toolConfig.OnThrow then
 				toolConfig.OnThrow(self, toolModels);
 			end
 		end)
-		remoteToolPrimaryFire:FireServer(storageItem.ID, origin, direction, throwCharge, rootVelocity);
+		remoteToolPrimaryFire:FireServer(storageItem.ID, origin, impactPoint, throwCharge);
 		
 		if storageItem.Quantity <= 1 and configurations.ConsumeOnThrow then
 			--ToolHandler:Unequip(storageItem);
@@ -272,15 +284,17 @@ function ToolHandler:Equip(storageItem, toolModels)
 				end
 			end
 			
-			if configurations.ShowFocusTraj ~= false then -- disable trajectory
-				local direction = mouseProperties.Direction;
-				if configurations.DirectionOffset then
-					direction = direction + configurations.DirectionOffset;
-					direction = direction.Unit;
-				end
+			if toggleTraj then -- disable trajectory
+				local origin = handle.Position;
+				local impactPoint = getImpactPoint(head.Position);
+				game.Debris:AddItem(Debugger:PointPart(impactPoint), 0.1);
 				
-				local arcPoints = arcTracer:GeneratePath(throwOrigin.Position, direction * (configurations.Velocity + (configurations.VelocityBonus or 0) * throwChargeValue)); --+ rootPart.Velocity
-				
+				local velocity = (configurations.Velocity + configurations.VelocityBonus * throwChargeValue);
+
+				local travelTime = (impactPoint-origin).Magnitude/velocity;
+				local velocityToImpact = arcTracer:GetSteppedVelocityByTime(origin, impactPoint, travelTime);
+
+				local arcPoints = arcTracer:GeneratePath(handle.Position, velocityToImpact);
 				if #arcList ~= #arcPoints then
 					while #arcList <= #arcPoints do
 						local arcPart = arcPartTemplate:Clone();
@@ -355,6 +369,20 @@ function ToolHandler:Equip(storageItem, toolModels)
 			toolConfig.OnLoad(self, toolModels);
 		end
 	end)
+
+	
+	if RunService:IsStudio() then
+		Equipped.RightHand["KeyWalk"] = function()
+			toggleTraj = not toggleTraj;
+			local tracks = animator:GetPlayingAnimationTracks();
+			
+			Debugger:Warn("animator", tracks);
+			for _, track in pairs(tracks) do
+				Debugger:Warn(track, "WeightCurrent", track.WeightCurrent, "WeightTarget", track.WeightTarget);
+			end
+		end
+	end
+
 end
 
 function ToolHandler:Unequip(storageItem)

@@ -22,6 +22,7 @@ function Pool.new(owner)
 		Bounce=0.6;
 		LifeTime=20;
 		MaxBounce=8;
+		Delta=1/60;
 	}
 	
 	function projectile:Activate()

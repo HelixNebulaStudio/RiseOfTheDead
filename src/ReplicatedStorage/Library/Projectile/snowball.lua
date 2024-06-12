@@ -12,12 +12,8 @@ local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local projectilePrefab = script.Snowball;
-local random = Random.new();
 
 local templateSnowSplash = game.ReplicatedStorage.Particles.SnowSplash;
-
-local remotes = game.ReplicatedStorage.Remotes;
-local bindIsInDuel = remotes.IsInDuel;
 
 --== Script;
 
@@ -33,15 +29,16 @@ function Pool.new(owner)
 		Bounce=0;
 		IgnoreWater=false;
 		RayRadius=0.6;
+		Delta=1/60;
 	}
 	
-	projectile.Configurations = {
-		ProjectileKeepAcceleration=true;
-		ProjectileVelocity=250;
-		ProjectileLifeTime=20;
-		ProjectileBounce=0;
-		IgnoreWater=false;
-	};
+	-- projectile.Configurations = {
+	-- 	ProjectileKeepAcceleration=true;
+	-- 	ProjectileVelocity=250;
+	-- 	ProjectileLifeTime=20;
+	-- 	ProjectileBounce=0;
+	-- 	IgnoreWater=false;
+	-- };
 	
 	function projectile:Activate()
 		
