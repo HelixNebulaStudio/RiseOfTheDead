@@ -841,7 +841,7 @@ function ItemsLibrary:Init(super)
 
 	-- Christmas 2022
 	new(crateBase, {Id="xmaspresent2022"; Name="Christmas Present 2022"; Icon="rbxassetid://11787305747"; Tags={"Christmas"; "Frostivus"}; TradingTax=0; Description="Merry Christmas, open it and see what you get!";});
-	new(skinPermBase, {Id="santahatwinterfest"; Icon="rbxassetid://11812491624"; SkinPerm="Frostivus"; TargetItemId="leathergloves"; Tags={"Christmas"; "Frostivus";};});
+	new(skinPermBase, {Id="santahatwinterfest"; Icon="rbxassetid://11812491624"; SkinPerm="Frostivus"; TargetItemId="santahat"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="mercskneepadswinterfest"; Icon="rbxassetid://11812666419"; SkinPerm="Frostivus"; TargetItemId="mercskneepads"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="xmassweatergreen"; Icon="rbxassetid://11863066782"; SkinPerm="Xmas Sweater"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="xmassweateryellow"; Icon="rbxassetid://11863078091"; SkinPerm="Xmas Sweater"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
