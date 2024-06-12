@@ -656,6 +656,19 @@ function Debugger:CFrameLinkPart(targetPart: BasePart)
 	return part;
 end
 
+local debounceList = {};
+function Debugger:Debounce(key, duration)
+	key = (self.Name or script.Name)..tostring(key);
+	duration = duration or 0.1;
+
+	if debounceList[key] == nil or tick()>debounceList[key] then
+		debounceList[key] = tick()+duration;
+		return false;
+	end
+
+	return true;
+end
+
 function Debugger:IsParallel()
 	return self.MainThread ~= true;
 end
