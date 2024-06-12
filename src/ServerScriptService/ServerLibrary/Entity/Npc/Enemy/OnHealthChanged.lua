@@ -28,6 +28,7 @@ function Enemy.new(self)
 					local hurtSound = modAudio.Play("ZombieHurt", self.RootPart);
 					hurtSound.PlaybackSpeed = random:NextNumber(0.5, 0.65);
 					hurtSound.Volume = random:NextNumber(0.25, 0.55);
+					Debugger.Expire(hurtSound, 5);
 				end
 			end
 		end
