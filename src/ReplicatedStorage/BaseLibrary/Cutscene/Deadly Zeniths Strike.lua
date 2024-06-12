@@ -183,7 +183,7 @@ return function(CutsceneSequence)
 						if npcModule.Blink == nil then
 							npcModule:AddComponent(modNpc.Script.Zombie.Blink);
 						end
-						npcModule.Garbage:Tag(npcModule.Humanoid.Died:Connect(function()
+						npcModule.Humanoid.Died:Connect(function()
 							npcModule.OnDeath();
 
 							if npcModule.CrateReward then
@@ -192,20 +192,21 @@ return function(CutsceneSequence)
 								local classPlayer = shared.modPlayers.Get(selectCoopPlayer);
 
 								local spawnCFrame;
+								if spawnCFrame == nil then
+									local dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(Ray.new(npcModule.DeathPosition, Vector3.new(0, -32, 0)), {workspace.Environment; workspace.Terrain}, true);
+									spawnCFrame = CFrame.new(dropRayPos);
+								end
+								
 								if classPlayer and classPlayer.SafeCFrame then
 									local dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(Ray.new(classPlayer.SafeCFrame.Position, Vector3.new(0, -32, 0)), {workspace.Environment; workspace.Terrain}, true);
 									spawnCFrame = CFrame.new(dropRayPos);
 								end
 
-								if spawnCFrame == nil then
-									local dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(Ray.new(npcModule.DeathPosition, Vector3.new(0, -32, 0)), {workspace.Environment; workspace.Terrain}, true);
-									spawnCFrame = CFrame.new(dropRayPos);
-								end
 								spawnCFrame = spawnCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
 
 								local cratePrefab, crateInteractable = npcModule:CrateReward(spawnCFrame, coopPlayers);
 							end
-						end));
+						end);
 						
 					end);
 					

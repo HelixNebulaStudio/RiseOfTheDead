@@ -1,9 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
-local templateHealthbarGui = script:WaitForChild("HealthbarGui");
+local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 
-local random = Random.new();
+local templateHealthbarGui = script:WaitForChild("HealthbarGui");
 local templateNpcStatusLink = script.Parent.Parent:WaitForChild("NpcStatus");
 
 --== Script;
@@ -48,6 +48,8 @@ function CustomHealthbar:GetFromPart(bodyPart: BasePart)
 			return healthObj;
 		end
 	end
+
+	return;
 end
 
 function CustomHealthbar:SetGuiSize(name, x, y)
@@ -132,28 +134,51 @@ end
 -- return true to isolate damage
 
 function CustomHealthbar:TakeDamage(name, amount)
-	if self.Healths[name] then
-		if self.Healths[name].Health <= 0 then return end
-		
-		self.Healths[name].LastDamaged = tick();
-		self.Healths[name].Health = self.Healths[name].Health - amount;
-		
-		self:RefreshGui(name)
-		task.delay(2, function()
-			if self.Healths[name] and not self.Healths[name].IsDead and tick()-self.Healths[name].LastDamaged > 2 then
-				self:HideGui(name);
-			end
-		end)
-		
-		if self.Healths[name].Health <= 0 then
-			self.Healths[name].OnDeath:Fire();
-			self.Healths[name].OnDeath:Destroy();
-			self.Healths[name].IsDead = true;
-			self.OnDeath:Fire(name, self.Healths[name]);
-		end
-	else
-		Debugger:Log("TakeDamage for unknown health bar",name);
+	local healthObj = self.Healths[name];
+	if healthObj == nil then
+		Debugger:StudioWarn("TakeDamage for unknown health bar",name);
+		return;
 	end
+	
+	if healthObj.Health <= 0 then return end
+		
+	healthObj.LastDamaged = tick();
+	healthObj.Health = healthObj.Health - amount;
+		
+	self:RefreshGui(name)
+	task.delay(2, function()
+		if healthObj and not healthObj.IsDead and tick()-healthObj.LastDamaged > 2 then
+			self:HideGui(name);
+		end
+	end)
+	
+	if healthObj.Health <= 0 then
+		healthObj.OnDeath:Fire();
+		healthObj.OnDeath:Destroy();
+		healthObj.IsDead = true;
+		self.OnDeath:Fire(name, healthObj);
+
+		task.spawn(function()
+			local destoryStr = `{name} Destroyed!`;
+			local attackers = self.Npc.Status:GetAttackers();
+
+			Debugger:StudioWarn("CustomHealth Obj: ", destoryStr);
+
+			modInfoBubbles.Create{
+				Players=attackers;
+				Position=healthObj.BasePart.Position;
+				Type="Status";
+				ValueString=destoryStr;
+			};
+			
+			task.delay(3, function()
+				if healthObj and not healthObj.IsDead then
+					self:HideGui(name);
+				end
+			end)
+		end)
+	end
+
 end
 
 function CustomHealthbar:Destroy()

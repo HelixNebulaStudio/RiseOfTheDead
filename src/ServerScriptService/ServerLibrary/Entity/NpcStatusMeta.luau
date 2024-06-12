@@ -100,6 +100,11 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 
 	local immunity = self:GetImmunity(damageType, damageCate);
 
+	local infoBubblePlayers = self:GetAttackers();
+	if player and table.find(infoBubblePlayers, player) == nil then
+		table.insert(infoBubblePlayers, player);
+	end
+
 	local toxicDmgTaken = false;
 	if amount > 0 then
 		if immunity > 1 then -- invert damage (1, inf]
@@ -113,14 +118,16 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 				local weaponDamage = toolModule.Configurations.PreModDamage;
 				local toxicDamage = (weaponDamage or 100) * (-immunity);
 	
-				local newDmgSrc = modDamagable.NewDamageSource{
-					Damage=toxicDamage;
-					Dealer=dealer;
-					ToolStorageItem=storageItem;
-					TargetPart=hitPart;
-					DamageType="ToxicDamage";
-				}
-				self:TakeDamagePackage(newDmgSrc);
+				if toxicDamage > 0 then
+					local newDmgSrc = modDamagable.NewDamageSource{
+						Damage=toxicDamage;
+						Dealer=dealer;
+						ToolStorageItem=storageItem;
+						TargetPart=hitPart;
+						DamageType="ToxicDamage";
+					}
+					self:TakeDamagePackage(newDmgSrc);
+				end
 				toxicDmgTaken = true;
 			end
 
@@ -133,7 +140,12 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 	
 	if initAmount > 0 and npcModule.CustomHealthbar and npcModule.CustomHealthbar.OnDamaged then
 		local returnPacket = npcModule.CustomHealthbar:OnDamaged(initAmount, dealer, storageItem, hitPart);
-		
+
+		if npcModule.Weapons == nil then npcModule.Weapons = {} end;
+		if player then
+			npcModule.Weapons[player.Name] = {};
+		end
+
 		if typeof(returnPacket) == "table" then
 			amount = returnPacket.Amount or amount;
 			immunity = returnPacket.Immunity or immunity;
@@ -146,14 +158,16 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 			end
 			
 			modInfoBubbles.Create{
-				Players=self:GetAttackers();
+				Players=infoBubblePlayers;
 				Position=hitPart.Position;
+				DamageType=damageType;
+				DamageCate=damageCate;
 				Value=damage;
 			};
 			return;
 			
 		elseif returnPacket == false then -- cancel damage;
-			
+
 			return;
 		end
 	end
@@ -203,8 +217,10 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 		
 	end
 
-	if amount < 0 and npcModule.OnHealed then 
-		npcModule.OnHealed(amount, dealer, storageItem, hitPart);
+	if amount < 0 then
+		if npcModule.OnHealed then
+			npcModule.OnHealed(amount, dealer, storageItem, hitPart);
+		end
 	end
 	
 	local armorDmg, breakArmor = nil, false;
@@ -359,7 +375,7 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 		
 		if hitPart then
 			modInfoBubbles.Create{
-				Players=self:GetAttackers();
+				Players=infoBubblePlayers;
 				Position=hitPart.Position;
 				Value=amount;
 				Type=dmgType;
@@ -371,7 +387,7 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 
 	elseif amount <= -1 then
 		modInfoBubbles.Create{
-			Players=self:GetAttackers();
+			Players=infoBubblePlayers;
 			Position=hitPart.Position;
 			Value=math.abs(amount);
 			Type="Heal";
@@ -379,7 +395,7 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 
 	else
 		if toxicDmgTaken ~= true then
-			local attackers = self:GetAttackers();
+			local attackers = infoBubblePlayers;
 			
 			if typeof(dealer) == "Instance" then
 				if dealer:IsA("Player") and table.find(attackers, dealer) == nil then
@@ -452,7 +468,9 @@ end
 function NpcStatusMeta:GetAttackers()
 	local players = {};
 	if self.NpcModule.Weapons then
-		for name, _ in pairs(self.NpcModule.Weapons) do table.insert(players, game.Players:FindFirstChild(name)) end;
+		for name, _ in pairs(self.NpcModule.Weapons) do
+			table.insert(players, game.Players:FindFirstChild(name));
+		end;
 	end
 	
 	if self.NpcModule.NetworkOwners then

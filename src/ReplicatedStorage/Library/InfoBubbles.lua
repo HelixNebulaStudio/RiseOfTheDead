@@ -70,6 +70,8 @@ function InfoBubbles.Spawn(packet)
 	new.Parent = att;
 	new.Adornee = att;
 	
+	local lifespan = 1 - math.clamp(lastBubbleInfo.Index/8, 0, 0.5);
+
 	if bubbleType == "FireDamage" then
 		iconTag.Image = "rbxassetid://3479646912";
 		iconTag.ImageColor3 = Color3.fromRGB(162, 53, 53);
@@ -121,6 +123,7 @@ function InfoBubbles.Spawn(packet)
 		labelTag.TextColor3 = iconTag.ImageColor3;
 
 	else
+		lifespan = 3;
 		labelTag.Size = UDim2.new(1, 0, 1, 0);
 		iconTag.Visible = false;
 	end
@@ -167,15 +170,17 @@ function InfoBubbles.Spawn(packet)
 	end
 	lastBubbleInfo.LastTick = tick();
 
-	local lifespan = 1 - math.clamp(lastBubbleInfo.Index/8, 0, 0.5);
+	if lifespan > 0.5 then
+		Debugger.Expire(att, lifespan);
+	else
+		game.Debris:AddItem(att, lifespan);
+	end
 
 	if Debugger.ClientFps >= 30 then
 		local spread = math.clamp(lastBubbleInfo.Index/8, 0, 3);
 		TweenService:Create(att, TweenInfo.new(lifespan, Enum.EasingStyle.Quart), {WorldPosition=(att.WorldPosition 
 			+ Vector3.new(random:NextNumber(-3 - spread, 3 + spread), 3 + spread, random:NextNumber(-3 - spread, 3 + spread)))}):Play();
 	end
-	game.Debris:AddItem(att, lifespan);
-	
 end
 
 if RunService:IsClient() then

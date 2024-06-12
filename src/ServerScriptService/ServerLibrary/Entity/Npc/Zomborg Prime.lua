@@ -56,7 +56,10 @@ return function(npc, spawnPoint)
 			end
 		end
 
-		self.CustomHealthbar:Create("ImmunitySource", 50000, self.Prefab:WaitForChild("PowerSource"));
+		local powerSource = self.Prefab:WaitForChild("PowerSource")
+		powerSource:AddTag("EntityDestructibles");
+		local powerCoreHealth = math.round(self.Humanoid.MaxHealth * 0.2);
+		self.CustomHealthbar:Create("Power Core", powerCoreHealth, powerSource);
 		
 		self.Immunity = 1.7;
 		self.WeakenImmunity = 1.35;
@@ -65,13 +68,15 @@ return function(npc, spawnPoint)
 		function self.CustomHealthbar:OnDamaged(amount, fromPlayer, storageItem, bodyPart)
 			if bodyPart == nil then return end;
 			if bodyPart.Name == "PowerSource" then
-				self:TakeDamage("ImmunitySource", amount);
+				self:TakeDamage("Power Core", amount);
 				return true;
 			end
+
+			return;
 		end
 
 		self.CustomHealthbar.OnDeath:Connect(function(name, healthInfo)
-			if name == "ImmunitySource" then
+			if name == "Power Core" then
 				self.Prefab.PowerSource.Color = Color3.fromRGB(50, 50, 50);
 				self.Immunity = self.DisabledImmunity;
 				self.RocketBarrageDamage = 25;
@@ -106,7 +111,6 @@ return function(npc, spawnPoint)
 	--== NPC Logic;
 	function self.Update()
 		if self.IsDead then return false; end;
-		--self.CustomHealthbar.Healths.ImmunitySource.IsDead
 		
 		if self.EntityStatus:GetOrDefault("ElectricMod") ~= nil then
 			if self.Immunity and self.Immunity > self.WeakenImmunity then
