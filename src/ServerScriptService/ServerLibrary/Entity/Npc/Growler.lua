@@ -73,7 +73,7 @@ return function(npc, spawnPoint)
 		function self.CustomHealthbar:OnDamaged(amount, fromPlayer: Player, storageItem, bodyPart)
 			if bodyPart == nil then return end;
 			
-			if bodyPart.Name == "Handle" and (bodyPart.Parent.Name == "LeftShield" or bodyPart.Parent.Name == "RightShield") then
+			if bodyPart.Name == "Handle" and (bodyPart.Parent.Name == "Left Scale Claw" or bodyPart.Parent.Name == "Right Scale Claw") then
 				self:TakeDamage(bodyPart.Parent.Name, amount);
 				return true;
 			end
@@ -84,7 +84,7 @@ return function(npc, spawnPoint)
 		local shieldPrefix = {"Left"; "Right"};
 		for a=1, #shieldPrefix do
 			local prefix = shieldPrefix[a];
-			local name = prefix.."Shield";
+			local name = prefix.." Scale Claw";
 			
 			local shieldAccessory = self.Prefab:FindFirstChild(name);
 			
@@ -102,7 +102,7 @@ return function(npc, spawnPoint)
 			bodyPart.CanCollide = true;
 			bodyPart.Parent = workspace.Debris;
 			
-			game.Debris:AddItem(healthInfo.BasePart, 2);
+			Debugger.Expire(healthInfo.BasePart, 2);
 		end)
 		
 		

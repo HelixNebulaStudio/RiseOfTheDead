@@ -179,7 +179,11 @@ function ToolHandler:OnToolEquip(toolModule)
 		self.Garbage:Destruct();
 		for a=1, #colliders do
 			self.Garbage:Tag(colliders[a].Touched:Connect(function(hitPart)
-				local damagable = modDamagable.NewDamagable(hitPart.Parent);
+				local prefab = hitPart.Parent;
+				if prefab and prefab:IsA("Accessory") then
+					prefab = prefab.Parent;
+				end
+				local damagable = modDamagable.NewDamagable(prefab);
 				
 				if damagable then
 					local model = damagable.Model;
