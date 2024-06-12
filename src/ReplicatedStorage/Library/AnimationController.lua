@@ -130,7 +130,10 @@ function AnimationController:LoadAnimation(categoryId, animList, animModule)
 			LoopEnd = nil;
 		};
 
-		self.Garbage:Tag(track);
+		self.Garbage:Tag(function()
+			table.clear(trackData);
+			game.Debris:AddItem(track, 0);
+		end);
 
 		if track.Looped == false then
 			self.Garbage:Tag(track.Stopped:Connect(function()
