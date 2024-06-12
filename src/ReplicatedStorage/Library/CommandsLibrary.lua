@@ -4075,6 +4075,21 @@ Commands["setrc"] = {
 	end;
 };
 
+Commands["setrecomputepaththreshold"] = {
+	Permission = PermissionLevel.DevBranch;
+	Description = "Set recompute path threshold.";
+
+	RequiredArgs = 1;
+	UsageInfo = "/setrecomputepaththreshold number";
+	Function = function(player, args)
+		local num = tonumber(args[1]);
+
+		workspace:SetAttribute("RecomputePathThreshold", num);
+		shared.Notify(player, `Set RecomputePathThreshold to {tostring(workspace:GetAttribute("RecomputePathThreshold"))}`);
+
+		return true;
+	end;
+}
 
 Commands["loadmainsave"] = {
 	Permission = PermissionLevel.DevBranchFree;

@@ -279,6 +279,30 @@ Npc.AttractEnemies = function(character: Model, range: number, func: ((npcModule
 	return enemies;
 end
 
+-- npcModule.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false);
+-- npcModule.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false);
+-- npcModule.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false);
+-- npcModule.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false);
+--
+local unneededHumanoidStates = {
+	--Enum.HumanoidStateType.Climbing;
+	--Enum.HumanoidStateType.Dead;
+	Enum.HumanoidStateType.FallingDown; --
+	Enum.HumanoidStateType.Flying;
+	--Enum.HumanoidStateType.Freefall;
+	--Enum.HumanoidStateType.GettingUp;
+	--Enum.HumanoidStateType.Jumping;
+	--Enum.HumanoidStateType.Landed;
+	--Enum.HumanoidStateType.None;
+	Enum.HumanoidStateType.Physics; --
+	--Enum.HumanoidStateType.PlatformStanding;
+	Enum.HumanoidStateType.Ragdoll; --
+	--Enum.HumanoidStateType.Running;
+	Enum.HumanoidStateType.RunningNoPhysics;
+	--Enum.HumanoidStateType.Seated;
+	Enum.HumanoidStateType.StrafingNoPhysics;
+	Enum.HumanoidStateType.Swimming; --
+};
 --[[**
 	Spawns a NPC of name.
 	@param name <String> Name of the NPC.
@@ -333,10 +357,9 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 	npcPrefab:SetAttribute("EntityId", npcModule.Id);
 	idCounter = idCounter +1;
 	
-	npcModule.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false);
-	npcModule.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false);
-	npcModule.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false);
-	npcModule.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false);
+	for a=1, #unneededHumanoidStates do
+		npcModule.Humanoid:SetStateEnabled(unneededHumanoidStates[a], false);
+	end
 	
 	npcModule.SpawnTime = tick();
 	npcModule.SpawnPoint = cframe;

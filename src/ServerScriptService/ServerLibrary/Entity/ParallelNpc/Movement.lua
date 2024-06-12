@@ -6,6 +6,7 @@ local PathfindingService = game:GetService("PathfindingService");
 local modRegion = require(game.ReplicatedStorage.Library.Region);
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
+local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 
 --
 local Movement = {}
@@ -23,10 +24,12 @@ function Movement.new(parallelNpc)
 	
 	self.Path = nil;
 	
+	self.Status = "idle";
 	self.MoveId = nil;
 	
 	self.TargetPosition = nil;
 	self.TargetPart = nil;
+	self.LastSuccessfulTargetPosition = nil;
 	
 	self.MaxFollowDist = nil;
 	self.MinFollowDist = nil;
@@ -54,6 +57,7 @@ function Movement.new(parallelNpc)
 	local stuckTick = tick();
 	local lastStuckTick = nil;
 	local forceRecomputeTick = tick();
+	local targetMoveRecomputeTick = tick();
 	local dumbFollow = nil;
 	local deltaPosChange, deltaRootPos = 0, nil;
 	
@@ -65,7 +69,22 @@ function Movement.new(parallelNpc)
 	groundRayParams.FilterType = Enum.RaycastFilterType.Include;
 	groundRayParams.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain;};
 
+
+	local walkSpeed = 0;
+	local humanoidAutoRotate = true;
+	local bodyGyroD = 500;
+	local moveToPoint = nil;
+	local jumpRequest = 0;
+	local jumpRequestDebounce = tick();
+
 	--
+	local function SetStatus(status)
+		if status ~= self.Status then
+			self.ParallelNpc.Event:Fire("updateStatus", status);
+		end
+		self.Status = status;
+	end
+
 	local function IsInRange(posA, posB, range, pDist)
 		--local dist = (posA-posB).Magnitude;
 		--if pDist == true then Debugger:Warn("dist", dist) end;
@@ -85,7 +104,7 @@ function Movement.new(parallelNpc)
 		if self.SmartNpc then return end;
 
 		local rootPartPos = getRootPos();
-		if self.TargetPosition and rootPartPos.Y < self.TargetPosition.Y then return end;
+		if self.TargetPosition and rootPartPos.Y < (self.TargetPosition.Y-3) then return end;
 
 		dumbFollow = tick() + (add or 0);
 	end
@@ -94,7 +113,7 @@ function Movement.new(parallelNpc)
 	function self:ComputePathAsync()
 		local cTick = tick();
 		if computeDebounce and tick() <= computeDebounce then
-			if self.DebugMove == true then Debugger:Warn("cpa debounce") end;
+			if self.DebugMove == true then if not Debugger:Debounce("cpadebounce", 1) then Debugger:Warn("cpa debounce") end end;
 			return 
 		end;
 		computeDebounce = cTick +1;
@@ -123,33 +142,29 @@ function Movement.new(parallelNpc)
 			if parallelNpc.IsDead then return end;
 			if self.DebugMove == true then Debugger:Warn("genpath") end;
 
-			if path.Status.Value >= 3 and self.TargetPosition then
-				task.desynchronize();
-				if self.DebugMove == true then Debugger:Warn("path fail approx") end;
-				local rayResults = modRaycastUtil.RingCast(self.TargetPosition, -Vector3.yAxis*16, 3, 4, groundRayParams, {
-					CastChance = 0.45;
-				});
-				task.synchronize();
-
-				for a=1, #rayResults do
-					pcall(function()
-						path:ComputeAsync(rootPartPos, rayResults[a].Position);
-					end)
-					if path.Status.Value <= 2 then
-						computeDebounce = cTick +3;
-						break;
-					end
-				end
-
-				if path.Status.Value >= 3 then
+			if path.Status == Enum.PathStatus.NoPath and self.LastSuccessfulTargetPosition then
+				-- MARK: path failed logic;
+				pcall(function()
+					path:ComputeAsync(rootPartPos, self.LastSuccessfulTargetPosition);
+				end)
+				
+				if path.Status == Enum.PathStatus.NoPath then
 					if self.DebugMove == true then Debugger:Warn("path failed", path.Status.Value) end;
 					self.NextWaypoint = nil;
 					table.clear(self.Waypoints);
 					computeDebounce = cTick +5;
+					SetStatus("moveToDirection");
 	
 					doDumbFollow();
 					return;
+				else
+					SetStatus("moveToLastPosition");
+
 				end
+			else
+				self.LastSuccessfulTargetPosition = self.TargetPosition;
+				SetStatus("moveToPosition");
+
 			end
 
 			task.synchronize();
@@ -219,6 +234,7 @@ function Movement.new(parallelNpc)
 		
 		if self.TargetPosition == nil then return end;
 		if not reached then
+			if self.DebugMove == true then Debugger:Warn("mtf != reach") end;
 			self.Recompute = true;
 			return;
 		end
@@ -230,7 +246,7 @@ function Movement.new(parallelNpc)
 		end
 
 		if self.NextWaypointIndex <= #self.Waypoints then
-			if self.DebugMove == true then Debugger:Warn("mtf unw",self.NextWaypointIndex,#self.Waypoints) end;
+			if self.DebugMove == true then Debugger:Warn("mtf unw",self.NextWaypointIndex, #self.Waypoints) end;
 			self:UpdateNextWaypoint();
 			lastStuckTick = nil;
 			
@@ -247,6 +263,7 @@ function Movement.new(parallelNpc)
 					self.TargetPart = nil;
 					self.TargetPosition = nil;
 					self.NextWaypoint = nil;
+					SetStatus("arrived");
 					self:MoveEnded("nomorepath");
 					
 				else
@@ -267,12 +284,10 @@ function Movement.new(parallelNpc)
 		
 	end)
 	
-
-	local walkSpeed = 0;
-	local humanoidAutoRotate = true;
-	local bodyGyroD = 500;
-	local moveToPoint = nil;
-	local jumpRequest = nil;
+	rootPart:GetPropertyChangedSignal("CFrame"):ConnectParallel(function()
+		if self.DebugMove == true then Debugger:Warn("npc tp recompute") end;
+		self.Recompute = true;
+	end)
 
 	RunService.Stepped:Connect(function()
 		if parallelNpc.IsDead then
@@ -291,9 +306,11 @@ function Movement.new(parallelNpc)
 			humanoid:MoveTo(moveToPoint);
 		end
 
-		if jumpRequest and walkSpeed > 0 then
-			humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
-			jumpRequest = nil;
+		if jumpRequest > 0 and walkSpeed > 0 and tick()>jumpRequestDebounce then
+			jumpRequestDebounce = tick()+0.1;
+			humanoid.Jump = true;
+			if self.DebugMove then Debugger:Warn("jmp") end;
+			jumpRequest = math.clamp(jumpRequest - 1, 0, 3);
 		end
 
 		if humanoidAutoRotate then
@@ -352,6 +369,7 @@ function Movement.new(parallelNpc)
 		if self.PauseTick and tick() <= self.PauseTick then
 			if not IsInRange(humanoid.WalkToPoint, getRootPos(), 1) then
 				moveToPoint = getRootPos();
+				SetStatus("moveToPause");
 			end
 			return;
 		end
@@ -361,21 +379,50 @@ function Movement.new(parallelNpc)
 		end
 		
 		if self.TargetPosition == nil then
+			SetStatus("idle");
 			return 
 		end;	
 		
 		
 		if #self.Waypoints <= 0 then
 			self.Recompute = true;
-			if self.DebugMove == true then Debugger:Warn("#wp <= 0") end;
+			if self.DebugMove == true then
+				if not Debugger:Debounce("wp<=0", 0.1) then
+					Debugger:Warn("#wp <= 0");
+				end
+			end;
 			
 		else
-			if self.LastTargetPosition == nil or not modRegion:InRegion(self.TargetPosition, self.LastTargetPosition, 2) then -- Target position moved;
+			local tarDistChange = self.LastTargetPosition and modVector.DistanceSqrd(self.TargetPosition, self.LastTargetPosition) or 0;
+			local distSqr = modVector.DistanceSqrd(self.TargetPosition, getRootPos())*(workspace:GetAttribute("RecomputePathThreshold") or 0.1);
+			
+			if self.LastTargetPosition == nil or (tarDistChange > distSqr) then -- Target position moved;
+				--or not modRegion:InRegion(self.TargetPosition, self.LastTargetPosition, 2)
 				local ltpIsNil = self.LastTargetPosition == nil;
+				local recompute = true;
+
+				-- local tSinceLastRecomputeForTargetPosChange = tick()-targetMoveRecomputeTick;
+
+				-- if tSinceLastRecomputeForTargetPosChange <= 6 and distSqr > 65536 then -- 256
+				-- 	recompute = false;
+					
+				-- elseif tSinceLastRecomputeForTargetPosChange <= 4 and distSqr > 16384 then -- 128
+				-- 	recompute = false;
+					
+				-- elseif tSinceLastRecomputeForTargetPosChange <= 2 and distSqr > 4096 then -- 64
+				-- 	recompute = false;
+
+				-- end
+
 				self.LastTargetPosition = self.TargetPosition;
-				self.Recompute = true;
+				self.Recompute = recompute;
+				if recompute then
+					targetMoveRecomputeTick = tick();
+				else
+					
+				end
 				
-				if self.DebugMove == true then Debugger:Warn("tp ~= ltp, ltpIsNil", ltpIsNil) end;
+				if self.DebugMove == true then Debugger:Warn("tp ~= ltp, ltpIsNil", ltpIsNil, "recompute", recompute) end;
 			end
 			
 		end
@@ -388,6 +435,7 @@ function Movement.new(parallelNpc)
 		
 		if isInMaxFollowDist and self.MaxFollowDist then
 			if dumbFollow and tick() <= dumbFollow then
+				moveToPoint = self.TargetPosition;
 				return;
 			end
 			
@@ -410,11 +458,14 @@ function Movement.new(parallelNpc)
 		
 		if dumbFollow and tick()-dumbFollow <= 2 then
 			moveToPoint = self.TargetPosition;
+
 			if math.random(1, deltaPosChange <= 0.01 and 32 or 64) == 1 then
 				local heightDif = self.TargetPosition.Y-rootPosition.Y;
-				if self.DebugMove == true then Debugger:Warn("Try jump", heightDif) end;
 				if heightDif > 8 or deltaPosChange <= 0.001 then
-					jumpRequest = true;
+					if jumpRequest <= 0 then
+						if self.DebugMove == true then Debugger:Warn("df jmp+", heightDif) end;
+						jumpRequest = jumpRequest +1;
+					end
 				end
 			end
 			return;
@@ -435,10 +486,14 @@ function Movement.new(parallelNpc)
 			
 			moveToPoint = walkToPoint;
 			
-			if self.NextWaypoint.Action == Enum.PathWaypointAction.Jump 
-				and IsInRange(rootPosition, walkToPoint, math.max(humanoid.WalkSpeed/2, 4))
-				or deltaPosChange <= 0.001 then
-				jumpRequest = true;
+			if self.NextWaypoint.Action == Enum.PathWaypointAction.Jump then
+				local jumpingDist = (math.max(humanoid.WalkSpeed/2, 4)^2)-5;
+				local wtpDist = modVector.DistanceSqrd(rootPosition+Vector3.new(0, 1, 0), walkToPoint);
+				
+				if self.DebugMove == true then Debugger:Warn("wp jmp+ rq", jumpingDist, wtpDist) end;
+				if wtpDist <= jumpingDist then
+					jumpRequest = jumpRequest +1;
+				end
 			end
 
 			if tick()-stuckTick < 3 then return end;
@@ -446,7 +501,9 @@ function Movement.new(parallelNpc)
 			
 			if lastStuckTick and tick()-lastStuckTick <= 6.1 then
 				if walkSpeed > 0 then
-					jumpRequest = true;
+					if jumpRequest <= 0 then
+						jumpRequest = jumpRequest +1;
+					end
 					if self.DebugMove == true then Debugger:Warn("ls jump") end;
 				end
 				if self.DebugMove == true then Debugger:Warn("long stuck") end;
@@ -454,15 +511,16 @@ function Movement.new(parallelNpc)
 				lastStuckTick = nil;
 			end
 
-			if IsInRange(self.LastRootPosition, rootPosition, 1) then
+			if deltaPosChange <= 0.01 then -- if IsInRange(self.LastRootPosition, rootPosition, 1) then
 				self.Recompute = true;
-				if self.DebugMove == true then Debugger:Warn("detected stuck") end;
+				if self.DebugMove == true then Debugger:Warn("detected stuck", deltaPosChange) end;
 				lastStuckTick = tick();
 			end
 
 			self.LastRootPosition = rootPosition;
 			
 		elseif isNextToTarget then
+			SetStatus("arrived");
 			self:MoveEnded("arrived")
 			
 		end
@@ -481,7 +539,6 @@ function Movement.new(parallelNpc)
 			if wpIndex <= self.NextWaypointIndex then return end;
 
 			self:ComputePathAsync();
-			Debugger:Warn("path blocked");
 		end)
 
 		path.Unblocked:Connect(function(wpIndex)
@@ -491,7 +548,6 @@ function Movement.new(parallelNpc)
 			if wpIndex <= self.NextWaypointIndex then return end;
 
 			self:ComputePathAsync();
-			Debugger:Warn("path unblocked");
 		end)
 
 		self.Path = path;
@@ -506,9 +562,9 @@ function Movement.new(parallelNpc)
 		self.MinFollowDist = packet.MinFollowDist;
 		self.LastRootPosition = getRootPos();
 
-		if self.DebugMove == true then
-			Debugger:Warn("Move Target", packet.Target, typeof(packet.Target)) 
-		end;
+		-- if self.DebugMove == true then
+		-- 	Debugger:Warn("Move Target", packet.Target, typeof(packet.Target)) 
+		-- end;
 		
 		if typeof(packet.Target) == "Vector3" then
 			self.TargetPart = nil;
@@ -517,6 +573,7 @@ function Movement.new(parallelNpc)
 		elseif typeof(packet.Target) == "Instance" then
 			if self.TargetPart ~= packet.Target then
 				self.Recompute = true;
+				self.LastSuccessfulTargetPosition = nil;
 			end
 			
 			self.TargetPart = packet.Target;
@@ -554,6 +611,7 @@ function Movement.new(parallelNpc)
 	parallelNpc.Actor:BindToMessage("Stop", function(packet)
 		self.TargetPart = nil;
 		self.TargetPosition = nil;
+		self.LastSuccessfulTargetPosition = nil;
 		self.MaxFollowDist = nil;
 		self.MinFollowDist = nil;
 		self.PauseTick = nil;

@@ -1464,6 +1464,7 @@ function Player.new(playerInstance: Player)
 		self.CharacterModule = nil;
 
 		PlayerService.Players[self.Name] = nil;
+		table.clear(self);
 	end
 	
 	function meta:CastGroundRay(distance)

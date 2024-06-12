@@ -238,6 +238,8 @@ function Move.new(self)
 	}
 	
 	moveObject.IsMoving = false;
+	moveObject.Status = "idle";
+
 	moveObject.MoveId = 0;
 	moveObject.MoveToEnded = modEventSignal.new("MoveToEnded");
 	
@@ -272,6 +274,14 @@ function Move.new(self)
 			moveObject.IsMoving = false;
 			moveObject.MoveToEnded:Fire(...);
 
+		elseif action == "updateStatus" then
+			moveObject.Status = ...;
+
+			if self.Prefab:GetAttribute("DebugMoveStatus") then
+				Debugger:Display({
+					MoveStatus=tostring(moveObject.Status);
+				});
+			end
 		end
 	end)
 	
