@@ -341,6 +341,7 @@ function Interface.init(modInterface)
 
 	local useDebounce = false;
 	local usableContextOption = {
+		Id="Usable";
 		Text=function(Table)
 			return Table.Library.Usable or "Use";
 		end;

@@ -963,6 +963,21 @@ function StorageInterface:NewButton(id)
 		mouseInOptionFrame = tick();
 		if generateOnly then return end;
 
+		if slotItem.Library and slotItem.Library.ContextOrder then
+			table.sort(self.ContextOptions, function(a, b)
+				local aOrder = (a.Order or 99);
+				local bOrder = (b.Order or 99);
+				if a and a.Id == slotItem.Library.ContextOrder then
+					aOrder = 0;
+					a.Order = aOrder;
+				elseif b and b.Id == slotItem.Library.ContextOrder then
+					bOrder = 0;
+					b.Order = bOrder;
+				end
+				return aOrder < bOrder;
+			end)
+		end
+
 		local contextOptionFirstPass = true;
 		for a=1, #self.ContextOptions do
 			local option = self.ContextOptions[a];
