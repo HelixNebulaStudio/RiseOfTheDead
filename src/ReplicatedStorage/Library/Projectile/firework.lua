@@ -30,12 +30,13 @@ function Pool.new(owner)
 	projectile.ArcTracerConfig = {
 		LifeTime=10;
 		Acceleration=Vector3.new(0, 296.2, 0);
+		Delta=1/60;
 	};
 	
-	projectile.Configurations = {
-		ProjectileLifeTime=10;
-		ProjectileAcceleration=Vector3.new(0, 296.2, 0);
-	};
+	-- projectile.Configurations = {
+	-- 	ProjectileLifeTime=10;
+	-- 	ProjectileAcceleration=Vector3.new(0, 296.2, 0);
+	-- };
 	
 	function projectile:Activate()
 		local Launch = projectile.Prefab:WaitForChild("Launch");

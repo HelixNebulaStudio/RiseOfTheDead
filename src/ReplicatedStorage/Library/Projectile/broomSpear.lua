@@ -24,6 +24,7 @@ function Pool.new(owner)
 		LifeTime=30;
 		Bounce=0;
 		RayRadius=0.5;
+		Delta=1/60;
 	};
 	
 	-- projectile.Configurations = {

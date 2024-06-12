@@ -23,6 +23,7 @@ function Pool.new(owner)
 		Velocity=300;
 		LifeTime=20;
 		Bounce=0;
+		Delta=1/60;
 	};
 
 	function projectile:Activate()

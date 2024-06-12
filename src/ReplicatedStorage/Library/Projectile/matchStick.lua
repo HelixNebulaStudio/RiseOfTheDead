@@ -25,6 +25,7 @@ function Pool.new(owner)
 		LifeTime = 4;
 		Acceleration = Vector3.new(0, -workspace.Gravity, 0);
 		KeepAcceleration = true;
+		Delta=1/60;
 	};
 	
 	projectile.Configurations = {

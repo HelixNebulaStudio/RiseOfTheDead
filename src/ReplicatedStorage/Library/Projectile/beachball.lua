@@ -25,6 +25,7 @@ function Pool.new(owner)
 		MaxBounce=32;
 		LifeTime=10;
 		RayRadius=1.5;
+		Delta=1/60;
 	};
 
 	function projectile:OnContact(arcPoint)

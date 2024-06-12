@@ -29,6 +29,8 @@ function Pool.new(owner)
 		Bounce=1;
 		MaxBounce=9;
 		KeepAcceleration = true;
+		
+		Delta=1/60;
 	}
 
 	function projectile.ArcTracerConfig.OnStepped(projectile, arcPoint)

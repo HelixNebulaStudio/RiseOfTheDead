@@ -24,6 +24,7 @@ function Pool.new(owner)
 	
 		IgnoreEntities=true;
 		AddIncludeTags={"TargetableEntities"};
+		Delta=1/60;
 	};
 	
 	function projectile:Activate()
