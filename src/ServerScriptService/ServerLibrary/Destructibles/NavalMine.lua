@@ -42,7 +42,8 @@ return function(Destructible)
 								damagable:TakeDamagePackage(modDamagable.NewDamageSource{
 									Damage=25000;
 									Dealer=Destructible;
-									DamageType="ExplosiveModel";
+									DamageType="Explosive";
+									DamageCate=modDamagable.DamageCategory.ExplosiveBarrel;
 								})
 								
 								if npcModule.Stunned == nil then
@@ -60,7 +61,8 @@ return function(Destructible)
 								damagable:TakeDamagePackage(modDamagable.NewDamageSource{
 									Damage=(humanoid.MaxHealth * (isBasicEnemy and random:NextNumber(0.8, 1) or random:NextNumber(0.1, 0.2)));
 									Dealer=Destructible;
-									DamageType="ExplosiveModel";
+									DamageType="Explosive";
+									DamageCate=modDamagable.DamageCategory.ExplosiveBarrel;
 								});
 							end
 						end

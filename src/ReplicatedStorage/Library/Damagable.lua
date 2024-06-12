@@ -22,6 +22,7 @@ Damagable.DamageCategory = {
 	Projectile="Projectile";
 
 	FumesGas="Fumes Gas";
+	ExplosiveBarrel="Explosive Barrel";
 }
 
 --==

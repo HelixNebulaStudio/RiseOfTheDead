@@ -48,7 +48,7 @@ function NpcStatusMeta:GetImmunity(damageType, damageCate)
 	local npcModule = self.NpcModule;
 	local immunity = npcModule.Immunity or 0;
 
-	if damageType == "ExplosiveModel" then
+	if damageCate == modDamagable.DamageCategory.ExplosiveBarrel then
 		damageType = nil;
 		immunity = 0;
 	end
@@ -101,11 +101,11 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 	local immunity = self:GetImmunity(damageType, damageCate);
 
 	local toxicDmgTaken = false;
-	if damageType == nil and amount > 0 then
+	if amount > 0 then
 		if immunity > 1 then -- invert damage (1, inf]
 			amount = amount * -immunity;
 
-		elseif immunity < 0 then -- extra damage [-inf, 0)
+		elseif immunity < 0 and damageType ~= "ToxicDamage" then -- extra damage [-inf, 0)
 			if storageItem and player and player:IsA("Player") then
 				local profile = shared.modProfile:Get(player);
 				local toolModule = profile:GetItemClass(storageItem.ID);
@@ -128,7 +128,6 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 			amount = amount * (1-immunity);
 
 		end
-
 	end
 
 	
