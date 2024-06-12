@@ -32,11 +32,15 @@ function InfoBubbles.Create(packet, ...)
 		
 		local firedPlayer = {};
 		for a=1, #packet.Players do
-			if typeof(packet.Players[a]) ~= "Instance" or not packet.Players[a]:IsA("Player") then continue end;
-			if firedPlayer[packet.Players[a]] then continue end;
-			firedPlayer[packet.Players[a]] = true;
+			local player = packet.Players[a];
+			if typeof(player) ~= "Instance" or not player:IsA("Player") then continue end;
+			if firedPlayer[player] then continue end;
+			firedPlayer[player] = true;
 			
-			remoteCreateInfoBubble:FireClient(packet.Players[a], packet);
+			local profile = shared.modProfile:Get(player);
+			if profile and profile.Settings and profile.Settings.DamageBubble == 1 then continue end;
+
+			remoteCreateInfoBubble:FireClient(player, packet);
 		end
 	end)
 end
@@ -192,14 +196,6 @@ if RunService:IsClient() then
 		remoteCreateInfoBubble.OnClientEvent:Connect(function(packet)
 			if localPlayer:GetAttribute("CinematicMode") then return end;
 			if localPlayer:GetAttribute("DisableHud") then return end;
-
-			local bubbleType = packet.Type;
-			modData = require(localPlayer:WaitForChild("DataModule"));
-			if modData and modData:GetSetting("DamageBubble") == 1 then
-				return;
-			end;
-
-			if Debugger.ClientFps <= 5 then return end;
 			
 			packet.SpawnPart = spawnPart;
 			InfoBubbles.Spawn(packet);
