@@ -37,7 +37,7 @@ function NekronSpore.Spawn(origin, veinTargetPart, parent, param)
 	newSpore.Transparency = 0;
 	newSpore.Size = Vector3.zero;
 	newSpore.CFrame = CFrame.new(origin);
-	newSpore.Name = "Spore".. hostNpcModule.SporeCount;
+	newSpore.Name = "Nekros Spore".. hostNpcModule.SporeCount;
 	newSpore.CollisionGroup = "Default";
 	newSpore.Parent = parent;
 	newSpore.CanCollide = false;
@@ -80,7 +80,7 @@ function NekronSpore.Spawn(origin, veinTargetPart, parent, param)
 			end
 			hostNpcModule.VeinLaunched = hostNpcModule.VeinLaunched +1;
 
-			local projectileName = "Vein"..hostNpcModule.VeinLaunched;
+			local projectileName = "Nekros Vein"..hostNpcModule.VeinLaunched;
 			local healthObj = hostNpcModule.CustomHealthbar:Create(projectileName, 100, projPart);
 
 			healthObj.SporeObject = newSpore;

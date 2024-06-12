@@ -63,7 +63,7 @@ return function(npc, spawnPoint)
 
 		local twistAngleLimit = 65;
 
-		self.VexBody = self.Prefab:WaitForChild("VexeronBody");
+		self.VexBody = self.Prefab:WaitForChild("Vexeworm");
 
 		self.Configuration.VexeronLength = 8;
 		self.Humanoid.MaxHealth = 256000;
@@ -140,7 +140,7 @@ return function(npc, spawnPoint)
 
 		self.CustomHealthbar.OnDeath:Connect(function(name, healthInfo)
 			local bodyPart = self.Prefab:FindFirstChild(name);
-			if bodyPart and bodyPart.Name:match("VexeronSpitterHead") then
+			if bodyPart and bodyPart.Name:match("Vexsplitter") then
 				bodyPart.Color = Color3.fromRGB(50, 50, 50);
 				
 				local newExplosion = Instance.new("Explosion");
@@ -225,7 +225,7 @@ return function(npc, spawnPoint)
 				return;
 			end
 			
-			if hitPart.Name:match("VexeronBody") then
+			if hitPart.Name:match("Vexeworm") then
 				self:DamageTarget(player.Character, self.Properties.AttackDamage);
 				modStatusEffects.Knockback(player, hitPart, 100);
 			end
@@ -321,7 +321,7 @@ return function(npc, spawnPoint)
 					local bodyParts = self.Prefab:GetChildren();
 					for a=1, #bodyParts do
 						if bodyParts[a]:IsA("BasePart") then
-							if bodyParts[a].Name:match("VexeronBody") and bodyParts[a].Name ~= "VexeronBody" then
+							if bodyParts[a].Name:match("Vexeworm") and bodyParts[a].Name ~= "Vexeworm" then
 								table.insert(self.VexBodies, bodyParts[a]);
 							end
 						end

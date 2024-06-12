@@ -102,7 +102,7 @@ return function(npc, spawnPoint)
 			bodyPart.CanCollide = true;
 			bodyPart.Parent = workspace.Debris;
 			
-			Debugger.Expire(healthInfo.BasePart, 2);
+			game.Debris:AddItem(healthInfo.BasePart, 2);
 		end)
 		
 		

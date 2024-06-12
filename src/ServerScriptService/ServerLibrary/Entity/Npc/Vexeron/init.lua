@@ -66,7 +66,7 @@ return function(npc, spawnPoint)
 		
 		local twistAngleLimit = 65;
 		
-		self.VexBody = self.Prefab:WaitForChild("VexeronBody");
+		self.VexBody = self.Prefab:WaitForChild("Vexeworm");
 		
 		if self.HardMode then
 			self.Configuration.VexeronLength = 16;
@@ -130,7 +130,7 @@ return function(npc, spawnPoint)
 		for a=1, #bodyParts do
 			if bodyParts[a]:IsA("BasePart") then
 				bodyParts[a]:SetNetworkOwner(nil);
-				if bodyParts[a].Name:match("VexeronBody") then
+				if bodyParts[a].Name:match("Vexeworm") then
 					if self.HardMode then
 						self.CustomHealthbar:Create(bodyParts[a].Name, 50000, bodyParts[a]);
 					else

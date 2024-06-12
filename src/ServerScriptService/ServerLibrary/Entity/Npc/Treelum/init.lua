@@ -45,8 +45,6 @@ return function(npc, spawnPoint)
 	function self.Initialize()
 		self.Prefab:SetAttribute("EntityHudHealth", true);
 
-		--self.CustomHealthbar:Create("Left Arm", 15000, self.Prefab:WaitForChild("LeftArm"));
-		
 		function self.CustomHealthbar:OnDamaged(amount, fromPlayer, storageItem, bodyPart)
 			if bodyPart == nil then return end;
 			--if bodyPart.Name == "LeftHand" or bodyPart.Name == "LeftArm" or bodyPart.Name == "LeftShoulder" then

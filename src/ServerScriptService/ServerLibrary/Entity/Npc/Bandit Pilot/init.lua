@@ -121,20 +121,19 @@ return function(npc, spawnPoint)
 				local partName = heliPart.Name;
 				if partName == "TopCover" then
 					heliPart:AddTag("EntityDestructibles");
-					self.CustomHealthbar:Create(partName, self.HardMode and 25000 or 10000, heliPart);
-					
+					self.CustomHealthbar:Create("Top Rotor", self.HardMode and 25000 or 10000, heliPart);
+
 				elseif (self.HardMode and partName == "TailHitbox") or partName == "TailPart" then
 					heliPart:AddTag("EntityDestructibles");
-					self.CustomHealthbar:Create(partName, self.HardMode and 25000 or 25000, heliPart);
+					self.CustomHealthbar:Create("Tail Rotor", self.HardMode and 25000 or 25000, heliPart);
 					
 				elseif partName == "FrontTip" then
 					heliPart:AddTag("EntityDestructibles");
-					self.CustomHealthbar:Create(partName, self.HardMode and 50000 or 10000, heliPart);
+					self.CustomHealthbar:Create("Controls", self.HardMode and 50000 or 10000, heliPart);
 
 				elseif partName == "LLauncherHitbox" or partName == "RLauncherHitbox" then
 					heliPart:AddTag("EntityDestructibles");
-					self.CustomHealthbar:Create(partName, 40000, heliPart);
-					
+					self.CustomHealthbar:Create(partName == "LLauncherHitbox" and "Left Missile Launcher" or "Right Missile Launcher", 40000, heliPart);
 					
 				elseif partName == "RopePoint" then
 					heliPart:SetNetworkOwner(nil);
@@ -234,10 +233,9 @@ return function(npc, spawnPoint)
 		
 		function self.CustomHealthbar:OnDamaged(amount, fromPlayer, storageItem, bodyPart)
 			if self.IsDead or bodyPart == nil then return end;
-			local healthInfo = self.Healths[bodyPart.Name];
+			local healthInfo = self:GetFromPart(bodyPart);
 			if healthInfo then
-				
-				self:TakeDamage(bodyPart.Name, amount);
+				self:TakeDamage(healthInfo.Name, amount);
 
 				local part = healthInfo.BasePart;
 				if tick()-(healthInfo.LastSoundEffect or 0) > 1.5 then

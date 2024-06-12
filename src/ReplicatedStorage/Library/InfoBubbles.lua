@@ -64,14 +64,12 @@ function InfoBubbles.Spawn(packet)
 	
 	local new = infoBubblePrefab:Clone();
 	local iconTag = new:WaitForChild("IconTag");
-	local labelTag = new:WaitForChild("LabelTag");
+	local labelTag: TextLabel = new:WaitForChild("LabelTag");
 
 	labelTag.Text = packet.ValueString or ""; --typeof(value) == "number" and math.floor(value+0.5) or value or ""; --(math.floor(value*100)/100)
 	new.Parent = att;
 	new.Adornee = att;
 	
-	local lifespan = 1 - math.clamp(lastBubbleInfo.Index/8, 0, 0.5);
-
 	if bubbleType == "FireDamage" then
 		iconTag.Image = "rbxassetid://3479646912";
 		iconTag.ImageColor3 = Color3.fromRGB(162, 53, 53);
@@ -123,7 +121,6 @@ function InfoBubbles.Spawn(packet)
 		labelTag.TextColor3 = iconTag.ImageColor3;
 
 	else
-		lifespan = 3;
 		labelTag.Size = UDim2.new(1, 0, 1, 0);
 		iconTag.Visible = false;
 	end
@@ -170,16 +167,23 @@ function InfoBubbles.Spawn(packet)
 	end
 	lastBubbleInfo.LastTick = tick();
 
-	if lifespan > 0.5 then
-		Debugger.Expire(att, lifespan);
+	local lifespan = 1 - math.clamp(lastBubbleInfo.Index/8, 0, 0.5);
+	local yOffset = 0;
+
+	if #labelTag.Text >= 6 then 
+		Debugger.Expire(att, math.clamp(#labelTag.Text/7, 0.5, 5));
+		yOffset = 3;
+		lifespan = lifespan +0.2;
+
 	else
 		game.Debris:AddItem(att, lifespan);
+
 	end
 
 	if Debugger.ClientFps >= 30 then
 		local spread = math.clamp(lastBubbleInfo.Index/8, 0, 3);
 		TweenService:Create(att, TweenInfo.new(lifespan, Enum.EasingStyle.Quart), {WorldPosition=(att.WorldPosition 
-			+ Vector3.new(random:NextNumber(-3 - spread, 3 + spread), 3 + spread, random:NextNumber(-3 - spread, 3 + spread)))}):Play();
+			+ Vector3.new(random:NextNumber(-3 - spread, 3 + spread), 3 + spread + yOffset, random:NextNumber(-3 - spread, 3 + spread)))}):Play();
 	end
 end
 

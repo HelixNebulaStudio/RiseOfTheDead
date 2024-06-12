@@ -159,10 +159,10 @@ function CustomHealthbar:TakeDamage(name, amount)
 		self.OnDeath:Fire(name, healthObj);
 
 		task.spawn(function()
-			local destoryStr = `{name} Destroyed!`;
+			task.wait(0.1);
+			local destoryStr = `{(string.gsub(name, "[%A]*", ""))} Destroyed!`;
 			local attackers = self.Npc.Status:GetAttackers();
-
-			Debugger:StudioWarn("CustomHealth Obj: ", destoryStr);
+			Debugger:StudioWarn("Destroyed CustomHealthObj ", name);
 
 			modInfoBubbles.Create{
 				Players=attackers;
@@ -172,7 +172,7 @@ function CustomHealthbar:TakeDamage(name, amount)
 			};
 			
 			task.delay(3, function()
-				if healthObj and not healthObj.IsDead then
+				if healthObj then
 					self:HideGui(name);
 				end
 			end)

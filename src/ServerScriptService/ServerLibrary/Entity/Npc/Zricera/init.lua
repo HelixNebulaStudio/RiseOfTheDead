@@ -3,14 +3,10 @@ local random = Random.new();
 
 local CollectionService = game:GetService("CollectionService");
 
-local remotes = game.ReplicatedStorage.Remotes;
-local remoteCameraShakeAndZoom = remotes.CameraShakeAndZoom;
-
 local ZombieModule = script.Parent.Zombie;
 --== Modules
 local modNpcComponent = Debugger:Require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
 local modAudio = Debugger:Require(game.ReplicatedStorage.Library.Audio);
-local modExperience = Debugger:Require(game.ServerScriptService.ServerLibrary.Experience);
 local modProjectile = Debugger:Require(game.ReplicatedStorage.Library.Projectile);
 local modTouchHandler = Debugger:Require(game.ReplicatedStorage.Library.TouchHandler);
 local modStatusEffects = Debugger:Require(game.ReplicatedStorage.Library.StatusEffects);
@@ -66,19 +62,19 @@ return function(npc, spawnPoint)
 		end
 		
 		if self.HardMode then
-			self.CustomHealthbar:Create("Left Arm", 300000, self.Prefab:WaitForChild("LeftArm"));
-			self.CustomHealthbar:Create("Right Arm", 300000, self.Prefab:WaitForChild("RightArm"));
-			self.CustomHealthbar:Create("Left Leg", 100000, self.Prefab:WaitForChild("LeftLeg"));
-			self.CustomHealthbar:Create("Right Leg", 100000, self.Prefab:WaitForChild("RightLeg"));
+			self.CustomHealthbar:Create("Left Leg", 300000, self.Prefab:WaitForChild("LeftArm"));
+			self.CustomHealthbar:Create("Right Leg", 300000, self.Prefab:WaitForChild("RightArm"));
+			self.CustomHealthbar:Create("Left Hind", 100000, self.Prefab:WaitForChild("LeftLeg"));
+			self.CustomHealthbar:Create("Right Hind", 100000, self.Prefab:WaitForChild("RightLeg"));
 
 			self.Humanoid.MaxHealth = 1200300;
 			self.Humanoid.Health = self.Humanoid.MaxHealth;
 			
 		else
-			self.CustomHealthbar:Create("Left Arm", 15000, self.Prefab:WaitForChild("LeftArm"));
-			self.CustomHealthbar:Create("Right Arm", 15000, self.Prefab:WaitForChild("RightArm"));
-			self.CustomHealthbar:Create("Left Leg", 5000, self.Prefab:WaitForChild("LeftLeg"));
-			self.CustomHealthbar:Create("Right Leg", 5000, self.Prefab:WaitForChild("RightLeg"));
+			self.CustomHealthbar:Create("Left Leg", 15000, self.Prefab:WaitForChild("LeftArm"));
+			self.CustomHealthbar:Create("Right Leg", 15000, self.Prefab:WaitForChild("RightArm"));
+			self.CustomHealthbar:Create("Left Hind", 5000, self.Prefab:WaitForChild("LeftLeg"));
+			self.CustomHealthbar:Create("Right Hind", 5000, self.Prefab:WaitForChild("RightLeg"));
 			
 			for _, obj in pairs(self.Prefab:GetChildren()) do
 				if obj:IsA("BasePart") and obj.Material == Enum.Material.Foil then
@@ -91,27 +87,27 @@ return function(npc, spawnPoint)
 		function self.CustomHealthbar:OnDamaged(amount, fromPlayer, storageItem, bodyPart)
 			if bodyPart == nil then return end;
 			if bodyPart.Name == "LeftHand" or bodyPart.Name == "LeftArm" or bodyPart.Name == "LeftShoulder" then
-				self:TakeDamage("Left Arm", amount);
-				
-			elseif bodyPart.Name == "RightHand" or bodyPart.Name == "RightArm" or bodyPart.Name == "RightShoulder" then
-				self:TakeDamage("Right Arm", amount);
-				
-			elseif bodyPart.Name == "LeftFeet" or bodyPart.Name == "LeftHip" or bodyPart.Name == "LeftLeg" then
 				self:TakeDamage("Left Leg", amount);
 				
-			elseif bodyPart.Name == "RightFeet" or bodyPart.Name == "RightHip" or bodyPart.Name == "RightLeg" then
+			elseif bodyPart.Name == "RightHand" or bodyPart.Name == "RightArm" or bodyPart.Name == "RightShoulder" then
 				self:TakeDamage("Right Leg", amount);
+				
+			elseif bodyPart.Name == "LeftFeet" or bodyPart.Name == "LeftHip" or bodyPart.Name == "LeftLeg" then
+				self:TakeDamage("Left Hind", amount);
+				
+			elseif bodyPart.Name == "RightFeet" or bodyPart.Name == "RightHip" or bodyPart.Name == "RightLeg" then
+				self:TakeDamage("Right Hind", amount);
 			end
 		end
 		
 		self.CustomHealthbar.OnDeath:Connect(function(name, healthInfo)
-			if name == "Left Arm" then
+			if name == "Left Leg" then
 				self.Prefab.LeftArm.Color = Color3.fromRGB(50, 50, 50);
-			elseif name == "Right Arm" then
-				self.Prefab.RightArm.Color = Color3.fromRGB(50, 50, 50);
-			elseif name == "Left Leg" then
-				self.Prefab.LeftLeg.Color = Color3.fromRGB(50, 50, 50);
 			elseif name == "Right Leg" then
+				self.Prefab.RightArm.Color = Color3.fromRGB(50, 50, 50);
+			elseif name == "Left Hind" then
+				self.Prefab.LeftLeg.Color = Color3.fromRGB(50, 50, 50);
+			elseif name == "Right Hind" then
 				self.Prefab.RightLeg.Color = Color3.fromRGB(50, 50, 50);
 			end
 		end)
@@ -166,12 +162,12 @@ return function(npc, spawnPoint)
 			local track = runningTracks[a].Track;
 			self.Garbage:Tag(track:GetMarkerReachedSignal("Step"):Connect(function(paramString)
 				if paramString == "1" then
-					if self.Prefab:FindFirstChild("RightHand") and not self.CustomHealthbar.Healths["Right Arm"].IsDead then
+					if self.Prefab:FindFirstChild("RightHand") and not self.CustomHealthbar.Healths["Right Leg"].IsDead then
 						spawnLava(self.Prefab.RightHand.Position);
 					end
 
 				elseif paramString == "2" then
-					if self.Prefab:FindFirstChild("LeftHand") and not self.CustomHealthbar.Healths["Left Arm"].IsDead then
+					if self.Prefab:FindFirstChild("LeftHand") and not self.CustomHealthbar.Healths["Left Leg"].IsDead then
 						spawnLava(self.Prefab.LeftHand.Position);
 					end
 
@@ -225,7 +221,7 @@ return function(npc, spawnPoint)
 		end
 	end);
 	self.Logic:AddAction("Leap", function(targetRootPart)
-		if self.CustomHealthbar.Healths["Left Leg"].IsDead and self.CustomHealthbar.Healths["Right Leg"].IsDead then 
+		if self.CustomHealthbar.Healths["Left Hind"].IsDead and self.CustomHealthbar.Healths["Right Hind"].IsDead then 
 			self.Humanoid.WalkSpeed = 20;
 			return 
 		end;

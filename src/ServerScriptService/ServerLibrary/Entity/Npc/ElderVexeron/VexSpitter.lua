@@ -18,6 +18,7 @@ function VexSpitter.Spawn(origin, parent, param)
 	local self = {};
 	
 	local newSpitterHead = spitterHeadPrefab:Clone();
+	newSpitterHead.Name = "Vexsplitter"
 	newSpitterHead.CFrame = CFrame.new(origin);
 	newSpitterHead.CollisionGroup = "Default";
 	newSpitterHead.Parent = parent;

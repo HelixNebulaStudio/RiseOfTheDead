@@ -3,21 +3,15 @@ local random = Random.new();
 
 local ZombieModule = script.Parent.Zombie;
 --== Modules Warn: Don't require(Npc)
-local CollectionService = game:GetService("CollectionService");
-local TweenService= game:GetService("TweenService");
 
 local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
-local modRegion = require(game.ReplicatedStorage.Library.Region);
-local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 
 local modNekronSpore = require(script:WaitForChild("NekronSpore"));
 
 local veinPrefab = script:WaitForChild("Vein");
 local moldTexture = script:WaitForChild("Mold");
-local veinLink = script:WaitForChild("VeinLink");
 
 local overlapParams = OverlapParams.new();
 overlapParams.MaxParts = 64;
@@ -78,14 +72,14 @@ return function(npc, spawnPoint)
 			if bodyPart == nil then return end;
 			
 			local bodyPartName = bodyPart.Name;
-			if bodyPart.Name:match("Vein") then
-				bodyPartName = "Vein";
+			if bodyPart.Name:match("Nekros Vein") then
+				bodyPartName = "Nekros Vein";
 				
-			elseif bodyPart.Name:match("Spore") then
-				bodyPartName = "Spore";
+			elseif bodyPart.Name:match("Nekros Spore") then
+				bodyPartName = "Nekros Spore";
 
-			elseif bodyPart.Name:match("Roots") then
-				bodyPartName = "Roots";
+			elseif bodyPart.Name:match("Nekros Plaque") then
+				bodyPartName = "Nekros Plaque";
 
 			end
 			
@@ -93,13 +87,13 @@ return function(npc, spawnPoint)
 				amount = amount *2;
 			end
 			
-			if bodyPartName == "Vein" then
+			if bodyPartName == "Nekros Plaque" then
 				healthObj:TakeDamage(bodyPart.Name, amount);
 				
-			elseif bodyPartName == "Spore" then
+			elseif bodyPartName == "Nekros Spore" then
 				healthObj:TakeDamage(bodyPart.Name, amount);
 				
-			elseif bodyPartName == "Roots" then
+			elseif bodyPartName == "Nekros Vein" then
 				healthObj:TakeDamage(bodyPart.Name, amount);
 				
 			end
@@ -111,7 +105,7 @@ return function(npc, spawnPoint)
 			
 			if healthInfo.BasePart == nil then return end;
 			
-			if name:match("Vein") then
+			if name:match("Nekros Vein") then
 				local projectile = healthInfo.ProjectileObject;
 				if projectile then
 					game.Debris:AddItem(projectile.Prefab, 0);
@@ -122,7 +116,7 @@ return function(npc, spawnPoint)
 					self.CustomHealthbar:TakeDamage(healthInfo.SporeObject.Name, self.BaseHealth*0.1);
 				end
 				
-			elseif name:match("Spore") then
+			elseif name:match("Nekros Spore") then
 				local amount = self.BaseHealth * 0.15;
 				if self.StatusLogicIsOnFire() then
 					amount = amount *2;
@@ -133,7 +127,7 @@ return function(npc, spawnPoint)
 					TargetPart=self.RootPart;
 				});
 				
-			elseif name:match("Roots") then
+			elseif name:match("Nekros Plaque") then --Nekros Plaque
 				game.Debris:AddItem(healthInfo.BasePart, 2);
 				healthInfo.BasePart.Color = Color3.fromRGB(48, 30, 30);
 				modAudio.Play("NekronHurt", healthInfo.BasePart).PlaybackSpeed = random:NextNumber(0.5, 0.6);
@@ -281,7 +275,7 @@ return function(npc, spawnPoint)
 						
 						self.VeinLaunched = self.VeinLaunched +1;
 						
-						local projectileName = "Roots"..self.VeinLaunched;
+						local projectileName = "Nekros Plaque"..self.VeinLaunched;
 						local newVein = veinPrefab:Clone();
 						newVein.Name = projectileName;
 						newVein.Parent = self.Prefab;
@@ -359,15 +353,17 @@ return function(npc, spawnPoint)
 			local newSpore = nekronSporeObject.Prefab;
 			local newHealthObj = self.CustomHealthbar:Create(newSpore.Name, self.BaseHealth*0.1, newSpore);
 			
-			newHealthObj.OnDeath:Connect(function()
-				game.Debris:AddItem(newHealthObj.BasePart, 2);
-				
-				nekronSporeObject.Cancelled = true;
-				
-				if newHealthObj.BasePart == nil then return end;
-				newHealthObj.BasePart.Color = Color3.fromRGB(48, 30, 30);
-				modAudio.Play("TicksZombieExplode", newHealthObj.BasePart).PlaybackSpeed = random:NextNumber(0.5, 0.6);
-			end)
+			if newHealthObj then
+				newHealthObj.OnDeath:Connect(function()
+					game.Debris:AddItem(newHealthObj.BasePart, 2);
+					
+					nekronSporeObject.Cancelled = true;
+					
+					if newHealthObj.BasePart == nil then return end;
+					newHealthObj.BasePart.Color = Color3.fromRGB(48, 30, 30);
+					modAudio.Play("TicksZombieExplode", newHealthObj.BasePart).PlaybackSpeed = random:NextNumber(0.5, 0.6);
+				end)
+			end
 		end
 	end
 	

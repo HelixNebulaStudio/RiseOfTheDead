@@ -61,12 +61,10 @@ return function(npc, spawnPoint)
 		}
 		
 		for a=1, #self.JawPrefabs do
-			--self.JawPrefabs[a].Parent = nil;
-			
 			local key = self.JawPrefabs[a].Name:sub(1,1);
 			local insidePart = self.JawPrefabs[a]:WaitForChild("Insides");
 			
-			self.CustomHealthbar:Create(key.."WeakSpot", 1, insidePart);
+			self.CustomHealthbar:Create(key.." Insides", 1, insidePart);
 		end
 		
 		self.DamageWeakSpotCount = 0;

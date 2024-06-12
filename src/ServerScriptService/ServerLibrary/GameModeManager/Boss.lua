@@ -259,7 +259,7 @@ function GameMode:Start(room)
 				local canRagdoll = npcPrefab:GetAttribute("HasRagdoll") == true;
 				if not canRagdoll then
 					for _, obj in pairs(npcPrefab:GetDescendants()) do
-						if obj:IsA("Motor6D") then
+						if obj:IsA("Motor6D") or obj:IsA("BodyMover") then
 							game.Debris:AddItem(obj, 0);
 						end
 					end
