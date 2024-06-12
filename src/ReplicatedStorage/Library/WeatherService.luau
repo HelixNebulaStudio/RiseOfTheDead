@@ -143,6 +143,10 @@ if RunService:IsServer() then
                     local weathers = modWeatherLibrary:GetKeys();
                     shared.Notify(speaker, `Weathers: {table.concat(weathers, ", ")}`, "Inform");
 
+                elseif action == "getactive" then
+
+                    Debugger:Warn("Weather GetActive", WeatherService:GetActive());
+
                 else
 					shared.Notify(speaker, "Unknown action for /weather", "Negative");
 

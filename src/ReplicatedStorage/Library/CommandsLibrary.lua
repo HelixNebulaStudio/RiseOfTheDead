@@ -4085,7 +4085,7 @@ Commands["setrecomputepaththreshold"] = {
 		local num = tonumber(args[1]);
 
 		workspace:SetAttribute("RecomputePathThreshold", num);
-		shared.Notify(player, `Set RecomputePathThreshold to {tostring(workspace:GetAttribute("RecomputePathThreshold"))}`);
+		shared.Notify(player, `Set RecomputePathThreshold to {tostring(workspace:GetAttribute("RecomputePathThreshold"))}`, "Inform");
 
 		return true;
 	end;

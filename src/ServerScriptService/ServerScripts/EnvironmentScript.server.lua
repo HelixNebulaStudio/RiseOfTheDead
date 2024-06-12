@@ -302,20 +302,22 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 		LiveWeatherCycle = modWeatherLibrary:GetKeys();
 	end
 
+	local activeWeather = modWeatherService:GetActive();
 	local weatherRandom = Random.new(unixSeed);
 	if modConfigurations.DisableWeatherCycle ~= true 
-	and modWeatherService:GetActive() == nil
+	and (activeWeather and activeWeather.Id == nil)
 	and tick() > lastWeatherEvent then
 		lastWeatherEvent = tick()+ weatherRandom:NextInteger(600, 3600);
 
+		Debugger:Warn("Roll Weather");
 		if weatherRandom:NextInteger(1, 3) == 1 then
 			local pickWeatherId = LiveWeatherCycle[weatherRandom:NextInteger(1, #LiveWeatherCycle)];
 			local pickWeatherDuration = weatherRandom:NextInteger(50, 150);
 	
 			modWeatherService:SetWeather({Id=pickWeatherId; Expire=pickWeatherDuration});
-	
 			Debugger:Warn("Weather", pickWeatherId, pickWeatherDuration);
 		end
+	
 	end
 
 	modWeatherService:OnTick();

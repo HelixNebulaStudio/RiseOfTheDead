@@ -383,3 +383,35 @@ for a=1, #spawnDescendants do
 		InitializeSpawner(spawnerModule);
 	end
 end
+
+
+task.spawn(function()
+	Debugger.AwaitShared("modCommandsLibrary");
+
+	shared.modCommandsLibrary:HookChatCommand("npcservice", {
+		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+		Description = [[
+			/npcservice setnaturallimit [85]
+		]];
+
+		RequiredArgs = 0;
+		Function = function(speaker, args)
+			
+			local action = args[1] or 999;
+			
+			if action == "setnaturallimit" then
+				local setlimit = args[2] or 999;
+				
+				modConfigurations.Set("NaturalSpawnLimit", setlimit);
+				shared.Notify(speaker, `Set world natural spawm limit to {modConfigurations.NaturalSpawnLimit}.`, "Inform");
+
+			else
+				shared.Notify(speaker, "Unknown action for /npcservice", "Negative");
+
+			end
+
+			return;
+		end;
+	});
+
+end)

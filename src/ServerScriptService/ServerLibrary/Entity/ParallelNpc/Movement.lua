@@ -57,7 +57,6 @@ function Movement.new(parallelNpc)
 	local stuckTick = tick();
 	local lastStuckTick = nil;
 	local forceRecomputeTick = tick();
-	local targetMoveRecomputeTick = tick();
 	local dumbFollow = nil;
 	local deltaPosChange, deltaRootPos = 0, nil;
 	
@@ -397,32 +396,12 @@ function Movement.new(parallelNpc)
 			local distSqr = modVector.DistanceSqrd(self.TargetPosition, getRootPos())*(workspace:GetAttribute("RecomputePathThreshold") or 0.1);
 			
 			if self.LastTargetPosition == nil or (tarDistChange > distSqr) then -- Target position moved;
-				--or not modRegion:InRegion(self.TargetPosition, self.LastTargetPosition, 2)
 				local ltpIsNil = self.LastTargetPosition == nil;
-				local recompute = true;
-
-				-- local tSinceLastRecomputeForTargetPosChange = tick()-targetMoveRecomputeTick;
-
-				-- if tSinceLastRecomputeForTargetPosChange <= 6 and distSqr > 65536 then -- 256
-				-- 	recompute = false;
-					
-				-- elseif tSinceLastRecomputeForTargetPosChange <= 4 and distSqr > 16384 then -- 128
-				-- 	recompute = false;
-					
-				-- elseif tSinceLastRecomputeForTargetPosChange <= 2 and distSqr > 4096 then -- 64
-				-- 	recompute = false;
-
-				-- end
 
 				self.LastTargetPosition = self.TargetPosition;
-				self.Recompute = recompute;
-				if recompute then
-					targetMoveRecomputeTick = tick();
-				else
-					
-				end
+				self.Recompute = true;
 				
-				if self.DebugMove == true then Debugger:Warn("tp ~= ltp, ltpIsNil", ltpIsNil, "recompute", recompute) end;
+				if self.DebugMove == true then Debugger:Warn("tp ~= ltp, ltpIsNil", ltpIsNil, "recompute") end;
 			end
 			
 		end
