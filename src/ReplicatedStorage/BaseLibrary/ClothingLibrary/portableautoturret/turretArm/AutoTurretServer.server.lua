@@ -636,7 +636,9 @@ function Update()
 	
 end
 
-modOnGameEvents:ConnectEvent("OnEnemiesAttract", function(p, st)
+local discOnEnemiesAttract;
+discOnEnemiesAttract = modOnGameEvents:ConnectEvent("OnEnemiesAttract", function(p, st)
+	if not workspace:IsAncestorOf(turretArm) then discOnEnemiesAttract(); end;
 	if p ~= player then return end;
 	selectedTargets = st or {};
 end)
