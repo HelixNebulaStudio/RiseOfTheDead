@@ -483,6 +483,22 @@ function StorageInterface:AddContextOption(packet)
 	end)
 end
 
+function StorageInterface:SortContextOptions(slotItem)
+	table.sort(self.ContextOptions, function(a, b)
+		local aOrder = (a.Order or 99);
+		local bOrder = (b.Order or 99);
+		if slotItem and slotItem.Library.ContextOrder then
+			if a and a.Id == slotItem.Library.ContextOrder then
+				aOrder = 0;
+				a.Order = aOrder;
+			elseif b and b.Id == slotItem.Library.ContextOrder then
+				bOrder = 0;
+				b.Order = bOrder;
+			end
+		end
+		return aOrder < bOrder;
+	end)
+end
 
 function StorageInterface:GetSlotWithID(storageItemID)
 	for a=self.StartIndex, self.EndIndex do
@@ -963,20 +979,7 @@ function StorageInterface:NewButton(id)
 		mouseInOptionFrame = tick();
 		if generateOnly then return end;
 
-		if slotItem.Library and slotItem.Library.ContextOrder then
-			table.sort(self.ContextOptions, function(a, b)
-				local aOrder = (a.Order or 99);
-				local bOrder = (b.Order or 99);
-				if a and a.Id == slotItem.Library.ContextOrder then
-					aOrder = 0;
-					a.Order = aOrder;
-				elseif b and b.Id == slotItem.Library.ContextOrder then
-					bOrder = 0;
-					b.Order = bOrder;
-				end
-				return aOrder < bOrder;
-			end)
-		end
+		self:SortContextOptions(slotItem);
 
 		local contextOptionFirstPass = true;
 		for a=1, #self.ContextOptions do
@@ -1655,6 +1658,11 @@ UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
 			local interface = slotItem.Interface;
 			
 			if modKeyBindsHandler:Debounce("KeyInteract") then return end;
+			
+			if slotItem.Library and slotItem.Library.ContextOrder then
+			end
+			interface:SortContextOptions(slotItem);
+
 			for a=1, #interface.ContextOptions do
 				local option = interface.ContextOptions[a];
 				if option.Check and option.Check(slotItem) == false then continue end;
