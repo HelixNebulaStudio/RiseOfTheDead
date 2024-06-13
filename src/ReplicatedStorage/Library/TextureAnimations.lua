@@ -115,14 +115,36 @@ library:Add{
 
 
 local active = false;
+local checkSetting = tick();
 --== Script;
 
 function TextureAnimations.Update()
-	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
-	if modData.Settings.DisableTextureAnimation ~= true then
+	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+	local textureStepBuffer = modData:GetSetting("TextureStepBuffer") or 2;
+
+	if textureStepBuffer <= 7 then
 		if not active then
 			active = true;
+
+			local stepBuffer = 0;
 			RunService:BindToRenderStep("TextureAnimations", Enum.RenderPriority.Last.Value, function(delta)
+				if stepBuffer >0 then 
+					stepBuffer = math.max(stepBuffer-1, 0);
+					return; 
+				end;
+				if tick()-checkSetting >= 1 then
+					checkSetting = tick();
+					textureStepBuffer = modData:GetSetting("TextureStepBuffer") or 2;
+				end
+				if textureStepBuffer >= 8 then
+					return;
+
+				elseif textureStepBuffer > 1 then
+					stepBuffer = textureStepBuffer;
+					delta = delta *textureStepBuffer;
+
+				end
+
 				lapse = lapse + delta;
 				
 				local textures = CollectionService:GetTagged("AnimatedTextures");

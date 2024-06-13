@@ -724,6 +724,10 @@ function Interface.init(modInterface)
 									end
 									modSettings.Set(localPlayer, config.SettingsKey, value);
 								end
+								
+								if config.RefreshGraphics then
+									modCameraGraphics:RefreshGraphics()
+								end
 							end;
 							DisplayValueFunc = rangeInfo.DisplayValueFunc;
 						});

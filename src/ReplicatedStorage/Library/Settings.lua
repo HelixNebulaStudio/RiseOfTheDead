@@ -138,7 +138,7 @@ Settings.Add("KeyWindowWorkbench", ignoreMouseKeys(keyCheck));
 Settings.Add("KeyWindowMapMenu", ignoreMouseKeys(keyCheck));
 Settings.Add("KeyHideHud", ignoreMouseKeys(keyCheck));
 
---==Keybinds;
+--== Gameplay;
 
 Settings.Add("ZoomLevel", function(value)
 	return math.clamp(math.floor(value), 2, 20);
@@ -223,9 +223,11 @@ Settings.Add("LimitParticles", booleanOrNil)
 Settings.Add("ReduceMaxDebris", booleanOrNil)
 Settings.Add("GlobalShadows", booleanOrNil)
 Settings.Add("DisableSmallShadows", booleanOrNil)
-Settings.Add("DisableTextureAnimation", booleanOrNil)
 Settings.Add("DisableParticle3D", booleanOrNil)
 Settings.Add("DisableWeatherParticles", booleanOrNil)
+
+Settings.Add("TextureStepBuffer", numOrNil)
+Settings.Add("MotionStepBuffer", numOrNil)
 
 --==
 Settings.Add("UseOldZombies", booleanOrNil);
@@ -342,7 +344,7 @@ baseConfigInterface:Add("Left", "CategoryOption", {Properties={Text="Music & Amb
 baseConfigInterface:Add("Left", "CategoryTitle", {Properties={Text="Data";}; });
 baseConfigInterface:Add("Left", "CategoryOption", {Properties={Text="Reset";}; ButtonLink="DataReset" });
 
--- GameplayGeneral;
+-- MARK: GameplayGeneral;
 baseConfigInterface:Add("Right", "Page", {Id="GameplayGeneral"; ClickOnRender=true;});
 baseConfigInterface:Add("GameplayGeneral", "ToggleOption", {
 	TitleProperties={Text="Toggle Focus Mode";};
@@ -360,7 +362,8 @@ baseConfigInterface:Add("GameplayGeneral", "ToggleOption", {
 		Type="Toggle;Hold;Toggle";
 	};
 });
--- GameplayAutoPickup;
+
+-- MARK: GameplayAutoPickup;
 baseConfigInterface:Add("Right", "Page", {Id="GameplayAutoPickup";
 	Config={
 		Type="AutoPickup";
@@ -375,7 +378,7 @@ baseConfigInterface:Add("GameplayAutoPickup", "ToggleOption", {
 	};
 });
 
--- ControlsKeybinds;
+-- MARK: ControlsKeybinds;
 baseConfigInterface:Add("Right", "Page", {Id="ControlsKeybinds";
 	Config={
 		Type="Keybinds";
@@ -383,7 +386,7 @@ baseConfigInterface:Add("Right", "Page", {Id="ControlsKeybinds";
 });
 
 
--- SocialsPublic;
+-- MARK: SocialsPublic;
 baseConfigInterface:Add("Right", "Page", {Id="SocialsRequests";});
 baseConfigInterface:Add("SocialsRequests", "ToggleOption", {
 	TitleProperties={Text="Travel Request";};
@@ -445,7 +448,7 @@ baseConfigInterface:Add("SocialsRoleplay", "InputOption", {
 });
 
 
--- VisualsInterface;
+-- MARK: VisualsInterface;
 baseConfigInterface:Add("Right", "Page", {Id="VisualsInterface";});
 baseConfigInterface:Add("VisualsInterface", "ToggleOption", {
 	TitleProperties={Text="Compact Interface";};
@@ -512,7 +515,7 @@ baseConfigInterface:Add("VisualsInterface", "ToggleOption", {
 	};
 });
 
--- VisualsGraphics;
+-- MARK: VisualsGraphics;
 baseConfigInterface:Add("Right", "Page", {Id="VisualsGraphics";});
 baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 	TitleProperties={Text="Blood Particles";};
@@ -641,14 +644,6 @@ baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 	};
 });
 baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
-	TitleProperties={Text="Texture Animations";};
-	DescProperties={Text="Animated textures on objects such as crates and skins.";};
-	Config={
-		SettingsKey="DisableTextureAnimation";
-		Type="Toggle";
-	};
-});
-baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 	TitleProperties={Text="3D Particles";};
 	DescProperties={Text="Particles that interact with the environment such as metal sparks, bullet shells, flesh chunks, etc..";};
 	Config={
@@ -673,8 +668,36 @@ baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 	};
 });
 
+baseConfigInterface:Add("VisualsGraphics", "SliderOption", {
+	TitleProperties={Text="Texture Animations Step Buffer";};
+	DescProperties={Text="Skip steps on scripted texture animations on crates and skins. Increase = more performance. Decrease = smoother animation.";};
+	Config={
+		SettingsKey="TextureStepBuffer";
+		RefreshGraphics=true;
+		RangeInfo={Min=1; Max=8; Default=2; ValueType="Flat";
+			DisplayValueFunc=function(v)
+				if v >= 8 then
+					return "Disabled Texture Animations"
+				end
+				return `Every {math.clamp(v, 1, 8)} step`;
+			end;
+		};
+	};
+});
+baseConfigInterface:Add("VisualsGraphics", "SliderOption", {
+	TitleProperties={Text="Joints Motion Step Buffer";};
+	DescProperties={Text="Skip steps on scripted motion of character joints. Increase = more performance. Decrease = smoother motion.";};
+	Config={
+		SettingsKey="MotionStepBuffer"; 
+		RangeInfo={Min=1; Max=3; Default=1; ValueType="Flat";
+			DisplayValueFunc=function(v)
+				return `Every {math.clamp(v, 1, 3)} step`;
+			end;
+		};
+	};
+});
 
--- AudioSoundeffects;
+-- MARK: AudioSoundeffects;
 baseConfigInterface:Add("Right", "Page", {Id="AudioSoundeffects";});
 baseConfigInterface:Add("AudioSoundeffects", "SliderOption", {
 	TitleProperties={Text="Effects";};
