@@ -310,9 +310,9 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 		lastWeatherEvent = tick()+ weatherRandom:NextInteger(600, 3600);
 
 		Debugger:Warn("Roll Weather");
-		if weatherRandom:NextInteger(1, 3) == 1 then
+		if weatherRandom:NextInteger(1, 4) == 1 then
 			local pickWeatherId = LiveWeatherCycle[weatherRandom:NextInteger(1, #LiveWeatherCycle)];
-			local pickWeatherDuration = weatherRandom:NextInteger(50, 150);
+			local pickWeatherDuration = weatherRandom:NextInteger(160, 240);
 	
 			modWeatherService:SetWeather({Id=pickWeatherId; Expire=pickWeatherDuration});
 			Debugger:Warn("Weather", pickWeatherId, pickWeatherDuration);
