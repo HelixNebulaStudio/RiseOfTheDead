@@ -36,13 +36,38 @@ local bindServerUnequipPlayer = remotes.Inventory.ServerUnequipPlayer;
 
 --== Script
 
-local function OnPlayerAdded(player)
-	player.CharacterAdded:Connect(function(character)
-		Debugger:Log(character.Name,"spawned.");
+local function OnPlayerAdded(player: Player)
+	player.CharacterRemoving:Connect(function()
 		local profile = modProfile:Get(player);
 		if profile == nil then Debugger:WarnClient(player, "Could not retrieve profile. Equipment system disabled, please respawn to try again."); return end;
 		
-		local modGearAttachments = require(player.Character:WaitForChild("GearAttachments"));
+		if profile.EquippedTools and profile.EquippedTools.WeaponModels then
+			for a=1, #profile.EquippedTools.WeaponModels do
+				local weaponModel = profile.EquippedTools.WeaponModels[a];
+				game.Debris:AddItem(weaponModel, 0);
+			end
+		end
+	end)
+
+	player.CharacterAdded:Connect(function(character: Model)
+		Debugger:Warn(character.Name,"spawned.");
+		local profile = modProfile:Get(player);
+		if profile == nil then Debugger:WarnClient(player, "Could not retrieve profile. Equipment system disabled, please respawn to try again."); return end;
+		
+		character.ChildRemoved:Connect(function(toolModel)
+			if not toolModel:HasTag("EquipTool") then return end;
+			Debugger:StudioWarn("Destroying toolModel", toolModel)
+			local siid = toolModel:GetAttribute("StorageItemId");
+
+			if toolModel:GetAttribute("Equipped") == true and profile.EquippedTools.ID == siid and profile.EquippedTools.StorageItem then
+				unequipTool(player, {
+					Id=siid;
+					StorageItem=profile.EquippedTools.StorageItem;
+				});
+			end
+		end)
+
+		local modGearAttachments = require(character:WaitForChild("GearAttachments"));
 		
 		for itemId, toolHandler in pairs(profile.ToolsCache) do
 			local prefabs = {};
@@ -76,7 +101,7 @@ local function OnPlayerAdded(player)
 						motor.C1 = motor.C1 * holsterLib.Offset;
 					end
 					
-					cloneTool.Parent = player.Character;
+					cloneTool.Parent = character;
 					motor:SetAttribute("CanQuery", false);
 					modGearAttachments:AttachMotor(cloneTool, motor, attachment.Parent, 2);
 					modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
@@ -84,6 +109,7 @@ local function OnPlayerAdded(player)
 			end
 			profile.ToolsCache.Prefabs = prefabs;
 		end
+		
 	end)
 end;
 
@@ -93,8 +119,6 @@ function unequipTool(player, returnPacket)
 	local lastId = profile and profile.EquippedTools and profile.EquippedTools.ID;
 	
 	returnPacket = returnPacket or {};
-	
-	Debugger:Log("unequipTool returnPacket", returnPacket, " EquippedTools",profile.EquippedTools);
 	
 	if lastId then
 		local itemId = lastStorageItem.ItemId;
@@ -221,8 +245,6 @@ function unequipTool(player, returnPacket)
 		profile.EquippedTools = {};
 	end
 	
-	Debugger:Log("Unequip");
-
 	return;
 end
 
@@ -333,9 +355,9 @@ local function equipTool(player, paramPacket)
 
 					end
 					
-					
-					local cloneTool = modGearAttachments:GetAttachedPrefab(toolModelName) or prefabTool:Clone(); -- getExistingPrefab or
+					local cloneTool: Model = modGearAttachments:GetAttachedPrefab(toolModelName) or prefabTool:Clone(); -- getExistingPrefab or
 
+					cloneTool:AddTag("EquipTool");
 					cloneTool:SetAttribute("ItemId", itemId);
 					cloneTool:SetAttribute("StorageItemId", id);
 					
@@ -362,14 +384,6 @@ local function equipTool(player, paramPacket)
 							
 						end
 					end
-					
-					cloneTool.Destroying:Connect(function()
-						if cloneTool:GetAttribute("Equipped") == true and profile.EquippedTools.ID == id then
-							Debugger:Log("Destroying unequip");
-							unequipTool(player, returnPacket)
-						end
-					end)
-					
 					
 					local handPart, toolGrip;
 					if weldName == "ToolGrip" or weldName == "RightToolGrip" then
@@ -423,7 +437,6 @@ local function equipTool(player, paramPacket)
 					WeldPacket=weldPacket;
 				};
 				
-				Debugger:Log("Equip returnPacket to client", returnPacket);
 			else
 				warn("Player(",player.Name,") tried to equip non-tool (",id,").");
 			end
@@ -431,7 +444,6 @@ local function equipTool(player, paramPacket)
 			warn("Player(",player.Name,") missing item id(",id,") or inventory(",inventory,").");
 		end
 		
-		Debugger:Log("Equip");
 		return;
 	end
 	

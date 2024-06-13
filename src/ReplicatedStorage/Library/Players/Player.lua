@@ -1446,6 +1446,7 @@ function Player.new(playerInstance: Player)
 	end
 	
 	function meta:Destroy()
+		if PlayerService.Players[self.Name] == nil then return end;
 		if self.StatusCycle then self.StatusCycle:Disconnect(); end
 		
 		self.OnHealthChanged:Destroy();
@@ -1465,6 +1466,7 @@ function Player.new(playerInstance: Player)
 
 		PlayerService.Players[self.Name] = nil;
 		table.clear(self);
+		table.clear(meta);
 	end
 	
 	function meta:CastGroundRay(distance)

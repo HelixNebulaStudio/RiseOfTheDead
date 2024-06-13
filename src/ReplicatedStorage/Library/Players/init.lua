@@ -126,7 +126,9 @@ function PlayerService.OnPlayerRemoving(playerInstance)
 		wait(1);
 		task.delay(player.IsTeleporting and 10 or 2, function()
 			player.IsTeleporting = false;
-			player:Destroy(tick());
+			if player.Destroy then
+				player:Destroy(tick());
+			end
 		end)
 	end
 	PlayerService.RefreshPlayers();

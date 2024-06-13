@@ -211,11 +211,11 @@ function ToolHandler:OnToolEquip(toolModule)
 end
 
 function ToolHandler:OnToolUnequip()
+	table.clear(self.VictimsList);
 	if not self.Equipped then return end;
 	self.Equipped = false;
 	self.Attacking = nil;
 	if self.MeleeTag then self.MeleeTag:Destroy() end;
-	table.clear(self.VictimsList);
 	self.Colliders = nil;
 end
 
