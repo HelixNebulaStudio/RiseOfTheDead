@@ -44,7 +44,7 @@ function CameraClass:Init()
 	
 	RunService.Heartbeat:Connect(function()
 		local pos = camera.CFrame.Position + camera.CFrame.LookVector * 40;
-		cameraParticlePart.CFrame = CFrame.new(pos.X, pos.Y+16, pos.Z);
+		cameraParticlePart.CFrame = CFrame.new(pos.X, pos.Y+30, pos.Z);
 	end)
 
 	CameraClass.PreviousLayerId = nil;
