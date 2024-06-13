@@ -204,6 +204,7 @@ function GameModeManager:Initialize(gameType, gameStage)
 			newLobbyPrefab = lobbyPrefabs:WaitForChild("TemplateLobby"):Clone();
 		end
 		if newLobbyPrefab then
+			newLobbyPrefab:AddTag("LobbyPrefab");
 			newLobbyPrefab.Parent = workspace.Environment;
 			
 			local spotIndex = 0;

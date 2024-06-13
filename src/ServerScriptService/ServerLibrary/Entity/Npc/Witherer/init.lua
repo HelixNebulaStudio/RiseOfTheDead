@@ -131,10 +131,19 @@ return function(npc, spawnPoint)
 					Points=scanPoints;
 					Radius=4;
 					RayParam=rayParam;
-					OnEachRay=function(origin, dir, rayResult)
+					OnEachRay=function(origin, dir, rayResult: RaycastResult)
 						if rayResult == nil then
 							return true;
 						end;
+
+						if rayResult.Instance then
+							local lobbyPrefabs = CollectionService:GetTagged("LobbyPrefab");
+							for a=1, #lobbyPrefabs do
+								if lobbyPrefabs[a]:IsAncestorOf(rayResult.Instance) then
+									return true;
+								end
+							end
+						end
 
 						local expectedPos = origin + dir;
 						local pos = rayResult.Position;
@@ -143,6 +152,8 @@ return function(npc, spawnPoint)
 						if maxDif > 1 then
 							return true;
 						end
+
+						return;
 					end;
 				};
 
