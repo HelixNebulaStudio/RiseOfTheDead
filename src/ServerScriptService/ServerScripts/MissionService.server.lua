@@ -219,7 +219,15 @@ function OnPlayerAdded(player)
 			destructibleObj.Enabled = false;
 			destructibleObj.NetworkOwners = {player};
 			
-			missionFactoryRaid.Cache.Blockade = blockade;
+			if missionFactoryRaid then
+				missionFactoryRaid.Cache.Blockade = blockade;
+			else
+				missionProfile.OnMissionChanged:Connect(function(mission)
+					if mission and mission.Id == 12 and mission.Type == 2 then 
+						mission.Cache.Blockade = blockade;
+					end
+				end)
+			end
 		end
 
 
