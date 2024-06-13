@@ -32,6 +32,11 @@ function Interface.init(modInterface)
 	local storageFrame = modConfigurations.CompactInterface and script:WaitForChild("MobileStorage"):Clone() or script:WaitForChild("Storage"):Clone();
 	storageFrame.Parent = interfaceScreenGui;
 	
+	local storageList = storageFrame:WaitForChild("MainList");
+	local slotTemplate = script:WaitForChild("Slot");
+	local buttonsFrame = storageFrame:WaitForChild("ButtonsFrame");
+	local gridLayout = storageList:WaitForChild("UIGridLayout");
+
 	local storageTitleTag;
 
 	if modConfigurations.CompactInterface then
@@ -41,13 +46,19 @@ function Interface.init(modInterface)
 		storageFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
 			Interface:CloseWindow("ExternalStorage");
 		end)
+		
+		gridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right;
+
+		local padding = Instance.new("UIPadding");
+		padding.PaddingLeft = UDim.new(0, 15);
+		padding.Parent = storageList;
+
+		buttonsFrame.Size = UDim2.new(1, 0, 0, 40);
+
 	else
 		storageTitleTag = storageFrame:WaitForChild("Title");
 	end
 
-	local storageList = storageFrame:WaitForChild("MainList");
-	local slotTemplate = script:WaitForChild("Slot");
-	local buttonsFrame = storageFrame:WaitForChild("ButtonsFrame");
 
 	local addSlotButton = script:WaitForChild("PurchaseSlot");
 	local pageButton = script:WaitForChild("pageButton");
@@ -75,6 +86,7 @@ function Interface.init(modInterface)
 		return storage;
 	end
 
+	local firstload = true;
 	local function refreshBoundarySize()
 		if modConfigurations.CompactInterface then
 			Interface.SelfWindow.OpenPosition = UDim2.new(0.5, 0, 0, 0);
@@ -94,18 +106,15 @@ function Interface.init(modInterface)
 		local xSize = (slots*65)+6;
 		local finalXSize = xSize;
 		
-		if smallScreen then
-			storageFrame.AnchorPoint = Vector2.new(0, 0.5);
-			storageFrame.Position = UDim2.new(0, 350, 0.5, 0);
-			Interface.SelfWindow.OpenPosition = UDim2.new(0, 350, 0.5, 0);
-			finalXSize = math.clamp(xSize, 0, math.clamp(math.floor((camera.ViewportSize.X-350)/5)*5-6, 200, math.huge));
-			
-		else
-			storageFrame.AnchorPoint = Vector2.new(0.5, 0.5);
-			storageFrame.Position = UDim2.new(0.5, 0, 0.5, 0);
-			Interface.SelfWindow.OpenPosition = UDim2.new(0.5, 0, 0.5, 0);
-			
-		end
+		finalXSize = math.clamp(xSize, 0, math.clamp(math.floor((viewPortX-350)/5)*5-6, 200, math.huge));
+		
+		storageFrame.AnchorPoint = Vector2.new(0.5, 0.5);
+
+		local minXPos = 350+math.ceil(finalXSize/2);
+		local newStorageX = math.max(minXPos, viewPortX*0.5)
+		storageFrame.Position = UDim2.new(0, newStorageX, 0.5, 0);
+		Interface.SelfWindow.OpenPosition = UDim2.new(0, newStorageX, 0.5, 0);
+
 		return finalXSize;
 	end
 	
@@ -258,6 +267,9 @@ function Interface.init(modInterface)
 					
 					newButton.LayoutOrder = a;
 					newButton.Parent = buttonsFrame;
+					if modConfigurations.CompactInterface then
+						newButton.ZIndex = 4;
+					end
 					if a == (storage.Page or 1) then
 						newButton.BackgroundColor3 = Color3.fromRGB(160, 160, 160);
 					end
@@ -292,6 +304,9 @@ function Interface.init(modInterface)
 				newButton.LayoutOrder = 0;
 				newButton.BackgroundColor3 = Color3.fromRGB(66, 46, 91);
 				newButton.Parent = buttonsFrame;
+				if modConfigurations.CompactInterface then
+					newButton.ZIndex = 4;
+				end
 				
 				local function updateRental()
 					local storage = modData.Storages[activeStorageInterface.StorageId];
@@ -306,14 +321,20 @@ function Interface.init(modInterface)
 					end
 					local rentCost = itemCount * rentalPrice;
 					
-					local timeLeft = storage.RentalUnlockTime - modSyncTime.GetTime()
+					local timeLeft = storage.RentalUnlockTime - modSyncTime.GetTime();
+					if timeLeft > 0 then
+						storageTitleTag.Text = storageName..` (Unlock Time Left: {modSyncTime.ToString(timeLeft)})`;
+					end
+
+					local goldSuffix = modConfigurations.CompactInterface and "G" or " Gold";
+
 					if timeLeft <= 0 then
 						activeStorageInterface.ViewOnly = true;
-						newButton.Text = "Unlock ".. storageName .." (<b><font color='rgb(170, 120, 0)'>".. rentCost .." Gold</font></b>)";
-						
+						newButton.Text = `Unlock [{storage.Page or "1"}/{storage.MaxPages}] (<b><font color='rgb(170, 120, 0)'>{rentCost}{goldSuffix}</font></b>)`
+
 					else
 						activeStorageInterface.ViewOnly = false;
-						newButton.Text = modSyncTime.ToString(timeLeft).." (<b><font color='rgb(170, 120, 0)'>".. rentCost .." Gold</font></b>)";
+						newButton.Text = `Cost (<b><font color='rgb(170, 120, 0)'>{rentCost}{goldSuffix}</font></b>)`;
 						
 					end
 					
@@ -386,6 +407,10 @@ function Interface.init(modInterface)
 			end
 			
 			refreshBoundarySize();
+			if firstload then
+				firstload = false;
+				task.delay(0.31, refreshBoundarySize);
+			end
 			activeStorageInterface:Update();
 			
 			if wardrobeStorageItemId then
@@ -445,6 +470,7 @@ function Interface.init(modInterface)
 
 	storageList.UIGridLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() --not crash
 		updateFrame();
+
 	end)
 
 	storageFrame:GetPropertyChangedSignal("Visible"):Connect(function()

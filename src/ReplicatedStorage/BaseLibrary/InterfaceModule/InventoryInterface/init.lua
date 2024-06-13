@@ -76,7 +76,7 @@ local BodyEquipmentStats = {
 	-- Melee;
 	["AdditionalStamina"] = function(bodyEquips, k)
 		local value = bodyEquips[k];
-		return {SortKey="MeleeStamina"; Text=`<b>Additional Stamina:</b> {string.format("%.0f", value*100)}%`;}
+		return {SortKey="MeleeStamina"; Text=`<b>Additional Stamina:</b> {string.format("%.0f", value)}`;}
 	end;
 
 	-- Offensive;
@@ -141,7 +141,6 @@ function Interface.init(modInterface)
 	end
 	
 	if modConfigurations.CompactInterface then
-		--inventoryFrame = interfaceScreenGui:WaitForChild("MobileInventory");
 		inventorySlotLists = inventoryFrame:WaitForChild("Inventory");
 
 		local armorTitleLabel: TextLabel = inventorySlotLists:WaitForChild("ArmorTitle");
@@ -160,6 +159,10 @@ function Interface.init(modInterface)
 		hotbarFrame.Size = UDim2.new(0, 40, 0, 0);
 		
 		templateTClothingOption.Size = UDim2.new(1, 0, 0, 30);
+
+		local padding = Instance.new("UIPadding");
+		padding.PaddingRight = UDim.new(0, 15);
+		padding.Parent = inventorySlotLists;
 
 	else
 		local armorTitleLabel: TextLabel = inventoryFrame:WaitForChild("ArmorTitle");
@@ -472,6 +475,8 @@ function Interface.init(modInterface)
 			Interface:CloseWindow("Inventory");
 		end)
 		window:SetOpenClosePosition(UDim2.new(0, 0, 0, 0), UDim2.new(0, 0, 1, 0));
+
+
 	else
 		window:SetOpenClosePosition(UDim2.new(0, 10, 0.5, 0), UDim2.new(-1, 0, 0.5, 0));
 	end
