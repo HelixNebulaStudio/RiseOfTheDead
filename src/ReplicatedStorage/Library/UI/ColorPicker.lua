@@ -183,9 +183,10 @@ function ColorPicker.GetColor(tag, allowCustomColors) : Color3?
 	return;
 end
 
-function ColorPicker.GetBackColor(color) : Color3
+function ColorPicker.GetBackColor(color, contrast) : Color3
+	contrast = contrast or 0.3;
 	local h, s, v = color:ToHSV();
-	return Color3.fromHSV(h, s, v > 0.5 and math.max(v-0.5, 0) or math.min(v+0.5, 1));
+	return Color3.fromHSV(h, s, v > 0.5 and math.max(v-contrast, 0) or math.min(v+contrast, 1));
 end
 
 function ColorPicker.GradientLerp(color1, color2, alpha)
