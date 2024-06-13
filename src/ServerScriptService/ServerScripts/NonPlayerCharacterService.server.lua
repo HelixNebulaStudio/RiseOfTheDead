@@ -55,7 +55,8 @@ function OnPlayerAdded(player)
 		task.wait(RunService:IsStudio() and 3 or 10);
 		while game.Players:IsAncestorOf(player) do
 			PlayerUpdate(player);
-			task.wait(0.2 + (0.125*(#game.Players:GetPlayers()-1)) )
+			local hb = math.clamp(wait(), 0.2, 1);
+			task.wait(hb + (0.125*(#game.Players:GetPlayers()-1)) );
 		end
 	end)
 end
