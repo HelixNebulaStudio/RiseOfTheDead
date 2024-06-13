@@ -200,9 +200,9 @@ Branches.WorldLibrary = {
 	AbandonedBunker={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=6;};
 	
 	-- Survival;
-	SectorF={GameMode=true; CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
-	Prison={GameMode=true; CanTravelTo=false; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
-	SectorD={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	SectorF={GameMode=true; CanTravelTo=false; TimeCycleEnabled=false; WeatherCycle=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	Prison={GameMode=true; CanTravelTo=false; TimeCycleEnabled=false; WeatherCycle=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	SectorD={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; WeatherCycle=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
 	
 	-- Coop;
 	Genesis={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
@@ -215,9 +215,9 @@ Branches.WorldLibrary = {
 	Slaughterfest={NoPrivateServers=true; CanTravelTo=true; PublicWorld=true; FreeTravels=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.Slaughterfest; MaxPlayers=16;};
 	
 	--== CommunityMaps;
-	CommunityWaySide={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
-	CommunityFissionBay={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
-	CommunityRooftops={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	CommunityWaySide={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; WeatherCycle=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	CommunityFissionBay={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; WeatherCycle=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	CommunityRooftops={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; WeatherCycle=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
 	
 	--==
 	Default={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=32;};
@@ -518,7 +518,7 @@ elseif Branches.WorldInfo.Type == Branches.WorldTypes.General or Branches.WorldI
 		modConfigurations.Set("SpawnProtectionTimer", 120);
 		modConfigurations.Set("DisableMapItems", false);
 		modConfigurations.Set("ExpireDeployables", true);
-		modConfigurations.Set("NaturalSpawnLimit", 85);
+		modConfigurations.Set("NaturalSpawnLimit", 60);
 		workspace:SetAttribute("RecomputePathThreshold", 1);
 		
 	else
@@ -533,6 +533,9 @@ elseif Branches.WorldInfo.Type == Branches.WorldTypes.General or Branches.WorldI
 	if Branches.WorldInfo.Witherer == true then
 		modConfigurations.Set("WithererSpawnLogic", true);
 		
+	end
+	if Branches.WorldInfo.WeatherCycle == false then
+		modConfigurations.Set("DisableWeatherCycle", true);
 	end
 
 elseif Branches.WorldInfo.Type == Branches.WorldTypes.Cutscene then
