@@ -142,18 +142,7 @@ if RunService:IsServer() then
 							entityStatus:Apply(statusKey);
 						end)
 					end
-
-					local immunity = (npcModule.Immunity or 0)-propertiesOfMod.Reduction;
-
-					if immunity < 0 then
-						local bonusDamage = (math.abs(immunity)/propertiesOfMod.Reduction)*bonusDmgRatio * preModDamage;
-						task.delay(0.1, function()
-							if npcModule.IsDead then return end;
-							damageSource.Damage=bonusDamage;
-							damageSource.DamageType="ToxicDamage";
-							damagable:TakeDamagePackage(damageSource);
-						end)
-					end
+					
 				end
 			end
 		end

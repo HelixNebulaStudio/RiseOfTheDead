@@ -119,14 +119,16 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 				local toxicDamage = (weaponDamage or 100) * (-immunity);
 	
 				if toxicDamage > 0 then
-					local newDmgSrc = modDamagable.NewDamageSource{
-						Damage=toxicDamage;
-						Dealer=dealer;
-						ToolStorageItem=storageItem;
-						TargetPart=hitPart;
-						DamageType="ToxicDamage";
-					}
-					self:TakeDamagePackage(newDmgSrc);
+					task.delay(0.5, function()
+						local newDmgSrc = modDamagable.NewDamageSource{
+							Damage=toxicDamage;
+							Dealer=dealer;
+							ToolStorageItem=storageItem;
+							TargetPart=hitPart;
+							DamageType="ToxicDamage";
+						}
+						self:TakeDamagePackage(newDmgSrc);
+					end)
 				end
 				toxicDmgTaken = true;
 			end
