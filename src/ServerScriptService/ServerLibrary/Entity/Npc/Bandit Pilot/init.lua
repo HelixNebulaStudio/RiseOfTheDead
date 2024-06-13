@@ -790,4 +790,7 @@ return function(npc, spawnPoint)
 	
 	self:AddComponent(BanditModule.OnTarget);
 	
+	--== Signals
+	self.Humanoid.Died:Connect(self.OnDeath);
+
 return self end
