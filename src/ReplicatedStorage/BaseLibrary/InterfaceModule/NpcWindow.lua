@@ -434,10 +434,18 @@ function Interface.init(modInterface)
 					if type == "ColorPicker" then
 						local colorPickerObj = Interface.ColorPicker;
 
+						local customColors = modData:GetFlag("CustomColors");
+						if customColors == nil then
+							customColors = modData:GetFlag("CustomColors", true);
+						end
+
 						local pickButton = new:WaitForChild("pickButton") :: TextButton;
 						pickButton.MouseButton1Click:Connect(function()
 							Interface:PlayButtonClick();
 
+							if customColors then
+								colorPickerObj:SetUnlocked(customColors.Unlocked);
+							end
 							if modConfigurations.CompactInterface then
 								Interface:CloseWindow("Inventory");
 								colorPickerObj.Frame.Position = UDim2.new(0, 0, 0, 0);

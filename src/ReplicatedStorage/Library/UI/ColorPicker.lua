@@ -7,6 +7,7 @@ local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
 local colorPaletteTemplate = script:WaitForChild("ColorPicker");
 local colorOptionTemplate = script:WaitForChild("ColorOption");
 local selectTemplate = script:WaitForChild("SelectTemplate");
+local lockedTemplate = script:WaitForChild("LockedTemplate");
 --==
 local ColorPicker = {};
 ColorPicker.__index = ColorPicker;
@@ -16,6 +17,25 @@ ColorPicker.LastColors = {};
 function ColorPicker:Destroy()
 	Debugger.Expire(self.Frame);
 	Debugger.Expire(self.SelectLabel);
+end
+
+function ColorPicker:SetUnlocked(hexList)
+	hexList = hexList or {};
+
+	local contentFrame = self.Frame:WaitForChild("Content") :: TextButton;
+	local colorPaletteImage = contentFrame:WaitForChild("ColorPalette");
+
+	for _, imgLabel in pairs(colorPaletteImage:GetChildren()) do
+		if not imgLabel:IsA("ImageLabel") then continue end;
+		local hexId = string.lower(imgLabel.ImageColor3:ToHex());
+		
+		if hexList[hexId] == nil and imgLabel:FindFirstChild("LockedTemplate") == nil then
+			local newLocked = lockedTemplate:Clone();
+			newLocked.ImageColor3 = ColorPicker.GetBackColor(imgLabel.ImageColor3);
+			newLocked.Parent = imgLabel;
+		end
+		
+	end
 end
 
 function ColorPicker.new(mainInterface)
