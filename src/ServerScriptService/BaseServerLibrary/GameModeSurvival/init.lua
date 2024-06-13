@@ -324,11 +324,12 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 		npcModule.SetAggression = 3;
 		
 		if hardMode then
-			npcModule.HardMode = true;
+			--npcModule.HardMode = true;
 		end
 		
 		npcModule.NetworkOwners = game.Players:GetPlayers();
-		npcModule.Configuration.Level = math.max(npcModule.Configuration.Level + level + math.random(-2, 0), 1);
+		local levelRng = npcModule.Properties and npcModule.Properties.BasicEnemy == true and math.random(-2, 0) or 0;
+		npcModule.Configuration.Level = math.max(npcModule.Configuration.Level + level + levelRng, 1);
 		npcModule.ForgetEnemies = false;
 		npcModule.AutoSearch = true;
 		npcModule.Properties.TargetableDistance = 4096;
