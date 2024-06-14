@@ -192,7 +192,6 @@ function OnPlayerAdded(player)
 				missionFirstRescue.Changed:Fire(false, missionFirstRescue);
 				
 			else
-				
 				missionProfile.OnMissionChanged:Connect(function(mission)
 					if mission and mission.Id == 6 and mission.Type == 2 then 
 						mission.Cache.Barricade = barricade;
@@ -221,9 +220,11 @@ function OnPlayerAdded(player)
 			
 			if missionFactoryRaid then
 				missionFactoryRaid.Cache.Blockade = blockade;
+				missionFactoryRaid.Changed:Fire(false, missionFactoryRaid);
+
 			else
 				missionProfile.OnMissionChanged:Connect(function(mission)
-					if mission and mission.Id == 12 and mission.Type == 2 then 
+					if mission and mission.Id == 12 and (missionFactoryRaid.Type < 3 and missionFactoryRaid.ProgressionPoint < 4) then 
 						mission.Cache.Blockade = blockade;
 					end
 				end)

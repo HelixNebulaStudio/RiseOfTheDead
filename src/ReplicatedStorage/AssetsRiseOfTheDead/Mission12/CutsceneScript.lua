@@ -109,7 +109,7 @@ return function(CutsceneSequence)
 						masonModule.Move:SetMoveSpeed("set", "default", 12);
 
 						masonModule.Move:MoveTo(Vector3.new(59.34, 57.66, -28.03));
-						masonModule.Move.MoveToEnded:Wait(10);
+						masonModule.Move.MoveToEnded:Wait(6);
 						
 						masonModule.Actions:WaitForOwner(30);
 						masonModule.Actions:EnterDoor("warehouseExit");
@@ -214,20 +214,24 @@ return function(CutsceneSequence)
 					elseif mission.ProgressionPoint == 3 or mission.ProgressionPoint == 4 then
 
 						if mission.Cache.Blockade then
+							local blockadePrefab = mission.Cache.Blockade;
+
 							local profile = shared.modProfile:Get(player);
 							local playerSave = profile:GetActiveSave();
 							local playerLevel = playerSave and playerSave:GetStat("Level") or 1;
 							local focusLevel = modGlobalVars.GetLevelToFocus(playerLevel);
 							
-							local maxHealth = focusLevel *100;
+							local maxHealth = math.clamp(focusLevel, 1, 56) *100;
 
-							local destructibleObj = require(mission.Cache.Blockade:FindFirstChild("Destructible"));
+							local destructibleObj = require(blockadePrefab:FindFirstChild("Destructible"));
 							destructibleObj:SetHealth(maxHealth, maxHealth);
 							destructibleObj.Enabled = true;
 							destructibleObj.OnDestroySignal:Connect(function()
 								Debugger:StudioWarn("Factory Blockade destroyed");
 								mission.Cache.Blockade = nil;
 							end)
+						else
+							Debugger:Warn("No factory blockade");
 						end
 
 						if firstRun then
