@@ -9,8 +9,6 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 
-local modLZ4 = require(game.ReplicatedStorage.Library.Util.LZ4);
-
 local remoteCustomizationData = modRemotesManager:Get("CustomizationData");
 
 local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
@@ -35,7 +33,8 @@ function Workbench.new(itemId, appearanceLib, storageItem)
         local rawLz4 = remoteCustomizationData:InvokeServer("get", siid);
 
         local customSkin = modCustomizationData.newCustomizationSkin(rawLz4);
-        
+		Debugger:StudioWarn("customSkin", customSkin);
+
     end
 	
 	return listMenu;

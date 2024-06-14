@@ -32,7 +32,6 @@ local modRatShopLibrary = require(game.ReplicatedStorage.Library.RatShopLibrary)
 local modSafehomesLibrary = require(game.ReplicatedStorage.Library.SafehomesLibrary);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 
-
 if RunService:IsServer() then
 	modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 	modMission = require(game.ServerScriptService.ServerLibrary.Mission);

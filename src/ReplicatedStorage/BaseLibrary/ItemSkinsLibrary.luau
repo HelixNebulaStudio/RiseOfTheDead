@@ -26,15 +26,4 @@ function ItemSkinsLibrary:Init(super)
 
 end
 
---[[
-SkinData = {
-    Designs={
-        {};
-    };
-    Parts={
-        {L=0; };
-    }
-}
-]]
-
 return ItemSkinsLibrary;
