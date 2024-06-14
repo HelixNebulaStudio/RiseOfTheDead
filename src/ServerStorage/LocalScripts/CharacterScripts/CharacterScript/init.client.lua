@@ -1651,6 +1651,15 @@ RunService.PreSimulation:Connect(function(step)
 				local neckTransform = head.Neck.Transform;
 				local waistTransform = character.UpperTorso.Waist.Transform;
 
+				if characterProperties.IsSliding then
+					-- sliding
+					waistTransform = CFrame.new();
+					
+				elseif characterProperties.IsCrouching then
+					-- crouching
+					waistTransform = CFrame.new();
+				end
+
 				head.Neck.Transform = neckTransform * Cache.NeckC0;
 				character.UpperTorso.Waist.Transform = waistTransform * Cache.WaistC0;
 			end)
