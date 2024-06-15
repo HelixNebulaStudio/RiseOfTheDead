@@ -193,21 +193,7 @@ function CustomizationData.newCustomizationPlan(rawLz4)
 end
 
 function CustomizationPlan:__tostring()
-    return `{
-        self.Color and "#"..self.Color:ToHex() or "nil"
-    };{
-        self.Skin or "nil"
-    };{
-        self.Transparency or "nil"
-    };{
-        self.PatternData and Debugger.Stringify(self.PatternData) or "nil"
-    };{
-        self.PositionOffset and "vec3("..tostring(self.PositionOffset)..")" or "nil"
-    };{
-        self.Material and self.Material.Name or "nil"
-    };{
-        self.Reflectance or "nil"
-    }`;
+    return self:Serialize();
 end
 
 function CustomizationPlan:Decompress(rawLz4)
@@ -250,7 +236,7 @@ function CustomizationPlan:Deserialize(valStr)
             Transparency = nil;
         };
         if patArgs[1] then --color
-            patData.Color = modColorPicker.GetColor(args[1], true);
+            patData.Color = modColorPicker.GetColor(patArgs[1], true);
         
         end
         if patArgs[2] then --offset
@@ -272,7 +258,7 @@ function CustomizationPlan:Deserialize(valStr)
         if patArgs[6] then --transparency
             local a = tonumber(patArgs[6]);
             if a then
-                self.Transparency = math.clamp(a, 0, 1);
+                patData.Transparency = math.clamp(a/100, 0, 1);
             end
 
         end
@@ -363,10 +349,10 @@ function CustomizationPlan:Serialize()
         end
         patStr = patStr..",";
 
-        if patStr.Transparency then
+        if self.PatternData.Transparency then
             patStr = patStr..math.round(self.PatternData.Transparency*100);
         end
-        patStr = patStr..",";
+        buildStr = buildStr..patStr;
 
     end
     buildStr = buildStr..";";
@@ -378,7 +364,6 @@ function CustomizationPlan:Serialize()
         buildStr = buildStr..math.round(self.PositionOffset.Y *1000);
         buildStr = buildStr..",";
         buildStr = buildStr..math.round(self.PositionOffset.Z *1000);
-        buildStr = buildStr..",";
 
     end
     buildStr = buildStr..";";
