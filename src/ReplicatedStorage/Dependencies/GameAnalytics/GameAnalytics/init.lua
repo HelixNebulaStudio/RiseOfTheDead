@@ -498,7 +498,15 @@ function ga:PlayerJoined(Player)
 
 	--Fill Data
 	for key, value in pairs(store.BasePlayerData) do
-		PlayerData[key] = PlayerData[key] or value
+		if PlayerData[key] then
+			continue
+		end
+
+		if typeof(value) == "table" then
+			PlayerData[key] = utilities:copyTable(value)
+		else
+			PlayerData[key] = value
+		end
 	end
 
 	local countryCodeResult, countryCode = pcall(function()
@@ -542,11 +550,7 @@ function ga:PlayerJoined(Player)
 		if PlayerData.OwnedGamepasses == nil then --player is new (or is playing after SDK update)
 			PlayerData.OwnedGamepasses = {}
 			for _, id in ipairs(state._availableGamepasses) do
-				local ownGP = false;
-				pcall(function()
-					ownGP = MKT:UserOwnsGamePassAsync(Player.UserId, id);
-				end)
-				if ownGP then
+				if MKT:UserOwnsGamePassAsync(Player.UserId, id) then
 					table.insert(PlayerData.OwnedGamepasses, id)
 				end
 			end
@@ -557,11 +561,7 @@ function ga:PlayerJoined(Player)
 			--build a list of the game passes a user owns
 			local currentlyOwned = {}
 			for _, id in ipairs(state._availableGamepasses) do
-				local ownGP = false;
-				pcall(function()
-					ownGP = MKT:UserOwnsGamePassAsync(Player.UserId, id);
-				end)
-				if ownGP then
+				if MKT:UserOwnsGamePassAsync(Player.UserId, id) then
 					table.insert(currentlyOwned, id)
 				end
 			end
@@ -622,6 +622,7 @@ function ga:PlayerRemoved(Player)
 			ga:endSession(Player.UserId)
 		else
 			store.PlayerCache[Player.UserId] = nil
+			store.DataStoreQueue.RemoveKey(Player.UserId)
 		end
 	end
 end
@@ -632,10 +633,6 @@ function ga:isPlayerReady(playerId)
 	else
 		return false
 	end
-end
-
-function ga:getPlayerData(playerId)
-	return store:GetPlayerDataFromCache(playerId);
 end
 
 function ga:ProcessReceiptCallback(Info)
@@ -694,8 +691,8 @@ local requiredInitializationOptions = {"gameKey", "secretKey"}
 
 function ga:initServer(gameKey: string, secretKey: string)
 	ga:initialize({
-		gameKey = gameKey;
-		secretKey = secretKey;
+		gameKey = gameKey,
+		secretKey = secretKey
 	})
 end
 
@@ -845,14 +842,6 @@ local function ErrorHandler(message, trace, scriptName, player)
 	if trace ~= nil then
 		traceTmp = trace
 	end
-	
-	if messageTmp == "cannot resume dead coroutine" then
-		scriptNameTmp = "(General)";
-	end
-	if messageTmp == "cannot resume non-suspended coroutine" then
-		scriptNameTmp = "(General)";
-	end
-	
 	local m = scriptNameTmp .. ": message=" .. messageTmp .. ", trace=" .. traceTmp
 	if #m > 8192 then
 		m = string.sub(m, 1, 8192)
