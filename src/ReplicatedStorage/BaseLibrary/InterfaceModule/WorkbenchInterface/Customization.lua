@@ -32,7 +32,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
         local siid = storageItem.ID;
         local rawLz4 = remoteCustomizationData:InvokeServer("get", siid);
 
-        local customSkin = modCustomizationData.newCustomizationSkin(rawLz4);
+        local customSkin = modCustomizationData.newCustomizationPlan(rawLz4);
 		Debugger:StudioWarn("customSkin", customSkin);
 
     end

@@ -3,6 +3,11 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modLibraryManager = require(game.ReplicatedStorage.Library.LibraryManager);
 local library = modLibraryManager.new();
 
+function library.applyCustomizations()
+    
+end
+
+--==
 library.SkinType = {
     Pattern="Pattern";
     Texture="Texture";

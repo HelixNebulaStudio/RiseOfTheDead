@@ -169,10 +169,10 @@ if RunService:IsServer() then
 	end)
 end
 --==
-local CustomizationSkin = {};
-CustomizationSkin.__index = CustomizationSkin;
+local CustomizationPlan = {};
+CustomizationPlan.__index = CustomizationPlan;
 
-function CustomizationData.newCustomizationSkin(rawLz4)
+function CustomizationData.newCustomizationPlan(rawLz4)
     local self = {
         Color=nil;
         Skin=nil;
@@ -180,44 +180,67 @@ function CustomizationData.newCustomizationSkin(rawLz4)
         PatternData=nil;
         PositionOffset=nil;
         Material=nil;
+        Reflectance=nil;
     };
 
-    setmetatable(self, CustomizationSkin);
+    setmetatable(self, CustomizationPlan);
+
+    if rawLz4 then
+        self:Decompress(rawLz4);
+    end
+
     return self;
 end
 
-function CustomizationData:__tostring()
-    return `{self.Color or "nil"};{self.Skin or "nil"};{self.Transparency};{self.PatternData};{self.PositionOffset};{self.Material}`;
+function CustomizationPlan:__tostring()
+    return `{
+        self.Color and "#"..self.Color:ToHex() or "nil"
+    };{
+        self.Skin or "nil"
+    };{
+        self.Transparency or "nil"
+    };{
+        self.PatternData and Debugger.Stringify(self.PatternData) or "nil"
+    };{
+        self.PositionOffset and "vec3("..tostring(self.PositionOffset)..")" or "nil"
+    };{
+        self.Material and self.Material.Name or "nil"
+    };{
+        self.Reflectance or "nil"
+    }`;
 end
 
-function CustomizationData:Decompress(rawLz4)
+function CustomizationPlan:Decompress(rawLz4)
     local valStr = modLZ4.decompress(rawLz4);
     return self:Deserialize(valStr);
 end
 
-function CustomizationData:Compress()
+function CustomizationPlan:Compress()
     local serializedData = self:Serialize();
     return modLZ4.compress(serializedData);
 end
 
-function CustomizationData:Deserialize(valStr)
+function CustomizationPlan:Deserialize(valStr)
     local args = string.split(tostring(valStr), ";");
 
     if args[1] then -- color
         self.Color = modColorPicker.GetColor(args[1], true);
     
-    elseif args[2] then -- skin
+    end
+    if args[2] then -- skin
         if modItemSkinsLibrary:Find(tostring(args[2])) then
             self.Skin = tostring(args[2]);
         end
 
-    elseif args[3] then -- transparency
+    end
+    if args[3] then -- transparency
         local a = tonumber(args[3]);
         if a then
             self.Transparency = math.clamp(a/100, 0, 1);
         end
 
-    elseif args[4] then -- skin {color, offset, scale, transparency}
+    end
+    if args[4] then -- skin {color, offset, scale, transparency}
         local patArgs = string.split(args[4], ",");
         
         local patData = {
@@ -229,33 +252,38 @@ function CustomizationData:Deserialize(valStr)
         if patArgs[1] then --color
             patData.Color = modColorPicker.GetColor(args[1], true);
         
-        elseif patArgs[2] then --offset
+        end
+        if patArgs[2] then --offset
             local u = tonumber(patArgs[2]);
             local v = tonumber(patArgs[3]);
             if u and v then
                 patData.Offset = Vector2.new(math.clamp(u/1000, -4, 4), math.clamp(v/1000, -4, 4));
             end
 
-        elseif patArgs[4] then --scale
+        end
+        if patArgs[4] then --scale
             local u = tonumber(patArgs[4]);
             local v = tonumber(patArgs[5]);
             if u and v then
                 patData.Scale = Vector2.new(math.clamp(u/1000, -4, 4), math.clamp(v/1000, -4, 4));
             end
 
-        elseif patArgs[6] then --transparency
+        end
+        if patArgs[6] then --transparency
             local a = tonumber(patArgs[6]);
             if a then
                 self.Transparency = math.clamp(a, 0, 1);
             end
 
-        elseif patArgs[7] then -- effects
+        end
+        if patArgs[7] then -- effects
             
             
         end
         self.PatternData = patData;
 
-    elseif args[5] then -- part offset;
+    end
+    if args[5] then -- part offset;
         local vec3Args = string.split(args[5], ",");
 
         local x = tonumber(vec3Args[1]);
@@ -269,7 +297,8 @@ function CustomizationData:Deserialize(valStr)
             );
         end
 
-    elseif args[6] then
+    end
+    if args[6] then -- part mat
         local mat = nil;
         pcall(function()
             mat = Enum.Material[args[6]];
@@ -278,9 +307,16 @@ function CustomizationData:Deserialize(valStr)
         self.Material = mat;
 
     end
+    if args[7] then -- part reflectance
+        local a = tonumber(args[7]);
+        if a then
+            self.Reflectance = math.clamp(a/100, 0, 1);
+        end
+
+    end
 end
 
-function CustomizationData:Serialize()
+function CustomizationPlan:Serialize()
     local buildStr = "";
 
     if self.Color then
@@ -350,6 +386,11 @@ function CustomizationData:Serialize()
     if self.Material then
         local mat: Enum.Material = self.Material;
         buildStr = buildStr..mat.Name;
+    end
+    buildStr = buildStr..";";
+
+    if self.Reflectance then
+        buildStr = buildStr..math.round(self.Reflectance *100);
     end
     buildStr = buildStr..";";
 
