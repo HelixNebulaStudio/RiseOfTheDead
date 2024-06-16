@@ -16,15 +16,6 @@ function Mod.Activate(packet)
 	if module.DamageReflection == nil or value > module.DamageReflection then
 		module.DamageReflection = value;
 	end
-	
-	--local modStorageItem, module = paramPacket.ModStorageItem, paramPacket.WeaponModule;
-	
-	--local info = ModsLibrary.Get(modStorageItem.ItemId);
-	--local values = modStorageItem.Values;
-	
-	--local damage = ModsLibrary.NaturalInterpolate(info.Upgrades[1].BaseValue, info.Upgrades[1].MaxValue, values["R"], info.Upgrades[1].MaxLevel);
-	
-	--module.DamageReflection = (module.DamageReflection or 0) + damage;
 end
 
 return Mod;
