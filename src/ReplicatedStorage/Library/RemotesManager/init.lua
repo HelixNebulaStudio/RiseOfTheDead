@@ -29,9 +29,6 @@ RemotesManager.Bridges = {};
 RemotesManager.LogRemotes = false;
 RemotesManager.WarnInsecure = true;
 
-RemotesManager.RecordRemotes = RunService:IsStudio();
-RemotesManager.Records = {};
-
 local function loop(t, cb)
 	for k,v in pairs(t) do
 		if typeof(v) == "table" then
@@ -41,39 +38,6 @@ local function loop(t, cb)
 		end
 	end
 end
-
-function RemotesManager:Record(remoteName, callType, data)
-	if not RemotesManager.RecordRemotes then return end
-	
-	task.spawn(function()
-		if RemotesManager.Records[remoteName] == nil then RemotesManager.Records[remoteName] = {}; end
-		local remoteRecords = RemotesManager.Records[remoteName];
-
-		if remoteRecords[callType] == nil then
-			remoteRecords[callType] = {
-				Calls=0;
-				MaxSize=0;
-				MinSize=math.huge;
-				TotalSize=0;
-				LastSubmission=tick();
-			};
-		end;
-		local callTable = remoteRecords[callType];
-
-		callTable.Calls = callTable.Calls +1;
-		local dataSize = modRemotePacketSizeCounter.GetPacketSize{
-			PacketData=data;
-		};
-		if dataSize > callTable.MaxSize then
-			callTable.MaxSize = dataSize;
-		end
-		if dataSize < callTable.MinSize then
-			callTable.MinSize = dataSize;
-		end
-		callTable.TotalSize = callTable.TotalSize + dataSize;
-	end)
-end
-
 
 function RemotesManager:NewUnreliableEventRemote(instanceOrName)
 	local remoteName = type(instanceOrName) == "string" and instanceOrName or instanceOrName.Name;
@@ -93,12 +57,10 @@ function RemotesManager:NewUnreliableEventRemote(instanceOrName)
 			local param = {...};
 			
 			if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> OnServerEvent. (",...,")"); end;
-			RemotesManager:Record(remote.Remote.Name, "OnServerEvent", param);
 		end)
 	else
 		remoteInstance.OnClientEvent:Connect(function(...)
 			if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> OnClientEvent. (",...,")"); end;
-			RemotesManager:Record(remote.Remote.Name, "OnClientEvent", {...});
 		end)
 	end
 	
@@ -106,7 +68,7 @@ function RemotesManager:NewUnreliableEventRemote(instanceOrName)
 		if k:lower() == "fireserver" then
 			return function(remoteTable, ...)
 				if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> Fired Server. (",...,")"); end;
-				RemotesManager:Record(remote.Remote.Name, "FireServer", {...});
+				
 				if remote.Deprecated then
 					Debugger:Warn(remote.Remote.Name..">> Deprecated trace:", debug.traceback());
 				end
@@ -116,7 +78,7 @@ function RemotesManager:NewUnreliableEventRemote(instanceOrName)
 		elseif k:lower() == "fireclient" then
 			return function(remoteTable, ...)
 				if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> Fired Client. (",...,")"); end;
-				RemotesManager:Record(remote.Remote.Name, "FireClient", {...});
+				
 				if remote.Deprecated then
 					Debugger:Warn(remote.Remote.Name..">> Deprecated trace:", debug.traceback());
 				end
@@ -126,7 +88,7 @@ function RemotesManager:NewUnreliableEventRemote(instanceOrName)
 		elseif k:lower() == "fireallclients" then
 			return function(remoteTable, ...)
 				if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> Fired All Client. (",...,")"); end;
-				RemotesManager:Record(remote.Remote.Name, "FireAllClients", {...});
+				
 				if remote.Deprecated then
 					Debugger:Warn(remote.Remote.Name..">> Deprecated trace:", debug.traceback());
 				end
@@ -197,12 +159,12 @@ function RemotesManager:NewEventRemote(remoteInstance, debounceInterval)
 			end
 			
 			if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> OnServerEvent. (",...,")"); end;
-			RemotesManager:Record(remote.Remote.Name, "OnServerEvent", {...});
+			
 		end)
 	else
 		remoteInstance.OnClientEvent:Connect(function(...)
 			if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> OnClientEvent. (",...,")"); end;
-			RemotesManager:Record(remote.Remote.Name, "OnClientEvent", {...});
+			
 		end)
 	end
 	
@@ -210,7 +172,7 @@ function RemotesManager:NewEventRemote(remoteInstance, debounceInterval)
 		if k:lower() == "fireserver" then
 			return function(remoteTable, ...)
 				if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> Fired Server. (",...,")"); end;
-				RemotesManager:Record(remote.Remote.Name, "FireServer", {...});
+				
 				if remote.Deprecated then
 					Debugger:Warn(remote.Remote.Name..">> Deprecated trace:", debug.traceback());
 				end
@@ -220,7 +182,7 @@ function RemotesManager:NewEventRemote(remoteInstance, debounceInterval)
 		elseif k:lower() == "fireclient" then
 			return function(remoteTable, ...)
 				if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> Fired Client. (",...,")"); end;
-				RemotesManager:Record(remote.Remote.Name, "FireClient", {...});
+				
 				if remote.Deprecated then
 					Debugger:Warn(remote.Remote.Name..">> Deprecated trace:", debug.traceback());
 				end
@@ -230,7 +192,7 @@ function RemotesManager:NewEventRemote(remoteInstance, debounceInterval)
 		elseif k:lower() == "fireallclients" then
 			return function(remoteTable, ...)
 				if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> Fired All Client. (",...,")"); end;
-				RemotesManager:Record(remote.Remote.Name, "FireAllClients", {...});
+				
 				if remote.Deprecated then
 					Debugger:Warn(remote.Remote.Name..">> Deprecated trace:", debug.traceback());
 				end
@@ -280,14 +242,14 @@ function RemotesManager:NewFunctionRemote(remoteInstance, debounceInterval)
 		if k:lower() == "invokeserver" then
 			return function(remoteTable, ...)
 				if RemotesManager.LogRemotes then Debugger:Log(remoteName..">> Invoked Server. (",...,")"); end;
-				RemotesManager:Record(remote.Remote.Name, "InvokeServer", {...});
+				
 				
 				return remote.Remote:InvokeServer(...);
 			end
 		elseif k:lower() == "invokeclient" then
 			return function(remoteTable, ...)
 				if RemotesManager.LogRemotes then Debugger:Log(remoteName..">> Invoked Client. (",...,")"); end;
-				RemotesManager:Record(remote.Remote.Name, "InvokeClient", {...});
+				
 
 				local p = {...};
 				local r;
@@ -328,14 +290,19 @@ function RemotesManager:NewFunctionRemote(remoteInstance, debounceInterval)
 						end
 					end
 				end)
-				RemotesManager:Record(remote.Remote.Name, "OnServerInvoke", {...});
-
+				
 				return v(player, ...);
 			end;
 			
 		elseif k:lower() == "onclientinvoke" then
 			remote.Remote.OnClientInvoke = v;
 			
+		elseif k:lower() == "onserverinvoked" then
+			error(`RemoteFunction OnServerInvoked {remote.Remote.Name} should be OnServerInvoke.`);
+
+		elseif k:lower() == "onclientinvoked" then
+			error(`RemoteFunction OnClientInvoked {remote.Remote.Name} should be OnServerInvoke.`);
+
 		end
 		meta[k] = v;
 	end
@@ -359,7 +326,7 @@ function RemotesManager:NewFunctionRemote(remoteInstance, debounceInterval)
 	return remote;
 end
 
-function RemotesManager:Get(name) : EventRemote | FunctionRemote | UnreliableRemoteEvent
+function RemotesManager:Get(name) : RemoteEvent | RemoteFunction | UnreliableRemoteEvent
 	if not isRemotesReady then bindWaitForRemotesReady:Wait(); end;
 	
 	local function get()
@@ -423,7 +390,6 @@ function RemotesManager:NewEventBridge(bridgeId)
 
 		elseif k:lower() == "fire" then
 			return function(remoteTable, ...)
-				RemotesManager:Record(bridgeId, "Fire", {...});
 				
 				local player = select(1, ...);
 				bridge:Fire(player, select(2, ...));
