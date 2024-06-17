@@ -50,10 +50,10 @@ end
 
 function CustomizationData.GenerateSkin(self, itemId, skinAsckey)
     local itemDesigns = self.Designs[itemId];
-    --if itemDesigns == nil then return end;
+    if itemDesigns == nil then return end;
 
     local itemDesign = itemDesigns[skinAsckey];
-    --if itemDesign == nil then return end;
+    if itemDesign == nil then return end;
 
     local plansList = {};
     for a=1, #itemDesign.Layers do
@@ -124,11 +124,7 @@ function CustomizationData:Load(rawTable)
 end
 
 if RunService:IsServer() then
-    Debugger:StudioWarn("OnCustomizationData server load");
-
-    function remoteCustomizationData.OnServerInvoked(player, action, ...)
-        Debugger:StudioWarn("remoteCustomizationData", player, action);
-
+    function remoteCustomizationData.OnServerInvoke(player, action, ...)
         local profile = shared.modProfile:Get(player);
         local customizationData = profile.CustomizationData;
 
@@ -137,11 +133,11 @@ if RunService:IsServer() then
             if siid == nil then return end;
             
 		    local storageItem, _ = shared.modStorage.FindIdFromStorages(siid, player);
-            --if storageItem == nil then return end;
+            if storageItem == nil then return end;
 
             local itemId = storageItem.ItemId;
             local skinAskey = storageItem:GetValues("SkinAskey");
-            --if skinAskey == nil then return end;
+            if skinAskey == nil then return end;
 
             local skinDesign = customizationData:GenerateSkin(itemId, skinAskey);
 
@@ -190,6 +186,13 @@ function CustomizationData.newCustomizationPlan(rawLz4)
     end
 
     return self;
+end
+
+function CustomizationData:Apply(obj)
+    obj.Color = self.Color or obj.Color;
+    obj.Transparency = self.Transparency or obj.Transparency;
+    obj.Material = self.Material or obj.Material;
+    obj.Reflectance = self.Reflectance or obj.Reflectance;
 end
 
 function CustomizationPlan:__tostring()
