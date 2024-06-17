@@ -307,7 +307,8 @@ function Interface.init(modInterface)
 		local self = {};
 		self.Refresh=nil;
 		self.ClearSearches=nil;
-		
+		self.OnVisiblityChanged=nil;
+
 		self.Menu = listFrameTemplate:Clone();
 		self.Menu.Parent = pageFrame;
 		self.SearchBar = self.Menu:WaitForChild("searchBar");
@@ -336,6 +337,11 @@ function Interface.init(modInterface)
 		end)
 
 		self.Menu:GetPropertyChangedSignal("Visible"):Connect(function()
+			if self.OnVisiblityChanged then
+				task.spawn(function()
+					self:OnVisiblityChanged();
+				end)
+			end
 			if self.Menu.Visible then
 				if self.Refresh then
 					self:Refresh();

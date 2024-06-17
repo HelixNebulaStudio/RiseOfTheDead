@@ -87,14 +87,25 @@ function ItemViewport.new() : ItemViewport
 	
 	setmetatable(self, ItemViewport);
 
-	self.Garbage:Tag(UserInputService.InputEnded:Connect(function(inputObject) 
-		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
-			if self.CurrentHighlightPart then
-				self.SelectedHighlightPart = self.CurrentHighlightPart;
-			end
-			Debugger:StudioWarn("Tap ", self.SelectedHighlightPart);
-		end
+	local selectDelta = nil;
+	self.Garbage:Tag(UserInputService.InputBegan:Connect(function(inputObject) 
+		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
+		selectDelta = self.CurrentHighlightPart;
+	
 	end))
+	self.Garbage:Tag(UserInputService.InputEnded:Connect(function(inputObject) 
+		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
+		if self.CurrentHighlightPart == selectDelta then
+			self.SelectedHighlightPart = self.CurrentHighlightPart;
+		end
+		selectDelta = nil;
+		
+	end))
+	self.Garbage:Tag(function()
+		selectDelta = nil;
+		self.SelectedHighlightPart = nil;
+		self.CurrentHighlightPart = nil;
+	end)
 
 	self.Frame:WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
 		self:Destroy();
