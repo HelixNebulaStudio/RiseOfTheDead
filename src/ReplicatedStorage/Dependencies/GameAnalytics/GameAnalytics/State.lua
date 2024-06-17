@@ -62,16 +62,11 @@ local function populateConfigurations(player)
 	PlayerData.RemoteConfigsIsReady = true
 	GameAnalyticsRemoteConfigs = GameAnalyticsRemoteConfigs or game:GetService("ReplicatedStorage"):WaitForChild("GameAnalyticsRemoteConfigs")
 	GameAnalyticsRemoteConfigs:FireClient(player, PlayerData.Configurations)
-	
-	pcall(function() -- MXK add-on
-		local depGameAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
-		depGameAnalytics:SyncRemoteConfigs(player);
-	end)
 end
 
 function state:sessionIsStarted(playerId)
 	local PlayerData = store:GetPlayerDataFromCache(playerId)
-	if PlayerData == nil then
+	if not PlayerData then
 		return false
 	end
 
@@ -80,7 +75,7 @@ end
 
 function state:isEnabled(playerId)
 	local PlayerData = store:GetPlayerDataFromCache(playerId)
-	if PlayerData == nil then
+	if not PlayerData then
 		return false
 	elseif not PlayerData.InitAuthorized then
 		return false
@@ -232,7 +227,7 @@ function state:startNewSession(player, teleportData)
 	populateConfigurations(player)
 
 	if not state:isEnabled(player.UserId) then
-		--logger:w("Could not start session: SDK is disabled.")
+		logger:w("Could not start session: SDK is disabled.")
 		return
 	end
 
@@ -247,8 +242,6 @@ function state:startNewSession(player, teleportData)
 	if state:isEventSubmissionEnabled() then
 		events:addSessionStartEvent(player.UserId, teleportData)
 	end
-	
-	
 end
 
 function state:endSession(playerId)

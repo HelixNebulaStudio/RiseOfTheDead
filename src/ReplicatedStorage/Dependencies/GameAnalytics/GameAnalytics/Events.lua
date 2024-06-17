@@ -226,7 +226,7 @@ local function processEvents()
 			if statusCode == http_api.EGAHTTPApiResponse.BadRequest and responseBody then
 				logger:w("Event queue: " .. tostring(#queue) .. " events sent. " .. tostring(#responseBody) .. " events failed GA server validation.")
 			else
-				--logger:w("Event queue: Failed to send events.")
+				logger:w("Event queue: Failed to send events.")
 			end
 		end
 	end

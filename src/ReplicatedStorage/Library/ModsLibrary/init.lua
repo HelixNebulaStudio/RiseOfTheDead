@@ -1485,7 +1485,7 @@ Add{
 Add{
 	Id="thornmod";
 	Name="Chest Thorn Plating";
-	Desc="When taking melee damage, attacker takes reflected damage based on a percent of their health. Reflected damage only affects basic enemeis. Minimum reflected damage is 10.";
+	Desc="When taking melee damage with armor > 0, attacker takes reflected damage based on a percent of their health. Reflected damage only affects basic enemies. Minimum reflected damage is 10.";
 	Icon="http://www.roblox.com/asset/?id=5720010211";
 	BaseTier=1;
 	Tier=1;

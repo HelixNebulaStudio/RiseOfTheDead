@@ -80,6 +80,7 @@ hardModeBitFlag:AddFlag("Slow", 1);
 hardModeBitFlag:AddFlag("LongerLoad", 2);
 hardModeBitFlag:AddFlag("KickLoad", 3);
 hardModeBitFlag:AddFlag("RngCrash", 4);
+hardModeBitFlag:AddFlag("LonerMode", 5);
 
 --== Script;
 local profileDatabase = FirebaseService:GetFirebase("Profiles");

@@ -46,7 +46,7 @@ function toolPackage.NewToolLib(handler)
 		BaseDamage=280;
 
 		PrimaryAttackSpeed=0.8;
-		PrimaryAttackAnimationSpeed=0.7;
+		--PrimaryAttackAnimationSpeed=0.7;
 
 		HeavyAttackMultiplier=2;
 		HeavyAttackSpeed=2;

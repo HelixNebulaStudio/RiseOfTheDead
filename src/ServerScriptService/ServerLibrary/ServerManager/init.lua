@@ -567,6 +567,18 @@ function ServerManager:Travel(player, worldName, teleportData)
 	elseif worldName == modBranchConfigs.WorldName then
 		shared.Notify(player, "You are already in world ("..worldDisplayName..").", "Negative");
 		
+	elseif player:GetAttribute("hm_5") == true and math.random(1, 3) == 1 then -- lonerMode
+		modOnGameEvents:Fire("OnWorldTravel", player, {
+			WorldId=worldName;
+		});
+		
+		shared.Notify(player, "Traveling to world ("..worldDisplayName..")", "Positive");
+		ServerManager.OnPlayerTravel:Fire(player);
+
+		local accessCode = ServerManager:CreatePrivateServer(worldName);
+		ServerManager:TeleportToPrivateServer(worldName, accessCode, {player}, teleportData);
+		return true;
+
 	else
 		modOnGameEvents:Fire("OnWorldTravel", player, {
 			WorldId=worldName;

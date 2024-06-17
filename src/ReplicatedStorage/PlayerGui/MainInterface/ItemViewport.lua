@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local UserInputService = game:GetService("UserInputService");
 
+local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
@@ -11,8 +12,9 @@ local modColorsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("Co
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
 local modCustomizeAppearance = require(game.ReplicatedStorage.Library:WaitForChild("CustomizeAppearance"));
-local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
+
+local modViewportUtil = require(game.ReplicatedStorage.Library.Util.ViewportUtil);
 
 local remoteEquipCosmetics = game.ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("AppearanceEditor"):WaitForChild("EquipCosmetics");
 local starterCharacter = game.StarterPlayer:WaitForChild("StarterCharacter");
@@ -37,6 +39,7 @@ function ItemViewport.new() : ItemViewport
 	local self = {
 		Index = ItemViewport.Counter;
 		Frame = diplayPortFrameTemplate:Clone();
+		WorldModel = Instance.new("WorldModel");
 		
 		Active=true;
 		OnDisplayID = nil;
@@ -49,6 +52,7 @@ function ItemViewport.new() : ItemViewport
 		Angles = CFrame.Angles(0, 0, 0);
 		Offset = CFrame.new(0, 0, 0);
 		
+		HightlightSelect=false;
 		CloseVisible=true;
 		
 		Garbage = modGarbageHandler.new();
@@ -82,6 +86,15 @@ function ItemViewport.new() : ItemViewport
 	end));
 	
 	setmetatable(self, ItemViewport);
+
+	self.Garbage:Tag(UserInputService.InputEnded:Connect(function(inputObject) 
+		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
+			if self.CurrentHighlightPart then
+				self.SelectedHighlightPart = self.CurrentHighlightPart;
+			end
+			Debugger:StudioWarn("Tap ", self.SelectedHighlightPart);
+		end
+	end))
 
 	self.Frame:WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
 		self:Destroy();
@@ -135,9 +148,10 @@ function ItemViewport:RefreshDisplay()
 	RunService:UnbindFromRenderStep("ItemViewport"..self.Index);
 	self.Frame.CurrentCamera = self.Camera;
 	for a=1, #self.DisplayModels do
-		self.DisplayModels[a].Prefab.Parent = self.Frame;
+		self.DisplayModels[a].Prefab.Parent = self.WorldModel;
 		self.DisplayModels[a].Prefab.PrimaryPart.Anchored = true;
 	end
+	self.WorldModel.Parent = self.Frame;
 	
 	local spin = true;
 	local rate = 180/(camera.ViewportSize.X/camera.ViewportSize.Y);
@@ -148,8 +162,31 @@ function ItemViewport:RefreshDisplay()
 	self.Rotor.WorldPosition = Vector3.new(0, 0, 0);
 	self.Offset = CFrame.new(0, 0, 0);
 	
+	local raycastParam = RaycastParams.new();
+	-- raycastParam.FilterType = Enum.RaycastFilterType.Include;
+	-- raycastParam.FilterDescendantsInstances = self.DisplayModels;
+
+	local rayScanTick = tick();
 	RunService:BindToRenderStep("ItemViewport"..self.Index, Enum.RenderPriority.Camera.Value-1, function()
 		local playerMouse = UserInputService:GetMouseLocation();
+
+		if self.HightlightSelect then
+			if tick()-rayScanTick > 0.1 then
+				rayScanTick = tick();
+				local rayResult = modViewportUtil.RaycastInViewportFrame(self.Frame, playerMouse.X, playerMouse.Y, 16, raycastParam);
+				if rayResult then
+					self.CurrentHighlightPart = rayResult.Instance;
+					self.Frame.highlightedLabel.Text = rayResult.Instance:GetAttribute("PartLabel") or rayResult.Instance.Name;
+				else
+					self.CurrentHighlightPart = nil;
+					self.Frame.highlightedLabel.Text = "";
+				end
+			end
+		else
+			self.CurrentHighlightPart = nil;
+			self.Frame.highlightedLabel.Text = "";
+		end
+
 		if self.OrbitTick == nil then
 			if OnClickX == nil or OnClickY == nil then
 				OnClickX = playerMouse.X;
@@ -189,11 +226,12 @@ function ItemViewport:RefreshDisplay()
 		
 		for a=1, #self.DisplayModels do
 			local prefab = self.DisplayModels[a].Prefab;
-			if prefab and prefab.PrimaryPart then
-				if prefab:FindFirstChild("CFraming") then self.DisplayModels[a].Offset = prefab.CFraming.Value end;
-				local prefabCFrame = self.Camera.CFrame*self.Offset*self.Angles;
-				prefab:SetPrimaryPartCFrame(prefabCFrame*(self.DisplayModels[a].Offset or CFrame.identity) + self.Camera.CFrame.lookVector*self.Zoom);
-			end
+			if prefab == nil or prefab.PrimaryPart == nil then continue end;
+
+			if prefab:FindFirstChild("CFraming") then self.DisplayModels[a].Offset = prefab.CFraming.Value end;
+			local prefabCFrame = self.Camera.CFrame*self.Offset*self.Angles;
+			prefab:PivotTo(prefabCFrame*(self.DisplayModels[a].Offset or CFrame.identity) + self.Camera.CFrame.lookVector*self.Zoom);
+		
 		end
 	end)
 end
@@ -281,10 +319,8 @@ end
 
 function ItemViewport:Clear()
 	RunService:UnbindFromRenderStep("ItemViewport"..self.Index);
-	for _, obj in pairs(self.Frame:GetChildren()) do
-		if obj.Name ~= "touchCloseButton" and obj.Name ~= "ItemIcon" then
-			obj:Destroy();
-		end
+	for _, obj in pairs(self.WorldModel:GetChildren()) do
+		obj:Destroy();
 	end
 	for a=1, #self.DisplayModels do
 		game.Debris:AddItem(self.DisplayModels[a].Prefab, 0);
