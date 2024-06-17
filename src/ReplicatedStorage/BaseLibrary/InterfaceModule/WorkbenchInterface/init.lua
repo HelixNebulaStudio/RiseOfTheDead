@@ -336,6 +336,15 @@ function Interface.init(modInterface)
 			end
 		end)
 
+		self.Menu.Destroying:Connect(function()
+			self.Menu.Visible = false;
+			if self.OnVisiblityChanged then
+				task.spawn(function()
+					self:OnVisiblityChanged();
+				end)
+			end
+		end)
+
 		self.Menu:GetPropertyChangedSignal("Visible"):Connect(function()
 			if self.OnVisiblityChanged then
 				task.spawn(function()
