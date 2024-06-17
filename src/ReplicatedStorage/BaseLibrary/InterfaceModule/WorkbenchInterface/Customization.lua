@@ -10,7 +10,9 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 
-local remoteCustomizationData = modRemotesManager:Get("CustomizationData");
+local modDropdownList = require(game.ReplicatedStorage.Library.UI.DropdownList);
+
+local remoteCustomizationData = modRemotesManager:Get("CustomizationData") :: RemoteFunction;
 
 local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 
@@ -30,12 +32,24 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 	local itemViewport = Interface.WorkbenchItemDisplay;
 
 	function listMenu:Refresh()
+		Debugger:StudioWarn("Select refresh");
         local siid = storageItem.ID;
         local rawLz4 = remoteCustomizationData:InvokeServer("get", siid);
 
         local customSkin = modCustomizationData.newCustomizationPlan(rawLz4);
 		Debugger:StudioWarn("customSkin", customSkin);
 
+		local newDropDownList = modDropdownList.new();
+		newDropDownList.Frame.Parent = self.Menu;
+
+		newDropDownList:LoadOptions({
+			"A";
+			"B";
+			"C";
+			"D";
+			"E";
+			"F";
+		})
     end
 	
 	function listMenu:OnVisiblityChanged()

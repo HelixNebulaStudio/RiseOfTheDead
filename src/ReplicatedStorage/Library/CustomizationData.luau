@@ -8,10 +8,9 @@ local modItemSkinsLibrary = require(game.ReplicatedStorage.Library.ItemSkinsLibr
 
 local modColorPicker = require(game.ReplicatedStorage.Library.UI.ColorPicker);
 local modLZ4 = require(game.ReplicatedStorage.Library.Util.LZ4);
-local modBaseNumber = require(game.ReplicatedStorage.Library.Util.BaseNumber);
 
 
-local remoteCustomizationData = modRemotesManager:Get("CustomizationData");
+local remoteCustomizationData = modRemotesManager:Get("CustomizationData") :: RemoteFunction;
 
 --==
 local CustomizationData = {};
@@ -125,7 +124,11 @@ function CustomizationData:Load(rawTable)
 end
 
 if RunService:IsServer() then
+    Debugger:StudioWarn("OnCustomizationData server load");
+
     function remoteCustomizationData.OnServerInvoked(player, action, ...)
+        Debugger:StudioWarn("remoteCustomizationData", player, action);
+
         local profile = shared.modProfile:Get(player);
         local customizationData = profile.CustomizationData;
 
@@ -143,6 +146,8 @@ if RunService:IsServer() then
             local skinDesign = customizationData:GenerateSkin(itemId, skinAskey);
 
         end
+
+        return;
     end
     
     task.spawn(function()
@@ -156,11 +161,6 @@ if RunService:IsServer() then
 			Function = function(speaker, args)
 				
 				local action = args[1];
-
-                if action == "basenum" then
-                    local input = tonumber(args[2]) or 0;
-                    shared.Notify(speaker, `Base36: {modBaseNumber.ToBase(input, 36)}`, "Inform");
-                end
 
 				return;
 			end;
