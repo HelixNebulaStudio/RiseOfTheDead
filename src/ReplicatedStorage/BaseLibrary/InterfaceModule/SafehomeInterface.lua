@@ -459,7 +459,7 @@ function Interface.init(modInterface)
 		end
 	end
 
-	function remoteSafehomeRequest.OnClientInvoked(rPacket)
+	function remoteSafehomeRequest.OnClientInvoke(rPacket)
 		modData.Profile.Safehome = rPacket.Data;
 		return;
 	end
