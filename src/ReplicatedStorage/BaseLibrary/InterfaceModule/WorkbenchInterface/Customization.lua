@@ -4,6 +4,7 @@ local Workbench = {};
 local Interface;
 
 local player = game.Players.LocalPlayer;
+local UserInputService = game:GetService("UserInputService");
 
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
@@ -26,9 +27,9 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 	listMenu.Menu.Name = "customize";
 	listMenu:SetEnableSearchBar(false);
 
+	local itemViewport = Interface.WorkbenchItemDisplay;
+
 	function listMenu:Refresh()
-        garbage:Destruct();
-        
         local siid = storageItem.ID;
         local rawLz4 = remoteCustomizationData:InvokeServer("get", siid);
 
@@ -37,6 +38,26 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
     end
 	
+	function listMenu:OnVisiblityChanged()
+		if not self.Menu.Visible then
+			garbage:Destruct();
+			return;
+		end
+
+		itemViewport.HightlightSelect = true;
+		garbage:Tag(UserInputService.InputEnded:Connect(function(inputObject) 
+			if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
+			task.wait();
+			Debugger:StudioWarn("Customize Select", itemViewport.SelectedHighlightPart);
+
+		end))
+		garbage:Tag(function()
+			itemViewport.HightlightSelect = false;
+			Debugger:StudioWarn("Destruct HightlightSelect=false")
+		end)
+
+	end
+
 	return listMenu;
 end
 
