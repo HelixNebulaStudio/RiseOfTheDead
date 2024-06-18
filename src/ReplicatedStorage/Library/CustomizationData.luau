@@ -174,9 +174,9 @@ function CustomizationData.newCustomizationPlan(rawLz4)
         Skin=nil;
         Transparency=nil;
         PatternData=nil;
-        PositionOffset=nil;
         Material=nil;
         Reflectance=nil;
+        PositionOffset=nil;
     };
 
     setmetatable(self, CustomizationPlan);
@@ -272,8 +272,24 @@ function CustomizationPlan:Deserialize(valStr)
         self.PatternData = patData;
 
     end
-    if args[5] then -- part offset;
-        local vec3Args = string.split(args[5], ",");
+    if args[5] then -- part mat
+        local mat = nil;
+        pcall(function()
+            mat = Enum.Material[args[5]];
+        end)
+
+        self.Material = mat;
+
+    end
+    if args[6] then -- part reflectance
+        local a = tonumber(args[6]);
+        if a then
+            self.Reflectance = math.clamp(a/100, 0, 1);
+        end
+
+    end
+    if args[7] then -- part offset;
+        local vec3Args = string.split(args[7], ",");
 
         local x = tonumber(vec3Args[1]);
         local y = tonumber(vec3Args[2]);
@@ -284,22 +300,6 @@ function CustomizationPlan:Deserialize(valStr)
                 math.clamp(y/1000, -1, 1), 
                 math.clamp(z/1000, -1, 1) 
             );
-        end
-
-    end
-    if args[6] then -- part mat
-        local mat = nil;
-        pcall(function()
-            mat = Enum.Material[args[6]];
-        end)
-
-        self.Material = mat;
-
-    end
-    if args[7] then -- part reflectance
-        local a = tonumber(args[7]);
-        if a then
-            self.Reflectance = math.clamp(a/100, 0, 1);
         end
 
     end
@@ -360,17 +360,6 @@ function CustomizationPlan:Serialize()
     end
     buildStr = buildStr..";";
 
-
-    if self.PositionOffset then
-        buildStr = buildStr..math.round(self.PositionOffset.X *1000);
-        buildStr = buildStr..",";
-        buildStr = buildStr..math.round(self.PositionOffset.Y *1000);
-        buildStr = buildStr..",";
-        buildStr = buildStr..math.round(self.PositionOffset.Z *1000);
-
-    end
-    buildStr = buildStr..";";
-
     if self.Material then
         local mat: Enum.Material = self.Material;
         buildStr = buildStr..mat.Name;
@@ -382,6 +371,16 @@ function CustomizationPlan:Serialize()
     end
     buildStr = buildStr..";";
 
+    if self.PositionOffset then
+        buildStr = buildStr..math.round(self.PositionOffset.X *1000);
+        buildStr = buildStr..",";
+        buildStr = buildStr..math.round(self.PositionOffset.Y *1000);
+        buildStr = buildStr..",";
+        buildStr = buildStr..math.round(self.PositionOffset.Z *1000);
+
+    end
+    buildStr = buildStr..";";
+    
     return buildStr;
 end
 
