@@ -13,6 +13,7 @@ local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
 local modCustomizeAppearance = require(game.ReplicatedStorage.Library:WaitForChild("CustomizeAppearance"));
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
+local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 
 local modViewportUtil = require(game.ReplicatedStorage.Library.Util.ViewportUtil);
 
@@ -56,6 +57,7 @@ function ItemViewport.new() : ItemViewport
 		CloseVisible=true;
 		SelectedHighlightParts={};
 		
+		OnSelectionChanged = modEventSignal.new("OnSelectionChanged");
 		Garbage = modGarbageHandler.new();
 	};
 	
@@ -107,6 +109,7 @@ function ItemViewport.new() : ItemViewport
 				table.insert(self.SelectedHighlightParts, self.CurrentHighlightPart);
 			end
 			Debugger:StudioWarn("self.SelectedHighlightParts",self.SelectedHighlightParts);
+			self.OnSelectionChanged:Fire(self.SelectedHighlightParts, selectDelta);
 		end
 
 		selectDelta = nil;
@@ -136,6 +139,7 @@ end
 
 function ItemViewport:Destroy()
 	self:Clear();
+	self.OnSelectionChanged:Destroy();
 	self.Garbage:Destruct();
 	game.Debris:AddItem(self.Frame, 0);
 end
