@@ -36,7 +36,7 @@ function CustomizationData.new(player)
                 ["aaa"]={
                     Name="name"?;
                     Layers={
-                        {N="PartName"; L=0; P="aaa"};
+                        {N="PartName"; L=0; P="aaa"; PO="123,456,789";};
                     };
                 }
             };

@@ -108,7 +108,6 @@ function ItemViewport.new() : ItemViewport
 				end
 				table.insert(self.SelectedHighlightParts, self.CurrentHighlightPart);
 			end
-			Debugger:StudioWarn("self.SelectedHighlightParts",self.SelectedHighlightParts);
 			self.OnSelectionChanged:Fire(self.SelectedHighlightParts, selectDelta);
 		end
 

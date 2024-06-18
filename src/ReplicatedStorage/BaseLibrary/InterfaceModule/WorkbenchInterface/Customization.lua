@@ -43,13 +43,22 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		garbage:Tag(dropDownFrame);
 		newDropDownList.Frame.Parent = scrollFrame;
 	
+		local customizationCache = {};
+
 		local mainFrame = templateMainFrame:Clone();
 		garbage:Tag(mainFrame);
 		mainFrame.Parent = scrollFrame;
 	
 		local selectTextbox = mainFrame:WaitForChild("SelectTextbox");
 		local selectDropButton: TextButton = selectTextbox:WaitForChild("SelectDropButton");
-	
+
+		local editPanel: Frame = mainFrame:WaitForChild("EditPanel");
+		local hintLabel: TextLabel = mainFrame:WaitForChild("HintLabel");
+
+		editPanel:GetPropertyChangedSignal("Visible"):Connect(function()
+			hintLabel.Visible = not editPanel.Visible;
+		end)
+
 		local function toggleVisibility(frame)
 			local exist = false;
 			for _, obj in pairs(scrollFrame:GetChildren()) do
@@ -93,6 +102,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
         local customSkin = modCustomizationData.newCustomizationPlan(rawLz4);
 		Debugger:StudioWarn("customSkin", customSkin);
 
+		garbage:Tag(itemViewport.OnSelectionChanged:Connect(function()
+			Debugger:StudioWarn("Customize Select", itemViewport.SelectedHighlightParts);
+			
+		end))
     end
 	
 	function listMenu:OnVisiblityChanged()
@@ -102,12 +115,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		end
 
 		itemViewport.HightlightSelect = true;
-		garbage:Tag(UserInputService.InputEnded:Connect(function(inputObject) 
-			if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
-			task.wait();
-			Debugger:StudioWarn("Customize Select", itemViewport.SelectedHighlightPart);
-
-		end))
 		garbage:Tag(function()
 			itemViewport.HightlightSelect = false;
 			Debugger:StudioWarn("Destruct HightlightSelect=false")
