@@ -317,15 +317,22 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 				if prefab then
 					prefab:SetAttribute("ItemId", itemId);
 					
+					local prefix = "";
 					if weldName == "LeftToolGrip" then
+						prefix = "Left";
 						prefab.Name = "Left"..prefabName;
+						prefab:SetAttribute("DisplayModelPrefix", "Left");
+
 					elseif weldName == "RightToolGrip" then
+						prefix = "Right";
 						prefab.Name = "Right"..prefabName;
+						prefab:SetAttribute("DisplayModelPrefix", "Right");
+
 					end
 					modColorsLibrary.ApplyAppearance(prefab, itemValues);
 					
 					local displayOffset = itemDisplayLib[weldName.."Offset"];
-					table.insert(self.DisplayModels, {WeldName=weldName; Prefab=prefab; BasePrefab=itemPrefabs[prefabName]; Offset=displayOffset});
+					table.insert(self.DisplayModels, {WeldName=weldName; Prefab=prefab; BasePrefab=itemPrefabs[prefabName]; Offset=displayOffset; Prefix=prefix;});
 				end
 			end
 		end
