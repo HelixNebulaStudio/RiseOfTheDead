@@ -34,56 +34,59 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 	local scrollFrame = listMenu.Menu.scrollList;
 	local itemViewport = Interface.WorkbenchItemDisplay;
 
-	local newDropDownList = modDropdownList.new();
-	local dropDownFrame = newDropDownList.Frame;
-	dropDownFrame.Size = UDim2.new(1, 0, 1, 0);
-	newDropDownList.Frame.Parent = scrollFrame;
-	garbage:Tag(dropDownFrame);
-
-	local mainFrame = templateMainFrame:Clone();
-	mainFrame.Parent = scrollFrame;
-
-	local selectTextbox = mainFrame:WaitForChild("SelectTextbox");
-	local selectDropButton: TextButton = selectTextbox:WaitForChild("SelectDropButton");
-
-	local function toggleVisibility(frame)
-		local exist = false;
-		for _, obj in pairs(scrollFrame:GetChildren()) do
-			if not obj:IsA("GuiObject") then continue end;
-			obj.Visible = obj == frame;
-			if obj.Visible then
-				exist = true;
-			end
-		end
-		if not exist then
-			mainFrame.Visible = true;
-		end
-	end
-
-	dropDownFrame:GetPropertyChangedSignal("Visible"):Connect(function()
-		if dropDownFrame.Visibility == false then
-			toggleVisibility();
-		end
-	end);
-
-	selectDropButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
-
-		newDropDownList:LoadOptions({
-			"[All]";
-			"[Priamry]";
-			"[Secondary]";
-			"Handle";
-			"Grips";
-			"Body";
-			"ScopeBody";
-		});
-
-		toggleVisibility(newDropDownList);
-	end)
-	
 	function listMenu:Refresh()
 		Debugger:StudioWarn("Select refresh");
+
+		local newDropDownList = modDropdownList.new();
+		local dropDownFrame = newDropDownList.Frame;
+		dropDownFrame.Size = UDim2.new(1, 0, 1, 0);
+		garbage:Tag(dropDownFrame);
+		newDropDownList.Frame.Parent = scrollFrame;
+	
+		local mainFrame = templateMainFrame:Clone();
+		garbage:Tag(mainFrame);
+		mainFrame.Parent = scrollFrame;
+	
+		local selectTextbox = mainFrame:WaitForChild("SelectTextbox");
+		local selectDropButton: TextButton = selectTextbox:WaitForChild("SelectDropButton");
+	
+		local function toggleVisibility(frame)
+			local exist = false;
+			for _, obj in pairs(scrollFrame:GetChildren()) do
+				if not obj:IsA("GuiObject") then continue end;
+				obj.Visible = obj == frame;
+				if obj.Visible then
+					exist = true;
+				end
+			end
+			if not exist then
+				mainFrame.Visible = true;
+			end
+		end
+	
+		dropDownFrame:GetPropertyChangedSignal("Visible"):Connect(function()
+			if dropDownFrame.Visible == false then
+				toggleVisibility();
+			end
+		end);
+	
+		selectDropButton.MouseButton1Click:Connect(function()
+			Interface:PlayButtonClick();
+	
+			newDropDownList:LoadOptions({
+				"[All]";
+				"[Priamry]";
+				"[Secondary]";
+				"Handle";
+				"Grips";
+				"Body";
+				"ScopeBody";
+			});
+	
+			toggleVisibility(dropDownFrame);
+		end)
+
+
         local siid = storageItem.ID;
         local rawLz4 = remoteCustomizationData:InvokeServer("get", siid);
 

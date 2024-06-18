@@ -188,7 +188,7 @@ function CustomizationData.newCustomizationPlan(rawLz4)
     return self;
 end
 
-function CustomizationData:Apply(obj)
+function CustomizationPlan:Apply(obj)
     obj.Color = self.Color or obj.Color;
     obj.Transparency = self.Transparency or obj.Transparency;
     obj.Material = self.Material or obj.Material;

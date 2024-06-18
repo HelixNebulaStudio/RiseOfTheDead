@@ -25,7 +25,7 @@ function DropdownList.new()
 		if #inputStr > 0 then
 			for _, obj in pairs(scrollFrame:GetChildren()) do
 				if not obj:IsA("GuiObject") then continue end;
-				obj.Visible = obj.Name:find(inputStr) ~= nil;
+				obj.Visible = obj.Name:lower():find(inputStr:lower()) ~= nil;
 			end
 		else
 			for _, obj in pairs(scrollFrame:GetChildren()) do
@@ -49,6 +49,10 @@ function DropdownList.new()
 	touchCloseButton.MouseButton1Click:Connect(function()
 		self.Frame.Visible = false;
 	end)
+
+	self.Frame.Destroying:Connect(function()
+		table.clear(self);
+	end)
 	
 	setmetatable(self, DropdownList);
 	return self;
@@ -64,6 +68,7 @@ function DropdownList:LoadOptions(list)
 		local new = templateOption:Clone();
 		new.LayoutOrder = a;
 		new.Text = list[a];
+		new.Name = new.Text;
 		new.Parent = self.ScrollFrame;
 		
 		new.MouseButton1Click:Connect(function()
