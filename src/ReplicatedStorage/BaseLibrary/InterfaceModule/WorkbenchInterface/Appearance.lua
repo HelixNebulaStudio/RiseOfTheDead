@@ -90,6 +90,14 @@ function Workbench.new(itemId, library, storageItem)
 		end;
 	end
 	
+	function listMenu:OnVisiblityChanged()
+		if self.Menu.Visible then
+			itemDisplay.HightlightSelect = true;
+		else
+			itemDisplay.HightlightSelect = false;
+		end
+	end
+
 	local appearanceListingFrames = {};
 	local styleButtonDebounce = false;
 	
