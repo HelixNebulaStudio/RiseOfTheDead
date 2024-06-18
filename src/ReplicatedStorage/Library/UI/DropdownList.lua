@@ -71,6 +71,12 @@ function DropdownList:LoadOptions(list)
 		new.Name = new.Text;
 		new.Parent = self.ScrollFrame;
 		
+		if self.OnNewButton then
+			task.spawn(function()
+				self:OnNewButton(a, new);
+			end)
+		end
+
 		new.MouseButton1Click:Connect(function()
 			if self.OnOptionSelect then
 				self:OnOptionSelect(a, list[a]);
