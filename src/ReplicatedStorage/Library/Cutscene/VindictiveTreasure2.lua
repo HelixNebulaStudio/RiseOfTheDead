@@ -42,6 +42,9 @@ return function(CutsceneSequence)
 				or mission.ProgressionPoint == 5) then
 					
 					if profile and profile.LastDoorCFrame and classPlayer and classPlayer.IsAlive and classPlayer.Properties.InBossBattle == nil then
+						if mission.Type == 3 then
+							shared.Notify(player, "You spotted a Cultist doing something suspicious, the Cultist spots you.", "Important");
+						end
 						modNpc.Spawn("Cultist", profile.LastDoorCFrame, function(npc, npcModule)
 							npcModule.Properties.TargetableDistance = 4096;
 							npcModule.OnTarget(player);
