@@ -322,9 +322,13 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 					if weldName == "LeftToolGrip" then
 						prefix = "Left";
 						prefab.Name = "Left"..prefabName;
+						prefab:SetAttribute("DisplayModelPrefix", "Left");
+
 					elseif weldName == "RightToolGrip" then
 						prefix = "Right";
 						prefab.Name = "Right"..prefabName;
+						prefab:SetAttribute("DisplayModelPrefix", "Right");
+
 					end
 					modColorsLibrary.ApplyAppearance(prefab, itemValues);
 					
