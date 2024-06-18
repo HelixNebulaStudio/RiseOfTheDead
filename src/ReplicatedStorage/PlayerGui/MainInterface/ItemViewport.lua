@@ -54,6 +54,7 @@ function ItemViewport.new() : ItemViewport
 		
 		HightlightSelect=false;
 		CloseVisible=true;
+		SelectedHighlightParts={};
 		
 		Garbage = modGarbageHandler.new();
 	};
@@ -95,15 +96,25 @@ function ItemViewport.new() : ItemViewport
 	end))
 	self.Garbage:Tag(UserInputService.InputEnded:Connect(function(inputObject) 
 		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
+
 		if self.CurrentHighlightPart == selectDelta then
-			self.SelectedHighlightPart = self.CurrentHighlightPart;
+			if selectDelta == nil then
+				table.clear(self.SelectedHighlightParts);
+			else
+				if not UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+					table.clear(self.SelectedHighlightParts);
+				end
+				table.insert(self.SelectedHighlightParts, self.CurrentHighlightPart);
+			end
+			Debugger:StudioWarn("self.SelectedHighlightParts",self.SelectedHighlightParts);
 		end
+
 		selectDelta = nil;
 		
 	end))
 	self.Garbage:Tag(function()
 		selectDelta = nil;
-		self.SelectedHighlightPart = nil;
+		table.clear(self.SelectedHighlightParts);
 		self.CurrentHighlightPart = nil;
 	end)
 
@@ -187,14 +198,17 @@ function ItemViewport:RefreshDisplay()
 				local rayResult = modViewportUtil.RaycastInViewportFrame(self.Frame, playerMouse.X, playerMouse.Y, 16, raycastParam);
 				if rayResult then
 					self.CurrentHighlightPart = rayResult.Instance;
-					self.Frame.highlightedLabel.Text = rayResult.Instance:GetAttribute("PartLabel") or rayResult.Instance.Name;
 				else
 					self.CurrentHighlightPart = nil;
-					self.Frame.highlightedLabel.Text = "";
 				end
 			end
 		else
 			self.CurrentHighlightPart = nil;
+		end
+
+		if self.CurrentHighlightPart then
+			self.Frame.highlightedLabel.Text = self.CurrentHighlightPart:GetAttribute("PartLabel") or self.CurrentHighlightPart.Name;
+		else
 			self.Frame.highlightedLabel.Text = "";
 		end
 
