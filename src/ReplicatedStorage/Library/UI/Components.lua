@@ -3,6 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local UserInputService = game:GetService("UserInputService");
 local RunService = game:GetService("RunService");
 
+local modMath = require(game.ReplicatedStorage.Library.Util.Math);
+
 --==
 local Components = {};
 
@@ -24,12 +26,17 @@ function Components.IsTrulyVisible(guiObject)
 	return true;
 end
 
+function Components.NewSliderButton()
+	return script:WaitForChild("Slider"):Clone();
+end
+
 function Components.CreateSlider(mainInterface, paramPacket)
 	local button = paramPacket.Button :: TextButton;
 	local setFunc = paramPacket.SetFunc;
 	
 	local rangeInfo = paramPacket.RangeInfo;
 	local minVal, maxVal, defaultVal = rangeInfo.Min, rangeInfo.Max, rangeInfo.Default;
+	local rangeScale = rangeInfo.Scale or 1;
 	local valueType = rangeInfo.ValueType or "Percent";
 	
 	local gradientLayout = button:WaitForChild("UIGradient");
@@ -42,7 +49,8 @@ function Components.CreateSlider(mainInterface, paramPacket)
 	local color2 = Color3.fromRGB(205, 205, 205);
 	
 	local function refreshSlider()
-		percentVal = math.clamp(currentVal, minVal, maxVal)/maxVal;
+		currentVal = math.round(math.clamp(currentVal, minVal, maxVal));
+		percentVal = modMath.MapNum(currentVal, minVal, maxVal, 0, 1, true);
 		
 		gradientLayout.Color = ColorSequence.new({
 			ColorSequenceKeypoint.new(0, color1),
@@ -57,7 +65,7 @@ function Components.CreateSlider(mainInterface, paramPacket)
 		end 
 		
 		if paramPacket.DisplayValueFunc then
-			button.Text = paramPacket.DisplayValueFunc(currentVal)
+			button.Text = paramPacket.DisplayValueFunc(currentVal/rangeScale)
 			return;
 		end
 		
@@ -73,13 +81,13 @@ function Components.CreateSlider(mainInterface, paramPacket)
 		local absSizeX = button.AbsoluteSize.X;
 		RunService:BindToRenderStep("slider", Enum.RenderPriority.Input.Value+1, function(delta)
 			local mousePosition = UserInputService:GetMouseLocation();
-			local sliderRatio = math.clamp(math.clamp(mousePosition.X-button.AbsolutePosition.X, 0, absSizeX)/absSizeX, 0, 0.999);
+			local sliderRatio = math.clamp(math.clamp(mousePosition.X-button.AbsolutePosition.X, 0, absSizeX)/absSizeX, 0, 1);
 			
-			currentVal = math.clamp(math.round(sliderRatio*maxVal), minVal, maxVal);
+			currentVal = modMath.MapNum(sliderRatio, 0, 1, minVal, maxVal, true);
 			refreshSlider();
 			
 			if not mainInterface.Button1Down or not Components.IsTrulyVisible(button) then
-				setFunc(currentVal);
+				setFunc(currentVal/rangeScale);
 				RunService:UnbindFromRenderStep("slider");
 			end
 		end)
@@ -102,20 +110,25 @@ function Components.CreateSlider(mainInterface, paramPacket)
 		lastClick = tick();
 	end)
 	
-	button.MouseButton2Click:Connect(function()
+	local function resetDefaultValues()
 		currentVal = defaultVal;
 		refreshSlider();
-		setFunc(currentVal);
-	end)
+		setFunc(currentVal/rangeScale);
+	end
+	button.MouseButton2Click:Connect(resetDefaultValues);
 	
 	typeInput.FocusLost:Connect(function(enterPressed, inputObject)
 		typeInput.Visible = false;
 		
 		local setVal = tonumber(typeInput.Text) or defaultVal;
 		
+		if tonumber(setVal) then
+			setVal = setVal * rangeInfo.Scale;
+		end
+
 		currentVal = setVal;
 		refreshSlider();
-		setFunc(currentVal);
+		setFunc(currentVal/rangeScale);
 	end)
 end
 
