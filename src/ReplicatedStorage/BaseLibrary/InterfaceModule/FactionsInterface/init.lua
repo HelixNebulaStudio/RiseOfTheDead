@@ -1864,8 +1864,10 @@ function Interface.init(modInterface)
 		Interface.SetPositionWithPadding(dropdownListObj.Frame);
 		dropdownListObj.Frame.Visible = true;
 
-		function dropdownListObj:OnOptionSelect(selectIndex, selectName)
+		function dropdownListObj:OnOptionSelect(selectIndex, optionButton)
 			Interface:PlayButtonClick();
+
+			local selectName = optionButton.Name;
 			
 			hqFrame.HqHostInput.Text = selectName;
 			dropdownListObj.Frame.Visible = false;
