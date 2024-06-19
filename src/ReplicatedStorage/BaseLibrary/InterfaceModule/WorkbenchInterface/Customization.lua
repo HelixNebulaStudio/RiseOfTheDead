@@ -34,8 +34,62 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 	local scrollFrame = listMenu.Menu.scrollList;
 	local itemViewport = Interface.WorkbenchItemDisplay;
 
+	--[[ 
+		itemViewport.DisplayModels = {
+			{WeldName=weldName; Prefab=prefab; BasePrefab=itemPrefabs[prefabName]; Offset=displayOffset; Prefix=prefix;})
+		};
+	]]
+
 	function listMenu:Refresh()
 		Debugger:StudioWarn("Select refresh");
+
+		local customizationCache = {};
+
+		local groupPartList = {};
+		local groupsList = {}
+		local modelParts = {};
+		--[[
+			{Name=prefix..obj.Name; Part=obj; DisplayModelData = displayModelData;}
+		]]
+
+		do -- load list of modelParts and part list
+			for a=1, #itemViewport.DisplayModels do
+				local displayModelData = itemViewport.DisplayModels[a];
+				local prefix = displayModelData.Prefix;
+
+				for _, basePart in pairs(displayModelData.Prefab:GetChildren()) do
+					if not basePart:IsA("BasePart") then continue end;
+					local predefinedGroup = basePart:GetAttribute("CustomizationGroup");
+					local modelPartData = {
+						Name=prefix..basePart.Name;
+						Part=basePart;
+						DisplayModelData = displayModelData;
+						PredefinedGroup = predefinedGroup;
+					};
+
+					if predefinedGroup and table.find(groupsList, `[{predefinedGroup}]`) == nil then
+						table.insert(groupsList, `[{predefinedGroup}]`);
+					end
+
+					table.insert(modelParts, modelPartData);
+					table.insert(groupPartList, modelPartData.Name);
+				end
+			end
+			table.sort(modelParts, function(a, b) return a.Name > b.Name; end);
+			table.sort(groupPartList);
+			table.sort(groupsList);
+			table.insert(groupsList, 1, "[All]");
+
+			for a=1, #groupsList do
+				table.insert(groupPartList, a, groupsList[a]);
+			end
+
+			garbage:Tag(function()
+				table.clear(groupPartList);
+				table.clear(groupsList);
+				table.clear(modelParts);
+			end)
+		end
 
 		local newDropDownList = modDropdownList.new();
 		local dropDownFrame = newDropDownList.Frame;
@@ -43,21 +97,68 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		garbage:Tag(dropDownFrame);
 		newDropDownList.Frame.Parent = scrollFrame;
 	
-		local customizationCache = {};
-
 		local mainFrame = templateMainFrame:Clone();
 		garbage:Tag(mainFrame);
 		mainFrame.Parent = scrollFrame;
 	
-		local selectTextbox = mainFrame:WaitForChild("SelectTextbox");
-		local selectDropButton: TextButton = selectTextbox:WaitForChild("SelectDropButton");
+		local selectTextbox: TextBox = mainFrame:WaitForChild("SelectTextbox");
+		local selectDropButton = selectTextbox:WaitForChild("SelectDropButton") :: TextButton;
 
-		local editPanel: Frame = mainFrame:WaitForChild("EditPanel");
+		local editPanel = mainFrame:WaitForChild("EditPanel") :: Frame;
 		local hintLabel: TextLabel = mainFrame:WaitForChild("HintLabel");
+		local infoLabel: TextLabel = editPanel:WaitForChild("InfoLabel");
+		local partLabel: TextLabel = editPanel:WaitForChild("PartList");
 
 		editPanel:GetPropertyChangedSignal("Visible"):Connect(function()
 			hintLabel.Visible = not editPanel.Visible;
 		end)
+
+		local function newSelection(selectionPartData, predefinedGroup)
+			if selectionPartData == nil then
+				selectionPartData = {};
+
+				local highlightSelect = itemViewport.SelectedHighlightParts;
+				for a=1, #highlightSelect do
+					for b=1, #modelParts do
+						if modelParts[b].Part == highlightSelect[a] then 
+							table.insert(selectionPartData, modelParts[b]);
+							break;
+						end;
+					end
+				end
+			end
+
+			Debugger:StudioWarn("selectionPartData", selectionPartData, "predefinedGroup", predefinedGroup);
+
+			if #selectionPartData <= 0 then
+				editPanel.Visible = false;
+				return; 
+			end
+
+			local groupName = predefinedGroup or "New Group";
+
+			editPanel.Visible = true;
+			selectTextbox.Text = "";
+
+			local partNames = {};
+			for a=1, #selectionPartData do
+				table.insert(partNames, selectionPartData[a].Name);
+			end;
+			
+			if predefinedGroup or #selectionPartData > 1 then
+				selectTextbox.Text = groupName;
+				infoLabel.Text = `Type: Group    Layer: 0`;
+				partLabel.Text = `<font size="14"><b>Grouped Parts:</b></font> {table.concat(partNames, ", ")}`;
+			
+			else
+				local partData = selectionPartData[1];
+				selectTextbox.Text = partData.Name;
+				infoLabel.Text = `Type: Part    Layer: 0`;
+				partLabel.Text = `<font size="14"><b>Part Group:</b> {partData.PredefinedGroup or "None"}</font>`;
+			end
+
+
+		end
 
 		local function toggleVisibility(frame)
 			local exist = false;
@@ -82,15 +183,31 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		selectDropButton.MouseButton1Click:Connect(function()
 			Interface:PlayButtonClick();
 	
-			newDropDownList:LoadOptions({
-				"[All]";
-				"[Priamry]";
-				"[Secondary]";
-				"Handle";
-				"Grips";
-				"Body";
-				"ScopeBody";
-			});
+			newDropDownList:LoadOptions(groupPartList);
+
+			function newDropDownList:OnOptionSelect(index, optionButton)
+				Debugger:StudioWarn("index", index, "optionButton", optionButton);
+				dropDownFrame.Visible = false;
+
+				local selectionName = optionButton.Name;
+				local selectionPartData = {};
+				local predefinedGroup = selectionName:sub(1,1) == "[" and selectionName;
+
+				for a=1, #modelParts do
+					if predefinedGroup == "[All]" then
+						table.insert(selectionPartData, modelParts[a]);
+
+					elseif predefinedGroup and `[{modelParts[a].PredefinedGroup}]` == selectionName then
+						table.insert(selectionPartData, modelParts[a]);
+
+					elseif modelParts[a].Name == selectionName then
+						table.insert(selectionPartData, modelParts[a]);
+
+					end
+				end
+
+				newSelection(selectionPartData, predefinedGroup);
+			end
 	
 			toggleVisibility(dropDownFrame);
 		end)
@@ -100,11 +217,11 @@ function Workbench.new(itemId, appearanceLib, storageItem)
         local rawLz4 = remoteCustomizationData:InvokeServer("get", siid);
 
         local customSkin = modCustomizationData.newCustomizationPlan(rawLz4);
-		Debugger:StudioWarn("customSkin", customSkin);
+		--Debugger:StudioWarn("customSkin", customSkin);
 
 		garbage:Tag(itemViewport.OnSelectionChanged:Connect(function()
-			Debugger:StudioWarn("Customize Select", itemViewport.SelectedHighlightParts);
-			
+			--Debugger:StudioWarn("Customize Select", itemViewport.SelectedHighlightParts);
+			newSelection();
 		end))
     end
 	

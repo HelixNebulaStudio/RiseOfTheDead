@@ -67,8 +67,8 @@ function DropdownList:LoadOptions(list)
 	for a=1, #list do
 		local new = templateOption:Clone();
 		new.LayoutOrder = a;
+		new.Name = list[a];
 		new.Text = list[a];
-		new.Name = new.Text;
 		new.Parent = self.ScrollFrame;
 		
 		if self.OnNewButton then
@@ -79,7 +79,7 @@ function DropdownList:LoadOptions(list)
 
 		new.MouseButton1Click:Connect(function()
 			if self.OnOptionSelect then
-				self:OnOptionSelect(a, list[a]);
+				self:OnOptionSelect(a, new);
 			end
 		end)
 	end
