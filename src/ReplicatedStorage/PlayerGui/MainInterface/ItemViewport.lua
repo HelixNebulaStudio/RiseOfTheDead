@@ -16,6 +16,7 @@ local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler)
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 
 local modViewportUtil = require(game.ReplicatedStorage.Library.Util.ViewportUtil);
+local modGuiObjectPlus = require(game.ReplicatedStorage.Library.UI.GuiObjectPlus);
 
 local remoteEquipCosmetics = game.ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("AppearanceEditor"):WaitForChild("EquipCosmetics");
 local starterCharacter = game.StarterPlayer:WaitForChild("StarterCharacter");
@@ -106,7 +107,9 @@ function ItemViewport.new() : ItemViewport
 				if not UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
 					table.clear(self.SelectedHighlightParts);
 				end
-				table.insert(self.SelectedHighlightParts, self.CurrentHighlightPart);
+				if table.find(self.SelectedHighlightParts, self.CurrentHighlightPart) == nil then
+					table.insert(self.SelectedHighlightParts, self.CurrentHighlightPart);
+				end
 			end
 			self.OnSelectionChanged:Fire(self.SelectedHighlightParts, selectDelta);
 		end
@@ -193,12 +196,16 @@ function ItemViewport:RefreshDisplay()
 
 	local rayScanTick = tick();
 	RunService:BindToRenderStep("ItemViewport"..self.Index, Enum.RenderPriority.Camera.Value-1, function()
+		if not self.Frame.Visible then return end;
 		local playerMouse = UserInputService:GetMouseLocation();
 
 		if self.HightlightSelect then
 			if tick()-rayScanTick > 0.1 then
 				rayScanTick = tick();
-				local rayResult = modViewportUtil.RaycastInViewportFrame(self.Frame, playerMouse.X, playerMouse.Y, 16, raycastParam);
+				local rayResult = nil;
+				if modGuiObjectPlus.IsMouseOver(self.Frame) then
+					rayResult = modViewportUtil.RaycastInViewportFrame(self.Frame, playerMouse.X, playerMouse.Y, 16, raycastParam);
+				end
 				if rayResult then
 					self.CurrentHighlightPart = rayResult.Instance;
 				else

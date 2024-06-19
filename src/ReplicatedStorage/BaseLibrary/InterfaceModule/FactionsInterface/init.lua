@@ -1866,6 +1866,8 @@ function Interface.init(modInterface)
 
 		function dropdownListObj:OnOptionSelect(selectIndex, optionButton)
 			Interface:PlayButtonClick();
+
+			local selectName = optionButton.Name;
 			
 			local selectName = optionButton.Name;
 			
