@@ -100,7 +100,7 @@ function ItemViewport.new() : ItemViewport
 	self.Garbage:Tag(UserInputService.InputEnded:Connect(function(inputObject) 
 		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
 
-		if self.CurrentHighlightPart == selectDelta then
+		if modGuiObjectPlus.IsMouseOver(self.Frame) and self.CurrentHighlightPart == selectDelta then
 			if selectDelta == nil then
 				table.clear(self.SelectedHighlightParts);
 			else
