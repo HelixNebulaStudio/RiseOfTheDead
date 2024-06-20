@@ -16,6 +16,7 @@ ColorsLibary.Packs = {
 	Hellsfire = {Name="Hellsfire"; LayoutOrder=3; List={};};
 	TurquoiseShades = {Name="TurquoiseShades"; LayoutOrder=3; List={};};
 	Sunset = {Name="Sunset"; LayoutOrder=3; List={};};
+	Abyss = {Name="Abyss"; LayoutOrder=4; List={};};
 }
 
 local order = 0;
@@ -225,5 +226,11 @@ NewColor("sun3", ColorsLibary.Packs.Sunset, "Sunset 3", Color3.fromRGB(153, 94, 
 NewColor("sun4", ColorsLibary.Packs.Sunset, "Sunset 4", Color3.fromRGB(102, 61, 0));
 NewColor("sun5", ColorsLibary.Packs.Sunset, "Sunset 5", Color3.fromRGB(51, 30, 0));
 
+--== Color Pack: Abyss
+NewColor("abyss1", ColorsLibary.Packs.Abyss, "Abyss 1", Color3.fromRGB(107, 123, 153));
+NewColor("abyss2", ColorsLibary.Packs.Abyss, "Abyss 2", Color3.fromRGB(81, 90, 116));
+NewColor("abyss3", ColorsLibary.Packs.Abyss, "Abyss 3", Color3.fromRGB(47, 68, 107));
+NewColor("abyss4", ColorsLibary.Packs.Abyss, "Abyss 4", Color3.fromRGB(31, 45, 71));
+NewColor("abyss5", ColorsLibary.Packs.Abyss, "Abyss 5", Color3.fromRGB(29, 29, 66));
 
 return ColorsLibary;

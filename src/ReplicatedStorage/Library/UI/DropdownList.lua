@@ -25,7 +25,14 @@ function DropdownList.new()
 		if #inputStr > 0 then
 			for _, obj in pairs(scrollFrame:GetChildren()) do
 				if not obj:IsA("GuiObject") then continue end;
-				obj.Visible = obj.Name:lower():find(inputStr:lower()) ~= nil;
+				local visible = false;
+				if obj.Name:lower():find(inputStr:lower()) ~= nil then
+					visible = true;
+				elseif (obj:IsA("TextButton") or obj:IsA("TextLabel") or obj:IsA("TextBox"))
+					and obj.Text:lower():find(inputStr:lower()) ~= nil then
+					visible = true;
+				end
+				obj.Visible = visible;
 			end
 		else
 			for _, obj in pairs(scrollFrame:GetChildren()) do

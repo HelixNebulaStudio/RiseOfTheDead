@@ -41,7 +41,7 @@ end
 function ColorPicker.new(mainInterface)
 	local self = {};
 	function self.SelectFunc() end;
-	function self:OnColorSelect(color: Color3, colorId: string?) end;
+	function self:OnColorSelect(color: Color3, colorId: string?, colorLabel: ImageLabel?) end;
 
 	self.HighlightLoop = false;
 
@@ -73,11 +73,14 @@ function ColorPicker.new(mainInterface)
 			local new = colorOptionTemplate:Clone() :: ImageButton;
 			new.ImageColor3 = colorLabel.ImageColor3;
 			new.MouseButton1Click:Connect(function()
-				self:OnColorSelect(colorLabel.ImageColor3, colorLabel.Name);
+				self:OnColorSelect(colorLabel.ImageColor3, colorLabel.Name, colorLabel);
 			end)
 
 			new.Parent = lastColorsFrame;
 		end
+
+		local paletteAbsPos = colorPaletteImage.AbsolutePosition;
+		local absPosOffset = Vector2.zero;
 
 		local colorsPaletteTable = {};
 		for _, obj in pairs(colorPaletteImage:GetChildren()) do
@@ -90,12 +93,13 @@ function ColorPicker.new(mainInterface)
 		end
 		
 		self.SelectFunc = function()
+			absPosOffset = (colorPaletteImage.AbsolutePosition - paletteAbsPos);
 			local mousePosition = UserInputService:GetMouseLocation() + Vector2.new(0, -game.GuiService.TopbarInset.Height);
 		
 			local closestLabel, closestDist = nil, math.huge;
 			
 			for a=1, #colorsPaletteTable do
-				local point = colorsPaletteTable[a].Point;
+				local point = colorsPaletteTable[a].Point + absPosOffset;
 				local label = colorsPaletteTable[a].Label;
 				
 				local dist = (point-mousePosition).Magnitude;
@@ -147,7 +151,7 @@ function ColorPicker.new(mainInterface)
 				table.insert(ColorPicker.LastColors, selectLabel);
 			end
 
-			self:OnColorSelect(selectLabel.ImageColor3, selectLabel.Name);
+			self:OnColorSelect(selectLabel.ImageColor3, selectLabel.Name, selectLabel);
 		end
 	end)
 
@@ -181,6 +185,13 @@ function ColorPicker.GetColor(tag, allowCustomColors) : Color3?
 	end
 
 	return;
+end
+function ColorPicker.IsInColorPicker(color: Color3)
+	local bc = BrickColor.new(color);
+	if approvedColors[`#{color:ToHex()}`] then
+		return true;
+	end
+	return bc.Color:ToHex() == color:ToHex();
 end
 
 function ColorPicker.GetBackColor(color, contrast) : Color3

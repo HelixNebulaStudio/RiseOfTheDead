@@ -9,17 +9,22 @@ local UserInputService = game:GetService("UserInputService");
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
+local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
 
 local modDropdownList = require(game.ReplicatedStorage.Library.UI.DropdownList);
 local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
+local modColorPicker = require(game.ReplicatedStorage.Library.UI.ColorPicker);
 
 local remoteCustomizationData = modRemotesManager:Get("CustomizationData") :: RemoteFunction;
 
 local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 
 local templateMainFrame = script.Parent:WaitForChild("CustomizationMain");
+local templateDropDownLabel = script.Parent:WaitForChild("DropDownLabel");
+local templateColorOption = game.ReplicatedStorage.Library.UI.ColorPicker.ColorOption;
 
 local garbage = modGarbageHandler.new();
+local firstSync = false;
 --==
 
 function Workbench.init(interface)
@@ -28,6 +33,14 @@ function Workbench.init(interface)
 end
 
 function Workbench.new(itemId, appearanceLib, storageItem)
+	if firstSync == false then
+		firstSync = true;
+
+		modData:RequestData("ColorPacks");
+		modData:RequestData("SkinsPacks");
+		modData:GetFlag("CustomColors", true);
+	end
+
 	local listMenu = Interface.List.create();
 	listMenu.Menu.Name = "customize";
 	listMenu:SetEnableSearchBar(false);
@@ -93,16 +106,52 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			end)
 		end
 
+		local colorPickerObj = modColorPicker.new(Interface);
+		local colorFrame = colorPickerObj.Frame;
+		colorFrame.Size = UDim2.new(0, 310, 0, 300);
+		colorFrame.UIGradient:Destroy();
+		colorFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50);
+		colorFrame.Content.BackgroundTransparency = 1;
+		colorFrame.Content.Position = UDim2.new(0, 0, 0, 0);
+		colorFrame.Content.Size = UDim2.new(1, 0, 1, 0);
+		colorFrame.Content.Advance.Visible = false;
+		colorFrame.Content.ColorPalette.Size = UDim2.new(1, 0, 1, 0);
+		colorFrame.NameTag.Visible = false;
+		colorFrame.touchCloseButton.Visible = false;
+		garbage:Tag(function()
+			colorPickerObj:Destroy();
+		end);
+
 		local newDropDownList = modDropdownList.new();
 		local dropDownFrame = newDropDownList.Frame;
 		dropDownFrame.Size = UDim2.new(1, 0, 1, 0);
 		garbage:Tag(dropDownFrame);
 		newDropDownList.Frame.Parent = scrollFrame;
 	
+		newDropDownList.Frame:GetPropertyChangedSignal("Visible"):Connect(function()
+			if newDropDownList.Frame.Visible then return end;
+			colorPickerObj.Frame.Parent = nil;
+			colorFrame.Visible = false;
+		end)
+
 		local mainFrame = templateMainFrame:Clone();
 		garbage:Tag(mainFrame);
 		mainFrame.Parent = scrollFrame;
 	
+		local function toggleVisibility(frame)
+			local exist = false;
+			for _, obj in pairs(scrollFrame:GetChildren()) do
+				if not obj:IsA("GuiObject") then continue end;
+				obj.Visible = obj == frame;
+				if obj.Visible then
+					exist = true;
+				end
+			end
+			if not exist then
+				mainFrame.Visible = true;
+			end
+		end
+
 		local selectTextbox: TextBox = mainFrame:WaitForChild("SelectTextbox");
 		local saveGroupNameButton = selectTextbox:WaitForChild("SaveButton") :: TextButton;
 		local selectDropButton = selectTextbox:WaitForChild("SelectDropButton") :: TextButton;
@@ -114,6 +163,196 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		do -- Load edit panel 
 
+			-- MARK:OpenColorCustomizations;
+			local function OpenColorCustomizations(onSelectFunc)
+				local customColors = modData:GetFlag("CustomColors");
+				local colorGroupOptionsList = {
+					"ColorPickerLabel";
+					"ColorPicker";
+				};
+				local colorPacksList = {};
+
+				-- Load Unique Colors;
+				if customColors then
+					local uniqueColors = {Name="Unique Colors"; LayoutOrder=0; List={}; Owned=true; CustomColors=true;};
+
+					local orderList = {};
+					for hex, _ in pairs(customColors.Unlocked) do
+						local color = Color3.fromHex(hex);
+						if modColorPicker.IsInColorPicker(color) then continue end;
+						local h, s, v = color:ToHSV();
+						local hLayer = math.floor(h*255/10)*10;
+						table.insert(orderList, {Id=hex; Value=(hLayer*10000 + v*1000 + s*255);});
+					end
+					table.sort(orderList, function(a, b) 
+						return a.Value > b.Value;
+					end);
+
+					for a=1, #orderList do
+						local hex = orderList[a].Id;
+						local customId = "#"..hex;
+
+						local getColor = modColorsLibrary.Get(customId);
+						table.insert(uniqueColors.List, getColor);
+					end
+
+					if #orderList > 0 then
+						table.insert(colorGroupOptionsList, "UniqueColorsLabel");
+						table.insert(colorGroupOptionsList, "UniqueColors");
+						modColorsLibrary.Packs.UniqueColors = uniqueColors;
+					end
+				end
+				table.insert(colorGroupOptionsList, "ColorPacksLabel");
+
+				-- Load Color Packs;
+				for packId, packInfo in pairs(modColorsLibrary.Packs) do
+					if packId == "UniqueColors" then continue end;
+					table.insert(colorPacksList, packId);
+				end
+				table.sort(colorPacksList, function(a, b)
+					local packInfoA = modColorsLibrary.Packs[a];
+					local packInfoB = modColorsLibrary.Packs[b];
+ 					return ((packInfoA.Owned and 0 or 100) + (packInfoA.LayoutOrder or 0)) < ((packInfoB.Owned and 0 or 100) + (packInfoB.LayoutOrder or 0))
+				end)
+				for a=1, #colorPacksList do
+					table.insert(colorGroupOptionsList, colorPacksList[a]);
+				end
+				
+
+				function newDropDownList:OnNewButton(index, optionButton: TextButton)
+					local selectionName = optionButton.Name;
+					if selectionName == "ColorPicker" then
+						optionButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50);
+						optionButton.AutoButtonColor = false;
+						optionButton.AutomaticSize = Enum.AutomaticSize.Y;
+						colorFrame.Parent = optionButton;
+						
+						if customColors then
+							colorPickerObj:SetUnlocked(customColors.Unlocked);
+						end
+						function colorPickerObj:OnColorSelect(selectColor, colorName, colorLabel)
+							if colorLabel:FindFirstChild("LockedTemplate") then
+								Debugger:StudioWarn("Selection locked");
+								return;
+							end
+
+							Interface:PlayButtonClick();
+							if onSelectFunc then
+								onSelectFunc(selectColor);
+							end
+
+							dropDownFrame.Visible = false;
+						end
+						colorFrame.Visible = true;
+
+					elseif selectionName:sub(#selectionName-4, #selectionName) == "Label" then
+						
+						local newDdLabel = templateDropDownLabel:Clone();
+						newDdLabel.LayoutOrder = optionButton.LayoutOrder;
+						local label = newDdLabel:WaitForChild("TextLabel");
+						newDdLabel.Parent = newDropDownList.ScrollFrame;
+
+						if selectionName == "ColorPickerLabel" then
+							label.Text = "Color Palette";
+						elseif selectionName == "UniqueColorsLabel" then
+							label.Text = "Custom Colors";
+						elseif selectionName == "ColorPacksLabel" then
+							label.Text = "Color Packs";
+						end
+						optionButton:Destroy();
+
+					elseif modColorsLibrary.Packs[selectionName] then
+						local colorPackInfo = modColorsLibrary.Packs[selectionName];
+						local isOwned = colorPackInfo.Owned;
+
+						optionButton.AutomaticSize = Enum.AutomaticSize.Y;
+						optionButton.TextYAlignment = Enum.TextYAlignment.Top;
+						optionButton.AutoButtonColor = false;
+
+						optionButton.BackgroundColor3 = isOwned and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(30, 30, 30);
+						optionButton.TextColor3 = isOwned and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
+
+						local padding = Instance.new("UIPadding");
+						padding.PaddingLeft = UDim.new(0, 5);
+						padding.PaddingRight = UDim.new(0, 5);
+						padding.PaddingBottom = UDim.new(0, 10);
+						padding.PaddingTop = UDim.new(0, 10);
+						padding.Parent = optionButton;
+
+						local colorsFrame = Instance.new("Frame");
+						colorsFrame.Position = UDim2.new(0, 0, 0, 25);
+						colorsFrame.Size = UDim2.new(1, 0, 0, 0);
+						colorsFrame.Parent = optionButton;
+
+						if selectionName == "UniqueColors" then
+							colorsFrame.Position = UDim2.new(0, 0, 0, 0);
+							optionButton.TextTransparency = 1;
+						end
+
+						local gridLayout = Instance.new("UIGridLayout");
+						gridLayout.CellSize = UDim2.new(0, 25, 0, 25);
+						gridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center;
+						gridLayout.Parent = colorsFrame;
+
+						local selectionHighlight = templateColorOption.Parent.SelectTemplate:Clone();
+						selectionHighlight.Parent = nil;
+
+						for a=1, #colorPackInfo.List do
+							local colorInfo = colorPackInfo.List[a];
+							local newColorOption = templateColorOption:Clone() :: ImageButton;
+							newColorOption.ImageColor3 = colorInfo.Color;
+							newColorOption.Parent = colorsFrame;
+
+							if not isOwned then
+								local newLocked = templateColorOption.Parent.LockedTemplate:Clone();
+								newLocked.ImageColor3 = modColorPicker.GetBackColor(colorInfo.Color);
+								newLocked.Parent = newColorOption;
+							end
+
+							newColorOption.MouseMoved:Connect(function()
+								if not isOwned then return end;
+								selectionHighlight.Parent = newColorOption;
+							end)
+							newColorOption.MouseLeave:Connect(function()
+								selectionHighlight.Parent = nil;
+							end)
+
+							newColorOption.MouseButton1Click:Connect(function() 
+								if not isOwned then return end;
+								Interface:PlayButtonClick();
+
+								if onSelectFunc then
+									onSelectFunc(colorInfo.Color);
+								end
+
+								dropDownFrame.Visible = false;
+							end)
+						end
+
+					end
+				end
+
+				function newDropDownList:OnOptionSelect(index, optionButton)
+					Debugger:StudioWarn("index", index, "optionButton", optionButton);
+					
+				end
+		
+				newDropDownList:LoadOptions(colorGroupOptionsList);
+				toggleVisibility(dropDownFrame);
+
+			end
+
+			local colorButton = editPanel.ColorFrame.Button;
+			colorButton.MouseButton1Click:Connect(function()
+				Interface:PlayButtonClick();
+				OpenColorCustomizations(function(selectColor: Color3)
+					colorButton.BackgroundColor3 = selectColor;
+					colorButton.TextColor3 = modColorPicker.GetBackColor(selectColor);
+					colorButton.Text = `#{selectColor:ToHex()}`;
+
+					Debugger:StudioWarn("Set Color=", colorButton.Text);
+				end);
+			end)
 
 			-- Transparency slider
 			local transparencySlider = modComponents.NewSliderButton() :: TextButton;
@@ -132,6 +371,20 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					return v;
 				end;
 			});
+
+			-- Texture color;
+			local textureColorButton = editPanel.SkinColorFrame.Button;
+			textureColorButton.MouseButton1Click:Connect(function()
+				Interface:PlayButtonClick();
+				OpenColorCustomizations(function(selectColor: Color3)
+					textureColorButton.ImageColor3 = selectColor;
+					textureColorButton.BackgroundColor3 = modColorPicker.GetBackColor(selectColor);
+					textureColorButton.TextLabel.Text = `#{selectColor:ToHex()}`;
+					textureColorButton.TextLabel.TextColor3 = modColorPicker.GetBackColor(selectColor);
+
+					Debugger:StudioWarn("Set TextureColor=", textureColorButton.TextLabel.Text);
+				end);
+			end)
 
 			-- Texture Offset
 			local textureOffsetXSlider = modComponents.NewSliderButton() :: TextButton;
@@ -346,15 +599,15 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			if predefinedGroup or #selectionPartData > 1 then
 				selectTextbox.Text = `[{groupName}]`;
 				selectTextbox.PlaceholderText = "";
-				infoLabel.Text = `Type: Group`; --    Layer: 0
-				partLabel.Text = `<font size="14"><b>Grouped Parts:</b></font> {table.concat(partNames, ", ")}`;
+				infoLabel.Text = `<b>Type:</b> Group`; --    Layer: 0
+				partLabel.Text = `<font size="14"><b>Group Parts:</b></font> {table.concat(partNames, ", ")}`;
 				selectTextbox.TextEditable = true;
 			
 			else
 				local partData = selectionPartData[1];
 				selectTextbox.Text = "";
 				selectTextbox.PlaceholderText = partData.Name;
-				infoLabel.Text = `Type: Part`;
+				infoLabel.Text = `<b>Type:</b> Part`;
 				partLabel.Text = `<font size="14"><b>Part Group:</b> {partData.PredefinedGroup or "None"}</font>`;
 				selectTextbox.TextEditable = false;
 
@@ -363,7 +616,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			local function onTextBoxUpdate()
 				if not selectTextbox.TextEditable then return end;
 
-				local cap1 = string.match(selectTextbox.Text, "%[(.*)%]") or "";
+				local cap1 = string.gsub(selectTextbox.Text, "[%[%]]", "") or ""; --string.match(selectTextbox.Text, "%[(.*)%]")
 				groupName = string.gsub(cap1, "[^%a%d]*", "") or "New Group";
 				groupName = groupName:sub(1, 16);
 				
@@ -379,20 +632,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		end
 
-
-		local function toggleVisibility(frame)
-			local exist = false;
-			for _, obj in pairs(scrollFrame:GetChildren()) do
-				if not obj:IsA("GuiObject") then continue end;
-				obj.Visible = obj == frame;
-				if obj.Visible then
-					exist = true;
-				end
-			end
-			if not exist then
-				mainFrame.Visible = true;
-			end
-		end
 	
 		dropDownFrame:GetPropertyChangedSignal("Visible"):Connect(function()
 			if dropDownFrame.Visible == false then
