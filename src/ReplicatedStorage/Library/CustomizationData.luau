@@ -200,7 +200,7 @@ function CustomizationPlan:Apply(obj)
     obj.Reflectance = self.Reflectance or obj.Reflectance;
 
     local textures: {Texture} = {};
-    local surfaceAppearance = nil;
+    local surfaceAppearance: SurfaceAppearance = nil;
 
     for _, obj in pairs(obj:GetChildren()) do
         if obj:IsA("Texture") and obj:GetAttribute("Skin") then
@@ -218,7 +218,9 @@ function CustomizationPlan:Apply(obj)
         if skinLib then
 
             if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
-                
+                if surfaceAppearance then
+                    surfaceAppearance:Destroy();
+                end
                 for _, face in pairs(Enum.NormalId:GetEnumItems()) do
                     if textures[face] == nil then
                         textures[face] = Instance.new("Texture");
@@ -285,10 +287,20 @@ function CustomizationPlan:Apply(obj)
     end
 
     if jointObj then
-        if self.PositionOffset then
-            jointObj.C1 = CFrame.new(self.PositionOffset);
-        else
-            jointObj.C1 = CFrame.new();
+        local defaultC1 = jointObj:GetAttribute("DefaultC1");
+        if defaultC1 == nil then
+            defaultC1 = jointObj.C1;
+            jointObj:SetAttribute("DefaultC1", defaultC1);
+        end
+        if defaultC1 then
+            if self.PositionOffset and self.PositionOffset.X == 0 and self.PositionOffset.Y == 0 and self.PositionOffset.Z == 0 then
+                self.PositionOffset = nil;
+            end
+            if self.PositionOffset then
+                jointObj.C1 = defaultC1 * CFrame.new(self.PositionOffset.X, -self.PositionOffset.Y, -self.PositionOffset.Z);
+            else
+                jointObj.C1 = defaultC1;
+            end
         end
     end
 end

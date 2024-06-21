@@ -383,11 +383,11 @@ function ItemSkinsLibrary:Init(super)
     };
 
     super:Add{
-        Id="skincosmos";
+        Id="skincottonfade";
         Type=super.SkinType.Pattern;
         OldId="103";
 
-        Name="Cosmos";
+        Name="Cotton Fade";
         Icon="rbxassetid://18142365196";
     
         Patterns={

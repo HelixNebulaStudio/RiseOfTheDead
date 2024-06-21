@@ -130,6 +130,22 @@ function Components.CreateSlider(mainInterface, paramPacket)
 		refreshSlider();
 		setFunc(currentVal/rangeScale);
 	end)
+
+	button:GetAttributeChangedSignal("Value"):Connect(function()
+		local valueSet = button:GetAttribute("Value");
+		if valueSet == nil then return end;
+		
+		local setVal = tonumber(valueSet);
+		button:SetAttribute("Value", nil);
+		
+		if tonumber(setVal) then
+			setVal = setVal * rangeInfo.Scale;
+		end
+
+		currentVal = setVal;
+		refreshSlider();
+		setFunc(currentVal/rangeScale);
+	end)
 end
 
 function Components.CreateSliderType2(mainInterface, paramPacket)

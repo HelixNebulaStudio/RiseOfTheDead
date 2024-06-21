@@ -659,7 +659,7 @@ end
 --== Texture Pack: Special
 NewTexture(101, SkinsLibrary.Packs.Special, "Diamonds", "rbxassetid://2751750764", Color3.fromRGB(79, 238, 255), Vector2.new(0.1, 0.1));
 NewTexture(102, SkinsLibrary.Packs.Special, "DeathCamo", "rbxassetid://4386399917", Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
-NewTexture(103, SkinsLibrary.Packs.Special, "Cosmos", "rbxassetid://4873625719", Color3.fromRGB(255, 255, 255), Vector2.new(4, 4));
+NewTexture(103, SkinsLibrary.Packs.Special, "Cotton Fade", "rbxassetid://4873625719", Color3.fromRGB(255, 255, 255), Vector2.new(4, 4));
 
 AddTexture{
 	Id=104;
