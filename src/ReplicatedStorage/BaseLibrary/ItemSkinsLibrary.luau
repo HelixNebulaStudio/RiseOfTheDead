@@ -23,6 +23,29 @@ function ItemSkinsLibrary:Init(super)
         return;
     end
 
+    function super:FindVariant(skinId, variantId)
+        if skinId == nil or variantId == nil then return end;
+        local lib = super:Find(skinId);
+
+        if lib.Type == super.SkinType.Pattern then
+            for _, variantLib in pairs(lib.Patterns) do
+                if variantLib.Id == variantId then
+                    return lib, variantLib;
+                end
+            end
+
+        elseif lib.Type == super.SkinType.Texture then
+            for _, variantLib in pairs(lib.Textures) do
+                if variantLib.Id == variantId then
+                    return lib, variantLib;
+                end
+            end
+
+        end
+
+        return lib;
+    end
+
     --== MARK: Pattern Skins
     super:Add{
         Id="skincamo";

@@ -195,7 +195,7 @@ function ColorPicker.IsInColorPicker(color: Color3)
 end
 
 function ColorPicker.GetBackColor(color, contrast) : Color3
-	contrast = contrast or 0.3;
+	contrast = contrast or 0.4;
 	local h, s, v = color:ToHSV();
 	return Color3.fromHSV(h, s, v > 0.5 and math.max(v-contrast, 0) or math.min(v+contrast, 1));
 end

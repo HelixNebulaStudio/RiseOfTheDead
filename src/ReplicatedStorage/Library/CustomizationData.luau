@@ -173,7 +173,12 @@ function CustomizationData.newCustomizationPlan(rawLz4)
         Color=nil;
         Skin=nil;
         Transparency=nil;
-        PatternData=nil;
+        PatternData={
+            Color = nil;
+            Offset = nil;
+            Scale = nil;
+            Transparency = nil;
+        };
         Material=nil;
         Reflectance=nil;
         PositionOffset=nil;
@@ -193,6 +198,99 @@ function CustomizationPlan:Apply(obj)
     obj.Transparency = self.Transparency or obj.Transparency;
     obj.Material = self.Material or obj.Material;
     obj.Reflectance = self.Reflectance or obj.Reflectance;
+
+    local textures: {Texture} = {};
+    local surfaceAppearance = nil;
+
+    for _, obj in pairs(obj:GetChildren()) do
+        if obj:IsA("Texture") and obj:GetAttribute("Skin") then
+            textures[obj.Face] = obj;
+
+        elseif obj:IsA("SurfaceAppearance") and obj:GetAttribute("Skin") then
+            surfaceAppearance = obj;
+        end
+    end
+
+    if self.Skin then
+        local skinId, variantId = string.match(self.Skin, "(.*)_(.*)");
+        local skinLib, variantLib = modItemSkinsLibrary:FindVariant(skinId, variantId);
+
+        if skinLib then
+
+            if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
+                
+                for _, face in pairs(Enum.NormalId:GetEnumItems()) do
+                    if textures[face] == nil then
+                        textures[face] = Instance.new("Texture");
+                    end
+                    local texture: Texture = textures[face];
+                    texture:SetAttribute("Skin", `{skinId}_{variantId}`);
+                    texture.Face = face;
+                    texture.Texture = variantLib.Image;
+
+                    if self.PatternData.Color then
+                        texture.Color3 = self.PatternData.Color;
+                    else
+                        texture.Color3 = Color3.new(1, 1, 1);
+                    end
+
+                    if self.PatternData.Offset then
+                        texture.OffsetStudsU = self.PatternData.Offset.X;
+                        texture.OffsetStudsV = self.PatternData.Offset.Y;
+                    else
+                        texture.OffsetStudsU = 0;
+                        texture.OffsetStudsV = 0;
+                    end
+
+                    if self.PatternData.Scale then
+                        texture.StudsPerTileU = self.PatternData.Scale.X;
+                        texture.StudsPerTileV = self.PatternData.Scale.Y;
+                    else
+                        texture.StudsPerTileU = variantLib.DefaultScale and variantLib.DefaultScale.X or 1;
+                        texture.StudsPerTileV = variantLib.DefaultScale and variantLib.DefaultScale.Y or 1;
+                    end
+
+                    if self.PatternData.Transparency then
+                        texture.Transparency = self.PatternData.Transparency;
+                    else
+                        texture.Transparency = 0;
+                    end
+
+                    texture.Parent = obj;
+
+                end
+                
+            elseif skinLib.Type == modItemSkinsLibrary.SkinType.Texture then
+                for face, texture in pairs(textures) do
+                    texture:Destroy();
+                end
+
+
+            end
+        end
+
+    else
+        for face, texture in pairs(textures) do
+            texture:Destroy();
+        end
+
+    end
+
+    local jointObj = nil;
+    for _, weld in pairs(obj.AssemblyRootPart.Parent:GetDescendants()) do 
+        if (weld:IsA("Motor6D") or weld:IsA("Weld")) and weld.Part1 == obj then 
+            jointObj = weld;
+            break;
+        end
+    end
+
+    if jointObj then
+        if self.PositionOffset then
+            jointObj.C1 = CFrame.new(self.PositionOffset);
+        else
+            jointObj.C1 = CFrame.new();
+        end
+    end
 end
 
 function CustomizationPlan:__tostring()
@@ -217,9 +315,7 @@ function CustomizationPlan:Deserialize(valStr)
     
     end
     if args[2] then -- skin
-        if modItemSkinsLibrary:Find(tostring(args[2])) then
-            self.Skin = tostring(args[2]);
-        end
+        self.Skin = tostring(args[2]);
 
     end
     if args[3] then -- transparency

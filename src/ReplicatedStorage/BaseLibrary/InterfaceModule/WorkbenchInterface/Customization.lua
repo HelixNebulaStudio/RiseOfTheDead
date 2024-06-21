@@ -55,11 +55,40 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		};
 	]]
 
+	type PartData = {
+		Name: string; 
+		Part: BasePart; 
+		DisplayModelData: {
+			Prefab: Model; 
+			BasePrefab: Model; 
+			Prefix: string; 
+			WeldName: string; 
+			Offset: CFrame;
+		};
+		PredefinedGroup: string?;
+	}
+	type PartSelection = {[number]:PartData};
 	function listMenu:Refresh()
 		Debugger:StudioWarn("Select refresh");
 
-		local customizationCache = {};
 		local activeGroupName = nil;
+		local activePartSelection: PartSelection = nil;
+		local customizationPlanCache = {};
+
+		local function updateCustomization(func)
+			if activePartSelection == nil then return end;
+
+			for a=1, #activePartSelection do
+				local partData = activePartSelection[a];
+
+				if customizationPlanCache[partData.Name] == nil then
+					customizationPlanCache[partData.Name] = modCustomizationData.newCustomizationPlan();
+				end
+
+				func(customizationPlanCache[partData.Name], partData);
+				Debugger:StudioWarn("customPlan Serial", customizationPlanCache[partData.Name]:Serialize());
+			end
+		end
 
 		local groupPartList = {};
 		local groupsList = {}
@@ -166,8 +195,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		local partLabel: TextLabel = editPanel:WaitForChild("PartList");
 
 		do -- Load edit panel 
-
-			-- MARK:OpenColorCustomizations;
+			-- MARK: OpenColorCustomizations;
 			local function OpenColorCustomizations(onSelectFunc)
 				local customColors = modData:GetFlag("CustomColors");
 				local colorGroupOptionsList = {
@@ -346,56 +374,8 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 			end
 
-			local colorButton = editPanel.ColorFrame.Button;
-			colorButton.MouseButton1Click:Connect(function()
-				Interface:PlayButtonClick();
-				OpenColorCustomizations(function(selectColor: Color3)
-					colorButton.BackgroundColor3 = selectColor;
-					colorButton.TextColor3 = modColorPicker.GetBackColor(selectColor);
-					colorButton.Text = `#{selectColor:ToHex()}`;
-
-					Debugger:StudioWarn("Set Color=", colorButton.Text);
-				end);
-			end)
-
-			-- Transparency slider
-			local transparencySlider = modComponents.NewSliderButton() :: TextButton;
-			transparencySlider.AnchorPoint = Vector2.new(1, 0);
-			transparencySlider.Position = UDim2.new(1, -5,0, 0);
-			transparencySlider.Size = UDim2.new(0, 200, 0, 30);
-			transparencySlider.Parent = editPanel.TransparencyFrame;
-
-			modComponents.CreateSlider(Interface, {
-				Button=transparencySlider;
-				RangeInfo={Min=0; Max=100; Scale=100; Default=0; ValueType="Flat";};
-				SetFunc=function(v)
-					Debugger:StudioWarn("Set Transparency=", v);
-				end;
-				DisplayValueFunc=function(v)
-					return v;
-				end;
-			});
-
-			-- Texture Color;
-			local textureColorButton = editPanel.SkinColorFrame.Button;
-			textureColorButton.MouseButton1Click:Connect(function()
-				Interface:PlayButtonClick();
-				OpenColorCustomizations(function(selectColor: Color3)
-					textureColorButton.ImageColor3 = selectColor;
-					textureColorButton.BackgroundColor3 = modColorPicker.GetBackColor(selectColor);
-					textureColorButton.TextLabel.Text = `#{selectColor:ToHex()}`;
-					textureColorButton.TextLabel.TextColor3 = modColorPicker.GetBackColor(selectColor);
-
-					Debugger:StudioWarn("Set TextureColor=", textureColorButton.TextLabel.Text);
-				end);
-			end)
-
-
-			-- Texture Skin;
-			local textureSetButton = editPanel.SkinFrame.Button;
-			textureSetButton.MouseButton1Click:Connect(function()
-				Interface:PlayButtonClick();
-
+			-- MARK: OpenSkinCustomizations;
+			local function OpenSkinCustomizations(onSelectFunc)
 				-- Get Owned Skins;
 				local unlockedSkins = {};
 				if storageItem.Values.Skins then
@@ -443,7 +423,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				selctionStroke.Color = Color3.fromRGB(255, 255, 255);
 				selctionStroke.Thickness = 4;
 				selctionStroke.Parent = nil;
-				
+
 				function newDropDownList:OnNewButton(index, optionButton: TextButton)
 					local selectionName = optionButton.Name;
 					if selectionName:sub(#selectionName-4, #selectionName) == "Label" then
@@ -458,7 +438,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 							optionButton.LayoutOrder = 0;
 
 						elseif selectionName == "TexturesLabel" then
-							label.Text = "Textures";
+							label.Text = "Skins";
 							optionButton.LayoutOrder = 1000;
 
 						elseif selectionName == "LockedLabel" then
@@ -556,6 +536,11 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 							newPatternButton.MouseButton1Click:Connect(function() 
 								if not isUnlocked then return end;
 								Interface:PlayButtonClick();
+
+								if onSelectFunc then
+									onSelectFunc(skinInfo.Id, patternData.Id);
+								end
+
 								dropDownFrame.Visible = false;
 							end)
 
@@ -591,6 +576,11 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 							newTextureButton.MouseButton1Click:Connect(function() 
 								if not isUnlocked then return end;
 								Interface:PlayButtonClick();
+
+								if onSelectFunc then
+									onSelectFunc(skinInfo.Id, textureData.Id);
+								end
+
 								dropDownFrame.Visible = false;
 							end)
 
@@ -608,11 +598,98 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		
 				newDropDownList:LoadOptions(skinPackOptionsList);
 				toggleVisibility(dropDownFrame);
+			end
 
+			-- MARK: Part Color;
+			local colorButton = editPanel.ColorFrame.Button;
+			colorButton.MouseButton1Click:Connect(function()
+				Interface:PlayButtonClick();
+				OpenColorCustomizations(function(selectColor: Color3)
+					colorButton.BackgroundColor3 = selectColor;
+					colorButton.TextColor3 = modColorPicker.GetBackColor(selectColor);
+					colorButton.Text = `#{selectColor:ToHex()}`;
+
+					Debugger:StudioWarn("Set Color=", colorButton.Text);
+					updateCustomization(function(customPlan, partData: PartData)
+						customPlan.Color = selectColor;
+						customPlan:Apply(partData.Part);
+					end)
+				end);
 			end)
 
 
-			-- Texture Offset
+			-- MARK: Part Transparency
+			local transparencySlider = modComponents.NewSliderButton() :: TextButton;
+			transparencySlider.AnchorPoint = Vector2.new(1, 0);
+			transparencySlider.Position = UDim2.new(1, -5,0, 0);
+			transparencySlider.Size = UDim2.new(0, 200, 0, 30);
+			transparencySlider.Parent = editPanel.TransparencyFrame;
+
+			local function onTransparencySet(v)
+				Debugger:StudioWarn("Set Transparency=", v);
+				updateCustomization(function(customPlan, partData: PartData)
+					customPlan.Transparency = v;
+					customPlan:Apply(partData.Part);
+				end)
+
+				return v;
+			end
+			modComponents.CreateSlider(Interface, {
+				Button=transparencySlider;
+				RangeInfo={Min=0; Max=100; Scale=100; Default=0; ValueType="Flat";};
+				SetFunc=onTransparencySet;
+				DisplayValueFunc=onTransparencySet;
+			});
+
+
+			-- MARK: Texture Skin;
+			local textureSetButton = editPanel.SkinFrame.Button;
+			textureSetButton.MouseButton1Click:Connect(function()
+				Interface:PlayButtonClick();
+
+				OpenSkinCustomizations(function(skinId, variantId)
+					local skinLib, skinVariantData = modItemSkinsLibrary:FindVariant(skinId, variantId)
+					Debugger:StudioWarn("Select Pattern", skinId, variantId, skinLib~=nil, skinVariantData~=nil);
+					
+					if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
+						editPanel.SkinColorFrame.Button.Image = skinVariantData.Image;
+						editPanel.SkinFrame.Button.Image = skinVariantData.Image;
+						editPanel.SkinFrame.Button.TextLabel.Text = `{skinLib.Name}: {skinVariantData.Name}`;
+
+					elseif skinLib.Type == modItemSkinsLibrary.SkinType.Texture then
+						editPanel.SkinColorFrame.Button.Image = skinVariantData.Icon;
+						editPanel.SkinFrame.Button.Image = skinVariantData.Icon;
+						editPanel.SkinFrame.Button.TextLabel.Text = `{skinLib.Name}`;
+
+					end
+
+					updateCustomization(function(customPlan, partData: PartData)
+						customPlan.Skin = `{skinId}_{variantId}`;
+						customPlan:Apply(partData.Part);
+					end)
+				end)
+			end)
+
+			-- MARK: Texture Color;
+			local textureColorButton = editPanel.SkinColorFrame.Button;
+			textureColorButton.MouseButton1Click:Connect(function()
+				Interface:PlayButtonClick();
+				OpenColorCustomizations(function(selectColor: Color3)
+					textureColorButton.ImageColor3 = selectColor;
+					textureColorButton.BackgroundColor3 = modColorPicker.GetBackColor(selectColor);
+					textureColorButton.TextLabel.Text = `#{selectColor:ToHex()}`;
+					textureColorButton.TextLabel.TextColor3 = modColorPicker.GetBackColor(selectColor);
+
+					Debugger:StudioWarn("Set TextureColor=", textureColorButton.TextLabel.Text);
+					updateCustomization(function(customPlan, partData: PartData)
+						customPlan.PatternData.Color = selectColor;
+						customPlan:Apply(partData.Part);
+					end)
+				end);
+			end)
+
+
+			-- MARK: Texture Offset
 			local textureOffsetXSlider = modComponents.NewSliderButton() :: TextButton;
 			textureOffsetXSlider.AnchorPoint = Vector2.new(1, 0);
 			textureOffsetXSlider.Position = UDim2.new(1, -110, 0, 0);
@@ -623,28 +700,45 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			textureOffsetYSlider.Position = UDim2.new(1, -5, 0, 0);
 			textureOffsetYSlider.Parent = editPanel.SkinOffsetFrame;
 			
+			local function onTextureOffsetX(v)
+				Debugger:StudioWarn("Set TextureOffsetX=", v);
+				updateCustomization(function(customPlan, partData: PartData)
+					if customPlan.PatternData.Offset == nil then
+						customPlan.PatternData.Offset = Vector2.zero;
+					end
+					customPlan.PatternData.Offset = Vector2.new(v, customPlan.PatternData.Offset.Y);
+					customPlan:Apply(partData.Part);
+				end)
+
+				return v;
+			end
+			local function onTextureOffsetY(v)
+				Debugger:StudioWarn("Set TextureOffsetY=", v);
+				updateCustomization(function(customPlan, partData: PartData)
+					if customPlan.PatternData.Offset == nil then
+						customPlan.PatternData.Offset = Vector2.zero;
+					end
+					customPlan.PatternData.Offset = Vector2.new(customPlan.PatternData.Offset.X, v);
+					customPlan:Apply(partData.Part);
+				end)
+
+				return v;
+			end
 			modComponents.CreateSlider(Interface, {
 				Button=textureOffsetXSlider;
 				RangeInfo={Min=-400; Max=400; Scale=100; Default=0; ValueType="Flat";};
-				SetFunc=function(v)
-					Debugger:StudioWarn("Set TextureOffsetX=", v);
-				end;
-				DisplayValueFunc=function(v)
-					return v;
-				end;
+				SetFunc=onTextureOffsetX;
+				DisplayValueFunc=onTextureOffsetX;
 			});
 			modComponents.CreateSlider(Interface, {
 				Button=textureOffsetYSlider;
 				RangeInfo={Min=-400; Max=400; Scale=100; Default=0; ValueType="Flat";};
-				SetFunc=function(v)
-					Debugger:StudioWarn("Set TextureOffsetY=", v);
-				end;
-				DisplayValueFunc=function(v)
-					return v;
-				end;
+				SetFunc=onTextureOffsetY;
+				DisplayValueFunc=onTextureOffsetY;
 			});
 
-			-- Texture Scale
+
+			-- MARK: Texture Scale
 			local textureScaleXSlider = modComponents.NewSliderButton() :: TextButton;
 			textureScaleXSlider.AnchorPoint = Vector2.new(1, 0);
 			textureScaleXSlider.Position = UDim2.new(1, -110, 0, 0);
@@ -655,46 +749,69 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			textureScaleYSlider.Position = UDim2.new(1, -5, 0, 0);
 			textureScaleYSlider.Parent = editPanel.SkinScaleFrame;
 			
+			local function onTextureScaleX(v)
+				Debugger:StudioWarn("Set TextureScaleX=", v);
+				updateCustomization(function(customPlan, partData: PartData)
+					if customPlan.PatternData.Scale == nil then
+						customPlan.PatternData.Scale = Vector2.new(1, 1);
+					end
+					customPlan.PatternData.Scale = Vector2.new(v, customPlan.PatternData.Scale.Y);
+					customPlan:Apply(partData.Part);
+				end)
+
+				return v;
+			end
+			local function onTextureScaleY(v)
+				Debugger:StudioWarn("Set TextureScaleY=", v);
+				updateCustomization(function(customPlan, partData: PartData)
+					if customPlan.PatternData.Scale == nil then
+						customPlan.PatternData.Scale = Vector2.new(1, 1);
+					end
+					customPlan.PatternData.Scale = Vector2.new(customPlan.PatternData.Scale.X, v);
+					customPlan:Apply(partData.Part);
+				end)
+
+				return v;
+			end
 			modComponents.CreateSlider(Interface, {
 				Button=textureScaleXSlider;
-				RangeInfo={Min=-400; Max=400; Scale=100; Default=0; ValueType="Flat";};
-				SetFunc=function(v)
-					Debugger:StudioWarn("Set TextureScaleX=", v);
-				end;
-				DisplayValueFunc=function(v)
-					return v;
-				end;
+				RangeInfo={Min=10; Max=400; Scale=100; Default=100; ValueType="Flat";};
+				SetFunc=onTextureScaleX;
+				DisplayValueFunc=onTextureScaleX;
 			});
 			modComponents.CreateSlider(Interface, {
 				Button=textureScaleYSlider;
-				RangeInfo={Min=-400; Max=400; Scale=100; Default=0; ValueType="Flat";};
-				SetFunc=function(v)
-					Debugger:StudioWarn("Set TextureScaleY=", v);
-				end;
-				DisplayValueFunc=function(v)
-					return v;
-				end;
+				RangeInfo={Min=10; Max=400; Scale=100; Default=100; ValueType="Flat";};
+				SetFunc=onTextureScaleY;
+				DisplayValueFunc=onTextureScaleY;
 			});
 
-			-- Texture Transparency;
+
+			-- MARK: Texture Transparency;
 			local textureAlphaSlider = modComponents.NewSliderButton() :: TextButton;
 			textureAlphaSlider.AnchorPoint = Vector2.new(1, 0);
 			textureAlphaSlider.Position = UDim2.new(1, -5,0, 0);
 			textureAlphaSlider.Size = UDim2.new(0, 200, 0, 30);
 			textureAlphaSlider.Parent = editPanel.SkinTransparencyFrame;
 
+			local function onTextureAlphaSet(v)
+				Debugger:StudioWarn("Set TextureAlpha=", v);
+				updateCustomization(function(customPlan, partData: PartData)
+					customPlan.PatternData.Transparency = v;
+					customPlan:Apply(partData.Part);
+				end)
+
+				return v;
+			end
 			modComponents.CreateSlider(Interface, {
 				Button=textureAlphaSlider;
 				RangeInfo={Min=0; Max=100; Scale=100; Default=0; ValueType="Flat";};
-				SetFunc=function(v)
-					Debugger:StudioWarn("Set Texture Transparency=", v);
-				end;
-				DisplayValueFunc=function(v)
-					return v;
-				end;
+				SetFunc=onTextureAlphaSet;
+				DisplayValueFunc=onTextureAlphaSet;
 			});
 
-			-- PartOffsetFrame
+
+			-- MARK: PartOffsetFrame
 			local partOffsetXSlider = modComponents.NewSliderButton() :: TextButton;
 			partOffsetXSlider.AnchorPoint = Vector2.new(1, 0);
 			partOffsetXSlider.Position = UDim2.new(1, -143, 0, 0);
@@ -709,58 +826,102 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			partOffsetZSlider.Position = UDim2.new(1, -5, 0, 0);
 			partOffsetZSlider.Parent = editPanel.PartOffsetFrame;
 
+			local function onPartOffsetX(v)
+				Debugger:StudioWarn("Set PartOffset.X=", v);
+				updateCustomization(function(customPlan, partData: PartData)
+					if customPlan.PositionOffset == nil then
+						customPlan.PositionOffset = Vector3.zero;
+					end
+					customPlan.PositionOffset = Vector3.new(
+						v,
+						customPlan.PositionOffset.Y,
+						customPlan.PositionOffset.Z
+					);
+					customPlan:Apply(partData.Part);
+				end)
+
+				return v;
+			end
 			modComponents.CreateSlider(Interface, {
 				Button=partOffsetXSlider;
 				RangeInfo={Min=-100; Max=100; Scale=100; Default=0; ValueType="Flat";};
-				SetFunc=function(v)
-					Debugger:StudioWarn("Set PartOffset.X=", v);
-				end;
-				DisplayValueFunc=function(v)
-					return v;
-				end;
+				SetFunc=onPartOffsetX;
+				DisplayValueFunc=onPartOffsetX;
 			});
 			
+			local function onPartOffsetY(v)
+				Debugger:StudioWarn("Set PartOffset.Y=", v);
+				updateCustomization(function(customPlan, partData: PartData)
+					if customPlan.PositionOffset == nil then
+						customPlan.PositionOffset = Vector3.zero;
+					end
+					customPlan.PositionOffset = Vector3.new(
+						customPlan.PositionOffset.X,
+						v,
+						customPlan.PositionOffset.Z
+					);
+					customPlan:Apply(partData.Part);
+				end)
+
+				return v;
+			end
 			modComponents.CreateSlider(Interface, {
 				Button=partOffsetYSlider;
 				RangeInfo={Min=-100; Max=100; Scale=100; Default=0; ValueType="Flat";};
-				SetFunc=function(v)
-					Debugger:StudioWarn("Set PartOffset.X=", v);
-				end;
-				DisplayValueFunc=function(v)
-					return v;
-				end;
+				SetFunc=onPartOffsetY;
+				DisplayValueFunc=onPartOffsetY;
 			});
 			
+			local function onPartOffsetZ(v)
+				Debugger:StudioWarn("Set PartOffset.Z=", v);
+				updateCustomization(function(customPlan, partData: PartData)
+					if customPlan.PositionOffset == nil then
+						customPlan.PositionOffset = Vector3.zero;
+					end
+					customPlan.PositionOffset = Vector3.new(
+						customPlan.PositionOffset.X,
+						customPlan.PositionOffset.Y,
+						v
+					);
+					customPlan:Apply(partData.Part);
+				end)
+
+				return v;
+			end
 			modComponents.CreateSlider(Interface, {
 				Button=partOffsetZSlider;
 				RangeInfo={Min=-100; Max=100; Scale=100; Default=0; ValueType="Flat";};
-				SetFunc=function(v)
-					Debugger:StudioWarn("Set PartOffset.X=", v);
-				end;
-				DisplayValueFunc=function(v)
-					return v;
-				end;
+				SetFunc=onPartOffsetZ;
+				DisplayValueFunc=onPartOffsetZ;
 			});
 
-			-- Texture Transparency;
+
+			-- MARK: Part Reflectance;
 			local reflectanceSlider = modComponents.NewSliderButton() :: TextButton;
 			reflectanceSlider.AnchorPoint = Vector2.new(1, 0);
 			reflectanceSlider.Position = UDim2.new(1, -5, 0, 0);
 			reflectanceSlider.Size = UDim2.new(0, 200, 0, 30);
 			reflectanceSlider.Parent = editPanel.ReflectanceFrame;
 
+			local function onReflectanceSet(v)
+				Debugger:StudioWarn("Set Reflectance=", v);
+				updateCustomization(function(customPlan, partData: PartData)
+					customPlan.Reflectance = v;
+					customPlan:Apply(partData.Part);
+				end)
+
+				return v;
+			end
 			modComponents.CreateSlider(Interface, {
 				Button=reflectanceSlider;
 				RangeInfo={Min=0; Max=100; Scale=100; Default=0; ValueType="Flat";};
-				SetFunc=function(v)
-					Debugger:StudioWarn("Set Reflectance=", v);
-				end;
-				DisplayValueFunc=function(v)
-					return v;
-				end;
+				SetFunc=onReflectanceSet;
+				DisplayValueFunc=onReflectanceSet;
 			});
 
+
 		end
+
 
 		editPanel:GetPropertyChangedSignal("Visible"):Connect(function()
 			hintLabel.Visible = not editPanel.Visible;
@@ -785,6 +946,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			selectTextbox.CursorPosition = selectTextbox.CursorPosition > 0 and math.clamp(selectTextbox.CursorPosition, math.min(2, #selectTextbox.Text-1), #selectTextbox.Text) or -1;
 		end)
 
+		-- MARK: OnNewSelection;
 		local function newSelection(selectionPartData, predefinedGroup)
 			if selectGroupTextChangeConn then selectGroupTextChangeConn:Disconnect(); selectGroupTextChangeConn=nil; end;
 
@@ -801,6 +963,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					end
 				end
 			end
+			activePartSelection = selectionPartData :: PartSelection;
 
 			Debugger:StudioWarn("selectionPartData", selectionPartData, "predefinedGroup", predefinedGroup);
 			
@@ -865,14 +1028,15 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			end
 		end);
 	
+		-- MARK: SelectPartDropDown;
 		selectDropButton.MouseButton1Click:Connect(function()
 			Interface:PlayButtonClick();
 	
 			function newDropDownList:OnNewButton(index, optionButton)
 				local selectionName = optionButton.Name;
 
-				if customizationCache[selectionName] then
-					local customizeData = customizationCache[selectionName];
+				if customizationPlanCache[selectionName] then
+					local customizeData = customizationPlanCache[selectionName];
 					
 					if customizeData.GroupId then
 						optionButton.Text = optionButton.Text..` [{customizeData.GroupId}]`;
