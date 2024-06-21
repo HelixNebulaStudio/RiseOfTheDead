@@ -10,6 +10,7 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
+local modItemSkinsLibrary = require(game.ReplicatedStorage.Library.ItemSkinsLibrary);
 
 local modDropdownList = require(game.ReplicatedStorage.Library.UI.DropdownList);
 local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
@@ -129,7 +130,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		newDropDownList.Frame.Parent = scrollFrame;
 	
 		newDropDownList.Frame:GetPropertyChangedSignal("Visible"):Connect(function()
-			if newDropDownList.Frame.Visible then return end;
+			if newDropDownList.Frame.Visible then 
+				newDropDownList.ScrollFrame.CanvasPosition = Vector2.zero;
+				return 
+			end;
 			colorPickerObj.Frame.Parent = nil;
 			colorFrame.Visible = false;
 		end)
@@ -372,7 +376,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				end;
 			});
 
-			-- Texture color;
+			-- Texture Color;
 			local textureColorButton = editPanel.SkinColorFrame.Button;
 			textureColorButton.MouseButton1Click:Connect(function()
 				Interface:PlayButtonClick();
@@ -385,6 +389,169 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					Debugger:StudioWarn("Set TextureColor=", textureColorButton.TextLabel.Text);
 				end);
 			end)
+
+
+			-- Texture Skin;
+			local textureSetButton = editPanel.SkinFrame.Button;
+			textureSetButton.MouseButton1Click:Connect(function()
+				Interface:PlayButtonClick();
+
+				-- Get Owned Skins;
+				local unlockedSkins = {};
+				if storageItem.Values.Skins then
+					for _, oldSkinId in pairs(storageItem.Values.Skins) do
+						local skinId = modItemSkinsLibrary.GetSkinIdFromOldId(oldSkinId);
+						if skinId then
+							unlockedSkins[skinId] = true;
+						end
+					end
+				end
+				if modData.Profile.SkinsPacks then
+					for skinId, _ in pairs(modData.Profile.SkinsPacks) do
+						if modItemSkinsLibrary:Find(skinId) then
+							unlockedSkins[skinId] = true;
+							break;
+						end
+
+						skinId = modItemSkinsLibrary.GetSkinIdFromOldId(skinId);
+						if skinId then
+							unlockedSkins[skinId] = true;
+						end
+					end
+				end
+				
+				-- Load Skin Packs;
+				local skinPackOptionsList = {};
+				local skinPacksList = {};
+				for index, skinInfo in pairs(modItemSkinsLibrary:GetIndexList()) do
+					if skinInfo.Type == modItemSkinsLibrary.SkinType.Texture and skinInfo.Textures[storageItem.ItemId] == nil then
+						continue;
+					end
+
+					table.insert(skinPackOptionsList, skinInfo.Name);
+					table.insert(skinPacksList, skinInfo);
+				end
+
+				local selctionStroke = Instance.new("UIStroke");
+				selctionStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+				selctionStroke.Color = Color3.fromRGB(255, 255, 255);
+				selctionStroke.Thickness = 4;
+				selctionStroke.Parent = nil;
+				
+				function newDropDownList:OnNewButton(index, optionButton: TextButton)
+					local skinInfo = skinPacksList[index];
+					local isUnlocked = unlockedSkins[skinInfo.Id];
+
+					optionButton.AutomaticSize = Enum.AutomaticSize.Y;
+					optionButton.TextYAlignment = Enum.TextYAlignment.Top;
+					optionButton.AutoButtonColor = false;
+					optionButton.Size = UDim2.new(1, 0, 0, 0);
+
+					local padding = Instance.new("UIPadding");
+					padding.PaddingTop = UDim.new(0, 10);
+					padding.PaddingBottom = UDim.new(0, 15);
+					padding.PaddingLeft = UDim.new(0, 10);
+					padding.PaddingRight = UDim.new(0, 10);
+					padding.Parent = optionButton;
+
+					optionButton.BackgroundColor3 = isUnlocked and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(30, 30, 30);
+					
+					local gridFrame = Instance.new("Frame");
+					gridFrame.BackgroundTransparency = 1;
+					gridFrame.AutomaticSize = Enum.AutomaticSize.Y;
+					gridFrame.Position = UDim2.new(0, 0, 0, 30);
+					gridFrame.Size = UDim2.new(1, 0, 0, 0);
+					gridFrame.ZIndex = 3;
+					gridFrame.Parent = optionButton;
+
+					local gridLayout = Instance.new("UIGridLayout");
+					gridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center;
+					gridLayout.CellSize = UDim2.new(0, 60, 0, 60);
+					gridLayout.Parent = gridFrame;
+
+					if skinInfo.Type == modItemSkinsLibrary.SkinType.Pattern then
+						local packIcon = Instance.new("ImageButton");
+						packIcon.ZIndex = 3;
+						packIcon.BackgroundTransparency = 1;
+						packIcon.Image = skinInfo.Icon;
+						packIcon.Parent = gridFrame;
+
+						for a=1, #skinInfo.Patterns do
+							local patternData = skinInfo.Patterns[a];
+
+							local newPatternButton = Instance.new("ImageButton");
+							newPatternButton.ZIndex = 3;
+							newPatternButton.Name = patternData.Id;
+							newPatternButton.Image = patternData.Image;
+
+							local corner = Instance.new("UICorner");
+							corner.CornerRadius = UDim.new(0, 5);
+							corner.Parent = newPatternButton;
+							newPatternButton.Parent = gridFrame;
+							
+							newPatternButton.MouseMoved:Connect(function()
+								if not isUnlocked then return end;
+								selctionStroke.Parent = newPatternButton;
+							end)
+
+							newPatternButton.MouseLeave:Connect(function()
+								selctionStroke.Parent = nil;
+							end)
+
+							newPatternButton.MouseButton1Click:Connect(function() 
+								if not isUnlocked then return end;
+								Interface:PlayButtonClick();
+								dropDownFrame.Visible = false;
+							end)
+
+						end
+
+					elseif skinInfo.Type == modItemSkinsLibrary.SkinType.Texture then
+						local textureData = skinInfo.Textures[itemId];
+						
+						if textureData then
+							local newPatternButton = Instance.new("ImageButton");
+							newPatternButton.ZIndex = 3;
+							newPatternButton.Name = textureData.Id;
+							newPatternButton.Image = textureData.Icon;
+
+							local corner = Instance.new("UICorner");
+							corner.CornerRadius = UDim.new(0, 5);
+							corner.Parent = newPatternButton;
+							newPatternButton.Parent = gridFrame;
+							
+							newPatternButton.MouseMoved:Connect(function()
+								if not isUnlocked then return end;
+								selctionStroke.Parent = newPatternButton;
+							end)
+
+							newPatternButton.MouseLeave:Connect(function()
+								selctionStroke.Parent = nil;
+							end)
+
+							newPatternButton.MouseButton1Click:Connect(function() 
+								if not isUnlocked then return end;
+								Interface:PlayButtonClick();
+								dropDownFrame.Visible = false;
+							end)
+
+						end
+
+					end
+
+
+				end
+				
+				function newDropDownList:OnOptionSelect(index, optionButton)
+					Debugger:StudioWarn("index", index, "optionButton", optionButton);
+					
+				end
+		
+				newDropDownList:LoadOptions(skinPackOptionsList);
+				toggleVisibility(dropDownFrame);
+
+			end)
+
 
 			-- Texture Offset
 			local textureOffsetXSlider = modComponents.NewSliderButton() :: TextButton;
