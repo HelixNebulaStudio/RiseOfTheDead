@@ -351,7 +351,7 @@ function ItemSkinsLibrary:Init(super)
         Type=super.SkinType.Pattern;
         OldId="102";
 
-        Name="DeathCamo";
+        Name="Death Camo";
         Icon="rbxassetid://18142364445";
     
         Patterns={

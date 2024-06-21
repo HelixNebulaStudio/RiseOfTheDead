@@ -421,16 +421,22 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				end
 				
 				-- Load Skin Packs;
-				local skinPackOptionsList = {};
+				local skinPackOptionsList = {"PatternsLabel";};
 				local skinPacksList = {};
+				local texturePhase = false;
 				for index, skinInfo in pairs(modItemSkinsLibrary:GetIndexList()) do
 					if skinInfo.Type == modItemSkinsLibrary.SkinType.Texture and skinInfo.Textures[storageItem.ItemId] == nil then
 						continue;
+					end
+					if skinInfo.Type == modItemSkinsLibrary.SkinType.Texture and texturePhase == false then
+						texturePhase = true;
+						table.insert(skinPackOptionsList, "TexturesLabel");
 					end
 
 					table.insert(skinPackOptionsList, skinInfo.Name);
 					table.insert(skinPacksList, skinInfo);
 				end
+				table.insert(skinPackOptionsList, "LockedLabel");
 
 				local selctionStroke = Instance.new("UIStroke");
 				selctionStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
@@ -439,8 +445,52 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				selctionStroke.Parent = nil;
 				
 				function newDropDownList:OnNewButton(index, optionButton: TextButton)
-					local skinInfo = skinPacksList[index];
+					local selectionName = optionButton.Name;
+					if selectionName:sub(#selectionName-4, #selectionName) == "Label" then
+						
+						local newDdLabel = templateDropDownLabel:Clone();
+						newDdLabel.LayoutOrder = optionButton.LayoutOrder;
+						local label = newDdLabel:WaitForChild("TextLabel");
+						newDdLabel.Parent = newDropDownList.ScrollFrame;
+
+						if selectionName == "PatternsLabel" then
+							label.Text = "Patterns";
+							optionButton.LayoutOrder = 0;
+
+						elseif selectionName == "TexturesLabel" then
+							label.Text = "Textures";
+							optionButton.LayoutOrder = 1000;
+
+						elseif selectionName == "LockedLabel" then
+							label.Text = "Locked";
+							optionButton.LayoutOrder = 1500;
+
+						end
+						optionButton:Destroy();
+
+						return;
+					end
+
+					local skinInfo = nil;
+					for a=1, #skinPacksList do
+						if skinPacksList[a].Name == selectionName then
+							skinInfo = skinPacksList[a];
+							break;
+						end
+					end
+					if skinInfo == nil then return end;
+
 					local isUnlocked = unlockedSkins[skinInfo.Id];
+
+					if not isUnlocked then
+						if skinInfo.Type == modItemSkinsLibrary.SkinType.Pattern then
+							optionButton.LayoutOrder = 500+index
+
+						elseif skinInfo.Type == modItemSkinsLibrary.SkinType.Texture then
+							optionButton.LayoutOrder = 1500+index
+
+						end
+					end
 
 					optionButton.AutomaticSize = Enum.AutomaticSize.Y;
 					optionButton.TextYAlignment = Enum.TextYAlignment.Top;
@@ -455,6 +505,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					padding.Parent = optionButton;
 
 					optionButton.BackgroundColor3 = isUnlocked and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(30, 30, 30);
+					optionButton.TextColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 					
 					local gridFrame = Instance.new("Frame");
 					gridFrame.BackgroundTransparency = 1;
@@ -480,9 +531,13 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 							local patternData = skinInfo.Patterns[a];
 
 							local newPatternButton = Instance.new("ImageButton");
+							newPatternButton.AutoButtonColor = false;
 							newPatternButton.ZIndex = 3;
 							newPatternButton.Name = patternData.Id;
 							newPatternButton.Image = patternData.Image;
+
+							newPatternButton.BackgroundColor3 = isUnlocked and Color3.fromRGB(200, 200, 200) or Color3.fromRGB(70, 70, 70);
+							newPatternButton.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150);
 
 							local corner = Instance.new("UICorner");
 							corner.CornerRadius = UDim.new(0, 5);
@@ -510,26 +565,30 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 						local textureData = skinInfo.Textures[itemId];
 						
 						if textureData then
-							local newPatternButton = Instance.new("ImageButton");
-							newPatternButton.ZIndex = 3;
-							newPatternButton.Name = textureData.Id;
-							newPatternButton.Image = textureData.Icon;
+							local newTextureButton = Instance.new("ImageButton");
+							newTextureButton.AutoButtonColor = false;
+							newTextureButton.ZIndex = 3;
+							newTextureButton.Name = textureData.Id;
+							newTextureButton.Image = textureData.Icon;
+
+							newTextureButton.BackgroundColor3 = isUnlocked and Color3.fromRGB(200, 200, 200) or Color3.fromRGB(70, 70, 70);
+							newTextureButton.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150);
 
 							local corner = Instance.new("UICorner");
 							corner.CornerRadius = UDim.new(0, 5);
-							corner.Parent = newPatternButton;
-							newPatternButton.Parent = gridFrame;
+							corner.Parent = newTextureButton;
+							newTextureButton.Parent = gridFrame;
 							
-							newPatternButton.MouseMoved:Connect(function()
+							newTextureButton.MouseMoved:Connect(function()
 								if not isUnlocked then return end;
-								selctionStroke.Parent = newPatternButton;
+								selctionStroke.Parent = newTextureButton;
 							end)
 
-							newPatternButton.MouseLeave:Connect(function()
+							newTextureButton.MouseLeave:Connect(function()
 								selctionStroke.Parent = nil;
 							end)
 
-							newPatternButton.MouseButton1Click:Connect(function() 
+							newTextureButton.MouseButton1Click:Connect(function() 
 								if not isUnlocked then return end;
 								Interface:PlayButtonClick();
 								dropDownFrame.Visible = false;
