@@ -9,6 +9,8 @@ local toolPackage = {
 		Inspect={Id=17791095270;};
 		Charge={Id=17791097278;};
 		Throw={Id=17791099691};
+		Equip={Id=18160784201};
+		Unequip={Id=18160786727};
 		
 	} or {
 		Core={Id=17791090952;};
@@ -17,6 +19,8 @@ local toolPackage = {
 		Inspect={Id=17791095270;};
 		Charge={Id=17791097278;};
 		Throw={Id=17791099691};
+		Equip={Id=18160784201};
+		Unequip={Id=18160786727};
 		
 	};
 	Audio={
