@@ -92,6 +92,8 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				for _, basePart in pairs(displayModelData.Prefab:GetChildren()) do
 					if not basePart:IsA("BasePart") then continue end;
 					local predefinedGroup = basePart:GetAttribute("CustomizationGroup");
+					predefinedGroup = predefinedGroup and `[{predefinedGroup}]` or nil;
+
 					local modelPartData = {
 						Name=prefix..basePart.Name;
 						Part=basePart;
@@ -99,8 +101,8 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 						PredefinedGroup = predefinedGroup;
 					};
 
-					if predefinedGroup and table.find(groupsList, `[{predefinedGroup}]`) == nil then
-						table.insert(groupsList, `[{predefinedGroup}]`);
+					if predefinedGroup and table.find(groupsList, predefinedGroup) == nil then
+						table.insert(groupsList, predefinedGroup);
 					end
 
 					table.insert(modelParts, modelPartData);
@@ -180,6 +182,9 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		local hintLabel: TextLabel = mainFrame:WaitForChild("HintLabel");
 		local infoLabel: TextLabel = editPanel:WaitForChild("InfoLabel");
 		local partLabel: TextLabel = editPanel:WaitForChild("PartList");
+
+		-- MARK: function declarations;
+		local newSelection;
 
 		-- MARK: UpdateCustomizations;
 		local function updateCustomization(func)
@@ -604,6 +609,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			toggleVisibility(dropDownFrame);
 		end
 
+		
 		-- MARK: Part Color;
 		local colorButton = editPanel.ColorFrame.Button;
 		colorButton.MouseButton1Click:Connect(function()
@@ -957,17 +963,8 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		end)
 			
-
-
 		editPanel:GetPropertyChangedSignal("Visible"):Connect(function()
 			hintLabel.Visible = not editPanel.Visible;
-		end)
-
-		saveGroupNameButton.MouseButton1Click:Connect(function()
-			activeGroupName = selectTextbox.Text;
-			saveGroupNameButton.Visible = false;
-
-			Debugger:StudioWarn("Save group name", selectTextbox.Text);
 		end)
 
 		local selectGroupTextChangeConn;
@@ -982,8 +979,72 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			selectTextbox.CursorPosition = selectTextbox.CursorPosition > 0 and math.clamp(selectTextbox.CursorPosition, math.min(2, #selectTextbox.Text-1), #selectTextbox.Text) or -1;
 		end)
 
-		-- MARK: OnNewSelection;
-		local function newSelection(selectionPartData, predefinedGroup)
+		saveGroupNameButton.MouseButton1Click:Connect(function()
+			activeGroupName = selectTextbox.Text;
+			saveGroupNameButton.Visible = false;
+
+			for a=1, #activePartSelection do
+				local partData = activePartSelection[a];
+				partData.PredefinedGroup = activeGroupName;
+			end
+
+			table.insert(groupsList, activeGroupName);
+			table.insert(groupPartList, #groupsList, activeGroupName);
+			Debugger:StudioWarn("Save group name", selectTextbox.Text);
+		end)
+
+		-- MARK: PartLabelButton
+		local partLabelButton = partLabel:WaitForChild("Button");
+		partLabelButton.MouseButton1Click:Connect(function()
+			Interface:PlayButtonClick();
+
+			if partLabelButton.Text == "+" then
+				Debugger:StudioWarn("Add part to group", activeGroupName);
+
+				function newDropDownList:OnOptionSelect(index, optionButton)
+					Debugger:StudioWarn("index", index, "optionButton", optionButton);
+					dropDownFrame.Visible = false;
+	
+					local modelPartData = nil;
+					for a=1, #modelParts do
+						if modelParts[a].Name == optionButton.Name then
+							modelPartData = modelParts[a];
+							break;
+						end
+					end
+					if modelPartData and table.find(activePartSelection, modelPartData) == nil then
+						table.insert(activePartSelection, modelPartData);
+						partLabel.Text = partLabel.Text..`, {modelPartData.Name}`;
+					end
+				end
+				
+				local partDropDownList = {};
+				for a=1, #modelParts do
+					if table.find(activePartSelection, modelParts[a]) == nil then
+						table.insert(partDropDownList, modelParts[a].Name);
+					end
+				end
+
+				newDropDownList:LoadOptions(partDropDownList);
+				toggleVisibility(dropDownFrame);
+
+			elseif partLabelButton.Text == "⦿" then
+				Debugger:StudioWarn("Select group of part", activeGroupName);
+
+				local selectionPartData = {};
+
+				for a=1, #modelParts do
+					if activeGroupName and modelParts[a].PredefinedGroup == activeGroupName then
+						table.insert(selectionPartData, modelParts[a]);
+					end
+				end
+
+				newSelection(selectionPartData, activeGroupName);
+			end
+		end)
+
+		-- MARK: newSelection;
+		function newSelection(selectionPartData, predefinedGroup)
 			dropDownFrame.Visible = false;
 			if selectGroupTextChangeConn then selectGroupTextChangeConn:Disconnect(); selectGroupTextChangeConn=nil; end;
 
@@ -1004,18 +1065,19 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 			Debugger:StudioWarn("selectionPartData", selectionPartData, "predefinedGroup", predefinedGroup);
 			
+			selectTextbox.Text = "";
 			if #selectionPartData <= 0 then
 				editPanel.Visible = false;
+				activeGroupName = nil;
 				return; 
 			end
 
-			local groupName = predefinedGroup or "New Group";
+			local groupName = predefinedGroup or "[New Group]";
 			if predefinedGroup then
 				activeGroupName = predefinedGroup;
 			end
 
 			editPanel.Visible = true;
-			selectTextbox.Text = "";
 
 			local partNames = {};
 			for a=1, #selectionPartData do
@@ -1023,12 +1085,14 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			end;
 			
 			if predefinedGroup or #selectionPartData > 1 then
-				selectTextbox.Text = `[{groupName}]`;
+				selectTextbox.Text = groupName;
 				selectTextbox.PlaceholderText = "";
 				infoLabel.Text = `<b>Type:</b> Group`; --    Layer: 0
 				partLabel.Text = `<font size="14"><b>Group Parts:</b></font> {table.concat(partNames, ", ")}`;
 				selectTextbox.TextEditable = true;
-			
+				
+				partLabelButton.Text = "+";
+
 			else
 				local partData = selectionPartData[1];
 				selectTextbox.Text = "";
@@ -1036,6 +1100,12 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				infoLabel.Text = `<b>Type:</b> Part`;
 				partLabel.Text = `<font size="14"><b>Part Group:</b> {partData.PredefinedGroup or "None"}</font>`;
 				selectTextbox.TextEditable = false;
+
+				if partData.PredefinedGroup then
+					activeGroupName = partData.PredefinedGroup;
+				end
+
+				partLabelButton.Text = "⦿";
 
 			end
 
@@ -1187,10 +1257,11 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				end
 
 			end
-
+			
 			function newDropDownList:OnOptionSelect(index, optionButton)
 				Debugger:StudioWarn("index", index, "optionButton", optionButton);
 				dropDownFrame.Visible = false;
+				activeGroupName = nil;
 
 				local selectionName = optionButton.Name;
 				local selectionPartData = {};
@@ -1200,7 +1271,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					if predefinedGroup == "[All]" then
 						table.insert(selectionPartData, modelParts[a]);
 
-					elseif predefinedGroup and `[{modelParts[a].PredefinedGroup}]` == selectionName then
+					elseif predefinedGroup and modelParts[a].PredefinedGroup == selectionName then
 						table.insert(selectionPartData, modelParts[a]);
 
 					elseif modelParts[a].Name == selectionName then
