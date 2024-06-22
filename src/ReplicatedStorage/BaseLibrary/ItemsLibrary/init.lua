@@ -856,7 +856,9 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="highvisjacketfallenleaves"; Icon="rbxassetid://12963945448"; SkinPerm="Fallen Leaves"; TargetItemId="highvisjacket"; Tags={"Easter"};});
 	new(skinPermBase, {Id="scraparmorcherryblossom"; Icon="rbxassetid://12963959744"; SkinPerm="Cherry Blossom"; TargetItemId="scraparmor"; Tags={"Easter"};});
 	
-
+	-- Legacy
+	new(toolBase, {Id="masusplush"; Name="Masus Plush"; Icon="rbxassetid://18158370701"; Tags={"Legacy"}; Description=`"Rotd mobile support is a myth"`;});
+	
 	--==========================================================[[ META ]]==========================================================--
 	local metaBase = {
 		Type = super.Types.None;
