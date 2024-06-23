@@ -16,8 +16,9 @@ function DropdownList.new()
 	
 	local selectButton = self.Frame:WaitForChild("Bottom"):WaitForChild("SelectButton");
 	local textInput = self.Frame.Bottom:WaitForChild("TextInput");
+	self.SearchBar = textInput;
 	
-	local scrollFrame = self.Frame.Top:WaitForChild("ScrollingFrame");
+	local scrollFrame = self.Frame.Top:WaitForChild("ScrollingFrame") :: ScrollingFrame;
 	self.ScrollFrame = scrollFrame;
 	
 	local function search()
@@ -44,6 +45,7 @@ function DropdownList.new()
 	
 	textInput:GetPropertyChangedSignal("Text"):Connect(function()
 		task.wait();
+		scrollFrame.CanvasPosition = Vector2.new();
 		search();
 	end)
 	
@@ -70,6 +72,8 @@ function DropdownList:LoadOptions(list)
 		if not obj:IsA("GuiObject") then continue end;
 		obj:Destroy();
 	end
+
+	self.SearchBar.Text = "";
 	
 	for a=1, #list do
 		local new = templateOption:Clone();

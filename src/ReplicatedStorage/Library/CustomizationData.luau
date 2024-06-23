@@ -170,6 +170,7 @@ CustomizationPlan.__index = CustomizationPlan;
 
 function CustomizationData.newCustomizationPlan(rawLz4)
     local self = {
+        Group=nil;
         Color=nil;
         Skin=nil;
         Transparency=nil;
@@ -322,23 +323,26 @@ end
 function CustomizationPlan:Deserialize(valStr)
     local args = string.split(tostring(valStr), ";");
 
-    if args[1] then -- color
-        self.Color = modColorPicker.GetColor(args[1], true);
+    if args[1] then -- group
+        self.Group = string.gsub(args[1], "[^%w]*", "");
+    end
+    if args[2] then -- color
+        self.Color = modColorPicker.GetColor(args[2], true);
     
     end
-    if args[2] then -- skin
-        self.Skin = tostring(args[2]);
+    if args[3] then -- skin
+        self.Skin = tostring(args[3]);
 
     end
-    if args[3] then -- transparency
-        local a = tonumber(args[3]);
+    if args[4] then -- transparency
+        local a = tonumber(args[4]);
         if a then
             self.Transparency = math.clamp(a/100, 0, 1);
         end
 
     end
-    if args[4] then -- skin {color, offset, scale, transparency}
-        local patArgs = string.split(args[4], ",");
+    if args[5] then -- skin {color, offset, scale, transparency}
+        local patArgs = string.split(args[5], ",");
         
         local patData = {
             Color = nil;
@@ -380,24 +384,24 @@ function CustomizationPlan:Deserialize(valStr)
         self.PatternData = patData;
 
     end
-    if args[5] then -- part mat
+    if args[6] then -- part mat
         local mat = nil;
         pcall(function()
-            mat = Enum.Material[args[5]];
+            mat = Enum.Material[args[6]];
         end)
 
         self.Material = mat;
 
     end
-    if args[6] then -- part reflectance
-        local a = tonumber(args[6]);
+    if args[7] then -- part reflectance
+        local a = tonumber(args[7]);
         if a then
             self.Reflectance = math.clamp(a/100, 0, 1);
         end
 
     end
-    if args[7] then -- part offset;
-        local vec3Args = string.split(args[7], ",");
+    if args[8] then -- part offset;
+        local vec3Args = string.split(args[8], ",");
 
         local x = tonumber(vec3Args[1]);
         local y = tonumber(vec3Args[2]);
@@ -415,6 +419,12 @@ end
 
 function CustomizationPlan:Serialize()
     local buildStr = "";
+
+    if self.Group then
+        buildStr = buildStr..(string.gsub(self.Group, "[^%w]*", "")); 
+    end
+    buildStr = buildStr..";";
+
 
     if self.Color then
         buildStr = buildStr..`#{self.Color:ToHex()}`; 

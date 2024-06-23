@@ -78,6 +78,8 @@ function Components.CreateSlider(mainInterface, paramPacket)
 	refreshSlider();
 	
 	local function StartQuantitySlider()
+		if button:GetAttribute("DisableSlider") == true then return end;
+
 		local absSizeX = button.AbsoluteSize.X;
 		RunService:BindToRenderStep("slider", Enum.RenderPriority.Input.Value+1, function(delta)
 			local mousePosition = UserInputService:GetMouseLocation();
@@ -98,6 +100,8 @@ function Components.CreateSlider(mainInterface, paramPacket)
 	
 	local lastClick = tick();
 	button.MouseButton1Click:Connect(function()
+		if button:GetAttribute("DisableSlider") == true then return end;
+
 		local lastClickLapse = tick()-lastClick;
 		
 		if lastClickLapse <= 0.2 then
@@ -111,6 +115,8 @@ function Components.CreateSlider(mainInterface, paramPacket)
 	end)
 	
 	local function resetDefaultValues()
+		if button:GetAttribute("DisableSlider") == true then return end;
+		
 		currentVal = defaultVal;
 		refreshSlider();
 		setFunc(currentVal/rangeScale);
