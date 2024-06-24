@@ -50,6 +50,8 @@ function LibraryManager:FindByKeyValue(key, value)
 			return self.Library[k];
 		end
 	end
+
+	return;
 end
 
 function LibraryManager:ListByKeyValue(key, valueOrFunc)

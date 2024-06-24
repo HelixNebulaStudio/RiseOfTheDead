@@ -46,6 +46,10 @@ function ItemSkinsLibrary:Init(super)
         return lib;
     end
 
+    for _, obj in pairs(script:GetChildren()) do
+        obj.Parent = super.Script;
+    end
+
     --== MARK: Pattern Skins
     super:Add{
         Id="skincamo";
@@ -174,20 +178,6 @@ function ItemSkinsLibrary:Init(super)
             {Id="v5"; Name="Cursed Cat"; Image="rbxassetid://7605222982"; DefaultScale=Vector2.new(0.6, 0.6); };
             {Id="v6"; Name="Spooky Skeletons RGB"; Image="rbxassetid://7605228557"; DefaultScale=Vector2.new(0.3, 0.3); };
             {Id="v7"; Name="Haunted Ghost RGB"; Image="rbxassetid://7605250341"; DefaultScale=Vector2.new(0.4, 0.4); };
-        };
-    };
-
-    super:Add{
-        Id="skinoffline";
-        Type=super.SkinType.Pattern;
-        OldId="Offline";
-
-        Name="Offline";
-        Icon="rbxassetid://7866873305";
-    
-        Patterns={
-            {Id="v1"; Name="Colored Static"; Image="rbxassetid://7866772353"; };
-            {Id="v2"; Name="Mono Static"; Image="rbxassetid://7866840036"; };
         };
     };
 
@@ -354,6 +344,19 @@ function ItemSkinsLibrary:Init(super)
             {Id="v4"; Name="Bevel"; Image="rbxassetid://18142697244"; DefaultScale=Vector2.new(2, 2); };
         };
     };
+    super:Add{
+        Id="skinoffline";
+        Type=super.SkinType.Pattern;
+        OldId="Offline";
+
+        Name="Offline";
+        Icon="rbxassetid://7866873305";
+    
+        Patterns={
+            {Id="v1"; Name="Colored Static"; Image="rbxassetid://7866772353"; };
+            {Id="v2"; Name="Mono Static"; Image="rbxassetid://7866840036"; };
+        };
+    };
     
     --== MARK: Special Patterns;
     super:Add{
@@ -362,7 +365,8 @@ function ItemSkinsLibrary:Init(super)
         OldId="101";
 
         Name="Diamonds";
-        Icon="rbxassetid://18142364245";
+        Icon="rbxassetid://18188893834";
+        Rare=true;
     
         Patterns={
             {Id="v1"; Name="Variant 1"; Image="rbxassetid://2751750764"; DefaultScale=Vector2.new(0.1, 0.1); };
@@ -375,7 +379,8 @@ function ItemSkinsLibrary:Init(super)
         OldId="102";
 
         Name="Death Camo";
-        Icon="rbxassetid://18142364445";
+        Icon="rbxassetid://18188894318";
+        Rare=true;
     
         Patterns={
             {Id="v1"; Name="Variant 1"; Image="rbxassetid://4386399917"; };
@@ -388,7 +393,8 @@ function ItemSkinsLibrary:Init(super)
         OldId="103";
 
         Name="Cotton Fade";
-        Icon="rbxassetid://18142365196";
+        Icon="rbxassetid://18188894651";
+        Rare=true;
     
         Patterns={
             {Id="v1"; Name="Variant 1"; Image="rbxassetid://4873625719"; DefaultScale=Vector2.new(4, 4); };
@@ -401,7 +407,8 @@ function ItemSkinsLibrary:Init(super)
         OldId="104";
 
         Name="Galaxy";
-        Icon="rbxassetid://18132817152";
+        Icon="rbxassetid://18188893351";
+        Rare=true;
     
         Patterns={
             {Id="v1"; Name="Variant 1"; Image="rbxassetid://8769490320"; DefaultScale=Vector2.new(2, 2); };
@@ -414,7 +421,8 @@ function ItemSkinsLibrary:Init(super)
         OldId="105";
 
         Name="Frostivus";
-        Icon="rbxassetid://18142365450";
+        Icon="rbxassetid://18188894862";
+        Rare=true;
     
         Patterns={
             {Id="v1"; Name="Variant 1"; Image="rbxassetid://11796319046"; };
@@ -427,33 +435,22 @@ function ItemSkinsLibrary:Init(super)
         OldId="106";
 
         Name="Fortune";
-        Icon="rbxassetid://18142365667";
+        Icon="rbxassetid://18188895079";
+        Rare=true;
     
         Patterns={
             {Id="v1"; Name="Variant 1"; Image="rbxassetid://11853778222"; DefaultScale=Vector2.new(0.3, 0.3); };
         };
     };
 
-    -- super:Add{
-    --     Id="skinfallenleaves";
-    --     Type=super.SkinType.Pattern;
-    --     OldId="107";
-
-    --     Name="Fallen Leaves";
-    --     Icon="rbxassetid://18142365861";
-    
-    --     Patterns={
-    --         {Id="v1"; Name="Variant 1"; Image="rbxassetid://12960875825"; DefaultScale=Vector2.new(2, 2); };
-    --     };
-    -- };
-
     super:Add{
-        Id="skingreyboxes";
+        Id="skindevtexture";
         Type=super.SkinType.Pattern;
         OldId="109";
 
-        Name="Grey Boxes";
-        Icon="rbxassetid://18142366016";
+        Name="Dev Texture";
+        Icon="rbxassetid://18188895302";
+        Rare=true;
     
         Patterns={
             {Id="v1"; Name="Variant 1"; Image="rbxassetid://17633873288"; DefaultScale=Vector2.new(4, 4); };
@@ -462,7 +459,7 @@ function ItemSkinsLibrary:Init(super)
 
     --== MARK: Texture Skins
     super:Add{
-        Id="skintoygun";
+        Id="toygun";
         Type=super.SkinType.Texture;
         OldId="201";
 
@@ -476,7 +473,7 @@ function ItemSkinsLibrary:Init(super)
     };
 
     super:Add{
-        Id="skinasiimov";
+        Id="asiimov";
         Type=super.SkinType.Texture;
         OldId="202";
 
@@ -489,7 +486,7 @@ function ItemSkinsLibrary:Init(super)
     };
     
     super:Add{
-        Id="skinantique";
+        Id="antique";
         Type=super.SkinType.Texture;
         OldId="203";
 
@@ -502,7 +499,7 @@ function ItemSkinsLibrary:Init(super)
     };
     
     super:Add{
-        Id="skinblaze";
+        Id="blaze";
         Type=super.SkinType.Texture;
         OldId="204";
 
@@ -516,7 +513,7 @@ function ItemSkinsLibrary:Init(super)
     };
     
     super:Add{
-        Id="skinslaughterwoods";
+        Id="slaughterwoods";
         Type=super.SkinType.Texture;
         OldId="205";
 
@@ -529,7 +526,7 @@ function ItemSkinsLibrary:Init(super)
     };
     
     super:Add{
-        Id="skinpossession";
+        Id="possession";
         Type=super.SkinType.Texture;
         OldId="206";
 
@@ -542,20 +539,21 @@ function ItemSkinsLibrary:Init(super)
     };
     
     super:Add{
-        Id="skinhorde";
+        Id="horde";
         Type=super.SkinType.Texture;
         OldId="207";
 
         Name="Horde";
         Icon="rbxassetid://16570534063";
     
+        HasAlphaTexture=true;
         Textures={
             ["sr308"]={Id="sr308horde"; Image="rbxassetid://16570456572"; Icon="rbxassetid://16570534063"; };
         };
     };
     
     super:Add{
-        Id="skincryogenics";
+        Id="cryogenics";
         Type=super.SkinType.Texture;
         OldId="208";
 

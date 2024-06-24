@@ -2,12 +2,45 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --=
 local modLibraryManager = require(game.ReplicatedStorage.Library.LibraryManager);
 local library = modLibraryManager.new();
+library.Script = script;
 
---==
 library.SkinType = {
     Pattern="Pattern";
     Texture="Texture";
 }
+
+library.ItemSkinIdList = {};
+--==
+
+function library:GetSurfaceAppearance(skinId, variantId)
+    local folder = script:FindFirstChild(skinId);
+    if folder then
+        variantId = string.gsub(variantId, skinId, "");
+        return folder:FindFirstChild(variantId);
+    end
+
+    return;
+end
+
+function library:GetItemSkinIdList(itemId)
+    return library.ItemSkinIdList[itemId];
+end
+
+library:SetOnAdd(function(data)
+    if data.Type ~= library.SkinType.Texture then return end;
+
+    for itemId, lib in pairs(data.Textures) do
+        local itemSkinIdList = library.ItemSkinIdList[itemId];
+        if itemSkinIdList == nil then
+            itemSkinIdList = {};
+            library.ItemSkinIdList[itemId] = itemSkinIdList;
+        end
+
+        table.insert(itemSkinIdList, data.Id);
+    end
+end)
+
+--==
 
 library:Add{
 	Id="skinbasic";

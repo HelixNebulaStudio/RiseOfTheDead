@@ -293,6 +293,9 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 			ToggleClothing={};
 		};
 
+		--== Optin;
+		profile.OptInNewCustomizationMenu = false;
+
 		--== Leaderboard
 		profile.LeaderstatsTimer = unixTime-120;
 
@@ -1293,7 +1296,7 @@ function Profile:Sync(hierarchyKey, paramPacket)
 		local data = modTableManager.GetDataHierarchy(self, hierarchyKey);
 		
 		if RunService:IsStudio() then
-			Debugger:Warn("[Studio] Profile Sync: ",hierarchyKey,"(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")");
+			Debugger:StudioWarn("[Studio] Profile Sync: ",hierarchyKey,"(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")");
 		end
 		
 		paramPacket = paramPacket or {};

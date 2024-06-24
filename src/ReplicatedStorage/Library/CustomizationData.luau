@@ -128,7 +128,9 @@ if RunService:IsServer() then
         local profile = shared.modProfile:Get(player);
         local customizationData = profile.CustomizationData;
 
-        if action == "get" then
+        local returnPacket = {};
+
+        if action == "loadskin" then
             local siid = ...;
             if siid == nil then return end;
             
@@ -141,9 +143,43 @@ if RunService:IsServer() then
 
             local skinDesign = customizationData:GenerateSkin(itemId, skinAskey);
 
+
+        elseif action == "setbaseskin" then
+            local packet = ...;
+            local workbenchPart = packet.WorkbenchPart;
+
+            local siid = packet.Siid;
+            local skinId = packet.SkinId;
+
+		    local storageItem, _ = shared.modStorage.FindIdFromStorages(siid, player);
+            if storageItem == nil then return end;
+
+			local unlockedSkins = storageItem:GetValues("Skins") or {};
+
+			if skinId == "None" then
+				storageItem:DeleteValues("ActiveSkin");
+				returnPacket.Success = true;
+                return returnPacket;
+			end
+
+            local skinLib = modItemSkinsLibrary:Find(skinId);
+
+			local isUnlocked = false;
+			for a=1, #unlockedSkins do
+				if tostring(unlockedSkins[a]) == tostring(skinId) or tostring(unlockedSkins[a]) == skinLib.OldId then
+					isUnlocked = true;
+					break;
+				end
+			end
+			
+			if isUnlocked then
+				storageItem:SetValues("ActiveSkin", skinId);
+			end
+
+            returnPacket.Success=true;
         end
 
-        return;
+        return returnPacket;
     end
     
     task.spawn(function()
@@ -170,6 +206,7 @@ CustomizationPlan.__index = CustomizationPlan;
 
 function CustomizationData.newCustomizationPlan(rawLz4)
     local self = {
+        BaseSkin=nil;
         Group=nil;
         Color=nil;
         Skin=nil;
@@ -200,17 +237,75 @@ function CustomizationPlan:Apply(obj)
     obj.Material = self.Material or obj.Material;
     obj.Reflectance = self.Reflectance or obj.Reflectance;
 
-    local textures: {Texture} = {};
+    local baseSkinTextures: {Texture} = {};
     local surfaceAppearance: SurfaceAppearance = nil;
 
+    local textures: {Texture} = {};
+
     for _, obj in pairs(obj:GetChildren()) do
-        if obj:IsA("Texture") and obj:GetAttribute("Skin") then
+        if obj:GetAttribute("BaseSkin") then
+            if obj:IsA("Texture") and obj:GetAttribute("SkinId") then
+                baseSkinTextures[obj.Face] = obj;
+
+            elseif obj:IsA("SurfaceAppearance") and obj:GetAttribute("SkinId") then
+                surfaceAppearance = obj;
+
+            end
+            
+        elseif obj:IsA("Texture") and obj:GetAttribute("SkinId") then
             textures[obj.Face] = obj;
 
-        elseif obj:IsA("SurfaceAppearance") and obj:GetAttribute("Skin") then
-            surfaceAppearance = obj;
         end
     end
+
+    if self.BaseSkin then
+        local skinId, variantId = string.match(self.BaseSkin, "(.*)_(.*)");
+        local skinLib, variantLib = modItemSkinsLibrary:FindVariant(skinId, variantId);
+
+        if skinLib then
+            if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
+                for _, face in pairs(Enum.NormalId:GetEnumItems()) do
+                    if baseSkinTextures[face] == nil then
+                        baseSkinTextures[face] = Instance.new("Texture");
+                    end
+                    local texture: Texture = baseSkinTextures[face];
+                    texture.Name = "BaseSkin";
+                    texture:SetAttribute("BaseSkin", skinId);
+                    texture:SetAttribute("SkinId", `{skinId}_{variantId}`);
+                    texture.Face = face;
+                    texture.Texture = variantLib.Image;
+                    texture.ZIndex = 0;
+                    texture.Parent = obj;
+                end
+                
+            elseif skinLib.Type == modItemSkinsLibrary.SkinType.Texture then
+                for face, texture in pairs(baseSkinTextures) do
+                    texture:Destroy();
+                end
+                table.clear(baseSkinTextures);
+
+                local templateSurfaceAppearance = modItemSkinsLibrary:GetSurfaceAppearance(skinId, variantId);
+                if templateSurfaceAppearance then
+                    surfaceAppearance = templateSurfaceAppearance:Clone();
+                    surfaceAppearance:SetAttribute("BaseSkin", skinId);
+                    surfaceAppearance:SetAttribute("SkinId", `{skinId}_{variantId}`);
+                    surfaceAppearance.Parent = obj;
+                end
+            end
+        end
+
+    else
+        for face, texture in pairs(baseSkinTextures) do
+            texture:Destroy();
+        end
+        table.clear(baseSkinTextures);
+        if surfaceAppearance then
+            surfaceAppearance:Destroy();
+            surfaceAppearance = nil :: any;
+        end
+
+    end
+
 
     if self.Skin then
         local skinId, variantId = string.match(self.Skin, "(.*)_(.*)");
@@ -219,15 +314,13 @@ function CustomizationPlan:Apply(obj)
         if skinLib then
 
             if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
-                if surfaceAppearance then
-                    surfaceAppearance:Destroy();
-                end
                 for _, face in pairs(Enum.NormalId:GetEnumItems()) do
                     if textures[face] == nil then
                         textures[face] = Instance.new("Texture");
                     end
                     local texture: Texture = textures[face];
-                    texture:SetAttribute("Skin", `{skinId}_{variantId}`);
+                    texture.Name = "Skin";
+                    texture:SetAttribute("SkinId", `{skinId}_{variantId}`);
                     texture.Face = face;
                     texture.Texture = variantLib.Image;
 
@@ -260,15 +353,7 @@ function CustomizationPlan:Apply(obj)
                     end
 
                     texture.Parent = obj;
-
                 end
-                
-            elseif skinLib.Type == modItemSkinsLibrary.SkinType.Texture then
-                for face, texture in pairs(textures) do
-                    texture:Destroy();
-                end
-
-
             end
         end
 
@@ -276,6 +361,7 @@ function CustomizationPlan:Apply(obj)
         for face, texture in pairs(textures) do
             texture:Destroy();
         end
+        table.clear(textures);
 
     end
 

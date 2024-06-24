@@ -18,6 +18,8 @@ local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modViewportUtil = require(game.ReplicatedStorage.Library.Util.ViewportUtil);
 local modGuiObjectPlus = require(game.ReplicatedStorage.Library.UI.GuiObjectPlus);
 
+local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+
 local remoteEquipCosmetics = game.ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("AppearanceEditor"):WaitForChild("EquipCosmetics");
 local starterCharacter = game.StarterPlayer:WaitForChild("StarterCharacter");
 
@@ -92,19 +94,25 @@ function ItemViewport.new() : ItemViewport
 	setmetatable(self, ItemViewport);
 
 	local selectDelta = nil;
+	local inputStart = 0; 
 	self.Garbage:Tag(UserInputService.InputBegan:Connect(function(inputObject) 
 		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
-		selectDelta = self.CurrentHighlightPart;
+
+		if modGuiObjectPlus.IsMouseOver(self.Frame) then
+			inputStart = 1;
+			selectDelta = self.CurrentHighlightPart;
+		end
 	
 	end))
 	self.Garbage:Tag(UserInputService.InputEnded:Connect(function(inputObject) 
 		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
+		if inputStart ~= 1 then return end;
 
 		if modGuiObjectPlus.IsMouseOver(self.Frame) and self.CurrentHighlightPart == selectDelta then
 			if selectDelta == nil then
 				table.clear(self.SelectedHighlightParts);
 			else
-				if not UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+				if not UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
 					table.clear(self.SelectedHighlightParts);
 				end
 				if table.find(self.SelectedHighlightParts, self.CurrentHighlightPart) == nil then
@@ -112,6 +120,7 @@ function ItemViewport.new() : ItemViewport
 				end
 			end
 			self.OnSelectionChanged:Fire(self.SelectedHighlightParts, selectDelta);
+			inputStart = 0;
 		end
 
 		selectDelta = nil;
@@ -336,7 +345,10 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 						prefab:SetAttribute("DisplayModelPrefix", "Right");
 
 					end
-					modColorsLibrary.ApplyAppearance(prefab, itemValues);
+					
+					if modData.Profile.OptInNewCustomizationMenu ~= true then
+						modColorsLibrary.ApplyAppearance(prefab, itemValues);
+					end
 					
 					local displayOffset = itemDisplayLib[weldName.."Offset"];
 					table.insert(self.DisplayModels, {WeldName=weldName; Prefab=prefab; BasePrefab=itemPrefabs[prefabName]; Offset=displayOffset; Prefix=prefix;});
@@ -344,6 +356,65 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 			end
 		end
 		
+		type PartData = {
+			Key: string; 
+			Part: BasePart; 
+			DisplayModelData: {
+				Prefab: Model; 
+				BasePrefab: Model; 
+				Prefix: string; 
+				WeldName: string; 
+				Offset: CFrame;
+			};
+			Group: string?;
+			PredefinedGroup: string?;
+		};
+		self.PartDataList = {} :: {PartData};
+
+		for a=1, #self.DisplayModels do
+			local displayModelData = self.DisplayModels[a];
+			local prefix = displayModelData.Prefix;
+
+			for _, basePart in pairs(displayModelData.Prefab:GetChildren()) do
+				if not basePart:IsA("BasePart") then continue end;
+				local predefinedGroup = basePart:GetAttribute("CustomizationGroup");
+				predefinedGroup = predefinedGroup and `[{predefinedGroup}]` or nil;
+
+				local newPartData = {
+					Key=prefix..basePart.Name;
+					Part=basePart;
+					DisplayModelData = displayModelData;
+					Group = predefinedGroup;
+					PredefinedGroup = predefinedGroup;
+				};
+
+				table.insert(self.PartDataList, newPartData);
+			end
+		end
+		table.sort(self.PartDataList, function(a, b) return a.Key > b.Key; end);
+
+		function self.ApplyCustomizationPlans(customPlans, baseCustomPlan)
+			for a=1, #self.PartDataList do
+				local partData = self.PartDataList[a];
+
+				if customPlans == nil then
+					baseCustomPlan:Apply(partData.Part);
+					continue;
+				end
+
+				if customPlans[partData.Key] then
+					customPlans[partData.Key]:Apply(partData.Part);
+
+				elseif customPlans[partData.Group] then
+					customPlans[partData.Group]:Apply(partData.Part);
+
+				elseif baseCustomPlan then
+					baseCustomPlan:Apply(partData.Part);
+					
+				end
+			end
+		end
+
 	else
 		local prefab = itemPrefabs:FindFirstChild(itemId) and itemPrefabs[itemId]:Clone() or nil;
 		if prefab then
@@ -372,6 +443,8 @@ function ItemViewport:Clear()
 	self.OnDisplayPackageId = nil;
 	self.Frame.ItemIcon.Image = "";
 	self.Frame.ItemIcon.Visible = false;
+	self.PartDataList = nil;
+	self.ApplyCustomizationPlans = nil;
 end
 
 return ItemViewport;

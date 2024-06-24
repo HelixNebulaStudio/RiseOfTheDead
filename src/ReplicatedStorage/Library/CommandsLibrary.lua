@@ -3364,6 +3364,48 @@ Commands["unlockpack"] = {
 	end;
 };
 
+Commands["optin"] = {
+	Permission = PermissionLevel.All;
+	Description = "Opt-in beta features.";
+	
+	RequiredArgs = 1;
+	UsageInfo = [[/optin featureId
+	
+		/optin NewCustomizationMenu
+	]];
+	Function = function(speaker, args)
+		local player = speaker;
+		local profile = shared.modProfile:Get(player);
+
+		local featureId = args[1];
+		local confirmArg = args[2];
+
+		if featureId:lower() == "newcustomizationmenu" then
+			if profile.OptInNewCustomizationMenu then
+				shared.Notify(speaker, "You are already opt-in to (NewCustomizationMenu)", "Inform");
+				return;
+			end
+			if confirmArg == "confirm" then
+				shared.Notify(speaker, "Confirming Opt-in: NewCustomizationMenu", "Inform");
+				profile.OptInNewCustomizationMenu = true;
+				profile:Sync("OptInNewCustomizationMenu");
+
+			else
+				local alertMsg = [[Are you sure you want to opt-in to using New Customization Menu?
+
+				- You will no longer be able to use the old workbench appearance menu.
+				- Your old appearance customizations are loaded at best effort.
+				- Opting-in is for testing purposes, if you would like to use the new customization menu, please wait for the finished release.
+				
+				To confirm, please enter /optin NewCustomizationMenu confirm]]
+				shared.Notify(speaker, alertMsg, "Inform");
+			end
+		end
+	
+		return true;
+	end;
+};
+
 Commands["award"] = {
 	Permission = PermissionLevel.Admin;
 	Description = "Unlock an achievement.";
