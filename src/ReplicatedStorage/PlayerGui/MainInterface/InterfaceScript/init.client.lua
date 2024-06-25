@@ -392,10 +392,21 @@ modInterface:Bind("UpdateStats", function()
 					previousStats[key] = Instance.new("NumberValue", label);
 					previousStats[key]:GetPropertyChangedSignal("Value"):Connect(function()
 						if label.Name == "moneylabel" then
-							label.Text = "Money: "..math.floor(previousStats[key].Value);
+							local money = previousStats[key].Value;
+							if money >= modGlobalVars.MaxMoney then
+								label.Text = "Money Maxed: "..math.floor(money);
+							else
+								label.Text = "Money: "..math.floor(money);
+							end
+
 						elseif label.Name == "perkslabel" then
 							local perks = math.floor(previousStats[key].Value);
-							label.Text = perks > 1 and perks.." :Perks" or perks.." :Perk";
+
+							if perks >= modGlobalVars.MaxPerks then
+								label.Text = perks.." :Perks Maxed";
+							else
+								label.Text = perks > 1 and perks.." :Perks" or perks.." :Perk";
+							end
 						end
 					end)
 				end;
@@ -437,31 +448,31 @@ modInterface:Bind("UpdateStats", function()
 end)
 
 
-local fullShown = false;
-modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
-	if modSyncTime.GetTime()%3 == 0 then
-		local stats = modData.GameSave and modData.GameSave.Stats;
-		if stats then
-			local money = stats.Money or 0;
-			if money >= modGlobalVars.MaxMoney and not fullShown then
-				generalStats.moneylabel.Text = "Maxed Money";
+-- local fullShown = false;
+-- modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
+-- 	if modSyncTime.GetTime()%3 == 0 then
+-- 		local stats = modData.GameSave and modData.GameSave.Stats;
+-- 		if stats then
+-- 			local money = stats.Money or 0;
+-- 			if money >= modGlobalVars.MaxMoney and not fullShown then
+-- 				generalStats.moneylabel.Text = "Maxed Money";
 				
-			else
-				generalStats.moneylabel.Text = "Money: "..math.floor(money);
-			end
+-- 			else
+-- 				generalStats.moneylabel.Text = "Money: "..math.floor(money);
+-- 			end
 			
-			local perks = stats.Perks or 0;
-			if perks >= modGlobalVars.MaxPerks and not fullShown then
-				generalStats.perkslabel.Text = "Maxed Perks";
+-- 			local perks = stats.Perks or 0;
+-- 			if perks >= modGlobalVars.MaxPerks and not fullShown then
+-- 				generalStats.perkslabel.Text = "Maxed Perks";
 				
-			else
-				generalStats.perkslabel.Text = perks.." :Perks"
-			end
+-- 			else
+-- 				generalStats.perkslabel.Text = perks.." :Perks"
+-- 			end
 			
-			fullShown = not fullShown;
-		end
-	end
-end)
+-- 			fullShown = not fullShown;
+-- 		end
+-- 	end
+-- end)
 
 local progressionPoint = 0;
 function UpdateProgressionBar(progress, labelId, value)
