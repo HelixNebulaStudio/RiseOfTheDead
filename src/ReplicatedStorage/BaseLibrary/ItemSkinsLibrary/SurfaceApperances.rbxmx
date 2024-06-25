@@ -1,0 +1,143 @@
+<roblox version="4">
+
+	<Item class="Folder">
+		<Properties>
+			<string name="Name">SurfaceAppearances</string>
+		</Properties>
+
+		<!-- MARK: antique -->
+		<Item class="Folder">
+			<Properties>
+				<string name="Name">antique</string>
+			</Properties>
+
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">arelshiftcross</string>
+					<Content name="ColorMap"><url>rbxassetid://13768020853</url></Content>
+					<Content name="MetalnessMap"><url>rbxassetid://13768050373</url></Content>
+					<Content name="NormalMap"><url>rbxassetid://13767667752</url></Content>
+					<Content name="RoughnessMap"><url>rbxassetid://13767791197</url></Content>
+				</Properties>
+			</Item>
+		</Item>
+
+		<!-- MARK: cryogenics -->
+		<Item class="Folder">
+			<Properties>
+				<string name="Name">cryogenics</string>
+			</Properties>
+
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">deagle</string>
+					<Content name="ColorMap"><url>rbxassetid://17227620804</url></Content>
+					<Content name="MetalnessMap"><url>rbxassetid://17227623457</url></Content>
+					<Content name="NormalMap"><url>rbxassetid://17227628500</url></Content>
+					<Content name="RoughnessMap"><url>rbxassetid://17227630841</url></Content>
+				</Properties>
+			</Item>
+		</Item>
+
+		<!-- MARK: possession -->
+		<Item class="Folder">
+			<Properties>
+				<string name="Name">possession</string>
+			</Properties>
+
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">vectorx</string>
+					<Content name="ColorMap"><url>rbxassetid://15006578225</url></Content>
+				</Properties>
+			</Item>
+		</Item>
+
+		<!-- MARK: blaze -->
+		<Item class="Folder">
+			<Properties>
+				<string name="Name">blaze</string>
+			</Properties>
+
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">rusty48</string>
+					<Content name="ColorMap"><url>rbxassetid://13822368962</url></Content>
+				</Properties>
+			</Item>
+
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">flamethrower</string>
+					<Content name="ColorMap"><url>rbxassetid://17229432117</url></Content>
+				</Properties>
+			</Item>
+		</Item>
+
+		<!-- MARK: asiimov -->
+		<Item class="Folder">
+			<Properties>
+				<string name="Name">asiimov</string>
+			</Properties>
+
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">czevo3</string>
+					<Content name="ColorMap"><url>rbxassetid://13846887623</url></Content>
+				</Properties>
+			</Item>
+		</Item>
+
+		<!-- MARK: toygun -->
+		<Item class="Folder">
+			<Properties>
+				<string name="Name">toygun</string>
+			</Properties>
+
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">czevo3</string>
+					<Content name="ColorMap"><url>rbxassetid://5013618682</url></Content>
+				</Properties>
+			</Item>
+
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">desolatorheavy</string>
+					<Content name="ColorMap"><url>rbxassetid://12929982078</url></Content>
+				</Properties>
+			</Item>
+		</Item>
+
+		<!-- MARK: horde -->
+		<Item class="Folder">
+			<Properties>
+				<string name="Name">horde</string>
+			</Properties>
+			
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">sr308</string>
+					<Content name="ColorMap"><url>rbxassetid://16570456572</url></Content>
+				</Properties>
+			</Item>
+		</Item>
+
+		<!-- MARK: slaughterwoods -->
+		<Item class="Folder">
+			<Properties>
+				<string name="Name">slaughterwoods</string>
+			</Properties>
+
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">sr308</string>
+					<Content name="ColorMap"><url>rbxassetid://16494491062</url></Content>
+					<Content name="MetalnessMap"><url>rbxassetid://16494491062</url></Content>
+					<Content name="RoughnessMap"><url>rbxassetid://16494491062</url></Content>
+				</Properties>
+			</Item>
+		</Item>
+
+	</Item>
+</roblox>

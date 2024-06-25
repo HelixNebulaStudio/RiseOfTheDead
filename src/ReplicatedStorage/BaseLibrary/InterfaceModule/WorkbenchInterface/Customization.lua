@@ -96,7 +96,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
 			variantId = "v1";
 		else
-			variantId = itemId;
+			variantId = itemId..skinLib.Id;
 		end
 	
 		return `{skinLib.Id}_{variantId}`;

@@ -46,7 +46,7 @@ function ItemSkinsLibrary:Init(super)
         return lib;
     end
 
-    for _, obj in pairs(script:GetChildren()) do
+    for _, obj in pairs(script:WaitForChild("SurfaceAppearances"):GetChildren()) do
         obj.Parent = super.Script;
     end
 
