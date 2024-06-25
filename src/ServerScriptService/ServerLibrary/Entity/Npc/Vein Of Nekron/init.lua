@@ -53,7 +53,8 @@ return function(npc, spawnPoint)
 		
 		self.TaggedObjects = {};
 		self.SporeObjects = {};
-		
+		self.PlaqueObjects = {};
+
 		self.SporeCount = 0;
 		self.VeinLaunched = 0;
 		self.AttackTimer = (self.IsHard and 3 or 4);
@@ -178,6 +179,7 @@ return function(npc, spawnPoint)
 			end
 		end
 		table.clear(self.SporeObjects);
+		table.clear(self.PlaqueObjects);
 	end
 	
 	--== Components;
@@ -281,7 +283,8 @@ return function(npc, spawnPoint)
 						newVein.Parent = self.Prefab;
 						newVein.CFrame = surfaceCenterCFrame * CFrame.new(lookVec);
 						newVein.Size = surfaceSize;
-						
+						table.insert(self.PlaqueObjects, newVein);
+
 						self.CustomHealthbar:Create(projectileName, self.BaseHealth*0.1, newVein);
 						
 						task.spawn(function()
@@ -404,6 +407,14 @@ return function(npc, spawnPoint)
 		
 		local toxicStatus = self.EntityStatus:GetOrDefault("ToxicMod");
 		
+		local randomPlaquePart = nil;
+		if #self.PlaqueObjects > 0 then
+			randomPlaquePart = self.PlaqueObjects[math.random(1, #self.PlaqueObjects)];
+		end
+		if randomPlaquePart == nil then
+			randomPlaquePart = self.RootPart;
+		end
+
 		if effectiveness > 0 then
 			local addNewHealth = math.ceil(self.BaseHealth *0.02 * effectiveness);
 			self.Humanoid.MaxHealth = math.clamp(self.Humanoid.MaxHealth + addNewHealth , self.BaseHealth, self.BaseMaxHealth);
@@ -414,7 +425,7 @@ return function(npc, spawnPoint)
 
 			local newHealSrc = modDamagable.NewDamageSource{
 				Damage=-addNewHealth;
-				TargetPart=(#self.TaggedObjects > 0 and self.TaggedObjects[math.random(1, #self.TaggedObjects)] or nil);
+				TargetPart=randomPlaquePart;
 			};
 			self.Status:TakeDamagePackage(newHealSrc);
 			
@@ -433,7 +444,7 @@ return function(npc, spawnPoint)
 				
 				local newHealSrc = modDamagable.NewDamageSource{
 					Damage=healAmt;
-					TargetPart=(self.TaggedObjects[math.random(1, #self.TaggedObjects)]);
+					TargetPart=randomPlaquePart;
 				}
 				self.Status:TakeDamagePackage(newHealSrc);
 				
