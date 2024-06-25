@@ -11,7 +11,10 @@ function attirePackage.NewToolLib(handler)
 	toolLib.Warmth = 3;
 	toolLib.HasFlinchProtection = true;
 	
-	return modClothingProperties.new(toolLib);
+	local clothing = modClothingProperties.new(toolLib);
+	clothing:RegisterPlayerProperty("CultistHood", {});
+
+	return clothing;
 end
 
 return attirePackage;

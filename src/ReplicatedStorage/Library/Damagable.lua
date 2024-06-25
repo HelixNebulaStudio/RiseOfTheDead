@@ -142,9 +142,10 @@ function Damagable:CanDamage(attacker)
 	end
 	
 	local attackerNpcStatus = typeof(attacker) == "Instance" and attacker:FindFirstChild("NpcStatus") or nil;
+	local attackerIsNpcModule = typeof(attacker) == "table" and attacker.ClassName == "NpcModule";
 	
 	if self.Object.ClassName == "NpcStatus" then
-		if self.Object:CanTakeDamageFrom(attacker) or (attackerNpcStatus ~= nil) then
+		if self.Object:CanTakeDamageFrom(attacker) or (attackerNpcStatus ~= nil) or (attackerIsNpcModule) then
 			
 		else
 			return false;

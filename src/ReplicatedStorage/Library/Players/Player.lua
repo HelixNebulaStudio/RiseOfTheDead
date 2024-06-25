@@ -597,6 +597,8 @@ function Player.new(playerInstance: Player)
 		
 		remoteDamagePacket:FireClient(classPlayer:GetInstance(), damageSource);
 		classPlayer.OnDamageTaken:Fire(damage);
+		
+		modOnGameEvents:Fire("OnPlayerDamaged", playerInstance, damageSource, damage);
 	end
 	
 	function meta:TakeDamage(damage, playerAttacker, storageItem, bodyPart, damageType)

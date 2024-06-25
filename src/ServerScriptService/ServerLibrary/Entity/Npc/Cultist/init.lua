@@ -48,19 +48,13 @@ return function(npc, spawnPoint)
 		self.RandomSkin();
 		self.Properties.AttackCooldown = tick();
 		self.Wield.Equip("survivalknife");
-		pcall(function()
-			self.Wield.ToolModule.Configurations.Damage = 15;
-			self.Wield.ToolModule.Configurations.PrimaryAttackAnimationSpeed = 0.2;
-		end);
 		
-		self.Wield.Targetable.Humanoid = 1;
 		repeat until not self.Update();
 	end
 	
 	function self.CantFollow(destination)
 		Debugger:Log("CantFollow");
 		if self.CutsceneMode then return end;
-		--self.Prefab:Destroy();
 		self:Destroy();
 	end
 	
@@ -88,6 +82,9 @@ return function(npc, spawnPoint)
 		if self == nil then return false end;
 		if self.IsDead or self.Humanoid.RootPart == nil then return false end;
 		
+		self.Wield.Targetable.Humanoid = 1;
+		self.Wield.Targetable.Zombie = 1;
+
 		if self.CutsceneMode then
 			wait(0.1);
 		else
@@ -95,36 +92,49 @@ return function(npc, spawnPoint)
 				local enemyRootPart = self.Enemy.Humanoid.RootPart;
 				self.Logic:SetState("Aggro");
 
-				self.Move:Follow(enemyRootPart);
+				self.Move:Follow(enemyRootPart, 2);
+
+				local enemyHumanoidType = self.Enemy.Humanoid.Name;
+				pcall(function()
+					self.Wield.ToolModule.Configurations.PrimaryAttackAnimationSpeed = 0.2;
+
+					if enemyHumanoidType == "Humanoid" then
+						self.Wield.ToolModule.Configurations.Damage = 15;
+					elseif enemyHumanoidType == "Zombie" then
+						self.Wield.ToolModule.Configurations.Damage = math.clamp(self.Enemy.Humanoid.MaxHealth * 0.1, 40, 30000);
+					end
+				end);
 
 				self.Enemy.Distance = (self.RootPart.CFrame.p - enemyRootPart.CFrame.p).Magnitude;
 				repeat
-					if self then
-						if self.Enemy and self.Enemy.Humanoid and enemyRootPart and self.Enemy.Humanoid.Health > 0 then
-							if self.Enemy.Distance <= self.Properties.AttackRange then
-								self.Wield.SetEnemyHumanoid(self.Enemy.Humanoid);
-								self.Move:LookAt(enemyRootPart.Position);
-								self.Move:Face(enemyRootPart.Position);
-								self.Wield.PrimaryFireRequest();
-							end
-						else
-							self.Enemy = nil;
-						end
-						if self.Humanoid and self.Humanoid.RootPart and self.Enemy and self.Enemy.Humanoid then
-							self.Move:Follow(enemyRootPart);
+					if self == nil then break end;
+					
+					if self.Enemy and self.Enemy.Humanoid and enemyRootPart and self.Enemy.Humanoid.Health > 0 then
+						if self.Enemy.Distance <= self.Properties.AttackRange then
+							self.Wield.SetEnemyHumanoid(self.Enemy.Humanoid);
 							self.Move:LookAt(enemyRootPart.Position);
-							self.Enemy.Distance = (self.Humanoid.RootPart.CFrame.p - enemyRootPart.CFrame.p).Magnitude;
-						else
-							if self.Prefab then self.Prefab:Destroy() end;	
+							self.Wield.PrimaryFireRequest();
 						end
 					else
-						break;
+						self.Enemy = nil;
 					end
+					if self.Humanoid and self.Humanoid.RootPart and self.Enemy and self.Enemy.Humanoid then
+						self.Move:Follow(enemyRootPart);
+						self.Move:LookAt(enemyRootPart.Position);
+						self.Enemy.Distance = (self.Humanoid.RootPart.CFrame.p - enemyRootPart.CFrame.p).Magnitude;
+					else
+						if self.Prefab then self.Prefab:Destroy() end;
+					end
+						
 					self.Logic:Timeout("Aggro", 0.1);
 
 				until self.IsDead or self.Enemy == nil or self.Enemy.Distance >= 50;
 
 				if self.Enemy == nil then
+					if self.HoodSpawn then
+						self:Destroy();
+						return;
+					end
 					self.NextTarget();
 				end
 				self.Logic:Timeout("Aggro", 1);
@@ -136,6 +146,10 @@ return function(npc, spawnPoint)
 				self.Move:Stop();
 
 			end
+		end
+
+		if self.HoodSpawn and tick() > self.HoodSpawn then
+			self:Destroy();
 		end
 
 		self.Logic:Timeout("Idle", 10);

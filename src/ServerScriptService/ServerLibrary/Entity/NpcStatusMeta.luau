@@ -28,11 +28,11 @@ end
 
 function NpcStatusMeta:CanTakeDamageFrom(player)
 	if self == nil or self.NpcModule == nil or self.NpcModule.Humanoid == nil then return false; end;
+	if player == nil or (typeof(player) == "Instance" and not player:IsA("Player")) then return true end;
 	
 	local dmgMulti = modConfigurations.TargetableEntities[self.NpcModule.Humanoid.Name];
 	if dmgMulti == nil or dmgMulti <= 0 then return false; end
 	
-	if player == nil then return true end;
 	if self.NpcModule.NetworkOwners == nil then return true end;
 	
 	for a=1, #self.NpcModule.NetworkOwners do
