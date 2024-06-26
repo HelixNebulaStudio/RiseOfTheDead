@@ -3383,6 +3383,7 @@ Commands["optin"] = {
 		if featureId:lower() == "newcustomizationmenu" then
 			if profile.OptInNewCustomizationMenu then
 				shared.Notify(speaker, "You are already opt-in to (NewCustomizationMenu)", "Inform");
+				profile:Sync("OptInNewCustomizationMenu");
 				return;
 			end
 			if confirmArg == "confirm" then

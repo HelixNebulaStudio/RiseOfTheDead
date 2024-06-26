@@ -1292,6 +1292,12 @@ function Profile:Sync(hierarchyKey, paramPacket)
 		self:Sync("SkillTree");
 		self:Sync("Collectibles");
 		
+		for k, v in pairs(self) do
+			if k:sub(1, 5) == "OptIn" then
+				self:Sync(k);
+			end
+		end
+
 	else
 		local data = modTableManager.GetDataHierarchy(self, hierarchyKey);
 		
@@ -1594,7 +1600,7 @@ function Profile:RefreshSettings(update)
 	
 	self:RefreshPlayerTitle();
 	self:Sync("Settings");
-	
+
 	modSettings.UpdateAutoPickup(self.Cache.PickupCache, self.Settings.AutoPickupConfig or {});
 end
 

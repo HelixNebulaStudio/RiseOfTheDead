@@ -231,7 +231,23 @@ function CustomizationData.newCustomizationPlan(rawLz4)
     return self;
 end
 
-function CustomizationPlan:Apply(obj)
+function CustomizationPlan:Copy(customPlan, onlyReplaceNil)
+    onlyReplaceNil = onlyReplaceNil == true;
+
+    self.Color = onlyReplaceNil and self.Color or customPlan.Color;
+    self.Skin = onlyReplaceNil and self.Skin or customPlan.Skin;
+    self.Transparency = onlyReplaceNil and self.Transparency or customPlan.Transparency;
+
+    self.PatternData.Color = onlyReplaceNil and self.PatternData.Color or customPlan.PatternData.Color;
+    self.PatternData.Offset = onlyReplaceNil and self.PatternData.Offset or customPlan.PatternData.Offset;
+    self.PatternData.Scale = onlyReplaceNil and self.PatternData.Scale or customPlan.PatternData.Scale;
+    self.PatternData.Transparency = onlyReplaceNil and self.PatternData.Transparency or customPlan.PatternData.Transparency;
+
+    self.Material = onlyReplaceNil and self.Material or customPlan.Material;
+    self.Reflectance = onlyReplaceNil and self.Reflectance or customPlan.Reflectance;
+end
+
+function CustomizationPlan:Apply(obj: BasePart)
     obj.Color = self.Color or obj.Color;
     obj.Transparency = self.Transparency or obj.Transparency;
     obj.Material = self.Material or obj.Material;
@@ -258,52 +274,54 @@ function CustomizationPlan:Apply(obj)
         end
     end
 
-    if self.BaseSkin then
-        local skinId, variantId = string.match(self.BaseSkin, "(.*)_(.*)");
-        local skinLib, variantLib = modItemSkinsLibrary:FindVariant(skinId, variantId);
-
-        if skinLib then
-            if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
-                for _, face in pairs(Enum.NormalId:GetEnumItems()) do
-                    if baseSkinTextures[face] == nil then
-                        baseSkinTextures[face] = Instance.new("Texture");
+    if obj:GetAttribute("BaseTexture") == nil and obj:GetAttribute("SkipPattern") == nil then
+        if self.BaseSkin and self.Color == nil then
+            local skinId, variantId = string.match(self.BaseSkin, "(.*)_(.*)");
+            local skinLib, variantLib = modItemSkinsLibrary:FindVariant(skinId, variantId);
+    
+            if skinLib then
+                if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
+                    for _, face in pairs(Enum.NormalId:GetEnumItems()) do
+                        if baseSkinTextures[face] == nil then
+                            baseSkinTextures[face] = Instance.new("Texture");
+                        end
+                        local texture: Texture = baseSkinTextures[face];
+                        texture.Name = "BaseSkin";
+                        texture:SetAttribute("BaseSkin", skinId);
+                        texture:SetAttribute("SkinId", `{skinId}_{variantId}`);
+                        texture.Face = face;
+                        texture.Texture = variantLib.Image;
+                        texture.ZIndex = 0;
+                        texture.Parent = obj;
                     end
-                    local texture: Texture = baseSkinTextures[face];
-                    texture.Name = "BaseSkin";
-                    texture:SetAttribute("BaseSkin", skinId);
-                    texture:SetAttribute("SkinId", `{skinId}_{variantId}`);
-                    texture.Face = face;
-                    texture.Texture = variantLib.Image;
-                    texture.ZIndex = 0;
-                    texture.Parent = obj;
-                end
-                
-            elseif skinLib.Type == modItemSkinsLibrary.SkinType.Texture then
-                for face, texture in pairs(baseSkinTextures) do
-                    texture:Destroy();
-                end
-                table.clear(baseSkinTextures);
-
-                local templateSurfaceAppearance = modItemSkinsLibrary:GetSurfaceAppearance(skinId, variantId);
-                if templateSurfaceAppearance then
-                    surfaceAppearance = templateSurfaceAppearance:Clone();
-                    surfaceAppearance:SetAttribute("BaseSkin", skinId);
-                    surfaceAppearance:SetAttribute("SkinId", `{skinId}_{variantId}`);
-                    surfaceAppearance.Parent = obj;
+                    
+                elseif skinLib.Type == modItemSkinsLibrary.SkinType.Texture then
+                    for face, texture in pairs(baseSkinTextures) do
+                        texture:Destroy();
+                    end
+                    table.clear(baseSkinTextures);
+    
+                    local templateSurfaceAppearance = modItemSkinsLibrary:GetSurfaceAppearance(skinId, variantId);
+                    if templateSurfaceAppearance then
+                        surfaceAppearance = templateSurfaceAppearance:Clone();
+                        surfaceAppearance:SetAttribute("BaseSkin", skinId);
+                        surfaceAppearance:SetAttribute("SkinId", `{skinId}_{variantId}`);
+                        surfaceAppearance.Parent = obj;
+                    end
                 end
             end
+    
+        else
+            for face, texture in pairs(baseSkinTextures) do
+                texture:Destroy();
+            end
+            table.clear(baseSkinTextures);
+            if surfaceAppearance then
+                surfaceAppearance:Destroy();
+                surfaceAppearance = nil :: any;
+            end
+    
         end
-
-    else
-        for face, texture in pairs(baseSkinTextures) do
-            texture:Destroy();
-        end
-        table.clear(baseSkinTextures);
-        if surfaceAppearance then
-            surfaceAppearance:Destroy();
-            surfaceAppearance = nil :: any;
-        end
-
     end
 
 
@@ -366,10 +384,12 @@ function CustomizationPlan:Apply(obj)
     end
 
     local jointObj = nil;
-    for _, weld in pairs(obj.AssemblyRootPart.Parent:GetDescendants()) do 
-        if (weld:IsA("Motor6D") or weld:IsA("Weld")) and weld.Part1 == obj then 
-            jointObj = weld;
-            break;
+    if obj.AssemblyRootPart and obj.AssemblyRootPart.Parent then
+        for _, weld in pairs(obj.AssemblyRootPart.Parent:GetDescendants()) do 
+            if (weld:IsA("Motor6D") or weld:IsA("Weld")) and weld.Part1 == obj then 
+                jointObj = weld;
+                break;
+            end
         end
     end
 

@@ -11,6 +11,7 @@ local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler)
 local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
 local modItemSkinsLibrary = require(game.ReplicatedStorage.Library.ItemSkinsLibrary)
+local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local modDropdownList = require(game.ReplicatedStorage.Library.UI.DropdownList);
 local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
@@ -57,31 +58,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		return;
 	end
 
-
 	local customPlansCache = {};
-	local groupPartList = {};
-	local groupsList = {};
-
-
-	do -- load list of modelParts and part list
-		for a=1, #itemViewport.PartDataList do
-			local partData = itemViewport.PartDataList;
-	
-			if partData.PredefinedGroup and table.find(groupsList, partData.PredefinedGroup) == nil then
-				table.insert(groupsList, partData.PredefinedGroup);
-			end
-	
-			table.insert(groupPartList, partData.Key);
-		end
-		table.sort(groupPartList);
-		table.sort(groupsList);
-		table.insert(groupsList, 1, "[All]");
-	
-		for a=1, #groupsList do
-			table.insert(groupPartList, a, groupsList[a]);
-		end
-	end
-
 
 	-- MARK: getBaseSkinFromActiveSkinId(activeSkinId)
 	local function getBaseSkinFromActiveSkinId(activeSkinId)
@@ -104,24 +81,27 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 
 	-- MARK: GetCustomPlan
-	local GetCustomEnum = {
+	local GetCustomPlanEnum = {
 		Part=1;
 		Group=2;
-	};
+	}
 	local baseCustomPlan = modCustomizationData.newCustomizationPlan();
-	local function getCustomPlan(partData, newType)
-		local customPlan = customPlansCache[partData.Key] or customPlansCache[partData.Group];
+	local function getCustomPlan(planType, planKey, newIfNil)
+		local customPlan = customPlansCache[planKey];
 
-		if customPlan == nil and newType ~= nil then
+		if customPlan == nil and newIfNil == true then
 			customPlan = modCustomizationData.newCustomizationPlan();
 			customPlan.BaseSkin = getBaseSkinFromActiveSkinId(storageItem.Values.ActiveSkin);
 
-			if partData.Group and newType == GetCustomEnum.Part then
-				customPlan.Group = partData.Group;
-				customPlansCache[partData.Group] = customPlan;
-			else
-				customPlansCache[partData.Key] = customPlan;
+			if planType == GetCustomPlanEnum.Group then
+				customPlan.Group = planKey;
+				customPlan.PositionOffset = nil;
+
+			elseif planType == GetCustomPlanEnum.Part then
+				
 			end
+
+			customPlansCache[planKey] = customPlan;
 		end
 
 		return customPlan or baseCustomPlan;
@@ -154,9 +134,30 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		end)
 	end
 	
-
 	-- listMenu:Refresh();
 	function listMenu:Refresh()
+		local groupPartList = {};
+		local groupsList = {};
+
+		do -- load list of modelParts and part list
+			for a=1, #itemViewport.PartDataList do
+				local partData = itemViewport.PartDataList[a];
+		
+				if partData.PredefinedGroup and table.find(groupsList, partData.PredefinedGroup) == nil then
+					table.insert(groupsList, partData.PredefinedGroup);
+				end
+		
+				table.insert(groupPartList, partData.Key);
+			end
+			table.sort(groupPartList);
+			table.sort(groupsList);
+			table.insert(groupsList, 1, "[All]");
+		
+			for a=1, #groupsList do
+				table.insert(groupPartList, a, groupsList[a]);
+			end
+		end
+
 		local activeGroupName = nil;
 		local activePartSelection = nil;
 
@@ -376,15 +377,38 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		-- MARK: UpdateCustomizations;
 		local function updateCustomization(func)
-			if activePartSelection == nil then return end;
+			
+			if activeGroupName then
+				for a=1, #itemViewport.PartDataList do
+					local partData = itemViewport.PartDataList[a];
+					if activeGroupName ~= "[All]" and partData.Group ~= activeGroupName then continue end;
+					
+					local customPlan = getCustomPlan(GetCustomPlanEnum.Group, activeGroupName, true);
+					func(customPlan);
 
-			for a=1, #activePartSelection do
-				local partData = activePartSelection[a];
+					customPlan:Apply(partData.Part);
+				end
 
-				local customPlan = getCustomPlan(partData, #activePartSelection == 1 and GetCustomEnum.Part or GetCustomEnum.Group);
-				func(customPlan);
+			else
+				if activePartSelection == nil then return end;
+	
+				for a=1, #activePartSelection do
+					local partData = activePartSelection[a];
+	
+					local customPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key, true);
 
-				customPlan:Apply(partData.Part);
+					if partData.Group then
+						local groupCustomPlan = getCustomPlan(GetCustomPlanEnum.Group, partData.Group);
+						if groupCustomPlan then
+							customPlan:Copy(groupCustomPlan, true);
+						end
+					end
+
+					func(customPlan);
+
+					customPlan:Apply(partData.Part);
+				end
+
 			end
 		end
 
@@ -776,21 +800,50 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		
 		-- MARK: Part Color;
 		local colorButton = editPanel.ColorFrame.Button;
+		local function OnColorSelect(selectColor: Color3 | any)
+			colorButton.BackgroundColor3 = selectColor or Color3.fromRGB(150, 150, 150);
+			colorButton.TextColor3 = modColorPicker.GetBackColor(selectColor or Color3.fromRGB(150, 150, 150));
+			colorButton.Text = `#{(selectColor or Color3.fromRGB(150, 150, 150)):ToHex()}`;
+
+			if baseCustomPlan.BaseSkin then
+				local skinId, variantId = string.match(baseCustomPlan.BaseSkin or "", "(.*)_(.*)");
+				local skinLib, skinVariantData = modItemSkinsLibrary:FindVariant(skinId, variantId);
+				local hasAlphaTexture = skinLib and skinLib.HasAlphaTexture;
+
+				if selectColor and hasAlphaTexture ~= true then
+					colorButton.ImageLabel.Image = "";
+					
+				elseif skinVariantData and skinVariantData.Icon then
+					colorButton.ImageLabel.Image = skinVariantData.Icon;
+
+				end
+			else
+				colorButton.ImageLabel.Image = "";
+			end
+
+			Debugger:StudioWarn("Set Color=", colorButton.Text);
+			updateCustomization(function(customPlan)
+				customPlan.Color = selectColor;
+			end)
+			
+		end
 		colorButton.MouseButton1Click:Connect(function()
 			if colorButton.Darken.Visible then return end;
-
 			Interface:PlayButtonClick();
-			OpenColorCustomizations(function(selectColor: Color3)
-				colorButton.BackgroundColor3 = selectColor;
-				colorButton.TextColor3 = modColorPicker.GetBackColor(selectColor);
-				colorButton.Text = `#{selectColor:ToHex()}`;
 
-				Debugger:StudioWarn("Set Color=", colorButton.Text);
-				updateCustomization(function(customPlan)
-					customPlan.Color = selectColor;
-				end)
-			end);
+			OpenColorCustomizations(OnColorSelect);
+			refreshConfigActive();
 		end)
+
+		local function resetPartColor()
+			if colorButton.Darken.Visible then return end;
+			Interface:PlayButtonClick();
+
+			OnColorSelect(nil);
+			refreshConfigActive();
+		end
+		colorButton.MouseButton2Click:Connect(resetPartColor);
+		colorButton.TouchLongPress:Connect(resetPartColor);
 
 		local templateDarkenFrame = colorButton.Darken;
 		
@@ -826,22 +879,34 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			local skinLib, skinVariantData = modItemSkinsLibrary:FindVariant(skinId, variantId)
 			Debugger:StudioWarn("Select Skin", skinId, variantId, skinLib~=nil, skinVariantData~=nil);
 			
-			if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
-				editPanel.SkinColorFrame.Button.Image = skinVariantData.Image;
-				editPanel.SkinFrame.Button.Image = skinVariantData.Image;
-				editPanel.SkinFrame.Button.TextLabel.Text = `{skinLib.Name}: {skinVariantData.Name}`;
+			if skinLib then
+				if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
+					editPanel.SkinColorFrame.Button.Image = skinVariantData.Image;
+					editPanel.SkinFrame.Button.Image = skinVariantData.Image;
+					editPanel.SkinFrame.Button.TextLabel.Text = `{skinLib.Name}: {skinVariantData.Name}`;
+	
+				elseif skinLib.Type == modItemSkinsLibrary.SkinType.Texture then
+					editPanel.SkinColorFrame.Button.Image = skinVariantData.Icon;
+					editPanel.SkinFrame.Button.Image = skinVariantData.Icon;
+					editPanel.SkinFrame.Button.TextLabel.Text = `{skinLib.Name}`;
+	
+				end
 
-			elseif skinLib.Type == modItemSkinsLibrary.SkinType.Texture then
-				editPanel.SkinColorFrame.Button.Image = skinVariantData.Icon;
-				editPanel.SkinFrame.Button.Image = skinVariantData.Icon;
-				editPanel.SkinFrame.Button.TextLabel.Text = `{skinLib.Name}`;
+				updateCustomization(function(customPlan)
+					customPlan.Skin = `{skinId}_{variantId}`;
+				end)
+
+			else
+				editPanel.SkinColorFrame.Button.Image = "";
+				editPanel.SkinFrame.Button.Image = "";
+				editPanel.SkinFrame.Button.TextLabel.Text = "None";
+
+				updateCustomization(function(customPlan)
+					customPlan.Skin = nil;
+				end)
 
 			end
 
-			updateCustomization(function(customPlan)
-				customPlan.Skin = `{skinId}_{variantId}`;
-			end)
-			
 			editPanel.SkinFrame.Button:SetAttribute("SkinId", skinId);
 			refreshConfigActive();
 		end
@@ -856,11 +921,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			if textureSetButton.Darken.Visible then return end;
 
 			Interface:PlayButtonClick();
-			updateCustomization(function(customPlan)
-				customPlan.Skin = nil;
-			end)
-			editPanel.SkinFrame.Button:SetAttribute("SkinId", nil);
-			refreshConfigActive();
+			OnSkinSelect(nil);
 		end
 		textureSetButton.TouchLongPress:Connect(resetTextureSet);
 		textureSetButton.MouseButton2Click:Connect(resetTextureSet);
@@ -1119,7 +1180,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			DisplayValueFunc=onReflectanceSet;
 		});
 
-
 		-- MARK: Part Material
 		local materialButton = editPanel.MaterialFrame.Button;
 		templateDarkenFrame:Clone().Parent = materialButton;
@@ -1190,10 +1250,9 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			local labelColor = canEdit and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 
 			-- Part Color
-			local hasAlphaTexture = skinLib and skinLib.HasAlphaTexture;
-			editPanel.ColorFrame.Button.AutoButtonColor = canEditPatternData or hasAlphaTexture;
-			editPanel.ColorFrame.Button.Darken.Visible = not (canEditPatternData or hasAlphaTexture);
-			editPanel.ColorFrame.NameLabel.TextColor3 = (canEditPatternData or hasAlphaTexture) and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
+			editPanel.ColorFrame.Button.AutoButtonColor = canEdit;
+			editPanel.ColorFrame.Button.Darken.Visible = not canEdit;
+			editPanel.ColorFrame.NameLabel.TextColor3 = canEdit and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 
 			-- Part Transparency
 			transparencySlider:SetAttribute("DisableSlider", not canEdit);
@@ -1236,16 +1295,22 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			editPanel.SkinTransparencyFrame.NameLabel.TextColor3 = patternLabelColor;
 
 			-- Part Offset
-			partOffsetXSlider:SetAttribute("DisableSlider", not canEdit);
-			partOffsetXSlider.AutoButtonColor = canEdit;
-			partOffsetXSlider.Darken.Visible = not canEdit;
-			partOffsetYSlider:SetAttribute("DisableSlider", not canEdit);
-			partOffsetYSlider.AutoButtonColor = canEdit;
-			partOffsetYSlider.Darken.Visible = not canEdit;
-			partOffsetZSlider:SetAttribute("DisableSlider", not canEdit);
-			partOffsetZSlider.AutoButtonColor = canEdit;
-			partOffsetZSlider.Darken.Visible = not canEdit;
-			editPanel.PartOffsetFrame.NameLabel.TextColor3 = labelColor;
+			local canEditOffset = false;
+			if activeGroupName == nil then
+				canEditOffset = true;
+			end
+			local offsetLabelColor = canEditOffset and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
+
+			partOffsetXSlider:SetAttribute("DisableSlider", not canEditOffset);
+			partOffsetXSlider.AutoButtonColor = canEditOffset;
+			partOffsetXSlider.Darken.Visible = not canEditOffset;
+			partOffsetYSlider:SetAttribute("DisableSlider", not canEditOffset);
+			partOffsetYSlider.AutoButtonColor = canEditOffset;
+			partOffsetYSlider.Darken.Visible = not canEditOffset;
+			partOffsetZSlider:SetAttribute("DisableSlider", not canEditOffset);
+			partOffsetZSlider.AutoButtonColor = canEditOffset;
+			partOffsetZSlider.Darken.Visible = not canEditOffset;
+			editPanel.PartOffsetFrame.NameLabel.TextColor3 = offsetLabelColor;
 
 			-- Part Reflectance
 			reflectanceSlider:SetAttribute("DisableSlider", not canEdit);
@@ -1282,6 +1347,21 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				saveGroupName();
 			end
 		end)
+
+		-- MARK: ButtonsFrame;
+		local buttonsFrame = editPanel.ButtonsFrame;
+		if modBranchConfigs.CurrentBranch.Name == "Dev" then
+			buttonsFrame.DebugButton.Visible = true;
+
+			buttonsFrame.DebugButton.MouseButton1Click:Connect(function()
+				Interface:PlayButtonClick();
+				local printTable = {};
+				for key, customPlan in pairs(customPlansCache) do
+					table.insert(printTable, `\n{key}="{tostring(customPlan)}"`);
+				end
+				Debugger:StudioWarn("CustomPlansCache", table.concat(printTable));
+			end)
+		end
 
 		-- MARK: Part Group Edit
 		local partLabelButton = partLabel:WaitForChild("Button");
@@ -1336,7 +1416,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 								
 								partData.Group = partData.PredefinedGroup;
 								
-								local customPlan = getCustomPlan(partData, GetCustomEnum.Part);
+								local customPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key);
 								customPlan:Apply(partData.Part);
 							end
 
@@ -1363,23 +1443,28 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				toggleVisibility(dropDownFrame);
 
 			elseif partLabelButton.Text == "⦿" then
-				Debugger:StudioWarn("Select group of part", activeGroupName);
-
-				local selectionPartData = {};
-
-				for a=1, #itemViewport.PartDataList do
-					if activeGroupName and itemViewport.PartDataList[a].Group == activeGroupName then
-						table.insert(selectionPartData, itemViewport.PartDataList[a]);
+				local partData = itemViewport.PartDataList[1];
+				if partData.Group then
+					local groupName = partData.Group;
+					Debugger:StudioWarn("Select group of part", groupName);
+	
+					local selectionPartData = {};
+	
+					for a=1, #itemViewport.PartDataList do
+						if groupName and itemViewport.PartDataList[a].Group == groupName then
+							table.insert(selectionPartData, itemViewport.PartDataList[a]);
+						end
 					end
+	
+					newSelection(selectionPartData, groupName);
 				end
-
-				newSelection(selectionPartData, activeGroupName);
 			end
 		end)
 
 
 		-- MARK: newSelection;
 		function newSelection(selectionPartData, selectGroupName)
+			activeGroupName = nil;
 			dropDownFrame.Visible = false;
 			if selectGroupTextChangeConn then selectGroupTextChangeConn:Disconnect(); selectGroupTextChangeConn=nil; end;
 
@@ -1401,13 +1486,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			selectTextbox.Text = "";
 			if #selectionPartData <= 0 then
 				editPanel.Visible = false;
-				activeGroupName = nil;
 				return; 
-			end
-
-			local groupName = selectGroupName or "[NewGroup]";
-			if selectGroupName then
-				activeGroupName = selectGroupName;
 			end
 
 			editPanel.Visible = true;
@@ -1418,8 +1497,14 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			end;
 			
 			if selectGroupName or #selectionPartData > 1 then
+				if selectGroupName then
+					activeGroupName = selectGroupName;
+					selectTextbox.Text = activeGroupName;
+				else
+					activeGroupName = "";
+					selectTextbox.Text = "[NewGroup]";
+				end
 
-				selectTextbox.Text = groupName;
 				selectTextbox.PlaceholderText = "";
 				infoLabel.Text = `<b>Currently Editing:</b> Group`; --    Layer: 0
 				partLabel.Text = `<font size="14"><b>Group Parts:</b></font> {table.concat(partNames, "  |  ")}`;
@@ -1428,7 +1513,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				partLabelButton.Text = "+";
 
 			else
-
 				local partData = selectionPartData[1];
 				selectTextbox.Text = "";
 				selectTextbox.PlaceholderText = partData.Key;
@@ -1436,13 +1520,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				partLabel.Text = `<font size="14"><b>Part Group:</b> {partData.Group or "None"}</font>`;
 				selectTextbox.TextEditable = false;
 
-				if partData.Group then
-					activeGroupName = partData.Group;
-				end
-
 				partLabelButton.Text = "⦿";
 				partLabelButton.Visible = partData.Group ~= nil;
 
+				canEdit = true;
 			end
 
 			for a=1, #selectionPartData do
@@ -1461,62 +1542,61 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 			do -- MARK: selection update
 				local partData = selectionPartData[1];
-				local customPlan = getCustomPlan(activeGroupName and {Group=activeGroupName;} or {Key=partData.Key});
+				local customPlan = getCustomPlan(activeGroupName and GetCustomPlanEnum.Group or GetCustomPlanEnum.Part, activeGroupName or partData.Key);
+				if activeGroupName == nil and customPlan == nil and partData.Group and getCustomPlan(GetCustomPlanEnum.Group, partData.Group) then
+					customPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key, true);
+				end
 
 				if customPlan then
-					local newColor = customPlan.Color;
-					if newColor then
-						local colorButton = editPanel.ColorFrame.Button;
-						colorButton.BackgroundColor3 = newColor;
-						colorButton.TextColor3 = modColorPicker.GetBackColor(newColor);
-						colorButton.Text = `#{newColor:ToHex()}`;
-					end
+					OnColorSelect(customPlan.Color);
+
 
 					local newSkin = customPlan.Skin;
 					local skinId, variantId = string.match(newSkin or "", "(.*)_(.*)");
 					local skinLib, skinVariantData = modItemSkinsLibrary:FindVariant(skinId, variantId)
-					
-					if skinId and skinVariantData then
-						if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
-							editPanel.SkinColorFrame.Button.Image = skinVariantData.Image;
-							OnSkinSelect(skinId, variantId);
+					OnSkinSelect(skinId, variantId);
+
+					-- if skinId and skinVariantData then
+					-- 	if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
+					-- 		editPanel.SkinColorFrame.Button.Image = skinVariantData.Image;
+					-- 		OnSkinSelect(skinId, variantId);
 							
-							local newPatternColor = customPlan.PatternData.Color;
-							if newPatternColor then
-								editPanel.SkinColorFrame.Button.BackgroundColor3 = modColorPicker.GetBackColor(newPatternColor);
-								editPanel.SkinColorFrame.Button.ImageColor3 = newPatternColor;
-								OnSelectTextureColor(newPatternColor);
-							end
+					-- 		local newPatternColor = customPlan.PatternData.Color;
+					-- 		if newPatternColor then
+					-- 			editPanel.SkinColorFrame.Button.BackgroundColor3 = modColorPicker.GetBackColor(newPatternColor);
+					-- 			editPanel.SkinColorFrame.Button.ImageColor3 = newPatternColor;
+					-- 			OnSelectTextureColor(newPatternColor);
+					-- 		end
 
-							local newPatternOffset = customPlan.PatternData.Offset or Vector2.zero;
-							textureOffsetXSlider:SetAttribute("Value", newPatternOffset.X);
-							textureOffsetYSlider:SetAttribute("Value", newPatternOffset.Y);
+					-- 		local newPatternOffset = customPlan.PatternData.Offset or Vector2.zero;
+					-- 		textureOffsetXSlider:SetAttribute("Value", newPatternOffset.X);
+					-- 		textureOffsetYSlider:SetAttribute("Value", newPatternOffset.Y);
 							
-							local newPatternScale = customPlan.PatternData.Scale or skinVariantData.DefaultScale or Vector2.one;
-							textureScaleXSlider:SetAttribute("Value", newPatternScale.X);
-							textureScaleYSlider:SetAttribute("Value", newPatternScale.Y);
+					-- 		local newPatternScale = customPlan.PatternData.Scale or skinVariantData.DefaultScale or Vector2.one;
+					-- 		textureScaleXSlider:SetAttribute("Value", newPatternScale.X);
+					-- 		textureScaleYSlider:SetAttribute("Value", newPatternScale.Y);
 
-							local newPatternAlpha = customPlan.PatternData.Transparency or 0;
-							transparencySlider:SetAttribute("Value", newPatternAlpha);
+					-- 		local newPatternAlpha = customPlan.PatternData.Transparency or 0;
+					-- 		transparencySlider:SetAttribute("Value", newPatternAlpha);
 
-						elseif skinLib.Type == modItemSkinsLibrary.SkinType.Texture then
-							editPanel.SkinColorFrame.Button.Image = skinVariantData.Icon;
-							editPanel.SkinFrame.Button.Image = skinVariantData.Icon;
-							editPanel.SkinFrame.Button.TextLabel.Text = `{skinLib.Name}`;
-							editPanel.SkinColorFrame.Button.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
-							editPanel.SkinColorFrame.Button.ImageColor3 = Color3.fromRGB(255, 255, 255);
+					-- 	elseif skinLib.Type == modItemSkinsLibrary.SkinType.Texture then
+					-- 		editPanel.SkinColorFrame.Button.Image = skinVariantData.Icon;
+					-- 		editPanel.SkinFrame.Button.Image = skinVariantData.Icon;
+					-- 		editPanel.SkinFrame.Button.TextLabel.Text = `{skinLib.Name}`;
+					-- 		editPanel.SkinColorFrame.Button.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
+					-- 		editPanel.SkinColorFrame.Button.ImageColor3 = Color3.fromRGB(255, 255, 255);
 	
-						end
-					else
-						editPanel.SkinColorFrame.Button.Image = "";
-						editPanel.SkinFrame.Button.Image = "";
-						editPanel.SkinFrame.Button.TextLabel.Text = `None`;
-						editPanel.SkinColorFrame.Button.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
-						editPanel.SkinColorFrame.Button.ImageColor3 = Color3.fromRGB(255, 255, 255);
+					-- 	end
+					-- else
+					-- 	editPanel.SkinColorFrame.Button.Image = "";
+					-- 	editPanel.SkinFrame.Button.Image = "";
+					-- 	editPanel.SkinFrame.Button.TextLabel.Text = `None`;
+					-- 	editPanel.SkinColorFrame.Button.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
+					-- 	editPanel.SkinColorFrame.Button.ImageColor3 = Color3.fromRGB(255, 255, 255);
 
-					end
-					editPanel.SkinColorFrame.Button.TextLabel.TextColor3 = modColorPicker.GetBackColor(editPanel.SkinColorFrame.Button.ImageColor3);
-					editPanel.SkinColorFrame.Button.TextLabel.Text = `#{editPanel.SkinColorFrame.Button.ImageColor3:ToHex()}`;
+					-- end
+					-- editPanel.SkinColorFrame.Button.TextLabel.TextColor3 = modColorPicker.GetBackColor(editPanel.SkinColorFrame.Button.ImageColor3);
+					-- editPanel.SkinColorFrame.Button.TextLabel.Text = `#{editPanel.SkinColorFrame.Button.ImageColor3:ToHex()}`;
 
 					local newTransparency = customPlan.Transparency;
 					if newTransparency then
@@ -1538,6 +1618,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					if newReflectance then
 						reflectanceSlider:SetAttribute("Value", newReflectance);
 					end
+					
 				end
 			end
 
@@ -1546,7 +1627,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				if not selectTextbox.TextEditable then return end;
 
 				local cap1 = string.gsub(selectTextbox.Text, "[%[%]]", "") or ""; --string.match(selectTextbox.Text, "%[(.*)%]")
-				groupName = string.gsub(cap1, "[^%a%d]*", "") or "NewGroup";
+				local groupName = string.gsub(cap1, "[^%a%d]*", "") or "NewGroup";
 				groupName = groupName:sub(1, 16);
 				
 				selectTextbox.Text = `[{groupName}]`;

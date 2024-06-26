@@ -94,19 +94,21 @@ function ItemViewport.new() : ItemViewport
 	setmetatable(self, ItemViewport);
 
 	local selectDelta = nil;
-	local inputStart = 0; 
+	local inputStart = nil;
+	
 	self.Garbage:Tag(UserInputService.InputBegan:Connect(function(inputObject) 
 		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
 
 		if modGuiObjectPlus.IsMouseOver(self.Frame) then
-			inputStart = 1;
+			inputStart = tick();
 			selectDelta = self.CurrentHighlightPart;
 		end
 	
 	end))
 	self.Garbage:Tag(UserInputService.InputEnded:Connect(function(inputObject) 
 		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
-		if inputStart ~= 1 then return end;
+		if inputStart == nil then return end;
+		if tick()-inputStart >= 0.1 then return end;
 
 		if modGuiObjectPlus.IsMouseOver(self.Frame) and self.CurrentHighlightPart == selectDelta then
 			if selectDelta == nil then
