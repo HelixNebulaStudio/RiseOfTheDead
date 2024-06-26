@@ -22,6 +22,7 @@ local modItemSkinWear = require(game.ReplicatedStorage.Library.ItemSkinWear);
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modColorsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ColorsLibrary"));
 local modSkinsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("SkinsLibrary"));
+local modItemSkinsLibrary = require(game.ReplicatedStorage.Library.ItemSkinsLibrary);
 
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
@@ -750,6 +751,12 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 			if permLib then
 				permType = "Clothing";
 
+			elseif modItemSkinsLibrary:Find(itemValues.ActiveSkin) then
+				permLib = modItemSkinsLibrary:Find(itemValues.ActiveSkin);
+				if permLib then
+					permType = "Tool";
+				end
+
 			else
 				permLib = modSkinsLibrary.Get(itemValues.ActiveSkin);
 				if permLib then
@@ -784,6 +791,11 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 						end
 					end
 
+				elseif modItemSkinsLibrary:Find(skinId) then
+					skinLib = modItemSkinsLibrary:Find(skinId);
+					if skinLib then
+						skinName = skinLib.Name;
+					end
 				else
 					skinLib = modSkinsLibrary.Get(skinId);
 					if skinLib then

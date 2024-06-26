@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local Workbench = {};
 local Interface;
 
-local player = game.Players.LocalPlayer;
+local localPlayer = game.Players.LocalPlayer;
 local UserInputService = game:GetService("UserInputService");
 
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
@@ -19,7 +19,7 @@ local modColorPicker = require(game.ReplicatedStorage.Library.UI.ColorPicker);
 
 local remoteCustomizationData = modRemotesManager:Get("CustomizationData") :: RemoteFunction;
 
-local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 
 local templateMainFrame = script.Parent:WaitForChild("CustomizationMain");
 local templateDropDownLabel = script.Parent:WaitForChild("DropDownLabel");
@@ -36,6 +36,7 @@ function Workbench.init(interface)
 end
 
 function Workbench.new(itemId, appearanceLib, storageItem)
+	local isDevBranch = modBranchConfigs.CurrentBranch.Name == "Dev";
 	if firstSync == false then
 		firstSync = true;
 
@@ -309,8 +310,9 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				unlockButton:SetAttribute("SkinId", skinId);
 				
 				unlockButton.AutoButtonColor = isUnlocked;
-				unlockButton.MouseButton1Click:Connect(function()
-					if not isUnlocked and skinId ~= "None" then return end;
+
+				local function setBaseSkinClicked(force)
+					if not isDevBranch and localPlayer.UserId ~= 16170943 then return end;
 					Interface:PlayButtonClick();
 
 					local rPacket = remoteCustomizationData:InvokeServer("setbaseskin", {
@@ -318,6 +320,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 						Siid=storageItem.ID;
 						SkinId=skinId;
 						Test="";
+						Force=force;
 					});
 
 					if rPacket.Success then
@@ -326,10 +329,19 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 						else
 							storageItem.Values.ActiveSkin = skinId;
 						end
+						if rPacket.UnlockedSkins then
+							storageItem.Values.Skins = rPacket.UnlockedSkins;
+						end
 
 						refreshSkinPerm();
 
 						itemViewport.ApplyCustomizationPlans(customPlansCache, baseCustomPlan);
+					end
+				end
+				unlockButton.MouseButton1Click:Connect(setBaseSkinClicked);
+				unlockButton.MouseButton2Click:Connect(function()
+					if isDevBranch or localPlayer.UserId == 16170943 then
+						setBaseSkinClicked(true);
 					end
 				end)
 
@@ -577,6 +589,17 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 							dropDownFrame.Visible = false;
 						end)
+
+						newColorOption.MouseButton2Click:Connect(function()
+							if not isDevBranch and localPlayer.UserId ~= 16170943 then return end;
+							Interface:PlayButtonClick();
+
+							if onSelectFunc then
+								onSelectFunc(colorInfo.Color);
+							end
+
+							dropDownFrame.Visible = false;
+						end)
 					end
 
 				end
@@ -803,7 +826,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		local function OnColorSelect(selectColor: Color3 | any)
 			colorButton.BackgroundColor3 = selectColor or Color3.fromRGB(150, 150, 150);
 			colorButton.TextColor3 = modColorPicker.GetBackColor(selectColor or Color3.fromRGB(150, 150, 150));
-			colorButton.Text = `#{(selectColor or Color3.fromRGB(150, 150, 150)):ToHex()}`;
 
 			if baseCustomPlan.BaseSkin then
 				local skinId, variantId = string.match(baseCustomPlan.BaseSkin or "", "(.*)_(.*)");
@@ -820,6 +842,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			else
 				colorButton.ImageLabel.Image = "";
 			end
+			colorButton.Text = colorButton.ImageLabel.Image == "" and `#{(selectColor or Color3.fromRGB(150, 150, 150)):ToHex()}` or "";
 
 			Debugger:StudioWarn("Set Color=", colorButton.Text);
 			updateCustomization(function(customPlan)
@@ -1350,7 +1373,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		-- MARK: ButtonsFrame;
 		local buttonsFrame = editPanel.ButtonsFrame;
-		if modBranchConfigs.CurrentBranch.Name == "Dev" then
+		if isDevBranch then
 			buttonsFrame.DebugButton.Visible = true;
 
 			buttonsFrame.DebugButton.MouseButton1Click:Connect(function()
@@ -1726,6 +1749,11 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		garbage:Tag(itemViewport.OnSelectionChanged:Connect(function()
 			newSelection();
 		end))
+		
+		function listMenu:OnMenuToggle()
+			if not self.Menu.Visible then return end
+			newSelection();
+		end
 
 		itemViewport.ApplyCustomizationPlans(customPlansCache);
     end

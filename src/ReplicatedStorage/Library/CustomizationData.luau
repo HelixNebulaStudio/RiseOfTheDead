@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService");
 
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modItemSkinsLibrary = require(game.ReplicatedStorage.Library.ItemSkinsLibrary);
+local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local modColorPicker = require(game.ReplicatedStorage.Library.UI.ColorPicker);
 local modLZ4 = require(game.ReplicatedStorage.Library.Util.LZ4);
@@ -146,6 +147,8 @@ if RunService:IsServer() then
 
         elseif action == "setbaseskin" then
             local packet = ...;
+            packet = packet or {};
+
             local workbenchPart = packet.WorkbenchPart;
 
             local siid = packet.Siid;
@@ -171,7 +174,17 @@ if RunService:IsServer() then
 					break;
 				end
 			end
-			
+
+            if packet.Force == true and (modBranchConfigs.CurrentBranch.Name == "Dev" or player.UserId == 16170943) then
+                if isUnlocked == false then
+                    table.insert(unlockedSkins, skinLib.Id);
+                    storageItem:SetValues("Skins", unlockedSkins);
+                    returnPacket.UnlockedSkins = unlockedSkins;
+
+                    isUnlocked = true;
+                end
+            end
+
 			if isUnlocked then
 				storageItem:SetValues("ActiveSkin", skinId);
 			end
@@ -248,38 +261,45 @@ function CustomizationPlan:Copy(customPlan, onlyReplaceNil)
 end
 
 function CustomizationPlan:Apply(obj: BasePart)
-    obj.Color = self.Color or obj.Color;
-    obj.Transparency = self.Transparency or obj.Transparency;
-    obj.Material = self.Material or obj.Material;
-    obj.Reflectance = self.Reflectance or obj.Reflectance;
+    obj.Color = self.Color or obj:GetAttribute("DefaultColor") or obj.Color;
+    obj.Transparency = self.Transparency or obj:GetAttribute("DefaultTransparency") or obj.Transparency;
+    obj.Material = self.Material or obj:GetAttribute("DefaultMaterial") or obj.Material;
+    obj.Reflectance = self.Reflectance or obj:GetAttribute("DefaultReflectance") or obj.Reflectance;
 
     local baseSkinTextures: {Texture} = {};
     local surfaceAppearance: SurfaceAppearance = nil;
 
     local textures: {Texture} = {};
 
-    for _, obj in pairs(obj:GetChildren()) do
-        if obj:GetAttribute("BaseSkin") then
-            if obj:IsA("Texture") and obj:GetAttribute("SkinId") then
-                baseSkinTextures[obj.Face] = obj;
+    for _, child in pairs(obj:GetChildren()) do
+        if child:GetAttribute("BaseSkin") then
+            if child:IsA("Texture") and child:GetAttribute("SkinId") then
+                baseSkinTextures[child.Face] = child;
 
-            elseif obj:IsA("SurfaceAppearance") and obj:GetAttribute("SkinId") then
-                surfaceAppearance = obj;
+            elseif child:IsA("SurfaceAppearance") and child:GetAttribute("SkinId") then
+                if surfaceAppearance == nil then
+                    surfaceAppearance = child;
+                else
+                    child:Destroy();
+                end
 
             end
             
-        elseif obj:IsA("Texture") and obj:GetAttribute("SkinId") then
-            textures[obj.Face] = obj;
+        elseif child:IsA("Texture") and child:GetAttribute("SkinId") then
+            textures[child.Face] = child;
 
         end
     end
 
     if obj:GetAttribute("BaseTexture") == nil and obj:GetAttribute("SkipPattern") == nil then
-        if self.BaseSkin and self.Color == nil then
+        local clearBaseSkin = false;
+
+        if self.BaseSkin then
             local skinId, variantId = string.match(self.BaseSkin, "(.*)_(.*)");
             local skinLib, variantLib = modItemSkinsLibrary:FindVariant(skinId, variantId);
-    
-            if skinLib then
+            local hasAlphaTexture = skinLib and skinLib.HasAlphaTexture;
+
+            if skinLib and (self.Color == nil or hasAlphaTexture) then
                 if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
                     for _, face in pairs(Enum.NormalId:GetEnumItems()) do
                         if baseSkinTextures[face] == nil then
@@ -300,6 +320,10 @@ function CustomizationPlan:Apply(obj: BasePart)
                         texture:Destroy();
                     end
                     table.clear(baseSkinTextures);
+                    if surfaceAppearance then
+                        surfaceAppearance:Destroy();
+                        surfaceAppearance = nil :: any;
+                    end
     
                     local templateSurfaceAppearance = modItemSkinsLibrary:GetSurfaceAppearance(skinId, variantId);
                     if templateSurfaceAppearance then
@@ -309,9 +333,14 @@ function CustomizationPlan:Apply(obj: BasePart)
                         surfaceAppearance.Parent = obj;
                     end
                 end
+            else
+                clearBaseSkin = true;
             end
-    
         else
+            clearBaseSkin = true;
+        end
+
+        if clearBaseSkin then
             for face, texture in pairs(baseSkinTextures) do
                 texture:Destroy();
             end

@@ -382,6 +382,16 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 				local predefinedGroup = basePart:GetAttribute("CustomizationGroup");
 				predefinedGroup = predefinedGroup and `[{predefinedGroup}]` or nil;
 
+				if displayModelData.Prefab and displayModelData.BasePrefab then
+					local defaultPartName = basePart.Name;
+					local defaultPart = displayModelData.BasePrefab:FindFirstChild(defaultPartName);
+					
+					basePart:SetAttribute("DefaultColor", defaultPart.Color);
+					basePart:SetAttribute("DefaultTransparency", defaultPart.Transparency);
+					basePart:SetAttribute("DefaultMaterial", defaultPart.Material);
+					basePart:SetAttribute("DefaultReflectance", defaultPart.Reflectance);
+				end
+
 				local newPartData = {
 					Key=prefix..basePart.Name;
 					Part=basePart;
