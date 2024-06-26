@@ -1579,48 +1579,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					local skinLib, skinVariantData = modItemSkinsLibrary:FindVariant(skinId, variantId)
 					OnSkinSelect(skinId, variantId);
 
-					-- if skinId and skinVariantData then
-					-- 	if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
-					-- 		editPanel.SkinColorFrame.Button.Image = skinVariantData.Image;
-					-- 		OnSkinSelect(skinId, variantId);
-							
-					-- 		local newPatternColor = customPlan.PatternData.Color;
-					-- 		if newPatternColor then
-					-- 			editPanel.SkinColorFrame.Button.BackgroundColor3 = modColorPicker.GetBackColor(newPatternColor);
-					-- 			editPanel.SkinColorFrame.Button.ImageColor3 = newPatternColor;
-					-- 			OnSelectTextureColor(newPatternColor);
-					-- 		end
-
-					-- 		local newPatternOffset = customPlan.PatternData.Offset or Vector2.zero;
-					-- 		textureOffsetXSlider:SetAttribute("Value", newPatternOffset.X);
-					-- 		textureOffsetYSlider:SetAttribute("Value", newPatternOffset.Y);
-							
-					-- 		local newPatternScale = customPlan.PatternData.Scale or skinVariantData.DefaultScale or Vector2.one;
-					-- 		textureScaleXSlider:SetAttribute("Value", newPatternScale.X);
-					-- 		textureScaleYSlider:SetAttribute("Value", newPatternScale.Y);
-
-					-- 		local newPatternAlpha = customPlan.PatternData.Transparency or 0;
-					-- 		transparencySlider:SetAttribute("Value", newPatternAlpha);
-
-					-- 	elseif skinLib.Type == modItemSkinsLibrary.SkinType.Texture then
-					-- 		editPanel.SkinColorFrame.Button.Image = skinVariantData.Icon;
-					-- 		editPanel.SkinFrame.Button.Image = skinVariantData.Icon;
-					-- 		editPanel.SkinFrame.Button.TextLabel.Text = `{skinLib.Name}`;
-					-- 		editPanel.SkinColorFrame.Button.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
-					-- 		editPanel.SkinColorFrame.Button.ImageColor3 = Color3.fromRGB(255, 255, 255);
-	
-					-- 	end
-					-- else
-					-- 	editPanel.SkinColorFrame.Button.Image = "";
-					-- 	editPanel.SkinFrame.Button.Image = "";
-					-- 	editPanel.SkinFrame.Button.TextLabel.Text = `None`;
-					-- 	editPanel.SkinColorFrame.Button.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
-					-- 	editPanel.SkinColorFrame.Button.ImageColor3 = Color3.fromRGB(255, 255, 255);
-
-					-- end
-					-- editPanel.SkinColorFrame.Button.TextLabel.TextColor3 = modColorPicker.GetBackColor(editPanel.SkinColorFrame.Button.ImageColor3);
-					-- editPanel.SkinColorFrame.Button.TextLabel.Text = `#{editPanel.SkinColorFrame.Button.ImageColor3:ToHex()}`;
-
 					local newTransparency = customPlan.Transparency;
 					if newTransparency then
 						transparencySlider:SetAttribute("Value", newTransparency);
@@ -1752,6 +1710,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		
 		function listMenu:OnMenuToggle()
 			if not self.Menu.Visible then return end
+			table.clear(itemViewport.SelectedHighlightParts);
 			newSelection();
 		end
 
