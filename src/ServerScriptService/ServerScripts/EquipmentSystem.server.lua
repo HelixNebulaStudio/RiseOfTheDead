@@ -104,7 +104,10 @@ local function OnPlayerAdded(player: Player)
 					cloneTool.Parent = character;
 					motor:SetAttribute("CanQuery", false);
 					modGearAttachments:AttachMotor(cloneTool, motor, attachment.Parent, 2);
-					modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
+					
+					if storageItem.Values.Colors or storageItem.Values.Textures or storageItem.Values.PartAlpha then
+						modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
+					end
 				end
 			end
 			profile.ToolsCache.Prefabs = prefabs;
@@ -408,7 +411,10 @@ local function equipTool(player, paramPacket)
 						Weld=toolGrip;
 						Prefab=cloneTool;
 					})
-					modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
+
+					if storageItem.Values.Colors or storageItem.Values.Textures or storageItem.Values.PartAlpha then
+						modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
+					end
 					
 				end
 

@@ -72,7 +72,7 @@ function Components.CreateSlider(mainInterface, paramPacket)
 		if valueType == "Percent" then
 			button.Text = math.round(percentVal*100).."%";
 		else
-			button.Text = currentVal;
+			button.Text = currentVal/rangeScale;
 		end
 	end
 	refreshSlider();
@@ -115,13 +115,14 @@ function Components.CreateSlider(mainInterface, paramPacket)
 	end)
 	
 	local function resetDefaultValues()
-		if button:GetAttribute("DisableSlider") == true then return end;
-		
 		currentVal = defaultVal;
 		refreshSlider();
 		setFunc(currentVal/rangeScale);
 	end
-	button.MouseButton2Click:Connect(resetDefaultValues);
+	button.MouseButton2Click:Connect(function()
+		if button:GetAttribute("DisableSlider") == true then return end;
+		resetDefaultValues();
+	end);
 	
 	typeInput.FocusLost:Connect(function(enterPressed, inputObject)
 		typeInput.Visible = false;
@@ -137,14 +138,17 @@ function Components.CreateSlider(mainInterface, paramPacket)
 		setFunc(currentVal/rangeScale);
 	end)
 
+	local resetCooldown = nil;
 	button:GetAttributeChangedSignal("Value"):Connect(function()
 		local valueSet = button:GetAttribute("Value");
 		if valueSet == nil then 
+			if resetCooldown and tick()-resetCooldown <= 0.2 then return end
 			resetDefaultValues();
 			return
 		end;
 		
 		local setVal = tonumber(valueSet);
+		resetCooldown = tick();
 		button:SetAttribute("Value", nil);
 		
 		if tonumber(setVal) then
@@ -155,6 +159,7 @@ function Components.CreateSlider(mainInterface, paramPacket)
 		refreshSlider();
 		setFunc(currentVal/rangeScale);
 	end)
+
 end
 
 function Components.CreateSliderType2(mainInterface, paramPacket)

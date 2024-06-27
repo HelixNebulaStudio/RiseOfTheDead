@@ -396,6 +396,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		If the color of <b>Part</b> is empty, the next color is blue.
 
 		Click Customization Layers to see edit breakdown based on the layers.
+
+	<b><font size="14">Notes:</font></b>
+		- Setting a color will replace cetain skin permanents that does not have a transparent background.
+		- Handle parts can not have a position offset.
 		]] 
 			or [[
 		 ]]
@@ -449,14 +453,14 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		guideButton.MouseButton1Click:Connect(function()
 			if currentPage == MenuPagesEnum.Guide then
-				updatePage();
+				updatePage(MenuPagesEnum.Main);
 				return;
 			end
 			updatePage(MenuPagesEnum.Guide);
 		end)
 		layersButton.MouseButton1Click:Connect(function()
-			if currentPage == MenuPagesEnum.Guide then
-				updatePage();
+			if currentPage == MenuPagesEnum.Layers then
+				updatePage(MenuPagesEnum.Main);
 				return;
 			end
 			updatePage(MenuPagesEnum.Layers);
@@ -498,20 +502,16 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				func(groupCustomPlan);
 				clean(groupCustomPlan);
 
-			else
-				if activePartSelection == nil then return end;
-	
-				for a=1, #activePartSelection do
-					local partData = activePartSelection[a];
-	
-					local customPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key, true);
-					if partData.Group then
-						customPlan.Group = string.gsub(partData.Group, "[%[%]]", "");
-					end
+			elseif activePartSelection and #activePartSelection >0 then
+				local partData = activePartSelection[1];
 
-					func(customPlan);
-					clean(customPlan);
+				local partCustomPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key, true);
+				if partData.Group then
+					partCustomPlan.Group = string.gsub(partData.Group, "[%[%]]", "");
 				end
+
+				func(partCustomPlan);
+				clean(partCustomPlan);
 
 			end
 
@@ -575,6 +575,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			end
 			
 			newDropDownList:Reset();
+			newDropDownList.Frame.NameTag.Text = "Select Color";
 			function newDropDownList:OnNewButton(index, optionButton: TextButton)
 				local selectionName = optionButton.Name;
 				if selectionName == "ColorPicker" then
@@ -750,6 +751,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			selctionStroke.Parent = nil;
 
 			newDropDownList:Reset();
+			newDropDownList.Frame.NameTag.Text = "Select Skin";
 			function newDropDownList:OnNewButton(index, optionButton: TextButton)
 				local selectionName = optionButton.Name;
 				if selectionName:sub(#selectionName-4, #selectionName) == "Label" then
@@ -1336,6 +1338,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			end
 			
 			newDropDownList:Reset();
+			newDropDownList.Frame.NameTag.Text = "Select Material";
 			function newDropDownList:OnOptionSelect(index, optionButton)
 				Debugger:StudioWarn("index", index, "optionButton", optionButton);
 
@@ -1482,7 +1485,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				Interface:PlayButtonClick();
 				local printTable = {};
 				for key, customPlan in pairs(customPlansCache) do
-					table.insert(printTable, `\n{key}="{tostring(customPlan)}"`);
+					table.insert(printTable, `\n{key}="{tostring(customPlan)}" {customPlan:IsEdited() and "--edited" or ""}`);
 				end
 				Debugger:StudioWarn("CustomPlansCache", table.concat(printTable));
 			end)
@@ -1497,6 +1500,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			if partLabelButton.Text == "+" then
 				Debugger:StudioWarn("Add part to group", activeGroupName);
 
+				newDropDownList.Frame.NameTag.Text = "Edit Group";
 				function newDropDownList:OnOptionLoad(index, isLast, optionButton)
 					if isLast then
 						local newLabel = templateDropDownLabel:Clone();
@@ -1672,11 +1676,14 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 			do -- MARK: selection update
 				local partData = selectionPartData[1];
-				local customPlan = getCustomPlan(activeGroupName and GetCustomPlanEnum.Group or GetCustomPlanEnum.Part, activeGroupName or partData.Key);
-				if activeGroupName == nil and customPlan == nil and partData.Group and getCustomPlan(GetCustomPlanEnum.Group, partData.Group) then
-					customPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key, true);
+				local customPlan;
+				
+				if activeGroupName then
+					customPlan = getCustomPlan(GetCustomPlanEnum.Group, activeGroupName);
+				else
+					customPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key);
 				end
-
+				
 				if customPlan then
 					OnColorSelect(customPlan.Color);
 
@@ -1755,6 +1762,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 	
 			newDropDownList:Reset();
 
+			newDropDownList.Frame.NameTag.Text = "Select Layer";
 			local editedLayers = 0;
 			function newDropDownList:OnOptionLoad(index, isLast, optionButton)
 				local selectionName = optionButton.Name;
@@ -1866,7 +1874,40 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		garbage:Tag(function()
 			itemViewport.HightlightSelect = false;
 
-			Debugger:StudioWarn("Submit save");
+			Debugger:StudioWarn("Save customizations");
+			local partDataGroups = {};
+			local modifiedCustomPlans = {};
+
+			modifiedCustomPlans["[All]"]=customPlansCache["[All]"];
+
+			for a=1, #itemViewport.PartDataList do
+				local partData = itemViewport.PartDataList[a];
+
+				local groupCustomPlan = customPlansCache[partData.Group];
+				if groupCustomPlan and groupCustomPlan:IsEdited() then
+					modifiedCustomPlans[partData.Group] = groupCustomPlan;
+				end
+
+				local partCustomPlan = customPlansCache[partData.Key];
+				if partCustomPlan and partCustomPlan:IsEdited() then
+					modifiedCustomPlans[partData.Key] = partCustomPlan;
+				end
+
+				if partData.Group ~= partData.PredefinedGroup then
+					if partDataGroups[partData.Group] == nil then
+						partDataGroups[partData.Group] = {};
+					end
+					table.insert(partDataGroups[partData.Group], partData.Key);
+				end
+			end
+
+			local rPacket = remoteCustomizationData:InvokeServer("savecustomizations", {
+				Siid=storageItem.ID;
+				CustomPlans=modifiedCustomPlans;
+				PartGroups=partDataGroups;
+			});
+
+
 		end)
 
 	end

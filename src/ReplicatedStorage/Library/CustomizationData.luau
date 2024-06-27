@@ -190,6 +190,20 @@ if RunService:IsServer() then
 			end
 
             returnPacket.Success=true;
+        
+        elseif action == "savecustomizations" then
+            local packet = ...;
+            packet = packet or {};
+
+            local workbenchPart = packet.WorkbenchPart;
+
+            local siid = packet.Siid;
+
+		    local storageItem, _ = shared.modStorage.FindIdFromStorages(siid, player);
+            if storageItem == nil then return end;
+
+            print(packet);
+            
         end
 
         return returnPacket;
@@ -232,6 +246,8 @@ function CustomizationData.newCustomizationPlan(rawLz4)
         };
         Material=nil;
         Reflectance=nil;
+
+        -- can't be copied
         PositionOffset=nil;
     };
 
@@ -270,6 +286,7 @@ function CustomizationPlan:IsEdited()
     if self.PatternData.Transparency then return true end;
     if self.Material then return true end;
     if self.Reflectance then return true end;
+    if self.PositionOffset then return true end;
 
     return false;
 end
@@ -287,6 +304,7 @@ function CustomizationData.ApplyCustomPlans(customPlans, partDataList)
 
         if partPlan then
             finalCustomPlan:Copy(partPlan, true);
+            finalCustomPlan.PositionOffset = partPlan.PositionOffset;
         end
         if groupPlan then
             finalCustomPlan:Copy(groupPlan, true);
@@ -295,6 +313,7 @@ function CustomizationData.ApplyCustomPlans(customPlans, partDataList)
             finalCustomPlan:Copy(baseCustomPlan, true);
             finalCustomPlan.BaseSkin = baseCustomPlan.BaseSkin;
         end
+        
 
         finalCustomPlan:Apply(partData.Part);
     end
