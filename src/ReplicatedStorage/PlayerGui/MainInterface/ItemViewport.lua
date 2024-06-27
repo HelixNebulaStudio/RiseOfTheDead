@@ -108,7 +108,7 @@ function ItemViewport.new() : ItemViewport
 	self.Garbage:Tag(UserInputService.InputEnded:Connect(function(inputObject) 
 		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
 		if inputStart == nil then return end;
-		if tick()-inputStart >= 0.1 then return end;
+		if tick()-inputStart >= 0.2 then return end;
 
 		if modGuiObjectPlus.IsMouseOver(self.Frame) and self.CurrentHighlightPart == selectDelta then
 			if selectDelta == nil then
@@ -404,28 +404,6 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 			end
 		end
 		table.sort(self.PartDataList, function(a, b) return a.Key > b.Key; end);
-
-		function self.ApplyCustomizationPlans(customPlans, baseCustomPlan)
-			for a=1, #self.PartDataList do
-				local partData = self.PartDataList[a];
-
-				if customPlans == nil then
-					baseCustomPlan:Apply(partData.Part);
-					continue;
-				end
-
-				if customPlans[partData.Key] then
-					customPlans[partData.Key]:Apply(partData.Part);
-
-				elseif customPlans[partData.Group] then
-					customPlans[partData.Group]:Apply(partData.Part);
-
-				elseif baseCustomPlan then
-					baseCustomPlan:Apply(partData.Part);
-					
-				end
-			end
-		end
 
 	else
 		local prefab = itemPrefabs:FindFirstChild(itemId) and itemPrefabs[itemId]:Clone() or nil;

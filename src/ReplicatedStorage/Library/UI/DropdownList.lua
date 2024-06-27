@@ -93,7 +93,17 @@ function DropdownList:LoadOptions(list)
 				self:OnOptionSelect(a, new);
 			end
 		end)
+
+		if self.OnOptionLoad then
+			self:OnOptionLoad(a, a == #list, new);
+		end
 	end
+end
+
+function DropdownList:Reset()
+	self.OnNewButton = nil;
+	self.OnOptionSelect = nil;
+	self.OnOptionLoad = nil;
 end
 
 return DropdownList;

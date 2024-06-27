@@ -139,7 +139,10 @@ function Components.CreateSlider(mainInterface, paramPacket)
 
 	button:GetAttributeChangedSignal("Value"):Connect(function()
 		local valueSet = button:GetAttribute("Value");
-		if valueSet == nil then return end;
+		if valueSet == nil then 
+			resetDefaultValues();
+			return
+		end;
 		
 		local setVal = tonumber(valueSet);
 		button:SetAttribute("Value", nil);

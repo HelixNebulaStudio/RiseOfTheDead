@@ -42,6 +42,7 @@ function ColorPicker.new(mainInterface)
 	local self = {};
 	function self.SelectFunc() end;
 	function self:OnColorSelect(color: Color3, colorId: string?, colorLabel: ImageLabel?) end;
+	function self:OnForceColorSelect(color: Color3, colorId: string?, colorLabel: ImageLabel?) end;
 
 	self.HighlightLoop = false;
 
@@ -74,6 +75,9 @@ function ColorPicker.new(mainInterface)
 			new.ImageColor3 = colorLabel.ImageColor3;
 			new.MouseButton1Click:Connect(function()
 				self:OnColorSelect(colorLabel.ImageColor3, colorLabel.Name, colorLabel);
+			end)
+			new.MouseButton2Click:Connect(function()
+				self:OnForceColorSelect(colorLabel.ImageColor3, colorLabel.Name, colorLabel);
 			end)
 
 			new.Parent = lastColorsFrame;
@@ -132,7 +136,7 @@ function ColorPicker.new(mainInterface)
 		self.HighlightLoop = false;
 	end)
 
-	contentFrame.MouseButton1Click:Connect(function()
+	local function onLastColorClick(force)
 		local selectLabel = self.SelectFunc();
 		if selectLabel then
 			while #ColorPicker.LastColors >= 12 do
@@ -151,8 +155,19 @@ function ColorPicker.new(mainInterface)
 				table.insert(ColorPicker.LastColors, selectLabel);
 			end
 
-			self:OnColorSelect(selectLabel.ImageColor3, selectLabel.Name, selectLabel);
+			if force == true then
+				self:OnForceColorSelect(selectLabel.ImageColor3, selectLabel.Name, selectLabel);
+			else
+				self:OnColorSelect(selectLabel.ImageColor3, selectLabel.Name, selectLabel);
+			end
 		end
+	end
+	
+	contentFrame.MouseButton1Click:Connect(function()
+		onLastColorClick();
+	end)
+	contentFrame.MouseButton2Click:Connect(function()
+		onLastColorClick(true);
 	end)
 
 	setmetatable(self, ColorPicker);

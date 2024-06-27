@@ -87,6 +87,8 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		Group=2;
 	}
 	local baseCustomPlan = modCustomizationData.newCustomizationPlan();
+	customPlansCache["[All]"] = baseCustomPlan;
+
 	local function getCustomPlan(planType, planKey, newIfNil)
 		local customPlan = customPlansCache[planKey];
 
@@ -105,7 +107,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			customPlansCache[planKey] = customPlan;
 		end
 
-		return customPlan or baseCustomPlan;
+		return customPlan;
 	end
 	
 
@@ -120,7 +122,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					Debugger:StudioWarn("rPacket.FailMsg", rPacket.FailMsg); 
 				end
 				
-				itemViewport.ApplyCustomizationPlans(nil, baseCustomPlan);
+				modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
 				return; 
 			end;
 	
@@ -131,7 +133,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				customPlansCache[planId].BaseSkin = baseSkin;
 			end
 
-			itemViewport.ApplyCustomizationPlans(customPlansCache);
+			modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
 		end)
 	end
 	
@@ -215,12 +217,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		local saveGroupNameButton = mainFrame:WaitForChild("SaveButton") :: TextButton;
 		local selectDropButton = mainFrame:WaitForChild("SelectDropButton") :: TextButton;
 
-		local hintLabel: TextLabel = mainFrame:WaitForChild("HintLabel");
 		local baseSkinFrame: Frame = mainFrame:WaitForChild("BaseSkins");
-
-		baseSkinFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-			hintLabel.Position = UDim2.new(0, 0, 0, baseSkinFrame.Position.Y.Offset + baseSkinFrame.AbsoluteSize.Y + 10);
-		end)
 
 		local function getUnlockedSkins()
 			local unlockedSkins = {};
@@ -335,7 +332,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 						refreshSkinPerm();
 
-						itemViewport.ApplyCustomizationPlans(customPlansCache, baseCustomPlan);
+						modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
 					end
 				end
 				unlockButton.MouseButton1Click:Connect(setBaseSkinClicked);
@@ -378,10 +375,92 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			refreshSkinPerm();
 		end
 
+		local hintLabel: TextLabel = mainFrame:WaitForChild("HintLabel");
+		hintLabel.Text = not UserInputService.TouchEnabled and UserInputService.MouseEnabled and [[<b><font size="16">Customization Menu Guide</font></b>
 
+	<b><font size="14">Edit:</font></b>
+		- Click on the part on screen to select.
+		- Shift + click to select multiple.
+		- Use drop down menu to select parts by name / group.
+		- Right click configuration options(e.g. Color, Skin, ..) to reset.
+		- Right click a layer to delete layer or reset layer from the drop down menu.
+
+	<b><font size="14">Layers:</font></b>
+		Customizations are based on layers. A edit will overwrite the other based on it's layer. Layers are ordered by:
+
+		- [All]		: Color = White
+		- [Group]	: Color = Blue
+		- Part		: Color = Green
+
+		In this configuration, the final layer is Part with the color green, which will be the final color of the part.
+		If the color of <b>Part</b> is empty, the next color is blue.
+
+		Click Customization Layers to see edit breakdown based on the layers.
+		]] 
+			or [[
+		 ]]
+
+		local guideButton = mainFrame:WaitForChild("GuideButton") :: TextButton;
+		local layersButton = mainFrame:WaitForChild("LayersButton") :: TextButton;
 		local editPanel = mainFrame:WaitForChild("EditPanel") :: Frame;
 		local infoLabel: TextLabel = editPanel:WaitForChild("InfoLabel");
 		local partLabel: TextLabel = editPanel:WaitForChild("PartList");
+
+		local MenuPagesEnum = {
+			Main=1;
+			Edit=2;
+			Guide=3;
+			Layers=4;
+		}
+		local currentPage = MenuPagesEnum.Main;
+		local function updatePage(setPage)
+			if setPage then
+				currentPage = setPage;
+			end
+
+			if currentPage == MenuPagesEnum.Edit then
+				hintLabel.Visible = false;
+				baseSkinFrame.Visible = false;
+				editPanel.Visible = true;
+				selectTextbox.Visible = true;
+				guideButton.Visible = false;
+				layersButton.Visible = false;
+
+			elseif currentPage == MenuPagesEnum.Guide then
+				hintLabel.Visible = true;
+				baseSkinFrame.Visible = false;
+				selectTextbox.Visible = false;
+
+			elseif currentPage == MenuPagesEnum.Layers then
+				hintLabel.Visible = false;
+				baseSkinFrame.Visible = false;
+				selectTextbox.Visible = false;
+
+			else
+				hintLabel.Visible = false;
+				baseSkinFrame.Visible = true;
+				editPanel.Visible = false;
+				selectTextbox.Visible = false;
+				guideButton.Visible = true;
+				layersButton.Visible = true;
+
+			end
+		end
+
+		guideButton.MouseButton1Click:Connect(function()
+			if currentPage == MenuPagesEnum.Guide then
+				updatePage();
+				return;
+			end
+			updatePage(MenuPagesEnum.Guide);
+		end)
+		layersButton.MouseButton1Click:Connect(function()
+			if currentPage == MenuPagesEnum.Guide then
+				updatePage();
+				return;
+			end
+			updatePage(MenuPagesEnum.Layers);
+		end)
 
 		-- MARK: function declarations;
 		local newSelection;
@@ -390,16 +469,34 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		-- MARK: UpdateCustomizations;
 		local function updateCustomization(func)
 			
-			if activeGroupName then
-				for a=1, #itemViewport.PartDataList do
-					local partData = itemViewport.PartDataList[a];
-					if activeGroupName ~= "[All]" and partData.Group ~= activeGroupName then continue end;
-					
-					local customPlan = getCustomPlan(GetCustomPlanEnum.Group, activeGroupName, true);
-					func(customPlan);
-
-					customPlan:Apply(partData.Part);
+			local function clean(customPlan)
+				-- if customPlan.Transparency == 0 then
+				-- 	customPlan.Transparency = nil;
+				-- end
+				
+				if customPlan.PatternData.Offset == Vector2.zero then
+					customPlan.PatternData.Offset = nil;
 				end
+				if customPlan.PatternData.Scale == Vector2.zero then
+					customPlan.PatternData.Scale = nil;
+				end
+				if customPlan.PatternData.Transparency == 0 then
+					customPlan.PatternData.Transparency = nil;
+				end
+
+				if customPlan.PositionOffset == Vector3.zero then
+					customPlan.PositionOffset = nil;
+				end
+
+				if customPlan.Reflectance == 0 then
+					customPlan.Reflectance = nil;
+				end
+			end
+
+			if activeGroupName then
+				local groupCustomPlan = getCustomPlan(GetCustomPlanEnum.Group, activeGroupName, true);
+				func(groupCustomPlan);
+				clean(groupCustomPlan);
 
 			else
 				if activePartSelection == nil then return end;
@@ -408,20 +505,17 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					local partData = activePartSelection[a];
 	
 					local customPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key, true);
-
 					if partData.Group then
-						local groupCustomPlan = getCustomPlan(GetCustomPlanEnum.Group, partData.Group);
-						if groupCustomPlan then
-							customPlan:Copy(groupCustomPlan, true);
-						end
+						customPlan.Group = string.gsub(partData.Group, "[%[%]]", "");
 					end
 
 					func(customPlan);
-
-					customPlan:Apply(partData.Part);
+					clean(customPlan);
 				end
 
 			end
+
+			modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
 		end
 
 
@@ -480,7 +574,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				table.insert(colorGroupOptionsList, colorPacksList[a]);
 			end
 			
-
+			newDropDownList:Reset();
 			function newDropDownList:OnNewButton(index, optionButton: TextButton)
 				local selectionName = optionButton.Name;
 				if selectionName == "ColorPicker" then
@@ -505,6 +599,17 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 						dropDownFrame.Visible = false;
 					end
+					function colorPickerObj:OnForceColorSelect(selectColor, colorName, colorLabel)
+						if not isDevBranch and localPlayer.UserId ~= 16170943 then return end;
+
+						Interface:PlayButtonClick();
+						if onSelectFunc then
+							onSelectFunc(selectColor, true);
+						end
+
+						dropDownFrame.Visible = false;
+					end
+
 					colorFrame.Visible = true;
 
 				elseif selectionName:sub(#selectionName-4, #selectionName) == "Label" then
@@ -644,6 +749,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			selctionStroke.Thickness = 4;
 			selctionStroke.Parent = nil;
 
+			newDropDownList:Reset();
 			function newDropDownList:OnNewButton(index, optionButton: TextButton)
 				local selectionName = optionButton.Name;
 				if selectionName:sub(#selectionName-4, #selectionName) == "Label" then
@@ -823,7 +929,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		
 		-- MARK: Part Color;
 		local colorButton = editPanel.ColorFrame.Button;
-		local function OnColorSelect(selectColor: Color3 | any)
+		local function OnColorSelect(selectColor: Color3 | any, force)
 			colorButton.BackgroundColor3 = selectColor or Color3.fromRGB(150, 150, 150);
 			colorButton.TextColor3 = modColorPicker.GetBackColor(selectColor or Color3.fromRGB(150, 150, 150));
 
@@ -848,7 +954,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			updateCustomization(function(customPlan)
 				customPlan.Color = selectColor;
 			end)
-			
 		end
 		colorButton.MouseButton1Click:Connect(function()
 			if colorButton.Darken.Visible then return end;
@@ -878,7 +983,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		transparencySlider.Parent = editPanel.TransparencyFrame;
 		templateDarkenFrame:Clone().Parent = transparencySlider;
 
-		local function onTransparencySet(v)
+		local function OnTransparencySet(v)
 			Debugger:StudioWarn("Set Transparency=", v);
 			updateCustomization(function(customPlan)
 				customPlan.Transparency = v;
@@ -889,8 +994,8 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		modComponents.CreateSlider(Interface, {
 			Button=transparencySlider;
 			RangeInfo={Min=0; Max=100; Scale=100; Default=0; ValueType="Flat";};
-			SetFunc=onTransparencySet;
-			DisplayValueFunc=onTransparencySet;
+			SetFunc=OnTransparencySet;
+			DisplayValueFunc=OnTransparencySet;
 		});
 
 
@@ -1217,7 +1322,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				customPlan.Material = mat;
 			end)
 
-			materialButton.Text = materialName;
+			materialButton.Text = materialName or "None";
 		end
 
 		materialButton.MouseButton1Click:Connect(function()
@@ -1230,6 +1335,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				table.insert(materialOptionList, matName.Name);
 			end
 			
+			newDropDownList:Reset();
 			function newDropDownList:OnOptionSelect(index, optionButton)
 				Debugger:StudioWarn("index", index, "optionButton", optionButton);
 
@@ -1243,10 +1349,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		end)
 			
-		editPanel:GetPropertyChangedSignal("Visible"):Connect(function()
-			hintLabel.Visible = not editPanel.Visible;
-			baseSkinFrame.Visible = not editPanel.Visible;
-		end)
 
 		local selectGroupTextChangeConn;
 		garbage:Tag(function()
@@ -1391,8 +1493,23 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		partLabelButton.MouseButton1Click:Connect(function()
 			Interface:PlayButtonClick();
 
+			newDropDownList:Reset();
 			if partLabelButton.Text == "+" then
 				Debugger:StudioWarn("Add part to group", activeGroupName);
+
+				function newDropDownList:OnOptionLoad(index, isLast, optionButton)
+					if isLast then
+						local newLabel = templateDropDownLabel:Clone();
+						newLabel.TextLabel.Text = "Remove";
+						newLabel.LayoutOrder = 0;
+						newLabel.Parent = newDropDownList.ScrollFrame;
+						
+						local newLabel2 = templateDropDownLabel:Clone();
+						newLabel2.TextLabel.Text = "Add";
+						newLabel2.LayoutOrder = #groupPartList;
+						newLabel2.Parent = newDropDownList.ScrollFrame;
+					end
+				end
 
 				function newDropDownList:OnNewButton(index, optionButton: TextButton)
 					local selectionName = optionButton.Name;
@@ -1440,7 +1557,11 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 								partData.Group = partData.PredefinedGroup;
 								
 								local customPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key);
-								customPlan:Apply(partData.Part);
+								if customPlan then
+									customPlan:Apply(partData.Part);
+								else
+									baseCustomPlan:Apply(partData.Part);
+								end
 							end
 
 						else
@@ -1466,7 +1587,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				toggleVisibility(dropDownFrame);
 
 			elseif partLabelButton.Text == "⦿" then
-				local partData = itemViewport.PartDataList[1];
+				local partData = activePartSelection[1];
 				if partData.Group then
 					local groupName = partData.Group;
 					Debugger:StudioWarn("Select group of part", groupName);
@@ -1508,11 +1629,11 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 			selectTextbox.Text = "";
 			if #selectionPartData <= 0 then
-				editPanel.Visible = false;
+				updatePage(MenuPagesEnum.Main);
 				return; 
 			end
 
-			editPanel.Visible = true;
+			updatePage(MenuPagesEnum.Edit);
 
 			local partNames = {};
 			for a=1, #selectionPartData do
@@ -1549,20 +1670,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				canEdit = true;
 			end
 
-			for a=1, #selectionPartData do
-				local partData = selectionPartData[a];
-
-				if partData.DisplayModelData and partData.DisplayModelData.Prefab then
-					local defaultPartName = string.gsub(partData.Key, partData.DisplayModelData.Prefix, "");
-					local defaultPart = partData.DisplayModelData.BasePrefab:FindFirstChild(defaultPartName);
-					partData.Part:SetAttribute("DefaultColor", defaultPart.Color);
-					partData.Part:SetAttribute("DefaultTransparency", defaultPart.Transparency);
-					partData.Part:SetAttribute("DefaultMaterial", defaultPart.Material);
-					partData.Part:SetAttribute("DefaultReflectance", defaultPart.Reflectance);
-				end
-			end
-
-
 			do -- MARK: selection update
 				local partData = selectionPartData[1];
 				local customPlan = getCustomPlan(activeGroupName and GetCustomPlanEnum.Group or GetCustomPlanEnum.Part, activeGroupName or partData.Key);
@@ -1573,33 +1680,33 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				if customPlan then
 					OnColorSelect(customPlan.Color);
 
-
 					local newSkin = customPlan.Skin;
 					local skinId, variantId = string.match(newSkin or "", "(.*)_(.*)");
-					local skinLib, skinVariantData = modItemSkinsLibrary:FindVariant(skinId, variantId)
 					OnSkinSelect(skinId, variantId);
 
 					local newTransparency = customPlan.Transparency;
-					if newTransparency then
-						transparencySlider:SetAttribute("Value", newTransparency);
-					end
+					transparencySlider:SetAttribute("Value", newTransparency);
 
 					local newPartOffset = customPlan.PositionOffset or Vector3.zero;
 					partOffsetXSlider:SetAttribute("Value", newPartOffset.X);
 					partOffsetYSlider:SetAttribute("Value", newPartOffset.Y);
 					partOffsetZSlider:SetAttribute("Value", newPartOffset.Z);
 
-					local newMaterial = customPlan.Material;
-					if newMaterial then
-						local materialButton = editPanel.MaterialFrame.Button;
-						materialButton.Text = newMaterial.Name;
-					end
+					OnMaterialSelect(customPlan.Material);
 
-					local newReflectance = customPlan.Reflectance;
-					if newReflectance then
-						reflectanceSlider:SetAttribute("Value", newReflectance);
-					end
-					
+					reflectanceSlider:SetAttribute("Value", customPlan.Reflectance);
+
+				else
+
+					OnColorSelect();
+					OnSkinSelect();
+					transparencySlider:SetAttribute("Value", nil);
+					partOffsetXSlider:SetAttribute("Value", nil);
+					partOffsetYSlider:SetAttribute("Value", nil);
+					partOffsetZSlider:SetAttribute("Value", nil);
+					OnMaterialSelect(nil);
+					reflectanceSlider:SetAttribute("Value", nil);
+
 				end
 			end
 
@@ -1635,6 +1742,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		dropDownFrame:GetPropertyChangedSignal("Visible"):Connect(function()
 			if dropDownFrame.Visible == false then
 				toggleVisibility();
+
+				if currentPage == MenuPagesEnum.Guide then
+					updatePage();
+				end
 			end
 		end);
 	
@@ -1642,13 +1753,38 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		selectDropButton.MouseButton1Click:Connect(function()
 			Interface:PlayButtonClick();
 	
+			newDropDownList:Reset();
+
+			local editedLayers = 0;
+			function newDropDownList:OnOptionLoad(index, isLast, optionButton)
+				local selectionName = optionButton.Name;
+
+				local customPlan = customPlansCache[selectionName];
+				if customPlan and customPlan:IsEdited() then
+					editedLayers = editedLayers +1;
+				end
+
+				if isLast then
+					if editedLayers > 0 then
+						local newLabel = templateDropDownLabel:Clone();
+						newLabel.TextLabel.Text = "Modified";
+						newLabel.LayoutOrder = 0;
+						newLabel.Parent = newDropDownList.ScrollFrame;
+					end
+					
+					local newLabel2 = templateDropDownLabel:Clone();
+					newLabel2.TextLabel.Text = "Default";
+					newLabel2.LayoutOrder = #groupPartList;
+					newLabel2.Parent = newDropDownList.ScrollFrame;
+				end
+			end
+
 			function newDropDownList:OnNewButton(index, optionButton)
 				local selectionName = optionButton.Name;
 				local selectGroupName = selectionName:sub(1,1) == "[" and selectionName or nil;
 
 				local customPlan = customPlansCache[selectionName];
-				if customPlan then
-
+				if customPlan and customPlan:IsEdited() then
 					if selectGroupName then
 						local groupCount = 0;
 						
@@ -1665,10 +1801,13 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 						if customPlan.Group then
 							optionButton.Text = optionButton.Text..` [{customPlan.Group}]`;
 						else
-							optionButton.Text = optionButton.Text..`*`;
+							optionButton.Text = optionButton.Text;
 						end
 
 					end
+
+				else
+					optionButton.LayoutOrder = optionButton.LayoutOrder + 200;
 
 				end
 
@@ -1691,7 +1830,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					elseif selectGroupName and partData.Group == selectionName then
 						table.insert(selectionPartData, partData);
 
-					elseif partData.Name == selectionName then
+					elseif partData.Key == selectionName then
 						table.insert(selectionPartData, partData);
 
 					end
@@ -1714,7 +1853,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			newSelection();
 		end
 
-		itemViewport.ApplyCustomizationPlans(customPlansCache);
+		modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
     end
 	
 	function listMenu:OnVisiblityChanged()
@@ -1726,6 +1865,8 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		itemViewport.HightlightSelect = true;
 		garbage:Tag(function()
 			itemViewport.HightlightSelect = false;
+
+			Debugger:StudioWarn("Submit save");
 		end)
 
 	end

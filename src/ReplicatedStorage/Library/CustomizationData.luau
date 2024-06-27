@@ -260,6 +260,46 @@ function CustomizationPlan:Copy(customPlan, onlyReplaceNil)
     self.Reflectance = onlyReplaceNil and self.Reflectance or customPlan.Reflectance;
 end
 
+function CustomizationPlan:IsEdited()
+    if self.Color then return true end;
+    if self.Skin then return true end;
+    if self.Transparency then return true end;
+    if self.PatternData.Color then return true end;
+    if self.PatternData.Offset then return true end;
+    if self.PatternData.Scale then return true end;
+    if self.PatternData.Transparency then return true end;
+    if self.Material then return true end;
+    if self.Reflectance then return true end;
+
+    return false;
+end
+
+function CustomizationData.ApplyCustomPlans(customPlans, partDataList)
+    local baseCustomPlan = customPlans["[All]"];
+
+    for a=1, #partDataList do
+        local partData = partDataList[a];
+
+        local groupPlan = customPlans[partData.Group];
+        local partPlan = customPlans[partData.Key];
+
+        local finalCustomPlan = CustomizationData.newCustomizationPlan();
+
+        if partPlan then
+            finalCustomPlan:Copy(partPlan, true);
+        end
+        if groupPlan then
+            finalCustomPlan:Copy(groupPlan, true);
+        end
+        if baseCustomPlan then
+            finalCustomPlan:Copy(baseCustomPlan, true);
+            finalCustomPlan.BaseSkin = baseCustomPlan.BaseSkin;
+        end
+
+        finalCustomPlan:Apply(partData.Part);
+    end
+end
+
 function CustomizationPlan:Apply(obj: BasePart)
     obj.Color = self.Color or obj:GetAttribute("DefaultColor") or obj.Color;
     obj.Transparency = self.Transparency or obj:GetAttribute("DefaultTransparency") or obj.Transparency;
