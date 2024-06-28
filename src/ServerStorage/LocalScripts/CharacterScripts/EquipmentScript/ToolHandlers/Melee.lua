@@ -406,6 +406,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 			attackTime = math.max(attackTime, 0.1);
 			nextAttackTick = tick()+attackTime;
 			task.wait(attackTime);
+			if unequiped then return end;
 			
 			characterProperties.Joints.WaistY = configurations.WaistRotation;
 			
