@@ -713,7 +713,11 @@ return function(self) : NpcModule
 				self.WaterBodyVelocity.Parent = self.RootPart;
 
 				while self.IsSwimming and self.IsDead ~= true and tick()-lastInWaterTick <= 1 do
-					self.WaterBodyVelocity.Velocity = Vector3.new(0, self.Humanoid.WalkToPoint.Y > 0 and self.Humanoid.WalkSpeed or -self.Humanoid.WalkSpeed, 0);
+					if self.Target then
+						self.WaterBodyVelocity.Velocity = Vector3.new(0, self.Humanoid.WalkToPoint.Y > 0 and self.Humanoid.WalkSpeed or -self.Humanoid.WalkSpeed, 0);
+					else
+						self.WaterBodyVelocity.Velocity = Vector3.new(0, self.Humanoid.WalkSpeed, 0);
+					end
 
 					task.wait(1);
 				end

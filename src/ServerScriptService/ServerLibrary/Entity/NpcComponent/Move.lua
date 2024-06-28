@@ -104,6 +104,7 @@ function Move:MoveTo(target: Vector3 | BasePart)
 	self.MoveId = self.MoveId + 1;
 	local moveId = self.MoveId;
 	self.IsMoving = true;
+	self.Npc.Humanoid:SetAttribute("IsMoving", self.IsMoving);
 	
 	self.Npc:SetNetworkOwner();
 	self.Npc:SendActorMessage("Move", {
@@ -124,6 +125,7 @@ function Move:Follow(target: Vector3 | BasePart, maxFollowDist: number, minFollo
 	
 	self.MoveId = self.MoveId + 1;
 	self.IsMoving = true;
+	self.Npc.Humanoid:SetAttribute("IsMoving", self.IsMoving);
 	
 	self.Npc:SetNetworkOwner();
 	self.Npc:SendActorMessage("Move", {
@@ -238,6 +240,7 @@ function Move.new(self)
 	}
 	
 	moveObject.IsMoving = false;
+	self.Npc.Humanoid:SetAttribute("IsMoving", self.IsMoving);
 	moveObject.Status = "idle";
 
 	moveObject.MoveId = 0;
@@ -273,6 +276,7 @@ function Move.new(self)
 		if action == "moveToEnded" then
 			moveObject.IsMoving = false;
 			moveObject.MoveToEnded:Fire(...);
+			self.Npc.Humanoid:SetAttribute("IsMoving", self.IsMoving);
 
 		elseif action == "updateStatus" then
 			moveObject.Status = ...;
