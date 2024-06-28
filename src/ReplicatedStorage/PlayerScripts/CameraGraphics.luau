@@ -419,6 +419,11 @@ function CameraClass:Init()
 		if tick()-lastInteractableScan < 2 then return end;
 		lastInteractableScan = tick();
 		
+		local disableSmallShadows = modData:GetSetting("DisableSmallShadows") == 1;
+		local disableObjMat = modData:GetSetting("ObjMats") == 1;
+
+		if disableSmallShadows == false and disableObjMat == false then return end;
+
 		local cameraPos = camera.CFrame.Position;
 		local hitList = workspace:GetPartBoundsInBox(cameraPos, 64, overlapParam);
 		
@@ -426,10 +431,10 @@ function CameraClass:Init()
 			local object = hitList[a] :: BasePart;
 
 			local isSmallObj = object.Size.X <= 5 and object.Size.Y <= 5 and object.Size.Z <= 5;
-			if modData:GetSetting("DisableSmallShadows") == 1 and isSmallObj and object.CastShadow then
+			if disableSmallShadows and isSmallObj and object.CastShadow then
 				object.CastShadow = false;
 			end
-			if modData:GetSetting("ObjMats") == 1 then
+			if disableObjMatthen
 				object.Material = Enum.Material.SmoothPlastic;
 			end
 		end
