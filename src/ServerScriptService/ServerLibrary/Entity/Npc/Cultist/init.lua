@@ -82,8 +82,11 @@ return function(npc, spawnPoint)
 		if self == nil then return false end;
 		if self.IsDead or self.Humanoid.RootPart == nil then return false end;
 		
-		self.Wield.Targetable.Humanoid = 1;
 		self.Wield.Targetable.Zombie = 1;
+
+		if self.HoodSpawn and tick()+55 > self.HoodSpawn then
+			self.Wield.Targetable.Humanoid = 1;
+		end
 
 		if self.CutsceneMode then
 			wait(0.1);
