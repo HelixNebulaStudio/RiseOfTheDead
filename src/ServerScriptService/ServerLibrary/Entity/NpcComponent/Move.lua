@@ -240,7 +240,7 @@ function Move.new(self)
 	}
 	
 	moveObject.IsMoving = false;
-	self.Npc.Humanoid:SetAttribute("IsMoving", self.IsMoving);
+	moveObject.Npc.Humanoid:SetAttribute("IsMoving", self.IsMoving);
 	moveObject.Status = "idle";
 
 	moveObject.MoveId = 0;
@@ -276,7 +276,7 @@ function Move.new(self)
 		if action == "moveToEnded" then
 			moveObject.IsMoving = false;
 			moveObject.MoveToEnded:Fire(...);
-			self.Npc.Humanoid:SetAttribute("IsMoving", self.IsMoving);
+			moveObject.Npc.Humanoid:SetAttribute("IsMoving", self.IsMoving);
 
 		elseif action == "updateStatus" then
 			moveObject.Status = ...;

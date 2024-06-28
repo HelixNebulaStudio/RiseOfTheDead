@@ -703,6 +703,7 @@ return function(self) : NpcModule
 
 			if self.IsSwimming then return end;
 			self.IsSwimming = true;
+			self.Humanoid:SetAttribute("IsSwimming", self.IsSwimming);
 
 			task.spawn(function()
 				if self.WaterBodyVelocity == nil then
@@ -713,15 +714,12 @@ return function(self) : NpcModule
 				self.WaterBodyVelocity.Parent = self.RootPart;
 
 				while self.IsSwimming and self.IsDead ~= true and tick()-lastInWaterTick <= 1 do
-					if self.Target then
-						self.WaterBodyVelocity.Velocity = Vector3.new(0, self.Humanoid.WalkToPoint.Y > 0 and self.Humanoid.WalkSpeed or -self.Humanoid.WalkSpeed, 0);
-					else
-						self.WaterBodyVelocity.Velocity = Vector3.new(0, self.Humanoid.WalkSpeed, 0);
-					end
+					self.WaterBodyVelocity.Velocity = Vector3.new(0, self.Humanoid.WalkSpeed, 0);
 
 					task.wait(1);
 				end
 				self.IsSwimming = false;
+				self.Humanoid:SetAttribute("IsSwimming", self.IsSwimming);
 
 				if self.WaterBodyVelocity then 
 					game.Debris:AddItem(self.WaterBodyVelocity, 0);

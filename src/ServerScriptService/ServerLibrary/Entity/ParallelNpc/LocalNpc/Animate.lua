@@ -80,7 +80,12 @@ function Animate.new(parallelNpc)
 		self.AnimationController:LoadAnimation("Climbing", climbingAnims:GetChildren());
 		self.AnimationController:SetAnimationMeta("Climbing", climbingAnims, self);
 	end
-	
+
+	local swimmingAnims = getAnimationsFolder("Swimming");
+	if swimmingAnims then
+		self.AnimationController:LoadAnimation("Swimming", swimmingAnims:GetChildren());
+		self.AnimationController:SetAnimationMeta("Swimming", swimmingAnims, self);
+	end
 	
 	local function movementUpdate(speed)
 		speed = speed or 0;
@@ -92,7 +97,7 @@ function Animate.new(parallelNpc)
 				self.AnimationController.MovementState = "Walking";
 			end
 			if self.IsSwimming then
-				self.AnimationController.MovementState = "SwimIdle";
+				self.AnimationController.MovementState = "Swimming";
 			end
 			if self.IsClimbing then
 				self.AnimationController.MovementState = "Climbing";
@@ -109,7 +114,7 @@ function Animate.new(parallelNpc)
 		elseif self.AnimationController.MovementState == "Walking" then
 			self.AnimationController:Play(self.AnimationController.MovementState);
 
-		elseif self.AnimationController.MovementState == "SwimIdle" then
+		elseif self.AnimationController.MovementState == "Swimming" then
 			self.AnimationController:Play(self.AnimationController.MovementState);
 			
 		elseif self.AnimationController.MovementState == "Climbing" then
@@ -121,7 +126,7 @@ function Animate.new(parallelNpc)
 			game.Debris:AddItem(Debugger:HudPrint(self.RootPart.Position, math.round(speed)), 1);
 		end
 
-		local categories = {"Running"; "Walking"; "SwimIdle"; "Climbing"};
+		local categories = {"Running"; "Walking"; "Swimming"; "Climbing"};
 		for a=1, #categories do
 			if categories[a] == self.AnimationController.MovementState then continue end;
 
@@ -162,15 +167,15 @@ function Animate.new(parallelNpc)
 		
 		if newState == Enum.HumanoidStateType.Running then
 			self.IsClimbing = false;
-			self.IsSwimming = false;
+			--self.IsSwimming = false;
 
 		elseif newState == Enum.HumanoidStateType.Climbing then
 			self.IsClimbing = true;
-			self.IsSwimming = false;
+			--self.IsSwimming = false;
 
 		elseif newState == Enum.HumanoidStateType.Swimming then
 			self.IsClimbing = false;
-			self.IsSwimming = true;
+			--self.IsSwimming = true;
 			
 		elseif newState == Enum.HumanoidStateType.PlatformStanding then
 			self.IsClimbing = false;
@@ -225,6 +230,10 @@ function Animate.new(parallelNpc)
 		task.wait();
 		--Debugger:Warn("Play death");
 		self.AnimationController:Play("Death");
+	end)
+
+	humanoid:GetAttributeChangedSignal("IsSwimming"):Connect(function()
+		self.IsSwimming = humanoid:GetAttribute("IsSwimming") == true;
 	end)
 
 	local aggroAnimFolder = getAnimationsFolder("Aggro", true);
