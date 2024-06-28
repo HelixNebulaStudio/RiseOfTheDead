@@ -11,12 +11,13 @@ return function(safehouseId, hitPart)
 	fireCooldown = tick();
 	
 	local model = hitPart.Parent;
+	if model == nil then return end;
 	if not model:IsA("Model") then return end;
 	
 	local damagable = modDamagable.NewDamagable(model);
 	if damagable then
 		local npcStatus = damagable.Object;
-		if npcStatus.ClassName == "NpcStatus" and npcStatus.NpcModule and npcStatus.NpcModule.Humanoid.Health > 0 then
+		if npcStatus.ClassName == "NpcStatus" and npcStatus.NpcModule and npcStatus.NpcModule.Humanoid.Name == "Zombie" and npcStatus.NpcModule.Humanoid.Health > 0 then
 			local humans = CollectionService:GetTagged("Humans");
 			
 			for a=1, #humans do

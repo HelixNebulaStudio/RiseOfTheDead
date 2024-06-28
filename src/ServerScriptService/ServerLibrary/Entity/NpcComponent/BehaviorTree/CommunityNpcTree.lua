@@ -27,7 +27,11 @@ return function(self)
 	    SleepSequence={"And"; "IsSleepTime"; "WalkToSleep"; "Sleep";};
 	}
 	
-	local cache = {};
+	local cache = {
+		RoamIdleTimer=nil;
+		HuntIndex=nil;
+		NpcToTalkTo=nil;
+	};
 	cache.InSafehome = false;
 	cache.SafehomeRoamIndex = 1;
 	cache.OutsideRoamIndex = 1;
@@ -220,7 +224,7 @@ return function(self)
 					self.Movement:Face(enemyHumanoid.RootPart.Position);
 					self.Wield.PrimaryFireRequest();
 					
-					cache.HuntTimer = tick() + wait(math.random(8,12)/10);
+					cache.HuntTimer = tick() + (math.random(8,12)/10);
 				else
 					if #self.Enemies > 1 then
 						updateTarget();

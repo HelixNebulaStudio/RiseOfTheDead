@@ -9,6 +9,9 @@ return function(player, damageSource, finalDamage)
     local classPlayer = shared.modPlayers.Get(player);
 
     local dealer = damageSource.Dealer;
+    if dealer == nil then
+        return;
+    end
     
     local dealerPlayer = game.Players:GetPlayerFromCharacter(dealer);
     if dealerPlayer then -- isPlayer
