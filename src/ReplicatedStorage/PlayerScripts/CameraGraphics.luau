@@ -434,7 +434,7 @@ function CameraClass:Init()
 			if disableSmallShadows and isSmallObj and object.CastShadow then
 				object.CastShadow = false;
 			end
-			if disableObjMatthen
+			if disableObjMat then
 				object.Material = Enum.Material.SmoothPlastic;
 			end
 		end
