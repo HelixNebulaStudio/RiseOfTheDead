@@ -707,11 +707,60 @@ end
 -- !outline: signal humanoid.Touched
 humanoid.Touched:Connect(modData.TouchInteract)
 
+local overlapInteractParam = OverlapParams.new();
+overlapInteractParam.FilterDescendantsInstances = {workspace.Interactables};
+overlapInteractParam.FilterType = Enum.RaycastFilterType.Include;
+overlapInteractParam.MaxParts = 25;
+
+
+local function handleInteractable(basePart)
+	local rootBase = basePart;
+
+	local interactModule = rootBase:FindFirstChild("Interactable");
+	while interactModule == nil do
+		rootBase = rootBase.Parent;
+		interactModule = rootBase:FindFirstChild("Interactable");
+
+		if workspace.Interactables:IsAncestorOf(rootBase) == false then break; end
+		if rootBase.Parent == workspace then break; end
+		if interactModule then break; end;
+	end
+
+	if interactModule == nil or not interactModule:IsA("ModuleScript") then return end;
+
+	local interactData = require(interactModule);
+	if interactData == nil or interactData.Trigger == nil then return end;
+
+	local dataMeta = getmetatable(interactData);
+	dataMeta.CharacterModule = modCharacter;
+	dataMeta.Humanoid = modCharacter.Humanoid;
+	dataMeta.RootPart = modCharacter.RootPart;
+
+	interactData.Script = interactModule;
+	if rootBase:IsA("Model") then
+		interactData.Object = rootBase.PrimaryPart;
+	else
+		interactData.Object = rootBase;
+	end
+	
+	interactData:Trigger();
+end
+
 -- !outline: signal modSyncTime.GetClock().ValueChanged
 modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 	if not canInteract() then return end;
 	
 	if characterProperties.ActiveInteract ~= nil and (characterProperties.ActiveInteract.Distance or math.huge) <= (characterProperties.ActiveInteract.InteractableRange or interactionRange) then
 		characterProperties.ActiveInteract:Trigger();
+	end
+
+	local hitList = workspace:GetPartBoundsInRadius(camera.CFrame.Position, 64, overlapInteractParam);
+		
+	for a=1, #hitList do
+		local object = hitList[a] :: BasePart;
+
+		task.spawn(function()
+			handleInteractable(object);
+		end)
 	end
 end)

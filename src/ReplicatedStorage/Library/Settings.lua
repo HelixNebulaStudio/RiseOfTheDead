@@ -608,14 +608,23 @@ baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 	};
 });
 baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
-	TitleProperties={Text="Show Far Details";};
-	DescProperties={Text="Disabling hides small models far away from the camera to improve performance. <b>Unstable, may or may not improve performance.</b>";};
+	TitleProperties={Text="Small Shadows";};
+	DescProperties={Text="Shadows of objects smaller than 5x5x5. <b>Enabling requires rejoining.</b>";};
 	Config={
-		SettingsKey="HideFarSmallObjects";
+		SettingsKey="DisableSmallShadows";
 		Type="Toggle";
 		RefreshGraphics=true;
 	};
 });
+-- baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
+-- 	TitleProperties={Text="Show Far Details";};
+-- 	DescProperties={Text="Disabling hides small models far away from the camera to improve performance. <b>Unstable, may or may not improve performance.</b>";};
+-- 	Config={
+-- 		SettingsKey="HideFarSmallObjects";
+-- 		Type="Toggle";
+-- 		RefreshGraphics=true;
+-- 	};
+-- });
 baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 	TitleProperties={Text="Extra Detail";};
 	DescProperties={Text="Disabling will delete decorative props and assets from the world. <b>Enabling requires rejoining.</b>";};
@@ -630,15 +639,6 @@ baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 	DescProperties={Text="Cast shadows from the sun.";};
 	Config={
 		SettingsKey="GlobalShadows";
-		Type="Toggle";
-		RefreshGraphics=true;
-	};
-});
-baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
-	TitleProperties={Text="Small Shadows";};
-	DescProperties={Text="Shadows of objects smaller than 5x5x5. <b>Enabling requires rejoining.</b>";};
-	Config={
-		SettingsKey="DisableSmallShadows";
 		Type="Toggle";
 		RefreshGraphics=true;
 	};

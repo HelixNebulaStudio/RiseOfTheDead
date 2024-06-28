@@ -406,188 +406,34 @@ function CameraClass:Init()
 		
 		modTextureAnimations.Update();
 	end
-	
-	--== MARK: Graphics Chunks
-	local graphicsChunks = modVoxelSpace.new();
-	
+
+
+	--== MARK: Graphical Chunks
 	local overlapParam = OverlapParams.new();
-	overlapParam.FilterDescendantsInstances = {workspace.Environment; workspace.Interactables};
+	overlapParam.FilterDescendantsInstances = {workspace.Environment;};
 	overlapParam.FilterType = Enum.RaycastFilterType.Include;
-	overlapParam.MaxParts = 128;
-	
-	local voxelSize = 64;
-	
-	local function handleInteractable(basePart: BasePart)
-		local rootBase = basePart;
-		local interactModule = rootBase:FindFirstChild("Interactable");
-		while interactModule == nil do
-			rootBase = rootBase.Parent;
-			interactModule = rootBase:FindFirstChild("Interactable");
-			if workspace.Interactables:IsAncestorOf(rootBase) == false then
-				return;
-			end
-			if interactModule then break; end;
-		end
-		if interactModule == nil or not interactModule:IsA("ModuleScript") then return end;
-		local modCharacter = modData:GetModCharacter();
-		if modCharacter == nil then return end;
+	overlapParam.MaxParts = 64;
 
-		local interactData = require(interactModule);
-		if interactData and interactData.Trigger then
-			
-			local dataMeta = getmetatable(interactData);
-			dataMeta.CharacterModule = modCharacter;
-			dataMeta.Humanoid = modCharacter.Humanoid;
-			dataMeta.RootPart = modCharacter.RootPart;
-
-			interactData.Script = interactModule;
-			if rootBase:IsA("Model") then
-				interactData.Object = rootBase.PrimaryPart;
-			else
-				interactData.Object = rootBase;
-			end
-			
-			if interactData.FirstTrigger == nil then
-				interactData.FirstTrigger = tick();
-				interactData:Trigger();
-			end
-		end
-	end
-
-	local lastScan = tick();
+	local lastInteractableScan = tick();
 	RunService.Heartbeat:Connect(function()
-		if tick()-lastScan < 5 then return end;
-		lastScan = tick();
+		if tick()-lastInteractableScan < 2 then return end;
+		lastInteractableScan = tick();
 		
-		local hitList = workspace:GetPartBoundsInRadius(camera.CFrame.Position, 64, overlapParam);
+		local cameraPos = camera.CFrame.Position;
+		local hitList = workspace:GetPartBoundsInBox(cameraPos, 64, overlapParam);
 		
 		for a=1, #hitList do
-			local object = hitList[a];
-			
-			if workspace.Interactables:IsAncestorOf(object) and localplayer.Character then
-				task.spawn(function()
-					handleInteractable(object);
-				end)
-				continue;
-			end
-			
+			local object = hitList[a] :: BasePart;
+
 			local isSmallObj = object.Size.X <= 5 and object.Size.Y <= 5 and object.Size.Z <= 5;
-			if modData:GetSetting("DisableSmallShadows") == 1 and isSmallObj then
+			if modData:GetSetting("DisableSmallShadows") == 1 and isSmallObj and object.CastShadow then
 				object.CastShadow = false;
 			end
 			if modData:GetSetting("ObjMats") == 1 then
 				object.Material = Enum.Material.SmoothPlastic;
 			end
-			
-			if modData:GetSetting("HideFarSmallObjects") ~= 1 or object.Anchored ~= true then continue end;
-			
-			local isDynamicPlatform = false;
-			local parCheck = object.Parent;
-			while workspace:IsAncestorOf(parCheck) do
-				if parCheck:GetAttribute("DynamicPlatform") == true then
-					isDynamicPlatform = true;
-					break;
-				else
-					parCheck = parCheck.Parent;
-				end
-			end
-			if isDynamicPlatform then continue end;
-			
-			--== Small Model;
-			local smallObject = nil;
-			
-			for a=1, 5 do
-				local parentModel = smallObject or object.Parent;
-				if parentModel:IsA("Model") then
-					local parentSize = parentModel:GetExtentsSize();
-					if parentSize.X <= 5 and parentSize.Y <= 5 and parentSize.Z <= 5 then
-						smallObject = parentModel;
-					else
-						break;
-					end
-				else
-					break;
-				end
-				if smallObject == nil then
-					break;
-				end
-			end
-			
-			
-			local objectPos = smallObject and smallObject:GetPivot().Position or object.Position;
-			if smallObject == nil then
-				smallObject = object;
-
-				if object.Size.X > 5 or object.Size.Y > 5 or object.Size.Z > 5 then
-					continue
-				end
-			end
-			
-			local voxelPos = modVoxelSpace:GetVoxelPosition(objectPos/voxelSize);
-			local voxelPoint = graphicsChunks:GetOrDefault(voxelPos, {Groups={};});
-
-			local chunkObject = voxelPoint.Value;
-			local _groupsList = chunkObject.Groups;
-			
-			if chunkObject.Groups[smallObject] == nil then
-				chunkObject.Groups[smallObject] = {};
-				
-				smallObject.Destroying:Connect(function()
-					chunkObject.Groups[smallObject] = nil;
-				end)
-			end
-			local chunkObjGroup = chunkObject.Groups[smallObject];
-			chunkObjGroup.Parent = smallObject.Parent;
 		end
 	end)
-	
-	
-	local lastUpdateChunks = tick();
-	RunService.Heartbeat:Connect(function()
-		if tick()-lastUpdateChunks < 1 then return end;
-		lastUpdateChunks = tick();
-
-		if modData:GetSetting("HideFarSmallObjects") ~= 1 then return end;
-
-		local camVoxelPos = modVoxelSpace:GetVoxelPosition(camera.CFrame.Position/voxelSize);
-		
-		local regionPoints = graphicsChunks:GetVoxelPointsInRadius(camVoxelPos, 3);
-		for a=1, #regionPoints do
-			local voxelPoint = regionPoints[a];
-			
-			local chunkObject = voxelPoint and voxelPoint.Value or nil;
-			if chunkObject then
-				local voxelCost = graphicsChunks:GetCost(voxelPoint, {Position=camVoxelPos;})
-				local inRange = voxelCost <= 15;
-				
-				if inRange then
-					-- Show chunk;
-					for smallObject, prefabData in pairs(chunkObject.Groups) do
-						if prefabData == nil then continue end;
-
-						if RunService:IsStudio() then
-							smallObject.Parent = prefabData.Parent;
-
-						else
-							pcall(function() 
-								smallObject.Parent = prefabData.Parent;
-							end)
-
-						end
-					end
-
-				else
-					for smallObject, prefabData in pairs(chunkObject.Groups) do
-						if prefabData == nil then continue end;
-
-						smallObject.Parent = nil;
-						Debugger:StudioWarn("Hide small instance (", smallObject,")");
-					end
-
-				end
-			end
-		end
-	end);
 
 end
 
