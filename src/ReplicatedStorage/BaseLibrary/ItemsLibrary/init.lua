@@ -843,8 +843,8 @@ function ItemsLibrary:Init(super)
 	new(crateBase, {Id="xmaspresent2022"; Name="Christmas Present 2022"; Icon="rbxassetid://11787305747"; Tags={"Christmas"; "Frostivus"}; TradingTax=0; Description="Merry Christmas, open it and see what you get!";});
 	new(skinPermBase, {Id="santahatwinterfest"; Icon="rbxassetid://11812491624"; SkinPerm="Frostivus"; TargetItemId="santahat"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="mercskneepadswinterfest"; Icon="rbxassetid://11812666419"; SkinPerm="Frostivus"; TargetItemId="mercskneepads"; Tags={"Christmas"; "Frostivus";};});
-	new(skinPermBase, {Id="xmassweatergreen"; Icon="rbxassetid://11863066782"; SkinPerm="Xmas Sweater"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
-	new(skinPermBase, {Id="xmassweateryellow"; Icon="rbxassetid://11863078091"; SkinPerm="Xmas Sweater"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
+	new(skinPermBase, {Id="xmassweatergreen"; Icon="rbxassetid://11863066782"; SkinPerm="Green & Red"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
+	new(skinPermBase, {Id="xmassweateryellow"; Icon="rbxassetid://11863078091"; SkinPerm="Yellow & Blue"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
 	
 	-- Christmas 2023
 	new(crateBase, {Id="xmaspresent2023"; Name="Christmas Present 2023"; Icon="rbxassetid://15565768345"; Tags={"Christmas"; "Frostivus"}; TradingTax=0; Description="Merry Christmas 2023!\n\n<i>\"I hope you're having a great holiday, I know RotD is lacking updates this winter and because of having to deal with a lot of irl things, there won't be a full winterfest update.\n\nI hope you'll enjoy this end of the year gift of a random cosmetic!\n~Khronos\"</i>\n\nOpen it and see what you get!";});

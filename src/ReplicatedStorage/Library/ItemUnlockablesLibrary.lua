@@ -272,7 +272,7 @@ library:Add{
 library:Add{
 	Id="xmassweatergreen";
 	ItemId="xmassweater";
-	Name="Green Red";
+	Name="Green & Red";
 	Textures={
 		["LLA"]="rbxassetid://6538903022";
 		["LT"]="rbxassetid://6538903022";
@@ -286,7 +286,7 @@ library:Add{
 library:Add{
 	Id="xmassweateryellow";
 	ItemId="xmassweater";
-	Name="Yellow Blue";
+	Name="Yellow & Blue";
 	Textures={
 		["LLA"]="rbxassetid://6538911498";
 		["LT"]="rbxassetid://6538911498";
