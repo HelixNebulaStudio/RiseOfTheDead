@@ -1172,7 +1172,7 @@ remoteTradeRequest.OnServerEvent:Connect(function(player, requestType, ...)
 		end
 
 		if targetProfile.TradeBan >= 1 then
-			shared.Notify(player, "The person you want to trade with is trade banned.", "Negative");
+			shared.Notify(player, "The person you want to trade with is unable to trade.", "Negative");
 			return;
 		end
 		
