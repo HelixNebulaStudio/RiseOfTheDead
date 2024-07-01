@@ -58,6 +58,8 @@ return function(CutsceneSequence)
 		local profile = shared.modProfile:Get(hostPlayer);
 		local factionTag = tostring(profile.Faction.Tag);
 		
+		Debugger:Warn("Load cutscene", hostPlayer);
+
 		local coopMission = modCoopMission:Get(factionTag, missionId);
 		if coopMission ~= nil then
 			-- coopMission exist;
@@ -197,7 +199,7 @@ return function(CutsceneSequence)
 									spawnCFrame = CFrame.new(dropRayPos);
 								end
 								
-								if classPlayer and classPlayer.SafeCFrame then
+								if classPlayer and classPlayer.SafeCFrame and spawnCFrame == nil then
 									local dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(Ray.new(classPlayer.SafeCFrame.Position, Vector3.new(0, -32, 0)), {workspace.Environment; workspace.Terrain}, true);
 									spawnCFrame = CFrame.new(dropRayPos);
 								end

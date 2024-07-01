@@ -2493,7 +2493,7 @@ MissionLibrary.New{
 MissionLibrary.New{
 	MissionId=73;
 	MissionType = MissionLibrary.MissionTypes.Faction;
-	ExpireTime=factionMissionExpireTime;
+	ExpireTime = factionMissionExpireTime;
 	Name="Deadly Zeniths Strike";
 	From="Faction";
 	Description="A zenith boss is approaching your faction headquarters. Call up faction members to take down the boss together.";

@@ -558,7 +558,8 @@ function Handler:FireWeapon(direction)
 					self:ToggleIdle(false);
 				end
 				
-				if model.Handle == nil or model.Handle:GetRootPart() == nil or model.Handle:GetRootPart().Name ~= "HumanoidRootPart" then
+				local handleRoot = model.Handle and model.Handle:GetRootPart() or nil;
+				if model.Handle == nil or model.Handle:GetRootPart() == nil or (self.Npc.Prefab:IsAncestorOf(handleRoot) and handleRoot.Name ~= "HumanoidRootPart") then
 					self.Wield.AllowShooting = false;
 					return;
 				end

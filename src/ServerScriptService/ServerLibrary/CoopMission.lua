@@ -63,10 +63,11 @@ function CoopMission:Fail(reasonStr)
 end
 
 function CoopMission:AddPlayer(player)
-	if table.find(self.Players, player) == nil then
-		table.insert(self.Players, player);
-		self.OnPlayerAdded:Fire(player);
-	end
+	if table.find(self.Players, player) then return end;
+	
+	table.insert(self.Players, player);
+	self.OnPlayerAdded:Fire(player);
+	
 end
 
 function CoopMission:ForEachPlayer(func)
