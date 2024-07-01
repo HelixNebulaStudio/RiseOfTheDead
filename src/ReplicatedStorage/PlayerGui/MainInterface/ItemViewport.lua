@@ -111,7 +111,6 @@ function ItemViewport.new() : ItemViewport
 					table.insert(self.SelectedHighlightParts, self.CurrentHighlightPart);
 				end
 			end
-			Debugger:StudioWarn("self.SelectedHighlightParts",self.SelectedHighlightParts);
 			self.OnSelectionChanged:Fire(self.SelectedHighlightParts, selectDelta);
 		end
 
@@ -270,6 +269,7 @@ function ItemViewport:RefreshDisplay()
 		
 		end
 	end)
+
 end
 
 function ItemViewport:SetDisplay(storageItem, yieldFunc)
@@ -301,7 +301,7 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 			end
 			
 			if accessoryData then
-				modCustomizeAppearance.ClientAddAccessory(characterModel, accessoryData, clothingLib.GroupName);
+				modCustomizeAppearance.ClientAddAccessory(characterModel, accessoryData, clothingLib.GroupName, storageItem);
 			else
 				Debugger:Warn("Could not load accessory:",clothingLib.Name);
 			end
@@ -312,6 +312,8 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 			if yieldFunc then
 				yieldFunc(self);
 			end
+
+			modCustomizeAppearance.RefreshIndex(characterModel);
 		end)
 		
 	elseif itemDisplayLib then
@@ -358,6 +360,7 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 		end
 	end
 	self:RefreshDisplay();
+
 end
 
 function ItemViewport:Clear()
