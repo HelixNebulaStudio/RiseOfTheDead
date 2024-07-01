@@ -104,9 +104,21 @@ function CustomizeAppearance.AttachAccessory(character, accessoryPrefab, accesso
 		
 	    local handle = accessory:FindFirstChild("Handle");
 	    if handle then
-	        local accessoryAttachment = handle:FindFirstChildOfClass("Attachment");
+
+	        local accessoryAttachment, characterAttachment;
+
+			for _, obj in pairs(handle:GetChildren()) do
+				if not obj:IsA("Attachment") then continue end;
+
+				local bodyAtt = findFirstMatchingAttachment(character, obj.Name);
+				if bodyAtt then
+					accessoryAttachment = obj;
+					characterAttachment = bodyAtt;
+					break;
+				end
+			end
+
 	        if accessoryAttachment then
-	            local characterAttachment = findFirstMatchingAttachment(character, accessoryAttachment.Name);
 	            if characterAttachment then
 					local originalSize = handle:FindFirstChild("OriginalSize");
 					if originalSize then handle.Size = originalSize.Value; end
@@ -384,12 +396,12 @@ function CustomizeAppearance.AddAccessory(character, accessoryName, accessoryGro
 	end
 end
 
-function CustomizeAppearance.ClientAddAccessory(character, accessoryData, accessoryGroup)
+function CustomizeAppearance.ClientAddAccessory(character, accessoryData, accessoryGroup, storageItem)
 	local newAccessories = CustomizeAppearance.LoadAccessory(accessoryData);
 	CustomizeAppearance.RemoveAccessory(character, accessoryData.Name);
 	
 	for a=1, #newAccessories do
-		CustomizeAppearance.AttachAccessory(character, newAccessories[a], accessoryData, accessoryData.Name);
+		CustomizeAppearance.AttachAccessory(character, newAccessories[a], accessoryData, accessoryData.Name, storageItem);
 	end
 end
 
