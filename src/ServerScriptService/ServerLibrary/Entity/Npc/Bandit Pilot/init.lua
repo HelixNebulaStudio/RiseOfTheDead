@@ -275,6 +275,7 @@ return function(npc, spawnPoint)
 			if part then
 				local netOwners = self.NetworkOwners or {};
 				local partName = part.Name;
+
 				if partName == "TopCover" then
 					if self.HardMode then harmImmunity() end
 					
@@ -319,16 +320,16 @@ return function(npc, spawnPoint)
 				elseif partName == "LLauncherHitbox" or partName == "RLauncherHitbox" then
 					game.Debris:AddItem(part, 0);
 					
-					local launcherModel = self.Helicopter.Prefab:FindFirstChild(partName == "LLauncherHitbox" and "LeftLauncher" or "RightLauncher");
-					if launcherModel then
-						part = launcherModel.PrimaryPart;
-						launcherModel:BreakJoints();
-					end
-					
 					if partName == "LLauncherHitbox" then
 						self.Helicopter.LeftLaunchers = nil;
 					else
 						self.Helicopter.RightLaunchers = nil;
+					end
+					
+					local launcherModel = self.Helicopter.Prefab:FindFirstChild(partName == "LLauncherHitbox" and "LeftLauncher" or "RightLauncher");
+					if launcherModel then
+						part = launcherModel.PrimaryPart;
+						launcherModel:BreakJoints();
 					end
 					
 					task.delay(2, function()
