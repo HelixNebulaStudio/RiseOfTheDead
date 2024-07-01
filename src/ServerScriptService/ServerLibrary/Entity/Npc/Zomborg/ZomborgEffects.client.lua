@@ -121,7 +121,7 @@ end)
 --end
 
 --local touchDebounce = tick();
---modCharacter.Character:WaitForChild("Humanoid").Touched:Connect(function(part)
+--localplayer.Character:WaitForChild("Humanoid").Touched:Connect(function(part)
 --	if part:IsDescendantOf(bossModel) and tick()-touchDebounce >= 4 then
 --		touchDebounce = tick();
 --		remoteVexeron:FireServer(part);
