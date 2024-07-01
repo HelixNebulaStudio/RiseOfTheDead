@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local remotes = game.ReplicatedStorage.Remotes;
 local remoteCameraShakeAndZoom = remotes.CameraShakeAndZoom;
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
+local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 
 local victims = {};
 local damage, rate = 2, 0.1;
@@ -20,9 +21,13 @@ local function Damage(player)
 				if gasProtection then
 					damage = damage * (1-gasProtection);
 				end
+				
+				classPlayer:TakeDamagePackage(modDamagable.NewDamageSource{
+					Damage=2;
+					OriginPosition=classPlayer:GetCFrame().Position;
+				});
 			end
-			
-			humanoid:TakeDamage(damage);
+
 		end
 		remoteCameraShakeAndZoom:FireClient(player, 5, 0, 0.3, 2, false);
 	end
