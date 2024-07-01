@@ -24,9 +24,10 @@ function WorkbenchLibrary.CalculateCost(library, level)
 	return math.floor(library.BaseCost+((library.MaxCost-library.BaseCost)*math.clamp(level/library.MaxLevel, 0, 1)^2.718281));
 end
 
-function WorkbenchLibrary.StorageCost(storageId, size)
+function WorkbenchLibrary.StorageCost(storageId, size, page)
 	if storageId:match("Safehouse") then
-		return math.clamp(5+((size-24)*1), 5, 25);
+		return math.clamp(5+((size-24)*(page or 1)), 5, 100);
+		--return math.clamp(5+((size-24)*1), 5, 25);
 		
 	elseif storageId:match("dufflebag") then
 		return math.clamp(10+((size-5)*1), 10, 15);

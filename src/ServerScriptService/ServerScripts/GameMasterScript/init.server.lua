@@ -682,6 +682,8 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 				end
 				storage.Values.Siid = storageItem.ID;
 				storage.Virtual = true;
+				storage.PremiumPage = storageConfig.PremiumPage or storage.PremiumPage;
+				storage.PremiumStorage = storageConfig.PremiumStorage or storage.PremiumStorage;
 				modOnGameEvents:Fire("OnStorageOpen", player, storageItem);
 
 				task.spawn(function()
@@ -716,6 +718,10 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 				newStorage.MaxSize = storageConfig.MaxSize;
 				newStorage.Size = math.clamp(activeSave.Storages[storageId].Size, defaultSize, storageConfig.MaxSize or activeSave.Storages[storageId].Size);
 				newStorage.Expandable = storageConfig.Expandable;
+
+				newStorage.PremiumPage = storageConfig.PremiumPage or newStorage.PremiumPage;
+				newStorage.PremiumStorage = storageConfig.PremiumStorage or newStorage.PremiumStorage;
+
 				newStorage.Virtual = true;
 				newStorage.Values.Siid = storageItem.ID;
 				
@@ -806,6 +812,8 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 				storage.MaxSize = storageConfig.MaxSize;
 				storage.Size = math.clamp(storage.Size, defaultSize, storageConfig.MaxSize or storage.Size);
 				storage.Expandable = storageConfig.Expandable;
+				storage.PremiumPage = storageConfig.PremiumPage or storage.PremiumPage;
+				storage.PremiumStorage = storageConfig.PremiumStorage or storage.PremiumStorage;
 				
 				if storageConfig.Settings then
 					for k, v in pairs(storageConfig.Settings) do
@@ -843,6 +851,8 @@ function remoteOpenStorageRequest.OnServerInvoke(player, interactObject, interac
 				newStorage.MaxSize = storageConfig.MaxSize;
 				newStorage.Size = math.clamp(activeSave.Storages[storageId].Size, defaultSize, storageConfig.MaxSize or activeSave.Storages[storageId].Size);
 				newStorage.Expandable = storageConfig.Expandable;
+				newStorage.PremiumPage = storageConfig.PremiumPage or newStorage.PremiumPage;
+				newStorage.PremiumStorage = storageConfig.PremiumStorage or newStorage.PremiumStorage;
 				newStorage.Physical = interactObject;
 				newStorage:RefreshAuth(player, 60);
 
@@ -976,8 +986,9 @@ function remoteUpgradeStorage.OnServerInvoke(player, storageId)
 	
 	if storage and storage.Expandable and storage.Size < storage.MaxSize then
 		local newSize = storage.Size+1;
-		local cost = modWorkbenchLibrary.StorageCost(storageId, storage.Size);
+		local cost = modWorkbenchLibrary.StorageCost(storageId, storage.Size, storage.Page or 1);
 		local playerCurrency = activeSave and activeSave.GetStat and activeSave:GetStat("Perks");
+		
 		if playerCurrency-cost >= 0 then
 			activeSave:AddStat("Perks", -cost);
 			modAnalytics.RecordResource(player.UserId, cost, "Sink", "Perks", "Gameplay", "StorageUpgrade");

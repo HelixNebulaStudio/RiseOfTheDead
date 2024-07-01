@@ -169,8 +169,7 @@ function Interface.init(modInterface)
 			
 			function activeStorageInterface:DecorateSlot(index, slotTable)
 				local slotFrame = slotTable.Frame;
-
-				if index > storage.PremiumStorage then
+				if index > storage.PremiumStorage or (storage.Page or 1) >= storage.PremiumPage then
 					slotFrame.ImageColor3 = Color3.fromRGB(75, 50, 50);
 				else
 					slotFrame.ImageColor3 = Color3.fromRGB(50, 50, 50);
@@ -180,13 +179,13 @@ function Interface.init(modInterface)
 			if storage.Expandable and storage.Size < storage.MaxSize then
 				newAddSlotButton.Visible = true;
 				
-				local cost = modWorkbenchLibrary.StorageCost(storage.Id, storage.Size);
+				local cost = modWorkbenchLibrary.StorageCost(storage.Id, storage.Size, storage.Page);
 				newAddSlotButton.MouseButton1Click:Connect(function()
 					if tick()-addSlotDebounce <= 0.1 then return end;
 					addSlotDebounce = tick();
 					
 					local proccessed = false;
-					cost = modWorkbenchLibrary.StorageCost(storage.Id, storage.Size);
+					cost = modWorkbenchLibrary.StorageCost(storage.Id, storage.Size, storage.Page);
 					Interface:CloseWindow("ExternalStorage");
 					
 					local promptWindow = Interface:PromptQuestion("Purchase storage slot?",
@@ -267,12 +266,26 @@ function Interface.init(modInterface)
 					
 					newButton.LayoutOrder = a;
 					newButton.Parent = buttonsFrame;
+
 					if modConfigurations.CompactInterface then
 						newButton.ZIndex = 4;
 					end
+					
+					local isPremiumPage = a >= (storage.PremiumPage or 10)
 					if a == (storage.Page or 1) then
-						newButton.BackgroundColor3 = Color3.fromRGB(160, 160, 160);
+						if isPremiumPage then
+							newButton.BackgroundColor3 = Color3.fromRGB(160, 128, 53);
+						else
+							newButton.BackgroundColor3 = Color3.fromRGB(160, 160, 160);
+						end
+					else
+						if isPremiumPage then
+							newButton.BackgroundColor3 = Color3.fromRGB(100, 81, 33);
+						else
+							newButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
+						end
 					end
+
 					newButton.MouseButton1Click:Connect(function()
 						Interface:PlayButtonClick();
 						local newStorageId = baseStorageId;

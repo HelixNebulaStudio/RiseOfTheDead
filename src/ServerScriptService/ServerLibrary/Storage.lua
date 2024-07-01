@@ -102,6 +102,7 @@ function Storage.new(id, name, size, owner)
 	storage.Name = name;
 	storage.Size = size;
 	storage.PremiumStorage = 100;
+	storage.PremiumPage = 10;
 	
 	storage.Expandable = false;
 	storage.LinkedStorages = {};
@@ -1186,6 +1187,9 @@ function Storage:FindEmpty()
 	local storageSize = (self.Settings and self.Settings.ScaleByContent and 100) or self.Size;
 	if containerSize < storageSize then
 		local isPremium = self.Player and shared.modProfile:IsPremium(self.Player);
+		if not isPremium and (self.Page or 1) >= self.PremiumPage then
+			return nil;
+		end
 		for index=1, isPremium and storageSize or self.PremiumStorage do
 			if occupied[index] == nil then return index; end
 		end
@@ -1532,6 +1536,9 @@ function Storage:SpaceCheck(items)
 		end);
 		if containerSize < self.Size then
 			local isPremium = self.Player and shared.modProfile:IsPremium(self.Player);
+			if not isPremium and (self.Page or 1) >= self.PremiumPage then
+				return nil;
+			end
 			for index=1, isPremium and self.Size or self.PremiumStorage do
 				if occupied[index] == nil and cacheContainer[index] == nil then return index; end
 			end
@@ -1622,6 +1629,9 @@ function Storage:FitStackableItem(item)
 		end);
 		if containerSize < self.Size then
 			local isPremium = self.Player and shared.modProfile:IsPremium(self.Player);
+			if not isPremium and (self.Page or 1) >= self.PremiumPage then
+				return nil;
+			end
 			for index=1, isPremium and self.Size or self.PremiumStorage do
 				if occupied[index] == nil and cacheContainer[index] == nil then return index; end
 			end
@@ -1929,7 +1939,10 @@ function Storage:SetIndex(player, id, target)
 	self.Debounce = true;
 	
 	local targetSize = (isPremium and targetStorage.Size or targetStorage.PremiumStorage);
-	if target.Index > 0 and target.Index <= targetSize then
+	
+	local targetIsValid = isPremium or (targetStorage.Page or 1) < targetStorage.PremiumPage;
+
+	if target.Index > 0 and target.Index <= targetSize and targetIsValid then
 		if storageItem then
 			if self.Id == target.Id then --Move within same storage;
 				local storageItemB = self:FindByIndex(target.Index);
@@ -1969,6 +1982,9 @@ function Storage:SetIndex(player, id, target)
 		else
 			self:Notify("red", "Failed to move non existing item.");
 		end
+	elseif not targetIsValid then
+		self:Notify("red", "Moving item to premium storage.");
+
 	else
 		self:Notify("red", "Moving item out of bounds. "..targetSize);
 		Debugger:Log("Attempt to set index ",target.Index," of ",targetStorage.Id," for ",storageItem.ItemId);
@@ -2134,7 +2150,9 @@ function Storage:Split(player, id, quantity, target)
 	
 	if self.Debounce then self:Notify("red", "Not ready to split item."); return {self:Shrink();}; end;
 	self.Debounce = true;
-	if target.Index > (isPremium and storageB.Size or storageB.PremiumStorage) then self:Notify("red", "You are not premium to put that there."); return {self:Shrink();}; end;
+
+	local targetIsValid = isPremium or storageB.Page < storageB.PremiumPage;
+	if target.Index > (isPremium and storageB.Size or storageB.PremiumStorage) or not targetIsValid then self:Notify("red", "You are not premium to put that there."); return {self:Shrink();}; end;
 	
 	if storageB and quantity < storageItem.Quantity then
 		quantity = math.clamp(quantity, 1, storageItem.Quantity);
@@ -2202,7 +2220,8 @@ function Storage:Shrink()
 	compressed.Container = {};
 	compressed.Size = self.Size;
 	compressed.PremiumStorage = self.PremiumStorage;
-	
+	compressed.PremiumPage = self.PremiumPage;
+
 	compressed.Expandable = self.Expandable;
 	compressed.LinkedStorages = self.LinkedStorages;
 	

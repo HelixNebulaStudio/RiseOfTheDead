@@ -1515,7 +1515,7 @@ function Interactable.InteractProxy()
 end
 
 Interactable.Premade = {
-	SafehouseStorage = Interactable.Storage(nil, "Safehouse", "Safehouse Storage", {Persistent=true; Size=24; Expandable=true; MaxSize=50; MaxPages=3;});
+	SafehouseStorage = Interactable.Storage(nil, "Safehouse", "Safehouse Storage", {Persistent=true; Size=24; Expandable=true; MaxSize=50; MaxPages=4; PremiumPage=4;});
 	Freezer = Interactable.Storage(nil, "Freezer", "Food Storage", {Persistent=true; Size=10; Expandable=true; MaxSize=20;});
 	Wardrobe = Interactable.Storage(nil, "Wardrobe", "Wardrobe");
 	
