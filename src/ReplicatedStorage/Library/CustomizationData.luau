@@ -2,16 +2,18 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 
 local RunService = game:GetService("RunService");
+local HttpService = game:GetService("HttpService");
 
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modItemSkinsLibrary = require(game.ReplicatedStorage.Library.ItemSkinsLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBaseNumber = require(game.ReplicatedStorage.Library.Util.BaseNumber);
 
 local modColorPicker = require(game.ReplicatedStorage.Library.UI.ColorPicker);
-local modLZ4 = require(game.ReplicatedStorage.Library.Util.LZ4);
 
 
 local remoteCustomizationData = modRemotesManager:Get("CustomizationData") :: RemoteFunction;
+local itemPrefabs = game.ReplicatedStorage.Prefabs:WaitForChild("Items");
 
 --==
 local CustomizationData = {};
@@ -25,213 +27,174 @@ function CustomizationData.new(player)
 
     local self = {
         Index=0;
-        Plans={};
-        Designs={};
     };
-    --[[
-        Plans={
-            ["aaa"]="lz4compressed";    
-        };
-        Designs={
-            ["p250"]={
-                ["aaa"]={
-                    Name="name"?;
-                    Layers={
-                        {N="PartName"; L=0; P="aaa"; PO="123,456,789";};
-                    };
-                }
-            };
-        };
-    ]]
 
     setmetatable(self, meta);
     setmetatable(meta, CustomizationData);
     return self;
 end
 
-function CustomizationData.GenerateSkin(self, itemId, skinAsckey)
-    local itemDesigns = self.Designs[itemId];
-    if itemDesigns == nil then return end;
-
-    local itemDesign = itemDesigns[skinAsckey];
-    if itemDesign == nil then return end;
-
-    local plansList = {};
-    for a=1, #itemDesign.Layers do
-        local layerData = itemDesign.Layers[a];
-
-        if self.Plans[layerData.P] then
-            plansList[layerData.P] = self.Plans[layerData.P];
-        end
-    end
-
-    local result = {
-        Plans=plansList;
-        Design=itemDesign;
-    }
-
-    return result;
+function CustomizationData:NextAscKey()
+    self.Index = self.Index +1;
+    return modBaseNumber.ToBase(self.Index, #modBaseNumber.Symbols);
 end
 
 function CustomizationData:Load(rawTable)
     for k, v in pairs(rawTable) do
-        if k == "Plans" then
-            for valK, valLz4 in pairs(v) do
-                local exist = false;
-                for planK, planLz4 in pairs(self.Plans) do
-                    if planLz4 == valLz4 then
-                        self.PlanOverwrites[valK] = planK;
-                        exist = true;
-                        break;
-                    end
-                end
-
-                if not exist then
-                    self.Plans[valK] = valLz4;
-                end
-            end
-
-        elseif k == "Designs" then
-            --jmp load;
-
-        else
-            self[k] = v;
-        end
+        self[k] = v;
     end
 
-    if rawTable.Designs then
-        for itemId, designList in pairs(rawTable.Designs) do
-            local loadedDesigns = {};
-
-            for designK, designData in pairs(designList) do
-                -- designK base36
-
-                for a=1, #designData.Layers do
-                    local layerDesignData = designData.Layers[a];
-                    if self.PlanOverwrites[layerDesignData.P] then
-                        layerDesignData.P = self.PlanOverwrites[layerDesignData.P];
-                    end
-                end
-
-                loadedDesigns[designK] = designData;
-            end
-
-            self.Designs[itemId] = loadedDesigns;
-        end
-    end
-    
-    
     return self;
 end
 
-if RunService:IsServer() then
-    function remoteCustomizationData.OnServerInvoke(player, action, ...)
-        local profile = shared.modProfile:Get(player);
-        local customizationData = profile.CustomizationData;
+function CustomizationData.Serialize(customPlans, partGroups)
+    local r = {
+        Layers={};
+        Plans={};
+    };
 
-        local returnPacket = {};
+    for groupKey, list in pairs(partGroups) do
+        local newStr = table.concat(list, ",");
+        r.Layers[groupKey] = newStr;
+    end
 
-        if action == "loadskin" then
-            local siid = ...;
-            if siid == nil then return end;
-            
-		    local storageItem, _ = shared.modStorage.FindIdFromStorages(siid, player);
-            if storageItem == nil then return end;
+    for planKey, customPlan in pairs(customPlans) do
+        local planSerial = customPlan:Serialize();
 
-            local itemId = storageItem.ItemId;
-            local skinAskey = storageItem:GetValues("SkinAskey");
-            if skinAskey == nil then return end;
+        r.Plans[planKey] = planSerial;
+    end
 
-            local skinDesign = customizationData:GenerateSkin(itemId, skinAskey);
+    return HttpService:JSONEncode(r);
+end
 
+function CustomizationData.Deserialize(rawJson)
+    local r = {Layers={}; Plans={};};
+    local s, e = pcall(function()
+        r = HttpService:JSONDecode(rawJson);
+    end)
+    if not s then 
+        Debugger:Warn("Failed to load customizations JSON.",e); 
+        return r;
+    end;
 
-        elseif action == "setbaseskin" then
-            local packet = ...;
-            packet = packet or {};
+    local partGroups = {};
 
-            local workbenchPart = packet.WorkbenchPart;
+    for groupKey, list in pairs(r.Layers) do
+        partGroups[groupKey] = string.split(list, ",");
+    end
 
-            local siid = packet.Siid;
-            local skinId = packet.SkinId;
+    local customPlans = {};
+    for planKey, rawPlan in pairs(r.Plans) do
+        customPlans[planKey] = CustomizationData.newCustomizationPlan();
+        customPlans[planKey]:Deserialize(rawPlan);
+    end
 
-		    local storageItem, _ = shared.modStorage.FindIdFromStorages(siid, player);
-            if storageItem == nil then return end;
+    r.Layers = partGroups;
+    r.Plans = customPlans;
 
-			local unlockedSkins = storageItem:GetValues("Skins") or {};
+    return r;
+end
 
-			if skinId == "None" then
-				storageItem:DeleteValues("ActiveSkin");
-				returnPacket.Success = true;
-                return returnPacket;
-			end
-
-            local skinLib = modItemSkinsLibrary:Find(skinId);
-
-			local isUnlocked = false;
-			for a=1, #unlockedSkins do
-				if tostring(unlockedSkins[a]) == tostring(skinId) or tostring(unlockedSkins[a]) == skinLib.OldId then
-					isUnlocked = true;
-					break;
-				end
-			end
-
-            if packet.Force == true and (modBranchConfigs.CurrentBranch.Name == "Dev" or player.UserId == 16170943) then
-                if isUnlocked == false then
-                    table.insert(unlockedSkins, skinLib.Id);
-                    storageItem:SetValues("Skins", unlockedSkins);
-                    returnPacket.UnlockedSkins = unlockedSkins;
-
-                    isUnlocked = true;
-                end
-            end
-
-			if isUnlocked then
-				storageItem:SetValues("ActiveSkin", skinId);
-			end
-
-            returnPacket.Success=true;
-        
-        elseif action == "savecustomizations" then
-            local packet = ...;
-            packet = packet or {};
-
-            local workbenchPart = packet.WorkbenchPart;
-
-            local siid = packet.Siid;
-
-		    local storageItem, _ = shared.modStorage.FindIdFromStorages(siid, player);
-            if storageItem == nil then return end;
-
-            print(packet);
-            
-        end
-
-        return returnPacket;
+function CustomizationData.GetBaseSkinFromActiveId(itemId, skinId)
+    if skinId == nil then return end;
+		
+    local skinLib = modItemSkinsLibrary:Find(skinId);
+    if skinLib == nil then
+        skinLib = modItemSkinsLibrary:FindByKeyValue("OldId", skinId);
     end
     
-    task.spawn(function()
-		Debugger.AwaitShared("modCommandsLibrary");
+    local variantId = nil;
+    if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
+        variantId = "v1";
+    else
+        variantId = itemId..skinLib.Id;
+    end
 
-		shared.modCommandsLibrary:HookChatCommand("itemskin", {
-			Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
-			Description = [[]];
-
-			RequiredArgs = 0;
-			Function = function(speaker, args)
-				
-				local action = args[1];
-
-				return;
-			end;
-		});
-
-	end)
+    return `{skinLib.Id}_{variantId}`;
 end
---==
+
+function CustomizationData.LoadCustomization(packet)
+    local itemId = packet.ItemId;
+    local serializedCustomization = packet.CustomizationData;
+    local skinId = packet.SkinId;
+    local toolModels = packet.ToolModels;
+
+    local customPlansCache = packet.CustomPlansCache or {};
+    local partDataList = packet.PartDataList or {};
+    ---
+
+    local designPacket = CustomizationData.Deserialize(serializedCustomization);
+    local baseSkin = CustomizationData.GetBaseSkinFromActiveId(itemId, skinId);
+    
+    local basePrefab = itemPrefabs:FindFirstChild(itemId);
+
+    for planId, customPlan in pairs(designPacket.Plans) do
+        customPlansCache[planId] = customPlan;
+        customPlansCache[planId].BaseSkin = baseSkin;
+    end
+
+
+    if toolModels then
+        for a=1, #toolModels do
+            local toolModel = toolModels[a];
+    
+            local weldName = toolModel:GetAttribute("Grip");
+            local prefix = "";
+            if weldName == "LeftToolGrip" then
+                prefix = "Left";
+            elseif weldName == "RightToolGrip" then
+                prefix = "Right";
+            end
+    
+            for _, basePart in pairs(toolModel:GetChildren()) do
+                if not basePart:IsA("BasePart") then continue end;
+        
+                local predefinedGroup = basePart:GetAttribute("CustomizationGroup");
+                predefinedGroup = predefinedGroup and `[{predefinedGroup}]` or nil;
+        
+                if toolModel and basePrefab then
+                    local defaultPartName = basePart.Name;
+                    local defaultPart = basePrefab:FindFirstChild(defaultPartName);
+                    
+                    basePart:SetAttribute("DefaultColor", defaultPart.Color);
+                    basePart:SetAttribute("DefaultTransparency", defaultPart.Transparency);
+                    basePart:SetAttribute("DefaultMaterial", defaultPart.Material);
+                    basePart:SetAttribute("DefaultReflectance", defaultPart.Reflectance);
+                end
+        
+                local newPartData = {
+                    Key=prefix..basePart.Name;
+                    Part=basePart;
+                    Group = predefinedGroup;
+                    PredefinedGroup = predefinedGroup;
+                };
+        
+                table.insert(partDataList, newPartData);
+            end
+        end
+    end
+
+    for a=1, #partDataList do
+        local partData = partDataList[a];
+
+        for groupKey, list in pairs(designPacket.Layers) do
+            if table.find(list, partData.Key) then
+                partData.Group = groupKey;
+                break;
+            end
+        end
+    end
+    
+    if toolModels then
+        CustomizationData.ApplyCustomPlans(customPlansCache, partDataList);
+    end
+end
+
+--== MARK: CustomizationPlan;
 local CustomizationPlan = {};
 CustomizationPlan.__index = CustomizationPlan;
 
-function CustomizationData.newCustomizationPlan(rawLz4)
+function CustomizationData.newCustomizationPlan()
     local self = {
         BaseSkin=nil;
         Group=nil;
@@ -252,11 +215,6 @@ function CustomizationData.newCustomizationPlan(rawLz4)
     };
 
     setmetatable(self, CustomizationPlan);
-
-    if rawLz4 then
-        self:Decompress(rawLz4);
-    end
-
     return self;
 end
 
@@ -317,6 +275,22 @@ function CustomizationData.ApplyCustomPlans(customPlans, partDataList)
 
         finalCustomPlan:Apply(partData.Part);
     end
+end
+
+function CustomizationPlan:Reset()
+    self.BaseSkin = nil;
+    self.Color = nil;
+    self.Skin = nil;
+    self.Transparency = nil;
+
+    self.PatternData.Color = nil;
+    self.PatternData.Offset = nil;
+    self.PatternData.Scale = nil;
+    self.PatternData.Transparency = nil;
+
+    self.Material = nil;
+    self.Reflectance = nil;
+    self.PositionOffset = nil;
 end
 
 function CustomizationPlan:Apply(obj: BasePart)
@@ -504,39 +478,26 @@ function CustomizationPlan:__tostring()
     return self:Serialize();
 end
 
-function CustomizationPlan:Decompress(rawLz4)
-    local valStr = modLZ4.decompress(rawLz4);
-    return self:Deserialize(valStr);
-end
-
-function CustomizationPlan:Compress()
-    local serializedData = self:Serialize();
-    return modLZ4.compress(serializedData);
-end
-
 function CustomizationPlan:Deserialize(valStr)
     local args = string.split(tostring(valStr), ";");
 
-    if args[1] then -- group
-        self.Group = string.gsub(args[1], "[^%w]*", "");
-    end
-    if args[2] then -- color
-        self.Color = modColorPicker.GetColor(args[2], true);
+    if args[1] then -- color
+        self.Color = modColorPicker.GetColor(args[1], true);
     
     end
-    if args[3] then -- skin
-        self.Skin = tostring(args[3]);
+    if args[2] then -- skin
+        self.Skin = tostring(args[2]);
 
     end
-    if args[4] then -- transparency
-        local a = tonumber(args[4]);
+    if args[3] then -- transparency
+        local a = tonumber(args[3]);
         if a then
             self.Transparency = math.clamp(a/100, 0, 1);
         end
 
     end
-    if args[5] then -- skin {color, offset, scale, transparency}
-        local patArgs = string.split(args[5], ",");
+    if args[4] then -- skin {color, offset, scale, transparency}
+        local patArgs = string.split(args[4], ",");
         
         local patData = {
             Color = nil;
@@ -578,24 +539,24 @@ function CustomizationPlan:Deserialize(valStr)
         self.PatternData = patData;
 
     end
-    if args[6] then -- part mat
+    if args[5] then -- part mat
         local mat = nil;
         pcall(function()
-            mat = Enum.Material[args[6]];
+            mat = Enum.Material[args[5]];
         end)
 
         self.Material = mat;
 
     end
-    if args[7] then -- part reflectance
-        local a = tonumber(args[7]);
+    if args[6] then -- part reflectance
+        local a = tonumber(args[6]);
         if a then
             self.Reflectance = math.clamp(a/100, 0, 1);
         end
 
     end
-    if args[8] then -- part offset;
-        local vec3Args = string.split(args[8], ",");
+    if args[7] then -- part offset;
+        local vec3Args = string.split(args[7], ",");
 
         local x = tonumber(vec3Args[1]);
         local y = tonumber(vec3Args[2]);
@@ -613,12 +574,6 @@ end
 
 function CustomizationPlan:Serialize()
     local buildStr = "";
-
-    if self.Group then
-        buildStr = buildStr..(string.gsub(self.Group, "[^%w]*", "")); 
-    end
-    buildStr = buildStr..";";
-
 
     if self.Color then
         buildStr = buildStr..`#{self.Color:ToHex()}`; 
@@ -694,6 +649,113 @@ function CustomizationPlan:Serialize()
     buildStr = buildStr..";";
     
     return buildStr;
+end
+
+
+if RunService:IsServer() then
+    -- MARK: remoteCustomizationData
+
+    function remoteCustomizationData.OnServerInvoke(player, action, ...)
+        local profile = shared.modProfile:Get(player);
+        local customizationData = profile.CustomizationData;
+
+        local returnPacket = {};
+
+        if action == "setbaseskin" then
+            local packet = ...;
+            packet = packet or {};
+
+            local workbenchPart = packet.WorkbenchPart;
+
+            local siid = packet.Siid;
+            local skinId = packet.SkinId;
+
+		    local storageItem, _ = shared.modStorage.FindIdFromStorages(siid, player);
+            if storageItem == nil then return end;
+
+			local unlockedSkins = storageItem:GetValues("Skins") or {};
+
+			if skinId == "None" then
+				storageItem:DeleteValues("ActiveSkin");
+				returnPacket.Success = true;
+                return returnPacket;
+			end
+
+            local skinLib = modItemSkinsLibrary:Find(skinId);
+
+			local isUnlocked = false;
+			for a=1, #unlockedSkins do
+				if tostring(unlockedSkins[a]) == tostring(skinId) or tostring(unlockedSkins[a]) == skinLib.OldId then
+					isUnlocked = true;
+					break;
+				end
+			end
+
+            if packet.Force == true and (modBranchConfigs.CurrentBranch.Name == "Dev" or player.UserId == 16170943) then
+                if isUnlocked == false then
+                    table.insert(unlockedSkins, skinLib.Id);
+                    storageItem:SetValues("Skins", unlockedSkins);
+                    returnPacket.UnlockedSkins = unlockedSkins;
+
+                    isUnlocked = true;
+                end
+            end
+
+			if isUnlocked then
+				storageItem:SetValues("ActiveSkin", skinId);
+			end
+
+            returnPacket.Success=true;
+        
+        elseif action == "savecustomizations" then
+            local packet = ...;
+            packet = packet or {};
+
+            local workbenchPart = packet.WorkbenchPart;
+
+            local siid = packet.Siid;
+
+		    local storageItem, _ = shared.modStorage.FindIdFromStorages(siid, player);
+            if storageItem == nil then return end;
+            local itemId = storageItem.ItemId;
+
+            local designSerialized = packet.Serialized;
+
+            Debugger:StudioWarn("designSerialized", designSerialized);
+            storageItem:SetValues("_Customs", designSerialized);
+            
+        elseif action == "loadcustomizations" then
+            local siid = ...;
+		    local storageItem, _ = shared.modStorage.FindIdFromStorages(siid, player);
+            if storageItem == nil then return end;
+
+            local serialized = storageItem:GetValues("_Customs");
+            Debugger:StudioWarn("design serialized", serialized);
+
+            returnPacket.Serialized = serialized;
+            returnPacket.Success = true;
+        end
+
+        return returnPacket;
+    end
+    
+    task.spawn(function()
+		Debugger.AwaitShared("modCommandsLibrary");
+
+		shared.modCommandsLibrary:HookChatCommand("itemskin", {
+			Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+			Description = [[]];
+
+			RequiredArgs = 0;
+			Function = function(speaker, args)
+				
+				local action = args[1];
+
+				return;
+			end;
+		});
+
+	end)
 end
 
 return CustomizationData;

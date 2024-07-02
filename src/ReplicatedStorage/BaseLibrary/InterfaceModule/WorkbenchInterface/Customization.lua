@@ -61,25 +61,41 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 	local customPlansCache = {};
 
-	-- MARK: getBaseSkinFromActiveSkinId(activeSkinId)
-	local function getBaseSkinFromActiveSkinId(activeSkinId)
-		if activeSkinId == nil then return end;
-		
-		local skinLib = modItemSkinsLibrary:Find(activeSkinId);
-		if skinLib == nil then
-			skinLib = modItemSkinsLibrary:FindByKeyValue("OldId", activeSkinId);
-		end
-		
-		local variantId = nil;
-		if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
-			variantId = "v1";
-		else
-			variantId = itemId..skinLib.Id;
-		end
-	
-		return `{skinLib.Id}_{variantId}`;
-	end
+	-- MARK: generateSerialized()
+	local function generateSerialized()
+		local partDataGroups = {};
+		local modifiedCustomPlans = {};
 
+		modifiedCustomPlans["[All]"]=customPlansCache["[All]"];
+
+		for a=1, #itemViewport.PartDataList do
+			local partData = itemViewport.PartDataList[a];
+
+			local groupCustomPlan = customPlansCache[partData.Group];
+			if groupCustomPlan and groupCustomPlan:IsEdited() then
+				modifiedCustomPlans[partData.Group] = groupCustomPlan;
+			end
+
+			local partCustomPlan = customPlansCache[partData.Key];
+			if partCustomPlan and partCustomPlan:IsEdited() then
+				modifiedCustomPlans[partData.Key] = partCustomPlan;
+			end
+
+			if partData.Group ~= partData.PredefinedGroup then
+				if partDataGroups[partData.Group] == nil then
+					partDataGroups[partData.Group] = {};
+				end
+				table.insert(partDataGroups[partData.Group], partData.Key);
+			end
+		end
+		for k, v in pairs(partDataGroups) do
+			if #v <= 0 then
+				partDataGroups[k] = nil;
+			end
+		end
+
+		return modCustomizationData.Serialize(modifiedCustomPlans, partDataGroups);
+	end
 
 	-- MARK: GetCustomPlan
 	local GetCustomPlanEnum = {
@@ -94,7 +110,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		if customPlan == nil and newIfNil == true then
 			customPlan = modCustomizationData.newCustomizationPlan();
-			customPlan.BaseSkin = getBaseSkinFromActiveSkinId(storageItem.Values.ActiveSkin);
+			customPlan.BaseSkin = modCustomizationData.GetBaseSkinFromActiveId(itemId, storageItem.Values.ActiveSkin);
 
 			if planType == GetCustomPlanEnum.Group then
 				customPlan.Group = planKey;
@@ -112,29 +128,26 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 	
 
 	do -- load premade customPlans
-		local baseSkin = getBaseSkinFromActiveSkinId(storageItem.Values.ActiveSkin);
+		local baseSkin = modCustomizationData.GetBaseSkinFromActiveId(itemId, storageItem.Values.ActiveSkin);
 		baseCustomPlan.BaseSkin = baseSkin;
 		
-		task.spawn(function()
-			local rPacket = remoteCustomizationData:InvokeServer("loadskin", siid);
-			if rPacket == nil or rPacket.Success ~= true then
-				if rPacket and rPacket.FailMsg then
-					Debugger:StudioWarn("rPacket.FailMsg", rPacket.FailMsg); 
-				end
-				
-				modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
-				return; 
-			end;
-	
-			local rawCustomPlans = rPacket.RawPlans;
-	
-			for planId, rawPlan in pairs(rawCustomPlans) do
-				customPlansCache[planId] = modCustomizationData.newCustomizationPlan(rawPlan);
-				customPlansCache[planId].BaseSkin = baseSkin;
-			end
+		local itemPartGroups = storageItem.Values.PartGroups;
+		if itemPartGroups then
+			Debugger:StudioWarn("Load part groups", itemPartGroups);
+			
+			for a=1, #itemViewport.PartDataList do
+				local partData = itemViewport.PartDataList[a];
 
-			modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
-		end)
+				for groupKey, list in pairs(itemPartGroups) do
+					if table.find(list, partData.Key) == nil then continue end;
+
+					partData.Group = groupKey;
+				end
+			end
+		end
+
+		itemViewport:LoadCustomizations(customPlansCache);
+		modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
 	end
 	
 	-- listMenu:Refresh();
@@ -150,6 +163,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					table.insert(groupsList, partData.PredefinedGroup);
 				end
 		
+				if partData.Group and table.find(groupsList, partData.Group) == nil then
+					table.insert(groupsList, partData.Group);
+				end
+
 				table.insert(groupPartList, partData.Key);
 			end
 			table.sort(groupPartList);
@@ -245,6 +262,14 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			return unlockedSkins;
 		end
 
+		local breakDownFrame: Frame = mainFrame:WaitForChild("BreakdownPanel");
+		local serialText = breakDownFrame:WaitForChild("serializeText");
+		breakDownFrame:GetPropertyChangedSignal("Visible"):Connect(function()
+			if not breakDownFrame.Visible then return end;
+			local serialized = generateSerialized();
+			serialText.Text = serialized;
+		end)
+
 		-- MARK: Titled Skin List
 		local rareSkinsList = {};
 		local baseSkinList = modItemSkinsLibrary:GetItemSkinIdList(itemId);
@@ -263,7 +288,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		local function refreshSkinPerm()
 			local activeSkinId = storageItem.Values.ActiveSkin;
-			local baseSkin = getBaseSkinFromActiveSkinId(activeSkinId);
+			local baseSkin = modCustomizationData.GetBaseSkinFromActiveId(itemId, activeSkinId);
 
 			for _, customPlan in pairs(customPlansCache) do
 				customPlan.BaseSkin = baseSkin;
@@ -429,20 +454,24 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				selectTextbox.Visible = true;
 				guideButton.Visible = false;
 				layersButton.Visible = false;
+				breakDownFrame.Visible = false;
 
 			elseif currentPage == MenuPagesEnum.Guide then
 				hintLabel.Visible = true;
 				baseSkinFrame.Visible = false;
 				selectTextbox.Visible = false;
+				breakDownFrame.Visible = false;
 
 			elseif currentPage == MenuPagesEnum.Layers then
 				hintLabel.Visible = false;
 				baseSkinFrame.Visible = false;
 				selectTextbox.Visible = false;
+				breakDownFrame.Visible = true;
 
 			else
 				hintLabel.Visible = false;
 				baseSkinFrame.Visible = true;
+				breakDownFrame.Visible = false;
 				editPanel.Visible = false;
 				selectTextbox.Visible = false;
 				guideButton.Visible = true;
@@ -1566,6 +1595,12 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 								else
 									baseCustomPlan:Apply(partData.Part);
 								end
+
+								if #activePartSelection <= 0 then
+									customPlansCache[activeGroupName] = nil;
+									activePartSelection = nil;
+									newSelection();
+								end
 							end
 
 						else
@@ -1707,12 +1742,12 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 					OnColorSelect();
 					OnSkinSelect();
-					transparencySlider:SetAttribute("Value", nil);
-					partOffsetXSlider:SetAttribute("Value", nil);
-					partOffsetYSlider:SetAttribute("Value", nil);
-					partOffsetZSlider:SetAttribute("Value", nil);
+					transparencySlider:SetAttribute("Value", "nil");
+					partOffsetXSlider:SetAttribute("Value", "nil");
+					partOffsetYSlider:SetAttribute("Value", "nil");
+					partOffsetZSlider:SetAttribute("Value", "nil");
 					OnMaterialSelect(nil);
-					reflectanceSlider:SetAttribute("Value", nil);
+					reflectanceSlider:SetAttribute("Value", "nil");
 
 				end
 			end
@@ -1819,6 +1854,32 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 				end
 
+				local function deleteLayer()
+					Debugger:StudioWarn("Reset/delete layer");
+					Interface:PlayButtonClick();
+
+					if selectionName == "[All]" then
+						baseCustomPlan:Reset();
+						local baseSkin = modCustomizationData.GetBaseSkinFromActiveId(itemId, storageItem.Values.ActiveSkin);
+						baseCustomPlan.BaseSkin = baseSkin;
+
+					else
+						customPlansCache[selectionName] = nil;
+						if selectGroupName then
+							for a=1, #itemViewport.PartDataList do
+								local partData = itemViewport.PartDataList[a];
+								if partData.Group == selectGroupName then
+									partData.Group = partData.PredefinedGroup;
+								end
+							end
+						end
+					end
+
+					dropDownFrame.Visible = false;
+					newSelection();
+				end
+				optionButton.TouchLongPress:Connect(deleteLayer);
+				optionButton.MouseButton2Click:Connect(deleteLayer);
 			end
 			
 			function newDropDownList:OnOptionSelect(index, optionButton)
@@ -1875,38 +1936,12 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			itemViewport.HightlightSelect = false;
 
 			Debugger:StudioWarn("Save customizations");
-			local partDataGroups = {};
-			local modifiedCustomPlans = {};
 
-			modifiedCustomPlans["[All]"]=customPlansCache["[All]"];
-
-			for a=1, #itemViewport.PartDataList do
-				local partData = itemViewport.PartDataList[a];
-
-				local groupCustomPlan = customPlansCache[partData.Group];
-				if groupCustomPlan and groupCustomPlan:IsEdited() then
-					modifiedCustomPlans[partData.Group] = groupCustomPlan;
-				end
-
-				local partCustomPlan = customPlansCache[partData.Key];
-				if partCustomPlan and partCustomPlan:IsEdited() then
-					modifiedCustomPlans[partData.Key] = partCustomPlan;
-				end
-
-				if partData.Group ~= partData.PredefinedGroup then
-					if partDataGroups[partData.Group] == nil then
-						partDataGroups[partData.Group] = {};
-					end
-					table.insert(partDataGroups[partData.Group], partData.Key);
-				end
-			end
-
+			local serialized = generateSerialized();
 			local rPacket = remoteCustomizationData:InvokeServer("savecustomizations", {
 				Siid=storageItem.ID;
-				CustomPlans=modifiedCustomPlans;
-				PartGroups=partDataGroups;
+				Serialized=serialized;
 			});
-
 
 		end)
 

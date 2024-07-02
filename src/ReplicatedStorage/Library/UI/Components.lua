@@ -62,7 +62,7 @@ function Components.CreateSlider(mainInterface, paramPacket)
 		if typeInput.Visible then
 			button.Text = "";
 			return;
-		end 
+		end
 		
 		if paramPacket.DisplayValueFunc then
 			button.Text = paramPacket.DisplayValueFunc(currentVal/rangeScale)
@@ -141,6 +141,10 @@ function Components.CreateSlider(mainInterface, paramPacket)
 	local resetCooldown = nil;
 	button:GetAttributeChangedSignal("Value"):Connect(function()
 		local valueSet = button:GetAttribute("Value");
+		if valueSet == "nil" then
+			valueSet = nil;
+			button:SetAttribute("Value", nil);
+		end
 		if valueSet == nil then 
 			if resetCooldown and tick()-resetCooldown <= 0.2 then return end
 			resetDefaultValues();

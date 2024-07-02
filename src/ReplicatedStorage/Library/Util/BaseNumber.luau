@@ -2,6 +2,8 @@ local BaseNumber = {}
 
 local Symbols = "0123456789abcdefghijklmnopqrstuvwxyz"
 
+BaseNumber.Symbols = Symbols;
+
 function BaseNumber.ToBase(Base10Number: number, k: number)
     local BaseK = ""
 

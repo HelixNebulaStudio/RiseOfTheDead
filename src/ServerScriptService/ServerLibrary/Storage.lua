@@ -2195,6 +2195,7 @@ function Storage:Changed()
 	end
 end
 
+-- MARK: Storage:Shrink()
 function Storage:Shrink()
 	local compressed = {};
 	compressed.Id = self.Id;

@@ -5,6 +5,7 @@ local UserInputService = game:GetService("UserInputService");
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
+local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
@@ -22,6 +23,8 @@ local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: M
 
 local remoteEquipCosmetics = game.ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("AppearanceEditor"):WaitForChild("EquipCosmetics");
 local starterCharacter = game.StarterPlayer:WaitForChild("StarterCharacter");
+
+local remoteCustomizationData = modRemotesManager:Get("CustomizationData") :: RemoteFunction;
 
 local camera = workspace.CurrentCamera;
 
@@ -282,12 +285,16 @@ function ItemViewport:RefreshDisplay()
 	end)
 end
 
+function ItemViewport:LoadCustomizations()
+end
+
 function ItemViewport:SetDisplay(storageItem, yieldFunc)
 	self:Clear();
 	local itemId = storageItem.ItemId;
 	local itemValues = storageItem.Values;
 	self.OnDisplayID = storageItem.ID;
 	
+
 	local itemDisplayLib = modWorkbenchLibrary.ItemAppearance[itemId];
 	local clothingLib = modClothingLibrary:Find(itemId);
 	
@@ -338,15 +345,16 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 					local prefix = "";
 					if weldName == "LeftToolGrip" then
 						prefix = "Left";
-						prefab.Name = "Left"..prefabName;
+						prefab.Name = prefix..prefabName;
 						prefab:SetAttribute("DisplayModelPrefix", "Left");
 
 					elseif weldName == "RightToolGrip" then
 						prefix = "Right";
-						prefab.Name = "Right"..prefabName;
+						prefab.Name = prefix..prefabName;
 						prefab:SetAttribute("DisplayModelPrefix", "Right");
 
 					end
+					prefab:SetAttribute("Grip", weldName);
 					
 					if modData.Profile.OptInNewCustomizationMenu ~= true then
 						modColorsLibrary.ApplyAppearance(prefab, itemValues);
@@ -376,13 +384,14 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 		for a=1, #self.DisplayModels do
 			local displayModelData = self.DisplayModels[a];
 			local prefix = displayModelData.Prefix;
+			local toolModel = displayModelData.Prefab;
 
-			for _, basePart in pairs(displayModelData.Prefab:GetChildren()) do
+			for _, basePart in pairs(toolModel:GetChildren()) do
 				if not basePart:IsA("BasePart") then continue end;
 				local predefinedGroup = basePart:GetAttribute("CustomizationGroup");
 				predefinedGroup = predefinedGroup and `[{predefinedGroup}]` or nil;
 
-				if displayModelData.Prefab and displayModelData.BasePrefab then
+				if toolModel and displayModelData.BasePrefab then
 					local defaultPartName = basePart.Name;
 					local defaultPart = displayModelData.BasePrefab:FindFirstChild(defaultPartName);
 					
@@ -404,6 +413,38 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 			end
 		end
 		table.sort(self.PartDataList, function(a, b) return a.Key > b.Key; end);
+
+		function self:LoadCustomizations(customPlansCache)
+			customPlansCache = customPlansCache or {};
+			
+			task.spawn(function()
+				local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
+
+				local rPacket = remoteCustomizationData:InvokeServer("loadcustomizations", storageItem.ID);
+				if rPacket == nil or rPacket.Success ~= true then
+					if rPacket and rPacket.FailMsg then
+						Debugger:StudioWarn("rPacket.FailMsg", rPacket.FailMsg); 
+					end
+					
+					return; 
+				end;
+		
+				local serialized = rPacket.Serialized;
+
+				modCustomizationData.LoadCustomization({
+					ItemId = itemId;
+					CustomizationData = serialized;
+					SkinId = storageItem.Values.ActiveSkin;
+
+					CustomPlansCache = customPlansCache;
+					PartDataList = self.PartDataList;
+				});
+
+				modCustomizationData.ApplyCustomPlans(customPlansCache, self.PartDataList);
+			end)
+		end
+		self:LoadCustomizations();
+		
 
 	else
 		local prefab = itemPrefabs:FindFirstChild(itemId) and itemPrefabs[itemId]:Clone() or nil;
