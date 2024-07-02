@@ -484,7 +484,7 @@ function Interface.init(modInterface)
 
 	local processTypeSorting = {BuildComplete=1; Deconstruction=2; PolishTool=3; Building=10;};
 	function Interface.GetProcesses()
-		local processes = {};
+		local processes= {};
 		local processesData = modTableManager.GetDataHierarchy(modData.Profile, "GameSave/Workbench/Processes") or {};
 		
 		for a=1, #processesData do
@@ -527,11 +527,13 @@ function Interface.init(modInterface)
 			listMenu:Destroy();
 			Interface.ActiveWorkbenches[k] = nil;
 		end
-		newItemDisplay:Clear();
+		
 		Interface.ActiveWorkbenches.Blueprints = Interface.Workbenches.Blueprints.Workbench.new();
 		Interface.ActiveWorkbenches.Blueprints.Menu.Parent = pageFrame;
 		Interface.ActiveWorkbenches.Blueprints.Menu.Name = "bpListFrame";
 		
+		newItemDisplay:Clear();
+
 		local processes = Interface.GetProcesses();
 		if #processes > 0 then
 			Interface.LoadProcesses();
@@ -585,8 +587,15 @@ function Interface.init(modInterface)
 						Interface:ToggleWindow("Inventory", false);
 					end)
 				end
+
 			else
-				Interface.ClearSelection();
+				for k, listMenu in pairs(Interface.ActiveWorkbenches) do
+					listMenu.Menu.Visible = false;
+				end
+
+				task.delay(0.1, function()
+					Interface.ClearSelection();
+				end)
 				clearSlotHighlight();
 				selectedSlot = nil;
 				Interface.SelectedSlot = selectedSlot;

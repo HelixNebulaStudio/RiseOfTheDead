@@ -97,6 +97,17 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		return modCustomizationData.Serialize(modifiedCustomPlans, partDataGroups);
 	end
 
+	-- MARK: saveCustomizations()
+	local function saveCustomizations()
+		Debugger:StudioWarn("Save customizations");
+		local serialized = generateSerialized();
+		local rPacket = remoteCustomizationData:InvokeServer("savecustomizations", {
+			Siid=storageItem.ID;
+			Serialized=serialized;
+		});
+
+	end
+
 	-- MARK: GetCustomPlan
 	local GetCustomPlanEnum = {
 		Part=1;
@@ -1382,14 +1393,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		end)
 			
 
-		local selectGroupTextChangeConn;
-		garbage:Tag(function()
-			if selectGroupTextChangeConn then
-				selectGroupTextChangeConn:Disconnect();
-				selectGroupTextChangeConn = nil;
-			end
-		end)
-		
 		selectTextbox:GetPropertyChangedSignal("CursorPosition"):Connect(function()
 			selectTextbox.CursorPosition = selectTextbox.CursorPosition > 0 and math.clamp(selectTextbox.CursorPosition, math.min(2, #selectTextbox.Text-1), #selectTextbox.Text) or -1;
 		end)
@@ -1644,7 +1647,8 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			end
 		end)
 
-
+		local selectGroupTextChangeConn;
+		
 		-- MARK: newSelection;
 		function newSelection(selectionPartData, selectGroupName)
 			activeGroupName = nil;
@@ -1934,15 +1938,8 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		itemViewport.HightlightSelect = true;
 		garbage:Tag(function()
 			itemViewport.HightlightSelect = false;
-
-			Debugger:StudioWarn("Save customizations");
-
-			local serialized = generateSerialized();
-			local rPacket = remoteCustomizationData:InvokeServer("savecustomizations", {
-				Siid=storageItem.ID;
-				Serialized=serialized;
-			});
-
+			
+			saveCustomizations();
 		end)
 
 	end
