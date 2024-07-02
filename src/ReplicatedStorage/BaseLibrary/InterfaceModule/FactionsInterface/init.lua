@@ -1869,6 +1869,8 @@ function Interface.init(modInterface)
 
 			local selectName = optionButton.Name;
 			
+			local selectName = optionButton.Name;
+			
 			hqFrame.HqHostInput.Text = selectName;
 			dropdownListObj.Frame.Visible = false;
 			task.spawn(function()

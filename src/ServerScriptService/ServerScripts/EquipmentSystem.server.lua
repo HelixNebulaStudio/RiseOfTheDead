@@ -17,6 +17,7 @@ local modRemotesManager = Debugger:Require(game.ReplicatedStorage.Library.Remote
 local modConfigurations = Debugger:Require(game.ReplicatedStorage.Library.Configurations);
 local modItemSkinWear = Debugger:Require(game.ReplicatedStorage.Library.ItemSkinWear);
 local modTools = Debugger:Require(game.ReplicatedStorage.Library.Tools);
+local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 
 local modProfile = Debugger:Require(game.ServerScriptService.ServerLibrary.Profile);
 local modOnGameEvents = Debugger:Require(game.ServerScriptService.ServerLibrary.OnGameEvents);
@@ -104,10 +105,30 @@ local function OnPlayerAdded(player: Player)
 					cloneTool.Parent = character;
 					motor:SetAttribute("CanQuery", false);
 					modGearAttachments:AttachMotor(cloneTool, motor, attachment.Parent, 2);
-					modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
+					
+					if storageItem.Values.Colors or storageItem.Values.Textures or storageItem.Values.PartAlpha then
+						modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
+
+					end
 				end
 			end
 			profile.ToolsCache.Prefabs = prefabs;
+
+			local customizationData = storageItem:GetValues("_Customs");
+			if customizationData then
+				task.spawn(function()
+					local activeSkinId = storageItem:GetValues("ActiveSkin");
+
+					modCustomizationData.LoadCustomization({
+						ToolModels = prefabs;
+
+						ItemId = itemId;
+						CustomizationData = customizationData;
+						SkinId = activeSkinId;
+					});
+				end)
+			end
+
 		end
 		
 	end)
@@ -408,8 +429,26 @@ local function equipTool(player, paramPacket)
 						Weld=toolGrip;
 						Prefab=cloneTool;
 					})
-					modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
+
+					if storageItem.Values.Colors or storageItem.Values.Textures or storageItem.Values.PartAlpha then
+						modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
+					end
 					
+				end
+
+				local customizationData = storageItem:GetValues("_Customs");
+				if customizationData then
+					task.spawn(function()
+						local activeSkinId = storageItem:GetValues("ActiveSkin");
+						
+						modCustomizationData.LoadCustomization({
+							ToolModels = newModels;
+
+							ItemId = itemId;
+							CustomizationData = customizationData;
+							SkinId = activeSkinId;
+						});
+					end)
 				end
 
 				modOnGameEvents:Fire("OnToolEquipped", player, storageItem);

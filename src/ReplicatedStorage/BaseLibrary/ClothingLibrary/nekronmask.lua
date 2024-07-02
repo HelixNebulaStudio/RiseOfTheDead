@@ -21,8 +21,7 @@ function attirePackage.NewToolLib(handler)
 			end
 		end
 		
-		local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
-		local _, storage = modStorage.FindIdFromStorages(storageItem.ID, player);
+		local _, storage = shared.modStorage.FindIdFromStorages(storageItem.ID, player);
 		if storage == nil then Debugger:Log("Unknown storage to remove nekron mask."); return end;
 
 		if classPlayer.Properties["NekronMask"] == nil then

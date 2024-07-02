@@ -293,6 +293,9 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 			ToggleClothing={};
 		};
 
+		--== Optin;
+		profile.OptInNewCustomizationMenu = false;
+
 		--== Leaderboard
 		profile.LeaderstatsTimer = unixTime-120;
 
@@ -1289,11 +1292,17 @@ function Profile:Sync(hierarchyKey, paramPacket)
 		self:Sync("SkillTree");
 		self:Sync("Collectibles");
 		
+		for k, v in pairs(self) do
+			if k:sub(1, 5) == "OptIn" then
+				self:Sync(k);
+			end
+		end
+
 	else
 		local data = modTableManager.GetDataHierarchy(self, hierarchyKey);
 		
 		if RunService:IsStudio() then
-			Debugger:Warn("[Studio] Profile Sync: ",hierarchyKey,"(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")");
+			Debugger:StudioWarn("[Studio] Profile Sync: ",hierarchyKey,"(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")");
 		end
 		
 		paramPacket = paramPacket or {};
@@ -1591,7 +1600,7 @@ function Profile:RefreshSettings(update)
 	
 	self:RefreshPlayerTitle();
 	self:Sync("Settings");
-	
+
 	modSettings.UpdateAutoPickup(self.Cache.PickupCache, self.Settings.AutoPickupConfig or {});
 end
 

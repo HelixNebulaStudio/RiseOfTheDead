@@ -15,6 +15,7 @@ local remoteStorageItemSync = modRemotesManager:Get("StorageItemSync");
 local StorageItem = {};
 StorageItem.__index = StorageItem;
 StorageItem.ClassType = "StorageItem";
+StorageItem.LargestDataSize = 0;
 
 type StorageItemObject = {
 	ItemId: string;
@@ -110,7 +111,6 @@ function StorageItem:Shrink()
 	compressedItem.ItemId = self.ItemId;
 	compressedItem.Index = self.Index;
 	compressedItem.Quantity = self.Quantity;
-	compressedItem.Values = modTables.DeepClone(self.Values);
 	compressedItem.Fav = self.Fav;
 	compressedItem.Vanity = self.Vanity;
 	compressedItem.Name = self.Name;
@@ -118,6 +118,24 @@ function StorageItem:Shrink()
 	compressedItem.DisplayName = self.DisplayName;
 	compressedItem.NonTradeable = self.NonTradeable;
 	
+	local cloneValues = modTables.DeepClone(self.Values);
+	for k, v in pairs(cloneValues) do
+		if k:sub(1,1) == "_" then
+			cloneValues[k] = nil;
+		end
+	end
+	if game:GetService("RunService"):IsStudio() then
+		local jsonEncode = game:GetService("HttpService"):JSONEncode(cloneValues);
+		local valuesSize = #jsonEncode;
+		if valuesSize >= 100 then
+			if valuesSize > StorageItem.LargestDataSize then
+				Debugger:StudioWarn(`StorageItem {self.ItemId} ({self.ID}) size >`, valuesSize);
+				StorageItem.LargestDataSize = valuesSize;
+			end
+		end 
+	end
+	compressedItem.Values = cloneValues;
+
 	return compressedItem;
 end
 

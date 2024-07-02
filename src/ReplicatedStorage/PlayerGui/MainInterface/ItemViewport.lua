@@ -5,6 +5,7 @@ local UserInputService = game:GetService("UserInputService");
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
+local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
@@ -18,8 +19,12 @@ local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modViewportUtil = require(game.ReplicatedStorage.Library.Util.ViewportUtil);
 local modGuiObjectPlus = require(game.ReplicatedStorage.Library.UI.GuiObjectPlus);
 
+local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+
 local remoteEquipCosmetics = game.ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("AppearanceEditor"):WaitForChild("EquipCosmetics");
 local starterCharacter = game.StarterPlayer:WaitForChild("StarterCharacter");
+
+local remoteCustomizationData = modRemotesManager:Get("CustomizationData") :: RemoteFunction;
 
 local camera = workspace.CurrentCamera;
 
@@ -92,19 +97,27 @@ function ItemViewport.new() : ItemViewport
 	setmetatable(self, ItemViewport);
 
 	local selectDelta = nil;
+	local inputStart = nil;
+	
 	self.Garbage:Tag(UserInputService.InputBegan:Connect(function(inputObject) 
 		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
-		selectDelta = self.CurrentHighlightPart;
+
+		if modGuiObjectPlus.IsMouseOver(self.Frame) then
+			inputStart = tick();
+			selectDelta = self.CurrentHighlightPart;
+		end
 	
 	end))
 	self.Garbage:Tag(UserInputService.InputEnded:Connect(function(inputObject) 
 		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
+		if inputStart == nil then return end;
+		if tick()-inputStart >= 0.2 then return end;
 
 		if modGuiObjectPlus.IsMouseOver(self.Frame) and self.CurrentHighlightPart == selectDelta then
 			if selectDelta == nil then
 				table.clear(self.SelectedHighlightParts);
 			else
-				if not UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+				if not UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
 					table.clear(self.SelectedHighlightParts);
 				end
 				if table.find(self.SelectedHighlightParts, self.CurrentHighlightPart) == nil then
@@ -112,6 +125,7 @@ function ItemViewport.new() : ItemViewport
 				end
 			end
 			self.OnSelectionChanged:Fire(self.SelectedHighlightParts, selectDelta);
+			inputStart = 0;
 		end
 
 		selectDelta = nil;
@@ -272,12 +286,16 @@ function ItemViewport:RefreshDisplay()
 
 end
 
+function ItemViewport:LoadCustomizations()
+end
+
 function ItemViewport:SetDisplay(storageItem, yieldFunc)
 	self:Clear();
 	local itemId = storageItem.ItemId;
 	local itemValues = storageItem.Values;
 	self.OnDisplayID = storageItem.ID;
 	
+
 	local itemDisplayLib = modWorkbenchLibrary.ItemAppearance[itemId];
 	local clothingLib = modClothingLibrary:Find(itemId);
 	
@@ -330,16 +348,20 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 					local prefix = "";
 					if weldName == "LeftToolGrip" then
 						prefix = "Left";
-						prefab.Name = "Left"..prefabName;
+						prefab.Name = prefix..prefabName;
 						prefab:SetAttribute("DisplayModelPrefix", "Left");
 
 					elseif weldName == "RightToolGrip" then
 						prefix = "Right";
-						prefab.Name = "Right"..prefabName;
+						prefab.Name = prefix..prefabName;
 						prefab:SetAttribute("DisplayModelPrefix", "Right");
 
 					end
-					modColorsLibrary.ApplyAppearance(prefab, itemValues);
+					prefab:SetAttribute("Grip", weldName);
+					
+					if modData.Profile.OptInNewCustomizationMenu ~= true then
+						modColorsLibrary.ApplyAppearance(prefab, itemValues);
+					end
 					
 					local displayOffset = itemDisplayLib[weldName.."Offset"];
 					table.insert(self.DisplayModels, {WeldName=weldName; Prefab=prefab; BasePrefab=itemPrefabs[prefabName]; Offset=displayOffset; Prefix=prefix;});
@@ -347,6 +369,86 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 			end
 		end
 		
+		type PartData = {
+			Key: string; 
+			Part: BasePart; 
+			DisplayModelData: {
+				Prefab: Model; 
+				BasePrefab: Model; 
+				Prefix: string; 
+				WeldName: string; 
+				Offset: CFrame;
+			};
+			Group: string?;
+			PredefinedGroup: string?;
+		};
+		self.PartDataList = {} :: {PartData};
+
+		for a=1, #self.DisplayModels do
+			local displayModelData = self.DisplayModels[a];
+			local prefix = displayModelData.Prefix;
+			local toolModel = displayModelData.Prefab;
+
+			for _, basePart in pairs(toolModel:GetChildren()) do
+				if not basePart:IsA("BasePart") then continue end;
+				local predefinedGroup = basePart:GetAttribute("CustomizationGroup");
+				predefinedGroup = predefinedGroup and `[{predefinedGroup}]` or nil;
+
+				if toolModel and displayModelData.BasePrefab then
+					local defaultPartName = basePart.Name;
+					local defaultPart = displayModelData.BasePrefab:FindFirstChild(defaultPartName);
+					
+					basePart:SetAttribute("DefaultColor", defaultPart.Color);
+					basePart:SetAttribute("DefaultTransparency", defaultPart.Transparency);
+					basePart:SetAttribute("DefaultMaterial", defaultPart.Material);
+					basePart:SetAttribute("DefaultReflectance", defaultPart.Reflectance);
+				end
+
+				local newPartData = {
+					Key=prefix..basePart.Name;
+					Part=basePart;
+					DisplayModelData = displayModelData;
+					Group = predefinedGroup;
+					PredefinedGroup = predefinedGroup;
+				};
+
+				table.insert(self.PartDataList, newPartData);
+			end
+		end
+		table.sort(self.PartDataList, function(a, b) return a.Key > b.Key; end);
+
+		function self:LoadCustomizations(customPlansCache)
+			customPlansCache = customPlansCache or {};
+			
+			task.spawn(function()
+				local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
+
+				local rPacket = remoteCustomizationData:InvokeServer("loadcustomizations", storageItem.ID);
+				if rPacket == nil or rPacket.Success ~= true then
+					if rPacket and rPacket.FailMsg then
+						Debugger:StudioWarn("rPacket.FailMsg", rPacket.FailMsg); 
+					end
+					
+					return; 
+				end;
+		
+				local serialized = rPacket.Serialized;
+
+				modCustomizationData.LoadCustomization({
+					ItemId = itemId;
+					CustomizationData = serialized;
+					SkinId = storageItem.Values.ActiveSkin;
+
+					CustomPlansCache = customPlansCache;
+					PartDataList = self.PartDataList;
+				});
+
+				modCustomizationData.ApplyCustomPlans(customPlansCache, self.PartDataList);
+			end)
+		end
+		self:LoadCustomizations();
+		
+
 	else
 		local prefab = itemPrefabs:FindFirstChild(itemId) and itemPrefabs[itemId]:Clone() or nil;
 		if prefab then
@@ -376,6 +478,8 @@ function ItemViewport:Clear()
 	self.OnDisplayPackageId = nil;
 	self.Frame.ItemIcon.Image = "";
 	self.Frame.ItemIcon.Visible = false;
+	self.PartDataList = nil;
+	self.ApplyCustomizationPlans = nil;
 end
 
 return ItemViewport;

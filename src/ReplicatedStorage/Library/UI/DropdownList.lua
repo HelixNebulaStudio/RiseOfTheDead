@@ -16,8 +16,9 @@ function DropdownList.new()
 	
 	local selectButton = self.Frame:WaitForChild("Bottom"):WaitForChild("SelectButton");
 	local textInput = self.Frame.Bottom:WaitForChild("TextInput");
+	self.SearchBar = textInput;
 	
-	local scrollFrame = self.Frame.Top:WaitForChild("ScrollingFrame");
+	local scrollFrame = self.Frame.Top:WaitForChild("ScrollingFrame") :: ScrollingFrame;
 	self.ScrollFrame = scrollFrame;
 	
 	local function search()
@@ -25,7 +26,14 @@ function DropdownList.new()
 		if #inputStr > 0 then
 			for _, obj in pairs(scrollFrame:GetChildren()) do
 				if not obj:IsA("GuiObject") then continue end;
-				obj.Visible = obj.Name:find(inputStr) ~= nil;
+				local visible = false;
+				if obj.Name:lower():find(inputStr:lower()) ~= nil then
+					visible = true;
+				elseif (obj:IsA("TextButton") or obj:IsA("TextLabel") or obj:IsA("TextBox"))
+					and obj.Text:lower():find(inputStr:lower()) ~= nil then
+					visible = true;
+				end
+				obj.Visible = visible;
 			end
 		else
 			for _, obj in pairs(scrollFrame:GetChildren()) do
@@ -37,6 +45,7 @@ function DropdownList.new()
 	
 	textInput:GetPropertyChangedSignal("Text"):Connect(function()
 		task.wait();
+		scrollFrame.CanvasPosition = Vector2.new();
 		search();
 	end)
 	
@@ -49,6 +58,10 @@ function DropdownList.new()
 	touchCloseButton.MouseButton1Click:Connect(function()
 		self.Frame.Visible = false;
 	end)
+
+	self.Frame.Destroying:Connect(function()
+		table.clear(self);
+	end)
 	
 	setmetatable(self, DropdownList);
 	return self;
@@ -59,6 +72,8 @@ function DropdownList:LoadOptions(list)
 		if not obj:IsA("GuiObject") then continue end;
 		obj:Destroy();
 	end
+
+	self.SearchBar.Text = "";
 	
 	for a=1, #list do
 		local new = templateOption:Clone();
@@ -78,7 +93,17 @@ function DropdownList:LoadOptions(list)
 				self:OnOptionSelect(a, new);
 			end
 		end)
+
+		if self.OnOptionLoad then
+			self:OnOptionLoad(a, a == #list, new);
+		end
 	end
+end
+
+function DropdownList:Reset()
+	self.OnNewButton = nil;
+	self.OnOptionSelect = nil;
+	self.OnOptionLoad = nil;
 end
 
 return DropdownList;

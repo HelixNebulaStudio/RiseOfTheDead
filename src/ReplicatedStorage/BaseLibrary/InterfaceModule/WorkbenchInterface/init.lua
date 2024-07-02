@@ -11,7 +11,7 @@ local TextService = game:GetService("TextService");
 
 local localplayer = game.Players.LocalPlayer;
 
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modAudio = require(game.ReplicatedStorage.Library:WaitForChild("Audio"));
 local modSyncTime = require(game.ReplicatedStorage.Library:WaitForChild("SyncTime"));
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
@@ -91,7 +91,10 @@ function Interface.init(modInterface)
 
 		Build={Library=modBlueprintLibrary.Library; Workbench=require(script.Build).init(Interface)};
 		Upgrades={Library=modWorkbenchLibrary.ItemUpgrades; Workbench=require(script.Upgrades).init(Interface)};
+		
 		Appearance={Library=modWorkbenchLibrary.ItemAppearance; Workbench=require(script.Appearance).init(Interface)};
+		Customization={Library=modWorkbenchLibrary.ItemAppearance; Workbench=require(script.Customization).init(Interface)};
+
 		DeconstructMod={Library=modModsLibrary.Library; Workbench=require(script.DeconstructMod).init(Interface)};
 		DeconstructWeapon={Library=modWeaponsLibrary; Workbench=require(script.DeconstructWeapon).init(Interface)};
 		
@@ -127,6 +130,7 @@ function Interface.init(modInterface)
 	local function onSelectionChange()
 		Interface.ClearSelection();
 		Interface:CloseWindow("WeaponStats");
+		
 		if selectedSlot then
 			newItemDisplay.Frame.Visible = true;
 			local itemId = selectedSlot.Item.ItemId;
@@ -138,6 +142,13 @@ function Interface.init(modInterface)
 			end
 
 			for key, wb in pairs(Interface.Workbenches) do
+				
+				if modData.Profile.OptInNewCustomizationMenu == true and (key == "Appearance") then
+					continue;
+				elseif modData.Profile.OptInNewCustomizationMenu ~= true and (key == "Customization") then
+					continue;
+				end
+
 				if wb.Library and wb.Workbench then
 					if wb.Library[itemId] or (modItemUnlockablesLibrary:Find(itemId) and key == "Appearance") then
 
