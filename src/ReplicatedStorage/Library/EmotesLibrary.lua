@@ -600,7 +600,7 @@ library:Add{
 	Id="FixingWire";
 	Name="Fixing Wire";
 	LayoutOrder=library.Size;
-	AnimationId="rbxassetid://7453395758";
+	AnimationId="rbxassetid://18314694331";
 	Looped=false;
 	Unlocked=true;
 	
@@ -624,7 +624,7 @@ library:Add{
 	Id="OpenDoor";
 	Name="Open Door";
 	LayoutOrder=library.Size;
-	AnimationId="rbxassetid://7453785412";
+	AnimationId="rbxassetid://18314691006";
 	Looped=false;
 	Unlocked=true;
 	
@@ -668,7 +668,7 @@ library:Add{
 	Id="PullLever";
 	Name="Pull Lever";
 	LayoutOrder=library.Size;
-	AnimationId="rbxassetid://7453932498";
+	AnimationId="rbxassetid://18314686618";
 	Looped=false;
 	Unlocked=true;
 	
@@ -679,7 +679,7 @@ library:Add{
 	Id="UnpullLever";
 	Name="Unpull Lever";
 	LayoutOrder=library.Size;
-	AnimationId="rbxassetid://7453985015";
+	AnimationId="rbxassetid://18314681437";
 	Looped=false;
 	Unlocked=true;
 	
@@ -734,7 +734,7 @@ library:Add{
 	Id="useterminal";
 	Name="Use Terminal";
 	LayoutOrder=library.Size;
-	AnimationId="rbxassetid://9730558323";
+	AnimationId="rbxassetid://18314675035";
 	Looped=true;
 	Unlocked=true;
 
