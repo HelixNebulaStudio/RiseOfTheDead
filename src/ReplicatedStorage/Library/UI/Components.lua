@@ -81,8 +81,19 @@ function Components.CreateSlider(mainInterface, paramPacket)
 		if button:GetAttribute("DisableSlider") == true then return end;
 
 		local absSizeX = button.AbsoluteSize.X;
+
+		local mousePositionLock = nil;
 		RunService:BindToRenderStep("slider", Enum.RenderPriority.Input.Value+1, function(delta)
-			local mousePosition = UserInputService:GetMouseLocation();
+			local rawMousePos = UserInputService:GetMouseLocation();
+			local mousePosition = rawMousePos;
+
+			if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift) then
+				mousePositionLock = mousePositionLock or rawMousePos;
+				mousePosition = mousePositionLock + (rawMousePos-mousePositionLock)/10;
+			else
+				mousePositionLock = nil;
+			end
+
 			local sliderRatio = math.clamp(math.clamp(mousePosition.X-button.AbsolutePosition.X, 0, absSizeX)/absSizeX, 0, 1);
 			
 			currentVal = modMath.MapNum(sliderRatio, 0, 1, minVal, maxVal, true);

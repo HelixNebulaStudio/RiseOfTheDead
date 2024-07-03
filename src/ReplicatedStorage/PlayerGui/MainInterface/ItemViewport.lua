@@ -389,6 +389,15 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 			local prefix = displayModelData.Prefix;
 			local toolModel = displayModelData.Prefab;
 
+			for _, joint in pairs(toolModel:GetDescendants()) do
+				if joint:IsA("Weld") or joint:IsA("Motor6D") then
+					local p1 = joint.Part1;
+					if p1 then
+						p1:SetAttribute("LinkParent", joint.Part0.Name);
+					end
+				end
+			end
+
 			for _, basePart in pairs(toolModel:GetChildren()) do
 				if not basePart:IsA("BasePart") then continue end;
 				local predefinedGroup = basePart:GetAttribute("CustomizationGroup");

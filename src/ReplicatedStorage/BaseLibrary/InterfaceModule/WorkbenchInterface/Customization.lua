@@ -436,6 +436,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 	<b><font size="14">Notes:</font></b>
 		- Setting a color will replace cetain skin permanents that does not have a transparent background.
 		- Handle parts can not have a position offset.
+		- Holding Shift while using sliders will reduce the change scale by a factor of 10.
 		]] 
 			or [[
 		 ]]
@@ -510,18 +511,15 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		local newSelection;
 		local refreshConfigActive;
 
+		local markForSave = false;
 		-- MARK: UpdateCustomizations;
 		local function updateCustomization(func)
 			
-			local function clean(customPlan)
-				-- if customPlan.Transparency == 0 then
-				-- 	customPlan.Transparency = nil;
-				-- end
-				
+			local function clean(customPlan, basePart)
 				if customPlan.PatternData.Offset == Vector2.zero then
 					customPlan.PatternData.Offset = nil;
 				end
-				if customPlan.PatternData.Scale == Vector2.zero then
+				if customPlan.PatternData.Scale == Vector2.one then
 					customPlan.PatternData.Scale = nil;
 				end
 				if customPlan.PatternData.Transparency == 0 then
@@ -532,7 +530,25 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					customPlan.PositionOffset = nil;
 				end
 
-				if customPlan.Reflectance == 0 then
+				if basePart == nil then return end;
+
+				local baseColor = basePart:GetAttribute("DefaultColor");
+				if baseColor and customPlan.Color == baseColor then
+					customPlan.Color = nil;
+				end
+
+				local baseTransparency = basePart:GetAttribute("DefaultTransparency");
+				if baseTransparency and customPlan.Transparency == baseTransparency then
+					customPlan.Transparency = nil;
+				end
+
+				local baseMaterial = basePart:GetAttribute("DefaultMaterial");
+				if baseMaterial and customPlan.Material == baseMaterial then
+					customPlan.Material = nil;
+				end
+
+				local baseReflectance = basePart:GetAttribute("DefaultReflectance");
+				if baseReflectance and customPlan.Reflectance == baseReflectance then
 					customPlan.Reflectance = nil;
 				end
 			end
@@ -551,11 +567,16 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				end
 
 				func(partCustomPlan);
-				clean(partCustomPlan);
+				clean(partCustomPlan, partData.Part);
 
 			end
 
 			modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
+
+			if markForSave then
+				markForSave = false;
+				saveCustomizations();
+			end
 		end
 
 
@@ -1001,6 +1022,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			if colorButton.Darken.Visible then return end;
 			Interface:PlayButtonClick();
 
+			markForSave = true;
 			OpenColorCustomizations(OnColorSelect);
 			refreshConfigActive();
 		end)
@@ -1009,6 +1031,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			if colorButton.Darken.Visible then return end;
 			Interface:PlayButtonClick();
 
+			markForSave = true;
 			OnColorSelect(nil);
 			refreshConfigActive();
 		end
@@ -1036,7 +1059,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		modComponents.CreateSlider(Interface, {
 			Button=transparencySlider;
 			RangeInfo={Min=0; Max=100; Scale=100; Default=0; ValueType="Flat";};
-			SetFunc=OnTransparencySet;
+			SetFunc=function(v)
+				OnTransparencySet(v);
+				markForSave = true;
+			end;
 			DisplayValueFunc=OnTransparencySet;
 		});
 
@@ -1084,12 +1110,14 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		textureSetButton.MouseButton1Click:Connect(function()
 			if textureSetButton.Darken.Visible then return end;
 
+			markForSave = true;
 			Interface:PlayButtonClick();
 			OpenSkinCustomizations(OnSkinSelect)
 		end)
 		local function resetTextureSet()
 			if textureSetButton.Darken.Visible then return end;
 
+			markForSave = true;
 			Interface:PlayButtonClick();
 			OnSkinSelect(nil);
 		end
@@ -1100,11 +1128,13 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		local textureColorButton = editPanel.SkinColorFrame.Button;
 		templateDarkenFrame:Clone().Parent = textureColorButton;
 
-		local function OnSelectTextureColor(selectColor: Color3)
-			textureColorButton.ImageColor3 = selectColor;
-			textureColorButton.BackgroundColor3 = modColorPicker.GetBackColor(selectColor);
-			textureColorButton.TextLabel.Text = `#{selectColor:ToHex()}`;
-			textureColorButton.TextLabel.TextColor3 = modColorPicker.GetBackColor(selectColor);
+		local function OnSelectTextureColor(selectColor)
+
+			local color = selectColor or Color3.fromRGB(255, 255, 255);
+			textureColorButton.ImageColor3 = color;
+			textureColorButton.BackgroundColor3 = modColorPicker.GetBackColor(color);
+			textureColorButton.TextLabel.Text = `#{color:ToHex()}`;
+			textureColorButton.TextLabel.TextColor3 = modColorPicker.GetBackColor(color);
 
 			Debugger:StudioWarn("Set TextureColor=", textureColorButton.TextLabel.Text);
 			updateCustomization(function(customPlan)
@@ -1115,10 +1145,20 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		textureColorButton.MouseButton1Click:Connect(function()
 			if textureColorButton.Darken.Visible then return end;
 
+			markForSave = true;
 			Interface:PlayButtonClick();
 			OpenColorCustomizations(OnSelectTextureColor);
 		end)
+		local function resetTextureColor()
+			if textureColorButton.Darken.Visible then return end;
 
+			markForSave = true;
+			Interface:PlayButtonClick();
+			OnSelectTextureColor(nil);
+		end
+		textureSetButton.TouchLongPress:Connect(resetTextureColor);
+		textureSetButton.MouseButton2Click:Connect(resetTextureColor);
+		
 
 		-- MARK: Texture Offset
 		local textureOffsetXSlider = modComponents.NewSliderButton() :: TextButton;
@@ -1158,13 +1198,19 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		modComponents.CreateSlider(Interface, {
 			Button=textureOffsetXSlider;
 			RangeInfo={Min=-400; Max=400; Scale=100; Default=0; ValueType="Flat";};
-			SetFunc=onTextureOffsetX;
+			SetFunc=function(v)
+				onTextureOffsetX(v);
+				markForSave = true;
+			end;
 			DisplayValueFunc=onTextureOffsetX;
 		});
 		modComponents.CreateSlider(Interface, {
 			Button=textureOffsetYSlider;
 			RangeInfo={Min=-400; Max=400; Scale=100; Default=0; ValueType="Flat";};
-			SetFunc=onTextureOffsetY;
+			SetFunc=function(v)
+				onTextureOffsetY(v);
+				markForSave = true;
+			end;
 			DisplayValueFunc=onTextureOffsetY;
 		});
 
@@ -1207,13 +1253,19 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		modComponents.CreateSlider(Interface, {
 			Button=textureScaleXSlider;
 			RangeInfo={Min=10; Max=400; Scale=100; Default=100; ValueType="Flat";};
-			SetFunc=onTextureScaleX;
+			SetFunc=function(v)
+				onTextureScaleX(v);
+				markForSave = true;
+			end;
 			DisplayValueFunc=onTextureScaleX;
 		});
 		modComponents.CreateSlider(Interface, {
 			Button=textureScaleYSlider;
 			RangeInfo={Min=10; Max=400; Scale=100; Default=100; ValueType="Flat";};
-			SetFunc=onTextureScaleY;
+			SetFunc=function(v)
+				onTextureScaleY(v);
+				markForSave = true;
+			end;
 			DisplayValueFunc=onTextureScaleY;
 		});
 
@@ -1237,7 +1289,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		modComponents.CreateSlider(Interface, {
 			Button=textureAlphaSlider;
 			RangeInfo={Min=0; Max=100; Scale=100; Default=0; ValueType="Flat";};
-			SetFunc=onTextureAlphaSet;
+			SetFunc=function(v)
+				onTextureAlphaSet(v);
+				markForSave = true;
+			end;
 			DisplayValueFunc=onTextureAlphaSet;
 		});
 
@@ -1278,7 +1333,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		modComponents.CreateSlider(Interface, {
 			Button=partOffsetXSlider;
 			RangeInfo={Min=-100; Max=100; Scale=100; Default=0; ValueType="Flat";};
-			SetFunc=onPartOffsetX;
+			SetFunc=function(v)
+				onPartOffsetX(v);
+				markForSave = true;
+			end;
 			DisplayValueFunc=onPartOffsetX;
 		});
 		
@@ -1300,7 +1358,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		modComponents.CreateSlider(Interface, {
 			Button=partOffsetYSlider;
 			RangeInfo={Min=-100; Max=100; Scale=100; Default=0; ValueType="Flat";};
-			SetFunc=onPartOffsetY;
+			SetFunc=function(v)
+				onPartOffsetY(v);
+				markForSave = true;
+			end;
 			DisplayValueFunc=onPartOffsetY;
 		});
 		
@@ -1322,8 +1383,107 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		modComponents.CreateSlider(Interface, {
 			Button=partOffsetZSlider;
 			RangeInfo={Min=-100; Max=100; Scale=100; Default=0; ValueType="Flat";};
-			SetFunc=onPartOffsetZ;
+			SetFunc=function(v)
+				onPartOffsetZ(v);
+				markForSave = true;
+			end;
 			DisplayValueFunc=onPartOffsetZ;
+		});
+
+		-- MARK: Part Scale;
+		local partScaleXSlider = modComponents.NewSliderButton() :: TextButton;
+		partScaleXSlider.AnchorPoint = Vector2.new(1, 0);
+		partScaleXSlider.Position = UDim2.new(1, -143, 0, 0);
+		partScaleXSlider.Size = UDim2.new(0, 63, 0, 30);
+		partScaleXSlider.Parent = editPanel.PartScaleFrame;
+		templateDarkenFrame:Clone().Parent = partScaleXSlider;
+
+		local partScaleYSlider = partScaleXSlider:Clone();
+		partScaleYSlider.Position = UDim2.new(1, -74, 0, 0);
+		partScaleYSlider.Parent = editPanel.PartScaleFrame;
+		templateDarkenFrame:Clone().Parent = partScaleYSlider;
+
+		local partScaleZSlider = partScaleXSlider:Clone();
+		partScaleZSlider.Position = UDim2.new(1, -5, 0, 0);
+		partScaleZSlider.Parent = editPanel.PartScaleFrame;
+		templateDarkenFrame:Clone().Parent = partScaleZSlider;
+		
+
+		local function onPartScaleX(v)
+			Debugger:StudioWarn("Set PartScale.X=", v);
+			updateCustomization(function(customPlan)
+				if customPlan.Scale == nil then
+					customPlan.Scale = Vector3.one;
+				end
+				customPlan.Scale = Vector3.new(
+					v,
+					customPlan.Scale.Y,
+					customPlan.Scale.Z
+				);
+			end)
+
+			return v;
+		end
+		modComponents.CreateSlider(Interface, {
+			Button=partScaleXSlider;
+			RangeInfo={Min=10; Max=200; Scale=100; Default=100; ValueType="Flat";};
+			SetFunc=function(v)
+				onPartScaleX(v);
+				markForSave = true;
+			end;
+			DisplayValueFunc=onPartScaleX;
+		});
+
+
+		local function onPartScaleY(v)
+			Debugger:StudioWarn("Set PartScale.Y=", v);
+			updateCustomization(function(customPlan)
+				if customPlan.Scale == nil then
+					customPlan.Scale = Vector3.one;
+				end
+				customPlan.Scale = Vector3.new(
+					customPlan.Scale.X,
+					v,
+					customPlan.Scale.Z
+				);
+			end)
+
+			return v;
+		end
+		modComponents.CreateSlider(Interface, {
+			Button=partScaleYSlider;
+			RangeInfo={Min=10; Max=200; Scale=100; Default=100; ValueType="Flat";};
+			SetFunc=function(v)
+				onPartScaleY(v);
+				markForSave = true;
+			end;
+			DisplayValueFunc=onPartScaleY;
+		});
+
+
+		local function onPartScaleZ(v)
+			Debugger:StudioWarn("Set PartScale.Z=", v);
+			updateCustomization(function(customPlan)
+				if customPlan.Scale == nil then
+					customPlan.Scale = Vector3.one;
+				end
+				customPlan.Scale = Vector3.new(
+					customPlan.Scale.X,
+					customPlan.Scale.Y,
+					v
+				);
+			end)
+
+			return v;
+		end
+		modComponents.CreateSlider(Interface, {
+			Button=partScaleZSlider;
+			RangeInfo={Min=10; Max=200; Scale=100; Default=100; ValueType="Flat";};
+			SetFunc=function(v)
+				onPartScaleZ(v);
+				markForSave = true;
+			end;
+			DisplayValueFunc=onPartScaleZ;
 		});
 
 
@@ -1346,7 +1506,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		modComponents.CreateSlider(Interface, {
 			Button=reflectanceSlider;
 			RangeInfo={Min=0; Max=100; Scale=100; Default=0; ValueType="Flat";};
-			SetFunc=onReflectanceSet;
+			SetFunc=function(v)
+				onReflectanceSet(v);
+				markForSave = true;
+			end;
 			DisplayValueFunc=onReflectanceSet;
 		});
 
@@ -1354,7 +1517,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		local materialButton = editPanel.MaterialFrame.Button;
 		templateDarkenFrame:Clone().Parent = materialButton;
 
-		local function OnMaterialSelect(materialName)
+		local function OnMaterialSelect(materialName, part)
 			Debugger:StudioWarn("Set Material=", materialName);
 			updateCustomization(function(customPlan)
 				local mat = nil;
@@ -1364,6 +1527,9 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				customPlan.Material = mat;
 			end)
 
+			if materialName == nil then
+				materialName = part.Material.Name;
+			end
 			materialButton.Text = materialName or "None";
 		end
 
@@ -1472,16 +1638,20 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			partOffsetZSlider.Darken.Visible = not canEditOffset;
 			editPanel.PartOffsetFrame.NameLabel.TextColor3 = offsetLabelColor;
 
-			-- Part Reflectance
-			reflectanceSlider:SetAttribute("DisableSlider", not canEdit);
-			reflectanceSlider.AutoButtonColor = canEdit;
-			reflectanceSlider.Darken.Visible = not canEdit;
-			editPanel.ReflectanceFrame.NameLabel.TextColor3 = labelColor;
+			-- Part Scale
 
 			-- Part Material
 			editPanel.MaterialFrame.Button.AutoButtonColor = canEdit;
 			editPanel.MaterialFrame.Button.Darken.Visible = not canEdit;
 			editPanel.MaterialFrame.NameLabel.TextColor3 = labelColor;
+
+			-- Part Reflectance
+			local currentMat = editPanel.MaterialFrame.Button;
+			local reflectiveMat = currentMat.Text == "SmoothPlastic";
+			reflectanceSlider:SetAttribute("DisableSlider", not reflectiveMat);
+			reflectanceSlider.AutoButtonColor = reflectiveMat;
+			reflectanceSlider.Darken.Visible = not reflectiveMat;
+			editPanel.ReflectanceFrame.NameLabel.TextColor3 = reflectiveMat and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 
 		end
 
@@ -1701,9 +1871,16 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 			else
 				local partData = selectionPartData[1];
+
+				local linkParentPartName = partData.Part:GetAttribute("LinkParent");
+
 				selectTextbox.Text = "";
 				selectTextbox.PlaceholderText = partData.Key;
 				infoLabel.Text = `<b>Currently Editing:</b> Part`;
+				if linkParentPartName then
+					infoLabel.Text = infoLabel.Text..`\n<b>Jointed To:</b> {linkParentPartName}`;
+				end
+
 				partLabel.Text = `<font size="14"><b>Part Group:</b> {partData.Group or "None"}</font>`;
 				selectTextbox.TextEditable = false;
 
@@ -1738,7 +1915,12 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					partOffsetYSlider:SetAttribute("Value", newPartOffset.Y);
 					partOffsetZSlider:SetAttribute("Value", newPartOffset.Z);
 
-					OnMaterialSelect(customPlan.Material);
+					local newPartScale = customPlan.Scale or Vector3.one;
+					partScaleXSlider:SetAttribute("Value", newPartScale.X);
+					partScaleYSlider:SetAttribute("Value", newPartScale.Y);
+					partScaleZSlider:SetAttribute("Value", newPartScale.Z);
+
+					OnMaterialSelect(customPlan.Material, partData.Part);
 
 					reflectanceSlider:SetAttribute("Value", customPlan.Reflectance);
 
@@ -1750,7 +1932,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					partOffsetXSlider:SetAttribute("Value", "nil");
 					partOffsetYSlider:SetAttribute("Value", "nil");
 					partOffsetZSlider:SetAttribute("Value", "nil");
-					OnMaterialSelect(nil);
+					partScaleXSlider:SetAttribute("Value", "nil");
+					partScaleYSlider:SetAttribute("Value", "nil");
+					partScaleZSlider:SetAttribute("Value", "nil");
+					OnMaterialSelect(nil, partData.Part);
 					reflectanceSlider:SetAttribute("Value", "nil");
 
 				end
@@ -1872,8 +2057,14 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 						if selectGroupName then
 							for a=1, #itemViewport.PartDataList do
 								local partData = itemViewport.PartDataList[a];
-								if partData.Group == selectGroupName then
+								if partData.Group == selectionName then
 									partData.Group = partData.PredefinedGroup;
+								end
+							end
+							
+							for a=#groupsList, 1, -1 do
+								if groupsList[a] == selectionName then
+									table.remove(groupsList, a);
 								end
 							end
 						end

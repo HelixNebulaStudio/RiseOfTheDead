@@ -212,6 +212,7 @@ function CustomizationData.newCustomizationPlan()
 
         -- can't be copied
         PositionOffset=nil;
+        Scale=nil;
     };
 
     setmetatable(self, CustomizationPlan);
@@ -245,6 +246,7 @@ function CustomizationPlan:IsEdited()
     if self.Material then return true end;
     if self.Reflectance then return true end;
     if self.PositionOffset then return true end;
+    if self.Scale then return true end;
 
     return false;
 end
@@ -263,6 +265,7 @@ function CustomizationData.ApplyCustomPlans(customPlans, partDataList)
         if partPlan then
             finalCustomPlan:Copy(partPlan, true);
             finalCustomPlan.PositionOffset = partPlan.PositionOffset;
+            finalCustomPlan.Scale = partPlan.Scale;
         end
         if groupPlan then
             finalCustomPlan:Copy(groupPlan, true);
@@ -272,7 +275,6 @@ function CustomizationData.ApplyCustomPlans(customPlans, partDataList)
             finalCustomPlan.BaseSkin = baseCustomPlan.BaseSkin;
         end
         
-
         finalCustomPlan:Apply(partData.Part);
     end
 end
@@ -291,6 +293,7 @@ function CustomizationPlan:Reset()
     self.Material = nil;
     self.Reflectance = nil;
     self.PositionOffset = nil;
+    self.Scale = nil;
 end
 
 function CustomizationPlan:Apply(obj: BasePart)
@@ -472,6 +475,22 @@ function CustomizationPlan:Apply(obj: BasePart)
             end
         end
     end
+
+    local defaultSize = obj:GetAttribute("Size");
+    if defaultSize == nil then
+        defaultSize = obj.Size;
+        obj:SetAttribute("Size", defaultSize);
+    end
+    if self.Scale and self.Scale.X == 1 and self.Scale.Y == 1 and self.Scale.Z == 1 then
+        self.Scale = nil;
+
+    end
+    if self.Scale then
+        obj.Size = defaultSize * self.Scale;
+    else
+        obj.Size = defaultSize;
+    end
+
 end
 
 function CustomizationPlan:__tostring()
@@ -486,8 +505,10 @@ function CustomizationPlan:Deserialize(valStr)
     
     end
     if args[2] then -- skin
-        self.Skin = tostring(args[2]);
-
+        local skinVarId = tostring(args[2]);
+        if #skinVarId > 0 then
+            self.Skin = skinVarId;
+        end
     end
     if args[3] then -- transparency
         local a = tonumber(args[3]);
@@ -505,7 +526,7 @@ function CustomizationPlan:Deserialize(valStr)
             Scale = nil;
             Transparency = nil;
         };
-        if patArgs[1] then --color
+        if patArgs[1] and #patArgs[1] > 0 then --color
             patData.Color = modColorPicker.GetColor(patArgs[1], true);
         
         end
@@ -570,6 +591,22 @@ function CustomizationPlan:Deserialize(valStr)
         end
 
     end
+    if args[8] then -- part scale;
+        local vec3Args = string.split(args[8], ",");
+
+        local x = tonumber(vec3Args[1]);
+        local y = tonumber(vec3Args[2]);
+        local z = tonumber(vec3Args[3]);
+        if x and y and z then
+            self.Scale = Vector3.new(
+                math.clamp(x/100, 0.1, 2), 
+                math.clamp(y/100, 0.1, 2), 
+                math.clamp(z/100, 0.1, 2) 
+            );
+        end
+
+    end
+
 end
 
 function CustomizationPlan:Serialize()
@@ -648,6 +685,16 @@ function CustomizationPlan:Serialize()
     end
     buildStr = buildStr..";";
     
+    if self.Scale then
+        buildStr = buildStr..math.round(self.Scale.X *100);
+        buildStr = buildStr..",";
+        buildStr = buildStr..math.round(self.Scale.Y *100);
+        buildStr = buildStr..",";
+        buildStr = buildStr..math.round(self.Scale.Z *100);
+
+    end
+    buildStr = buildStr..";";
+
     return buildStr;
 end
 
