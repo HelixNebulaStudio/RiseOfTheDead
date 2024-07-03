@@ -194,6 +194,58 @@ end
 local CustomizationPlan = {};
 CustomizationPlan.__index = CustomizationPlan;
 
+CustomizationData.Materials = {
+    ["Neon"]={Material=Enum.Material.Neon; Val=0.02;};
+    ["ForceField"]={Material=Enum.Material.ForceField; Val=0.04;};
+
+    ["Glass"]={Material=Enum.Material.Glass; Reflectance=true; Val=0.06;};
+    ["SmoothPlastic"]={Material=Enum.Material.SmoothPlastic; Reflectance=true; Val=0.06;};
+
+    ["Plastic"]={Material=Enum.Material.Plastic; Reflectance=true; Val=0.1;};
+
+    ["BrushedMetal"]={Material=Enum.Material.Metal; Varient="Brushed Metal"; Val=0.5;};
+    ["RustySpots"]={Material=Enum.Material.Metal; Varient="Rusty Spots"; Val=0.5;};
+    ["OldMetal"]={Material=Enum.Material.Metal; Varient="Old Metal"; Val=0.5;};
+    ["WornMetal"]={Material=Enum.Material.Metal; Varient="Worn Metal"; Val=0.5;};
+    ["DeadWood"]={Material=Enum.Material.Wood; Varient="Dead Wood"; Val=0.5;};
+    ["RoughWood"]={Material=Enum.Material.Wood; Varient="Rough Wood"; Val=0.5;};
+    ["TarpPlastic"]={Material=Enum.Material.Plastic; Varient="Tarp Plastic"; Val=0.5;};
+    ["Tree Leaves"]={Material=Enum.Material.LeafyGrass; Varient="Tree Leaves"; Val=0.5;};
+    
+
+    ["WoodPlanks"]={Material=Enum.Material.WoodPlanks; Val=1;};
+    ["Wood"]={Material=Enum.Material.Wood; Val=1;};
+    ["CorrodedMetal"]={Material=Enum.Material.CorrodedMetal; Val=1;};
+    ["DiamondPlate"]={Material=Enum.Material.DiamondPlate; Val=1;};
+    ["Foil"]={Material=Enum.Material.Foil; Val=1;};
+    ["Metal"]={Material=Enum.Material.Metal; Val=1;};
+    ["Sand"]={Material=Enum.Material.Sand; Val=1;};
+    ["Fabric"]={Material=Enum.Material.Fabric; Val=1;};
+    ["Ice"]={Material=Enum.Material.Ice; Val=1;};
+
+    ["Marble"]={Material=Enum.Material.Marble; Val=2;};
+    ["Slate"]={Material=Enum.Material.Slate; Val=2;};
+    ["Concrete"]={Material=Enum.Material.Concrete; Val=2;};
+    ["Granite"]={Material=Enum.Material.Granite; Val=2;};
+    ["Brick"]={Material=Enum.Material.Brick; Val=2;};
+    ["Pebble"]={Material=Enum.Material.Pebble; Val=2;};
+    ["Cobblestone"]={Material=Enum.Material.Cobblestone; Val=2;};
+    ["Rock"]={Material=Enum.Material.Rock; Val=2;};
+    ["Sandstone"]={Material=Enum.Material.Sandstone; Val=2;};
+    ["Basalt"]={Material=Enum.Material.Basalt; Val=2;};
+    ["CrackedLava"]={Material=Enum.Material.CrackedLava; Val=2;};
+    ["Limestone"]={Material=Enum.Material.Limestone; Val=2;};
+    ["Pavement"]={Material=Enum.Material.Pavement; Val=2;};
+    ["Grass"]={Material=Enum.Material.Grass; Val=2;};
+    ["LeafyGrass"]={Material=Enum.Material.LeafyGrass; Val=2;};
+    ["Snow"]={Material=Enum.Material.Snow; Val=2;};
+    ["Mud"]={Material=Enum.Material.Mud; Val=2;};
+    ["Ground"]={Material=Enum.Material.Ground; Val=2;};
+    ["Asphalt"]={Material=Enum.Material.Asphalt; Val=2;};
+    ["Salt"]={Material=Enum.Material.Salt; Val=2;};
+    ["Glacier"]={Material=Enum.Material.Glacier; Val=2;};
+};
+
 function CustomizationData.newCustomizationPlan()
     local self = {
         BaseSkin=nil;
@@ -298,9 +350,21 @@ end
 
 function CustomizationPlan:Apply(obj: BasePart)
     obj.Color = self.Color or obj:GetAttribute("DefaultColor") or obj.Color;
+
     obj.Transparency = self.Transparency or obj:GetAttribute("DefaultTransparency") or obj.Transparency;
-    obj.Material = self.Material or obj:GetAttribute("DefaultMaterial") or obj.Material;
+    obj:SetAttribute("ActiveTransparency", obj.Transparency);
+
     obj.Reflectance = self.Reflectance or obj:GetAttribute("DefaultReflectance") or obj.Reflectance;
+
+    local matInfo = CustomizationData.Materials[self.Material];
+    if matInfo then
+        obj.Material = matInfo.Material;
+        if matInfo.Varient then
+            obj.MaterialVariant = matInfo.Varient;
+        end
+    else
+        obj.Material = obj:GetAttribute("DefaultMaterial") or obj.Material;
+    end
 
     local baseSkinTextures: {Texture} = {};
     local surfaceAppearance: SurfaceAppearance = nil;
@@ -561,12 +625,11 @@ function CustomizationPlan:Deserialize(valStr)
 
     end
     if args[5] then -- part mat
-        local mat = nil;
-        pcall(function()
-            mat = Enum.Material[args[5]];
-        end)
+        local mat = args[5];
 
-        self.Material = mat;
+        if #mat > 0 then
+            self.Material = mat;
+        end
 
     end
     if args[6] then -- part reflectance
@@ -665,8 +728,7 @@ function CustomizationPlan:Serialize()
     buildStr = buildStr..";";
 
     if self.Material then
-        local mat: Enum.Material = self.Material;
-        buildStr = buildStr..mat.Name;
+        buildStr = buildStr..self.Material;
     end
     buildStr = buildStr..";";
 

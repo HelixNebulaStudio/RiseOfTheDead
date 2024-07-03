@@ -12,6 +12,7 @@ local modCustomizationData = require(game.ReplicatedStorage.Library.Customizatio
 local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
 local modItemSkinsLibrary = require(game.ReplicatedStorage.Library.ItemSkinsLibrary)
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modItemSkinWear = require(game.ReplicatedStorage.Library.ItemSkinWear);
 
 local modDropdownList = require(game.ReplicatedStorage.Library.UI.DropdownList);
 local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
@@ -163,6 +164,18 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 	
 	-- listMenu:Refresh();
 	function listMenu:Refresh()
+		local itemWear, itemWearTitle = 0, "";
+
+		if storageItem.Values.SkinWearId then
+			local skinWearLib = modItemSkinWear.LoadFloat(itemId, storageItem.Values.SkinWearId);
+
+			if skinWearLib.Title then
+				itemWearTitle = modItemSkinWear.Titles[skinWearLib.Title];
+			end
+
+			itemWear = math.round(skinWearLib.Float*10000)/10000;
+		end
+
 		local groupPartList = {};
 		local groupsList = {};
 
@@ -542,10 +555,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					customPlan.Transparency = nil;
 				end
 
-				local baseMaterial = basePart:GetAttribute("DefaultMaterial");
-				if baseMaterial and customPlan.Material == baseMaterial then
-					customPlan.Material = nil;
-				end
+				-- local baseMaterial = basePart:GetAttribute("DefaultMaterial");
+				-- if baseMaterial and customPlan.Material == baseMaterial then
+				-- 	customPlan.Material = nil;
+				-- end
 
 				local baseReflectance = basePart:GetAttribute("DefaultReflectance");
 				if baseReflectance and customPlan.Reflectance == baseReflectance then
@@ -654,6 +667,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 							return;
 						end
 
+						markForSave = true;
 						Interface:PlayButtonClick();
 						if onSelectFunc then
 							onSelectFunc(selectColor);
@@ -664,6 +678,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					function colorPickerObj:OnForceColorSelect(selectColor, colorName, colorLabel)
 						if not isDevBranch and localPlayer.UserId ~= 16170943 then return end;
 
+						markForSave = true;
 						Interface:PlayButtonClick();
 						if onSelectFunc then
 							onSelectFunc(selectColor, true);
@@ -926,6 +941,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 							if not isUnlocked then return end;
 							Interface:PlayButtonClick();
 
+							markForSave = true;
 							if onSelectFunc then
 								onSelectFunc(skinInfo.Id, patternData.Id);
 							end
@@ -966,6 +982,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 							if not isUnlocked then return end;
 							Interface:PlayButtonClick();
 
+							markForSave = true;
 							if onSelectFunc then
 								onSelectFunc(skinInfo.Id, textureData.Id);
 							end
@@ -1519,18 +1536,21 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		local function OnMaterialSelect(materialName, part)
 			Debugger:StudioWarn("Set Material=", materialName);
+			local matInfo = modCustomizationData.Materials[materialName];
+
 			updateCustomization(function(customPlan)
-				local mat = nil;
-				pcall(function()
-					mat = Enum.Material[materialName];
-				end)
-				customPlan.Material = mat;
+				if matInfo then
+					customPlan.Material = materialName;
+				else
+					customPlan.Material = nil;
+				end
 			end)
 
 			if materialName == nil then
 				materialName = part.Material.Name;
 			end
 			materialButton.Text = materialName or "None";
+			refreshConfigActive();
 		end
 
 		materialButton.MouseButton1Click:Connect(function()
@@ -1538,16 +1558,36 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			Interface:PlayButtonClick();
 
 			local materialOptionList = {};
-			for index, matName in pairs(Enum.Material:GetEnumItems()) do
-				if matName.Name == "Air" then continue end;
-				table.insert(materialOptionList, matName.Name);
+
+			for matName, matInfo in pairs(modCustomizationData.Materials) do
+				table.insert(materialOptionList, matName);
 			end
+			table.sort(materialOptionList, function(a, b)
+				local matInfoA = modCustomizationData.Materials[a];
+				local matInfoB = modCustomizationData.Materials[b];
+
+				return matInfoA.Val < matInfoB.Val;
+			end)
 			
 			newDropDownList:Reset();
 			newDropDownList.Frame.NameTag.Text = "Select Material";
+
+			function newDropDownList:OnNewButton(index, optionButton: TextButton)
+				local selectionName = optionButton.Name;
+				local matInfo = modCustomizationData.Materials[selectionName];
+
+				optionButton.Text = optionButton.Text..(matInfo.Val <= 0.1 and ` ({matInfo.Val})` or ``);
+				
+				local isUnlocked = itemWear <= 0.1 and itemWear <= matInfo.Val;
+				optionButton.AutoButtonColor = isUnlocked;
+				optionButton.BackgroundColor3 = isUnlocked and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(30, 30, 30);
+			end
+
 			function newDropDownList:OnOptionSelect(index, optionButton)
+				if not optionButton.AutoButtonColor then return end;
 				Debugger:StudioWarn("index", index, "optionButton", optionButton);
 
+				markForSave = true;
 				OnMaterialSelect(optionButton.Name);
 
 				dropDownFrame.Visible = false;
@@ -1647,7 +1687,9 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 			-- Part Reflectance
 			local currentMat = editPanel.MaterialFrame.Button;
-			local reflectiveMat = currentMat.Text == "SmoothPlastic";
+			local matInfo = modCustomizationData.Materials[currentMat.Text];
+			local reflectiveMat = matInfo.Reflectance == true;
+
 			reflectanceSlider:SetAttribute("DisableSlider", not reflectiveMat);
 			reflectanceSlider.AutoButtonColor = reflectiveMat;
 			reflectanceSlider.Darken.Visible = not reflectiveMat;

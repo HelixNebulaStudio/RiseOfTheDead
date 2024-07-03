@@ -470,7 +470,7 @@ local function ToggleBodypartTransparency(bodyParts, hide, includeArms)
 			end
 			
 		elseif object:IsA("BasePart") or object:IsA("Texture") or object:IsA("Decal") then
-			local savedTransparency = object:GetAttribute("DefaultTransparency");
+			local savedTransparency = object:GetAttribute("ActiveTransparency") or object:GetAttribute("DefaultTransparency");
 			
 			if hide and fpVisible == false then
 				if savedTransparency == nil then
