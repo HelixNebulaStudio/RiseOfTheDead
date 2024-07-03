@@ -400,6 +400,11 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 
 			for _, basePart in pairs(toolModel:GetChildren()) do
 				if not basePart:IsA("BasePart") then continue end;
+				if basePart.Name == "Collider" then 
+					basePart.CanQuery = false;
+					continue
+				end;
+
 				local predefinedGroup = basePart:GetAttribute("CustomizationGroup");
 				predefinedGroup = predefinedGroup and `[{predefinedGroup}]` or nil;
 
