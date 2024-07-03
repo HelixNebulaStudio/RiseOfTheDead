@@ -1024,6 +1024,9 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				elseif skinVariantData and skinVariantData.Icon then
 					colorButton.ImageLabel.Image = skinVariantData.Icon;
 
+				elseif skinVariantData and skinVariantData.Image then
+					colorButton.ImageLabel.Image = skinVariantData.Image;
+
 				end
 			else
 				colorButton.ImageLabel.Image = "";
@@ -1665,6 +1668,9 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			if activeGroupName == nil then
 				canEditOffset = true;
 			end
+			if activePartSelection and #activePartSelection == 1 and activePartSelection[1].Part.Name == "Handle" then
+				canEditOffset = false;
+			end
 			local offsetLabelColor = canEditOffset and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 
 			partOffsetXSlider:SetAttribute("DisableSlider", not canEditOffset);
@@ -1679,6 +1685,21 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			editPanel.PartOffsetFrame.NameLabel.TextColor3 = offsetLabelColor;
 
 			-- Part Scale
+			local canEditScale = false;
+			if activeGroupName == nil then
+				canEditScale = true;
+			end
+			
+			partScaleXSlider:SetAttribute("DisableSlider", not canEditScale);
+			partScaleXSlider.AutoButtonColor = canEditScale;
+			partScaleXSlider.Darken.Visible = not canEditScale;
+			partScaleYSlider:SetAttribute("DisableSlider", not canEditScale);
+			partScaleYSlider.AutoButtonColor = canEditScale;
+			partScaleYSlider.Darken.Visible = not canEditScale;
+			partScaleZSlider:SetAttribute("DisableSlider", not canEditScale);
+			partScaleZSlider.AutoButtonColor = canEditScale;
+			partScaleZSlider.Darken.Visible = not canEditScale;
+			editPanel.PartOffsetFrame.NameLabel.TextColor3 = canEditScale and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 
 			-- Part Material
 			editPanel.MaterialFrame.Button.AutoButtonColor = canEdit;
