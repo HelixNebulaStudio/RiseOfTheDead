@@ -157,9 +157,9 @@ function WeaponHandler:Equip(library, weaponId)
 		objects.Right.Model = rightWeaponModel;
 		objects.Right.Handle = rightWeaponModel:WaitForChild("Handle");
 		objects.Right.BulletOrigin = objects.Right.Handle:WaitForChild("BulletOrigin");
-		objects.Right.MuzzleOrigin = objects.Right.Handle:WaitForChild("MuzzleOrigin");
 		objects.Right.CaseOutPoint = objects.Right.Handle:FindFirstChild("CaseOut");
 		objects.Right.WeaponSights = objects.Right.Handle:FindFirstChild("WeaponSights");
+		objects.Right.MuzzleOrigin = rightWeaponModel:FindFirstChild("MuzzleOrigin", true);
 		
 	end
 	
@@ -168,9 +168,9 @@ function WeaponHandler:Equip(library, weaponId)
 		objects.Left.Model = leftWeaponModel;
 		objects.Left.Handle = leftWeaponModel:WaitForChild("Handle");
 		objects.Left.BulletOrigin = objects.Left.Handle:WaitForChild("BulletOrigin");
-		objects.Left.MuzzleOrigin = objects.Left.Handle:WaitForChild("MuzzleOrigin");
 		objects.Left.CaseOutPoint = objects.Left.Handle:FindFirstChild("CaseOut");
 		objects.Left.WeaponSights = objects.Left.Handle:FindFirstChild("WeaponSights");
+		objects.Left.MuzzleOrigin = leftWeaponModel:WaitForChild("MuzzleOrigin", true);
 	end
 
 	local storageItem = modData.GetItemById(weaponId);

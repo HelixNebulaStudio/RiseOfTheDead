@@ -83,7 +83,7 @@ if RunService:IsServer() then
 		
 		local toxicEmitter = script.ToxicEmitter;
 		for _, prefab in pairs(toolHandler.Prefabs) do
-			local muzzleOrigin = prefab.PrimaryPart:FindFirstChild("MuzzleOrigin");
+			local muzzleOrigin = prefab:FindFirstChild("MuzzleOrigin", true);
 			if muzzleOrigin == nil then continue end;
 			
 			for _, obj in pairs(muzzleOrigin:GetChildren()) do

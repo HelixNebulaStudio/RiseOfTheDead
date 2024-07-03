@@ -40,7 +40,7 @@ return function()
 		local weaponConfigurations = weaponModule.Configurations;
 		local audio = weaponModule.Audio;
 	
-		local muzzleOrigin = handle:FindFirstChild("MuzzleOrigin");
+		local muzzleOrigin = weapon:FindFirstChild("MuzzleOrigin", true);
 		local bulletOrigin = handle:FindFirstChild("BulletOrigin");
 	
 		if weaponConfigurations then
