@@ -424,8 +424,8 @@ function CameraClass:Init()
 
 		if disableSmallShadows == false and disableObjMat == false then return end;
 
-		local cameraPos = camera.CFrame.Position;
-		local hitList = workspace:GetPartBoundsInBox(cameraPos, 64, overlapParam);
+		local cameraPos = camera.CFrame;
+		local hitList = workspace:GetPartBoundsInBox(cameraPos, Vector3.new(50, 50, 50), overlapParam);
 		
 		for a=1, #hitList do
 			local object = hitList[a] :: BasePart;
