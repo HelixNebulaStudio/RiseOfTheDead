@@ -287,11 +287,258 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		end
 
 		local breakDownFrame: Frame = mainFrame:WaitForChild("BreakdownPanel");
+		local breakdownLabel = breakDownFrame:WaitForChild("BreakdownLabel");
 		local serialText = breakDownFrame:WaitForChild("serializeText");
 		breakDownFrame:GetPropertyChangedSignal("Visible"):Connect(function()
 			if not breakDownFrame.Visible then return end;
 			local serialized = generateSerialized();
 			serialText.Text = serialized;
+
+
+			task.spawn(function()
+				while breakDownFrame.Visible and self.Menu.Visible and localPlayer:IsAncestorOf(self.Menu) do
+					task.wait();
+					
+					if itemViewport.PartDataList == nil then continue end;
+
+					local partData = nil;
+					for a=1, #itemViewport.PartDataList do
+						if itemViewport.PartDataList[a].Part == itemViewport.CurrentHighlightPart then
+							partData = itemViewport.PartDataList[a];
+							break;
+						end
+					end
+					if partData == nil then
+						breakdownLabel.Text = "Mouse over a part to see breakdown.";
+						continue;
+					end;
+
+					local partCustomPlan = customPlansCache[partData.Key];
+					local groupCustomPlan = partData.Group and customPlansCache[partData.Group] or nil;
+
+					local bdStr = "";
+
+					bdStr = bdStr..`<b>Part:</b> {partData.Key}\n\n`;
+		
+					-- Color;
+					local colorHex, colorDetails;
+					if partCustomPlan and partCustomPlan.Color then
+						colorHex = partCustomPlan.Color:ToHex();
+						colorDetails = "Part Color";
+
+					elseif groupCustomPlan and groupCustomPlan.Color then
+						colorHex = groupCustomPlan.Color:ToHex();
+						colorDetails = `{partData.Group} Color`;
+
+					elseif baseCustomPlan.Color then
+						colorHex = baseCustomPlan.Color:ToHex();
+						colorDetails = `[All] Color`;
+
+					end
+					if colorHex and colorDetails then
+						bdStr = bdStr..`<b>Color:</b> <font color="#{colorHex}">#{colorHex}</font> ({colorDetails})\n`;
+					elseif baseCustomPlan.BaseSkin then
+						bdStr = bdStr..`<b>Color:</b> {baseCustomPlan.BaseSkin} (Skin Colors)\n`;
+					else
+						bdStr = bdStr..`<b>Color:</b> Unset\n`;
+					end
+		
+
+					-- Skins;
+					local skinName, skinDetail;
+					if partCustomPlan and partCustomPlan.Skin then
+						skinName = partCustomPlan.Skin;
+						skinDetail = "Part Pattern";
+
+					elseif groupCustomPlan and groupCustomPlan.Skin then
+						skinName = groupCustomPlan.Skin;
+						skinDetail = `{partData.Group} Pattern`;
+
+					elseif baseCustomPlan.Skin then
+						skinName = baseCustomPlan.Skin;
+						skinDetail = `[All] Pattern`;
+
+					end
+					if skinName and skinDetail then
+						bdStr = bdStr..`<b>Pattern:</b> {skinName} ({skinDetail})\n`;
+					else
+						bdStr = bdStr..`<b>Pattern:</b> Unset\n`;
+					end
+
+
+					-- Transparency;
+					local transparencyVal, transparencyDetail;
+					if partCustomPlan and partCustomPlan.Transparency then
+						transparencyVal = partCustomPlan.Transparency;
+						transparencyDetail = "Part Transparency";
+
+					elseif groupCustomPlan and groupCustomPlan.Transparency then
+						transparencyVal = groupCustomPlan.Transparency;
+						transparencyDetail = `{partData.Group} Transparency`;
+
+					elseif baseCustomPlan.Transparency then
+						transparencyVal = baseCustomPlan.Transparency;
+						transparencyDetail = `[All] Transparency`;
+
+					end
+					if transparencyVal and transparencyDetail then
+						bdStr = bdStr..`<b>Transparency:</b> {transparencyVal} ({transparencyDetail})\n`;
+					else
+						bdStr = bdStr..`<b>Transparency:</b> Unset\n`;
+					end
+
+
+					-- PatternData.Color;
+					local patColor, patColorDetail;
+					if partCustomPlan and partCustomPlan.PatternData.Color then
+						patColor = partCustomPlan.PatternData.Color:ToHex();
+						patColorDetail = "Part Pattern Color";
+
+					elseif groupCustomPlan and groupCustomPlan.PatternData.Color then
+						patColor = groupCustomPlan.PatternData.Color:ToHex();
+						patColorDetail = `{partData.Group} Pattern Color`;
+
+					elseif baseCustomPlan.PatternData.Color then
+						patColor = baseCustomPlan.PatternData.Color:ToHex();
+						patColorDetail = `[All] Pattern Color`;
+					end
+					if patColor and patColorDetail then
+						bdStr = bdStr..`<b>Pattern Color:</b> <font color="#{patColor}">#{patColor}</font> ({patColorDetail})\n`;
+					else
+						bdStr = bdStr..`<b>Pattern Color:</b> Unset\n`;
+					end
+
+
+					-- PatternData.Offset
+					local patOffset, patOffsetDetail;
+					if partCustomPlan and partCustomPlan.PatternData.Offset then
+						patOffset = partCustomPlan.PatternData.Offset;
+						patOffsetDetail = "Part Pattern Offset";
+
+					elseif groupCustomPlan and groupCustomPlan.PatternData.Offset then
+						patOffset = groupCustomPlan.PatternData.Offset;
+						patOffsetDetail = `{partData.Group} Pattern Offset`;
+
+					elseif baseCustomPlan.PatternData.Offset then
+						patOffset = baseCustomPlan.PatternData.Offset;
+						patOffsetDetail = `[All] Pattern Offset`;
+
+					end
+					if patOffset and patOffsetDetail then
+						bdStr = bdStr..`<b>Pattern Offset:</b> x:{ math.round(patOffset.X*1000)/1000 } y:{ math.round(patOffset.Y*1000)/1000 } ({patOffsetDetail})\n`;
+					else
+						bdStr = bdStr..`<b>Pattern Offset:</b> Unset\n`;
+					end
+
+
+					-- PatternData.Scale
+					local patScale, patScaleDetail;
+					if partCustomPlan and partCustomPlan.PatternData.Scale then
+						patScale = partCustomPlan.PatternData.Scale;
+						patScaleDetail = "Part Pattern Scale";
+
+					elseif groupCustomPlan and groupCustomPlan.PatternData.Scale then
+						patScale = groupCustomPlan.PatternData.Scale;
+						patScaleDetail = `{partData.Group} Pattern Scale`;
+
+					elseif baseCustomPlan.PatternData.Scale then
+						patScale = baseCustomPlan.PatternData.Scale;
+						patScaleDetail = `[All] Pattern Scale`;
+
+					end
+					if patScale and patScaleDetail then
+						bdStr = bdStr..`<b>Pattern Scale:</b> x:{ math.round(patScale.X*1000)/1000 } y:{ math.round(patScale.Y*1000)/1000 } ({patScaleDetail})\n`;
+					else
+						bdStr = bdStr..`<b>Pattern Scale:</b> Unset\n`;
+					end
+
+
+					-- PatternData.Transparency
+					local patAlpha, patAlphaDetail;
+					if partCustomPlan and partCustomPlan.PatternData.Transparency then
+						patAlpha = partCustomPlan.PatternData.Transparency;
+						patAlphaDetail = "Part Pattern Alpha";
+
+					elseif groupCustomPlan and groupCustomPlan.PatternData.Transparency then
+						patAlpha = groupCustomPlan.PatternData.Transparency;
+						patAlphaDetail = `{partData.Group} Pattern Alpha`;
+
+					elseif baseCustomPlan.PatternData.Alpha then
+						patAlpha = baseCustomPlan.PatternData.Alpha;
+						patAlphaDetail = `[All] Pattern Alpha`;
+	
+					end
+					if patAlpha and patAlphaDetail then
+						bdStr = bdStr..`<b>Pattern Alpha:</b> {patAlpha} ({patAlphaDetail})\n`;
+					else
+						bdStr = bdStr..`<b>Pattern Alpha:</b> Unset\n`;
+					end
+
+
+					-- Material
+					local matName, matDetail
+					if partCustomPlan and partCustomPlan.Material then
+						matName = partCustomPlan.Material;
+						matDetail = "Part Material";
+
+					elseif groupCustomPlan and groupCustomPlan.Material then
+						matName = groupCustomPlan.Material;
+						matDetail = `{partData.Group} Material`;
+
+					elseif baseCustomPlan.Material then
+						matName = baseCustomPlan.Material;
+						matDetail = `[All] Material`;
+
+					end
+					if matName and matDetail then
+						bdStr = bdStr..`<b>Material:</b> {matName} ({matDetail})\n`;
+					else
+						bdStr = bdStr..`<b>Material:</b> Unset\n`;
+					end
+
+
+					-- Reflectance
+					local reflectanceVal, reflectanceDetail;
+					if partCustomPlan and partCustomPlan.Reflectance then
+						reflectanceVal = partCustomPlan.Reflectance;
+						reflectanceDetail = "Part Reflectance";
+					elseif groupCustomPlan and groupCustomPlan.Reflectance then
+						reflectanceVal = groupCustomPlan.Reflectance;
+						reflectanceDetail = `{partData.Group} Reflectance`;
+					elseif baseCustomPlan.Reflectance then
+						reflectanceVal = baseCustomPlan.Reflectance;
+						reflectanceDetail = `[All] Reflectance`;
+					end
+					if reflectanceVal and reflectanceDetail then
+						bdStr = bdStr..`<b>Reflectance:</b> {reflectanceVal} ({reflectanceDetail})\n`;
+					else
+						bdStr = bdStr..`<b>Reflectance:</b> Unset\n`;
+					end
+
+					bdStr = bdStr..`\n<b>Part Customizations:<b> <font size="9">(This values are independent per part.)</font>`;
+
+
+					-- Offset Position;
+					if partCustomPlan and partCustomPlan.PositionOffset then
+						local pos = partCustomPlan.PositionOffset;
+						bdStr = bdStr..`<b>Part Offset:</b> x:{math.round(pos.X*100)/100} y:{math.round(pos.Y*100)/100} z:{math.round(pos.Z*100)/100}\n`;
+					else
+						bdStr = bdStr..`<b>Part Offset:</b> Unset\n`;
+					end
+
+
+					-- Scale;
+					if partCustomPlan and partCustomPlan.Scale then
+						local scale = partCustomPlan.Scale;
+						bdStr = bdStr..`<b>Part Scale:</b> x:{math.round(scale.X*100)/100} y:{math.round(scale.Y*100)/100} z:{math.round(scale.Z*100)/100}\n`;
+					else
+						bdStr = bdStr..`<b>Part Scale:</b> Unset\n`;
+					end
+
+
+					breakdownLabel.Text = bdStr;
+				end
+			end)
 		end)
 
 		-- MARK: Titled Skin List

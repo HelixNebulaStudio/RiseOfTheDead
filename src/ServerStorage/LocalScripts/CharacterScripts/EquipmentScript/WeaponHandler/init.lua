@@ -2027,25 +2027,27 @@ function WeaponHandler:Equip(library, weaponId)
 			local partObj = args[2] and toolModel and toolModel:FindFirstChild(args[2]);
 			local transparencyValue = partObj and args[3];
 
-			if transparencyValue then
-				local function setTransparency(obj)
-					if obj:IsA("BasePart") then
-						obj.Transparency = obj:GetAttribute("CustomTransparency") or transparencyValue;
-						for _, child in pairs(obj:GetChildren()) do
-							if child:IsA("Decal") or child:IsA("Texture") then
-								child.Transparency = transparencyValue;
-							end
-						end
-						
-					elseif obj:IsA("Model") then
-						for _, child in pairs(obj:GetChildren()) do
-							setTransparency(child);
+			if transparencyValue == nil then return end;
+
+			local function setTransparency(obj)
+				if obj:IsA("BasePart") then
+					obj.Transparency = obj:GetAttribute("CustomTransparency") or transparencyValue;
+
+					for _, child in pairs(obj:GetChildren()) do
+						if child:IsA("Decal") or child:IsA("Texture") then
+							child.Transparency = transparencyValue;
 						end
 					end
+					
+				elseif obj:IsA("Model") then
+					for _, child in pairs(obj:GetChildren()) do
+						setTransparency(child);
+					end
+					
 				end
-				
-				setTransparency(partObj);
 			end
+			
+			setTransparency(partObj);
 		end)
 		
 		local fakeMotors;
