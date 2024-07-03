@@ -111,6 +111,7 @@ function ItemViewport.new() : ItemViewport
 	self.Garbage:Tag(UserInputService.InputEnded:Connect(function(inputObject) 
 		if inputObject.UserInputType ~= Enum.UserInputType.MouseButton1 and inputObject.UserInputType ~= Enum.UserInputType.Touch then return end;
 		if inputStart == nil then return end;
+		if selectDelta == nil then return end;
 		if tick()-inputStart >= 0.2 then return end;
 
 		if modGuiObjectPlus.IsMouseOver(self.Frame) and self.CurrentHighlightPart == selectDelta then

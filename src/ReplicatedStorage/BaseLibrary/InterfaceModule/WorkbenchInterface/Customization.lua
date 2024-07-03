@@ -2175,7 +2175,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		end))
 		
 		function listMenu:OnMenuToggle()
-			if not self.Menu.Visible then return end
+			if not self.Menu.Visible then 
+				return;
+			end
+
 			table.clear(itemViewport.SelectedHighlightParts);
 			newSelection();
 		end
@@ -2186,8 +2189,12 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 	function listMenu:OnVisiblityChanged()
 		if not self.Menu.Visible then
 			garbage:Destruct();
+			if Interface:IsVisible("Workbench") then
+				Interface:OpenWindow("WeaponStats");
+			end
 			return;
 		end
+		Interface:CloseWindow("WeaponStats");
 
 		itemViewport.HightlightSelect = true;
 		garbage:Tag(function()
