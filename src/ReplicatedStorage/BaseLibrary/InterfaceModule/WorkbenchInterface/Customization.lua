@@ -553,10 +553,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		local unlockedSkins = getUnlockedSkins();
 		for index, skinInfo in pairs(modItemSkinsLibrary:GetIndexList()) do
 			if skinInfo.Rare ~= true then continue end;
-			if unlockedSkins[skinInfo.Id] == nil then continue end;
+			if not isDevBranch and unlockedSkins[skinInfo.Id] == nil then continue end;
 			table.insert(rareSkinsList, skinInfo.Id);
 		end
-
+	
 		local function refreshSkinPerm()
 			local activeSkinId = storageItem.Values.ActiveSkin;
 			local baseSkin = modCustomizationData.GetBaseSkinFromActiveId(itemId, activeSkinId);
