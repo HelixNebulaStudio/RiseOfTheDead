@@ -1623,6 +1623,19 @@ RunService.Stepped:Connect(function(total, delta)
 		end
 	end 
 	
+	local s = pcall(function()
+		local camPos = currentCamera.CFrame.Position;
+		local readTerrain = (workspace.Terrain:ReadVoxels(Region3.new(camPos, camPos):ExpandToGrid(4), 4));
+		local terrainMat = readTerrain[1] and readTerrain[1][1] and readTerrain[1][1][1];
+		if terrainMat and terrainMat == Enum.Material.Water then
+			characterProperties.CamUnderwater = true;
+		else
+			characterProperties.CamUnderwater = false;
+		end
+	end)
+	if not s then
+		characterProperties.CamUnderwater = false;
+	end
 	--Anim debug
 	--local animationTracks = animator:GetPlayingAnimationTracks();
 	--local animationNames = {};
@@ -1636,7 +1649,6 @@ local lastMovablePos = rootPart.CFrame;
 local unstuckPos = rootPart.CFrame;
 local ragdollActive = true;
 
-Cache.LastHeadUnderwater = tick();
 Cache.OneSecTick = tick();
 Cache.LowestFps = math.huge;
 

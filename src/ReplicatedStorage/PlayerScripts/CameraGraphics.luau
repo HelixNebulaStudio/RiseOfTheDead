@@ -48,7 +48,7 @@ function CameraClass:Init()
 	end)
 
 	CameraClass.PreviousLayerId = nil;
-	CameraClass.UnderRoof = false;
+	CameraClass.IsIndoors = false;
 
 	-- Camera priority level
 	-- 1 Character
@@ -228,7 +228,7 @@ function CameraClass:Init()
 			local effectAtmosphere = activeEffect.Atmosphere;
 			local previousAtmosphere = previousWeather and previousWeather.Atmosphere or {};
 
-			local density = (CameraClass.UnderRoof and effectAtmosphere.DensityIndoors) or effectAtmosphere.Density or atmosphere.Density;
+			local density = (CameraClass.IsIndoors and effectAtmosphere.DensityIndoors) or effectAtmosphere.Density or atmosphere.Density;
 			atmosphere.Density = modMath.DeltaLerp(atmosphere.Density, density, densityDecay, delta);
 
 			local offset = effectAtmosphere.Offset or atmosphere.Offset;
@@ -292,13 +292,18 @@ function CameraClass:Init()
 		local sunRayIntensity = Lighting:GetAttribute("SunRaysIntensity");
 		sunRays.Intensity = modMath.Lerp(sunRayIntensity or 0.1, activeEffect and activeEffect.SunRaysIntensity or sunRayIntensity, tweenRatio);
 
-		local isUnderRoof = CameraClass.UnderRoof;
-		if tick()-ceilingCheck > 0.2 and rootPart then
-			ceilingCheck = tick();
+		local isIndoors = CameraClass.IsIndoors;
 
-			isUnderRoof = modRaycastUtil.GetCeiling(rootPart.CFrame.Position, 256) ~= nil;
-			CameraClass.UnderRoof = isUnderRoof;
+		if tick()-ceilingCheck > 0.2 and camera then
+			ceilingCheck = tick();
+			isIndoors = modRaycastUtil.GetCeiling(camera.CFrame.Position, 256) ~= nil;
 		end
+		
+		local modCharacter = modData:GetModCharacter();
+		if modCharacter and modCharacter.CharacterProperties and modCharacter.CharacterProperties.CamUnderwater then
+			isIndoors = true;
+		end
+		CameraClass.IsIndoors = isIndoors;
 
 		local weatherParticlesEnabled = modData:GetSetting("DisableWeatherParticles") ~= 1;
 		local existParticle = {};
@@ -319,7 +324,7 @@ function CameraClass:Init()
 					local particle = screenParticles[particleData.Id];
 					
 					if particle:GetAttribute("OutdoorsOnly") then
-						particle.Enabled = not CameraClass.UnderRoof;
+						particle.Enabled = not isIndoors;
 					end
 
 				end
@@ -340,7 +345,7 @@ function CameraClass:Init()
 		end
 
 
-		if activeEffect and activeEffect.EnableScreenRain and not isUnderRoof and weatherParticlesEnabled then
+		if activeEffect and activeEffect.EnableScreenRain and not isIndoors and weatherParticlesEnabled then
 			modScreenRain:Enable({
 				Rate = activeEffect.ScreenRainRate or 5;
 			});
@@ -353,7 +358,7 @@ function CameraClass:Init()
 			local sound = weatherSounds[a];
 			local eq = sound:FindFirstChild("EqualizerSoundEffect");
 			if eq then
-				eq.Enabled = isUnderRoof;
+				eq.Enabled = isIndoors;
 			end
 			
             if sound:GetAttribute("Lightning") then
