@@ -766,6 +766,8 @@ if RunService:IsServer() then
 
     function remoteCustomizationData.OnServerInvoke(player, action, ...)
         local profile = shared.modProfile:Get(player);
+        local activeSave = profile:GetActiveSave();
+
         local customizationData = profile.CustomizationData;
 
         local returnPacket = {};
@@ -830,8 +832,27 @@ if RunService:IsServer() then
 
             local designSerialized = packet.Serialized;
 
-            Debugger:StudioWarn("designSerialized", designSerialized);
             storageItem:SetValues("_Customs", designSerialized);
+            storageItem:DeleteValues("Colors");
+            storageItem:DeleteValues("Textures");
+            storageItem:DeleteValues("PartAlpha");
+            
+	        activeSave:AwardAchievement("fimyst");
+            profile:AddPlayPoints(2, "Gameplay:Workbench");
+            
+            if profile.EquippedTools and profile.EquippedTools.ID == siid then
+                task.spawn(function()
+                    local activeSkinId = storageItem:GetValues("ActiveSkin");
+                    
+                    CustomizationData.LoadCustomization({
+                        ToolModels = profile.EquippedTools.WeaponModels;
+    
+                        ItemId = itemId;
+                        CustomizationData = designSerialized;
+                        SkinId = activeSkinId;
+                    });
+                end)
+            end
             
         elseif action == "loadcustomizations" then
             local siid = ...;
@@ -839,7 +860,6 @@ if RunService:IsServer() then
             if storageItem == nil then return end;
 
             local serialized = storageItem:GetValues("_Customs");
-            Debugger:StudioWarn("design serialized", serialized);
 
             returnPacket.Serialized = serialized;
             returnPacket.Success = true;

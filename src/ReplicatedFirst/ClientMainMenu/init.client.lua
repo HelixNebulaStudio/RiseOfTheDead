@@ -630,7 +630,7 @@ function initialize()
 			cameraBlur = Instance.new("BlurEffect");
 		end
 		cameraBlur.Parent = camera;
-		cameraBlur.Size = 4;--lastBlur*(1-0.1) + (1-math.clamp(menuTheme.PlaybackLoudness/400, 0, 1))*10 *0.1;
+		cameraBlur.Size = 4;	
 		lastBlur = cameraBlur.Size;
 	end)
 	

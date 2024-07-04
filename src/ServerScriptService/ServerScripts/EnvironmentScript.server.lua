@@ -222,14 +222,16 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 
 		end
 		
+		local activeBrightness = LightingConfigurations.Properties.BaseBrightness*range;
 
 		TweenService:Create(Lighting, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
 			ClockTime = hourClock;
 			ExposureCompensation = -1+(0.1*range);
-			Brightness = LightingConfigurations.Properties.BaseBrightness*range;
+			Brightness = activeBrightness;
 			OutdoorAmbient = newOutDoorAmbient;
 		}):Play();
 		
+		Lighting:SetAttribute("Brightness", activeBrightness);
 		Lighting:SetAttribute("OutdoorAmbient", newOutDoorAmbient);
 		Lighting:SetAttribute("FogColor", newFogColor);
 		Lighting:SetAttribute("FogStart", 40+(160*range));

@@ -350,10 +350,21 @@ function CameraClass:Init()
 
 		local weatherSounds = CollectionService:GetTagged("WeatherSound");
 		for a=1, #weatherSounds do
-			local eq = weatherSounds[a]:FindFirstChild("EqualizerSoundEffect");
+			local sound = weatherSounds[a];
+			local eq = sound:FindFirstChild("EqualizerSoundEffect");
 			if eq then
 				eq.Enabled = isUnderRoof;
 			end
+			
+            if sound:GetAttribute("Lightning") then
+				if sound.IsPlaying and sound.PlaybackLoudness > 250 then
+					task.spawn(function()
+						Lighting.Brightness = math.random(14, 20);
+						task.wait(math.random(200,300)/1000);
+						Lighting.Brightness = Lighting:GetAttribute("Brightness") or 0;
+					end)
+				end
+            end
 		end
 	end)
 
