@@ -7,7 +7,7 @@ local Interface = {};
 local RunService = game:GetService("RunService");
 
 local localplayer = game.Players.LocalPlayer;
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
@@ -66,7 +66,7 @@ renameButton.MouseButton1Click:Connect(function()
 	local promptWindow;
 	local filteredName = not clearName and remoteRenameItem:InvokeServer("test", activeStorageItem.ID, inputBox.Text) or "";
 	if clearName then
-		promptWindow = Interface:PromptQuestion("Clear name for "..activeStorageItem.CustomName, "Are you sure you want to clear the name of the "..itemLib.Name.."?");
+		promptWindow = Interface:PromptQuestion("Clear name for "..itemLib.Name, "Are you sure you want to clear the name of the "..itemLib.Name.."?");
 	else
 		promptWindow = Interface:PromptQuestion("Rename "..itemLib.Name, "Are you sure you want to rename the "..itemLib.Name.." to ("..filteredName..") for 50 Gold?");
 	end
