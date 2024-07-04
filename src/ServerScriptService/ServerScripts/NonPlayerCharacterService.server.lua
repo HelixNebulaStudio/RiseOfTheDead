@@ -155,6 +155,15 @@ function InitializeSpawner(spawnerModule)
 		modNpc.Spawn(spawnType, cframe, function(npc, npcModule)
 			npc:SetAttribute("NaturalSpawn", true);
 			table.insert(self.Active, npcModule);
+
+			task.spawn(function()
+				local rp = npcModule.RootPart;
+				if rp == nil then return end;
+
+				rp.Anchored = true;
+				task.wait(0.5);
+				rp.Anchored = false;
+			end)
 			
 			local modMapLibrary = require(game.ReplicatedStorage.Library.MapLibrary);
 			local layerName = modMapLibrary:GetLayer(cframe.Position);
