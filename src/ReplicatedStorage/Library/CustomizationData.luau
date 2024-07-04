@@ -195,33 +195,37 @@ local CustomizationPlan = {};
 CustomizationPlan.__index = CustomizationPlan;
 
 CustomizationData.Materials = {
-    ["Neon"]={Material=Enum.Material.Neon; Val=0.02;};
+    ["Neon"]={Material=Enum.Material.Neon; Val=0.01;};
     ["ForceField"]={Material=Enum.Material.ForceField; Val=0.04;};
 
     ["Glass"]={Material=Enum.Material.Glass; Reflectance=true; Val=0.06;};
     ["SmoothPlastic"]={Material=Enum.Material.SmoothPlastic; Reflectance=true; Val=0.06;};
 
     ["Plastic"]={Material=Enum.Material.Plastic; Reflectance=true; Val=0.1;};
+    ["BrushedMetal"]={Material=Enum.Material.Metal; Varient="Brushed Metal"; Val=0.1;};
+    ["Foil"]={Material=Enum.Material.Foil; Val=0.1;};
+    ["Ice"]={Material=Enum.Material.Ice; Val=0.1;};
 
-    ["BrushedMetal"]={Material=Enum.Material.Metal; Varient="Brushed Metal"; Val=0.5;};
-    ["RustySpots"]={Material=Enum.Material.Metal; Varient="Rusty Spots"; Val=0.5;};
-    ["OldMetal"]={Material=Enum.Material.Metal; Varient="Old Metal"; Val=0.5;};
-    ["WornMetal"]={Material=Enum.Material.Metal; Varient="Worn Metal"; Val=0.5;};
-    ["DeadWood"]={Material=Enum.Material.Wood; Varient="Dead Wood"; Val=0.5;};
-    ["RoughWood"]={Material=Enum.Material.Wood; Varient="Rough Wood"; Val=0.5;};
-    ["TarpPlastic"]={Material=Enum.Material.Plastic; Varient="Tarp Plastic"; Val=0.5;};
-    ["Tree Leaves"]={Material=Enum.Material.LeafyGrass; Varient="Tree Leaves"; Val=0.5;};
-    
+    ["WornMetal"]={Material=Enum.Material.Metal; Varient="Worn Metal"; Val=0.55;};
 
-    ["WoodPlanks"]={Material=Enum.Material.WoodPlanks; Val=1;};
-    ["Wood"]={Material=Enum.Material.Wood; Val=1;};
+    ["OldMetal"]={Material=Enum.Material.Metal; Varient="Old Metal"; Val=0.75;};
+    ["RoughWood"]={Material=Enum.Material.Wood; Varient="Rough Wood"; Val=1;};
+
+    ["RustySpots"]={Material=Enum.Material.Metal; Varient="Rusty Spots"; Val=1;};
+
     ["CorrodedMetal"]={Material=Enum.Material.CorrodedMetal; Val=1;};
-    ["DiamondPlate"]={Material=Enum.Material.DiamondPlate; Val=1;};
-    ["Foil"]={Material=Enum.Material.Foil; Val=1;};
+    ["DeadWood"]={Material=Enum.Material.Wood; Varient="Dead Wood"; Val=1;};
+    
     ["Metal"]={Material=Enum.Material.Metal; Val=1;};
-    ["Sand"]={Material=Enum.Material.Sand; Val=1;};
-    ["Fabric"]={Material=Enum.Material.Fabric; Val=1;};
-    ["Ice"]={Material=Enum.Material.Ice; Val=1;};
+
+    ["TreeLeaves"]={Material=Enum.Material.LeafyGrass; Varient="Tree Leaves"; Val=1.1;};
+    ["TarpPlastic"]={Material=Enum.Material.Plastic; Varient="Tarp Plastic"; Val=1.1;};
+
+    ["WoodPlanks"]={Material=Enum.Material.WoodPlanks; Val=1.1;};
+    ["Wood"]={Material=Enum.Material.Wood; Val=1.1;};
+    ["DiamondPlate"]={Material=Enum.Material.DiamondPlate; Val=1.1;};
+    ["Sand"]={Material=Enum.Material.Sand; Val=1.1;};
+    ["Fabric"]={Material=Enum.Material.Fabric; Val=1.1;};
 
     ["Marble"]={Material=Enum.Material.Marble; Val=2;};
     ["Slate"]={Material=Enum.Material.Slate; Val=2;};

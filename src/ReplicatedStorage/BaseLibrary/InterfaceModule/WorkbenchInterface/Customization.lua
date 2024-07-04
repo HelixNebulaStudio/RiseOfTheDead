@@ -1693,7 +1693,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		end
 		modComponents.CreateSlider(Interface, {
 			Button=partScaleXSlider;
-			RangeInfo={Min=10; Max=200; Scale=100; Default=100; ValueType="Flat";};
+			RangeInfo={Min=50; Max=150; Scale=100; Default=100; ValueType="Flat";};
 			SetFunc=function(v)
 				onPartScaleX(v);
 				markForSave = true;
@@ -1719,7 +1719,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		end
 		modComponents.CreateSlider(Interface, {
 			Button=partScaleYSlider;
-			RangeInfo={Min=10; Max=200; Scale=100; Default=100; ValueType="Flat";};
+			RangeInfo={Min=50; Max=150; Scale=100; Default=100; ValueType="Flat";};
 			SetFunc=function(v)
 				onPartScaleY(v);
 				markForSave = true;
@@ -1745,7 +1745,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		end
 		modComponents.CreateSlider(Interface, {
 			Button=partScaleZSlider;
-			RangeInfo={Min=10; Max=200; Scale=100; Default=100; ValueType="Flat";};
+			RangeInfo={Min=50; Max=150; Scale=100; Default=100; ValueType="Flat";};
 			SetFunc=function(v)
 				onPartScaleZ(v);
 				markForSave = true;
@@ -1826,9 +1826,9 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				local selectionName = optionButton.Name;
 				local matInfo = modCustomizationData.Materials[selectionName];
 
-				optionButton.Text = optionButton.Text..(matInfo.Val <= 0.1 and ` ({matInfo.Val})` or ``);
+				optionButton.Text = optionButton.Text..(matInfo.Val < 1 and ` ({matInfo.Val})` or ``);
 				
-				local isUnlocked = itemWear <= 0.1 and itemWear <= matInfo.Val;
+				local isUnlocked = itemWear <= math.min(matInfo.Val, 1);
 				optionButton.AutoButtonColor = isUnlocked;
 				optionButton.BackgroundColor3 = isUnlocked and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(30, 30, 30);
 			end
@@ -1855,6 +1855,15 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		-- MARK: RefreshConfigActive
 		local canEdit = false;
+
+		local canEditColor = Color3.fromRGB(255, 255, 255);
+		local disabledColor = Color3.fromRGB(100, 100, 100);
+
+		local hwWear = 0.79;
+		local imWear = 0.55;
+		local mcWear = 0.31;
+		local fnWear = 0.1;
+
 		function refreshConfigActive()
 			local skinLib = modItemSkinsLibrary:Find(editPanel.SkinFrame.Button:GetAttribute("SkinId"));
 			local canEditPatternData = false;
@@ -1862,53 +1871,73 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				canEditPatternData = true;
 			end
 
-			local patternLabelColor = canEditPatternData and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
-			local labelColor = canEdit and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
-
 			-- Part Color
 			editPanel.ColorFrame.Button.AutoButtonColor = canEdit;
 			editPanel.ColorFrame.Button.Darken.Visible = not canEdit;
-			editPanel.ColorFrame.NameLabel.TextColor3 = canEdit and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
+			editPanel.ColorFrame.NameLabel.TextColor3 = canEdit and canEditColor or disabledColor;
 
-			-- Part Transparency
-			transparencySlider:SetAttribute("DisableSlider", not canEdit);
-			transparencySlider.AutoButtonColor = canEdit;
-			transparencySlider.Darken.Visible = not canEdit;
-			editPanel.TransparencyFrame.NameLabel.TextColor3 = labelColor;
+			-- Part Material
+			editPanel.MaterialFrame.Button.AutoButtonColor = canEdit;
+			editPanel.MaterialFrame.Button.Darken.Visible = not canEdit;
+			editPanel.MaterialFrame.NameLabel.TextColor3 = canEdit and canEditColor or disabledColor;
 
 			-- Part Skin/Pattern
 			editPanel.SkinFrame.Button.AutoButtonColor = canEdit;
 			editPanel.SkinFrame.Button.Darken.Visible = not canEdit;
-			editPanel.SkinFrame.NameLabel.TextColor3 = labelColor;
+			editPanel.SkinFrame.NameLabel.TextColor3 = canEdit and canEditColor or disabledColor;
 
+
+			--== HeavilyWorn
+			local canEditHW = canEdit and itemWear < hwWear;
+			editPanel.HWLine.Text = "Heavily Worn"..(itemWear < hwWear and `` or `\n\t\t- Requires Item Condition <= {hwWear}`);
+			
+			-- Part Transparency
+			transparencySlider:SetAttribute("DisableSlider", not canEditHW);
+			transparencySlider.AutoButtonColor = canEditHW;
+			transparencySlider.Darken.Visible = not canEditHW;
+			editPanel.TransparencyFrame.NameLabel.TextColor3 = canEditHW and canEditColor or disabledColor;
+			editPanel.TransparencyFrame.Visible = itemWear < hwWear;
+			
+			--== Ideal Model
+			local canEditIM = canEditPatternData and itemWear < imWear;
+			editPanel.IMLine.Text = "Ideal Model"..(itemWear < imWear and `` or `\n\t\t- Requires Item Condition <= {imWear}`);
+			
 			-- Pattern Color
-			editPanel.SkinColorFrame.Button.AutoButtonColor = canEditPatternData;
-			editPanel.SkinColorFrame.Button.Darken.Visible = not canEditPatternData;
-			editPanel.SkinColorFrame.NameLabel.TextColor3 = patternLabelColor;
+			editPanel.SkinColorFrame.Button.AutoButtonColor = canEditIM;
+			editPanel.SkinColorFrame.Button.Darken.Visible = not canEditIM;
+			editPanel.SkinColorFrame.NameLabel.TextColor3 = canEditIM and canEditColor or disabledColor;
+			editPanel.SkinColorFrame.Visible = itemWear < imWear;
 
 			-- Pattern Offset
-			textureOffsetXSlider:SetAttribute("DisableSlider", not canEditPatternData);
-			textureOffsetXSlider.AutoButtonColor = canEditPatternData;
-			textureOffsetXSlider.Darken.Visible = not canEditPatternData;
-			textureOffsetYSlider:SetAttribute("DisableSlider", not canEditPatternData);
-			textureOffsetYSlider.AutoButtonColor = canEditPatternData;
-			textureOffsetYSlider.Darken.Visible = not canEditPatternData;
-			editPanel.SkinOffsetFrame.NameLabel.TextColor3 = patternLabelColor;
+			textureOffsetXSlider:SetAttribute("DisableSlider", not canEditIM);
+			textureOffsetXSlider.AutoButtonColor = canEditIM;
+			textureOffsetXSlider.Darken.Visible = not canEditIM;
+			textureOffsetYSlider:SetAttribute("DisableSlider", not canEditIM);
+			textureOffsetYSlider.AutoButtonColor = canEditIM;
+			textureOffsetYSlider.Darken.Visible = not canEditIM;
+			editPanel.SkinOffsetFrame.NameLabel.TextColor3 = canEditIM and canEditColor or disabledColor;
+			editPanel.SkinOffsetFrame.Visible = itemWear < imWear;
 
 			-- Pattern Scale
-			textureScaleXSlider:SetAttribute("DisableSlider", not canEditPatternData);
-			textureScaleXSlider.AutoButtonColor = canEditPatternData;
-			textureScaleXSlider.Darken.Visible = not canEditPatternData;
-			textureScaleYSlider:SetAttribute("DisableSlider", not canEditPatternData);
-			textureScaleYSlider.AutoButtonColor = canEditPatternData;
-			textureScaleYSlider.Darken.Visible = not canEditPatternData;
-			editPanel.SkinScaleFrame.NameLabel.TextColor3 = patternLabelColor;
+			textureScaleXSlider:SetAttribute("DisableSlider", not canEditIM);
+			textureScaleXSlider.AutoButtonColor = canEditIM;
+			textureScaleXSlider.Darken.Visible = not canEditIM;
+			textureScaleYSlider:SetAttribute("DisableSlider", not canEditIM);
+			textureScaleYSlider.AutoButtonColor = canEditIM;
+			textureScaleYSlider.Darken.Visible = not canEditIM;
+			editPanel.SkinScaleFrame.NameLabel.TextColor3 = canEditIM and canEditColor or disabledColor;
+			editPanel.SkinScaleFrame.Visible = itemWear < imWear;
 
 			-- Pattern Alpha
-			textureAlphaSlider:SetAttribute("DisableSlider", not canEditPatternData);
-			textureAlphaSlider.AutoButtonColor = canEditPatternData;
-			textureAlphaSlider.Darken.Visible = not canEditPatternData;
-			editPanel.SkinTransparencyFrame.NameLabel.TextColor3 = patternLabelColor;
+			textureAlphaSlider:SetAttribute("DisableSlider", not canEditIM);
+			textureAlphaSlider.AutoButtonColor = canEditIM;
+			textureAlphaSlider.Darken.Visible = not canEditIM;
+			editPanel.SkinTransparencyFrame.NameLabel.TextColor3 = canEditIM and canEditColor or disabledColor;
+			editPanel.SkinTransparencyFrame.Visible = itemWear < imWear;
+
+			--== Mint Condition
+			local canEditMC = canEdit and itemWear < mcWear;
+			editPanel.MCLine.Text = "Mint Condition"..(canEditMC and `` or `\n\t\t- Requires Item Condition <= {mcWear}`);
 
 			-- Part Offset
 			local canEditOffset = false;
@@ -1918,7 +1947,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			if activePartSelection and #activePartSelection == 1 and activePartSelection[1].Part.Name == "Handle" then
 				canEditOffset = false;
 			end
-			local offsetLabelColor = canEditOffset and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
+			canEditOffset = canEditOffset and canEditMC;
 
 			partOffsetXSlider:SetAttribute("DisableSlider", not canEditOffset);
 			partOffsetXSlider.AutoButtonColor = canEditOffset;
@@ -1929,13 +1958,15 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			partOffsetZSlider:SetAttribute("DisableSlider", not canEditOffset);
 			partOffsetZSlider.AutoButtonColor = canEditOffset;
 			partOffsetZSlider.Darken.Visible = not canEditOffset;
-			editPanel.PartOffsetFrame.NameLabel.TextColor3 = offsetLabelColor;
+			editPanel.PartOffsetFrame.NameLabel.TextColor3 = canEditOffset and canEditColor or disabledColor;
+			editPanel.PartOffsetFrame.Visible = itemWear < mcWear;
 
 			-- Part Scale
 			local canEditScale = false;
 			if activeGroupName == nil then
 				canEditScale = true;
 			end
+			canEditScale = canEditScale and canEditMC;
 			
 			partScaleXSlider:SetAttribute("DisableSlider", not canEditScale);
 			partScaleXSlider.AutoButtonColor = canEditScale;
@@ -1946,22 +1977,25 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			partScaleZSlider:SetAttribute("DisableSlider", not canEditScale);
 			partScaleZSlider.AutoButtonColor = canEditScale;
 			partScaleZSlider.Darken.Visible = not canEditScale;
-			editPanel.PartOffsetFrame.NameLabel.TextColor3 = canEditScale and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
+			editPanel.PartScaleFrame.NameLabel.TextColor3 = canEditScale and canEditColor or disabledColor;
+			editPanel.PartScaleFrame.Visible = itemWear < mcWear;
 
-			-- Part Material
-			editPanel.MaterialFrame.Button.AutoButtonColor = canEdit;
-			editPanel.MaterialFrame.Button.Darken.Visible = not canEdit;
-			editPanel.MaterialFrame.NameLabel.TextColor3 = labelColor;
+
+			--== Factory New
+			local canEditFN = canEdit and itemWear < fnWear;
+			editPanel.FNLine.Text = "Factory New"..(itemWear < fnWear and `` or `\n\t\t- Requires Item Condition <= {fnWear}`);
+			editPanel.FNLine.UIPadding.PaddingBottom = UDim.new(0, itemWear < fnWear and 15 or 0);
 
 			-- Part Reflectance
 			local currentMat = editPanel.MaterialFrame.Button;
 			local matInfo = modCustomizationData.Materials[currentMat.Text];
-			local reflectiveMat = matInfo.Reflectance == true;
+			local reflectiveMat = canEditFN and matInfo.Reflectance == true;
 
 			reflectanceSlider:SetAttribute("DisableSlider", not reflectiveMat);
 			reflectanceSlider.AutoButtonColor = reflectiveMat;
 			reflectanceSlider.Darken.Visible = not reflectiveMat;
-			editPanel.ReflectanceFrame.NameLabel.TextColor3 = reflectiveMat and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
+			editPanel.ReflectanceFrame.NameLabel.TextColor3 = reflectiveMat and canEditColor or disabledColor;
+			editPanel.ReflectanceFrame.Visible = itemWear < fnWear;
 
 		end
 
