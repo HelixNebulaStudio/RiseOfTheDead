@@ -1854,6 +1854,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		end)
 
 		-- MARK: RefreshConfigActive
+		local padding = "\n\t\t\t\t\t\t";
 		local canEdit = false;
 
 		local canEditColor = Color3.fromRGB(255, 255, 255);
@@ -1889,7 +1890,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 			--== HeavilyWorn
 			local canEditHW = canEdit and itemWear < hwWear;
-			editPanel.HWLine.Text = "Heavily Worn"..(itemWear < hwWear and `` or `\n\t\t- Requires Item Condition <= {hwWear}`);
+			editPanel.HWLine.Text = "Heavily Worn"..(itemWear < hwWear and `` or `{padding}Requires Item Condition <= {hwWear}`);
 			
 			-- Part Transparency
 			transparencySlider:SetAttribute("DisableSlider", not canEditHW);
@@ -1900,7 +1901,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			
 			--== Ideal Model
 			local canEditIM = canEditPatternData and itemWear < imWear;
-			editPanel.IMLine.Text = "Ideal Model"..(itemWear < imWear and `` or `\n\t\t- Requires Item Condition <= {imWear}`);
+			editPanel.IMLine.Text = "Ideal Model"..(itemWear < imWear and `` or `{padding}Requires Item Condition <= {imWear}`);
 			
 			-- Pattern Color
 			editPanel.SkinColorFrame.Button.AutoButtonColor = canEditIM;
@@ -1937,7 +1938,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 			--== Mint Condition
 			local canEditMC = canEdit and itemWear < mcWear;
-			editPanel.MCLine.Text = "Mint Condition"..(canEditMC and `` or `\n\t\t- Requires Item Condition <= {mcWear}`);
+			editPanel.MCLine.Text = "Mint Condition"..(canEditMC and `` or `{padding}Requires Item Condition <= {mcWear}`);
 
 			-- Part Offset
 			local canEditOffset = false;
@@ -1961,12 +1962,17 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			editPanel.PartOffsetFrame.NameLabel.TextColor3 = canEditOffset and canEditColor or disabledColor;
 			editPanel.PartOffsetFrame.Visible = itemWear < mcWear;
 
+			--== Factory New
+			local canEditFN = canEdit and itemWear < fnWear;
+			editPanel.FNLine.Text = "Factory New"..(itemWear < fnWear and `` or `{padding}Requires Item Condition <= {fnWear}`);
+			editPanel.FNLine.UIPadding.PaddingBottom = UDim.new(0, itemWear < fnWear and 0 or 15);
+
 			-- Part Scale
 			local canEditScale = false;
 			if activeGroupName == nil then
 				canEditScale = true;
 			end
-			canEditScale = canEditScale and canEditMC;
+			canEditScale = canEditScale and canEditFN;
 			
 			partScaleXSlider:SetAttribute("DisableSlider", not canEditScale);
 			partScaleXSlider.AutoButtonColor = canEditScale;
@@ -1978,13 +1984,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			partScaleZSlider.AutoButtonColor = canEditScale;
 			partScaleZSlider.Darken.Visible = not canEditScale;
 			editPanel.PartScaleFrame.NameLabel.TextColor3 = canEditScale and canEditColor or disabledColor;
-			editPanel.PartScaleFrame.Visible = itemWear < mcWear;
-
-
-			--== Factory New
-			local canEditFN = canEdit and itemWear < fnWear;
-			editPanel.FNLine.Text = "Factory New"..(itemWear < fnWear and `` or `\n\t\t- Requires Item Condition <= {fnWear}`);
-			editPanel.FNLine.UIPadding.PaddingBottom = UDim.new(0, itemWear < fnWear and 15 or 0);
+			editPanel.PartScaleFrame.Visible = itemWear < fnWear;
 
 			-- Part Reflectance
 			local currentMat = editPanel.MaterialFrame.Button;
