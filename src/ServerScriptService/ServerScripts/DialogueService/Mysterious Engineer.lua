@@ -69,6 +69,7 @@ return function(player, dialog, data)
 			local function giveTubes(dialog)
 				local itemId = "nekronparticulate";
 				local total, itemList = inventory:ListQuantity(itemId, 4);
+
 				if itemList then
 					local giveItemId = "sunkenchest";
 
@@ -131,7 +132,7 @@ return function(player, dialog, data)
 						giveTubes(dialog);
 					end);
 				else
-					dialog:AddChoice("sunkenShip_need", giveTubes);
+					dialog:AddChoice("sunkenShip_need");
 				
 				end
 			end
