@@ -122,7 +122,9 @@ Item.Library:SetOnAdd(function(data)
 		or data.Type == Item.Types.Food 
 		or toolsModule:FindFirstChild(data.Id) ~= nil;
 
-	data.CanDelete = (data.Id ~= "p250" and data.Type ~= Item.Types.Mission and 0 or 1);
+	if data.CanDelete == nil then
+		data.CanDelete = data.Id == "p250" and 1 or 0;
+	end
 
 	if modBranchConfigs.CurrentBranch.Name == "Dev" then
 		data.CanDelete = 0;

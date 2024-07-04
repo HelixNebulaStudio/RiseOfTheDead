@@ -1504,10 +1504,12 @@ function StorageInterface.new(storageId, mainFrame, slotFrames)
 				return false;
 			end
 			
-			local visible = slotItem.Library.CanDelete == 0;
-			if slotItem.Library.CanDelete > 0 then
+			local itemLib = slotItem.Library;
+
+			local visible = itemLib.CanDelete == 0;
+			if itemLib.CanDelete > 0 then
 				local c = modData.CountItemIdFromStorages(slotItem.Item.ItemId);
-				visible = c > slotItem.Library.CanDelete;
+				visible = c > itemLib.CanDelete;
 			end
 
 			if slotItem.Item.Fav then

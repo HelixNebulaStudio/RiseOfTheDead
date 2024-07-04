@@ -445,10 +445,39 @@ function remoteRemoveItem.OnServerInvoke(player, storageId, id, quantity)
 	local storageItem = storage:Find(id);
 	if storageItem == nil then Debugger:Warn("StorageItem unknown."); return end;
 	
+	local itemLib = modItemsLibrary:Find(storageItem.ItemId);
+
+	if itemLib.Type == modItemsLibrary.Types.Mission then
+		Debugger:StudioWarn("IsMissionItem");
+
+		if itemLib.MissionIds == nil then
+			shared.Notify(player, "This mission item can not be deleted.", "Negative");
+			return;
+		end
+
+		local canDelete = true;
+		local unfinMissions = {};
+		for a=1, #itemLib.MissionIds do
+			local missionId = itemLib.MissionIds[a];
+			local mission = shared.modMission:GetMission(player, missionId);
+			local missionLib = shared.modMission.MissionLibrary.Get(missionId);
+
+			if mission and mission.Type >= 3 then continue end;
+
+			canDelete = false;
+			table.insert(unfinMissions, missionLib and missionLib.Name or missionId);
+		end
+
+		if canDelete == false then
+			shared.Notify(player, `This mission item can not be deleted. Mission Incomplete: ({table.concat(unfinMissions, ", ")})`, "Negative");
+			return {storage:Shrink();};
+		end
+	end
+
+
 	quantity = shared.IsNan(quantity) and 1 or quantity;
 	quantity = math.clamp(quantity, 1, storageItem.Library.Stackable == false and 1 or storageItem.Library.Stackable);
 
-	logRemoteUse(storage, "remoteRemoveItem");
 	return storage:Remove(id, quantity);
 end
 

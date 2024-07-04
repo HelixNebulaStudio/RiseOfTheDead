@@ -414,16 +414,16 @@ function ItemsLibrary:Init(super)
 		CanBeRenamed=false;
 	};
 
-	new(missionBase, {Id="oddbluebook"; Name="Odd-looking Blue Book"; Icon="rbxassetid://289066042"; Description="An odd looking blue book, I wonder what's it about."; Sources={"Obtained in <b>Mission: Stephanie's Book</b>";};  });
-	new(missionBase, {Id="zombiearm"; Name="Zombie Arm"; Icon="rbxassetid://2751766625"; Description="Dr. Deniski needs it."; Sources={"Obtained in <b>Mission: Stephanie's Book</b>";};  });
-	new(missionBase, {Id="antibiotics"; Name="Antibiotics"; Icon="rbxassetid://1551829670"; Description="Jefferson needs it."; Sources={"Obtained from a secret mission";};  });
-	new(missionBase, {Id="sewerskey1"; Name="Sewers Maintenance Key"; Icon="rbxassetid://4366400646"; Description="Maintenance key used to unlock the maintenance room in the sewers."; Sources={"Obtained from <b>Carlson in Mission: The Backup Plan</b>";};  });
-	new(missionBase, {Id="cultistnote1"; Name="Cultist Note"; Icon="rbxassetid://5538983878"; Description="\"A hireling of the venator has stolen the mask. They do not have any clue what they are messing with. Eradicate and retrieve the mask immediately before they unleash hellfire upon everyone.\" ~S.F."; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
-	new(missionBase, {Id="researchpapers"; Name="Research Papers"; Icon="rbxassetid://11617421144"; Description="\"BioX Nekrosis Osmosis Research Paper\", by Eugene Baileys, Sven Førre, Joseph Mahma"; Sources={"Obtained in <b>Mission: Rats Recruitment</b>";};  });
-	new(missionBase, {Id="highvaluepackage"; Name="High Value Package"; Icon="rbxassetid://14889119970"; Description="A package container of high value."; });
-	new(missionBase, {Id="bloodsample"; Equippable=true; StorageIncludeList={"Inventory"}; Name="Blood Sample"; Icon="rbxassetid://15845539438"; Description="Test tubes containing blood samples."; });
-	new(missionBase, {Id="samplereport"; Name="Sample Report"; StorageIncludeList={"Inventory"}; Icon="rbxassetid://15904123699"; Description="Sample's unintelligible result report."; });
-	new(missionBase, {Id="blueprintpiece"; Name="Blueprint Piece"; StorageIncludeList={"Inventory"}; Icon="rbxassetid://16537824817"; Description="A piece of torn up blueprint."; });
+	new(missionBase, {Id="oddbluebook"; Name="Odd-looking Blue Book"; MissionIds={3}; Icon="rbxassetid://289066042"; Description="An odd looking blue book, I wonder what's it about."; Sources={"Obtained in <b>Mission: Stephanie's Book</b>";};  });
+	new(missionBase, {Id="zombiearm"; Name="Zombie Arm"; MissionIds={4}; Icon="rbxassetid://2751766625"; Description="Dr. Deniski needs it."; Sources={"Obtained in <b>Mission: Stephanie's Book</b>";};  });
+	new(missionBase, {Id="antibiotics"; Name="Antibiotics"; MissionIds={10}; Icon="rbxassetid://1551829670"; Description="Jefferson needs it."; Sources={"Obtained from a secret mission";};  });
+	new(missionBase, {Id="sewerskey1"; Name="Sewers Maintenance Key"; MissionIds={22}; Icon="rbxassetid://4366400646"; Description="Maintenance key used to unlock the maintenance room in the sewers."; Sources={"Obtained from <b>Carlson in Mission: The Backup Plan</b>";};  });
+	new(missionBase, {Id="cultistnote1"; Name="Cultist Note"; MissionIds={40}; Icon="rbxassetid://5538983878"; Description="\"A hireling of the venator has stolen the mask. They do not have any clue what they are messing with. Eradicate and retrieve the mask immediately before they unleash hellfire upon everyone.\" ~S.F."; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
+	new(missionBase, {Id="researchpapers"; Name="Research Papers"; MissionIds={62}; Icon="rbxassetid://11617421144"; Description="\"BioX Nekrosis Osmosis Research Paper\", by Eugene Baileys, Sven Førre, Joseph Mahma"; Sources={"Obtained in <b>Mission: Rats Recruitment</b>";};  });
+	new(missionBase, {Id="highvaluepackage"; Name="High Value Package"; MissionIds={71}; Icon="rbxassetid://14889119970"; Description="A package container of high value."; });
+	new(missionBase, {Id="bloodsample"; Equippable=true; MissionIds={75}; StorageIncludeList={"Inventory"}; Name="Blood Sample"; Icon="rbxassetid://15845539438"; Description="Test tubes containing blood samples."; });
+	new(missionBase, {Id="samplereport"; Name="Sample Report"; MissionIds={75}; StorageIncludeList={"Inventory"}; Icon="rbxassetid://15904123699"; Description="Sample's unintelligible result report."; });
+	new(missionBase, {Id="blueprintpiece"; Name="Blueprint Piece"; MissionIds={77}; StorageIncludeList={"Inventory"}; CanDelete=0; Icon="rbxassetid://16537824817"; Description="A piece of torn up blueprint."; });
 
 	--==========================================================[[ USABLE ]]==========================================================--
 	local customizationPack = {

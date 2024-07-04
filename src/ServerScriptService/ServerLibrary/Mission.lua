@@ -29,6 +29,7 @@ local remotePinMission = remotes.Interface.PinMission;
 local bindPlayServerScene = remotes.Cutscene.PlayServerScene;
 
 --== Script;
+Mission.MissionLibrary = modMissionLibrary;
 Mission.MissionProfiles = {};
 
 Mission.MissionType = {Active=1; Available=2; Completed=3; Failed=4};
