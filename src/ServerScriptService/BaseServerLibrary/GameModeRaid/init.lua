@@ -60,8 +60,10 @@ function Raid.new()
 		EliminateCount=0;
 		
 		SpawnPlatforms = {};
-		SpawnPlatformFolders = {};
+
 		HiddenSpawns = {};
+
+
 		SpecialSpawns = {};
 		
 		Doors = {};
@@ -186,7 +188,8 @@ function Raid:Load()
 						
 					elseif child.Name == "HiddenSpawns" then
 						for _, obj in pairs(child:GetDescendants()) do
-							if obj.Name == "HiddenSpawn" and obj:IsA("Attachment") then
+							if obj:IsA("Attachment") then
+								obj:SetAttribute("Enabled", obj.Name == "HiddenSpawn");
 								table.insert(self.HiddenSpawns, obj);
 							end
 						end
@@ -235,15 +238,16 @@ function Raid:Load()
 				for _, child in pairs(object:GetChildren()) do
 
 					if child:IsA("Folder") then
-						self.SpawnPlatformFolders[child.Name] = {};
-
 						for _, plat in pairs(child:GetChildren()) do
 							spCount = spCount +1;
-							self.SpawnPlatformFolders[child.Name][plat] = {
+							self.SpawnPlatforms[plat] = {
 								Name="SpawnPlatform"..spCount;
 								Part=plat;
 								Index=(plat:GetAttribute("Index") or 999);
 								Spawns={};
+
+								PlatformGroup=child.Name;
+								Enabled=false;
 							};
 						end
 
@@ -254,6 +258,7 @@ function Raid:Load()
 							Part=child;
 							Index=(child:GetAttribute("Index") or 999);
 							Spawns={};
+							Enabled=true;
 						};
 
 					end
@@ -681,6 +686,7 @@ function Raid:Start()
 			end
 		end
 		
+
 		local blockadeFolder = serverPrefabs:FindFirstChild("DefaultBlockades");
 		if blockadeFolder then
 			local new = blockadeFolder[blockadeId]:Clone();
@@ -698,35 +704,23 @@ function Raid:Start()
 				local addStageSpawn = doorPrefab:GetAttribute("AddStageSpawn");
 				if addStageSpawn == nil then return end;
 
-				local stageSpawns = self.GameDir:FindFirstChild("StageSpawns");
-				if stageSpawns == nil then return end;
-
-				for _, obj in pairs(stageSpawns:GetChildren()) do
-					if not obj:IsA("BasePart") then continue end;
-					if obj.Name ~= addStageSpawn then continue end;
-
-					obj.Name = obj.Name.."Loaded";
-
-					local att = Instance.new("Attachment");
-					att.Parent = obj;
-
-					table.insert(self.HiddenSpawns, att);
+				for _, att in pairs(self.HiddenSpawns) do
+					if att.Name == addStageSpawn then
+						att:SetAttribute("Enabled", true);
+					end
 				end
+
 			end)
 
 			destructibleObj.OnDestroySignal:Connect(function(dealer, storageItem)
 				local platformName = doorPrefab:GetAttribute("AddSpawnPlatforms");
 				if platformName == nil then return end;
 				
-				local platformFolder = self.SpawnPlatformFolders[platformName];
-				if platformFolder == nil then return end;
-
 				Debugger:StudioWarn("Load spawn platforms", platformName);
-				self.SpawnPlatformFolders[platformName] = nil;
-
-				for k, v in pairs(platformFolder) do
-					self.SpawnPlatforms[k] = v;
-					platformParam:AddToFilter(k);
+				for platformPart, platformInfo in pairs(self.SpawnPlatforms) do
+					if platformInfo.PlatformGroup == platformName then
+						platformInfo.Enabled = true;
+					end
 				end
 			end)
 			
@@ -735,10 +729,18 @@ function Raid:Start()
 		end
 	end
 	
+	for _, att in pairs(self.HiddenSpawns) do
+		att:SetAttribute("Enabled", att.Name == "HiddenSpawn");
+	end
+
 	local spawnPlatformCount = 0;
 	for spawnPart, spawnInfo in pairs(self.SpawnPlatforms) do
 		spawnInfo.SpawnedAmbientZombies = nil;
 		spawnPlatformCount = spawnPlatformCount +1;
+		
+		if spawnInfo.PlatformGroup then
+			spawnInfo.Enabled = false;
+		end
 	end
 	
 	-- MARK: Initializing Config;
@@ -805,7 +807,7 @@ local spawnCfCaches = {};
 function Raid:LoadSpawnPlatform(spawnPart)
 	local spawnPlatformInfo = self.SpawnPlatforms[spawnPart];
 	
-	if spawnPlatformInfo == nil then return end;
+	if spawnPlatformInfo == nil and spawnPlatformInfo.Enabled ~= true then return end;
 
 	if spawnPlatformInfo.Load ~= nil then return end;
 	spawnPlatformInfo.Load = 1;
@@ -966,7 +968,7 @@ function Raid:Initialize(roomData)
 								self:LoadSpawnPlatform(spawnPlatformPart);
 
 								local spawnPlatformInfo = self.SpawnPlatforms[spawnPlatformPart];
-								if spawnPlatformInfo == nil then continue end;
+								if spawnPlatformInfo == nil or spawnPlatformInfo.Enabled ~= true then continue end;
 
 								if spawnPlatformInfo.Load == 2 and spawnPlatformInfo.SpawnedAmbientZombies ~= true then
 									spawnPlatformInfo.SpawnedAmbientZombies = true;
@@ -1103,24 +1105,42 @@ function Raid:Initialize(roomData)
 			local hordeZombieCount = #self.Characters * 25;
 			hordeZombieCount = math.max(math.min(hordeZombieCount, Config.EnemyCap-#self.EnemyModules), 0);
 			
-			if hordeZombieCount > 0 and self.EliminateCount < self.EliminateGoal and #self.HiddenSpawns > 0 then
+			local validSpawns = {};
+
+			for a=1, #self.HiddenSpawns do
+				if self.HiddenSpawns[a]:GetAttribute("Enabled") then
+					table.insert(validSpawns, self.HiddenSpawns[a]);
+				end
+			end
+
+			if hordeZombieCount > 0 and self.EliminateCount < self.EliminateGoal and #validSpawns > 0 then
 				for a=1, hordeZombieCount do
 					local targetChar = self.Characters[math.random(1, #self.Characters)];
 					local player = game.Players:GetPlayerFromCharacter(targetChar);
 					
+					local closestAtt, closestDist = nil, math.huge;
+
+					
 					for b=1, 4 do
-						local spawnAtt = self.HiddenSpawns[math.random(1, #self.HiddenSpawns)];
-						
-						if player:DistanceFromCharacter(spawnAtt.WorldCFrame.Position) <= 128 then
-							self:SpawnEnemy(self:PickEnemy({IsHordeWave=true;}), {
-								SpawnCFrame=spawnAtt.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
-								InfTargeting=true;
-							});
-							
-							task.wait(Config.HordeSpawnRate or 0.5);
-							break;
+						if #validSpawns <= 0 then break end;
+						local spawnAtt = table.remove(validSpawns, math.random(1, #validSpawns));
+						local dist = player:DistanceFromCharacter(spawnAtt.WorldCFrame.Position);
+
+						if dist < closestDist then
+							closestAtt = spawnAtt;
+							closestDist = dist;
 						end
 					end
+
+					if closestAtt then
+						self:SpawnEnemy(self:PickEnemy({IsHordeWave=true;}), {
+							SpawnCFrame=closestAtt.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
+							InfTargeting=true;
+						});
+						
+						task.wait(Config.HordeSpawnRate or 0.5);
+					end
+					
 				end
 				
 			end
