@@ -9,6 +9,7 @@ local Config = {
 
 	HordeCycle=nil;
 	HordeSpawnRate=nil;
+	HordeWhenEnemiesDropsBelow=nil;
 }
 
 local Raid = {};
@@ -759,7 +760,9 @@ function Raid:Start()
 	if self.Objective.HordeSpawnRate then
 		Config.HordeSpawnRate = self.Objective.HordeSpawnRate;
 	end
-	
+	if self.Objective.HordeWhenEnemiesDropsBelow then
+		Config.HordeWhenEnemiesDropsBelow = self.Objective.HordeWhenEnemiesDropsBelow;
+	end
 
 	local minTotalZombieCount = spawnPlatformCount * Config.MinSpawnCount;
 	
@@ -1077,6 +1080,10 @@ function Raid:Initialize(roomData)
 			while self.Status ~= EnumStatus.InProgress do task.wait() end;
 			repeat
 				wait(1);
+
+				if Config.HordeWhenEnemiesDropsBelow and #self.EnemyModules <= Config.HordeWhenEnemiesDropsBelow then
+					shared.HordeTimer = tick();
+				end
 				
 				if RunService:IsStudio() then
 					Debugger:Display{
