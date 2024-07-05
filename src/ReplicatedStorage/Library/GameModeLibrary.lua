@@ -416,7 +416,6 @@ GameModeLibrary.GameModes={
 				ExitSpawn="factoryExit";
 				MaxPlayers=1;
 				TitleImage="http://www.roblox.com/asset/?id=4664135775";
-				--CrateId="factoryRaid";
 				RewardsId="factorycrate";
 				Soundtrack="Soundtrack:Falster Trap";
 			};
@@ -428,6 +427,7 @@ GameModeLibrary.GameModes={
 				TitleImage="http://www.roblox.com/asset/?id=4665901752";
 				RewardsId="officecrate";
 				Soundtrack=(modConfigurations.SpecialEvent.Halloween and "Soundtrack:Creepy" or "Soundtrack:High Velocity");
+				EnableStopwatch=true;
 			};
 			
 			["BanditOutpost"]={

@@ -207,9 +207,12 @@ function Doors.new(prefab)
 		Script = prefab:WaitForChild("Door");
 		InstanceCache = {};
 		OnDoorToggle = modEventSignal.new("OnDoorToggle");
-		Sounds = {};
+		Sounds = {Toggle=nil; Slam=nil;};
 		
 		WidthType=(prefab:GetExtentsSize().X > 9) and "Double" or "Single";
+
+		CustomSound=nil;
+		Interactable=nil;
 	};
 	
 	Debugger.Expire(prefab:FindFirstChild("NavMeshIgnore"), 0);

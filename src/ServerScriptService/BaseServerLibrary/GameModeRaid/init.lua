@@ -30,6 +30,7 @@ local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modDoors = require(game.ReplicatedStorage.Library.Doors);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
+local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
@@ -42,6 +43,8 @@ local serverPrefabs = game.ServerStorage:WaitForChild("PrefabStorage"):WaitForCh
 local extractInteractable = script:WaitForChild("ExtractInteractable");
 --==
 -- modEventSignal.new("OnWaveChanged");
+local platformParam = OverlapParams.new();
+platformParam.FilterType = Enum.RaycastFilterType.Include;
 
 function Raid.new()
 	local self = {
@@ -56,6 +59,7 @@ function Raid.new()
 		EliminateCount=0;
 		
 		SpawnPlatforms = {};
+		SpawnPlatformFolders = {};
 		HiddenSpawns = {};
 		SpecialSpawns = {};
 		
@@ -65,6 +69,7 @@ function Raid.new()
 		Characters = {};
 		EnemyModules = {};
 		
+		StopwatchTick = nil;
 		Path = PathfindingService:CreatePath();
 	};
 
@@ -218,6 +223,7 @@ function Raid:Load()
 		
 	end
 
+	-- MARK: Load Static Game Elements
 	self.GameDir = workspace.Environment:FindFirstChild("Game");
 	if workspace.Environment:FindFirstChild("Game") then
 		local gameDir: Folder = self.GameDir;
@@ -226,13 +232,31 @@ function Raid:Load()
 			if object.Name == "SpawnPlatforms" then
 				local spCount = 0;
 				for _, child in pairs(object:GetChildren()) do
-					spCount = spCount +1;
-					self.SpawnPlatforms[child] = {
-						Name="SpawnPlatform"..spCount;
-						Part=child;
-						Index=(child:GetAttribute("Index") or 999);
-						Spawns={};
-					};
+
+					if child:IsA("Folder") then
+						self.SpawnPlatformFolders[child.Name] = {};
+
+						for _, plat in pairs(child:GetChildren()) do
+							spCount = spCount +1;
+							self.SpawnPlatformFolders[child.Name][plat] = {
+								Name="SpawnPlatform"..spCount;
+								Part=plat;
+								Index=(plat:GetAttribute("Index") or 999);
+								Spawns={};
+							};
+						end
+
+					else
+						spCount = spCount +1;
+						self.SpawnPlatforms[child] = {
+							Name="SpawnPlatform"..spCount;
+							Part=child;
+							Index=(child:GetAttribute("Index") or 999);
+							Spawns={};
+						};
+
+					end
+
 				end
 
 			elseif object.Name == "Doors" then
@@ -259,6 +283,13 @@ function Raid:Load()
 						table.insert(self.HiddenSpawns, obj);
 					end
 				end
+
+			elseif object.Name == "StageSpawns" then
+				for _, obj in pairs(object:GetChildren()) do
+					if not obj:IsA("BasePart") then continue end;
+					obj.Transparency = 1;
+				end
+
 			end
 		end
 	end
@@ -319,8 +350,17 @@ end
 
 function Raid:CompleteRaid()
 	workspace:SetAttribute("GameModeComplete", true);
+
+	local runTimeStr = "";
+	if self.StopwatchTick then
+		local timeLapse = workspace:GetServerTimeNow()-self.StopwatchTick;
+		self.StopwatchFinal = timeLapse;
+
+		runTimeStr = ` Run time: {modSyncTime.FormatMs(timeLapse *1000)}!`;
+	end
+
 	self.Status = EnumStatus.Completed;
-	shared.Notify(game.Players:GetPlayers(), "Raid Complete!", "Positive");
+	shared.Notify(game.Players:GetPlayers(), `Raid Complete!{runTimeStr}`, "Positive");
 	self:Hud{
 		Status="Raid Complete!";
 		PlayMusic=false;
@@ -512,6 +552,7 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 				self.LastEnemyDeathPos = npcModule.DeathPosition;
 				
 				self.EliminateCount = self.EliminateCount +1;
+				self:StartStopwatch();
 				
 				if self.Status == EnumStatus.InProgress then
 					
@@ -565,7 +606,17 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 	return npcPrefab, newNpcModule;
 end
 
+function Raid:StartStopwatch()
+	if self.StageLib.EnableStopwatch ~= true then return end;
+
+	if self.StopwatchTick == nil then
+		self.StopwatchTick = workspace:GetServerTimeNow();
+		
+	end
+end
+
 function Raid:Start()
+	self.StopwatchTick = nil;
 	Debugger:Warn("Raid:Start");
 
 	self:Hud({Action="Open"});
@@ -609,17 +660,21 @@ function Raid:Start()
 	
 	for a=1, #self.Doors do
 		local doorObject = self.Doors[a];
+		local doorPrefab = doorObject.Prefab;
 		
 		doorObject.Raided = nil;
-		doorObject.CanBreakIn = false;
 		doorObject:Toggle(false);
+
+
+		if doorObject.SpawnBlockade == false then continue end;
+		doorObject.CanBreakIn = false;
 		
 		local blockadeId = "BlockadeSingle";
 		if doorObject.WidthType == "Double" then
 			blockadeId = "BlockadeDouble";
 		end
 		
-		for _, obj in pairs(doorObject.Prefab:GetChildren()) do
+		for _, obj in pairs(doorPrefab:GetChildren()) do
 			if obj.Name == "Blockade" then
 				game.Debris:AddItem(obj, 0);
 			end
@@ -629,10 +684,51 @@ function Raid:Start()
 		if blockadeFolder then
 			local new = blockadeFolder[blockadeId]:Clone();
 			new.Name = "Blockade";
-			new:PivotTo(doorObject.Prefab:GetPivot());
-			new.Parent = doorObject.Prefab;
+			new:PivotTo(doorPrefab:GetPivot());
+			new.Parent = doorPrefab;
 			
 			local destructibleObj = require(new:WaitForChild("Destructible"));
+
+			destructibleObj.OnDestroySignal:Connect(function()
+				self:StartStopwatch();
+			end)
+
+			destructibleObj.OnDestroySignal:Connect(function(dealer, storageItem)
+				local addStageSpawn = doorPrefab:GetAttribute("AddStageSpawn");
+				if addStageSpawn == nil then return end;
+
+				local stageSpawns = self.GameDir:FindFirstChild("StageSpawns");
+				if stageSpawns == nil then return end;
+
+				for _, obj in pairs(stageSpawns:GetChildren()) do
+					if not obj:IsA("BasePart") then continue end;
+					if obj.Name ~= addStageSpawn then continue end;
+
+					obj.Name = obj.Name.."Loaded";
+
+					local att = Instance.new("Attachment");
+					att.Parent = obj;
+
+					table.insert(self.HiddenSpawns, att);
+				end
+			end)
+
+			destructibleObj.OnDestroySignal:Connect(function(dealer, storageItem)
+				local platformName = doorPrefab:GetAttribute("AddSpawnPlatforms");
+				if platformName == nil then return end;
+				
+				local platformFolder = self.SpawnPlatformFolders[platformName];
+				if platformFolder == nil then return end;
+
+				Debugger:StudioWarn("Load spawn platforms", platformName);
+				self.SpawnPlatformFolders[platformName] = nil;
+
+				for k, v in pairs(platformFolder) do
+					self.SpawnPlatforms[k] = v;
+					platformParam:AddToFilter(k);
+				end
+			end)
+			
 			destructibleObj.Enabled = false;
 			table.insert(destructibleObjs, destructibleObj);
 		end
@@ -706,6 +802,8 @@ local spawnCfCaches = {};
 function Raid:LoadSpawnPlatform(spawnPart)
 	local spawnPlatformInfo = self.SpawnPlatforms[spawnPart];
 	
+	if spawnPlatformInfo == nil then return end;
+
 	if spawnPlatformInfo.Load ~= nil then return end;
 	spawnPlatformInfo.Load = 1;
 	
@@ -850,9 +948,7 @@ function Raid:Initialize(roomData)
 					table.insert(wlInstances, part);
 				end
 				
-				local platformParam = OverlapParams.new();
 				platformParam.FilterDescendantsInstances = wlInstances;
-				platformParam.FilterType = Enum.RaycastFilterType.Include;
 
 				local rootPart = character:WaitForChild("HumanoidRootPart");
 				task.spawn(function()
@@ -867,11 +963,13 @@ function Raid:Initialize(roomData)
 								self:LoadSpawnPlatform(spawnPlatformPart);
 
 								local spawnPlatformInfo = self.SpawnPlatforms[spawnPlatformPart];
+								if spawnPlatformInfo == nil then continue end;
+
 								if spawnPlatformInfo.Load == 2 and spawnPlatformInfo.SpawnedAmbientZombies ~= true then
 									spawnPlatformInfo.SpawnedAmbientZombies = true;
 
 									for a=1, math.min(math.random(Config.MinSpawnCount, Config.MaxSpawnCount), #spawnPlatformInfo.Spawns) do
-										local spawnCf = spawnPlatformInfo.Spawns[a] * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
+										local spawnCf = spawnPlatformInfo.Spawns[a] * CFrame.new(0, 1, 0) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
 										
 										if #self.EnemyModules > Config.EnemyCap then
 											for a=1, 4 do
@@ -951,6 +1049,7 @@ function Raid:Initialize(roomData)
 		
 		doorObject.Raided = true;
 		self.DoorsOpened = self.DoorsOpened +1;
+		self:StartStopwatch();
 		
 		Debugger:Warn("#self.Doors Opened (".. self.DoorsOpened .."/".. #self.Doors ..")");
 		
@@ -997,7 +1096,7 @@ function Raid:Initialize(roomData)
 			local hordeZombieCount = #self.Characters * 25;
 			hordeZombieCount = math.max(math.min(hordeZombieCount, Config.EnemyCap-#self.EnemyModules), 0);
 			
-			if hordeZombieCount > 0 and self.EliminateCount < self.EliminateGoal then
+			if hordeZombieCount > 0 and self.EliminateCount < self.EliminateGoal and #self.HiddenSpawns > 0 then
 				for a=1, hordeZombieCount do
 					local targetChar = self.Characters[math.random(1, #self.Characters)];
 					local player = game.Players:GetPlayerFromCharacter(targetChar);
@@ -1050,6 +1149,9 @@ function Raid:Hud(data)
 		
 		LootPrefab=self.LootPrefab;
 		PlayMusic=data.PlayMusic;
+
+		StopwatchTick = self.StopwatchTick;
+		StopwatchFinal = self.StopwatchFinal;
 	});
 end
 

@@ -17,6 +17,7 @@ local ModeHudClass = require(script.Parent);
 return function(...)
 	local modeHud = ModeHudClass.new(...);
 	
+	local stopWatchRs = nil;
 	modeHud.Soundtrack = nil;
 	
 	function modeHud:Update(data)
@@ -70,6 +71,33 @@ return function(...)
 			if not self:IsSpectating() then
 				self:Spectate();
 			end
+		end
+
+		local stopwatchLabel = self.MainFrame.stopwatchLabel;
+		if stageLib.EnableStopwatch then
+			stopwatchLabel.Visible = true;
+			stopwatchLabel.Text = "Stopwatch: Ready";
+
+			if stopWatchRs == nil then
+				stopWatchRs = RunService.RenderStepped:Connect(function(delta)
+					if data.StopwatchFinal then
+						stopwatchLabel.Text = `Run Time: {modSyncTime.FormatMs(data.StopwatchFinal *1000)}!`;
+						return;
+					end
+
+					if data.StopwatchTick == nil then
+						stopwatchLabel.Text = "Stopwatch: Ready";
+						return;
+					end
+
+					local timeLapse = (workspace:GetServerTimeNow()-data.StopwatchTick);
+					stopwatchLabel.Text = `Stopwatch: {modSyncTime.FormatMs(timeLapse *1000)}`;
+				end)
+			end
+
+		else
+			stopwatchLabel.Visible = false;
+
 		end
 	end
 	

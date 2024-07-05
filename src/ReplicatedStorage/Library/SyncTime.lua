@@ -180,6 +180,13 @@ function SyncTime.ToString(s)
 	return string.format("%02id:%02i:%02i:%02i", math.floor(s/3600/24), (s/(3600)) % 24, s/60%60, s%60);
 end
 
+function SyncTime.FormatMs(ms)
+	if ms/1000/60/60 >= 1 then
+		return string.format("%d:%02d:%02d.%03d", ms/1000/60/60%60, ms/1000/60%60, ms/1000%60, (ms%1000));
+	end
+	return string.format("%02d:%02d.%03d", ms/1000/60%60, ms/1000%60, (ms%1000));
+end
+
 task.spawn(function()
 	if RunService:IsClient() then return end;
 
