@@ -547,6 +547,8 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 			end)
 
 			npcModule.Humanoid.Died:Connect(function()
+				self:StartStopwatch();
+
 				self.LastKilled = tick();
 				for a=#self.EnemyModules, 1, -1 do
 					if self.EnemyModules[a] == npcModule then
@@ -560,7 +562,6 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 				self.LastEnemyDeathPos = npcModule.DeathPosition;
 				
 				self.EliminateCount = self.EliminateCount +1;
-				self:StartStopwatch();
 				
 				if self.Status == EnumStatus.InProgress then
 					
@@ -620,6 +621,7 @@ function Raid:StartStopwatch()
 	if self.StopwatchTick == nil then
 		self.StopwatchTick = workspace:GetServerTimeNow();
 		
+		self:Hud();
 	end
 end
 
@@ -1106,26 +1108,36 @@ function Raid:Initialize(roomData)
 			local hordeZombieCount = #self.Characters * 25;
 			hordeZombieCount = math.max(math.min(hordeZombieCount, Config.EnemyCap-#self.EnemyModules), 0);
 			
-			local validSpawns = {};
 
-			for a=1, #self.HiddenSpawns do
-				if self.HiddenSpawns[a]:GetAttribute("Enabled") then
-					table.insert(validSpawns, self.HiddenSpawns[a]);
-				end
-			end
-
-			if hordeZombieCount > 0 and self.EliminateCount < self.EliminateGoal and #validSpawns > 0 then
+			if hordeZombieCount > 0 and self.EliminateCount < self.EliminateGoal then
 				for a=1, hordeZombieCount do
+					
+					local validSpawns = {};
+					for c=1, #self.HiddenSpawns do
+						if self.HiddenSpawns[c]:GetAttribute("Enabled") then
+							table.insert(validSpawns, self.HiddenSpawns[c]);
+						end
+					end
+
+					if #validSpawns <= 0 then break; end;
+					if self.EliminateCount > self.EliminateGoal then break end;
+
+					
 					local targetChar = self.Characters[math.random(1, #self.Characters)];
+					local charCFrame = targetChar:GetPivot();
 					local player = game.Players:GetPlayerFromCharacter(targetChar);
 					
 					local closestAtt, closestDist = nil, math.huge;
 
-					
-					for b=1, 4 do
+					for b=1, 5 do
 						if #validSpawns <= 0 then break end;
+
 						local spawnAtt = table.remove(validSpawns, math.random(1, #validSpawns));
 						local dist = player:DistanceFromCharacter(spawnAtt.WorldCFrame.Position);
+
+						if charCFrame.Y > spawnAtt.WorldCFrame.Y+8 then
+							dist = dist + 50;
+						end
 
 						if dist < closestDist then
 							closestAtt = spawnAtt;

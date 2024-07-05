@@ -76,9 +76,9 @@ return function(...)
 		local stopwatchLabel = self.MainFrame.stopwatchLabel;
 		if stageLib.EnableStopwatch then
 			stopwatchLabel.Visible = true;
-			stopwatchLabel.Text = "Stopwatch: Ready";
 
 			if stopWatchRs == nil then
+				stopwatchLabel.Text = "Stopwatch: Ready";
 				stopWatchRs = RunService.RenderStepped:Connect(function(delta)
 					if data.StopwatchFinal then
 						stopwatchLabel.Text = `Run Time: {modSyncTime.FormatMs(data.StopwatchFinal *1000)}!`;
