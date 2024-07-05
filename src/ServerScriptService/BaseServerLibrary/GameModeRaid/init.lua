@@ -62,8 +62,6 @@ function Raid.new()
 		SpawnPlatforms = {};
 
 		HiddenSpawns = {};
-
-
 		SpecialSpawns = {};
 		
 		Doors = {};
@@ -174,6 +172,7 @@ function Raid:Load()
 							Part=child;
 							Index=(child:GetAttribute("Index") or 999);
 							Spawns={};
+							Enabled=true;
 						};
 						
 						if mapTotalVec == nil then
@@ -188,10 +187,11 @@ function Raid:Load()
 						
 					elseif child.Name == "HiddenSpawns" then
 						for _, obj in pairs(child:GetDescendants()) do
-							if obj:IsA("Attachment") then
-								obj:SetAttribute("Enabled", obj.Name == "HiddenSpawn");
-								table.insert(self.HiddenSpawns, obj);
-							end
+							if not obj:IsA("Attachment") then continue end;
+
+							obj:SetAttribute("Enabled", obj.Name == "HiddenSpawn");
+							table.insert(self.HiddenSpawns, obj);
+							
 						end
 						
 					elseif child.Name == "TileModule" then
@@ -285,9 +285,11 @@ function Raid:Load()
 			
 			elseif object.Name == "HiddenSpawns" then
 				for _, obj in pairs(object:GetChildren()) do
-					if obj.Name == "HiddenSpawn" and obj:IsA("Attachment") then
-						table.insert(self.HiddenSpawns, obj);
-					end
+					if not obj:IsA("Attachment") then continue end;
+					
+					obj:SetAttribute("Enabled", obj.Name == "HiddenSpawn");
+					table.insert(self.HiddenSpawns, obj);
+					
 				end
 
 			elseif object.Name == "StageSpawns" then
@@ -716,7 +718,6 @@ function Raid:Start()
 				local platformName = doorPrefab:GetAttribute("AddSpawnPlatforms");
 				if platformName == nil then return end;
 				
-				Debugger:StudioWarn("Load spawn platforms", platformName);
 				for platformPart, platformInfo in pairs(self.SpawnPlatforms) do
 					if platformInfo.PlatformGroup == platformName then
 						platformInfo.Enabled = true;
