@@ -170,7 +170,7 @@ function WeaponHandler:Equip(library, weaponId)
 		objects.Left.BulletOrigin = objects.Left.Handle:WaitForChild("BulletOrigin");
 		objects.Left.CaseOutPoint = objects.Left.Handle:FindFirstChild("CaseOut");
 		objects.Left.WeaponSights = objects.Left.Handle:FindFirstChild("WeaponSights");
-		objects.Left.MuzzleOrigin = leftWeaponModel:WaitForChild("MuzzleOrigin", true);
+		objects.Left.MuzzleOrigin = leftWeaponModel:FindFirstChild("MuzzleOrigin", true);
 	end
 
 	local storageItem = modData.GetItemById(weaponId);
