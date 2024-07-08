@@ -706,6 +706,10 @@ function Interface:PromptDialogBox(params)
 			end
 		end
 
+		if optionButtonInfo.Color then
+			newButton.BackgroundColor3 = optionButtonInfo.Color;
+		end
+
 		local debouceTick = tick();
 		newButton.MouseButton1Click:Connect(function()
 			if not promptDialogActive then return end;

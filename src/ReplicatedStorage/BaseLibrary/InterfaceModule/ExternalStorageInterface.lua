@@ -235,6 +235,10 @@ function Interface.init(modInterface)
 				end
 			end
 			
+			if syncTimeConn then
+				syncTimeConn:Disconnect();
+				syncTimeConn = nil;
+			end
 			if storage.MaxPages and storage.MaxPages >= 1 then
 				buttonsFrame.Visible = true;
 				
@@ -242,6 +246,9 @@ function Interface.init(modInterface)
 				baseStorageId = indA and storageId:sub(1, indA-1) or storageId;
 				
 				for a=1, storage.MaxPages do
+					local isOnButtonPage = a == (storage.Page or 1);
+					local pageStorageId = a==1 and baseStorageId or baseStorageId..("#p"..a);
+
 					local newButton = pageButton:Clone();
 					newButton.Text = a;
 					
@@ -252,20 +259,41 @@ function Interface.init(modInterface)
 						newButton.ZIndex = 4;
 					end
 					
-					local isPremiumPage = a >= (storage.PremiumPage or 10)
-					if a == (storage.Page or 1) then
-						if isPremiumPage then
-							newButton.BackgroundColor3 = Color3.fromRGB(160, 128, 53);
+					local pageStorage = modData.Storages[pageStorageId];
+					if storage.Settings and storage.Settings.Rental > 0 then
+						if pageStorage then
+							local timeLeft = pageStorage.RentalUnlockTime - modSyncTime.GetTime();
+							local isLocked = timeLeft <= 0;
+							
+							if a == (storage.Page or 1) then
+								newButton.BackgroundColor3 = isLocked and Color3.fromRGB(105, 75, 143) or Color3.fromRGB(50, 50, 50);
+							else
+								newButton.BackgroundColor3 = isLocked and Color3.fromRGB(75, 64, 90) or Color3.fromRGB(100, 100, 100);
+							end
+							
 						else
-							newButton.BackgroundColor3 = Color3.fromRGB(160, 160, 160);
+							newButton.BackgroundColor3 = Color3.fromRGB(75, 64, 90);
+
 						end
 					else
-						if isPremiumPage then
-							newButton.BackgroundColor3 = Color3.fromRGB(100, 81, 33);
+						local isPremiumPage = a >= (storage.PremiumPage or 10)
+						if isOnButtonPage then
+							if isPremiumPage then
+								newButton.BackgroundColor3 = Color3.fromRGB(160, 128, 53);
+							else
+								newButton.BackgroundColor3 = Color3.fromRGB(160, 160, 160);
+							end
 						else
-							newButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
+							if isPremiumPage then
+								newButton.BackgroundColor3 = Color3.fromRGB(100, 81, 33);
+							else
+								newButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
+							end
 						end
+
 					end
+
+					local onButtonClick;
 
 					newButton.MouseButton1Click:Connect(function()
 						Interface:PlayButtonClick();
@@ -273,132 +301,231 @@ function Interface.init(modInterface)
 						
 						if a ~= 1 then
 							newStorageId = baseStorageId.."#p"..a;
-							
-							--if modData.Storages[newStorageId] == nil then
-							openStorage(newStorageId, a);
-							--end
 						end
-						Interface.Update(newStorageId, modData.Storages[newStorageId]);
+						
+						if activeStorageId ~= newStorageId then
+							openStorage(newStorageId, a);
+							Interface.Update(newStorageId, modData.Storages[newStorageId]);
+
+							return;
+						end
+
+						if onButtonClick then
+							onButtonClick();
+						end
 					end)
-				end
-			end
 
-
-			if syncTimeConn then
-				syncTimeConn:Disconnect();
-				syncTimeConn = nil;
-			end
-			if storage.Settings and storage.Settings.Rental > 0 then
-				buttonsFrame.Visible = true;
-				local rentalPrice = storage.Settings.Rental;
-				
-				local newButton = pageButton:Clone();
-				newButton.Text = "Rent";
-				
-				newButton.LayoutOrder = 0;
-				newButton.BackgroundColor3 = Color3.fromRGB(66, 46, 91);
-				newButton.Parent = buttonsFrame;
-				if modConfigurations.CompactInterface then
-					newButton.ZIndex = 4;
-				end
-				
-				local function updateRental()
-					local storage = modData.Storages[activeStorageInterface.StorageId];
-					if storage.Settings == nil or storage.Settings.Rental <= 0 then
-						return;
-					end
-					
-					local itemCount = 0;
-					
-					for storageItemId, storageItem in pairs(storage.Container) do
-						itemCount = itemCount +1;
-					end
-					local rentCost = itemCount * rentalPrice;
-					
-					local timeLeft = storage.RentalUnlockTime - modSyncTime.GetTime();
-					if timeLeft > 0 then
-						storageTitleTag.Text = storageName..` (Unlock Time Left: {modSyncTime.ToString(timeLeft)})`;
-					end
-
-					local goldSuffix = modConfigurations.CompactInterface and "G" or " Gold";
-
-					if timeLeft <= 0 then
-						activeStorageInterface.ViewOnly = true;
-						newButton.Text = `Unlock [{storage.Page or "1"}/{storage.MaxPages}] (<b><font color='rgb(170, 120, 0)'>{rentCost}{goldSuffix}</font></b>)`
-
-					else
-						activeStorageInterface.ViewOnly = false;
-						newButton.Text = `Cost (<b><font color='rgb(170, 120, 0)'>{rentCost}{goldSuffix}</font></b>)`;
+					if storage.Settings and storage.Settings.Rental > 0 and isOnButtonPage then
+						local rentalPrice = storage.Settings.Rental;
 						
-					end
-					
-					for id, buttonTable in pairs(activeStorageInterface.Buttons) do
-						buttonTable.ItemButtonObject.DimOut = timeLeft <= 0 and 0.392157 or false;
-						buttonTable.ItemButtonObject:Update(buttonTable.Item);
-					end
-					
-					return itemCount, timeLeft;
-				end
-
-				activeStorageInterface:ConnectOnUpdate(updateRental);
-				updateRental();
-				syncTimeConn = modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(updateRental)
-				
-				newButton.MouseButton1Click:Connect(function()
-					Interface:PlayButtonClick();
-					local newStorageId = baseStorageId;
-					
-					local itemCount, timeLeft = updateRental();
-					local rentCost = itemCount * rentalPrice;
-					
-					if timeLeft > 0 then return end;
-					
-					local promptWindow = Interface:PromptQuestion("Rent Rat Storage for <b><font color='rgb(170, 120, 0)'>".. rentCost.." Gold</font></b>?",
-						"Unlock rat storage for 24 hours, <b><font color='rgb(170, 120, 0)'>10 Gold per slot</font></b>.\n<b>Warning, your items will be inaccessible after 24 hours and it will cost gold to re-unlock.</b>", 
-						"Rent", "Cancel");
-					local YesClickedSignal, NoClickedSignal;
-
-					YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
-						promptWindow.Frame.Yes.buttonText.Text = "Unlocking...";
-						
-						local returnPacket = remoteStorageService:InvokeServer({Action="Rental"; StorageId=storage.Id; Request=true;});
-						if returnPacket.Success then
-							if returnPacket.Storages then
-								for storageId, _ in pairs(returnPacket.Storages) do
-									modData.SetStorage(returnPacket.Storages[storageId]);
-								end
+						local function updateRental()
+							local storage = modData.Storages[activeStorageInterface.StorageId];
+							if storage.Settings == nil or storage.Settings.Rental <= 0 then
+								return;
 							end
 							
-							task.wait(1);
-							Interface.Update(newStorageId, modData.Storages[newStorageId]);
+							local itemCount = 0;
 							
-						else
-							task.wait(2);
-							promptWindow:Close();
-							Interface:OpenWindow("GoldMenu", "GoldPage");
-							return;
+							for storageItemId, storageItem in pairs(storage.Container) do
+								itemCount = itemCount +1;
+							end
+							local rentCost = itemCount * rentalPrice;
 							
+							local timeLeft = storage.RentalUnlockTime - modSyncTime.GetTime();
+							if timeLeft > 0 then
+								storageTitleTag.Text = storageName..` (Unlock Time Left: {modSyncTime.ToString(timeLeft)})`;
+							end
+
+							local goldSuffix = modConfigurations.CompactInterface and "G" or " Gold";
+
+							if timeLeft <= 0 then
+								activeStorageInterface.ViewOnly = true;
+								newButton.Text = `Unlock {a} (<b><font color='rgb(170, 120, 0)'>{rentCost}{goldSuffix}</font></b>)`
+
+							else
+								activeStorageInterface.ViewOnly = false;
+								newButton.Text = `{a} (<b><font color='rgb(170, 120, 0)'>{rentCost}{goldSuffix}</font></b>)`;
+								
+							end
+							
+							for id, buttonTable in pairs(activeStorageInterface.Buttons) do
+								buttonTable.ItemButtonObject.DimOut = timeLeft <= 0 and 0.392157 or false;
+								buttonTable.ItemButtonObject:Update(buttonTable.Item);
+							end
+							
+							return itemCount, timeLeft;
 						end
 
-						activeStorageInterface:Update();
-						promptWindow:Close();
-						Interface:OpenWindow("ExternalStorage");
-						
-						YesClickedSignal:Disconnect();
-						NoClickedSignal:Disconnect();
-					end);
+						activeStorageInterface:ConnectOnUpdate(updateRental);
+						updateRental();
+						syncTimeConn = modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(updateRental)
 					
-					NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
-						promptWindow:Close();
-						
-						YesClickedSignal:Disconnect();
-						NoClickedSignal:Disconnect();
-					end);
-				end)
-				
+						onButtonClick = function()
+							local newStorageId = baseStorageId;
+					
+							local itemCount, timeLeft = updateRental();
+							local rentCost = itemCount * rentalPrice;
+							
+							if timeLeft > 0 then return end;
+							
+							Interface:PromptDialogBox({
+								Title=`Rent Rat Storage for <b><font color='rgb(170, 120, 0)'>{rentCost} Gold</font></b>?`;
+								Desc=`Unlock rat storage for 24 hours, <b><font color='rgb(170, 120, 0)'>{rentalPrice} Gold per slot used</font></b>.\n\n<b>Important: Your items will be inaccessible after 24 hours and it will cost gold to re-unlock the storage.</b>`;
+								Buttons={
+									{
+										Text="Rent";
+										Color=Color3.fromRGB(105, 75, 143);
+										OnPrimaryClick=function(promptDialogFrame, textButton)
+											promptDialogFrame.statusLabel.Text = "Unlocking...";
+											
+											local returnPacket = remoteStorageService:InvokeServer({Action="Rental"; StorageId=storage.Id; Request=true;});
+											if returnPacket.Success then
+												if returnPacket.Storages then
+													for storageId, _ in pairs(returnPacket.Storages) do
+														modData.SetStorage(returnPacket.Storages[storageId]);
+													end
+												end
+												
+												task.wait(0.5);
+												Interface.Update(pageStorageId, modData.Storages[pageStorageId]);
+												
+											else
+												promptDialogFrame.statusLabel.Text = "Insufficient Gold...";
+	
+												task.wait(2);
+												window:Close();
+												Interface:OpenWindow("GoldMenu", "GoldPage");
+												return;
+												
+											end
+	
+											activeStorageInterface:Update();
+											
+										end;
+									};
+									{
+										Text="Cancel";
+										Style="Cancel";
+									};
+								}
+							});
+						end
+
+					end
+				end
 			end
+
+
+			-- if storage.Settings and storage.Settings.Rental > 0 then
+			-- 	buttonsFrame.Visible = true;
+			-- 	local rentalPrice = storage.Settings.Rental;
+				
+			-- 	local newButton = pageButton:Clone();
+			-- 	newButton.Text = "Rent";
+				
+			-- 	newButton.LayoutOrder = 0;
+			-- 	newButton.BackgroundColor3 = Color3.fromRGB(66, 46, 91);
+			-- 	newButton.Parent = buttonsFrame;
+			-- 	if modConfigurations.CompactInterface then
+			-- 		newButton.ZIndex = 4;
+			-- 	end
+				
+			-- 	local function updateRental()
+			-- 		local storage = modData.Storages[activeStorageInterface.StorageId];
+			-- 		if storage.Settings == nil or storage.Settings.Rental <= 0 then
+			-- 			return;
+			-- 		end
+					
+			-- 		local itemCount = 0;
+					
+			-- 		for storageItemId, storageItem in pairs(storage.Container) do
+			-- 			itemCount = itemCount +1;
+			-- 		end
+			-- 		local rentCost = itemCount * rentalPrice;
+					
+			-- 		local timeLeft = storage.RentalUnlockTime - modSyncTime.GetTime();
+			-- 		if timeLeft > 0 then
+			-- 			storageTitleTag.Text = storageName..` (Unlock Time Left: {modSyncTime.ToString(timeLeft)})`;
+			-- 		end
+
+			-- 		local goldSuffix = modConfigurations.CompactInterface and "G" or " Gold";
+
+			-- 		if timeLeft <= 0 then
+			-- 			activeStorageInterface.ViewOnly = true;
+			-- 			newButton.Text = `Unlock [{storage.Page or "1"}/{storage.MaxPages}] (<b><font color='rgb(170, 120, 0)'>{rentCost}{goldSuffix}</font></b>)`
+
+			-- 		else
+			-- 			activeStorageInterface.ViewOnly = false;
+			-- 			newButton.Text = `Cost (<b><font color='rgb(170, 120, 0)'>{rentCost}{goldSuffix}</font></b>)`;
+						
+			-- 		end
+					
+			-- 		for id, buttonTable in pairs(activeStorageInterface.Buttons) do
+			-- 			buttonTable.ItemButtonObject.DimOut = timeLeft <= 0 and 0.392157 or false;
+			-- 			buttonTable.ItemButtonObject:Update(buttonTable.Item);
+			-- 		end
+					
+			-- 		return itemCount, timeLeft;
+			-- 	end
+
+			-- 	activeStorageInterface:ConnectOnUpdate(updateRental);
+			-- 	updateRental();
+			-- 	syncTimeConn = modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(updateRental)
+				
+			-- 	newButton.MouseButton1Click:Connect(function()
+			-- 		Interface:PlayButtonClick();
+			-- 		local newStorageId = baseStorageId;
+					
+			-- 		local itemCount, timeLeft = updateRental();
+			-- 		local rentCost = itemCount * rentalPrice;
+					
+			-- 		if timeLeft > 0 then return end;
+					
+			-- 		Interface:PromptDialogBox({
+			-- 			Title=`Rent Rat Storage for <b><font color='rgb(170, 120, 0)'>{rentCost} Gold</font></b>?`;
+			-- 			Desc=`Unlock rat storage for 24 hours, <b><font color='rgb(170, 120, 0)'>{rentalPrice} Gold per slot used</font></b>.\n\n<b>Important: Your items will be inaccessible after 24 hours and it will cost gold to re-unlock the storage.</b>`;
+			-- 			Buttons={
+			-- 				{
+			-- 					Text="Rent";
+			-- 					Color=Color3.fromRGB(105, 75, 143);
+			-- 					OnPrimaryClick=function(promptDialogFrame, textButton)
+			-- 						promptDialogFrame.statusLabel.Text = "Unlocking...";
+									
+			-- 						local returnPacket = remoteStorageService:InvokeServer({Action="Rental"; StorageId=storage.Id; Request=true;});
+			-- 						if returnPacket.Success then
+			-- 							if returnPacket.Storages then
+			-- 								for storageId, _ in pairs(returnPacket.Storages) do
+			-- 									modData.SetStorage(returnPacket.Storages[storageId]);
+			-- 								end
+			-- 							end
+										
+			-- 							task.wait(0.5);
+			-- 							Interface.Update(newStorageId, modData.Storages[newStorageId]);
+										
+			-- 						else
+			-- 							promptDialogFrame.statusLabel.Text = "Insufficient Gold...";
+
+			-- 							task.wait(2);
+			-- 							window:Close();
+			-- 							Interface:OpenWindow("GoldMenu", "GoldPage");
+			-- 							return;
+										
+			-- 						end
+
+			-- 						activeStorageInterface:Update();
+									
+			-- 					end;
+			-- 				};
+			-- 				{
+			-- 					Text="Cancel";
+			-- 					Style="Cancel";
+			-- 				};
+			-- 			}
+			-- 		});
+
+			-- 	end)
+				
+			-- end
 			
 			refreshBoundarySize();
 			if firstload then
