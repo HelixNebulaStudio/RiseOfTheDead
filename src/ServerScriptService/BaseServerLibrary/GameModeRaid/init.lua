@@ -548,7 +548,7 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 			end)
 
 			npcModule.Humanoid.Died:Connect(function()
-				self:StartStopwatch();
+				self:BeginCount();
 
 				self.LastKilled = tick();
 				for a=#self.EnemyModules, 1, -1 do
@@ -616,14 +616,16 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 	return npcPrefab, newNpcModule;
 end
 
-function Raid:StartStopwatch()
-	if self.StageLib.EnableStopwatch ~= true then return end;
-
-	if self.StopwatchTick == nil then
-		self.StopwatchTick = workspace:GetServerTimeNow();
-		
-		self:Hud();
+function Raid:Begin()
+	if self.StageLib.EnableStopwatch == true then
+		if self.StopwatchTick == nil then
+			self.StopwatchTick = workspace:GetServerTimeNow();
+		end
 	end
+
+	self:Hud({
+		PlayMusic=true;
+	});
 end
 
 function Raid:Start()
@@ -702,7 +704,7 @@ function Raid:Start()
 			local destructibleObj = require(new:WaitForChild("Destructible"));
 
 			destructibleObj.OnDestroySignal:Connect(function()
-				self:StartStopwatch();
+				self:BeginCount();
 			end)
 
 			destructibleObj.OnDestroySignal:Connect(function(dealer, storageItem)
@@ -803,7 +805,6 @@ function Raid:Start()
 
 	self:Hud({
 		Status="Eliminate "..self.EliminateGoal.." enemies.";
-		PlayMusic=true;
 	})
 end
 
@@ -1058,7 +1059,7 @@ function Raid:Initialize(roomData)
 		
 		doorObject.Raided = true;
 		self.DoorsOpened = self.DoorsOpened +1;
-		self:StartStopwatch();
+		self:BeginCount();
 		
 		shared.Notify(game.Players:GetPlayers(), `{self.DoorsOpened}/{#self.Doors} Doors Opened!{self.DoorsOpened == 1 and "\nThe more doors open, the more frequent hordes occur." or ""}`, "Inform");
 		
