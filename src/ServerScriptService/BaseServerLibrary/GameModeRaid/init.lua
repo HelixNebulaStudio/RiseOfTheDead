@@ -616,7 +616,9 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 	return npcPrefab, newNpcModule;
 end
 
-function Raid:Begin()
+function Raid:BeginCount()
+	if self.Status ~= EnumStatus.InProgress then return end;
+	
 	if self.StageLib.EnableStopwatch == true then
 		if self.StopwatchTick == nil then
 			self.StopwatchTick = workspace:GetServerTimeNow();
