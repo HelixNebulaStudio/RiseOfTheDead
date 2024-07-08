@@ -184,64 +184,48 @@ function Interface.init(modInterface)
 					if tick()-addSlotDebounce <= 0.1 then return end;
 					addSlotDebounce = tick();
 					
-					local proccessed = false;
 					cost = modWorkbenchLibrary.StorageCost(storage.Id, storage.Size, storage.Page);
-					Interface:CloseWindow("ExternalStorage");
 					
-					local promptWindow = Interface:PromptQuestion("Purchase storage slot?",
-						("Are you sure you want to purchase a storage slot for $Cost Perks?"):gsub("$Cost", cost), 
-						"Purchase", "Cancel", "rbxassetid://3187395807");
-					local YesClickedSignal, NoClickedSignal;
+					Interface:PromptDialogBox({
+						Title=`Purchase storage slot?`;
+						Desc=`Are you sure you want to purchase a storage slot for {cost} Perks?`;
+						Icon=`rbxassetid://3187395807`;
+						Buttons={
+							{
+								Text="Purchase";
+								Style="Confirm";
+								OnPrimaryClick=function(promptDialogFrame, textButton)
+									if tick()-addSlotDebounce <= 0.2 then return end;
+									addSlotDebounce = tick();
+
+									promptDialogFrame.statusLabel.Text = "Purchasing...";
+									local r = remoteUpgradeStorage:InvokeServer(storage.Id);
+									if type(r) == "table" and r.Id then
+										modData.SetStorage(r);
+										Interface.Update(r.Id, r);
+										promptDialogFrame.statusLabel.Text = "Slot Purchased!";
+										wait(0.5);
+										
+									elseif r == 1 then
+										promptDialogFrame.statusLabel.Text = "Purchase Failed!";
+										wait(2);
+										
+									elseif r == 2 then
+										promptDialogFrame.statusLabel.Text = "Not enough Perks!";
+										wait(1);
+										window:Close();
+										Interface:OpenWindow("GoldMenu", "PerksPage");
+										return;
+									end
+								end;
+							};
+							{
+								Text="Cancel";
+								Style="Cancel";
+							};
+						}
+					});
 					
-					YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-						if tick()-addSlotDebounce <= 0.2 then return end;
-						addSlotDebounce = tick();
-						
-						Interface:PlayButtonClick();
-						promptWindow.Frame.Yes.buttonText.Text = "Purchasing...";
-						local r = remoteUpgradeStorage:InvokeServer(storage.Id);
-						if type(r) == "table" and r.Id then
-							modData.SetStorage(r);
-							Interface.Update(r.Id, r);
-							promptWindow.Frame.Yes.buttonText.Text = "Slot Purchased!";
-							wait(0.5);
-							
-						elseif r == 1 then
-							promptWindow.Frame.Yes.buttonText.Text = "Purchase Failed!";
-							wait(2);
-							
-						elseif r == 2 then
-							promptWindow.Frame.Yes.buttonText.Text = "Not enough Perks!";
-							wait(2);
-							promptWindow:Close();
-							Interface:OpenWindow("GoldMenu", "PerksPage");
-							return;
-							
-						end
-						
-						activeStorageInterface:Update();
-						promptWindow:Close();
-						proccessed = true;
-						Interface:OpenWindow("ExternalStorage");
-						
-						YesClickedSignal:Disconnect();
-						NoClickedSignal:Disconnect();
-					end);
-					
-					NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
-						promptWindow:Close();
-						proccessed = true;
-						Interface:OpenWindow("ExternalStorage");
-						YesClickedSignal:Disconnect();
-						NoClickedSignal:Disconnect();
-					end);
-					
-					delay(5, function()
-						if not proccessed and promptWindow then
-							promptWindow:Close();
-						end;
-					end)
 				end)
 			else
 				newAddSlotButton.Visible = false;

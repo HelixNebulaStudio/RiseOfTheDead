@@ -634,6 +634,126 @@ function Interface:PromptWarning(warningMessage)
 end
 
 
+-- MARK: PromptDialogBox()
+local promptDialogBox = script.Parent:WaitForChild("PromptDialogBox") :: TextButton;
+local templatePromptButton = promptDialogBox:WaitForChild("Button") :: TextButton; 
+local promptDialogWindow = promptDialogBox:WaitForChild("Window") :: TextButton;
+local promptDialogFrame = promptDialogWindow:WaitForChild("Frame") :: Frame;
+
+local promptDialogActive = false;
+
+local function closePromptDialogBox()
+	if not promptDialogActive then 
+		promptDialogBox.Visible = false;
+		return 
+	end;
+	promptDialogActive = false;
+
+	TweenService:Create(promptDialogBox, TweenInfo.new(0.3), {
+		BackgroundTransparency = 1;
+	}):Play();
+	TweenService:Create(promptDialogWindow, TweenInfo.new(0.5), {
+		Position = UDim2.new(0.5, 0, -1.5, 0);
+	}):Play();
+	task.delay(0.3, function()
+		promptDialogBox.Visible = false;
+	end)
+end
+function Interface:ClosePromptDialogBox()
+	closePromptDialogBox();
+end
+
+promptDialogBox.MouseButton1Click:Connect(closePromptDialogBox);
+
+function Interface:PromptDialogBox(params)
+	local titleLabel = promptDialogFrame.titleLabel;
+	local descLabel = promptDialogFrame.descLabel;
+	local iconLabel = promptDialogWindow.iconLabel;
+
+	local buttonsFrame = promptDialogFrame.Buttons;
+	local statusLabel = promptDialogFrame.statusLabel;
+	
+	titleLabel.Text = params.Title or "Are you sure?";
+	descLabel.Text = params.Desc or "?"
+	iconLabel.Image = params.Icon or "";
+	iconLabel.Visible = iconLabel.Image ~= "";
+
+	buttonsFrame.Visible = true;
+	statusLabel.Visible = false;
+
+	for _, obj in pairs(buttonsFrame:GetChildren()) do
+		if obj:IsA("GuiObject") then
+			obj:Destroy();
+		end
+	end
+
+	local optionButtons = params.Buttons or {};
+
+	for a=1, #optionButtons do
+		local newButton = templatePromptButton:Clone();
+		local optionButtonInfo = optionButtons[a];
+
+		newButton.Text = optionButtonInfo.Text or "Button"..a;
+
+		local onClick1 = optionButtonInfo.OnPrimaryClick;
+		local onClick2 = optionButtonInfo.OnSecondaryClick;
+
+		if optionButtonInfo.Style then
+			if optionButtonInfo.Style == "Confirm" then
+				optionButtonInfo.BackgroundColor3 = Color3.fromRGB(54, 107, 51);
+			elseif optionButtonInfo.Style == "Cancel" then
+				optionButtonInfo.BackgroundColor3 = Color3.fromRGB(102, 38, 38);
+			end
+		end
+
+		newButton.MouseButton1Click:Connect(function()
+			if not promptDialogActive then return end;
+			Interface:PlayButtonClick();
+			
+			buttonsFrame.Visible = false;
+			statusLabel.Visible = true;
+
+			if onClick1 then
+				onClick1(promptDialogFrame, newButton);
+			end
+
+			closePromptDialogBox();
+		end)
+
+		local function onSecondaryClick()
+			if not promptDialogActive then return end;
+			Interface:PlayButtonClick();
+
+			buttonsFrame.Visible = false;
+			statusLabel.Visible = true;
+			
+			if onClick2 then
+				onClick2();
+			end
+
+			closePromptDialogBox();
+		end
+		newButton.MouseButton2Click:Connect(onSecondaryClick);
+		newButton.TouchLongPress:Connect(onSecondaryClick);
+
+		newButton.Visible = true;
+		newButton.Parent = buttonsFrame;
+	end
+
+	promptDialogWindow.Position = UDim2.new(0.5, 0, -1.5, 0);
+	TweenService:Create(promptDialogBox, TweenInfo.new(0.3), {
+		BackgroundTransparency = 0.3;
+	}):Play();
+	TweenService:Create(promptDialogWindow, TweenInfo.new(0.5), {
+		Position = UDim2.new(0.5, 0, 0.5, 0);
+	}):Play();
+	task.delay(0.3, function() 
+		promptDialogActive = true;
+	end)
+	promptDialogBox.Visible = true;
+end
+
+
 function Interface:NewDropdownList(options, newButtonTemplate)
 	local dropdownObj = {};
 	dropdownObj.OptionButtons = {};
