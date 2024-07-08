@@ -440,9 +440,7 @@ function Interface.init(modInterface)
 						pickButton.MouseButton1Click:Connect(function()
 							Interface:PlayButtonClick();
 
-							if customColors then
-								colorPickerObj:SetUnlocked(customColors.Unlocked);
-							end
+							colorPickerObj:SetUnlocked(customColors and customColors.Unlocked);
 							if modConfigurations.CompactInterface then
 								Interface:CloseWindow("Inventory");
 								colorPickerObj.Frame.Position = UDim2.new(0, 0, 0, 0);

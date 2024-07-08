@@ -906,9 +906,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					optionButton.AutomaticSize = Enum.AutomaticSize.Y;
 					colorFrame.Parent = optionButton;
 					
-					if customColors then
-						colorPickerObj:SetUnlocked(customColors.Unlocked);
-					end
+					colorPickerObj:SetUnlocked(customColors and customColors.Unlocked);
 					function colorPickerObj:OnColorSelect(selectColor, colorName, colorLabel)
 						if colorLabel:FindFirstChild("LockedTemplate") then
 							Debugger:StudioWarn("Selection locked");
