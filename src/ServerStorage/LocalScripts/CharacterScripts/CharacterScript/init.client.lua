@@ -1108,6 +1108,7 @@ RunService:BindToRenderStep("OffCamRender", Enum.RenderPriority.Input.Value, fun
 end)
 
 
+local upRayHit, upRayEnd;
 local function renderStepped(camera, deltaTime)
 	local renderTick = tick();
 	if not workspace:IsAncestorOf(character) then return; end
@@ -1233,7 +1234,6 @@ local function renderStepped(camera, deltaTime)
 
 	local upOffset = 4;
 	local upCollisionRay = Ray.new(rootPoint.Position, Vector3.new(0, upOffset, 0));
-	local upRayHit, upRayEnd;
 
 	if renderTick > Cache.CrouchCheckCooldown then
 		Cache.CrouchCheckCooldown = renderTick + 0.2;
