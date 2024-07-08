@@ -113,7 +113,10 @@ function Interface.init(modInterface)
 	end
 	
 	window.OnWindowToggle:Connect(function(visible, shopType, ...)
+
 		if visible then
+			local reselectSlot = ...;
+
 			if defaultInterface then defaultInterface.OnItemButton1Click = onItemSelect; end
 			if premiumInterface then premiumInterface.OnItemButton1Click = onItemSelect; end
 			if clothingInterface then clothingInterface.OnItemButton1Click = onItemSelect; end
@@ -140,6 +143,15 @@ function Interface.init(modInterface)
 				repeat until not window.Visible or Interface.Object == nil or not Interface.Object:IsDescendantOf(workspace) or Interface.modCharacter.Player:DistanceFromCharacter(Interface.Object.Position) >= 16 or not wait(0.5);
 				Interface:ToggleWindow("RatShopWindow", false);
 			end)
+
+			if reselectSlot and reselectSlot.Button then
+				onItemSelect(nil, reselectSlot);
+	
+			else
+				Interface.Update();
+				Interface.LoadPage("Money");
+	
+			end
 			
 		else
 			game.Debris:AddItem(shopFrame:FindFirstChild("ToolTip"), 0);
@@ -156,8 +168,7 @@ function Interface.init(modInterface)
 			end)
 			
 		end
-		Interface.Update();
-		Interface.LoadPage("Money");
+
 	end)
 	
 	function Interface.ClearSelection()
@@ -398,6 +409,7 @@ function Interface.init(modInterface)
 		if Interface.SelectedSlot then
 			Interface.ClearPage();
 
+			local selectedSlot = Interface.SelectedSlot;
 			local storageItemID = Interface.SelectedSlot.ID;
 			local selectedItem = modData.GetItemById(storageItemID);
 
@@ -513,6 +525,7 @@ function Interface.init(modInterface)
 				or bpLib and (bpLib.SellPrice or (bpLib.Tier and modShopLibrary.SellPrice["Tier"..bpLib.Tier])) or nil;
 
 			if itemLib and price then
+				local shopPartObj = Interface.Object;
 				Interface.NewListing(function(newListing)
 					local infoBox = newListing:WaitForChild("infoFrame");
 					local descFrame = infoBox:WaitForChild("descFrame");
@@ -564,7 +577,9 @@ function Interface.init(modInterface)
 							end
 
 							promptWindow:Close();
-							Interface:OpenWindow("RatShopWindow");
+							Interface.Object = shopPartObj;
+							Interface:OpenWindow("RatShopWindow", activeShopType, selectedSlot);
+
 							YesClickedSignal:Disconnect();
 							NoClickedSignal:Disconnect();
 						end);
