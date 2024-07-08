@@ -115,8 +115,6 @@ function Zombie.new(self)
 			
 			local dmgRange = math.pow((1-math.clamp(distance/self.Properties.AttackRange, 0, 1)), 1/2);
 			
-			--local zLvl = self.Configuration.Level + math.floor(modGlobalVars.MaxLevels/100); -- math.clamp( zLvl/(modGlobalVars.MaxLevels/10), 0.1, 3);
-			
 			local attackDamage = self.Properties.AttackDamage;
 			attackDamage = attackDamage * dmgRange - (self.DamageReduction or 0);
 			

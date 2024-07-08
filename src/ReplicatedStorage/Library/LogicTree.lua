@@ -252,10 +252,10 @@ function LogicTree:Hook(nodeName: string, func)
 	node.Function = func;
 end
 
-function LogicTree:Call(nodeName: string)
+function LogicTree:Call(nodeName: string, ...)
 	local node = self.Nodes[nodeName];
 	if node == nil then Debugger:Warn("Logic tree does not contain node ("..nodeName..") to call."); return end;
-	return node.Function();
+	return node.Function(...);
 end
 
 return LogicTree;

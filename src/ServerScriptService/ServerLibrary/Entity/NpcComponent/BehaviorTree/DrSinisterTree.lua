@@ -13,18 +13,49 @@ local templateLinks = script:WaitForChild("linksPrefab");
 
 return function(self)
 	local tree = modLogicTree.new{
-		Root={"Or"; "StatusLogic"; "ProtectSequence"; "ZombieTree";};
+		Root={"Or"; "StatusLogic"; "AttackSequence"; "ProtectSequence"; "ZombieTree";};
+        AttackSequence={"And"; "CanAttackTarget"; "Attack";};
 		ProtectSequence={"And"; "GetZombies"; "ChannelImmunity";};
 	}
 	
 	local cache = {};
 	cache.LastFailScan = tick()-60;
 	cache.LastGetZombies = tick()-5;
+	cache.AttackCooldown = tick();
 	cache.LinkedUnits = {};
 	
 	local veinOptions = templateLinks:GetChildren();
 
 	tree:Hook("StatusLogic", self.StatusLogic);
+
+	tree:Hook("Attack", function(closestEnemy)
+		if tick() < cache.AttackCooldown then return tree.Failure end;
+		
+		cache.AttackCooldown = tick() + (self.Properties.AttackSpeed * math.random(90, 110)/100);
+
+		self.Move:Face(closestEnemy.Character.PrimaryPart);
+		self.BasicAttack2(closestEnemy.Humanoid);
+
+		return tree.Failure;
+	end)
+
+	tree:Hook("CanAttackTarget", function()
+		if tick() < cache.AttackCooldown then return tree.Failure end;
+		
+		local closestEnemy = nil;
+		for a=#self.Enemies, 1, -1 do
+			if self.Enemies[a] and self.Enemies[a].Distance <= self.Properties.AttackRange then
+				closestEnemy = self.Enemies[a];
+				break;
+			end
+		end
+
+		if closestEnemy then
+			return tree:Call("Attack", closestEnemy);
+		end
+
+		return tree.Failure;
+	end)
 
 	tree:Hook("GetZombies", function()
 		if tick()-cache.LastFailScan <= 5 then

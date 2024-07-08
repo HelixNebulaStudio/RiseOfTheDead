@@ -14,7 +14,7 @@ return function(npc, spawnPoint)
 		Properties = {
 			BasicEnemy=true;
 			AttackSpeed=1;
-			AttackRange=8;
+			AttackRange=8; 
 			TargetableDistance=70;
 
 			AttackDamage=nil;
@@ -54,7 +54,7 @@ return function(npc, spawnPoint)
 	self:AddComponent(ZombieModule.OnHealthChanged);
 	self:AddComponent(ZombieModule.OnDamaged);
 	self:AddComponent(ZombieModule.OnTarget);
-	self:AddComponent(ZombieModule.BasicAttack1);
+	self:AddComponent(ZombieModule.BasicAttack2);
 	
 	
 	--== Signals;
