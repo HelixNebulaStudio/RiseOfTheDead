@@ -418,6 +418,7 @@ GameModeLibrary.GameModes={
 				TitleImage="http://www.roblox.com/asset/?id=4664135775";
 				RewardsId="factorycrate";
 				Soundtrack="Soundtrack:Falster Trap";
+				EnableStopwatch=true;
 			};
 			
 			["Office"]={

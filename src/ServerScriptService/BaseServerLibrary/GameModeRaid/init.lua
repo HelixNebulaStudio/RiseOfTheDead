@@ -73,6 +73,8 @@ function Raid.new()
 		
 		StopwatchTick = nil;
 		Path = PathfindingService:CreatePath();
+
+		ObjectiveStatusText = "";
 	};
 
 	if Raid.Active == nil then
@@ -568,8 +570,10 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 					
 					if self.Objective.Id == "Eliminate" then
 						local remining = math.max(0, self.EliminateGoal - self.EliminateCount);
+
+						self.ObjectiveStatusText = "Eliminate "..remining.." enemies.";
 						self:Hud({
-							Status="Eliminate "..remining.." enemies.";
+							Status=self.ObjectiveStatusText;
 						});
 						
 						if self.EliminateCount >= self.EliminateGoal then
@@ -586,7 +590,6 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 	local npcPrefab = modNpc.Spawn(npcName, spawnCf, function(npcPrefab, npcModule)
 		self.EnemiesSpawned = self.EnemiesSpawned + 1;
 		
-		Debugger:Warn("self.EnemyModules", #self.EnemyModules, "self.EnemiesSpawned", self.EnemiesSpawned);
 		newNpcModule = npcModule;
 
 		npcModule.Configuration.Level = math.max(npcModule.Configuration.Level + (self.Difficulty + (self.Wave-1)) + math.random(-2, 0), 1);
@@ -626,6 +629,7 @@ function Raid:BeginCount()
 	end
 
 	self:Hud({
+		Status=self.ObjectiveStatusText;
 		PlayMusic=true;
 	});
 end
@@ -805,8 +809,9 @@ function Raid:Start()
 
 	self.Status = EnumStatus.InProgress;
 
+	self.ObjectiveStatusText = "Eliminate "..self.EliminateGoal.." enemies.";
 	self:Hud({
-		Status="Eliminate "..self.EliminateGoal.." enemies.";
+		Status=self.ObjectiveStatusText;
 	})
 end
 
