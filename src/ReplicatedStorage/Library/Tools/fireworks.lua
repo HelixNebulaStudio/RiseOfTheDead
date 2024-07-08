@@ -13,6 +13,8 @@ return function()
 		ProjectileLifeTime = 10;
 		ProjectileAcceleration = Vector3.new(0, 296.2, 0);
 		ProjectileKeepAcceleration = true;
+
+		ThrowingMode="Directional";
 		
 		--ShowFocusTraj=false;
 		ConsumeOnThrow=true;

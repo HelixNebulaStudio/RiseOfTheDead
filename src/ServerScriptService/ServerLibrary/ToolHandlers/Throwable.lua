@@ -49,11 +49,21 @@ function ToolHandler:OnPrimaryFire(...)
 
 		throwCharge = math.clamp(throwCharge, 0, 1);
 
-		local velocityScalar = (configurations.Velocity + configurations.VelocityBonus * throwCharge);
-		local travelTime = (targetPoint-origin).Magnitude/velocityScalar;
-		Debugger:StudioWarn("travelTime",travelTime, "velocityScalar", velocityScalar);
-		local velocity = projectileObject.ArcTracer:GetVelocityByTime(origin, targetPoint, travelTime);
-		
+		local velocity;
+
+		if configurations.ThrowingMode == "Directional" then
+			local dir = (targetPoint-origin).Unit;
+
+			velocity = dir * configurations.Velocity;
+
+		else
+			local velocityScalar = (configurations.Velocity + configurations.VelocityBonus * throwCharge);
+			local travelTime = (targetPoint-origin).Magnitude/velocityScalar;
+			Debugger:StudioWarn("travelTime",travelTime, "velocityScalar", velocityScalar);
+			velocity = projectileObject.ArcTracer:GetVelocityByTime(origin, targetPoint, travelTime);
+			
+		end
+
 
 		modProjectile.ServerSimulate(projectileObject, origin, velocity);
 		
