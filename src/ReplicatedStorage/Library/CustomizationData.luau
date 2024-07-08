@@ -119,6 +119,8 @@ function CustomizationData.LoadCustomization(packet)
     local skinId = packet.SkinId;
     local toolModels = packet.ToolModels;
 
+    if serializedCustomization == nil then return end;
+
     local customPlansCache = packet.CustomPlansCache or {};
     local partDataList = packet.PartDataList or {};
     ---

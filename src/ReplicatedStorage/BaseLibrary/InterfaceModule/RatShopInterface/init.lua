@@ -5,6 +5,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local Interface = {};
 
 local RunService = game:GetService("RunService");
+local UserInputService = game:GetService("UserInputService");
 
 local localplayer = game.Players.LocalPlayer;
 local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
@@ -276,6 +277,8 @@ function Interface.init(modInterface)
 					priceLabel.Text = product.Currency == "Money" and "$"..modFormatNumber.Beautify(product.Price)
 						or modFormatNumber.Beautify(product.Price).." "..product.Currency;
 
+
+					-- MARK: BuyItem
 					local purchaseDebounce = false;
 					local function purchaseClicked()
 						if purchaseDebounce then return end;
@@ -283,33 +286,53 @@ function Interface.init(modInterface)
 
 						Interface:PromptDialogBox({
 							Title=`Purchase: {itemLib.Name}`;
-							Desc=`Are you sure you want to purchase <b>{itemLib.Name}</b> for <b>{priceLabel.Text}</b>?`;
+							Desc=`Are you sure you want to purchase <b>{itemLib.Name}</b> for <b>{priceLabel.Text}</b>?\n\n<font size="8">(Right click to enable multi purchase.)</font>`;
 							Icon=itemLib.Icon;
 							Buttons={
 								{
 									Text="Purchase";
 									Style="Confirm";
 									OnPrimaryClick=function(promptDialogFrame, textButton)
+										local buyMulti = textButton:GetAttribute("SkipClose");
+
 										promptDialogFrame.statusLabel.Text = "Purchasing item...";
 				
 										local serverReply = remoteShopService:InvokeServer("buyitem", Interface.Object, info.Id);
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
 											promptDialogFrame.statusLabel.Text = "Purchased!";
-											wait(0.5);
+
+											wait(buyMulti and 0.2 or 0.5);
 										else
 											warn("Purchase Item>> Error Code:"..serverReply);
-											promptDialogFrame.statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply));
+											promptDialogFrame.statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply)):gsub("$Currency", product.Currency);
 											wait(1);
 										end
+	
+										if buyMulti == true then
+											return true;
+										end;
 
 										Interface.Update();
+										return;
+									end;
+									OnSecondaryClick=function(promptDialogFrame, textButton)
+										if textButton:GetAttribute("SkipClose") then
+											textButton:SetAttribute("SkipClose", nil);
+											textButton.Text = "Purchase";
+
+										else
+											textButton:SetAttribute("SkipClose", true);
+											textButton.Text = "Purchase Multiple";
+
+										end
+										return true;
 									end;
 								};
 								{
 									Text="Cancel";
 									Style="Cancel";
 								};
-							}
+							};
 						});
 
 						purchaseDebounce = false;

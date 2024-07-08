@@ -690,9 +690,13 @@ function Interface:PromptDialogBox(params)
 	local optionButtons = params.Buttons or {};
 
 	for a=1, #optionButtons do
-		local newButton = templatePromptButton:Clone();
 		local optionButtonInfo = optionButtons[a];
 
+		if optionButtonInfo.Check and (not optionButtonInfo.Check()) then
+			continue;
+		end
+		
+		local newButton = templatePromptButton:Clone();
 		newButton.Text = optionButtonInfo.Text or "Button"..a;
 
 		local onClick1 = optionButtonInfo.OnPrimaryClick;
@@ -722,10 +726,16 @@ function Interface:PromptDialogBox(params)
 			buttonsFrame.Visible = false;
 			statusLabel.Visible = true;
 
+			local skipClose = false;
 			if onClick1 then
-				onClick1(promptDialogFrame, newButton);
+				skipClose = onClick1(promptDialogFrame, newButton);
 			end
 
+			if optionButtonInfo.SkipClosePrompt or skipClose == true then 
+				buttonsFrame.Visible = true;
+				statusLabel.Visible = false;
+				return;
+			end;
 			closePromptDialogBox();
 		end)
 
@@ -740,10 +750,16 @@ function Interface:PromptDialogBox(params)
 			buttonsFrame.Visible = false;
 			statusLabel.Visible = true;
 			
+			local skipClose = false;
 			if onClick2 then
-				onClick2();
+				skipClose = onClick2(promptDialogFrame, newButton);
 			end
 
+			if optionButtonInfo.SkipClosePrompt or skipClose == true then 
+				buttonsFrame.Visible = true;
+				statusLabel.Visible = false;
+				return;
+			end;
 			closePromptDialogBox();
 		end
 		newButton.MouseButton2Click:Connect(onSecondaryClick);
