@@ -86,7 +86,7 @@ function Interface.init(modInterface)
 	end
 
 	local function onItemSelect(interface, slot)
-		if Interface.SelectedSlot == nil or Interface.SelectedSlot.ID ~= (slot and slot.ID or 0) then
+		if slot and slot.Button and (Interface.SelectedSlot == nil or Interface.SelectedSlot.ID ~= (slot and slot.ID or 0)) then
 			clearSlotHighlight(slot);
 			Interface.SelectedSlot = slot;
 			Interface:PlayButtonClick();
@@ -281,39 +281,36 @@ function Interface.init(modInterface)
 						if purchaseDebounce then return end;
 						purchaseDebounce = true;
 
-						local promptWindow = Interface:PromptQuestion("Purchase ".. itemLib.Name,
-							("Are you sure you want to purchase $ItemName for $Cost?")
-							:gsub("$ItemName", itemLib.Name):gsub("$Cost", priceLabel.Text), 
-							"Purchase", "Cancel", itemLib.Icon);
-						local YesClickedSignal, NoClickedSignal;
+						Interface:PromptDialogBox({
+							Title=`Purchase: {itemLib.Name}`;
+							Desc=`Are you sure you want to purchase <b>{itemLib.Name}</b> for <b>{priceLabel.Text}</b>?`;
+							Icon=itemLib.Icon;
+							Buttons={
+								{
+									Text="Purchase";
+									Style="Confirm";
+									OnPrimaryClick=function(promptDialogFrame, textButton)
+										promptDialogFrame.statusLabel.Text = "Purchasing item...";
+				
+										local serverReply = remoteShopService:InvokeServer("buyitem", Interface.Object, info.Id);
+										if serverReply == modShopLibrary.PurchaseReplies.Success then
+											promptDialogFrame.statusLabel.Text = "Purchased!";
+											wait(0.5);
+										else
+											warn("Purchase Item>> Error Code:"..serverReply);
+											promptDialogFrame.statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply));
+											wait(1);
+										end
 
-						YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-							Interface:PlayButtonClick();
-
-							promptWindow.Frame.Yes.buttonText.Text = "Purchasing";
-
-							local serverReply = remoteShopService:InvokeServer("buyitem", Interface.Object, info.Id);
-							if serverReply == modShopLibrary.PurchaseReplies.Success then
-								promptWindow.Frame.Yes.buttonText.Text = "Purchased!";
-								wait(0.5);
-								Interface:OpenWindow("RatShopWindow");
-							else
-								warn("Sell Item>> Error Code:"..serverReply);
-								promptWindow.Frame.Yes.buttonText.Text = (modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply));
-							end
-
-							promptWindow:Close();
-							Interface:OpenWindow("RatShopWindow");
-							YesClickedSignal:Disconnect();
-							NoClickedSignal:Disconnect();
-						end);
-						NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-							Interface:PlayButtonClick();
-							promptWindow:Close();
-							Interface:OpenWindow("RatShopWindow");
-							YesClickedSignal:Disconnect();
-							NoClickedSignal:Disconnect();
-						end);
+										Interface.Update();
+									end;
+								};
+								{
+									Text="Cancel";
+									Style="Cancel";
+								};
+							}
+						});
 
 						purchaseDebounce = false;
 					end
@@ -409,9 +406,13 @@ function Interface.init(modInterface)
 		if Interface.SelectedSlot then
 			Interface.ClearPage();
 
-			local selectedSlot = Interface.SelectedSlot;
 			local storageItemID = Interface.SelectedSlot.ID;
 			local selectedItem = modData.GetItemById(storageItemID);
+			if selectedItem == nil then
+				Interface.SelectedSlot = nil;
+				Interface.LoadPage("Money");
+				return;
+			end
 
 			local itemLib = modItemsLibrary:Find(selectedItem.ItemId);
 			local weaponInfo = modData:GetItemClass(storageItemID);
@@ -525,7 +526,6 @@ function Interface.init(modInterface)
 				or bpLib and (bpLib.SellPrice or (bpLib.Tier and modShopLibrary.SellPrice["Tier"..bpLib.Tier])) or nil;
 
 			if itemLib and price then
-				local shopPartObj = Interface.Object;
 				Interface.NewListing(function(newListing)
 					local infoBox = newListing:WaitForChild("infoFrame");
 					local descFrame = infoBox:WaitForChild("descFrame");
@@ -542,54 +542,50 @@ function Interface.init(modInterface)
 					descLabel.Text = "Sell "..itemLib.Name.." for "..priceTag;
 					titleLabel.Text = "Sell";
 					priceLabel.Text = priceTag;
-					iconLabel.Image = "rbxassetid://3598790816";
+					iconLabel.Image = itemLib.Icon or "";
 
 					local sellItemDebounce = false;
 					newListing.MouseButton1Click:Connect(function()
 						if sellItemDebounce then return end;
 						sellItemDebounce = true;
 
-						local promptWindow = Interface:PromptQuestion("Sell: ".. itemLib.Name,
-							("Are you sure you want to sell $ItemName for $$Cost?")
-							:gsub("$ItemName", itemLib.Name):gsub("$Cost", price), 
-							"Sell", "Cancel", "rbxassetid://3598790816");
-						local YesClickedSignal, NoClickedSignal;
+						Interface:PromptDialogBox({
+							Title=`Sell: {itemLib.Name}`;
+							Desc=`Are you sure you want to sell <b>{itemLib.Name}</b> for <b>${price}</b>?`;
+							Icon=itemLib.Icon;
+							Buttons={
+								{
+									Text="Sell";
+									Style="Confirm";
+									OnPrimaryClick=function(promptDialogFrame, textButton)
+										promptDialogFrame.statusLabel.Text = "Selling item...";
+				
+										if selectedItem.Fav then
+											promptDialogFrame.statusLabel.Text  = "Can't sell favourited item.";
+											sellItemDebounce = false;
+											return;
+										end;
 
-						YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-							Interface:PlayButtonClick();
+										
+										local serverReply = remoteShopService:InvokeServer("sellitem", Interface.Object, storageItemID);
+										if serverReply == modShopLibrary.PurchaseReplies.Success then
+											promptDialogFrame.statusLabel.Text = "Sold!";
+											wait(0.5);
+										else
+											warn("Sell Item>> Error Code:"..tostring(serverReply));
+											promptDialogFrame.statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply)):gsub("$Currency", "Money");
+											wait(1);
+										end
 
-							promptWindow.Frame.Yes.buttonText.Text = "Selling item..";
-							if selectedItem.Fav then
-								promptWindow.Frame.Yes.buttonText.Text = "Can't sell favorited.";
-								sellItemDebounce = false;
-								Interface:OpenWindow("RatShopWindow");
-								return
-							end;
-
-							local serverReply = remoteShopService:InvokeServer("sellitem", Interface.Object, storageItemID);
-							if serverReply == modShopLibrary.PurchaseReplies.Success then
-								promptWindow.Frame.Yes.buttonText.Text = "Sold!";
-								wait(0.5);
-								Interface:OpenWindow("RatShopWindow");
-							else
-								warn("Sell Item>> Error Code:"..tostring(serverReply));
-								promptWindow.Frame.Yes.buttonText.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply)):gsub("$Currency", "Money");
-							end
-
-							promptWindow:Close();
-							Interface.Object = shopPartObj;
-							Interface:OpenWindow("RatShopWindow", activeShopType, selectedSlot);
-
-							YesClickedSignal:Disconnect();
-							NoClickedSignal:Disconnect();
-						end);
-						NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-							Interface:PlayButtonClick();
-							promptWindow:Close();
-							Interface:OpenWindow("RatShopWindow");
-							YesClickedSignal:Disconnect();
-							NoClickedSignal:Disconnect();
-						end);
+										Interface.Update();
+									end;
+								};
+								{
+									Text="Cancel";
+									Style="Cancel";
+								};
+							}
+						});
 
 						sellItemDebounce = false;
 					end)
@@ -615,58 +611,51 @@ function Interface.init(modInterface)
 						descLabel.Text = "Sell all "..itemLib.Name.." for "..priceTag;
 						titleLabel.Text = "Sell All";
 						priceLabel.Text = priceTag;
-						iconLabel.Image = "rbxassetid://3598790816";
+						iconLabel.Image = itemLib.Icon or "";
 
 						local sellItemDebounce = false;
 						newListing.MouseButton1Click:Connect(function()
 							if sellItemDebounce then return end;
 							sellItemDebounce = true;
 
-							local promptWindow = Interface:PromptQuestion("Sell All: ".. itemLib.Name,
-								("Are you sure you want to sell $Amt $ItemName for $$Cost?")
-								:gsub("$Amt", selectedItem.Quantity):gsub("$ItemName", itemLib.Name):gsub("$Cost", allPrice), 
-								"Sell All", "Cancel", "rbxassetid://3598790816");
-							local YesClickedSignal, NoClickedSignal;
-
-							YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-								Interface:PlayButtonClick();
-
-								promptWindow.Frame.Yes.buttonText.Text = "Selling item..";
-								if selectedItem.Fav then
-									promptWindow.Frame.Yes.buttonText.Text = "Can't sell favorited.";
-									sellItemDebounce = false;
-									Interface:OpenWindow("RatShopWindow");
-									return
-								end;
-
-								local serverReply = remoteShopService:InvokeServer("sellitem", Interface.Object, storageItemID, selectedItem.Quantity);
-								if serverReply == modShopLibrary.PurchaseReplies.Success then
-									promptWindow.Frame.Yes.buttonText.Text = "Sold!";
-									wait(0.5);
-									Interface:OpenWindow("RatShopWindow");
-								else
-									if serverReply then
-										warn("Sell Item>> Error Code:"..serverReply);
-										promptWindow.Frame.Yes.buttonText.Text = (modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply)):gsub("$Currency", "Money");
-
-									else
-										promptWindow.Frame.Yes.buttonText.Text = "Unknown error";
-									end
-									
-								end
-
-								promptWindow:Close();
-								Interface:OpenWindow("RatShopWindow");
-								YesClickedSignal:Disconnect();
-								NoClickedSignal:Disconnect();
-							end);
-							NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-								Interface:PlayButtonClick();
-								promptWindow:Close();
-								Interface:OpenWindow("RatShopWindow");
-								YesClickedSignal:Disconnect();
-								NoClickedSignal:Disconnect();
-							end);
+							local allQuantity = selectedItem.Quantity;
+							Interface:PromptDialogBox({
+								Title=`Sell All: {itemLib.Name}`;
+								Desc=`Are you sure you want to sell <b>{allQuantity}</b> <b>{itemLib.Name}</b> for <b>${price}</b>?`;
+								Icon=itemLib.Icon;
+								Buttons={
+									{
+										Text="Sell";
+										Style="Confirm";
+										OnPrimaryClick=function(promptDialogFrame, textButton)
+											promptDialogFrame.statusLabel.Text = "Selling item...";
+					
+											if selectedItem.Fav then
+												promptDialogFrame.statusLabel.Text  = "Can't sell favourited item.";
+												sellItemDebounce = false;
+												return;
+											end;
+	
+											
+											local serverReply = remoteShopService:InvokeServer("sellitem", Interface.Object, storageItemID, allQuantity);
+											if serverReply == modShopLibrary.PurchaseReplies.Success then
+												promptDialogFrame.statusLabel.Text = `Sold all <b>{allQuantity}</b> {itemLib.Name}!`;
+												wait(1);
+											else
+												warn("Sell Item>> Error Code:"..tostring(serverReply));
+												promptDialogFrame.statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply)):gsub("$Currency", "Money");
+												wait(1);
+											end
+	
+											Interface.Update();
+										end;
+									};
+									{
+										Text="Cancel";
+										Style="Cancel";
+									};
+								}
+							});
 
 							sellItemDebounce = false;
 						end)
@@ -705,44 +694,45 @@ function Interface.init(modInterface)
 						if exchangeItemDebounce then return end;
 						exchangeItemDebounce = true;
 
-						local promptWindow = Interface:PromptQuestion(`Exchange <b>{itemLib.Name}</b>`,
-							`Are you sure you want to exchange 1 <b>{itemLib.Name}</b> for <b>{tokenReward}</b> token.`, 
-							"Exchange", "Cancel", battlepassLib.Icon);
-						local YesClickedSignal, NoClickedSignal;
+						Interface:PromptDialogBox({
+							Title=`Exchange: {itemLib.Name}`;
+							Desc=`Are you sure you want to exchange <b>1 {itemLib.Name}</b> for <b>{tokenReward}</b> token.`;
+							Icon=itemLib.Icon;
+							Buttons={
+								{
+									Text="Exchange";
+									Style="Confirm";
+									OnPrimaryClick=function(promptDialogFrame, textButton)
+										promptDialogFrame.statusLabel.Text = "Exchanging item..";
 
-						YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-							Interface:PlayButtonClick();
+										if selectedItem.Fav then
+											promptDialogFrame.statusLabel.Text = "Can't exchange favorited items.";
+											exchangeItemDebounce = false;
+											
+											return;
+										end;
 
-							promptWindow.Frame.Yes.buttonText.Text = "Exchanging item..";
-							if selectedItem.Fav then
-								promptWindow.Frame.Yes.buttonText.Text = "Can't exchange favorited.";
-								exchangeItemDebounce = false;
-								Interface:OpenWindow("RatShopWindow");
-								return
-							end;
+										local serverReply = remoteShopService:InvokeServer("exchangefortoken", Interface.Object, storageItemID);
+										if serverReply == modShopLibrary.PurchaseReplies.Success then
+											promptDialogFrame.statusLabel.Text = "Exchanged!";
+											wait(0.5);
+											
+										else
+											warn("Exchange Item>> Error Code:"..tostring(serverReply));
+											promptDialogFrame.statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply));
+											task.wait(1);
 
-							local serverReply = remoteShopService:InvokeServer("exchangefortoken", Interface.Object, storageItemID);
-							if serverReply == modShopLibrary.PurchaseReplies.Success then
-								promptWindow.Frame.Yes.buttonText.Text = "Exchanged!";
-								wait(0.5);
-								Interface:OpenWindow("RatShopWindow");
-							else
-								warn("Exchange Item>> Error Code:"..tostring(serverReply));
-								promptWindow.Frame.Yes.buttonText.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply));
-							end
+										end
 
-							promptWindow:Close();
-							Interface:OpenWindow("RatShopWindow");
-							YesClickedSignal:Disconnect();
-							NoClickedSignal:Disconnect();
-						end);
-						NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-							Interface:PlayButtonClick();
-							promptWindow:Close();
-							Interface:OpenWindow("RatShopWindow");
-							YesClickedSignal:Disconnect();
-							NoClickedSignal:Disconnect();
-						end);
+										Interface.Update();
+									end;
+								};
+								{
+									Text="Cancel";
+									Style="Cancel";
+								};
+							}
+						});
 
 						exchangeItemDebounce = false;
 					end)
@@ -773,45 +763,47 @@ function Interface.init(modInterface)
 							if exchangeItemDebounce then return end;
 							exchangeItemDebounce = true;
 	
-							local promptWindow = Interface:PromptQuestion(`Exchange <b>{itemLib.Name}</b>`,
-								`Are you sure you want to exchange {selectedItem.Quantity} <b>{itemLib.Name}</b> for <b>{tokenReward}</b> token.`, 
-								"Exchange", "Cancel", battlepassLib.Icon);
-							local YesClickedSignal, NoClickedSignal;
+							local exchangeQuantity = selectedItem.Quantity;
+							Interface:PromptDialogBox({
+								Title=`Exchange All: {itemLib.Name}`;
+								Desc=`Are you sure you want to exchange <b>{exchangeQuantity} {itemLib.Name}</b> for <b>{tokenReward}</b> tokens.`;
+								Icon=itemLib.Icon;
+								Buttons={
+									{
+										Text="Exchange All";
+										Style="Confirm";
+										OnPrimaryClick=function(promptDialogFrame, textButton)
+											promptDialogFrame.statusLabel.Text = "Exchanging item..";
 	
-							YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-								Interface:PlayButtonClick();
+											if selectedItem.Fav then
+												promptDialogFrame.statusLabel.Text = "Can't exchange favorited items.";
+												exchangeItemDebounce = false;
+												
+												return;
+											end;
 	
-								promptWindow.Frame.Yes.buttonText.Text = "Exchanging items..";
-								if selectedItem.Fav then
-									promptWindow.Frame.Yes.buttonText.Text = "Can't exchange favorited.";
-									exchangeItemDebounce = false;
-									Interface:OpenWindow("RatShopWindow");
-									return
-								end;
+											local serverReply = remoteShopService:InvokeServer("exchangefortoken", Interface.Object, storageItemID, exchangeQuantity);
+											if serverReply == modShopLibrary.PurchaseReplies.Success then
+												promptDialogFrame.statusLabel.Text = `Exchanged <b>{exchangeQuantity} {itemLib.Name}</b> for <b>{tokenReward}</b> tokens!`;
+												wait(1);
+												
+											else
+												warn("Exchange Item>> Error Code:"..tostring(serverReply));
+												promptDialogFrame.statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply));
+												task.wait(1);
 	
-								local serverReply = remoteShopService:InvokeServer("exchangefortoken", Interface.Object, storageItemID, selectedItem.Quantity);
-								if serverReply == modShopLibrary.PurchaseReplies.Success then
-									promptWindow.Frame.Yes.buttonText.Text = "Exchanged!";
-									wait(0.5);
-									Interface:OpenWindow("RatShopWindow");
-								else
-									warn("Exchange Item>> Error Code:"..tostring(serverReply));
-									promptWindow.Frame.Yes.buttonText.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply));
-								end
+											end
 	
-								promptWindow:Close();
-								Interface:OpenWindow("RatShopWindow");
-								YesClickedSignal:Disconnect();
-								NoClickedSignal:Disconnect();
-							end);
-							NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-								Interface:PlayButtonClick();
-								promptWindow:Close();
-								Interface:OpenWindow("RatShopWindow");
-								YesClickedSignal:Disconnect();
-								NoClickedSignal:Disconnect();
-							end);
-	
+											Interface.Update();
+										end;
+									};
+									{
+										Text="Cancel";
+										Style="Cancel";
+									};
+								}
+							});
+							
 							exchangeItemDebounce = false;
 						end)
 					end)
