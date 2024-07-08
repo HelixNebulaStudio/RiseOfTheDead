@@ -700,14 +700,19 @@ function Interface:PromptDialogBox(params)
 
 		if optionButtonInfo.Style then
 			if optionButtonInfo.Style == "Confirm" then
-				optionButtonInfo.BackgroundColor3 = Color3.fromRGB(54, 107, 51);
+				newButton.BackgroundColor3 = Color3.fromRGB(54, 107, 51);
 			elseif optionButtonInfo.Style == "Cancel" then
-				optionButtonInfo.BackgroundColor3 = Color3.fromRGB(102, 38, 38);
+				newButton.BackgroundColor3 = Color3.fromRGB(102, 38, 38);
 			end
 		end
 
+		local debouceTick = tick();
 		newButton.MouseButton1Click:Connect(function()
 			if not promptDialogActive then return end;
+
+			if tick()-debouceTick <= 0.2 then return end;
+			debouceTick = tick();
+
 			Interface:PlayButtonClick();
 			
 			buttonsFrame.Visible = false;
@@ -722,6 +727,10 @@ function Interface:PromptDialogBox(params)
 
 		local function onSecondaryClick()
 			if not promptDialogActive then return end;
+			
+			if tick()-debouceTick <= 0.2 then return end;
+			debouceTick = tick();
+
 			Interface:PlayButtonClick();
 
 			buttonsFrame.Visible = false;

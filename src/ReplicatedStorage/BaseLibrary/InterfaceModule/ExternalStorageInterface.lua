@@ -195,9 +195,6 @@ function Interface.init(modInterface)
 								Text="Purchase";
 								Style="Confirm";
 								OnPrimaryClick=function(promptDialogFrame, textButton)
-									if tick()-addSlotDebounce <= 0.2 then return end;
-									addSlotDebounce = tick();
-
 									promptDialogFrame.statusLabel.Text = "Purchasing...";
 									local r = remoteUpgradeStorage:InvokeServer(storage.Id);
 									if type(r) == "table" and r.Id then
