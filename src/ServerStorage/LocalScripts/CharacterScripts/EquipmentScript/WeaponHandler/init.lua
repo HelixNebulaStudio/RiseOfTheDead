@@ -733,62 +733,6 @@ function WeaponHandler:Equip(library, weaponId)
 			reloadLabel.Visible = false;
 		end
 		
-		local projArcShow = false;
-		if configurations.AdsTrajectory and projArcShow then -- perma disabled;
-			if characterProperties.IsFocused then
-
-				local rayWhitelist = CollectionService:GetTagged("TargetableEntities") or {};
-				table.insert(rayWhitelist, workspace.Environment);
-				table.insert(rayWhitelist, workspace.Characters);
-				table.insert(rayWhitelist, workspace.Terrain);
-				projRaycast.FilterDescendantsInstances = rayWhitelist;
-				
-				local origin = mouseProperties.Focus.p;
-				local raycastResult = workspace:Raycast(origin, mouseProperties.Direction*configurations.BulletRange, projRaycast);
-				local rayEndPoint = raycastResult and raycastResult.Position or (origin + mouseProperties.Direction*configurations.BulletRange);
-				local dist = (origin-rayEndPoint).Magnitude;
-				
-				local bulletOrigin = bulletOrigin.WorldPosition;
-				
-				local velocity = arcTracer:GetVelocityByTime(bulletOrigin, rayEndPoint, dist/ arcTracerConfig.Velocity);
-				local arcPoints = arcTracer:GeneratePath(bulletOrigin, velocity);
-				--bulletOrigin.WorldPosition; mouseProperties.Direction * configurations.ProjectileVelocity;
-				
-				if #arcList ~= #arcPoints then
-					while #arcList <= #arcPoints do
-						local arcPart = arcPartTemplate:Clone();
-						CollectionService:AddTag(arcPart, "AdsTrajectory");
-						table.insert(arcList, arcPart);
-					end
-					while #arcList > #arcPoints do
-						local arcPart = table.remove(arcList, #arcList);
-						arcPart:Destroy();
-					end
-				end
-				
-				for a=1, #arcList do
-					local arcPart = arcList[a];
-					local arcPoint = arcPoints[a];
-					
-					local _order = math.clamp(1 - (a/#arcList * 0.7), 0.5, 1);
-					arcPart.Parent = workspace.CurrentCamera;
-					arcPart.Size = Vector3.new(0.05, 0.05, arcPoint.Displacement);
-					arcPart.Transparency = 0;
-					arcPart.CFrame = CFrame.new(arcPoint.Origin, arcPoint.Point) * CFrame.new(0, 0, -arcPoint.Displacement/2);
-					
-					if a == #arcList and arcPoint.Normal and arcDisk then
-						arcDisk.Parent = workspace.CurrentCamera;
-						arcDisk.CFrame = CFrame.new(arcPoint.Point, arcPoint.Point + arcPoint.Normal) * CFrame.Angles(math.pi/2, 0, 0);
-					end
-				end
-			else
-				arcDisk = nil;
-				for _, obj in pairs(CollectionService:GetTagged("AdsTrajectory")) do
-					obj:Destroy();
-				end
-				table.clear(arcList);
-			end
-		end
 		
 		if rootPart:GetAttribute("WaistRotation") then
 			characterProperties.Joints.WaistY = math.rad(tonumber(rootPart:GetAttribute("WaistRotation")) or 0);
@@ -797,8 +741,7 @@ function WeaponHandler:Equip(library, weaponId)
 			characterProperties.Joints.WaistY = configurations.WaistRotation;
 		end
 		
-		
-		modFlashlight:Update(camera.CFrame);
+		modFlashlight:Update(bulletOrigin.WorldCFrame * CFrame.new(0, 0.5, 0));
 	end
 	
 	local function playWeaponSound(id, looped)
