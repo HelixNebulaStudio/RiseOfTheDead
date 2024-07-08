@@ -33,6 +33,9 @@ function ColorPicker:SetUnlocked(hexList)
 			local newLocked = lockedTemplate:Clone();
 			newLocked.ImageColor3 = ColorPicker.GetBackColor(imgLabel.ImageColor3);
 			newLocked.Parent = imgLabel;
+
+		elseif hexList[hexId] and imgLabel:FindFirstChild("LockedTemplate") then
+			game.Debris:AddItem(imgLabel.LockedTemplate, 0);
 		end
 		
 	end

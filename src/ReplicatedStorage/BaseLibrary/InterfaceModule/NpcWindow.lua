@@ -434,11 +434,8 @@ function Interface.init(modInterface)
 					if type == "ColorPicker" then
 						local colorPickerObj = Interface.ColorPicker;
 
-						local customColors = modData:GetFlag("CustomColors");
-						if customColors == nil then
-							customColors = modData:GetFlag("CustomColors", true);
-						end
-
+						local customColors = modData:GetFlag("CustomColors", true);
+						
 						local pickButton = new:WaitForChild("pickButton") :: TextButton;
 						pickButton.MouseButton1Click:Connect(function()
 							Interface:PlayButtonClick();
