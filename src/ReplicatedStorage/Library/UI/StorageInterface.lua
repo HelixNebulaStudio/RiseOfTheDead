@@ -195,11 +195,10 @@ function StorageInterface:GetEmptySlotData(bSelf)
 	if bSelf ~= nil and bSelf.Library.Stackable then
 		for a=self.StartIndex, self.EndIndex do
 			local aSelf = self.Slots[a].Table;
-			if aSelf ~= nil
-				and aSelf.Library and aSelf.Library.Stackable
-				and aSelf.Item.ItemId == bSelf.Item.ItemId
-				and (aSelf.Item.Quantity+bSelf.Item.Quantity) <= aSelf.Library.Stackable then
-				
+
+			local isStackable = aSelf ~= nil and modStorageItem.IsStackable(aSelf.Item, bSelf.Item) or false;
+			
+			if isStackable and (aSelf.Item.Quantity+bSelf.Item.Quantity) <= aSelf.Library.Stackable then
 				return self.Slots[a];
 			end
 		end
