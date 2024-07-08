@@ -69,29 +69,31 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		modifiedCustomPlans["[All]"]=customPlansCache["[All]"];
 
-		for a=1, #itemViewport.PartDataList do
-			local partData = itemViewport.PartDataList[a];
-
-			local groupCustomPlan = customPlansCache[partData.Group];
-			if groupCustomPlan and groupCustomPlan:IsEdited() then
-				modifiedCustomPlans[partData.Group] = groupCustomPlan;
-			end
-
-			local partCustomPlan = customPlansCache[partData.Key];
-			if partCustomPlan and partCustomPlan:IsEdited() then
-				modifiedCustomPlans[partData.Key] = partCustomPlan;
-			end
-
-			if partData.Group ~= partData.PredefinedGroup then
-				if partDataGroups[partData.Group] == nil then
-					partDataGroups[partData.Group] = {};
+		if itemViewport.PartDataList then
+			for a=1, #itemViewport.PartDataList do
+				local partData = itemViewport.PartDataList[a];
+	
+				local groupCustomPlan = customPlansCache[partData.Group];
+				if groupCustomPlan and groupCustomPlan:IsEdited() then
+					modifiedCustomPlans[partData.Group] = groupCustomPlan;
 				end
-				table.insert(partDataGroups[partData.Group], partData.Key);
+	
+				local partCustomPlan = customPlansCache[partData.Key];
+				if partCustomPlan and partCustomPlan:IsEdited() then
+					modifiedCustomPlans[partData.Key] = partCustomPlan;
+				end
+	
+				if partData.Group ~= partData.PredefinedGroup then
+					if partDataGroups[partData.Group] == nil then
+						partDataGroups[partData.Group] = {};
+					end
+					table.insert(partDataGroups[partData.Group], partData.Key);
+				end
 			end
-		end
-		for k, v in pairs(partDataGroups) do
-			if #v <= 0 then
-				partDataGroups[k] = nil;
+			for k, v in pairs(partDataGroups) do
+				if #v <= 0 then
+					partDataGroups[k] = nil;
+				end
 			end
 		end
 
@@ -293,7 +295,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			if not breakDownFrame.Visible then return end;
 			local serialized = generateSerialized();
 			serialText.Text = serialized;
-
 
 			task.spawn(function()
 				while breakDownFrame.Visible and self.Menu.Visible and localPlayer:IsAncestorOf(self.Menu) do
