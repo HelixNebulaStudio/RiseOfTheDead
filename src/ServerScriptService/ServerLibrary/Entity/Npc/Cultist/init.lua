@@ -84,13 +84,14 @@ return function(npc, spawnPoint)
 		
 		self.Wield.Targetable.Zombie = 1;
 
-		if self.HoodSpawn and tick()+55 > self.HoodSpawn then
+		if self.HoodSpawn == nil or tick()+55 > self.HoodSpawn then
 			self.Wield.Targetable.Humanoid = 1;
 		end
-
+		
 		if self.CutsceneMode then
 			wait(0.1);
 		else
+	
 			if self.Enemy and self.Enemy.Humanoid and self.Enemy.Humanoid.Health > 0 and self.Enemy.Humanoid.RootPart then
 				local enemyRootPart = self.Enemy.Humanoid.RootPart;
 				self.Logic:SetState("Aggro");
