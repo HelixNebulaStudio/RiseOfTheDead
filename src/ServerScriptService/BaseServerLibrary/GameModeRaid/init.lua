@@ -42,8 +42,9 @@ local remoteDoorInteraction = modRemotesManager:Get("DoorInteraction");
 
 local serverPrefabs = game.ServerStorage:WaitForChild("PrefabStorage"):WaitForChild("Objects");
 local extractInteractable = script:WaitForChild("ExtractInteractable");
+
+local isDevBranch = modBranchConfigs.CurrentBranch.Name == "Dev";
 --==
--- modEventSignal.new("OnWaveChanged");
 local platformParam = OverlapParams.new();
 platformParam.FilterType = Enum.RaycastFilterType.Include;
 
@@ -1059,14 +1060,13 @@ function Raid:Initialize(roomData)
 		self.DoorsOpened = self.DoorsOpened +1;
 		self:StartStopwatch();
 		
-		Debugger:Warn("#self.Doors Opened (".. self.DoorsOpened .."/".. #self.Doors ..")");
+		shared.Notify(game.Players:GetPlayers(), `{self.DoorsOpened}/{#self.Doors} Doors Opened!{self.DoorsOpened == 1 and "\nThe more doors open, the more frequent hordes occur." or ""}`, "Inform");
 		
-		shared.HordeTimer = shared.HordeTimer - math.random(20, 40);
+		shared.HordeTimer = shared.HordeTimer - math.random(10, 38);
 		if doorObject.TriggerHorde == true then
 			shared.HordeTimer = tick();
 		end
 
-		
 		local nearbyNpcModules = modNpc.EntityScan(doorObject.Prefab:GetPivot().Position, 64, 32);
 		for a=1, #nearbyNpcModules do
 			local npcModule = nearbyNpcModules[a];
@@ -1086,7 +1086,7 @@ function Raid:Initialize(roomData)
 			repeat
 				wait(1);
 
-				if Config.HordeWhenEnemiesDropsBelow and #self.EnemyModules <= Config.HordeWhenEnemiesDropsBelow then
+				if Config.HordeWhenEnemiesDropsBelow and #self.EnemyModules <= Config.HordeWhenEnemiesDropsBelow and self.DoorsOpened >= math.round(#self.Doors * 0.9) then
 					shared.HordeTimer = tick();
 				end
 				
