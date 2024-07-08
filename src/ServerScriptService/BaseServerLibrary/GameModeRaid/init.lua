@@ -1089,7 +1089,7 @@ function Raid:Initialize(roomData)
 			repeat
 				wait(1);
 
-				if Config.HordeWhenEnemiesDropsBelow and #self.EnemyModules <= Config.HordeWhenEnemiesDropsBelow and self.DoorsOpened >= math.round(#self.Doors * 0.9) then
+				if Config.HordeWhenEnemiesDropsBelow and #self.EnemyModules <= Config.HordeWhenEnemiesDropsBelow and self.DoorsOpened >= math.floor(#self.Doors * 0.88) then
 					shared.HordeTimer = tick();
 				end
 				
