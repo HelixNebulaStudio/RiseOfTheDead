@@ -109,9 +109,6 @@ WorkbenchLibrary.ItemUpgrades={
 			{Rarity=1; Stat="Inaccuracy"; Value={Min=15; Max=40;}; Negative=true;};
 			{Rarity=1/3; Stat="HeadshotMultiplier"; Value={Min=5; Max=30;}; Add=true;};
 		};
-		SkinWear={
-			Wear={Min=0.000001; Max=0.43;};
-		};
 	};
 	["dualp250"]={
 		Tier=2;
@@ -341,9 +338,6 @@ WorkbenchLibrary.ItemUpgrades={
 			{Rarity=1; Stat="FocusWalkSpeedReduction"; Value={Min=20; Max=50;};};
 			{Rarity=1/3; Stat="HeadshotMultiplier"; Value={Min=4; Max=10;}; Add=true; }; --Value={Min=15; Max=35;};
 		};
-		SkinWear={
-			Wear={Min=0.000001; Max=0.43;};
-		};
 	};
 	["desolatorheavy"]={
 		Tier=2;
@@ -404,9 +398,6 @@ WorkbenchLibrary.ItemUpgrades={
 			{Rarity=1/2; Stat="HeadshotMultiplier"; Value={Min=15; Max=45;}; Add=true; };
 			{Rarity=1/3; Stat="CritChance"; Value={Min=1; Max=5;}; Add=true;};
 		};
-		SkinWear={
-			Wear={Min=0.000001; Max=0.43;};
-		};
 	};
 	["rusty48"]={
 		Tier=4;
@@ -419,9 +410,6 @@ WorkbenchLibrary.ItemUpgrades={
 			{Rarity=1/2; Stat="HeadshotMultiplier"; Value={Min=25; Max=50;}; Add=true; };
 			{Rarity=1/3; Stat="CritChance"; Value={Min=1; Max=3;}; Add=true;};
 		};
-		SkinWear={
-			Wear={Min=0.32; Max=0.999999;};
-		};
 	};
 	["arelshiftcross"]={
 		Tier=4;
@@ -433,9 +421,6 @@ WorkbenchLibrary.ItemUpgrades={
 			GenericTraits.MaxAmmoLimit;
 			{Rarity=1; Stat="FocusWalkSpeedReduction"; Value={Min=20; Max=50;};};
 			{Rarity=1/3; Stat="HeadshotMultiplier"; Value={Min=10; Max=20;}; Add=true; };
-		};
-		SkinWear={
-			Wear={Min=0.000001; Max=0.59;};
 		};
 	};
 	
@@ -489,9 +474,6 @@ WorkbenchLibrary.ItemUpgrades={
 	["keytar"]={
 		Tier=2;
 		Type={"Edged Melee"; "Melee"};
-		SkinWear={
-			Wear={Min=0.000001; Max=0.4;};
-		};
 	};
 	["boomerang"]={
 		Type={"Pointed Melee"; "Melee"};
