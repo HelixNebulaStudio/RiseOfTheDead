@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Workbench = {};
-local Interface = {};
+local Interface = {} :: any;
 
 local player = game.Players.LocalPlayer;
 
@@ -46,14 +46,6 @@ function Workbench.new(itemId, library, storageItem)
 	local hourLabel = outcomeList:WaitForChild("Item3");
 
 	local playerStats = modData.GameSave and modData.GameSave.Stats;
-	
-	local polishCost = modWorkbenchLibrary.PolishCost;
-	if Interface.IsPremium then
-		polishCost = modWorkbenchLibrary.PolishPremiumCost;
-	end
-	
-	perksLabel.Text = `• {polishCost} Perks`;
-	perksLabel.TextColor3 = (playerStats.Perks or 0) >= polishCost and Color3.fromRGB(147, 255, 135) or Color3.fromRGB(255, 108, 103);
 	
 	local lmpCountOnChar = modData.CountItemIdFromCharacter("liquidmetalpolish");
 	local lmpCountAll = modData.CountItemIdFromStorages("liquidmetalpolish");

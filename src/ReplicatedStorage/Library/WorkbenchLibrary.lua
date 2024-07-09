@@ -5,10 +5,7 @@ local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 
 local WorkbenchLibrary = {}
 
-
-WorkbenchLibrary.PolishCost = 100;
-WorkbenchLibrary.PolishPremiumCost = 50;
-
+WorkbenchLibrary.PolishDuration = 3600;
 WorkbenchLibrary.PolishRangeBase = {Min=0.01; Max=0.2;};
 --==
 

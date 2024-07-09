@@ -8,6 +8,7 @@ AnalyticsServiceWrapper.Currency = {
     Money="Money";
     Perks="Perks";
     TweakPoints="TweakPoints";
+    Gold="Gold";
 }
 
 function AnalyticsServiceWrapper:Source(param)

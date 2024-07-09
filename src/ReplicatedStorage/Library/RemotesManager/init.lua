@@ -647,7 +647,7 @@ else
 	RemotesManager:NewFunctionRemote("CustomizationData", 0.1);
 	RemotesManager:NewFunctionRemote("DeconstructItem", 0.5);
 	RemotesManager:NewFunctionRemote("TweakItem", 0.5);
-	RemotesManager:NewFunctionRemote("PolishTool", 0.5);
+	RemotesManager:NewFunctionRemote("PolishTool", 0.5).Secure = true;
 	RemotesManager:NewFunctionRemote("BlueprintHandler", 0.1);
 	
 	--== Skill Tree;

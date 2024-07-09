@@ -24,19 +24,18 @@ local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modLimitedService = require(game.ServerScriptService.ServerLibrary.LimitedService);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local remoteShopService = modRemotesManager:Get("ShopService");
 local remoteGoldShopPurchase = modRemotesManager:Get("GoldShopPurchase");
 local remoteReloadWeapon = modRemotesManager:Get("ReloadWeapon");
 
 local Interactables = workspace:WaitForChild("Interactables");
-
-local isCommunityServer = game.ServerScriptService:FindFirstChild("CommunityService") ~= nil;
 --== Script;
 
 function IsInShopRange(player, storeObject)
 	if game.ReplicatedStorage.Library:FindFirstChild("CustomShopLibrary") then
-		modShopLibrary = require(game.ReplicatedStorage.Library.CustomShopLibrary);
+		modShopLibrary = require(game.ReplicatedStorage.Library.CustomShopLibrary) :: any;
 	end
 	if storeObject then
 		if storeObject:IsDescendantOf(workspace) and player:DistanceFromCharacter(storeObject.Position) <= 17 then
@@ -65,7 +64,7 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		local inRange = IsInShopRange(player, storeObject); if inRange ~= nil then return inRange end;
 
 		local profile = modProfile:Get(player);
-		local activeSave = profile:GetActiveSave();
+		local playerSave = profile:GetActiveSave();
 		local inventory = profile.ActiveInventory;
 
 		local storageItem = inventory ~= nil and inventory:Find(id) or nil;
@@ -82,20 +81,34 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 				inventory:Remove(id, sellAmt, function()
 					shared.Notify(player, ("Sold $Amt $Item for $$Price."):gsub("$Amt", sellAmt):gsub("$Item", itemLib.Name):gsub("$Price", sellPrice), "Reward");
 					Debugger:Log("Player (",player.Name,") sold a",itemLib.Name,"for $"..sellPrice);
-					activeSave:AddStat("Money", sellPrice);
+					playerSave:AddStat("Money", sellPrice);
 				end);
 				
 				local bonus = 0;
 				if modBranchConfigs.IsWorld("Safehome") then
 					bonus = math.ceil(sellPrice*0.15);
 					shared.Notify(player, ("You got $"..bonus.." bonus for selling in safehome.") , "Reward");
-					activeSave:AddStat("Money", bonus);
+					playerSave:AddStat("Money", bonus);
 					modAnalytics.RecordResource(player.UserId, bonus, "Source", "Money", "Sold", "SafehomeBonus");
+					
+					modAnalyticsService:Source{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Money;
+						Amount=bonus;
+						EndBalance=playerSave:GetStat("Money");
+						ItemSKU="SellItem:SafehomeBonus";
+					};
+
 				end
 
-				if not isCommunityServer then
-					modAnalytics.RecordResource(player.UserId, sellPrice, "Source", "Money", "Sold", storageItem.ItemId);
-				end
+				modAnalytics.RecordResource(player.UserId, sellPrice, "Source", "Money", "Sold", storageItem.ItemId);
+				modAnalyticsService:Source{
+					Player=player;
+					Currency=modAnalyticsService.Currency.Money;
+					Amount=sellPrice;
+					EndBalance=playerSave:GetStat("Money");
+					ItemSKU=`SellItem:{storageItem.ItemId}`;
+				};
 				
 				local finalPrice = sellPrice + bonus;
 				if finalPrice > 0 then
@@ -129,16 +142,16 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 
 		local profile = modProfile:Get(player);
 
-		local activeSave = profile:GetActiveSave();
+		local playerSave = profile:GetActiveSave();
 		local inventory = profile.ActiveInventory;
 
 		local currency = productInfo.Currency;
 		local price = productInfo.Price;
 
-		if inventory and activeSave.GetStat and activeSave:GetStat(currency) >= price then
+		if inventory and playerSave.GetStat and playerSave:GetStat(currency) >= price then
 			if inventory:SpaceCheck{{ItemId=itemLib.Id; Data={Quantity=(productInfo.Amount or 1)};}} then
 
-				activeSave:AddStat(currency, -price);
+				playerSave:AddStat(currency, -price);
 				inventory:Add(itemLib.Id, {Quantity=(productInfo.Amount or 1);}, function(queueEvent, storageItem)
 					shared.Notify(player, "You purchased ".. ((productInfo.Amount or 1) > 1 and productInfo.Amount or "a").." ".. itemLib.Name, "Reward");
 					Debugger:Log("Player (",player.Name,") purchased a",itemLib.Name);
@@ -156,9 +169,15 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 			else
 				return modShopLibrary.PurchaseReplies.InventoryFull;
 			end
-			if not isCommunityServer then
-				modAnalytics.RecordResource(player.UserId, price, "Sink", currency, "Purchase", itemLib.Id);
-			end
+			
+			modAnalytics.RecordResource(player.UserId, price, "Sink", currency, "Purchase", itemLib.Id);
+			modAnalyticsService:Sink{
+				Player=player;
+				Currency=modAnalyticsService.Currency[currency];
+				Amount=price;
+				EndBalance=playerSave:GetStat(currency);
+				ItemSKU=`BuyItem:{itemLib.Id}`;
+			};
 
 			profile:AddPlayPoints(price/1000, "Sink:Money");
 			return modShopLibrary.PurchaseReplies.Success;
@@ -176,11 +195,11 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		end;
 
 		local profile = modProfile:Get(player);
-		local activeSave = profile:GetActiveSave();
+		local playerSave = profile:GetActiveSave();
 		local storage;
 		
 		if storageId == "portableautoturret" then
-			storage = activeSave.Storages[storageId];
+			storage = playerSave.Storages[storageId];
 		else
 			storage = profile.ActiveInventory;
 		end
@@ -218,14 +237,13 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		
 		
 		local currency = modShopLibrary.AmmunitionCurrency or "Money";
-		local playerCurrency = activeSave and activeSave.GetStat and activeSave:GetStat(currency)
+		local playerCurrency = playerSave and playerSave.GetStat and playerSave:GetStat(currency)
 		local price, mags = modShopLibrary.CalculateAmmoPrice(storageItem.ItemId, storageItem.Values, weaponModule.Configurations, playerCurrency, profile.Punishment == modGlobalVars.Punishments.AmmoCostPenalty);
 		if playerCurrency < price then
 			return modShopLibrary.PurchaseReplies.InsufficientCurrency;
 		end
 		
-		
-		activeSave:AddStat(currency, -price);
+		playerSave:AddStat(currency, -price);
 		local totalMags = (weaponModule.Configurations.MaxAmmoLimit + weaponModule.Configurations.AmmoLimit)/weaponModule.Configurations.AmmoLimit;
 		if totalMags == mags then
 			storageItem:SetValues("A", weaponModule.Configurations.AmmoLimit);
@@ -252,6 +270,14 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 
 		if price > 0 then
 			modAnalytics.RecordResource(player.UserId, price, "Sink", currency, "Gameplay", "Ammo");
+			modAnalyticsService:Sink{
+				Player=player;
+				Currency=modAnalyticsService.Currency[currency];
+				Amount=price;
+				EndBalance=playerSave:GetStat(currency);
+				ItemSKU=`BuyAmmo:{storageItem.ItemId}`;
+			};
+			
 		end
 		if modMission:Progress(player, 2) then
 			modMission:Progress(player, 2, function(mission)
@@ -310,6 +336,13 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 
 		if repairPrice > 0 then
 			modAnalytics.RecordResource(player.UserId, repairPrice, "Sink", "Money", "Gameplay", "Repair");
+			modAnalyticsService:Sink{
+				Player=player;
+				Currency=modAnalyticsService.Currency.Money;
+				Amount=repairPrice;
+				EndBalance=playerSave:GetStat("Money");
+				ItemSKU=`Repair:{storageItem.ItemId}`;
+			};
 		end
 
 		local itemLib = modItemsLibrary:Find(storageItem.ItemId);
@@ -503,6 +536,20 @@ function remoteGoldShopPurchase.OnServerInvoke(player, key)
 					traderProfile:AddGold(-price);
 					profile:AddPlayPoints(price/100, "Sink:Gold");
 					modAnalytics.RecordResource(player.UserId, price, "Sink", "Gold", "Purchase", itemId);
+
+					modAnalyticsService:Sink{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Gold;
+						Amount=price;
+						EndBalance=traderProfile.Gold;
+						ItemSKU=`BuyItem:{itemId}`;
+					};
+
+					if profile.Purchases[itemId] == nil then
+						profile.Purchases[itemId] = 0;
+					end
+					profile.Purchases[itemId] = profile.Purchases[itemId] +1;
+
 				end
 
 				return 0;
@@ -527,7 +574,7 @@ function MarketplaceService.ProcessReceipt(receiptInfo)
 	end
 	
 	local purchaseKey = receiptInfo.PlayerId..":"..receiptInfo.PurchaseId;
-	if isCommunityServer then warn("MarketplaceService>> ProcessReceipt: In community game."); return Enum.ProductPurchaseDecision.NotProcessedYet; end;
+	
 	local purchaseStatus = false;
 	local getStatusSuccess = pcall(function() purchaseStatus = PurchaseHistory:GetAsync(purchaseKey); end)
 	if getStatusSuccess and purchaseStatus then return Enum.ProductPurchaseDecision.PurchaseGranted; end;
@@ -542,16 +589,34 @@ function MarketplaceService.ProcessReceipt(receiptInfo)
 	local productData = productInfo.Product;
 	
 	if productData.Perks then
-		local activeSave = profile:GetActiveSave();
-		activeSave:AddStat("Perks", productData.Perks, true);
+		local playerSave = profile:GetActiveSave();
+		playerSave:AddStat("Perks", productData.Perks, true);
 		shared.Notify(player, ("Thank you for purchasing $Amount Perks."):gsub("$Amount", productData.Perks), "Reward");
 	
+		modAnalyticsService:Source{
+			Player=player;
+			Currency=modAnalyticsService.Currency.Perks;
+			Amount=productData.Perks;
+			EndBalance=playerSave:GetStat("Perks");
+			TransactionType=Enum.AnalyticsEconomyTransactionType.IAP;
+			ItemSKU=`BuyPerks:{productData.Perks}`;
+		};
+		
 	elseif productData.Gold then
 		local traderProfile = profile.Trader;
 		traderProfile:AddGold(productData.Gold);
 		shared.Notify(player, ("Thank you for purchasing $Amount Gold."):gsub("$Amount", productData.Gold), "Reward");
 		modAnalytics.RecordResource(player.UserId, productData.Gold, "Source", "Gold", "Purchase", tostring(productData.Gold));
 		
+		modAnalyticsService:Source{
+			Player=player;
+			Currency=modAnalyticsService.Currency.Gold;
+			Amount=productData.Gold;
+			EndBalance=traderProfile.Gold;
+			TransactionType=Enum.AnalyticsEconomyTransactionType.IAP;
+			ItemSKU=`BuyGold:{productData.Gold}`;
+		};
+
 	end
 	
 	local productKey = tostring(productId);
@@ -563,7 +628,7 @@ function MarketplaceService.ProcessReceipt(receiptInfo)
 	profile:Save();
 	
 	PurchaseHistory:SetAsync(purchaseKey, true);
-	--modAnalytics:RecordTransaction(player, "DeveloperProduct:"..ProductInfo.Name, receiptInfo.CurrencySpent);
+	
 	return Enum.ProductPurchaseDecision.PurchaseGranted;
 end
 

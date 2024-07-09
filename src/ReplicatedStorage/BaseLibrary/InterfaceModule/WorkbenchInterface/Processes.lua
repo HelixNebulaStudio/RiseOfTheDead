@@ -419,7 +419,7 @@ function Workbench.new()
 					}
 				});
 
-			else
+			elseif process.Type == "PolishTool" then
 				Interface:PromptDialogBox({
 					Title=`Skip {titleTag.Text}`;
 					Desc=`Are you sure you want to skip <b>{titleTag.Text}</b> process with <b>{modRichFormatter.PerkText(skipCost.." Perks")}</b>?`;
@@ -430,7 +430,7 @@ function Workbench.new()
 							OnPrimaryClick=function(promptDialogFrame, textButton)
 								promptDialogFrame.statusLabel.Text = "Skipping...";
 								
-								local serverReply = remotePolishTool:InvokeServer(Interface.Object, 2, process.Index);
+								local serverReply = remotePolishTool:InvokeServer(Interface.Object, 4, process.Index);
 								if serverReply == modWorkbenchLibrary.PolishToolReplies.Success then
 									promptDialogFrame.statusLabel.Text = "Skipped!";
 									refreshProcessPage();

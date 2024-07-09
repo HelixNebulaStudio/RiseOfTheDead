@@ -808,7 +808,7 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 	
 	if action <= 2 then
 		-- Tweak System 1
-		if action == 1 then -- TweakPoints;
+		if action == 1 then -- MARK: Tweak with TweakPoints;
 			if playerSave:GetStat("TweakPoints") <= 0 then return modWorkbenchLibrary.PurchaseReplies.InsufficientCurrency; end;
 			playerSave:AddStat("TweakPoints", -1);
 			shared.Notify(player, "A tweak point has been consumed.", "Reward");
@@ -822,7 +822,7 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 				ItemSKU="TweakItem";
 			};
 
-		elseif action == 2 then -- Perks;
+		elseif action == 2 then -- MARK: Tweak with Perks;
 			if playerSave:GetStat("Perks") >= 20 then
 				playerSave:AddStat("Perks", -20);
 				shared.Notify(player, "20 perks has been consumed.", "Reward");
@@ -866,7 +866,7 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 				end
 			end
 			
-		elseif action == 3 then -- Start Tweak
+		elseif action == 3 then -- MARK: Start Tweak
 			local startTarget = 0.2;
 			local rerollTp = false;
 			
@@ -946,7 +946,7 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 			
 			profile:AddPlayPoints(10, "Gameplay:Workbench");
 			
-		elseif action == 4 then -- Tweak
+		elseif action == 4 then -- MARK: Tweak
 			if storageItem.Values.Tweak == nil then return modWorkbenchLibrary.PurchaseReplies.Failed; end;
 			
 			local _, sliderValue = ...;
@@ -979,7 +979,7 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 			--inventory:SyncValues(id, "TweakPivot");
 			storageItem:Sync({"TweakValues"; "TweakPivot";})
 			
-		elseif action == 5 then -- Calibrate
+		elseif action == 5 then -- MARK: Calibrate
 			
 			local tweakPoints = playerSave:GetStat("TweakPoints");
 			if tweakPoints <= 0 then return modWorkbenchLibrary.PurchaseReplies.InsufficientCurrency; end;
@@ -1038,7 +1038,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 	local inventory = profile.ActiveInventory;
 	local userWorkbench = playerSave.Workbench;
 	
-	if action == 1 then -- Start deconstruction
+	if action == 1 then -- MARK: Start deconstruction
 		local storageItemId = arg;
 		local storageItem = inventory ~= nil and inventory:Find(storageItemId) or nil;
 		local itemLib = storageItem and modItemsLibrary:Find(storageItem.ItemId) or nil;
@@ -1110,7 +1110,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			return modWorkbenchLibrary.DeconstructModReplies.InvalidItem;
 		end
 		
-	elseif action == 2 then -- Claim deconstruction
+	elseif action == 2 then -- MARK: Claim deconstruction
 		local index = arg;
 		local processData = userWorkbench:GetProcess(index);
 		if processData.T-modSyncTime.GetTime() > 0 then return modWorkbenchLibrary.DeconstructModReplies.TooFrequentRequest end;
@@ -1247,7 +1247,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			return modWorkbenchLibrary.DeconstructModReplies.Success;
 		end
 		
-	elseif action == 3 then -- Cancel deconstruction
+	elseif action == 3 then -- MARK: Cancel deconstruction
 		local index = arg;
 		local processData = userWorkbench:GetProcess(index);
 		
@@ -1287,7 +1287,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 	local inventory = profile.ActiveInventory;
 	local userWorkbench = playerSave.Workbench;
 
-	if action == 1 then -- Start polish
+	if action == 1 then -- MARK: Start polish
 		local storageItemId = arg;
 		local storageItem = inventory ~= nil and inventory:Find(storageItemId) or nil;
 		local itemLib = storageItem and modItemsLibrary:Find(storageItem.ItemId) or nil;
@@ -1311,17 +1311,6 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			local oldSeed = itemValues.SkinWearId;
 			local oldFloat = modItemSkinWear.LoadFloat(itemId, oldSeed).Float;
 
-			--local wearLib = modItemSkinWear.GetWearLib(itemId);
-			
-			local polishCost = modWorkbenchLibrary.PolishCost;
-			if profile.Premium then
-				polishCost = modWorkbenchLibrary.PolishPremiumCost;
-			end
-			
-			if playerSave:GetStat("Perks") < polishCost then
-				return modWorkbenchLibrary.PolishToolReplies.InsufficientCurrency;
-			end
-			
 			local lmqId = "liquidmetalpolish";
 			local total, itemList = inventory:ListQuantity(lmqId, 1);
 			if itemList == nil or total <= 0 then
@@ -1335,19 +1324,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 
 			end
 			
-			playerSave:AddStat("Perks", -polishCost);
-			shared.Notify(player, polishCost .." perks has been consumed.", "Reward");
-			modAnalytics.RecordResource(player.UserId, polishCost, "Sink", "Perks", "Gameplay", "PolishItem");
-			
-			modAnalyticsService:Sink{
-				Player=player;
-				Currency=modAnalyticsService.Currency.Perks;
-				Amount=polishCost;
-				EndBalance=playerSave:GetStat("Perks");
-				ItemSKU="PolishItem";
-			};
-
-			local duration = modSyncTime.GetTime() + 3600;
+			local duration = modSyncTime.GetTime() + modWorkbenchLibrary.PolishDuration;
 			--local upgradeLib = modWorkbenchLibrary.ItemUpgrades[itemId];
 			
 			local cleanMin, cleanMax = modWorkbenchLibrary.PolishRangeBase.Min, modWorkbenchLibrary.PolishRangeBase.Max;
@@ -1406,11 +1383,10 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 				
 				ChangeFloat=changeFloat;
 				NewSeed=newSeed;
-				PerksSpent=polishCost;
 				
 				PlayProcessSound=true;
 			};
-			profile:AddPlayPoints(polishCost, "Sink:Perks");
+			profile:AddPlayPoints(30, "Gameplay:Workbench");
 
 			inventory:Remove(storageItemId, 1, function()
 				shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.Name), "Negative");
@@ -1422,7 +1398,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			return modWorkbenchLibrary.PolishToolReplies.InvalidItem;
 		end
 
-	elseif action == 2 then -- Claim polished
+	elseif action == 2 then -- MARK: Claim polished
 		local index = arg;
 		local processData = userWorkbench:GetProcess(index);
 		if processData.T-modSyncTime.GetTime() > 0 then return modWorkbenchLibrary.PolishToolReplies.TooFrequentRequest end;
@@ -1460,7 +1436,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 					shared.Notify(player, "Your "..itemName.." has been polished by ".. percent .."%.", "Reward");
 					
 				else
-					shared.Notify(player, "Polishing "..itemName.." has been unsuccessful. You recieved a Liquid Metal Polish.", "Reward");
+					shared.Notify(player, "Polishing "..itemName.." has been unsuccessful.\nYou recieved a Liquid Metal Polish.", "Reward");
 					inventory:Add("liquidmetalpolish");
 					
 				end
@@ -1475,7 +1451,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			return modWorkbenchLibrary.PolishToolReplies.Success;
 		end
 
-	elseif action == 3 then -- Cancel polish
+	elseif action == 3 then -- MARK: Cancel polish
 		local index = arg;
 		local processData = userWorkbench:GetProcess(index);
 
@@ -1494,11 +1470,6 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 						shared.Notify(player, "You recieved a Liquid Metal Polish.", "Reward");
 					end);
 					
-					if processData.PerksSpent then
-						playerSave:AddStat("Perks", processData.PerksSpent);
-						shared.Notify(player, "You recieved ".. processData.PerksSpent .." Perks.", "Reward");
-					end
-					
 					userWorkbench:RemoveProcess(index);
 					return modWorkbenchLibrary.PolishToolReplies.Success;
 				else
@@ -1509,11 +1480,11 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			end
 		end
 
-	elseif action == 4 then -- Skip polish
+	elseif action == 4 then -- MARK: Skip polish
 
 		local index = arg;
 		local processData = userWorkbench:GetProcess(index);
-		if processData.T-modSyncTime.GetTime() > 0 then return modWorkbenchLibrary.PolishToolReplies.TooFrequentRequest end;
+		if processData.T-modSyncTime.GetTime() <= 5 then return modWorkbenchLibrary.PolishToolReplies.TooFrequentRequest end;
 
 		local skipCost = modWorkbenchLibrary.GetSkipCost(processData.T-modSyncTime.GetTime());
 		
