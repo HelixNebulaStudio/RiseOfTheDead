@@ -102,6 +102,7 @@ function CustomizationData.GetBaseSkinFromActiveId(itemId, skinId)
     if skinLib == nil then
         skinLib = modItemSkinsLibrary:FindByKeyValue("OldId", skinId);
     end
+    if skinLib == nil then return end;
     
     local variantId = nil;
     if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
