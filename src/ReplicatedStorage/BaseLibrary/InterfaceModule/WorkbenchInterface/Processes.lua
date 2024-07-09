@@ -1,13 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Workbench = {ActiveSyncs={};};
-local Interface = {};
+local Interface = {} :: any;
 
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 local player = game.Players.LocalPlayer;
 
-local modData = require(player:WaitForChild("DataModule"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modModsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ModsLibrary"));
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
@@ -15,6 +15,7 @@ local modItem = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibrary);
 local modSyncTime = require(game.ReplicatedStorage.Library:WaitForChild("SyncTime"));
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
+local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
 local processTemplate = script:WaitForChild("processFrame");
 
@@ -92,13 +93,15 @@ function Workbench.new()
 		newProcessFrame.Parent = cateList[process.Type].list;
 		newProcessFrame.Name = process.Data.ItemId;
 		
+		local skipCost = 0;
+
 		local bpLib = modBlueprintLibrary.Get(process.Data.ItemId);
 		local function refreshContent(t)
 			local t = modSyncTime.GetTime();
 			
 			if newProcessFrame:IsDescendantOf(Interface.MainInterface) then
 				if process.Type == "Building" or process.Type == "BuildComplete" then
-					titleTag.Text = bpLib.Name;
+					titleTag.Text = "Build "..bpLib.Name;
 					
 					local timeLeft = process.Data.BT-t;
 					local buildPercent = math.clamp(1-(timeLeft/bpLib.Duration), 0, 1);
@@ -130,12 +133,15 @@ function Workbench.new()
 						cancelButton.Visible = false;
 						claimButton.Visible = true;
 						skipButton.Visible = false;
+						skipCost = nil;
+
 					else
 						cancelButton.Visible = true;
 						claimButton.Visible = false;
 						
 						skipButton.Visible = true;
-						skipButton.Text = "Skip Build (".. modWorkbenchLibrary.GetSkipCost(timeLeft) .." Perks)";
+						skipCost = modWorkbenchLibrary.GetSkipCost(timeLeft);
+						skipButton.Text = "Skip Build ("..skipCost.." Perks)";
 						
 						timeTag.Text = modSyncTime.ToString(timeLeft > 0 and timeLeft or 0);
 					end
@@ -145,7 +151,7 @@ function Workbench.new()
 					local data = process.Data;
 					local itemLib = modItem:Find(data.ItemId);
 					if itemLib then
-						titleTag.Text = itemLib.Name;
+						titleTag.Text = "Deconstruct "..itemLib.Name;
 						
 						local timeLeft = process.Data.T-t;
 						local buildPercent = math.clamp(1-(timeLeft/600), 0, 1);
@@ -185,7 +191,7 @@ function Workbench.new()
 					local data = process.Data;
 					local itemLib = modItem:Find(data.ItemId);
 					if itemLib then
-						titleTag.Text = itemLib.Name;
+						titleTag.Text = `Polish {itemLib.Name}`;
 
 						local timeLeft = process.Data.T-t;
 						local buildPercent = math.clamp(1-(timeLeft/600), 0, 1);
@@ -209,9 +215,16 @@ function Workbench.new()
 							progressBar.Size = UDim2.new(1, 0, 1, 0);
 							cancelButton.Visible = false;
 							claimButton.Visible = true;
+							skipButton.Visible = false;
+
 						else
 							cancelButton.Visible = true;
 							claimButton.Visible = false;
+							
+							skipButton.Visible = true;
+							skipCost = modWorkbenchLibrary.GetSkipCost(timeLeft);
+							skipButton.Text = "Skip Polish (".. skipCost .." Perks)";
+
 							timeTag.Text = modSyncTime.ToString(timeLeft > 0 and timeLeft or 0);
 						end
 					else
@@ -349,6 +362,7 @@ function Workbench.new()
 				end
 
 			elseif process.Type == "PolishTool" then
+
 				local serverReply = remotePolishTool:InvokeServer(Interface.Object, 2, process.Index);
 				if serverReply == modWorkbenchLibrary.PolishToolReplies.Success then
 					cancelButtonDown = false;
@@ -365,51 +379,82 @@ function Workbench.new()
 		end);
 		
 		skipButton.MouseButton1Click:Connect(function()
+			if skipCost == nil then return end;
 			Interface:PlayButtonClick();
 			
-			local timeLeft = process.Data.BT- modSyncTime.GetTime();
-			local promptWindow = Interface:PromptQuestion("Build "..bpLib.Name, 
-				"Are you sure you want to skip build (<b>"..bpLib.Name.."</b>) with <b><font color='rgb(172, 255, 225)'>".. modWorkbenchLibrary.GetSkipCost(timeLeft) .."</font></b> Perks?");
-			local YesClickedSignal, NoClickedSignal;
-
-			YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-				if debounce then return end;
-				debounce = true;
-				Interface:PlayButtonClick();
-
-				local rPacket = remoteBlueprintHandler:InvokeServer("skipbuild", {
-					Index=process.Index;
+			if process.Type == "Building" or process.Type == "BuildComplete" then
+				Interface:PromptDialogBox({
+					Title=`Skip {titleTag.Text}`;
+					Desc=`Are you sure you want to skip <b>{titleTag.Text}</b> process with <b>{modRichFormatter.PerkText(skipCost.." Perks")}</b>?`;
+					Buttons={
+						{
+							Text="Skip";
+							Style="Confirm";
+							OnPrimaryClick=function(promptDialogFrame, textButton)
+								promptDialogFrame.statusLabel.Text = "Skipping...";
+								
+								local rPacket = remoteBlueprintHandler:InvokeServer("skipbuild", {
+									Index=process.Index;
+								});
+								
+								if rPacket and rPacket.Success then
+									promptDialogFrame.statusLabel.Text = "Skipped!";
+									task.wait(0.5);
+									
+								elseif rPacket.GoldShop then
+									promptDialogFrame.statusLabel.Text = "Not enough Perk";
+									task.wait(1);
+									Interface:OpenWindow("GoldMenu", "PerksPage");
+									return;
+									
+								else
+									promptDialogFrame.statusLabel.Text = "Error: ".. rPacket and rPacket.FailMsg or "Unknown";
+								end
+							end;
+						};
+						{
+							Text="Cancel";
+							Style="Cancel";
+						};
+					}
 				});
-				
-				if rPacket and rPacket.Success then
-					promptWindow.Frame.Yes.buttonText.Text = "Build Skip Purchased";
-					
-				elseif rPacket.GoldShop then
-					promptWindow.Frame.Yes.buttonText.Text = "Not enough Perk";
-					task.wait(0.8);
-					promptWindow:Close();
-					Interface:OpenWindow("GoldMenu", "PerksPage");
-					return;
-					
-				else
-					promptWindow.Frame.Yes.buttonText.Text = "Error: ".. rPacket and rPacket.FailMsg or "Unknown";
-				end
-				
-				wait(1.6);
-				debounce = false;
-				promptWindow:Close();
-				Interface:OpenWindow("Workbench");
-				YesClickedSignal:Disconnect();
-				NoClickedSignal:Disconnect();
-			end);
-			NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-				if debounce then return end;
-				Interface:PlayButtonClick();
-				promptWindow:Close();
-				Interface:OpenWindow("Workbench");
-				YesClickedSignal:Disconnect();
-				NoClickedSignal:Disconnect();
-			end);
+
+			else
+				Interface:PromptDialogBox({
+					Title=`Skip {titleTag.Text}`;
+					Desc=`Are you sure you want to skip <b>{titleTag.Text}</b> process with <b>{modRichFormatter.PerkText(skipCost.." Perks")}</b>?`;
+					Buttons={
+						{
+							Text="Skip";
+							Style="Confirm";
+							OnPrimaryClick=function(promptDialogFrame, textButton)
+								promptDialogFrame.statusLabel.Text = "Skipping...";
+								
+								local serverReply = remotePolishTool:InvokeServer(Interface.Object, 2, process.Index);
+								if serverReply == modWorkbenchLibrary.PolishToolReplies.Success then
+									promptDialogFrame.statusLabel.Text = "Skipped!";
+									refreshProcessPage();
+									task.wait(0.5);
+
+								elseif serverReply == modWorkbenchLibrary.PolishToolReplies.InsufficientPerks then
+									promptDialogFrame.statusLabel.Text = "Not enough Perk";
+									task.wait(1);
+									Interface:OpenWindow("GoldMenu", "PerksPage");
+
+								else
+									promptDialogFrame.statusLabel.Text = "Error: "..tostring(serverReply);
+								end
+							end;
+						};
+						{
+							Text="Cancel";
+							Style="Cancel";
+						};
+					}
+				});
+
+			end
+
 		end)
 		
 		table.insert(Workbench.ActiveSyncs, refreshContent);

@@ -3,15 +3,12 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local Workbench = {};
 local Interface = {};
 
-local TweenService = game:GetService("TweenService");
 local player = game.Players.LocalPlayer;
 
-local modData = require(player:WaitForChild("DataModule"));
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modItemSkinWear = require(game.ReplicatedStorage.Library.ItemSkinWear);
 
 --== Remotes;
 local remotePolishTool = modRemotesManager:Get("PolishTool");
@@ -38,8 +35,11 @@ function Workbench.new(itemId, library, storageItem)
 	
 	local descLabel = buttonFrame:WaitForChild("descTag");
 	local rangeStr = modWorkbenchLibrary.PolishRangeBase.Min*100 .."-".. modWorkbenchLibrary.PolishRangeBase.Max*100;
-	descLabel.Text = "Polishing a tool will give you a chance to improve the condition of the tool.\n\nThe amount of improvement may vary from "..rangeStr.."%."
-	
+	local descStr = "Polishing a tool will give you a chance to improve the condition of the tool and unlock more customization options.";
+	descStr = descStr.."\n\nThe amount of improvement vary from "..rangeStr.."%.";
+	descStr = descStr.."\n\nA polish may be unsucessful if you exceed below 0 tool condition when attempting to polish.";
+	descLabel.Text = descStr;
+
 	local outcomeList = buttonFrame:WaitForChild("OutcomeFrame"):WaitForChild("List");
 	local perksLabel = outcomeList:WaitForChild("Item1");
 	local lmpLabel = outcomeList:WaitForChild("Item2");
@@ -52,19 +52,18 @@ function Workbench.new(itemId, library, storageItem)
 		polishCost = modWorkbenchLibrary.PolishPremiumCost;
 	end
 	
-	perksLabel.Text = "• Perks: ".. (playerStats.Perks or 0) .."/".. polishCost;
+	perksLabel.Text = `• {polishCost} Perks`;
 	perksLabel.TextColor3 = (playerStats.Perks or 0) >= polishCost and Color3.fromRGB(147, 255, 135) or Color3.fromRGB(255, 108, 103);
 	
 	local lmpCountOnChar = modData.CountItemIdFromCharacter("liquidmetalpolish");
 	local lmpCountAll = modData.CountItemIdFromStorages("liquidmetalpolish");
 	
-	lmpLabel.Text = "• Liquid Metal Polish: ".. (lmpCountOnChar or 0) .."/1".. "(In Storage: ".. lmpCountAll .. ")";
+	lmpLabel.Text = `• 1 Liquid Metal Polish (Storage: {lmpCountAll})`;
 	lmpLabel.TextColor3 = (lmpCountOnChar or 0) >= 1 and Color3.fromRGB(147, 255, 135) or Color3.fromRGB(255, 108, 103);
 	
 	local upgradeLib = modWorkbenchLibrary.ItemUpgrades[itemId];
-	local hoursCost = upgradeLib and upgradeLib.Tier or 1
-	hourLabel.Text = "• Time Cost: ".. (hoursCost > 1 and hoursCost .." Hours" or hoursCost .." Hour");
-	hourLabel.TextColor3 = Color3.fromRGB(147, 255, 135);
+	hourLabel.Text = `Polish Duration: 1 Hour`;
+	hourLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
 	
 	
 	local actionButtonDebounce = false;
@@ -86,15 +85,9 @@ function Workbench.new(itemId, library, storageItem)
 		actionButtonDebounce = false;
 	end)
 	
+	-- local wearLib = modItemSkinWear.GetWearLib(itemId);
+	-- local toolFloat = modItemSkinWear.LoadFloat(itemId, ItemValues.SkinWearId).Float;
 	
-	local wearLib = modItemSkinWear.GetWearLib(itemId);
-	local toolFloat = modItemSkinWear.LoadFloat(itemId, ItemValues.SkinWearId).Float;
-	
-	if toolFloat < modWorkbenchLibrary.PolishLimit or toolFloat < wearLib.Wear.Min+modWorkbenchLibrary.PolishLimit then
-		actionButtonDebounce = true;
-		startButton.Text = "Polish limit reached";
-	end
-
 	listMenu:Add(newFrame);
 	return listMenu;
 end

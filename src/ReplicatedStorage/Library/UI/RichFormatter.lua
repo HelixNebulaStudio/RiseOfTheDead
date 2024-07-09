@@ -28,6 +28,10 @@ function RichFormatter.GoldText(text)
 	return goldPremiumFont.. text .. "</font>";
 end
 
+function RichFormatter.PerkText(text)
+	return perksColor..text..'</font>';
+end
+
 function RichFormatter.SuccessText(text)
 	return successFont.. text .. "</font>";
 end

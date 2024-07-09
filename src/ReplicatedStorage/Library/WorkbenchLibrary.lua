@@ -9,9 +9,7 @@ local WorkbenchLibrary = {}
 WorkbenchLibrary.PolishCost = 100;
 WorkbenchLibrary.PolishPremiumCost = 50;
 
-WorkbenchLibrary.PolishLimit = 0.15;
-
-WorkbenchLibrary.PolishRangeBase = {Min=0.05; Max=0.1;};
+WorkbenchLibrary.PolishRangeBase = {Min=0.01; Max=0.2;};
 --==
 
 function WorkbenchLibrary.GetSkipCost(timeLeft)
@@ -919,7 +917,7 @@ WorkbenchLibrary.PolishToolReplies = setmetatable({
 	InventoryFull = 5;
 	HasMods = 6;
 	InsufficientResources = 7;
-	PolishLimitReached = 8
+	InsufficientPerks = 8;
 }, {__index={
 	"Please try again after 1 second.";
 	"You are too far from workbench.";
@@ -928,7 +926,7 @@ WorkbenchLibrary.PolishToolReplies = setmetatable({
 	"Inventory is full.";
 	"Cannot polish modded item.";
 	"Insufficient resources.";
-	"Can not polish anymore.";
+	"Insufficient Perks.";
 };});
 
 WorkbenchLibrary.BlueprintReplies = setmetatable({

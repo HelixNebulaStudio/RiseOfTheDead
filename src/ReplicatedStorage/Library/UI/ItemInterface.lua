@@ -834,9 +834,9 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 				
 				itemDesc = itemDesc..h3O.."\nCondition: "..h3C.. colorStringText(titleString) .." (".. colorNumberText(math.round(skinWearLib.Float*10000)/10000) ..")";
 
-				if itemValues.TimesPolished then
-					itemDesc = itemDesc.." Polished: "..colorNumberText(itemValues.TimesPolished);
-				end
+				-- if itemValues.TimesPolished then
+				-- 	itemDesc = itemDesc.." Polished: "..colorNumberText(itemValues.TimesPolished);
+				-- end
 			end
 		end
 

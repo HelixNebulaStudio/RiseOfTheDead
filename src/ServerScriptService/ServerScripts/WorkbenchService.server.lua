@@ -10,8 +10,7 @@ local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
 local modSkinsLibrary = require(game.ReplicatedStorage.Library.SkinsLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
-local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibrary);
-local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
+local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibrary) :: any;
 local modSyncTime = require(game.ReplicatedStorage.Library:WaitForChild("SyncTime"));
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
@@ -26,6 +25,7 @@ local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modSkillTree = require(game.ServerScriptService.ServerLibrary.SkillTree);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remoteWorkbenchInteract = remotes.Workbench.WorkbenchInteract;
@@ -37,7 +37,6 @@ local remoteBlueprintHandler = modRemotesManager:Get("BlueprintHandler");
 local remoteDeconstruct = modRemotesManager:Get("DeconstructItem");
 local remoteTweakItem = modRemotesManager:Get("TweakItem");
 local remotePolishTool = modRemotesManager:Get("PolishTool");
-local remoteItemModAction = modRemotesManager:Get("ItemModAction");
 
 local Interactables = workspace:WaitForChild("Interactables");
 local debounceCache = {};
@@ -115,6 +114,7 @@ function CheckBlueprintCost(player, bpId)
 	else
 		Debugger:Warn("Library does not exist for blueprint(",bpId,").");
 	end
+	return;
 end
 
 function ConsumeBlueprintCost(player, fulfillment)
@@ -132,8 +132,17 @@ function ConsumeBlueprintCost(player, fulfillment)
 			end
 			playerSave:AddStat(r.Name, -r.Amount);
 
-			if r.Name == "Perks" and r.Name == "Money" then
-				modAnalytics.RecordResource(player.UserId, r.Amount, "Sink", r.Name, "Gameplay", "Build");
+			if r.Name == "Perks" or r.Name == "Money" then
+				modAnalytics.RecordResource(player.UserId, r.Amount, "Sink", r.Name, "Gameplay", "BuildCost");
+
+				modAnalyticsService:Sink{
+					Player=player;
+					Currency=modAnalyticsService.Currency[r.Name];
+					Amount=r.Amount;
+					EndBalance=playerSave:GetStat(r.Name);
+					ItemSKU="BuildCost";
+				};
+
 			end
 
 		elseif r.Type == "Item" then
@@ -350,6 +359,14 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		
 		playerSave:AddStat("Perks", -skipCost);
 		modAnalytics.RecordResource(player.UserId, skipCost, "Sink", "Perks", "Gameplay", "SkipBuild");
+		
+		modAnalyticsService:Sink{
+			Player=player;
+			Currency=modAnalyticsService.Currency.Perks;
+			Amount=skipCost;
+			EndBalance=playerSave:GetStat("Perks");
+			ItemSKU="SkipBuild";
+		}
 
 		shared.Notify(player, bpLib.Name.." has finished building.", "Reward");
 
@@ -401,7 +418,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modId, id
 	
 	if action == 1 then --== Equip;
 		if modLib == nil then return 3; end
-		local item, itemStorage = activeSave:FindItemFromStorages(id);
+		local item, _itemStorage = activeSave:FindItemFromStorages(id);
 		
 		local toolWorkbenchLib = modWorkbenchLibrary.ItemUpgrades[item.ItemId];
 		local toolCompatType = toolWorkbenchLib and toolWorkbenchLib.Type or nil;
@@ -444,6 +461,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modId, id
 					elementalModExist = true;
 					return 6;
 				end
+				return;
 			end)
 			if elementalModExist then
 				return 6;
@@ -494,6 +512,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modId, id
 			return 3;
 		end
 	end
+	return;
 end
 
 function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
@@ -502,8 +521,8 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 	if not IsInWorkbenchRange(player, interactPart) then return modWorkbenchLibrary.PurchaseReplies.TooFar; end;
 	
 	local profile = modProfile:Get(player);
-	local activeSave = profile:GetActiveSave();
-	local storageItem, storage = activeSave:FindItemFromStorages(id);
+	local playerSave = profile:GetActiveSave();
+	local storageItem, storage = playerSave:FindItemFromStorages(id);
 	local weaponId = storage.Id;
 	local modLib = modModsLibrary.Get(storageItem.ItemId);
 	
@@ -516,8 +535,8 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 			local upgradeCost = modWorkbenchLibrary.CalculateCost(upgradeInfo, upgradeLevel);
 			
 			if upgradeLevel+1 <= upgradeInfo.MaxLevel then
-				if activeSave and activeSave:GetStat(currencyType) >= upgradeCost then
-					activeSave:AddStat(currencyType, -upgradeCost);
+				if playerSave and playerSave:GetStat(currencyType) >= upgradeCost then
+					playerSave:AddStat(currencyType, -upgradeCost);
 					
 					storageItem.Values[upgradeInfo.DataTag] = upgradeLevel + 1;
 					if upgradeInfo.SliderTag then
@@ -526,15 +545,24 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 						storageItem:Sync({upgradeInfo.SliderTag});
 					end
 					
-					activeSave:AwardAchievement("titoup");
+					playerSave:AwardAchievement("titoup");
 					modOnGameEvents:Fire("OnItemUpgraded", player, storageItem);
 					
 					if weaponId ~= "Inventory" then profile:GetItemClass(weaponId); end
 					--storage:SyncValues(id, upgradeInfo.DataTag);
 					storageItem:Sync({upgradeInfo.DataTag});
-					activeSave.AppearanceData:Update(activeSave.Clothing);
+					playerSave.AppearanceData:Update(playerSave.Clothing);
 					
 					modAnalytics.RecordResource(player.UserId, upgradeCost, "Sink", "Perks", "Gameplay", "ModUpgrade");
+					
+					modAnalyticsService:Sink{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Perks;
+						Amount=upgradeCost;
+						EndBalance=playerSave:GetStat("Perks");
+						ItemSKU="ModUpgrade";
+					};
+					
 					return modWorkbenchLibrary.PurchaseReplies.Success;
 				else
 					return modWorkbenchLibrary.PurchaseReplies.InsufficientCurrency;
@@ -549,6 +577,7 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 	
 	debounceCache[player.Name]=nil;
 	spawn(function() clearDebounceCaches() end);
+	return;
 end
 
 
@@ -558,7 +587,7 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 	if not IsInWorkbenchRange(player, interactPart) then return end;
 	local profile = modProfile:Get(player);
 	local activeSave = profile:GetActiveSave();
-	local storageItem, storage = activeSave:FindItemFromStorages(id);
+	local storageItem, _storage = activeSave:FindItemFromStorages(id);
 	
 	if storageItem == nil then return end;
 
@@ -567,7 +596,7 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 	local itemPrefabs = game.ReplicatedStorage.Prefabs.Items;
 	local baseItemModel = itemPrefabs:FindFirstChild(modelName);
 	
-	local itemLib = modItemsLibrary:Find(itemId);
+	--local itemLib = modItemsLibrary:Find(itemId);
 
 	local customizeLib = modWorkbenchLibrary.ItemAppearance[itemId];
 	local partName;
@@ -768,8 +797,8 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 	
 	if profile == nil then return modWorkbenchLibrary.PurchaseReplies.Failed; end;
 	
-	local activeSave = profile:GetActiveSave();
-	if activeSave == nil then return modWorkbenchLibrary.PurchaseReplies.Failed; end;
+	local playerSave = profile:GetActiveSave();
+	if playerSave == nil then return modWorkbenchLibrary.PurchaseReplies.Failed; end;
 	
 	local inventory = profile.ActiveInventory;
 	local id = ...;
@@ -780,16 +809,33 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 	if action <= 2 then
 		-- Tweak System 1
 		if action == 1 then -- TweakPoints;
-			if activeSave:GetStat("TweakPoints") <= 0 then return modWorkbenchLibrary.PurchaseReplies.InsufficientCurrency; end;
-			activeSave:AddStat("TweakPoints", -1);
+			if playerSave:GetStat("TweakPoints") <= 0 then return modWorkbenchLibrary.PurchaseReplies.InsufficientCurrency; end;
+			playerSave:AddStat("TweakPoints", -1);
 			shared.Notify(player, "A tweak point has been consumed.", "Reward");
 			modAnalytics.RecordResource(player.UserId, 1, "Sink", "TweakPoints", "Gameplay", "Tweak Item");
+			
+			modAnalyticsService:Sink{
+				Player=player;
+				Currency=modAnalyticsService.Currency.TweakPoints;
+				Amount=1;
+				EndBalance=playerSave:GetStat("TweakPoints");
+				ItemSKU="TweakItem";
+			};
 
 		elseif action == 2 then -- Perks;
-			if activeSave:GetStat("Perks") >= 20 then
-				activeSave:AddStat("Perks", -20);
+			if playerSave:GetStat("Perks") >= 20 then
+				playerSave:AddStat("Perks", -20);
 				shared.Notify(player, "20 perks has been consumed.", "Reward");
 				modAnalytics.RecordResource(player.UserId, 20, "Sink", "Perks", "Gameplay", "Tweak Item");
+				
+				modAnalyticsService:Sink{
+					Player=player;
+					Currency=modAnalyticsService.Currency.Perks;
+					Amount=20;
+					EndBalance=playerSave:GetStat("Perks");
+					ItemSKU="TweakItem";
+				};
+
 			else
 				return modWorkbenchLibrary.PurchaseReplies.InsufficientCurrency;
 			end
@@ -799,7 +845,7 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 
 		local traitInfo = modToolTweaks.LoadTrait(storageItem.ItemId, storageItem.Values.Tweak);
 		if traitInfo.Title == "Nekronomical" then
-			activeSave:AwardAchievement("nekron");
+			playerSave:AwardAchievement("nekron");
 		end
 
 		profile:AddPlayPoints(10, "Gameplay:Workbench");
@@ -888,7 +934,7 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 			storageItem.Values.TweakValues = tweakValues;
 			
 			if #tweakValues >= 5 then
-				activeSave:AwardAchievement("nekron");
+				playerSave:AwardAchievement("nekron");
 			end
 
 			--inventory:SyncValues(id, "TweakValues");
@@ -926,7 +972,7 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 			storageItem.Values.TweakValues = tweakValues;
 			
 			if #tweakValues >= 5 then
-				activeSave:AwardAchievement("nekron");
+				playerSave:AwardAchievement("nekron");
 			end
 			
 			--inventory:SyncValues(id, "TweakValues");
@@ -935,9 +981,9 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 			
 		elseif action == 5 then -- Calibrate
 			
-			local tweakPoints = activeSave:GetStat("TweakPoints");
+			local tweakPoints = playerSave:GetStat("TweakPoints");
 			if tweakPoints <= 0 then return modWorkbenchLibrary.PurchaseReplies.InsufficientCurrency; end;
-			activeSave:AddStat("TweakPoints", -1);
+			playerSave:AddStat("TweakPoints", -1);
 
 			local tweakSeed = storageItem.Values.Tweak;
 			local graphData = modToolTweaks.LoadGraph(tweakSeed);
@@ -988,9 +1034,9 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 	if not IsInWorkbenchRange(player, interactPart) then return modWorkbenchLibrary.DeconstructModReplies.TooFar; end;
 	
 	local profile = modProfile:Get(player);
-	local activeSave = profile:GetActiveSave();
+	local playerSave = profile:GetActiveSave();
 	local inventory = profile.ActiveInventory;
-	local userWorkbench = activeSave.Workbench;
+	local userWorkbench = playerSave.Workbench;
 	
 	if action == 1 then -- Start deconstruction
 		local storageItemId = arg;
@@ -1017,8 +1063,8 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 				local duration = modSyncTime.GetTime()+900;
 				if modBranchConfigs.CurrentBranch.Name == "Dev" then duration = modSyncTime.GetTime()+5; end;
 				
-				activeSave.Workbench:NewProcess{
-					Type=activeSave.Workbench.ProcessTypes.DeconstructMod;
+				playerSave.Workbench:NewProcess{
+					Type=playerSave.Workbench.ProcessTypes.DeconstructMod;
 					ItemId=modLib.Id;
 					T=duration;
 					Perks=perks;
@@ -1036,12 +1082,12 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 				local levels = storageItem.Values and storageItem.Values.L or 0;
 				if levels < 5 then return modWorkbenchLibrary.DeconstructModReplies.InvalidItem; end
 				
-				local rewardTiers = math.floor(levels/5);
+				--local rewardTiers = math.floor(levels/5);
 				local duration = modSyncTime.GetTime()+60;
 				if modBranchConfigs.CurrentBranch.Name == "Dev" then duration = modSyncTime.GetTime()+5; end;
 				
-				activeSave.Workbench:NewProcess{
-					Type=activeSave.Workbench.ProcessTypes.DeconstructWeapon;
+				playerSave.Workbench:NewProcess{
+					Type=playerSave.Workbench.ProcessTypes.DeconstructWeapon;
 					ItemId=itemId;
 					T=duration;
 					Levels=levels;
@@ -1072,16 +1118,16 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 		local itemId = processData.ItemId;
 		local itemLib = modItemsLibrary:Find(itemId);
 		
-		if processData.Type == activeSave.Workbench.ProcessTypes.DeconstructMod then
+		if processData.Type == playerSave.Workbench.ProcessTypes.DeconstructMod then
 			local perks = processData.Perks;
 			
 			if perks > 0 then
-				if activeSave.Stats.Perks >= modGlobalVars.MaxPerks then
+				if playerSave.Stats.Perks >= modGlobalVars.MaxPerks then
 					shared.Notify(player, "You perks is maxed!", "Negative");
 					
 				else
-					activeSave:AddStat("Perks", perks);
-					if processData.Maxed then activeSave:AwardAchievement("thedec"); end
+					playerSave:AddStat("Perks", perks);
+					if processData.Maxed then playerSave:AwardAchievement("thedec"); end
 					shared.Notify(player, (("You recieved $p Perks from deconstructing $name."):gsub("$p", perks):gsub("$name", itemLib.Name)), "Reward");
 					
 				end
@@ -1090,7 +1136,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			userWorkbench:RemoveProcess(index);
 			return modWorkbenchLibrary.DeconstructModReplies.Success;
 			
-		elseif processData.Type == activeSave.Workbench.ProcessTypes.DeconstructWeapon then
+		elseif processData.Type == playerSave.Workbench.ProcessTypes.DeconstructWeapon then
 			local levels = processData.Levels;
 			local rewardTiers = math.floor(levels/5);
 			local itemName = itemLib.Name;
@@ -1116,50 +1162,83 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			
 			if rewardTiers >= 4 then
 
-				if activeSave.Stats.TweakPoints >= modGlobalVars.MaxTweakPoints then
+				if playerSave.Stats.TweakPoints >= modGlobalVars.MaxTweakPoints then
 					shared.Notify(player, "You TweakPoints is maxed!", "Negative");
 					
 				else
-					activeSave:AddStat("TweakPoints", 5);
+					playerSave:AddStat("TweakPoints", 5);
 					shared.Notify(player, "You recieved 5 Tweak Point from deconstructing a level "..levels.." "..itemName..".", "Reward");
 					modAnalytics.RecordResource(player.UserId, 5, "Source", "TweakPoints", "Gameplay", "Deconstruct");
+
+					modAnalyticsService:Source{
+						Player=player;
+						Currency=modAnalyticsService.Currency.TweakPoints;
+						Amount=5;
+						EndBalance=playerSave:GetStat("TweakPoints");
+						ItemSKU="Deconstruct";
+					};
 					
 				end
 			end
 			if rewardTiers >= 3 then
-				if activeSave.Stats.Perks >= modGlobalVars.MaxPerks then
+				if playerSave.Stats.Perks >= modGlobalVars.MaxPerks then
 					shared.Notify(player, "You Perks is maxed!", "Negative");
 					
 				else
-					activeSave:AddStat("Perks", 25);
+					playerSave:AddStat("Perks", 25);
 					shared.Notify(player, "You recieved 25 Perks from deconstructing a level "..levels.." "..itemName..".", "Reward");
 					modAnalytics.RecordResource(player.UserId, 25, "Source", "Perks", "Gameplay", "Deconstruct");
 					
+					modAnalyticsService:Source{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Perks;
+						Amount=25;
+						EndBalance=playerSave:GetStat("Perks");
+						ItemSKU="Deconstruct";
+					};
+
 				end
 				
 				
 			elseif rewardTiers >= 1 then
-				if activeSave.Stats.Money >= modGlobalVars.MaxMoney then
+				if playerSave.Stats.Money >= modGlobalVars.MaxMoney then
 					shared.Notify(player, "You Money is maxed!", "Negative");
 					
 				else
-					activeSave:AddStat("Money", 5000);
+					playerSave:AddStat("Money", 5000);
 					shared.Notify(player, "You recieved $5000 from deconstructing a level "..levels.." "..itemName..".", "Reward");
 					modAnalytics.RecordResource(player.UserId, 5000, "Source", "Money", "Gameplay", "Deconstruct");
 					
+					modAnalyticsService:Source{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Money;
+						Amount=5000;
+						EndBalance=playerSave:GetStat("Money");
+						ItemSKU="Deconstruct";
+					};
+
 				end
 				
 				
 			end
 			if rewardTiers >= 2 then
-				if activeSave.Stats.Money >= modGlobalVars.MaxMoney then
+				if playerSave.Stats.Money >= modGlobalVars.MaxMoney then
 					shared.Notify(player, "You Money is maxed!", "Negative");
 					
 				else
-					activeSave:AddStat("Money", 25000, true);
+					playerSave:AddStat("Money", 25000, true);
 					shared.Notify(player, "You recieved $25'000 from deconstructing a level "..levels.." "..itemName..".", "Reward");
 					modAnalytics.RecordResource(player.UserId, 25000, "Source", "Money", "Gameplay", "Deconstruct");
 					
+					modAnalyticsService:Source{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Money;
+						Amount=25000;
+						EndBalance=playerSave:GetStat("Money");
+						ItemSKU="Deconstruct";
+					};
+
+
 				end
 			end
 			
@@ -1172,8 +1251,8 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 		local index = arg;
 		local processData = userWorkbench:GetProcess(index);
 		
-		if processData.Type == activeSave.Workbench.ProcessTypes.DeconstructMod
-			or processData.Type == activeSave.Workbench.ProcessTypes.DeconstructWeapon then
+		if processData.Type == playerSave.Workbench.ProcessTypes.DeconstructMod
+			or processData.Type == playerSave.Workbench.ProcessTypes.DeconstructWeapon then
 
 			if inventory:SpaceCheck{{ItemId=processData.ItemId; Data={Quantity=1;};}} then
 				local productLib = modItemsLibrary:Find(processData.ItemId);
@@ -1195,6 +1274,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 	end
 	
 	debounceCache[player.Name]=nil;
+	return;
 end
 
 function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
@@ -1203,9 +1283,9 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 	if not IsInWorkbenchRange(player, interactPart) then return modWorkbenchLibrary.PolishToolReplies.TooFar; end;
 	
 	local profile = modProfile:Get(player);
-	local activeSave = profile:GetActiveSave();
+	local playerSave = profile:GetActiveSave();
 	local inventory = profile.ActiveInventory;
-	local userWorkbench = activeSave.Workbench;
+	local userWorkbench = playerSave.Workbench;
 
 	if action == 1 then -- Start polish
 		local storageItemId = arg;
@@ -1231,18 +1311,14 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			local oldSeed = itemValues.SkinWearId;
 			local oldFloat = modItemSkinWear.LoadFloat(itemId, oldSeed).Float;
 
-			local wearLib = modItemSkinWear.GetWearLib(itemId);
+			--local wearLib = modItemSkinWear.GetWearLib(itemId);
 			
-			if oldFloat < modWorkbenchLibrary.PolishLimit or oldFloat < wearLib.Wear.Min+modWorkbenchLibrary.PolishLimit then
-				return modWorkbenchLibrary.PolishToolReplies.PolishLimitReached;
-			end
-
 			local polishCost = modWorkbenchLibrary.PolishCost;
 			if profile.Premium then
 				polishCost = modWorkbenchLibrary.PolishPremiumCost;
 			end
 			
-			if activeSave:GetStat("Perks") < polishCost then
+			if playerSave:GetStat("Perks") < polishCost then
 				return modWorkbenchLibrary.PolishToolReplies.InsufficientCurrency;
 			end
 			
@@ -1254,64 +1330,82 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			end
 
 			for a=1, #itemList do
-				local itemLib = modItemsLibrary:Find(lmqId);
 				inventory:Remove(itemList[a].ID, itemList[a].Quantity);
 				shared.Notify(player, "Liquid Metal Polish removed from your Inventory.", "Negative");
 
 			end
 			
-			activeSave:AddStat("Perks", -polishCost);
+			playerSave:AddStat("Perks", -polishCost);
 			shared.Notify(player, polishCost .." perks has been consumed.", "Reward");
-			modAnalytics.RecordResource(player.UserId, polishCost, "Sink", "Perks", "Gameplay", "Polish Item");
+			modAnalytics.RecordResource(player.UserId, polishCost, "Sink", "Perks", "Gameplay", "PolishItem");
 			
+			modAnalyticsService:Sink{
+				Player=player;
+				Currency=modAnalyticsService.Currency.Perks;
+				Amount=polishCost;
+				EndBalance=playerSave:GetStat("Perks");
+				ItemSKU="PolishItem";
+			};
+
 			local duration = modSyncTime.GetTime() + 3600;
-			local upgradeLib = modWorkbenchLibrary.ItemUpgrades[itemId];
-			
-			if upgradeLib then
-				duration = modSyncTime.GetTime() + (3600 * (upgradeLib.Tier or 1));
-			end
-			
-			if modBranchConfigs.CurrentBranch.Name == "Dev" then duration = modSyncTime.GetTime()+5; end;
+			--local upgradeLib = modWorkbenchLibrary.ItemUpgrades[itemId];
 			
 			local cleanMin, cleanMax = modWorkbenchLibrary.PolishRangeBase.Min, modWorkbenchLibrary.PolishRangeBase.Max;
-			--if profile.Premium then
-			--	cleanMin, cleanMax = modWorkbenchLibrary.PolishRangePremium.Min, modWorkbenchLibrary.PolishRangePremium.Max;
-			--end
 			
+			local rngChange = math.random(cleanMin*100000, cleanMax*100000)/100000;
+
 			local success = false;
-			local seed, genData, changeFloat;
-			local a=0;
-			repeat
-				seed = math.random(0, 999999);
-				genData = modItemSkinWear.LoadFloat(itemId, seed);
+
+			local newSeed;
+
+			local closestSeed, closestGenData;
+			local closestDif = math.huge;
+
+			local targetFloat = oldFloat-rngChange;
+			local changeFloat = 0;
+
+			if targetFloat > 0 then
+				local a=0;
+				repeat
+					local seed = math.random(0, 999999);
+					local genData = modItemSkinWear.LoadFloat(itemId, seed);
+					
+					local absDif = math.abs(genData.Float-targetFloat);
+					
+					if genData.Float < oldFloat and absDif <= 0.01 and absDif <= closestDif then
+						closestDif = absDif;
+						closestSeed = seed;
+						closestGenData = genData;
+					end
+
+					a = a +1;
+				until a > 64;
 				
-				changeFloat = genData.Float - oldFloat;
-				if genData.Float > (oldFloat-cleanMax) and genData.Float < (oldFloat-cleanMin) then
+				if closestSeed then
+					newSeed = closestSeed;
+					changeFloat = closestGenData.Float - oldFloat;
 					success = true;
-					break;
 				end
-				
-				a = a +1;
-			until a > 64;
-			
+			end
+
 			if not success then
 				changeFloat = 0;
-				seed = oldSeed;
+				newSeed = oldSeed;
 				
-				task.spawn(function()
-					modAnalytics:ReportError("Workbench", "Unsuccessful polish.");
-				end)
+				Debugger:StudioWarn(`Failed polish: Old: {oldFloat} New: {oldFloat}, Change: {changeFloat}`);
+			else
+				Debugger:StudioWarn(`Success polish: Old: {oldFloat} New: {oldFloat+changeFloat}, Change: {changeFloat}`);
 			end
 			
-			activeSave.Workbench:NewProcess{
-				Type=activeSave.Workbench.ProcessTypes.PolishItem;
+			playerSave.Workbench:NewProcess{
+				Type=playerSave.Workbench.ProcessTypes.PolishItem;
 				ItemId=itemId;
 				T=duration;
 				Values=storageItem.Values;
 				ItemName=storageItem.CustomName;
 				
 				ChangeFloat=changeFloat;
-				NewSeed=seed;
+				NewSeed=newSeed;
 				PerksSpent=polishCost;
 				
 				PlayProcessSound=true;
@@ -1328,7 +1422,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			return modWorkbenchLibrary.PolishToolReplies.InvalidItem;
 		end
 
-	elseif action == 2 then -- Claim polish
+	elseif action == 2 then -- Claim polished
 		local index = arg;
 		local processData = userWorkbench:GetProcess(index);
 		if processData.T-modSyncTime.GetTime() > 0 then return modWorkbenchLibrary.PolishToolReplies.TooFrequentRequest end;
@@ -1336,7 +1430,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 		local itemId = processData.ItemId;
 		local itemLib = modItemsLibrary:Find(itemId);
 		
-		if processData.Type == activeSave.Workbench.ProcessTypes.PolishItem then
+		if processData.Type == playerSave.Workbench.ProcessTypes.PolishItem then
 			
 			local itemName = itemLib.Name;
 			local values = processData.Values;
@@ -1385,7 +1479,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 		local index = arg;
 		local processData = userWorkbench:GetProcess(index);
 
-		if processData.Type == activeSave.Workbench.ProcessTypes.PolishItem then
+		if processData.Type == playerSave.Workbench.ProcessTypes.PolishItem then
 			if inventory:SpaceCheck{{ItemId=processData.ItemId; Data={Quantity=1;};}} then
 				if inventory:SpaceCheck{{ItemId="liquidmetalpolish"; Data={Quantity=1;};}} then
 					local customName = processData.ItemName;
@@ -1401,7 +1495,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 					end);
 					
 					if processData.PerksSpent then
-						activeSave:AddStat("Perks", processData.PerksSpent);
+						playerSave:AddStat("Perks", processData.PerksSpent);
 						shared.Notify(player, "You recieved ".. processData.PerksSpent .." Perks.", "Reward");
 					end
 					
@@ -1414,9 +1508,39 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 				return modWorkbenchLibrary.PolishToolReplies.InventoryFull;
 			end
 		end
+
+	elseif action == 4 then -- Skip polish
+
+		local index = arg;
+		local processData = userWorkbench:GetProcess(index);
+		if processData.T-modSyncTime.GetTime() > 0 then return modWorkbenchLibrary.PolishToolReplies.TooFrequentRequest end;
+
+		local skipCost = modWorkbenchLibrary.GetSkipCost(processData.T-modSyncTime.GetTime());
+		
+		if playerSave:GetStat("Perks") < skipCost then
+			return modWorkbenchLibrary.PolishToolReplies.InsufficientPerks;
+		end
+		
+		playerSave:AddStat("Perks", -skipCost);
+
+		modAnalytics.RecordResource(player.UserId, skipCost, "Sink", "Perks", "Gameplay", "SkipPolish");
+		modAnalyticsService:Sink{
+			Player=player;
+			Currency=modAnalyticsService.Currency.Perks;
+			Amount=skipCost;
+			EndBalance=playerSave:GetStat("Perks");
+			ItemSKU="SkipPolish";
+		};
+
+		processData.T = modSyncTime.GetTime()-1;
+		userWorkbench:Sync();
+		
+		return modWorkbenchLibrary.PolishToolReplies.Success;
 	end
 
 	debounceCache[player.Name]=nil;
+
+	return;
 end
 
 remoteWorkbenchInteract.OnServerEvent:Connect(function(player, visible)
