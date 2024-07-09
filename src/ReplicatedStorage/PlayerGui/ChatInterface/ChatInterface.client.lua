@@ -87,9 +87,17 @@ ChatService.BubbleChatEnabled = true;
 chatButton.Visible = UserInputService.TouchEnabled;
 
 if camera.ViewportSize.X < 800 then
-	mainChatFrame.Position = UDim2.new(0, 0, 1, 0);
+	mainChatFrame.Position = UDim2.new(0, 0, 1, -80);
 	mainChatFrame.Size = UDim2.new(0, 300, 0, 100);
 end
+
+UserInputService:GetPropertyChangedSignal("OnScreenKeyboardSize"):Connect(function()
+	if UserInputService.OnScreenKeyboardSize.Y > 0 then
+		mainChatFrame.Position = UDim2.new(0, 0, 1, -UserInputService.OnScreenKeyboardSize.Y-50);
+	else
+		mainChatFrame.Position = UDim2.new(0, 0, 1, -UserInputService.OnScreenKeyboardSize.Y-80);
+	end
+end)
 
 local function onChannelButtonsChange()
 	local objs = mainChannelsFrame:GetChildren();
