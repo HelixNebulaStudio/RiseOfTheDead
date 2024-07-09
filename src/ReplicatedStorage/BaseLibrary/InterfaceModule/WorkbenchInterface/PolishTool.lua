@@ -41,7 +41,6 @@ function Workbench.new(itemId, library, storageItem)
 	descLabel.Text = descStr;
 
 	local outcomeList = buttonFrame:WaitForChild("OutcomeFrame"):WaitForChild("List");
-	local perksLabel = outcomeList:WaitForChild("Item1");
 	local lmpLabel = outcomeList:WaitForChild("Item2");
 	local hourLabel = outcomeList:WaitForChild("Item3");
 
