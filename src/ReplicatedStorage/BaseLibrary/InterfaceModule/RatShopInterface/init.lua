@@ -644,7 +644,7 @@ function Interface.init(modInterface)
 							local allQuantity = selectedItem.Quantity;
 							Interface:PromptDialogBox({
 								Title=`Sell All: {itemLib.Name}`;
-								Desc=`Are you sure you want to sell <b>{allQuantity}</b> <b>{itemLib.Name}</b> for <b>${price}</b>?`;
+								Desc=`Are you sure you want to sell <b>{allQuantity}</b> <b>{itemLib.Name}</b> for <b>${allPrice}</b>?`;
 								Icon=itemLib.Icon;
 								Buttons={
 									{
