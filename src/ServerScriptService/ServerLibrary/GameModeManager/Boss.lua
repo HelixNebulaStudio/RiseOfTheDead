@@ -113,7 +113,6 @@ function GameMode:Start(room)
 		if mission == nil or mission.ProgressionPoint <= 4 then
 			highestFocusLevel = 1;
 		end
-
 	end
 
 	local bossLevel = math.clamp(highestFocusLevel, 1, math.huge);
@@ -175,7 +174,7 @@ function GameMode:Start(room)
 				
 				local npcs = modNpc.GetPlayerNpcList(player);
 				if npcs then
-					for a=1, #npcs do
+					for a=1, #npcs do -- Make player's assist npcs target boss prefab.
 						npcs[a].Target = npcPrefab;
 						break;
 					end
