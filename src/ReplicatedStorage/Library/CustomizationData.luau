@@ -421,14 +421,13 @@ function CustomizationPlan:Apply(obj: BasePart)
                         texture.ZIndex = 0;
                         texture.Parent = obj;
 
-                        local patternPreset = variantLib.PatternPreset;
+                        local patternPreset = skinLib.PatternPreset;
                         if patternPreset then
                             texture.Color3 = patternPreset.Color or texture.Color3;
 
                             local scale = patternPreset.Scale or Vector2.one;
                             texture.StudsPerTileU = scale.X;
                             texture.StudsPerTileV = scale.Y;
-
                         end
                     end
                     
