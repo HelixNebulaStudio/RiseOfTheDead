@@ -420,6 +420,16 @@ function CustomizationPlan:Apply(obj: BasePart)
                         texture.Texture = variantLib.Image;
                         texture.ZIndex = 0;
                         texture.Parent = obj;
+
+                        local patternPreset = variantLib.PatternPreset;
+                        if patternPreset then
+                            texture.Color3 = patternPreset.Color or texture.Color3;
+
+                            local scale = patternPreset.Scale or Vector2.one;
+                            texture.StudsPerTileU = scale.X;
+                            texture.StudsPerTileV = scale.Y;
+
+                        end
                     end
                     
                 elseif skinLib.Type == modItemSkinsLibrary.SkinType.Texture then
@@ -492,12 +502,13 @@ function CustomizationPlan:Apply(obj: BasePart)
                         texture.OffsetStudsV = 0;
                     end
 
+                    local defaultScale = variantLib.ScaleRatio or Vector2.one;
                     if self.PatternData.Scale then
-                        texture.StudsPerTileU = self.PatternData.Scale.X;
-                        texture.StudsPerTileV = self.PatternData.Scale.Y;
+                        texture.StudsPerTileU = self.PatternData.Scale.X * defaultScale.X;
+                        texture.StudsPerTileV = self.PatternData.Scale.Y * defaultScale.Y;
                     else
-                        texture.StudsPerTileU = variantLib.DefaultScale and variantLib.DefaultScale.X or 1;
-                        texture.StudsPerTileV = variantLib.DefaultScale and variantLib.DefaultScale.Y or 1;
+                        texture.StudsPerTileU = 1 * defaultScale.X;
+                        texture.StudsPerTileV = 1 * defaultScale.Y;
                     end
 
                     if self.PatternData.Transparency then

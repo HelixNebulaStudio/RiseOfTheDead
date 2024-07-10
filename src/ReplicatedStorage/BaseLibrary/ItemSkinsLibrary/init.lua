@@ -123,11 +123,11 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://5180744566";
     
         Patterns={
-            {Id="v1"; Name="Flat"; Image="rbxassetid://18142621094"; DefaultScale=Vector2.new(0.5, 0.5); };
-            {Id="v2"; Name="Engraved"; Image="rbxassetid://18142621388"; DefaultScale=Vector2.new(0.5, 0.5); };
-            {Id="v3"; Name="Glow"; Image="rbxassetid://18142621636"; DefaultScale=Vector2.new(0.5, 0.5); };
-            {Id="v4"; Name="Bevel"; Image="rbxassetid://18142621852"; DefaultScale=Vector2.new(0.5, 0.5); };
-            {Id="v5"; Name="Rainbow"; Image="rbxassetid://5180772738"; DefaultScale=Vector2.new(0.5, 0.5); };
+            {Id="v1"; Name="Flat"; Image="rbxassetid://18142621094"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="v2"; Name="Engraved"; Image="rbxassetid://18142621388"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="v3"; Name="Glow"; Image="rbxassetid://18142621636"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="v4"; Name="Bevel"; Image="rbxassetid://18142621852"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="v5"; Name="Rainbow"; Image="rbxassetid://5180772738"; ScaleRatio=Vector2.new(0.5, 0.5); };
         };
     };
 
@@ -140,8 +140,8 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://5635664589";
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://5635457255"; DefaultScale=Vector2.new(0.5, 0.5); };
-            {Id="v2"; Name="Variant 2"; Image="rbxassetid://5635675457"; DefaultScale=Vector2.new(0.5, 0.5); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://5635457255"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="v2"; Name="Variant 2"; Image="rbxassetid://5635675457"; ScaleRatio=Vector2.new(0.5, 0.5); };
         };
     };
 
@@ -154,11 +154,11 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://6534859112";
     
         Patterns={
-            {Id="v1"; Name="Flat"; Image="rbxassetid://18142774057"; DefaultScale=Vector2.new(0.2, 0.2); };
-            {Id="v2"; Name="Engrave"; Image="rbxassetid://18142774245"; DefaultScale=Vector2.new(0.2, 0.2); };
-            {Id="v3"; Name="Bevel"; Image="rbxassetid://18142774369"; DefaultScale=Vector2.new(0.2, 0.2); };
-            {Id="v4"; Name="Glow"; Image="rbxassetid://18142774495"; DefaultScale=Vector2.new(0.2, 0.2); };
-            {Id="v5"; Name="Rainbow"; Image="rbxassetid://6534829842"; DefaultScale=Vector2.new(0.2, 0.2); };
+            {Id="v1"; Name="Flat"; Image="rbxassetid://18142774057"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v2"; Name="Engrave"; Image="rbxassetid://18142774245"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v3"; Name="Bevel"; Image="rbxassetid://18142774369"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v4"; Name="Glow"; Image="rbxassetid://18142774495"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v5"; Name="Rainbow"; Image="rbxassetid://6534829842"; };
         };
     };
 
@@ -171,13 +171,13 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://7605179907";
     
         Patterns={
-            {Id="v1"; Name="Spooky Skeletons"; Image="rbxassetid://7605195491"; DefaultScale=Vector2.new(0.3, 0.3); };
-            {Id="v2"; Name="Zombie Face"; Image="rbxassetid://7605205046"; DefaultScale=Vector2.new(0.5, 0.5); };
-            {Id="v3"; Name="Possessed Jane"; Image="rbxassetid://7605214869"; DefaultScale=Vector2.new(0.2, 0.2); };
-            {Id="v4"; Name="Haunted Ghost"; Image="rbxassetid://7605218975"; DefaultScale=Vector2.new(0.4, 0.4); };
-            {Id="v5"; Name="Cursed Cat"; Image="rbxassetid://7605222982"; DefaultScale=Vector2.new(0.6, 0.6); };
-            {Id="v6"; Name="Spooky Skeletons RGB"; Image="rbxassetid://7605228557"; DefaultScale=Vector2.new(0.3, 0.3); };
-            {Id="v7"; Name="Haunted Ghost RGB"; Image="rbxassetid://7605250341"; DefaultScale=Vector2.new(0.4, 0.4); };
+            {Id="v1"; Name="Spooky Skeletons"; Image="rbxassetid://7605195491"; ScaleRatio=Vector2.new(0.3, 0.3); };
+            {Id="v2"; Name="Zombie Face"; Image="rbxassetid://7605205046"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="v3"; Name="Possessed Jane"; Image="rbxassetid://7605214869"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v4"; Name="Haunted Ghost"; Image="rbxassetid://7605218975"; ScaleRatio=Vector2.new(0.4, 0.4); };
+            {Id="v5"; Name="Cursed Cat"; Image="rbxassetid://7605222982"; ScaleRatio=Vector2.new(0.6, 0.6); };
+            {Id="v6"; Name="Spooky Skeletons RGB"; Image="rbxassetid://7605228557"; ScaleRatio=Vector2.new(0.3, 0.3); };
+            {Id="v7"; Name="Haunted Ghost RGB"; Image="rbxassetid://7605250341"; ScaleRatio=Vector2.new(0.4, 0.4); };
         };
     };
 
@@ -190,9 +190,9 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://8532443079";
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://8532292678"; DefaultScale=Vector2.new(4, 4); };
-            {Id="v2"; Name="Variant 2"; Image="rbxassetid://8532360403"; DefaultScale=Vector2.new(4, 4); };
-            {Id="v3"; Name="Variant 3"; Image="rbxassetid://8532366520"; DefaultScale=Vector2.new(4, 4); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://8532292678"; ScaleRatio=Vector2.new(4, 4); };
+            {Id="v2"; Name="Variant 2"; Image="rbxassetid://8532360403"; ScaleRatio=Vector2.new(4, 4); };
+            {Id="v3"; Name="Variant 3"; Image="rbxassetid://8532366520"; ScaleRatio=Vector2.new(4, 4); };
         };
     };
 
@@ -205,14 +205,14 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://14250975612";
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://14249893630"; DefaultScale=Vector2.new(1.5, 1); };
-            {Id="v2"; Name="Variant 2"; Image="rbxassetid://14249961683"; DefaultScale=Vector2.new(1.5, 1); };
-            {Id="v3"; Name="Variant 3"; Image="rbxassetid://14250624431"; DefaultScale=Vector2.new(1.5, 1); };
-            {Id="v4"; Name="Variant 4"; Image="rbxassetid://14250629686"; DefaultScale=Vector2.new(1.5, 1); };
-            {Id="v5"; Name="Variant 5"; Image="rbxassetid://14250875240"; DefaultScale=Vector2.new(1, 1); };
-            {Id="v6"; Name="Variant 6"; Image="rbxassetid://14250921231"; DefaultScale=Vector2.new(1, 1); };
-            {Id="v7"; Name="Variant 7"; Image="rbxassetid://14250924060"; DefaultScale=Vector2.new(1, 1); };
-            {Id="v8"; Name="Variant 8"; Image="rbxassetid://14250925805"; DefaultScale=Vector2.new(1, 1); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://14249893630"; ScaleRatio=Vector2.new(1.5, 1); };
+            {Id="v2"; Name="Variant 2"; Image="rbxassetid://14249961683"; ScaleRatio=Vector2.new(1.5, 1); };
+            {Id="v3"; Name="Variant 3"; Image="rbxassetid://14250624431"; ScaleRatio=Vector2.new(1.5, 1); };
+            {Id="v4"; Name="Variant 4"; Image="rbxassetid://14250629686"; ScaleRatio=Vector2.new(1.5, 1); };
+            {Id="v5"; Name="Variant 5"; Image="rbxassetid://14250875240"; ScaleRatio=Vector2.new(1, 1); };
+            {Id="v6"; Name="Variant 6"; Image="rbxassetid://14250921231"; ScaleRatio=Vector2.new(1, 1); };
+            {Id="v7"; Name="Variant 7"; Image="rbxassetid://14250924060"; ScaleRatio=Vector2.new(1, 1); };
+            {Id="v8"; Name="Variant 8"; Image="rbxassetid://14250925805"; ScaleRatio=Vector2.new(1, 1); };
         };
     };
 
@@ -225,17 +225,17 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://18142364038";
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://4527242130"; DefaultScale=Vector2.new(0.3, 0.3); };
-            {Id="v2"; Name="Variant 2"; Image="rbxassetid://4527242331"; DefaultScale=Vector2.new(0.3, 0.3); };
-            {Id="v3"; Name="Variant 3"; Image="rbxassetid://4527242469"; DefaultScale=Vector2.new(0.1, 0.1); };
-            {Id="v4"; Name="Variant 4"; Image="rbxassetid://4527242591"; DefaultScale=Vector2.new(0.1, 0.1); };
-            {Id="v5"; Name="Variant 5"; Image="rbxassetid://4527242713"; DefaultScale=Vector2.new(0.2, 0.2); };
-            {Id="v6"; Name="Variant 6"; Image="rbxassetid://4527242820"; DefaultScale=Vector2.new(0.2, 0.2); };
-            {Id="v7"; Name="Variant 7"; Image="rbxassetid://4527259843"; DefaultScale=Vector2.new(0.2, 0.2); };
-            {Id="v8"; Name="Variant 8"; Image="rbxassetid://4527259963"; DefaultScale=Vector2.new(0.2, 0.2); };
-            {Id="v9"; Name="Variant 9"; Image="rbxassetid://4527257042"; DefaultScale=Vector2.new(0.5, 0.5); };
-            {Id="va"; Name="Variant a"; Image="rbxassetid://4527242932"; DefaultScale=Vector2.new(0.5, 0.5); };
-            {Id="vb"; Name="Variant b"; Image="rbxassetid://4527256263"; DefaultScale=Vector2.new(0.5, 0.5); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://4527242130"; ScaleRatio=Vector2.new(0.3, 0.3); };
+            {Id="v2"; Name="Variant 2"; Image="rbxassetid://4527242331"; ScaleRatio=Vector2.new(0.3, 0.3); };
+            {Id="v3"; Name="Variant 3"; Image="rbxassetid://4527242469"; ScaleRatio=Vector2.new(0.1, 0.1); };
+            {Id="v4"; Name="Variant 4"; Image="rbxassetid://4527242591"; ScaleRatio=Vector2.new(0.1, 0.1); };
+            {Id="v5"; Name="Variant 5"; Image="rbxassetid://4527242713"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v6"; Name="Variant 6"; Image="rbxassetid://4527242820"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v7"; Name="Variant 7"; Image="rbxassetid://4527259843"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v8"; Name="Variant 8"; Image="rbxassetid://4527259963"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v9"; Name="Variant 9"; Image="rbxassetid://4527257042"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="va"; Name="Variant a"; Image="rbxassetid://4527242932"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="vb"; Name="Variant b"; Image="rbxassetid://4527256263"; ScaleRatio=Vector2.new(0.5, 0.5); };
         };
     };
 
@@ -248,11 +248,11 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://4836171086";
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://4835841001"; DefaultScale=Vector2.new(0.2, 0.2); };
-            {Id="v2"; Name="Variant 2"; Image="rbxassetid://4836204240"; DefaultScale=Vector2.new(0.2, 0.2); };
-            {Id="v3"; Name="Variant 3"; Image="rbxassetid://4835841305"; DefaultScale=Vector2.new(1, 1); };
-            {Id="v4"; Name="Variant 4"; Image="rbxassetid://4835841576"; DefaultScale=Vector2.new(1, 1); };
-            {Id="v5"; Name="Variant 5"; Image="rbxassetid://4835841746"; DefaultScale=Vector2.new(1, 1); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://4835841001"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v2"; Name="Variant 2"; Image="rbxassetid://4836204240"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v3"; Name="Variant 3"; Image="rbxassetid://4835841305"; ScaleRatio=Vector2.new(1, 1); };
+            {Id="v4"; Name="Variant 4"; Image="rbxassetid://4835841576"; ScaleRatio=Vector2.new(1, 1); };
+            {Id="v5"; Name="Variant 5"; Image="rbxassetid://4835841746"; ScaleRatio=Vector2.new(1, 1); };
         };
     };
 
@@ -265,9 +265,9 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://18142364602";
     
         Patterns={
-            {Id="v1"; Name="Pumpkins"; Image="rbxassetid://5888890391"; DefaultScale=Vector2.new(0.5, 0.5); };
-            {Id="v2"; Name="Skulls"; Image="rbxassetid://5888891774"; DefaultScale=Vector2.new(0.5, 0.5); };
-            {Id="v3"; Name="Witch hats"; Image="rbxassetid://5888922149"; DefaultScale=Vector2.new(0.5, 0.5); };
+            {Id="v1"; Name="Pumpkins"; Image="rbxassetid://5888890391"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="v2"; Name="Skulls"; Image="rbxassetid://5888891774"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="v3"; Name="Witch hats"; Image="rbxassetid://5888922149"; ScaleRatio=Vector2.new(0.5, 0.5); };
         };
     };
 
@@ -280,14 +280,14 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://18142364818";
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://6109052204"; DefaultScale=Vector2.new(0.1, 0.1); };
-            {Id="v2"; Name="Variant 2"; Image="rbxassetid://6109059756"; DefaultScale=Vector2.new(0.1, 0.1); };
-            {Id="v3"; Name="Variant 3"; Image="rbxassetid://6109074464"; DefaultScale=Vector2.new(0.1, 0.1); };
-            {Id="v4"; Name="Variant 4"; Image="rbxassetid://6109088388"; DefaultScale=Vector2.new(0.1, 0.1); };
-            {Id="v5"; Name="Variant 5"; Image="rbxassetid://6109084797"; DefaultScale=Vector2.new(0.1, 0.1); };
-            {Id="v6"; Name="Variant 6"; Image="rbxassetid://6109085983"; DefaultScale=Vector2.new(0.1, 0.1); };
-            {Id="v7"; Name="Variant 7"; Image="rbxassetid://6109157985"; DefaultScale=Vector2.new(0.5, 0.5); };
-            {Id="v8"; Name="Variant 8"; Image="rbxassetid://6109215107"; DefaultScale=Vector2.new(0.2, 0.2); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://6109052204"; ScaleRatio=Vector2.new(0.1, 0.1); };
+            {Id="v2"; Name="Variant 2"; Image="rbxassetid://6109059756"; ScaleRatio=Vector2.new(0.1, 0.1); };
+            {Id="v3"; Name="Variant 3"; Image="rbxassetid://6109074464"; ScaleRatio=Vector2.new(0.1, 0.1); };
+            {Id="v4"; Name="Variant 4"; Image="rbxassetid://6109088388"; ScaleRatio=Vector2.new(0.1, 0.1); };
+            {Id="v5"; Name="Variant 5"; Image="rbxassetid://6109084797"; ScaleRatio=Vector2.new(0.1, 0.1); };
+            {Id="v6"; Name="Variant 6"; Image="rbxassetid://6109085983"; ScaleRatio=Vector2.new(0.1, 0.1); };
+            {Id="v7"; Name="Variant 7"; Image="rbxassetid://6109157985"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="v8"; Name="Variant 8"; Image="rbxassetid://6109215107"; ScaleRatio=Vector2.new(0.2, 0.2); };
             
         };
     };
@@ -338,10 +338,10 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://17281999442";
     
         Patterns={
-            {Id="v1"; Name="Flat"; Image="rbxassetid://18142686355"; DefaultScale=Vector2.new(2, 2); };
-            {Id="v2"; Name="Engraved"; Image="rbxassetid://18142692314"; DefaultScale=Vector2.new(2, 2); };
-            {Id="v3"; Name="Glow"; Image="rbxassetid://18142697060"; DefaultScale=Vector2.new(2, 2); };
-            {Id="v4"; Name="Bevel"; Image="rbxassetid://18142697244"; DefaultScale=Vector2.new(2, 2); };
+            {Id="v1"; Name="Flat"; Image="rbxassetid://18142686355"; ScaleRatio=Vector2.new(2, 2); };
+            {Id="v2"; Name="Engraved"; Image="rbxassetid://18142692314"; ScaleRatio=Vector2.new(2, 2); };
+            {Id="v3"; Name="Glow"; Image="rbxassetid://18142697060"; ScaleRatio=Vector2.new(2, 2); };
+            {Id="v4"; Name="Bevel"; Image="rbxassetid://18142697244"; ScaleRatio=Vector2.new(2, 2); };
         };
     };
     super:Add{
@@ -369,7 +369,12 @@ function ItemSkinsLibrary:Init(super)
         Rare=true;
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://2751750764"; DefaultScale=Vector2.new(0.1, 0.1); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://2751750764"; ScaleRatio=Vector2.new(0.1, 0.1);};
+        };
+
+        PatternPreset={
+            Color=Color3.fromRGB(79, 238, 255);
+            Scale=Vector2.new(0.1, 0.1);
         };
     };
 
@@ -397,7 +402,11 @@ function ItemSkinsLibrary:Init(super)
         Rare=true;
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://4873625719"; DefaultScale=Vector2.new(4, 4); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://4873625719"; ScaleRatio=Vector2.new(4, 4); };
+        };
+
+        PatternPreset={
+            Scale=Vector2.new(4, 4);
         };
     };
 
@@ -411,7 +420,11 @@ function ItemSkinsLibrary:Init(super)
         Rare=true;
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://8769490320"; DefaultScale=Vector2.new(2, 2); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://8769490320"; ScaleRatio=Vector2.new(2, 2); };
+        };
+
+        PatternPreset={
+            Scale=Vector2.new(2, 2);
         };
     };
 
@@ -439,7 +452,11 @@ function ItemSkinsLibrary:Init(super)
         Rare=true;
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://11853778222"; DefaultScale=Vector2.new(0.3, 0.3); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://11853778222"; ScaleRatio=Vector2.new(0.3, 0.3); };
+        };
+
+        PatternPreset={
+            Scale=Vector2.new(0.3, 0.3);
         };
     };
 
@@ -453,7 +470,11 @@ function ItemSkinsLibrary:Init(super)
         Rare=true;
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://17633873288"; DefaultScale=Vector2.new(4, 4); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://17633873288"; ScaleRatio=Vector2.new(4, 4); };
+        };
+
+        PatternPreset={
+            Scale=Vector2.new(4, 4);
         };
     };
 
