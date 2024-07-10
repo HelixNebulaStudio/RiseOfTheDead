@@ -335,50 +335,6 @@ return function(self)
 	self.WaistMotor = self.Prefab:FindFirstChild("UpperTorso") and self.Prefab.UpperTorso:FindFirstChild("Waist");
 	self.RootMotor = self.Prefab:FindFirstChild("LowerTorso") and self.Prefab.LowerTorso:FindFirstChild("Root");
 	
-	-- local lastSwimState = nil;
-	-- self.Garbage:Tag(self.Humanoid.StateChanged:Connect(function(old, new)
-	-- 	if self.DebugAnim == true then
-	-- 		self.AnimationController.Debug = true;
-	-- 	end
-		
-		
-	-- 	if new == Enum.HumanoidStateType.Swimming then
-	-- 		lastSwimState = tick();
-			
-	-- 		self.IsSwimming = true;
-			
-	-- 		self.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false);
-	-- 		self.Humanoid:ChangeState(Enum.HumanoidStateType.Running);
-			
-	-- 		if self.WaterBodyVelocity == nil then
-	-- 			self.WaterBodyVelocity = Instance.new("BodyVelocity");
-	-- 		end
-	-- 		self.WaterBodyVelocity.Name = "FloatVelocity";
-	-- 		self.WaterBodyVelocity.MaxForce = Vector3.new(0, 500 * self.RootPart:GetMass(), 0);
-	-- 		self.WaterBodyVelocity.Velocity = Vector3.new(0, 10, 0);
-	-- 		self.WaterBodyVelocity.Parent = self.RootPart;
-			
-	-- 		task.delay(1, function()
-	-- 			if self.WaterBodyVelocity == nil then return end;
-	-- 			self.IsSwimming = false;
-	-- 			game.Debris:AddItem(self.WaterBodyVelocity, 0);
-	-- 			self.WaterBodyVelocity = nil;
-	-- 			self.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, true);
-	-- 		end)
-			
-	-- 	else
-	-- 		if lastSwimState and tick()-lastSwimState >= 5 then
-	-- 			lastSwimState = nil;
-	-- 			self.IsSwimming = false;
-	-- 			game.Debris:AddItem(self.WaterBodyVelocity, 0);
-	-- 			self.WaterBodyVelocity = nil;
-	-- 			self.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, true);
-				
-	-- 		end
-			
-	-- 	end
-	-- end))
-	
 	self.Garbage:Tag(self.Humanoid.Swimming:Connect(function(speed)
 		if self.Movement then self.Movement:UpdateWalkSpeed(); end
 		if self.Humanoid.Sit then speed = 0; end;

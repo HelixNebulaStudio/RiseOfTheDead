@@ -19,7 +19,7 @@ return function(self)
 	}
 	
 	self.FollowOwner = true;
-	self.FollowGap = 16;
+	self.FollowGap = 10;
 	
 	self.TargetNpcModule = nil;
 	
@@ -47,7 +47,7 @@ return function(self)
 			end
 			
 			if ownerRootPart then
-				self.Move:Follow(ownerRootPart, self.FollowGap);
+				self.Move:Follow(ownerRootPart, self.FollowGap, 8);
 			end
 		end
 		

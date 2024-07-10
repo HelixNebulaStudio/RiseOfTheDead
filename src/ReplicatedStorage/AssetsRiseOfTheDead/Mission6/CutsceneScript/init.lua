@@ -98,6 +98,8 @@ return function(CutsceneSequence)
 				robertModule.StopAnimation("Sit");
 				robertModule.RootPart.Anchored = true;
 				robertModule.Actions:Teleport(bloxMartCf);
+
+				robertModule.SetAnimation("Holding", {script:WaitForChild("RobertHoldingAnim")});
 				robertModule.PlayAnimation("Holding");
 				
 			elseif mission.Type == 1 then -- OnActive

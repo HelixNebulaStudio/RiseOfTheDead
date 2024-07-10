@@ -5,7 +5,6 @@ local PathfindingService = game:GetService("PathfindingService");
 
 local modRegion = require(game.ReplicatedStorage.Library.Region);
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
-local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 
 --
@@ -406,8 +405,9 @@ function Movement.new(parallelNpc)
 			
 		end
 		
-		local minFDist = (self.MinFollowDist or 0)
-		local maxFDist = math.max(minFDist, self.MaxFollowDist or 0)+4;
+		local minFDist = (self.MinFollowDist or 0); -- min Dist from Target;
+		local maxFDist = math.max(minFDist, self.MaxFollowDist or 0)+4; -- max Dist from Target;
+		local fBetween = (maxFDist-minFDist);
 		
 		local isInMaxFollowDist = IsInRange(rootPosition, self.TargetPosition, maxFDist) and math.abs(rootPosition.Y-self.TargetPosition.Y) < 8;
 		local isNextToTarget = IsInRange(rootPosition, self.TargetPosition, minFDist);
@@ -415,25 +415,32 @@ function Movement.new(parallelNpc)
 		if isInMaxFollowDist and self.MaxFollowDist then
 			if dumbFollow and tick() <= dumbFollow then
 				moveToPoint = self.TargetPosition;
+				
 				return;
 			end
 			
 			if isNextToTarget then
-				local awayDir = (rootPosition-self.TargetPosition).Unit;
-				local displaceScaler = ( minFDist+ (maxFDist-minFDist)/2);
-				local newPos = self.TargetPosition + awayDir*displaceScaler;
+				dumbFollow = nil;
+				
+				-- Follow Gap, move back if too close;
+				local tarPos = self.TargetPosition;
+				local awayDir = -((tarPos-rootPosition).Unit * Vector3.new(1, 0, 1));
+				local newPos = rootPosition + awayDir*minFDist;
 				
 				moveToPoint = newPos;
-				dumbFollow = tick() + math.random(5,15)/10;
 				
 			else
 				dumbFollow = nil;
-				moveToPoint = rootPosition;
+
+				-- Stop if out of follow gap but within max follow.
+				if IsInRange(rootPosition, self.TargetPosition, minFDist+fBetween/2) then
+					moveToPoint = rootPosition;
+				end
 				
 			end
 			return;
+
 		end
-		
 		
 		if dumbFollow and tick()-dumbFollow <= 2 then
 			moveToPoint = self.TargetPosition;
@@ -446,6 +453,8 @@ function Movement.new(parallelNpc)
 						jumpRequest = jumpRequest +1;
 					end
 				end
+			else
+				--df2
 			end
 			return;
 			

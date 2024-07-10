@@ -1064,6 +1064,7 @@ Commands["spawnentity"] = {
 		config = typeof(config) == "table" and config or nil;
 		-- /spawnentity "Vexeron" [[{"HardMode":true}]]
 		-- /spawnentity "Bandit" [[{"WeaponId":"minigun"}]]
+		-- /spawnentity
 		Debugger:Log("Cmd spawn entity:", entityName, " arg[1]=", args[1], " config",config);
 		if entityName and modNpc.NpcBaseModules[entityName] then
 			
@@ -1108,6 +1109,11 @@ Commands["spawnentity"] = {
 					if config.DebugAnim then
 						npcModule.DebugAnim = true;
 						table.insert(printTable, "DebugAnim enabled");
+					end
+
+					if config.DebugMove then
+						npc:SetAttribute("DebugMove", true);
+						table.insert(printTable, "DebugMove enabled");
 					end
 					
 					if config.ResourceDrop then
@@ -1886,12 +1892,19 @@ Commands["spawnpet"] = {
 		local player = speaker;
 		local classPlayer = modPlayers.Get(speaker);
 		
-		local namesList = {"Jesse"; "Diana"; "Frank"; "Maverick"; "Larry"}
+		local namesList = {"Jesse"; "Diana"; "Frank"; "Maverick"; "Larry"};
+
+		local config = args[1];
 		
 		if classPlayer.Properties.SpawnedPets == nil or classPlayer.Properties.SpawnedPets < 5 then
 			modNpc.Spawn(namesList[math.random(1, #namesList)], classPlayer.RootPart.CFrame, function(npc, npcModule)
 				npcModule.Humanoid.Name = "Pet";
 				npcModule.Owner = player;
+
+				if config == "dm" then
+					npc:SetAttribute("DebugMove", true);
+				end
+
 			end, require(game.ServerStorage.PrefabStorage.CustomNpcModules.PetNpcModule));
 			
 			classPlayer.Properties.SpawnedPets = (classPlayer.Properties.SpawnedPets or 0) + 1;

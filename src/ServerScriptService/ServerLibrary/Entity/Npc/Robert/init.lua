@@ -28,7 +28,6 @@ return function(npc, spawnPoint)
 		
 		self.Humanoid.JumpPower = 50;
 		
-		self.SetAnimation("Holding", {npc.HoldingAnim});
 		self.SetAnimation("CrouchLook", {npc.CrouchLookAnim});
 		
 		Debugger:Log("Spawned Robert as ", self.Humanoid.Name);

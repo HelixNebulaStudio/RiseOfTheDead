@@ -141,7 +141,8 @@ function Human.new(Npc)
 								
 							end
 							
-							Npc.Move:Follow(rootPart, fDist or 16);
+							Npc.Move:Recompute();
+							Npc.Move:Follow(rootPart, fDist or 8, 4);
 							
 						else
 							if distance >= 64 then
@@ -152,7 +153,7 @@ function Human.new(Npc)
 								Npc.Humanoid.WalkSpeed = fSpeed and fSpeed/2 or 10;
 							end
 							
-							Npc.Follow(rootPart, fDist or 4);
+							Npc.Follow(rootPart, fDist or 2);
 						end
 					end
 				end
