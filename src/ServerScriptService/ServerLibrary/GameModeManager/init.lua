@@ -772,12 +772,21 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 					exited = true;
 				end;
 			end)
-		end;
-		
+		end
+
+		local teleportCFrame = profile.BossDoorCFrame;
+		if profile.Cache.GameModeDisconnectOverwrite then
+			local newCFrame = profile.Cache.GameModeDisconnectOverwrite(oldMenuRoom);
+			if newCFrame then
+				teleportCFrame = newCFrame;
+			end
+			profile.Cache.GameModeDisconnectOverwrite = nil;
+		end
+
 		if not exited then
-			if profile.BossDoorCFrame then
+			if teleportCFrame then
 				if exitTeleport ~= false then
-					shared.modAntiCheatService:Teleport(player, profile.BossDoorCFrame);
+					shared.modAntiCheatService:Teleport(player, teleportCFrame);
 					rootPart.Anchored = false;
 					
 				end

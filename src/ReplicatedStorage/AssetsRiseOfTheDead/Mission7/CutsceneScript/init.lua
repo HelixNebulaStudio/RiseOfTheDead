@@ -43,6 +43,8 @@ if RunService:IsServer() then
 			if npcModule.NetworkOwners == nil then return end;
 
 			for _, player in pairs(npcModule.NetworkOwners) do
+				local profile = shared.modProfile:Get(player);
+
 				modMission:Progress(player, missionId, function(mission)
 					if mission.ProgressionPoint < 4 then 
 						mission.ProgressionPoint = 4;
@@ -52,6 +54,24 @@ if RunService:IsServer() then
 							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission7_DefeatedBoss;
 						};
 						
+						function profile.Cache.GameModeDisconnectOverwrite(menuRoom)
+							if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage ~= "The Prisoner" then return end;
+							
+							local destination;
+							modMission:Progress(player, missionId, function(mission)
+								if mission.ProgressionPoint ~= 4 then return end;
+
+								local doorInstance = workspace.Interactables:FindFirstChild("securityRoomEntrance");
+								if doorInstance == nil then return end;
+
+								destination = CFrame.new(doorInstance.Destination.WorldPosition + Vector3.new(0, 2.3, 0)) 
+									* CFrame.Angles(0, math.rad(doorInstance.Destination.WorldOrientation.Y-90), 0);
+								
+							end)
+
+							return destination;
+						end
+
 					end;
 				end)
 			end
@@ -105,27 +125,12 @@ if RunService:IsServer() then
 
 		modOnGameEvents:ConnectEvent("OnGameLobbyDisconnect", function(player, menuRoom)
 			if not modMission:Progress(player, missionId) then return end;
-			if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage == "The Prisoner" then return end;
 			
-			local classPlayer = shared.modPlayers.Get(player);
-			local rootPart = classPlayer.RootPart;
-
 			modMission:Progress(player, missionId, function(mission)
 				if mission.ProgressionPoint == 4 then
-
-					local doorInstance = workspace.Interactables:FindFirstChild("securityRoomEntrance");
-					if doorInstance then
-						local destination = CFrame.new(doorInstance.Destination.WorldPosition + Vector3.new(0, 2.3, 0)) 
-							* CFrame.Angles(0, math.rad(doorInstance.Destination.WorldOrientation.Y-90), 0)
-						
-						shared.modAntiCheatService:Teleport(player, destination);
-						rootPart.Anchored = false;
-						
-						mission.ProgressionPoint = 5;
-					end;
+					mission.ProgressionPoint = 5;
 				end;
 			end)
-			
 		end)
 	end
 

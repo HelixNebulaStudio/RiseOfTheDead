@@ -47,6 +47,8 @@ function OnGameEvents:Invoke(eventId, player, ...)
 	if eventListener then
 		return eventListener(player, ...);
 	end
+
+	return;
 end
 
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
