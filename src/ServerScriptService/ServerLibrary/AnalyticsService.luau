@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local AnalyticsServiceWrapper = {};
 
 local AnalyticsService = game:GetService("AnalyticsService");
+--==
 
 AnalyticsServiceWrapper.Currency = {
     Money="Money";
@@ -51,6 +52,46 @@ function AnalyticsServiceWrapper:Sink(param)
         itemSku,
         customFields
     );
+end
+
+--==
+AnalyticsServiceWrapper.OnBoardingSteps = {
+    ClickPlay = 1;
+
+    Mission1_WakeUp = 2;
+    Mission1_TakePistol = 3;
+    Mission1_EquipPistol = 4;
+    Mission1_Complete = 5;
+
+    Mission2_WakeUp = 6;
+    Mission2_TalkToMason = 7;
+    Mission2_ExitBedroom = 8;
+    Mission2_DrDeniskiHeal = 9;
+    Mission2_PurchaseAmmo = 10;
+    Mission2_KillTenZombies = 11;
+    Mission2_Complete = 12;
+};
+
+function AnalyticsServiceWrapper:LogOnBoarding(param)
+    local player = param.Player;
+    local boardingStep = param.OnBoardingStep;
+    local customFields = param.CustomFields;
+
+    local boardingStepName;
+    for name, step in pairs(AnalyticsServiceWrapper.OnBoardingSteps) do
+        if step == boardingStep then
+            boardingStepName = name;
+            break;
+        end
+    end
+
+    AnalyticsService:LogOnboardingFunnelStepEvent(
+        player,
+        boardingStep,
+        boardingStepName,
+        customFields
+    )
+    
 end
 
 return AnalyticsServiceWrapper;

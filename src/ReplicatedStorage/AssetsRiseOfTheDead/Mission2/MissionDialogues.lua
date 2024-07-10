@@ -73,6 +73,8 @@ Dialogues.Nick.Dialogues = function()
 end
 
 if RunService:IsServer() then
+	local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+
 	-- !outline: Mason Handler
 	Dialogues.Mason.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
@@ -93,6 +95,11 @@ if RunService:IsServer() then
 						end)
 					end)
 				end)
+				
+				modAnalyticsService:LogOnBoarding{
+					Player=player;
+					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_TalkToMason;
+				};
 				
 			elseif checkpoint == 3 or checkpoint == 4 then
 				dialog:SetInitiateTag("whereAmI_init2");
@@ -150,7 +157,6 @@ if RunService:IsServer() then
 						local function taskOffer(dialog)
 							dialog:AddChoice("whereAmI_acceptTask", function(dialog)
 								modMission:SetData(player, missionId, "accept", 1);
-								data:Set("Affinity", (data:Get("Affinity") or 0)+1);
 								modMission:Progress(player, missionId, function(mission)
 									if mission.ProgressionPoint < 8 then
 										mission.ProgressionPoint = 8
@@ -159,7 +165,6 @@ if RunService:IsServer() then
 							end)
 							dialog:AddChoice("whereAmI_denyTask", function(dialog)
 								modMission:SetData(player, missionId, "accept", 0);
-								data:Set("Affinity", (data:Get("Affinity") or 0)-1);
 							end)
 							dialog:AddChoice("whereAmI_why", taskOffer);
 						end
@@ -175,7 +180,7 @@ if RunService:IsServer() then
 					
 					dialog:AddChoice("whereAmI_reacceptTask", function(dialog)
 						modMission:SetData(player, missionId, "accept", 1);
-						data:Set("Affinity", (data:Get("Affinity") or 0)+1);
+						
 						modMission:Progress(player, missionId, function(mission)
 							if mission.ProgressionPoint < 8 then
 								mission.ProgressionPoint = 8
@@ -184,8 +189,12 @@ if RunService:IsServer() then
 					end)
 					dialog:AddChoice("whereAmI_redenyTask", function(dialog)
 						modMission:SetData(player, missionId, "accept", 0);
-						data:Set("Affinity", (data:Get("Affinity") or 0)-1);
+						
 						modMission:CompleteMission(player, missionId);
+						modAnalyticsService:LogOnBoarding{
+							Player=player;
+							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_Complete;
+						};
 					end)
 					
 				end
@@ -195,6 +204,10 @@ if RunService:IsServer() then
 				if checkpoint == 10 then
 					dialog:AddChoice("whereAmI_taskComplete", function(dialog)
 						modMission:CompleteMission(player, missionId);
+						modAnalyticsService:LogOnBoarding{
+							Player=player;
+							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_Complete;
+						};
 					end)
 				end
 				

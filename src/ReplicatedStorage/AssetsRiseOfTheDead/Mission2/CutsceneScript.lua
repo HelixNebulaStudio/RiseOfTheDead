@@ -16,9 +16,102 @@ if RunService:IsServer() then
 	modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	modEvents = require(game.ServerScriptService.ServerLibrary.Events);
+	modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+	modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+
+	if modBranchConfigs.IsWorld("TheWarehouse") then
+		modOnGameEvents:ConnectEvent("OnDoorEnter", function(player, interactData)
+			local doorName = interactData.Name;
+			if doorName == nil then return end;
 	
+			if doorName == "Bedroom Door" then
+				modMission:Progress(player, missionId, function(mission)
+					if mission.ProgressionPoint < 3 then
+						mission.ProgressionPoint = 3;
+
+						modAnalyticsService:LogOnBoarding{
+							Player=player;
+							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_ExitBedroom;
+						};
+					end;
+				end)
+				
+			elseif doorName == "Warehouse Exit Door" then
+				modMission:Progress(player, missionId, function(mission)
+					if mission.ProgressionPoint == 8 then
+						mission.ProgressionPoint = 9;
+					end;
+				end)
+				
+			end
+		end)
+
+		local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
+		modOnGameEvents:ConnectEvent("OnNpcDeath", function(npcModule)
+			if npcModule.Name ~= "Zombie" then return end;
+
+			local playerTags = modDamageTag:Get(npcModule.Prefab, "Player");
+			for _, playerTag in pairs(playerTags) do
+				local player = playerTag.Player;
+				
+				if modMission:IsComplete(player, missionId) then continue end;
+
+				modMission:Progress(player, missionId, function(mission)
+					if mission.ProgressionPoint ~= 9 then return end;
+
+					mission.SaveData.Kills = mission.SaveData.Kills -1;
+					if mission.SaveData.Kills > 0 then return end;
+
+					mission.ProgressionPoint = 10;
+
+					modAnalyticsService:LogOnBoarding{
+						Player=player;
+						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_KillTenZombies;
+					};
+				end)
+				
+			end
+		end)
+		
+		modOnGameEvents:ConnectEvent("OnRatShopAction", function(player, actionPacket)
+			if actionPacket.Action ~= "BuyAmmo" then return end;
+			if not modMission:Progress(player, missionId) then return end;
+
+			modMission:Progress(player, missionId, function(mission)
+				local m2restorepointEvent = modEvents:GetEvent(player, "m2restorepoint");
+				if mission.ProgressionPoint < 7 then
+					mission.ProgressionPoint = 7;
+					modAnalyticsService:LogOnBoarding{
+						Player=player;
+						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_PurchaseAmmo;
+					};
+
+				elseif m2restorepointEvent then
+					mission.ProgressionPoint = m2restorepointEvent.Point;
+					modEvents:RemoveEvent(player, "m2restorepoint");
+				end;
+			end)
+			
+		end)
+
+		modOnGameEvents:ConnectEvent("OnMedicHeal", function(player, npcName)
+			if not modMission:Progress(player, missionId) then return end;
+
+			modMission:Progress(player, missionId, function(mission)
+				if mission.ProgressionPoint < 4 then
+					mission.ProgressionPoint = 4;
+	
+					modAnalyticsService:LogOnBoarding{
+						Player=player;
+						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_DrDeniskiHeal;
+					};
+				end;
+			end)
+		end)
+	end
+
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 
@@ -101,6 +194,12 @@ return function(CutsceneSequence)
 					task.delay(1, function()
 						shared.modAntiCheatService:Teleport(player, CFrame.new(-19.9, 57.6, -35.95, -0.99, 0, 0.037, 0, 1, 0, -0.037, 0, -0.99));
 					end)
+					
+					modAnalyticsService:LogOnBoarding{
+						Player=player;
+						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_WakeUp;
+					};
+
 					CutsceneSequence:NextScene("wakeUp");
 
 				elseif mission.ProgressionPoint == 2 then
@@ -110,7 +209,7 @@ return function(CutsceneSequence)
 					
 					masonModule:ToggleInteractable(false);
 					masonModule.Move:SetMoveSpeed("set", "default", 10);
-					task.wait(3);
+					task.wait(2);
 
 					if mission.ProgressionPoint ~= 2 then return end;
 					masonModule.Chat(masonModule.Owner, "Follow me...");
@@ -119,7 +218,7 @@ return function(CutsceneSequence)
 
 					if mission.ProgressionPoint ~= 2 then return end;
 					masonModule.Move:MoveTo(Vector3.new(-5.81999636, 57.6597404, -24.2718925));
-					masonModule.Move.MoveToEnded:Wait(3);
+					masonModule.Move.MoveToEnded:Wait(2);
 					wait(0.2);
 
 					if mission.ProgressionPoint ~= 2 then return end;

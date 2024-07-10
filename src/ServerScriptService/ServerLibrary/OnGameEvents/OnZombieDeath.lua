@@ -29,16 +29,6 @@ return function(zombieNpcModule)
 		local activeSave = profile:GetActiveSave();
 		local inventory = activeSave.Inventory;
 		
-		if not modMission:IsComplete(player, 2) then
-			modMission:Progress(player, 2, function(mission)
-				if mission.ProgressionPoint == 9 then
-					mission.SaveData.Kills = mission.SaveData.Kills -1;
-					if mission.SaveData.Kills <= 0 then
-						mission.ProgressionPoint = 10;
-					end
-				end;
-			end)
-		end
 		if not modMission:IsComplete(player, 13) then
 			modMission:Progress(player, 13, function(mission)
 				if mission.ProgressionPoint == 1 then

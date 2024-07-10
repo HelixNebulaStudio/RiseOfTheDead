@@ -7,7 +7,6 @@ local TweenService = game:GetService("TweenService");
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 
 --== Variables;
 local missionId = 1;
@@ -18,6 +17,7 @@ if RunService:IsServer() then
 	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 	modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+	modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 	modOnGameEvents:ConnectEvent("OnToolEquipped", function(player, storageItem)
 		if storageItem == nil then return end;
@@ -27,7 +27,13 @@ if RunService:IsServer() then
 		if mission1 == nil or mission1.Type ~= 1 then return end;
 
 		modMission:Progress(player, missionId, function(mission)
-			if mission.ProgressionPoint < 5 then mission.ProgressionPoint = 5; end;
+			if mission.ProgressionPoint < 5 then 
+				mission.ProgressionPoint = 5; 
+				modAnalyticsService:LogOnBoarding{
+					Player=player;
+					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission1_EquipPistol;
+				};
+			end;
 		end)
 	end)
 	
@@ -36,7 +42,13 @@ if RunService:IsServer() then
 		if storageItem.ItemId ~= "p250" then return end;
 		
 		modMission:Progress(player, missionId, function(mission)
-			if mission.ProgressionPoint < 4 then mission.ProgressionPoint = 4; end;
+			if mission.ProgressionPoint < 4 then 
+				mission.ProgressionPoint = 4; 
+				modAnalyticsService:LogOnBoarding{
+					Player=player;
+					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission1_TakePistol;
+				};
+			end;
 		end)
 	end)
 
@@ -73,7 +85,7 @@ return function(CutsceneSequence)
 	if not modBranchConfigs.IsWorld("TheBeginning") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 
 	local modInterface;
-	local studioLogo, titleLogo, blurEffect, bloomEffect, musicTrack, MasonNpcModule
+	local studioLogo, titleLogo, blurEffect, bloomEffect, musicTrack;
 
 	if modData then
 		repeat
@@ -115,7 +127,7 @@ return function(CutsceneSequence)
 
 	local sceneRunning = false;
 	CutsceneSequence:Initialize(function()
-		if sceneRunning then Debugger:Log("Scene already running..") return end;
+		if sceneRunning then Debugger:Log("Scene already running.."); return end;
 		sceneRunning = true;
 
 		game.Lighting:SetAttribute("FogEnd", 250);
@@ -376,8 +388,6 @@ return function(CutsceneSequence)
 	local disableSecondSpawner = true;
 	
 	CutsceneSequence:NewServerScene("MasonArrives", function()
-		local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
-		local missionLibrary = modMissionLibrary.Get(1);
 
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
@@ -396,14 +406,20 @@ return function(CutsceneSequence)
 		task.wait(1);
 		CutsceneSequence:Pause(18);
 
-		modMission:Progress(player, 1, function(mission)
-			if mission.ProgressionPoint < 2 then mission.ProgressionPoint = 2; end;
+		modMission:Progress(player, missionId, function(mission)
+			if mission.ProgressionPoint < 2 then 
+				mission.ProgressionPoint = 2; 
+				modAnalyticsService:LogOnBoarding{
+					Player=player;
+					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission1_WakeUp;
+				};
+			end;
 		end)
 		
 		task.wait(1);
 		masonNpcModule.NextAction();
 		
-		player.Character:SetAttribute("VisibleArms", true);
+		(player.Character :: Model):SetAttribute("VisibleArms", true);
 		CutsceneSequence:NextScene("playerWake");
 		masonNpcModule.Chat(player, sceneDialogues[3].Reply);
 		
@@ -416,9 +432,9 @@ return function(CutsceneSequence)
 
 		task.wait(1.3);
 		
-		local item, storage = modStorage.FindItemIdFromStorages("p250", player);
+		local item, _storage = modStorage.FindItemIdFromStorages("p250", player);
 		if item == nil then
-			modMission:Progress(player, 1, function(mission)
+			modMission:Progress(player, missionId, function(mission)
 				if mission.ProgressionPoint < 3 then mission.ProgressionPoint = 3; end;
 			end)
 			
@@ -436,7 +452,7 @@ return function(CutsceneSequence)
 			until mission.ProgressionPoint == 4;
 
 		else
-			modMission:Progress(player, 1, function(mission)
+			modMission:Progress(player, missionId, function(mission)
 				if mission.ProgressionPoint < 4 then mission.ProgressionPoint = 4; end;
 			end)
 
@@ -498,13 +514,13 @@ return function(CutsceneSequence)
 		task.spawn(function()
 			for a=1, 15 do
 				if endSpawnLoop then break; else
-					local zombiePrefab = modNpc.Spawn("Zombie", pickSpawn(), loadZombies);
+					modNpc.Spawn("Zombie", pickSpawn(), loadZombies);
 					task.wait(4);
 				end;
 			end
 			for a=1, 12 do
 				if disableSecondSpawner then break; else
-					local zombiePrefab = modNpc.Spawn("Zombie", pickSpawn(), loadZombies);
+					modNpc.Spawn("Zombie", pickSpawn(), loadZombies);
 					task.wait(2);
 				end;
 			end
@@ -580,8 +596,6 @@ return function(CutsceneSequence)
 	end);
 	
 	CutsceneSequence:NewServerScene("blowUpBridge", function()
-		local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
-		local missionLibrary = modMissionLibrary.Get(1);
 
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
@@ -656,19 +670,22 @@ return function(CutsceneSequence)
 		TweenService:Create(explosionLight, TweenInfo.new(3), {Range = 0;}):Play();
 		wait(5);
 
-		for _, player in pairs(game.Players:GetPlayers()) do
-			local char = player.Character;
-			if char and char:FindFirstChild("Humanoid") then
-				char.Humanoid.Health = 10;
-			end
-			if not playerDied then
-				modMission:CompleteMission(player, 1);
-				modMission:StartMission(player, 2);
+		local char = player.Character;
+		if char and char:FindFirstChild("Humanoid") then
+			char.Humanoid.Health = 10;
+		end
+		if not playerDied then
+			modMission:CompleteMission(player, missionId);
+			modAnalyticsService:LogOnBoarding{
+				Player=player;
+				OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission1_Complete;
+			};
 
-				modServerManager:Travel(player, "TheWarehouse");
-			else
-				modServerManager:Teleport(player, "TheBeginning");
-			end
+			modMission:StartMission(player, 2);
+
+			modServerManager:Travel(player, "TheWarehouse");
+		else
+			modServerManager:Teleport(player, "TheBeginning");
 		end
 	end);
 

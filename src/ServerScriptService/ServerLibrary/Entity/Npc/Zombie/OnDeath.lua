@@ -92,8 +92,7 @@ function Zombie.new(self)
 			local totalDamage = 0;
 			if self.Weapons and self.Weapons[player.Name] then
 				local weaponsPool = self.Weapons[player.Name];
-				local playerSave = modProfile:Get(player):GetActiveSave();
-
+				
 				for id, weaponData in pairs(weaponsPool) do
 					totalDamage = totalDamage + weaponData.Damaged;
 				end

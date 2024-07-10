@@ -8,9 +8,7 @@ local PurchaseHistory = game:GetService("DataStoreService"):GetDataStore("Purcha
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 local modShopLibrary = require(game.ReplicatedStorage.Library.RatShopLibrary);
-local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibrary);
@@ -18,19 +16,17 @@ local modGoldShopLibrary = require(game.ReplicatedStorage.Library.GoldShopLibrar
 local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
 
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
-local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modLimitedService = require(game.ServerScriptService.ServerLibrary.LimitedService);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
+local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local remoteShopService = modRemotesManager:Get("ShopService");
 local remoteGoldShopPurchase = modRemotesManager:Get("GoldShopPurchase");
-local remoteReloadWeapon = modRemotesManager:Get("ReloadWeapon");
 
-local Interactables = workspace:WaitForChild("Interactables");
 --== Script;
 
 function IsInShopRange(player, storeObject)
@@ -279,18 +275,12 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 			};
 			
 		end
-		if modMission:Progress(player, 2) then
-			modMission:Progress(player, 2, function(mission)
-				local m2restorepointEvent = modEvents:GetEvent(player, "m2restorepoint");
-				if mission.ProgressionPoint < 7 then
-					mission.ProgressionPoint = 7;
-
-				elseif m2restorepointEvent then
-					mission.ProgressionPoint = m2restorepointEvent.Point;
-					modEvents:RemoveEvent(player, "m2restorepoint");
-				end;
-			end)
-		end
+ 
+		modOnGameEvents:Fire("OnRatShopAction", player, {
+			Action="BuyAmmo";
+			StorageItem=storageItem;
+			Cost=price;
+		});
 
 		profile:AddPlayPoints(price/1000, "Sink:Money");
 		

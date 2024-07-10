@@ -25,17 +25,7 @@ return function(player, interactData)
 	end
 		
 	local doorName = interactData.Name;
-	if doorName == "Bedroom Door" then
-		modMission:Progress(player, 2, function(mission)
-			if mission.ProgressionPoint < 3 then mission.ProgressionPoint = 3; end;
-		end)
-		
-	elseif doorName == "Warehouse Exit Door" then
-		modMission:Progress(player, 2, function(mission)
-			if mission.ProgressionPoint == 8 then mission.ProgressionPoint = 9; end;
-		end)
-		
-	elseif doorName == "Warehouse Entrance Door" then
+	if doorName == "Warehouse Entrance Door" then
 		if modMission:Progress(player, 6) and modMission:Progress(player, 6).ProgressionPoint == 2 then
 			modMission:CompleteMission(player, 6);
 		end
