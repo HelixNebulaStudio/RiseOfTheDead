@@ -519,7 +519,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 						bdStr = bdStr..`<b>Reflectance:</b> Unset\n`;
 					end
 
-					bdStr = bdStr..`\n<b>Part Customizations:</b> <font size="9">(This values are independent per part.)</font>`;
+					bdStr = bdStr..`\n<b>Part Customizations:</b> <font size="9">(This values are independent per part.)</font>\n`;
 
 
 					-- Offset Position;
