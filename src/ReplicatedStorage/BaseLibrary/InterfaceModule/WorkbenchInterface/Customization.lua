@@ -1836,7 +1836,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				
 				local isUnlocked = itemWear <= math.min(matInfo.Val, 1);
 				optionButton.AutoButtonColor = isUnlocked;
-				optionButton.BackgroundColor3 = isUnlocked and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(30, 30, 30);
+				optionButton.BackgroundColor3 = isUnlocked and Color3.fromRGB(100, 100, 100) or Color3.fromRGB(30, 30, 30);
 			end
 
 			function newDropDownList:OnOptionSelect(index, optionButton)
