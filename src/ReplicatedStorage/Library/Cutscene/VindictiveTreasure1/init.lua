@@ -23,6 +23,7 @@ if RunService:IsServer() then
 	modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 	modGameModeManager = require(game.ServerScriptService.ServerLibrary.GameModeManager);
 	modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
+	modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	
 	if modBranchConfigs.IsWorld("TheWarehouse") then
 		local caveTpTouch = modTouchHandler.new("CaveTP", 1);
@@ -56,9 +57,38 @@ if RunService:IsServer() then
 		for _, part in pairs(workspace.Environment:WaitForChild("SecPark"):WaitForChild("Lava"):GetChildren()) do
 			touchHandler:AddObject(part);
 		end
+
+		
+		modOnGameEvents:ConnectEvent("OnNpcDeath", function(npcModule)
+			if npcModule.Name ~= "Zricera" then return end;
+			if npcModule.NetworkOwners == nil then return end;
+
+			for _, player in pairs(npcModule.NetworkOwners) do
+				local profile = shared.modProfile:Get(player);
+				modMission:Progress(player, 40, function(mission)
+					if mission.ProgressionPoint > 2 then return end;
+					mission.ProgressionPoint = 2;
+					
+					function profile.Cache.GameModeDisconnectOverwrite(menuRoom)
+						if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage ~= "Zricera" then return end;
+						
+						local destination;
+						modMission:Progress(player, 40, function(mission)
+							if mission.ProgressionPoint >= 2 and mission.ProgressionPoint <= 4 then
+								mission.ProgressionPoint = 3;
+								destination = CFrame.new(352.464, -30.64, 1885.59);
+							end;
+						end)
+
+						return destination;
+					end
+				end)
+			end
+
+		end)
 	end
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 end
 
 --== Script;

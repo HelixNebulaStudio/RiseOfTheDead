@@ -204,12 +204,6 @@ function GameMode:Start(room)
 				players = room:GetInstancePlayers();
 				for _, player in pairs(players) do
 					shared.Notify(player, npcName, "BossDefeat");
-					
-					if npcName == "Zricera" then
-						modMission:Progress(player, 40, function(mission)
-							if mission.ProgressionPoint < 2 then mission.ProgressionPoint = 2; end;
-						end)
-					end
 				end
 				
 				npcModule.DeathPosition = npcModule.RootPart.CFrame.p;

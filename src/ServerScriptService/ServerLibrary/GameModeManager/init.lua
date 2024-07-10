@@ -11,12 +11,10 @@ local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
-local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modLeaderboardService = require(game.ReplicatedStorage.Library.LeaderboardService);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
 local modMatchMaking = require(game.ServerScriptService.ServerLibrary.MatchMaking);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
@@ -758,21 +756,6 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 	local rootPart = classPlayer.RootPart;
 	if rootPart then
 		local profile = shared.modProfile:Get(player);
-		
-		local exited = false;
-		if modMission:Progress(player, 40) then
-			modMission:Progress(player, 40, function(mission)
-				if mission.ProgressionPoint >= 2 and mission.ProgressionPoint <= 4 then
-					local destination = CFrame.new(352.464, -30.64, 1885.59)
-					
-					mission.ProgressionPoint = 3;
-					shared.modAntiCheatService:Teleport(player, destination);
-					rootPart.Anchored = false;
-					
-					exited = true;
-				end;
-			end)
-		end
 
 		local teleportCFrame = profile.BossDoorCFrame;
 		if profile.Cache.GameModeDisconnectOverwrite then
@@ -783,13 +766,11 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 			profile.Cache.GameModeDisconnectOverwrite = nil;
 		end
 
-		if not exited then
-			if teleportCFrame then
-				if exitTeleport ~= false then
-					shared.modAntiCheatService:Teleport(player, teleportCFrame);
-					rootPart.Anchored = false;
-					
-				end
+		if teleportCFrame then
+			if exitTeleport ~= false then
+				shared.modAntiCheatService:Teleport(player, teleportCFrame);
+				rootPart.Anchored = false;
+				
 			end
 		end
 
