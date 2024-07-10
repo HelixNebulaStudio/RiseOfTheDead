@@ -171,13 +171,13 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://7605179907";
     
         Patterns={
-            {Id="v1"; Name="Spooky Skeletons"; Image="rbxassetid://7605195491"; ScaleRatio=Vector2.new(0.3, 0.3); };
+            {Id="v1"; Name="Pixel Skeletons"; Image="rbxassetid://7605195491"; ScaleRatio=Vector2.new(0.3, 0.3); };
             {Id="v2"; Name="Zombie Face"; Image="rbxassetid://7605205046"; ScaleRatio=Vector2.new(0.5, 0.5); };
             {Id="v3"; Name="Possessed Jane"; Image="rbxassetid://7605214869"; ScaleRatio=Vector2.new(0.2, 0.2); };
-            {Id="v4"; Name="Haunted Ghost"; Image="rbxassetid://7605218975"; ScaleRatio=Vector2.new(0.4, 0.4); };
+            {Id="v4"; Name="Pixel Ghost"; Image="rbxassetid://7605218975"; ScaleRatio=Vector2.new(0.4, 0.4); };
             {Id="v5"; Name="Cursed Cat"; Image="rbxassetid://7605222982"; ScaleRatio=Vector2.new(0.6, 0.6); };
-            {Id="v6"; Name="Spooky Skeletons RGB"; Image="rbxassetid://7605228557"; ScaleRatio=Vector2.new(0.3, 0.3); };
-            {Id="v7"; Name="Haunted Ghost RGB"; Image="rbxassetid://7605250341"; ScaleRatio=Vector2.new(0.4, 0.4); };
+            --{Id="v6"; Name="Pixel Skeletons RGB"; Image="rbxassetid://7605228557"; ScaleRatio=Vector2.new(0.3, 0.3);};
+            --{Id="v7"; Name="Pixel Ghost RGB"; Image="rbxassetid://7605250341"; ScaleRatio=Vector2.new(0.4, 0.4);};
         };
     };
 
@@ -205,14 +205,14 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://14250975612";
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://14249893630"; ScaleRatio=Vector2.new(1.5, 1); };
-            {Id="v2"; Name="Variant 2"; Image="rbxassetid://14249961683"; ScaleRatio=Vector2.new(1.5, 1); };
-            {Id="v3"; Name="Variant 3"; Image="rbxassetid://14250624431"; ScaleRatio=Vector2.new(1.5, 1); };
-            {Id="v4"; Name="Variant 4"; Image="rbxassetid://14250629686"; ScaleRatio=Vector2.new(1.5, 1); };
-            {Id="v5"; Name="Variant 5"; Image="rbxassetid://14250875240"; ScaleRatio=Vector2.new(1, 1); };
-            {Id="v6"; Name="Variant 6"; Image="rbxassetid://14250921231"; ScaleRatio=Vector2.new(1, 1); };
-            {Id="v7"; Name="Variant 7"; Image="rbxassetid://14250924060"; ScaleRatio=Vector2.new(1, 1); };
-            {Id="v8"; Name="Variant 8"; Image="rbxassetid://14250925805"; ScaleRatio=Vector2.new(1, 1); };
+            {Id="v1"; Name="Wind Vertical"; Image="rbxassetid://14249893630"; ScaleRatio=Vector2.new(1.5, 1); };
+            {Id="v2"; Name="Wind Horizontal"; Image="rbxassetid://14249961683"; ScaleRatio=Vector2.new(1.5, 1); };
+            {Id="v3"; Name="Wind 2 Right"; Image="rbxassetid://14250624431"; ScaleRatio=Vector2.new(1.5, 1); };
+            {Id="v4"; Name="Wind 2 Up"; Image="rbxassetid://14250629686"; ScaleRatio=Vector2.new(1.5, 1); };
+            {Id="v5"; Name="Cloud Right"; Image="rbxassetid://14250875240"; ScaleRatio=Vector2.new(1, 1);};
+            {Id="v6"; Name="Cloud Left"; Image="rbxassetid://14250921231"; ScaleRatio=Vector2.new(1, 1);};
+            {Id="v7"; Name="Cloud Up"; Image="rbxassetid://14250924060"; ScaleRatio=Vector2.new(1, 1);};
+            {Id="v8"; Name="Cloud Down"; Image="rbxassetid://14250925805"; ScaleRatio=Vector2.new(1, 1);};
         };
     };
 
@@ -225,17 +225,17 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://18142364038";
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://4527242130"; ScaleRatio=Vector2.new(0.3, 0.3); };
-            {Id="v2"; Name="Variant 2"; Image="rbxassetid://4527242331"; ScaleRatio=Vector2.new(0.3, 0.3); };
-            {Id="v3"; Name="Variant 3"; Image="rbxassetid://4527242469"; ScaleRatio=Vector2.new(0.1, 0.1); };
-            {Id="v4"; Name="Variant 4"; Image="rbxassetid://4527242591"; ScaleRatio=Vector2.new(0.1, 0.1); };
-            {Id="v5"; Name="Variant 5"; Image="rbxassetid://4527242713"; ScaleRatio=Vector2.new(0.2, 0.2); };
-            {Id="v6"; Name="Variant 6"; Image="rbxassetid://4527242820"; ScaleRatio=Vector2.new(0.2, 0.2); };
-            {Id="v7"; Name="Variant 7"; Image="rbxassetid://4527259843"; ScaleRatio=Vector2.new(0.2, 0.2); };
-            {Id="v8"; Name="Variant 8"; Image="rbxassetid://4527259963"; ScaleRatio=Vector2.new(0.2, 0.2); };
-            {Id="v9"; Name="Variant 9"; Image="rbxassetid://4527257042"; ScaleRatio=Vector2.new(0.5, 0.5); };
-            {Id="va"; Name="Variant a"; Image="rbxassetid://4527242932"; ScaleRatio=Vector2.new(0.5, 0.5); };
-            {Id="vb"; Name="Variant b"; Image="rbxassetid://4527256263"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="v1"; Name="Stripes 1"; Image="rbxassetid://4527242130"; ScaleRatio=Vector2.new(0.3, 0.3); };
+            {Id="v2"; Name="Stripes 2"; Image="rbxassetid://4527242331"; ScaleRatio=Vector2.new(0.3, 0.3); };
+            {Id="v3"; Name="Stars 1"; Image="rbxassetid://4527242469"; ScaleRatio=Vector2.new(0.1, 0.1); };
+            {Id="v4"; Name="Stars 2"; Image="rbxassetid://4527242591"; ScaleRatio=Vector2.new(0.1, 0.1); };
+            {Id="v5"; Name="Crystal 1"; Image="rbxassetid://4527242713"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v6"; Name="Crystal 2"; Image="rbxassetid://4527242820"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v7"; Name="Crystal 3"; Image="rbxassetid://4527259843"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v8"; Name="Crystal 4"; Image="rbxassetid://4527259963"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v9"; Name="Checkers 1"; Image="rbxassetid://4527257042"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="va"; Name="Checkers 2"; Image="rbxassetid://4527242932"; ScaleRatio=Vector2.new(0.5, 0.5); };
+            {Id="vb"; Name="Checkers 3"; Image="rbxassetid://4527256263"; ScaleRatio=Vector2.new(0.5, 0.5); };
         };
     };
 
@@ -248,11 +248,11 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://4836171086";
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://4835841001"; ScaleRatio=Vector2.new(0.2, 0.2); };
-            {Id="v2"; Name="Variant 2"; Image="rbxassetid://4836204240"; ScaleRatio=Vector2.new(0.2, 0.2); };
-            {Id="v3"; Name="Variant 3"; Image="rbxassetid://4835841305"; ScaleRatio=Vector2.new(1, 1); };
-            {Id="v4"; Name="Variant 4"; Image="rbxassetid://4835841576"; ScaleRatio=Vector2.new(1, 1); };
-            {Id="v5"; Name="Variant 5"; Image="rbxassetid://4835841746"; ScaleRatio=Vector2.new(1, 1); };
+            {Id="v1"; Name="Egg 1"; Image="rbxassetid://4835841001"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v2"; Name="Egg 2"; Image="rbxassetid://4836204240"; ScaleRatio=Vector2.new(0.2, 0.2); };
+            {Id="v3"; Name="Stripes 1"; Image="rbxassetid://4835841305"; ScaleRatio=Vector2.new(1, 1); };
+            {Id="v4"; Name="Stripes 2"; Image="rbxassetid://4835841576"; ScaleRatio=Vector2.new(1, 1); };
+            {Id="v5"; Name="Stripes 3"; Image="rbxassetid://4835841746"; ScaleRatio=Vector2.new(1, 1); };
         };
     };
 
@@ -316,16 +316,16 @@ function ItemSkinsLibrary:Init(super)
         Icon="rbxassetid://15016488348";
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://15016449317"; };
-            {Id="v2"; Name="Variant 2"; Image="rbxassetid://15016458759"; };
-            {Id="v3"; Name="Variant 3"; Image="rbxassetid://15016462697"; };
-            {Id="v4"; Name="Variant 4"; Image="rbxassetid://15016466372"; };
-            {Id="v5"; Name="Variant 5"; Image="rbxassetid://15016503835"; };
-            {Id="v6"; Name="Variant 6"; Image="rbxassetid://15016521823"; };
-            {Id="v7"; Name="Variant 7"; Image="rbxassetid://15016470436"; };
-            {Id="v8"; Name="Variant 8"; Image="rbxassetid://15016474733"; };
-            {Id="v9"; Name="Variant 9"; Image="rbxassetid://15016524848"; };
-            {Id="va"; Name="Variant a"; Image="rbxassetid://15016528084"; };
+            {Id="v1"; Name="Pumpkins 1"; Image="rbxassetid://15016449317"; };
+            {Id="v2"; Name="Pumpkins 2"; Image="rbxassetid://15016458759"; };
+            {Id="v3"; Name="Cute Skulls 1"; Image="rbxassetid://15016462697"; };
+            {Id="v4"; Name="Cute Skulls 2"; Image="rbxassetid://15016466372"; };
+            {Id="v5"; Name="Cute Skulls Greyscale"; Image="rbxassetid://15016503835"; };
+            {Id="v6"; Name="Cute Ghosts 1"; Image="rbxassetid://15016470436"; };
+            {Id="v7"; Name="Cute Ghosts 2"; Image="rbxassetid://15016474733"; };
+            {Id="v8"; Name="Cute Ghosts Greyscale"; Image="rbxassetid://15016524848"; };
+            --{Id="v6"; Name="Skulls RGB"; Image="rbxassetid://15016521823";};
+            --{Id="va"; Name="Ghosts RGB"; Image="rbxassetid://15016528084";};
         };
     };
 
@@ -358,6 +358,9 @@ function ItemSkinsLibrary:Init(super)
         };
     };
     
+    --== MARK: Animated Patterns;
+    
+
     --== MARK: Special Patterns;
     super:Add{
         Id="skindiamonds";
@@ -402,10 +405,11 @@ function ItemSkinsLibrary:Init(super)
         Rare=true;
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://4873625719"; ScaleRatio=Vector2.new(4, 4); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://4873625719"; ScaleRatio=Vector2.new(4, 4);};
         };
 
         PatternPreset={
+            TextureAnimationId="SoftMotion";
             Scale=Vector2.new(4, 4);
         };
     };
@@ -420,10 +424,11 @@ function ItemSkinsLibrary:Init(super)
         Rare=true;
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://8769490320"; ScaleRatio=Vector2.new(2, 2); };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://8769490320"; ScaleRatio=Vector2.new(2, 2);};
         };
 
         PatternPreset={
+            TextureAnimationId="Parallax";
             Scale=Vector2.new(2, 2);
         };
     };
@@ -438,7 +443,7 @@ function ItemSkinsLibrary:Init(super)
         Rare=true;
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://11796319046"; };
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://18429493237";}; --rbxassetid://11796319046
         };
     };
 

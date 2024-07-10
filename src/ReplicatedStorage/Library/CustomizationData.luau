@@ -7,6 +7,8 @@ local HttpService = game:GetService("HttpService");
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modItemSkinsLibrary = require(game.ReplicatedStorage.Library.ItemSkinsLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modTextureAnimations = require(game.ReplicatedStorage.Library.TextureAnimations);
+
 local modBaseNumber = require(game.ReplicatedStorage.Library.Util.BaseNumber);
 
 local modColorPicker = require(game.ReplicatedStorage.Library.UI.ColorPicker);
@@ -422,12 +424,18 @@ function CustomizationPlan:Apply(obj: BasePart)
                         texture.Parent = obj;
 
                         local patternPreset = skinLib.PatternPreset;
-                        if patternPreset then
-                            texture.Color3 = patternPreset.Color or texture.Color3;
+                        texture.Color3 = patternPreset and patternPreset.Color or Color3.fromRGB(255, 255, 255);
 
-                            local scale = patternPreset.Scale or Vector2.one;
-                            texture.StudsPerTileU = scale.X;
-                            texture.StudsPerTileV = scale.Y;
+                        local scale = patternPreset and patternPreset.Scale or Vector2.one;
+                        texture.StudsPerTileU = scale.X;
+                        texture.StudsPerTileV = scale.Y;
+
+                        if patternPreset and patternPreset.TextureAnimationId then
+                            texture:SetAttribute("TextureAnimationId", patternPreset and patternPreset.TextureAnimationId);
+                            texture:AddTag("AnimatedTextures");
+                        else
+                            texture:SetAttribute("TextureAnimationId", nil);
+                            texture:RemoveTag("AnimatedTextures");
                         end
                     end
                     
@@ -514,6 +522,14 @@ function CustomizationPlan:Apply(obj: BasePart)
                         texture.Transparency = self.PatternData.Transparency;
                     else
                         texture.Transparency = 0;
+                    end
+
+                    if variantLib.TextureAnimationId then
+                        texture:SetAttribute("TextureAnimationId", variantLib.TextureAnimationId);
+                        texture:AddTag("AnimatedTextures");
+                    else
+                        texture:SetAttribute("TextureAnimationId", nil);
+                        texture:RemoveTag("AnimatedTextures");
                     end
 
                     texture.Parent = obj;

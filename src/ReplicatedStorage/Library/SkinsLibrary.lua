@@ -183,7 +183,7 @@ function SkinsLibrary.SetTexture(part, id, generateTag)
 					end
 				end
 				
-				if modTextureAnimations.Library:Find(txtPack.AnimationId or txtPack.Id) then
+				if modTextureAnimations:Find(txtPack.AnimationId or txtPack.Id) then
 					texture:SetAttribute("TextureAnimationId", txtPack.Id);
 					CollectionService:AddTag(texture, "AnimatedTextures");
 				end
