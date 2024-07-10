@@ -125,7 +125,7 @@ function ItemViewport.new() : ItemViewport
 					table.insert(self.SelectedHighlightParts, self.CurrentHighlightPart);
 				end
 			end
-			self.OnSelectionChanged:Fire(self.SelectedHighlightParts, selectDelta);
+			(self.OnSelectionChanged :: any):Fire(self.SelectedHighlightParts, selectDelta);
 			inputStart = 0;
 		end
 

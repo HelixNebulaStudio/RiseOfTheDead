@@ -29,6 +29,8 @@ local templateTitledSkin = script.Parent:WaitForChild("TitledSkinButton");
 
 local garbage = modGarbageHandler.new();
 local firstSync = false;
+
+local copyCache = nil;
 --==
 
 function Workbench.init(interface)
@@ -62,12 +64,15 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 	local customPlansCache = {};
 
+	local baseCustomPlan = modCustomizationData.newCustomizationPlan();
+	customPlansCache["[All]"] = baseCustomPlan;
+
 	-- MARK: generateSerialized()
 	local function generateSerialized()
 		local partDataGroups = {};
 		local modifiedCustomPlans = {};
 
-		modifiedCustomPlans["[All]"]=customPlansCache["[All]"];
+		modifiedCustomPlans["[All]"]=baseCustomPlan;
 
 		if itemViewport.PartDataList then
 			for a=1, #itemViewport.PartDataList do
@@ -116,8 +121,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		Part=1;
 		Group=2;
 	}
-	local baseCustomPlan = modCustomizationData.newCustomizationPlan();
-	customPlansCache["[All]"] = baseCustomPlan;
 
 	local function getCustomPlan(planType, planKey, newIfNil)
 		local customPlan = customPlansCache[planKey];
@@ -789,6 +792,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 				if customPlan.PositionOffset == Vector3.zero then
 					customPlan.PositionOffset = nil;
+				end
+
+				if customPlan.Scale == Vector3.one then
+					customPlan.Scale = nil;
 				end
 
 				if basePart == nil then return end;
@@ -1996,6 +2003,24 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			editPanel.ReflectanceFrame.NameLabel.TextColor3 = reflectiveMat and canEditColor or disabledColor;
 			editPanel.ReflectanceFrame.Visible = itemWear < fnWear;
 
+			-- MARK: serializeText
+			local serializeTextBox = editPanel.serializeText;
+			
+			local activeCustomPlan;
+
+			if activeGroupName then
+				activeCustomPlan = getCustomPlan(GetCustomPlanEnum.Group, activeGroupName);
+
+			elseif activePartSelection and #activePartSelection >0 then
+				local partData = activePartSelection[1];
+				activeCustomPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key);
+			end
+			
+			if activeCustomPlan then
+				serializeTextBox.PlaceholderText = activeCustomPlan:Serialize();
+			else
+				serializeTextBox.PlaceholderText = "";
+			end
 		end
 
 		local function saveGroupName()
@@ -2023,6 +2048,72 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		-- MARK: ButtonsFrame;
 		local buttonsFrame = editPanel.ButtonsFrame;
+
+		buttonsFrame.CopyButton.MouseButton1Click:Connect(function()
+			if buttonsFrame.CopyButton.Text ~= "Copy" then return end;
+			Interface:PlayButtonClick();
+			
+			local activeCustomPlan;
+			local activeKey;
+
+			if activeGroupName then
+				activeCustomPlan = getCustomPlan(GetCustomPlanEnum.Group, activeGroupName);
+				activeKey = activeGroupName;
+
+			elseif activePartSelection and #activePartSelection >0 then
+				local partData = activePartSelection[1];
+				activeCustomPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key);
+				activeKey = partData.Key;
+			end
+			
+			if activeCustomPlan then
+				buttonsFrame.CopyButton.Text = "Copied!";
+				copyCache = activeCustomPlan:Serialize();
+
+			else
+				buttonsFrame.CopyButton.Text = "No changes to copy!";
+				copyCache = nil;
+			end
+
+			Debugger:Warn("Copied (", copyCache, ") from", activeKey);
+
+			task.wait(0.5);
+			buttonsFrame.CopyButton.Text = "Copy";
+		end)
+
+		buttonsFrame.PasteButton.MouseButton1Click:Connect(function()
+			if buttonsFrame.PasteButton.Text ~= "Paste" then return end;
+			Interface:PlayButtonClick();
+
+			local activeCustomPlan;
+			local activeKey;
+
+			if activeGroupName then
+				activeCustomPlan = getCustomPlan(GetCustomPlanEnum.Group, activeGroupName, true);
+				activeKey = activeGroupName;
+
+			elseif activePartSelection and #activePartSelection >0 then
+				local partData = activePartSelection[1];
+				activeCustomPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key, true);
+				activeKey = partData.Key;
+
+			end
+			
+			if activeCustomPlan then
+				buttonsFrame.PasteButton.Text = "Pasted!";
+				activeCustomPlan:Deserialize(copyCache);
+				Debugger:Warn("Pasted (", copyCache,") to",activeKey);
+
+				newSelection(activePartSelection, activeGroupName);
+
+			else
+				buttonsFrame.PasteButton.Text = "Fail to paste!";
+			end
+
+			task.wait(0.5);
+			buttonsFrame.PasteButton.Text = "Paste";
+		end)
+
 		if isDevBranch then
 			buttonsFrame.DebugButton.Visible = true;
 

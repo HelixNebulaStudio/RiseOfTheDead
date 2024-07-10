@@ -134,7 +134,11 @@ function CustomizationData.LoadCustomization(packet)
     local basePrefab = itemPrefabs:FindFirstChild(itemId);
 
     for planId, customPlan in pairs(designPacket.Plans) do
-        customPlansCache[planId] = customPlan;
+        if planId == "[All]" and customPlansCache[planId] then
+            customPlansCache[planId]:Copy(customPlan);
+        else
+            customPlansCache[planId] = customPlan;
+        end
         customPlansCache[planId].BaseSkin = baseSkin;
     end
 
