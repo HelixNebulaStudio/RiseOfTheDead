@@ -30,20 +30,7 @@ return function(player, interactData)
 			modMission:CompleteMission(player, 12);
 		end
 		
-	elseif doorName == "Security Entrance Door" then
-		modMission:Progress(player, 7, function(mission)
-			if mission.ProgressionPoint == 4 then mission.ProgressionPoint = 5; end;
-		end)
-		
-	elseif doorName == "Security Exit Door" then
-		modMission:Progress(player, 7, function(mission)
-			if mission.ProgressionPoint == 6 then mission.ProgressionPoint = 7; end;
-		end)
-		
 	elseif doorName == "Sundays Entrance" then
-		if modMission:Progress(player, 7) and modMission:Progress(player, 7).ProgressionPoint == 7 then
-			modMission:CompleteMission(player, 7);
-		end;
 		modMission:Progress(player, 14, function(mission) if mission.ProgressionPoint < 2 then mission.ProgressionPoint = 2; end; end)
 		
 	elseif doorName == "Underbridge Entrance Door" then

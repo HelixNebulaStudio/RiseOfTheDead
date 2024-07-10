@@ -81,6 +81,12 @@ AnalyticsServiceWrapper.OnBoardingSteps = {
     Mission6_Start = 19;
     Mission6_DestroyedBarricade = 20;
     Mission6_Complete = 21;
+
+    Mission7_Start = 22;
+    Mission7_EnteredBossFight = 23;
+    Mission7_DefeatedBoss = 24;
+    Mission7_UnlockedBloxmartGate = 25;
+    Mission7_Complete = 26;
 };
 
 function AnalyticsServiceWrapper:LogOnBoarding(param)

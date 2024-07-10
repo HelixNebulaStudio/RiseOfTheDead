@@ -35,6 +35,7 @@ if RunService:IsServer() then
 	-- !outline: Robert Handler
 	Dialogues.Robert.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+		local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 		if mission.Type == 2 then -- Available;
 			dialog:AddChoice("thePrisoner_areYouAlright", function(dialog)
@@ -43,6 +44,11 @@ if RunService:IsServer() then
 						dialog:AddChoice("thePrisoner_dangerous", function(dialog)
 							dialog:AddChoice("thePrisoner_stillThere", function(dialog)
 								modMission:StartMission(player, missionId);
+								modAnalyticsService:LogOnBoarding{
+									Player=player;
+									OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission7_Start;
+								};
+								
 							end)
 						end)
 					end)

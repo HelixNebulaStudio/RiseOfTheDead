@@ -17,7 +17,118 @@ if RunService:IsServer() then
 	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 	modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
+	modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+	modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+
+	if modBranchConfigs.IsWorld("TheWarehouse") then
+		modOnGameEvents:ConnectEvent("OnGameModeStart", function(player, gameType, gameStage, room)
+			if gameType ~= "Boss" and gameStage ~= "The Prisoner" then return end;
+			if not modMission:Progress(player, missionId) then return end;
+
+			modMission:Progress(player, missionId, function(mission)
+				if mission.ProgressionPoint < 3 then
+					mission.ProgressionPoint = 3;
+
+					modAnalyticsService:LogOnBoarding{
+						Player=player;
+						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission7_EnteredBossFight;
+					};
+				end;
+			end)
+			
+		end)
+
+		modOnGameEvents:ConnectEvent("OnNpcDeath", function(npcModule)
+			if npcModule.Name ~= "The Prisoner" then return end;
+			if npcModule.NetworkOwners == nil then return end;
+
+			for _, player in pairs(npcModule.NetworkOwners) do
+				modMission:Progress(player, missionId, function(mission)
+					if mission.ProgressionPoint < 4 then 
+						mission.ProgressionPoint = 4;
+
+						modAnalyticsService:LogOnBoarding{
+							Player=player;
+							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission7_DefeatedBoss;
+						};
+						
+					end;
+				end)
+			end
+		end)
+
+		modOnGameEvents:ConnectEvent("OnTrigger", function(player, interactData, ...)
+			local triggerId = interactData.TriggerTag;
+			if triggerId ~= "BloxmartUnlock" then return end;
+			if not modMission:Progress(player, missionId) then return end;
+
+			modMission:Progress(player, missionId, function(mission)
+				if mission.ProgressionPoint == 5 then
+					mission.ProgressionPoint = 6;
+					
+					modAnalyticsService:LogOnBoarding{
+						Player=player;
+						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission7_UnlockedBloxmartGate;
+					};
+				end;
+			end)
+		end)
+
+		modOnGameEvents:ConnectEvent("OnDoorEnter", function(player, interactData)
+			local doorName = interactData.Name;
+			if doorName == nil then return end;
 	
+			if doorName == "Security Entrance Door" then
+				modMission:Progress(player, missionId, function(mission)
+					if mission.ProgressionPoint == 4 then mission.ProgressionPoint = 5; end;
+				end)
+				
+			elseif doorName == "Security Exit Door" then
+				modMission:Progress(player, missionId, function(mission)
+					if mission.ProgressionPoint == 6 then mission.ProgressionPoint = 7; end;
+				end)
+
+			elseif doorName == "Sundays Entrance" then
+				modMission:Progress(player, missionId, function(mission)
+					if mission.ProgressionPoint == 7 then
+						modMission:CompleteMission(player, 7); 
+						modAnalyticsService:LogOnBoarding{
+							Player=player;
+							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission7_Complete;
+						};
+
+					end;
+				end)
+
+			end
+		end)
+
+		modOnGameEvents:ConnectEvent("OnGameLobbyDisconnect", function(player, menuRoom)
+			if not modMission:Progress(player, missionId) then return end;
+			if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage == "The Prisoner" then return end;
+			
+			local classPlayer = shared.modPlayers.Get(player);
+			local rootPart = classPlayer.RootPart;
+
+			modMission:Progress(player, missionId, function(mission)
+				if mission.ProgressionPoint == 4 then
+
+					local doorInstance = workspace.Interactables:FindFirstChild("securityRoomEntrance");
+					if doorInstance then
+						local destination = CFrame.new(doorInstance.Destination.WorldPosition + Vector3.new(0, 2.3, 0)) 
+							* CFrame.Angles(0, math.rad(doorInstance.Destination.WorldOrientation.Y-90), 0)
+						
+						shared.modAntiCheatService:Teleport(player, destination);
+						rootPart.Anchored = false;
+						
+						mission.ProgressionPoint = 5;
+					end;
+				end;
+			end)
+			
+		end)
+	end
+
 else
 	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
@@ -63,16 +174,17 @@ return function(CutsceneSequence)
 				robertModule:ToggleInteractable(false);
 				
 				robertModule.Actions:Teleport(CFrame.new(58.4135704, 57.6597404, -28.7544289, -0.573575675, 0, 0.819152594, 0, 1, 0, -0.819152594, 0, -0.573575675));
+				robertModule.Move:Stop();
 				task.wait(0.3);
 				
 				robertModule.Move:SetMoveSpeed("set", "default", 10);
 				robertModule.Humanoid.JumpPower = 0;
 				
 				robertModule.Move:MoveTo(Vector3.new(13, 57.5, 39.3));
-				robertModule.Move.MoveToEnded:Wait(15);
-				robertModule.Move:Stop();
+				robertModule.Move.MoveToEnded:Wait(10);
+				robertModule.Move:Stop(1);
 				
-				robertModule.Actions:Teleport(CFrame.new(15.6800423, 57.6597404, 42.3099594, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+				robertModule.Actions:Teleport(CFrame.new(15.6800423, 57.6597404, 42.3099594));
 				
 				robertModule.Move:Face(Vector3.new(15.6800423, 57.6597404, 37.0099602));
 				robertModule.Chat(robertModule.Owner, "");
@@ -112,6 +224,7 @@ return function(CutsceneSequence)
 					
 					-- Run to Warehouse Exit;
 					robertModule.Actions:WaitForOwner(30);
+					task.wait(0.5);
 					robertModule.Actions:EnterDoor("warehouseExit");
 
 					-- Run to Fence Door;
@@ -210,6 +323,7 @@ return function(CutsceneSequence)
 					robertModule.Move.MoveToEnded:Wait(5);
 					robertModule.Move:Face(Vector3.new(287.8, 70.5, 4.8));
 					
+					robertModule.SetAnimation("CrouchLook", {script:WaitForChild("RobertCrouchLookAnim")});
 					robertModule.PlayAnimation("CrouchLook", 1);
 					local face = robertModule.Prefab:FindFirstChild("face", true);
 					if face then face.Texture = "rbxassetid://2222767231" end;

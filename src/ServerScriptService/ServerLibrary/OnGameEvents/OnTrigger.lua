@@ -27,14 +27,7 @@ return function(player, interactData, ...)
 	local inventory = activeSave.Inventory;
 	local triggerId = interactData.TriggerTag;
 	
-	if triggerId == "BloxmartUnlock" then
-		if modMission:Progress(player, 7) and modMission:Progress(player, 7).ProgressionPoint == 5 then
-			modMission:Progress(player, 7, function(mission)
-				if mission.ProgressionPoint == 5 then mission.ProgressionPoint = 6; end;
-			end)
-		end
-		
-	elseif triggerId == "StealAtmMoney" then
+	if triggerId == "StealAtmMoney" then
 		if modEvents:GetEvent(player, "bankAtm") == nil then
 			modEvents:NewEvent(player, {Id="bankAtm"}, true);
 			activeSave:AddStat("Money", 2000);

@@ -142,7 +142,7 @@ function Human.new(Npc)
 							end
 							
 							Npc.Move:Recompute();
-							Npc.Move:Follow(rootPart, fDist or 8, 4);
+							Npc.Move:Follow(rootPart, fDist or 5, 2);
 							
 						else
 							if distance >= 64 then

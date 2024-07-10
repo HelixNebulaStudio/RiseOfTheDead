@@ -342,7 +342,7 @@ MissionLibrary.New{
 	World="TheWarehouse";
 	Checkpoint={
 		{Text="Follow Robert to the armored door inside Bloxmart";};
-		{Text="Enter the boss door";};
+		{Text="Enter the boss door and ready up to fight";};
 		{Text="Defeat The Prisoner boss";};
 		{Text="Exit the boss arena";};
 		{Text="Press the green button to open the Bloxmart gate";};

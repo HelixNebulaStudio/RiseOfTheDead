@@ -13,15 +13,16 @@ local RunService = game:GetService("RunService");
 
 local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
 
-local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
-local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
+
+local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
+local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
-local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
+local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local remoteGameModeUpdate = modRemotesManager:Get("GameModeUpdate");
 local remoteGameModeHud = modRemotesManager:Get("GameModeHud");
@@ -105,20 +106,14 @@ function GameMode:Start(room)
 			if focusLevel > highestFocusLevel then
 				highestFocusLevel = focusLevel;
 			end
-			
-			modMission:Progress(player, 7, function(mission)
-				if mission.ProgressionPoint <= 4 then 
-
-				end;
-			end)
 		end
 	end
 	for _, player in pairs(players) do
-		modMission:Progress(player, 7, function(mission)
-			if mission.ProgressionPoint <= 4 and highestFocusLevel > 1 then 
-				highestFocusLevel = 1;
-			end;
-		end)
+		local mission = modMission:GetMission(player, 7);
+		if mission == nil or mission.ProgressionPoint <= 4 then
+			highestFocusLevel = 1;
+		end
+
 	end
 
 	local bossLevel = math.clamp(highestFocusLevel, 1, math.huge);
@@ -164,15 +159,6 @@ function GameMode:Start(room)
 			for _, player in pairs(players) do
 				npcPrefab:AddPersistentPlayer(player);
 
-				modMission:Progress(player, 7, function(mission)
-					if mission.ProgressionPoint == 3 then
-						local npcs = modNpc.GetPlayerNpcList(player);
-						for a=1, #npcs do
-							npcs[a].Target = npcPrefab;
-						end
-					end;
-				end)
-				
 				local classPlayer = modPlayers.Get(player);
 				if classPlayer and classPlayer.Humanoid then
 					npcModule.Garbage:Tag(classPlayer.Humanoid.Died:Connect(function()
@@ -186,6 +172,15 @@ function GameMode:Start(room)
 						end
 					end));
 				end
+				
+				local npcs = modNpc.GetPlayerNpcList(player);
+				if npcs then
+					for a=1, #npcs do
+						npcs[a].Target = npcPrefab;
+						break;
+					end
+				end
+
 			end
 			
 			if npcModule.FullHealOnSpawn ~= false then
@@ -209,10 +204,6 @@ function GameMode:Start(room)
 				players = room:GetInstancePlayers();
 				for _, player in pairs(players) do
 					shared.Notify(player, npcName, "BossDefeat");
-					
-					modMission:Progress(player, 7, function(mission)
-						if mission.ProgressionPoint < 4 then mission.ProgressionPoint = 4; end;
-					end)
 					
 					if npcName == "Zricera" then
 						modMission:Progress(player, 40, function(mission)
@@ -321,6 +312,12 @@ function GameMode:Start(room)
 		room.OnPlayersChanged:Fire();
 	end)
 	
+	task.spawn(function()
+		for _, player in pairs(players) do
+			modOnGameEvents:Fire("OnGameModeStart", player, "Boss", self.GameTable.Stage, room);
+		end
+	end);
+
 	if bossArena:FindFirstChild("BossArena") then
 		roomMeta.ArenaModule = require(bossArena.BossArena);
 	end

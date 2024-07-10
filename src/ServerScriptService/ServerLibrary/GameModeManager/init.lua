@@ -234,53 +234,51 @@ function GameModeManager:Initialize(gameType, gameStage)
 		
 		local function StartRoom(canStart)
 			if room.State >= enumRoomStates.InProgress then return end;
-			if canStart then
-				if room.State == enumRoomStates.Intermission then
-					for a=1, #room.Players do
-						task.spawn(function()
-							local player = room.Players[a] and room.Players[a].Instance;
-							if player then
-								local classPlayer = modPlayers.Get(player);
-								if classPlayer and classPlayer.RootPart then
-									classPlayer.RootPart.Anchored = false;
-								end
 
-								modMission:Progress(player, 7, function(mission)
-									if mission.ProgressionPoint < 3 then mission.ProgressionPoint = 3; end;
-								end)
+			if canStart ~= true then
+				room.StartTime = nil;
+				room:SetState(enumRoomStates.Idle);
+				gameTable:Sync();
+				return;
+			end
+			
+			if room.State == enumRoomStates.Intermission then
+				for a=1, #room.Players do
+					task.spawn(function()
+						local player = room.Players[a] and room.Players[a].Instance;
+						if player then
+							local classPlayer = modPlayers.Get(player);
+							if classPlayer and classPlayer.RootPart then
+								classPlayer.RootPart.Anchored = false;
+							end
+
+							if room.IsHard then
+								local hardItemId = gameTable.StageLib.HardModeItem;
 								
-								if room.IsHard then
-									local hardItemId = gameTable.StageLib.HardModeItem;
-									
-									if player and player.Character then
-										local toolModel = hardItemId and player.Character:FindFirstChild(hardItemId);
-										local storageItemID = toolModel and toolModel:GetAttribute("StorageItemId");
-										if storageItemID then
-											local profile = shared.modProfile:Get(player);
-											local inventory = profile.ActiveInventory;
-											local storageItem = inventory and inventory.Find and inventory:Find(storageItemID);
-											if storageItem then
-												local itemLib = modItemsLibrary:Find(hardItemId);
-												inventory:Remove(storageItemID, 1);
-												shared.Notify(player, ("$Item removed from your Inventory."):gsub("$Item", itemLib.Name), "Negative");
-											end
+								if player and player.Character then
+									local toolModel = hardItemId and player.Character:FindFirstChild(hardItemId);
+									local storageItemID = toolModel and toolModel:GetAttribute("StorageItemId");
+									if storageItemID then
+										local profile = shared.modProfile:Get(player);
+										local inventory = profile.ActiveInventory;
+										local storageItem = inventory and inventory.Find and inventory:Find(storageItemID);
+										if storageItem then
+											local itemLib = modItemsLibrary:Find(hardItemId);
+											inventory:Remove(storageItemID, 1);
+											shared.Notify(player, ("$Item removed from your Inventory."):gsub("$Item", itemLib.Name), "Negative");
 										end
 									end
 								end
-								
-								modAnalytics.RecordProgression(room.Players[a].Instance.UserId, "Start", gameType..":"..(room.IsHard and "Hard" or "")..gameStage);
 							end
-						end);
-					end
-					--==
-					
-					room:SetState(enumRoomStates.InProgress);
-					if gameTable.System.Start then gameTable.System:Start(room) end;
+							
+							modAnalytics.RecordProgression(room.Players[a].Instance.UserId, "Start", gameType..":"..(room.IsHard and "Hard" or "")..gameStage);
+						end
+					end);
 				end
+				--==
 				
-			else
-				room.StartTime = nil;
-				room:SetState(enumRoomStates.Idle);
+				room:SetState(enumRoomStates.InProgress);
+				if gameTable.System.Start then gameTable.System:Start(room) end;
 			end
 			gameTable:Sync();
 		end
@@ -754,7 +752,7 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 	local classPlayer = modPlayers.Get(player);
 	if classPlayer == nil then return end;
 	
-	local _oldMenuRoom = GameModeManager:GetPlayerMenuRoom(player);
+	local oldMenuRoom = GameModeManager:GetPlayerMenuRoom(player);
 	GameModeManager:RemovePlayerFromMenuRoom(player);
 	
 	local rootPart = classPlayer.RootPart;
@@ -762,24 +760,7 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 		local profile = shared.modProfile:Get(player);
 		
 		local exited = false;
-		if modMission:Progress(player, 7) then
-			modMission:Progress(player, 7, function(mission)
-				if mission.ProgressionPoint == 4 then
-					local doorInstance = workspace.Interactables:FindFirstChild("securityRoomEntrance");
-					if doorInstance then
-						local destination = CFrame.new(doorInstance.Destination.WorldPosition + Vector3.new(0, 2.3, 0)) 
-							* CFrame.Angles(0, math.rad(doorInstance.Destination.WorldOrientation.Y-90), 0)
-						
-						shared.modAntiCheatService:Teleport(player, destination);
-						rootPart.Anchored = false;
-						
-						mission.ProgressionPoint = 5;
-						exited = true;
-					end;
-				end;
-			end)
-			
-		elseif modMission:Progress(player, 40) then
+		if modMission:Progress(player, 40) then
 			modMission:Progress(player, 40, function(mission)
 				if mission.ProgressionPoint >= 2 and mission.ProgressionPoint <= 4 then
 					local destination = CFrame.new(352.464, -30.64, 1885.59)
@@ -796,13 +777,14 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 		if not exited then
 			if profile.BossDoorCFrame then
 				if exitTeleport ~= false then
-					
 					shared.modAntiCheatService:Teleport(player, profile.BossDoorCFrame);
 					rootPart.Anchored = false;
 					
 				end
 			end
 		end
+
+		modOnGameEvents:Fire("OnGameLobbyDisconnect", player, oldMenuRoom);
 	end
 	local character = player.Character;
 	if character then

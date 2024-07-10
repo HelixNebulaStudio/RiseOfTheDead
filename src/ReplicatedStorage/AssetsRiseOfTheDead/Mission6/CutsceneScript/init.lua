@@ -150,7 +150,8 @@ return function(CutsceneSequence)
 				
 			elseif mission.Type == 3 then -- OnComplete
 				if firstRun and not modMission:IsComplete(player, 7) then
-					robertModule.Actions:Teleport(CFrame.new(15.6800423, 57.6597404, 42.3099594, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+					robertModule.Move:Stop();
+					robertModule.Actions:Teleport(CFrame.new(15.6800423, 57.6597404, 42.3099594));
 					robertModule.Move:Face(Vector3.new(15.6800423, 57.6597404, 37.0099602));
 					robertModule.PlayAnimation("Sit", 0.75);
 

@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local TweenService = game:GetService("TweenService");
 local CollectionService = game:GetService("CollectionService");
+local RunService = game:GetService("RunService");
 
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 
@@ -141,12 +142,22 @@ function Move:Follow(target: Vector3 | BasePart, maxFollowDist: number, minFollo
 	return self.MoveId;
 end
 
-function Move:Stop()
+function Move:Stop(yield)
 	if self.Destroyed then return end;
 	if self.Npc.RootPart == nil or self.Npc.IsDead then return end;
 	if self.Npc.Humanoid.PlatformStand then return end;
 	
 	self.Npc:SendActorMessage("Stop");
+
+	if yield == nil then return end;
+	if typeof(yield) ~= "number" then
+		yield = 1;
+	end
+
+	local timeOutTick = tick()+yield;
+	while tick()<timeOutTick do
+		RunService.Stepped:Wait();
+	end
 end
 
 function Move:Pause(pauseTime)
