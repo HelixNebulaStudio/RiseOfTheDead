@@ -273,7 +273,7 @@ MissionLibrary.New{
 	Persistent=true;
 	World="TheWarehouse";
 	Checkpoint={
-		{Text="Walk towards the workbench";};
+		{Text="Use the workbench in the Warehouse";};
 		{Text="Check the requirements for to build a Pistol Damage Mod";};
 		{Text="Collect items to build Pistol Damage Mod";};
 		{Text="Build the Pistol Damage Mod";};

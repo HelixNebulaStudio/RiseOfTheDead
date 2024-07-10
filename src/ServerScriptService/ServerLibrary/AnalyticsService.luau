@@ -72,6 +72,15 @@ AnalyticsServiceWrapper.OnBoardingSteps = {
     Mission2_Complete = 12;
 
     Mission5_Start = 13;
+    Mission5_CheckBlueprintCost = 14;
+    Mission5_BuildDamageMod = 15;
+    Mission5_CollectDamageMod = 16;
+    Mission5_EquippedDamageMod = 17;
+    Mission5_Complete = 18;
+
+    Mission6_Start = 19;
+    Mission6_DestroyedBarricade = 20;
+    Mission6_Complete = 21;
 };
 
 function AnalyticsServiceWrapper:LogOnBoarding(param)

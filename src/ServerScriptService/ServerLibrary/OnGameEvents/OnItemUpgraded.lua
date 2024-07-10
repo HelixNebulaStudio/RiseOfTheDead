@@ -12,12 +12,6 @@ return function(player, item)
 	local inventory = activeSave.Inventory;
 	local modLib = modModsLibrary.Get(item.ItemId);
 	
-	if item.ItemId == "pistoldamagemod" then
-		if modMission:Progress(player, 5) then
-			modMission:CompleteMission(player, 5);
-		end
-	end
-	
 	if modLib.Module.Name == "Damage"  then
 		local maxLevel = 10;
 		for a=1, #modLib.Upgrades do

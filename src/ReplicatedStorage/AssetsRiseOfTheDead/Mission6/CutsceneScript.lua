@@ -13,9 +13,34 @@ if RunService:IsServer() then
 	modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 	modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+	modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+	modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 	storagePrefabs = game.ReplicatedStorage.Prefabs:WaitForChild("Objects");
 	
+	if modBranchConfigs.IsWorld("TheWarehouse") then
+		modOnGameEvents:ConnectEvent("OnDoorEnter", function(player, interactData)
+			local doorName = interactData.Name;
+			if doorName == nil then return end;
+			if not modMission:Progress(player, missionId) then return end;
+	
+			if doorName == "Warehouse Entrance Door" then
+				modMission:Progress(player, missionId, function(mission)
+					if mission.ProgressionPoint == 2 then 
+						modMission:CompleteMission(player, 6);
+						
+						modAnalyticsService:LogOnBoarding{
+							Player=player;
+							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission6_Complete;
+						};
+					end;
+				end)
+
+			end
+		end)
+
+	end
+
 else
 	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
@@ -92,6 +117,11 @@ return function(CutsceneSequence)
 							modMission:Progress(player, missionId, function(mission)
 								if mission.ProgressionPoint < 2 then
 									mission.ProgressionPoint = 2;
+									modAnalyticsService:LogOnBoarding{
+										Player=player;
+										OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission6_DestroyedBarricade;
+									};
+
 								end;
 							end)
 						end

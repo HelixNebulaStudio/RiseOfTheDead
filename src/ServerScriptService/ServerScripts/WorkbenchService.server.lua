@@ -21,14 +21,12 @@ local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
 
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
-local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modSkillTree = require(game.ServerScriptService.ServerLibrary.SkillTree);
 local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local remotes = game.ReplicatedStorage.Remotes;
-local remoteWorkbenchInteract = remotes.Workbench.WorkbenchInteract;
 local remotePurchaseUpgrade = remotes.Workbench.PurchaseUpgrade;
 local remoteModHandler = remotes.Workbench.ModHandler;
 local remoteSetAppearance = remotes.Workbench.SetAppearance;
@@ -1513,13 +1511,3 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 
 	return;
 end
-
-remoteWorkbenchInteract.OnServerEvent:Connect(function(player, visible)
-	if modMission:Progress(player, 5) then
-		modMission:Progress(player, 5, function(mission)
-			if mission.ProgressionPoint == 1 and visible then
-				mission.ProgressionPoint = 2;
-			end;
-		end)
-	end
-end)

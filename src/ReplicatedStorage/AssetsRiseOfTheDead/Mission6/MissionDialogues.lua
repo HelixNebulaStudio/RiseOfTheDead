@@ -28,12 +28,18 @@ if RunService:IsServer() then
 	-- !outline: Robert Handler
 	Dialogues.Robert.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+		local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 		if mission.Type == 2 then -- Available;
 			dialog:SetInitiate("Help!! I'm trapped!");
 			dialog:AddChoice("firstRescue_how", function(dialog)
 				dialog:AddChoice("firstRescue_standback", function(dialog)
 					modMission:StartMission(player, missionId);
+					modAnalyticsService:LogOnBoarding{
+						Player=player;
+						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission6_Start;
+					};
+					
 				end)
 			end);
 			
