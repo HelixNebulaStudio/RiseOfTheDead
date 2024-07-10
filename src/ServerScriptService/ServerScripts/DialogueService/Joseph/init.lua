@@ -5,12 +5,14 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
+local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 return function(player, dialog, data)
 	if modBranchConfigs.IsWorld("TheInvestigation") then return end;
 	dialog:AddChoice("heal_request", function()
 		if not dialog.InRange() then return end;
 		modStatusEffects.FullHeal(player, 0.1);
+		modOnGameEvents:Fire("OnMedicHeal", player, dialog.Name);
 	end)
 
 	if #modMission:GetNpcMissions(player, script.Name) > 0 then

@@ -55,7 +55,7 @@ modPlayers.SkillTree = Debugger:Require(game.ServerScriptService.ServerLibrary.S
 local modAnalytics = Debugger:Require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modCharacterAppearance = Debugger:Require(game.ServerScriptService.ServerLibrary.CharacterAppearance);
 local modEconomyAnalytics = Debugger:Require(game.ServerScriptService.ServerLibrary.EconomyAnalytics);
-
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local modOnGameEvents = Debugger:Require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modModerationSystem = Debugger:Require(game.ServerScriptService.ServerLibrary.ModerationSystem);
@@ -1194,6 +1194,10 @@ remoteEnterCampaign.OnServerEvent:Connect(function(player, followName)
 				end
 				
 			else
+				modAnalyticsService:LogOnBoarding{
+					Player=player;
+					OnBoardingStep=modAnalyticsService.OnBoardingSteps.ClickPlay;
+				};
 				saveData.Missions:Start(1);
 				
 				remoteSetLoadLabel:FireClient(player, "You hear the sound of thunder...");
