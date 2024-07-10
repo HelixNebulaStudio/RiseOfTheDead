@@ -2071,7 +2071,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				copyCache = activeCustomPlan:Serialize();
 
 			else
-				buttonsFrame.CopyButton.Text = "No changes to copy!";
+				buttonsFrame.CopyButton.Text = "Nothing to copy!";
 				copyCache = nil;
 			end
 
@@ -2084,6 +2084,13 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		buttonsFrame.PasteButton.MouseButton1Click:Connect(function()
 			if buttonsFrame.PasteButton.Text ~= "Paste" then return end;
 			Interface:PlayButtonClick();
+
+			if copyCache == nil then
+				buttonsFrame.PasteButton.Text = "Nothing to paste!";
+				task.wait(0.5);
+				buttonsFrame.PasteButton.Text = "Paste";
+				return;
+			end
 
 			local activeCustomPlan;
 			local activeKey;
