@@ -299,7 +299,7 @@ function CameraClass:Init()
 			isIndoors = modRaycastUtil.GetCeiling(camera.CFrame.Position, 256) ~= nil;
 		end
 		
-		local modCharacter = modData:GetModCharacter();
+		local modCharacter = localplayer.Character and modData:GetModCharacter() or nil;
 		if modCharacter and modCharacter.CharacterProperties and modCharacter.CharacterProperties.CamUnderwater then
 			isIndoors = true;
 		end
