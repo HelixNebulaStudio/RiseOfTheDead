@@ -37,7 +37,7 @@ if RunService:IsServer() then
 					end
 				elseif not modBranchConfigs.IsWorld("AwokenTheBear") then
 					if mission.ProgressionPoint > 3 and mission.ProgressionPoint < 13 then
-						modMission:Progress(player, 33, function(mission)
+						modMission:Progress(player, missionId, function(mission)
 							mission.ProgressionPoint = 3;
 						end)
 
@@ -49,7 +49,7 @@ if RunService:IsServer() then
 
 				else
 					if mission.ProgressionPoint <= 3 then
-						modMission:Progress(player, 33, function(mission)
+						modMission:Progress(player, missionId, function(mission)
 							if mission.ProgressionPoint <= 3 then
 								mission.ProgressionPoint = 4;
 							end;
@@ -64,7 +64,6 @@ if RunService:IsServer() then
 		end
 		
 		mission.Changed:Connect(OnChanged);
-		OnChanged(true, mission);
 	end
 end
 

@@ -31,12 +31,19 @@ if RunService:IsServer() then
 	Dialogues.Mason.DialogueHandler = function(player, dialog, data, mission)
 		local modBlueprints = require(game.ServerScriptService.ServerLibrary.Blueprints);
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+		local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 		if mission.Type == 2 then -- Available;
 			dialog:AddChoice("timeToUpgrade_request", function(dialog)
 				modMission:StartMission(player, missionId, function(successful)
 					if successful then
 						modBlueprints.UnlockBlueprint(player, "pistoldamagebp");
+						
+						modAnalyticsService:LogOnBoarding{
+							Player=player;
+							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_Start;
+						};
+
 					end
 				end);
 			end);

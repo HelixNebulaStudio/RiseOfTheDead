@@ -8,6 +8,7 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local missionId = 58;
+
 if RunService:IsServer() then
 	local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 	local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
@@ -47,13 +48,13 @@ if RunService:IsServer() then
 					else
 						if mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 6 then
 							if firstRun then
-								modMission:Progress(player, 58, function(mission)
+								modMission:Progress(player, missionId, function(mission)
 									mission.ProgressionPoint = 3;
 								end)
 							end
 
 						elseif mission.ProgressionPoint >= 9 and mission.ProgressionPoint <= 16 then
-							modMission:Progress(player, 58, function(mission)
+							modMission:Progress(player, missionId, function(mission)
 								mission.ProgressionPoint = 8;
 							end)
 

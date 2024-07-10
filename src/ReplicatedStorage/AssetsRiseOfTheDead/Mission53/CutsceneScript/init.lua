@@ -19,7 +19,7 @@ if RunService:IsServer() then
 	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 
@@ -53,7 +53,7 @@ return function(CutsceneSequence)
 				
 			elseif mission.Type == 1 then -- OnActive
 				if firstRun and mission.ProgressionPoint ~= 1 and mission.ProgressionPoint <= 3 then
-					modMission:Progress(player, 53, function(mission)
+					modMission:Progress(player, missionId, function(mission)
 						mission.ProgressionPoint = 1;
 					end)
 					return;
@@ -198,7 +198,7 @@ return function(CutsceneSequence)
 					walterModule.Chat(walterModule.Owner, "You there, come here..");
 					walterModule.AvatarFace:Set("Confident");
 
-					modMission:Progress(player, 53, function(mission)
+					modMission:Progress(player, missionId, function(mission)
 						mission.ProgressionPoint = 3;
 					end)
 
@@ -265,7 +265,7 @@ return function(CutsceneSequence)
 			end
 		end
 		mission.Changed:Connect(OnChanged);
-		OnChanged(true, mission);
+		OnChanged(true);
 	end)
 	
 	return CutsceneSequence;

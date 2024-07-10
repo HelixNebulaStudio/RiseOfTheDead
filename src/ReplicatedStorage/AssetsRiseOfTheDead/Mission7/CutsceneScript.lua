@@ -134,7 +134,7 @@ return function(CutsceneSequence)
 					robertModule.Chat(player, "Lets go in and put it out of it's misery!");
 					classPlayer.EnemyDetectionRange = nil;
 
-					modMission:Progress(player, 7, function(mission)
+					modMission:Progress(player, missionId, function(mission)
 						if mission.ProgressionPoint < 2 then mission.ProgressionPoint = 2; end;
 					end)
 

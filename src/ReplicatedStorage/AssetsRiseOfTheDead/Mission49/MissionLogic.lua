@@ -7,6 +7,8 @@ local modMarkers = require(game.ReplicatedStorage.Library.Markers);
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modGuiHighlight = require(game.ReplicatedStorage.Library.UI.GuiHighlight);
 
+local missionId = 49;
+
 if RunService:IsServer() then
 	local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 
@@ -16,7 +18,7 @@ if RunService:IsServer() then
 
 		if mission.Type == 1 then -- OnActive
 			if mission.ProgressionPoint == 4 and profile.Collectibles.vrm == true then
-				modMission:Progress(player, 49, function(mission)
+				modMission:Progress(player, missionId, function(mission)
 					mission.ProgressionPoint = 5;
 				end)
 			end

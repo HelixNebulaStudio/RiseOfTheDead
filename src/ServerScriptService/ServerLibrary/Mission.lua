@@ -83,7 +83,7 @@ function Mission:IsAvailable(player, missionId)
 	return mission and mission.Type == Mission.MissionType.Available or false;
 end
 
-function Mission:Progress(player, missionId, func: ((mission: {[any]:any})->boolean)?)
+function Mission:Progress(player: Player, missionId: number, func: ((mission: {[any]:any})->boolean)?)
 	if player == nil then return end;
 	local missionProfile = self.GetMissions(player.Name);
 	local mission = missionProfile and missionProfile:Get(missionId) or nil;

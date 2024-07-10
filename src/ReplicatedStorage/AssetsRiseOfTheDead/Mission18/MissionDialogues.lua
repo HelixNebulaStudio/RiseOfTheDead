@@ -93,7 +93,7 @@ if RunService:IsServer() then
 			if mission.ProgressionPoint == 1 then
 				dialog:SetInitiate("Yo, $PlayerName.");
 				dialog:AddChoice("aNewCommunity_joinMe", function(dialog)
-					modMission:Progress(player, 18, function(mission)
+					modMission:Progress(player, missionId, function(mission)
 						if mission.ProgressionPoint < 2 then
 							mission.ProgressionPoint = 2;
 						end;
@@ -102,7 +102,7 @@ if RunService:IsServer() then
 			elseif mission.ProgressionPoint == 8 then
 				dialog:SetInitiate("$PlayerName, I think I should head back to Sunday's to warn the others..");
 				dialog:AddChoice("aNewCommunity_warn", function(dialog)
-					modMission:Progress(player, 18, function(mission)
+					modMission:Progress(player, missionId, function(mission)
 						if mission.ProgressionPoint < 9 then
 							mission.ProgressionPoint = 9;
 						end;

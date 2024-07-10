@@ -70,6 +70,8 @@ AnalyticsServiceWrapper.OnBoardingSteps = {
     Mission2_PurchaseAmmo = 10;
     Mission2_KillTenZombies = 11;
     Mission2_Complete = 12;
+
+    Mission5_Start = 13;
 };
 
 function AnalyticsServiceWrapper:LogOnBoarding(param)

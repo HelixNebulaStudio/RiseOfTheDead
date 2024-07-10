@@ -89,7 +89,7 @@ return function(CutsceneSequence)
 						destructible:SetEnabled(true);
 						destructible.OnDestroy = function()
 							game.Debris:AddItem(barricade, 20);
-							modMission:Progress(player, 6, function(mission)
+							modMission:Progress(player, missionId, function(mission)
 								if mission.ProgressionPoint < 2 then
 									mission.ProgressionPoint = 2;
 								end;
@@ -127,7 +127,7 @@ return function(CutsceneSequence)
 			end
 		end
 		mission.Changed:Connect(OnChanged);
-		OnChanged(true, mission);
+		OnChanged(true);
 	end)
 	
 	return CutsceneSequence;

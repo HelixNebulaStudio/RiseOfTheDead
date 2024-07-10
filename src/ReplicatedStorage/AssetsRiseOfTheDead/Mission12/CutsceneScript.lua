@@ -262,7 +262,7 @@ return function(CutsceneSequence)
 						
 					elseif mission.ProgressionPoint >= 5 then
 						masonModule.StopCarLoop();
-						modMission:Progress(player, 12, function(mission)
+						modMission:Progress(player, missionId, function(mission)
 							if mission.ProgressionPoint < 6 then
 								mission.ProgressionPoint = 6;
 							end;
@@ -286,7 +286,7 @@ return function(CutsceneSequence)
 				end
 			end
 			mission.Changed:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
 		end)
 		
 		

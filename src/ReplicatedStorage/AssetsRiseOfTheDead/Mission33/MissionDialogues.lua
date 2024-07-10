@@ -122,7 +122,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("awokeTheBear_zarkInit", function(dialog)
 					dialog:AddChoice("awokeTheBear_robert", function(dialog)
 						dialog:AddChoice("awokeTheBear_accuse", function(dialog)
-							modMission:Progress(player, 33, function(mission)
+							modMission:Progress(player, missionId, function(mission)
 								if mission.ProgressionPoint <= 7 then
 									mission.ProgressionPoint = 8;
 								end;
@@ -134,7 +134,7 @@ if RunService:IsServer() then
 			elseif mission.ProgressionPoint == 8 then
 				dialog:SetInitiate("Well.. What is it?", "Angry");
 				dialog:AddChoice("awokeTheBear_where", function(dialog)
-					modMission:Progress(player, 33, function(mission)
+					modMission:Progress(player, missionId, function(mission)
 						if mission.ProgressionPoint <= 8 then
 							mission.ProgressionPoint = 9;
 						end;
@@ -144,7 +144,7 @@ if RunService:IsServer() then
 			elseif mission.ProgressionPoint == 9 then
 				dialog:SetInitiate("...", "Angry");
 				dialog:AddChoice("awokeTheBear_bandits", function(dialog)
-					modMission:Progress(player, 33, function(mission)
+					modMission:Progress(player, missionId, function(mission)
 						if mission.ProgressionPoint <= 9 then
 							mission.ProgressionPoint = 10;
 						end;
@@ -154,7 +154,7 @@ if RunService:IsServer() then
 			elseif mission.ProgressionPoint == 10 then
 				dialog:SetInitiate("...", "Angry");
 				dialog:AddChoice("awokeTheBear_stop", function(dialog)
-					modMission:Progress(player, 33, function(mission)
+					modMission:Progress(player, missionId, function(mission)
 						if mission.ProgressionPoint <= 10 then
 							mission.ProgressionPoint = 11;
 						end;
@@ -167,7 +167,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("awokeTheBear_player", function(dialog)
 						dialog:AddChoice("awokeTheBear_sewers", function(dialog)
 							dialog:AddChoice("awokeTheBear_banditZombie", function(dialog)
-								modMission:Progress(player, 33, function(mission)
+								modMission:Progress(player, missionId, function(mission)
 									if mission.ProgressionPoint <= 11 then
 										mission.ProgressionPoint = 12;
 									end;
@@ -191,7 +191,7 @@ if RunService:IsServer() then
 			if mission.ProgressionPoint == 2 then
 				dialog:SetInitiate("Here, took me a while to sneak this key out. This is the key to the secret room below to enter the camp.", "Confident");
 				dialog:AddChoice("awokenTheBear_giveKey", function(dialog)
-					modMission:Progress(player, 33, function(mission)
+					modMission:Progress(player, missionId, function(mission)
 						if mission.ProgressionPoint <= 2 then
 							mission.ProgressionPoint = 3;
 						end;
@@ -200,7 +200,7 @@ if RunService:IsServer() then
 
 			elseif mission.ProgressionPoint == 13 then
 				dialog:SetInitiate("Hey, it's me, Patrick. We need to get out of here.\nI am so sorry about Stan, I didn't think Zark wanted him dead for trying to meet him.", "Confident");
-				modMission:Progress(player, 33, function(mission)
+				modMission:Progress(player, missionId, function(mission)
 					if mission.ProgressionPoint <= 13 then
 						mission.ProgressionPoint = 14;
 					end;
