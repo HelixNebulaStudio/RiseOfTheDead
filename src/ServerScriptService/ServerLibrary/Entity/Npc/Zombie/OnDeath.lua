@@ -58,6 +58,13 @@ function Zombie.new(self)
 
 				local moneyReward = math.random(config.MoneyReward.Min, config.MoneyReward.Max) + (config.Level-1);
 				playerSave:AddStat("Money", moneyReward);
+				modAnalyticsService:Source{
+					Player=player;
+					Currency=modAnalyticsService.Currency.Money;
+					Amount=moneyReward;
+					EndBalance=playerSave:GetStat("Money");
+					ItemSKU=`Kill:{self.Name}`;
+				};
 
 				if playerSave.Statistics then
 					local killKey = "L"..config.Level.."-"..self.Name.."Kills";

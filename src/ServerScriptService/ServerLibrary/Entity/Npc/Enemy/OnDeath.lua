@@ -52,6 +52,13 @@ function Enemy.new(self)
 				
 				local moneyReward = random:NextInteger(self.Configuration.MoneyReward.Min, self.Configuration.MoneyReward.Max) + 2*(self.Configuration.Level-1);
 				playerSave:AddStat("Money", moneyReward);
+				modAnalyticsService:Source{
+					Player=player;
+					Currency=modAnalyticsService.Currency.Money;
+					Amount=moneyReward;
+					EndBalance=playerSave:GetStat("Money");
+					ItemSKU=`Kill:{self.Name}`;
+				};
 				
 				if playerSave.Statistics then
 					local killKey = "L"..self.Configuration.Level.."-"..self.Name.."Kills";

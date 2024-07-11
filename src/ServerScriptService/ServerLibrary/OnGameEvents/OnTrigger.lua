@@ -19,18 +19,19 @@ local modCrates = require(game.ServerScriptService.ServerLibrary.Crates);
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 --== When user activates a game trigger;
 return function(player, interactData, ...)
 	local profile = modProfile:Get(player);
-	local activeSave = profile:GetActiveSave();
-	local inventory = activeSave.Inventory;
+	local playerSave = profile:GetActiveSave();
+	local inventory = playerSave.Inventory;
 	local triggerId = interactData.TriggerTag;
 	
 	if triggerId == "StealAtmMoney" then
 		if modEvents:GetEvent(player, "bankAtm") == nil then
 			modEvents:NewEvent(player, {Id="bankAtm"}, true);
-			activeSave:AddStat("Money", 2000);
+			playerSave:AddStat("Money", 2000);
 			shared.Notify(player, "You found $2000 in the ATM machine.", "Reward");
 		else
 			modEvents:SyncEvent(player, "bankAtm");
@@ -41,7 +42,7 @@ return function(player, interactData, ...)
 		local lastVending = event and event.Time;
 		
 		if lastVending == nil or modSyncTime.GetTime() >= lastVending then
-			local playerMoney = activeSave:GetStat("Money");
+			local playerMoney = playerSave:GetStat("Money");
 			if playerMoney >= 500 then
 				local rewardsLib = modRewardsLibrary:Find("t1Vending");
 				local reward = modDropRateCalculator.RollDrop(rewardsLib, player);
@@ -49,8 +50,17 @@ return function(player, interactData, ...)
 				local hasSpace = inventory:SpaceCheck{{ItemId=itemId; Data={Quantity=1;}}};
 				
 				modEvents:NewEvent(player, {Id="VendingMachine1"; Time=modSyncTime.GetTime()+60;}, true);
-				activeSave:AddStat("Money", -500);
+				playerSave:AddStat("Money", -500);
 				modAnalytics.RecordResource(player.UserId, 500, "Sink", "Money", "Gameplay", "VendingMachine");
+				
+				modAnalyticsService:Sink{
+					Player=player;
+					Currency=modAnalyticsService.Currency.Money;
+					Amount=500;
+					EndBalance=playerSave:GetStat("Money");
+					ItemSKU=`t1Vending`;
+				};
+
 				modAudio.Play("VendingMachine", interactData.Object);
 				
 				if hasSpace then
@@ -548,7 +558,6 @@ return function(player, interactData, ...)
 			shared.Notify(game.Players:GetPlayers(), "A Winter Treelum has been awokened.", "Important");
 			
 			game.Debris:AddItem(interactData.Object.Parent, 0);
-			
 		else
 			shared.Notify(player, "Winter Treelum can not be summoned at the moment.", "Negative");
 			
