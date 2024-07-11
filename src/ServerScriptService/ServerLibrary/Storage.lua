@@ -20,6 +20,7 @@ local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 local modProfile = shared.modProfile;
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modStorageHandler = require(game.ServerScriptService.ServerLibrary.StorageHandler);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remoteStorageService = modRemotesManager:Get("StorageService");
@@ -647,6 +648,15 @@ function remoteRenameItem.OnServerInvoke(player, action, id, customName)
 
 					traderProfile:AddGold(-50);
 					modAnalytics.RecordResource(player.UserId, 50, "Sink", "Gold", "Usage", "Rename Item");
+
+					modAnalyticsService:Sink{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Gold;
+						Amount=50;
+						EndBalance=traderProfile.Gold;
+						ItemSKU=`RenameItem`;
+					};
+
 					storageItem:Sync();
 					
 					return 1;
@@ -2474,6 +2484,14 @@ function remoteStorageService.OnServerInvoke(player, packet)
 				
 				profile:AddPlayPoints(cost/100, "Sink:Gold");
 				modAnalytics.RecordResource(player.UserId, cost, "Sink", "Gold", "Purchase", "RatStorage");
+
+				modAnalyticsService:Sink{
+					Player=player;
+					Currency=modAnalyticsService.Currency.Gold;
+					Amount=cost;
+					EndBalance=traderProfile.Gold;
+					ItemSKU=`RatStorageRent`;
+				};
 				
 				storage.RentalUnlockTime = modSyncTime.GetTime() + daySecs;
 				

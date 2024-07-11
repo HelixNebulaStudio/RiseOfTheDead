@@ -19,6 +19,7 @@ local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local remoteSafehomeRequest = modRemotesManager:Get("SafehomeRequest");
 
@@ -297,6 +298,14 @@ function remoteSafehomeRequest.OnServerInvoke(player, actionId, packet)
 			traderProfile:AddGold(-price);
 			modAnalytics.RecordResource(player.UserId, price, "Sink", "Gold", "Purchase", "Safehome_"..safehomeId);
 			
+            modAnalyticsService:Sink{
+                Player=player;
+                Currency=modAnalyticsService.Currency.Gold;
+                Amount=price;
+                EndBalance=traderProfile.Gold;
+                ItemSKU=`Unlock:{safehomeId}`;
+            };
+
 			return {ReplyCode=1; Data=safehomeData;};
 			
 		else

@@ -536,6 +536,13 @@ function remoteGoldDonate.OnServerInvoke(player, id)
 		
 		traderProfile:AddGold(-donateAmount);
 		modAnalytics.RecordResource(player.UserId, donateAmount, "Sink", "Gold", "Usage", "donate");
+		modAnalyticsService:Sink{
+			Player=player;
+			Currency=modAnalyticsService.Currency.Gold;
+			Amount=donateAmount;
+			EndBalance=traderProfile.Gold;
+			ItemSKU=`Donation`;
+		};
 
 		profile.DailyStats.GoldDonor = (profile.DailyStats.GoldDonor or 0) + donateAmount;
 		profile.WeeklyStats.GoldDonor = (profile.WeeklyStats.GoldDonor or 0) + donateAmount;

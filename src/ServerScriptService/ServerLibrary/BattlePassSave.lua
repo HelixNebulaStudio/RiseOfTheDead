@@ -16,6 +16,7 @@ local modDatabaseService = require(game.ServerScriptService.ServerLibrary.Databa
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
 
@@ -466,6 +467,15 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		traderProfile:AddGold(-price);
 		profile:AddPlayPoints(price/10, "Sink:Gold");
 		modAnalytics.RecordResource(player.UserId, price, "Sink", "Gold", "Purchase", activeId);
+
+		modAnalyticsService:Sink{
+			Player=player;
+			Currency=modAnalyticsService.Currency.Gold;
+			Amount=price;
+			EndBalance=traderProfile.Gold;
+			ItemSKU=`UnlockBp:{activeId}`;
+		};
+
 		returnPacket.Success = true;
 		
 		task.spawn(function()
@@ -534,6 +544,15 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 			traderProfile:AddGold(rewardQuantity);
 			profile:AddPlayPoints(rewardQuantity/100, "Source:Reward");
 			modAnalytics.RecordResource(player.UserId, rewardQuantity, "Source", "Gold", "Gameplay", activeId);
+
+			modAnalyticsService:Source{
+				Player=player;
+				Currency=modAnalyticsService.Currency.Gold;
+				Amount=rewardQuantity;
+				EndBalance=traderProfile.Gold;
+				ItemSKU=`BpGoldDrop:{activeId}`;
+			};
+
 			shared.Notify(player, "You recieved "..rewardQuantity.." Gold!", "Reward");
 			table.insert(actionLogsFlag.Logs, {
 				Action="claim";
@@ -595,6 +614,15 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		traderProfile:AddGold(-price);
 		profile:AddPlayPoints(price/10, "Sink:Gold");
 		modAnalytics.RecordResource(player.UserId, price, "Sink", "Gold", "Purchase", activeId.."Lvls");
+		
+		modAnalyticsService:Sink{
+			Player=player;
+			Currency=modAnalyticsService.Currency.Gold;
+			Amount=price;
+			EndBalance=traderProfile.Gold;
+			ItemSKU=`BpLevels:{activeId}`;
+		};
+
 		returnPacket.Success = true;
 
 		task.spawn(function()
@@ -655,6 +683,15 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 			traderProfile:AddGold(rewardQuantity);
 			profile:AddPlayPoints(rewardQuantity/100, "Source:Reward");
 			modAnalytics.RecordResource(player.UserId, rewardQuantity, "Source", "Gold", "Gameplay", activeId);
+			
+			modAnalyticsService:Source{
+				Player=player;
+				Currency=modAnalyticsService.Currency.Gold;
+				Amount=rewardQuantity;
+				EndBalance=traderProfile.Gold;
+				ItemSKU=`BpDropTable:{activeId}`;
+			};
+
 			shared.Notify(player, "You recieved "..rewardQuantity.." Gold!", "Reward");
 			table.insert(actionLogsFlag.Logs, {
 				Action="claim";

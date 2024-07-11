@@ -532,7 +532,7 @@ function remoteGoldShopPurchase.OnServerInvoke(player, key)
 						Currency=modAnalyticsService.Currency.Gold;
 						Amount=price;
 						EndBalance=traderProfile.Gold;
-						ItemSKU=`BuyItem:{itemId}`;
+						ItemSKU=`Purchase:{itemId}`;
 					};
 
 					if profile.Purchases[itemId] == nil then

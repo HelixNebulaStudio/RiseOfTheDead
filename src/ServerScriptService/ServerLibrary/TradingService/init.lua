@@ -9,18 +9,18 @@ local DataStoreService = game:GetService("DataStoreService");
 local traderNetStore = DataStoreService:GetOrderedDataStore("WanderingTrader");
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-local modGameSave = require(game.ServerScriptService.ServerLibrary.GameSave); modGameSave.TradingService = TradingService;
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
-local modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
-local modGoldShopLibrary = require(game.ReplicatedStorage.Library.GoldShopLibrary);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
-local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modLeaderboardService = require(game.ReplicatedStorage.Library.LeaderboardService);
+
+local modGameSave = require(game.ServerScriptService.ServerLibrary.GameSave); modGameSave.TradingService = TradingService;
+local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
+local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
+local modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local modTradingMarket = require(script.TradingMarket);
 
@@ -541,6 +541,14 @@ function TradeSessionObject:CheckConfirm()
 
 								task.spawn(function()
 									modAnalytics.RecordResource(playerObj.Player.UserId, playerObj.GoldTax, "Sink", "Gold", "Trade", "Tax");
+
+									modAnalyticsService:Sink{
+										Player=playerObj.Player;
+										Currency=modAnalyticsService.Currency.Gold;
+										Amount=playerObj.GoldTax;
+										EndBalance=traderProfile.Gold;
+										ItemSKU=`TradeTax`;
+									};
 								end)
 							end
 							

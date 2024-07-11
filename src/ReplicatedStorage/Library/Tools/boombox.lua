@@ -14,7 +14,8 @@ if RunService:IsServer() then
 	modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 	modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 	modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
-	
+	modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+
 	function onBoomboxRemote(player, action, storageItemId, trackId)
 		local profile = modProfile:Get(player);
 		local playerSave = profile and profile:GetActiveSave();
@@ -46,6 +47,15 @@ if RunService:IsServer() then
 						inventory:SetValues(storageItemId, {Songs=playList});
 						traderProfile:AddGold(-200);
 						modAnalytics.RecordResource(player.UserId, 200, "Sink", "Gold", "Usage", "boombox");
+						
+						modAnalyticsService:Sink{
+							Player=player;
+							Currency=modAnalyticsService.Currency.Gold;
+							Amount=200;
+							EndBalance=traderProfile.Gold;
+							ItemSKU=`Usage:boombox`;
+						};
+
 						return 1;
 					else
 						return 5;

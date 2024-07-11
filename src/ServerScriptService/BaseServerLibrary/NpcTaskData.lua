@@ -13,6 +13,7 @@ local modColorPicker = require(game.ReplicatedStorage.Library.UI.ColorPicker);
 
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local remoteNpcData = modRemotesManager:Get("NpcData");
 
@@ -439,6 +440,14 @@ function remoteNpcData.OnServerInvoke(player: Player, action: string, npcName: s
             playerSave:AddStat("Perks", -perkCost);
             modAnalytics.RecordResource(player.UserId, perkCost, "Sink", "Perks", "Gameplay", "SkipTask");
 
+            modAnalyticsService:Sink{
+                Player=player;
+                Currency=modAnalyticsService.Currency.Perks;
+                Amount=perkCost;
+                EndBalance=playerSave:GetStat("Perks");
+                ItemSKU=`SkipTask:{taskLib.Id}`;
+            };
+
         elseif currency == "Gold" then
             local goldCost = taskLib.SkipCost.Gold;
             if traderProfile.Gold < goldCost then
@@ -448,6 +457,14 @@ function remoteNpcData.OnServerInvoke(player: Player, action: string, npcName: s
 
 			traderProfile:AddGold(-goldCost);
 			modAnalytics.RecordResource(player.UserId, goldCost, "Sink", "Gold", "Gameplay", "SkipTask");
+
+            modAnalyticsService:Sink{
+                Player=player;
+                Currency=modAnalyticsService.Currency.Gold;
+                Amount=goldCost;
+                EndBalance=traderProfile.Gold;
+                ItemSKU=`SkipTask:{taskLib.Id}`;
+            };
 
         end
 

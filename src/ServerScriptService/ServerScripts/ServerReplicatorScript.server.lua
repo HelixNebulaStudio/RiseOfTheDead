@@ -48,6 +48,7 @@ local modPrefabManager = require(game.ServerScriptService.ServerLibrary.PrefabMa
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modRedeemService = require(game.ServerScriptService.ServerLibrary.RedeemService);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local dirRemotes = game.ReplicatedStorage.Remotes;
 local bindIsInDuel = dirRemotes.IsInDuel;
@@ -950,6 +951,15 @@ function remoteDisguiseKitRemote.OnServerInvoke(player, id, action, disguiseId)
 						storage:SetValues(id, {Disguises=disguises});
 						traderProfile:AddGold(-disguiseLib.Price);
 						modAnalytics.RecordResource(player.UserId, disguiseLib.Price, "Sink", "Gold", "Usage", "disguisekit");
+
+						modAnalyticsService:Sink{
+							Player=player;
+							Currency=modAnalyticsService.Currency.Gold;
+							Amount=disguiseLib.Price;
+							EndBalance=traderProfile.Gold;
+							ItemSKU=`Unlock:disguisekit`;
+						};
+
 						return 1;
 					else
 						return 2;
@@ -1051,7 +1061,16 @@ function remoteGpsRemote.OnServerInvoke(player, id, action, gpsId)
 				storage:SetValues(id, {Gps=unlock});
 				traderProfile:AddGold(-100);
 				shared.Notify(player, "Unlocked "..gpsLib.Name.." on GPS.", "Reward");
+
 				modAnalytics.RecordResource(player.UserId, 100, "Sink", "Gold", "Usage", "gps");
+				modAnalyticsService:Sink{
+					Player=player;
+					Currency=modAnalyticsService.Currency.Gold;
+					Amount=100;
+					EndBalance=traderProfile.Gold;
+					ItemSKU=`Unlock:gps`;
+				};
+
 				mission49Check();
 				return 1;
 				

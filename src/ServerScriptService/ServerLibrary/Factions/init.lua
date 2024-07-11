@@ -24,6 +24,7 @@ local modDatabaseService = require(game.ServerScriptService.ServerLibrary.Databa
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local FactionGroup = require(script:WaitForChild("FactionGroup"));
 local FactionUser = require(script:WaitForChild("FactionUser"));
@@ -1762,6 +1763,15 @@ function Factions.InvokeHandler(player, action, ...)
 					traderProfile:AddGold(-factionCreateCost);
 					shared.Notify(player, "You have successfully created a faction.", "Reward");
 					modAnalytics.RecordResource(player.UserId, factionCreateCost, "Sink", "Gold", "Purchase", "Faction");
+					
+					modAnalyticsService:Sink{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Gold;
+						Amount=factionCreateCost;
+						EndBalance=traderProfile.Gold;
+						ItemSKU=`NewFaction`;
+					};
+
 					activeSave:AwardAchievement("faction");
 
 					local factionsMadeFlag = profile.Flags:Get("FactionsCreated", {Id="FactionsCreated", Value=0});

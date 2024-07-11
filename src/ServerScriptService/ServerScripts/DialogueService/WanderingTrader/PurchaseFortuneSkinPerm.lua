@@ -7,6 +7,8 @@ local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 
 return function(player, dialog, data)
+	local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+
 	local profile = shared.modProfile:Get(player);
 	local playerSave = profile:GetActiveSave();
 	local traderProfile = profile and profile.Trader;
@@ -36,6 +38,14 @@ return function(player, dialog, data)
 						traderProfile:AddGold(-fortuneSkinCost);
 
 						modSkinPerm:AddSkinPermanent(storageItem, fortuneSkinId);
+
+						modAnalyticsService:Sink{
+							Player=player;
+							Currency=modAnalyticsService.Currency.Gold;
+							Amount=fortuneSkinCost;
+							EndBalance=traderProfile.Gold;
+							ItemSKU=`Purchase:fortunepatternperm`;
+						};
 
 						task.spawn(function()
 							modAnalytics.RecordResource(player.UserId, fortuneSkinCost, "Sink", "Gold", "Purchase", "fortunepatternperm");
