@@ -62,6 +62,9 @@ function ItemViewport.new() : ItemViewport
 		HightlightSelect=false;
 		CloseVisible=true;
 		SelectedHighlightParts={};
+
+		HighlightPort=nil;
+		HighlightPartClone=nil;
 		
 		OnSelectionChanged = modEventSignal.new("OnSelectionChanged");
 		Garbage = modGarbageHandler.new();
@@ -158,6 +161,7 @@ function ItemViewport:Destroy()
 	self:Clear();
 	self.OnSelectionChanged:Destroy();
 	self.Garbage:Destruct();
+	game.Debris:AddItem(self.HighlightPort, 0);
 	game.Debris:AddItem(self.Frame, 0);
 end
 
@@ -210,11 +214,38 @@ function ItemViewport:RefreshDisplay()
 	-- raycastParam.FilterDescendantsInstances = self.DisplayModels;
 
 	local rayScanTick = tick();
-	RunService:BindToRenderStep("ItemViewport"..self.Index, Enum.RenderPriority.Camera.Value-1, function()
-		if not self.Frame.Visible then return end;
+	RunService:BindToRenderStep("ItemViewport"..self.Index, Enum.RenderPriority.Camera.Value-1, function(delta)
+		if not self.Frame.Visible then 
+			if self.HighlightPort then
+				self.HighlightPort:Destroy();
+				self.HighlightPort = nil;
+			end
+			if self.HighlightPartClone then
+				self.HighlightPartClone:Destroy();
+				self.HighlightPartClone = nil;
+			end
+			return
+		end;
 		local playerMouse = UserInputService:GetMouseLocation();
 
 		if self.HightlightSelect then
+			if self.HighlightPort == nil then
+				self.HighlightPort = self.Frame:Clone();
+				self.HighlightPort.Name = "HighlighPort";
+				self.HighlightPort.ImageColor3 = Color3.fromRGB(255, 255, 255);
+
+			else
+				self.HighlightPort.Parent = self.Frame.Parent;
+				self.HighlightPort.Visible = self.Frame.Visible;
+				self.HighlightPort.Position = self.Frame.Position;
+				self.HighlightPort.Size = self.Frame.Size;
+				self.HighlightPort.AnchorPoint = self.Frame.AnchorPoint;
+				self.HighlightPort.CurrentCamera = self.Frame.CurrentCamera;
+
+				self.HighlightPort.ImageTransparency = 0.6 + 0.3 * math.sin(tick()*1.5);
+
+			end
+
 			if tick()-rayScanTick > 0.1 then
 				rayScanTick = tick();
 				local rayResult = nil;
@@ -233,8 +264,30 @@ function ItemViewport:RefreshDisplay()
 
 		if self.CurrentHighlightPart then
 			self.Frame.highlightedLabel.Text = self.CurrentHighlightPart:GetAttribute("PartLabel") or self.CurrentHighlightPart.Name;
+
+			if self.HighlightPort then
+				if self.HighlightPartClone == nil or self.HighlightPartClone.Name ~= self.CurrentHighlightPart.Name then
+					if self.HighlightPartClone then
+						self.HighlightPartClone:Destroy();
+					end
+
+					self.HighlightPartClone = self.CurrentHighlightPart:Clone();
+					self.HighlightPartClone.Material = Enum.Material.Neon;
+					self.HighlightPartClone.Color = Color3.fromRGB(255, 255, 255);
+					self.HighlightPartClone.Parent = self.HighlightPort;
+				end
+
+				self.HighlightPartClone.CFrame = self.CurrentHighlightPart.CFrame;
+				self.HighlightPartClone.Size = self.CurrentHighlightPart.Size;
+			end
+
 		else
 			self.Frame.highlightedLabel.Text = "";
+			if self.HighlightPort then
+				self.HighlightPort:ClearAllChildren();
+				self.HighlightPartClone = nil;
+			end
+
 		end
 
 		if self.OrbitTick == nil then

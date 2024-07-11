@@ -697,6 +697,12 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		Click Customization Layers to see edit breakdown based on the layers.
 
+	<b><font size="14">Groups:</font></b>
+		Groups are a group of parts that shares a layer. The [All] group is essentially the base layer which groups every part, any any changes will affect every part.
+		
+		To create groups:
+			- Shift + click and select multiple and name the group.
+
 	<b><font size="14">Notes:</font></b>
 		- Setting a color will replace cetain skin permanents that does not have a transparent background.
 		- Handle parts can not have a position offset.
