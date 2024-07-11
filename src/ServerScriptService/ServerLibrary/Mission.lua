@@ -18,6 +18,7 @@ local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local remotes = game.ReplicatedStorage.Remotes;
 
@@ -245,10 +246,34 @@ function Mission:CompleteMission(players, missionId, sync)
 							
 							if library.MissionType == 1 then
 								modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "Core Missions");
+								modAnalyticsService:Source{
+									Player=player;
+									Currency=modAnalyticsService.Currency.Perks;
+									Amount=perkAmount;
+									EndBalance=playerSave:GetStat("Perks");
+									ItemSKU=`Mission:Core`;
+								};
+
 							elseif library.MissionType == 4 then
 								modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "Board Missions");
+								modAnalyticsService:Source{
+									Player=player;
+									Currency=modAnalyticsService.Currency.Perks;
+									Amount=perkAmount;
+									EndBalance=playerSave:GetStat("Perks");
+									ItemSKU=`Mission:Board_{missionId}`;
+								};
+
 							else
 								modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "Missions");
+								modAnalyticsService:Source{
+									Player=player;
+									Currency=modAnalyticsService.Currency.Perks;
+									Amount=perkAmount;
+									EndBalance=playerSave:GetStat("Perks");
+									ItemSKU=`Mission:Others`;
+								};
+
 							end
 						end
 						
@@ -297,6 +322,15 @@ function Mission:CompleteMission(players, missionId, sync)
 								shared.Notify(player, "+35 Perks from Premium Bonus!", "Positive");
 								playerSave:AddStat("Perks", 35);
 								modAnalytics.RecordResource(player.UserId, 35, "Source", "Perks", "Gameplay", "PremiumBonus");
+
+								modAnalyticsService:Source{
+									Player=player;
+									Currency=modAnalyticsService.Currency.Perks;
+									Amount=35;
+									EndBalance=playerSave:GetStat("Perks");
+									ItemSKU=`Mission:PremiumBonus`;
+								};
+
 								rbxPerksFlag.CompleteTime = os.time();
 							end
 							

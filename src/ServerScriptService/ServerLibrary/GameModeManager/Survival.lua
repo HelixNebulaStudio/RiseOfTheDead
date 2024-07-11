@@ -10,6 +10,7 @@ local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 --==
 local GameMode = {};
@@ -87,6 +88,14 @@ function GameMode:WorldLoad(modeData)
 						if math.fmod(wave, 3) == 0 then
 							local perksReward = math.min(math.ceil(wave/3), 3);
 							playerSave:AddStat("Perks", perksReward);
+
+							modAnalyticsService:Source{
+								Player=player;
+								Currency=modAnalyticsService.Currency.Perks;
+								Amount=perksReward;
+								EndBalance=playerSave:GetStat("Perks");
+								ItemSKU=`{gameType}:{gameStage}`;
+							};
 					
 							shared.Notify(player, "You recieved "..perksReward.." Perks for reaching wave "..wave.."!", "Reward");
 							modAnalytics.RecordResource(player.UserId, perksReward, "Source", "Perks", "Gameplay", "Survival");

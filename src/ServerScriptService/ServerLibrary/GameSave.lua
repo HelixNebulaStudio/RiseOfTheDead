@@ -29,6 +29,8 @@ local modWorkbenchData = require(game.ServerScriptService.ServerLibrary.Workbenc
 local modAppearanceData = require(game.ServerScriptService.ServerLibrary.AppearanceData);
 local modStatisticProfile = require(game.ServerScriptService.ServerLibrary.StatisticProfile);
 local modStatusSave = require(game.ServerScriptService.ServerLibrary.StatusSave);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 
 local remoteMasterySync = modRemotesManager:Get("MasterySync");
@@ -458,11 +460,20 @@ end
 function SaveData:CalculateLevel()
 	local previousLevel = self:GetStat("Level") or 0;
 	local totalLevels = self:SumMasteries();
-	self:SetStat("Level", math.clamp(totalLevels, 0, modGlobalVars.MaxLevels)); 
+	self:SetStat("Level", math.clamp(totalLevels, 0, modGlobalVars.MaxLevels));
+
 	if totalLevels > previousLevel then
 		if totalLevels ~= 0 and math.fmod(totalLevels, 5) == 0 then
 			self:AddStat("Perks", 10);
 			shared.Notify(self.Player, (("+10 Perks for reaching level $level."):gsub("$level", totalLevels)), "Reward");
+
+			modAnalyticsService:Source{
+				Player=self.Player;
+				Currency=modAnalyticsService.Currency.Perks;
+				Amount=10;
+				EndBalance=self:GetStat("Perks");
+				ItemSKU=`LevelMilestone`;
+			};
 		end
 		remoteHudNotification:FireClient(self.Player, "Levelup", {Level=totalLevels;});
 		
@@ -533,7 +544,17 @@ function SaveData:AwardAchievement(id, giveBadge)
 				end
 			end
 			self.Achievements[id] = largestNum+1;
-			if lib.Tier.Perks then self:AddStat("Perks", lib.Tier.Perks); end;
+			if lib.Tier.Perks then
+				self:AddStat("Perks", lib.Tier.Perks);
+
+				modAnalyticsService:Source{
+					Player=self.Player;
+					Currency=modAnalyticsService.Currency.Perks;
+					Amount=lib.Tier.Perks;
+					EndBalance=self:GetStat("Perks");
+					ItemSKU=`Achievement`;
+				};
+			end;
 			
 			if giveBadge ~= false then
 				spawn(function()

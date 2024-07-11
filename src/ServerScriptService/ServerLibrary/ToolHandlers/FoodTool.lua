@@ -13,6 +13,7 @@ local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
 
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local bindServerUnequipPlayer = remotes.Inventory.ServerUnequipPlayer;
@@ -39,7 +40,8 @@ function ToolHandler:OnPrimaryFire(...)
 				local inventory = profile.ActiveInventory;
 				profile:AddPlayPoints(3, "Gameplay:Use");
 				
-				local itemLib = modItemsLibrary:Find(self.StorageItem.ItemId);
+				local itemId = self.StorageItem.ItemId;
+				local itemLib = modItemsLibrary:Find(itemId);
 				local configurations = self.ToolConfig.Configurations;
 				
 				local useDuration = configurations.UseDuration;
@@ -80,6 +82,14 @@ function ToolHandler:OnPrimaryFire(...)
 						end
 
 						playerSave:AddStat("Perks", 1000);
+
+						modAnalyticsService:Source{
+							Player=self.Player;
+							Currency=modAnalyticsService.Currency.Perks;
+							Amount=1000;
+							EndBalance=playerSave:GetStat("Perks");
+							ItemSKU=`Usage:{itemId}`;
+						};
 					end
 					
 					if self.StorageItem.Quantity == 1 then

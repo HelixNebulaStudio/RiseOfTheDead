@@ -3,13 +3,14 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local random = Random.new();
 
 --== Modules
+local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 local modExperience = require(game.ServerScriptService.ServerLibrary.Experience);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local Enemy = {};
 
@@ -40,9 +41,10 @@ function Enemy.new(self)
 		for a=1, #playerTags do
 			local playerTag = playerTags[a];
 			local player = playerTag.Player;
-			local profile = modProfile:Get(player);
 
-			local playerSave = modProfile:Get(player):GetActiveSave();
+			local profile = modProfile:Get(player);
+			local playerSave = profile:GetActiveSave();
+
 			if playerSave and playerSave.AddStat then
 				playerSave:AddStat("Kills", 1);
 				playerSave:AddStat("HumanKills", 1);
@@ -63,12 +65,23 @@ function Enemy.new(self)
 				local playerLevel = playerSave:GetStat("Level") or 0;
 				if levelKills > 0 and math.fmod(levelKills, modGlobalVars.GetFocusLevel(playerLevel, self.Configuration.Level)) == 0 then
 					playerSave:AddStat("Perks", 1);
+					modAnalyticsService:Source{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Perks;
+						Amount=1;
+						EndBalance=playerSave:GetStat("Perks");
+						ItemSKU=`FocusKills`;
+					};
+
+					modOnGameEvents:Fire("OnFocusKill", self, player);
 					
 					shared.Notify(player, (("Killed $enemyName [$level] +$$moneyReward, +1 Perk"):gsub("$level", self.Configuration.Level)
 						:gsub("$enemyName", self.Name):gsub("$moneyReward", moneyReward)), "Reward");
+
 				else
 					shared.Notify(player, (("Killed $enemyName [$level] +$$moneyReward"):gsub("$level", self.Configuration.Level)
 						:gsub("$enemyName", self.Name):gsub("$moneyReward", moneyReward)), "Reward");
+						
 				end
 			end
 			

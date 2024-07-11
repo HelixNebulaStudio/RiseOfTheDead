@@ -25,6 +25,7 @@ local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytic
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 local modWorldNaturalResource = require(game.ServerScriptService.ServerLibrary.WorldNaturalResource);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 require(script.ShortFilmReward23);
 
@@ -120,7 +121,7 @@ function ModEngine.OnPlayerAdded(player: Player)
 		if modBranchConfigs.IsWorld("Main Menu") then return end;
 		
 		task.delay(5, function()
-			-- !outline Premium bonus free perks
+			-- !outline Premium daily bonus free perks
 			if player.MembershipType == Enum.MembershipType.Premium or profile.Premium then
 
 				local rbxPerksFlag = profile.Flags:Get("rbxPremiumPerks") or {Id="rbxPremiumPerks"; JoinTime=0; MissionsComplete=0; CompleteTime=0;};
@@ -136,6 +137,14 @@ function ModEngine.OnPlayerAdded(player: Player)
 					playerSave:AddStat("Perks", joinPerks);
 					shared.Notify(player, "+"..joinPerks.." Perks from Premium Daily Bonus. Complete 0/3 missions for a bonus +35 Perks!", "Positive");
 					modAnalytics.RecordResource(player.UserId, joinPerks, "Source", "Perks", "Gameplay", "PremiumBonus");
+
+					modAnalyticsService:Source{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Perks;
+						Amount=joinPerks;
+						EndBalance=playerSave:GetStat("Perks");
+						ItemSKU="PremiumDaily";
+					};
 				end
 			end
 		end)

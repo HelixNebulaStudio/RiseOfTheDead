@@ -364,7 +364,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 			Amount=skipCost;
 			EndBalance=playerSave:GetStat("Perks");
 			ItemSKU="SkipBuild";
-		}
+		};
 
 		shared.Notify(player, bpLib.Name.." has finished building.", "Reward");
 
@@ -1117,6 +1117,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 		local itemLib = modItemsLibrary:Find(itemId);
 		
 		if processData.Type == playerSave.Workbench.ProcessTypes.DeconstructMod then
+			-- DeconstructMod
 			local perks = processData.Perks;
 			
 			if perks > 0 then
@@ -1128,6 +1129,13 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 					if processData.Maxed then playerSave:AwardAchievement("thedec"); end
 					shared.Notify(player, (("You recieved $p Perks from deconstructing $name."):gsub("$p", perks):gsub("$name", itemLib.Name)), "Reward");
 					
+					modAnalyticsService:Source{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Perks;
+						Amount=perks;
+						EndBalance=playerSave:GetStat("Perks");
+						ItemSKU="DeconstructMod";
+					};
 				end
 				
 			end
@@ -1135,6 +1143,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			return modWorkbenchLibrary.DeconstructModReplies.Success;
 			
 		elseif processData.Type == playerSave.Workbench.ProcessTypes.DeconstructWeapon then
+			-- DeconstructWeapon
 			local levels = processData.Levels;
 			local rewardTiers = math.floor(levels/5);
 			local itemName = itemLib.Name;
@@ -1192,7 +1201,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 						Currency=modAnalyticsService.Currency.Perks;
 						Amount=25;
 						EndBalance=playerSave:GetStat("Perks");
-						ItemSKU="Deconstruct";
+						ItemSKU="DeconstructWeapon";
 					};
 
 				end

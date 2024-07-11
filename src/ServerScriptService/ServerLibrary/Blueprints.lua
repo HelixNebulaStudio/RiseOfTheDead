@@ -7,6 +7,8 @@ local modBranchConfigs = Debugger:Require(game.ReplicatedStorage.Library.BranchC
 local modItemsLibrary = Debugger:Require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRemotesManager = Debugger:Require(game.ReplicatedStorage.Library.RemotesManager);
 
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+
 local remoteHudNotification = modRemotesManager:Get("HudNotification");
 
 --== Script;
@@ -56,8 +58,17 @@ function Blueprints.new(player, syncFunc)
 			end
 			if data.Time == nil and library.Category == "Commodities" then
 				local profile = Blueprints.Profiles:Get(self.Player);
-				local gameSave = profile:GetActiveSave();
-				gameSave:AddStat("Perks", 20);
+				local playerSave = profile:GetActiveSave();
+				playerSave:AddStat("Perks", 20);
+
+				modAnalyticsService:Source{
+					Player=player;
+					Currency=modAnalyticsService.Currency.Perks;
+					Amount=20;
+					EndBalance=playerSave:GetStat("Perks");
+					ItemSKU=`UnlockBlueprint`;
+				};
+
 				shared.Notify(player, ("You recieved 20 Perks for learning the $Name."):gsub("$Name", library.Name), "Reward");
 			end
 		else

@@ -988,17 +988,26 @@ end)
 
 function remoteUpgradeStorage.OnServerInvoke(player, storageId)
 	local profile = modProfile:Get(player);
-	local activeSave = profile and profile:GetActiveSave();
+	local playerSave = profile and profile:GetActiveSave();
 	local storage = storageId and modStorage.Get(storageId, player);
 	
 	if storage and storage.Expandable and storage.Size < storage.MaxSize then
 		local newSize = storage.Size+1;
 		local cost = modWorkbenchLibrary.StorageCost(storageId, storage.Size, storage.Page or 1);
-		local playerCurrency = activeSave and activeSave.GetStat and activeSave:GetStat("Perks");
+		local playerCurrency = playerSave and playerSave.GetStat and playerSave:GetStat("Perks");
 		
 		if playerCurrency-cost >= 0 then
-			activeSave:AddStat("Perks", -cost);
+			playerSave:AddStat("Perks", -cost);
+
 			modAnalytics.RecordResource(player.UserId, cost, "Sink", "Perks", "Gameplay", "StorageUpgrade");
+			modAnalyticsService:Sink{
+				Player=player;
+				Currency=modAnalyticsService.Currency.Perks;
+				Amount=cost;
+				EndBalance=playerSave:GetStat("Perks");
+				ItemSKU="StorageUpgrade";
+			};
+
 			storage.Size = newSize;
 			storage.OnChanged:Fire(storage);
 			

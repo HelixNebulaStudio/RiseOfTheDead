@@ -3,16 +3,17 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local CollectionService = game:GetService("CollectionService");
 
 --== Modules
+local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
+
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 local modExperience = require(game.ServerScriptService.ServerLibrary.Experience);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local Zombie = {};
 
@@ -71,21 +72,25 @@ function Zombie.new(self)
 				if levelKills > 0 and math.fmod(levelKills, modGlobalVars.GetFocusLevel(playerLevel, config.Level)) == 0 then
 					playerSave:AddStat("Perks", 1);
 
-					if not modMission:IsComplete(player, 27) then
-						modMission:Progress(player, 27, function(mission)
-							if mission.ProgressionPoint == 2 then
-								modMission:CompleteMission(player, 27);
-							end;
-						end)
-					end
+					modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "FocusKills");
+					modAnalyticsService:Source{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Perks;
+						Amount=1;
+						EndBalance=playerSave:GetStat("Perks");
+						ItemSKU=`FocusKills`;
+					};
 
+					modOnGameEvents:Fire("OnFocusKill", self, player);
+					
 					shared.Notify(player, (("Killed $enemyName [$level] +$$moneyReward, +1 Perk"):gsub("$level", config.Level)
 						:gsub("$enemyName", self.Name):gsub("$moneyReward", moneyReward)), "Reward");
-
-					modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "FocusKills");
+						
 				else
 					shared.Notify(player, (("Killed $enemyName [$level] +$$moneyReward"):gsub("$level", config.Level)
 						:gsub("$enemyName", self.Name):gsub("$moneyReward", moneyReward)), "Reward");
+
+					
 				end
 			end
 
