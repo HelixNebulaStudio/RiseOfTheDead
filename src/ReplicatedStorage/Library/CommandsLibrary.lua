@@ -3408,7 +3408,7 @@ Commands["optin"] = {
 				local alertMsg = [[Are you sure you want to opt-in to using New Customization Menu?
 
 				- You will no longer be able to use the old workbench appearance menu.
-				- Your old appearance customizations are loaded at best effort.
+				- Your old customizations are loaded at best effort.
 				- Opting-in is for testing purposes, if you would like to use the new customization menu, please wait for the finished release.
 				
 				To confirm, please enter /optin NewCustomizationMenu confirm]]

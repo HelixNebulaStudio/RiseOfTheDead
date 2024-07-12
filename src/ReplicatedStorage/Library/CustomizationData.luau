@@ -55,7 +55,7 @@ function CustomizationData.Serialize(customPlans, partGroups)
         Plans={};
     };
 
-    for groupKey, list in pairs(partGroups) do
+    for groupKey, list in pairs(partGroups or {}) do
         local newStr = table.concat(list, ",");
         r.Layers[groupKey] = newStr;
     end
@@ -797,6 +797,64 @@ function CustomizationPlan:Serialize()
     return buildStr;
 end
 
+local function ConvertOldAppearanceData(storageItem)
+    local oldColor = storageItem:GetValues("Colors");
+    local oldTextures = storageItem:GetValues("Textures");
+    local oldPartAlphas = storageItem:GetValues("PartAlpha");
+
+    local customPlanCache = {};
+
+    local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
+    local modSkinsLibrary = require(game.ReplicatedStorage.Library.SkinsLibrary);
+    
+    for partName, colorId in pairs(oldColor or {}) do
+        partName = string.gsub(partName, "L%-", "Left");
+        partName = string.gsub(partName, "R%-", "Right");
+        
+
+		local getColor = modColorsLibrary.Get(colorId);
+
+        if getColor then
+            customPlanCache[partName] = CustomizationData.newCustomizationPlan();
+            customPlanCache[partName].Color = getColor.Color;
+        end
+    end
+    
+    for partName, skinId in pairs(oldTextures or {}) do
+        partName = string.gsub(partName, "L%-", "Left");
+        partName = string.gsub(partName, "R%-", "Right");
+
+        local skinLib = modSkinsLibrary.GetCustomPlanData(skinId);
+        if skinLib then
+            if customPlanCache[partName] == nil then
+                customPlanCache[partName] = CustomizationData.newCustomizationPlan();
+            end
+
+            local customPlan = customPlanCache[partName];
+            customPlan.Skin = skinLib.Skin;
+            customPlan.PatternData.Color = skinLib.Color;
+        end
+    end
+    
+    for partName, bool in pairs(oldPartAlphas or {}) do
+        partName = string.gsub(partName, "L%-", "Left");
+        partName = string.gsub(partName, "R%-", "Right");
+        
+        if customPlanCache[partName] == nil then
+            customPlanCache[partName] = CustomizationData.newCustomizationPlan();
+        end
+        if bool == true then
+            customPlanCache[partName].Transparency = 1;
+        end
+    end
+
+    local designSerialized = CustomizationData.Serialize(customPlanCache);
+    storageItem:SetValues("_Customs", designSerialized);
+
+    storageItem:DeleteValues("Colors");
+    storageItem:DeleteValues("Textures");
+    storageItem:DeleteValues("PartAlpha");
+end
 
 if RunService:IsServer() then
     -- MARK: remoteCustomizationData
@@ -895,6 +953,15 @@ if RunService:IsServer() then
             local siid = ...;
 		    local storageItem, _ = shared.modStorage.FindIdFromStorages(siid, player);
             if storageItem == nil then return end;
+
+            
+            local oldColor = storageItem:GetValues("Colors");
+            local oldTextures = storageItem:GetValues("Textures");
+            local oldPartAlphas = storageItem:GetValues("PartAlpha");
+
+            if oldColor or oldTextures or oldPartAlphas then
+                ConvertOldAppearanceData(storageItem);
+            end
 
             local serialized = storageItem:GetValues("_Customs");
 

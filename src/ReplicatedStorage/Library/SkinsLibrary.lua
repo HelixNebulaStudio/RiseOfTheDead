@@ -1,6 +1,7 @@
-local SkinsLibrary = {Library={}};
+local SkinsLibrary = {Library={}; OldToNew={}};
 --== Libraries;
 local CollectionService = game:GetService("CollectionService");
+local RunService = game:GetService("RunService");
 
 local modTexturePackage = require(game.ReplicatedStorage.Library.TexturePackage);
 local modTextureAnimations = require(game.ReplicatedStorage.Library.TextureAnimations);
@@ -66,7 +67,7 @@ function AddTexture(data)
 	table.insert(data.Pack.List, SkinsLibrary.Library[id]);
 end
 
-function NewTexture(id, pack, name, textureIds, color, tile, transparency, isMeshTexture)
+function NewTexture(id, pack, name, textureIds, color, tile, transparency, isMeshTexture, newId)
 	id = tostring(id);
 	if SkinsLibrary.Library[id] then error("Texture ID("..id..") already exist!"); return end;
 	order = order+1;
@@ -87,7 +88,22 @@ function NewTexture(id, pack, name, textureIds, color, tile, transparency, isMes
 	};
 	SkinsLibrary.Library[id] = data;
 	table.insert(pack.List, SkinsLibrary.Library[id]);
+
+	if RunService:IsServer() then
+		local oldToNew = SkinsLibrary.OldToNew;
+
+		oldToNew[id] = {
+			Skin = newId;
+			Color = color;
+		}
+	end
+
 	return data;
+end
+
+function SkinsLibrary.GetCustomPlanData(id)
+	id = tostring(id);
+	return SkinsLibrary.OldToNew[id];
 end
 
 function SkinsLibrary.Get(id)
@@ -209,423 +225,420 @@ function SkinsLibrary.SetTexture(part, id, generateTag)
 end
 
 --== Texture Pack: Basic
-local basicConvert = function(lib)
-
-end
-NewTexture(1, SkinsLibrary.Packs.Basic, "Red Grids", "rbxassetid://2686209243", Color3.fromRGB(72, 49, 49), Vector2.new(0.1, 0.1)).Convert = basicConvert;
-NewTexture(2, SkinsLibrary.Packs.Basic, "Green Grids", "rbxassetid://2686209243", Color3.fromRGB(59, 72, 49), Vector2.new(0.1, 0.1)).Convert = basicConvert;
-NewTexture(3, SkinsLibrary.Packs.Basic, "Blue Grids", "rbxassetid://2686209243", Color3.fromRGB(44, 54, 72), Vector2.new(0.1, 0.1)).Convert = basicConvert;
-NewTexture(4, SkinsLibrary.Packs.Basic, "Red Dots", "rbxassetid://2686209162", Color3.fromRGB(72, 49, 49), Vector2.new(0.05, 0.05)).Convert = basicConvert;
-NewTexture(5, SkinsLibrary.Packs.Basic, "Green Dots", "rbxassetid://2686209162", Color3.fromRGB(59, 72, 49), Vector2.new(0.05, 0.05)).Convert = basicConvert;
-NewTexture(6, SkinsLibrary.Packs.Basic, "Blue Dots", "rbxassetid://2686209162", Color3.fromRGB(44, 54, 72), Vector2.new(0.05, 0.05)).Convert = basicConvert;
-NewTexture(7, SkinsLibrary.Packs.Basic, "Red Checkers", "rbxassetid://2692783156", Color3.fromRGB(72, 49, 49), Vector2.new(0.1, 0.1)).Convert = basicConvert;
-NewTexture(8, SkinsLibrary.Packs.Basic, "Green Checkers", "rbxassetid://2692783156", Color3.fromRGB(59, 72, 49), Vector2.new(0.1, 0.1)).Convert = basicConvert;
-NewTexture(9, SkinsLibrary.Packs.Basic, "Blue Checkers", "rbxassetid://2692783156", Color3.fromRGB(44, 54, 72), Vector2.new(0.1, 0.1)).Convert = basicConvert;
+NewTexture(1, SkinsLibrary.Packs.Basic, "Red Grids", "rbxassetid://2686209243", Color3.fromRGB(72, 49, 49), Vector2.new(0.1, 0.1), nil, nil, "skinbasic_grids");
+NewTexture(2, SkinsLibrary.Packs.Basic, "Green Grids", "rbxassetid://2686209243", Color3.fromRGB(59, 72, 49), Vector2.new(0.1, 0.1), nil, nil, "skinbasic_grids");
+NewTexture(3, SkinsLibrary.Packs.Basic, "Blue Grids", "rbxassetid://2686209243", Color3.fromRGB(44, 54, 72), Vector2.new(0.1, 0.1), nil, nil, "skinbasic_grids");
+NewTexture(4, SkinsLibrary.Packs.Basic, "Red Dots", "rbxassetid://2686209162", Color3.fromRGB(72, 49, 49), Vector2.new(0.05, 0.05), nil, nil, "skinbasic_dots");
+NewTexture(5, SkinsLibrary.Packs.Basic, "Green Dots", "rbxassetid://2686209162", Color3.fromRGB(59, 72, 49), Vector2.new(0.05, 0.05), nil, nil, "skinbasic_dots");
+NewTexture(6, SkinsLibrary.Packs.Basic, "Blue Dots", "rbxassetid://2686209162", Color3.fromRGB(44, 54, 72), Vector2.new(0.05, 0.05), nil, nil, "skinbasic_dots");
+NewTexture(7, SkinsLibrary.Packs.Basic, "Red Checkers", "rbxassetid://2692783156", Color3.fromRGB(72, 49, 49), Vector2.new(0.1, 0.1), nil, nil, "skinbasic_checkers");
+NewTexture(8, SkinsLibrary.Packs.Basic, "Green Checkers", "rbxassetid://2692783156", Color3.fromRGB(59, 72, 49), Vector2.new(0.1, 0.1), nil, nil, "skinbasic_checkers");
+NewTexture(9, SkinsLibrary.Packs.Basic, "Blue Checkers", "rbxassetid://2692783156", Color3.fromRGB(44, 54, 72), Vector2.new(0.1, 0.1), nil, nil, "skinbasic_checkers");
 
 --== Texture Pack: Camo
-NewTexture(11, SkinsLibrary.Packs.Camo, "Red Camo", "rbxassetid://4386335941", Color3.fromRGB(72, 49, 49), Vector2.new(1, 1));
-NewTexture(12, SkinsLibrary.Packs.Camo, "Green Camo", "rbxassetid://4386336507", Color3.fromRGB(59, 72, 49), Vector2.new(1, 1));
-NewTexture(13, SkinsLibrary.Packs.Camo, "Blue Camo", "rbxassetid://4386337276", Color3.fromRGB(44, 54, 72), Vector2.new(1, 1));
-NewTexture(14, SkinsLibrary.Packs.Camo, "Yellow Camo", "rbxassetid://4386335941", Color3.fromRGB(71, 72, 43), Vector2.new(1, 1));
-NewTexture(15, SkinsLibrary.Packs.Camo, "Purple Camo", "rbxassetid://4386336507", Color3.fromRGB(49, 43, 72), Vector2.new(1, 1));
-NewTexture(16, SkinsLibrary.Packs.Camo, "Pink Camo", "rbxassetid://4386337276", Color3.fromRGB(67, 41, 72), Vector2.new(1, 1));
-NewTexture(17, SkinsLibrary.Packs.Camo, "White Camo", "rbxassetid://4386480680", Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
-NewTexture(18, SkinsLibrary.Packs.Camo, "Grey Camo", "rbxassetid://4386479893", Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
-NewTexture(19, SkinsLibrary.Packs.Camo, "Black Camo", "rbxassetid://4386481250", Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+NewTexture(11, SkinsLibrary.Packs.Camo, "Red Camo", "rbxassetid://4386335941", Color3.fromRGB(72, 49, 49), Vector2.new(1, 1), nil, nil, "skincamo_v1");
+NewTexture(12, SkinsLibrary.Packs.Camo, "Green Camo", "rbxassetid://4386336507", Color3.fromRGB(59, 72, 49), Vector2.new(1, 1), nil, nil, "skincamo_v2");
+NewTexture(13, SkinsLibrary.Packs.Camo, "Blue Camo", "rbxassetid://4386337276", Color3.fromRGB(44, 54, 72), Vector2.new(1, 1), nil, nil, "skincamo_v3");
+NewTexture(14, SkinsLibrary.Packs.Camo, "Yellow Camo", "rbxassetid://4386335941", Color3.fromRGB(71, 72, 43), Vector2.new(1, 1), nil, nil, "skincamo_v1");
+NewTexture(15, SkinsLibrary.Packs.Camo, "Purple Camo", "rbxassetid://4386336507", Color3.fromRGB(49, 43, 72), Vector2.new(1, 1), nil, nil, "skincamo_v2");
+NewTexture(16, SkinsLibrary.Packs.Camo, "Pink Camo", "rbxassetid://4386337276", Color3.fromRGB(67, 41, 72), Vector2.new(1, 1), nil, nil, "skincamo_v3");
+NewTexture(17, SkinsLibrary.Packs.Camo, "White Camo", "rbxassetid://4386480680", Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincamo_v4");
+NewTexture(18, SkinsLibrary.Packs.Camo, "Grey Camo", "rbxassetid://4386479893", Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincamo_v5");
+NewTexture(19, SkinsLibrary.Packs.Camo, "Black Camo", "rbxassetid://4386481250", Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincamo_v6");
 
 --== Texture Pack: Xmas
-NewTexture(20, SkinsLibrary.Packs.Xmas, "Stripes Wrapping Paper 1", "rbxassetid://4527242130", Color3.fromRGB(180, 180, 180), Vector2.new(0.3, 0.3));
-NewTexture(21, SkinsLibrary.Packs.Xmas, "Stripes Wrapping Paper 2", "rbxassetid://4527242331", Color3.fromRGB(180, 180, 180), Vector2.new(0.3, 0.3));
-NewTexture(22, SkinsLibrary.Packs.Xmas, "Stars Wrapping Paper 1", "rbxassetid://4527242469", Color3.fromRGB(180, 180, 180), Vector2.new(0.1, 0.1));
-NewTexture(23, SkinsLibrary.Packs.Xmas, "Stars Wrapping Paper 2", "rbxassetid://4527242591", Color3.fromRGB(180, 180, 180), Vector2.new(0.1, 0.1));
-NewTexture(24, SkinsLibrary.Packs.Xmas, "Crystal Wrapping Paper 1", "rbxassetid://4527242713", Color3.fromRGB(180, 180, 180), Vector2.new(0.2, 0.2));
-NewTexture(25, SkinsLibrary.Packs.Xmas, "Crystal Wrapping Paper 2", "rbxassetid://4527242820", Color3.fromRGB(180, 180, 180), Vector2.new(0.2, 0.2));
-NewTexture(26, SkinsLibrary.Packs.Xmas, "Crystal Wrapping Paper 3", "rbxassetid://4527259843", Color3.fromRGB(180, 180, 180), Vector2.new(0.2, 0.2));
-NewTexture(27, SkinsLibrary.Packs.Xmas, "Crystal Wrapping Paper 4", "rbxassetid://4527259963", Color3.fromRGB(180, 180, 180), Vector2.new(0.2, 0.2));
-NewTexture(28, SkinsLibrary.Packs.Xmas, "Checkers Wrapping Paper 1", "rbxassetid://4527257042", Color3.fromRGB(180, 180, 180), Vector2.new(0.5, 0.5));
-NewTexture(29, SkinsLibrary.Packs.Xmas, "Checkers Wrapping Paper 2", "rbxassetid://4527242932", Color3.fromRGB(180, 180, 180), Vector2.new(0.5, 0.5));
-NewTexture(30, SkinsLibrary.Packs.Xmas, "Checkers Wrapping Paper 3", "rbxassetid://4527256263", Color3.fromRGB(180, 180, 180), Vector2.new(0.5, 0.5));
+NewTexture(20, SkinsLibrary.Packs.Xmas, "Stripes Wrapping Paper 1", "rbxassetid://4527242130", Color3.fromRGB(180, 180, 180), Vector2.new(0.3, 0.3), nil, nil, "skinxmas_v1");
+NewTexture(21, SkinsLibrary.Packs.Xmas, "Stripes Wrapping Paper 2", "rbxassetid://4527242331", Color3.fromRGB(180, 180, 180), Vector2.new(0.3, 0.3), nil, nil, "skinxmas_v2");
+NewTexture(22, SkinsLibrary.Packs.Xmas, "Stars Wrapping Paper 1", "rbxassetid://4527242469", Color3.fromRGB(180, 180, 180), Vector2.new(0.1, 0.1), nil, nil, "skinxmas_v3");
+NewTexture(23, SkinsLibrary.Packs.Xmas, "Stars Wrapping Paper 2", "rbxassetid://4527242591", Color3.fromRGB(180, 180, 180), Vector2.new(0.1, 0.1), nil, nil, "skinxmas_v4");
+NewTexture(24, SkinsLibrary.Packs.Xmas, "Crystal Wrapping Paper 1", "rbxassetid://4527242713", Color3.fromRGB(180, 180, 180), Vector2.new(0.2, 0.2), nil, nil, "skinxmas_v5");
+NewTexture(25, SkinsLibrary.Packs.Xmas, "Crystal Wrapping Paper 2", "rbxassetid://4527242820", Color3.fromRGB(180, 180, 180), Vector2.new(0.2, 0.2), nil, nil, "skinxmas_v6");
+NewTexture(26, SkinsLibrary.Packs.Xmas, "Crystal Wrapping Paper 3", "rbxassetid://4527259843", Color3.fromRGB(180, 180, 180), Vector2.new(0.2, 0.2), nil, nil, "skinxmas_v7");
+NewTexture(27, SkinsLibrary.Packs.Xmas, "Crystal Wrapping Paper 4", "rbxassetid://4527259963", Color3.fromRGB(180, 180, 180), Vector2.new(0.2, 0.2), nil, nil, "skinxmas_v8");
+NewTexture(28, SkinsLibrary.Packs.Xmas, "Checkers Wrapping Paper 1", "rbxassetid://4527257042", Color3.fromRGB(180, 180, 180), Vector2.new(0.5, 0.5), nil, nil, "skinxmas_v9");
+NewTexture(29, SkinsLibrary.Packs.Xmas, "Checkers Wrapping Paper 2", "rbxassetid://4527242932", Color3.fromRGB(180, 180, 180), Vector2.new(0.5, 0.5), nil, nil, "skinxmas_va");
+NewTexture(30, SkinsLibrary.Packs.Xmas, "Checkers Wrapping Paper 3", "rbxassetid://4527256263", Color3.fromRGB(180, 180, 180), Vector2.new(0.5, 0.5), nil, nil, "skinxmas_vb");
 
 --== Texture Pack: StreetArt
 NewTexture(31, SkinsLibrary.Packs.StreetArt, "Jerry", {
 	{Id="rbxassetid://4610326832"; Rotations={"rbxassetid://4610890070"; "rbxassetid://4610905873"; "rbxassetid://4610907110";};};
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skinstreetart_v1");
 NewTexture(32, SkinsLibrary.Packs.StreetArt, "The Helix", {
 	{Id="rbxassetid://4611060133"; Rotations={"rbxassetid://4611068146"; "rbxassetid://4611068392"; "rbxassetid://4611068901";};};
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skinstreetart_v2");
 NewTexture(33, SkinsLibrary.Packs.StreetArt, "Genetical", {
 	{Id="rbxassetid://4611094988"; Rotations={"rbxassetid://4611106796"; "rbxassetid://4611107124"; "rbxassetid://4611107401";};};
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skinstreetart_v3");
 NewTexture(34, SkinsLibrary.Packs.StreetArt, "WaveMix", {
 	{Id="rbxassetid://4641413755"; Rotations={"rbxassetid://4641426526"; "rbxassetid://4641428407"; "rbxassetid://4641429840";};};
-}, Color3.fromRGB(170, 170, 170), Vector2.new(3, 3));
+}, Color3.fromRGB(170, 170, 170), Vector2.new(3, 3), nil, nil, "skinstreetart_v4");
 
 --== Texture Pack: Wireframe
 NewTexture(41, SkinsLibrary.Packs.Wireframe, "Red", {
 	{Id="rbxassetid://4790500605"; Rotations={"rbxassetid://4790500605"; "rbxassetid://4790500605"; "rbxassetid://4790500605";};};
-}, Color3.fromRGB(255, 0, 0), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 0, 0), Vector2.new(1, 1), nil, nil, "skinwireframe_v1");
 NewTexture(42, SkinsLibrary.Packs.Wireframe, "Green", {
 	{Id="rbxassetid://4790500605"; Rotations={"rbxassetid://4790500605"; "rbxassetid://4790500605"; "rbxassetid://4790500605";};};
-}, Color3.fromRGB(0, 255, 0), Vector2.new(1, 1));
+}, Color3.fromRGB(0, 255, 0), Vector2.new(1, 1), nil, nil, "skinwireframe_v1");
 NewTexture(43, SkinsLibrary.Packs.Wireframe, "Blue", {
 	{Id="rbxassetid://4790500605"; Rotations={"rbxassetid://4790500605"; "rbxassetid://4790500605"; "rbxassetid://4790500605";};};
-}, Color3.fromRGB(0, 213, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(0, 213, 255), Vector2.new(1, 1), nil, nil, "skinwireframe_v1");
 NewTexture(44, SkinsLibrary.Packs.Wireframe, "Yellow", {
 	{Id="rbxassetid://4790500605"; Rotations={"rbxassetid://4790500605"; "rbxassetid://4790500605"; "rbxassetid://4790500605";};};
-}, Color3.fromRGB(255, 255, 0), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 0), Vector2.new(1, 1), nil, nil, "skinwireframe_v1");
 NewTexture(45, SkinsLibrary.Packs.Wireframe, "Purple", {
 	{Id="rbxassetid://4790500605"; Rotations={"rbxassetid://4790500605"; "rbxassetid://4790500605"; "rbxassetid://4790500605";};};
-}, Color3.fromRGB(93, 0, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(93, 0, 255), Vector2.new(1, 1), nil, nil, "skinwireframe_v1");
 NewTexture(46, SkinsLibrary.Packs.Wireframe, "Pink", {
 	{Id="rbxassetid://4790500605"; Rotations={"rbxassetid://4790500605"; "rbxassetid://4790500605"; "rbxassetid://4790500605";};};
-}, Color3.fromRGB(255, 0, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 0, 255), Vector2.new(1, 1), nil, nil, "skinwireframe_v1");
 NewTexture(47, SkinsLibrary.Packs.Wireframe, "White", {
 	{Id="rbxassetid://4790500605"; Rotations={"rbxassetid://4790500605"; "rbxassetid://4790500605"; "rbxassetid://4790500605";};};
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skinwireframe_v1");
 NewTexture(48, SkinsLibrary.Packs.Wireframe, "Grey", {
 	{Id="rbxassetid://4790500605"; Rotations={"rbxassetid://4790500605"; "rbxassetid://4790500605"; "rbxassetid://4790500605";};};
-}, Color3.fromRGB(128, 128, 128), Vector2.new(1, 1));
+}, Color3.fromRGB(128, 128, 128), Vector2.new(1, 1), nil, nil, "skinwireframe_v1");
 NewTexture(49, SkinsLibrary.Packs.Wireframe, "Black", {
 	{Id="rbxassetid://4790500605"; Rotations={"rbxassetid://4790500605"; "rbxassetid://4790500605"; "rbxassetid://4790500605";};};
-}, Color3.fromRGB(0, 0, 0), Vector2.new(1, 1));
+}, Color3.fromRGB(0, 0, 0), Vector2.new(1, 1), nil, nil, "skinwireframe_v1");
 
 --== Texture Pack: EasterSkins
 NewTexture(50, SkinsLibrary.Packs.EasterSkins, "Green Egg 1", {
 	"rbxassetid://4835841001";
-}, Color3.fromRGB(187, 255, 171), Vector2.new(0.2, 0.2));
+}, Color3.fromRGB(187, 255, 171), Vector2.new(0.2, 0.2), nil, nil, "skineaster_v1");
 
 NewTexture(52, SkinsLibrary.Packs.EasterSkins, "Pink Egg 1", {
 	"rbxassetid://4835841001";
-}, Color3.fromRGB(255, 181, 217), Vector2.new(0.2, 0.2));
+}, Color3.fromRGB(255, 181, 217), Vector2.new(0.2, 0.2), nil, nil, "skineaster_v1");
 
 NewTexture(53, SkinsLibrary.Packs.EasterSkins, "Blue Egg 1", {
 	"rbxassetid://4835841001";
-}, Color3.fromRGB(175, 223, 255), Vector2.new(0.2, 0.2));
+}, Color3.fromRGB(175, 223, 255), Vector2.new(0.2, 0.2), nil, nil, "skineaster_v1");
 
 NewTexture(54, SkinsLibrary.Packs.EasterSkins, "Yellow Egg 1", {
 	"rbxassetid://4835841001";
-}, Color3.fromRGB(255, 243, 175), Vector2.new(0.2, 0.2));
+}, Color3.fromRGB(255, 243, 175), Vector2.new(0.2, 0.2), nil, nil, "skineaster_v1");
 
 --
 NewTexture(55, SkinsLibrary.Packs.EasterSkins, "Green Egg 2", {
 	"rbxassetid://4836204240";
-}, Color3.fromRGB(187, 255, 171), Vector2.new(0.2, 0.2));
+}, Color3.fromRGB(187, 255, 171), Vector2.new(0.2, 0.2), nil, nil, "skineaster_v2");
 
 NewTexture(56, SkinsLibrary.Packs.EasterSkins, "Pink Egg 2", {
 	"rbxassetid://4836204240";
-}, Color3.fromRGB(255, 181, 217), Vector2.new(0.2, 0.2));
+}, Color3.fromRGB(255, 181, 217), Vector2.new(0.2, 0.2), nil, nil, "skineaster_v2");
 
 NewTexture(57, SkinsLibrary.Packs.EasterSkins, "Blue Egg 2", {
 	"rbxassetid://4836204240";
-}, Color3.fromRGB(175, 223, 255), Vector2.new(0.2, 0.2));
+}, Color3.fromRGB(175, 223, 255), Vector2.new(0.2, 0.2), nil, nil, "skineaster_v2");
 
 NewTexture(58, SkinsLibrary.Packs.EasterSkins, "Yellow Egg 2", {
 	"rbxassetid://4836204240";	
-}, Color3.fromRGB(255, 243, 175), Vector2.new(0.2, 0.2));
+}, Color3.fromRGB(255, 243, 175), Vector2.new(0.2, 0.2), nil, nil, "skineaster_v2");
 
 --
 NewTexture(59, SkinsLibrary.Packs.EasterSkins, "Orange Egg Stripe", {
 	"rbxassetid://4835841305";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skineaster_v3");
 
 NewTexture(60, SkinsLibrary.Packs.EasterSkins, "Purple Egg Stripe", {
 	"rbxassetid://4835841576";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skineaster_v4");
 
 NewTexture(61, SkinsLibrary.Packs.EasterSkins, "Turquoise Egg Stripe", {
 	"rbxassetid://4835841746";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skineaster_v5");
 
 --== Texture Pack: Wraps;
 NewTexture(70, SkinsLibrary.Packs.Wraps, "Bandage Wraps", {
 	"rbxassetid://5065061974";
-}, Color3.fromRGB(200, 200, 200), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(200, 200, 200), Vector2.new(0.5, 0.5), nil, nil, "skinwraps_v1");
 NewTexture(71, SkinsLibrary.Packs.Wraps, "Bandage Wraps 90", {
 	"rbxassetid://5065128803";
-}, Color3.fromRGB(200, 200, 200), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(200, 200, 200), Vector2.new(0.5, 0.5), nil, nil, "skinwraps_v2");
 NewTexture(72, SkinsLibrary.Packs.Wraps, "Yellow Bandage Wraps", {
 	"rbxassetid://5065061974";
-}, Color3.fromRGB(113, 90, 57), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(113, 90, 57), Vector2.new(0.5, 0.5), nil, nil, "skinwraps_v1");
 NewTexture(73, SkinsLibrary.Packs.Wraps, "Yellow Bandage Wraps 90", {
 	"rbxassetid://5065128803";
-}, Color3.fromRGB(113, 90, 57), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(113, 90, 57), Vector2.new(0.5, 0.5), nil, nil, "skinwraps_v2");
 NewTexture(74, SkinsLibrary.Packs.Wraps, "Brown Bandage Wraps", {
 	"rbxassetid://5065061974";
-}, Color3.fromRGB(77, 55, 40), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(77, 55, 40), Vector2.new(0.5, 0.5), nil, nil, "skinwraps_v1");
 NewTexture(75, SkinsLibrary.Packs.Wraps, "Brown Bandage Wraps 90", {
 	"rbxassetid://5065128803";
-}, Color3.fromRGB(77, 55, 40), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(77, 55, 40), Vector2.new(0.5, 0.5), nil, nil, "skinwraps_v2");
 NewTexture(76, SkinsLibrary.Packs.Wraps, "Transparent Bandage Wraps", {
 	"rbxassetid://5065128031";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinwraps_v3");
 NewTexture(77, SkinsLibrary.Packs.Wraps, "Transparent Bandage Wraps 90", {
 	"rbxassetid://5065127222";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinwraps_v4");
 
 --== Texture Pack: ScalePlating;
 NewTexture(80, SkinsLibrary.Packs.ScalePlating, "Blue Scales Plating", {
 	"rbxassetid://5180756308";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinscaleplating_v1");
 NewTexture(81, SkinsLibrary.Packs.ScalePlating, "Dark Blue Scales Plating", {
 	"rbxassetid://5180763234";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinscaleplating_v1");
 NewTexture(82, SkinsLibrary.Packs.ScalePlating, "Green Scales Plating", {
 	"rbxassetid://5180764589";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinscaleplating_v1");
 NewTexture(83, SkinsLibrary.Packs.ScalePlating, "Orange Scales Plating", {
 	"rbxassetid://5180765908";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinscaleplating_v1");
 NewTexture(84, SkinsLibrary.Packs.ScalePlating, "Pink Scales Plating", {
 	"rbxassetid://5180767362";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinscaleplating_v1");
 NewTexture(85, SkinsLibrary.Packs.ScalePlating, "Purple Scales Plating", {
 	"rbxassetid://5180768559";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinscaleplating_v1");
 NewTexture(86, SkinsLibrary.Packs.ScalePlating, "Red Scales Plating", {
 	"rbxassetid://5180770264";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinscaleplating_v1");
 NewTexture(87, SkinsLibrary.Packs.ScalePlating, "Yellow Scales Plating", {
 	"rbxassetid://5180771371";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinscaleplating_v1");
 NewTexture(88, SkinsLibrary.Packs.ScalePlating, "Rainbow Scales Plating", {
 	"rbxassetid://5180772738";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinscaleplating_v5");
 
 
 --== Texture Pack: CarbonFiber;
 NewTexture(90, SkinsLibrary.Packs.CarbonFiber, "Blue Scales Plating", {
 	"rbxassetid://5635457255";
-}, Color3.fromRGB(19, 80, 126), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(19, 80, 126), Vector2.new(0.5, 0.5), nil, nil, "skincarbonfiber_v1");
 NewTexture(91, SkinsLibrary.Packs.CarbonFiber, "Dark Grey Scales Plating", {
 	"rbxassetid://5635457255";
-}, Color3.fromRGB(50, 50, 50), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(50, 50, 50), Vector2.new(0.5, 0.5), nil, nil, "skincarbonfiber_v1");
 NewTexture(92, SkinsLibrary.Packs.CarbonFiber, "Green Scales Plating", {
 	"rbxassetid://5635457255";
-}, Color3.fromRGB(29, 68, 21), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(29, 68, 21), Vector2.new(0.5, 0.5), nil, nil, "skincarbonfiber_v1");
 NewTexture(93, SkinsLibrary.Packs.CarbonFiber, "Orange Scales Plating", {
 	"rbxassetid://5635457255";
-}, Color3.fromRGB(122, 69, 51), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(122, 69, 51), Vector2.new(0.5, 0.5), nil, nil, "skincarbonfiber_v1");
 NewTexture(94, SkinsLibrary.Packs.CarbonFiber, "Pink Scales Plating", {
 	"rbxassetid://5635457255";
-}, Color3.fromRGB(102, 60, 82), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(102, 60, 82), Vector2.new(0.5, 0.5), nil, nil, "skincarbonfiber_v1");
 NewTexture(95, SkinsLibrary.Packs.CarbonFiber, "Purple Scales Plating", {
 	"rbxassetid://5635457255";
-}, Color3.fromRGB(69, 50, 95), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(69, 50, 95), Vector2.new(0.5, 0.5), nil, nil, "skincarbonfiber_v1");
 NewTexture(96, SkinsLibrary.Packs.CarbonFiber, "Red Scales Plating", {
 	"rbxassetid://5635457255";
-}, Color3.fromRGB(95, 53, 54), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(95, 53, 54), Vector2.new(0.5, 0.5), nil, nil, "skincarbonfiber_v1");
 NewTexture(97, SkinsLibrary.Packs.CarbonFiber, "Yellow Scales Plating", {
 	"rbxassetid://5635457255";
-}, Color3.fromRGB(109, 107, 57), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(109, 107, 57), Vector2.new(0.5, 0.5), nil, nil, "skincarbonfiber_v1");
 NewTexture(98, SkinsLibrary.Packs.CarbonFiber, "Rainbow Scales Plating", {
 	"rbxassetid://5635675457";
-}, Color3.fromRGB(140, 140, 140), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(140, 140, 140), Vector2.new(0.5, 0.5), nil, nil, "skincarbonfiber_v2");
 
 
 --== Texture Pack: Halloween;
 NewTexture(110, SkinsLibrary.Packs.Halloween, "Orange Pumpkins", {
 	"rbxassetid://5888890391";
-}, Color3.fromRGB(255, 106, 0), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 106, 0), Vector2.new(0.5, 0.5), nil, nil, "skinhalloween_v1");
 NewTexture(111, SkinsLibrary.Packs.Halloween, "Purple Pumpkins", {
 	"rbxassetid://5888890391";
-}, Color3.fromRGB(106, 0, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(106, 0, 255), Vector2.new(0.5, 0.5), nil, nil, "skinhalloween_v1");
 NewTexture(112, SkinsLibrary.Packs.Halloween, "Green Pumpkins", {
 	"rbxassetid://5888890391";
-}, Color3.fromRGB(27, 106, 23), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(27, 106, 23), Vector2.new(0.5, 0.5), nil, nil, "skinhalloween_v1");
 NewTexture(113, SkinsLibrary.Packs.Halloween, "Orange Skulls", {
 	"rbxassetid://5888891774";
-}, Color3.fromRGB(255, 106, 0), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 106, 0), Vector2.new(0.5, 0.5), nil, nil, "skinhalloween_v2");
 NewTexture(114, SkinsLibrary.Packs.Halloween, "Purple Skulls", {
 	"rbxassetid://5888891774";
-}, Color3.fromRGB(106, 0, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(106, 0, 255), Vector2.new(0.5, 0.5), nil, nil, "skinhalloween_v2");
 NewTexture(115, SkinsLibrary.Packs.Halloween, "Green Skulls", {
 	"rbxassetid://5888891774";
-}, Color3.fromRGB(27, 106, 23), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(27, 106, 23), Vector2.new(0.5, 0.5), nil, nil, "skinhalloween_v2");
 NewTexture(116, SkinsLibrary.Packs.Halloween, "Orange Witch hats", {
 	"rbxassetid://5888922149";
-}, Color3.fromRGB(255, 106, 0), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 106, 0), Vector2.new(0.5, 0.5), nil, nil, "skinhalloween_v3");
 NewTexture(117, SkinsLibrary.Packs.Halloween, "Purple Witch hats", {
 	"rbxassetid://5888922149";
-}, Color3.fromRGB(106, 0, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(106, 0, 255), Vector2.new(0.5, 0.5), nil, nil, "skinhalloween_v3");
 NewTexture(118, SkinsLibrary.Packs.Halloween, "Green Witch hats", {
 	"rbxassetid://5888922149";
-}, Color3.fromRGB(27, 106, 23), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(27, 106, 23), Vector2.new(0.5, 0.5), nil, nil, "skinhalloween_v3");
 
 
 --
-NewTexture(120, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 01", "rbxassetid://6109052204", Color3.fromRGB(255, 255, 255), Vector2.new(0.1, 0.1));
-NewTexture(121, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 02", "rbxassetid://6109059756", Color3.fromRGB(255, 255, 255), Vector2.new(0.1, 0.1));
-NewTexture(122, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 03", "rbxassetid://6109074464", Color3.fromRGB(255, 255, 255), Vector2.new(0.1, 0.1));
-NewTexture(123, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 04", "rbxassetid://6109088388", Color3.fromRGB(255, 255, 255), Vector2.new(0.1, 0.1));
-NewTexture(124, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 05", "rbxassetid://6109084797", Color3.fromRGB(255, 255, 255), Vector2.new(0.1, 0.1));
-NewTexture(125, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 06", "rbxassetid://6109085983", Color3.fromRGB(255, 255, 255), Vector2.new(0.1, 0.1));
-NewTexture(126, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 07", "rbxassetid://6109157985", Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
-NewTexture(127, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 08", "rbxassetid://6109215107", Color3.fromRGB(255, 255, 255), Vector2.new(0.2, 0.2));
+NewTexture(120, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 01", "rbxassetid://6109052204", Color3.fromRGB(255, 255, 255), Vector2.new(0.1, 0.1), nil, nil, "skinfestivewrapping_v1");
+NewTexture(121, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 02", "rbxassetid://6109059756", Color3.fromRGB(255, 255, 255), Vector2.new(0.1, 0.1), nil, nil, "skinfestivewrapping_v2");
+NewTexture(122, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 03", "rbxassetid://6109074464", Color3.fromRGB(255, 255, 255), Vector2.new(0.1, 0.1), nil, nil, "skinfestivewrapping_v3");
+NewTexture(123, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 04", "rbxassetid://6109088388", Color3.fromRGB(255, 255, 255), Vector2.new(0.1, 0.1), nil, nil, "skinfestivewrapping_v4");
+NewTexture(124, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 05", "rbxassetid://6109084797", Color3.fromRGB(255, 255, 255), Vector2.new(0.1, 0.1), nil, nil, "skinfestivewrapping_v5");
+NewTexture(125, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 06", "rbxassetid://6109085983", Color3.fromRGB(255, 255, 255), Vector2.new(0.1, 0.1), nil, nil, "skinfestivewrapping_v6");
+NewTexture(126, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 07", "rbxassetid://6109157985", Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinfestivewrapping_v7");
+NewTexture(127, SkinsLibrary.Packs.FestiveWrapping, "Festive Wrapping 08", "rbxassetid://6109215107", Color3.fromRGB(255, 255, 255), Vector2.new(0.2, 0.2), nil, nil, "skinfestivewrapping_v8");
 
-NewTexture(130, SkinsLibrary.Packs.Hexatiles, "Hexatiles Red", "rbxassetid://6534768496", Color3.fromRGB(140, 49, 51), Vector2.new(0.2, 0.2));
-NewTexture(131, SkinsLibrary.Packs.Hexatiles, "Hexatiles Blue", "rbxassetid://6534768496", Color3.fromRGB(49, 49, 140), Vector2.new(0.2, 0.2));
-NewTexture(132, SkinsLibrary.Packs.Hexatiles, "Hexatiles Green", "rbxassetid://6534768496", Color3.fromRGB(58, 140, 49), Vector2.new(0.2, 0.2));
-NewTexture(133, SkinsLibrary.Packs.Hexatiles, "Hexatiles Yellow", "rbxassetid://6534768496", Color3.fromRGB(140, 120, 49), Vector2.new(0.2, 0.2));
-NewTexture(134, SkinsLibrary.Packs.Hexatiles, "Hexatiles Orange", "rbxassetid://6534768496", Color3.fromRGB(140, 84, 49), Vector2.new(0.2, 0.2));
-NewTexture(135, SkinsLibrary.Packs.Hexatiles, "Hexatiles Purple", "rbxassetid://6534768496", Color3.fromRGB(91, 49, 140), Vector2.new(0.2, 0.2));
-NewTexture(136, SkinsLibrary.Packs.Hexatiles, "Hexatiles Pink", "rbxassetid://6534768496", Color3.fromRGB(140, 49, 129), Vector2.new(0.2, 0.2));
-NewTexture(137, SkinsLibrary.Packs.Hexatiles, "Hexatiles Cyan", "rbxassetid://6534768496", Color3.fromRGB(49, 113, 140), Vector2.new(0.2, 0.2));
-NewTexture(138, SkinsLibrary.Packs.Hexatiles, "Hexatiles Rainbow", "rbxassetid://6534829842", Color3.fromRGB(255, 255, 255), Vector2.new(0.8, 0.8));
+NewTexture(130, SkinsLibrary.Packs.Hexatiles, "Hexatiles Red", "rbxassetid://6534768496", Color3.fromRGB(140, 49, 51), Vector2.new(0.2, 0.2), nil, nil, "skinhexatiles_v1");
+NewTexture(131, SkinsLibrary.Packs.Hexatiles, "Hexatiles Blue", "rbxassetid://6534768496", Color3.fromRGB(49, 49, 140), Vector2.new(0.2, 0.2), nil, nil, "skinhexatiles_v1");
+NewTexture(132, SkinsLibrary.Packs.Hexatiles, "Hexatiles Green", "rbxassetid://6534768496", Color3.fromRGB(58, 140, 49), Vector2.new(0.2, 0.2), nil, nil, "skinhexatiles_v1");
+NewTexture(133, SkinsLibrary.Packs.Hexatiles, "Hexatiles Yellow", "rbxassetid://6534768496", Color3.fromRGB(140, 120, 49), Vector2.new(0.2, 0.2), nil, nil, "skinhexatiles_v1");
+NewTexture(134, SkinsLibrary.Packs.Hexatiles, "Hexatiles Orange", "rbxassetid://6534768496", Color3.fromRGB(140, 84, 49), Vector2.new(0.2, 0.2), nil, nil, "skinhexatiles_v1");
+NewTexture(135, SkinsLibrary.Packs.Hexatiles, "Hexatiles Purple", "rbxassetid://6534768496", Color3.fromRGB(91, 49, 140), Vector2.new(0.2, 0.2), nil, nil, "skinhexatiles_v1");
+NewTexture(136, SkinsLibrary.Packs.Hexatiles, "Hexatiles Pink", "rbxassetid://6534768496", Color3.fromRGB(140, 49, 129), Vector2.new(0.2, 0.2), nil, nil, "skinhexatiles_v1");
+NewTexture(137, SkinsLibrary.Packs.Hexatiles, "Hexatiles Cyan", "rbxassetid://6534768496", Color3.fromRGB(49, 113, 140), Vector2.new(0.2, 0.2), nil, nil, "skinhexatiles_v1");
+NewTexture(138, SkinsLibrary.Packs.Hexatiles, "Hexatiles Rainbow", "rbxassetid://6534829842", Color3.fromRGB(255, 255, 255), Vector2.new(0.8, 0.8), nil, nil, "skinhexatiles_v5");
 
 --== HalloweenPixelArt
 NewTexture(140, SkinsLibrary.Packs.HalloweenPixelArt, "Spooky Skeletons", {
 	"rbxassetid://7605195491";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.3, 0.3)); --
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.3, 0.3), nil, nil, "skinhalloweenpixelart_v1"); --
 NewTexture(141, SkinsLibrary.Packs.HalloweenPixelArt, "Zombie Face", {
 	"rbxassetid://7605205046";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skinhalloweenpixelart_v2");
 NewTexture(142, SkinsLibrary.Packs.HalloweenPixelArt, "Possessed Jane", {
 	"rbxassetid://7605214869";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.2, 0.2));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.2, 0.2), nil, nil, "skinhalloweenpixelart_v3");
 NewTexture(143, SkinsLibrary.Packs.HalloweenPixelArt, "Haunted Ghost", {
 	"rbxassetid://7605218975";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.4, 0.4));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.4, 0.4), nil, nil, "skinhalloweenpixelart_v4");
 NewTexture(144, SkinsLibrary.Packs.HalloweenPixelArt, "Cursed Cat", {
 	"rbxassetid://7605222982";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.6, 0.6));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.6, 0.6), nil, nil, "skinhalloweenpixelart_v5");
 NewTexture(145, SkinsLibrary.Packs.HalloweenPixelArt, "Spooky Skeletons RGB", {
 	"rbxassetid://7605228557";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.3, 0.3));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.3, 0.3), nil, nil, "skinhalloweenpixelart_v1");
 NewTexture(146, SkinsLibrary.Packs.HalloweenPixelArt, "Haunted Ghost RGB", {
 	"rbxassetid://7605250341";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.4, 0.4));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.4, 0.4), nil, nil, "skinhalloweenpixelart_v3");
 
 --== Texture Pack: Offline
 NewTexture(150, SkinsLibrary.Packs.Offline, "Colored Static", {
 	"rbxassetid://7866772353";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skinoffline_v1");
 NewTexture(151, SkinsLibrary.Packs.Offline, "Pink Static", {
 	"rbxassetid://7866772353";
-}, Color3.fromRGB(255, 0, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 0, 255), Vector2.new(1, 1), nil, nil, "skinoffline_v1");
 NewTexture(152, SkinsLibrary.Packs.Offline, "Cyan Static", {
 	"rbxassetid://7866772353";
-}, Color3.fromRGB(0, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(0, 255, 255), Vector2.new(1, 1), nil, nil, "skinoffline_v1");
 NewTexture(153, SkinsLibrary.Packs.Offline, "Lime Static", {
 	"rbxassetid://7866772353";
-}, Color3.fromRGB(255, 255, 0), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 0), Vector2.new(1, 1), nil, nil, "skinoffline_v1");
 NewTexture(154, SkinsLibrary.Packs.Offline, "Mono Static", {
 	"rbxassetid://7866840036";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skinoffline_v2");
 
 NewTexture(160, SkinsLibrary.Packs.Ice, "Red", {
 	"rbxassetid://8532292678";
-}, Color3.fromRGB(255, 105, 105), Vector2.new(4, 4));
+}, Color3.fromRGB(255, 105, 105), Vector2.new(4, 4), nil, nil, "skinice_v1");
 NewTexture(161, SkinsLibrary.Packs.Ice, "Green", {
 	"rbxassetid://8532360403";
-}, Color3.fromRGB(105, 255, 105), Vector2.new(4, 4));
+}, Color3.fromRGB(105, 255, 105), Vector2.new(4, 4), nil, nil, "skinice_v2");
 NewTexture(162, SkinsLibrary.Packs.Ice, "Blue", {
 	"rbxassetid://8532366520";
-}, Color3.fromRGB(105, 105, 255), Vector2.new(4, 4));
+}, Color3.fromRGB(105, 105, 255), Vector2.new(4, 4), nil, nil, "skinice_v3");
 NewTexture(163, SkinsLibrary.Packs.Ice, "Purple", {
 	"rbxassetid://8532292678";
-}, Color3.fromRGB(255, 105, 255), Vector2.new(4, 4));
+}, Color3.fromRGB(255, 105, 255), Vector2.new(4, 4), nil, nil, "skinice_v1");
 NewTexture(164, SkinsLibrary.Packs.Ice, "Cyan", {
 	"rbxassetid://8532360403";
-}, Color3.fromRGB(105, 255, 255), Vector2.new(4, 4));
+}, Color3.fromRGB(105, 255, 255), Vector2.new(4, 4), nil, nil, "skinice_v2");
 NewTexture(165, SkinsLibrary.Packs.Ice, "Yellow", {
 	"rbxassetid://8532366520";
-}, Color3.fromRGB(255, 255, 105), Vector2.new(4, 4));
+}, Color3.fromRGB(255, 255, 105), Vector2.new(4, 4), nil, nil, "skinice_v3");
 NewTexture(166, SkinsLibrary.Packs.Ice, "White", {
 	"rbxassetid://8532292678";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(4, 4));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(4, 4), nil, nil, "skinice_v1");
 NewTexture(167, SkinsLibrary.Packs.Ice, "Grey", {
 	"rbxassetid://8532360403";
-}, Color3.fromRGB(100, 100, 100), Vector2.new(4, 4));
+}, Color3.fromRGB(100, 100, 100), Vector2.new(4, 4), nil, nil, "skinice_v2");
 NewTexture(168, SkinsLibrary.Packs.Ice, "Black", {
 	"rbxassetid://8532366520";
-}, Color3.fromRGB(50, 50, 50), Vector2.new(4, 4));
+}, Color3.fromRGB(50, 50, 50), Vector2.new(4, 4), nil, nil, "skinice_v3");
 
 
 --== Texture Pack: Easter 2023
 NewTexture(170, SkinsLibrary.Packs.Easter2023, "Purple Egg", {
 	"rbxassetid://12961909431";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skineaster2023_v1");
 
 NewTexture(171, SkinsLibrary.Packs.Easter2023, "Green Egg", {
 	"rbxassetid://12961914801";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skineaster2023_v2");
 
 NewTexture(172, SkinsLibrary.Packs.Easter2023, "Cherry Blossom Egg", {
 	"rbxassetid://12961916162";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skineaster2023_v3");
 NewTexture(173, SkinsLibrary.Packs.Easter2023, "Purple Egg 2", {
 	"rbxassetid://12961909431";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skineaster2023_v1");
 
 NewTexture(174, SkinsLibrary.Packs.Easter2023, "Green Egg 2", {
 	"rbxassetid://12961914801";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skineaster2023_v2");
 
 NewTexture(175, SkinsLibrary.Packs.Easter2023, "Cherry Blossom Egg 2", {
 	"rbxassetid://12961916162";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(0.5, 0.5), nil, nil, "skineaster2023_v3");
 
 
 --== Windtrails
 NewTexture(180, SkinsLibrary.Packs.Windtrails, "Wind Vertical", {
 	"rbxassetid://14249893630";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1.5, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1.5, 1), nil, nil, "skinwindtrails_v1");
 NewTexture(181, SkinsLibrary.Packs.Windtrails, "Wind Horizontal", {
 	"rbxassetid://14249961683";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1.5, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1.5, 1), nil, nil, "skinwindtrails_v2");
 NewTexture(182, SkinsLibrary.Packs.Windtrails, "Wind 2 Right", {
 	"rbxassetid://14250624431";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1.5, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1.5, 1), nil, nil, "skinwindtrails_v3");
 NewTexture(183, SkinsLibrary.Packs.Windtrails, "Wind 2 Up", {
 	"rbxassetid://14250629686";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1.5, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1.5, 1), nil, nil, "skinwindtrails_v4");
 NewTexture(184, SkinsLibrary.Packs.Windtrails, "Cloud 1 Right", {
 	"rbxassetid://14250875240";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skinwindtrails_v5");
 NewTexture(185, SkinsLibrary.Packs.Windtrails, "Cloud 1 Left", {
 	"rbxassetid://14250921231";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skinwindtrails_v6");
 NewTexture(186, SkinsLibrary.Packs.Windtrails, "Cloud 1 Up", {
 	"rbxassetid://14250924060";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skinwindtrails_v7");
 NewTexture(187, SkinsLibrary.Packs.Windtrails, "Cloud 1 Down", {
 	"rbxassetid://14250925805";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skinwindtrails_v8");
 
 
 --== CuteButScary
 NewTexture(190, SkinsLibrary.Packs.CuteButScary, "Pumpkins 1", {
 	"rbxassetid://15016449317";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincutebutscary_v1");
 NewTexture(191, SkinsLibrary.Packs.CuteButScary, "Pumpkins 2", {
 	"rbxassetid://15016458759";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincutebutscary_v2");
 
 NewTexture(192, SkinsLibrary.Packs.CuteButScary, "Skulls 1", {
 	"rbxassetid://15016462697";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincutebutscary_v3");
 NewTexture(193, SkinsLibrary.Packs.CuteButScary, "Skulls 2", {
 	"rbxassetid://15016466372";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincutebutscary_v4");
 NewTexture(194, SkinsLibrary.Packs.CuteButScary, "Skulls BW", {
 	"rbxassetid://15016503835";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincutebutscary_v5");
 NewTexture(195, SkinsLibrary.Packs.CuteButScary, "Skulls RGB", {
 	"rbxassetid://15016521823";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincutebutscary_v5");
 
 NewTexture(196, SkinsLibrary.Packs.CuteButScary, "Ghosts 1", {
 	"rbxassetid://15016470436";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincutebutscary_v6");
 NewTexture(197, SkinsLibrary.Packs.CuteButScary, "Ghosts 2", {
 	"rbxassetid://15016474733";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincutebutscary_v7");
 NewTexture(198, SkinsLibrary.Packs.CuteButScary, "Ghosts BW", {
 	"rbxassetid://15016524848";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincutebutscary_v8");
 NewTexture(199, SkinsLibrary.Packs.CuteButScary, "Ghosts RGB", {
 	"rbxassetid://15016528084";
-}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1));
+}, Color3.fromRGB(255, 255, 255), Vector2.new(1, 1), nil, nil, "skincutebutscary_v8");
 
 
 --== Skin Pack: Fancy
@@ -640,19 +653,19 @@ for a=1, #FancyTypes do
 	FancyId = FancyId +1;
 	NewTexture(FancyId, SkinsLibrary.Packs.Fancy, FancyTypes[a][1].."Fancy", {
 		"rbxassetid://17282157675";
-	}, FancyTypes[a][2], Vector2.new(2, 2));
+	}, FancyTypes[a][2], Vector2.new(2, 2), nil, nil, "skinfancy_v1");
 	FancyId = FancyId +1;
 	NewTexture(FancyId, SkinsLibrary.Packs.Fancy, FancyTypes[a][1].."Fancy Inner Shadow", {
 		"rbxassetid://17282156952";
-	}, FancyTypes[a][2], Vector2.new(2, 2));
+	}, FancyTypes[a][2], Vector2.new(2, 2), nil, nil, "skinfancy_v2");
 	FancyId = FancyId +1;
 	NewTexture(FancyId, SkinsLibrary.Packs.Fancy, FancyTypes[a][1].."Fancy Glow", {
 		"rbxassetid://17282157229";
-	}, FancyTypes[a][2], Vector2.new(2, 2));
+	}, FancyTypes[a][2], Vector2.new(2, 2), nil, nil, "skinfancy_v3");
 	FancyId = FancyId +1;
 	NewTexture(FancyId, SkinsLibrary.Packs.Fancy, FancyTypes[a][1].."Fancy Bevel", {
 		"rbxassetid://17282157420";
-	}, FancyTypes[a][2], Vector2.new(2, 2));
+	}, FancyTypes[a][2], Vector2.new(2, 2), nil, nil, "skinfancy_v4");
 end
 
 

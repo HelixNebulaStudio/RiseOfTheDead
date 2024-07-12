@@ -490,6 +490,7 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 			customPlansCache = customPlansCache or {};
 			
 			task.spawn(function()
+				if modData.Profile.OptInNewCustomizationMenu ~= true then return end;
 				local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 
 				local rPacket = remoteCustomizationData:InvokeServer("loadcustomizations", storageItem.ID);

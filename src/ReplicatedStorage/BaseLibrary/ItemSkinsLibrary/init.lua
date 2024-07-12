@@ -81,7 +81,7 @@ function ItemSkinsLibrary:Init(super)
             {Id="v1"; Name="Jerry"; Image="rbxassetid://4610326832"; };
             {Id="v2"; Name="The Helix"; Image="rbxassetid://4611060133"; };
             {Id="v3"; Name="Genetical"; Image="rbxassetid://4611094988"; };
-            {Id="v4"; Name="Wasted"; Image="rbxassetid://4641413755"; };
+            {Id="v4"; Name="Wave"; Image="rbxassetid://4641413755"; };
         };
     };
 
@@ -288,7 +288,6 @@ function ItemSkinsLibrary:Init(super)
             {Id="v6"; Name="Variant 6"; Image="rbxassetid://6109085983"; ScaleRatio=Vector2.new(0.1, 0.1); };
             {Id="v7"; Name="Variant 7"; Image="rbxassetid://6109157985"; ScaleRatio=Vector2.new(0.5, 0.5); };
             {Id="v8"; Name="Variant 8"; Image="rbxassetid://6109215107"; ScaleRatio=Vector2.new(0.2, 0.2); };
-            
         };
     };
 
