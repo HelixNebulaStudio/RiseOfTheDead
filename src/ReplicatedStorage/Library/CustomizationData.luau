@@ -907,6 +907,14 @@ if RunService:IsServer() then
                 Debugger:StudioWarn("Unlock by skin pack");
 
                 addToUnlockedSkins = true;
+
+                for a=#unlockedSkins, 1, -1 do
+                    local isReplacable = modItemSkinsLibrary:Find(unlockedSkins[a]);
+                    isReplacable = isReplacable and isReplacable.SkinsListReplacable or false;
+                    if isReplacable then
+                        table.remove(unlockedSkins, a);
+                    end
+                end
             end
 
             if addToUnlockedSkins and isUnlocked == false then

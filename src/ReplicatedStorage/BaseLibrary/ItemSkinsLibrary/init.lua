@@ -365,6 +365,7 @@ function ItemSkinsLibrary:Init(super)
 
         OldPackId="HalloweenPixelArt";
         UnlockPack="skinhalloweenpixelart";
+        SkinsListReplacable=true;
     
         Patterns={
             {Id="v1"; Name="Variant 1"; Image="rbxassetid://7605228557"; ScaleRatio=Vector2.new(0.3, 0.3);};
@@ -387,6 +388,7 @@ function ItemSkinsLibrary:Init(super)
         
         OldPackId="HalloweenPixelArt";
         UnlockPack="skinhalloweenpixelart";
+        SkinsListReplacable=true;
     
         Patterns={
             {Id="v1"; Name="Variant 1"; Image="rbxassetid://7605250341"; ScaleRatio=Vector2.new(0.4, 0.4);};
@@ -409,6 +411,7 @@ function ItemSkinsLibrary:Init(super)
 
         OldPackId="CuteButScary";
         UnlockPack="skincutebutscary";
+        SkinsListReplacable=true;
     
         Patterns={
             {Id="v1"; Name="Variant 1"; Image="rbxassetid://15016521823";};
@@ -427,9 +430,10 @@ function ItemSkinsLibrary:Init(super)
         Name="Cute Ghosts";
         Icon="rbxassetid://18456013933";
         Rare=true;
-        
+
         OldPackId="CuteButScary";
         UnlockPack="skincutebutscary";
+        SkinsListReplacable=true;
     
         Patterns={
             {Id="v1"; Name="Variant 1"; Image="rbxassetid://15016528084";};

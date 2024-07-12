@@ -603,14 +603,16 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				local skinLib = modItemSkinsLibrary:Find(skinId);
 				local isUnlocked = unlockedSkins[skinId] == true;
 
-				if skinLib and skinLib.UnlockPack and unlockedSkins[skinLib.UnlockPack] then
-					isUnlocked = true;
-				end
-
 				local unlockButton = templateTitledSkin:Clone();
+				local chargeLabel = unlockButton:WaitForChild("ChargesLabel");
 				unlockButton.LayoutOrder = a;
 				unlockButton:SetAttribute("SkinId", skinId);
-				
+
+				if skinLib and skinLib.UnlockPack and unlockedSkins[skinLib.UnlockPack] then
+					isUnlocked = true;
+					chargeLabel.Text = `∞`;
+				end
+
 				unlockButton.AutoButtonColor = isUnlocked;
 
 				local function setBaseSkinClicked(force)

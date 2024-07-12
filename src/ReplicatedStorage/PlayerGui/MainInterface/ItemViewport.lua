@@ -242,7 +242,7 @@ function ItemViewport:RefreshDisplay()
 				self.HighlightPort.AnchorPoint = self.Frame.AnchorPoint;
 				self.HighlightPort.CurrentCamera = self.Frame.CurrentCamera;
 
-				self.HighlightPort.ImageTransparency = 0.7 + 0.2 * math.sin(tick()*1.5);
+				self.HighlightPort.ImageTransparency = 0.5 + 0.2 * math.sin(tick()*1.5);
 
 			end
 
