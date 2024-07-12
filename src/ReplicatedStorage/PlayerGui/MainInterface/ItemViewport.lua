@@ -242,7 +242,7 @@ function ItemViewport:RefreshDisplay()
 				self.HighlightPort.AnchorPoint = self.Frame.AnchorPoint;
 				self.HighlightPort.CurrentCamera = self.Frame.CurrentCamera;
 
-				self.HighlightPort.ImageTransparency = 0.6 + 0.3 * math.sin(tick()*1.5);
+				self.HighlightPort.ImageTransparency = 0.7 + 0.2 * math.sin(tick()*1.5);
 
 			end
 
@@ -272,6 +272,7 @@ function ItemViewport:RefreshDisplay()
 					end
 
 					self.HighlightPartClone = self.CurrentHighlightPart:Clone();
+					self.HighlightPartClone:ClearAllChildren();
 					self.HighlightPartClone.Material = Enum.Material.Neon;
 					self.HighlightPartClone.Color = Color3.fromRGB(255, 255, 255);
 					self.HighlightPartClone.Parent = self.HighlightPort;

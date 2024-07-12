@@ -32,15 +32,18 @@ end
 
 function Components.CreateSlider(mainInterface, paramPacket)
 	local button = paramPacket.Button :: TextButton;
-	local setFunc = paramPacket.SetFunc;
 	
+	local setFunc = paramPacket.SetFunc;
+	local saveFunc = paramPacket.SaveFunc;
+
+	local sliderName = paramPacket.Name;
 	local rangeInfo = paramPacket.RangeInfo;
 	local minVal, maxVal, defaultVal = rangeInfo.Min, rangeInfo.Max, rangeInfo.Default;
 	local rangeScale = rangeInfo.Scale or 1;
 	local valueType = rangeInfo.ValueType or "Percent";
 	
 	local gradientLayout = button:WaitForChild("UIGradient");
-	local typeInput = button:WaitForChild("typeInput");
+	local typeInput = button:WaitForChild("typeInput") :: TextBox;
 	
 	local currentVal = defaultVal;
 	local percentVal = nil;
@@ -100,8 +103,11 @@ function Components.CreateSlider(mainInterface, paramPacket)
 			refreshSlider();
 			
 			if not mainInterface.Button1Down or not Components.IsTrulyVisible(button) then
-				setFunc(currentVal/rangeScale);
 				RunService:UnbindFromRenderStep("slider");
+				if saveFunc then
+					saveFunc(currentVal/rangeScale);
+				end
+				setFunc(currentVal/rangeScale);
 			end
 		end)
 	end
@@ -146,7 +152,16 @@ function Components.CreateSlider(mainInterface, paramPacket)
 
 		currentVal = setVal;
 		refreshSlider();
+		if saveFunc then
+			saveFunc(currentVal/rangeScale);
+		end
 		setFunc(currentVal/rangeScale);
+	end)
+
+	typeInput:GetPropertyChangedSignal("Text"):Connect(function()
+		if typeInput:IsFocused() then
+			button.Text = "";
+		end
 	end)
 
 	local resetCooldown = nil;
