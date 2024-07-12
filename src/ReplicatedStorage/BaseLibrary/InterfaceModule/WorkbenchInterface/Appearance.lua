@@ -11,7 +11,7 @@ local Interface = {
 	RefreshNavigations = nil;
 	SetPage = nil;
 	PromptQuestion = nil;
-};
+} :: any;
 
 local TweenService = game:GetService("TweenService");
 local UserInputService = game:GetService("UserInputService");
@@ -105,6 +105,8 @@ function Workbench.new(itemId, library, storageItem)
 		local basePrefab = itemDisplay.DisplayModels[a].BasePrefab;
 		local prefab = itemDisplay.DisplayModels[a].Prefab;
 		
+		local itemLib = modItemLibrary:Find(itemId);
+
 		local unlockableLib = modItemUnlockablesLibrary:Find(itemId);
 		if unlockableLib then
 			local clothingLib = modClothingLibrary:Find(itemId);
@@ -233,32 +235,26 @@ function Workbench.new(itemId, library, storageItem)
 								local name = itemLib and itemLib.Name or `{unlockItemLib.ItemId}:{unlockItemLib.Name}`;
 								local icon = itemLib and itemLib.Icon or unlockItemLib.Icon;
 								
-								local promptWindow = Interface:PromptQuestion("Apply Skin?",
-									`You are about to apply {name}?`, 
-									"Apply", "Cancel", icon);
-								local YesClickedSignal, NoClickedSignal;
-								
-								local applyDebounce = tick();
-								YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-									if tick()-applyDebounce <= 0.2 then return end;
-									applyDebounce = tick();
-									
-									Interface:PlayButtonClick();
-									promptWindow.Frame.Yes.buttonText.Text = "Applying...";
-									
-									remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId", unlockItemLib.Id);
-
-									promptWindow:Close();
-									YesClickedSignal:Disconnect();
-									NoClickedSignal:Disconnect();
-								end);
-								
-								NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-									Interface:PlayButtonClick();
-									promptWindow:Close();
-									YesClickedSignal:Disconnect();
-									NoClickedSignal:Disconnect();
-								end);
+								Interface:PromptDialogBox({
+									Title=`Apply {name} Skin?`;
+									Desc=`You are about to apply {name} skin on {itemLib.Name}?`;
+									Icon=icon;
+									Buttons={
+										{
+											Text="Apply";
+											Style="Confirm";
+											OnPrimaryClick=function(promptDialogFrame, textButton)
+												promptDialogFrame.statusLabel.Text = "Applying...";
+												remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId", unlockItemLib.Id);
+												task.wait(0.5);
+											end;
+										};
+										{
+											Text="Cancel";
+											Style="Cancel";
+										};
+									}
+								});
 
 								return;
 							end

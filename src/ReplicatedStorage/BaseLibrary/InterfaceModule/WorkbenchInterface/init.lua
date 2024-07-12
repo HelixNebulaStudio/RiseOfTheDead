@@ -143,7 +143,7 @@ function Interface.init(modInterface)
 
 			for key, wb in pairs(Interface.Workbenches) do
 				
-				if modData.Profile.OptInNewCustomizationMenu == true and (key == "Appearance") then
+				if modData.Profile.OptInNewCustomizationMenu == true and (key == "Appearance") and itemLib.Type ~= modItemLibrary.Types.Clothing then
 					continue;
 				elseif modData.Profile.OptInNewCustomizationMenu ~= true and (key == "Customization") then
 					continue;
