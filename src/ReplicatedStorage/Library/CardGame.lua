@@ -92,18 +92,22 @@ function Lobby.new()
 	return self;
 end
 
-function Lobby:GetPlayer(player)
+function Lobby:GetPlayer(player, inGame)
 	for a=#self.Players, 1, -1 do
 		if self.Players[a].Player == player then
 			return self.Players[a], a; -- {Type="Players"};
 		end
 	end
 	
+	if inGame then return end;
+
 	for a=#self.Spectators, 1, -1 do
 		if self.Spectators[a].Player == player then
 			return self.Spectators[a], a; -- {Type="Spectators"};
 		end
 	end
+
+	return;
 end
 
 function Lobby:SetPlayerType(player, setType)
@@ -279,9 +283,15 @@ function Lobby:NextTurn()
 			
 		end
 		
-		local loserPlayerTable = self:GetPlayer(stageInfo.Loser);
-		if #loserPlayerTable.Cards <= 1 then
-			duration = 2;
+		local loserPlayerTable = self:GetPlayer(stageInfo.Loser, true);
+
+		if loserPlayerTable == nil or loserPlayerTable.Cards == nil then
+			Debugger:Warn("Missing loserPlayerTable (",stageInfo.Loser") A:",accuserPlayer, "D:",defendantPlayer);
+
+		end
+
+		if loserPlayerTable and loserPlayerTable.Cards and #loserPlayerTable.Cards <= 1 then
+			duration = 2; 
 			self.ActionPlayed = true;
 			self:QueueStage(StageType.PlayerDefeated, {DefeatedPlayer=stageInfo.Loser;});
 			
@@ -378,7 +388,7 @@ function Lobby:NextTurn()
 end
 
 function Lobby:PlayAction(player, packet)
-	local playerTable = self:GetPlayer(player);
+	local playerTable = self:GetPlayer(player, true);
 	
 	local unixTime = DateTime.now().UnixTimestampMillis;
 	local optionIndex = packet.OptionIndex;
@@ -401,7 +411,7 @@ function Lobby:PlayAction(player, packet)
 		packet.FoldCard = packet.FoldCard == 1 and 1 or 2;
 		
 		local loser = stageInfo.Loser;
-		local loserPlayerTable = self:GetPlayer(loser);
+		local loserPlayerTable = self:GetPlayer(loser, true);
 		
 		Debugger:Log("PlayAction fold", loser, packet);
 		local card = table.remove(loserPlayerTable.Cards, packet.FoldCard);
@@ -517,7 +527,7 @@ function Lobby:PlayAction(player, packet)
 			end
 
 		elseif optionLib.SelectTarget and targetPlayer then
-			local targetPlayerTable = self:GetPlayer(targetPlayer);
+			local targetPlayerTable = self:GetPlayer(targetPlayer, true);
 			broadcastMsg = string.gsub(broadcastMsg, "$TargetName", targetPlayer.Name);
 
 			if optionIndex == 2 then -- Heavy Attack;
@@ -874,7 +884,7 @@ if RunService:IsServer() then
 
 			if lobby == nil or lobby.StageIndex ~= packet.StageIndex then Debugger:Log("false lobby", lobby); return rPacket end;
 
-			local playerTable = lobby:GetPlayer(player);
+			local playerTable = lobby:GetPlayer(player, true);
 			
 			local stageInfo = lobby.StageQueue[lobby.StageIndex];
 			if playerTable.Player ~= stageInfo.TurnPlayer then Debugger:Log("false player", stageInfo); return rPacket; end
@@ -909,8 +919,6 @@ if RunService:IsServer() then
 			local stageInfo = lobby.StageQueue[lobby.StageIndex];
 			if stageInfo.TargettedPlayer ~= nil and stageInfo.TargettedPlayer ~= player then Debugger:Log("false player", stageInfo); return rPacket; end
 			
-			local playerTable = lobby:GetPlayer(player);
-
 			if packet.CallBluff == true then
 				Debugger:Log("decideaction stageInfo", stageInfo);
 				--local optionLib = CardGame.ActionOptions[stageInfo.ActionId];
@@ -943,7 +951,7 @@ if RunService:IsServer() then
 			local stageInfo = lobby.StageQueue[lobby.StageIndex];
 			
 			if stageInfo.Loser ~= player then Debugger:Log("false loser", stageInfo); return rPacket; end
-			local loserPlayerTable = lobby:GetPlayer(player);
+			local loserPlayerTable = lobby:GetPlayer(player, true);
 			
 			lobby:PlayAction(player, packet);
 			rPacket.NewCards = loserPlayerTable.Cards;

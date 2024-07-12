@@ -908,7 +908,6 @@ function Interface.init(modInterface)
 					resourceLabel.Visible = false;
 					
 				end
-				Debugger:Log("localPlayerTable", localPlayerTable);
 				
 				local stageInfo = lobby.Stage;
 
