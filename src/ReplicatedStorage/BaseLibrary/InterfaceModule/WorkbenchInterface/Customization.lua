@@ -557,10 +557,11 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		local unlockedSkins = getUnlockedSkins();
 		for index, skinInfo in pairs(modItemSkinsLibrary:GetIndexList()) do
 			if skinInfo.Rare ~= true then continue end;
-			if not isDevBranch and unlockedSkins[skinInfo.Id] == nil then continue end;
+			-- Rare skins;
+			if unlockedSkins[skinInfo.Id] == nil and (skinInfo.UnlockPack and unlockedSkins[skinInfo.UnlockPack] == nil) then continue end; --  not isDevBranch and
 			table.insert(rareSkinsList, skinInfo.Id);
 		end
-	
+
 		local function refreshSkinPerm()
 			local activeSkinId = storageItem.Values.ActiveSkin;
 			local baseSkin = modCustomizationData.GetBaseSkinFromActiveId(itemId, activeSkinId);
@@ -602,6 +603,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				local skinLib = modItemSkinsLibrary:Find(skinId);
 				local isUnlocked = unlockedSkins[skinId] == true;
 
+				if skinLib and skinLib.UnlockPack and unlockedSkins[skinLib.UnlockPack] then
+					isUnlocked = true;
+				end
+
 				local unlockButton = templateTitledSkin:Clone();
 				unlockButton.LayoutOrder = a;
 				unlockButton:SetAttribute("SkinId", skinId);
@@ -616,7 +621,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 						WorkbenchPart=Interface.Object;
 						Siid=storageItem.ID;
 						SkinId=skinId;
-						Test="";
 						Force=force;
 					});
 
@@ -653,6 +657,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				end
 
 				if skinLib == nil then continue end;
+
+				if skinLib.Rare and not isUnlocked and not isDevBranch then
+					unlockButton.Visible = false;
+				end
 
 				local imgLabel = unlockButton:WaitForChild("TextureLabel");
 				imgLabel.Image = skinLib.Icon;

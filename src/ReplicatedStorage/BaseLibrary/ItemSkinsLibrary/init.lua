@@ -176,8 +176,6 @@ function ItemSkinsLibrary:Init(super)
             {Id="v3"; Name="Possessed Jane"; Image="rbxassetid://7605214869"; ScaleRatio=Vector2.new(0.2, 0.2); };
             {Id="v4"; Name="Pixel Ghost"; Image="rbxassetid://7605218975"; ScaleRatio=Vector2.new(0.4, 0.4); };
             {Id="v5"; Name="Cursed Cat"; Image="rbxassetid://7605222982"; ScaleRatio=Vector2.new(0.6, 0.6); };
-            --{Id="v6"; Name="Pixel Skeletons RGB"; Image="rbxassetid://7605228557"; ScaleRatio=Vector2.new(0.3, 0.3);};
-            --{Id="v7"; Name="Pixel Ghost RGB"; Image="rbxassetid://7605250341"; ScaleRatio=Vector2.new(0.4, 0.4);};
         };
     };
 
@@ -323,8 +321,6 @@ function ItemSkinsLibrary:Init(super)
             {Id="v6"; Name="Cute Ghosts 1"; Image="rbxassetid://15016470436"; };
             {Id="v7"; Name="Cute Ghosts 2"; Image="rbxassetid://15016474733"; };
             {Id="v8"; Name="Cute Ghosts Greyscale"; Image="rbxassetid://15016524848"; };
-            --{Id="v6"; Name="Skulls RGB"; Image="rbxassetid://15016521823";};
-            --{Id="va"; Name="Ghosts RGB"; Image="rbxassetid://15016528084";};
         };
     };
 
@@ -358,8 +354,93 @@ function ItemSkinsLibrary:Init(super)
     };
     
     --== MARK: Animated Patterns;
-    
+    super:Add{
+        Id="skinpixelskeletons";
+        Type=super.SkinType.Pattern;
+        OldId="145";
 
+        Name="Pixel Skeletons";
+        Icon="rbxassetid://18456012800";
+        Rare=true;
+
+        OldPackId="HalloweenPixelArt";
+        UnlockPack="skinhalloweenpixelart";
+    
+        Patterns={
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://7605228557"; ScaleRatio=Vector2.new(0.3, 0.3);};
+        };
+
+        PatternPreset={
+            TextureAnimationId="FadeRGB";
+            Scale=Vector2.new(0.3, 0.3);
+        };
+    };
+
+    super:Add{
+        Id="skinpixelghosts";
+        Type=super.SkinType.Pattern;
+        OldId="146";
+
+        Name="Pixel Ghosts";
+        Icon="rbxassetid://18456013143";
+        Rare=true;
+        
+        OldPackId="HalloweenPixelArt";
+        UnlockPack="skinhalloweenpixelart";
+    
+        Patterns={
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://7605250341"; ScaleRatio=Vector2.new(0.4, 0.4);};
+        };
+
+        PatternPreset={
+            TextureAnimationId="FadeRGB";
+            Scale=Vector2.new(0.4, 0.4);
+        };
+    };
+
+    super:Add{
+        Id="skincuteskulls";
+        Type=super.SkinType.Pattern;
+        OldId="195";
+
+        Name="Cute Skulls";
+        Icon="rbxassetid://18456013486";
+        Rare=true;
+
+        OldPackId="CuteButScary";
+        UnlockPack="skincutebutscary";
+    
+        Patterns={
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://15016521823";};
+        };
+
+        PatternPreset={
+            TextureAnimationId="FadeRGB";
+        };
+    };
+
+    super:Add{
+        Id="skincuteghosts";
+        Type=super.SkinType.Pattern;
+        OldId="199";
+
+        Name="Cute Ghosts";
+        Icon="rbxassetid://18456013933";
+        Rare=true;
+        
+        OldPackId="CuteButScary";
+        UnlockPack="skincutebutscary";
+    
+        Patterns={
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://15016528084";};
+        };
+
+        PatternPreset={
+            TextureAnimationId="FadeRGB";
+        };
+    };
+    
+    
     --== MARK: Special Patterns;
     super:Add{
         Id="skindiamonds";

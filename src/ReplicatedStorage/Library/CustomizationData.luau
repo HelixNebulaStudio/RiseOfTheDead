@@ -897,14 +897,24 @@ if RunService:IsServer() then
 				end
 			end
 
-            if packet.Force == true and (modBranchConfigs.CurrentBranch.Name == "Dev" or player.UserId == 16170943) then
-                if isUnlocked == false then
-                    table.insert(unlockedSkins, skinLib.Id);
-                    storageItem:SetValues("Skins", unlockedSkins);
-                    returnPacket.UnlockedSkins = unlockedSkins;
+            local addToUnlockedSkins = false;
 
-                    isUnlocked = true;
-                end
+            if packet.Force == true and (modBranchConfigs.CurrentBranch.Name == "Dev" or player.UserId == 16170943) then
+                addToUnlockedSkins = true;
+            end
+            
+            if skinLib and skinLib.OldPackId and profile.SkinsPacks[skinLib.OldPackId] then
+                Debugger:StudioWarn("Unlock by skin pack");
+
+                addToUnlockedSkins = true;
+            end
+
+            if addToUnlockedSkins and isUnlocked == false then
+                table.insert(unlockedSkins, skinLib.Id);
+                storageItem:SetValues("Skins", unlockedSkins);
+                returnPacket.UnlockedSkins = unlockedSkins;
+
+                isUnlocked = true;
             end
 
 			if isUnlocked then
