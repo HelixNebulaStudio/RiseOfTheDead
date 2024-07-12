@@ -41,7 +41,12 @@ function library:GetTasks(npcName)
     return library.NpcTasks[npcName];
 end
 
-local genericSkipCost = {Perks=25; Gold=700;};
+local genericSkipCost = {Perks=1; Gold=10;}; --{Perks=25; Gold=700;}; -- Per minute;
+
+--[[MARK: Notes;
+    NpcsList keywords;
+    - "x" all
+]]
 --==
 library:Add{
     Id="scavengeColorCustoms";

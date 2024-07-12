@@ -8,6 +8,9 @@ local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 --==
 local Components = {};
 
+Components.TemplateGoldImageLabel = script:WaitForChild("GoldImageLabel");
+Components.TemplatePerksImageLabel = script:WaitForChild("PerksImageLabel");
+
 function Components.IsTrulyVisible(guiObject)
 	local screenGui = guiObject:FindFirstAncestorWhichIsA("ScreenGui");
 
@@ -306,8 +309,6 @@ function Components.CreateProgressListing(mainInterface, paramPacket)
 		timeTag.Text = self.ProgressLabel;
 
 		local detailsFrame = self.Button:WaitForChild("DetailsFrame");
-		local inProgressFrame = detailsFrame:WaitForChild("InProgressButtons");
-		local completeButton = detailsFrame:WaitForChild("CompleteButton") :: TextButton;
 		
 		local descLabel = detailsFrame:WaitForChild("Description") :: TextLabel;
 		if self.DescText == nil or #self.DescText <= 0 then
@@ -317,38 +318,15 @@ function Components.CreateProgressListing(mainInterface, paramPacket)
 			descLabel.Text = self.DescText;
 		end
 
-		local skipGoldButton = inProgressFrame:WaitForChild("SkipButtonGold") :: TextButton;
-		local skipPerksButton = inProgressFrame:WaitForChild("SkipButtonPerks") :: TextButton;
-
 		local isComplete = self.ProgressValue >= 1
 		
+		local completeButton = detailsFrame:WaitForChild("CompleteButton") :: TextButton;
 		completeButton.Visible = isComplete;
+		
 		self.CancelHoldDownObject.Button.Visible = not isComplete;
 
-		if not isComplete then
-			if self.SkipCost.Perks == nil and self.SkipCost.Gold == nil then
-				inProgressFrame.Visible = false;
-			else
-				inProgressFrame.Visible = true;
-				
-				if self.SkipCost.Perks == nil then
-					skipPerksButton.Visible = false;
-					skipGoldButton.Size = UDim2.new(0, 230, 0, 30);
-				else
-					skipPerksButton.Text = tostring(self.SkipCost.Perks);
-				end
-				if self.SkipCost.Gold == nil then
-					skipGoldButton.Visible = false;
-					skipPerksButton.Position = UDim2.new(1, 0, 0, 0);
-					skipPerksButton.Size = UDim2.new(0, 230, 0, 30);
-				else
-					skipGoldButton.Text = tostring(self.SkipCost.Gold);
-				end
-			end
-		else
-			inProgressFrame.Visible = false;
-
-		end
+		local skipButton = detailsFrame:WaitForChild("SkipButton") :: TextButton;
+		skipButton.Visible = not isComplete and self.IsSkipVisible;
 	end
 
 	local self = {};
@@ -357,20 +335,11 @@ function Components.CreateProgressListing(mainInterface, paramPacket)
 	self.Title = "n/a";
 	self.ProgressValue = 0;
 	self.ProgressLabel = "";
+	self.IsSkipVisible = false;
 
-	self.SkipCost = {
-		Perks=nil;
-		Gold=nil;
-	};
-
-	
-	self.OnSkipYes = function(packet)
-	end
-	self.OnSkipNo = function(packet)
-	end
-	self.ReopenWindow = function() end;
-	self.OnComplete = function(packet) end;
-	self.OnCancel = function(packet) end;
+	self.OnSkipClick = function(packet) end;
+	self.OnCompleteClick = function(packet) end;
+	self.OnCancelClick = function(packet) end;
 	
 	local newButton = taskProcessTemplate:Clone() :: ImageButton;
 	newButton.Name = self.Id;
@@ -378,33 +347,39 @@ function Components.CreateProgressListing(mainInterface, paramPacket)
 	self.Button = newButton;
 
 	local detailsFrame = newButton:WaitForChild("DetailsFrame");
-	local completeButton = detailsFrame:WaitForChild("CompleteButton") :: TextButton;
-
-	local inProgressFrame = detailsFrame:WaitForChild("InProgressButtons");
-	local skipGoldButton = inProgressFrame:WaitForChild("SkipButtonGold") :: TextButton;
-	local skipPerksButton = inProgressFrame:WaitForChild("SkipButtonPerks") :: TextButton;
-
 	newButton.MouseButton1Click:Connect(function()
 		mainInterface:PlayButtonClick();
 		detailsFrame.Visible = not detailsFrame.Visible;
 	end)
 
+	local skipButton = detailsFrame:WaitForChild("SkipButton") :: TextButton;
+	skipButton.MouseButton1Click:Connect(function()
+		mainInterface:PlayButtonClick();
+		if self.OnSkipClick then
+			self.OnSkipClick({
+				Button=skipButton;
+			});
+		end
+	end)
+
+	local completeButton = detailsFrame:WaitForChild("CompleteButton") :: TextButton;
 	completeButton.MouseButton1Click:Connect(function()
 		mainInterface:PlayButtonClick();
 
-		if self.OnComplete then
-			self.OnComplete({
+		if self.OnCompleteClick then
+			self.OnCompleteClick({
 				Button=completeButton;
 			});
 		end
 	end)
 
 	self.CancelHoldDownObject = Components.CreateHoldDownButton(mainInterface, {
+		Name = "CancelButton";
 		Text = "Cancel Task";
 	})
 	self.CancelHoldDownObject.OnHoldDownConfirm = function()
-		if self.OnCancel then
-			self.OnCancel({
+		if self.OnCancelClick then
+			self.OnCancelClick({
 				Button=self.CancelHoldDownObject.Button;
 			});
 		end
@@ -417,68 +392,6 @@ function Components.CreateProgressListing(mainInterface, paramPacket)
 
 	detailsFrame:GetPropertyChangedSignal("Visible"):Connect(function()
 		self:Update();
-	end)
-
-	local function skipPrompt(currency)
-		detailsFrame.Visible = false;
-
-		local promptWindow = mainInterface:PromptQuestion("Skip "..self.Title,
-			currency == "Perks"
-			and "Are you sure you want to skip task for <b><font color='rgb(135, 169, 255)'>".. tostring(self.SkipCost.Perks) .." Perks</font></b>?"
-			or "Are you sure you want to skip task for <b><font color='rgb(255, 205, 79)'>".. tostring(self.SkipCost.Gold) .." Gold</font></b>?"
-		);
-		local YesClickedSignal, NoClickedSignal;
-
-		local debounce = false;
-		YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-			if debounce then return end;
-			debounce = true;
-			mainInterface:PlayButtonClick();
-
-			local packet = {
-				Currency = currency;
-				YesLabel = promptWindow.Frame.Yes.buttonText;
-			};
-			local rPacket = self.OnSkipYes(packet);
-			if rPacket and rPacket.GoldShop then
-				promptWindow.Frame.Yes.buttonText.Text = `Not enough {currency}`;
-				task.wait(0.8);
-				promptWindow:Close();
-				mainInterface:OpenWindow("GoldMenu", currency == "Perks" and "PerksPage" or "GoldPage");
-				return;
-			end
-
-			wait(0.6);
-			debounce = false;
-			promptWindow:Close();
-			
-			YesClickedSignal:Disconnect();
-			NoClickedSignal:Disconnect();
-
-			if self.ReopenWindow then
-				self.ReopenWindow();
-			end
-		end);
-		NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-			if debounce then return end;
-			mainInterface:PlayButtonClick();
-			promptWindow:Close();
-			
-			YesClickedSignal:Disconnect();
-			NoClickedSignal:Disconnect();
-
-			self.OnSkipNo();
-			if self.ReopenWindow then
-				self.ReopenWindow();
-			end
-		end);
-	end
-
-	skipPerksButton.MouseButton1Click:Connect(function()
-		skipPrompt("Perks");
-	end)
-	skipGoldButton.MouseButton1Click:Connect(function()
-		skipPrompt("Gold");
 	end)
 
 	return self;
@@ -494,6 +407,7 @@ function Components.CreateHoldDownButton(mainInterface, paramPacket)
 	self.OnHoldDownConfirm = function() end;
 
 	self.Button = holdDownButtonTemplate:Clone() :: TextButton;
+	self.Button.Name = paramPacket.Name or self.Button.Name;
 	self.Button.Text = paramPacket.Text;
 
 	local progressBar = self.Button:WaitForChild("Bar") :: Frame;

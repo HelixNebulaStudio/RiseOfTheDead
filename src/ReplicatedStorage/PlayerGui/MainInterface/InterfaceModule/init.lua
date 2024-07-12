@@ -20,6 +20,7 @@ local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandle
 
 local modColorPicker = require(game.ReplicatedStorage.Library.UI.ColorPicker);
 local modDropdownList = require(game.ReplicatedStorage.Library.UI.DropdownList);
+local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
 
 local modGuiObjectTween = require(playerGui:WaitForChild("GuiObjectTween"));
 
@@ -707,6 +708,22 @@ function Interface:PromptDialogBox(params)
 				newButton.BackgroundColor3 = Color3.fromRGB(54, 107, 51);
 			elseif optionButtonInfo.Style == "Cancel" then
 				newButton.BackgroundColor3 = Color3.fromRGB(102, 38, 38);
+			elseif optionButtonInfo.Style == "Perks" then
+				newButton.BackgroundColor3 = Color3.fromRGB(53, 66, 100);
+				newButton.UIPadding.PaddingRight = UDim.new(0, 20);
+				local newLabel = modComponents.TemplatePerksImageLabel:Clone();
+				newLabel.ZIndex = 7;
+				newLabel.Size = UDim2.new(1, -5, 1, -5);
+				newLabel.Parent = newButton;
+
+			elseif optionButtonInfo.Style == "Gold" then
+				newButton.BackgroundColor3 = Color3.fromRGB(120, 103, 53);
+				newButton.UIPadding.PaddingRight = UDim.new(0, 20);
+				local newLabel = modComponents.TemplateGoldImageLabel:Clone();
+				newLabel.ZIndex = 7;
+				newLabel.Size = UDim2.new(1, -5, 1, -5);
+				newLabel.Parent = newButton;
+
 			end
 		end
 

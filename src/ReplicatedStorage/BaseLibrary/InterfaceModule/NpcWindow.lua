@@ -223,6 +223,16 @@ function Interface.init(modInterface)
 			local taskProcessObj = taskProcessObjects[taskData.Id];
 			updatedFlag[taskData.Id] = true;
 
+			local timeLeft = (taskData.EndTime)-t;
+			local duration = taskData.EndTime - taskData.StartTime;
+			local buildPercent = math.clamp(1-(timeLeft/duration), 0, 1);
+
+			local skipPerkCost, skipGoldCost = nil, nil;
+			if taskLib.SkipCost then
+				skipPerkCost = taskLib.SkipCost.Perks * math.ceil(timeLeft/60);
+				skipGoldCost = taskLib.SkipCost.Gold * math.ceil(timeLeft/60);
+			end
+
 			if taskProcessObj and taskProcessObj.StartTime ~= taskData.StartTime then
 				taskProcessObj:Destroy();
 				taskProcessObj = nil;
@@ -236,36 +246,61 @@ function Interface.init(modInterface)
 				taskProcessObj = taskProcessObjects[taskData.Id];
 				taskProcessObj.StartTime = taskData.StartTime;
 
-				taskProcessObj.SkipCost.Perks = taskLib.SkipCost.Perks;
-				taskProcessObj.SkipCost.Gold = taskLib.SkipCost.Gold;
-
-				taskProcessObj.OnSkipYes = function(packet: {Currency: string; YesLabel: TextLabel})
+				local function onSkip(currency, promptDialogFrame)
 					local rPacket = remoteNpcData:InvokeServer("skiptask", activeNpcName, {
 						Id = taskLib.Id;
-						Currency= packet.Currency;
+						Currency= currency;
 					});
 					
 					if rPacket.Success then
 						modData.Profile.NpcTaskData.Npc[activeNpcName] = rPacket.Data;
-						
+						promptDialogFrame.statusLabel.Text = "Task skipped!";
+						task.wait(0.5);
+
 						activePage = nil;
 						Interface.RefreshPage();
 
 					elseif rPacket.FailMsg then
-						packet.YesLabel.Text = rPacket.FailMsg;
-						task.wait(0.4);
+						promptDialogFrame.statusLabel.Text = rPacket.FailMsg;
+						task.wait(1);
+
+						if rPacket.GoldShop then
+							Interface:OpenWindow("GoldMenu", currency == "Perks" and "PerksPage" or "GoldPage");
+						end
 					end
 				end
 
-				taskProcessObj.OnSkipNo = function()
-				end
-
-				taskProcessObj.ReopenWindow = function()
-					window:Open(activeNpcName);
+				taskProcessObj.OnSkipClick = function()
+					Interface:PromptDialogBox({
+						Title=`Skip {taskLib.Name}?`;
+						Desc=`How would you like to skip {taskLib.Name} for {activeNpcName}?`;
+						Buttons={
+							{
+								Text=`{skipPerkCost}`;
+								Style="Perks";
+								OnPrimaryClick=function(promptDialogFrame, textButton)
+									promptDialogFrame.statusLabel.Text = "Skipping task with perks..";
+									onSkip("Perks", promptDialogFrame);
+								end;
+							};
+							{
+								Text=`{skipGoldCost}`;
+								Style="Gold";
+								OnPrimaryClick=function(promptDialogFrame, textButton)
+									promptDialogFrame.statusLabel.Text = "Skipping task with gold..";
+									onSkip("Gold", promptDialogFrame);
+								end;
+							};
+							{
+								Text="Cancel";
+								Style="Cancel";
+							};
+						}
+					});
 				end
 
 				local completeDebounce = false;
-				taskProcessObj.OnComplete = function(packet: {Button: TextButton})
+				taskProcessObj.OnCompleteClick = function(packet: {Button: TextButton})
 					if completeDebounce then return end;
 					completeDebounce = true;
 
@@ -295,7 +330,7 @@ function Interface.init(modInterface)
 				end
 
 				local cancelDebounce = false;
-				taskProcessObj.OnCancel = function(packet: {Button: TextButton})
+				taskProcessObj.OnCancelClick = function(packet: {Button: TextButton})
 					if cancelDebounce then return end;
 					cancelDebounce = true;
 
@@ -318,10 +353,6 @@ function Interface.init(modInterface)
 				end;
 			end
 
-			local timeLeft = (taskData.EndTime)-t;
-			local duration = taskData.EndTime - taskData.StartTime;
-			local buildPercent = math.clamp(1-(timeLeft/duration), 0, 1);
-
 			taskData.Title = taskLib.Name; 
 			taskData.ProgressLabel = timeLeft > 0 and modSyncTime.ToString(timeLeft or 0) or "Complete";
 			taskData.ProgressValue = buildPercent;
@@ -339,6 +370,8 @@ function Interface.init(modInterface)
 			end
 			 
 			taskData.DescText = descText;
+
+			taskProcessObj.IsSkipVisible = skipPerkCost or skipGoldCost;
 			taskProcessObj:Update(taskData);
 		end
 

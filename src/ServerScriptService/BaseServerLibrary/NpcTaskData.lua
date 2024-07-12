@@ -424,14 +424,20 @@ function remoteNpcData.OnServerInvoke(player: Player, action: string, npcName: s
             return rPacket;
         end
          
-        if taskData.EndTime and (taskData.EndTime-os.time()) <= 10 then
+        local timeLeft = taskData.EndTime-os.time();
+        if taskData.EndTime and timeLeft <= 10 then
             rPacket.FailMsg = "Task about to be complete.";
+            return rPacket;
+        end
+
+        if taskLib.SkipCost == nil then
+            rPacket.FailMsg = "Task is not skippable.";
             return rPacket;
         end
 
         local currency = packet.Currency or "Perks";
         if currency == "Perks" then
-            local perkCost = taskLib.SkipCost.Perks;
+            local perkCost = taskLib.SkipCost.Perks * math.ceil(timeLeft/60);
             if playerSave:GetStat(currency) < perkCost then
                 rPacket.FailMsg = "Insufficient Perks";
               return rPacket;
@@ -449,7 +455,7 @@ function remoteNpcData.OnServerInvoke(player: Player, action: string, npcName: s
             };
 
         elseif currency == "Gold" then
-            local goldCost = taskLib.SkipCost.Gold;
+            local goldCost = taskLib.SkipCost.Gold * math.ceil(timeLeft/60);
             if traderProfile.Gold < goldCost then
                 rPacket.FailMsg = "Insufficient Gold";
               return rPacket;
