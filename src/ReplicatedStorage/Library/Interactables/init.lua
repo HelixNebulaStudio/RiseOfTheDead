@@ -273,6 +273,17 @@ function Interactable.new()
 		interactMeta[k] = v;
 	end
 	
+	function interactMeta:Proximity()
+		if self.OnProximity then
+			self:OnProximity();
+		end
+
+		if self.ProximityTriggerTick == nil or tick()-self.ProximityTriggerTick >= 60 then
+			self.ProximityTriggerTick = tick();
+			self:Trigger();
+		end
+	end
+
 	function interactMeta:Trigger()
 		self:RemoteTriggerEvent();
 		

@@ -289,7 +289,9 @@ RunService.Heartbeat:Connect(function(delta)
 						
 					elseif rayHit.Parent:GetAttribute("InteractableParent") then
 						local model = rayHit.Parent;
-						while model:GetAttribute("InteractableParent") do model = model.Parent; end
+						while model:GetAttribute("InteractableParent") do
+							model = model.Parent;
+						end
 						
 						if model.PrimaryPart and model:FindFirstChild("Interactable") and model.Interactable:IsA("ModuleScript") then
 							interactableModule = model.Interactable;
@@ -710,10 +712,10 @@ humanoid.Touched:Connect(modData.TouchInteract)
 local overlapInteractParam = OverlapParams.new();
 overlapInteractParam.FilterDescendantsInstances = {workspace.Interactables};
 overlapInteractParam.FilterType = Enum.RaycastFilterType.Include;
-overlapInteractParam.MaxParts = 25;
+overlapInteractParam.MaxParts = 10;
 
 
-local function handleInteractable(basePart)
+local function proximityInteractable(basePart)
 	local rootBase = basePart;
 
 	local interactModule = rootBase:FindFirstChild("Interactable");
@@ -743,12 +745,12 @@ local function handleInteractable(basePart)
 		interactData.Object = rootBase;
 	end
 	
-	interactData:Trigger();
+	interactData:Proximity();
 end
 
 -- !outline: signal modSyncTime.GetClock().ValueChanged
 modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
-	if not canInteract() then return end;
+	--if not canInteract() then return end;
 	
 	if characterProperties.ActiveInteract ~= nil and (characterProperties.ActiveInteract.Distance or math.huge) <= (characterProperties.ActiveInteract.InteractableRange or interactionRange) then
 		characterProperties.ActiveInteract:Trigger();
@@ -760,7 +762,7 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 		local object = hitList[a] :: BasePart;
 
 		task.spawn(function()
-			handleInteractable(object);
+			proximityInteractable(object);
 		end)
 	end
 end)
