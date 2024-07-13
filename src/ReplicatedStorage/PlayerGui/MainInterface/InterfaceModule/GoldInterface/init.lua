@@ -577,7 +577,9 @@ function Interface:LoadPage(pageId)
 		local pageDetails = pageInfo[a];
 		local pageType = pageDetails.Type;
 		
-		
+		if pageDetails.OptInNewCustomizationMenu and modData.Profile.OptInNewCustomizationMenu ~= true then
+			continue;
+		end
 		
 		local new = templatePageButton:Clone();
 		new.LayoutOrder = a;

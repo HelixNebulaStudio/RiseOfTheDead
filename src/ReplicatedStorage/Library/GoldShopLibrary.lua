@@ -495,6 +495,7 @@ GoldShopLibrary.Products:Add{
 		Price=1000;
 		ItemId="skinpolaris";
 		ShowcaseType="SkinPerm";
+		New=true;
 	};
 	
 	Trader={Buy=false; Sell=false;};
@@ -1442,7 +1443,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=24000;
 		ItemId="portableautoturret";
-		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
@@ -1454,7 +1454,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=1000;
 		ItemId="ticksnaretrapbp";
-		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
@@ -1466,7 +1465,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=4990;
 		ItemId="pacifistamuletmod";
-		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
@@ -1478,7 +1476,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=4990;
 		ItemId="warmongerscalesmod";
-		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
@@ -1490,7 +1487,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=4990;
 		ItemId="mendingmod";
-		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
@@ -1502,7 +1498,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=4990;
 		ItemId="flinchcushioning";
-		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
@@ -1514,7 +1509,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=490;
 		ItemId="ziphoningserum";
-		New=true;
 	};
 	LimitedId="gs_ziphoningserum";
 
@@ -1527,7 +1521,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=4990;
 		ItemId="nekrosampmod";
-		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
@@ -1539,7 +1532,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=90;
 		ItemId="abandonedbunkermap";
-		New=true;
 		Desc="When purchased, you will receive an abandoned bunker map with a random seed.";
 	};
 	LimitedId="gs_abandonedbunkermap";
@@ -1553,7 +1545,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=4990;
 		ItemId="engineersplanner";
-		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
@@ -1565,7 +1556,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=4990;
 		ItemId="tirearmor";
-		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
@@ -1577,7 +1567,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=4990;
 		ItemId="bluntknockoutmod";
-		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
@@ -1589,7 +1578,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=4990;
 		ItemId="apron";
-		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
@@ -1774,7 +1762,7 @@ GoldShopLibrary.Pages = {
 	};
 	
 	CustomizationsPage = {
-		{Type="Product"; Id="skinpolaris"};
+		{Type="Product"; Id="skinpolaris"; OptInNewCustomizationMenu=true};
 		{Type="Product"; Id="skinice"};
 		{Type="Product"; Id="skinhexatiles"};
 		{Type="Product"; Id="skincarbonfiber"};

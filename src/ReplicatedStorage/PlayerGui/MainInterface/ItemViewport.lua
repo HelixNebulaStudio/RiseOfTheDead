@@ -350,6 +350,8 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 	local itemValues = storageItem.Values;
 	self.OnDisplayID = storageItem.ID;
 	
+	local phantomValues = storageItem.PhantomValues or {};
+	local customizationData = phantomValues._Customs;
 
 	local itemDisplayLib = modWorkbenchLibrary.ItemAppearance[itemId];
 	local clothingLib = modClothingLibrary:Find(itemId);
@@ -488,21 +490,25 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 
 		function self:LoadCustomizations(customPlansCache)
 			customPlansCache = customPlansCache or {};
-			
+
+			if modData.Profile.OptInNewCustomizationMenu ~= true then return end;
+
 			task.spawn(function()
-				if modData.Profile.OptInNewCustomizationMenu ~= true then return end;
 				local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 
-				local rPacket = remoteCustomizationData:InvokeServer("loadcustomizations", storageItem.ID);
-				if rPacket == nil or rPacket.Success ~= true then
-					if rPacket and rPacket.FailMsg then
-						Debugger:StudioWarn("rPacket.FailMsg", rPacket.FailMsg); 
-					end
-					
-					return; 
-				end;
-		
-				local serialized = rPacket.Serialized;
+				local serialized = customizationData;
+				if customizationData == nil then
+					local rPacket = remoteCustomizationData:InvokeServer("loadcustomizations", storageItem.ID);
+					if rPacket == nil or rPacket.Success ~= true then
+						if rPacket and rPacket.FailMsg then
+							Debugger:StudioWarn("rPacket.FailMsg", rPacket.FailMsg); 
+						end
+						
+						return; 
+					end;
+			
+					serialized = rPacket.Serialized;
+				end
 
 				modCustomizationData.LoadCustomization({
 					ItemId = itemId;

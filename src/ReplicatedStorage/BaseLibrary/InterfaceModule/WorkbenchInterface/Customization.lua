@@ -107,7 +107,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 	-- MARK: saveCustomizations()
 	local function saveCustomizations()
-		Debugger:Warn("Save customizations", isDevBranch and debug.traceback() or "");
+		Debugger:Warn("Save customizations");
 		local serialized = generateSerialized();
 		local rPacket = remoteCustomizationData:InvokeServer("savecustomizations", {
 			Siid=storageItem.ID;
