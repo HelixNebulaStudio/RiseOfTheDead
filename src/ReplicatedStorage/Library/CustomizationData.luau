@@ -421,11 +421,15 @@ function CustomizationPlan:Apply(obj: BasePart)
                         local texture: Texture = baseSkinTextures[face];
                         texture.Name = "BaseSkin";
                         texture:SetAttribute("BaseSkin", skinId);
+
+                        local oldSkinId = texture:GetAttribute("SkinId");
                         texture:SetAttribute("SkinId", `{skinId}_{variantId}`);
                         texture.Face = face;
                         texture.Texture = variantLib.Image;
                         texture.ZIndex = 0;
                         texture.Parent = obj;
+                        
+                        if oldSkinId == texture:GetAttribute("SkinId") then continue end;
 
                         local patternPreset = skinLib.PatternPreset;
                         texture.Color3 = patternPreset and patternPreset.Color or Color3.fromRGB(255, 255, 255);

@@ -51,9 +51,9 @@ library:Add{
     Icon="rbxassetid://17635624550";
 
     Patterns={
-        {Id="grids"; Name="Grids"; Image="rbxassetid://2686209243"; DefaultScale=Vector2.new(0.1, 0.1); };
-        {Id="dots"; Name="Dots"; Image="rbxassetid://2686209162"; DefaultScale=Vector2.new(0.05, 0.05); };
-        {Id="checkers"; Name="Checkers"; Image="rbxassetid://2692783156"; DefaultScale=Vector2.new(0.1, 0.1); };
+        {Id="grids"; Name="Grids"; Image="rbxassetid://2686209243"; ScaleRatio=Vector2.new(0.1, 0.1); };
+        {Id="dots"; Name="Dots"; Image="rbxassetid://2686209162"; ScaleRatio=Vector2.new(0.05, 0.05); };
+        {Id="checkers"; Name="Checkers"; Image="rbxassetid://2692783156"; ScaleRatio=Vector2.new(0.1, 0.1); };
     };
 };
 

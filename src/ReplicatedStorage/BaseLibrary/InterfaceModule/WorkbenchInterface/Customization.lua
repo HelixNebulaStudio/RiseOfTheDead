@@ -792,6 +792,28 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		local refreshConfigActive;
 
 		local markForSave = false;
+		
+		-- MARK: updateSerializeText
+		local function updateSerializeText()
+			local serializeTextBox = editPanel.serializeText;
+			
+			local activeCustomPlan;
+
+			if activeGroupName then
+				activeCustomPlan = getCustomPlan(GetCustomPlanEnum.Group, activeGroupName);
+
+			elseif activePartSelection and #activePartSelection >0 then
+				local partData = activePartSelection[1];
+				activeCustomPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key);
+			end
+			
+			if activeCustomPlan then
+				serializeTextBox.PlaceholderText = activeCustomPlan:Serialize();
+			else
+				serializeTextBox.PlaceholderText = "";
+			end
+		end
+
 		-- MARK: UpdateCustomizations;
 		local function updateCustomization(func)
 			
@@ -860,6 +882,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			if markForSave then
 				markForSave = false;
 				saveCustomizations();
+				updateSerializeText();
 			end
 		end
 
@@ -2011,25 +2034,9 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			editPanel.ReflectanceFrame.NameLabel.TextColor3 = reflectiveMat and canEditColor or disabledColor;
 			editPanel.ReflectanceFrame.Visible = itemWear < fnWear;
 
-			-- MARK: serializeText
-			local serializeTextBox = editPanel.serializeText;
-			
-			local activeCustomPlan;
-
-			if activeGroupName then
-				activeCustomPlan = getCustomPlan(GetCustomPlanEnum.Group, activeGroupName);
-
-			elseif activePartSelection and #activePartSelection >0 then
-				local partData = activePartSelection[1];
-				activeCustomPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key);
-			end
-			
-			if activeCustomPlan then
-				serializeTextBox.PlaceholderText = activeCustomPlan:Serialize();
-			else
-				serializeTextBox.PlaceholderText = "";
-			end
+			updateSerializeText();
 		end
+
 
 		local function saveGroupName()
 			activeGroupName = selectTextbox.Text;
