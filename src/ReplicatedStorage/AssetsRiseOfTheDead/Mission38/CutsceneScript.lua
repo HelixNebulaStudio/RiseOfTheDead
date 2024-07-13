@@ -200,12 +200,18 @@ return function(CutsceneSequence)
 						robertModule.Move.MoveToEnded:Wait(10);
 
 					end
-					robertModule.Actions:Teleport(CFrame.new(1138.83765, 60.4196625, -126.609146, -0.0202159919, 0, -0.999795616, 0, 1, 0, 0.999795616, 0, -0.0202159919));
 
-					robertModule.AvatarFace:Set("Confident");
+					if robertModule then
+						robertModule.Actions:Teleport(CFrame.new(1138.83765, 60.4196625, -126.609146, -0.0202159919, 0, -0.999795616, 0, 1, 0, 0.999795616, 0, -0.0202159919));
+	
+						robertModule.AvatarFace:Set("Confident");
+	
+						local hair = robertModule.Prefab:WaitForChild("Hair");
+						hair.Handle.Transparency = 0;
 
-					local hair = robertModule.Prefab:WaitForChild("Hair");
-					hair.Handle.Transparency = 0;
+					else
+						Debugger:Warn("Failed to load RobertModule for mission 38");
+					end
 
 				end
 			end
