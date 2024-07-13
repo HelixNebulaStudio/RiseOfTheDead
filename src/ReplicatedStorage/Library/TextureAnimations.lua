@@ -69,16 +69,9 @@ library:Add{
 };
 
 library:Add{
-	Id="HueShiftHalfSat";
-	OnRenderStep=function(delta, texture)
-		texture.Color3 = Color3.fromHSV(math.fmod(lapse/10,1), 0.5, 1);
-	end;
-};
-
-library:Add{
 	Id="HueShift";
 	OnRenderStep=function(delta, texture)
-		texture.Color3 = Color3.fromHSV(math.fmod(lapse/10,1), 1, 1);
+		texture.Color3 = Color3.fromHSV(math.fmod(lapse/10,1), 0.5, 1);
 	end;
 };
 

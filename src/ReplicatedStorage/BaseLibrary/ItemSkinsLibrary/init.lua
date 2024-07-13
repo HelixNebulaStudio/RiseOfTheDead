@@ -531,7 +531,7 @@ function ItemSkinsLibrary:Init(super)
         };
 
         PatternPreset={
-            TextureAnimationId="HueShiftHalfSat";
+            TextureAnimationId="HueShift";
         };
     };
 
@@ -580,7 +580,7 @@ function ItemSkinsLibrary:Init(super)
         Rare=true;
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://18467951799";};
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://18469158896";};
         };
 
         PatternPreset={

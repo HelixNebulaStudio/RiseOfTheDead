@@ -17,7 +17,7 @@ function ShowcaseObject.new(interface, parent, library)
     local frame = itemViewportObject.Frame :: Frame;
 
     frame.Destroying:Connect(function()
-        itemViewportObject:Clear();
+        itemViewportObject:Destroy();
     end)
 
     frame.Parent = parent;
@@ -31,8 +31,9 @@ function ShowcaseObject.new(interface, parent, library)
         ["[All]"]=baseCustomPlan;
     }
 
+    local randomPreviewTool = {"m4a4"; "sr308"; "rec21"; "machete";}
     itemViewportObject:SetDisplay({
-        ItemId="sr308";
+        ItemId=randomPreviewTool[math.random(1, #randomPreviewTool)];
         Values={
             ActiveSkin = itemId;
         };

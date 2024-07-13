@@ -552,10 +552,13 @@ function ItemViewport:Clear()
 	self.DisplayModels = {};
 	self.OnDisplayID = nil;
 	self.OnDisplayPackageId = nil;
-	self.Frame.ItemIcon.Image = "";
-	self.Frame.ItemIcon.Visible = false;
 	self.PartDataList = nil;
 	self.ApplyCustomizationPlans = nil;
+
+	pcall(function()
+		self.Frame.ItemIcon.Image = "";
+		self.Frame.ItemIcon.Visible = false;
+	end)
 end
 
 return ItemViewport;
