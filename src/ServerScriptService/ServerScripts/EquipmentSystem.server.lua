@@ -114,6 +114,8 @@ local function OnPlayerAdded(player: Player)
 			end
 			profile.ToolsCache.Prefabs = prefabs;
 
+			if storageItem == nil then continue end;
+			
 			local customizationData = storageItem:GetValues("_Customs");
 			if customizationData then
 				task.spawn(function()
