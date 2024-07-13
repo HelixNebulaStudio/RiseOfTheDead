@@ -61,7 +61,11 @@ function Interface.init(modInterface)
 			selectedItem = slot.Item;
 
 			local skinPermItemLib = modItemsLibrary:Find(skinPermItem.ItemId);
-			if selectedItem.ItemId ~= skinPermItemLib.TargetItemId then
+			if skinPermItemLib.PatPerm == true and not modItemsLibrary:HasTag(selectedItem.ItemId, "Skinnable") then
+				selectItemButton.DimOut = true;
+				applyButton.BackgroundColor3 = Color3.fromRGB(81, 107, 79);
+				
+			elseif skinPermItemLib.PatPerm ~= true and selectedItem.ItemId ~= skinPermItemLib.TargetItemId then
 				selectItemButton.DimOut = true;
 				applyButton.BackgroundColor3 = Color3.fromRGB(81, 107, 79);
 				
@@ -83,7 +87,10 @@ function Interface.init(modInterface)
 	local debounce = false;
 	applyButton.MouseButton1Click:Connect(function()
 		local skinPermItemLib = modItemsLibrary:Find(skinPermItem.ItemId);
-		if selectedItem.ItemId ~= skinPermItemLib.TargetItemId then
+
+		if skinPermItemLib.PatPerm == true and not modItemsLibrary:HasTag(selectedItem.ItemId, "Skinnable") then
+			return;
+		elseif skinPermItemLib.PatPerm ~= true and selectedItem.ItemId ~= skinPermItemLib.TargetItemId then
 			return;
 		end
 
@@ -132,25 +139,44 @@ function Interface.init(modInterface)
 			
 			local skinPermItemLib = modItemsLibrary:Find(skinPermItem.ItemId);
 			
-			titleLabel.Text = "Apply ".. skinPermItemLib.SkinPerm .." Skin Permanent";
-			
-			for id, buttonTable in pairs(defaultInterface.Buttons) do
-				if buttonTable.Item.ItemId == skinPermItemLib.TargetItemId then continue end;
-				buttonTable.ItemButtonObject.DimOut = true;
-				buttonTable.ItemButtonObject:Update(buttonTable.Item);
-			end
-			for id, buttonTable in pairs(premiumInterface.Buttons) do
-				if buttonTable.Item.ItemId == skinPermItemLib.TargetItemId then continue end;
-				buttonTable.ItemButtonObject.DimOut = true;
-				buttonTable.ItemButtonObject:Update(buttonTable.Item);
-			end
-			
-			
-			task.delay(0.5, function()
-				defaultInterface.OnItemButton1Click = onItemSelect;
-				premiumInterface.OnItemButton1Click = onItemSelect;
-				clothingInterface.OnItemButton1Click = onItemSelect;
+			if skinPermItemLib.PatPerm then
+				titleLabel.Text = "Apply ".. skinPermItemLib.Name .." Permanent";
 
+				for id, buttonTable in pairs(defaultInterface.Buttons) do
+					if modItemsLibrary:HasTag(buttonTable.Item.ItemId, "Skinnable") then continue end;
+					buttonTable.ItemButtonObject.DimOut = true;
+					buttonTable.ItemButtonObject:Update(buttonTable.Item);
+				end
+				for id, buttonTable in pairs(premiumInterface.Buttons) do
+					if modItemsLibrary:HasTag(buttonTable.Item.ItemId, "Skinnable") then continue end;
+					buttonTable.ItemButtonObject.DimOut = true;
+					buttonTable.ItemButtonObject:Update(buttonTable.Item);
+				end
+
+			else
+				titleLabel.Text = "Apply ".. skinPermItemLib.SkinPerm .." Skin Permanent";
+
+				for id, buttonTable in pairs(defaultInterface.Buttons) do
+					if buttonTable.Item.ItemId == skinPermItemLib.TargetItemId then continue end;
+					buttonTable.ItemButtonObject.DimOut = true;
+					buttonTable.ItemButtonObject:Update(buttonTable.Item);
+				end
+				for id, buttonTable in pairs(premiumInterface.Buttons) do
+					if buttonTable.Item.ItemId == skinPermItemLib.TargetItemId then continue end;
+					buttonTable.ItemButtonObject.DimOut = true;
+					buttonTable.ItemButtonObject:Update(buttonTable.Item);
+				end
+				
+			end
+
+			task.spawn(function()
+				for a=0, 0.5, 0.1 do
+					defaultInterface.OnItemButton1Click = onItemSelect;
+					premiumInterface.OnItemButton1Click = onItemSelect;
+					clothingInterface.OnItemButton1Click = onItemSelect;
+					task.wait(0.1);
+					if not window.Visible then break; end;
+				end
 			end)
 			
 		else

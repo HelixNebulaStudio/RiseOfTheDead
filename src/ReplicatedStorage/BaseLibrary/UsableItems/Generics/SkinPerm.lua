@@ -6,6 +6,7 @@ local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
 local modSkinsLibrary = require(game.ReplicatedStorage.Library.SkinsLibrary);
 local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
+local modItemSkinsLibrary = require(game.ReplicatedStorage.Library.ItemSkinsLibrary);
 
 local UsablePreset = require(game.ReplicatedStorage.Library.UsableItems.UsablePreset).new();
 
@@ -60,7 +61,7 @@ else
 		end
 
 		local skinPermItemLib = modItemsLibrary:Find(skinPermStorageItem.ItemId);
-		if skinPermItemLib.TargetItemId ~= targetStorageItem.ItemId then
+		if skinPermItemLib.PatPerm ~= true and skinPermItemLib.TargetItemId ~= targetStorageItem.ItemId then
 			returnPacket.Success = false;
 			returnPacket.FailMsg = "Incompatible item";
 			return returnPacket;
@@ -70,6 +71,11 @@ else
 		local permLib = modItemUnlockablesLibrary:Find(skinPermItemLib.Id);
 		if permLib then
 			permType = "Clothing";
+
+		elseif modItemSkinsLibrary:Find(skinPermItemLib.Id) then
+			permLib = modItemSkinsLibrary:Find(skinPermItemLib.Id);
+			permType = "Tool";
+
 		else
 			permLib = modSkinsLibrary.GetByName(skinPermItemLib.SkinPerm)
 			if permLib then
@@ -100,10 +106,12 @@ else
 			elseif permType == "Tool" then
 				if profile.EquippedTools.WeaponModels == nil then return end;
 				
-				for a=1, #profile.EquippedTools.WeaponModels do
-					if not profile.EquippedTools.WeaponModels[a]:IsA("Model") then continue end;
-					
-					modColorsLibrary.ApplyAppearance(profile.EquippedTools.WeaponModels[a], storageItem.Values);
+				if profile.OptInNewCustomizationMenu ~= true then
+					for a=1, #profile.EquippedTools.WeaponModels do
+						if not profile.EquippedTools.WeaponModels[a]:IsA("Model") then continue end;
+						
+						modColorsLibrary.ApplyAppearance(profile.EquippedTools.WeaponModels[a], storageItem.Values);
+					end
 				end
 
 			end

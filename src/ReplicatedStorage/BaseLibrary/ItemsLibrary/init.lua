@@ -68,7 +68,7 @@ function ItemsLibrary:Init(super)
 	local gunBase = {
 		Type = super.Types.Tool;
 		Tradable = super.Tradable.PremiumOnly;
-		Tags = {"Gun"; "Weapon"};
+		Tags = {"Gun"; "Weapon"; "Skinnable";};
 		SkinWear = true;
 		NonPremiumTax = 1000;
 	}
@@ -113,7 +113,7 @@ function ItemsLibrary:Init(super)
 	local meleeBase = {
 		Type = super.Types.Tool;
 		Tradable = super.Tradable.PremiumOnly;
-		Tags = {"Melee"; "Weapon"};
+		Tags = {"Melee"; "Weapon"; "Skinnable";};
 		SkinWear = true;
 		NonPremiumTax = 500;
 	}
@@ -600,6 +600,25 @@ function ItemsLibrary:Init(super)
 	new(instrumentBase, {Id="keytar"; Name="Keytar"; Tags={"Melee"}; Icon="rbxassetid://15338385507"; Description="A playable keyboard guitar while also being a melee weapon, also known as keytar instrument. Can play premade tunes or with keyboard/touch buttons.";});
 
 	--==========================================================[[ SKIN PERM ]]==========================================================--
+	local patternPermBase = {
+		Type = super.Types.Usable;
+		TypeIcon = "rbxassetid://12964393529";
+		Stackable = 5;
+
+		Tradable = super.Tradable.Tradable;
+		Tags = {"Skin Perm"};
+		OnAdd = function(data)
+			data.PatPerm = true;
+			data.Name = data.Name .." Skin";
+			data.Description = "Right click to apply "..data.Name.." skin to a tool.";
+		end;
+		TradingTax=100;
+	};
+
+	--== Pattern Skin Perms
+	new(patternPermBase, {Id="skinpolaris"; Name="Polaris"; Icon="rbxassetid://18467999802";});
+
+
 	local skinPermBase = {
 		Type = super.Types.Usable;
 		TypeIcon = "rbxassetid://12964393529";
@@ -620,6 +639,7 @@ function ItemsLibrary:Init(super)
 		TradingTax=100;
 	};
 	
+	--== Weapon Skin Perms
 	new(skinPermBase, {Id="arelshiftcrossantique"; Icon="rbxassetid://13768313905"; SkinPerm="Antique"; TargetItemId="arelshiftcross"; });
 	new(skinPermBase, {Id="desolatorheavytoygun"; Icon="rbxassetid://13787997600"; SkinPerm="Toy Gun"; TargetItemId="desolatorheavy"; });
 	new(skinPermBase, {Id="czevo3asiimov"; Icon="rbxassetid://13810605651"; SkinPerm="Asiimov"; TargetItemId="czevo3"; });
