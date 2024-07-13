@@ -312,7 +312,7 @@ function Interface:LoadProduct(productId)
 		
 		
 		if productLib.ShowcaseType then
-			local modShowcasing = modShowcases.new(productLib.ShowcaseType, showcaseFrame, productLib);
+			local modShowcasing = modShowcases.new(productLib.ShowcaseType, Interface, showcaseFrame, productLib);
 		end
 	end
 	buttonText.Text = purchaseText;

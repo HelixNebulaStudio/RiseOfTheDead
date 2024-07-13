@@ -527,7 +527,11 @@ function ItemSkinsLibrary:Init(super)
         Rare=true;
     
         Patterns={
-            {Id="v1"; Name="Variant 1"; Image="rbxassetid://18429493237";}; --rbxassetid://11796319046
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://18467334699";}; --rbxassetid://11796319046 rbxassetid://18429493237 
+        };
+
+        PatternPreset={
+            TextureAnimationId="HueShiftHalfSat";
         };
     };
 
@@ -564,6 +568,23 @@ function ItemSkinsLibrary:Init(super)
 
         PatternPreset={
             Scale=Vector2.new(4, 4);
+        };
+    };
+
+    super:Add{
+        Id="skinpolaris";
+        Type=super.SkinType.Pattern;
+
+        Name="Polaris";
+        Icon="rbxassetid://18467999802";
+        Rare=true;
+    
+        Patterns={
+            {Id="v1"; Name="Variant 1"; Image="rbxassetid://18467951799";};
+        };
+
+        PatternPreset={
+            TextureAnimationId="HueShift";
         };
     };
 

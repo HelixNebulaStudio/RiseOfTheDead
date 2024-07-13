@@ -62,21 +62,25 @@ library:Add{
 };
 
 library:Add{
-	Id="BreathingRGB";
-	OnRenderStep=function(delta, texture)
-		texture.Color3 = Color3.fromHSV(math.fmod(lapse/10,1), 0.5, 0.5);
-	end;
-};
-
-library:Add{
 	Id="FadeRGB";
 	OnRenderStep=function(delta, texture)
 		texture.Color3 = Color3.fromHSV(math.fmod(lapse/5,1), 0.4, 1);
 	end;
 };
 
+library:Add{
+	Id="HueShiftHalfSat";
+	OnRenderStep=function(delta, texture)
+		texture.Color3 = Color3.fromHSV(math.fmod(lapse/10,1), 0.5, 1);
+	end;
+};
 
-
+library:Add{
+	Id="HueShift";
+	OnRenderStep=function(delta, texture)
+		texture.Color3 = Color3.fromHSV(math.fmod(lapse/10,1), 1, 1);
+	end;
+};
 
 
 

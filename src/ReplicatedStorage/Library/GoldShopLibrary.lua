@@ -484,6 +484,22 @@ GoldShopLibrary.Products:Add{
 	Trader={Buy=false; Sell=false;};
 };
 
+--== MARK: Skin Perms
+GoldShopLibrary.Products:Add{
+	Id="skinpolaris";
+	Icon="";
+	TitleText="Polaris Skin Perm";
+	Desc="Apply on any weapon a hue shifting start pattern.";
+	Product={
+		Type="Gold";
+		Price=1000;
+		ItemId="skinpolaris";
+		ShowcaseType="SkinPerm";
+	};
+	
+	Trader={Buy=false; Sell=false;};
+};
+
 --== Equipment Appearance;
 --== Locked Items;
 GoldShopLibrary.Products:Add{
@@ -1711,10 +1727,10 @@ GoldShopLibrary.Pages = {
 		};
 		{
 			Type="Page";
-			Id="EquipmentSprayPage";
+			Id="CustomizationsPage";
 			Icon="http://www.roblox.com/asset/?id=5065159425";
-			TitleText="Customization Sprays";
-			Desc="• Colors and skins pack for customizing your items even more!";
+			TitleText="Customizations";
+			Desc="• Colors, skins pack and skin permanents for customizing your items even more!";
 		};
 	};
 	
@@ -1757,7 +1773,8 @@ GoldShopLibrary.Pages = {
 		{Type="Product"; Id="rusty48blaze"};
 	};
 	
-	EquipmentSprayPage = {
+	CustomizationsPage = {
+		{Type="Product"; Id="skinpolaris"};
 		{Type="Product"; Id="skinice"};
 		{Type="Product"; Id="skinhexatiles"};
 		{Type="Product"; Id="skincarbonfiber"};

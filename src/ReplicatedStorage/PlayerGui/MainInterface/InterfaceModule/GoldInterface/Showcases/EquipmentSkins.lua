@@ -6,7 +6,7 @@ local modSkinsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("Ski
 local templateFrame = script:WaitForChild("appearanceImage");
 local templateIcon = script:WaitForChild("ImageIcon");
 
-function ShowcaseObject.new(parent, library)
+function ShowcaseObject.new(interface, parent, library)
 	if library == nil or library.PackType == nil or library.PackId == nil then return end;
 	
 	local listLibrary = library.PackType == "Colors" and modColorsLibrary or modSkinsLibrary;
