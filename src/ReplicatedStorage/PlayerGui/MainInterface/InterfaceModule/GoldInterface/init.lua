@@ -10,9 +10,7 @@ local Interface = {
 	PromptWarning = nil;
 };
 
-local SoundService = game:GetService("SoundService");
 local RunService = game:GetService("RunService");
-local TextService = game:GetService("TextService");
 local TweenService = game:GetService("TweenService");
 local MarketplaceService = game:GetService("MarketplaceService");
 

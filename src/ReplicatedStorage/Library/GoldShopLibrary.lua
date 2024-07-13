@@ -1578,6 +1578,7 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=4990;
 		ItemId="apron";
+		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
@@ -1722,19 +1723,7 @@ GoldShopLibrary.Pages = {
 		};
 	};
 	
-	NewItems = {
-		{Type="Product"; Id="boomerang"};
-		{Type="Product"; Id="apron"};
-		{Type="Product"; Id="bluntknockoutmod"};
-		{Type="Product"; Id="portableautoturret"};
-		{Type="Product"; Id="engineersplanner"};
-		{Type="Product"; Id="ticksnaretrapbp"};
-		{Type="Product"; Id="pacifistamuletmod"};
-		{Type="Product"; Id="warmongerscalesmod"};
-		{Type="Product"; Id="mendingmod"};
-		{Type="Product"; Id="nekrosampmod"};
-		{Type="Product"; Id="flinchcushioning"};
-		{Type="Product"; Id="tirearmor"};
+	NewItems = { --Products with New == true
 	};
 	
 	FunItems = {
@@ -1826,5 +1815,10 @@ GoldShopLibrary.Pages = {
 	--};
 };
 
+for itemId, lib in pairs(GoldShopLibrary.Products:GetAll()) do
+	if lib.Product and lib.Product.New == true then
+		table.insert(GoldShopLibrary.Pages.NewItems, {Type="Product"; Id=itemId});
+	end
+end
 
 return GoldShopLibrary;
