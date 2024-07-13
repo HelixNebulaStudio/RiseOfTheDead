@@ -2190,7 +2190,7 @@ function Storage:Split(player, id, quantity, target)
 	if self.Debounce then self:Notify("red", "Not ready to split item."); return {self:Shrink();}; end;
 	self.Debounce = true;
 
-	local targetIsValid = isPremium or storageB.Page < storageB.PremiumPage;
+	local targetIsValid = isPremium or (storageB.Page or 1) < storageB.PremiumPage;
 	if target.Index > (isPremium and storageB.Size or storageB.PremiumStorage) or not targetIsValid then self:Notify("red", "You are not premium to put that there."); return {self:Shrink();}; end;
 	
 	if storageB and quantity < storageItem.Quantity then
