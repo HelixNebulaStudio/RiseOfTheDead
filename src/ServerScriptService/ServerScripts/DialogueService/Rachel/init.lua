@@ -14,9 +14,10 @@ if modBranchConfigs.IsWorld("Safehome") then
 	
 else
 	return function(player, dialog, dialogueData)
-		player:AddChoice("heal_request", function()
+		dialog:AddChoice("heal_request", function()
 			if not dialog.InRange() then return end;
 			modStatusEffects.FullHeal(player, 0.15);
+
 			modOnGameEvents:Fire("OnMedicHeal", player, dialog.Name);
 		end)
 	end
