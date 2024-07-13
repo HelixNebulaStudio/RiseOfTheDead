@@ -616,7 +616,9 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				unlockButton.AutoButtonColor = isUnlocked;
 
 				local function setBaseSkinClicked(force)
-					if not isDevBranch and localPlayer.UserId ~= 16170943 then return end;
+					if force then
+						if not isDevBranch and localPlayer.UserId ~= 16170943 then return end;
+					end
 					Interface:PlayButtonClick();
 
 					local rPacket = remoteCustomizationData:InvokeServer("setbaseskin", {
