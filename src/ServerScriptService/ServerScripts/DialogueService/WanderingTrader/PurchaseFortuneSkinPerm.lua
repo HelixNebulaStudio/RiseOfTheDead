@@ -50,6 +50,7 @@ return function(player, dialog, data)
 						task.spawn(function()
 							modAnalytics.RecordResource(player.UserId, fortuneSkinCost, "Sink", "Gold", "Purchase", "fortunepatternperm");
 
+							if profile.OptInNewCustomizationMenu == true then return end;
 							if profile.EquippedTools.WeaponModels then
 								for a=1, #profile.EquippedTools.WeaponModels do
 									if profile.EquippedTools.WeaponModels[a]:IsA("Model") then

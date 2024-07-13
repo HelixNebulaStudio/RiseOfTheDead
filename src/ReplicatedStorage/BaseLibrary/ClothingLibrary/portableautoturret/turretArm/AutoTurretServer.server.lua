@@ -9,6 +9,7 @@ local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 
 local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
@@ -545,6 +546,8 @@ function Update()
 	accessoryStorageItem = modStorage.FindIdFromStorages(accessorySiid, player);
 	local weaponStorageItemID = accessory:GetAttribute("WeaponStorageItemID");
 	
+	local profile = shared.modProfile:Get(player);
+
 	local isWeaponChanged = lastWeaponId ~= weaponStorageItemID;
 	if isWeaponChanged then
 		for _, obj in pairs(turretArm:GetChildren()) do
@@ -594,13 +597,33 @@ function Update()
 
 		weaponModel.Parent = turretArm;
 		
-		modColorsLibrary.ApplyAppearance(weaponModel, weaponStorageItem.Values);
-		
-		for _, obj in pairs(weaponModel:GetChildren()) do
-			if obj.Name == "Magazine" then
-				obj.Name = "patMagazine";
+		if profile.OptInNewCustomizationMenu ~= true then
+			modColorsLibrary.ApplyAppearance(weaponModel, weaponStorageItem.Values);
+
+			for _, obj in pairs(weaponModel:GetChildren()) do
+				if obj.Name == "Magazine" then
+					obj.Name = "patMagazine";
+				end
 			end
+
+		else
+			local customizationData = weaponStorageItem:GetValues("_Customs");
+			if customizationData then
+				task.spawn(function()
+					local activeSkinId = weaponStorageItem:GetValues("ActiveSkin");
+
+					modCustomizationData.LoadCustomization({
+						ToolModels = {weaponModel};
+
+						ItemId = itemId;
+						CustomizationData = customizationData;
+						SkinId = activeSkinId;
+					});
+				end)
+			end
+
 		end
+		
 
 		activeWeaponModel = weaponModel;
 	end

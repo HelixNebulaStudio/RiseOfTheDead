@@ -586,6 +586,11 @@ function Interface:LoadPage(pageId)
 		if pageType == "Product" then
 			lib = modGoldShopLibrary.Products:Find(pageDetails.Id);
 
+			if lib.OptInNewCustomizationMenu and modData.Profile.OptInNewCustomizationMenu ~= true then
+				new:Destroy();
+				continue;
+			end
+
 			if lib.Product and lib.Product.Type == "GamePass" then
 				spawn(function()
 					local own = false;

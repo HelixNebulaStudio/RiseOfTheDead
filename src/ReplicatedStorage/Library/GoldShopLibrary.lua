@@ -497,6 +497,7 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="SkinPerm";
 		New=true;
 	};
+	OptInNewCustomizationMenu=true;
 	
 	Trader={Buy=false; Sell=false;};
 };
@@ -1751,7 +1752,7 @@ GoldShopLibrary.Pages = {
 	};
 	
 	CustomizationsPage = {
-		{Type="Product"; Id="skinpolaris"; OptInNewCustomizationMenu=true};
+		{Type="Product"; Id="skinpolaris";};
 		{Type="Product"; Id="skinice"};
 		{Type="Product"; Id="skinhexatiles"};
 		{Type="Product"; Id="skincarbonfiber"};

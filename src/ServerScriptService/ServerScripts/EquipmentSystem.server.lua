@@ -106,7 +106,7 @@ local function OnPlayerAdded(player: Player)
 					motor:SetAttribute("CanQuery", false);
 					modGearAttachments:AttachMotor(cloneTool, motor, attachment.Parent, 2);
 					
-					if storageItem.Values.Colors or storageItem.Values.Textures or storageItem.Values.PartAlpha then
+					if profile.OptInNewCustomizationMenu ~= true then
 						modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
 
 					end
@@ -430,7 +430,7 @@ local function equipTool(player, paramPacket)
 						Prefab=cloneTool;
 					})
 
-					if storageItem.Values.Colors or storageItem.Values.Textures or storageItem.Values.PartAlpha then
+					if profile.OptInNewCustomizationMenu ~= true then
 						modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
 					end
 					
