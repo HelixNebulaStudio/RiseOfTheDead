@@ -382,9 +382,12 @@ function CustomizationPlan:Apply(obj: BasePart)
         obj.Material = matInfo.Material;
         if matInfo.Varient then
             obj.MaterialVariant = matInfo.Varient;
+        else
+            obj.MaterialVariant = ""; 
         end
     else
         obj.Material = obj:GetAttribute("DefaultMaterial") or obj.Material;
+        obj.MaterialVariant = "";
     end
 
     local baseSkinTextures: {Texture} = {};

@@ -1820,7 +1820,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			end)
 
 			if materialName == nil then
-				materialName = part.Material.Name;
+				materialName = part and part.Material.Name or "Default";
 			end
 			materialButton.Text = materialName or "None";
 			refreshConfigActive();
@@ -1869,6 +1869,16 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			newDropDownList:LoadOptions(materialOptionList);
 			toggleVisibility(dropDownFrame);
 
+		end)
+		materialButton.MouseButton2Click:Connect(function()
+			local activePart;
+			if activePartSelection and #activePartSelection >0 then
+				local partData = activePartSelection[1];
+				activePart = partData.Part;
+			end
+
+			markForSave = true;
+			OnMaterialSelect(nil, activePart);
 		end)
 			
 
