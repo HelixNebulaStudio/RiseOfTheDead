@@ -278,6 +278,9 @@ function ItemViewport:RefreshDisplay()
 					self.HighlightPartClone:ClearAllChildren();
 					self.HighlightPartClone.Material = Enum.Material.Neon;
 					self.HighlightPartClone.Color = Color3.fromRGB(255, 255, 255);
+					if self.HighlightPartClone:IsA("MeshPart") then
+						self.HighlightPartClone.TextureID = "";
+					end
 					self.HighlightPartClone.Parent = self.HighlightPort;
 				end
 

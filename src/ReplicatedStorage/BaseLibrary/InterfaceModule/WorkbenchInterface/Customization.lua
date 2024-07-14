@@ -1312,7 +1312,12 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 				end
 			else
-				colorButton.ImageLabel.Image = "";
+				local partData = activePartSelection and #activePartSelection > 0 and activePartSelection[1];
+				if partData and partData.Part:GetAttribute("BaseTexture") and selectColor == nil then
+					colorButton.ImageLabel.Image = partData.Part:GetAttribute("BaseTexture");
+				else
+					colorButton.ImageLabel.Image = "";
+				end
 			end
 			colorButton.Text = colorButton.ImageLabel.Image == "" and `#{(selectColor or Color3.fromRGB(150, 150, 150)):ToHex()}` or "";
 

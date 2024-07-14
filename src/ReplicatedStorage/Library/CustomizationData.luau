@@ -397,6 +397,14 @@ function CustomizationPlan:Apply(obj: BasePart)
         obj.Material = obj:GetAttribute("DefaultMaterial") or obj.Material;
         obj.MaterialVariant = "";
     end
+    
+    if obj:IsA("MeshPart") then
+        if self.Color or self.Material then
+            obj.TextureID = "";
+        else
+            obj.TextureID = obj:GetAttribute("BaseTexture") or "";
+        end
+    end
 
     local baseSkinTextures: {Texture} = {};
     local surfaceAppearance: SurfaceAppearance = nil;
@@ -423,10 +431,10 @@ function CustomizationPlan:Apply(obj: BasePart)
         end
     end
 
-    if obj:GetAttribute("BaseTexture") == nil and obj:GetAttribute("SkipPattern") == nil then
+    if obj:GetAttribute("SkipPattern") == nil then
         local clearBaseSkin = false;
 
-        if self.BaseSkin then
+        if self.BaseSkin and obj:GetAttribute("BaseTexture") == nil then
             local skinId, variantId = CustomizationData.GetSkinIds(self.BaseSkin);
             local skinLib, variantLib = modItemSkinsLibrary:FindVariant(skinId, variantId);
             local hasAlphaTexture = skinLib and skinLib.HasAlphaTexture;
@@ -500,10 +508,8 @@ function CustomizationPlan:Apply(obj: BasePart)
                 surfaceAppearance:Destroy();
                 surfaceAppearance = nil :: any;
             end
-    
         end
     end
-
 
     if self.Skin then
         local skinId, variantId = CustomizationData.GetSkinIds(self.Skin);
