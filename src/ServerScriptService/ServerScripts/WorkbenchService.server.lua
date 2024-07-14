@@ -1315,9 +1315,6 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 				return modWorkbenchLibrary.PolishToolReplies.InvalidItem;
 			end
 			
-			local oldSeed = itemValues.SkinWearId;
-			local oldFloat = modItemSkinWear.LoadFloat(itemId, oldSeed).Float;
-
 			local lmqId = "liquidmetalpolish";
 			local total, itemList = inventory:ListQuantity(lmqId, 1);
 			if itemList == nil or total <= 0 then
@@ -1332,54 +1329,8 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			end
 			
 			local duration = modSyncTime.GetTime() + modWorkbenchLibrary.PolishDuration;
-			--local upgradeLib = modWorkbenchLibrary.ItemUpgrades[itemId];
 			
-			local cleanMin, cleanMax = modWorkbenchLibrary.PolishRangeBase.Min, modWorkbenchLibrary.PolishRangeBase.Max;
-			
-			local rngChange = math.random(cleanMin*100000, cleanMax*100000)/100000;
-
-			local success = false;
-
-			local newSeed;
-
-			local closestSeed, closestGenData;
-			local closestDif = math.huge;
-
-			local targetFloat = oldFloat-rngChange;
-			local changeFloat = 0;
-
-			if targetFloat > 0 then
-				local a=0;
-				repeat
-					local seed = math.random(0, 999999);
-					local genData = modItemSkinWear.LoadFloat(itemId, seed);
-					
-					local absDif = math.abs(genData.Float-targetFloat);
-					
-					if genData.Float < oldFloat and absDif <= 0.01 and absDif <= closestDif then
-						closestDif = absDif;
-						closestSeed = seed;
-						closestGenData = genData;
-					end
-
-					a = a +1;
-				until a > 64;
-				
-				if closestSeed then
-					newSeed = closestSeed;
-					changeFloat = closestGenData.Float - oldFloat;
-					success = true;
-				end
-			end
-
-			if not success then
-				changeFloat = 0;
-				newSeed = oldSeed;
-				
-				Debugger:StudioWarn(`Failed polish: Old: {oldFloat} New: {oldFloat}, Change: {changeFloat}`);
-			else
-				Debugger:StudioWarn(`Success polish: Old: {oldFloat} New: {oldFloat+changeFloat}, Change: {changeFloat}`);
-			end
+			local newSeed, changeFloat = modItemSkinWear.PolishTool(storageItem);
 			
 			playerSave.Workbench:NewProcess{
 				Type=playerSave.Workbench.ProcessTypes.PolishItem;

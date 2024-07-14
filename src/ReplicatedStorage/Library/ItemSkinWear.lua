@@ -21,8 +21,8 @@ ItemSkinWear.Titles = {
 local idealSeeds = {702925; 186711; 922565; 228877; 326920; 380975; 473148; 166530};
 function ItemSkinWear.Generate(player, storageItem, action)
 	local itemDisplayLib = modWorkbenchLibrary.ItemAppearance[storageItem.ItemId];
-	if itemDisplayLib == nil then Debugger:Log("itemDisplayLib nil", storageItem) return; end
-	if storageItem.Values.SkinWearId ~= nil then Debugger:Log("SkinWearId exist", storageItem); return; end
+	if itemDisplayLib == nil then return; end
+	if storageItem.Values.SkinWearId ~= nil then return; end
 	
 	if action == "setideal" then
 		local closestFloat, closestSeed = math.huge, 0;
@@ -71,6 +71,70 @@ function ItemSkinWear.GetWearLib(itemId)
 	return {
 		Wear={Min=0.000001; Max=0.999999;};
 	}
+end
+
+function ItemSkinWear.PolishTool(storageItem)
+	local itemId = storageItem.ItemId;
+	local itemValues = storageItem.Values;
+
+	local oldSeed = itemValues.SkinWearId;
+	local oldFloat = ItemSkinWear.LoadFloat(itemId, oldSeed).Float;
+
+	local cleanMin, cleanMax = modWorkbenchLibrary.PolishRangeBase.Min, modWorkbenchLibrary.PolishRangeBase.Max;
+				
+	local rngChange = math.random(cleanMin*100000, cleanMax*100000)/100000;
+
+	local success = false;
+
+	local newSeed;
+
+	local closestSeed, closestGenData;
+	local closestDif = math.huge;
+
+	local targetFloat = oldFloat-rngChange;
+	local changeFloat = 0;
+
+	local maxRangeFloat = math.floor(oldFloat*100000);
+	if targetFloat <= 0 and maxRangeFloat > 999 and math.random(1, 10) == 1 then
+		targetFloat = math.random(999, maxRangeFloat)/100000;
+	end
+
+	if targetFloat > 0 then
+		local a=0;
+
+		repeat
+			local seed = math.random(0, 999999);
+			local genData = ItemSkinWear.LoadFloat(itemId, seed);
+			
+			local absDif = math.abs(genData.Float-targetFloat);
+			
+			if genData.Float < oldFloat and absDif <= closestDif then
+				closestDif = absDif;
+				closestSeed = seed;
+				closestGenData = genData;
+				
+			end
+
+			a = a +1;
+		until a > 64;
+		
+		if closestSeed and closestDif <= 0.01 then
+			newSeed = closestSeed;
+			changeFloat = closestGenData.Float - oldFloat;
+			success = true;
+		end
+	end
+
+	if not success then
+		changeFloat = 0;
+		newSeed = oldSeed;
+		
+		Debugger:StudioWarn(`Failed polish: Old: {oldFloat} New: {oldFloat}, Closest: {closestDif}`);
+	else
+		Debugger:StudioWarn(`Success polish: Old: {oldFloat} New: {oldFloat+changeFloat}, Change: {changeFloat}`);
+	end
+
+	return newSeed, changeFloat;
 end
 
 function ItemSkinWear.LoadFloat(itemId, seed)

@@ -9,7 +9,6 @@ local modGlobalVars = Debugger:Require(game.ReplicatedStorage:WaitForChild("Glob
 local modItemsLibrary = Debugger:Require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modWeapons = Debugger:Require(game.ReplicatedStorage.Library.Weapons);
 local modColorsLibrary = Debugger:Require(game.ReplicatedStorage.Library.ColorsLibrary);
-local modSkinsLibrary = Debugger:Require(game.ReplicatedStorage.Library:WaitForChild("SkinsLibrary"));
 local modProjectile = Debugger:Require(game.ReplicatedStorage.Library.Projectile);
 local modWeaponAttributes = Debugger:Require(game.ReplicatedStorage.Library.WeaponsAttributes);
 local modDropAppearance = Debugger:Require(game.ReplicatedStorage.Library.DropAppearance);

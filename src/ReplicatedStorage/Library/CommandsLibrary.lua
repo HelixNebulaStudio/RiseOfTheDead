@@ -3646,6 +3646,53 @@ Commands["toolcondition"] = {
 		return true;
 	end;
 };
+Commands["polishtool"] = {
+	Permission = PermissionLevel.DevBranch;
+	Description = "Polishs a equipped tool.";
+	
+	UsageInfo = "/polishtool";
+	Function = function(speaker, args)
+		local player = speaker;
+		local profile = shared.modProfile:Get(player);
+
+		if profile.ActiveInventory == nil then 
+			shared.Notify(player, "Missing player inventory.", "Negative");
+			return 
+		end;
+
+		local storageItemID = profile and profile.EquippedTools and profile.EquippedTools.ID;
+		local itemId = profile.EquippedTools.ItemId;
+
+		local storageItem = profile.ActiveInventory:Find(storageItemID);
+		if storageItem == nil then 
+			shared.Notify(player, "Missing player equipped tool.", "Negative");
+			return 
+		end;
+
+		local cycles = tonumber(args[1]) or 1;
+		
+		if not RunService:IsStudio() then
+			cycles = 1;
+		end
+
+		local newSeed, changeFloat;
+		for a=1, cycles do
+			newSeed, changeFloat = modItemSkinWear.PolishTool(storageItem);
+
+			shared.Notify(player, "Polished, float change: "..changeFloat, "Inform");
+			if changeFloat ~= 0 then
+				storageItem.Values.SkinWearId = newSeed;
+			end
+		end
+
+		if changeFloat ~= 0 then
+			storageItem:SetValues("SkinWearId", newSeed);
+			storageItem:Sync({"SkinWearId"});
+		end
+
+		return true;
+	end;
+};
 
 Commands["itemunlockables"] = {
 	Permission = PermissionLevel.DevBranch;
