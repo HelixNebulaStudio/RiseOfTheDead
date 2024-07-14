@@ -161,6 +161,7 @@ function ItemViewport:Destroy()
 	self:Clear();
 	self.OnSelectionChanged:Destroy();
 	self.Garbage:Destruct();
+
 	game.Debris:AddItem(self.HighlightPort, 0);
 	game.Debris:AddItem(self.Frame, 0);
 end
@@ -234,8 +235,10 @@ function ItemViewport:RefreshDisplay()
 				self.HighlightPort.Name = "HighlighPort";
 				self.HighlightPort.ImageColor3 = Color3.fromRGB(255, 255, 255);
 
-			else
+				self.Garbage:Tag(self.HighlightPort);
 				self.HighlightPort.Parent = self.Frame.Parent;
+
+			else
 				self.HighlightPort.Visible = self.Frame.Visible;
 				self.HighlightPort.Position = self.Frame.Position;
 				self.HighlightPort.Size = self.Frame.Size;
@@ -519,41 +522,7 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 			end
 		end
 		table.sort(self.PartDataList, function(a, b) return a.Key > b.Key; end);
-
-		-- function self:LoadCustomizations(customPlansCache)
-		-- 	customPlansCache = customPlansCache or {};
-
-		-- 	if modData.Profile.OptInNewCustomizationMenu ~= true then return end;
-
-		-- 	task.spawn(function()
-		-- 		local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
-
-		-- 		local serialized = customizationData;
-		-- 		if customizationData == nil then
-		-- 			local rPacket = remoteCustomizationData:InvokeServer("loadcustomizations", storageItem.ID);
-		-- 			if rPacket == nil or rPacket.Success ~= true then
-		-- 				if rPacket and rPacket.FailMsg then
-		-- 					Debugger:StudioWarn("rPacket.FailMsg", rPacket.FailMsg); 
-		-- 				end
-						
-		-- 				return; 
-		-- 			end;
-			
-		-- 			serialized = rPacket.Serialized;
-		-- 		end
-
-		-- 		modCustomizationData.LoadCustomization({
-		-- 			ItemId = itemId;
-		-- 			CustomizationData = serialized;
-		-- 			SkinId = storageItem.Values.ActiveSkin;
-
-		-- 			CustomPlansCache = customPlansCache;
-		-- 			PartDataList = self.PartDataList;
-		-- 		});
-
-		-- 		modCustomizationData.ApplyCustomPlans(customPlansCache, self.PartDataList);
-		-- 	end)
-		-- end
+		
 		self:LoadCustomizations(storageItem);
 		
 

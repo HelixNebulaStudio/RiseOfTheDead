@@ -116,32 +116,38 @@ function CustomizationData.GetBaseSkinFromActiveId(itemId, skinId)
     return `{skinLib.Id}_{variantId}`;
 end
 
+local allGroupTag = "[All]";
 function CustomizationData.LoadCustomization(packet)
     local itemId = packet.ItemId;
     local serializedCustomization = packet.CustomizationData;
     local skinId = packet.SkinId;
     local toolModels = packet.ToolModels;
 
-    if serializedCustomization == nil then return end;
+    local basePrefab = itemPrefabs:FindFirstChild(itemId);
+    local baseSkin = CustomizationData.GetBaseSkinFromActiveId(itemId, skinId);
 
     local customPlansCache = packet.CustomPlansCache or {};
     local partDataList = packet.PartDataList or {};
     ---
 
-    local designPacket = CustomizationData.Deserialize(serializedCustomization);
-    local baseSkin = CustomizationData.GetBaseSkinFromActiveId(itemId, skinId);
+    local designPacket;
+    if serializedCustomization then
+        designPacket = CustomizationData.Deserialize(serializedCustomization);
     
-    local basePrefab = itemPrefabs:FindFirstChild(itemId);
-
-    for planId, customPlan in pairs(designPacket.Plans) do
-        if planId == "[All]" and customPlansCache[planId] then
-            customPlansCache[planId]:Copy(customPlan);
-        else
-            customPlansCache[planId] = customPlan;
+        for planId, customPlan in pairs(designPacket.Plans) do
+            if planId == allGroupTag and customPlansCache[planId] then
+                customPlansCache[planId]:Copy(customPlan);
+            else
+                customPlansCache[planId] = customPlan;
+            end
+            customPlansCache[planId].BaseSkin = baseSkin;
         end
-        customPlansCache[planId].BaseSkin = baseSkin;
     end
 
+    if customPlansCache[allGroupTag] == nil then
+        customPlansCache[allGroupTag] = CustomizationData.newCustomizationPlan();
+    end
+    customPlansCache[allGroupTag].BaseSkin = baseSkin;
 
     if toolModels then
         for a=1, #toolModels do
@@ -183,18 +189,20 @@ function CustomizationData.LoadCustomization(packet)
         end
     end
 
-    for a=1, #partDataList do
-        local partData = partDataList[a];
+    if designPacket then
+        for a=1, #partDataList do
+            local partData = partDataList[a];
 
-        for groupKey, list in pairs(designPacket.Layers) do
-            if table.find(list, partData.Key) then
-                partData.Group = groupKey;
-                break;
+            for groupKey, list in pairs(designPacket.Layers) do
+                if table.find(list, partData.Key) then
+                    partData.Group = groupKey;
+                    break;
+                end
             end
         end
     end
     
-    if toolModels then
+    if #partDataList > 0 then
         CustomizationData.ApplyCustomPlans(customPlansCache, partDataList);
     end
 end
