@@ -240,46 +240,54 @@ function Mission:CompleteMission(players, missionId, sync)
 						if playerSave and playerSave.AddStat then
 							local perkAmount = reward.Amount;
 							
-							playerSave:AddStat("Perks", perkAmount);
+							if playerSave:AddStat("Perks", perkAmount) > 0 then
+								if library.MissionType == 1 then
+									modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "Core Missions");
+									modAnalyticsService:Source{
+										Player=player;
+										Currency=modAnalyticsService.Currency.Perks;
+										Amount=perkAmount;
+										EndBalance=playerSave:GetStat("Perks");
+										ItemSKU=`Mission:Core`;
+									};
+	
+								elseif library.MissionType == 4 then
+									modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "Board Missions");
+									modAnalyticsService:Source{
+										Player=player;
+										Currency=modAnalyticsService.Currency.Perks;
+										Amount=perkAmount;
+										EndBalance=playerSave:GetStat("Perks");
+										ItemSKU=`Mission:Board_{missionId}`;
+									};
+	
+								else
+									modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "Missions");
+									modAnalyticsService:Source{
+										Player=player;
+										Currency=modAnalyticsService.Currency.Perks;
+										Amount=perkAmount;
+										EndBalance=playerSave:GetStat("Perks");
+										ItemSKU=`Mission:Others`;
+									};
+								end
+							end
 							shared.Notify(player, ("You recieved $Amount Perks and 1 Tweak Points for completing $Name."):gsub("$Amount", perkAmount):gsub("$Name", library.Name), "Reward");
 							tweakPointsNotifed = true;
 							
-							if library.MissionType == 1 then
-								modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "Core Missions");
-								modAnalyticsService:Source{
-									Player=player;
-									Currency=modAnalyticsService.Currency.Perks;
-									Amount=perkAmount;
-									EndBalance=playerSave:GetStat("Perks");
-									ItemSKU=`Mission:Core`;
-								};
-
-							elseif library.MissionType == 4 then
-								modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "Board Missions");
-								modAnalyticsService:Source{
-									Player=player;
-									Currency=modAnalyticsService.Currency.Perks;
-									Amount=perkAmount;
-									EndBalance=playerSave:GetStat("Perks");
-									ItemSKU=`Mission:Board_{missionId}`;
-								};
-
-							else
-								modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "Missions");
-								modAnalyticsService:Source{
-									Player=player;
-									Currency=modAnalyticsService.Currency.Perks;
-									Amount=perkAmount;
-									EndBalance=playerSave:GetStat("Perks");
-									ItemSKU=`Mission:Others`;
-								};
-
-							end
 						end
 						
 					elseif reward.Type == "Money" then
 						if playerSave and playerSave.AddStat then
-							playerSave:AddStat("Money", reward.Amount);
+							if playerSave:AddStat("Money", reward.Amount) > 0 then
+								modAnalyticsService:Source{
+									Player=player;
+									Currency=modAnalyticsService.Currency.Money;
+									Amount=reward.Amount;
+									EndBalance=playerSave:GetStat("Money");
+									ItemSKU=`Mission:Board_{missionId}`;
+								};
+							end
 							shared.Notify(player, string.gsub("You recieved $$Amount for completing $Name.", "$Amount", reward.Amount):gsub("$Name", library.Name), "Reward");
 						end
 						

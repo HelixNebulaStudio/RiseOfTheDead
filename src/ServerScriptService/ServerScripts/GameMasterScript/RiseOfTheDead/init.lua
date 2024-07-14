@@ -134,17 +134,20 @@ function ModEngine.OnPlayerAdded(player: Player)
 					
 					profile.Flags:Add(rbxPerksFlag);
 
-					playerSave:AddStat("Perks", joinPerks);
-					shared.Notify(player, "+"..joinPerks.." Perks from Premium Daily Bonus. Complete 0/3 missions for a bonus +35 Perks!", "Positive");
-					modAnalytics.RecordResource(player.UserId, joinPerks, "Source", "Perks", "Gameplay", "PremiumBonus");
+					if playerSave:AddStat("Perks", joinPerks) > 0 then
+						modAnalytics.RecordResource(player.UserId, joinPerks, "Source", "Perks", "Gameplay", "PremiumBonus");
 
-					modAnalyticsService:Source{
-						Player=player;
-						Currency=modAnalyticsService.Currency.Perks;
-						Amount=joinPerks;
-						EndBalance=playerSave:GetStat("Perks");
-						ItemSKU="PremiumDaily";
-					};
+						modAnalyticsService:Source{
+							Player=player;
+							Currency=modAnalyticsService.Currency.Perks;
+							Amount=joinPerks;
+							EndBalance=playerSave:GetStat("Perks");
+							ItemSKU="PremiumDaily";
+						};
+					end
+					
+					shared.Notify(player, "+"..joinPerks.." Perks from Premium Daily Bonus. Complete 0/3 missions for a bonus +35 Perks!", "Positive");
+					
 				end
 			end
 		end)

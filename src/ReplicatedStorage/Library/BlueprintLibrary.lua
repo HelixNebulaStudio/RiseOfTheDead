@@ -450,7 +450,7 @@ BlueprintLibrary.New{
 	Tier=1;
 	Type="Mod";
 	Duration=300;
-	SellPrice=100;
+	SellPrice=1000;
 	Requirements={
 		{Type="Stat"; Name="Money"; Amount=1000;};
 		{Type="Item"; ItemId="metal"; Amount=50;};
@@ -468,7 +468,7 @@ BlueprintLibrary.New{
 	Tier=1;
 	Type="Mod";
 	Duration=300;
-	SellPrice=100;
+	SellPrice=1000;
 	Requirements={
 		{Type="Stat"; Name="Money"; Amount=3000;};
 		{Type="Item"; ItemId="metal"; Amount=160;};
@@ -484,7 +484,7 @@ BlueprintLibrary.New{
 	Tier=1;
 	Type="Mod";
 	Duration=300;
-	SellPrice=100;
+	SellPrice=1000;
 	Requirements={
 		{Type="Stat"; Name="Money"; Amount=2000;};
 		{Type="Item"; ItemId="metal"; Amount=60;};
@@ -500,7 +500,7 @@ BlueprintLibrary.New{
 	Tier=1;
 	Type="Mod";
 	Duration=300;
-	SellPrice=100;
+	SellPrice=1000;
 	Requirements={
 		{Type="Stat"; Name="Money"; Amount=3500;};
 		{Type="Item"; ItemId="metal"; Amount=200;};
@@ -531,7 +531,7 @@ BlueprintLibrary.New{
 	Tier=1;
 	Type="Mod";
 	Duration=300;
-	SellPrice=100;
+	SellPrice=1000;
 	Requirements={
 		{Type="Stat"; Name="Money"; Amount=8500;};
 		{Type="Item"; ItemId="metal"; Amount=25;};
@@ -625,7 +625,7 @@ BlueprintLibrary.New{
 	Product="frostmod";
 	Type="Mod";
 	Duration=300;
-	SellPrice=200;
+	SellPrice=2000;
 	Requirements={
 		{Type="Stat"; Name="Level"; Amount=20;};
 		{Type="Stat"; Name="Money"; Amount=8000;};
@@ -642,7 +642,7 @@ BlueprintLibrary.New{
 	Product="toxicmod";
 	Type="Mod";
 	Duration=300;
-	SellPrice=200;
+	SellPrice=2000;
 	Requirements={
 		{Type="Stat"; Name="Level"; Amount=20;};
 		{Type="Stat"; Name="Money"; Amount=6500;};
@@ -1101,7 +1101,7 @@ BlueprintLibrary.New{
 	Name="Tactical Belt Blueprint";
 	Product="brownbelt";
 	Duration=600;
-	SellPrice=100;
+	SellPrice=1000;
 	Requirements={
 		{Type="Stat"; Name="Money"; Amount=2300;};
 		{Type="Item"; ItemId="cloth"; Amount=60;};
@@ -1130,7 +1130,7 @@ BlueprintLibrary.New{
 	Name="Lab Coat Blueprint";
 	Product="labcoat";
 	Duration=600;
-	SellPrice=100;
+	SellPrice=1000;
 	Requirements={
 		{Type="Stat"; Name="Money"; Amount=6000;};
 		{Type="Item"; ItemId="cloth"; Amount=160;};
@@ -1209,7 +1209,7 @@ BlueprintLibrary.New{
 	Name="Diving Goggles Blueprint";
 	Product="divinggoggles";
 	Duration=600;
-	SellPrice=100;
+	SellPrice=1000;
 	Requirements={
 		{Type="Stat"; Name="Money"; Amount=6000;};
 		{Type="Item"; ItemId="cloth"; Amount=200;};
@@ -1278,7 +1278,7 @@ BlueprintLibrary.New{
 	Name="Charger Blueprint";
 	Product="charger";
 	Duration=60;
-	SellPrice=50;
+	SellPrice=200;
 	Requirements={
 		{Type="Item"; ItemId="metal"; Amount=20;};
 		{Type="Item"; ItemId="battery"; Amount=2;};
@@ -1292,7 +1292,7 @@ BlueprintLibrary.New{
 	Name="Portable Stove Blueprint";
 	Product="portablestove";
 	Duration=60;
-	SellPrice=50;
+	SellPrice=100;
 	Requirements={
 		{Type="Item"; ItemId="metal"; Amount=50;};
 		{Type="Item"; ItemId="wood"; Amount=5;};
@@ -1307,7 +1307,7 @@ BlueprintLibrary.New{
 	Name="Lantern Blueprint";
 	Product="lantern";
 	Duration=60;
-	SellPrice=50;
+	SellPrice=100;
 	Requirements={
 		{Type="Item"; ItemId="metal"; Amount=30;};
 		{Type="Item"; ItemId="igniter"; Amount=1;};
@@ -1321,7 +1321,7 @@ BlueprintLibrary.New{
 	Name="Hand Crank Generator Blueprint";
 	Product="handgenerator";
 	Duration=60;
-	SellPrice=50;
+	SellPrice=100;
 	Requirements={
 		{Type="Item"; ItemId="metal"; Amount=50;};
 		{Type="Item"; ItemId="wires"; Amount=1;};
@@ -1350,7 +1350,7 @@ BlueprintLibrary.New{
 	Name="Spotlight Blueprint";
 	Product="spotlight";
 	Duration=60;
-	SellPrice=50;
+	SellPrice=100;
 	Requirements={
 		{Type="Item"; ItemId="metal"; Amount=50;};
 		{Type="Item"; ItemId="wires"; Amount=1;};
@@ -1365,7 +1365,7 @@ BlueprintLibrary.New{
 	Name="Music Box Blueprint";
 	Product="musicbox";
 	Duration=60;
-	SellPrice=50;
+	SellPrice=100;
 	Requirements={
 		{Type="Item"; ItemId="metal"; Amount=10;};
 		{Type="Item"; ItemId="wood"; Amount=5;};
@@ -1381,7 +1381,7 @@ BlueprintLibrary.New{
 	Name="Binoculars Blueprint";
 	Product="binoculars";
 	Duration=60;
-	SellPrice=50;
+	SellPrice=100;
 	Requirements={
 		{Type="Item"; ItemId="metal"; Amount=10;};
 		{Type="Item"; ItemId="glass"; Amount=20;};
@@ -1410,7 +1410,7 @@ BlueprintLibrary.New{
 	Name="Watering Can Blueprint";
 	Product="wateringcan";
 	Duration=60;
-	SellPrice=60;
+	SellPrice=100;
 	Requirements={
 		{Type="Item"; ItemId="metal"; Amount=50;};
 	};
@@ -1423,7 +1423,7 @@ BlueprintLibrary.New{
 	Name="Ladder Blueprint";
 	Product="ladder";
 	Duration=60;
-	SellPrice=60;
+	SellPrice=100;
 	Requirements={
 		{Type="Item"; ItemId="steelfragments"; Amount=20;};
 	};

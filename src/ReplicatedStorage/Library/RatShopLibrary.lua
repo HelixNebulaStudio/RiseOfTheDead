@@ -5,21 +5,21 @@ local ShopLibrary = {
 
 --
 ShopLibrary.SellPrice = {
-	["Tier1"]=50;
+	["Tier1"]=300;
 	
-	["metal"]=5;
-	["glass"]=5;
-	["wood"]=5;
-	["cloth"]=5;
-	["screws"]=5;
-	["adhesive"]=5;
+	["metal"]=10;
+	["glass"]=10;
+	["wood"]=10;
+	["cloth"]=10;
+	["screws"]=10;
+	["adhesive"]=10;
 	
-	["cannedbeans"]=24;
-	["chocobar"]=24;
-	["cannedfish"]=1200;
+	["cannedbeans"]=48;
+	["chocobar"]=48;
+	["cannedfish"]=1452;
 	
 	["metalpipes"]=200;
-	["igniter"]=200; --300
+	["igniter"]=200;
 	["gastank"]=200;
 	
 	["wires"]=400;
@@ -53,7 +53,7 @@ ShopLibrary.SellPrice = {
 	
 	["coal"]=64;
 	
-	["purplelemon"]=12500; --10500
+	["purplelemon"]=12500;
 	["fotlcardgame"]=14000;
 	
 	-- Weapon parts;
@@ -363,12 +363,12 @@ ShopLibrary.Products:Add{Id="nekronparticulatecachebp"; Currency="Money"; Price=
 
 
 --== Mods Blueprints;
-ShopLibrary.Products:Add{Id="pistoldamagebp"; Currency="Money"; Price=200;};
-ShopLibrary.Products:Add{Id="pistolfireratebp"; Currency="Money"; Price=300;};
-ShopLibrary.Products:Add{Id="pistolreloadspeedbp"; Currency="Money"; Price=400;};
-ShopLibrary.Products:Add{Id="pistolammocapbp"; Currency="Money"; Price=500;};
-ShopLibrary.Products:Add{Id="shotgunreloadspeedbp"; Currency="Money"; Price=500;};
-ShopLibrary.Products:Add{Id="shotgunammocapbp"; Currency="Money"; Price=500;};
+ShopLibrary.Products:Add{Id="pistoldamagebp"; Currency="Money"; Price=ShopLibrary.SellPrice.Tier1+200;};
+ShopLibrary.Products:Add{Id="pistolfireratebp"; Currency="Money"; Price=ShopLibrary.SellPrice.Tier1+300;};
+ShopLibrary.Products:Add{Id="pistolreloadspeedbp"; Currency="Money"; Price=ShopLibrary.SellPrice.Tier1+400;};
+ShopLibrary.Products:Add{Id="pistolammocapbp"; Currency="Money"; Price=ShopLibrary.SellPrice.Tier1+500;};
+ShopLibrary.Products:Add{Id="shotgunreloadspeedbp"; Currency="Money"; Price=ShopLibrary.SellPrice.Tier1+500;};
+ShopLibrary.Products:Add{Id="shotgunammocapbp"; Currency="Money"; Price=ShopLibrary.SellPrice.Tier1+500;};
 
 --== Mods;
 ShopLibrary.Products:Add{Id="pistolreloadspeedmod"; Currency="Perks"; Price=25;};

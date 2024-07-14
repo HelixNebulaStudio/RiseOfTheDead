@@ -388,16 +388,14 @@ function SaveData:SetStat(key, value)
 end
 
 function SaveData:AddStat(key, amount, force)
-	if modBranchConfigs.CurrentBranch.Name == "Live" then
-		if key == "Money" and self.Stats.Money and self.Stats.Money >= modGlobalVars.MaxMoney and amount > 0 and force ~= true then
-			amount = 0;
-		end
-		if key == "Perks" and self.Stats.Perks and self.Stats.Perks >= modGlobalVars.MaxPerks and amount > 0 and force ~= true then
-			amount = 0;
-		end 
-		if key == "TweakPoints" and self.Stats.TweakPoints and self.Stats.TweakPoints >= modGlobalVars.MaxTweakPoints and amount > 0 and force ~= true then
-			amount = 0;
-		end 
+	if key == "Money" and self.Stats.Money and self.Stats.Money >= modGlobalVars.MaxMoney and amount > 0 and force ~= true then
+		amount = 0;
+	end
+	if key == "Perks" and self.Stats.Perks and self.Stats.Perks >= modGlobalVars.MaxPerks and amount > 0 and force ~= true then
+		amount = 0;
+	end 
+	if key == "TweakPoints" and self.Stats.TweakPoints and self.Stats.TweakPoints >= modGlobalVars.MaxTweakPoints and amount > 0 and force ~= true then
+		amount = 0;
 	end
 	
 	self.Stats[key] = (self.Stats[key] or 0) + amount;
@@ -440,6 +438,8 @@ function SaveData:AddStat(key, amount, force)
 	end
 	
 	self:Sync("Stats/"..key);
+
+	return amount;
 end
 
 function SaveData:FindItemFromStorages(id)

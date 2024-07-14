@@ -87,18 +87,19 @@ function GameMode:WorldLoad(modeData)
 					if playerSave and playerSave.AddStat then
 						if math.fmod(wave, 3) == 0 then
 							local perksReward = math.min(math.ceil(wave/3), 3);
-							playerSave:AddStat("Perks", perksReward);
+							if playerSave:AddStat("Perks", perksReward) > 0 then
+								modAnalytics.RecordResource(player.UserId, perksReward, "Source", "Perks", "Gameplay", "Survival");
+								modAnalyticsService:Source{
+									Player=player;
+									Currency=modAnalyticsService.Currency.Perks;
+									Amount=perksReward;
+									EndBalance=playerSave:GetStat("Perks");
+									ItemSKU=`{gameType}:{gameStage}`;
+								};
+						
+							end
 
-							modAnalyticsService:Source{
-								Player=player;
-								Currency=modAnalyticsService.Currency.Perks;
-								Amount=perksReward;
-								EndBalance=playerSave:GetStat("Perks");
-								ItemSKU=`{gameType}:{gameStage}`;
-							};
-					
 							shared.Notify(player, "You recieved "..perksReward.." Perks for reaching wave "..wave.."!", "Reward");
-							modAnalytics.RecordResource(player.UserId, perksReward, "Source", "Perks", "Gameplay", "Survival");
 						end
 					end
 					

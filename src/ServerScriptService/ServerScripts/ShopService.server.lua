@@ -77,34 +77,38 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 				inventory:Remove(id, sellAmt, function()
 					shared.Notify(player, ("Sold $Amt $Item for $$Price."):gsub("$Amt", sellAmt):gsub("$Item", itemLib.Name):gsub("$Price", sellPrice), "Reward");
 					Debugger:Log("Player (",player.Name,") sold a",itemLib.Name,"for $"..sellPrice);
-					playerSave:AddStat("Money", sellPrice);
+
+					if playerSave:AddStat("Money", sellPrice) > 0 then
+						modAnalytics.RecordResource(player.UserId, sellPrice, "Source", "Money", "Sold", storageItem.ItemId);
+						modAnalyticsService:Source{
+							Player=player;
+							Currency=modAnalyticsService.Currency.Money;
+							Amount=sellPrice;
+							EndBalance=playerSave:GetStat("Money");
+							ItemSKU=`SellItem:{storageItem.ItemId}`;
+						};
+					end
+
 				end);
 				
+
 				local bonus = 0;
 				if modBranchConfigs.IsWorld("Safehome") then
 					bonus = math.ceil(sellPrice*0.15);
 					shared.Notify(player, ("You got $"..bonus.." bonus for selling in safehome.") , "Reward");
-					playerSave:AddStat("Money", bonus);
-					modAnalytics.RecordResource(player.UserId, bonus, "Source", "Money", "Sold", "SafehomeBonus");
 					
-					modAnalyticsService:Source{
-						Player=player;
-						Currency=modAnalyticsService.Currency.Money;
-						Amount=bonus;
-						EndBalance=playerSave:GetStat("Money");
-						ItemSKU="SellItem:SafehomeBonus";
-					};
-
+					if playerSave:AddStat("Money", bonus) > 0 then
+						modAnalytics.RecordResource(player.UserId, bonus, "Source", "Money", "Sold", "SafehomeBonus");
+						modAnalyticsService:Source{
+							Player=player;
+							Currency=modAnalyticsService.Currency.Money;
+							Amount=bonus;
+							EndBalance=playerSave:GetStat("Money");
+							ItemSKU="SellItem:SafehomeBonus";
+						};
+					end
 				end
 
-				modAnalytics.RecordResource(player.UserId, sellPrice, "Source", "Money", "Sold", storageItem.ItemId);
-				modAnalyticsService:Source{
-					Player=player;
-					Currency=modAnalyticsService.Currency.Money;
-					Amount=sellPrice;
-					EndBalance=playerSave:GetStat("Money");
-					ItemSKU=`SellItem:{storageItem.ItemId}`;
-				};
 				
 				local finalPrice = sellPrice + bonus;
 				if finalPrice > 0 then

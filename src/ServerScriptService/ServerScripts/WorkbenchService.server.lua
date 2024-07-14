@@ -983,6 +983,14 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 			if tweakPoints <= 0 then return modWorkbenchLibrary.PurchaseReplies.InsufficientCurrency; end;
 			playerSave:AddStat("TweakPoints", -1);
 
+			modAnalyticsService:Sink{
+				Player=player;
+				Currency=modAnalyticsService.Currency.TweakPoints;
+				Amount=1;
+				EndBalance=playerSave:GetStat("TweakPoints");
+				ItemSKU="TweakItem";
+			};
+			
 			local tweakSeed = storageItem.Values.Tweak;
 			local graphData = modToolTweaks.LoadGraph(tweakSeed);
 			
@@ -1125,17 +1133,20 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 					shared.Notify(player, "You perks is maxed!", "Negative");
 					
 				else
-					playerSave:AddStat("Perks", perks);
+					if playerSave:AddStat("Perks", perks) > 0 then
+						modAnalyticsService:Source{
+							Player=player;
+							Currency=modAnalyticsService.Currency.Perks;
+							Amount=perks;
+							EndBalance=playerSave:GetStat("Perks");
+							ItemSKU="DeconstructMod";
+						};
+
+					end
+
 					if processData.Maxed then playerSave:AwardAchievement("thedec"); end
 					shared.Notify(player, (("You recieved $p Perks from deconstructing $name."):gsub("$p", perks):gsub("$name", itemLib.Name)), "Reward");
 					
-					modAnalyticsService:Source{
-						Player=player;
-						Currency=modAnalyticsService.Currency.Perks;
-						Amount=perks;
-						EndBalance=playerSave:GetStat("Perks");
-						ItemSKU="DeconstructMod";
-					};
 				end
 				
 			end
@@ -1173,17 +1184,19 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 					shared.Notify(player, "You TweakPoints is maxed!", "Negative");
 					
 				else
-					playerSave:AddStat("TweakPoints", 5);
-					shared.Notify(player, "You recieved 5 Tweak Point from deconstructing a level "..levels.." "..itemName..".", "Reward");
-					modAnalytics.RecordResource(player.UserId, 5, "Source", "TweakPoints", "Gameplay", "Deconstruct");
+					if playerSave:AddStat("TweakPoints", 5) > 0 then
+						modAnalytics.RecordResource(player.UserId, 5, "Source", "TweakPoints", "Gameplay", "Deconstruct");
+						modAnalyticsService:Source{
+							Player=player;
+							Currency=modAnalyticsService.Currency.TweakPoints;
+							Amount=5;
+							EndBalance=playerSave:GetStat("TweakPoints");
+							ItemSKU="Deconstruct";
+						};
 
-					modAnalyticsService:Source{
-						Player=player;
-						Currency=modAnalyticsService.Currency.TweakPoints;
-						Amount=5;
-						EndBalance=playerSave:GetStat("TweakPoints");
-						ItemSKU="Deconstruct";
-					};
+					end
+					
+					shared.Notify(player, "You recieved 5 Tweak Point from deconstructing a level "..levels.." "..itemName..".", "Reward");
 					
 				end
 			end
@@ -1192,18 +1205,20 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 					shared.Notify(player, "You Perks is maxed!", "Negative");
 					
 				else
-					playerSave:AddStat("Perks", 25);
-					shared.Notify(player, "You recieved 25 Perks from deconstructing a level "..levels.." "..itemName..".", "Reward");
-					modAnalytics.RecordResource(player.UserId, 25, "Source", "Perks", "Gameplay", "Deconstruct");
+					if playerSave:AddStat("Perks", 25) > 0 then
+						modAnalytics.RecordResource(player.UserId, 25, "Source", "Perks", "Gameplay", "Deconstruct");
 					
-					modAnalyticsService:Source{
-						Player=player;
-						Currency=modAnalyticsService.Currency.Perks;
-						Amount=25;
-						EndBalance=playerSave:GetStat("Perks");
-						ItemSKU="DeconstructWeapon";
-					};
+						modAnalyticsService:Source{
+							Player=player;
+							Currency=modAnalyticsService.Currency.Perks;
+							Amount=25;
+							EndBalance=playerSave:GetStat("Perks");
+							ItemSKU="DeconstructWeapon";
+						};
 
+					end
+
+					shared.Notify(player, "You recieved 25 Perks from deconstructing a level "..levels.." "..itemName..".", "Reward");
 				end
 				
 				
@@ -1212,18 +1227,20 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 					shared.Notify(player, "You Money is maxed!", "Negative");
 					
 				else
-					playerSave:AddStat("Money", 5000);
-					shared.Notify(player, "You recieved $5000 from deconstructing a level "..levels.." "..itemName..".", "Reward");
-					modAnalytics.RecordResource(player.UserId, 5000, "Source", "Money", "Gameplay", "Deconstruct");
+					if playerSave:AddStat("Money", 5000) > 0 then
+						modAnalytics.RecordResource(player.UserId, 5000, "Source", "Money", "Gameplay", "Deconstruct");
 					
-					modAnalyticsService:Source{
-						Player=player;
-						Currency=modAnalyticsService.Currency.Money;
-						Amount=5000;
-						EndBalance=playerSave:GetStat("Money");
-						ItemSKU="Deconstruct";
-					};
+						modAnalyticsService:Source{
+							Player=player;
+							Currency=modAnalyticsService.Currency.Money;
+							Amount=5000;
+							EndBalance=playerSave:GetStat("Money");
+							ItemSKU="Deconstruct";
+						};
+					end
 
+					shared.Notify(player, "You recieved $5000 from deconstructing a level "..levels.." "..itemName..".", "Reward");
+				
 				end
 				
 				

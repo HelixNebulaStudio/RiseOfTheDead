@@ -59,15 +59,16 @@ function Blueprints.new(player, syncFunc)
 			if data.Time == nil and library.Category == "Commodities" then
 				local profile = Blueprints.Profiles:Get(self.Player);
 				local playerSave = profile:GetActiveSave();
-				playerSave:AddStat("Perks", 20);
 
-				modAnalyticsService:Source{
-					Player=player;
-					Currency=modAnalyticsService.Currency.Perks;
-					Amount=20;
-					EndBalance=playerSave:GetStat("Perks");
-					ItemSKU=`UnlockBlueprint`;
-				};
+				if playerSave:AddStat("Perks", 20) > 0 then
+					modAnalyticsService:Source{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Perks;
+						Amount=20;
+						EndBalance=playerSave:GetStat("Perks");
+						ItemSKU=`UnlockBlueprint`;
+					};
+				end
 
 				shared.Notify(player, ("You recieved 20 Perks for learning the $Name."):gsub("$Name", library.Name), "Reward");
 			end

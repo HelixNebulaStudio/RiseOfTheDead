@@ -2483,15 +2483,18 @@ function remoteStorageService.OnServerInvoke(player, packet)
 				shared.Notify(player, "Unlocked Rat Storage with ".. cost .." Gold", "Positive");
 				
 				profile:AddPlayPoints(cost/100, "Sink:Gold");
-				modAnalytics.RecordResource(player.UserId, cost, "Sink", "Gold", "Purchase", "RatStorage");
 
-				modAnalyticsService:Sink{
-					Player=player;
-					Currency=modAnalyticsService.Currency.Gold;
-					Amount=cost;
-					EndBalance=traderProfile.Gold;
-					ItemSKU=`RatStorageRent`;
-				};
+				if cost > 0 then
+					modAnalytics.RecordResource(player.UserId, cost, "Sink", "Gold", "Purchase", "RatStorage");
+
+					modAnalyticsService:Sink{
+						Player=player;
+						Currency=modAnalyticsService.Currency.Gold;
+						Amount=cost;
+						EndBalance=traderProfile.Gold;
+						ItemSKU=`RatStorageRent`;
+					};
+				end
 				
 				storage.RentalUnlockTime = modSyncTime.GetTime() + daySecs;
 				

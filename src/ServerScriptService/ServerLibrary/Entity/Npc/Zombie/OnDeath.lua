@@ -54,50 +54,53 @@ function Zombie.new(self)
 			if playerSave and playerSave.AddStat then
 				playerSave:AddStat("Kills", 1);
 				playerSave:AddStat("ZombieKills", 1);
-				profile:AddPlayPoints(3, "Gameplay:Kill:Zombie");
 
-				local moneyReward = math.random(config.MoneyReward.Min, config.MoneyReward.Max) + (config.Level-1);
-				playerSave:AddStat("Money", moneyReward);
-				modAnalyticsService:Source{
-					Player=player;
-					Currency=modAnalyticsService.Currency.Money;
-					Amount=moneyReward;
-					EndBalance=playerSave:GetStat("Money");
-					ItemSKU=`Kill:{self.Name}`;
-				};
+				local killNotice = {`Killed {self.Name} [{config.Level}]`};
+				if config.MoneyReward then
+					local moneyReward = math.random(config.MoneyReward.Min, config.MoneyReward.Max) + (config.Level-1);
 
-				if playerSave.Statistics then
-					local killKey = "L"..config.Level.."-"..self.Name.."Kills";
-					playerSave.Statistics:AddStat("KillTracker", killKey, 1);
+					if playerSave:AddStat("Money", moneyReward) > 0 then
+						modAnalyticsService:Source{
+							Player=player;
+							Currency=modAnalyticsService.Currency.Money;
+							Amount=moneyReward;
+							EndBalance=playerSave:GetStat("Money");
+							ItemSKU=`Kill:{self.Name}`;
+						};
+					end
+
+					table.insert(killNotice, `+${moneyReward}`);
 				end
 
 				local levelKey = "LevelKills-"..config.Level;
 				playerSave:AddStat(levelKey, 1);
-
 				local levelKills = playerSave:GetStat(levelKey) or 0;
 				local playerLevel = playerSave:GetStat("Level") or 0;
 				if levelKills > 0 and math.fmod(levelKills, modGlobalVars.GetFocusLevel(playerLevel, config.Level)) == 0 then
-					playerSave:AddStat("Perks", 1);
 
-					modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "FocusKills");
-					modAnalyticsService:Source{
-						Player=player;
-						Currency=modAnalyticsService.Currency.Perks;
-						Amount=1;
-						EndBalance=playerSave:GetStat("Perks");
-						ItemSKU=`FocusKills`;
-					};
+					if playerSave:AddStat("Perks", 1) > 0 then
+						modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "FocusKills");
+						modAnalyticsService:Source{
+							Player=player;
+							Currency=modAnalyticsService.Currency.Perks;
+							Amount=1;
+							EndBalance=playerSave:GetStat("Perks");
+							ItemSKU=`FocusKills`;
+						};
+					end
 
 					modOnGameEvents:Fire("OnFocusKill", self, player);
-					
-					shared.Notify(player, (("Killed $enemyName [$level] +$$moneyReward, +1 Perk"):gsub("$level", config.Level)
-						:gsub("$enemyName", self.Name):gsub("$moneyReward", moneyReward)), "Reward");
-						
-				else
-					shared.Notify(player, (("Killed $enemyName [$level] +$$moneyReward"):gsub("$level", config.Level)
-						:gsub("$enemyName", self.Name):gsub("$moneyReward", moneyReward)), "Reward");
-
-					
+					table.insert(killNotice, `+1 Perk`);
+				end
+				
+				shared.Notify(player, table.concat(killNotice, " "), "Reward");
+				
+				
+				-- statistics;
+				profile:AddPlayPoints(3, "Gameplay:Kill:Zombie");
+				if playerSave.Statistics then
+					local killKey = "L"..config.Level.."-"..self.Name.."Kills";
+					playerSave.Statistics:AddStat("KillTracker", killKey, 1);
 				end
 			end
 
