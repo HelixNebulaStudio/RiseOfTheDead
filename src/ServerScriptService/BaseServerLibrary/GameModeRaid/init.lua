@@ -1130,27 +1130,32 @@ function Raid:Initialize(roomData)
 					if #validSpawns <= 0 then break; end;
 					if self.EliminateCount > self.EliminateGoal then break end;
 
-					
-					local targetChar = self.Characters[math.random(1, #self.Characters)];
-					local charCFrame = targetChar:GetPivot();
-					local player = game.Players:GetPlayerFromCharacter(targetChar);
-					
 					local closestAtt, closestDist = nil, math.huge;
-
-					for b=1, 5 do
-						if #validSpawns <= 0 then break end;
-
-						local spawnAtt = table.remove(validSpawns, math.random(1, #validSpawns));
-						local dist = player:DistanceFromCharacter(spawnAtt.WorldCFrame.Position);
-
-						if charCFrame.Y > spawnAtt.WorldCFrame.Y+8 then
-							dist = dist + 50;
+					if #self.Characters > 0 then
+						local targetChar = self.Characters[math.random(1, #self.Characters)];
+						local charCFrame = targetChar:GetPivot();
+						local player = game.Players:GetPlayerFromCharacter(targetChar);
+						
+	
+						for b=1, 5 do
+							if #validSpawns <= 0 then break end;
+	
+							local spawnAtt = table.remove(validSpawns, math.random(1, #validSpawns));
+							local dist = player:DistanceFromCharacter(spawnAtt.WorldCFrame.Position);
+	
+							if charCFrame.Y > spawnAtt.WorldCFrame.Y+8 then
+								dist = dist + 50;
+							end
+	
+							if dist < closestDist then
+								closestAtt = spawnAtt;
+								closestDist = dist;
+							end
 						end
 
-						if dist < closestDist then
-							closestAtt = spawnAtt;
-							closestDist = dist;
-						end
+					else
+						closestAtt = table.remove(validSpawns, math.random(1, #validSpawns));
+
 					end
 
 					if closestAtt then
