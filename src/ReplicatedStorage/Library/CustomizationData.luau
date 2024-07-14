@@ -163,6 +163,7 @@ function CustomizationData.LoadCustomization(packet)
     
             for _, basePart in pairs(toolModel:GetChildren()) do
                 if not basePart:IsA("BasePart") then continue end;
+                if basePart:GetAttribute("WorkbenchIgnore") then continue end;
         
                 local predefinedGroup = basePart:GetAttribute("CustomizationGroup");
                 predefinedGroup = predefinedGroup and `[{predefinedGroup}]` or nil;
@@ -329,6 +330,9 @@ function CustomizationData.ApplyCustomPlans(customPlans, partDataList)
 
     for a=1, #partDataList do
         local partData = partDataList[a];
+        if partData and partData.Part:GetAttribute("WorkbenchIgnore") then
+            continue;
+        end
 
         local groupPlan = customPlans[partData.Group];
         local partPlan = customPlans[partData.Key];
