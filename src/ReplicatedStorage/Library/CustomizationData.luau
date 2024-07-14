@@ -802,6 +802,7 @@ function CustomizationPlan:Serialize()
 end
 
 local function ConvertOldAppearanceData(storageItem)
+    if storageItem:GetValues("_Customs") then return end;
     local oldColor = storageItem:GetValues("Colors");
     local oldTextures = storageItem:GetValues("Textures");
     local oldPartAlphas = storageItem:GetValues("PartAlpha");
