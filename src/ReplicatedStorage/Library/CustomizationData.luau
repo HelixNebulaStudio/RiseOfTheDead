@@ -816,7 +816,6 @@ local function ConvertOldAppearanceData(storageItem)
         partName = string.gsub(partName, "L%-", "Left");
         partName = string.gsub(partName, "R%-", "Right");
         
-
 		local getColor = modColorsLibrary.Get(colorId);
 
         if getColor then
@@ -859,6 +858,8 @@ local function ConvertOldAppearanceData(storageItem)
     storageItem:DeleteValues("Colors");
     storageItem:DeleteValues("Textures");
     storageItem:DeleteValues("PartAlpha");
+
+    Debugger:StudioWarn("Converting old customizations to new.");
 end
 
 if RunService:IsServer() then

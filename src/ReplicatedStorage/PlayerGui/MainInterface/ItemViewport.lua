@@ -341,7 +341,39 @@ function ItemViewport:RefreshDisplay()
 
 end
 
-function ItemViewport:LoadCustomizations()
+function ItemViewport:LoadCustomizations(storageItem, customPlansCache, serializedCustomization)
+	customPlansCache = customPlansCache or {};
+
+	if modData.Profile.OptInNewCustomizationMenu ~= true then return end;
+
+	task.spawn(function()
+		local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
+
+		local serialized = serializedCustomization;
+		if serializedCustomization == nil then
+			local rPacket = remoteCustomizationData:InvokeServer("loadcustomizations", storageItem.ID);
+			if rPacket == nil or rPacket.Success ~= true then
+				if rPacket and rPacket.FailMsg then
+					Debugger:StudioWarn("rPacket.FailMsg", rPacket.FailMsg); 
+				end
+				
+				return; 
+			end;
+	
+			serialized = rPacket.Serialized;
+		end
+
+		modCustomizationData.LoadCustomization({
+			ItemId = storageItem.ItemId;
+			CustomizationData = serialized;
+			SkinId = storageItem.Values.ActiveSkin;
+
+			CustomPlansCache = customPlansCache;
+			PartDataList = self.PartDataList;
+		});
+
+		modCustomizationData.ApplyCustomPlans(customPlansCache, self.PartDataList);
+	end);
 end
 
 function ItemViewport:SetDisplay(storageItem, yieldFunc)
@@ -488,41 +520,41 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 		end
 		table.sort(self.PartDataList, function(a, b) return a.Key > b.Key; end);
 
-		function self:LoadCustomizations(customPlansCache)
-			customPlansCache = customPlansCache or {};
+		-- function self:LoadCustomizations(customPlansCache)
+		-- 	customPlansCache = customPlansCache or {};
 
-			if modData.Profile.OptInNewCustomizationMenu ~= true then return end;
+		-- 	if modData.Profile.OptInNewCustomizationMenu ~= true then return end;
 
-			task.spawn(function()
-				local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
+		-- 	task.spawn(function()
+		-- 		local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 
-				local serialized = customizationData;
-				if customizationData == nil then
-					local rPacket = remoteCustomizationData:InvokeServer("loadcustomizations", storageItem.ID);
-					if rPacket == nil or rPacket.Success ~= true then
-						if rPacket and rPacket.FailMsg then
-							Debugger:StudioWarn("rPacket.FailMsg", rPacket.FailMsg); 
-						end
+		-- 		local serialized = customizationData;
+		-- 		if customizationData == nil then
+		-- 			local rPacket = remoteCustomizationData:InvokeServer("loadcustomizations", storageItem.ID);
+		-- 			if rPacket == nil or rPacket.Success ~= true then
+		-- 				if rPacket and rPacket.FailMsg then
+		-- 					Debugger:StudioWarn("rPacket.FailMsg", rPacket.FailMsg); 
+		-- 				end
 						
-						return; 
-					end;
+		-- 				return; 
+		-- 			end;
 			
-					serialized = rPacket.Serialized;
-				end
+		-- 			serialized = rPacket.Serialized;
+		-- 		end
 
-				modCustomizationData.LoadCustomization({
-					ItemId = itemId;
-					CustomizationData = serialized;
-					SkinId = storageItem.Values.ActiveSkin;
+		-- 		modCustomizationData.LoadCustomization({
+		-- 			ItemId = itemId;
+		-- 			CustomizationData = serialized;
+		-- 			SkinId = storageItem.Values.ActiveSkin;
 
-					CustomPlansCache = customPlansCache;
-					PartDataList = self.PartDataList;
-				});
+		-- 			CustomPlansCache = customPlansCache;
+		-- 			PartDataList = self.PartDataList;
+		-- 		});
 
-				modCustomizationData.ApplyCustomPlans(customPlansCache, self.PartDataList);
-			end)
-		end
-		self:LoadCustomizations();
+		-- 		modCustomizationData.ApplyCustomPlans(customPlansCache, self.PartDataList);
+		-- 	end)
+		-- end
+		self:LoadCustomizations(storageItem);
 		
 
 	else

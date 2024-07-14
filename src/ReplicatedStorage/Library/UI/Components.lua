@@ -141,6 +141,9 @@ function Components.CreateSlider(mainInterface, paramPacket)
 	end
 	button.MouseButton2Click:Connect(function()
 		if button:GetAttribute("DisableSlider") == true then return end;
+		if saveFunc then
+			saveFunc(currentVal/rangeScale);
+		end
 		resetDefaultValues();
 	end);
 	

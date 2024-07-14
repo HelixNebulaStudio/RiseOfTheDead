@@ -67,6 +67,15 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 	local baseCustomPlan = modCustomizationData.newCustomizationPlan();
 	customPlansCache["[All]"] = baseCustomPlan;
 
+	-- do -- load premade customPlans
+	-- 	local baseSkin = modCustomizationData.GetBaseSkinFromActiveId(itemId, storageItem.Values.ActiveSkin);
+	-- 	baseCustomPlan.BaseSkin = baseSkin;
+		
+	-- 	itemViewport:LoadCustomizations(customPlansCache);
+	-- 	modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
+	-- end
+	itemViewport:LoadCustomizations(storageItem, customPlansCache);
+
 	-- MARK: generateSerialized()
 	local function generateSerialized()
 		local partDataGroups = {};
@@ -107,8 +116,9 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 	-- MARK: saveCustomizations()
 	local function saveCustomizations()
-		Debugger:Warn("Save customizations");
 		local serialized = generateSerialized();
+		Debugger:Warn("Save customizations (",storageItem.ID,"):", isDevBranch and serialized or "");
+
 		local rPacket = remoteCustomizationData:InvokeServer("savecustomizations", {
 			Siid=storageItem.ID;
 			Serialized=serialized;
@@ -141,30 +151,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		end
 
 		return customPlan;
-	end
-	
-
-	do -- load premade customPlans
-		local baseSkin = modCustomizationData.GetBaseSkinFromActiveId(itemId, storageItem.Values.ActiveSkin);
-		baseCustomPlan.BaseSkin = baseSkin;
-		
-		local itemPartGroups = storageItem.Values.PartGroups;
-		if itemPartGroups then
-			Debugger:StudioWarn("Load part groups", itemPartGroups);
-			
-			for a=1, #itemViewport.PartDataList do
-				local partData = itemViewport.PartDataList[a];
-
-				for groupKey, list in pairs(itemPartGroups) do
-					if table.find(list, partData.Key) == nil then continue end;
-
-					partData.Group = groupKey;
-				end
-			end
-		end
-
-		itemViewport:LoadCustomizations(customPlansCache);
-		modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
 	end
 	
 	-- listMenu:Refresh();
@@ -2643,8 +2629,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		itemViewport.HightlightSelect = true;
 		garbage:Tag(function()
 			itemViewport.HightlightSelect = false;
-			
-			saveCustomizations();
 		end)
 
 	end
