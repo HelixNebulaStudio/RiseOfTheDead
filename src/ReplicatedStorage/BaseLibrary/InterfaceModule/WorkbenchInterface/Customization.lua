@@ -1297,7 +1297,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 			colorButton.TextColor3 = modColorPicker.GetBackColor(selectColor or Color3.fromRGB(150, 150, 150));
 
 			if baseCustomPlan.BaseSkin then
-				local skinId, variantId = string.match(baseCustomPlan.BaseSkin or "", "(.*)_(.*)");
+				local skinId, variantId = modCustomizationData.GetSkinIds(baseCustomPlan.BaseSkin);
 				local skinLib, skinVariantData = modItemSkinsLibrary:FindVariant(skinId, variantId);
 				local hasAlphaTexture = skinLib and skinLib.HasAlphaTexture;
 
@@ -2125,6 +2125,19 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				local pasteCustomPlan = modCustomizationData.newCustomizationPlan();
 				pasteCustomPlan:Deserialize(copyCache);
 
+				pasteCustomPlan.BaseSkin = nil;
+
+				if pasteCustomPlan.Skin then
+					local skinId, variantId = modCustomizationData.GetSkinIds(pasteCustomPlan.Skin);
+					local skinLib, skinVariantData = modItemSkinsLibrary:FindVariant(skinId, variantId);
+					
+					local unlockedSkins = getUnlockedSkins();
+					if skinLib.Rare and unlockedSkins[skinId] == nil then
+						pasteCustomPlan.Skin = nil;
+					end
+				end
+
+
 				if itemWear >= hwWear then
 					pasteCustomPlan.Transparency = nil;
 				end
@@ -2162,6 +2175,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				buttonsFrame.PasteButton.Text = "Fail to paste!";
 			end
 
+			saveCustomizations();
 			task.wait(0.5);
 			buttonsFrame.PasteButton.Text = "Paste";
 		end)
@@ -2390,7 +2404,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 					OnColorSelect(customPlan.Color);
 
 					local newSkin = customPlan.Skin;
-					local skinId, variantId = string.match(newSkin or "", "(.*)_(.*)");
+					local skinId, variantId = modCustomizationData.GetSkinIds(newSkin);
 					OnSkinSelect(skinId, variantId);
 
 					local newTransparency = customPlan.Transparency;

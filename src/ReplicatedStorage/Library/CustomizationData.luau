@@ -352,6 +352,10 @@ function CustomizationData.ApplyCustomPlans(customPlans, partDataList)
     end
 end
 
+function CustomizationData.GetSkinIds(str)
+    return string.match(str or "", "(.*)_(.*)");
+end
+
 function CustomizationPlan:Reset()
     self.BaseSkin = nil;
     self.Color = nil;
@@ -419,7 +423,7 @@ function CustomizationPlan:Apply(obj: BasePart)
         local clearBaseSkin = false;
 
         if self.BaseSkin then
-            local skinId, variantId = string.match(self.BaseSkin, "(.*)_(.*)");
+            local skinId, variantId = CustomizationData.GetSkinIds(self.BaseSkin);
             local skinLib, variantLib = modItemSkinsLibrary:FindVariant(skinId, variantId);
             local hasAlphaTexture = skinLib and skinLib.HasAlphaTexture;
 
@@ -498,7 +502,7 @@ function CustomizationPlan:Apply(obj: BasePart)
 
 
     if self.Skin then
-        local skinId, variantId = string.match(self.Skin, "(.*)_(.*)");
+        local skinId, variantId = CustomizationData.GetSkinIds(self.Skin);
         local skinLib, variantLib = modItemSkinsLibrary:FindVariant(skinId, variantId);
 
         if skinLib then
@@ -999,6 +1003,53 @@ if RunService:IsServer() then
             end
 
             local serialized = storageItem:GetValues("_Customs");
+
+            if serialized then
+
+                local function GetUnlockedSkins()
+                    local unlockedSkins = {};
+                    if storageItem.Values.Skins then
+                        for _, oldSkinId in pairs(storageItem.Values.Skins) do
+                            local skinId = modItemSkinsLibrary.GetSkinIdFromOldId(oldSkinId);
+                            if skinId then
+                                unlockedSkins[skinId] = true;
+                            end
+                        end
+                    end
+                    if profile.SkinsPacks then
+                        for skinId, _ in pairs(profile.SkinsPacks) do
+                            if modItemSkinsLibrary:Find(skinId) then
+                                unlockedSkins[skinId] = true;
+                                break;
+                            end
+        
+                            skinId = modItemSkinsLibrary.GetSkinIdFromOldId(skinId);
+                            if skinId then
+                                unlockedSkins[skinId] = true;
+                            end
+                        end
+                    end
+                    return unlockedSkins;
+                end
+
+                local unlockedSkins = GetUnlockedSkins();
+                local designPacket = CustomizationData.Deserialize(serialized);
+                
+                for planKey, customPlan in pairs(designPacket.Plans) do
+                    local baseSkinId = CustomizationData.GetSkinIds(customPlan.BaseSkin);
+
+                    if baseSkinId and unlockedSkins[baseSkinId] == nil then
+                        Debugger:StudioWarn("Erase invalid base skin", customPlan.BaseSkin);
+                        serialized = string.gsub(serialized, customPlan.BaseSkin, "");
+                    end
+
+                    local skinId = CustomizationData.GetSkinIds(customPlan.Skin);
+                    if skinId and unlockedSkins[skinId] == nil then
+                        Debugger:StudioWarn("Erase invalid skin", customPlan.Skin);
+                        serialized = string.gsub(serialized, customPlan.Skin, "");
+                    end
+                end
+            end
 
             returnPacket.Serialized = serialized;
             returnPacket.Success = true;
