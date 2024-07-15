@@ -73,36 +73,36 @@ ShopLibrary.SellPrice = {
 };
 
 ShopLibrary.AmmunitionPrice = {
-	["p250"]=0;
-	["cz75"]=2;
-	["xm1014"]=6;
-	["sawedoff"]=4;
-	["mp5"]=7;
-	["mp7"]=7;
-	["tec9"]=12;
-	["deagle"]=16;
-	["m4a4"]=26;
-	["ak47"]=28;
-	["awp"]=75;
-	["minigun"]=120;
-	["flamethrower"]=95;
-	["m9legacy"]=85;
+	-- ["p250"]=0;
+	-- ["cz75"]=2;
+	-- ["xm1014"]=6;
+	-- ["sawedoff"]=4;
+	-- ["mp5"]=7;
+	-- ["mp7"]=7;
+	-- ["tec9"]=12;
+	-- ["deagle"]=16;
+	-- ["m4a4"]=26;
+	-- ["ak47"]=28;
+	-- ["awp"]=75;
+	-- ["minigun"]=120;
+	-- ["flamethrower"]=95;
+	-- ["m9legacy"]=85;
 	
-	["grenadelauncher"]=120;
-	["dualp250"]=40;
-	["revolver454"]=80;
-	["mariner590"]=45;
-	["czevo3"]=48;
-	["fnfal"]=26;
-	["tacticalbow"]=16;
-	["desolatorheavy"]=180;
-	["rec21"]=55;
-	["at4"]=60;
-	["sr308"]=52;
-	["vectorx"]=160;
+	-- ["grenadelauncher"]=120;
+	-- ["dualp250"]=40;
+	-- ["revolver454"]=80;
+	-- ["mariner590"]=45;
+	-- ["czevo3"]=48;
+	-- ["fnfal"]=26;
+	-- ["tacticalbow"]=16;
+	-- ["desolatorheavy"]=180;
+	-- ["rec21"]=55;
+	-- ["at4"]=60;
+	-- ["sr308"]=52;
+	-- ["vectorx"]=160;
 	
-	["rusty48"]=200;
-	["arelshiftcross"]=148;
+	-- ["rusty48"]=200;
+	-- ["arelshiftcross"]=148;
 }
 
 ShopLibrary.RepairPrice = {
@@ -403,7 +403,7 @@ function ShopLibrary.CalculateAmmoPrice(itemId, values, config, maxPrice, double
 	local maxAmmo = values.MA or config.MaxAmmoLimit;
 	
 	local totalAmmoNeeded = (config.AmmoLimit-ammo)+(config.MaxAmmoLimit-maxAmmo);
-	local pricePerMag = ShopLibrary.AmmunitionPrice[itemId] or 1;
+	local pricePerMag = ShopLibrary.AmmunitionPrice[itemId] or 0;
 	
 	local totalMagsNeeded = math.ceil(totalAmmoNeeded/config.AmmoLimit);
 	local ammoPrice = math.ceil(pricePerMag*totalMagsNeeded);
