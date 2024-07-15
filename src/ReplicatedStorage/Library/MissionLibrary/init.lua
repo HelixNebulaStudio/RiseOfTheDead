@@ -966,6 +966,7 @@ MissionLibrary.New{
 		["addWall3"]={World="TheUnderground"; Label="Build A Wall"; Target=Vector3.new(-55.146, 27.972, 272.869); Type=modMarkers.MarkerTypes.Waypoint;};
 		["addWall4"]={World="TheUnderground"; Label="Build A Wall"; Target=Vector3.new(-55.646, 27.972, 265.289); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 29 - Lab Assistant

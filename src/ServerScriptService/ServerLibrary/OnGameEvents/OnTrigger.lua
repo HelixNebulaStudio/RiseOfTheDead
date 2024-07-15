@@ -8,7 +8,6 @@ local modReplicationManager = require(game.ReplicatedStorage.Library.Replication
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
@@ -135,59 +134,6 @@ return function(player, interactData, ...)
 			else
 				shared.Notify(player, "Not enough Metal Scraps, need "..math.clamp(requiredQuantity-quantity, 0, requiredQuantity).." more.", "Negative");
 			end
-		end
-		
-	elseif triggerId == "SafetySafehouse:Add" then
-		local subId = interactData.SubId;
-		if subId == nil then Debugger:Warn("SafetySafehouse:Add>>  Missing sub id."); return end;
-		local mission = modMission:Progress(player, 28);
-		if mission and mission.ObjectivesCompleted[subId] ~= true then
-			local playerGaveMetal = interactData.GaveMetal or false;
-			local build = false;
-			
-			if not playerGaveMetal then
-				local quantity = 0;
-				local itemsList = profile.ActiveInventory:ListByItemId("metal");
-				for a=1, #itemsList do quantity = quantity +itemsList[a].Quantity; end
-				
-				if quantity >= 100 then
-					local storageItem = inventory:FindByItemId("metal");
-					inventory:Remove(storageItem.ID, 100);
-					shared.Notify(player, "100 Metal Scraps removed from your Inventory.", "Negative");
-					
-					build = true;
-				else
-					shared.Notify(player, "Not enough Metal Scraps, need "..math.clamp(quantity, 0, 100).."/100 more.", "Negative");
-				end
-			else
-				build = true;
-			end
-			if build then
-				modMission:Progress(player, 28, function(mission)
-					mission.ObjectivesCompleted[subId] = true;
-				end)
-				
-				local wallObjects = interactData.Object and interactData.Object:FindFirstChild("Objects");
-				local interactables = interactData.Object and interactData.Object:FindFirstChild("Interactables");
-				
-				if interactables then 
-					modReplicationManager.ReplicateIn(player, interactables, workspace.Interactables);
-				end;
-				modReplicationManager.ReplicateIn(player, wallObjects, workspace.Environment);
-				local parts = wallObjects and wallObjects:GetDescendants();
-				for a=1, #parts do
-					if parts[a]:IsA("BasePart") then
-						parts[a].CanCollide = true;
-						parts[a].Transparency = 0;
-					end
-				end
-				if wallObjects and wallObjects.PrimaryPart then
-					modAudio.Play("Repair", wallObjects.PrimaryPart);
-				end
-				interactData.Object:Destroy();
-			end
-		else
-			shared.Notify(player, "That is already built.", "Negative");
 		end
 		
 	elseif triggerId == "Repair TSLift" and modEvents:GetEvent(player, "lift1Shortcut") == nil then
