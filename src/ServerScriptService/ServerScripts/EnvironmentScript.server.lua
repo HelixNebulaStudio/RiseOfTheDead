@@ -392,9 +392,13 @@ local function loadClipping(object)
 		elseif object.Name == "_Clip" then
 			object.Transparency = 1;
 			
+		elseif object.Name == "_physicsClip" then
+			object.Transparency = 1;
+			object.CollisionGroup = "PhysicsClip"; 
+
 		elseif object.Name == "_enemyClip" then
 			object.Transparency = 1;
-			object.CollisionGroup = "EnemyClips";
+			object.CollisionGroup = "EnemyClips"; 
 			
 		elseif object.Name == "_lightClip" then
 			object.Transparency = 1;

@@ -11,6 +11,7 @@ Physics.CollisionLayers = {
 	
 	"PlayerClips";
 	"EnemyClips";
+	"PhysicsClip";
 	"Accessories";
 	"Structure";
 	"Tool";
@@ -40,21 +41,24 @@ PhysicsService:CollisionGroupSetCollidable("Debris","Characters", false);
 --== Characters
 PhysicsService:CollisionGroupSetCollidable("Characters","Players", false);
 PhysicsService:CollisionGroupSetCollidable("Characters","Characters", false);
+PhysicsService:CollisionGroupSetCollidable("Characters","PlayerClips", false);
+PhysicsService:CollisionGroupSetCollidable("Characters","PhysicsClip", false);
 
 --== Enemies
 PhysicsService:CollisionGroupSetCollidable("Enemies","PlayerClips", false);
-PhysicsService:CollisionGroupSetCollidable("Characters","PlayerClips", false);
+PhysicsService:CollisionGroupSetCollidable("Enemies","PhysicsClip", false);
 
 --== EnemiesSpawn
 PhysicsService:CollisionGroupSetCollidable("EnemiesSpawn","PlayerClips", false);
 PhysicsService:CollisionGroupSetCollidable("EnemiesSpawn","Enemies", false);
 PhysicsService:CollisionGroupSetCollidable("EnemiesSpawn","EnemiesSpawn", false);
+PhysicsService:CollisionGroupSetCollidable("EnemiesSpawn","PhysicsClip", false);
 
 
 --== Players
 PhysicsService:CollisionGroupSetCollidable("Players","EnemyClips", false);
+PhysicsService:CollisionGroupSetCollidable("Players","PhysicsClip", false);
 PhysicsService:CollisionGroupSetCollidable("Players","Players", false);
---PhysicsService:CollisionGroupSetCollidable("Players","Debris", false);
 
 --== Entities
 PhysicsService:CollisionGroupSetCollidable("Entities","Players", true);
