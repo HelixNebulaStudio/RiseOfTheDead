@@ -4366,7 +4366,7 @@ Commands["specialevents"] = {
 
 Commands["talktome"] = {
 	Permission = PermissionLevel.DevBranch;
-	Description = "Makes an npc manually talk to you.\nThis is for testing server-side initiated dialogue without a player interacting with the npc.";
+	Description = "Talk to me, Makes an npc manually talk to you.\nThis is for testing server-side initiated dialogue without a player interacting with the npc.";
 
 	RequiredArgs = 1;
 	UsageInfo = "/talktome npcName";
@@ -4386,7 +4386,66 @@ Commands["talktome"] = {
 	end;
 };
 
+Commands["dialoguedata"] = {
+	Permission = PermissionLevel.DevBranch;
+	Description = [[Dialogue save data debugging cmds.
+	
+	Actions:
+		del [key]			-- Deletes a data from npc.
+		set [key] [value] 	-- Set a data for npc.
+	]];
 
+	RequiredArgs = 1;
+	UsageInfo = "/dialoguedata npcName [action] [...]";
+	Function = function(speaker, args)
+		local modDialogues = require(game.ServerScriptService.ServerLibrary.DialogueSave);
+
+		local npcName = args[1] or "nil";
+
+		local dialogueData = modDialogues:Get(speaker);
+		local npdDialogueData = dialogueData and dialogueData:Get(npcName) or dialogueData.new(npcName);
+		
+		if npdDialogueData == nil then
+			shared.Notify(speaker, `No dialogue data for: {npcName}`, "Inform");
+			return;
+		end
+
+		local action = args[2];
+
+		if action == nil then
+			local dataToStr = {};
+
+			for k, v in pairs(npdDialogueData:ListData()) do
+				table.insert(dataToStr, `[{k}] = <i>{typeof(v)}</i>: {Debugger:Stringify(v)}`);
+			end
+
+			shared.Notify(speaker, `{npcName} dialogue saves:\n{table.concat(dataToStr, "\n")}\n---`, "Inform");
+
+		elseif action == "del" then
+			local key = args[3];
+
+			if npdDialogueData:Get(key) == nil then
+				shared.Notify(speaker, `No key to delete from {npcName}: {key}`, "Inform");
+				return;
+			end
+
+			npdDialogueData:Set(key, nil);
+			shared.Notify(speaker, `Deleted {npcName} dialogue data: {key}`, "Inform");
+
+		elseif action == "set" then
+
+			local key = args[3];
+			local val = args[4];
+			
+			npdDialogueData:Set(key, val);
+			shared.Notify(speaker, `Set {npcName} dialogue data: {key} = <i>{typeof(val)}</i>: {val}`, "Inform");
+
+		end
+
+
+		return true;
+	end;
+};
 
 Commands["toggledebug"] = {
 	Permission = PermissionLevel.Admin;

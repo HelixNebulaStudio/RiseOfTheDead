@@ -16,13 +16,17 @@ function DialogueSave.new(player)
 	function meta:Get(npcName)
 		return activeDialogues[npcName];
 	end
-	
+
 	function meta.new(npcName)
 		local npcDialogData = {};
 		npcDialogData.__index = npcDialogData;
 		
 		local dialogueObject = {};
 		
+		function npcDialogData:ListData()
+			return Dialogues[npcName] or {};
+		end
+
 		function npcDialogData:Get(key)
 			return Dialogues[npcName] and Dialogues[npcName][key];
 		end
