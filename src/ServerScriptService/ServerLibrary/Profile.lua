@@ -1405,7 +1405,7 @@ function Profile:SyncPublic(caller)
 		
 		publicData.Stats["TraderRep"] = math.floor(self.Trader:CalRep()*100).."%";
 		
-		local cardgamestatsFlag = self.Flags:Get("cardgamestats");
+		local cardgamestatsFlag = self.Flags:Get("cardgamestats") or {};
 		
 		if caller.Name == self.Player.Name then
 			publicData.Stats["FotlStats"] = `{ (cardgamestatsFlag.Wins or 0) }/{ (cardgamestatsFlag.Loses or 0) }`;
