@@ -250,9 +250,10 @@ local function SelectPlayer(playerName, refresh)
 				Perks={Name="Perks"; Index=50};
 				Money={Name="Money"; Index=60};
 				MissionsCompleted={Name="Missions Completed"; Index=70};
+				FotlStats={Name="Fall of the Living"; Index=75;};
 				ColorPacks={Name="Color Packs"; Index=80};
 				SkinsPacks={Name="Skin Packs"; Index=90};
-				TraderRep={Name="Trader Reputation"; Index=100};
+				--TraderRep={Name="Trader Reputation"; Index=100};
 			};
 			local enemySort = {
 				["Zombie"]=1;

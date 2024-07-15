@@ -1405,6 +1405,14 @@ function Profile:SyncPublic(caller)
 		
 		publicData.Stats["TraderRep"] = math.floor(self.Trader:CalRep()*100).."%";
 		
+		local cardgamestatsFlag = self.Flags:Get("cardgamestats");
+		
+		if caller.Name == self.Player.Name then
+			publicData.Stats["FotlStats"] = `{ (cardgamestatsFlag.Wins or 0) }/{ (cardgamestatsFlag.Loses or 0) }`;
+		else
+			publicData.Stats["FotlStats"] = `{ (cardgamestatsFlag.Wins or 0) } Wins`;
+		end
+		
 		local playerLevel = activeSave:GetStat("Level") or 0;
 		local focusLevel = modGlobalVars.GetLevelToFocus(playerLevel);
 		publicData.Stats["FocusLevel"] = focusLevel;

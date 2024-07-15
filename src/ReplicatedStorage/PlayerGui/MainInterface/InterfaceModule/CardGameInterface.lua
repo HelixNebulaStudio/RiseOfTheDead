@@ -903,80 +903,83 @@ function Interface.init(modInterface)
 					resourceLabel.Text = (localPlayerTable.R or 0) .. "/10";
 					resourceLabel.Visible = true;
 					
+
+					local stageInfo = lobby.Stage;
+
+					for _, panel in pairs(playerPanelsList) do
+						panel.selectButton.Visible = false;
+					end
+					
+					if stageInfo.Type == modCardGame.StageType.NextTurn and turnPlayerTable.Player == localPlayer then
+						actionButton.Visible = true;
+						bluffButton.Visible = true;
+						actionButton.Text = "Action";
+						bluffButton.Text = "Bluff";
+						
+					elseif stageInfo.Type == modCardGame.StageType.Dispute 
+						and ((stageInfo.TargettedPlayer == nil and turnPlayerTable.Player ~= localPlayer)
+							or stageInfo.TargettedPlayer == localPlayer) then
+						actionButton.Visible = true;
+						bluffButton.Visible = true;
+						actionButton.Text = "Accept Action";
+						bluffButton.Text = "Call Bluff";
+
+					elseif stageInfo.Type == modCardGame.StageType.Sacrifice and stageInfo.TargettedPlayer == localPlayer then
+						actionButton.Visible = true;
+						bluffButton.Visible = true;
+
+						actionButton.Text = "Sacrifice ".. tostring(localPlayerTable.Cards[1]);
+						bluffButton.Text = "Sacrifice ".. tostring(localPlayerTable.Cards[2]);
+						
+					elseif stageInfo.Type == modCardGame.StageType.AttackDispute and stageInfo.Victim == localPlayer then
+						if #localPlayerTable.Cards > 1 then
+							actionButton.Visible = true;
+							bluffButton.Visible = true;
+							
+							if table.find(localPlayerTable.Cards, "Zombie") then
+								actionButton.Text = "Zombie Block Attack";
+								bluffButton.Text = "Surrender";
+
+							else
+								actionButton.Text = "Surrender";
+								bluffButton.Text = "Bluff Zombie Block";
+
+							end
+							
+						else
+							actionButton.Visible = true;
+							if table.find(localPlayerTable.Cards, "Zombie") then
+								actionButton.Text = "Zombie Block Attack";
+								
+							else
+								actionButton.Text = "Bluff Zombie Block";
+								
+							end
+							
+						end
+						
+					elseif stageInfo.Type == modCardGame.StageType.SwapCards and turnPlayerTable.Player ~= localPlayer then
+						actionButton.Visible = true;
+						bluffButton.Visible = true;
+						actionButton.Text = "Accept Action";
+						bluffButton.Text = "Call Bluff";
+
+					elseif stageInfo.Type == modCardGame.StageType.BluffConclusion and stageInfo.Loser == localPlayer and #localPlayerTable.Cards >= 2 then
+						actionButton.Visible = true;
+						bluffButton.Visible = true;
+
+						actionButton.Text = "Surrender "..localPlayerTable.Cards[1];
+						bluffButton.Text = "Surrender "..localPlayerTable.Cards[2];
+						
+					else
+						actionButton.Visible = false;
+						bluffButton.Visible = false;
+						
+					end
+
 				else
 					cardViewport.Visible = false;
 					resourceLabel.Visible = false;
-					
-				end
-				
-				local stageInfo = lobby.Stage;
-
-				for _, panel in pairs(playerPanelsList) do
-					panel.selectButton.Visible = false;
-				end
-				
-				if stageInfo.Type == modCardGame.StageType.NextTurn and turnPlayerTable.Player == localPlayer then
-					actionButton.Visible = true;
-					bluffButton.Visible = true;
-					actionButton.Text = "Action";
-					bluffButton.Text = "Bluff";
-					
-				elseif stageInfo.Type == modCardGame.StageType.Dispute 
-					and ((stageInfo.TargettedPlayer == nil and turnPlayerTable.Player ~= localPlayer)
-						or stageInfo.TargettedPlayer == localPlayer) then
-					actionButton.Visible = true;
-					bluffButton.Visible = true;
-					actionButton.Text = "Accept Action";
-					bluffButton.Text = "Call Bluff";
-
-				elseif stageInfo.Type == modCardGame.StageType.Sacrifice and stageInfo.TargettedPlayer == localPlayer then
-					actionButton.Visible = true;
-					bluffButton.Visible = true;
-
-					actionButton.Text = "Sacrifice ".. tostring(localPlayerTable.Cards[1]);
-					bluffButton.Text = "Sacrifice ".. tostring(localPlayerTable.Cards[2]);
-					
-				elseif stageInfo.Type == modCardGame.StageType.AttackDispute and stageInfo.Victim == localPlayer then
-					if #localPlayerTable.Cards > 1 then
-						actionButton.Visible = true;
-						bluffButton.Visible = true;
-						
-						if table.find(localPlayerTable.Cards, "Zombie") then
-							actionButton.Text = "Zombie Block Attack";
-							bluffButton.Text = "Surrender";
-
-						else
-							actionButton.Text = "Surrender";
-							bluffButton.Text = "Bluff Zombie Block";
-
-						end
-						
-					else
-						actionButton.Visible = true;
-						if table.find(localPlayerTable.Cards, "Zombie") then
-							actionButton.Text = "Zombie Block Attack";
-							
-						else
-							actionButton.Text = "Bluff Zombie Block";
-							
-						end
-						
-					end
-					
-				elseif stageInfo.Type == modCardGame.StageType.SwapCards and turnPlayerTable.Player ~= localPlayer then
-					actionButton.Visible = true;
-					bluffButton.Visible = true;
-					actionButton.Text = "Accept Action";
-					bluffButton.Text = "Call Bluff";
-
-				elseif stageInfo.Type == modCardGame.StageType.BluffConclusion and stageInfo.Loser == localPlayer and #localPlayerTable.Cards >= 2 then
-					actionButton.Visible = true;
-					bluffButton.Visible = true;
-
-					actionButton.Text = "Surrender "..localPlayerTable.Cards[1];
-					bluffButton.Text = "Surrender "..localPlayerTable.Cards[2];
-					
-				else
 					actionButton.Visible = false;
 					bluffButton.Visible = false;
 					
@@ -987,6 +990,8 @@ function Interface.init(modInterface)
 		elseif lobby.State == modCardGame.GameState.End then
 			cardViewport.Visible = false;
 			resourceLabel.Visible = false;
+			actionButton.Visible = false;
+			bluffButton.Visible = false;
 			
 			if lobby.Host == localPlayer then
 				actionButton.Visible = true;

@@ -178,6 +178,8 @@ function Lobby:NextTurn()
 		
 		for a=1, #self.Players do
 			local playerTable = self.Players[a];
+			if playerTable.Type == "Spectators" then continue end;
+
 			playerTable.Cards = {
 				table.remove(self.CardPool, 1);
 				table.remove(self.CardPool, 1);
@@ -286,7 +288,7 @@ function Lobby:NextTurn()
 		local loserPlayerTable = self:GetPlayer(stageInfo.Loser, true);
 
 		if loserPlayerTable == nil or loserPlayerTable.Cards == nil then
-			Debugger:Warn("Missing loserPlayerTable (",stageInfo.Loser") A:",accuserPlayer, "D:",defendantPlayer);
+			Debugger:Warn("Missing loserPlayerTable (",stageInfo.Loser,") A:",tostring(accuserPlayer), "D:",tostring(defendantPlayer));
 
 		end
 
@@ -797,16 +799,22 @@ if RunService:IsServer() then
 		elseif action == "requestjoin" then
 			local interactableModule = packet.Interactable;
 
-			local playerLobby = CardGame.GetLobby(player);
-			if playerLobby and playerLobby.Host == player then
-				
-				shared.Notify(player, "[FotL] You are currently hosting a lobby, leave current lobby in order to join another.", "Negative");
-				return rPacket;
-			end
-			
 			local hostPlayer = CardGame.GetPlayerFromInteractable(interactableModule);
 			local hostLobby = CardGame.GetLobby(hostPlayer);
-			if hostLobby == nil then Debugger:Warn("Host does not have a lobby") return rPacket end;
+			if hostLobby == nil then
+				Debugger:Warn("Host does not have a lobby");
+				
+				shared.Notify(player, `[FotL] {hostPlayer} does not have a lobby.`, "Negative");
+				return rPacket; 
+			end;
+
+			local playerLobby = CardGame.GetLobby(player);
+			if playerLobby and playerLobby.Host == player then
+				playerLobby:Leave(player);
+
+				shared.Notify(player, `[FotL] Leaving your lobby to join {hostPlayer}'s lobby.`, "Negative");
+				return rPacket;
+			end
 			
 			hostLobby:Join(player);
 			shared.Notify(player, "[FotL] Join request sent to ".. hostPlayer.Name ..".", "Inform");
@@ -815,8 +823,13 @@ if RunService:IsServer() then
 			local acceptPlayer = packet.AcceptPlayer;
 
 			local hostLobby = CardGame.GetLobby(player);
-			if hostLobby == nil or hostLobby.Host ~= player then Debugger:Warn("Invalid host request", hostLobby) return rPacket end;
+			if hostLobby == nil or hostLobby.Host ~= player then Debugger:Warn("Invalid host request", hostLobby); return rPacket end;
 			
+			if hostLobby.State ~= GameState.Idle then
+				shared.Notify(player, "[FotL] Can not accept request during an active lobby.", "Inform");
+				return;
+			end
+
 			if #hostLobby.Players < 4 then
 				hostLobby:SetPlayerType(acceptPlayer, "Players");
 				rPacket.Success = true;
@@ -857,24 +870,28 @@ if RunService:IsServer() then
 			
 		elseif action == "playaction" then
 			local lobby = CardGame.GetLobby(player);
+
+			local playerTable = lobby:GetPlayer(player, true);
+			if playerTable == nil then return rPacket end;
 			
-			if lobby == nil or lobby.StageIndex ~= packet.StageIndex then Debugger:Log("false lobby", lobby); return rPacket end;
-			local playerTable = lobby.Players[lobby.TurnIndex];
+			if lobby == nil or lobby.StageIndex ~= packet.StageIndex then return rPacket end;
 			
-			if playerTable.Player ~= player then Debugger:Log("false player", playerTable); return rPacket; end
-			if packet.OptionIndex == nil then Debugger:Log("false OptionIndex", packet); return rPacket; end
+			if playerTable.Player ~= player then return rPacket; end
+			if packet.OptionIndex == nil then return rPacket; end
 
 			local stageInfo = lobby.StageQueue[lobby.StageIndex];
-			if stageInfo == nil then Debugger:Log("false StageQueue", packet); return rPacket; end
-			if stageInfo.Type ~= StageType.NextTurn then Debugger:Log("false stageInfo", packet); return rPacket; end
+			if stageInfo == nil then return rPacket; end
+			if stageInfo.Type ~= StageType.NextTurn then return rPacket; end
 			
 			local optionLib = CardGame.ActionOptions[packet.OptionIndex];
 			
 			if optionLib.SelectTarget then
 				local targetLobby = CardGame.GetLobby(packet.TargetPlayer);
-				if targetLobby ~= lobby then Debugger:Log("false TargetPlayer lobby", packet); return rPacket end;
-				if targetLobby:GetPlayer(packet.TargetPlayer).Type == "Spectators" then Debugger:Log("false TargetPlayer type", targetLobby); return rPacket end;
-				if packet.TargetPlayer == player then Debugger:Log("false TargetPlayer", packet); return rPacket end;
+
+				if targetLobby ~= lobby then return rPacket end;
+				local tarPlayerTable = targetLobby:GetPlayer(packet.TargetPlayer, true);
+				if tarPlayerTable == nil then return rPacket end;
+				if packet.TargetPlayer == player then return rPacket end;
 			end
 			
 			lobby:PlayAction(player, packet);
