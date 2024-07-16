@@ -106,6 +106,7 @@ local Branches = {
 			--Coop;
 			Genesis=7431407555;
 			SunkenShip=10523367357;
+			CargoShip=18503534484;
 			
 			--Events;
 			EasterButchery=4852144007;
@@ -207,7 +208,8 @@ Branches.WorldLibrary = {
 	-- Coop;
 	Genesis={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
 	SunkenShip={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
-	
+	CargoShip={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+
 	--== Events;
 	EasterButchery={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=1;};
 	HalloweenBasement={GameMode=true; CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.General; MaxPlayers=8;};
@@ -375,7 +377,7 @@ Branches.WorldDisplayNames = {
 	-- Coop;
 	Genesis="Coop: Genesis";
 	SunkenShip="Coop: Sunken Ship";
-	
+	CargoShip="Coop: Cargo Ship";
 	
 	--Events;
 	EasterButchery="Easter Event: Butchery";
