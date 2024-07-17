@@ -444,6 +444,7 @@ function ItemsLibrary:Init(super)
 	new(customizationPack, {Id="colorhellsfire"; Icon="rbxassetid://5180692180"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Hellsfire";};});
 	new(customizationPack, {Id="colorturquoiseshades"; Icon="rbxassetid://12163679259"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="TurquoiseShades";};});
 	new(customizationPack, {Id="colorsunset"; Icon="rbxassetid://12163681091"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Sunset";};});
+	new(customizationPack, {Id="colorabyss"; Icon="rbxassetid://18529603001"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Abyss";};});
 	
 	new(customizationPack, {Id="skinstreetart"; Icon="rbxassetid://4788857679"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="StreetArt";};});
 	new(customizationPack, {Id="skinwireframe"; Icon="rbxassetid://5065159425"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Wireframe";};});

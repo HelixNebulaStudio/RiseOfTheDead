@@ -417,6 +417,23 @@ GoldShopLibrary.Products:Add{
 };
 
 GoldShopLibrary.Products:Add{
+	Id="colorabyss";
+	Icon="";
+	TitleText="Abyss Colors Pack";
+	Desc="The bottomless extends to the profound depths of the unknown.";
+	Product={
+		Type="Gold";
+		Price=200;
+		ItemId="colorabyss";
+		PackType="Colors";
+		PackId="Abyss";
+		ShowcaseType="EquipmentSkins";
+	};
+
+	Trader={Buy=false; Sell=false;};
+};
+
+GoldShopLibrary.Products:Add{
 	Id="skinscaleplating";
 	Icon="";
 	TitleText="Scale Plating Pack";
@@ -1765,6 +1782,7 @@ GoldShopLibrary.Pages = {
 		{Type="Product"; Id="skinscaleplating"};
 		{Type="Product"; Id="colorturquoiseshades"};
 		{Type="Product"; Id="colorsunset"};
+		{Type="Product"; Id="colorabyss"};
 	};
 	
 	ClothingSkins = {
