@@ -1350,7 +1350,7 @@ function WeaponHandler:Equip(library, weaponId)
 			getReserveAmmo(true);
 			
 			local reloadYielded = false;
-			local reloadDuration = math.clamp(properties.ReloadSpeed-0.2, 0.05, 20);
+			local reloadDuration = math.clamp(properties.ReloadSpeed, 0.05, 20);
 			delay(reloadDuration, function()
 				if not reloadYielded then
 					bindReloadYield:Fire(1);

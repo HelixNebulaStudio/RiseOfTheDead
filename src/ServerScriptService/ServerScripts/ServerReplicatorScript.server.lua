@@ -222,6 +222,8 @@ remoteReloadWeapon.OnServerEvent:Connect(function(client, weaponId, weaponModel,
 	
 	if initial then
 		cache.InitialReloadTick = tick();
+		cache.ReloadDuration = properties.ReloadSpeed;
+
 		cache.ReloadModel = weaponModel;
 		
 		modOnGameEvents:Fire("OnToolReload", client, storageItem, initial);
@@ -234,13 +236,12 @@ remoteReloadWeapon.OnServerEvent:Connect(function(client, weaponId, weaponModel,
 	end
 	
 	local reloadTimeLapsed = tick()-cache.InitialReloadTick;
-	local inValidTimeRange =( reloadTimeLapsed+0.3) >= properties.ReloadSpeed;
+	local inValidTimeRange = (reloadTimeLapsed+0.3) >= properties.ReloadSpeed;
 	
 	if not inValidTimeRange then
 		Debugger:Warn("Invalid reload, out of valid time", properties.ReloadSpeed)
-		return; 
+		return;
 	end;
-	
 	
 	local defaultAmmoId = storageItem:GetValues("AmmoId") or configurations.AmmoType;
 
@@ -469,7 +470,7 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 	local clientHumanoid = client.Character and client.Character:FindFirstChildWhichIsA("Humanoid") or nil;
 	if clientHumanoid and clientHumanoid.Health <= 0 then return end;
 	local clientRootPart = clientHumanoid.RootPart;
-	if clientRootPart == nil then Debugger:Warn("Character missing RootPart.") return end;
+	if clientRootPart == nil then Debugger:Warn("Character missing RootPart."); return end;
 	
 	if modConfigurations.RemoveForceFieldOnWeaponFire then
 		local forcefield = client.Character and client.Character:FindFirstChildWhichIsA("ForceField") or nil;
@@ -521,16 +522,38 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 	local ammo = storageItem:GetValues("A") or configurations.AmmoLimit;
 	local maxAmmo = storageItem:GetValues("MA") or configurations.MaxAmmoLimit;
 	
+	local clientAmmoData = shotdata.AmmoData;
+	if clientAmmoData == nil then
+		Debugger:Warn("Player attempted to fire without ammo data.");
+		return;
+	end
+
+	local ammoCost = math.min(configurations.AmmoCost or 1, ammo);
+
 	if ammo <= 0 then
-		storageItem:Sync({"A"; "MA"});
-		ammo = 1;
+		maxAmmo = math.max(maxAmmo -1, 0);
+		ammo = 0;
 		
-		Debugger:WarnClient(client, "Player ammo desync. A");
+		local initReload = cache.InitialReloadTick or 0;
+		local reloadDuration = cache.ReloadDuration or 0;
+
+		local timeSinceLastReload = math.abs(tick()-(initReload+reloadDuration));
+		Debugger:WarnClient(client, "Player ammo desync. A; Tslr", timeSinceLastReload, `cad: {ammo}/{clientAmmoData.Ammo} {maxAmmo}/{clientAmmoData.MaxAmmo}`);
+		
+		if timeSinceLastReload <= 0.3 then
+			local ammoLimit = configurations.AmmoLimit;
+			if configurations.ReloadMode == modAttributes.ReloadModes.Full then
+			
+			elseif configurations.ReloadMode == modAttributes.ReloadModes.Single then
+			
+			end
+
+		else
+			storageItem:Sync({"A"; "MA"});
+		end
 	end
 	
 	ammo = math.min(ammo, configurations.AmmoLimit);
-	
-	local ammoCost = math.min(configurations.AmmoCost or 1, ammo);
 	
 	if configurations.Triplethreat then
 		ammoCost = math.min(ammo, 3);
@@ -549,11 +572,6 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 		
 	end
 	
-	local clientAmmoData = shotdata.AmmoData;
-	if clientAmmoData == nil then
-		Debugger:Warn("Player attempted to fire without ammo data.");
-		return;
-	end
 	if clientAmmoData.Ammo ~= ammo or clientAmmoData.MaxAmmo ~= maxAmmo then
 		storageItem:Sync({"A"; "MA"});
 		Debugger:WarnClient(client, "Player ammo desync. B");
