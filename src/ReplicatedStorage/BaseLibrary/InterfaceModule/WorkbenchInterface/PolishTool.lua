@@ -76,9 +76,6 @@ function Workbench.new(itemId, library, storageItem)
 		actionButtonDebounce = false;
 	end)
 	
-	-- local wearLib = modItemSkinWear.GetWearLib(itemId);
-	-- local toolFloat = modItemSkinWear.LoadFloat(itemId, ItemValues.SkinWearId).Float;
-	
 	listMenu:Add(newFrame);
 	return listMenu;
 end

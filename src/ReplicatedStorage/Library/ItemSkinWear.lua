@@ -10,6 +10,9 @@ local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibr
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 
 ItemSkinWear.Titles = {
+	"Illuminating";
+	"Master Piece";
+	"Golden Sample";
 	"Factory New";
 	"Mint Condition";
 	"Ideal Model";
@@ -142,33 +145,35 @@ function ItemSkinWear.LoadFloat(itemId, seed)
 	if seed == nil then return returnPacket end;
 	
 	local wearLib = ItemSkinWear.GetWearLib(itemId);
-	--local wearLib = {
-	--	Wear={Min=0.000001; Max=0.999999;};
-	--}
-	
-	--if modWorkbenchLibrary.ItemUpgrades[itemId] and modWorkbenchLibrary.ItemUpgrades[itemId].SkinWear then
-	--	wearLib = modWorkbenchLibrary.ItemUpgrades[itemId].SkinWear;
-	--end
-	
+		
 	local random = Random.new(seed);
 	local wearFloat = modMath.MapNum(random:NextNumber(), 0, 1, wearLib.Wear.Min, wearLib.Wear.Max);
 	
 	returnPacket.Float = wearFloat;
 	
-	if wearFloat <= 0.1 then -- 0.06
+	if wearFloat <= 0.01 then
 		returnPacket.Title = 1;
+
+	elseif wearFloat <= 0.04 then 
+		returnPacket.Title = 2;
 		
-	elseif wearFloat <= 0.31 then -- 0.12
-		returnPacket.Title = 2;	
+	elseif wearFloat <= 0.06 then
+		returnPacket.Title = 3;
+	
+	elseif wearFloat <= 0.1 then
+		returnPacket.Title = 4;
 		
-	elseif wearFloat <= 0.55 then -- 0.44
-		returnPacket.Title = 3;	
+	elseif wearFloat <= 0.31 then
+		returnPacket.Title = 5;	
 		
-	elseif wearFloat <= 0.79 then -- 0.66
-		returnPacket.Title = 4;	
+	elseif wearFloat <= 0.55 then
+		returnPacket.Title = 6;	
+		
+	elseif wearFloat <= 0.79 then
+		returnPacket.Title = 7;	
 		
 	elseif wearFloat <= 1 then
-		returnPacket.Title = 5;	
+		returnPacket.Title = 8;	
 		
 	end
 	
@@ -177,8 +182,42 @@ end
 
 
 ItemSkinWear.WearMap = {
+	{--Illuminating
+		Wear = {Min=0.0; Max=0.01;};
+		TextureRange = {Min=0.0; Max=0.1;};
+		
+		Metal = {
+			{Max=0; Varient="Brushed Metal"};
+		};
+		Wood = {
+			{Max=0; Varient=""};
+		};
+	};
+	{--Master Piece
+		Wear = {Min=0.011; Max=0.04;};
+		TextureRange = {Min=0.0; Max=0.1;};
+		
+		Metal = {
+			{Max=0; Varient="Brushed Metal"};
+		};
+		Wood = {
+			{Max=0; Varient=""};
+		};
+	};
+	{--Golden Sample
+		Wear = {Min=0.041; Max=0.06;};
+		TextureRange = {Min=0.0; Max=0.1;};
+		
+		Metal = {
+			{Max=0; Varient="Brushed Metal"};
+		};
+		Wood = {
+			{Max=0; Varient=""};
+		};
+	};
+
 	{--Factory New
-		Wear = {Min=0; Max=0.1;};
+		Wear = {Min=0.061; Max=0.1;};
 		TextureRange = {Min=0.2; Max=0.6;};
 		
 		Metal = {
@@ -280,24 +319,6 @@ function ItemSkinWear.ApplyAppearance(weaponModel, itemId, seed)
 				end
 			end
 		end
-		--if obj:GetAttribute("BaseMat") == "Metal" then
-		--	if wearLib.Title == 1 then
-		--		obj.MaterialVariant = "Glossy Metal";
-				
-		--	elseif wearLib.Title == 2 then
-		--		obj.MaterialVariant = "Brushed Metal";
-				
-		--	elseif wearLib.Title == 3 then
-		--		obj.MaterialVariant = "";
-				
-		--	elseif wearLib.Title == 4 then
-		--		obj.MaterialVariant = "Rusty Metal";
-				
-		--	elseif wearLib.Title == 5 then
-		--		obj.MaterialVariant = "Old Metal";
-				
-		--	end
-		--end
 	end
 end
 
@@ -310,23 +331,6 @@ function ItemSkinWear.MapTransparency(wearFloat, alphaMap)
 			break;
 		end
 	end
-	
-	--if wearFloat <= 0.06 then
-	--	return modMath.MapNum(wearFloat, 0, 0.06, 0.4, 0.8);
-
-	--elseif wearFloat <= 0.12 then
-	--	return modMath.MapNum(wearFloat, 0.07, 0.12, 0.5, 0.8);
-
-	--elseif wearFloat <= 0.44 then
-	--	return modMath.MapNum(wearFloat, 0.13, 0.44, 0.55, 0.8);
-
-	--elseif wearFloat <= 0.66 then
-	--	return modMath.MapNum(wearFloat, 0.45, 0.66, 0.6, 0.8);
-
-	--elseif wearFloat <= 1 then
-	--	return modMath.MapNum(wearFloat, 0.67, 1, 0.65, 0.8);
-
-	--end
 	
 	return tranparency;
 end
