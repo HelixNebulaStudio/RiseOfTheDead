@@ -289,21 +289,6 @@ return function()
 			end
 		end)
 		syncedRefresh();
-		
-		--if hierarchyKey == "Collectibles" then
-		--	local collectiblesData = modTableManager.GetDataHierarchy(modData.Profile, "Collectibles");
-
-		--	local interactablesFolder = game.Workspace:FindFirstChild("Interactables");
-		--	if interactablesFolder and data then
-		--		for id, _ in pairs(data) do
-		--			local lib = modCollectiblesLibrary:Find(id);
-		--			if lib == nil then continue end;
-
-		--			local obj = interactablesFolder:FindFirstChild("(Collectible)"..lib.Name);
-		--			if obj then game.Debris:AddItem(obj, 0); end
-		--		end
-		--	end
-		--end
 	end)
 
 	local function onCharacterAdded(character)
@@ -350,11 +335,39 @@ return function()
 		end
 	end)
 	
-	Debugger:Log("Requesting for save data sync...");
-	repeat
-		remotePlayerDataSync:Fire(playerDataSyncRequest);
-		task.wait(1);
-	until sendDataRequest == false;
+	remoteInteractableSync.OnClientEvent:Connect(function(src, data)
+		if src == nil then Debugger:Log("Missing interactable module."); return end;
+		if src.ClassName ~= "ModuleScript" then Debugger:Warn("Invalid src. Data:", data); return end;
+		if not game:IsAncestorOf(src) then Debugger:Warn("Interactable was destroyed."); return end;
+		
+		local interact = require(src);
+		if interact.OnSync then
+			interact:OnSync(data);
+			
+			-- if localPlayer.Character then
+			-- 	local modCharacter = modData:GetModCharacter();
+			-- 	if modCharacter == nil or modCharacter.CharacterProperties == nil then return end; 
+
+			-- 	local activeInteractable = modCharacter.CharacterProperties.ActiveInteract;
+			-- 	if activeInteractable and activeInteractable == interact then
+			-- 		activeInteractable:Trigger();
+			-- 	end
+			-- end
+			
+			if src:GetAttribute("Debug") == true then
+				Debugger:Warn(src:GetFullName(), " ManualSynced.");
+			end
+			
+		else
+			for k, v in pairs(data) do
+				interact[k] = v;
+			end
+			if src:GetAttribute("Debug") == true then
+				Debugger:Warn(src:GetFullName(), " AutoSynced.");
+			end
+			
+		end
+	end)
 	
 	remoteGoldStatSync.OnClientEvent:Connect(function(playerGold)
 		if modData.Profile and modData.Profile.Trader and modData.Profile.Trader.Gold then
@@ -432,55 +445,6 @@ return function()
 	
 	remoteStorageDestroy.OnClientEvent:Connect(function(id)
 		modData.DelStorage(id);
-	end)
-	
-	local function refreshCharacterVisibility()
-		if not hideAllPlayers then
-			for _, c in pairs(hiddenCharacter:GetChildren()) do
-				if hiddenPlayers[c.Name] == nil then
-					c.Parent = otherCharacter;
-				end
-			end
-		end
-		for _, c in pairs(otherCharacter:GetChildren()) do
-			if hiddenPlayers[c.Name] == true or hideAllPlayers then
-				c.Parent = hiddenCharacter;
-			end
-		end
-	end
-	
-	remoteInteractableSync.OnClientEvent:Connect(function(src, data)
-		if src == nil then Debugger:Log("Missing interactable module."); return end;
-		if src.ClassName ~= "ModuleScript" then Debugger:Warn("Invalid src. Data:", data); return end;
-		if not game:IsAncestorOf(src) then Debugger:Warn("Interactable was destroyed."); return end;
-		
-		local interact = require(src);
-		if interact.OnSync then
-			interact:OnSync(data);
-			
-			if localPlayer.Character then
-				local modCharacter = modData:GetModCharacter();
-				if modCharacter == nil or modCharacter.CharacterProperties == nil then return end; 
-
-				local activeInteractable = modCharacter.CharacterProperties.ActiveInteract;
-				if activeInteractable and activeInteractable == interact then
-					activeInteractable:Trigger();
-				end
-			end
-			
-			if src:GetAttribute("Debug") == true then
-				Debugger:Warn(src:GetFullName(), " ManualSynced.");
-			end
-			
-		else
-			for k, v in pairs(data) do
-				interact[k] = v;
-			end
-			if src:GetAttribute("Debug") == true then
-				Debugger:Warn(src:GetFullName(), " AutoSynced.");
-			end
-			
-		end
 	end)
 	
 	remoteStorageItemSync.OnClientEvent:Connect(function(packet)
@@ -660,8 +624,6 @@ return function()
 			if modMissionFuncs and modMissionFuncs.Init then
 				modMissionFuncs.Init(missionsList, mission);
 			end
-			
-			Debugger:Warn("Init mission logic", missionId, logicScript);
 		end
 	end
 	
@@ -743,6 +705,21 @@ return function()
 		player.CharacterAdded:Connect(ParentCharacter);
 	end)
 	
+	
+	local function refreshCharacterVisibility()
+		if not hideAllPlayers then
+			for _, c in pairs(hiddenCharacter:GetChildren()) do
+				if hiddenPlayers[c.Name] == nil then
+					c.Parent = otherCharacter;
+				end
+			end
+		end
+		for _, c in pairs(otherCharacter:GetChildren()) do
+			if hiddenPlayers[c.Name] == true or hideAllPlayers then
+				c.Parent = hiddenCharacter;
+			end
+		end
+	end
 	spawn(function() while wait(10) do refreshCharacterVisibility(); end end)
 	
 	function shared.DisableHudRefresh()
@@ -804,7 +781,6 @@ return function()
 	
 	modSettings.OnChanged:Connect(function(key)
 		Debugger:Warn("OnSettingsChanged",key, modData.Settings[key]);
-
 		if key == "CompactInterface" then
 			shared.ReloadGui();
 			
@@ -837,4 +813,10 @@ return function()
 		end
 	end)
 	
+	Debugger:Warn("Requesting for initial save data sync...");
+	repeat
+		remotePlayerDataSync:Fire(playerDataSyncRequest);
+		task.wait(1);
+	until sendDataRequest == false;
+	Debugger:Warn("Initialized.");
 end

@@ -147,12 +147,14 @@ if RunService:IsServer() then
 	
 	remoteInteractableSync.OnServerEvent:Connect(function(player, moduleScript)
 		if typeof(moduleScript) ~= "Instance" or not moduleScript:IsA("ModuleScript") or moduleScript.Name ~= "Interactable" then return end;
+		if moduleScript.Parent == nil then return end;
 		
 		local interactData = shared.saferequire(player, moduleScript);
 		if interactData == nil then return end;
 		
 		interactData.Script = moduleScript;
 		interactData:Sync(player);
+		Debugger:Warn("Sync", player, moduleScript.Parent:GetFullName());
 	end)
 	
 	if workspace.Environment:FindFirstChild("Game") then
@@ -191,6 +193,7 @@ function Interactable:SyncAll(func)
 	end
 end
 
+-- MARK: self:Sync(players, data)
 function Interactable:Sync(scr, players, data)
 	players = type(players) == "table" and players or {players};
 	if RunService:IsClient() then return end;
@@ -255,6 +258,7 @@ function Interactable.new()
 		end
 	end
 	
+	-- MARK: self:SyncRequest()
 	function interactMeta:SyncRequest()
 		if RunService:IsServer() then return end;
 		
@@ -264,6 +268,7 @@ function Interactable.new()
 		end
 	end
 	
+	-- MARK: self:Sync(players, data)
 	function interactMeta:Sync(players, data)
 		if self.Script == nil then Debugger:Warn("Missing Interactable Script."); return end;
 		Interactable:Sync(self.Script, (players or game.Players:GetPlayers()), data or self);
