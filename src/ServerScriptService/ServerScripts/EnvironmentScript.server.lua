@@ -84,8 +84,8 @@ local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
-local folderClips = workspace:WaitForChild("Clips");
 local folderInteractables = workspace:WaitForChild("Interactables");
+local folderClips = workspace:WaitForChild("Clips");
 local folderDebris = workspace:WaitForChild("Debris");
 local folderMapEvent = game.ServerStorage:FindFirstChild("MapEvents");
 if folderMapEvent == nil then
@@ -419,11 +419,12 @@ for a=1, #playerClips do
 	loadClipping(playerClips[a]);
 end;
 
-local function InitInteractable(interactableModule)
+local function InitInteractable(interactableModule : ModuleScript)
 	local obj = interactableModule.Parent;
 	if obj:IsA("BasePart") then
 		obj.Transparency = 1;
 	end
+	obj:AddTag("Interactables");
 	
 	for iconType, iconInfo in pairs(modInteractable.TypeIcons) do
 		if string.match(obj.Name, iconType) then

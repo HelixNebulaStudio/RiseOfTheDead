@@ -5,6 +5,7 @@ local interactRadialConfig = '{"version":1,"size":128,"count":256,"columns":8,"r
 
 -- Variables;
 local RunService = game:GetService("RunService");
+local CollectionService = game:GetService("CollectionService");
 
 local localPlayer = game.Players.LocalPlayer;
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
@@ -710,10 +711,9 @@ end
 humanoid.Touched:Connect(modData.TouchInteract)
 
 local overlapInteractParam = OverlapParams.new();
-overlapInteractParam.FilterDescendantsInstances = {workspace.Interactables};
+
 overlapInteractParam.FilterType = Enum.RaycastFilterType.Include;
 overlapInteractParam.MaxParts = 10;
-
 
 local function proximityInteractable(basePart)
 	local rootBase = basePart;
@@ -750,7 +750,7 @@ end
 
 -- !outline: signal modSyncTime.GetClock().ValueChanged
 modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
-	--if not canInteract() then return end;
+	overlapInteractParam.FilterDescendantsInstances = CollectionService:GetTagged("Interactables");
 	
 	if characterProperties.ActiveInteract ~= nil and (characterProperties.ActiveInteract.Distance or math.huge) <= (characterProperties.ActiveInteract.InteractableRange or interactionRange) then
 		characterProperties.ActiveInteract:Trigger();
