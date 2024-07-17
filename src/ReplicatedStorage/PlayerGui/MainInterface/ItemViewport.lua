@@ -211,9 +211,7 @@ function ItemViewport:RefreshDisplay()
 	self.Offset = CFrame.new(0, 0, 0);
 	
 	local raycastParam = RaycastParams.new();
-	-- raycastParam.FilterType = Enum.RaycastFilterType.Include;
-	-- raycastParam.FilterDescendantsInstances = self.DisplayModels;
-
+	
 	local rayScanTick = tick();
 	RunService:BindToRenderStep("ItemViewport"..self.Index, Enum.RenderPriority.Camera.Value-1, function(delta)
 		if not self.Frame.Visible then 
@@ -561,7 +559,15 @@ function ItemViewport:Clear()
 	self.OnDisplayID = nil;
 	self.OnDisplayPackageId = nil;
 	self.PartDataList = nil;
-	self.ApplyCustomizationPlans = nil;
+
+	if self.HighlightPort then
+		self.HighlightPort:Destroy();
+		self.HighlightPort = nil;
+	end
+	if self.HighlightPartClone then
+		self.HighlightPartClone:Destroy();
+		self.HighlightPartClone = nil;
+	end
 
 	pcall(function()
 		self.Frame.ItemIcon.Image = "";
