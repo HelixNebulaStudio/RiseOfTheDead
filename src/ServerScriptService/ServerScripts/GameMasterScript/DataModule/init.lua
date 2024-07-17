@@ -93,6 +93,7 @@ end
 
 -- !outline: Data:SaveSettings()
 function Data:SaveSettings(force)
+	if script:GetAttribute("SettingsLoaded") ~= true then return end;
 	if Data.MarkSettingsDirty ~= true and force ~= true then return end;
 	Data.MarkSettingsDirty = false;
 	
