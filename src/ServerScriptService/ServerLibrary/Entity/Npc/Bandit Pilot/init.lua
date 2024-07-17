@@ -233,6 +233,7 @@ return function(npc, spawnPoint)
 		
 		function self.CustomHealthbar:OnDamaged(amount, fromPlayer, storageItem, bodyPart)
 			if self.IsDead or bodyPart == nil then return end;
+			
 			local healthInfo = self:GetFromPart(bodyPart);
 			if healthInfo then
 				self:TakeDamage(healthInfo.Name, amount);

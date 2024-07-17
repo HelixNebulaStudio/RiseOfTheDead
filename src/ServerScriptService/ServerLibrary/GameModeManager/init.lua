@@ -768,7 +768,9 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 
 		if teleportCFrame then
 			if exitTeleport ~= false then
-				shared.modAntiCheatService:Teleport(player, teleportCFrame);
+				if classPlayer.IsAlive then
+					shared.modAntiCheatService:Teleport(player, teleportCFrame);
+				end
 				rootPart.Anchored = false;
 				
 			end
