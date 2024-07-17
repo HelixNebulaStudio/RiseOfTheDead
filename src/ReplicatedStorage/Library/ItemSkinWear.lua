@@ -10,7 +10,7 @@ local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibr
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 
 ItemSkinWear.Titles = {
-	"Illuminating";
+	"Illuminant";
 	"Master Piece";
 	"Golden Sample";
 	"Factory New";

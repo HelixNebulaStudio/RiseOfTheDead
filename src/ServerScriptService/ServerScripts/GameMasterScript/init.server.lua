@@ -210,7 +210,7 @@ end)
 
 
 function remotePlayerDataFetch.OnServerInvoke(player, packet)
-	local profile = modProfile:WaitForProfile(player);
+	local profile = modProfile:Find(player.Name);
 	if profile == nil then return end;
 	
 	local action = packet[modRemotesManager.Ref("Action")];
@@ -270,7 +270,7 @@ function remotePlayerDataFetch.OnServerInvoke(player, packet)
 end
 
 remotePlayerDataSync.OnEvent:Connect(function(player, packet)
-	local profile = modProfile:WaitForProfile(player);
+	local profile = modProfile:Find(player.Name);
 	if profile == nil then return end;
 	
 	local action = packet[modRemotesManager.Ref("Action")];
@@ -296,7 +296,6 @@ remotePlayerDataSync.OnEvent:Connect(function(player, packet)
 	elseif action == "savesettings" then
 		if data == nil or type(data) ~= "table" then return end;
 
-		local profile = modProfile:Get(player);
 		profile:RefreshSettings(data);
 		Debugger:Log("Player (",player.Name,") Saving settings.");
 	end
