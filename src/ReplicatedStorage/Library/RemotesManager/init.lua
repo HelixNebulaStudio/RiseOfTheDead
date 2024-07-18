@@ -189,6 +189,7 @@ function RemotesManager:NewEventRemote(remoteInstance, debounceInterval)
 				
 				remote.Remote:FireClient(...);
 			end
+
 		elseif k:lower() == "fireallclients" then
 			return function(remoteTable, ...)
 				if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> Fired All Client. (",...,")"); end;
@@ -199,6 +200,21 @@ function RemotesManager:NewEventRemote(remoteInstance, debounceInterval)
 				
 				remote.Remote:FireAllClients(...);
 			end
+
+		elseif k:lower() == "firelistclients" then
+			return function(remoteTable, playersList, ...)
+				if RemotesManager.LogRemotes then Debugger:Log(remote.Remote.Name..">> Fired Client. (",...,")"); end;
+				
+				if remote.Deprecated then
+					Debugger:Warn(remote.Remote.Name..">> Deprecated trace:", debug.traceback());
+				end
+				
+				assert(typeof(playersList) == "table", "Invalid list of clients to fire event.")
+				for a=1, #playersList do
+					remote.Remote:FireClient(playersList[a], ...);
+				end
+			end
+
 		end
 		return meta[k] or remote.Remote[k];
 	end;
@@ -352,81 +368,6 @@ function RemotesManager.OnPlayerRemoving(player)
 	end
 end
 
-
---== BridgeNet
-function RemotesManager:NewEventBridge(bridgeId)
-	if self.Remotes[bridgeId] then
-		Debugger:Warn("Bridge and remote cannot co-exist. (",bridgeId,")");
-		return self.Remotes[bridgeId];
-	end
-	if self.Bridges[bridgeId] then
-		Debugger:Warn("Bridge (",bridgeId,") already exist.");
-		return self.Bridges[bridgeId];
-	end
-	
-	local bridge = modBridgeNet.ReferenceBridge(bridgeId);
-	
-	local remote = {Remote=bridge;};
-	local meta = {};
-
-	function meta.__index(t, k)
-		if k:lower() == "fireserver" then
-			return function(remoteTable, packet)
-				bridge:Fire(packet);
-			end
-			
-		elseif k:lower() == "fireclient" then
-			return function(remoteTable, ...)
-				local args = {...};
-				local player = table.remove(args, 1);
-				
-				bridge:Fire(player, args);
-			end
-			
-		elseif k:lower() == "fireallclients" then
-			return function(remoteTable, packet)
-				bridge:Fire(modBridgeNet.AllPlayers(), packet);
-			end
-
-		elseif k:lower() == "fire" then
-			return function(remoteTable, ...)
-				
-				local player = select(1, ...);
-				bridge:Fire(player, select(2, ...));
-			end
-			
-		elseif k:lower() == "onevent" then
-			return bridge;
-			
-		elseif k:lower() == "onclientevent" then
-			return bridge;
-			
-		elseif k:lower() == "onserverevent" then
-			return bridge;
-			
-		end
-		
-		return meta[k];
-	end;
-	
-	function meta.__newindex(t, k, v)
-		if k:lower() == "logging" then
-			rawset(bridge, k, v);
-		end
-	end
-
-	self.Bridges[bridgeId] = setmetatable(remote, meta);
-	
-	if RunService:IsServer() then
-		local bridgeTag = Instance.new("BoolValue");
-		bridgeTag.Name = bridgeId;
-		bridgeTag.Parent = script;
-		
-	end
-	
-	return remote;
-end
-
 function RemotesManager.Compress(packet)
 	local function compress(t)
 		local setkeys = {};
@@ -493,9 +434,6 @@ if RunService:IsClient() then
 		elseif obj:IsA("UnreliableRemoteEvent") then
 			RemotesManager:NewUnreliableEventRemote(obj);
 
-		elseif obj:IsA("BoolValue") then
-			RemotesManager:NewEventBridge(obj.Name);
-			
 		end
 	end
 	
@@ -530,7 +468,6 @@ else
 	
 	--== Debug;
 	RemotesManager:NewEventRemote("RemoteManager");
-	RemotesManager:NewEventBridge("TestRemote")
 	
 	--== Engine;
 	RemotesManager:NewFunctionRemote("ApiRequest");
@@ -538,7 +475,7 @@ else
 	RemotesManager:NewFunctionRemote("GeneralUIRemote", 0.1).Secure = true;
 	RemotesManager:NewFunctionRemote("Replication");
 	RemotesManager:NewEventRemote("PlayAudio");
-	RemotesManager:NewEventBridge("EventService");
+	RemotesManager:NewEventRemote("EventService");
 
 	--== Game;
 	RemotesManager:NewUnreliableEventRemote("CharacterRemote");
@@ -555,7 +492,7 @@ else
 	
 	
 	--== DataControl;
-	RemotesManager:NewEventBridge("PlayerDataSync");
+	RemotesManager:NewEventRemote("PlayerDataSync");
 	RemotesManager:NewFunctionRemote("PlayerDataFetch").Secure = true;
 	
 	RemotesManager:NewEventRemote("GoldStatSync");
@@ -610,8 +547,8 @@ else
 	RemotesManager:NewEventRemote("GameModeHud");
 	RemotesManager:NewEventRemote("GameModeAssign");
 	
-	--== Gameplay
-	RemotesManager:NewEventRemote("CreateInfoBubble");
+	--== Gameplay  
+	RemotesManager:NewUnreliableEventRemote("CreateInfoBubble");
 	RemotesManager:NewEventRemote("GenerateArcParticles");
 	RemotesManager:NewEventRemote("PlayerStatusEffect");
 	RemotesManager:NewEventRemote("SyncStatusEffect");
@@ -626,7 +563,7 @@ else
 	RemotesManager:NewFunctionRemote("CardGame",0.1).Secure = true;
 	
 	--== Tools;
-	RemotesManager:NewEventBridge("ToolInputHandler");
+	RemotesManager:NewEventRemote("ToolInputHandler");
 	do -- Identifiers
 		RemotesManager.NewRef("InputType");
 		RemotesManager.NewRef("InputObject");
@@ -692,7 +629,7 @@ else
 	RemotesManager:NewFunctionRemote("DisguiseKitRemote", 1);
 	RemotesManager:NewFunctionRemote("GpsRemote", 1);
 	
-	RemotesManager:NewEventBridge("InstrumentRemote");
+	RemotesManager:NewEventRemote("InstrumentRemote");
 	do --Indentifiers
 		RemotesManager.NewRef("StorageItemID")
 		RemotesManager.NewRef("Prefabs")
@@ -727,19 +664,12 @@ isRemotesReady = true;
 bindWaitForRemotesReady:Fire();
 
 RemotesManager.Remote = RemotesManager:Get("RemoteManager");
-local remoteTestRemote = RemotesManager:Get("TestRemote");
 
 if RunService:IsClient() then
 	RemotesManager.Remote.OnClientEvent:Connect(function(key, value)
 		RemotesManager[key] = value;
 	end)
 	
-	remoteTestRemote.OnEvent:Connect(function(packet)
-		packet =  RemotesManager.Uncompress(packet);
-
-		Debugger:Warn("TestRemote Uncompressed:",packet);
-	end)
-
 else
 	-- Server;
 	task.spawn(function()
@@ -820,8 +750,6 @@ else
 					}
 					packet = RemotesManager.Compress(packet);
 					Debugger:Warn("TestRemote Compressed:",packet);
-					
-					remoteTestRemote:Fire(speaker, packet);
 					
 					shared.Notify(speaker, "Fired test", "Info");
 					

@@ -22,7 +22,7 @@ function BaseInterface:Init(Interface)
 	table.sort(msrcs, function(a,b) return a.Order < b.Order end)
 	for _, s in pairs(msrcs) do
 		Interface[s.Name] = require(s.Msrc).init(Interface);
-		Debugger:Log("Loaded", s.Name);
+		Debugger:StudioLog("Loaded", s.Name);
 	end
 end
 

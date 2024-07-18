@@ -10,7 +10,6 @@ return function()
 	
 	local modRemotesManager = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("RemotesManager"));
 	local remotePrimaryFire = modRemotesManager:Get("PrimaryFire");
-	local remoteInstrumentRemote = modRemotesManager:Get("InstrumentRemote");
 	local remoteCharacterRemote = modRemotesManager:Get("CharacterRemote");
 	
 	local weaponsLibrary = game.ReplicatedStorage.Library.Weapons;
@@ -23,10 +22,8 @@ return function()
 	local _modProjectile = require(game.ReplicatedStorage.Library.Projectile);
 	local modAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
 	local modArcParticles = require(game.ReplicatedStorage.Particles.ArcParticles);
-	local modInstrument = require(game.ReplicatedStorage.Library.InstrumentModule);
+	local modInstrumentModule = require(game.ReplicatedStorage.Library.InstrumentModule);
 	
-	local modBuffer = require(game.ReplicatedStorage.Library.Util.Buffer);
-
 	--== Script;
 	local function replicatePrimaryFire(weaponItemId, weapon, data, skipAudio)
 		if weapon == nil then return end;
@@ -112,88 +109,6 @@ return function()
 		delay(duration or 0.1, function() arc:Destroy(); end);
 	end)
 	
-	local instruments = {};
-	remoteInstrumentRemote.OnEvent:Connect(function(packet)
-		packet = modRemotesManager.Uncompress(packet);
-
-		local toolModels = packet.Prefabs;
-		local notesChanged = packet.Data;
-		local ownerPlayer = packet.OwnerPlayer;
-		local instrumentType = packet.Instrument;
-		
-		local prefab = toolModels[1];
-		local handle = prefab.PrimaryPart;
-		if handle == nil then return end;
-		
-		local boolClientInitTag = handle:FindFirstChild("InstrumentTag");
-		local instrument;
-		
-		if boolClientInitTag == nil then
-			boolClientInitTag = Instance.new("BoolValue");
-			boolClientInitTag.Name = "InstrumentTag";
-			boolClientInitTag.Parent = handle;
-
-			instrument = modInstrument.new(instrumentType, handle, handle)
-			instrument.Player = ownerPlayer;
-			table.insert(instruments, instrument);
-
-			handle.Destroying:Connect(function()
-				for a=#instruments, 1, -1 do
-					if instruments[a] and instruments[a].Handle == nil or not instruments[a].Handle:IsDescendantOf(workspace) then
-						instruments[a]:Destroy();
-						table.remove(instruments, a);
-					end
-				end
-			end)
-
-		else
-			for a=1, #instruments do
-				if instruments[a] and instruments[a].Handle == handle then
-					instrument = instruments[a];
-					break;
-				end
-			end
-		end
-		if instrument then
-			instrument:Sync(notesChanged);
-		end
-	end)
-	--remoteInstrumentRemote.OnClientEvent:Connect(function(ownerPlayer, handle, ...)
-	--	local instrumentType, isShiftDown, isCtrlDown, notes = ...;
-	--	local boolClientInitTag = handle:FindFirstChild("InstrumentTag");
-	--	local instrument = nil;
-		
-	--	if boolClientInitTag == nil then
-	--		boolClientInitTag = Instance.new("BoolValue");
-	--		boolClientInitTag.Name = "InstrumentTag";
-	--		boolClientInitTag.Parent = handle;
-			
-	--		instrument = modInstrument.new(instrumentType, handle, handle)
-	--		instrument.Player = ownerPlayer;
-	--		table.insert(instruments, instrument);
-			
-	--		handle.Destroying:Connect(function()
-	--			for a=#instruments, 1, -1 do
-	--				if instruments[a] and instruments[a].Handle == nil or not instruments[a].Handle:IsDescendantOf(workspace) then
-	--					instruments[a]:Destroy();
-	--					table.remove(instruments, a);
-	--				end
-	--			end
-	--		end)
-			
-	--	else
-	--		for a=1, #instruments do
-	--			if instruments[a] and instruments[a].Handle == handle then
-	--				instrument = instruments[a];
-	--				break;
-	--			end
-	--		end
-	--	end
-	--	if instrument then
-	--		instrument:Sync(isShiftDown, isCtrlDown, notes);
-	--	end
-	--end)
-	
 	remoteCharacterRemote.OnClientEvent:Connect(function(action, paramPacket)
 		--local action, paramPacket = unpack(data);
 		local character = paramPacket.Character;
@@ -229,45 +144,6 @@ return function()
 					TweenService:Create(neckMotor, TweenInfo.new(0.6), properties):Play();
 				end
 			end
-
-			-- local joints = typeof(paramPacket) == "table" and paramPacket or {};
-
-			-- local jointsList = {"Waist"; "Neck"};
-
-			-- for _, key in pairs(jointsList) do
-			-- 	if joints[key] then
-			-- 		local data = joints[key];
-			-- 		local motor = data.Motor;
-			-- 		if motor ~= nil and character:IsAncestorOf(motor) and motor.Name == key then
-			-- 			-- local properties = {};
-			-- 			-- if data.Properties.C1 then
-			-- 			-- 	properties.C1 = CFrame.new(motor.C1.Position) * data.Properties.C1.Rotation;
-			-- 			-- end
-			-- 			-- if data.Properties.C0 then
-			-- 			-- 	properties.C0 = CFrame.new(motor.C0.Position) * data.Properties.C0.Rotation;
-			-- 			-- end
-						
-			-- 			-- local tween = TweenService:Create(motor, TweenInfo.new(0.6), properties);
-			-- 			-- tween:Play();
-
-			-- 			if data.B then
-			-- 				local motorValues = modBuffer.readMotorBuffer(data.B);
-			-- 				local c0X, c0Y, c0Z = motorValues.C0:ToOrientation();
-			-- 				Debugger:StudioWarn(motor, "motorValues C0", c0X, c0Y, c0Z, "C1", motorValues.C1:ToOrientation());
-
-			-- 				local properties = {
-			-- 					Transform = motorValues.C0;
-			-- 					C1 = CFrame.new(motor.C1.Position) * motorValues.C1;
-			-- 				};
-
-			-- 				local tween = TweenService:Create(motor, TweenInfo.new(0.6), properties);
-			-- 				tween:Play();
-			-- 				-- motor.Transform = motorValues.C0;
-			-- 				-- motor.C1 = CFrame.new(motor.C1.Position) * motorValues.C1;
-			-- 			end
-			-- 		end
-			-- 	end
-			-- end
 		end
 	end)
 	
@@ -312,4 +188,6 @@ return function()
 			end
 		end
 	end)
+
+	modInstrumentModule:InitClient();
 end

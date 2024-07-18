@@ -37,7 +37,7 @@ function Zombie.new(self)
 				task.spawn(self.OnTarget, attacker);
 			end
 		else
-			Debugger:Log("Attacker (",attacker.Name,") dealt 0 damage with a (",weaponItem and weaponItem.ItemId or "nil",")");
+			Debugger:StudioLog("Attacker (",attacker.Name,") dealt 0 damage with a (",weaponItem and weaponItem.ItemId or "nil",")");
 		end
 	end
 end

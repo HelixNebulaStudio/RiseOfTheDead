@@ -80,7 +80,7 @@ function CameraClass:Init()
 		if layer.Id ~= CameraClass.PreviousLayerId then
 			CameraClass.PreviousLayerId = layer.Id;
 			
-			Debugger:Log("CameraLayer changed", layer.Id);
+			Debugger:StudioLog("CameraLayer changed", layer.Id);
 		end
 		
 		if camera.CameraType ~= activeRenderLayer.CameraType then

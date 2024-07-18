@@ -200,7 +200,7 @@ function Instrument:Replicate()
 		Data = changedNotes;
 	}
 	
-	remoteInstrumentRemote:Fire(modRemotesManager.Compress(packet));
+	remoteInstrumentRemote:FireServer(modRemotesManager.Compress(packet));
 end
 
 function Instrument:Sync(notesChanged)
@@ -348,6 +348,101 @@ function Instrument:Destroy()
 	
 	self.Loop:Disconnect();
 	for _, snd in pairs(self.NoteSounds) do snd:Destroy(); end
+end
+
+function Instrument:InitServer()
+	if RunService:IsClient() then return end;
+
+	local modTools = require(game.ReplicatedStorage.Library.Tools);
+	local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+
+
+	remoteInstrumentRemote.OnServerEvent:Connect(function(player, packet)
+		packet = modRemotesManager.Uncompress(packet);
+		
+		local storageItemId = packet.StorageItemID;
+		local toolModels = packet.Prefabs;
+		
+		local profile = shared.modProfile:Get(player);
+		local activeSave = profile:GetActiveSave();
+		local storageItem, storage = shared.modStorage.FindIdFromStorages(storageItemId, player);
+		profile:AddPlayPoints(4, "Gameplay:Use:Instrument");
+		
+		local character = player.Character;
+		if character == nil then Debugger:Warn("Missing Character"); return end;
+		for a=1, #toolModels do if not toolModels[a]:IsDescendantOf(character) then Debugger:Warn("Tool does not belong to player."); return end end;
+		if storageItem == nil then Debugger:Warn("StorageItem(",storageItemId,") does not exist."); return end;
+		local itemId = storageItem.ItemId;
+		
+		local handler = profile:GetToolHandler(storageItem, modTools[itemId], toolModels);
+		if handler and handler.ToolConfig and handler.ToolConfig.Instrument and #toolModels > 0 then
+			local prefab = toolModels[1];
+			local handle = prefab.PrimaryPart;
+	
+			packet.OwnerPlayer = player;
+			packet.Instrument = handler.ToolConfig.Instrument;
+			
+			modOnGameEvents:Fire("OnInstrumentPlay", player, packet.Instrument, packet.Data);
+			local players = {};
+			for _, oPlayer in pairs(game.Players:GetPlayers()) do
+				if oPlayer ~= player and oPlayer:DistanceFromCharacter(handle:GetPivot().Position) <= 128 then
+					table.insert(players, oPlayer);
+				end
+			end
+			
+			remoteInstrumentRemote:FireListClients(players, modRemotesManager.Compress(packet));
+		end
+	end)
+	
+end
+
+function Instrument:InitClient()
+	local instruments = {};
+	remoteInstrumentRemote.OnClientEvent:Connect(function(packet)
+		packet = modRemotesManager.Uncompress(packet);
+
+		local toolModels = packet.Prefabs;
+		local notesChanged = packet.Data;
+		local ownerPlayer = packet.OwnerPlayer;
+		local instrumentType = packet.Instrument;
+		
+		local prefab = toolModels[1];
+		local handle = prefab.PrimaryPart;
+		if handle == nil then return end;
+		
+		local boolClientInitTag = handle:FindFirstChild("InstrumentTag");
+		local instrument;
+		
+		if boolClientInitTag == nil then
+			boolClientInitTag = Instance.new("BoolValue");
+			boolClientInitTag.Name = "InstrumentTag";
+			boolClientInitTag.Parent = handle;
+
+			instrument = Instrument.new(instrumentType, handle, handle)
+			instrument.Player = ownerPlayer;
+			table.insert(instruments, instrument);
+
+			handle.Destroying:Connect(function()
+				for a=#instruments, 1, -1 do
+					if instruments[a] and instruments[a].Handle == nil or not instruments[a].Handle:IsDescendantOf(workspace) then
+						instruments[a]:Destroy();
+						table.remove(instruments, a);
+					end
+				end
+			end)
+
+		else
+			for a=1, #instruments do
+				if instruments[a] and instruments[a].Handle == handle then
+					instrument = instruments[a];
+					break;
+				end
+			end
+		end
+		if instrument then
+			instrument:Sync(notesChanged);
+		end
+	end)
 end
 
 return Instrument;

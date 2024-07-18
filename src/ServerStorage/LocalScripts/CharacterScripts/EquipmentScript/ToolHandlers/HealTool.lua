@@ -124,7 +124,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 			storageItem = modData.GetItemById(storageItem.ID);
 		end
 
-		remoteToolInputHandler:Fire(modRemotesManager.Compress{
+		remoteToolInputHandler:FireServer(modRemotesManager.Compress{
 			Action = "action";
 			SiId = storageItem.ID;
 			ActionIndex = 2;
@@ -238,7 +238,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 				updateProgressionBar();
 				startHealingTick = tick();
 
-				remoteToolInputHandler:Fire(modRemotesManager.Compress{
+				remoteToolInputHandler:FireServer(modRemotesManager.Compress{
 					Action = "action";
 					SiId = storageItem.ID;
 					ActionIndex = 1;

@@ -1310,7 +1310,7 @@ function Profile:Sync(hierarchyKey, paramPacket)
 		paramPacket[modRemotesManager.Ref("Data")] = data;
 		paramPacket[modRemotesManager.Ref("HierarchyKey")] = hierarchyKey;
 		
-		remotePlayerDataSync:Fire(self.Player, paramPacket);
+		remotePlayerDataSync:FireClient(self.Player, paramPacket);
 	end
 	
 	task.spawn(function()

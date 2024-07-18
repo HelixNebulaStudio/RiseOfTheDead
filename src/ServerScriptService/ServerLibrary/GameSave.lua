@@ -51,12 +51,9 @@ function SaveData.new(profile)
 	dataMeta.Player = player;
 	dataMeta.Title = "Main Save";
 	dataMeta.Statistics = modStatisticProfile.new(player);
-	dataMeta.FirstSync = false;
 	
 	local data = setmetatable({}, dataMeta);
 	dataMeta.Sync = function(self, hierarchyKey)
-		--if self.FirstSync == false then return end;
-		
 		if hierarchyKey == nil then
 			profile:Sync("GameSave/Missions");
 			profile:Sync("GameSave/Stats");
@@ -66,7 +63,6 @@ function SaveData.new(profile)
 			profile:Sync("GameSave"..(hierarchyKey and "/"..hierarchyKey or ""));
 			
 		end
-		
 	end;
 	dataMeta.AppearanceData = modAppearanceData.new(player, data);
 	

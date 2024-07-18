@@ -40,7 +40,7 @@ local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandle
 local bindCharacterInput = script:WaitForChild("CharacterInput");
 
 local remoteToolHandler = modRemotesManager:Get("ToolHandler");
-local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler");
+local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler") :: RemoteEvent;
 
 local BaseEquipped = {LeftHand={}; RightHand={}; Animations={};};
 local Equipped = modGlobalVars.CloneTable(BaseEquipped);
@@ -298,7 +298,7 @@ UserInputService.InputBegan:connect(function(inputObject, inputEvent)
 			if submitInput then
 				
 				inputData.Action = "input";
-				remoteToolInputHandler:Fire(modRemotesManager.Compress(inputData));
+				remoteToolInputHandler:FireServer(modRemotesManager.Compress(inputData));
 				
 			end
 		end
@@ -323,7 +323,7 @@ UserInputService.InputEnded:Connect(function(inputObject, inputEvent)
 				local submitInput = equipment:OnInputEvent(inputData);
 				if submitInput then
 					inputData.Action = "input";
-					remoteToolInputHandler:Fire(modRemotesManager.Compress(inputData));
+					remoteToolInputHandler:FireServer(modRemotesManager.Compress(inputData));
 					
 				end
 				
@@ -348,7 +348,7 @@ bindCharacterInput.Event:Connect(function(keyId, inputState) -- max rentry pass
 				if submitInput then
 
 					inputData.Action = "input";
-					remoteToolInputHandler:Fire(modRemotesManager.Compress(inputData));
+					remoteToolInputHandler:FireServer(modRemotesManager.Compress(inputData));
 					
 				end
 			end

@@ -77,7 +77,6 @@ Interface.ScreenEffects = {};
 
 function Interface:Bind(id, func)
 	self.BindFuncs[id] = func;
-	Debugger:Log("BindFuncs",id);
 end
 
 function Interface:CallBind(id, ...)
@@ -91,7 +90,7 @@ function Interface:CallBind(id, ...)
 				else
 					task.wait();
 					if math.fmod(a/60, 1) == 0 then
-						Debugger:Log("CallBind not yet binded",id);
+						Debugger:StudioLog("CallBind not yet binded",id);
 					end
 				end
 			end
@@ -129,7 +128,7 @@ modData.modChatRoomInterface = modChatRoomInterface;
 for a=1, 10*60 do
 	if modData:IsSettingsLoaded() ~= true then
 		task.wait()
-		if math.fmod(a/60, 1) == 0 then
+		if math.fmod(a/60, 2) == 0 then
 			Debugger:Warn("Waiting for settings to load 1s..");
 		end
 		

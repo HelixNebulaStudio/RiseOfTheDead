@@ -112,7 +112,7 @@ function DatabaseService:AddCache(key, funcId, values)
 	end
 	
 	if cachePacket then
-		Debugger:Log(":AddCache ",(cachePacket and cachePacket.F or "newCache nil line:130")," (", self.Scope,"/",key ,") successful.");
+		Debugger:StudioLog(":AddCache ",(cachePacket and cachePacket.F or "newCache nil line:130")," (", self.Scope,"/",key ,") successful.");
 		return cachePacket;
 	end
 
@@ -237,7 +237,7 @@ function DatabaseService:Publish(key, updateFunc)
 					end
 
 					if rawData == nil then
-						Debugger:Log(":Read (",self.Scope,"/",key,")") 
+						Debugger:StudioLog(":Read (",self.Scope,"/",key,")") 
 						return nil 
 					end;
 					return rawData, self.UserIds[key];
@@ -250,7 +250,7 @@ function DatabaseService:Publish(key, updateFunc)
 			end;
 			
 			if saveS and rawData then
-				Debugger:Log(":Published (",self.Scope,"/",key,") Size:", #tostring(rawData) or "nil", "  Pulled Cache:", #pulledCache);
+				Debugger:StudioLog(":Published (",self.Scope,"/",key,") Size:", #tostring(rawData) or "nil", "  Pulled Cache:", #pulledCache);
 				
 				TryFunction("UpdatePublishTime", function()
 					self.CachePool:SetAsync(key.."lastpublish", DateTime.now().UnixTimestampMillis, oneDaySecs);
@@ -258,7 +258,7 @@ function DatabaseService:Publish(key, updateFunc)
 				
 			else
 				if #pulledCache > 0 then
-					Debugger:Log(":Flushed (",self.Scope,"/",key,") Pulled Cache:", #pulledCache);
+					Debugger:StudioLog(":Flushed (",self.Scope,"/",key,") Pulled Cache:", #pulledCache);
 				end
 				
 			end
@@ -304,7 +304,7 @@ function DatabaseService:ProcessLocalCacheQueue()
 			local addTimeMs = packet.AddTickMs;
 
 			if addTimeMs and currTimeMs-addTimeMs >= 30*1000 then
-				Debugger:Log(":LocalCacheQueue Publish:", scope,"/",key);
+				Debugger:StudioLog(":LocalCacheQueue Publish:", scope,"/",key);
 
 				local database = DatabaseService:GetDatabase(scope);
 				database:Publish(key);
@@ -328,7 +328,7 @@ function DatabaseService:AddCacheQueue(newScope, newKey)
 
 	TryFunction("AddFlushQueue", function()
 		CacheFlushQueue:AddAsync(flushPacket, 300);
-		Debugger:Log(":ProcessCacheQueue AddFlushQueue:", flushPacket);
+		Debugger:StudioLog(":ProcessCacheQueue AddFlushQueue:", flushPacket);
 	end)
 end
 
@@ -337,7 +337,7 @@ function DatabaseService:ProcessCacheQueue(newScope, newKey)
 
 	TryFunction("ProcessCacheQueue", function()
 		queueData, queueKey = CacheFlushQueue:ReadAsync(100, false, 0);
-		Debugger:Log(":ProcessCacheQueue ReadQueue:",queueData and #queueData or 0, queueKey);
+		Debugger:StudioLog(":ProcessCacheQueue ReadQueue:",queueData and #queueData or 0, queueKey);
 	end)
 
 	if queueKey then
@@ -376,14 +376,14 @@ function DatabaseService:ProcessCacheQueue(newScope, newKey)
 			local key = packet.Key;
 
 			if packet.Index == 1 then
-				Debugger:Log(":ProcessCacheQueue Publish:", scope,"/",key);
+				Debugger:StudioLog(":ProcessCacheQueue Publish:", scope,"/",key);
 				
 				local database = DatabaseService:GetDatabase(scope);
 				database:Publish(key);
 				
 				
 			elseif packet.Index == 2 then
-				Debugger:Log(":ProcessCacheQueue Queue:", scope,"/",key);
+				Debugger:StudioLog(":ProcessCacheQueue Queue:", scope,"/",key);
 				
 				packet.Index = nil;
 				if packet.AddTickMs == nil then
@@ -404,7 +404,7 @@ function DatabaseService:UpdateRequest(key, callbackId, values)
 	callbackId = devBranchPrefix.. callbackId;
 
 	if self.RequestCallbacks[callbackId] == nil then
-		Debugger:Log("Missing RequestCallbacks", callbackId, debug.traceback());
+		Debugger:StudioLog("Missing RequestCallbacks", callbackId, debug.traceback());
 		return;
 	end
 	
@@ -431,7 +431,7 @@ function DatabaseService:UpdateRequest(key, callbackId, values)
 		end)
 		
 	else
-		Debugger:Log("UpdateRequest() AddCache: (",self.Scope,"/",key,") ", callbackId);
+		Debugger:StudioLog("UpdateRequest() AddCache: (",self.Scope,"/",key,") ", callbackId);
 		newCache = self:AddCache(key, callbackId, values);
 		
 	end
@@ -445,7 +445,7 @@ function DatabaseService:UpdateRequest(key, callbackId, values)
 	requestPacket.Data = r;
 	
 	
-	Debugger:Log("UpdateRequest() newCache ", newCache, " ProxyRequestPacket:", {
+	Debugger:StudioLog("UpdateRequest() newCache ", newCache, " ProxyRequestPacket:", {
 		Success=requestPacket.Success;
 		FailMsg=requestPacket.FailMsg;
 		CacheId=requestPacket.CacheId;
@@ -533,7 +533,7 @@ function DatabaseService:Get(key, requestPacket)
 		end
 	end
 	
-	Debugger:Log(":Get (",self.Scope,"/",key,") RawData:", RunService:IsStudio() and {rawData} or tostring(rawData));
+	Debugger:StudioLog(":Get (",self.Scope,"/",key,") RawData:", RunService:IsStudio() and {rawData} or tostring(rawData));
 
 	if self.Serializer then
 		return self.Serializer:Deserialize(rawData), dsKeyInfo;
@@ -565,7 +565,7 @@ function DatabaseService:OnUpdateRequest(callbackId, func)
 		object = func(requestPacket);
 		
 		if requestPacket.FailMsg then
-			Debugger:Log(callbackId, "IsPublish:",requestPacket.Publish == true,"FailMsg", requestPacket.FailMsg);
+			Debugger:StudioLog(callbackId, "IsPublish:",requestPacket.Publish == true,"FailMsg", requestPacket.FailMsg);
 		end
 		
 		if object then
@@ -595,7 +595,7 @@ function DatabaseService.new(scope)
 	setmetatable(self, DatabaseService);
 	
 	self:OnUpdateRequest("default", function(requestPacket)
-		Debugger:Log("Using (default) callback. RequestPacket:", requestPacket);
+		Debugger:StudioLog("Using (default) callback. RequestPacket:", requestPacket);
 		local _rawData = requestPacket.RawData;
 		local _dataObject = requestPacket.Data;
 		local inputValues = requestPacket.Values;
@@ -710,7 +710,7 @@ task.spawn(function()
 				local db = DatabaseService:GetDatabase(key);
 				local cacheData = db:GetCache(value);
 				
-				Debugger:Log("Database Cache(",key,"):", cacheData, "\nCount:", #cacheData);
+				Debugger:StudioLog("Database Cache(",key,"):", cacheData, "\nCount:", #cacheData);
 				shared.Notify(player, Debugger:Stringify("Database Cache(",key,"):", cacheData, "\nCount:", #cacheData), "Inform");
 				
 			elseif action == "flush" then

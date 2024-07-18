@@ -6,7 +6,7 @@ local modBitFlags = require(game.ReplicatedStorage.Library.BitFlags);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
-local remoteEventService = modRemotesManager:Get("EventService");
+local remoteEventService = modRemotesManager:Get("EventService") :: RemoteEvent;
 
 local EventHandlerPermissions = modBitFlags.new();
 EventHandlerPermissions:AddFlag("CanInvoke", "Client can invoke");
@@ -206,13 +206,13 @@ function EventService:ServerInvoke(key: string, players: Player? | {Player}?, ..
             if event.Players then
                 for _, player in pairs(event.Players) do
                     if eventHandler:HasPermissions("CanListen", player) then
-                        remoteEventService:Fire(player, packet);
+                        remoteEventService:FireClient(player, packet);
                     end
                 end
             end
             
         elseif RunService:IsClient() and eventSource == EventSource.Client then
-            remoteEventService:Fire(packet);
+            remoteEventService:FireServer(packet);
 
         end
        
@@ -249,7 +249,7 @@ function EventService:ClientInvoke(key: string, player: Player?, ...): EventPack
         };
 
         if eventSource == EventSource.Client then
-            remoteEventService:Fire(packet);
+            remoteEventService:FireServer(packet);
 
         end
        
@@ -281,7 +281,7 @@ if RunService:IsServer() then
         end
     end)
 
-    remoteEventService.OnEvent:Connect(function(player, packet)
+    remoteEventService.OnServerEvent:Connect(function(player, packet)
 		local key = packet[modRemotesManager.Ref("Key")];
 		local args = packet[modRemotesManager.Ref("Arguments")] or {};
 
@@ -307,7 +307,7 @@ if RunService:IsServer() then
 	end)
 
 else
-    remoteEventService.OnEvent:Connect(function(packet)
+    remoteEventService.OnClientEvent:Connect(function(packet)
 		local key = packet[modRemotesManager.Ref("Key")];
 		local args = packet[modRemotesManager.Ref("Arguments")] or {};
 

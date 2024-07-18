@@ -34,7 +34,6 @@ local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 
 --== Remotes;
 local remoteToolPrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
-local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler");
 
 --== Vars;
 local mouseProperties = modCharacter.MouseProperties;

@@ -12,7 +12,7 @@ local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 
 local modEventSignal = require(game.ReplicatedStorage.Library:WaitForChild("EventSignal"));
 
-local remotePlayerDataSync = modRemotesManager:Get("PlayerDataSync");
+local remotePlayerDataSync = modRemotesManager:Get("PlayerDataSync") :: RemoteEvent;
 local remotePlayerDataFetch = modRemotesManager:Get("PlayerDataFetch");
 
 Data.modInterface = nil;
@@ -97,7 +97,7 @@ function Data:SaveSettings(force)
 	if Data.MarkSettingsDirty ~= true and force ~= true then return end;
 	Data.MarkSettingsDirty = false;
 	
-	remotePlayerDataSync:Fire({
+	remotePlayerDataSync:FireServer({
 		[modRemotesManager.Ref("Action")] = "savesettings";
 		[modRemotesManager.Ref("Data")] = Data.Settings;
 	});
@@ -484,7 +484,7 @@ function Data:GetEvent(id, fetch)
 end
 
 function Data:RequestData(hierarchyKey)
-	remotePlayerDataSync:Fire{
+	remotePlayerDataSync:FireServer{
 		[modRemotesManager.Ref("Action")] = "request";
 		[modRemotesManager.Ref("HierarchyKey")] = hierarchyKey;
 	};

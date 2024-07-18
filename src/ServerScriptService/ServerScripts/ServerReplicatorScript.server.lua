@@ -61,7 +61,6 @@ local remotePrimaryFire = modRemotesManager:Get("PrimaryFire");
 local remoteReloadWeapon = modRemotesManager:Get("ReloadWeapon");
 local remoteDisguiseKitRemote = modRemotesManager:Get("DisguiseKitRemote");
 local remoteGpsRemote = modRemotesManager:Get("GpsRemote");
-local remoteInstrumentRemote = modRemotesManager:Get("InstrumentRemote");
 local remoteReviveInteract = modRemotesManager:Get("ReviveInteract");
 local remoteMysteryChest = modRemotesManager:Get("MysteryChest");
 
@@ -1174,75 +1173,6 @@ function remoteGpsRemote.OnServerInvoke(player, id, action, gpsId)
 	end
 end
 
-remoteInstrumentRemote.OnEvent:Connect(function(player, packet)
-	packet = modRemotesManager.Uncompress(packet);
-	
-	local storageItemId = packet.StorageItemID;
-	local toolModels = packet.Prefabs;
-	
-	local profile = modProfile:Get(player);
-	local activeSave = profile:GetActiveSave();
-	local storageItem, storage = modStorage.FindIdFromStorages(storageItemId, player);
-	profile:AddPlayPoints(4, "Gameplay:Use:Instrument");
-	
-	local character = player.Character;
-	if character == nil then Debugger:Warn("Missing Character"); return end;
-	for a=1, #toolModels do if not toolModels[a]:IsDescendantOf(character) then Debugger:Warn("Tool does not belong to player."); return end end;
-	if storageItem == nil then Debugger:Warn("StorageItem(",storageItemId,") does not exist."); return end;
-	local itemId = storageItem.ItemId;
-	
-	local handler = profile:GetToolHandler(storageItem, modTools[itemId], toolModels);
-	if handler and handler.ToolConfig and handler.ToolConfig.Instrument and #toolModels > 0 then
-		local prefab = toolModels[1];
-		local handle = prefab.PrimaryPart;
-
-		packet.OwnerPlayer = player;
-		packet.Instrument = handler.ToolConfig.Instrument;
-		
-		modOnGameEvents:Fire("OnInstrumentPlay", player, packet.Instrument, packet.Data);
-		local players = {};
-		for _, oPlayer in pairs(game.Players:GetPlayers()) do
-			if oPlayer ~= player and oPlayer:DistanceFromCharacter(handle:GetPivot().Position) <= 128 then
-				table.insert(players, oPlayer);
-			end
-		end
-		
-		
-		remoteInstrumentRemote:Fire(modRemotesManager.Players(players), modRemotesManager.Compress(packet));
-		--for _, oPlayer in pairs(game.Players:GetPlayers()) do
-		--	if oPlayer ~= player and oPlayer:DistanceFromCharacter(handle:GetPivot().Position) <= 128 then
-		--		remoteInstrumentRemote:FireClient(oPlayer, player, handle, handler.ToolConfig.Instrument, ...);
-		--	end
-		--end
-	end
-end)
---remoteInstrumentRemote.OnServerEvent:Connect(function(player, storageItemId, toolModels, ...)
---	local profile = modProfile:Get(player);
---	local activeSave = profile:GetActiveSave();
---	local storageItem, storage = modStorage.FindIdFromStorages(storageItemId, player);
-	
---	local character = player.Character;
---	if character == nil then Debugger:Warn("Missing Character"); return end;
---	for a=1, #toolModels do if not toolModels[a]:IsDescendantOf(character) then Debugger:Warn("Tool does not belong to player."); return end end;
---	if storageItem == nil then Debugger:Warn("StorageItem(",storageItemId,") does not exist."); return end;
---	local itemId = storageItem.ItemId;
-	
---	local handler = profile:GetToolHandler(storageItem, modTools[itemId], toolModels);
---	if handler and handler.ToolConfig and handler.ToolConfig.Instrument and #toolModels > 0 then
---		local prefab = toolModels[1];
---		local handle = prefab.PrimaryPart;
-
---		modOnGameEvents:Fire("OnInstrumentPlay", player, handler.ToolConfig.Instrument, ...);
---		for _, oPlayer in pairs(game.Players:GetPlayers()) do
---			if oPlayer ~= player and oPlayer:DistanceFromCharacter(handle:GetPivot().Position) <= 128 then
---				remoteInstrumentRemote:FireClient(oPlayer, player, handle, handler.ToolConfig.Instrument, ...);
---			end
---		end
---	end
---end)
-
-
-
 remoteReviveInteract.OnServerEvent:Connect(function(player, rawInteractData, startRevive)
 	if rawInteractData == nil then return end;
 	local interactScript = rawInteractData.Script;
@@ -1382,3 +1312,6 @@ function remoteMysteryChest.OnServerInvoke(player, interactableScript, redeemCod
 	
 	return rPacket;
 end
+
+local modInstrumentModule = require(game.ReplicatedStorage.Library.InstrumentModule);
+modInstrumentModule:InitServer();

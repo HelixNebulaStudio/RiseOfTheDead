@@ -1773,7 +1773,7 @@ function WeaponHandler:Equip(library, weaponId)
 					inputData.PrimaryEffectMod = ToggleSpecialRequest();
 
 					inputData.Action = "input";
-					remoteToolInputHandler:Fire(modRemotesManager.Compress(inputData));
+					remoteToolInputHandler:FireServer(modRemotesManager.Compress(inputData));
 					
 				end)
 			end

@@ -88,7 +88,7 @@ function Events.new(player)
 			end
 		end
 		
-		remotePlayerDataSync:Fire(player, {
+		remotePlayerDataSync:FireClient(player, {
 			[modRemotesManager.Ref("Action")] = action;
 			[modRemotesManager.Ref("Data")] = data;
 		})

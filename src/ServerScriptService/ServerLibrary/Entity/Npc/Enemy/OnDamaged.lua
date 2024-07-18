@@ -31,9 +31,9 @@ function Enemy.new(self)
 			if self.OnDamagedEvent then self.OnDamagedEvent(attacker:IsA("Player") and attacker.Character or attacker); end
 		else
 			if weaponItem then
-				Debugger:Warn("Attacker (",attacker.Name,") dealt 0 damage with a (", weaponItem.ItemId,")");
+				Debugger:StudioLog("Attacker (",attacker.Name,") dealt 0 damage with a (", weaponItem.ItemId,")");
 			else
-				Debugger:Warn("Attacker (",attacker.Name,") dealt 0 damage.");
+				Debugger:StudioLog("Attacker (",attacker.Name,") dealt 0 damage.");
 			end
 		end
 	end

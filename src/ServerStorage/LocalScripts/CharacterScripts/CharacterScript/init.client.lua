@@ -1959,27 +1959,29 @@ RunService.PostSimulation:Connect(function(step)
 		end
 	end
 	
-	if not mouseProperties.MouseLocked and mouseProperties.Mouse2Down then
-		mainInterface.Crosshair.Visible = true;
-		UserInputService.MouseIconEnabled = false;
-		
-	elseif not mouseProperties.MouseLocked then
-		UserInputService.MouseIconEnabled = true;
-		mainInterface.Crosshair.Visible = false;
-		
-	elseif characterProperties.IsEquipped then
-		mainInterface.Crosshair.Visible = not characterProperties.HideCrosshair;
-		
-		if not mouseProperties.MouseLocked then
-			UserInputService.MouseIconEnabled = true;
-		else
+	if mainInterface then
+		if not mouseProperties.MouseLocked and mouseProperties.Mouse2Down then
+			mainInterface.Crosshair.Visible = true;
 			UserInputService.MouseIconEnabled = false;
+			
+		elseif not mouseProperties.MouseLocked then
+			UserInputService.MouseIconEnabled = true;
+			mainInterface.Crosshair.Visible = false;
+			
+		elseif characterProperties.IsEquipped then
+				mainInterface.Crosshair.Visible = not characterProperties.HideCrosshair;
+			
+			if not mouseProperties.MouseLocked then
+				UserInputService.MouseIconEnabled = true;
+			else
+				UserInputService.MouseIconEnabled = false;
+			end
+			
+		else
+			mainInterface.Crosshair.Visible = true;
+			UserInputService.MouseIconEnabled = false;
+			
 		end
-		
-	else
-		mainInterface.Crosshair.Visible = true;
-		UserInputService.MouseIconEnabled = false;
-		
 	end
 	
 	

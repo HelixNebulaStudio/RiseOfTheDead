@@ -28,7 +28,7 @@ local prefabsItems = game.ReplicatedStorage.Prefabs.Items;
 --ToolHandler
 local remotes = game.ReplicatedStorage.Remotes;
 local remoteToolHandler = modRemotesManager:Get("ToolHandler");
-local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler");
+local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler") :: RemoteEvent;
 local remoteToolPrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
 
 shared.EquipmentSystem = {};
@@ -571,7 +571,7 @@ function remoteToolHandler.OnServerInvoke(player, action, paramPacket)
 	return toolHandler(player, action, paramPacket);
 end
 
-remoteToolInputHandler.OnEvent:Connect(function(player, packet)
+remoteToolInputHandler.OnServerEvent:Connect(function(player, packet)
 	packet = modRemotesManager.Uncompress(packet);
 	
 	local character = player.Character;

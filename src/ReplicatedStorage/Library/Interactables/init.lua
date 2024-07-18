@@ -154,7 +154,6 @@ if RunService:IsServer() then
 		
 		interactData.Script = moduleScript;
 		interactData:Sync(player);
-		Debugger:Warn("Sync", player, moduleScript.Parent:GetFullName());
 	end)
 	
 	if workspace.Environment:FindFirstChild("Game") then
@@ -235,7 +234,7 @@ function Interactable:Sync(scr, players, data)
 		end
 
 		if RunService:IsStudio() then
-			Debugger:Warn("[Studio] Interactable Sync: ",scr:GetFullName(),"(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")","to", player);
+			Debugger:StudioLog("[Studio] Interactable Sync: ",scr:GetFullName(),"(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")","to", player);
 		end
 		remoteInteractableSync:FireClient(player, scr, data);
 	end
@@ -283,10 +282,10 @@ function Interactable.new()
 			self:OnProximity();
 		end
 
-		if self.ProximityTriggerTick == nil or tick()-self.ProximityTriggerTick >= 60 then
-			self.ProximityTriggerTick = tick();
-			self:Trigger();
-		end
+		-- if self.ProximityTriggerTick == nil or tick()-self.ProximityTriggerTick >= 60 then
+		-- 	self.ProximityTriggerTick = tick();
+		-- 	self:Trigger();
+		-- end
 	end
 
 	function interactMeta:Trigger()

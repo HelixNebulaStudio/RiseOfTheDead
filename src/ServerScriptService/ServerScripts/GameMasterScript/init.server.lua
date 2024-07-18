@@ -20,7 +20,7 @@ local modItemsLibrary = Debugger:Require(game.ReplicatedStorage.Library.ItemsLib
 local modModsLibrary = Debugger:Require(game.ReplicatedStorage.Library.ModsLibrary);
 local modSyncTime = Debugger:Require(game.ReplicatedStorage.Library.SyncTime);
 local modBranchConfigs = Debugger:Require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modRemotesManager = Debugger:Require(game.ReplicatedStorage.Library.RemotesManager);
+local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = Debugger:Require(game.ReplicatedStorage.Library.Configurations);
 local modCommandHandler = Debugger:Require(game.ReplicatedStorage.Library.CommandHandler);
 local modInteractables = Debugger:Require(game.ReplicatedStorage.Library.Interactables);
@@ -66,7 +66,7 @@ local remotePickUpRequest = remotes.Interactable.PickUpRequest;
 local remoteWorldTravelRequest = remotes.Interactable.WorldTravelRequest;
 local remoteOpenStorageRequest = remotes.Interactable.OpenStorageRequest;
 
-local remotePlayerDataSync = modRemotesManager:Get("PlayerDataSync");
+local remotePlayerDataSync = modRemotesManager:Get("PlayerDataSync") :: RemoteEvent;
 local remotePlayerDataFetch = modRemotesManager:Get("PlayerDataFetch");
 
 local remoteUpgradeStorage = modRemotesManager:Get("UpgradeStorage");
@@ -269,22 +269,24 @@ function remotePlayerDataFetch.OnServerInvoke(player, packet)
 	return;
 end
 
-remotePlayerDataSync.OnEvent:Connect(function(player, packet)
+remotePlayerDataSync.OnServerEvent:Connect(function(player, packet)
 	local profile = modProfile:Find(player.Name);
 	if profile == nil then return end;
 	
 	local action = packet[modRemotesManager.Ref("Action")];
 	local data = packet[modRemotesManager.Ref("Data")];
+	
+	Debugger:Log("DataSync request action", action, "data size", modRemotesManager.PacketSizeCounter.GetDataByteSize(data));
 
-	if action == "request" then
-		if profile.FirstSync == nil then
+	if action == "request" or action == "requestfull" then
+		if profile.FirstSync == nil or action == "requestfull" then
 			profile.FirstSync = true;
 			profile:Sync();
 
 			if profile.GameSave then
 				profile.GameSave.FirstSync = true;
 			end
-			Debugger:Warn("First sync ("..player.Name..")");
+			Debugger:Warn("Full sync ("..player.Name..")");
 		end
 		
 		local hierarchyKey = packet[modRemotesManager.Ref("HierarchyKey")];

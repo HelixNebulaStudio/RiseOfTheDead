@@ -98,7 +98,7 @@ function ItemSkinWear.PolishTool(storageItem)
 	local changeFloat = 0;
 
 	local maxRangeFloat = math.floor(oldFloat*100000);
-	if targetFloat <= 0 and maxRangeFloat > 999 and math.random(1, 10) == 1 then
+	if targetFloat <= 0 and maxRangeFloat > 999 and math.random(1, 20) == 1 then
 		targetFloat = math.random(999, maxRangeFloat)/100000;
 	end
 

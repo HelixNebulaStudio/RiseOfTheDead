@@ -205,15 +205,15 @@ return function()
 	end
 	
 	local sendDataRequest = true;
-	remotePlayerDataSync.OnEvent:Connect(function(packet)
+	remotePlayerDataSync.OnClientEvent:Connect(function(packet)
 		local action = packet[modRemotesManager.Ref("Action")];
 		local id = packet[modRemotesManager.Ref("Id")];
 		local data = packet[modRemotesManager.Ref("Data")];
 		local hierarchyKey = packet[modRemotesManager.Ref("HierarchyKey")];
 		
-		sendDataRequest = false;
-		
 		if action == "sync" then
+			sendDataRequest = false;
+
 			if hierarchyKey == nil then
 				Debugger:Warn("Missing hierarchy key");
 				return;
@@ -295,7 +295,7 @@ return function()
 		local modCharacter = modData:GetModCharacter();
 		local _humanoid = character:WaitForChild("Humanoid");
 
-		remotePlayerDataSync:Fire(playerDataSyncRequest);
+		remotePlayerDataSync:FireServer(playerDataSyncRequest);
 
 		modCharacter.CharacterProperties.ZoomLevel = modData.Settings.ZoomLevel;
 
@@ -813,9 +813,11 @@ return function()
 		end
 	end)
 	
-	Debugger:Warn("Requesting for initial save data sync...");
 	repeat
-		remotePlayerDataSync:Fire(playerDataSyncRequest);
+		Debugger:Warn("Requesting for initial save data sync...");
+		remotePlayerDataSync:FireServer({
+			[modRemotesManager.Ref("Action")] = "requestfull";
+		});
 		task.wait(1);
 	until sendDataRequest == false;
 	Debugger:Warn("Initialized.");
