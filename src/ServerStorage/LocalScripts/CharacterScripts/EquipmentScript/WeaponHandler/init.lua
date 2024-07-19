@@ -752,7 +752,9 @@ function WeaponHandler:Equip(library, weaponId)
 		end
 		
 		local sound = modAudio.PlayReplicated(id, soundOrigin, looped);
-		sound:SetAttribute("WeaponAudio", true);
+		if sound then
+			sound:SetAttribute("WeaponAudio", true);
+		end
 		
 		return sound;
 	end
