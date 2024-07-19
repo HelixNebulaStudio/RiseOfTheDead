@@ -160,12 +160,19 @@ function Load(child, soundGroupName)
 	end
 end
 
+function Preload(key)
+	if RunService:IsClient() then
+		lazyLoader:Request(key);
+	end
+end
+
 script.ChildAdded:Connect(Load)
 
 return {
 	Play = Play;
 	PlayReplicated = PlayReplicated;
 	Get = Get;
+	Preload = Preload;
 	Library = Library;
 	Load = Load;
 	ModdedSelf = moddedSelf;
