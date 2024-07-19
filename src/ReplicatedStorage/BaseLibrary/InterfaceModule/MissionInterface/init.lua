@@ -1247,6 +1247,7 @@ function Interface.init(modInterface)
 			return newTab, newList;
 		end
 		
+		modAudio.Preload("MissionUpdated", 5);
 		local function createListing(missionInfo, newTab, newList)
 			local missionData = missionInfo.Data;
 			local book = missionInfo.Lib;
@@ -1907,38 +1908,35 @@ function Interface.init(modInterface)
 
 							Interface:PlayButtonClick();
 
-							local debounce;
-							local promptWindow = Interface:PromptQuestion("Start "..titleLabel.Text .."?", descLabel.Text);
-							local YesClickedSignal, NoClickedSignal;
+							Interface:PromptDialogBox({
+								Title=`Start <b>{titleLabel.Text}</b>?`;
+								Desc=`{descLabel.Text}`;
+								Buttons={
+									{
+										Text="Start";
+										Style="Confirm";
+										OnPrimaryClick=function(promptDialogFrame, textButton)
+											promptDialogFrame.statusLabel.Text = "Starting...";
+											
+											local r = remoteMissionRemote:InvokeServer("MissionBoardStart", missionData.Id);
+											r = r or {};
 
-							YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-								if debounce then return end;
-								debounce = true;
-								Interface:PlayButtonClick();
+											if r.FailMsg then
+												promptDialogFrame.statusLabel.Text = `Fail to start: {r.FailMsg}`;
+												task.wait(1);
+											else
+												task.wait(0.5);
+												Interface.Select(missionData.Id);
+											end
 
-								local r = remoteMissionRemote:InvokeServer("MissionBoardStart", missionData.Id);
-								r = r or {};
-
-								if r.FailMsg then
-									Interface:PromptWarning("Failed: ".. r.FailMsg);
-									task.wait(1);
-								end
-								
-								debounce = false;
-								promptWindow:Close();
-
-								YesClickedSignal:Disconnect();
-								NoClickedSignal:Disconnect();
-							end);
-							NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-								if debounce then return end;
-								Interface:PlayButtonClick();
-								promptWindow:Close();
-								Interface:OpenWindow("Missions");
-								YesClickedSignal:Disconnect();
-								NoClickedSignal:Disconnect();
-							end);
-
+										end;
+									};
+									{
+										Text="Cancel";
+										Style="Cancel";
+									};
+								}
+							});
 						end)
 
 					end
