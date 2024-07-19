@@ -160,9 +160,19 @@ function Load(child, soundGroupName)
 	end
 end
 
-function Preload(key)
-	if RunService:IsClient() then
-		lazyLoader:Request(key);
+function Preload(key, yield)
+	if RunService:IsServer() then return end;
+	local audioInstance = Library[key];
+	if audioInstance then return end;
+	
+	lazyLoader:Request(key);
+
+	if yield == nil then return end;
+
+	for a=0, 5, 1/60 do
+		task.wait(1/60);
+		local audioInstance = Library[key];
+		if audioInstance then break; end
 	end
 end
 

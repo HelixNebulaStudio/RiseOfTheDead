@@ -153,42 +153,50 @@ local function MajorNotification(Type, notificationData)
 				titleImage.Image = "rbxassetid://2048330360";
 				titleText = ("You are now mastery level $Level!"):gsub("$Level", values.Level or "NIL");
 				modInterface.modMasteryInterface.Update();
+				modAudio.Preload("LevelUp", 5);
 				modAudio.Play("LevelUp");
 				
 			elseif Type == "Unlocked" then
 				titleImage.Image = "rbxassetid://2696762854";
 				titleText = ("You have unlocked $Name!"):gsub("$Name", values.Name or "NIL");
+				modAudio.Preload("Unlocked", 5);
 				modAudio.Play("Unlocked");
 				
 			elseif Type == "MissionFail" then
 				titleImage.Image = "rbxassetid://3376501069";
 				titleText = ("You have failed $Name!"):gsub("$Name", values.Name or "NIL");
+				modAudio.Preload("MissionFail", 5);
 				modAudio.Play("MissionFail");
 				
 			elseif Type == "MissionComplete" then
 				titleImage.Image = "rbxassetid://2740686675";
 				titleText = ("You have completed $Name!"):gsub("$Name", values.Name or "NIL");
+				modAudio.Preload("MissionComplete", 5);
 				modAudio.Play("MissionComplete");
 				
 			elseif Type == "MissionStart" then
 				titleImage.Image = "rbxassetid://2741993719";
 				titleText = ("You have started $Name!"):gsub("$Name", values.Name or "NIL");
+				modAudio.Preload("MissionStart", 5);
 				modAudio.Play("MissionStart");
 			
 			elseif Type == "HordeAttack" then
 				titleImage.Image = "rbxassetid://4473237759";
 				titleText = ("The horde is attacking $Name!"):gsub("$Name", values.Name or "NIL");
+				modAudio.Preload("HordeGrowl", 5);
 				modAudio.Play("HordeGrowl");	
 
 			elseif Type == "Breach" then
 				titleImage.Image = "rbxassetid://4473237759";
 				titleText = "There's a breach in a safehome!";
+				modAudio.Preload("TerrorAlert", 5);
 				modAudio.Play("TerrorAlert");
 				
 				
 			elseif Type == "PremiumAward" then
 				titleImage.Image = "rbxassetid://3235348619";
 				titleText = ("$PlayerName have been upgrade to Premium!"):gsub("$PlayerName", localPlayer.Name);
+				modAudio.Preload("Ascended", 5);
 				modAudio.Play("Ascended");
 
 			elseif Type == "WeaponLevelup" then
@@ -198,16 +206,19 @@ local function MajorNotification(Type, notificationData)
 				
 				titleImage.Image = "rbxassetid://2048330360";
 				titleText = itemLib.Name.." leveled up to "..values.Level.."! Weapon mastery+ Weapon damage+"
+				modAudio.Preload("WeaponLevelUp", 5);
 				modAudio.Play("WeaponLevelUp");
 				
 			elseif Type == "BattlePassLevelUp" then
 				titleImage.Image = "rbxassetid://2048330360";
 				titleText = "Event Pass leveled up to ".. values.Level .."!".. (values.HasRewards and " Check your missions menu for rewards!" or "");
+				modAudio.Preload("Collectible", 5);
 				modAudio.Play("Collectible");
 				
 			elseif Type == "BattlePassComplete" then
 				titleImage.Image = "rbxassetid://2740686675";
 				titleText = "You have completed Event Pass: ".. values.Title .."!";
+				modAudio.Preload("Ascended", 5);
 				modAudio.Play("Ascended");
 
 				

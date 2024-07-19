@@ -102,6 +102,7 @@ end
 function playerClickSound()
 	if modAudio == nil then modAudio = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("Audio")); end
 	if modAudio then
+		modAudio.Preload("ButtonSound", 1);
 		modAudio.Play("ButtonSound", nil, nil, false);
 	end
 end

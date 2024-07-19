@@ -110,6 +110,7 @@ function Interface.init(modInterface)
 				lastTrackChange = tick();
 				
 				if activeSndTracks[trackName] == nil or not activeSndTracks[trackName].IsPlaying then
+					modAudio.Preload(trackName, 5);
 					local sound = modAudio.Play(trackName, mainFrame);
 					sound.Volume = 0;
 					activeSndTracks[trackName] = sound;

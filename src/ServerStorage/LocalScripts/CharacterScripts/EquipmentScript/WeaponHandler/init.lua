@@ -99,6 +99,13 @@ modConfigurations.OnChanged("DisableWeaponInterface", toggleWeaponInterface)
 modConfigurations.OnChanged("DisableHud", toggleWeaponInterface);
 
 function WeaponHandler:Equip(library, weaponId)
+	modAudio.Preload("BulletBodyImpact");
+	modAudio.Preload("BulletBodyImpact2");
+	modAudio.Preload("BulletHeadImpact");
+	modAudio.Preload("BulletHeadImpact2");
+	modAudio.Preload("BulletFleshKillshot");
+	modAudio.Preload("BulletFleshKillshot2");
+
 	local cache = {
 		FlipPlayingWeaponAnim = nil;
 		LastSprintAnimationCanPlay = nil;
