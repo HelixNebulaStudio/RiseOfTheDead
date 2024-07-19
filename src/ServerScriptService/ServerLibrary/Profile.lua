@@ -1302,7 +1302,7 @@ function Profile:Sync(hierarchyKey, paramPacket)
 		local data = modTableManager.GetDataHierarchy(self, hierarchyKey);
 		
 		if RunService:IsStudio() then
-			Debugger:StudioWarn("[Studio] Profile Sync: ",hierarchyKey,"(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")");
+			Debugger:StudioWarn("Profile Sync: ",hierarchyKey,"(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")");
 		end
 		
 		paramPacket = paramPacket or {};

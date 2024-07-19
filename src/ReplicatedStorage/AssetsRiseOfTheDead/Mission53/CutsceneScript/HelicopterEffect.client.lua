@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localplayer = game.Players.LocalPlayer;
 
 local RunService = game:GetService("RunService");
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modCharacter = modData:GetModCharacter();
 
@@ -23,6 +23,8 @@ end)
 
 local topRotorAnimation = animationController:LoadAnimation(script:WaitForChild("TopRotor"));
 topRotorAnimation:Play();
+
+modAudio.Preload("HelicopterCore", 5);
 modAudio.Play("HelicopterCore", rootPart);
 
 --wait(0.5)

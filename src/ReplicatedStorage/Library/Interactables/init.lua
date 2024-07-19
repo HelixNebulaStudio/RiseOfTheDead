@@ -234,7 +234,7 @@ function Interactable:Sync(scr, players, data)
 		end
 
 		if RunService:IsStudio() then
-			Debugger:StudioLog("[Studio] Interactable Sync: ",scr:GetFullName(),"(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")","to", player);
+			Debugger:StudioLog("Interactable Sync: ",scr:GetFullName(),"(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")","to", player);
 		end
 		remoteInteractableSync:FireClient(player, scr, data);
 	end
@@ -842,40 +842,44 @@ function Interactable.Pickup(itemId, quantity)
 				
 			end
 
-			--library.interface = library.modData:GetInterfaceModule();
-			--if library.interface.modInventoryInterface then
-			--	library.interface.modInventoryInterface.InventoryVisibleChanged(true);
-			--end
 			
-			local sound;
+			local soundName;
 			if self.PickUpSound then
-				sound = modAudio.Play(self.PickUpSound, nil, nil, false);
-				
+				soundName = self.PickUpSound;
+
 			else
 				if itemLib and itemLib.Type == modItem.Types.Resource then
 					if itemLib.Name == "Metal Scraps" then
-						sound = modAudio.Play("StorageMetalPickup", nil, nil, false);
+						soundName = "StorageMetalPickup";
 					elseif itemLib.Name == "Glass Shards" then
-						sound = modAudio.Play("StorageGlassPickup", nil, nil, false);
+						soundName = "StorageGlassPickup";
 					elseif itemLib.Name == "Wooden Parts" then
-						sound = modAudio.Play("StorageWoodPickup", nil, nil, false);
+						soundName = "StorageWoodPickup";
 					elseif itemLib.Name == "Cloth" then
-						sound = modAudio.Play("StorageClothPickup", nil, nil, false);
+						soundName = "StorageClothPickup";
 					else
-						sound = modAudio.Play("StorageItemPickup", nil, nil, false);
+						soundName = "StorageItemPickup";
 					end
 				elseif itemLib and itemLib.Type == modItem.Types.Blueprint then
-					sound = modAudio.Play("StorageBlueprintPickup", nil, nil, false);
+					soundName = "StorageBlueprintPickup";
 				elseif itemLib and itemLib.Type == modItem.Types.Tool then
-					sound = modAudio.Play("StorageWeaponPickup", nil, nil, false);
+					soundName = "StorageWeaponPickup";
 				elseif itemLib and itemLib.Type == modItem.Types.Clothing then
-					sound = modAudio.Play("StorageClothPickup", nil, nil, false);
+					soundName = "StorageClothPickup";
 				else
-					sound = modAudio.Play("StorageItemPickup", nil, nil, false);
+					soundName = "StorageItemPickup";
 				end
+
 			end
-			if sound then sound.PlaybackSpeed = math.random(70, 120)/100; end;
-			
+
+			if soundName then
+				modAudio.Preload(soundName, 5);
+				local sound = modAudio.Play(soundName, nil, nil, false);
+				if sound then
+					sound.PlaybackSpeed = math.random(70, 120)/100;
+				end;
+			end
+
 		else
 			if interactObject.Parent ~= nil then
 				if objectParent then

@@ -29,8 +29,11 @@ return function(...)
 		local stageLib = gameLib and modGameModeLibrary.GetStage(gameType, gameStage);
 
 		if self.Soundtrack == nil then
+			modAudio.Preload(stageLib.Soundtrack, 5);
 			self.Soundtrack = modAudio.Play(stageLib.Soundtrack, script.Parent);
-			self.Soundtrack.Volume = 0;
+			if self.Soundtrack then
+				self.Soundtrack.Volume = 0;
+			end
 		end
 
 		local labelsList = self.MainFrame.Labels;
@@ -48,6 +51,7 @@ return function(...)
 			timeLimitLabel.TextColor3 = timeLeft <= 0 and Color3.fromRGB(144, 70, 70) or Color3.fromRGB(255,255,255);
 
 			if math.fmod(timeLeft, 60) == 0 then
+				modAudio.Preload("Sonar", 5);
 				modAudio.Play("Sonar", script.Parent);
 			end
 		end

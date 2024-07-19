@@ -52,26 +52,37 @@ return function(...)
 		waveTag.Text = data.Wave or 1;
 
 		if data.PlayWaveStart == true then
+			local soundName = stageLib.WaveStartTrack;
+			
 			if typeof(stageLib.WaveStartTrack) == "table" then
-				modAudio.Play(stageLib.WaveStartTrack[math.random(1, #stageLib.WaveStartTrack)], script.Parent);
-			else
-				modAudio.Play(stageLib.WaveStartTrack, script.Parent);
+				soundName = stageLib.WaveStartTrack[math.random(1, #stageLib.WaveStartTrack)];
 			end
+
+			modAudio.Preload(soundName, 5);
+			modAudio.Play(soundName, script.Parent);
 		end
 		if data.PlayWaveEnd == true then
+			local soundName = stageLib.WaveEndTrack;
+
 			if typeof(stageLib.WaveEndTrack) == "table" then
-				modAudio.Play(stageLib.WaveEndTrack[math.random(1, #stageLib.WaveEndTrack)], script.Parent);
-			else
-				modAudio.Play(stageLib.WaveEndTrack, script.Parent);
+				soundName = stageLib.WaveEndTrack[math.random(1, #stageLib.WaveEndTrack)]
 			end
+			
+			modAudio.Preload(soundName, 5);
+			modAudio.Play(soundName, script.Parent);
 		end
 		if data.SurvivalFailed == true then
+			local soundName = stageLib.SurvivalFailedTrack;
+
 			if typeof(stageLib.SurvivalFailedTrack) == "table" then
-				survivalFailTrack = modAudio.Play(stageLib.SurvivalFailedTrack[math.random(1, #stageLib.SurvivalFailedTrack)], script.Parent);
-			else
-				survivalFailTrack = modAudio.Play(stageLib.SurvivalFailedTrack, script.Parent);
+				soundName = stageLib.SurvivalFailedTrack[math.random(1, #stageLib.SurvivalFailedTrack)];
 			end
-			game.Debris:AddItem(survivalFailTrack, 60);
+			
+			modAudio.Preload(soundName, 5);
+			survivalFailTrack = modAudio.Play(soundName, script.Parent);
+			if survivalFailTrack then
+				game.Debris:AddItem(survivalFailTrack, 60);
+			end
 		else
 			if survivalFailTrack and game:IsAncestorOf(survivalFailTrack) then
 				local track = survivalFailTrack;
@@ -84,11 +95,13 @@ return function(...)
 			end
 		end
 		if data.BossKilled == true then
+			local bossKillTrack = stageLib.BossKilledTrack;
 			if typeof(stageLib.BossKilledTrack) == "table" then
-				modAudio.Play(stageLib.BossKilledTrack[math.random(1, #stageLib.BossKilledTrack)], script.Parent);
-			else
-				modAudio.Play(stageLib.BossKilledTrack, script.Parent);
+				bossKillTrack = stageLib.BossKilledTrack[math.random(1, #stageLib.BossKilledTrack)];
 			end
+
+			modAudio.Preload(bossKillTrack, 5);
+			modAudio.Play(bossKillTrack, script.Parent);
 		end
 
 		local statsBoard = data.StatsCount or data.Stats;

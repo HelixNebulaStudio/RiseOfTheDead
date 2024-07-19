@@ -27,8 +27,13 @@ return function()
 	
 	if modConfigurations.SpecialEvent.Halloween then
 		while wait(random:NextNumber(60, 180)) do
-			local sound = modAudio.Play("FarThunder"..random:NextInteger(1, 2));
-			sound.Volume = 0.6;
+			local soundName = "FarThunder"..random:NextInteger(1, 2);
+			
+			modAudio.Preload(soundName, 5);
+			local sound = modAudio.Play(soundName);
+			if sound then
+				sound.Volume = 0.6;
+			end
 			
 			spawn(function()
 				wait(random:NextNumber(0.2, 0.4));

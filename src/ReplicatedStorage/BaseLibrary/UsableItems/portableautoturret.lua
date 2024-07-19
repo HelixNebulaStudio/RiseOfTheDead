@@ -16,6 +16,7 @@ function UsablePreset:Use(storageItem)
 	
 	local storage = remoteOpenStorageRequest:InvokeServer(storageItem);
 	if storage and type(storage) == "table" then
+		modAudio.Preload("TorqueWrench", 5);
 		modAudio.Play("TorqueWrench");
 		
 		storage.Name = "AutoTurret";

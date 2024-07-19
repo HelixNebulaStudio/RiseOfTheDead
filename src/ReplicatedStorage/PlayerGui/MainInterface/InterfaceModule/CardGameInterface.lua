@@ -9,12 +9,13 @@ local UserInputService = game:GetService("UserInputService");
 local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = require(localPlayer:WaitForChild("DataModule"));
+
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modCardGame = require(game.ReplicatedStorage.Library.CardGame);
-local modAudio = require(game.ReplicatedStorage.Library:WaitForChild("Audio"));
+local modAudio = require(game.ReplicatedStorage.Library.Audio);
 
 local modRadialImage = require(game.ReplicatedStorage.Library.UI.RadialImage);
 local remoteCardGame = modRemotesManager:Get("CardGame");
@@ -737,6 +738,7 @@ function Interface.init(modInterface)
 				end
 				
 				if lobby.BroadcastMsg.SndId then
+					modAudio.Preload(lobby.BroadcastMsg.SndId, 5);
 					modAudio.Play(lobby.BroadcastMsg.SndId, nil, nil, false);
 				end
 				

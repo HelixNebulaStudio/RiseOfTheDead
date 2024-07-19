@@ -32,10 +32,14 @@ end)
 local wingsAnimation = animator:LoadAnimation(script:WaitForChild("Fly"));
 wingsAnimation:Play();
 
+modAudio.Preload("WingsCore", 5);
 local wingsCoreSound = modAudio.Play("WingsCore", rootPart);
 
 humanoid:GetAttributeChangedSignal("IsDead"):Connect(function()
 	if not humanoid:GetAttribute("IsDead") then return end;
 	wingsAnimation:Stop();
-	wingsCoreSound:Destroy();
+
+	if wingsCoreSound then
+		wingsCoreSound:Destroy();
+	end
 end)

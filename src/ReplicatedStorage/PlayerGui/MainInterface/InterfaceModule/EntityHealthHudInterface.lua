@@ -112,10 +112,12 @@ function Interface.init(modInterface)
 				if activeSndTracks[trackName] == nil or not activeSndTracks[trackName].IsPlaying then
 					modAudio.Preload(trackName, 5);
 					local sound = modAudio.Play(trackName, mainFrame);
-					sound.Volume = 0;
-					activeSndTracks[trackName] = sound;
-
-					TweenService:Create(sound, TweenInfo.new(6), {Volume=1;}):Play();
+					if sound then
+						sound.Volume = 0;
+						activeSndTracks[trackName] = sound;
+	
+						TweenService:Create(sound, TweenInfo.new(6), {Volume=1;}):Play();
+					end
 				end
 			end
 			

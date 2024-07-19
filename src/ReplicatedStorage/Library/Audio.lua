@@ -12,6 +12,7 @@ local moddedSelf = modModEngineService:GetModule(script.Name);
 
 local Library = {};
 local lazyLoader = modLazyLoader.new(script);
+lazyLoader.RequestLimit = 5;
 
 local proxySound = Instance.new("Sound");
 
@@ -44,6 +45,9 @@ if RunService:IsServer() then
 end
 if RunService:IsClient() then
 	lazyLoader:ConnectOnClientLoad(function(key: string, sound: Sound)
+		local audioInstance = Library[key];
+		if audioInstance then return end;
+
 		local new = sound:Clone();
 		new.Parent = script.ClientAudio;
 		Library[key] = new;

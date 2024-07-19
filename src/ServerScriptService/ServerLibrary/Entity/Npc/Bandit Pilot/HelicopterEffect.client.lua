@@ -35,12 +35,10 @@ end)
 
 local topRotorAnimation = animationController:LoadAnimation(script:WaitForChild("TopRotor"));
 topRotorAnimation:Play();
-local sound = modAudio.Play("HelicopterCore", rootPart);
+modAudio.Play("HelicopterCore", rootPart);
 
 wait(0.5)
-if RunService:IsStudio() then
-	sound.Volume = 0.1;
-end
+
 local function updateCollision(model)
 	if model:IsA("BasePart") then
 		model.CollisionGroup = "Default";

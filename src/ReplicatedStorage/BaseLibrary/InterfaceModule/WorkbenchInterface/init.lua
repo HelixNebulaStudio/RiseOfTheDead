@@ -626,10 +626,12 @@ function Interface.init(modInterface)
 end;
 
 function Interface.PlayUpgradeSound()
+	modAudio.Preload("StorageWeaponPickup", 5);
 	modAudio.Play("StorageWeaponPickup", nil, nil, false);
 end
 
 function Interface.PlayCollectSound()
+	modAudio.Preload("StorageItemPickup", 5);
 	modAudio.Play("StorageItemPickup", nil, nil, false);
 end
 

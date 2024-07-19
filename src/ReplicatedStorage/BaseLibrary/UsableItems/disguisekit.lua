@@ -9,7 +9,7 @@ local remoteOpenStorageRequest = remotes.Interactable.OpenStorageRequest;
 
 function UsablePreset:Use(storageItem)
 	local player = game.Players.LocalPlayer;
-	local modData = require(player:WaitForChild("DataModule"));
+	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 	
 	local modInterface = modData:GetInterfaceModule();
 	

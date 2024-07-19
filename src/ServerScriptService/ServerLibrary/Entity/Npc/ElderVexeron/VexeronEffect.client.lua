@@ -49,6 +49,7 @@ runLoop = RunService.Heartbeat:Connect(function()
 		nextGrowl = random:NextNumber(7, 20);
 		
 		if bossModel:GetAttribute("IsSnoozing") ~= true then
+			modAudio.Preload("VexeronGrowl", 5);
 			modAudio.Play("VexeronGrowl", rootPart).PlaybackSpeed = random:NextNumber(0.35, 0.4);
 		end
 	end

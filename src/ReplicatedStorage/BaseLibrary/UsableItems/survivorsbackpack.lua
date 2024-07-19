@@ -11,10 +11,11 @@ UsablePreset.PortableStorage = {StorageId="dufflebag"; Persistent=true; Size=5; 
 
 function UsablePreset:Use(storageItem)
 	local player = game.Players.LocalPlayer;
-	local modData = require(player:WaitForChild("DataModule"));
+	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 	
 	local storage = remoteOpenStorageRequest:InvokeServer(storageItem);
 	if storage and type(storage) == "table" then
+		modAudio.Preload("ZipOpen", 5);
 		modAudio.Play("ZipOpen");
 		
 		storage.Name = "Survivor's Backpack";

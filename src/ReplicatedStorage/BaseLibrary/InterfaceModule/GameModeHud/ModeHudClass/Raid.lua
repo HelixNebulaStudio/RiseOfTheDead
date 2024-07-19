@@ -36,8 +36,11 @@ return function(...)
 		statusTag.Text = data.Status or "";
 
 		if self.Soundtrack == nil then
+			modAudio.Preload(stageLib.Soundtrack, 5);
 			self.Soundtrack = modAudio.Play(stageLib.Soundtrack, script.Parent);
-			self.Soundtrack.Volume = 0;
+			if self.Soundtrack then
+				self.Soundtrack.Volume = 0;
+			end
 		end
 
 		if data.NextStageSound == true then

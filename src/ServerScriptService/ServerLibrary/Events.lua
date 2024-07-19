@@ -80,10 +80,10 @@ function Events.new(player)
 	eventsMeta.Sync = function(self, action, data)
 		if RunService:IsStudio() then
 			if action == "syncevent" then
-				Debugger:Warn("[Studio] Profile Sync Event: ", data.Id, "(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")");
+				Debugger:StudioLog("Profile Sync Event: ", data.Id, "(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")");
 				
 			elseif action == "destroyevent" then
-				Debugger:Warn("[Studio] Profile Destroy Event: ", data, "(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")");
+				Debugger:StudioLog("Profile Destroy Event: ", data, "(",modRemotesManager.PacketSizeCounter.GetPacketSize{PacketData={data};},")");
 				
 			end
 		end

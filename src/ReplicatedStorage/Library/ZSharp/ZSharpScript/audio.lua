@@ -31,7 +31,9 @@ function ZSharp.Load(zSS, zEnv)
 	setmetatable(Audio, AudioMeta);
 	
 	function Audio:Play(soundName: string)
-		local sound = modAudio.Play(soundName, workspace); 
+		modAudio.Preload(soundName, 2);
+		local sound = modAudio.Play(soundName, workspace);
+		if sound == nil then return nil end;
 		local newZSound = zEnv.new("Sound", sound);
 		return newZSound;
 	end
