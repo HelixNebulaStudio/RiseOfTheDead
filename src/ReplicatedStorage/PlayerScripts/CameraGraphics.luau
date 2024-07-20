@@ -403,10 +403,10 @@ function CameraClass:Init()
 			sunRays.Enabled = modData:GetSetting("FilterSunRays") ~= 1;
 		end
 
-		if modData:GetSetting("GlobalShadows") == nil then
-			game.Lighting.GlobalShadows = true;
-		else
+		if modData:GetSetting("GlobalShadows") == 1 then
 			game.Lighting.GlobalShadows = false;
+		else
+			game.Lighting.GlobalShadows = true;
 		end
 
 		if modData:GetSetting("LessDetail") == 1 then

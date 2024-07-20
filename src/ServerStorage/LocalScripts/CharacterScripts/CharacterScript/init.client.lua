@@ -1205,7 +1205,7 @@ local function renderStepped(camera, deltaTime)
 
 	local defaultSensitivity = mouseProperties.DefaultSensitivity;
 	if modData:IsMobile() then
-		defaultSensitivity = defaultSensitivity * 1.5;
+		defaultSensitivity = defaultSensitivity * 2;
 	end
 
 	local zoomSensitivityDiff = camera.FieldOfView / characterProperties.BaseFieldOfView;

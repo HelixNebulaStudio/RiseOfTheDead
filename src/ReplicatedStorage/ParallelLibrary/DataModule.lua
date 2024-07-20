@@ -27,6 +27,7 @@ function Data:GetSetting(key)
 			["BloodParticle"] = (Data:IsMobile() and 1 or 0);
 			["MotionStepBuffer"] = (Data:IsMobile() and 3 or 1);
 			["TextureStepBuffer"] = (Data:IsMobile() and 7 or 2);
+			["GlobalShadows"] = (Data:IsMobile() and 1 or 0);
 		};
 	end
 
