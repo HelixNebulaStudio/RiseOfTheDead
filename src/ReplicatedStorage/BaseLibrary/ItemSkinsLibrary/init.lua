@@ -109,8 +109,8 @@ function ItemSkinsLibrary:Init(super)
         Patterns={
             {Id="v1"; Name="Variant 1"; Image="rbxassetid://5065061974"; };
             {Id="v2"; Name="Variant 2"; Image="rbxassetid://5065128803"; };
-            {Id="v2"; Name="Variant 3"; Image="rbxassetid://5065128031"; };
-            {Id="v2"; Name="Variant 4"; Image="rbxassetid://5065127222"; };
+            {Id="v3"; Name="Variant 3"; Image="rbxassetid://5065128031"; };
+            {Id="v4"; Name="Variant 4"; Image="rbxassetid://5065127222"; };
         };
     };
 
