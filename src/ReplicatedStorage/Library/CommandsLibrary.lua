@@ -4281,12 +4281,11 @@ Commands["searchaudio"] = {
 		
 		local audioList = {};
 		
-		for _, sound in pairs(game.ReplicatedStorage.Library.Audio:GetChildren()) do
-			if string.lower(sound.Name):match(searchtag) then
-				table.insert(audioList, sound.Name);
+		for soundName, sound in pairs(modAudio.Library) do
+			if string.lower(soundName):match(searchtag) then
+				table.insert(audioList, soundName);
 			end
 		end
-		
 
 		shared.Notify(player, "Searching for audio matching (".. searchtag ..")", "Inform");
 		for a=1, #audioList do
@@ -4309,7 +4308,7 @@ Commands["playaudio"] = {
 
 		local classPlayer = modPlayers.Get(player);
 		
-		if game.ReplicatedStorage.Library.Audio:FindFirstChild(trackName) then
+		if modAudio.Get(trackName) then
 			for _, obj in pairs(classPlayer.Head:GetChildren()) do
 				if obj:IsA("Sound") and obj.Name == "cmdSndTrack" then
 					Debugger.Expire(obj, 0);

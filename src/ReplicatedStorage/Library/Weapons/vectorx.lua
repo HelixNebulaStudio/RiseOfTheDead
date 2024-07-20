@@ -89,6 +89,9 @@ local Animations=workspace:GetAttribute("IsDev") and {
 local Audio={
 	PrimaryFire={Id=8527857141; Pitch=1; Volume=0.5;};
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
+	LightMagUnload={Id="LightMagUnload"; Preload=true;};
+	MagPrepare={Id="MagPrepare"; Preload=true;};
+	LightMagLoad={Id="LightMagLoad"; Preload=true;};
 };
 
 Configurations.ItemId = script.Name;

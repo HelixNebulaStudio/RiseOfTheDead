@@ -94,6 +94,8 @@ local Audio={
 	Load={Id=169799883; Pitch=1.2; Volume=0.4;};
 	PrimaryFire={Id=7105581785; Pitch=1; Volume=1;};
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
+	BRSlidePull={Id="BRSlidePull"; Preload=true;};
+	BRSlideRelease={Id="BRSlideRelease"; Preload=true;};
 }
 
 Configurations.ItemId = script.Name;

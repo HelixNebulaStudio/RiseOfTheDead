@@ -27,14 +27,17 @@ function AddWeapon(data)
 	totalWeapons = totalWeapons +1;
 	
 	local newToolModule = packet.NewToolLib();
+	packet.PreloadAudio = newToolModule.PreloadAudio;
+
 	for soundType, audioProperties in pairs(newToolModule.Audio or data.Audio or {}) do
-		local audioId = audioProperties.Id;
-		local soundFile = game.ReplicatedStorage.Library.Audio:FindFirstChild(tostring(audioId));
-		if soundFile then
-			modAudio.Library[audioId] = soundFile;
-		else
-			if modAudio.Library[audioId] == nil then
-				soundFile = Instance.new("Sound", script);
+		if audioProperties.Preload == true then continue end;
+		local audioId = tostring(audioProperties.Id);
+		audioProperties.Id = audioId;
+		
+		local soundFile = modAudio.Get(audioId);
+		if soundFile == nil then
+			if game:GetService("RunService"):IsServer() then
+				soundFile = Instance.new("Sound");
 				soundFile.Name = audioId;
 				soundFile.SoundId = "rbxassetid://"..audioId;
 				soundFile.PlaybackSpeed = audioProperties.Pitch;
@@ -49,13 +52,16 @@ function AddWeapon(data)
 				end
 				soundFile.SoundGroup = game.SoundService.WeaponEffects;
 				soundFile.Volume = audioProperties.Volume ~= nil and audioProperties.Volume or 0.5;
-
+				soundFile.Parent = modAudio.ServerAudio;
+	
 				if modAudio.ModdedSelf then
 					modAudio.ModdedSelf.OnWeaponAudioLoad(soundType, audioProperties, soundFile);
 				end
 				modAudio.Library[audioId] = soundFile;
+
 			end
 		end
+		
 	end
 end
 

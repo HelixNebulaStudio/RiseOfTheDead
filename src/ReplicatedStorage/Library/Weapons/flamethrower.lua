@@ -140,6 +140,14 @@ local Audio={
 	PrimaryFire={Id=260131485; Pitch=1; Volume=1; Looped=true;};
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
 	--Reload={Id=6291966821; Pitch=1; Volume=0.6;};
+	SafetyFlip={Id="SafetyFlip"; Preload=true;};
+	OpenMagTop2={Id="OpenMagTop2"; Preload=true;};
+	FlamethrowerMagOut={Id="FlamethrowerMagOut"; Preload=true;};
+	FlamethrowerMagOut2={Id="FlamethrowerMagOut2"; Preload=true;};
+	FlamethrowerGas={Id="FlamethrowerGas"; Preload=true;};
+	FlamethrowerMagIn1={Id="FlamethrowerMagIn1"; Preload=true;};
+	FlamethrowerMagIn2={Id="FlamethrowerMagIn2"; Preload=true;};
+	CloseMagTop={Id="CloseMagTop"; Preload=true;};
 }
 
 Configurations.ItemId = script.Name;

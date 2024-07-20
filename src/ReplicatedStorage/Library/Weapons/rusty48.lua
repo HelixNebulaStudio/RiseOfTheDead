@@ -108,6 +108,9 @@ local Audio={
 	Load={Id=169799883; Pitch=1.3; Volume=0.4;};
 	PrimaryFire={Id=10400758719; Pitch=1; Volume=1;};
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
+	ShotgunHandle={Id="ShotgunHandle"; Preload=true;};
+	ShotgunPump2={Id="ShotgunPump2"; Preload=true;};
+	LoadShotgunShell={Id="LoadShotgunShell"; Preload=true;};
 }
 
 Configurations.ItemId = script.Name;

@@ -149,6 +149,10 @@ function WeaponHandler:Equip(library, weaponId)
 	local animations = modWeaponModule.Animations or library.Animations;
 	local audio = modWeaponModule.Audio or library.Audio;
 
+	for k, audioData in pairs(audio) do
+		modAudio.Preload(audioData.Id);
+	end
+
 	properties.CanPrimaryFire = false;
 	
 	local objects = {};
@@ -1894,7 +1898,7 @@ function WeaponHandler:Equip(library, weaponId)
 		end
 		
 		track:GetMarkerReachedSignal("PlaySound"):Connect(function(paramString)
-			--print(key," Animation PlaySound Marker:",paramString)
+			modAudio.Preload(paramString, 2);
 			playWeaponSound(paramString);
 		end)
 		

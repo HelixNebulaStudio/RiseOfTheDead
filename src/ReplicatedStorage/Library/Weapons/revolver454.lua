@@ -101,6 +101,10 @@ local Audio={
 	Load={Id=169799883; Pitch=1.5; Volume=0.4;};
 	PrimaryFire={Id=1943677171; Pitch=0.6; Volume=1;};
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
+	RevolverEjectBullets={Id="RevolverEjectBullets"; Preload=true;};
+	RevolverBulletInsert={Id="RevolverBulletInsert"; Preload=true;};
+	RevolverCloseChamber={Id="RevolverCloseChamber"; Preload=true;};
+	RevolverSpinChamber={Id="RevolverSpinChamber"; Preload=true;};
 }
 
 Configurations.ItemId = script.Name;

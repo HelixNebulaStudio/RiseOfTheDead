@@ -9,12 +9,15 @@ metaTools.__index = metaTools;
 metaTools.Modules = {};
 
 local Tools = {};
+setmetatable(Tools, metaTools);
 
 function metaTools:LoadToolLib(itemId)
-	if itemId and Tools.Modules[itemId] == nil then
-		Tools.Modules[itemId] = Tools[itemId].NewToolLib();
+	local toolModules = Tools.Modules;
+
+	if itemId and toolModules[itemId] == nil then
+		toolModules[itemId] = Tools[itemId].NewToolLib();
 	end
-	return Tools.Modules[itemId];
+	return toolModules[itemId];
 end
 
 function AddTool(data)
@@ -45,14 +48,15 @@ function AddTool(data)
 	
 	if data.Audio then
 		for soundType, audioProperties in pairs(data.Audio) do
-			local audioId = audioProperties.Id;
-			local soundFile = game.ReplicatedStorage.Library.Audio:FindFirstChild(tostring(audioId));
-			if soundFile then
-				modAudio.Library[audioId] = soundFile;
-				
-			else
-				if modAudio.Library[audioId] == nil then
-					soundFile = Instance.new("Sound", script);
+			if audioProperties.Preload == true then continue end;
+			
+			local audioId = tostring(audioProperties.Id);
+			audioProperties.Id = audioId;
+	
+			local soundFile = modAudio.Get(audioId);
+			if soundFile == nil then
+				if game:GetService("RunService"):IsServer() then
+					soundFile = Instance.new("Sound");
 					soundFile.Name = audioId;
 					soundFile.SoundId = "rbxassetid://"..audioId;
 					soundFile.PlaybackSpeed = audioProperties.Pitch;
@@ -66,13 +70,16 @@ function AddTool(data)
 					end
 					soundFile.SoundGroup = game.SoundService.WeaponEffects;
 					soundFile.Volume = audioProperties.Volume ~= nil and audioProperties.Volume or 0.5;
+					soundFile.Parent = modAudio.ServerAudio;
 
 					if modAudio.ModdedSelf then
 						modAudio.ModdedSelf.OnWeaponAudioLoad(soundType, audioProperties, soundFile);
 					end
 					modAudio.Library[audioId] = soundFile;
+
 				end
 			end
+
 		end
 	end
 end
@@ -788,13 +795,14 @@ function metaTools:LoadToolModule(module)
 	
 	if toolPackage.Audio then
 		for soundType, audioProperties in pairs(toolPackage.Audio) do
-			local audioId = audioProperties.Id;
-			local soundFile = game.ReplicatedStorage.Library.Audio:FindFirstChild(tostring(audioId));
-			if soundFile then
-				modAudio.Library[audioId] = soundFile;
+			if audioProperties.Preload == true then continue end;
 
-			else
-				if modAudio.Library[audioId] == nil then
+			local audioId = tostring(audioProperties.Id);
+			audioProperties.Id = audioId;
+	
+			local soundFile = modAudio.Get(audioId);
+			if soundFile == nil then
+				if game:GetService("RunService"):IsServer() then
 					soundFile = Instance.new("Sound", script);
 					soundFile.Name = audioId;
 					soundFile.SoundId = "rbxassetid://"..audioId;
@@ -809,20 +817,21 @@ function metaTools:LoadToolModule(module)
 					end
 					soundFile.SoundGroup = game.SoundService.WeaponEffects;
 					soundFile.Volume = audioProperties.Volume ~= nil and audioProperties.Volume or 0.5;
+					soundFile.Parent = modAudio.ServerAudio;
 
 					if modAudio.ModdedSelf then
 						modAudio.ModdedSelf.OnWeaponAudioLoad(soundType, audioProperties, soundFile);
 					end
 					modAudio.Library[audioId] = soundFile;
+
 				end
 			end
+
 		end
 	end
 	
 	Tools[itemId] = toolPackage;
 end
-
-setmetatable(Tools, metaTools);
 
 for _, m in pairs(script:GetChildren()) do
 	if m.Name == "Template" then continue end;

@@ -65,12 +65,12 @@ if RunService:IsServer() then
 
                 if debounceTable.Rate <= 0 then
                     isDebounced = true;
+                    Debugger:StudioLog("Request rate limited", player, lazyLoader.Script, key);
                 end
             end
         end
 
         if isDebounced then 
-            Debugger:StudioLog("Request debounced", player, lazyLoader.Script, key);
             return;
         end;
 

@@ -82,6 +82,10 @@ local Audio={
 	Load={Id=169799883; Pitch=1.2; Volume=0.4;};
 	PrimaryFire={Id=2920959; Pitch=1; Volume=1;};
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
+	LightSlidePull={Id="LightSlidePull"; Preload=true;};
+	LightSlideRelease={Id="LightSlideRelease"; Preload=true;};
+	LightMagLoad={Id="LightMagLoad"; Preload=true;};
+	LightMagUnload={Id="LightMagUnload"; Preload=true;};
 };
 
 Configurations.ItemId = script.Name;

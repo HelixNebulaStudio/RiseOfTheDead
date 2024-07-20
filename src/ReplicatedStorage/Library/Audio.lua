@@ -12,13 +12,14 @@ local moddedSelf = modModEngineService:GetModule(script.Name);
 
 local Library = {};
 local lazyLoader = modLazyLoader.new(script);
-lazyLoader.RequestLimit = 5;
+lazyLoader.RequestLimit = 20;
 
 local proxySound = Instance.new("Sound");
+local serverAudio;
 
 --==
 if RunService:IsServer() then
-	local serverAudio = script:WaitForChild("ServerAudio");
+	serverAudio = script:WaitForChild("ServerAudio");
 
 	if serverAudio then
 		local soundFiles = serverAudio:GetChildren();
@@ -33,6 +34,7 @@ if RunService:IsServer() then
 	end
 
 	lazyLoader:ConnectOnServerRequested(function(player, key)
+		key = tostring(key);
 		local audioInstance = Library[key];
 		if audioInstance == nil then return end;
 
@@ -45,6 +47,7 @@ if RunService:IsServer() then
 end
 if RunService:IsClient() then
 	lazyLoader:ConnectOnClientLoad(function(key: string, sound: Sound)
+		key = tostring(key);
 		local audioInstance = Library[key];
 		if audioInstance then return end;
 
@@ -61,6 +64,7 @@ end
 
 
 function Get(id)
+	id = tostring(id);
 	local audioInstance = Library[id];
 	if audioInstance ~= nil then
 		return audioInstance;
@@ -124,6 +128,12 @@ end
 function PlayReplicated(id, parent, looped, pitch, volume)
 	if RunService:IsServer() then error("Audio>>  Failed to play audio from server. Use Play() instead."); return end;
 	local audioInstance = Library[id];
+	
+	if audioInstance == nil then
+		Debugger:Warn("Audio missing (",id,").");
+		lazyLoader:Request(id);
+	end
+
 	if audioInstance ~= nil then
 		if parent == nil then
 			SoundService:PlayLocalSound(audioInstance);
@@ -145,7 +155,7 @@ end
 
 function Load(child, soundGroupName)
 	if child:IsA("Sound") then 
-		warn("Importing new audio file(",child,").");
+		Debugger:StudioLog("Importing audio file(",child,").");
 		child.Parent = script;
 		
 		soundGroupName = soundGroupName or child:GetAttribute("SoundGroupId");
@@ -166,6 +176,8 @@ end
 
 function Preload(key, yield)
 	if RunService:IsServer() then return end;
+	key = tostring(key);
+
 	local audioInstance = Library[key];
 	if audioInstance then return end;
 	
@@ -175,7 +187,7 @@ function Preload(key, yield)
 
 	for a=0, 5, 1/60 do
 		task.wait(1/60);
-		local audioInstance = Library[key];
+		audioInstance = Library[key];
 		if audioInstance then break; end
 	end
 end
@@ -190,5 +202,7 @@ return {
 	Library = Library;
 	Load = Load;
 	ModdedSelf = moddedSelf;
+
 	Script = script;
+	ServerAudio = serverAudio;
 };
