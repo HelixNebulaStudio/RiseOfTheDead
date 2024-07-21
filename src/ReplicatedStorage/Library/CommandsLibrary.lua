@@ -1807,15 +1807,15 @@ Commands["travel"] = {
 
 Commands["time"] = {
 	Permission = PermissionLevel.DevBranch;
-	Description = "Offsets time by x seconds.";
-	
-	RequiredArgs = 0;
-	UsageInfo = [[/time [set/offset] [seconds]
+	Description = [[Offsets time by x seconds.
 
 		/time set (0-1200)  -- set and freeze time to a number from 0 - 1200. 
 		/time offset [number]	-- offset current time.
 		/time setdaynightcycle [number]  -- set the cycle length in seconds [60, inf].
 	]];
+	
+	RequiredArgs = 0;
+	UsageInfo = "/time [set/offset] [seconds]";
 	Function = function(speaker, args)
 		local action = args[1];
 		local seconds = tonumber(args[2]);

@@ -515,6 +515,20 @@ GameModeLibrary.GameModes={
 				Soundtrack="Soundtrack:Drowning World";
 
 			};
+
+			["CargoShip"]={
+				WorldId="CargoShip";
+				ExitSpawn="sewersToharbor";
+				TitleImage="rbxassetid://18589491051";
+				Description="Let's just make sure everything goes well..";
+
+				MaxPlayers=4;
+				RewardsId="sunkenchest";
+				RewardsIds={"sunkenchest";};
+
+				Soundtrack="Soundtrack:Kingdom2Dirge";
+				Disabled=true;
+			};
 		};
 	};
 };
