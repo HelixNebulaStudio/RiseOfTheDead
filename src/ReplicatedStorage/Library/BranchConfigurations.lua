@@ -609,7 +609,7 @@ elseif Branches.WorldName == "Safehome" then
 elseif Branches.WorldName == "SunkenShip" or Branches.WorldName == "CargoShip" then
 	local skyPhaseColors = modConfigurations.SkyPhaseColor;
 
-	skyPhaseColors.Night = Color3.fromRGB(32, 33, 40);
+	skyPhaseColors.Night = Color3.fromRGB(45, 48, 70);
 	
 end
 

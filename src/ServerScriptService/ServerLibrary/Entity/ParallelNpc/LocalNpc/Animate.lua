@@ -102,6 +102,9 @@ function Animate.new(parallelNpc)
 			if self.IsClimbing then
 				self.AnimationController.MovementState = "Climbing";
 			end
+			if humanoid:GetAttribute("RigAttached") == true then
+				self.AnimationController.MovementState = "Idle";
+			end
 
 		else
 			self.AnimationController.MovementState = "Idle";
@@ -151,7 +154,9 @@ function Animate.new(parallelNpc)
 
 		while self.CurrentSpeed > 0 do
 			task.wait(1);
-			if modRegion:InRegion(rootPart.AssemblyLinearVelocity, Vector3.zero, 1) then
+
+			local isNotMoving = rootPart.AssemblyLinearVelocity.Magnitude <= 0.2;
+			if isNotMoving then
 				movementUpdate(0);
 				self.CurrentSpeed = 0;
 				break;

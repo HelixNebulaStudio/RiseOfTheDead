@@ -468,6 +468,33 @@ function NpcComponent:TeleportHide()
 	end
 end
 
+function NpcComponent:Attach(att: Attachment)
+	local rootRigAtt = self.RootPart.RootRigAttachment;
+
+	if att == nil then
+		for _, obj in pairs(self.RootPart:GetChildren()) do
+			if obj.Name == "RigAttach" then
+				obj:Destroy();
+			end
+		end
+		self.Humanoid:SetAttribute("RigAttached", nil);
+
+	else
+		local alignPosition = self.RootPart:FindFirstChild("RigAttach");
+		if alignPosition == nil then
+			alignPosition = Instance.new("AlignPosition");
+			alignPosition.Name = "RigAttach";
+			alignPosition.RigidityEnabled = true;
+			alignPosition.Parent = self.RootPart;
+			alignPosition.Attachment0 = rootRigAtt;
+
+		end
+
+		alignPosition.Attachment1 = att;
+		self.Humanoid:SetAttribute("RigAttached", true);
+	end
+end
+
 function NpcComponent:GetHealth(valueType: string, bodyPart: BasePart)
 	if bodyPart and self.CustomHealthbar then
 		local healthObj = self.CustomHealthbar:GetFromPart(bodyPart);

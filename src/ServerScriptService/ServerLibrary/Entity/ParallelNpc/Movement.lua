@@ -91,7 +91,9 @@ function Movement.new(parallelNpc)
 
 		posA = Vector3.new(posA.X, 0, posA.Z);
 		posB = Vector3.new(posB.X, 0, posB.Z);
-		return modRegion:InRegion(posA, posB, range);
+		
+		return (posA-posB).Magnitude <= range;
+		--return modRegion:InRegion(posA, posB, range);
 	end
 	
 	local function getRootPos()
