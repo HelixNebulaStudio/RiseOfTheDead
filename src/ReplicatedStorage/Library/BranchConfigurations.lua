@@ -169,7 +169,7 @@ Branches.WorldTypes = {
 local isMainBranch = Branches.CurrentBranch.Name == "Live";
 Branches.WorldLibrary = {
 	MainMenu={CanTravelTo=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.Menu; MaxPlayers=25;};
-	BioXResearch={CanTravelTo=true; PrivateWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=10; DevsOnly=isMainBranch}; -- PublicWorld=true;
+	BioXResearch={CanTravelTo=true; PrivateWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=10; DevsOnly=isMainBranch;}; -- PublicWorld=true;
 	
 	-- Cutscene;
 	TheBeginning={CanTravelTo=false; Type=Branches.WorldTypes.Cutscene; MaxPlayers=1;};
@@ -208,7 +208,7 @@ Branches.WorldLibrary = {
 	-- Coop;
 	Genesis={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
 	SunkenShip={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
-	CargoShip={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	CargoShip={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; WeatherCycle=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
 
 	--== Events;
 	EasterButchery={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=1;};
@@ -605,6 +605,11 @@ if Branches.WorldName == "BioXResearch" then
 elseif Branches.WorldName == "Safehome" then
 	modConfigurations.Set("DisableSafehomeMenu", false);
 	modConfigurations.Set("DisableMapItems", false);
+	
+elseif Branches.WorldName == "SunkenShip" or Branches.WorldName == "CargoShip" then
+	local skyPhaseColors = modConfigurations.SkyPhaseColor;
+
+	skyPhaseColors.Night = Color3.fromRGB(32, 33, 40);
 	
 end
 

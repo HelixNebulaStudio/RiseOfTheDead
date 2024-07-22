@@ -134,14 +134,7 @@ for _, obj in pairs(workspace:GetChildren()) do
 	end
 end
 
-
-local dawnStartColor = Color3.fromRGB(58, 25, 31);
-local dawnPeakColor = Color3.fromRGB(104, 30, 52);
-local dawnEndColor = Color3.fromRGB(154, 105, 124);
-
-local duskStartColor = Color3.fromRGB(166, 157, 153);
-local duskPeakColor = Color3.fromRGB(121, 69, 31);
-local duskEndColor = Color3.fromRGB(74, 60, 47);
+local skyPhaseColors = modConfigurations.SkyPhaseColor;
 
 local lastWeatherEvent = tick();
 modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
@@ -168,57 +161,61 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 		if hourClock <= 0.1 then
 			Lighting.ClockTime = hourClock;
 		end
-		
-		local newOutDoorAmbient = LightingConfigurations.NightOutdoorAmbient:Lerp(LightingConfigurations.DayOutdoorAmbient, range);
-		local newFogColor = Color3.fromRGB(0, 0, 0):Lerp(Color3.fromRGB(255, 255, 255), range);
+
+		local newOutDoorAmbient = skyPhaseColors.Night; --:Lerp(LightingConfigurations.DayOutdoorAmbient, range);
+		local newFogColor = Color3.fromRGB(255, 255, 255);
 
 		if Lighting.ClockTime >= 18 then
 			local a = modMath.MapNum(Lighting.ClockTime, 18, 18.6, 0, 1, true);
-			newOutDoorAmbient = duskEndColor:Lerp(newOutDoorAmbient, a);
+			newOutDoorAmbient = skyPhaseColors.DuskEnd:Lerp(skyPhaseColors.Night, a);
 			newFogColor = newOutDoorAmbient;
 			Lighting:SetAttribute("DuskDawnPeak", 0.5-(a/2));
 
 		elseif Lighting.ClockTime >= 17.6 then
 			local a = modMath.MapNum(Lighting.ClockTime, 17.6, 18, 0, 1, true);
-			newOutDoorAmbient = duskPeakColor:Lerp(duskEndColor, a);
+			newOutDoorAmbient = skyPhaseColors.DuskPeak:Lerp(skyPhaseColors.DuskEnd, a);
 			newFogColor = newOutDoorAmbient;
 			Lighting:SetAttribute("DuskDawnPeak", 1-(a/2));
 
 		elseif Lighting.ClockTime >= 17.2 then
 			local a = modMath.MapNum(Lighting.ClockTime, 17.2, 17.6, 0, 1, true);
-			newOutDoorAmbient = duskStartColor:Lerp(duskPeakColor, a);
+			newOutDoorAmbient = skyPhaseColors.DuskStart:Lerp(skyPhaseColors.DuskPeak, a);
 			newFogColor = newOutDoorAmbient;
 			Lighting:SetAttribute("DuskDawnPeak", 0.5+(a/2));
 
 		elseif Lighting.ClockTime >= 16.6 then
 			local a = modMath.MapNum(Lighting.ClockTime, 16.6, 17.2, 0, 1, true);
-			newOutDoorAmbient = newOutDoorAmbient:Lerp(duskStartColor, a);
+			newOutDoorAmbient = skyPhaseColors.Day:Lerp(skyPhaseColors.DuskStart, a);
 			newFogColor = newOutDoorAmbient;
 			Lighting:SetAttribute("DuskDawnPeak", a/2);
 
 		elseif Lighting.ClockTime >= 6.8 then
 			local a = modMath.MapNum(Lighting.ClockTime, 6.8, 7.4, 0, 1, true);
-			newOutDoorAmbient = dawnEndColor:Lerp(newOutDoorAmbient, a);
+			newOutDoorAmbient = skyPhaseColors.DawnEnd:Lerp(skyPhaseColors.Day, a);
 			newFogColor = newOutDoorAmbient;
 			Lighting:SetAttribute("DuskDawnPeak", 0.5-(a/2));
 
 		elseif Lighting.ClockTime >= 6.4 then
 			local a = modMath.MapNum(Lighting.ClockTime, 6.4, 6.8, 0, 1, true);
-			newOutDoorAmbient = dawnPeakColor:Lerp(dawnEndColor, a);
+			newOutDoorAmbient = skyPhaseColors.DawnPeak:Lerp(skyPhaseColors.DawnEnd, a);
 			newFogColor = newOutDoorAmbient;
 			Lighting:SetAttribute("DuskDawnPeak", 1-(a/2));
 
 		elseif Lighting.ClockTime >= 6 then
 			local a = modMath.MapNum(Lighting.ClockTime, 6, 6.4, 0, 1, true);
-			newOutDoorAmbient = dawnStartColor:Lerp(dawnPeakColor, a);
+			newOutDoorAmbient = skyPhaseColors.DawnStart:Lerp(skyPhaseColors.DawnPeak, a);
 			newFogColor = newOutDoorAmbient;
 			Lighting:SetAttribute("DuskDawnPeak", 0.5+(a/2));
 
 		elseif Lighting.ClockTime >= 5.4 then
 			local a = modMath.MapNum(Lighting.ClockTime, 5.4, 6, 0, 1, true);
-			newOutDoorAmbient = newOutDoorAmbient:Lerp(dawnStartColor, a);
+			newOutDoorAmbient = skyPhaseColors.Night:Lerp(skyPhaseColors.DawnStart, a);
 			newFogColor = newOutDoorAmbient;
 			Lighting:SetAttribute("DuskDawnPeak", a/2);
+
+		else
+			newOutDoorAmbient = skyPhaseColors.Night;
+			newFogColor = newOutDoorAmbient;
 
 		end
 		

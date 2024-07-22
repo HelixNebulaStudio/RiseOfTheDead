@@ -67,7 +67,6 @@ Configurations.Set("VelocityTriggerRagdoll", false);
 Configurations.Set("DisableMapItems", true);
 Configurations.Set("DisableHurtInterface", false);
 
-
 Configurations.Set("IgnoreModCompatibility", false);
 
 --== Server;
@@ -99,6 +98,20 @@ Configurations.Set("ExpireDeployables", false);
 Configurations.Set("NpcThinkCycle", 15);
 Configurations.Set("WithererSpawnLogic", false);
 Configurations.Set("NaturalSpawnLimit", 999);
+
+Configurations.Set("SkyPhaseColor", {
+	Night = Color3.fromRGB(25, 28, 34);
+
+	DawnStart = Color3.fromRGB(58, 25, 31);
+	DawnPeak = Color3.fromRGB(104, 30, 52);
+	DawnEnd = Color3.fromRGB(154, 105, 124);
+
+	Day = Color3.fromRGB(223, 234, 240);
+
+	DuskStart = Color3.fromRGB(166, 157, 153);
+	DuskPeak = Color3.fromRGB(121, 69, 31);
+	DuskEnd = Color3.fromRGB(77, 50, 38);
+});
 
 --== Events;
 local Months = {"January"; "Feburary"; "March"; "April"; "May"; "June"; "July"; "August"; "September"; "October"; "November"; "December";};
