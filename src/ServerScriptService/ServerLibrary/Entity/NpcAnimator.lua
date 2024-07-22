@@ -217,6 +217,9 @@ return function(self)
 			if self.IsClimbing then
 				self.AnimationController.MovementState = "Climbing";
 			end
+			if self.Humanoid:GetAttribute("RigAttached") == true then
+				self.AnimationController.MovementState = "Idle";
+			end
 
 		else
 			self.AnimationController.MovementState = "Idle";
@@ -268,7 +271,7 @@ return function(self)
 
 		while self.CurrentSpeed > 0 do
 			task.wait(1);
-			if self.RootPart == nil or modRegion:InRegion(self.RootPart.AssemblyLinearVelocity, Vector3.zero, 1) then
+			if self.RootPart == nil or self.RootPart.AssemblyLinearVelocity.Magnitude <= 0.2 then
 				movementUpdate(0);
 				self.CurrentSpeed = 0;
 				break;
