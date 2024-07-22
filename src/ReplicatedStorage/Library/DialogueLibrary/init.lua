@@ -91,7 +91,6 @@ function DialogueLibrary.GetByTag(name, tag)
 end
 
 function DialogueLibrary.GetDialogues(name)
-	Debugger:Log("GetDialogues", DialogueLibrary[name])
 	return DialogueLibrary[name];
 end
 
@@ -100,34 +99,6 @@ for _, mod in pairs(script:GetChildren()) do
 	if dialogueModules[mod.Name] then error("DialogueLibrary>>  Npc ("..mod.Name..") already exist."); end;
 	dialogueModules[mod.Name] = mod;
 end
-
---function DialogueLibrary.Get(name, indexes, initialOverwrite)
---	local CharacterDialogues = DialogueLibrary[name];
---	if CharacterDialogues then
---		local dialogueTable = {};
---		dialogueTable.Initial = (initialOverwrite and {initialOverwrite}) or CharacterDialogues.Initial;
-
---		if initialOverwrite and type(initialOverwrite) == "number" then
---			if CharacterDialogues.Dialogues[initialOverwrite] then
---				local dialogueData = CharacterDialogues.Dialogues[initialOverwrite];
-
---				dialogueTable.Initial = {dialogueData.Reply};
---				dialogueTable.AskMe = dialogueData.AskMe;
---			end
---		end
---		if indexes then
---			for a=1, #indexes do
---				local i = indexes[a];
---				if dialogueTable.DialogueTree == nil then dialogueTable.DialogueTree = {}; end;
---				if hidden[name] == nil or hidden[name][i] == nil or tick() > hidden[name][i] then
---					table.insert(dialogueTable.DialogueTree, CharacterDialogues.Dialogues[i]);
---				end
---			end
---		end
-
---		return dialogueTable;
---	end
---end
 
 local modModEngineService = require(game.ReplicatedStorage.Library.ModEngineService);
 local moddedSelf = modModEngineService:GetModule(script.Name);

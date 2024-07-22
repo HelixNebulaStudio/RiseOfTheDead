@@ -31,6 +31,7 @@ local modGoldShopLibrary = require(game.ReplicatedStorage.Library.GoldShopLibrar
 local modRatShopLibrary = require(game.ReplicatedStorage.Library.RatShopLibrary);
 local modSafehomesLibrary = require(game.ReplicatedStorage.Library.SafehomesLibrary);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
+local modDialogueService = require(game.ReplicatedStorage.Library.DialogueService);
 
 if RunService:IsServer() then
 	modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
@@ -45,7 +46,7 @@ if RunService:IsServer() then
 	modRedeemService = require(game.ServerScriptService.ServerLibrary.RedeemService);
 	modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
 	modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
-	
+
 end
 
 
@@ -1066,189 +1067,189 @@ Commands["spawnentity"] = {
 		-- /spawnentity "Bandit" [[{"WeaponId":"minigun"}]]
 		-- /spawnentity
 		Debugger:Log("Cmd spawn entity:", entityName, " arg[1]=", args[1], " config",config);
-		if entityName and modNpc.NpcBaseModules[entityName] then
-			
-			local classPlayerA = modPlayers.Get(player);
-			local rootPartA = classPlayerA and classPlayerA.RootPart;
-			
-			--Debugger:Log("rootPartA.P", rootPartA.Position);
-			
-			local configDataRules = {
-				Properties = {
-					AttackSpeed = "number";
-					AttackDamage = "number";
-					AttackRange = "number";
-				};
-				Configuration = {
-					Level = "number";
-					ExperiencePool = "number";
-				};
-			}
-			
-			local printTable = {};
-			
-			local spawnCf = rootPartA.CFrame;
-			local entityId = 1;
-			modNpc.Spawn(entityName, spawnCf, function(npc, npcModule)
-				if debugFlag == "debug" then
-					npc:SetAttribute("Debug", true);
+		if entityName == nil then --or modNpc.NpcBaseModules[entityName] == nil
+			shared.Notify(player, `Unknown Entity {args[1] or ""}.`, "Negative"); -- "Could not spawn "..(args[1] or "").."."
+			return
+		end
 
-					table.insert(printTable, "Debug Enabled");
+		local classPlayerA = modPlayers.Get(player);
+		local rootPartA = classPlayerA and classPlayerA.RootPart;
+		
+		--Debugger:Log("rootPartA.P", rootPartA.Position);
+		
+		local configDataRules = {
+			Properties = {
+				AttackSpeed = "number";
+				AttackDamage = "number";
+				AttackRange = "number";
+			};
+			Configuration = {
+				Level = "number";
+				ExperiencePool = "number";
+			};
+		}
+		
+		local printTable = {};
+		
+		local spawnCf = rootPartA.CFrame;
+		local entityId = 1;
+		modNpc.Spawn(entityName, spawnCf, function(npc, npcModule)
+			if debugFlag == "debug" then
+				npc:SetAttribute("Debug", true);
+
+				table.insert(printTable, "Debug Enabled");
+			end
+			
+			if config then
+				if npcModule.Configuration == nil then
+					npcModule.Configuration = {};
 				end
 				
-				if config then
-					if npcModule.Configuration == nil then
-						npcModule.Configuration = {};
-					end
-					
-					if config.DebugTTK then
-						npcModule.DebugTTK = true;
-						table.insert(printTable, "Print Time to kill enabled");
-					end
-					
-					if config.DebugAnim then
-						npcModule.DebugAnim = true;
-						table.insert(printTable, "DebugAnim enabled");
-					end
-
-					if config.DebugMove then
-						npc:SetAttribute("DebugMove", true);
-						table.insert(printTable, "DebugMove enabled");
-					end
-					
-					if config.ResourceDrop then
-						local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
-						npcModule.Configuration.ResourceDrop = modRewardsLibrary:Find(config.ResourceDrop);
-						
-						table.insert(printTable, "ResourceDrop Set "..config.ResourceDrop);
-					end
-
-					if tonumber(config.Level) then
-						npcModule.Configuration.Level = tonumber(config.Level);
-
-						table.insert(printTable, "Level Set");
-					end
-					
-					if config.HardMode == true then
-						npcModule.HardMode = true;
-						
-						table.insert(printTable, "HardMode Set");
-					end
-
-					if config.Owner == true then
-						npcModule.Owner = player;
-						
-						table.insert(printTable, "Owner Set");
-					end
-					
-					if config.Anchored == true then
-						table.insert(printTable, "Anchored Set");
-						task.spawn(function()
-							while workspace:IsAncestorOf(npc) do
-								if npc.PrimaryPart then
-									break;
-								end
-								task.wait();
-							end
-							
-							if npc.PrimaryPart then
-								npc.PrimaryPart.Anchored = true;
-							end
-							
-							while game:IsAncestorOf(npc) do
-								npc:PivotTo(spawnCf);
-								task.wait();
-							end
-						end)
-					end
-					
-					if config.WeaponId and npcModule.Properties then
-						npcModule.Properties.WeaponId = config.WeaponId;
-						
-						table.insert(printTable, "WeaponId Set");
-					end
-					
-					if config.HideName then
-						npcModule.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None;
-
-						table.insert(printTable, "HideName Set");
-					end
-					
-					if config.ShirtId then
-						npcModule.RandomClothing = nil;
-						local productInfo = MarketplaceService:GetProductInfo(config.ShirtId, Enum.InfoType.Asset)
-						if productInfo and productInfo.AssetTypeId == 11 then
-							local asset = game:GetService("InsertService"):LoadAsset(config.ShirtId)
-							
-							for _, obj in pairs(npc:GetChildren()) do
-								if obj:IsA("Shirt") then
-									obj:Destroy();
-								end
-							end
-							
-							asset.Shirt.Parent = npc;
-
-							table.insert(printTable, "Shirt Set");
-						end
-					end
-					if config.PantsId then
-						npcModule.RandomClothing = nil;
-						
-						local productInfo = MarketplaceService:GetProductInfo(config.PantsId, Enum.InfoType.Asset)
-						if productInfo and productInfo.AssetTypeId == 12 then
-							local asset = game:GetService("InsertService"):LoadAsset(config.PantsId)
-							
-							for _, obj in pairs(npc:GetChildren()) do
-								if obj:IsA("Pants") then
-									obj:Destroy();
-								end
-							end
-							
-							asset.Pants.Parent = npc;
-
-							table.insert(printTable, "Pants Set");
-						end
-					end
-					
-					for k, v in pairs(config) do
-						if typeof(v) == "table" and configDataRules[k] and npcModule[k] then
-							local ruleLib = configDataRules[k];
-							for subK, subV in pairs(v) do
-								if npcModule[k][subK] and typeof(subV) == ruleLib[subK] then
-									npcModule[k][subK] = subV;
-									
-									table.insert(printTable, subK.." Set");
-								end
-							end
-						end
-					end
-					
-					entityId = npcModule.Id;
+				if config.DebugTTK then
+					npcModule.DebugTTK = true;
+					table.insert(printTable, "Print Time to kill enabled");
+				end
+				
+				if config.DebugAnim then
+					npcModule.DebugAnim = true;
+					table.insert(printTable, "DebugAnim enabled");
 				end
 
-				npcModule.Think:Fire();
-				if npcModule.OnTarget then
-					task.delay(1, function()
-						--npcModule.ForgetEnemies = false;
-						--npcModule.AutoSearch = true;
+				if config.DebugMove then
+					npc:SetAttribute("DebugMove", true);
+					table.insert(printTable, "DebugMove enabled");
+				end
+				
+				if config.ResourceDrop then
+					local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
+					npcModule.Configuration.ResourceDrop = modRewardsLibrary:Find(config.ResourceDrop);
+					
+					table.insert(printTable, "ResourceDrop Set "..config.ResourceDrop);
+				end
+
+				if tonumber(config.Level) then
+					npcModule.Configuration.Level = tonumber(config.Level);
+
+					table.insert(printTable, "Level Set");
+				end
+				
+				if config.HardMode == true then
+					npcModule.HardMode = true;
+					
+					table.insert(printTable, "HardMode Set");
+				end
+
+				if config.Owner == true then
+					npcModule.Owner = player;
+					
+					table.insert(printTable, "Owner Set");
+				end
+				
+				if config.Anchored == true then
+					table.insert(printTable, "Anchored Set");
+					task.spawn(function()
+						while workspace:IsAncestorOf(npc) do
+							if npc.PrimaryPart then
+								break;
+							end
+							task.wait();
+						end
 						
-						local ff = player.Character:FindFirstChild("GodModeFF");
-						if ff == nil then
-							npcModule.Properties.TargetableDistance = 4096;
-							npcModule.OnTarget(game.Players:GetPlayers());
-							npcModule.NetworkOwners = game.Players:GetPlayers();
-							
+						if npc.PrimaryPart then
+							npc.PrimaryPart.Anchored = true;
+						end
+						
+						while game:IsAncestorOf(npc) do
+							npc:PivotTo(spawnCf);
+							task.wait();
 						end
 					end)
 				end
-			end);
-			
-			shared.Notify(player, "Spawned "..entityName..", EntityId: "..entityId..".", "Inform");
-			if #printTable > 0 then
-				shared.Notify(player, entityName.. " spawned with: "..table.concat(printTable,", "), "Inform");
+				
+				if config.WeaponId and npcModule.Properties then
+					npcModule.Properties.WeaponId = config.WeaponId;
+					
+					table.insert(printTable, "WeaponId Set");
+				end
+				
+				if config.HideName then
+					npcModule.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None;
+
+					table.insert(printTable, "HideName Set");
+				end
+				
+				if config.ShirtId then
+					npcModule.RandomClothing = nil;
+					local productInfo = MarketplaceService:GetProductInfo(config.ShirtId, Enum.InfoType.Asset)
+					if productInfo and productInfo.AssetTypeId == 11 then
+						local asset = game:GetService("InsertService"):LoadAsset(config.ShirtId)
+						
+						for _, obj in pairs(npc:GetChildren()) do
+							if obj:IsA("Shirt") then
+								obj:Destroy();
+							end
+						end
+						
+						asset.Shirt.Parent = npc;
+
+						table.insert(printTable, "Shirt Set");
+					end
+				end
+				if config.PantsId then
+					npcModule.RandomClothing = nil;
+					
+					local productInfo = MarketplaceService:GetProductInfo(config.PantsId, Enum.InfoType.Asset)
+					if productInfo and productInfo.AssetTypeId == 12 then
+						local asset = game:GetService("InsertService"):LoadAsset(config.PantsId)
+						
+						for _, obj in pairs(npc:GetChildren()) do
+							if obj:IsA("Pants") then
+								obj:Destroy();
+							end
+						end
+						
+						asset.Pants.Parent = npc;
+
+						table.insert(printTable, "Pants Set");
+					end
+				end
+				
+				for k, v in pairs(config) do
+					if typeof(v) == "table" and configDataRules[k] and npcModule[k] then
+						local ruleLib = configDataRules[k];
+						for subK, subV in pairs(v) do
+							if npcModule[k][subK] and typeof(subV) == ruleLib[subK] then
+								npcModule[k][subK] = subV;
+								
+								table.insert(printTable, subK.." Set");
+							end
+						end
+					end
+				end
+				
+				entityId = npcModule.Id;
 			end
-		else
-			shared.Notify(player, "Could not spawn "..(args[1] or "")..".", "Negative");
+
+			npcModule.Think:Fire();
+			if npcModule.OnTarget then
+				task.delay(1, function()
+					--npcModule.ForgetEnemies = false;
+					--npcModule.AutoSearch = true;
+					
+					local ff = player.Character:FindFirstChild("GodModeFF");
+					if ff == nil then
+						npcModule.Properties.TargetableDistance = 4096;
+						npcModule.OnTarget(game.Players:GetPlayers());
+						npcModule.NetworkOwners = game.Players:GetPlayers();
+						
+					end
+				end)
+			end
+		end);
+		
+		shared.Notify(player, "Spawned "..entityName..", EntityId: "..entityId..".", "Inform");
+		if #printTable > 0 then
+			shared.Notify(player, entityName.. " spawned with: "..table.concat(printTable,", "), "Inform");
 		end
 		
 		return true;

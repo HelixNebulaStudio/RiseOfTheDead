@@ -112,10 +112,13 @@ return function(CutsceneSequence)
 		bloomEffect.Threshold = 0.8;
 		bloomEffect.Parent = camera;
 
+		modAudio.Preload("MainTheme", 5);
 		musicTrack = modAudio.Get("MainTheme");
-		musicTrack.Volume = 0;
-		musicTrack:Play();
-		TweenService:Create(musicTrack, TweenInfo.new(30), {Volume = 0.45;}):Play();
+		if musicTrack then
+			musicTrack.Volume = 0;
+			musicTrack:Play();
+			TweenService:Create(musicTrack, TweenInfo.new(30), {Volume = 0.45;}):Play();
+		end
 
 		modConfigurations.Set("DisableHealthbar", true);
 		modConfigurations.Set("DisableMapMenu", true);
@@ -380,7 +383,9 @@ return function(CutsceneSequence)
 		task.wait(3.5);
 		TweenService:Create(titleLogo, TweenInfo.new(1), {ImageTransparency = 1;}):Play();
 		TweenService:Create(blurEffect, TweenInfo.new(3), {Size = 6;}):Play();
-		TweenService:Create(musicTrack, TweenInfo.new(10), {Volume = 0.1;}):Play();
+		if musicTrack then
+			TweenService:Create(musicTrack, TweenInfo.new(10), {Volume = 0.1;}):Play();
+		end
 		
 	end);
 
@@ -690,6 +695,7 @@ return function(CutsceneSequence)
 	end);
 
 	CutsceneSequence:NewScene("intensifyMusic", function()
+		if musicTrack == nil then return end;
 		musicTrack:Stop();
 		musicTrack.TimePosition = 133;
 		musicTrack:Resume()

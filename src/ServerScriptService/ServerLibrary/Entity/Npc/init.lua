@@ -10,7 +10,6 @@ local modNpcAnimator = require(game.ServerScriptService.ServerLibrary.Entity.Npc
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modNpcComponent = require(game.ServerScriptService.ServerLibrary.Entity.NpcComponent);
 
 local modNpcModules = {};
