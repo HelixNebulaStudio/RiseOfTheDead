@@ -8,7 +8,7 @@ if RunService:IsServer() then
 	local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	
 	function MissionFunctions.Init(missionProfile, mission)
-		Debugger:Log("MissionFunctions: ", mission)
+		Debugger:StudioLog("MissionFunctions: ", mission)
 		local player = missionProfile.Player;
 		
 		local function OnChanged(firstRun)

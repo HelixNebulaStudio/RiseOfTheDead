@@ -13,7 +13,7 @@ CoopMission.Groups = {};
 
 ---
 function CoopMission:Get(groupId, missionId)
-	local group = self.Groups[groupId];
+	local group = CoopMission.Groups[groupId];
 	if group == nil then return end;
 	
 	return group[missionId];
@@ -22,7 +22,7 @@ end
 
 function CoopMission.new(groupId, missionId)
 	local meta = {
-		Lib = modMissionLibrary.Get(missionId);
+		Lib = missionId and modMissionLibrary.Get(missionId) or nil;
 	}
 	local self = {
 		GroupId=groupId;

@@ -752,7 +752,9 @@ return function(CutsceneSequence)
 		mission.Changed:Connect(OnChanged);
 		OnChanged(true);
 		
-		CutsceneSequence:NextScene("enableInterfaces");
+		if modBranchConfigs.IsWorld("MedicalBreakthrough") then
+			CutsceneSequence:NextScene("enableInterfaces");
+		end
 	end)
 
 	CutsceneSequence:NewScene("enableInterfaces", function()

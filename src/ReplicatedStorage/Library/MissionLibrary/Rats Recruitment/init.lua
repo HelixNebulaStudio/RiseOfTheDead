@@ -24,7 +24,7 @@ if RunService:IsServer() then
 	end
 	
 	function MissionFunctions.Init(missionProfile, mission)
-		Debugger:Log("MissionFunctions: ", mission)
+		Debugger:StudioLog("MissionFunctions: ", mission)
 		local player = missionProfile.Player;
 		
 		

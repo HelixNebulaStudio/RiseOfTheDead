@@ -88,10 +88,10 @@ function CutsceneSequence.new(cutscene)
 							end
 						end
 						if not invoked then
-							error("Client failed to respond.");
+							error(`Client ({player.Name}) failed to respond.`);
 						end
 					end)
-					if not success then Debugger:Warn("NewScene (",sceneName,") failed: ",failedErr) end;
+					if not success then Debugger:Warn(`{cutscene.Name}:{sceneName} failed:`,failedErr) end;
 					completed[player.Name] = true;
 	
 					local c = true;

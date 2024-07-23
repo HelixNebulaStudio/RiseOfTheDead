@@ -53,9 +53,14 @@ function GameModeManager:OnPlayerJoin(player)
 	local joinData = player:GetJoinData();
 	local teleportData = joinData.TeleportData;
 	
-	if teleportData == nil and (modBranchConfigs.CurrentBranch.Name == "Dev" or RunService:IsStudio()) and GameModeManager.StudioData then -- modGlobalVars.IsCreator(player)
+	if modBranchConfigs.CurrentBranch.Name == "Dev" and GameModeManager.StudioData and GameModeManager.StudioData.ForceDevBranchTpData == true then
+		Debugger:Warn(`Overriding teleport data ({ Debugger:Stringify(teleportData) })`);
+		teleportData = GameModeManager.StudioData;
+
+	elseif teleportData == nil and (modBranchConfigs.CurrentBranch.Name == "Dev" or RunService:IsStudio()) and GameModeManager.StudioData then
 		Debugger:Warn("No teleport data, using studio teleport data.");
 		teleportData = GameModeManager.StudioData;
+
 	end;
 
 	if teleportData and teleportData.GameMode and GameModeManager.TeleportDataLoaded ~= true then
