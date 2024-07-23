@@ -22,7 +22,7 @@ end
 
 function CoopMission.new(groupId, missionId)
 	local meta = {
-		Lib = missionId and modMissionLibrary.Get(missionId) or nil;
+		Lib = modMissionLibrary.Get(missionId);
 	}
 	local self = {
 		GroupId=groupId;
