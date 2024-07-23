@@ -11,7 +11,7 @@ localPlayer.PlayerScripts:ClearComputerMovementModes();
 
 repeat task.wait() until #character:GetChildren() >= 17;
 
-local humanoid = character:WaitForChild("Humanoid");
+local humanoid = character:WaitForChild("Humanoid") :: Humanoid;
 local head = character:WaitForChild("Head");
 local upperTorso = character:WaitForChild("UpperTorso");
 local animator = humanoid:WaitForChild("Animator");
@@ -1497,23 +1497,33 @@ RunService.Stepped:Connect(function(total, delta)
 	
 	groundRayParam.FilterDescendantsInstances = environmentCollidable;
 	
-	local results = modRaycastUtil.EdgeCast(rootPart, rayDir, groundRayParam);
-	
 	local groundResult = nil;
+	local groundHit = nil;
 	local closestDist = math.huge;
-	
-	for a=1, #results do
-		local pos = results[a].Position;
-		local yDist = math.abs(pos.Y - feetY)
+
+	if modData:IsMobile() then
+		local hitResult = workspace:Raycast(rootPart.Position, rayDir, groundRayParam);
+		if hitResult and hitResult.Instance then
+			groundResult = hitResult;
+		end
+		closestDist = 0;
+
+	else
+		local results = modRaycastUtil.EdgeCast(rootPart, rayDir, groundRayParam);
 		
-		if yDist < closestDist then
-			groundResult = results[a];
-			closestDist = yDist;
+		for a=1, #results do
+			local pos = results[a].Position;
+			local yDist = math.abs(pos.Y - feetY)
+			
+			if yDist < closestDist then
+				groundResult = results[a];
+				closestDist = yDist;
+			end
+			
 		end
 		
+		groundHit = #results > 0 and groundResult.Instance or nil;
 	end
-	
-	local groundHit = #results > 0 and groundResult.Instance or nil;
 	
 	characterProperties.GroundObject = groundHit;
 	if groundHit and closestDist > 3 then
@@ -1561,7 +1571,11 @@ RunService.Stepped:Connect(function(total, delta)
 			
 			dynamicPlatformCframe = newCf;
 			
-			rootPart.CFrame = cfChange * rootCframe;
+			if dynamicPlatformModel and dynamicPlatformModel.PrimaryPart and dynamicPlatformModel.PrimaryPart.Anchored then
+				rootPart.CFrame = cfChange * rootCframe;
+			elseif humanoid.FloorMaterial == Enum.Material.Air then
+				rootPart.CFrame = cfChange * rootCframe;
+			end
 			
 			characterProperties.DynamicPlatformVelocity = (rootCframe.Position - rootPart.CFrame.Position);
 		end
