@@ -8,9 +8,6 @@ local LiveWeatherCycle = {"fog"; "rain"; "heavyrain"};
 
 local LightingConfigurations = {
 	OutdoorAmbient = Color3.fromRGB(35, 41, 49);
-	NightOutdoorAmbient = Color3.fromRGB(25, 28, 34);
-	DayOutdoorAmbient = Color3.fromRGB(223, 234, 240);
-	
 	Properties = {
 		BaseBrightness = 2.5;
 		FogRange = 1000;
@@ -135,6 +132,7 @@ for _, obj in pairs(workspace:GetChildren()) do
 end
 
 local skyPhaseColors = modConfigurations.SkyPhaseColor;
+local fogRange = modConfigurations.FogRange;
 
 local lastWeatherEvent = tick();
 modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
@@ -162,7 +160,7 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 			Lighting.ClockTime = hourClock;
 		end
 
-		local newOutDoorAmbient = skyPhaseColors.Night; --:Lerp(LightingConfigurations.DayOutdoorAmbient, range);
+		local newOutDoorAmbient = skyPhaseColors.Night;
 		local newFogColor = Color3.fromRGB(255, 255, 255);
 
 		if Lighting.ClockTime >= 18 then
@@ -231,8 +229,8 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 		Lighting:SetAttribute("Brightness", activeBrightness);
 		Lighting:SetAttribute("OutdoorAmbient", newOutDoorAmbient);
 		Lighting:SetAttribute("FogColor", newFogColor);
-		Lighting:SetAttribute("FogStart", 40+(160*range));
-		Lighting:SetAttribute("FogEnd", 400+(LightingConfigurations.Properties.FogRange * range));
+		Lighting:SetAttribute("FogStart", fogRange.Start +(160*range));
+		Lighting:SetAttribute("FogEnd", fogRange.End +(LightingConfigurations.Properties.FogRange * range));
 		
 		if modSyncTime.IsDay and isNight ~= false then
 			isNight = false;
@@ -308,7 +306,6 @@ modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 	and tick() > lastWeatherEvent then
 		lastWeatherEvent = tick()+ weatherRandom:NextInteger(600, 3600);
 
-		Debugger:Warn("Roll Weather");
 		if weatherRandom:NextInteger(1, 4) == 1 then
 			local pickWeatherId = LiveWeatherCycle[weatherRandom:NextInteger(1, #LiveWeatherCycle)];
 			local pickWeatherDuration = weatherRandom:NextInteger(160, 240);

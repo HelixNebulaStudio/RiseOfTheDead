@@ -112,6 +112,10 @@ Configurations.Set("SkyPhaseColor", {
 	DuskPeak = Color3.fromRGB(121, 69, 31);
 	DuskEnd = Color3.fromRGB(77, 50, 38);
 });
+Configurations.Set("FogRange", {
+	Start = 40;
+	End = 400;
+});
 
 --== Events;
 local Months = {"January"; "Feburary"; "March"; "April"; "May"; "June"; "July"; "August"; "September"; "October"; "November"; "December";};

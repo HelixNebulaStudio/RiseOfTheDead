@@ -1573,7 +1573,7 @@ RunService.Stepped:Connect(function(total, delta)
 			
 			if dynamicPlatformModel and dynamicPlatformModel.PrimaryPart and dynamicPlatformModel.PrimaryPart.Anchored then
 				rootPart.CFrame = cfChange * rootCframe;
-			elseif humanoid.FloorMaterial == Enum.Material.Air then
+			elseif humanoid.FloorMaterial == Enum.Material.Air or humanoid.Jump == true then
 				rootPart.CFrame = cfChange * rootCframe;
 			end
 			
