@@ -1399,7 +1399,10 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 				})
 			end
 			
-			if not inventory:SpaceCheck(spaceCheckPacket) then return modWorkbenchLibrary.BlueprintReplies.InventoryFull; end
+			if not inventory:SpaceCheck(spaceCheckPacket) then 
+				shared.Notify(player, "Inventory is full!", "Negative");
+				return modWorkbenchLibrary.BlueprintReplies.InventoryFull; 
+			end
 			
 			values.TimesPolished = (values.TimesPolished or 0) +1
 			values.IsEquipped = nil;
