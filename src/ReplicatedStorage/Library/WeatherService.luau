@@ -74,7 +74,7 @@ function WeatherService:OnTick()
 end
 
 function WeatherService:GetActive()
-    if RunService:IsClient() then
+    if RunService:IsClient() and script:GetAttribute("Active") then
         return HttpService:JSONDecode(script:GetAttribute("Active"));
     end
 

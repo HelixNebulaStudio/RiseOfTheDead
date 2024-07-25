@@ -36,7 +36,9 @@ function ModEngineService:GetModule(name, parent, timeOut)
 		if parent then
 			moduleScript = Debugger:YieldDir(parent, name, timeOut);
 			
-			return require(parent[name]);
+			if moduleScript then
+				return require(moduleScript); --parent[name]
+			end
 		end
 		
 		moduleScript = Debugger:YieldDir(ModEngineService.ModLibrary, name, timeOut);

@@ -224,9 +224,7 @@ end
 if RunService:IsClient() then
 	local activeCutscenes = {};
 	function remotePlayClientScene.OnClientInvoke(cutsceneName, sceneName)
-		if RunService:IsStudio() then
-			Debugger:Warn("[Studio]","Play Cutscene ( "..cutsceneName..": "..sceneName.." )")
-		end
+		Debugger:StudioWarn(`Play Cutscene ({cutsceneName}: {sceneName})`);
 		local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 
 		local cutsceneObj = activeCutscenes[cutsceneName];
@@ -238,17 +236,7 @@ if RunService:IsClient() then
 		local cutsceneSequence = cutsceneObj and cutsceneObj.Sequence;
 		if cutsceneSequence and cutsceneSequence[sceneName] then
 			cutsceneObj.Status = Cutscene.Status.Playing;
-
 			cutsceneSequence.modData = modData;
-			
-			local modInterface = modData:GetInterfaceModule();
-			while modInterface == nil do
-				modInterface = modData:GetInterfaceModule();
-				task.wait();
-			end
-			
-			cutsceneSequence.modInterface = modInterface;
-
 			cutsceneSequence[sceneName]();
 		else
 			Debugger:Warn("Cutscene>> Scene(",sceneName,") does not exist for (",cutsceneName,").");
