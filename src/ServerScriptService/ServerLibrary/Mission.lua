@@ -27,7 +27,6 @@ local remoteHudNotification = modRemotesManager:Get("HudNotification");
 
 local remoteMissionCheckFunction = remotes.Interface.MissionCheckFunction;
 local remotePinMission = remotes.Interface.PinMission;
-local bindPlayServerScene = remotes.Cutscene.PlayServerScene;
 
 --== Script;
 Mission.MissionLibrary = modMissionLibrary;
@@ -663,7 +662,11 @@ function Mission.NewList(profile, gameSave, syncFunc)
 				end
 				
 				task.spawn(function()
-					remoteMissionRemote:InvokeClient(player, "init", missionObject.Id, missionLogic);
+					local new = missionLogic:Clone();
+					new.Parent = player.PlayerGui;
+					Debugger.Expire(new, 5);
+					
+					remoteMissionRemote:InvokeClient(player, "init", missionObject.Id, new);
 				end)
 			end
 			
@@ -808,14 +811,21 @@ function Mission.NewList(profile, gameSave, syncFunc)
 		end
 		
 		task.spawn(function()
+			local modCutscene = shared.modCutscene;
 			local cutsceneLoaded = {};
 			
 			for a=1, #list do
 				local lib = modMissionLibrary.Get(list[a].Id);
-				if lib.Cutscene and CheckWorld(lib.World) then
+				
+				if lib.CutsceneScript and CheckWorld(lib.World) then
 					table.insert(cutsceneLoaded, list[a].Id);
-					bindPlayServerScene:Invoke({player}, lib.Cutscene);
+
+					modCutscene:LoadScript(lib.Name, lib.CutsceneScript);
+					modCutscene:PlayCutscene({player}, lib.Name);
+					
 				end
+
+				
 			end
 			
 			if #cutsceneLoaded > 0 then
@@ -939,8 +949,12 @@ function Mission.NewList(profile, gameSave, syncFunc)
 		self.OnMissionChanged:Fire(mission);
 		
 		spawn(function()
-			if library.Cutscene and CheckWorld(library.World) then
-				bindPlayServerScene:Invoke({player}, library.Cutscene);
+			local modCutscene = shared.modCutscene;
+
+			if library.CutsceneScript and CheckWorld(library.World) then
+				modCutscene:LoadScript(library.Name, library.CutsceneScript);
+				modCutscene:PlayCutscene({player}, library.Name);
+
 			end
 		end);
 		

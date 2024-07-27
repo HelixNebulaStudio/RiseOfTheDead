@@ -112,14 +112,11 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 				
 				local finalPrice = sellPrice + bonus;
 				if finalPrice > 0 then
-					if not modMission:IsComplete(player, 67) then
-						modMission:Progress(player, 67, function(mission)
-							mission.SaveData.Money = mission.SaveData.Money +finalPrice;
-							if mission.SaveData.Money >= mission.SaveData.MaxMoney then
-								modMission:CompleteMission(player, 67);
-							end
-						end)
-					end
+					modOnGameEvents:Fire("OnEventPoint", "ShopService_Sell", {
+						Player=player;
+						FinalPrice=finalPrice;
+						StorageItem=storageItem;
+					});
 				end
 
 				profile:AddPlayPoints(sellPrice/1000, "Source:Money");

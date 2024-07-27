@@ -18,7 +18,6 @@ local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
 local remotePlayClientScene = remotes:WaitForChild("Cutscene"):WaitForChild("PlayClientScene");
 local remoteContinueScene = remotes:WaitForChild("Cutscene"):WaitForChild("ContinueScene");
 local remoteClientReady = remotes:WaitForChild("Cutscene"):WaitForChild("ClientReady");
-local bindPlayServerScene = remotes:WaitForChild("Cutscene"):WaitForChild("PlayServerScene");
 
 local CutsceneSequence = {};
 
@@ -252,6 +251,8 @@ if RunService:IsClient() then
 	end)
 	
 else
+	-- IsServer
+
 	function Cutscene:WaitForReady(players)
 		local timelapsed = 1;
 		repeat
@@ -292,25 +293,14 @@ else
 			end
 		end)
 
-		function bindPlayServerScene.OnInvoke(players, cutsceneName, sceneName)
-			Debugger:Log("bind Play Cutscene ( ",(cutsceneName or "NULL")," ) for ", players);
-			
-			task.wait();
-			local cutscene = Cutscene.New(cutsceneName);
-			if cutscene and cutscene.Sequence then
-				cutscene.Players = players or {};
-				cutscene.Status = Cutscene.Status.Playing;
-				
-				Cutscene:WaitForReady(players)
-				cutscene:Play(sceneName);
-				
-			else
-				Debugger:Warn("PlayServerScene.OnInvoke Cutscene (",cutsceneName,") does not exist.");
-				
-			end
-		end
 	end
 	
+	function Cutscene:LoadScript(cutsceneName, cutsceneScript)
+		if Cutscene.Scenes[cutsceneName] then return end;
+
+		Cutscene.Scenes[cutsceneName] = {Name=cutsceneName; File=cutsceneScript;};
+	end
+
 	function Cutscene:PlayCutscene(players, cutsceneName, sceneName)
 		Debugger:Log("Play Cutscene ( ",(cutsceneName or "NULL")," ) for ", players);
 	
@@ -331,5 +321,7 @@ end
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local moddedSelf = modModEngineService:GetModule(script.Name);
 if moddedSelf then moddedSelf:Init(Cutscene); end
+
+shared.modCutscene = Cutscene;
 
 return Cutscene;

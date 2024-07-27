@@ -169,13 +169,11 @@ return function(player, interactData, ...)
 		end
 	
 	elseif triggerId == "UnlockCamoPack" then
-		local profile = modProfile:Get(player);
 		if profile.SkinsPacks.Camo == nil then
 			profile:Unlock("SkinsPacks", "Camo", true);
 		end
 
 	elseif triggerId == "UnlockHalloweenPack" then
-		local profile = modProfile:Get(player);
 		if profile.SkinsPacks.Halloween == nil then
 			profile:Unlock("SkinsPacks", "Halloween", true);
 		end
@@ -458,33 +456,6 @@ return function(player, interactData, ...)
 			modAudio.Play("HeavyMetalDoor", interactObject.Destination).PlaybackSpeed = 0.5;
 		end
 		
-	elseif triggerId == "ToggleFireplace" then
-		local mission = modMission:Progress(player, 46);
-		if mission then
-			if mission.ProgressionPoint == 1 then
-				local quantity = 0;
-				local itemsList = profile.ActiveInventory:ListByItemId("coal");
-				for a=1, #itemsList do quantity = quantity +itemsList[a].Quantity; end
-
-				if quantity >= 5 then
-					local storageItem = inventory:FindByItemId("coal");
-					inventory:Remove(storageItem.ID, 5);
-					modMission:Progress(player, 46, function(mission)
-						mission.ProgressionPoint = 2;
-					end)
-					shared.Notify(player, "5 Coal removed from your Inventory.", "Negative");
-					modAudio.Play("StorageItemDrop", interactData.Object);
-				else
-					shared.Notify(player, "Not enough Coal, need "..math.clamp(5-quantity, 0, 5).." more.", "Negative");
-				end
-				
-			elseif mission.ProgressionPoint == 2 then
-				modMission:Progress(player, 46, function(mission)
-					mission.ProgressionPoint = 3;
-				end)
-				
-			end
-		end
 
 	elseif triggerId == "EB2_LightBarrel" then
 		local mission = modMission:Progress(player, 50);

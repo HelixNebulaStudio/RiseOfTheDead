@@ -22,7 +22,6 @@ local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 local remoteProgressMission = modRemotesManager:Get("ProgressMission");
 
 local Prefabs = game.ReplicatedStorage.Prefabs:WaitForChild("Objects");
-local missionLibraryScript = game.ReplicatedStorage.Library.MissionLibrary;
 
 local serverPrefabs = game.ServerStorage:WaitForChild("PrefabStorage"):WaitForChild("Objects");
 local blockadeFolder = serverPrefabs:FindFirstChild("DefaultBlockades");
@@ -427,14 +426,14 @@ function OnPlayerAdded(player)
 		local mission = missionProfile[a];
 		local missionLib = modMissionLibrary.Get(mission.Id);
 		
-
 		if missionLib.AddCache then
 			for k,v in pairs(missionLib.AddCache) do
 				cache[k] = v;
 			end
 		end
 		
-		local missionLogic = missionLibraryScript:FindFirstChild(missionLib.Name);
+		
+		local missionLogic = missionLib.LogicScript;
 		if missionLogic then
 			local modMissionFunctions = require(missionLogic);
 

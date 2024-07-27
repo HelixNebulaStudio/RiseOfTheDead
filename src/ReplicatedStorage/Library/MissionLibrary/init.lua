@@ -10,6 +10,8 @@ local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler);
 
 local MissionLibrary = {};
+MissionLibrary.Script = script;
+
 local library = {};
 
 local BoardTimeLimit = 3600;
@@ -70,37 +72,46 @@ function MissionLibrary.New(data)
 	library[data.MissionId] = data;
 	missionCount = missionCount +1;
 	
-	if data.UseAssets then
-		local gameAssets = modAssetHandler:Get("Mission".. data.MissionId);
+	if data.UseAssets and RunService:IsServer() then
+		local gameAssets = modAssetHandler:GetServer("Missions", `Mission{data.MissionId}`);
 		
 		local missionDialogues = gameAssets and gameAssets:FindFirstChild("MissionDialogues") or nil;
 		if missionDialogues then
-			missionDialogues = require(gameAssets.MissionDialogues);
-			
-			for npcName, pack in pairs(missionDialogues) do
-				if pack.Dialogues == nil then continue end;
+			data.LoadDialogues = function()
+				missionDialogues = require(gameAssets.MissionDialogues);
 				
-				modDialogueLibrary.AddDialogues(npcName, pack.Dialogues(), {
-					MissionId = data.MissionId;
-				});
+				for npcName, pack in pairs(missionDialogues) do
+					if pack.Dialogues == nil then continue end;
+					
+					modDialogueLibrary.AddDialogues(npcName, pack.Dialogues(), {
+						MissionId = data.MissionId;
+					});
+				end
 			end
-		end
+		end;
+
+		-- data.LoadCutscene = function()
+		-- 	local cutsceneScript = gameAssets and gameAssets:FindFirstChild("CutsceneScript") or nil;
+		-- 	if cutsceneScript then
+		-- 		cutsceneScript.Name = data.Name;
+		-- 		cutsceneScript.Parent = modCutscene.Script;
+		-- 		data.Cutscene = data.Name;
+		-- 	end
+		-- end;
 		
 		local cutsceneScript = gameAssets and gameAssets:FindFirstChild("CutsceneScript") or nil;
 		if cutsceneScript then
-			cutsceneScript.Name = data.Name;
-			cutsceneScript.Parent = modCutscene.Script;
 			data.Cutscene = data.Name;
+			data.CutsceneScript = cutsceneScript;
+
 		end
-		
+
 		local missionLogic = gameAssets and gameAssets:FindFirstChild("MissionLogic") or nil;
 		if missionLogic then
-			missionLogic.Name = data.Name;
-			missionLogic:SetAttribute("MissionId", data.MissionId);
-			missionLogic.Parent = script;
 			data.LogicScript = missionLogic;
 			
 		end
+
 	end
 	
 	return function(func)
@@ -116,17 +127,6 @@ end
 local function getHourNumber() : number
 	return tonumber(os.date("%H")) :: number;
 end
-
-local function loadLogicScript(moduleScript)
-	if not moduleScript:IsA("ModuleScript") then return end;
-	local missionId = moduleScript:GetAttribute("MissionId");
-	if missionId == nil then return end;
-	
-	local missionLib = MissionLibrary.Get(missionId);
-	missionLib.LogicScript = moduleScript;
-end 
-script.ChildAdded:Connect(loadLogicScript);
-
 
 local PerksReward = {
 	Core=5;
@@ -538,6 +538,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=20;
 	};
+	UseAssets=true;
 };
 
 -- MARK: 14 - Pigeon Post
@@ -561,6 +562,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=9;
 	};
+	UseAssets=true;
 };
 
 -- MARK: 15 - Chain Reaction
@@ -571,7 +573,6 @@ MissionLibrary.New{
 	From="Stephanie";
 	Description="Stephanie worked out another blueprint for another elemental mod and she wants you to build it.";
 	Persistent=true;
-	Cutscene="Chain Reaction";
 	World="TheWarehouse";
 	Progression={
 		"Build the Electric Charge mod using the workbench";
@@ -587,6 +588,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=25;
 	};
+	UseAssets=true;
 };
 
 -- MARK: 16 - A Good Deal
@@ -597,7 +599,6 @@ MissionLibrary.New{
 	From="Jesse";
 	Description="Jesse needs to restock some components in the shop, he thinks you're capable enough to help him.";
 	Persistent=true;
-	Cutscene="A Good Trade";
 	World="TheWarehouse";
 	Objectives={
 		["IgniterSearch"]={Index=1; Description="Find $Amount Igniters for Jesse"; Type="RequireItem"; ItemId="igniter"; Amount=2;};
@@ -611,6 +612,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=20;
 	};
+	UseAssets=true;
 };
 
 -- MARK: 17 - Restock
@@ -712,6 +714,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="MissionCompleted"; Value={13}};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 20 - Eight Legs
@@ -735,6 +738,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=30;
 	};
+	UseAssets=true;
 };
 
 -- MARK: 21 - Spring Killing
@@ -760,6 +764,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 22 - The Backup Plan
@@ -770,7 +775,6 @@ MissionLibrary.New{
 	From="Carlson";
 	Description="Carlson hid something somewhere as backup for emergency situations, he needs someone to help him get that item.";
 	Persistent=true;
-	Cutscene="The Backup Plan";
 	World="TheUnderground";
 	Progression={
 		"Search for a key in the break room";
@@ -793,6 +797,7 @@ MissionLibrary.New{
 		[3]={World="TheUnderground"; Label="Wooden Crate"; Target=Vector3.new(-155.686, 19.493, -92.027); Type=modMarkers.MarkerTypes.Waypoint;};
 		[4]={World="TheUnderground"; Label="Carlson"; Target="Carlson"; Type=modMarkers.MarkerTypes.Npc;};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 23 - Sniper's Nest
@@ -822,6 +827,7 @@ MissionLibrary.New{
 		[1]={World="TheUnderground"; Label="Targets"; Target=Vector3.new(-278.695, 22.56, -1.19); Type=modMarkers.MarkerTypes.Waypoint;};
 		[2]={World="TheUnderground"; Label="Lennon"; Target="Lennon"; Type=modMarkers.MarkerTypes.Npc;};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 24 - Missing In Action
@@ -886,6 +892,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Mission"; Id=57};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 26 - Blueprint Demands
@@ -942,7 +949,6 @@ MissionLibrary.New{
 	From="Carlson";
 	Description="Carlson needs your help in reinforcing the safehouse.";
 	Persistent=true;
-	Cutscene="Safety Safehouse";
 	World="TheUnderground";
 	Objectives={
 		["addDoorway"]={Index=1; Description="Build a door way";};
@@ -1005,7 +1011,6 @@ MissionLibrary.New{
 	From="Stan";
 	Description="You encounter another scavenger, he seems to live nearby, he might know something about what happened to Robert.";
 	Persistent=true;
-	Cutscene="Poke The Bear";
 	World={"TheUnderground", "TheMall"};
 	Checkpoint={
 		{Text="Follow Stan";};
@@ -1041,6 +1046,7 @@ MissionLibrary.New{
 		[9]={World="TheMall"; Label="Stan"; Target="Stan"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanRedo={};
+	UseAssets=true;
 };
 
 -- MARK: 31 - Bunny Man's Eggs
@@ -1064,6 +1070,7 @@ MissionLibrary.New{
 		{Type="Item"; ItemId="bunnymanhead";  Quantity=1;};
 		{Type="Mission"; Id=32};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 32 - Easter Butchery
@@ -1087,6 +1094,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Mission"; Id=50};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 33 - Awoken The Bear
@@ -1148,7 +1156,6 @@ MissionLibrary.New{
 	Description="Molly wants you to escort a stranger to a location. Protect them at all costs.";
 	Timer=BoardTimeLimit;
 	Persistent=true;
-	Cutscene="Escort";
 	SaveData={
 		Location=(function()
 			local list = {"Mall Safehouse", "Train Station Safehouse", "Community Safehouse"};
@@ -1175,6 +1182,7 @@ MissionLibrary.New{
 	};
 	CanFastTravelWhenActive={2};
 	BoardPickFreq=5;
+	UseAssets=true;
 };
 
 -- MARK: 35 - Food Airdrop
@@ -1186,7 +1194,6 @@ MissionLibrary.New{
 	From="Faction";
 	Description="Collect food airdrop to increase to your faction's Food supply.";
 	Persistent=true;
-	Cutscene="Food Airdrop";
 	SaveData={
 		Location=function()
 			local list = {"Office"; "BanditOutpost"; "Tombs"; "Railways";};
@@ -1235,6 +1242,7 @@ MissionLibrary.New{
 
 		return noteText;
 	end;
+	UseAssets=true;
 };
 
 -- MARK: 36 - Calming Tunes
@@ -1258,6 +1266,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=35;
 	};
+	UseAssets=true;
 };
 
 -- MARK: 37 - Joseph's Lettuce
@@ -1268,7 +1277,6 @@ MissionLibrary.New{
 	From="Joseph";
 	Description="Help Joseph water his lettuce.";
 	Persistent=true;
-	Cutscene="Joseph's Lettuce";
 	World="TheResidentials";
 	Objectives={
 		["wateringcan"]={Index=1; Description="Make a watering can";};
@@ -1293,6 +1301,7 @@ MissionLibrary.New{
 		["jlLettuce2"]={World="TheResidentials"; Label="Water plants"; Target=Vector3.new(1242.231, 57.213, -56.169); Type=modMarkers.MarkerTypes.Waypoint;};
 		["jlLettuce3"]={World="TheResidentials"; Label="Water plants"; Target=Vector3.new(1235.111, 57.213, -56.169); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 38 - Something's Not Right
@@ -1346,7 +1355,6 @@ MissionLibrary.New{
 	From="Danny";
 	Description="Danny is annoyed by the noise of the zombies banging on the store gate.";
 	Persistent=true;
-	Cutscene="Spiking Up";
 	World="TheMall";
 	Objectives={
 		["addWall1"]={Index=1; Description="Build a spiked fence";};
@@ -1370,6 +1378,7 @@ MissionLibrary.New{
 		["addWall4"]={World="TheMall"; Label="Build A Spiked Fence"; Target=Vector3.new(796.555, 99.391, -693.789); Type=modMarkers.MarkerTypes.Waypoint;};
 		["addWall5"]={World="TheMall"; Label="Build A Spiked Fence"; Target=Vector3.new(796.555, 99.391, -672.399); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 40 - Vindictive Treasure 1
@@ -1380,7 +1389,6 @@ MissionLibrary.New{
 	From="Victor";
 	Description="Victor needs your help with something.";
 	Persistent=true;
-	Cutscene="VindictiveTreasure1"; 
 	World={"TheWarehouse"; "Tombs"};
 	Progression={
 		"Kill Zricera";
@@ -1412,6 +1420,7 @@ MissionLibrary.New{
 	EventFlags={
 		{Id="takeNekronMask"; Clear=true};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 41 - Vindictive Treasure 2
@@ -1422,7 +1431,6 @@ MissionLibrary.New{
 	From="Victor";
 	Description="The cultists are hunting you down for what you have taken from them.";
 	Persistent=true;
-	Cutscene="VindictiveTreasure2"; 
 	Progression={
 		"You are hunted by cultists";
 		"Pick up the note from the cultist";
@@ -1441,6 +1449,7 @@ MissionLibrary.New{
 		MissionCompleted={40};
 	};
 	Markers={};
+	UseAssets=true;
 };
 
 -- MARK: 42 - Vindictive Treasure 3
@@ -1451,7 +1460,6 @@ MissionLibrary.New{
 	From="Victor";
 	Description="Victor needs your help with something in the tombs.";
 	Persistent=true;
-	Cutscene="VindictiveTreasure3"; 
 	Progression={
 		"Talk to Victor when you are ready";
 		"Talk to Victor";
@@ -1480,6 +1488,7 @@ MissionLibrary.New{
 		{Id="mission42Bp"; Clear=true};
 		{Id="mission42Bp2"; Clear=true};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 43 - Missing Body 1
@@ -1513,6 +1522,7 @@ MissionLibrary.New{
 		[1]={World="TheWarehouse"; Label="The Office Raid"; Target=Vector3.new(643.575, 60.15, 276.25); Type=modMarkers.MarkerTypes.Waypoint;};
 		[4]={World="TheMall"; Label="Marker"; Target=Vector3.new(443.31, 95.481, -660.39); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 44 - Missing Body 2
@@ -1542,6 +1552,7 @@ MissionLibrary.New{
 	};
 	Markers={
 	};
+	UseAssets=true;
 };
 
 -- MARK: 45 - Mike's Lucky Coin
@@ -1574,6 +1585,7 @@ MissionLibrary.New{
 	Markers={
 		[3]={World="Prison"; Label="Marker"; Target=Vector3.new(36.91, -9.045, 45.03); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 46 - Warming Up
@@ -1599,6 +1611,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Mission"; Id=25;};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 47 - Sound of Music
@@ -1626,6 +1639,7 @@ MissionLibrary.New{
 	};
 	Markers={
 	};
+	UseAssets=true;
 };
 
 -- MARK: 48 - Coming To The Rescue
@@ -1663,6 +1677,7 @@ MissionLibrary.New{
 		[2]={World="TheMall"; Label="Stranger"; Target="Stranger"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanFastTravelWhenActive={2};
+	UseAssets=true;
 };
 
 -- MARK: 49 - Navigation
@@ -1725,6 +1740,7 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 51 - Quarantine Assessment
@@ -1766,6 +1782,7 @@ MissionLibrary.New{
 		[4]={World="TheResidentials"; Label="Radio"; Target=Vector3.new(1092.714, 130.857, -508.18); Type=modMarkers.MarkerTypes.Waypoint;};
 		[5]={World="TheResidentials"; Label="Radio"; Target=Vector3.new(1092.714, 130.857, -508.18); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 52 - The Investigation
@@ -1777,7 +1794,6 @@ MissionLibrary.New{
 	Description="After finding Robert, something seems to be off about him. Investigate and find out what's going on.";
 	Persistent=true;
 	World={"TheResidentials"; "TheInvestigation"; "TheMall"};
-	Cutscene="The Investigation";
 	Progression={
 		"Talk to Nate";
 		"Talk to Robert";
@@ -1820,6 +1836,7 @@ MissionLibrary.New{
 		[17]={World="TheMall"; Label="Molly"; Target="Molly"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanRedo={};
+	UseAssets=true;
 };
 
 -- MARK: 53 - Quarantine Assessment 2
@@ -1898,7 +1915,6 @@ MissionLibrary.New{
 	Name="Another Survivor";
 	Description="A survivor has arrive at your safehome.";
 	World={"Safehome";};
-	Cutscene="Another Survivor";
 	Timer=BoardTimeLimit;
 	Persistent=true;
 	Progression={
@@ -1920,6 +1936,7 @@ MissionLibrary.New{
 	};
 	BoardPickFreq=6;
 	SkipDestroyIfAddRequirementsNotMet=true;
+	UseAssets=true;
 };
 
 -- MARK: 56 - End Of The Line
@@ -1931,7 +1948,6 @@ MissionLibrary.New{
 	Description="Ah, here we go again.. Chasing after Robert.";
 	Persistent=true;
 	World={"TheResidentials"; "Genesis"};
-	Cutscene="End Of The Line";
 	Checkpoint={
 		{Text="Go back to the basement";};
 		{Text="Figure out where Robert went";};
@@ -1953,6 +1969,7 @@ MissionLibrary.New{
 		
 	};
 	CanRedo={};
+	UseAssets=true;
 };
 
 -- MARK: 57 - Mr. Klaw's Workshop
@@ -1979,6 +1996,7 @@ MissionLibrary.New{
 	Markers={
 		[2]={World="KlawsWorkshop"; Label="Mr. Klaw's Journal"; Target=Vector3.new(-19.151, 103.838, -224.87); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 58 - Double Cross
@@ -2044,7 +2062,6 @@ MissionLibrary.New{
 	SaveData={Kills=function() return 300; end;};
 	Checkpoint={
 		{Text="Kill $Kills zombies";};
-		{Text="Return to Patrick";};
 	};
 	GuideText="Start by faction";
 	FactionCosts={
@@ -2060,6 +2077,7 @@ MissionLibrary.New{
 		SuccessfulAgents=1;
 	};
 	QuotaLimit=16;
+	UseAssets=true;
 };
 
 -- MARK: 60 - Reconnaissance Duty
@@ -2071,7 +2089,6 @@ MissionLibrary.New{
 	From="Faction";
 	Description="Keep your faction informed as to the on goings around and promote your faction to increase faction's Comfort level.";
 	Persistent=true;
-	Cutscene="Reconnaissance Duty";
 	SaveData={
 		Location=function(mission)
 			local list = {};
@@ -2118,6 +2135,7 @@ MissionLibrary.New{
 	};
 	QuotaLimit=16;
 	CanFastTravelWhenActive={2};
+	UseAssets=true;
 };
 
 -- MARK: 61 - Ammo Manufacturing
@@ -2147,6 +2165,7 @@ MissionLibrary.New{
 		SuccessfulAgents=1;
 	};
 	QuotaLimit=16;
+	UseAssets=true;
 };
 
 -- MARK: 62 - Rats Recruitment
@@ -2158,7 +2177,6 @@ MissionLibrary.New{
 	Description="After the cargo ship disaster, you check up on Patrick to see what's up.";
 	Persistent=true;
 	World={"TheHarbor"; "SectorE"; "SectorF"};
-	Cutscene="Rats Recruitment";
 	Checkpoint={
 		{Text="Talk to Revas";};
 		{Text="Talk to Revas to travel";};
@@ -2205,6 +2223,7 @@ MissionLibrary.New{
 	AddCache={
 		RatsAllied=true;
 	};
+	UseAssets=true;
 };
 
 -- MARK: 63 - Bandits Recruitment
@@ -2259,6 +2278,7 @@ MissionLibrary.New{
 	AddCache={
 		BanditsAllied=true;
 	};
+	UseAssets=true;
 };
 
 -- MARK: 64 - Joseph's Crossbow
@@ -2283,6 +2303,7 @@ MissionLibrary.New{
 	};
 	Markers={};
 	AddRequirements={};
+	UseAssets=true;
 };
 
 -- MARK: 65 - Eternal Inferno
@@ -2306,6 +2327,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 66 - Monorail
@@ -2334,6 +2356,7 @@ MissionLibrary.New{
 		{Type="Level"; Value=30};
 	};
 	BoardPickFreq=8;
+	UseAssets=true;
 };
 
 -- MARK: 67 - Capital Gains
@@ -2357,6 +2380,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 68 - Sunken Salvages
@@ -2368,7 +2392,6 @@ MissionLibrary.New{
 	Timer=BoardTimeLimit;
 	Persistent=true;
 	World="TheHarbor";
-	Cutscene="Sunken Salvages";
 	Checkpoint={
 		{Text="Search for $SalvagesLeft more sunken salvages in W.D Harbor.";};
 	};
@@ -2381,6 +2404,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 69 - Reserved Weapons
@@ -2409,6 +2433,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 70 - Anti Immunity
@@ -2433,6 +2458,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 71 - High Value Package
@@ -2501,7 +2527,6 @@ MissionLibrary.New{
 	Persistent=true;
 	OneAtATime=true;
 	World={"Safehome"; "BioXResearch"};
-	Cutscene="Deadly Zeniths Strike";
 	SaveData={};
 	Checkpoint={
 		{Text="Talk to Patrick";};
@@ -2523,6 +2548,7 @@ MissionLibrary.New{
 		SuccessfulAgents=4;
 	};
 	QuotaLimit=10;
+	UseAssets=true;
 };
 
 -- MARK: 74 - Breach by the Dead
@@ -2546,6 +2572,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
+	UseAssets=true;
 };
 
 -- MARK: 75 - Medical Breakthrough
@@ -2720,9 +2747,5 @@ MissionLibrary.New{
 		{Type="Money"; Amount=20};
 	};
 };
-
-for _, obj in pairs(script:GetChildren()) do
-	loadLogicScript(obj);
-end
 
 return MissionLibrary;

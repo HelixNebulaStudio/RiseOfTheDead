@@ -29,13 +29,5 @@ return function(player, modeType, modeStage, roomData)
 
 		end
 		
-	elseif modeType == "Survival" then
-		if modeStage == "Sector D" then
-			modMission:Progress(player, 66, function(mission)
-				mission.ObjectivesCompleted["CompleteSurvival"] = true;
-			end)
-			
-		end
-		
 	end
 end;

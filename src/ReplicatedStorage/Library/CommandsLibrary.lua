@@ -49,10 +49,6 @@ if RunService:IsServer() then
 
 end
 
-
-local remotes = game.ReplicatedStorage.Remotes;
-local bindPlayServerScene = remotes.Cutscene.PlayServerScene;
-
 local Cache = {Group={};};
 local PermissionLevel = {
 	All=1;
@@ -184,7 +180,10 @@ Commands["playcutscene"] = {
 		- CameraHijack
 	]];
 	Function = function(player, args)
-		bindPlayServerScene:Invoke({player}, args[1]);
+		
+		local cutsceneName = args[1];
+		shared.modCutscene:PlayCutscene({player}, cutsceneName);
+
 		shared.Notify(player, "Playing cutscene.", "Inform");
 		return true;
 	end;

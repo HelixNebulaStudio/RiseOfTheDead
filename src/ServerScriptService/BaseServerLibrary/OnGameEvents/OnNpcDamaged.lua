@@ -25,44 +25,6 @@ return function(player, damageSource)
 		end
 	end
 	
-	if humanoid.Name == "Zombie" and damageSource.Killed == true and npcModule.IsDead ~= true then
-		
-		if not modMission:IsComplete(player, 65) and (damageSource.DamageType == "FireDamage" or (npcModule.StatusLogicIsOnFire and npcModule.StatusLogicIsOnFire() == true)) then
-			modMission:Progress(player, 65, function(mission)
-				mission.SaveData.Kills = mission.SaveData.Kills -1;
-				if mission.SaveData.Kills <= 0 then
-					modMission:CompleteMission(player, 65);
-				end
-			end)
-		end
-		
-		local toolWorkbenchLib = storageItem and modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId] or nil;
-		
-		local mission = modMission:GetMission(player, 69);
-		if mission and mission.Type == 1 and toolWorkbenchLib and (mission.SaveData.WeaponItemId or table.find(toolWorkbenchLib.Type, mission.SaveData.WeaponType) ~= nil) then
-			modMission:Progress(player, 69, function(mission)
-				mission.SaveData.Kills = mission.SaveData.Kills -1;
-				if mission.SaveData.Kills <= 0 then
-					modMission:CompleteMission(player, 69);
-				end
-			end)
-		end
-		
-
-		local mission = modMission:GetMission(player, 70);
-		if mission and mission.Type == 1 and toolWorkbenchLib and table.find(toolWorkbenchLib.Type, "Melee") ~= nil then
-			if damageSource.Immunity and damageSource.Immunity > 0 then
-				modMission:Progress(player, 70, function(mission)
-					mission.SaveData.Kills = mission.SaveData.Kills -1;
-					if mission.SaveData.Kills <= 0 then
-						modMission:CompleteMission(player, 70);
-					end
-				end)
-			end
-		end
-		
-	end
-
 	if storageItem == nil then return end; -- Missing Dealer StorageItem
 	if (humanoid.Name == "Zombie" or humanoid.Name == "Bandit" or humanoid.Name == "Rat") and damageSource.Killed == true and npcModule.IsDead ~= true
 		and damageSource.DamageCate == modDamagable.DamageCategory.Projectile then

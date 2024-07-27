@@ -9,7 +9,6 @@ local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariabl
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modSyncTime = Debugger:Require(game.ReplicatedStorage.Library.SyncTime);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
@@ -55,9 +54,9 @@ function WorldEvent.Initialize(worldEventsService)
 			end
 		end
 		
-		modMission:Progress(player, 74, function(mission)
-			mission.ProgressionPoint = 2;
-		end)
+		modOnGameEvents:Fire("OnEventPoint", "SafehomeBreach_RepairWall", {
+			Player=player;
+		});
 		
 		if b >= 3 then return end;
 
@@ -91,21 +90,6 @@ function WorldEvent.Initialize(worldEventsService)
 		task.delay(math.random(380,650)/10, tryDmg)
 	end)
 
-	modOnGameEvents:ConnectEvent("OnZombieDeath", function(npcModule)
-		if npcModule.SafehomeBreach == nil then return end;
-		
-		local playerTags = modDamageTag:Get(npcModule.Prefab, "Player");
-
-		for a=1, #playerTags do
-			local playerTag = playerTags[a];
-			local player = playerTag.Player;
-
-			modMission:Progress(player, 74, function(mission)
-				mission.ProgressionPoint = 2;
-			end)
-		end
-	end);
-	
 	return true;
 end
 
@@ -148,13 +132,8 @@ function WorldEvent.Start()
 	task.delay(duration, function()
 		shared.Notify(game.Players:GetPlayers(), "The safehouse breach is now over, walls and fences are patched up.", "Defeated");
 		
-		for _, player in pairs(game.Players:GetPlayers()) do
-			local mission = modMission:GetMission(player, 74);
-			if mission and mission.ProgressionPoint == 2 then
-				modMission:CompleteMission(player, 74);
-			end
-		end
-		
+		modOnGameEvents:Fire("OnEventPoint", "SafehomeBreach_EventEnd");
+
 		for _, spawnModel in pairs(WorldEvent.SpawnHoles) do
 			spawnModel:Destroy();
 		end

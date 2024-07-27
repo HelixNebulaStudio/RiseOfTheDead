@@ -16,17 +16,7 @@ return function(player, interactData)
 	if interactData.Type == modInteractables.Types.Pickup then 
 		local itemId = interactData.ItemId;
 		
-		if itemId == "battery" then
-			if modMission:Progress(player, 15) then
-				modEvents:NewEvent(player, {Id="mission15Battery"});
-			end
-			
-		elseif itemId == "wires" then
-			if modMission:Progress(player, 15) then
-				modEvents:NewEvent(player, {Id="mission15Wires"});
-			end
-			
-		elseif itemId == "sewerskey1" then
+		if itemId == "sewerskey1" then
 			if modMission:Progress(player, 22) then
 				modMission:Progress(player, 22, function(mission)
 					if mission.ProgressionPoint == 1 then

@@ -16,20 +16,12 @@ NpcDialogues.Dialogues = {
 			local npcModel = dialogPacket.Prefab;
 			if npcModel:FindFirstChild("prisonInteractable") then
 				local localPlayer = game.Players.LocalPlayer;
-				local modData = require(localPlayer:WaitForChild("DataModule"));
+				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 
 				modData.InteractRequest(npcModel.prisonInteractable, npcModel.PrimaryPart);
 			end
 		end};
-	
-	{MissionId=45; Tag="mlc_init"; Dialogue="What's wrong? What did you left?"; 
-		Reply="My lucky coin, I left it when I got out of prison."};
-	{MissionId=45; Tag="mlc_start"; CheckMission=45; Dialogue="I could help you look for it if you lead me there."; 
-		Reply="Oh, that would be great. Whenever you are ready."};
-	{MissionId=45; Tag="mlc_found"; Dialogue="Is this the coin you were looking for?"; 
-		Reply="YES! Oh, thanks so much."};
-	
-	
+
 	{Tag="general_inprison"; Dialogue="Why were you in prison?"; 
 		Reply="I was on a job.. A heist all planned out, a three man job.. But I was backstabbed.. They threw me under the bus and they escaped. This was years ago."}; --end
 	{Tag="general_how"; Dialogue="How did you escape?"; 

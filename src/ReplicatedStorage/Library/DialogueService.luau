@@ -176,7 +176,7 @@ function DialogueService:InitServer(baseDialogueHandlers)
                                 missionDialogueFunc(player, dialog, npcDialogData, missionData);
                                 
                             elseif missionLib.UseAssets == true then
-                                local missionAssets = modAssetHandler:Get("Mission"..tostring(missionData.Id));
+                                local missionAssets = modAssetHandler:GetServer("Missions", `Mission{missionData.Id}`);
                                 
                                 if missionAssets and missionAssets:FindFirstChild("MissionDialogues") then
                                     local missionDialogues = require(missionAssets.MissionDialogues);

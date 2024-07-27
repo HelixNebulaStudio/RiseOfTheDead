@@ -29,85 +29,11 @@ return function(zombieNpcModule)
 		local activeSave = profile:GetActiveSave();
 		local inventory = activeSave.Inventory;
 		
-		if not modMission:IsComplete(player, 13) then
-			modMission:Progress(player, 13, function(mission)
-				if mission.ProgressionPoint == 1 then
-					mission.SaveData.Kills = mission.SaveData.Kills -1;
-					if mission.SaveData.Kills <= 0 then
-						mission.ProgressionPoint = 2;
-					end
-				end;
-			end)
-		end
-		if not modMission:IsComplete(player, 19) and (zombieNpcModule.Name == "Ticks Zombie" or zombieNpcModule.Name == "Ticks") then
-			modMission:Progress(player, 19, function(mission)
-				if mission.ProgressionPoint == 1 then
-					mission.SaveData.Kills = mission.SaveData.Kills -1;
-					if mission.SaveData.Kills <= 0 then
-						mission.ProgressionPoint = 2;
-					end
-				end;
-			end)
-		end
-		if not modMission:IsComplete(player, 20) and zombieNpcModule.Name == "Zpider" then
-			modMission:Progress(player, 20, function(mission)
-				if mission.ProgressionPoint == 1 then
-					mission.SaveData.Kills = mission.SaveData.Kills -1;
-					if mission.SaveData.Kills <= 0 then
-						mission.ProgressionPoint = 2;
-					end
-				end;
-			end)
-		end
-		if not modMission:IsComplete(player, 21) then
-			local bossName;
-			if zombieNpcModule.Name == "The Prisoner" or zombieNpcModule.Name == "Tanker" or zombieNpcModule.Name == "Fumes" then
-				bossName = zombieNpcModule.Name;
-			end
-			if bossName then
-				modMission:Progress(player, 21, function(mission)
-					mission.ObjectivesCompleted[bossName] = true;
-				end)
-			end
-		end
-		if not modMission:IsComplete(player, 59) then
-			modMission:Progress(player, 59, function(mission)
-				if mission.ProgressionPoint == 1 then
-					mission.SaveData.Kills = mission.SaveData.Kills -1;
-					if mission.SaveData.Kills <= 0 then
-						mission.ProgressionPoint = 2;
-					end
-				end;
-			end)
-		end
-		
 		if modMission:Progress(player, 24) and zombieNpcModule.Name == "Bandit Zombie" then
 			modMission:Progress(player, 24, function(mission)
 				if mission.ProgressionPoint == 5 then
 					mission.ProgressionPoint = 6;
 				end;
-			end)
-		end
-		
-		if modMission:Progress(player, 23) and zombieNpcModule.Configuration.MissionTag == 23 then
-			modMission:Progress(player, 23, function(mission)
-				if mission.ProgressionPoint == 1 then
-					mission.SaveData.Kills = mission.SaveData.Kills -1;
-					if mission.SaveData.Kills <= 0 then
-						mission.ProgressionPoint = 2;
-					end
-				end;
-			end)
-		end
-		
-		if modMission:Progress(player, 25) and zombieNpcModule.Configuration.SantaHat then
-			modMission:Progress(player, 25, function(mission)
-				if mission.SaveData.Kills > 0 then
-					mission.SaveData.Kills = mission.SaveData.Kills -1;
-				end
-				if mission.SaveData.Kills <= 0 then
-					mission.ProgressionPoint = 2;
-				end
 			end)
 		end
 		

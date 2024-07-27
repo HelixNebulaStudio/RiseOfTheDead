@@ -617,9 +617,18 @@ return function()
 		if actionId == "init" then
 			modData:WaitForMissions();
 
+			local missionLib = modMissionLibrary.Get(missionId);
+
 			local missionsList = modData.GameSave and modData.GameSave.Missions;
 			local mission = modData:GetMission(missionId);
 			
+			if missionLib.LogicScript == nil then
+				local newLogicScript = logicScript:Clone();
+				newLogicScript.Name = `{missionLib.Name}LogicScript`;
+				newLogicScript.Parnet = modMissionLibrary.Script;
+				missionLib.LogicScript = newLogicScript;
+			end
+
 			local modMissionFuncs = require(logicScript);
 			if modMissionFuncs and modMissionFuncs.Init then
 				modMissionFuncs.Init(missionsList, mission);
