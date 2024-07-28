@@ -28,6 +28,16 @@ function LazyLoader.new(src: LuaSourceContainer)
 end
 
 if RunService:IsServer() then
+    function LazyLoader:Load(player, key)
+        if self.OnServerRequested == nil then return end;
+
+        local packet = self.OnServerRequested(player, key);
+        if packet then
+            remote:FireClient(player, self.Script, key, packet);
+        end
+        return packet;
+    end
+
     function LazyLoader:ConnectOnServerRequested(func)
         self.OnServerRequested = func;
     end
@@ -74,12 +84,7 @@ if RunService:IsServer() then
             return;
         end;
 
-        if lazyLoader.OnServerRequested then
-            local packet = lazyLoader.OnServerRequested(player, key);
-            if packet then
-                remote:FireClient(player, lazyLoader.Script, key, packet);
-            end
-        end
+        lazyLoader:Load(player, key);
     end)
 
     game:GetService("Players").PlayerRemoving:Connect(function()
@@ -99,6 +104,12 @@ if RunService:IsClient() then
         remote:FireServer(self.Script, key);
     end
     
+    function LazyLoader:Load(key, packet)
+        if self.OnClientLoad == nil then return end;
+
+        self.OnClientLoad(key, packet);
+    end
+
     function LazyLoader:ConnectOnClientLoad(func)
         self.OnClientLoad = func;
     end
@@ -107,9 +118,7 @@ if RunService:IsClient() then
         local lazyLoader = LazyLoader.List[src];
         if lazyLoader == nil then return end;
 
-        if lazyLoader.OnClientLoad then
-            lazyLoader.OnClientLoad(key, packet);
-        end
+        lazyLoader:Load(key, packet);
     end)
 end
 

@@ -17,20 +17,23 @@ local AssetHandler = {
 --==
 
 
-local function getDirectory(root, ...)
+local function getDirectory(root, path)
 	local index = 0;
 	local dir = nil;
 
-	for _, path in pairs({...}) do
+	local paths = string.split(path, "/");
+
+	for _, dirName in pairs(paths) do
 		if index == 0 then
 			dir = root;
 		end
 
-		dir = dir:FindFirstChild(path);
+		dir = dir:FindFirstChild(dirName);
 
 		if dir == nil then
 			return nil;
 		end
+		index = index +1;
 	end
 
 	return dir;
@@ -45,18 +48,19 @@ function AssetHandler.init()
 	AssetHandler.ServerAssetsFolder = game.ServerStorage:FindFirstChild(assetsKey);
 end
 
-function AssetHandler:GetShared(...: string)
+function AssetHandler:GetShared(path: string)
 	if self.Inited ~= true then AssetHandler.init() end;
 	if self.SharedAssetsFolder == nil then return end
+	Debugger:StudioLog("GetShared", path);
 
-	return getDirectory(self.SharedAssetsFolder, ...);
+	return getDirectory(self.SharedAssetsFolder, path);
 end
 
-function AssetHandler:GetServer(...: string)
+function AssetHandler:GetServer(path: string)
 	if self.Inited ~= true then AssetHandler.init() end;
+	Debugger:StudioLog("GetServer", path);
 
 	if RunService:IsClient() then 
-		local path = table.concat({...}, "/");
 		local asset = self:GetShared(path);
 
 		if asset then
@@ -82,16 +86,21 @@ function AssetHandler:GetServer(...: string)
 
 	if self.ServerAssetsFolder == nil then return end;
 
-	return getDirectory(self.ServerAssetsFolder, ...);
+	return getDirectory(self.ServerAssetsFolder, path);
 end
 
 
 if RunService:IsServer() then
+	function AssetHandler:Load(player, key)
+		Debugger:StudioLog("Load", player, key);
+		lazyLoader:Load(player, key);
+	end
+	
 	lazyLoader:ConnectOnServerRequested(function(player, key)
 		if key == nil then return end;
-		local path = string.split(key, "/");
+		Debugger:StudioLog("OnServerRequest", player, key);
 
-		local asset = AssetHandler:GetServer(path);
+		local asset = AssetHandler:GetServer(key);
 		if asset == nil then return end
 
 		local new = asset:Clone();
@@ -106,6 +115,7 @@ if RunService:IsClient() then
 	lazyLoader:ConnectOnClientLoad(function(key: string, obj: Instance)
 		if AssetHandler.Inited ~= true then AssetHandler.init() end;
 		if key == nil then return end;
+		Debugger:StudioLog("OnClientLoad", key, obj);
 	
 		if AssetHandler.SharedAssetsFolder:FindFirstChild(key) then return end;
 

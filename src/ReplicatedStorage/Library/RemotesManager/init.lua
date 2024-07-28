@@ -476,6 +476,7 @@ else
 	RemotesManager:NewFunctionRemote("Replication");
 	RemotesManager:NewEventRemote("PlayAudio");
 	RemotesManager:NewEventRemote("EventService");
+	RemotesManager:NewFunctionRemote("CutsceneService");
 
 	--== Game;
 	RemotesManager:NewUnreliableEventRemote("CharacterRemote");

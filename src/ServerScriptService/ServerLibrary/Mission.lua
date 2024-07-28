@@ -13,6 +13,7 @@ local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler);
 
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
@@ -954,7 +955,6 @@ function Mission.NewList(profile, gameSave, syncFunc)
 			if library.CutsceneScript and CheckWorld(library.World) then
 				modCutscene:LoadScript(library.Name, library.CutsceneScript);
 				modCutscene:PlayCutscene({player}, library.Name);
-
 			end
 		end);
 		

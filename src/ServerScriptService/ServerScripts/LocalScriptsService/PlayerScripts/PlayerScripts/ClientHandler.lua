@@ -26,12 +26,12 @@ return function()
 	local modTableManager = require(game.ReplicatedStorage.Library.TableManager);
 	local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 
+	local modMissionLibrary = require(game.ReplicatedStorage.Library:WaitForChild("MissionLibrary"));
 	local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
 	local modPlayers = require(game.ReplicatedStorage.Library.Players);
 	local modReplicationManager = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("ReplicationManager"));
 	local modBranchConfigurations = require(game.ReplicatedStorage.Library.BranchConfigurations);
 	local modInteractable = require(game.ReplicatedStorage.Library.Interactables);
-	local modMissionLibrary = require(game.ReplicatedStorage.Library:WaitForChild("MissionLibrary"));
 	local modCollectiblesLibrary = require(game.ReplicatedStorage.Library.CollectiblesLibrary);
 	local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 	local modEventService = require(game.ReplicatedStorage.Library.EventService);
@@ -260,7 +260,6 @@ return function()
 
 				end
 				
-				Debugger:Warn("data", data);
 				modData.UpdatePickupCache();
 				
 			end
@@ -625,7 +624,7 @@ return function()
 			if missionLib.LogicScript == nil then
 				local newLogicScript = logicScript:Clone();
 				newLogicScript.Name = `{missionLib.Name}LogicScript`;
-				newLogicScript.Parnet = modMissionLibrary.Script;
+				newLogicScript.Parent = modMissionLibrary.Script;
 				missionLib.LogicScript = newLogicScript;
 			end
 

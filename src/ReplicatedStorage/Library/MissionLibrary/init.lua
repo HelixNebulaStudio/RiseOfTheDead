@@ -73,7 +73,8 @@ function MissionLibrary.New(data)
 	missionCount = missionCount +1;
 	
 	if data.UseAssets and RunService:IsServer() then
-		local gameAssets = modAssetHandler:GetServer("Missions", `Mission{data.MissionId}`);
+		local assetKey = `Missions/Mission{data.MissionId}`;
+		local gameAssets = modAssetHandler:GetServer(assetKey);
 		
 		local missionDialogues = gameAssets and gameAssets:FindFirstChild("MissionDialogues") or nil;
 		if missionDialogues then
@@ -99,6 +100,8 @@ function MissionLibrary.New(data)
 		-- 	end
 		-- end;
 		
+		data.AssetKey = assetKey;
+
 		local cutsceneScript = gameAssets and gameAssets:FindFirstChild("CutsceneScript") or nil;
 		if cutsceneScript then
 			data.Cutscene = data.Name;
@@ -1496,7 +1499,6 @@ MissionLibrary.New{
 	MissionId=43;
 	MissionType = MissionLibrary.MissionTypes.Event;
 	Name="Missing Body 1";
-	Cutscene="Missing Body"; 
 	From="Jack Reap";
 	Description="A mysterious man needs your help searching for something..";
 	Persistent=true;
@@ -1530,7 +1532,6 @@ MissionLibrary.New{
 	MissionId=44;
 	MissionType = MissionLibrary.MissionTypes.Event;
 	Name="Missing Body 2";
-	Cutscene="Missing Body2"; 
 	From="Jack Reap";
 	Description="Did you see a ghost?! Investigate further.";
 	Persistent=true;
@@ -1560,7 +1561,6 @@ MissionLibrary.New{
 	MissionId=45;
 	MissionType = MissionLibrary.MissionTypes.Side;
 	Name="Mike's Lucky Coin";
-	Cutscene="Mikes Coin"; 
 	From="Mike";
 	Description="Mike left his lucky coin in the prison that he escape, help him find it.";
 	Persistent=true;
@@ -1650,7 +1650,6 @@ MissionLibrary.New{
 	Description="A stranger is trapped somewhere in W.D. Mall and needs your help.";
 	Timer=BoardTimeLimit;
 	Persistent=true;
-	Cutscene="Coming To The Rescue";
 	SaveData={
 		Id=(function()
 			local list = {1;2;3;};
@@ -1717,7 +1716,6 @@ MissionLibrary.New{
 	From="Bunny Man";
 	Description="Bunny Man gives player another job.";
 	World="EasterButchery";
-	Cutscene="Easter Butchery 2";
 	Persistent=true;
 	Progression={
 		"Talk to Bunny Man";
@@ -1751,7 +1749,6 @@ MissionLibrary.New{
 	From="Wilson";
 	Description="Wilson recieves a radio broadcast from the military that they are sending in an inspector squad into the quarantine zone to assess the situation.";
 	World={"TheUnderground"; "TheResidentials"};
-	Cutscene="Quarantine Assessment";
 	Persistent=true;
 	Progression={
 		"Make contact using the military radio in the Underbridge Community";
@@ -2235,7 +2232,6 @@ MissionLibrary.New{
 	Description="After the cargo ship disaster, you check up on Patrick to see what's up.";
 	Persistent=true;
 	World={"TheMall"; "BanditsRecruitment"; };
-	Cutscene="Bandits Recruitment";
 	Checkpoint={
 		{Text="Head to the Bandit Camp";};
 		{Text="Talk to the bandit again when you are ready to travel";};
@@ -2583,7 +2579,6 @@ MissionLibrary.New{
 	From="Rachel";
 	Description="Rachel has an epiphany about Stan and the possibility of his blood.";
 	Persistent=true;
-	Cutscene="Medical Breakthrough";
 	Checkpoint={
 		{Text="Talk to Rachel to pick up the blood samples";};
 		{Text="Head to W.D. Mall's Clinic Safehouse"; Notify=true;};

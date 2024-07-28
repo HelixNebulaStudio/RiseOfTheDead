@@ -90,7 +90,7 @@ function DialogueService:InitServer(baseDialogueHandlers)
                 end
                 
                 function dialog:AddChoice(tag, func, data)
-                    local choiceData, choiceIndex = modDialogueLibrary.GetByTag(npcName, tag);
+                    local _choiceData, choiceIndex = modDialogueLibrary.GetByTag(npcName, tag);
                     
                     local exist = false;
                     for a=1, #dialog.Choices do
@@ -176,13 +176,14 @@ function DialogueService:InitServer(baseDialogueHandlers)
                                 missionDialogueFunc(player, dialog, npcDialogData, missionData);
                                 
                             elseif missionLib.UseAssets == true then
-                                local missionAssets = modAssetHandler:GetServer("Missions", `Mission{missionData.Id}`);
+                                local missionAssets = modAssetHandler:GetServer(`Missions/Mission{missionData.Id}`);
                                 
                                 if missionAssets and missionAssets:FindFirstChild("MissionDialogues") then
                                     local missionDialogues = require(missionAssets.MissionDialogues);
                                     missionDialogueFunc = missionDialogues[npcName] and missionDialogues[npcName].DialogueHandler;
                                     
                                     if missionDialogueFunc then
+                                        modAssetHandler:Load(player, `Missions/Mission{missionData.Id}`);
                                         missionDialogueFunc(player, dialog, npcDialogData, missionData);
                                     end
                                 end
