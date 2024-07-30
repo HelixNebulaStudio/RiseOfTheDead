@@ -16,15 +16,11 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local modLazyLoader = require(game.ReplicatedStorage.Library.LazyLoader);
 
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-
 local remoteCutsceneService = modRemotesManager:Get("CutsceneService");
 
-
 local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
-local remotePlayClientScene = remotes:WaitForChild("Cutscene"):WaitForChild("PlayClientScene");
 local remoteContinueScene = remotes:WaitForChild("Cutscene"):WaitForChild("ContinueScene");
 local remoteClientReady = remotes:WaitForChild("Cutscene"):WaitForChild("ClientReady");
-
 
 local lazyLoader = modLazyLoader.new(script);
 lazyLoader.RequestLimit = 20;
@@ -91,11 +87,8 @@ function CutsceneSequence.new(cutscene)
 				
 				cutscene:ForEachPlayer(function(player)
 					completed[player.Name] = false;
+
 					local success, failedErr = pcall(function()
-
-
-
-
 						local invoked = false;
 						task.spawn(function()
 							local load = remoteCutsceneService:InvokeClient(player, "load", {
@@ -111,7 +104,6 @@ function CutsceneSequence.new(cutscene)
 								Scene=sceneName;
 							});
 							
-							--remotePlayClientScene:InvokeClient(player, cutscene.Name, sceneName);
 							invoked = true;
 						end)
 						for a=1, 5, 0.1 do
@@ -125,12 +117,15 @@ function CutsceneSequence.new(cutscene)
 							error(`Client ({player.Name}) failed to respond.`);
 						end
 					end)
-					if not success then Debugger:Warn(`{cutscene.Name}:{sceneName} failed:`,failedErr) end;
+
+					if not success then
+						Debugger:Warn(`{cutscene.Name}:{sceneName} failed:`,failedErr);
+					end;
 					completed[player.Name] = true;
 	
 					local c = true;
-					for playerName, completed in pairs(completed) do
-						if not completed then c = false; break; end;
+					for playerName, isComplete in pairs(completed) do
+						if not isComplete then c = false; break; end;
 					end
 					allComplete = c;
 
@@ -272,14 +267,17 @@ if RunService:IsClient() then
 	local activeCutscenes = {};
 
 	function remoteCutsceneService.OnClientInvoke(action, ...)
-
 		if action == "load" then
 			local packet = ...;
 
 			Debugger:StudioLog("load", packet);
 			local cutsceneName = packet.Name;
 
-			return Cutscene.Scenes[cutsceneName] == nil;
+			local isLoaded = Cutscene.Scenes[cutsceneName] ~= nil;
+			if not isLoaded then
+				Debugger:Warn("Loading Cutscene(",cutsceneName,")");
+			end
+			return not isLoaded;
 
 		elseif action == "play" then
 			local packet = ...;
@@ -296,7 +294,7 @@ if RunService:IsClient() then
 				end
 			end
 
-			Debugger:StudioWarn(`Play Cutscene ({cutsceneName}: {sceneName})`);
+			Debugger:Warn(`Play Cutscene ({cutsceneName}: {sceneName})`);
 			local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 			local cutsceneObj = activeCutscenes[cutsceneName];
@@ -317,28 +315,6 @@ if RunService:IsClient() then
 		end
 
 		return;
-	end
-
-	function remotePlayClientScene.OnClientInvoke(cutsceneName, sceneName)
-		-- MARK: Client PlayCutscene;
-
-		Debugger:StudioWarn(`Play Cutscene ({cutsceneName}: {sceneName})`);
-		local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
-
-		local cutsceneObj = activeCutscenes[cutsceneName];
-		if cutsceneObj == nil then
-			cutsceneObj = Cutscene.New(cutsceneName);
-			activeCutscenes[cutsceneName] = cutsceneObj;
-		end
-
-		local cutsceneSequence = cutsceneObj and cutsceneObj.Sequence;
-		if cutsceneSequence and cutsceneSequence[sceneName] then
-			cutsceneObj.Status = Cutscene.Status.Playing;
-			cutsceneSequence.modData = modData;
-			cutsceneSequence[sceneName]();
-		else
-			Debugger:Warn("Cutscene>> Scene(",sceneName,") does not exist for (",cutsceneName,").");
-		end
 	end
 	
 	task.spawn(function()

@@ -29,6 +29,7 @@ local modDialogueLibrary = require(game.ReplicatedStorage.Library.DialogueLibrar
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modFacesLibrary = require(game.ReplicatedStorage.Library.FacesLibrary);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
+local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler);
 
 local modScreenRelativeTextSize = require(game.ReplicatedStorage.Library.UI.ScreenRelativeTextSize);
 local branchColor = modBranchConfigs.BranchColor;
@@ -101,13 +102,35 @@ function Interface.init(modInterface)
 	end)
 
 	function remoteDialogueHandler.OnClientInvoke(action, packet)
-		if action == "talk" then
+		if action == "load" then
+			Debugger:StudioLog("Load dialogues", packet);
+
+			local missionId = packet.MissionId;
+			local file = packet.File;
+
+			local missionDialogues = require(file);
+				
+			for npcName, pack in pairs(missionDialogues) do
+				if pack.Dialogues == nil then continue end;
+				
+				modDialogueLibrary.AddDialogues(npcName, pack.Dialogues(), {
+					MissionId = missionId;
+				});
+			end
+
+			return true;
+
+		elseif action == "talk" then
 			local dialogPacket = packet;
 			window:Open();
 			Interface:OnDialogue(dialogPacket);
 			
 		end
+
+		return;
 	end
+
+	modAssetHandler.init();
 	
 	window:AddCloseButton(dialogueFrame);
 	return Interface;

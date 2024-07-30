@@ -15,8 +15,6 @@ local missionId = 64;
 -- MARK: Joseph Dialogues
 Dialogues.Joseph.Dialogues = function()
 	return {
-		{Tag="josephcrossbow_init"; Face="Suspicious"; 
-			Reply="If you ever come across a crossbow, please show it to me.";};
 		{Tag="josephcrossbow_try"; Face="Skeptical"; 
 			Dialogue="Is this crossbow what you are talking about?"; 
 			Reply="Ahh yes.. I had a build for the crossbow, I've written my build somewhere near my workbench a long time ago and forgotten it, try to figure out how it's built."};

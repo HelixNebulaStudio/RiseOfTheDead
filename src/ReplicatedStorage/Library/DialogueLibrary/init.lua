@@ -38,7 +38,18 @@ function DialogueLibrary.AddDialogues(name, dialogues, params)
 		if params.MissionId and dialog.MissionId == nil then
 			dialog.MissionId = params.MissionId;
 		end
-		table.insert(lib.Dialogues, dialog);
+
+		local exist = false;
+		for b=1, #lib.Dialogues do
+			if lib.Dialogues[b].Tag == dialog.Tag then
+				exist = true;
+				break;
+			end
+		end
+		if not exist then
+			table.insert(lib.Dialogues, dialog);
+		end
+		
 	end
 end
 

@@ -14,17 +14,11 @@ local missionId = 2;
 -- !outline: Mason Dialogues
 Dialogues.Mason.Dialogues = function()
 	return {
-		{Tag="whereAmI_init";
-			Face="Happy"; Reply="Oh hey, you're finally awake. I'm Mason, how are you feeling?";};
-		
 		{Tag="whereAmI_deniski"; Dialogue="Not so well, where are we?"; Face="Happy";
 			Reply="You're in the warehouse. You're safe here, that's why we also call it the safehouse, haaha.. You should talk to the doctor to get you fixed up."};
 		{Tag="whereAmI_canHeal"; Dialogue="Where is he?"; Face="Skeptical";
 			Reply="Dr. Deniski should be here somewhere, follow me, he'll gladly help you out."};
 		
-
-		{Tag="whereAmI_init2";
-			Face="Happy"; Reply="How do you feel now?";};
 		{Tag="whereAmI_found"; Dialogue="Much better now, thanks for saving me back there."; Face="Surprise";
 			Reply="You're welcome, I was scavenging when I found you unconscious. It's really a miracle being out there unconscious for days."};
 		{Tag="whereAmI_apocalypse"; Dialogue="Are we stuck here?"; Face="Disgusted";
@@ -84,7 +78,10 @@ if RunService:IsServer() then
 		elseif mission.Type == 1 then -- Active
 			local checkpoint = mission.ProgressionPoint;
 			if checkpoint <= 2 then
-				dialog:SetInitiateTag("whereAmI_init");
+				dialog:InitDialog{
+					Text="Oh hey, you're finally awake. I'm Mason, how are you feeling?";
+					Face="Happy";
+				}
 				
 				dialog:AddChoice("whereAmI_deniski", function(dialog)
 					dialog:AddChoice("whereAmI_canHeal", function(dialog)
@@ -102,10 +99,16 @@ if RunService:IsServer() then
 				};
 				
 			elseif checkpoint == 3 or checkpoint == 4 then
-				dialog:SetInitiateTag("whereAmI_init2");
+				dialog:InitDialog{
+					Text="How do you feel now?";
+					Face="Happy";
+				}
 				
 				if checkpoint == 4 then
-					dialog:SetInitiate("How do you feel now?");
+					dialog:InitDialog{
+						Text="How do you feel now?";
+						Face="Happy";
+					}
 					dialog:AddChoice("whereAmI_found", function(dialog)
 						dialog:AddChoice("whereAmI_apocalypse", function(dialog)
 							dialog:AddChoice("whereAmI_talkToNick", function(dialog)
@@ -125,7 +128,7 @@ if RunService:IsServer() then
 		end
 	end
 	
-	-- !outline: Nick Handler
+	-- MARK: Nick Handler
 	Dialogues.Nick.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 
@@ -176,7 +179,10 @@ if RunService:IsServer() then
 					end
 					
 				else
-					dialog:SetInitiate("Oh, have you changed your mind?");
+					dialog:InitDialog{
+						Text="Oh, have you changed your mind?";
+						Face="Surprise";
+					}
 					
 					dialog:AddChoice("whereAmI_reacceptTask", function(dialog)
 						modMission:SetData(player, missionId, "accept", 1);
@@ -200,7 +206,11 @@ if RunService:IsServer() then
 				end
 				
 			elseif checkpoint >= 8 and checkpoint <= 10 then
-				dialog:SetInitiate("Have you killed the zombies outside the warehouse yet?");
+				dialog:InitDialog{
+					Text="Have you killed the zombies outside the warehouse yet?";
+					Face="Surprise";
+				}
+				
 				if checkpoint == 10 then
 					dialog:AddChoice("whereAmI_taskComplete", function(dialog)
 						modMission:CompleteMission(player, missionId);

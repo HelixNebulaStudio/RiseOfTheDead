@@ -7,8 +7,12 @@ local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 
 return function(player, dialog, data)
     if math.random(1, 99) == 1 then
-        dialog:SetInitiate("... *creak*");
+        dialog:InitDialog{
+            Text="... *creak*";
+        }
     else
-        dialog:SetInitiate("...");
+        dialog:InitDialog{
+            Text="...";
+        }
     end
 end

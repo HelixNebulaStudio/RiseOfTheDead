@@ -4,6 +4,8 @@ MarkupFormatter.TestString = "## Revived 1.5.9 Update\n\n```\nDev Log: Press [F1
 function MarkupFormatter.Format(essay)
 	local head = false;
 
+	essay = string.gsub(essay, `(%[%[.-%](.-)%])`, "");
+
 	essay = string.gsub(essay, "[%*][%*]", function(s)
 		head = not head;
 		if head then
@@ -84,7 +86,7 @@ function MarkupFormatter.Format(essay)
 	essay = newheader(essay, "#", function(lineText)
 		return '<font size="32" color="rgb(255,255,255)">'.. lineText .. '</font>';
 	end)
-	
+
 	return essay;
 end
 

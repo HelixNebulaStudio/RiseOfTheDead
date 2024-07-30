@@ -28,7 +28,10 @@ return function(player, dialog, data)
 		local playerLevel = playerSave:GetStat("Level") or 0;
 
 		if playerLevel >= 500 then
-			dialog:SetInitiateTag("josephcrossbow_init");
+			dialog:InitDialog{
+				Text="If you ever come across a crossbow, please show it to me.";
+				Face="Suspicious";
+			}
 
 			local isCrossBow = false;
 			if profile.EquippedTools.WeaponModels == nil then return end;

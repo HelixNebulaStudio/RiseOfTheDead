@@ -15,7 +15,6 @@ return function(player, dialog, data)
 	end
 	
 	if not modMission:IsComplete(player, 58) then return end;
-		--dialog:SetInitiateTag("safehomeInit");
 		
 	local safehomeNpcsDialogues = {};
 	local profile = shared.modProfile:Get(player);

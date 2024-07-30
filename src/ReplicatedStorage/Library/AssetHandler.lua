@@ -45,6 +45,8 @@ function AssetHandler.init()
 	local assetsKey = "Assets"..modGlobalVars.EngineMode;
 
 	AssetHandler.SharedAssetsFolder = game.ReplicatedStorage:FindFirstChild(assetsKey);
+
+	if RunService:IsClient() then return end;
 	AssetHandler.ServerAssetsFolder = game.ServerStorage:FindFirstChild(assetsKey);
 end
 

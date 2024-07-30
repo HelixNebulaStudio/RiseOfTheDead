@@ -140,7 +140,6 @@ function GuiHighlight.Set(...)
 			for a=1, #interface.Pages do
 				interface.Pages[a].Refresh();
 			end
-			Debugger:Log("interface.Pages", interface.Pages);
 		end
 
 		local function search(page, index, path)

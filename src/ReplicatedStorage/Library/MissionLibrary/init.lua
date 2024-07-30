@@ -78,7 +78,12 @@ function MissionLibrary.New(data)
 		
 		local missionDialogues = gameAssets and gameAssets:FindFirstChild("MissionDialogues") or nil;
 		if missionDialogues then
+			local loadedDialogues = false;
 			data.LoadDialogues = function()
+				if loadedDialogues then return end;
+				loadedDialogues = true;
+				
+				Debugger:StudioWarn("Load dialogue", data.MissionId);
 				missionDialogues = require(gameAssets.MissionDialogues);
 				
 				for npcName, pack in pairs(missionDialogues) do
@@ -89,17 +94,9 @@ function MissionLibrary.New(data)
 					});
 				end
 			end
+			data.DialogueScript = missionDialogues;
 		end;
 
-		-- data.LoadCutscene = function()
-		-- 	local cutsceneScript = gameAssets and gameAssets:FindFirstChild("CutsceneScript") or nil;
-		-- 	if cutsceneScript then
-		-- 		cutsceneScript.Name = data.Name;
-		-- 		cutsceneScript.Parent = modCutscene.Script;
-		-- 		data.Cutscene = data.Name;
-		-- 	end
-		-- end;
-		
 		data.AssetKey = assetKey;
 
 		local cutsceneScript = gameAssets and gameAssets:FindFirstChild("CutsceneScript") or nil;
@@ -180,7 +177,7 @@ MissionLibrary.New{
 	MissionId=2;
 	MissionType = MissionLibrary.MissionTypes.Core;
 	Name="Where am I";
-	From="Nick";
+	From="Mason";
 	Description="You woke up in a warehouse after the explosion on the Wrighton Dale bridge.";
 	Persistent=true;
 	World="TheWarehouse";

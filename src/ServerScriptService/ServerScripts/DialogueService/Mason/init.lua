@@ -59,7 +59,8 @@ return function(player, dialog, data)
 	end
 
 	local hardhatsilver = modEvents:GetEvent(player, "freeHardhatsilver");
-	if hardhatsilver == nil and profile.GamePass.DbTinker then
+	Debugger:StudioLog("Mason activemission count ", activeMissionCount);
+	if hardhatsilver == nil and profile.GamePass.DbTinker and activeMissionCount <= 0 then
 		dialog:SetInitiate("Hey $PlayerName, I have something for you.");
 
 		local dialogPacket = {

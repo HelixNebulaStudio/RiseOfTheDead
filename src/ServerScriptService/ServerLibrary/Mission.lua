@@ -821,6 +821,9 @@ function Mission.NewList(profile, gameSave, syncFunc)
 				if lib.CutsceneScript and CheckWorld(lib.World) then
 					table.insert(cutsceneLoaded, list[a].Id);
 
+					if lib.LoadDialogues then
+						lib.LoadDialogues();
+					end
 					modCutscene:LoadScript(lib.Name, lib.CutsceneScript);
 					modCutscene:PlayCutscene({player}, lib.Name);
 					
@@ -950,6 +953,9 @@ function Mission.NewList(profile, gameSave, syncFunc)
 		self.OnMissionChanged:Fire(mission);
 		
 		spawn(function()
+			if library.LoadDialogues then
+				library.LoadDialogues();
+			end
 			local modCutscene = shared.modCutscene;
 
 			if library.CutsceneScript and CheckWorld(library.World) then

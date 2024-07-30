@@ -9,6 +9,7 @@ local library = modLibraryManager.new();
 
 library.BranchName = modBranchConfigs.BranchName;
 library.GameVersion = string.match(modGlobalVars.GameVersion, "%d.%d");
+library.DevVersion = string.match(modGlobalVars.DevVersion, "%d.%d");
 
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local moddedSelf = modModEngineService:GetServerModule(script.Name);

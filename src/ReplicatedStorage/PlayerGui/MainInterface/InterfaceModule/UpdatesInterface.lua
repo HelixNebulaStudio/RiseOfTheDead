@@ -61,6 +61,7 @@ end;
 
 function Interface.Update()
 	local updateLogText = remoteApiRequest:InvokeServer("updatelog") or "";
+	Debugger:StudioWarn("updateLogText", updateLogText)
 	local success, message = pcall(function()
 		textLabel.Text = modMarkupFormatter.Format(updateLogText);
 	end)

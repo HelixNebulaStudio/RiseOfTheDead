@@ -19,6 +19,7 @@ function DialogueService:InitServer(baseDialogueHandlers)
 
     local modDialogues = require(game.ServerScriptService.ServerLibrary.DialogueSave);
     local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+    local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 
     local bindOnTalkedTo = game.ReplicatedStorage.Remotes.Dialogue.OnTalkedTo;
     local remoteDialogueHandler = modRemotesManager:Get("DialogueHandler");
@@ -30,6 +31,8 @@ function DialogueService:InitServer(baseDialogueHandlers)
 
     --== Script;
     local function OnDialogue(player, npcModel, npcName, choice)
+        local profile = shared.modProfile:Get(player);
+
         npcName = npcName or "nilName";
         local activeDialogues = modDialogues:Get(player);
         local npcDialogData = activeDialogues and activeDialogues:Get(npcName) or nil;
@@ -120,6 +123,40 @@ function DialogueService:InitServer(baseDialogueHandlers)
                     dialog.ExpireTime = t;
                 end
                 
+                --[[
+                    dialog:InitDialog()
+                    packet = {
+                        Text: string;
+                        Face: string;
+                    }
+                ]]
+                function dialog:InitDialog(packet)
+                    local npcModule = npcStatus and npcStatus:GetModule();
+                    
+                    dialog.Initial = packet.Text or "n/a";
+                    local face = nil;
+
+                    if packet.Tag then
+                        local choiceData, choiceIndex = modDialogueLibrary.GetByTag(npcName, packet.Tag);
+                        
+                        if choiceIndex then
+                            dialog.Initial = choiceIndex;
+                        end
+                        if choiceData and choiceData.Face then
+                            face = choiceData.Face;
+                        end
+                    end
+
+                    if face == nil then
+                        face = packet.Face;
+                    end
+
+                    if face and npcModule and npcModule.AvatarFace then
+                        npcModule.AvatarFace:DialogSet(face, player);
+                        
+                    end
+                end
+
                 function dialog:SetInitiate(str, face)
                     dialog.Initial = str;
                     
@@ -176,14 +213,31 @@ function DialogueService:InitServer(baseDialogueHandlers)
                                 missionDialogueFunc(player, dialog, npcDialogData, missionData);
                                 
                             elseif missionLib.UseAssets == true then
-                                local missionAssets = modAssetHandler:GetServer(`Missions/Mission{missionData.Id}`);
+                                local assetKey = `Missions/Mission{missionData.Id}`;
+                                local missionAssets = modAssetHandler:GetServer(assetKey);
                                 
                                 if missionAssets and missionAssets:FindFirstChild("MissionDialogues") then
                                     local missionDialogues = require(missionAssets.MissionDialogues);
                                     missionDialogueFunc = missionDialogues[npcName] and missionDialogues[npcName].DialogueHandler;
                                     
                                     if missionDialogueFunc then
-                                        modAssetHandler:Load(player, `Missions/Mission{missionData.Id}`);
+                                        
+                                        if profile.Cache[assetKey] == nil then
+                                            Debugger:Warn("Load dialogues (",assetKey,")");
+                                            local new = missionAssets.MissionDialogues:Clone();
+                                            new.Parent = player.PlayerGui;
+                                            Debugger.Expire(new, 5);
+    
+                                            local loadSuccess = remoteDialogueHandler:InvokeClient(player, "load", {
+                                                Key=assetKey;
+                                                File=new;
+                                                MissionId=missionData.Id;
+                                            });
+                                            if loadSuccess then
+                                                profile.Cache[assetKey] = true;
+                                            end
+                                        end
+                                        
                                         missionDialogueFunc(player, dialog, npcDialogData, missionData);
                                     end
                                 end
