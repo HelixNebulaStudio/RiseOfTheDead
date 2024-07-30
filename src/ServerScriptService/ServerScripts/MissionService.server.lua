@@ -223,7 +223,7 @@ function OnPlayerAdded(player)
 
 			else
 				missionProfile.OnMissionChanged:Connect(function(mission)
-					if mission and mission.Id == 12 and (missionFactoryRaid.Type < 3 and missionFactoryRaid.ProgressionPoint < 4) then 
+					if mission and mission.Id == 12 and (mission.Type < 3 and mission.ProgressionPoint < 4) then 
 						mission.Cache.Blockade = blockade;
 					end
 				end)

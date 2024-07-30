@@ -248,8 +248,10 @@ function Interface:OnDialogue(dialogPacket)
 			local data = choiceOption.Dialogue;
 			local dialogData = choiceOption.Data;
 			
-			if data == nil and RunService:IsStudio() then
-				Debugger:Warn("[Studio] data==nil; choiceOption=", choiceOption);
+			if data == nil then
+				Debugger:Warn(NpcName,"failed to load dialogue", index);
+				Debugger:StudioWarn("data==nil; choiceOption=", choiceOption);
+				continue;
 			end
 			
 			local unlockTime = dialogData and dialogData.ChoiceUnlockTime and (dialogData.ChoiceUnlockTime-serverTime) or nil;

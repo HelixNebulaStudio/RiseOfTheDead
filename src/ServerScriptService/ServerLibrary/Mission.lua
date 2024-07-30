@@ -818,15 +818,15 @@ function Mission.NewList(profile, gameSave, syncFunc)
 			for a=1, #list do
 				local lib = modMissionLibrary.Get(list[a].Id);
 				
+				if lib.LoadDialogues then
+					lib.LoadDialogues();
+				end
+
 				if lib.CutsceneScript and CheckWorld(lib.World) then
 					table.insert(cutsceneLoaded, list[a].Id);
 
-					if lib.LoadDialogues then
-						lib.LoadDialogues();
-					end
 					modCutscene:LoadScript(lib.Name, lib.CutsceneScript);
 					modCutscene:PlayCutscene({player}, lib.Name);
-					
 				end
 
 				

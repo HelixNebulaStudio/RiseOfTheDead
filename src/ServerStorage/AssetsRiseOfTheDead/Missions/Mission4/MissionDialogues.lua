@@ -10,10 +10,10 @@ local Dialogues = {
 local missionId = 4;
 --==
 
--- !outline: Dr. Deniski Dialogues
+-- MARK: Dr. Deniski Dialogues
 Dialogues["Dr. Deniski"].Dialogues = function()
 	return {
-		{Tag="lendAHand_start"; CheckMission=4; Dialogue="Sure, how can I help you?"; 
+		{Tag="lendAHand_start"; CheckMission=missionId; Dialogue="Sure, how can I help you?"; 
 			Reply="I'm doing some experiments and I need a zombie arm, if you can find me one, that would be great!";
 			FailResponses = {
 				{Reply="Hahah, if you want to help, you'll need to prove yourself first."};
@@ -25,13 +25,16 @@ Dialogues["Dr. Deniski"].Dialogues = function()
 end
 
 if RunService:IsServer() then
-	-- !outline: Dr. Deniski Handler
+	-- MARK: Dr. Deniski Handler
 	Dialogues["Dr. Deniski"].DialogueHandler = function(player, dialog, data, mission)
 		local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 
 		if mission.Type == 2 then -- Available;
-			dialog:SetInitiate("Hey friend, can you do me a favor?");
+			dialog:InitDialog{
+				Text="Hey friend, can you do me a favor?";
+				Face="Smirk";
+			}
 			dialog:AddChoice("lendAHand_start", function(dialog)
 				modMission:StartMission(player, missionId);
 			end);
