@@ -38,11 +38,7 @@ if RunService:IsServer() then
 		local audioInstance = Library[key];
 		if audioInstance == nil then return end;
 
-		local new = audioInstance:Clone();
-		new.Parent = player.PlayerGui.ReplicationDelivery;
-		Debugger.Expire(new, 5);
-
-		return new;
+		return lazyLoader:Deliver(player, audioInstance);
 	end)
 end
 if RunService:IsClient() then

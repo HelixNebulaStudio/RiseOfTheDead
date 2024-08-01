@@ -7,6 +7,7 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler);
+local modLazyLoader = require(game.ReplicatedStorage.Library.LazyLoader);
 
 
 local DialogueService = {
@@ -224,13 +225,10 @@ function DialogueService:InitServer(baseDialogueHandlers)
                                         
                                         if profile.Cache[assetKey] == nil then
                                             Debugger:Warn("Load dialogues (",assetKey,")");
-                                            local new = missionAssets.MissionDialogues:Clone();
-                                            new.Parent = player.PlayerGui.ReplicationDelivery;
-                                            Debugger.Expire(new, 5);
-    
+                                            
                                             local loadSuccess = remoteDialogueHandler:InvokeClient(player, "load", {
                                                 Key=assetKey;
-                                                File=new;
+                                                File=modLazyLoader:Deliver(player, missionAssets.MissionDialogues);
                                                 MissionId=missionData.Id;
                                             });
                                             if loadSuccess then

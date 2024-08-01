@@ -437,6 +437,12 @@ else
 end
 
 local function OnPlayerAdded(player: Player)
+	if RunService:IsServer() then
+		local screenGui = Instance.new("ScreenGui");
+		screenGui.Name = "ReplicationDelivery";
+		screenGui.ResetOnSpawn = false;
+		screenGui.Parent = player.PlayerGui;
+	end
 	if RunService:IsClient() then
 		
 		player.CharacterAdded:Connect(LocalSync)
@@ -461,7 +467,7 @@ game.Players.PlayerRemoving:Connect(function(player)
 end)
 
 local modEngineCore = require(game.ReplicatedStorage.EngineCore);
-modEngineCore:ConnectOnPlayerAdded(script, OnPlayerAdded)
+modEngineCore:ConnectOnPlayerAdded(script, OnPlayerAdded, 1)
 
 if RunService:IsServer() then
 	task.spawn(function()

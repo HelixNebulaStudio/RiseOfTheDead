@@ -28,6 +28,14 @@ function LazyLoader.new(src: LuaSourceContainer)
 end
 
 if RunService:IsServer() then
+    function LazyLoader:Deliver(player: Player, obj: Instance)
+        local new = obj:Clone();
+        new.Parent = player.PlayerGui:WaitForChild("ReplicationDelivery");
+        Debugger.Expire(new, 10);
+
+        return new;
+    end
+
     function LazyLoader:Load(player, key)
         if self.OnServerRequested == nil then return end;
 

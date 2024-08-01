@@ -13,7 +13,7 @@ local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler);
+local modLazyLoader = require(game.ReplicatedStorage.Library.LazyLoader);
 
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
@@ -663,11 +663,7 @@ function Mission.NewList(profile, gameSave, syncFunc)
 				end
 				
 				task.spawn(function()
-					local new = missionLogic:Clone();
-					new.Parent = player.PlayerGui.ReplicationDelivery;
-					Debugger.Expire(new, 5);
-					
-					remoteMissionRemote:InvokeClient(player, "init", missionObject.Id, new);
+					remoteMissionRemote:InvokeClient(player, "init", missionObject.Id, modLazyLoader:Deliver(player, missionLogic));
 				end)
 			end
 			

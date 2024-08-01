@@ -104,13 +104,8 @@ if RunService:IsServer() then
 
 		local asset = AssetHandler:GetServer(key);
 		if asset == nil then return end
-
-		local new = asset:Clone();
-		new.Parent = player.PlayerGui.ReplicationDelivery;
-
-		Debugger.Expire(new, 10);
-
-		return new;
+		
+		return lazyLoader:Deliver(player, asset);
 	end)
 end
 if RunService:IsClient() then

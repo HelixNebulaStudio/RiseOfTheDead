@@ -396,12 +396,7 @@ if RunService:IsServer() then
 
 		local file = Cutscene.Scenes[key].File;
 		
-		local new = file:Clone();
-		new.Parent = player.PlayerGui.ReplicationDelivery;
-		Debugger.Expire(new, 5);
-
-		Debugger:StudioLog("OnServerRequest", key, new);
-		return new;
+		return modLazyLoader:Deliver(player, file);
 	end)
 
 end
