@@ -225,7 +225,7 @@ function DialogueService:InitServer(baseDialogueHandlers)
                                         if profile.Cache[assetKey] == nil then
                                             Debugger:Warn("Load dialogues (",assetKey,")");
                                             local new = missionAssets.MissionDialogues:Clone();
-                                            new.Parent = player.PlayerGui;
+                                            new.Parent = player.PlayerGui.ReplicationDelivery;
                                             Debugger.Expire(new, 5);
     
                                             local loadSuccess = remoteDialogueHandler:InvokeClient(player, "load", {

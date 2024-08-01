@@ -664,7 +664,7 @@ function Mission.NewList(profile, gameSave, syncFunc)
 				
 				task.spawn(function()
 					local new = missionLogic:Clone();
-					new.Parent = player.PlayerGui;
+					new.Parent = player.PlayerGui.ReplicationDelivery;
 					Debugger.Expire(new, 5);
 					
 					remoteMissionRemote:InvokeClient(player, "init", missionObject.Id, new);
