@@ -32,7 +32,7 @@ if RunService:IsServer() then
 
 		if mission.Type == 2 then -- Available;
 			dialog:InitDialog{
-				Text="Hey friend, can you do me a favor?";
+				Reply="Hey friend, can you do me a favor?";
 				Face="Smirk";
 			}
 			dialog:AddChoice("lendAHand_start", function(dialog)

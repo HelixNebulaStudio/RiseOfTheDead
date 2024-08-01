@@ -25,7 +25,6 @@ local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modMissionLibrary = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("MissionLibrary"));
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
-local modDialogueLibrary = require(game.ReplicatedStorage.Library.DialogueLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modFacesLibrary = require(game.ReplicatedStorage.Library.FacesLibrary);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
@@ -105,18 +104,18 @@ function Interface.init(modInterface)
 		if action == "load" then
 			Debugger:StudioLog("Load dialogues", packet);
 
-			local missionId = packet.MissionId;
-			local file = packet.File;
+			-- local missionId = packet.MissionId;
+			-- local file = packet.File;
 
-			local missionDialogues = require(file);
+			-- local missionDialogues = require(file);
 				
-			for npcName, pack in pairs(missionDialogues) do
-				if pack.Dialogues == nil then continue end;
+			-- for npcName, pack in pairs(missionDialogues) do
+			-- 	if pack.Dialogues == nil then continue end;
 				
-				modDialogueLibrary.AddDialogues(npcName, pack.Dialogues(), {
-					MissionId = missionId;
-				});
-			end
+			-- 	modDialogueLibrary.AddDialogues(npcName, pack.Dialogues(), {
+			-- 		MissionId = missionId;
+			-- 	});
+			-- end
 
 			return true;
 
@@ -160,7 +159,7 @@ function Interface:DialogueInteract(modInteractable)
 
 	local npcModel = modInteractable.Object and modInteractable.Object.Parent;
 	
-	local dialogPacket = remoteDialogueHandler:InvokeServer("oldconverse", {
+	local dialogPacket = remoteDialogueHandler:InvokeServer("dialogue", {
 		NpcName=modInteractable.NpcName;
 		NpcModel=npcModel;
 	});
@@ -184,8 +183,8 @@ function Interface:OnDialogue(dialogPacket)
 	NpcName = dialogPacket.Name;
 	NpcModel = dialogPacket.Prefab;
 	
-	local humanoid = NpcModel and NpcModel:FindFirstChildWhichIsA("Humanoid");
 
+	local humanoid = NpcModel and NpcModel:FindFirstChildWhichIsA("Humanoid");
 	if humanoid then
 		task.spawn(function()
 			while window.Visible do
@@ -201,31 +200,23 @@ function Interface:OnDialogue(dialogPacket)
 	messageFrame.NameTag.Text = NpcName;
 	self:SetDialogueText("");
 	
-	if RunService:IsStudio() then
-		Debugger:Warn("[Studio] dialogPacket", dialogPacket);
-	end
-	
-	loadedDialog = modDialogueLibrary.LoadDialog(NpcName, dialogPacket);
-	
-	
-	if loadedDialog == nil then return end;
-	loadedDialog.Initial = typeof(loadedDialog.Initial) == "table" and loadedDialog.Initial or {loadedDialog.Initial};
-	
-	local initialText = loadedDialog and loadedDialog.Initial[random:NextInteger(1, #loadedDialog.Initial)];
+	Debugger:StudioLog("dialogPacket", dialogPacket);
 
+	local initReply = dialogPacket.InitReply;
 	if modConfigurations.SpecialEvent.AprilFools then
 		local listOfAprilFoolsInit = {
 			"Why hello, legendary one!\n";
 			"It's the legendary one!\n";
 			"Oh hello there, legendary one!\n";
 		}
-		initialText = listOfAprilFoolsInit[math.random(1, #listOfAprilFoolsInit)]..initialText;
+		initReply = listOfAprilFoolsInit[math.random(1, #listOfAprilFoolsInit)]..initReply;
 	end
+	self:SetDialogueText(initReply);
 	
-	self:SetDialogueText(initialText);
-	
+
 	local function refreshDialogues()
-		if loadedDialog == nil or type(loadedDialog) ~= "table" then Debugger:Log("No dialogue table..."); return end;
+		local dialogChoices = dialogPacket.Choices;
+
 		for _, child in pairs(questionsList:GetChildren()) do 
 			if child:IsA("TextButton") and child.Name ~= "questionOption" then child:Destroy() end; 
 		end
@@ -242,39 +233,34 @@ function Interface:OnDialogue(dialogPacket)
 		
 		local dialogueButtons = {};
 		local serverTime = modSyncTime.GetTime();
-		for index=1, #loadedDialog.Choices do
-			local choiceOption = loadedDialog.Choices[index];
-			
-			local data = choiceOption.Dialogue;
-			local dialogData = choiceOption.Data;
-			
-			if data == nil then
-				Debugger:Warn(NpcName,"failed to load dialogue", index);
-				Debugger:StudioWarn("data==nil; choiceOption=", choiceOption);
-				continue;
-			end
-			
-			local unlockTime = dialogData and dialogData.ChoiceUnlockTime and (dialogData.ChoiceUnlockTime-serverTime) or nil;
+
+		for choiceTag, choiceInfo in pairs(dialogChoices) do
+			local data = choiceInfo.Data;
+			local sayStr = choiceInfo.Say;
+			local replyStr = choiceInfo.Reply;
+			local faceSet = choiceInfo.Face;
+
+			local unlockTime = data and data.ChoiceUnlockTime and (data.ChoiceUnlockTime-serverTime) or nil;
 						
 			local newDialogue = dialogueButtonTemplate:Clone();
 			newDialogue.Parent = script;
 			
 			local textLabel = newDialogue:WaitForChild("TextLabel");
-			textLabel.Text = formatDialogues(data.Dialogue);
+			textLabel.Text = formatDialogues(sayStr);
 			local textSize = textLabel.TextSize;
 			
-			local missionLib = data.MissionId and modMissionLibrary.Get(data.MissionId) or nil;
+			local missionLib = choiceInfo.MissionId and modMissionLibrary.Get(choiceInfo.MissionId) or nil;
 			
 			local function updateText()
 				serverTime = modSyncTime.GetTime();
-				unlockTime = dialogData and dialogData.ChoiceUnlockTime and (dialogData.ChoiceUnlockTime-serverTime) or nil;
+				unlockTime = data and data.ChoiceUnlockTime and (data.ChoiceUnlockTime-serverTime) or nil;
 				
-				local newText = formatDialogues(data.Dialogue);
+				local newText = formatDialogues(sayStr);
 				if missionLib then
 					local missionType = missionLib.MissionType;
 					local fontColor = '<font color="rgb(255, 255, 255)">';
 					
-					if pinnedMissionId == nil or pinnedMissionId == data.MissionId then
+					if pinnedMissionId == nil or pinnedMissionId == choiceInfo.MissionId then
 						if missionType == 1 then
 							fontColor = '<font color="rgb(255, 106, 106)">';
 						elseif missionType == 3 then
@@ -330,21 +316,25 @@ function Interface:OnDialogue(dialogPacket)
 
 			local diagIcon = newDialogue:WaitForChild("DialogueIcon");
 			
-			if data.Tag and data.Tag:find("general_") == nil then
+			if choiceTag:find("general_") == nil then
 				diagIcon.Visible = true;
 				diagIcon.ImageColor3 = Color3.fromRGB(255, 255, 255);
 				textLabel.Position = UDim2.new(0, 32, 0, 0);
 				textLabel.Size = UDim2.new(1, -32, 0, 0);
 				
-				if data.Tag:find("heal_") then
+				if choiceTag:find("heal_") then
 					diagIcon.Image = "rbxassetid://2770153676";
-				elseif data.Tag:find("shop_") then
+
+				elseif choiceTag:find("shop_") then
 					diagIcon.Image = "rbxassetid://4629984614";
 					diagIcon.ImageColor3 = Color3.fromRGB(255, 240, 23);
-				elseif data.Tag:find("guide_") then
+
+				elseif choiceTag:find("guide_") then
 					diagIcon.Image = "rbxassetid://3291004554";
+
 				elseif missionLib then
 					diagIcon.Image = "rbxassetid://1550983590";
+
 				else
 					diagIcon.Visible = false;
 					textLabel.Position = UDim2.new(0, 0, 0, 0);
@@ -352,8 +342,8 @@ function Interface:OnDialogue(dialogPacket)
 				end
 			end
 			
-			newDialogue.Name = data.Tag or "untagged";
-			newDialogue.LayoutOrder = index;
+			newDialogue.Name = choiceTag or "untagged";
+			newDialogue.LayoutOrder = choiceInfo.Order;
 			
 			table.insert(dialogueButtons, newDialogue);
 			newDialogue.MouseMoved:Connect(function()
@@ -367,24 +357,24 @@ function Interface:OnDialogue(dialogPacket)
 			end)
 
 			updateText();
-			spawn(function()
+			task.spawn(function()
 				local canStart, failReasons;
-				if data.CheckMission then
-					canStart, failReasons = remoteMissionCheckFunction:InvokeServer(data.CheckMission);
+				if choiceInfo.CheckMission then
+					canStart, failReasons = remoteMissionCheckFunction:InvokeServer(choiceInfo.CheckMission);
 				end
 				
 				local function onOptionClicked()
-					if data.CheckMission == nil or canStart == true then
-						self:SetDialogueText(data.Reply);
+					if choiceInfo.CheckMission == nil or canStart == true then
+						self:SetDialogueText(replyStr);
 						
-						local faceInfo = data.Face and modFacesLibrary:Find(data.Face);
+						local faceInfo = faceSet and modFacesLibrary:Find(faceSet);
 						if faceInfo and NpcModel and NpcModel:FindFirstChild("Head") and NpcModel.Head:FindFirstChild("face") then
 							NpcModel.Head.face.Texture = faceInfo.Texture;
 						end
-						if data.ReplyFunction then data.ReplyFunction(dialogPacket) end;
+						--if dialoguePacket.ReplyFunction then dialoguePacket.ReplyFunction(dialogPacket) end;
 						
 					else
-						local failDialogues = data.FailResponses or {};
+						local failDialogues = choiceInfo.FailResponses or {};
 						if #failDialogues <= 0 then
 							table.insert(failDialogues, {Reply="Nevermind, come back later..."});
 						end
@@ -404,24 +394,20 @@ function Interface:OnDialogue(dialogPacket)
 						if child:IsA("TextButton") and child.Name ~= "questionOption" then child:Destroy() end; 
 					end
 					
-					if data.CheckMission == nil or canStart == true then
-						local dP = remoteDialogueHandler:InvokeServer("oldconverse", {
+					if choiceInfo.CheckMission == nil or canStart == true then
+						local newDialoguePacket = remoteDialogueHandler:InvokeServer("dialogue", {
 							NpcName = NpcName;
 							NpcModel = NpcModel;
-							SelectTag = data.Tag;
-							
-							SelectIndex = index;
+							ChoiceTag = choiceTag;
 						});
-						
-						Debugger:StudioWarn("dialogPacket", dP);
-						
-						dialogPacket = dP;
-						loadedDialog = modDialogueLibrary.LoadDialog(NpcName, dP);
+
+						Debugger:StudioLog("newDialoguePacket", newDialoguePacket);
+						dialogPacket = newDialoguePacket;
 						refreshDialogues();
 					end
 					
-					if data.ToggleWindow then
-						Interface:ToggleWindow(data.ToggleWindow, true, dialogData);
+					if choiceInfo.ToggleWindow then
+						Interface:ToggleWindow(choiceInfo.ToggleWindow, true, data);
 					end
 				end
 				
@@ -430,13 +416,13 @@ function Interface:OnDialogue(dialogPacket)
 				end
 				
 				newDialogue.MouseButton1Click:Connect(function()
-					unlockTime = dialogData and dialogData.ChoiceUnlockTime and (dialogData.ChoiceUnlockTime-modSyncTime.GetTime()) or nil;
+					unlockTime = data and data.ChoiceUnlockTime and (data.ChoiceUnlockTime-modSyncTime.GetTime()) or nil;
 					if unlockTime and unlockTime > 0 then return end;
 					onOptionClicked()
 				end)
 			end);
 			
-			if data.InspectItem then
+			if choiceInfo.InspectItem then
 				local itemViewportObject = Interface.ItemViewport.new();
 				itemViewportObject:SetZIndex(4);
 				local frame = itemViewportObject.Frame;
@@ -461,14 +447,14 @@ function Interface:OnDialogue(dialogPacket)
 					end
 				end)
 
-				itemViewportObject:SetDisplay(data.InspectItem);
+				itemViewportObject:SetDisplay(choiceInfo.InspectItem);
 			end
 			
 			newDialogue.Parent = questionsList;
-			questionOption.Visible = loadedDialog.AskMe == true or (#dialogueButtons > 1);
+			questionOption.Visible = choiceInfo.AskMe == true or (#dialogueButtons > 1);
 		end
 
-		questionOption.Visible = loadedDialog.AskMe == true or (#dialogueButtons > 1);
+		questionOption.Visible = dialogPacket.AskMe == true or (#dialogueButtons > 1);
 		
 
 		if dialogPacket.ExpireTime then
@@ -480,7 +466,6 @@ function Interface:OnDialogue(dialogPacket)
 			timerBar.ImageColor3 = branchColor;
 			timerBar.Visible = true;
 			local timeLeft = expireTime-currTime;
-			Debugger:Warn("timeLeft", timeLeft);
 
 			timerBar.Size = UDim2.new(1, 0, 0, 3);
 			TweenService:Create(
@@ -547,29 +532,29 @@ questionInput.FocusLost:Connect(function(enterPressed, inputObject)
 			if child:IsA("TextButton") and child.Visible and child.Name ~= "questionOption" then canAnswer = true; break end;
 		end
 		if not canAnswer and NpcName then
-			local replies = unevaluableAnswers;
+			-- local replies = unevaluableAnswers;
 			
-			local dialogLib = modDialogueLibrary[NpcName];
+			-- local dialogLib = modDialogueLibrary[NpcName];
 			
-			if dialogLib then
-				replies = dialogLib.UnevaluableAnswers or unevaluableAnswers;
+			-- if dialogLib then
+			-- 	replies = dialogLib.UnevaluableAnswers or unevaluableAnswers;
 				
-				local questionKeywords = {"what"; "when"; "will"; "is"; "are"; "who"; "where"; "should"};
+			-- 	local questionKeywords = {"what"; "when"; "will"; "is"; "are"; "who"; "where"; "should"};
 				
-				local isQuestion = false;
-				for a=1, #questionKeywords do
-					if inputText:lower():match(questionKeywords[a]) then
-						isQuestion = true;
-						break;
-					end
-				end
+			-- 	local isQuestion = false;
+			-- 	for a=1, #questionKeywords do
+			-- 		if inputText:lower():match(questionKeywords[a]) then
+			-- 			isQuestion = true;
+			-- 			break;
+			-- 		end
+			-- 	end
 				
-				if isQuestion and dialogLib.FortuneAnswers then
-					replies = dialogLib.FortuneAnswers;
-				end
-			end
+			-- 	if isQuestion and dialogLib.FortuneAnswers then
+			-- 		replies = dialogLib.FortuneAnswers;
+			-- 	end
+			-- end
 			
-			Interface:SetDialogueText(replies[random:NextInteger(1, #replies)]);
+			-- Interface:SetDialogueText(replies[random:NextInteger(1, #replies)]);
 		end
 	end
 end)

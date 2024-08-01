@@ -11,14 +11,6 @@ NpcDialogues.Initial = {
 };
 
 NpcDialogues.Dialogues = {
-	-- Another Survivor
-	{MissionId=55; Tag="shelter_init"; Face="Confident"; Reply="Hey, looking for a recycler?";};
-	
-	{MissionId=55; Tag="shelter_accept"; Face="Smirk"; Dialogue="Yes, I do! Welcome to the safehome.";
-		Reply="Great, straight to the point. I like it."};
-	{MissionId=55; Tag="shelter_decline"; Face="Suspicious"; Dialogue="I'm afraid we can't accept anyone at the moment.";
-		Reply="Very well, farewell."};
-	
 	--== Lvl0
 	{Tag="shelter_new"; Face="Confident"; Reply="This place will do..";};
 	

@@ -10,28 +10,19 @@ local Dialogues = {
 local missionId = 27;
 --==
 
--- !outline: Mason Dialogues
-Dialogues.Mason.Dialogues = function()
-	return {
-		--{Tag="medbre_init";
-		--	Face="Worried"; Reply="Stan saved my life, I was trapped and he heard me cried for help. I miss him so much..";};
-
-		--{CheckMission=missionId; Tag="medbre_start"; Dialogue="Hey, it's okay. I have some news about Stan.";
-		--	Face="Worried"; Reply="News.. about Stan?";
-		--	FailResponses = {
-		--		{Reply="Hold on, I'm quite busy right now.."};
-		--	};	
-		--};
-		--{Tag="medbre_start2"; Dialogue="Yes, so apparently Stan is still alive.";
-		--	Face="Disbelief"; Reply="..."};
-		
-		{Tag="focusLevels_request"; Dialogue="Which specific zombies?";
-			Face="Happy"; Reply="Here's a list of zombies, I labelled some with different levels because some seems to be stronger than others.."};
-		{Tag="focusLevels_okay"; Dialogue="So I have to focus on specific levels of zombies?";
-			Face="Joyful"; Reply="Exactly! The perks of focusing them is that you will get to improve your weapons based on how strong they are.\n\nGood luck out there."};
-
+-- !outline: Mason DialogueStrings
+Dialogues.Mason.DialogueStrings = {
+	["focusLevels_request"]={
+		Face="Happy";
+		Say="Which specific zombies?";
+		Reply="Here's a list of zombies, I labelled some with different levels because some seems to be stronger than others..";
 	};
-end
+	["focusLevels_okay"]={
+		Face="Joyful";
+		Say="So I have to focus on specific levels of zombies?";
+		Reply="Exactly! The perks of focusing them is that you will get to improve your weapons based on how strong they are.\n\nGood luck out there.";
+	}
+};
 
 if RunService:IsServer() then
 	-- !outline: Mason Handler

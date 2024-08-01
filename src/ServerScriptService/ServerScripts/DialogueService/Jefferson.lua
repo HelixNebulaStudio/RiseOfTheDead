@@ -10,7 +10,7 @@ return function(player, dialog, dialogueData)
 	local mission10 = modMission:GetMission(player, 10);
 	if mission10 == nil then
 		dialog:InitDialog{
-			Text="GET BACK! Stay away from me, I am infected.";
+			Reply="GET BACK! Stay away from me, I am infected.";
 			Face="Frustrated";
 		}
 		dialog:AddChoice("infected_letmehelp", function(dialog)

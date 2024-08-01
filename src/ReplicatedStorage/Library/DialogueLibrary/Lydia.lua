@@ -21,15 +21,7 @@ NpcDialogues.FortuneAnswers = {
 };
 
 
-NpcDialogues.Dialogues = {
-	-- Another Survivor
-	{MissionId=55; Tag="shelter_init"; Face="Skeptical"; Reply="Let me stay, and I will tell you your fortune..";};
-	
-	{MissionId=55; Tag="shelter_accept"; Face="Smirk"; Dialogue="Ummm, okay.";
-		Reply="Very well.."};
-	{MissionId=55; Tag="shelter_decline"; Face="Frustrated"; Dialogue="I'm afraid we can't accept anyone at the moment.";
-		Reply="I see.. I hope this place will not be ill fated.."};
-	
+NpcDialogues.Dialogues = {	
 	--== Lvl0
 	{Tag="shelter_new"; Face="Smirk"; Reply="Yes... yes.. I can work with this..";};
 	

@@ -80,7 +80,7 @@ if RunService:IsServer() then
 			local checkpoint = mission.ProgressionPoint;
 			if checkpoint <= 2 then
 				dialog:InitDialog{
-					Text="Oh hey, you're finally awake. I'm Mason, how are you feeling?";
+					Reply="Oh hey, you're finally awake. I'm Mason, how are you feeling?";
 					Face="Happy";
 				}
 				
@@ -101,13 +101,13 @@ if RunService:IsServer() then
 				
 			elseif checkpoint == 3 or checkpoint == 4 then
 				dialog:InitDialog{
-					Text="How do you feel now?";
+					Reply="How do you feel now?";
 					Face="Happy";
 				}
 				
 				if checkpoint == 4 then
 					dialog:InitDialog{
-						Text="How do you feel now?";
+						Reply="How do you feel now?";
 						Face="Happy";
 					}
 					dialog:AddChoice("whereAmI_found", function(dialog)
@@ -181,7 +181,7 @@ if RunService:IsServer() then
 					
 				else
 					dialog:InitDialog{
-						Text="Oh, have you changed your mind?";
+						Reply="Oh, have you changed your mind?";
 						Face="Surprise";
 					}
 					
@@ -208,7 +208,7 @@ if RunService:IsServer() then
 				
 			elseif checkpoint >= 8 and checkpoint <= 10 then
 				dialog:InitDialog{
-					Text="Have you killed the zombies outside the warehouse yet?";
+					Reply="Have you killed the zombies outside the warehouse yet?";
 					Face="Surprise";
 				}
 				

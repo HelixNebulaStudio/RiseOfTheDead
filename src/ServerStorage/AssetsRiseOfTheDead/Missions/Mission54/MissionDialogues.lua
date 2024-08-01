@@ -65,21 +65,6 @@ if RunService:IsServer() then
 				modMission:StartMission(player, missionId);
 			end)
 			
-			--dialog:SetInitiateTag("medbre_init");
-
-			--dialog:AddChoice("medbre_start", function(dialog)
-			--	modMission:StartMission(player, missionId);
-				
-			--	modMission:CompleteMission(player, 75);
-				
-			--	modMission:Progress(player, missionId, function(mission)
-			--		if mission.ProgressionPoint <= 1 then
-			--			mission.ProgressionPoint = 1;
-			--		end
-			--	end);
-			--end)
-			
-			
 		elseif mission.Type == 1 then -- Active
 			if modBranchConfigs.IsWorld("TheWarehouse") then
 				dialog:SetInitiate("Let's go?");

@@ -9,15 +9,7 @@ NpcDialogues.Initial = {
 	"Hey hey";
 };
 
-NpcDialogues.Dialogues = {
-	-- Another Survivor
-	{MissionId=55; Tag="shelter_init"; Face="Confident"; Reply="Hi, I would like to order a number 9 large.. Haha, just kidding around, don't shoot me.. Let's make a deal..\n\nYou let me open shop in your base for R.A.T. and we'll give you bonuses for doing business with us.";};
-	
-	{MissionId=55; Tag="shelter_accept"; Face="Smirk"; Dialogue="Sure, I'll take that deal..";
-		Reply="Hack yeah! Let me make myself at home.."};
-	{MissionId=55; Tag="shelter_decline"; Face="Suspicious"; Dialogue="I'm afraid we can't accept anyone at the moment.";
-		Reply="Alright then.."};
-	
+NpcDialogues.Dialogues = {	
 	--== Lvl0
 	{Tag="shelter_new"; Face="Confident"; Reply="Is this place a palace or what.";};
 	

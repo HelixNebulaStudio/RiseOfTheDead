@@ -78,22 +78,6 @@ function MissionLibrary.New(data)
 		
 		local missionDialogues = gameAssets and gameAssets:FindFirstChild("MissionDialogues") or nil;
 		if missionDialogues then
-			local loadedDialogues = false;
-			data.LoadDialogues = function()
-				if loadedDialogues then return end;
-				loadedDialogues = true;
-				
-				Debugger:StudioWarn("Load dialogue", data.MissionId);
-				missionDialogues = require(gameAssets.MissionDialogues);
-				
-				for npcName, pack in pairs(missionDialogues) do
-					if pack.Dialogues == nil then continue end;
-					
-					modDialogueLibrary.AddDialogues(npcName, pack.Dialogues(), {
-						MissionId = data.MissionId;
-					});
-				end
-			end
 			data.DialogueScript = missionDialogues;
 		end;
 

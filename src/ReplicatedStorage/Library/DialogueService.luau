@@ -20,28 +20,24 @@ function DialogueService:InitServer(baseDialogueHandlers)
 
     local modDialogues = require(game.ServerScriptService.ServerLibrary.DialogueSave);
     local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
-    local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 
     local bindOnTalkedTo = game.ReplicatedStorage.Remotes.Dialogue.OnTalkedTo;
     local remoteDialogueHandler = modRemotesManager:Get("DialogueHandler");
 
-    local MissionDialogueModules = {};
-
-    local modModEngineService = require(game.ReplicatedStorage.Library.ModEngineService);
-    local modDialogueHandlers = modModEngineService:GetServerModule("DialogueHandlers");
-
     --== Script;
-    local function OnDialogue(player, npcModel, npcName, choice)
+    local function OnDialogue(player, npcModel, npcName, choiceTag)
         local profile = shared.modProfile:Get(player);
+        if profile then
+            profile:AddPlayPoints(3, "Gameplay:Dialogue");
+        end
 
         npcName = npcName or "nilName";
         local activeDialogues = modDialogues:Get(player);
         local npcDialogData = activeDialogues and activeDialogues:Get(npcName) or nil;
         
-        --if modDialogueLibrary.GetDialogues(npcName) == nil then Debugger:Warn("Player ("..player.Name..") Npc dialogues does not exist ("..npcName..")."); return end;
         local npcPrefab = npcModel;
         if npcPrefab == nil then Debugger:Warn("Player ("..player.Name..") Attempt to dialogue with non-existing npc ("..npcName..")."); return end;
-        if npcPrefab.PrimaryPart == nil and npcPrefab:FindFirstChild("HumanoidRootPart") then npcPrefab.PrimaryPart = npcPrefab.HumanoidRootPart end;
+        
         local function checkInRange()
             if player == nil then return end;
             if shared.modAntiCheatService:GetLastTeleport(player) <= 3 then
@@ -51,40 +47,50 @@ function DialogueService:InitServer(baseDialogueHandlers)
             return true;
         end
         
-        if DialogueService.Handlers[npcName] == nil and modDialogueHandlers.Script:FindFirstChild(npcName) then
-            local npcDialogueHandler = modDialogueHandlers.Script[npcName];
+        -- if DialogueService.Handlers[npcName] == nil and modDialogueHandlers.Script:FindFirstChild(npcName) then
+        --     local npcDialogueHandler = modDialogueHandlers.Script[npcName];
 
-            DialogueService.Handlers[npcName] = require(npcDialogueHandler);
+        --     DialogueService.Handlers[npcName] = require(npcDialogueHandler);
 
-            MissionDialogueModules[npcName] = {};
-            for _, module in pairs(npcDialogueHandler:GetChildren()) do
-                if module.ClassName ~= "ModuleScript" then continue end;
+        --     MissionDialogueModules[npcName] = {};
+        --     for _, module in pairs(npcDialogueHandler:GetChildren()) do
+        --         if module.ClassName ~= "ModuleScript" then continue end;
                 
-                MissionDialogueModules[npcName][module.Name] = require(module);
-            end
-        end
+        --         MissionDialogueModules[npcName][module.Name] = require(module);
+        --     end
+        -- end
 
-        if DialogueService.Handlers[npcName] == nil and baseDialogueHandlers:FindFirstChild(npcName) then
-            DialogueService.Handlers[npcName] = require(baseDialogueHandlers[npcName]);
+        -- if DialogueService.Handlers[npcName] == nil and baseDialogueHandlers:FindFirstChild(npcName) then
+        --     DialogueService.Handlers[npcName] = require(baseDialogueHandlers[npcName]);
             
-            MissionDialogueModules[npcName] = {};
-            for _, module in pairs(baseDialogueHandlers[npcName]:GetChildren()) do
-                if module.ClassName == "ModuleScript" then
-                    MissionDialogueModules[npcName][module.Name] = require(module);
-                end
-            end
-        end
+        --     MissionDialogueModules[npcName] = {};
+        --     for _, module in pairs(baseDialogueHandlers[npcName]:GetChildren()) do
+        --         if module.ClassName == "ModuleScript" then
+        --             MissionDialogueModules[npcName][module.Name] = require(module);
+        --         end
+        --     end
+        -- end
         
-        if npcDialogData == nil and DialogueService.Handlers[npcName] then
+        if npcDialogData == nil then
             npcDialogData = activeDialogues.new(npcName);
             npcDialogData.ChoiceHandleData = {};
             
-            npcDialogData.Invoke = function(choice)
-                local dialog = {};
+            local lambda = 0;
+            local orderCount = 1;
+            npcDialogData.Reset = function()
+                lambda = 0;
+                orderCount = 1;
+                table.clear(npcDialogData.ChoiceHandleData);
+            end
+
+            npcDialogData.Invoke = function(choiceTag)
+                local dialog = {}; -- Sent to client;
+                dialog.Player = player;
                 dialog.Name = npcName;
                 dialog.Prefab = npcPrefab;
-                dialog.Choices = {};
                 dialog.InRange = checkInRange;
+
+                dialog.Choices = {};
 
                 local npcStatus = npcPrefab:FindFirstChild("NpcStatus") and require(npcPrefab.NpcStatus) or nil;
                 
@@ -93,178 +99,138 @@ function DialogueService:InitServer(baseDialogueHandlers)
                     return npcModule;
                 end
                 
-                function dialog:AddChoice(tag, func, data)
-                    local _choiceData, choiceIndex = modDialogueLibrary.GetByTag(npcName, tag);
-                    
-                    local exist = false;
-                    for a=1, #dialog.Choices do
-                        if dialog.Choices[a].Index == choiceIndex then
-                            exist = true;
-                            break;
-                        end;
-                    end
-                    if not exist then
-                        local choiceInfo = {Index=choiceIndex; Data=data; Func=func;}
-                        table.insert(dialog.Choices, choiceInfo);
-                        npcDialogData.ChoiceHandleData[#dialog.Choices] = choiceInfo;
-                    end;
-                end
-                
-                --[[
-                    dialog:AddDialog(dialogue, func, data)
-                    @param dialogue {}
-                ]]
-                function dialog:AddDialog(dialogue, func, data)
-                    local choiceInfo = {Dialogue=dialogue; Data=data; Func=func;};
-                    table.insert(dialog.Choices, choiceInfo);
-                    npcDialogData.ChoiceHandleData[#dialog.Choices] = choiceInfo;
-                end
-                
                 function dialog:SetExpireTime(t)
                     dialog.ExpireTime = t;
                 end
+
+                function dialog:AddDialog(dialoguePacket, func, data)
+                    lambda = lambda +1;
+                    local tag = dialoguePacket.Tag or `tag{lambda}`;
+
+                    local choiceInfo = table.clone(dialoguePacket);
+                    choiceInfo.Data = data;
+                    choiceInfo.Func = func;
+                    choiceInfo.Order = orderCount
+                    orderCount = orderCount + 1;
+
+                    dialog.Choices[tag] = choiceInfo;
+                    npcDialogData.ChoiceHandleData[tag] = choiceInfo;
+                end
+
+                function dialog:AddChoice(tag, func, data)
+                    local dialoguePacket = modDialogueLibrary:Get(npcName, tag);
+                    dialoguePacket.Tag = tag;
+                    self:AddDialog(dialoguePacket, func, data);
+                end
                 
-                --[[
-                    dialog:InitDialog()
-                    packet = {
-                        Text: string;
-                        Face: string;
-                    }
-                ]]
-                function dialog:InitDialog(packet)
-                    local npcModule = npcStatus and npcStatus:GetModule();
-                    
-                    dialog.Initial = packet.Text or "n/a";
-                    local face = nil;
+                function dialog:InitDialog(dialoguePacket)
+                    dialog.InitReply = dialoguePacket.Reply;
 
-                    if packet.Tag then
-                        local choiceData, choiceIndex = modDialogueLibrary.GetByTag(npcName, packet.Tag);
-                        
-                        if choiceIndex then
-                            dialog.Initial = choiceIndex;
+                    local npcModule = self:GetNpcModule();
+                    if npcModule and npcModule.AvatarFace then
+                        if dialoguePacket.Face then
+                            npcModule.AvatarFace:DialogSet(dialoguePacket.Face, player);
                         end
-                        if choiceData and choiceData.Face then
-                            face = choiceData.Face;
-                        end
-                    end
-
-                    if face == nil then
-                        face = packet.Face;
-                    end
-
-                    if face and npcModule and npcModule.AvatarFace then
-                        npcModule.AvatarFace:DialogSet(face, player);
-                        
                     end
                 end
 
-                function dialog:SetInitiate(str, face)
-                    dialog.Initial = str;
-                    
-                    local npcModule = npcStatus and npcStatus:GetModule();
-                    if face and npcModule.AvatarFace then
-                        npcModule.AvatarFace:DialogSet(face, player);
-                    end
+                function dialog:SetInitiate(text, face)
+                    self:InitDialog({
+                        Face=face;
+                        Reply=text;
+                    });
                 end
                 
                 function dialog:SetInitiateTag(tag)
-                    local choiceData, choiceIndex = modDialogueLibrary.GetByTag(npcName, tag);
+                    local dialoguePacket = modDialogueLibrary:Get(npcName, tag);
+                    self:InitDialog(dialoguePacket);
+                end
+                
+                local choiceInfo = choiceTag and npcDialogData.ChoiceHandleData[choiceTag];
+                if choiceInfo then  -- MARK: client choice
+                    npcDialogData:Reset();
+
+                    local data = choiceInfo and choiceInfo.Data;
+                    local unlockTime = data and data.ChoiceUnlockTime and (data.ChoiceUnlockTime-modSyncTime.GetTime())
                     
-                    dialog.Initial = choiceIndex;
+                    if unlockTime and unlockTime > -0.3 then
+                        Debugger:Warn("Dialogue (",choiceTag,") is currently locked for", player);
+                        return;
+                    end
                     
-                    local npcModule = npcStatus and npcStatus:GetModule();
-                    if choiceData.Face and npcModule and npcModule.AvatarFace then
-                        npcModule.AvatarFace:DialogSet(choiceData.Face, player);
+                    if choiceInfo.Func then
+                        dialog.NpcDialogData = npcDialogData;
+                        
+                        choiceInfo.Func(dialog);
+                        choiceInfo.Func = nil;
+                    end
+                    
+                    if choiceInfo.ReturnToInit ~= true then
+                        return dialog;
                     end
                 end
                 
-                if choice ~= nil then
-                    if npcDialogData.ChoiceHandleData[choice] then
-                        local choiceInfo = npcDialogData.ChoiceHandleData[choice];
-                        
-                        local data = choiceInfo and choiceInfo.Data;
-                        
-                        local unlockTime = data and data.ChoiceUnlockTime and (data.ChoiceUnlockTime-modSyncTime.GetTime())
-                        
-                        if unlockTime == nil or unlockTime <= 0 then
-                            if choiceInfo.Func then
-                                
-                                dialog.Player = player;
-                                dialog.NpcDialogData = npcDialogData;
-                                
-                                choiceInfo.Func(dialog);
-                                choiceInfo.Func = nil;
-                            end
-                        else
-                            Debugger:Warn("Dialogue (",choice,") is currently locked for", player)
-                        end
-                    end
-                    
-                else
-                    local missionProfile = modMission.GetMissions(player.Name);
-                    if missionProfile then
-                        for a=1, #missionProfile do
-                            if MissionDialogueModules[npcName] == nil then continue end;
-                            
-                            local missionData = missionProfile[a];
-                            local missionLib = missionData and modMissionLibrary.Get(missionData.Id);
-                            
-                            if missionLib.DialogueScript then
-                                local assetKey = `Missions/Mission{missionData.Id}`;
-                                local missionDialogues = require(missionLib.DialogueScript);
-                                local missionDialogueFunc = missionDialogues[npcName] and missionDialogues[npcName].DialogueHandler;
-                                    
-                                Debugger:Warn("Player(",player,") access dialogue (",assetKey,") for npc (",npcName,").", missionDialogueFunc);
-                                if missionDialogueFunc then
+                -- MARK: On Dialogue Initiate;
+                npcDialogData:Reset();
+                local initDialoguePacket = nil;
 
-                                    local choiceCount = #dialog.Choices;
-                                    missionDialogueFunc(player, dialog, npcDialogData, missionData);
-                                    if #dialog.Choices > choiceCount then
-                                        if profile.Cache[assetKey] == nil then
-                                            Debugger:Warn("Load dialogues (",assetKey,")");
-                                            
-                                            local loadSuccess = remoteDialogueHandler:InvokeClient(player, "load", {
-                                                Key=assetKey;
-                                                File=modLazyLoader:Deliver(player, missionLib.DialogueScript);
-                                                MissionId=missionData.Id;
-                                            });
-                                            if loadSuccess then
-                                                profile.Cache[assetKey] = true;
-                                            end
-                                        end
-                                    end
-                                end
+                -- Mission dialogues;
+                local missionProfile = modMission.GetMissions(player.Name);
+                if missionProfile then
+                    for a=1, #missionProfile do
+                        local missionData = missionProfile[a];
+                        local missionId = missionData.Id;
+                        local missionLib = missionData and modMissionLibrary.Get(missionId);
 
-                            elseif missionLib and MissionDialogueModules[npcName][missionLib.Name] then
-                                local missionDialogueFunc = missionLib and MissionDialogueModules[npcName][missionLib.Name];
-                                if missionDialogueFunc then
-                                    Debugger:StudioWarn("Using deprecated dialoguefunc", npcName, missionLib.Name);
-                                    missionDialogueFunc(player, dialog, npcDialogData, missionData);
+                        if missionLib.DialogueScript then
+                            local missionDialogues = require(missionLib.DialogueScript);
+                            local npcDialogueResources = missionDialogues[npcName];
+                            if npcDialogueResources == nil then continue end;
+
+                            if npcDialogueResources.DialogueStrings then
+                                for tag, dialoguePacket in pairs(npcDialogueResources.DialogueStrings) do
+                                    dialoguePacket.MissionId = missionId;
+                                    modDialogueLibrary:Load(npcName, tag, dialoguePacket);
                                 end
-                                
                             end
 
+                            if npcDialogueResources.DialogueHandler then
+                                npcDialogueResources.DialogueHandler(player, dialog, npcDialogData, missionData);
+                            end
                         end
                     end
-                    
-                    DialogueService.Handlers[npcName](player, dialog, npcDialogData);
                 end
-                
+
+
+                -- Base dialogues;
+                local baseDialoguesScript = modAssetHandler:GetServer(`Npc/{npcName}/Dialogues`);
+                if baseDialoguesScript then
+                    local dialogueResources = require(baseDialoguesScript);
+                    
+                    local initReplies = {};
+                    for _, dialoguePacket in pairs(dialogueResources.InitStrings) do
+                        table.insert(initReplies, dialoguePacket);
+                    end
+                    initDialoguePacket = initReplies[math.random(1, #initReplies)];
+
+                    for tag, dialoguePacket in pairs(dialogueResources.DialogueStrings) do
+                        modDialogueLibrary:Load(npcName, tag, dialoguePacket);
+                    end
+
+                    dialogueResources.DialogueHandler(player, dialog, npcDialogData);
+                end
+
+
+                if dialog.InitReply == nil and initDialoguePacket then
+                    dialog:InitDialog(initDialoguePacket);
+                end
+
                 return dialog;
             end
         end;
         
-        bindOnTalkedTo:Fire(npcPrefab, player, choice);
-        if npcDialogData then
-            return npcDialogData.Invoke(choice);
-        end
-
-        local profile = shared.modProfile:Get(player);
-        if profile then
-            profile:AddPlayPoints(3, "Gameplay:Dialogue");
-        end
-
-        return;
+        bindOnTalkedTo:Fire(npcPrefab, player, choiceTag);
+        return npcDialogData.Invoke(choiceTag);
     end
 
     -- MARK: OnDialogueHandler(player, action, packet)
@@ -289,6 +255,9 @@ function DialogueService:InitServer(baseDialogueHandlers)
         elseif action == "oldconverse" then
             return OnDialogue(player, packet.NpcModel, packet.NpcName, packet.SelectIndex);
             
+        elseif action == "dialogue" then
+            return OnDialogue(player, packet.NpcModel, packet.NpcName, packet.ChoiceTag);
+
         elseif action == "talk" then
             
             local npcModel = packet.NpcModel;

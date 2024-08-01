@@ -9,15 +9,7 @@ NpcDialogues.Initial = {
 	"Hey";
 };
 
-NpcDialogues.Dialogues = {
-	-- Another Survivor
-	{MissionId=55; Tag="shelter_init"; Face="Worried"; Reply="Ahhh, what was that chasing me!? God, my arm! Hey, I can't go back out there, I'm staying here.";};
-	
-	{MissionId=55; Tag="shelter_accept"; Face="Worried"; Dialogue="Sure, stay as long as you want..";
-		Reply="Thank god.. Err, I mean thank you.."};
-	{MissionId=55; Tag="shelter_decline"; Face="Worried"; Dialogue="I'm afraid we can't accept anyone at the moment.";
-		Reply="Fine, I'll look for another place."};
-	
+NpcDialogues.Dialogues = {	
 	--== Lvl0
 	{Tag="shelter_new"; Face="Worried"; Reply="Pretty cosy place.";};
 	

@@ -10,15 +10,7 @@ NpcDialogues.Initial = {
 	"Have you seen my sister Kat..?";
 };
 
-NpcDialogues.Dialogues = {
-	-- Another Survivor
-	{MissionId=55; Tag="shelter_init"; Face="Confident"; Reply="Hey, nice place you got there. Let's make a deal..\n\nYou let me open shop in your base for R.A.T. and we'll give you bonuses for doing business with us.";};
-	
-	{MissionId=55; Tag="shelter_accept"; Face="Smirk"; Dialogue="Sure, I'll take that deal..";
-		Reply="Good choice, Mr. Remington would be very pleased."};
-	{MissionId=55; Tag="shelter_decline"; Face="Suspicious"; Dialogue="I'm afraid we can't accept anyone at the moment.";
-		Reply="Alright then.."};
-	
+NpcDialogues.Dialogues = {	
 	--== Lvl0
 	{Tag="shelter_new"; Face="Confident"; Reply="Wow, the place is bigger inside.";};
 	
