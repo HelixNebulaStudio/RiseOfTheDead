@@ -2044,7 +2044,7 @@ function Interface.init(modInterface)
 				end
 
 			elseif pinnedMissionLib and pinnedMissionLib.Markers then
-				if pinnedMissionLib.Progression then
+				if pinnedMissionLib.Progression or pinnedMissionLib.Checkpoint then
 					local markInfo = pinnedMissionLib.Markers[pinnedMission.ProgressionPoint];
 					if markInfo then
 						local missionWorld = markInfo.World or pinnedMissionLib.World;
