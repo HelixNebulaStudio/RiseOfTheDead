@@ -473,7 +473,6 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
-		{Type="Mission"; Id=27};
 		{Type="Mission"; Id=49};
 	};
 	StartRequirements={
@@ -509,6 +508,7 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
+		{Type="Mission"; Id=27};
 		{Type="Mission"; Id=13};
 		{Type="Mission"; Id=14};
 		{Type="Mission"; Id=16};

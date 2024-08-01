@@ -15,7 +15,7 @@ if RunService:IsServer() then
 	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 
@@ -36,7 +36,7 @@ return function(CutsceneSequence)
 
 				elseif mission.Type == 1 then -- OnActive
 					if mission.ProgressionPoint == 4 then
-						local new = script:WaitForChild("Vehicle Repair Manual"):Clone();
+						local new = script.Parent:WaitForChild("Vehicle Repair Manual"):Clone();
 						new.Parent = workspace.Interactables;
 						modReplicationManager.ReplicateOut(player, new);
 					end
@@ -47,7 +47,7 @@ return function(CutsceneSequence)
 				end
 			end
 			mission.Changed:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
 		end
 	end)
 	
