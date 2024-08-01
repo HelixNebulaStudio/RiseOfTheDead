@@ -36,12 +36,12 @@ ShopLibrary.SellPrice = {
 	
 	["binoculars"]=400;
 	["lantern"]=1000;
-	["portablestove"]=3300;
 	["charger"]=4700;
-	["handgenerator"]=5910;
+	["portablestove"]=3300;
+	["handgenerator"]=13050;
 	
 	["walkietalkie"]=9100;
-	["spotlight"]=4000;
+	["spotlight"]=16030;
 	["musicbox"]=7000;
 	["boombox"]=2300;
 	["wateringcan"]=3000;
@@ -53,7 +53,7 @@ ShopLibrary.SellPrice = {
 	
 	["coal"]=64;
 	
-	["purplelemon"]=12500;
+	["purplelemon"]=6500;
 	["fotlcardgame"]=14000;
 	
 	-- Weapon parts;
@@ -61,9 +61,9 @@ ShopLibrary.SellPrice = {
 	["at4parts"]=3000;
 	["sr308parts"]=4000;
 	["vectorxparts"]=5000;
-	["rusty48parts"]=6000;
-	["arelshiftcrossparts"]=7000;
-	["deagleparts"]=8000;
+	["rusty48parts"]=5000;
+	["arelshiftcrossparts"]=5000;
+	["deagleparts"]=4000;
 	
 	--
 	["wantedposter"]=1000;

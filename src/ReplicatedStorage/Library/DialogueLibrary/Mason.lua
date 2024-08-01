@@ -28,7 +28,7 @@ NpcDialogues.Dialogues = {
 	{Tag="guide_invSpace"; Dialogue="How to get more space in my inventory?"; Face="Welp";
 		Reply="You can't, however every safehouse has a storage and you can store your excess items there."};
 	{Tag="guide_makeMoney"; Dialogue="How to earn money?"; Face="Happy";
-		Reply="You can get some pocket change by killing zombies. But if you want to earn more, you should sell commodity items. Commodity items are usually crafted from a blueprint obtain from bosses."};
+		Reply="You can sell things to the shop for pocket change, but if you really want to earn, you can sell commodity items. Commodity items are usually crafted from a blueprint obtain from bosses."};
 	{Tag="guide_getMaterials"; Dialogue="Where do I find materials I need for building?"; Face="Skeptical";
 		Reply="You can use the \"/item [itemName]\" command to know where to obtain an item from. For example, try typing this in chat /item Boombox"};
 	
