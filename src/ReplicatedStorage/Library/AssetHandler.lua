@@ -106,7 +106,7 @@ if RunService:IsServer() then
 		if asset == nil then return end
 
 		local new = asset:Clone();
-		new.Parent = player.PlayerGui;
+		new.Parent = player.PlayerGui.ReplicationDelivery;
 
 		Debugger.Expire(new, 10);
 

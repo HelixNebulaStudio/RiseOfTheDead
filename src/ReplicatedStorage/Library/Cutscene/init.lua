@@ -397,7 +397,7 @@ if RunService:IsServer() then
 		local file = Cutscene.Scenes[key].File;
 		
 		local new = file:Clone();
-		new.Parent = player.PlayerGui;
+		new.Parent = player.PlayerGui.ReplicationDelivery;
 		Debugger.Expire(new, 5);
 
 		Debugger:StudioLog("OnServerRequest", key, new);

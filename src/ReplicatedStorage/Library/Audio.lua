@@ -39,7 +39,7 @@ if RunService:IsServer() then
 		if audioInstance == nil then return end;
 
 		local new = audioInstance:Clone();
-		new.Parent = player.PlayerGui;
+		new.Parent = player.PlayerGui.ReplicationDelivery;
 		Debugger.Expire(new, 5);
 
 		return new;
