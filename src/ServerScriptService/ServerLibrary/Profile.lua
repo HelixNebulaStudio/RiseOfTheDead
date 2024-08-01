@@ -772,7 +772,8 @@ function Profile:Load(loadOverwrite)
 		end
 		
 		if encodedData then return end;
-		 
+		
+		local breakLoadingNotify = false;
 		task.spawn(function()
 			waitTick = tick();
 			while encodedData == nil do
@@ -782,9 +783,12 @@ function Profile:Load(loadOverwrite)
 					Debugger:Log("Loading ", self.Player, " save.. ",math.floor(tick()-waitTick));
 				end
 				task.wait(0.1);
+				if workspace:IsAncestorOf(self.Player) then break; end;
+				if breakLoadingNotify then break; end;
 			end
 		end)
 		encodedData = profileDatabase.Datastore:GetAsync(loadKey);
+		breakLoadingNotify = true;
 	end
 	
 	for a=1, 5 do

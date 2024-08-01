@@ -409,8 +409,8 @@ function GameModeManager:Initialize(gameType, gameStage)
 				for a=1, #players do
 					local player = players[a];
 					if player then
-						GameModeManager:Purge(player);
 						GameModeManager:DisconnectPlayer(player, stageLib.ExitTeleport);
+						GameModeManager:Purge(player);
 					end
 				end
 				room:Destroy();
@@ -491,13 +491,13 @@ function GameModeManager:Initialize(gameType, gameStage)
 			self:NewRoom();
 		end
 		
-		for a=1, #self.Lobbies do
-			local lobbyData = self.Lobbies[a];
+		-- for a=1, #self.Lobbies do
+		-- 	local lobbyData = self.Lobbies[a];
 
-			local lobbyPrefab: Model = self.LobbyPrefab;
-			if lobbyPrefab == nil then continue end;
+		-- 	local lobbyPrefab: Model = self.LobbyPrefab;
+		-- 	if lobbyPrefab == nil then continue end;
 
-		end
+		-- end
 	end
 	
 	table.insert(GameModeManager.MenuRooms, {MenuRoom=meta.MenuRoom; GameTable=gameTable;});
@@ -1068,7 +1068,7 @@ task.spawn(function()
 				e.g. /gamemode join Raid Tombs
 		]];
 		Function = function(player, args)
-			local profile = shared.modProfile:Get(player);
+			--local profile = shared.modProfile:Get(player);
 
 			local action = args[1];
 

@@ -38,11 +38,10 @@ if RunService:IsServer() then
 			
 		end)
 
-		modOnGameEvents:ConnectEvent("OnNpcDeath", function(npcModule)
+		modOnGameEvents:ConnectEvent("OnBossDefeated", function(players, npcModule)
 			if npcModule.Name ~= "The Prisoner" then return end;
-			if npcModule.NetworkOwners == nil then return end;
 
-			for _, player in pairs(npcModule.NetworkOwners) do
+			for _, player in pairs(players) do
 				local profile = shared.modProfile:Get(player);
 
 				modMission:Progress(player, missionId, function(mission)

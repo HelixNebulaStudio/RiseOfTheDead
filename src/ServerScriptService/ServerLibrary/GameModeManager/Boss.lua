@@ -204,6 +204,7 @@ function GameMode:Start(room)
 				for _, player in pairs(players) do
 					shared.Notify(player, npcName, "BossDefeat");
 				end
+				modOnGameEvents:Fire("OnBossDefeated", players, npcModule);
 				
 				npcModule.DeathPosition = npcModule.RootPart.CFrame.p;
 				
@@ -357,13 +358,13 @@ function GameMode:End(room)
 			remoteGameModeHud:FireClient(player, {
 				Action="Close";
 			});
-			room:RemovePlayer(player);
 			self.GameTable:DisconnectPlayer(player);
+			room:RemovePlayer(player);
 		end
 	else
 		for a=1, #players do
-			room:RemovePlayer(players[a]);
 			self.GameTable:DisconnectPlayer(players[a], false);
+			room:RemovePlayer(players[a]);
 			remoteGameModeHud:FireClient(players[a], {
 				Action="Close";
 			});

@@ -612,7 +612,7 @@ elseif Branches.WorldName == "SunkenShip" or Branches.WorldName == "CargoShip" t
 	skyPhaseColors.Day = Color3.fromRGB(195, 219, 243);
 	skyPhaseColors.Night = Color3.fromRGB(61, 66, 95);
 	
-	modConfigurations.FogRange.Start = 100;
+	modConfigurations.FogRange.Start = 200;
 	modConfigurations.FogRange.End = 1200;
 
 end
