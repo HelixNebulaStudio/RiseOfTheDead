@@ -7,7 +7,7 @@ function Zombie.new(self)
 		if attacker == nil then return end;
 		if self.Weapons == nil then self.Weapons = {} end;
 		
-		Debugger:Log("Attacker (",attacker.Name,") dealt",amount,"damage with a (",weaponItem and weaponItem.ItemId or "nil",")");
+		Debugger:StudioLog("Attacker (",attacker.Name,") dealt",amount,"damage with a (",weaponItem and weaponItem.ItemId or "nil",")");
 		
 		amount = amount and math.ceil(amount) or 0;
 		if amount > 0 then

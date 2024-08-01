@@ -209,37 +209,41 @@ function DialogueService:InitServer(baseDialogueHandlers)
                             local missionData = missionProfile[a];
                             local missionLib = missionData and modMissionLibrary.Get(missionData.Id);
                             
-                            local missionDialogueFunc = missionLib and MissionDialogueModules[npcName][missionLib.Name];
-                            if missionDialogueFunc then
-                                missionDialogueFunc(player, dialog, npcDialogData, missionData);
-                                
-                            elseif missionLib.UseAssets == true then
+                            if missionLib.DialogueScript then
                                 local assetKey = `Missions/Mission{missionData.Id}`;
-                                local missionAssets = modAssetHandler:GetServer(assetKey);
-                                
-                                if missionAssets and missionAssets:FindFirstChild("MissionDialogues") then
-                                    local missionDialogues = require(missionAssets.MissionDialogues);
-                                    missionDialogueFunc = missionDialogues[npcName] and missionDialogues[npcName].DialogueHandler;
+                                local missionDialogues = require(missionLib.DialogueScript);
+                                local missionDialogueFunc = missionDialogues[npcName] and missionDialogues[npcName].DialogueHandler;
                                     
-                                    if missionDialogueFunc then
-                                        
+                                Debugger:Warn("Player(",player,") access dialogue (",assetKey,") for npc (",npcName,").", missionDialogueFunc);
+                                if missionDialogueFunc then
+
+                                    local choiceCount = #dialog.Choices;
+                                    missionDialogueFunc(player, dialog, npcDialogData, missionData);
+                                    if #dialog.Choices > choiceCount then
                                         if profile.Cache[assetKey] == nil then
                                             Debugger:Warn("Load dialogues (",assetKey,")");
                                             
                                             local loadSuccess = remoteDialogueHandler:InvokeClient(player, "load", {
                                                 Key=assetKey;
-                                                File=modLazyLoader:Deliver(player, missionAssets.MissionDialogues);
+                                                File=modLazyLoader:Deliver(player, missionLib.DialogueScript);
                                                 MissionId=missionData.Id;
                                             });
                                             if loadSuccess then
                                                 profile.Cache[assetKey] = true;
                                             end
                                         end
-                                        
-                                        missionDialogueFunc(player, dialog, npcDialogData, missionData);
                                     end
                                 end
+
+                            elseif missionLib and MissionDialogueModules[npcName][missionLib.Name] then
+                                local missionDialogueFunc = missionLib and MissionDialogueModules[npcName][missionLib.Name];
+                                if missionDialogueFunc then
+                                    Debugger:StudioWarn("Using deprecated dialoguefunc", npcName, missionLib.Name);
+                                    missionDialogueFunc(player, dialog, npcDialogData, missionData);
+                                end
+                                
                             end
+
                         end
                     end
                     

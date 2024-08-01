@@ -6,6 +6,7 @@ local RunService = game:GetService("RunService");
 local Dialogues = {
 	Mason={};
 	Nick={};
+	["Dr. Deniski"]={};
 };
 
 local missionId = 2;
@@ -225,6 +226,15 @@ if RunService:IsServer() then
 
 		elseif mission.Type == 4 then -- Failed
 
+		end
+	end
+
+	-- MARK: Dr. Deniski Handler
+	Dialogues["Dr. Deniski"].DialogueHandler = function(player, dialog, data, mission)
+		if mission.Type == 1 then -- Active
+			if mission.ProgressionPoint == 3 then
+				dialog:SetInitiate("Hey, you don't look so well.");
+			end
 		end
 	end
 end

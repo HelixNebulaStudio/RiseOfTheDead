@@ -99,6 +99,7 @@ if RunService:IsServer() then
 						end;
 					end)
 				end)
+				
 			elseif mission.ProgressionPoint == 8 then
 				dialog:SetInitiate("$PlayerName, I think I should head back to Sunday's to warn the others..");
 				dialog:AddChoice("aNewCommunity_warn", function(dialog)
