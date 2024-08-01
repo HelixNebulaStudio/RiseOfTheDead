@@ -138,6 +138,12 @@ local PerksReward = {
 };
 MissionLibrary.PerksReward = PerksReward;
 
+local MoneyReward = {
+	Core=100;
+	Side=1000;
+};
+MissionLibrary.MoneyReward = MoneyReward;
+
 local factionMissionExpireTime = 3600*20;
 --===
 
@@ -160,6 +166,7 @@ MissionLibrary.New{
 	GuideText="";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 	};
 	Markers={
 		[2]={World="TheBeginning"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
@@ -198,6 +205,7 @@ MissionLibrary.New{
 	GuideText="";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=5};
 	};
 	Markers={
@@ -286,6 +294,7 @@ MissionLibrary.New{
 	GuideText="Talk to Mason to learn how to upgrade your weapons";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Item"; ItemId="pistolfireratebp"; Quantity=1;};
 		{Type="Mission"; Id=3};
 		{Type="Mission"; Id=4};
@@ -318,6 +327,7 @@ MissionLibrary.New{
 	GuideText="Someone is screaming for help in Bloxmart, go check it out";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=7};
 	};
 	StartRequirements={
@@ -353,6 +363,7 @@ MissionLibrary.New{
 	GuideText="Help Robert get back to his safehouse";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=11};
 		{Type="Mission"; Id=46;};
 		{Type="Mission"; Id=40;};
@@ -461,6 +472,7 @@ MissionLibrary.New{
 	GuideText="Talk to Jane to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=27};
 		{Type="Mission"; Id=49};
 	};
@@ -496,6 +508,7 @@ MissionLibrary.New{
 	GuideText="Talk to Mason to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=13};
 		{Type="Mission"; Id=14};
 		{Type="Mission"; Id=16};
@@ -666,6 +679,7 @@ MissionLibrary.New{
 	LinkNextMission=24;
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=19};
 		{Type="Mission"; Id=22};
 		{Type="Mission"; Id=23};
@@ -851,6 +865,7 @@ MissionLibrary.New{
 	GuideText="Talk to Jane to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=29};
 		{Type="Mission"; Id=30};
 	};
@@ -1028,6 +1043,7 @@ MissionLibrary.New{
 	GuideText="Talk to Stan";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=33};
 	};
 	LinkNextMission=33;
@@ -1127,6 +1143,7 @@ MissionLibrary.New{
 	GuideText="Talk to Stan";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=54};
 		{Type="Mission"; Id=38};
 		{Type="Mission"; Id=47};
@@ -1326,6 +1343,7 @@ MissionLibrary.New{
 	GuideText="Talk to Patrick";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=36};
 		{Type="Mission"; Id=39};
 		{Type="Mission"; Id=52};
@@ -1695,6 +1713,7 @@ MissionLibrary.New{
 	GuideText="Talk to Mason";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=(MoneyReward.Core+1000)};
 		{Type="Mission"; Id=12};
 	};
 	Markers={
@@ -1815,6 +1834,7 @@ MissionLibrary.New{
 	GuideText="Talk to Joseph";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=37};
 		{Type="Mission"; Id=45};
 		{Type="Mission"; Id=51};
@@ -1893,6 +1913,7 @@ MissionLibrary.New{
 	};
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 	};
 	Markers={
 		[1]={World="Safehome"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
@@ -1954,6 +1975,7 @@ MissionLibrary.New{
 	GuideText="Talk to Joseph";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=58};
 		{Type="Mission"; Id=77};
 	};
@@ -2031,6 +2053,7 @@ MissionLibrary.New{
 	GuideText="Talk to Patrick";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=62};
 		{Type="Mission"; Id=63};
 		{Type="Mission"; Id=75};
@@ -2254,6 +2277,7 @@ MissionLibrary.New{
 	GuideText="Talk to Patrick";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Money"; Amount=MoneyReward.Core};
 	};
 	Markers={
 		[1]={World="TheMall"; Label="Bandit"; Target=Vector3.new(798.55481, 162.668854, -728.297119); Type=modMarkers.MarkerTypes.Waypoint;};
