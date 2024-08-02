@@ -191,7 +191,6 @@ ShopLibrary.Pages = {
 			{Type="Product"; Id="gps"};
 			{Type="Product"; Id="lantern"};
 			{Type="Product"; Id="boombox"};
-			{Type="Product"; Id="spotlight"};
 			{Type="Product"; Id="fireworks"};
 			{Type="Product"; Id="rcetablet"};
 			{Type="Product"; Id="entityleash"};
