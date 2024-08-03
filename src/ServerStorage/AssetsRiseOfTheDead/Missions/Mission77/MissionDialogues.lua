@@ -214,7 +214,7 @@ if RunService:IsServer() then
 			if itemsList and #itemsList > 0 then
 				dialog:AddDialog({
 					Face="Serious";
-					Dialogue="I found some extra blueprint pieces, and I don't need them..";
+					Say="I found some extra blueprint pieces, and I don't need them..";
 					Reply="I'll take those off your hands, thanks!";
 				}, function(dialog)
 					for a=1, #itemsList do

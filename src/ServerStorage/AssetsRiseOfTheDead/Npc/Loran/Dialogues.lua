@@ -20,7 +20,7 @@ Dialogues.InitStrings = {
 -- MARK: DialogueStrings
 Dialogues.DialogueStrings = {
 	["shop_banditShop"]={
-		Dialogue="Do you sell anything?";
+		Say="Do you sell anything?";
 		Reply="What do you want..?";
 		ReplyFunction=function(dialogPacket)
 			local npcModel = dialogPacket.Prefab;

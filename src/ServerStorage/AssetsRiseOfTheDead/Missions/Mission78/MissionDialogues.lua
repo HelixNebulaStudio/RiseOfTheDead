@@ -103,7 +103,7 @@ if RunService:IsServer() then
 			if mission.ProgressionPoint == 1 then
 				dialog:AddDialog({
 					Face="Happy";
-					Dialogue="Hey, I got a gun for you.";
+					Say="Hey, I got a gun for you.";
 					Reply="Yay!";
 					ToggleWindow="NpcWindow";
 				}, function(dialog)

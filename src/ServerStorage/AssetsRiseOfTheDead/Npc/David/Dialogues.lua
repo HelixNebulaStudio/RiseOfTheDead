@@ -73,7 +73,7 @@ if RunService:IsServer() then
 		else
 			dialog:AddDialog({
 				Face="Skeptical";
-				Dialogue="I got some commodities to trade.";
+				Say="I got some commodities to trade.";
 				Reply="Sure..";
 				ToggleWindow="Trade";
 				

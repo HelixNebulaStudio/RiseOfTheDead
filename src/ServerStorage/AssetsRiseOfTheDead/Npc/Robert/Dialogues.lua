@@ -24,7 +24,7 @@ Dialogues.DialogueStrings = {
 	};
 	["general_funny"]={
 		Face="Oops";
-		Dialogue="You're funny.";
+		Say="You're funny.";
 		Reply="No you.";
 	};
 };

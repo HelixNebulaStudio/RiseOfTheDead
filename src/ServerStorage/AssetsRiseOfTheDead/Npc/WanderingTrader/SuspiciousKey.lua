@@ -18,7 +18,7 @@ return function(player, dialog, data)
 	
 	dialog:AddDialog({
 		Face="Skeptical";
-		Dialogue="How much do you want for that Suspicious Key?";
+		Say="How much do you want for that Suspicious Key?";
 		Reply="Let's see..";
 		ToggleWindow="Trade";
 

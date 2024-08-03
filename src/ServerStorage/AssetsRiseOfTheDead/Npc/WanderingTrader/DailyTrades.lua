@@ -178,7 +178,7 @@ return function(player, dialog, data)
 
 	dialog:AddDialog({
 		Face="Skeptical";
-		Dialogue="Let's trade";
+		Say="Let's trade";
 		Reply="Sure";
 		ToggleWindow="Trade";
 

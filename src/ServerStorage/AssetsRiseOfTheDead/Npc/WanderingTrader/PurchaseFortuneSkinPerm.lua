@@ -24,7 +24,7 @@ return function(player, dialog, data)
 		local function purchase1mPattern(dialog)
 			local dialogPacket = {
 				Face="Happy";
-				Dialogue="Yes, I would like to purchase it.";
+				Say="Yes, I would like to purchase it.";
 			};
 
 			if itemDisplayLib then
@@ -82,7 +82,7 @@ return function(player, dialog, data)
 		local costString = modFormatNumber.Beautify(fortuneSkinCost);
 		dialog:AddDialog({
 			Face="Disbelief";
-			Dialogue="What can I get for <b>".. costString .." gold</b>?";
+			Say="What can I get for <b>".. costString .." gold</b>?";
 			Reply=(
 				storageItem == nil 
 					and "Equip a tool first and I'll show you."
@@ -94,7 +94,7 @@ return function(player, dialog, data)
 			local itemLib = modItemsLibrary:Find(storageItem.ItemId);
 			dialog:AddDialog({
 				Face="Surprise";
-				Dialogue="Yes, I want it..";
+				Say="Yes, I want it..";
 				Reply="Really? For <b>".. costString .." gold</b>, you really want it on your <b>".. itemLib.Name .."</b>?";
 				InspectItem={
 					ID=storageItem.ID;
@@ -105,14 +105,14 @@ return function(player, dialog, data)
 				purchase1mPattern(dialog)
 				dialog:AddDialog({
 					Face="Surprise";
-					Dialogue="Nevermind";
+					Say="Nevermind";
 					Reply="Arg..";
 				});
 
 			end)
 			dialog:AddDialog({
 				Face="Surprise";
-				Dialogue="No thanks.";
+				Say="No thanks.";
 				Reply="Oh well, come back anytime.";
 			});
 		end)

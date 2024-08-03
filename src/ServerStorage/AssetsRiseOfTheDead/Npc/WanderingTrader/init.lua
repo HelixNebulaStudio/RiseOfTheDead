@@ -22,7 +22,7 @@ return function(player, dialog, data)
 	if modBranchConfigs.CurrentBranch.Name == "Dev" or player.UserId == 16170943 then
 		local reportDialog = {
 			Face="Skeptical";
-			Dialogue=(modBranchConfigs.CurrentBranch.Name == "Dev" and "[Dev Branch]" or "[Dev]").." Status report";
+			Say=(modBranchConfigs.CurrentBranch.Name == "Dev" and "[Dev Branch]" or "[Dev]").." Status report";
 			Reply="Arr, what report?"
 		};
 
@@ -132,7 +132,7 @@ return function(player, dialog, data)
 			
 			dialog:AddDialog({
 				Face="Skeptical";
-				Dialogue="What's on the market at the moment?";
+				Say="What's on the market at the moment?";
 				Reply="Have a look.";
 				ToggleWindow="GoldMenu";
 			});

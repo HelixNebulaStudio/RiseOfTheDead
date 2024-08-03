@@ -409,7 +409,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 				if playerSave:GetStat("Money") >= bribeCost then
 					dialog:AddDialog({
 						Face="Hehe";
-						Dialogue=".. *Give $5'000 to bandit*";
+						Say=".. *Give $5'000 to bandit*";
 						Reply="Alright, haha, see you next time.";
 					}, function(dialog)
 						dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
@@ -433,7 +433,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 				else
 					dialog:AddDialog({
 						Face="Serious";
-						Dialogue=".. I don't have any more money.";
+						Say=".. I don't have any more money.";
 						Reply="Ugh.. fine.";
 					}, function(dialog)
 						dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
@@ -462,7 +462,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 			if banditsAllied then
 				dialog:AddDialog({
 					Face="Serious";
-					Dialogue="I'm $PlayerName! I'm one of the new recruit.";
+					Say="I'm $PlayerName! I'm one of the new recruit.";
 					Reply="Oh really? And what are you doing here?";
 					
 				}, function(dialog)
@@ -470,7 +470,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 					
 					dialog:AddDialog({
 						Face="Serious";
-						Dialogue="[Truth] I'm testing these blood samples for dormant parasites..";
+						Say="[Truth] I'm testing these blood samples for dormant parasites..";
 						Reply="Hmmm.. Did Zark assign you to this?";
 						
 					}, function(dialog)
@@ -478,7 +478,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 						
 						dialog:AddDialog({
 							Face="Angry";
-							Dialogue="[Truth] No, Zark doesn't know about this..";
+							Say="[Truth] No, Zark doesn't know about this..";
 							Reply="I see.. My squad is outside, hand over the samples right now! We will take it from here.";
 							
 						}, function(dialog)
@@ -486,7 +486,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 							
 							dialog:AddDialog({
 								Face="Serious";
-								Dialogue="Umm what?";
+								Say="Umm what?";
 								Reply="You heard me, give me the samples. You are done here!";
 								
 							}, function(dialog)
@@ -494,7 +494,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 								
 								dialog:AddDialog({
 									Face="Serious";
-									Dialogue="Is that Zark's orders?";
+									Say="Is that Zark's orders?";
 									Reply="It doesn't matter! *Loads weapon*\n*Clicks walkie talkie* \"I'll be needing backup here..\"\n\nYou have a count of 3!";
 									
 								}, function(dialog)
@@ -522,21 +522,21 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 					
 					dialog:AddDialog({
 						Face="Serious";
-						Dialogue="[Lie] Zark assigned me to pick up some items here..";
+						Say="[Lie] Zark assigned me to pick up some items here..";
 						Reply="Hahah, Zark made you do his errand? Are you the only one who's put on this task?";
 					}, function(dialog)
 						dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
 						
 						dialog:AddDialog({
 							Face="Angry";
-							Dialogue="Um yeah..";
+							Say="Um yeah..";
 							Reply="Hmmm.. Now why would he put you on a solo mission..\n\nWait.. He doesn't want us to know about this isn't it?";
 						}, function(dialog)
 							dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
 							
 							dialog:AddDialog({
 								Face="Serious";
-								Dialogue="Not sure, it's probably unimportant..";
+								Say="Not sure, it's probably unimportant..";
 								Reply=".. Alright.. I'll leave you to it..";
 							}, function(dialog)
 								patrolBanditNpcModule:ToggleInteractable(false);
@@ -564,7 +564,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 				
 				dialog:AddDialog({
 					Face="Serious";
-					Dialogue="Oh, I'm a new survivor here..";
+					Say="Oh, I'm a new survivor here..";
 					Reply="Oh really? What are you doing here?";
 					
 				}, function(dialog)
@@ -592,14 +592,14 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 					
 					dialog:AddDialog({
 						Face="Angry";
-						Dialogue="[Bribe] Just some blood tests..";
+						Say="[Bribe] Just some blood tests..";
 						Reply=".. You are not allowed to be here. Leave immediately, I'm not going to say it twice!"
 					}, function(dialog)
 						dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
 						
 						dialog:AddDialog({
 							Face="Serious";
-							Dialogue="Please, I need to do this.. Maybe we can work something out?";
+							Say="Please, I need to do this.. Maybe we can work something out?";
 							Reply="...\n\nIf you can cough up $10'000 then sure, I can pretend nothing happened here.";
 						}, function(dialog)
 							dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
@@ -608,7 +608,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 							if playerSave:GetStat("Money") >= bribeCost then
 								dialog:AddDialog({
 									Face="Serious";
-									Dialogue="Fine, here.. *Give $10'000 to bandit*";
+									Say="Fine, here.. *Give $10'000 to bandit*";
 									Reply="Alright, you get 5 minutes!";
 								}, function(dialog)
 									playerSave:AddStat("Money", -bribeCost);
@@ -634,7 +634,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 
 							dialog:AddDialog({
 								Face="Frustrated";
-								Dialogue="Noo way, that's too much!";
+								Say="Noo way, that's too much!";
 								Reply="Well, then you have 5 seconds to leave!";
 							}, function(dialog)
 								
@@ -646,7 +646,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 					
 					local lieDialog = {
 						Face="Angry";
-						Dialogue="[Lie] I was helping the doctors test the machines..";
+						Say="[Lie] I was helping the doctors test the machines..";
 						Reply="Uh huuh.. Well, you have no permissions to be here. Leave immediately!";
 					};
 					dialog:AddDialog(lieDialog, function(dialog)
@@ -654,7 +654,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 						
 						dialog:AddDialog({
 							Face="Serious";
-							Dialogue="Please, I just need 5 minutes..";
+							Say="Please, I just need 5 minutes..";
 							Reply="No, leave now. You have 5 seconds!";
 						}, function(dialog)
 							

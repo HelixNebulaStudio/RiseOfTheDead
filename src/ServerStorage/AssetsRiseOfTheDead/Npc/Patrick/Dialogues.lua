@@ -99,7 +99,7 @@ if RunService:IsServer() then
 	
 			local newDialog = {
 				Face="Smirk";
-				Dialogue="Anything interesting happened?";
+				Say="Anything interesting happened?";
 				Reply="Hmmm, ".. targetNpcName .. rngDialogues[math.random(1, #rngDialogues)];
 			};
 	
@@ -121,7 +121,7 @@ if RunService:IsServer() then
 		if wantedPoster then
 			local dialogPacket = {
 				Face="Happy";
-				Dialogue="Who's wanted posters are we putting up?";
+				Say="Who's wanted posters are we putting up?";
 			}
 			
 			local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
@@ -140,7 +140,7 @@ if RunService:IsServer() then
 	
 			local dialogPacket = {
 				Face="Happy";
-				Dialogue="I have wanted posters I want you to put up..";
+				Say="I have wanted posters I want you to put up..";
 				Reply="Sure, which one?";
 			}
 			
@@ -166,7 +166,7 @@ if RunService:IsServer() then
 	
 					local dialogPacket = {
 						Face="Happy";
-						Dialogue= "Give ".. info.NameRich .."'s Wanted Poster";
+						Say= "Give ".. info.NameRich .."'s Wanted Poster";
 						Reply="I'll get right to it and put up these ".. info.NameRich .."'s Wanted Poster";
 					}
 					

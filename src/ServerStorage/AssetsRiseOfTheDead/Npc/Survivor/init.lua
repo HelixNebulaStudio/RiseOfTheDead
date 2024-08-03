@@ -28,7 +28,7 @@ return function(player, dialog, data)
 
 		local reportDialog = {
 			Face="Skeptical";
-			Dialogue=(modBranchConfigs.CurrentBranch.Name == "Dev" and "[Dev Branch]" or "[Dev]").." Status report";
+			Say=(modBranchConfigs.CurrentBranch.Name == "Dev" and "[Dev Branch]" or "[Dev]").." Status report";
 			Reply=reportMsg;
 		};
 		dialog:AddDialog(reportDialog, function(dialog)

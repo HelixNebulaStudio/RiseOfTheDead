@@ -86,7 +86,7 @@ if RunService:IsServer() then
 			local yearVal = os.date("*t")["year"];
 			local dialogPacket = {
 				Face="Happy";
-				Dialogue="Claim your end of ".. yearVal .." present";
+				Say="Claim your end of ".. yearVal .." present";
 			}
 			
 			local lvlRequirement = math.round(modGlobalVars.MaxLevels/2);
@@ -127,7 +127,7 @@ if RunService:IsServer() then
 			
 			local dialogPacket = {
 				Face="Happy";
-				Dialogue="I have ".. presentsRequired .." Christmas Presents 2022 for you.";
+				Say="I have ".. presentsRequired .." Christmas Presents 2022 for you.";
 			}
 			
 			local equippedToolID = profile.EquippedTools.ID;

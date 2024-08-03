@@ -65,7 +65,7 @@ if RunService:IsServer() then
 		else
 			dialog:AddDialog({
 				Face="Skeptical";
-				Dialogue="I want to trade for some steel fragments.";
+				Say="I want to trade for some steel fragments.";
 				Reply="This is what I need..";
 				ToggleWindow="Trade";
 				

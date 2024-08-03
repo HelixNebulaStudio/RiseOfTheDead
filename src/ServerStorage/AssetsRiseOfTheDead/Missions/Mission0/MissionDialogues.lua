@@ -42,7 +42,7 @@ if RunService:IsServer() then
 
 			-- local dialogPacket = {
 			-- 	Face="Happy";
-			-- 	Dialogue="I've done killing the horde..";
+			-- 	Say="I've done killing the horde..";
 			-- 	Reply="Wow, you better wash the blood off your clothes.";
 			-- 	MissionId=0;
 			-- };

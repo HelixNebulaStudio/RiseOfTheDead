@@ -44,7 +44,7 @@ Dialogues.Carlson.DialogueStrings = {
 		Reply="About 500 metal scrap should be enough, we'll use my metal scraps.";
 	};
 	["safetysafehouse_start"]={
-		Dialogue="Okay, I'll get started."; 
+		Say="Okay, I'll get started."; 
 		Reply="Alright.";
 	};
 	["safetysafehouse_complete"]={

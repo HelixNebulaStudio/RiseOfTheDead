@@ -126,7 +126,7 @@ if RunService:IsServer() then
 		if perkCupcakes and perkCupcakes.Remaining > 0 then
 			local dialogPacket = {
 				Face="Happy";
-				Dialogue="Can I have a cupcake?";
+				Say="Can I have a cupcake?";
 			}
 	
 			local inventory = playerSave.Inventory;
@@ -163,7 +163,7 @@ if RunService:IsServer() then
 	
 			local dialogPacket = {
 				Face="Happy";
-				Dialogue="What is it?";
+				Say="What is it?";
 			}
 	
 			local inventory = playerSave.Inventory;

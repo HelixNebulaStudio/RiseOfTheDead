@@ -29,7 +29,7 @@ if RunService:IsServer() then
 			if total >= 1 then
 				local dialogPacket = {
 					Face="Happy";
-					Dialogue="Here's a box of ammo.";
+					Say="Here's a box of ammo.";
 					Reply="Great, that'll do.";
 					MissionId=missionId;
 				};

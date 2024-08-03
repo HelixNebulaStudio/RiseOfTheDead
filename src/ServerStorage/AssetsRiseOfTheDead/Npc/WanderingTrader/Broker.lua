@@ -373,7 +373,7 @@ return function(player, dialog, data)
 		if returnPacket.Success ~= true then
 			dialog:AddDialog({
 				Face="Skeptical";
-				Dialogue="Well?";
+				Say="Well?";
 				Reply="Hold on, I'm still looking for my ledger, come back later..";
 			});
 			
@@ -598,7 +598,7 @@ return function(player, dialog, data)
 		--	-- -- Listing sales;
 		--	dialog:AddDialog({
 		--		Face="Skeptical";
-		--		Dialogue="I got some items to list for sale.";
+		--		Say="I got some items to list for sale.";
 		--		Reply="Let me see them.";
 		--		ToggleWindow="Trade";
 
@@ -608,7 +608,7 @@ return function(player, dialog, data)
 		--else
 		--	dialog:AddDialog({
 		--		Face="Skeptical";
-		--		Dialogue="I got some items to list for sale.";
+		--		Say="I got some items to list for sale.";
 		--		Reply=(
 		--			tradersMarket.IsPremium 
 		--			and "You already have ".. #tradersMarket.Listing .. "/5 listed."
@@ -865,7 +865,7 @@ return function(player, dialog, data)
 			--== checkSaleDialog
 			dialog:AddDialog({
 				Face="Skeptical";
-				Dialogue="Can I have my stuff back?";
+				Say="Can I have my stuff back?";
 				Reply="Sure";
 			}, checkSaleDialog);
 			--== checkSaleDialog
@@ -873,7 +873,7 @@ return function(player, dialog, data)
 		else
 			dialog:AddDialog({
 				Face="Skeptical";
-				Dialogue="Can I have my stuff back?";
+				Say="Can I have my stuff back?";
 				Reply="I don't seem to have any of your stuff.";
 			});
 
@@ -1229,7 +1229,7 @@ return function(player, dialog, data)
 		--	--== GlobalList
 		--	dialog:AddDialog({
 		--		Face="Skeptical";
-		--		Dialogue="What's on sale?";
+		--		Say="What's on sale?";
 		--		Reply="Here, have a look..";
 		--	}, loadSalesDialog);
 		--	--== GlobalList
@@ -1237,7 +1237,7 @@ return function(player, dialog, data)
 		--else
 		--	dialog:AddDialog({
 		--		Face="Skeptical";
-		--		Dialogue="What's on sale?";
+		--		Say="What's on sale?";
 		--		Reply="Nothing is on sale at the moment.";
 		--	});
 			
@@ -1249,19 +1249,19 @@ return function(player, dialog, data)
 	if sellDisabled == nil then
 		--dialog:AddDialog({
 		--	Face="Skeptical";
-		--	Dialogue="Let's broker";
+		--	Say="Let's broker";
 		--	Reply="I'm the right guy for the job.";
 		--}, enterBrokerFunc);
 		dialog:AddDialog({
 			Face="Skeptical";
-			Dialogue="Let's broker";
+			Say="Let's broker";
 			Reply="I'm afraid I'm retiring from brokering. It's just too much for me to handle.";
 		}, enterBrokerFunc);
 		
 	else
 		dialog:AddDialog({
 			Face="Skeptical";
-			Dialogue="Let's broker";
+			Say="Let's broker";
 			Reply=sellDisabled;
 		});
 		
