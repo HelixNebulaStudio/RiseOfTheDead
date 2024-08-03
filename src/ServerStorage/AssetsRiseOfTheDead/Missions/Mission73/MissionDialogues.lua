@@ -14,25 +14,35 @@ local missionId = 73;
 --==
 
 -- MARK: Patrick Dialogues
-Dialogues.Patrick.Dialogues = function()
-	return {
-		{Tag="dps_init"; Face="Frustrated"; 
-			Reply="Hurry, I think it's around here somewhere. Get your weapons ready..";};
-		{Tag="dps_start"; Face="Skeptical"; 
-			Dialogue="What is here?";
-			Reply="A zenith boss is here, be careful."};
-		{Tag="dps_retry"; Face="Frustrated"; 
-			Reply="It's still around, let's try this again.";};
-		{Tag="dps_restart"; Face="Skeptical"; 
-			Dialogue="Let's do this again..";
-			Reply="That's the spirit, take it down."};
-		{Tag="dps_cheer"; Face="Frustrated"; 
-			Reply="Watch your backs!";};
-		{Tag="dps_goToHq"; Face="Happy"; 
-			Dialogue="I got a mission from my faction, can you bring me to HQ?";
-			Reply="Sure, let's go.."};
+Dialogues.Patrick.DialogueStrings = {
+	["dps_init"]={
+		Face="Frustrated"; 
+		Reply="Hurry, I think it's around here somewhere. Get your weapons ready..";
 	};
-end
+	["dps_start"]={
+		Face="Skeptical"; 
+		Say="What is here?";
+		Reply="A zenith boss is here, be careful.";
+	};
+	["dps_retry"]={
+		Face="Frustrated"; 
+		Reply="It's still around, let's try this again.";
+	};
+	["dps_restart"]={
+		Face="Skeptical"; 
+		Say="Let's do this again..";
+		Reply="That's the spirit, take it down.";
+	};
+	["dps_cheer"]={
+		Face="Frustrated"; 
+		Reply="Watch your backs!";
+	};
+	["dps_goToHq"]={
+		Face="Happy"; 
+		Say="I got a mission from my faction, can you bring me to HQ?";
+		Reply="Sure, let's go..";
+	};
+};
 
 if RunService:IsServer() then
 

@@ -13,22 +13,34 @@ local cache = {};
 --==
 
 -- !outline: Rachel Dialogues
-Dialogues.Rachel.Dialogues = function()
-	return {
-		{ Tag="ziphon_create"; Dialogue="I got some material to make some Ziphoning Serum.";
-			Face="Happy"; Reply="Alright"};
-		
-
-		{Tag="ziphon_init";
-			Face="Happy"; Reply="$PlayerName, I managed to make use of our research. I just need some stuff to create a serum.";};
-		{Tag="ziphon_serum"; Dialogue="Oh cool, a serum?";
-			Face="Smirk"; Reply="Yes, upon consumption, it cleanses adverse health effects and also provides a temporary healing property. Tested it myself.."};
-		{Tag="ziphon_serum2"; Dialogue="Wow, that's useful. What do you need?";
-			Face="Happy"; Reply="If you could bring me these items on the checklist and come back to me. I can whip up a couple bottles."};
-		{Tag="ziphon_serum3"; Dialogue="Sure!";
-			Face="Happy"; Reply="Wonderful!"};
+Dialogues.Rachel.DialogueStrings = {
+	["ziphon_create"]={
+		Say="I got some material to make some Ziphoning Serum.";
+		Face="Happy"; 
+		Reply="Alright";
 	};
-end
+	
+
+	["ziphon_init"]={
+		Face="Happy"; 
+		Reply="$PlayerName, I managed to make use of our research. I just need some stuff to create a serum.";
+	};
+	["ziphon_serum"]={
+		Say="Oh cool, a serum?";
+		Face="Smirk"; 
+		Reply="Yes, upon consumption, it cleanses adverse health effects and also provides a temporary healing property. Tested it myself..";
+	};
+	["ziphon_serum2"]={
+		Say="Wow, that's useful. What do you need?";
+		Face="Happy"; 
+		Reply="If you could bring me these items on the checklist and come back to me. I can whip up a couple bottles.";
+	};
+	["ziphon_serum3"]={
+		Say="Sure!";
+		Face="Happy"; 
+		Reply="Wonderful!";
+	};
+};
 
 if RunService:IsServer() then
 	-- !outline: Rachel Handler

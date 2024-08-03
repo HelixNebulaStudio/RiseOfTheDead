@@ -11,17 +11,21 @@ local missionId = 37;
 --==
 
 -- MARK: Joseph Dialogues
-Dialogues.Joseph.Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="josephsLettuce_start"; Face="Joyful";
-			Dialogue="Sure, how do I help make the watering can?"; 
-			Reply="Here's a blueprint, after you're done please also water the plants for me."};
-		{Tag="josephsLettuce_end"; Face="Happy";
-			Dialogue="Yep, I watered them."; 
-			Reply="Good job, get some rest. You earned it."};
-			
+Dialogues.Joseph.DialogueStrings = {
+	["josephsLettuce_start"]={
+		CheckMission=missionId;
+		Face="Joyful";
+		Say="Sure, how do I help make the watering can?"; 
+		Reply="Here's a blueprint, after you're done please also water the plants for me.";
 	};
-end
+	["josephsLettuce_end"]={
+		Face="Happy";
+		Say="Yep, I watered them."; 
+		Reply="Good job, get some rest. You earned it.";
+	};
+		
+};
+
 
 if RunService:IsServer() then
 	-- MARK: Joseph Handler

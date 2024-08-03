@@ -11,18 +11,24 @@ local missionId = 56;
 --==
 
 -- MARK: Joseph Dialogues
-Dialogues.Joseph.Dialogues = function()
-	return {
-		{Tag="eotl_init"; Face="Happy"; 
-			Reply="Welcome back, $PlayerName.";};
-		{Tag="eotl_howsarm"; Face="Skeptical";
-			Dialogue="How's your arm, Joseph?"; 
-			Reply="Thank god it was just my arm, it could have been worse."};
-		{Tag="eotl_patchup"; CheckMission=missionId; Face="Skeptical";
-			Dialogue="Good to hear it, what should I do about Robert and the hole he escaped through?"; 
-			Reply="Nate patched up the hole a bit, I don't recommend going after him alone.. But it's up to you, I know you can take care of yourself."};
+Dialogues.Joseph.DialogueStrings = {
+	["eotl_init"]={
+		Face="Happy"; 
+		Reply="Welcome back, $PlayerName.";
 	};
-end
+	["eotl_howsarm"]={
+		Face="Skeptical";
+		Say="How's your arm, Joseph?"; 
+		Reply="Thank god it was just my arm, it could have been worse.";
+	};
+	["eotl_patchup"]={
+		CheckMission=missionId; 
+		Face="Skeptical";
+		Say="Good to hear it, what should I do about Robert and the hole he escaped through?"; 
+		Reply="Nate patched up the hole a bit, I don't recommend going after him alone.. But it's up to you, I know you can take care of yourself.";
+	};
+};
+
 
 if RunService:IsServer() then
 	-- MARK: Joseph Handler

@@ -13,40 +13,61 @@ local missionId = 71;
 --==
 
 -- !outline: Frank Dialogues
-Dialogues.Frank.Dialogues = function()
-	return {
-		{Tag="hvp_collect"; Dialogue="I'm here to deliver this high value package to you..";
-			Face="Happy"; Reply="Ah yes, put it here dude."};
-		{Tag="hvp_collectfull"; Dialogue="I'm here to deliver this high value package to you..";
-			Face="Happy"; Reply="Got any space for this dude?"};
-		{Tag="hvp_lost"; Dialogue="I was suppose to deliver a package to you, but I lost it..";
-			Face="Serious"; Reply="Ah welp, you should go back and get another one.."};
+Dialogues.Frank.DialogueStrings = {
+	["hvp_collect"]={
+		Say="I'm here to deliver this high value package to you..";
+		Face="Happy"; 
+		Reply="Ah yes, put it here dude.";
 	};
-end
+	["hvp_collectfull"]={
+		Say="I'm here to deliver this high value package to you..";
+		Face="Happy"; 
+		Reply="Got any space for this dude?";
+	};
+	["hvp_lost"]={
+		Say="I was suppose to deliver a package to you, but I lost it..";
+		Face="Serious"; 
+		Reply="Ah welp, you should go back and get another one..";
+	};
+};
 
 -- !outline: Greg Dialogues
-Dialogues.Greg.Dialogues = function()
-	return {
-		{Tag="hvp_init"; Dialogue="Hey, heard you need someone for a delivery?";
-			Face="Welp"; Reply="Yes, here take this package and bring it to wherever man."};
-		{Tag="hvp_package"; Dialogue="Umm, what's in the package?";
-			Face="Serious"; Reply="None of your business, you imbecile."};
-		{Tag="hvp_lost"; Dialogue="Umm, I think I lost the package..";
-			Face="Angry"; Reply="What! Are you serious man!"};
+Dialogues.Greg.DialogueStrings = {
+	["hvp_init"]={
+		Say="Hey, heard you need someone for a delivery?";
+		Face="Welp"; 
+		Reply="Yes, here take this package and bring it to wherever man.";
 	};
-end
+	["hvp_package"]={
+		Say="Umm, what's in the package?";
+		Face="Serious"; 
+		Reply="None of your business, you imbecile.";
+	};
+	["hvp_lost"]={
+		Say="Umm, I think I lost the package..";
+		Face="Angry"; 
+		Reply="What! Are you serious man!";
+	};
+};
 
 -- !outline: Diana Dialogues
-Dialogues.Diana.Dialogues = function()
-	return {
-		{Tag="hvp_collect"; Dialogue="I'm here to deliver this high value package to you..";
-			Face="Happy"; Reply="Awesome, I hope it wasn't much trouble."};
-		{Tag="hvp_collectfull"; Dialogue="I'm here to deliver this high value package to you..";
-			Face="Happy"; Reply="Great, but you're gonna need space for this.."};
-		{Tag="hvp_lost"; Dialogue="I was suppose to deliver a package to you, but I lost it..";
-			Face="Serious"; Reply="Ah.. You might have to get another one."};
+Dialogues.Diana.DialogueStrings = {
+	["hvp_collect"]={
+		Say="I'm here to deliver this high value package to you..";
+		Face="Happy"; 
+		Reply="Awesome, I hope it wasn't much trouble.";
 	};
-end
+	["hvp_collectfull"]={
+		Say="I'm here to deliver this high value package to you..";
+		Face="Happy"; 
+		Reply="Great, but you're gonna need space for this..";
+	};
+	["hvp_lost"]={
+		Say="I was suppose to deliver a package to you, but I lost it..";
+		Face="Serious"; 
+		Reply="Ah.. You might have to get another one.";
+	};
+};
 
 
 if RunService:IsServer() then

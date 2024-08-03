@@ -13,20 +13,24 @@ local missionId = 64;
 --==
 
 -- MARK: Joseph Dialogues
-Dialogues.Joseph.Dialogues = function()
-	return {
-		{Tag="josephcrossbow_try"; Face="Skeptical"; 
-			Dialogue="Is this crossbow what you are talking about?"; 
-			Reply="Ahh yes.. I had a build for the crossbow, I've written my build somewhere near my workbench a long time ago and forgotten it, try to figure out how it's built."};
-		{Tag="josephcrossbow_failBuild"; Face="Skeptical"; 
-			Dialogue="Is this how you built your crossbow?"; 
-			Reply="Hmm, not quite, something's off. Look around my workbench to see if you can find any clues.."};
-		{Tag="josephcrossbow_corectBuild"; Face="Skeptical"; 
-			Dialogue="Is this how you built your crossbow?"; 
-			Reply="Well well well, it is perfeect. Here, use this to give it a final touch."};
-
+Dialogues.Joseph.DialogueStrings = {
+	["josephcrossbow_try"]={
+		Face="Skeptical"; 
+		Say="Is this crossbow what you are talking about?"; 
+		Reply="Ahh yes.. I had a build for the crossbow, I've written my build somewhere near my workbench a long time ago and forgotten it, try to figure out how it's built.";
 	};
-end
+	["josephcrossbow_failBuild"]={
+		Face="Skeptical"; 
+		Say="Is this how you built your crossbow?"; 
+		Reply="Hmm, not quite, something's off. Look around my workbench to see if you can find any clues..";
+	};
+	["josephcrossbow_corectBuild"]={
+		Face="Skeptical"; 
+		Say="Is this how you built your crossbow?"; 
+		Reply="Well well well, it is perfeect. Here, use this to give it a final touch.";
+	};
+
+};
 
 if RunService:IsServer() then
 	-- MARK: Joseph Handler

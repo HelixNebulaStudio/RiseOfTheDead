@@ -12,36 +12,55 @@ local missionId = 10;
 --==
 
 -- !outline: Jefferson Dialogues
-Dialogues.Jefferson.Dialogues = function()
-	return {
-		{Tag="infected_letmehelp"; CheckMission=missionId; Dialogue="Please let me help you.";
-			Face="Frustrated"; Reply="I can't be saved, I'm infected. Don't waste your resources on me.";
-			FailResponses = {
-				{Reply="I don't think you can help me.."};
-			};
+Dialogues.Jefferson.DialogueStrings = {
+	["infected_letmehelp"]={
+		CheckMission=missionId;
+		Say="Please let me help you.";
+		Face="Frustrated"; Reply="I can't be saved, I'm infected. Don't waste your resources on me.";
+		FailResponses = {
+			{Reply="I don't think you can help me.."};
 		};
-		{Tag="infected_insist"; Dialogue="It's okay, I want to help you.";
-			Face="Serious"; Reply="*sigh* If you insist, please get me some antibiotics for this wound from Sunday's convenient store."};
-		{Tag="infected_foundit"; Dialogue="Here's the antibiotics.";
-			Face="Skeptical"; Reply="Thanks, it's best if you leave me here for now."};
-		{Tag="infected_helper"; Dialogue="I can't find the antibiotics anywhere...";
-			Face="Serious"; Reply="Is there a doctor you could ask the antibiotics from?"};
 	};
-end
+	["infected_insist"]={
+		Say="It's okay, I want to help you.";
+		Face="Serious"; 
+		Reply="*sigh* If you insist, please get me some antibiotics for this wound from Sunday's convenient store.";
+	};
+	["infected_foundit"]={
+		Say="Here's the antibiotics.";
+		Face="Skeptical"; 
+		Reply="Thanks, it's best if you leave me here for now.";
+	};
+	["infected_helper"]={
+		Say="I can't find the antibiotics anywhere...";
+		Face="Serious"; 
+		Reply="Is there a doctor you could ask the antibiotics from?";
+	};
+};
 
--- !outline: Wilson Dialogues
-Dialogues.Wilson.Dialogues = function()
-	return {
-		{Tag="fallen_contact"; Dialogue="*Listens*";
-			Face="Surprise"; Reply="Derrick, are you there? Have you found Jefferson yet? Over...\n\n *Radio(Derrick)*: Copy, Wilson, still no signs of Jefferson. Over..."};
-		{Tag="fallen_hurry"; Dialogue="*Listens*";
-			Face="Skeptical"; Reply="Derrick, you got to hurry, Jefferson could be bleeding out. Over...\n\n *Radio(Derrick)*: *Static* *Static*"};
-		{Tag="fallen_disconnected"; Dialogue="*Listens*";
-			Face="Serious"; Reply="Derrick, do you copy?! Over...\n\n *Radio(Derrick)*: *Static* *Static*"};
-		{Tag="fallen_mia"; Dialogue="*Listens*"; 
-			Face="Bored"; Reply="######! Signal is dead."};
+-- !outline: Wilson DialogueStrings
+Dialogues.Wilson.DialogueStrings = {
+	["fallen_contact"]={
+		Say="*Listens*";
+		Face="Surprise"; 
+		Reply="Derrick, are you there? Have you found Jefferson yet? Over...\n\n *Radio(Derrick)*: Copy, Wilson, still no signs of Jefferson. Over...";
 	};
-end
+	["fallen_hurry"]={
+		Say="*Listens*";
+		Face="Skeptical"; 
+		Reply="Derrick, you got to hurry, Jefferson could be bleeding out. Over...\n\n *Radio(Derrick)*: *Static* *Static*";
+	};
+	["fallen_disconnected"]={
+		Say="*Listens*";
+		Face="Serious"; 
+		Reply="Derrick, do you copy?! Over...\n\n *Radio(Derrick)*: *Static* *Static*";
+		};
+	["fallen_mia"]={
+		Say="*Listens*"; 
+		Face="Bored"; 
+		Reply="######! Signal is dead.";
+	};
+};
 
 if RunService:IsServer() then
 	-- !outline: Jefferson Handler

@@ -14,83 +14,111 @@ local missionId = 63;
 --==
 
 -- MARK: Patrick Dialogues
-Dialogues.Patrick.Dialogues = function()
-	return {
-		{Tag="theRecruit_settleB"; Face="Confident"; 
-			Dialogue="How are you settling in?";
-			Reply="It's great, the place is really cozy."};
-		{Tag="theRecruit_settle2B"; Face="Confident"; 
-			Dialogue="Hear anything about the Bandits or the Rats?";
-			Reply="Yes actually, I heard the Bandits are recruiting, and they are looking specifically for you because they somehow found out you helped them."};
-		{Tag="theRecruit_zark1"; Face="Surprise"; 
-			Dialogue="Should I talk to Zark?";
-			Reply="That would be quite risky, but if you want to take the Bandits down, you might have to take them down from within."};
+Dialogues.Patrick.DialogueStrings = {
+	["theRecruit_settleB"]={
+		Face="Confident"; 
+		Say="How are you settling in?";
+		Reply="It's great, the place is really cozy.";
 	};
-end
+	["theRecruit_settle2B"]={
+		Face="Confident"; 
+		Say="Hear anything about the Bandits or the Rats?";
+		Reply="Yes actually, I heard the Bandits are recruiting, and they are looking specifically for you because they somehow found out you helped them.";
+	};
+	["theRecruit_zark1"]={
+		Face="Surprise"; 
+		Say="Should I talk to Zark?";
+		Reply="That would be quite risky, but if you want to take the Bandits down, you might have to take them down from within.";
+	};
+};
 
 -- MARK: Bandit Dialogues
-Dialogues.Bandit.Dialogues = function()
-	return {
-		{Tag="banditRecruit_banditCampGate"; Face="Serious"; 
-			Reply="Halt right here! What do you want?";};
-		
-		{Tag="banditRecruit_recruit1"; Face="Serious";
-			Dialogue="I heard you guys are recruiting?";
-			Reply="Yes, and if you dare to join, you are going to have to prove your loyalty.."};
-		{Tag="banditRecruit_recruit2"; Face="Skeptical";
-			Dialogue="How do I prove my loyalty?";
-			Reply="If you're sure about proving your loyalty, I will take you to our recruitment leader.."};
-		{Tag="banditRecruit_recruit3"; Face="Serious";
-			Dialogue="I want to prove my loyalty.";
-			Reply="Alright, follow me.."};
+Dialogues.Bandit.DialogueStrings = {
+	["banditRecruit_banditCampGate"]={
+		Face="Serious"; 
+		Reply="Halt right here! What do you want?";
 	};
-end
+	
+	["banditRecruit_recruit1"]={
+		Face="Serious";
+		Say="I heard you guys are recruiting?";
+		Reply="Yes, and if you dare to join, you are going to have to prove your loyalty..";
+	};
+	["banditRecruit_recruit2"]={
+		Face="Skeptical";
+		Say="How do I prove my loyalty?";
+		Reply="If you're sure about proving your loyalty, I will take you to our recruitment leader..";
+	};
+	["banditRecruit_recruit3"]={
+		Face="Serious";
+		Say="I want to prove my loyalty.";
+		Reply="Alright, follow me..";
+	};
+};
 
 -- MARK: Loran Dialogues
-Dialogues.Loran.Dialogues = function()
-	return {
-		{Tag="theRecruit_init"; Face="Frustrated"; 
-			Reply="I'm going to start counting again..";};
-
-		{Tag="theRecruit_wait"; Face="Frustrated";
-			Dialogue="Wait wait wait wait";
-			Reply="...\n\n<b>Stranger:</b> Stop!"};
-
-		{Tag="theRecruit_help"; Face="Skeptical";
-			Dialogue="Umm, sorry. I forgot what I'm suppose to look for.";
-			Reply="You're dumber than you look. Zark said 2 Nekron Particulate Caches!"};
-		{Tag="theRecruit_nekronParticulateCache"; Face="Skeptical";
-			Dialogue="Here's the 2 Nekron Particulate Caches.";
-			Reply="Good...\n\nWhy are you still here?"};
+Dialogues.Loran.DialogueStrings = {
+	["theRecruit_init"]={
+		Face="Frustrated"; 
+		Reply="I'm going to start counting again..";
 	};
-end
+
+	["theRecruit_wait"]={
+		Face="Frustrated";
+		Say="Wait wait wait wait";
+		Reply="...\n\n<b>Stranger:</b> Stop!";
+	};
+
+	["theRecruit_help"]={
+		Face="Skeptical";
+		Say="Umm, sorry. I forgot what I'm suppose to look for.";
+		Reply="You're dumber than you look. Zark said 2 Nekron Particulate Caches!";
+	};
+	["theRecruit_nekronParticulateCache"]={
+		Face="Skeptical";
+		Say="Here's the 2 Nekron Particulate Caches.";
+		Reply="Good...\n\nWhy are you still here?";
+	};
+};
 
 -- MARK: Zark Dialogues
-Dialogues.Zark.Dialogues = function()
-	return {
-		{Tag="theRecruit_zarkInit"; Face="Confident"; 
-			Reply="Well well well, look who it is..";};
-
-		{Tag="theRecruit_recruit1"; Face="Confident";
-			Dialogue="I heard you were recruiting and you are looking for me..";
-			Reply="Bold of you to come directly to me, hahah. You are quite a warrior, and it would be great to have someone like you among our ranks."};
-		{Tag="theRecruit_recruit2"; Face="Confident";
-			Dialogue="I only came to talk, what makes you think I want to join you?";
-			Reply="It's kill or to be killed, allow me to convince you to join us.."};
-
-		{Tag="theRecruit_zarkInit2"; Face="Confident"; 
-			Reply="Anyways, I will need somethings from you.. Remember your friend Stan?";};
-		{Tag="theRecruit_recruit3"; Face="Skeptical";
-			Dialogue="Yeah, you shot him dead and now he's in your rejuvenation chamber which you wanted to trade to the Rats..";
-			Reply="Yes, I had a hunch he was an infector, but he wasn't the one which took out one of our squads."};
-		{Tag="theRecruit_recruit4"; Face="Confident";
-			Dialogue="So what are you doing with Stan?";
-			Reply="Stan has some levels of immunity to the parasite.. You are going to help me if you want to save him. "};
-		{Tag="theRecruit_recruit5"; Face="Confident";
-			Dialogue="What do you need?";
-			Reply="Get these items, and bring it back to the mall. Loran will be there to collect."};
+Dialogues.Zark.DialogueStrings = {
+	["theRecruit_zarkInit"]={
+		Face="Confident"; 
+		Reply="Well well well, look who it is..";
 	};
-end
+
+	["theRecruit_recruit1"]={
+		Face="Confident";
+		Say="I heard you were recruiting and you are looking for me..";
+		Reply="Bold of you to come directly to me, hahah. You are quite a warrior, and it would be great to have someone like you among our ranks.";
+	};
+	["theRecruit_recruit2"]={
+		Face="Confident";
+		Say="I only came to talk, what makes you think I want to join you?";
+		Reply="It's kill or to be killed, allow me to convince you to join us..";
+	};
+
+	["theRecruit_zarkInit2"]={
+		Face="Confident"; 
+		Reply="Anyways, I will need somethings from you.. Remember your friend Stan?";
+	};
+	["theRecruit_recruit3"]={
+		Face="Skeptical";
+		Say="Yeah, you shot him dead and now he's in your rejuvenation chamber which you wanted to trade to the Rats..";
+		Reply="Yes, I had a hunch he was an infector, but he wasn't the one which took out one of our squads.";
+	};
+	["theRecruit_recruit4"]={
+		Face="Confident";
+		Say="So what are you doing with Stan?";
+		Reply="Stan has some levels of immunity to the parasite.. You are going to help me if you want to save him.";
+	};
+	["theRecruit_recruit5"]={
+		Face="Confident";
+		Say="What do you need?";
+		Reply="Get these items, and bring it back to the mall. Loran will be there to collect.";
+	};
+};
 
 
 if RunService:IsServer() then

@@ -11,27 +11,41 @@ local missionId = 9;
 --==
 
 -- !outline: Stephanie Dialogues
-Dialogues.Stephanie.Dialogues = function()
-	return {		
-		{Tag="specialmods_start"; CheckMission=missionId; Dialogue="What did you find?";
-			Face="Suspicious"; Reply="I found a way to attach special mods to your weapons.";
-			FailResponses = {
-				{Reply="I haven't finished reading this, but it might be something big."};
-			};	
-		};
-		{Tag="specialmods_like"; Dialogue="Special mods?";
-			Face="Confident"; Reply="Yes, there's this mod called Incendiary Rounds which allows you to set the enemy you shot on fire!"};
-		{Tag="specialmods_amazing"; Dialogue="That's amazing, how do I make such mod?";
-			Face="Confident"; Reply="Here's the blueprint I drafted.\n\nAsk me if you can't find the resources you need, maybe I know where you can find them."};
-
-		{Tag="guide_metalpipes"; Dialogue="Where can I find a metal pipe?";
-			Face="Suspicious"; Reply="I think the Prisoner might have some..."};
-		{Tag="guide_igniter"; Dialogue="Where can I find a igniter?";
-			Face="Suspicious"; Reply="I think Tanker might have some..."};
-		{Tag="guide_gastank"; Dialogue="Where can I find a gas tank?";
-			Face="Suspicious"; Reply="I think Fumes might have some..."};
+Dialogues.Stephanie.DialogueStrings = {		
+	["specialmods_start"]={
+		CheckMission=missionId; 
+		Say="What did you find?";
+		Face="Suspicious"; Reply="I found a way to attach special mods to your weapons.";
+		FailResponses = {
+			{Reply="I haven't finished reading this, but it might be something big."};
+		};	
 	};
-end
+	["specialmods_like"]={
+		Say="Special mods?";
+		Face="Confident"; 
+		Reply="Yes, there's this mod called Incendiary Rounds which allows you to set the enemy you shot on fire!";
+	};
+	["specialmods_amazing"]={
+		Say="That's amazing, how do I make such mod?";
+		Face="Confident"; 
+		Reply="Here's the blueprint I drafted.\n\nAsk me if you can't find the resources you need, maybe I know where you can find them.";
+	};
+
+	["guide_metalpipes"]={
+		Say="Where can I find a metal pipe?";
+		Face="Suspicious"; Reply="I think the Prisoner might have some...";
+	};
+	["guide_igniter"]={
+		Say="Where can I find a igniter?";
+		Face="Suspicious"; 
+		Reply="I think Tanker might have some...";
+	};
+	["guide_gastank"]={
+		Say="Where can I find a gas tank?";
+		Face="Suspicious"; 
+		Reply="I think Fumes might have some...";
+	};
+};
 
 if RunService:IsServer() then
 	

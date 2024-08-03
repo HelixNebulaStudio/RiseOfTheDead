@@ -11,34 +11,54 @@ local missionId = 3;
 --==
 
 -- !outline: Stephanie Dialogues
-Dialogues.Stephanie.Dialogues = function()
-	return {
-		{Tag="pre_findBook"; 
-			Face="Suspicious"; Dialogue="Hello, I'm new here."; Reply="Ummm, okay."};
-
-		{Tag="findBook_found?";
-			Face="Suspicious"; Reply="Have you found the book yet?";};
-		
-		{Tag="findBook_letMeHelp"; CheckMission=missionId; Dialogue="Umm no, but I can help you find it."; 
-			Face="Skeptical"; Reply="It's an odd looking blue book, please try to find it, it's important.";
-			FailResponses = {
-				{Reply="You're too new here, come back once you're more familiar with the place."};
-			};
-		};
-		{Tag="findBook_foundBook"; Dialogue="Found it, here you go..."; 
-			Face="Happy"; Reply="Thanks a lot!"};
-		{Tag="findBook_whatsInTheBook"; Dialogue="What did you need this book for anyways?";
-			Face="Surprise"; Reply="Well, this book might have information on how to build something better to get rid of the zombies. I will tell you if I find anything useful in this book, thanks again."};
-		{Tag="findBook_helper"; Dialogue="Where could the book be?"; 
-			Face="Suspicious"; Reply="Maybe it's upstairs somewhere, not sure..."};
-
-		{Tag="post_findBook"; Dialogue="Found anything from the book yet?";
-			Face="Confident"; Reply="No, I will tell you when I do."};
-
-		{Tag="post_extrabook"; Dialogue="I found an extra blue book, do you want it?";
-			Face="Confident"; Reply="Sure! Some pages from my book is torn out so this would help.."};
+Dialogues.Stephanie.DialogueStrings = {
+	["pre_findBook"]={
+		Face="Suspicious"; 
+		Say="Hello, I'm new here."; 
+		Reply="Ummm, okay.";
 	};
-end
+
+	["findBook_found"]={
+		Face="Suspicious"; 
+		Reply="Have you found the book yet?";
+	};
+	
+	["findBook_letMeHelp"]={
+		CheckMission=missionId; 
+		Say="Umm no, but I can help you find it."; 
+		Face="Skeptical"; Reply="It's an odd looking blue book, please try to find it, it's important.";
+		FailResponses = {
+			{Reply="You're too new here, come back once you're more familiar with the place."};
+		};
+	};
+	["findBook_foundBook"]={
+		Say="Found it, here you go..."; 
+		Face="Happy"; 
+		Reply="Thanks a lot!";
+	};
+	["findBook_whatsInTheBook"]={
+		Say="What did you need this book for anyways?";
+		Face="Surprise"; 
+		Reply="Well, this book might have information on how to build something better to get rid of the zombies. I will tell you if I find anything useful in this book, thanks again.";
+	};
+	["findBook_helper"]={
+		Say="Where could the book be?"; 
+		Face="Suspicious"; 
+		Reply="Maybe it's upstairs somewhere, not sure...";
+	};
+
+	["post_findBook"]={
+		Say="Found anything from the book yet?";
+		Face="Confident"; 
+		Reply="No, I will tell you when I do.";
+	};
+
+	["post_extrabook"]={
+		Say="I found an extra blue book, do you want it?";
+		Face="Confident"; 
+		Reply="Sure! Some pages from my book is torn out so this would help..";
+	};
+};
 
 if RunService:IsServer() then
 	-- !outline: Stephanie Handler

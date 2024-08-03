@@ -11,25 +11,38 @@ local missionId = 7;
 --==
 
 -- !outline: Robert Dialogues
-Dialogues.Robert.Dialogues = function()
-	return {
-		{Tag="thePrisoner_areYouAlright"; Dialogue="Hey, are you alright?"; 
-			Face="Smile"; Reply="Yeah, thanks again dude."};
-		{Tag="thePrisoner_howLong"; Dialogue="How long have you been in there?";
-			Face="Grumpy"; Reply="Couple days dude, I survived off the food in the store. I got trapped in there when I was scavenging some supplies then the power went out and the gates locked me in."};
-		{Tag="thePrisoner_otherSafehouse"; Dialogue="Oh...";
-			Face="Worried"; Reply="I really want to get back to my safehouse, but there's something dangerous in the way..."};
-		{Tag="thePrisoner_dangerous"; Dialogue="What is it?";
-			Face="Scared"; Reply="When I tried to get the gates open, I saw a really strong zombie with prison jumpsuit on, it killed a dude and his dead body is still there!"};
-		{Tag="thePrisoner_stillThere"; CheckMission=missionId; Dialogue="I can help you get back to your safehouse.";
-			Face="Confident"; Reply="Okay, I'll show you the way.";
-			FailResponses = {
-				{Reply="We're not ready. Come back later.."};
-			};
-		};
-
+Dialogues.Robert.DialogueStrings = {
+	["thePrisoner_areYouAlright"]={
+		Say="Hey, are you alright?"; 
+		Face="Smile"; 
+		Reply="Yeah, thanks again dude.";
 	};
-end
+	["thePrisoner_howLong"]={
+		Say="How long have you been in there?";
+		Face="Grumpy"; 
+		Reply="Couple days dude, I survived off the food in the store. I got trapped in there when I was scavenging some supplies then the power went out and the gates locked me in.";
+	};
+	["thePrisoner_otherSafehouse"]={
+		Say="Oh...";
+		Face="Worried"; 
+		Reply="I really want to get back to my safehouse, but there's something dangerous in the way...";
+	};
+	["thePrisoner_dangerous"]={
+		Say="What is it?";
+		Face="Scared"; 
+		Reply="When I tried to get the gates open, I saw a really strong zombie with prison jumpsuit on, it killed a dude and his dead body is still there!";
+	};
+	["thePrisoner_stillThere"]={
+		CheckMission=missionId;
+		Say="I can help you get back to your safehouse.";
+		Face="Confident";
+		Reply="Okay, I'll show you the way.";
+		FailResponses = {
+			{Reply="We're not ready. Come back later.."};
+		};
+	};
+
+};
 
 if RunService:IsServer() then
 	-- !outline: Robert Handler

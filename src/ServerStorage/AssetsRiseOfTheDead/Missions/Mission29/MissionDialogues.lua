@@ -13,44 +13,63 @@ local missionId = 29;
 --==
 
 -- !outline: Hilbert Dialogues
-Dialogues.Hilbert.Dialogues = function()
-	return {		
-		{Tag="labAssistant_start"; Dialogue="*Picks up note*";
-			Reply="Note: Elr1Orj#996\nVshflphq H55 dqg J85 lv frqiluphg wr kdv hvfdshg. Vljqv vkrzv wkdw wkh lqihfwru kdv ehhq wr wkh vhfwru, lw pxvw kdyh frqwdplqdwhg uhohdvhg wkh vshflphqv.\n-Kloehuw Z."};
-		{CheckMission=missionId; Tag="labAssistant_note"; Dialogue="What is this.. It's totally unintelligible.. *Notices BioX symbol on the back of the note*";
-			Reply="*still dead*";
-			FailResponses = {
-				{Reply="..."};
-			};	
-		};
+Dialogues.Hilbert.DialogueStrings = {		
+	["labAssistant_start"]={
+		Say="*Picks up note*";
+		Reply="Note: Elr1Orj#996\nVshflphq H55 dqg J85 lv frqiluphg wr kdv hvfdshg. Vljqv vkrzv wkdw wkh lqihfwru kdv ehhq wr wkh vhfwru, lw pxvw kdyh frqwdplqdwhg uhohdvhg wkh vshflphqv.\n-Kloehuw Z.";
 	};
-end
+	["labAssistant_note"]={
+		CheckMission=missionId;
+		Say="What is this.. It's totally unintelligible.. *Notices BioX symbol on the back of the note*";
+		Reply="*still dead*";
+		FailResponses = {
+			{Reply="..."};
+		};	
+	};
+};
 
 -- !outline: Dr. Deniski Dialogues
-Dialogues["Dr. Deniski"].Dialogues = function()
-	return {		
-		{Tag="labAssistant_hilbert"; Dialogue="Yeah, I need some help. I found this note on a dead scientist named Hilbert. Do you know anything about him?";
-			Face="Suspicious"; Reply="Hmmm, I've heard of the name before, could be a BioX scientist.. Can I see the note?"};
-		{Tag="labAssistant_note"; Dialogue="Sure, I think it's a cipher though, not sure how to read it.";
-			Face="Confident"; Reply="Ahhh, hahah, my friend, this looks like children's cipher, wait while I decipher this."};
-		{Tag="labAssistant_wait"; Dialogue="*wait*";
-			Face="Confident"; Reply="Hmmm, okay I got it. It says something about some specimens has escaped something called the \"Sector\" and about another creature called the Infector. That's all I can decipher, hope it helps."};
-		{Tag="labAssistant_helped"; Dialogue="That definitely helps, thanks a lot!";
-			Face="Happy"; Reply="Any time!"};
+Dialogues["Dr. Deniski"].DialogueStrings = {		
+	["labAssistant_hilbert"]={
+		Say="Yeah, I need some help. I found this note on a dead scientist named Hilbert. Do you know anything about him?";
+		Face="Suspicious"; 
+		Reply="Hmmm, I've heard of the name before, could be a BioX scientist.. Can I see the note?";
 	};
-end
+	["labAssistant_note"]={
+		Say="Sure, I think it's a cipher though, not sure how to read it.";
+		Face="Confident"; 
+		Reply="Ahhh, hahah, my friend, this looks like children's cipher, wait while I decipher this.";
+	};
+	["labAssistant_wait"]={
+		Say="*wait*";
+		Face="Confident"; 
+		Reply="Hmmm, okay I got it. It says something about some specimens has escaped something called the \"Sector\" and about another creature called the Infector. That's all I can decipher, hope it helps.";
+	};
+	["labAssistant_helped"]={
+		Say="That definitely helps, thanks a lot!";
+		Face="Happy"; 
+		Reply="Any time!";
+	};
+};
 
 -- !outline: Lennon Dialogues
-Dialogues.Lennon.Dialogues = function()
-	return {		
-		{Tag="labAssistant_yes"; Dialogue="Oh.. err.. umm, do you know that scientist guy in the caves named Hilbert?"; 
-			Face="Skeptical"; Reply="Nooo, but he was in a rush, ran out that compound over there. I think I heard him saying something in Russian."};
-		{Tag="labAssistant_note"; Dialogue="Thanks, here's another thing. I picked up this blue note, I can't seem to understand what it's about. Can you read this? *shows note*"; 
-			Face="Suspicious"; Reply="Hmmm, yes.. I think I can read this.. It's says \"Please remember to flush the toliet.\".."};
-		{Tag="labAssistant_disbelieve"; Dialogue="*nods in disbelief* Okay.. thanks.."; 
-			Face="Happy"; Reply="You're welcome. :>"};
+Dialogues.Lennon.DialogueStrings = {		
+	["labAssistant_yes"]={
+		Say="Oh.. err.. umm, do you know that scientist guy in the caves named Hilbert?"; 
+		Face="Skeptical"; 
+		Reply="Nooo, but he was in a rush, ran out that compound over there. I think I heard him saying something in Russian.";
 	};
-end
+	["labAssistant_note"]={
+		Say="Thanks, here's another thing. I picked up this blue note, I can't seem to understand what it's about. Can you read this? *shows note*"; 
+		Face="Suspicious"; 
+		Reply="Hmmm, yes.. I think I can read this.. It's says \"Please remember to flush the toliet.\"..";
+	};
+	["labAssistant_disbelieve"]={
+		Say="*nods in disbelief* Okay.. thanks.."; 
+		Face="Happy"; 
+		Reply="You're welcome. :>";
+	};
+};
 
 if RunService:IsServer() then
 	-- !outline: Hilbert Handler

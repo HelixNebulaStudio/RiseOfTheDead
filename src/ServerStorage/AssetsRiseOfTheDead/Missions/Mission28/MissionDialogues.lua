@@ -11,24 +11,51 @@ local missionId = 28;
 --==
 
 -- !outline: Carlson Dialogues
-Dialogues.Carlson.Dialogues = function()
-	return {
-		--== Safety Safehouse
-		{CheckMission=missionId; Tag="safetysafehouse_goodGotTime"; Dialogue="Yeah, I got time."; Reply="Good, I think we should fortify the front with some metal walls."};
-		{CheckMission=missionId; Tag="safetysafehouse_badGotTime"; Dialogue="Yeah, I got time."; Reply="Good, since the bandits took our metal, we'll need metal to build some metal walls in the front."};
-		
-		-- ss bad dialog
-		{Tag="safetysafehouse_badMetal"; Dialogue="How much metal will we need?"; Reply="About 500 metal scrap should be enough, if the bandits had not taken my 1000 metal scraps, we wouldn't have to find metal ourselves."};
-		{Tag="safetysafehouse_truth"; Dialogue="Carlson, I'm so sorry. I actually kept the metal for myself that I took from your crate."; Reply="Oh... How could you.. Are you still going to help us?"};
-		{Tag="safetysafehouse_yes"; Dialogue="Yes, I will do anything to redeem from what I did."; Reply="Okay.. you'll have to get the metal to build the walls."};
-		
-		-- ss good dialog
-		{Tag="safetysafehouse_goodMetal"; Dialogue="How much metal will we need?"; Reply="About 500 metal scrap should be enough, we'll use my metal scraps."};
-		{Tag="safetysafehouse_start"; Dialogue="Okay, I'll get started."; Reply="Alright."};
-		{Tag="safetysafehouse_complete"; Dialogue="I've added walls to the front of the safehouse, is that enough?"; Reply="Yes, that'll do for now. Thanks for your help. Here's the spare scraps as a gratitude for helping us with this."};
-		{Tag="safetysafehouse_askForMetal"; Dialogue="Hey, do you have any spare metal scraps?"; Reply="Yeah, I do, here have some."};
+Dialogues.Carlson.DialogueStrings = {
+	--== Safety Safehouse
+	["safetysafehouse_goodGotTime"]={
+		CheckMission=missionId;
+		Say="Yeah, I got time."; 
+		Reply="Good, I think we should fortify the front with some metal walls.";
 	};
-end
+	["safetysafehouse_badGotTime"]={
+		CheckMission=missionId;
+		Say="Yeah, I got time."; 
+		Reply="Good, since the bandits took our metal, we'll need metal to build some metal walls in the front.";
+	};
+	
+	-- ss bad dialog
+	["safetysafehouse_badMetal"]={
+		Say="How much metal will we need?"; 
+		Reply="About 500 metal scrap should be enough, if the bandits had not taken my 1000 metal scraps, we wouldn't have to find metal ourselves.";
+	};
+	["safetysafehouse_truth"]={
+		Say="Carlson, I'm so sorry. I actually kept the metal for myself that I took from your crate."; 
+		Reply="Oh... How could you.. Are you still going to help us?";
+	};
+	["safetysafehouse_yes"]={
+		Say="Yes, I will do anything to redeem from what I did."; 
+		Reply="Okay.. you'll have to get the metal to build the walls.";
+	};
+	
+	-- ss good dialog
+	["safetysafehouse_goodMetal"]={
+		Say="How much metal will we need?"; 
+		Reply="About 500 metal scrap should be enough, we'll use my metal scraps.";
+	};
+	["safetysafehouse_start"]={
+		Dialogue="Okay, I'll get started."; 
+		Reply="Alright.";
+	};
+	["safetysafehouse_complete"]={
+		Say="I've added walls to the front of the safehouse, is that enough?"; 
+		Reply="Yes, that'll do for now. Thanks for your help. Here's the spare scraps as a gratitude for helping us with this.";
+	};
+	["safetysafehouse_askForMetal"]={
+		Say="Hey, do you have any spare metal scraps?"; 
+		Reply="Yeah, I do, here have some.";
+	};
+};
 
 if RunService:IsServer() then
 	-- !outline: Carlson Handler

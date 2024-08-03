@@ -11,20 +11,27 @@ local missionId = 17;
 --==
 
 -- !outline: Jesse Dialogues
-Dialogues.Jesse.Dialogues = function()
-	return {		
-		{Tag="partTime_start"; CheckMission=missionId; Dialogue="What do you need this time?";
-			Face="Skeptical"; Reply="Get me this list of items, and make it snappy.";
-			FailResponses = {
-				{Reply="What?"};
-			};	
-		};
-		{Tag="restock_done"; Dialogue="Here you go.";
-			Face="Smirk"; Reply="Nicely done, same thing tomorrow."};
-		{Tag="restock_donefull"; Dialogue="Here you go.";
-			Face="Smirk"; Reply="First, make some space in your inventory.."};
+Dialogues.Jesse.DialogueStrings = {		
+	["partTime_start"]={
+		CheckMission=missionId;
+		Say="What do you need this time?";
+		Face="Skeptical"; 
+		Reply="Get me this list of items, and make it snappy.";
+		FailResponses = {
+			{Reply="What?"};
+		};	
 	};
-end
+	["restock_done"]={
+		Say="Here you go.";
+		Face="Smirk"; 
+		Reply="Nicely done, same thing tomorrow.";
+	};
+	["restock_donefull"]={
+		Say="Here you go.";
+		Face="Smirk"; 
+		Reply="First, make some space in your inventory..";
+	};
+};
 
 if RunService:IsServer() then
 	local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);

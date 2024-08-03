@@ -14,94 +14,126 @@ local missionId = 62;
 --==
 
 -- MARK: Patrick Dialogues
-Dialogues.Patrick.Dialogues = function()
-	return {
-		{Tag="theRecruit_settleR"; Face="Confident"; 
-			Dialogue="How are you settling in?";
-			Reply="It's great, the place is really cozy."};
-		{Tag="theRecruit_settle2R"; Face="Confident"; 
-			Dialogue="Hear anything about the Bandits or the Rats?";
-			Reply="Yes, in fact, I got intel that Revas wants to talk to you after you helped pull the lever."};
-		{Tag="theRecruit_revas1"; Face="Surprise"; 
-			Dialogue="Should I talk to Revas?";
-			Reply="I guess if you want to figure out what he wants, since he shot me last time, I'm no longer interested in joining them."};
+Dialogues.Patrick.DialogueStrings = {
+	["theRecruit_settleR"]={
+		Face="Confident"; 
+		Say="How are you settling in?";
+		Reply="It's great, the place is really cozy.";
 	};
-end
+	["theRecruit_settle2R"]={
+		Face="Confident"; 
+		Say="Hear anything about the Bandits or the Rats?";
+		Reply="Yes, in fact, I got intel that Revas wants to talk to you after you helped pull the lever.";
+	};
+	["theRecruit_revas1"]={
+		Face="Surprise"; 
+		Say="Should I talk to Revas?";
+		Reply="I guess if you want to figure out what he wants, since he shot me last time, I'm no longer interested in joining them.";
+	};
+};
 
 -- MARK: Eugene Dialogues
-Dialogues.Eugene.Dialogues = function()
-	return {
-		{Tag="theRecruit_help"; Face="Skeptical";
-			Dialogue="Umm, sorry. What do you need again?";
-			Reply="What?! How incompetent are you, I said I need 2 Nekron Particulate Caches."};
-
-		{Tag="theRecruit_nekronParticulateCache"; Face="Skeptical";
-			Dialogue="Here's the 2 Nekron Particulate Cache you requested.";
-			Reply="Good, good. Just put it down and get out of my sight."};
+Dialogues.Eugene.DialogueStrings = {
+	["theRecruit_help"]={
+		Face="Skeptical";
+		Say="Umm, sorry. What do you need again?";
+		Reply="What?! How incompetent are you, I said I need 2 Nekron Particulate Caches.";
 	};
-end
+
+	["theRecruit_nekronParticulateCache"]={
+		Face="Skeptical";
+		Say="Here's the 2 Nekron Particulate Cache you requested.";
+		Reply="Good, good. Just put it down and get out of my sight.";
+	};
+};
 
 -- MARK: Revas Dialogues
-Dialogues.Revas.Dialogues = function()
-	return {
-		{Tag="theRecruit_revasInit"; Face="Confident"; 
-			Reply="Ah, just who I was looking for..";};
-
-		{Tag="theRecruit_revas1"; Face="Confident";
-			Dialogue="What on earth was that?! You shot patrick!";
-			Reply="Indeed, how is he right now? He honored our argreement."};
-		{Tag="theRecruit_revas2"; Face="Confident";
-			Dialogue="He did not agree to being shot. He's no longer interested in your offer.";
-			Reply="That's ashame despite agreeing to do whatever it takes.\n\nAnyways, I have not had the chance to show my gratitude for helping us."};
-		{Tag="theRecruit_revas3"; Face="Confident";
-			Dialogue="By pulling the lever?";
-			Reply="Yes, thanks to you, we captured the infector that the Bandits brought in. Come with me when you are ready.."};
-		{Tag="theRecruit_revasTravel"; Face="Confident";
-			Dialogue="I'm ready to go.";
-			Reply="Fantastic, follow me this way, through the intricate rat underground tunnels."};
-
-		{Tag="theRecruit_secE"; Face="Confident";
-			Dialogue="So this is Sector E..";
-			Reply="Indeed, it has been repurposed. Since much of the systems are still functional and Eugene was the head of this sector.\n\nNow, follow me.."};
-
-		{Tag="theRecruit_retrieve1"; Face="Confident";
-			Dialogue="Alright, what do you need?";
-			Reply="There's only one physical copy of a certain research paper that Eugene needs. He'll also need some Nekron particulate cache. Let's first head to Sector F.."};
-
-		{Tag="theRecruit_cantFind"; Face="Suspicious";
-			Dialogue="I can't seem to find it..";
-			Reply="It should be in one of the labs, check the top of the counters.."};
-		{Tag="theRecruit_found"; Face="Confident";
-			Dialogue="Here's the papers.";
-			Reply="Excellent, as for the Nekron particulate cache, I trust that you can manage that yourself. Good luck."};
-
+Dialogues.Revas.DialogueStrings = {
+	["theRecruit_revasInit"]={
+		Face="Confident"; 
+		Reply="Ah, just who I was looking for..";
 	};
-end
+
+	["theRecruit_revas1"]={ 
+		Face="Confident";
+		Say="What on earth was that?! You shot patrick!";
+		Reply="Indeed, how is he right now? He honored our argreement.";
+	};
+	["theRecruit_revas2"]={
+		Face="Confident";
+		Say="He did not agree to being shot. He's no longer interested in your offer.";
+		Reply="That's ashame despite agreeing to do whatever it takes.\n\nAnyways, I have not had the chance to show my gratitude for helping us.";
+	};
+	["theRecruit_revas3"]={
+		Face="Confident";
+		Say="By pulling the lever?";
+		Reply="Yes, thanks to you, we captured the infector that the Bandits brought in. Come with me when you are ready..";
+	};
+	["theRecruit_revasTravel"]={
+		Face="Confident";
+		Say="I'm ready to go.";
+		Reply="Fantastic, follow me this way, through the intricate rat underground tunnels.";
+	};
+
+	["theRecruit_secE"]={
+		Face="Confident";
+		Say="So this is Sector E..";
+		Reply="Indeed, it has been repurposed. Since much of the systems are still functional and Eugene was the head of this sector.\n\nNow, follow me..";
+	};
+
+	["theRecruit_retrieve1"]={
+		Face="Confident";
+		Say="Alright, what do you need?";
+		Reply="There's only one physical copy of a certain research paper that Eugene needs. He'll also need some Nekron particulate cache. Let's first head to Sector F..";
+	};
+
+	["theRecruit_cantFind"]={
+		Face="Suspicious";
+		Say="I can't seem to find it..";
+		Reply="It should be in one of the labs, check the top of the counters..";
+	};
+	["theRecruit_found"]={
+		Face="Confident";
+		Say="Here's the papers.";
+		Reply="Excellent, as for the Nekron particulate cache, I trust that you can manage that yourself. Good luck.";
+	};
+
+};
 
 -- MARK: Stan Dialogues
-Dialogues.Stan.Dialogues = function()
-	return {
-		{Tag="ratRecruit_chamber1"; Face="Tired";
-			Dialogue="Stan?! Can you hear me..?";
-			Reply="Yes.. What's happening?.."};
-		{Tag="ratRecruit_chamber2"; Face="Tired";
-			Dialogue="You are a infector..";
-			Reply="Yeah, I can feel it fighting inside of me.. Please.. Help me."};
-		{Tag="ratRecruit_chamber3"; Face="Tired";
-			Dialogue="But the parasite inside you.. What can I do?";
-			Reply="I will control it. Please, they are going to kill me, or at least help me turn down the heat.."};
-		
-		{Tag="ratRecruit_chamber4"; Face="Serious";
-			Dialogue="Those people are Rats' people, they might be able to help you..";
-			Reply="No, don't trust them. They will use you, they just want whatever's inside of me and kill me when they're done.."};
-		{Tag="ratRecruit_chamber5"; Face="Skeptical";
-			Dialogue="I'm not sure what I can do..";
-			Reply="Alright, listen. You've come this far, just work with them for a while, buy me some time so I can figure out how you can get me out of here.."};
-		{Tag="ratRecruit_chamber6"; Face="Skeptical";
-			Dialogue="Sure, I'll do that..";
-			Reply="Okay, I hear them coming back, quick, act natural!"};
+Dialogues.Stan.DialogueStrings = {
+	["ratRecruit_chamber1"]={
+		Face="Tired";
+		Say="Stan?! Can you hear me..?";
+		Reply="Yes.. What's happening?..";
 	};
-end
+	["ratRecruit_chamber2"]={
+		Face="Tired";
+		Say="You are a infector..";
+		Reply="Yeah, I can feel it fighting inside of me.. Please.. Help me.";
+	};
+	["ratRecruit_chamber3"]={
+		Face="Tired";
+		Say="But the parasite inside you.. What can I do?";
+		Reply="I will control it. Please, they are going to kill me, or at least help me turn down the heat..";
+	};
+	
+	["ratRecruit_chamber4"]={
+		Face="Serious";
+		Say="Those people are Rats' people, they might be able to help you..";
+		Reply="No, don't trust them. They will use you, they just want whatever's inside of me and kill me when they're done..";
+	};
+	["ratRecruit_chamber5"]={
+		Face="Skeptical";
+		Say="I'm not sure what I can do..";
+		Reply="Alright, listen. You've come this far, just work with them for a while, buy me some time so I can figure out how you can get me out of here..";
+	};
+	["ratRecruit_chamber6"]={
+		Face="Skeptical";
+		Say="Sure, I'll do that..";
+		Reply="Okay, I hear them coming back, quick, act natural!";
+	};
+};
 
 if RunService:IsServer() then
 	local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);

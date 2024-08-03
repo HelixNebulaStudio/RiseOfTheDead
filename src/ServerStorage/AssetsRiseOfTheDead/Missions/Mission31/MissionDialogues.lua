@@ -11,25 +11,30 @@ local missionId = 31;
 --==
 
 -- MARK: Bunny Man Dialogues
-Dialogues["Bunny Man"].Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="egghunt_init";
-			Dialogue="Who are you?!";
-			Reply="I'm the Bunny Man, what do you want..?"};
-		{Tag="egghunt_find";
-			Dialogue="What are you doing here?"; 
-			Reply="I'm searching for eggs. You know what. Help me find the Easter Eggs.."};
-		{Tag="egghunt_end";
-			Dialogue="Here I found some.."; 
-			Reply="Good.. good..."};
-		{Tag="egghunt_where";
-			Dialogue="Where do I find the Easter Eggs?"; 
-			Reply="Hmmm, never thought about that.. Just look around.."};
-		{Tag="egghunt_invfull";
-			Dialogue="Here I found some.."; 
-			Reply="Your inventory is full."};
+Dialogues["Bunny Man"].DialogueStrings = {
+	["egghunt_init"]={
+		CheckMission=missionId;
+		Say="Who are you?!";
+		Reply="I'm the Bunny Man, what do you want..?";
 	};
-end
+	["egghunt_find"]={
+		Say="What are you doing here?"; 
+		Reply="I'm searching for eggs. You know what. Help me find the Easter Eggs..";
+	};
+	["egghunt_end"]={
+		Say="Here I found some.."; 
+		Reply="Good.. good...";
+	};
+	["egghunt_where"]={
+		Say="Where do I find the Easter Eggs?"; 
+		Reply="Hmmm, never thought about that.. Just look around..";
+	};
+	["egghunt_invfull"]={
+		Say="Here I found some..";
+		Reply="Your inventory is full.";
+	};
+};
+
 
 if RunService:IsServer() then
 	-- MARK: Bunny Man Handler

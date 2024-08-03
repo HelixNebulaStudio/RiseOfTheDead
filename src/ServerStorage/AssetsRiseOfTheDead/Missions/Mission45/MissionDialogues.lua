@@ -11,21 +11,26 @@ local missionId = 45;
 --==
 
 -- MARK: Mike Dialogues
-Dialogues.Mike.Dialogues = function()
-	return {	
-		{Tag="mlc_init"; Face="Serious";
-			Dialogue="What's wrong? What did you left?"; 
-			Reply="My lucky coin, I left it when I got out of prison."};
-
-		{CheckMission=missionId; Tag="mlc_start"; Face="Smirk";
-			Dialogue="I could help you look for it if you lead me there."; 
-			Reply="Oh, that would be great. Whenever you are ready."};
-
-		{Tag="mlc_found"; Face="Smirk";
-			Dialogue="Is this the coin you were looking for?"; 
-			Reply="YES! Oh, thanks so much."};
+Dialogues.Mike.DialogueStrings = {	
+	["mlc_init"]={
+		Face="Serious";
+		Say="What's wrong? What did you left?"; 
+		Reply="My lucky coin, I left it when I got out of prison.";
 	};
-end
+
+	["mlc_start"]={
+		CheckMission=missionId; 
+		Face="Smirk";
+		Say="I could help you look for it if you lead me there."; 
+		Reply="Oh, that would be great. Whenever you are ready.";
+	};
+
+	["mlc_found"]={
+		Face="Smirk";
+		Say="Is this the coin you were looking for?"; 
+		Reply="YES! Oh, thanks so much.";
+	};
+};
 
 if RunService:IsServer() then
 	-- MARK: Mike Handler

@@ -11,26 +11,39 @@ local missionId = 26;
 --==
 
 -- !outline: Diana Dialogues
-Dialogues.Diana.Dialogues = function()
-	return {
-		{Tag="blueprint_jesse"; Dialogue="Yes, that's me.. why?..";
-			Face="Smirk"; Reply="Jesse told me about you, he said you are very capable. Got time for a job?"};
-		
-		{Tag="blueprint_start"; CheckMission=missionId; Dialogue="Sure, what is it?";
-			Face="Confident"; Reply="Got some demands for this item, see if you can find it..";
-			FailResponses = {
-				{Reply="Hmm, nevermind, come back later.."};
-			};
-		};
-		{Tag="blueprint_done"; Dialogue="Got it, here you go..";
-			Face="Happy"; Reply="Awesome, you are more capable than you look."};
-		{Tag="blueprint_notYet"; Dialogue="Nope, not yet.";
-			Face="Suspicious"; Reply="Whatever~ Just don't take too long, Revas aint going to be happy about it.."};
-		{Tag="blueprint_donefull"; Dialogue="Got it, here you go..";
-			Face="Happy"; Reply="Awesome, but clear your inventory first.."};
-
+Dialogues.Diana.DialogueStrings = {
+	["blueprint_jesse"]={
+		Say="Yes, that's me.. why?..";
+		Face="Smirk"; 
+		Reply="Jesse told me about you, he said you are very capable. Got time for a job?";
 	};
-end
+	
+	["blueprint_start"]={
+		CheckMission=missionId;
+		Say="Sure, what is it?";
+		Face="Confident"; 
+		Reply="Got some demands for this item, see if you can find it..";
+		FailResponses = {
+			{Reply="Hmm, nevermind, come back later.."};
+		};
+	};
+	["blueprint_done"]={
+		Say="Got it, here you go..";
+		Face="Happy"; 
+		Reply="Awesome, you are more capable than you look.";
+	};
+	["blueprint_notYet"]={
+		Say="Nope, not yet.";
+		Face="Suspicious"; 
+		Reply="Whatever~ Just don't take too long, Revas aint going to be happy about it..";
+	};
+	["blueprint_donefull"]={
+		Say="Got it, here you go..";
+		Face="Happy"; 
+		Reply="Awesome, but clear your inventory first..";
+	};
+
+};
 
 if RunService:IsServer() then
 	local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);

@@ -11,23 +11,40 @@ local missionId = 23;
 --==
 
 -- MARK: Lennon Dialogues
-Dialogues.Lennon.Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="snipernest_help"; Dialogue="Ummm ok?";
-			Face="Smirk"; Reply="Good good, are you good at killing zombies?"};
-		{Tag="snipernest_many"; Dialogue="YES! I'm the greatest zombie killer here.";
-			Face="Surprise"; Reply="WOW! There's are few zombies I want you to kill."};
-		{Tag="snipernest_yes"; Dialogue="Maybe.. What do you think?";
-			Face="Joyful"; Reply="Errrr, you seem like you are really good at it. I believe you can do it, there's a few zombies I want you to kill."};
-		{Tag="snipernest_no"; Dialogue="Nah, it's hard to kill them.";
-			Face="Disbelief"; Reply="Ohh darn, come back when you are better please."};
-		
-		{Tag="snipernest_done"; Dialogue="Yeah, I helped you kill some zombies.";
-			Face="Oops"; Reply="Oh! Umm, thank you?"};
-		{Tag="fail_invFull"; Dialogue="Yeah, I helped you kill some zombies.";
-			Face="Suspicious"; Reply="Your inventory is quite full, comeback when you have some space available."};
+Dialogues.Lennon.DialogueStrings = {
+	["snipernest_help"]={
+		CheckMission=missionId;
+		Say="Ummm ok?";
+		Face="Smirk"; 
+		Reply="Good good, are you good at killing zombies?";
 	};
-end
+	["snipernest_many"]={
+		Say="YES! I'm the greatest zombie killer here.";
+		Face="Surprise"; 
+		Reply="WOW! There's are few zombies I want you to kill.";
+	};
+	["snipernest_yes"]={
+		Say="Maybe.. What do you think?";
+		Face="Joyful"; 
+		Reply="Errrr, you seem like you are really good at it. I believe you can do it, there's a few zombies I want you to kill.";
+	};
+	["snipernest_no"]={
+		Say="Nah, it's hard to kill them.";
+		Face="Disbelief"; 
+		Reply="Ohh darn, come back when you are better please.";
+	};
+	
+	["snipernest_done"]={
+		Say="Yeah, I helped you kill some zombies.";
+		Face="Oops"; 
+		Reply="Oh! Umm, thank you?";
+	};
+	["fail_invFull"]={
+		Say="Yeah, I helped you kill some zombies.";
+		Face="Suspicious"; 
+		Reply="Your inventory is quite full, comeback when you have some space available.";
+	};
+};
 
 if RunService:IsServer() then
 	-- MARK: Lennon Handler

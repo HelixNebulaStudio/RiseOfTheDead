@@ -11,19 +11,29 @@ local missionId = 5;
 --==
 
 -- !outline: Mason Dialogues
-Dialogues.Mason.Dialogues = function()
-	return {
-		{Tag="timeToUpgrade_upgrade?";
-			Face="Happy"; Reply="Have you upgraded your pistol yet?";};
-
-		{Tag="timeToUpgrade_request"; CheckMission=missionId; Dialogue="Can you teach me how to upgrade my weapons?"; 
-			Face="Happy"; Reply="Sure, you can upgrade your weapon at the workbench."};
-		{Tag="timeToUpgrade_how1"; Dialogue="What should I do?"; 
-			Face="Confident"; Reply="Build yourself a Pistol Damage Mod from the workbench. Then, equip the mod onto your gun and upgrade it."};
-		{Tag="timeToUpgrade_how2"; Dialogue="How do I get the resources to build a Pistol Damage Mod?"; 
-			Face="Confident"; Reply="Some zombies will drop some money and metal items when you kill them, those are useful for building stuff."};
+Dialogues.Mason.DialogueStrings = {
+	["timeToUpgrade_upgrade"]={
+		Face="Happy"; 
+		Reply="Have you upgraded your pistol yet?";
 	};
-end
+
+	["timeToUpgrade_request"]={
+		CheckMission=missionId;
+		Say="Can you teach me how to upgrade my weapons?"; 
+		Face="Happy"; 
+		Reply="Sure, you can upgrade your weapon at the workbench.";
+	};
+	["timeToUpgrade_how1"]={
+		Say="What should I do?"; 
+		Face="Confident"; 
+		Reply="Build yourself a Pistol Damage Mod from the workbench. Then, equip the mod onto your gun and upgrade it.";
+	};
+	["timeToUpgrade_how2"]={
+		Say="How do I get the resources to build a Pistol Damage Mod?"; 
+		Face="Confident"; 
+		Reply="Some zombies will drop some money and metal items when you kill them, those are useful for building stuff.";
+	};
+};
 
 if RunService:IsServer() then
 	
@@ -49,7 +59,7 @@ if RunService:IsServer() then
 			end);
 			
 		elseif mission.Type == 1 then -- Active
-			dialog:SetInitiateTag("timeToUpgrade_upgrade?");
+			dialog:SetInitiateTag("timeToUpgrade_upgrade");
 			dialog:AddChoice("timeToUpgrade_how1");
 			dialog:AddChoice("timeToUpgrade_how2");
 			

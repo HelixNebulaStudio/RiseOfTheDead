@@ -13,59 +13,98 @@ local missionId = 2;
 --==
 
 -- !outline: Mason Dialogues
-Dialogues.Mason.Dialogues = function()
-	return {
-		{Tag="whereAmI_deniski"; Dialogue="Not so well, where are we?"; Face="Happy";
-			Reply="You're in the warehouse. You're safe here, that's why we also call it the safehouse, haaha.. You should talk to the doctor to get you fixed up."};
-		{Tag="whereAmI_canHeal"; Dialogue="Where is he?"; Face="Skeptical";
-			Reply="Dr. Deniski should be here somewhere, follow me, he'll gladly help you out."};
-		
-		{Tag="whereAmI_found"; Dialogue="Much better now, thanks for saving me back there."; Face="Surprise";
-			Reply="You're welcome, I was scavenging when I found you unconscious. It's really a miracle being out there unconscious for days."};
-		{Tag="whereAmI_apocalypse"; Dialogue="Are we stuck here?"; Face="Disgusted";
-			Reply="Probably... we have no clue where to go and how wide spread is the apocalypse..."};
-		{Tag="whereAmI_talkToNick"; Dialogue="What can I do to help?"; Face="Happy";
-			Reply="Talk to Nick, he might need some help."};
-		
+Dialogues.Mason.DialogueStrings = {
+	["whereAmI_deniski"]={
+		Face="Happy";
+		Say="Not so well, where are we?";
+		Reply="You're in the warehouse. You're safe here, that's why we also call it the safehouse, haaha.. You should talk to the doctor to get you fixed up.";
 	};
-end
-
-Dialogues.Nick.Dialogues = function()
-	return {
-		{Tag="whereAmI_hmm";
-			Face="Suspicious"; Reply="Hmmm?";};
-
-		{Tag="whereAmI_hello";
-			Face="Surprise"; Reply="Hello, I see you're new here, what's your name?";};
-		
-		{Tag="whereAmI_welcome"; Dialogue="Oh, ummm, I think my name is.. $PlayerName. I can't remember much after waking from that car crash on the bridge."; 
-			Reply="Oh, I'm sorry to hear that, $PlayerName. We haven't found any new survivors lately and I'm glad to see a new face."};
-		{Tag="whereAmI_neededHelp"; Dialogue="Thanks, Mason said you needed help?"; 
-			Reply="Oh yes, but first you might want to refill your gun."};
-		{Tag="whereAmI_howToRefill"; Dialogue="Oh, not yet, where do I refill my gun?"; 
-			Reply="The store behind me, click on Inventory and select your weapon and purchase ammo."};
-		{Tag="whereAmI_firstTask"; Dialogue="Yes, I refilled the gun."; 
-			Reply="Alrighty, there are a couple of zombies outside the warehouse, perhaps you can take care of it?"};
-
-		{Tag="whereAmI_refill";
-			Face="Happy"; Reply="Have you refilled your weapon yet?";};
-		
-		
-		{Tag="whereAmI_acceptTask"; Dialogue="Sure, I'll get right to it."; 
-			Face="Confident"; Reply="Talk to you later then."};
-		{Tag="whereAmI_why"; Dialogue="Hmmm, why should I help you?"; 
-			Reply="Well, the zombies are starting to break down our gates and we need to protect this place in order to survive."};
-		{Tag="whereAmI_denyTask"; Dialogue="No, I don't want to."; 
-			Reply="Ummm, alrighty, I understand."};
-
-		{Tag="whereAmI_reacceptTask"; Dialogue="Yes, sorry, I want to help out now."; 
-			Reply="Alrighty then, come back once you're done."};
-		{Tag="whereAmI_redenyTask"; Dialogue="No, I'm still not going to help you."; 
-			Reply="Well, it's okay, someone else will help out with the zombies."};
-		{Tag="whereAmI_taskComplete"; Dialogue="There were too many, but I killed enough to prevent more damage on the gates."; 
-			Face="Confident"; Reply="Hmmm, I guess that will do for now, thanks.\n\nTalk to Mason, he can teach you how to upgrade your weapons."};
+	["whereAmI_canHeal"]={
+		Face="Skeptical";
+		Say="Where is he?";
+		Reply="Dr. Deniski should be here somewhere, follow me, he'll gladly help you out.";
 	};
-end
+	
+	["whereAmI_found"]={
+		Face="Surprise";
+		Say="Much better now, thanks for saving me back there.";
+		Reply="You're welcome, I was scavenging when I found you unconscious. It's really a miracle being out there unconscious for days.";
+	};
+	["whereAmI_apocalypse"]={
+		Face="Disgusted";
+		Say="Are we stuck here?"; 
+		Reply="Probably... we have no clue where to go and how wide spread is the apocalypse...";
+	};
+	["whereAmI_talkToNick"]={
+		Face="Happy";
+		Say="What can I do to help?"; 
+		Reply="Talk to Nick, he might need some help.";
+	};
+	
+};
+
+Dialogues.Nick.DialogueStrings = {
+	["whereAmI_hmm"]={
+		Face="Suspicious"; 
+		Reply="Hmmm?";
+	};
+
+	["whereAmI_hello"]={
+		Face="Surprise"; 
+		Reply="Hello, I see you're new here, what's your name?";
+	};
+	
+	["whereAmI_welcome"]={
+		Say="Oh, ummm, I think my name is.. $PlayerName. I can't remember much after waking from that car crash on the bridge."; 
+		Reply="Oh, I'm sorry to hear that, $PlayerName. We haven't found any new survivors lately and I'm glad to see a new face.";
+	};
+	["whereAmI_neededHelp"]={
+		Say="Thanks, Mason said you needed help?"; 
+		Reply="Oh yes, but first you might want to refill your gun.";
+	};
+	["whereAmI_howToRefill"]={
+		Say="Oh, not yet, where do I refill my gun?"; 
+		Reply="The store behind me, click on Inventory and select your weapon and purchase ammo.";
+	};
+	["whereAmI_firstTask"]={
+		Say="Yes, I refilled the gun."; 
+		Reply="Alrighty, there are a couple of zombies outside the warehouse, perhaps you can take care of it?";
+	};
+
+	["whereAmI_refill"]={
+		Face="Happy"; 
+		Reply="Have you refilled your weapon yet?";
+	};
+	
+	
+	["whereAmI_acceptTask"]={
+		Face="Confident"; 
+		Say="Sure, I'll get right to it."; 
+		Reply="Talk to you later then.";
+	};
+	["whereAmI_why"]={
+		Say="Hmmm, why should I help you?"; 
+		Reply="Well, the zombies are starting to break down our gates and we need to protect this place in order to survive.";
+	};
+	["whereAmI_denyTask"]={
+		Say="No, I don't want to."; 
+		Reply="Ummm, alrighty, I understand.";
+	};
+
+	["whereAmI_reacceptTask"]={
+		Say="Yes, sorry, I want to help out now."; 
+		Reply="Alrighty then, come back once you're done.";
+	};
+	["whereAmI_redenyTask"]={
+		Say="No, I'm still not going to help you."; 
+		Reply="Well, it's okay, someone else will help out with the zombies.";
+	};
+	["whereAmI_taskComplete"]={
+		Face="Confident"; 
+		Say="There were too many, but I killed enough to prevent more damage on the gates."; 
+		Reply="Hmmm, I guess that will do for now, thanks.\n\nTalk to Mason, he can teach you how to upgrade your weapons.";
+	};
+};
 
 if RunService:IsServer() then
 	local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);

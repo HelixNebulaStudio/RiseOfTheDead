@@ -11,27 +11,43 @@ local missionId = 11;
 --==
 
 -- !outline: Jane Dialogues
-Dialogues.Jane.Dialogues = function()
-	return {
-		{Tag="signal_radio"; Dialogue="Does that radio work?";
-			Face="Suspicious"; Reply="It powers on, but all I get is static and noise, can't seem to get a signal.."};
-		{Tag="signal_repair"; CheckMission=missionId; Dialogue="Is there anyway to fix it?"; 
-			Face="Surprise"; Reply="There's a satellite on the roof, but it's too dangerous for me to go outside.";
-			FailResponses = {
-				{Reply="I'm not sure yet.."};
-			};	
-		};
-		{Tag="signal_fix"; Dialogue="I can go fix it.";
-			Face="Happy"; Reply="That would be great.";};
-		{Tag="signal_great"; Dialogue="It's going errr great!";
-			Face="Suspicious"; Reply="Alright..."};
-		{Tag="signal_complete"; Dialogue="The satellite is repaired now, getting any signals?";
-			Face="Confident"; Reply="Thanks! I'll turn the dial around and see if it's catching any signals."};
-		{Tag="signal_distress"; Dialogue="*Listens*";
-			Face="Surprise"; Reply="Radio: *Static*...Any....one..out.ther..pleas..res..pond...We...are..in.. *Static*"};
-
+Dialogues.Jane.DialogueStrings = {
+	["signal_radio"]={
+		Say="Does that radio work?";
+		Face="Suspicious"; 
+		Reply="It powers on, but all I get is static and noise, can't seem to get a signal..";
 	};
-end
+	["signal_repair"]={
+		CheckMission=missionId;
+		Say="Is there anyway to fix it?"; 
+		Face="Surprise"; 
+		Reply="There's a satellite on the roof, but it's too dangerous for me to go outside.";
+		FailResponses = {
+			{Reply="I'm not sure yet.."};
+		};	
+	};
+	["signal_fix"]={
+		Say="I can go fix it.";
+		Face="Happy"; 
+		Reply="That would be great.";
+	};
+	["signal_great"]={
+		Say="It's going errr great!";
+		Face="Suspicious"; 
+		Reply="Alright...";
+	};
+	["signal_complete"]={
+		Say="The satellite is repaired now, getting any signals?";
+		Face="Confident"; 
+		Reply="Thanks! I'll turn the dial around and see if it's catching any signals.";
+	};
+	["signal_distress"]={
+		Say="*Listens*";
+		Face="Surprise"; 
+		Reply="Radio: *Static*...Any....one..out.ther..pleas..res..pond...We...are..in.. *Static*";
+	};
+
+};
 
 if RunService:IsServer() then
 	-- !outline: Jane Handler

@@ -11,16 +11,24 @@ local missionId = 21;
 --==
 
 -- MARK: Jane Dialogues
-Dialogues.Jane.Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="springkill_yes"; Dialogue="Yes, I'm up for it.";
-			Face="Happy"; Reply="Bloxmart, the bank and the factory. You know the places.."};
-		{Tag="springkill_done"; Dialogue="I've killed them all."; 
-			Face="Joyful"; Reply="Hurray! I feel much safer already.."};
-		{Tag="springkill_notYet"; Dialogue="Still On it.."; 
-			Face="Excited"; Reply="Good luck~"};
+Dialogues.Jane.DialogueStrings = {
+	["springkill_yes"]={
+		CheckMission=missionId;
+		Say="Yes, I'm up for it.";
+		Face="Happy"; 
+		Reply="Bloxmart, the bank and the factory. You know the places..";
 	};
-end
+	["springkill_done"]={
+		Say="I've killed them all."; 
+		Face="Joyful"; 
+		Reply="Hurray! I feel much safer already..";
+	};
+	["springkill_notYet"]={
+		Say="Still On it.."; 
+		Face="Excited"; 
+		Reply="Good luck~";
+	};
+};
 
 if RunService:IsServer() then
 	-- MARK: Jane Handler

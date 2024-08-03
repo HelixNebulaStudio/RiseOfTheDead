@@ -11,18 +11,20 @@ local missionId = 4;
 --==
 
 -- MARK: Dr. Deniski Dialogues
-Dialogues["Dr. Deniski"].Dialogues = function()
-	return {
-		{Tag="lendAHand_start"; CheckMission=missionId; Dialogue="Sure, how can I help you?"; 
-			Reply="I'm doing some experiments and I need a zombie arm, if you can find me one, that would be great!";
-			FailResponses = {
-				{Reply="Hahah, if you want to help, you'll need to prove yourself first."};
-			};
+Dialogues["Dr. Deniski"].DialogueStrings = {
+	["lendAHand_start"]={
+		CheckMission=missionId; 
+		Say="Sure, how can I help you?"; 
+		Reply="I'm doing some experiments and I need a zombie arm, if you can find me one, that would be great!";
+		FailResponses = {
+			{Reply="Hahah, if you want to help, you'll need to prove yourself first."};
 		};
-		{Tag="lendAHand_complete"; Dialogue="Here you go..."; 
-			Reply="Thank you, here's something for your troubles."};
 	};
-end
+	["lendAHand_complete"]={
+		Say="Here you go..."; 
+		Reply="Thank you, here's something for your troubles.";
+	};
+};
 
 if RunService:IsServer() then
 	-- MARK: Dr. Deniski Handler

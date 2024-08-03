@@ -11,34 +11,44 @@ local missionId = 40;
 --==
 
 -- MARK: Victor Dialogues
-Dialogues.Victor.Dialogues = function()
-	return {
-		{Tag="vt1_init"; Face="Skeptical";
-			Dialogue="Ummm, what is it?"; 
-			Reply="There is a pathway under the park's statue, a pathway to some kind of tombs."};
-
-		{Tag="vt1_beast"; Face="Confident";
-			Dialogue="What's in the tombs?"; 
-			Reply="I am not sure. There are rumors about some kind of treasure but the beast is in the way. Could you clear the path to the tombs?"};
-
-		{CheckMission=missionId; Tag="vt1_sure"; Face="Happy";
-			Dialogue="Sure."; 
-			Reply="Thats rad dude, let me know if you find anything."};
-		
-		{Tag="vt1_tombs"; Face="Suspicious";
-			Dialogue="I'll be heading down to the tombs again."; 
-			Reply="Alright."};
-		
-		{Tag="vt1_find"; Face="Happy";
-			Dialogue="The tombs was overran with zombies. I found this mask in the tombs though."; 
-			Reply="Wow, I'm impressed. Thanks for the mask, I will be inspecting it."};
-			
-		{Tag="vt1_notfind"; Face="Suspicious";
-			Dialogue="The tombs was overran with zombies, and I didn't find anything special there."; 
-			Reply="Hmmm, thats odd.. Anyways thanks for clearing the path there."};
-		
+Dialogues.Victor.DialogueStrings = {
+	["vt1_init"]={
+		Face="Skeptical";
+		Say="Ummm, what is it?"; 
+		Reply="There is a pathway under the park's statue, a pathway to some kind of tombs.";
 	};
-end
+
+	["vt1_beast"]={
+		Face="Confident";
+		Say="What's in the tombs?"; 
+		Reply="I am not sure. There are rumors about some kind of treasure but the beast is in the way. Could you clear the path to the tombs?";
+	};
+
+	["vt1_sure"]={
+		CheckMission=missionId;
+		Face="Happy";
+		Say="Sure."; 
+		Reply="Thats rad dude, let me know if you find anything.";
+	};
+	
+	["vt1_tombs"]={
+		Face="Suspicious";
+		Say="I'll be heading down to the tombs again."; 
+		Reply="Alright."};
+	
+	["vt1_find"]={
+		Face="Happy";
+		Say="The tombs was overran with zombies. I found this mask in the tombs though."; 
+		Reply="Wow, I'm impressed. Thanks for the mask, I will be inspecting it.";
+	};
+		
+	["vt1_notfind"]={
+		Face="Suspicious";
+		Say="The tombs was overran with zombies, and I didn't find anything special there."; 
+		Reply="Hmmm, thats odd.. Anyways thanks for clearing the path there.";
+	};
+	
+};
 
 if RunService:IsServer() then
 	-- MARK: Victor Handler

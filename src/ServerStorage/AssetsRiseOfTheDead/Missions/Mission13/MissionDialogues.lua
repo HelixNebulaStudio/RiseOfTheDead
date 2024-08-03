@@ -11,22 +11,32 @@ local missionId = 13;
 --==
 
 -- !outline: Wilson Dialogues
-Dialogues.Wilson.Dialogues = function()
-	return {
-		{Tag="crowdcontrol_what"; Dialogue="What do you need help with?"; 
-			Face="Serious"; Reply="I have intel that the population of the zombies is growing rapidly.. I've heard you are very capable of taking out large amount of zombies."};
-		{CheckMission=missionId; Tag="crowdcontrol_yeah"; Dialogue="Yeah, I can."; 
-			Face="Joyful"; Reply="Great! This will really help me out in finding my partner. Kill about a hundred zombies will do.";
-			FailResponses = {
-				{Reply="You're gonna need bigger weapons before you do this.."};
-			};};
-		{Tag="crowdcontrol_stillWorking"; Dialogue="Still working on it.."; 
-			Face="Smirk"; Reply="Alright, keep at it."};
-		{Tag="crowdcontrol_return"; Dialogue="I think I killed about a hundred zombies..."; 
-			Face="Happy"; Reply="That'll be good for now, thanks for your help."};
-		
+Dialogues.Wilson.DialogueStrings = {
+	["crowdcontrol_what"]={
+		Say="What do you need help with?"; 
+		Face="Serious"; 
+		Reply="I have intel that the population of the zombies is growing rapidly.. I've heard you are very capable of taking out large amount of zombies.";
 	};
-end
+	["crowdcontrol_yeah"]={
+		CheckMission=missionId;
+		Say="Yeah, I can."; 
+		Face="Joyful"; Reply="Great! This will really help me out in finding my partner. Kill about a hundred zombies will do.";
+		FailResponses = {
+			{Reply="You're gonna need bigger weapons before you do this.."};
+		};
+	};
+	["crowdcontrol_stillWorking"]={
+		Say="Still working on it.."; 
+		Face="Smirk"; 
+		Reply="Alright, keep at it.";
+	};
+	["crowdcontrol_return"]={
+		Say="I think I killed about a hundred zombies..."; 
+		Face="Happy"; 
+		Reply="That'll be good for now, thanks for your help.";
+	};
+	
+};
 
 if RunService:IsServer() then
 	-- !outline: Wilson Handler

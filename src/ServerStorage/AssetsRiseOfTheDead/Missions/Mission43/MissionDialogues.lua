@@ -11,25 +11,28 @@ local missionId = 43;
 --==
 
 -- MARK: Jack Reap Dialogues
-Dialogues["Jack Reap"].Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="missingbody_init";
-			Dialogue="Hey.. You look really pale. Are you alright?";
-			Reply="You.. Help me.. I am finding something.. Head in, you will find it.."};
-		
-		{Tag="missingbody_voodoo";
-			Dialogue="What happened to the place!? Something's wrong with the place and I didn't find anything.."; 
-			Reply="Oh no, it was there.. Here take this.."};
-	
-		{Tag="missingbody_takevoodoo";
-			Dialogue="*Take Voodoo Doll*"; 
-			Reply="This doll will guide you to where you need to go.."};
-		
-		{Tag="missingbody_invfull";
-			Dialogue="*Take Voodoo Doll*"; 
-			Reply="Your inventory is full."};
+Dialogues["Jack Reap"].DialogueStrings = {
+	["missingbody_init"]={
+		CheckMission=missionId;
+		Say="Hey.. You look really pale. Are you alright?";
+		Reply="You.. Help me.. I am finding something.. Head in, you will find it..";
 	};
-end
+	
+	["missingbody_voodoo"]={
+		Say="What happened to the place!? Something's wrong with the place and I didn't find anything.."; 
+		Reply="Oh no, it was there.. Here take this..";
+	};
+
+	["missingbody_takevoodoo"]={
+		Say="*Take Voodoo Doll*"; 
+		Reply="This doll will guide you to where you need to go..";
+	};
+	
+	["missingbody_invfull"]={
+		Say="*Take Voodoo Doll*"; 
+		Reply="Your inventory is full.";
+	};
+};
 
 if RunService:IsServer() then
 	-- MARK: Jack Reap Handler

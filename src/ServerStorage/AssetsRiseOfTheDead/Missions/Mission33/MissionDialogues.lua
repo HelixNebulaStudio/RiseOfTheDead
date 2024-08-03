@@ -13,83 +13,100 @@ local missionId = 33;
 --==
 
 -- !outline: Stan Dialogues
-Dialogues.Stan.Dialogues = function()
-	return {
-		{Tag="awokeTheBear_init";  CheckMission=missionId; Dialogue="Yeah, I think he should hold up his end of the bargin.";
-			Face="Confident"; Reply="Alright, let's go.";
-			FailResponses = {
-				{Reply="There's an increase in bandits activity, we should wait a bit.."};
-			};	
-		};
-
-		{Tag="awokeTheBear_tryAgain"; Dialogue="Sorry, something came up, I had to go. Let's go again.";
-			Face="Confident"; Reply="Fine.. let's go."};
+Dialogues.Stan.DialogueStrings = {
+	["awokeTheBear_init"]={
+		CheckMission=missionId;
+		Say="Yeah, I think he should hold up his end of the bargin.";
+		Face="Confident";
+		Reply="Alright, let's go.";
+		FailResponses = {
+			{Reply="There's an increase in bandits activity, we should wait a bit.."};
+		};	
 	};
-end
+
+	["awokeTheBear_tryAgain"]={
+		Say="Sorry, something came up, I had to go. Let's go again.";
+		Face="Confident"; 
+		Reply="Fine.. let's go.";
+	};
+};
 
 -- !outline: Zark Dialogues
-Dialogues.Zark.Dialogues = function()
-	return {
-		{Tag="awokeTheBear_zarkInit"; Dialogue="We have some questions..";
-			Face="Frustrated"; Reply="And why do you think I have the answers to them?"};
-
-		{Tag="awokeTheBear_robert";
-			Dialogue="Why did you kidnap one of ours?!";
-			Face="Angry"; Reply="Kidnapped? How dare you accuse me of kidnapping. "
-		};
-
-		{Tag="awokeTheBear_accuse";
-			Dialogue="We think you kidnapped one of ours and we need him back!";
-			Face="Frustrated"; Reply="I have no clue what you are talking about, you better ask your next question carefully. Your friend's life is on the line.."
-		};
-
-		{Tag="awokeTheBear_where";
-			Dialogue="Where is Robert?!";
-			Face="Angry"; Reply="I've answered that question already, I do not know who is Robert!"};
-
-		{Tag="awokeTheBear_bandits";
-			Dialogue="WAIT!!! BUT HE WENT MISSING WHEN HE WAS TRYING TO TELL US ABOUT YOU GUYS!!";
-			Face="Frustrated"; Reply="That is not a question, last chance.."};
-
-		{Tag="awokeTheBear_stop";
-			Dialogue="STOP!! SOME OF YOUR BANDITS WERE HEARD RUNNING AWAY FROM THE SEWERS WHEN HE WENT MISSING!!";
-			Face="Frustrated"; Reply="Hmmmm.. Yes, there was reports of that happening. But oh well. *bang*"};
-
-		{Tag="awokeTheBear_why"; Face="Frustrated";
-			Dialogue="WHY!!! WHY WOULD YOU DO THIS?!";
-			Reply="He was already going to die the moment he stepped into this place."};
-
-		{Tag="awokeTheBear_player"; Face="Angry";
-			Dialogue="?!";
-			Reply="But you, you are special, aren't you. Tell me about what happened in the sewers.."};
-
-		{Tag="awokeTheBear_sewers"; Face="Angry";
-			Dialogue="ALL I KNOW IS YOUR GROUP OF BANDITS RAN... or was running away from something..";
-			Reply="Or something.. Listen carefully now, I need you to tell me everything, or else you will end up in pieces like your friend over here."};
-
-		{Tag="awokeTheBear_banditZombie"; Face="Angry";
-			Dialogue=".. one of your members changed, changed into a zombie..";
-			Reply="Is that so..."};
+Dialogues.Zark.DialogueStrings = {
+	["awokeTheBear_zarkInit"]={
+		Say="We have some questions..";
+		Face="Frustrated"; 
+		Reply="And why do you think I have the answers to them?";
 	};
-end
+
+	["awokeTheBear_robert"]={
+		Say="Why did you kidnap one of ours?!";
+		Face="Angry"; 
+		Reply="Kidnapped? How dare you accuse me of kidnapping.";
+	};
+
+	["awokeTheBear_accuse"]={
+		Say="We think you kidnapped one of ours and we need him back!";
+		Face="Frustrated"; 
+		Reply="I have no clue what you are talking about, you better ask your next question carefully. Your friend's life is on the line..";
+	};
+
+	["awokeTheBear_where"]={
+		Say="Where is Robert?!";
+		Face="Angry"; 
+		Reply="I've answered that question already, I do not know who is Robert!";
+	};
+
+	["awokeTheBear_bandits"]={
+		Say="WAIT!!! BUT HE WENT MISSING WHEN HE WAS TRYING TO TELL US ABOUT YOU GUYS!!";
+		Face="Frustrated"; 
+		Reply="That is not a question, last chance..";
+	};
+
+	["awokeTheBear_stop"]={
+		Say="STOP!! SOME OF YOUR BANDITS WERE HEARD RUNNING AWAY FROM THE SEWERS WHEN HE WENT MISSING!!";
+		Face="Frustrated"; 
+		Reply="Hmmmm.. Yes, there was reports of that happening. But oh well. *bang*";
+	};
+
+	["awokeTheBear_why"]={
+		Face="Frustrated";
+		Say="WHY!!! WHY WOULD YOU DO THIS?!";
+		Reply="He was already going to die the moment he stepped into this place.";
+	};
+
+	["awokeTheBear_player"]={
+		Face="Angry";
+		Say="?!";
+		Reply="But you, you are special, aren't you. Tell me about what happened in the sewers..";
+	};
+
+	["awokeTheBear_sewers"]={
+		Face="Angry";
+		Say="ALL I KNOW IS YOUR GROUP OF BANDITS RAN... or was running away from something..";
+		Reply="Or something.. Listen carefully now, I need you to tell me everything, or else you will end up in pieces like your friend over here.";
+	};
+
+	["awokeTheBear_banditZombie"]={
+		Face="Angry";
+		Say=".. one of your members changed, changed into a zombie..";
+		Reply="Is that so...";
+	};
+};
 
 -- !outline: Patrick Dialogues
-Dialogues.Patrick.Dialogues = function()
-	return {
-		{
-			Tag="awokenTheBear_giveKey";
-			Dialogue="Where's the room?";
-			Reply="Downstairs, next to the food court..";
-			Face="Grumpy";
-		};
-		{
-			Tag="newInfo";
-			Dialogue="Got any new info about the Bandits?";
-			Reply="I got nothing interesting for now.";
-			Face="Confident";
-		};
+Dialogues.Patrick.DialogueStrings = {
+	["awokenTheBear_giveKey"]={
+		Face="Grumpy";
+		Say="Where's the room?";
+		Reply="Downstairs, next to the food court..";
 	};
-end
+	["newInfo"]={
+		Face="Confident";
+		Say="Got any new info about the Bandits?";
+		Reply="I got nothing interesting for now.";
+	};
+};
 
 if RunService:IsServer() then
 	-- !outline: Stan Handler

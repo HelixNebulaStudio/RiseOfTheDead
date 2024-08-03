@@ -11,18 +11,25 @@ local missionId = 16;
 --==
 
 -- MARK: Jesse Dialogues
-Dialogues.Jesse.Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="aGoodDeal_start"; Dialogue="Sure, I can help."; 
-			Face="Skeptical"; Reply="Alright, find me 2 Igniters but don't take too long. I got customers waiting.."};
-		
-		{Tag="aGoodDeal_notYet"; Dialogue="Still working on it.";
-			Face="Question"; Reply="Alright, but don't take too long. I got customers waiting.."};
-		{Tag="aGoodDeal_done"; Dialogue="Here you go."; 
-			Face="Smirk"; Reply="Alright, great, come back tomorrow. I might have some interesting items to offer for more of your work."};
-	
+Dialogues.Jesse.DialogueStrings = {
+	["aGoodDeal_start"]={
+		CheckMission=missionId;
+		Say="Sure, I can help."; 
+		Face="Skeptical"; Reply="Alright, find me 2 Igniters but don't take too long. I got customers waiting..";
 	};
-end
+	
+	["aGoodDeal_notYet"]={
+		Say="Still working on it.";
+		Face="Question"; 
+		Reply="Alright, but don't take too long. I got customers waiting..";
+	};
+	["aGoodDeal_done"]={
+		Say="Here you go."; 
+		Face="Smirk"; 
+		Reply="Alright, great, come back tomorrow. I might have some interesting items to offer for more of your work.";
+	};
+
+};
 
 if RunService:IsServer() then
 	-- MARK: Jesse Handler

@@ -11,34 +11,56 @@ local missionId = 54;
 --==
 
 -- !outline: Mason Dialogues
-Dialogues.Mason.Dialogues = function()
-	return {
-		{Tag="hsh_init"; CheckMission=missionId; Dialogue="Yeah, sure.";
-			Face="Confident"; Reply="There's this place, I don't think it's been scavenged before.. We should check it out. Let me know when you're ready to head out.";
-			FailResponses = {
-				{Reply="Come back later, I'm just preparing some stuff.."};
-			};	
-		};
-
-		{Tag="hsh_letsgo"; Dialogue="Alright, I'm ready.";
-			Face="Confident"; Reply="Here we go.."};
-		{Tag="hsh_quiet"; Dialogue="Hmmm, it's so quiet here.";
-			Face="Skeptical"; Reply="Yeah.. Now that you mention it.. \n\nAnyways, follow me."};
-
-		{Tag="hsh_safehouse"; Dialogue="This place seems pretty sturdy, it could work as another safehouse.";
-			Face="Welp"; Reply="It could, but this place might be a bit too far out.\n\nYou know what, you could make it your own!"};
-		{Tag="hsh_mine"; Dialogue="My own?"; 
-			Face="Happy"; Reply="Yes, your very own safehouse. You have been surviving on your own for quite some time, I'm sure you can take care of yourself here!"};
-		{Tag="hsh_work"; Dialogue="I guess I could make something work..";
-			Face="Confident"; Reply="Yeah! Maybe one day you could shelter survivors here and we could get more people to fight this apocalypse or something.."};
-
-		{Tag="tpwarehouse"; Dialogue="Let's go back to the warehouse"; Face="Confident";
-			Reply="Alright."};
-
-		{Tag="tpsafehome"; Dialogue="Let's go to my safehome."; Face="Confident";
-			Reply="Alright."};
+Dialogues.Mason.DialogueStrings = {
+	["hsh_init"]={
+		CheckMission=missionId;
+		Say="Yeah, sure.";
+		Face="Confident"; 
+		Reply="There's this place, I don't think it's been scavenged before.. We should check it out. Let me know when you're ready to head out.";
+		FailResponses = {
+			{Reply="Come back later, I'm just preparing some stuff.."};
+		};	
 	};
-end
+
+	["hsh_letsgo"]={
+		Say="Alright, I'm ready.";
+		Face="Confident"; 
+		Reply="Here we go..";
+	};
+	["hsh_quiet"]={
+		Say="Hmmm, it's so quiet here.";
+		Face="Skeptical"; 
+		Reply="Yeah.. Now that you mention it.. \n\nAnyways, follow me.";
+	};
+
+	["hsh_safehouse"]={
+		Say="This place seems pretty sturdy, it could work as another safehouse.";
+		Face="Welp"; 
+		Reply="It could, but this place might be a bit too far out.\n\nYou know what, you could make it your own!";
+	};
+	["hsh_mine"]={
+		Say="My own?"; 
+		Face="Happy"; 
+		Reply="Yes, your very own safehouse. You have been surviving on your own for quite some time, I'm sure you can take care of yourself here!";
+	};
+	["hsh_work"]={
+		Say="I guess I could make something work..";
+		Face="Confident"; 
+		Reply="Yeah! Maybe one day you could shelter survivors here and we could get more people to fight this apocalypse or something..";
+	};
+
+	["tpwarehouse"]={
+		Say="Let's go back to the warehouse"; 
+		Face="Confident";
+		Reply="Alright.";
+	};
+
+	["tpsafehome"]={
+		Say="Let's go to my safehome."; 
+		Face="Confident";
+		Reply="Alright.";
+	};
+};
 
 if RunService:IsServer() then
 	-- !outline: Mason Handler

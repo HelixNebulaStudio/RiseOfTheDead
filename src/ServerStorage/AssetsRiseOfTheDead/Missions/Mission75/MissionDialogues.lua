@@ -20,91 +20,156 @@ local cache = {
 --==
 
 -- !outline: Rachel Dialogues
-Dialogues.Rachel.Dialogues = function()
-	return {
-		{Tag="medbre_init";
-			Face="Worried"; Reply="Stan saved my life, I was trapped and he heard me cried for help. I miss him so much..";};
-
-		{CheckMission=missionId; Tag="medbre_start"; Dialogue="Hey, it's okay. I have some news about Stan.";
-			Face="Worried"; Reply="News.. about Stan?"};
-		{Tag="medbre_start2"; Dialogue="Yes, so apparently Stan is still alive.";
-			Face="Disbelief"; Reply="..."};
-		{Tag="medbre_start3"; Dialogue="But.. He's an infector..";
-			Face="Skeptical"; Reply="That explains a lot.. But he never tried to infect me, or you.."};
-		{Tag="medbre_start4"; Dialogue="I'm not sure why either.";
-			Face="Suspicious"; Reply="Hmmm.. If that's true, I have something I need you to do. I have Stan's blood sample from all the time I had to take care of him."};
-		{Tag="medbre_start5"; Dialogue="What do I need to do?";
-			Face="Confident"; Reply="There's a clinic near the W.D. Mall, there should be some testing labs there. I've worked there before, there should be instructions on how to test these samples. Then bring back the reports and I'll see if there are dormant parasites lingering."};
-
-		{Tag="medbre_ready"; 
-			Face="Worried"; Reply="When you're ready, bring these blood sample to the clinic.";};
-		{Tag="medbre_takesample"; Dialogue="I'm ready to go.";
-			Face="Confident"; Reply="Here you go, keep the samples safe! (When you take damage, the samples also takes damage!)"};
-
-		{Tag="medbre_reready"; 
-			Face="Worried"; Reply="You're back so soon?";};
-		{Tag="medbre_retakesample"; Dialogue="Sorry but I hope you have more of those samples..";
-			Face="Bored"; Reply="You are lucky I have more backups. Here, keep them safe!"};
-		
-
-		{Tag="medbre_return1"; 
-			Face="Worried"; Reply="Wow, you look roughed up. What happened?";};
-		{Tag="medbre_banditsAttacked"; Dialogue="Yeah, a group of rogue bandits attacked.. But I took care of them and got the results.";
-			Face="Surprise"; Reply="Oh noo, I didn't mean to put you in danger.."};
-
-		{Tag="medbre_return2"; 
-			Face="Worried"; Reply="Welcome back, have you got the results?";};
-		{Tag="medbre_banditsBribed"; Dialogue="Yeah, I had to bribe a rouge bandit just so I can stay in the lab.";
-			Face="Surprise"; Reply="Oh noo, I didn't mean to put you in danger.."};
-		
-		{Tag="medbre_showResults"; Dialogue="It's okay, I can handle myself. Anyways, here are the results for the 4 samples.. *Shows reports*";
-			Face="Surprise"; Reply="Hmmm.. This has information beyond my understanding at the moment. I think I'll need some time researching this.."};
-		{Tag="medbre_drden"; Dialogue="Wait, I actually know a guy who might be able to help. He goes by Dr. Deniski and he has been researching zombie blood..";
-			Face="Surprise"; Reply="Oh wonderful, do help me get his insights on the reports. I'll continue my own research."};
-		
-
-		{Tag="medbre_final"; 
-			Face="Happy"; Reply="So how did it go?";};
-		{Tag="medbre_insights"; Dialogue="Here's the insight Dr. Deniski written. *Gives report*";
-			Face="Skeptical"; Reply="fascinating.. We might have a breakthrough here, but I'll need some time to figure out the chemistry.."};
-		{Tag="medbre_end"; Dialogue="Sure, if you need anything let me know!";
-			Face="Confident"; Reply="Come back after a while and I'll let you know what I need."};
+Dialogues.Rachel.DialogueStrings = {
+	["medbre_init"]={
+		Face="Worried"; 
+		Reply="Stan saved my life, I was trapped and he heard me cried for help. I miss him so much..";
 	};
-end
+
+	["medbre_start"]={
+		CheckMission=missionId; 
+		Say="Hey, it's okay. I have some news about Stan.";
+		Face="Worried"; 
+		Reply="News.. about Stan?";
+	};
+	["medbre_start2"]={
+		Say="Yes, so apparently Stan is still alive.";
+		Face="Disbelief"; 
+		Reply="...";
+	};
+	["medbre_start3"]={
+		Say="But.. He's an infector..";
+		Face="Skeptical"; 
+		Reply="That explains a lot.. But he never tried to infect me, or you..";
+	};
+	["medbre_start4"]={
+		Say="I'm not sure why either.";
+		Face="Suspicious"; 
+		Reply="Hmmm.. If that's true, I have something I need you to do. I have Stan's blood sample from all the time I had to take care of him.";
+	};
+	["medbre_start5"]={
+		Say="What do I need to do?";
+		Face="Confident"; 
+		Reply="There's a clinic near the W.D. Mall, there should be some testing labs there. I've worked there before, there should be instructions on how to test these samples. Then bring back the reports and I'll see if there are dormant parasites lingering.";
+	};
+
+	["medbre_ready"]={
+		Face="Worried"; 
+		Reply="When you're ready, bring these blood sample to the clinic.";
+	};
+	["medbre_takesample"]={
+		Say="I'm ready to go.";
+		Face="Confident"; 
+		Reply="Here you go, keep the samples safe! (When you take damage, the samples also takes damage!)";
+	};
+
+	["medbre_reready"]={
+		Face="Worried"; 
+		Reply="You're back so soon?";
+	};
+	["medbre_retakesample"]={
+		Say="Sorry but I hope you have more of those samples..";
+		Face="Bored"; 
+		Reply="You are lucky I have more backups. Here, keep them safe!";
+	};
+	
+
+	["medbre_return1"]={
+		Face="Worried"; 
+		Reply="Wow, you look roughed up. What happened?";
+	};
+	["medbre_banditsAttacked"]={
+		Say="Yeah, a group of rogue bandits attacked.. But I took care of them and got the results.";
+		Face="Surprise"; 
+		Reply="Oh noo, I didn't mean to put you in danger..";
+	};
+
+	["medbre_return2"]={
+		Face="Worried"; 
+		Reply="Welcome back, have you got the results?";
+	};
+	["medbre_banditsBribed"]={
+		Say="Yeah, I had to bribe a rouge bandit just so I can stay in the lab.";
+		Face="Surprise"; 
+		Reply="Oh noo, I didn't mean to put you in danger..";
+	};
+	
+	["medbre_showResults"]={
+		Say="It's okay, I can handle myself. Anyways, here are the results for the 4 samples.. *Shows reports*";
+		Face="Surprise"; 
+		Reply="Hmmm.. This has information beyond my understanding at the moment. I think I'll need some time researching this..";
+	};
+	["medbre_drden"]={
+		Say="Wait, I actually know a guy who might be able to help. He goes by Dr. Deniski and he has been researching zombie blood..";
+		Face="Surprise"; 
+		Reply="Oh wonderful, do help me get his insights on the reports. I'll continue my own research.";
+	};
+	
+
+	["medbre_final"]={
+		Face="Happy"; 
+		Reply="So how did it go?";
+	};
+	["medbre_insights"]={
+		Say="Here's the insight Dr. Deniski written. *Gives report*";
+		Face="Skeptical"; 
+		Reply="fascinating.. We might have a breakthrough here, but I'll need some time to figure out the chemistry..";
+	};
+	["medbre_end"]={
+		Say="Sure, if you need anything let me know!";
+		Face="Confident"; 
+		Reply="Come back after a while and I'll let you know what I need.";
+	};
+};
 
 -- !outline: Mike Dialogues
-Dialogues.Mike.Dialogues = function()
-	return {
-		{Tag="medbre_init";
-			Face="Bored"; Reply="You look like you're in a rush.";};
-		{Tag="medbre_helplab"; Dialogue="Yeah, I'm looking for the laboratories.";
-			Face="Bored"; Reply="It should be on the third floor. But the doors are locked, I think Molly might be able to help."};
+Dialogues.Mike.DialogueStrings = {
+	["medbre_init"]={
+		Face="Bored"; 
+		Reply="You look like you're in a rush.";
 	};
-end
+	["medbre_helplab"]={
+		Say="Yeah, I'm looking for the laboratories.";
+		Face="Bored"; 
+		Reply="It should be on the third floor. But the doors are locked, I think Molly might be able to help.";
+	};
+};
 
 -- !outline: Molly Dialogues
-Dialogues.Molly.Dialogues = function()
-	return {
-		{Tag="medbre_init";
-			Face="Bored"; Reply="This better be important..";};
-		{Tag="medbre_helplab"; Dialogue="I need to get to the laboratories, how do I get pass the locked doors?";
-			Face="Bored"; Reply="About that, we can't access that area ever since the military took over. You're gonna need to find another way in."};
+Dialogues.Molly.DialogueStrings = {
+	["medbre_init"]={
+		Face="Bored"; 
+		Reply="This better be important..";
 	};
-end
+	["medbre_helplab"]={
+		Say="I need to get to the laboratories, how do I get pass the locked doors?";
+		Face="Bored"; 
+		Reply="About that, we can't access that area ever since the military took over. You're gonna need to find another way in.";
+	};
+};
 
 -- !outline: Dr. Deniski Dialogues
-Dialogues["Dr. Deniski"].Dialogues = function()
-	return {
-		{Tag="medbre_init";
-			Face="Confident"; Reply="привет, my friend..\n\nThat means hello, haha!";};
-		{Tag="medbre_showReport"; Dialogue="Hey doc, I have some blood reports of infector blood and need some insight on it. Maybe you could help us?\n\n*Shows reports*";
-			Face="Suspicious"; Reply="Oh sure.. Hmmm... Very interesting..\nSo they are parasites, but they are in like a hibernating state because they aren't multiplying much..\nAnd during this state, they seem to be producing some kind of regenerative enzymes byproduct.."};
-		{Tag="medbre_showReport"; Dialogue="...";
-			Face="Joyful"; Reply="Haha, don't worry. I'll write it down, this is definately huge discover!\n\n*Writing up summary report*"};
-		{Tag="medbre_showReport2"; Dialogue="Wait, but how does this compare to zombie blood?";
-			Face="Happy"; Reply="Well, in my tests, there aren't any dormant parasites in zombie blood.. My hypothesis is that the parasites only resides in the brain after the body is dead or something.\n*Finishes writing* annd done. Show this to your friend."};
+Dialogues["Dr. Deniski"].DialogueStrings = {
+	["medbre_init"]={
+		Face="Confident"; 
+		Reply="привет, my friend..\n\nThat means hello, haha!";
 	};
-end
+	["medbre_showReport"]={
+		Say="Hey doc, I have some blood reports of infector blood and need some insight on it. Maybe you could help us?\n\n*Shows reports*";
+		Face="Suspicious"; 
+		Reply="Oh sure.. Hmmm... Very interesting..\nSo they are parasites, but they are in like a hibernating state because they aren't multiplying much..\nAnd during this state, they seem to be producing some kind of regenerative enzymes byproduct..";
+	};
+	["medbre_showReport2"]={
+		Say="...";
+		Face="Joyful"; 
+		Reply="Haha, don't worry. I'll write it down, this is definately huge discover!\n\n*Writing up summary report*";
+	};
+	["medbre_showReport3"]={
+		Say="Wait, but how does this compare to zombie blood?";
+		Face="Happy"; 
+		Reply="Well, in my tests, there aren't any dormant parasites in zombie blood.. My hypothesis is that the parasites only resides in the brain after the body is dead or something.\n*Finishes writing* annd done. Show this to your friend.";
+	};
+};
 
 if RunService:IsServer() then
 	-- !outline: Rachel Handler
@@ -273,39 +338,41 @@ if RunService:IsServer() then
 
 				dialog:AddChoice("medbre_showReport", function(dialog)
 					dialog:AddChoice("medbre_showReport2", function(dialog)
-						local profile = shared.modProfile:Get(player);
-						local playerSave = profile:GetActiveSave();
-						local inventory = playerSave.Inventory;
-						
-						
-						if mission.SaveData.MissionItems then
-							for a, itemIDs in pairs(mission.SaveData.MissionItems) do
-								inventory:Remove(itemIDs, 1);
+						dialog:AddChoice("medbre_showReport3", function(dialog)
+							local profile = shared.modProfile:Get(player);
+							local playerSave = profile:GetActiveSave();
+							local inventory = playerSave.Inventory;
+							
+							
+							if mission.SaveData.MissionItems then
+								for a, itemIDs in pairs(mission.SaveData.MissionItems) do
+									inventory:Remove(itemIDs, 1);
+								end
+								table.clear(mission.SaveData.MissionItems);
 							end
-							table.clear(mission.SaveData.MissionItems);
-						end
-						
-						modMission:Progress(player, missionId, function(mission)
-							if mission.ProgressionPoint <= 14 then
-								mission.ProgressionPoint = 14;
-							end
-						end);
-
-						local hasSpace = inventory:SpaceCheck{{ItemId="samplereport"}};
-						if not hasSpace then
-							shared.Notify(player, "Inventory is full!", "Negative");
-							return;
-						end;
-						
-						inventory:Add("samplereport", {
-							CustomName=inventory.RegisterItemName("Dr. Deniski's Report Insights");
-							Values={
-								Result=false;
-							};}, function(queueEvent, storageItem)
-								mission.SaveData.ReportId = storageItem.ID;
+							
+							modMission:Progress(player, missionId, function(mission)
+								if mission.ProgressionPoint <= 14 then
+									mission.ProgressionPoint = 14;
+								end
 							end);
-						shared.Notify(player, "Dr. Deniski's Report Insights added to your inventory.", "Inform");
-						
+	
+							local hasSpace = inventory:SpaceCheck{{ItemId="samplereport"}};
+							if not hasSpace then
+								shared.Notify(player, "Inventory is full!", "Negative");
+								return;
+							end;
+							
+							inventory:Add("samplereport", {
+								CustomName=inventory.RegisterItemName("Dr. Deniski's Report Insights");
+								Values={
+									Result=false;
+								};}, function(queueEvent, storageItem)
+									mission.SaveData.ReportId = storageItem.ID;
+								end);
+							shared.Notify(player, "Dr. Deniski's Report Insights added to your inventory.", "Inform");
+							
+						end)
 					end);
 				end);
 			end

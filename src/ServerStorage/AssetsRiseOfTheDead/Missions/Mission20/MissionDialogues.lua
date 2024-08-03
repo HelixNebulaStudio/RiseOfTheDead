@@ -11,23 +11,33 @@ local missionId = 20;
 --==
 
 -- MARK: Erik Dialogues
-Dialogues.Erik.Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="eightlegs_sure"; Dialogue="What do you need help with?";
-			Face="Worried"; Reply="The Zpider is making a lot of noise and I have a hard time sleeping because of it..\nCould you kill it for me please?";
-			FailResponses = {
-				{Reply="I'm okay for now, come back later."};
-			};
+Dialogues.Erik.DialogueStrings = {
+	["eightlegs_sure"]={
+		CheckMission=missionId;
+		Say="What do you need help with?";
+		Face="Worried"; 
+		Reply="The Zpider is making a lot of noise and I have a hard time sleeping because of it..\nCould you kill it for me please?";
+		FailResponses = {
+			{Reply="I'm okay for now, come back later."};
 		};
-		{Tag="eightlegs_yeah"; Dialogue="Absoutely!";
-			Face="Smile"; Reply="Thanks.."};
-		{Tag="eightlegs_almost"; Dialogue="Still trying to get rid of it, sit tight.";
-			Face="Smile"; Reply="Oh.. okay."};
-		{Tag="eightlegs_return"; Dialogue="I killed it. You don't have to worry about it now.";
-			Face="Joyful"; Reply="Thanks a lot.."};
-		
 	};
-end
+	["eightlegs_yeah"]={
+		Say="Absoutely!";
+		Face="Smile"; 
+		Reply="Thanks..";
+	};
+	["eightlegs_almost"]={
+		Say="Still trying to get rid of it, sit tight.";
+		Face="Smile"; 
+		Reply="Oh.. okay.";
+	};
+	["eightlegs_return"]={
+		Say="I killed it. You don't have to worry about it now.";
+		Face="Joyful"; 
+		Reply="Thanks a lot..";
+	};
+	
+};
 
 if RunService:IsServer() then
 	-- MARK: Erik Handler

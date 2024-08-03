@@ -11,26 +11,37 @@ local missionId = 15;
 --==
 
 -- MARK: Stephanie Dialogues
-Dialogues.Stephanie.Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="chainReaction_start"; Dialogue="Interesting, what is it?";
-			Face="Confident"; Reply="Well, this one's called Electric Charge, I believe it damages nearby enemeis, seems useful for taking out multiple enemies.";
-			FailResponses = {
-				{Reply="Stephanie hasn't finished reading the book yet.."};
-			};
+Dialogues.Stephanie.DialogueStrings = {
+	["chainReaction_start"]={
+		CheckMission=missionId;
+		Say="Interesting, what is it?";
+		Face="Confident"; 
+		Reply="Well, this one's called Electric Charge, I believe it damages nearby enemeis, seems useful for taking out multiple enemies.";
+		FailResponses = {
+			{Reply="Stephanie hasn't finished reading the book yet.."};
 		};
-		{Tag="chainReaction_useful"; Dialogue="That's definitely useful."; 
-			Face="Skeptical"; Reply="Yeah, I finished reading the book and there are two more of these elemental mods which I couldn't figure out how to make the blueprint for."};
-		{Tag="chainReaction_otherTwo"; Dialogue="Which are they?";
-			Face="Surprise"; Reply="Frost and toxic.. I've worked out the fire and electricity mods blueprints now, but for the other two, I'm not sure what the materials are. Anyways, I'll call you when I figured it out."};
-		
-		{Tag="guide_battery"; Dialogue="Where can I find batteries?";
-			Reply="I think there might be some in the warehouse, if not maybe corrosive might have some..."};
-		{Tag="guide_wires"; Dialogue="Where can I find wires?";
-			Reply="I think there might be some in the factory, if not maybe zpider might have some..."};
-		
 	};
-end
+	["chainReaction_useful"]={
+		Say="That's definitely useful."; 
+		Face="Skeptical"; 
+		Reply="Yeah, I finished reading the book and there are two more of these elemental mods which I couldn't figure out how to make the blueprint for.";
+	};
+	["chainReaction_otherTwo"]={
+		Say="Which are they?";
+		Face="Surprise"; 
+		Reply="Frost and toxic.. I've worked out the fire and electricity mods blueprints now, but for the other two, I'm not sure what the materials are. Anyways, I'll call you when I figured it out.";
+	};
+	
+	["guide_battery"]={
+		Say="Where can I find batteries?";
+		Reply="I think there might be some in the warehouse, if not maybe corrosive might have some...";
+	};
+	["guide_wires"]={
+		Say="Where can I find wires?";
+		Reply="I think there might be some in the factory, if not maybe zpider might have some...";
+	};
+	
+};
 
 if RunService:IsServer() then
 	-- MARK: Stephanie Handler

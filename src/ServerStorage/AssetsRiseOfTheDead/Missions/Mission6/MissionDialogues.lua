@@ -11,18 +11,22 @@ local missionId = 6;
 --==
 
 -- !outline: Robert Dialogues
-Dialogues.Robert.Dialogues = function()
-	return {		
-		{Tag="firstRescue_how"; CheckMission=missionId; Dialogue="How can I get you out?!"; 
-			Face="Worried"; Reply="Ummmm, try destroying this wooden barricade.";
-			FailResponses = {
-				{Reply="I think you're going need to bring some better tools to destroy this barricade."};
-			};
+Dialogues.Robert.DialogueStrings = {		
+	["firstRescue_how"]={
+		CheckMission=missionId;
+		Say="How can I get you out?!"; 
+		Face="Worried"; 
+		Reply="Ummmm, try destroying this wooden barricade.";
+		FailResponses = {
+			{Reply="I think you're going need to bring some better tools to destroy this barricade."};
 		};
-		{Tag="firstRescue_standback"; Dialogue="Alright, stand back."; 
-			Face="Surprise"; Reply="Hope this works..."};
 	};
-end
+	["firstRescue_standback"]={
+		Say="Alright, stand back."; 
+		Face="Surprise"; 
+		Reply="Hope this works...";
+	};
+};
 
 if RunService:IsServer() then
 	-- !outline: Robert Handler

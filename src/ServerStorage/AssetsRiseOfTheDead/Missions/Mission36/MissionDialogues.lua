@@ -11,28 +11,37 @@ local missionId = 36;
 --==
 
 -- MARK: Erik Dialogues
-Dialogues.Erik.Dialogues = function()
-	return {
-		{Tag="calmingtunes_start"; Face="Ugh";
-			Dialogue="Hey.. hey, it can't hurt you. Don't worry."; 
-			Reply="It's driving me insane, I need something to calm me down."};
-
-		{CheckMission=missionId; Tag="calmingtunes_musicbox"; Dialogue="Okay, I have an idea. Wait here."; 
-			Reply="Okay.."};
-		
-		{Tag="calmingtunes_wait"; Face="Worried";
-			Dialogue="A music box might help calm you down."; 
-			Reply="Hmm.. I'll be waiting, hope it works."};
-		
-		{Tag="calmingtunes_give"; Face="Joyful";
-			Dialogue="Here you go, a music box."; 
-			Reply="Ooh, thanks dude."};
-
-		{Tag="calmingtunes_giveBoombox"; Face="Suspicious";
-			Dialogue="Here you go, a boom box."; 
-			Reply="Erik needs a Music box instead of a Boombox."};
+Dialogues.Erik.DialogueStrings = {
+	["calmingtunes_start"]={
+		Face="Ugh";
+		Say="Hey.. hey, it can't hurt you. Don't worry."; 
+		Reply="It's driving me insane, I need something to calm me down.";
 	};
-end
+
+	["calmingtunes_musicbox"]={
+		CheckMission=missionId;
+		Say="Okay, I have an idea. Wait here."; 
+		Reply="Okay..";
+	};
+	
+	["calmingtunes_wait"]={
+		Face="Worried";
+		Say="A music box might help calm you down."; 
+		Reply="Hmm.. I'll be waiting, hope it works.";
+	};
+	
+	["calmingtunes_give"]={
+		Face="Joyful";
+		Say="Here you go, a music box."; 
+		Reply="Ooh, thanks dude.";
+	};
+
+	["calmingtunes_giveBoombox"]={
+		Face="Suspicious";
+		Say="Here you go, a boom box."; 
+		Reply="Erik needs a Music box instead of a Boombox.";
+	};
+};
 
 if RunService:IsServer() then
 	-- MARK: Erik Handler

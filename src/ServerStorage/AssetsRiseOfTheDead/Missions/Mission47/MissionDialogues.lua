@@ -11,30 +11,34 @@ local missionId = 47;
 --==
 
 -- MARK: Carlos Dialogues
-Dialogues.Carlos.Dialogues = function()
-	return {
-		{Tag="soundOfMusic_get";
-			Dialogue="Hey, where can I get a flute like yours?";
-			Reply="Oh, I'm glad you asked. I want to spread hope with music, I'd gladly give you one of my extra new flute if you can learn to play it."};
-		{Tag="soundOfMusic_sure"; CheckMission=missionId;
-			Dialogue="Sure, can you teach me?";
-			Reply="Of course, give me a second to find it."};
-		{Tag="soundOfMusic_full";
-			Dialogue="*Waits patiently for the flute*";
-			Reply="Your inventory is full."};
-		{Tag="soundOfMusic_take";
-			Dialogue="*Waits patiently for the flute*";
-			Reply="Here you go, try to play these notes to me."};
-		{Tag="soundOfMusic_done";
-			Dialogue="That was great! Please share your musical knowledge with others too!";
-			Reply="Thanks, that was fun."};
-		
-		
-		{Tag="soundOfMusic_how";
-			Dialogue="How do I do this again?";
-			Reply="Okay, you need to equip the flute, then use it to play these notes. C, C, G, F, D#, D, D, D, F, D#, D, C, C, D#, D, D#, D, D#."};
+Dialogues.Carlos.DialogueStrings = {
+	["soundOfMusic_get"]={
+		Say="Hey, where can I get a flute like yours?";
+		Reply="Oh, I'm glad you asked. I want to spread hope with music, I'd gladly give you one of my extra new flute if you can learn to play it.";
 	};
-end
+	["soundOfMusic_sure"]={
+		CheckMission=missionId;
+		Say="Sure, can you teach me?";
+		Reply="Of course, give me a second to find it.";
+	};
+	["soundOfMusic_full"]={
+		Say="*Waits patiently for the flute*";
+		Reply="Your inventory is full.";
+	};
+	["soundOfMusic_take"]={
+		Say="*Waits patiently for the flute*";
+		Reply="Here you go, try to play these notes to me.";
+	};
+	["soundOfMusic_done"]={
+		Say="That was great! Please share your musical knowledge with others too!";
+		Reply="Thanks, that was fun.";
+	};
+	
+	["soundOfMusic_how"]={
+		Say="How do I do this again?";
+		Reply="Okay, you need to equip the flute, then use it to play these notes. C, C, G, F, D#, D, D, D, F, D#, D, C, C, D#, D, D#, D, D#.";
+	};
+};
 
 if RunService:IsServer() then
 	-- MARK: Carlos Handler

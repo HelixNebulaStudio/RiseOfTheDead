@@ -11,17 +11,17 @@ local missionId = 57;
 --==
 
 -- MARK: Mr. Klaws Dialogues
-Dialogues["Mr. Klaws"].Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="klawsWorkshop_init";
-			Dialogue="Sure, but where is your workshop?";
-			Reply="Here's a map, good luck!"};
-		{Tag="klawsWorkshop_done";
-			Dialogue="I found it, here you go..";
-			Reply="Hah thanks! I am moving your name to the good list."};
-		
+Dialogues["Mr. Klaws"].DialogueStrings = {
+	["klawsWorkshop_init"]={
+		CheckMission=missionId;
+		Say="Sure, but where is your workshop?";
+		Reply="Here's a map, good luck!";
 	};
-end
+	["klawsWorkshop_done"]={
+		Say="I found it, here you go..";
+		Reply="Hah thanks! I am moving your name to the good list.";
+	};
+};
 
 if RunService:IsServer() then
 	-- MARK: Mr. Klaws Handler

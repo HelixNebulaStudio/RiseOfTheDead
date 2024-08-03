@@ -13,108 +13,148 @@ local missionId = 58;
 --==
 
 -- !outline: Patrick Dialogues
-Dialogues.Patrick.Dialogues = function()
-	return {		
-		{Tag="doubleCross_init";
-			Face="Disbelief"; Reply="Thank god you're here. I need your help, something big is happening..";};
-		{Tag="doubleCross_1"; Dialogue="What's going on?";
-			Face="Serious"; Reply="Zark is planning a meet with the leader of R.A.T., Revas Remington, for an exchange and I am involved.."};
-		{Tag="doubleCross_2"; Face="Serious";
-			Dialogue="What!? Are they friends or something?";
-			Reply="Definitely not, there's a power struggle between the Bandits and the Rats for months and now Zark wants to make a \"peace\" offering."};
-		{Tag="doubleCross_3"; Face="Angry";
-			Dialogue="Sounds kinda sus..";
-			Reply="Exactly, it's a trap and there's internal conflicts among the Bandits because Zark is about to trigger a war."};
-		{Tag="doubleCross_4"; Face="Frustrated";
-			Dialogue="Oh god, a war between the Bandits and the Rats..";
-			Reply="I got to defect, the Bandits are chaotic, disorganized and I can't leave on my own, they will hunt me down."};
-		{CheckMission=missionId;
-			Tag="doubleCross_5"; Face="Confident";
-			Dialogue="What can I do to help?";
-			Reply="I need you to help me convince Revas to let me into their ranks by telling them about the trap.";
-			FailResponses = {
-				{Reply="Come back when you are prepared."};
-			};	
-		};
-
-		{Tag="doubleCross_6"; Face="Surprise"; 
-			Reply="Did you manage to talk to Revas?";};
-		{Tag="doubleCross_7"; Face="Skeptical";
-			Dialogue="Yes, he said you need to prove yourself if you want to join the Rats. Here's the instructions...";
-			Reply="*Takes envelope & reads letter* Hmmm.. Okay, I know what to do. We will have to meet at the Rat's cargo ship.."};
-		{Tag="doubleCross_travelToCargoShip"; Face="Confident";
-			Dialogue="Meet you at the Rat's cargo ship then..";
-			Reply="I'll see you there soon..";
-			ReplyFunction=function(dialogPacket)
-				local npcModel = dialogPacket.Prefab;
-				if npcModel:FindFirstChild("doubleCrossInteractable") then
-					local localPlayer = game.Players.LocalPlayer;
-					local modData = require(localPlayer:WaitForChild("DataModule"));
-
-					modData.InteractRequest(npcModel.doubleCrossInteractable, npcModel.PrimaryPart);
-				end
-			end};
-
-		{Tag="doubleCross_17"; Face="Frustrated"; 
-			Reply="*groan* Bring me a medkit would ya?";};
-		{Tag="doubleCross_giveMedkit"; Face="Serious";
-			Dialogue="Here you go.. *give medkit*";
-			Reply="Thanks.. Heh, guess getting into the Rats wasn't that easy.. Revas is more calculated than I thought."};
-		{Tag="doubleCross_18"; Face="Skeptical";
-			Dialogue="Just another tyrant I guess.. You're better off here.";
-			Reply="Yeah! You know what, we could band up people to form our own group instead! Let's talk more about it later, I need some rest.."};
-
+Dialogues.Patrick.DialogueStrings = {		
+	["doubleCross_init"]={
+		Face="Disbelief"; 
+		Reply="Thank god you're here. I need your help, something big is happening..";
 	};
-end
+	["doubleCross_1"]={
+		Say="What's going on?";
+		Face="Serious"; 
+		Reply="Zark is planning a meet with the leader of R.A.T., Revas Remington, for an exchange and I am involved..";
+	};
+	["doubleCross_2"]={
+		Face="Serious";
+		Say="What!? Are they friends or something?";
+		Reply="Definitely not, there's a power struggle between the Bandits and the Rats for months and now Zark wants to make a \"peace\" offering.";
+	};
+	["doubleCross_3"]={
+		Face="Angry";
+		Say="Sounds kinda sus..";
+		Reply="Exactly, it's a trap and there's internal conflicts among the Bandits because Zark is about to trigger a war.";
+	};
+	["doubleCross_4"]={
+		Face="Frustrated";
+		Say="Oh god, a war between the Bandits and the Rats..";
+		Reply="I got to defect, the Bandits are chaotic, disorganized and I can't leave on my own, they will hunt me down.";
+	};
+	["doubleCross_5"]={
+		CheckMission=missionId;
+		Face="Confident";
+		Say="What can I do to help?";
+		Reply="I need you to help me convince Revas to let me into their ranks by telling them about the trap.";
+		FailResponses = {
+			{Reply="Come back when you are prepared."};
+		};	
+	};
+
+	["doubleCross_6"]={
+		Face="Surprise"; 
+		Reply="Did you manage to talk to Revas?";
+	};
+	["doubleCross_7"]={
+		Face="Skeptical";
+		Say="Yes, he said you need to prove yourself if you want to join the Rats. Here's the instructions...";
+		Reply="*Takes envelope & reads letter* Hmmm.. Okay, I know what to do. We will have to meet at the Rat's cargo ship..";
+	};
+	["doubleCross_travelToCargoShip"]={
+		Face="Confident";
+		Say="Meet you at the Rat's cargo ship then..";
+		Reply="I'll see you there soon..";
+		ReplyFunction=function(dialogPacket)
+			local npcModel = dialogPacket.Prefab;
+			if npcModel:FindFirstChild("doubleCrossInteractable") then
+				local localPlayer = game.Players.LocalPlayer;
+				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+
+				modData.InteractRequest(npcModel.doubleCrossInteractable, npcModel.PrimaryPart);
+			end
+		end
+	};
+
+	["doubleCross_17"]={
+		Face="Frustrated"; 
+		Reply="*groan* Bring me a medkit would ya?";
+	};
+	["doubleCross_giveMedkit"]={
+		Face="Serious";
+		Say="Here you go.. *give medkit*";
+		Reply="Thanks.. Heh, guess getting into the Rats wasn't that easy.. Revas is more calculated than I thought.";
+	};
+	["doubleCross_18"]={
+		Face="Skeptical";
+		Say="Just another tyrant I guess.. You're better off here.";
+		Reply="Yeah! You know what, we could band up people to form our own group instead! Let's talk more about it later, I need some rest..";
+	};
+
+};
 
 
 -- !outline: Revas Dialogues
-Dialogues.Revas.Dialogues = function()
-	return {
-		{Tag="doubleCross_1"; Face="Smirk";
-			Dialogue="I have insider knowledge of what the Bandits are planning..";
-			Reply="And who is this informant may I ask?"};
-		{Tag="doubleCross_2"; Face="Confident";
-			Dialogue="A bandit who wants to defect. He is willing to give up information if you let him into the Rats.";
-			Reply="Interesting.. I already know the trap they are planning. If this person is true to their word, I just need one thing done."};
-		{Tag="doubleCross_3"; Face="Smirk";
-			Dialogue="Oh.. What is it?";
-			Reply="Give these the instructions to your friend, it will tell you what to do to join us.."};
-
-
-		{Tag="doubleCross_4"; Face="Confident"; 
-			Reply="Soo, have you given Patrick the envelope?";};
-		{Tag="doubleCross_5"; Face="Smile";
-			Dialogue="Yes. I gave him the instructions... Wait, how did you know it was Patrick?";
-			Reply="That's not important right now, I have one task for you.."};
-		{Tag="doubleCross_6"; Face="Smile";
-			Dialogue="What do I need to do?..";
-			Reply="You are going to hide in this crate behind me. We want to welcome the bandits without a threat. They are going to skim the place for security."};
-		{Tag="doubleCross_7"; Face="Smile";
-			Dialogue="Okay..";
-			Reply="Come out when the meeting happens and keep an eye out. If things goes wrong.. pull that lever."};
-		{Tag="doubleCross_8"; Face="Confident";
-			Dialogue="Alright, but what does the lever do?";
-			Reply="Don't worry about it.. Alright, in the crate you go.."};
-
+Dialogues.Revas.DialogueStrings = {
+	["doubleCross_1"]={
+		Face="Smirk";
+		Say="I have insider knowledge of what the Bandits are planning..";
+		Reply="And who is this informant may I ask?";
 	};
-end
+	["doubleCross_2"]={
+		Face="Confident";
+		Say="A bandit who wants to defect. He is willing to give up information if you let him into the Rats.";
+		Reply="Interesting.. I already know the trap they are planning. If this person is true to their word, I just need one thing done.";
+	};
+	["doubleCross_3"]={
+		Face="Smirk";
+		Say="Oh.. What is it?";
+		Reply="Give these the instructions to your friend, it will tell you what to do to join us..";
+	};
+
+
+	["doubleCross_4"]={
+		Face="Confident"; 
+		Reply="Soo, have you given Patrick the envelope?";
+	};
+	["doubleCross_5"]={
+		Face="Smile";
+		Say="Yes. I gave him the instructions... Wait, how did you know it was Patrick?";
+		Reply="That's not important right now, I have one task for you..";
+	};
+	["doubleCross_6"]={
+		Face="Smile";
+		Say="What do I need to do?..";
+		Reply="You are going to hide in this crate behind me. We want to welcome the bandits without a threat. They are going to skim the place for security.";
+	};
+	["doubleCross_7"]={
+		Face="Smile";
+		Say="Okay..";
+		Reply="Come out when the meeting happens and keep an eye out. If things goes wrong.. pull that lever.";
+	};
+	["doubleCross_8"]={
+		Face="Confident";
+		Say="Alright, but what does the lever do?";
+		Reply="Don't worry about it.. Alright, in the crate you go..";
+	};
+
+};
 
 
 -- !outline: Caitlin Dialogues
-Dialogues.Caitlin.Dialogues = function()
-	return {
-		{Tag="doubleCross_1"; Face="Suspicious";
-			Dialogue="Hey err.. I need to talk to Revas Remington about something important.";
-			Reply="What makes you think Mr. Remington would want to meet you?"};
-		{Tag="doubleCross_2"; Face="Suspicious";
-			Dialogue="Let's just say I know an informant who has information on the Bandits.";
-			Reply="Is that so.. I'll pass the information up the chain, if he wants to talk to you, he will let you know."};
-		{Tag="doubleCross_3"; Face="Confident";
-			Dialogue="Soo.. What did he say?";
-			Reply="Guess it's your lucky day, head on up.."};
+Dialogues.Caitlin.DialogueStrings = {
+	["doubleCross_1"]={
+		Face="Suspicious";
+		Say="Hey err.. I need to talk to Revas Remington about something important.";
+		Reply="What makes you think Mr. Remington would want to meet you?";
 	};
-end
+	["doubleCross_2"]={
+		Face="Suspicious";
+		Say="Let's just say I know an informant who has information on the Bandits.";
+		Reply="Is that so.. I'll pass the information up the chain, if he wants to talk to you, he will let you know.";
+	};
+	["doubleCross_3"]={
+		Face="Confident";
+		Say="Soo.. What did he say?";
+		Reply="Guess it's your lucky day, head on up..";
+	};
+};
 
 if RunService:IsServer() then
 	-- !outline: Patrick Handler

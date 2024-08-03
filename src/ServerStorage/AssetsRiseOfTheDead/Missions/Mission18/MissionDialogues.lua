@@ -14,58 +14,83 @@ local missionId = 18;
 --==
 
 -- !outline: Jane Dialogues
-Dialogues.Jane.Dialogues = function()
-	return {
-		{Tag="aNewCommunity_okay"; Dialogue="Okay..";
-			Face="Surprise"; Reply="Radio: *Static*..Help!..*Static*..Anyone..out..there....*Static*\n\n*Static*Please..respond..*Static*...We..are..in..the..sewers!..*Static*.."};
-		{Tag="aNewCommunity_help"; CheckMission=missionId; Dialogue="Oh no, they need help.";
-			Face="Disbelief"; Reply="Sounds like they're deep inside the sewers. They could be in danger, you need to find them. Oh, and ask Robert to go along with you, he can help..";
-			FailResponses = {
-				{Reply="Prepare yourself before we go further out there.."};
-			};	
-		};
-
+Dialogues.Jane.DialogueStrings = {
+	["aNewCommunity_okay"]={
+		Say="Okay..";
+		Face="Surprise"; 
+		Reply="Radio: *Static*..Help!..*Static*..Anyone..out..there....*Static*\n\n*Static*Please..respond..*Static*...We..are..in..the..sewers!..*Static*..";
 	};
-end
+	["aNewCommunity_help"]={
+		CheckMission=missionId;
+		Say="Oh no, they need help.";
+		Face="Disbelief"; 
+		Reply="Sounds like they're deep inside the sewers. They could be in danger, you need to find them. Oh, and ask Robert to go along with you, he can help..";
+		FailResponses = {
+			{Reply="Prepare yourself before we go further out there.."};
+		};	
+	};
+
+};
 
 -- !outline: Robert Dialogues
-Dialogues.Robert.Dialogues = function()
-	return {
-		{Tag="aNewCommunity_joinMe"; Dialogue="We heard someone calling for help on the Radio, they said they were in the sewers.\n\nJane wants you to join me to find them.";
-			Face="Question"; Reply="Umm alright, but the sewers sure is going to be nasty."};
-		{Tag="aNewCommunity_warn"; Dialogue="Alright, be careful on your way back. I'll talk to Carlson to know more about these bandits.";
-			Face="Confident"; Reply="Ok dude, stay safe."};
+Dialogues.Robert.DialogueStrings = {
+	["aNewCommunity_joinMe"]={
+		Say="We heard someone calling for help on the Radio, they said they were in the sewers.\n\nJane wants you to join me to find them.";
+		Face="Question"; 
+		Reply="Umm alright, but the sewers sure is going to be nasty.";
 	};
-end
+	["aNewCommunity_warn"]={
+		Say="Alright, be careful on your way back. I'll talk to Carlson to know more about these bandits.";
+		Face="Confident"; 
+		Reply="Ok dude, stay safe.";
+	};
+};
 
 -- !outline: Carlson Dialogues
-Dialogues.Carlson.Dialogues = function()
-	return {
-		{Tag="aNewCommunity_help"; Dialogue="Hey, how can I help you?";
-			Face="Frustrated"; Reply="I just need some medkits please.."};
-		{Tag="aNewCommunity_again"; Dialogue="Sorry, what do you need again?";
-			Face="Tired"; Reply="Some medkits, please.."};
-		{Tag="aNewCommunity_here"; Dialogue="Here's some medkits.";
-			Face="Yeesh"; Reply="Thanks a lot.. I'll be much better later."};
-
-		{Tag="aNewCommunity_event"; Dialogue="What happened here?";
-			Face="Frustrated"; Reply="We were attacked by a group of scavenging bandits. They asked us to prepare enough food next time otherwise they will kill us.."};
-		{Tag="aNewCommunity_bandits"; Dialogue="Do you know where the bandits live?";
-			Face="Skeptical"; Reply="No idea, but they have weapons and a lot of people, fighting them would not be a good idea."};
-
+Dialogues.Carlson.DialogueStrings = {
+	["aNewCommunity_help"]={
+		Say="Hey, how can I help you?";
+		Face="Frustrated"; 
+		Reply="I just need some medkits please..";
 	};
-end
+	["aNewCommunity_again"]={
+		Say="Sorry, what do you need again?";
+		Face="Tired"; 
+		Reply="Some medkits, please..";
+	};
+	["aNewCommunity_here"]={
+		Say="Here's some medkits.";
+		Face="Yeesh"; 
+		Reply="Thanks a lot.. I'll be much better later.";
+	};
+
+	["aNewCommunity_event"]={
+		Say="What happened here?";
+		Face="Frustrated"; 
+		Reply="We were attacked by a group of scavenging bandits. They asked us to prepare enough food next time otherwise they will kill us..";
+	};
+	["aNewCommunity_bandits"]={
+		Say="Do you know where the bandits live?";
+		Face="Skeptical";
+		Reply="No idea, but they have weapons and a lot of people, fighting them would not be a good idea.";
+	};
+
+};
 
 -- !outline: Erik Dialogues
-Dialogues.Erik.Dialogues = function()
-	return {
-		{Tag="aNewCommunity_who"; Dialogue="Who attacked you?";
-			Face="Disgusted"; Reply="We were attacked by bandits and they took our food."};
-		{Tag="aNewCommunity_took"; Dialogue="I think they are gone now, you don't have to worry.";
-			Face="Worried"; Reply="Oh, okay, Thanks."};
-
+Dialogues.Erik.DialogueStrings = {
+	["aNewCommunity_who"]={
+		Say="Who attacked you?";
+		Face="Disgusted"; 
+		Reply="We were attacked by bandits and they took our food.";
 	};
-end
+	["aNewCommunity_took"]={
+		Say="I think they are gone now, you don't have to worry.";
+		Face="Worried"; 
+		Reply="Oh, okay, Thanks.";
+	};
+
+};
 
 
 if RunService:IsServer() then

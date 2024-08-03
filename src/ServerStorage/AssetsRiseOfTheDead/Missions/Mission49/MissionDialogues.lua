@@ -11,17 +11,25 @@ local missionId = 49;
 --==
 
 -- !outline: Mason Dialogues
-Dialogues.Mason.Dialogues = function()
-	return {
-		{Tag="navigation_sure"; Dialogue="Sure, what do you need?";
-			Face="Welp"; Reply="I left a book somewhere while scavenging. I was out of space so I had to leave it, I need you to look for it."};
-		{Tag="navigation_where"; Dialogue="Oh alright, where is it?"; 
-			Face="Confident"; Reply="It should be in the abandon office beside the bank. I think you should buy a GPS from the shop to navigate there.\n\nBe careful on your way!"};
-		{Tag="navigation_done"; Dialogue="I found it, the Vehicle Repair Manual.";
-			Face="Frustrated"; Reply="YES! That's the one..\n*reads book*\nHmmm, well I'll be ####ed, I have no clue where to find these components to fix the car.."};
-
+Dialogues.Mason.DialogueStrings = {
+	["navigation_sure"]={
+		Say="Sure, what do you need?";
+		Face="Welp"; 
+		Reply="I left a book somewhere while scavenging. I was out of space so I had to leave it, I need you to look for it.";
 	};
-end
+	["navigation_where"]={
+		Say="Oh alright, where is it?"; 
+		Face="Confident"; 
+		Reply="It should be in the abandon office beside the bank. I think you should buy a GPS from the shop to navigate there.\n\nBe careful on your way!";
+	};
+	["navigation_done"]={
+		Say="I found it, the Vehicle Repair Manual.";
+		Face="Frustrated"; 
+		Reply="YES! That's the one..\n*reads book*\nHmmm, well I'll be ####ed, I have no clue where to find these components to fix the car..";
+	};
+
+};
+
 
 if RunService:IsServer() then
 	-- !outline: Mason Handler

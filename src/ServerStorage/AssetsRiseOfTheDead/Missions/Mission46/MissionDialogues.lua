@@ -11,19 +11,22 @@ local missionId = 46;
 --==
 
 -- MARK: Mr. Klaws Dialogues
-Dialogues["Mr. Klaws"].Dialogues = function()
-	return {
-		{Tag="warmup_init";
-			Dialogue="Sure, how do I do that?";
-			Reply="You'll need coal. The zombies has been pretty naughty so they might drop some coal when you kill them."};
-		{CheckMission=missionId; Tag="warmup_start";
-			Dialogue="I'm on it.";
-			Reply="Chip chop!"};
-		{Tag="warmup_done";
-			Dialogue="I've started the fireplace.";
-			Reply="Goodjob, it will keep these surivors warm and cozy."};
+Dialogues["Mr. Klaws"].DialogueStrings = {
+	["warmup_init"]={
+		Say="Sure, how do I do that?";
+		Reply="You'll need coal. The zombies has been pretty naughty so they might drop some coal when you kill them.";
 	};
-end
+	["warmup_start"]={
+		CheckMission=missionId;
+		Say="I'm on it.";
+		Reply="Chip chop!";
+	};
+	["warmup_done"]={
+		Say="I've started the fireplace.";
+		Reply="Goodjob, it will keep these surivors warm and cozy.";
+	};
+};
+
 
 if RunService:IsServer() then
 	-- MARK: Mr. Klaws Handler

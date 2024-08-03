@@ -11,9 +11,7 @@ local missionId = 61;
 --==
 
 -- MARK: Patrick Dialogues
-Dialogues.Patrick.Dialogues = function()
-	return {};
-end
+Dialogues.Patrick.DialogueStrings = {};
 
 if RunService:IsServer() then
 	-- MARK: Patrick Handler

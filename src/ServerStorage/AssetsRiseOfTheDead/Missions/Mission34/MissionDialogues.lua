@@ -11,25 +11,33 @@ local missionId = 34;
 --==
 
 -- MARK: Molly Dialogues
-Dialogues.Molly.Dialogues = function()
-	return {
-		{Tag="escort_init"; Dialogue="Sure, how can I help?"; 
-			Reply="So.. This person wants to get somewhere, could you escort the person there?"};
-
-		{Tag="escort_alright"; Dialogue="Sure, hope it's not far.."; 
-			Reply="Mhm.. Alright, get going.."};
-			
-		{Tag="escort_heal"; Dialogue="Could you heal the person?"; 
-			Reply="Ugh, how hard is it just to escort someone to some place. Here, healed."};
-		
-		{Tag="escort_retry"; Dialogue="Sorry, I should be more focused. Can we try again?"; 
-			Reply="Alright, be careful this time!"};
-		
-		{Tag="escort_complete"; Dialogue="It's done, we've safely arrived to the destination."; 
-			Reply="Hmmm.. Good job I guess, come back next time for another one."};
-		
+Dialogues.Molly.DialogueStrings = {
+	["escort_init"]={
+		Say="Sure, how can I help?"; 
+		Reply="So.. This person wants to get somewhere, could you escort the person there?";
 	};
-end
+
+	["escort_alright"]={
+		Say="Sure, hope it's not far.."; 
+		Reply="Mhm.. Alright, get going..";
+	};
+		
+	["escort_heal"]={
+		Say="Could you heal the person?"; 
+		Reply="Ugh, how hard is it just to escort someone to some place. Here, healed.";
+	};
+	
+	["escort_retry"]={
+		Say="Sorry, I should be more focused. Can we try again?"; 
+		Reply="Alright, be careful this time!";
+	};
+	
+	["escort_complete"]={
+		Say="It's done, we've safely arrived to the destination."; 
+		Reply="Hmmm.. Good job I guess, come back next time for another one.";
+	};
+	
+};
 
 if RunService:IsServer() then
 	-- MARK: Molly Handler

@@ -11,33 +11,38 @@ local missionId = 32;
 --==
 
 -- MARK: Bunny Man Dialogues
-Dialogues["Bunny Man"].Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="reborn_init";
-			Dialogue="Yeah, what do you need me for?"; 
-			Reply="You helped me, I will help you back, you need to be reborn. Complete my challenge and you will be reborn.."};
-
-		{Tag="reborn_what";
-			Dialogue="What challenge?"; 
-			Reply="Err.. I will bring you there. Let me know if you are ready for the challenge."};
-
-		{Tag="reborn_alright";
-			Dialogue="Umm, alright."; 
-			Reply="Err.. Good, good.."};
-		
-		{Tag="reborn_travel";
-			Dialogue="Bring me to the butchery."; 
-			Reply="Follow me.."};
-			
-		{Tag="reborn_complete";
-			Dialogue="Ummm.."; 
-			Reply="Now I can tell you anything you want to know.."};
-			 
-		{Tag="reborn_home";
-			Dialogue="Okay, can you bring me home now?"; 
-			Reply="Err.. alright."};
+Dialogues["Bunny Man"].DialogueStrings = {
+	["reborn_init"]={
+		CheckMission=missionId;
+		Say="Yeah, what do you need me for?"; 
+		Reply="You helped me, I will help you back, you need to be reborn. Complete my challenge and you will be reborn..";
 	};
-end
+
+	["reborn_what"]={
+		Say="What challenge?"; 
+		Reply="Err.. I will bring you there. Let me know if you are ready for the challenge.";
+	};
+
+	["reborn_alright"]={
+		Say="Umm, alright."; 
+		Reply="Err.. Good, good..";
+	};
+	
+	["reborn_travel"]={
+		Say="Bring me to the butchery."; 
+		Reply="Follow me..";
+	};
+		
+	["reborn_complete"]={
+		Say="Ummm.."; 
+		Reply="Now I can tell you anything you want to know..";
+	};
+		 
+	["reborn_home"]={
+		Say="Okay, can you bring me home now?"; 
+		Reply="Err.. alright.";
+	};
+};
 
 if RunService:IsServer() then
 	-- MARK: Bunny Man Handler

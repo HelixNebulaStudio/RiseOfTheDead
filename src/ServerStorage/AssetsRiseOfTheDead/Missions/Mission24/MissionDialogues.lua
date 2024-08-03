@@ -13,46 +13,66 @@ local missionId = 24;
 --==
 
 -- !outline: Jane Dialogues
-Dialogues.Jane.Dialogues = function()
-	return {		
-		{Tag="mia_yes"; CheckMission=missionId; Dialogue="Yeah, there were 2 survivors outside the other end of the sewers."; 
-			Face="Surprise"; Reply="Oh, under the Wrighton Dale Bridge?";
-			FailResponses = {
-				{Reply="Wait, I'm a bit busy.."};
-			};	
-		};
-		{Tag="mia_bridge"; Dialogue="Yeah, they said they were attacked by the bandits.. I thought Robert was coming back to tell you this. Did he come back?"; 
-			Face="Surprise"; Reply="No.. He hasn't been back for a while now, where did he say he was going?"};
-		{Tag="mia_warn"; Dialogue="Wait what!?.. He said he's coming back to warn you guys about the bandits."; 
-			Face="Scared"; Reply="Oh nooo, we need to find him."};
-
-		{Tag="mia_no"; Dialogue="Still no signs of him, but I think the bandits got him.."; 
-			Face="Scared"; Reply="*Gasp* This is bad.. You need to help us get to the bottom of this.."};
-		{Tag="mia_zombie"; Dialogue="There was a bandit, he was turning into a zombie. He said that something got him, but he wasn't bitten or anything.. He just turned.."; 
-			Face="Suspicious"; Reply="I'm no expert at this but many of the zombies I saw weren't bitten too!"};
+Dialogues.Jane.DialogueStrings = {		
+	["mia_yes"]={
+		CheckMission=missionId;
+		Say="Yeah, there were 2 survivors outside the other end of the sewers."; 
+		Face="Surprise"; Reply="Oh, under the Wrighton Dale Bridge?";
+		FailResponses = {
+			{Reply="Wait, I'm a bit busy.."};
+		};	
 	};
-end
+	["mia_bridge"]={
+		Say="Yeah, they said they were attacked by the bandits.. I thought Robert was coming back to tell you this. Did he come back?"; 
+		Face="Surprise"; 
+		Reply="No.. He hasn't been back for a while now, where did he say he was going?";
+	};
+	["mia_warn"]={
+		Say="Wait what!?.. He said he's coming back to warn you guys about the bandits."; 
+		Face="Scared"; 
+		Reply="Oh nooo, we need to find him.";
+	};
+
+	["mia_no"]={
+		Say="Still no signs of him, but I think the bandits got him.."; 
+		Face="Scared"; 
+		Reply="*Gasp* This is bad.. You need to help us get to the bottom of this..";
+	};
+	["mia_zombie"]={
+		Say="There was a bandit, he was turning into a zombie. He said that something got him, but he wasn't bitten or anything.. He just turned.."; 
+		Face="Suspicious"; 
+		Reply="I'm no expert at this but many of the zombies I saw weren't bitten too!";
+	};
+};
 
 -- !outline: Lennon Dialogues
-Dialogues.Lennon.Dialogues = function()
-	return {		
-		{Tag="mia_clue"; Dialogue="Hey, umm, have you seen a guy with a red beanie?"; 
-			Face="Bored"; Reply="Yeah, he came by and told me that be careful of bandits, and I told him, they should be careful of me!"};
-		{Tag="mia_thanks"; Dialogue="Oh, umm.. okay, Thanks."; 
-			Face="Joyful"; Reply="Yeah, I'm welcome. Huhuh."};
+Dialogues.Lennon.DialogueStrings = {		
+	["mia_clue"]={
+		Say="Hey, umm, have you seen a guy with a red beanie?"; 
+		Face="Bored"; 
+		Reply="Yeah, he came by and told me that be careful of bandits, and I told him, they should be careful of me!";
 	};
-end
+	["mia_thanks"]={
+		Say="Oh, umm.. okay, Thanks."; 
+		Face="Joyful"; 
+		Reply="Yeah, I'm welcome. Huhuh.";
+	};
+};
 
 -- !outline: Carlson Dialogues
-Dialogues.Carlson.Dialogues = function()
-	return {		
-		{Tag="mia_seen"; Dialogue="Hey, has Robert come by recently??"; 
-			Face="Suspicious"; Reply="No, but there were a lot of noise of bandits running by towards north. Did something happen to Robert?"};
-		{Tag="mia_thanks"; Dialogue="I think he's been kidnapped by the bandits.."; 
-			Face="Scared"; Reply="Oh Jesus! I remember hearing screaming too, that could had been him! You should head into the caves to look for him."};
-
+Dialogues.Carlson.DialogueStrings = {		
+	["mia_seen"]={
+		Say="Hey, has Robert come by recently??"; 
+		Face="Suspicious"; 
+		Reply="No, but there were a lot of noise of bandits running by towards north. Did something happen to Robert?";
 	};
-end
+	["mia_thanks"]={
+		Say="I think he's been kidnapped by the bandits.."; 
+		Face="Scared"; 
+		Reply="Oh Jesus! I remember hearing screaming too, that could had been him! You should head into the caves to look for him.";
+	};
+
+};
 
 if RunService:IsServer() then
 	-- !outline: Jane Handler

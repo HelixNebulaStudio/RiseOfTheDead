@@ -11,22 +11,36 @@ local missionId = 22;
 --==
 
 -- MARK: Carlson Dialogues
-Dialogues.Carlson.Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="thebackup_help"; Dialogue="Yup, what do you need help with?";
-			Face="Serious"; Reply="We are in deep trouble, we won't have enough food for the bandits the next time they attack.. I need you to help me get my hidden metal supplies to fortify this safehouse."};
-		{Tag="thebackup_thekey"; Dialogue="Absolutely, where is it?";
-			Face="Confident"; Reply="It's in the maintenance room, but I hid the room's key somewhere in the break room. Go find the key in order to unlock the maintenance room."};
-		
-		{Tag="thebackup_gotit"; Dialogue="*Gives 1000 metal*";
-			Face="Happy"; Reply="Ah, there we go, it's all here.\n\nThanks a lot $PlayerName, we'll see how we can fortify the safehouse with it."};
-		{Tag="thebackup_wait"; Dialogue="Wait, I'm still getting it..";
-			Face="Confident"; Reply="Okay."};
-		{Tag="thebackup_stolen"; Dialogue="There wasn't any metal there.";
-			Face="Frustrated"; Reply="Noooo! The bandits must have some how gotten it too. This is bad, what are we going to do?!\n\nThanks again for trying to help, we'll have to figure out something else."};
-	
+Dialogues.Carlson.DialogueStrings = {
+	["thebackup_help"]={
+		CheckMission=missionId;
+		Say="Yup, what do you need help with?";
+		Face="Serious"; 
+		Reply="We are in deep trouble, we won't have enough food for the bandits the next time they attack.. I need you to help me get my hidden metal supplies to fortify this safehouse.";
 	};
-end
+	["thebackup_thekey"]={
+		Say="Absolutely, where is it?";
+		Face="Confident"; 
+		Reply="It's in the maintenance room, but I hid the room's key somewhere in the break room. Go find the key in order to unlock the maintenance room.";
+	};
+	
+	["thebackup_gotit"]={
+		Say="*Gives 1000 metal*";
+		Face="Happy"; 
+		Reply="Ah, there we go, it's all here.\n\nThanks a lot $PlayerName, we'll see how we can fortify the safehouse with it.";
+	};
+	["thebackup_wait"]={
+		Say="Wait, I'm still getting it..";
+		Face="Confident"; 
+		Reply="Okay.";
+	};
+	["thebackup_stolen"]={
+		Say="There wasn't any metal there.";
+		Face="Frustrated"; 
+		Reply="Noooo! The bandits must have some how gotten it too. This is bad, what are we going to do?!\n\nThanks again for trying to help, we'll have to figure out something else.";
+	};
+
+};
 
 if RunService:IsServer() then
 	-- MARK: Carlson Handler

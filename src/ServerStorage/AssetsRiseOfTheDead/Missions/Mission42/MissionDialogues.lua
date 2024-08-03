@@ -11,48 +11,61 @@ local missionId = 42;
 --==
 
 -- MARK: Victor Dialogues
-Dialogues.Victor.Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="vt3_check"; Face="Happy";
-			Dialogue="Sure?"; 
-			Reply="Cool, just let me know when you're ready to travel."};
-
-		{Tag="vt3_vttravel"; Face="Confident";
-			Dialogue="I'm ready to go to the tombs."; 
-			Reply="Alright, let's go.";
-			ReplyFunction=function(dialogPacket)
-				local npcModel = dialogPacket.Prefab;
-				local LowerTorso = npcModel.LowerTorso;
-				if LowerTorso:FindFirstChild("Interactable") then
-					local localPlayer = game.Players.LocalPlayer;
-					local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-	
-					modData.InteractRequest(LowerTorso.Interactable, LowerTorso);
-				end
-			end
-		};
-
-		{Tag="vt3_follow"; Face="Skeptical";
-			Dialogue="Sure?"; 
-			Reply="Cool, just let me know when you're ready to travel."};
-		
-		{Tag="vt3_bargain"; Face="Grumpy";
-			Dialogue="No! You tried to kill me and now you are going to rot here."; 
-			Reply="Uggh. Fine. I'm sorry, if you get me out of here, you will never see me again."};
-
-		{Tag="vt3_depress"; Face="Worried";
-			Dialogue="I won't be making any deals with you.."; 
-			Reply="Well then, this is it huh.. "};
-		
-		{Tag="vt3_save"; Face="Tired";
-			Dialogue="*Save Victor*"; 
-			Reply="..."};
-
-		{Tag="vt3_dontsave"; Face="Tired";
-			Dialogue="*Kill Victor*"; 
-			Reply="..."};
+Dialogues.Victor.DialogueStrings = {
+	["vt3_check"]={
+		CheckMission=missionId;
+		Face="Happy";
+		Say="Sure?"; 
+		Reply="Cool, just let me know when you're ready to travel.";
 	};
-end
+
+	["vt3_vttravel"]={
+		Face="Confident";
+		Say="I'm ready to go to the tombs."; 
+		Reply="Alright, let's go.";
+		ReplyFunction=function(dialogPacket)
+			local npcModel = dialogPacket.Prefab;
+			local LowerTorso = npcModel.LowerTorso;
+			if LowerTorso:FindFirstChild("Interactable") then
+				local localPlayer = game.Players.LocalPlayer;
+				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+
+				modData.InteractRequest(LowerTorso.Interactable, LowerTorso);
+			end
+		end
+	};
+
+	["vt3_follow"]={
+		Face="Skeptical";
+		Say="Sure?"; 
+		Reply="Cool, just let me know when you're ready to travel.";
+	};
+	
+	["vt3_bargain"]={
+		Face="Grumpy";
+		Say="No! You tried to kill me and now you are going to rot here."; 
+		Reply="Uggh. Fine. I'm sorry, if you get me out of here, you will never see me again.";
+	};
+
+	["vt3_depress"]={
+		Face="Worried";
+		Say="I won't be making any deals with you.."; 
+		Reply="Well then, this is it huh.. ";
+	};
+	
+	["vt3_save"]={
+		Face="Tired";
+		Say="*Save Victor*"; 
+		Reply="...";
+	};
+
+	["vt3_dontsave"]={
+		Face="Tired";
+		Say="*Kill Victor*"; 
+		Reply="...";
+	};
+};
+
 
 if RunService:IsServer() then
 	-- MARK: Victor Handler

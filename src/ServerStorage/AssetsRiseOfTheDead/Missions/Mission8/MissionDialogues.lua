@@ -12,29 +12,36 @@ local missionId = 8;
 --==
 
 -- !outline: Dr. Deniski Dialogues
-Dialogues["Dr. Deniski"].Dialogues = function()
-	return {		
-		{Tag="bandageup_start"; CheckMission=missionId; Dialogue="Hey doctor, how can I heal myself when I'm outside?"; 
-			Face="Surprise"; Reply="I was researching the zombie blood from the arm you gave me earlier, it was pretty strange. They are apparently not infectious, something else must be turning people into zombies..";
-			FailResponses = {
-				{Reply="Hold on, I'm quite busy right now.."};
-			};
-		};
-		{Tag="bandageup_get"; Dialogue="oh no.."; 
-			Face="Confident"; Reply="Anyways, I made this medkit blueprint which you can use to heal yourself, wait while I look for where I placed it... *searches*"};
-		{Tag="bandageup_wait"; Dialogue="*waits*"; 
-			Face="Happy"; Reply="Ah, here it is. Here you go.";
+Dialogues["Dr. Deniski"].DialogueStrings = {		
+	["bandageup_start"]={
+		CheckMission=missionId;
+		Say="Hey doctor, how can I heal myself when I'm outside?"; 
+		Face="Surprise"; 
+		Reply="I was researching the zombie blood from the arm you gave me earlier, it was pretty strange. They are apparently not infectious, something else must be turning people into zombies..";
+		FailResponses = {
+			{Reply="Hold on, I'm quite busy right now.."};
 		};
 	};
-end
+	["bandageup_get"]={
+		Say="oh no.."; 
+		Face="Confident"; 
+		Reply="Anyways, I made this medkit blueprint which you can use to heal yourself, wait while I look for where I placed it... *searches*";
+	};
+	["bandageup_wait"]={
+		Say="*waits*"; 
+		Face="Happy"; 
+		Reply="Ah, here it is. Here you go.";
+	};
+};
 
 -- !outline: Carlos Dialogues
-Dialogues.Carlos.Dialogues = function()
-	return {		
-		{Tag="pillsHere_where"; Dialogue="Hey, where's can I find medicine?";
-			Face="Excited"; Reply="It's nearby that storage crate over there."};
+Dialogues.Carlos.DialogueStrings = {		
+	["pillsHere_where"]={
+		Say="Hey, where's can I find medicine?";
+		Face="Excited"; 
+		Reply="It's nearby that storage crate over there.";
 	};
-end
+};
 
 if RunService:IsServer() then
 	-- !outline: Dr. Deniski Handler

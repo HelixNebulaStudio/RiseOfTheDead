@@ -12,39 +12,68 @@ local missionId = 78;
 --==
 
 -- MARK: Lydia Dialogues
-Dialogues.Lydia.Dialogues = function()
-	return {
-		{Tag="killhue_init";
-			Face="Happy"; Reply="Hi $PlayerName!";};
-
-		{CheckMission=missionId; Tag="killhue_start"; Dialogue="Hey Lydia, how are you doing?";
-			Face="Worried"; Reply="I'm alright.. But since you're here, I have a request.";
-			FailResponses = {
-				{Reply="Hmm, actually nevermind.."};
-			};
-		};
-		{Tag="killhue_start2"; Dialogue="Oh, what are you requesting?";
-			Face="Worried"; Reply="I've been wanting to kill zombies, but I've never used a gun before."};
-		{Tag="killhue_start3"; Dialogue="I could teach you how to use a gun.";
-			Face="Happy"; Reply="Yay! Oh, but I don't actually have a gun."};
-		{Tag="killhue_start4"; Dialogue="Don't worry, I will get you a gun.";
-			Face="Happy"; Reply="Oooo. Sure, I'll wait here."};
-
-		{Tag="killhue_giveGun"; Dialogue="Hey, I got a gun for you.";
-			Face="Happy"; Reply="Yay!"};
-
-		{Tag="killhue_finInit";
-			Face="Joyful"; Reply="That was really fun, thanks for letting me learn and shoot some zombies!";};
-		{Tag="killhue_fin1"; Dialogue="You did pretty good! Now you can defend yourself with the gun.";
-			Face="Suspicious"; Reply="Mhm! Hmmmm, something still bothers me. It's not too important but.."};
-		{Tag="killhue_fin2"; Dialogue="..? What's bothering you?";
-			Face="Oops"; Reply="The colors of the gun.. Hahah! I like to decorate the things I have.."};
-		{Tag="killhue_fin3"; Dialogue="Ohh";
-			Face="Oops"; Reply="You know what, since you taught me how to shoot, how about I scavenge some new colors for your weapons?"};
-		{Tag="killhue_fin4"; Dialogue="Sure, I guess..";
-			Face="Happy"; Reply="Yay! I'll see what I can find."};
+Dialogues.Lydia.DialogueStrings = {
+	["killhue_init"]={
+		Face="Happy"; 
+		Reply="Hi $PlayerName!";
 	};
-end
+
+	["killhue_start"]={
+		CheckMission=missionId; 
+		Say="Hey Lydia, how are you doing?";
+		Face="Worried"; 
+		Reply="I'm alright.. But since you're here, I have a request.";
+		FailResponses = {
+			{Reply="Hmm, actually nevermind.."};
+		};
+	};
+	["killhue_start2"]={
+		Say="Oh, what are you requesting?";
+		Face="Worried"; 
+		Reply="I've been wanting to kill zombies, but I've never used a gun before.";
+	};
+	["killhue_start3"]={
+		Say="I could teach you how to use a gun.";
+		Face="Happy"; 
+		Reply="Yay! Oh, but I don't actually have a gun.";
+	};
+	["killhue_start4"]={
+		Say="Don't worry, I will get you a gun.";
+		Face="Happy"; 
+		Reply="Oooo. Sure, I'll wait here.";
+	};
+
+	["killhue_giveGun"]={
+		Say="Hey, I got a gun for you.";
+		Face="Happy"; 
+		Reply="Yay!";
+	};
+
+	["killhue_finInit"]={
+		Face="Joyful"; 
+		Reply="That was really fun, thanks for letting me learn and shoot some zombies!";
+	};
+	["killhue_fin1"]={
+		Say="You did pretty good! Now you can defend yourself with the gun.";
+		Face="Suspicious"; 
+		Reply="Mhm! Hmmmm, something still bothers me. It's not too important but..";
+	};
+	["killhue_fin2"]={
+		Say="..? What's bothering you?";
+		Face="Oops"; 
+		Reply="The colors of the gun.. Hahah! I like to decorate the things I have..";
+	};
+	["killhue_fin3"]={
+		Say="Ohh";
+		Face="Oops"; 
+		Reply="You know what, since you taught me how to shoot, how about I scavenge some new colors for your weapons?";
+	};
+	["killhue_fin4"]={
+		Say="Sure, I guess..";
+		Face="Happy"; 
+		Reply="Yay! I'll see what I can find.";
+	};
+};
 
 if RunService:IsServer() then
 	-- MARK: Lydia Handler

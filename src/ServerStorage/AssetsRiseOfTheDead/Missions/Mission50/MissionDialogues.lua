@@ -11,39 +11,47 @@ local missionId = 50;
 --==
 
 -- MARK: Bunny Man Dialogues
-Dialogues["Bunny Man"].Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="eb2_greet";
-			Dialogue="What task do you have for me?"; 
-			Reply="The people who caused this apocalypse, is no single person. The groups that are responsible.. are powerful people. But not powerful enough to contain what they have created."};
-		{Tag="eb2_greet2";
-			Dialogue="Hmm"; 
-			Reply="Scattered to pieces by their own creation, they now struggle.. fight.. and hunt to survive. They almost killed me, left me to die out in the woods."};
-		{Tag="eb2_greet3";
-			Dialogue="I see"; 
-			Reply="They should have made sure they finished what they started, because I will get back at them."};
-		{Tag="eb2_greet4";
-			Dialogue="..."; 
-			Reply="As we have been reborn, we have nothing to fear. We shall make contact with the cultist. They have something I need."};
-		{Tag="eb2_start";
-			Dialogue="Alright"; 
-			Reply="We will commence when you are ready."};
-		
-		{Tag="eb2_letsgo";
-			Dialogue="I am ready, let's go."; 
-			Reply="Follow me.."};
-		{Tag="eb2_lead";
-			Dialogue="Okay."; 
-			Reply="Come."};
-		{Tag="eb2_end1";
-			Dialogue="I see, who is omega?"; 
-			Reply="The one who exiled me."};
-		{Tag="eb2_end2";
-			Dialogue="What do we do now?"; 
-			Reply="We are done for today, that earlier is going to raise some alarms. We will need to lay low, we will continue this next time."};
-		
+Dialogues["Bunny Man"].DialogueStrings = {
+	["eb2_greet"]={
+		CheckMission=missionId;
+		Say="What task do you have for me?"; 
+		Reply="The people who caused this apocalypse, is no single person. The groups that are responsible.. are powerful people. But not powerful enough to contain what they have created.";
 	};
-end
+	["eb2_greet2"]={
+		Say="Hmm"; 
+		Reply="Scattered to pieces by their own creation, they now struggle.. fight.. and hunt to survive. They almost killed me, left me to die out in the woods.";
+	};
+	["eb2_greet3"]={
+		Say="I see"; 
+		Reply="They should have made sure they finished what they started, because I will get back at them.";
+	};
+	["eb2_greet4"]={
+		Say="..."; 
+		Reply="As we have been reborn, we have nothing to fear. We shall make contact with the cultist. They have something I need.";
+	};
+	["eb2_start"]={
+		Say="Alright"; 
+		Reply="We will commence when you are ready.";
+	};
+	
+	["eb2_letsgo"]={
+		Say="I am ready, let's go."; 
+		Reply="Follow me.."};
+	["eb2_lead"]={
+		Say="Okay."; 
+		Reply="Come.";
+	};
+	["eb2_end1"]={
+		Say="I see, who is omega?"; 
+		Reply="The one who exiled me.";
+	};
+	["eb2_end2"]={
+		Say="What do we do now?"; 
+		Reply="We are done for today, that earlier is going to raise some alarms. We will need to lay low, we will continue this next time.";
+	};
+	
+};
+
 
 if RunService:IsServer() then
 	-- MARK: Bunny Man Handler

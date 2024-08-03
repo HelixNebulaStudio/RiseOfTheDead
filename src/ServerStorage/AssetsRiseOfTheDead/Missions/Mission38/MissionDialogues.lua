@@ -13,43 +13,52 @@ local missionId = 38;
 --==
 
 -- !outline: Patrick Dialogues
-Dialogues.Patrick.Dialogues = function()
-	return {
-		{CheckMission=missionId; Tag="notRight_start1"; Face="Disgusted";
-			Dialogue="I will avenge him.";
-			Reply="Alright, well, don't let your emotions get to you."};
-		{CheckMission=missionId; Tag="notRight_start2"; Face="Disgusted";
-			Dialogue="He was a good man.";
-			Reply="Salute to that.."};
+Dialogues.Patrick.DialogueStrings = {
+	["notRight_start1"]={
+		CheckMission=missionId; 
+		Face="Disgusted";
+		Say="I will avenge him.";
+		Reply="Alright, well, don't let your emotions get to you."};
+	["notRight_start2"]={
+		CheckMission=missionId;
+		Face="Disgusted";
+		Say="He was a good man.";
+		Reply="Salute to that..";
 	};
-end
+};
 
 -- !outline: Robert Dialogues
-Dialogues.Robert.Dialogues = function()
-	return {
-		{Tag="notRight_fast"; Face="Surprise";
-			Dialogue="Uhhh.. How were you running so fast?!";
-			Reply="Whaat? I was?"};
-		{Tag="notRight_where"; Face="Question";
-			Dialogue="And where did you disapeared to?!";
-			Reply="I was.. I err.. I heard a cry for help from another community."};
-		{Tag="notRight_bandits"; Face="Joyful";
-			Dialogue="We thought the bandits got to you!!";
-			Reply="Oh err.. They didn't. Heh heh, I got away."};
-		{Tag="notRight_worried"; Face="Worried";
-			Dialogue="We were worried sick!";
-			Reply="Oh.. sorry. Stay here, this is a nice place."};
+Dialogues.Robert.DialogueStrings = {
+	["notRight_fast"]={
+		Face="Surprise";
+		Say="Uhhh.. How were you running so fast?!";
+		Reply="Whaat? I was?";
 	};
-end
+	["notRight_where"]={
+		Face="Question";
+		Say="And where did you disapeared to?!";
+		Reply="I was.. I err.. I heard a cry for help from another community.";
+	};
+	["notRight_bandits"]={
+		Face="Joyful";
+		Say="We thought the bandits got to you!!";
+		Reply="Oh err.. They didn't. Heh heh, I got away.";
+	};
+	["notRight_worried"]={
+		Face="Worried";
+		Say="We were worried sick!";
+		Reply="Oh.. sorry. Stay here, this is a nice place.";
+	};
+};
 
 -- !outline: Rachel Dialogues
-Dialogues.Rachel.Dialogues = function()
-	return {
-		{Tag="notRight_stan"; Face="Disgusted";
-			Dialogue="I'm sorry, but.. but Stan was murdered by the bandits.";
-			Reply="I can't believe it has come to this.."};
+Dialogues.Rachel.DialogueStrings = {
+	["notRight_stan"]={
+		Face="Disgusted";
+		Say="I'm sorry, but.. but Stan was murdered by the bandits.";
+		Reply="I can't believe it has come to this..";
 	};
-end
+};
 
 if RunService:IsServer() then
 	-- !outline: Patrick Handler

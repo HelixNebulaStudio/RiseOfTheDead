@@ -15,94 +15,121 @@ local missionId = 52;
 --==
 
 -- MARK: Dallas Dialogues
-Dialogues.Dallas.Dialogues = function()
-	return {
-		{Tag="investigation_wakeUp";
-			Dialogue="Hey Dallas, wake up!!"; 
-			Reply="Ohh.. God dumm... I was knocked out cold.."};
-	};
-end
+Dialogues.Dallas.DialogueStrings = {
+	["investigation_wakeUp"]={
+		Say="Hey Dallas, wake up!!"; 
+		Reply="Ohh.. God dumm... I was knocked out cold.."};
+};
 
 -- MARK: Joseph Dialogues
-Dialogues.Joseph.Dialogues = function()
-	return {
-		{Tag="investigation_zombieface"; Face="Surprise";
-			Dialogue="Robert has been acting strange and I feel like it's bad. He had this zombie look the last time I saw him, but when I went up close to him, he was fine."; 
-			Reply="Zombie look? Who else saw it? Could it be just you?"};
-		{Tag="investigation_fast"; Face="Skeptical";
-			Dialogue="Not sure, that's why I have some questions. How long has Robert been here? He went missing for a couple days and next thing I know, he's here.."; 
-			Reply="He's been here for a couple days. He saved one of our members, Nate, from a dire situation when he was caught under some debris after an explosion while scavenging for supplies.. He somehow lifted the heavy debris and got Nate out of there.."};
-		{Tag="investigation_zark"; Face="Question";
-			Dialogue="I see. I had an encounter with the Bandit leader, Zark. He mentioned something about Infectors.. Do you know anything about them?"; 
-			Reply="Hmmm, I've only heard of them, but I know that they are physically stronger and can disguise as a normal person. There are rumors about infectors lurking around in the train stations.."};
-		{CheckMission=missionId; Tag="investigation_keepEye"; Face="Question";
-			Dialogue="Hmmm, I'm going to talk to the others to get more information.";
-			Reply="Alright, I'll try to keep an eye on Robert while you do that."};
-		
-		
-		{Tag="investigation_patchJoseph"; Face="Frustrated";
-			Dialogue="*Wrap strap around arm to stop bleeding*";
-			Reply="Ugh... Alright, this will stop the bleeding.."};
-		{Tag="investigation_complete"; Face="Serious";
-			Dialogue="Are you sure? You should just rest here..";
-			Reply="... I rather not. Our people needs us, the community needs us."};
-		{Tag="investigation_complete2"; Face="Serious";
-			Dialogue="Alright..";
-			Reply="Don't worry kid, you did well.. We will be fine, we will continue once I'm well rested."};
-		
+Dialogues.Joseph.DialogueStrings = {
+	["investigation_zombieface"]={
+		Face="Surprise";
+		Say="Robert has been acting strange and I feel like it's bad. He had this zombie look the last time I saw him, but when I went up close to him, he was fine."; 
+		Reply="Zombie look? Who else saw it? Could it be just you?";
 	};
-end
+	["investigation_fast"]={
+		Face="Skeptical";
+		Say="Not sure, that's why I have some questions. How long has Robert been here? He went missing for a couple days and next thing I know, he's here.."; 
+		Reply="He's been here for a couple days. He saved one of our members, Nate, from a dire situation when he was caught under some debris after an explosion while scavenging for supplies.. He somehow lifted the heavy debris and got Nate out of there..";
+	};
+	["investigation_zark"]={
+		Face="Question";
+		Say="I see. I had an encounter with the Bandit leader, Zark. He mentioned something about Infectors.. Do you know anything about them?"; 
+		Reply="Hmmm, I've only heard of them, but I know that they are physically stronger and can disguise as a normal person. There are rumors about infectors lurking around in the train stations..";
+	};
+	["investigation_keepEye"]={
+		CheckMission=missionId;
+		Face="Question";
+		Say="Hmmm, I'm going to talk to the others to get more information.";
+		Reply="Alright, I'll try to keep an eye on Robert while you do that.";
+	};
+	
+	
+	["investigation_patchJoseph"]={
+		Face="Frustrated";
+		Say="*Wrap strap around arm to stop bleeding*";
+		Reply="Ugh... Alright, this will stop the bleeding..";
+	};
+	["investigation_complete"]={
+		Face="Serious";
+		Say="Are you sure? You should just rest here..";
+		Reply="... I rather not. Our people needs us, the community needs us.";
+	};
+	["investigation_complete2"]={
+		Face="Serious";
+		Say="Alright..";
+		Reply="Don't worry kid, you did well.. We will be fine, we will continue once I'm well rested.";
+	};
+	
+};
 
 -- MARK: Molly Dialogues
-Dialogues.Molly.Dialogues = function()
-	return {
-		{Tag="investigation_convince"; Face="Question";
-			Dialogue="Can you help my friend?! An infector ripped out his arm!!";
-			Reply="Afraid not sir.. Why can't just help everyone that comes in here.."};
-		{Tag="investigation_convince2"; Face="Welp"; 
-			Dialogue="What?! Why not?!";
-			Reply="Look, you guys aren't the first to come here for help. Many came here for help and still didn't make it, we don't have a choice. Supplies are limited."};
-		{Tag="investigation_convince3"; Face="Suspicious"; 
-			Dialogue="What resources do you need? Maybe I can get you some..";
-			Reply="I'll need advance med kits. You better make it quick if you want to help your friend here cause I'm not starting until I get the resource I need.."};
-		{Tag="investigation_medkit"; Face="Surprise"; 
-			Dialogue="*Give Advance Medkit*";
-			Reply="I'm surprise you actually got it. Alright, I'll patch him up."};
-		{Tag="investigation_needAdvmedkit"; Face="Welp"; 
-			Dialogue="I don't have an advance medkit.";
-			Reply="Then you should look for some.."};
+Dialogues.Molly.DialogueStrings = {
+	["investigation_convince"]={
+		Face="Question";
+		Say="Can you help my friend?! An infector ripped out his arm!!";
+		Reply="Afraid not sir.. Why can't just help everyone that comes in here..";
 	};
-end
+	["investigation_convince2"]={
+		Face="Welp"; 
+		Say="What?! Why not?!";
+		Reply="Look, you guys aren't the first to come here for help. Many came here for help and still didn't make it, we don't have a choice. Supplies are limited.";
+	};
+	["investigation_convince3"]={
+		Face="Suspicious"; 
+		Say="What resources do you need? Maybe I can get you some..";
+		Reply="I'll need advance med kits. You better make it quick if you want to help your friend here cause I'm not starting until I get the resource I need..";
+	};
+	["investigation_medkit"]={
+		Face="Surprise"; 
+		Say="*Give Advance Medkit*";
+		Reply="I'm surprise you actually got it. Alright, I'll patch him up.";
+	};
+	["investigation_needAdvmedkit"]={
+		Face="Welp"; 
+		Say="I don't have an advance medkit.";
+		Reply="Then you should look for some..";
+	};
+};
 
 -- MARK: Nate Dialogues
-Dialogues.Nate.Dialogues = function()
-	return {
-		{Tag="investigation_robert"; Face="Serious";
-			Dialogue="Hey, have you noticed anything suspicious with Robert? Joseph and I suspect that he might be an infector..";
-			Reply="Now that you mention it, after the explosion from my scavenge, I was trapped and my vision was blurry. I didn't believe it at the time, but he had this zombie look on his face."};
-		{Tag="investigation_face"; Face="Angry";
-			Dialogue="So I wasn't the only one who saw it.. We need to do something..";
-			Reply="We made a cell in the basement of one of the buildings in case of event like these. I'll set it up, I need you to lure him there."};
-		{Tag="investigation_wakeUp"; Face="Skeptical";
-			Dialogue="Nate, wake up. Wake up!";
-			Reply="Ahhh. My heaad.. It hurts.."};
-		{Tag="investigation_wHappen"; Face="Skeptical";
-			Dialogue="Robert knocked you out, then the bandits came. They took Robert's severed hand and left.";
-			Reply="OH MY GOD, Joseph! Bring him to the hospital now!"};
+Dialogues.Nate.DialogueStrings = {
+	["investigation_robert"]={
+		Face="Serious";
+		Say="Hey, have you noticed anything suspicious with Robert? Joseph and I suspect that he might be an infector..";
+		Reply="Now that you mention it, after the explosion from my scavenge, I was trapped and my vision was blurry. I didn't believe it at the time, but he had this zombie look on his face.";
 	};
-end
+	["investigation_face"]={
+		Face="Angry";
+		Say="So I wasn't the only one who saw it.. We need to do something..";
+		Reply="We made a cell in the basement of one of the buildings in case of event like these. I'll set it up, I need you to lure him there.";
+	};
+	["investigation_wakeUp"]={
+		Face="Skeptical";
+		Say="Nate, wake up. Wake up!";
+		Reply="Ahhh. My heaad.. It hurts..";
+	};
+	["investigation_wHappen"]={
+		Face="Skeptical";
+		Say="Robert knocked you out, then the bandits came. They took Robert's severed hand and left.";
+		Reply="OH MY GOD, Joseph! Bring him to the hospital now!";
+	};
+};
 
 -- MARK: Robert Dialogues
-Dialogues.Robert.Dialogues = function()
-	return {
-		{Tag="investigation_sus"; Face="Smile";
-			Dialogue="Oh umm, what are doing here?";
-			Reply="Just checking this place out, not sure why it's blocked up.. It might have some useful supplies."};
-		{Tag="investigation_lure"; Face="Skeptical";
-			Dialogue="Robert, Nate needs our help. Come, I think he's in the basement.";
-			Reply="Oh alright.."};
+Dialogues.Robert.DialogueStrings = {
+	["investigation_sus"]={
+		Face="Smile";
+		Say="Oh umm, what are doing here?";
+		Reply="Just checking this place out, not sure why it's blocked up.. It might have some useful supplies.";
 	};
-end
+	["investigation_lure"]={
+		Face="Skeptical";
+		Say="Robert, Nate needs our help. Come, I think he's in the basement.";
+		Reply="Oh alright..";
+	};
+};
 
 
 if RunService:IsServer() then

@@ -11,18 +11,29 @@ local missionId = 25;
 --==
 
 -- MARK: Mr. Klaws Dialogues
-Dialogues["Mr. Klaws"].Dialogues = function()
-	return {
-		{Tag="xmasramp_yes"; Dialogue="Umm, yes.";
-			Face="Confident"; Reply="Well, I need you to kill some zombies which are wearing santa hats."};
-		{CheckMission=missionId;Tag="xmasramp_start"; Dialogue="Oh, that sounds easy. I'll do it.";
-			Face="Joyful"; Reply="Good luck out there!"};
-		{Tag="xmasramp_done"; Dialogue="It's done.";
-			Face="Surprise"; Reply="Wow, you got it done."};
-		{Tag="xmasramp_almost"; Dialogue="Yeah, am I on the nice list now?";
-			Face="Smirk"; Reply="Oh ho ho, I won't reveal that."};
+Dialogues["Mr. Klaws"].DialogueStrings = {
+	["xmasramp_yes"]={
+		Say="Umm, yes.";
+		Face="Confident"; 
+		Reply="Well, I need you to kill some zombies which are wearing santa hats.";
 	};
-end
+	["xmasramp_start"]={
+		CheckMission=missionId;
+		Say="Oh, that sounds easy. I'll do it.";
+		Face="Joyful"; 
+		Reply="Good luck out there!";
+	};
+	["xmasramp_done"]={
+		Say="It's done.";
+		Face="Surprise"; 
+		Reply="Wow, you got it done.";
+	};
+	["xmasramp_almost"]={
+		Say="Yeah, am I on the nice list now?";
+		Face="Smirk"; 
+		Reply="Oh ho ho, I won't reveal that.";
+	};
+};
 
 if RunService:IsServer() then
 	-- MARK: Mr. Klaws Handler

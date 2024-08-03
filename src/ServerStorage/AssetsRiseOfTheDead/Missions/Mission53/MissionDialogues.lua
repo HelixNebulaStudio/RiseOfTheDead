@@ -13,48 +13,72 @@ local missionId = 53;
 --==
 
 -- !outline: Wilson Dialogues
-Dialogues.Wilson.Dialogues = function()
-	return {		
-		{CheckMission=missionId; Tag="qa2_arrive"; Face="Joyful"; Dialogue="Alright."; 
-			Reply="Let's head up to the roof.";
-			FailResponses = {
-				{Reply="He will be here in no time.."};
-			};	
-		};
-		{Tag="qa2_goodnews"; Face="Oops"; Dialogue="Good news?"; 
-			Reply="According to Walter, the quarantine seems successful, the rest of the world is keeping an eye on us."};
-		{Tag="qa2_badnews"; Face="Tired"; Dialogue="Bad news?"; 
-			Reply="They are not going to let anyone or anything out of the quarantine zone. They will fire at anyone who gets near the borders of the quarantine zone.. They are just monitoring the developments within the quarantine zone and if the zombie grows out of control, they might nuke us."};
-		{Tag="qa2_walter"; Face="Serious"; Dialogue="What about walter?"; 
-			Reply="Err.. I think he's a bit of a kook. He volunteered to dive into the zone for research. Kudos to him, I guess.."};
+Dialogues.Wilson.DialogueStrings = {		
+	["qa2_arrive"]={
+		CheckMission=missionId;
+		Face="Joyful"; 
+		Say="Alright."; 
+		Reply="Let's head up to the roof.";
+		FailResponses = {
+			{Reply="He will be here in no time.."};
+		};	
 	};
-end
+	["qa2_goodnews"]={
+		Face="Oops";
+		Say="Good news?"; 
+		Reply="According to Walter, the quarantine seems successful, the rest of the world is keeping an eye on us.";
+	};
+	["qa2_badnews"]={
+		Face="Tired";
+		Say="Bad news?"; 
+		Reply="They are not going to let anyone or anything out of the quarantine zone. They will fire at anyone who gets near the borders of the quarantine zone.. They are just monitoring the developments within the quarantine zone and if the zombie grows out of control, they might nuke us.";
+	};
+	["qa2_walter"]={
+		Face="Serious";
+		Say="What about walter?"; 
+		Reply="Err.. I think he's a bit of a kook. He volunteered to dive into the zone for research. Kudos to him, I guess..";
+	};
+};
 
 -- !outline: Walter Dialogues
-Dialogues.Walter.Dialogues = function()
-	return {		
-		{Tag="qa2_yes"; Face="Oops"; Dialogue="Yeah, I guess.."; 
-			Reply="I need you to catch me a zombie.."};
-		{Tag="qa2_how"; Face="Hehe"; Dialogue="What?! How?"; 
-			Reply="You'll need a Entity Leash. It hooks on to a target and controls it's limbs with electrical signals."};
-		{Tag="qa2_entityleash"; Face="Smirk"; Dialogue="Okay, where can I get that?"; 
-			Reply="From the militaries intelligence, the R.A.T. shops might sell some.."};
-
-		{Tag="qa2_caughtfail"; Face="Skeptical"; Dialogue="Here's the zombie I caught."; 
-			Reply="... I don't see any.."};
-
-		{Tag="qa2_caught"; Face="Joyful"; Dialogue="Here's the zombie I caught."; 
-			Reply="Wow, you actually caught one. I'll take it from here.."};
+Dialogues.Walter.DialogueStrings = {		
+	["qa2_yes"]={
+		Face="Oops";
+		Say="Yeah, I guess.."; 
+		Reply="I need you to catch me a zombie..";
 	};
-end
+	["qa2_how"]={
+		Face="Hehe";
+		Say="What?! How?"; 
+		Reply="You'll need a Entity Leash. It hooks on to a target and controls it's limbs with electrical signals.";
+	};
+	["qa2_entityleash"]={
+		Face="Smirk";
+		Say="Okay, where can I get that?"; 
+		Reply="From the militaries intelligence, the R.A.T. shops might sell some..";
+	};
+
+	["qa2_caughtfail"]={
+		Face="Skeptical";
+		Say="Here's the zombie I caught."; 
+		Reply="... I don't see any..";
+	};
+
+	["qa2_caught"]={
+		Face="Joyful";
+		Say="Here's the zombie I caught."; 
+		Reply="Wow, you actually caught one. I'll take it from here..";
+	};
+};
 
 -- !outline: Michael Dialogues
-Dialogues.Michael.Dialogues = function()
-	return {		
-		{Tag="qa2_catch"; Face="Confident"; Dialogue="Yeah, the military sent in an inspector. Now I have to catch a zombie for him.."; 
-			Reply="Oh, alright. Good luck."};
+Dialogues.Michael.DialogueStrings = {		
+	["qa2_catch"]={
+		Face="Confident"; 
+		Say="Yeah, the military sent in an inspector. Now I have to catch a zombie for him.."; 
+		Reply="Oh, alright. Good luck.";
 	};
-end
+};
 
 
 if RunService:IsServer() then
