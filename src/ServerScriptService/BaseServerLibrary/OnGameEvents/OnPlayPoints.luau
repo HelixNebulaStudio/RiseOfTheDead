@@ -25,6 +25,11 @@ return function(profile, points: number?, reason: string?)
     if playPointsStats and points > 1 and math.random(1, 2) == 1 then
         local activeId = modBattlePassLibrary.Active;
         if activeId == nil then return end;
+
+        local unixTime = DateTime.now().UnixTimestamp;
+        local bpLib = modBattlePassLibrary:Find(activeId);
+        
+        if unixTime > bpLib.EndUnixTime then return end
         
 		local activeInventory = profile.ActiveInventory;
         if activeInventory == nil then return end;
