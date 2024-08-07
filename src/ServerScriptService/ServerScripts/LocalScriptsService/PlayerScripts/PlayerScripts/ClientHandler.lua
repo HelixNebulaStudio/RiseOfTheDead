@@ -62,6 +62,7 @@ return function()
 	local remoteGameModeAssign = modRemotesManager:Get("GameModeAssign");
 	local remoteMissionRemote = modRemotesManager:Get("MissionRemote");
 	
+
 	--== Bind:
 	local bindOpenLobbyInterface = remotes.LobbyInterface.OpenLobbyInterface;
 	
@@ -326,7 +327,7 @@ return function()
 	localPlayer.CharacterAdded:Connect(onCharacterAdded);
 
 	remoteInteractionUpdate.OnClientEvent:Connect(function(src, object, action)
-		if workspace:IsAncestorOf(src) then return end;
+		if not workspace:IsAncestorOf(src) then return end;
 		
 		Debugger:Warn("Server ",action, src, object);
 		if action == "interact" then
@@ -342,16 +343,6 @@ return function()
 		local interact = require(src);
 		if interact.OnSync then
 			interact:OnSync(data);
-			
-			-- if localPlayer.Character then
-			-- 	local modCharacter = modData:GetModCharacter();
-			-- 	if modCharacter == nil or modCharacter.CharacterProperties == nil then return end; 
-
-			-- 	local activeInteractable = modCharacter.CharacterProperties.ActiveInteract;
-			-- 	if activeInteractable and activeInteractable == interact then
-			-- 		activeInteractable:Trigger();
-			-- 	end
-			-- end
 			
 			if src:GetAttribute("Debug") == true then
 				Debugger:Warn(src:GetFullName(), " ManualSynced.");

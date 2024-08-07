@@ -189,6 +189,7 @@ if RunService:IsServer() then
 										mission.ProgressionPoint = 12;
 									end;
 								end)
+								dialog:SetExpireTime(workspace:GetServerTimeNow()+3);
 							end);
 						end);
 					end);
@@ -234,7 +235,12 @@ if RunService:IsServer() then
 			else
 				if mission58.Type ~= 1 then
 					if shared.modSafehomeService == nil or shared.modSafehomeService.FactionTag == nil then
-						dialog:AddChoice("banditOutpost");
+						dialog:AddChoice("banditOutpost", function()
+							local npcModel = dialog.Prefab;
+							if npcModel:FindFirstChild("banditOutpostInteractable") then
+								dialog:InteractRequest(npcModel.banditOutpostInteractable, npcModel.PrimaryPart);
+							end
+						end);
 					end
 				end
 			end

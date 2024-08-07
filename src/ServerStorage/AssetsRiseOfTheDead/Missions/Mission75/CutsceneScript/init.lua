@@ -10,6 +10,7 @@ local modConfigurations = require(game.ReplicatedStorage.Library.Configurations)
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
+local modDialogueService = require(game.ReplicatedStorage.Library.DialogueService);
 
 --== Variables;
 local missionId = 75;
@@ -561,7 +562,7 @@ return function(CutsceneSequence)
 					task.wait(1);
 					patrolBandit.Movement:Face(classPlayer:GetCFrame().Position);
 
-					shared.OnDialogueHandler(player, "talk", {
+					modDialogueService:InvokeDialogue(player, "talk", {
 						NpcModel=patrolBandit.Prefab;
 					});
 					

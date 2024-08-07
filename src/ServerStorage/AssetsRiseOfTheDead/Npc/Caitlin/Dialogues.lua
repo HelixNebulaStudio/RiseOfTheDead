@@ -27,15 +27,6 @@ Dialogues.DialogueStrings = {
 	["shop_ratShop"]={
 		Say="What do you have for sale?";
 		Reply="Have a look..";
-		ReplyFunction=function(dialogPacket)
-			local npcModel = dialogPacket.Prefab;
-			if npcModel:FindFirstChild("shopInteractable") then
-				local localPlayer = game.Players.LocalPlayer;
-				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-
-				modData.InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart);
-			end
-		end
 	};
 };
 
@@ -51,7 +42,12 @@ if RunService:IsServer() then
 			modOnGameEvents:Fire("OnMedicHeal", player, dialog.Name);
 		end)
 		
-		dialog:AddChoice("shop_ratShop");
+		dialog:AddChoice("shop_ratShop", function()
+			local npcModel = dialog.Prefab;
+			if npcModel:FindFirstChild("shopInteractable") then
+				dialog:InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart, "interact");
+			end
+		end);
 	end 
 end
 

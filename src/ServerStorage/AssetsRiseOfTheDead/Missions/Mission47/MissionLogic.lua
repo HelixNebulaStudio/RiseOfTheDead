@@ -9,7 +9,7 @@ if RunService:IsServer() then
 	local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	
-	if not modBranchConfigs.IsWorld("TheWarehouse") then return end;
+	if not modBranchConfigs.IsWorld("TheWarehouse") then return {} end;
 
 
 	modOnGameEvents:ConnectEvent("OnInstrumentPlay", function(player, instrumentType, notesChanged)

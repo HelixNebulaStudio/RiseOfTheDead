@@ -9,6 +9,7 @@ local modReplicationManager = require(game.ReplicatedStorage.Library.Replication
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
+local modDialogueService = require(game.ReplicatedStorage.Library.DialogueService);
 
 --== Variables;
 local missionId = 33;
@@ -132,7 +133,7 @@ return function(CutsceneSequence)
 		end)
 		
 		
-	elseif modBranchConfigs.IsWorld("AwokenTheBear") then
+	elseif modBranchConfigs.IsWorld("AwokenTheBear") then -- MARK: AwokenTheBear
 		CutsceneSequence:Initialize(function()
 			local players: {Player} = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
@@ -352,6 +353,11 @@ return function(CutsceneSequence)
 						zarkModule.Wield.Targetable.Human = 1;
 						stanModule.Immortal = 0.1;
 
+						task.wait(1);
+						modDialogueService:InvokeDialogue(player, "talk", {
+							NpcModel=zarkModule.Prefab;
+						});
+
 					elseif mission.ProgressionPoint == 9 then
 						wait(1.4)
 						pcall(function()
@@ -369,9 +375,14 @@ return function(CutsceneSequence)
 						task.wait(0.2);
 						stanModule.Chat(player, "Ouhh..");
 						
-						wait(1);
+						task.wait(1);
 						zarkModule.Actions:FaceOwner();
 						zarkModule.Move:HeadTrack(classPlayer.Head);
+
+						task.wait(1);
+						modDialogueService:InvokeDialogue(player, "talk", {
+							NpcModel=zarkModule.Prefab;
+						});
 
 					elseif mission.ProgressionPoint == 10 then
 						task.wait(1.4);
@@ -390,6 +401,11 @@ return function(CutsceneSequence)
 						wait(1);
 						zarkModule.Actions:FaceOwner();
 						zarkModule.Move:HeadTrack(classPlayer.Head);
+
+						task.wait(1);
+						modDialogueService:InvokeDialogue(player, "talk", {
+							NpcModel=zarkModule.Prefab;
+						});
 
 					elseif mission.ProgressionPoint == 11 then
 						wait(1.4);
@@ -419,7 +435,10 @@ return function(CutsceneSequence)
 						zarkModule.Move:HeadTrack(classPlayer.Head);
 						task.wait(0.4);
 						
-						Debugger:Log("11 done");
+						task.wait(1);
+						modDialogueService:InvokeDialogue(player, "talk", {
+							NpcModel=zarkModule.Prefab;
+						});
 
 					elseif mission.ProgressionPoint == 12 then
 						zarkModule:ToggleInteractable(false);

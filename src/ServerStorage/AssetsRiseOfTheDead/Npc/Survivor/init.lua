@@ -197,7 +197,12 @@ return function(player, dialog, data)
 			
 		elseif npcLevel == 5 then
 			
-			dialog:AddChoice("shelter_shop");
+			dialog:AddChoice("shelter_shop", function()
+				local npcModel = dialog.Prefab;
+				if npcModel:FindFirstChild("ShopInteractable") then
+					dialog:InteractRequest(npcModel.ShopInteractable, npcModel.PrimaryPart, "interact");
+				end
+			end);
 			
 		end
 

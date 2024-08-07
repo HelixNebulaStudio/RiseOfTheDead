@@ -23,15 +23,7 @@ Dialogues.DialogueStrings = {
 	["shop_ratShop"]={
 		Say="Do you sell anything?";
 		Reply="Yes, that's what I do here.";
-		ReplyFunction=function(dialogPacket)
-			local npcModel = dialogPacket.Prefab;
-		if npcModel:FindFirstChild("shopInteractable") then
-				local localPlayer = game.Players.LocalPlayer;
-				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-
-				modData.InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart);
-		end
-		end};
+	};
 	
 	["general_steel"]={
 		Say="Umm, do you know where I can get steel fragments?"; 

@@ -23,15 +23,6 @@ Dialogues.DialogueStrings = {
 	["banditOutpost"]={
 		Say="Could you take me to the Bandit Outpost?";
 		Reply="Sure..";
-		ReplyFunction=function(dialogPacket)
-			local npcModel = dialogPacket.Prefab;
-			if npcModel:FindFirstChild("banditOutpostInteractable") then
-				local localPlayer = game.Players.LocalPlayer;
-				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-
-				modData.InteractRequest(npcModel.banditOutpostInteractable, npcModel.PrimaryPart);
-			end
-		end
 	};
 
 	["banditmapGift"]={

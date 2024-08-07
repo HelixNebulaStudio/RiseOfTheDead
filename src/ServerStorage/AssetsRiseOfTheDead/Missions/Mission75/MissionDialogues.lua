@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modDialogueService = require(game.ReplicatedStorage.Library.DialogueService);
 
 --=
 local Dialogues = {
@@ -626,7 +627,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 									task.wait(4);
 									patrolBanditNpcModule:ToggleInteractable(true);
 									
-									shared.OnDialogueHandler(player, "talk", {
+									modDialogueService:InvokeDialogue(player, "talk", {
 										NpcModel=patrolBanditNpcModule.Prefab;
 									});
 								end);

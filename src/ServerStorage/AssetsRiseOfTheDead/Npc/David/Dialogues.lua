@@ -20,15 +20,6 @@ Dialogues.DialogueStrings = {
 	["shop_ratShop"]={
 		Say="What do you have for sale?";
 		Reply="You'll honestly find everything you need here.";
-		ReplyFunction=function(dialogPacket)
-			local npcModel = dialogPacket.Prefab;
-			if npcModel:FindFirstChild("shopInteractable") then
-				local localPlayer = game.Players.LocalPlayer;
-				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-
-				modData.InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart);
-			end
-		end
 	};
 	
 	["general_fold"]={
@@ -62,7 +53,12 @@ if RunService:IsServer() then
 
 		local npcName = dialog.Name;
 		
-		dialog:AddChoice("shop_ratShop")
+		dialog:AddChoice("shop_ratShop", function()
+			local npcModel = dialog.Prefab;
+			if npcModel:FindFirstChild("shopInteractable") then
+				dialog:InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart, "interact");
+			end
+		end)
 		dialog:AddChoice("general_fold")
 		
 		if modEvents:GetEvent(player, "david_purpose") == nil then

@@ -103,6 +103,11 @@ function DialogueService:InitServer(baseDialogueHandlers)
                     dialog.ExpireTime = t;
                 end
 
+                function dialog:InteractRequest(interactableModule, obj)
+                    local remoteInteractionUpdate = modRemotesManager:Get("InteractionUpdate");
+                    remoteInteractionUpdate:FireClient(player, interactableModule, obj, "interact")
+                end
+
                 function dialog:AddDialog(dialoguePacket, func, data)
                     lambda = lambda +1;
                     local tag = dialoguePacket.Tag or `tag{lambda}`;
@@ -159,8 +164,6 @@ function DialogueService:InitServer(baseDialogueHandlers)
                     end
                     
                     if choiceInfo.Func then
-                        dialog.NpcDialogData = npcDialogData;
-                        
                         choiceInfo.Func(dialog);
                         choiceInfo.Func = nil;
                     end
@@ -217,7 +220,9 @@ function DialogueService:InitServer(baseDialogueHandlers)
                         modDialogueLibrary:Load(npcName, tag, dialoguePacket);
                     end
 
-                    dialogueResources.DialogueHandler(player, dialog, npcDialogData);
+                    if dialogueResources.DialogueHandler then
+                        dialogueResources.DialogueHandler(player, dialog, npcDialogData);
+                    end
                 end
 
 
@@ -273,8 +278,11 @@ function DialogueService:InitServer(baseDialogueHandlers)
         return;
     end
 
-    shared.OnDialogueHandler = OnDialogueHandler;
     remoteDialogueHandler.OnServerInvoke = OnDialogueHandler;
+
+    function DialogueService:InvokeDialogue(...)
+        return OnDialogueHandler(...);
+    end
 end
 
 function DialogueService:LoadHandlers(dialogues)

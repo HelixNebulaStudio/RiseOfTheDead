@@ -23,16 +23,6 @@ Dialogues.Victor.DialogueStrings = {
 		Face="Confident";
 		Say="I'm ready to go to the tombs."; 
 		Reply="Alright, let's go.";
-		ReplyFunction=function(dialogPacket)
-			local npcModel = dialogPacket.Prefab;
-			local LowerTorso = npcModel.LowerTorso;
-			if LowerTorso:FindFirstChild("Interactable") then
-				local localPlayer = game.Players.LocalPlayer;
-				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-
-				modData.InteractRequest(LowerTorso.Interactable, LowerTorso);
-			end
-		end
 	};
 
 	["vt3_follow"]={
@@ -84,7 +74,14 @@ if RunService:IsServer() then
 		elseif mission.Type == 1 then -- Active;
 			if modBranchConfigs.IsWorld("TheWarehouse") then
 				if mission.ProgressionPoint == 1 then
-					dialog:AddChoice("vt3_vttravel");
+					dialog:AddChoice("vt3_vttravel", function()
+						local npcModel = dialog.Prefab;
+						local lowerTorso = npcModel.LowerTorso;
+						if lowerTorso:FindFirstChild("Interactable") then
+							dialog:InteractRequest(lowerTorso.Interactable, lowerTorso, "interact");
+						end
+
+					end);
 				end
 			elseif modBranchConfigs.IsWorld("VindictiveTreasure") then
 				modMission:Progress(player, missionId, function(mission)

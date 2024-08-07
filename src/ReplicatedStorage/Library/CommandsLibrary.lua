@@ -4377,7 +4377,8 @@ Commands["talktome"] = {
 			return;
 		end
 		
-		shared.OnDialogueHandler(speaker, "talk", {
+		local modDialogueService = require(game.ReplicatedStorage.Library.DialogueService);
+		modDialogueService:InvokeDialogue(speaker, "talk", {
 			NpcModel=npcModel;
 		});
 		

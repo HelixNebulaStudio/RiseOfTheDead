@@ -23,15 +23,6 @@ Dialogues.DialogueStrings = {
 	["travel_prison"]={
 		Say="Could you take me to the Wrighton Dale Prison?";
 		Reply="I guess..";
-		ReplyFunction=function(dialogPacket)
-			local npcModel = dialogPacket.Prefab;
-			if npcModel:FindFirstChild("prisonInteractable") then
-				local localPlayer = game.Players.LocalPlayer;
-				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-
-				modData.InteractRequest(npcModel.prisonInteractable, npcModel.PrimaryPart);
-			end
-		end
 	};
 
 	["general_inprison"]={
@@ -56,7 +47,12 @@ if RunService:IsServer() then
 		
 		local mission45 = modMission:GetMission(player, 45);
 		if mission45 and mission45.ProgressionPoint >= 1 then
-			dialog:AddChoice("travel_prison");
+			dialog:AddChoice("travel_prison", function()
+				local npcModel = dialog.Prefab;
+				if npcModel:FindFirstChild("prisonInteractable") then
+					dialog:InteractRequest(npcModel.prisonInteractable, npcModel.PrimaryPart);
+				end
+			end);
 		end
 		
 		dialog:AddChoice("general_inprison");

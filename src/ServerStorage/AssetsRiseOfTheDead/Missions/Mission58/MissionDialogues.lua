@@ -61,15 +61,6 @@ Dialogues.Patrick.DialogueStrings = {
 		Face="Confident";
 		Say="Meet you at the Rat's cargo ship then..";
 		Reply="I'll see you there soon..";
-		ReplyFunction=function(dialogPacket)
-			local npcModel = dialogPacket.Prefab;
-			if npcModel:FindFirstChild("doubleCrossInteractable") then
-				local localPlayer = game.Players.LocalPlayer;
-				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-
-				modData.InteractRequest(npcModel.doubleCrossInteractable, npcModel.PrimaryPart);
-			end
-		end
 	};
 
 	["doubleCross_17"]={
@@ -189,11 +180,21 @@ if RunService:IsServer() then
 								mission.ProgressionPoint = 8;
 							end;
 						end)
+						
+						local npcModel = dialog.Prefab;
+						if npcModel:FindFirstChild("doubleCrossInteractable") then
+							dialog:InteractRequest(npcModel.doubleCrossInteractable, npcModel.PrimaryPart);
+						end
 					end)
 				end)
 
 			elseif mission.ProgressionPoint == 8 then
-				dialog:AddChoice("doubleCross_travelToCargoShip");
+				dialog:AddChoice("doubleCross_travelToCargoShip", function()
+					local npcModel = dialog.Prefab;
+					if npcModel:FindFirstChild("doubleCrossInteractable") then
+						dialog:InteractRequest(npcModel.doubleCrossInteractable, npcModel.PrimaryPart);
+					end
+				end);
 
 			elseif mission.ProgressionPoint == 18 then
 				local profile = shared.modProfile:Get(player);

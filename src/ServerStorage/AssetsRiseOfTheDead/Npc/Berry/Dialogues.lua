@@ -104,15 +104,6 @@ Dialogues.DialogueStrings = {
 		Face="Smirk";
 		Say="What do you have for sale?";
 		Reply="We got all the time to trade.";
-		ReplyFunction=function(dialogPacket)
-			local npcModel = dialogPacket.Prefab;
-			if npcModel:FindFirstChild("ShopInteractable") then
-				local localPlayer = game.Players.LocalPlayer;
-				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-
-				modData.InteractRequest(npcModel.ShopInteractable, npcModel.PrimaryPart);
-			end
-		end
 	};
 };
 

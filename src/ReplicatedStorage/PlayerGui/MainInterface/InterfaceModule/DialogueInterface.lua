@@ -371,7 +371,6 @@ function Interface:OnDialogue(dialogPacket)
 						if faceInfo and NpcModel and NpcModel:FindFirstChild("Head") and NpcModel.Head:FindFirstChild("face") then
 							NpcModel.Head.face.Texture = faceInfo.Texture;
 						end
-						--if dialoguePacket.ReplyFunction then dialoguePacket.ReplyFunction(dialogPacket) end;
 						
 					else
 						local failDialogues = choiceInfo.FailResponses or {};

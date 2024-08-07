@@ -22,15 +22,6 @@ Dialogues.DialogueStrings = {
 	["shop_banditShop"]={
 		Say="Do you sell anything?";
 		Reply="What do you want..?";
-		ReplyFunction=function(dialogPacket)
-			local npcModel = dialogPacket.Prefab;
-			if npcModel:FindFirstChild("shopInteractable") then
-				local localPlayer = game.Players.LocalPlayer;
-				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-
-				modData.InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart);
-			end
-		end
 	};
 };
 
@@ -39,7 +30,12 @@ if RunService:IsServer() then
 	Dialogues.DialogueHandler = function(player, dialog, data)
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 		if modMission:IsComplete(player, 63) then
-			dialog:AddChoice("shop_banditShop");
+			dialog:AddChoice("shop_banditShop", function()
+				local npcModel = dialog.Prefab;
+				if npcModel:FindFirstChild("shopInteractable") then
+					dialog:InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart, "interact");
+				end
+			end);
 			
 		end
 	end 

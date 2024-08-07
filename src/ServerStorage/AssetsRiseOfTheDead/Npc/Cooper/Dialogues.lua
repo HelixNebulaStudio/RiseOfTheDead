@@ -23,15 +23,6 @@ Dialogues.DialogueStrings = {
 	["shop_ratShop"]={
 		Say="Can I buy something?";
 		Reply="Sure, what do ya need?";
-			ReplyFunction=function(dialogPacket)
-				local npcModel = dialogPacket.Prefab;
-			if npcModel:FindFirstChild("shopInteractable") then
-				local localPlayer = game.Players.LocalPlayer;
-				local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-
-				modData.InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart);
-			end
-		end
 	};
 	
 	["general_win"]={
@@ -43,7 +34,12 @@ Dialogues.DialogueStrings = {
 if RunService:IsServer() then
 	-- MARK: DialogueHandler
 	Dialogues.DialogueHandler = function(player, dialog, data)
-		dialog:AddChoice("shop_ratShop");
+		dialog:AddChoice("shop_ratShop", function()
+			local npcModel = dialog.Prefab;
+			if npcModel:FindFirstChild("shopInteractable") then
+				dialog:InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart, "interact");
+			end
+		end);
 		dialog:AddChoice("general_win");
 	end 
 end
