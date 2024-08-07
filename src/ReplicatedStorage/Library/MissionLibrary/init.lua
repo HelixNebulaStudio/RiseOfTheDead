@@ -72,7 +72,7 @@ function MissionLibrary.New(data)
 	library[data.MissionId] = data;
 	missionCount = missionCount +1;
 	
-	if data.UseAssets and RunService:IsServer() then
+	if RunService:IsServer() then
 		local assetKey = `Missions/Mission{data.MissionId}`;
 		local gameAssets = modAssetHandler:GetServer(assetKey);
 		
@@ -160,7 +160,7 @@ MissionLibrary.New{
 		Travel="TheBeginning";
 	};
 	LinkNextMission=2;
-	UseAssets=true;
+	
 };
 
 -- MARK: 2 - Where am I
@@ -204,7 +204,7 @@ MissionLibrary.New{
 		[10]={World="TheWarehouse"; Label="Nick"; Target="Nick"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 3 - Stephanie's Book
@@ -228,7 +228,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=3;
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 4 - Lend A Hand
@@ -252,7 +252,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=2;
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 5 - Time To Upgrade
@@ -293,7 +293,7 @@ MissionLibrary.New{
 		[7]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 6 - First Rescue
@@ -324,7 +324,7 @@ MissionLibrary.New{
 		[2]={World="TheWarehouse"; Label="Warehouse Safehouse"; Target=Vector3.new(62.4, 63.2, -28.7); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 7 - The Prisoner
@@ -366,7 +366,7 @@ MissionLibrary.New{
 		[7]={World="TheWarehouse"; Label="Robert"; Target="Robert"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 8 - Bandage Up
@@ -391,7 +391,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=7;
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 9 - Special Mods
@@ -417,7 +417,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=7;
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 10 - Infected
@@ -439,7 +439,7 @@ MissionLibrary.New{
 	GuideText="Talk to Jefferson to start";
 	RewardText="Unlocked Army Colors Pack";
 	Rewards={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 11 - Radio Signal
@@ -469,7 +469,7 @@ MissionLibrary.New{
 		[2]={World="TheWarehouse"; Label="Jane"; Target="Jane"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 12 - Factory Raid
@@ -512,7 +512,7 @@ MissionLibrary.New{
 		[6]={World="TheWarehouse"; Label="Warehouse"; Target=Vector3.new(62.4, 60.2, -28.7); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 13 - Crowd Control
@@ -537,7 +537,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=20;
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 14 - Pigeon Post
@@ -561,7 +561,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=9;
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 15 - Chain Reaction
@@ -587,7 +587,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=25;
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 16 - A Good Deal
@@ -611,7 +611,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=20;
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 17 - Restock
@@ -636,7 +636,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="MissionCompleted"; Value={16}};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 18 - A New Community
@@ -687,7 +687,7 @@ MissionLibrary.New{
 		[9]={World="TheUnderground"; Label="Carlson"; Target="Carlson"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 19 - Ticking Mess
@@ -714,7 +714,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="MissionCompleted"; Value={13}};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 20 - Eight Legs
@@ -738,7 +738,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=30;
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 21 - Spring Killing
@@ -764,7 +764,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 22 - The Backup Plan
@@ -797,7 +797,7 @@ MissionLibrary.New{
 		[3]={World="TheUnderground"; Label="Wooden Crate"; Target=Vector3.new(-155.686, 19.493, -92.027); Type=modMarkers.MarkerTypes.Waypoint;};
 		[4]={World="TheUnderground"; Label="Carlson"; Target="Carlson"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 23 - Sniper's Nest
@@ -827,7 +827,7 @@ MissionLibrary.New{
 		[1]={World="TheUnderground"; Label="Targets"; Target=Vector3.new(-278.695, 22.56, -1.19); Type=modMarkers.MarkerTypes.Waypoint;};
 		[2]={World="TheUnderground"; Label="Lennon"; Target="Lennon"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 24 - Missing In Action
@@ -867,7 +867,7 @@ MissionLibrary.New{
 		[6]={World="TheWarehouse"; Label="Jane"; Target="Jane"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 25 - Christmas Rampage
@@ -893,7 +893,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Mission"; Id=57};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 26 - Blueprint Demands
@@ -918,7 +918,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=40};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 27 - Focus Levels
@@ -939,7 +939,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 28 - Safety Safehouse
@@ -973,7 +973,7 @@ MissionLibrary.New{
 		["addWall3"]={World="TheUnderground"; Label="Build A Wall"; Target=Vector3.new(-55.146, 27.972, 272.869); Type=modMarkers.MarkerTypes.Waypoint;};
 		["addWall4"]={World="TheUnderground"; Label="Build A Wall"; Target=Vector3.new(-55.646, 27.972, 265.289); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 29 - Lab Assistant
@@ -1001,7 +1001,7 @@ MissionLibrary.New{
 		[1]={World="TheUnderground"; Label="Lennon"; Target="Lennon"; Type=modMarkers.MarkerTypes.Npc;};
 		[2]={World="TheWarehouse"; Label="Dr. Deniski"; Target="Dr. Deniski"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 30 - Poke The Bear
@@ -1048,7 +1048,7 @@ MissionLibrary.New{
 		[9]={World="TheMall"; Label="Stan"; Target="Stan"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 31 - Bunny Man's Eggs
@@ -1072,7 +1072,7 @@ MissionLibrary.New{
 		{Type="Item"; ItemId="bunnymanhead";  Quantity=1;};
 		{Type="Mission"; Id=32};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 32 - Easter Butchery
@@ -1096,7 +1096,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Mission"; Id=50};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 33 - Awoken The Bear
@@ -1148,7 +1148,7 @@ MissionLibrary.New{
 		[14]={World="BanditOutpost"; Label="Exit"; Target=Vector3.new(-20.444, 5.115, 30.344); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 34 - Escort
@@ -1185,7 +1185,7 @@ MissionLibrary.New{
 	};
 	CanFastTravelWhenActive={2};
 	BoardPickFreq=5;
-	UseAssets=true;
+	
 };
 
 -- MARK: 35 - Food Airdrop
@@ -1245,7 +1245,7 @@ MissionLibrary.New{
 
 		return noteText;
 	end;
-	UseAssets=true;
+	
 };
 
 -- MARK: 36 - Calming Tunes
@@ -1269,7 +1269,7 @@ MissionLibrary.New{
 	StartRequirements={
 		Level=35;
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 37 - Joseph's Lettuce
@@ -1304,7 +1304,7 @@ MissionLibrary.New{
 		["jlLettuce2"]={World="TheResidentials"; Label="Water plants"; Target=Vector3.new(1242.231, 57.213, -56.169); Type=modMarkers.MarkerTypes.Waypoint;};
 		["jlLettuce3"]={World="TheResidentials"; Label="Water plants"; Target=Vector3.new(1235.111, 57.213, -56.169); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 38 - Something's Not Right
@@ -1348,7 +1348,7 @@ MissionLibrary.New{
 		[7]={World="TheResidentials"; Label="Robert"; Target="Robert"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 39 - Spiking Up
@@ -1382,7 +1382,7 @@ MissionLibrary.New{
 		["addWall4"]={World="TheMall"; Label="Build A Spiked Fence"; Target=Vector3.new(796.555, 99.391, -693.789); Type=modMarkers.MarkerTypes.Waypoint;};
 		["addWall5"]={World="TheMall"; Label="Build A Spiked Fence"; Target=Vector3.new(796.555, 99.391, -672.399); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 40 - Vindictive Treasure 1
@@ -1424,7 +1424,7 @@ MissionLibrary.New{
 	EventFlags={
 		{Id="takeNekronMask"; Clear=true};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 41 - Vindictive Treasure 2
@@ -1453,7 +1453,7 @@ MissionLibrary.New{
 		MissionCompleted={40};
 	};
 	Markers={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 42 - Vindictive Treasure 3
@@ -1492,7 +1492,7 @@ MissionLibrary.New{
 		{Id="mission42Bp"; Clear=true};
 		{Id="mission42Bp2"; Clear=true};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 43 - Missing Body 1
@@ -1525,7 +1525,7 @@ MissionLibrary.New{
 		[1]={World="TheWarehouse"; Label="The Office Raid"; Target=Vector3.new(643.575, 60.15, 276.25); Type=modMarkers.MarkerTypes.Waypoint;};
 		[4]={World="TheMall"; Label="Marker"; Target=Vector3.new(443.31, 95.481, -660.39); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 44 - Missing Body 2
@@ -1554,7 +1554,7 @@ MissionLibrary.New{
 	};
 	Markers={
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 45 - Mike's Lucky Coin
@@ -1586,7 +1586,7 @@ MissionLibrary.New{
 	Markers={
 		[3]={World="Prison"; Label="Marker"; Target=Vector3.new(36.91, -9.045, 45.03); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 46 - Warming Up
@@ -1612,7 +1612,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Mission"; Id=25;};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 47 - Sound of Music
@@ -1640,7 +1640,7 @@ MissionLibrary.New{
 	};
 	Markers={
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 48 - Coming To The Rescue
@@ -1677,7 +1677,7 @@ MissionLibrary.New{
 		[2]={World="TheMall"; Label="Stranger"; Target="Stranger"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanFastTravelWhenActive={2};
-	UseAssets=true;
+	
 };
 
 -- MARK: 49 - Navigation
@@ -1707,7 +1707,7 @@ MissionLibrary.New{
 		[5]={World="TheWarehouse"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 50 - Easter Butchery 2
@@ -1740,7 +1740,7 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 51 - Quarantine Assessment
@@ -1781,7 +1781,7 @@ MissionLibrary.New{
 		[4]={World="TheResidentials"; Label="Radio"; Target=Vector3.new(1092.714, 130.857, -508.18); Type=modMarkers.MarkerTypes.Waypoint;};
 		[5]={World="TheResidentials"; Label="Radio"; Target=Vector3.new(1092.714, 130.857, -508.18); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 52 - The Investigation
@@ -1836,7 +1836,7 @@ MissionLibrary.New{
 		[17]={World="TheMall"; Label="Molly"; Target="Molly"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 53 - Quarantine Assessment 2
@@ -1873,7 +1873,7 @@ MissionLibrary.New{
 		Level=300;
 	};
 	Markers={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 54 - Home Sweet Home
@@ -1906,7 +1906,7 @@ MissionLibrary.New{
 		[2]={World="Safehome"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
 		[5]={World="Safehome"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 55 - Another Survivor
@@ -1937,7 +1937,7 @@ MissionLibrary.New{
 	};
 	BoardPickFreq=6;
 	SkipDestroyIfAddRequirementsNotMet=true;
-	UseAssets=true;
+	
 };
 
 -- MARK: 56 - End Of The Line
@@ -1971,7 +1971,7 @@ MissionLibrary.New{
 		
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 57 - Mr. Klaw's Workshop
@@ -1998,7 +1998,7 @@ MissionLibrary.New{
 	Markers={
 		[2]={World="KlawsWorkshop"; Label="Mr. Klaw's Journal"; Target=Vector3.new(-19.151, 103.838, -224.87); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 58 - Double Cross
@@ -2049,7 +2049,7 @@ MissionLibrary.New{
 		[4]={World="TheHarbor"; Label="Revas's Office"; Target=Vector3.new(-290.606, 107.853, 243.741); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
 	CanRedo={};
-	UseAssets=true;
+	
 }
 
 -- MARK: 59 - Horde Clearance
@@ -2080,7 +2080,7 @@ MissionLibrary.New{
 		SuccessfulAgents=1;
 	};
 	QuotaLimit=16;
-	UseAssets=true;
+	
 };
 
 -- MARK: 60 - Reconnaissance Duty
@@ -2138,7 +2138,7 @@ MissionLibrary.New{
 	};
 	QuotaLimit=16;
 	CanFastTravelWhenActive={2};
-	UseAssets=true;
+	
 };
 
 -- MARK: 61 - Ammo Manufacturing
@@ -2168,7 +2168,7 @@ MissionLibrary.New{
 		SuccessfulAgents=1;
 	};
 	QuotaLimit=16;
-	UseAssets=true;
+	
 };
 
 -- MARK: 62 - Rats Recruitment
@@ -2226,7 +2226,7 @@ MissionLibrary.New{
 	AddCache={
 		RatsAllied=true;
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 63 - Bandits Recruitment
@@ -2281,7 +2281,7 @@ MissionLibrary.New{
 	AddCache={
 		BanditsAllied=true;
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 64 - Joseph's Crossbow
@@ -2306,7 +2306,7 @@ MissionLibrary.New{
 	};
 	Markers={};
 	AddRequirements={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 65 - Eternal Inferno
@@ -2330,7 +2330,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 66 - Monorail
@@ -2359,7 +2359,7 @@ MissionLibrary.New{
 		{Type="Level"; Value=30};
 	};
 	BoardPickFreq=8;
-	UseAssets=true;
+	
 };
 
 -- MARK: 67 - Capital Gains
@@ -2383,7 +2383,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 68 - Sunken Salvages
@@ -2407,7 +2407,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 69 - Reserved Weapons
@@ -2436,7 +2436,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 70 - Anti Immunity
@@ -2461,7 +2461,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 71 - High Value Package
@@ -2493,7 +2493,7 @@ MissionLibrary.New{
 	};
 	SetMissionCheckpointOnStart=1;
 	CanFastTravelWhenActive={2};
-	UseAssets=true;
+	
 };
 
 -- MARK: 72 - Weapons Expert
@@ -2551,7 +2551,7 @@ MissionLibrary.New{
 		SuccessfulAgents=4;
 	};
 	QuotaLimit=10;
-	UseAssets=true;
+	
 };
 
 -- MARK: 74 - Breach by the Dead
@@ -2575,7 +2575,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 75 - Medical Breakthrough
@@ -2616,7 +2616,7 @@ MissionLibrary.New{
 	};
 	Markers={
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 76 - Ziphoning Serum
@@ -2642,7 +2642,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="MissionCompleted"; Value={75}};
 	};
-	UseAssets=true;
+	
 };
 
 -- MARK: 77 - Belly of the Beast
@@ -2672,7 +2672,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	Markers={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 78 - The Killer Hues
@@ -2703,7 +2703,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	Markers={};
-	UseAssets=true;
+	
 };
 
 -- MARK: 79 - Javelineer Prodigy
@@ -2728,7 +2728,7 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
-	UseAssets=true;
+	
 };
 
 

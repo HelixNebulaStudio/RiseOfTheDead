@@ -31,7 +31,6 @@ if RunService:IsServer() then
 			end)
 		end
 	end)
-
 else
 	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
@@ -41,7 +40,6 @@ end
 return function(CutsceneSequence)
 	local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
 	local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");
-	local bindServerUnequipPlayer = remotes.Inventory.ServerUnequipPlayer;
 	local remoteCameraShakeAndZoom = remotes.CameraShakeAndZoom;
 	
 	if modBranchConfigs.IsWorld("TheResidentials") then
@@ -118,7 +116,7 @@ return function(CutsceneSequence)
 		local waterBarrels = workspace.Environment:WaitForChild("CutsceneBarrels");
 		local cutsceneWallDestroy = workspace.Environment:WaitForChild("cutsceneWallDestroy");
 
-		local assetTheInvestigation = script.Parent:WaitForChild("TheInvestigationAssets");
+		local assetTheInvestigation = script:WaitForChild("TheInvestigationAssets");
 
 		local robertLeftHand = assetTheInvestigation:WaitForChild("RobertLeftHand");
 		local cutStrap = assetTheInvestigation:WaitForChild("cutStrap");
@@ -231,7 +229,7 @@ return function(CutsceneSequence)
 						josephModule.SetAnimation("JosephInvestigate1", {assetTheInvestigation.JosephInvestigate1});
 						josephModule.SetAnimation("JosephDown", {assetTheInvestigation.JosephDown});
 						josephModule.SetAnimation("JosephDown2", {assetTheInvestigation.JosephDown2});
-						josephModule.SetAnimation("JosephNoArm", {assetTheInvestigation.JosephNoArm});
+						josephModule.SetAnimation("JosephNoArm", {script.JosephNoArm});
 						zarkModule.SetAnimation("LookAround", {assetTheInvestigation.LookAround});
 						zarkModule.SetAnimation("CrouchLookAnim", {assetTheInvestigation.CrouchLookAnim});
 						
@@ -373,7 +371,7 @@ return function(CutsceneSequence)
 						robertModule.Move:SetMoveSpeed("set", "default", 30);
 
 						robertModule.Move:MoveTo(nateModule.RootPart.Position);
-						robertModule.Move.MoveToEnded:Wait(10);
+						task.wait(0.5);
 						
 						robertModule.PlayAnimation("Punch");
 						modAudio.Play("Punch", robertModule.RootPart);
@@ -399,7 +397,7 @@ return function(CutsceneSequence)
 						wait(0.8);
 
 						robertModule.Move:MoveTo(dallasModule.RootPart.Position);
-						robertModule.Move.MoveToEnded:Wait(10);
+						robertModule.Move.MoveToEnded:Wait(1);
 						
 						josephModule.Chat(josephModule.Owner, "Dallas!");
 						josephModule.Movement:Face(robertModule.RootPart.Position);
@@ -427,7 +425,8 @@ return function(CutsceneSequence)
 						modAudio.Play("Punch", robertModule.RootPart);
 						wait(0.2);
 						
-						bindServerUnequipPlayer:Invoke(player);
+						classPlayer:UnequipTools();
+						
 						CutsceneSequence:NextScene("playerKnockout");
 						shared.Notify(player, "*Helicopter approaching..*", "Message");
 						
@@ -519,7 +518,7 @@ return function(CutsceneSequence)
 						robertModule.RootPart.Anchored = false;
 						
 						robertModule.Move:MoveTo(Vector3.new(-10.408, 162.593, -48.561));
-						robertModule.Move.MoveToEnded:Wait();
+						robertModule.Move.MoveToEnded:Wait(1);
 						
 						robertModule.PlayAnimation("Punch");
 						modAudio.Play("Punch", robertModule.RootPart);
@@ -712,7 +711,7 @@ return function(CutsceneSequence)
 			modConfigurations.Set("DisableMasteryMenu", true);
 			
 			rootPart.CFrame = CFrame.new(48.7122955, 162.593155, -49.6710472, 0, 0, 1, 0, 1, 0, -1, 0, 0);
-			local unconsciousAnimation = humanoid:LoadAnimation(assetTheInvestigation:WaitForChild("Unconscious"));
+			local unconsciousAnimation = humanoid:LoadAnimation(script:WaitForChild("Unconscious"));
 			
 			modCharacter.CharacterProperties.CanMove = false;
 			modCharacter.CharacterProperties.CanInteract = false;
@@ -802,7 +801,7 @@ return function(CutsceneSequence)
 					else
 						if mission.ProgressionPoint == 15 then
 							nateModule.AvatarFace:Set("Grumpy");
-							josephModule.SetAnimation("JosephNoArm", {assetTheMall.JosephNoArm});
+							josephModule.SetAnimation("JosephNoArm", {script.JosephNoArm});
 							josephModule.AvatarFace:Set("Frustrated");
 							josephModule.PlayAnimation("JosephNoArm");
 							
