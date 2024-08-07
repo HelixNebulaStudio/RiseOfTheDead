@@ -755,8 +755,6 @@ return function(CutsceneSequence)
 	elseif modBranchConfigs.IsWorld("TheMall") then
 		-- MARK: TheMall
 	
-		local assetTheMall = script.Parent:WaitForChild("TheMallAssets");
-
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
@@ -794,95 +792,112 @@ return function(CutsceneSequence)
 				if mission.Type == 2 then -- OnAvailable
 					
 				elseif mission.Type == 1 then -- OnActive
-					if firstRun and mission.ProgressionPoint > 15 then
-						modMission:Progress(player, missionId, function(mission)
-							mission.ProgressionPoint = 15;
-						end)
-					else
-						if mission.ProgressionPoint == 15 then
-							nateModule.AvatarFace:Set("Grumpy");
-							josephModule.SetAnimation("JosephNoArm", {script.JosephNoArm});
-							josephModule.AvatarFace:Set("Frustrated");
-							josephModule.PlayAnimation("JosephNoArm");
-							
-							josephModule.Movement:SetWalkSpeed("default", 6);
-							nateModule.Movement:SetWalkSpeed("default", 16);
-							
-							josephModule.Actions:FollowOwner(function() return mission.ProgressionPoint == 15; end, nil, 12);
-							
-							nateModule.Wield.Equip("m4a4");
-							nateModule.Actions:FollowOwner(function() return mission.ProgressionPoint == 15; end);
-							nateModule.Actions:ProtectOwner(function()
-								return mission.ProgressionPoint == 15;
-							end)
-							
-							josephModule.Prefab.LeftLowerArm.Transparency = 1;
-							josephModule.Prefab.LeftHand.Transparency = 1;
-							
+					if firstRun and mission.ProgressionPoint >= 16 then
+						nateModule.Actions:Teleport(CFrame.new(510.818, 96.781, -1094.263));
+						josephModule.Actions:Teleport(CFrame.new(499.114, 96.781, -1096.703));
+						
+						task.wait(0.1);
+						josephModule.Movement:Face(Vector3.new(502.829, 96.781, -1100.442));
+						nateModule.Movement:Face(Vector3.new(512.225, 96.781, -1100.017))
+
+						nateModule.AvatarFace:Set("Grumpy");
+						josephModule.SetAnimation("JosephNoArm", {script.JosephNoArm});
+						josephModule.AvatarFace:Set("Frustrated");
+						josephModule.PlayAnimation("JosephNoArm");
+						josephModule.Prefab.LeftLowerArm.Transparency = 1;
+						josephModule.Prefab.LeftHand.Transparency = 1;
+						
+						if mission.ProgressionPoint  < 19 then
 							nateModule.Interactable.Parent = script;
 							josephModule.Interactable.Parent = script;
 							remoteSetHeadIcon:FireClient(player, 1, "Joseph", "HideAll");
-							
-						elseif mission.ProgressionPoint == 16 then
-							wait(0.5);
-							nateModule.Actions:Teleport(CFrame.new(525.922974, 96.880806, -1094.84497, 1, 0, 0, 0, 1, 0, 0, 0, 1));
-							josephModule.Actions:Teleport(CFrame.new(530.039429, 96.880806, -1094.13831, 1, 0, 0, 0, 1, 0, 0, 0, 1));
-							
-							spawn(function()
-								josephModule.Movement:Move(Vector3.new(499.114, 96.781, -1096.703)):Wait();
-								josephModule.Movement:Face(Vector3.new(502.829, 96.781, -1100.442));
-								
-							end)
-							spawn(function()
-								nateModule.Movement:Move(Vector3.new(510.818, 96.781, -1094.263)):Wait();
-								nateModule.Movement:Face(Vector3.new(512.225, 96.781, -1100.017))
-								nateModule.Wield.Unequip();
-							end)
-							
-						elseif mission.ProgressionPoint == 17 then
-							
-							
-						elseif mission.ProgressionPoint == 18 then
-							
-							josephModule.Actions:Teleport(CFrame.new(501.90802, 97.3525085, -1095.74792, 0.983893275, -1.08350854e-07, -0.178756803, 1.05717149e-07, 1, -2.42590161e-08, 0.178756803, 4.97062347e-09, 0.983893275));
-							
-							mollyModule.Movement:SetWalkSpeed("default", 8);
-							mollyModule.Movement:Face(Vector3.new(512.225, 96.781, -1100.017))
-							wait(1);
-							
-							mollyModule.Interactable.Parent = script;
-							mollyModule.Movement:Move(Vector3.new(502.301, 96.881, -1098.085)):Wait();
-							wait(0.6);
-							mollyModule.Chat(mollyModule.Owner, "Alright.. Hold still..");
-							josephModule.StopAnimation("JosephNoArm");
-							josephModule.Movement:Face(Vector3.new(506.223, 96.261, -1097.082))
-							wait(1);
-							mollyModule.Chat(mollyModule.Owner, "*Patching*");
-							mollyModule.PlayAnimation("Patching");
-							wait(5);
-							mollyModule.StopAnimation("Patching");
-							mollyModule.Chat(mollyModule.Owner, "Done!");
-							
-							josephModule.Prefab.Bandage.Handle.Transparency = 0;
-							wait(2);
-							josephModule.Chat(josephModule.Owner, ".. Thanks..");
-							josephModule.AvatarFace:Set("Skeptical");
-							josephModule.Movement:Face(Vector3.new(504.616, 96.781, -1105.925))
-							
-							modMission:Progress(player, missionId, function(mission)
-								if mission.ProgressionPoint == 18 then
-									mission.ProgressionPoint = 19;
-								end
-							end)
-							
-						elseif mission.ProgressionPoint == 19 then
-							josephModule.Interactable.Parent = josephModule.Prefab;
-							mollyModule.Interactable.Parent = mollyModule.Prefab;
-							mollyModule.Movement:Move(Vector3.new(508.767, 96.941, -1120.23)):Wait();
-							mollyModule.Movement:Face(Vector3.new(509.305, 95.031, -1110.56));
-							
 						end
 					end
+
+					if mission.ProgressionPoint == 15 then
+						nateModule.AvatarFace:Set("Grumpy");
+						josephModule.SetAnimation("JosephNoArm", {script.JosephNoArm});
+						josephModule.AvatarFace:Set("Frustrated");
+						josephModule.PlayAnimation("JosephNoArm");
+						
+						josephModule.Movement:SetWalkSpeed("default", 6);
+						nateModule.Movement:SetWalkSpeed("default", 16);
+						
+						josephModule.Actions:FollowOwner(function() return mission.ProgressionPoint == 15; end, nil, 12);
+						
+						nateModule.Wield.Equip("m4a4");
+						nateModule.Actions:FollowOwner(function() return mission.ProgressionPoint == 15; end);
+						nateModule.Actions:ProtectOwner(function()
+							return mission.ProgressionPoint == 15;
+						end)
+						
+						josephModule.Prefab.LeftLowerArm.Transparency = 1;
+						josephModule.Prefab.LeftHand.Transparency = 1;
+						
+						nateModule.Interactable.Parent = script;
+						josephModule.Interactable.Parent = script;
+						remoteSetHeadIcon:FireClient(player, 1, "Joseph", "HideAll");
+						
+					elseif mission.ProgressionPoint == 16 then
+						wait(0.5);
+						nateModule.Actions:Teleport(CFrame.new(525.922974, 96.880806, -1094.84497, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+						josephModule.Actions:Teleport(CFrame.new(530.039429, 96.880806, -1094.13831, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+						
+						spawn(function()
+							josephModule.Movement:Move(Vector3.new(499.114, 96.781, -1096.703)):Wait();
+							josephModule.Movement:Face(Vector3.new(502.829, 96.781, -1100.442));
+							
+						end)
+						spawn(function()
+							nateModule.Movement:Move(Vector3.new(510.818, 96.781, -1094.263)):Wait();
+							nateModule.Movement:Face(Vector3.new(512.225, 96.781, -1100.017))
+							nateModule.Wield.Unequip();
+						end)
+						
+					elseif mission.ProgressionPoint == 17 then
+						
+						
+					elseif mission.ProgressionPoint == 18 then
+						
+						josephModule.Actions:Teleport(CFrame.new(501.90802, 97.3525085, -1095.74792, 0.983893275, -1.08350854e-07, -0.178756803, 1.05717149e-07, 1, -2.42590161e-08, 0.178756803, 4.97062347e-09, 0.983893275));
+						
+						mollyModule.Movement:SetWalkSpeed("default", 8);
+						mollyModule.Movement:Face(Vector3.new(512.225, 96.781, -1100.017))
+						wait(1);
+						
+						mollyModule.Interactable.Parent = script;
+						mollyModule.Movement:Move(Vector3.new(502.301, 96.881, -1098.085)):Wait();
+						wait(0.6);
+						mollyModule.Chat(mollyModule.Owner, "Alright.. Hold still..");
+						josephModule.StopAnimation("JosephNoArm");
+						josephModule.Movement:Face(Vector3.new(506.223, 96.261, -1097.082))
+						wait(1);
+						mollyModule.Chat(mollyModule.Owner, "*Patching*");
+						mollyModule.PlayAnimation("Patching");
+						wait(5);
+						mollyModule.StopAnimation("Patching");
+						mollyModule.Chat(mollyModule.Owner, "Done!");
+						
+						josephModule.Prefab.Bandage.Handle.Transparency = 0;
+						wait(2);
+						josephModule.Chat(josephModule.Owner, ".. Thanks..");
+						josephModule.AvatarFace:Set("Skeptical");
+						josephModule.Movement:Face(Vector3.new(504.616, 96.781, -1105.925))
+						
+						modMission:Progress(player, missionId, function(mission)
+							if mission.ProgressionPoint == 18 then
+								mission.ProgressionPoint = 19;
+							end
+						end)
+						
+					elseif mission.ProgressionPoint == 19 then
+						josephModule.Interactable.Parent = josephModule.Prefab;
+						mollyModule.Interactable.Parent = mollyModule.Prefab;
+						mollyModule.Movement:Move(Vector3.new(508.767, 96.941, -1120.23)):Wait();
+						mollyModule.Movement:Face(Vector3.new(509.305, 95.031, -1110.56));
+						
+					end
+						
 				elseif mission.Type == 3 then -- OnComplete
 					if not firstRun then
 						josephModule.Movement:Move(Vector3.new(525.61, 99.44, -1089.824));

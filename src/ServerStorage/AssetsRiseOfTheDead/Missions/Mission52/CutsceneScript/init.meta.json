@@ -1,8 +1,3 @@
 {
-  "ignoreUnknownInstances": true,
-  "properties": {
-    "Attributes": {
-      "MissionName":{"String": ""}
-    }
-  }
+  "ignoreUnknownInstances": true
 }
