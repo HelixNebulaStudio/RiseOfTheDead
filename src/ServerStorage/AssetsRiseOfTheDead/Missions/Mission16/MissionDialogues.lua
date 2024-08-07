@@ -29,6 +29,21 @@ Dialogues.Jesse.DialogueStrings = {
 		Reply="Alright, great, come back tomorrow. I might have some interesting items to offer for more of your work.";
 	};
 
+	["aGoodDeal_questions"]={
+		Say="Hey, this is the first time you are outside the shop!"; 
+		Reply="Yes, I wanted to take a breath of the fresh air..";
+		ReturnToInit=true;
+	};
+	["aGoodDeal_org"]={
+		Say="Who do you work for?"; 
+		Reply="R.A.T., now stop asking..";
+		ReturnToInit=true;
+	};
+	["aGoodDeal_why"]={
+		Say="Why are you working in this apocalypse?"; 
+		Reply="I work for them and they protect me alright? I'm not going to answer anymore questions.";
+		ReturnToInit=true;
+	};
 };
 
 if RunService:IsServer() then

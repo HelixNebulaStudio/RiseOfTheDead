@@ -80,8 +80,6 @@ return function(CutsceneSequence)
 			modData.ToggleChat();
 		end);
 		
-		local mechDoor3Clip = script.Parent:WaitForChild("_playerClip") ;
-		local terminalInteractable = script.Parent:WaitForChild("shutDownHeating");
 		
 		local mechDoor1 = modEntity:GetEntity(workspace.Environment.Game:WaitForChild("mechDoor1"));
 		local mechDoor2 = modEntity:GetEntity(workspace.Environment.Game:WaitForChild("mechDoor2"));
@@ -151,6 +149,9 @@ return function(CutsceneSequence)
 				end
 			end);
 			
+			local mechDoor3Clip = script.Parent:WaitForChild("_playerClip");
+			local terminalInteractable = script.Parent:WaitForChild("shutDownHeating");
+
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
 

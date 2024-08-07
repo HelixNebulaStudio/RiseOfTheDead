@@ -308,7 +308,7 @@ if RunService:IsServer() then
 		end
 	end
 	
-	-- !outline: Caitlin Handler
+	-- MARK: Caitlin Handler
 	Dialogues.Caitlin.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 
@@ -322,6 +322,8 @@ if RunService:IsServer() then
 								mission.ProgressionPoint = 2;
 							end;
 						end)
+						
+						dialog:SetExpireTime(workspace:GetServerTimeNow()+3);
 					end)
 				end);
 

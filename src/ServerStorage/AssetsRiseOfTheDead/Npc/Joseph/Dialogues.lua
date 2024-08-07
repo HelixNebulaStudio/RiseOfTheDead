@@ -27,12 +27,6 @@ Dialogues.DialogueStrings = {
 		Say="Can you heal me please?";
 		Reply="Cmon' closer and I'll patch you up.";
 	};
-
-	["lostArm_muchBetter"]={
-		Face="Confident";
-		Say="How are you feeling?";
-		Reply="Much better now.. Definitely going to miss my left arm.. Going to need a hand later though, hahah..";
-	};
 };
 
 if RunService:IsServer() then

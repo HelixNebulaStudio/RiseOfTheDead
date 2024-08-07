@@ -235,12 +235,17 @@ if RunService:IsServer() then
 			else
 				if mission58.Type ~= 1 then
 					if shared.modSafehomeService == nil or shared.modSafehomeService.FactionTag == nil then
-						dialog:AddChoice("banditOutpost", function()
+						
+						dialog:AddDialog({
+							Say="Could you take me to the Bandit Outpost?";
+							Reply="Sure..";
+						}, function(dialog)
 							local npcModel = dialog.Prefab;
 							if npcModel:FindFirstChild("banditOutpostInteractable") then
 								dialog:InteractRequest(npcModel.banditOutpostInteractable, npcModel.PrimaryPart);
 							end
 						end);
+						
 					end
 				end
 			end

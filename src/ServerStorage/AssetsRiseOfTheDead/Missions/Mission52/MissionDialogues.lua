@@ -214,9 +214,15 @@ if RunService:IsServer() then
 			if modBranchConfigs.IsWorld("TheResidentials") then
 				if data:Get("lostArm") == nil then
 					dialog:SetInitiate("You're back, $PlayerName..");
-					dialog:AddChoice("lostArm_muchBetter", function(dialog)
+					
+					dialog:AddDialog({
+						Face="Confident";
+						Say="How are you feeling?";
+						Reply="Much better now.. Definitely going to miss my left arm.. Going to need a hand later though, hahah..";
+					}, function(dialog)
 						data:Set("lostArm", true);
 					end);
+
 				end
 			end
 		end

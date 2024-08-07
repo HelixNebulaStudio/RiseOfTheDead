@@ -84,7 +84,7 @@ if RunService:IsServer() then
 			end);
 			
 		elseif mission.Type == 1 then -- Active
-			dialog:SetInitiateTag("findBook_found?");
+			dialog:SetInitiateTag("findBook_found");
 			
 			local item, storage = modStorage.FindItemIdFromStorages("oddbluebook", player);
 

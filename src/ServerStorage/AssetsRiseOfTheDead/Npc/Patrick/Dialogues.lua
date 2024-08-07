@@ -20,11 +20,6 @@ Dialogues.DialogueStrings = {
 		Reply="Halt! Turn back now!";
 	};
 	
-	["banditOutpost"]={
-		Say="Could you take me to the Bandit Outpost?";
-		Reply="Sure..";
-	};
-
 	["banditmapGift"]={
 		Face="Happy";
 		Say="Hey, how's the wound?";
