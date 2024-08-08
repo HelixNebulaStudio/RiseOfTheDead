@@ -50,11 +50,15 @@ function DialogueSave.new(player)
 	return Dialogues;
 end
 
-function DialogueSave:Get(player)
+function DialogueSave:Get(player, npcName)
 	local profile = shared.modProfile:Get(player);
 	local activeSave = profile and profile:GetActiveSave();
 	local dialoguesSave = activeSave and activeSave.Dialogues;
 	
+	if npcName then
+		return dialoguesSave and dialoguesSave:Get(npcName) or dialoguesSave.new(npcName);
+	end
+
 	return dialoguesSave;
 end
 

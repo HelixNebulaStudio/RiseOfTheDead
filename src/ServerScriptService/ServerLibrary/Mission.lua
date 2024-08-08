@@ -1337,15 +1337,37 @@ task.spawn(function()
 		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
 
 		RequiredArgs = 0;
-		UsageInfo = "/printmissions";
+		UsageInfo = "/printmissions [missionId]";
 		Description = [[Prints missions.]];
 
 		Function = function(player, args)
 			local missionProfile = Mission.GetMissions(player.Name);
 			
+			local missionId = args[1];
+
 			if RunService:IsStudio() then
 				print("missionProfile", missionProfile);
+
+				if missionId then
+					for a=1, #missionProfile do
+						if missionProfile[a] and missionProfile[a].Id == missionId then
+							print(`Mission{missionId}`,missionProfile[a]);
+							break;
+						end
+					end
+				end
+
 			else
+				if missionId then
+					for a=1, #missionProfile do
+						if missionProfile[a] and missionProfile[a].Id == missionId then
+							Debugger:Warn("mission",missionId, missionProfile[a]);
+							Debugger:WarnClient(player, missionProfile[a]);
+							return true;
+						end
+					end
+				end
+
 				Debugger:Warn("missionProfile", missionProfile);
 				Debugger:WarnClient(player, missionProfile);
 			end

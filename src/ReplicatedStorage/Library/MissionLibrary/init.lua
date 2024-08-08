@@ -720,7 +720,7 @@ MissionLibrary.New{
 -- MARK: 20 - Eight Legs
 MissionLibrary.New{
 	MissionId=20;
-	MissionType = MissionLibrary.MissionTypes.Side;
+	MissionType = MissionLibrary.MissionTypes.Premium;
 	Name="Eight Legs";
 	From="Erik";
 	Description="Erik can't sleep because of the sounds of the Zpider in the cave across..";
@@ -736,6 +736,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	StartRequirements={
+		Premium=true;
 		Level=30;
 	};
 	
@@ -785,7 +786,6 @@ MissionLibrary.New{
 	GuideText="Talk to Carlson to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
-		{Type="Mission"; Id=20};
 		{Type="Mission"; Id=28};
 	};
 	StartRequirements={
@@ -854,6 +854,7 @@ MissionLibrary.New{
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=29};
 		{Type="Mission"; Id=30};
+		{Type="Mission"; Id=20};
 	};
 	LinkNextMission=30;
 	StartRequirements={
@@ -979,7 +980,7 @@ MissionLibrary.New{
 -- MARK: 29 - Lab Assistant
 MissionLibrary.New{
 	MissionId=29;
-	MissionType = MissionLibrary.MissionTypes.Premium;
+	MissionType = MissionLibrary.MissionTypes.Side;
 	Name="Lab Assistant";
 	From="Hilbert";
 	Description="You found a dead scientist with a blue note.";
@@ -994,7 +995,6 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	StartRequirements={
-		Premium=true;
 		Level=30;
 	};
 	Markers={
@@ -1464,6 +1464,7 @@ MissionLibrary.New{
 	From="Victor";
 	Description="Victor needs your help with something in the tombs.";
 	Persistent=true;
+	World={"TheWarehouse"; "VindictiveTreasure"};
 	Progression={
 		"Talk to Victor when you are ready";
 		"Talk to Victor";

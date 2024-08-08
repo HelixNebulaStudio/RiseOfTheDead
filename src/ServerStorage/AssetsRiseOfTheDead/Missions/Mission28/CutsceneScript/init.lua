@@ -40,7 +40,7 @@ if RunService:IsServer() then
 			local playerSave = profile:GetActiveSave();
 			local inventory = playerSave.Inventory;
 
-			local playerGaveMetal = interactData.GaveMetal or false;
+			local playerGaveMetal = interactData.GaveMetal == true;
 			local build = false;
 			
 			if not playerGaveMetal then
@@ -103,10 +103,8 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, missionId);
 		if mission == nil then return end;
 			
-		local activeDialogues = modDialogues:Get(player);
-		local carlsonMemory = activeDialogues and activeDialogues:Get("Carlson") or nil;
-		local gaveMetal = carlsonMemory and carlsonMemory:Get("thebackup_gaveMetal") or nil;
-		gaveMetal = gaveMetal == true;
+		local carlsonDialogueData = modDialogues:Get(player, "Carlson");
+		local gaveMetal = carlsonDialogueData:Get("thebackup_gaveMetal") == true;
 
 		local loaded = false;
 		local function load()
@@ -132,6 +130,7 @@ return function(CutsceneSequence)
 					modInteractable.Object = newObj;
 					modInteractable.GaveMetal = gaveMetal;
 					modInteractable.SubId = obj.Name;
+
 					if gaveMetal then
 						modInteractable.Label = obj.Name == "addDoorway" and "Build doorway" or "Build wall";
 					else

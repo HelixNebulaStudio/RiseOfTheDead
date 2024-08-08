@@ -47,32 +47,11 @@ function DialogueService:InitServer(baseDialogueHandlers)
             return true;
         end
         
-        -- if DialogueService.Handlers[npcName] == nil and modDialogueHandlers.Script:FindFirstChild(npcName) then
-        --     local npcDialogueHandler = modDialogueHandlers.Script[npcName];
-
-        --     DialogueService.Handlers[npcName] = require(npcDialogueHandler);
-
-        --     MissionDialogueModules[npcName] = {};
-        --     for _, module in pairs(npcDialogueHandler:GetChildren()) do
-        --         if module.ClassName ~= "ModuleScript" then continue end;
-                
-        --         MissionDialogueModules[npcName][module.Name] = require(module);
-        --     end
-        -- end
-
-        -- if DialogueService.Handlers[npcName] == nil and baseDialogueHandlers:FindFirstChild(npcName) then
-        --     DialogueService.Handlers[npcName] = require(baseDialogueHandlers[npcName]);
-            
-        --     MissionDialogueModules[npcName] = {};
-        --     for _, module in pairs(baseDialogueHandlers[npcName]:GetChildren()) do
-        --         if module.ClassName == "ModuleScript" then
-        --             MissionDialogueModules[npcName][module.Name] = require(module);
-        --         end
-        --     end
-        -- end
-        
         if npcDialogData == nil then
             npcDialogData = activeDialogues.new(npcName);
+        end
+
+        if npcDialogData.Invoke == nil then
             npcDialogData.ChoiceHandleData = {};
             
             local lambda = 0;

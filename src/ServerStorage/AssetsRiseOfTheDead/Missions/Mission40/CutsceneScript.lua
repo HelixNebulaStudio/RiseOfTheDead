@@ -61,13 +61,12 @@ if RunService:IsServer() then
 		for _, part in pairs(workspace.Environment:WaitForChild("SecPark"):WaitForChild("Lava"):GetChildren()) do
 			touchHandler:AddObject(part);
 		end
-
 		
-		modOnGameEvents:ConnectEvent("OnNpcDeath", function(npcModule)
-			if npcModule.Name ~= "Zricera" then return end;
-			if npcModule.NetworkOwners == nil then return end;
 
-			for _, player in pairs(npcModule.NetworkOwners) do
+		modOnGameEvents:ConnectEvent("OnBossDefeated", function(players, npcModule)
+			if npcModule.Name ~= "Zricera" then return end;
+
+			for _, player in pairs(players) do
 				local profile = shared.modProfile:Get(player);
 
 				modMission:Progress(player, missionId, function(mission)
@@ -88,10 +87,10 @@ if RunService:IsServer() then
 						return destination;
 					end
 				end)
-
+				
 			end
-
 		end)
+		
 	end
 
 else

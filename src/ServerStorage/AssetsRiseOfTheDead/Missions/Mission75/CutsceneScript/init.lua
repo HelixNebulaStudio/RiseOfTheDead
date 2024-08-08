@@ -31,6 +31,13 @@ return function(CutsceneSequence)
 
 	local patrolBandit;
 
+	if RunService:IsServer() then
+		modStorage.RegisterItemName("Stan's Blood Samples Report #1");
+		modStorage.RegisterItemName("Stan's Blood Samples Report #2");
+		modStorage.RegisterItemName("Stan's Blood Samples Report #3");
+		modStorage.RegisterItemName("Stan's Blood Samples Report #4");
+	end
+	
 	if RunService:IsServer() and modBranchConfigs.IsWorld("MedicalBreakthrough") then
 		local jerCan = script:WaitForChild("JerryCan");
 		jerCan.Parent = workspace.Interactables;

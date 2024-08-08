@@ -325,7 +325,7 @@ function ItemViewport:RefreshDisplay()
 			if spin and tick()-self.OrbitTick >= 1 then
 				self.Rotor.WorldOrientation = Vector3.new(
 					self.Rotor.WorldOrientation.X, 
-					self.Rotor.WorldOrientation.Y +1, 
+					self.Rotor.WorldOrientation.Y +0.5, 
 					self.Rotor.WorldOrientation.Z
 				):Lerp(Vector3.new(0, self.Rotor.WorldOrientation.Y +1, 0), 0.005);
 			end

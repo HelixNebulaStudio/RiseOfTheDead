@@ -158,14 +158,19 @@ Dialogues["Dr. Deniski"].DialogueStrings = {
 	["medbre_showReport"]={
 		Say="Hey doc, I have some blood reports of infector blood and need some insight on it. Maybe you could help us?\n\n*Shows reports*";
 		Face="Suspicious"; 
-		Reply="Oh sure.. Hmmm... Very interesting..\nSo they are parasites, but they are in like a hibernating state because they aren't multiplying much..\nAnd during this state, they seem to be producing some kind of regenerative enzymes byproduct..";
+		Reply="Oh sure.. Hmmm... Very interesting..\nSo they are parasites, but they are in like a hibernating state because they aren't multiplying much..";
 	};
 	["medbre_showReport2"]={
+		Say="...";
+		Face="Suspicious"; 
+		Reply="And during this state, they seem to be producing some kind of regenerative enzymes byproduct..";
+	};
+	["medbre_showReport3"]={
 		Say="...";
 		Face="Joyful"; 
 		Reply="Haha, don't worry. I'll write it down, this is definately huge discover!\n\n*Writing up summary report*";
 	};
-	["medbre_showReport3"]={
+	["medbre_showReport4"]={
 		Say="Wait, but how does this compare to zombie blood?";
 		Face="Happy"; 
 		Reply="Well, in my tests, there aren't any dormant parasites in zombie blood.. My hypothesis is that the parasites only resides in the brain after the body is dead or something.\n*Finishes writing* annd done. Show this to your friend.";
@@ -340,41 +345,43 @@ if RunService:IsServer() then
 				dialog:AddChoice("medbre_showReport", function(dialog)
 					dialog:AddChoice("medbre_showReport2", function(dialog)
 						dialog:AddChoice("medbre_showReport3", function(dialog)
-							local profile = shared.modProfile:Get(player);
-							local playerSave = profile:GetActiveSave();
-							local inventory = playerSave.Inventory;
-							
-							
-							if mission.SaveData.MissionItems then
-								for a, itemIDs in pairs(mission.SaveData.MissionItems) do
-									inventory:Remove(itemIDs, 1);
+							dialog:AddChoice("medbre_showReport4", function(dialog)
+								local profile = shared.modProfile:Get(player);
+								local playerSave = profile:GetActiveSave();
+								local inventory = playerSave.Inventory;
+								
+								
+								if mission.SaveData.MissionItems then
+									for a, itemIDs in pairs(mission.SaveData.MissionItems) do
+										inventory:Remove(itemIDs, 1);
+									end
+									table.clear(mission.SaveData.MissionItems);
 								end
-								table.clear(mission.SaveData.MissionItems);
-							end
-							
-							modMission:Progress(player, missionId, function(mission)
-								if mission.ProgressionPoint <= 14 then
-									mission.ProgressionPoint = 14;
-								end
-							end);
-	
-							local hasSpace = inventory:SpaceCheck{{ItemId="samplereport"}};
-							if not hasSpace then
-								shared.Notify(player, "Inventory is full!", "Negative");
-								return;
-							end;
-							
-							inventory:Add("samplereport", {
-								CustomName=inventory.RegisterItemName("Dr. Deniski's Report Insights");
-								Values={
-									Result=false;
-								};}, function(queueEvent, storageItem)
-									mission.SaveData.ReportId = storageItem.ID;
+								
+								modMission:Progress(player, missionId, function(mission)
+									if mission.ProgressionPoint <= 14 then
+										mission.ProgressionPoint = 14;
+									end
 								end);
-							shared.Notify(player, "Dr. Deniski's Report Insights added to your inventory.", "Inform");
-							
-						end)
-					end);
+		
+								local hasSpace = inventory:SpaceCheck{{ItemId="samplereport"}};
+								if not hasSpace then
+									shared.Notify(player, "Inventory is full!", "Negative");
+									return;
+								end;
+								
+								inventory:Add("samplereport", {
+									CustomName=inventory.RegisterItemName("Dr. Deniski's Report Insights");
+									Values={
+										Result=false;
+									};}, function(queueEvent, storageItem)
+										mission.SaveData.ReportId = storageItem.ID;
+									end);
+								shared.Notify(player, "Dr. Deniski's Report Insights added to your inventory.", "Inform");
+								
+							end)
+						end);
+					end)
 				end);
 			end
 		end

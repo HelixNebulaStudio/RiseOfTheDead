@@ -30,8 +30,8 @@ Dialogues.Carlos.DialogueStrings = {
 		Reply="Here you go, try to play these notes to me.";
 	};
 	["soundOfMusic_done"]={
-		Say="That was great! Please share your musical knowledge with others too!";
-		Reply="Thanks, that was fun.";
+		Say="Thanks, that was fun.";
+		Reply="There are other instruments too if you ever come across them.";
 	};
 	
 	["soundOfMusic_how"]={
@@ -72,6 +72,7 @@ if RunService:IsServer() then
 				end)
 				
 			elseif stage == 3 then
+				dialog:SetInitiate("That was great! Please share your musical knowledge with others too!");
 				dialog:AddChoice("soundOfMusic_done", function(dialog)
 					modMission:CompleteMission(player, missionId);
 				end)
