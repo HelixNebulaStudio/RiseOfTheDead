@@ -103,6 +103,11 @@ function DialogueService:InitServer(baseDialogueHandlers)
 
                 function dialog:AddChoice(tag, func, data)
                     local dialoguePacket = modDialogueLibrary:Get(npcName, tag);
+                    if dialoguePacket == nil then
+                        Debugger:WarnClient(player, `Missing {npcName} dialogue with tag ({tag}).`);
+                        return;
+                    end
+
                     dialoguePacket.Tag = tag;
                     self:AddDialog(dialoguePacket, func, data);
                 end
@@ -127,6 +132,10 @@ function DialogueService:InitServer(baseDialogueHandlers)
                 
                 function dialog:SetInitiateTag(tag)
                     local dialoguePacket = modDialogueLibrary:Get(npcName, tag);
+                    if dialoguePacket == nil then
+                        Debugger:WarnClient(player, `Missing {npcName} dialogue with tag ({tag}).`);
+                        return;
+                    end
                     self:InitDialog(dialoguePacket);
                 end
                 

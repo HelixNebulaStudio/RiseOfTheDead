@@ -143,7 +143,11 @@ if RunService:IsServer() then
 	Dialogues.Patrick.DialogueHandler = function(player, dialog, data, mission)
 		if mission.Type == 2 then -- Available
 			if mission.ProgressionPoint == 1 then
-				dialog:SetInitiateTag("safehomeInit");
+				dialog:InitDialog({
+					Face="Confident"; 
+					Reply="Welcome back.";
+				});
+
 				dialog:AddChoice("theRecruit_settleR", function(dialog)
 					dialog:AddChoice("theRecruit_settle2R", function(dialog)
 						dialog:AddChoice("theRecruit_revas1", function(dialog)

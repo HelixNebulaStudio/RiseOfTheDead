@@ -130,7 +130,11 @@ if RunService:IsServer() then
 	Dialogues.Patrick.DialogueHandler = function(player, dialog, data, mission)
 		if mission.Type == 2 then -- Available
 			if mission.ProgressionPoint == 1 then
-				dialog:SetInitiateTag("safehomeInit");
+				dialog:InitDialog({
+					Face="Confident"; 
+					Reply="Welcome back.";
+				});
+				
 				dialog:AddChoice("theRecruit_settleB", function(dialog)
 					dialog:AddChoice("theRecruit_settle2B", function(dialog)
 						dialog:AddChoice("theRecruit_zark1", function(dialog)
@@ -266,6 +270,12 @@ if RunService:IsServer() then
 								
 								task.wait(5);
 								modServerManager:Travel(player, "TheMall");
+
+								local zarkModule = dialog:GetNpcModule();
+								if zarkModule then
+									zarkModule.Chat(player, "Bring it to Loran in the Bandit Camp once you obtained them.");
+								end
+								
 							end)
 						end)
 					end)

@@ -20,22 +20,12 @@ Dialogues.DialogueStrings = {
 		Reply="Halt! Turn back now!";
 	};
 	
-	["banditmapGift"]={
-		Face="Happy";
-		Say="Hey, how's the wound?";
-		Reply="It's getting better.. Oh and I want to give you this..";
-	};
-
 	["guide_factions"]={
 		Face="Happy";
 		Say="You said something about starting our own faction?";
 		Reply="Yeah! I'll help with distributing the information to keep the members up to date.. But I'll need 5000 gold before we begin..";
 		ReturnToInit=true;
 	};
-	["safehomeInit"]={
-		Face="Confident"; 
-		Reply="Welcome back.";
-	};	
 };
 
 if RunService:IsServer() then

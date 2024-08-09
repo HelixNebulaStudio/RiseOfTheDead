@@ -3907,10 +3907,25 @@ Commands["disguise"] = {
 			end
 		end
 		
+		local name;
+		if disguiseLib == nil and disguiseId then
+			local s, e = pcall(function()
+				name = game:GetService("Players"):GetNameFromUserIdAsync(tonumber(disguiseId));
+				if name then
+					disguiseId = tonumber(disguiseId);
+				end
+			end)
+		end
+
 		if disguiseLib then
 			modDisguiseMechanics:Disguise(speaker, disguiseId);
 			--shared.Notify(speaker, "Disguised as "..disguiseLib.Id, "Inform");
 			Debugger:WarnClient(speaker, "Disguised as "..disguiseLib.Id);
+
+		elseif name then
+			speaker:SetAttribute("CharacterAppearanceId", disguiseId);
+			shared.Notify(speaker, "Character appearance set.", "Inform");
+
 		else
 			shared.Notify(speaker, "Invalid disguise id, if your entityName has spaces, use \"s. e.g. /disguise \"Dr. Deniski\"", "Inform");
 		end

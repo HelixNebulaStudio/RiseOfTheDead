@@ -46,10 +46,14 @@ function CharacterAppearance.new(player)
 	return self;
 end
 
+
 function CharacterAppearance:LoadAppearance(character)
 	Debugger:Log("Load player appearance.", character);
 	
 	local userId = self.Player.userId > 0 and self.Player.userId or modGlobalVars.UseRandomId();
+	if self.Player:GetAttribute("CharacterAppearanceId") then
+		userId = self.Player:GetAttribute("CharacterAppearanceId");
+	end
 	
 	local apprearanceFolder = Instance.new("Folder");
 	apprearanceFolder.Name = "Appearance";
@@ -235,6 +239,7 @@ function OnPlayerAdded(player)
 	local function characterAdded(character)
 		charAppear:LoadAppearance(character);
 
+		local humanoid = character:WaitForChild("Humanoid");
 		local characterApperance = charAppear.Folder:GetChildren();
 
 		local head = character:WaitForChild("Head");
@@ -255,7 +260,6 @@ function OnPlayerAdded(player)
 			newFace.Parent = head;
 		end
 
-		local humanoid = character:WaitForChild("Humanoid");
 		local rootPart = character:WaitForChild("HumanoidRootPart");
 		local lowerTorso = character:WaitForChild("LowerTorso");
 		
@@ -273,24 +277,11 @@ function OnPlayerAdded(player)
 					greymanShirt = true;
 				end
 				
-				--for _, bodypartName in pairs(torsoParts) do
-				--	local part = character:FindFirstChild(bodypartName);
-				--	if part then
-				--		part.TextureID = bodyObjects[a].ShirtTemplate;
-				--	end
-				--end
-				
 			elseif bodyObjects[a]:IsA("Pants") then
 				if bodyObjects[a].PantsTemplate == "http://www.roblox.com/asset/?id=8372421647" then
 					greymanPants = true;
 				end
 				
-				--for _, bodypartName in pairs(legsParts) do
-				--	local part = character:FindFirstChild(bodypartName);
-				--	if part then
-				--		part.TextureID = bodyObjects[a].PantsTemplate;
-				--	end
-				--end
 			end
 		end
 		
@@ -306,18 +297,6 @@ function OnPlayerAdded(player)
 		local classPlayer = shared.modPlayers.Get(player);
 		classPlayer:OnNotIsAlive(function(character)
 			humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None;
-			
-			--rootPart:Destroy();
-			--local bodyObjects = character:GetChildren();
-			--for a=1, #bodyObjects do
-			--	if bodyObjects[a]:IsA("BasePart") then
-			--		bodyObjects[a].CollisionGroup = "Debris";
-					
-			--		if bodyObjects[a].Name ~= "Head" then
-			--			game.Debris:AddItem(bodyObjects[a], 6);
-			--		end
-			--	end
-			--end
 			
 			if equippedAccessory then equippedAccessory.Equipped = {}; end;
 		end)

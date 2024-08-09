@@ -12,7 +12,7 @@ local Dialogues = {
 local missionId = 58;
 --==
 
--- !outline: Patrick Dialogues
+-- MARK: Patrick Dialogues
 Dialogues.Patrick.DialogueStrings = {		
 	["doubleCross_init"]={
 		Face="Disbelief"; 
@@ -78,10 +78,15 @@ Dialogues.Patrick.DialogueStrings = {
 		Reply="Yeah! You know what, we could band up people to form our own group instead! Let's talk more about it later, I need some rest..";
 	};
 
+	["banditmapGift"]={
+		Face="Happy";
+		Say="Hey, how's the wound?";
+		Reply="It's getting better.. Oh and I want to give you this..";
+	};
 };
 
 
--- !outline: Revas Dialogues
+-- MARK: Revas Dialogues
 Dialogues.Revas.DialogueStrings = {
 	["doubleCross_1"]={
 		Face="Smirk";
@@ -128,7 +133,7 @@ Dialogues.Revas.DialogueStrings = {
 };
 
 
--- !outline: Caitlin Dialogues
+-- MARK: Caitlin Dialogues
 Dialogues.Caitlin.DialogueStrings = {
 	["doubleCross_1"]={
 		Face="Suspicious";
@@ -148,7 +153,7 @@ Dialogues.Caitlin.DialogueStrings = {
 };
 
 if RunService:IsServer() then
-	-- !outline: Patrick Handler
+	-- MARK: Patrick Handler
 	Dialogues.Patrick.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 		local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
@@ -268,7 +273,7 @@ if RunService:IsServer() then
 		end
 	end
 	
-	-- !outline: Revas Handler
+	-- MARK: Revas Handler
 	Dialogues.Revas.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 

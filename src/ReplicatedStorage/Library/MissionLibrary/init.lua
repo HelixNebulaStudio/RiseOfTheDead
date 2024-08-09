@@ -2268,6 +2268,7 @@ MissionLibrary.New{
 	};
 	Markers={
 		[1]={World="TheMall"; Label="Bandit"; Target=Vector3.new(798.55481, 162.668854, -728.297119); Type=modMarkers.MarkerTypes.Waypoint;};
+		[2]={World="TheMall"; Label="Bandit"; Target=Vector3.new(798.55481, 162.668854, -728.297119); Type=modMarkers.MarkerTypes.Waypoint;};
 		[12]={World="TheMall"; Label="Loran"; Target="Loran"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	SkipDestroyIfAddRequirementsNotMet=true;

@@ -91,6 +91,7 @@ if RunService:IsServer() then
 				end)
 				if mission.ProgressionPoint == 2 then
 					dialog:SetInitiate("Alright, I know there's another secret passage somewhere..", "Skeptical");
+					dialog:SetExpireTime(workspace:GetServerTimeNow()+6);
 					modMission:Progress(player, missionId, function(mission)
 						if mission.ProgressionPoint <= 2 then
 							mission.ProgressionPoint = 3;

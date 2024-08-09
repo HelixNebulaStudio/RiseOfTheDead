@@ -102,9 +102,16 @@ Dialogues["Mysterious Engineer"].DialogueStrings = {
 		Face="Happy"; 
 		Reply="*Rubs hands together* Hah.. There's so much more I can do with these schem--Oh you're still here..\nErr, you're welcome!";
 	};
+
+	["bofb_hint"]={
+		Say="Why do you have so many SunkenShip Chests?";
+		Face="Confident"; 
+		Reply="I have a fish catching machine, sometimes it devours random chests it finds. I've opened a bunch of them before, but they're mostly junk to me. If you do find something interesting, let me know!";
+	}
 };
 
 if RunService:IsServer() then
+	local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 	local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 	
 	-- !outline: Mysterious Engineer Handler
@@ -133,29 +140,35 @@ if RunService:IsServer() then
 				or extendedDesc == blueprintFinalDesc;
 		end);
 		
-		if mission.Type == 2 and #itemsList > 0 then -- Available;
-			dialog:SetInitiateTag("bofb_init");
-			
-			dialog:AddChoice("bofb_start", function(dialog)
-				dialog:AddChoice("bofb_start2", function(dialog)
-					dialog:AddChoice("bofb_start3", function(dialog)
-						dialog:AddChoice("bofb_start4", function(dialog)
-							
-							dialog:AddChoice("bofb_startNo");
-							dialog:AddChoice("bofb_startYes", function(dialog)
+		if mission.Type == 2 then -- Available;
+			if #itemsList > 0 then
+				dialog:SetInitiateTag("bofb_init");
+				
+				dialog:AddChoice("bofb_start", function(dialog)
+					dialog:AddChoice("bofb_start2", function(dialog)
+						dialog:AddChoice("bofb_start3", function(dialog)
+							dialog:AddChoice("bofb_start4", function(dialog)
 								
-								for a=1, #itemsList do
-									inventory:Remove(itemsList[a].ID);
-									shared.Notify(player, `{itemsList[a]:GetCustomName() or itemsList[a].Library.Name} was removed from your Inventory.`, `Negative`);
-								end
+								dialog:AddChoice("bofb_startNo");
+								dialog:AddChoice("bofb_startYes", function(dialog)
+									
+									for a=1, #itemsList do
+										inventory:Remove(itemsList[a].ID);
+										shared.Notify(player, `{itemsList[a]:GetCustomName() or itemsList[a].Library.Name} was removed from your Inventory.`, `Negative`);
+									end
+									
+									modMission:StartMission(player, missionId);
+								end)
 								
-								modMission:StartMission(player, missionId);
 							end)
-							
 						end)
 					end)
 				end)
-			end)
+
+			elseif modEvents:GetEvent(player, "freeDivingSuit") then
+				dialog:AddChoice("bofb_hint");
+
+			end
 			
 			
 		elseif mission.Type == 1 then -- Active
@@ -198,6 +211,7 @@ if RunService:IsServer() then
 									end
 									
 									inventory:Add("portableautoturretbp");
+									shared.Notify(player, `Portable Auto Turret Blueprint was added to your Inventory.`, `Inform`);
 									
 									modMission:CompleteMission(player, missionId);
 								end)

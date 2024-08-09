@@ -428,6 +428,8 @@ end
 
 -- !outline: OnServerInvoke RemoveItem
 function remoteRemoveItem.OnServerInvoke(player, storageId, id, quantity)
+	local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+
 	if remoteRemoveItem:Debounce(player) then return end;
 	local storage = Storage.Get(storageId, player);
 	
@@ -453,7 +455,9 @@ function remoteRemoveItem.OnServerInvoke(player, storageId, id, quantity)
 
 		if itemLib.MissionIds == nil then
 			shared.Notify(player, "This mission item can not be deleted.", "Negative");
-			return;
+			if modBranchConfigs.CurrentBranch.Name ~= "Dev" then
+				return;
+			end
 		end
 
 		local canDelete = true;
@@ -471,7 +475,9 @@ function remoteRemoveItem.OnServerInvoke(player, storageId, id, quantity)
 
 		if canDelete == false then
 			shared.Notify(player, `This mission item can not be deleted. Mission Incomplete: ({table.concat(unfinMissions, ", ")})`, "Negative");
-			return {storage:Shrink();};
+			if modBranchConfigs.CurrentBranch.Name ~= "Dev" then
+				return {storage:Shrink();};
+			end
 		end
 	end
 

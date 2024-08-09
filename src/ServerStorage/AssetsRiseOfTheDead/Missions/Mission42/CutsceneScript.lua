@@ -13,7 +13,7 @@ local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local remotes = game.ReplicatedStorage.Remotes;
 local remoteCameraShakeAndZoom = remotes.CameraShakeAndZoom;
 --== Variables;
-local missionId = 0;
+local missionId = 42;
 
 if RunService:IsServer() then
 	modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
@@ -37,8 +37,6 @@ return function(CutsceneSequence)
 	--if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
-		Debugger:Warn("Load VindictiveTreasure 3 cutscene");
-		
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
 		local mission = modMission:GetMission(player, missionId);
