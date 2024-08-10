@@ -25,11 +25,12 @@ function DialogueService:InitServer(baseDialogueHandlers)
     local remoteDialogueHandler = modRemotesManager:Get("DialogueHandler");
 
     --== Script;
-    local function OnDialogue(player, npcModel, npcName, choiceTag)
+    local function OnDialogue(player, npcModel, npcName, packet)
         local profile = shared.modProfile:Get(player);
         if profile then
             profile:AddPlayPoints(3, "Gameplay:Dialogue");
         end
+
 
         npcName = npcName or "nilName";
         local activeDialogues = modDialogues:Get(player);
@@ -55,14 +56,16 @@ function DialogueService:InitServer(baseDialogueHandlers)
             npcDialogData.ChoiceHandleData = {};
             
             local lambda = 0;
-            local orderCount = 1;
+            local orderCount = 10;
             npcDialogData.Reset = function()
                 lambda = 0;
-                orderCount = 1;
+                orderCount = 10;
                 table.clear(npcDialogData.ChoiceHandleData);
             end
 
-            npcDialogData.Invoke = function(choiceTag)
+            npcDialogData.Invoke = function(packet)
+                local choiceTag = packet.ChoiceTag;
+                
                 local dialog = {}; -- Sent to client;
                 dialog.Player = player;
                 dialog.Name = npcName;
@@ -213,6 +216,49 @@ function DialogueService:InitServer(baseDialogueHandlers)
                     end
                 end
 
+                -- MARK: UserPrompt;
+                if RunService:IsStudio() and packet.UserPrompt then
+                    local userPrompt = packet.UserPrompt;
+                    Debugger:Warn("UserPrompted(",player.Name,") to (",npcName,"):", userPrompt);
+
+                    local promptProfile = nil;
+                    if baseDialoguesScript then
+                        local dialogueResources = require(baseDialoguesScript);
+                        promptProfile = dialogueResources.PromptProfile;
+                    end
+
+                    if promptProfile then
+                        local modLLMService = require(game.ServerScriptService.ServerLibrary.LLMService);
+                        if npcDialogData.PromptChain == nil then
+                            npcDialogData.PromptChain = modLLMService.InitPrompt(npcName, promptProfile);
+                        end
+                        
+                        npcDialogData.PromptChain = npcDialogData.PromptChain..`\n$PlayerName askes:{userPrompt}`;
+    
+                        local llmResponse = modLLMService.Query(npcDialogData.PromptChain);
+                        
+                        for k, v in string.gmatch(llmResponse, `(%w+):.-"(.-)"`) do
+                            if k == "Npc" then
+                                dialog:SetInitiate(v);
+                                npcDialogData.PromptChain = npcDialogData.PromptChain..v;
+                                Debugger:Warn("PromptResponse(",npcName,"):",v);
+    
+                            elseif tonumber(k) then
+                                dialog:AddDialog({
+                                    Say=v;
+                                    Reply=`*thinking...*`;
+                                }, nil, {
+                                    Order=tonumber(k);
+                                    UserPrompt=true;
+                                });
+    
+                            end
+                        end
+
+                        dialog.ExpireTime = nil;
+                    end
+
+                end
 
                 if dialog.InitReply == nil and initDialoguePacket then
                     dialog:InitDialog(initDialoguePacket);
@@ -222,8 +268,8 @@ function DialogueService:InitServer(baseDialogueHandlers)
             end
         end;
         
-        bindOnTalkedTo:Fire(npcPrefab, player, choiceTag);
-        return npcDialogData.Invoke(choiceTag);
+        bindOnTalkedTo:Fire(npcPrefab, player); -- , packet.ChoiceTag
+        return npcDialogData.Invoke(packet);
     end
 
     -- MARK: OnDialogueHandler(player, action, packet)
@@ -246,10 +292,10 @@ function DialogueService:InitServer(baseDialogueHandlers)
             bindOnTalkedTo:Fire(npcModel, player, "close");
             
         elseif action == "oldconverse" then
-            return OnDialogue(player, packet.NpcModel, packet.NpcName, packet.SelectIndex);
+            return OnDialogue(player, packet.NpcModel, packet.NpcName, {ChoiceTag=packet.SelectIndex});
             
         elseif action == "dialogue" then
-            return OnDialogue(player, packet.NpcModel, packet.NpcName, packet.ChoiceTag);
+            return OnDialogue(player, packet.NpcModel, packet.NpcName, {ChoiceTag=packet.ChoiceTag});
 
         elseif action == "talk" then
             
@@ -261,6 +307,12 @@ function DialogueService:InitServer(baseDialogueHandlers)
             task.spawn(function()
                 remoteDialogueHandler:InvokeClient(player, "talk", dialogPacket);
             end)
+
+        elseif action == "userprompt" and RunService:IsStudio() then
+            return OnDialogue(player, packet.NpcModel, packet.NpcName, {
+                UserPrompt=packet.UserPrompt;
+            });
+
         end;
         
         return;

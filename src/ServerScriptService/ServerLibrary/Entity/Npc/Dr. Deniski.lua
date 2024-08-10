@@ -37,6 +37,7 @@ return function(npc, spawnPoint)
 				if self.IsDead or self.Humanoid.RootPart == nil then return false; end;
 				self.Chat(game.Players:GetPlayers(), speeches[random:NextInteger(1, #speeches)]);
 			until not wait(random:NextNumber(32,350));
+			return;
 		end)
 		repeat until not self.Update();
 	end

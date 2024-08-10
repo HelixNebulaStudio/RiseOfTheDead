@@ -101,25 +101,7 @@ function Interface.init(modInterface)
 	end)
 
 	function remoteDialogueHandler.OnClientInvoke(action, packet)
-		if action == "load" then
-			Debugger:StudioLog("Load dialogues", packet);
-
-			-- local missionId = packet.MissionId;
-			-- local file = packet.File;
-
-			-- local missionDialogues = require(file);
-				
-			-- for npcName, pack in pairs(missionDialogues) do
-			-- 	if pack.Dialogues == nil then continue end;
-				
-			-- 	modDialogueLibrary.AddDialogues(npcName, pack.Dialogues(), {
-			-- 		MissionId = missionId;
-			-- 	});
-			-- end
-
-			return true;
-
-		elseif action == "talk" then
+		if action == "talk" then
 			local dialogPacket = packet;
 			window:Open();
 			Interface:OnDialogue(dialogPacket);
@@ -285,6 +267,10 @@ function Interface:OnDialogue(dialogPacket)
 					newText = fontColor.."["..missionLib.Name.."]"..'</font> '..'<font size="'.. textSize-2 ..'">' ..newText.."</font>";
 				end
 				
+				if data and data.UserPrompt then
+					newText = `<b>[Chat]</b> {newText}`;
+				end
+
 				if unlockTime and unlockTime > 0 then
 					textLabel.Text = newText.." ("..modSyncTime.ToString(unlockTime)..")";
 					textLabel.TextColor3 = Color3.fromRGB(150, 150, 150);
@@ -296,6 +282,7 @@ function Interface:OnDialogue(dialogPacket)
 					textLabel:SetAttribute("TextColor", textLabel.TextColor3);
 					textLabel:SetAttribute("AutoColor", true);
 				end
+
 			end
 			
 			updateText();
@@ -344,6 +331,9 @@ function Interface:OnDialogue(dialogPacket)
 			
 			newDialogue.Name = choiceTag or "untagged";
 			newDialogue.LayoutOrder = choiceInfo.Order;
+			if data and data.Order then
+				newDialogue.LayoutOrder = data.Order;
+			end
 			
 			table.insert(dialogueButtons, newDialogue);
 			newDialogue.MouseMoved:Connect(function()
@@ -365,11 +355,27 @@ function Interface:OnDialogue(dialogPacket)
 				
 				local function onOptionClicked()
 					if choiceInfo.CheckMission == nil or canStart == true then
+						-- MARK: Set Reply text
 						self:SetDialogueText(replyStr);
 						
 						local faceInfo = faceSet and modFacesLibrary:Find(faceSet);
 						if faceInfo and NpcModel and NpcModel:FindFirstChild("Head") and NpcModel.Head:FindFirstChild("face") then
 							NpcModel.Head.face.Texture = faceInfo.Texture;
+						end
+
+						if data and data.UserPrompt then
+							task.spawn(function()
+								local newDialoguePacket = remoteDialogueHandler:InvokeServer("userprompt", {
+									NpcName = NpcName;
+									NpcModel = NpcModel;
+									UserPrompt = sayStr;
+								});
+		
+								Interface:SetDialogueText(newDialoguePacket.InitReply);
+								Debugger:StudioLog("newDialoguePacket", newDialoguePacket);
+								dialogPacket = newDialoguePacket;
+								refreshDialogues();
+							end)
 						end
 						
 					else
@@ -450,10 +456,10 @@ function Interface:OnDialogue(dialogPacket)
 			end
 			
 			newDialogue.Parent = questionsList;
-			questionOption.Visible = choiceInfo.AskMe == true or (#dialogueButtons > 1);
+			questionOption.Visible = true;--choiceInfo.AskMe == true or (#dialogueButtons > 1);
 		end
 
-		questionOption.Visible = dialogPacket.AskMe == true or (#dialogueButtons > 1);
+		questionOption.Visible = true;--dialogPacket.AskMe == true or (#dialogueButtons > 1);
 		
 
 		if dialogPacket.ExpireTime then
@@ -476,6 +482,10 @@ function Interface:OnDialogue(dialogPacket)
 			):Play();
 			
 			task.delay(timeLeft, function()
+				if lastExpireTime == nil then 
+					timerBar.Visible = false;
+					return
+				end;
 				if lastExpireTime ~= expireTime then return end;
 				Interface:CloseWindow("Dialogue");
 			end)
@@ -522,38 +532,30 @@ questionInput:GetPropertyChangedSignal("Text"):Connect(function()
 	end
 end)
 
+local lastInputText = nil;
 questionInput.FocusLost:Connect(function(enterPressed, inputObject)
 	local inputText = questionInput.Text;
 	
 	if enterPressed then
-		local canAnswer = false;
 		for _, child in pairs(questionsList:GetChildren()) do
-			if child:IsA("TextButton") and child.Visible and child.Name ~= "questionOption" then canAnswer = true; break end;
+			if child:IsA("TextButton") and child.Visible and child.Name ~= "questionOption" then 
+				break;
+			end;
 		end
-		if not canAnswer and NpcName then
-			-- local replies = unevaluableAnswers;
-			
-			-- local dialogLib = modDialogueLibrary[NpcName];
-			
-			-- if dialogLib then
-			-- 	replies = dialogLib.UnevaluableAnswers or unevaluableAnswers;
-				
-			-- 	local questionKeywords = {"what"; "when"; "will"; "is"; "are"; "who"; "where"; "should"};
-				
-			-- 	local isQuestion = false;
-			-- 	for a=1, #questionKeywords do
-			-- 		if inputText:lower():match(questionKeywords[a]) then
-			-- 			isQuestion = true;
-			-- 			break;
-			-- 		end
-			-- 	end
-				
-			-- 	if isQuestion and dialogLib.FortuneAnswers then
-			-- 		replies = dialogLib.FortuneAnswers;
-			-- 	end
-			-- end
-			
-			-- Interface:SetDialogueText(replies[random:NextInteger(1, #replies)]);
+
+		if NpcName and lastInputText ~= inputText then
+			lastInputText = inputText;
+			lastExpireTime = nil;
+			Interface:SetDialogueText("*thinking...*");
+
+			local dialogPacket = remoteDialogueHandler:InvokeServer("userprompt", {
+				NpcName = NpcName;
+				NpcModel = NpcModel;
+				UserPrompt = inputText;
+			});
+
+			Debugger:StudioLog("UserPrompt dialogPacket", dialogPacket);
+			Interface:OnDialogue(dialogPacket);
 		end
 	end
 end)
