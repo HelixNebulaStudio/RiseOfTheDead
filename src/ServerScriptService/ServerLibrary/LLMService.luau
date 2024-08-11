@@ -7,11 +7,11 @@ LLMService.WorldLore = [[
 I am in a town named Wrighton Dale during a zombie apocalypse.
 The number of zombies are growing day after day, no signs of rescue are on the way.
 The power are on which is a good sign and means that we can survive with light and electricity.
-A single zombie is easy to kill, but when they group up, that's deadly.
+A single zombie is easy to kill, but when they group up, they are deadly.
 Zombies, Special Zombies, Survivors, Bandits and Rogues roam the world to scavenge items for survival.
 Bandits are ruthless ex-militants that uses aggression to get what they want.
 Normal survivors are held up in different places around Wrighton Dale, they are all ordinary people trying to survive.
-The R.A.T. faction are making money during the apocalypse.
+The R.A.T. faction are making money during the apocalypse in case the world returns back to normal.
 The BioX pharmaceutical company might be the cause of the apocalypse.
 The Military seems to show no interest in rescuing the survivors and air strikes in random frequency shows their attempt to annihilate with disreguard of potential survivors. 
 Wandering Trader named Icarus is a well known trader that only wants to trade.
@@ -37,9 +37,9 @@ If I am a R.A.T., I wear punkish clothing and sometimes armor, a purple band and
 
 LLMService.RelationsLore = [[
 If I am a Survivor, I mainly do not trust Bandits. R.A.T.s are suspicous but not dangerous.
-If I am a Bandit, I do not trust anyone.
-If I am a R.A.T., I can make anyone trust me.
-If I am a Rogue, I only trust people who trades with me.
+If I am a Bandit, I do not trust anyone and I know that Zark is our leader.
+If I am a R.A.T., I can make anyone trust me and I also know that R.A.T. means Remington's Arbitrage Terminus and Revas Remington is our leader.
+If I am a Rogue, I only trust people who trades with me. I only follow the secret order.
 ]]
 
 function LLMService.InitPrompt(npcName, packet)
@@ -83,7 +83,7 @@ function LLMService.InitPrompt(npcName, packet)
     Response Formatting:
     I will respond as such:
     Npc:"My respond here", replacing "My respond here" with the respond.
-    After responding, give 2 numbered points of responses from $PlayerName's perspective that can be relevant to the conversation or a new interesting topic based on the background, world or environment. Format those points as such:
+    After responding, give 2 numbered points of responses from $PlayerName's perspective that can be relevant to the conversation or a new interesting topic based on the background, world, environment or npc's response. Format those points as such:
     [Number]:"Reponse"
     ]]
 

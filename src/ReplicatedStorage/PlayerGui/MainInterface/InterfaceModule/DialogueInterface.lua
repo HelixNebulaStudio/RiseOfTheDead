@@ -365,12 +365,15 @@ function Interface:OnDialogue(dialogPacket)
 
 						if data and data.UserPrompt then
 							task.spawn(function()
+								questionInput.Text = sayStr;
 								local newDialoguePacket = remoteDialogueHandler:InvokeServer("userprompt", {
 									NpcName = NpcName;
 									NpcModel = NpcModel;
 									UserPrompt = sayStr;
 								});
-		
+								questionInput.Text = "";
+								if newDialoguePacket.Name ~= NpcName then return end;
+
 								Interface:SetDialogueText(newDialoguePacket.InitReply);
 								Debugger:StudioLog("newDialoguePacket", newDialoguePacket);
 								dialogPacket = newDialoguePacket;
@@ -461,7 +464,7 @@ function Interface:OnDialogue(dialogPacket)
 
 		questionOption.Visible = true;--dialogPacket.AskMe == true or (#dialogueButtons > 1);
 		
-
+		
 		if dialogPacket.ExpireTime then
 			local expireTime = dialogPacket.ExpireTime;
 			lastExpireTime = expireTime;
@@ -536,6 +539,11 @@ local lastInputText = nil;
 questionInput.FocusLost:Connect(function(enterPressed, inputObject)
 	local inputText = questionInput.Text;
 	
+	if inputText and #inputText >= 2 then
+		lastExpireTime = nil;
+		timerBar.Visible = false;
+	end
+
 	if enterPressed then
 		for _, child in pairs(questionsList:GetChildren()) do
 			if child:IsA("TextButton") and child.Visible and child.Name ~= "questionOption" then 
@@ -545,7 +553,10 @@ questionInput.FocusLost:Connect(function(enterPressed, inputObject)
 
 		if NpcName and lastInputText ~= inputText then
 			lastInputText = inputText;
+
 			lastExpireTime = nil;
+			timerBar.Visible = false;
+
 			Interface:SetDialogueText("*thinking...*");
 
 			local dialogPacket = remoteDialogueHandler:InvokeServer("userprompt", {

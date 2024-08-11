@@ -29,7 +29,7 @@ Dialogues.PromptProfile = {
 	I created the Incendiary Rounds mod blueprint for $PlayerName, with it built and attached to their weapon, they can ignite their enemies with the mod.
 	I created another elemental mod called Electric Charge for $PlayerName which when attached to a weapon allows their weapon to shock and damage near by enemies.
 	Mason is a great leader of this group, if it wasn't for him, I would have still be looking for shelter.
-	I used to sell chopped up planks from my martial arts class to Mason.
+	I used to sell chopped up planks from my martial arts class to Mason in his pawn shop.
 	Nick is great, he is really socially aware for his age.
 	I don't know Dr. Deniski that well but he was helpful when I needed bandages.
 	Russell used to be my building's janitor and cleans up my martial art's class room once we're done, he is a wholesome guy.

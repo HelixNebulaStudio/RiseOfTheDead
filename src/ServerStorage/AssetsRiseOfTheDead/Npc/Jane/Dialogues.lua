@@ -5,6 +5,30 @@ local RunService = game:GetService("RunService");
 local Dialogues = {};
 --==
 
+-- MARK: PromptProfile
+Dialogues.PromptProfile = {
+	World=[[
+	I'm held up in the Sundays Safehouse.
+	It's a convenient store named Sundays.
+	The windows and front door is barricaded up and the store is completely ransacked.
+	]];
+	Role=[[
+	I am a Survivor.
+	I am a 21 year old woman who was a farmer before the apocalypse.
+	I am anxious and easily startled.
+	I am always by the radio incase there's good news.
+	I am a INFP.
+	]];
+	Appear=[[
+	I have black hair with a red hair band.
+	I wear a denim loose bib pants and a red hoodie underneath.
+	]];
+	Relations=[[
+	I know $PlayerName rescued Robert from Bloxmart.
+	I know Robert who is part of my group, and is our scavenger.
+	]];
+};
+
 -- MARK: InitStrings
 Dialogues.InitStrings = {
 	["init1"]={

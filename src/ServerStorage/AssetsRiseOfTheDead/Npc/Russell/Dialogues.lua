@@ -21,7 +21,7 @@ Dialogues.PromptProfile = {
 	My catchphrase is "Get out of my face."
 	]];
 	Appear=[[
-	I have a buzz cut and brown beard.
+	I have a buzz cut and black beard.
 	I wear a green camo jacket and cap.
 	I have my trusty Minigun under my couch.
 	]];
