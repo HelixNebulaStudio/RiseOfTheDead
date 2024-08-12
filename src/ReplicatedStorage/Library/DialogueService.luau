@@ -217,7 +217,7 @@ function DialogueService:InitServer(baseDialogueHandlers)
                 end
 
                 -- MARK: UserPrompt;
-                if RunService:IsStudio() and packet.UserPrompt then
+                if packet.UserPrompt then
                     local userPrompt = packet.UserPrompt;
                     Debugger:Warn("UserPrompted(",player.Name,") to (",npcName,"):", userPrompt);
 
@@ -225,25 +225,61 @@ function DialogueService:InitServer(baseDialogueHandlers)
                     if baseDialoguesScript then
                         local dialogueResources = require(baseDialoguesScript);
                         promptProfile = dialogueResources.PromptProfile;
+
+                        if dialogueResources.PromptHandler then
+                            dialogueResources.PromptHandler(player, dialog, npcDialogData, userPrompt);
+                        end
                     end
 
-                    if promptProfile then
+                    local canQueryLLM = RunService:IsStudio();
+                    local approvedUserIds = {
+                        16170943;
+                        3295490081;
+                        86976526;
+                        32911077;
+                        117392244;
+                        99496471;
+                    };
+                    for a=1, #approvedUserIds do
+                        if approvedUserIds[a] == player.UserId then
+                            canQueryLLM = true;
+                            Debugger:Warn(player,"is allowed to query npc.");
+
+                            local DataStoreService = game:GetService("DataStoreService");
+                            local dataStore = DataStoreService:GetDataStore("LLMQuery");
+                            local newVal = dataStore:IncrementAsync(tostring(player.UserId), nil, {player.UserId});
+                            
+                            if newVal < 99 then
+                                shared.Notify(player, `AI NPC query quota: {100-newVal}/100`, "Inform");
+                            else
+                                canQueryLLM = false;
+                                shared.Notify(player, "No more quotas for AI NPC query.", "Negative");
+                            end
+                            
+                            break;
+                        end
+                    end
+
+                    if promptProfile and canQueryLLM then
                         local modLLMService = require(game.ServerScriptService.ServerLibrary.LLMService);
                         if npcDialogData.PromptChain == nil then
                             npcDialogData.PromptChain = modLLMService.InitPrompt(npcName, promptProfile);
                         end
                         
-                        npcDialogData.PromptChain = npcDialogData.PromptChain..`\n$PlayerName askes:{userPrompt}`;
+                        npcDialogData.PromptChain = npcDialogData.PromptChain..`\n$PlayerName:{userPrompt}`;
     
                         local llmResponse = modLLMService.Query(npcDialogData.PromptChain);
-                        
-                        for k, v in string.gmatch(llmResponse, `(%w+):.-"(.-)"`) do
-                            if k == "Npc" then
+                        local npcResponded = false;
+                        local suggestedRespond = 0;
+
+                        for k, v in string.gmatch(llmResponse, `([$%w]+):.-"(.-)"`) do
+                            if k == "$Me" then
                                 dialog:SetInitiate(v);
-                                npcDialogData.PromptChain = npcDialogData.PromptChain..v;
+                                npcDialogData.PromptChain = npcDialogData.PromptChain..`\n$Me:{v}`;
                                 Debugger:Warn("PromptResponse(",npcName,"):",v);
+                                npcResponded = true;
     
-                            elseif tonumber(k) then
+                            elseif tonumber(k) and npcResponded then
                                 dialog:AddDialog({
                                     Say=v;
                                     Reply=`*thinking...*`;
@@ -251,9 +287,11 @@ function DialogueService:InitServer(baseDialogueHandlers)
                                     Order=tonumber(k);
                                     UserPrompt=true;
                                 });
-    
+                                suggestedRespond = suggestedRespond +1;
+
                             end
                         end
+                        Debugger:StudioLog("Npc response:", npcResponded, {llmResponse});
 
                         dialog.ExpireTime = nil;
                     end
@@ -308,7 +346,7 @@ function DialogueService:InitServer(baseDialogueHandlers)
                 remoteDialogueHandler:InvokeClient(player, "talk", dialogPacket);
             end)
 
-        elseif action == "userprompt" and RunService:IsStudio() then
+        elseif action == "userprompt" then
             return OnDialogue(player, packet.NpcModel, packet.NpcName, {
                 UserPrompt=packet.UserPrompt;
             });

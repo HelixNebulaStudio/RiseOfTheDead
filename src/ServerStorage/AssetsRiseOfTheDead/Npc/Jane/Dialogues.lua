@@ -72,7 +72,7 @@ if RunService:IsServer() then
 				end)
 			end);
 		end
-	end 
+	end
 end
 
 return Dialogues;

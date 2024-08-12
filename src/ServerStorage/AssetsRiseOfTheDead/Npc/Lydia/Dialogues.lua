@@ -115,7 +115,47 @@ if RunService:IsServer() then
 	Dialogues.DialogueHandler = function(player, dialog, data)
 		local survivorDialogueHandler = require(script.Parent.Parent.Survivor);
 		survivorDialogueHandler(player, dialog, data);
-	end 
+	end
+
+	Dialogues.PromptHandler = function(player, dialog, data, userPrompt)
+		local npcName = dialog.Name;
+		local profile = shared.modProfile:Get(player);
+		local safehomeData = profile.Safehome;
+		
+		local npcData = safehomeData:GetNpc(npcName);
+		if npcData == nil then return end
+
+		local npcLevel = npcData.Level or 0;
+		if npcLevel < 5 then 
+			dialog:SetInitiate("Your question will be answered when I have my magic crystal set up.");
+			return 
+		end;
+
+		local questionKeywords = {"what"; "when"; "will"; "is"; "are"; "who"; "where"; "should"};
+				
+		local isQuestion = false;
+		for a=1, #questionKeywords do
+			if userPrompt:lower():match(questionKeywords[a]) then
+				isQuestion = true;
+				break;
+			end
+		end
+
+		if isQuestion then
+			local randomResponse = {
+				"It is certain.";
+				"It is decidedly so.";
+				"Without a doubt.";
+				"Yes, definitely.";
+				"You may rely on it.";
+				"As I see it, yes.";
+				"Most likely.";
+				"Outlook good.";
+			}
+			dialog:SetInitiate(randomResponse[math.random(1, #randomResponse)]);
+		end
+	end
+
 end
 
 return Dialogues;
