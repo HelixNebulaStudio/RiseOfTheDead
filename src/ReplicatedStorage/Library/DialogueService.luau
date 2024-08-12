@@ -240,23 +240,25 @@ function DialogueService:InitServer(baseDialogueHandlers)
                         117392244;
                         99496471;
                     };
-                    for a=1, #approvedUserIds do
-                        if approvedUserIds[a] == player.UserId then
-                            canQueryLLM = true;
-                            Debugger:Warn(player,"is allowed to query npc.");
-
-                            local DataStoreService = game:GetService("DataStoreService");
-                            local dataStore = DataStoreService:GetDataStore("LLMQuery");
-                            local newVal = dataStore:IncrementAsync(tostring(player.UserId), nil, {player.UserId});
-                            
-                            if newVal < 99 then
-                                shared.Notify(player, `AI NPC query quota: {100-newVal}/100`, "Inform");
-                            else
-                                canQueryLLM = false;
-                                shared.Notify(player, "No more quotas for AI NPC query.", "Negative");
+                    if promptProfile then
+                        for a=1, #approvedUserIds do
+                            if approvedUserIds[a] == player.UserId then
+                                canQueryLLM = true;
+                                Debugger:Warn(player,"is allowed to query npc.");
+    
+                                local DataStoreService = game:GetService("DataStoreService");
+                                local dataStore = DataStoreService:GetDataStore("LLMQuery");
+                                local newVal = dataStore:IncrementAsync(tostring(player.UserId), nil, {player.UserId});
+                                
+                                if newVal < 99 then
+                                    shared.Notify(player, `AI NPC query quota: {100-newVal}/100`, "Inform");
+                                else
+                                    canQueryLLM = false;
+                                    shared.Notify(player, "No more quotas for AI NPC query.", "Negative");
+                                end
+                                
+                                break;
                             end
-                            
-                            break;
                         end
                     end
 

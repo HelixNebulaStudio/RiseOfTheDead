@@ -98,7 +98,7 @@ return function(npc, spawnPoint)
 		self.AnimationController:Stop("SearchAnim");
 		self.AnimationController:Stop("InspectAnim");
 		
-		self.TalkPause = tick()+10;
+		self.TalkPause = tick()+300;
 		if choice == "close" then
 			self.TalkPause = tick();
 			return;

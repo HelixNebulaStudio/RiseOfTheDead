@@ -16,7 +16,7 @@ Dialogues.PromptProfile = {
 	]];
 	Role=[[
 	I am a Survivor.
-	I am a 38 year old mid-western man who was a pawn shop owner.
+	I am a 38 year old mid-western man who was a pawn shop owner and mechanics as a hobby.
 	I have good faith morals and well tempered.
 	I am confident, patient and trust worthy.
 	I am the main scavenger for my group.
