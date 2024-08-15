@@ -377,6 +377,7 @@ function Interface.init(modInterface)
 		missionTypeOrder.Unreleased = nil;
 	end
 
+	local currentStoryline = "";
 	local activeEntryTween: Tween;	
 	function Interface.RefreshMissionMap()
 		local mapTypes = {
@@ -496,6 +497,24 @@ function Interface.init(modInterface)
 					activeEntryTween:Cancel();
 				end
 			end)
+
+			local storylineOptions = missionMap:WaitForChild("Storylines");
+			for _, button: TextButton in pairs(storylineOptions:GetChildren()) do
+				if not button:IsA("TextButton") then continue end;
+
+				button.MouseButton1Click:Connect(function()
+					Interface:PlayButtonClick();
+					currentStoryline = button.Name;
+
+					local missionMap = MissionDisplayFrame:FindFirstChild("MissionsMap");
+					if missionMap then
+						missionMap:Destroy();
+					end
+
+					Interface.RefreshMissionMap();
+				end)
+			end
+
 		end
 		
 		local scrollFrame = missionMap:WaitForChild("ScrollingFrame");
@@ -503,16 +522,35 @@ function Interface.init(modInterface)
 		local rootNode = nil;
 		local missionChecked = {};
 
-		local function mapOutMission(id, parentNode)
+		local function mapOutMission(id, parentNode, packet)
 			local lib = modMissionsLibrary.Get(id);
 			if lib == nil then return end;
-			if missionChecked[id] then Debugger:Warn("Mission (",id,") already mapped."); return end; missionChecked[id] = true;
+
+			if modMissionsLibrary.StoryLineEnum[currentStoryline] then
+				if lib.Storyline ~= currentStoryline and parentNode then return end;
+			else
+				if lib.Storyline then 
+					if packet == nil or packet.StorylineInfo == nil then
+						return 
+					end
+				end;
+			end
+
+			if missionChecked[id] then Debugger:Warn("Mission (",id,") already mapped."); return end;
+			missionChecked[id] = true;
+
 			if not validMissionType(lib) then return end;
 			
+			local nodeType = mapTypes[lib.MissionType];
+			if packet and packet.NodeType then
+				nodeType = packet.NodeType;
+			end
+
 			local newNode = {
 				Id=id;
-				Type=mapTypes[lib.MissionType];
+				Type=nodeType;
 				Children={};
+				StorylineInfo=(packet and packet.StorylineInfo or nil); 
 			};
 			
 			if parentNode == nil then
@@ -538,9 +576,33 @@ function Interface.init(modInterface)
 			if linkNextMission then
 				mapOutMission(lib.LinkNextMission, newNode);
 			end
+
+			if lib.StorylineSplit then
+				for a=1, #lib.StorylineSplit do
+					local info = lib.StorylineSplit[a];
+					mapOutMission(info.NextId, newNode, {
+						NodeType=nodeType+1;
+						StorylineInfo=info;
+					});
+				end
+			end
+
+			return newNode;
 		end
-		mapOutMission(1, nil);
 		
+		if modMissionsLibrary.StoryLineEnum[currentStoryline] then
+			-- MARK: Custom Storyline
+			local storylineSplitInfo = modMissionsLibrary.StoryLines[currentStoryline];
+			if storylineSplitInfo then
+				local node = mapOutMission(storylineSplitInfo.Id, nil);
+				mapOutMission(storylineSplitInfo.NextId, node);
+			end
+
+		else
+			mapOutMission(1, nil);
+
+		end
+
 		local function sortChildren(node)
 			table.sort(node.Children, function(a, b)
 				return a.Type > b.Type;
@@ -636,6 +698,47 @@ function Interface.init(modInterface)
 					end
 				end
 
+				if node.StorylineInfo then
+					local info = node.StorylineInfo;
+
+					local storylineButton = mapEntryTemplate:Clone();
+					storylineButton.Name = info.Storyline;
+
+					storylineButton.MouseButton1Click:Connect(function()
+						Interface:PlayButtonClick();
+						
+						currentStoryline = info.Storyline;
+
+						local missionMap = MissionDisplayFrame:FindFirstChild("MissionsMap");
+						if missionMap then
+							missionMap:Destroy();
+						end
+
+						Interface.RefreshMissionMap();
+					end)
+					
+					local bar = Instance.new("Frame");
+					bar.Name = "bar";
+					bar.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
+					bar.BorderSizePixel = 0;
+					bar.AnchorPoint = Vector2.new(1, 0.5);
+					bar.Position = UDim2.new(0.5, 0, 0.5, 0);
+					bar.Size = UDim2.new(0, (node.Type+1)*entryXSize, 0, 10);
+					bar.ZIndex = 1;
+					bar.Parent = storylineButton;
+
+					storylineButton.BackgroundColor3 = info.Color;
+
+					local titleLabel: TextLabel = storylineButton:WaitForChild("Title") :: TextLabel;
+					titleLabel.Text = info.Title;
+					
+					local iconLabel: ImageButton = storylineButton:WaitForChild("Avatar") :: ImageButton;
+					iconLabel.BackgroundColor3 = info.Color;
+					iconLabel.Image = info.Icon;
+
+					storylineButton.Position = UDim2.new(0, (node.Type+1)*entryXSize, 0, orderPos*entryYSize);
+					storylineButton.Parent = scrollFrame;
+				end
 			end
 			
 			

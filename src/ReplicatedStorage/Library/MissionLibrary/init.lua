@@ -38,6 +38,14 @@ function MissionLibrary.GetTypeKey(i)
 	return typesIndexToKey[i];
 end
 
+
+local StoryLineEnum = {
+	Rat="Rat";
+	Bandit="Bandit";
+}
+MissionLibrary.StoryLines = {};
+MissionLibrary.StoryLineEnum = StoryLineEnum;
+
 --[[
 	MissionLibrary.Get(id: number)
 	Gets the mission library of mission id.
@@ -95,9 +103,16 @@ function MissionLibrary.New(data)
 			data.LogicScript = missionLogic;
 			
 		end
-
 	end
 	
+	if data.StorylineSplit then
+		for a=1, #data.StorylineSplit do
+			local info = data.StorylineSplit[a];
+			info.Id = data.MissionId;
+			MissionLibrary.StoryLines[info.Storyline] = info;
+		end
+	end	
+
 	return function(func)
 		if func == nil then return end;
 		func(data);
@@ -2044,13 +2059,18 @@ MissionLibrary.New{
 		{Type="Mission"; Id=62};
 		{Type="Mission"; Id=63};
 		{Type="Mission"; Id=75};
+		{Type="Mission"; Id=81};
 	};
 	Markers={
 		[1]={World="TheHarbor"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
 		[4]={World="TheHarbor"; Label="Revas's Office"; Target=Vector3.new(-290.606, 107.853, 243.741); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
 	CanRedo={};
-	
+	StorylineSplit={
+		{Storyline="Rat"; NextId=62; Hint="You chose to pull the lever."; Icon="rbxassetid://18930113603"; Title="Rat"; Color=Color3.fromRGB(67, 58, 84);};
+		{Storyline="Bandit"; NextId=63; Hint="You chose not to pull the lever."; Icon="rbxassetid://18930113293"; Title="Bandit"; Color=Color3.fromRGB(84, 58, 40);};
+	};
+	LinkNextMission=81;
 }
 
 -- MARK: 59 - Horde Clearance
@@ -2177,6 +2197,7 @@ MissionLibrary.New{
 	MissionId=62;
 	MissionType = MissionLibrary.MissionTypes.Core;
 	Name="Rats Recruitment";
+	Storyline=StoryLineEnum.Rat;
 	From="Patrick";
 	Description="After the cargo ship disaster, you check up on Patrick to see what's up.";
 	Persistent=true;
@@ -2227,7 +2248,7 @@ MissionLibrary.New{
 	AddCache={
 		RatsAllied=true;
 	};
-	
+	LinkNextMission=80;
 };
 
 -- MARK: 63 - Bandits Recruitment
@@ -2235,6 +2256,7 @@ MissionLibrary.New{
 	MissionId=63;
 	MissionType = MissionLibrary.MissionTypes.Core;
 	Name="Bandits Recruitment";
+	Storyline=StoryLineEnum.Bandit;
 	From="Patrick";
 	Description="After the cargo ship disaster, you check up on Patrick to see what's up.";
 	Persistent=true;
@@ -2733,6 +2755,56 @@ MissionLibrary.New{
 	
 };
 
+-- MARK: 80 - Cargo Ship Enroute
+MissionLibrary.New{
+	MissionId=80;
+	MissionType = MissionLibrary.MissionTypes.Core;
+	Name="Cargo Ship Enroute";
+	Storyline=StoryLineEnum.Rat;
+	From="Revas";
+	Description="Another cargo ship disaster.";
+	Persistent=true;
+	Checkpoint={
+		{Text="Talk to Revas";};
+	};
+	StartRequirements={
+		MissionCompleted={62};
+	};
+	GuideText="Talk to Revas";
+	Rewards={
+		{Type="Perks"; Amount=PerksReward.Core};
+	};
+	AddRequirements={};
+	Markers={
+	};
+	CanRedo={};
+	
+};
+
+-- MARK: 81 - Fall of the Living
+MissionLibrary.New{
+	MissionId=81;
+	MissionType = MissionLibrary.MissionTypes.Core;
+	Name="Fall of the Living";
+	From="Joseph";
+	Description="Joseph made a deal with the Rats for walkie talkies, but their didn't deliver.";
+	Persistent=true;
+	Checkpoint={
+		{Text="Talk to Rats at The Harbor";};
+	};
+	StartRequirements={
+		MissionCompleted={58};
+	};
+	GuideText="Talk to Joseph";
+	Rewards={
+		{Type="Perks"; Amount=PerksReward.Core};
+	};
+	AddRequirements={};
+	Markers={
+	};
+	CanRedo={};
+	
+};
 
 -- MARK: 666 - TestMission
 MissionLibrary.New{

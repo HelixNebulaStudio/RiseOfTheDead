@@ -19,8 +19,16 @@ library.ClassColors = {
 	Trader=Color3.fromRGB(255, 205, 79);
 	
 	TomGreyman=Color3.fromRGB(208, 208, 208);
-}
+};
 
+library.ClassIcons = {
+	Survivor="rbxassetid://18930109253";
+	RAT="rbxassetid://18930113603";
+	Bandit="rbxassetid://18930113293";
+	BioX="rbxassetid://18930113452";
+	Military="rbxassetid://18930527891";
+	Cultist="rbxassetid://18930528078";
+}
 
 
 --==
@@ -73,7 +81,7 @@ library:Add{Id="Lewis"; Class="RAT"; World="TheHarbor"; Avatar="rbxassetid://159
 library:Add{Id="Greg"; Class="RAT"; World="TheHarbor";};
 library:Add{Id="Caitlin"; Class="Medic"; HeadIcon="Heal"; World="TheHarbor";};
 
-library:Add{Id="Zark"; Class="Bandit"; World="BanditCamp";};
+library:Add{Id="Zark"; Class="Bandit"; World="BanditCamp"; Avatar="rbxassetid://18932927518"; };
 library:Add{Id="Loran"; Class="Bandit"; World="BanditCamp";};
 library:Add{Id="Jason"; Class="Bandit"; World="BanditCamp";};
 
@@ -105,8 +113,8 @@ library:Add{Id="Lydia"; Class="FortuneTeller"; World="Safehome"; SafehomeNpc=tru
 library:Add{Id="Icarus"; Class="Trader"; Avatar="rbxassetid://13192700114"};
 
 --== Cutscene
-library:Add{Id="Revas"; Class="RAT"; World="TheHarbor";};
-library:Add{Id="Eugene"; Class="BioX"; World="SectorE"};
+library:Add{Id="Revas"; Class="RAT"; World="TheHarbor"; Avatar="rbxassetid://18932917905"; };
+library:Add{Id="Eugene"; Class="BioX"; World="SectorE"; };
 
 
 
