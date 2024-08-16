@@ -245,6 +245,10 @@ CustomizationData.Materials = {
     ["Sand"]={Material=Enum.Material.Sand; Val=1.1;};
     ["Fabric"]={Material=Enum.Material.Fabric; Val=1.1;};
 
+    ["Leather"]={Material=Enum.Material.Leather; Val=1.1;};
+    ["Rubber"]={Material=Enum.Material.Rubber; Val=1.1;};
+    ["Cardboard"]={Material=Enum.Material.Cardboard; Val=1.1;};
+
     ["Marble"]={Material=Enum.Material.Marble; Val=2;};
     ["Slate"]={Material=Enum.Material.Slate; Val=2;};
     ["Concrete"]={Material=Enum.Material.Concrete; Val=2;};
@@ -266,6 +270,12 @@ CustomizationData.Materials = {
     ["Asphalt"]={Material=Enum.Material.Asphalt; Val=2;};
     ["Salt"]={Material=Enum.Material.Salt; Val=2;};
     ["Glacier"]={Material=Enum.Material.Glacier; Val=2;};
+
+    ["Plaster"]={Material=Enum.Material.Plaster; Val=2;};
+    ["CeramicTiles"]={Material=Enum.Material.CeramicTiles; Val=2;};
+    ["Carpet"]={Material=Enum.Material.Carpet; Val=2;};
+    ["RoofShingles"]={Material=Enum.Material.RoofShingles; Val=2;};
+    ["ClayRoofTiles"]={Material=Enum.Material.ClayRoofTiles; Val=2;};
 };
 
 function CustomizationData.newCustomizationPlan()
