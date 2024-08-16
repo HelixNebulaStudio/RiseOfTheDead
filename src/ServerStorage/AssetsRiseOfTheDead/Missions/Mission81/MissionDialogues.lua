@@ -18,8 +18,6 @@ local Dialogues = {
 
 local missionId = 81;
 
-local cooperPrefab = workspace.Entity:WaitForChild("Cooper");
-local davidPrefab = workspace.Entity:WaitForChild("David");
 
 local checkpointFlags = modBitFlags.new();
 checkpointFlags:AddFlag("david_askWalkieTalkie", 1);
@@ -92,6 +90,8 @@ end
 
 -- MARK: David Handler
 Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
+	local cooperPrefab = workspace.Entity:FindFirstChild("Cooper");
+
 	local saveFlag = mission.SaveData.Flags;
 
 	if mission.Type ~= 1 then return end;
@@ -108,9 +108,7 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 		}, function(dialog)
 			mission.SaveData.Flags = checkpointFlags:Set(saveFlag, "david_revealCooperHas", true);
 			
-			modDialogueService:InvokeDialogue(player, "talk", {
-				NpcModel=cooperPrefab;
-			});
+			dialog:TalkTo(cooperPrefab);
 
 		end);
 
@@ -125,7 +123,6 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 		}, function(dialog)
 			mission.SaveData.Flags = checkpointFlags:Set(saveFlag, "david_askWalkieTalkie", true);
 
-			Debugger:Warn("David saveFlag", saveFlag);
 			dialog:TalkTo(cooperPrefab);
 
 		end);
@@ -140,12 +137,12 @@ end
 
 -- MARK: Cooper Handler
 Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
+	local davidPrefab = workspace.Entity:FindFirstChild("David");
 	local saveFlag = mission.SaveData.Flags;
 
 	if mission.Type ~= 1 then return end;
 	if mission.ProgressionPoint ~= 1 then return end;
 
-	Debugger:Warn("Cooper saveFlag", saveFlag);
 	if checkpointFlags:Test("david_askWalkieTalkie", saveFlag) then
 		dialog:SetInitiate("Box of walkie talkies ey? David over here bet them away earlier!", "Smirk");
 

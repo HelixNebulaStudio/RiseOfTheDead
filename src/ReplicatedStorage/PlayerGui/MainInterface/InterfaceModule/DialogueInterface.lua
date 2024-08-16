@@ -29,6 +29,7 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modFacesLibrary = require(game.ReplicatedStorage.Library.FacesLibrary);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler);
+local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 
 local modScreenRelativeTextSize = require(game.ReplicatedStorage.Library.UI.ScreenRelativeTextSize);
 local branchColor = modBranchConfigs.BranchColor;
@@ -44,6 +45,7 @@ local vpCamera = Instance.new("Camera");
 vpCamera.Parent = dialogueFrame;
 vpCamera.CFrame = CFrame.new(1.26, 3.36, -4.3) * CFrame.Angles(math.rad(-170), math.rad(17.5), math.rad(177));
 viewportFrame.CurrentCamera = vpCamera;
+local vpWorldModel = viewportFrame:WaitForChild("WorldModel") :: WorldModel;
 
 local messageFrame = backgroundFrame:WaitForChild("MessageFrame");
 local questionsList = backgroundFrame:WaitForChild("QuestionList");
@@ -59,6 +61,7 @@ local random = Random.new();
 local NpcName, NpcModel;
 
 local lastExpireTime;
+local lastNpcModel = nil;
 local window;
 --== Script;
 function Interface.init(modInterface)
@@ -100,6 +103,10 @@ function Interface.init(modInterface)
 			end
 		else
 			Interface:CloseDialogue();
+			task.delay(0.3, function()
+				lastNpcModel = nil;
+				vpWorldModel:ClearAllChildren();
+			end)
 			task.delay(0.3, function()
 				Interface:ToggleInteraction(true);
 			end)
@@ -155,7 +162,6 @@ function Interface:DialogueInteract(modInteractable)
 	Interface:OnDialogue(dialogPacket);
 end
 
-local lastNpcModel = nil;
 function Interface:OnDialogue(dialogPacket)
 	for _, child in pairs(questionsList:GetChildren()) do 
 		if child:IsA("TextButton") and child.Name ~= "questionOption" then child:Destroy() end; 
@@ -193,19 +199,63 @@ function Interface:OnDialogue(dialogPacket)
 			lastNpcModel = NpcModel;
 
 			viewportFrame.ImageTransparency = 1;
-			viewportFrame:ClearAllChildren();
-			if NpcModel then
-				local new = NpcModel:Clone();
+			vpWorldModel:ClearAllChildren();
+			if NpcModel and NpcModel:FindFirstChildWhichIsA("Humanoid") then
+				local new = NpcModel:Clone() :: Model;
+				new:RemoveTag("ReplicateObject");
+				new.Parent = vpWorldModel;
 				new:PivotTo(CFrame.new());
-				new.Parent = viewportFrame;
-				game.Debris:AddItem(new:FindFirstChild("MissionIcon"), 0);
-				game.Debris:AddItem(new:FindFirstChild("GuideIcon"), 0);
-				game.Debris:AddItem(new:FindFirstChild("HealIcon"), 0);
+				
+				task.spawn(function()
+					game.Debris:AddItem(new:FindFirstChild("MissionIcon"), 0);
+					game.Debris:AddItem(new:FindFirstChild("GuideIcon"), 0);
+					game.Debris:AddItem(new:FindFirstChild("HealIcon"), 0);
+	
+					local neckMotor = new:FindFirstChild("Neck", true);
+					if neckMotor then
+						neckMotor.Transform = CFrame.identity;
+						neckMotor.Parent:RemoveTag("LookingHead");
+					end
+	
+					local newGarbage = modGarbageHandler.new();
+					lastNpcModel.Destroying:Connect(function()
+						newGarbage:Destruct();
+					end)
 
-				local neckMotor = new:FindFirstChild("Neck", true);
-				if neckMotor then
-					neckMotor.Transform = CFrame.identity;
-				end
+					local faceDecal = NpcModel:FindFirstChild("face", true) :: Decal;
+					local newFaceDecal = new:FindFirstChild("face", true) :: Decal;
+					if faceDecal and faceDecal:IsA("Decal") then
+						newGarbage:Tag(faceDecal:GetPropertyChangedSignal("Texture"):Connect(function()
+							newFaceDecal.Texture = faceDecal.Texture;
+						end));
+					end
+					
+					local humanoid = NpcModel:FindFirstChildWhichIsA("Humanoid") :: Humanoid;
+					local animator = humanoid:WaitForChild("Animator") :: Animator;
+
+					local newHumanoid = new:FindFirstChildWhichIsA("Humanoid") :: Humanoid;
+					local newAnimator = newHumanoid:WaitForChild("Animator") :: Animator;
+
+					for _, animationTrack: AnimationTrack in pairs(animator:GetPlayingAnimationTracks()) do
+						local newAnimTrack = newAnimator:LoadAnimation(animationTrack.Animation) :: AnimationTrack;
+						newAnimTrack:Play();
+
+						newGarbage:Tag(animationTrack.Stopped:Connect(function()
+							newAnimTrack:Stop();
+						end));
+					end
+
+					newGarbage:Tag(animator.AnimationPlayed:Connect(function(animationTrack: AnimationTrack)
+						pcall(function()
+							local newAnimTrack = newAnimator:LoadAnimation(animationTrack.Animation) :: AnimationTrack;
+							newAnimTrack:Play();
+
+							newGarbage:Tag(animationTrack.Stopped:Connect(function()
+								newAnimTrack:Stop();
+							end));
+						end)
+					end));
+				end)
 			end
 			TweenService:Create(viewportFrame, TweenInfo.new(0.25),{
 				ImageTransparency = 0;

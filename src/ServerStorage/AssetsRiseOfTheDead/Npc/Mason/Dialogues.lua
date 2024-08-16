@@ -259,7 +259,7 @@ if RunService:IsServer() then
 		end
 		
 		if npcModule.CarLooping then
-			dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
+			dialog:SetExpireTime(workspace:GetServerTimeNow()+60);
 		end
 	end
 	
