@@ -7,7 +7,7 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modAssetHandler = require(game.ReplicatedStorage.Library.AssetHandler);
-local modLazyLoader = require(game.ReplicatedStorage.Library.LazyLoader);
+local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 
 
 local DialogueService = {
@@ -26,6 +26,8 @@ function DialogueService:InitServer(baseDialogueHandlers)
 
     --== Script;
     local function OnDialogue(player, npcModel, npcName, packet)
+        packet = packet or {};
+
         local profile = shared.modProfile:Get(player);
         if profile then
             profile:AddPlayPoints(3, "Gameplay:Dialogue");
@@ -75,6 +77,7 @@ function DialogueService:InitServer(baseDialogueHandlers)
                 dialog.Choices = {};
 
                 local npcStatus = npcPrefab:FindFirstChild("NpcStatus") and require(npcPrefab.NpcStatus) or nil;
+                local skipOtherDialogues = false;
                 
                 function dialog:GetNpcModule()
                     local npcModule = npcStatus and npcStatus:GetModule();
@@ -82,6 +85,7 @@ function DialogueService:InitServer(baseDialogueHandlers)
                 end
                 
                 function dialog:SetExpireTime(t)
+                    if skipOtherDialogues then return end;
                     dialog.ExpireTime = t;
                 end
 
@@ -91,6 +95,8 @@ function DialogueService:InitServer(baseDialogueHandlers)
                 end
 
                 function dialog:AddDialog(dialoguePacket, func, data)
+                    if skipOtherDialogues then return end;
+
                     lambda = lambda +1;
                     local tag = dialoguePacket.Tag or `tag{lambda}`;
 
@@ -116,6 +122,8 @@ function DialogueService:InitServer(baseDialogueHandlers)
                 end
                 
                 function dialog:InitDialog(dialoguePacket)
+                    if skipOtherDialogues then return end;
+                    
                     dialog.InitReply = dialoguePacket.Reply;
 
                     local npcModule = self:GetNpcModule();
@@ -141,6 +149,16 @@ function DialogueService:InitServer(baseDialogueHandlers)
                     end
                     self:InitDialog(dialoguePacket);
                 end
+
+                local overrideReturnDialog = nil;
+                function dialog:TalkTo(npcModel)
+                    if overrideReturnDialog then return end;
+                    overrideReturnDialog = OnDialogue(player, npcModel, npcModel.Name);
+                end
+
+                function dialog:SkipOtherDialogues()
+                    skipOtherDialogues = true;
+                end
                 
                 local choiceInfo = choiceTag and npcDialogData.ChoiceHandleData[choiceTag];
                 if choiceInfo then  -- MARK: client choice
@@ -160,6 +178,10 @@ function DialogueService:InitServer(baseDialogueHandlers)
                     end
                     
                     if choiceInfo.ReturnToInit ~= true then
+                        -- Default;
+                        if overrideReturnDialog then
+                            return overrideReturnDialog;
+                        end
                         return dialog;
                     end
                 end
@@ -171,8 +193,18 @@ function DialogueService:InitServer(baseDialogueHandlers)
                 -- Mission dialogues;
                 local missionProfile = modMission.GetMissions(player.Name);
                 if missionProfile then
+                    local sortedMissions = {};
+
                     for a=1, #missionProfile do
-                        local missionData = missionProfile[a];
+                        table.insert(sortedMissions, missionProfile[a]);
+                    end
+
+                    table.sort(sortedMissions, function(a, b)
+                        return a.Type == 1 and b.Type ~= 1;
+                    end)
+
+                    for a=1, #sortedMissions do
+                        local missionData = sortedMissions[a];
                         local missionId = missionData.Id;
                         local missionLib = missionData and modMissionLibrary.Get(missionId);
 
@@ -301,9 +333,20 @@ function DialogueService:InitServer(baseDialogueHandlers)
                 end
 
                 if dialog.InitReply == nil and initDialoguePacket then
+                    if modConfigurations.SpecialEvent.AprilFools then
+                        local listOfAprilFoolsInit = {
+                            "Why hello, legendary one!\n";
+                            "It's the legendary one!\n";
+                            "Oh hello there, legendary one!\n";
+                        }
+                        initDialoguePacket.Reply = listOfAprilFoolsInit[math.random(1, #listOfAprilFoolsInit)]..initDialoguePacket.Reply;
+                    end
                     dialog:InitDialog(initDialoguePacket);
                 end
 
+                if overrideReturnDialog then
+                    return overrideReturnDialog;
+                end
                 return dialog;
             end
         end;

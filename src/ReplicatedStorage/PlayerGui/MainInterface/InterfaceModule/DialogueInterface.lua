@@ -39,6 +39,12 @@ local dialogueFrame = script.Parent.Parent:WaitForChild("DialogueFrame");
 local backgroundFrame = dialogueFrame:WaitForChild("BackgroundFrame");
 local timerBar = dialogueFrame:WaitForChild("timerBar");
 
+local viewportFrame: ViewportFrame = dialogueFrame:WaitForChild("ViewportFrame");
+local vpCamera = Instance.new("Camera");
+vpCamera.Parent = dialogueFrame;
+vpCamera.CFrame = CFrame.new(1.26, 3.36, -4.3) * CFrame.Angles(math.rad(-170), math.rad(17.5), math.rad(177));
+viewportFrame.CurrentCamera = vpCamera;
+
 local messageFrame = backgroundFrame:WaitForChild("MessageFrame");
 local questionsList = backgroundFrame:WaitForChild("QuestionList");
 
@@ -149,6 +155,7 @@ function Interface:DialogueInteract(modInteractable)
 	Interface:OnDialogue(dialogPacket);
 end
 
+local lastNpcModel = nil;
 function Interface:OnDialogue(dialogPacket)
 	for _, child in pairs(questionsList:GetChildren()) do 
 		if child:IsA("TextButton") and child.Name ~= "questionOption" then child:Destroy() end; 
@@ -165,7 +172,6 @@ function Interface:OnDialogue(dialogPacket)
 	NpcName = dialogPacket.Name;
 	NpcModel = dialogPacket.Prefab;
 	
-
 	local humanoid = NpcModel and NpcModel:FindFirstChildWhichIsA("Humanoid");
 	if humanoid then
 		task.spawn(function()
@@ -179,24 +185,40 @@ function Interface:OnDialogue(dialogPacket)
 		end)
 	end
 
-	messageFrame.NameTag.Text = NpcName;
+	Debugger:StudioLog("dialogPacket", dialogPacket);
 	self:SetDialogueText("");
 	
-	Debugger:StudioLog("dialogPacket", dialogPacket);
-
-	local initReply = dialogPacket.InitReply;
-	if modConfigurations.SpecialEvent.AprilFools then
-		local listOfAprilFoolsInit = {
-			"Why hello, legendary one!\n";
-			"It's the legendary one!\n";
-			"Oh hello there, legendary one!\n";
-		}
-		initReply = listOfAprilFoolsInit[math.random(1, #listOfAprilFoolsInit)]..initReply;
-	end
-	self:SetDialogueText(initReply);
-	
-
 	local function refreshDialogues()
+		if lastNpcModel ~= NpcModel then
+			lastNpcModel = NpcModel;
+
+			viewportFrame.ImageTransparency = 1;
+			viewportFrame:ClearAllChildren();
+			if NpcModel then
+				local new = NpcModel:Clone();
+				new:PivotTo(CFrame.new());
+				new.Parent = viewportFrame;
+				game.Debris:AddItem(new:FindFirstChild("MissionIcon"), 0);
+				game.Debris:AddItem(new:FindFirstChild("GuideIcon"), 0);
+				game.Debris:AddItem(new:FindFirstChild("HealIcon"), 0);
+
+				local neckMotor = new:FindFirstChild("Neck", true);
+				if neckMotor then
+					neckMotor.Transform = CFrame.identity;
+				end
+			end
+			TweenService:Create(viewportFrame, TweenInfo.new(0.25),{
+				ImageTransparency = 0;
+			}):Play();
+		end
+
+		messageFrame.NameTag.Text = NpcName;
+	
+		local initReply = dialogPacket.InitReply;
+		if initReply then
+			self:SetDialogueText(initReply);
+		end
+
 		local dialogChoices = dialogPacket.Choices;
 
 		for _, child in pairs(questionsList:GetChildren()) do 
@@ -411,6 +433,14 @@ function Interface:OnDialogue(dialogPacket)
 
 						Debugger:StudioLog("newDialoguePacket", newDialoguePacket);
 						dialogPacket = newDialoguePacket;
+
+						if dialogPacket.Name ~= NpcName then
+							NpcName = dialogPacket.Name
+						end
+						if dialogPacket.Prefab ~= NpcModel then
+							NpcModel = dialogPacket.Prefab;
+						end
+
 						refreshDialogues();
 					end
 					
@@ -515,6 +545,7 @@ function Interface:CloseDialogue()
 	questionInput:ReleaseFocus();
 	questionInput.Text = "";
 	Interface.InDialogue = false;
+	
 end
 
 questionInput:GetPropertyChangedSignal("Text"):Connect(function()

@@ -2787,7 +2787,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Core;
 	Name="Fall of the Living";
 	From="Joseph";
-	Description="Joseph made a deal with the Rats for walkie talkies, but their didn't deliver.";
+	Description="Joseph made a deal with the Rats for walkie talkies, but they didn't deliver.";
 	Persistent=true;
 	Checkpoint={
 		{Text="Talk to Rats at The Harbor";};
@@ -2795,6 +2795,7 @@ MissionLibrary.New{
 	StartRequirements={
 		MissionCompleted={58};
 	};
+	SaveData={Flags=0;};
 	GuideText="Talk to Joseph";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
