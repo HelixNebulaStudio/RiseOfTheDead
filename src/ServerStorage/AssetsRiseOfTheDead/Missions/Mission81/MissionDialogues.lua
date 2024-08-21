@@ -97,7 +97,17 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 
 	if mission.Type ~= 1 then return end;
 
-	if mission.ProgressionPoint == 1 then 
+	local activeCardGameLobby = modCardGame.GetLobby(player);
+	
+	if activeCardGameLobby then
+		if activeCardGameLobby.Host == dialog.Prefab then
+			dialog:SetInitiate("You're going down.", "Smirk");
+
+		else
+			return;
+
+		end
+	elseif mission.ProgressionPoint == 1 then 
 		if checkpointFlags:Test("cooper_askWalkie", saveFlag) then
 			dialog:SetInitiate("Cooper has them! And I'm pretty sure he won't give it away.", "Skeptical");
 			
@@ -240,16 +250,79 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 
 		local function StartCardGame(dialog)
 			local npcName = dialog.Name;
-			Debugger:StudioWarn("Npc player", npcName);
-
+			local npcPrefab = dialog.Prefab;
 			
+			local cardGameLobby = modCardGame.NewLobby(npcPrefab);
+			local npcTable = cardGameLobby:GetPlayer(npcPrefab);
 
+			npcTable.ComputerAutoPlay = function(stageInfo)
+				local cards = npcTable.Cards;
+				local resources = npcTable.R;
+
+				Debugger:Warn("David table", npcTable);
+				if stageInfo.TurnPlayer ~= npcPrefab then
+					Debugger:Warn("David judges", stageInfo);
+
+				elseif stageInfo.Type == modCardGame.StageType.NextTurn then
+					Debugger:Warn("David plays turn", stageInfo);
+					task.wait(math.random(30, 40)/10);
+
+					if resources >= 10 then
+						cardGameLobby:PlayAction(npcPrefab, {
+							OptionIndex=2; -- Scavenge
+						});
+						
+					elseif table.find(cards,"RAT") then
+						cardGameLobby:PlayAction(npcPrefab, {
+							OptionIndex=6; -- Play rat
+						});
+
+					else
+						cardGameLobby:PlayAction(npcPrefab, {
+							OptionIndex=2; -- HeavyAttackRng
+						});
+
+					end
+					
+
+				elseif stageInfo.Type == modCardGame.StageType.Dispute then
+					Debugger:Warn("David Dispute", stageInfo);
+
+				elseif stageInfo.Type == modCardGame.StageType.Sacrifice then
+					Debugger:Warn("David Sacrifice", stageInfo);
+						
+				elseif stageInfo.Type == modCardGame.StageType.AttackDispute then
+					Debugger:Warn("David AttackDispute", stageInfo);
+							
+				elseif stageInfo.Type == modCardGame.StageType.Break then
+					Debugger:Warn("David Break", stageInfo);
+							
+				elseif stageInfo.Type == modCardGame.StageType.SwapCards then
+					Debugger:Warn("David SwapCards", stageInfo);
+		
+				elseif stageInfo.Type == modCardGame.StageType.BluffTrial then
+					Debugger:Warn("David BluffTrial", stageInfo);
+
+				elseif stageInfo.Type == modCardGame.StageType.BluffConclusion then
+					Debugger:Warn("David BluffConclusion", stageInfo);
+
+				elseif stageInfo.Type == modCardGame.StageType.PlayerDefeated then
+					Debugger:Warn("David PlayerDefeated", stageInfo);
+					
+				end
+
+			end;
+
+			cardGameLobby:Join(player, true);
+			cardGameLobby:Start();
+
+			dialog:SetExpireTime(workspace:GetServerTimeNow()+2);
 		end
 
 		dialog:AddDialog({
 			Face="Confident";
-			Say="I see.";
-			Reply="That's the general idea, do you want more detail or do you get the idea?";
+			Say="Let's play";
+			Reply="Alright. *Hands you two cards*";
 			
 		}, StartCardGame);
 
@@ -307,14 +380,22 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 					Reply="Alright, I'll give you a chance to practice by playing against David first.";
 				}, function(dialog)
 					
-					modMission:Progress(player, missionId, function()
-						if mission.ProgressionPoint <= 1 then
-							mission.ProgressionPoint = 3;
-						end
+					dialog:AddDialog({
+						Face="Confident";
+						Say="Okay";
+						Reply="...";
+					}, function(dialog)
+						
+						modMission:Progress(player, missionId, function()
+							if mission.ProgressionPoint <= 1 then
+								mission.ProgressionPoint = 3;
+							end
+						end)
+
+						dialog:TalkTo(davidPrefab);
+
 					end)
-
-					dialog:TalkTo(davidPrefab);
-
+					
 				end)
 
 			end)

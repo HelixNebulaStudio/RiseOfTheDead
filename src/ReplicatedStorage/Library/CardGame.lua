@@ -156,6 +156,7 @@ function Lobby:Destroy()
 end
 
 function Lobby:UpdateStats(player, isWin)
+	if not player:IsA("Player") then return end;
 	task.spawn(function()
 		local profile = shared.modProfile:Get(player);
 		local cardgamestatsFlag = profile.Flags:Get("cardgamestats") or {Id="cardgamestats";};
@@ -235,12 +236,11 @@ function Lobby:NextTurn()
 	end
 	
 	self.Stage = stageInfo;
-	Debugger:Log("Stage ",self.StageIndex.."/"..(#self.StageQueue)," NextTurn ", self.Stage.Type);
+	Debugger:StudioLog("Stage ",self.StageIndex.."/"..(#self.StageQueue)," NextTurn ", self.Stage.Type);
 	
 	if stageInfo.Type == StageType.NextTurn then
 		self:Broadcast(turnPlayerTable.Player.Name.."'s turn..", {SndId="Notification"});
 		duration = 15;
-		Debugger:Log("stageInfo.Type == NextTurn");
 
 	elseif stageInfo.Type == StageType.Dispute then
 		duration = 3;
@@ -252,7 +252,6 @@ function Lobby:NextTurn()
 
 	elseif stageInfo.Type == StageType.Break then
 		duration = 2;
-		Debugger:Log("stageInfo.Type == Break");
 		
 	elseif stageInfo.Type == StageType.SwapCards then
 		duration = 20;
@@ -263,15 +262,12 @@ function Lobby:NextTurn()
 		local defendantPlayer = stageInfo.Defendant; 
 		self:Broadcast(accuserPlayer.Name .." has called "..defendantPlayer.Name.."'s bluff.", {SndId="CallBluff"});
 		
-		Debugger:Log("Bluff trial", stageInfo);
 		duration = 2;
 		
 		self:QueueStage(StageType.BluffConclusion, stageInfo);
 
 	elseif stageInfo.Type == StageType.BluffConclusion then
 
-		Debugger:Log("BluffConclusion stageInfo, ", stageInfo);
-		
 		local accuserPlayer = stageInfo.Accuser;
 		local defendantPlayer = stageInfo.Defendant;
 		
@@ -302,13 +298,13 @@ function Lobby:NextTurn()
 		end
 
 	elseif stageInfo.Type == StageType.PlayerDefeated then
-		Debugger:Log("stageInfo", stageInfo);
+		
 		self:Broadcast(stageInfo.DefeatedPlayer.Name .." was defeated.", {SndId="HardBassDefeat"});
 		self:SetPlayerType(stageInfo.DefeatedPlayer, "Spectators");
 		duration = 3;
 
 		self:UpdateStats(stageInfo.DefeatedPlayer, false);
-		Debugger:Log(stageInfo.DefeatedPlayer.Name,"Defeated", self);
+		
 	end
 
 	self.RadialStartTime = unixTime;
@@ -343,20 +339,17 @@ function Lobby:NextTurn()
 				
 			elseif stageInfo.Type == StageType.Dispute then
 				if stageInfo.ActionId == 3 then -- Rouge Attack;
-					Debugger:Log("Dispute Timeout", stageInfo);
 					self:PlayAction(stageInfo.TargettedPlayer, {CallBluff=false;});
 					
 					return;
 				end
 				
 			elseif stageInfo.Type == StageType.AttackDispute then
-				Debugger:Log("AttackDispute Timeout", stageInfo);
 				self:PlayAction(stageInfo.Victim, {AttackDisputeChoice=math.random(1, 2)});
 				
 				return;
 				
 			elseif stageInfo.Type == StageType.SwapCards then
-				Debugger:Log("SwapCards Timeout", stageInfo);
 				if playerTable.Player.ClassName == "Player" then
 					task.spawn(function()
 						remoteCardGame:InvokeClient(playerTable.Player, "swapcards", self.CardSwapSelections);
@@ -367,24 +360,27 @@ function Lobby:NextTurn()
 				return;
 				
 			elseif stageInfo.Type == StageType.BluffConclusion and stageInfo.Loser then
-				Debugger:Log("BluffConclusion Timeout", stageInfo);
 				self:PlayAction(stageInfo.Loser, {FoldCard=math.random(1, 2)});
 				
 				return;
 				
 			elseif stageInfo.Type == StageType.Sacrifice then
-				Debugger:Log("Sacrifice Timeout", stageInfo);
 				self:PlayAction(stageInfo.Loser, {FoldCard=math.random(1, 2)});
 				
 			end
 			
 			if self.ActionPlayed then
-				Debugger:Log("No action played, defaulting", stageInfo);
+				Debugger:StudioLog("No action played, defaulting", stageInfo);
 			end
 		end
 		
 		self:NextTurn();
 	end)
+
+	for index, playerTable in pairs(self.Players) do
+		if playerTable.ComputerAutoPlay == nil then continue end;
+		task.spawn(playerTable.ComputerAutoPlay, stageInfo);
+	end
 
 	self:Changed(true);
 end
@@ -465,6 +461,18 @@ function Lobby:PlayAction(player, packet)
 
 		local broadcastMsg = optionLib.BroadcastMsg;
 		broadcastMsg = string.gsub(broadcastMsg, "$PlayerName", player.Name);
+
+		if optionLib.SelectTarget and targetPlayer == nil then
+			
+			local targetOptions = {};
+			for a=#self.Players, 1, -1 do
+				if self.Players[a].Player ~= playerTable.Player then
+					table.insert(targetOptions, self.Players[a].Player);
+				end
+			end
+
+			targetPlayer = targetOptions[math.random(1, #targetOptions)];
+		end
 
 		if optionIndex == 1 then -- Scavenge;
 			local rngRAmt = math.random(1,2);
@@ -572,12 +580,14 @@ function Lobby:PlayAction(player, packet)
 		
 	end
 	
-	task.spawn(function()
-		local profile = shared.modProfile:Get(player);
-		if profile then
-			profile:AddPlayPoints(4, "Gameplay:Minigame:Fotl");
-		end
-	end)
+	if player:IsA("Player") then
+		task.spawn(function()
+			local profile = shared.modProfile:Get(player);
+			if profile then
+				profile:AddPlayPoints(4, "Gameplay:Minigame:Fotl");
+			end
+		end)
+	end
 
 	self:Changed(true);
 	self:NextTurn();
@@ -602,7 +612,7 @@ function Lobby:Start()
 	end
 end
 
-function Lobby:Join(player)
+function Lobby:Join(player, setPlayer)
 	local playerTable = self:GetPlayer(player);
 	
 	if playerTable == nil then
@@ -610,6 +620,10 @@ function Lobby:Join(player)
 		table.insert(self.Spectators, playerTable);
 	end
 	
+	if setPlayer == true then
+		self:SetPlayerType(player, "Players");
+	end
+
 	self:Changed(true);
 end
 
@@ -633,6 +647,7 @@ function Lobby:Leave(player)
 						end
 					end
 				end)
+
 				break;
 			end
 		end
@@ -670,6 +685,10 @@ function Lobby:Changed(sync)
 		for a=#self.Players, 1, -1 do
 			local playerTable = self.Players[a];
 
+			if playerTable.Player.ClassName ~= "Player" then 
+				continue 
+			end;
+
 			task.spawn(function()
 				if playerTable.Player then
 					local profile = shared.modProfile:Get(playerTable.Player);
@@ -706,9 +725,11 @@ function Lobby:Changed(sync)
 			
 		end
 		for a=#self.Spectators, 1, -1 do
-			task.spawn(function()
-				remoteCardGame:InvokeClient(self.Spectators[a].Player, "sync", syncPacket);
-			end)
+			if self.Spectators[a].ClassName == "Player" then
+				task.spawn(function()
+					remoteCardGame:InvokeClient(self.Spectators[a].Player, "sync", syncPacket);
+				end)
+			end
 		end
 	end
 end
@@ -727,7 +748,9 @@ function CardGame.NewLobby(player)
 	lobby:SetPlayerType(player, "Players");
 	
 	Debugger:Log("New lobby ", lobby);
-	shared.Notify(player, "[FotL] New lobby created for Fall of the Living.", "Inform");
+	if player:IsA("Player") then
+		shared.Notify(player, "[FotL] New lobby created for Fall of the Living.", "Inform");
+	end
 	
 	table.insert(CardGame.Lobbies, lobby);
 	
@@ -784,7 +807,10 @@ if RunService:IsServer() then
 
 			local hostPlayer = CardGame.GetPlayerFromInteractable(interactableModule);
 			local hostLobby = CardGame.GetLobby(hostPlayer);
-			if hostLobby == nil then Debugger:Warn("Host does not have a lobby", hostPlayer) return rPacket end;
+			if hostLobby == nil then
+				Debugger:Warn("Host does not have a lobby", hostPlayer);
+				return rPacket;
+			end;
 			
 			
 			if hostLobby.State == GameState.Idle then
