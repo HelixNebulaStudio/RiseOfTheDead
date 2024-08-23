@@ -75,4 +75,20 @@ function Tables.Truncate(t, amt, direction: number?)
     end
 end
 
+function Tables.Mold(t, template)
+    for k, v in pairs(template) do
+        if t[k] == nil then
+            if typeof(v) == "table" then
+                t[k] = Tables.DeepClone(v);
+            else
+                t[k] = v;
+            end
+        elseif typeof(t[k]) == "table" then
+            t[k] = Tables.Mold(t[k], v);
+        end
+    end
+
+    return t :: (typeof(template) | typeof(t));
+end
+
 return Tables;

@@ -286,6 +286,7 @@ function Interface.init(modInterface)
 			mainFrame.bluffButton.Visible = false;
 			
 			cardViewport:TweenPosition(UDim2.new(0.5, 0, 1.5, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 1, true);
+			
 			local pingTick = tick();
 			local rPacket = remoteCardGame:InvokeServer("pickcards", {
 				StageIndex = lobby.StageIndex;
@@ -342,7 +343,7 @@ function Interface.init(modInterface)
 				for _, pT in pairs(lobby.Players) do
 					if pT.Player == player then
 						
-						if optionLib.RequiresResources and pT.R <= 0 then
+						if optionLib.RequiresTargetResources and pT.R <= 0 then
 							cantSelectText = "No Resources";
 						end
 						
@@ -769,7 +770,7 @@ function Interface.init(modInterface)
 				
 				local selectButton = playerPanel:WaitForChild("selectButton");
 				selectButton.MouseButton1Click:Connect(function()
-					if selectButton.Text ~= "Select" then Debugger:Log("Cannot select", playerTable.Player) return end;
+					if selectButton.Text ~= "Select" then Debugger:Log("Cannot select", playerTable.Player); return end;
 					Interface:PlayButtonClick();
 					selectButton.Visible = false;
 					if onPlayerSelect then
@@ -875,6 +876,9 @@ function Interface.init(modInterface)
 						else
 							resourceLabel.Text = "Defeated";
 						end
+
+						local cardLImage = panel:WaitForChild("CardL");
+						cardLImage.Visible = #playerTable.Cards > 0
 
 						local cardRImage = panel:WaitForChild("CardR");
 						cardRImage.Visible = #playerTable.Cards > 1;

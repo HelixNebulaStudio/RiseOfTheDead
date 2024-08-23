@@ -64,6 +64,9 @@ function Component.new(Npc)
 			Wield.Handler:Equip();
 			
 		end
+		for k, obj in pairs(Wield.Instances) do
+			obj:SetAttribute("ItemId", toolItemId);
+		end
 	end
 
 	function Wield.Unequip(toolItemId)

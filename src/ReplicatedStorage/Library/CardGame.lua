@@ -7,6 +7,7 @@ local RunService = game:GetService("RunService");
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
+local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
 
 local remoteCardGame = modRemotesManager:Get("CardGame");
 
@@ -42,16 +43,16 @@ CardGame.Cards = {
 
 CardGame.ActionOptions = {
 	--== Basic Actions
-	{Text="Scavenge (+1-2 Resource)"; SpaceCost=1; BroadcastMsg="$PlayerName scavenged and found $Amount resources."};
+	{Key="Scavenge"; Text="Scavenge (+1-2 Resource)"; SpaceCost=1; BroadcastMsg="$PlayerName scavenged and found $Amount resources."};
 	{Text="Heavy Attack (-10 Resource)"; Cost=10; SelectTarget=true; BroadcastMsg="$PlayerName has attacked $TargetName."};
 	--== Card Actions
-	{Text="Attack (-4 Resource)"; Cost=4; Requires="Rouge"; SelectTarget=true; BroadcastMsg="$PlayerName has attacked $TargetName."};
+	{Key="RogueAttack"; Text="Attack (-4 Resource)"; Cost=4; Requires="Rouge"; SelectTarget=true; BroadcastMsg="$PlayerName has attacked $TargetName."};
 	{Text="Block Attack"; Requires="_Zombie"; BroadcastMsg="$PlayerName has blocked the attack."};
 	
 	--5
-	{Text="Raid (+2 Resource)"; SpaceCost=2; Requires="Bandit"; SelectTarget=true; RequiresResources=true; BroadcastMsg="$PlayerName has raided $TargetName for $Amount resources."};
-	{Text="Smuggle (+3 Resource)"; SpaceCost=3; Requires="RAT"; BroadcastMsg="$PlayerName has smuggled in $Amount extra resources."};
-	{Text="Switch Allies (-1 Resource)"; Cost=1; Requires="BioX"; PickCards=true; BroadcastMsg="$PlayerName has decided to switch alliance."};
+	{Key="BanditRaid"; Text="Raid (+2 Resource)"; SpaceCost=2; Requires="Bandit"; SelectTarget=true; RequiresTargetResources=true; BroadcastMsg="$PlayerName has raided $TargetName for $Amount resources."};
+	{Key="RatSmuggle"; Text="Smuggle (+3 Resource)"; SpaceCost=3; Requires="RAT"; BroadcastMsg="$PlayerName has smuggled in $Amount extra resources."};
+	{Key="BioXSwap"; Text="Swap Allies (-1 Resource)"; Cost=1; Requires="BioX"; PickCards=true; BroadcastMsg="$PlayerName has decided to switch alliance."};
 }
 
 CardGame.Lobbies = {};
@@ -379,7 +380,7 @@ function Lobby:NextTurn()
 
 	for index, playerTable in pairs(self.Players) do
 		if playerTable.ComputerAutoPlay == nil then continue end;
-		task.spawn(playerTable.ComputerAutoPlay, stageInfo);
+		task.spawn(playerTable.ComputerAutoPlay, playerTable, stageInfo);
 	end
 
 	self:Changed(true);
@@ -394,10 +395,37 @@ function Lobby:PlayAction(player, packet)
 	
 	local stageInfo = self.StageQueue[self.StageIndex];
 	
-	Debugger:Log("Stage ",self.StageIndex.."/"..(#self.StageQueue) ," PlayAction ",optionIndex, player, packet);
+	local stageTypeName = nil;
+	for k, v in pairs(CardGame.StageType) do
+		if v == stageInfo.Type then
+			stageTypeName = k;
+			break;
+		end
+	end
+
+	Debugger:Warn(self.StageIndex.."/"..(#self.StageQueue),"Type",stageTypeName,player,"PlayAction", packet, "StageInfo", stageInfo);
+
+	if stageInfo.Type == CardGame.StageType.NextTurn and stageInfo.TurnPlayer ~= player then
+		return;
+	end
+	if stageInfo.Type == CardGame.StageType.SwapCards and stageInfo.TurnPlayer ~= player then
+		if packet.CallBluff == true then
+			if stageInfo.BluffCalled then Debugger:Log("bluff already called", stageInfo); return; end
+			stageInfo.BluffCalled = true;
+			
+			stageInfo.Accuser=player;
+			stageInfo.Defendant=stageInfo.Victim or stageInfo.TurnPlayer;
+			
+			self:QueueStage(StageType.BluffTrial, stageInfo);
+		end
+		return;
+	end
+
 	self.ActionPlayed = true;
 	
 	if packet.CallBluff == false then
+		if stageInfo.TurnPlayer == player then Debugger:StudioWarn("False PlayAction"); return end;
+
 		if stageInfo.ActionId == 3 then
 			Debugger:Log("Accept attack");
 			self:QueueStage(StageType.AttackDispute, {Attacker=stageInfo.TurnPlayer; Victim=stageInfo.TargettedPlayer;});
@@ -685,44 +713,62 @@ function Lobby:Changed(sync)
 		for a=#self.Players, 1, -1 do
 			local playerTable = self.Players[a];
 
-			if playerTable.Player.ClassName ~= "Player" then 
-				continue 
-			end;
-
-			task.spawn(function()
-				if playerTable.Player then
-					local profile = shared.modProfile:Get(playerTable.Player);
-					
-					if profile and playerTable.Cards then
-						if profile.EquippedTools.ID == nil then
-							if #playerTable.Cards > 0 then
-								shared.EquipmentSystem.ToolHandler(playerTable.Player, "equip", {MockEquip=true; ItemId="fotlcardgame"});
-							end
-							
-						elseif profile.EquippedTools.StorageItem and profile.EquippedTools.StorageItem.ItemId == "fotlcardgame" then
-							if #playerTable.Cards <= 0 then
-								shared.EquipmentSystem.ToolHandler(playerTable.Player, "unequip");
+			if playerTable.Player.ClassName == "Player" then
+				task.spawn(function()
+					if playerTable.Player then
+						local profile = shared.modProfile:Get(playerTable.Player);
+						
+						if profile and playerTable.Cards then
+							if profile.EquippedTools.ID == nil then
+								if #playerTable.Cards > 0 then
+									shared.EquipmentSystem.ToolHandler(playerTable.Player, "equip", {MockEquip=true; ItemId="fotlcardgame"});
+								end
+								
+							elseif profile.EquippedTools.StorageItem and profile.EquippedTools.StorageItem.ItemId == "fotlcardgame" then
+								if #playerTable.Cards <= 0 then
+									shared.EquipmentSystem.ToolHandler(playerTable.Player, "unequip");
+								end
 							end
 						end
 					end
-				end
-			end)
-			
-			task.spawn(function()
-				remoteCardGame:InvokeClient(playerTable.Player, "sync", syncPacket);
-			end)
-
-			task.spawn(function()
-				local character = playerTable.Player and playerTable.Player.Character;
-				if character then
-					local foltcardgamePrefab = character:FindFirstChild("fotlcardgame");
-					if foltcardgamePrefab and playerTable.Cards then
-						foltcardgamePrefab.CardR.Transparency = (self.State == GameState.Active and #playerTable.Cards <= 1) and 1 or 0;
-						foltcardgamePrefab.CardL.Transparency = (self.State == GameState.Active and #playerTable.Cards <= 0) and 1 or 0;
+				end)
+				
+				task.spawn(function()
+					remoteCardGame:InvokeClient(playerTable.Player, "sync", syncPacket);
+				end)
+	
+				task.spawn(function()
+					local character = playerTable.Player and playerTable.Player.Character;
+					if character then
+						local foltcardgamePrefab = character:FindFirstChild("fotlcardgame");
+						if foltcardgamePrefab and playerTable.Cards then
+							foltcardgamePrefab.CardR.Transparency = (self.State == GameState.Active and #playerTable.Cards <= 1) and 1 or 0;
+							foltcardgamePrefab.CardL.Transparency = (self.State == GameState.Active and #playerTable.Cards <= 0) and 1 or 0;
+						end
 					end
+				end)
+
+			elseif playerTable.Player.ClassName == "Model" then
+
+				local npcStatusModule = playerTable.Player:FindFirstChild("NpcStatus");
+				if npcStatusModule == nil then continue end;
+
+				local npcStatus = npcStatusModule and require(npcStatusModule) or nil;
+				local npcModule = npcStatus:GetModule();
+				
+				if npcModule == nil then continue end;
+				if npcModule.Wield == nil then continue end
+
+				if playerTable.Cards and #playerTable.Cards > 0 then
+					npcModule.Wield.Equip("fotlcardgame");
+
+				elseif npcModule.Wield.ToolModule and npcModule.Wield.ToolModule.ItemId == "fotlcardgame" then
+					npcModule.Wield.Unequip();
+
 				end
-			end)
-			
+
+			end;
+
 		end
 		for a=#self.Spectators, 1, -1 do
 			if self.Spectators[a].ClassName == "Player" then
@@ -781,7 +827,178 @@ function CardGame.GetPlayerFromInteractable(interactableModule)
 			return player;
 		end
 	end
+	return;
 end
+
+function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
+	local templateParams = {
+		BluffChance = 0.5;
+		Actions = {
+			Scavenge = {Genuine=0.3;};
+			RogueAttack = {Genuine=0.3; Bluff=0.1;};
+			BanditRaid = {Genuine=0.6; Bluff=0.35;};
+			RatSmuggle = {Genuine=0.8; Bluff=0.6;};
+			BioXSwap = {Genuine=0.6; Bluff=0.2;};
+		};
+		Cards = {
+			Rouge={0.5; 0.1;};
+			Zombie={0.5; 0.1;};
+			Bandit={0.5; 0.1;};
+			RAT={0.5; 0.1;};
+			BioX={0.5; 0.1;};
+		};
+	};
+
+	params = modTables.Mold(params or {}, templateParams);
+	
+	-- ComputerAutoPlay
+	return function(npcTable, stageInfo)
+		local cards = npcTable.Cards;
+		local resources = npcTable.R;
+
+		Debugger:Warn("Agent table", npcTable);
+
+		local isMyTurn = stageInfo.TurnPlayer == agentPrefab;
+		local isBluffing = stageInfo.IsBluff;
+
+		if stageInfo.Type == StageType.NextTurn then
+			if isMyTurn then
+				Debugger:Warn("Agent Plays", stageInfo);
+				task.wait(math.random(24, 42)/10);
+
+				local validOptions = {1, 2, 3, 5, 6, 7};
+
+				local genuineActions = {};
+				local genuineTotalChance = 0;
+				local bluffActions = {};
+				local bluffTotalChance = 0;
+
+				for a=1, #validOptions do
+					local optionIndex = validOptions[a];
+					local optionLib = CardGame.ActionOptions[optionIndex];
+
+					local key = optionLib.Key;
+					local actionChance = {Genuine=0.1; Bluff=0.1;};
+
+					for k, v in pairs(params.Actions) do
+						if key and k == key then
+							actionChance = v;
+							break;
+						end
+					end
+
+					if optionLib.Cost and resources < optionLib.Cost then continue end;
+					if optionLib.SpaceCost and (resources+optionLib.SpaceCost) > 10 then continue end;
+
+					if optionLib.Requires == nil or table.find(cards, optionLib.Requires) then
+						genuineTotalChance = genuineTotalChance + actionChance.Genuine;
+						table.insert(genuineActions, {
+							ActionId = optionIndex;
+							Lib = optionLib;
+							Chance = actionChance.Genuine;
+							ChanceTotal = genuineTotalChance;
+						});
+
+					else
+						bluffTotalChance = bluffTotalChance + actionChance.Bluff;
+						table.insert(bluffActions, {
+							ActionId = optionIndex;
+							Lib = optionLib;
+							Chance = actionChance.Bluff;
+							ChanceTotal = bluffTotalChance;
+						});
+
+					end
+				end
+
+				Debugger:StudioWarn("Agent",agentPrefab,"Genuines", genuineActions, "Bluffs", bluffActions);
+
+				local finalChoice = nil;
+
+				local bluffRoll = math.random(0, 100)/100;
+				if params.BluffChance > bluffRoll and #bluffActions > 0 then
+					local totalChance = bluffActions[#bluffActions].ChanceTotal;
+					local bluffActionRoll = math.random(0, totalChance *100)/100;
+
+					for a=1, #bluffActions do
+						if bluffActionRoll < bluffActions[a].ChanceTotal and bluffActionRoll >= (bluffActions[a].ChanceTotal-bluffActions[a].Chance) then
+							finalChoice = bluffActions[a];
+							break;
+						end
+					end
+
+				else
+					local totalChance = genuineActions[#genuineActions].ChanceTotal;
+					local genuineActionRoll = math.random(0, totalChance *100)/100;
+
+					for a=1, #genuineActions do
+						if genuineActionRoll < genuineActions[a].ChanceTotal and genuineActionRoll >= (genuineActions[a].ChanceTotal-genuineActions[a].Chance) then
+							finalChoice = genuineActions[a];
+							break;
+						end
+					end
+				end
+
+				Debugger:StudioWarn("finalChoice", finalChoice);
+				if finalChoice then
+					lobby:PlayAction(agentPrefab, {
+						OptionIndex=finalChoice.ActionId;
+					});
+				end
+
+			else
+				Debugger:Warn("Agent Judges", stageInfo.TurnPlayer, stageInfo);
+
+				task.wait(math.random(12, 24)/10);
+				lobby:PlayAction(agentPrefab, {
+					CallBluff=false;
+				});
+
+			end
+			
+
+		elseif stageInfo.Type == StageType.Dispute then
+			Debugger:Warn("Agent Dispute", stageInfo.TurnPlayer, stageInfo);
+
+		elseif stageInfo.Type == StageType.Sacrifice then
+			Debugger:Warn("Agent Sacrifice", stageInfo.TurnPlayer, stageInfo);
+				
+		elseif stageInfo.Type == StageType.AttackDispute then
+			Debugger:Warn("Agent AttackDispute", stageInfo.TurnPlayer, stageInfo);
+					
+		elseif stageInfo.Type == StageType.Break then
+			Debugger:Warn("Agent Break", stageInfo.TurnPlayer, stageInfo);
+					
+		elseif stageInfo.Type == StageType.SwapCards then
+			Debugger:Warn("Agent SwapCards", stageInfo.TurnPlayer, stageInfo);
+			
+			if isMyTurn then
+				
+
+			else
+				if isBluffing then
+					task.wait(math.random(32, 44)/10);
+					lobby:PlayAction(agentPrefab, {
+						CallBluff=true;
+					});
+				end
+
+			end
+
+		elseif stageInfo.Type == StageType.BluffTrial then
+			Debugger:Warn("Agent BluffTrial", stageInfo.TurnPlayer, stageInfo);
+
+		elseif stageInfo.Type == StageType.BluffConclusion then
+			Debugger:Warn("Agent BluffConclusion", stageInfo.TurnPlayer, stageInfo);
+
+		elseif stageInfo.Type == StageType.PlayerDefeated then
+			Debugger:Warn("Agent PlayerDefeated", stageInfo.TurnPlayer, stageInfo);
+			
+		end
+
+	end;
+end
+
 
 if RunService:IsServer() then
 	function remoteCardGame.OnServerInvoke(player, action, packet)

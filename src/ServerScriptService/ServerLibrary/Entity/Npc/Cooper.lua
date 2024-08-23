@@ -35,6 +35,7 @@ return function(npc, spawnPoint)
 	end
 	
 	--== Components;
+	self:AddComponent("Wield");
 	self:AddComponent("AvatarFace");
 	self:AddComponent(HumanModule.OnHealthChanged);
 	self:AddComponent(HumanModule.Chat);

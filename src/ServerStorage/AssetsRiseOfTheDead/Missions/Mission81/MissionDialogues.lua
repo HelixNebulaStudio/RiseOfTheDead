@@ -246,7 +246,7 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 		end);
 	
 	elseif mission.ProgressionPoint == 3 then
-		dialog:SetInitiate("Ready to put your skill to the test?", "Suspicious");
+		dialog:SetInitiate("Want to put your skill to the test?", "Suspicious");
 
 		local function StartCardGame(dialog)
 			local npcName = dialog.Name;
@@ -255,63 +255,7 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 			local cardGameLobby = modCardGame.NewLobby(npcPrefab);
 			local npcTable = cardGameLobby:GetPlayer(npcPrefab);
 
-			npcTable.ComputerAutoPlay = function(stageInfo)
-				local cards = npcTable.Cards;
-				local resources = npcTable.R;
-
-				Debugger:Warn("David table", npcTable);
-				if stageInfo.TurnPlayer ~= npcPrefab then
-					Debugger:Warn("David judges", stageInfo);
-
-				elseif stageInfo.Type == modCardGame.StageType.NextTurn then
-					Debugger:Warn("David plays turn", stageInfo);
-					task.wait(math.random(30, 40)/10);
-
-					if resources >= 10 then
-						cardGameLobby:PlayAction(npcPrefab, {
-							OptionIndex=2; -- Scavenge
-						});
-						
-					elseif table.find(cards,"RAT") then
-						cardGameLobby:PlayAction(npcPrefab, {
-							OptionIndex=6; -- Play rat
-						});
-
-					else
-						cardGameLobby:PlayAction(npcPrefab, {
-							OptionIndex=2; -- HeavyAttackRng
-						});
-
-					end
-					
-
-				elseif stageInfo.Type == modCardGame.StageType.Dispute then
-					Debugger:Warn("David Dispute", stageInfo);
-
-				elseif stageInfo.Type == modCardGame.StageType.Sacrifice then
-					Debugger:Warn("David Sacrifice", stageInfo);
-						
-				elseif stageInfo.Type == modCardGame.StageType.AttackDispute then
-					Debugger:Warn("David AttackDispute", stageInfo);
-							
-				elseif stageInfo.Type == modCardGame.StageType.Break then
-					Debugger:Warn("David Break", stageInfo);
-							
-				elseif stageInfo.Type == modCardGame.StageType.SwapCards then
-					Debugger:Warn("David SwapCards", stageInfo);
-		
-				elseif stageInfo.Type == modCardGame.StageType.BluffTrial then
-					Debugger:Warn("David BluffTrial", stageInfo);
-
-				elseif stageInfo.Type == modCardGame.StageType.BluffConclusion then
-					Debugger:Warn("David BluffConclusion", stageInfo);
-
-				elseif stageInfo.Type == modCardGame.StageType.PlayerDefeated then
-					Debugger:Warn("David PlayerDefeated", stageInfo);
-					
-				end
-
-			end;
+			npcTable.ComputerAutoPlay = modCardGame.NewComputerAgentFunc(npcPrefab, cardGameLobby);
 
 			cardGameLobby:Join(player, true);
 			cardGameLobby:Start();
