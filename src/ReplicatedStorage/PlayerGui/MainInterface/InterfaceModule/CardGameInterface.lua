@@ -136,14 +136,13 @@ function Interface.init(modInterface)
 							
 							--== Card selection;
 							local cardSwitchSelected = false;
-							local selectedCount = {};
+							local selectedCardNames = {};
 
 							for a=1, #cardPrefabsList do
 								if cardPrefabsList[a]:GetAttribute("Selected") == true then
-									table.insert(selectedCount, cardPrefabsList[a].Name);
+									table.insert(selectedCardNames, cardPrefabsList[a].Name);
 
-									if #selectedCount >= #playerTable.Cards then
-										Debugger:Log("Selected enough cards", selectedCount, #selectedCount, playerTable.Cards, #playerTable.Cards);
+									if #selectedCardNames >= #playerTable.Cards then
 										cardSwitchSelected = true;
 										break;
 									end
@@ -156,7 +155,7 @@ function Interface.init(modInterface)
 								local pingTick = tick();
 								local rPacket = remoteCardGame:InvokeServer("pickcards", {
 									StageIndex = lobby.StageIndex;
-									PickedCards = selectedCount;
+									PickedCards = selectedCardNames;
 								});
 								if rPacket.NewCards then
 									playerTable.Cards = rPacket.NewCards;

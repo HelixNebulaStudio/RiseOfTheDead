@@ -2794,6 +2794,7 @@ MissionLibrary.New{
 		{Text="Talk to David to learn how to play Fall of the Living";};
 		{Text="Win David in Fall of the Living";};
 		{Text="Win Cooper in Fall of the Living";};
+		{Text="Talk to ";};
 	};
 	StartRequirements={
 		MissionCompleted={58};

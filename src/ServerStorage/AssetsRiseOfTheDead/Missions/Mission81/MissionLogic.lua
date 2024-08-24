@@ -7,7 +7,33 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local missionId = 81;
 if RunService:IsServer() then
 	local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
-	
+	local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+
+	modOnGameEvents:ConnectEvent("OnFotlLossNpc", function(npcPrefab)
+		for _, player in pairs(game.Players:GetPlayers()) do
+
+			if npcPrefab.Name == "David" then
+				modMission:Progress(player, missionId, function(mission)
+					if mission.ProgressionPoint <= 3 then
+						mission.ProgressionPoint = 4;
+					end
+				end)
+
+			elseif npcPrefab.Name == "Cooper" then
+				modMission:Progress(player, missionId, function(mission)
+					if mission.ProgressionPoint <= 4 then
+						mission.ProgressionPoint = 5;
+					end
+				end)
+
+			end
+		end
+	end)
+
+	modOnGameEvents:ConnectEvent("OnFotlWonNpc", function(npcPrefab)
+		
+	end)
+
 	-- modBranchConfigs.IsWorld("TheMall")
 	
 	-- function MissionLogic.Init(missionProfile, mission)

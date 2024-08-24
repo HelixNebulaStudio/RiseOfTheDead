@@ -244,24 +244,71 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 			end);
 
 		end);
+	end
 	
-	elseif mission.ProgressionPoint == 3 then
+	local function StartCardGame(dialog)
+		local npcName = dialog.Name;
+		local npcPrefab = dialog.Prefab;
+		
+		local cardGameLobby = modCardGame.NewLobby(npcPrefab);
+		local npcTable = cardGameLobby:GetPlayer(npcPrefab);
+
+		local npcModule = dialog:GetNpcModule();
+
+		npcTable.ComputerAutoPlay = modCardGame.NewComputerAgentFunc(npcPrefab, cardGameLobby, {
+			OnCaughtNotBluffing=function()
+				local chats = {
+					"Bad guess";
+					"Thought I was bluffing ey?";
+					"Nice try pal";
+					"Sike! It's genuine!";
+				};
+				npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+			end;
+			OnCaughtBluffing=function()
+				local chats = {
+					"Ain't no way";
+					"Lucky guess";
+					"You got me";
+					"What gave it away?";
+				};
+				npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+			end;
+			OnCardLoss=function()
+				local chats = {
+					"Yikes, down a card";
+					"Uoh noo";
+					"How could you";
+				};
+				npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+			end;
+			OnPlayerDefeated=function(defeatedPlayer)
+				local chats = {
+					"Better luck next time "..defeatedPlayer.Name;
+					"Good try, you just need a bit more practice "..defeatedPlayer.Name;
+				};
+				npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+			end;
+		});
+
+		cardGameLobby:Join(player, true);
+		cardGameLobby:Start();
+
+		dialog:SetExpireTime(workspace:GetServerTimeNow()+2);
+	end
+	
+	if mission.ProgressionPoint == 3 then
 		dialog:SetInitiate("Want to put your skill to the test?", "Suspicious");
 
-		local function StartCardGame(dialog)
-			local npcName = dialog.Name;
-			local npcPrefab = dialog.Prefab;
+		dialog:AddDialog({
+			Face="Confident";
+			Say="Let's play";
+			Reply="Alright. *Hands you two cards*";
 			
-			local cardGameLobby = modCardGame.NewLobby(npcPrefab);
-			local npcTable = cardGameLobby:GetPlayer(npcPrefab);
+		}, StartCardGame);
 
-			npcTable.ComputerAutoPlay = modCardGame.NewComputerAgentFunc(npcPrefab, cardGameLobby);
-
-			cardGameLobby:Join(player, true);
-			cardGameLobby:Start();
-
-			dialog:SetExpireTime(workspace:GetServerTimeNow()+2);
-		end
+	elseif mission.ProgressionPoint == 4 then
+		dialog:SetInitiate("Best 2 out of 3?", "Welp");
 
 		dialog:AddDialog({
 			Face="Confident";
@@ -445,6 +492,64 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 	elseif mission.ProgressionPoint == 4 then
 		dialog:SetInitiate("Alright, now that you're ready..", "Smirk");
 		
+		local function StartCardGame(dialog)
+			local npcName = dialog.Name;
+			local npcPrefab = dialog.Prefab;
+			
+			local cardGameLobby = modCardGame.NewLobby(npcPrefab);
+			local npcTable = cardGameLobby:GetPlayer(npcPrefab);
+
+			local npcModule = dialog:GetNpcModule();
+
+			npcTable.ComputerAutoPlay = modCardGame.NewComputerAgentFunc(npcPrefab, cardGameLobby, {
+				OnCaughtNotBluffing=function()
+					local chats = {
+						"Bad guess";
+						"Thought I was bluffing ey?";
+						"Nice try pal";
+						"Sike! It's genuine!";
+					};
+					npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+				end;
+				OnCaughtBluffing=function()
+					local chats = {
+						"Ain't no way";
+						"Lucky guess";
+						"You got me";
+						"What gave it away?";
+					};
+					npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+				end;
+				OnCardLoss=function()
+					local chats = {
+						"Yikes, down a card";
+						"Uoh noo";
+						"How could you";
+					};
+					npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+				end;
+				OnPlayerDefeated=function(defeatedPlayer)
+					local chats = {
+						"Better luck next time "..defeatedPlayer.Name;
+						"Good try, you just need a bit more practice "..defeatedPlayer.Name;
+					};
+					npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+				end;
+			});
+
+			cardGameLobby:Join(player, true);
+			cardGameLobby:Start();
+
+			dialog:SetExpireTime(workspace:GetServerTimeNow()+2);
+		end
+
+		dialog:AddDialog({
+			Face="Confident";
+			Say="I'm ready, let's play";
+			Reply="Alright. *Hands you two cards*";
+			
+		}, StartCardGame);
+
 	end
 
 	dialog:SkipOtherDialogues();
