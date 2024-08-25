@@ -502,6 +502,7 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 			local npcModule = dialog:GetNpcModule();
 
 			npcTable.ComputerAutoPlay = modCardGame.NewComputerAgentFunc(npcPrefab, cardGameLobby, {
+				--BluffChance=1;
 				OnCaughtNotBluffing=function()
 					local chats = {
 						"Bad guess";

@@ -47,7 +47,7 @@ CardGame.ActionOptions = {
 	{Text="Heavy Attack (-10 Resource)"; Cost=10; SelectTarget=true; BroadcastMsg="$PlayerName has attacked $TargetName."};
 	--== Card Actions
 	{Key="RogueAttack"; Text="Attack (-4 Resource)"; Cost=4; Requires="Rouge"; SelectTarget=true; BroadcastMsg="$PlayerName has attacked $TargetName."};
-	{Text="Block Attack"; Requires="_Zombie"; BroadcastMsg="$PlayerName has blocked the attack."};
+	{Key="ZombieBlock"; Text="Block Attack"; Requires="_Zombie"; BroadcastMsg="$PlayerName has blocked the attack."};
 	
 	--5
 	{Key="BanditRaid"; Text="Raid (+2 Resource)"; SpaceCost=2; Requires="Bandit"; SelectTarget=true; RequiresTargetResources=true; BroadcastMsg="$PlayerName has raided $TargetName for $Amount resources."};
@@ -128,12 +128,14 @@ function Lobby:SetPlayerType(player, setType)
 	self:Changed(true);
 end
 
+-- MARK: Lobby:SetState
 function Lobby:SetState(gameState)
 	self.State = gameState;
 
 	self:Changed(true);
 end
 
+-- MARK: Lobby:QueueStage
 function Lobby:QueueStage(stageType, data)
 	data = data or {};
 	data.Type = stageType;
@@ -142,6 +144,7 @@ function Lobby:QueueStage(stageType, data)
 	table.insert(self.StageQueue, data);
 end
 
+-- MARK: Lobby:Destroy
 function Lobby:Destroy()
 	table.clear(self.Players);
 	table.clear(self.Spectators);
@@ -156,6 +159,7 @@ function Lobby:Destroy()
 	self.Host = nil;
 end
 
+-- MARK: Lobby:UpdateStats
 function Lobby:UpdateStats(player, isWin)
 	if not player:IsA("Player") then return end;
 	task.spawn(function()
@@ -169,6 +173,7 @@ function Lobby:UpdateStats(player, isWin)
 	end)
 end
 
+-- MARK: Lobby:NextTurn
 function Lobby:NextTurn()
 	local unixTime = DateTime.now().UnixTimestampMillis;
 	
@@ -312,6 +317,8 @@ function Lobby:NextTurn()
 		if loserPlayerTable and loserPlayerTable.Cards and #loserPlayerTable.Cards <= 1 then
 			duration = 2; 
 			self.ActionPlayed = true;
+			
+			table.clear(loserPlayerTable.Cards);
 			self:QueueStage(StageType.PlayerDefeated, {DefeatedPlayer=stageInfo.Loser;});
 			
 		else
@@ -415,6 +422,7 @@ function Lobby:NextTurn()
 	self:Changed(true);
 end
 
+-- MARK: Lobby:PlayAction
 function Lobby:PlayAction(player, packet)
 	local playerTable = self:GetPlayer(player, true);
 	
@@ -648,6 +656,7 @@ function Lobby:PlayAction(player, packet)
 	self:NextTurn();
 end
 
+-- MARK: Lobby:Broadcast
 function Lobby:Broadcast(msg, packet)
 	packet = packet or {};
 	packet.Text = msg;
@@ -656,6 +665,7 @@ function Lobby:Broadcast(msg, packet)
 	self:Changed(true)
 end
 
+-- MARK: Lobby:Start
 function Lobby:Start()
 	if self.State == GameState.Idle then
 		self:SetState(GameState.Active);
@@ -667,6 +677,7 @@ function Lobby:Start()
 	end
 end
 
+-- MARK: Lobby:Join
 function Lobby:Join(player, setPlayer)
 	local playerTable = self:GetPlayer(player);
 	
@@ -866,6 +877,7 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 			BanditRaid = {Genuine=0.6; Bluff=0.35;};
 			RatSmuggle = {Genuine=0.8; Bluff=0.6;};
 			BioXSwap = {CallBluff=0.1; Genuine=0.6; Bluff=0.2;};
+			ZombieBlock = {Bluff=0.5;};
 		};
 		Cards = {
 			Rouge={0.5; 0.1;};
@@ -958,8 +970,9 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 							break;
 						end
 					end
+				end
 
-				else
+				if finalChoice == nil then
 					local totalChance = genuineActions[#genuineActions].ChanceTotal;
 					local genuineActionRoll = math.random(0, totalChance *100)/100;
 
@@ -997,10 +1010,32 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 			
 			if stageInfo.Loser == agentPrefab then
 				task.spawn(params.OnCardLoss);
+
+				task.wait(math.random(12, 24)/10);
+				lobby:PlayAction(stageInfo.Loser, {FoldCard=math.random(1, 2)});
 			end
 
 		elseif stageInfo.Type == StageType.AttackDispute then
 			Debugger:Warn("Agent AttackDispute", stageInfo.TurnPlayer, stageInfo);
+
+			if stageInfo.Victim == agentPrefab then
+				local bluffRoll = math.random(0, 100)/100;
+				if params.Actions.ZombieBlock.Bluff > bluffRoll then
+					-- Bluff zombie block;
+					task.wait(math.random(32, 44)/10);
+					lobby:PlayAction(agentPrefab, {
+						AttackDisputeChoice=2;
+					});
+					
+				else
+					-- Accept;
+					task.wait(math.random(12, 24)/10);
+					lobby:PlayAction(agentPrefab, {
+						AttackDisputeChoice=1;
+					});
+
+				end
+			end
 					
 		elseif stageInfo.Type == StageType.Break then
 			Debugger:Warn("Agent Break", stageInfo.TurnPlayer, stageInfo);
@@ -1053,6 +1088,7 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 			if stageInfo.DefeatedPlayer ~= agentPrefab then
 				task.spawn(params.OnPlayerDefeated, stageInfo.DefeatedPlayer);
 			end
+
 		end
 
 	end;
