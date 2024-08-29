@@ -117,6 +117,7 @@ library:Add{
 	AnimationId="rbxassetid://507772104";
 	Looped=true;
 	Unlocked=true;
+	IsDance=true;
 	-- Rbx;
 };
 
@@ -127,6 +128,7 @@ library:Add{
 	AnimationId="rbxassetid://507776879";
 	Looped=true;
 	Unlocked=true;
+	IsDance=true;
 	-- Rbx;
 };
 
@@ -137,6 +139,7 @@ library:Add{
 	AnimationId="rbxassetid://507777623";
 	Looped=true;
 	Unlocked=true;
+	IsDance=true;
 	-- Rbx;
 };
 
@@ -147,6 +150,7 @@ library:Add{
 	AnimationId="rbxassetid://3641511003";
 	Looped=true;
 	Unlocked=true;
+	IsDance=true;
 };
 
 library:Add{
@@ -249,6 +253,7 @@ library:Add{
 	Looped=false;
 	Unlocked=true;
 	Thumbnail=thumbnailString.."3570535774";
+	IsDance=true;
 	-- Rbx;
 };
 
@@ -260,6 +265,7 @@ library:Add{
 	Looped=false;
 	Unlocked=true;
 	Thumbnail=thumbnailString.."3576721660";
+	IsDance=true;
 	-- Rbx;
 };
 
@@ -346,6 +352,7 @@ library:Add{
 	Looped=true;
 	Unlocked=true;
 	Thumbnail=thumbnailString.."3576747102";
+	IsDance=true;
 	-- Rbx;
 };
 
@@ -405,6 +412,7 @@ library:Add{
 	AnimationId="rbxassetid://3695333486";
 	Looped=true;
 	Unlocked=true;
+	IsDance=true;
 	-- Rbx;
 };
 
@@ -526,6 +534,7 @@ library:Add{
 	AnimationId="rbxassetid://3333432454";
 	Looped=false;
 	Unlocked=true;
+	IsDance=true;
 	-- Rbx;
 };
 
@@ -537,6 +546,7 @@ library:Add{
 	Looped=false;
 	Unlocked=true;
 	Thumbnail=thumbnailString.."5938365243";
+	IsDance=true;
 	-- Rbx;
 };
 
@@ -570,6 +580,7 @@ library:Add{
 	Looped=false;
 	Unlocked=true;
 	Thumbnail=thumbnailString.."5915773992";
+	IsDance=true;
 	-- Rbx;
 };
 
@@ -842,6 +853,7 @@ library:Add{
 	AnimationId="rbxassetid://17654368799";
 	Looped=true;
 	Unlocked=true;
+	IsDance=true;
 	-- Rbx;
 };
 

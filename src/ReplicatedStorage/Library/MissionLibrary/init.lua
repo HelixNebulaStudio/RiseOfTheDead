@@ -2794,12 +2794,21 @@ MissionLibrary.New{
 		{Text="Talk to David to learn how to play Fall of the Living";};
 		{Text="Win David in Fall of the Living";};
 		{Text="Win Cooper in Fall of the Living";};
-		{Text="Talk to ";};
+		{Text="Talk to Cooper";};
+
+		{Text="Open the Emote menu to dance";};
+		{Text="Talk to Cooper";};
+		{Text="Talk to Cooper";};
+		{Text="Talk to David";};
+		{Text="Talk to Joseph";};
 	};
 	StartRequirements={
 		MissionCompleted={58};
 	};
-	SaveData={Flags=0;};
+	SaveData={
+		Flags=0;
+		CooperRematch=0;
+	};
 	GuideText="Talk to Joseph";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};

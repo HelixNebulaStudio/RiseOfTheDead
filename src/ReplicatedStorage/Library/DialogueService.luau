@@ -20,6 +20,7 @@ function DialogueService:InitServer(baseDialogueHandlers)
 
     local modDialogues = require(game.ServerScriptService.ServerLibrary.DialogueSave);
     local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+	local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
     local bindOnTalkedTo = game.ReplicatedStorage.Remotes.Dialogue.OnTalkedTo;
     local remoteDialogueHandler = modRemotesManager:Get("DialogueHandler");
@@ -190,7 +191,7 @@ function DialogueService:InitServer(baseDialogueHandlers)
                 npcDialogData:Reset();
                 local initDialoguePacket = nil;
 
-                -- Mission dialogues;
+                -- MARK: Mission dialogues;
                 local missionProfile = modMission.GetMissions(player.Name);
                 if missionProfile then
                     local sortedMissions = {};
@@ -227,9 +228,11 @@ function DialogueService:InitServer(baseDialogueHandlers)
                     end
                 end
 
-
-                -- Base dialogues;
+                -- MARK: Base dialogues;
                 local baseDialoguesScript = modAssetHandler:GetServer(`Npc/{npcName}/Dialogues`);
+                if baseDialoguesScript == nil then
+                    baseDialoguesScript = modAssetHandler:GetServer(`Npc/Base/Dialogues`);
+                end
                 if baseDialoguesScript then
                     local dialogueResources = require(baseDialoguesScript);
                     
@@ -241,6 +244,15 @@ function DialogueService:InitServer(baseDialogueHandlers)
 
                     for tag, dialoguePacket in pairs(dialogueResources.DialogueStrings) do
                         modDialogueLibrary:Load(npcName, tag, dialoguePacket);
+                    end
+
+                    -- MARK: Equipment dialogues;
+                    if profile.EquippedTools.ItemId ~= nil then
+                        dialog.EquippedTools = profile.EquippedTools;
+
+                        if dialogueResources.EquipmentDialogueHandler then
+                            dialogueResources.EquipmentDialogueHandler(player, dialog, npcDialogData);
+                        end
                     end
 
                     if dialogueResources.DialogueHandler then
@@ -373,6 +385,7 @@ function DialogueService:InitServer(baseDialogueHandlers)
                 npcModule.AvatarFace:DialogSet(nil, player);
             end
             bindOnTalkedTo:Fire(npcModel, player, "close");
+            modOnGameEvents:Fire("OnDialogueClose", player, npcModel);
             
         elseif action == "oldconverse" then
             return OnDialogue(player, packet.NpcModel, packet.NpcName, {ChoiceTag=packet.SelectIndex});

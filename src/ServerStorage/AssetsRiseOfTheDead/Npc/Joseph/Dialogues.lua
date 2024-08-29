@@ -80,6 +80,116 @@ if RunService:IsServer() then
 			end
 		end
 	end
+
+	-- MARK: EquipmentDialogueHandler
+	Dialogues.EquipmentDialogueHandler = function(player, dialog, data)
+		local itemId = dialog.EquippedTools.ItemId;
+
+		if itemId == "fotlcardgame" then
+			local modCardGame = require(game.ReplicatedStorage.Library.CardGame);
+			
+			local function StartCardGame(dialog)
+				local npcPrefab = dialog.Prefab;
+				
+				local cardGameLobby = modCardGame.NewLobby(npcPrefab);
+				local npcTable = cardGameLobby:GetPlayer(npcPrefab);
+	
+				local npcModule = dialog:GetNpcModule();
+	
+	
+				local npcQuips = {
+					CaughtNotBluffing = {
+						"Nice try kiddo.";
+						"Did it looked like a bluff?";
+					};
+					CaughtBluffing = {
+						"Haha, what was my tell?";
+						"How did you tell?";
+					};
+					CardLoss = {
+						"Darnit";
+						"Owell";
+					};
+					FailAccuse = {
+						"Looks like I made a miscalculation here";
+						"I must've missed something..";
+						"Hmmmm";
+					};
+					CallBluff = {
+						"Haha, something tells me you're bluffing..";
+						"I smell a bluff..";
+						"I'd laugh if you aren't bluffing.";
+					};
+					PlayerDefeated = {
+						"Good game, $PlayerName";
+						"Want a rematch? $PlayerName";
+					};
+				};
+	
+				local function cardGameQuips(quipType, param)
+					param = param or {};
+	
+					local quipsList = npcQuips[quipType];
+					if quipsList == nil then return end;
+	
+					local pickQuip = quipsList[math.random(1, #quipsList)];
+					pickQuip = string.gsub(pickQuip, "$PlayerName", (param.PlayerName or "pal"));
+	
+					npcModule.Chat(game.Players:GetPlayers(), pickQuip);
+				end
+	
+				-- MARK: Cooper Fotl Agent
+				npcTable.ComputerAutoPlay = modCardGame.NewComputerAgentFunc(npcPrefab, cardGameLobby, {
+					BluffChance=0.5;
+					CheatChance=0.5;
+					Actions = {
+						Scavenge = {Genuine=0.3;};
+						RogueAttack = {CallBluff=0.75; Genuine=0.5; Bluff=0.5;};
+						BanditRaid = {CallBluff=0.7; Genuine=0.8; Bluff=0.3;};
+						RatSmuggle = {CallBluff=0.6; Genuine=0.7; Bluff=0.4;};
+						BioXSwap = {CallBluff=0.5; Genuine=0.5; Bluff=0.5;};
+						ZombieBlock = {CallBluff=0.4; Bluff=0.5;};
+					};
+					OnCaughtNotBluffing=function()
+						cardGameQuips("CaughtNotBluffing");
+					end;
+					OnCaughtBluffing=function()
+						cardGameQuips("CaughtBluffing");
+					end;
+					OnCardLoss=function()
+						cardGameQuips("CardLoss");
+					end;
+					OnCallBluff=function()
+						cardGameQuips("CallBluff");
+					end;
+					OnFailAccuse=function()
+						cardGameQuips("FailAccuse");
+					end;
+					OnPlayerDefeated=function(defeatedPlayer)
+						cardGameQuips("CardLoss", {
+							PlayerName=defeatedPlayer and defeatedPlayer.Name;
+						});
+					end;
+				});
+	
+	
+				cardGameLobby:Join(player, true);
+				cardGameLobby:Start();
+	
+				dialog:SetExpireTime(workspace:GetServerTimeNow()+2);
+			end
+	
+			dialog:SetInitiate("Heh, Fall of the Living? I used to play that a lot.", "Smirk");
+
+			dialog:AddDialog({
+				Face="Smirk";
+				Say="Let's play Fall of the Living?";
+				Reply="Sure *Hands you two cards*";
+				
+			}, StartCardGame);
+		end
+	end
+	
 end
 
 return Dialogues;

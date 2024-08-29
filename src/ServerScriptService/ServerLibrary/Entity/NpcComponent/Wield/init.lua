@@ -26,7 +26,9 @@ function Component.new(Npc)
 	Wield.Audio = {};
 	Wield.ItemId = nil;
 	
-	function Wield.Equip(toolItemId)
+	function Wield.Equip(toolItemId, packet)
+		packet = packet or {};
+
 		if Wield.ItemId == toolItemId then return end;
 		if Wield.ItemId then
 			Wield.Unequip();
@@ -61,6 +63,9 @@ function Component.new(Npc)
 			end
 		end
 		if Wield.Handler then
+			if packet.MockItem then
+				Wield.Handler.MockItem = true;
+			end
 			Wield.Handler:Equip();
 			
 		end

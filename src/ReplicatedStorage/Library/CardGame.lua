@@ -44,7 +44,7 @@ CardGame.Cards = {
 CardGame.ActionOptions = {
 	--== Basic Actions
 	{Key="Scavenge"; Text="Scavenge (+1-2 Resource)"; SpaceCost=1; BroadcastMsg="$PlayerName scavenged and found $Amount resources."};
-	{Text="Heavy Attack (-10 Resource)"; Cost=10; SelectTarget=true; BroadcastMsg="$PlayerName has attacked $TargetName."};
+	{Text="Heavy Attack (-10 Resource)"; ForceAtMaxResource=true; Cost=10; SelectTarget=true; BroadcastMsg="$PlayerName has attacked $TargetName."};
 	--== Card Actions
 	{Key="RogueAttack"; Text="Attack (-4 Resource)"; Cost=4; Requires="Rouge"; SelectTarget=true; BroadcastMsg="$PlayerName has attacked $TargetName."};
 	{Key="ZombieBlock"; Text="Block Attack"; Requires="_Zombie"; BroadcastMsg="$PlayerName has blocked the attack."};
@@ -140,12 +140,65 @@ function Lobby:QueueStage(stageType, data)
 	data = data or {};
 	data.Type = stageType;
 	
-	Debugger:Log("QueueStage:", data);
+	local stageTypeName = stageType;
+	if RunService:IsStudio() then
+		for k,v in pairs(StageType) do
+			if v == stageType then
+				stageTypeName = k;
+				break;
+			end
+		end
+		Debugger:Log("QueueStage:", stageTypeName, data);
+	end
+
 	table.insert(self.StageQueue, data);
 end
 
 -- MARK: Lobby:Destroy
 function Lobby:Destroy()
+	
+	for a=#self.Players, 1, -1 do
+		local playerTable = self.Players[a];
+
+		if playerTable.Player.ClassName == "Player" then
+			task.spawn(function()
+				if playerTable.Player then
+					local profile = shared.modProfile:Get(playerTable.Player);
+					
+					if profile and playerTable.Cards then
+						if profile.EquippedTools.ID == nil then
+							if #playerTable.Cards > 0 then
+								shared.EquipmentSystem.ToolHandler(playerTable.Player, "equip", {MockEquip=true; ItemId="fotlcardgame"});
+							end
+							
+						elseif profile.EquippedTools.StorageItem and profile.EquippedTools.StorageItem.ItemId == "fotlcardgame" then
+							if #playerTable.Cards <= 0 then
+								shared.EquipmentSystem.ToolHandler(playerTable.Player, "unequip");
+							end
+						end
+					end
+				end
+			end)
+			
+		elseif playerTable.Player.ClassName == "Model" then
+			task.spawn(function()
+				local npcStatusModule = playerTable.Player:FindFirstChild("NpcStatus");
+				if npcStatusModule == nil then return end;
+
+				local npcStatus = npcStatusModule and require(npcStatusModule) or nil;
+				local npcModule = npcStatus:GetModule();
+				
+				if npcModule == nil then return end;
+				if npcModule.Wield == nil then return end
+
+				if npcModule.Wield.ItemId == "fotlcardgame" then
+					npcModule.Wield.Unequip();
+
+				end
+			end)
+		end;
+	end
+
 	table.clear(self.Players);
 	table.clear(self.Spectators);
 	table.clear(self);
@@ -153,7 +206,7 @@ function Lobby:Destroy()
 	local lobbyIndex = table.find(CardGame.Lobbies, self);
 	if lobbyIndex then
 		table.remove(CardGame.Lobbies, lobbyIndex);
-		Debugger:Log("Destroyed lobby");
+		Debugger:Log("Destroyed lobby", self);
 	end
 	self.Destroyed = true;
 	self.Host = nil;
@@ -440,22 +493,44 @@ function Lobby:PlayAction(player, packet)
 		end
 	end
 
+	if stageInfo.Type == StageType.PlayerDefeated then
+		return;
+	end
+
 	Debugger:Warn(self.StageIndex.."/"..(#self.StageQueue),"Type",stageTypeName,player,"PlayAction", packet, "StageInfo", stageInfo);
 
 	if stageInfo.Type == CardGame.StageType.NextTurn and stageInfo.TurnPlayer ~= player then
 		return;
 	end
-	if stageInfo.Type == CardGame.StageType.SwapCards and stageInfo.TurnPlayer ~= player then
-		if packet.CallBluff == true then
-			if stageInfo.BluffCalled then Debugger:Log("bluff already called", stageInfo); return; end
-			stageInfo.BluffCalled = true;
-			
-			stageInfo.Accuser=player;
-			stageInfo.Defendant=stageInfo.Victim or stageInfo.TurnPlayer;
-			
-			self:QueueStage(StageType.BluffTrial, stageInfo);
+
+	if packet.CallBluff == true and stageInfo.TurnPlayer ~= player then
+		Debugger:Log("CallBluff stageInfo", stageInfo);
+		
+		if stageInfo.BluffCalled then Debugger:Log("bluff already called", stageInfo); return; end
+		stageInfo.BluffCalled = true;
+		
+		stageInfo.Accuser=player;
+		stageInfo.Defendant=stageInfo.Victim or stageInfo.TurnPlayer;
+		
+		self:QueueStage(StageType.BluffTrial, stageInfo);
+		if stageInfo.ActionId ~= 7 then
+			self:NextTurn();
+			return;
 		end
+
+	elseif packet.CallBluff == true and stageInfo.TurnPlayer == player and stageInfo.AttackDispute == true then
+		-- Call bluff on zombie block;
+		
+		if stageInfo.BluffCalled then Debugger:Log("bluff already called", stageInfo); return; end
+		stageInfo.BluffCalled = true;
+		
+		stageInfo.Accuser=player;
+		stageInfo.Defendant=stageInfo.Victim;
+		
+		self:QueueStage(StageType.BluffTrial, stageInfo);
+		self:NextTurn();
 		return;
+
 	end
 
 	self.ActionPlayed = true;
@@ -467,6 +542,9 @@ function Lobby:PlayAction(player, packet)
 			Debugger:Log("Accept attack");
 			self:QueueStage(StageType.AttackDispute, {Attacker=stageInfo.TurnPlayer; Victim=stageInfo.TargettedPlayer;});
 
+		elseif stageInfo.ActionId == 7 then
+			return;
+
 		end
 		
 		
@@ -476,13 +554,15 @@ function Lobby:PlayAction(player, packet)
 		local loser = stageInfo.Loser;
 		local loserPlayerTable = self:GetPlayer(loser, true);
 		
-		Debugger:Log("PlayAction fold", loser, packet);
-		local card = table.remove(loserPlayerTable.Cards, packet.FoldCard);
-		
-		self:Broadcast(loser.Name .. " folds ".. card .."!", {SndId="CardGameKilled"});
-		self:QueueStage(StageType.Break, {
-			StateLog=(loser.Name.." folds "..card);
-		});
+		if #loserPlayerTable.Cards > 0 then
+			Debugger:Log("PlayAction fold", loser, packet);
+			local card = table.remove(loserPlayerTable.Cards, packet.FoldCard);
+			
+			self:Broadcast(loser.Name .. " folds ".. card .."!", {SndId="CardGameKilled"});
+			self:QueueStage(StageType.Break, {
+				StateLog=(loser.Name.." folds "..card);
+			});
+		end
 
 	elseif packet.AttackDisputeChoice then
 		local hasZombieCard = table.find(playerTable.Cards, "Zombie") ~= nil;
@@ -561,6 +641,7 @@ function Lobby:PlayAction(player, packet)
 
 
 		elseif optionIndex == 7 then
+			Debugger:StudioLog("PickCards", packet.PickedCards)
 			if packet.PickedCards then
 				local cardsLeft = #playerTable.Cards;
 
@@ -798,9 +879,9 @@ function Lobby:Changed(sync)
 				if npcModule.Wield == nil then continue end
 
 				if playerTable.Cards and #playerTable.Cards > 0 then
-					npcModule.Wield.Equip("fotlcardgame");
+					npcModule.Wield.Equip("fotlcardgame", {MockItem=true;});
 
-				elseif npcModule.Wield.ToolModule and npcModule.Wield.ToolModule.ItemId == "fotlcardgame" then
+				elseif npcModule.Wield.ItemId == "fotlcardgame" then
 					npcModule.Wield.Unequip();
 
 				end
@@ -871,13 +952,14 @@ end
 function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 	local templateParams = {
 		BluffChance = 0.5;
+		CheatChance = 1;
 		Actions = {
 			Scavenge = {Genuine=0.3;};
-			RogueAttack = {Genuine=0.3; Bluff=0.1;};
-			BanditRaid = {Genuine=0.6; Bluff=0.35;};
-			RatSmuggle = {Genuine=0.8; Bluff=0.6;};
-			BioXSwap = {CallBluff=0.1; Genuine=0.6; Bluff=0.2;};
-			ZombieBlock = {Bluff=0.5;};
+			RogueAttack = {CallBluff=0.3; Genuine=0.3; Bluff=0.1; AccuseFailPenalty=0.2;};
+			BanditRaid = {CallBluff=0.3; Genuine=0.6; Bluff=0.35; AccuseFailPenalty=0.2;};
+			RatSmuggle = {CallBluff=0.3; Genuine=0.8; Bluff=0.6; AccuseFailPenalty=0.2;};
+			BioXSwap = {CallBluff=0.1; Genuine=0.6; Bluff=0.2; AccuseFailPenalty=0.2;};
+			ZombieBlock = {CallBluff=0.3; Bluff=0.5; AccuseFailPenalty=0.2;};
 		};
 		Cards = {
 			Rouge={0.5; 0.1;};
@@ -891,10 +973,16 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 		OnCaughtNotBluffing=(function()end);
 		OnCardLoss=(function()end);
 		OnPlayerDefeated=(function()end);
+		OnFailAccuse=(function()end);
+		OnCallBluff=(function()end);
 	};
 
 	params = modTables.Mold(params or {}, templateParams);
 	
+	local agentMemory = {
+		AccuseFail={};
+	};
+
 	-- ComputerAutoPlay
 	return function(npcTable, stageInfo)
 		local cards = npcTable.Cards;
@@ -916,6 +1004,8 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 				local genuineTotalChance = 0;
 				local bluffActions = {};
 				local bluffTotalChance = 0;
+
+				local finalChoice = nil;
 
 				for a=1, #validOptions do
 					local optionIndex = validOptions[a];
@@ -943,6 +1033,11 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 							ChanceTotal = genuineTotalChance;
 						});
 
+						if resources >= 10 and optionLib.ForceAtMaxResource then
+							finalChoice = genuineActions[#genuineActions];
+							break;
+						end
+
 					else
 						bluffTotalChance = bluffTotalChance + actionChance.Bluff;
 						table.insert(bluffActions, {
@@ -957,10 +1052,8 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 
 				Debugger:StudioLog("Agent Choices",agentPrefab,"Genuines", genuineActions, "Bluffs", bluffActions);
 
-				local finalChoice = nil;
-
 				local bluffRoll = math.random(0, 100)/100;
-				if params.BluffChance > bluffRoll and #bluffActions > 0 then
+				if finalChoice == nil and params.BluffChance > bluffRoll and #bluffActions > 0 then
 					local totalChance = bluffActions[#bluffActions].ChanceTotal;
 					local bluffActionRoll = math.random(0, totalChance *100)/100;
 
@@ -984,35 +1077,58 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 					end
 				end
 
-				Debugger:StudioWarn("Agent finalChoice", finalChoice);
 				if finalChoice then
+					Debugger:StudioWarn("Agent finalChoice", finalChoice.Key);
 					lobby:PlayAction(agentPrefab, {
 						OptionIndex=finalChoice.ActionId;
 					});
 				end
-
-			else
-				Debugger:Warn("Agent Judges", stageInfo.TurnPlayer, stageInfo);
-
-				task.wait(math.random(12, 24)/10);
-				lobby:PlayAction(agentPrefab, {
-					CallBluff=false;
-				});
-
 			end
 			
 
 		elseif stageInfo.Type == StageType.Dispute then
 			Debugger:Warn("Agent Dispute", stageInfo.TurnPlayer, stageInfo);
 
+			if stageInfo.TurnPlayer ~= agentPrefab then
+				local optionLib = CardGame.ActionOptions[stageInfo.ActionId];
+
+				if optionLib and optionLib.Key then
+					local callBluffChance = params.Actions[optionLib.Key] and params.Actions[optionLib.Key].CallBluff;
+					
+					if callBluffChance then
+						local callRoll = math.random(0, 100)/100;
+
+						local cheatRoll = math.random(0, 100)/100;
+						local skipCallBluff = params.CheatChance > cheatRoll and stageInfo.IsBluff ~= true;
+						
+						local accuseFail = agentMemory.AccuseFail[optionLib.Key] or 0;
+						callBluffChance = callBluffChance - (params.Actions[optionLib.Key].AccuseFailPenalty * accuseFail);
+
+						if callBluffChance > callRoll and not skipCallBluff then
+							task.wait(math.random(12, 24)/10);
+							lobby:PlayAction(agentPrefab, {
+								CallBluff=true;
+							});
+							task.spawn(params.OnCallBluff);
+
+						end
+					end
+				end
+
+				for aKey, _ in pairs(agentMemory.AccuseFail) do
+					if aKey == (optionLib and optionLib.Key) then continue end;
+					agentMemory.AccuseFail[aKey] = math.max(agentMemory.AccuseFail[aKey] -1, 0);
+				end
+			end
+
 		elseif stageInfo.Type == StageType.Sacrifice then
 			Debugger:Warn("Agent Sacrifice", stageInfo.TurnPlayer, stageInfo);
 			
 			if stageInfo.Loser == agentPrefab then
-				task.spawn(params.OnCardLoss);
 
 				task.wait(math.random(12, 24)/10);
 				lobby:PlayAction(stageInfo.Loser, {FoldCard=math.random(1, 2)});
+				task.spawn(params.OnCardLoss);
 			end
 
 		elseif stageInfo.Type == StageType.AttackDispute then
@@ -1020,7 +1136,7 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 
 			if stageInfo.Victim == agentPrefab then
 				local bluffRoll = math.random(0, 100)/100;
-				if params.Actions.ZombieBlock.Bluff > bluffRoll then
+				if params.Actions.ZombieBlock.CallBluff > bluffRoll then
 					-- Bluff zombie block;
 					task.wait(math.random(32, 44)/10);
 					lobby:PlayAction(agentPrefab, {
@@ -1041,12 +1157,18 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 			Debugger:Warn("Agent Break", stageInfo.TurnPlayer, stageInfo);
 					
 		elseif stageInfo.Type == StageType.SwapCards then
-			Debugger:Warn("Agent SwapCards", stageInfo.TurnPlayer, stageInfo);
+			Debugger:Warn("Agent SwapCards", stageInfo.TurnPlayer, stageInfo, " lobby.CardSwapSelections",lobby.CardSwapSelections);
 			
 			if isMyTurn then
 				task.wait(math.random(12, 24)/10);
+
+				local cardsPick = {};
+
+				table.insert(cardsPick, table.remove(lobby.CardSwapSelections, math.random(1, #lobby.CardSwapSelections)));
+				table.insert(cardsPick, table.remove(lobby.CardSwapSelections, math.random(1, #lobby.CardSwapSelections)));
+
 				lobby:PlayAction(agentPrefab, {
-					PickedCards=lobby.CardSwapSelections;
+					PickedCards=cardsPick;
 				});
 				
 			else
@@ -1056,6 +1178,7 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 					lobby:PlayAction(agentPrefab, {
 						CallBluff=true;
 					});
+					task.spawn(params.OnCallBluff);
 				else
 					task.wait(math.random(12, 24)/10);
 					lobby:PlayAction(agentPrefab, {
@@ -1071,12 +1194,25 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 		elseif stageInfo.Type == StageType.BluffConclusion then
 			Debugger:Warn("Agent BluffConclusion", stageInfo.TurnPlayer, stageInfo);
 
-			if stageInfo.Defendant == agentPrefab and stageInfo.Loser ~= nil then
+			if stageInfo.Loser == agentPrefab then
 				if stageInfo.Defendant == stageInfo.Loser then
-					task.spawn(params.OnCaughtBluffing);
 					
 					task.wait(math.random(32, 44)/10);
 					lobby:PlayAction(agentPrefab, {FoldCard=math.random(1, 2)});
+					task.spawn(params.OnCaughtBluffing);
+
+				elseif stageInfo.Accuser == stageInfo.Loser then
+					
+					local actionOptLib = CardGame.ActionOptions[stageInfo.ActionId];
+					if actionOptLib and actionOptLib.Key then
+						agentMemory.AccuseFail[actionOptLib.Key] = (agentMemory.AccuseFail[actionOptLib.Key] or 0) +1;
+					end
+					
+
+					task.wait(math.random(12, 24)/10);
+					lobby:PlayAction(agentPrefab, {FoldCard=math.random(1, 2)});
+					task.spawn(params.OnFailAccuse);
+
 				else
 					task.spawn(params.OnCaughtNotBluffing);
 				end
@@ -1279,27 +1415,8 @@ if RunService:IsServer() then
 			local stageInfo = lobby.StageQueue[lobby.StageIndex];
 			if stageInfo.TargettedPlayer ~= nil and stageInfo.TargettedPlayer ~= player then Debugger:Log("false player", stageInfo); return rPacket; end
 			
-			if packet.CallBluff == true then
-				Debugger:Log("decideaction stageInfo", stageInfo);
-				--local optionLib = CardGame.ActionOptions[stageInfo.ActionId];
-				--if stageInfo.AttackDispute == nil and optionLib and optionLib.Requires == nil then Debugger:Log("false optionLib", stageInfo); return rPacket; end
-				
-				if stageInfo.BluffCalled then Debugger:Log("bluff already called", stageInfo); return rPacket; end
-				stageInfo.BluffCalled = true;
-				
-				stageInfo.Accuser=player;
-				stageInfo.Defendant=stageInfo.Victim or stageInfo.TurnPlayer;
-				
-				lobby:QueueStage(StageType.BluffTrial, stageInfo);
-				if stageInfo.ActionId ~= 7 then
-					lobby:NextTurn();
-				end
-				
-			else
-				if stageInfo.ActionId == 3 then
-					lobby:PlayAction(player, packet);
-					
-				end
+			if packet.CallBluff == true or stageInfo.ActionId == 3 then
+				lobby:PlayAction(player, packet);
 				
 			end
 			

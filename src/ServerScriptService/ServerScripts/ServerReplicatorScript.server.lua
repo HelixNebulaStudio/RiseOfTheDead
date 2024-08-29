@@ -187,6 +187,9 @@ remoteCharacterRemote.OnServerEvent:Connect(function(player, action, paramPacket
 			
 		end
 		
+	elseif action == 6 then -- emote;
+		modOnGameEvents:Fire("OnEmote", player, paramPacket);
+
 	end
 	
 end)

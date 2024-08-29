@@ -11,7 +11,7 @@ Dialogues.InitStrings = {
 		Reply="Ummmm, what should I do?";
 	};
 	["init2"]={
-		Reply="Hey bro, should I honestly play this card or that card?";
+		Reply="Hey homie, should I honestly play this card or that card?";
 	};
 };
 
@@ -70,7 +70,7 @@ if RunService:IsServer() then
 			dialog:AddDialog({
 				Face="Skeptical";
 				Say="I got some commodities to trade.";
-				Reply="Sure..";
+				Reply="Sure homie..";
 				ToggleWindow="Trade";
 				
 			}, function(dialog)
@@ -150,7 +150,7 @@ if RunService:IsServer() then
 						tradingSession:SetData(npcName, "Message", "Let's trade 1 commodity at a time.");
 						
 					elseif #totalItemsCount <= 0 then
-						tradingSession:SetData(npcName, "Message", "I'm looking for these items below.");
+						tradingSession:SetData(npcName, "Message", "I'm looking for these items homie.");
 						
 					else
 						tradingSession:SetData(npcName, "Message", "Errr.. These aren't commodities..");

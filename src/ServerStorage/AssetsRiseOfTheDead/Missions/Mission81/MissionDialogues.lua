@@ -1,7 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
-local modDialogueService = require(game.ReplicatedStorage.Library.DialogueService);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modBitFlags = require(game.ReplicatedStorage.Library.BitFlags);
 local modCardGame = require(game.ReplicatedStorage.Library.CardGame);
@@ -81,8 +80,48 @@ Dialogues.Joseph.DialogueHandler = function(player, dialog, data, mission)
 	elseif mission.Type == 1 then -- Active
 
 		if mission.ProgressionPoint <= 3 then
-			dialog:SetInitiate("I swear if we were scammed by those Rats..", "Suspicious");
+			dialog:SetInitiate("I swear if we were scammed by those Rats again..", "Suspicious");
 
+		elseif mission.ProgressionPoint == 10 then
+
+			dialog:SetInitiate("How'd it go with the Rats?", "Suspicious");
+
+			dialog:AddDialog({
+				Face="Frustrated";
+				Say="David gambled it away and they wouldn't give it back..";
+				Reply="Those darn Rats.. This isn't the first time they failed to deliver.";
+				
+			}, function(dialog)
+				dialog:AddDialog({
+					Face="Skeptical";
+					Say="What happened?";
+					Reply="We exchanged a large amount of food for better farming equipments. They never delivered, they said they lost the cargo at sea or something.. But I bet they were lying.";
+					
+				}, function(dialog)
+					dialog:AddDialog({
+						Face="Skeptical";
+						Say="How about the walkies?";
+						Reply="We exchanged money and this time, we're going to get what we paid for..\nWe'll plan something..";
+						
+					}, function(dialog)
+						dialog:AddDialog({
+							Face="Smirk";
+							Say="Plans to steal back from the Rats?";
+							Reply="*Shhh* We'll talk about it later, and not near the Rat shop keeper stationed here.";
+							
+						}, function(dialog)
+							modMission:CompleteMission(player, missionId);
+				
+						end);
+			
+					end);
+		
+				end);
+	
+			end);
+
+
+			dialog:SkipOtherDialogues();
 		end
 
 	end
@@ -244,6 +283,31 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 			end);
 
 		end);
+
+	elseif mission.ProgressionPoint == 9 then
+		dialog:SetInitiate("Soo yeah...", "Oops");
+
+		dialog:AddDialog({
+			Face="Sad";
+			Say="You owe us those walkies..";
+			Reply="Sorry homie, I can't do anything about it.";
+			
+		}, function(dialog)
+			dialog:AddDialog({
+				Face="Question";
+				Say="But you gambled it away!";
+				Reply="Like I said, can't do anything about it..";
+				
+			}, function(dialog)
+				modMission:Progress(player, missionId, function()
+					if mission.ProgressionPoint <= 9 then
+						mission.ProgressionPoint = 10;
+					end
+				end)
+
+			end);
+		end);
+
 	end
 	
 	local function StartCardGame(dialog)
@@ -255,39 +319,83 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 
 		local npcModule = dialog:GetNpcModule();
 
+		local npcQuips = {
+			CaughtNotBluffing = {
+				"Bad guess";
+				"Thought I was bluffing ey?";
+				"Nice try pal";
+				"Sike! It's genuine!";
+			};
+			CaughtBluffing = {
+				"Ain't no way";
+				"Lucky guess";
+				"You got me";
+				"What gave it away?";
+			};
+			CardLoss = {
+				"Yikes, down a card";
+				"Uoh noo";
+				"How could you!";
+			};
+			FailAccuse = {
+				"How!?";
+				"But I thought..";
+				"I've guessed wrong..";
+			};
+			CallBluff = {
+				"I have a feeling you're bluffing..";
+				"Bluffing?";
+				"Pretty sure you're bluffing";
+			};
+			PlayerDefeated = {
+				"Better luck next time $PlayerName";
+				"Good try, you just need a bit more practice $PlayerName";
+			};
+		};
+
+		local function cardGameQuips(quipType, param)
+			param = param or {};
+
+			local quipsList = npcQuips[quipType];
+			if quipsList == nil then return end;
+
+			local pickQuip = quipsList[math.random(1, #quipsList)];
+			pickQuip = string.gsub(pickQuip, "$PlayerName", (param.PlayerName or "pal"));
+
+			npcModule.Chat(game.Players:GetPlayers(), pickQuip);
+ 		end
+
+		-- MARK: David Fotl Agent
 		npcTable.ComputerAutoPlay = modCardGame.NewComputerAgentFunc(npcPrefab, cardGameLobby, {
+			BluffChance=0;
+			CheatChance=0;
+			Actions = {
+				Scavenge = {Genuine=0.3;};
+				RogueAttack = {CallBluff=1; Genuine=0.3; Bluff=0.1; AccuseFailPenalty=0.7;};
+				BanditRaid = {CallBluff=1; Genuine=0.6; Bluff=0.35; AccuseFailPenalty=0.7;};
+				RatSmuggle = {CallBluff=1; Genuine=0.8; Bluff=0.6; AccuseFailPenalty=0.7;};
+				BioXSwap = {CallBluff=0.1; Genuine=0.6; Bluff=0.2;};
+				ZombieBlock = {CallBluff=1; Bluff=0.5; AccuseFailPenalty=0.7;};
+			};
 			OnCaughtNotBluffing=function()
-				local chats = {
-					"Bad guess";
-					"Thought I was bluffing ey?";
-					"Nice try pal";
-					"Sike! It's genuine!";
-				};
-				npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+				cardGameQuips("CaughtNotBluffing");
 			end;
 			OnCaughtBluffing=function()
-				local chats = {
-					"Ain't no way";
-					"Lucky guess";
-					"You got me";
-					"What gave it away?";
-				};
-				npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+				cardGameQuips("CaughtBluffing");
 			end;
 			OnCardLoss=function()
-				local chats = {
-					"Yikes, down a card";
-					"Uoh noo";
-					"How could you";
-				};
-				npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+				cardGameQuips("CardLoss");
+			end;
+			OnCallBluff=function()
+				cardGameQuips("CallBluff");
+			end;
+			OnFailAccuse=function()
+				cardGameQuips("FailAccuse");
 			end;
 			OnPlayerDefeated=function(defeatedPlayer)
-				local chats = {
-					"Better luck next time "..defeatedPlayer.Name;
-					"Good try, you just need a bit more practice "..defeatedPlayer.Name;
-				};
-				npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+				cardGameQuips("CardLoss", {
+					PlayerName=defeatedPlayer and defeatedPlayer.Name;
+				});
 			end;
 		});
 
@@ -318,7 +426,6 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 		}, StartCardGame);
 
 	end
-
 
 	dialog:SkipOtherDialogues();
 end
@@ -490,7 +597,6 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 		dialog:SetInitiate("I'll give you some time to practice your skill against David first.", "Smirk");
 
 	elseif mission.ProgressionPoint == 4 then
-		dialog:SetInitiate("Alright, now that you're ready..", "Smirk");
 		
 		local function StartCardGame(dialog)
 			local npcName = dialog.Name;
@@ -501,42 +607,80 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 
 			local npcModule = dialog:GetNpcModule();
 
+
+			local npcQuips = {
+				CaughtNotBluffing = {
+					"Too bad";
+					"Haha! Gotcha";
+				};
+				CaughtBluffing = {
+					"";
+				};
+				CardLoss = {
+					"Hmmm";
+					"It is what it is..";
+				};
+				FailAccuse = {
+					"";
+				};
+				CallBluff = {
+					"You think you can bluff me?";
+					"Nice bluff, try that again";
+					"Not slipping that bluff by me";
+				};
+				PlayerDefeated = {
+					"You need to play better than that, $PlayerName";
+					"What was thaat? $PlayerName";
+				};
+			};
+
+			local function cardGameQuips(quipType, param)
+				param = param or {};
+
+				local quipsList = npcQuips[quipType];
+				if quipsList == nil then return end;
+
+				local pickQuip = quipsList[math.random(1, #quipsList)];
+				pickQuip = string.gsub(pickQuip, "$PlayerName", (param.PlayerName or "pal"));
+
+				npcModule.Chat(game.Players:GetPlayers(), pickQuip);
+			end
+
+			-- MARK: Cooper Fotl Agent
 			npcTable.ComputerAutoPlay = modCardGame.NewComputerAgentFunc(npcPrefab, cardGameLobby, {
-				--BluffChance=1;
+				BluffChance=0.5;
+				CheatChance=1;
+				Actions = {
+					Scavenge = {Genuine=0.3;};
+					RogueAttack = {CallBluff=1; Genuine=0.5; Bluff=0.5;};
+					BanditRaid = {CallBluff=1; Genuine=0.7; Bluff=0.8;};
+					RatSmuggle = {CallBluff=1; Genuine=0.5; Bluff=0.5;};
+					BioXSwap = {CallBluff=1; Genuine=0.5; Bluff=0.5;};
+					ZombieBlock = {CallBluff=1; Bluff=0.5;};
+				};
 				OnCaughtNotBluffing=function()
-					local chats = {
-						"Bad guess";
-						"Thought I was bluffing ey?";
-						"Nice try pal";
-						"Sike! It's genuine!";
-					};
-					npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+					cardGameQuips("CaughtNotBluffing");
 				end;
 				OnCaughtBluffing=function()
-					local chats = {
-						"Ain't no way";
-						"Lucky guess";
-						"You got me";
-						"What gave it away?";
-					};
-					npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+					--cardGameQuips("CaughtBluffing");
 				end;
 				OnCardLoss=function()
-					local chats = {
-						"Yikes, down a card";
-						"Uoh noo";
-						"How could you";
-					};
-					npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+					cardGameQuips("CardLoss");
+				end;
+				OnCallBluff=function()
+					cardGameQuips("CallBluff");
+				end;
+				OnFailAccuse=function()
+					cardGameQuips("FailAccuse");
 				end;
 				OnPlayerDefeated=function(defeatedPlayer)
-					local chats = {
-						"Better luck next time "..defeatedPlayer.Name;
-						"Good try, you just need a bit more practice "..defeatedPlayer.Name;
-					};
-					npcModule.Chat(game.Players:GetPlayers(), chats[math.random(1, #chats)]);
+					Debugger:Warn("defeatedPlayer", defeatedPlayer);
+					cardGameQuips("CardLoss", {
+						PlayerName=defeatedPlayer and defeatedPlayer.Name;
+					});
 				end;
 			});
+
 
 			cardGameLobby:Join(player, true);
 			cardGameLobby:Start();
@@ -544,13 +688,111 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 			dialog:SetExpireTime(workspace:GetServerTimeNow()+2);
 		end
 
-		dialog:AddDialog({
-			Face="Confident";
-			Say="I'm ready, let's play";
-			Reply="Alright. *Hands you two cards*";
-			
-		}, StartCardGame);
+		if mission.SaveData.CooperRematch == 1 then
+			dialog:SetInitiate("It's okay, I'll give you another try. Rematch?", "Smirk");
 
+			dialog:AddDialog({
+				Face="Smirk";
+				Say="Rematch";
+				Reply="*Hands you two cards*";
+				
+			}, StartCardGame);
+
+		else
+			dialog:SetInitiate("Alright, now that you're ready..\nHere's the deal, you beat me in Fall of the Living, and I'll give you the box of walkies.", "Smirk");
+
+			dialog:AddDialog({
+				Face="Smirk";
+				Say="Okay.. And if you beat me?";
+				Reply="Don't worry, I don't want much. Let's play.";
+				
+			}, function(dialog)
+				dialog:AddDialog({
+					Face="Smirk";
+					Say="Okay..";
+					Reply="*Hands you two cards*";
+					
+				}, StartCardGame);
+			end);
+	
+		end
+
+
+	elseif mission.ProgressionPoint == 5 or mission.ProgressionPoint == 6 then
+		dialog:SetInitiate("Welp.. I did say I don't ask for much, how about you dance for me too and I'll give you your box of walkies.", "Smirk");
+
+		if mission.ProgressionPoint == 5 then
+			modMission:Progress(player, missionId, function(mission)
+				if mission.ProgressionPoint <= 5 then
+					mission.ProgressionPoint = 6;
+				end
+			end)
+		end
+		
+		dialog:AddDialog({
+			Face="Question";
+			Say="Okay, fine. I'll dance, just give me the walkies..";
+			Reply="Show me what you got first hahah!";
+		});
+		
+		dialog:AddDialog({
+			Face="Question";
+			Say="No way, I'm not dancing, just give me the walkies..";
+			Reply="That's not what I want to hear! You're not getting your walkies.";
+			
+		}, function(dialog)
+			dialog:AddDialog({
+				Face="Frustrated";
+				Say="Are you serious!";
+				Reply="...";
+			}, function(dialog)
+			
+				modMission:Progress(player, missionId, function()
+					if mission.ProgressionPoint <= 7 then
+						mission.ProgressionPoint = 8;
+					end
+				end)
+
+				dialog:TalkTo(dialog.Prefab);
+
+			end);
+		end);
+
+	elseif mission.ProgressionPoint == 7 then
+		dialog:SetInitiate("I can't believe you actually danced for me..", "Hehe");
+
+		dialog:AddDialog({
+			Face="Question";
+			Say="Well? Where's my walkies?!";
+			Reply="Woah the attitude, you're not getting walklies..";
+			
+		}, function(dialog)
+			dialog:AddDialog({
+				Face="Frustrated";
+				Say="Are you serious!";
+				Reply="...";
+			}, function(dialog)
+			
+				modMission:Progress(player, missionId, function()
+					if mission.ProgressionPoint <= 7 then
+						mission.ProgressionPoint = 8;
+					end
+				end)
+
+				dialog:TalkTo(dialog.Prefab);
+
+			end);
+		end);
+
+	elseif mission.ProgressionPoint == 8 then
+		dialog:SetInitiate("Yeah, now get lost!", "Hehe");
+		
+		modMission:Progress(player, missionId, function()
+			if mission.ProgressionPoint <= 8 then
+				mission.ProgressionPoint = 9;
+			end
+		end)
+		
 	end
 
 	dialog:SkipOtherDialogues();

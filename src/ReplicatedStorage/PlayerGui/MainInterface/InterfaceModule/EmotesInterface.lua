@@ -19,6 +19,7 @@ local modConfigurations = require(game.ReplicatedStorage.Library.Configurations)
 local modEmotes = require(game.ReplicatedStorage.Library.EmotesLibrary);
 local modFacesLibrary = require(game.ReplicatedStorage.Library.FacesLibrary);
 
+local remoteCharacterRemote = modRemotesManager:Get("CharacterRemote");
 local remoteSetPlayerFace = modRemotesManager:Get("SetPlayerFace");
 
 local windowFrameTemplate = script:WaitForChild("EmotesMenu");
@@ -249,9 +250,11 @@ function Interface.init(modInterface)
 			if remotePlayEmote then
 				if buttonObj.Track then
 					remotePlayEmote:Invoke(buttonObj.Track, looped);
+					remoteCharacterRemote:FireServer(6, buttonObj.Track.Animation.AnimationId);
 					
 				elseif buttonObj.EmoteLib then
 					remotePlayEmote:Invoke(emoteId, looped);
+					remoteCharacterRemote:FireServer(6, emoteId);
 
 				else
 				end
