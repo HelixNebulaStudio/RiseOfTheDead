@@ -73,36 +73,36 @@ ShopLibrary.SellPrice = {
 };
 
 ShopLibrary.AmmunitionPrice = {
-	-- ["p250"]=0;
-	-- ["cz75"]=2;
-	-- ["xm1014"]=6;
-	-- ["sawedoff"]=4;
-	-- ["mp5"]=7;
-	-- ["mp7"]=7;
-	-- ["tec9"]=12;
-	-- ["deagle"]=16;
-	-- ["m4a4"]=26;
-	-- ["ak47"]=28;
-	-- ["awp"]=75;
-	-- ["minigun"]=120;
-	-- ["flamethrower"]=95;
-	-- ["m9legacy"]=85;
+	["p250"]=0;
+	["cz75"]=1;
+	["xm1014"]=3;
+	["sawedoff"]=2;
+	["mp5"]=3;
+	["mp7"]=3;
+	["tec9"]=6;
+	["deagle"]=8;
+	["m4a4"]=13;
+	["ak47"]=14;
+	["awp"]=35;
+	["minigun"]=60;
+	["flamethrower"]=42;
+
+	["m9legacy"]=42;
+	["grenadelauncher"]=60;
+	["dualp250"]=20;
+	["revolver454"]=40;
+	["mariner590"]=22;
+	["czevo3"]=24;
+	["fnfal"]=13;
+	["tacticalbow"]=8;
+	["desolatorheavy"]=90;
+	["rec21"]=28;
+	["at4"]=30;
+	["sr308"]=26;
+	["vectorx"]=80;
 	
-	-- ["grenadelauncher"]=120;
-	-- ["dualp250"]=40;
-	-- ["revolver454"]=80;
-	-- ["mariner590"]=45;
-	-- ["czevo3"]=48;
-	-- ["fnfal"]=26;
-	-- ["tacticalbow"]=16;
-	-- ["desolatorheavy"]=180;
-	-- ["rec21"]=55;
-	-- ["at4"]=60;
-	-- ["sr308"]=52;
-	-- ["vectorx"]=160;
-	
-	-- ["rusty48"]=200;
-	-- ["arelshiftcross"]=148;
+	["rusty48"]=100;
+	["arelshiftcross"]=74;
 }
 
 ShopLibrary.RepairPrice = {
