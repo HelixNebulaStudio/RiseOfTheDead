@@ -88,6 +88,9 @@ if RunService:IsServer() then
 		if itemId == "fotlcardgame" then
 			local modCardGame = require(game.ReplicatedStorage.Library.CardGame);
 			
+			local playerLobby = modCardGame.GetLobby(player);
+			if playerLobby and playerLobby.State >= 2 and playerLobby.State <= 3 then return end;
+
 			local function StartCardGame(dialog)
 				local npcPrefab = dialog.Prefab;
 				
@@ -147,8 +150,8 @@ if RunService:IsServer() then
 						RogueAttack = {CallBluff=0.75; Genuine=0.5; Bluff=0.5;};
 						BanditRaid = {CallBluff=0.7; Genuine=0.8; Bluff=0.3;};
 						RatSmuggle = {CallBluff=0.6; Genuine=0.7; Bluff=0.4;};
-						BioXSwap = {CallBluff=0.5; Genuine=0.5; Bluff=0.5;};
-						ZombieBlock = {CallBluff=0.4; Bluff=0.5;};
+						BioXSwap = {CallBluff=0.5; Genuine=0.3; Bluff=0.2;};
+						ZombieBlock = {CallBluff=0.3; Bluff=0.5;};
 					};
 					OnCaughtNotBluffing=function()
 						cardGameQuips("CaughtNotBluffing");

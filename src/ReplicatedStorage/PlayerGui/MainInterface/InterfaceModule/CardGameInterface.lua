@@ -95,7 +95,7 @@ function Interface.init(modInterface)
 					
 					cardViewport.CurrentCamera = workspace.CurrentCamera;
 					
-					
+					-- MARK: CardPrefabsList
 					if Interface.CardPrefabsList then
 						local mousePosition = UserInputService:GetMouseLocation();
 						local xRatio = math.clamp(mousePosition.X/viewportCam.ViewportSize.X, 0, 1)*2 -1;
@@ -107,7 +107,7 @@ function Interface.init(modInterface)
 						local hitPart = raycastResult and raycastResult.Instance;
 						
 						local cardPrefabsList = Interface.CardPrefabsList;
-						local countSelected = 0;
+						
 						for a=1, #cardPrefabsList do
 							local cardPart = cardPrefabsList[a];
 							
@@ -120,7 +120,7 @@ function Interface.init(modInterface)
 								end
 							end
 							
-							local pivotCFrame = viewportCam.CFrame:ToWorldSpace(CFrame.new(((a-0.5) - #cardPrefabsList/2) * 0.8, 
+							pivotCFrame = viewportCam.CFrame:ToWorldSpace(CFrame.new(((a-0.5) - #cardPrefabsList/2) * 0.8, 
 								-0.2, -2.8 + (cardPart:GetAttribute("Selected") == true and 0.2 or (hitPart == cardPart and 0.05 or 0))) 
 									* CFrame.Angles(math.rad(90) + yRatio *0.2, math.rad(180), xRatio *0.2));
 
@@ -284,23 +284,37 @@ function Interface.init(modInterface)
 			mainFrame.actionButton.Visible = false;
 			mainFrame.bluffButton.Visible = false;
 			
+			local currStageIndex = lobby.StageIndex;
+
 			cardViewport:TweenPosition(UDim2.new(0.5, 0, 1.5, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 1, true);
 			
 			local pingTick = tick();
 			local rPacket = remoteCardGame:InvokeServer("pickcards", {
-				StageIndex = lobby.StageIndex;
+				StageIndex = currStageIndex;
 				OptionIndex = optionIndex;
 			});
 			local pingLapsed = tick()-pingTick;
 			task.wait(math.clamp(1-pingLapsed, 0.5, 1));
 			
+			currStageIndex = Interface.GameData and Interface.GameData.Lobby and Interface.GameData.Lobby.StageIndex;
+			task.spawn(function()
+				while Interface.GameData and Interface.GameData.Lobby and Interface.GameData.Lobby.StageIndex == currStageIndex do
+					task.wait();
+				end
+
+				cardViewport:TweenPosition(UDim2.new(0.5, 0, 1.5, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.4, true);
+				task.wait(0.4);
+				pickedCardsModel:ClearAllChildren();
+				Interface.CardPrefabsList = nil;
+				task.wait(0.1);
+				cardViewport:TweenPosition(UDim2.new(0.5, 0, 0.5, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 1, true);
+			end)
+
 			local pickedCards = playerTable.Cards;
 			for a=1, 2 do
 				table.insert(pickedCards, rPacket.PickedCards[a]);
 			end
 			
-			Debugger:Log("PickedCards", pickedCards);
-
 			pickedCardsModel:ClearAllChildren();
 			
 			local cardPrefabsList = {};
@@ -323,13 +337,14 @@ function Interface.init(modInterface)
 			cardViewport:TweenPosition(UDim2.new(0.5, 0, 0.5, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 1, true);
 			
 			
+			
 		elseif optionLib.SelectTarget then
 			onPlayerSelect = function(player)
 				mainFrame.actionButton.Visible = false;
 				mainFrame.bluffButton.Visible = false;
 				
 				task.spawn(function()
-					local rPacket = remoteCardGame:InvokeServer("playaction", {
+					remoteCardGame:InvokeServer("playaction", {
 						StageIndex = lobby.StageIndex;
 						OptionIndex = optionIndex;
 						TargetPlayer = player;
@@ -369,7 +384,7 @@ function Interface.init(modInterface)
 			mainFrame.bluffButton.Visible = false;
 			
 			task.spawn(function()
-				local rPacket = remoteCardGame:InvokeServer("playaction", {
+				remoteCardGame:InvokeServer("playaction", {
 					StageIndex = lobby.StageIndex;
 					OptionIndex = optionIndex;
 				});
@@ -385,7 +400,7 @@ function Interface.init(modInterface)
 			mainFrame.actionButton.Visible = false;
 			mainFrame.bluffButton.Visible = false;
 			task.spawn(function()
-				local rPacket = remoteCardGame:InvokeServer("startgame");
+				remoteCardGame:InvokeServer("startgame");
 			end)
 			
 		elseif lobby.State == modCardGame.GameState.Active then
@@ -393,7 +408,6 @@ function Interface.init(modInterface)
 				local turnPlayerTable = lobby.Players[lobby.TurnIndex];
 
 				local stageInfo = lobby.Stage;
-				Debugger:Log("action Stage", lobby.Stage);
 
 				if stageInfo.Type == modCardGame.StageType.NextTurn and turnPlayerTable.Player == localPlayer then
 					for _, panel in pairs(playerPanelsList) do
@@ -460,7 +474,7 @@ function Interface.init(modInterface)
 
 					Debugger:Log("accept action");
 					task.spawn(function()
-						local rPacket = remoteCardGame:InvokeServer("decideaction", {
+						remoteCardGame:InvokeServer("decideaction", {
 							StageIndex = lobby.StageIndex;
 							CallBluff = false;
 						});
@@ -511,7 +525,7 @@ function Interface.init(modInterface)
 					mainFrame.bluffButton.Visible = false;
 
 					task.spawn(function()
-						local rPacket = remoteCardGame:InvokeServer("attackdispute", {
+						remoteCardGame:InvokeServer("attackdispute", {
 							StageIndex = lobby.StageIndex;
 							AttackDisputeChoice = 1;
 						});
@@ -525,7 +539,7 @@ function Interface.init(modInterface)
 			mainFrame.bluffButton.Visible = false;
 
 			task.spawn(function()
-				local rPacket = remoteCardGame:InvokeServer("newmatch");
+				remoteCardGame:InvokeServer("newmatch");
 			end)
 			
 		end
@@ -541,7 +555,6 @@ function Interface.init(modInterface)
 				local turnPlayerTable = lobby.Players[lobby.TurnIndex];
 
 				local stageInfo = lobby.Stage;
-				Debugger:Log("bluff Stage", lobby.Stage);
 
 				if stageInfo.Type == modCardGame.StageType.NextTurn and turnPlayerTable.Player == localPlayer then
 					for _, panel in pairs(playerPanelsList) do
@@ -607,7 +620,7 @@ function Interface.init(modInterface)
 					
 					Debugger:Log("call bluff")
 					task.spawn(function()
-						local rPacket = remoteCardGame:InvokeServer("decideaction", {
+						remoteCardGame:InvokeServer("decideaction", {
 							StageIndex = lobby.StageIndex;
 							CallBluff = true;
 						});
@@ -657,7 +670,7 @@ function Interface.init(modInterface)
 					mainFrame.bluffButton.Visible = false;
 
 					task.spawn(function()
-						local rPacket = remoteCardGame:InvokeServer("attackdispute", {
+						remoteCardGame:InvokeServer("attackdispute", {
 							StageIndex = lobby.StageIndex;
 							AttackDisputeChoice = 2;
 						});
@@ -812,7 +825,7 @@ function Interface.init(modInterface)
 							requestPanel.Visible = false;
 							requestPanel:SetAttribute("RefreshTick", tick());
 
-							local rPacket = remoteCardGame:InvokeServer("acceptrequest", {AcceptPlayer=playerTable.Player;});
+							remoteCardGame:InvokeServer("acceptrequest", {AcceptPlayer=playerTable.Player;});
 						end)
 
 						local denyButton = requestPanel:WaitForChild("denyButton");
@@ -851,7 +864,6 @@ function Interface.init(modInterface)
 
 			if lobby.TurnIndex then
 				local turnPlayerTable = lobby.Players[lobby.TurnIndex]; -- player of this turn;
-				local localPlayerTable; 
 				
 				for _, playerTable in pairs(lobby.Players) do
 					if playerTable.Player == localPlayer then

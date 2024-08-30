@@ -43,16 +43,17 @@ CardGame.Cards = {
 
 CardGame.ActionOptions = {
 	--== Basic Actions
-	{Key="Scavenge"; Text="Scavenge (+1-2 Resource)"; SpaceCost=1; BroadcastMsg="$PlayerName scavenged and found $Amount resources."};
-	{Text="Heavy Attack (-10 Resource)"; ForceAtMaxResource=true; Cost=10; SelectTarget=true; BroadcastMsg="$PlayerName has attacked $TargetName."};
-	--== Card Actions
-	{Key="RogueAttack"; Text="Attack (-4 Resource)"; Cost=4; Requires="Rouge"; SelectTarget=true; BroadcastMsg="$PlayerName has attacked $TargetName."};
-	{Key="ZombieBlock"; Text="Block Attack"; Requires="_Zombie"; BroadcastMsg="$PlayerName has blocked the attack."};
+	{Id=1; Key="Scavenge"; Text="Scavenge (+1-2 Resource)"; SpaceCost=1; BroadcastMsg="$PlayerName scavenged and found $Amount resources."};
+	{Id=2; Text="Heavy Attack (-10 Resource)"; ForceAtMaxResource=true; Cost=10; SelectTarget=true; BroadcastMsg="$PlayerName has attacked $TargetName."};
 	
-	--5
-	{Key="BanditRaid"; Text="Raid (+2 Resource)"; SpaceCost=2; Requires="Bandit"; SelectTarget=true; RequiresTargetResources=true; BroadcastMsg="$PlayerName has raided $TargetName for $Amount resources."};
-	{Key="RatSmuggle"; Text="Smuggle (+3 Resource)"; SpaceCost=3; Requires="RAT"; BroadcastMsg="$PlayerName has smuggled in $Amount extra resources."};
-	{Key="BioXSwap"; Text="Swap Allies (-1 Resource)"; Cost=1; Requires="BioX"; PickCards=true; BroadcastMsg="$PlayerName has decided to switch alliance."};
+	--== Card Actions
+	{Id=3; Key="RogueAttack"; Text="Attack (-4 Resource)"; Cost=4; Requires="Rouge"; SelectTarget=true; BroadcastMsg="$PlayerName has attacked $TargetName."};
+	{Id=4; Key="ZombieBlock"; Text="Block Attack"; Requires="_Zombie"; BroadcastMsg="$PlayerName has blocked the attack."};
+	
+	{Id=5; Key="BanditRaid"; Text="Raid (+2 Resource)"; SpaceCost=2; Requires="Bandit"; SelectTarget=true; RequiresTargetResources=true; BroadcastMsg="$PlayerName has raided $TargetName for $Amount resources."};
+	{Id=6; Key="RatSmuggle"; Text="Smuggle (+3 Resource)"; SpaceCost=3; Requires="RAT"; BroadcastMsg="$PlayerName has smuggled in $Amount extra resources."};
+	
+	{Id=7; Key="BioXSwap"; Text="Swap Allies (-1 Resource)"; Cost=1; Requires="BioX"; PickCards=true; BroadcastMsg="$PlayerName has decided to switch alliance."};
 }
 
 CardGame.Lobbies = {};
@@ -375,6 +376,7 @@ function Lobby:NextTurn()
 			self:QueueStage(StageType.PlayerDefeated, {DefeatedPlayer=stageInfo.Loser;});
 			
 		else
+			self.ActionPlayed = false;
 			duration = 10;
 		end
 
@@ -407,6 +409,11 @@ function Lobby:NextTurn()
 		if self.ActionPlayed == false then
 			local playerTable = self.Players[self.TurnIndex];
 			
+			if playerTable == nil then 
+				self:NextTurn();
+				return 
+			end;
+
 			if stageInfo.Type == StageType.NextTurn then
 				if playerTable.R < 10 then
 					self:PlayAction(playerTable.Player, {OptionIndex=1});
@@ -445,7 +452,10 @@ function Lobby:NextTurn()
 						remoteCardGame:InvokeClient(playerTable.Player, "swapcards", self.CardSwapSelections);
 					end)
 				end
-				self:PlayAction(playerTable.Player, {PickedCards=self.CardSwapSelections});
+				self:PlayAction(playerTable.Player, {
+					OptionIndex=7;
+					PickedCards=self.CardSwapSelections;
+				});
 				
 				return;
 				
@@ -497,26 +507,29 @@ function Lobby:PlayAction(player, packet)
 		return;
 	end
 
-	Debugger:Warn(self.StageIndex.."/"..(#self.StageQueue),"Type",stageTypeName,player,"PlayAction", packet, "StageInfo", stageInfo);
-
 	if stageInfo.Type == CardGame.StageType.NextTurn and stageInfo.TurnPlayer ~= player then
 		return;
 	end
 
+	if packet.CallBluff == true and stageInfo.Type == StageType.NextTurn then return end;
+	
+	Debugger:Warn(self.StageIndex.."/"..(#self.StageQueue),"Type",stageTypeName,player,"PlayAction", packet, "StageInfo", stageInfo);
+	self.ActionPlayed = true;
+
 	if packet.CallBluff == true and stageInfo.TurnPlayer ~= player then
-		Debugger:Log("CallBluff stageInfo", stageInfo);
-		
 		if stageInfo.BluffCalled then Debugger:Log("bluff already called", stageInfo); return; end
 		stageInfo.BluffCalled = true;
 		
 		stageInfo.Accuser=player;
 		stageInfo.Defendant=stageInfo.Victim or stageInfo.TurnPlayer;
 		
-		self:QueueStage(StageType.BluffTrial, stageInfo);
-		if stageInfo.ActionId ~= 7 then
-			self:NextTurn();
-			return;
+		if stageInfo.Type == StageType.SwapCards then
+			self.CardSwapSelections = nil;
 		end
+
+		self:QueueStage(StageType.BluffTrial, stageInfo);
+		self:NextTurn();
+		return;
 
 	elseif packet.CallBluff == true and stageInfo.TurnPlayer == player and stageInfo.AttackDispute == true then
 		-- Call bluff on zombie block;
@@ -533,7 +546,6 @@ function Lobby:PlayAction(player, packet)
 
 	end
 
-	self.ActionPlayed = true;
 	
 	if packet.CallBluff == false then
 		if stageInfo.TurnPlayer == player then Debugger:StudioWarn("False PlayAction"); return end;
@@ -641,7 +653,8 @@ function Lobby:PlayAction(player, packet)
 
 
 		elseif optionIndex == 7 then
-			Debugger:StudioLog("PickCards", packet.PickedCards)
+			Debugger:StudioLog("PickCards", packet.PickedCards);
+
 			if packet.PickedCards then
 				local cardsLeft = #playerTable.Cards;
 
@@ -667,7 +680,6 @@ function Lobby:PlayAction(player, packet)
 				end
 
 				playerTable.R = math.clamp(playerTable.R -1, 0, 10);
-				Debugger:Log("Picked cards", self);
 
 			else
 				self.CardSwapSelections = {
@@ -1160,14 +1172,16 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 			Debugger:Warn("Agent SwapCards", stageInfo.TurnPlayer, stageInfo, " lobby.CardSwapSelections",lobby.CardSwapSelections);
 			
 			if isMyTurn then
-				task.wait(math.random(12, 24)/10);
+				task.wait(math.random(33, 44)/10);
 
 				local cardsPick = {};
+				local deckToPickFrom = table.clone(lobby.CardSwapSelections);
 
-				table.insert(cardsPick, table.remove(lobby.CardSwapSelections, math.random(1, #lobby.CardSwapSelections)));
-				table.insert(cardsPick, table.remove(lobby.CardSwapSelections, math.random(1, #lobby.CardSwapSelections)));
+				table.insert(cardsPick, table.remove(deckToPickFrom, math.random(1, #deckToPickFrom)));
+				table.insert(cardsPick, table.remove(deckToPickFrom, math.random(1, #deckToPickFrom)));
 
 				lobby:PlayAction(agentPrefab, {
+					OptionIndex=7;
 					PickedCards=cardsPick;
 				});
 				
@@ -1378,16 +1392,17 @@ if RunService:IsServer() then
 		elseif action == "pickcards" then
 			local lobby = CardGame.GetLobby(player);
 
-			if lobby == nil or lobby.StageIndex ~= packet.StageIndex then Debugger:Log("false lobby", lobby); return rPacket end;
+			if lobby == nil or lobby.StageIndex ~= packet.StageIndex then Debugger:StudioLog("false lobby", lobby); return rPacket end;
 
 			local playerTable = lobby:GetPlayer(player, true);
 			
 			local stageInfo = lobby.StageQueue[lobby.StageIndex];
-			if playerTable.Player ~= stageInfo.TurnPlayer then Debugger:Log("false player", stageInfo); return rPacket; end
-			
+			if playerTable.Player ~= stageInfo.TurnPlayer then Debugger:StudioLog("false player", stageInfo); return rPacket; end
+
 			if packet.PickedCards then
 				--== Picked cards;
-				if lobby.CardSwapSelections == nil then Debugger:Log("false CardSwapSelections", lobby); return rPacket end;
+				if lobby.CardSwapSelections == nil then Debugger:StudioLog("false CardSwapSelections", lobby); return rPacket end;
+				if stageInfo.Type ~= StageType.SwapCards then Debugger:StudioLog("SwapCards stage over.", stageInfo); return rPacket end;
 				
 				packet.OptionIndex = 7;
 				lobby:PlayAction(player, packet);
@@ -1396,10 +1411,10 @@ if RunService:IsServer() then
 			else
 				--== Pick cards start;
 
-				if packet.OptionIndex == nil then Debugger:Log("false OptionIndex", packet); return rPacket; end
+				if packet.OptionIndex == nil then Debugger:StudioLog("false OptionIndex", packet); return rPacket; end
 
 				local optionLib = CardGame.ActionOptions[packet.OptionIndex];
-				if optionLib.PickCards ~= true then Debugger:Log("false PickCards", lobby); return rPacket end;
+				if optionLib.PickCards ~= true then Debugger:StudioLog("false PickCards", lobby); return rPacket end;
 
 				lobby:PlayAction(player, packet);
 				rPacket.PickedCards = lobby.CardSwapSelections;
