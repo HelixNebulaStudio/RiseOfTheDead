@@ -48,7 +48,13 @@ if RunService:IsServer() then
 
 		local npcName = dialog.Name;
 		
-		dialog:AddChoice("shop_ratShop");
+		dialog:AddChoice("shop_ratShop", function()
+			local npcModel = dialog.Prefab;
+			if npcModel:FindFirstChild("shopInteractable") then
+				dialog:InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart, "interact");
+			end
+		end)
+		
 		if modEvents:GetEvent(player, "lewis_purpose") == nil then
 			dialog:AddChoice("general_steel", function()
 				modEvents:NewEvent(player, {Id="lewis_purpose"});

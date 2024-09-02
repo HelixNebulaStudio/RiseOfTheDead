@@ -34,7 +34,12 @@ Dialogues.DialogueStrings = {
 if RunService:IsServer() then
 	-- MARK: DialogueHandler
 	Dialogues.DialogueHandler = function(player, dialog, data)
-		dialog:AddChoice("shop_ratShop");
+		dialog:AddChoice("shop_ratShop", function()
+			local npcModel = dialog.Prefab;
+			if npcModel:FindFirstChild("shopInteractable") then
+				dialog:InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart, "interact");
+			end
+		end)
 		dialog:AddChoice("general_mean");
 	end 
 end
