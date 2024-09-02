@@ -10,9 +10,10 @@ local Dialogues = {
 	Joseph={};
 
 	David={};
+	Cooper={};
+
 	Caitlin={};
 	Greg={};
-	Cooper={};
 	Lewis={};
 };
 
@@ -796,6 +797,48 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 	end
 
 	dialog:SkipOtherDialogues();
+end
+
+
+-- MARK: Caitlin Handler
+Dialogues.Caitlin.DialogueHandler = function(player, dialog, data, mission)
+	if mission.ProgressionPoint == 1 then
+		dialog:SetInitiate("On look out duty again.. So boring.", "Bored");
+
+		dialog:AddDialog({
+			Face="Suspicious";
+			Say="Hey, Joseph has been waiting for his box of walkie talkies delivered.";
+			Reply="Hmm, not my department. Talk to the guys upstairs..";
+		})
+	end
+end
+
+
+-- MARK: Greg Handler
+Dialogues.Greg.DialogueHandler = function(player, dialog, data, mission)
+	if mission.ProgressionPoint == 1 then
+		dialog:SetInitiate("What do you want?!", "Angry");
+
+		dialog:AddDialog({
+			Face="Angry";
+			Say="Hey, Joseph has been waiting for his box of walkie talkies delivered.";
+			Reply="What do I look like, the delivery boy? Get lost!";
+		})
+	end
+end
+
+
+-- MARK: Lewis Handler
+Dialogues.Lewis.DialogueHandler = function(player, dialog, data, mission)
+	if mission.ProgressionPoint == 1 then
+		dialog:SetInitiate("Hmm?", "Skeptical");
+
+		dialog:AddDialog({
+			Face="Suspicious";
+			Say="Hey, Joseph has been waiting for his box of walkie talkies delivered.";
+			Reply="Hmm, I think one of the guys had it on the table for a bet. Guess who won, hah!";
+		})
+	end
 end
 
 return Dialogues;
