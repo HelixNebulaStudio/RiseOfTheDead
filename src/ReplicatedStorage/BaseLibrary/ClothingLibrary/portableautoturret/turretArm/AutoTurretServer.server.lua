@@ -581,6 +581,7 @@ function Update()
 		local weaponModel: Model = prefabTool:Clone();
 		weaponModel:SetAttribute("TurretWeapon", true);
 		weaponModel:SetAttribute("ItemId", itemId);
+		weaponModel:SetAttribute("Grip", "ToolGrip");
 		weaponModel:ScaleTo( customWeaponScale[itemId] or (weaponModel:GetScale()*0.8) );
 		
 		local handle = weaponModel:WaitForChild("Handle");
@@ -596,35 +597,22 @@ function Update()
 		rigidConstraint.Parent = handle;
 
 		weaponModel.Parent = turretArm;
-		
-		if profile.OptInNewCustomizationMenu ~= true then
-			modColorsLibrary.ApplyAppearance(weaponModel, weaponStorageItem.Values);
+	
+		local customizationData = weaponStorageItem:GetValues("_Customs");
+		if customizationData then
+			task.spawn(function()
+				local activeSkinId = weaponStorageItem:GetValues("ActiveSkin");
 
-			for _, obj in pairs(weaponModel:GetChildren()) do
-				if obj.Name == "Magazine" then
-					obj.Name = "patMagazine";
-				end
-			end
+				modCustomizationData.LoadCustomization({
+					ToolModels = {weaponModel};
 
-		else
-			local customizationData = weaponStorageItem:GetValues("_Customs");
-			if customizationData then
-				task.spawn(function()
-					local activeSkinId = weaponStorageItem:GetValues("ActiveSkin");
-
-					modCustomizationData.LoadCustomization({
-						ToolModels = {weaponModel};
-
-						ItemId = itemId;
-						CustomizationData = customizationData;
-						SkinId = activeSkinId;
-					});
-				end)
-			end
-
+					ItemId = itemId;
+					CustomizationData = customizationData;
+					SkinId = activeSkinId;
+				});
+			end)
 		end
 		
-
 		activeWeaponModel = weaponModel;
 	end
 	

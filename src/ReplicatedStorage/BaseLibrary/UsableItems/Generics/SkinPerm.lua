@@ -106,14 +106,6 @@ else
 			elseif permType == "Tool" then
 				if profile.EquippedTools.WeaponModels == nil then return end;
 				
-				if profile.OptInNewCustomizationMenu ~= true then
-					for a=1, #profile.EquippedTools.WeaponModels do
-						if not profile.EquippedTools.WeaponModels[a]:IsA("Model") then continue end;
-						
-						modColorsLibrary.ApplyAppearance(profile.EquippedTools.WeaponModels[a], storageItem.Values);
-					end
-				end
-
 			end
 		end)
 

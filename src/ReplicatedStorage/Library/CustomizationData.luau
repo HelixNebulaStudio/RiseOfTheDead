@@ -404,7 +404,7 @@ function CustomizationPlan:Apply(obj: BasePart)
             obj.MaterialVariant = ""; 
         end
     else
-        obj.Material = obj:GetAttribute("DefaultMaterial") or obj.Material;
+        obj.Material = (obj:GetAttribute("DefaultMaterial") :: Enum.Material) or obj.Material;
         obj.MaterialVariant = "";
     end
     
@@ -412,7 +412,7 @@ function CustomizationPlan:Apply(obj: BasePart)
         if self.Color or self.Material then
             obj.TextureID = "";
         else
-            obj.TextureID = obj:GetAttribute("BaseTexture") or "";
+            obj.TextureID = (obj:GetAttribute("BaseTexture") :: string) or "";
         end
     end
 
@@ -834,6 +834,151 @@ function CustomizationPlan:Serialize()
     buildStr = buildStr..";";
 
     return buildStr;
+end
+
+function CustomizationData.ClientLoadCustomizations(storageItem, partDataList, customPlansCache, serializedCustomization)
+    if RunService:IsServer() then return end;
+    
+	customPlansCache = customPlansCache or {};
+
+	task.spawn(function()
+		local serialized = serializedCustomization;
+		if serializedCustomization == nil then
+			local rPacket = remoteCustomizationData:InvokeServer("loadcustomizations", storageItem.ID);
+			if rPacket == nil or rPacket.Success ~= true then
+				if rPacket and rPacket.FailMsg then
+					Debugger:StudioWarn("rPacket.FailMsg", rPacket.FailMsg); 
+				end
+				
+				return; 
+			end;
+	
+			serialized = rPacket.Serialized;
+		end
+
+		CustomizationData.LoadCustomization({
+			ItemId = storageItem.ItemId;
+			CustomizationData = serialized;
+			SkinId = storageItem.Values.ActiveSkin;
+
+			CustomPlansCache = customPlansCache;
+			PartDataList = partDataList;
+		});
+
+		CustomizationData.ApplyCustomPlans(customPlansCache, partDataList);
+	end);
+end
+
+function CustomizationData.LoadWeaponModelsData(itemId, weaponModels)
+    local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
+    local modTools = require(game.ReplicatedStorage.Library.Tools);
+
+    local toolLib = modWeapons[itemId] or modTools[itemId];
+
+    local weaponModelsData = {};
+
+    for a=1, #weaponModels do
+        local prefab = weaponModels[a];
+        local weldName = prefab:GetAttribute("Grip");
+        local prefabName = toolLib.Welds[weldName];
+
+        local prefix = "";
+        if weldName == "LeftToolGrip" then
+            prefix = "Left";
+        elseif weldName == "RightToolGrip" then
+            prefix = "Right";
+        end
+
+        table.insert(weaponModelsData, {
+            WeldName=weldName; 
+            Prefab=prefab; 
+            BasePrefab=itemPrefabs[prefabName]; 
+            Offset=CFrame.identity; 
+            Prefix=prefix;
+        });
+    end
+
+    return weaponModelsData;
+end
+
+function CustomizationData.LoadPartDataList(itemId, weaponModelsData)
+    if RunService:IsServer() then return end;
+    
+    weaponModelsData = weaponModelsData :: {{
+        WeldName: string;
+        Prefab: Model;
+        BasePrefab: Model;
+        Offset: CFrame;
+        Prefix: string;
+    }};
+
+    type PartData = {
+        Key: string; 
+        Part: BasePart; 
+        DisplayModelData: {
+            Prefab: Model; 
+            BasePrefab: Model; 
+            Prefix: string; 
+            WeldName: string; 
+            Offset: CFrame;
+        };
+        Group: string?;
+        PredefinedGroup: string?;
+    };
+    local partDataList = {} :: {PartData};
+
+    for a=1, #weaponModelsData do
+        local weaponModelData = weaponModelsData[a];
+        local prefix = weaponModelData.Prefix;
+        local toolModel = weaponModelData.Prefab;
+
+        for _, joint in pairs(toolModel:GetDescendants()) do
+            if joint:IsA("Weld") or joint:IsA("Motor6D") then
+                local p1 = joint.Part1;
+                if p1 then
+                    p1:SetAttribute("LinkParent", joint.Part0.Name);
+                end
+            end
+        end
+
+        for _, basePart in pairs(toolModel:GetChildren()) do
+            if not basePart:IsA("BasePart") then continue end;
+
+            if basePart.Name == "Collider" then 
+                basePart.CanQuery = false;
+                continue
+            end;
+            if basePart:GetAttribute("WorkbenchIgnore") then
+                continue;
+            end
+
+            local predefinedGroup = basePart:GetAttribute("CustomizationGroup");
+            predefinedGroup = predefinedGroup and `[{predefinedGroup}]` or nil;
+
+            if toolModel and weaponModelData.BasePrefab then
+                local defaultPartName = basePart.Name;
+                local defaultPart = weaponModelData.BasePrefab:FindFirstChild(defaultPartName);
+                
+                basePart:SetAttribute("DefaultColor", defaultPart.Color);
+                basePart:SetAttribute("DefaultTransparency", defaultPart.Transparency);
+                basePart:SetAttribute("DefaultMaterial", defaultPart.Material);
+                basePart:SetAttribute("DefaultReflectance", defaultPart.Reflectance);
+            end
+
+            local newPartData = {
+                Key=prefix..basePart.Name;
+                Part=basePart;
+                DisplayModelData = weaponModelData;
+                Group = predefinedGroup;
+                PredefinedGroup = predefinedGroup;
+            };
+
+            table.insert(partDataList, newPartData);
+        end
+    end
+    table.sort(partDataList, function(a, b) return a.Key > b.Key; end);
+
+    return partDataList;
 end
 
 local function ConvertOldAppearanceData(storageItem)

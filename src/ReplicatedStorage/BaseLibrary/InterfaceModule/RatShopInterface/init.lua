@@ -471,7 +471,7 @@ function Interface.init(modInterface)
 					local descLabel = labelFrame:WaitForChild("descLabel");
 
 					local priceTag = "$"..modFormatNumber.Beautify(price);
-					descLabel.Text = `Refill <b>{itemLib.Name}</b> ammunition`..(price > 0 and ` for {price}` or ``);
+					descLabel.Text = `Refill <b>{itemLib.Name}</b> ammunition`..(price > 0 and ` for <b>{priceTag}</b>.` or `.`);
 					--"<b>"..itemLib.Name.."</b>: ".."Buy "..mags.." magazine"..(mags > 1 and "s" or "").." = "..priceTag;
 						
 					titleLabel.Text = "Refill Ammunition";

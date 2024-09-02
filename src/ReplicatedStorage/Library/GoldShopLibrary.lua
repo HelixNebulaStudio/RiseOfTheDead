@@ -514,7 +514,6 @@ GoldShopLibrary.Products:Add{
 		ShowcaseType="SkinPerm";
 		New=true;
 	};
-	OptInNewCustomizationMenu=true;
 	
 	Trader={Buy=false; Sell=false;};
 };

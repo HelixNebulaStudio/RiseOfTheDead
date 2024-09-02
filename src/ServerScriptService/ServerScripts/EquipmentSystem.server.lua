@@ -105,10 +105,6 @@ local function OnPlayerAdded(player: Player)
 					motor:SetAttribute("CanQuery", false);
 					modGearAttachments:AttachMotor(cloneTool, motor, attachment.Parent, 2);
 					
-					if profile.OptInNewCustomizationMenu ~= true then
-						modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
-
-					end
 				end
 			end
 			profile.ToolsCache.Prefabs = prefabs;
@@ -116,7 +112,7 @@ local function OnPlayerAdded(player: Player)
 			if storageItem == nil then continue end;
 			
 			local customizationData = storageItem:GetValues("_Customs");
-			if customizationData then
+			if customizationData and profile.ItemCustomizationBan == 0 then
 				task.spawn(function()
 					local activeSkinId = storageItem:GetValues("ActiveSkin");
 
@@ -431,14 +427,10 @@ local function equipTool(player, paramPacket)
 						Prefab=cloneTool;
 					})
 
-					if profile.OptInNewCustomizationMenu ~= true then
-						modColorsLibrary.ApplyAppearance(cloneTool, storageItem.Values);
-					end
-					
 				end
 
 				local customizationData = storageItem:GetValues("_Customs");
-				if customizationData then
+				if customizationData and profile.ItemCustomizationBan == 0 then
 					task.spawn(function()
 						local activeSkinId = storageItem:GetValues("ActiveSkin");
 						

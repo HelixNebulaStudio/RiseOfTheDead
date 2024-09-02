@@ -540,7 +540,7 @@ function Interface.init(modInterface)
 			modStorageInterface.CloseInspectFrame()
 			clothingToggleMenu.Visible = false;
 			Interface.DefaultInterface:StopDragItem();
-			if not modConfigurations.CompactInterface or Interface.modWorkbenchInterface.SelectedSlot == nil then
+			if not modConfigurations.CompactInterface or (Interface.modWorkbenchInterface and Interface.modWorkbenchInterface.SelectedSlot == nil) then
 				Interface:CloseWindow("Workbench");
 				Interface:CloseWindow("WeaponStats");
 			end

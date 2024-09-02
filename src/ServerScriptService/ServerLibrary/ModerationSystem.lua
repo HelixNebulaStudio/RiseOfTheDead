@@ -45,7 +45,8 @@ task.spawn(function()
 	shared.modCommandsLibrary:HookChatCommand("moderation", {
 		Permission = shared.modCommandsLibrary.PermissionLevel.Moderator;
 		Description = [[Server moderation commands:
-		/moderation movecheck playerName
+		
+		/moderation customizationban playerName [true/false]
 		]];
 
 		RequiredArgs = 0;
@@ -61,6 +62,25 @@ task.spawn(function()
 				
 				shared.Notify(speaker, "Player (".. player.Name ..") has movecheck set to = ".. tostring(setActive), "Inform");
 				
+			elseif action == "customizationban" then
+
+				local playerName = args[2];
+				local player = modCommandHandler.GetPlayerFromString(playerName, speaker);
+				if player == nil then return end;
+
+				local profile = shared.modProfile:Get(player);
+				if profile == nil then return end;
+				
+				if args[3] ~= nil then
+					local setBanned = args[3] == true;
+					if setBanned then
+						profile.ItemCustomizationBan = 1;
+					else
+						profile.ItemCustomizationBan = 0;
+					end
+				end
+				shared.Notify(speaker, `Player ({player.Name}) [Item Customization] Ban Status: {profile.ItemCustomizationBan == 1}`, "Inform");
+
 			else
 				shared.Notify(speaker, "Unknown action for /moderation", "Negative");
 				

@@ -2,11 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
 
 --== Variables;
-local Interface = {};
+local Interface : any = {};
 
-local RunService = game:GetService("RunService");
-local UserInputService = game:GetService("UserInputService");
-local TweenService = game:GetService("TweenService");
 local TextService = game:GetService("TextService");
 
 local localplayer = game.Players.LocalPlayer;
@@ -83,7 +80,6 @@ function Interface.init(modInterface)
 	local basicListTemplate = script:WaitForChild("basicList");
 	local labelTemplate = script:WaitForChild("label");
 	local itemButtonTemplate = script:WaitForChild("itemButton");
-	local highlightLabel = script:WaitForChild("highlightLabel");
 
 	Interface.Workbenches = {
 		Processes={Workbench=require(script.Processes).init(Interface)}; -- List of processes
@@ -125,12 +121,30 @@ function Interface.init(modInterface)
 		newItemDisplay.Frame.AnchorPoint = Vector2.new(0, 0);
 		newItemDisplay.Frame.Position = UDim2.new(0, 0, 0, 0);
 		newItemDisplay.Frame.Size = UDim2.new(0.5, 0, 0.5, 0);
+
 	end
 	
+	local connWeapStatToggle = false;
 	local function onSelectionChange()
 		Interface.ClearSelection();
 		Interface:CloseWindow("WeaponStats");
 		
+		if modConfigurations.CompactInterface then
+			if connWeapStatToggle == false then
+				connWeapStatToggle = true;
+
+				if Interface.Windows.WeaponStats then
+					Interface.Windows.WeaponStats.OnWindowToggle:Connect(function(visible)
+						if visible then
+							newItemDisplay.Frame.Size = UDim2.new(0.5, 0, 0.5, 0);
+						else
+							newItemDisplay.Frame.Size = UDim2.new(0.5, 0, 1, 0);
+						end
+					end)
+				end
+			end
+		end
+
 		if selectedSlot then
 			newItemDisplay.Frame.Visible = true;
 			local itemId = selectedSlot.Item.ItemId;
@@ -142,10 +156,7 @@ function Interface.init(modInterface)
 			end
 
 			for key, wb in pairs(Interface.Workbenches) do
-				
-				if modData.Profile.OptInNewCustomizationMenu == true and (key == "Appearance") and itemLib.Type ~= modItemLibrary.Types.Clothing then
-					continue;
-				elseif modData.Profile.OptInNewCustomizationMenu ~= true and (key == "Customization") then
+				if key == "Appearance" and itemLib.Type ~= modItemLibrary.Types.Clothing then
 					continue;
 				end
 
@@ -244,7 +255,7 @@ function Interface.init(modInterface)
 	function ListMenu:NewBasicList()
 		local list = basicListTemplate:Clone();
 		local contentlist = list:WaitForChild("list");
-		local layout = contentlist:WaitForChild("UIListLayout");
+		local _layout = contentlist:WaitForChild("UIListLayout");
 
 		return list;
 	end
@@ -252,14 +263,14 @@ function Interface.init(modInterface)
 	function ListMenu:NewGridList()
 		local list = gridListTemplate:Clone();
 		local contentlist = list:WaitForChild("list");
-		local gridLayout = contentlist:WaitForChild("UIGridLayout");
+		local _gridLayout = contentlist:WaitForChild("UIGridLayout");
 
 		return list;
 	end
 
 	function ListMenu:NewTab(subject)
 		local tab = cateTabTemplate:Clone();
-		local titleLabel = tab:WaitForChild("titleLabel");
+		local _titleLabel = tab:WaitForChild("titleLabel");
 		local collapseSign = tab:WaitForChild("collapseSign");
 
 		local active = true;
@@ -511,7 +522,7 @@ function Interface.init(modInterface)
 			return (processTypeSorting[A.Type] or 999) < (processTypeSorting[B.Type] or 999);
 		end)
 
-		processesTag.Text = ("($c/$t)"):gsub("$c", #processes):gsub("$t", Interface.IsPremium and 10 or 5);
+		processesTag.Text = ("($c/$t)"):gsub("$c", tostring(#processes)):gsub("$t", Interface.IsPremium and "10" or "5");
 
 		return processes;
 	end

@@ -2,14 +2,14 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
 
 --== Variables;
-local Interface = {};
+local Interface: any = {};
 
 local SoundService = game:GetService("SoundService");
 local RunService = game:GetService("RunService");
 local TextService = game:GetService("TextService");
 
 local localplayer = game.Players.LocalPlayer;
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
@@ -452,7 +452,6 @@ function Interface.Update(storageItem)
 	Interface.CurrentClass = itemClass.Class;
 	local statsTemplate = statTemplates[itemClass.Class];
 	
-	local classPlayer = shared.modPlayers.Get(game.Players.LocalPlayer);
 	refreshFrameSize();
 	
 	local newShortHandLabel = graphStatTemplates[itemClass.Class];
@@ -707,7 +706,7 @@ function Interface.Update(storageItem)
 			end
 			
 			local weakpointDmg = nil;
-			local level, skillStats = modData:GetSkillTree("weapoi");
+			local _level, skillStats = modData:GetSkillTree("weapoi");
 			if skillStats and (a == ammoMag or math.fmod(a, 6) == 0) then
 				local weapoiMulti = (skillStats.Percent.Default + skillStats.Percent.Value)/100
 				
@@ -789,7 +788,7 @@ function Interface.Update(storageItem)
 		local wExp = storageItem.Values.E or 0;
 		local wExpGoal = storageItem.Values.EG or 0;
 		masteryBar.Size = UDim2.new(math.clamp(wExp/wExpGoal, 0, 1), 0, 1, 0);
-		masteryLabel.Text = ("Weapon Level: $Lvl/$Mvl"):gsub("$Lvl", math.floor(weaponLevel)):gsub("$Mvl", 20);
+		masteryLabel.Text = ("Weapon Level: $Lvl/$Mvl"):gsub("$Lvl", tostring(math.floor(weaponLevel))):gsub("$Mvl", tostring(20));
 		masteryFrame.Visible = true;
 		
 	else

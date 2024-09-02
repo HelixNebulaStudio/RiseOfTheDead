@@ -283,6 +283,8 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 		profile.ShadowBan = 0;
 		profile.TradeBan = 0;
 		profile.FactionBan = 0;
+		profile.ItemCustomizationBan = 0;
+		
 		profile.Reports = 2;
 
 		--== Squad Integration
@@ -294,7 +296,7 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 		};
 
 		--== Optin;
-		profile.OptInNewCustomizationMenu = false;
+		profile.OptInNewCustomizationMenu = true;
 
 		--== Leaderboard
 		profile.LeaderstatsTimer = unixTime-120;

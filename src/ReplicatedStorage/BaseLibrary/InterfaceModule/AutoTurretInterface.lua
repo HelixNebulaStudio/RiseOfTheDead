@@ -292,6 +292,7 @@ function Interface.init(modInterface)
 			storageItem.Values.Online = packet.Online;
 			storageItem.Values.Config = packet.Config;
 			Interface.Refresh();
+
 		end
 	end
 	--Interface.Garbage:Tag();

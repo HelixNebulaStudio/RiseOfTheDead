@@ -15,6 +15,7 @@ local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrar
 local modCustomizeAppearance = require(game.ReplicatedStorage.Library:WaitForChild("CustomizeAppearance"));
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
+local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 
 local modViewportUtil = require(game.ReplicatedStorage.Library.Util.ViewportUtil);
 local modGuiObjectPlus = require(game.ReplicatedStorage.Library.UI.GuiObjectPlus);
@@ -345,41 +346,6 @@ function ItemViewport:RefreshDisplay()
 
 end
 
-function ItemViewport:LoadCustomizations(storageItem, customPlansCache, serializedCustomization)
-	customPlansCache = customPlansCache or {};
-
-	if modData.Profile.OptInNewCustomizationMenu ~= true then return end;
-
-	task.spawn(function()
-		local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
-
-		local serialized = serializedCustomization;
-		if serializedCustomization == nil then
-			local rPacket = remoteCustomizationData:InvokeServer("loadcustomizations", storageItem.ID);
-			if rPacket == nil or rPacket.Success ~= true then
-				if rPacket and rPacket.FailMsg then
-					Debugger:StudioWarn("rPacket.FailMsg", rPacket.FailMsg); 
-				end
-				
-				return; 
-			end;
-	
-			serialized = rPacket.Serialized;
-		end
-
-		modCustomizationData.LoadCustomization({
-			ItemId = storageItem.ItemId;
-			CustomizationData = serialized;
-			SkinId = storageItem.Values.ActiveSkin;
-
-			CustomPlansCache = customPlansCache;
-			PartDataList = self.PartDataList;
-		});
-
-		modCustomizationData.ApplyCustomPlans(customPlansCache, self.PartDataList);
-	end);
-end
-
 function ItemViewport:SetDisplay(storageItem, yieldFunc)
 	self:Clear();
 	local itemId = storageItem.ItemId;
@@ -452,84 +418,21 @@ function ItemViewport:SetDisplay(storageItem, yieldFunc)
 					end
 					prefab:SetAttribute("Grip", weldName);
 					
-					if modData.Profile.OptInNewCustomizationMenu ~= true then
-						modColorsLibrary.ApplyAppearance(prefab, itemValues);
-					end
-					
 					local displayOffset = itemDisplayLib[weldName.."Offset"];
-					table.insert(self.DisplayModels, {WeldName=weldName; Prefab=prefab; BasePrefab=itemPrefabs[prefabName]; Offset=displayOffset; Prefix=prefix;});
+
+					table.insert(self.DisplayModels, {
+						WeldName=weldName; 
+						Prefab=prefab; 
+						BasePrefab=itemPrefabs[prefabName]; 
+						Offset=displayOffset; 
+						Prefix=prefix;
+					});
 				end
 			end
 		end
 		
-		type PartData = {
-			Key: string; 
-			Part: BasePart; 
-			DisplayModelData: {
-				Prefab: Model; 
-				BasePrefab: Model; 
-				Prefix: string; 
-				WeldName: string; 
-				Offset: CFrame;
-			};
-			Group: string?;
-			PredefinedGroup: string?;
-		};
-		self.PartDataList = {} :: {PartData};
-
-		for a=1, #self.DisplayModels do
-			local displayModelData = self.DisplayModels[a];
-			local prefix = displayModelData.Prefix;
-			local toolModel = displayModelData.Prefab;
-
-			for _, joint in pairs(toolModel:GetDescendants()) do
-				if joint:IsA("Weld") or joint:IsA("Motor6D") then
-					local p1 = joint.Part1;
-					if p1 then
-						p1:SetAttribute("LinkParent", joint.Part0.Name);
-					end
-				end
-			end
-
-			for _, basePart in pairs(toolModel:GetChildren()) do
-				if not basePart:IsA("BasePart") then continue end;
-
-				if basePart.Name == "Collider" then 
-					basePart.CanQuery = false;
-					continue
-				end;
-				if basePart:GetAttribute("WorkbenchIgnore") then
-					continue;
-				end
-
-				local predefinedGroup = basePart:GetAttribute("CustomizationGroup");
-				predefinedGroup = predefinedGroup and `[{predefinedGroup}]` or nil;
-
-				if toolModel and displayModelData.BasePrefab then
-					local defaultPartName = basePart.Name;
-					local defaultPart = displayModelData.BasePrefab:FindFirstChild(defaultPartName);
-					
-					basePart:SetAttribute("DefaultColor", defaultPart.Color);
-					basePart:SetAttribute("DefaultTransparency", defaultPart.Transparency);
-					basePart:SetAttribute("DefaultMaterial", defaultPart.Material);
-					basePart:SetAttribute("DefaultReflectance", defaultPart.Reflectance);
-				end
-
-				local newPartData = {
-					Key=prefix..basePart.Name;
-					Part=basePart;
-					DisplayModelData = displayModelData;
-					Group = predefinedGroup;
-					PredefinedGroup = predefinedGroup;
-				};
-
-				table.insert(self.PartDataList, newPartData);
-			end
-		end
-		table.sort(self.PartDataList, function(a, b) return a.Key > b.Key; end);
-		
-		self:LoadCustomizations(storageItem);
-		
+		self.PartDataList = modCustomizationData.LoadPartDataList(itemId, self.DisplayModels);
+		modCustomizationData.ClientLoadCustomizations(storageItem, self.PartDataList);
 
 	else
 		local prefab = itemPrefabs:FindFirstChild(itemId) and itemPrefabs[itemId]:Clone() or nil;

@@ -1127,7 +1127,7 @@ local function renderStepped(camera, deltaTime)
 		return;
 	end;
 
-	if specFrame then
+	if specFrame and specFrame.Parent ~= nil then
 		specFrame.Visible = characterProperties.IsSpectating;
 
 		local specLabel = specFrame.SpectatingLabel;
@@ -1163,13 +1163,13 @@ local function renderStepped(camera, deltaTime)
 			UserInputService.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition;
 		end
 		--== Gui;
-		if mainInterface and mainInterface.Crosshair then
+		if mainInterface and mainInterface.Parent and mainInterface.Crosshair then
 			mainInterface.Crosshair:TweenSizeAndPosition(crosshairGui.zoomSize, crosshairGui.zoomPosition, crosshairGui.easingDirection, crosshairGui.easingStyle, 0.1, false);	
 		end
 
 	else
 		--== Gui;
-		if mainInterface and mainInterface.Crosshair then
+		if mainInterface and mainInterface.Parent and mainInterface.Crosshair then
 			mainInterface.Crosshair:TweenSizeAndPosition(crosshairGui.defaultSize, crosshairGui.defaultPosition, crosshairGui.easingDirection, crosshairGui.easingStyle, 0.1, false);	
 		end
 		--== Camera;
@@ -1973,7 +1973,7 @@ RunService.PostSimulation:Connect(function(step)
 		end
 	end
 	
-	if mainInterface then
+	if mainInterface and mainInterface.Parent then
 		if not mouseProperties.MouseLocked and mouseProperties.Mouse2Down then
 			mainInterface.Crosshair.Visible = true;
 			UserInputService.MouseIconEnabled = false;
@@ -2372,7 +2372,7 @@ RunService.PostSimulation:Connect(function(step)
 		Cache.AntiGravityForce.Force = (Vector3.yAxis * gravity * rootPart:GetMass());
 	end
 	
-	if touchEnabled then
+	if touchEnabled and mainInterface.Parent then
 		mainInterface.TouchControls.Focus.ImageColor3 = mouseProperties.Mouse2Down and Color3.fromRGB(255, 60, 60) or Color3.fromRGB(255, 255, 255);
 		mainInterface.TouchControls.Crouch.ImageColor3 = characterProperties.CrouchKeyDown and Color3.fromRGB(255, 60, 60) or Color3.fromRGB(255, 255, 255);
 		mainInterface.TouchControls.Sprint.ImageColor3 = characterProperties.SprintKeyDown and Color3.fromRGB(255, 60, 60) or Color3.fromRGB(255, 255, 255);

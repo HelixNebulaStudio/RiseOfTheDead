@@ -2251,10 +2251,10 @@ function Interface.init(modInterface)
 	local battlepassLib = modBattlePassLibrary:Find(activeBpId);
 	
 	local dOYToday = os.date("%j", unixTime); 
-	local dOYEnd = battlepassLib and os.date("%j", battlepassLib.EndUnixTime) or 0;
+	local dOYEnd = battlepassLib and tonumber(os.date("%j", battlepassLib.EndUnixTime)) or 0;
 	
 	local yearToday = os.date("%Y", unixTime);
-	local yearEnd = battlepassLib and os.date("%Y", battlepassLib.EndUnixTime) or 0;
+	local yearEnd = battlepassLib and tonumber(os.date("%Y", battlepassLib.EndUnixTime)) or 0;
 	
 	local leftFrameSizeXAnchor = 0.3;
 	local rightFrameSizeXAnchor = 1-leftFrameSizeXAnchor;

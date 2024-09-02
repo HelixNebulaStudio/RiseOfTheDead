@@ -775,15 +775,6 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 	
 	storageItem:Sync();
 	
-	-- Refresh weapon skin;
-	if player.Character and profile.OptInNewCustomizationMenu ~= true then
-		for _, obj in pairs(player.Character:GetChildren()) do
-			if obj:GetAttribute("StorageItemId") == id then
-				modColorsLibrary.ApplyAppearance(obj, storageItem.Values);
-			end
-		end
-	end
-
 	debounceCache[player.Name]=nil;
 end)
 

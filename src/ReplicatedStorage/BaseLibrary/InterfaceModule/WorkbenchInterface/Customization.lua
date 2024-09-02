@@ -67,14 +67,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 	local baseCustomPlan = modCustomizationData.newCustomizationPlan();
 	customPlansCache["[All]"] = baseCustomPlan;
 
-	-- do -- load premade customPlans
-	-- 	local baseSkin = modCustomizationData.GetBaseSkinFromActiveId(itemId, storageItem.Values.ActiveSkin);
-	-- 	baseCustomPlan.BaseSkin = baseSkin;
-		
-	-- 	itemViewport:LoadCustomizations(customPlansCache);
-	-- 	modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
-	-- end
-	itemViewport:LoadCustomizations(storageItem, customPlansCache);
+	modCustomizationData.ClientLoadCustomizations(storageItem, itemViewport.PartDataList, customPlansCache);
 
 	-- MARK: generateSerialized()
 	local function generateSerialized()

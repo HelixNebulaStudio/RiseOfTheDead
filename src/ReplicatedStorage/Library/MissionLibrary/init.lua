@@ -2756,30 +2756,30 @@ MissionLibrary.New{
 };
 
 -- MARK: 80 - Cargo Ship Enroute
-MissionLibrary.New{
-	MissionId=80;
-	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Cargo Ship Enroute";
-	Storyline=StoryLineEnum.Rat;
-	From="Revas";
-	Description="Another cargo ship disaster.";
-	Persistent=true;
-	Checkpoint={
-		{Text="Talk to Revas";};
-	};
-	StartRequirements={
-		MissionCompleted={62};
-	};
-	GuideText="Talk to Revas";
-	Rewards={
-		{Type="Perks"; Amount=PerksReward.Core};
-	};
-	AddRequirements={};
-	Markers={
-	};
-	CanRedo={};
+-- MissionLibrary.New{
+-- 	MissionId=80;
+-- 	MissionType = MissionLibrary.MissionTypes.Core;
+-- 	Name="Cargo Ship Enroute";
+-- 	Storyline=StoryLineEnum.Rat;
+-- 	From="Revas";
+-- 	Description="Another cargo ship disaster.";
+-- 	Persistent=true;
+-- 	Checkpoint={
+-- 		{Text="Talk to Revas";};
+-- 	};
+-- 	StartRequirements={
+-- 		MissionCompleted={62};
+-- 	};
+-- 	GuideText="Talk to Revas";
+-- 	Rewards={
+-- 		{Type="Perks"; Amount=PerksReward.Core};
+-- 	};
+-- 	AddRequirements={};
+-- 	Markers={
+-- 	};
+-- 	CanRedo={};
 	
-};
+-- };
 
 -- MARK: 81 - Fall of the Living
 MissionLibrary.New{
