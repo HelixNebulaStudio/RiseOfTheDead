@@ -30,7 +30,8 @@ local DamageSource = {};
 DamageSource.__index = DamageSource;
 
 function DamageSource:Clone()
-	return setmetatable(table.clone(self), DamageSource);
+	local clone = table.clone(self);
+	return setmetatable(clone, DamageSource);
 end
 
 function Damagable.NewDamageSource(data) -- Contains every detail about a damage.

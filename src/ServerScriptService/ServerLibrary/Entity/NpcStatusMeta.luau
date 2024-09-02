@@ -259,6 +259,8 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 		end
 	end
 
+	local killShotBool = false;
+
 	hitPart = hitPart or self.RootPart;
 	if amount >= 1 then
 		local dmgType = armorDmg and "Armor" or "Damage";
@@ -272,6 +274,8 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 		local killMarkerSnd;
 		if isLethal and npcModule.KilledMark == nil then
 			npcModule.KilledMark = true;
+			killShotBool = true;
+
 			killMarkerSnd = (hitPart and (hitPart.Name == "Head" or hitPart:GetAttribute("IsHead") == true)) and "KillHead" or "KillFlesh";
 			
 			if dmgPosition then
@@ -424,12 +428,12 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 	if damageSource.Clone then
 		cloneDmgSrc = damageSource:Clone();
 		cloneDmgSrc.NpcModule = npcModule;
-		cloneDmgSrc.Killed = npcModule.KilledMark==true;
+		cloneDmgSrc.Killed = killShotBool;
 		
 	else
 		cloneDmgSrc = table.clone(damageSource);
 		cloneDmgSrc.NpcModule = npcModule;
-		cloneDmgSrc.Killed = npcModule.KilledMark==true;
+		cloneDmgSrc.Killed = killShotBool;
 		
 		Debugger:Warn(npcModule.Name,"deprecate TakeDamage used: ", debug.traceback());
 	end
