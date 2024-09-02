@@ -850,7 +850,7 @@ function Storage.GetAuthorisedStorages(player)
 		end
 	end
 	
-	Debugger:Log("Get auth storages:", storageIds);
+	Debugger:StudioLog("Get auth storages:", storageIds);
 	return storages;
 end
 

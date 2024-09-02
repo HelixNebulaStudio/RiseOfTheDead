@@ -28,16 +28,16 @@ function Human.new(self)
 		--if target == nil then Debugger:Warn("NpcChat>> No target. (",message,")"); return end;
 		
 		message = message and tostring(message) or nil;
-		if message and message:match("_") then
-			local choiceData = modDialogueLibrary.GetByTag(self.Name, message);
-			if choiceData then
-				message = choiceData.Reply;
+		-- if message and message:match("_") then
+		-- 	local choiceData = modDialogueLibrary.GetByTag(self.Name, message);
+		-- 	if choiceData then
+		-- 		message = choiceData.Reply;
 				
-				if choiceData.Face and self.AvatarFace then
-					self.AvatarFace:Set(choiceData.Face);
-				end
-			end
-		end
+		-- 		if choiceData.Face and self.AvatarFace then
+		-- 			self.AvatarFace:Set(choiceData.Face);
+		-- 		end
+		-- 	end
+		-- end
 		
 		message = message or "";
 		--bubbleLabel.Text = message;

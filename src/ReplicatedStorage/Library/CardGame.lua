@@ -149,7 +149,7 @@ function Lobby:QueueStage(stageType, data)
 				break;
 			end
 		end
-		Debugger:Log("QueueStage:", stageTypeName, data);
+		Debugger:StudioLog("QueueStage:", stageTypeName, data);
 	end
 
 	table.insert(self.StageQueue, data);
@@ -207,7 +207,7 @@ function Lobby:Destroy()
 	local lobbyIndex = table.find(CardGame.Lobbies, self);
 	if lobbyIndex then
 		table.remove(CardGame.Lobbies, lobbyIndex);
-		Debugger:Log("Destroyed lobby", self);
+		Debugger:StudioLog("Destroyed lobby", self);
 	end
 	self.Destroyed = true;
 	self.Host = nil;
@@ -297,7 +297,7 @@ function Lobby:NextTurn()
 	if stageInfo == nil then
 		self:QueueStage(StageType.NextTurn);
 		stageInfo = self.StageQueue[self.StageIndex];
-		Debugger:Log("Missing next stage", self.StageIndex);
+		Debugger:StudioLog("Missing next stage", self.StageIndex);
 	end
 	
 	--===
@@ -364,7 +364,7 @@ function Lobby:NextTurn()
 		local loserPlayerTable = self:GetPlayer(stageInfo.Loser, true);
 
 		if loserPlayerTable == nil or loserPlayerTable.Cards == nil then
-			Debugger:Warn("Missing loserPlayerTable (",stageInfo.Loser,") A:",tostring(accuserPlayer), "D:",tostring(defendantPlayer));
+			Debugger:StudioWarn("Missing loserPlayerTable (",stageInfo.Loser,") A:",tostring(accuserPlayer), "D:",tostring(defendantPlayer));
 
 		end
 
@@ -513,11 +513,11 @@ function Lobby:PlayAction(player, packet)
 
 	if packet.CallBluff == true and stageInfo.Type == StageType.NextTurn then return end;
 	
-	Debugger:Warn(self.StageIndex.."/"..(#self.StageQueue),"Type",stageTypeName,player,"PlayAction", packet, "StageInfo", stageInfo);
+	Debugger:StudioWarn(self.StageIndex.."/"..(#self.StageQueue),"Type",stageTypeName,player,"PlayAction", packet, "StageInfo", stageInfo);
 	self.ActionPlayed = true;
 
 	if packet.CallBluff == true and stageInfo.TurnPlayer ~= player then
-		if stageInfo.BluffCalled then Debugger:Log("bluff already called", stageInfo); return; end
+		if stageInfo.BluffCalled then Debugger:StudioLog("bluff already called", stageInfo); return; end
 		stageInfo.BluffCalled = true;
 		
 		stageInfo.Accuser=player;
@@ -534,7 +534,7 @@ function Lobby:PlayAction(player, packet)
 	elseif packet.CallBluff == true and stageInfo.TurnPlayer == player and stageInfo.AttackDispute == true then
 		-- Call bluff on zombie block;
 		
-		if stageInfo.BluffCalled then Debugger:Log("bluff already called", stageInfo); return; end
+		if stageInfo.BluffCalled then Debugger:StudioLog("bluff already called", stageInfo); return; end
 		stageInfo.BluffCalled = true;
 		
 		stageInfo.Accuser=player;
@@ -551,7 +551,7 @@ function Lobby:PlayAction(player, packet)
 		if stageInfo.TurnPlayer == player then Debugger:StudioWarn("False PlayAction"); return end;
 
 		if stageInfo.ActionId == 3 then
-			Debugger:Log("Accept attack");
+			Debugger:StudioLog("Accept attack");
 			self:QueueStage(StageType.AttackDispute, {Attacker=stageInfo.TurnPlayer; Victim=stageInfo.TargettedPlayer;});
 
 		elseif stageInfo.ActionId == 7 then
@@ -567,7 +567,7 @@ function Lobby:PlayAction(player, packet)
 		local loserPlayerTable = self:GetPlayer(loser, true);
 		
 		if #loserPlayerTable.Cards > 0 then
-			Debugger:Log("PlayAction fold", loser, packet);
+			Debugger:StudioLog("PlayAction fold", loser, packet);
 			local card = table.remove(loserPlayerTable.Cards, packet.FoldCard);
 			
 			self:Broadcast(loser.Name .. " folds ".. card .."!", {SndId="CardGameKilled"});
@@ -579,7 +579,7 @@ function Lobby:PlayAction(player, packet)
 	elseif packet.AttackDisputeChoice then
 		local hasZombieCard = table.find(playerTable.Cards, "Zombie") ~= nil;
 		
-		Debugger:Log("attackdispute stageInfo", stageInfo, " playerTable", playerTable, " hasZombieCard ", hasZombieCard, " AttackDisputeChoice ", packet.AttackDisputeChoice);
+		Debugger:StudioLog("attackdispute stageInfo", stageInfo, " playerTable", playerTable, " hasZombieCard ", hasZombieCard, " AttackDisputeChoice ", packet.AttackDisputeChoice);
 		if #playerTable.Cards <= 1 then
 			self:Broadcast(player.Name .. " blocks with Zombie!");
 			stageInfo.IsBluff=(not hasZombieCard);
@@ -688,7 +688,7 @@ function Lobby:PlayAction(player, packet)
 				};
 
 				self:QueueStage(StageType.SwapCards, {IsBluff=table.find(playerTable.Cards, "BioX") == nil; ActionId=optionIndex;});
-				Debugger:Log(self.StageIndex," = ", self.StageQueue);
+				Debugger:StudioLog(self.StageIndex," = ", self.StageQueue);
 
 			end
 
@@ -924,7 +924,7 @@ function CardGame.NewLobby(player)
 	lobby:Join(player);
 	lobby:SetPlayerType(player, "Players");
 	
-	Debugger:Log("New lobby ", lobby);
+	Debugger:StudioLog("New lobby ", lobby);
 	if player:IsA("Player") then
 		shared.Notify(player, "[FotL] New lobby created for Fall of the Living.", "Inform");
 	end
@@ -1000,14 +1000,14 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 		local cards = npcTable.Cards;
 		local resources = npcTable.R;
 
-		Debugger:Warn("Agent table", npcTable);
+		Debugger:StudioWarn("Agent table", npcTable);
 
 		local isMyTurn = stageInfo.TurnPlayer == agentPrefab;
 		local isBluffing = stageInfo.IsBluff;
 
 		if stageInfo.Type == StageType.NextTurn then
 			if isMyTurn then
-				Debugger:Warn("Agent Plays", stageInfo);
+				Debugger:StudioWarn("Agent Plays", stageInfo);
 				task.wait(math.random(24, 42)/10);
 
 				local validOptions = {1, 2, 3, 5, 6, 7};
@@ -1099,7 +1099,7 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 			
 
 		elseif stageInfo.Type == StageType.Dispute then
-			Debugger:Warn("Agent Dispute", stageInfo.TurnPlayer, stageInfo);
+			Debugger:StudioWarn("Agent Dispute", stageInfo.TurnPlayer, stageInfo);
 
 			if stageInfo.TurnPlayer ~= agentPrefab then
 				local optionLib = CardGame.ActionOptions[stageInfo.ActionId];
@@ -1134,7 +1134,7 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 			end
 
 		elseif stageInfo.Type == StageType.Sacrifice then
-			Debugger:Warn("Agent Sacrifice", stageInfo.TurnPlayer, stageInfo);
+			Debugger:StudioWarn("Agent Sacrifice", stageInfo.TurnPlayer, stageInfo);
 			
 			if stageInfo.Loser == agentPrefab then
 
@@ -1144,7 +1144,7 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 			end
 
 		elseif stageInfo.Type == StageType.AttackDispute then
-			Debugger:Warn("Agent AttackDispute", stageInfo.TurnPlayer, stageInfo);
+			Debugger:StudioWarn("Agent AttackDispute", stageInfo.TurnPlayer, stageInfo);
 
 			if stageInfo.Victim == agentPrefab then
 				local bluffRoll = math.random(0, 100)/100;
@@ -1166,10 +1166,10 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 			end
 					
 		elseif stageInfo.Type == StageType.Break then
-			Debugger:Warn("Agent Break", stageInfo.TurnPlayer, stageInfo);
+			Debugger:StudioWarn("Agent Break", stageInfo.TurnPlayer, stageInfo);
 					
 		elseif stageInfo.Type == StageType.SwapCards then
-			Debugger:Warn("Agent SwapCards", stageInfo.TurnPlayer, stageInfo, " lobby.CardSwapSelections",lobby.CardSwapSelections);
+			Debugger:StudioWarn("Agent SwapCards", stageInfo.TurnPlayer, stageInfo, " lobby.CardSwapSelections",lobby.CardSwapSelections);
 			
 			if isMyTurn then
 				task.wait(math.random(33, 44)/10);
@@ -1203,10 +1203,10 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 			end
 
 		elseif stageInfo.Type == StageType.BluffTrial then
-			Debugger:Warn("Agent BluffTrial", stageInfo.TurnPlayer, stageInfo);
+			Debugger:StudioWarn("Agent BluffTrial", stageInfo.TurnPlayer, stageInfo);
 
 		elseif stageInfo.Type == StageType.BluffConclusion then
-			Debugger:Warn("Agent BluffConclusion", stageInfo.TurnPlayer, stageInfo);
+			Debugger:StudioWarn("Agent BluffConclusion", stageInfo.TurnPlayer, stageInfo);
 
 			if stageInfo.Loser == agentPrefab then
 				if stageInfo.Defendant == stageInfo.Loser then
@@ -1233,7 +1233,7 @@ function CardGame.NewComputerAgentFunc(agentPrefab, lobby, params)
 			end
 
 		elseif stageInfo.Type == StageType.PlayerDefeated then
-			Debugger:Warn("Agent PlayerDefeated", stageInfo.TurnPlayer, stageInfo);
+			Debugger:StudioWarn("Agent PlayerDefeated", stageInfo.TurnPlayer, stageInfo);
 			
 			if stageInfo.DefeatedPlayer ~= agentPrefab then
 				task.spawn(params.OnPlayerDefeated, stageInfo.DefeatedPlayer);
@@ -1260,7 +1260,7 @@ if RunService:IsServer() then
 			local playerLobby = CardGame.GetLobby(player);
 			if playerLobby then
 				
-				Debugger:Warn("Already in a lobby;");
+				Debugger:StudioWarn("Already in a lobby;");
 				return rPacket;
 			end
 			
@@ -1270,7 +1270,7 @@ if RunService:IsServer() then
 			local hostPlayer = CardGame.GetPlayerFromInteractable(interactableModule);
 			local hostLobby = CardGame.GetLobby(hostPlayer);
 			if hostLobby == nil then
-				Debugger:Warn("Host does not have a lobby", hostPlayer);
+				Debugger:StudioWarn("Host does not have a lobby", hostPlayer);
 				return rPacket;
 			end;
 			
@@ -1290,7 +1290,7 @@ if RunService:IsServer() then
 			local hostPlayer = CardGame.GetPlayerFromInteractable(interactableModule);
 			local hostLobby = CardGame.GetLobby(hostPlayer);
 			if hostLobby == nil then
-				Debugger:Warn("Host does not have a lobby");
+				Debugger:StudioWarn("Host does not have a lobby");
 				
 				shared.Notify(player, `[FotL] {hostPlayer} does not have a lobby.`, "Negative");
 				return rPacket; 
@@ -1311,7 +1311,7 @@ if RunService:IsServer() then
 			local acceptPlayer = packet.AcceptPlayer;
 
 			local hostLobby = CardGame.GetLobby(player);
-			if hostLobby == nil or hostLobby.Host ~= player then Debugger:Warn("Invalid host request", hostLobby); return rPacket end;
+			if hostLobby == nil or hostLobby.Host ~= player then Debugger:StudioWarn("Invalid host request", hostLobby); return rPacket end;
 			
 			if hostLobby.State ~= GameState.Idle then
 				shared.Notify(player, "[FotL] Can not accept request during an active lobby.", "Inform");
@@ -1339,11 +1339,11 @@ if RunService:IsServer() then
 			local lobby = CardGame.GetLobby(player);
 			
 			if lobby == nil or lobby.Host ~= player then
-				Debugger:Warn("Not lobby host", lobby);
+				Debugger:StudioWarn("Not lobby host", lobby);
 				return rPacket;
 			end
 			
-			Debugger:Log("lobby", lobby);
+			Debugger:StudioLog("lobby", lobby);
 			if #lobby.Players > 5 then
 				shared.Notify(player, "[FotL] The lobby is overloaded!", "Inform");
 				return rPacket;
@@ -1425,7 +1425,7 @@ if RunService:IsServer() then
 		elseif action == "decideaction" then
 			local lobby = CardGame.GetLobby(player);
 
-			if lobby == nil or lobby.StageIndex ~= packet.StageIndex then Debugger:Log("false lobby", lobby); return rPacket end;
+			if lobby == nil or lobby.StageIndex ~= packet.StageIndex then Debugger:StudioLog("false lobby", lobby); return rPacket end;
 			
 			local stageInfo = lobby.StageQueue[lobby.StageIndex];
 			if stageInfo.TargettedPlayer ~= nil and stageInfo.TargettedPlayer ~= player then Debugger:Log("false player", stageInfo); return rPacket; end
@@ -1439,10 +1439,10 @@ if RunService:IsServer() then
 		elseif action == "fold" then
 			local lobby = CardGame.GetLobby(player);
 
-			if lobby == nil or lobby.StageIndex ~= packet.StageIndex then Debugger:Log("false lobby", lobby); return rPacket end;
+			if lobby == nil or lobby.StageIndex ~= packet.StageIndex then Debugger:StudioLog("false lobby", lobby); return rPacket end;
 			local stageInfo = lobby.StageQueue[lobby.StageIndex];
 			
-			if stageInfo.Loser ~= player then Debugger:Log("false loser", stageInfo); return rPacket; end
+			if stageInfo.Loser ~= player then Debugger:StudioLog("false loser", stageInfo); return rPacket; end
 			local loserPlayerTable = lobby:GetPlayer(player, true);
 			
 			lobby:PlayAction(player, packet);
@@ -1452,7 +1452,7 @@ if RunService:IsServer() then
 		elseif action == "attackdispute" then
 			local lobby = CardGame.GetLobby(player);
 
-			if lobby == nil or lobby.StageIndex ~= packet.StageIndex then Debugger:Log("false lobby", lobby); return rPacket end;
+			if lobby == nil or lobby.StageIndex ~= packet.StageIndex then Debugger:StudioLog("false lobby", lobby); return rPacket end;
 			local stageInfo = lobby.StageQueue[lobby.StageIndex];
 			
 			packet.AttackDisputeChoice = packet.AttackDisputeChoice == 2 and 2 or 1;
@@ -1473,5 +1473,5 @@ if RunService:IsServer() then
 	
 end
 
-Debugger:Log("Initialized CardGame");
+Debugger:StudioLog("Initialized CardGame");
 return CardGame;

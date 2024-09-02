@@ -15,14 +15,14 @@ if RunService:IsServer() then
 	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 
 --== Script;
 return function(CutsceneSequence)
-	--if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
-	
+	if modBranchConfigs.IsWorld("MainMenu") then return end;
+
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
@@ -162,7 +162,7 @@ return function(CutsceneSequence)
 			end
 		end
 		mission.Changed:Connect(OnChanged);
-		OnChanged(true, mission);
+		OnChanged(true);
 	end)
 	
 	return CutsceneSequence;
