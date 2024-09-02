@@ -12,7 +12,7 @@ if RunService:IsServer() then
 		local npcModule = damageSource.NpcModule;
 		local humanoid = npcModule.Humanoid;
 
-		if humanoid.Name ~= "Zombie" or damageSource.Killed ~= true or npcModule.IsDead ~= true then return end;
+		if humanoid.Name ~= "Zombie" or damageSource.Killed ~= true then return end;
 			
 		if modMission:IsComplete(player, missionId) then return end;
 

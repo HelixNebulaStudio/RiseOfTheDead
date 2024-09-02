@@ -15,7 +15,7 @@ if RunService:IsServer() then
 		local storageItem = damageSource.ToolStorageItem;
 		local humanoid = npcModule.Humanoid;
 
-		if humanoid.Name ~= "Zombie" or damageSource.Killed ~= true or npcModule.IsDead ~= true then return end;
+		if humanoid.Name ~= "Zombie" or damageSource.Killed ~= true then return end;
 		if modMission:IsComplete(player, missionId) then return end;
 
 		local toolWorkbenchLib = storageItem and modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId] or nil;
