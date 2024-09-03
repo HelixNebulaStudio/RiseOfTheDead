@@ -99,7 +99,7 @@ npcPrefabsList = nil;
 local prefabCache = {};
 function Npc.GetNpcPrefab(name)
 	if prefabCache[name] then return prefabCache[name] end;
-	if npcPrefabs:FindFirstChild(name) == nil then Debugger:Warn("Npc prefab: "..name.." does not exist."); end;
+	if npcPrefabs:FindFirstChild(name) == nil then Debugger:Warn("Npc prefab: "..name.." does not exist."); return; end;
 
 	local prefab = npcPrefabs[name];
 	if prefab:IsA("Folder") then

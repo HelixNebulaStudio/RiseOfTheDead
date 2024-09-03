@@ -7,13 +7,12 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local missionId = 67;
 
 if RunService:IsServer() then
-	if not modBranchConfigs.IsWorld("SectorD") then return {}; end;
 	local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	
 	modOnGameEvents:ConnectEvent("OnEventPoint", function(pointName, packet)
 		if pointName ~= "ShopService_Sell" then return end;
-
+ 
 		local player = packet.Player;
 		local finalPrice = packet.FinalPrice;
 
