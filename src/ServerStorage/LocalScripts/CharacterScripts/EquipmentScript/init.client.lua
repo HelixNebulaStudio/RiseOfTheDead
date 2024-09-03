@@ -136,7 +136,7 @@ function equip(equipPacket, toolWelds)
 			end));
 		end
 		
-		if modData.Profile and modData.Profile.ItemCustomizationBan ~= 0 then
+		if modData.Profile and modData.Profile.ItemCustomizationBan and modData.Profile.ItemCustomizationBan >= 1 then
 			local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 
 			local weaponModelsData = modCustomizationData.LoadWeaponModelsData(itemId, toolModels);

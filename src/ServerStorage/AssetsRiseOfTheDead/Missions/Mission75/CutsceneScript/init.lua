@@ -4,11 +4,9 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 local modEntity = require(game.ReplicatedStorage.Library.Entity);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 local modDialogueService = require(game.ReplicatedStorage.Library.DialogueService);
 
@@ -32,6 +30,8 @@ return function(CutsceneSequence)
 	local patrolBandit;
 
 	if RunService:IsServer() then
+		modStorage.RegisterItemName("Stan's Blood Samples");
+		modStorage.RegisterItemName("Dr. Deniski's Report Insights");
 		modStorage.RegisterItemName("Stan's Blood Samples Report #1");
 		modStorage.RegisterItemName("Stan's Blood Samples Report #2");
 		modStorage.RegisterItemName("Stan's Blood Samples Report #3");
@@ -109,7 +109,7 @@ return function(CutsceneSequence)
 				bloodMachineInteractData.State = 4;
 				
 				inventory:Add("samplereport", {
-					CustomName=modStorage.RegisterItemName("Stan's Blood Samples Report #1");
+					CustomName="Stan's Blood Samples Report #1";
 					Values={
 						Result=false;
 						--DescExtend=h3O.."\nReport Status: "..h3C.."Negative";
@@ -180,7 +180,7 @@ return function(CutsceneSequence)
 				bloodMachineInteractData:Sync();
 
 				inventory:Add("samplereport", {
-					CustomName=modStorage.RegisterItemName("Stan's Blood Samples Report #2");
+					CustomName="Stan's Blood Samples Report #2";
 					Values={
 						Result=true;
 					};}, function(queueEvent, storageItem)
@@ -238,7 +238,7 @@ return function(CutsceneSequence)
 				bloodMachineInteractData:Sync();
 
 				inventory:Add("samplereport", {
-					CustomName=modStorage.RegisterItemName("Stan's Blood Samples Report #3");
+					CustomName="Stan's Blood Samples Report #3";
 					Values={
 						Result=false;
 					};}, function(queueEvent, storageItem)
@@ -296,7 +296,7 @@ return function(CutsceneSequence)
 				bloodMachineInteractData:Sync();
 
 				inventory:Add("samplereport", {
-					CustomName=modStorage.RegisterItemName("Stan's Blood Samples Report #4");
+					CustomName="Stan's Blood Samples Report #4";
 					Values={
 						Result=true;
 					};}, function(queueEvent, storageItem)
@@ -360,7 +360,6 @@ return function(CutsceneSequence)
 			if storageItemId == nil then return end;
 
 			local profile = shared.modProfile:Get(player);
-			local playerSave = profile:GetActiveSave();
 			local inventory = profile.ActiveInventory;
 			local storageItem = inventory:Find(storageItemId);
 			
@@ -465,7 +464,7 @@ return function(CutsceneSequence)
 					return;
 				end
 				
-				local generatorPoint = workspace:WaitForChild("CutscenePoints"):WaitForChild("Generator");
+				local _generatorPoint = workspace:WaitForChild("CutscenePoints"):WaitForChild("Generator");
 				local interactData = modEntity:GetEntity(workspace.Interactables:WaitForChild("generator")).Interactable;
 
 				local bloodMachineInteractData = modEntity:GetEntity(workspace.Interactables:WaitForChild("bloodmachine")).Interactable;
@@ -647,9 +646,9 @@ return function(CutsceneSequence)
 								local bandanaHandle = npc:WaitForChild("Bandana"):WaitForChild("Handle");
 								bandanaHandle.Color = Color3.fromRGB(85, 85, 85);
 								
-								local isAlive = true;
+								--local isAlive = true;
 								npcModule.Humanoid.Died:Connect(function()
-									isAlive = false;
+									--isAlive = false;
 									for a=#enemies, 1, -1 do
 										if enemies[a] == npcModule then
 											table.remove(enemies, a);

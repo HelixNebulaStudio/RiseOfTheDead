@@ -855,6 +855,7 @@ function CustomizationData.ClientLoadCustomizations(storageItem, partDataList, c
 	
 			serialized = rPacket.Serialized;
 		end
+        if serialized == nil then return end;
 
 		CustomizationData.LoadCustomization({
 			ItemId = storageItem.ItemId;
@@ -935,7 +936,7 @@ function CustomizationData.LoadPartDataList(itemId, weaponModelsData)
         for _, joint in pairs(toolModel:GetDescendants()) do
             if joint:IsA("Weld") or joint:IsA("Motor6D") then
                 local p1 = joint.Part1;
-                if p1 then
+                if p1 and joint.Part0 then
                     p1:SetAttribute("LinkParent", joint.Part0.Name);
                 end
             end

@@ -200,7 +200,7 @@ if RunService:IsServer() then
 				end
 				
 				inventory:Add("bloodsample", {
-					CustomName=inventory.RegisterItemName("Stan's Blood Samples");
+					CustomName="Stan's Blood Samples";
 					Values={
 						Health=100;
 						MaxHealth=100;
@@ -371,7 +371,7 @@ if RunService:IsServer() then
 								end;
 								
 								inventory:Add("samplereport", {
-									CustomName=inventory.RegisterItemName("Dr. Deniski's Report Insights");
+									CustomName="Dr. Deniski's Report Insights";
 									Values={
 										Result=false;
 									};}, function(queueEvent, storageItem)
