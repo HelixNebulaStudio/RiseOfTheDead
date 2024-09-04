@@ -17,7 +17,7 @@ if RunService:IsServer() then
 
 			if npcPrefab.Name == "David" then
 				modMission:Progress(player, missionId, function(mission)
-					if mission.ProgressionPoint <= 3 then
+					if mission.ProgressionPoint == 3 then
 						mission.ProgressionPoint = 4;
 					end
 
@@ -31,21 +31,23 @@ if RunService:IsServer() then
 
 			elseif npcPrefab.Name == "Cooper" then
 				modMission:Progress(player, missionId, function(mission)
-					if mission.ProgressionPoint <= 4 then
+					if mission.ProgressionPoint == 4 then
 						mission.ProgressionPoint = 5;
 						mission.SaveData.CooperLost = 1;
 					end
 				end)
+
 			end
 		end
 	end)
 
 	modOnGameEvents:ConnectEvent("OnFotlWonNpc", function(npcPrefab)
 		for _, player in pairs(game.Players:GetPlayers()) do
+
 			if npcPrefab.Name == "Cooper" then
 				modMission:Progress(player, missionId, function(mission)
 					if mission.SaveData.CooperRematch == 1 then
-						if mission.ProgressionPoint <= 4 then
+						if mission.ProgressionPoint == 4 then
 							mission.ProgressionPoint = 5;
 
 							local npcModule = modNpc.GetNpcModule(npcPrefab);
@@ -59,6 +61,7 @@ if RunService:IsServer() then
 				end)
 			end
 		end
+		
 	end)
 
 	modOnGameEvents:ConnectEvent("OnEmote", function(player, emoteId)
