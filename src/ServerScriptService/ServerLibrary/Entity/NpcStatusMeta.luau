@@ -392,9 +392,10 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 		end
 
 	elseif amount <= -1 then
+		
 		modInfoBubbles.Create{
 			Players=infoBubblePlayers;
-			Position=hitPart.Position;
+			Position=dmgPosition;
 			Value=math.abs(amount);
 			Type="Heal";
 		};

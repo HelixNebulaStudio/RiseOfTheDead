@@ -123,10 +123,6 @@ return function(CutsceneSequence)
 
 					local targetNpcName = string.split(mission.SaveData.TargetPlace, " ")[1];
 					
-					if RunService:IsStudio() then
-						targetNpcName = "Diana";
-					end
-					
 					if targetNpcName == "Diana" then
 						Debugger:Warn("Diana walk out");
 
@@ -156,7 +152,7 @@ return function(CutsceneSequence)
 				end
 
 			elseif mission.Type == 3 then -- OnComplete		
-				player:SetAttribute("FrankStandsOutside", false);
+				player:SetAttribute("FrankStandsOutside", nil);
 				endMission();
 				
 			end

@@ -84,10 +84,10 @@ remoteCharacterRemote.OnServerEvent:Connect(function(player, action, paramPacket
 	local classPlayer = modPlayers.GetByName(player.Name);
 	local t = tick();
 	
-	if action == 0 then -- 0 Force reset
+	if action == 0 and classPlayer then -- 0 Force reset
 		classPlayer:Kill(0);
 		
-	elseif action == 1 and t-(classPlayer.MotorCooldown or 0) >= 0.4 then -- 1 updatebodymotors
+	elseif action == 1 and t-(classPlayer.MotorCooldown or 0) >= 0.4 and classPlayer then -- 1 updatebodymotors
 		classPlayer.MotorCooldown = t;
 		
 		if paramPacket.LowestFps then
@@ -130,26 +130,6 @@ remoteCharacterRemote.OnServerEvent:Connect(function(player, action, paramPacket
 				end
 			end
 		end
-
-		-- local joints = typeof(paramPacket) == "table" and paramPacket or {};
-		
-		-- if classPlayer.Mount and classPlayer.Mount.Passenger then
-		-- 	for passChar, info in pairs(classPlayer.Mount.Passenger) do
-		-- 		if info.Waist and joints.Waist then
-		-- 			local motor = info.Waist;
-		-- 			local data = joints.Waist;
-					
-		-- 			local properties = {};
-		-- 			if data.Properties.C1 then
-		-- 				local angX, angY, angZ = data.Properties.C1:ToEulerAnglesXYZ();
-		-- 				properties.C1 = CFrame.new(motor.C1.Position) * CFrame.Angles(angX+math.rad(-5), 0, 0);
-		-- 			end
-					
-		-- 			local tween = TweenService:Create(info.Waist, TweenInfo.new(0.6), properties);
-		-- 			tween:Play();
-		-- 		end
-		-- 	end
-		-- end
 		
 	elseif action == 2 then
 		local platformModel, groundPart = unpack(paramPacket);

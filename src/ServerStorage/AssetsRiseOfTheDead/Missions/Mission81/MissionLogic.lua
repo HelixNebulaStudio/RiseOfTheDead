@@ -92,7 +92,11 @@ if RunService:IsServer() then
 							"That's not exactly a dance..";
 							"What was that?!";
 						};
-						npcModule.Chat(player, notDanceMsg[math.random(1,#notDanceMsg)]);
+						
+						if mission.CarlsonNotDanceTick == nil or tick()-mission.CarlsonNotDanceTick >= 1 then
+							mission.CarlsonNotDanceTick = tick();
+							npcModule.Chat(player, notDanceMsg[math.random(1,#notDanceMsg)]);
+						end
 					end
 
 				end

@@ -161,7 +161,7 @@ function CustomHealthbar:TakeDamage(name, amount)
 		task.spawn(function()
 			task.wait(0.1);
 			local destoryStr = `{(string.gsub(name, "[%A]*", ""))} Destroyed!`;
-			local attackers = self.Npc.Status:GetAttackers();
+			local attackers = self.Npc.Status and self.Npc.Status:GetAttackers();
 			Debugger:StudioWarn("Destroyed CustomHealthObj ", name);
 
 			modInfoBubbles.Create{

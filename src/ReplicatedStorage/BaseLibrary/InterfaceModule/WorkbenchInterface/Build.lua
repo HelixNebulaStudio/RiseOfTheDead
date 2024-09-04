@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Workbench = {};
-local Interface = {};
+local Interface = {} :: any;
 
 local TweenService = game:GetService("TweenService");
 local player = game.Players.LocalPlayer;
@@ -123,7 +123,7 @@ function Workbench.new(itemId, library, storageItem)
 		
 		if rPacket and rPacket.Success then
 			Interface.ClearSelection();
-			task.delay(0.5, function()
+			task.delay(0.2, function()
 				if Interface.ActivePage ~= "Processes" then
 					Interface.ClearSelection();
 				end

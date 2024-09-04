@@ -37,6 +37,7 @@ modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
 		Interface.ClearPages("blueprints");
 		Interface.ActiveWorkbenches.Blueprints = Interface.Workbenches.Blueprints.Workbench.new();
 		Interface.RefreshNavigations();
+		
 		Interface.SetPage(Interface.ActiveWorkbenches.Blueprints.Menu);
 	end
 	
