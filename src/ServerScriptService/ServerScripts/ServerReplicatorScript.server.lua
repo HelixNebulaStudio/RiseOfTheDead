@@ -131,21 +131,21 @@ remoteCharacterRemote.OnServerEvent:Connect(function(player, action, paramPacket
 			end
 		end
 		
-	elseif action == 2 then
+	elseif action == 2 and classPlayer then
 		local platformModel, groundPart = unpack(paramPacket);
 		local dynamicPlatformModel = typeof(platformModel) == "Instance" and platformModel:IsA("Model") and platformModel or nil;
 		
 		classPlayer.DynamicPlatform = dynamicPlatformModel;
 		classPlayer.GroundPart = groundPart;
 		
-	elseif action == 3 then
+	elseif action == 3 and classPlayer then
 		-- climbing
 		classPlayer.IsClimbing = paramPacket == true;
 		
-	elseif action == 4 then
+	elseif action == 4 and classPlayer then
 		classPlayer.IsSwimming = paramPacket == true;
 
-	elseif action == 5 then -- excess velocity;
+	elseif action == 5 and classPlayer then -- excess velocity;
 		local playerVelocity = paramPacket;
 		
 		if playerVelocity >= 100 and modConfigurations.VelocityTriggerRagdoll == true then
