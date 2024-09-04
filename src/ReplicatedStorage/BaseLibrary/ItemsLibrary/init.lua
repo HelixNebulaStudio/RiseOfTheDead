@@ -121,7 +121,9 @@ function ItemsLibrary:Init(super)
 	new(meleeBase, {Id="machete"; Name="Machete"; Icon="rbxassetid://4469866502"; Tags={"Edged Melee"}; Description="A heavy duty zombie killer, can't get far without it.";});
 	new(meleeBase, {Id="jacksscythe"; Name="Jack's Scythe"; Icon="rbxassetid://5816459861"; Tags={"Edged Melee"}; Description="Jack's very own scythe.";});
 	new(meleeBase, {Id="chainsaw"; Name="Chainsaw"; Icon="rbxassetid://7319587982"; Tags={"Edged Melee"}; Description="Cutting through zombies has never been easier.";});
-
+	new(meleeBase, {Id="fireaxe"; Name="Fire Axe"; Icon="rbxassetid://12865194088"; Tags={"Edged Melee"}; Description="Not exactly an axe on fire. 66% chance to ignite enemies for 5 seconds dealing 50 x Stack + 1% of enemy's Current Health.";});
+	new(meleeBase, {Id="megaswitchblade"; Name="Mega Switchblade"; Icon="rbxassetid://111485795155248"; Tags={"Edged Melee"}; Description="Just a very big switchblade.";});
+	
 	new(meleeBase, {Id="spikedbat"; Name="Spiked Bat"; Icon="rbxassetid://4600968105"; Tags={"Blunt Melee"}; Description="Time to hit some home runs on these zombies.";});
 	new(meleeBase, {Id="crowbar"; Name="Crowbar"; Icon="rbxassetid://4843541333"; Tags={"Blunt Melee"}; Description="A handy tool to break free.";});
 	new(meleeBase, {Id="sledgehammer"; Name="Sledgehammer"; Icon="rbxassetid://5175332306"; Tags={"Blunt Melee"}; Description="A construction grade sledgehammer.";});
@@ -132,8 +134,6 @@ function ItemsLibrary:Init(super)
 	new(meleeBase, {Id="broomspear"; Name="Broom Spear"; Icon="rbxassetid://5120882769"; Tags={"Pointed Melee"; "Throwable"}; Description="Chipped out from a broom stick.";});
 	new(meleeBase, {Id="boomerang"; Name="Boomerang"; Icon="rbxassetid://17763515915"; Tags={"Pointed Melee"; "Throwable"}; Description="A light weight sharp tip boomerang. Has built-in ricochet when thrown.";});
 	
-	new(meleeBase, {Id="fireaxe"; Name="Fire Axe"; Icon="rbxassetid://12865194088"; Tags={"Edged Melee"}; Description="Not exactly an axe on fire. 66% chance to ignite enemies for 5 seconds dealing 50 x Stack + 1% of enemy's Current Health.";});
-
 	new(meleeBase, {Id="inquisitorssword"; Name="The Inquisitor's Sword"; Icon="rbxassetid://12163013682"; Tradable=super.Tradable.Nontradable; Tags={"Edged Melee"; "Unobtainable"}; Description="The Inquisitor's Sword, earned by contributing to the inquisition of bugs and testing in Rise of the Dead.";});
 	new(meleeBase, {Id="tankerrebar"; Name="Tanker's Rebar"; Icon="rbxassetid://16798723165"; Tradable=super.Tradable.Nontradable; Tags={"Blunt Melee"; "Unobtainable"}; Description="Rebar with a slab of concrete stuck to its end. Used by the Tanker.";});
 
