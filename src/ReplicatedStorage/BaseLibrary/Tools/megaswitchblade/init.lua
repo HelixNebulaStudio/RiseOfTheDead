@@ -58,7 +58,7 @@ function toolPackage.NewToolLib(handler)
 		StaminaCost = 28;
 		StaminaDeficiencyPenalty = 0.6;
 
-		BleedDamagePercent=0.1;
+		BleedDamagePercent=0.2;
 		BleedSlowPercent=0.2;
 	};
 

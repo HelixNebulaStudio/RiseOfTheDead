@@ -43,6 +43,8 @@ if RunService:IsServer() then
 end
 if RunService:IsClient() then
 	lazyLoader:ConnectOnClientLoad(function(key: string, sound: Sound)
+		if sound == nil then return end;
+		
 		key = tostring(key);
 		local audioInstance = Library[key];
 		if audioInstance then return end;

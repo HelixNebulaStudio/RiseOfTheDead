@@ -122,7 +122,7 @@ function ItemsLibrary:Init(super)
 	new(meleeBase, {Id="jacksscythe"; Name="Jack's Scythe"; Icon="rbxassetid://5816459861"; Tags={"Edged Melee"}; Description="Jack's very own scythe.";});
 	new(meleeBase, {Id="chainsaw"; Name="Chainsaw"; Icon="rbxassetid://7319587982"; Tags={"Edged Melee"}; Description="Cutting through zombies has never been easier.";});
 	new(meleeBase, {Id="fireaxe"; Name="Fire Axe"; Icon="rbxassetid://12865194088"; Tags={"Edged Melee"}; Description="Not exactly an axe on fire. <b>Passive:</b> 66% chance to ignite enemies for 5 seconds dealing 50 x Stack + 1% of enemy's Current Health.";});
-	new(meleeBase, {Id="megaswitchblade"; Name="Mega Switchblade"; Icon="rbxassetid://111485795155248"; Tags={"Edged Melee"; "Blunt Melee";}; Description="Just a very big switchblade. <b>Active:</b> ";});
+	new(meleeBase, {Id="megaswitchblade"; Name="Mega Switchblade"; Icon="rbxassetid://111485795155248"; Tags={"Edged Melee"; "Blunt Melee";}; Description="Just a very big switchblade. <b>Active:</b> Switch between <b>Edged Melee</b> and <b>Blunt Melee</b>.";});
 	
 	new(meleeBase, {Id="spikedbat"; Name="Spiked Bat"; Icon="rbxassetid://4600968105"; Tags={"Blunt Melee"}; Description="Time to hit some home runs on these zombies.";});
 	new(meleeBase, {Id="crowbar"; Name="Crowbar"; Icon="rbxassetid://4843541333"; Tags={"Blunt Melee"}; Description="A handy tool to break free.";});

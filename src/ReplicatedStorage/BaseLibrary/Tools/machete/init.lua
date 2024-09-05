@@ -33,6 +33,7 @@ local modMeleeProperties = require(game.ReplicatedStorage.Library.Tools.MeleePro
 function toolPackage.NewToolLib(handler)
 	local Tool = {};
 	Tool.Class = "Melee";
+	Tool.Category = "Edged";
 	
 	Tool.Holster = {
 		RightSwordAttachment={PrefabName="machete";};
@@ -54,6 +55,9 @@ function toolPackage.NewToolLib(handler)
 
 		StaminaCost = 13;
 		StaminaDeficiencyPenalty = 0.6;
+
+		BleedDamagePercent=0.1;
+		BleedSlowPercent=0.1;
 	};
 
 	Tool.Properties = {

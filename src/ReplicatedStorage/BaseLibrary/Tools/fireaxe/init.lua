@@ -24,6 +24,7 @@ local modMeleeProperties = require(game.ReplicatedStorage.Library.Tools.MeleePro
 function toolPackage.NewToolLib(handler)
 	local Tool = {};
 	Tool.Class = "Melee";
+	Tool.Category = "Edged";
 
 	Tool.Configurations = {
 		Type="Sword";
@@ -42,6 +43,9 @@ function toolPackage.NewToolLib(handler)
 		StaminaCost = 18;
 		StaminaDeficiencyPenalty = 0.8;
 		
+		BleedDamagePercent=0.1;
+		BleedSlowPercent=0.2;
+
 		SpecialStats = {
 			IgnitionChance = 0.66;
 		};

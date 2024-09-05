@@ -35,6 +35,7 @@ local modMeleeProperties = require(game.ReplicatedStorage.Library.Tools.MeleePro
 function toolPackage.NewToolLib(handler)
 	local Tool = {};
 	Tool.Class = "Melee";
+	Tool.Category = "Edged";
 
 	Tool.Holster = {
 		RightSwordAttachment={PrefabName="inquisitorssword"; Offset=CFrame.new(-0.600000024, -0.200000003, 0.5, -0.256916583, 0.344730973, 0.902859032, -0.383022249, 0.821393788, -0.42261824, -0.887292385, -0.454392731, -0.0789900571);}; -- Use `Offset` attribute to adjust
@@ -56,6 +57,9 @@ function toolPackage.NewToolLib(handler)
 
 		StaminaCost = 10;
 		StaminaDeficiencyPenalty = 0.8;
+
+		BleedDamagePercent=0.3;
+		BleedSlowPercent=0.3;
 	};
 
 	Tool.Properties = {

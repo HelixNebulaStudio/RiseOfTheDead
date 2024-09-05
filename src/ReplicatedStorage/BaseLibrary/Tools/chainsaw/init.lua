@@ -31,6 +31,7 @@ local modMeleeProperties = require(game.ReplicatedStorage.Library.Tools.MeleePro
 function toolPackage.NewToolLib(handler)
 	local Tool = {};
 	Tool.Class = "Melee";
+	Tool.Category = "Edged";
 
 	Tool.Configurations = {
 		Type="Chainsaw";
@@ -47,6 +48,9 @@ function toolPackage.NewToolLib(handler)
 
 		StaminaCost = 6;
 		StaminaDeficiencyPenalty = 0.8;
+		
+		BleedDamagePercent=0.1;
+		BleedSlowPercent=0.4;
 	};
 
 	Tool.Properties = {
