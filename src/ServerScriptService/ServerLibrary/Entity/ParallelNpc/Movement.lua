@@ -51,6 +51,7 @@ function Movement.new(parallelNpc)
 	local humanoid: Humanoid = self.ParallelNpc.Humanoid;
 	local rootPart: BasePart = self.ParallelNpc.RootPart;
 	local moveSpeed = self.ParallelNpc.MoveSpeed;
+	local moveSpeedPercent = 1;
 	local prefabHeight = prefab:GetExtentsSize().Y;
 
 	local stuckTick = tick();
@@ -341,7 +342,7 @@ function Movement.new(parallelNpc)
 		end
 		deltaRootPos = rootPosition;
 
-		walkSpeed = math.clamp(moveSpeed:Get(), 0, 64);
+		walkSpeed = math.clamp(moveSpeed:Get() * moveSpeedPercent, 0, 64);
 
 		if self.FacePart then
 			self.FacePosition = self.FacePart.Position;
@@ -621,14 +622,18 @@ function Movement.new(parallelNpc)
 		local action, id, value, priority, expire = 
 			packet.Action, packet.Id, packet.Value, packet.Priority, packet.Expire;
 		
+		moveSpeedPercent = packet.MoveSpeedPercent;
+
 		if action == "set" then
 			moveSpeed:Set(id, value, priority, expire);
 
 		elseif action == "remove" then
 			moveSpeed:Remove(id);
 			
+		elseif action == "update" then
+			
 		else
-			Debugger:Warn("Unknown SetMoveSpeed action", action);
+			Debugger:StudioWarn("Unknown SetMoveSpeed action", action);
 			
 		end
 		

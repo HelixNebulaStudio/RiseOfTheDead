@@ -133,7 +133,12 @@ function LayeredVariable:Set(id, value, priority, expireDuration)
 	end
 	
 	if not exist then
-		table.insert(self.Table, {Id=id; Value=value; Order=priority or 0; Expire=(expireDuration and tick()+expireDuration or nil);});
+		table.insert(self.Table, {
+			Id=id; 
+			Value=value; 
+			Order=priority or 0; 
+			Expire=(expireDuration and tick()+expireDuration or nil);
+		});
 		self.Dirty=true;
 	end
 	

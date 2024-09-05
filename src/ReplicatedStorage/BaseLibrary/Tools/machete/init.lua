@@ -35,7 +35,7 @@ function toolPackage.NewToolLib(handler)
 	Tool.Class = "Melee";
 	
 	Tool.Holster = {
-		RightSwordAttachment={PrefabName="megaswitchblade";};
+		RightSwordAttachment={PrefabName="machete";};
 	}
 
 	Tool.Configurations = {
@@ -43,8 +43,8 @@ function toolPackage.NewToolLib(handler)
 		EquipLoadTime=1;
 		BaseDamage=240;
 
-		PrimaryAttackSpeed=0.8;
-		PrimaryAttackAnimationSpeed=0.35;
+		PrimaryAttackSpeed=1;
+		PrimaryAttackAnimationSpeed=0.4;
 
 		HeavyAttackMultiplier=1.75;
 		HeavyAttackSpeed=1.4;

@@ -81,7 +81,6 @@ function ToolHandler:KeyToggleSpecial(inputData)
 				modsModule.OnActivate(self);
 			end
 		else
-			--storageOfWeapon:SyncItem(storageItemModID);
 			storageItemOfMod:Sync();
 			
 			Debugger:Warn("Active or on cooldown.", (lastActiveTime + cooldownDuration) - unixTime);

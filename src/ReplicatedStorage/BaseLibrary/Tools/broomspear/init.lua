@@ -35,6 +35,7 @@ local modMeleeProperties = require(game.ReplicatedStorage.Library.Tools.MeleePro
 function toolPackage.NewToolLib(handler)
 	local Tool = {};
 	Tool.Class = "Melee";
+	Tool.Category = "Pointed";
 
 	Tool.Configurations = {
 		Type="Spear";

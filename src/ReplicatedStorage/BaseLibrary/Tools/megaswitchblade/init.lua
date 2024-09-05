@@ -33,6 +33,7 @@ local modMeleeProperties = require(game.ReplicatedStorage.Library.Tools.MeleePro
 function toolPackage.NewToolLib(handler)
 	local Tool = {};
 	Tool.Class = "Melee";
+	Tool.Category = "Edged";
 	
 	Tool.Holster = {
 		RightSwordAttachment={PrefabName="megaswitchblade";};
@@ -41,19 +42,24 @@ function toolPackage.NewToolLib(handler)
 	Tool.Configurations = {
 		Type="Sword";
 		EquipLoadTime=1;
-		BaseDamage=240;
+		BaseDamage=250;
 
 		PrimaryAttackSpeed=0.8;
 		PrimaryAttackAnimationSpeed=0.35;
 
-		HeavyAttackMultiplier=1.75;
+		HeavyAttackMultiplier=3.45;
 		HeavyAttackSpeed=1.4;
-		HitRange=12.5;
+		HitRange=14;
+
+		BaseKnockback=80;
 
 		WaistRotation=math.rad(0);
 
-		StaminaCost = 13;
+		StaminaCost = 28;
 		StaminaDeficiencyPenalty = 0.6;
+
+		BleedDamagePercent=0.1;
+		BleedSlowPercent=0.2;
 	};
 
 	Tool.Properties = {

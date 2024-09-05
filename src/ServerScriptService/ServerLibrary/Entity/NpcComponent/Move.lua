@@ -189,6 +189,7 @@ function Move:SetMoveSpeed(action, id, value, priority, expire)
 
 	self.Npc:SendActorMessage("SetMoveSpeed", {
 		Initials=self.Initials;
+		MoveSpeedPercent=self.MoveSpeedPercent;
 		
 		Action=action;
 		Id=id;
@@ -249,6 +250,7 @@ function Move.new(self)
 		PathAgent=self.PathAgent;
 		SmartNpc=(self.Humanoid.Name == "Human");
 	}
+	moveObject.MoveSpeedPercent = 1;
 	
 	moveObject.IsMoving = false;
 	moveObject.Npc.Humanoid:SetAttribute("IsMoving", self.IsMoving);

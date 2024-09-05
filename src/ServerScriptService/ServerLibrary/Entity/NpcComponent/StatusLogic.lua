@@ -21,7 +21,7 @@ function StatusLogic.new(self)
 		local entityStatus = self.EntityStatus;
 		
 		local ragdollStatus, hijackedStatus, stunStatus;
-		local slowValue;
+		local slowValue, slowPercent;
 		
 		for k, v in pairs(entityStatus.List) do
 			local status = v;
@@ -35,8 +35,12 @@ function StatusLogic.new(self)
 			end
 			
 			if typeof(v) ~= "table" then continue end;
+
 			if status.SlowValue and (slowValue == nil or status.SlowValue < slowValue) then
 				slowValue = status.SlowValue;
+			end
+			if status.SlowPercent and (slowPercent == nil or status.SlowPercent > slowPercent) then
+				slowPercent = status.SlowPercent 
 			end
 			if status.Ragdoll then
 				ragdollStatus = status;
@@ -47,6 +51,16 @@ function StatusLogic.new(self)
 		end
 		
 		--==
+		
+		if slowPercent and slowPercent > 0 then
+			self.Move.MoveSpeedPercent = 1-math.clamp(slowPercent, 0, 1);
+		else
+			if self.Move.MoveSpeedPercent ~= 1 then
+				self.Move.MoveSpeedPercent = 1;
+				self.Move:SetMoveSpeed("update");
+			end
+			self.Move.MoveSpeedPercent = 1;
+		end
 		
 		if slowValue then
 			self.SlowFlag = true;

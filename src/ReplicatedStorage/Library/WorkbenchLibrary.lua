@@ -471,7 +471,12 @@ WorkbenchLibrary.ItemUpgrades={
 		Type={"Edged Melee"; "Melee"};
 	};
 	["boomerang"]={
+		Tier=3;
 		Type={"Pointed Melee"; "Melee"};
+	};
+	["megaswitchblade"]={
+		Tier=3;
+		Type={"Edged Melee"; "Blunt Melee"; "Melee"};
 	};
 	
 	--== Clothing

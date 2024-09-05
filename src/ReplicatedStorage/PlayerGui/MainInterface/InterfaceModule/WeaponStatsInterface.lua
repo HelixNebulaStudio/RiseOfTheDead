@@ -71,7 +71,8 @@ local statTemplates = {
 		{Category="Configurations"; Tag="VelocityBonus"; Text="<b>Charge Velocity Bonus:</b>    $stat u/s"; Type="2dp";};
 		{Category="Configurations"; Tag="ChargeDuration"; Text="<b>Charge Time:</b>    $stats"; Type="2dp";};
 
-		
+		{Category="Configurations"; Tag="BleedDamagePercent"; Text="<b>Bleed Damage Percent:</b>    $stat%"; Type="percent";};
+		{Category="Configurations"; Tag="BleedSlowPercent"; Text="<b>Bleed Slow Percent:</b>    $stat%"; Type="percent";};
 	};
 	--MARK: Weapon stats;
 	Weapon={
@@ -285,7 +286,12 @@ local mouseOverDescription = {
 	ChargeDuration={
 		Desc="The time it takes to fully charge your throws.\n\n(Lower is better)";
 	};
-	
+	BleedDamagePercent={
+		Desc="Edged melee applies a bleed debuff on hit. Bleed damage is a percentage of the melee damage.";
+	};
+	BleedSlowPercent={
+		Desc="Bleed debuff applies a slow by percentage.";
+	};
 
 	--MARK: Clothings desc;
 	HotEquipSlots={

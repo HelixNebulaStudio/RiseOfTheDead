@@ -335,7 +335,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 				
 			end
 			
-			if configurations.HeavyAttackSpeed then
+			if configurations.HeavyAttackSpeed and toolConfig.Category == "Edged" then
 				local charge = 0;
 				local maxCharged = false;
 				repeat
@@ -367,6 +367,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 					animations["HeavyAttack"]:Stop();
 					primaryAttack();
 				end
+				
 			else
 				local comboIndex;
 				if configurations.Combos then

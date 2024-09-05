@@ -13,6 +13,7 @@ end
 function MeleeConfigurations.new(modMelee)
 	modMelee.__index = modMelee;
 	modMelee.Class = "Melee";
+	modMelee.Category = "Edged";
 	
 	local self = {
 		Configurations = {};

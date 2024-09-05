@@ -72,28 +72,83 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 			
 			if self.Player and damagableObj:CanTakeDamageFrom(self.Player) then
 				
-				if npcModule and npcModule.KnockbackResistant == nil or npcModule.KnockbackResistant == 0 then
-					local knockbackStrength = configurations.Knockback or configurations.BaseKnockback;
-					if knockbackStrength and damage > 0 then
-						local rootPart = model.PrimaryPart;
-						local playerRootPart = self.Character and self.Character.PrimaryPart;
-						if rootPart and playerRootPart then
-							rootPart.Velocity = (playerRootPart.CFrame.LookVector * knockbackStrength) + Vector3.new(0, 40, 0);
+				if self.ToolConfig.Category == "Blunt" then
+					if npcModule and npcModule.KnockbackResistant == nil or npcModule.KnockbackResistant == 0 then
+						local knockbackStrength = configurations.Knockback or configurations.BaseKnockback;
+						if knockbackStrength and damage > 0 then
+							local rootPart = model.PrimaryPart;
+							local playerRootPart = self.Character and self.Character.PrimaryPart;
+							if rootPart and playerRootPart then
+								rootPart.Velocity = (playerRootPart.CFrame.LookVector * knockbackStrength) + Vector3.new(0, 40, 0);
+							end
+						end
+	
+						local knockoutDuration = configurations.KnockoutDuration or configurations.BaseKnockoutDuration;
+						if knockoutDuration and damage > 0 then
+							local healthInfo = damagable:GetHealthInfo();
+							if healthInfo.Armor <= 0 then
+								npcModule.EntityStatus:GetOrDefault("meleeKnockout", {
+									Ragdoll=true;
+									Expires=tick()+knockoutDuration;
+								});
+								
+							end
 						end
 					end
 
-					local knockoutDuration = configurations.KnockoutDuration or configurations.BaseKnockoutDuration;
-					if knockoutDuration and damage > 0 then
+				elseif self.ToolConfig.Category == "Edged" then
+					if npcModule and npcModule.BleedResistant == nil or npcModule.BleedResistant == 0 then
 						local healthInfo = damagable:GetHealthInfo();
 						if healthInfo.Armor <= 0 then
-							npcModule.EntityStatus:GetOrDefault("meleeKnockout", {
-								Ragdoll=true;
-								Expires=tick()+knockoutDuration;
+							if npcModule.EntityStatus:GetOrDefault("meleeBleed") == nil then
+								task.spawn(function()
+									while true do
+										task.wait(1);
+
+										local statusData = npcModule.EntityStatus:GetOrDefault("meleeBleed");
+										if statusData == nil then break; end;
+
+										if self.Player and damagableObj:CanTakeDamageFrom(self.Player) then
+											healthInfo = damagable:GetHealthInfo();
+
+											if healthInfo.Health <= 0 then break; end;
+
+											if self.Player and damagable:CanDamage(self.Player) == false then continue end;
+											if self.NpcModule and damagable:CanDamage(self.NpcModule) == false then continue end;
+											
+											modDamageTag.Tag(model, self.Character, (hitPart.Name == "Head" or hitPart:GetAttribute("IsHead") == true) and true or nil);
+											
+											local bleedDamage = math.ceil(damage * (configurations.BleedDamagePercent or 0.05));
+
+											local newDmgSrc = modDamagable.NewDamageSource{
+												Damage=bleedDamage;
+												DamageType="BleedDamage";
+												Dealer=self.Player;
+												ToolStorageItem=self.StorageItem;
+												TargetPart=hitPart;
+												DamageCate=modDamagable.DamageCategory.Melee;
+											}
+											if self.Player == nil then
+												newDmgSrc.Dealer = self.Character;
+											end
+											damagable:TakeDamagePackage(newDmgSrc);
+
+										end
+
+									end
+								end)
+							end
+							npcModule.EntityStatus:GetOrDefault("meleeBleed", {
+								SlowPercent=(configurations.BleedSlowPercent or 0.1);
+								Expires=tick()+5;
 							});
 							
 						end
+
 					end
+
 				end
+
 			end
 			
 		else
@@ -356,6 +411,14 @@ function ToolHandler:OnInputEvent(inputData)
 			self.ToolConfig.OnInputEvent(self, inputData);
 		end
 	end
+end
+
+function ToolHandler:KeyToggleSpecial(inputData)
+	local player = self.Player;
+	local weaponStorageItemID = self.StorageItem.ID;
+
+	Debugger:Warn("inputData", inputData);
+
 end
 
 function ToolHandler.new(player, storageItem, toolPackage, toolModels)
