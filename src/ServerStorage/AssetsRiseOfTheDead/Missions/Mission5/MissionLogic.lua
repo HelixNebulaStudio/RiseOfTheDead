@@ -11,7 +11,9 @@ local modGuiHighlight = require(game.ReplicatedStorage.Library.UI.GuiHighlight);
 local missionId = 5;
 -- MARK: IsServer()
 if RunService:IsServer() then
-	if not modBranchConfigs.IsWorld("TheWarehouse") then return {}; end;
+	if not RunService:IsStudio() then
+		if not modBranchConfigs.IsWorld("TheWarehouse") then return {}; end;
+	end
 
 	local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 	local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
@@ -40,11 +42,7 @@ if RunService:IsServer() then
 
 		modMission:Progress(player, missionId, function(mission)
 			if mission.ProgressionPoint == 2 or mission.ProgressionPoint == 3 then
-				if fulfilled then
-					mission.ProgressionPoint = 4;
-				else
-					mission.ProgressionPoint = 3;
-				end
+
 				modAnalyticsService:LogOnBoarding{
 					Player=player;
 					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_CheckBlueprintCost;

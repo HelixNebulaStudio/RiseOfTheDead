@@ -16,7 +16,7 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modAchievementLibrary = require(game.ReplicatedStorage.Library.AchievementLibrary);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
@@ -39,6 +39,8 @@ local remoteHudNotification = modRemotesManager:Get("HudNotification");
 local libAuthTree = modSkillTreeLibrary.Authority:GetSorted();
 local libEnduTree = modSkillTreeLibrary.Endurance:GetSorted();
 local libSyneTree = modSkillTreeLibrary.Synergy:GetSorted();
+
+SaveData.OnPlayerStatChanged = modEventSignal.new("OnPlayerStatChanged");
 
 --== Script;
 function SaveData.new(profile)
@@ -434,6 +436,8 @@ function SaveData:AddStat(key, amount, force)
 	end
 	
 	self:Sync("Stats/"..key);
+
+	SaveData.OnPlayerStatChanged:Fire(self, key, amount, force);
 
 	return amount;
 end

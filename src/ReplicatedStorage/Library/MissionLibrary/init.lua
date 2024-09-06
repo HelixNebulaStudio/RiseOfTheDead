@@ -282,13 +282,17 @@ MissionLibrary.New{
 	Checkpoint={
 		{Text="Use the workbench in the Warehouse";};
 		{Text="Check the requirements for to build a Pistol Damage Mod";};
-		{Text="Collect items to build Pistol Damage Mod";};
+		{Text="Kill Zombies and Sell items to obtain"; CompleteText="Build the Pistol Damage Mod"; Objectives={"Item1"; "Item2"};};
 		{Text="Build the Pistol Damage Mod";};
 		{Text="Wait for the mod to build";};
 
 		{Text="Collect the Pistol Damage Mod from the workbench"; Notify=true;};
 		{Text="Add the mod to your weapon using the workbench";};
 		{Text="Upgrade the mod's damage by selecting the mod on the workbench";};
+	};
+	Objectives={
+		["Item1"]={Index=1; Description="$Amount Metal Scraps"; Type="RequireItem"; ItemId="metal"; Amount=10;};
+		["Item2"]={Index=1; Description="$$Amount"; Type="RequireStat"; StatName="Money"; Amount=60;};
 	};
 	GuideText="Talk to Mason to learn how to upgrade your weapons";
 	Rewards={

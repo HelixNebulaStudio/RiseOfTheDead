@@ -1634,11 +1634,23 @@ function Interface.init(modInterface)
 									newTask.Parent = pinnedTasklist;
 
 									if missionData.ObjectivesCompleted[objectiveId] == true then
-										taskStr = "<s>"..taskStr.."</s>"
+										taskStr = `<s>{taskStr}</s>`;
 									else
 										incomplete = true;
 									end
 									newTask.Text = "• "..taskStr;
+								end
+
+								if checkpointInfo.Text then
+									local newTask = taskTemplate:Clone();
+									newTask.LayoutOrder = 0;
+									newTask.Parent = pinnedTasklist;
+									
+									if not incomplete then
+										newTask.Text = `<s>{checkpointInfo.Text}</s>`;
+									else
+										newTask.Text = checkpointInfo.Text;
+									end
 								end
 
 								pinnedTasklist.Visible = true;

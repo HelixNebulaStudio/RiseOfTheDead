@@ -722,6 +722,21 @@ function Mission.NewList(profile, gameSave, syncFunc)
 						
 					end
 					updated = true;
+
+				elseif objective.Type == "RequireStat" then
+					local statName = objective.StatName;
+					local amount = objective.Amount;
+
+					local statVal = playerSave:GetStat(statName);
+					if statVal and statVal >= amount then
+						mission.ObjectivesCompleted[objectiveId] = true;
+
+					else
+						mission.ObjectivesCompleted[objectiveId] = false;
+
+					end
+					updated = true;
+
 				end
 				
 				if mission.ObjectivesCompleted[objectiveId] == nil then
@@ -1285,6 +1300,17 @@ function Mission.NewList(profile, gameSave, syncFunc)
 
 				return;
 			end);
+
+			local cooldown = tick();
+			playerSave.OnPlayerStatChanged:Connect(function()
+				if tick()-cooldown <= 1 then return end;
+				cooldown = tick();
+
+				if listMeta.Player == nil then return true end;
+				listMeta:UpdateObjectives();
+
+				return;
+			end)
 		end
 		listMeta:UpdateObjectives();
 	end
