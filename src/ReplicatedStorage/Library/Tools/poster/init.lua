@@ -106,21 +106,22 @@ return function(handler)
 	
 	rayParam.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain; workspace.Interactables};
 	
-	function Tool:OnInputEvent(inputData)
+	function Tool.OnInputEvent(toolHandler, inputData)
 		if inputData.InputType ~= "Begin" then return end;
 		
-		local classPlayer = shared.modPlayers.Get(self.Player);
+		local toolConfig = toolHandler.ToolConfig;
+		local classPlayer = shared.modPlayers.Get(toolHandler.Player);
 		if RunService:IsClient() then
 			if inputData.KeyIds.KeyFire then
-				local modData = require(self.Player:WaitForChild("DataModule"));
+				local modData = require(toolHandler.Player:WaitForChild("DataModule"));
 				local modCharacter = modData:GetModCharacter();
 			
 				local mouseProperties = modCharacter.MouseProperties;
 				
-				inputData.IsActive = self.IsActive;
+				inputData.IsActive = toolConfig.IsActive;
 				
-				if self.IsActive then
-					local toolModel = self.Prefab;
+				if toolConfig.IsActive then
+					local toolModel = toolHandler.Prefab;
 					
 					local placementHighlight;
 					local colorPlaceable, colorInvalid = Color3.fromRGB(131, 255, 135), Color3.fromRGB(255, 90, 93);
@@ -156,7 +157,7 @@ return function(handler)
 					end
 					
 					task.spawn(function()
-						while self.IsActive do
+						while toolConfig.IsActive do
 							local mouseOrigin=mouseProperties.Focus.p;
 							local mouseDirection=mouseProperties.Direction;
 							
@@ -191,10 +192,10 @@ return function(handler)
 								placementHighlight.Parent = workspace.CurrentCamera;
 								
 								if distance <= 25 then
-									self.PosterCFrame = placeCf;
+									toolConfig.PosterCFrame = placeCf;
 									setHighlightColor(colorPlaceable);
 								else
-									self.PosterCFrame = nil;
+									toolConfig.PosterCFrame = nil;
 									setHighlightColor(colorInvalid);
 								end
 								
@@ -210,7 +211,7 @@ return function(handler)
 					end)
 					
 				else
-					inputData.PosterCFrame = self.PosterCFrame;
+					inputData.PosterCFrame = toolConfig.PosterCFrame;
 				end
 				
 				return true;
@@ -220,11 +221,13 @@ return function(handler)
 		
 		-- Server;
 		if classPlayer and not classPlayer.IsAlive then return end;
-		self.IsActive = inputData.IsActive == true;
+		toolConfig.IsActive = inputData.IsActive == true;
 		
-		if inputData.KeyIds.KeyFire and not self.IsActive and inputData.PosterCFrame then
-			modPoster.Spawn(inputData.PosterCFrame, self.Player);
+		if inputData.KeyIds.KeyFire and not toolConfig.IsActive and inputData.PosterCFrame then
+			modPoster.Spawn(inputData.PosterCFrame, toolHandler.Player);
 		end
+		
+		return;
 	end
 	
 	

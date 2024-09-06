@@ -28,12 +28,32 @@ local toolPackage = {
 };
 
 --==
+local RunService = game:GetService("RunService");
 local modMeleeProperties = require(game.ReplicatedStorage.Library.Tools.MeleeProperties);
 
 function toolPackage.NewToolLib(handler)
 	local Tool = {};
 	Tool.Class = "Melee";
 	Tool.Category = "Edged";
+
+	Tool.SpecialToggleHint = "to toggle between Edged and Blunt.";
+
+	function Tool.OnInputEvent(toolHandler, inputData)
+		if inputData.InputType ~= "Begin" or inputData.KeyIds.KeyToggleSpecial == nil then return end;
+		
+		local toolConfig = toolHandler.ToolConfig;
+		if toolConfig.Category == "Edged" then
+			toolConfig.Category = "Blunt";
+
+		elseif toolConfig.Category == "Blunt" then
+			toolConfig.Category = "Edged";
+
+		end
+		Debugger:Warn("ToolCategory:", toolConfig.Category);
+		
+
+		return true; -- submit input to server;
+	end
 	
 	Tool.Holster = {
 		RightSwordAttachment={PrefabName="megaswitchblade";};

@@ -413,13 +413,6 @@ function ToolHandler:OnInputEvent(inputData)
 	end
 end
 
-function ToolHandler:KeyToggleSpecial(inputData)
-	local player = self.Player;
-	local weaponStorageItemID = self.StorageItem.ID;
-
-	Debugger:Warn("inputData", inputData);
-
-end
 
 function ToolHandler.new(player, storageItem, toolPackage, toolModels)
 	local self = {

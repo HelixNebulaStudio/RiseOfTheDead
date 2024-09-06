@@ -15,7 +15,7 @@ local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modUsableItems = require(game.ReplicatedStorage.Library.UsableItems);
-local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem); 
+local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem) :: any; 
 
 local modProfile = shared.modProfile;
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);

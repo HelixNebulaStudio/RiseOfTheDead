@@ -21,11 +21,11 @@ return function()
 	local ladderPrefab = game.ReplicatedStorage.Prefabs.Objects.Ladder;
 	local prefabSize = ladderPrefab:GetExtentsSize();
 	
-	function Tool:OnInputEvent(inputData)
+	function Tool.OnInputEvent(toolHandler, inputData)
 		local maxLadderRange = 24;
 		if inputData.InputType ~= "Begin" then return end;
 		
-		local classPlayer = shared.modPlayers.Get(self.Player);
+		local classPlayer = shared.modPlayers.Get(toolHandler.Player);
 		
 		local groundCFrame;
 		local function getGroundCFrame()
@@ -35,19 +35,19 @@ return function()
 		end
 		getGroundCFrame();
 		
-		
+		local toolConfig = toolHandler.ToolConfig;
 		if RunService:IsClient() then
 			if inputData.KeyIds.KeyFire then
-				local modData = require(self.Player:WaitForChild("DataModule"));
+				local modData = require(toolHandler.Player:WaitForChild("DataModule"));
 				local modCharacter = modData:GetModCharacter();
 			
 				local mouseProperties = modCharacter.MouseProperties;
 				
-				inputData.IsActive = self.IsActive;
+				inputData.IsActive = toolConfig.IsActive;
 				
-				if self.IsActive then
+				if toolConfig.IsActive then
 					
-					local toolModel = self.Prefab;
+					local toolModel = toolHandler.Prefab;
 					
 					local placementHighlight, highlightDescendants;
 					local colorPlaceable, colorInvalid = Color3.fromRGB(131, 255, 135), Color3.fromRGB(255, 90, 93);
@@ -90,7 +90,7 @@ return function()
 					
 					task.spawn(function()
 						local lastStrech = 0;
-						while self.IsActive do
+						while toolConfig.IsActive do
 							local groundCFrame = getGroundCFrame();
 							
 							local mouseOrigin=mouseProperties.Focus.p;
@@ -153,10 +153,10 @@ return function()
 								lastStrech = strechCount;
 								
 								if distance <= maxLadderRange then
-									self.TargetPosition = rayPos;
+									toolConfig.TargetPosition = rayPos;
 									setHighlightColor(colorPlaceable);
 								else
-									self.TargetPosition = nil;
+									toolConfig.TargetPosition = nil;
 									setHighlightColor(colorInvalid);
 								end
 								
@@ -173,7 +173,7 @@ return function()
 					end)
 					
 				else
-					inputData.TargetPosition = self.TargetPosition;
+					inputData.TargetPosition = toolConfig.TargetPosition;
 					
 				end
 				
@@ -185,17 +185,17 @@ return function()
 		-- Server;
 		--===
 		if classPlayer and not classPlayer.IsAlive then return end;
-		self.IsActive = inputData.IsActive == true;
+		toolConfig.IsActive = inputData.IsActive == true;
 		
 		maxLadderRange = maxLadderRange +2;
 		
 		if inputData.KeyIds.KeyFire then
-			local toolModel = self.Prefabs[1];
+			local toolModel = toolHandler.Prefabs[1];
 			
 			local placed = false;
-			if self.IsActive then
-				if self.PropModel then
-					for _, obj in pairs(self.PropModel:GetChildren()) do
+			if toolConfig.IsActive then
+				if toolConfig.PropModel then
+					for _, obj in pairs(toolConfig.PropModel:GetChildren()) do
 						if obj.Name == "ladderProp" then
 							Debugger.Expire(obj, 0);
 						end
@@ -215,22 +215,22 @@ return function()
 										* CFrame.Angles(math.rad(90), 0, 0)
 										* CFrame.new(0, -prefabSize.Y/2, 0);
 						
-						if self.PropModel == nil then
-							self.PropModel = Instance.new("Model");
-							self.PropModel.Name = self.Player.Name.."_ladder";
-							Debugger.Expire(self.PropModel, 300);
+						if toolConfig.PropModel == nil then
+							toolConfig.PropModel = Instance.new("Model");
+							toolConfig.PropModel.Name = toolHandler.Player.Name.."_ladder";
+							Debugger.Expire(toolConfig.PropModel, 300);
 							
 							local conn
 							conn = toolModel:GetPropertyChangedSignal("Parent"):Connect(function()
-								Debugger.Expire(self.PropModel, 0);
-								self.PropModel = nil;
+								Debugger.Expire(toolConfig.PropModel, 0);
+								toolConfig.PropModel = nil;
 								conn:Disconnect();
 							end)
 							
 							
-							local profile = shared.modProfile:Get(self.Player);
+							local profile = shared.modProfile:Get(toolHandler.Player);
 							if profile and profile.Junk and profile.Junk.CacheInstances then
-								table.insert(profile.Junk.CacheInstances, self.PropModel);
+								table.insert(profile.Junk.CacheInstances, toolConfig.PropModel);
 							end
 						end
 						
@@ -240,17 +240,17 @@ return function()
 							new.PrimaryPart.Anchored = true;
 							
 							new.Name = "ladderProp";
-							new.Parent = self.PropModel;
+							new.Parent = toolConfig.PropModel;
 							
 							new:SetPrimaryPartCFrame(baseCFrame * CFrame.new(0, -prefabSize.Y * (a-1), 0));
 							
 						end
 						
-						self.PropModel.Parent = workspace.Clips;
+						toolConfig.PropModel.Parent = workspace.Clips;
 						
-						self.Garbage:Tag(function()
-							Debugger.Expire(self.PropModel, 0);
-							self.PropModel = nil;
+						toolHandler.Garbage:Tag(function()
+							Debugger.Expire(toolConfig.PropModel, 0);
+							toolConfig.PropModel = nil;
 						end)
 						
 						placed = true;
@@ -259,13 +259,13 @@ return function()
 				
 			end
 			
-			local players = modGlobalVars.GetPlayersExlude(self.Player);
+			local players = modGlobalVars.GetPlayersExlude(toolHandler.Player);
 			modReplicationManager:SetClientProperties(players, { -- sets tool properties;
-				Instances=self.Prefabs;
+				Instances=toolHandler.Prefabs;
 				ClassName={
 					BasePart={
-						CollisionGroupId=(self.IsActive and 0 or 10);
-						CanCollide=self.IsActive;
+						CollisionGroupId=(toolConfig.IsActive and 0 or 10);
+						CanCollide=toolConfig.IsActive;
 					};
 				};
 			});
@@ -277,7 +277,7 @@ return function()
 			end
 			
 		elseif inputData.KeyIds.KeyFocus then
-			if not self.IsActive then return end;
+			if not toolConfig.IsActive then return end;
 			
 			
 		end

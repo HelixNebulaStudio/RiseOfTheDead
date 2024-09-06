@@ -608,7 +608,7 @@ remoteToolInputHandler.OnServerEvent:Connect(function(player, packet)
 	
 	if action == "input"  then
 		if handler and handler.OnInputEvent then
-			handler:OnInputEvent(packet);
+			handler.OnInputEvent(handler, packet);
 			
 			if modConfigurations.RemoveForceFieldOnWeaponFire then
 				local forcefield = character:FindFirstChildWhichIsA("ForceField") or nil;

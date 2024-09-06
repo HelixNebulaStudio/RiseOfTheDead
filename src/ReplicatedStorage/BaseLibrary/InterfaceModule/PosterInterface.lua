@@ -60,7 +60,7 @@ function Interface.init(modInterface)
 				for a=1, #rPacket.List do
 					local item = rPacket.List[a];
 
-					local productInfo = {};
+					local productInfo = {} :: any;
 					pcall(function()
 						productInfo = MarketplaceService:GetProductInfo(item.ImageId, Enum.InfoType.Asset);
 					end)
@@ -76,8 +76,10 @@ function Interface.init(modInterface)
 			end
 
 			for a=1, #savedDecals do
+				if rightScrollFrame:FindFirstChild(savedDecals[a].ImageId) then continue end;
+				
 				local new = templateListingButton:Clone();
-				new.Name = "new";
+				new.Name = savedDecals[a].ImageId;
 				new.Text = (savedDecals[a].Title or "").." (".. savedDecals[a].ImageId ..")";
 
 				new.MouseMoved:Connect(function()
@@ -147,8 +149,10 @@ function Interface.init(modInterface)
 	end));
 
 	for a=1, #templateDecals do
+		if rightScrollFrame:FindFirstChild(templateDecals[a].ImageId) then continue end;
+
 		local new = templateListingButton:Clone();
-		new.Name = "templateButton";
+		new.Name = templateDecals[a].ImageId;
 		new.LayoutOrder = a;
 		new.Text = templateDecals[a].Title.." (".. templateDecals[a].ImageId ..")";
 		

@@ -1752,7 +1752,7 @@ function WeaponHandler:Equip(library, weaponId)
 		return modInfo;
 	end
 	
-	function Equipped.RightHand:OnInputEvent(inputData)
+	function Equipped.RightHand.OnInputEvent(toolHandler, inputData)
 		if inputData.InputType ~= "Begin" then return end;
 		
 		if modKeyBindsHandler:Match(inputData.InputObject, "KeyToggleSpecial") then

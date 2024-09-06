@@ -79,27 +79,28 @@ function toolPackage.NewToolLib(handler)
 	Tool.ActiveTrack = nil;
 
 
-	function Tool:OnInputEvent(inputData)
+	function Tool.OnInputEvent(toolHandler, inputData)
 		if inputData.InputType ~= "Begin" or inputData.KeyIds.KeyFire == nil then return end;
 
+		local toolConfig = toolHandler.ToolConfig;
 		if RunService:IsClient() then
 			local player = game.Players.LocalPlayer;
-			local modData = require(player:WaitForChild("DataModule"));
+			local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 			local modInterface = modData:GetInterfaceModule();
 
 			if not modInterface:IsVisible("InstrumentWindow") then
 				return;
 			end
 
-			self.IsActive = not self.IsActive;
-			inputData.IsActive = self.IsActive;
+			toolConfig.IsActive = not toolConfig.IsActive;
+			inputData.IsActive = toolConfig.IsActive;
 
 			task.spawn(function()
-				local track = self.Handle:WaitForChild("TuneMusic");
-				if self.Handle:FindFirstChild("musicConn") == nil then
+				local track = toolConfig.Handle:WaitForChild("TuneMusic");
+				if toolConfig.Handle:FindFirstChild("musicConn") == nil then
 					local newTag = Instance.new("BoolValue");
 					newTag.Name = "musicConn";
-					newTag.Parent = self.Handle;
+					newTag.Parent = toolConfig.Handle;
 
 					local lastId;
 					local function onChanged()
@@ -120,16 +121,16 @@ function toolPackage.NewToolLib(handler)
 			end)
 
 		else
-			self.IsActive = inputData.IsActive;
+			toolConfig.IsActive = inputData.IsActive;
 
-			if self.IsActive then
-				for a=1, #self.Prefabs do
-					local prefab = self.Prefabs[a];
+			if toolConfig.IsActive then
+				for a=1, #toolHandler.Prefabs do
+					local prefab = toolHandler.Prefabs[a];
 					local handle = prefab.PrimaryPart;
 
 					local sound = handle:FindFirstChild("TuneMusic");
 					local function nextTrack()
-						if self.IsActive then
+						if toolConfig.IsActive then
 							sound.SoundId = BaseTracks[Tool.Index].Id;
 							sound.Volume = 3;
 							sound:Play();
@@ -150,7 +151,7 @@ function toolPackage.NewToolLib(handler)
 					sound.Volume = 1;
 					sound.SoundGroup = game.SoundService:FindFirstChild("InstrumentMusic");
 
-					sound:SetAttribute("SoundOwner", self.Player and self.Player.Name or nil);
+					sound:SetAttribute("SoundOwner", toolHandler.Player and toolHandler.Player.Name or nil);
 					CollectionService:AddTag(sound, "PlayerNoiseSounds");
 					sound.Parent = handle;
 
@@ -164,8 +165,8 @@ function toolPackage.NewToolLib(handler)
 					break;
 				end
 			else
-				for a=1, #self.Prefabs do
-					local prefab = self.Prefabs[a];
+				for a=1, #toolHandler.Prefabs do
+					local prefab = toolHandler.Prefabs[a];
 					local handle = prefab.PrimaryPart;
 
 					if handle:FindFirstChild("musicParticle") then
@@ -184,7 +185,7 @@ function toolPackage.NewToolLib(handler)
 
 	function Tool:ClientUnequip()
 		local player = game.Players.LocalPlayer;
-		local modData = require(player:WaitForChild("DataModule"));
+		local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 		local modInterface = modData:GetInterfaceModule();
 
 		modInterface:CloseWindow("InstrumentWindow");
@@ -192,7 +193,7 @@ function toolPackage.NewToolLib(handler)
 
 	function Tool:ClientItemPrompt()
 		local player = game.Players.LocalPlayer;
-		local modData = require(player:WaitForChild("DataModule"));
+		local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 		local modInterface = modData:GetInterfaceModule();
 
 		if modInterface:IsVisible("InstrumentWindow") then return end;

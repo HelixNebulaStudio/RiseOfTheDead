@@ -34,6 +34,7 @@ local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 
 --== Remotes;
 local remoteToolPrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
+local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler");
 
 --== Vars;
 local mouseProperties = modCharacter.MouseProperties;
@@ -852,7 +853,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 	Equipped.RightHand["KeyInteract"] = Equipped.ItemPromptRequest;
 	Equipped.RightHand["KeyFire"] = PrimaryFireRequest;
 	Equipped.RightHand["KeyInspect"] = InspectRequest;
-	
+
 	if RunService:IsStudio() then
 		Equipped.RightHand["KeyWalk"] = function()
 			toggleTraj = not toggleTraj;
@@ -894,6 +895,27 @@ function ToolHandler:Equip(storageItem, toolModels)
 				end)
 			end
 		end
+
+		if Equipped.ToolConfig.SpecialToggleHint then
+			if UserInputService.KeyboardEnabled then
+				local hintString = `Press [{modKeyBindsHandler:ToString("KeyToggleSpecial")}] {Equipped.ToolConfig.SpecialToggleHint}`;
+				modInterface:HintWarning(hintString, nil, Color3.fromRGB(255, 255, 255));
+			end
+
+			if UserInputService.TouchEnabled then
+				local itemPromptButton = modInterface.TouchControls:WaitForChild("ItemPrompt");
+				local touchItemPrompt = itemPromptButton:WaitForChild("Item");
+				
+				touchItemPrompt.Image = itemLib.Icon;
+				itemPromptButton.Visible = true;
+
+				if modData.ItemPromptConn then modData.ItemPromptConn:Disconnect(); end
+				modData.ItemPromptConn = itemPromptButton.MouseButton1Click:Connect(function()
+					SpecialRequest();
+				end)
+			end
+		end
+
 	end
 
 	delay(equipTime, function()

@@ -45,6 +45,7 @@ local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler") :: Remo
 local BaseEquipped = {LeftHand={}; RightHand={}; Animations={};};
 local Equipped = modGlobalVars.CloneTable(BaseEquipped);
 Equipped.Garbage = modGarbageHandler.new();
+Equipped.Player = localPlayer;
 
 local instanceCache = {};
 --== Script;
@@ -302,7 +303,7 @@ UserInputService.InputBegan:connect(function(inputObject, inputEvent)
 				KeyCode = inputObject.KeyCode;
 			};
 			
-			local submitInput = equipment:OnInputEvent(inputData);
+			local submitInput = equipment.OnInputEvent(Equipped, inputData);
 			if submitInput then
 				
 				inputData.Action = "input";
@@ -328,7 +329,7 @@ UserInputService.InputEnded:Connect(function(inputObject, inputEvent)
 					KeyCode = inputObject.KeyCode;
 				};
 				
-				local submitInput = equipment:OnInputEvent(inputData);
+				local submitInput = equipment.OnInputEvent(Equipped, inputData);
 				if submitInput then
 					inputData.Action = "input";
 					remoteToolInputHandler:FireServer(modRemotesManager.Compress(inputData));
@@ -352,7 +353,7 @@ bindCharacterInput.Event:Connect(function(keyId, inputState) -- max rentry pass
 					KeyIds={[keyId]=true};
 				};
 				
-				local submitInput = equipment:OnInputEvent(inputData);
+				local submitInput = equipment.OnInputEvent(Equipped, inputData);
 				if submitInput then
 
 					inputData.Action = "input";

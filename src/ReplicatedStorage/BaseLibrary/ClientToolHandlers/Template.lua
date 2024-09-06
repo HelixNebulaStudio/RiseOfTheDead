@@ -191,7 +191,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 			end
 		end
 		
-		function Equipped.ToolConfig:OnInputEvent(inputData)
+		function Equipped.ToolConfig.OnInputEvent(toolHandler, inputData)
 			if inputData.KeyIds and inputData.KeyIds.KeyFocus then
 				if inputData.InputType == "Begin" then
 					modInterface:OpenWindow("EngineerPlannerWindow", self);

@@ -158,7 +158,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 		rotations = 0;
 		tilt = 0;
 		
-		function Equipped.ToolConfig:OnInputEvent(inputData)
+		function Equipped.OnInputEvent(toolHandler, inputData)
 			if inputData.InputType ~= "Begin" then return end;
 			
 			if inputData.KeyCode == Enum.KeyCode.R then
