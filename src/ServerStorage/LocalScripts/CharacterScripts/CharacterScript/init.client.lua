@@ -543,10 +543,12 @@ local function crouchRequest(value)
 	if value then
 		characterProperties.CrouchKeyDown = true;
 		crouchCooldown = tick();
+
 		if (characterProperties.IsSprinting and humanoid.WalkSpeed > characterProperties.WalkingSpeed+1) 
 			and not characterProperties.IsWalking and not characterProperties.IsSliding and (tick()-slideCooldown)>0.7
 			and not characterProperties.IsWounded then
-			
+			-- MARK: StartSlide;
+
 			slideBeginTick = tick();
 			characterProperties.CrouchKeyDown = false;
 			if slideSound then
@@ -559,10 +561,9 @@ local function crouchRequest(value)
 			dustParticle.Enabled = true;
 
 			characterProperties.IsSliding = true;
-			slideDirection = Vector3.new(rootPart.CFrame.LookVector.X, 0, rootPart.CFrame.LookVector.Z);
-			oldSlideMomentum = slideDirection*characterProperties.SlideSpeed;
-
-			
+			slideDirection = Vector3.new(rootPart.CFrame.LookVector.X, 0, rootPart.CFrame.LookVector.Z).Unit;
+			oldSlideMomentum = characterProperties.SlideSpeed;
+			slideForce.Velocity = slideDirection*oldSlideMomentum;
 
 		end
 		characterProperties.IsCrouching = true;
@@ -917,6 +918,7 @@ local function characterMoving(speed)
 	end
 end
 
+-- MARK: stopSliding
 function stopSliding(delayTime)
 	Cache.lastSlide = nil;
 	characterProperties.IsSliding = false;
@@ -926,6 +928,7 @@ function stopSliding(delayTime)
 	dustParticle.Enabled = false;
 	if animations["slide"] then animations["slide"]:Stop(); end
 	slideCooldown = tick();
+
 	delay(delayTime == nil and 0 or delayTime, function()
 		slideForce.MaxForce = Vector3.new(0, 0, 0);
 		characterProperties.SlideVelocity = Vector3.zero;
@@ -1504,7 +1507,7 @@ RunService.Stepped:Connect(function(total, delta)
 	
 	groundRayParam.FilterDescendantsInstances = environmentCollidable;
 	
-	local groundResult = nil;
+	local groundResult: RaycastResult = nil;
 	local groundHit = nil;
 	local closestDist = math.huge;
 
@@ -1526,7 +1529,6 @@ RunService.Stepped:Connect(function(total, delta)
 				groundResult = results[a];
 				closestDist = yDist;
 			end
-			
 		end
 		
 		groundHit = #results > 0 and groundResult.Instance or nil;
@@ -1539,8 +1541,10 @@ RunService.Stepped:Connect(function(total, delta)
 	
 	if groundResult then
 		characterProperties.GroundPoint = Vector3.new(rootPart.Position.X, groundResult.Position.Y, rootPart.Position.Z);
+		characterProperties.GroundNormal = groundResult.Normal;
 	else
 		characterProperties.GroundPoint = nil;
+		characterProperties.GroundNormal = Vector3.yAxis;
 	end
 	
 	if groundHit and not groundHit:IsA("Terrain") then
@@ -2084,7 +2088,7 @@ RunService.PostSimulation:Connect(function(step)
 				stopSliding();
 			end
 			
-		elseif characterProperties.IsSliding then
+		elseif characterProperties.IsSliding then -- MARK: PostSimulation IsSliding
 			if animations["slide"] then animations["slide"]:Play(); end
 			characterProperties.WalkSpeed:Set("default", 0);
 			
@@ -2096,8 +2100,25 @@ RunService.PostSimulation:Connect(function(step)
 					Enabled=true;
 				};
 				slideForce.MaxForce = Vector3.new(40000, 0, 40000);
-				slideForce.Velocity = oldSlideMomentum:Lerp(Vector3.new(),mathClamp((beatTick-slideBeginTick)/6, 0, 1));
-				oldSlideMomentum = slideForce.Velocity;
+				
+				local rootLookVector = Vector3.new(rootPart.CFrame.LookVector.X, 0, rootPart.CFrame.LookVector.Z).Unit;
+				local newSlideDirection = rootLookVector;
+				
+				local slideMomentum = oldSlideMomentum;
+
+				local slopeDot = newSlideDirection:Dot(characterProperties.GroundNormal);
+
+				local friction = 1.8;
+				if slopeDot > 0 then
+					slideMomentum = math.min(slideMomentum + slopeDot/friction, characterProperties.SlideSpeed*2);
+				else
+					slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.3) *friction;
+				end
+
+				slideForce.Velocity = newSlideDirection*math.max(slideMomentum, 0);
+				slideDirection = newSlideDirection;
+
+				oldSlideMomentum = slideMomentum;
 				
 				if Cache.lastSlide == nil then
 					Cache.lastSlide = beatTick;
@@ -2107,7 +2128,7 @@ RunService.PostSimulation:Connect(function(step)
 			
 			if characterProperties.State == Enum.HumanoidStateType.FallingDown
 				or Cache.lastSlide == nil
-				or (beatTick-Cache.lastSlide) >= 1
+				--or (beatTick-Cache.lastSlide) >= slideDuration
 				or (rootPart.AssemblyLinearVelocity*Vector3.new(1, 0, 1)).Magnitude <= 5 
 				or humanoid.Sit 
 				or humanoid.PlatformStand 

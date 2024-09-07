@@ -217,9 +217,9 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="vexgloves"; Name="Vexeron Gloves"; Icon="rbxassetid://7181328504"; Tags={"Gloves"}; Description="Gloves made with Vexeron skin, providing additional 50 max stamina.";});
 	
 	-- Shoes
-	new(clothingBase, {Id="brownleatherboots"; Name="Brown Leather Boots"; Icon="rbxassetid://4866819545"; Tags={"Shoes"}; Description="These look great on you. Reduces movement impairment debuffs by 10%.";});
-	new(clothingBase, {Id="militaryboots"; Name="Military Boots"; Icon="rbxassetid://17022087037"; Tags={"Shoes"}; Description="Military grade boots. Reduces movement impairment debuffs by 20%.";});
-	new(clothingBase, {Id="divingfins"; Name="Diving Fins"; Icon="rbxassetid://10334749462"; Tags={"Shoes"; "Diving Gear"}; Description="Improves underwater mobility.";});
+	new(clothingBase, {Id="brownleatherboots"; Name="Brown Leather Boots"; Icon="rbxassetid://4866819545"; Tags={"Shoes"}; Description="These look great on you. <b>Passive:</b> Reduces movement impairment debuffs by 10%.";});
+	new(clothingBase, {Id="militaryboots"; Name="Military Boots"; Icon="rbxassetid://17022087037"; Tags={"Shoes"}; Description="Military grade boots. <b>Passive:</b> Reduces movement impairment debuffs by 20%.";});
+	new(clothingBase, {Id="divingfins"; Name="Diving Fins"; Icon="rbxassetid://10334749462"; Tags={"Shoes"; "Diving Gear"}; Description="Swim like a fish. <b>Passive:</b> Improves underwater mobility.";});
 
 	-- Misc Wear
 	new(clothingBase, {Id="brownbelt"; Name="Tactical Belt"; Icon="rbxassetid://4789684750"; Tags={"Belt"; "Utility Wear";}; Description="A tactical belt. Adds an extra hot bar slot.";});

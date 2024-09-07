@@ -106,6 +106,7 @@ if RunService:IsClient() then
 			
 			GroundObject=nil;
 			GroundPoint=Vector3.zero;
+			GroundNormal=Vector3.yAxis;
 			
 			ViewModelSwayX=0;
 			ViewModelSwayY=0;
