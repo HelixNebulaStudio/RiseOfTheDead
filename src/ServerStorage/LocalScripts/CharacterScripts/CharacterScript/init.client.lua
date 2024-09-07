@@ -45,8 +45,11 @@ local modSpectateManager = require(game.ReplicatedStorage.Library.SpectateManage
 local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 local modBuffer = require(game.ReplicatedStorage.Library.Util.Buffer);
-
 Debugger.AwaitShared("modPlayers");
+
+-- Flags;
+modCharacter.DeadlockMovement = true;
+
 local classPlayer = shared.modPlayers.Get(localPlayer);
 
 local rootRigAttachment = rootPart:WaitForChild("RootRigAttachment");
@@ -554,9 +557,13 @@ local function crouchRequest(value)
 				slideSound = head:FindFirstChild("BodySlide");
 			end
 			dustParticle.Enabled = true;
+
+			characterProperties.IsSliding = true;
 			slideDirection = Vector3.new(rootPart.CFrame.LookVector.X, 0, rootPart.CFrame.LookVector.Z);
 			oldSlideMomentum = slideDirection*characterProperties.SlideSpeed;
-			characterProperties.IsSliding = true;
+
+			
+
 		end
 		characterProperties.IsCrouching = true;
 		
@@ -1354,7 +1361,7 @@ local function renderStepped(camera, deltaTime)
 			local s, e = pcall(function()
 				local waistY = characterProperties.CanMove and characterProperties.Joints.WaistY or 0;
 				if rootPart:GetAttribute("WaistY") then
-					waistY = math.rad(rootPart:GetAttribute("WaistY"));
+					waistY = math.rad(rootPart:GetAttribute("WaistY") :: number);
 				end
 				local swayY = ((math.sin(tick())/2-0.5)/50 * characterProperties.SwayYStrength);
 
@@ -1673,7 +1680,7 @@ RunService.PreSimulation:Connect(function(step)
 		stepBuffer = math.max(stepBuffer-1, 0); 
 
 		if characterProperties.AllowLerpBody then
-			local lerpS, lerpE = pcall(function()
+			pcall(function()
 				local neckTransform = head.Neck.Transform;
 				local waistTransform = character.UpperTorso.Waist.Transform;
 
