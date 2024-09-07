@@ -14,6 +14,7 @@ local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modLazyLoader = require(game.ReplicatedStorage.Library.LazyLoader);
+local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
@@ -109,6 +110,8 @@ function Mission:Progress(player: Player, missionId: number, func: ((mission: {[
 				missionProfile:Pin(missionId, true);
 				mission.Changed:Fire(false, mission);
 				missionProfile.OnMissionChanged:Fire(mission);
+				
+				missionProfile:UpdateObjectives();
 				
 			end
 			if sync ~= false then
@@ -581,6 +584,7 @@ end
 function Mission.NewList(profile, gameSave, syncFunc)
 	local listMeta = {
 		PinCooldown = nil;
+		Garbage = modGarbageHandler.new();
 	};
 	listMeta.__index = listMeta;
 	
@@ -684,7 +688,7 @@ function Mission.NewList(profile, gameSave, syncFunc)
 	end
 	
 	function listMeta:UpdateObjectives()
-		local profile = shared.modProfile:Get(player);
+		local profile = shared.modProfile:Find(player.Name);
 		if profile == nil then return end;
 		
 		local playerSave = profile:GetActiveSave();
@@ -1302,7 +1306,7 @@ function Mission.NewList(profile, gameSave, syncFunc)
 			end);
 
 			local cooldown = tick();
-			playerSave.OnPlayerStatChanged:Connect(function()
+			playerSave.OnStatsChanged:Connect(function()
 				if tick()-cooldown <= 1 then return end;
 				cooldown = tick();
 
@@ -1311,6 +1315,7 @@ function Mission.NewList(profile, gameSave, syncFunc)
 
 				return;
 			end)
+			
 		end
 		listMeta:UpdateObjectives();
 	end

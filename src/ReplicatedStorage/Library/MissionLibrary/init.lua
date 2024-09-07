@@ -308,6 +308,7 @@ MissionLibrary.New{
 	};
 	Markers={
 		[1]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
+		[3]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
 		[6]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
 		[7]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
 	};

@@ -1185,6 +1185,8 @@ function Profile:Unload()
 		if playerSave.Missions then
 			playerSave.Missions:Unload();
 		end
+
+		playerSave:Unload();
 	end
 	
 	if self.MessageConnection then

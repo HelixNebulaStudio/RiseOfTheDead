@@ -40,8 +40,6 @@ local libAuthTree = modSkillTreeLibrary.Authority:GetSorted();
 local libEnduTree = modSkillTreeLibrary.Endurance:GetSorted();
 local libSyneTree = modSkillTreeLibrary.Synergy:GetSorted();
 
-SaveData.OnPlayerStatChanged = modEventSignal.new("OnPlayerStatChanged");
-
 --== Script;
 function SaveData.new(profile)
 	local player = profile.Player;
@@ -54,6 +52,9 @@ function SaveData.new(profile)
 	dataMeta.Title = "Main Save";
 	dataMeta.Statistics = modStatisticProfile.new(player);
 	
+	-- Events;
+	dataMeta.OnStatsChanged = modEventSignal.new("OnStatsChanged");
+
 	local data = setmetatable({}, dataMeta);
 	dataMeta.Sync = function(self, hierarchyKey)
 		if hierarchyKey == nil then
@@ -375,6 +376,12 @@ function SaveData:Loaded()
 	end
 end
 
+function SaveData:Unload()
+	if self.OnStatsChanged then
+		self.OnStatsChanged:Destroy();
+	end
+end
+
 function SaveData:GetStat(key)
 	return self.Stats[key] or 0;
 end
@@ -436,8 +443,7 @@ function SaveData:AddStat(key, amount, force)
 	end
 	
 	self:Sync("Stats/"..key);
-
-	SaveData.OnPlayerStatChanged:Fire(self, key, amount, force);
+	self.OnStatsChanged:Fire(self, key, amount, force);
 
 	return amount;
 end
