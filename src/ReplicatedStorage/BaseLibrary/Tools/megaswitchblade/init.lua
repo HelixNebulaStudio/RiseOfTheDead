@@ -22,14 +22,16 @@ local toolPackage = {
 	};
 	Audio={
 		Load={Id=2304904662; Pitch=1; Volume=0.4;};
-		PrimaryHit={Id=9141019032; Pitch=1; Volume=1;};
 		PrimarySwing={Id=158037267; Pitch=0.8; Volume=0.6;};
 	};
 };
 
 --==
 local RunService = game:GetService("RunService");
+local TweenService = game:GetService("TweenService");
 local modMeleeProperties = require(game.ReplicatedStorage.Library.Tools.MeleeProperties);
+
+local bladeTweenInfo = TweenInfo.new(0.15);
 
 function toolPackage.NewToolLib(handler)
 	local Tool = {};
@@ -49,9 +51,28 @@ function toolPackage.NewToolLib(handler)
 			toolConfig.Category = "Edged";
 
 		end
-		Debugger:Warn("ToolCategory:", toolConfig.Category);
-		
 
+		if RunService:IsServer() then
+			local toolPrefab = toolHandler.Prefabs[1];
+
+			local bladeMotor: Motor6D = toolPrefab.Handle.Blade;
+			local colliderMotor: Motor6D = toolPrefab.Handle.Collider;
+
+			if toolConfig.Category == "Edged" then
+				colliderMotor.C0 = CFrame.new(0, 2.122, 0);
+				TweenService:Create(bladeMotor, bladeTweenInfo, {
+					C0=CFrame.new(0, 1.26, 0);
+				}):Play();
+
+			else
+				colliderMotor.C0 = CFrame.new(0, 0, 0);
+				TweenService:Create(bladeMotor, bladeTweenInfo, {
+					C0=CFrame.new(0, 1.26, 0) * CFrame.Angles(0, 0, math.rad(-178));
+				}):Play();
+
+			end
+		end
+		
 		return true; -- submit input to server;
 	end
 	

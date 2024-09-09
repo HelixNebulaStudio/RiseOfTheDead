@@ -241,10 +241,10 @@ function ToolHandler:Equip(storageItem, toolModels)
 				}
 				
 				if not playedImpactSound and audio.PrimarySwing then
-					local snd = modAudio.PlayReplicated(audio.PrimaryHit.Id, handle, nil, audio.PrimarySwing.Pitch, audio.PrimarySwing.Volume);
-					if snd then
-						snd.PlaybackSpeed = math.random(audio.PrimarySwing.Pitch*10-1, audio.PrimarySwing.Pitch*10+1)/10
-					end
+					-- local snd = modAudio.PlayReplicated(audio.PrimaryHit.Id, handle, nil, audio.PrimarySwing.Pitch, audio.PrimarySwing.Volume);
+					-- if snd then
+					-- 	snd.PlaybackSpeed = math.random(audio.PrimarySwing.Pitch*10-1, audio.PrimarySwing.Pitch*10+1)/10
+					-- end
 				end
 			end
 			

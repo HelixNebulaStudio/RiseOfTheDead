@@ -195,6 +195,7 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 				BasePart=hitPart;
 				Point=hitPart.Position;
 				HideMolten=true;
+				WeaponType=self.ToolConfig.Category;
 			}
 
 			if not playedImpactSound then
@@ -202,7 +203,14 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 				handle = handle.PrimaryPart;
 				local audio = self.ToolPackage.Audio;
 				
-				local snd = modAudio.Play(audio.PrimaryHit.Id, handle, nil, audio.PrimarySwing.Pitch, audio.PrimarySwing.Volume);
+				local hitSoundId = "MeleeEdgedHit";
+				if self.ToolConfig.Category == "Edged" then
+					hitSoundId = "MeleeEdgedHit";
+				elseif self.ToolConfig.Category == "Blunt" then
+					hitSoundId = "MeleeBluntHit";
+				end
+
+				local snd = modAudio.Play(hitSoundId, handle, nil, audio.PrimarySwing.Pitch, audio.PrimarySwing.Volume);
 				snd.PlaybackSpeed = math.random(audio.PrimarySwing.Pitch*10-1, audio.PrimarySwing.Pitch*10+1)/10
 			end
 		end
