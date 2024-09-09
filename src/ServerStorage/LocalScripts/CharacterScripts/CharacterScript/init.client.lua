@@ -2108,11 +2108,12 @@ RunService.PostSimulation:Connect(function(step)
 
 				local slopeDot = newSlideDirection:Dot(characterProperties.GroundNormal);
 
-				local friction = 1.8;
+				local slopeUpFriction = 2;
+				local slopeDownFriction = 6;
 				if slopeDot > 0 then
-					slideMomentum = math.min(slideMomentum + slopeDot/friction, characterProperties.SlideSpeed*2);
+					slideMomentum = math.min(slideMomentum + slopeDot/slopeDownFriction, characterProperties.SlideSpeed*1.5);
 				else
-					slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.3) *friction;
+					slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.2) *slopeUpFriction;
 				end
 
 				slideForce.Velocity = newSlideDirection*math.max(slideMomentum, 0);
