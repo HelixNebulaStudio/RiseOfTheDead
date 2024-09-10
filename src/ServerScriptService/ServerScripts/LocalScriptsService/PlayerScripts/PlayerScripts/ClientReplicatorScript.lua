@@ -118,21 +118,22 @@ return function()
 
 			if paramPacket.B and typeof(paramPacket.B) == "buffer" then
 				local waistC0X = buffer.readi16(paramPacket.B, 0)/100;
-				local waistC1Y = buffer.readi16(paramPacket.B, 2)/100;
-				local waistC1X = buffer.readi16(paramPacket.B, 4)/100;
+				local waistC0Z = buffer.readi16(paramPacket.B, 2)/100;
+				local waistC1Y = buffer.readi16(paramPacket.B, 4)/100;
+				local waistC1X = buffer.readi16(paramPacket.B, 6)/100;
 
 				local waistMotor = character:FindFirstChild("Waist", true);
 				if waistMotor and waistMotor:IsA("Motor6D") then
 					local properties = {
-						C0 = CFrame.new(waistMotor.C0.Position) * CFrame.Angles(waistC0X, 0, 0);
+						C0 = CFrame.new(waistMotor.C0.Position) * CFrame.Angles(waistC0X, 0, 0) * CFrame.Angles(0, 0, waistC0Z);
 						C1 = CFrame.new(waistMotor.C1.Position) * CFrame.Angles(0, waistC1Y, 0) * CFrame.Angles(waistC1X, 0, 0);
 					};
 
 					TweenService:Create(waistMotor, TweenInfo.new(0.6), properties):Play();
 				end
 
-				local neckC0Y = buffer.readi16(paramPacket.B, 6)/100;
-				local neckC1X = buffer.readi16(paramPacket.B, 8)/100;
+				local neckC0Y = buffer.readi16(paramPacket.B, 8)/100;
+				local neckC1X = buffer.readi16(paramPacket.B, 10)/100;
 
 				local neckMotor = character:FindFirstChild("Neck", true);
 				if neckMotor and neckMotor:IsA("Motor6D") then

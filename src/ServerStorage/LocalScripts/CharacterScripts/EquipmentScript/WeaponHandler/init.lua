@@ -31,6 +31,7 @@ local modParticleSprinkler = require(game.ReplicatedStorage.Particles.ParticleSp
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
+local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 
@@ -85,6 +86,7 @@ local Equipped;
 local itemPromptConn;
 
 local editPanelVisible = false;
+
 --== Script;
 --modGuiObjectTween.FadeTween(script:WaitForChild("WeaponInterface"), modGuiObjectTween.FadeDirection.Out, TweenInfo.new(0.1));
 
@@ -122,7 +124,7 @@ function WeaponHandler:Equip(library, weaponId)
 	weaponInterface.Parent = playerGui;
 	
 	local crosshairFrame = weaponInterface:WaitForChild("CrosshairFrame");
-	local tpScanFrame = weaponInterface:WaitForChild("TPScan");
+	local tpBlockFrame = weaponInterface:WaitForChild("TPBlock");
 	local scopeFrame = weaponInterface:WaitForChild("ScopeFrame");
 	local ammoCounter = weaponInterface:WaitForChild("AmmoCounter");
 	local reloadLabel = crosshairFrame:WaitForChild("ReloadIcon");
@@ -335,9 +337,11 @@ function WeaponHandler:Equip(library, weaponId)
 	projRaycast.FilterType = Enum.RaycastFilterType.Include;
 	projRaycast.IgnoreWater = true;
 	projRaycast.CollisionGroup = "Raycast";
-	projRaycast.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain;};
+	projRaycast.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain; workspace.Entity};
 	
 	local s1Tick = tick();
+	local aimWaistZ = 0;
+	
 	local function weaponRender(delta)
 		if not characterProperties.IsEquipped then return end;
 		if crosshairFrame == nil or not crosshairFrame:IsDescendantOf(playerGui) then return end;
@@ -393,7 +397,7 @@ function WeaponHandler:Equip(library, weaponId)
 		
 		if characterProperties.FirstPersonCamera then
 			characterProperties.BodyLockToCam = true;
-			tpScanFrame.Visible = false;
+			tpBlockFrame.Visible = false;
 			
 		else
 			if (currentTick - Equipped.RightHand.Data.lastFired) > 1 or properties.Reloading then
@@ -408,28 +412,70 @@ function WeaponHandler:Equip(library, weaponId)
 				IncludeList = projRaycast.FilterDescendantsInstances;
 				Range = configurations.BulletRange;
 			};
-			
-			local headDir = (scanPoint-head.Position).Unit;
 
+			local motorHeadPoint = (characterProperties.MotorHeadCFrameA * CFrame.Angles(0, 0, aimWaistZ) * characterProperties.MotorHeadCFrameB).Position;
+
+			-- local headPp = Debugger:PointPart(motorHeadPoint);
+			-- headPp.Color = Color3.fromRGB(0, 0, 255);
+			-- headPp.Size = Vector3.new(0.2,0.2,0.2);
+			-- game.Debris:AddItem(headPp, 0.1);
+
+			local headDir = (scanPoint-motorHeadPoint).Unit;
+			local headDist = (scanPoint-motorHeadPoint).Magnitude;
 			local landPoint = modWeaponMechanics.CastHitscanRay{
-				Origin = head.Position;
+				Origin = motorHeadPoint;
 				Direction = headDir;
 				IncludeList = projRaycast.FilterDescendantsInstances;
-				Range = configurations.BulletRange;
+				Range = headDist;
 			};
 
-			local pointsDist = ((scanPoint.X-landPoint.X)^2 + (scanPoint.Y-landPoint.Y)^2 + (scanPoint.Z-landPoint.Z)^2);
-			
-			local screenPoint, onScreen = camera:WorldToViewportPoint(landPoint);
-			
-			if onScreen and pointsDist > 4 then
-				tpScanFrame.Visible = true;
-				tpScanFrame.Position = UDim2.new(0, screenPoint.X, 0, screenPoint.Y);
-				
-			else
-				tpScanFrame.Visible = false;
+			if RunService:IsStudio() then
+				local scanPp = Debugger:PointPart(scanPoint);
+				scanPp.Color = Color3.fromRGB(255, 0, 0);
+				game.Debris:AddItem(scanPp, 0.1);
+	
+				local scanLp = Debugger:PointPart(landPoint);
+				scanLp.Color = Color3.fromRGB(0, 255, 0);
+				game.Debris:AddItem(scanLp, 0.1);
 			end
-			
+
+			local pointsDist = (scanPoint-landPoint).Magnitude;
+
+			--local screenPoint, onScreen = camera:WorldToViewportPoint(landPoint);
+			--tpScanFrame.Position = UDim2.new(0, screenPoint.X, 0, screenPoint.Y);
+
+
+			local limZ = math.rad(30);
+			if pointsDist > 0.1 then
+				-- third person blocked;
+
+				--local newHeadToTargetDot = (-mouseProperties.Direction):Dot(-headDir);
+				-- newHeadToTargetDot = math.clamp(newHeadToTargetDot, -limZ, limZ);
+
+				-- aimWaistZ = -newHeadToTargetDot;
+				-- if characterProperties.LeftSideCamera then
+				-- 	aimWaistZ = -newHeadToTargetDot;
+				-- end
+				tpBlockFrame.Visible = true;
+
+				if characterProperties.LeftSideCamera then
+					aimWaistZ = aimWaistZ +0.02;
+				else
+					aimWaistZ = aimWaistZ -0.02;
+				end
+				aimWaistZ = math.clamp(aimWaistZ, -limZ, limZ);
+				
+
+			else
+				-- third person not blocked;
+				tpBlockFrame.Visible = false;
+
+				aimWaistZ = modMath.Lerp(aimWaistZ, 0, 0.1);
+
+			end
+
+			characterProperties.Joints.WaistZ = modMath.Lerp(characterProperties.Joints.WaistZ, aimWaistZ, 0.1);
+
 		end
 		
 		if configurations.AimDownViewModel and equipped then
@@ -847,7 +893,7 @@ function WeaponHandler:Equip(library, weaponId)
 		end
 		
 		if characterProperties.FirstPersonCamera and configurations.AimDownViewModel and characterProperties.IsFocused then
-			primaryFireAnim:Play(0, primaryFireAnim:GetAttribute("FocusWeight") or 0.2);
+			primaryFireAnim:Play(0, (primaryFireAnim:GetAttribute("FocusWeight") :: number) or 0.2);
 		else
 			if primaryFireAnim:GetAttribute("LoopMarker") == true then
 				if not primaryFireAnim.IsPlaying then
@@ -2063,7 +2109,7 @@ function WeaponHandler:Equip(library, weaponId)
 				end
 				
 				if mouseProperties.Mouse1Down and track:GetAttribute("LoopStart") then
-					track.TimePosition = track:GetAttribute("LoopStart");
+					track.TimePosition = (track:GetAttribute("LoopStart") :: number);
 				end
 			end
 		end)

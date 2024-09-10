@@ -86,6 +86,7 @@ if RunService:IsClient() then
 			Joints={
 				WaistX=0;
 				WaistY=0;
+				WaistZ=0;
 				RightShoulderAngle=CFrame.Angles(0, 0, 0);
 				LeftShoulderAngle=CFrame.Angles(0, 0, 0);
 			};
@@ -120,6 +121,9 @@ if RunService:IsClient() then
 			UnderwaterVision = 0.01;
 			
 			EnumStates = {};
+			
+			MotorHeadCFrameA=CFrame.new();
+			MotorHeadCFrameB=CFrame.new();
 		};
 		MouseProperties={
 			X=0;

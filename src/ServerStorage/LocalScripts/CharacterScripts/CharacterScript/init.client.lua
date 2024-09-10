@@ -1678,6 +1678,7 @@ Cache.OneSecTick = tick();
 Cache.LowestFps = math.huge;
 
 local stepBuffer = 0;
+-- MARK: PreSimulation;
 RunService.PreSimulation:Connect(function(step)
 	if not characterProperties.IsAlive then return end;
 	if stepBuffer >0 then 
@@ -1714,7 +1715,7 @@ RunService.PreSimulation:Connect(function(step)
 	local beatTick = tick();
 	local submitMotorUpdates = (beatTick-motorUpdateCooldown) > 0.5 and characterProperties.IsAlive;
 	
-	local bodyBuffer = submitMotorUpdates and buffer.create(10) or nil;
+	local bodyBuffer = submitMotorUpdates and buffer.create(12) or nil;
 
 	if characterProperties.AllowLerpBody then
 		local lerpS, lerpE = pcall(function()
@@ -1731,9 +1732,6 @@ RunService.PreSimulation:Connect(function(step)
 			local neckPitchOffset = -0.2;
 			
 			local waistY = characterProperties.CanMove and characterProperties.Joints.WaistY or 0;
-			-- local waistX = characterProperties.CanMove and characterProperties.Joints.WaistX or 0;
-			-- local neckYcompensate = math.rad(waistY > 20 and 20 or waistY*0.333);
-			-- local waistXcompensate = characterProperties.IsEquipped and math.rad(-50) or 0;
 			
 			local mouseY = (mouseProperties.Y + mouseProperties.YAngOffset);
 			if not characterProperties.CanMove then 
@@ -1746,6 +1744,9 @@ RunService.PreSimulation:Connect(function(step)
 				if toolModule and toolModule.Configurations and toolModule.Configurations.ThirdPersonWaistOffset then
 					waistY = waistY + toolModule.Configurations.ThirdPersonWaistOffset * (characterProperties.LeftSideCamera and -1 or 1);
 				end
+				
+				local waistZ = characterProperties.CanMove and characterProperties.Joints.WaistZ or 0;
+				waistC0.Z = waistZ;
 			end
 			
 			local rootCFrame = rootPart.CFrame;
@@ -1771,10 +1772,6 @@ RunService.PreSimulation:Connect(function(step)
 				mouseY = 0;
 			end
 
-			-- neckCFrameAngles = (characterProperties.IsWounded and CFrame.Angles(0, 0, mathClamp(-camLookYaw, -0.8, 0.8))
-			-- 	or CFrame.Angles(0, mathClamp(-camLookYaw+waistY-neckYcompensate, -1, 1), 0))
-			-- 		* CFrame.Angles(mathClamp(mouseY, -0.4, 0.3) + 0.15, 0, 0);
-			
 			if characterProperties.IsRagdoll and not Cache.AntiGravityForce then
 				-- ragdolling
 				
@@ -1783,18 +1780,12 @@ RunService.PreSimulation:Connect(function(step)
 				
 			elseif characterProperties.IsSliding then
 				-- sliding
-				--* CFrame.Angles(mathClamp(waistX, -0.87, 0.87), 0, 0)
-				--waistC1 = CFrame.Angles(0, waistY, 0) * CFrame.Angles(deg60, 0, 0);
 				waistC1.X = deg60;
 				waistC1.Y = waistY;
 				waistTransform = CFrame.new();
 				
 			elseif characterProperties.IsCrouching then
 				-- crouching
-				--waistC1 = CFrame.Angles(0, waistY, 0) * CFrame.Angles(characterProperties.IsEquipped and 0 or deg45, 0, 0);
-					-- --* CFrame.Angles(mathClamp(-mouseY, -0.5, 0.5)+mathClamp(waistX, -0.87, 0.87)+waistXcompensate, 0, 0);
-				--waistC0 = CFrame.Angles(mathClamp(mouseY, -0.7, 0.7), 0, 0);
-
 				waistC1.X = characterProperties.IsEquipped and 0 or deg45;
 				waistC1.Y = waistY;
 
@@ -1806,16 +1797,11 @@ RunService.PreSimulation:Connect(function(step)
 
 			else 
 				-- idle
-				-- waistC1 = CFrame.Angles(0, waistY, 0)
-				-- 	--* CFrame.Angles(mathClamp(-mouseY, -0.6, 1.1)+mathClamp(waistX-0.1, -0.87, 0.87), 0, 0);
-				-- waistC0 = CFrame.Angles(mathClamp(mouseY, -1, 1.1), 0, 0);
-
 				waistC1.Y = waistY;
-				waistC0.X = mathClamp(mouseY, -1, 1.1)
+				waistC0.X = mathClamp(mouseY, -1, 1.1);
 
 			end
 			if humanoid.PlatformStand == true then
-				--waistC1 = CFrame.Angles(0, waistY, 0);
 				waistC1.Y = waistY;
 			end
 			-- WaistY = Left/Right
@@ -1826,14 +1812,14 @@ RunService.PreSimulation:Connect(function(step)
 
 			if submitMotorUpdates then
 				buffer.writei16(bodyBuffer, 0, math.round(waistC0.X*100));
-				buffer.writei16(bodyBuffer, 2, math.round(waistC1.Y*100));
-				buffer.writei16(bodyBuffer, 4, math.round(waistC1.X*100));
+				buffer.writei16(bodyBuffer, 2, math.round(waistC0.Z*100));
+				buffer.writei16(bodyBuffer, 4, math.round(waistC1.Y*100));
+				buffer.writei16(bodyBuffer, 6, math.round(waistC1.X*100));
 			end
 			
 			if character.UpperTorso.Waist then
 				if characterProperties.FirstPersonCamera and not characterProperties.IsRagdoll then
 					-- First Person & not ragdoll
-					--prevdata.WaistC1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1, 0.1);
 					prevdata.WaistC1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1Cf, 0.1);
 
 					local viewModelHeight = modMath.Lerp(prevViewModelHeight, characterProperties.IsSliding and 2.1 or characterProperties.IsCrouching and 1.1 or -0.4, 0.15);
@@ -1846,7 +1832,6 @@ RunService.PreSimulation:Connect(function(step)
 						character.UpperTorso.Waist.C1 = waistToCamCFrame;
 						
 					else
-						-- waistToCamCFrame * CFrame.Angles(0, waistY, 0) * CFrame.Angles(-mathClamp(mouseY, -1, 1.5), 0, 0);
 						character.UpperTorso.Waist.C1 = waistToCamCFrame * waistC1Cf;
 						character.UpperTorso.Waist.Transform = waistC0Cf;
 
@@ -1856,14 +1841,12 @@ RunService.PreSimulation:Connect(function(step)
 					-- Third Person Mode
 
 					-- Apply C1
-					--character.UpperTorso.Waist.C1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1, 0.1);
 					character.UpperTorso.Waist.C1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1Cf, 0.1);
 					prevdata.WaistC1 = character.UpperTorso.Waist.C1;
 					
 					-- Apply C0
-					--Cache.WaistC0 = (Cache.WaistC0 or waistC0):Lerp(waistC0, 0.1);
 					Cache.WaistC0 = (Cache.WaistC0 or waistC0Cf):Lerp(waistC0Cf, 0.1);
-					character.UpperTorso.Waist.Transform = waistTransform * Cache.WaistC0;
+					character.UpperTorso.Waist.Transform = waistTransform * (Cache.WaistC0 * CFrame.Angles(0, 0, waistC0.Z));
 
 				end
 			end
@@ -1878,8 +1861,8 @@ RunService.PreSimulation:Connect(function(step)
 			local neckC1Cf = CFrame.Angles(neckC1.X, 0, 0);
 			
 			if submitMotorUpdates then
-				buffer.writei16(bodyBuffer, 6, math.round(neckC0.Y*100));
-				buffer.writei16(bodyBuffer, 8, math.round(neckC1.X*100));
+				buffer.writei16(bodyBuffer, 8, math.round(neckC0.Y*100));
+				buffer.writei16(bodyBuffer, 10, math.round(neckC1.X*100));
 			end
 
 			if character.Head then
@@ -1923,9 +1906,9 @@ RunService.PreSimulation:Connect(function(step)
 		})
 	end
 	
-	-- characterProperties.Joints.WaistX = modMath.DeltaLerp(prevdata.WaistX, 0, 5, step);
-	-- prevdata.WaistX = characterProperties.Joints.WaistX;
 end)
+
+-- MARK: PostSimulation;
 RunService.PostSimulation:Connect(function(step)
 	local beatTick = tick();
 	loadInterface();
@@ -1944,6 +1927,19 @@ RunService.PostSimulation:Connect(function(step)
 	mouseProperties.FlinchInacc = modMath.Lerp(mouseProperties.FlinchInacc, 0, 0.05);
 	if math.abs(mouseProperties.FlinchInacc) < 0.1 then mouseProperties.FlinchInacc = 0 end;
 	
+	
+	local motorHeadA = character.LowerTorso.CFrame 
+		* CFrame.new(0, 0.38, 0)
+		* character.UpperTorso.Waist.C0 
+		* Cache.WaistC0;
+	local motorHeadB = character.UpperTorso.Waist.C1:Inverse() 
+		* character.Head.Neck.C0 
+		* Cache.NeckC0
+		* character.Head.Neck.C1:Inverse();
+	characterProperties.MotorHeadCFrameA = motorHeadA;
+	characterProperties.MotorHeadCFrameB = motorHeadB;
+
+
 	if beatTick-Cache.OneSecTick >= 1 then
 		Cache.OneSecTick = beatTick;
 		
@@ -2113,7 +2109,7 @@ RunService.PostSimulation:Connect(function(step)
 				if slopeDot > 0 then
 					slideMomentum = math.min(slideMomentum + slopeDot/slopeDownFriction, characterProperties.SlideSpeed*1.5);
 				else
-					slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.2) *slopeUpFriction;
+					slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.3) *slopeUpFriction;
 				end
 
 				slideForce.Velocity = newSlideDirection*math.max(slideMomentum, 0);
