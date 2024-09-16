@@ -2,24 +2,14 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local toolPackage = {
 	Type="Melee";
-	Animations=workspace:GetAttribute("IsDev") and {
-		Core={Id=16971537726;};
+	Animations={
+		Core={Id=16971537726; IdRoleplay=16971600436;};
 		Load={Id=16971542912;};
-		RoleplayCore={Id=16971600436};
+		--RoleplayCore={Id=16971600436};
 		Inspect={Id=16971597553;};
 		Unequip={Id=16971602144};
 		PrimaryAttack={Id=16971526990;};
 		HeavyAttack={Id=16971594147};
-		
-	} or {
-		Core={Id=16971537726;};
-		Load={Id=16971542912;};
-		RoleplayCore={Id=16971600436};
-		Inspect={Id=16971597553;};
-		Unequip={Id=16971602144};
-		PrimaryAttack={Id=16971526990;};
-		HeavyAttack={Id=16971594147};
-		
 	};
 	Audio={
 		Load={Id=2304904662; Pitch=0.6; Volume=0.5;};

@@ -29,6 +29,7 @@ local modArcTracing = require(game.ReplicatedStorage.Library.ArcTracing);
 local modWeaponMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modToolAnimator = require(script.Parent.Parent.ToolAnimator);
 
 local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 
@@ -113,28 +114,34 @@ function ToolHandler:Equip(storageItem, toolModels)
 
 	local head = character:WaitForChild("Head");
 
-	local animations = Equipped.Animations;
-	for key, animLib in pairs(toolLib.Animations) do
-		local animationId = "rbxassetid://"..(animLib.OverrideId or animLib.Id);
-		local animationFile = animationFiles[animationId] or Instance.new("Animation");
-		animationFile.AnimationId = animationId;
-		animationFile.Parent = humanoid;
-		animationFiles[animationId] = animationFile;
+	local toolAnimator = modToolAnimator.new(animator);
+	toolAnimator:LoadToolAnimations(toolLib.Animations, toolConfig.DefaultAnimatorState or "");
 
-		if animations[key] then animations[key]:Stop() end;
-		local track: AnimationTrack = animator:LoadAnimation(animationFile);
-		animations[key] = track
-		animations[key].Name = (storageItem.ID)..":"..key;
+	Equipped.ToolAnimator = toolAnimator;
 
-		if animLib.Looped ~= nil then
-			track.Looped = animLib.Looped == true;
-		end
-		
-		if key ~= "Core" and key ~= "RoleplayCore" then
-			animations[key].Priority = Enum.AnimationPriority.Action2;
-		end
-	end;
-	animations["Core"]:Play(0.5);
+			-- local animations = Equipped.Animations;
+			-- for key, animLib in pairs(toolLib.Animations) do
+			-- 	local animationId = "rbxassetid://"..(animLib.OverrideId or animLib.Id);
+			-- 	local animationFile = animationFiles[animationId] or Instance.new("Animation");
+			-- 	animationFile.AnimationId = animationId;
+			-- 	animationFile.Parent = humanoid;
+			-- 	animationFiles[animationId] = animationFile;
+
+			-- 	if animations[key] then animations[key]:Stop() end;
+			-- 	local track: AnimationTrack = animator:LoadAnimation(animationFile);
+			-- 	animations[key] = track
+			-- 	animations[key].Name = (storageItem.ID)..":"..key;
+
+			-- 	if animLib.Looped ~= nil then
+			-- 		track.Looped = animLib.Looped == true;
+			-- 	end
+				
+			-- 	if key ~= "Core" and key ~= "RoleplayCore" then
+			-- 		animations[key].Priority = Enum.AnimationPriority.Action2;
+			-- 	end
+			-- end;
+			-- animations["Core"]:Play(0.5);
+	toolAnimator:Play("Core", {FadeTime=0.5});
 	
 	characterProperties.HideCrosshair = false;
 	if toolConfig.UseViewmodel == false then
@@ -148,15 +155,17 @@ function ToolHandler:Equip(storageItem, toolModels)
 		characterProperties.HideCrosshair = false;
 		characterProperties.UseViewModel = true;
 
-		for key, _ in pairs(animations) do
-			animations[key]:Stop();
-		end
+		toolAnimator:Destroy();
+		-- for key, _ in pairs(animations) do
+		-- 	animations[key]:Stop();
+		-- end
 		modCharacter.EquippedTool = nil;
 		characterProperties.Joints.WaistY = 0;
 
-		if animations["Unequip"] then
-			animations["Unequip"]:Play();
-		end
+		toolAnimator:Play("Unequip");
+		-- if animations["Unequip"] then
+		-- 	animations["Unequip"]:Play();
+		-- end
 
 		if configurations.Throwable then
 			arcDisk:Destroy();
@@ -195,18 +204,16 @@ function ToolHandler:Equip(storageItem, toolModels)
 		end
 	end
 
-	table.insert(Equipped.Connections, animations["PrimaryAttack"]:GetMarkerReachedSignal("SetWaist"):Connect(setWaistMarker));
-	--table.insert(Equipped.Connections, animations["PrimaryAttack"]:GetMarkerReachedSignal("SetWaistX"):Connect(setWaistMarker));
-	if animations["PrimaryAttack2"] then
-		table.insert(Equipped.Connections, animations["PrimaryAttack2"]:GetMarkerReachedSignal("SetWaist"):Connect(setWaistMarker));
-		--table.insert(Equipped.Connections, animations["PrimaryAttack2"]:GetMarkerReachedSignal("SetWaistX"):Connect(setWaistMarker));
-	end;
-	-- OLD
-	table.insert(Equipped.Connections, animations["PrimaryAttack"].KeyframeReached:Connect(onKeyFrameReached));
-	if animations["PrimaryAttack2"] then
-		table.insert(Equipped.Connections, animations["PrimaryAttack2"].KeyframeReached:Connect(onKeyFrameReached));
-	end;
-	--
+	-- table.insert(Equipped.Connections, animations["PrimaryAttack"]:GetMarkerReachedSignal("SetWaist"):Connect(setWaistMarker));
+	-- if animations["PrimaryAttack2"] then
+	-- 	table.insert(Equipped.Connections, animations["PrimaryAttack2"]:GetMarkerReachedSignal("SetWaist"):Connect(setWaistMarker));
+	-- end;
+	-- -- OLD
+	-- table.insert(Equipped.Connections, animations["PrimaryAttack"].KeyframeReached:Connect(onKeyFrameReached));
+	-- if animations["PrimaryAttack2"] then
+	-- 	table.insert(Equipped.Connections, animations["PrimaryAttack2"].KeyframeReached:Connect(onKeyFrameReached));
+	-- end;
+	-- --
 	
 	Equipped.Cache.HitCache = {};
 	
@@ -279,7 +286,9 @@ function ToolHandler:Equip(storageItem, toolModels)
 			if properties.Attacking then return end;
 			if tick()-nextAttackTick < 0 then return end;
 			Stats.LastDrain = tick();
-			animations["Inspect"]:Stop();
+			--animations["Inspect"]:Stop();
+			toolAnimator:Stop("Inspect");
+
 			victims = {};
 			properties.Attacking = true;
 			
@@ -303,37 +312,29 @@ function ToolHandler:Equip(storageItem, toolModels)
 					modAudio.PlayReplicated(audio.PrimarySwing.Id, handle, nil, audio.PrimarySwing.Pitch, audio.PrimarySwing.Volume);
 				end
 				
-				if comboIndex and animations["ComboAttack"..comboIndex] then
+				if comboIndex and toolAnimator:GetTracks(`ComboAttack{comboIndex}`) then
+					characterProperties.CanMove = false;
+
 					local comboInfo = configurations.Combos[comboIndex];
 					local animationId = "ComboAttack"..comboIndex;
-					characterProperties.CanMove = false;
-					animations[animationId]:Play(0);
-					animations[animationId]:AdjustWeight(1,0);
-					animations[animationId]:AdjustSpeed(animations[animationId].Length / comboInfo.AnimationSpeed);
+
+					local track = toolAnimator:Play(animationId, {FadeTime=0;});
+					track:AdjustWeight(1,0);
+					track:AdjustSpeed(track.Length / comboInfo.AnimationSpeed);
 					
 					local onAnimFinish
-					onAnimFinish = animations[animationId].Stopped:Connect(function() 
+					onAnimFinish = track.Stopped:Connect(function() 
 						onAnimFinish:Disconnect();
 						characterProperties.CanMove = true;
 					end)
 					return;
 				end
-				if animations["PrimaryAttack2"] and math.random(1, 2) == 1 then
-					animations["PrimaryAttack2"]:Play(0);
-					animations["PrimaryAttack2"]:AdjustWeight(1,0);
-					if configurations.PrimaryAttackAnimationSpeed then
-						animations["PrimaryAttack2"]:AdjustSpeed(animations["PrimaryAttack2"].Length / configurations.PrimaryAttackAnimationSpeed);
-					end
-					
-					return;
-				end
 				
-				animations["PrimaryAttack"]:Play(0);
-				animations["PrimaryAttack"]:AdjustWeight(1,0);
+				local track = toolAnimator:Play("PrimaryAttack");
+				track:AdjustWeight(1, 0);
 				if configurations.PrimaryAttackAnimationSpeed then
-					animations["PrimaryAttack"]:AdjustSpeed(animations["PrimaryAttack"].Length / configurations.PrimaryAttackAnimationSpeed);
+					track:AdjustSpeed(track.Length / configurations.PrimaryAttackAnimationSpeed);
 				end
-				
 			end
 			
 			if configurations.HeavyAttackSpeed and toolConfig.Category == "Edged" then
@@ -341,14 +342,16 @@ function ToolHandler:Equip(storageItem, toolModels)
 				local maxCharged = false;
 				repeat
 					charge = charge + RunService.Heartbeat:Wait();
-					if charge >= 0.15 and not animations["HeavyAttack"].IsPlaying then
-						animations["HeavyAttack"]:Play();
-						animations["HeavyAttack"]:AdjustSpeed(animations["HeavyAttack"].Length/2/configurations.HeavyAttackSpeed);
+
+					local track = toolAnimator:GetPlaying("HeavyAttack");
+					if charge >= 0.15 and track == nil then
+						track = toolAnimator:Play("HeavyAttack", {PlayLength=configurations.HeavyAttackSpeed*2;});
 					end
-					if maxCharged and animations["HeavyAttack"].IsPlaying then
-						animations["HeavyAttack"].TimePosition = animations["HeavyAttack"].Length/2;
-						animations["HeavyAttack"]:AdjustSpeed(0);
+					if maxCharged and track.IsPlaying then
+						track.TimePosition = track.Length/2;
+						track:AdjustSpeed(0);
 					end
+					
 					maxCharged = charge >= configurations.HeavyAttackSpeed;
 					
 				until not mouseProperties.Mouse1Down or not characterProperties.CanAction or not characterProperties.IsEquipped;
@@ -357,7 +360,8 @@ function ToolHandler:Equip(storageItem, toolModels)
 				if maxCharged then
 					staminaCost = staminaCost *2;
 					
-					animations["HeavyAttack"]:AdjustSpeed(1);
+					local track = toolAnimator:GetPlaying("HeavyAttack");
+					track:AdjustSpeed(1);
 					
 					remoteToolPrimaryFire:FireServer(storageItem.ID, 2);
 					if audio.PrimarySwing then
@@ -365,7 +369,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 					end
 					
 				else
-					animations["HeavyAttack"]:Stop();
+					toolAnimator:Stop("HeavyAttack");
 					primaryAttack();
 				end
 				
@@ -470,10 +474,11 @@ function ToolHandler:Equip(storageItem, toolModels)
 			repeat
 				if unequiped then return end;
 				remoteToolPrimaryFire:FireServer(storageItem.ID);
-				animations["PrimaryAttack"]:Play(0);
+				--animations["PrimaryAttack"]:Play(0);
 				
 				Stats.LastDrain = tick();
-				animations["Inspect"]:Stop();
+				toolAnimator:Stop("Inspect");
+
 				victims = {};
 				properties.Attacking = true;
 				
@@ -536,7 +541,8 @@ function ToolHandler:Equip(storageItem, toolModels)
 			
 			properties.Attacking = false;
 			
-			animations["PrimaryAttack"]:Stop(0.6);
+			toolAnimator:Stop("PrimaryAttack", {FadeTime=0.6});
+
 			if Equipped.Cache["CoreLoopAudio"] and audio.Core then
 				Equipped.Cache["CoreLoopAudio"].PlaybackSpeed = 1;
 				Equipped.Cache["CoreLoopAudio"].Volume = audio.Core.Volume;
@@ -547,14 +553,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 	
 	local function InspectRequest()
 		if not properties.Attacking then
-			local roll = random:NextInteger(1,10);
-			if animations["Inspect2"] and roll >= 7 then
-				animations["Inspect2"]:Play(0);
-				animations["Inspect2"].Stopped:Wait();
-			else
-				animations["Inspect"]:Play(0);
-				animations["Inspect"].Stopped:Wait();
-			end
+			toolAnimator:Play("Inspect", {FadeTime=0;});
 		end
 	end
 	
@@ -644,9 +643,9 @@ function ToolHandler:Equip(storageItem, toolModels)
 				throwStaminaCost = 0;
 			end
 			if Stats.Stamina <= 0 then 
-				animations["Charge"]:Stop(0);
-				animations["Throw"]:Play(0);
-				animations["Throw"]:AdjustSpeed(0.1);
+				toolAnimator:Stop("Charge", {FadeTime=0;});
+				toolAnimator:Play("Throw", {FadeTime=0; PlaySpeed=0.1});
+
 				return 
 			end;
 			Stats.LastDrain = tick();
@@ -656,8 +655,8 @@ function ToolHandler:Equip(storageItem, toolModels)
 			local throwCharge = throwChargeValue > 0.05 and throwChargeValue or 0;
 			local impactPoint = getImpactPoint();
 
-			animations["Charge"]:Stop(0);
-			animations["Throw"]:Play(0);
+			toolAnimator:Stop("Charge", {FadeTime=0;});
+			toolAnimator:Play("Throw", {FadeTime=0;});
 			
 			if audio.Throw then
 				modAudio.PlayReplicated(audio.Throw.Id, handle);
@@ -677,12 +676,25 @@ function ToolHandler:Equip(storageItem, toolModels)
 			remoteToolPrimaryFire:FireServer(storageItem.ID, "Throw", handle.Position, impactPoint, throwCharge);
 			
 			if storageItem.Quantity > 1 and configurations.ConsumeOnThrow ~= true then
-				--ToolHandler:Unequip(storageItem);
+				--
 			else
 				wait(configurations.ThrowRate or 0.2);
 				toolConfig.CanThrow = true;
 			end
 		end
+
+		local function meleeRender()
+			if not characterProperties.IsEquipped then return end;
+		
+			if rootPart:GetAttribute("WaistRotation") then
+				characterProperties.Joints.WaistY = math.rad(tonumber(rootPart:GetAttribute("WaistRotation")) or 0);
+				
+			elseif configurations.WaistRotation then
+				characterProperties.Joints.WaistY = configurations.WaistRotation;
+				
+			end
+		end
+		RunService:BindToRenderStep("MeleeRender", Enum.RenderPriority.Camera.Value, meleeRender);
 
 		RunService:BindToRenderStep("Throwable", Enum.RenderPriority.Character.Value, function()
 			if not characterProperties.IsFocused then
@@ -694,10 +706,10 @@ function ToolHandler:Equip(storageItem, toolModels)
 				arcList = {};
 				
 				characterProperties.Joints.WaistY = configurations.WaistRotation;
-				if animations["Charge"].IsPlaying then
-					animations["Charge"]:Stop(0);
-					animations["Throw"]:Play(0);
-					animations["Throw"]:AdjustSpeed(0.3);
+				local track = toolAnimator:GetPlaying("Charge");
+				if track then
+					track:Stop(0);
+					toolAnimator:Play("Throw", {FadeTime=0; PlaySpeed=0.3});
 				end
 				
 				initThrow = false;
@@ -721,11 +733,11 @@ function ToolHandler:Equip(storageItem, toolModels)
 				else
 					throwChargeValue = math.clamp((tick()-throwChargeTick) / configurations.ChargeDuration, 0.01, 0.99);
 					if throwChargeValue > 0.05 or characterProperties.IsFocused then
-						if not animations["Charge"].IsPlaying then
-							animations["Charge"]:Play(0);
-							animations["Charge"]:AdjustSpeed(0);
+						local track = toolAnimator:GetPlaying("Charge");
+						if track == nil then
+							track = toolAnimator:Play("Charge", {FadeTime=0; PlaySpeed=0;});
 						end
-						animations["Charge"].TimePosition = animations["Charge"].Length * throwChargeValue;
+						track.TimePosition = track.Length * throwChargeValue;
 					end
 					
 				end
@@ -795,20 +807,17 @@ function ToolHandler:Equip(storageItem, toolModels)
 			toolConfig:ClientItemPrompt();
 		end
 		
-		if toolConfig.RoleplayStateWindow then
-			if animations["RoleplayCore"] then
-				animations["RoleplayCore"]:Play(0.5);
-				animations["Core"]:Stop(0.5);
+		if toolConfig.RoleplayStateWindow and table.find(toolAnimator.StateList, "Roleplay") then
+			
+			toolAnimator:SetState("Roleplay");
+			toolAnimator:Play("Core", {FadeTime=0.5;});
 
-				task.spawn(function()
-					repeat task.wait(0.3) until not equipped or not modInterface:IsVisible(toolConfig.RoleplayStateWindow);
-					
-					if animations["RoleplayCore"] then
-						animations["RoleplayCore"]:Stop(0.5);
-					end
-					animations["Core"]:Play(0.5);
-				end)
-			end
+			task.spawn(function()
+				repeat task.wait(0.3) until not equipped or not modInterface:IsVisible(toolConfig.RoleplayStateWindow);
+				toolAnimator:SetState();
+				toolAnimator:Play("Core", {FadeTime=0.5;});
+			end)
+			
 		end
 	end
 	
@@ -829,13 +838,10 @@ function ToolHandler:Equip(storageItem, toolModels)
 		equipTime = equipTime * math.clamp(1-equipTimeReduction, 0, 1);
 	end
 	
-	local selectedLoadAnim = animations["Load"];
-	if selectedLoadAnim then
-		selectedLoadAnim:Play(0);
-		if selectedLoadAnim.Length > 0 then
-			local animSpeed = math.clamp(configurations.EquipLoadTime/equipTime, 0.5, 2);
-			selectedLoadAnim:AdjustSpeed(animSpeed);
-		end
+	local loadTrack = toolAnimator:Play("Load", {FadeTime=0;});
+	if loadTrack.Length > 0 then
+		local animSpeed = math.clamp(configurations.EquipLoadTime/equipTime, 0.5, 2);
+		loadTrack:AdjustSpeed(animSpeed);
 	end
 	
 	if toolConfig.OnToolEquip then
@@ -911,7 +917,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 
 				if modData.ItemPromptConn then modData.ItemPromptConn:Disconnect(); end
 				modData.ItemPromptConn = itemPromptButton.MouseButton1Click:Connect(function()
-					SpecialRequest();
+					script.Parent.Parent.CharacterInput:Fire("KeyToggleSpecial");
 				end)
 			end
 		end
@@ -927,6 +933,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 end
 
 function ToolHandler:Unequip(storageItem)
+	RunService:UnbindFromRenderStep("MeleeRender");
 	RunService:UnbindFromRenderStep("Throwable");
 	RunService.RenderStepped:Wait();
 	modFlashlight:Destroy();

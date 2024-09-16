@@ -802,6 +802,7 @@ function WeaponHandler:Equip(library, weaponId)
 			
 		elseif configurations.WaistRotation then
 			characterProperties.Joints.WaistY = configurations.WaistRotation;
+			
 		end
 		
 		modFlashlight:Update(bulletOrigin.WorldCFrame * CFrame.new(0, 0.5, 0));

@@ -3,13 +3,12 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local toolPackage = {
 	Type="Melee";
 	Animations={
-		Core={Id=88385412741022;};
-		Load={Id=90134835056137;};
-		PrimaryAttack={Id=129349391321673};
-		PrimaryAttack2={Id=129349391321673};
-		HeavyAttack={Id=138107195915025};
-		Inspect={Id=123039690215804;};
-		Unequip={Id=100516511704056};
+		Core={IdEdged=88385412741022; IdBlunt=88385412741022;};
+		Load={IdEdged=90134835056137; IdBlunt=90134835056137;};
+		PrimaryAttack={IdEdged=129349391321673; IdBlunt=129349391321673;};
+		HeavyAttack={IdEdged=138107195915025; IdBlunt=138107195915025;};
+		Inspect={IdEdged=123039690215804; IdBlunt=123039690215804;};
+		Unequip={IdEdged=100516511704056; IdBlunt=100516511704056;};
 	};
 	Audio={
 		Load={Id=2304904662; Pitch=1; Volume=0.4;};
@@ -21,6 +20,7 @@ local toolPackage = {
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 local modMeleeProperties = require(game.ReplicatedStorage.Library.Tools.MeleeProperties);
+local modAudio = require(game.ReplicatedStorage.Library.Audio);
 
 local bladeTweenInfo = TweenInfo.new(0.15);
 
@@ -28,6 +28,7 @@ function toolPackage.NewToolLib(handler)
 	local Tool = {};
 	Tool.Class = "Melee";
 	Tool.Category = "Edged";
+	Tool.DefaultAnimatorState = "Edged";
 
 	Tool.SpecialToggleHint = "to toggle between Edged and Blunt.";
 
@@ -43,6 +44,12 @@ function toolPackage.NewToolLib(handler)
 
 		end
 
+		if RunService:IsClient() then
+			local toolAnimator = toolHandler.ToolAnimator;
+
+			toolAnimator:SetState(toolConfig.Category);
+		end
+
 		if RunService:IsServer() then
 			local toolPrefab = toolHandler.Prefabs[1];
 
@@ -50,12 +57,16 @@ function toolPackage.NewToolLib(handler)
 			local colliderMotor: Motor6D = toolPrefab.Handle.Collider;
 
 			if toolConfig.Category == "Edged" then
+				modAudio.Play("SwitchBladeOpen", toolPrefab.PrimaryPart);
+
 				colliderMotor.C0 = CFrame.new(0, 2.122, 0);
 				TweenService:Create(bladeMotor, bladeTweenInfo, {
 					C0=CFrame.new(0, 1.26, 0);
 				}):Play();
 
 			else
+				modAudio.Play("SwitchBladeClose", toolPrefab.PrimaryPart);
+
 				colliderMotor.C0 = CFrame.new(0, 0, 0);
 				TweenService:Create(bladeMotor, bladeTweenInfo, {
 					C0=CFrame.new(0, 1.26, 0) * CFrame.Angles(0, 0, math.rad(-178));

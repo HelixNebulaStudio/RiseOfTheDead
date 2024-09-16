@@ -4261,6 +4261,34 @@ Commands["loadmainsave"] = {
 	end;
 };
 
+Commands["setwaistrot"] = {
+	Permission = PermissionLevel.DevBranch;
+	Description = "Set waist rotation for testing.";
+
+	RequiredArgs = 0;
+	UsageInfo = "/setwaistrot [degrees]";
+	Function = function(speaker, args)
+		local player = speaker;
+		
+		local classPlayer = modPlayers.Get(player);
+
+		if classPlayer.RootPart then
+
+			local waistRotation = tonumber(args[1]);
+			if waistRotation then
+				classPlayer.RootPart:SetAttribute("WaistRotation", waistRotation);
+				shared.Notify(player, `Waist rotation set = {waistRotation}`, "Inform");
+			else
+				classPlayer.RootPart:SetAttribute("WaistRotation", nil);
+				shared.Notify(player, `Waist rotation cleared`, "Inform");
+			end
+
+		end
+
+		return;
+	end;
+};
+
 Commands["mockequip"] = {
 	Permission = PermissionLevel.DevBranch;
 	Description = "Equip/unequip any tool as a proxy.";
