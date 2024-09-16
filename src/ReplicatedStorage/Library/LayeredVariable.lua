@@ -47,7 +47,7 @@ function LayeredVariable:Remove(id)
 	self.Changed:Fire();
 end
 
-function LayeredVariable:GetTable(recursive)
+function LayeredVariable:GetTable(index, recursive)
 	if self.Dirty then
 		for a=#self.Table, 1, -1 do
 			if self.Table[a].Expire and tick() > self.Table[a].Expire then
@@ -65,7 +65,7 @@ function LayeredVariable:GetTable(recursive)
 		self.Dirty = true;
 
 		if recursive ~= true then
-			t = self:GetTable(true);
+			t = self:GetTable(nil, true);
 		end
 	end
 

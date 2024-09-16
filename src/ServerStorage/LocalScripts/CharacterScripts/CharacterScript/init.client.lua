@@ -174,6 +174,8 @@ end
 
 characterProperties.WalkSpeed = modLayeredVariable.new(characterProperties.DefaultWalkSpeed);
 characterProperties.JumpPower = modLayeredVariable.new(characterProperties.DefaultJumpPower);
+characterProperties.SpeedMulti = modLayeredVariable.new(1);
+
 characterProperties.AmbientReverb = modLayeredVariable.new(Enum.ReverbType.NoReverb);
 characterProperties.SwimSpeed = characterProperties.DefaultSwimSpeed;
 characterProperties.SprintSpeed = characterProperties.DefaultSprintSpeed;
@@ -997,8 +999,9 @@ modCharacter.UpdateWalkSpeed = function()
 	elseif characterProperties.CanMove then
 		local speedTable = characterProperties.WalkSpeed:GetTable();
 		local speed = speedTable and speedTable.Value or nil;
-		
-		humanoid.WalkSpeed = math.clamp(speed, 0, 300);
+		local speedMulti = characterProperties.SpeedMulti:Get();
+
+		humanoid.WalkSpeed = math.clamp(speed * speedMulti, 0, 300);
 		humanoid.JumpPower = math.clamp(characterProperties.JumpPower:Get(), 0, 65);
 		
 		if speedTable.Id == "forceWalkspeed" and speed <= 0 then

@@ -313,10 +313,13 @@ function ToolHandler:Equip(storageItem, toolModels)
 				end
 				
 				if comboIndex and toolAnimator:GetTracks(`ComboAttack{comboIndex}`) then
-					characterProperties.CanMove = false;
+					--characterProperties.CanMove = false;
 
 					local comboInfo = configurations.Combos[comboIndex];
 					local animationId = "ComboAttack"..comboIndex;
+
+					modCharacter.CharacterProperties.SpeedMulti:Set("melee", 0.6, 2);
+					modCharacter.UpdateWalkSpeed();
 
 					local track = toolAnimator:Play(animationId, {FadeTime=0;});
 					track:AdjustWeight(1,0);
@@ -325,7 +328,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 					local onAnimFinish
 					onAnimFinish = track.Stopped:Connect(function() 
 						onAnimFinish:Disconnect();
-						characterProperties.CanMove = true;
+						modCharacter.CharacterProperties.SpeedMulti:Remove("melee");
 					end)
 					return;
 				end

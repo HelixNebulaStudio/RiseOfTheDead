@@ -27,6 +27,7 @@ if RunService:IsClient() then
 			DefaultWalkSpeed=18;
 			DefaultSprintSpeed=22;
 			DefaultSwimSpeed=12;
+			
 			NewWalkSpeed=18;
 			CrouchSpeed=10;
 			WalkingSpeed=6;
