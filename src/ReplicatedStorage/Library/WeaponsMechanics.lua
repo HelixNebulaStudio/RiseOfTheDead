@@ -286,9 +286,9 @@ type HitscanRayProperties = {
 		Position: Vector3;
 		Normal: Vector3;
 	}) -> nil)?;
+	RayRadius: number?;
 };
 
--- !outline: function CastHitscanRay(properties: HitscanRayProperties)
 -- MARK: CastHitscanRay()
 function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 	local origin = properties.Origin;
@@ -301,6 +301,7 @@ function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 	local onCastFunc = properties.OnCastFunc;
 	local penTable = properties.PenTable or {};
 	local penReDirection = properties.PenReDirection;
+	local rayRadius = properties.RayRadius or 0;
 	
 	local newOrigin = origin;
 	local distance = range;
@@ -317,7 +318,15 @@ function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 	repeat
 		raycastParams.FilterDescendantsInstances = includeList;
 
-		local raycastResult = workspace:Raycast(newOrigin, direction*distance, raycastParams);
+		local raycastResult;
+		
+		if rayRadius <= 0 then
+			raycastResult = workspace:Raycast(newOrigin, direction*distance, raycastParams);
+
+		else
+			raycastResult = workspace:Spherecast(origin, rayRadius, direction*distance, raycastParams);
+
+		end
 
 		local rayBasePart: BasePart, rayPoint, rayNormal, rayMaterial;
 		if raycastResult then

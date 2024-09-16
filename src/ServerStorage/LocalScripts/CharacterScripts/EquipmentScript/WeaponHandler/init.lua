@@ -337,9 +337,10 @@ function WeaponHandler:Equip(library, weaponId)
 	projRaycast.FilterType = Enum.RaycastFilterType.Include;
 	projRaycast.IgnoreWater = true;
 	projRaycast.CollisionGroup = "Raycast";
-	projRaycast.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain; workspace.Entity};
+	projRaycast.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain; workspace.Entity; workspace:FindFirstChild("Characters")};
 	
 	local s1Tick = tick();
+	
 	local aimWaistZ = 0;
 	
 	local function weaponRender(delta)
@@ -413,13 +414,9 @@ function WeaponHandler:Equip(library, weaponId)
 				Range = configurations.BulletRange;
 			};
 
+			-- MARK: 3rd person tilt peek;
 			local motorHeadPoint = (characterProperties.MotorHeadCFrameA * CFrame.Angles(0, 0, aimWaistZ) * characterProperties.MotorHeadCFrameB).Position;
-
-			-- local headPp = Debugger:PointPart(motorHeadPoint);
-			-- headPp.Color = Color3.fromRGB(0, 0, 255);
-			-- headPp.Size = Vector3.new(0.2,0.2,0.2);
-			-- game.Debris:AddItem(headPp, 0.1);
-
+			
 			local headDir = (scanPoint-motorHeadPoint).Unit;
 			local headDist = (scanPoint-motorHeadPoint).Magnitude;
 			local landPoint = modWeaponMechanics.CastHitscanRay{
@@ -429,34 +426,45 @@ function WeaponHandler:Equip(library, weaponId)
 				Range = headDist;
 			};
 
-			if RunService:IsStudio() then
-				local scanPp = Debugger:PointPart(scanPoint);
-				scanPp.Color = Color3.fromRGB(255, 0, 0);
-				game.Debris:AddItem(scanPp, 0.1);
+			local secAimWaist = aimWaistZ + (characterProperties.LeftSideCamera and -0.4 or 0.4);
+			local hpSecondPoint = (characterProperties.MotorHeadCFrameA * CFrame.Angles(0, 0, secAimWaist) * characterProperties.MotorHeadCFrameB).Position;
+
+			local secondPoint = modWeaponMechanics.CastHitscanRay{
+				Origin = hpSecondPoint;
+				Direction = (scanPoint-hpSecondPoint).Unit;
+				IncludeList = projRaycast.FilterDescendantsInstances;
+				Range = (scanPoint-hpSecondPoint).Magnitude;
+			};
+
+			-- if RunService:IsStudio() then
+			-- 	local scanPp = Debugger:PointPart(scanPoint);
+			-- 	scanPp.Color = Color3.fromRGB(255, 0, 0);
+			-- 	game.Debris:AddItem(scanPp, 0.1);
 	
-				local scanLp = Debugger:PointPart(landPoint);
-				scanLp.Color = Color3.fromRGB(0, 255, 0);
-				game.Debris:AddItem(scanLp, 0.1);
-			end
+			-- 	local scanLp = Debugger:PointPart(landPoint);
+			-- 	scanLp.Color = Color3.fromRGB(0, 255, 0);
+			-- 	game.Debris:AddItem(scanLp, 0.1);
+
+			-- 	local scanSp = Debugger:PointPart(secondPoint);
+			-- 	scanSp.Color = Color3.fromRGB(0, 0, 255);
+			-- 	game.Debris:AddItem(scanSp, 0.1);
+			-- end
 
 			local pointsDist = (scanPoint-landPoint).Magnitude;
+			local secondDist = (scanPoint-secondPoint).Magnitude;
 
 			--local screenPoint, onScreen = camera:WorldToViewportPoint(landPoint);
 			--tpScanFrame.Position = UDim2.new(0, screenPoint.X, 0, screenPoint.Y);
 
-
-			local limZ = math.rad(30);
 			if pointsDist > 0.1 then
-				-- third person blocked;
-
-				--local newHeadToTargetDot = (-mouseProperties.Direction):Dot(-headDir);
-				-- newHeadToTargetDot = math.clamp(newHeadToTargetDot, -limZ, limZ);
-
-				-- aimWaistZ = -newHeadToTargetDot;
-				-- if characterProperties.LeftSideCamera then
-				-- 	aimWaistZ = -newHeadToTargetDot;
-				-- end
 				tpBlockFrame.Visible = true;
+			else
+				tpBlockFrame.Visible = false;
+			end
+
+			local limZ = math.rad(20);
+			if secondDist > 0.1 then
+				-- third person blocked;
 
 				if characterProperties.LeftSideCamera then
 					aimWaistZ = aimWaistZ +0.02;
@@ -468,14 +476,12 @@ function WeaponHandler:Equip(library, weaponId)
 
 			else
 				-- third person not blocked;
-				tpBlockFrame.Visible = false;
 
 				aimWaistZ = modMath.Lerp(aimWaistZ, 0, 0.1);
 
 			end
 
 			characterProperties.Joints.WaistZ = modMath.Lerp(characterProperties.Joints.WaistZ, aimWaistZ, 0.1);
-
 		end
 		
 		if configurations.AimDownViewModel and equipped then
