@@ -6,9 +6,10 @@ local toolPackage = {
 		Core={IdEdged=88385412741022; IdBlunt=88385412741022;};
 		Load={IdEdged=90134835056137; IdBlunt=90134835056137;};
 		PrimaryAttack={IdEdged=129349391321673; IdBlunt=129349391321673;};
-		HeavyAttack={IdEdged=138107195915025; IdBlunt=138107195915025;};
+		HeavyAttack={IdEdged=138107195915025;};
 		Inspect={IdEdged=123039690215804; IdBlunt=123039690215804;};
 		Unequip={IdEdged=100516511704056; IdBlunt=100516511704056;};
+		SwitchMode={IdEdged=111076155912694; IdBlunt=111076155912694;};
 	};
 	Audio={
 		Load={Id=2304904662; Pitch=1; Volume=0.4;};
@@ -48,6 +49,7 @@ function toolPackage.NewToolLib(handler)
 			local toolAnimator = toolHandler.ToolAnimator;
 
 			toolAnimator:SetState(toolConfig.Category);
+			toolAnimator:Play("SwitchMode");
 		end
 
 		if RunService:IsServer() then
