@@ -369,7 +369,7 @@ GoldShopLibrary.Products:Add{
 	Id="colorhellsfire";
 	Icon="";
 	TitleText="Hellsfire Colors Pack";
-	Desc="Dip your weapons deep down to the depths of hell and back with these new hellsfire colors.";
+	Desc="Dip your weapons deep down to the depths of hell and back with these hellsfire colors.";
 	Product={
 		Type="Gold";
 		Price=200;
@@ -512,7 +512,6 @@ GoldShopLibrary.Products:Add{
 		Price=1000;
 		ItemId="skinpolaris";
 		ShowcaseType="SkinPerm";
-		New=true;
 	};
 	
 	Trader={Buy=false; Sell=false;};
@@ -1612,6 +1611,19 @@ GoldShopLibrary.Products:Add{
 	};
 };
 
+GoldShopLibrary.Products:Add{
+	Id="skullburstmod";
+	Product={
+		Type="Gold";
+		Price=4990;
+		ItemId="skullburstmod";
+		New=true;
+		Desc="\n\n\n<b>[Early Access]</b>  Will be obtainable from drops in the future.";
+	};
+};
+
+
+
 --=== CONTENT PAGES
 
 GoldShopLibrary.Pages = {
@@ -1740,8 +1752,7 @@ GoldShopLibrary.Pages = {
 		};
 	};
 	
-	NewItems = { --Products with New == true
-	};
+	NewItems = {}; --Products with New == true, auto added;
 	
 	FunItems = {
 		{Type="Product"; Id="keytar"};
