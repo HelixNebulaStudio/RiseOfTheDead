@@ -230,6 +230,7 @@ function DialogueService:InitServer(baseDialogueHandlers)
 
                 -- MARK: Base dialogues;
                 local baseDialoguesScript = modAssetHandler:GetServer(`Npc/{npcName}/Dialogues`);
+            
                 if baseDialoguesScript == nil then
                     baseDialoguesScript = modAssetHandler:GetServer(`Npc/Base/Dialogues`);
                 end
@@ -258,7 +259,14 @@ function DialogueService:InitServer(baseDialogueHandlers)
                     if dialogueResources.DialogueHandler then
                         dialogueResources.DialogueHandler(player, dialog, npcDialogData);
                     end
+
+                    local loadedDialogueHandler = DialogueService.Handlers[npcName];
+                    if loadedDialogueHandler then
+                        loadedDialogueHandler(player, dialog, npcDialogData);
+                    end
+                    
                 end
+
 
                 -- MARK: UserPrompt;
                 if packet.UserPrompt then
