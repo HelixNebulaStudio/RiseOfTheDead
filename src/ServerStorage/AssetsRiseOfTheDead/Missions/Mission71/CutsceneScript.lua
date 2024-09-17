@@ -155,6 +155,10 @@ return function(CutsceneSequence)
 				player:SetAttribute("FrankStandsOutside", nil);
 				endMission();
 				
+			elseif mission.Type == 4 then -- OnFail/Abort
+				player:SetAttribute("FrankStandsOutside", nil);
+				endMission();
+
 			end
 		end
 		mission.Changed:Connect(OnChanged);
