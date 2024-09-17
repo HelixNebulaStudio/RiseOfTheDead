@@ -111,7 +111,9 @@ function WeaponHandler:Equip(library, weaponId)
 	local cache = {
 		FlipPlayingWeaponAnim = nil;
 		LastSprintAnimationCanPlay = nil;
-	};
+	} :: any;
+
+	local weaponStatusDisplay = {};
 
 	for _, obj in pairs(playerGui:GetChildren()) do
 		if obj.Name == "WeaponInterface" then
@@ -123,12 +125,15 @@ function WeaponHandler:Equip(library, weaponId)
 	weaponInterface = script.WeaponInterface:Clone();
 	weaponInterface.Parent = playerGui;
 	
+	local weaponStatusTemplate = script:WaitForChild("WeaponStatusTemplate") :: TextLabel;
+
 	local crosshairFrame = weaponInterface:WaitForChild("CrosshairFrame");
 	local tpBlockFrame = weaponInterface:WaitForChild("TPBlock");
 	local scopeFrame = weaponInterface:WaitForChild("ScopeFrame");
 	local ammoCounter = weaponInterface:WaitForChild("AmmoCounter");
 	local reloadLabel = crosshairFrame:WaitForChild("ReloadIcon");
 	local hitmarker = weaponInterface:WaitForChild("HitmarkerFrame");
+	local weaponStatusHud = weaponInterface:WaitForChild("WeaponStatusHud") :: Frame;
 	
 	local keyPromptsFrame = weaponInterface:WaitForChild("KeyPrompts");
 	local reloadFrame = keyPromptsFrame:WaitForChild("ReloadHint");
@@ -396,6 +401,37 @@ function WeaponHandler:Equip(library, weaponId)
 			Equipped.RightHand.Data.Inaccuracy = Equipped.RightHand.Data.Inaccuracy + mouseProperties.FlinchInacc;
 		end
 		
+		-- Mod: Skullburst
+		if configurations.SkullBurst then
+			if cache.SkullBurstStacks == nil then
+				cache.SkullBurstStacks = 0;
+				cache.SkullBurstCooldownTick = tick();
+				cache.SkullBurstDepleteTick = tick();
+
+				weaponStatusDisplay.SkullBurst = {
+					Order=1;
+					Value=0;
+					Icon="rbxassetid://122209706920942";
+					Color=Color3.fromRGB(63, 130, 255);
+				}
+			end
+
+			if tick()-cache.SkullBurstCooldownTick >= 5 then
+				if tick()-cache.SkullBurstDepleteTick >= 0.5 then
+					cache.SkullBurstDepleteTick = tick();
+					cache.SkullBurstStacks = math.clamp(cache.SkullBurstStacks -0.04, 0, 1);
+				end
+			end
+
+			weaponStatusDisplay.SkullBurst.Value = cache.SkullBurstStacks/1;
+
+		else
+			cache.SkullBurstStacks = nil;
+			cache.SkullBurstCooldownTick = nil;
+			cache.SkullBurstDepleteTick = nil;
+			weaponStatusDisplay.SkullBurst = nil;
+		end
+
 		if characterProperties.FirstPersonCamera then
 			characterProperties.BodyLockToCam = true;
 			tpBlockFrame.Visible = false;
@@ -806,6 +842,39 @@ function WeaponHandler:Equip(library, weaponId)
 		end
 		
 		modFlashlight:Update(bulletOrigin.WorldCFrame * CFrame.new(0, 0.5, 0));
+
+		-- MARK: WeaponStatusDisplay;
+		for k, statusInfo in pairs(weaponStatusDisplay) do
+			local statusLabel = weaponStatusHud:FindFirstChild(k);
+			if statusLabel == nil then
+				statusLabel = weaponStatusTemplate:Clone();
+				statusLabel.Name = k;
+				statusLabel.LayoutOrder = statusInfo.Order;
+				statusLabel.Parent = weaponStatusHud;
+
+				local statusIcon = statusLabel:WaitForChild("ModIcon") :: ImageLabel;
+				statusIcon.Image = statusInfo.Icon;
+				statusIcon.ImageColor3 = statusInfo.Color;
+			end
+
+			statusLabel.Visible = statusInfo.Hide ~= true;
+			statusLabel.Text = statusInfo.Text or `{math.round(statusInfo.Value*100)}%`;
+		end
+
+		local wStatusHudVisible = false;
+		for _, obj in pairs(weaponStatusHud:GetChildren()) do
+			if not obj:IsA("GuiObject") then continue end;
+			if weaponStatusDisplay[obj.Name] == nil then
+				obj.Visible = false;
+				game.Debris:AddItem(obj, 0);
+			else
+				if obj.Visible then
+					wStatusHudVisible = true;
+				end
+			end
+		end
+		weaponStatusHud.Visible = wStatusHudVisible;
+
 	end
 	
 	local function playWeaponSound(id, looped)
@@ -848,14 +917,20 @@ function WeaponHandler:Equip(library, weaponId)
 	local function fireProj()
 		if not equipped or unequiped then return end;
 		
-		local baseFr = 60/properties.Rpm;
+		local rawRpm = properties.Rpm;
+
+		if configurations.SkullBurst and cache.SkullBurstStacks and cache.SkullBurstStacks >=0 then
+			rawRpm = rawRpm + (configurations.SkullBurst * cache.SkullBurstStacks);
+		end
+
+		local baseFr = 60/rawRpm;
 		local firerate = baseFr;
 		
 		if configurations.RapidFire then
 			local f = math.clamp((tick()-Equipped.RightHand.Data.RapidFireStart)/configurations.RapidFire, 0, 1);
 			firerate = baseFr + f*(delta - baseFr);
-			
 		end
+
 		firerate = math.clamp(firerate, configurations.RapidFireMax or delta, 999);
 		
 		if onShotTick and tick()-onShotTick < firerate then return end;
@@ -956,16 +1031,27 @@ function WeaponHandler:Equip(library, weaponId)
 				if audio.PrimaryFire.Looped then
 					if Equipped.RightHand.Data.loopedPrimaryFire == nil then
 						Equipped.RightHand.Data.loopedPrimaryFire = playWeaponSound(audio.PrimaryFire.Id, true);
-						if configurations.PrimaryFireAudio ~= nil then configurations.PrimaryFireAudio(Equipped.RightHand.Data.loopedPrimaryFire, 1); end
+						if configurations.PrimaryFireAudio ~= nil then 
+							configurations.PrimaryFireAudio(Equipped.RightHand.Data.loopedPrimaryFire, 1);
+						end
 					end
 				else
 					local primaryFireSound = playWeaponSound(audio.PrimaryFire.Id, false);
 					if primaryFireSound then
-						primaryFireSound.PlaybackSpeed = (audio.PrimaryFire.Pitch or 1) + (math.noise(properties.Ammo+0.1, 0.1, 0.1)/5);
-						
 						if configurations.RapidFire and Equipped.RightHand.Data.RapidFireStart then
 							local f = math.clamp((tick()-Equipped.RightHand.Data.RapidFireStart)/configurations.RapidFire, 0, 1);
 							primaryFireSound.PlaybackSpeed = 1+(f/2);
+
+						else
+							local rpmDif = 0;
+							if rawRpm > properties.BaseRpm then
+								rpmDif = (rawRpm/properties.BaseRpm)-1; -- > 0
+							elseif rawRpm < properties.BaseRpm then
+								rpmDif = (1/(properties.BaseRpm/rawRpm))-1; -- < 0
+							end
+							
+							primaryFireSound.PlaybackSpeed = (audio.PrimaryFire.Pitch or 1) + rpmDif; --+ (math.noise(properties.Ammo+0.1, 0.1, 0.1)/5);
+							 
 						end
 					end
 					if configurations.PrimaryFireAudio ~= nil then configurations.PrimaryFireAudio(primaryFireSound, 1); end
@@ -1075,11 +1161,21 @@ function WeaponHandler:Equip(library, weaponId)
 									end
 								end
 								
+								local isHeadshot = basePart.Name == "Head" or basePart:GetAttribute("IsHead") == true;
 								modWeaponMechanics.BulletHitSound{
 									Humanoid=humanoid;
 									BasePart=basePart;
 									Index=index;
 								}
+
+								-- Mod: Skullburst
+								if configurations.SkullBurst and isHeadshot then
+									if tick()-cache.SkullBurstCooldownTick >= 0.1 then
+										cache.SkullBurstCooldownTick = tick();
+										cache.SkullBurstStacks = math.clamp(cache.SkullBurstStacks +0.05, 0, 1);
+
+									end
+								end
 								
 								local weakpointTarget = basePart:FindFirstChild("WeakpointTarget");
 								if weakpointTarget then

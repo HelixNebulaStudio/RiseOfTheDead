@@ -478,7 +478,13 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 	end
 	
 	local timeSinceLastShot = (cache.LastShot and tick()-cache.LastShot or 99);
-	local baseFirerate = 60/properties.Rpm;
+	local rawRpm = properties.Rpm;
+
+	if configurations.SkullBurst then
+		rawRpm = rawRpm + configurations.SkullBurst;
+	end
+
+	local baseFirerate = 60/rawRpm;
 	if cache.LastShot and timeSinceLastShot+0.3 < baseFirerate then --properties.FireRate
 		warn("PrimaryFire>> "..client.Name.." fired "..weaponModel.Name.." too soon. Last shot:"..(math.ceil(timeSinceLastShot*10000)/10000).." Firerate:"..properties.FireRate);
 		return;

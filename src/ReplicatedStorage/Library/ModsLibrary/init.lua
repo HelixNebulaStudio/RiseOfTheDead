@@ -226,7 +226,7 @@ local GenericUpgrades = {
 	AmmoCapacity={DataTag="AC"; Name="Ammo Capacity"; Syntax="Upgrade Ammo Capacity"; MaxLevel=10; BaseCost=5; MaxCost=50; BaseValue=0.3; MaxValue=3; TweakBonus=1; Scaling=ModsLibrary.ScalingStyle.NaturalCurve; Rate=1;};
 }
 
---== Pistol Mods 1-49;
+-- MARK: Pistol Mods 1-49;
 Add{
 	Id="pistoldamagemod";
 	Name="Pistol Damage";
@@ -345,7 +345,7 @@ Add{
 	Category="Rare Mods";
 }
 
---== Submachine Gun Mods 50-99;
+-- MARK: Submachine Gun Mods 50-99;
 Add{
 	Id="subdamagemod";
 	Name="Submachine Gun Damage";
@@ -504,7 +504,7 @@ Add{
 }
 
 
---== Submachine Gun Mods 100-149;
+-- MARK: Submachine Gun Mods 100-149;
 Add{
 	Id="shotgundamagemod";
 	Name="Shotgun Damage";
@@ -660,7 +660,7 @@ Add{
 	Category="Rare Mods";
 }
 
---== Rifle Mods 150 - 199;
+-- MARK: Rifle Mods 150 - 199;
 Add{
 	Id="rifledamagemod";
 	Name="Rifle Damage";
@@ -798,7 +798,7 @@ Add{
 	Category="Rare Mods";
 }
 
---== Sniper 200 - 249;
+-- MARK: Sniper 200 - 249;
 Add{
 	Id="sniperdamagemod";
 	Name="Sniper Damage";
@@ -918,7 +918,7 @@ Add{
 	Category="Rare Mods";
 }
 
---== Heavy machine gun 250 - 299;
+-- MARK: Heavy machine gun 250 - 299;
 Add{
 	Id="hmgdamagemod";
 	Name="Heavy Machine Gun Damage";
@@ -988,7 +988,7 @@ Add{
 }
 
 
---== Pyrotechnic;
+-- MARK: Pyrotechnic;
 Add{
 	Id="pyrodamagemod";
 	Name="Pyrotechnic Damage";
@@ -1058,7 +1058,7 @@ Add{
 	Category="Rare Mods";
 }
 
---== Explosive;
+-- MARK: Explosive;
 Add{
 	Id="explosivedamagemod";
 	Name="Explosive Damage";
@@ -1127,7 +1127,7 @@ Add{
 	Category="Rare Mods";
 }
 
---== Bow;
+-- MARK: Bow;
 Add{
 	Id="bowdamagemod";
 	Name="Bow Damage";
@@ -1179,7 +1179,7 @@ Add{
 	Category="Rare Mods";
 }
 
---== Bolt mods;
+-- MARK: Bolt mods;
 Add{
 	Id="bowdeadweightmod";
 	Name="Bow Deadweight";
@@ -1199,7 +1199,7 @@ Add{
 }
 
 
---== Launcher mods;
+-- MARK: Launcher mods;
 Add{
 	Id="launchertriplethreatmod";
 	Name="Launcher Triple Threat";
@@ -1218,7 +1218,7 @@ Add{
 }
 
 
---== Generic Rare mods;
+-- MARK: Generic Rare mods;
 Add{
 	Id="ammorecyclermod";
 	Name="Ammo Recycler";
@@ -1236,7 +1236,24 @@ Add{
 	Category="Rare Mods";
 }
 
---== Elementals Mods 500-599;
+Add{
+	Id="skullburstmod";
+	Name="Intensifying Skull Burst";
+	Desc="Headshotting enemies stacks up <b>Fire Rate</b> by adding <b>RPM</b> based on a base <b>Fire Rate</b>. Stack Frequency: 0.1s";
+	Icon="rbxassetid://122209706920942";
+	BaseTier=2;
+	Tier=2;
+	Upgrades={
+		{DataTag="F"; Name="Fire Rate"; Syntax="Upgrade Fire Rate"; MaxLevel=10; BaseCost=8; MaxCost=80; BaseValue=0.1; MaxValue=0.5; TweakBonus=0.1; Scaling=ModsLibrary.ScalingStyle.NaturalCurve; Rate=1.5;};
+	};
+	Stackable=false;
+	Type={"Pistol"; "Submachine gun"; "Rifle"; "Sniper";};
+	EffectTrigger=ModsLibrary.EffectTrigger.Passive;
+	Module=script.SkullBurst;
+	Category="Rare Mods";
+}
+
+-- MARK: Elementals Mods 500-599;
 Add{
 	Id="incendiarymod";
 	Name="Incendiary Rounds";
@@ -1349,8 +1366,12 @@ Add{
 
 
 
---== Melee Mods;
---== Edge Melee Mods;
+-- MARK: Melee Mods;
+--==
+
+
+
+-- MARK: Edge Melee Mods;
 Add{
 	Id="edgeddamagemod";
 	Name="Edged Melee Damage";
@@ -1369,7 +1390,7 @@ Add{
 	Category="Damage Mods";
 };
 
---== Blunt Melee Mods;
+-- MARK: Blunt Melee Mods;
 Add{
 	Id="bluntdamagemod";
 	Name="Blunt Melee Damage";
@@ -1423,7 +1444,7 @@ Add{
 
 
 
---== Pointed Melee Mods;
+-- MARK: Pointed Melee Mods;
 Add{
 	Id="pointdamagemod";
 	Name="Point Melee Damage";
@@ -1442,8 +1463,12 @@ Add{
 };
 
 
---== Clothing Mods;
---== Utility Wear Mods;
+-- MARK: Clothing Mods;
+
+
+
+
+-- MARK: Utility Wear Mods;
 Add{
 	Id="beltslotsmod";
 	Name="Hot Slots";
@@ -1596,7 +1621,7 @@ Add{
 
 -- DoubleEdged rbxassetid://16049544633
 
---== Head wear;
+-- MARK: Head wear;
 Add{
 	Id="flinchcushioning";
 	Name="Flinch Cushioning";
@@ -1614,7 +1639,7 @@ Add{
 	Category="Rare Mods";
 };
 
---== Gloves
+-- MARK: Gloves
 
 Add{
 	Id="gripmod";
