@@ -36,6 +36,7 @@ function ToolAnimator:LoadToolAnimations(toolLibAnimations, setState)
             table.insert(self.StateList, stateName);
 
             for a=1, #idList do
+                if typeof(idList[a]) ~= "number" then continue end;
                 local animationId = "rbxassetid://"..idList[a];
                 
                 local animationFile = Instance.new("Animation");

@@ -1120,7 +1120,7 @@ RunService:BindToRenderStep("OffCamRender", Enum.RenderPriority.Input.Value, fun
 	end
 end)
 
-
+local vpWtY = 0;
 local upRayHit, upRayEnd;
 local function renderStepped(camera, deltaTime)
 	local renderTick = tick();
@@ -1402,9 +1402,9 @@ local function renderStepped(camera, deltaTime)
 
 					end
 				end
-				
+			
 				characterProperties.ViewModelPivot = viewModel
-					* CFrame.Angles(characterProperties.ViewModelSwayPitch, -waistY+characterProperties.ViewModelSwayYaw, characterProperties.ViewModelSwayRoll)
+					* CFrame.Angles(characterProperties.ViewModelSwayPitch, -waistY+vpWtY+characterProperties.ViewModelSwayYaw, characterProperties.ViewModelSwayRoll)
 					+ Vector3.new(characterProperties.ViewModelSwayX, swayY + characterProperties.ViewModelSwayY, 0) 
 					+ viewModel:VectorToObjectSpace(rootPart.CFrame:VectorToObjectSpace(rootPart.AssemblyLinearVelocity/200*characterProperties.VelocitySrength));
 
@@ -1726,6 +1726,7 @@ RunService.PreSimulation:Connect(function(step)
 			local neckTransform = head.Neck.Transform;
 			local waistTransform = character.UpperTorso.Waist.Transform;
 			local wtX, wtY, wtZ = waistTransform:ToEulerAnglesXYZ();
+			vpWtY = wtY;
 
 			local waistC0 = {X=0; Y=0; Z=0;};
 			local waistC1 = {X=0; Y=0; Z=0;};
@@ -1832,13 +1833,13 @@ RunService.PreSimulation:Connect(function(step)
 					prevViewModelHeight = viewModelHeight;
 					
 					local waistToCamCFrame = (rootPart.CFrame * CFrame.new(0, -viewModelHeight, 0)):ToObjectSpace(
-						CFrame.new(character.LowerTorso.CFrame.p) * CFrame.Angles(0, math.rad(rootPart.Orientation.Y), 0) * CFrame.new(originaldata.WaistC1.p)
+						CFrame.new(character.LowerTorso.CFrame.p)* CFrame.new(originaldata.WaistC1.p) -- math.rad(rootPart.Orientation.Y)  * CFrame.Angles(0, wtY, 0) 
 					);
 					if characterProperties.IsWounded then
 						character.UpperTorso.Waist.C1 = waistToCamCFrame;
 						
 					else
-						character.UpperTorso.Waist.C1 = waistToCamCFrame * waistC1Cf;
+						character.UpperTorso.Waist.C1 = waistToCamCFrame;
 						character.UpperTorso.Waist.Transform = waistC0Cf;
 
 					end
@@ -1864,7 +1865,7 @@ RunService.PreSimulation:Connect(function(step)
 			neckC1.X = math.clamp(-mouseY, -0.5, 0.4) + neckPitchOffset;
 
 			local neckC0Cf = CFrame.Angles(0, neckC0.Y, 0);
-			local neckC1Cf = CFrame.Angles(neckC1.X, 0, 0);
+			local neckC1Cf = CFrame.Angles(neckC1.X, wtY, 0);
 			
 			if submitMotorUpdates then
 				buffer.writei16(bodyBuffer, 8, math.round(neckC0.Y*100));

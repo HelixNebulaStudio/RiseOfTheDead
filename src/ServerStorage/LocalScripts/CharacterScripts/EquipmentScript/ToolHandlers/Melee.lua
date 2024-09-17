@@ -42,8 +42,6 @@ local mouseProperties = modCharacter.MouseProperties;
 local characterProperties = modCharacter.CharacterProperties;
 
 local Equipped;
-local animationFiles = {};
-local random = Random.new();
 local classPlayer = modPlayers.GetByName(player.Name);
 
 local BaseStats = {
@@ -394,8 +392,6 @@ function ToolHandler:Equip(storageItem, toolModels)
 			task.wait(attackTime);
 			if unequiped then return end;
 			
-			characterProperties.Joints.WaistY = configurations.WaistRotation;
-			
 			local cooldownTime = (attackTime * deficiency) - attackTime;
 			wait(cooldownTime);
 			properties.Attacking = false;
@@ -532,6 +528,22 @@ function ToolHandler:Equip(storageItem, toolModels)
 		end
 	end
 	
+
+	-- MARK: MeleeRender
+	local function meleeRender()
+		if not characterProperties.IsEquipped then return end;
+	
+		if rootPart:GetAttribute("WaistRotation") then
+			characterProperties.Joints.WaistY = math.rad(tonumber(rootPart:GetAttribute("WaistRotation")) or 0);
+			
+		elseif configurations.WaistRotation then
+			characterProperties.Joints.WaistY = configurations.WaistRotation;
+			
+		end
+	end
+	RunService:BindToRenderStep("MeleeRender", Enum.RenderPriority.Camera.Value, meleeRender);
+
+
 	local toggleTraj = false;
 
 	Equipped.Throwable = configurations.Throwable;
@@ -658,19 +670,6 @@ function ToolHandler:Equip(storageItem, toolModels)
 			end
 		end
 
-		local function meleeRender()
-			if not characterProperties.IsEquipped then return end;
-		
-			if rootPart:GetAttribute("WaistRotation") then
-				characterProperties.Joints.WaistY = math.rad(tonumber(rootPart:GetAttribute("WaistRotation")) or 0);
-				
-			elseif configurations.WaistRotation then
-				characterProperties.Joints.WaistY = configurations.WaistRotation;
-				
-			end
-		end
-		RunService:BindToRenderStep("MeleeRender", Enum.RenderPriority.Camera.Value, meleeRender);
-
 		RunService:BindToRenderStep("Throwable", Enum.RenderPriority.Character.Value, function()
 			if not characterProperties.IsFocused then
 				characterProperties.HideCrosshair = true;
@@ -680,7 +679,6 @@ function ToolHandler:Equip(storageItem, toolModels)
 				end
 				arcList = {};
 				
-				characterProperties.Joints.WaistY = configurations.WaistRotation;
 				local track = toolAnimator:GetPlaying("Charge");
 				if track then
 					track:Stop(0);
@@ -795,8 +793,6 @@ function ToolHandler:Equip(storageItem, toolModels)
 			
 		end
 	end
-	
-	characterProperties.Joints.WaistY = configurations.WaistRotation;
 	
 	if audio.Load then
 		modAudio.PlayReplicated(audio.Load.Id, handle, nil, audio.PrimarySwing.Pitch, audio.PrimarySwing.Volume);

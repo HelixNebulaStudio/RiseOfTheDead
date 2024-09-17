@@ -13,10 +13,10 @@ end
 function MeleeConfigurations.new(modMelee)
 	modMelee.__index = modMelee;
 	modMelee.Class = "Melee";
-	modMelee.Category = "Edged";
 	
 	local self = {
 		Configurations = {};
+		Category = modMelee.Category or "Edged";
 		
 		CalculateDps=function(self)
 			local dmg = self.Configurations.Damage;
