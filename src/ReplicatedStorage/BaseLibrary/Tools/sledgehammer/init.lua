@@ -5,7 +5,7 @@ local toolPackage = {
 	Animations=workspace:GetAttribute("IsDev") and {
 		Core={Id=16971466256;};
 		Load={Id=16971470417;};
-		PrimaryAttack={Id=16971463462};
+		PrimaryAttack={Id=77333142865939};
 		ComboAttack3={Id=16971481755};
 		Inspect={Id=16971479063;};
 		Unequip={Id=16971484030};

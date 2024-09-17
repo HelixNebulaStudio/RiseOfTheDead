@@ -4,7 +4,7 @@ local toolPackage = {
 	Type="Melee";
 	Animations=workspace:GetAttribute("IsDev") and {
 		Core={Id=16971651562;};
-		PrimaryAttack={Id=16971648919};
+		PrimaryAttack={Id=102007195486358};
 		Load={Id=16971653858;};
 		Inspect={Id=16971657001;};
 		Unequip={Id=16971658803;};
