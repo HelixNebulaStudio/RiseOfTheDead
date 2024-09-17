@@ -49,6 +49,9 @@ if RunService:IsServer() then
 				};
 
 			end;
+			if mission.ProgressionPoint == 2 then
+				mission.ProgressionPoint = 3;
+			end
 		end)
 	end)
 	
@@ -104,29 +107,30 @@ if RunService:IsServer() then
 
 		modMission:Progress(player, missionId, function(mission)
 			if mission.ProgressionPoint == 7 then
-				mission.ProgressionPoint = 8;
+				--mission.ProgressionPoint = 8;
+				modMission:CompleteMission(player, missionId);
 
 				modAnalyticsService:LogOnBoarding{
 					Player=player;
-					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_EquippedDamageMod;
+					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_Complete;
 				};
 			end;
 		end)
 	end)
 
-	modOnGameEvents:ConnectEvent("OnItemUpgraded", function(player, storageItem)
-		if not modMission:Progress(player, missionId) then return end
+	-- modOnGameEvents:ConnectEvent("OnItemUpgraded", function(player, storageItem)
+	-- 	if not modMission:Progress(player, missionId) then return end
 		
-		if storageItem.ItemId ~= "pistoldamagemod" then return end;
+	-- 	if storageItem.ItemId ~= "pistoldamagemod" then return end;
 		
-		modMission:CompleteMission(player, missionId);
+	-- 	modMission:CompleteMission(player, missionId);
 
-		modAnalyticsService:LogOnBoarding{
-			Player=player;
-			OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_Complete;
-		};
+	-- 	modAnalyticsService:LogOnBoarding{
+	-- 		Player=player;
+	-- 		OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_Complete;
+	-- 	};
 		
-	end)
+	-- end)
 	
 end
 

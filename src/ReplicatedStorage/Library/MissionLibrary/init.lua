@@ -287,8 +287,7 @@ MissionLibrary.New{
 		{Text="Wait for the mod to build";};
 
 		{Text="Collect the Pistol Damage Mod from the workbench"; Notify=true;};
-		{Text="Add the mod to your weapon using the workbench";};
-		{Text="Upgrade the mod's damage by selecting the mod on the workbench";};
+		{Text="Add the mod to your weapon by selecting the weapon on the workbench";};
 	};
 	Objectives={
 		["Item1"]={Index=1; Description="$Amount Metal Scraps"; Type="RequireItem"; ItemId="metal"; Amount=10;};

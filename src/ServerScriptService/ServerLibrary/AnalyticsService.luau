@@ -75,18 +75,18 @@ AnalyticsServiceWrapper.OnBoardingSteps = {
     Mission5_CheckBlueprintCost = 14;
     Mission5_BuildDamageMod = 15;
     Mission5_CollectDamageMod = 16;
-    Mission5_EquippedDamageMod = 17;
-    Mission5_Complete = 18;
+    --Mission5_EquippedDamageMod = 17;
+    Mission5_Complete = 17;
 
-    Mission6_Start = 19;
-    Mission6_DestroyedBarricade = 20;
-    Mission6_Complete = 21;
+    Mission6_Start = 18;
+    Mission6_DestroyedBarricade = 19;
+    Mission6_Complete = 20;
 
-    Mission7_Start = 22;
-    Mission7_EnteredBossFight = 23;
-    Mission7_DefeatedBoss = 24;
-    Mission7_UnlockedBloxmartGate = 25;
-    Mission7_Complete = 26;
+    Mission7_Start = 21;
+    Mission7_EnteredBossFight = 22;
+    Mission7_DefeatedBoss = 23;
+    Mission7_UnlockedBloxmartGate = 24;
+    Mission7_Complete = 25;
 };
 
 function AnalyticsServiceWrapper:LogOnBoarding(param)
