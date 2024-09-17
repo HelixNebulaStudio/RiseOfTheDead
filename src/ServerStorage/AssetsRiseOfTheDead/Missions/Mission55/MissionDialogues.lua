@@ -219,5 +219,25 @@ Dialogues.Zoey = {
 	DialogueHandler = genericDialogueHandler;
 };
 
+-- MARK: Rafael Handler
+Dialogues.Rafael = {
+	DialogueStrings = {
+		["shelter_init"]={
+			Face="Confident"; 
+			Reply="Hey, I'm just a scrappy but I can turn your poop into gold.";
+		};
+		["shelter_accept"]={
+			Face="Smirk"; 
+			Say="Is that soo? Come on in.";
+			Reply="Thanks, I'll just need some stuff before we begin.";
+		};
+		["shelter_decline"]={
+			Face="Suspicious"; 
+			Say="I'm afraid we can't accept anyone at the moment.";
+			Reply="One person's trash is another person's treasure, see ya then.";
+		};
+	};
+	DialogueHandler = genericDialogueHandler;
+};
 
 return Dialogues;
