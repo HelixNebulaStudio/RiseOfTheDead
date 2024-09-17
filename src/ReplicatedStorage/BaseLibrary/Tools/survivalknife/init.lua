@@ -5,15 +5,13 @@ local toolPackage = {
 	Animations=workspace:GetAttribute("IsDev") and {
 		Core={Id=16855529757;};
 		Load={Id=16855532480;};
-		PrimaryAttack={Id=16855534942};
-		PrimaryAttack2={Id=16855537221};
+		PrimaryAttack={Id={16855534942; 16855537221}};
 		Inspect={Id=16855539538;};
 		Unequip={Id=16855542753};
 	} or {
 		Core={Id=16855529757;};
 		Load={Id=16855532480;};
-		PrimaryAttack={Id=16855534942};
-		PrimaryAttack2={Id=16855537221};
+		PrimaryAttack={Id={16855534942; 16855537221}};
 		Inspect={Id=16855539538;};
 		Unequip={Id=16855542753};
 	};

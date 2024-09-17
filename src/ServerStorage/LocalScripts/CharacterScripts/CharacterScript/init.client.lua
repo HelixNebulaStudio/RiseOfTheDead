@@ -1684,13 +1684,14 @@ local stepBuffer = 0;
 -- MARK: PreSimulation;
 RunService.PreSimulation:Connect(function(step)
 	if not characterProperties.IsAlive then return end;
+
 	if stepBuffer >0 then 
 		stepBuffer = math.max(stepBuffer-1, 0); 
 
 		if characterProperties.AllowLerpBody then
 			pcall(function()
 				local neckTransform = head.Neck.Transform;
-				local waistTransform = character.UpperTorso.Waist.Transform;
+				local waistTransform: CFrame = character.UpperTorso.Waist.Transform;
 
 				if characterProperties.IsSliding then
 					-- sliding
@@ -1724,6 +1725,8 @@ RunService.PreSimulation:Connect(function(step)
 		local lerpS, lerpE = pcall(function()
 			local neckTransform = head.Neck.Transform;
 			local waistTransform = character.UpperTorso.Waist.Transform;
+			local wtX, wtY, wtZ = waistTransform:ToEulerAnglesXYZ();
+
 			local waistC0 = {X=0; Y=0; Z=0;};
 			local waistC1 = {X=0; Y=0; Z=0;};
 
@@ -1784,13 +1787,13 @@ RunService.PreSimulation:Connect(function(step)
 			elseif characterProperties.IsSliding then
 				-- sliding
 				waistC1.X = deg60;
-				waistC1.Y = waistY;
+				waistC1.Y = waistY - wtY;
 				waistTransform = CFrame.new();
 				
 			elseif characterProperties.IsCrouching then
 				-- crouching
 				waistC1.X = characterProperties.IsEquipped and 0 or deg45;
-				waistC1.Y = waistY;
+				waistC1.Y = waistY - wtY;
 
 				waistC0.X = mathClamp(mouseY, -0.7, 0.7);
 

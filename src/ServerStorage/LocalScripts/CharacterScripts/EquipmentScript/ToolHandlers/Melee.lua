@@ -118,29 +118,6 @@ function ToolHandler:Equip(storageItem, toolModels)
 	toolAnimator:LoadToolAnimations(toolLib.Animations, toolConfig.DefaultAnimatorState or "");
 
 	Equipped.ToolAnimator = toolAnimator;
-
-			-- local animations = Equipped.Animations;
-			-- for key, animLib in pairs(toolLib.Animations) do
-			-- 	local animationId = "rbxassetid://"..(animLib.OverrideId or animLib.Id);
-			-- 	local animationFile = animationFiles[animationId] or Instance.new("Animation");
-			-- 	animationFile.AnimationId = animationId;
-			-- 	animationFile.Parent = humanoid;
-			-- 	animationFiles[animationId] = animationFile;
-
-			-- 	if animations[key] then animations[key]:Stop() end;
-			-- 	local track: AnimationTrack = animator:LoadAnimation(animationFile);
-			-- 	animations[key] = track
-			-- 	animations[key].Name = (storageItem.ID)..":"..key;
-
-			-- 	if animLib.Looped ~= nil then
-			-- 		track.Looped = animLib.Looped == true;
-			-- 	end
-				
-			-- 	if key ~= "Core" and key ~= "RoleplayCore" then
-			-- 		animations[key].Priority = Enum.AnimationPriority.Action2;
-			-- 	end
-			-- end;
-			-- animations["Core"]:Play(0.5);
 	toolAnimator:Play("Core", {FadeTime=0.5});
 	
 	characterProperties.HideCrosshair = false;
@@ -156,16 +133,11 @@ function ToolHandler:Equip(storageItem, toolModels)
 		characterProperties.UseViewModel = true;
 
 		toolAnimator:Destroy();
-		-- for key, _ in pairs(animations) do
-		-- 	animations[key]:Stop();
-		-- end
+
 		modCharacter.EquippedTool = nil;
 		characterProperties.Joints.WaistY = 0;
 
 		toolAnimator:Play("Unequip");
-		-- if animations["Unequip"] then
-		-- 	animations["Unequip"]:Play();
-		-- end
 
 		if configurations.Throwable then
 			arcDisk:Destroy();
