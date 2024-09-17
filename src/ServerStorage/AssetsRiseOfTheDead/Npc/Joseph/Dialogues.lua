@@ -37,6 +37,7 @@ if RunService:IsServer() then
 		local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 		
 		if modBranchConfigs.IsWorld("TheInvestigation") then return end;
+
 		dialog:AddChoice("heal_request", function()
 			if not dialog.InRange() then return end;
 			modStatusEffects.FullHeal(player, 0.1);
@@ -59,23 +60,19 @@ if RunService:IsServer() then
 				dialog:InitDialog{
 					Reply="If you ever come across a crossbow, please show it to me.";
 					Face="Suspicious";
-				}
-	
-				local isCrossBow = false;
-				if profile.EquippedTools.WeaponModels == nil then return end;
-	
-				for a=1, #profile.EquippedTools.WeaponModels do
-					if profile.EquippedTools.WeaponModels[a]:IsA("Model") and profile.EquippedTools.WeaponModels[a]:GetAttribute("ItemId") == "arelshiftcross" then
-						isCrossBow = true;
-						break;
-	
-					end
-				end
-	
+				};
+				
+				local itemId = profile.EquippedTools and profile.EquippedTools.ItemId;
+				local isCrossBow = itemId == "arelshiftcross";
+
 				if isCrossBow then
-					dialog:AddChoice("josephcrossbow_try", function(dialog)
+					dialog:AddDialog({
+						Face="Skeptical"; 
+						Say="Is this crossbow what you are talking about?"; 
+						Reply="Ahh yes.. I had a build for the crossbow, I've written my build somewhere near my workbench a long time ago and forgotten it, try to figure out how it's built.";
+					}, function(dialog)
 						modMission:StartMission(player, 64);
-					end)
+					end);
 				end
 			end
 		end
