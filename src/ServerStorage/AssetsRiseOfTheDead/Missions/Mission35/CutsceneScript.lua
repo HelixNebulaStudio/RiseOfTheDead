@@ -81,6 +81,7 @@ return function(CutsceneSequence)
 					
 					local newCrate = game.ServerStorage.PrefabStorage.Objects.Crates.CratePallet:Clone();
 					newCrate.Name = "FoodScavengePackage";
+					newInteractable.Name = "Interactable";
 					newInteractable.Parent = newCrate;
 					
 					newCrate:PivotTo(workspace:FindFirstChild("RewardSpawn", true).CFrame * CFrame.new(0, 2, 0));
