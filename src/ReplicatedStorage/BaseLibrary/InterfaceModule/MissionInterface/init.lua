@@ -1262,7 +1262,12 @@ function Interface.init(modInterface)
 						newList.Visible = true;
 						for _, obj in pairs(newList:GetChildren()) do
 							if not obj:IsA("GuiObject") then continue end;
-							obj.Visible = true;
+
+							if obj:GetAttribute("OverrideVisible") == nil then
+								obj.Visible = true;
+							else
+								obj.Visible = obj:GetAttribute("OverrideVisible");
+							end
 							
 						end		
 
@@ -1867,15 +1872,15 @@ function Interface.init(modInterface)
 			end
 		end
 		
-		-- Repeatable Missions;
-		if #repeatableMissionList > 0 then 
+		-- MARK: Repeatable Missions;
+		do
 			local countRepeatableMissions = 0;
 			for a=1, #repeatableMissionList do
 				local missionData = repeatableMissionList[a].Data;
 				if missionData.Type == 1 or missionData.Type == 3 then continue end;
 				countRepeatableMissions = countRepeatableMissions +1;
 			end
-			local repeatableTab, repeatableList = newMissionList("Board", 0); -- {ForceExpand=true;}
+			local repeatableTab, repeatableList = newMissionList("Board", 0, {ForceExpand=true;}); -- 
 			repeatableTab:WaitForChild("titleLabel").Text = "Missions Board: "..countRepeatableMissions
 
 			local hourlyMissionListing = repeatableList:FindFirstChild("hourlyMission");
@@ -1968,7 +1973,7 @@ function Interface.init(modInterface)
 
 						local missionLib = repeatableMissionList[a].Lib;
 
-						local newButton = templateRMissionButton:Clone();
+						local newButton = templateRMissionButton:Clone() :: TextButton;
 						local titleLabel = newButton:WaitForChild("Title");
 						local descLabel = newButton:WaitForChild("Desc");
 						local rewardLabel = newButton:WaitForChild("Reward");
@@ -2052,6 +2057,12 @@ function Interface.init(modInterface)
 									};
 								}
 							});
+						end);
+
+						newButton.MouseButton2Click:Connect(function()
+							if RunService:IsStudio() then
+								Debugger:Warn("MissionInfo", missionData.Id, missionData);
+							end
 						end)
 
 					end
@@ -2071,8 +2082,6 @@ function Interface.init(modInterface)
 
 			questFrom.Visible = false;
 			titleLabel.Text = "Pick Mission";
-			hourlyMissionListing:SetAttribute("ForceShow", true);
-
 			hourlyMissionListing.Parent = repeatableList;
 
 			for a=1, #repeatableMissionList do
@@ -2081,8 +2090,10 @@ function Interface.init(modInterface)
 
 				createListing(repeatableMissionList[a], repeatableTab, repeatableList);
 			end
+			
+			hourlyMissionListing:SetAttribute("OverrideVisible", countRepeatableMissions > 0);
 		end
-		
+
 		-- General Missions;
 		for typeKey, typeMissions in pairs(missionTypesList) do
 			local typeIndex = modMissionsLibrary.MissionTypes[typeKey];

@@ -536,9 +536,14 @@ function ToolHandler:Equip(storageItem, toolModels)
 		if rootPart:GetAttribute("WaistRotation") then
 			characterProperties.Joints.WaistY = math.rad(tonumber(rootPart:GetAttribute("WaistRotation")) or 0);
 			
-		elseif configurations.WaistRotation then
-			characterProperties.Joints.WaistY = configurations.WaistRotation;
-			
+		else
+			if configurations.WaistRotation then
+				local waistRot = configurations.WaistRotation;
+				if characterProperties.FirstPersonCamera and configurations.FirstPersonWaistOffset then
+					waistRot = waistRot + configurations.FirstPersonWaistOffset;
+				end
+				characterProperties.Joints.WaistY = waistRot;
+			end
 		end
 	end
 	RunService:BindToRenderStep("MeleeRender", Enum.RenderPriority.Camera.Value, meleeRender);

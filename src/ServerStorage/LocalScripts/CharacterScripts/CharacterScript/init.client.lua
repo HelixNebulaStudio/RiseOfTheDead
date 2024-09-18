@@ -1381,6 +1381,7 @@ local function renderStepped(camera, deltaTime)
 				end
 
 				-- Having an attachment on the weapon for ADS does not work because of attachment cframe moving when adjusting pivot cframe.
+				local viewModelWaistY = 0;
 
 				local toolModule = modCharacter.EquippedToolModule;
 				if toolModule and toolModule.Configurations then
@@ -1392,7 +1393,7 @@ local function renderStepped(camera, deltaTime)
 						if modCharacter.DevViewModel then
 							viewModel = modCharacter.DevViewModel;
 						end
-
+						
 					else
 						if modCharacter.DevViewModel then
 							viewModel = viewModel * modCharacter.DevViewModel;
@@ -1400,11 +1401,17 @@ local function renderStepped(camera, deltaTime)
 							viewModel = viewModel * toolModule.Configurations.HipFireViewModel;
 						end
 
+						if toolModule.Class == "Weapon" then
+							viewModelWaistY = vpWtY/10;
+						else
+							viewModelWaistY = vpWtY;
+						end
+
 					end
 				end
 			
 				characterProperties.ViewModelPivot = viewModel
-					* CFrame.Angles(characterProperties.ViewModelSwayPitch, -waistY+vpWtY+characterProperties.ViewModelSwayYaw, characterProperties.ViewModelSwayRoll)
+					* CFrame.Angles(characterProperties.ViewModelSwayPitch, -waistY+viewModelWaistY+characterProperties.ViewModelSwayYaw, characterProperties.ViewModelSwayRoll)
 					+ Vector3.new(characterProperties.ViewModelSwayX, swayY + characterProperties.ViewModelSwayY, 0) 
 					+ viewModel:VectorToObjectSpace(rootPart.CFrame:VectorToObjectSpace(rootPart.AssemblyLinearVelocity/200*characterProperties.VelocitySrength));
 
@@ -1725,7 +1732,7 @@ RunService.PreSimulation:Connect(function(step)
 		local lerpS, lerpE = pcall(function()
 			local neckTransform = head.Neck.Transform;
 			local waistTransform = character.UpperTorso.Waist.Transform;
-			local wtX, wtY, wtZ = waistTransform:ToEulerAnglesXYZ();
+			local _, wtY, _ = waistTransform:ToEulerAnglesXYZ();
 			vpWtY = wtY;
 
 			local waistC0 = {X=0; Y=0; Z=0;};
