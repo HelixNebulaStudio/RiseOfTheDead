@@ -134,31 +134,36 @@ function Handler:Equip()
 	self.Npc.JointRotations.NeckRot:Set("tool", toolWaistRotation, 1);
 	
 	for key, libAnimations in pairs(toolLib.Animations) do
-		local animationFile = Instance.new("Animation");
-		animationFile.Parent = self.Wield.Instances.RightModel;
-		animationFile.AnimationId = "rbxassetid://"..(libAnimations.OverrideId or libAnimations.Id);
-		
-		local trackData = self.AnimGroup:LoadAnimation(key, animationFile);
-		self.Wield.ToolModule.Animations[key] = trackData;
-		
-		local track: AnimationTrack = trackData.Track;
-		track.Name = key;
-		
-		if key == "Core" then
-			track.Priority = Enum.AnimationPriority.Action;
+
+		local idList = typeof(libAnimations.Id) == "table" and libAnimations.Id or {libAnimations.Id};
+
+		for a=1, #idList do
+			local animationFile = Instance.new("Animation");
+			animationFile.Parent = self.Wield.Instances.RightModel;
+			animationFile.AnimationId = "rbxassetid://"..idList[a];
 			
-		elseif key == "Load" then
-			self.AnimGroup:Play("Load");
+			local trackData = self.AnimGroup:LoadAnimation(key, animationFile);
+			self.Wield.ToolModule.Animations[key] = trackData;
 			
-			track.Priority = Enum.AnimationPriority.Action3;
-		else
-			track.Priority = Enum.AnimationPriority.Action2;
-		end
-		
-		if self.Wield.ToolModule.OnMarkerEvent then
-			self.Npc.AnimationController:ConnectMarker(self.AnimGroup.Id..key, "Event", function(...)
-				self.Wield.ToolModule:OnMarkerEvent(self.Wield, ...);
-			end)
+			local track: AnimationTrack = trackData.Track;
+			track.Name = key;
+			
+			if key == "Core" then
+				track.Priority = Enum.AnimationPriority.Action;
+				
+			elseif key == "Load" then
+				self.AnimGroup:Play("Load");
+				
+				track.Priority = Enum.AnimationPriority.Action3;
+			else
+				track.Priority = Enum.AnimationPriority.Action2;
+			end
+			
+			if self.Wield.ToolModule.OnMarkerEvent then
+				self.Npc.AnimationController:ConnectMarker(self.AnimGroup.Id..key, "Event", function(...)
+					self.Wield.ToolModule:OnMarkerEvent(self.Wield, ...);
+				end)
+			end
 		end
 		
 	end

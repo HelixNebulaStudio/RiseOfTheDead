@@ -67,7 +67,7 @@ end
 
 function Mission:GetMission(player, missionId)
 	if missionId == 0 then error("Potential mission id unset.") end;
-	if player == nil then return end;
+	if player == nil or typeof(player) ~= "Instance" or not player:IsA("Player") then return end;
 	local missionProfile = self.GetMissions(player.Name);
 	local mission = missionProfile and missionProfile:Get(missionId) or nil;
 	return mission;
