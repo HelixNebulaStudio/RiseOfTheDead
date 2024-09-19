@@ -21,6 +21,7 @@ local modCustomizationData = require(game.ReplicatedStorage.Library.Customizatio
 local modProfile = Debugger:Require(game.ServerScriptService.ServerLibrary.Profile);
 local modOnGameEvents = Debugger:Require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modAnalytics = Debugger:Require(game.ServerScriptService.ServerLibrary.GameAnalytics);
+local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 
 local prefabsItems = game.ReplicatedStorage.Prefabs.Items;
@@ -225,7 +226,6 @@ function unequipTool(player, returnPacket)
 		if storageItem then
 			storageItem:DeleteValues("IsEquipped"):Sync();
 		end
-		--if inventory then inventory:DeleteValues(lastId, "IsEquipped"); end
 		
 		if profile.EquippedTools.Tick and profile.EquippedTools.ItemId then
 			pcall(function()
@@ -235,11 +235,68 @@ function unequipTool(player, returnPacket)
 				local duration = math.floor(tick()-profile.EquippedTools.Tick);
 				if duration <= 10 then return end;
 				
-				local key = "Wield:"..profile.EquippedTools.ItemId;
+				local key = `Wield_{profile.EquippedTools.ItemId}`;
 
 				if toolLib.IsWeapon then
-					if playerLevel > (modGlobalVars.MaxLevels * 0.75) then
-						modAnalytics.RecordDesign(player.UserId, key, duration);
+					local weaponLevel = storageItem:GetValues("L") or 0;
+
+					if playerLevel > 100 then
+						local modsAttached = 0;
+						local attachModTracking = {};
+						local attachmentStorage = storageItem and playerSave.Storages[storageItem.ID];
+						if attachmentStorage then
+							for attachId, attachStorageItem in pairs(attachmentStorage.Container) do
+								local attachItemId = attachStorageItem.ItemId;
+
+								local existingTrack;
+								for a=1, #attachModTracking do
+									if attachModTracking[a].ItemId == attachItemId then
+										existingTrack=attachModTracking[a];
+										break;
+									end
+								end
+
+								if existingTrack == nil then
+									existingTrack = {ItemId=attachItemId; Value=0;};
+									table.insert(attachModTracking, existingTrack);
+								end
+								existingTrack.Value = existingTrack.Value + duration;
+
+								modsAttached = modsAttached +1;
+							end
+
+							table.sort(attachModTracking, function(a, b)
+								return a.Value > b.Value;
+							end);
+	
+							for a=1, #attachModTracking do
+								local attachModItemId = attachModTracking[a].ItemId;
+								local attachModValue = attachModItemId[a].Value;
+
+								modAnalyticsService:LogCustomEvent{
+									Player=player;
+									EventName=`Attach_{attachModItemId}`;
+									Value=attachModValue;
+									CustomFields={
+										[Enum.AnalyticsCustomFieldKeys.CustomField01.Name] = `Weapon_{profile.EquippedTools.ItemId}`;
+										[Enum.AnalyticsCustomFieldKeys.CustomField02.Name] = `WeaponLevel_{math.round(weaponLevel/5)*5}`;
+										[Enum.AnalyticsCustomFieldKeys.CustomField03.Name] = `PlayerLevel_{math.round(playerLevel/100)*100}`;
+									};
+								};
+							end
+						end
+
+						modAnalyticsService:LogCustomEvent{
+							Player=player;
+							EventName=key;
+							Value=duration;
+							CustomFields={
+								[Enum.AnalyticsCustomFieldKeys.CustomField01.Name] = `WeaponLevel_{math.round(weaponLevel/5)*5}`;
+								[Enum.AnalyticsCustomFieldKeys.CustomField02.Name] = `PlayerLevel_{math.round(playerLevel/100)*100}`;
+								[Enum.AnalyticsCustomFieldKeys.CustomField03.Name] = `ModsAttached_{modsAttached}`;
+							};
+						};
+
 					end
 				else
 					profile.Analytics:LogTime(key, duration);
@@ -457,7 +514,13 @@ local function equipTool(player, paramPacket)
 					end
 					
 				end
-				profile.EquippedTools = {ItemId=storageItem.ItemId; ID=id; ToolWelds=newWelds; WeaponModels=newModels; Tick=tick(); StorageItem=storageItem;};
+				profile.EquippedTools = {
+					ItemId=storageItem.ItemId; 
+					ID=id; ToolWelds=newWelds; 
+					WeaponModels=newModels; 
+					Tick=tick(); 
+					StorageItem=storageItem;
+				};
 				
 				profile:SyncAuthSeed(false);
 				returnPacket.Equip = {

@@ -87,7 +87,7 @@ remoteCharacterRemote.OnServerEvent:Connect(function(player, action, paramPacket
 	if action == 0 and classPlayer then -- 0 Force reset
 		classPlayer:Kill(0);
 		
-	elseif action == 1 and t-(classPlayer.MotorCooldown or 0) >= 0.4 and classPlayer then -- 1 updatebodymotors
+	elseif action == 1 and classPlayer and t-(classPlayer.MotorCooldown or 0) >= 0.4 then -- 1 updatebodymotors
 		classPlayer.MotorCooldown = t;
 		
 		if paramPacket.LowestFps then

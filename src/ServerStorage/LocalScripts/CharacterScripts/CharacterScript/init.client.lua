@@ -1624,7 +1624,7 @@ RunService.Stepped:Connect(function(total, delta)
 	end
 	
 	
-	if classPlayer.Properties then
+	if classPlayer and classPlayer.Properties then
 		characterProperties.UnderwaterVision = classPlayer:GetBodyEquipment("UnderwaterVision") or 0.01;
 		characterProperties.SwimSpeed = classPlayer:GetBodyEquipment("SwimmingSpeed") or characterProperties.DefaultSwimSpeed;
 		characterProperties.SprintSpeed = classPlayer:GetBodyEquipment("SprintingSpeed") or characterProperties.DefaultSprintSpeed;

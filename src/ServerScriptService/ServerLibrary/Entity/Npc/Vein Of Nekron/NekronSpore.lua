@@ -8,7 +8,6 @@ local TweenService = game:GetService("TweenService");
 local CollectionService = game:GetService("CollectionService");
 
 local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 
 
@@ -21,6 +20,7 @@ function NekronSpore.Spawn(origin, veinTargetPart, parent, param)
 	
 	local self = {
 		Prefab=nil;
+		Cancelled=false;
 	};
 	
 	local hostNpcModule = param.HostNpcModule;

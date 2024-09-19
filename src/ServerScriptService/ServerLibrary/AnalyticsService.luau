@@ -107,8 +107,23 @@ function AnalyticsServiceWrapper:LogOnBoarding(param)
         boardingStep,
         boardingStepName,
         customFields
-    )
+    );
     
+end
+
+function AnalyticsServiceWrapper:LogCustomEvent(param)
+    local player = param.Player;
+    local eventName = param.EventName;
+    local value = param.Value;
+    local customFields = param.CustomFields;
+
+    AnalyticsService:LogCustomEvent(
+        player, 
+        eventName, 
+        value, 
+        customFields
+    );
+
 end
 
 return AnalyticsServiceWrapper;

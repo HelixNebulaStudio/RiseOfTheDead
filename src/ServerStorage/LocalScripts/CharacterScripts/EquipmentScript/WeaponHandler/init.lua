@@ -426,7 +426,7 @@ function WeaponHandler:Equip(library, weaponId)
 				}
 			end
 
-			if tick()-cache.SkullBurstCooldownTick >= 5 then
+			if tick()-cache.SkullBurstCooldownTick >= 3 then
 				if tick()-cache.SkullBurstDepleteTick >= 0.5 then
 					cache.SkullBurstDepleteTick = tick();
 					cache.SkullBurstStacks = math.clamp(cache.SkullBurstStacks -0.04, 0, 1);
