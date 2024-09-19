@@ -25,12 +25,14 @@ function ToolAnimator:LoadToolAnimations(toolLibAnimations, setState)
         local animPacket = {};
 
         for idKey, idList in pairs(animLib) do
-            idList = typeof(idList) == "table" and idList or {idList};
-            
             local stateName = "";
             if idKey:sub(1, 2) == "Id" then
                 stateName = idKey:sub(3, #idKey);
+            else
+                continue;
             end
+
+            idList = typeof(idList) == "table" and idList or {idList};
 
             animPacket[stateName] = {};
             table.insert(self.StateList, stateName);
