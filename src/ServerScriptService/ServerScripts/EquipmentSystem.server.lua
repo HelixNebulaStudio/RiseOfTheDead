@@ -271,7 +271,7 @@ function unequipTool(player, returnPacket)
 	
 							for a=1, #attachModTracking do
 								local attachModItemId = attachModTracking[a].ItemId;
-								local attachModValue = attachModItemId[a].Value;
+								local attachModValue = attachModTracking[a].Value;
 
 								modAnalyticsService:LogCustomEvent{
 									Player=player;
