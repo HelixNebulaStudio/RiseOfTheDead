@@ -2122,7 +2122,7 @@ RunService.PostSimulation:Connect(function(step)
 
 				local slopeUpFriction = 2;
 				local slopeDownFriction = 6;
-				if slopeDot > 0 then
+				if slopeDot > 0.1 then
 					slideMomentum = math.min(slideMomentum + slopeDot/slopeDownFriction, characterProperties.SlideSpeed*1.5);
 				else
 					slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.3) *slopeUpFriction;
