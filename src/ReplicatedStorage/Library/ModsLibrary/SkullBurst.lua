@@ -13,11 +13,11 @@ function Mod.Activate(packet)
 		value = value + tweakVal;
 	end
 	
-	local baseRpm = module.Properties.BaseRpm;
-	local skullBurstRpm = baseRpm * value;
+	--local baseRpm = module.Properties.BaseRpm;
+	--local skullBurstRpm = baseRpm * value;
 
-	if module.Configurations.SkullBurst == nil or skullBurstRpm > module.Configurations.SkullBurst then
-		module.Configurations.SkullBurst = skullBurstRpm;
+	if module.Configurations.SkullBurst == nil or value > module.Configurations.SkullBurst then
+		module.Configurations.SkullBurst = value;
 	end
 end
 

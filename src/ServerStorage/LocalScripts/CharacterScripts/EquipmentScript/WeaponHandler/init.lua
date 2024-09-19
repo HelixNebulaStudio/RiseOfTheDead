@@ -114,6 +114,19 @@ function WeaponHandler:Equip(library, weaponId)
 	} :: any;
 
 	local weaponStatusDisplay = {};
+	
+	weaponStatusDisplay.Reload = {
+		Order=1;
+		Text="Reload";
+		Hide=true;
+		KeyCode=modKeyBindsHandler:ToString("KeyReload");
+	}
+	weaponStatusDisplay.ToggleSpecial = {
+		Order=2;
+		Text="Special";
+		Hide=true;
+		KeyCode=modKeyBindsHandler:ToString("KeyToggleSpecial");
+	}
 
 	for _, obj in pairs(playerGui:GetChildren()) do
 		if obj.Name == "WeaponInterface" then
@@ -126,6 +139,7 @@ function WeaponHandler:Equip(library, weaponId)
 	weaponInterface.Parent = playerGui;
 	
 	local weaponStatusTemplate = script:WaitForChild("WeaponStatusTemplate") :: TextLabel;
+	local keyPromptTemplate = script:WaitForChild("KeyPromptTemplate") :: TextLabel;
 
 	local crosshairFrame = weaponInterface:WaitForChild("CrosshairFrame");
 	local tpBlockFrame = weaponInterface:WaitForChild("TPBlock");
@@ -135,10 +149,6 @@ function WeaponHandler:Equip(library, weaponId)
 	local hitmarker = weaponInterface:WaitForChild("HitmarkerFrame");
 	local weaponStatusHud = weaponInterface:WaitForChild("WeaponStatusHud") :: Frame;
 	
-	local keyPromptsFrame = weaponInterface:WaitForChild("KeyPrompts");
-	local reloadFrame = keyPromptsFrame:WaitForChild("ReloadHint");
-	local activateModHint = keyPromptsFrame:WaitForChild("ActivateModHint");
-
 	local itemPromptButton = modInterface.TouchControls:WaitForChild("ItemPrompt");
 	local touchItemPrompt = itemPromptButton:WaitForChild("Item");
 	
@@ -410,9 +420,9 @@ function WeaponHandler:Equip(library, weaponId)
 
 				weaponStatusDisplay.SkullBurst = {
 					Order=1;
-					Value=0;
 					Icon="rbxassetid://122209706920942";
 					Color=Color3.fromRGB(63, 130, 255);
+					Text="0%";
 				}
 			end
 
@@ -423,7 +433,8 @@ function WeaponHandler:Equip(library, weaponId)
 				end
 			end
 
-			weaponStatusDisplay.SkullBurst.Value = cache.SkullBurstStacks/1;
+			local percentRpm = math.round(math.clamp(configurations.SkullBurst * (cache.SkullBurstStacks/1), 0, configurations.SkullBurst)*100);
+			weaponStatusDisplay.SkullBurst.Text = `{percentRpm > 0 and "+" or ""}{percentRpm}%`;
 
 		else
 			cache.SkullBurstStacks = nil;
@@ -598,12 +609,7 @@ function WeaponHandler:Equip(library, weaponId)
 			lastAdsBool = false;
 		end
 		
-		
-		if properties.Ammo <= 0 and getReserveAmmo() > 0 then
-			reloadFrame.Visible = true;
-		else
-			reloadFrame.Visible = false;
-		end
+		weaponStatusDisplay.Reload.Hide = not (properties.Ammo <= 0 and getReserveAmmo() > 0);
 		
 		if characterProperties.IsFocused then
 			
@@ -847,18 +853,31 @@ function WeaponHandler:Equip(library, weaponId)
 		for k, statusInfo in pairs(weaponStatusDisplay) do
 			local statusLabel = weaponStatusHud:FindFirstChild(k);
 			if statusLabel == nil then
-				statusLabel = weaponStatusTemplate:Clone();
-				statusLabel.Name = k;
-				statusLabel.LayoutOrder = statusInfo.Order;
-				statusLabel.Parent = weaponStatusHud;
+				if statusInfo.KeyCode == nil then
+					statusLabel = weaponStatusTemplate:Clone();
+					statusLabel.Name = k;
+					statusLabel.LayoutOrder = statusInfo.Order;
+					statusLabel.Parent = weaponStatusHud;
+	
+					local statusIcon = statusLabel:WaitForChild("ModIcon") :: ImageLabel;
+					statusIcon.Image = statusInfo.Icon;
+					statusIcon.ImageColor3 = statusInfo.Color;
 
-				local statusIcon = statusLabel:WaitForChild("ModIcon") :: ImageLabel;
-				statusIcon.Image = statusInfo.Icon;
-				statusIcon.ImageColor3 = statusInfo.Color;
+				else
+					statusLabel = keyPromptTemplate:Clone();
+					statusLabel.Name = k;
+					statusLabel.LayoutOrder = statusInfo.Order+99;
+					statusLabel.Parent = weaponStatusHud;
+					
+					local statusIcon = statusLabel:WaitForChild("ModIcon") :: ImageLabel;
+					local keyLabel = statusIcon:WaitForChild("button") :: ImageLabel;
+					keyLabel.Text = statusInfo.KeyCode;
+
+				end
 			end
 
 			statusLabel.Visible = statusInfo.Hide ~= true;
-			statusLabel.Text = statusInfo.Text or `{math.round(statusInfo.Value*100)}%`;
+			statusLabel.Text = statusInfo.Text;
 		end
 
 		local wStatusHudVisible = false;
@@ -920,7 +939,10 @@ function WeaponHandler:Equip(library, weaponId)
 		local rawRpm = properties.Rpm;
 
 		if configurations.SkullBurst and cache.SkullBurstStacks and cache.SkullBurstStacks >=0 then
-			rawRpm = rawRpm + (configurations.SkullBurst * cache.SkullBurstStacks);
+			local baseRpm = properties.BaseRpm;
+			local skullBurstRpm = baseRpm * (configurations.SkullBurst * cache.SkullBurstStacks/1);
+
+			rawRpm = rawRpm + skullBurstRpm;
 		end
 
 		local baseFr = 60/rawRpm;
@@ -2283,10 +2305,6 @@ function WeaponHandler:Equip(library, weaponId)
 			
 			
 		elseif modInfo.Library.EffectTrigger == modModsLibrary.EffectTrigger.Activate then
-			activateModHint.Visible = true;
-			task.delay(1, function()
-				activateModHint.Visible = false;
-			end)
 			
 		end
 	end
