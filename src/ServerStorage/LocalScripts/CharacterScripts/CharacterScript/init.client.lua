@@ -1525,8 +1525,10 @@ RunService.Stepped:Connect(function(total, delta)
 		local hitResult = workspace:Raycast(rootPart.Position, rayDir, groundRayParam);
 		if hitResult and hitResult.Instance then
 			groundResult = hitResult;
+
+			groundHit = hitResult.Instance;
+			closestDist = hitResult.Distance;
 		end
-		closestDist = 0;
 
 	else
 		local results = modRaycastUtil.EdgeCast(rootPart, rayDir, groundRayParam);
