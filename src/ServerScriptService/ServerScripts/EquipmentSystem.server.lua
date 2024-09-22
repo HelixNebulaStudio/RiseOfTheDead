@@ -240,7 +240,7 @@ function unequipTool(player, returnPacket)
 				if toolLib.IsWeapon then
 					local weaponLevel = storageItem:GetValues("L") or 0;
 
-					if playerLevel > 100 then
+					if playerLevel >= 100 then
 						local modsAttached = 0;
 						local attachModTracking = {};
 						local attachmentStorage = storageItem and playerSave.Storages[storageItem.ID];
@@ -279,7 +279,7 @@ function unequipTool(player, returnPacket)
 									Value=attachModValue;
 									CustomFields={
 										[Enum.AnalyticsCustomFieldKeys.CustomField01.Name] = `Weapon_{profile.EquippedTools.ItemId}`;
-										[Enum.AnalyticsCustomFieldKeys.CustomField02.Name] = `WeaponLevel_{math.round(weaponLevel/5)*5}`;
+										[Enum.AnalyticsCustomFieldKeys.CustomField02.Name] = `WeaponClass_{toolLib.WeaponClass or "Misc"}`;
 										[Enum.AnalyticsCustomFieldKeys.CustomField03.Name] = `PlayerLevel_{math.round(playerLevel/100)*100}`;
 									};
 								};
@@ -288,12 +288,12 @@ function unequipTool(player, returnPacket)
 
 						modAnalyticsService:LogCustomEvent{
 							Player=player;
-							EventName=key;
+							EventName=`Wield_Weapon`;
 							Value=duration;
 							CustomFields={
-								[Enum.AnalyticsCustomFieldKeys.CustomField01.Name] = `WeaponLevel_{math.round(weaponLevel/5)*5}`;
-								[Enum.AnalyticsCustomFieldKeys.CustomField02.Name] = `PlayerLevel_{math.round(playerLevel/100)*100}`;
-								[Enum.AnalyticsCustomFieldKeys.CustomField03.Name] = `ModsAttached_{modsAttached}`;
+								[Enum.AnalyticsCustomFieldKeys.CustomField01.Name] = profile.EquippedTools.ItemId;
+								[Enum.AnalyticsCustomFieldKeys.CustomField02.Name] = `WeaponClass_{toolLib.WeaponClass or "Misc"}`;
+								[Enum.AnalyticsCustomFieldKeys.CustomField03.Name] = `PlayerLevel_{math.round(playerLevel/100)*100}`;
 							};
 						};
 

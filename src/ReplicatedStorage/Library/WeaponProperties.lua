@@ -81,7 +81,7 @@ function Weapon.new(configurations, properties, animations, audio)
 			
 			FocusDuration = 0;
 			AmmoCost = 1;
-		}
+		} :: any;
 		Configurations.BaseAmmoLimit = Configurations.AmmoLimit;
 		Configurations.BaseMaxAmmoLimit = Configurations.MaxAmmoLimit;
 		Configurations.__index = Configurations;

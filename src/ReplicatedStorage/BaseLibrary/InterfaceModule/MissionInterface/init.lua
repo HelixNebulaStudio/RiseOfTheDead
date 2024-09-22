@@ -673,8 +673,10 @@ function Interface.init(modInterface)
 				end)
 
 				if parentNode then
+					local bar;
+
 					if node.Type == parentNode.Type then
-						local bar = Instance.new("Frame");
+						bar = Instance.new("Frame");
 						bar.Name = "bar";
 						bar.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
 						bar.BorderSizePixel = 0;
@@ -685,7 +687,7 @@ function Interface.init(modInterface)
 						bar.Parent = newEntry;
 
 					elseif node.Type > parentNode.Type then
-						local bar = Instance.new("Frame");
+						bar = Instance.new("Frame");
 						bar.Name = "bar";
 						bar.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
 						bar.BorderSizePixel = 0;
@@ -696,6 +698,7 @@ function Interface.init(modInterface)
 						bar.Parent = newEntry;
 
 					end
+
 				end
 
 				if node.StorylineInfo then
@@ -726,7 +729,7 @@ function Interface.init(modInterface)
 					bar.Size = UDim2.new(0, (node.Type+1)*entryXSize, 0, 10);
 					bar.ZIndex = 1;
 					bar.Parent = storylineButton;
-
+					
 					storylineButton.BackgroundColor3 = info.Color;
 
 					local titleLabel: TextLabel = storylineButton:WaitForChild("Title") :: TextLabel;
