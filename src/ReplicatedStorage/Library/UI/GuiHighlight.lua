@@ -1,6 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local GuiHighlight = {}
+local GuiHighlight = {
+	HideBackground=nil;
+}
 
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
@@ -212,7 +214,7 @@ function GuiHighlight.Set(...)
 		end
 		
 		local function set(...)
-			local page = {Visible=true;};
+			local page = {Visible=true;} :: any;
 			
 			page.GuiObjects = {};
 			page.Directory = {...};
@@ -322,6 +324,8 @@ function GuiHighlight.Set(...)
 		
 		return interface;
 	end
+
+	return;
 end
 
 return GuiHighlight;

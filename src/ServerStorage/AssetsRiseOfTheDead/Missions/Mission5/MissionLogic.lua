@@ -117,26 +117,14 @@ if RunService:IsServer() then
 			end;
 		end)
 	end)
-
-	-- modOnGameEvents:ConnectEvent("OnItemUpgraded", function(player, storageItem)
-	-- 	if not modMission:Progress(player, missionId) then return end
-		
-	-- 	if storageItem.ItemId ~= "pistoldamagemod" then return end;
-		
-	-- 	modMission:CompleteMission(player, missionId);
-
-	-- 	modAnalyticsService:LogOnBoarding{
-	-- 		Player=player;
-	-- 		OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_Complete;
-	-- 	};
-		
-	-- end)
 	
 end
 
 -- MARK: IsClient()
 if RunService:IsClient() then
-	if not modBranchConfigs.IsWorld("TheWarehouse") then return {}; end;
+	if not RunService:IsStudio() then
+		if not modBranchConfigs.IsWorld("TheWarehouse") then return {}; end;
+	end
 	
 	local modWaypoint = require(game.ReplicatedStorage.Library.Waypoint);
 
@@ -166,9 +154,11 @@ if RunService:IsClient() then
 
 	function MissionLogic.Checkpoint3()
 		SetWaypoint();
-		local highlight = modGuiHighlight.Set("MainInterface", workbenchFrame, "navBar", "Blueprints")
+		local highlight = modGuiHighlight.Set("MainInterface", "MissionPinHud");
+		highlight.Next("MainInterface", workbenchFrame, "navBar", "Blueprints");
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "blueprints", "scrollList", "Damage Modslist", "list", "Pistol Damage Mod Blueprint")
-		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "customBuild", "scrollList", "BuildFrame", "ButtonFrame", "RequirementsFrame")
+		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "customBuild", "scrollList", "BuildFrame", "ButtonFrame", "BuildButton")
+
 	end
 
 	function MissionLogic.Checkpoint4()

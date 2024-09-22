@@ -24,8 +24,20 @@ if RunService:IsClient() then
 		MissionFunctions.activeWaypoint = w;
 	end
 
+	function MissionFunctions.Checkpoint1()
+		Debugger:Log("Checkpoint 1");
+		modGuiHighlight.Set("MainInterface", "DialogueFrame", "BackgroundFrame", "QuestionList", "whereAmI_deniski");
+
+	end
+	function MissionFunctions.Checkpoint2()
+		Debugger:Log("Checkpoint 2");
+
+		modGuiHighlight.Set("MainInterface");
+		SetWaypoint();
+	end
+
 	function MissionFunctions.Checkpoint6()
-		Debugger:Warn("Checkpoint6");
+		Debugger:Log("Checkpoint6");
 		local character = player.Character or player.CharacterAdded:Wait();
 		local rootPart = character:WaitForChild("HumanoidRootPart");
 		RunService.Heartbeat:Wait();
@@ -33,7 +45,6 @@ if RunService:IsClient() then
 		local highlight = modGuiHighlight.Set("MainInterface", "RatShopFrame", true);
 		highlight.Next("MainInterface", "Inventory", "MainList", "search:p250", "p250");
 		highlight.Next("MainInterface", "RatShopFrame", "PageFrame", "AmmoRefillOption");
-
 
 		if modBranchConfigs.IsWorld("TheWarehouse") then
 			SetWaypoint(modWaypoint.NewWaypoint(rootPart, workspace:WaitForChild("Interactables"):WaitForChild("ShopWaypoint") ));
@@ -43,8 +54,8 @@ if RunService:IsClient() then
 	end
 
 	function MissionFunctions.Checkpoint7()
-		Debugger:Warn("Checkpoint 7");
-		modGuiHighlight.Set();
+		Debugger:Log("Checkpoint 7");
+		modGuiHighlight.Set("MainInterface");
 		SetWaypoint();
 	end
 

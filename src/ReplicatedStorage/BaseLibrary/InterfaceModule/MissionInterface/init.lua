@@ -212,9 +212,6 @@ function Interface.init(modInterface)
 	end
 
 	local function loadObjectiveDescription(mission, objName, obj)
-		if RunService:IsStudio() then
-			Debugger:Warn("[Studio] loadObjectiveDescription ",mission.SaveData);
-		end
 		local itemId = mission.SaveData.ItemId;
 		local itemlib = mission.SaveData.ItemId and modItemsLibrary:Find(itemId);
 		local desc = obj.Description;

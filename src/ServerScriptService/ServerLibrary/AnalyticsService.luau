@@ -75,7 +75,6 @@ AnalyticsServiceWrapper.OnBoardingSteps = {
     Mission5_CheckBlueprintCost = 14;
     Mission5_BuildDamageMod = 15;
     Mission5_CollectDamageMod = 16;
-    --Mission5_EquippedDamageMod = 17;
     Mission5_Complete = 17;
 
     Mission6_Start = 18;
