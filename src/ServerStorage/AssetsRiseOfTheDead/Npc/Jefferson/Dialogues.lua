@@ -29,11 +29,24 @@ if RunService:IsServer() then
 			Reply="GET BACK! Stay away from me, I am infected.";
 			Face="Frustrated";
 		}
-		dialog:AddChoice("infected_letmehelp", function(dialog)
-			dialog:AddChoice("infected_insist", function(dialog)
+
+		dialog:AddDialog({
+			CheckMission=10;
+			Say="Please let me help you.";
+			Reply="I can't be saved, I'm infected. Don't waste your resources on me.";
+			Face="Frustrated"; 
+			FailResponses = {
+				{Reply="I don't think you can help me.."};
+			};
+		}, function(dialog)
+			dialog:AddDialog({
+				Say="It's okay, I want to help you.";
+				Face="Serious"; 
+				Reply="*sigh* If you insist, please get me some antibiotics for this wound from Sunday's convenient store.";
+			}, function(dialog)
 				modMission:StartMission(player, 10);
-			end)
-		end)
+			end);
+		end);
 		
 	end 
 end

@@ -13,19 +13,6 @@ local missionId = 10;
 
 -- !outline: Jefferson Dialogues
 Dialogues.Jefferson.DialogueStrings = {
-	["infected_letmehelp"]={
-		CheckMission=missionId;
-		Say="Please let me help you.";
-		Face="Frustrated"; Reply="I can't be saved, I'm infected. Don't waste your resources on me.";
-		FailResponses = {
-			{Reply="I don't think you can help me.."};
-		};
-	};
-	["infected_insist"]={
-		Say="It's okay, I want to help you.";
-		Face="Serious"; 
-		Reply="*sigh* If you insist, please get me some antibiotics for this wound from Sunday's convenient store.";
-	};
 	["infected_foundit"]={
 		Say="Here's the antibiotics.";
 		Face="Skeptical"; 
