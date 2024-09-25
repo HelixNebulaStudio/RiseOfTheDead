@@ -113,5 +113,19 @@ local Audio={
 	LoadShotgunShell={Id="LoadShotgunShell"; Preload=true;};
 }
 
-Configurations.ItemId = script.Name;
-return WeaponProperties.new(Configurations, Properties, Animations, Audio);
+local toolPackage = {
+	ItemId="rusty48";
+	Type="GunTool";
+	Animations=Animations;
+	Audio=Audio;
+
+	WeaponClass="Shotgun";
+	Tier=4;
+};
+
+function toolPackage.NewToolLib(handler)
+	local weaponModule = WeaponProperties.new(Configurations, Properties, Animations, Audio);
+	return weaponModule;
+end
+
+return toolPackage;

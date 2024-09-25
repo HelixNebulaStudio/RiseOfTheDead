@@ -92,5 +92,19 @@ local Audio={
 	Reload={Id=5677987779; Pitch=1.1; Volume=0.6;}; --2697295
 }
 
-Configurations.ItemId = script.Name;
-return WeaponProperties.new(Configurations, Properties, Animations, Audio);
+local toolPackage = {
+	ItemId="xm1014";
+	Type="GunTool";
+	Animations=Animations;
+	Audio=Audio;
+
+	WeaponClass="Shotgun";
+	Tier=1;
+};
+
+function toolPackage.NewToolLib(handler)
+	local weaponModule = WeaponProperties.new(Configurations, Properties, Animations, Audio);
+	return weaponModule;
+end
+
+return toolPackage;

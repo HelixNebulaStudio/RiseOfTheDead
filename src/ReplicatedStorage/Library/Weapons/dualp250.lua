@@ -93,5 +93,24 @@ local Audio={
 	Reload={Id=6876277137; Pitch=0.8; Volume=0.6;};
 };
 
-Configurations.ItemId = script.Name;
-return WeaponProperties.new(Configurations, Properties, Animations, Audio);
+local toolPackage = {
+	ItemId="dualp250";
+	Type="GunTool";
+	Animations=Animations;
+	Audio=Audio;
+
+	WeaponClass="Pistol";
+	Tier=2;
+	
+	Welds={
+		LeftToolGrip="p250";
+		RightToolGrip="p250";
+	}
+};
+
+function toolPackage.NewToolLib(handler)
+	local weaponModule = WeaponProperties.new(Configurations, Properties, Animations, Audio);
+	return weaponModule;
+end
+
+return toolPackage;

@@ -107,5 +107,19 @@ local Audio={
 	RevolverSpinChamber={Id="RevolverSpinChamber"; Preload=true;};
 }
 
-Configurations.ItemId = script.Name;
-return WeaponProperties.new(Configurations, Properties, Animations, Audio);
+local toolPackage = {
+	ItemId="revolver454";
+	Type="GunTool";
+	Animations=Animations;
+	Audio=Audio;
+
+	WeaponClass="Pistol";
+	Tier=2;
+};
+
+function toolPackage.NewToolLib(handler)
+	local weaponModule = WeaponProperties.new(Configurations, Properties, Animations, Audio);
+	return weaponModule;
+end
+
+return toolPackage;

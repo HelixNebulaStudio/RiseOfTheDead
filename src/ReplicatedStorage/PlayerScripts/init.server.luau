@@ -11,7 +11,7 @@ for _, s in pairs(script:GetChildren()) do
 end
 
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
-local moddedSelf = modModEngineService:GetModule(script.Name, game.ReplicatedStorage);
+local moddedSelf = modModEngineService:GetModule(`ModPlayerScripts`, game.ReplicatedStorage);
 if moddedSelf then 
 	moddedSelf:Init();
 end

@@ -113,6 +113,10 @@ function Npc.GetNpcPrefab(name)
 			
 		else
 			prefab = npcPrefabs[refPrefabName];
+			if prefab:IsA("Folder") then
+				local prefabsList = prefab:GetChildren();
+				return prefabsList[math.random(1, #prefabsList)];
+			end
 			
 		end;
 	end

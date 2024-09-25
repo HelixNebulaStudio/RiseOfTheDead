@@ -94,6 +94,19 @@ local Audio={
 	Reload={Id=5677987779; Pitch=1; Volume=0.6;};
 }
 
+local toolPackage = {
+	ItemId="sawedoff";
+	Type="GunTool";
+	Animations=Animations;
+	Audio=Audio;
 
-Configurations.ItemId = script.Name;
-return WeaponProperties.new(Configurations, Properties, Animations, Audio);
+	WeaponClass="Shotgun";
+	Tier=1;
+};
+
+function toolPackage.NewToolLib(handler)
+	local weaponModule = WeaponProperties.new(Configurations, Properties, Animations, Audio);
+	return weaponModule;
+end
+
+return toolPackage;

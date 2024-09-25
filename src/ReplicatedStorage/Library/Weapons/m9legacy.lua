@@ -85,6 +85,19 @@ local Audio={
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
 };
 
+local toolPackage = {
+	ItemId="m9legacy";
+	Type="GunTool";
+	Animations=Animations;
+	Audio=Audio;
 
-Configurations.ItemId = script.Name;
-return WeaponProperties.new(Configurations, Properties, Animations, Audio);
+	WeaponClass="Pistol";
+	Tier=2;
+};
+
+function toolPackage.NewToolLib(handler)
+	local weaponModule = WeaponProperties.new(Configurations, Properties, Animations, Audio);
+	return weaponModule;
+end
+
+return toolPackage;

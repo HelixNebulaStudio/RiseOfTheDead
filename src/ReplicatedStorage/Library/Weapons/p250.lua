@@ -88,5 +88,19 @@ local Audio={
 	LightMagUnload={Id="LightMagUnload"; Preload=true;};
 };
 
-Configurations.ItemId = script.Name;
-return WeaponProperties.new(Configurations, Properties, Animations, Audio);
+local toolPackage = {
+	ItemId="p250";
+	Type="GunTool";
+	Animations=Animations;
+	Audio=Audio;
+
+	WeaponClass="Pistol";
+	Tier=1;
+};
+
+function toolPackage.NewToolLib(handler)
+	local weaponModule = WeaponProperties.new(Configurations, Properties, Animations, Audio);
+	return weaponModule;
+end
+
+return toolPackage;

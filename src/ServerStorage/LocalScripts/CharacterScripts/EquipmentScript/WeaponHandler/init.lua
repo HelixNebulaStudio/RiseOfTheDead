@@ -100,7 +100,7 @@ end
 modConfigurations.OnChanged("DisableWeaponInterface", toggleWeaponInterface)
 modConfigurations.OnChanged("DisableHud", toggleWeaponInterface);
 
-function WeaponHandler:Equip(library, weaponId)
+function WeaponHandler:Equip(toolPackage, weaponId)
 	modAudio.Preload("BulletBodyImpact");
 	modAudio.Preload("BulletBodyImpact2");
 	modAudio.Preload("BulletHeadImpact");
@@ -163,8 +163,8 @@ function WeaponHandler:Equip(library, weaponId)
 	
 	local properties = modWeaponModule.Properties;
 	local configurations = modWeaponModule.Configurations;
-	local animations = modWeaponModule.Animations or library.Animations;
-	local audio = modWeaponModule.Audio or library.Audio;
+	local animations = modWeaponModule.Animations or toolPackage.Animations;
+	local audio = modWeaponModule.Audio or toolPackage.Audio;
 
 	for k, audioData in pairs(audio) do
 		modAudio.Preload(audioData.Id);

@@ -2,12 +2,17 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 
+local metaWeapons = {};
+metaWeapons.__index = metaWeapons;
 
 local Weapons = {};
+setmetatable(Weapons, metaWeapons);
+
 local totalWeapons = 0;
 
 function AddWeapon(data)
 	local module = script:WaitForChild(data.ItemId);
+	local toolPackage = require(module);
 	
 	local packet = {
 		Type="GunTool";
@@ -66,169 +71,82 @@ function AddWeapon(data)
 	end
 end
 
-Weapons.Import = AddWeapon;
+function metaWeapons:LoadToolModule(module)
+	if not module:IsA("ModuleScript") then return end;
 
-AddWeapon{
-	ItemId="p250";
-	WeaponClass="Pistol";
-}
+	local itemId = module.Name;
+	local toolPackage = require(module);
 
-AddWeapon{
-	ItemId="cz75";
-	WeaponClass="Pistol";
-};
+	toolPackage.ItemId = toolPackage.ItemId or itemId;
+	toolPackage.Animations = toolPackage.Animations or {};
+	toolPackage.Audio = toolPackage.Audio or {};
+	toolPackage.Welds = toolPackage.Welds or {
+		ToolGrip=(toolPackage.Generic or toolPackage.ItemId);
+	};
+	toolPackage.Module = module;
 
-AddWeapon{
-	ItemId="tec9";
-	WeaponClass="Pistol";
-};
+	toolPackage.IsWeapon = true;
+	toolPackage.WeaponClass = toolPackage.WeaponClass or "Misc";
+	toolPackage.Tier = toolPackage.Tier or 1;
+	toolPackage.Module = module;
 
-AddWeapon{
-	ItemId="deagle";
-	WeaponClass="Pistol";
-	Tier=3;
-};
+	local itemModel = module:FindFirstChild("itemModel");
+	if itemModel then
+		itemModel.Name = itemId;
+		itemModel.Parent = game.ReplicatedStorage.Prefabs.Items;
 
-AddWeapon{
-	ItemId="xm1014";
-	WeaponClass="Shotgun";
-};
+		toolPackage.Prefab = itemModel;
+	else
+		itemModel = game.ReplicatedStorage.Prefabs.Items:FindFirstChild(itemId);
+		toolPackage.Prefab = itemModel;
+	end
 
-AddWeapon{
-	ItemId="sawedoff";
-	WeaponClass="Shotgun";
-};
+	if toolPackage.Audio then
+		for soundType, audioProperties in pairs(toolPackage.Audio) do
+			if audioProperties.Preload == true then continue end;
 
-AddWeapon{
-	ItemId="mp5";
-	WeaponClass="Submachine gun";
-};
+			local audioId = tostring(audioProperties.Id);
+			audioProperties.Id = audioId;
+	
+			local soundFile = modAudio.Get(audioId);
+			if soundFile == nil then
+				if game:GetService("RunService"):IsServer() then
+					soundFile = Instance.new("Sound", script);
+					soundFile.Name = audioId;
+					soundFile.SoundId = "rbxassetid://"..audioId;
+					soundFile.PlaybackSpeed = audioProperties.Pitch;
+					soundFile.EmitterSize = 5;
+					if soundType == "PrimaryFire" then
+						soundFile.RollOffMaxDistance = 128;
+					elseif soundType == "Empty" then
+						soundFile.RollOffMaxDistance = 16;
+					else
+						soundFile.RollOffMaxDistance = 32;
+					end
+					soundFile.SoundGroup = game.SoundService.WeaponEffects;
+					soundFile.Volume = audioProperties.Volume ~= nil and audioProperties.Volume or 0.5;
+					soundFile.Parent = modAudio.ServerAudio;
 
-AddWeapon{
-	ItemId="mp7";
-	WeaponClass="Submachine gun";
-};
+					if modAudio.ModdedSelf then
+						modAudio.ModdedSelf.OnWeaponAudioLoad(soundType, audioProperties, soundFile);
+					end
+					modAudio.Library[audioId] = soundFile;
 
-AddWeapon{
-	ItemId="m4a4";
-	WeaponClass="Rifle";
-};
+				end
+			end
 
-AddWeapon{
-	ItemId="ak47";
-	WeaponClass="Rifle";
-};
+		end
+	end
 
-AddWeapon{
-	ItemId="awp";
-	WeaponClass="Sniper";
-};
+	Weapons[itemId] = toolPackage;
+end
 
-AddWeapon{
-	ItemId="minigun";
-	WeaponClass="Heavy machine gun";
-};
-
-AddWeapon{
-	ItemId="flamethrower";
-	WeaponClass="Pyrotechnic";
-};
-
-AddWeapon{
-	ItemId="revolver454";
-	WeaponClass="Pistol";
-	Tier=2;
-};
-
-AddWeapon{
-	ItemId="grenadelauncher";
-	WeaponClass="Explosive";
-	Tier=2;
-};
-
-AddWeapon{
-	ItemId="dualp250";
-	WeaponClass="Pistol";
-	Tier=2;
-	Welds={
-		LeftToolGrip="p250";
-		RightToolGrip="p250";
-	}
-};
-
-AddWeapon{
-	ItemId="m9legacy";
-	WeaponClass="Pistol";
-	Tier=2;
-}
-
-AddWeapon{
-	ItemId="mariner590";
-	WeaponClass="Shotgun";
-	Tier=2;
-};
-
-AddWeapon{
-	ItemId="czevo3";
-	WeaponClass="Submachine gun";
-	Tier=2;
-};
-
-AddWeapon{
-	ItemId="fnfal";
-	WeaponClass="Rifle";
-};
-
-AddWeapon{
-	ItemId="tacticalbow";
-	WeaponClass="Bow";
-	Tier=3;
-	Welds={
-		LeftToolGrip="tacticalbow";
-	}
-};
-
-AddWeapon{
-	ItemId="desolatorheavy";
-	WeaponClass="Heavy machine gun";
-};
-
-AddWeapon{
-	ItemId="rec21";
-	WeaponClass="Sniper";
-};
-
-AddWeapon{
-	ItemId="at4";
-	WeaponClass="Explosive";
-	Tier=3;
-};
-
-AddWeapon{
-	ItemId="sr308";
-	WeaponClass="Rifle";
-	Tier=3;
-};
-
-AddWeapon{
-	ItemId="vectorx";
-	WeaponClass="Submachine gun";
-	Tier=4;
-};
-
-AddWeapon{
-	ItemId="rusty48";
-	WeaponClass="Shotgun";
-	Tier=4;
-};
-
-AddWeapon{
-	ItemId="arelshiftcross";
-	WeaponClass="Bow";
-	Tier=4;
-};
-
-
+for _, m in pairs(script:GetChildren()) do
+	if not m:IsA("ModuleScript") then continue end;
+	if m.Name == "Template" then continue end;
+	
+	metaWeapons:LoadToolModule(m);
+end
 
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local moddedSelf = modModEngineService:GetModule(script.Name);

@@ -89,6 +89,8 @@ return function(npc, spawnPoint)
 			ExperiencePool=20;
 			ResourceDrop=modRewardsLibrary:Find("zombie");
 		};
+
+		WeakPointHidden=true;
 	};
 	
 	--== Initialize;
@@ -106,7 +108,7 @@ return function(npc, spawnPoint)
 		local wraithSmoke = game.ReplicatedStorage.Particles.WraithSmoke:Clone();
 		wraithSmoke.Parent = self.RootPart;
 		
-		for _, obj in pairs(self.Prefab:GetChildren()) do
+		for _, obj in pairs(self.Prefab:GetDescendants()) do
 			if obj:IsA("BasePart") and obj.Name ~= "HumanoidRootPart" then
 				obj.Transparency = 1;
 				
@@ -123,7 +125,9 @@ return function(npc, spawnPoint)
 		eyesPrefab.Parent = self.Prefab;
 		
 		local faceDecal = self.Prefab:FindFirstChild("face", true);
-		faceDecal.Transparency = 1;
+		if faceDecal then
+			faceDecal.Transparency = 1;
+		end
 
 		self.Movement:SetWalkSpeed("default", 16);
 		

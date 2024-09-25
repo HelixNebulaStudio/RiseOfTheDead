@@ -88,6 +88,19 @@ local Audio={
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
 }
 
+local toolPackage = {
+	ItemId="mp5";
+	Type="GunTool";
+	Animations=Animations;
+	Audio=Audio;
 
-Configurations.ItemId = script.Name;
-return WeaponProperties.new(Configurations, Properties, Animations, Audio);
+	WeaponClass="Submachine gun";
+	Tier=1;
+};
+
+function toolPackage.NewToolLib(handler)
+	local weaponModule = WeaponProperties.new(Configurations, Properties, Animations, Audio);
+	return weaponModule;
+end
+
+return toolPackage;
