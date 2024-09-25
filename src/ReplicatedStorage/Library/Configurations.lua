@@ -140,6 +140,10 @@ for eventId, dateTable in pairs(SpecialEventsTable) do
 		end
 	end
 	
+	if workspace:GetAttribute(eventId) == true then
+		isActive = true;
+	end
+
 	SpecialEvents[eventId] = isActive;
 end
 
