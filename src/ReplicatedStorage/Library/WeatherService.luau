@@ -112,6 +112,7 @@ if RunService:IsServer() then
 			/weather start [weatherId] [duration]
             /weather stop [weatherId]
             /weather list
+            /weather getactive
 			]];
 
 			RequiredArgs = 0;

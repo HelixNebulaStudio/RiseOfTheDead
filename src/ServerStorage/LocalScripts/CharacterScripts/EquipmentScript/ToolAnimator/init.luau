@@ -196,4 +196,18 @@ function ToolAnimator:Stop(animKey, param)
 
 end
 
+function ToolAnimator:ConnectMarkerSignal(markerKey, func)
+    for animKey, animPacket in pairs(self.Anims) do
+        for state, tracks: {AnimationTrack} in pairs(animPacket) do
+            for a=1, #tracks do
+                local track = tracks[a];
+                
+                track:GetMarkerReachedSignal(markerKey):Connect(function(value)
+                    func(animKey, track, value);
+                end)
+            end
+        end
+    end
+end
+
 return ToolAnimator;

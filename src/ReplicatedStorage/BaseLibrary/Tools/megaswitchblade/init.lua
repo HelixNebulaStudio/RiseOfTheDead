@@ -98,7 +98,8 @@ function toolPackage.NewToolLib(handler)
 
 		BaseKnockback=80;
 
-		WaistRotation=math.rad(0);
+		WaistRotation=math.rad(25);
+		FirstPersonWaistOffset=math.rad(0);
 
 		StaminaCost = 28;
 		StaminaDeficiencyPenalty = 0.6;

@@ -174,6 +174,16 @@ function ToolHandler:Equip(storageItem, toolModels)
 		end
 	end
 
+	toolAnimator:ConnectMarkerSignal("Event", function(animId, animTrack, value)
+		if configurations.OnMarkerEvent ~= nil then
+			configurations.OnMarkerEvent(self, animId, animTrack, value);
+		end
+	end)
+	-- :GetMarkerReachedSignal("Event"):Connect(function(paramString)
+	-- 	if configurations.OnMarkerEvent ~= nil then
+	-- 		configurations.OnMarkerEvent({Left=leftWeaponModel; Right=rightWeaponModel;}, key, paramString);
+	-- 	end
+	-- end)
 	-- table.insert(Equipped.Connections, animations["PrimaryAttack"]:GetMarkerReachedSignal("SetWaist"):Connect(setWaistMarker));
 	-- if animations["PrimaryAttack2"] then
 	-- 	table.insert(Equipped.Connections, animations["PrimaryAttack2"]:GetMarkerReachedSignal("SetWaist"):Connect(setWaistMarker));

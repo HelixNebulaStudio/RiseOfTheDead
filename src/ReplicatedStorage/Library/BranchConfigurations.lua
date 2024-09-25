@@ -208,7 +208,7 @@ Branches.WorldLibrary = {
 	-- Coop;
 	Genesis={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
 	SunkenShip={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
-	CargoShip={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; WeatherCycle=false; Type=Branches.WorldTypes.General; MaxPlayers=4;};
+	CargoShip={GameMode=true; CanTravelTo=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=4;};
 
 	--== Events;
 	EasterButchery={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=1;};
