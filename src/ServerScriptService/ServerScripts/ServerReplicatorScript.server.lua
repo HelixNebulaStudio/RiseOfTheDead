@@ -692,7 +692,7 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 				newDamageSource.TargetPart=targetObject;
 				
 				if humanoid and targetDamageMultiplier then
-					if npcStatus.ClassName == "NpcStatus" and not npcStatus:CanTakeDamageFrom(client) then
+					if damagable.Object.ClassName == "NpcStatus" and not damagable.Object:CanTakeDamageFrom(client) then
 						return;
 					end
 					
@@ -704,7 +704,7 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 					damageSourceClone.Damage = damage;
 					modWeaponsMechanics.ProcessModHooks(damageSourceClone);
 					
-					if npcStatus.ClassName == "NpcStatus" then
+					if damagable.Object.ClassName == "NpcStatus" then
 						local npcModule = npcStatus:GetModule();
 						
 						if configurations.WeaponType == modAttributes.WeaponType.Pistol then

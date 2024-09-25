@@ -31,8 +31,7 @@ return function()
 		if handle == nil or not handle:IsDescendantOf(workspace) then return end;
 		local weaponData = modWeaponsLibrary[weaponItemId] or modWeaponsLibrary["p250"];
 		
-		local weaponModule = require(weaponData.Module)();
-		
+		local weaponModule = weaponData.NewToolLib();
 		
 		local weaponConfigurations = weaponModule.Configurations;
 		local audio = weaponModule.Audio;
