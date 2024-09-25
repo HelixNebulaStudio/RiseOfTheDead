@@ -2007,6 +2007,7 @@ function WeaponHandler:Equip(library, weaponId)
 
 		modData.OnAmmoUpdate:DisconnectAll();
 		characterProperties.Joints.WaistY = 0;
+		characterProperties.Joints.WaistZ = 0;
 		characterProperties.CustomViewModel = nil;
 		characterProperties.AimDownSights = false;
 		modCharacter.DevViewModel = nil;

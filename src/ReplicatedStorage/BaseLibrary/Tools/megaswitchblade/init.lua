@@ -3,13 +3,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local toolPackage = {
 	Type="Melee";
 	Animations={
-		Core={IdEdged=88385412741022; IdBlunt=88385412741022;};
+		Core={IdEdged=88385412741022; IdBlunt=100039716699323;};
 		Load={IdEdged=90134835056137; IdBlunt=90134835056137;};
-		PrimaryAttack={IdEdged=129349391321673; IdBlunt=129349391321673;};
+		PrimaryAttack={IdEdged=129349391321673; IdBlunt=132575511732000;};
 		HeavyAttack={IdEdged=138107195915025;};
 		Inspect={IdEdged=123039690215804; IdBlunt=123039690215804;};
 		Unequip={IdEdged=100516511704056; IdBlunt=100516511704056;};
-		SwitchMode={IdEdged=111076155912694; IdBlunt=111076155912694;};
+		SwitchMode={IdEdged=111076155912694; IdBlunt=112369282090587;};
 	};
 	Audio={
 		Load={Id=2304904662; Pitch=1; Volume=0.4;};
