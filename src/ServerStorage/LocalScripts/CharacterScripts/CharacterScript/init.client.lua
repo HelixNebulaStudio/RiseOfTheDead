@@ -552,7 +552,7 @@ local function crouchRequest(value)
 			-- MARK: StartSlide;
 
 			slideBeginTick = tick();
-			characterProperties.CrouchKeyDown = false;
+			--characterProperties.CrouchKeyDown = false;
 			if slideSound then
 				slideSound.PlaybackSpeed = random:NextNumber(1.2, 1.5);
 				slideSound.Volume = 0.15;
@@ -575,6 +575,7 @@ local function crouchRequest(value)
 		
 	end
 end
+
 
 local mainInterface, interfaceModule, specFrame, notifyFrame, deathScreen, gameBlinds;
 local function loadInterface()
@@ -617,7 +618,7 @@ local function loadInterface()
 			end
 		end)
 
-		mainInterface.TouchControls.Crouch.MouseButton1Click:Connect(function()
+		mainInterface.TouchControls.Crouch.MouseButton1Down:Connect(function()
 			if characterProperties.IsAlive and characterProperties.CanMove and (tick()-crouchCooldown) > 0.1 then
 				if characterProperties.CanCrouch then
 					crouchRequest(not characterProperties.CrouchKeyDown);
@@ -625,6 +626,9 @@ local function loadInterface()
 					crouchRequest(false);
 				end
 			end
+		end)
+		mainInterface.TouchControls.Crouch.MouseButton1Up:Connect(function()
+			characterProperties.CrouchKeyDown = false;
 		end)
 
 		mainInterface.TouchControls.Sprint.MouseButton1Click:Connect(function()
@@ -797,9 +801,9 @@ UserInputService.InputChanged:Connect(function(inputObject, gameProcessedEvent)
 	end
 end)
 
-local function bindGamepadMovement(gamepad)
+local function bindGamepadMovement(gamepadId)
 	characterProperties.ControllerEnabled = true;
-	RunService:BindToRenderStep(tostring(gamepad), Enum.RenderPriority.Input.Value, function()
+	RunService:BindToRenderStep(tostring(gamepadId), Enum.RenderPriority.Input.Value, function()
 		mouseProperties.X = mouseProperties.X < -math.pi and math.pi or mouseProperties.X > math.pi and -math.pi or mouseProperties.X;
 		mouseProperties.X = mouseProperties.X + (-gamepadDelta.X/(mouseProperties.Mouse1Down and 40 or 10)* mouseProperties.Sensitivity);
 		mouseProperties.Y = mouseProperties.Y + (-gamepadDelta.Y/(mouseProperties.Mouse1Down and 60 or 15)* mouseProperties.Sensitivity);
@@ -807,9 +811,9 @@ local function bindGamepadMovement(gamepad)
 	end)
 end
 
-for _, gamepad in pairs(UserInputService:GetConnectedGamepads()) do bindGamepadMovement(gamepad) end;
+for _, gamepadId in pairs(UserInputService:GetConnectedGamepads()) do bindGamepadMovement(gamepadId) end;
 UserInputService.GamepadConnected:Connect(bindGamepadMovement);
-UserInputService.GamepadDisconnected:Connect(function(gamepad) RunService:UnbindFromRenderStep(tostring(gamepad)) end);
+UserInputService.GamepadDisconnected:Connect(function(gamepadId) RunService:UnbindFromRenderStep(tostring(gamepadId)) end);
 
 UserInputService.InputEnded:Connect(function(inputObject, gameProcessedEvent)
 	if modKeyBindsHandler:Match(inputObject, "KeyFire") then
@@ -832,6 +836,7 @@ UserInputService.InputEnded:Connect(function(inputObject, gameProcessedEvent)
 	
 	if inputObject.KeyCode == Enum.KeyCode.Left then xLeftDeltaAddition = false; end
 	if inputObject.KeyCode == Enum.KeyCode.Right then xRightDeltaAddition = false; end
+
 	if modKeyBindsHandler:Match(inputObject, "KeyCrouch") then -- or inputObject.KeyCode == Enum.KeyCode.ButtonR3
 		characterProperties.ActionKeyCtrlDown = false;
 		if modData.Settings.ToggleCrouch == 1 then
@@ -1224,6 +1229,45 @@ local function renderStepped(camera, deltaTime)
 	local zoomSensitivityDiff = camera.FieldOfView / characterProperties.BaseFieldOfView;
 	mouseProperties.Sensitivity = defaultSensitivity * zoomSensitivityDiff;
 
+	
+	if characterProperties.IsSliding then
+		if characterProperties.CrouchKeyDown == false then
+			stopSliding();
+		end
+
+		local xSlideTurnDelta = 0;
+		if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+			xSlideTurnDelta = xSlideTurnDelta +1;
+		end
+		if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+			xSlideTurnDelta = xSlideTurnDelta -1;
+		end
+		
+		if characterProperties.ThirdPersonCamera then
+			if xSlideTurnDelta ~= 0 then
+				mouseProperties.X = mouseProperties.X < -math.pi and math.pi or mouseProperties.X > math.pi and -math.pi or mouseProperties.X;
+				mouseProperties.X = mouseProperties.X + (xSlideTurnDelta * math.rad(2));
+				setAlignRot{
+					CFrame=rootPoint;
+					Enabled=true;
+				};
+
+			else
+				if characterProperties.IsFocused then
+					setAlignRot{
+						CFrame=rootPoint;
+						Enabled=true;
+					};
+				else
+					setAlignRot{
+						Enabled=false;
+					};
+				end
+
+			end
+		end
+	end
+
 	if xLeftDeltaAddition and not xRightDeltaAddition then
 		local add = math.rad(3);
 		if mouseProperties.MovementNoise == true then
@@ -1303,9 +1347,13 @@ local function renderStepped(camera, deltaTime)
 		camera.Focus = focusCf;
 		camera.CFrame = camera.Focus * CFrame.new(originOffset.X, originOffset.Y, tempzoom);
 
-		local zoomCutoff = camera:GetLargestCutoffDistance({CameraSubject.RootPart.Parent; CameraSubject.Vehicle;});
-		local newZoom = tempzoom-zoomCutoff --mathClamp(tempzoom-zoomCutoff, 0, maxZoomLevel);
-
+		local zoomCutoff = 0;
+		if modData:IsMobile() then
+		else
+			zoomCutoff = camera:GetLargestCutoffDistance({CameraSubject.RootPart.Parent; CameraSubject.Vehicle;});
+		end
+		
+		local newZoom = tempzoom-zoomCutoff;
 		local newCameraCFrame = camera.Focus * CFrame.new(originOffset.X, originOffset.Y, newZoom);
 
 		camera.CFrame = mouseProperties.CameraSmoothing == 0 and newCameraCFrame or oldCameraCFrame:lerp(newCameraCFrame, mouseProperties.CameraSmoothing);
@@ -1316,7 +1364,6 @@ local function renderStepped(camera, deltaTime)
 			character.RightUpperArm.RightShoulder.C0 = originaldata.RightShoulderC0;
 
 		end)
-
 
 	elseif characterProperties.FirstPersonCamera then
 		if CameraSubject.IsClientSubject and characterProperties.CanMove and characterProperties.IsAlive == true then

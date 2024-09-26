@@ -50,7 +50,6 @@ return function(npc, spawnPoint)
 	end
 	
 	--== Components;
---	self:AddComponent("Movement");
 --	self:AddComponent("Follow");
 --	self:AddComponent("Logic");
 --	self:AddComponent("DropReward");
