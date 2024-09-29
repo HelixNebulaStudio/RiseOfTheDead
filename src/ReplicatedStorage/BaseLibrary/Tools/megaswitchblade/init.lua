@@ -37,6 +37,7 @@ function toolPackage.NewToolLib(handler)
 		if inputData.InputType ~= "Begin" or inputData.KeyIds.KeyToggleSpecial == nil then return end;
 		
 		local toolConfig = toolHandler.ToolConfig;
+		local configurations = toolConfig.Configurations;
 		local properties = toolConfig.Properties;
 
 		if properties.Disabled then return end;
@@ -58,10 +59,18 @@ function toolPackage.NewToolLib(handler)
 
 			toolAnimator:SetState(toolConfig.Category);
 			toolAnimator:Play("SwitchMode");
-
+			toolAnimator:Play("Core");
 
 			properties.RadialDuration = 0.75;
 			properties.RadialTick = tick()+properties.RadialDuration;
+
+			-- if toolConfig.Category == "Edged" then
+			-- 	configurations.WaistRotation=math.rad(25);
+	
+			-- elseif toolConfig.Category == "Blunt" then
+			-- 	configurations.WaistRotation=math.rad(0);
+	
+			-- end
 		end
 
 		if RunService:IsServer() then
