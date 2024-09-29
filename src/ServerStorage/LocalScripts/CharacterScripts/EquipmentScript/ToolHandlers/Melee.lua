@@ -173,6 +173,8 @@ function ToolHandler:Equip(storageItem, toolModels)
 		if modData.ItemPromptConn then
 			modData.ItemPromptConn:Disconnect();
 		end
+
+		meleeInterface:Destroy();
 	end
 
 	local colliderOverlapParams = OverlapParams.new();

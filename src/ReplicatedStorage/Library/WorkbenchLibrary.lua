@@ -841,7 +841,11 @@ WorkbenchLibrary.ItemAppearance={
 		ToolGripOffset=CFrame.new();
 		ToolGrip={};
 	};
-	
+	["megaswitchblade"]={
+		ToolGripModel="megaswitchblade";
+		ToolGripOffset=CFrame.new();
+		ToolGrip={};
+	};
 	
 	--== Tools
 	["wateringcan"]={

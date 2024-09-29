@@ -15,13 +15,14 @@ function GearAttachments:RefreshAttachments(prefab)
 	local canQuery = true;
 	for a=1, #self.Attached[prefab] do
 		local attachmentData = self.Attached[prefab][a];
-		if attachmentData.Motor then
+		local motor = attachmentData.Motor;
+		if motor then
 			if a == 1 then
-				attachmentData.Motor.Part1 = prefab.PrimaryPart;
-				canQuery = attachmentData.Motor:GetAttribute("CanQuery") ~= false;
+				motor.Part1 = prefab.PrimaryPart;
+				canQuery = motor:GetAttribute("CanQuery") ~= false;
 				
 			else
-				attachmentData.Motor.Part1 = nil;
+				motor.Part1 = nil;
 				
 			end
 		end
@@ -41,14 +42,28 @@ function GearAttachments:AttachMotor(prefab, motor, bodyPart, priority)
 	motor.Parent, motor.Part1, motor.Part0 = bodyPart, prefab.PrimaryPart, bodyPart;
 	
 	table.insert(self.Attached[prefab], {Motor=motor; Priority=priority;});
+
+	if RunService:IsStudio() then
+		local offsetAtt = Instance.new("Attachment");
+		offsetAtt.Name = `{motor.Name}Offset`;
+		offsetAtt.Parent = bodyPart;
+		
+		offsetAtt:GetPropertyChangedSignal("CFrame"):Connect(function()
+			motor.C1 = motor:GetAttribute("DefaultC1") * offsetAtt.CFrame;
+		end)
+	end
+
 	self:RefreshAttachments(prefab);
 end
 
 function GearAttachments:CreateAttachmentMotor(attachment)
 	if attachment == nil then return end;
 	local bodyPart = attachment.Parent;
+
 	local motor = Instance.new("Motor6D");
 	motor.C1 = attachment.CFrame:Inverse();
+	motor:SetAttribute("DefaultC1", motor.C1);
+
 	--if RunService:IsStudio() then
 	--	attachment:GetPropertyChangedSignal("CFrame"):Connect(function()
 	--		motor.C1 = attachment.CFrame:Inverse();
