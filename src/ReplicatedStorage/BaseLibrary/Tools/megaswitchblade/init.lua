@@ -7,7 +7,7 @@ local toolPackage = {
 		Load={IdEdged=90134835056137; IdBlunt=90134835056137;};
 		PrimaryAttack={IdEdged=129349391321673; IdBlunt=132575511732000;};
 		HeavyAttack={IdEdged=138107195915025;};
-		Inspect={IdEdged=123039690215804; IdBlunt=123039690215804;};
+		Inspect={IdEdged=124027192088239; IdBlunt=71182743483465;};
 		Unequip={IdEdged=100516511704056; IdBlunt=100516511704056;};
 		SwitchMode={IdEdged=111076155912694; IdBlunt=112369282090587;};
 	};

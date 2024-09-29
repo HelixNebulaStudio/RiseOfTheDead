@@ -553,6 +553,7 @@ local function crouchRequest(value)
 
 			slideBeginTick = tick();
 			--characterProperties.CrouchKeyDown = false;
+
 			if slideSound then
 				slideSound.PlaybackSpeed = random:NextNumber(1.2, 1.5);
 				slideSound.Volume = 0.15;
@@ -628,6 +629,7 @@ local function loadInterface()
 			end
 		end)
 		mainInterface.TouchControls.Crouch.MouseButton1Up:Connect(function()
+			if modData:IsMobile() then return end;
 			characterProperties.CrouchKeyDown = false;
 		end)
 
@@ -945,6 +947,9 @@ function stopSliding(delayTime)
 		};
 		characterMoving(1.1);
 	end)
+	if modData:IsMobile() then
+		characterProperties.CrouchKeyDown = false;
+	end
 end
 
 function CameraShakeAndZoom(shakeStrength, zoomStrength, duration, smoothing, disallowOverride)
@@ -2193,6 +2198,7 @@ RunService.PostSimulation:Connect(function(step)
 				or humanoid.Sit 
 				or humanoid.PlatformStand 
 				or not characterProperties.IsAlive then
+
 				stopSliding();
 			end
 			
