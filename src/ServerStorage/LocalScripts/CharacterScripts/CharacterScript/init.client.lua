@@ -92,11 +92,13 @@ local oldCamOffsetX = 0;
 local oldCamOffsetY = 0;
 local cameraOriginOffset = Vector3.new();
 local crouchCooldown = tick()-1;
-local slideBeginTick = 0;
+
 local slideDirection = Vector3.new();
 local slideForce = Instance.new("BodyVelocity"); slideForce.MaxForce = Vector3.new(); slideForce.Parent = rootPart;
 local slideCooldown = tick()-5;
-local oldSlideMomentum = Vector3.new();
+local oldSlideMomentum = 0;
+local slopeUpFriction = 2;
+local slopeDownFriction = 6;
 
 local heartbeatSecTick = tick()-1;
 
@@ -551,9 +553,6 @@ local function crouchRequest(value)
 			and not characterProperties.IsWounded then
 			-- MARK: StartSlide;
 
-			slideBeginTick = tick();
-			--characterProperties.CrouchKeyDown = false;
-
 			if slideSound then
 				slideSound.PlaybackSpeed = random:NextNumber(1.2, 1.5);
 				slideSound.Volume = 0.15;
@@ -932,13 +931,28 @@ function stopSliding(delayTime)
 	Cache.lastSlide = nil;
 	characterProperties.IsSliding = false;
 	if slideSound then
-		spawn(function() repeat slideSound.Volume = slideSound.Volume - 0.05 until slideSound.Volume <= 0 or not wait(1/60); end)
+		spawn(function() 
+			repeat 
+				slideSound.Volume = slideSound.Volume - 0.05 
+			until slideSound.Volume <= 0 or not wait(1/60);
+		end)
 	end
 	dustParticle.Enabled = false;
 	if animations["slide"] then animations["slide"]:Stop(); end
 	slideCooldown = tick();
 
-	delay(delayTime == nil and 0 or delayTime, function()
+	task.spawn(function()
+		for a=0, (delayTime or 0), 1/15 do
+			local slopeDot = slideDirection:Dot(characterProperties.GroundNormal);
+
+			if slopeDot <= 0.1 then
+				oldSlideMomentum = oldSlideMomentum - math.max(math.abs(slopeDot), 0.3) *(slopeUpFriction*4);
+			end
+			slideForce.Velocity = slideDirection*math.max(oldSlideMomentum, 0);
+
+			task.wait(1/15);
+		end
+		
 		slideForce.MaxForce = Vector3.new(0, 0, 0);
 		characterProperties.SlideVelocity = Vector3.zero;
 		
@@ -947,6 +961,7 @@ function stopSliding(delayTime)
 		};
 		characterMoving(1.1);
 	end)
+	
 	if modData:IsMobile() then
 		characterProperties.CrouchKeyDown = false;
 	end
@@ -1240,40 +1255,11 @@ local function renderStepped(camera, deltaTime)
 			stopSliding();
 		end
 
-		local xSlideTurnDelta = 0;
-		-- if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-		-- 	xSlideTurnDelta = xSlideTurnDelta +1;
-		-- end
-		-- if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-		-- 	xSlideTurnDelta = xSlideTurnDelta -1;
-		-- end
-		
 		if characterProperties.ThirdPersonCamera then
-			if xSlideTurnDelta ~= 0 then
-				mouseProperties.X = mouseProperties.X < -math.pi and math.pi or mouseProperties.X > math.pi and -math.pi or mouseProperties.X;
-				mouseProperties.X = mouseProperties.X + (xSlideTurnDelta * math.rad(2));
-				setAlignRot{
-					CFrame=rootPoint;
-					Enabled=true;
-				};
-
-			else
-				setAlignRot{
-					CFrame=rootPoint;
-					Enabled=true;
-				};
-				-- if characterProperties.IsFocused then
-				-- 	setAlignRot{
-				-- 		CFrame=rootPoint;
-				-- 		Enabled=true;
-				-- 	};
-				-- else
-				-- 	setAlignRot{
-				-- 		Enabled=false;
-				-- 	};
-				-- end
-
-			end
+			setAlignRot{
+				CFrame=rootPoint;
+				Enabled=true;
+			};
 		end
 	end
 
@@ -2176,8 +2162,6 @@ RunService.PostSimulation:Connect(function(step)
 
 				local slopeDot = newSlideDirection:Dot(characterProperties.GroundNormal);
 
-				local slopeUpFriction = 2;
-				local slopeDownFriction = 6;
 				if slopeDot > 0.1 then
 					slideMomentum = math.min(slideMomentum + slopeDot/slopeDownFriction, characterProperties.SlideSpeed*1.5);
 				else
@@ -2197,7 +2181,6 @@ RunService.PostSimulation:Connect(function(step)
 			
 			if characterProperties.State == Enum.HumanoidStateType.FallingDown
 				or Cache.lastSlide == nil
-				--or (beatTick-Cache.lastSlide) >= slideDuration
 				or (rootPart.AssemblyLinearVelocity*Vector3.new(1, 0, 1)).Magnitude <= 5 
 				or humanoid.Sit 
 				or humanoid.PlatformStand 
@@ -2596,10 +2579,15 @@ end)
 
 humanoid.StateChanged:Connect(onHumanoidStateChanged);
 
+-- MARK: Humanoid.Jumping
 humanoid.Jumping:Connect(function(jumped)
 	Cache.LastJump = tick();
 	if jumped then
 		characterProperties.IsSliding = false;
+		
+		oldSlideMomentum = oldSlideMomentum + 5;
+		slideForce.Velocity = slideDirection*math.max(oldSlideMomentum, 0);
+		
 		stopSliding(0.2);
 		crouchToggleCheck(rootPart.CFrame, true);
 	end
