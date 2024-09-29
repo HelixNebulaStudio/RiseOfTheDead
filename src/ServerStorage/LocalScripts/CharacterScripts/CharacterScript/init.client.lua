@@ -1241,12 +1241,12 @@ local function renderStepped(camera, deltaTime)
 		end
 
 		local xSlideTurnDelta = 0;
-		if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-			xSlideTurnDelta = xSlideTurnDelta +1;
-		end
-		if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-			xSlideTurnDelta = xSlideTurnDelta -1;
-		end
+		-- if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+		-- 	xSlideTurnDelta = xSlideTurnDelta +1;
+		-- end
+		-- if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+		-- 	xSlideTurnDelta = xSlideTurnDelta -1;
+		-- end
 		
 		if characterProperties.ThirdPersonCamera then
 			if xSlideTurnDelta ~= 0 then
@@ -1258,16 +1258,20 @@ local function renderStepped(camera, deltaTime)
 				};
 
 			else
-				if characterProperties.IsFocused then
-					setAlignRot{
-						CFrame=rootPoint;
-						Enabled=true;
-					};
-				else
-					setAlignRot{
-						Enabled=false;
-					};
-				end
+				setAlignRot{
+					CFrame=rootPoint;
+					Enabled=true;
+				};
+				-- if characterProperties.IsFocused then
+				-- 	setAlignRot{
+				-- 		CFrame=rootPoint;
+				-- 		Enabled=true;
+				-- 	};
+				-- else
+				-- 	setAlignRot{
+				-- 		Enabled=false;
+				-- 	};
+				-- end
 
 			end
 		end

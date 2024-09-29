@@ -511,7 +511,7 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 					tpBlockFrame.Visible = false;
 				end
 
-				local limZ = math.rad(20);
+				local limZ = math.rad(26); 
 				if secondDist > 0.1 then
 					-- third person blocked;
 
