@@ -13,6 +13,7 @@ local character = script.Parent.Parent.Parent;
 local humanoid = character:WaitForChild("Humanoid");
 local animator = humanoid:WaitForChild("Animator");
 local player = game.Players.LocalPlayer;
+local playerGui = player.PlayerGui;
 
 --== Modules;
 local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
@@ -31,6 +32,7 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modToolAnimator = require(script.Parent.Parent.ToolAnimator);
 
+local modRadialImage = require(game.ReplicatedStorage.Library.UI.RadialImage);
 local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 
 --== Remotes;
@@ -43,6 +45,10 @@ local characterProperties = modCharacter.CharacterProperties;
 
 local Equipped;
 local classPlayer = modPlayers.GetByName(player.Name);
+
+local meleeInterface;
+local radialBar;
+local radialConfig = '{"version":1,"size":128,"count":60,"columns":8,"rows":8,"images":["rbxassetid://4286509260"]}';
 
 local BaseStats = {
 	MaxStamina = 100;
@@ -75,6 +81,7 @@ local Stats = setmetatable({Stamina = 0; SubStamina = 0;}, {__index=BaseStats;})
 local nextAttackTick = tick()-5;
 
 modData.MeleeStats = Stats;
+
 --== Script;
 ToolHandler.StaminaStats = Stats;
 
@@ -89,6 +96,8 @@ function ToolHandler:Equip(storageItem, toolModels)
 	local properties = toolConfig.Properties;
 	local audio = toolLib.Audio;
 	
+	properties.Disabled = false;
+
 	for k, audioData in pairs(audio) do
 		modAudio.Preload(audioData.Id);
 	end
@@ -123,6 +132,22 @@ function ToolHandler:Equip(storageItem, toolModels)
 		characterProperties.UseViewModel = false;
 	end
 	
+	for _, obj in pairs(playerGui:GetChildren()) do
+		if obj.Name == "MeleeInterface" then
+			obj:Destroy();
+		end
+	end
+
+	meleeInterface = script.MeleeInterface:Clone();
+	meleeInterface.Parent = playerGui;
+
+	local crosshairFrame = meleeInterface:WaitForChild("CrosshairFrame");
+	local radialBarImage = crosshairFrame:WaitForChild("RadialBar");
+
+	properties.RadialTick = tick()-1;
+	properties.RadialDuration = 0.1;
+	radialBar = modRadialImage.new(radialConfig, radialBarImage);
+
 	Equipped.RightHand.Unequip = function()
 		equipped = false;
 		unequiped = true;
@@ -260,6 +285,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 		end
 		
 		if not characterProperties.CanAction then return end;
+		if properties.Disabled then return end;
 		if configurations.Throwable and characterProperties.IsFocused then return end;
 		
 		if meleeMode == "Swing" then
@@ -533,6 +559,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 	end;
 	
 	local function InspectRequest()
+		if properties.Disabled then return end;
 		if not properties.Attacking then
 			toolAnimator:Play("Inspect", {FadeTime=0;});
 		end
@@ -543,6 +570,15 @@ function ToolHandler:Equip(storageItem, toolModels)
 	local function meleeRender()
 		if not characterProperties.IsEquipped then return end;
 	
+		if tick() <= properties.RadialTick then
+			radialBarImage.Visible=true;
+	
+			local alpha = 1-math.clamp((properties.RadialTick-tick())/properties.RadialDuration, 0, 1);
+			radialBar:UpdateLabel(alpha);
+		else
+			radialBarImage.Visible=false;
+		end
+
 		if rootPart:GetAttribute("WaistRotation") then
 			characterProperties.Joints.WaistY = math.rad(tonumber(rootPart:GetAttribute("WaistRotation")) or 0);
 			

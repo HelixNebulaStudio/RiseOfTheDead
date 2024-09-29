@@ -134,9 +134,10 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 		end
 	end
 
-	local modInterface = modData:GetInterfaceModule();
 	weaponInterface = script.WeaponInterface:Clone();
 	weaponInterface.Parent = playerGui;
+	
+	local modInterface = modData:GetInterfaceModule();
 	
 	local weaponStatusTemplate = script:WaitForChild("WeaponStatusTemplate") :: TextLabel;
 	local keyPromptTemplate = script:WaitForChild("KeyPromptTemplate") :: TextLabel;
