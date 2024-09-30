@@ -31,7 +31,25 @@ if RunService:IsClient() then
 	end
 	function MissionFunctions.Checkpoint2()
 		Debugger:Log("Checkpoint 2");
+		modGuiHighlight.Set("MainInterface");
+		SetWaypoint();
+	end
 
+	function MissionFunctions.Checkpoint3()
+		Debugger:Log("Checkpoint 3");
+		local character = player.Character or player.CharacterAdded:Wait();
+		local rootPart = character:WaitForChild("HumanoidRootPart");
+
+		modGuiHighlight.Set("MainInterface");
+		if modBranchConfigs.IsWorld("TheWarehouse") then
+			SetWaypoint(modWaypoint.NewWaypoint(rootPart, workspace:WaitForChild("Entity"):WaitForChild("Dr. Deniski"):WaitForChild("HumanoidRootPart") ));
+		else
+			SetWaypoint();
+		end;
+	end
+
+	function MissionFunctions.Checkpoint4()
+		Debugger:Log("Checkpoint 4");
 		modGuiHighlight.Set("MainInterface");
 		SetWaypoint();
 	end
@@ -43,7 +61,7 @@ if RunService:IsClient() then
 		RunService.Heartbeat:Wait();
 
 		local highlight = modGuiHighlight.Set("MainInterface", "RatShopFrame", true);
-		highlight.Next("MainInterface", "Inventory", "MainList", "search:p250", "p250");
+		highlight.Next("MainInterface", "Inventory"); --, "MainList", "search:p250", "p250"
 		highlight.Next("MainInterface", "RatShopFrame", "PageFrame", "AmmoRefillOption");
 
 		if modBranchConfigs.IsWorld("TheWarehouse") then

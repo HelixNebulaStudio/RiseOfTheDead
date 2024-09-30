@@ -194,7 +194,7 @@ MissionLibrary.New{
 		{Text="Talk to Mason";};
 		{Text="Talk to Nick";};
 		
-		{Text="Purchase ammo from the store for your P250";};
+		{Text="Go to shop and click your gun to buy ammo";};
 		{Text="Return to Nick"; Notify=true;};
 		{Text="Leave the warehouse";};
 		{Text="Kill $Kills zombies";};
