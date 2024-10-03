@@ -36,6 +36,7 @@ function LaserParticle.new()
 
     self.Beam.Attachment0 = self.OriginAttachment;
     self.Beam.Attachment1 = self.DestAttachment;
+    self.Beam.Parent = terrain;
 
     self.LaserDot.Parent = self.Beam.Attachment1;
 
@@ -69,30 +70,22 @@ function LaserParticle:Test(character: Model)
     self.OriginAttachment.Parent = terrain;
     self.DestAttachment.Parent = terrain;
     
-    self.Beam.Parent = terrain;
 
     local rootPart = character.PrimaryPart :: BasePart;
     local originPos = rootPart.Position;
 
-    for a=0, 128 do
-        local semiSphereRng = CFrame.Angles(0, math.rad(math.random(1, 360)), 0) * CFrame.Angles(math.rad(math.random(20, 65)), 0, 0) * CFrame.new(0, 64, 0);
-        local part = Debugger:PointPart(originPos + semiSphereRng.Position);
-        part.Size = Vector3.one;
-    end
-    local semiSphereRng = CFrame.Angles(0, math.rad(math.random(1, 360)), 0) * CFrame.Angles(math.rad(math.random(6, 90)), 0, 0) * CFrame.new(0, 64, 0);
-    
-    local raycastParams = RaycastParams.new();
-    raycastParams.FilterType = Enum.RaycastFilterType.Include;
-
-    local updateSemiSphereRngTick = tick();
-    task.spawn(function()
-        local filterList = {workspace.Terrain; workspace.Environment; workspace.Entity;};
-        for _, player in pairs(game.Players:GetPlayers()) do
-            if player.Character == nil then continue end;
-            table.insert(filterList, player.Character);
+    if RunService:IsStudio() then
+        for a=0, 128 do
+            local semiSphereRng = CFrame.Angles(0, math.rad(math.random(1, 360)), 0) * CFrame.Angles(math.rad(math.random(20, 65)), 0, 0) * CFrame.new(0, 64, 0);
+            local part = Debugger:PointPart(originPos + semiSphereRng.Position);
+            part.Size = Vector3.one;
         end
-        raycastParams.FilterDescendantsInstances = filterList;
+    end
 
+    local semiSphereRng = CFrame.Angles(0, math.rad(math.random(1, 360)), 0) * CFrame.Angles(math.rad(math.random(6, 90)), 0, 0) * CFrame.new(0, 64, 0);
+    local updateSemiSphereRngTick = tick();
+    local focusIn = tick();
+    task.spawn(function()
         while true do
             task.wait();
 
@@ -107,7 +100,12 @@ function LaserParticle:Test(character: Model)
             local targetPos = rootPart.Position;
 
             self.TargetPosition = targetPos;
-            self.PointAccuracy = 6;
+
+            local maxPointAcc = 6;
+            self.PointAccuracy = maxPointAcc - math.clamp(tick()-focusIn, 0, maxPointAcc);
+            if tick()-focusIn > maxPointAcc+2 then
+                focusIn = tick();
+            end
 
             self:SetActive(true);
         end
@@ -118,7 +116,7 @@ end
 function LaserParticle:Destroy()
     self.Enabled = false;
     LaserParticle.Refresh();
-    
+
     self.Beam.Enabled = false;
     self.LaserDot.Enabled = false;
     task.wait();
