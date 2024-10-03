@@ -34,6 +34,76 @@ Dialogues.Joseph.DialogueStrings = {
 
 if RunService:IsServer() then
 	-- MARK: Joseph Handler
+	Dialogues.Joseph.DialogueHandler = function(player, dialog, data, mission)
+		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+		local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
+
+		local profile = shared.modProfile:Get(player);
+
+		if mission.Type == 1 then -- Active
+		
+			if mission.Type == 1 then
+				if profile.EquippedTools.WeaponModels == nil then return end;
+		
+				local crossBowId = nil;
+				for a=1, #profile.EquippedTools.WeaponModels do
+					if profile.EquippedTools.WeaponModels[a]:IsA("Model") and profile.EquippedTools.WeaponModels[a]:GetAttribute("ItemId") == "arelshiftcross" then
+						crossBowId = profile.EquippedTools.WeaponModels[a]:GetAttribute("StorageItemId");
+						break;
+		
+					end
+				end
+				if crossBowId == nil then return end;
+				
+				local storageItem, storage = modStorage.FindIdFromStorages(crossBowId, player);
+				if storageItem == nil then return end;
+				
+				local crossbowModStorage = modStorage.Get(crossBowId, player)
+				
+				
+				local listOfMods = {
+					bowdamagemod=false;
+					bowricochetmod=false;
+					bowdeadweightmod=false;
+					electricmod=false;
+					bowammocapmod=false;
+				}
+		
+				local correctBuild = true;
+				if crossbowModStorage == nil then
+					correctBuild = false;
+					
+				else
+					for id, item in pairs(crossbowModStorage.Container) do
+						if listOfMods[item.ItemId] ~= nil then
+							listOfMods[item.ItemId] = true;
+						end
+					end
+		
+					for k, v in pairs(listOfMods) do
+						if v == false then
+							correctBuild = false;
+							break;
+						end
+					end
+					
+				end
+				
+				if correctBuild then
+					dialog:AddChoice("josephcrossbow_corectBuild", function(dialog)
+						modMission:CompleteMission(player, missionId);
+					end)
+					
+				else
+					dialog:AddChoice("josephcrossbow_failBuild");
+					
+				end
+
+			end
+			
+		end
+	end
+
 end
 
 
