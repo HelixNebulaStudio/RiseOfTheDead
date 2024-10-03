@@ -149,6 +149,14 @@ function NpcComponent:KillNpc()
 	humanoid:SetAttribute("IsDead", true);
 	self.IsDead = true;
 
+	if humanoid.SeatPart then
+		for _, weld in pairs(humanoid.SeatPart:GetChildren()) do
+			if weld:IsA("Weld") and weld.Part1 == rootPart then
+				game.Debris:AddItem(weld, 0);
+			end
+		end
+	end
+
 	if self.Animator then
 		for _, track: AnimationTrack in pairs(self.Animator:GetPlayingAnimationTracks()) do
 			track:Stop();

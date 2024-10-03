@@ -4669,6 +4669,26 @@ Commands["error"] = {
 };
 
 
+--== MARK: Test
+Commands["testlaser"] = {
+	Permission = PermissionLevel.Admin;
+	Description = "";
+
+	RequiredArgs = 0;
+	UsageInfo = "/testlaser";
+	Function = function(speaker, args)
+		local player = speaker;
+		
+		local modLaserParticle = require(game.ReplicatedStorage.Particles.LaserParticle);
+
+		local newLaser = modLaserParticle.new();
+		newLaser:Test(player.Character);
+		
+		return;
+	end;
+};
+
+
 --== Methods
 local hookedCommands = {};
 function CommandsLibrary:HookChatCommand(cmd, cmdLib)
