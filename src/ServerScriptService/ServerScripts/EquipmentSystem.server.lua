@@ -113,9 +113,9 @@ local function OnPlayerAdded(player: Player)
 			if storageItem == nil then continue end;
 			
 			local customizationData = storageItem:GetValues("_Customs");
-			if customizationData and profile.ItemCustomizationBan == 0 then
+			local activeSkinId = storageItem:GetValues("ActiveSkin");
+			if profile.ItemCustomizationBan == 0 and (customizationData or activeSkinId) then
 				task.spawn(function()
-					local activeSkinId = storageItem:GetValues("ActiveSkin");
 
 					modCustomizationData.LoadCustomization({
 						ToolModels = prefabs;
@@ -487,10 +487,9 @@ local function equipTool(player, paramPacket)
 				end
 
 				local customizationData = storageItem:GetValues("_Customs");
-				if customizationData and profile.ItemCustomizationBan == 0 then
+				local activeSkinId = storageItem:GetValues("ActiveSkin");
+				if profile.ItemCustomizationBan == 0 and (customizationData or activeSkinId) then
 					task.spawn(function()
-						local activeSkinId = storageItem:GetValues("ActiveSkin");
-						
 						modCustomizationData.LoadCustomization({
 							ToolModels = newModels;
 

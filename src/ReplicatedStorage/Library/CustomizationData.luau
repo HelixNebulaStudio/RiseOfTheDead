@@ -495,7 +495,7 @@ function CustomizationPlan:Apply(obj: BasePart)
                     end
     
                     local templateSurfaceAppearance = modItemSkinsLibrary:GetSurfaceAppearance(skinId, variantId);
-                    if templateSurfaceAppearance then
+                    if templateSurfaceAppearance and obj:IsA("MeshPart") then
                         surfaceAppearance = templateSurfaceAppearance:Clone();
                         surfaceAppearance:SetAttribute("BaseSkin", skinId);
                         surfaceAppearance:SetAttribute("SkinId", `{skinId}_{variantId}`);
@@ -855,7 +855,9 @@ function CustomizationData.ClientLoadCustomizations(storageItem, partDataList, c
 	
 			serialized = rPacket.Serialized;
 		end
-        if serialized == nil then return end;
+
+        local activeSkinId = storageItem.Values and storageItem.Values.ActiveSkin;
+        if serialized == nil and activeSkinId == nil then return end;
 
 		CustomizationData.LoadCustomization({
 			ItemId = storageItem.ItemId;
