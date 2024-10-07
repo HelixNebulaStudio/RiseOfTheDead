@@ -71,7 +71,7 @@ function EventSignal:Disconnect(Function) : nil
 	return;
 end
 
-function EventSignal:Once(Function) : () -> nil
+function EventSignal:Once(Function) : (() -> nil)
 	local func;
 	
 	func = function(...)

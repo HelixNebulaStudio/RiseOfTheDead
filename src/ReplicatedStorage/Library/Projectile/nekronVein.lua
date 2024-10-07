@@ -5,7 +5,7 @@ Pool.__index = Pool;
 local RunService = game:GetService("RunService");
 
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
+
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modRope = require(game.ReplicatedStorage.Library.Rope);
 
@@ -30,7 +30,7 @@ function Pool.new(owner)
 		Acceleration=Vector3.new(0, 0, 0);
 		IgnoreEntities=true;
 		RayRadius=0.5;
-		Delta=1/2;
+		Delta=1/3;
 	};
 	
 	function projectile:Load()
@@ -49,15 +49,17 @@ function Pool.new(owner)
 		
 		task.spawn(function()
 			for a=1, #linkObjects do
-				game.Debris:AddItem(linkObjects[a], 5);
-				linkObjects[a].Color = Color3.fromRGB(48, 30, 30);
-				linkObjects[a].Anchored = false;
-				if linkObjects[a]:FindFirstChild("CollisionShape") then
-					linkObjects[a].CollisionShape.CanCollide = true;
+				local linkObj = linkObjects[a];
+				
+				game.Debris:AddItem(linkObj, 5);
+				linkObj.Color = Color3.fromRGB(48, 30, 30);
+				linkObj.Anchored = false;
+
+				if linkObj:FindFirstChild("CollisionShape") then
+					linkObj.CollisionShape.CanCollide = true;
 				end
-				linkObjects[a] = nil;
 			end
-			linkObjects = {};
+			table.clear(linkObjects);
 		end)
 		
 		self.OnContact = nil;
@@ -76,7 +78,7 @@ function Pool.new(owner)
 		origin = prefab.Position;
 		
 		self.Rope = modRope.new();
-		self.Rope.Cycles = 2;
+		self.Rope.Cycles = 3;
 		self.Rope.GravitationalForce = Vector3.new(0, -workspace.Gravity/5, 0) * 1/900;
 		self.Rope:Run();
 		
@@ -93,6 +95,7 @@ function Pool.new(owner)
 			newLink.CFrame = CFrame.lookAt(center, self.PointB.Position) * CFrame.Angles(math.rad(90), 0, 0);
 		end
 		prevStick:Update();
+		
 		newLink.Parent = prefab.Parent;
 		table.insert(linkObjects, newLink);
 		

@@ -168,7 +168,7 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 			};
 			return;
 			
-		elseif returnPacket == false then -- cancel damage;
+		elseif returnPacket == false then -- stop damage pass through;
 
 			return;
 		end

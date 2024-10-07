@@ -43,7 +43,7 @@ function NekronSpore.Spawn(origin, veinTargetPart, parent, param)
 	newSpore.CanCollide = false;
 	newSpore.Material = Enum.Material.Neon;
 	newSpore:SetAttribute("IgnoreWeaponRay", nil);
-	Debugger.Expire(newSpore, 10);
+	Debugger.Expire(newSpore, 30);
 	
 	if param.WeldTo then
 		newSpore.Anchored = false;
@@ -60,10 +60,13 @@ function NekronSpore.Spawn(origin, veinTargetPart, parent, param)
 		Size=Vector3.new(6, 6, 6);
 	}):Play();
 	
+	self.Destroy = function() end;
+
 	task.delay(incubateTime, function()
-		self.Prefab.Color = Color3.fromRGB(77, 34, 34);
+		local sporePrefab = self.Prefab;
 		self.Prefab = nil;
 		if self.Cancelled == true then return end;
+		sporePrefab.Color = Color3.fromRGB(77, 34, 34);
 		
 		local targetPoint = veinTargetPart;
 		if veinTargetPart:IsA("BasePart")  then
@@ -71,21 +74,23 @@ function NekronSpore.Spawn(origin, veinTargetPart, parent, param)
 		end
 		
 		local projectileObject = modProjectile.Fire("nekronVein", CFrame.new(origin));
+		self.Destroy = function() 
+			projectileObject:Destroy();
+		end;
+
 		local velocity = (targetPoint-origin).Unit * projectileObject.ArcTracerConfig.Velocity;
 		projectileObject.Prefab.Parent = parent;
 
+		if hostNpcModule.VeinLaunched == nil then
+			hostNpcModule.VeinLaunched = 0;
+		end
+		hostNpcModule.VeinLaunched = hostNpcModule.VeinLaunched +1;
+
+		local projectileName = "Nekros Vein"..hostNpcModule.VeinLaunched;
+		param.HookCustomHealth(self, sporePrefab, projectileName);
+
 		projectileObject.OnNewVein = function(_, projPart)
-			if hostNpcModule.VeinLaunched == nil then
-				hostNpcModule.VeinLaunched = 0;
-			end
-			hostNpcModule.VeinLaunched = hostNpcModule.VeinLaunched +1;
-
-			local projectileName = "Nekros Vein"..hostNpcModule.VeinLaunched;
-			local healthObj = hostNpcModule.CustomHealthbar:Create(projectileName, 100, projPart);
-
-			healthObj.SporeObject = newSpore;
-			healthObj.ProjectileObject = projectileObject;
-
+			if self.Cancelled == true then return end;
 			projPart.Name = projectileName;
 		end
 

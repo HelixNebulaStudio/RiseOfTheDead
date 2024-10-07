@@ -12,6 +12,7 @@ CustomHealthbar.__index = CustomHealthbar;
 
 function CustomHealthbar:Create(name, maxHealth, adornee)
 	if self.Healths[name] then Debugger:Warn("Health bar already exist. (",name,")"); return end;
+
 	local newHealthGui = templateHealthbarGui:Clone();
 	local healthObj = {
 		Name = name;
@@ -21,7 +22,7 @@ function CustomHealthbar:Create(name, maxHealth, adornee)
 		MaxHealth=maxHealth;
 		HealthGui=newHealthGui;
 		BasePart=adornee;
-		OnDeath = modEventSignal.new("OnCustomHealthbarDeath");
+		OnDeath = modEventSignal.new("OnCustomHealthobjDeath");
 	};
 	self.Healths[name] = healthObj;
 	newHealthGui.Parent = adornee;
@@ -31,12 +32,16 @@ function CustomHealthbar:Create(name, maxHealth, adornee)
 	if adornee.Parent and adornee.Parent:FindFirstChild("NpcStatus") == nil then
 		local newLink = templateNpcStatusLink:Clone();
 		newLink.Parent = adornee.Parent;
+
 		require(newLink):Initialize(self.Npc);
 	end
 	
 	self.Npc.Garbage:Tag(function()
+		game.Debris:AddItem(healthObj.BasePart, 0);
 		healthObj.BasePart = nil;
 		healthObj.OnDeath:Destroy();
+
+		table.clear(healthObj);
 	end);
 	
 	return self.Healths[name];
@@ -55,6 +60,8 @@ end
 function CustomHealthbar:SetGuiSize(name, x, y)
 	local healthInfo = self.Healths[name];
 	local healthGui = healthInfo and healthInfo.HealthGui;
+
+	if healthGui.Parent == nil then return end;
 	if healthGui then
 		healthGui.Size = UDim2.new(x, 0, y, 0);
 	end
@@ -63,6 +70,8 @@ end
 function CustomHealthbar:SetOffset(name, vec)
 	local healthInfo = self.Healths[name];
 	local healthGui = healthInfo and healthInfo.HealthGui;
+
+	if healthGui.Parent == nil then return end;
 	if healthGui then
 		healthGui.StudsOffsetWorldSpace = vec;
 	end
@@ -70,21 +79,26 @@ end
 
 function CustomHealthbar:RefreshGui(name)
 	if self.Healths[name] == nil then Debugger:Warn("Missing health bar gui",name); return end;
+	
 	local healthInfo = self.Healths[name];
 	local healthGui = healthInfo.HealthGui;
+
+	if healthGui.Parent == nil then return end;
+	
 	if (healthInfo.Health > 0 and healthInfo.Health ~= healthInfo.MaxHealth) or healthGui.Enabled then
 		healthGui.Enabled = true;
 		local bar = healthGui.Frame.Bar;
-		local lostBar = healthGui.Frame.Lostbar;
+		local lostBar: Frame = healthGui.Frame.Lostbar;
 		local labelTag = healthGui.Label;
 		
 		labelTag.Text = math.max(math.ceil(healthInfo.Health), 0).."/"..healthInfo.MaxHealth;
-		
 		local newSize = UDim2.new(math.clamp(healthInfo.Health/healthInfo.MaxHealth, 0, 1), 0, 1, 0);
 		bar.Size = newSize;
-		task.delay(0.1, function()
-			lostBar.Size = newSize;
+
+		pcall(function()
+			lostBar:TweenSize(newSize, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 2, true);
 		end)
+
 	else
 		healthGui.Enabled = false;
 	end
@@ -94,6 +108,8 @@ function CustomHealthbar:ShowGui(name)
 	if self.Healths[name] == nil then Debugger:Warn("Missing health bar gui",name); return end;
 	local healthInfo = self.Healths[name];
 	local healthGui = healthInfo.HealthGui;
+
+	if healthGui.Parent == nil then return end;
 	if healthGui then
 		healthGui.Enabled = true;
 		self:RefreshGui(name);
@@ -104,6 +120,8 @@ function CustomHealthbar:HideGui(name)
 	if self.Healths[name] == nil then Debugger:Warn("Missing health bar gui",name); return end;
 	local healthInfo = self.Healths[name];
 	local healthGui = healthInfo.HealthGui;
+
+	if healthGui.Parent == nil then return end;
 	if healthGui then
 		healthGui.Enabled = false;
 	end
@@ -113,6 +131,8 @@ function CustomHealthbar:SetGuiDistance(name, value)
 	if self.Healths[name] == nil then Debugger:Warn("Missing health bar gui",name); return end;
 	local healthInfo = self.Healths[name];
 	local healthGui = healthInfo.HealthGui;
+
+	if healthGui.Parent == nil then return end;
 	if healthGui then
 		healthGui.MaxDistance = value;
 	end
@@ -123,6 +143,7 @@ function CustomHealthbar:ToggleLabel(name, v)
 	local healthInfo = self.Healths[name];
 	local healthGui = healthInfo.HealthGui;
 	
+	if healthGui.Parent == nil then return end;
 	if healthGui then
 		local label: TextLabel = healthGui.Label;
 		
@@ -142,12 +163,13 @@ function CustomHealthbar:TakeDamage(name, amount)
 	
 	if healthObj.Health <= 0 then return end
 		
+	local hitPartPos = healthObj.BasePart and healthObj.BasePart.Position or nil;
 	healthObj.LastDamaged = tick();
 	healthObj.Health = healthObj.Health - amount;
 		
 	self:RefreshGui(name)
 	task.delay(2, function()
-		if healthObj and not healthObj.IsDead and tick()-healthObj.LastDamaged > 2 then
+		if healthObj and not healthObj.IsDead and tick()-healthObj.LastDamaged >= 2 then
 			self:HideGui(name);
 		end
 	end)
@@ -155,6 +177,7 @@ function CustomHealthbar:TakeDamage(name, amount)
 	if healthObj.Health <= 0 then
 		healthObj.OnDeath:Fire();
 		healthObj.OnDeath:Destroy();
+
 		healthObj.IsDead = true;
 		self.OnDeath:Fire(name, healthObj);
 
@@ -166,30 +189,30 @@ function CustomHealthbar:TakeDamage(name, amount)
 
 			modInfoBubbles.Create{
 				Players=attackers;
-				Position=healthObj.BasePart.Position;
+				Position=hitPartPos;
 				Type="Status";
 				ValueString=destoryStr;
 			};
 			
-			task.delay(3, function()
-				if healthObj then
-					self:HideGui(name);
-				end
-			end)
+			task.wait(3);
+			self:HideGui(name);
 		end)
 	end
 
 end
 
 function CustomHealthbar:Destroy()
-	self.OnDeath:Destroy();
-	pcall(function()
-		for k,v in pairs(self.Healths) do
-			self.Healths[k].OnDeath:Fire();
-			self.Healths[k].OnDeath:Destroy();
-			self.Healths[k] = nil;
+	for k,healthInfo in pairs(self.Healths) do
+		local dS, dE = pcall(function()
+			healthInfo.OnDeath:Fire();
+			healthInfo.OnDeath:Destroy();
+		end);
+		if not dS then
+			Debugger:Warn("CustomHealth Destroy (",k,") error:", dE);
 		end
-	end)
+	end
+	table.clear(self.Healths);
+	self.OnDeath:Destroy();
 end
 
 function CustomHealthbar.new(Npc)

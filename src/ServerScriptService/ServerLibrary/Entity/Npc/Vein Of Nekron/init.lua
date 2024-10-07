@@ -70,6 +70,7 @@ return function(npc, spawnPoint)
 		self.RootPart.CanCollide = false;
 
 		function self.CustomHealthbar.OnDamaged(healthObj, amount, fromPlayer, storageItem, bodyPart)
+			if amount <= 0 then return true end;
 			if bodyPart == nil then return end;
 			
 			local bodyPartName = bodyPart.Name;
@@ -89,33 +90,36 @@ return function(npc, spawnPoint)
 			end
 			
 			if bodyPartName == "Nekros Plaque" then
-				healthObj:TakeDamage(bodyPart.Name, amount);
+				self.CustomHealthbar:TakeDamage(bodyPart.Name, amount);
 				
 			elseif bodyPartName == "Nekros Spore" then
-				healthObj:TakeDamage(bodyPart.Name, amount);
+				self.CustomHealthbar:TakeDamage(bodyPart.Name, amount);
 				
 			elseif bodyPartName == "Nekros Vein" then
-				healthObj:TakeDamage(bodyPart.Name, amount);
+				self.CustomHealthbar:TakeDamage(bodyPart.Name, amount);
 				
 			end
+			
+			return;
 		end
 		
 		
 		self.CustomHealthbar.OnDeath:Connect(function(name, healthInfo)
-			local part = healthInfo.BasePart;
-			
-			if healthInfo.BasePart == nil then return end;
+			local deathPart = healthInfo.BasePart;
+			if deathPart == nil then return end;
 			
 			if name:match("Nekros Vein") then
-				local projectile = healthInfo.ProjectileObject;
-				if projectile then
-					game.Debris:AddItem(projectile.Prefab, 0);
-					projectile:Destroy();
-				end
+				-- local projectile = healthInfo.ProjectileObject;
+				-- if projectile then
+				-- 	healthInfo.ProjectileObject = nil;
+				-- 	game.Debris:AddItem(projectile.Prefab, 0);
+				-- 	projectile:Destroy();
+				-- end
 				
-				if healthInfo.SporeObject then
-					self.CustomHealthbar:TakeDamage(healthInfo.SporeObject.Name, self.BaseHealth*0.1);
-				end
+				-- if healthInfo.SporeObject then
+				-- 	self.CustomHealthbar:TakeDamage(healthInfo.SporeObject.Name, self.BaseHealth*0.1);
+				-- 	healthInfo.SporeObject = nil;
+				-- end
 				
 			elseif name:match("Nekros Spore") then
 				local amount = self.BaseHealth * 0.15;
@@ -125,13 +129,13 @@ return function(npc, spawnPoint)
 
 				self.Status:TakeDamagePackage(modDamagable.NewDamageSource{
 					Damage=amount;
-					TargetPart=self.RootPart;
+					TargetPart=deathPart;
 				});
 				
 			elseif name:match("Nekros Plaque") then --Nekros Plaque
-				game.Debris:AddItem(healthInfo.BasePart, 2);
-				healthInfo.BasePart.Color = Color3.fromRGB(48, 30, 30);
-				modAudio.Play("NekronHurt", healthInfo.BasePart).PlaybackSpeed = random:NextNumber(0.5, 0.6);
+				game.Debris:AddItem(deathPart, 2);
+				deathPart.Color = Color3.fromRGB(48, 30, 30);
+				modAudio.Play("NekronHurt", deathPart).PlaybackSpeed = random:NextNumber(0.5, 0.6);
 				
 				local amount = self.BaseHealth *0.35;
 				if self.StatusLogicIsOnFire() then
@@ -140,7 +144,7 @@ return function(npc, spawnPoint)
 				
 				self.Status:TakeDamagePackage(modDamagable.NewDamageSource{
 					Damage=amount;
-					TargetPart=self.RootPart;
+					TargetPart=deathPart;
 				});
 				
 			end
@@ -191,6 +195,7 @@ return function(npc, spawnPoint)
 	self:AddComponent(ZombieModule.OnTarget);
 	
 	local function spread(part)
+		--if true then Debugger:Warn("Nekron spread disabled"); return end;
 		if self.IsDead then return; end;
 		if part.Anchored == false then return end;
 		if part:GetAttribute("VeinOfNekronInfected") then return end
@@ -343,12 +348,19 @@ return function(npc, spawnPoint)
 			spread(hitPart);
 			self.SporeCount = self.SporeCount +1;
 
-			local timelapsed = (tick()-self.SpawnTime);
-			
 			local nekronSporeObject = modNekronSpore.Spawn(attackOrigin, targetPart, self.Prefab, {
 				IncubationTime=incubateTime;
 				NekronSpreadFunc=spread;
 				HostNpcModule=self;
+				HookCustomHealth=function(projectileObject, projectilePart, projectileName)
+					local newHealthObj = self.CustomHealthbar:Create(projectileName, 5000, projectilePart);
+					if newHealthObj then
+						newHealthObj.OnDeath:Connect(function()
+							projectileObject:Destroy();
+							self.CustomHealthbar:TakeDamage(projectilePart.Name, self.BaseHealth*0.1);
+						end)
+					end
+				end
 			})
 			
 			table.insert(self.SporeObjects, nekronSporeObject);
@@ -358,11 +370,11 @@ return function(npc, spawnPoint)
 			
 			if newHealthObj then
 				newHealthObj.OnDeath:Connect(function()
-					game.Debris:AddItem(newHealthObj.BasePart, 2);
-					
 					nekronSporeObject.Cancelled = true;
-					
+					nekronSporeObject:Destroy();
+
 					if newHealthObj.BasePart == nil then return end;
+					game.Debris:AddItem(newHealthObj.BasePart, 2);
 					newHealthObj.BasePart.Color = Color3.fromRGB(48, 30, 30);
 					modAudio.Play("TicksZombieExplode", newHealthObj.BasePart).PlaybackSpeed = random:NextNumber(0.5, 0.6);
 				end)
