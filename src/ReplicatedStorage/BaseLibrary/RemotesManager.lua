@@ -6,6 +6,7 @@ function RemotesManager:Init(super)
 	super:NewFunctionRemote("AutoTurret", 0.1).Secure = true;
 	super:NewFunctionRemote("NpcData", 0.1).Secure = true;
 	
+	super:NewUnreliableEventRemote("LiveFeedRemote").Secure = true;
 end
 
 return RemotesManager;

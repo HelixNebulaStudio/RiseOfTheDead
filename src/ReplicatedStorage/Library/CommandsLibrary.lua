@@ -4668,6 +4668,51 @@ Commands["error"] = {
 	end;
 };
 
+local testlivefeedC = 0;
+Commands["testlivefeed"] = {
+	Permission = PermissionLevel.DevBranch;
+	Description = "";
+
+	RequiredArgs = 0;
+	UsageInfo = "/testlivefeed";
+	Function = function(speaker, args)
+		local player = speaker;
+		
+		testlivefeedC = testlivefeedC +1;
+		local remoteLiveFeedRemote = modRemotesManager:Get("LiveFeedRemote") :: UnreliableRemoteEvent;
+
+		remoteLiveFeedRemote:FireClient(player, {
+			Content={
+				{Text=`Robert{testlivefeedC}`; Image="rbxassetid://15641321827";};
+				{Type="KillSym";};
+				{Text="Mason"; Image="rbxassetid://15641265681";};
+			};
+			Preset={Type="Kill"; Killer="Robert"; Victim="Mason"};
+		});
+
+		remoteLiveFeedRemote:FireClient(player, {
+			Content={
+				{Text=player.DisplayName; Avatar=player.UserId;};
+				{Type="KillSym";};
+				{Text="Robert"; Image="rbxassetid://15641321827";};
+			};
+			Preset={Type="Kill"; Killer=player.Name; Victim="Robert"};
+		});
+
+		remoteLiveFeedRemote:FireClient(player, {
+			Content={
+				{Text="Robert"; Image="rbxassetid://15641265681";};
+				{Type="KillSym";};
+				{Text=player.DisplayName; Avatar=player.UserId;};
+			};
+			Preset={Type="Kill"; Killer="Robert"; Victim=player.Name};
+		});
+		
+
+		
+		return;
+	end;
+};
 
 --== MARK: Test
 Commands["testlaser"] = {
