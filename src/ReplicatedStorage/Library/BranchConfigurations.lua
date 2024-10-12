@@ -115,6 +115,7 @@ local Branches = {
 			Slaughterfest=11264091769;
 			
 			BioXResearch=289213709;
+			Deadlock=140550016869053;
 			
 			--CommunityMaps;
 			CommunityWaySide=10976260433;
@@ -170,7 +171,8 @@ local isMainBranch = Branches.CurrentBranch.Name == "Live";
 Branches.WorldLibrary = {
 	MainMenu={CanTravelTo=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.Menu; MaxPlayers=25;};
 	BioXResearch={CanTravelTo=true; PrivateWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=10; DevsOnly=isMainBranch;}; -- PublicWorld=true;
-	
+	Deadlock={NoPrivateServers=true; CanTravelTo=true; PublicWorld=true; FreeTravels=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=12;};
+
 	-- Cutscene;
 	TheBeginning={CanTravelTo=false; Type=Branches.WorldTypes.Cutscene; MaxPlayers=1;};
 	AwokenTheBear={CanTravelTo=false; Type=Branches.WorldTypes.Cutscene; MaxPlayers=1;};
@@ -384,7 +386,8 @@ Branches.WorldDisplayNames = {
 	HalloweenBasement="Halloween Mission: Halloween Basement";
 	KlawsWorkshop="Christmas Event: Mr. Klaws Workshop";
 	Slaughterfest="Halloween Event: Slaughterfest";
-	
+	Deadlock="Event: Deadlock";
+
 	--CommunityMap;
 	CommunityWaySide="Community: Way Side";
 	CommunityFissionBay="Community: Fission Bay";
@@ -614,6 +617,11 @@ elseif Branches.WorldName == "SunkenShip" or Branches.WorldName == "CargoShip" t
 	
 	modConfigurations.FogRange.Start = 200;
 	modConfigurations.FogRange.End = 1200;
+
+elseif Branches.WorldName == "Slaughterfest" then
+
+	local skyPhaseColors = modConfigurations.SkyPhaseColor;
+	skyPhaseColors.Night = Color3.fromRGB(38, 47, 94);
 
 end
 

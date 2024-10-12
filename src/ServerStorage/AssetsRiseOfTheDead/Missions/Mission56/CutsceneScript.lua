@@ -41,9 +41,11 @@ return function(CutsceneSequence)
 				elseif mission.ProgressionPoint == 2 then
 					
 					local coopEntrancePos = Vector3.new(1060.251, -20.875, -126.729);
+					local distFromEntrance = math.huge;
 					repeat
-						wait(1)
-					until not player:IsDescendantOf(game.Players) or (classPlayer.RootPart.Position-coopEntrancePos).Magnitude <= 14;
+						wait(1);
+						distFromEntrance = (classPlayer.RootPart.Position-coopEntrancePos).Magnitude;
+					until not player:IsDescendantOf(game.Players) or distFromEntrance <= 14;
 					
 					modMission:Progress(player, missionId, function(mission)
 						if mission.ProgressionPoint == 2 then mission.ProgressionPoint = 3; end;

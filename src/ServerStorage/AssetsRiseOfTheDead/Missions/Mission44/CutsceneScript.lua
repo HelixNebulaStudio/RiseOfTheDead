@@ -91,8 +91,8 @@ if RunService:IsServer() then
 		end)
 	end
 
-	noteTrigger = script:WaitForChild("noteTrigger");
-	footSteps = script:WaitForChild("warehouseFootprints");
+	noteTrigger = script.Parent:WaitForChild("noteTrigger");
+	footSteps = script.Parent:WaitForChild("warehouseFootprints");
 
 	residentialsFootprints = script.Parent:WaitForChild("residentialsFootprints");
 	jacksPhonePrefab = script.Parent:WaitForChild("jacksPhone");

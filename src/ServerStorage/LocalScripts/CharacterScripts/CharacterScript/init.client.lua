@@ -2480,29 +2480,37 @@ classPlayer:OnNotIsAlive(function(character)
 		
 		local fadeOutTime = 3;
 		for a=1, #uiFrames do
-			if uiFrames[a] ~= specFrame and not uiFrames[a]:IsDescendantOf(specFrame)
-				and uiFrames[a] ~= gameBlinds and not uiFrames[a]:IsDescendantOf(gameBlinds)
-				and uiFrames[a] ~= interfaceModule and not uiFrames[a]:IsDescendantOf(interfaceModule)
-				and uiFrames[a] ~= deathScreen and not uiFrames[a]:IsDescendantOf(deathScreen)
-				and uiFrames[a] ~= notifyFrame and not uiFrames[a]:IsDescendantOf(notifyFrame)
-				and uiFrames[a] ~= mouseLockHint and not uiFrames[a]:IsDescendantOf(mouseLockHint)
-				and uiFrames[a] ~= questionPrompt and not uiFrames[a]:IsDescendantOf(questionPrompt) then
+			local descGuiObj = uiFrames[a];
+
+			local mainWindowFrame = descGuiObj;
+			while mainWindowFrame:IsDescendantOf(mainInterface) and mainWindowFrame.Parent ~= mainInterface do
+				mainWindowFrame = mainWindowFrame.Parent;
+			end
+			if mainWindowFrame and mainWindowFrame:GetAttribute("IgnoreDeathFade") == true then continue end;
+
+			if descGuiObj ~= specFrame and not descGuiObj:IsDescendantOf(specFrame)
+				and descGuiObj ~= gameBlinds and not descGuiObj:IsDescendantOf(gameBlinds)
+				and descGuiObj ~= interfaceModule and not descGuiObj:IsDescendantOf(interfaceModule)
+				and descGuiObj ~= deathScreen and not descGuiObj:IsDescendantOf(deathScreen)
+				and descGuiObj ~= notifyFrame and not descGuiObj:IsDescendantOf(notifyFrame)
+				and descGuiObj ~= mouseLockHint and not descGuiObj:IsDescendantOf(mouseLockHint)
+				and descGuiObj ~= questionPrompt and not descGuiObj:IsDescendantOf(questionPrompt) then
 				
 				local tween = nil;
-				if uiFrames[a]:IsA("Frame") then
-					tween = TweenService:Create(uiFrames[a], TweenInfo.new(fadeOutTime), {BackgroundTransparency = 1;});
-				elseif uiFrames[a]:IsA("ImageButton") then
-					uiFrames[a].Active = false;
-					tween = TweenService:Create(uiFrames[a], TweenInfo.new(fadeOutTime), {BackgroundTransparency = 1; ImageTransparency = 1;});
-				elseif uiFrames[a]:IsA("ImageLabel") then
-					tween = TweenService:Create(uiFrames[a], TweenInfo.new(fadeOutTime), {BackgroundTransparency = 1; ImageTransparency = 1;});
-				elseif uiFrames[a]:IsA("TextLabel") then
-					tween = TweenService:Create(uiFrames[a], TweenInfo.new(fadeOutTime), {BackgroundTransparency = 1; TextTransparency = 1; TextStrokeTransparency = 1;});
-				elseif uiFrames[a]:IsA("TextButton") then
-					uiFrames[a].Active = false;
-					tween = TweenService:Create(uiFrames[a], TweenInfo.new(fadeOutTime), {BackgroundTransparency = 1; TextTransparency = 1; TextStrokeTransparency = 1;});
-				elseif uiFrames[a]:IsA("TextBox") then
-					tween = TweenService:Create(uiFrames[a], TweenInfo.new(fadeOutTime), {BackgroundTransparency = 1; TextTransparency = 1; TextStrokeTransparency = 1;});
+				if descGuiObj:IsA("Frame") then
+					tween = TweenService:Create(descGuiObj, TweenInfo.new(fadeOutTime), {BackgroundTransparency = 1;});
+				elseif descGuiObj:IsA("ImageButton") then
+					descGuiObj.Active = false;
+					tween = TweenService:Create(descGuiObj, TweenInfo.new(fadeOutTime), {BackgroundTransparency = 1; ImageTransparency = 1;});
+				elseif descGuiObj:IsA("ImageLabel") then
+					tween = TweenService:Create(descGuiObj, TweenInfo.new(fadeOutTime), {BackgroundTransparency = 1; ImageTransparency = 1;});
+				elseif descGuiObj:IsA("TextLabel") then
+					tween = TweenService:Create(descGuiObj, TweenInfo.new(fadeOutTime), {BackgroundTransparency = 1; TextTransparency = 1; TextStrokeTransparency = 1;});
+				elseif descGuiObj:IsA("TextButton") then
+					descGuiObj.Active = false;
+					tween = TweenService:Create(descGuiObj, TweenInfo.new(fadeOutTime), {BackgroundTransparency = 1; TextTransparency = 1; TextStrokeTransparency = 1;});
+				elseif descGuiObj:IsA("TextBox") then
+					tween = TweenService:Create(descGuiObj, TweenInfo.new(fadeOutTime), {BackgroundTransparency = 1; TextTransparency = 1; TextStrokeTransparency = 1;});
 				end
 				if tween then tween:Play() end;
 			end

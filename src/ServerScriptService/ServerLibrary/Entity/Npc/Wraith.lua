@@ -74,6 +74,8 @@ return function(npc, spawnPoint)
 		SpawnPoint = spawnPoint; -- CFrame;
 		PathAgent = {AgentRadius=1; AgentHeight=4;};
 		
+		AggressLevel = 0;
+		
 		Properties = {
 			BasicEnemy=true;
 			WalkSpeed={Min=12; Max=16};
@@ -175,7 +177,7 @@ return function(npc, spawnPoint)
 	self:AddComponent(ZombieModule.OnHealthChanged);
 	self:AddComponent(ZombieModule.OnDamaged);
 	self:AddComponent(ZombieModule.OnTarget);
-	self:AddComponent(ZombieModule.BasicAttack1);
+	self:AddComponent(ZombieModule.BasicAttack2);
 	self:AddComponent(ZombieModule.Idle);
 	
 	--== NPC Logic;

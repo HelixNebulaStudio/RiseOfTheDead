@@ -218,6 +218,7 @@ function Cutscene.New(cutsceneName)
 		Sequence=nil;
 	};
 	if cutscene.Sequence == nil then
+
 		local cutsceneSequence = require(cutscene.File)(CutsceneSequence.new(cutscene));
 		if cutsceneSequence == nil then
 			Debugger:Warn("Cutscene(",cutsceneName,") didn't load.");
@@ -295,22 +296,24 @@ if RunService:IsClient() then
 			end
 
 			Debugger:Warn(`Play Cutscene ({cutsceneName}: {sceneName})`);
-			local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
-	
-			local cutsceneObj = activeCutscenes[cutsceneName];
-			if cutsceneObj == nil then
-				cutsceneObj = Cutscene.New(cutsceneName);
-				activeCutscenes[cutsceneName] = cutsceneObj;
-			end
-	
-			local cutsceneSequence = cutsceneObj and cutsceneObj.Sequence;
-			if cutsceneSequence and cutsceneSequence[sceneName] then
-				cutsceneObj.Status = Cutscene.Status.Playing;
-				cutsceneSequence.modData = modData;
-				cutsceneSequence[sceneName]();
-			else
-				Debugger:Warn("Cutscene>> Scene(",sceneName,") does not exist for (",cutsceneName,").");
-			end
+			task.spawn(function()
+				local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+		
+				local cutsceneObj = activeCutscenes[cutsceneName];
+				if cutsceneObj == nil then
+					cutsceneObj = Cutscene.New(cutsceneName);
+					activeCutscenes[cutsceneName] = cutsceneObj;
+				end
+		
+				local cutsceneSequence = cutsceneObj and cutsceneObj.Sequence;
+				if cutsceneSequence and cutsceneSequence[sceneName] then
+					cutsceneObj.Status = Cutscene.Status.Playing;
+					cutsceneSequence.modData = modData;
+					cutsceneSequence[sceneName]();
+				else
+					Debugger:Warn("Cutscene>> Scene(",sceneName,") does not exist for (",cutsceneName,").");
+				end
+			end)
 
 		end
 
@@ -374,16 +377,18 @@ if RunService:IsServer() then
 	function Cutscene:PlayCutscene(players, cutsceneName, sceneName)
 		Debugger:Log("Play Cutscene ( ",(cutsceneName or "NULL")," ) for ", players);
 	
-		local cutscene = Cutscene.New(cutsceneName);
-		if cutscene and cutscene.Sequence then
-			cutscene.Players = players or {};
-			cutscene.Status = Cutscene.Status.Playing;
-			
-			Cutscene:WaitForReady(players)
-			cutscene:Play(sceneName);
-		else
-			Debugger:Warn("PlayCutscene (",cutsceneName,") does not exist.");
-		end
+		task.spawn(function()
+			local cutscene = Cutscene.New(cutsceneName);
+			if cutscene and cutscene.Sequence then
+				cutscene.Players = players or {};
+				cutscene.Status = Cutscene.Status.Playing;
+				
+				Cutscene:WaitForReady(players)
+				cutscene:Play(sceneName);
+			else
+				Debugger:Warn("PlayCutscene (",cutsceneName,") does not exist.");
+			end
+		end)
 	end	
 	
 end

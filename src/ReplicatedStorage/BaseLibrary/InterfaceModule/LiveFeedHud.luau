@@ -30,6 +30,7 @@ local ContTypes = {
 	AddAva = templateAdditionalAvatarLabel;
 
 	KillSym = templateSymbolLabel;
+	Icon = templateSymbolLabel;
 }
 
 local maxFeedCount = 5;
@@ -98,6 +99,10 @@ function Interface.init(modInterface)
 						txtLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
 					end
 				end
+
+			elseif contType == "Icon" then
+				local iconLabel = new:WaitForChild("ImageLabel");
+				iconLabel.Image = contData.Icon or "";
 
 			elseif contType == "KillSym" then
 			end

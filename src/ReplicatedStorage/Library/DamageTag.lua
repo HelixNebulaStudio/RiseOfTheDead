@@ -23,8 +23,9 @@ export type Tag = typeof(setmetatable({} :: TagObject, Tag));
 type TagList = {
     [number]:{
         Prefab:Model;
+        Player:Player?;
         IsHeadshot:boolean?;
-        Player:Player?
+        DamageSrc:{}?;
     };
 }
 

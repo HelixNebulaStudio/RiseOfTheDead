@@ -4684,11 +4684,13 @@ Commands["testlivefeed"] = {
 		remoteLiveFeedRemote:FireClient(player, {
 			Content={
 				{Text=`Robert{testlivefeedC}`; Image="rbxassetid://15641321827";};
+				{Type="Icon"; Icon="rbxassetid://4469866502";};
 				{Type="KillSym";};
 				{Text="Mason"; Image="rbxassetid://15641265681";};
 			};
 			Preset={Type="Kill"; Killer="Robert"; Victim="Mason"};
 		});
+		task.wait(math.random(10, 100)/100);
 
 		remoteLiveFeedRemote:FireClient(player, {
 			Content={
@@ -4698,6 +4700,7 @@ Commands["testlivefeed"] = {
 			};
 			Preset={Type="Kill"; Killer=player.Name; Victim="Robert"};
 		});
+		task.wait(math.random(10, 100)/100);
 
 		remoteLiveFeedRemote:FireClient(player, {
 			Content={
@@ -4707,8 +4710,6 @@ Commands["testlivefeed"] = {
 			};
 			Preset={Type="Kill"; Killer="Robert"; Victim=player.Name};
 		});
-		
-
 		
 		return;
 	end;
