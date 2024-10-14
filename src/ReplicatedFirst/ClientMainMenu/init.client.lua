@@ -239,6 +239,31 @@ function menu(menuInterface)
 			mainDescendants[a].Text = "Version: "..modGlobalVars.GameVersion.."."..modGlobalVars.GameBuild;
 		end
 		
+		if mainDescendants[a]:IsA("TextButton") then
+			local buttonName = mainDescendants[a].Name;
+
+			if buttonName == "JoinEventButton" then
+				mainDescendants[a].MouseButton1Click:Connect(function()
+					if buttonDebounce then return end;
+					buttonDebounce = true;
+					playerClickSound();
+					if workspace:GetAttribute("IsGameOnline") == false then buttonDebounce = false; return end;
+					
+					local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
+					local remoteHalloween = modRemotesManager:Get("Halloween");
+
+					modGuiTween.FadeTween(menuInterface.MenuFrame.EventFrame, modGuiTween.FadeDirection.Out, TweenInfo.new(0.48));
+					modGuiTween.FadeTween(menuInterface.MenuFrame.MainFrame, modGuiTween.FadeDirection.Out, TweenInfo.new(0.48));
+					menuInterface.LoadLabel.Text = "Joining Slaughterfest";
+					task.spawn(function()
+						local rPacket = remoteHalloween:InvokeServer({Action="Join";});
+					end)
+					task.wait(0.5);
+					modGuiTween.FadeTween(menuInterface.LoadLabel, modGuiTween.FadeDirection.In, TweenInfo.new(0.48));
+				end)
+			end
+		end
+
 		if mainDescendants[a]:IsA("ImageButton") and mainDescendants[a].Name ~= "FriendFrame" then
 			local defaultColor = mainDescendants[a].ImageColor3;
 			mainDescendants[a].MouseEnter:Connect(function()
@@ -306,6 +331,7 @@ function menu(menuInterface)
 					buttonDebounce = false;
 					resetButtons();
 				end);
+				
 			elseif buttonName == "MainPlay" then
 				mainDescendants[a].MouseButton1Click:Connect(function()
 					if buttonDebounce then return end;
@@ -324,6 +350,7 @@ function menu(menuInterface)
 					buttonDebounce = false;
 					resetButtons();
 				end);
+				
 			elseif buttonName == "MainAppearance" then
 				mainDescendants[a].MouseButton1Click:Connect(function()
 					if buttonDebounce then return end;
