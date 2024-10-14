@@ -2843,6 +2843,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Hard};
 	};
 	AddRequirements={
+		{Type="SpecialEvent"; Value="Halloween"};
 		{Type="Level"; Value=30};
 	};
 	
