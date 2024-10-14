@@ -48,45 +48,45 @@ function Interface.init(modInterface)
 	local rewardButtons = {};
 
 	if modBranchConfigs.WorldName == "Slaughterfest" then
-		local slaughterfestHud = script:WaitForChild("SlaughterfestHud"):Clone();
-		slaughterfestHud.Parent = interfaceScreenGui;
+		-- local slaughterfestHud = script:WaitForChild("SlaughterfestHud"):Clone();
+		-- slaughterfestHud.Parent = interfaceScreenGui;
 
-		local window = Interface.NewWindow("SlaughterfestHud", slaughterfestHud);
-		window.IgnoreHideAll = true;
-		window.ReleaseMouse = false;
-		window:Open();
+		-- local window = Interface.NewWindow("SlaughterfestHud", slaughterfestHud);
+		-- window.IgnoreHideAll = true;
+		-- window.ReleaseMouse = false;
+		-- window:Open();
 		
-		local counterLabel = slaughterfestHud:WaitForChild("CandyBag"):WaitForChild("counterLabel");
-		local cauldronTimerLabel = slaughterfestHud:WaitForChild("CandyBag"):WaitForChild("CauldronTimer");
+		-- local counterLabel = slaughterfestHud:WaitForChild("CandyBag"):WaitForChild("counterLabel");
+		-- local cauldronTimerLabel = slaughterfestHud:WaitForChild("CandyBag"):WaitForChild("CauldronTimer");
 		
-		task.spawn(function()
-			while true do
-				if not slaughterfestHud:IsDescendantOf(interfaceScreenGui) then break; end;
+		-- task.spawn(function()
+		-- 	while true do
+		-- 		if not slaughterfestHud:IsDescendantOf(interfaceScreenGui) then break; end;
 				
-				local timer = math.clamp((workspace:GetAttribute("NextCauldronSpawn") or 0)-modSyncTime.GetTime(), 0, 300);
+		-- 		local timer = math.clamp((workspace:GetAttribute("NextCauldronSpawn") or 0)-modSyncTime.GetTime(), 0, 300);
 				
-				if timer < 240 then
-					cauldronTimerLabel.Text = "Cauldron: ".. modSyncTime.ToString(timer)
+		-- 		if timer < 240 then
+		-- 			cauldronTimerLabel.Text = "Cauldron: ".. modSyncTime.ToString(timer)
 					
-				else
-					cauldronTimerLabel.Text = "Cauldrons are available..";
+		-- 		else
+		-- 			cauldronTimerLabel.Text = "Cauldrons are available..";
 					
-				end
+		-- 		end
 				
-				local halloweenCauldronStorage = modData.Storages.HalloweenCauldron;
-				if halloweenCauldronStorage then
-					local count = 0;
+		-- 		local halloweenCauldronStorage = modData.Storages.HalloweenCauldron;
+		-- 		if halloweenCauldronStorage then
+		-- 			local count = 0;
 
-					for id, storageItem in pairs(halloweenCauldronStorage.Container) do
-						count = count + storageItem.Quantity;
-					end
+		-- 			for id, storageItem in pairs(halloweenCauldronStorage.Container) do
+		-- 				count = count + storageItem.Quantity;
+		-- 			end
 
-					counterLabel.Text = count.."/500";
-				end
+		-- 			counterLabel.Text = count.."/500";
+		-- 		end
 				
-				task.wait(0.5)
-			end
-		end)
+		-- 		task.wait(0.5)
+		-- 	end
+		-- end)
 		
 	end
 	

@@ -145,12 +145,11 @@ function remoteHalloween.OnServerInvoke(player, packet)
 	if activeSave == nil then return end;
 	
 	local cauldronStorage = activeSave.Storages.HalloweenCauldron;	
-	if cauldronStorage == nil then Debugger:Warn("Missing CauldronStorage!") return end;
+	if cauldronStorage == nil then Debugger:Warn("Missing CauldronStorage!"); return end;
 
 	--cauldronStorage.OnAccess:Connect(function(isOpen)
 	--	if not isOpen then
 	--		Debugger:Log("StorageClose submit candy");
-
 	--	end
 	--end)
 	
