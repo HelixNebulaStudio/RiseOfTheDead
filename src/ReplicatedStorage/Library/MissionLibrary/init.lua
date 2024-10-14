@@ -2824,6 +2824,30 @@ MissionLibrary.New{
 	
 };
 
+
+-- MARK: 82 - Slaughter King
+MissionLibrary.New{
+	MissionId=82;
+	MissionType = MissionLibrary.MissionTypes.Board;
+	Name="Slaughter King";
+	Description="Get first place in Slaughterfest with at least a kill.";
+	Timer=BoardTimeLimit;
+	Persistent=true;
+	Checkpoint={
+		{Text="Get first place in Slaughterfest";};
+	};
+	SaveData={};
+	GuideText="";
+	Tier="Hard";
+	Rewards={
+		{Type="Perks"; Amount=PerksReward.Hard};
+	};
+	AddRequirements={
+		{Type="Level"; Value=30};
+	};
+	
+};
+
 -- MARK: 666 - TestMission
 MissionLibrary.New{
 	MissionId=666;

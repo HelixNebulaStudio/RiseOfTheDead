@@ -578,6 +578,7 @@ elseif Branches.WorldInfo.Type == Branches.WorldTypes.Slaughterfest then
 	modConfigurations.Set("DisableStatusHud", false);
 	modConfigurations.Set("DisableEmotes", false);
 	modConfigurations.Set("DisableMissions", false);
+	modConfigurations.Set("DisablePinnedMission", false);
 	
 	modConfigurations.Set("DisableExperiencebar", false);
 	modConfigurations.Set("RemoveForceFieldOnWeaponFire", true);
