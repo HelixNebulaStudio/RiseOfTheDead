@@ -80,6 +80,8 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local remoteCharacterRemote = modRemotesManager:Get("CharacterRemote");
 local remoteCharacterInteractions = modRemotesManager:Get("CharacterInteractions");
 
+local rbxPlayerModule = require(localPlayer.PlayerScripts.PlayerModule) :: any;
+
 local remotes = game.ReplicatedStorage:FindFirstChild("Remotes");
 local remoteCameraShakeAndZoom = remotes and remotes:FindFirstChild("CameraShakeAndZoom");
 
@@ -1251,15 +1253,25 @@ local function renderStepped(camera, deltaTime)
 
 	
 	if characterProperties.IsSliding then
-		if characterProperties.CrouchKeyDown == false then
+		if characterProperties.CrouchKeyDown == false or humanoid:GetState() == Enum.HumanoidStateType.Swimming then
 			stopSliding();
 		end
 
 		if characterProperties.ThirdPersonCamera then
 			local mouseMoveDelta = UserInputService:GetMouseDelta();
 
+			local inputVector = rbxPlayerModule:GetControls():GetMoveVector();
+			local rootFaceCf = CFrame.new(rootPart.CFrame.Position, rootPart.CFrame.Position+slideDirection);
+
+			if inputVector.X ~= 0 or inputVector.Z ~= 0 then
+				local localInputDir = CFrame.lookAt(currentCamera.CFrame.Position, currentCamera.CFrame:ToWorldSpace(CFrame.new(inputVector)).Position);
+				rootFaceCf = rootFaceCf:Lerp(
+					localInputDir,
+					0.1);
+			end
+
 			setAlignRot{
-				CFrame = CFrame.new(rootPart.CFrame.Position, rootPart.CFrame.Position+slideDirection) * CFrame.Angles(0, math.rad(-mouseMoveDelta.X/2), 0);
+				CFrame = rootFaceCf * CFrame.Angles(0, math.rad(-mouseMoveDelta.X/1.9), 0);
 				Enabled=true;
 			};
 		end
