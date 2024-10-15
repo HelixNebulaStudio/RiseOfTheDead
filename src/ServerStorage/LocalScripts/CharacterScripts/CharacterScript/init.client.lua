@@ -1256,8 +1256,10 @@ local function renderStepped(camera, deltaTime)
 		end
 
 		if characterProperties.ThirdPersonCamera then
+			local mouseMoveDelta = UserInputService:GetMouseDelta();
+
 			setAlignRot{
-				CFrame=rootPoint;
+				CFrame = CFrame.new(rootPart.CFrame.Position, rootPart.CFrame.Position+slideDirection) * CFrame.Angles(0, math.rad(-mouseMoveDelta.X/2), 0);
 				Enabled=true;
 			};
 		end
@@ -2146,13 +2148,7 @@ RunService.PostSimulation:Connect(function(step)
 			if animations["slide"] then animations["slide"]:Play(); end
 			characterProperties.WalkSpeed:Set("default", 0);
 			
-			setAlignRot{
-				CFrame = CFrame.new(rootPart.CFrame.Position, rootPart.CFrame.Position+slideDirection);
-			};
 			if not humanoid.Sit and not humanoid.PlatformStand and not humanoid.Jump then
-				setAlignRot{
-					Enabled=true;
-				};
 				slideForce.MaxForce = Vector3.new(40000, 0, 40000);
 				
 				local rootLookVector = Vector3.new(rootPart.CFrame.LookVector.X, 0, rootPart.CFrame.LookVector.Z).Unit;
@@ -2165,7 +2161,7 @@ RunService.PostSimulation:Connect(function(step)
 				if slopeDot > 0.1 then
 					slideMomentum = math.min(slideMomentum + slopeDot/slopeDownFriction, characterProperties.SlideSpeed*1.5);
 				else
-					slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.3) *slopeUpFriction;
+					--slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.3) *slopeUpFriction;
 				end
 
 				slideForce.Velocity = newSlideDirection*math.max(slideMomentum, 0);
