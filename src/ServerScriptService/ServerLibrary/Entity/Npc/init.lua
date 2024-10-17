@@ -314,7 +314,7 @@ local unneededHumanoidStates = {
 	@param customNpcModule <NpcModule:Object> Load in a custom NPC Module for the NPC.
 	@return Model npc Returns NPC's character model.
 **--]]
-Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
+Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule, customNpcPrefab)
 	if name == "Ticks Zombie" then
 		name = "Ticks";
 	end
@@ -325,7 +325,7 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule)
 		name = "Heavy";
 	end
 	
-	local basePrefab = Npc.GetNpcPrefab(name);
+	local basePrefab = customNpcPrefab or Npc.GetNpcPrefab(name);
 	if basePrefab == nil then return end;
 	
 	local npcPrefab: Actor = basePrefab:Clone();
@@ -639,13 +639,14 @@ Npc.Spawn = function(
 	name: string, 
 	cframe: CFrame?, 
 	preloadCallback: ((prefab: (Model | Actor), npcModule: modNpcComponent.NpcModule) -> (Model | Actor))?, 
-	customNpcModule
+	customNpcModule,
+	customNpcPrefab: (Model | Actor)?
 )
-	if RunService:IsStudio() then
-		return Npc.DoSpawn(name, cframe, preloadCallback, customNpcModule);
-	else
-		return templateSpawnSrc.Function:Invoke(name, cframe, preloadCallback, customNpcModule);
-	end
+	return Npc.DoSpawn(name, cframe, preloadCallback, customNpcModule, customNpcPrefab);
+	-- if RunService:IsStudio() then
+	-- else
+	-- 	return templateSpawnSrc.Function:Invoke(name, cframe, preloadCallback, customNpcModule);
+	-- end
 end
 
 function Npc.GetCFrameFromPlatform(platform)

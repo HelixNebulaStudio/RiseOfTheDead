@@ -171,7 +171,7 @@ local isMainBranch = Branches.CurrentBranch.Name == "Live";
 Branches.WorldLibrary = {
 	MainMenu={CanTravelTo=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.Menu; MaxPlayers=25;};
 	BioXResearch={CanTravelTo=true; PrivateWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=10; DevsOnly=isMainBranch;}; -- PublicWorld=true;
-	Deadlock={NoPrivateServers=true; CanTravelTo=true; PublicWorld=true; FreeTravels=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=12;};
+	Deadlock={NoPrivateServers=true; CanTravelTo=true; PublicWorld=true; FreeTravels=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.Slaughterfest; MaxPlayers=8;};
 
 	-- Cutscene;
 	TheBeginning={CanTravelTo=false; Type=Branches.WorldTypes.Cutscene; MaxPlayers=1;};
@@ -386,7 +386,7 @@ Branches.WorldDisplayNames = {
 	HalloweenBasement="Halloween Mission: Halloween Basement";
 	KlawsWorkshop="Christmas Event: Mr. Klaws Workshop";
 	Slaughterfest="Halloween Event: Slaughterfest";
-	Deadlock="Event: Deadlock";
+	Deadlock="Pvp: Deadlock";
 
 	--CommunityMap;
 	CommunityWaySide="Community: Way Side";
@@ -498,7 +498,7 @@ elseif Branches.WorldInfo.Type == Branches.WorldTypes.General or Branches.WorldI
 	modConfigurations.Set("DisableMissions", false);
 	modConfigurations.Set("DisablePinnedMission", false);
 	modConfigurations.Set("DisableWorkbench", false);
-	modConfigurations.Set("DisableReportMenu", false);
+	modConfigurations.Set("DisableReportMenu", true);
 	modConfigurations.Set("DisableMasteryMenu", false);
 	modConfigurations.Set("DisableExperiencebar", false);
 	modConfigurations.Set("DisableGeneralStats", false);

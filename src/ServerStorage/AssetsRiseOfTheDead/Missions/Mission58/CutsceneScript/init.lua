@@ -506,7 +506,7 @@ return function(CutsceneSequence)
 								npcModule:AddComponent(game.ServerScriptService.ServerLibrary.Entity.Npc.Rat.RandomSkin);
 								npcModule.RandomSkin();
 								npcModule.Movement:SetWalkSpeed("default", 8);
-							end, require(game.ServerStorage.PrefabStorage.CustomNpcModules.CutsceneHuman));
+							end, modNpc.NpcBaseModules.CutsceneHuman);
 						end
 
 						local banditSpawns = {
@@ -524,7 +524,7 @@ return function(CutsceneSequence)
 								npcModule:AddComponent(game.ServerScriptService.ServerLibrary.Entity.Npc.Bandit.RandomSkin);
 								npcModule.RandomSkin();
 								npcModule.Movement:SetWalkSpeed("default", 8);
-							end, require(game.ServerStorage.PrefabStorage.CustomNpcModules.CutsceneHuman));
+							end, modNpc.NpcBaseModules.CutsceneHuman);
 						end
 
 						zarkModule.Actions:Teleport(CFrame.new(-8.77352238, 2.6205008, 90.7937851, 0, 0, 1, 0, 1, 0, -1, 0, 0));
@@ -1387,7 +1387,7 @@ return function(CutsceneSequence)
 								npcModule:AddComponent("SafehomeSurvivor");
 								coroutine.yield();
 							end
-						end, require(game.ServerStorage.PrefabStorage.CustomNpcModules.CutsceneHuman));
+						end, modNpc.NpcBaseModules.CutsceneHuman);
 						modReplicationManager.ReplicateOut(player, npc);
 					end
 				end

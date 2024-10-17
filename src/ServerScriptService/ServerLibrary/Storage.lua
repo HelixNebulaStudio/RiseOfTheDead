@@ -15,7 +15,7 @@ local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modUsableItems = require(game.ReplicatedStorage.Library.UsableItems);
-local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem) :: any; 
+local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem); 
 
 local modProfile = shared.modProfile;
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
@@ -1780,13 +1780,13 @@ function Storage:Delete(id, quantity, callback)
 		if quantity <= storageItem.Quantity then
 			if storageItem.Quantity > quantity then
 				storageItem.Quantity = storageItem.Quantity - quantity;
-				Debugger:Print("Removed -"..quantity.." of "..id.." from "..self.Id);
+				Debugger:StudioLog("Removed -"..quantity.." of "..id.." from "..self.Id);
 				storageItem:Sync();
 				
 				if callback then task.spawn(callback, QueueEvents.Success); end
 				
 			else
-				Debugger:Print("Removed "..storageItem.ID.." from "..self.Id);
+				Debugger:StudioLog("Removed "..storageItem.ID.." from "..self.Id);
 				self.Container[id] = nil;
 				storageItem.Quantity = 0;
 				storageItem:Sync();
@@ -1822,7 +1822,7 @@ function Storage:Delete(id, quantity, callback)
 		self:Changed();
 		
 	else
-		Debugger:Print("Unable to remove non existing "..id.." from "..self.Id);
+		Debugger:Log("Unable to remove non existing "..id.." from "..self.Id);
 		if callback then task.spawn(callback, QueueEvents.Missing); end
 		
 	end

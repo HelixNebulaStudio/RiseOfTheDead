@@ -541,7 +541,7 @@ return function(CutsceneSequence)
 								end
 							end);
 						end)
-					end, require(game.ServerStorage.PrefabStorage.CustomNpcModules.CutsceneHuman));
+					end, modNpc.NpcBaseModules.CutsceneHuman);
 					
 					Debugger:Warn("walking to point");
 					patrolBandit:ToggleInteractable(false);

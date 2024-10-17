@@ -25,7 +25,7 @@ local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 
 Debugger:Log("InterfaceModule loading.");
-local modInterface = require(script.Parent.InterfaceModule);
+local modInterface = require(script.Parent.InterfaceModule) :: any;
 modInterface.modCharacter = modCharacter;
 modInterface.NavBarFrame = script.Parent:WaitForChild("QuickButtons");
 Debugger:Log("InterfaceModule loaded.");
@@ -491,16 +491,16 @@ function UpdateProgressionBar(progress, labelId, value)
 	
 	displayingMasteryLevel = false;
 	if labelId == "Heal" then
-		progressionLabel.Text = ("Healing: $value/100%"):gsub("$value", math.ceil(progress*100));
+		progressionLabel.Text = ("Healing: $value/100%"):gsub("$value", tostring(math.ceil(progress*100)));
 		
 	elseif labelId == "Throw" then
-		progressionLabel.Text = ("Throw Strength: $value/100%"):gsub("$value", math.ceil(progress*100));
+		progressionLabel.Text = ("Throw Strength: $value/100%"):gsub("$value", tostring(math.ceil(progress*100)));
 		
 	elseif labelId == "Building" then
-		progressionLabel.Text = ("Building: $value/100%"):gsub("$value", math.ceil(progress*100));
+		progressionLabel.Text = ("Building: $value/100%"):gsub("$value", tostring(math.ceil(progress*100)));
 		
 	elseif labelId == "Eating" then
-		progressionLabel.Text = ("Consuming: $value/100%"):gsub("$value", math.ceil(progress*100));
+		progressionLabel.Text = ("Consuming: $value/100%"):gsub("$value", tostring(math.ceil(progress*100)));
 		
 	elseif labelId == "WeaponLevel" then
 		progressionLabel.Text = "Weapon Level: ".. tostring(value or 0);
@@ -620,11 +620,15 @@ end
 local function updateTopbarGuiObjects()
 	local height = GuiService.TopbarInset.Height;
 	local minX = GuiService.TopbarInset.Min.X;
-	modInterface.NavBarFrame.Position = UDim2.new(0, minX+14, 0, 4);
-	modInterface.NavBarFrame.Size = UDim2.new(0, 32, 0, height);
+	modInterface.NavBarFrame.Position = UDim2.new(0, minX, 0, 5); --+14
+	modInterface.NavBarFrame.Size = UDim2.new(0, 32, 0, height-10);
 end
 GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(updateTopbarGuiObjects);
 updateTopbarGuiObjects();
+
+modInterface.Garbage:Tag(modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
+	updateTopbarGuiObjects();
+end))
 
 Debugger:Log("Loaded main user interface..");
 

@@ -16,6 +16,7 @@ local StorageItem = {};
 StorageItem.__index = StorageItem;
 StorageItem.ClassType = "StorageItem";
 StorageItem.LargestDataSize = 0;
+StorageItem.Storage = nil;
 
 type StorageItemObject = {
 	ItemId: string;
