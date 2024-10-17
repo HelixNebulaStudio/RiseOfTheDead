@@ -9,7 +9,7 @@ return function(self)
 	if self.Humanoid == nil then Debugger:Warn("NpcAnimator>>  ",self.Name,"is missing humanoid."); return end;
 
 	local mainPrefab = self.NpcService.GetNpcPrefab(self.Name);
-	local npcName = mainPrefab.Name;
+	local npcName = mainPrefab and mainPrefab.Name or self.Name;
 	
 	local function getAnimationsFolder(animCategoryName)
 		local npcAnimFolder = animationLibrary:FindFirstChild(npcName);

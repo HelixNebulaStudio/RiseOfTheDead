@@ -2173,7 +2173,7 @@ RunService.PostSimulation:Connect(function(step)
 				if slopeDot > 0.1 then
 					slideMomentum = math.min(slideMomentum + slopeDot/slopeDownFriction, characterProperties.SlideSpeed*1.5);
 				else
-					slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.3) *slopeUpFriction;
+					slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.25) *slopeUpFriction;
 				end
 
 				slideForce.Velocity = newSlideDirection*math.max(slideMomentum, 0);
