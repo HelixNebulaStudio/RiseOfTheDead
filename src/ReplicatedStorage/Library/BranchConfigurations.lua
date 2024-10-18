@@ -113,9 +113,9 @@ local Branches = {
 			HalloweenBasement=5884577465;
 			KlawsWorkshop=8374649741;
 			Slaughterfest=11264091769;
+			NekronsGambit=140550016869053;
 			
 			BioXResearch=289213709;
-			Deadlock=140550016869053;
 			
 			--CommunityMaps;
 			CommunityWaySide=10976260433;
@@ -171,7 +171,7 @@ local isMainBranch = Branches.CurrentBranch.Name == "Live";
 Branches.WorldLibrary = {
 	MainMenu={CanTravelTo=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.Menu; MaxPlayers=25;};
 	BioXResearch={CanTravelTo=true; PrivateWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=10; DevsOnly=isMainBranch;}; -- PublicWorld=true;
-	Deadlock={NoPrivateServers=true; CanTravelTo=true; PublicWorld=true; FreeTravels=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.Slaughterfest; MaxPlayers=8;};
+	NekronsGambit={NoPrivateServers=true; CanTravelTo=true; PublicWorld=true; FreeTravels=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.Slaughterfest; MaxPlayers=8;};
 
 	-- Cutscene;
 	TheBeginning={CanTravelTo=false; Type=Branches.WorldTypes.Cutscene; MaxPlayers=1;};
@@ -381,12 +381,14 @@ Branches.WorldDisplayNames = {
 	SunkenShip="Coop: Sunken Ship";
 	CargoShip="Coop: Cargo Ship";
 	
+	-- Pvp;
+	NekronsGambit="Pvp: Nekron's Gambit";
+
 	--Events;
 	EasterButchery="Easter Event: Butchery";
 	HalloweenBasement="Halloween Mission: Halloween Basement";
 	KlawsWorkshop="Christmas Event: Mr. Klaws Workshop";
 	Slaughterfest="Halloween Event: Slaughterfest";
-	Deadlock="Pvp: Deadlock";
 
 	--CommunityMap;
 	CommunityWaySide="Community: Way Side";

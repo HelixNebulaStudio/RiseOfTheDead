@@ -879,6 +879,7 @@ function ItemsLibrary:Init(super)
 	
 	-- Legacy
 	new(toolBase, {Id="masusplush"; Name="Masus Plush"; Icon="rbxassetid://18158370701"; Tags={"Legacy"}; Description=`Suspiciously cute. Keep an eye on it though.`;});
+	new(toolBase, {Id="rideofthemothena"; Name="Ride of the Mothena"; Icon="rbxassetid://131087152228754"; Tags={"Legacy"}; Description=`Ride of the Valkyries but it's Mothena and Tom Greyman.`;});
 	
 	--==========================================================[[ META ]]==========================================================--
 	local metaBase = {
