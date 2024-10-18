@@ -2830,11 +2830,11 @@ MissionLibrary.New{
 	MissionId=82;
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Slaughter King";
-	Description="Get first place in Slaughterfest with at least a kill.";
+	Description="Get top 3 in Slaughterfest with at least a kill.";
 	Timer=BoardTimeLimit;
 	Persistent=true;
 	Checkpoint={
-		{Text="Get first place in Slaughterfest";};
+		{Text="Get top 3 in Slaughterfest";};
 	};
 	SaveData={};
 	GuideText="";
