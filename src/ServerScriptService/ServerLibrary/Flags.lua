@@ -4,24 +4,31 @@ Flags.__index = Flags;
 --== Variables;
 
 --== Script;
-function Flags:Get(eventId, default)
+function Flags:Get(flagId, default)
+	local rawGet, rawIndex;
 	for a=1, #self.Data do
-		if self.Data[a].Id == eventId then
-			return self.Data[a], a;
+		if self.Data[a].Id == flagId then
+			rawGet, rawIndex = self.Data[a], a;
+			break;
 		end;
 	end
-	
+
 	if default then
-		return self:Add(default);
+		rawGet, rawIndex = self:Add(default);
 	end
-	return;
+	
+	if self.GetHooks[flagId] then
+		rawGet, rawIndex = self:Add(self.GetHooks[flagId](rawGet));
+	end
+
+	return rawGet, rawIndex;
 end
 
 function Flags:Add(data)
 	self:Remove(data.Id);
 	table.insert(self.Data, data);
 	
-	return data;
+	return data, #self.Data;
 end
 
 function Flags:Remove(id)
@@ -32,9 +39,9 @@ function Flags:Remove(id)
 	end
 end
 
-function Flags:Sync()
+function Flags:Sync(flagId)
 	if self.Sync then
-		self:Sync();
+		self:Sync(flagId);
 	end
 end
 
@@ -65,10 +72,20 @@ function Flags:Load(rawData)
 	return self;
 end
 
+function Flags:HookGet(flagId, func)
+	if self.GetHooks[flagId] then 
+		Debugger:Warn(`FlagId {flagId} is already hooked for {self.Player}!`);
+		return 
+	end;
+
+	self.GetHooks[flagId] = func;
+end
+
 function Flags.new(player, syncFunc)
 	local meta = {
 		Player = player;
 		Sync = syncFunc;
+		GetHooks = {};
 	}
 	meta.__index = meta;
 	

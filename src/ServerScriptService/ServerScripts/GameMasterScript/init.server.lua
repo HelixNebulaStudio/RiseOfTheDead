@@ -209,7 +209,7 @@ Players.PlayerRemoving:Connect(function(player)
 end)
 
 
-function remotePlayerDataFetch.OnServerInvoke(player, packet)
+function remotePlayerDataFetch.OnServerInvoke(player, packet) 
 	local profile = modProfile:Find(player.Name);
 	if profile == nil then return end;
 	
@@ -388,6 +388,16 @@ function PickUpRequest(player, interactObject, interactModule)
 			
 			if interactData.Players == nil then interactData.Players = {} end;
 			
+			if interactData.CollectibleId then
+				task.spawn(function()
+					local lib = modCollectiblesLibrary:Find(interactData.CollectibleId);
+					if lib == nil then return "Unknown collectible." end;
+					
+					profile:UnlockCollectible(interactData.CollectibleId);
+					return;
+				end)
+			end
+
 			if interactData.StorageItem then -- Unique item;
 				if interactData.Taken == nil then
 					local storageItem = interactData.StorageItem;

@@ -142,7 +142,7 @@ function Workbench.new(itemId, library, storageItem)
 						isUnlocked = true;
 					end
 					
-					if unlockItemLib.Hidden ~= true then
+					if unlockItemLib.Hidden ~= true or modBranchConfigs.CurrentBranch.Name == "Dev" then
 						-- MARK: New UnlockableButton 
 						local unlockButton = unlockButtonTemplate:Clone();
 						local txrLabel = unlockButton:WaitForChild("TextureLabel");
@@ -194,7 +194,7 @@ function Workbench.new(itemId, library, storageItem)
 							setCharacterAccessories(ItemValues.ActiveSkin);
 						end)
 						
-						if player.UserId == 16170943 then
+						if player.UserId == 16170943 or modBranchConfigs.CurrentBranch.Name == "Dev" then
 							unlockButton.MouseButton2Click:Connect(function()
 								Interface:PlayButtonClick();
 								

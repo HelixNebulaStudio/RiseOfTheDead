@@ -147,6 +147,8 @@ for eventId, dateTable in pairs(SpecialEventsTable) do
 	SpecialEvents[eventId] = isActive;
 end
 
-Configurations.Set("SpecialEvent",SpecialEvents);
+SpecialEvents.Halloween = true;
+
+Configurations.Set("SpecialEvent", SpecialEvents);
 
 return Configurations;

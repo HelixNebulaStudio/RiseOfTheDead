@@ -66,28 +66,39 @@ function DropRateCalculator.Calculate(rewardLib, criteria)
 	return indexGroups;
 end
 
-function DropRateCalculator.RollDrop(rewardLib, player, criteria)
+function DropRateCalculator.RollDrop(rewardLib, seedObj, criteria)
 	local groups = DropRateCalculator.Calculate(rewardLib, criteria);
 	
 	local rolls = 0;
 	
-	if typeof(player) == "Instance" then
-		rolls = modPseudoRandom:NextNumber(player, rewardLib.Id, 0, 1);
-		
-	elseif player == "Global" then
-		rolls = modGlobalRandom:NextNumber(rewardLib.Id, 0, 1);
-		
-	else
-		if randoms[rewardLib.Id] == nil then
-			randoms[rewardLib.Id] = Random.new();
-		end
-		
-		rolls = randoms[rewardLib.Id]:NextNumber();
-		
+	local globalRandom = nil;
+	if typeof(seedObj) == "number" then
+		globalRandom = Random.new(seedObj);
+
+	elseif seedObj == "Global" then
+		globalRandom = Random.new(modGlobalRandom:NextNumber(rewardLib.Id, 0, 1));
 	end
-	
+
 	local drops = {};
 	for a=1, #groups do
+		if typeof(seedObj) == "number" and globalRandom then
+			rolls = globalRandom:NextNumber(0, 1);
+
+		elseif typeof(seedObj) == "Instance" then
+			rolls = modPseudoRandom:NextNumber(seedObj, rewardLib.Id, 0, 1);
+			
+		elseif seedObj == "Global" and globalRandom then
+			rolls = globalRandom:NextNumber(0, 1);
+			
+		else
+			if randoms[rewardLib.Id] == nil then
+				randoms[rewardLib.Id] = Random.new();
+			end
+			
+			rolls = randoms[rewardLib.Id]:NextNumber();
+			
+		end
+
 		local aRoll = groups[a].TotalChance * rolls;
 		
 		for b=1, #groups[a] do

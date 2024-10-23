@@ -279,6 +279,23 @@ function CrateLibrary:Init(super)
 		};
 	};
 	
+	super.New{
+		Id="slaughterfestcandybag";
+		Name="Slaughterfest Candy Bag";
+		PrefabName="CandyBag";
+		RewardsId="slaughterfestcandybag";
+
+		EmptyLabel="Empty Bag";
+		Configurations={
+			Persistent=false;
+			Settings={
+				WithdrawalOnly=true;
+				DestroyOnEmpty=true;
+			}
+		};
+	};
+
+	
 end
 
 return CrateLibrary;

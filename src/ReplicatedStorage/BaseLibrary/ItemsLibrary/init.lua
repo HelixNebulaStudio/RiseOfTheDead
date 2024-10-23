@@ -193,7 +193,7 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="santahat"; Name="Santa Hat"; Tradable=super.Tradable.Tradable; Icon="rbxassetid://6108356239"; Tags={"Head"; "Christmas"; "Frostivus"}; Description="Merry Christmas, ho ho ho!";});
 	new(clothingBase, {Id="greensantahat"; Name="Green Santa Hat"; Tradable=super.Tradable.Tradable; Icon="rbxassetid://6122942270"; Tags={"Head"; "Christmas"; "Frostivus"}; Description="Merry Christmas, ho ho ho!";});
 	new(clothingBase, {Id="bunnymanhead"; Name="Bunny Man's Head"; Icon="rbxassetid://4845183167"; Tags={"Head"; "Easter"}; Description="Bunny Man's Headwear. Normal environmental Zombies will ignore you during the Easter event.\nEvent-Active: "..tostring(modConfigurations.SpecialEvent.Easter); Sources={"Obtained from <b>The Bunny Man in Mission: Bunny Man's Eggs</b>";};});
-	new(clothingBase, {Id="jackolantern"; Name="Jack o' Lantern"; Icon="rbxassetid://14951707178"; Tags={"Head";}; Description="Where Jack watches through the jacks o lanterns.";});
+	new(clothingBase, {Id="jackolantern"; Name="Jack o' Lantern"; Icon="rbxassetid://14951707178"; Tags={"Head"; "Slaughterfest";}; Description="Where Jack watches through the jacks o lanterns.";});
 
 	-- Chest
 	new(clothingBase, {Id="greytshirt"; Name="T-Shirt"; Icon="rbxassetid://5756503297"; Tags={"Chest"}; Description="Comfy T-Shirt. Gives you 1 armor point for protection.";});
@@ -778,7 +778,8 @@ function ItemsLibrary:Init(super)
 	-- zriceraskull
 	new(skinPermBase, {Id="zriceraskullinferno"; Icon="rbxassetid://8378956341"; SkinPerm="Inferno"; TargetItemId="zriceraskull";});
 	
-
+	-- jackolantern
+	new(skinPermBase, {Id="jackolanternhaunted"; Icon="rbxassetid://90787164761656"; SkinPerm="Haunted"; TargetItemId="jackolantern";});
 	
 
 	--==========================================================[[ SUMMONS ]]==========================================================--
@@ -842,6 +843,15 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="armwrapscbsghosts"; Icon="rbxassetid://15016755235"; SkinPerm="Cute But Scary Ghosts"; TargetItemId="armwraps"; Tags={"Slaughterfest";}; });
 	new(skinPermBase, {Id="maraudersmaskcbspumpkins"; Icon="rbxassetid://15016821671"; SkinPerm="Cute But Scary Pumpkins"; TargetItemId="maraudersmask"; Tags={"Slaughterfest";}; });
 	
+	-- Slaughterfest 2024
+	new(crateBase, {Id="slaughterfestcandybag"; Name="Slaughterfest Candy Bag"; Icon="rbxassetid://122301894594822"; Tags={"Slaughterfest"}; TradingTax=0; Description="Happy Slaughterfest, open it and see what you get!";});
+	local candyCaravanStr = "Eatible candies but why not cook them in the Slaughterfest Cauldron for something much more special instead?\n";
+	new(foodBase, {Id="zombiejello"; Name="Zombie Jello"; Icon="rbxassetid://99854271826378"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] After eating this, you get a craving for brainsss.."; Tradable=super.Tradable.Nontradable;});
+	new(foodBase, {Id="eyeballgummies"; Name="Eyeball Gummies"; Icon="rbxassetid://72634660358826"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] Heighten vision that gives you the ability to see vibrations.."; Tradable=super.Tradable.Nontradable;});
+	new(foodBase, {Id="spookmallow"; Name="Spookmallow"; Icon="rbxassetid://93144909042467"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] TBD"; Tradable=super.Tradable.Nontradable;});
+	new(foodBase, {Id="cherrybloodbar"; Name="Cherry Blood Bar"; Icon="rbxassetid://87358672710754"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] TBD"; Tradable=super.Tradable.Nontradable;});
+	new(foodBase, {Id="wickedtaffy"; Name="Wicked Taffy"; Icon="rbxassetid://125482145777312"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] TBD"; Tradable=super.Tradable.Nontradable;});
+	
 	-- Christmas 2019
 	
 	new(foodBase, {Id="gingerbreadman"; Name="Gingerbread Man"; Icon="rbxassetid://4533980328"; Tags={"Christmas"; "Frostivus"}; Description="Puts you in a Christmas Spirit.";});
@@ -879,7 +889,7 @@ function ItemsLibrary:Init(super)
 	
 	-- Legacy
 	new(toolBase, {Id="masusplush"; Name="Masus Plush"; Icon="rbxassetid://18158370701"; Tags={"Legacy"}; Description=`Suspiciously cute. Keep an eye on it though.`;});
-	new(toolBase, {Id="rideofthemothena"; Name="Ride of the Mothena"; Icon="rbxassetid://131087152228754"; Tags={"Legacy"}; Description=`Ride of the Valkyries but it's Mothena and Tom Greyman.`;});
+	new(toolBase, {Id="rideofthemothena"; Name="Ride of the Mothena"; Icon="rbxassetid://131087152228754"; Tags={"Legacy"}; Description=`Adorable little critter. Now quite huggable, marketable and including some sort of deity!`;});
 	
 	--==========================================================[[ META ]]==========================================================--
 	local metaBase = {

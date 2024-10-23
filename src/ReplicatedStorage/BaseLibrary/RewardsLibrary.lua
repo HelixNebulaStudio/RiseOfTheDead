@@ -127,6 +127,68 @@ function RewardsLibrary:Init(super)
 		};
 	};
 
+	super:Add{
+		Id="slaughterfestcandybag";
+		Rewards={
+			{Index=1; ItemId="zombiejello"; Quantity={Min=1; Max=3}; Chance=1;};
+			{Index=1; ItemId="eyeballgummies"; Quantity={Min=1; Max=3}; Chance=1;};
+			{Index=1; ItemId="spookmallow"; Quantity={Min=1; Max=3}; Chance=1;};
+			{Index=1; ItemId="cherrybloodbar"; Quantity={Min=1; Max=3}; Chance=1;};
+			{Index=1; ItemId="wickedtaffy"; Quantity={Min=1; Max=3}; Chance=1;};
+
+			{Index=2; ItemId="zombiejello"; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=2; ItemId="eyeballgummies"; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=2; ItemId="spookmallow"; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=2; ItemId="cherrybloodbar"; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=2; ItemId="wickedtaffy"; Quantity={Min=1; Max=2}; Chance=1;};
+
+			{Index=3; ItemId="zombiejello"; Quantity=1; Chance=1;};
+			{Index=3; ItemId="eyeballgummies"; Quantity=1; Chance=1;};
+			{Index=3; ItemId="spookmallow"; Quantity=1; Chance=1;};
+			{Index=3; ItemId="cherrybloodbar"; Quantity=1; Chance=1;};
+			{Index=3; ItemId="wickedtaffy"; Quantity=1; Chance=1;};
+		};
+		SpecialEvent="Halloween";
+	};
+
+	super:Add{
+		Id="slaughterfestcandyrecipes24";
+		Rewards={
+			{ItemId="skincutebutscary"; Quantity=1; Chance=1; Tier=1;};
+			
+			{ItemId="skincutebutscary"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="clothbagmaskcbsskulls"; Quantity=1; Chance=1; Tier=1;};
+
+			{ItemId="tophat"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="clownmask"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="skullmask"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="maraudersmask"; Quantity=1; Chance=1; Tier=1;};
+
+			{ItemId="sr308slaughterwoods"; Quantity=1; Chance=1; Tier=1;};
+			
+			{ItemId="nekrostrenchhauntedpumpkin"; Quantity=1/10; Chance=1; Tier=2;};
+			{ItemId="skullmaskgold"; Quantity=1; Chance=1/10; Tier=2;};
+
+			{ItemId="jackolantern"; Quantity=1; Chance=1/10; Tier=2;};
+			{ItemId="clownmaskus"; Quantity=1; Chance=1/10; Tier=2;};
+			{ItemId="clownmaskmissjoyful"; Quantity=1; Chance=1/10; Tier=2;};
+			{ItemId="maraudersmaskblue"; Quantity=1; Chance=1/10; Tier=2;};
+			{ItemId="tophatgrey"; Quantity=1; Chance=1/10; Tier=2;};
+			{ItemId="tophatpurple"; Quantity=1; Chance=1/10; Tier=2;};
+			{ItemId="tophatred"; Quantity=1; Chance=1/10; Tier=2;};
+			{ItemId="jackolanternhaunted"; Quantity=1; Chance=1/10; Tier=2;};
+			
+			{ItemId="maraudersmaskrisingsun"; Quantity=1; Chance=1/40; Tier=3;};
+			{ItemId="tophatgold"; Quantity=1; Chance=1/40; Tier=3;};
+
+			{ItemId="slaughterwoodsunlockpapers"; Quantity=1; Chance=1/100; Tier=4;};
+			{ItemId="vectorxpossession"; Quantity=1; Chance=1/100; Tier=4;};
+
+			{ItemId="skinhalloweenpixelart"; Quantity=1; Chance=1/10000; Tier=5;};
+		};
+		SpecialEvent="Halloween";
+	};
+
 end
 
 return RewardsLibrary;

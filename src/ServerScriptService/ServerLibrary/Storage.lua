@@ -1111,7 +1111,7 @@ function Storage.ConsumeList(list)
 	-- {{Item=storageItem; Amount=1};}
 	local syncStorages = {};
 	for a=1, #list do
-		if list[a].Amount == nil then Debugger:Warn("ConsumeList missing item: (",list[a].Item, ")") continue end;
+		if list[a].Amount == nil then Debugger:Warn("ConsumeList missing item: (",list[a].Item, ")"); continue end;
 		
 		local storageItem = list[a].Item;
 		local storage = list[a].Storage; -- or Storage.FindIdFromStorages(storageItem.ID, player)

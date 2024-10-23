@@ -10,24 +10,24 @@ local Keys = {
 local MemoryStoreService = game:GetService("MemoryStoreService");
 local halloweenMemory = MemoryStoreService:GetHashMap(Keys.MemMap);
 
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
+local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
+
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 
 local remoteHalloween = modRemotesManager:NewFunctionRemote("Halloween", 1);
 
-local rewardLib = modRewardsLibrary:Find("HalloweenCandyCauldron").Rewards
+local rewardLib = modRewardsLibrary:Find("slaughterfestcandyrecipes24");
 
 SpecialEvent.Cache = {
 	CandyPool = 0;	
 };
 
-local oneMonthSecs = 86400*30;
 --==
 repeat wait() until shared.modProfile;
 
@@ -65,6 +65,43 @@ shared.modProfile.OnProfileLoad:Connect(function(player, profile)
 	Debugger:Log("OnProfileLoad", activeSave ~= nil);
 	
 	if activeSave == nil then return end;
+
+	local maxRerolls = 10;
+	local restockTimer = 18000;
+
+	profile.Flags:HookGet("Slaughterfest", function(flagData)
+		local nowTime = workspace:GetServerTimeNow();
+
+		flagData = flagData or {
+			Id="Slaughterfest";
+			RollSeed=nowTime;
+			Claimed={};
+		};
+
+		if flagData.ShopReroll == nil then
+			flagData.ShopReroll = maxRerolls;
+			flagData.ShopLastRestock = nowTime;
+
+		elseif flagData.ShopReroll < maxRerolls then
+			local needRerolls = maxRerolls-flagData.ShopReroll;
+			for a=1, needRerolls do
+				if flagData.ShopLastRestock+restockTimer <= nowTime then
+					flagData.ShopReroll = flagData.ShopReroll +1;
+
+					if flagData.ShopReroll == 10 then
+						flagData.ShopLastRestock = nowTime;
+					else
+						flagData.ShopLastRestock = flagData.ShopLastRestock+restockTimer;
+					end
+				else
+					break;
+				end
+			end
+
+		end
+
+		return flagData;
+	end)
 
 	if activeSave.Storages and activeSave.Storages.HalloweenCauldron == nil then
 		activeSave.Storages.HalloweenCauldron = modStorage.new("HalloweenCauldron", "HalloweenCauldron", 1, player);
@@ -141,9 +178,147 @@ function remoteHalloween.OnServerInvoke(player, packet)
 	SpecialEvent.LoadCache();
 	
 	local profile = shared.modProfile:WaitForProfile(player);
+	local activeInventory = profile.ActiveInventory;
 	local activeSave = profile:GetActiveSave();
 	if activeSave == nil then return end;
 	
+	if action == "Reroll" then
+		local slaughterfestData = profile.Flags:Get("Slaughterfest");
+		local nowTime = workspace:GetServerTimeNow();
+		if nowTime-slaughterfestData.RollSeed <= 1 then return end;
+
+		if slaughterfestData.ShopReroll > 0 then
+			if slaughterfestData.ShopReroll >= 10 then
+				slaughterfestData.ShopLastRestock = nowTime;
+			end
+			slaughterfestData.ShopReroll = slaughterfestData.ShopReroll -1;
+			slaughterfestData.RollSeed = nowTime;
+			table.clear(slaughterfestData.Claimed);
+		end
+
+		profile.Flags:Sync("Slaughterfest");
+
+		return rPacket;
+
+	elseif action == "Cook" then
+
+		if packet.ItemId == nil then return end;
+
+		local slaughterfestData = profile.Flags:Get("Slaughterfest");
+		local rollSeed = slaughterfestData.RollSeed;
+		
+		local shopRewardInfoList = {};
+
+		for a=1, 10 do
+			local rewardsData = modDropRateCalculator.RollDrop(rewardLib, rollSeed/a);
+			local rewardInfo = rewardsData[1];
+			if rewardInfo == nil then continue end;
+
+			local exist = false;
+			for b=1, #shopRewardInfoList do
+				if shopRewardInfoList[b].ItemId == rewardInfo.ItemId then
+					exist = true;
+					break;
+				end
+			end
+
+			if not exist then
+				table.insert(shopRewardInfoList, rewardInfo);
+			end
+
+			if #shopRewardInfoList >= 3 then
+				break;
+			end
+		end
+
+		local chosenRewardInfo = nil;
+		local chosenIndex = nil;
+		for a=1, #shopRewardInfoList do
+			if shopRewardInfoList[a].ItemId == packet.ItemId then
+				chosenIndex = a;
+				chosenRewardInfo = shopRewardInfoList[a];
+				break;
+			end
+		end
+		if chosenRewardInfo == nil then return end;
+
+		if slaughterfestData.Claimed[chosenRewardInfo.ItemId] then
+			shared.Notify(player, "Reward already claimed.", "Negative");
+			return;
+		end
+
+		local candyTypes = {
+			"zombiejello";
+			"eyeballgummies";
+			"spookmallow";
+			"cherrybloodbar";
+			"wickedtaffy";
+		};
+		local tierRecipeCost = {
+			[1] = 6;
+			[2] = 8;
+			[3] = 12;
+			[4] = 16;
+			[5] = 20;
+		};
+
+		local rewardTier = chosenRewardInfo.Tier;
+		local recipeRandom = Random.new(rollSeed/chosenIndex);
+
+		local recipeItems = {};
+		local recipeCost = tierRecipeCost[rewardTier];
+
+		for b=1, recipeCost do
+			local pickCandyItemId = candyTypes[recipeRandom:NextInteger(1, #candyTypes)];
+
+			local recipeCandyItem = nil;
+			for a=1, #recipeItems do
+				if recipeItems[a].ItemId == pickCandyItemId then
+					recipeCandyItem = recipeItems[a];
+					break;
+				end
+			end
+			if recipeCandyItem == nil then
+				recipeCandyItem = {
+					ItemId = pickCandyItemId;
+					Amount = 0;
+				};
+				table.insert(recipeItems, recipeCandyItem);
+			end
+
+			recipeCandyItem.Amount = recipeCandyItem.Amount +1;
+		end
+		Debugger:Warn("Cook",chosenRewardInfo.ItemId,"Recipe", recipeItems);
+
+		local hasSpace = activeInventory:SpaceCheck({{ItemId=chosenRewardInfo.ItemId; Data={Quantity=1};}});
+		if not hasSpace then
+			shared.Notify(player, "Not enough inventory space.", "Negative");
+			return;
+		end
+
+		local fulfill, itemsList = shared.modStorage.FulfillList(player, recipeItems);
+		if not fulfill then
+			for _, candyItem in pairs(itemsList) do
+				local itemLib = modItemsLibrary:Find(candyItem.ItemId);
+				shared.Notify(player, `Not enough {itemLib.Name}, {candyItem.Amount} required.`, "Negative");
+			end
+			return
+		end;
+
+		slaughterfestData.Claimed[chosenRewardInfo.ItemId] = true;
+
+		shared.modStorage.ConsumeList(itemsList);
+		activeInventory:Add(chosenRewardInfo.ItemId, nil, function()
+			local itemLib = modItemsLibrary:Find(chosenRewardInfo.ItemId);
+			shared.Notify(player, `You received a {itemLib.Name}.`, "Reward");
+		end);
+
+		profile.Flags:Sync("Slaughterfest");
+
+		rPacket.Success = true;
+		return rPacket;
+	end
+
 	local cauldronStorage = activeSave.Storages.HalloweenCauldron;	
 	if cauldronStorage == nil then Debugger:Warn("Missing CauldronStorage!"); return end;
 
@@ -158,6 +333,7 @@ function remoteHalloween.OnServerInvoke(player, packet)
 	
 	
 	if action == "Request" then
+
 
 	elseif action == "Submit" then
 		candyData = loadCandyData(player);
@@ -229,7 +405,6 @@ function remoteHalloween.OnServerInvoke(player, packet)
 		
 		if candyData.Claimed[itemId] == true then rPacket.Error=4; return rPacket; end;
 		
-		local activeInventory = profile.ActiveInventory;
 		local hasSpace = activeInventory:SpaceCheck{
 			{ItemId=itemId; Data={Quantity=1};};
 		};
@@ -281,6 +456,43 @@ if folderMapEvent then
 		halloweenMapDecor.Parent = workspace.Environment;
 	end
 end
+
+
+task.spawn(function()
+	Debugger.AwaitShared("modCommandsLibrary");
+
+	shared.modCommandsLibrary:HookChatCommand("slaughterfest", {
+		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+		Description = [[Slaughterfest commands.
+		/slaughterfest addreroll
+		/slaughterfest uprerolltimer
+		]];
+
+		RequiredArgs = 0;
+		UsageInfo = "/slaughterfest cmd";
+		Function = function(player, args)
+			local profile = shared.modProfile:Get(player);
+			local slaughterfestData = profile.Flags:Get("Slaughterfest");
+
+			local actionId = args[1];
+
+			if actionId == "addreroll" then
+				slaughterfestData.ShopReroll = slaughterfestData.ShopReroll +1;
+				profile.Flags:Sync("Slaughterfest");
+
+				shared.Notify(player, "addreroll", "Inform");
+
+			elseif actionId == "uprerolltimer" then
+				slaughterfestData.ShopLastRestock = workspace:GetServerTimeNow()-(18000-20);
+				profile.Flags:Sync("Slaughterfest");
+
+				shared.Notify(player, "uprerolltimer", "Inform");
+			end
+
+			return true;
+		end;
+	});
+end)
 
 
 return SpecialEvent;

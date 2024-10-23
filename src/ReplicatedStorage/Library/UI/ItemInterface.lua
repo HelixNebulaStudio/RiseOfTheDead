@@ -327,7 +327,7 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 				permType = "Clothing";
 				
 				local unlockItemLib = modItemsLibrary:Find(itemValues.ActiveSkin);
-				itemIcon = permLib.Icon or unlockItemLib.Icon or itemIcon;
+				itemIcon = permLib.Icon or unlockItemLib and unlockItemLib.Icon or itemIcon;
 
 			else
 				permLib = modSkinsLibrary.Get(itemValues.ActiveSkin);

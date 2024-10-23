@@ -433,6 +433,12 @@ function Data:GetFlag(flagId, fetch)
 			local index = packet[modRemotesManager.Ref("Index")];
 			local data = packet[modRemotesManager.Ref("Data")];
 			
+			for k, flagData in pairs(Data.Profile.Flags.Data) do
+				if flagData.Id == flagId then
+					Data.Profile.Flags.Data[k] = nil;
+				end
+			end
+		
 			Data.Profile.Flags.Data[index] = data;
 		end
 	end

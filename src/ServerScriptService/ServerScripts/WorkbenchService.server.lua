@@ -732,7 +732,7 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 						end
 					end
 
-					if player.UserId == 16170943 then
+					if player.UserId == 16170943 or modBranchConfigs.CurrentBranch.Name == "Dev" then
 						isUnlocked = true;
 					end
 					if isUnlocked then

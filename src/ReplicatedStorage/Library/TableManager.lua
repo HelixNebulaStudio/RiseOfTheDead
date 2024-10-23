@@ -31,6 +31,9 @@ function TableManager.GetDataHierarchy(data, hierarchyKey, createEmptyIfNil)
 		for a=1, #keys do
 			local dir = rData;
 			rData = dir[keys[a]];
+			if rData == nil and tonumber(keys[a]) then
+				rData = dir[tonumber(keys[a])];
+			end
 
 			if rData == nil then
 				if createEmptyIfNil == true then
@@ -57,7 +60,11 @@ function TableManager.SetDataHierarchy(rootData, dataValue, hierarchyKey, create
 	local newHierarchyKey = #keys > 0 and table.concat(keys, "/") or nil;
 	local parentData = TableManager.GetDataHierarchy(rootData, newHierarchyKey, createEmptyIfNil);
 	if parentData then
-		parentData[dataKey] = dataValue;
+		if tonumber(dataKey) and parentData[tonumber(dataKey)] then
+			parentData[tonumber(dataKey)] = dataValue;
+		else
+			parentData[dataKey] = dataValue;
+		end
 		
 	else
 		Debugger:Warn("Fail to index: rootData", rootData);

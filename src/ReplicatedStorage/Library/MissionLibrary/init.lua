@@ -2841,6 +2841,7 @@ MissionLibrary.New{
 	Tier="Hard";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Hard};
+		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
 	};
 	AddRequirements={
 		{Type="SpecialEvent"; Value="Halloween"};

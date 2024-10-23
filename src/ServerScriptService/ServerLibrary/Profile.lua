@@ -324,7 +324,12 @@ function Profile.new(player) -- Contains player to game statistics. Not characte
 		};
 		
 		profile.PseudoRandom = modPseudoRandom.new(player);
-		profile.Flags = modFlags.new(player, function() profile:Sync("Flags"); end);
+		profile.Flags = modFlags.new(player, function(playerFlags, flagId)
+			local flagData, flagIndex = playerFlags:Get(flagId);
+			if flagData == nil then return end;
+
+			profile:Sync(`Flags/Data/{flagIndex}`);
+		end);
 
 		--Any attributes default as nil will not be saved.
 		setmetatable(profile, profileMeta);
@@ -1951,6 +1956,32 @@ task.spawn(function()
 
 			shared.Notify(player, "Hardmode: ".. tostring(profile.HardMode) , "Inform");
 
+			return true;
+		end;
+	});
+	
+	shared.modCommandsLibrary:HookChatCommand("flags", {
+		Permission = shared.modCommandsLibrary.PermissionLevel.Admin;
+		Description = [[flags commands.
+		/flags del flagid
+		]];
+
+		RequiredArgs = 0;
+		UsageInfo = "/flags action";
+		Function = function(player, args)
+			local profile = shared.modProfile:Get(player);
+			
+			local action = args[1];
+			
+			
+			if action == "del" then
+				local flagId = args[2];
+
+				profile.Flags:Remove(flagId);
+
+				shared.Notify(player, `Deleting flag {flagId}.`, "Inform");
+			end
+			
 			return true;
 		end;
 	});

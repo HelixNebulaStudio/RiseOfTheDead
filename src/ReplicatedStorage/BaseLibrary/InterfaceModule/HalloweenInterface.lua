@@ -5,10 +5,11 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local Interface = {};
 
 local localplayer = game.Players.LocalPlayer;
+local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
+local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modLeaderboardService = require(game.ReplicatedStorage.Library.LeaderboardService);
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modItem = require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -19,90 +20,55 @@ local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface
 
 local remoteHalloween = modRemotesManager:Get("Halloween");
 	
+local shopOptionTemplate = script:WaitForChild("ShopOption");
+local candyOptionTemplate = script:WaitForChild("CandyOption");
+
 --== Script;
 function Interface.init(modInterface)
 	if not modConfigurations.SpecialEvent.Halloween then return; end
 	setmetatable(Interface, modInterface);
 	
-	local templateMarker = script:WaitForChild("pointMarker");
-	
-	local modData = require(localplayer:WaitForChild("DataModule"));
+	local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 	local modLeaderboardInterface = require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
 	
-	--local rewardLib = modRewardsLibrary:Find("HalloweenCandyCauldron").Rewards
-	--local MaxBarValue = rewardLib[#rewardLib].Value;
-
 	local interfaceScreenGui = localplayer.PlayerGui:WaitForChild("MainInterface");
 
 	local mainFrame = script:WaitForChild("Halloween"):Clone();
 	mainFrame.Parent = interfaceScreenGui;
 
-	local frame = mainFrame:WaitForChild("Frame");
-	local playerDepositLabel = frame:WaitForChild("playerDepositLabel");
-	local commDepositLabel = frame:WaitForChild("commDepositLabel");
-	local candyCapacityFrame = frame:WaitForChild("CandyCapacity");
-	local depositButton = mainFrame:WaitForChild("depositButton");
 	local travelButton = mainFrame:WaitForChild("travelButton");
 
-	local prevCandies = 0;
-	local rewardButtons = {};
+	local rewardLib = modRewardsLibrary:Find("slaughterfestcandyrecipes24");
 
 	if modBranchConfigs.WorldName == "Slaughterfest" then
-		-- local slaughterfestHud = script:WaitForChild("SlaughterfestHud"):Clone();
-		-- slaughterfestHud.Parent = interfaceScreenGui;
 
-		-- local window = Interface.NewWindow("SlaughterfestHud", slaughterfestHud);
-		-- window.IgnoreHideAll = true;
-		-- window.ReleaseMouse = false;
-		-- window:Open();
-		
-		-- local counterLabel = slaughterfestHud:WaitForChild("CandyBag"):WaitForChild("counterLabel");
-		-- local cauldronTimerLabel = slaughterfestHud:WaitForChild("CandyBag"):WaitForChild("CauldronTimer");
-		
-		-- task.spawn(function()
-		-- 	while true do
-		-- 		if not slaughterfestHud:IsDescendantOf(interfaceScreenGui) then break; end;
-				
-		-- 		local timer = math.clamp((workspace:GetAttribute("NextCauldronSpawn") or 0)-modSyncTime.GetTime(), 0, 300);
-				
-		-- 		if timer < 240 then
-		-- 			cauldronTimerLabel.Text = "Cauldron: ".. modSyncTime.ToString(timer)
-					
-		-- 		else
-		-- 			cauldronTimerLabel.Text = "Cauldrons are available..";
-					
-		-- 		end
-				
-		-- 		local halloweenCauldronStorage = modData.Storages.HalloweenCauldron;
-		-- 		if halloweenCauldronStorage then
-		-- 			local count = 0;
-
-		-- 			for id, storageItem in pairs(halloweenCauldronStorage.Container) do
-		-- 				count = count + storageItem.Quantity;
-		-- 			end
-
-		-- 			counterLabel.Text = count.."/500";
-		-- 		end
-				
-		-- 		task.wait(0.5)
-		-- 	end
-		-- end)
-		
 	end
-	
-	
+
 	local window = Interface.NewWindow("HalloweenWindow", mainFrame);
-	window:SetOpenClosePosition(UDim2.new(0.5, 0, 0.45, 0), UDim2.new(0.5, 0, -1.5, 0));
-	
+	window.CompactFullscreen = true;
+	if modConfigurations.CompactInterface then
+		window:SetOpenClosePosition(UDim2.new(0.5, 0, 0, 0), UDim2.new(0.5, 0, -1.5, 0));
+	else
+		window:SetOpenClosePosition(UDim2.new(0.5, 0, 0, game:GetService("GuiService").TopbarInset.Height+10), UDim2.new(0.5, 0, -1.5, 0));
+	end
+
+	mainFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+		Interface:CloseWindow("HalloweenWindow");
+	end)
+
 	window.OnWindowToggle:Connect(function(visible)
 		if visible then
+			if modConfigurations.CompactInterface then
+				mainFrame.Size = UDim2.new(1, 0, 1, 0);
+			else
+				mainFrame.Size = UDim2.new(0.7, 0, 0.8, -game:GetService("GuiService").TopbarInset.Height-10);
+			end
 			if modBranchConfigs.WorldName == "Slaughterfest" then
 				travelButton.Visible = false;
-				depositButton.Visible = true;
-				depositButton.Text = "Submit Candies";
+				
 			else
 				travelButton.Visible = true;
-				depositButton.Visible = false;
+				
 			end
 			
 			Interface.Update();
@@ -124,125 +90,267 @@ function Interface.init(modInterface)
 		Interface:PlayButtonClick();
 		if modBranchConfigs.WorldName == "Slaughterfest" then return end;
 		
-		local promptWindow = Interface:PromptQuestion("Travel", 
-			"Are you sure you want to travel to <b>Slaughterfest</b>?", 
-			"Travel", "Cancel", "http://www.roblox.com/asset/?id=11262940674");
-		local YesClickedSignal, NoClickedSignal;
-
-		YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-			if debounce then return end;
-			debounce = true;
-			Interface:PlayButtonClick();
-			promptWindow.Frame.Yes.buttonText.Text = "Travelling...";
-			local rPacket = remoteHalloween:InvokeServer({Action="Join";});
-			modInterface:ToggleGameBlinds(false, 3);
-			
-			wait(1.6);
-			debounce = false;
-			promptWindow:Close();
-			YesClickedSignal:Disconnect();
-			NoClickedSignal:Disconnect();
-		end);
-		NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-			if debounce then return end;
-			Interface:PlayButtonClick();
-			promptWindow:Close();
-			YesClickedSignal:Disconnect();
-			NoClickedSignal:Disconnect();
-		end);
+		Interface:PromptDialogBox({
+			Title=`Join Slaughterfest`;
+			Desc=`Are you sure you want to travel to <b>Slaughterfest</b>?`;
+			Icon=`rbxassetid://11262940674`;
+			Buttons={
+				{
+					Text="Travel";
+					Style="Confirm";
+					OnPrimaryClick=function(promptDialogFrame, textButton)
+						promptDialogFrame.statusLabel.Text = "Travelling...";
+						local rPacket = remoteHalloween:InvokeServer({Action="Join";});
+						modInterface:ToggleGameBlinds(false, 3);
+					end;
+				};
+				{
+					Text="Cancel";
+					Style="Cancel";
+				};
+			}
+		});
 	end))
-	
-	Interface.Garbage:Tag(depositButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
-		if modBranchConfigs.WorldName ~= "Slaughterfest" then return end;
-		
-		Debugger:Log("Deposit Click");
-		--Interface:OpenWindow("ExternalStorage", "Cauldron");
-		
-		depositButton.Text = "Submitting Candies";
-		local rPacket = remoteHalloween:InvokeServer({Action="Submit";});
-		if rPacket and rPacket.Success then
-			depositButton.Text = "Submitted!";
-			Interface.Update(rPacket);
-			
-		elseif rPacket and rPacket.FailMsg then
-			depositButton.Text = rPacket.FailMsg;
-			Interface.Update(rPacket);
-		end
-	end));
-	
-	--for a=1, #rewardLib do
-	--	local reward = rewardLib[a];
-		
-	--	local newPointer = templateMarker:Clone();
-	--	local itemLib = modItem:Find(reward.ItemId);
-		
-	--	local itemSlot = newPointer:WaitForChild("itemSlot");
-	--	local label = newPointer:WaitForChild("label");
-		
-	--	label.Text = reward.Value
-		
-	--	local itemButtonObj = modItemInterface.newItemButton(reward.ItemId);
-		
-	--	itemButtonObj.ImageButton.Parent = itemSlot;
-		
-	--	Interface.Garbage:Tag(itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
-	--		Debugger:Log("Item Click");
-			
-	--		local rPacket = remoteHalloween:InvokeServer({Action="Claim"; ItemId=reward.ItemId;});
-			
-	--		if rPacket.ClaimSuccess then
-	--			if rewardButtons[a] then
-	--				rewardButtons[a]:Destroy();
-	--				rewardButtons[a] = nil;
-	--			end
-	--		end
-	--	end));
-		
-	--	itemButtonObj:Update();
-		
-	--	newPointer.Parent = candyCapacityFrame;
-	--	newPointer.Position = UDim2.new(reward.Value/MaxBarValue, 0, 1, 0);
-		
-	--	rewardButtons[a] = itemButtonObj;
-	--end
 	
 	window:AddCloseButton(mainFrame);
 	
-	function Interface.Update(rPacket)
-		rPacket = rPacket or remoteHalloween:InvokeServer({Action="Request"});
+	local candyShopFrame = mainFrame:WaitForChild("CandyShop");
+	local shopChoicesFrame = candyShopFrame:WaitForChild("RewardChoices");
+
+	local rerollButton: TextButton = candyShopFrame:WaitForChild("rerollButton");
+	local rerollDebounce = tick();
+
+	local restockTimer = 18000;
+	local function updateRerollText()
+		local slaughterfestData = modData:GetFlag("Slaughterfest");
+
+		local shopReroll = slaughterfestData.ShopReroll;
+		local shopLastRestock = slaughterfestData.ShopLastRestock;
+
+		if tick()-rerollDebounce < 1 then
+			rerollButton.Text = "Rerolling Recipes";
+			rerollButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80);
+			rerollButton.AutoButtonColor = false;
+			
+		else
+			rerollButton.BackgroundColor3 = Color3.fromRGB(50, 80, 106);
+			rerollButton.AutoButtonColor = true;
+
+			local timeLapse = workspace:GetServerTimeNow() - shopLastRestock;
+			local nextRestock = math.clamp(restockTimer-timeLapse, 0, restockTimer);
+			if shopReroll < 10 then
+				rerollButton.Text = `Reroll Recipes ({shopReroll}/10)    +1 reroll in {modSyncTime.ToString(nextRestock)}`;
+			else
+				rerollButton.Text = `Reroll Recipes ({shopReroll}/10)`;
+			end
+			if nextRestock <= 0 then
+				modData:GetFlag("Slaughterfest", true);
+			end
+		end
+	end
+
+	rerollButton.MouseButton1Click:Connect(function()
+		if tick()-rerollDebounce <= 1.1 then return end;
+
+		local slaughterfestData = modData:GetFlag("Slaughterfest", true);
+		if slaughterfestData.ShopReroll <= 0 then return; end
+
+		Interface:PlayButtonClick();
+		rerollDebounce = tick();
+
+		local rPacket = remoteHalloween:InvokeServer({Action="Reroll";});
 		if rPacket == nil then return end;
 
-		local candyData = rPacket.CandyData;
-		local claimed = candyData.Claimed or {};
+		updateRerollText();
+		Interface.Update();
+	end)
+	Interface.Garbage:Tag(modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
+		if not mainFrame.Visible then return end;
+		updateRerollText();
+		task.wait(0.5);
+		updateRerollText();
+	end));
 
-		--playerDepositLabel.Text = "Your Candy Contribution: "..(modFormatNumber.Beautify(candyData.Candy) or "0");
-		--commDepositLabel.Text = modFormatNumber.Beautify(rPacket.CommunityContributions);
+	function Interface.Update()
+		local slaughterfestData = modData:GetFlag("Slaughterfest", true);
+		local rollSeed = slaughterfestData.RollSeed;
+		local claimedReward = slaughterfestData.Claimed or {};
 
-		--candyCapacityFrame.bar.Size = UDim2.new( math.clamp(candyData.Candy/MaxBarValue, 0, 1), 0, 1, 0);
+		if rewardLib then
+			local shopRewardInfoList = {};
 
-		if rPacket.Storage then
-			modData.SetStorage(rPacket.Storage);
+			for a=1, 10 do
+				local rewardsData = modDropRateCalculator.RollDrop(rewardLib, rollSeed/a);
+				local rewardInfo = rewardsData[1];
+				if rewardInfo == nil then continue end;
+
+				local exist = false;
+				for b=1, #shopRewardInfoList do
+					if shopRewardInfoList[b].ItemId == rewardInfo.ItemId then
+						exist = true;
+						break;
+					end
+				end
+
+				if not exist then
+					table.insert(shopRewardInfoList, rewardInfo);
+				end
+
+				if #shopRewardInfoList >= 3 then
+					break;
+				end
+			end
+			
+			local candyIcons = {
+				["zombiejello"]="rbxassetid://99854271826378";
+				["eyeballgummies"]="rbxassetid://72634660358826";
+				["spookmallow"]="rbxassetid://93144909042467";
+				["cherrybloodbar"]="rbxassetid://87358672710754";
+				["wickedtaffy"]="rbxassetid://125482145777312";
+			};
+			local candyTypes = {
+				"zombiejello";
+				"eyeballgummies";
+				"spookmallow";
+				"cherrybloodbar";
+				"wickedtaffy";
+			};
+			local tierRecipeCost = {
+				[1] = 6;
+				[2] = 8;
+				[3] = 12;
+				[4] = 16;
+				[5] = 20;
+			}
+			for _, obj in pairs(shopChoicesFrame:GetChildren()) do
+				if not obj:IsA("GuiObject") then continue end;
+				game.Debris:AddItem(obj, 0);
+			end
+			for a=1, #shopRewardInfoList do
+				local rewardInfo = shopRewardInfoList[a];
+
+				local itemLib = modItem:Find(rewardInfo.ItemId);
+
+				local newOption = shopOptionTemplate:Clone();
+				newOption.Name = rewardInfo.ItemId;
+
+				local alreadyClaimed = claimedReward[rewardInfo.ItemId];
+
+				local uiLayout: UIListLayout = newOption:WaitForChild("UIListLayout");
+				
+				local itemButtonObj = modItemInterface.newItemButton(rewardInfo.ItemId);
+				local itemImgButton = itemButtonObj.ImageButton;
+				itemImgButton.AnchorPoint = Vector2.new(0.5, 0.5);
+				itemImgButton.Size = UDim2.new(0.8, 0, 0.8, 0);
+
+				local uiAspect = Instance.new("UIAspectRatioConstraint");
+				uiAspect.Parent = itemImgButton;
+
+				itemImgButton.Parent = newOption;
+				newOption.Parent = shopChoicesFrame;
+
+				itemButtonObj:Update();
+				
+				if alreadyClaimed then
+					itemImgButton.ImageColor3 = Color3.fromRGB(50, 50, 50);
+					newOption.BackgroundColor3 = Color3.fromRGB(15, 30, 15);
+					newOption.AutoButtonColor = false;
+				end
+
+				local candyCostFrame = newOption:WaitForChild("CandyCost"); 
+
+				local rewardTier = rewardInfo.Tier;
+				local recipeRandom = Random.new(rollSeed/a);
+
+				local recipeItems = {};
+				local recipeCost = tierRecipeCost[rewardTier];
+
+				local candyOrder = {};
+
+				for b=1, recipeCost do
+					local pickCandyItemId = candyTypes[recipeRandom:NextInteger(1, #candyTypes)];
+					recipeItems[pickCandyItemId] = (recipeItems[pickCandyItemId] or 0) + 1;
+
+					if table.find(candyOrder, pickCandyItemId) == nil then
+						table.insert(candyOrder, pickCandyItemId);
+					end
+				end
+
+				for b=1, #candyOrder do
+					local candyItemId = candyOrder[b];
+					local amt = recipeItems[candyItemId];
+
+					local validCount = modData.CountItemIdFromStorages(candyItemId);
+
+					for c=1, amt do
+						local newCandy: ImageLabel = candyOptionTemplate:Clone();
+						newCandy.Image = candyIcons[candyItemId];
+						newCandy.Parent = candyCostFrame;
+
+						if alreadyClaimed then
+							newCandy.ImageTransparency = 0.5;
+							newCandy.BackgroundTransparency = 0.9;
+
+						elseif validCount >= c then
+							newCandy.ImageTransparency = 0;
+							newCandy.BackgroundTransparency = 0.6;
+						else
+							newCandy.ImageTransparency = 0.5;
+							newCandy.BackgroundTransparency = 0.9;
+						end
+
+						if modConfigurations.CompactInterface then
+							if recipeCost > 20 then
+								newCandy.Size = UDim2.new(0, 20, 0, 20);
+							elseif recipeCost > 6 then
+								newCandy.Size = UDim2.new(0, 25, 0, 25);
+							end
+						end
+					end
+				end
+				
+				if modConfigurations.CompactInterface then
+					uiLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom;
+
+					if recipeCost > 20 then
+						itemImgButton.Size = UDim2.new(0.5, 0, 0.5, 0);
+					elseif recipeCost > 10 then
+						itemImgButton.Size = UDim2.new(0.65, 0, 0.65, 0);
+					end
+				end
+
+				newOption.MouseButton1Click:Connect(function()
+					if alreadyClaimed then return end;
+
+					Interface:PromptDialogBox({
+						Title=`Cook {itemLib.Name}`;
+						Desc=`Are you sure you want to cook your candies in the cauldron for a {itemLib.Name}.`;
+						Icon=itemLib.Icon;
+						Buttons={
+							{
+								Text="Cook";
+								Style="Confirm";
+								OnPrimaryClick=function(promptDialogFrame, textButton)
+									promptDialogFrame.statusLabel.Text = "Cooking...";
+									local rPacket = remoteHalloween:InvokeServer({Action="Cook"; ItemId=rewardInfo.ItemId});
+									if rPacket == nil then
+										return;
+									end
+									slaughterfestData.Claimed[rewardInfo.ItemId]=true;
+
+									Interface.Update();
+								end;
+							};
+							{
+								Text="Cancel";
+								Style="Cancel";
+							};
+						}
+					});
+				end)
+			end
+
 		end
-
-		--for a=1, #rewardLib do
-		--	local reward = rewardLib[a];
-
-		--	if candyData.Candy >= reward.Value then
-		--		if claimed[reward.ItemId] == nil and rewardButtons[a] then
-		--			local newGlow = rewardButtons[a].GlowEffect or modItemInterface.newGlowEffect();
-		--			newGlow.Parent = rewardButtons[a].ImageButton;
-
-		--		else
-		--			if rewardButtons[a] then
-		--				rewardButtons[a]:Destroy();
-		--				rewardButtons[a] = nil;
-		--			end
-		--		end
-		--	end
-		--end
-
-		prevCandies = candyData.Candy or 0;
 	end
 	
 	return Interface;

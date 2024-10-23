@@ -687,7 +687,19 @@ function ItemUnlockablesLibrary:Init(library)
 		};
 		SurfaceAppearanceParent=script;
 	};
-	
+
+	library:Add{
+		Id="nekrostrenchdarkcarbon";
+		ItemId="nekrostrench";
+		Name="Dark Carbon";
+		DefaultPackage=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://129799567178229";
+		};
+		SurfaceAppearanceParent=script;
+		Hidden=true;
+	};
 	
 	--== MARK: tirearmor
 	library:Add{
@@ -822,6 +834,72 @@ function ItemUnlockablesLibrary:Init(library)
 		};
 		SurfaceAppearanceParent=script;
 	};
+
+
+	--== MARK: ammopouch
+	library:Add{
+		Id="ammopouch";
+		ItemId="ammopouch";
+		Name="Default";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://7335387705";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="ammopouchnight";
+		ItemId="ammopouch";
+		Name="Night";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://80433516626640";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="ammopouchhexcamo";
+		ItemId="ammopouch";
+		Name="Hex Camo";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://83208049914596";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="ammopouchdarkcarbon";
+		ItemId="ammopouch";
+		Name="Dark Carbon";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://93994020837531";
+		};
+		SurfaceAppearanceParent=script;
+		Hidden=true;
+	};
+
+
+	--== MARK: jackolantern
+	library:Add{
+		Id="jackolantern";
+		ItemId="jackolantern";
+		Name="Default";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://14951625583";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="jackolanternhaunted";
+		ItemId="jackolantern";
+		Name="Haunted";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://126543190548570";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
 end
 
 return ItemUnlockablesLibrary;
