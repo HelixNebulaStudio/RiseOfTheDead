@@ -30,7 +30,7 @@ library.ClassIcons = {
 	Cultist="rbxassetid://18930528078";
 }
 
-
+-- Blank Avatar: rbxassetid://15641359355
 --==
 library:Add{Id="Mason"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641265681";};
 library:Add{Id="Stephanie"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641528330";};

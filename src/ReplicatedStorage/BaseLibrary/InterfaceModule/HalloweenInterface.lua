@@ -15,6 +15,7 @@ local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modItem = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
+local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 
 local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface);
 
@@ -22,6 +23,7 @@ local remoteHalloween = modRemotesManager:Get("Halloween");
 	
 local shopOptionTemplate = script:WaitForChild("ShopOption");
 local candyOptionTemplate = script:WaitForChild("CandyOption");
+local offerListingTemplate = script:WaitForChild("OfferListing");
 
 --== Script;
 function Interface.init(modInterface)
@@ -36,7 +38,7 @@ function Interface.init(modInterface)
 	local mainFrame = script:WaitForChild("Halloween"):Clone();
 	mainFrame.Parent = interfaceScreenGui;
 
-	local travelButton = mainFrame:WaitForChild("travelButton");
+	local travelButton = mainFrame:WaitForChild("Slaughterfest"):WaitForChild("travelButton");
 
 	local rewardLib = modRewardsLibrary:Find("slaughterfestcandyrecipes24");
 
@@ -123,6 +125,7 @@ function Interface.init(modInterface)
 	local restockTimer = 18000;
 	local function updateRerollText()
 		local slaughterfestData = modData:GetFlag("Slaughterfest");
+		if slaughterfestData == nil then return end;
 
 		local shopReroll = slaughterfestData.ShopReroll;
 		local shopLastRestock = slaughterfestData.ShopLastRestock;
@@ -133,7 +136,7 @@ function Interface.init(modInterface)
 			rerollButton.AutoButtonColor = false;
 			
 		else
-			rerollButton.BackgroundColor3 = Color3.fromRGB(50, 80, 106);
+			rerollButton.BackgroundColor3 = Color3.fromRGB(28, 106, 5);
 			rerollButton.AutoButtonColor = true;
 
 			local timeLapse = workspace:GetServerTimeNow() - shopLastRestock;
@@ -171,6 +174,23 @@ function Interface.init(modInterface)
 		updateRerollText();
 	end));
 
+	local npcTradesFrame = mainFrame:WaitForChild("NpcTrades");
+
+	local candyIcons = {
+		["zombiejello"]="rbxassetid://99854271826378";
+		["eyeballgummies"]="rbxassetid://72634660358826";
+		["spookmallow"]="rbxassetid://93144909042467";
+		["cherrybloodbar"]="rbxassetid://87358672710754";
+		["wickedtaffy"]="rbxassetid://125482145777312";
+	};
+	local candyTypes = {
+		"zombiejello";
+		"eyeballgummies";
+		"spookmallow";
+		"cherrybloodbar";
+		"wickedtaffy";
+	};
+
 	function Interface.Update()
 		local slaughterfestData = modData:GetFlag("Slaughterfest", true);
 		local rollSeed = slaughterfestData.RollSeed;
@@ -201,20 +221,6 @@ function Interface.init(modInterface)
 				end
 			end
 			
-			local candyIcons = {
-				["zombiejello"]="rbxassetid://99854271826378";
-				["eyeballgummies"]="rbxassetid://72634660358826";
-				["spookmallow"]="rbxassetid://93144909042467";
-				["cherrybloodbar"]="rbxassetid://87358672710754";
-				["wickedtaffy"]="rbxassetid://125482145777312";
-			};
-			local candyTypes = {
-				"zombiejello";
-				"eyeballgummies";
-				"spookmallow";
-				"cherrybloodbar";
-				"wickedtaffy";
-			};
 			local tierRecipeCost = {
 				[1] = 6;
 				[2] = 8;
@@ -349,8 +355,128 @@ function Interface.init(modInterface)
 					});
 				end)
 			end
-
 		end
+
+		local npcSeed = modSyncTime.TimeOfEndOfDay();
+		local npcRandom = Random.new(npcSeed);
+
+		local survivorsList = modNpcProfileLibrary:ListByKeyValue("Class", "Survivor");
+		local tradeNpcList = {};
+
+		for a=1, 5 do
+			local npcInfo = table.remove(survivorsList, npcRandom:NextInteger(1, #survivorsList));
+			table.insert(tradeNpcList, npcInfo);
+		end
+
+		local offersScrollFrame = npcTradesFrame:WaitForChild("OffersList");
+		for _, obj in pairs(offersScrollFrame:GetChildren()) do
+			if not obj:IsA("GuiObject") then continue end;
+			game.Debris:AddItem(obj, 0);
+		end
+		for a=1, #tradeNpcList do
+			local npcInfo = tradeNpcList[a];
+			local worldName = modBranchConfigs.GetWorldDisplayName(npcInfo.World) or "Unknown";
+
+			local newListing = offerListingTemplate:Clone();
+			newListing.Name = npcInfo.Id;
+
+			local nameLabel = newListing:WaitForChild("NameLabel");
+			nameLabel.Text = `<b>{npcInfo.Id}</b>\n{worldName}`;
+
+			local avatarLabel = newListing:WaitForChild("AvatarLabel");
+			avatarLabel.Image = npcInfo.Avatar or "rbxassetid://15641359355";
+
+			local candyRandom = Random.new(npcSeed+a);
+			local biasRng = candyRandom:NextNumber();
+
+			local candyWantAmt = candyRandom:NextInteger(3, 4);
+			local candyForAmt = candyRandom:NextInteger(2, 4);
+
+			if candyWantAmt > candyForAmt and biasRng > 0.6 then -- 60% chance to equal;
+				candyWantAmt, candyForAmt = 3, 3;
+			end
+			if candyForAmt > candyWantAmt and biasRng > 0.1 then -- 10% chance to better;
+				candyWantAmt, candyForAmt = candyForAmt, candyWantAmt;
+			end
+
+			local candyWantList = {};
+			local candyWantOrder = {};
+			for b=1, candyWantAmt do
+				local pickCandyItemId;
+				if #candyWantOrder >= 3 then
+					pickCandyItemId = candyWantOrder[candyRandom:NextInteger(1, #candyWantOrder)];
+				else
+					pickCandyItemId = candyTypes[candyRandom:NextInteger(1, #candyTypes)];
+				end
+				candyWantList[pickCandyItemId] = (candyWantList[pickCandyItemId] or 0) + 1;
+
+				if table.find(candyWantOrder, pickCandyItemId) == nil then
+					table.insert(candyWantOrder, pickCandyItemId);
+				end
+			end
+
+			local candyForList = {};
+			local candyForOrder = {};
+			for b=1, #candyTypes do
+				if table.find(candyWantOrder, candyTypes[b]) then continue end;
+				table.insert(candyForOrder, candyTypes[b]);
+			end
+			for b=1, candyForAmt do
+				local pickCandyItemId;
+				if b <= #candyForOrder then
+					pickCandyItemId = candyForOrder[b];
+				else
+					pickCandyItemId = candyForOrder[candyRandom:NextInteger(1, #candyForOrder)];
+				end
+				
+				candyForList[pickCandyItemId] = (candyForList[pickCandyItemId] or 0) + 1;
+			end
+			for b=#candyForOrder, 1, -1 do
+				if candyForList[candyForOrder[b]] == nil then
+					table.remove(candyForOrder, b);
+				end
+			end 
+
+			local candyWantFrame = newListing:WaitForChild("CandyWant");
+			for b=1, #candyWantOrder do
+				local candyItemId = candyWantOrder[b];
+				local candyAmt = candyWantList[candyItemId];
+
+				local validCount = modData.CountItemIdFromStorages(candyItemId);
+
+				for c=1, candyAmt do
+					local newCandy: ImageLabel = candyOptionTemplate:Clone();
+					newCandy.Image = candyIcons[candyItemId];
+					newCandy.Parent = candyWantFrame;
+
+					if validCount >= c then
+						newCandy.ImageTransparency = 0;
+						newCandy.BackgroundTransparency = 0.6;
+					else
+						newCandy.ImageTransparency = 0.5;
+						newCandy.BackgroundTransparency = 0.9;
+					end
+				end
+			end
+
+			local candyForFrame = newListing:WaitForChild("CandyFor");
+			for b=1, #candyForOrder do
+				local candyItemId = candyForOrder[b];
+				local candyAmt = candyForList[candyItemId];
+
+				for c=1, candyAmt do
+					local newCandy: ImageLabel = candyOptionTemplate:Clone();
+					newCandy.Image = candyIcons[candyItemId];
+					newCandy.Parent = candyForFrame;
+
+					newCandy.ImageTransparency = 0;
+					newCandy.BackgroundTransparency = 0.6;
+				end
+			end
+
+			newListing.Parent = offersScrollFrame;
+		end
+
 	end
 	
 	return Interface;
