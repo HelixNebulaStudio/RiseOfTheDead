@@ -260,9 +260,11 @@ function DialogueService:InitServer(baseDialogueHandlers)
                         dialogueResources.DialogueHandler(player, dialog, npcDialogData);
                     end
 
-                    local loadedDialogueHandler = DialogueService.Handlers[npcName];
-                    if loadedDialogueHandler then
-                        loadedDialogueHandler(player, dialog, npcDialogData);
+                    local loadedDialogueHandlers = DialogueService.Handlers[npcName];
+                    if loadedDialogueHandlers then
+                        for _, handlerFunc in pairs(loadedDialogueHandlers) do
+                            handlerFunc(player, dialog, npcDialogData);
+                        end
                     end
                     
                 end
@@ -433,7 +435,37 @@ function DialogueService:LoadHandlers(dialogues)
     for npcName, npcData in pairs(dialogues) do
         local dialogueHandlerFunc = npcData.DialogueHandler;
         
-        DialogueService.Handlers[npcName] = dialogueHandlerFunc;
+        if DialogueService.Handlers[npcName] == nil then
+            DialogueService.Handlers[npcName] = {};
+        end
+
+        local handlers = DialogueService.Handlers[npcName];
+
+        if table.find(handlers, dialogueHandlerFunc) == nil then
+            table.insert(handlers, dialogueHandlerFunc);
+        end
+    end
+end
+
+function DialogueService:AddHandler(npcName, dialogueHandlerFunc)
+    local handlers = DialogueService.Handlers[npcName];
+    if handlers == nil then
+        handlers = {}
+        DialogueService.Handlers[npcName] = handlers;
+    end
+
+    if table.find(handlers, dialogueHandlerFunc) == nil then
+        table.insert(handlers, dialogueHandlerFunc);
+    end
+end
+
+function DialogueService:ClearHandler(npcName, dialogueHandlerFunc)
+    local handlers = DialogueService.Handlers[npcName];
+
+    for a=#handlers, 1, -1 do
+        if handlers[a] == dialogueHandlerFunc then
+            table.remove(handlers, a);
+        end
     end
 end
 

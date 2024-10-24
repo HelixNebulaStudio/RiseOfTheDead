@@ -15,6 +15,8 @@ local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary)
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
+local modDialogueService = require(game.ReplicatedStorage.Library.DialogueService);
+local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
@@ -28,8 +30,257 @@ SpecialEvent.Cache = {
 	CandyPool = 0;	
 };
 
+local candyTypes = {
+	"zombiejello";
+	"eyeballgummies";
+	"spookmallow";
+	"cherrybloodbar";
+	"wickedtaffy";
+};
+
+SpecialEvent.SlaughterfestGetCandyTrade = nil;
 --==
 repeat wait() until shared.modProfile;
+
+local loadedDialogues = {};
+function SpecialEvent.LoadSlaughterfestDialogues(npcList)
+	for npcName, dialogueHandlerFunc in pairs(loadedDialogues) do
+		modDialogueService:ClearHandler(npcName, dialogueHandlerFunc);
+	end
+	table.clear(loadedDialogues);
+
+	for a=1, #npcList do
+		local npcInfo = npcList[a];
+		local npcName = npcInfo.Id;
+
+		local fulfillLists = SpecialEvent.SlaughterfestGetCandyTrade(npcName);
+		if fulfillLists == nil then continue end;
+
+		local requireList = fulfillLists.RequireList;
+		local rewardsList = fulfillLists.RewardList;
+
+		local requireStr = {};
+		for a=1, #requireList do
+			local itemLib = modItemsLibrary:Find(requireList[a].ItemId);
+			local amt = requireList[a].Amount;
+			table.insert(requireStr, `{amt} x {itemLib.Name}`);
+		end
+		
+		local rewardStr = {};
+		for a=1, #rewardsList do
+			local itemLib = modItemsLibrary:Find(rewardsList[a].ItemId);
+			local amt = rewardsList[a].Amount;
+			table.insert(rewardStr, `{amt} x {itemLib.Name}`);
+		end
+
+		local dialogueHandlerFunc = function(player, dialog, data)
+			local profile = shared.modProfile:Get(player);
+			local activeInventory = profile.ActiveInventory;
+
+			dialog:AddDialog({
+				Face="Happy";
+				Say="Trick or treat, want to exchange candies?";
+				Reply=`Sure, I'm looking for:\n{table.concat(requireStr, ",  ")}\nIn return:\n{table.concat(rewardStr, ",  ")}`;
+
+			}, function(dialog)
+				Debugger:StudioWarn(npcName, "fulfillLists", fulfillLists);
+
+				-- Check space;
+				local spaceCheckList = {};
+				for a=1, #requireList do
+					local itemId = requireList[a].ItemId;
+					local amt = requireList[a].Amount;
+					table.insert(spaceCheckList, {ItemId=itemId; Data={Quantity=amt};});
+				end
+				local hasSpace = activeInventory:SpaceCheck(spaceCheckList);
+				if not hasSpace then
+					dialog:AddDialog({
+						Face="Happy";
+						Say="*Exchange*";
+						Reply="Your inventory too full to exchange.";
+		
+					}, function(dialog)
+					end);
+					return;
+				end
+
+				-- Check fulfill;
+				local fulfill, itemsList = shared.modStorage.FulfillList(player, requireList);
+				if not fulfill then
+					local missingStr = {};
+					for _, candyItem in pairs(itemsList) do
+						local itemLib = modItemsLibrary:Find(candyItem.ItemId);
+						table.insert(missingStr, `{candyItem.Amount} x {itemLib.Name}`);
+					end
+					
+					dialog:AddDialog({
+						Face="Happy";
+						Say="*Exchange*";
+						Reply=`You are missing {table.concat(missingStr, ",  ")}!`;
+		
+					}, function(dialog)
+					end);
+					return;
+				end;
+
+				dialog:AddDialog({
+					Face="Happy";
+					Say="*Exchange*";
+					Reply="Thanks! Happy Slaughterfest!";
+	
+				}, function(dialog)
+					shared.modStorage.ConsumeList(itemsList);
+					for a=1, #rewardsList do
+						local itemId = rewardsList[a].ItemId;
+						local amt = rewardsList[a].Amount;
+						local itemLib = modItemsLibrary:Find(itemId);
+
+						activeInventory:Add(itemId, {Quantity=amt}, function()
+							shared.Notify(player, `You received {amt} {itemLib.Name}.`, "Reward");
+						end);
+					end
+
+				end);
+			end);
+
+		end
+
+		modDialogueService:AddHandler(npcName, dialogueHandlerFunc);
+	end
+end
+
+local npcSeedOverride = nil;
+function SpecialEvent.SlaughterfestGetCandyTrade(npcName)
+	local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
+
+	local npcSeed = npcSeedOverride or modSyncTime.TimeOfEndOfDay();
+	local npcRandom = Random.new(npcSeed);
+
+	local survivorsList = modNpcProfileLibrary:ListByMatchFunc(function(libItem)
+		if libItem.Class == "Survivor" and libItem.Id ~= "Stan" and libItem.Id ~= "Robert" then
+			return true;
+		end
+		return false;
+	end);
+	local tradeNpcList = {};
+
+	for a=1, 5 do
+		local npcInfo = table.remove(survivorsList, npcRandom:NextInteger(1, #survivorsList));
+		table.insert(tradeNpcList, npcInfo);
+	end
+	
+	if npcName == nil then
+		SpecialEvent.LoadSlaughterfestDialogues(tradeNpcList);
+		return;
+	end
+
+	local npcInfo, npcIndex;
+	for a=1, #tradeNpcList do
+		if tradeNpcList[a].Id == npcName then
+			npcInfo, npcIndex = tradeNpcList[a], a;
+			break;
+		end
+	end
+	if npcInfo == nil then return end;
+
+	local candyRandom = Random.new(npcSeed+npcIndex);
+	local biasRng = candyRandom:NextNumber();
+
+	local candyWantAmt = candyRandom:NextInteger(3, 4);
+	local candyForAmt = candyRandom:NextInteger(2, 4);
+
+	if candyWantAmt > candyForAmt and biasRng > 0.4 then -- 60% chance to equal;
+	candyWantAmt = candyWantAmt -1;
+	end
+	if candyForAmt > candyWantAmt and biasRng > 0.1 then -- 10% chance to better;
+		candyWantAmt, candyForAmt = candyForAmt, candyWantAmt;
+	end
+
+	local candyWantList = {};
+	local candyWantOrder = {};
+	for b=1, candyWantAmt do
+		local pickCandyItemId;
+		if #candyWantOrder >= 3 then
+			pickCandyItemId = candyWantOrder[candyRandom:NextInteger(1, #candyWantOrder)];
+		else
+			pickCandyItemId = candyTypes[candyRandom:NextInteger(1, #candyTypes)];
+		end
+		candyWantList[pickCandyItemId] = (candyWantList[pickCandyItemId] or 0) + 1;
+
+		if table.find(candyWantOrder, pickCandyItemId) == nil then
+			table.insert(candyWantOrder, pickCandyItemId);
+		end
+	end
+
+	local candyForList = {};
+	local candyForOrder = {};
+	for b=1, #candyTypes do
+		if table.find(candyWantOrder, candyTypes[b]) then continue end;
+		table.insert(candyForOrder, candyTypes[b]);
+	end
+	for b=1, candyForAmt do
+		local pickCandyItemId;
+		if b <= #candyForOrder then
+			pickCandyItemId = candyForOrder[b];
+		else
+			pickCandyItemId = candyForOrder[candyRandom:NextInteger(1, #candyForOrder)];
+		end
+		
+		candyForList[pickCandyItemId] = (candyForList[pickCandyItemId] or 0) + 1;
+	end
+	for b=#candyForOrder, 1, -1 do
+		if candyForList[candyForOrder[b]] == nil then
+			table.remove(candyForOrder, b);
+		end
+	end
+
+	local candyRequireList = {};
+	for b=1, #candyWantOrder do
+		local candyItemId = candyWantOrder[b];
+		local candyAmt = candyWantList[candyItemId];
+
+		local recipeCandyItem = nil;
+		for a=1, #candyRequireList do
+			if candyRequireList[a].ItemId == candyItemId then
+				recipeCandyItem = candyRequireList[a];
+				break;
+			end
+		end
+		if recipeCandyItem == nil then
+			recipeCandyItem = {
+				ItemId = candyItemId;
+				Amount = candyAmt;
+			};
+			table.insert(candyRequireList, recipeCandyItem);
+		end
+	end
+
+	local candyRewardList = {};
+	for b=1, #candyForOrder do
+		local candyItemId = candyForOrder[b];
+		local candyAmt = candyForList[candyItemId];
+
+		local recipeCandyItem = nil;
+		for a=1, #candyRewardList do
+			if candyRewardList[a].ItemId == candyItemId then
+				recipeCandyItem = candyRewardList[a];
+				break;
+			end
+		end
+		if recipeCandyItem == nil then
+			recipeCandyItem = {
+				ItemId = candyItemId;
+				Amount = candyAmt;
+			};
+			table.insert(candyRewardList, recipeCandyItem);
+		end
+	end
+
+	return {
+		RequireList=candyRequireList;
+		RewardList=candyRewardList;
+	};
+end
 
 shared.modProfile.OnProfileSave:Connect(function(player, profile)
 	Debugger:Log("OnProfileSave");
@@ -132,6 +383,8 @@ shared.modProfile.OnProfileLoad:Connect(function(player, profile)
 			return packet;
 		end)
 	end
+
+	SpecialEvent.SlaughterfestGetCandyTrade();
 end)
 
 function SpecialEvent.LoadCache()
@@ -199,7 +452,7 @@ function remoteHalloween.OnServerInvoke(player, packet)
 		profile.Flags:Sync("Slaughterfest");
 
 		return rPacket;
-		
+
 	elseif action == "Cook" then
 		if packet.ItemId == nil then return end;
 
@@ -246,13 +499,6 @@ function remoteHalloween.OnServerInvoke(player, packet)
 			return;
 		end
 
-		local candyTypes = {
-			"zombiejello";
-			"eyeballgummies";
-			"spookmallow";
-			"cherrybloodbar";
-			"wickedtaffy";
-		};
 		local tierRecipeCost = {
 			[1] = 6;
 			[2] = 8;
@@ -487,6 +733,18 @@ task.spawn(function()
 				profile.Flags:Sync("Slaughterfest");
 
 				shared.Notify(player, "skiprerolltimer", "Inform");
+
+			elseif actionId == "npctrades" then
+				local npcName = args[2];
+
+				local fulfillLists = SpecialEvent.SlaughterfestGetCandyTrade(npcName);
+				Debugger:Warn("fulfillLists", fulfillLists);
+
+			elseif actionId == "settradeseed" then
+				local seed = tonumber(args[2]);
+				npcSeedOverride = seed;
+				Debugger:Warn("setseed", npcSeedOverride);
+				SpecialEvent.SlaughterfestGetCandyTrade();
 			end
 
 			return true;

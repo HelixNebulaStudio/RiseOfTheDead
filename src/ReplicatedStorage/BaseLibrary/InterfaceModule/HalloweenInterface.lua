@@ -360,7 +360,12 @@ function Interface.init(modInterface)
 		local npcSeed = modSyncTime.TimeOfEndOfDay();
 		local npcRandom = Random.new(npcSeed);
 
-		local survivorsList = modNpcProfileLibrary:ListByKeyValue("Class", "Survivor");
+		local survivorsList = modNpcProfileLibrary:ListByMatchFunc(function(libItem)
+			if libItem.Class == "Survivor" and libItem.Id ~= "Stan" and libItem.Id ~= "Robert" then
+				return true;
+			end
+			return false;
+		end);
 		local tradeNpcList = {};
 
 		for a=1, 5 do
@@ -392,8 +397,8 @@ function Interface.init(modInterface)
 			local candyWantAmt = candyRandom:NextInteger(3, 4);
 			local candyForAmt = candyRandom:NextInteger(2, 4);
 
-			if candyWantAmt > candyForAmt and biasRng > 0.6 then -- 60% chance to equal;
-				candyWantAmt, candyForAmt = 3, 3;
+			if candyWantAmt > candyForAmt and biasRng > 0.4 then -- 60% chance to equal;
+				candyWantAmt = candyWantAmt -1;
 			end
 			if candyForAmt > candyWantAmt and biasRng > 0.1 then -- 10% chance to better;
 				candyWantAmt, candyForAmt = candyForAmt, candyWantAmt;
