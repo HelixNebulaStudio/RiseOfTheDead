@@ -199,9 +199,8 @@ function remoteHalloween.OnServerInvoke(player, packet)
 		profile.Flags:Sync("Slaughterfest");
 
 		return rPacket;
-
+		
 	elseif action == "Cook" then
-
 		if packet.ItemId == nil then return end;
 
 		local slaughterfestData = profile.Flags:Get("Slaughterfest");
@@ -464,8 +463,8 @@ task.spawn(function()
 	shared.modCommandsLibrary:HookChatCommand("slaughterfest", {
 		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
 		Description = [[Slaughterfest commands.
-		/slaughterfest addreroll
-		/slaughterfest uprerolltimer
+		/slaughterfest addreroll [amount]
+		/slaughterfest skiprerolltimer
 		]];
 
 		RequiredArgs = 0;
@@ -477,16 +476,17 @@ task.spawn(function()
 			local actionId = args[1];
 
 			if actionId == "addreroll" then
-				slaughterfestData.ShopReroll = slaughterfestData.ShopReroll +1;
+				local amt = tonumber(args[2] or 1);
+				slaughterfestData.ShopReroll = slaughterfestData.ShopReroll +amt;
 				profile.Flags:Sync("Slaughterfest");
 
 				shared.Notify(player, "addreroll", "Inform");
 
-			elseif actionId == "uprerolltimer" then
+			elseif actionId == "skiprerolltimer" then
 				slaughterfestData.ShopLastRestock = workspace:GetServerTimeNow()-(18000-20);
 				profile.Flags:Sync("Slaughterfest");
 
-				shared.Notify(player, "uprerolltimer", "Inform");
+				shared.Notify(player, "skiprerolltimer", "Inform");
 			end
 
 			return true;

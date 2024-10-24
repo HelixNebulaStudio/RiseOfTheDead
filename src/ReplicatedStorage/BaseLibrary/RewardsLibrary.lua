@@ -158,6 +158,8 @@ function RewardsLibrary:Init(super)
 			
 			{ItemId="skincutebutscary"; Quantity=1; Chance=1; Tier=1;};
 			{ItemId="clothbagmaskcbsskulls"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="armwrapscbsghosts"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="maraudersmaskcbspumpkins"; Quantity=1; Chance=1; Tier=1;};
 
 			{ItemId="tophat"; Quantity=1; Chance=1; Tier=1;};
 			{ItemId="clownmask"; Quantity=1; Chance=1; Tier=1;};
@@ -169,6 +171,7 @@ function RewardsLibrary:Init(super)
 			{ItemId="nekrostrenchhauntedpumpkin"; Quantity=1/10; Chance=1; Tier=2;};
 			{ItemId="skullmaskgold"; Quantity=1; Chance=1/10; Tier=2;};
 
+			{ItemId="jackolantern"; Quantity=1; Chance=1/10; Tier=2;};
 			{ItemId="jackolantern"; Quantity=1; Chance=1/10; Tier=2;};
 			{ItemId="clownmaskus"; Quantity=1; Chance=1/10; Tier=2;};
 			{ItemId="clownmaskmissjoyful"; Quantity=1; Chance=1/10; Tier=2;};
