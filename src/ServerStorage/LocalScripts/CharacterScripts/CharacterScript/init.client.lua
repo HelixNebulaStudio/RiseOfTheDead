@@ -1230,6 +1230,16 @@ local function renderStepped(camera, deltaTime)
 					end
 
 				else
+					-- if modData:IsMobile() and characterProperties.IsSliding then
+					-- 	humanoid.AutoRotate = false;
+					-- 	setAlignRot{
+					-- 		CFrame=rootPoint;
+					-- 		Enabled=true;
+					-- 	};
+	
+					-- else
+	
+					-- end
 					humanoid.AutoRotate = true;
 					setAlignRot{
 						Enabled=false;
@@ -1257,7 +1267,7 @@ local function renderStepped(camera, deltaTime)
 			stopSliding();
 		end
 
-		if characterProperties.ThirdPersonCamera then
+		if characterProperties.ThirdPersonCamera then -- and not modData:IsMobile()
 			local mouseMoveDelta = UserInputService:GetMouseDelta();
 
 			local inputVector = rbxPlayerModule:GetControls():GetMoveVector();
@@ -1267,11 +1277,11 @@ local function renderStepped(camera, deltaTime)
 				local localInputDir = CFrame.lookAt(currentCamera.CFrame.Position, currentCamera.CFrame:ToWorldSpace(CFrame.new(inputVector)).Position);
 				rootFaceCf = rootFaceCf:Lerp(
 					localInputDir,
-					0.1);
+					modData:IsMobile() and 0.5 or 0.1);
 			end
 
 			setAlignRot{
-				CFrame = rootFaceCf * CFrame.Angles(0, math.rad(-mouseMoveDelta.X/1.9), 0);
+				CFrame = rootFaceCf * CFrame.Angles(0, math.rad(-mouseMoveDelta.X/(modData:IsMobile() and 1 or 1.9)), 0);
 				Enabled=true;
 			};
 		end
