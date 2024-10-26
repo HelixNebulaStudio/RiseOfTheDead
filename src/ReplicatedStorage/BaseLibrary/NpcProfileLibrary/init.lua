@@ -32,10 +32,36 @@ library.ClassIcons = {
 
 -- Blank Avatar: rbxassetid://15641359355
 --==
-library:Add{Id="Mason"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641265681";};
-library:Add{Id="Stephanie"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641528330";};
-library:Add{Id="Nick"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641641112";};
-library:Add{Id="Russell"; Class="Survivor"; World="TheWarehouse";};
+library:Add{Id="Mason"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641265681";
+	Descriptors={
+		Hair="Short Grey";
+		Beard="Full Brown";
+		Gender="M";
+		Clothing={"Brown Leather Jacket"};
+	};
+};
+library:Add{Id="Stephanie"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641528330";
+	Descriptors={
+		Hair="Long Red Brown";
+		Gender="F";
+		Clothing={"Black Leather Jacket"; "Black Leather Gloves"};
+	};
+};
+library:Add{Id="Nick"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641641112";
+	Descriptors={
+		Hair="Short Spikey Black";
+		Gender="M";
+		Clothing={"Red Flannel Shirt"; "Blue Jeans"};
+	};
+};
+library:Add{Id="Russell"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://79562631617102";
+	Descriptors={
+		Hat="Dark Green Hat";
+		Beard="Full Black";
+		Gender="M";
+		Clothing={"Green Shirt with Stains"; "Brown Belt"};
+	};
+};
 library:Add{Id="Jesse"; Class="RAT"; World="TheWarehouse"; Avatar="rbxassetid://15641530418";};
 library:Add{Id="Dr. Deniski"; Class="Medic"; HeadIcon="Heal"; World="TheWarehouse"; Avatar="rbxassetid://15641529113";};
 
@@ -43,16 +69,41 @@ library:Add{Id="Jefferson"; Class="Hidden"; World="TheWarehouse";};
 library:Add{Id="Victor"; Class="Rouge"; World="TheWarehouse"; Avatar="rbxassetid://15641532247";};
 
 library:Add{Id="Robert"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641321827";};
-library:Add{Id="Jane"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641421758";};
-library:Add{Id="Michael"; Class="Survivor"; World="TheWarehouse";};
-library:Add{Id="Wilson"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641529876";};
+library:Add{Id="Jane"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641421758";
+	Descriptors={
+		Hair="Long Black";
+		Gender="F";
+		Clothing={"Red Sweater"; "Demin Overalls"};
+	};
+};
+library:Add{Id="Michael"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://140050354048212";
+	Descriptors={
+		Hair="Short Spikey Black";
+		Gender="M";
+		Clothing={"White TShirt"; "Demin Jeans"};
+		Scar={"Red"};
+	};
+};
+library:Add{Id="Wilson"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641529876";
+	Descriptors={
+		Generic="Military";
+		Gender="M";
+		Clothing={"Desert Boots";};
+	};
+};
 library:Add{Id="Frank"; Class="RAT"; World="TheWarehouse";};
 library:Add{Id="Carlos"; Class="Medic"; HeadIcon="Heal"; World="TheWarehouse"; Avatar="rbxassetid://15641640711";};
 
 library:Add{Id="Lennon"; Class="Medic"; HeadIcon="Heal"; World="TheUnderground"; Avatar="rbxassetid://15641639930";};
 
 library:Add{Id="Carlson"; Class="Medic"; HeadIcon="Heal"; World="TheUnderground"; Avatar="rbxassetid://15641534044";};
-library:Add{Id="Erik"; Class="Survivor"; World="TheUnderground"; Avatar="rbxassetid://15641530840";};
+library:Add{Id="Erik"; Class="Survivor"; World="TheUnderground"; Avatar="rbxassetid://15641530840";
+	Descriptors={
+		Hair="Short Light Brown";
+		Gender="M";
+		Clothing={"Black Polo Shirt"; "Beige Basketball Shoes"};
+	};
+};
 library:Add{Id="Diana"; Class="RAT"; World="TheUnderground";};
 
 library:Add{Id="Hilbert"; Class="BioX"; World="TheUnderground"; Avatar="rbxassetid://15641642353";};
@@ -70,10 +121,35 @@ library:Add{Id="Mike"; Class="Survivor"; World="TheMall"; Avatar="rbxassetid://1
 
 library:Add{Id="Larry"; Class="RAT"; World="TheResidentials";};
 library:Add{Id="Joseph"; Class="Medic"; HeadIcon="Heal"; World="TheResidentials"; Avatar="rbxassetid://15641421273";};
-library:Add{Id="Nate"; Class="Survivor"; World="TheResidentials";};
-library:Add{Id="Dallas"; Class="Survivor"; World="TheResidentials";};
-library:Add{Id="Zep"; Class="Survivor"; World="TheResidentials";};
-library:Add{Id="Kelly"; Class="Survivor"; World="TheResidentials";};
+library:Add{Id="Nate"; Class="Survivor"; World="TheResidentials"; Avatar="rbxassetid://79078550661090";
+	Descriptors={
+		Hair="Short Yellow";
+		Generic="FBI";
+		Gender="M";
+	};
+};
+library:Add{Id="Dallas"; Class="Survivor"; World="TheResidentials"; Avatar="rbxassetid://79182460537916";
+	Descriptors={
+		Hair="Short Black";
+		Gender="M";
+		Clothing={"Red Baseball Jacket"; "Brown Pants"};
+	};
+};
+library:Add{Id="Zep"; Class="Survivor"; World="TheResidentials"; Avatar="rbxassetid://110229481480464";
+	Descriptors={
+		Hair="Short Blonde";
+		Hat="Black Beanie";
+		Clothing={"Black and White Stripes"; "Neck Chain"};
+	};
+};
+library:Add{Id="Kelly"; Class="Survivor"; World="TheResidentials"; Avatar="rbxassetid://131391159298964";
+	Descriptors={
+		Hair="Curly Black";
+		Hat="Black Baseball Cap";
+		Gender="F";
+		Clothing={"Red Hoodie with Stripes";};
+	};
+};
 
 library:Add{Id="David"; Class="RAT"; World="TheHarbor"; Avatar="rbxassetid://15944948446";};
 library:Add{Id="Cooper"; Class="RAT"; World="TheHarbor";};

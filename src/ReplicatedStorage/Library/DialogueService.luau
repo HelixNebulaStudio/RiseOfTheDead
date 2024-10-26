@@ -259,16 +259,14 @@ function DialogueService:InitServer(baseDialogueHandlers)
                     if dialogueResources.DialogueHandler then
                         dialogueResources.DialogueHandler(player, dialog, npcDialogData);
                     end
-
-                    local loadedDialogueHandlers = DialogueService.Handlers[npcName];
-                    if loadedDialogueHandlers then
-                        for _, handlerFunc in pairs(loadedDialogueHandlers) do
-                            handlerFunc(player, dialog, npcDialogData);
-                        end
-                    end
-                    
                 end
 
+                local loadedDialogueHandlers = DialogueService.Handlers[npcName];
+                if loadedDialogueHandlers then
+                    for _, handlerFunc in pairs(loadedDialogueHandlers) do
+                        handlerFunc(player, dialog, npcDialogData);
+                    end
+                end
 
                 -- MARK: UserPrompt;
                 if packet.UserPrompt then

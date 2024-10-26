@@ -39,18 +39,19 @@ local candyTypes = {
 };
 
 SpecialEvent.SlaughterfestGetCandyTrade = nil;
+local npcSeedOverride = nil;
 --==
 repeat wait() until shared.modProfile;
 
 local loadedDialogues = {};
-function SpecialEvent.LoadSlaughterfestDialogues(npcList)
+function SpecialEvent.LoadSlaughterfestDialogues(trickNpcList, treatNpcList)
 	for npcName, dialogueHandlerFunc in pairs(loadedDialogues) do
 		modDialogueService:ClearHandler(npcName, dialogueHandlerFunc);
 	end
 	table.clear(loadedDialogues);
 
-	for a=1, #npcList do
-		local npcInfo = npcList[a];
+	for a=1, #trickNpcList do
+		local npcInfo = trickNpcList[a];
 		local npcName = npcInfo.Id;
 
 		local fulfillLists = SpecialEvent.SlaughterfestGetCandyTrade(npcName);
@@ -79,8 +80,8 @@ function SpecialEvent.LoadSlaughterfestDialogues(npcList)
 
 			dialog:AddDialog({
 				Face="Happy";
-				Say="Trick or treat, want to exchange candies?";
-				Reply=`Sure, I'm looking for:\n{table.concat(requireStr, ",  ")}\nIn return:\n{table.concat(rewardStr, ",  ")}`;
+				Say="Trick or treat?";
+				Reply=`Trick, I'm looking for:\n{table.concat(requireStr, ",  ")}\nIn return:\n{table.concat(rewardStr, ",  ")}`;
 
 			}, function(dialog)
 				Debugger:StudioWarn(npcName, "fulfillLists", fulfillLists);
@@ -146,10 +147,75 @@ function SpecialEvent.LoadSlaughterfestDialogues(npcList)
 		end
 
 		modDialogueService:AddHandler(npcName, dialogueHandlerFunc);
+		loadedDialogues[npcName] = dialogueHandlerFunc;
+	end
+
+	local npcSeed = npcSeedOverride or modSyncTime.TimeOfEndOfDay();
+	for a=1, #treatNpcList do
+		local npcInfo = trickNpcList[a];
+		local npcName = npcInfo.Id;
+
+		local candyRandom = Random.new(npcSeed+a);
+		local candyItemId = candyTypes[candyRandom:NextInteger(1, #candyTypes)];
+		local candyAmount = candyRandom:NextInteger(1, 3);
+
+		local dialogueHandlerFunc = function(player, dialog, data)
+			local profile = shared.modProfile:Get(player);
+			local activeInventory = profile.ActiveInventory;
+			local slaughterfestData = profile.Flags:Get("Slaughterfest");
+
+			if slaughterfestData.ClaimedTreats == nil then
+				slaughterfestData.ClaimedTreats = {};
+			end
+
+			for n, s in pairs(slaughterfestData.ClaimedTreats) do
+				if s ~= npcSeed then
+					slaughterfestData.ClaimedTreats[n] = nil;
+				end
+			end
+
+			local claimTime = slaughterfestData.ClaimedTreats[npcName];
+			if claimTime == npcSeed then
+				dialog:AddDialog({
+					Say="Trick or treat?";
+					Reply="You've already been treated!";
+				});
+				return 
+			end;
+			
+			local hasSpace = activeInventory:SpaceCheck({
+				{ItemId=candyItemId; Data={Quantity=candyAmount};}
+			});
+			if not hasSpace then
+				dialog:AddDialog({
+					Say="Trick or treat?";
+					Reply="Your inventory is too full!";
+				});
+				return;
+			end
+
+
+			dialog:AddDialog({
+				Face="Happy";
+				Say="Trick or treat?";
+				Reply="Here's some treat!";
+
+			}, function(dialog)
+				slaughterfestData.ClaimedTreats[npcName] = npcSeed;
+
+				local itemLib = modItemsLibrary:Find(candyItemId);
+				activeInventory:Add(candyItemId, {Quantity=candyAmount}, function()
+					shared.Notify(player, `You received {candyAmount} {itemLib.Name}.`, "Reward");
+				end);
+
+			end);
+		end
+		
+		modDialogueService:AddHandler(npcName, dialogueHandlerFunc);
+		loadedDialogues[npcName] = dialogueHandlerFunc;
 	end
 end
 
-local npcSeedOverride = nil;
 function SpecialEvent.SlaughterfestGetCandyTrade(npcName)
 	local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 
@@ -164,13 +230,19 @@ function SpecialEvent.SlaughterfestGetCandyTrade(npcName)
 	end);
 	local tradeNpcList = {};
 
+	local treatNpcList = {};
+
 	for a=1, 5 do
 		local npcInfo = table.remove(survivorsList, npcRandom:NextInteger(1, #survivorsList));
 		table.insert(tradeNpcList, npcInfo);
 	end
+	for a=1, 3 do
+		local npcInfo = table.remove(survivorsList, npcRandom:NextInteger(1, #survivorsList));
+		table.insert(treatNpcList, npcInfo);
+	end
 	
 	if npcName == nil then
-		SpecialEvent.LoadSlaughterfestDialogues(tradeNpcList);
+		SpecialEvent.LoadSlaughterfestDialogues(tradeNpcList, treatNpcList);
 		return;
 	end
 
