@@ -186,13 +186,20 @@ local function inputBoxChange()
 	mainChannelsFrame.Size = UDim2.new(0, maxInputSize.X+40, 0, UserInputService.TouchEnabled and 40 or 20);
 	mainChannelsFrame.Position = UDim2.new(0, 0, 1, -inputY+20 - 40);
 
+	if inputBox:GetAttribute("IsFiltered") then
+		inputBox:SetAttribute("IsFiltered", nil);
+		inputBox.TextColor3 = Color3.fromRGB(255, 255, 255);
+	end
+
 	delay(2, function()
 		if tick()-lastInputTick < 2 then return end;
 		if inputBox.Text:sub(1,1) ~= "/" and inputBox.Text ~= "" then
 			local cacheText = inputBox.Text;
 			local filtered = remoteSubmitMessage:InvokeServer(ChatRoomInterface.Channels[ChatRoomInterface.ActiveChannel].Id, cacheText, true);
 			if inputBox.Text == cacheText then
-				inputBox.Text = filtered;
+				--inputBox.Text = filtered;
+				inputBox.TextColor3 = Color3.fromRGB(255, 124, 124);
+				inputBox:SetAttribute("IsFiltered", true);
 			end
 		end
 	end)

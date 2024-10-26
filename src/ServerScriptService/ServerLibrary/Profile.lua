@@ -1706,6 +1706,7 @@ function Profile:RefreshPlayerTitle()
 	return;
 end
 
+-- MARK: Profile:UpdateTrustLevel()
 function Profile:UpdateTrustLevel()
 	local trustTable = self.TrustTable;
 	
@@ -1835,6 +1836,26 @@ function Profile:Debounce(actionId, value)
 	end
 	return true;
 end
+
+-- MARK: .IsBeingRecon
+local reconCache = {
+	UserIds = nil;
+	LastCache = tick();
+}
+function Profile.IsBeingRecon(player: Player)
+	if reconCache.UserIds == nil or tick()-reconCache.LastCache > 10 then
+		reconCache.LastCache = tick();
+		local reconDatabase = modDatabaseService:GetDatabase("Recon");
+		reconCache.UserIds = reconDatabase:Get("UserIds") or {};
+	end
+	
+	return table.find(reconCache.UserIds, player.UserId) ~= nil;
+end
+
+
+
+
+
 
 function remoteSetPlayerTitle.OnServerInvoke(player, id)
 	local profile = Profile:Get(player);

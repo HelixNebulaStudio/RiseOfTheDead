@@ -228,7 +228,11 @@ function remoteSubmitMessage.OnServerInvoke(player, channelId, text, filterTest,
 	
 	if #testText <= 0 or #text >= 200 then return text; end;
 	
-	
+	if shared.modProfile.IsBeingRecon(player) then
+		local modDiscordWebhook = require(game.ServerScriptService.ServerLibrary.DiscordWebhook);
+		modDiscordWebhook.PostText(modDiscordWebhook.Hooks.ChatLogs, `{player.Name}\`{player.UserId}\`: [{channelId}] {text}`);
+	end
+
 	local filteredText = shared.modAntiCheatService:Filter(text, player, false, true);
 	if filterTest == true then return filteredText end;
 	-- Passes clean up.

@@ -21,6 +21,7 @@ local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
 local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+local modDiscordWebhook = require(game.ServerScriptService.ServerLibrary.DiscordWebhook);
 
 local modTradingMarket = require(script.TradingMarket);
 
@@ -507,16 +508,13 @@ function TradeSessionObject:CheckConfirm()
 									modAnalytics.RecordResource(playerObj.Player.UserId, playerObj.Gold, "Sink", "Gold", "Trade", "Exchange");
 									
 									if playerObj.Gold >= 10000 then
-										local goldTradeDatastore = game:GetService("DataStoreService"):GetOrderedDataStore("GoldTradeHigh");
+										local goldTradeDatastore = DataStoreService:GetOrderedDataStore("GoldTradeHigh");
 										goldTradeDatastore:UpdateAsync(profile.UserId, function(oldGold)
 											if playerObj.Gold > (oldGold or 0) then
 												return playerObj.Gold 
 											end
 											return nil;
 										end)
-
-										modAnalytics:ReportError("Trading", playerObj.Player.Name.." traded ".. playerObj.Gold .. " Gold to " ..targetName, playerObj.Gold >= 50000 and "critical" or "info");
-										shared.modGameLogService:Log(playerObj.Player.Name.." traded <b>".. (playerObj.Gold) .. "</b> Gold to " ..targetName , "Trades");
 									end
 								end)
 							end
@@ -656,6 +654,64 @@ function TradeSessionObject:CheckConfirm()
 
 					self:Sync(enumRequestTypes.SessionSync);
 					
+					task.spawn(function()
+						local isRecon = false;
+						local playerNames = {};
+						for name, _ in pairs(self.Players) do
+							table.insert(playerNames, name);
+
+							local playerObj = self.Players[name];
+							if isRecon == false and playerObj.Player and shared.modProfile.IsBeingRecon(playerObj.Player) then
+								isRecon = true;
+							end
+						end
+						if isRecon == false then return end;
+
+						local p1Obj = self.Players[playerNames[1]];
+						local p2Obj = self.Players[playerNames[2]];
+						local desc = ``;
+
+						local fields = {};
+						for a=1, #playerNames do
+							local name = playerNames[a];
+							local playerObj = self.Players[name];
+
+							local goldReceived = playerObj == p1Obj and p2Obj.Gold or p1Obj.Gold;
+							local itemsReceived = {};
+							if self.Fee > 0 then
+								for Id, storageItem in pairs(self.Storages[name].Container) do
+									local values = {};
+									if storageItem.Values.Seed then
+										table.insert(values, `Seed={storageItem.Values.Seed}`);
+									end
+									if storageItem.Values.ActiveSkin then
+										table.insert(values, `ActiveSkin={storageItem.Values.ActiveSkin}`);
+									end
+									table.insert(itemsReceived, `{#itemsReceived+1}.  \`{Id}\`  **{storageItem.Quantity}** x **{storageItem.ItemId}** [{table.concat(values, ";")}]`);
+								end
+							end
+
+							table.insert(fields, {
+								inline = true;
+								name = `__{playerObj.Name}{playerObj.Player and (" `"..playerObj.Player.UserId.."`") or ""}__`;
+								value = `Gold: **{goldReceived}**\n{table.concat(itemsReceived, "\n")}`;
+							});
+							if a==1 then
+								table.insert(fields, {
+									inline = true;
+									name = `   `;
+									value = `   `;
+								});
+							end
+						end
+
+						modDiscordWebhook.PostEmbed(modDiscordWebhook.Hooks.TradeLogs, function(embed)
+							embed.title = `Trade: {DateTime.now().UnixTimestamp}`;
+							embed.description = desc;
+							embed.fields = fields;
+						end)
+					end)
+
 					for name, _ in pairs(self.Players) do
 						local playerObj = self.Players[name];
 						
@@ -734,7 +790,7 @@ function TradeSessionObject:Cancel(playerName)
 		
 		for name, _ in pairs(self.Players) do
 			local player = self.Players[name].Player;
-			if player then
+			if player and game.Players:IsAncestorOf(player) then
 				
 				if self.State <= 2 then
 					local profile = self.Players[name].Profile;
@@ -1268,6 +1324,14 @@ end)
 game.Players.PlayerRemoving:Connect(function(player)
 	if TradingService.PlayerRequests[player.Name] then
 		TradingService.PlayerRequests[player.Name] = nil;
+	end
+
+	local sessionObj = TradingService.TradeSessions[player.Name];
+	if sessionObj == nil then return end;
+	sessionObj:Cancel(player.Name);
+
+	if shared.modProfile.IsBeingRecon(player) then
+		modDiscordWebhook.PostText(modDiscordWebhook.Hooks.TradeLogs, `{player.Name} \`{player.UserId}\` disconnected during a trade.`);
 	end
 end)
 

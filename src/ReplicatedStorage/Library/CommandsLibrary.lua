@@ -803,6 +803,56 @@ Commands["droptable"] = {
 	end;
 };
 
+Commands["webhook"] = {
+	Permission = PermissionLevel.Admin;
+	Description = "Use a webhook.";
+
+	Function = function(player, args)
+		local modDiscordWebhook = require(game.ServerScriptService.ServerLibrary.DiscordWebhook);
+
+		local text = args[1];
+		modDiscordWebhook.PostText(modDiscordWebhook.Hooks.General, text or "Hello World!");
+
+		if true then return end;
+		local dataPacket: any = {
+			["type"] = "rich";
+			["content"] = "Hi";
+			["tts"] = false;
+			["embed"] = {
+				["title"] = "Hello";
+				["description"] = "Hi";
+			}
+		};
+
+		dataPacket = {
+			["content"] = "",
+			["embeds"] = {{
+				["title"] = "__**Ultimate Title**__",
+				["description"] = "blah blah",
+				["type"] = "rich",
+				["color"] = tonumber(0xffffff),
+				["fields"] = {
+					{
+						["name"] = "__Title__",
+						["value"] = "hi",
+						["inline"] = true
+					},
+					{
+						["name"] = "__Title__",
+						["value"] = "hi",
+						["inline"] = true
+					}
+				}
+			}}
+		};
+
+		dataPacket = HttpService:JSONEncode(dataPacket);
+		print(HttpService:PostAsync(`https://discord.com/api/webhooks/1299721433248694353/7aJbgCdff6txQHLe_dpoqJdSLd7v2_72iaW2cWDV9BSdpRbC7v30Qq23rXFBBpV323p1`, dataPacket))
+
+		return true;
+	end;
+};
+
 Commands["menu"] = {
 	Permission = PermissionLevel.All;
 	Description = "Teleport to main menu.";
@@ -4625,6 +4675,92 @@ Commands["golddata"] = {
 		local goldSink = trackingDatabase:Get("GoldSink") or 0;
 
 		shared.Notify(player, "+"..goldSource.."/"..goldSink.."-  Supply: "..(goldSource-goldSink), "Inform");
+		
+		return;
+	end;
+};
+
+Commands["recon"] = {
+	Permission = PermissionLevel.Admin;
+	Description = [[Player monitoring commands.
+	/recon add userId
+	/recon remove userId
+	/recon list
+	]];
+
+	RequiredArgs = 0;
+	UsageInfo = "/recon";
+	Function = function(speaker, args)
+		local player = speaker;
+		
+		local action = args[1];
+
+		if action == "add" then
+			local userId = tonumber(args[2]);
+			if userId == nil then 
+				shared.Notify(player, `Missing userid {userId}`, "Negative");
+				return
+			end;
+
+			local username = game.Players:GetNameFromUserIdAsync(userId);
+			if username == nil then
+				shared.Notify(player, `Unknown username {userId}`, "Negative");
+				return
+			end
+
+			local i = username..tostring(os.time());
+			shared.Notify(player, `Adding {username} ({userId}) to recon list.`, "Inform", i);
+
+			local finalData;
+			local reconDatabase = modDatabaseService:GetDatabase("Recon");
+			reconDatabase:Publish("UserIds", function(userIdsList)
+				userIdsList = userIdsList or {};
+				table.insert(userIdsList, userId);
+				finalData = userIdsList;
+				return userIdsList;
+			end)
+
+			shared.Notify(player, `Added {username} ({userId}).\nRecon list: {table.concat(finalData, ", ")}`, "Inform", i);
+
+		elseif action == "remove" then
+			local userId = tonumber(args[2]);
+			if userId == nil then 
+				shared.Notify(player, `Missing userid {userId}`, "Negative");
+				return
+			end;
+			
+			local username = game.Players:GetNameFromUserIdAsync(userId);
+			if username == nil then
+				shared.Notify(player, `Unknown username {userId}`, "Negative");
+				return
+			end
+
+			local i = username..tostring(os.time());
+			shared.Notify(player, `Removing {username} ({userId}).`, "Inform", i);
+
+			local finalData;
+			local reconDatabase = modDatabaseService:GetDatabase("Recon");
+			reconDatabase:Publish("UserIds", function(userIdsList)
+				userIdsList = userIdsList or {};
+
+				for a=#userIdsList, 1, -1 do
+					if userIdsList[a] == userId then
+						table.remove(userIdsList, a);
+					end
+				end
+
+				finalData = userIdsList;
+				return userIdsList;
+			end)
+
+			shared.Notify(player, `Removed {username} ({userId}).\nRecon list: {table.concat(finalData, ", ")}`, "Inform", i);
+
+		elseif action == "list" then
+			local reconDatabase = modDatabaseService:GetDatabase("Recon");
+			local userIdsList = reconDatabase:Get("UserIds") or {};
+
+			shared.Notify(player, `Recon list: {table.concat(userIdsList, ", ")}`, "Inform");
+		end
 		
 		return;
 	end;
