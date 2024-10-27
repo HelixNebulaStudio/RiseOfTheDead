@@ -33,6 +33,9 @@ local EmbedPacket = {
 
 function DiscordWebhook.PostText(hookId, text)
     task.spawn(function()
+        if workspace:GetAttribute("IsDev") then
+            text = "**[DB]** "..text;
+        end
         local dataStr: string = HttpService:JSONEncode({
             ["content"] = text;
         });
@@ -44,6 +47,9 @@ function DiscordWebhook.PostEmbed(hookId, dataFunc: (embedPacket: typeof(EmbedPa
     task.spawn(function()
         local embedPacket = table.clone(EmbedPacket);
         dataFunc(embedPacket.embeds[1]);
+        if workspace:GetAttribute("IsDev") then
+            embedPacket.embeds[1].description = "**[DB]** "..embedPacket.embeds[1].description;
+        end
         local dataStr: string = HttpService:JSONEncode(embedPacket);
         Debugger:StudioLog(HttpService:PostAsync(hookId, dataStr));
     end)

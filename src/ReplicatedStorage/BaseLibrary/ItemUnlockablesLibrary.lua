@@ -900,6 +900,61 @@ function ItemUnlockablesLibrary:Init(library)
 		SurfaceAppearanceParent=script;
 	};
 
+	--== MARK: ninjacloak
+	library:Add{
+		Id="ninjacloak";
+		ItemId="ninjacloak";
+		Name="Default";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://95622409496577";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
+	library:Add{
+		Id="ninjacloaksleeveless";
+		ItemId="ninjacloak";
+		Name="Sleeveless";
+		Icon="rbxassetid://117128086199919";
+		PackageId="ninjacloaksleeveless";
+		Unlocked=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://95622409496577";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
+
+	--== MARK: ninjashroud
+	library:Add{
+		Id="ninjashroud";
+		ItemId="ninjashroud";
+		Name="Default";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://81644359023125";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
+	library:Add{
+		Id="ninjashroudmaskless";
+		ItemId="ninjashroud";
+		Name="Maskless";
+		Icon="rbxassetid://74957968914072";
+		PackageId="ninjashroudmaskless";
+		Unlocked=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://81644359023125";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
 end
 
 return ItemUnlockablesLibrary;

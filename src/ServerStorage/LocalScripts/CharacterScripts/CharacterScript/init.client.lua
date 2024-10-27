@@ -2710,6 +2710,10 @@ task.spawn(function()
 
 		end
 	end
+	
+	shared.ClientCommands["classplayerproperties"] = function(channelId, args)
+		Debugger:Log("classPlayer.Properties", classPlayer.Properties);
+	end
 end)
 
 currentCamera.CameraSubject = humanoid;
