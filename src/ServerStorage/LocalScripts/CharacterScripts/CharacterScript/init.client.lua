@@ -2612,6 +2612,9 @@ humanoid.Jumping:Connect(function(jumped)
 		characterProperties.IsSliding = false;
 		
 		oldSlideMomentum = oldSlideMomentum + 5;
+		if classPlayer.Properties.BullLeaping then
+			oldSlideMomentum = oldSlideMomentum + (classPlayer.Properties.BullLeaping.Speed or 10);
+		end
 		slideForce.Velocity = slideDirection*math.max(oldSlideMomentum, 0);
 		
 		stopSliding(0.2);
@@ -2713,6 +2716,7 @@ task.spawn(function()
 	
 	shared.ClientCommands["classplayerproperties"] = function(channelId, args)
 		Debugger:Log("classPlayer.Properties", classPlayer.Properties);
+
 	end
 end)
 

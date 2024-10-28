@@ -14,7 +14,7 @@ function attirePackage.NewToolLib(handler)
 	local clothing = modClothingProperties.new(toolLib);
 
 	if not modBranchConfigs.IsWorld("Slaughterfest") then
-		clothing:RegisterPlayerProperty("SuperiorFocus", {
+		clothing:RegisterPlayerProperty("NinjaFocus", {
 			Visible = false;
 		});
 	end

@@ -5,6 +5,46 @@ ItemUnlockablesLibrary.__index = ItemUnlockablesLibrary;
 --== Script;
 function ItemUnlockablesLibrary:Init(library)
 
+	-- MARK: brownleatherboots
+	library:Add{
+		Id="brownleatherboots";
+		ItemId="brownleatherboots";
+		Name="Default";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://89618350805668";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
+	library:Add{
+		Id="brownleatherbootsclassic";
+		ItemId="brownleatherboots";
+		Name="Classic";
+		Icon="rbxassetid://4866819545";
+		PackageId="brownleatherbootsclassic";
+		Unlocked=true;
+		
+		-- SurfaceAppearance={
+		-- 	ColorMap="rbxassetid://81644359023125";
+		-- };
+		-- SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="brownleatherbootsblack";
+		ItemId="brownleatherboots";
+		Name="Black";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://102039474574433";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
+
 	--== MARK: gasmask
 	library:Add{
 		Id="gasmask";
@@ -945,7 +985,7 @@ function ItemUnlockablesLibrary:Init(library)
 		Id="ninjashroudmaskless";
 		ItemId="ninjashroud";
 		Name="Maskless";
-		Icon="rbxassetid://74957968914072";
+		Icon="rbxassetid://99934459977878";
 		PackageId="ninjashroudmaskless";
 		Unlocked=true;
 		

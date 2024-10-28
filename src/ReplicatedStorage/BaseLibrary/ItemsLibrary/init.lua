@@ -121,12 +121,12 @@ function ItemsLibrary:Init(super)
 	new(meleeBase, {Id="machete"; Name="Machete"; Icon="rbxassetid://4469866502"; Tags={"Edged Melee"}; Description="A heavy duty zombie killer, can't get far without it.";});
 	new(meleeBase, {Id="jacksscythe"; Name="Jack's Scythe"; Icon="rbxassetid://5816459861"; Tags={"Edged Melee"}; Description="Jack's very own scythe.";});
 	new(meleeBase, {Id="chainsaw"; Name="Chainsaw"; Icon="rbxassetid://7319587982"; Tags={"Edged Melee"}; Description="Cutting through zombies has never been easier.";});
-	new(meleeBase, {Id="fireaxe"; Name="Fire Axe"; Icon="rbxassetid://12865194088"; Tags={"Edged Melee"}; Description="Not exactly an axe on fire. <b>Passive:</b> 66% chance to ignite enemies for 5 seconds dealing 50 x Stack + 1% of enemy's Current Health.";});
+	new(meleeBase, {Id="fireaxe"; Name="Fire Axe"; Icon="rbxassetid://12865194088"; Tags={"Edged Melee"}; Description="Not exactly an axe on fire. <b>[Passive] Axe of Fire:</b> 66% chance to ignite enemies for 5 seconds dealing 50 x Stack + 1% of enemy's Current Health.";});
 	new(meleeBase, {Id="megaswitchblade"; Name="Mega Switchblade"; Icon="rbxassetid://111485795155248"; Tags={"Edged Melee"; "Blunt Melee"; "Unobtainable"}; Description="Just a very big switchblade. <b>Active:</b> Switch between <b>Edged Melee</b> and <b>Blunt Melee</b>.";});
 	
 	new(meleeBase, {Id="spikedbat"; Name="Spiked Bat"; Icon="rbxassetid://4600968105"; Tags={"Blunt Melee"}; Description="Time to hit some home runs on these zombies.";});
 	new(meleeBase, {Id="crowbar"; Name="Crowbar"; Icon="rbxassetid://4843541333"; Tags={"Blunt Melee"}; Description="A handy tool to break free.";});
-	new(meleeBase, {Id="sledgehammer"; Name="Sledgehammer"; Icon="rbxassetid://5175332306"; Tags={"Blunt Melee"}; Description="A construction grade sledgehammer. <b>Passive: Every 3rd attack performs a spin attack.</b>";});
+	new(meleeBase, {Id="sledgehammer"; Name="Sledgehammer"; Icon="rbxassetid://5175332306"; Tags={"Blunt Melee"}; Description="A construction grade sledgehammer. <b>[Passive] Spinning Destruction: Every 3rd attack performs a spin attack.</b>";});
 	new(meleeBase, {Id="naughtycane"; Name="Naughty Cane"; Icon="rbxassetid://5966504204"; Tags={"Blunt Melee"}; Description="Bad zombie! *bonk*";});
 	new(meleeBase, {Id="shovel"; Name="Shovel"; Icon="rbxassetid://8814526891"; Tags={"Blunt Melee"}; Description="A gardener's trusty shovel. Good for digging graves and maybe sand on the seabed.";});
 	
@@ -175,10 +175,10 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="cowboyhat"; Name="Cowboy Hat"; Icon="rbxassetid://4994923375"; Tags={"Head"}; Description="I will be the one yeeee-haw-ing around here.";});
 	new(clothingBase, {Id="gasmask"; Name="Gas Mask"; Icon="rbxassetid://6971981402"; Tags={"Head"}; Description="Hudda hudda huuh! Reduce effects and damage from gas clouds and toxic damages.";});
 	new(clothingBase, {Id="nekronmask"; Name="Nekron Mask"; Icon="rbxassetid://5419783427"; Tags={"Head"}; Description="Once you put it on, the mask will start consuming itself and some zombies will start looking like you.. (It will continue to consume even if you take the mask off.)"; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
-	new(clothingBase, {Id="cultisthood"; Name="Cultist Hood"; Icon="rbxassetid://5550425398"; Tags={"Head"}; Description="Live in the shadows and pull the strings.. <b>Passive:</b> When damaged by a zombie, a Cultist will spawn to help you kill the zombie. (Cooldown: 10s)"; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
+	new(clothingBase, {Id="cultisthood"; Name="Cultist Hood"; Icon="rbxassetid://5550425398"; Tags={"Head"}; Description="Live in the shadows and pull the strings.. <b>[Passive] Hoods Pact:</b> When damaged by a zombie, a Cultist will spawn to help you kill the zombie. (Cooldown: 10s)"; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
 	new(clothingBase, {Id="onyxhoodiehood"; Name="OnyxHound Hoodie's Hood"; Icon="rbxassetid://5644700762"; Tags={"Head"}; Description="Ultra Rare OnyxHound Hood.";});
 	new(clothingBase, {Id="disguisekit"; Name="Disguise Kit"; Icon="rbxassetid://5783987908"; Tags={"Head"}; Usable="Disguise"; Description="Disguise yourself as anything available. Right-click to open disguse menu. To unlock new disguises, get kills in order to unlock. Unlock progress only saves on this item, so deleting this item will lose your disguise progression. Trading this item will also lose all kills saved in this item.";});
-	new(clothingBase, {Id="nvg"; Name="Night Vision Goggles"; Icon="rbxassetid://6008673515"; Tags={"Head"}; Description="Night vision goggles. <b>Passive:</b> Enhances visibility in the dark.";});
+	new(clothingBase, {Id="nvg"; Name="Night Vision Goggles"; Icon="rbxassetid://6008673515"; Tags={"Head"}; Description="Night vision goggles. <b>[Passive] Nights Light:</b> Enhances visibility in the dark.";});
 	new(clothingBase, {Id="strawhat"; Name="Straw Hat"; Icon="rbxassetid://6416330399"; Tags={"Head"}; Description="It ain't much, but it's honest hard work.";});
 	new(clothingBase, {Id="zriceraskull"; Name="Zricera Skull"; Icon="rbxassetid://6806306800"; Tags={"Head"}; Description="Strength of a beast and shield of the skull.";});
 	new(clothingBase, {Id="hazmathood"; Name="Hazmat Hood"; Icon="rbxassetid://7021892111"; Tags={"Head"}; Description="Hazmat hood part of the hazmat suit.";});
@@ -195,21 +195,21 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="greensantahat"; Name="Green Santa Hat"; Tradable=super.Tradable.Tradable; Icon="rbxassetid://6122942270"; Tags={"Head"; "Christmas"; "Frostivus"}; Description="Merry Christmas, ho ho ho!";});
 	new(clothingBase, {Id="bunnymanhead"; Name="Bunny Man's Head"; Icon="rbxassetid://4845183167"; Tags={"Head"; "Easter"}; Description="Bunny Man's Headwear. Normal environmental Zombies will ignore you during the Easter event.\nEvent-Active: "..tostring(modConfigurations.SpecialEvent.Easter); Sources={"Obtained from <b>The Bunny Man in Mission: Bunny Man's Eggs</b>";};});
 	new(clothingBase, {Id="jackolantern"; Name="Jack o' Lantern"; Icon="rbxassetid://14951707178"; Tags={"Head"; "Slaughterfest";}; Description="Where Jack watches through the jacks o lanterns.";});
-	new(clothingBase, {Id="ninjashroud"; Name="Ninja Shroud"; Icon="rbxassetid://100919147489582"; Tags={"Head";}; Description="Comfortable cloth shroud. <b>Passive:</b> Slows your fall descent while focusing.";});
+	new(clothingBase, {Id="ninjashroud"; Name="Ninja Shroud"; Icon="rbxassetid://88409858365523"; Tags={"Head";}; Description="Comfortable cloth shroud. <b>[Passive] Ninja Focus:</b> Slows your fall descent while focusing.";});
 
 	-- Chest
 	new(clothingBase, {Id="greytshirt"; Name="T-Shirt"; Icon="rbxassetid://5756503297"; Tags={"Chest"}; Description="Comfy T-Shirt. Gives you 1 armor point for protection.";});
 	new(clothingBase, {Id="xmassweater"; Name="Xmas Sweater"; Tradable=super.Tradable.Tradable; Icon="rbxassetid://6126020940"; Tags={"Chest"; "Christmas"; "Frostivus"}; Description="Xmas Sweater.";});
 	new(clothingBase, {Id="prisonshirt"; Name="Prisoner's Shirt"; Icon="rbxassetid://5627570767"; Tags={"Chest"}; Description="The Prisoner's Shirt.";});
 	new(clothingBase, {Id="onyxhoodie"; Name="OnyxHound Hoodie"; Icon="rbxassetid://5642499590"; Tags={"Chest"}; Description="Rare OnyxHound Hoodie.";});
-	new(clothingBase, {Id="labcoat"; Name="Lab Coat"; Icon="rbxassetid://4978200934"; Tags={"Chest"}; Description="Protects you from unwanted chemicals and gases. <b>Passive:</b> If <b>Gas Protection</b> exist from other wearables, Lab Coat will grant you an additional 30% Gas Protection.";});
+	new(clothingBase, {Id="labcoat"; Name="Lab Coat"; Icon="rbxassetid://4978200934"; Tags={"Chest"}; Description="Protects you from unwanted chemicals and gases. <b>[Passive] Lab Safety:</b> If <b>Gas Protection</b> exist from other wearables, Lab Coat will grant you an additional 30% Gas Protection.";});
 	new(clothingBase, {Id="plankarmor"; Name="Plank Armor"; Icon="rbxassetid://5765969051"; Tags={"Chest"}; Description="Makeshift wooden plank armor.";});
 	new(clothingBase, {Id="scraparmor"; Name="Scrap Armor"; Icon="rbxassetid://6996766551"; Tags={"Chest"}; Description="Makeshift metal scrap armor.";});
 	new(clothingBase, {Id="highvisjacket"; Name="High Visibility Jacket"; Icon="rbxassetid://8488333823"; Tags={"Chest"}; Description="The high visibility jacket provides warmth and armor points.";});
-	new(clothingBase, {Id="nekrostrench"; Name="Nekros Trench Coat"; Icon="rbxassetid://14423236705"; Tags={"Chest"}; Description="Trench coat covered in dried Nekron leather, scales and veins. <b>Passive:</b> +2HP/s, The passive will be disabled for 15s if you take any damage.";});
-	new(clothingBase, {Id="tirearmor"; Name="Tire Armor"; Icon="rbxassetid://16791518600"; Tags={"Chest"}; Description="Tire armor, made with tires. <b>Passive:</b> When equipping a melee, grants a 60% chance to block 40 damage from melee attacks. Reduced damage minimum does not go below 1 damage.";});
-	new(clothingBase, {Id="apron"; Name="Apron"; Icon="rbxassetid://17381982100"; Tags={"Chest"}; Description="The butcher's apron. <b>Passive:</b> Splash effects from enemies are reflected by 200%, Ticks' detonation does twice the damage and stun duration to surrounding enemies.";});
-	new(clothingBase, {Id="ninjacloak"; Name="Ninja Cloak"; Icon="rbxassetid://134341247648095"; Tags={"Chest"}; Description="Light and resistent, feels a lot more flexible to move in. <b>Passive:</b> ";});
+	new(clothingBase, {Id="nekrostrench"; Name="Nekros Trench Coat"; Icon="rbxassetid://14423236705"; Tags={"Chest"}; Description="Trench coat covered in dried Nekron leather, scales and veins. <b>[Passive] Nekrosis Heal:</b> +2HP/s, The passive will be disabled for 15s if you take any damage.";});
+	new(clothingBase, {Id="tirearmor"; Name="Tire Armor"; Icon="rbxassetid://16791518600"; Tags={"Chest"}; Description="Tire armor, made with tires. <b>[Passive] Tiring Attacks:</b> When equipping a melee, grants a 60% chance to block 40 damage from melee attacks. Reduced damage minimum does not go below 1 damage.";});
+	new(clothingBase, {Id="apron"; Name="Apron"; Icon="rbxassetid://17381982100"; Tags={"Chest"}; Description="The butcher's apron. <b>[Passive] Splash Reflect:</b> Splash effects from enemies are reflected by 200%, Ticks' detonation does twice the damage and stun duration to surrounding enemies.";});
+	new(clothingBase, {Id="ninjacloak"; Name="Ninja Cloak"; Icon="rbxassetid://134341247648095"; Tags={"Chest"}; Description="Light and resistent, feels a lot more flexible to move in. <b>[Passive] Ninja Agility:</b> TBD";});
 	
 	-- Pants
 	new(clothingBase, {Id="prisonpants"; Name="Prisoner's Pants"; Icon="rbxassetid://5627737032"; Tags={"Legs"}; Description="The Prisoner's Pants.";});
@@ -220,9 +220,9 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="vexgloves"; Name="Vexeron Gloves"; Icon="rbxassetid://7181328504"; Tags={"Gloves"}; Description="Gloves made with Vexeron skin, providing additional 50 max stamina.";});
 	
 	-- Shoes
-	new(clothingBase, {Id="brownleatherboots"; Name="Brown Leather Boots"; Icon="rbxassetid://4866819545"; Tags={"Shoes"}; Description="These look great on you. <b>Passive:</b> Reduces movement impairment debuffs by 10%.";});
-	new(clothingBase, {Id="militaryboots"; Name="Military Boots"; Icon="rbxassetid://17022087037"; Tags={"Shoes"}; Description="Military grade boots. <b>Passive:</b> Reduces movement impairment debuffs by 20%.";});
-	new(clothingBase, {Id="divingfins"; Name="Diving Fins"; Icon="rbxassetid://10334749462"; Tags={"Shoes"; "Diving Gear"}; Description="Swim like a fish. <b>Passive:</b> Improves underwater mobility.";});
+	new(clothingBase, {Id="brownleatherboots"; Name="Leather Boots"; Icon="rbxassetid://89716224000012"; Tags={"Shoes"}; Description="These look great on you. <b>[Passive] Bull Leaping:</b> Slide jumping adds 10 units/sec launch speed.";});
+	new(clothingBase, {Id="militaryboots"; Name="Military Boots"; Icon="rbxassetid://17022087037"; Tags={"Shoes"}; Description="Military grade boots. <b>[Passive] Firm Footing:</b> Reduces movement impairment debuffs by 20%.";});
+	new(clothingBase, {Id="divingfins"; Name="Diving Fins"; Icon="rbxassetid://10334749462"; Tags={"Shoes"; "Diving Gear"}; Description="Swim like a fish. <b>[Passive] Dolphin Stride:</b> Improves underwater mobility.";});
 
 	-- Misc Wear
 	new(clothingBase, {Id="brownbelt"; Name="Tactical Belt"; Icon="rbxassetid://4789684750"; Tags={"Belt"; "Utility Wear";}; Description="A tactical belt. Adds an extra hot bar slot.";});
@@ -784,6 +784,8 @@ function ItemsLibrary:Init(super)
 	-- jackolantern
 	new(skinPermBase, {Id="jackolanternhaunted"; Icon="rbxassetid://90787164761656"; SkinPerm="Haunted"; TargetItemId="jackolantern";});
 	
+	-- brownleatherbootsblack
+	new(skinPermBase, {Id="brownleatherbootsblack"; Icon="rbxassetid://110623857537822"; SkinPerm="Black"; TargetItemId="brownleatherboots";});
 
 	--==========================================================[[ SUMMONS ]]==========================================================--
 	local summonsBase = {

@@ -612,7 +612,7 @@ function Interface.Update(storageItem)
 	end
 
 	if itemClass.RegisteredProperties then
-		Debugger:Warn("itemClass.RegisteredProperties", itemClass.RegisteredProperties);
+		Debugger:StudioWarn("itemClass.RegisteredProperties", itemClass.RegisteredProperties);
 		for k, v in pairs(itemClass.RegisteredProperties) do
 			createLabel(k, {
 				Text="<b>+ Passive:</b>    $stat"; 

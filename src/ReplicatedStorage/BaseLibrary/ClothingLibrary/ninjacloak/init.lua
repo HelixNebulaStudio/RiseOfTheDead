@@ -16,7 +16,7 @@ function attirePackage.NewToolLib(handler)
 	local clothing = modClothingProperties.new(toolLib);
 	
 	if not modBranchConfigs.IsWorld("Slaughterfest") then
-		clothing:RegisterPlayerProperty("SuperiorAgility", {
+		clothing:RegisterPlayerProperty("NinjaAgility", {
 			Visible = false;
 		});
 	end
