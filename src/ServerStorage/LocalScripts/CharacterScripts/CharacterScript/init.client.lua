@@ -44,7 +44,6 @@ local modSpectateManager = require(game.ReplicatedStorage.Library.SpectateManage
 
 local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
-local modBuffer = require(game.ReplicatedStorage.Library.Util.Buffer);
 Debugger.AwaitShared("modPlayers");
 
 -- Flags;
@@ -1889,6 +1888,11 @@ RunService.Stepped:Connect(function(total, delta)
 
 	end
 
+	-- MARK: Dashing
+	if classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaFocus then
+
+	end
+
 	local s = pcall(function()
 		local camPos = currentCamera.CFrame.Position;
 		local readTerrain = (workspace.Terrain:ReadVoxels(Region3.new(camPos, camPos):ExpandToGrid(4), 4));
@@ -1910,6 +1914,7 @@ RunService.Stepped:Connect(function(total, delta)
 	--end
 	--Debugger:Display(animationNames);
 end)
+
 
 local lastMovablePos = rootPart.CFrame;
 local unstuckPos = rootPart.CFrame;
@@ -2799,6 +2804,8 @@ humanoid:GetPropertyChangedSignal("Jump"):Connect(function()
 			humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
 			Cache.AirJumpsCounter = Cache.AirJumpsCounter +1;
 			rootPart:ApplyImpulse(Vector3.new(0, 150*Cache.AirJumpsCounter, 0));
+			animations["doubleJump"]:Play(0);
+			animations["doubleJump"]:AdjustSpeed(5);
 		end
 	end
 end)
