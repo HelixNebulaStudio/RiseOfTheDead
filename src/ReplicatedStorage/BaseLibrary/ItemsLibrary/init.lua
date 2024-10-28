@@ -209,7 +209,7 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="nekrostrench"; Name="Nekros Trench Coat"; Icon="rbxassetid://14423236705"; Tags={"Chest"}; Description="Trench coat covered in dried Nekron leather, scales and veins. <b>[Passive] Nekrosis Heal:</b> +2HP/s, The passive will be disabled for 15s if you take any damage.";});
 	new(clothingBase, {Id="tirearmor"; Name="Tire Armor"; Icon="rbxassetid://16791518600"; Tags={"Chest"}; Description="Tire armor, made with tires. <b>[Passive] Tiring Attacks:</b> When equipping a melee, grants a 60% chance to block 40 damage from melee attacks. Reduced damage minimum does not go below 1 damage.";});
 	new(clothingBase, {Id="apron"; Name="Apron"; Icon="rbxassetid://17381982100"; Tags={"Chest"}; Description="The butcher's apron. <b>[Passive] Splash Reflect:</b> Splash effects from enemies are reflected by 200%, Ticks' detonation does twice the damage and stun duration to surrounding enemies.";});
-	new(clothingBase, {Id="ninjacloak"; Name="Ninja Cloak"; Icon="rbxassetid://134341247648095"; Tags={"Chest"}; Description="Light and resistent, feels a lot more flexible to move in. <b>[Passive] Ninja Agility:</b> TBD";});
+	new(clothingBase, {Id="ninjacloak"; Name="Ninja Cloak"; Icon="rbxassetid://134341247648095"; Tags={"Chest"}; Description="Light and resistent, feels a lot more flexible to move in. <b>[Passive] Ninja Agility:</b> Adds the ability to wall climb and double jump.";});
 	
 	-- Pants
 	new(clothingBase, {Id="prisonpants"; Name="Prisoner's Pants"; Icon="rbxassetid://5627737032"; Tags={"Legs"}; Description="The Prisoner's Pants.";});

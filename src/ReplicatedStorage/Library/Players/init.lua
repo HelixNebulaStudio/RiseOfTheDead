@@ -158,6 +158,16 @@ if RunService:IsServer() then
 					status.OnRelay(classPlayer, status, select(2, ...));
 				end
 			end
+
+		elseif action == "SpawnSync" then
+			if classPlayer.SpawnSyncTick and tick()-classPlayer.SpawnSyncTick <= 10 then return end;
+			classPlayer.SpawnSyncTick = tick();
+			
+			local keys = {};
+			for k, _ in pairs(classPlayer.Properties) do
+				table.insert(keys, k);
+			end
+			classPlayer:SyncProperties(keys);
 		end
 	end)
 else

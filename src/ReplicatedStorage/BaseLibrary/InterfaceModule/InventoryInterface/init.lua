@@ -491,6 +491,7 @@ function Interface.init(modInterface)
 	local function updateBodyEquipments()
 		local classPlayer = shared.modPlayers.Get(localPlayer);
 		local playerBodyEquipments = classPlayer.Properties and classPlayer.Properties.BodyEquipments;
+		if playerBodyEquipments == nil then return end;
 		
 		local label = bodyEquipmentsFrame:WaitForChild("label");
 		local beStr = {};

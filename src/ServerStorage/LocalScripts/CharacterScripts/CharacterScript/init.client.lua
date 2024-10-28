@@ -145,7 +145,7 @@ local Cache = {
 
 	NeckC0 = CFrame.new();
 	WaistC0 = CFrame.new();
-};
+} :: any;
 
 local CollisionModel={
 	Default={C0=CFrame.new(0, 1, 0); Size=Vector3.new(2, 3.8, 1);};
@@ -184,13 +184,25 @@ characterProperties.AmbientReverb = modLayeredVariable.new(Enum.ReverbType.NoRev
 characterProperties.SwimSpeed = characterProperties.DefaultSwimSpeed;
 characterProperties.SprintSpeed = characterProperties.DefaultSprintSpeed;
 
+local rootPartAttachment = rootPart:WaitForChild("RootRigAttachment") :: Attachment;
+
 local charBodyForce = Instance.new("VectorForce");
 charBodyForce.Name = "BodyForce";
 charBodyForce.ApplyAtCenterOfMass = true;
 charBodyForce.RelativeTo = Enum.ActuatorRelativeTo.World;
-charBodyForce.Attachment0 = rootPart:WaitForChild("RootRigAttachment");
+charBodyForce.Attachment0 = rootPartAttachment;
 charBodyForce.Enabled = false;
 charBodyForce.Parent = rootPart;
+
+local charAlignPosition: AlignPosition = Instance.new("AlignPosition");
+charAlignPosition.Name = "BodyPosition";
+charAlignPosition.Mode = Enum.PositionAlignmentMode.OneAttachment;
+charAlignPosition.ApplyAtCenterOfMass = true;
+charAlignPosition.ForceLimitMode = Enum.ForceLimitMode.PerAxis;
+charAlignPosition.MaxAxesForce = Vector3.new(math.huge, math.huge, math.huge);
+charAlignPosition.Attachment0 = rootPartAttachment;
+charAlignPosition.Enabled = false;
+charAlignPosition.Parent = rootPart;
 
 characterProperties.BodyForce = modLayeredVariable.new();
 
@@ -371,6 +383,15 @@ local function setAlignRot(data)
 	if enabled ~= nil then
 		alignRotation.Enabled = enabled;
 	end
+end
+
+local function getIsJumping()
+	local rbxControls = rbxPlayerModule:GetControls();
+	if rbxControls == nil then return false end;
+	
+	return (rbxControls.activeController and rbxControls.activeController:GetIsJumping())
+		or (rbxControls.touchJumpController and rbxControls.touchJumpController:GetIsJumping())
+		or false;
 end
 
 local function toggleCameraMode(value)
@@ -1552,6 +1573,7 @@ local platformChange, groundChange;
 local groundRayParam = RaycastParams.new();
 groundRayParam.IgnoreWater = true;
 groundRayParam.FilterType = Enum.RaycastFilterType.Include;
+groundRayParam.RespectCanCollide = true;
 
 local function resetCameraEffects()
 	if modData.Blur then
@@ -1560,6 +1582,7 @@ local function resetCameraEffects()
 end
 resetCameraEffects();
 
+-- MARK: RS.Stepped
 RunService.Stepped:Connect(function(total, delta)
 	characterProperties.IsAlive = character:GetAttribute("IsAlive") == true;
 
@@ -1725,7 +1748,147 @@ RunService.Stepped:Connect(function(total, delta)
 			
 		end
 	end 
-	
+
+	if humanoid.FloorMaterial ~= Enum.Material.Air then
+		Cache.AirJumpsCounter = 0;
+	end
+	-- MARK: Wall climbing
+	if classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaAgility then
+		local maxClimbHeight = 8;
+		local minClimbHeight = 7;
+		local validClimbGapSize = Vector3.new(2, 3, 2);
+		
+		local debugWallClimbing = false --RunService:IsStudio();
+		local function wallClimb()
+			if humanoid.FloorMaterial ~= Enum.Material.Air then return end;
+			if Cache.WallClimbCooldown and Cache.WallClimbCooldown > tick() then return end;
+ 
+			local rootLookVector = rootCframe.LookVector;
+			local rootRightVector = rootCframe.RightVector;
+			local checkOrigin = rootCframe + -rootLookVector*1;
+
+			local ceilingHitResult = workspace:Blockcast(checkOrigin, Vector3.new(2, 1, 2), Vector3.new(0, maxClimbHeight, 0), groundRayParam);
+			local ceilingPoint = ceilingHitResult 
+									and (checkOrigin.Position + Vector3.new(0, ceilingHitResult.Position.Y-checkOrigin.Y, 0)) 
+									or (checkOrigin.Position + Vector3.new(0, maxClimbHeight, 0));
+			
+			local floorHeight = checkOrigin.Y+minClimbHeight;
+			if ceilingPoint.Y <= floorHeight then return end;
+			local heightDif = (checkOrigin.Y+maxClimbHeight) - floorHeight;
+
+			local minClimbOrigin = checkOrigin + Vector3.new(0, minClimbHeight, 0);
+			local climbSpaceFound = false;
+
+			for y=0, heightDif, 1 do
+				minClimbOrigin = minClimbOrigin + Vector3.new(0, 1, 0);
+				local wallHitResult = workspace:Blockcast(minClimbOrigin, validClimbGapSize, rootLookVector*6, groundRayParam);
+				local distanceFromWall = wallHitResult and wallHitResult.Distance or 6;
+				if distanceFromWall <= 2 then continue end;
+
+				if debugWallClimbing then
+					local ceilingDp = Debugger:Region(minClimbOrigin + rootLookVector*distanceFromWall/2, validClimbGapSize+Vector3.new(0, 0, distanceFromWall));
+					ceilingDp.Transparency = 0.5;
+					ceilingDp.Color = Color3.fromRGB(100, 100, 100);
+					game.Debris:AddItem(ceilingDp, 0.1);
+				end
+
+				climbSpaceFound = true;
+				break;
+			end
+
+			if not climbSpaceFound then return end;
+			
+			local lzRayResult;
+			for z=1.5, 4, 0.5 do
+				local climbGroundAllHit = true;
+				local climbGroundRayResults = {};
+				local climbGroundOrigin = minClimbOrigin + rootLookVector*z;
+
+				for x=-1, 1, 1 do
+					local gRayOrigin = climbGroundOrigin.Position + rootRightVector * x;
+					local gRayDir = Vector3.new(0, -validClimbGapSize.Y*2, 0);
+					local gHitResult = workspace:Raycast(gRayOrigin, gRayDir, groundRayParam);
+					table.insert(climbGroundRayResults, {RayResult=gHitResult; Ray=Ray.new(gRayOrigin, gRayDir)});
+
+					if x == 0 and gHitResult then
+						lzRayResult = gHitResult;
+					end
+
+					if gHitResult == nil then
+						climbGroundAllHit = false;
+						break;
+					end
+				end
+
+				if climbGroundAllHit then
+					if debugWallClimbing then
+						for a=1, #climbGroundRayResults do
+							local rayResult = climbGroundRayResults[a];
+							
+							local debugRayPart = Debugger:Ray(
+								rayResult.Ray, 
+								rayResult.RayResult and rayResult.RayResult.Instance or nil, 
+								rayResult.RayResult and rayResult.RayResult.Position or nil
+							);
+							game.Debris:AddItem(debugRayPart, 2);
+						end
+					end
+
+					break;
+				end
+			end
+
+			if lzRayResult == nil then return end;
+
+			Cache.WallClimbCooldown = tick()+1;
+
+			if debugWallClimbing then
+				game.Debris:AddItem(Debugger:PointPart(lzRayResult.Position), 2);
+				game.Debris:AddItem(Debugger:PointPart(ceilingPoint), 2);
+			end
+			
+			local rootLatchPosition = rootPart.Position;
+			charAlignPosition.Position = rootLatchPosition;
+			charAlignPosition.Enabled = true;
+
+			local latchAttachment = Instance.new("Attachment");
+			latchAttachment.Name = "ClimbLatch";
+			latchAttachment.Parent = lzRayResult.Instance; 
+			latchAttachment.WorldPosition = lzRayResult.Position;
+
+			local rpOffset = latchAttachment.WorldPosition - rootLatchPosition;
+			local climbBlocked = false;
+			while rootPart.Position.Y <= (latchAttachment.WorldPosition.Y) do
+				local targetPosition = latchAttachment.WorldPosition + rpOffset;
+				rpOffset = rpOffset + Vector3.new(0, 0.2, 0);
+				charAlignPosition.Position = targetPosition;
+				task.wait(0.1);
+
+				local climbBlockedHitResult = workspace:Blockcast(rootPart.CFrame+Vector3.new(0,2,0), Vector3.new(2, 1, 2), Vector3.yAxis*2, groundRayParam);
+				if climbBlockedHitResult then
+					climbBlocked = true;
+					break;
+				end
+			end
+
+			if not climbBlocked then
+				local zDif = 2;
+				for z=0, zDif, 0.2 do
+					local targetDir = (latchAttachment.WorldPosition-rootPart.Position);
+					rootPart:ApplyImpulse(targetDir * 50);
+					task.wait();
+				end
+			end
+			
+			charAlignPosition.Enabled = false;
+		end
+
+		if getIsJumping() then
+			wallClimb();
+		end
+
+	end
+
 	local s = pcall(function()
 		local camPos = currentCamera.CFrame.Position;
 		local readTerrain = (workspace.Terrain:ReadVoxels(Region3.new(camPos, camPos):ExpandToGrid(4), 4));
@@ -2625,6 +2788,21 @@ humanoid.Jumping:Connect(function(jumped)
 		characterProperties.JumpPower:Set("cooldown", 0, 99, 0.5);
 	end
 end)
+humanoid:GetPropertyChangedSignal("Jump"):Connect(function()
+	if humanoid.Jump == false then return end;
+	if Cache.LastJump and tick()-Cache.LastJump <= 0.2 then return end;
+
+	-- MARK: Double jumping
+	if classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaAgility then
+		local maxAirJumps = 1;
+		if humanoid.FloorMaterial == Enum.Material.Air and Cache.AirJumpsCounter < maxAirJumps then
+			humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
+			Cache.AirJumpsCounter = Cache.AirJumpsCounter +1;
+			rootPart:ApplyImpulse(Vector3.new(0, 150*Cache.AirJumpsCounter, 0));
+		end
+	end
+end)
+
 humanoid.AnimationPlayed:Connect(function(track)
 	if animations[track.Name] == nil then
 		animations[track.Name] = track;

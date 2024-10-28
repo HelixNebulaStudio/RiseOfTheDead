@@ -1383,6 +1383,7 @@ function Player.new(playerInstance: Player)
 				
 			end)
 			
+			remotePlayerProperties:FireServer("SpawnSync");
 		end
 
 		classPlayer:SetProperties("Ragdoll", 0);
@@ -1433,8 +1434,6 @@ function Player.new(playerInstance: Player)
 		
 		for a=1, #keys do
 			local k = keys[a];
-			
-			Debugger:Log("SetProperties", k, self.Properties[k], debug.traceback());
 			remotePlayerProperties:FireClient(playerInstance, playerInstance.Name, "SetProperties", k, self.Properties[k]);
 		end
 	end

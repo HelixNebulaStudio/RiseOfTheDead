@@ -320,7 +320,6 @@ function Debugger:HudPrint(position, text)
 end
 
 function Debugger:Region(cframe, size)
-	if self:CheckDisable() then return end;
 	if cframe and size then
 		local A = Instance.new("Part"); A.Name = "A";
 		A.Anchored = true;
@@ -674,6 +673,11 @@ end
 
 function Debugger:InitMainThread()
 	Debugger.MainThread = true;
+
+	local worldRootAttachment: Attachment = Instance.new("Attachment");
+	worldRootAttachment.Name = "RootAttachment";
+	worldRootAttachment.Parent = workspace.Terrain;
+	Debugger.RootAttachment = worldRootAttachment;
 
 	if RunService:IsClient() then
 		local fpsCounter, lastTick =0, tick();
