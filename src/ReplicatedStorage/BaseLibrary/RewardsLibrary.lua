@@ -152,7 +152,7 @@ function RewardsLibrary:Init(super)
 	};
 
 	super:Add{
-		Id="slaughterfestcandyrecipes24";
+		Id="slaughterfestcauldron";
 		Rewards={
 			{ItemId="skincutebutscary"; Quantity=1; Chance=1; Tier=1;};
 			
@@ -172,14 +172,12 @@ function RewardsLibrary:Init(super)
 			{ItemId="skullmaskgold"; Quantity=1; Chance=1/10; Tier=2;};
 
 			{ItemId="jackolantern"; Quantity=1; Chance=1/10; Tier=2;};
-			{ItemId="jackolantern"; Quantity=1; Chance=1/10; Tier=2;};
 			{ItemId="clownmaskus"; Quantity=1; Chance=1/10; Tier=2;};
 			{ItemId="clownmaskmissjoyful"; Quantity=1; Chance=1/10; Tier=2;};
 			{ItemId="maraudersmaskblue"; Quantity=1; Chance=1/10; Tier=2;};
 			{ItemId="tophatgrey"; Quantity=1; Chance=1/10; Tier=2;};
 			{ItemId="tophatpurple"; Quantity=1; Chance=1/10; Tier=2;};
 			{ItemId="tophatred"; Quantity=1; Chance=1/10; Tier=2;};
-			{ItemId="jackolanternhaunted"; Quantity=1; Chance=1/10; Tier=2;};
 			
 			{ItemId="maraudersmaskrisingsun"; Quantity=1; Chance=1/40; Tier=3;};
 			{ItemId="tophatgold"; Quantity=1; Chance=1/40; Tier=3;};
@@ -188,6 +186,14 @@ function RewardsLibrary:Init(super)
 			{ItemId="vectorxpossession"; Quantity=1; Chance=1/100; Tier=4;};
 
 			{ItemId="skinhalloweenpixelart"; Quantity=1; Chance=1/10000; Tier=5;};
+		};
+		SpecialEvent="Halloween";
+	};
+
+	super:Add{
+		Id="slaughterfestcandyrecipes24";
+		Rewards={
+			{ItemId="jackolanternhaunted"; Quantity=1; Chance=1; Tier=1;};
 		};
 		SpecialEvent="Halloween";
 	};

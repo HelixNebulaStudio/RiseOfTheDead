@@ -1,4 +1,5 @@
 local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
+local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 
 local attirePackage = {
 	GroupName="HeadGroup";
@@ -6,6 +7,8 @@ local attirePackage = {
 
 function attirePackage.NewToolLib(handler)
 	local toolLib = {};
+
+	toolLib.Slaughterfest=modConfigurations.SpecialEvent.Halloween;
 	toolLib.Warmth = 2;
 	toolLib.HasFlinchProtection = true;
 	

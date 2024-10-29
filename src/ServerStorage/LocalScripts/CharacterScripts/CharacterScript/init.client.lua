@@ -47,7 +47,7 @@ local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 Debugger.AwaitShared("modPlayers");
 
 -- Flags;
-modCharacter.DeadlockMovement = true;
+modCharacter.SprintMode = 1;
 
 local classPlayer = shared.modPlayers.Get(localPlayer);
 
@@ -94,12 +94,23 @@ local oldCamOffsetY = 0;
 local cameraOriginOffset = Vector3.new();
 local crouchCooldown = tick()-1;
 
+local jumpDebounce = false;
+local dashDebounce = false;
+
+local bodyVelocity = Instance.new("BodyVelocity");
+bodyVelocity.MaxForce = Vector3.new(); 
+bodyVelocity.Parent = rootPart;
+
 local slideDirection = Vector3.new();
-local slideForce = Instance.new("BodyVelocity"); slideForce.MaxForce = Vector3.new(); slideForce.Parent = rootPart;
 local slideCooldown = tick()-5;
 local oldSlideMomentum = 0;
-local slopeUpFriction = 2;
-local slopeDownFriction = 6;
+local slopeUpFriction = 3;
+local slopeDownFriction = 3;
+
+local dashDirection = Vector3.new();
+local oldDashMomentum = 0;
+local airDashYForce = 0;
+local dashMomentumDecay = 3;
 
 local heartbeatSecTick = tick()-1;
 
@@ -344,6 +355,7 @@ onCameraSubjectUpdate();
 
 
 local function getCharacterMass()
+	if true then return rootPart.AssemblyMass end;
 	local mass = 0;
 	for _, child in pairs(character:GetDescendants()) do
 		if child:IsA("BasePart") and child.Parent.ClassName ~= "Accessory" then
@@ -565,30 +577,81 @@ local function ToggleBodypartTransparency(bodyParts, hide, includeArms)
 	end
 end
 
+-- MARK: Start Sliding;
+local function startSliding()
+	local inputVector: Vector3 = rbxPlayerModule:GetControls():GetMoveVector();
+	local localInputDir = CFrame.lookAt(currentCamera.CFrame.Position, currentCamera.CFrame:ToWorldSpace(CFrame.new(inputVector)).Position);
+	
+	local initSlideSpeed = characterProperties.SlideSpeed;
+	local slideDir = Vector3.new(localInputDir.LookVector.X, 0, localInputDir.LookVector.Z).Unit;
+	if inputVector.X == 0 and inputVector.Z == 0 then
+		if characterProperties.GroundNormal.X == 0 and characterProperties.GroundNormal.Z == 0 then return end;
+		local groundDir = (characterProperties.GroundNormal-Vector3.yAxis);
+		local groundMag = groundDir.Magnitude;
+		slideDir = Vector3.new(groundDir.X, 0, groundDir.Z).Unit * groundMag;
+		if slideDir.Magnitude <= 0.1 then return end;
+		initSlideSpeed = math.min(initSlideSpeed, initSlideSpeed*(groundMag/1));
+	end
+
+	characterProperties.IsSliding = true;
+	slideDirection = slideDir; 
+	oldSlideMomentum = initSlideSpeed;
+	bodyVelocity.MaxForce = Vector3.new(40000, 0, 40000);
+	bodyVelocity.Velocity = slideDirection*oldSlideMomentum;
+
+	-- OLD SLIDE;
+	-- if slideSound then
+	-- 	slideSound.PlaybackSpeed = random:NextNumber(1.2, 1.5);
+	-- 	slideSound.Volume = 0.15;
+	-- 	slideSound:Play();
+	-- else
+	-- 	slideSound = head:FindFirstChild("BodySlide");
+	-- end
+	-- dustParticle.Enabled = true;
+
+	-- characterProperties.IsSliding = true;
+
+	-- slideDirection = Vector3.new(rootPart.CFrame.LookVector.X, 0, rootPart.CFrame.LookVector.Z).Unit;
+	-- oldSlideMomentum = characterProperties.SlideSpeed;
+	-- slideForce.Velocity = slideDirection*oldSlideMomentum;
+end
+
+-- MARK: startDashing
+local airDashYDiminish = 4000;
+local function startDashing()
+	dashMomentumDecay = character:GetAttribute("DashMomentumDecay") or 4;
+
+	local inputVector: Vector3 = rbxPlayerModule:GetControls():GetMoveVector();
+
+	animations["dashForward"]:Play(0);
+	animations["dashForward"]:AdjustSpeed(2);
+
+	local localInputDir = CFrame.lookAt(currentCamera.CFrame.Position, currentCamera.CFrame:ToWorldSpace(CFrame.new(inputVector)).Position);
+	
+	local initDashSpeed = characterProperties.DashSpeed;
+	local dashDir = Vector3.new(localInputDir.LookVector.X, 0, localInputDir.LookVector.Z).Unit;
+
+	characterProperties.IsDashing = true;
+	dashDirection = dashDir; 
+	oldDashMomentum = initDashSpeed;
+	bodyVelocity.MaxForce = Vector3.new(40000, airDashYForce, 40000);
+	bodyVelocity.Velocity = dashDirection*oldDashMomentum + Vector3.new(0, 3, 0);
+
+end
+
 local function crouchRequest(value)
 	if value then
 		characterProperties.CrouchKeyDown = true;
 		crouchCooldown = tick();
 
-		if (characterProperties.IsSprinting and humanoid.WalkSpeed > characterProperties.WalkingSpeed+1) 
-			and not characterProperties.IsWalking and not characterProperties.IsSliding and (tick()-slideCooldown)>0.7
+		if characterProperties.IsSprinting --and humanoid.WalkSpeed > characterProperties.WalkingSpeed+1
+			and not characterProperties.IsWalking 
+			and not characterProperties.IsSliding 
+			and (tick()-slideCooldown)>0.7
 			and not characterProperties.IsWounded then
-			-- MARK: StartSlide;
-
-			if slideSound then
-				slideSound.PlaybackSpeed = random:NextNumber(1.2, 1.5);
-				slideSound.Volume = 0.15;
-				slideSound:Play();
-			else
-				slideSound = head:FindFirstChild("BodySlide");
-			end
-			dustParticle.Enabled = true;
-
-			characterProperties.IsSliding = true;
-			slideDirection = Vector3.new(rootPart.CFrame.LookVector.X, 0, rootPart.CFrame.LookVector.Z).Unit;
-			oldSlideMomentum = characterProperties.SlideSpeed;
-			slideForce.Velocity = slideDirection*oldSlideMomentum;
-
+				
+			characterProperties.IsDashing = false;
+			startSliding();
 		end
 		characterProperties.IsCrouching = true;
 		
@@ -747,7 +810,9 @@ UserInputService.InputBegan:connect(function(inputObject, gameProcessedEvent)
 	
 	if modKeyBindsHandler:Match(inputObject, "KeySprint") and characterProperties.IsAlive and characterProperties.CanMove and characterProperties.CanSprint and not humanoid.Sit and not humanoid.PlatformStand then
 		characterProperties.SprintKeyDown = true;
-		characterProperties.IsSprinting = true;
+		if modCharacter.SprintMode == 1 then
+			characterProperties.IsSprinting = true;
+		end
 	end
 	
 	if modKeyBindsHandler:Match(inputObject, "KeyWalk") and characterProperties.IsAlive and characterProperties.CanMove and not humanoid.Sit and not humanoid.PlatformStand then
@@ -815,7 +880,8 @@ UserInputService.InputChanged:Connect(function(inputObject, gameProcessedEvent)
 		characterProperties.ZoomLevel = mathClamp(characterProperties.ZoomLevel - 2*inputObject.Position.Z, 2, maxZoomLevel);
 	end
 	if inputObject.KeyCode == Enum.KeyCode.Thumbstick2 then
-		local inputVector = Vector2.new(inputObject.Position.X, -inputObject.Position.Y);
+		--local inputVector = Vector2.new(inputObject.Position.X, -inputObject.Position.Y);
+		local inputVector = rbxPlayerModule:GetControls():GetMoveVector();
 		if inputVector.magnitude > 0.2 then
 			gamepadDelta = inputVector;
 		else
@@ -883,11 +949,16 @@ local function characterMoving(speed)
 	characterProperties.IsMoving = speed > 1;
 
 	if not characterProperties.IsMoving then
-		characterProperties.IsSprinting = false;
+		if modCharacter.SprintMode == 1 then
+			characterProperties.IsSprinting = false;
+		end
+
 		characterProperties.IsWalking = false;
 		
 	elseif characterProperties.CanMove and characterProperties.SprintKeyDown then
-		characterProperties.IsSprinting = true;
+		if modCharacter.SprintMode == 1 then
+			characterProperties.IsSprinting = true;
+		end
 		
 	end
 	
@@ -948,6 +1019,15 @@ local function characterMoving(speed)
 	end
 end
 
+-- MARK: stopDashing
+function stopDashing(delayTime)
+	Cache.lastDash = nil;
+	airDashYForce = 0;
+	characterProperties.IsDashing = false;
+	bodyVelocity.MaxForce = Vector3.new(0, 0, 0);
+	characterProperties.DashVelocity = Vector3.zero;
+end
+
 -- MARK: stopSliding
 function stopSliding(delayTime)
 	Cache.lastSlide = nil;
@@ -970,12 +1050,12 @@ function stopSliding(delayTime)
 			if slopeDot <= 0.1 then
 				oldSlideMomentum = oldSlideMomentum - math.max(math.abs(slopeDot), 0.3) *(slopeUpFriction*4);
 			end
-			slideForce.Velocity = slideDirection*math.max(oldSlideMomentum, 0);
+			bodyVelocity.Velocity = slideDirection*math.max(oldSlideMomentum, 0);
 
 			task.wait(1/15);
 		end
 		
-		slideForce.MaxForce = Vector3.new(0, 0, 0);
+		bodyVelocity.MaxForce = Vector3.new(0, 0, 0);
 		characterProperties.SlideVelocity = Vector3.zero;
 		
 		setAlignRot{
@@ -1250,16 +1330,6 @@ local function renderStepped(camera, deltaTime)
 					end
 
 				else
-					-- if modData:IsMobile() and characterProperties.IsSliding then
-					-- 	humanoid.AutoRotate = false;
-					-- 	setAlignRot{
-					-- 		CFrame=rootPoint;
-					-- 		Enabled=true;
-					-- 	};
-	
-					-- else
-	
-					-- end
 					humanoid.AutoRotate = true;
 					setAlignRot{
 						Enabled=false;
@@ -1281,30 +1351,74 @@ local function renderStepped(camera, deltaTime)
 	local zoomSensitivityDiff = camera.FieldOfView / characterProperties.BaseFieldOfView;
 	mouseProperties.Sensitivity = defaultSensitivity * zoomSensitivityDiff;
 
-	
-	if characterProperties.IsSliding then
+	local turnSensitivity = 7; --character:GetAttribute("SlideTurnSensitivity") or 
+	if characterProperties.IsDashing then -- MARK: Dash Turning
+		local dashCf = CFrame.lookAt(Vector3.zero, dashDirection);
+		-- local inputVector = rbxPlayerModule:GetControls():GetMoveVector();
+		-- if inputVector.X ~= 0 or inputVector.Z ~= 0 then
+		-- 	local lookAtDir = currentCamera.CFrame:ToWorldSpace(CFrame.new(inputVector)).Position * Vector3.new(1, 0, 1);
+		-- 	local localInputDir = CFrame.lookAt(currentCamera.CFrame.Position *Vector3.new(1, 0, 1), lookAtDir);
+		-- 	--dashCf = dashCf:Lerp(localInputDir, 0.1);
+		-- 	dashCf = localInputDir;
+		-- end
+
+		dashDirection = dashCf.LookVector;
+
+		if characterProperties.ThirdPersonCamera then
+			setAlignRot{
+				CFrame = dashCf;
+				Enabled=true;
+			};
+		end
+
+	elseif characterProperties.IsSliding then-- MARK: Slide Turning
 		if characterProperties.CrouchKeyDown == false or humanoid:GetState() == Enum.HumanoidStateType.Swimming then
 			stopSliding();
 		end
 
-		if characterProperties.ThirdPersonCamera then -- and not modData:IsMobile()
-			local mouseMoveDelta = UserInputService:GetMouseDelta();
+		if modData:IsMobile() then turnSensitivity = turnSensitivity-2 end;
 
-			local inputVector = rbxPlayerModule:GetControls():GetMoveVector();
-			local rootFaceCf = CFrame.new(rootPart.CFrame.Position, rootPart.CFrame.Position+slideDirection);
+		local mouseMoveDelta = UserInputService:GetMouseDelta();
+		local mouseTurnCf = CFrame.Angles(0, math.rad(-mouseMoveDelta.X/(turnSensitivity)), 0);
 
-			if inputVector.X ~= 0 or inputVector.Z ~= 0 then
-				local localInputDir = CFrame.lookAt(currentCamera.CFrame.Position, currentCamera.CFrame:ToWorldSpace(CFrame.new(inputVector)).Position);
-				rootFaceCf = rootFaceCf:Lerp(
-					localInputDir,
-					modData:IsMobile() and 0.5 or 0.1);
-			end
+		local slideCf = CFrame.lookAt(Vector3.zero, slideDirection) * mouseTurnCf;
 
+		local inputVector = rbxPlayerModule:GetControls():GetMoveVector();
+		if inputVector.X ~= 0 or inputVector.Z ~= 0 then
+			local lookAtDir = currentCamera.CFrame:ToWorldSpace(CFrame.new(inputVector)).Position * Vector3.new(1, 0, 1);
+			local localInputDir = CFrame.lookAt(Vector3.new(currentCamera.CFrame.Position.X, 0, currentCamera.CFrame.Position.Z), lookAtDir);
+			slideCf = slideCf:Lerp(localInputDir, 0.1);
+		end
+
+		slideDirection = slideCf.LookVector;
+
+		local rootFaceCf = CFrame.lookAt(Vector3.zero, rootPart.CFrame.LookVector) * mouseTurnCf;
+		rootFaceCf = rootFaceCf:Lerp(slideCf, 0.3);
+
+		if characterProperties.ThirdPersonCamera then
 			setAlignRot{
-				CFrame = rootFaceCf * CFrame.Angles(0, math.rad(-mouseMoveDelta.X/(modData:IsMobile() and 1 or 1.9)), 0);
+				CFrame = rootFaceCf;
 				Enabled=true;
 			};
 		end
+
+		-- OLD SLIDE
+		--if characterProperties.ThirdPersonCamera then
+			-- local mouseMoveDelta = UserInputService:GetMouseDelta();
+
+			-- local inputVector = rbxPlayerModule:GetControls():GetMoveVector();
+			-- local rootFaceCf = CFrame.new(rootPart.CFrame.Position, rootPart.CFrame.Position+slideDirection);
+
+			-- if inputVector.X ~= 0 or inputVector.Z ~= 0 then
+			-- 	local localInputDir = CFrame.lookAt(currentCamera.CFrame.Position, currentCamera.CFrame:ToWorldSpace(CFrame.new(inputVector)).Position);
+			-- 	rootFaceCf = rootFaceCf:Lerp(localInputDir, 0.2);
+			-- end
+
+			-- setAlignRot{
+			-- 	CFrame = rootFaceCf * CFrame.Angles(0, math.rad(-mouseMoveDelta.X/(modData:IsMobile() and 1 or 2.9)), 0);
+			-- 	Enabled=true;
+			-- };
+		--end
 	end
 
 	if xLeftDeltaAddition and not xRightDeltaAddition then
@@ -1584,6 +1698,7 @@ resetCameraEffects();
 -- MARK: RS.Stepped
 RunService.Stepped:Connect(function(total, delta)
 	characterProperties.IsAlive = character:GetAttribute("IsAlive") == true;
+	local isJumping = getIsJumping();
 
 	local rootCframe = rootPart.CFrame;
 	
@@ -1750,7 +1865,41 @@ RunService.Stepped:Connect(function(total, delta)
 
 	if humanoid.FloorMaterial ~= Enum.Material.Air then
 		Cache.AirJumpsCounter = 0;
+		Cache.AirDashCounter = 0;
 	end
+	if isJumping == true and jumpDebounce ~= true then
+		jumpDebounce = true;
+
+		-- MARK: Double jumping
+		if classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaAgility then
+			local maxAirJumps = 1;
+			if humanoid.FloorMaterial == Enum.Material.Air and Cache.AirJumpsCounter < maxAirJumps then
+				humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
+				Cache.AirJumpsCounter = Cache.AirJumpsCounter +1;
+
+				local jumpForce = Vector3.new(0, 300*Cache.AirJumpsCounter, 0);
+				local rootSpeed = Vector3.new(rootPart.AssemblyLinearVelocity.X, 0, rootPart.AssemblyLinearVelocity.Z).Magnitude;
+				jumpForce = jumpForce + currentCamera.CFrame.LookVector * math.min(rootSpeed, characterProperties.SlideSpeed) * getCharacterMass();
+
+				rootPart:ApplyImpulse(jumpForce);
+
+				animations["doubleJump"]:Play(0);
+				animations["doubleJump"]:AdjustSpeed(5);
+
+				setAlignRot{
+					CFrame = CFrame.lookAt(Vector3.zero, currentCamera.CFrame.LookVector);
+					Enabled = true;
+				};
+
+				Debugger:StudioLog("AirJump");
+			end
+		end
+
+	elseif isJumping == false and jumpDebounce == true then
+		jumpDebounce = false;
+
+	end
+
 	-- MARK: Wall climbing
 	if classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaAgility then
 		local maxClimbHeight = 8;
@@ -1855,6 +2004,13 @@ RunService.Stepped:Connect(function(total, delta)
 			latchAttachment.Parent = lzRayResult.Instance; 
 			latchAttachment.WorldPosition = lzRayResult.Position;
 
+			if debugWallClimbing then
+				game.Debris:AddItem(Debugger:PointPart(latchAttachment.WorldCFrame), 2);
+			end
+
+			animations["wallClimb"]:Play(0);
+			animations["wallClimb"]:AdjustSpeed(3);
+
 			local rpOffset = latchAttachment.WorldPosition - rootLatchPosition;
 			local climbBlocked = false;
 			while rootPart.Position.Y <= (latchAttachment.WorldPosition.Y) do
@@ -1863,9 +2019,10 @@ RunService.Stepped:Connect(function(total, delta)
 				charAlignPosition.Position = targetPosition;
 				task.wait(0.1);
 
-				local climbBlockedHitResult = workspace:Blockcast(rootPart.CFrame+Vector3.new(0,2,0), Vector3.new(2, 1, 2), Vector3.yAxis*2, groundRayParam);
+				local climbBlockedHitResult = workspace:Blockcast(rootPart.CFrame, Vector3.new(2, 1, 1), Vector3.yAxis*4, groundRayParam);
 				if climbBlockedHitResult then
 					climbBlocked = true;
+					animations["wallClimb"]:Stop();
 					break;
 				end
 			end
@@ -1882,15 +2039,42 @@ RunService.Stepped:Connect(function(total, delta)
 			charAlignPosition.Enabled = false;
 		end
 
-		if getIsJumping() then
+		if isJumping then
 			wallClimb();
 		end
 
 	end
 
 	-- MARK: Dashing
-	if classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaFocus then
+	if classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaFleet then
+		modCharacter.SprintMode = 2;
+		local maxAirDash = 1;
+		if characterProperties.SprintKeyDown and characterProperties.IsDashing == false and characterProperties.IsSliding == false and dashDebounce == false then
+			dashDebounce = true;
+			local airDashing = humanoid.FloorMaterial == Enum.Material.Air;
 
+			local inputVector: Vector3 = rbxPlayerModule:GetControls():GetMoveVector();
+			if inputVector.X == 0 and inputVector.Z == 0 then
+
+			elseif not airDashing or Cache.AirDashCounter < maxAirDash then
+				if airDashing then
+					Cache.AirDashCounter = Cache.AirDashCounter +1;
+				end
+				airDashYForce = 40000;
+				startDashing();
+			end
+
+		elseif characterProperties.SprintKeyDown == false then
+			dashDebounce = false;
+
+		end
+
+	else
+		modCharacter.SprintMode = 1;
+	end
+
+	if modCharacter.SprintMode == 2 and (Cache.LastDamaged == nil or tick()-Cache.LastDamaged > 2) and not characterProperties.IsFocused then
+		characterProperties.IsSprinting = true;
 	end
 
 	local s = pcall(function()
@@ -2159,7 +2343,7 @@ RunService.PreSimulation:Connect(function(step)
 end)
 
 -- MARK: PostSimulation;
-RunService.PostSimulation:Connect(function(step)
+RunService.PostSimulation:Connect(function(deltaTimeSim)
 	local beatTick = tick();
 	loadInterface();
 	if modCharacter.CharacterProperties.CharacterCameraEnabled ~= isCharCamEnabled then
@@ -2258,6 +2442,7 @@ RunService.PostSimulation:Connect(function(step)
 	
 	if not characterProperties.CanMove then
 		stopSliding();
+		stopDashing();
 		characterProperties.IsCrouching = false;
 		characterProperties.IsWalking = false;
 		characterProperties.IsSprinting = false;
@@ -2319,6 +2504,7 @@ RunService.PostSimulation:Connect(function(step)
 			animations["woundedWalk"]:Stop();
 			if characterProperties.IsSliding then
 				stopSliding();
+				stopDashing();
 			end
 			
 		elseif characterProperties.IsWounded then
@@ -2332,42 +2518,95 @@ RunService.PostSimulation:Connect(function(step)
 			collisionModelId = "Wounded";
 			if characterProperties.IsSliding then
 				stopSliding();
+				stopDashing();
 			end
 			
-		elseif characterProperties.IsSliding then -- MARK: PostSimulation IsSliding
+		elseif characterProperties.IsDashing then -- MARK: IsDashing
+			characterProperties.WalkSpeed:Set("default", 0);
+			if not humanoid.Sit and not humanoid.PlatformStand then
+				local yForce = airDashYForce;
+				if humanoid.FloorMaterial ~= Enum.Material.Air then
+					yForce = 0;
+				end
+				bodyVelocity.MaxForce = Vector3.new(40000, yForce, 40000);
+
+				local dashMomentum = oldDashMomentum;
+				
+				if Cache.lastDash and tick()-Cache.lastDash >= 0.1 then
+					dashMomentum = math.max(dashMomentum - dashMomentumDecay * 60*deltaTimeSim, 0);
+					airDashYForce = math.max(airDashYForce - 60*deltaTimeSim * (airDashYDiminish), 0);
+
+					bodyVelocity.Velocity = dashDirection*math.max(dashMomentum, 0);
+				else
+					bodyVelocity.Velocity = Vector3.new(0, 3, 0) + dashDirection*math.max(dashMomentum, 0);
+				end
+
+				oldDashMomentum = dashMomentum;
+
+				if Cache.lastDash == nil then
+					Cache.lastDash = beatTick;
+				end
+			end
+
+			if Cache.lastDash == nil
+				or oldDashMomentum <= 16
+				or (Cache.lastDash and tick()-Cache.lastDash >= 0.5 and (rootPart.AssemblyLinearVelocity*Vector3.new(1, 0, 1)).Magnitude <= 5 )
+				or humanoid.Sit 
+				or humanoid.PlatformStand 
+				or not characterProperties.IsAlive then
+
+				stopDashing();
+			end
+
+		elseif characterProperties.IsSliding then -- MARK: IsSliding Mechanics
 			if animations["slide"] then animations["slide"]:Play(); end
 			characterProperties.WalkSpeed:Set("default", 0);
 			
 			if not humanoid.Sit and not humanoid.PlatformStand and not humanoid.Jump then
-				slideForce.MaxForce = Vector3.new(40000, 0, 40000);
-				
-				local rootLookVector = Vector3.new(rootPart.CFrame.LookVector.X, 0, rootPart.CFrame.LookVector.Z).Unit;
-				local newSlideDirection = rootLookVector;
+				bodyVelocity.MaxForce = Vector3.new(40000, 0, 40000);
 				
 				local slideMomentum = oldSlideMomentum;
+				local slopeDot = slideDirection:Dot(characterProperties.GroundNormal);
 
-				local slopeDot = newSlideDirection:Dot(characterProperties.GroundNormal);
-
-				if slopeDot > 0.1 then
-					slideMomentum = math.min(slideMomentum + slopeDot/slopeDownFriction, characterProperties.SlideSpeed*1.5);
+				if slopeDot > 0.15 then
+					-- >0 slide down;
+					slideMomentum = math.min(slideMomentum + (slopeDot/slopeDownFriction) * 60*deltaTimeSim, characterProperties.SlideSpeed*1.5);
 				else
-					slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.25) *slopeUpFriction;
+					-- <0: slide up;
+					slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.3) *slopeUpFriction * 60*deltaTimeSim;
 				end
-
-				slideForce.Velocity = newSlideDirection*math.max(slideMomentum, 0);
-				slideDirection = newSlideDirection;
-
+				bodyVelocity.Velocity = slideDirection*math.max(slideMomentum, 0);
 				oldSlideMomentum = slideMomentum;
+
+				-- OLD SLIDE
+				-- local rootLookVector = Vector3.new(rootPart.CFrame.LookVector.X, 0, rootPart.CFrame.LookVector.Z).Unit;
+				-- local newSlideDirection = rootLookVector;
+				
+				-- local slideMomentum = oldSlideMomentum;
+
+				-- local slopeDot = newSlideDirection:Dot(characterProperties.GroundNormal);
+				-- if slopeDot > 0.15 then
+				-- 	-- >0 slide down;
+				-- 	slideMomentum = math.min(slideMomentum + (slopeDot/slopeDownFriction) * 60*deltaTimeSim, characterProperties.SlideSpeed*1.5);
+				-- else
+				-- 	-- <0: slide up;
+				-- 	slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.25) *slopeUpFriction * 60*deltaTimeSim;
+				-- end
+
+				-- slideForce.Velocity = newSlideDirection*math.max(slideMomentum, 0);
+				-- slideDirection = newSlideDirection;
+
+				-- oldSlideMomentum = slideMomentum;
 				
 				if Cache.lastSlide == nil then
 					Cache.lastSlide = beatTick;
 				end
 			end
-			characterProperties.SlideVelocity = slideForce.Velocity;
+			characterProperties.SlideVelocity = bodyVelocity.Velocity;
 			
 			if characterProperties.State == Enum.HumanoidStateType.FallingDown
 				or Cache.lastSlide == nil
-				or (rootPart.AssemblyLinearVelocity*Vector3.new(1, 0, 1)).Magnitude <= 5 
+				or (Cache.lastSlide and tick()-Cache.lastSlide >= 0.5 and (rootPart.AssemblyLinearVelocity*Vector3.new(1, 0, 1)).Magnitude <= 5 )
 				or humanoid.Sit 
 				or humanoid.PlatformStand 
 				or not characterProperties.IsAlive then
@@ -2400,7 +2639,13 @@ RunService.PostSimulation:Connect(function(step)
 			
 			local adsMulti = characterProperties.AdsWalkSpeedMultiplier or 1;
 			
-			if characterProperties.IsCrouching then
+			local customCharState = false;
+
+			if customCharState then
+				animations["crouchIdle"]:Stop();
+				animations["crouchWalk"]:Stop();
+
+			elseif characterProperties.IsCrouching then
 				collisionModelId = "Crouch";
 				characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, characterProperties.CrouchSpeed * adsMulti, 0.6));
 				characterProperties.NewWalkSpeed = humanoid.WalkSpeed;
@@ -2427,6 +2672,7 @@ RunService.PostSimulation:Connect(function(step)
 				characterProperties.NewWalkSpeed = humanoid.WalkSpeed;
 				animations["crouchIdle"]:Stop();
 				animations["crouchWalk"]:Stop();
+
 			end
 		end
 		
@@ -2651,6 +2897,7 @@ classPlayer:OnNotIsAlive(function(character)
 	mouseProperties.MouseLocked = false;
 	
 	stopSliding();
+	stopDashing();
 	characterProperties.IsCrouching = false;
 	characterProperties.IsWalking = false;
 	characterProperties.IsSprinting = false;
@@ -2773,40 +3020,56 @@ end)
 
 humanoid.StateChanged:Connect(onHumanoidStateChanged);
 
+-- MARK: Health Changed
+Cache.PreviousHealth = humanoid.Health;
+humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+	local delta = humanoid.Health - Cache.PreviousHealth;
+	if delta < 0 then
+		Cache.LastDamaged = tick();
+		characterProperties.IsSprinting = false;
+	end
+	Cache.PreviousHealth = humanoid.Health;
+end)
+
+
 -- MARK: Humanoid.Jumping
 humanoid.Jumping:Connect(function(jumped)
 	Cache.LastJump = tick();
 	if jumped then
-		characterProperties.IsSliding = false;
-		
-		oldSlideMomentum = oldSlideMomentum + 5;
-		if classPlayer.Properties.BullLeaping then
-			oldSlideMomentum = oldSlideMomentum + (classPlayer.Properties.BullLeaping.Speed or 10);
+		if characterProperties.IsSliding then
+			characterProperties.IsSliding = false;
+			
+			oldSlideMomentum = oldSlideMomentum + 10;
+			if classPlayer.Properties.BullLeaping then
+				oldSlideMomentum = oldSlideMomentum + (classPlayer.Properties.BullLeaping.Speed or 20);
+			end
+			bodyVelocity.Velocity = slideDirection*math.max(oldSlideMomentum, 0);
+			
+			stopSliding(0.2);
 		end
-		slideForce.Velocity = slideDirection*math.max(oldSlideMomentum, 0);
-		
-		stopSliding(0.2);
+
+		if characterProperties.IsDashing then
+			local canDashJump = oldDashMomentum >= 4;
+			stopDashing();
+
+			if canDashJump then
+				local dashJumpForce = Vector3.new(0, 1, 0) * humanoid.JumpPower;
+				local dashSpeed = characterProperties.DashJumpSpeed;
+
+				if classPlayer.Properties.BullLeaping then
+					dashSpeed = dashSpeed + (classPlayer.Properties.BullLeaping.Speed or 20);
+				end
+
+				dashJumpForce = dashJumpForce + dashDirection * dashSpeed * getCharacterMass();
+				rootPart:ApplyImpulse(dashJumpForce);
+			end
+		end
+
 		crouchToggleCheck(rootPart.CFrame, true);
 	end
 	
 	if characterProperties.IsSwimming then
 		characterProperties.JumpPower:Set("cooldown", 0, 99, 0.5);
-	end
-end)
-humanoid:GetPropertyChangedSignal("Jump"):Connect(function()
-	if humanoid.Jump == false then return end;
-	if Cache.LastJump and tick()-Cache.LastJump <= 0.2 then return end;
-
-	-- MARK: Double jumping
-	if classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaAgility then
-		local maxAirJumps = 1;
-		if humanoid.FloorMaterial == Enum.Material.Air and Cache.AirJumpsCounter < maxAirJumps then
-			humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
-			Cache.AirJumpsCounter = Cache.AirJumpsCounter +1;
-			rootPart:ApplyImpulse(Vector3.new(0, 150*Cache.AirJumpsCounter, 0));
-			animations["doubleJump"]:Play(0);
-			animations["doubleJump"]:AdjustSpeed(5);
-		end
 	end
 end)
 

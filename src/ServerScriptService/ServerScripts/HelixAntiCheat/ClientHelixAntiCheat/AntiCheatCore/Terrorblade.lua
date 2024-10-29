@@ -4,10 +4,10 @@ return function(core)
 	local localPlayer = game.Players.LocalPlayer;
 	
 	workspace:GetPropertyChangedSignal("Gravity"):Connect(function()
-		local valid = core.Sniper{Ability="BlackHole"; Value=workspace.Gravity;};
-		if workspace.Gravity ~= valid then
-			workspace.Gravity = valid;
-		end
+		-- local valid = core.Sniper{Ability="BlackHole"; Value=workspace.Gravity;};
+		-- if workspace.Gravity ~= valid then
+		-- 	workspace.Gravity = valid;
+		-- end 
 	end)
 	
 	local function onCharacterAdded(character)

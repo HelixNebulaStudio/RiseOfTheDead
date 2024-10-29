@@ -1010,8 +1010,10 @@ function Profile:Load(loadOverwrite)
 	
 	if (os.time()-self.SessionLock) <= 30 then
 		task.spawn(function()
-			modAnalytics:ReportError("Security Alert", self.Player.Name.." ("..self.UserId..") attempting to join a locked session..", "critical");
-			shared.modGameLogService:Log(self.Player.Name.." ("..self.UserId..") attempting to join a locked session..", "Logs");
+			if shared.modProfile.IsBeingRecon(self.Player) then
+				local modDiscordWebhook = require(game.ServerScriptService.ServerLibrary.DiscordWebhook);
+				modDiscordWebhook.PostText(modDiscordWebhook.Hooks.General, `{self.Player.Name} \`{self.Player.UserId}\` attempting to join a locked session.`);
+			end
 		end)
 		self.Player:Kick("Session is currently locked.");
 		return;
@@ -1363,6 +1365,7 @@ function Profile:SyncPublic(caller)
 		publicData.Punishment = self.Punishment;
 		publicData.TitleId = self.TitleId;
 		
+
 		if publicData.TitleId == nil and self.GroupRank and self.GroupRank > 1 then
 			local rankId = "rank"..self.GroupRank;
 			local titleLib = modPlayerTitlesLibrary:Find(rankId);
@@ -1654,6 +1657,7 @@ function Profile:RefreshPlayerTitle()
 		if titleLib then
 			id = rankId;
 		end
+		self.Player:SetAttribute("HNSGroupRank", self.GroupRank);
 	end
 	
 	if id == "" then

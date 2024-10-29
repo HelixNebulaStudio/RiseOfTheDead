@@ -5,12 +5,12 @@ local HacAbility = {}
 function HacAbility:OnSniper(player, case, packet)
 	local gravity = packet.Value;
 	
-	if gravity ~= workspace.Gravity then
-		task.spawn(function()
-			self.LogToAnalytics("Illegal gravity set!");
-			Debugger:Warn(player.Name, "Illegal gravity set!");
-		end)
-	end
+	-- if gravity ~= workspace.Gravity then
+	-- 	task.spawn(function()
+	-- 		self.LogToAnalytics("Illegal gravity set!");
+	-- 		Debugger:Warn(player.Name, "Illegal gravity set!");
+	-- 	end)
+	-- end
 	
 	return workspace.Gravity;
 end

@@ -13,7 +13,7 @@ return function(player, damageSource, finalDamage)
         return;
     end
     
-    local dealerPlayer = game.Players:GetPlayerFromCharacter(dealer);
+    local dealerPlayer = typeof(dealer) == "Instance" and dealer:IsA("Model") and game.Players:GetPlayerFromCharacter(dealer) or nil;
     if dealerPlayer then -- isPlayer
         return;
     end

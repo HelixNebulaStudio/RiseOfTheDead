@@ -48,6 +48,7 @@ if RunService:IsClient() then
 			IsSliding=false;
 			IsWalking=false;
 			IsSprinting=false;
+			IsDashing=false;
 			IsSwimming=false;
 			IsCrouching=false;
 			IsEquipped=false;
@@ -84,6 +85,8 @@ if RunService:IsClient() then
 	
 			Mass=0;
 			SlideSpeed=55;
+			DashSpeed=70;
+			DashJumpSpeed=20;
 			Joints={
 				WaistX=0;
 				WaistY=0;
