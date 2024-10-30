@@ -2824,20 +2824,44 @@ MissionLibrary.New{
 	
 };
 
-
 -- MARK: 82 - Candy Hoarder
 MissionLibrary.New{
 	MissionId=82;
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Candy Hoarder";
-	Description="Complete Slaughterfest round with at least 500 candies.";
+	Description="Complete a Slaughterfest round with at least 500 candies.";
 	Timer=BoardTimeLimit;
 	Persistent=true;
 	Checkpoint={
-		{Text="Complete Slaughterfest round with at least 500 candies";};
+		{Text="Complete a Slaughterfest round with at least 500 candies";};
 		{Text="Completed"; AutoComplete=true;};
 	};
 	SaveData={};
+	GuideText="";
+	Tier="Halloween";
+	Rewards={
+		{Type="Perks"; Amount=PerksReward.Hard};
+		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
+	};
+	AddRequirements={
+		{Type="SpecialEvent"; Value="Halloween"};
+		{Type="Level"; Value=30};
+	};
+};
+
+-- MARK: 83 - Mass Slaughterer
+MissionLibrary.New{
+	MissionId=83;
+	MissionType = MissionLibrary.MissionTypes.Board;
+	Name="Mass Slaughterer";
+	Description="Complete a Slaughterfest round and get 10 player kills.";
+	Timer=BoardTimeLimit;
+	Persistent=true;
+	Checkpoint={
+		{Text="Complete a Slaughterfest round and get $Kills kills";};
+		{Text="Completed"; AutoComplete=true;};
+	};
+	SaveData={Kills=10;};
 	GuideText="";
 	Tier="Halloween";
 	Rewards={
