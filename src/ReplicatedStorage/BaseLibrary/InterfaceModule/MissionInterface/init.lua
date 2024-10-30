@@ -87,6 +87,9 @@ local boardMissionColors = {
 	Easy = Color3.fromRGB(100, 100, 100);
 	Normal = Color3.fromRGB(51, 102, 204);
 	Hard = Color3.fromRGB(101, 59, 169);
+
+	--Special;
+	Halloween = Color3.fromRGB(75, 188, 0);
 };
 
 local bpColors = {
@@ -2210,6 +2213,14 @@ function Interface.init(modInterface)
 		for name, icon in pairs(modHeadIcons.GetIcons()) do
 			if icon and icon.Active == "Mission" then
 				if headIconUpdated[name] == nil then modHeadIcons.Clear(name, "Mission"); end;
+			end
+		end
+
+		if pinnedMission and pinnedMissionLib and pinnedMissionLib.Checkpoint then
+			local checkpointInfo = pinnedMissionLib.Checkpoint[pinnedMission.ProgressionPoint];
+
+			if checkpointInfo.AutoComplete then
+				local r = remoteMissionRemote:InvokeServer("AutoComplete", pinnedMission.Id);
 			end
 		end
 	end

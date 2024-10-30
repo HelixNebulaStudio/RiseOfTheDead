@@ -282,7 +282,7 @@ function Player.new(playerInstance: Player)
 	function meta:TakeDamagePackage(damageSource)
 		local damage = damageSource.Damage;
 		local dealer = damageSource.Dealer;
-		--local storageItem = damageSource.ToolStorageItem;
+		local storageItem = damageSource.ToolStorageItem;
 		local hitPart = damageSource.TargetPart;
 		local damageType = damageSource.DamageType;
 		local damageCategory = damageSource.DamageCate or modDamagable.DamageCategory.Generic;
@@ -329,11 +329,17 @@ function Player.new(playerInstance: Player)
 					if typeof(dealer) == "table" then
 
 					elseif dealer:IsA("Player") then
-						modDamageTag.Tag(classPlayer.Character, dealer.Character, hitPart and hitPart.Name == "Head");
+						modDamageTag.Tag(classPlayer.Character, dealer.Character, {
+							WeaponItemId=(storageItem and storageItem.ItemId or nil);
+							IsHeadshot=(hitPart and hitPart.Name == "Head");
+						}); 
 
 					elseif dealer:IsA("Model") then
 						local enemyPrefab = dealer;
-						modDamageTag.Tag(classPlayer.Character, enemyPrefab, hitPart and hitPart.Name == "Head");
+						modDamageTag.Tag(classPlayer.Character, enemyPrefab, {
+							WeaponItemId=(storageItem and storageItem.ItemId or nil);
+							IsHeadshot=(hitPart and hitPart.Name == "Head");
+						}); 
 
 					end
 				end

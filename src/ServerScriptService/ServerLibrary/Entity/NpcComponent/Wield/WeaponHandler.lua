@@ -678,7 +678,10 @@ function Handler:ReplicateFire(shotData)
 						end
 						
 						if humanoid and dmgMulti then
-							modDamageTag.Tag(targetModel, self.Npc.Prefab, targetObject.Name == "Head" and true or nil);
+							modDamageTag.Tag(targetModel, self.Npc.Prefab, {
+								WeaponItemId=self.Wield.ItemId;
+								IsHeadshot=(targetObject.Name == "Head" and true or nil);
+							});
 							damage = damage*dmgMulti;
 							
 							if self.Wield.OnWieldHit then

@@ -849,7 +849,16 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="maraudersmaskcbspumpkins"; Icon="rbxassetid://15016821671"; SkinPerm="Cute But Scary Pumpkins"; TargetItemId="maraudersmask"; Tags={"Slaughterfest";}; });
 	
 	-- Slaughterfest 2024
-	new(crateBase, {Id="slaughterfestcandybag"; Name="Slaughterfest Candy Bag"; Icon="rbxassetid://122301894594822"; Tags={"Slaughterfest"}; TradingTax=0; Description="Happy Slaughterfest, open it and see what you get!";});
+	new(crateBase, {Id="slaughterfestcandybag"; Name="Slaughterfest Candy Bag"; Icon="rbxassetid://122301894594822"; Tags={"Slaughterfest"}; TradingTax=0; Description="Happy Slaughterfest, open it and see what you get!";
+		DestroyOnExpire=true;
+		OnInstantiate=function(storageItem)
+			local itemValues = storageItem.Values;
+			if itemValues.Expire then return end;
+			itemValues.Expire = (math.ceil(workspace:GetServerTimeNow()) + shared.Const.MonthSecs);
+			itemValues.ExpireLength = shared.Const.MonthSecs;
+		end;
+		Sources={"Obtained from Slaughterfest.";};
+	});
 	local candyCaravanStr = "Eatible candies but why not cook them in the Slaughterfest Cauldron for something much more special instead?\n";
 	new(foodBase, {Id="zombiejello"; Name="Zombie Jello"; Icon="rbxassetid://99854271826378"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] After eating this, you get a craving for brainsss.."; Tradable=super.Tradable.Nontradable;});
 	new(foodBase, {Id="eyeballgummies"; Name="Eyeball Gummies"; Icon="rbxassetid://72634660358826"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] Heighten vision that gives you the ability to see vibrations.."; Tradable=super.Tradable.Nontradable;});

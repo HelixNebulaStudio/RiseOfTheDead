@@ -116,7 +116,10 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 											if self.Player and damagable:CanDamage(self.Player) == false then continue end;
 											if self.NpcModule and damagable:CanDamage(self.NpcModule) == false then continue end;
 											
-											modDamageTag.Tag(model, self.Character, (hitPart.Name == "Head" or hitPart:GetAttribute("IsHead") == true) and true or nil);
+											modDamageTag.Tag(model, self.Character, {
+												WeaponItemId=(self.StorageItem and self.StorageItem.ItemId or nil);
+												IsHeadshot=(hitPart.Name == "Head" or hitPart:GetAttribute("IsHead") == true or nil);
+											});
 											
 											local bleedDamage = math.ceil(damage * (configurations.BleedDamagePercent or 0.05));
 
@@ -171,7 +174,10 @@ function ToolHandler:PrimaryAttack(damagable, hitPart)
 		if self.Player and damagable:CanDamage(self.Player) == false then return end;
 		if self.NpcModule and damagable:CanDamage(self.NpcModule) == false then return end;
 		
-		modDamageTag.Tag(model, self.Character, (hitPart.Name == "Head" or hitPart:GetAttribute("IsHead") == true) and true or nil);
+		modDamageTag.Tag(model, self.Character, {
+			WeaponItemId=(self.StorageItem and self.StorageItem.ItemId or nil);
+			IsHeadshot=(hitPart.Name == "Head" or hitPart:GetAttribute("IsHead") == true or nil);
+		});
 		
 		local newDmgSrc = modDamagable.NewDamageSource{
 			Damage=damage;

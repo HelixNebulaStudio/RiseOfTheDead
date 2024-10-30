@@ -339,11 +339,11 @@ end)
 --== NPC Primary Fire;
 bindPrimaryFire.Event:Connect(function(character, weaponModule, shotdata, targetable)
 	Debugger:Warn("bindPrimaryFire deprecated?", debug.traceback());
-	if character == nil then Debugger:Warn("Character missing.") return end;
+	if character == nil then Debugger:Warn("Character missing."); return end;
 	local humanoid = character:FindFirstChildWhichIsA("Humanoid") or nil;
 	if humanoid and humanoid.Health <= 0 then return end;
 	local rootPart = humanoid.RootPart;
-	if rootPart == nil then Debugger:Warn("Character missing RootPart.") return end;
+	if rootPart == nil then Debugger:Warn("Character missing RootPart."); return end;
 	
 	if modConfigurations.RemoveForceFieldOnWeaponFire then
 		local forcefield = character:FindFirstChildWhichIsA("ForceField") or nil;
@@ -385,8 +385,6 @@ bindPrimaryFire.Event:Connect(function(character, weaponModule, shotdata, target
 							damage = damage * targetDamageMultiplier
 							
 							if damagable:CanDamage(character) then
-								modDamageTag.Tag(targetModel, character, (targetObject.Name == "Head" or targetObject:GetAttribute("IsHead") == true) and true or nil);
-
 								task.spawn(function()
 									newDamageSource.Damage = damage;
 									newDamageSource.DamageType = newDamageSource.DamageType;
@@ -696,7 +694,10 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 						return;
 					end
 					
-					modDamageTag.Tag(targetModel, client.Character, (targetObject.Name == "Head" or targetObject:GetAttribute("IsHead") == true) and true or nil);
+					modDamageTag.Tag(targetModel, client.Character, {
+						WeaponItemId=itemId;
+						IsHeadshot=(targetObject.Name == "Head" or targetObject:GetAttribute("IsHead") == true or nil);
+					});
 					
 					damage = damage * targetDamageMultiplier;
 					

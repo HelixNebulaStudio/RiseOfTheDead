@@ -56,10 +56,9 @@ library:Add{Id="Nick"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxasseti
 };
 library:Add{Id="Russell"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://79562631617102";
 	Descriptors={
-		Hat="Dark Green Hat";
 		Beard="Full Black";
 		Gender="M";
-		Clothing={"Green Shirt with Stains"; "Brown Belt"};
+		Clothing={"Green Shirt with Stains"; "Brown Belt"; "Dark Green Hat"};
 	};
 };
 library:Add{Id="Jesse"; Class="RAT"; World="TheWarehouse"; Avatar="rbxassetid://15641530418";};
@@ -81,12 +80,12 @@ library:Add{Id="Michael"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxass
 		Hair="Short Spikey Black";
 		Gender="M";
 		Clothing={"White TShirt"; "Demin Jeans"};
-		Scar={"Red"};
+		Scar="Red";
 	};
 };
 library:Add{Id="Wilson"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641529876";
 	Descriptors={
-		Generic="Military";
+		Role="Military";
 		Gender="M";
 		Clothing={"Desert Boots";};
 	};
@@ -117,14 +116,19 @@ library:Add{Id="Danny"; Class="Medic"; HeadIcon="Heal"; World="TheMall"; Avatar=
 library:Add{Id="Patrick"; Class="Bandit"; World="TheMall"; Avatar="rbxassetid://15641420747";};
 library:Add{Id="Alice"; Class="RAT"; World="TheMall";};
 library:Add{Id="Molly"; Class="Medic"; HeadIcon="Heal"; World="TheMall";};
-library:Add{Id="Mike"; Class="Survivor"; World="TheMall"; Avatar="rbxassetid://15641532613";};
+library:Add{Id="Mike"; Class="Survivor"; World="TheMall"; Avatar="rbxassetid://15641532613";
+	Descriptors={
+		Role="Inmate";
+		Gender="M";
+	};
+};
 
 library:Add{Id="Larry"; Class="RAT"; World="TheResidentials";};
 library:Add{Id="Joseph"; Class="Medic"; HeadIcon="Heal"; World="TheResidentials"; Avatar="rbxassetid://15641421273";};
 library:Add{Id="Nate"; Class="Survivor"; World="TheResidentials"; Avatar="rbxassetid://79078550661090";
 	Descriptors={
 		Hair="Short Yellow";
-		Generic="FBI";
+		Role="FBI";
 		Gender="M";
 	};
 };
@@ -138,16 +142,14 @@ library:Add{Id="Dallas"; Class="Survivor"; World="TheResidentials"; Avatar="rbxa
 library:Add{Id="Zep"; Class="Survivor"; World="TheResidentials"; Avatar="rbxassetid://110229481480464";
 	Descriptors={
 		Hair="Short Blonde";
-		Hat="Black Beanie";
-		Clothing={"Black and White Stripes"; "Neck Chain"};
+		Clothing={"Black and White Stripes"; "Neck Chain"; "Black Beanie"};
 	};
 };
 library:Add{Id="Kelly"; Class="Survivor"; World="TheResidentials"; Avatar="rbxassetid://131391159298964";
 	Descriptors={
 		Hair="Curly Black";
-		Hat="Black Baseball Cap";
 		Gender="F";
-		Clothing={"Red Hoodie with Stripes";};
+		Clothing={"Red Hoodie with Stripes"; "Black Baseball Cap";};
 	};
 };
 

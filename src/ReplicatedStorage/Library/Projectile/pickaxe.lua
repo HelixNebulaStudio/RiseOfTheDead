@@ -77,10 +77,13 @@ function Pool.new(owner)
 				TargetModel = model;
 				TargetPart=hitObj;
 				DamageCate=modDamagable.DamageCategory.Projectile;
-			}
+			};
 
 			if damagable:CanDamage(self.Owner) then
-				modDamageTag.Tag(model, self.Owner.Character);
+				modDamageTag.Tag(model, self.Owner.Character, {
+					WeaponItemId=(self.StorageItem and self.StorageItem.ItemId or nil);
+					IsHeadshot=(hitObj.Name == "Head" or hitObj:GetAttribute("IsHead") == true or nil);
+				});
 				damagable:TakeDamagePackage(newDmgSrc);
 			end
 		end

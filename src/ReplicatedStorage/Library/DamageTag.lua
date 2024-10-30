@@ -67,7 +67,7 @@ function Tag:Add(param)
 end
 --
 
-function DamageTag.Tag(victimModel: Model, dealerModel: Model, isHead: boolean?)
+function DamageTag.TagOld(victimModel: Model, dealerModel: Model, isHead: boolean?)
 	if victimModel == nil then return end;
 	if dealerModel == nil then return end;
 	
@@ -98,6 +98,45 @@ function DamageTag.Tag(victimModel: Model, dealerModel: Model, isHead: boolean?)
         Prefab=dealerModel;
         IsHeadshot=isHead;
     };
+end
+
+function DamageTag.Tag(victimModel: Model, taggerModel: Model, tagPacket, ...)
+	if victimModel == nil then return end;
+    if taggerModel == nil then return end;
+
+    if typeof(tagPacket) == "boolean" then
+        DamageTag.TagOld(victimModel, taggerModel, tagPacket, ...);
+        Debugger:Warn("Deprecated use of DamageTag.Tag", debug.traceback());
+        return;
+    end
+
+    tagPacket = tagPacket or {};
+
+	local parent = victimModel;
+	local humanoid = parent:FindFirstChildWhichIsA("Humanoid");
+	for a=1, 3 do
+		if humanoid == nil then
+			parent = parent.Parent;
+			if parent == nil then return end;
+			
+			humanoid = parent:FindFirstChildWhichIsA("Humanoid");
+		else
+			break;
+		end
+	end
+	
+	victimModel = humanoid and humanoid.Parent or nil;
+	if victimModel == nil then return end;
+	--
+    
+	local tag = DamageTag.Tagged[victimModel];
+	if tag == nil then
+        tag = Tag.new();
+		DamageTag.Tagged[victimModel] = tag;
+	end;
+	
+    tagPacket.Prefab = taggerModel;
+    tag:Add(tagPacket);
 end
 
 function DamageTag:Get(victimModel: Model, filter: string?) : TagList

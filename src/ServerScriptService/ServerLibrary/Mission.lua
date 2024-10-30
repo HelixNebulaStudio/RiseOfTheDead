@@ -576,6 +576,26 @@ function remoteMissionRemote.OnServerInvoke(player, actionId, missionId)
 		
 		returnPacket.Success = true;
 		return returnPacket;
+
+	elseif actionId == "AutoComplete" then
+		local returnPacket = {};
+		
+		local missionProfile = Mission.GetMissions(player.Name);
+		local mission = missionProfile:Get(missionId);
+		if mission == nil then return end;
+		local missionLib = modMissionLibrary.Get(missionId);
+
+		if missionLib == nil then return end;
+
+		local checkpointInfo = missionLib.Checkpoint and mission.ProgressionPoint and missionLib.Checkpoint[mission.ProgressionPoint] or nil;
+		if checkpointInfo == nil then return end;
+
+		if checkpointInfo.AutoComplete then
+			Mission:CompleteMission(player, missionId);
+		end
+
+		returnPacket.Success = true;
+		return returnPacket;
 	end
 
 	return;

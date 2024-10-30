@@ -402,7 +402,10 @@ function ToolService.ProcessWeaponShot(shotPacket)
 			if damagable == nil or not damagable:CanDamage(shotPacket.Player) then continue end;
 			
 			if shotPacket.Player then
-				modDamageTag.Tag(targetModel, shotPacket.Player.Character, (targetObject.Name == "Head" or targetObject:GetAttribute("IsHead") == true) and true or nil);
+				modDamageTag.Tag(targetModel, shotPacket.Player.Character, {
+					WeaponItemId=itemId;
+					IsHeadshot=((targetObject.Name == "Head" or targetObject:GetAttribute("IsHead") == true) and true or nil);
+				});
 			end
 
 			local preModDamage = configurations.PreModDamage;

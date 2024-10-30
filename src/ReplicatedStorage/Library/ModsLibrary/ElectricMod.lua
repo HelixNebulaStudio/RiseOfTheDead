@@ -91,7 +91,10 @@ if RunService:IsServer() then
 						
 						if targetsHit < propertiesOfMod.Targets then
 							task.delay(0.1, function()
-								modDamageTag.Tag(strikeModel, player.Character, strikePart.Name == "Head" and true or nil);
+								modDamageTag.Tag(strikeModel, player.Character, {
+									WeaponItemId=weaponItem.ItemId;
+									IsHeadshot=strikePart.Name == "Head" and true or nil;
+								});
 
 								local weaponDamage = toolModule.Configurations.PreModDamage;
 								local dmgRatio = math.clamp(propertiesOfMod.DamagePercent - 0.02*targetsHit, 0.05, 1);

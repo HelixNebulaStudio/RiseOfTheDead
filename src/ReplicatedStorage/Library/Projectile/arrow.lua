@@ -83,7 +83,10 @@ function Pool.new(owner)
 						self.DamageSource.DamageType = shotCache.CritOccured or self.DamageSource.DamageType;
 						
 						modWeaponsMechanics.ProcessModHooks(self.DamageSource);
-						modDamageTag.Tag(model, self.Owner.Character);
+						modDamageTag.Tag(model, self.Owner.Character, {
+							WeaponItemId=(self.StorageItem and self.StorageItem.ItemId or nil);
+							IsHeadshot=hitObj.Name == "Head" and true or nil;
+						});
 
 						damagable:TakeDamagePackage(self.DamageSource);
 					end

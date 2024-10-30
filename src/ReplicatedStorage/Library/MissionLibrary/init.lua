@@ -2825,20 +2825,21 @@ MissionLibrary.New{
 };
 
 
--- MARK: 82 - Slaughter King
+-- MARK: 82 - Candy Hoarder
 MissionLibrary.New{
 	MissionId=82;
 	MissionType = MissionLibrary.MissionTypes.Board;
-	Name="Slaughter King";
-	Description="Get top 3 in Slaughterfest with at least a kill.";
+	Name="Candy Hoarder";
+	Description="Complete Slaughterfest round with at least 500 candies.";
 	Timer=BoardTimeLimit;
 	Persistent=true;
 	Checkpoint={
-		{Text="Get top 3 in Slaughterfest";};
+		{Text="Complete Slaughterfest round with at least 500 candies";};
+		{Text="Completed"; AutoComplete=true;};
 	};
 	SaveData={};
 	GuideText="";
-	Tier="Hard";
+	Tier="Halloween";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Hard};
 		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
@@ -2847,7 +2848,6 @@ MissionLibrary.New{
 		{Type="SpecialEvent"; Value="Halloween"};
 		{Type="Level"; Value=30};
 	};
-	
 };
 
 -- MARK: 666 - TestMission

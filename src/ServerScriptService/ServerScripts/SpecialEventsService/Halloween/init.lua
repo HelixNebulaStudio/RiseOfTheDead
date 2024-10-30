@@ -24,7 +24,8 @@ local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 
 local remoteHalloween = modRemotesManager:NewFunctionRemote("Halloween", 1);
 
-local rewardLib = modRewardsLibrary:Find("slaughterfestcandyrecipes24");
+local cauldronRewardLib = modRewardsLibrary:Find("slaughterfestcauldron");
+local festRewardLib = modRewardsLibrary:Find("slaughterfestcandyrecipes24");
 
 SpecialEvent.Cache = {
 	CandyPool = 0;	
@@ -152,7 +153,7 @@ function SpecialEvent.LoadSlaughterfestDialogues(trickNpcList, treatNpcList)
 
 	local npcSeed = npcSeedOverride or modSyncTime.TimeOfEndOfDay();
 	for a=1, #treatNpcList do
-		local npcInfo = trickNpcList[a];
+		local npcInfo = treatNpcList[a];
 		local npcName = npcInfo.Id;
 
 		local candyRandom = Random.new(npcSeed+a);
@@ -525,6 +526,99 @@ function remoteHalloween.OnServerInvoke(player, packet)
 
 		return rPacket;
 
+	elseif action == "CookNew" then
+		if packet.ItemId == nil then return end;
+		if festRewardLib == nil then return end;
+
+		local rewardsList = festRewardLib.Rewards;
+		local existIndex = nil;
+
+		for a=1, #rewardsList do
+			if rewardsList[a].ItemId == packet.ItemId then
+				existIndex = a;
+				break;
+			end	
+		end
+		if existIndex == nil then return end;
+
+		local tierRecipeCost = {
+			[1] = 10;
+			[2] = 15;
+			[3] = 20;
+		};
+		local rewardInfo = rewardsList[existIndex];
+
+		local cookCostSeed = modSyncTime.TimeOfEndOfDay();
+		local cookCostAmount = tierRecipeCost[rewardInfo.Tier];
+		local costRandom = Random.new(cookCostSeed+(existIndex*100));
+
+		local candyCost = {};
+		local candyOrder = {};
+		for b=1, cookCostAmount do
+			local pickCandyId = candyTypes[costRandom:NextInteger(1, #candyTypes)];
+
+			if table.find(candyOrder, pickCandyId) == nil then
+				table.insert(candyOrder, pickCandyId);
+			end
+			candyCost[pickCandyId] = (candyCost[pickCandyId] or 0) +1;
+		end
+		Debugger:StudioWarn("candyCost", candyCost);
+
+		local recipeItems = {};
+		for b=1, #candyOrder do
+			local candyItemId = candyOrder[b];
+			local amt = candyCost[candyItemId];
+
+			local recipeCandyItem = nil;
+			for a=1, #recipeItems do
+				if recipeItems[a].ItemId == candyItemId then
+					recipeCandyItem = recipeItems[a];
+					break;
+				end
+			end
+			if recipeCandyItem == nil then
+				recipeCandyItem = {
+					ItemId = candyItemId;
+					Amount = amt;
+				};
+				table.insert(recipeItems, recipeCandyItem);
+			end
+		end
+		
+		Debugger:Warn("Cook",rewardInfo.ItemId,"Recipe", recipeItems);
+
+		local hasSpace = activeInventory:SpaceCheck({{ItemId=rewardInfo.ItemId; Data={Quantity=1};}});
+		if not hasSpace then
+			shared.Notify(player, "Not enough inventory space.", "Negative");
+			return;
+		end
+
+		local fulfill, itemsList = shared.modStorage.FulfillList(player, recipeItems);
+		if not fulfill then
+			for _, candyItem in pairs(itemsList) do
+				local itemLib = modItemsLibrary:Find(candyItem.ItemId);
+				shared.Notify(player, `Not enough {itemLib.Name}, {candyItem.Amount} required.`, "Negative");
+			end
+			return
+		end;
+
+		shared.modStorage.ConsumeList(itemsList);
+		activeInventory:Add(rewardInfo.ItemId, nil, function()
+			local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
+			shared.Notify(player, `You received a {itemLib.Name}.`, "Reward");
+		end);
+
+		profile.Flags:Sync("Slaughterfest");
+
+		local slaughterfestData = profile.Flags:Get("Slaughterfest");
+		if slaughterfestData.RecipesCooked == nil then
+			slaughterfestData.RecipesCooked = {};
+		end
+		slaughterfestData.RecipesCooked[rewardInfo.ItemId] = (slaughterfestData.RecipesCooked[rewardInfo.ItemId] or 0) + 1;
+
+		rPacket.Success = true;
+		return rPacket;
+
 	elseif action == "Cook" then
 		if packet.ItemId == nil then return end;
 
@@ -534,7 +628,7 @@ function remoteHalloween.OnServerInvoke(player, packet)
 		local shopRewardInfoList = {};
 
 		for a=1, 10 do
-			local rewardsData = modDropRateCalculator.RollDrop(rewardLib, rollSeed/a);
+			local rewardsData = modDropRateCalculator.RollDrop(cauldronRewardLib, rollSeed/a);
 			local rewardInfo = rewardsData[1];
 			if rewardInfo == nil then continue end;
 
@@ -631,6 +725,10 @@ function remoteHalloween.OnServerInvoke(player, packet)
 		end);
 
 		profile.Flags:Sync("Slaughterfest");
+		if slaughterfestData.RecipesCooked == nil then
+			slaughterfestData.RecipesCooked = {};
+		end
+		slaughterfestData.RecipesCooked[chosenRewardInfo.ItemId] = (slaughterfestData.RecipesCooked[chosenRewardInfo.ItemId] or 0) + 1;
 
 		rPacket.Success = true;
 		return rPacket;
@@ -709,9 +807,9 @@ function remoteHalloween.OnServerInvoke(player, packet)
 		if itemId == nil then rPacket.Error=1; return rPacket end;
 		
 		local reward;
-		for a=1, #rewardLib do
-			if rewardLib[a].ItemId == itemId then
-				reward = rewardLib[a];
+		for a=1, #cauldronRewardLib do
+			if cauldronRewardLib[a].ItemId == itemId then
+				reward = cauldronRewardLib[a];
 				break;
 			end
 		end

@@ -48,7 +48,10 @@ function Pool.new(owner)
 
 			if damagable.Object.ClassName == "NpcStatus" then
 				local npcModule = npcStatus:GetModule();
-				modDamageTag.Tag(npcModule.Prefab, self.Owner.Character);
+				modDamageTag.Tag(npcModule.Prefab, self.Owner.Character, {
+					WeaponItemId=(self.StorageItem and self.StorageItem.ItemId or nil);
+					IsHeadshot=hitPart.Name == "Head" and true or nil;
+				});
 			end
 
 			npcStatus:TakeDamagePackage(modDamagable.NewDamageSource{

@@ -1988,6 +1988,7 @@ task.spawn(function()
 	shared.modCommandsLibrary:HookChatCommand("flags", {
 		Permission = shared.modCommandsLibrary.PermissionLevel.Admin;
 		Description = [[flags commands.
+		/flags get flagid
 		/flags del flagid
 		]];
 
@@ -1998,8 +1999,14 @@ task.spawn(function()
 			
 			local action = args[1];
 			
-			
-			if action == "del" then
+			if action == "get" then
+				local flagId = args[2];
+
+				local flagData = profile.Flags:Get(flagId);
+				shared.Notify(player, `Get flag {flagId}:\n{Debugger:Stringify(flagData)}`, "Inform");
+				Debugger:Warn("flagData", flagData);
+
+			elseif action == "del" then
 				local flagId = args[2];
 
 				profile.Flags:Remove(flagId);
