@@ -124,14 +124,23 @@ local SpecialEventsTable = {
 	NewYear = {Month="January";};
 	AprilFools = {Month="April"; DaysBefore=7;}; -- First week of April;
 	Easter = {Month="April"; DaysAfter=8;}; -- Second week of April;
-	Halloween = {Month="October"; DaysAfter=8;}; -- second week of October;
+	Halloween = {Month={"October"; "November";};}; -- second week of October;
 	Christmas = {Month="December"};
 };
 local SpecialEvents = {};
 
 for eventId, dateTable in pairs(SpecialEventsTable) do
 	local isActive = false;
-	if dateTable.Month and os.date("%B") == dateTable.Month then
+
+	if typeof(dateTable.Month) == "table" then
+		isActive = false;
+		for a=1, #dateTable.Month do
+			if dateTable.Month[a] == os.date("%B") then
+				isActive = true;
+				break;
+			end	
+		end
+	elseif dateTable.Month and os.date("%B") == dateTable.Month then
 		if dateTable.DaysBefore then
 			isActive = tonumber(os.date("%d")) <= dateTable.DaysBefore;
 		elseif dateTable.DaysAfter then
@@ -147,8 +156,6 @@ for eventId, dateTable in pairs(SpecialEventsTable) do
 
 	SpecialEvents[eventId] = isActive;
 end
-
-SpecialEvents.Halloween = true;
 
 Configurations.Set("SpecialEvent", SpecialEvents);
 
