@@ -1345,7 +1345,7 @@ Commands["itsshowtime"] = {
 	RequiredArgs = 0;
 	UsageInfo = "/itsshowtime";
 	Function = function(player, args)
-		if modBranchConfigs.IsWorld("MainMenu") then
+		if modBranchConfigs.IsWorld("MainMenu") or modBranchConfigs.CurrentBranch.Name == "Dev" then
 			local classPlayer = shared.modPlayers.Get(player);
 			classPlayer:Spawn();
 		end
