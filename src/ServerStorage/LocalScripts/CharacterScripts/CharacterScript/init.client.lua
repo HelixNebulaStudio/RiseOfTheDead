@@ -108,9 +108,11 @@ local slopeUpFriction = 3;
 local slopeDownFriction = 3;
 
 local dashDirection = Vector3.new();
+local dashCooldown = tick()-5;
 local oldDashMomentum = 0;
 local airDashYForce = 0;
-local dashMomentumDecay = 3;
+local dashMomentumDecay = 4;
+local slideFromDashTick = nil;
 
 local heartbeatSecTick = tick()-1;
 
@@ -599,6 +601,15 @@ local function startSliding()
 	bodyVelocity.MaxForce = Vector3.new(40000, 0, 40000);
 	bodyVelocity.Velocity = slideDirection*oldSlideMomentum;
 
+	if slideSound then
+		slideSound.PlaybackSpeed = random:NextNumber(1.2, 1.5);
+		slideSound.Volume = 0.15;
+		slideSound:Play();
+	else
+		slideSound = head:FindFirstChild("BodySlide");
+	end
+	dustParticle.Enabled = true;
+
 	-- OLD SLIDE;
 	-- if slideSound then
 	-- 	slideSound.PlaybackSpeed = random:NextNumber(1.2, 1.5);
@@ -619,7 +630,7 @@ end
 -- MARK: startDashing
 local airDashYDiminish = 4000;
 local function startDashing()
-	dashMomentumDecay = character:GetAttribute("DashMomentumDecay") or 4;
+	--dashMomentumDecay = character:GetAttribute("DashMomentumDecay") or 4;
 
 	local inputVector: Vector3 = rbxPlayerModule:GetControls():GetMoveVector();
 
@@ -650,6 +661,9 @@ local function crouchRequest(value)
 			and (tick()-slideCooldown)>0.7
 			and not characterProperties.IsWounded then
 				
+			if characterProperties.IsDashing then
+				slideFromDashTick = tick();
+			end
 			characterProperties.IsDashing = false;
 			startSliding();
 		end
@@ -1021,9 +1035,11 @@ end
 
 -- MARK: stopDashing
 function stopDashing(delayTime)
+	if not characterProperties.IsDashing then return end;
+	characterProperties.IsDashing = false;
+	dashCooldown = tick();
 	Cache.lastDash = nil;
 	airDashYForce = 0;
-	characterProperties.IsDashing = false;
 	bodyVelocity.MaxForce = Vector3.new(0, 0, 0);
 	characterProperties.DashVelocity = Vector3.zero;
 end
@@ -1032,6 +1048,7 @@ end
 function stopSliding(delayTime)
 	Cache.lastSlide = nil;
 	characterProperties.IsSliding = false;
+	slideFromDashTick = nil;
 	if slideSound then
 		spawn(function() 
 			repeat 
@@ -1890,8 +1907,6 @@ RunService.Stepped:Connect(function(total, delta)
 					CFrame = CFrame.lookAt(Vector3.zero, currentCamera.CFrame.LookVector);
 					Enabled = true;
 				};
-
-				Debugger:StudioLog("AirJump");
 			end
 		end
 
@@ -2055,7 +2070,7 @@ RunService.Stepped:Connect(function(total, delta)
 
 			local inputVector: Vector3 = rbxPlayerModule:GetControls():GetMoveVector();
 			if inputVector.X == 0 and inputVector.Z == 0 then
-
+			elseif tick()-dashCooldown<= 0.2 then
 			elseif not airDashing or Cache.AirDashCounter < maxAirDash then
 				if airDashing then
 					Cache.AirDashCounter = Cache.AirDashCounter +1;
@@ -2560,6 +2575,7 @@ RunService.PostSimulation:Connect(function(deltaTimeSim)
 
 		elseif characterProperties.IsSliding then -- MARK: IsSliding Mechanics
 			if animations["slide"] then animations["slide"]:Play(); end
+			if animations["dashForward"].IsPlaying then animations["dashForward"]:Stop() end;
 			characterProperties.WalkSpeed:Set("default", 0);
 			
 			if not humanoid.Sit and not humanoid.PlatformStand and not humanoid.Jump then
@@ -2573,7 +2589,9 @@ RunService.PostSimulation:Connect(function(deltaTimeSim)
 					slideMomentum = math.min(slideMomentum + (slopeDot/slopeDownFriction) * 60*deltaTimeSim, characterProperties.SlideSpeed*1.5);
 				else
 					-- <0: slide up;
-					slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.3) *slopeUpFriction * 60*deltaTimeSim;
+					if slideFromDashTick == nil or tick()-slideFromDashTick > 0.5 then
+						slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.3) *slopeUpFriction * 60*deltaTimeSim;
+					end
 				end
 				bodyVelocity.Velocity = slideDirection*math.max(slideMomentum, 0);
 				oldSlideMomentum = slideMomentum;

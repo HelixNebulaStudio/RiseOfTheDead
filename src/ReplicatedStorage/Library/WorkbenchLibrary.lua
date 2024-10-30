@@ -548,7 +548,9 @@ WorkbenchLibrary.ItemUpgrades={
 	["jackolantern"]={
 		Type={"Head"};
 	};
-	
+	["ninjashroud"]={
+		Type={"Head"};
+	};
 	
 	-- Chest
 	["labcoat"]={
@@ -582,6 +584,9 @@ WorkbenchLibrary.ItemUpgrades={
 		Type={"Chest"};
 	};
 	["apron"]={
+		Type={"Chest"};
+	};
+	["ninjacloak"]={
 		Type={"Chest"};
 	};
 	
