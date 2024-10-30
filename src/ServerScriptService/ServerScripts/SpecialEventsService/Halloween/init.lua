@@ -259,14 +259,14 @@ function SpecialEvent.SlaughterfestGetCandyTrade(npcName)
 	local candyRandom = Random.new(npcSeed+npcIndex);
 	local biasRng = candyRandom:NextNumber();
 
-	local candyWantAmt = candyRandom:NextInteger(3, 4);
+	local candyWantAmt = candyRandom:NextInteger(3, 5);
 	local candyForAmt = candyRandom:NextInteger(2, 4);
 
 	if candyWantAmt > candyForAmt and biasRng > 0.4 then -- 60% chance to equal;
-	candyWantAmt = candyWantAmt -1;
+		candyWantAmt = candyWantAmt -1;
 	end
-	if candyForAmt > candyWantAmt and biasRng > 0.1 then -- 10% chance to better;
-		candyWantAmt, candyForAmt = candyForAmt, candyWantAmt;
+	if candyForAmt > candyWantAmt then
+		candyWantAmt = candyForAmt;
 	end
 
 	local candyWantList = {};

@@ -753,6 +753,11 @@ function Interface.init(modInterface)
 			local textLabel = newListing:WaitForChild("TextLabel");
 			newListing.Parent = treatNpcScrollFrame;
 
+			local avatarLabel = newListing:WaitForChild("AvatarLabel");
+			if slaughterfestData.ClaimedTreats and slaughterfestData.ClaimedTreats[npcName] then
+				avatarLabel.Image = npcProfileLib.Avatar;
+			end
+
 			local DescTypes = {
 				{Str=`$Gender with $Hair`; Keys={"Gender"; "Hair"}; Gender={["M"]="Guy"; ["F"]="Gal"};};
 				{Str=`Some $Role $Gender`; Keys={"Gender"; "Role"}; Gender={["M"]="Gentleman"; ["F"]="Lady"};};
