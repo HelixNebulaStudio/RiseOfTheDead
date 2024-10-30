@@ -47,7 +47,7 @@ local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 Debugger.AwaitShared("modPlayers");
 
 -- Flags;
-modCharacter.SprintMode = 1;
+modCharacter.SprintMode = modConfigurations.DefaultSprintMode or 1;
 
 local classPlayer = shared.modPlayers.Get(localPlayer);
 
@@ -2063,6 +2063,15 @@ RunService.Stepped:Connect(function(total, delta)
 	-- MARK: Dashing
 	if classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaFleet then
 		modCharacter.SprintMode = 2;
+	else
+		modCharacter.SprintMode = modConfigurations.DefaultSprintMode or 1;
+	end
+
+	if modCharacter.SprintMode == 2 then
+		if (Cache.LastDamaged == nil or tick()-Cache.LastDamaged > 2) and not characterProperties.IsFocused then
+			characterProperties.IsSprinting = true;
+		end
+
 		local maxAirDash = 1;
 		if characterProperties.SprintKeyDown and characterProperties.IsDashing == false and characterProperties.IsSliding == false and dashDebounce == false then
 			dashDebounce = true;
@@ -2083,13 +2092,6 @@ RunService.Stepped:Connect(function(total, delta)
 			dashDebounce = false;
 
 		end
-
-	else
-		modCharacter.SprintMode = 1;
-	end
-
-	if modCharacter.SprintMode == 2 and (Cache.LastDamaged == nil or tick()-Cache.LastDamaged > 2) and not characterProperties.IsFocused then
-		characterProperties.IsSprinting = true;
 	end
 
 	local s = pcall(function()

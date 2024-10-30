@@ -66,6 +66,7 @@ Configurations.Set("KnockoutOnDeath", 0);
 Configurations.Set("VelocityTriggerRagdoll", false);
 Configurations.Set("DisableMapItems", true);
 Configurations.Set("DisableHurtInterface", false);
+Configurations.Set("DefaultSprintMode", 1);
 
 Configurations.Set("IgnoreModCompatibility", false);
 

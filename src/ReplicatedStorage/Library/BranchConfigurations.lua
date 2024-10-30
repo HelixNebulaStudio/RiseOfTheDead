@@ -570,6 +570,7 @@ elseif Branches.WorldInfo.Type == Branches.WorldTypes.Slaughterfest then
 	modConfigurations.Set("DisableHotbar", true);
 	modConfigurations.Set("CanQuickEquip", false);
 
+	modConfigurations.Set("DefaultSprintMode", 2);
 	modConfigurations.Set("DisableSettingsMenu", false);
 	modConfigurations.Set("DisableSocialMenu", false);
 	modConfigurations.Set("DisableSquadInterface", false);
