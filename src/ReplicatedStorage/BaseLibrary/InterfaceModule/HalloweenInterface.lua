@@ -606,7 +606,7 @@ function Interface.init(modInterface)
 		end
 
 		-- MARK: Exchange & Treats
-		local npcSeed = modSyncTime.TimeOfEndOfDay();
+		local npcSeed = workspace:GetAttribute("SlaughterfestSeed") or modSyncTime.TimeOfEndOfDay();
 		local npcRandom = Random.new(npcSeed);
 
 		local survivorsList = modNpcProfileLibrary:ListByMatchFunc(function(libItem)
@@ -741,7 +741,7 @@ function Interface.init(modInterface)
 			if not obj:IsA("GuiObject") then continue end;
 			game.Debris:AddItem(obj, 0);
 		end
-		local npcSeed = modSyncTime.TimeOfEndOfDay();
+		
 		for a=1, #treatNpcList do
 			local npcInfo = treatNpcList[a];
 			local npcName = npcInfo.Id;
@@ -763,13 +763,13 @@ function Interface.init(modInterface)
 				{Str=`Some $Role $Gender`; Keys={"Gender"; "Role"}; Gender={["M"]="Gentleman"; ["F"]="Lady"};};
 				{Str=`$Gender wearing $Clothing`; Keys={"Gender"; "Clothing"}; Gender={["M"]="Man"; ["F"]="Woman"};};
 				{Str=`Someone with $Hair wearing $Clothing`; Keys={"Hair"; "Clothing"}};
-				{Str=`Some guy with $Hair and $Beard`; Keys={"Hair"; "Beard"}};
+				{Str=`Someone with $Hair and $Beard`; Keys={"Hair"; "Beard"}};
 				{Str=`Person with the $Scar Scar`; Keys={"Scar";}};
 			};
 			for b=#DescTypes, 1, -1 do
 				local missingKey = false;
 				for c=1, #DescTypes[b].Keys do
-					if npcProfileLib.Descriptors[DescTypes[b].Keys[c]] == nil then
+					if npcProfileLib.Descriptors == nil or npcProfileLib.Descriptors[DescTypes[b].Keys[c]] == nil then
 						missingKey = true;
 					end
 				end

@@ -113,7 +113,13 @@ library:Add{Id="Vladimir"; Class="RAT"; World="TheUnderground";};
 library:Add{Id="Maverick"; Class="RAT"; World="TheMall";};
 library:Add{Id="Danny"; Class="Medic"; HeadIcon="Heal"; World="TheMall"; Avatar="rbxassetid://15641531785";};
 
-library:Add{Id="Patrick"; Class="Bandit"; World="TheMall"; Avatar="rbxassetid://15641420747";};
+library:Add{Id="Patrick"; Class="Bandit"; World="TheMall"; Avatar="rbxassetid://15641420747";
+	Descriptors={
+		Hair="Short Blue";
+		Gender="M";
+		Clothing={"Bandana"; "Military Vest"; "Camo Pants"};
+	};
+};
 library:Add{Id="Alice"; Class="RAT"; World="TheMall";};
 library:Add{Id="Molly"; Class="Medic"; HeadIcon="Heal"; World="TheMall";};
 library:Add{Id="Mike"; Class="Survivor"; World="TheMall"; Avatar="rbxassetid://15641532613";

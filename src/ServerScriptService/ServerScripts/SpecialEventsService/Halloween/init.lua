@@ -881,6 +881,7 @@ task.spawn(function()
 		Description = [[Slaughterfest commands.
 		/slaughterfest addreroll [amount]
 		/slaughterfest skiprerolltimer
+		/slaughterfest setseed [number]
 		]];
 
 		RequiredArgs = 0;
@@ -910,9 +911,10 @@ task.spawn(function()
 				local fulfillLists = SpecialEvent.SlaughterfestGetCandyTrade(npcName);
 				Debugger:Warn("fulfillLists", fulfillLists);
 
-			elseif actionId == "settradeseed" then
+			elseif actionId == "setseed" then
 				local seed = tonumber(args[2]);
 				npcSeedOverride = seed;
+				workspace:SetAttribute("SlaughterfestSeed", seed);
 				Debugger:Warn("setseed", npcSeedOverride);
 				SpecialEvent.SlaughterfestGetCandyTrade();
 			end
