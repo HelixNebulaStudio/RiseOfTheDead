@@ -92,6 +92,7 @@ return function(npc, spawnPoint)
 			ResourceDrop=modRewardsLibrary:Find("zombie");
 		};
 
+		Detectable=false;
 		WeakPointHidden=true;
 	};
 	

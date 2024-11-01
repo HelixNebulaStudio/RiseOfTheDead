@@ -3,13 +3,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Dependencies;
 repeat task.wait() until shared.MasterScriptInit == true;
 
-local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
+local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
@@ -649,8 +649,10 @@ end
 
 local discOnEnemiesAttract;
 discOnEnemiesAttract = modOnGameEvents:ConnectEvent("OnEnemiesAttract", function(p, st)
+	if modBranchConfigs.IsWorld("Slaughterfest") then return end;
 	if not workspace:IsAncestorOf(turretArm) then discOnEnemiesAttract(); end;
 	if p ~= player then return end;
+	
 	selectedTargets = st or {};
 end)
 
