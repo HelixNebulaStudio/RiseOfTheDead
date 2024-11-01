@@ -10,6 +10,7 @@ local Keys = {
 local MemoryStoreService = game:GetService("MemoryStoreService");
 local halloweenMemory = MemoryStoreService:GetHashMap(Keys.MemMap);
 
+local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -882,6 +883,7 @@ task.spawn(function()
 		/slaughterfest addreroll [amount]
 		/slaughterfest skiprerolltimer
 		/slaughterfest setseed [number]
+		/slaughterfest endround
 		]];
 
 		RequiredArgs = 0;
@@ -917,6 +919,16 @@ task.spawn(function()
 				workspace:SetAttribute("SlaughterfestSeed", seed);
 				Debugger:Warn("setseed", npcSeedOverride);
 				SpecialEvent.SlaughterfestGetCandyTrade();
+				shared.Notify(player, "seet set", "Inform");
+
+			elseif actionId == "endround" then
+				local activeGameController = modGlobalVars.ActiveGameController;
+
+				if activeGameController and activeGameController.ModeType == "Pvp" and activeGameController.ModeStage == "Slaughterfest" then
+					activeGameController.RoundEndTick = workspace:GetServerTimeNow()+10;
+					workspace:SetAttribute("RoundEndTick", activeGameController.RoundEndTick);
+					shared.Notify(player, "end round", "Inform");
+				end
 			end
 
 			return true;

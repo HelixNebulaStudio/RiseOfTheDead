@@ -36,22 +36,34 @@ function DiscordWebhook.PostText(hookId, text)
         if workspace:GetAttribute("IsDev") then
             text = "**[DB]** "..text;
         end
-        local dataStr: string = HttpService:JSONEncode({
-            ["content"] = text;
-        });
-        Debugger:StudioLog(HttpService:PostAsync(hookId, dataStr));
+        
+        local s, e = pcall(function()
+            local dataStr: string = HttpService:JSONEncode({
+                ["content"] = text;
+            });
+            Debugger:StudioLog(HttpService:PostAsync(hookId, dataStr));
+        end)
+        if not s then
+            Debugger:Warn(e);
+        end
     end)
 end
 
 function DiscordWebhook.PostEmbed(hookId, dataFunc: (embedPacket: typeof(EmbedPacket.embeds[1])) -> typeof(EmbedPacket.embeds[1]))
     task.spawn(function()
-        local embedPacket = table.clone(EmbedPacket);
-        dataFunc(embedPacket.embeds[1]);
-        if workspace:GetAttribute("IsDev") then
-            embedPacket.embeds[1].description = "**[DB]** "..embedPacket.embeds[1].description;
+        local s, e = pcall(function()
+            local embedPacket = table.clone(EmbedPacket);
+            dataFunc(embedPacket.embeds[1]);
+            if workspace:GetAttribute("IsDev") then
+                embedPacket.embeds[1].description = "**[DB]** "..embedPacket.embeds[1].description;
+            end
+
+            local dataStr: string = HttpService:JSONEncode(embedPacket);
+            Debugger:StudioLog(HttpService:PostAsync(hookId, dataStr));
+        end)
+        if not s then
+            Debugger:Warn(e);
         end
-        local dataStr: string = HttpService:JSONEncode(embedPacket);
-        Debugger:StudioLog(HttpService:PostAsync(hookId, dataStr));
     end)
 end
 

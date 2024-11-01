@@ -305,4 +305,6 @@ Vars.FactionPermissions:AddFlag("CustomizeHq", "Customize Headquarters");
 
 Vars.EngineMode = game.ReplicatedFirst:FindFirstChild("EngineMode") and game.ReplicatedFirst.EngineMode.Value or Vars.EngineMode;
 
+Vars.ActiveGameController = nil;
+
 return Vars;
