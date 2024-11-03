@@ -764,7 +764,7 @@ function Interface.init(modInterface)
 				{Str=`$Gender wearing $Clothing`; Keys={"Gender"; "Clothing"}; Gender={["M"]="Man"; ["F"]="Woman"};};
 				{Str=`Someone with $Hair wearing $Clothing`; Keys={"Hair"; "Clothing"}};
 				{Str=`Someone with $Hair and $Beard`; Keys={"Hair"; "Beard"}};
-				{Str=`Person with the $Scar Scar`; Keys={"Scar";}};
+				{Str=`Person with a $Item`; Keys={"Item";}};
 			};
 			for b=#DescTypes, 1, -1 do
 				local missingKey = false;
