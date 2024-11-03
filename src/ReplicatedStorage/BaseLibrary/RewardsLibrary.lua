@@ -194,6 +194,11 @@ function RewardsLibrary:Init(super)
 		Id="slaughterfestcandyrecipes24";
 		Rewards={
 			{ItemId="jackolanternhaunted"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="tirearmorhaunted"; Quantity=1; Chance=1; Tier=2;};
+			{ItemId="nvghaunted"; Quantity=1; Chance=1; Tier=3;};
+
+			{ItemId="brownleatherbootsblack"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="aproncarnage"; Quantity=1; Chance=1; Tier=2;};
 		};
 		SpecialEvent="Halloween";
 	};

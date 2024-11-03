@@ -1622,6 +1622,27 @@ GoldShopLibrary.Products:Add{
 	};
 };
 
+GoldShopLibrary.Products:Add{
+	Id="ninjashroud";
+	Product={
+		Type="Gold";
+		Price=9990;
+		ItemId="ninjashroud";
+		New=true;
+		Desc="\n\n\n<b>[Early Access]</b>  Will be obtainable from drops in the future.";
+	};
+};
+
+GoldShopLibrary.Products:Add{
+	Id="ninjacloak";
+	Product={
+		Type="Gold";
+		Price=9990;
+		ItemId="ninjacloak";
+		New=true;
+		Desc="\n\n\n<b>[Early Access]</b>  Will be obtainable from drops in the future.";
+	};
+};
 
 
 --=== CONTENT PAGES
@@ -1833,6 +1854,13 @@ GoldShopLibrary.Pages = {
 		--	TitleText="Diving Set";
 		--	Desc="• Full diving outfit.";
 		--};
+		{
+			Type="Page";
+			Id="NinjaSet";
+			Icon="rbxassetid://78019079266385";
+			TitleText="Ninja Set";
+			Desc="• Full ninja outfit.";
+		};
 		{Type="Product"; Id="ziphoningserum"};
 		{Type="Product"; Id="abandonedbunkermap"};
 	};
@@ -1842,6 +1870,10 @@ GoldShopLibrary.Pages = {
 	--	{Type="Product"; Id="divingsuit"};
 	--	{Type="Product"; Id="inflatablebuoy"};
 	--};
+	NinjaSet = {
+		{Type="Product"; Id="ninjashroud"};
+		{Type="Product"; Id="ninjacloak"};
+	};
 };
 
 for itemId, lib in pairs(GoldShopLibrary.Products:GetAll()) do

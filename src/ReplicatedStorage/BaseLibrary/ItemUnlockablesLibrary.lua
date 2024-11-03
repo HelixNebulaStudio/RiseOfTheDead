@@ -771,6 +771,16 @@ function ItemUnlockablesLibrary:Init(library)
 		};
 		SurfaceAppearanceParent=script;
 	};
+	
+	library:Add{
+		Id="tirearmorhaunted";
+		ItemId="tirearmor";
+		Name="Haunted";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17248585652";
+		};
+		SurfaceAppearanceParent=script;
+	};
 
 	
 	--== MARK: dufflebag
@@ -919,6 +929,28 @@ function ItemUnlockablesLibrary:Init(library)
 	};
 
 
+	--== MARK: nvg
+	library:Add{
+		Id="nvg";
+		ItemId="nvg";
+		Name="Default";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://18300273818";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="nvghaunted";
+		ItemId="nvg";
+		Name="Haunted";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://71176524889324";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+
 	--== MARK: jackolantern
 	library:Add{
 		Id="jackolantern";
@@ -936,6 +968,28 @@ function ItemUnlockablesLibrary:Init(library)
 		Name="Haunted";
 		SurfaceAppearance={
 			ColorMap="rbxassetid://126543190548570";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+
+	--== MARK: apron
+	library:Add{
+		Id="apron";
+		ItemId="apron";
+		Name="Default";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://17382127448";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="aproncarnage";
+		ItemId="apron";
+		Name="Carnage";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://78844705064427";
 		};
 		SurfaceAppearanceParent=script;
 	};
@@ -995,6 +1049,7 @@ function ItemUnlockablesLibrary:Init(library)
 		SurfaceAppearanceParent=script;
 	};
 
+	
 end
 
 return ItemUnlockablesLibrary;

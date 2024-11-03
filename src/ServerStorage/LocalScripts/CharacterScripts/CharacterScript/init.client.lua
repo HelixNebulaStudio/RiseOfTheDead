@@ -1887,10 +1887,10 @@ RunService.Stepped:Connect(function(total, delta)
 	if isJumping == true and jumpDebounce ~= true then
 		jumpDebounce = true;
 
-		-- MARK: Double jumping
+		-- MARK: Air jumping
 		if classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaAgility then
 			local maxAirJumps = 1;
-			if humanoid.FloorMaterial == Enum.Material.Air and Cache.AirJumpsCounter < maxAirJumps then
+			if humanoid.FloorMaterial == Enum.Material.Air and Cache.AirJumpsCounter < maxAirJumps and not characterProperties.IsWounded then
 				humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
 				Cache.AirJumpsCounter = Cache.AirJumpsCounter +1;
 
@@ -2067,7 +2067,7 @@ RunService.Stepped:Connect(function(total, delta)
 		modCharacter.SprintMode = modConfigurations.DefaultSprintMode or 1;
 	end
 
-	if modCharacter.SprintMode == 2 then
+	if modCharacter.SprintMode == 2 and not characterProperties.IsWounded then
 		if (Cache.LastDamaged == nil or tick()-Cache.LastDamaged > 2) and not characterProperties.IsFocused then
 			characterProperties.IsSprinting = true;
 		end

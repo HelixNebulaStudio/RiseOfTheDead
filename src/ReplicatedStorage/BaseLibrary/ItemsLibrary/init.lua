@@ -178,7 +178,7 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="cultisthood"; Name="Cultist Hood"; Icon="rbxassetid://5550425398"; Tags={"Head"}; Description="Live in the shadows and pull the strings..\n<b>[Passive] Hoods Pact:</b> When damaged by a zombie, a Cultist will spawn to help you kill the zombie. (Cooldown: 10s)"; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
 	new(clothingBase, {Id="onyxhoodiehood"; Name="OnyxHound Hoodie's Hood"; Icon="rbxassetid://5644700762"; Tags={"Head"}; Description="Ultra Rare OnyxHound Hood.";});
 	new(clothingBase, {Id="disguisekit"; Name="Disguise Kit"; Icon="rbxassetid://5783987908"; Tags={"Head"}; Usable="Disguise"; Description="Disguise yourself as anything available. Right-click to open disguse menu. To unlock new disguises, get kills in order to unlock. Unlock progress only saves on this item, so deleting this item will lose your disguise progression. Trading this item will also lose all kills saved in this item.";});
-	new(clothingBase, {Id="nvg"; Name="Night Vision Goggles"; Icon="rbxassetid://6008673515"; Tags={"Head"}; Description="Night vision goggles.\n<b>[Passive] Nights Light:</b> Enhances visibility in the dark.";});
+	new(clothingBase, {Id="nvg"; Name="Night Vision Goggles"; Icon="rbxassetid://108723648769674"; Tags={"Head"}; Description="Night vision goggles.\n<b>[Passive] Nights Light:</b> Enhances visibility in the dark.";});
 	new(clothingBase, {Id="strawhat"; Name="Straw Hat"; Icon="rbxassetid://6416330399"; Tags={"Head"}; Description="It ain't much, but it's honest hard work.";});
 	new(clothingBase, {Id="zriceraskull"; Name="Zricera Skull"; Icon="rbxassetid://6806306800"; Tags={"Head"}; Description="Strength of a beast and shield of the skull.";});
 	new(clothingBase, {Id="hazmathood"; Name="Hazmat Hood"; Icon="rbxassetid://7021892111"; Tags={"Head"}; Description="Hazmat hood part of the hazmat suit.";});
@@ -860,12 +860,16 @@ function ItemsLibrary:Init(super)
 		Sources={"Obtained from Slaughterfest.";};
 	});
 	local candyCaravanStr = "Eatible candies but why not cook them in the Slaughterfest Cauldron for something much more special instead?\n";
-	new(foodBase, {Id="zombiejello"; Name="Zombie Jello"; Icon="rbxassetid://99854271826378"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] After eating this, you get a craving for brainsss.."; Tradable=super.Tradable.Nontradable;});
-	new(foodBase, {Id="eyeballgummies"; Name="Eyeball Gummies"; Icon="rbxassetid://72634660358826"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] Heighten vision that gives you the ability to see vibrations.."; Tradable=super.Tradable.Nontradable;});
-	new(foodBase, {Id="spookmallow"; Name="Spookmallow"; Icon="rbxassetid://93144909042467"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] TBD"; Tradable=super.Tradable.Nontradable;});
+	new(foodBase, {Id="zombiejello"; Name="Zombie Jello"; Icon="rbxassetid://99854271826378"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."Craving for brains.."; Tradable=super.Tradable.Nontradable;});
+	new(foodBase, {Id="eyeballgummies"; Name="Eyeball Gummies"; Icon="rbxassetid://72634660358826"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."More eyes, more sights.."; Tradable=super.Tradable.Nontradable;});
+	new(foodBase, {Id="spookmallow"; Name="Spookmallow"; Icon="rbxassetid://93144909042467"; Tags={"Slaughterfest"}; Description=candyCaravanStr..""; Tradable=super.Tradable.Nontradable;});
 	new(foodBase, {Id="cherrybloodbar"; Name="Cherry Blood Bar"; Icon="rbxassetid://87358672710754"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] TBD"; Tradable=super.Tradable.Nontradable;});
 	new(foodBase, {Id="wickedtaffy"; Name="Wicked Taffy"; Icon="rbxassetid://125482145777312"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] TBD"; Tradable=super.Tradable.Nontradable;});
+	new(skinPermBase, {Id="tirearmorhaunted"; Icon="rbxassetid://91499977896252"; SkinPerm="Haunted"; TargetItemId="tirearmor"; Tags={"Slaughterfest";}; });
+	new(skinPermBase, {Id="nvghaunted"; Icon="rbxassetid://117993502981374"; SkinPerm="Haunted"; TargetItemId="nvg"; Tags={"Slaughterfest";}; });
+	new(skinPermBase, {Id="aproncarnage"; Icon="rbxassetid://97620098577599"; SkinPerm="Carnage"; TargetItemId="apron"; Tags={"Slaughterfest";}; });
 	
+
 	-- Christmas 2019
 	
 	new(foodBase, {Id="gingerbreadman"; Name="Gingerbread Man"; Icon="rbxassetid://4533980328"; Tags={"Christmas"; "Frostivus"}; Description="Puts you in a Christmas Spirit.";});
