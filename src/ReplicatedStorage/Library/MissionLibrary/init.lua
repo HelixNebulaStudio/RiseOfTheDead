@@ -1769,7 +1769,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Side;
 	Name="Quarantine Assessment";
 	From="Wilson";
-	Description="Wilson recieves a radio broadcast from the military that they are sending in an inspector squad into the quarantine zone to assess the situation.";
+	Description="Wilson recieves a radio broadcast from the military saying that they are sending in an inspector squad into the quarantine zone to assess the situation.";
 	World={"TheUnderground"; "TheResidentials"};
 	Persistent=true;
 	Progression={
@@ -2756,7 +2756,6 @@ MissionLibrary.New{
 	AddRequirements={
 		{Type="Level"; Value=30};
 	};
-	
 };
 
 -- MARK: 80 - Cargo Ship Enroute
@@ -2834,13 +2833,13 @@ MissionLibrary.New{
 	Persistent=true;
 	Checkpoint={
 		{Text="Complete a Slaughterfest round with at least 500 candies";};
-		{Text="Completed"; AutoComplete=true;};
+		{Text="Click Complete on mission menu";};
 	};
 	SaveData={};
 	GuideText="";
 	Tier="Halloween";
 	Rewards={
-		{Type="Perks"; Amount=PerksReward.Hard};
+		{Type="Perks"; Amount=PerksReward.Normal};
 		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
 	};
 	AddRequirements={
@@ -2858,14 +2857,18 @@ MissionLibrary.New{
 	Timer=BoardTimeLimit;
 	Persistent=true;
 	Checkpoint={
-		{Text="Complete a Slaughterfest round and get $Kills kills";};
-		{Text="Completed"; AutoComplete=true;};
+		{Text="Objectives"; CompleteText="Complete a Slaughterfest round"; Objectives={"Objective1";};};
+	};
+	Objectives={
+		["Objective1"]={Index=1; Description="Get $Kills kills in Slaughterfest"; Type="SaveData"; Key="Kills"; CheckFunc=function(m, k, v)
+			return (k == "Kills" and v <= 0);
+		end};
 	};
 	SaveData={Kills=10;};
 	GuideText="";
 	Tier="Halloween";
 	Rewards={
-		{Type="Perks"; Amount=PerksReward.Hard};
+		{Type="Perks"; Amount=PerksReward.Normal};
 		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
 	};
 	AddRequirements={
@@ -2873,6 +2876,130 @@ MissionLibrary.New{
 		{Type="Level"; Value=30};
 	};
 };
+
+-- MARK: 84 - Jack of all Slaughter
+MissionLibrary.New{
+	MissionId=84;
+	MissionType = MissionLibrary.MissionTypes.Board;
+	Name="Jack of all Slaughter";
+	Description="Complete a Slaughterfest round with different weapon kills.";
+	Timer=BoardTimeLimit;
+	Persistent=true;
+	Checkpoint={
+		{Text="Objectives"; CompleteText="Complete a Slaughterfest round"; Objectives={"ItemA"; "ItemB"; "ItemC";};};
+	};
+	Objectives={
+		["ItemA"]={Index=1; Description="Get a kill with a $ItemA";};
+		["ItemB"]={Index=1; Description="Get a kill with a $ItemB";};
+		["ItemC"]={Index=1; Description="Get a kill with a $ItemC";};
+	};
+	SaveData={
+		ItemA=(function()
+			local list = {"minigun"; "p250"; "tacticalbow"};
+			return list[math.fmod(math.random(1, 999), #list) +1];
+		end);
+		ItemB=(function()
+			local list = {"survivalknife"; "machete"; "spikedbat";};
+			return list[math.fmod(math.random(1, 999), #list) +1];
+		end);
+		ItemC=(function()
+			local list = {"sledgehammer"; "shovel"; "broomspear";};
+			return list[math.fmod(math.random(1, 999), #list) +1];
+		end);
+	};
+	GuideText="";
+	Tier="Halloween";
+	Rewards={
+		{Type="Perks"; Amount=PerksReward.Normal};
+		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
+	};
+	AddRequirements={
+		{Type="SpecialEvent"; Value="Halloween"};
+		{Type="Level"; Value=30};
+	};
+};
+
+-- MARK: 85 - Whos that Survivor
+MissionLibrary.New{
+	MissionId=85;
+	MissionType = MissionLibrary.MissionTypes.Board;
+	Name="Whos that Survivor";
+	Description="Figure out which survivor to talk to.";
+	Timer=BoardTimeLimit; 
+	Persistent=true;
+	Checkpoint={
+		{Text="Talk to $NpcDesc";};
+	};
+	SaveData={
+		NpcName=(function(mission)
+			local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
+			local survivorsList = modNpcProfileLibrary:ListByMatchFunc(function(libItem)
+				if libItem.Class == "Survivor" and libItem.Id ~= "Stan" and libItem.Id ~= "Robert" then
+					return true;
+				end
+				return false;
+			end);
+			
+			local npcProfileLib = survivorsList[math.random(1, #survivorsList)];
+			local npcName = npcProfileLib.Id;
+
+			mission.SaveData.NpcDesc = npcName;
+
+			local DescTypes = {
+				{Str=`a $Gender with $Hair`; Keys={"Gender"; "Hair"}; Gender={["M"]="guy"; ["F"]="gal"};};
+				{Str=`some $Role $Gender`; Keys={"Gender"; "Role"}; Gender={["M"]="gentleman"; ["F"]="lady"};};
+				{Str=`a $Gender wearing $Clothing`; Keys={"Gender"; "Clothing"}; Gender={["M"]="man"; ["F"]="woman"};};
+				{Str=`someone with $Hair wearing $Clothing`; Keys={"Hair"; "Clothing"}};
+				{Str=`someone with $Hair and $Beard`; Keys={"Hair"; "Beard"}};
+				{Str=`a person with a $Item`; Keys={"Item";}};
+			};
+			for b=#DescTypes, 1, -1 do
+				local missingKey = false;
+				for c=1, #DescTypes[b].Keys do
+					if npcProfileLib.Descriptors == nil or npcProfileLib.Descriptors[DescTypes[b].Keys[c]] == nil then
+						missingKey = true;
+					end
+				end
+				if missingKey then
+					table.remove(DescTypes, b);
+				end
+			end
+
+			local pickDesc = DescTypes[math.random(1, #DescTypes)];
+			
+			for b=1, #pickDesc.Keys do
+				local key = pickDesc.Keys[b];
+				local val = npcProfileLib.Descriptors[key];
+				if key == "Gender" then
+					if pickDesc[key] then
+						pickDesc.Str = string.gsub(pickDesc.Str, `${key}`, pickDesc[key][val]);
+					else
+						pickDesc.Str = string.gsub(pickDesc.Str, `${key}`, val);
+					end
+				else
+					if typeof(val) == "table" then
+						pickDesc.Str = string.gsub(pickDesc.Str, `${key}`, val[math.random(1, #val)]);
+					else
+						pickDesc.Str = string.gsub(pickDesc.Str, `${key}`, val);
+					end
+				end
+			end
+
+			mission.SaveData.NpcDesc = pickDesc.Str;
+
+			return npcName;
+		end);
+	};
+	GuideText="";
+	Tier="Easy";
+	Rewards={
+		{Type="Perks"; Amount=PerksReward.Easy};
+	};
+	AddRequirements={
+		{Type="Level"; Value=30};
+	};
+};
+
 
 -- MARK: 666 - TestMission
 MissionLibrary.New{

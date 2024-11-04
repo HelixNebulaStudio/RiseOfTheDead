@@ -6,6 +6,7 @@ local hours32Sec = 86400 + 43200;
 
 local RunService = game:GetService("RunService");
 
+local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
@@ -102,10 +103,13 @@ function Mission:Progress(player: Player, missionId: number, func: ((mission: {[
 				end 
 			end
 			
+			local saveDataCopy = modTables.DeepClone(mission.SaveData);
+
 			local sync = func(mission);
 			local changedObjectives = 0; for _,v in next, (mission.ObjectivesCompleted or {}) do if v == true then changedObjectives = changedObjectives +1; end end
 			
-			if mission.ProgressionPoint ~= progressionPoint or objectivesCompleted ~= changedObjectives then
+			local saveDataChanged = modTables.HasChanged(saveDataCopy, mission.SaveData);
+			if mission.ProgressionPoint ~= progressionPoint or objectivesCompleted ~= changedObjectives or saveDataChanged then
 				
 				missionProfile:Pin(missionId, true);
 				mission.Changed:Fire(false, mission);
@@ -161,7 +165,7 @@ function Mission:CanCompleteMission(player, missionId, announce)
 		local hasSpace = activeInventory:SpaceCheck(list);
 		if not hasSpace then
 			if announce then
-				shared.Notify(player, "Not enough inventory space to receive mission reward.", "Negative");
+				shared.Notify(player, "Not enough inventory space to receive mission reward. Make space and try again by clicking Complete on mission menu.", "Negative");
 			end
 			return false;
 		end
@@ -577,7 +581,7 @@ function remoteMissionRemote.OnServerInvoke(player, actionId, missionId)
 		returnPacket.Success = true;
 		return returnPacket;
 
-	elseif actionId == "AutoComplete" then
+	elseif actionId == "MarkForCompletion" then
 		local returnPacket = {};
 		
 		local missionProfile = Mission.GetMissions(player.Name);
@@ -587,10 +591,7 @@ function remoteMissionRemote.OnServerInvoke(player, actionId, missionId)
 
 		if missionLib == nil then return end;
 
-		local checkpointInfo = missionLib.Checkpoint and mission.ProgressionPoint and missionLib.Checkpoint[mission.ProgressionPoint] or nil;
-		if checkpointInfo == nil then return end;
-
-		if checkpointInfo.AutoComplete then
+		if mission.MarkForCompletion and mission.Type ~= 3 then
 			Mission:CompleteMission(player, missionId);
 		end
 
@@ -665,6 +666,7 @@ function Mission.NewList(profile, gameSave, syncFunc)
 			FailTag=input.FailTag;
 			Pinned=input.Pinned;
 			Redo=input.Redo;
+			MarkForCompletion=input.MarkForCompletion;
 			
 			CatType=library.MissionType;
 		}, missionObjectMeta);
@@ -760,6 +762,18 @@ function Mission.NewList(profile, gameSave, syncFunc)
 
 					end
 					updated = true;
+
+				elseif objective.Type == "SaveData" then
+					local saveDataKey = objective.Key;
+					local checkFunc = objective.CheckFunc;
+
+					local v = mission.SaveData[saveDataKey];
+
+					local newObjCompValue = checkFunc(mission, saveDataKey, v);
+					if newObjCompValue ~= mission.ObjectivesCompleted[objectiveId] then
+						mission.ObjectivesCompleted[objectiveId] = newObjCompValue;
+						updated = true;
+					end
 
 				end
 				

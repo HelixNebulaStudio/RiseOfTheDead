@@ -91,4 +91,32 @@ function Tables.Mold(t, template)
     return t :: (typeof(template) | typeof(t));
 end
 
+function Tables.HasChanged(old, new)
+    if typeof(old) ~= "table" then return true; end;
+    if typeof(new) ~= "table" then return true end;
+
+    local keys = {};
+    for k, _ in pairs(old) do
+        table.insert(keys, k);
+    end
+    for k, _ in pairs(new) do
+        table.insert(keys, k);
+    end
+
+    for a=1, #keys do
+        local oldV = old[keys[a]];
+        local newV = new[keys[a]];
+
+        if typeof(oldV) ~= typeof(newV) then
+            return true;
+        elseif typeof(oldV) == "table" and Tables.HasChanged(oldV, newV) then
+            return true;
+        elseif (oldV :: any) ~= (newV :: any) then
+            return true;
+        end
+    end
+    
+    return false;
+end
+
 return Tables;

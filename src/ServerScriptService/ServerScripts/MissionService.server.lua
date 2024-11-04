@@ -16,6 +16,7 @@ local modReplicationManager = require(game.ReplicatedStorage.Library.Replication
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 
 local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 
@@ -298,6 +299,28 @@ function OnPlayerAdded(player)
 					end
 				end
 				
+				task.spawn(function()
+					for id, missionLib in pairs(modMissionLibrary.List()) do
+						if missionLib.MissionType ~= modMissionLibrary.MissionTypes.Board then continue end;
+						
+						local canAddSpecialMission = false;
+						if missionLib.AddRequirements then
+							for a=1, #missionLib.AddRequirements do
+								local rType = missionLib.AddRequirements[a].Type;
+								local rValue = missionLib.AddRequirements[a].Value;
+								if rType == "SpecialEvent" and modConfigurations.SpecialEvent[rValue] then
+									canAddSpecialMission = true;
+									break;
+								end
+							end
+						end
+						
+						if canAddSpecialMission and missionProfile:Get(id) == nil and missionProfile:CanAdd(id) then
+							modMission:AddMission(player, id);
+						end
+					end
+				end)
+
 				local templateMetaData = {Id="missionCycleData"; RepeatableMissionCount=0; LastAddUnixTime=0;};
 				local missionMetaData = modEvents:GetEvent(player, "missionCycleData") or templateMetaData;
 				
@@ -345,6 +368,18 @@ function OnPlayerAdded(player)
 					for a=1, #missionIdsList do
 						local missionLib = missionIdsList[a];
 						
+						if missionLib.AddRequirements then
+							local isSpecialEventMission = false;
+							for a=1, #missionLib.AddRequirements do
+								local rType = missionLib.AddRequirements[a].Type;
+								if rType == "SpecialEvent" then
+									isSpecialEventMission = true;
+									break;
+								end
+							end
+							if isSpecialEventMission then continue; end;
+						end
+
 						local missionId = missionLib.MissionId;
 						local boardPickFreq = missionLib.BoardPickFreq or 1;
 						

@@ -215,14 +215,33 @@ function Interface.init(modInterface)
 	end
 
 	local function loadObjectiveDescription(mission, objName, obj)
-		local itemId = mission.SaveData.ItemId;
-		local itemlib = mission.SaveData.ItemId and modItemsLibrary:Find(itemId);
+		local missionSaveData = mission.SaveData;
+		local itemId = missionSaveData.ItemId;
+		local itemlib = missionSaveData.ItemId and modItemsLibrary:Find(itemId);
 		local desc = obj.Description;
 
 		local needCount = tonumber(mission.ObjectivesCompleted[objName]);
-		local objectiveAmount = obj.Amount or mission.SaveData.Amount or 1;
+		local objectiveAmount = obj.Amount or missionSaveData.Amount or 1;
 		desc = string.gsub(desc, "$Amount", needCount and objectiveAmount and objectiveAmount == needCount and needCount or (objectiveAmount - (needCount or 0)).."/"..objectiveAmount);
 		desc = string.gsub(desc, "$ItemName", itemlib and itemlib.Name or itemId or "");
+		
+		for k, v in pairs(missionSaveData) do
+			if desc:find("$"..k) then
+				local newVal = v;
+
+				if tonumber(newVal) then
+					newVal = modFormatNumber.Beautify(tonumber(newVal));
+				end
+
+				if ("$"..k):sub(1, 5) == "$Item" then
+					local saveDataItemlib = modItemsLibrary:Find(newVal);
+					desc = desc:gsub("$"..k, saveDataItemlib and saveDataItemlib.Name or newVal);
+				else
+					desc = desc:gsub("$"..k, newVal);
+				end
+			end
+		end
+
 		return desc;
 	end
 
@@ -825,6 +844,9 @@ function Interface.init(modInterface)
 		if book == nil then Debugger:Warn("Missing mission library. Id:",id); return end;
 		if data.Type == 1 or data.Type == 3 then
 			local menu = activeDetailsFrameTemplate:Clone();
+
+			local contextButton = menu:WaitForChild("contextButton");
+
 			local titleTag = menu:WaitForChild("Title");
 			local fromTag = menu:WaitForChild("FromTag");
 			local descTag = menu:WaitForChild("Desc");
@@ -880,35 +902,59 @@ function Interface.init(modInterface)
 				titleTag.Text = titleTag.Text.." (Board Mission)";
 				
 				if data.Type ~= 3 then
-					menu.AbortButton.Visible = true;
+					contextButton.Visible = true;
+				end
+
+				if data.MarkForCompletion then
+					contextButton.BackgroundColor3 = Color3.fromRGB(57, 120, 57);
+					contextButton.Text = "Complete";
+				else
+					contextButton.BackgroundColor3 = Color3.fromRGB(120, 57, 57);
+					contextButton.Text = "Abort";
 				end
 
 				local debounce = false;
-				menu.AbortButton.MouseButton1Click:Connect(function()
+				contextButton.MouseButton1Click:Connect(function()
 					Interface:PlayButtonClick();
-					local promptWindow = Interface:PromptQuestion("Abort "..book.Name, 
-						"Are you sure you want to abort mission, <b>"..book.Name.."</b>?\n\n<b>It will be considered as failed mission.</b>");
-					local YesClickedSignal, NoClickedSignal;
 
-					YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
+					if data.MarkForCompletion then
+						-- COMPLETE mission;
 						if debounce then return end;
 						debounce = true;
-						Interface:PlayButtonClick();
+						MissionDisplayFrame:ClearAllChildren();
+						Interface.RefreshMissionMap();
 
-						local _r = remoteMissionRemote:InvokeServer("Abort", id);
+						local _r = remoteMissionRemote:InvokeServer("MarkForCompletion", id);
+						
+						debounce = false;
 
-						promptWindow:Close();
-						YesClickedSignal:Disconnect();
-						NoClickedSignal:Disconnect();
-					end);
-					NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-						if debounce then return end;
-						Interface:PlayButtonClick();
-						promptWindow:Close();
-						Interface:OpenWindow("Missions");
-						YesClickedSignal:Disconnect();
-						NoClickedSignal:Disconnect();
-					end);
+					else
+						-- ABORT mission;
+						local promptWindow = Interface:PromptQuestion("Abort "..book.Name, 
+							"Are you sure you want to abort mission, <b>"..book.Name.."</b>?\n\n<b>It will be considered as failed mission.</b>");
+						local YesClickedSignal, NoClickedSignal;
+	
+						YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
+							if debounce then return end;
+							debounce = true;
+							Interface:PlayButtonClick();
+	
+							local _r = remoteMissionRemote:InvokeServer("Abort", id);
+	
+							promptWindow:Close();
+							YesClickedSignal:Disconnect();
+							NoClickedSignal:Disconnect();
+						end);
+						NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
+							if debounce then return end;
+							Interface:PlayButtonClick();
+							promptWindow:Close();
+							Interface:OpenWindow("Missions");
+							YesClickedSignal:Disconnect();
+							NoClickedSignal:Disconnect();
+						end);
+
+					end
 				end)
 				
 			elseif book.MissionType == modMissionsLibrary.MissionTypes.Secret then
@@ -958,6 +1004,52 @@ function Interface.init(modInterface)
 					completionBox.BackgroundColor3 = pointColor;
 					
 					newTaskLabel.Parent = taskList;
+
+					if checkpointInfo.Objectives then
+						completionBox.BackgroundColor3 = Color3.fromRGB(180, 180, 180);
+						label.Text = `Checkpoint {a}:`;
+
+						local isCompleted = true;
+						for _, objName in pairs(checkpointInfo.Objectives) do
+							local objData = book.Objectives[objName];
+
+							local newObjTask = taskListingTemplate:Clone();
+							local paddingUi = newObjTask:WaitForChild("UIPadding");
+							paddingUi.PaddingLeft = UDim.new(0, 20);
+							local objLabel = newObjTask:WaitForChild("TaskLabel");
+		
+							objLabel.Text = loadObjectiveDescription(data, objName, objData);
+		
+							if data.SaveData then
+								for k, v in pairs(data.SaveData) do
+									if label.Text:find("$"..k) then
+										local newVal = v;
+		
+										if tonumber(newVal) then
+											newVal = modFormatNumber.Beautify(tonumber(newVal));
+										end
+		
+										label.Text = label.Text:gsub("$"..k, newVal);
+									end
+								end
+							end
+							
+							local objCheckColor = Color3.fromRGB(60, 60, 60);
+							if data.ObjectivesCompleted[objName] then
+								objCheckColor = Color3.fromRGB(180, 180, 180);
+							else
+								isCompleted = false;
+							end
+							
+							local completionCheckBox = newObjTask:WaitForChild("CompletionBox");
+							completionCheckBox.BackgroundColor3 = objCheckColor;
+							
+							newObjTask.Parent = taskList;
+						end
+						if isCompleted then
+							completionBox.BackgroundColor3 = Color3.fromRGB(180, 60, 60);
+						end
+					end
 				end
 
 
@@ -1057,6 +1149,42 @@ function Interface.init(modInterface)
 				end
 				logList.CanvasSize = UDim2.new(0, 0, 0, logLayout.AbsoluteContentSize.Y);
 				logList.CanvasPosition = Vector2.new(0, 9999);
+			end
+
+			if book.Rewards then
+				local rewardsMenu = menu:WaitForChild("RewardsBackground");
+				local rewardsList = rewardsMenu:WaitForChild("RewardsList");
+				local listLayout = rewardsList:WaitForChild("UIListLayout");
+				rewardsMenu.Visible = true;
+
+				for a=1, #book.Rewards do
+					local reward = book.Rewards[a];
+					local rewardType = reward.Type;
+					local preset = rewardsPresets[rewardType];
+					if preset then
+						local newLabel = logListingTemplate:Clone();
+						newLabel.Font = Enum.Font.Arial;
+						if rewardType == "Mission" then
+							local rewardMission = modMissionsLibrary.Get(reward.Id);
+							newLabel.Text = preset.Text:gsub("$value", rewardMission and rewardMission.Name or "MissionId("..reward.Id..")");
+
+						elseif rewardType == "Perks" then
+							local perkAmount = reward.Amount;
+							newLabel.Text = preset.Text:gsub("$value", perkAmount);
+
+						elseif rewardType == "Item" then
+							local itemLib = modItemsLibrary:Find(reward.ItemId);
+							newLabel.Text = preset.Text:gsub("$amt", reward.Quantity):gsub("$item", itemLib.Name);
+
+						end
+						newLabel.Text = "• "..newLabel.Text;
+						newLabel.LayoutOrder = a;
+						newLabel.Size = UDim2.new(1, -10, 0, 15);
+						newLabel.Visible = true;
+						newLabel.Parent = rewardsList;
+					end
+				end
+				rewardsList.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y);
 			end
 
 			menu.Parent = MissionDisplayFrame;
@@ -1162,6 +1290,7 @@ function Interface.init(modInterface)
 							newLabel.Text = preset.Text:gsub("$amt", reward.Quantity):gsub("$item", itemLib.Name);
 
 						end
+						newLabel.Text = "• "..newLabel.Text;
 						newLabel.LayoutOrder = a;
 						newLabel.Size = UDim2.new(1, -10, 0, 15);
 						newLabel.Visible = true;
@@ -2217,11 +2346,11 @@ function Interface.init(modInterface)
 		end
 
 		if pinnedMission and pinnedMissionLib and pinnedMissionLib.Checkpoint then
-			local checkpointInfo = pinnedMissionLib.Checkpoint[pinnedMission.ProgressionPoint];
+			-- local checkpointInfo = pinnedMissionLib.Checkpoint[pinnedMission.ProgressionPoint];
 
-			if checkpointInfo.AutoComplete then
-				local r = remoteMissionRemote:InvokeServer("AutoComplete", pinnedMission.Id);
-			end
+			-- if checkpointInfo.AutoComplete then
+			-- 	local r = remoteMissionRemote:InvokeServer("AutoComplete", pinnedMission.Id);
+			-- end
 		end
 	end
 

@@ -3116,7 +3116,7 @@ Commands["setmissionpoint"] = {
 
 Commands["setmissionobjective"] = {
 	Permission = PermissionLevel.DevBranch;
-	Description = "Set mission's objective.";
+	Description = "Set mission's objective. Leave objectiveId empty to list objective keys.";
 
 	RequiredArgs = 1;
 	UsageInfo = "/setmissionpoint missionId objectiveId value";
@@ -3150,6 +3150,43 @@ Commands["setmissionobjective"] = {
 				end
 				mission.ObjectivesCompleted[objectiveId] = value;
 				shared.Notify(player, "Mission ("..missionId..") Objective set to "..tostring(value)..".", "Reward");
+			end)
+		end
+		return true;
+	end;
+};
+
+Commands["setmissionsavedata"] = {
+	Permission = PermissionLevel.DevBranch;
+	Description = "Set mission's save data. Missions that store save data such as 'Kills', 'Seed', 'Location', etc.. Leave key empty to list possible data keys.";
+
+	RequiredArgs = 1;
+	UsageInfo = "/setmissionsavedata missionId key value";
+	Function = function(speaker, args)
+		local player = speaker;
+		local missionId = args[1];
+		local key = args[2];
+		local value = args[3]
+
+		if player and missionId then
+			if key == nil then
+				local mission = modMission:GetMission(player, missionId);
+
+				local keysList = {};
+				for k, v in pairs(mission.SaveData) do
+					table.insert(keysList, `    <b>{k}</b>: {typeof(v)} = {v}`);
+				end
+				
+				shared.Notify(player, "Mission ("..missionId..") SaveData:\n"..table.concat(keysList, "\n"), "Inform");
+				return;
+			end
+			modMission:Progress(player, missionId, function(mission)
+				if key == "MarkForCompletion" then
+					mission.MarkForCompletion = value;
+				else
+					mission.SaveData[key] = value;
+				end
+				shared.Notify(player, "Mission ("..missionId..") SaveData: <b>"..key.."</b>: "..typeof(value).." set to "..tostring(value), "Reward");
 			end)
 		end
 		return true;
