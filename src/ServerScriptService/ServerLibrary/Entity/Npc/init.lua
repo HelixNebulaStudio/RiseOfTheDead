@@ -429,7 +429,7 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule, customNp
 				middle.Transparency = rightHand.Transparency;
 				pinky.Transparency = rightHand.Transparency;
 			end
-			rightArm:GetPropertyChangedSignal("Color"):Connect(updateHand);
+			rightHand:GetPropertyChangedSignal("Color"):Connect(updateHand);
 			rightHand:GetPropertyChangedSignal("Transparency"):Connect(updateHand);
 			updateHand()
 		end
@@ -450,7 +450,7 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule, customNp
 				middle.Transparency = leftHand.Transparency;
 				pinky.Transparency = leftHand.Transparency;
 			end
-			leftArm:GetPropertyChangedSignal("Color"):Connect(updateHand);
+			leftHand:GetPropertyChangedSignal("Color"):Connect(updateHand);
 			leftHand:GetPropertyChangedSignal("Transparency"):Connect(updateHand);
 			updateHand()
 		end
