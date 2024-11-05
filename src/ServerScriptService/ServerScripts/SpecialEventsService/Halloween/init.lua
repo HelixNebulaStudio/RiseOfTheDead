@@ -897,7 +897,7 @@ task.spawn(function()
 		if player == nil or storageItem == nil then return end;
 
 		local candyId = storageItem.ItemId;
-		if not (candyId == "wickedtaffy" or candyId == "cherrybloodbar" or candyId == "spookmallow" or candyId == "eyeballgummies" or candyId == "zombiejellow") then
+		if not (candyId == "wickedtaffy" or candyId == "cherrybloodbar" or candyId == "spookmallow" or candyId == "eyeballgummies" or candyId == "zombiejello") then
 			return;
 		end
 

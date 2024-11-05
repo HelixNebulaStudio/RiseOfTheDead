@@ -250,6 +250,7 @@ if RunService:IsServer() then
 					dialog:AddDialog({
 						Say=pickDialog.Say;
 						Reply=pickDialog.Reply;
+						MissionId=missionId;
 		
 					}, function(dialog)
 						modMission:CompleteMission(player, missionId);
