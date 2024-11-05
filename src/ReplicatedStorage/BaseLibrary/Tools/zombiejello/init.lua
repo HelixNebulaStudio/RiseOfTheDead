@@ -13,6 +13,12 @@ function toolPackage.NewToolLib(handler)
 	local toolLib = {};
 	
 	toolLib.Configurations = {
+		EffectDuration = 3;
+		EffectType = "Heal";
+
+		HealSourceId = "FoodHeal";
+		HealRate = 2;
+		
 		UseDuration = 1;
 	};
 

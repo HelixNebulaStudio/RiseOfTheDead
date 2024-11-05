@@ -3000,6 +3000,44 @@ MissionLibrary.New{
 	};
 };
 
+-- MARK: 86 - Candy Devourer
+MissionLibrary.New{
+	MissionId=86;
+	MissionType = MissionLibrary.MissionTypes.Board;
+	Name="Candy Devourer";
+	Description="Complete a Slaughterfest round after eating different candies.";
+	Timer=BoardTimeLimit;
+	Persistent=true;
+	Checkpoint={
+		{Text="Objectives"; CompleteText="Complete a Slaughterfest round"; Objectives={"ItemA"; "ItemB"; "ItemC";};};
+	};
+	Objectives={
+		["ItemA"]={Index=1; Description="Find and eat a $ItemA";};
+		["ItemB"]={Index=1; Description="Find and eat a $ItemB";};
+		["ItemC"]={Index=1; Description="Find and eat a $ItemC";};
+	};
+	SaveData={
+		List=(function(mission)
+			local candyTypes = {"wickedtaffy"; "cherrybloodbar"; "spookmallow"; "eyeballgummies"; "zombiejello"};
+
+			mission.SaveData.ItemA = table.remove(candyTypes, math.random(1, #candyTypes));
+			mission.SaveData.ItemB = table.remove(candyTypes, math.random(1, #candyTypes));
+			mission.SaveData.ItemC = table.remove(candyTypes, math.random(1, #candyTypes));
+
+			return {mission.SaveData.ItemA; mission.SaveData.ItemB; mission.SaveData.ItemC};
+		end)
+	};
+	GuideText="";
+	Tier="Halloween";
+	Rewards={
+		{Type="Perks"; Amount=PerksReward.Normal};
+		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
+	};
+	AddRequirements={
+		{Type="SpecialEvent"; Value="Halloween"};
+		{Type="Level"; Value=30};
+	};
+};
 
 -- MARK: 666 - TestMission
 MissionLibrary.New{

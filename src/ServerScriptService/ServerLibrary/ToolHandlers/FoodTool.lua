@@ -14,6 +14,7 @@ local modPlayers = require(game.ReplicatedStorage.Library.Players);
 
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local bindServerUnequipPlayer = remotes.Inventory.ServerUnequipPlayer;
@@ -97,6 +98,7 @@ function ToolHandler:OnPrimaryFire(...)
 					end
 					inventory:Remove(self.StorageItem.ID, 1);
 					shared.Notify(self.Player, ("1 $Item removed from your Inventory."):gsub("$Item", itemLib.Name), "Negative");
+					modOnGameEvents:Fire("OnFoodToolConsume", self);
 
 				else
 					Debugger:Warn("TimeLapsed invalid", inValidTimeRange, "configurations.UseDuration", configurations.UseDuration, "useDuration", useDuration);

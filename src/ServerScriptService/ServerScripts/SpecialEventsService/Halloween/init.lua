@@ -18,10 +18,12 @@ local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLi
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modDialogueService = require(game.ReplicatedStorage.Library.DialogueService);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
+local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
+local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 
 local remoteHalloween = modRemotesManager:NewFunctionRemote("Halloween", 1);
 
@@ -885,6 +887,40 @@ task.spawn(function()
 		newCauldron.Parent = workspace.Environment;
 		newCauldron:SetPrimaryPartCFrame(cauldronSpawn.WorldCFrame);
 	end
+	
+	local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+	modOnGameEvents:ConnectEvent("OnFoodToolConsume", function(toolHandler)
+		local player = toolHandler.Player;
+		local storageItem = toolHandler.StorageItem;
+
+		Debugger:StudioWarn(player,"Ate", storageItem);
+		if player == nil or storageItem == nil then return end;
+
+		local candyId = storageItem.ItemId;
+		if not (candyId == "wickedtaffy" or candyId == "cherrybloodbar" or candyId == "spookmallow" or candyId == "eyeballgummies" or candyId == "zombiejellow") then
+			return;
+		end
+
+		if not modBranchConfigs.IsWorld("Slaughterfest") then
+		end
+		
+		-- MARK: Candy Devourer
+		local missionId = 86;
+		local mission = modMission:GetMission(player, missionId);
+		if mission and mission.Type == 1 and mission.SaveData and mission.SaveData.List and table.find(mission.SaveData.List, candyId) then
+			modMission:Progress(player, missionId, function(mission)
+				for sdKey, v in pairs(mission.SaveData) do
+					if v == candyId then
+						mission.ObjectivesCompleted[sdKey] = true;
+						break;
+					end
+				end
+			end)
+
+		end
+
+		
+	end)
 end)
 
 local folderMapEvent = game.ServerStorage:FindFirstChild("MapEvents");
