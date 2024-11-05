@@ -277,6 +277,7 @@ function StorageItem:Clone()
 	data.Quantity = self.Quantity;
 	
 	local clone = StorageItem.new(self.Index, self.ItemId, data);
+	clone:UpdatePlayer(self.Player);
 	return clone;
 end
 

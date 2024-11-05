@@ -41,7 +41,7 @@ function DiscordWebhook.PostText(hookId, text)
             local dataStr: string = HttpService:JSONEncode({
                 ["content"] = text;
             });
-            Debugger:StudioLog(HttpService:PostAsync(hookId, dataStr));
+            HttpService:PostAsync(hookId, dataStr);
         end)
         if not s then
             Debugger:Warn(e);
@@ -59,7 +59,7 @@ function DiscordWebhook.PostEmbed(hookId, dataFunc: (embedPacket: typeof(EmbedPa
             end
 
             local dataStr: string = HttpService:JSONEncode(embedPacket);
-            Debugger:StudioLog(HttpService:PostAsync(hookId, dataStr));
+            HttpService:PostAsync(hookId, dataStr);
         end)
         if not s then
             Debugger:Warn(e);

@@ -305,7 +305,7 @@ function Mission:CompleteMission(players, missionId, sync)
 						activeInventory:Add(reward.ItemId, {Quantity=reward.Quantity;}, function(queueEvent, storageItem)
 							shared.Notify(player, "You recieved "..(reward.Quantity > 1 and reward.Quantity.." "..itemLibrary.Name or "a "..itemLibrary.Name).." for completing "..library.Name..".", "Reward");
 							
-							modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+							modStorage.OnItemSourced:Fire(nil, storageItem, storageItem.Quantity);
 						end);
 						
 					elseif reward.Type == "Mission" then

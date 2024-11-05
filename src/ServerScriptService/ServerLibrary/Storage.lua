@@ -163,7 +163,10 @@ function Storage.new(id, name, size, owner)
 								
 								if firstInQueue.Callback ~= nil then 
 									task.spawn(function()
-										firstInQueue.Callback(newQuantity == quantityLeftover and QueueEvents.Success or QueueEvents.Remainding, compatibleItem:Clone({Quantity=newQuantity;}));
+										firstInQueue.Callback(
+											newQuantity == quantityLeftover and QueueEvents.Success or QueueEvents.Remainding, 
+											compatibleItem:Clone({Quantity=newQuantity;})
+										);
 									end)
 								end
 								
@@ -1002,13 +1005,16 @@ function Storage.ListItemIdFromStorages(itemId, player, customStorages)
 		end
 	end
 	
+	local totalCount = 0;
 	for storageId, storage in pairs(storageList) do
 		local items = storage:ListByItemId(itemId);
 		for a=1, #items do
-			table.insert(list, {Item=items[a]; Storage=storage});
+			local storageItem = items[a];
+			totalCount = totalCount + (storageItem.Quantity or 1);
+			table.insert(list, {Item=storageItem; Storage=storage});
 		end
 	end
-	return list;
+	return list, totalCount;
 end
 
 function Storage.RemoveItemIdFromStorages(itemId, player, amount, customStorages)

@@ -461,6 +461,29 @@ shared.modProfile.OnProfileLoad:Connect(function(player, profile)
 	SpecialEvent.SlaughterfestGetCandyTrade();
 end)
 
+modStorage.OnItemSourced:Connect(function(_, storageItem, quantity)
+	if quantity <= 0 then return; end
+
+	local candyBagItemId = "slaughterfestcandybag";
+	if storageItem.ItemId ~= candyBagItemId then return end;
+
+	local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+
+	local player = storageItem.Player;
+	if player == nil then return end;
+	
+	local _, itemCount = modStorage.ListItemIdFromStorages(candyBagItemId, player);
+	modAnalyticsService:Source{
+		Player=player;
+		Currency="CandyBags";
+		Amount=quantity;
+		EndBalance=itemCount;
+		ItemSKU=`ItemDrop:slaughterfestcandybag`;
+	};
+
+	Debugger:StudioLog("Log",candyBagItemId,`+{quantity} = {itemCount}`);
+end)
+
 function SpecialEvent.LoadCache()
 	if SpecialEvent.Cache.LoadTick and tick()-SpecialEvent.Cache.LoadTick <= 5 then return end;
 	SpecialEvent.Cache.LoadTick = tick();
@@ -752,46 +775,46 @@ function remoteHalloween.OnServerInvoke(player, packet)
 
 
 	elseif action == "Submit" then
-		candyData = loadCandyData(player);
+		-- candyData = loadCandyData(player);
 
-		local candyCount = 0;
-		cauldronStorage:Loop(function(storageItem)
-			if storageItem.ItemId == "halloweencandy" then
-				candyCount = candyCount + storageItem.Quantity;
-			end
-		end);
+		-- local candyCount = 0;
+		-- cauldronStorage:Loop(function(storageItem)
+		-- 	if storageItem.ItemId == "halloweencandy" then
+		-- 		candyCount = candyCount + storageItem.Quantity;
+		-- 	end
+		-- end);
 		
-		if candyCount < 100 then
-			rPacket.FailMsg = "You need at least 100 candies to submit!";
-			return rPacket;
-		end
+		-- if candyCount < 100 then
+		-- 	rPacket.FailMsg = "You need at least 100 candies to submit!";
+		-- 	return rPacket;
+		-- end
 		
-		local candiesToSubmit = math.floor(candyCount/100)*100;
+		-- local candiesToSubmit = math.floor(candyCount/100)*100;
 
-		local total, itemList = cauldronStorage:ListQuantity("halloweencandy", candiesToSubmit);
+		-- local total, itemList = cauldronStorage:ListQuantity("halloweencandy", candiesToSubmit);
 
-		if total >= candiesToSubmit then
-			for a=1, #itemList do
-				cauldronStorage:Remove(itemList[a].ID, itemList[a].Quantity);
-			end
-		end
+		-- if total >= candiesToSubmit then
+		-- 	for a=1, #itemList do
+		-- 		cauldronStorage:Remove(itemList[a].ID, itemList[a].Quantity);
+		-- 	end
+		-- end
 		
-		local bpLevelsAdd = math.clamp(math.round(candiesToSubmit/100), 0, 5);
+		-- local bpLevelsAdd = math.clamp(math.round(candiesToSubmit/100), 0, 5);
 		
-		--cauldronStorage:Wipe();
-		Debugger:Log("Submitting ",candiesToSubmit," candies");
+		-- --cauldronStorage:Wipe();
+		-- Debugger:Log("Submitting ",candiesToSubmit," candies");
 
-		shared.Notify(player, "You submitted "..candiesToSubmit.." candies.", "Inform");
-		candyData.Candy = candyData.Candy + candiesToSubmit;
-		profile.Cache.SubmitHalloweenCandyCache = (profile.Cache.SubmitHalloweenCandyCache or 0) + candiesToSubmit;
+		-- shared.Notify(player, "You submitted "..candiesToSubmit.." candies.", "Inform");
+		-- candyData.Candy = candyData.Candy + candiesToSubmit;
+		-- profile.Cache.SubmitHalloweenCandyCache = (profile.Cache.SubmitHalloweenCandyCache or 0) + candiesToSubmit;
 
-		shared.Notify(player, "Event Pass: Slaughter Fest levelled up by "..bpLevelsAdd.."!", "Inform");
-		profile.BattlePassSave:AddLevel(modBattlePassLibrary.Active, bpLevelsAdd);
-		profile.BattlePassSave:Sync();
+		-- shared.Notify(player, "Event Pass: Slaughter Fest levelled up by "..bpLevelsAdd.."!", "Inform");
+		-- profile.BattlePassSave:AddLevel(modBattlePassLibrary.Active, bpLevelsAdd);
+		-- profile.BattlePassSave:Sync();
 		
-		modEvents:NewEvent(player, candyData);
-		rPacket.Storage = cauldronStorage:Shrink();
-		rPacket.Success = true;
+		-- modEvents:NewEvent(player, candyData);
+		-- rPacket.Storage = cauldronStorage:Shrink();
+		-- rPacket.Success = true;
 		
 		
 	elseif action == "Join" then
@@ -803,39 +826,38 @@ function remoteHalloween.OnServerInvoke(player, packet)
 		end)
 		
 	elseif action == "Claim" then
+		-- local itemId = packet.ItemId;
+		-- if itemId == nil then rPacket.Error=1; return rPacket end;
 		
-		local itemId = packet.ItemId;
-		if itemId == nil then rPacket.Error=1; return rPacket end;
+		-- local reward;
+		-- for a=1, #cauldronRewardLib do
+		-- 	if cauldronRewardLib[a].ItemId == itemId then
+		-- 		reward = cauldronRewardLib[a];
+		-- 		break;
+		-- 	end
+		-- end
+		-- if reward == nil then rPacket.Error=2; return rPacket end;
 		
-		local reward;
-		for a=1, #cauldronRewardLib do
-			if cauldronRewardLib[a].ItemId == itemId then
-				reward = cauldronRewardLib[a];
-				break;
-			end
-		end
-		if reward == nil then rPacket.Error=2; return rPacket end;
-		
-		if candyData.Candy < reward.Value then rPacket.Error=3; return rPacket; end;
+		-- if candyData.Candy < reward.Value then rPacket.Error=3; return rPacket; end;
 			
 		
-		if candyData.Claimed[itemId] == true then rPacket.Error=4; return rPacket; end;
+		-- if candyData.Claimed[itemId] == true then rPacket.Error=4; return rPacket; end;
 		
-		local hasSpace = activeInventory:SpaceCheck{
-			{ItemId=itemId; Data={Quantity=1};};
-		};
-		if not hasSpace then
-			shared.Notify(player, "No inventory space!", "Negative");
-			rPacket.Error=5;
-			return rPacket;
-		end
+		-- local hasSpace = activeInventory:SpaceCheck{
+		-- 	{ItemId=itemId; Data={Quantity=1};};
+		-- };
+		-- if not hasSpace then
+		-- 	shared.Notify(player, "No inventory space!", "Negative");
+		-- 	rPacket.Error=5;
+		-- 	return rPacket;
+		-- end
 		
-		local itemLibrary = modItemsLibrary:Find(reward.ItemId);
-		activeInventory:Add(reward.ItemId, {Quantity=reward.Quantity;}, function()
-			shared.Notify(player, "You recieved "..(reward.Quantity > 1 and reward.Quantity.." "..itemLibrary.Name or "a "..itemLibrary.Name)..".", "Reward");
-		end);
-		rPacket.ClaimSuccess = true;
-		candyData.Claimed[itemId] = true;
+		-- local itemLibrary = modItemsLibrary:Find(reward.ItemId);
+		-- activeInventory:Add(reward.ItemId, {Quantity=reward.Quantity;}, function()
+		-- 	shared.Notify(player, "You recieved "..(reward.Quantity > 1 and reward.Quantity.." "..itemLibrary.Name or "a "..itemLibrary.Name)..".", "Reward");
+		-- end);
+		-- rPacket.ClaimSuccess = true;
+		-- candyData.Claimed[itemId] = true;
 	end
 	
 	modEvents:NewEvent(player, candyData);

@@ -862,9 +862,9 @@ function ItemsLibrary:Init(super)
 	local candyCaravanStr = "Eatible candies but why not cook them in the Slaughterfest Cauldron for something much more special instead?\n";
 	new(foodBase, {Id="zombiejello"; Name="Zombie Jello"; Icon="rbxassetid://99854271826378"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."Craving for brains.."; Tradable=super.Tradable.Nontradable;});
 	new(foodBase, {Id="eyeballgummies"; Name="Eyeball Gummies"; Icon="rbxassetid://72634660358826"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."More eyes, more sights.."; Tradable=super.Tradable.Nontradable;});
-	new(foodBase, {Id="spookmallow"; Name="Spookmallow"; Icon="rbxassetid://93144909042467"; Tags={"Slaughterfest"}; Description=candyCaravanStr..""; Tradable=super.Tradable.Nontradable;});
-	new(foodBase, {Id="cherrybloodbar"; Name="Cherry Blood Bar"; Icon="rbxassetid://87358672710754"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] TBD"; Tradable=super.Tradable.Nontradable;});
-	new(foodBase, {Id="wickedtaffy"; Name="Wicked Taffy"; Icon="rbxassetid://125482145777312"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."[WIP] TBD"; Tradable=super.Tradable.Nontradable;});
+	new(foodBase, {Id="spookmallow"; Name="Spookmallow"; Icon="rbxassetid://93144909042467"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."Spooky marshmallow."; Tradable=super.Tradable.Nontradable;});
+	new(foodBase, {Id="cherrybloodbar"; Name="Cherry Blood Bar"; Icon="rbxassetid://87358672710754"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."The bleeding chocolate bar."; Tradable=super.Tradable.Nontradable;});
+	new(foodBase, {Id="wickedtaffy"; Name="Wicked Taffy"; Icon="rbxassetid://125482145777312"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."Taffy that glues your teeth shut."; Tradable=super.Tradable.Nontradable;});
 	new(skinPermBase, {Id="tirearmorhaunted"; Icon="rbxassetid://91499977896252"; SkinPerm="Haunted"; TargetItemId="tirearmor"; Tags={"Slaughterfest";}; });
 	new(skinPermBase, {Id="nvghaunted"; Icon="rbxassetid://117993502981374"; SkinPerm="Haunted"; TargetItemId="nvg"; Tags={"Slaughterfest";}; });
 	new(skinPermBase, {Id="aproncarnage"; Icon="rbxassetid://97620098577599"; SkinPerm="Carnage"; TargetItemId="apron"; Tags={"Slaughterfest";}; });

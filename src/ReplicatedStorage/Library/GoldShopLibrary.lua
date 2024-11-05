@@ -1644,6 +1644,17 @@ GoldShopLibrary.Products:Add{
 	};
 };
 
+GoldShopLibrary.Products:Add{
+	Id="megaswitchblade";
+	Product={
+		Type="Gold";
+		Price=4990;
+		ItemId="megaswitchblade";
+		New=true;
+		Desc="\n\n\n<b>[Early Access]</b>  Will be obtainable from drops in the future.";
+	};
+};
+
 
 --=== CONTENT PAGES
 
@@ -1773,7 +1784,15 @@ GoldShopLibrary.Pages = {
 		};
 	};
 	
-	NewItems = {}; --Products with New == true, auto added;
+	NewItems = {
+		{
+			Type="Page";
+			Id="NinjaSet";
+			Icon="rbxassetid://78019079266385";
+			TitleText="Ninja Set";
+			Desc="• Full ninja outfit.";
+		};
+	}; --Products with New == true, auto added;
 	
 	FunItems = {
 		{Type="Product"; Id="keytar"};
@@ -1854,13 +1873,6 @@ GoldShopLibrary.Pages = {
 		--	TitleText="Diving Set";
 		--	Desc="• Full diving outfit.";
 		--};
-		{
-			Type="Page";
-			Id="NinjaSet";
-			Icon="rbxassetid://78019079266385";
-			TitleText="Ninja Set";
-			Desc="• Full ninja outfit.";
-		};
 		{Type="Product"; Id="ziphoningserum"};
 		{Type="Product"; Id="abandonedbunkermap"};
 	};
