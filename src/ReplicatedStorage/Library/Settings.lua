@@ -169,6 +169,7 @@ Settings.Add("CompactInterface", function(value)
 end)
 Settings.Add("DisableAccessoryHud", booleanOrNil)
 Settings.Add("DisableDamageIndicator", booleanOrNil)
+Settings.Add("SlideCameraLock", booleanOrNil)
 
 --== Social;
 Settings.Add("InviteFriendsOnly", booleanOrNil)
@@ -362,6 +363,16 @@ baseConfigInterface:Add("GameplayGeneral", "ToggleOption", {
 		Type="Toggle;Hold;Toggle";
 	};
 });
+baseConfigInterface:Add("GameplayGeneral", "ToggleOption", {
+	TitleProperties={Text="Slide Camera Lock";};
+	DescProperties={Text="Lock sliding direction to camera.";};
+	Config={
+		SettingsKey="SlideCameraLock"; 
+		Type="Toggle;Off;Lock";
+	};
+});
+
+
 
 -- MARK: GameplayAutoPickup;
 baseConfigInterface:Add("Right", "Page", {Id="GameplayAutoPickup";

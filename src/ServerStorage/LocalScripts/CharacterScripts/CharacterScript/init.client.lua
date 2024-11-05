@@ -1371,14 +1371,6 @@ local function renderStepped(camera, deltaTime)
 	local turnSensitivity = 7; --character:GetAttribute("SlideTurnSensitivity") or 
 	if characterProperties.IsDashing then -- MARK: Dash Turning
 		local dashCf = CFrame.lookAt(Vector3.zero, dashDirection);
-		-- local inputVector = rbxPlayerModule:GetControls():GetMoveVector();
-		-- if inputVector.X ~= 0 or inputVector.Z ~= 0 then
-		-- 	local lookAtDir = currentCamera.CFrame:ToWorldSpace(CFrame.new(inputVector)).Position * Vector3.new(1, 0, 1);
-		-- 	local localInputDir = CFrame.lookAt(currentCamera.CFrame.Position *Vector3.new(1, 0, 1), lookAtDir);
-		-- 	--dashCf = dashCf:Lerp(localInputDir, 0.1);
-		-- 	dashCf = localInputDir;
-		-- end
-
 		dashDirection = dashCf.LookVector;
 
 		if characterProperties.ThirdPersonCamera then
@@ -1393,32 +1385,44 @@ local function renderStepped(camera, deltaTime)
 			stopSliding();
 		end
 
-		if modData:IsMobile() then turnSensitivity = turnSensitivity-2 end;
-
-		local mouseMoveDelta = UserInputService:GetMouseDelta();
-		local mouseTurnCf = CFrame.Angles(0, math.rad(-mouseMoveDelta.X/(turnSensitivity)), 0);
-
-		local slideCf = CFrame.lookAt(Vector3.zero, slideDirection) * mouseTurnCf;
-
-		local inputVector = rbxPlayerModule:GetControls():GetMoveVector();
-		if inputVector.X ~= 0 or inputVector.Z ~= 0 then
-			local lookAtDir = currentCamera.CFrame:ToWorldSpace(CFrame.new(inputVector)).Position * Vector3.new(1, 0, 1);
-			local localInputDir = CFrame.lookAt(Vector3.new(currentCamera.CFrame.Position.X, 0, currentCamera.CFrame.Position.Z), lookAtDir);
-			slideCf = slideCf:Lerp(localInputDir, 0.1);
+		local slideCameraLock = modData:GetSetting("SlideCameraLock");
+		if slideCameraLock == 1 then
+			if characterProperties.ThirdPersonCamera then
+				setAlignRot{
+					CFrame = rootPoint;
+					Enabled=true;
+				};
+				slideDirection = rootPoint.LookVector;
+			end
+	
+		else
+			if modData:IsMobile() then turnSensitivity = turnSensitivity-2 end;
+	
+			local mouseMoveDelta = UserInputService:GetMouseDelta();
+			local mouseTurnCf = CFrame.Angles(0, math.rad(-mouseMoveDelta.X/(turnSensitivity)), 0);
+	
+			local slideCf = CFrame.lookAt(Vector3.zero, slideDirection) * mouseTurnCf;
+	
+			local inputVector = rbxPlayerModule:GetControls():GetMoveVector();
+			if inputVector.X ~= 0 or inputVector.Z ~= 0 then
+				local lookAtDir = currentCamera.CFrame:ToWorldSpace(CFrame.new(inputVector)).Position * Vector3.new(1, 0, 1);
+				local localInputDir = CFrame.lookAt(Vector3.new(currentCamera.CFrame.Position.X, 0, currentCamera.CFrame.Position.Z), lookAtDir);
+				slideCf = slideCf:Lerp(localInputDir, 0.1);
+			end
+	
+			slideDirection = slideCf.LookVector;
+	
+			local rootFaceCf = CFrame.lookAt(Vector3.zero, rootPart.CFrame.LookVector) * mouseTurnCf;
+			rootFaceCf = rootFaceCf:Lerp(slideCf, 0.3);
+	
+			if characterProperties.ThirdPersonCamera then
+				setAlignRot{
+					CFrame = rootFaceCf;
+					Enabled=true;
+				};
+			end
+	
 		end
-
-		slideDirection = slideCf.LookVector;
-
-		local rootFaceCf = CFrame.lookAt(Vector3.zero, rootPart.CFrame.LookVector) * mouseTurnCf;
-		rootFaceCf = rootFaceCf:Lerp(slideCf, 0.3);
-
-		if characterProperties.ThirdPersonCamera then
-			setAlignRot{
-				CFrame = rootFaceCf;
-				Enabled=true;
-			};
-		end
-
 		-- OLD SLIDE
 		--if characterProperties.ThirdPersonCamera then
 			-- local mouseMoveDelta = UserInputService:GetMouseDelta();
