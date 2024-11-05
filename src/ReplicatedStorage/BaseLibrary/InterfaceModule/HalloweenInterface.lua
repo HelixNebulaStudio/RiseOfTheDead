@@ -37,6 +37,8 @@ function Interface.init(modInterface)
 	if not modConfigurations.SpecialEvent.Halloween then return; end
 	setmetatable(Interface, modInterface);
 	
+	local itemToolTip = modItemInterface.newItemTooltip();
+
 	local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 	local modLeaderboardInterface = require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
 	
@@ -96,6 +98,7 @@ function Interface.init(modInterface)
 			
 			
 		else
+			itemToolTip.Frame.Visible = false;
 			task.delay(0.3, function()
 				Interface:ToggleInteraction(true);
 			end)
@@ -103,6 +106,7 @@ function Interface.init(modInterface)
 	end)
 
 	Interface.Garbage:Tag(travelButton.MouseButton1Click:Connect(function()
+		itemToolTip.Frame.Visible = false;
 		Interface:PlayButtonClick();
 		if modBranchConfigs.WorldName == "Slaughterfest" then return end;
 		
@@ -141,6 +145,7 @@ function Interface.init(modInterface)
 
 
 	local function updatePage()
+		itemToolTip.Frame.Visible = false;
 		if setPage == "Uncover" then
 			uncoverButton.BackgroundColor3 = Color3.fromRGB(28, 106, 5);
 			uncoverButton.BackgroundTransparency = 0;
@@ -313,6 +318,12 @@ function Interface.init(modInterface)
 					itemImgButton.ZIndex = 1;
 					itemButtonObj:Update();
 	
+					itemToolTip:BindHoverOver(itemImgButton, function()
+						itemToolTip.Frame.Parent = mainFrame;
+						itemToolTip:Update(rewardInfo.ItemId);
+						itemToolTip:SetPosition(itemImgButton);
+					end);
+
 					local candyCostFrame = newOption:WaitForChild("CandyCost"); 
 	
 					local cookCostAmount = tierRecipeCost[rewardInfo.Tier];
@@ -370,6 +381,7 @@ function Interface.init(modInterface)
 	
 					local itemLib = modItem:Find(itemId);
 					local optionClickFunc = function()
+						itemToolTip.Frame.Visible = false;
 						Interface:PromptDialogBox({
 							Title=`Cook {itemLib.Name}`;
 							Desc=`Are you sure you want to cook your candies in the cauldron for a {itemLib.Name}.`;
@@ -501,6 +513,12 @@ function Interface.init(modInterface)
 				itemImgButton.ZIndex = 1;
 				itemButtonObj:Update();
 				
+				itemToolTip:BindHoverOver(itemImgButton, function()
+					itemToolTip.Frame.Parent = mainFrame;
+					itemToolTip:Update(rewardInfo.ItemId);
+					itemToolTip:SetPosition(itemImgButton);
+				end);
+
 				if alreadyClaimed then
 					itemImgButton.ImageColor3 = Color3.fromRGB(50, 50, 50);
 					newOption.BackgroundColor3 = Color3.fromRGB(15, 30, 15);
@@ -570,6 +588,7 @@ function Interface.init(modInterface)
 				end
 
 				local optionClickFunc = function()
+					itemToolTip.Frame.Visible = false;
 					if alreadyClaimed then return end;
 
 					Interface:PromptDialogBox({
