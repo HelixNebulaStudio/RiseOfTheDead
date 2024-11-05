@@ -13,7 +13,7 @@ function Flags:Get(flagId, default)
 		end;
 	end
 
-	if default then
+	if rawGet == nil and default then
 		rawGet, rawIndex = self:Add(default);
 	end
 	

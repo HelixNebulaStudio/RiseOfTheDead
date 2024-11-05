@@ -2017,6 +2017,78 @@ task.spawn(function()
 			return true;
 		end;
 	});
+
+	-- bug fix cmds;
+	shared.modCommandsLibrary:HookChatCommand("fixitemcodex", {
+		Permission = shared.modCommandsLibrary.PermissionLevel.All;
+		Description = [[Fixes your item codex from failing to load. 
+		]];
+
+		RequiredArgs = 0;
+		UsageInfo = "/fixitemcodex";
+		Function = function(speaker: Player, args: {[number]: any})
+			local player = speaker;
+
+			if player:GetAttribute("fixitemcodex") then 
+				shared.Notify(player, `Item Codex data fix already attempted, if it is still not fixed restart your game and try again or contact developers.`, "Inform");
+				return 
+			end;
+			player:SetAttribute("fixitemcodex", true);
+
+			local profile = Profile:Get(player);
+
+			local profileDataStore = DataStoreService:GetDataStore("Profiles");
+			local dataVersionPages = profileDataStore:ListVersionsAsync(player.UserId, Enum.SortDirection.Descending, nil, 1730678400000, 5);
+			local dataVersionList = dataVersionPages:GetCurrentPage();
+
+			local success = false;
+			local failMsg = nil;
+
+			for a=1, #dataVersionList do
+				local versionId = dataVersionList[a].Version;
+				local rawData = profileDataStore:GetVersionAsync(player.UserId, versionId);
+				local profileData = HttpService:JSONDecode(rawData or "[]");
+
+				local itemCodexData;
+				local flagsData = profileData and profileData.Flags and profileData.Flags.Data;
+				
+				if flagsData then
+					for b=1, #flagsData do
+						if flagsData[b].Id == "ItemCodex" then
+							itemCodexData = flagsData[b];
+							break;
+						end
+					end
+				end
+
+				if itemCodexData then
+					print(itemCodexData.Data);
+
+					local itemCodexFlag = profile.Flags:Get("ItemCodex", {Id="ItemCodex"; Data={};});
+					for itemId, b in pairs(itemCodexData.Data) do
+						itemCodexFlag.Data[itemId] = true;
+					end
+					success = true;
+
+				else
+					print("itemCodexData nil");
+					failMsg="No item codex data history";
+				end
+			
+				if success then
+					shared.Notify(player, `Fixed Item Codex data.`, "Inform");
+					break; 
+				end;
+			end
+
+			if not success then
+				shared.Notify(player, `Failed to fix item codex. Error: {tostring(failMsg)}`, "Inform");
+			end
+
+			return true;
+		end;
+	});
+
 end)
 
 
