@@ -421,9 +421,9 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule, customNp
 			local pinky: BasePart = npcPrefab:FindFirstChild("RightPinky") :: BasePart;
 
 			local function updateHand()
-				rightPoint.Color = rightArm.Color;
-				middle.Color = rightArm.Color;
-				pinky.Color = rightArm.Color;
+				rightPoint.Color = rightHand.Color;
+				middle.Color = rightHand.Color;
+				pinky.Color = rightHand.Color;
 
 				rightPoint.Transparency = rightHand.Transparency;
 				middle.Transparency = rightHand.Transparency;
@@ -442,9 +442,9 @@ Npc.DoSpawn = function (name, cframe, preloadCallback, customNpcModule, customNp
 			local pinky: BasePart = npcPrefab:FindFirstChild("LeftPinky") :: BasePart;
 
 			local function updateHand()
-				leftPoint.Color = leftArm.Color;
-				middle.Color = leftArm.Color;
-				pinky.Color = leftArm.Color;
+				leftPoint.Color = leftHand.Color;
+				middle.Color = leftHand.Color;
+				pinky.Color = leftHand.Color;
 
 				leftPoint.Transparency = leftHand.Transparency;
 				middle.Transparency = leftHand.Transparency;
