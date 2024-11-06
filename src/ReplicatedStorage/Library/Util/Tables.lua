@@ -22,6 +22,17 @@ function Tables.Shuffle(t, seed)
     end
 end
 
+--[[
+    Tables.Reverse(t)
+
+    @param t table
+]]
+function Tables.Reverse(t)
+    for i = 1, math.floor(#t/2) do
+        local j = #t - i + 1
+        t[i], t[j] = t[j], t[i];
+    end
+end
 
 --[[
     Tables.DeepClone(t)
