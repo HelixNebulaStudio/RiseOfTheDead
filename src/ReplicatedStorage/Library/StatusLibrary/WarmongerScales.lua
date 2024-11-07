@@ -3,10 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local localPlayer = game.Players.LocalPlayer;
 
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
+local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local StatusClass = require(script.Parent.StatusClass).new();
 --==
@@ -16,6 +13,8 @@ if RunService:IsServer() then
 	local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 	modOnGameEvents:ConnectEvent("OnNpcDamaged", function(player, damageSource)
+		if modBranchConfigs.IsWorld("Slaughterfest") then return end;
+
 		local classPlayer = shared.modPlayers.Get(player);
 		if classPlayer == nil then return end;
 
