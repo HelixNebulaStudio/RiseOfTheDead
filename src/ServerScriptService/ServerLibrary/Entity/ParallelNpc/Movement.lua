@@ -32,6 +32,7 @@ function Movement.new(parallelNpc)
 	
 	self.MaxFollowDist = nil;
 	self.MinFollowDist = nil;
+	self.FollowGapOffset = nil;
 
 	self.FacePart = nil;
 	self.FacePosition = nil;
@@ -90,11 +91,17 @@ function Movement.new(parallelNpc)
 		--return dist <= range;
 		if math.abs(posA.Y-posB.Y) > (prefabHeight/2) then return false end;
 
-		posA = Vector3.new(posA.X, 0, posA.Z);
-		posB = Vector3.new(posB.X, 0, posB.Z);
+		--return modRegion:InRegion(posA, posB, range);
+
+		-- posA = Vector3.new(posA.X, 0, posA.Z);
+		-- posB = Vector3.new(posB.X, 0, posB.Z);
+		
+		-- return (posA-posB).Magnitude <= range;
+
+		posA = Vector2.new(posA.X, posA.Z);
+		posB = Vector2.new(posB.X, posB.Z);
 		
 		return (posA-posB).Magnitude <= range;
-		--return modRegion:InRegion(posA, posB, range);
 	end
 	
 	local function getRootPos()
@@ -437,7 +444,21 @@ function Movement.new(parallelNpc)
 
 				-- Stop if out of follow gap but within max follow.
 				if IsInRange(rootPosition, self.TargetPosition, minFDist+fBetween/2) then
-					moveToPoint = rootPosition;
+
+					if self.FollowGapOffset then
+						-- Offset within grey area
+						local newTargetPosition = self.TargetPosition + self.FollowGapOffset;
+
+						local dir = (newTargetPosition-rootPosition).Unit;
+						local mag = (newTargetPosition-rootPosition).Magnitude;
+
+						local clampedMag = math.clamp(mag, minFDist, maxFDist);
+
+						moveToPoint = dir*clampedMag;
+
+					else
+						moveToPoint = rootPosition;
+					end
 				end
 				
 			end
@@ -551,6 +572,7 @@ function Movement.new(parallelNpc)
 		self.PersistFollowTarget = packet.Follow == true;
 		self.MaxFollowDist = packet.MaxFollowDist;
 		self.MinFollowDist = packet.MinFollowDist;
+		self.FollowGapOffset = packet.FollowGapOffset;
 		self.LastRootPosition = getRootPos();
 
 		-- if self.DebugMove == true then
@@ -605,6 +627,7 @@ function Movement.new(parallelNpc)
 		self.LastSuccessfulTargetPosition = nil;
 		self.MaxFollowDist = nil;
 		self.MinFollowDist = nil;
+		self.FollowGapOffset = nil;
 		self.PauseTick = nil;
 		
 		humanoid:MoveTo(getRootPos());
