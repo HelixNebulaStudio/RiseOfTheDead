@@ -101,9 +101,9 @@ Configurations.Set("WithererSpawnLogic", false);
 Configurations.Set("NaturalSpawnLimit", 999);
 
 Configurations.Set("SkyPhaseColor", {
-	Night = Color3.fromRGB(25, 28, 34);
+	Night = Color3.fromRGB(60, 62, 74); --Color3.fromRGB(25, 28, 34);
 
-	DawnStart = Color3.fromRGB(58, 25, 31);
+	DawnStart = Color3.fromRGB(75, 33, 40);
 	DawnPeak = Color3.fromRGB(104, 30, 52);
 	DawnEnd = Color3.fromRGB(154, 105, 124);
 
