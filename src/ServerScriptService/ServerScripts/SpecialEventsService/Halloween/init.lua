@@ -14,11 +14,11 @@ local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariabl
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modDialogueService = require(game.ReplicatedStorage.Library.DialogueService);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
 
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
@@ -28,7 +28,7 @@ local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local remoteHalloween = modRemotesManager:NewFunctionRemote("Halloween", 1);
 
 local cauldronRewardLib = modRewardsLibrary:Find("slaughterfestcauldron");
-local festRewardLib = modRewardsLibrary:Find("slaughterfestcandyrecipes24");
+local festRewardLib = modRewardsLibrary:Find(`slaughterfestcandyrecipes{modGlobalVars.Year}`);
 
 SpecialEvent.Cache = {
 	CandyPool = 0;	
@@ -758,6 +758,61 @@ function remoteHalloween.OnServerInvoke(player, packet)
 
 		rPacket.Success = true;
 		return rPacket;
+
+	elseif action == "CookBadge" then
+		if packet.Index == nil then return end;
+
+		local chosenIndex = packet.Index;
+		
+		local slaughterfestData = profile.Flags:Get("Slaughterfest");
+		local rollSeed = slaughterfestData.RollSeed;
+
+		local recipeRandom = Random.new(rollSeed/chosenIndex);
+
+		local recipeItems = {};
+		local recipeCost = 4;
+
+		for b=1, recipeCost do
+			local pickCandyItemId = candyTypes[recipeRandom:NextInteger(1, #candyTypes)];
+
+			local recipeCandyItem = nil;
+			for a=1, #recipeItems do
+				if recipeItems[a].ItemId == pickCandyItemId then
+					recipeCandyItem = recipeItems[a];
+					break;
+				end
+			end
+			if recipeCandyItem == nil then
+				recipeCandyItem = {
+					ItemId = pickCandyItemId;
+					Amount = 0;
+				};
+				table.insert(recipeItems, recipeCandyItem);
+			end
+
+			recipeCandyItem.Amount = recipeCandyItem.Amount +1;
+		end
+		Debugger:Warn("Cook Badge","Recipe", recipeItems);
+
+		local fulfill, itemsList = shared.modStorage.FulfillList(player, recipeItems);
+		if not fulfill then
+			for _, candyItem in pairs(itemsList) do
+				local itemLib = modItemsLibrary:Find(candyItem.ItemId);
+				shared.Notify(player, `Not enough {itemLib.Name}, {candyItem.Amount} required.`, "Negative");
+			end
+			return
+		end;
+
+		shared.modStorage.ConsumeList(itemsList);
+
+		profile.BattlePassSave:AddLevel(modBattlePassLibrary.Active, 1);
+		activeSave:AwardAchievement(modBattlePassLibrary.Active);
+		profile:RefreshPlayerTitle();
+
+		rPacket.Success = true;
+		return rPacket;
+		
+
 	end
 
 	local cauldronStorage = activeSave.Storages.HalloweenCauldron;	
@@ -987,6 +1042,16 @@ task.spawn(function()
 					workspace:SetAttribute("RoundEndTick", activeGameController.RoundEndTick);
 					shared.Notify(player, "end round", "Inform");
 				end
+
+			elseif actionId == "setlevel" then
+				local key = args[2] or "slaughterfest24Levels";
+				local val = tonumber(args[3]);
+				
+				profile.Flags:Add({
+					Id=key;
+					FlagLevels=val;
+				});
+
 			end
 
 			return true;

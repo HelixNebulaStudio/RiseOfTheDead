@@ -2,6 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local BattlePassLibrary = {};
 BattlePassLibrary.__index = BattlePassLibrary;
+
 --==
 
 local function newTree(list)
@@ -26,9 +27,9 @@ local function leaf(index, data)
 end
 
 function BattlePassLibrary:Init(library)
-	library.Active = "bp5years";
-	
-	library.GiftShop = {
+	library.Active = "slaughterfest2024";
+
+	library[`GiftShop2024`] = {
 		{ItemId="apron"; Cost=4;};
 		{ItemId="militarybootsforest"; Cost=5;};
 		{ItemId="armwrapsrat"; Cost=10;};
@@ -494,6 +495,14 @@ function BattlePassLibrary:Init(library)
 		};
 	};
 	
+	library:Add{
+		Id="slaughterfest2024";
+
+		Title="Slaughterfest 2024";
+		HudTitle="Slaughterfest 2024 badge";
+		Icon="rbxassetid://129368759663555";
+	};
+
 end
 
 

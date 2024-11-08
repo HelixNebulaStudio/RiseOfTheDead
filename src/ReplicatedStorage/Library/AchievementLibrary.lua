@@ -193,6 +193,16 @@ library:Add{
 	Hidden=true;
 }
 
+library:Add{
+	Id="slaughterfest2024";
+	Tier=Tiers.Bloodmetal;
+	BadgeId=3813260452618296;
+	Announce="$PlayerName Unlocked: Slaughterfest 2024";
+	Hidden=true;
+}
+
+
+
 
 library.Tiers = Tiers;
 return library;

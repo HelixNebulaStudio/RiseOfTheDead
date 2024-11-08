@@ -216,6 +216,7 @@ function Interface.init(modInterface)
 			if info.ShopType and info.ShopType ~= activeShopType then
 				continue;
 			end
+
 			if info.Id == "MissionPassLbPage" then
 				local activeBpId = modBattlePassLibrary.Active;
 				local battlepassLib = modBattlePassLibrary:Find(activeBpId);
@@ -691,10 +692,8 @@ function Interface.init(modInterface)
 			--== MARK: Exchange Gift Shop Tokens
 			local isExchangable = modItemsLibrary:HasTag(itemLib.Id, "Skin Perm") or modItemsLibrary:HasTag(itemLib.Id, "Color Pack") or modItemsLibrary:HasTag(itemLib.Id, "Skin Pack");
 			local activeBpId = modBattlePassLibrary.Active;
-			if activeBpId and #activeBpId > 0 and isExchangable then
-				local battlepassLib = modBattlePassLibrary:Find(activeBpId);
-				
-
+			local battlepassLib = activeBpId and modBattlePassLibrary:Find(activeBpId);
+			if activeBpId and #activeBpId > 0 and isExchangable and battlepassLib and battlepassLib.Tree then
 				Interface.NewListing(function(newListing)
 					local infoBox = newListing:WaitForChild("infoFrame");
 					local descFrame = infoBox:WaitForChild("descFrame");

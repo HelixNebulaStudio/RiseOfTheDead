@@ -8,6 +8,7 @@ local Vars = {
 	ModeVerLabel = "$UpTime";
 	
 	--VoteKey = "sfc23";
+	Year=tonumber(os.date("*t").year);
 	
 	BaseFocusKills=30;
 	FocusLinearScale=10;

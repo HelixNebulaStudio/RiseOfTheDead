@@ -101,9 +101,9 @@ function toolPackage.NewToolLib(handler)
 		return true; -- submit input to server;
 	end
 	
-	Tool.Holster = {
-		LowerTorsoHolster={PrefabName="megaswitchblade"; Offset=CFrame.new(-0.293823242, -0.206907272, -0.817176819, -0.0917134061, -0.965947926, -0.241936639, 0.0980803296, -0.250541896, 0.963124633, -0.990943432, 0.0646022111, 0.11771854)};
-	}
+	-- Tool.Holster = {
+	-- 	LowerTorsoHolster={PrefabName="megaswitchblade"; Offset=CFrame.new(-0.293823242, -0.206907272, -0.817176819, -0.0917134061, -0.965947926, -0.241936639, 0.0980803296, -0.250541896, 0.963124633, -0.990943432, 0.0646022111, 0.11771854)};
+	-- }
 
 	Tool.Configurations = {
 		Type="Sword";

@@ -53,7 +53,7 @@ function Interface.init(modInterface)
 	local travelButton = treatFrame:WaitForChild("travelButton");
 
 	local cauldronRewardLib = modRewardsLibrary:Find("slaughterfestcauldron");
-	local festRewardLib = modRewardsLibrary:Find("slaughterfestcandyrecipes24");
+	local festRewardLib = modRewardsLibrary:Find(`slaughterfestcandyrecipes{modGlobalVars.Year}`);
 
 	if modBranchConfigs.WorldName == "Slaughterfest" then
 
@@ -138,9 +138,13 @@ function Interface.init(modInterface)
 
 	local uncoverButton = candyShopFrame:WaitForChild("newButton");
 	local antiqueButton = candyShopFrame:WaitForChild("oldButton");
+	local badgeButton = candyShopFrame:WaitForChild("badgeButton");
+
 	local pageButtonsFrame = candyShopFrame:WaitForChild("PageButtons");
 	local antiqueCookOptionsFrame = candyShopFrame:WaitForChild("AntiqueCookOptions");
 	local uncoverCookOptionsFrame = candyShopFrame:WaitForChild("UncoverCookOptions");
+	local badgesOptionsFrame = candyShopFrame:WaitForChild("BadgesOptions");
+	
 	local rerollButton: TextButton = candyShopFrame:WaitForChild("rerollButton");
 
 
@@ -151,21 +155,45 @@ function Interface.init(modInterface)
 			uncoverButton.BackgroundTransparency = 0;
 			antiqueButton.BackgroundColor3 = Color3.fromRGB(35, 70, 36);
 			antiqueButton.BackgroundTransparency = 0.4;
+			badgeButton.BackgroundColor3 = Color3.fromRGB(35, 70, 36);
+			badgeButton.BackgroundTransparency = 0.4;
+
 			pageButtonsFrame.Visible = true;
 			rerollButton.Visible = false;
 			antiqueCookOptionsFrame.Visible = false;
 			uncoverCookOptionsFrame.Visible = true;
+
+			badgesOptionsFrame.Visible = false;
 
 		elseif setPage == "Antique" then
 			antiqueButton.BackgroundColor3 = Color3.fromRGB(28, 106, 5);
 			antiqueButton.BackgroundTransparency = 0;
 			uncoverButton.BackgroundColor3 = Color3.fromRGB(35, 70, 36);
 			uncoverButton.BackgroundTransparency = 0.4;
+			badgeButton.BackgroundColor3 = Color3.fromRGB(35, 70, 36);
+			badgeButton.BackgroundTransparency = 0.4;
+
 			pageButtonsFrame.Visible = false;
 			rerollButton.Visible = true;
 			antiqueCookOptionsFrame.Visible = true;
 			uncoverCookOptionsFrame.Visible = false;
 
+			badgesOptionsFrame.Visible = false;
+
+		elseif setPage == "Badge" then
+			antiqueButton.BackgroundColor3 = Color3.fromRGB(35, 70, 36);
+			antiqueButton.BackgroundTransparency = 0.4;
+			uncoverButton.BackgroundColor3 = Color3.fromRGB(35, 70, 36);
+			uncoverButton.BackgroundTransparency = 0.4;
+			badgeButton.BackgroundColor3 = Color3.fromRGB(28, 106, 5);
+			badgeButton.BackgroundTransparency = 0;
+
+			pageButtonsFrame.Visible = false;
+			rerollButton.Visible = false;
+			antiqueCookOptionsFrame.Visible = false;
+			uncoverCookOptionsFrame.Visible = false;
+
+			badgesOptionsFrame.Visible = true;
 		end
 	end
 
@@ -176,6 +204,11 @@ function Interface.init(modInterface)
 	end)
 	antiqueButton.MouseButton1Click:Connect(function()
 		setPage = "Antique";
+		Interface:PlayButtonClick();
+		updatePage();
+	end)
+	badgeButton.MouseButton1Click:Connect(function()
+		setPage = "Badge";
 		Interface:PlayButtonClick();
 		updatePage();
 	end)
@@ -269,6 +302,7 @@ function Interface.init(modInterface)
 
 	function Interface.Update()
 		local slaughterfestData = modData:GetFlag("Slaughterfest", true);
+
 		local rollSeed = slaughterfestData.RollSeed;
 		local claimedReward = slaughterfestData.Claimed or {};
 
@@ -371,12 +405,6 @@ function Interface.init(modInterface)
 					
 					if modConfigurations.CompactInterface then
 						uiLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom;
-	
-						if cookCostAmount > 20 then
-							itemImgButton.Size = UDim2.new(0.5, 0, 0.5, 0);
-						elseif cookCostAmount > 10 then
-							itemImgButton.Size = UDim2.new(0.65, 0, 0.65, 0);
-						end
 					end
 	
 					local itemLib = modItem:Find(itemId);
@@ -579,12 +607,6 @@ function Interface.init(modInterface)
 				
 				if modConfigurations.CompactInterface then
 					uiLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom;
-
-					if recipeCost > 20 then
-						itemImgButton.Size = UDim2.new(0.5, 0, 0.5, 0);
-					elseif recipeCost > 10 then
-						itemImgButton.Size = UDim2.new(0.65, 0, 0.65, 0);
-					end
 				end
 
 				local optionClickFunc = function()
@@ -623,6 +645,121 @@ function Interface.init(modInterface)
 
 			end
 		end
+
+		-- MARK: Upgrade Badge
+		local modAchievementLibrary = require(game.ReplicatedStorage.Library.AchievementLibrary);
+		local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
+		local achievementLib = modAchievementLibrary:Find(`slaughterfest{modGlobalVars.Year}`);
+		local eventLib = modBattlePassLibrary:Find(`slaughterfest{modGlobalVars.Year}`);
+		if achievementLib and eventLib then
+			badgeButton.Visible = true;
+			badgeButton.ImageLabel.Image = eventLib.Icon;
+
+			badgeButton = badgeButton :: ImageLabel;
+
+			badgeButton.MouseEnter:Connect(function()
+				badgeButton.ImageLabel:TweenSize(UDim2.new(2, 0, 2, 0), nil, nil, 0.3, true);
+			end)
+			badgeButton.MouseLeave:Connect(function()
+				badgeButton.ImageLabel:TweenSize(UDim2.new(1.9, 0, 1.9, 0), nil, nil, 0.3, true);
+			end)
+
+			for _, obj in pairs(badgesOptionsFrame:GetChildren()) do
+				if not obj:IsA("GuiObject") then continue end;
+				game.Debris:AddItem(obj, 0);
+			end
+			for a=1, 3 do
+				local newOption = shopOptionTemplate:Clone();
+				local candyCostFrame = newOption:WaitForChild("CandyCost"); 
+				local imageLabel = newOption:WaitForChild("ItemButtonPlaceholder");
+				imageLabel.Visible = true;
+
+				local recipeRandom = Random.new(rollSeed/a);
+
+				local recipeItems = {};
+				local recipeCost = 4;
+
+				local candyOrder = {};
+
+				for b=1, recipeCost do
+					local pickCandyItemId = candyTypes[recipeRandom:NextInteger(1, #candyTypes)];
+					recipeItems[pickCandyItemId] = (recipeItems[pickCandyItemId] or 0) + 1;
+
+					if table.find(candyOrder, pickCandyItemId) == nil then
+						table.insert(candyOrder, pickCandyItemId);
+					end
+				end
+
+				for b=1, #candyOrder do
+					local candyItemId = candyOrder[b];
+					local amt = recipeItems[candyItemId];
+
+					local validCount = modData.CountItemIdFromStorages(candyItemId);
+
+					for c=1, amt do
+						local newCandy: ImageLabel = candyOptionTemplate:Clone();
+						newCandy.Image = candyIcons[candyItemId];
+						newCandy.Parent = candyCostFrame;
+
+						if validCount >= c then
+							newCandy.ImageTransparency = 0;
+							newCandy.BackgroundTransparency = 0.4;
+
+						else
+							newCandy.ImageTransparency = 0.5;
+							newCandy.BackgroundTransparency = 0.9;
+
+						end
+
+						if modConfigurations.CompactInterface then
+							if recipeCost > 20 then
+								newCandy.Size = UDim2.new(0, 20, 0, 20);
+							elseif recipeCost > 6 then
+								newCandy.Size = UDim2.new(0, 25, 0, 25);
+							end
+						end
+					end
+				end
+
+				newOption.Name = achievementLib.Id;
+				imageLabel.Image = eventLib.Icon;
+
+				newOption.Parent = badgesOptionsFrame;
+				
+				local optionClickFunc = function()
+					Interface:PromptDialogBox({
+						Title=`Unlock {eventLib.Title} Level`;
+						Desc=`Are you sure you want to cook your candies for a {eventLib.Title} level? (You will unlock the badge.)`;
+						Icon=eventLib.Icon;
+						Buttons={
+							{
+								Text="Cook";
+								Style="Confirm";
+								OnPrimaryClick=function(promptDialogFrame, textButton)
+									promptDialogFrame.statusLabel.Text = "Cooking...";
+									local rPacket = remoteHalloween:InvokeServer({Action="CookBadge"; Index=a;});
+									if rPacket == nil then
+										return;
+									end
+									
+									Interface.Update();
+								end;
+							};
+							{
+								Text="Cancel";
+								Style="Cancel";
+							};
+						}
+					});
+				end
+
+				newOption.MouseButton1Click:Connect(optionClickFunc);
+			end
+
+		else
+			badgeButton.Visible = false;
+		end
+
 
 		-- MARK: Exchange & Treats
 		local npcSeed = workspace:GetAttribute("SlaughterfestSeed") or modSyncTime.TimeOfEndOfDay();

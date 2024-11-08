@@ -249,7 +249,7 @@ function BattlePassSave:GetPassData(bpId)
 
 	if self.Passes[bpId] == nil then
 		local unixTime = DateTime.now().UnixTimestamp;
-		if unixTime > bpLib.EndUnixTime then return end;
+		if bpLib.EndUnixTime and unixTime > bpLib.EndUnixTime then return end;
 		
 		self.Passes[bpId] = BattlePassSave.newPassData();
 	end
@@ -275,64 +275,72 @@ function BattlePassSave:AddLevel(bpId, addAmt, majorAlert)
 	local treeList = bpLib.Tree;
 
 	local currentLevel = passData.Level;
-	local leafInfo = treeList[currentLevel] or {};
 	
 	addAmt = addAmt or 1;
 	local newLevel = passData.Level + addAmt;
 	passData.Level = newLevel;
-	
+
 	local newRewardAdded = false;
-	if passData.Level >= #treeList then
-		if passData.Completed == false then
-			passData.Completed = true;
+	if treeList then
+		local leafInfo = treeList[currentLevel] or {};
 
-			local activeSave = self.Profile:GetActiveSave();
-			activeSave:AwardAchievement(bpLib.Id);
-
-			remoteHudNotification:FireClient(self.Player, "BattlePassComplete", {Title=bpLib.Title;});
-		end
-		
-		self.Profile:RefreshPlayerTitle();
-
-		local serverTime = workspace:GetServerTimeNow();
-
-		local rewardsLib = modRewardsLibrary:Find(bpId);
-		if newLevel >= #treeList and rewardsLib then
+		if passData.Level >= #treeList then
+			if passData.Completed == false then
+				passData.Completed = true;
+	
+				local activeSave = self.Profile:GetActiveSave();
+				activeSave:AwardAchievement(bpLib.Id);
+	
+				remoteHudNotification:FireClient(self.Player, "BattlePassComplete", {Title=bpLib.Title;});
+			end
 			
-			for lvl=(currentLevel+1), newLevel do
-				if lvl < #treeList then continue end;
-
-				local isFmodLvl = math.fmod(lvl, modBattlePassLibrary.PostRewardLvlFmod);
-				if isFmodLvl == 0 then
-					local lvlStr = tostring(lvl);
-					if passData.PostRewards[lvlStr] == nil then
-
-						local rewards = modDropRateCalculator.RollDrop(rewardsLib);
-						local rewardInfo = rewards[1];
-						
-						if rewardInfo then
-							rewardInfo.ExpireTime = serverTime+shared.Const.OneDaySecs;
-							passData.PostRewards[lvlStr] = rewardInfo;
-							newRewardAdded = true;
+			self.Profile:RefreshPlayerTitle();
+	
+			local serverTime = workspace:GetServerTimeNow();
+	
+			local rewardsLib = modRewardsLibrary:Find(bpId);
+			if newLevel >= #treeList and rewardsLib then
+				
+				for lvl=(currentLevel+1), newLevel do
+					if lvl < #treeList then continue end;
+	
+					local isFmodLvl = math.fmod(lvl, modBattlePassLibrary.PostRewardLvlFmod);
+					if isFmodLvl == 0 then
+						local lvlStr = tostring(lvl);
+						if passData.PostRewards[lvlStr] == nil then
+	
+							local rewards = modDropRateCalculator.RollDrop(rewardsLib);
+							local rewardInfo = rewards[1];
+							
+							if rewardInfo then
+								rewardInfo.ExpireTime = serverTime+shared.Const.OneDaySecs;
+								passData.PostRewards[lvlStr] = rewardInfo;
+								newRewardAdded = true;
+							end
 						end
 					end
 				end
+				
 			end
 			
+			for lvlStr, rewardInfo in pairs(passData.PostRewards) do
+				if serverTime <= rewardInfo.ExpireTime then continue end;
+				passData.PostRewards[lvlStr] = nil;
+			end
+			
+		else
+			passData.LastLevelUpTime = workspace:GetServerTimeNow();
+			newRewardAdded = leafInfo.Reward ~= nil
+	
 		end
-		
-		for lvlStr, rewardInfo in pairs(passData.PostRewards) do
-			if serverTime <= rewardInfo.ExpireTime then continue end;
-			passData.PostRewards[lvlStr] = nil;
-		end
-		
-	else
-		passData.LastLevelUpTime = workspace:GetServerTimeNow();
-		newRewardAdded = leafInfo.Reward ~= nil
 
 	end
-	
-	remoteHudNotification:FireClient(self.Player, "BattlePassLevelUp", {Level=passData.Level; HasRewards=newRewardAdded;});
+
+	remoteHudNotification:FireClient(self.Player, "BattlePassLevelUp", {
+		Title=bpLib.HudTitle;
+		Level=passData.Level; 
+		HasRewards=newRewardAdded;
+	});
 	self:Sync();
 	
 	local playerRng = Random.new(self.Player.UserId);
@@ -359,6 +367,7 @@ function BattlePassSave:OnMissionComplete(mission)
 	
 	local bpLib = modBattlePassLibrary:Find(activeId);
 	if bpLib == nil then return end;
+	if bpLib.Tree == nil then return end;
 	if unixTime > bpLib.EndUnixTime then return end;
 
 	local playerSave = self.Profile:GetActiveSave();
@@ -427,6 +436,10 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 	local bpLib = modBattlePassLibrary:Find(activeId);
 	local treeList = bpLib.Tree;
 	
+	if bpLib.EndUnixTime == nil then
+		returnPacket.FailMsg = "Can not use this";
+		return returnPacket;
+	end
 	if unixTime > bpLib.EndUnixTime then
 		returnPacket.FailMsg = "Event Pass is over";
 		return returnPacket

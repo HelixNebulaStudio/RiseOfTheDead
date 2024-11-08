@@ -307,5 +307,13 @@ library:Add{
 	TitleStyle=TitleStyle.Gold;
 };
 
+library:Add{
+	Id="slaughterfest2024";
+	Title="Slaughterfest 2024";
+	Unlock=UnlockMethods.Achievement;
+	TitleStyle=TitleStyle.Bloodmetal;
+	BpLevels=true;
+};
+
 
 return library;

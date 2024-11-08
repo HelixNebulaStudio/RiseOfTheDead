@@ -1686,6 +1686,13 @@ function Profile:RefreshPlayerTitle()
 					titleText = titleText.." Level ".. modFormatNumber.Beautify(passData.Level);
 				end
 			end
+
+			if titleLib.FlagLevels then
+				local flagLevelData = self.Flags:Get(titleLib.FlagLevels);
+				if flagLevelData and flagLevelData.FlagLevels and self.Settings.AchievementTitleLevels ~= 1 then
+					titleText = titleText.." Level ".. modFormatNumber.Beautify(flagLevelData.FlagLevels);
+				end
+			end
 			
 			titleLabel.Text = titleText;
 		else

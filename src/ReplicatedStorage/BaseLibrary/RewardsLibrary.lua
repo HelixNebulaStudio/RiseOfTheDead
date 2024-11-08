@@ -191,7 +191,7 @@ function RewardsLibrary:Init(super)
 	};
 
 	super:Add{
-		Id="slaughterfestcandyrecipes24";
+		Id="slaughterfestcandyrecipes2024";
 		Rewards={
 			{ItemId="jackolanternhaunted"; Quantity=1; Chance=1; Tier=1;};
 			{ItemId="tirearmorhaunted"; Quantity=1; Chance=1; Tier=2;};

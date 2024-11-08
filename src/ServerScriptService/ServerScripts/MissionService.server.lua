@@ -331,9 +331,23 @@ function OnPlayerAdded(player)
 				
 				local availRepetablesMissions = 0;
 				for _, missionData in pairs(missionProfile:GetCatTypes(modMissionLibrary.MissionTypes.Board)) do
-					if missionData.Type == 2 then
-						availRepetablesMissions = availRepetablesMissions +1;
+					local missionLib = missionData.Library;
+					if missionData.Type ~= 2 then continue end;
+
+					local isSpecialMission = false;
+					if missionLib.AddRequirements then
+						for a=1, #missionLib.AddRequirements do
+							local rType = missionLib.AddRequirements[a].Type;
+							local rValue = missionLib.AddRequirements[a].Value;
+							if rType == "SpecialEvent" and modConfigurations.SpecialEvent[rValue] then
+								isSpecialMission = true;
+								break;
+							end
+						end
 					end
+					if isSpecialMission then continue end;
+
+					availRepetablesMissions = availRepetablesMissions +1;
 				end
 				if availRepetablesMissions >= maxBoardMissions then
 					missionMetaData.LastAddUnixTime = unixTime;

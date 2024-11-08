@@ -118,7 +118,7 @@ function Move:MoveTo(target: Vector3 | BasePart)
 	return moveId;
 end
 
-function Move:Follow(target: Vector3 | BasePart, maxFollowDist: number, minFollowDist: number)
+function Move:Follow(target: Vector3 | BasePart, maxFollowDist: number, minFollowDist: number, followGapOffset: number)
 	if self.Destroyed then return end;
 	if self.Npc.RootPart == nil or self.Npc.IsDead then return end;
 	if self.Npc.Humanoid.PlatformStand then return end;
@@ -137,6 +137,7 @@ function Move:Follow(target: Vector3 | BasePart, maxFollowDist: number, minFollo
 		Target=target;
 		MaxFollowDist=maxFollowDist;
 		MinFollowDist=minFollowDist;
+		FollowGapOffset=followGapOffset;
 	});
 	
 	return self.MoveId;

@@ -1,5 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
+
 local modLibraryManager = require(game.ReplicatedStorage.Library.LibraryManager);
 
 local library = modLibraryManager.new();
@@ -21,7 +23,6 @@ if library.Active then
 		RanksLimit=100;
 		Folder="AllTimeStats";
 	};
-	
 end
 
 return library;

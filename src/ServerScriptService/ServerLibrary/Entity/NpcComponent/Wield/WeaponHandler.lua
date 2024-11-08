@@ -467,8 +467,12 @@ function Handler:FireWeapon(direction)
 						local function onCast(basePart, position, normal, material, index, distance)
 							if basePart == nil then return end;
 						
-							local humanoid = basePart.Parent:FindFirstChildWhichIsA("Humanoid");
-							local targetRootPart = basePart.Parent:FindFirstChild("HumanoidRootPart");
+							local targetPrefab = basePart.Parent;
+							local humanoid = targetPrefab:FindFirstChildWhichIsA("Humanoid");
+							local targetRootPart = targetPrefab:FindFirstChild("HumanoidRootPart");
+							
+							local damagable = modDamagable.NewDamagable(targetPrefab);
+							if damagable == nil or damagable:CanDamage(self.Npc) == false then return end;
 							
 							if humanoid then
 								if humanoid.Health > 0 then
@@ -493,18 +497,19 @@ function Handler:FireWeapon(direction)
 							return;
 						end
 						
-						local whitelist = {workspace.Environment; workspace.Terrain};
-						if self.Wield.Targetable then
+						local whitelist = {};
+						if self.Wield.RayWhitelist then
+							whitelist = self.Wield.RayWhitelist;
+
+						elseif self.Wield.Targetable then
 							if self.Wield.Targetable.Zombie then
 								whitelist = CollectionService:GetTagged("Zombies");
-								table.insert(whitelist, workspace.Environment);
 							end
 							if self.Wield.Targetable.Human then
 								local humanoidList = CollectionService:GetTagged("Humans");
 								for a=1, #humanoidList do
 									table.insert(whitelist, humanoidList[a]);
 								end
-								table.insert(whitelist, workspace.Environment);
 							end
 								
 							if self.Wield.Targetable.Bandit then
@@ -512,7 +517,6 @@ function Handler:FireWeapon(direction)
 								for a=1, #humanoidList do
 									table.insert(whitelist, humanoidList[a]);
 								end
-								table.insert(whitelist, workspace.Environment);
 							end
 								
 							if self.Wield.Targetable.Cultist then
@@ -520,7 +524,6 @@ function Handler:FireWeapon(direction)
 								for a=1, #humanoidList do
 									table.insert(whitelist, humanoidList[a]);
 								end
-								table.insert(whitelist, workspace.Environment);
 							end
 							
 							if self.Wield.Targetable.Rat then
@@ -528,7 +531,6 @@ function Handler:FireWeapon(direction)
 								for a=1, #humanoidList do
 									table.insert(whitelist, humanoidList[a]);
 								end
-								table.insert(whitelist, workspace.Environment);
 							end
 								
 							if self.Wield.Targetable.Humanoid then
@@ -536,8 +538,9 @@ function Handler:FireWeapon(direction)
 								for a=1, #humanoidList do
 									table.insert(whitelist, humanoidList[a]);
 								end
-								table.insert(whitelist, workspace.Environment);
 							end
+							table.insert(whitelist, workspace.Environment);
+							table.insert(whitelist, workspace.Terrain);
 						end
 
 						local bulletEnd = modWeaponsMechanics.CastHitscanRay{
@@ -778,6 +781,10 @@ end
 
 function Handler:Destroy()
 	self:Unequip();
+
+	if self.Wield.RayWhitelist then
+		table.clear(self.Wield.RayWhitelist);
+	end
 end
 
 return Handler;
