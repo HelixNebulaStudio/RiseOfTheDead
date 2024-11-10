@@ -677,7 +677,7 @@ function Interface.init(modInterface)
 				local recipeRandom = Random.new(rollSeed/a);
 
 				local recipeItems = {};
-				local recipeCost = 4;
+				local recipeCost = 5;
 
 				local candyOrder = {};
 

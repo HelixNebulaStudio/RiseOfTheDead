@@ -770,7 +770,7 @@ function remoteHalloween.OnServerInvoke(player, packet)
 		local recipeRandom = Random.new(rollSeed/chosenIndex);
 
 		local recipeItems = {};
-		local recipeCost = 4;
+		local recipeCost = 5;
 
 		for b=1, recipeCost do
 			local pickCandyItemId = candyTypes[recipeRandom:NextInteger(1, #candyTypes)];
