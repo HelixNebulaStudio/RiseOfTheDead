@@ -131,6 +131,23 @@ function InfoBubbles.Spawn(packet)
 	else
 		labelTag.Size = UDim2.new(1, 0, 1, 0);
 		iconTag.Visible = false;
+
+		if packet.TextColor then
+			labelTag.TextColor3 = Color3.fromHex(packet.TextColor);
+		end
+		if packet.TextSize then
+			labelTag.TextSize = packet.TextSize;
+		end
+		if packet.TextStrokeColor then
+			labelTag.TextStrokeColor3 = packet.TextStrokeColor;
+		end
+		if packet.IconColor then
+			iconTag.ImageColor3 = Color3.fromHex(packet.IconColor);
+		end
+		if packet.IconImage then
+			iconTag.Image = packet.IconImage;
+			iconTag.Visible = true;
+		end
 	end
 	
 	if bubbleType == "Crit" then

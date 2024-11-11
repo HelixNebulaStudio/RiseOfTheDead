@@ -164,6 +164,7 @@ Branches.WorldTypes = {
 	General=1;
 	Cutscene=2;
 	Slaughterfest=3;
+	NekronsGambit=4;
 	Custom=9;
 }
 
@@ -171,7 +172,7 @@ local isMainBranch = Branches.CurrentBranch.Name == "Live";
 Branches.WorldLibrary = {
 	MainMenu={CanTravelTo=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.Menu; MaxPlayers=25;};
 	BioXResearch={CanTravelTo=true; PrivateWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=10; DevsOnly=isMainBranch;}; -- PublicWorld=true;
-	NekronsGambit={NoPrivateServers=true; CanTravelTo=true; PublicWorld=true; FreeTravels=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.Slaughterfest; MaxPlayers=8;};
+	NekronsGambit={NoPrivateServers=true; CanTravelTo=true; PublicWorld=true; FreeTravels=true; TimeCycleEnabled=false; WeatherCycle=false; Type=Branches.WorldTypes.NekronsGambit; MaxPlayers=8;};
 
 	-- Cutscene;
 	TheBeginning={CanTravelTo=false; Type=Branches.WorldTypes.Cutscene; MaxPlayers=1;};
@@ -600,6 +601,42 @@ elseif Branches.WorldInfo.Type == Branches.WorldTypes.Slaughterfest then
 	modConfigurations.Set("DisableNonMockEquip", true);
 	modConfigurations.Set("DisableMasterySkills", true);
 	
+elseif Branches.WorldInfo.Type == Branches.WorldTypes.NekronsGambit then
+	modConfigurations.Set("DisableHealthbar", false);
+	modConfigurations.Set("DisableHotbar", true);
+	modConfigurations.Set("CanQuickEquip", false);
+
+	modConfigurations.Set("DefaultSprintMode", 2);
+	modConfigurations.Set("DisableSettingsMenu", false);
+	modConfigurations.Set("DisableSocialMenu", false);
+	modConfigurations.Set("DisableSquadInterface", false);
+	modConfigurations.Set("DisableMajorNotifications", false);
+	modConfigurations.Set("DisableDialogue", true);
+	modConfigurations.Set("DisableMapMenu", true);
+	modConfigurations.Set("DisableGoldMenu", false);
+	modConfigurations.Set("DisableStatusHud", false);
+	modConfigurations.Set("DisableEmotes", false);
+	modConfigurations.Set("DisableMissions", false);
+	modConfigurations.Set("DisablePinnedMission", false);
+	modConfigurations.Set("DisableInfoBubbles", false);
+	
+	modConfigurations.Set("DisableExperiencebar", false);
+	modConfigurations.Set("RemoveForceFieldOnWeaponFire", true);
+	modConfigurations.Set("DisableGearMods", true);
+	
+	modConfigurations.Set("PvpMode", true);
+	
+	modConfigurations.Set("SpawnProtectionTimer", 5);
+	modConfigurations.Set("TargetableEntities", {
+		Humanoid=1;
+		Zombie=1;
+	});
+	
+	--== Server;
+	modConfigurations.Set("DisableItemDrops", false);
+	modConfigurations.Set("DisableNonMockEquip", true);
+	modConfigurations.Set("DisableMasterySkills", true);
+
 end
 	
 if Branches.WorldName == "BioXResearch" then

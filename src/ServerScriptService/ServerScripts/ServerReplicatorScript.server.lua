@@ -517,7 +517,11 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 	local ammoCost = math.min(configurations.AmmoCost or 1, ammo);
 
 	if ammo <= 0 then
-		maxAmmo = math.max(maxAmmo -1, 0);
+		if configurations.NoMaxAmmo then
+			maxAmmo = configurations.MaxAmmoLimit;
+		else
+			maxAmmo = math.max(maxAmmo -1, 0);
+		end
 		ammo = 0;
 		
 		local initReload = cache.InitialReloadTick or 0;

@@ -47,7 +47,7 @@ function Player.new(playerInstance: Player)
 	local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 
 	local modModEngineService = require(game.ReplicatedStorage.Library.ModEngineService);
-	local moddedSelf = modModEngineService:GetModule(script.Name);
+	local moddedSelf = modModEngineService:GetModule(`ClassPlayer`);
 	
 	local meta = {};
 	local classPlayer = setmetatable({}, meta);

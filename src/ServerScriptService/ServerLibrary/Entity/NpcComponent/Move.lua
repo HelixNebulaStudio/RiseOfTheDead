@@ -82,7 +82,7 @@ function Move:LookAt(point: Vector3 | BasePart)
 	if waistMotor then
 		local waistX = math.atan2(self.Npc.RootPart.Position.Y - point.Y, 3.5);
 		local waistY = self.Npc.JointRotations.WaistRot:Get();
-		waistMotor.C1 = CFrame.new(self.WaistMotorC1.p) * CFrame.Angles(math.clamp(waistX, -0.8, 0.7), waistY, 0);
+		waistMotor.C1 = CFrame.new(self.WaistMotorC1.p) * CFrame.Angles(math.clamp(waistX, -1.1, 1.1), waistY, 0);
 		
 		if self.WaistTween then
 			self.WaistTween:Cancel();

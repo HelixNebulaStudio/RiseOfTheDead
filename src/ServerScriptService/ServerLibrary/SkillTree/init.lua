@@ -82,7 +82,7 @@ end
 function SkillTree:TriggerSkills(player, triggerType, ...)
 	local profile = shared.modProfile:Find(player.Name);
 	if profile == nil then return end;
-	if modConfigurations.DisableMasterySkills then Debugger:StudioLog("MasterySkills disabled."); return end;
+	if modConfigurations.DisableMasterySkills then return end;
 	
 	local skillTree = profile.SkillTree and profile.SkillTree.ActiveTree and profile.SkillTree.Trees[profile.SkillTree.ActiveTree] or nil;
 	local triggerTable = modSkillTreeLibrary.Triggers[triggerType];

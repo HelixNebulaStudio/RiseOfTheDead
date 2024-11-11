@@ -331,7 +331,11 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 			ammoCounter.Position = UDim2.new(0.5, 0, 0.94, -145);
 		end
 		
-		ammoCounter.Text = properties.Ammo .."/".. getReserveAmmo();
+		if configurations.NoMaxAmmo then
+			ammoCounter.Text = properties.Ammo .."/".. configurations.AmmoLimit;
+		else
+			ammoCounter.Text = properties.Ammo .."/".. getReserveAmmo();
+		end
 		
 		task.spawn(function()
 			modStorageInterface.RefreshStorageItemId(weaponId);
@@ -1576,7 +1580,11 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 				end
 				
 				properties.Ammo = newAmmo;
-				properties.MaxAmmo = infType == nil and newMaxAmmo or configurations.MaxAmmoLimit;
+				if configurations.NoMaxAmmo then
+					properties.MaxAmmo = configurations.MaxAmmoLimit;
+				else
+					properties.MaxAmmo = infType == nil and newMaxAmmo or configurations.MaxAmmoLimit;
+				end
 				values.A = newAmmo;
 				
 				Equipped.RightHand.Data.reloadAttemptCount = 0;
@@ -1638,8 +1646,12 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 							properties.Ammo = properties.Ammo + ammoDelta;
 							
 							if ammoFromMA > 0 then
-								properties.MaxAmmo = infType == nil and (properties.MaxAmmo - ammoFromMA) or configurations.MaxAmmoLimit;
-								properties.MaxAmmo = math.max(properties.MaxAmmo, 0);
+								if configurations.NoMaxAmmo then
+									properties.MaxAmmo = configurations.MaxAmmoLimit;
+								else
+									properties.MaxAmmo = infType == nil and (properties.MaxAmmo - ammoFromMA) or configurations.MaxAmmoLimit;
+									properties.MaxAmmo = math.max(properties.MaxAmmo, 0);
+								end
 							end
 							if ammoFromInv > 0 then
 								availableInvAmmo = availableInvAmmo - ammoFromInv;
