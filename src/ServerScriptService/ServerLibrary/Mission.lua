@@ -324,36 +324,36 @@ function Mission:CompleteMission(players, missionId, sync)
 					shared.Notify(player, "Press [B] to open your missions menu.", "Inform");
 				end
 				
-				task.spawn(function()
-					local rbxPerksFlag = profile.Flags:Get("rbxPremiumPerks") or {Id="rbxPremiumPerks"; JoinTime=0; MissionsComplete=0; CompleteTime=0;};
+				-- task.spawn(function()
+				-- 	local rbxPerksFlag = profile.Flags:Get("rbxPremiumPerks") or {Id="rbxPremiumPerks"; JoinTime=0; MissionsComplete=0; CompleteTime=0;};
 					
-					if player.MembershipType == Enum.MembershipType.Premium or profile.Premium then
-						if rbxPerksFlag.MissionsComplete < 3 then
-							rbxPerksFlag.MissionsComplete = rbxPerksFlag.MissionsComplete +1;
+				-- 	if player.MembershipType == Enum.MembershipType.Premium or profile.Premium then
+				-- 		if rbxPerksFlag.MissionsComplete < 3 then
+				-- 			rbxPerksFlag.MissionsComplete = rbxPerksFlag.MissionsComplete +1;
 							
-							if rbxPerksFlag.MissionsComplete < 3 then
-								shared.Notify(player, "Complete ".. rbxPerksFlag.MissionsComplete .."/3 missions for a bonus +35 Perks!", "Positive");
+				-- 			if rbxPerksFlag.MissionsComplete < 3 then
+				-- 				shared.Notify(player, "Complete ".. rbxPerksFlag.MissionsComplete .."/3 missions for a bonus +35 Perks!", "Positive");
 								
-							else
-								shared.Notify(player, "+35 Perks from Premium Bonus!", "Positive");
-								playerSave:AddStat("Perks", 35);
-								modAnalytics.RecordResource(player.UserId, 35, "Source", "Perks", "Gameplay", "PremiumBonus");
+				-- 			else
+				-- 				shared.Notify(player, "+35 Perks from Premium Bonus!", "Positive");
+				-- 				playerSave:AddStat("Perks", 35);
+				-- 				modAnalytics.RecordResource(player.UserId, 35, "Source", "Perks", "Gameplay", "PremiumBonus");
 
-								modAnalyticsService:Source{
-									Player=player;
-									Currency=modAnalyticsService.Currency.Perks;
-									Amount=35;
-									EndBalance=playerSave:GetStat("Perks");
-									ItemSKU=`Mission:PremiumBonus`;
-								};
+				-- 				modAnalyticsService:Source{
+				-- 					Player=player;
+				-- 					Currency=modAnalyticsService.Currency.Perks;
+				-- 					Amount=35;
+				-- 					EndBalance=playerSave:GetStat("Perks");
+				-- 					ItemSKU=`Mission:PremiumBonus`;
+				-- 				};
 
-								rbxPerksFlag.CompleteTime = os.time();
-							end
+				-- 				rbxPerksFlag.CompleteTime = os.time();
+				-- 			end
 							
-							profile.Flags:Add(rbxPerksFlag);
-						end
-					end
-				end)
+				-- 			profile.Flags:Add(rbxPerksFlag);
+				-- 		end
+				-- 	end
+				-- end)
 				
 				modAnalytics.RecordProgression(player.UserId, "Complete", "Mission:"..library.MissionId);
 
