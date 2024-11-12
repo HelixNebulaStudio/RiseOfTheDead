@@ -250,6 +250,10 @@ remoteReloadWeapon.OnServerEvent:Connect(function(client, weaponId, weaponModel,
 		
 		local maxAmmo = infAmmo == nil and storageItem:GetValues("MA") or configurations.MaxAmmoLimit;
 		
+		if configurations.NoMaxAmmo then
+			maxAmmo = configurations.MaxAmmoLimit;
+		end
+
 		local ammoNeeded = configurations.AmmoLimit - ammo;
 		local newMaxAmmo = infAmmo == nil and (maxAmmo - ammoNeeded) or maxAmmo;
 		local newAmmo = configurations.AmmoLimit;
@@ -291,6 +295,10 @@ remoteReloadWeapon.OnServerEvent:Connect(function(client, weaponId, weaponModel,
 		local ammo = storageItem:GetValues("A") or configurations.AmmoLimit;
 		local maxAmmo = infAmmo == nil and storageItem:GetValues("MA") or configurations.MaxAmmoLimit;
 		
+		if configurations.NoMaxAmmo then
+			maxAmmo = configurations.MaxAmmoLimit;
+		end
+
 		if maxAmmo > 1607317596421 then -- fix a bug;
 			maxAmmo = math.min(maxAmmo, configurations.MaxAmmoLimit);
 		end
@@ -514,14 +522,14 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 		return;
 	end
 
+	if configurations.NoMaxAmmo then
+		maxAmmo = configurations.MaxAmmoLimit;
+	end
+
 	local ammoCost = math.min(configurations.AmmoCost or 1, ammo);
 
 	if ammo <= 0 then
-		if configurations.NoMaxAmmo then
-			maxAmmo = configurations.MaxAmmoLimit;
-		else
-			maxAmmo = math.max(maxAmmo -1, 0);
-		end
+		maxAmmo = math.max(maxAmmo -1, 0);
 		ammo = 0;
 		
 		local initReload = cache.InitialReloadTick or 0;
@@ -561,6 +569,7 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 		storageItem:SetValues("A", ammo);
 		
 	end
+	
 	
 	if clientAmmoData.Ammo ~= ammo or clientAmmoData.MaxAmmo ~= maxAmmo then
 		storageItem:Sync({"A"; "MA"});

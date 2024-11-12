@@ -20,6 +20,7 @@ local animator = humanoid:WaitForChild("Animator");
 local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 
+local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local modWeaponMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 local modAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
 local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
@@ -29,7 +30,6 @@ local modConfigurations = require(game.ReplicatedStorage.Library.Configurations)
 local modArcTracing = require(game.ReplicatedStorage.Library.ArcTracing);
 local modParticleSprinkler = require(game.ReplicatedStorage.Particles.ParticleSprinkler);
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
-local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 
@@ -293,6 +293,8 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 			local activeAmmoId = storageItem.Values.AmmoId or configurations.AmmoType;
 			availableInvAmmo = modData.CountItemIdFromCharacter(activeAmmoId);
 		end
+
+		if configurations.NoMaxAmmo then return configurations.MaxAmmoLimit end;
 
 		return properties.MaxAmmo + availableInvAmmo;
 	end
@@ -1568,6 +1570,10 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 				local newAmmo = configurations.AmmoLimit;
 				local newMaxAmmo = properties.MaxAmmo - ammoNeeded;
 				
+				if configurations.NoMaxAmmo then
+					newMaxAmmo = configurations.MaxAmmoLimit;
+				end
+
 				if newMaxAmmo < 0 then
 					newAmmo = properties.MaxAmmo + currentAmmo;
 					newMaxAmmo = 0
@@ -1636,6 +1642,10 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 						local ammoFromMA = math.min(ammoDelta, properties.MaxAmmo);
 						local ammoFromInv = 0;
 						
+						if configurations.NoMaxAmmo then
+							ammoFromMA = configurations.MaxAmmoLimit;
+						end
+
 						if ammoDelta-ammoFromMA > 0 then
 							ammoFromInv = math.min(ammoDelta-ammoFromMA, availableInvAmmo);
 						end
@@ -1903,7 +1913,9 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 		end
 	end
 	
+	local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
 	local function ToggleSpecialRequest()
+		if modItemModsLibrary == nil then return end;
 		local modInfo = modWeaponModule.ModHooks.PrimaryEffectMod;
 		
 		if modInfo == nil then return end;
@@ -1911,7 +1923,7 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 		local storageItemOfMod = modData.GetItemById(modInfo.StorageItemID);
 		local modLib = modInfo.Library;
 		
-		if modLib.EffectTrigger == modModsLibrary.EffectTrigger.Passive then
+		if modLib.EffectTrigger == modItemModsLibrary.EffectTrigger.Passive then
 			return;
 		end
 
@@ -1950,14 +1962,14 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 		return;
 	end
 
-	if modWeaponModule.ModHooks.PrimaryEffectMod then
+	if modWeaponModule.ModHooks.PrimaryEffectMod and modItemModsLibrary then
 		local storageItemOfMod = modData.GetItemById(modWeaponModule.ModHooks.PrimaryEffectMod.StorageItemID);
-		local modLib = modModsLibrary.Get(storageItemOfMod.ItemId);
+		local modLib = modItemModsLibrary.Get(storageItemOfMod.ItemId);
 
-		if modLib.EffectTrigger == modModsLibrary.EffectTrigger.Passive then
+		if modLib.EffectTrigger == modItemModsLibrary.EffectTrigger.Passive then
 			
 			
-		elseif modLib.EffectTrigger == modModsLibrary.EffectTrigger.Activate then
+		elseif modLib.EffectTrigger == modItemModsLibrary.EffectTrigger.Activate then
 			if UserInputService.TouchEnabled then
 				touchItemPrompt.Image = modLib.Icon;
 				itemPromptButton.Visible = true;
@@ -2317,12 +2329,14 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 	end);
 	
 	local modInfo = modWeaponModule.ModHooks.PrimaryEffectMod;
-	if modInfo and UserInputService.KeyboardEnabled then
-		if modInfo.Library.EffectTrigger == modModsLibrary.EffectTrigger.Passive then
-			
-			
-		elseif modInfo.Library.EffectTrigger == modModsLibrary.EffectTrigger.Activate then
-			
+	if modItemModsLibrary then
+		if modInfo and UserInputService.KeyboardEnabled then
+			if modInfo.Library.EffectTrigger == modItemModsLibrary.EffectTrigger.Passive then
+				
+				
+			elseif modInfo.Library.EffectTrigger == modItemModsLibrary.EffectTrigger.Activate then
+				
+			end
 		end
 	end
 	

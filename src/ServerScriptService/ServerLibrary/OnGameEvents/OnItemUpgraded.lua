@@ -1,16 +1,18 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
-local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
-local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
-local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 
+
+local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
+local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
+local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
 
 --== When OnItemUpgraded;
 return function(player, item)
+	if modItemModsLibrary == nil then return end;
+
 	local profile = modProfile:Get(player);
 	local activeSave = profile:GetActiveSave();
 	local inventory = activeSave.Inventory;
-	local modLib = modModsLibrary.Get(item.ItemId);
+	local modLib = modItemModsLibrary.Get(item.ItemId);
 	
 	if modLib.Module.Name == "Damage"  then
 		local maxLevel = 10;

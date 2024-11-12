@@ -1478,6 +1478,19 @@ function Profile:GetItemClass(storageItemId, getShadowCopy)
 
 	local attachmentStorage = playerSave.Storages[storageItemId];
 	
+	
+	local modItemClass = modModEngineService:GetModule(`ItemClass`);
+
+	if modItemClass then
+		local getItemClass = modItemClass.GetItemClass(self.Player, storageItem, getShadowCopy);
+		if getItemClass then
+			if getItemClass.AttachmentStorage then
+				attachmentStorage = getItemClass.AttachmentStorage;
+			end
+		end
+	end
+
+	
 	local function update(class)
 		if class.Reset then class:Reset(); end;
 		if modConfigurations.SkipRotDModding == true then return class; end;

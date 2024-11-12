@@ -26,7 +26,7 @@ local Configurations={
 	
 	AmmoLimit=15;
 	MaxAmmoLimit=(15*5);
-	
+
 	DamageDropoff={
 		MinDistance=100;
 		MaxDistance=200;

@@ -1,17 +1,15 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Workbench = {};
-local Interface = {};
+local Interface = {} :: any;
 
 local TweenService = game:GetService("TweenService");
 local RunService = game:GetService("RunService");
 local localplayer = game.Players.LocalPlayer;
 
-local modData = require(localplayer:WaitForChild("DataModule"));
-local modModsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ModsLibrary"));
-local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
-local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modItem = require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibrary);
 local modTableManager = require(game.ReplicatedStorage.Library.TableManager);
 
@@ -29,7 +27,7 @@ function Workbench.new()
 		newGridList.Name = category.."list";
 		local newCateTab = listMenu:NewTab(newGridList);
 		newCateTab.Name = category.."tab";
-		newCateTab.titleLabel.Text = category..(" ($u/$t)"):gsub("$u", #idList):gsub("$t", math.max(modBlueprintLibrary:CountCategory(category), #idList));
+		newCateTab.titleLabel.Text = category..(" ($u/$t)"):gsub("$u", tostring(#idList)):gsub("$t", tostring(math.max(modBlueprintLibrary:CountCategory(category), #idList)));
 
 		for a=1, #idList do
 			local bpId = idList[a];

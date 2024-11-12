@@ -36,8 +36,6 @@ return function()
 	local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 	local modEventService = require(game.ReplicatedStorage.Library.EventService);
 	
-	local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
-
 	local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface);
 	local modStorageInterface = require(game.ReplicatedStorage.Library.UI.StorageInterface);
 	Debugger:Log("Dependencies loaded.");

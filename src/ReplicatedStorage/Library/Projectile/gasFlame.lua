@@ -5,8 +5,7 @@ Pool.__index = Pool;
 local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modInfoBubbles = require(game.ReplicatedStorage.Library.InfoBubbles);
+local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
@@ -79,27 +78,31 @@ function Pool.new(owner)
 			local dmgMulti = self.TargetableEntities[humanoid.Name];
 			
 			if dmgMulti and damagableObj:CanTakeDamageFrom(player) then
-				
-				local modFlameMod = require(game.ReplicatedStorage.Library.ModsLibrary.FlameMod);
-				
+								
 				local newFire = Instance.new("Fire");
 				newFire.Heat = 10;
 				newFire.Size = 8;
 				newFire.Parent = hitPart;
 				Debugger.Expire(newFire, 0.5);
-				
-				local newDmgSrc = self.DamageSource:Clone();
-				newDmgSrc.ToolModule={
-					Configurations={
-						PropertiesOfMod={
-							UseCurrentHpDmg = false;
-							Damage = damage * (owDurMulti or 0.5);
-							Duration = 25 + (configurations.EverlastDuration or 0);
+
+				local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
+				if modItemModsLibrary then
+					local flameModLib = modItemModsLibrary.Get("incendiarymod");
+					local modFlameMod = require(flameModLib.Module);
+
+					local newDmgSrc = self.DamageSource:Clone();
+					newDmgSrc.ToolModule={
+						Configurations={
+							PropertiesOfMod={
+								UseCurrentHpDmg = false;
+								Damage = damage * (owDurMulti or 0.5);
+								Duration = 25 + (configurations.EverlastDuration or 0);
+							};
 						};
 					};
-				};
-				modFlameMod.ActivateMod(newDmgSrc);
-
+					modFlameMod.ActivateMod(newDmgSrc);
+				end
+				
 				if damage and damage > 0 then
 					damagable:TakeDamagePackage(self.DamageSource);
 				end

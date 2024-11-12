@@ -4,7 +4,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Variables;
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
-local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
+
+local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
 local modParticleSprinkler = require(game.ReplicatedStorage.Particles.ParticleSprinkler);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
@@ -153,6 +154,9 @@ end
 
 -- !outline: function ApplyPassiveMods(storageItem, attachmentStorage, weaponModule)
 function WeaponsMechanics.ApplyPassiveMods(storageItem, attachmentStorage, weaponModule)
+	local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
+	if modItemModsLibrary == nil then return weaponModule end;
+
 	local tweakValues = storageItem.Values and storageItem.Values.TweakValues or {};
 	
 	local upgradeLib = modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId];
@@ -161,12 +165,12 @@ function WeaponsMechanics.ApplyPassiveMods(storageItem, attachmentStorage, weapo
 	local sortedList = {};
 	
 	for _, storageItemMod in pairs(attachmentStorage.Container) do
-		local modLib = modModsLibrary.Get(storageItemMod.ItemId);
+		local modLib = modItemModsLibrary.Get(storageItemMod.ItemId);
 		
 		table.insert(sortedList, {
 			StorageItem=storageItemMod;
 			Lib=modLib;
-			Index=storageItemMod.Index; --(modLib.Tier or 1)*10000 + (modLib.Layer or 1)*1000 + (modLib.Order or 1);
+			Index=storageItemMod.Index;
 		});
 	end
 	
@@ -220,6 +224,9 @@ end;
 
 -- !outline: function ProcessModHooks(damageSource)
 function WeaponsMechanics.ProcessModHooks(damageSource)
+	local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
+	if modItemModsLibrary == nil then return end;
+
 	local dealer = damageSource.Dealer;
 	local toolModule = damageSource.ToolModule;
 	
@@ -240,12 +247,12 @@ function WeaponsMechanics.ProcessModHooks(damageSource)
 		if storageItemOfMod then
 			local itemValues = storageItemOfMod.Values
 
-			local modLib = modModsLibrary.Get(storageItemOfMod.ItemId);
+			local modLib = modItemModsLibrary.Get(storageItemOfMod.ItemId);
 			
 			local timelapsed = modSyncTime.GetTime()-(itemValues.AT or 0); 
 			local isActive = (timelapsed >= 0 and timelapsed <= modLib.ActivationDuration);
 
-			if modLib.EffectTrigger == modModsLibrary.EffectTrigger.Passive then
+			if modLib.EffectTrigger == modItemModsLibrary.EffectTrigger.Passive then
 				isActive = true;
 
 			end

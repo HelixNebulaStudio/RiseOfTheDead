@@ -1,13 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Workbench = {};
-local Interface = {};
+local Interface = {} :: any;
 
 local TweenService = game:GetService("TweenService");
 local player = game.Players.LocalPlayer;
 
-local modData = require(player:WaitForChild("DataModule"));
-local modModsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ModsLibrary"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+local modItemModsLibrary = require(game.ReplicatedStorage.BaseLibrary.ItemModsLibrary);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -39,7 +39,7 @@ local ModUpgrader = {};
 local upgradesGuiTable = {};
 
 function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
-	local self = {};
+	local self = {} :: any;
 	
 	local itemLib = modItemLibrary:Find(storageItemOfMod.ItemId);
 	
@@ -436,7 +436,7 @@ function Workbench.new(itemId, library, storageItem)
 	if itemLib.Type == modItemLibrary.Types.Mod then
 		listMenu:SetListPadding(UDim2.new(1, 0, 1, 0));
 		
-		local modLib = modModsLibrary.Get(itemId);
+		local modLib = modItemModsLibrary.Get(itemId);
 		local upgrader = ModUpgrader.new(modLib, storageItem);
 		upgrader.UpgradeFrame.Size = UDim2.new(1, 0, 1, 0);
 		upgrader.DetachButton.Visible = false;
@@ -482,7 +482,7 @@ function Workbench.new(itemId, library, storageItem)
 				for modId, storageItemOfMod in pairs(itemStorage.Container) do
 					modsAttached = modsAttached +1;
 					
-					local modLib = modModsLibrary.Get(storageItemOfMod.ItemId);
+					local modLib = modItemModsLibrary.Get(storageItemOfMod.ItemId);
 					if modLib == nil then Debugger:Warn("Mod ("..tostring(storageItemOfMod.ItemId)..") does not exist in library."); continue end;
 					
 					if upgradesGuiTable[modId] == nil then

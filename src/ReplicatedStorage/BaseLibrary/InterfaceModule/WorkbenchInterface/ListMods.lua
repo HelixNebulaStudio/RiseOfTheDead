@@ -1,15 +1,14 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Workbench = {};
-local Interface = {};
+local Interface = {} :: any;
 
 local TweenService = game:GetService("TweenService");
 local localplayer = game.Players.LocalPlayer;
 
-local modData = require(localplayer:WaitForChild("DataModule"));
-local modModsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ModsLibrary"));
-local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
-local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
+local modItemModsLibrary = require(game.ReplicatedStorage.BaseLibrary.ItemModsLibrary);
+local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 local modItem = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modToolTweaks = require(game.ReplicatedStorage.Library.ToolTweaks);
@@ -30,7 +29,7 @@ function Workbench.UpdateModDesc(storageItem, modLib, containerStorageItem)
 			if a==1 then desc = desc .."\n" end;
 
 			local upgradeInfo = modLib.Upgrades[a];
-			local layerInfo = modModsLibrary.GetLayer(upgradeInfo.DataTag, {
+			local layerInfo = modItemModsLibrary.GetLayer(upgradeInfo.DataTag, {
 				ModStorageItem=storageItem;
 				StorageItem = containerStorageItem;
 				ItemTier = tierOfItem or modLib.BaseTier;
@@ -41,12 +40,7 @@ function Workbench.UpdateModDesc(storageItem, modLib, containerStorageItem)
 			local maxLvl = layerInfo.MaxLevel; --modLib.Upgrades[a].MaxLevel;
 
 			local upgradeValue = layerInfo.Value;
-			--if upgradeInfo.Scaling == modModsLibrary.ScalingStyle.NaturalCurve then
-			--	upgradeValue = modModsLibrary.NaturalInterpolate(upgradeInfo.BaseValue, upgradeInfo.MaxValue, upgradeLvl, maxLvl, upgradeInfo.Rate);
-			--elseif upgradeInfo.Scaling == modModsLibrary.ScalingStyle.Linear then
-			--	upgradeValue = modModsLibrary.Linear(upgradeInfo.BaseValue, upgradeInfo.MaxValue, upgradeLvl, maxLvl);
-			--end
-			
+
 			desc = desc .."\n"
 			desc = desc ..'<font size="16"><b>'..upgradeInfo.Name..":  "..'</b></font>';
 			
@@ -108,10 +102,10 @@ function Workbench.UpdateModDesc(storageItem, modLib, containerStorageItem)
 				local activeLvl = storageItem.Values[upgradeInfo.SliderTag] or upgradeLvl;
 				
 				local activeValue;
-				if upgradeInfo.Scaling == modModsLibrary.ScalingStyle.NaturalCurve then
-					activeValue = modModsLibrary.NaturalInterpolate(upgradeInfo.BaseValue, upgradeInfo.MaxValue, activeLvl, maxLvl, upgradeInfo.Rate);
-				elseif upgradeInfo.Scaling == modModsLibrary.ScalingStyle.Linear then
-					activeValue = modModsLibrary.Linear(upgradeInfo.BaseValue, upgradeInfo.MaxValue, activeLvl, maxLvl);
+				if upgradeInfo.Scaling == modItemModsLibrary.ScalingStyle.NaturalCurve then
+					activeValue = modItemModsLibrary.NaturalInterpolate(upgradeInfo.BaseValue, upgradeInfo.MaxValue, activeLvl, maxLvl, upgradeInfo.Rate);
+				elseif upgradeInfo.Scaling == modItemModsLibrary.ScalingStyle.Linear then
+					activeValue = modItemModsLibrary.Linear(upgradeInfo.BaseValue, upgradeInfo.MaxValue, activeLvl, maxLvl);
 				end
 
 				local statStr = math.round(activeValue*dPV*100)/dPV;
@@ -151,7 +145,7 @@ function Workbench.new(paramPacket)
 		local storage = modsStorage[a].Storage;
 		local storageItem = modsStorage[a].Item;
 		
-		local modLib = modModsLibrary.Get(storageItem.ItemId);
+		local modLib = modItemModsLibrary.Get(storageItem.ItemId);
 		if modLib then
 			local compatible = false;
 			for b=1, #modLib.Type do

@@ -5,8 +5,9 @@ local Data = setmetatable({Script = script;}, dataMeta);
 
 local CollectionService = game:GetService("CollectionService");
 
-local localplayer: Player = game.Players.LocalPlayer;
+local localPlayer: Player = game.Players.LocalPlayer;
 
+local modModEngineService = require(game.ReplicatedStorage.Library.ModEngineService);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 
@@ -62,7 +63,7 @@ end
 function Data:GetModCharacter()
 	local fiveSecTick = tick();
 	
-	while localplayer.Character == nil do
+	while localPlayer.Character == nil do
 		task.wait();
 		if tick()-fiveSecTick >= 5 then
 			fiveSecTick = tick();
@@ -70,7 +71,7 @@ function Data:GetModCharacter()
 		end
 	end
 	
-	local character: Model? = localplayer.Character;
+	local character: Model? = localPlayer.Character;
 	if character == nil then return end;
 	
 	local characterModule = character:WaitForChild("CharacterModule") :: ModuleScript;
@@ -547,6 +548,19 @@ function Data:GetItemClass(storageItemId, getShadowCopy)
 
 	local attachmentStorage = Data.GetItemStorage(storageItemId);
 	
+
+	local modItemClass = modModEngineService:GetModule(`ItemClass`);
+
+	if modItemClass then
+		local getItemClass = modItemClass.GetItemClass(localPlayer, storageItem, getShadowCopy);
+		if getItemClass then
+			if getItemClass.AttachmentStorage then
+				attachmentStorage = getItemClass.AttachmentStorage;
+			end
+		end
+	end
+
+
 	local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 	local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 

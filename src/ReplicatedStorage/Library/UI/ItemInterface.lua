@@ -9,6 +9,7 @@ local TweenService = game:GetService("TweenService");
 
 local localPlayer = game.Players.LocalPlayer;
 
+local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modBranchConfigurations = require(game.ReplicatedStorage.Library.BranchConfigurations);
@@ -16,17 +17,18 @@ local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 local modShopLibrary = require(game.ReplicatedStorage.Library.RatShopLibrary);
 local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
-local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 local modToolTweaks = require(game.ReplicatedStorage.Library.ToolTweaks);
 local modItemSkinWear = require(game.ReplicatedStorage.Library.ItemSkinWear);
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modColorsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ColorsLibrary"));
 local modSkinsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("SkinsLibrary"));
 local modItemSkinsLibrary = require(game.ReplicatedStorage.Library.ItemSkinsLibrary);
+local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
+
 local remoteStorageItemSync = modRemotesManager:Get("StorageItemSync");
 
 local templateItemButton = script:WaitForChild("ItemButton");
@@ -428,10 +430,9 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 			if activatableIconLabel then
 				activatableIconLabel.Image = "";
 			end
-			if modData.Storages[storageItemID] and self.HideAttachmentIcons ~= true then
+			if modData.Storages[storageItemID] and self.HideAttachmentIcons ~= true and modItemModsLibrary then
 				for id, item in pairs(modData.Storages[storageItemID].Container) do
-					local modLib = modModsLibrary.Get(item.ItemId);
-
+					local modLib = modItemModsLibrary.Get(item.ItemId);
 					if modLib and modLib.ActivationDuration then
 						local iconLabel = self.ImageButton:FindFirstChild("ActivatableIcon") or templateAttachmentIcon:Clone();
 						iconLabel.Name = "ActivatableIcon";
@@ -962,8 +963,8 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 			itemDesc = itemDesc.."\n";
 		end
 		
-		if itemLib.Type == modItemsLibrary.Types.Mod then
-			local modLib = modModsLibrary.Get(itemId);
+		if itemLib.Type == modItemsLibrary.Types.Mod and modItemModsLibrary then
+			local modLib = modItemModsLibrary.Get(itemId);
 			
 			for _, obj in pairs(modUpgradesFrame:GetChildren()) do
 				if obj:IsA("GuiObject") then
@@ -977,10 +978,10 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 				local maxLvl = modLib.Upgrades[a].MaxLevel;
 				
 				local upgradeValue;
-				if upgradeInfo.Scaling == modModsLibrary.ScalingStyle.NaturalCurve then
-					upgradeValue = modModsLibrary.NaturalInterpolate(upgradeInfo.BaseValue, upgradeInfo.MaxValue, upgradeLvl, maxLvl, upgradeInfo.Rate);
-				elseif upgradeInfo.Scaling == modModsLibrary.ScalingStyle.Linear then
-					upgradeValue = modModsLibrary.Linear(upgradeInfo.BaseValue, upgradeInfo.MaxValue, upgradeLvl, maxLvl);
+				if upgradeInfo.Scaling == modItemModsLibrary.ScalingStyle.NaturalCurve then
+					upgradeValue = modItemModsLibrary.NaturalInterpolate(upgradeInfo.BaseValue, upgradeInfo.MaxValue, upgradeLvl, maxLvl, upgradeInfo.Rate);
+				elseif upgradeInfo.Scaling == modItemModsLibrary.ScalingStyle.Linear then
+					upgradeValue = modItemModsLibrary.Linear(upgradeInfo.BaseValue, upgradeInfo.MaxValue, upgradeLvl, maxLvl);
 				end
 				if upgradeInfo.ValueType == "Normal" then
 					itemDesc = itemDesc:gsub("$"..upgradeInfo.Name, math.floor(upgradeValue));

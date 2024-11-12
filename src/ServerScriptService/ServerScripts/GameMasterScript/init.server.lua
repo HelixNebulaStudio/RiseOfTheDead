@@ -17,7 +17,6 @@ local modPlayers = Debugger:Require(game.ReplicatedStorage.Library.Players);
 local modScheduler = Debugger:Require(game.ReplicatedStorage.Library.Scheduler); modScheduler:GetGlobal();
 local modGameLogService = Debugger:Require(game.ReplicatedStorage.Library.GameLogService);
 local modItemsLibrary = Debugger:Require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modModsLibrary = Debugger:Require(game.ReplicatedStorage.Library.ModsLibrary);
 local modSyncTime = Debugger:Require(game.ReplicatedStorage.Library.SyncTime);
 local modBranchConfigs = Debugger:Require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);

@@ -2,16 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Services;
 
 --== Modules;
-local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
-local modTools = require(game.ReplicatedStorage.Library.Tools);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modPlayers = require(game.ReplicatedStorage.Library.Players);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
-local modModsLibrary = Debugger:Require(game.ReplicatedStorage.Library.ModsLibrary);
-
-local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
+local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 
 local ToolHandler = {};
@@ -61,10 +52,11 @@ function ToolHandler:KeyToggleSpecial(inputData)
 	--local profile = shared.modProfile:Get(player);
 	--local toolModule = profile:GetItemClass(weaponStorageItemID);
 
-	local modLib = modModsLibrary.Get(storageItemOfMod.ItemId);
+	local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
+	local modLib = modItemModsLibrary.Get(storageItemOfMod.ItemId);
 	if modLib == nil then return end;
 	
-	if modLib.EffectTrigger == modModsLibrary.EffectTrigger.Activate then
+	if modLib.EffectTrigger == modItemModsLibrary.EffectTrigger.Activate then
 		local activationDuration = modLib.ActivationDuration;
 		local cooldownDuration = modLib.CooldownDuration;
 
@@ -87,7 +79,7 @@ function ToolHandler:KeyToggleSpecial(inputData)
 			
 		end
 		
-	elseif modLib.EffectTrigger == modModsLibrary.EffectTrigger.Trigger then
+	elseif modLib.EffectTrigger == modItemModsLibrary.EffectTrigger.Trigger then
 		
 	end
 end

@@ -65,7 +65,7 @@ function toolPackage.NewToolLib(handler)
 		local ignitionChance = self.ToolConfig.Configurations.SpecialStats.IgnitionChance;
 		if math.random(0, 100)/100 > ignitionChance then return end;
 		
-		local modFlameMod = require(game.ReplicatedStorage.Library.ModsLibrary.FlameMod);
+		local modFlameMod = require(game.ReplicatedStorage.BaseLibrary.ItemModsLibrary.FlameMod);
 		
 		local bodyParts = {};
 		for _, obj in pairs(model:GetChildren()) do

@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Workbench = {};
-local Interface = {};
+local Interface = {} :: any;
 
 local StatNames = {
 	FireRate = "Fire Rate";
@@ -21,14 +21,11 @@ local UserInputService = game:GetService("UserInputService");
 local RunService = game:GetService("RunService");
 local player = game.Players.LocalPlayer;
 
-local modData = require(player:WaitForChild("DataModule"));
-local modModsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ModsLibrary"));
-local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
-local modBranchConfigs = require(game.ReplicatedStorage.Library:WaitForChild("BranchConfigurations"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+local modItemModsLibrary = require(game.ReplicatedStorage.BaseLibrary.ItemModsLibrary);
+local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibrary);
 local modToolTweaks = require(game.ReplicatedStorage.Library.ToolTweaks);
-local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 
 local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
@@ -190,7 +187,7 @@ function Workbench.new(itemId, library, storageItem)
 		end)
 		
 		
-		function graphObject:OnDataRender(dataPoint: table, point: ImageButton, line: Frame)
+		function graphObject:OnDataRender(dataPoint: any, point: ImageButton, line: Frame)
 			if dataPoint.IsPeak then
 				point.Size = UDim2.new(0, 6, 0, 6);
 				point.BackgroundColor3 = modToolTweaks.GetTierColor(dataPoint.Value);
@@ -234,7 +231,7 @@ function Workbench.new(itemId, library, storageItem)
 				local tweakV = tweakValues[a];
 				if tweakV == nil then continue end;
 				
-				local modLib = modModsLibrary.Get(storageItem.ItemId);
+				local modLib = modItemModsLibrary.Get(storageItem.ItemId);
 				if modLib == nil then continue end;
 				
 				local tcolor = modToolTweaks.GetTierColor(tweakV);
@@ -349,7 +346,7 @@ function Workbench.new(itemId, library, storageItem)
 			for a=2, 5 do
 				local value = tweakValues[a];
 				
-				local intPoint: Frame = xBarFrame:FindFirstChild("IntersectPoint"..a);
+				local intPoint = xBarFrame:FindFirstChild("IntersectPoint"..a);
 				if intPoint == nil then
 					intPoint = intersectPointTemplate:Clone();
 					intPoint.Name = "IntersectPoint"..a;

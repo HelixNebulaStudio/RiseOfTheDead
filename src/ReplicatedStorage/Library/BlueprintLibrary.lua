@@ -1,9 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local modItemsLibrary = Debugger:Require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modModsLibrary = Debugger:Require(game.ReplicatedStorage.Library.ModsLibrary);
-local modBranchConfigs = Debugger:Require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = Debugger:Require(game.ReplicatedStorage.Library.Configurations);
+local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
 
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 --

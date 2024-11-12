@@ -6,8 +6,7 @@ local Interface = {} :: any;
 local TweenService = game:GetService("TweenService");
 local player = game.Players.LocalPlayer;
 
-local modData = require(player:WaitForChild("DataModule"));
-local modModsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ModsLibrary"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -76,7 +75,7 @@ function Workbench.new(itemId, library, storageItem)
 				end
 			elseif library.Requirements[a].Type == "Item" then
 				local itemLib = modItemLibrary:Find(library.Requirements[a].ItemId);
-				listingLabel.Text = ("• $Requires/$Amount $Name"):gsub("$Requires", 0):gsub("$Amount", amount):gsub("$Name", itemLib.Name);
+				listingLabel.Text = ("• $Requires/$Amount $Name"):gsub("$Requires", `{0}`):gsub("$Amount", amount):gsub("$Name", itemLib.Name);
 			end
 			listingLabel.Parent = requireListFrame;
 			listingLabel.Visible = true;

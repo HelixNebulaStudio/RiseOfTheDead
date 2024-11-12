@@ -15,7 +15,7 @@ local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibrary);
-local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
+local modItemModsLibrary = require(game.ReplicatedStorage.BaseLibrary.ItemModsLibrary);
 local modWeaponsLibrary = require(game.ReplicatedStorage.Library.Weapons);
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
@@ -92,7 +92,7 @@ function Interface.init(modInterface)
 		Appearance={Library=modWorkbenchLibrary.ItemAppearance; Workbench=require(script.Appearance).init(Interface)};
 		Customization={Library=modWorkbenchLibrary.ItemAppearance; Workbench=require(script.Customization).init(Interface)};
 
-		DeconstructMod={Library=modModsLibrary.Library; Workbench=require(script.DeconstructMod).init(Interface)};
+		DeconstructMod={Library=modItemModsLibrary.Library; Workbench=require(script.DeconstructMod).init(Interface)};
 		DeconstructWeapon={Library=modWeaponsLibrary; Workbench=require(script.DeconstructWeapon).init(Interface)};
 		
 		PolishTool={Library=modWorkbenchLibrary.ItemAppearance; Workbench=require(script.PolishTool).init(Interface)};

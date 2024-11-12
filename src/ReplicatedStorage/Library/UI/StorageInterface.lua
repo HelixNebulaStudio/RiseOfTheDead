@@ -18,7 +18,6 @@ local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariabl
 local modItem = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 local modShopLibrary = require(game.ReplicatedStorage.Library.RatShopLibrary);
-local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modUsableItems = require(game.ReplicatedStorage.Library.UsableItems);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
@@ -566,7 +565,7 @@ function SlotItem:ActivateDelete(mousePosition)
 	
 	local interface = self.Interface;
 	
-	local promptPos = getPromptPosition(interface.MainFrame.AbsolutePosition, lastMousePos or mousePosition, currentQuanFrame.AbsoluteSize);
+	local promptPos = getPromptPosition(interface.MainFrame.AbsolutePosition, mousePosition, currentQuanFrame.AbsoluteSize);
 	currentQuanFrame.Position = UDim2.new(0, promptPos.X, 0, promptPos.Y);
 
 	currentQuanFrame.Visible = true;
@@ -1032,7 +1031,7 @@ function StorageInterface:NewButton(id)
 			table.insert(optionsListeners, currentOptionFrame.SplitOption.MouseButton1Click:Connect(function()
 				itemActionDebounce = false;
 
-				local promptPos = getPromptPosition(self.MainFrame.AbsolutePosition, lastMousePos, currentQuanFrame.AbsoluteSize);
+				local promptPos = getPromptPosition(self.MainFrame.AbsolutePosition, UserInputService:GetMouseLocation(), currentQuanFrame.AbsoluteSize);
 				currentQuanFrame.Position = UDim2.new(0, promptPos.X, 0, promptPos.Y);
 
 				currentQuanFrame.Visible = true;

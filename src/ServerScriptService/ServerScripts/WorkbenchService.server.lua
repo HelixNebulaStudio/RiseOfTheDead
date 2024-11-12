@@ -3,13 +3,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 repeat task.wait() until shared.MasterScriptInit == true;
 
 --== Variables;
+local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
 local modSkinsLibrary = require(game.ReplicatedStorage.Library.SkinsLibrary);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modModsLibrary = require(game.ReplicatedStorage.Library.ModsLibrary);
 local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibrary) :: any;
 local modSyncTime = require(game.ReplicatedStorage.Library:WaitForChild("SyncTime"));
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
@@ -18,6 +18,7 @@ local modToolTweaks = require(game.ReplicatedStorage.Library.ToolTweaks);
 local modItemSkinWear = require(game.ReplicatedStorage.Library.ItemSkinWear);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
+local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
 
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
@@ -39,11 +40,13 @@ local remotePolishTool = modRemotesManager:Get("PolishTool");
 local Interactables = workspace:WaitForChild("Interactables");
 local debounceCache = {};
 --== Script;
-for itemId, modLib in pairs(modModsLibrary.Library) do
-	if modLib.Module == nil then continue end;
-	task.spawn(function()
-		require(modLib.Module);
-	end)
+if modItemModsLibrary then
+	for itemId, modLib in pairs(modItemModsLibrary.Library) do
+		if modLib.Module == nil then continue end;
+		task.spawn(function()
+			require(modLib.Module);
+		end)
+	end
 end
 
 local function clearDebounceCaches() for n, c in pairs(debounceCache) do if tick()-c > 1 then debounceCache[n]=nil; end; end; end
@@ -381,6 +384,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 end
 
 function remoteModHandler.OnServerInvoke(player, interactPart, action, modId, id) -- modId = (mod's) StorageItem.ID; (tool's) id = StorageItem.ID;
+	if modItemModsLibrary == nil then return end;
 	if not IsInWorkbenchRange(player, interactPart) then return modWorkbenchLibrary.PurchaseReplies.TooFar; end;
 	if debounceCache[player.Name] and tick()-debounceCache[player.Name]<0.1 then return modWorkbenchLibrary.PurchaseReplies.TooFrequentRequest end;
 	debounceCache[player.Name]=tick();
@@ -391,12 +395,12 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modId, id
 	local mod, storageOfMod = activeSave:FindItemFromStorages(modId);
 	if mod == nil then return 3; end
 	
-	local modLib = modModsLibrary.Get(mod.ItemId);
+	local modLib = modItemModsLibrary.Get(mod.ItemId);
 	
 	local function sortModsFunc(self)
 		local sortedList = {};
 		for _, storageItemMod in pairs(self.Container) do
-			local modLib = modModsLibrary.Get(storageItemMod.ItemId);
+			local modLib = modItemModsLibrary.Get(storageItemMod.ItemId);
 
 			table.insert(sortedList, {
 				StorageItem=storageItemMod;
@@ -453,7 +457,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modId, id
 		if modLib.Element then
 			local elementalModExist = false;
 			storageForMod:Loop(function(storageItem)
-				local oModLib = modModsLibrary.Get(storageItem.ItemId);
+				local oModLib = modItemModsLibrary.Get(storageItem.ItemId);
 				
 				if oModLib and oModLib.Element then
 					elementalModExist = true;
@@ -514,6 +518,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modId, id
 end
 
 function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
+	if modItemModsLibrary == nil then return end;
 	if debounceCache[player.Name] and tick()-debounceCache[player.Name]<0.3 then return modWorkbenchLibrary.PurchaseReplies.TooFrequentRequest end;
 	debounceCache[player.Name] = tick();
 	if not IsInWorkbenchRange(player, interactPart) then return modWorkbenchLibrary.PurchaseReplies.TooFar; end;
@@ -522,7 +527,7 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 	local playerSave = profile:GetActiveSave();
 	local storageItem, storage = playerSave:FindItemFromStorages(id);
 	local weaponId = storage.Id;
-	local modLib = modModsLibrary.Get(storageItem.ItemId);
+	local modLib = modItemModsLibrary.Get(storageItem.ItemId);
 	
 	if storageItem and modLib then
 		local upgradeInfo = nil;
@@ -1039,7 +1044,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 		local storageItemId = arg;
 		local storageItem = inventory ~= nil and inventory:Find(storageItemId) or nil;
 		local itemLib = storageItem and modItemsLibrary:Find(storageItem.ItemId) or nil;
-		local modLib = storageItem and modModsLibrary.Get(storageItem.ItemId) or nil;
+		local modLib = storageItem and modItemModsLibrary and modItemModsLibrary.Get(storageItem.ItemId) or nil;
 		
 		local storageOfItem = modStorage.Get(storageItemId, player);
 		if storageOfItem and storageOfItem:Loop() > 0 then
