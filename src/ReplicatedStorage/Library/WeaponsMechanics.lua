@@ -151,12 +151,9 @@ function WeaponsMechanics.ApplyTraits(storageItem, weaponModule)
 	end
 end
 
-
 -- !outline: function ApplyPassiveMods(storageItem, attachmentStorage, weaponModule)
 function WeaponsMechanics.ApplyPassiveMods(storageItem, attachmentStorage, weaponModule)
-	local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
-	if modItemModsLibrary == nil then return weaponModule end;
-
+	local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
 	local tweakValues = storageItem.Values and storageItem.Values.TweakValues or {};
 	
 	local upgradeLib = modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId];
@@ -224,9 +221,8 @@ end;
 
 -- !outline: function ProcessModHooks(damageSource)
 function WeaponsMechanics.ProcessModHooks(damageSource)
-	local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
-	if modItemModsLibrary == nil then return end;
-
+	local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
+	
 	local dealer = damageSource.Dealer;
 	local toolModule = damageSource.ToolModule;
 	

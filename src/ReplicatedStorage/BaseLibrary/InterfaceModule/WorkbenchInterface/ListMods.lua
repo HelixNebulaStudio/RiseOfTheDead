@@ -7,7 +7,7 @@ local TweenService = game:GetService("TweenService");
 local localplayer = game.Players.LocalPlayer;
 
 local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
-local modItemModsLibrary = require(game.ReplicatedStorage.BaseLibrary.ItemModsLibrary);
+local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 local modItem = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);

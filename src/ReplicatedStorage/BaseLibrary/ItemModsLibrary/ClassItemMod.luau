@@ -1,5 +1,5 @@
 
-local modModsLibrary = require(game.ReplicatedStorage.BaseLibrary.ItemModsLibrary);
+local modModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
 
 local ClassItemMod = {};
 ClassItemMod.__index = ClassItemMod;

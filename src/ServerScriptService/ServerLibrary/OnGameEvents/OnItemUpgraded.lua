@@ -3,12 +3,10 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
-local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
+local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
 
 --== When OnItemUpgraded;
 return function(player, item)
-	if modItemModsLibrary == nil then return end;
-
 	local profile = modProfile:Get(player);
 	local activeSave = profile:GetActiveSave();
 	local inventory = activeSave.Inventory;

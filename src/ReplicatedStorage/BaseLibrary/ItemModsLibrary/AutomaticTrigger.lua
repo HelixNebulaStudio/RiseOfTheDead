@@ -1,6 +1,6 @@
 
-local modClassItemMod = require(script.Parent:WaitForChild("ClassItemMod"));
-local itemMod = modClassItemMod.new();
+local modItemModProperties = require(game.ReplicatedStorage.Library.ItemModsLibrary.ItemModProperties);
+local itemMod = modItemModProperties.new();
 
 local modWeaponsAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
 

@@ -18,7 +18,7 @@ local modToolTweaks = require(game.ReplicatedStorage.Library.ToolTweaks);
 local modItemSkinWear = require(game.ReplicatedStorage.Library.ItemSkinWear);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
-local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
+local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
 
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);

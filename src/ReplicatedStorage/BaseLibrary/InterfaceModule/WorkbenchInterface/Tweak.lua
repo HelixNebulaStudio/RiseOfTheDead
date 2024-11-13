@@ -22,7 +22,7 @@ local RunService = game:GetService("RunService");
 local player = game.Players.LocalPlayer;
 
 local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
-local modItemModsLibrary = require(game.ReplicatedStorage.BaseLibrary.ItemModsLibrary);
+local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
 local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modToolTweaks = require(game.ReplicatedStorage.Library.ToolTweaks);

@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modClassItemMod = require(script.Parent:WaitForChild("ClassItemMod"));
-local itemMod = modClassItemMod.new();
+local modItemModProperties = require(game.ReplicatedStorage.Library.ItemModsLibrary.ItemModProperties);
+local itemMod = modItemModProperties.new();
 
 function itemMod.Activate(packet)
 	local storageItem = packet.ModStorageItem;

@@ -456,12 +456,10 @@ return function()
 			local itemData = packet.Data;
 			
 			if storageId == "MockStorageItem" then
-				--modData.Profile.MockStorageItem = itemData;
 				for k, v in pairs(itemData) do
 					modData.MockStorageItem[k] = v;
 				end
 				
-				--Debugger:Warn("fullsync MockStorageItem", itemData.ItemId);
 				return;
 			end
 			

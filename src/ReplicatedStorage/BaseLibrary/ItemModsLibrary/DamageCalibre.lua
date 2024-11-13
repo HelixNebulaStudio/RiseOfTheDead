@@ -2,8 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modClassItemMod = require(script.Parent:WaitForChild("ClassItemMod"));
-local itemMod = modClassItemMod.new();
+local modItemModProperties = require(game.ReplicatedStorage.Library.ItemModsLibrary.ItemModProperties);
+local itemMod = modItemModProperties.new();
 
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local remoteItemModAction = modRemotesManager:Get("ItemModAction");

@@ -52,7 +52,7 @@ function ToolHandler:KeyToggleSpecial(inputData)
 	--local profile = shared.modProfile:Get(player);
 	--local toolModule = profile:GetItemClass(weaponStorageItemID);
 
-	local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
+	local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
 	local modLib = modItemModsLibrary.Get(storageItemOfMod.ItemId);
 	if modLib == nil then return end;
 	

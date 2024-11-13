@@ -85,11 +85,11 @@ function Pool.new(owner)
 				newFire.Parent = hitPart;
 				Debugger.Expire(newFire, 0.5);
 
-				local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
-				if modItemModsLibrary then
-					local flameModLib = modItemModsLibrary.Get("incendiarymod");
+				local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
+				local flameModLib = modItemModsLibrary.Get("incendiarymod");
+				if flameModLib then
 					local modFlameMod = require(flameModLib.Module);
-
+	
 					local newDmgSrc = self.DamageSource:Clone();
 					newDmgSrc.ToolModule={
 						Configurations={

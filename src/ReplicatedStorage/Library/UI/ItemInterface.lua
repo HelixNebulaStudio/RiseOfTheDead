@@ -24,10 +24,9 @@ local modColorsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("Co
 local modSkinsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("SkinsLibrary"));
 local modItemSkinsLibrary = require(game.ReplicatedStorage.Library.ItemSkinsLibrary);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
 
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
-
-local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
 
 local remoteStorageItemSync = modRemotesManager:Get("StorageItemSync");
 

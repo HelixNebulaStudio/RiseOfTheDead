@@ -673,7 +673,7 @@ function ItemUnlockablesLibrary:Init(library)
 		DefaultPackage=true;
 
 		SurfaceAppearance={
-			ColorMap="rbxassetid://14506983094";
+			ColorMap="rbxassetid://97925970473635";
 		};
 		SurfaceAppearanceParent=script;
 	};
@@ -687,7 +687,7 @@ function ItemUnlockablesLibrary:Init(library)
 		Unlocked=true;
 		
 		SurfaceAppearance={
-			ColorMap="rbxassetid://14506983094";
+			ColorMap="rbxassetid://97925970473635";
 		};
 		SurfaceAppearanceParent=script;
 	};
@@ -731,6 +731,7 @@ function ItemUnlockablesLibrary:Init(library)
 	library:Add{
 		Id="nekrostrenchdarkcarbon";
 		ItemId="nekrostrench";
+		Icon="rbxassetid://";
 		Name="Dark Carbon";
 		DefaultPackage=true;
 		
@@ -920,6 +921,7 @@ function ItemUnlockablesLibrary:Init(library)
 	library:Add{
 		Id="ammopouchdarkcarbon";
 		ItemId="ammopouch";
+		Icon="rbxassetid://";
 		Name="Dark Carbon";
 		SurfaceAppearance={
 			ColorMap="rbxassetid://93994020837531";

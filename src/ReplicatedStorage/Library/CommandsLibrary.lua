@@ -2369,7 +2369,21 @@ Commands["give"] = {
 			local profile = shared.modProfile:Get(player);
 			local playerSave = profile:GetActiveSave();
 			
-			if profile.ActiveInventory then
+			local inventory = profile.ActiveInventory;
+			if profile.Cache and profile.Cache.CmdGiveFunc then
+				local rPacket = profile.Cache.CmdGiveFunc(speaker, player, itemId, quantity, itemData);
+				if rPacket then
+					if rPacket.Cancel then
+						shared.Notify(speaker, "Give command cancelled. Reason:"..tostring(rPacket.Cancel), "Negative");
+						return;
+					end
+					if rPacket.Inventory then
+						inventory = rPacket.Inventory;
+					end
+				end
+			end
+
+			if inventory then
 				itemData.Quantity = quantity;
 				
 				local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
@@ -2380,7 +2394,7 @@ Commands["give"] = {
 					storageItem.ID = profile:NewID();
 				end
 				
-				local rPacket = profile.ActiveInventory:InsertRequest(storageItem);
+				local rPacket = inventory:InsertRequest(storageItem);
 				
 				if rPacket.Success then
 					local messageText;

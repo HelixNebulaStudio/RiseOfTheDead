@@ -20,7 +20,6 @@ local animator = humanoid:WaitForChild("Animator");
 local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 
-local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local modWeaponMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 local modAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
 local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
@@ -1913,7 +1912,7 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 		end
 	end
 	
-	local modItemModsLibrary = modModEngineService:GetBaseModule("ItemModsLibrary");
+	local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
 	local function ToggleSpecialRequest()
 		if modItemModsLibrary == nil then return end;
 		local modInfo = modWeaponModule.ModHooks.PrimaryEffectMod;
