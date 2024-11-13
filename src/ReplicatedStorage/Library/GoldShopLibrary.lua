@@ -1655,6 +1655,17 @@ GoldShopLibrary.Products:Add{
 	};
 };
 
+GoldShopLibrary.Products:Add{
+	Id="nekrostrenchblaze";
+	Product={
+		Type="Gold";
+		Price=4990;
+		ItemId="nekrostrenchblaze";
+		New=true;
+	};
+};
+
+
 
 --=== CONTENT PAGES
 
@@ -1836,6 +1847,7 @@ GoldShopLibrary.Pages = {
 	};
 	
 	ClothingSkins = {
+		{Type="Product"; Id="nekrostrenchblaze"};
 		{Type="Product"; Id="greytshirtcamo"};
 		
 		{Type="Product"; Id="dufflebagstreetart"};

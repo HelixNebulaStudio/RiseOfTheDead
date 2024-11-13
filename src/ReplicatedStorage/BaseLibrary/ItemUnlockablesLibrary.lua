@@ -742,6 +742,19 @@ function ItemUnlockablesLibrary:Init(library)
 		Hidden=true;
 	};
 	
+	library:Add{
+		Id="nekrostrenchblaze";
+		ItemId="nekrostrench";
+		Name="Blaze";
+		DefaultPackage=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://72472027526657";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
+
 	--== MARK: tirearmor
 	library:Add{
 		Id="tirearmor";
@@ -921,7 +934,7 @@ function ItemUnlockablesLibrary:Init(library)
 	library:Add{
 		Id="ammopouchdarkcarbon";
 		ItemId="ammopouch";
-		Icon="rbxassetid://";
+		Icon="rbxassetid://98882966031889";
 		Name="Dark Carbon";
 		SurfaceAppearance={
 			ColorMap="rbxassetid://93994020837531";

@@ -743,7 +743,8 @@ function ItemsLibrary:Init(super)
 	-- nekrostrench
 	new(skinPermBase, {Id="nekrostrenchblue"; Icon="rbxassetid://17291808230"; SkinPerm="Blue"; TargetItemId="nekrostrench";});
 	new(skinPermBase, {Id="nekrostrenchgreen"; Icon="rbxassetid://17291810059"; SkinPerm="Green"; TargetItemId="nekrostrench";});
-
+	new(skinPermBase, {Id="nekrostrenchblaze"; Icon="rbxassetid://83643758081990"; SkinPerm="Blaze"; TargetItemId="nekrostrench";});
+	
 	-- prisonshirt
 	new(skinPermBase, {Id="prisonshirtblue"; Icon="rbxassetid://6665649672"; SkinPerm="Blue"; TargetItemId="prisonshirt"; });
 
