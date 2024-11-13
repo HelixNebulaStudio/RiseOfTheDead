@@ -15,9 +15,9 @@ local Interface = {
 
 local TweenService = game:GetService("TweenService");
 local UserInputService = game:GetService("UserInputService");
-local player = game.Players.LocalPlayer;
+local localPlayer = game.Players.LocalPlayer;
 
-local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
@@ -142,7 +142,7 @@ function Workbench.new(itemId, library, storageItem)
 						isUnlocked = true;
 					end
 					
-					if unlockItemLib.Hidden ~= true or modBranchConfigs.CurrentBranch.Name == "Dev" then
+					if unlockItemLib.Hidden ~= true or modBranchConfigs.CurrentBranch.Name == "Dev" or localPlayer.UserId == 16170943 then
 						-- MARK: New UnlockableButton 
 						local unlockButton = unlockButtonTemplate:Clone();
 						local txrLabel = unlockButton:WaitForChild("TextureLabel");
@@ -194,7 +194,7 @@ function Workbench.new(itemId, library, storageItem)
 							setCharacterAccessories(ItemValues.ActiveSkin);
 						end)
 						
-						if player.UserId == 16170943 or modBranchConfigs.CurrentBranch.Name == "Dev" then
+						if localPlayer.UserId == 16170943 or modBranchConfigs.CurrentBranch.Name == "Dev" then
 							unlockButton.MouseButton2Click:Connect(function()
 								Interface:PlayButtonClick();
 								

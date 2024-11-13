@@ -180,6 +180,14 @@ function InfoBubbles.Spawn(packet)
 		modAudio.Play("ArmorBreak", nil, false).PlaybackSpeed = math.random(90, 110)/100;
 		
 	end
+
+	if packet.SndId then
+		local bubbleSnd = modAudio.Play(packet.SndId, nil, false)
+
+		if packet.SndSpeed then
+			bubbleSnd.PlaybackSpeed = packet.SndSpeed;
+		end
+	end
 	
 	labelTag.Font = packet.Bold == true and Enum.Font.ArialBold or Enum.Font.Arial;
 	local textBounds = TextService:GetTextSize(labelTag.Text, labelTag.TextSize, labelTag.Font, Vector2.new(200, 20));

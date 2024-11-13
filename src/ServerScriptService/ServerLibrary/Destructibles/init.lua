@@ -14,12 +14,7 @@ local modModEngineService = require(game.ReplicatedStorage.Library.ModEngineServ
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 function Destructibles:TakeDamagePackage(damageSource)
-	local damage = damageSource.Damage;
 	local dealer = damageSource.Dealer;
-	local storageItem = damageSource.ToolStorageItem;
-	local hitPart = damageSource.TargetPart;
-	local damageType = damageSource.DamageType;
-	
 	if not self.Enabled then Debugger:Log(self.Prefab," Distructible not enabled."); return false end;
 
 	if self.DamagableBy then
@@ -32,8 +27,14 @@ function Destructibles:TakeDamagePackage(damageSource)
 	end
 
 	if self.DamageModifier then
-		damage, dealer, storageItem, hitPart, damageType = self:DamageModifier(damage, dealer, storageItem, hitPart, damageType);
+		self:DamageModifier(damageSource);
 	end
+
+	dealer = damageSource.Dealer;
+	local damage = damageSource.Damage;
+	local storageItem = damageSource.ToolStorageItem;
+	local hitPart = damageSource.TargetPart;
+	local damageType = damageSource.DamageType;
 
 	if self.DamageCap then
 		damage = math.min(damage, self.DamageCap);

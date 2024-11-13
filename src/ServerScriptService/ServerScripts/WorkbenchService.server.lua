@@ -739,7 +739,13 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 
 					if player.UserId == 16170943 or modBranchConfigs.CurrentBranch.Name == "Dev" then
 						isUnlocked = true;
+
+						if table.find(unlockedSkins, unlockableItemLib.Id) == nil then
+							table.insert(unlockedSkins, unlockableItemLib.Id);
+							storageItem:SetValues("Skins", unlockedSkins);
+						end
 					end
+					
 					if isUnlocked then
 						storageItem:SetValues("ActiveSkin", appearId);
 					end
