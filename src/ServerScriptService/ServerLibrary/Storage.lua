@@ -105,6 +105,7 @@ function Storage.new(id, name, size, owner)
 	storage.PremiumStorage = 100;
 	storage.PremiumPage = 10;
 	
+	storage.ViewOnly = false;
 	storage.Expandable = false;
 	storage.LinkedStorages = {};
 
@@ -2274,6 +2275,7 @@ function Storage:Shrink()
 	compressed.PremiumStorage = self.PremiumStorage;
 	compressed.PremiumPage = self.PremiumPage;
 
+	compressed.ViewOnly = self.ViewOnly;
 	compressed.Expandable = self.Expandable;
 	compressed.LinkedStorages = self.LinkedStorages;
 	

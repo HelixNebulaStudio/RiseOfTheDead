@@ -905,6 +905,21 @@ function ItemUnlockablesLibrary:Init(library)
 		Id="ammopouch";
 		ItemId="ammopouch";
 		Name="Default";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://105803584540454";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="ammopouchlegacy";
+		ItemId="ammopouch";
+		Name="Legacy";
+		Icon="rbxassetid://7335420098";
+		PackageId="ammopouchlegacy";
+
 		SurfaceAppearance={
 			ColorMap="rbxassetid://7335387705";
 		};
@@ -915,8 +930,10 @@ function ItemUnlockablesLibrary:Init(library)
 		Id="ammopouchnight";
 		ItemId="ammopouch";
 		Name="Night";
+		DefaultPackage=true;
+
 		SurfaceAppearance={
-			ColorMap="rbxassetid://80433516626640";
+			ColorMap="rbxassetid://85622479449999";
 		};
 		SurfaceAppearanceParent=script;
 	};
@@ -925,8 +942,10 @@ function ItemUnlockablesLibrary:Init(library)
 		Id="ammopouchhexcamo";
 		ItemId="ammopouch";
 		Name="Hex Camo";
+		DefaultPackage=true;
+
 		SurfaceAppearance={
-			ColorMap="rbxassetid://83208049914596";
+			ColorMap="rbxassetid://104364493766588";
 		};
 		SurfaceAppearanceParent=script;
 	};
@@ -936,6 +955,8 @@ function ItemUnlockablesLibrary:Init(library)
 		ItemId="ammopouch";
 		Icon="rbxassetid://98882966031889";
 		Name="Dark Carbon";
+		DefaultPackage=true;
+		
 		SurfaceAppearance={
 			ColorMap="rbxassetid://93994020837531";
 		};

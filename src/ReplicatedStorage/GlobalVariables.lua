@@ -2,7 +2,7 @@ local mxkhronosUserId = 16170943;
 local Vars = {
 	DevVersion="2.2.x";
 	GameVersion="2.1.26";
-	GameBuild="0";
+	GameBuild="2";
 	
 	EngineMode="RiseOfTheDead";
 	ModeVerLabel = "$UpTime";
@@ -287,6 +287,30 @@ shared.CleanUnitVec = Vars.CleanUnitVec;
 
 function Vars.GaussianRandom() -- ~ -2.5 to ~ 2.5;
 	return math.sqrt(-2*math.log(1 - math.random()))*math.cos(2*math.pi*math.random());
+end
+
+function Vars.GetVersion(versionStr)
+	local versionNumbers = string.split(versionStr, ".");
+	local versionPacket = {
+		Series = 0;
+		Major = 0;
+		Minor = 0;
+		Dev = 0;
+	};
+
+	for a=1, #versionNumbers do
+		if a == 1 then
+			versionPacket.Series = tonumber(versionNumbers[a]);
+		elseif a == 2 then
+			versionPacket.Major = tonumber(versionNumbers[a]);
+		elseif a == 3 then
+			versionPacket.Minor = tonumber(versionNumbers[a]);
+		elseif a == 4 then
+			versionPacket.Dev = tonumber(versionNumbers[a]);
+		end
+	end
+
+	return versionPacket;
 end
 
 local modBitFlags = require(game.ReplicatedStorage.Library.BitFlags);

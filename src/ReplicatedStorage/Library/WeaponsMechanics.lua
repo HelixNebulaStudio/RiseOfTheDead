@@ -157,13 +157,14 @@ function WeaponsMechanics.ApplyPassiveMods(storageItem, attachmentStorage, weapo
 	local tweakValues = storageItem.Values and storageItem.Values.TweakValues or {};
 	
 	local upgradeLib = modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId];
-	local itemTier = upgradeLib.Tier or 1;
+	local itemTier = upgradeLib and upgradeLib.Tier or 1;
 	
 	local sortedList = {};
 	
 	for _, storageItemMod in pairs(attachmentStorage.Container) do
 		local modLib = modItemModsLibrary.Get(storageItemMod.ItemId);
-		
+		if modLib == nil then continue end;
+
 		table.insert(sortedList, {
 			StorageItem=storageItemMod;
 			Lib=modLib;

@@ -307,6 +307,26 @@ function SaveData:Load(rawData, isPrimarySave)
 				
 			end
 		end
+
+		local versionObj = modGlobalVars.GetVersion(rawData.Version);
+		if versionObj.Major <= 1 and versionObj.Minor <= 26 then -- 2.1.26.1
+			local function updateItem(storageItem)
+				if storageItem.ItemId ~= "ammopouch" then return end;
+
+				local unlockedSkins = storageItem:GetValues("Skins") or {};
+				if table.find(unlockedSkins, "ammopouchlegacy") == nil then
+					table.insert(unlockedSkins, "ammopouchlegacy");
+					storageItem:SetValues("Skins", unlockedSkins);
+				end
+			end
+
+			self.Inventory:Loop(updateItem);
+			self.Clothing:Loop(updateItem);
+			self.Wardrobe:Loop(updateItem);
+			for id, _ in pairs(self.Storages) do
+				self.Storages[id]:Loop(updateItem);
+			end
+		end
 		
 		local codexEvent = self.Events:Get("itemCodex1");
 		if codexEvent == nil then

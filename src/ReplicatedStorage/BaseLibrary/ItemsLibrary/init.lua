@@ -242,7 +242,7 @@ function ItemsLibrary:Init(super)
 
 	new(storageBase, {Id="dufflebag"; Name="Duffle Bag"; Icon="rbxassetid://8827967921";});
 	new(storageBase, {Id="survivorsbackpack"; Name="Survivor's Backpack"; Icon="rbxassetid://8948320931";});
-	new(storageBase, {Id="ammopouch"; Name="Ammo Pouch"; Tags={"Unobtainable"}; Icon="rbxassetid://7335420098";});
+	new(storageBase, {Id="ammopouch"; Name="Ammo Pouch"; Tags={"Unobtainable"}; Icon="rbxassetid://122023406947488";});
 
 	--==========================================================[[ CRATES ]]==========================================================--
 	local crateBase = {
@@ -656,7 +656,7 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="deaglecryogenics"; Icon="rbxassetid://17227806515"; SkinPerm="Cryogenics"; TargetItemId="deagle"; });
 	new(skinPermBase, {Id="flamethrowerblaze"; Icon="rbxassetid://17229367894"; SkinPerm="Blaze"; TargetItemId="flamethrower"; });
 	
-	--== Clothing Skin Perms;
+	--MARK: Clothing Skin Perms;
 	-- armwraps
 	new(skinPermBase, {Id="armwrapsrat"; Icon="rbxassetid://13021422822"; SkinPerm="R.A.T."; TargetItemId="armwraps"; });
 	new(skinPermBase, {Id="armwrapsmissingtextures"; Icon="rbxassetid://13207932009"; SkinPerm="Missing Textures"; TargetItemId="armwraps"; });
@@ -787,6 +787,11 @@ function ItemsLibrary:Init(super)
 	
 	-- brownleatherbootsblack
 	new(skinPermBase, {Id="brownleatherbootsblack"; Icon="rbxassetid://110623857537822"; SkinPerm="Black"; TargetItemId="brownleatherboots";});
+
+	-- ammopouch
+	new(skinPermBase, {Id="ammopouchnight"; Icon="rbxassetid://110108323033027"; SkinPerm="Night"; TargetItemId="ammopouch";});
+	new(skinPermBase, {Id="ammopouchhexcamo"; Icon="rbxassetid://71912683610580"; SkinPerm="Hexcamo"; TargetItemId="ammopouch";});
+
 
 	--==========================================================[[ SUMMONS ]]==========================================================--
 	local summonsBase = {
