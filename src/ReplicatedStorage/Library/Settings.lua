@@ -627,15 +627,6 @@ baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 		RefreshGraphics=true;
 	};
 });
--- baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
--- 	TitleProperties={Text="Show Far Details";};
--- 	DescProperties={Text="Disabling hides small models far away from the camera to improve performance. <b>Unstable, may or may not improve performance.</b>";};
--- 	Config={
--- 		SettingsKey="HideFarSmallObjects";
--- 		Type="Toggle";
--- 		RefreshGraphics=true;
--- 	};
--- });
 baseConfigInterface:Add("VisualsGraphics", "ToggleOption", {
 	TitleProperties={Text="Extra Detail";};
 	DescProperties={Text="Disabling will delete decorative props and assets from the world. <b>Enabling requires rejoining.</b>";};
@@ -769,6 +760,10 @@ baseConfigInterface:Add("Right", "Page", {Id="DataReset";
 
 Settings.DefaultConfigInterface = baseConfigInterface;
 
+Settings.Checks = {
+	KeyCheck = keyCheck;
+	IgnoreMouseKeys = ignoreMouseKeys;
+}
 
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local moddedSelf = modModEngineService:GetModule(script.Name);

@@ -184,6 +184,12 @@ function Interface.init(modInterface)
 							{Type="Option"; Id="KeyHideHud"; Text="Toggle Hud"; Default=modKeyBindsHandler:ToString("KeyHideHud");};
 						};
 
+						if modSettings.SettingsKeybindControlsTable then
+							for a=1, #modSettings.SettingsKeybindControlsTable do
+								table.insert(controlsTable, modSettings.SettingsKeybindControlsTable[a]);
+							end
+						end
+
 						local changingKeys = false;
 						
 						for a=1, #controlsTable do
