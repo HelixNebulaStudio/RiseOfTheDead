@@ -183,7 +183,7 @@ modCharacter.RootPart = rootPart;
 mouseProperties.DefaultSensitivity = UserGameSettings.MouseSensitivity;
 
 if localPlayer:GetAttribute("hm_1") then
-	characterProperties.DefaultWalkSpeed = 16;
+	characterProperties.DefaultWalkSpeed = 15;
 	characterProperties.DefaultSwimSpeed = 10;
 	characterProperties.DefaultSprintSpeed = 20;
 end
@@ -1892,7 +1892,7 @@ RunService.Stepped:Connect(function(total, delta)
 		jumpDebounce = true;
 
 		-- MARK: Air jumping
-		if classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaAgility then
+		if modCharacter.SprintMode >= 3 or (classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaAgility) then
 			local maxAirJumps = 1;
 			if humanoid.FloorMaterial == Enum.Material.Air and Cache.AirJumpsCounter < maxAirJumps and not characterProperties.IsWounded then
 				humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
@@ -1920,7 +1920,7 @@ RunService.Stepped:Connect(function(total, delta)
 	end
 
 	-- MARK: Wall climbing
-	if classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaAgility then
+	if modCharacter.SprintMode >= 3 or (classPlayer and classPlayer.Properties and classPlayer.Properties.NinjaAgility) then
 		local maxClimbHeight = 8;
 		local minClimbHeight = 7;
 		local validClimbGapSize = Vector3.new(2, 3, 2);
@@ -2071,7 +2071,7 @@ RunService.Stepped:Connect(function(total, delta)
 		modCharacter.SprintMode = modConfigurations.DefaultSprintMode or 1;
 	end
 
-	if modCharacter.SprintMode == 2 and not characterProperties.IsWounded then
+	if modCharacter.SprintMode >= 2 and not characterProperties.IsWounded then
 		if (Cache.LastDamaged == nil or tick()-Cache.LastDamaged > 2) and not characterProperties.IsFocused then
 			characterProperties.IsSprinting = true;
 		end
@@ -2746,8 +2746,6 @@ RunService.PostSimulation:Connect(function(deltaTimeSim)
 			
 			collisionRootPart.Size = collisionSize;
 			collisionRootMotor.C0 = collisionC0;
-			-- collisionRootPart.Size = collisionRootPart.Size:Lerp(collisionSize, 0.5);
-			-- collisionRootMotor.C0 = collisionRootMotor.C0:Lerp(collisionC0, 0.5);
 			
 		else
 			collisionRootPart.Size = Vector3.new(2, 2, 1);

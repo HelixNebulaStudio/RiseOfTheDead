@@ -127,7 +127,7 @@ function Add(_, data)
 	ItemModsLibrary.List[data.Name] = {
 		Id=data.Id;
 		Name=data.Name;
-		Desc=data.ModDesc or data.Desc;
+		Desc=data.Desc or "";
 		BaseTier=data.BaseTier or 1;
 		Tier=data.BaseTier or 1;
 		Icon=data.Icon or "rbxassetid://2635316236";
@@ -149,20 +149,32 @@ function Add(_, data)
 		GetModule = function(self)
 			return self.Module and require(self.Module) or nil;
 		end;
-	}
+	};
 	ItemModsLibrary.Library[data.Id] = ItemModsLibrary.List[data.Name];
 	
-	description = description.."\n\n<b>Compatibility:</b> ";
-	for a=1, #data.Type do
-		description = description..colorStringText(data.Type[a])
-		if a ~= #data.Type then
-			description = description..", ";
-		else
-			description = description.."";
+	for k, v in pairs(data) do
+		ItemModsLibrary.Library[data.Id][k] = v;
+	end
+	if data.ModDesc then
+		ItemModsLibrary.Library[data.Id].Desc = data.ModDesc;
+	end
+
+	if data.Type then
+		description = description.."\n\n<b>Compatibility:</b> ";
+		for a=1, #data.Type do
+			description = description..colorStringText(data.Type[a])
+			if a ~= #data.Type then
+				description = description..", ";
+			else
+				description = description.."";
+			end
 		end
 	end
-	description = description.."\n\n<b>EffectTrigger:</b> "..(data.EffectTrigger == ItemModsLibrary.EffectTrigger.Passive and colorStringText("Passive") 
-		or data.EffectTrigger == ItemModsLibrary.EffectTrigger.Activate and colorStringText("Activate") or colorStringText("Unknown"));
+
+	if data.EffectTrigger then
+		description = description.."\n\n<b>EffectTrigger:</b> "..(data.EffectTrigger == ItemModsLibrary.EffectTrigger.Passive and colorStringText("Passive") 
+			or data.EffectTrigger == ItemModsLibrary.EffectTrigger.Activate and colorStringText("Activate") or colorStringText("Unknown"));
+	end
 	
 	local stackable = "";
 	if typeof(data.Stackable) == "boolean" then
@@ -174,15 +186,22 @@ function Add(_, data)
 	end
 	description = description.."\n<b>Mod Stackable:</b> ".. stackable;
 	
-
-	new(modBase, {
+	local itemMetadata = {
 		Id=data.Id; 
 		Name=data.Name; 
 		Icon=data.Icon; 
 		Description=description;
 		Tier=data.Tier;
 		Tags = {data.Category};
-	});
+	};
+
+	if data.ItemMetaData then
+		for k, v in pairs(data.ItemMetaData) do
+			itemMetadata[k] = v;
+		end
+	end
+
+	new(modBase, itemMetadata);
 end
 
 function ItemModsLibrary.Get(nameOrId)

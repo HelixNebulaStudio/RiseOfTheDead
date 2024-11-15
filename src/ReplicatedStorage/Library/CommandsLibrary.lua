@@ -2369,7 +2369,7 @@ Commands["give"] = {
 			local profile = shared.modProfile:Get(player);
 			local playerSave = profile:GetActiveSave();
 			
-			local inventory = profile.ActiveInventory;
+			local storage = profile.ActiveInventory;
 			if profile.Cache and profile.Cache.CmdGiveFunc then
 				local rPacket = profile.Cache.CmdGiveFunc(speaker, player, itemId, quantity, itemData);
 				if rPacket then
@@ -2378,12 +2378,12 @@ Commands["give"] = {
 						return;
 					end
 					if rPacket.Inventory then
-						inventory = rPacket.Inventory;
+						storage = rPacket.Inventory;
 					end
 				end
 			end
 
-			if inventory then
+			if storage then
 				itemData.Quantity = quantity;
 				
 				local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem);
@@ -2394,14 +2394,14 @@ Commands["give"] = {
 					storageItem.ID = profile:NewID();
 				end
 				
-				local rPacket = inventory:InsertRequest(storageItem);
+				local rPacket = storage:InsertRequest(storageItem);
 				
 				if rPacket.Success then
 					local messageText;
 					if player ~= speaker then
-						messageText = "Item "..itemLib.Id.." given to "..player.Name..".";
+						messageText = `Item {itemLib.Id} given to {player.Name}'s {storage.Name}`;
 					else
-						messageText = "Recieved "..quantity.." "..itemLib.Id..".";
+						messageText = `Recieved {quantity} {itemLib.Id} in {storage.Name}`;
 					end
 					
 					if rPacket.QuantityRemaining then
@@ -2411,13 +2411,13 @@ Commands["give"] = {
 					shared.Notify(speaker, messageText, "Reward");
 					
 				elseif rPacket.Failed == 1 then
-					shared.Notify(speaker, "Not enough inventory space.", "Negative");
+					shared.Notify(speaker, `Not enough {storage.Name} space.`, "Negative");
 
 				end
 				
 				return;
 			else
-				shared.Notify(speaker, "No active inventory.", "Negative");
+				shared.Notify(speaker, `No active {storage.Name}.`, "Negative");
 			end
 		end
 		return;
