@@ -149,6 +149,7 @@ function Weapon.new(configurations, properties, animations, audio)
 		Cache={};
 		ArcTracerConfig={};
 		ModHooks={};
+		ModifierTriggers = {};
 		
 		Configurations=setmetatable(configurationCache, Configurations);
 		Properties=setmetatable(propertiesCache, Properties);
@@ -174,6 +175,9 @@ function Weapon.new(configurations, properties, animations, audio)
 			for k, _ in pairs(propertiesCache) do propertiesCache[k] = nil; end
 			table.clear(self.ArcTracerConfig);
 			table.clear(self.ModHooks);
+			for k, itemModifier in pairs(self.ModifierTriggers) do
+				itemModifier:SetActive(false);
+			end
 		end;
 		CalculateDps=function(self)
 			if self.Configurations.CustomDpsCal then
@@ -202,7 +206,6 @@ function Weapon.new(configurations, properties, animations, audio)
 
 			if dmg and firerate and multishot and reloadspeed and ammo then
 				multishot = type(multishot) == "table" and multishot.Max or multishot;
-				-- (60/((ammo*firerate)+reloadspeed))*(dmg*ammo);
 				self.Configurations.Dpm = 60/((ammo*firerate)+reloadspeed)*(dmg*ammo);
 			end
 		end;
@@ -210,30 +213,6 @@ function Weapon.new(configurations, properties, animations, audio)
 			local preModDmg = self.Configurations.PreModDamage;
 			local dmg = self.Configurations.Damage;
 			local ammo = self.Configurations.AmmoLimit;
-
-			--local multishot = self.Properties.Multishot;
-			--if type(multishot) == "table" then
-			--	self.Configurations.Md = {
-			--		Min=dmg * (ammo) * multishot.Min;
-			--		Max=dmg * (ammo) * multishot.Max;
-			--	}
-			--else
-
-			--	local multi = self.Configurations.DamageRev;
-			--	if multi then
-			--		local add = (preModDmg * multi);
-
-			--		self.Configurations.Md = dmg;
-			--		for a=ammo, 1, -1 do
-			--			self.Configurations.Md = self.Configurations.Md + dmg + (add * math.clamp(1-(a/ammo), 0, 1));
-			--		end
-
-			--	else
-			--		self.Configurations.Md = dmg * (ammo);
-
-			--	end
-			--end
-
 
 			local multishot = type(self.Properties.Multishot) == "table" and self.Properties.Multishot.Max or self.Properties.Multishot;
 
@@ -258,14 +237,6 @@ function Weapon.new(configurations, properties, animations, audio)
 			local ammo = self.Configurations.AmmoLimit;
 			local maxAmmo = self.Configurations.MaxAmmoLimit;
 
-			--local multishot = self.Properties.Multishot;
-
-			--if type(multishot) == "table" then
-			--	self.Configurations.Tad = {
-			--		Min=dmg * (ammo+maxAmmo) * multishot.Min;
-			--		Max=dmg * (ammo+maxAmmo) * multishot.Max;
-			--	}
-			--else
 			if self.Configurations.Md then
 				local ammo = self.Configurations.AmmoLimit;
 				local maxAmmo = self.Configurations.MaxAmmoLimit;
@@ -279,15 +250,28 @@ function Weapon.new(configurations, properties, animations, audio)
 				local multishot = type(self.Properties.Multishot) == "table" and self.Properties.Multishot.Max or self.Properties.Multishot;
 				self.Configurations.Tad = dmg * (ammo+maxAmmo) * multishot;
 			end
-
-			--end
-			-- Total ammo damage.
 		end;
 		SetPrimaryModHook=function(self, data, modLib)
 			local meta = {Library=modLib;};
 			meta.__index = meta;
 			
 			self.ModHooks.PrimaryEffectMod = setmetatable(data, meta);
+		end;
+		AddModifierTrigger=function(self, storageItem, itemModifier, data)
+			local src = itemModifier.Script;
+			local id = src.Name;
+
+			if self.ModifierTriggers[id] == nil then
+				self.ModifierTriggers[id] = itemModifier:Instance(storageItem);
+			end
+			local newItemModifier = self.ModifierTriggers[id];
+			newItemModifier:SetActive(true);
+
+			if data then
+				for k, v in pairs(data) do
+					newItemModifier[k] = v;
+				end
+			end
 		end;
 	} 
 	

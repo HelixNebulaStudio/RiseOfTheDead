@@ -78,7 +78,7 @@ local Properties={
 }
 
 local Animations=workspace:GetAttribute("IsDev") and {
-	Core={Id=16311093189;};
+	Core={Id=77499261157109;};
 	PrimaryFire={Id=16311102924;};
 	Reload={Id=16311104731;};
 	Load={Id=16311101004;};
@@ -89,7 +89,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Idle={Id=17557363942};
 
 } or { -- Main
-	Core={Id=16311093189;};
+	Core={Id=77499261157109;};
 	PrimaryFire={Id=16311102924;};
 	Reload={Id=16311104731;};
 	Load={Id=16311101004;};

@@ -36,6 +36,7 @@ local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
 local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
+local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
 
 local toolHandlers = game.ServerScriptService.ServerLibrary.ToolHandlers;
 
@@ -486,10 +487,21 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 	local timeSinceLastShot = (cache.LastShot and tick()-cache.LastShot or 99);
 	local rawRpm = properties.Rpm;
 
-	if configurations.SkullBurst then
-		rawRpm = rawRpm + configurations.SkullBurst;
+	--MARK: ProcessItemModifiers
+	local function ProcessItemModifiers(processType, ...)
+		for id, itemModifier in pairs(weaponModule.ModifierTriggers) do
+			itemModifier.WeaponModule = weaponModule;
+
+			if itemModifier[processType] then
+				itemModifier[processType](itemModifier, ...);
+			end
+		end
 	end
 
+	local changeRef = {RawRpm=rawRpm};
+	ProcessItemModifiers("OnPrimaryFire", changeRef);
+	rawRpm = changeRef.RawRpm;
+	
 	local baseFirerate = 60/rawRpm;
 	if cache.LastShot and timeSinceLastShot+0.3 < baseFirerate then --properties.FireRate
 		warn("PrimaryFire>> "..client.Name.." fired "..weaponModel.Name.." too soon. Last shot:"..(math.ceil(timeSinceLastShot*10000)/10000).." Firerate:"..properties.FireRate);
@@ -630,6 +642,13 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 				targetModel = targetModel.Parent;
 			end
 			
+			--MARK: OnBulletHit
+			ProcessItemModifiers("OnBulletHit", {
+				Player=client;
+				TargetPart = targetObject;
+				ToolModule = weaponModule;
+			});
+
 			-- shot handler;
 			if targetModel and (targetObject:IsDescendantOf(workspace) or targetObject:IsDescendantOf(game.ReplicatedStorage.Replicated)) then
 				local distance = client:DistanceFromCharacter(targetObject.Position);

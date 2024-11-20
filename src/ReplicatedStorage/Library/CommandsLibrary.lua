@@ -1131,6 +1131,7 @@ Commands["spawnentity"] = {
 				AttackSpeed = "number";
 				AttackDamage = "number";
 				AttackRange = "number";
+				WeaponId = "string";
 			};
 			Configuration = {
 				Level = "number";
@@ -3613,6 +3614,7 @@ Commands["itemvalues"] = {
 		return true;
 	end;
 };
+
 
 local modToolTweaks = require(game.ReplicatedStorage.Library.ToolTweaks);
 Commands["tweak"] = {

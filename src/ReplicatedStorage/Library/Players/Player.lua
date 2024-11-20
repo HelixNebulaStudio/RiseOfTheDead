@@ -323,6 +323,8 @@ function Player.new(playerInstance: Player)
 		local initDamage = damage;
 		local armorDamage = damage;
 
+		damageSource.InitDamage = initDamage;
+
 		if damage > 0 then
 			task.spawn(function()
 				if dealer then
@@ -395,7 +397,7 @@ function Player.new(playerInstance: Player)
 						damage = math.floor(damage*10)/10;
 
 						local newRegenDelay = math.abs(classPlayer.Properties.Armor)/(self.Humanoid.MaxHealth/50);
-						newRegenDelay = math.clamp(math.floor(newRegenDelay*10)/10, 5, 60);
+						newRegenDelay = math.clamp(math.floor(newRegenDelay*10)/10, 10, 60);
 						classPlayer.Properties.ArmorRegenDelay = newRegenDelay;
 
 						local statusTable = {
@@ -870,7 +872,7 @@ function Player.new(playerInstance: Player)
 						end
 						
 						classPlayer.Properties.Armor = classPlayer.Properties.Armor + armorRate;
-						classPlayer.Properties.ArmorRegenDelay = 1;
+						--classPlayer.Properties.ArmorRegenDelay = 1;
 					end
 				end
 

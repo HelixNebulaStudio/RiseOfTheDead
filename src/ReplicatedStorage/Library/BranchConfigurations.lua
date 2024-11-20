@@ -616,7 +616,6 @@ elseif Branches.WorldInfo.Type == Branches.WorldTypes.NekronsGambit then
 	modConfigurations.Set("DisableGoldMenu", false);
 	modConfigurations.Set("DisableStatusHud", false);
 	modConfigurations.Set("DisableEmotes", false);
-	modConfigurations.Set("DisableMissions", false);
 	modConfigurations.Set("DisablePinnedMission", false);
 	modConfigurations.Set("DisableInfoBubbles", false);
 	

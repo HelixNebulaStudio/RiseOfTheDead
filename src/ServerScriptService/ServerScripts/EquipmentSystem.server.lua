@@ -116,7 +116,6 @@ local function OnPlayerAdded(player: Player)
 			local activeSkinId = storageItem:GetValues("ActiveSkin");
 			if profile.ItemCustomizationBan == 0 and (customizationData or activeSkinId) then
 				task.spawn(function()
-
 					modCustomizationData.LoadCustomization({
 						ToolModels = prefabs;
 
@@ -154,6 +153,13 @@ function unequipTool(player, returnPacket)
 		if player == nil or player.Character == nil then return returnPacket; end;
 		local modGearAttachments = require(player.Character:FindFirstChild("GearAttachments"));
 		
+		local toolModule = profile:GetItemClass(lastId, lastId == "MockStorageItem");
+		if toolModule and toolModule.ModifierTriggers then
+			for k, itemModifier in pairs(toolModule.ModifierTriggers) do
+				itemModifier:SetActive(false);
+			end
+		end
+
 		if profile.EquippedTools.WeaponModels then
 			local preexistingMotors = {};
 			for a=1, #profile.EquippedTools.ToolWelds do
@@ -313,7 +319,6 @@ function unequipTool(player, returnPacket)
 			if handler and handler.OnToolUnequip then
 				handler:OnToolUnequip();
 			end
-			
 		end
 		
 		modOnGameEvents:Fire("OnToolUnequipped", player, storageItem);

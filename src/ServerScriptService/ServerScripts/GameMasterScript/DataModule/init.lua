@@ -544,27 +544,13 @@ function Data:GetItemClass(storageItemId, getShadowCopy)
 	if itemLib == nil then return end;
 	
 	local classLib = nil;
-	local classType = nil;
 
 	local attachmentStorage = Data.GetItemStorage(storageItemId);
-	
-
-	local modItemClass = modModEngineService:GetModule(`ItemClass`);
-
-	if modItemClass then
-		local getItemClass = modItemClass.GetItemClass(localPlayer, storageItem, getShadowCopy);
-		if getItemClass then
-			if getItemClass.AttachmentStorage then
-				attachmentStorage = getItemClass.AttachmentStorage;
-			end
-		end
-	end
-
 
 	local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 	local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
 
-	local function update(class)
+	local update = function(storageItem, class, classType)
 		if class.Reset then class:Reset(); end;
 		if modConfigurations.SkipRotDModding == true then return class; end;
 
@@ -576,7 +562,6 @@ function Data:GetItemClass(storageItemId, getShadowCopy)
 			end
 			
 		elseif classType == "Clothing" then
-
 			if itemValues and itemValues.Seed then
 				if class.ApplySeed then
 					class:ApplySeed(storageItem);
@@ -606,6 +591,12 @@ function Data:GetItemClass(storageItemId, getShadowCopy)
 		return class;
 	end
 	
+	local modItemClass = modModEngineService:GetModule(`ItemClass`);
+	if modItemClass then
+		update = modItemClass.UpdateItemClass;
+	end
+
+	local classType = nil;
 	if itemLib.Type == modItemsLibrary.Types.Tool then
 		local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 		local modTools = require(game.ReplicatedStorage.Library.Tools);
@@ -630,10 +621,12 @@ function Data:GetItemClass(storageItemId, getShadowCopy)
 	
 	if classLib then
 		if getShadowCopy == true then
-			return update(classLib.NewToolLib()), classType;
+			return update(storageItem, classLib.NewToolLib(), classType), classType;
 		else
-			Data.ItemClassesCache[storageItemId] = classLib.NewToolLib();
-			return update(Data.ItemClassesCache[storageItemId]), classType;
+			if Data.ItemClassesCache[storageItemId] == nil then
+				Data.ItemClassesCache[storageItemId] = classLib.NewToolLib();
+			end
+			return update(storageItem, Data.ItemClassesCache[storageItemId], classType), classType;
 		end
 		
 	end

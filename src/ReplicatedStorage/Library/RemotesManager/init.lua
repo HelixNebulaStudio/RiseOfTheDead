@@ -598,6 +598,7 @@ else
 	RemotesManager:NewEventRemote("SimulateProjectile");
 	RemotesManager:NewEventRemote("ClientProjectileHit").Secure = true;
 	RemotesManager:NewFunctionRemote("ItemModAction", 0.1).Secure = true;
+	RemotesManager:NewEventRemote("ItemModifier");
 	
 	--== Storage;
 	RemotesManager:NewFunctionRemote("StorageService", 0.1);

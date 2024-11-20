@@ -19,6 +19,11 @@ ItemModsLibrary.ScalingStyle = {
 	NaturalCurve=1;
 };
 
+ItemModsLibrary.TriggerType = {
+	None=0;
+	OnBulletHit=1;
+};
+
 function ItemModsLibrary.Linear(base, max, level, maxlevel)
 	level = level or 0;
 	if base > max then -- base=8, max=2
@@ -108,7 +113,7 @@ end
 local Lib = modItemsLibrary.Library;
 local function new(b, d)
 	b.__index=b;
-	modItemsLibrary:Add(setmetatable(d, b));
+	return modItemsLibrary:Add(setmetatable(d, b));
 end;
 
 local modBase = {
@@ -151,12 +156,13 @@ function Add(_, data)
 		end;
 	};
 	ItemModsLibrary.Library[data.Id] = ItemModsLibrary.List[data.Name];
+	local modLib = ItemModsLibrary.Library[data.Id];
 	
 	for k, v in pairs(data) do
-		ItemModsLibrary.Library[data.Id][k] = v;
+		modLib[k] = v;
 	end
 	if data.ModDesc then
-		ItemModsLibrary.Library[data.Id].Desc = data.ModDesc;
+		modLib.Desc = data.ModDesc;
 	end
 
 	if data.Type then
@@ -195,13 +201,18 @@ function Add(_, data)
 		Tags = {data.Category};
 	};
 
+	if data.BaseTier > 1 then
+		local tierColor = modItemsLibrary.TierColors[data.BaseTier];
+		modLib.Color = tierColor;
+	end
+
 	if data.ItemMetaData then
 		for k, v in pairs(data.ItemMetaData) do
 			itemMetadata[k] = v;
 		end
 	end
 
-	new(modBase, itemMetadata);
+	return new(modBase, itemMetadata);
 end
 
 function ItemModsLibrary.Get(nameOrId)

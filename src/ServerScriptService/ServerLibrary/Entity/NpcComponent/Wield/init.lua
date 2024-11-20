@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
-local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
+local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 
 local weaponHandler = require(script.WeaponHandler);
 local meleeHandler = require(script.MeleeHandler);
@@ -113,24 +113,26 @@ function Component.new(Npc)
 		end
 	end
 	
-	--[[
-		SetSkin({
-			Colors={
-				["Handle"]=14;
-			};
-			Textures={
-				["Handle"]=10;
-			};
-		});
-	]]--
-	function Wield.SetSkin(itemValues)
-		for k, obj in next, Wield.Instances do
-			if obj:IsA("Model") then
-				modColorsLibrary.ApplyAppearance(obj, itemValues);
+	function Wield.SetCustomization(customizationData, activeSkinId)
+		task.spawn(function()
+			local toolModels = {};
+			if Wield.Instances.LeftModel then
+				table.insert(toolModels, Wield.Instances.LeftModel);
 			end
-		end
-	end
+			if Wield.Instances.RightModel then
+				table.insert(toolModels, Wield.Instances.RightModel);
+			end
+			if #toolModels <= 0 then return end;
 
+			modCustomizationData.LoadCustomization({
+				ToolModels = toolModels;
+
+				ItemId = Wield.ItemId;
+				CustomizationData = customizationData;
+				SkinId = activeSkinId;
+			});
+		end)
+	end
 
 	function Wield.ActionRequest(...)
 		if Wield.Handler and Wield.Handler.ActionRequest then

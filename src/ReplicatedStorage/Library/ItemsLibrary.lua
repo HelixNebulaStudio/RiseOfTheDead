@@ -63,6 +63,7 @@ Item.TierColors = {
 }
 
 setmetatable(Item.TierColors, {__index=getrgb255;});
+
 --== Script;
 local baseItem = {
 	Id = "n/a";

@@ -1474,23 +1474,10 @@ function Profile:GetItemClass(storageItemId, getShadowCopy)
 	local itemLib = modItemsLibrary:Find(itemId);
 	
 	local classLib = nil;
-	local classType = nil;
 
 	local attachmentStorage = playerSave.Storages[storageItemId];
 	
-	local modItemClass = modModEngineService:GetModule(`ItemClass`);
-
-	if modItemClass then
-		local getItemClass = modItemClass.GetItemClass(self.Player, storageItem, getShadowCopy);
-		if getItemClass then
-			if getItemClass.AttachmentStorage then
-				attachmentStorage = getItemClass.AttachmentStorage;
-			end
-		end
-	end
-
-
-	local function update(class)
+	local update = function(storageItem, class, classType)
 		if class.Reset then class:Reset(); end;
 		if modConfigurations.SkipRotDModding == true then return class; end;
 
@@ -1531,6 +1518,12 @@ function Profile:GetItemClass(storageItemId, getShadowCopy)
 		return class;
 	end
 	
+	local modItemClass = modModEngineService:GetModule(`ItemClass`);
+	if modItemClass then
+		update = modItemClass.UpdateItemClass;
+	end
+
+	local classType = nil;
 	if itemLib.Type == modItemsLibrary.Types.Tool then
 		if modWeapons[itemId] then
 			classType = "Weapon";
@@ -1553,13 +1546,13 @@ function Profile:GetItemClass(storageItemId, getShadowCopy)
 			Debugger:Warn("Missing newtoollib func ", itemId);
 		end
 		if getShadowCopy == true then
-			return update(classLib.NewToolLib()), classType;
+			return update(storageItem, classLib.NewToolLib(), classType), classType;
 			
 		else
 			if self.ItemClassesCache[storageItemId] == nil then
 				self.ItemClassesCache[storageItemId] = classLib.NewToolLib();
 			end
-			return update(self.ItemClassesCache[storageItemId]), classType;
+			return update(storageItem, self.ItemClassesCache[storageItemId], classType), classType;
 		end
 	end
 

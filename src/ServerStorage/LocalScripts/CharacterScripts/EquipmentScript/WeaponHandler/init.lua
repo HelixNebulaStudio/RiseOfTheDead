@@ -30,9 +30,10 @@ local modArcTracing = require(game.ReplicatedStorage.Library.ArcTracing);
 local modParticleSprinkler = require(game.ReplicatedStorage.Particles.ParticleSprinkler);
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
-local modMath = require(game.ReplicatedStorage.Library.Util.Math);
-
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
+
+local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 
 local modRadialImage = require(game.ReplicatedStorage.Library.UI.RadialImage);
 local modStorageInterface = require(game.ReplicatedStorage.Library.UI.StorageInterface);
@@ -43,6 +44,7 @@ local prefabs = game.ReplicatedStorage.Prefabs.Objects;
 local remotePrimaryFire = modRemotesManager:Get("PrimaryFire");
 local remoteReloadWeapon = modRemotesManager:Get("ReloadWeapon");
 local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler");
+local remoteItemModifier = modRemotesManager:Get("ItemModifier");
 
 local bindReloadYield = script:WaitForChild("ReloadYield");
 local bindPrimaryFiringYield = script:WaitForChild("PrimaryFiringYield");
@@ -118,13 +120,13 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 		Order=1;
 		Text="Reload";
 		Hide=true;
-		KeyCode=modKeyBindsHandler:ToString("KeyReload");
+		KeyString="KeyReload";
 	}
 	weaponStatusDisplay.ToggleSpecial = {
 		Order=2;
 		Text="Special";
 		Hide=true;
-		KeyCode=modKeyBindsHandler:ToString("KeyToggleSpecial");
+		KeyString="KeyToggleSpecial";
 	}
 
 	for _, obj in pairs(playerGui:GetChildren()) do
@@ -139,7 +141,6 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 	local modInterface = modData:GetInterfaceModule();
 	
 	local weaponStatusTemplate = script:WaitForChild("WeaponStatusTemplate") :: TextLabel;
-	local keyPromptTemplate = script:WaitForChild("KeyPromptTemplate") :: TextLabel;
 
 	local crosshairFrame = weaponInterface:WaitForChild("CrosshairFrame");
 	local tpBlockFrame = weaponInterface:WaitForChild("TPBlock");
@@ -354,6 +355,18 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 		updateAmmoCounter();
 	end)
 	
+	--MARK: ProcessItemModifiers
+	local function ProcessItemModifiers(processType, ...)
+		for id, itemModifier in pairs(modWeaponModule.ModifierTriggers) do
+			itemModifier.WeaponModule = modWeaponModule;
+			itemModifier.WeaponStatusDisplay = weaponStatusDisplay;
+
+			if itemModifier[processType] then
+				itemModifier[processType](itemModifier, ...);
+			end
+		end
+	end
+
 	local projRaycast = RaycastParams.new();
 	projRaycast.FilterType = Enum.RaycastFilterType.Include;
 	projRaycast.IgnoreWater = true;
@@ -417,37 +430,7 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 			Equipped.RightHand.Data.Inaccuracy = Equipped.RightHand.Data.Inaccuracy + mouseProperties.FlinchInacc;
 		end
 		
-		-- Mod: Skullburst
-		if configurations.SkullBurst then
-			if cache.SkullBurstStacks == nil then
-				cache.SkullBurstStacks = 0;
-				cache.SkullBurstCooldownTick = tick();
-				cache.SkullBurstDepleteTick = tick();
-
-				weaponStatusDisplay.SkullBurst = {
-					Order=1;
-					Icon="rbxassetid://122209706920942";
-					Color=Color3.fromRGB(63, 130, 255);
-					Text="0%";
-				}
-			end
-
-			if tick()-cache.SkullBurstCooldownTick >= 3 then
-				if tick()-cache.SkullBurstDepleteTick >= 0.5 then
-					cache.SkullBurstDepleteTick = tick();
-					cache.SkullBurstStacks = math.clamp(cache.SkullBurstStacks -0.04, 0, 1);
-				end
-			end
-
-			local percentRpm = math.round(math.clamp(configurations.SkullBurst * (cache.SkullBurstStacks/1), 0, configurations.SkullBurst)*100);
-			weaponStatusDisplay.SkullBurst.Text = `{percentRpm > 0 and "+" or ""}{percentRpm}%`;
-
-		else
-			cache.SkullBurstStacks = nil;
-			cache.SkullBurstCooldownTick = nil;
-			cache.SkullBurstDepleteTick = nil;
-			weaponStatusDisplay.SkullBurst = nil;
-		end
+		ProcessItemModifiers("OnWeaponRender");
 
 		if characterProperties.FirstPersonCamera then
 			characterProperties.BodyLockToCam = true;
@@ -862,31 +845,63 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 		for k, statusInfo in pairs(weaponStatusDisplay) do
 			local statusLabel = weaponStatusHud:FindFirstChild(k);
 			if statusLabel == nil then
-				if statusInfo.KeyCode == nil then
-					statusLabel = weaponStatusTemplate:Clone();
-					statusLabel.Name = k;
-					statusLabel.LayoutOrder = statusInfo.Order;
-					statusLabel.Parent = weaponStatusHud;
-	
-					local statusIcon = statusLabel:WaitForChild("ModIcon") :: ImageLabel;
-					statusIcon.Image = statusInfo.Icon;
-					statusIcon.ImageColor3 = statusInfo.Color;
+				statusLabel = weaponStatusTemplate:Clone();
+				statusLabel.Name = k;
+				statusLabel.LayoutOrder = statusInfo.Order;
+				statusLabel.Parent = weaponStatusHud;
 
-				else
-					statusLabel = keyPromptTemplate:Clone();
-					statusLabel.Name = k;
-					statusLabel.LayoutOrder = statusInfo.Order+99;
-					statusLabel.Parent = weaponStatusHud;
-					
-					local statusIcon = statusLabel:WaitForChild("ModIcon") :: ImageLabel;
-					local keyLabel = statusIcon:WaitForChild("button") :: ImageLabel;
-					keyLabel.Text = statusInfo.KeyCode;
+				if statusInfo.KeyString then
+					local hotKeyFrame = statusLabel:WaitForChild("hotKey");
+					hotKeyFrame.Visible = true;
+					local hotKeyLabel = hotKeyFrame:WaitForChild("button");
+					hotKeyLabel.Text = modKeyBindsHandler:ToString(statusInfo.KeyString);
+				end
 
+				if statusInfo.ModItemId then
+					local modLib = modItemModsLibrary.Get(statusInfo.ModItemId);
+					statusLabel:SetAttribute("Icon", modLib.Icon);
+					statusLabel:SetAttribute("Color", modLib.Color:ToHex());
 				end
 			end
 
 			statusLabel.Visible = statusInfo.Hide ~= true;
 			statusLabel.Text = statusInfo.Text;
+
+			local statusIcon = statusLabel:WaitForChild("Icon");
+			local iconStr = statusInfo.Icon or statusLabel:GetAttribute("Icon");
+			if iconStr then
+				statusIcon.Visible = true;
+				statusIcon.Image = iconStr;
+			else
+				statusIcon.Visible = false;
+			end
+
+			local uiGradient = statusIcon:WaitForChild("UIGradient") :: UIGradient;
+			local colorHex = statusInfo.Color or statusLabel:GetAttribute("Color");
+			if colorHex then
+				local newColor = Color3.fromHex(colorHex);
+				local hue, sat, val = newColor:ToHSV();
+				local baseColor = Color3.fromHSV(hue, sat*0.5, math.min(val*1.3, 1));
+
+				uiGradient.Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, baseColor);
+					ColorSequenceKeypoint.new(0.499, baseColor);
+					ColorSequenceKeypoint.new(0.5, newColor);
+					ColorSequenceKeypoint.new(1, newColor);
+				});
+			end
+
+			if statusInfo.ColorPercent then
+				if statusInfo.ColorPercent <= 0 then
+					uiGradient.Offset = Vector2.new(0, 0.5);
+				elseif statusInfo.ColorPercent >= 1 then
+					uiGradient.Offset = Vector2.new(0, -0.5);
+				else
+					uiGradient.Offset = Vector2.new(0, modMath.MapNum(statusInfo.ColorPercent, 0, 1, 0.4, -0.4, true));
+				end
+			else
+				uiGradient.Offset = Vector2.new(0, 0.5);
+			end
 		end
 
 		local wStatusHudVisible = false;
@@ -947,12 +962,9 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 		
 		local rawRpm = properties.Rpm;
 
-		if configurations.SkullBurst and cache.SkullBurstStacks and cache.SkullBurstStacks >=0 then
-			local baseRpm = properties.BaseRpm;
-			local skullBurstRpm = baseRpm * (configurations.SkullBurst * cache.SkullBurstStacks/1);
-
-			rawRpm = rawRpm + skullBurstRpm;
-		end
+		local changeRef = {RawRpm=rawRpm};
+		ProcessItemModifiers("OnPrimaryFire", changeRef);
+		rawRpm = changeRef.RawRpm;
 
 		local baseFr = 60/rawRpm;
 		local firerate = baseFr;
@@ -1174,6 +1186,22 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 							local humanoid = model:FindFirstChildWhichIsA("Humanoid");
 							if humanoid and humanoid.Name == "NavMeshIgnore" then humanoid = nil; end;
 							
+							local isHeadshot = (humanoid or npcStatus) and basePart.Name == "Head" or basePart:GetAttribute("IsHead") == true or nil;
+
+							ProcessItemModifiers("OnBulletHit", {
+								TargetPart=basePart;
+								TargetPoint=position;
+								TargetNormal=normal;
+								TargetMaterial=material;
+								TargetIndex=index;
+								TargetDistance=distance;
+
+								TargetModel=model;
+								TargetNpcStatus=npcStatus;
+								TargetHumanoid=humanoid;
+								IsHeadshot=isHeadshot;
+							})
+
 							if (humanoid and humanoid.Health > 0 or npcStatus) then
 								local weakPointGui = model:FindFirstChild("WeakpointTarget", true);
 								if weakPointGui and weakPointGui.Parent ~= basePart then
@@ -1192,22 +1220,12 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 									end
 								end
 								
-								local isHeadshot = basePart.Name == "Head" or basePart:GetAttribute("IsHead") == true;
 								modWeaponMechanics.BulletHitSound{
 									Humanoid=humanoid;
 									BasePart=basePart;
 									Index=index;
 								}
 
-								-- Mod: Skullburst
-								if configurations.SkullBurst and isHeadshot then
-									if tick()-cache.SkullBurstCooldownTick >= 0.1 then
-										cache.SkullBurstCooldownTick = tick();
-										cache.SkullBurstStacks = math.clamp(cache.SkullBurstStacks +0.05, 0, 1);
-
-									end
-								end
-								
 								local weakpointTarget = basePart:FindFirstChild("WeakpointTarget");
 								if weakpointTarget then
 									modAudio.Play("WeakPointImpact", nil, false, 1/((index+1)*0.9));
@@ -2039,6 +2057,8 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 		characterProperties.AimDownSights = false;
 		modCharacter.DevViewModel = nil;
 		modCharacter.EquippedTool = nil;
+		
+		table.clear(weaponStatusDisplay);
 	end
 	
 	updateValues();
@@ -2385,6 +2405,22 @@ remoteReloadWeapon.OnClientEvent:Connect(function(paramPacket)
 	
 	if paramPacket.A then
 		properties.Ammo = paramPacket.A;
+	end
+end)
+
+remoteItemModifier.OnClientEvent:Connect(function(modifierId, action, packet)
+	if Equipped == nil or Equipped.Id == nil then return end;
+	
+	local modWeaponModule = modData:GetItemClass(Equipped.Id);
+	if modWeaponModule == nil then return end;
+
+	local itemModifier = modWeaponModule.ModifierTriggers[modifierId];
+	if itemModifier == nil then return end;
+
+	if action == "sync" then
+		for k, v in pairs(packet) do
+			itemModifier[k] = v;
+		end
 	end
 end)
 

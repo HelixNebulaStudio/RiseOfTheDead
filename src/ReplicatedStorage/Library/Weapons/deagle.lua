@@ -25,7 +25,7 @@ local Configurations={
 	
 	-- Weapon Properties;
 	MinBaseDamage=260;
-	BaseDamage=5200;--730;3900
+	BaseDamage=5200;
 	
 	AmmoLimit=8;
 	MaxAmmoLimit=(8*4);

@@ -186,8 +186,8 @@ function WeaponsMechanics.ApplyPassiveMods(storageItem, attachmentStorage, weapo
 					ItemTier = (itemTier or 1);
 					StorageItem = storageItem;
 					ModStorageItem = storageItemMod;
-					WeaponModule = weaponModule;
 					TweakStat = tweakValues[storageItemMod.Index];
+					WeaponModule = weaponModule;
 				});
 			end
 			

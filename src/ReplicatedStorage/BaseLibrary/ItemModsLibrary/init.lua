@@ -313,7 +313,6 @@ function ItemModsLibrary:Init(super)
 		Category="Rare Mods";
 	}
 
-
 	-- MARK: Submachine Gun Mods 100-149;
 	super:Add{
 		Id="shotgundamagemod";
@@ -1049,7 +1048,7 @@ function ItemModsLibrary:Init(super)
 	super:Add{
 		Id="skullburstmod";
 		Name="Intensifying Skull Burst";
-		Desc="Headshotting enemies stacks up <b>Fire Rate</b> by adding <b>RPM</b> based on a base <b>Fire Rate</b>. Stack Frequency: 0.1s";
+		Desc="Headshotting enemies stacks up <b>Fire Rate</b> by adding <b>RPM</b> based on a base <b>Fire Rate</b>.\n<b>Stack Frequency:</b> 0.1s\n<b>Decay Delay:</b> 10s";
 		Icon="rbxassetid://122209706920942";
 		BaseTier=2;
 		Tier=2;
@@ -1058,8 +1057,26 @@ function ItemModsLibrary:Init(super)
 		};
 		Stackable=false;
 		Type={"Pistol"; "Submachine gun"; "Rifle"; "Sniper";};
-		EffectTrigger=super.EffectTrigger.Passive;
+		EffectTrigger=super.EffectTrigger.OnBulletHit;
 		Module=script.SkullBurst;
+		Category="Rare Mods";
+	}
+
+	super:Add{
+		Id="frenzydamagemod";
+		Name="Frenzy Damage";
+		Desc="Adds <b>Damage</b> based on <b>Premod Damage</b>. Additional <b>Damage</b> is built up when you take damage.\n<b>Stack Rate:</b> 1% per Damage Taken\n<b>Decay Delay:</b> 10s";
+		Icon="rbxassetid://105743703562476";
+		BaseTier=4;
+		Tier=4;
+		Upgrades={
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.05; MaxValue=0.2; TweakBonus=0.1; Scaling=super.ScalingStyle.NaturalCurve; Rate=1.5;};
+			{DataTag="FD"; Name="Frenzy Damage"; Syntax="Upgrade Frenzy Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.1; MaxValue=0.6; Scaling=super.ScalingStyle.NaturalCurve; Rate=1.5;};
+		};
+		Stackable=false;
+		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun";};
+		EffectTrigger=super.EffectTrigger.OnBulletHit;
+		Module=script.Frenzy;
 		Category="Rare Mods";
 	}
 
@@ -1300,7 +1317,7 @@ function ItemModsLibrary:Init(super)
 	--== Chest Mods;
 	super:Add{
 		Id="armorpointsmod";
-		Name="Chest Armor Points";
+		Name="Armor Points";
 		Desc="Increase max armor points.";
 		Icon="rbxassetid://16078917792";
 		BaseTier=1;
@@ -1319,7 +1336,7 @@ function ItemModsLibrary:Init(super)
 
 	super:Add{
 		Id="thornmod";
-		Name="Chest Thorn Plating";
+		Name="Thorn Plating";
 		Desc="When taking melee damage with armor > 0, attacker takes reflected damage based on a percent of their health. Reflected damage only affects basic enemies. Minimum reflected damage is 10.";
 		Icon="http://www.roblox.com/asset/?id=5720010211";
 		BaseTier=1;
@@ -1336,7 +1353,7 @@ function ItemModsLibrary:Init(super)
 
 	super:Add{
 		Id="healthmod";
-		Name="Chest Health Points";
+		Name="Health Points";
 		Desc="Increase max health.";
 		Icon="rbxassetid://16078919527";
 		BaseTier=1;
