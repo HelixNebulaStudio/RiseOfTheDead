@@ -54,11 +54,6 @@ return function(npc, spawnPoint)
 		if name ~= "None" then
 			wait(1);
 			self.Wield.Equip(name or "p250");
-			self.Wield.SetSkin({
-				Textures={
-					["Handle"]=10;
-				};
-			});
 		end
 	end
 	

@@ -75,12 +75,8 @@ return function(npc, spawnPoint)
 		pcall(function()
 			self.Wield.ToolModule.Configurations.AmmoLimit = 40;
 			self.Wield.ToolModule.Properties.ReloadSpeed = 1;
-			self.Wield.SetSkin({
-				Textures={
-					["Grip"]=101;
-					["Stock"]=101;
-				};
-			});
+			local skinJson = [[{"Plans":{"[All]":"#111111;;;,,,,,;WornMetal;;;;","[Diamonds]":";skindiamonds_v1;;#12eed4,,,,,19;;;;;"},"Layers":{"[Diamonds]":"Stock,Grip"}}]];
+			self.Wield.SetCustomization(skinJson);
 		end);
 		repeat until not self.Update();
 	end

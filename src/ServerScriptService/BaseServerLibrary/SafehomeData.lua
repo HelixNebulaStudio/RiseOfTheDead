@@ -146,7 +146,8 @@ function SafehomeData:GetNpc(npcName: string)
 				if activeWeapon then
 					npcModule.Wield.Equip(activeWeapon.ItemId);
 					npcModule.Wield.SetSkin(activeWeapon.Values);
-					
+
+					self.Wield.SetCustomization(activeWeapon.Values["_Customs"], activeWeapon.Values["ActiveSkin"]);
 					npcModule.Wield:ToggleIdle();
 
 				else

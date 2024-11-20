@@ -184,6 +184,11 @@ return function(npc, spawnPoint)
 					self.Wield.Equip(self.Properties.WeaponId);
 					pcall(function()
 						self.Wield.ToolModule.Configurations.MinBaseDamage = self.Properties.AttackDamage;
+
+						if self.Properties.WeaponId == "ak47" then
+							local akSkin = [[{"Plans":{"StockGrip":";;100;,,,,,;;;;;","[All]":";;;,,,,,;;;;;","Stock":";;100;,,,,,;;;;;"},"Layers":[]}]];
+							self.Wield.SetCustomization(akSkin);
+						end
 					end);
 				end
 				

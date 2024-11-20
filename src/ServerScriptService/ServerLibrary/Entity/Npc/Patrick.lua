@@ -60,13 +60,9 @@ return function(npc, spawnPoint)
 		pcall(function()
 			self.Wield.ToolModule.Configurations.AmmoLimit = 40;
 			self.Wield.ToolModule.Properties.ReloadSpeed = 1;
-			self.Wield.ToolModule.Configurations.MinBaseDamage = 200;
-			self.Wield.SetSkin({
-				Textures={
-					["Grip"]=102;
-					["Stock"]=102;
-				};
-			});
+			self.Wield.ToolModule.Configurations.MinBaseDamage = 200;			
+			local skinJson = [[{"Plans":{"[Third]":"#965555;;;,,,,,;WornMetal;;;;","[Primary]":"#1b2a35;;0;,,,,,;OldMetal;0;;;","Magazine":";;;,,,,,;;;-50,210,0;87,66,98;","[All]":";;;,,,,,;;;;;","[Secondary]":"#965555;skindeathcamo_v1;0;,,,,,25;RustySpots;0;;;"},"Layers":{"[Third]":"Safety,ChargingHandle"}}]];
+			self.Wield.SetCustomization(skinJson);
 		end);
 		repeat until not self.Update();
 	end

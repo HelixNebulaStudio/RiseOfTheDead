@@ -1231,12 +1231,40 @@ if RunService:IsServer() then
 
 		shared.modCommandsLibrary:HookChatCommand("itemskin", {
 			Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
-			Description = [[]];
+			Description = [[Prints item customization data.
+            /itemskin [id/equip] setskin customizationjson
+            /itemskin [id/equip] print
+            ]];
 
 			RequiredArgs = 0;
 			Function = function(speaker, args)
-				
-				local action = args[1];
+                local player = speaker;
+                local profile = shared.modProfile:Get(player);
+                
+                local storageItemID = args[1];
+                
+                if storageItemID == "equip" then
+                    storageItemID = profile and profile.EquippedTools and profile.EquippedTools.ID;
+                end
+                local storageItem, storage = shared.modStorage.FindIdFromStorages(storageItemID, player);
+                
+                local action = args[2];
+
+                if action == "print" then
+                    local customizationDataJson = storageItem:GetValues("_Customs");
+                    local activeSkinId = storageItem:GetValues("ActiveSkin");
+
+                    local str = `ItemID: {storageItem.ID}\nActiveSkinId: {activeSkinId}\nCustomizationData: {customizationDataJson}`;
+                    Debugger:WarnClient(player, str);
+                    shared.Notify(player, str, "Inform");
+
+                elseif action == "setskin" then
+                    local setSkinData = args[3];
+                    Debugger:Print("Set Skin", setSkinData);
+                    local customizationJson = game:GetService("HttpService"):JSONEncode(setSkinData);
+                    storageItem:SetValues(storageItemID, {["_Customs"]=customizationJson});
+
+                end
 
 				return;
 			end;

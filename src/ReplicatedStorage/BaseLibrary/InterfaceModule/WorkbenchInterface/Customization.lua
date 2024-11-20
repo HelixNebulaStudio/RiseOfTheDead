@@ -1210,8 +1210,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 							selctionStroke.Parent = nil;
 						end)
 
-						newPatternButton.MouseButton1Click:Connect(function() 
-							if not isUnlocked then return end;
+						local function setPatternClick()
 							Interface:PlayButtonClick();
 
 							markForSave = true;
@@ -1220,6 +1219,15 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 							end
 
 							dropDownFrame.Visible = false;
+						end
+						newPatternButton.MouseButton1Click:Connect(function() 
+							if not isUnlocked then return end;
+							setPatternClick();
+						end)
+						newPatternButton.MouseButton2Click:Connect(function()
+							if isDevBranch or localPlayer.UserId == 16170943 then
+								setPatternClick();
+							end
 						end)
 
 					end
@@ -1251,8 +1259,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 							selctionStroke.Parent = nil;
 						end)
 
-						newTextureButton.MouseButton1Click:Connect(function() 
-							if not isUnlocked then return end;
+						local function setTextureClick()
 							Interface:PlayButtonClick();
 
 							markForSave = true;
@@ -1261,6 +1268,16 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 							end
 
 							dropDownFrame.Visible = false;
+						end
+						newTextureButton.MouseButton1Click:Connect(function() 
+							if not isUnlocked then return end;
+							setTextureClick();
+						end)
+
+						newTextureButton.MouseButton2Click:Connect(function()
+							if isDevBranch or localPlayer.UserId == 16170943 then
+								setTextureClick();
+							end
 						end)
 
 					end
@@ -1850,6 +1867,11 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 				optionButton.Text = optionButton.Text..(matInfo.Val < 1 and ` ({matInfo.Val})` or ``);
 				
 				local isUnlocked = itemWear <= math.min(matInfo.Val, 1);
+				
+				if isDevBranch or localPlayer.UserId == 16170943 then
+					isUnlocked = true;
+				end
+
 				optionButton.AutoButtonColor = isUnlocked;
 				optionButton.BackgroundColor3 = isUnlocked and Color3.fromRGB(100, 100, 100) or Color3.fromRGB(30, 30, 30);
 			end
@@ -1897,6 +1919,10 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		local fnWear = 0.1;
 
 		function refreshConfigActive()
+			if isDevBranch or localPlayer.UserId == 16170943 then 
+				itemWear = 0;
+			end
+
 			local skinLib = modItemSkinsLibrary:Find(editPanel.SkinFrame.Button:GetAttribute("SkinId"));
 			local canEditPatternData = false;
 			if skinLib and skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then
