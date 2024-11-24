@@ -126,7 +126,7 @@ local order = 0;
 function Add(_, data)
 	if ItemModsLibrary.Library[data.Id] ~= nil then error("ModulesLibrary>>  Add Id alerady exist for ("..data.Name..")("..data.Id..")"); end;
 	if data.Module == nil then error("ModulesLibrary>> Mod ("..data.Name..")("..data.Id..") does not have module attached."); end;
-	local description = data.Description or data.Desc;
+	local description = data.Description or data.Desc or ``;
 	
 	order = order+1;
 	ItemModsLibrary.List[data.Name] = {
@@ -201,7 +201,7 @@ function Add(_, data)
 		Tags = {data.Category};
 	};
 
-	if data.BaseTier > 1 then
+	if data.BaseTier and data.BaseTier > 1 then
 		local tierColor = modItemsLibrary.TierColors[data.BaseTier];
 		modLib.Color = tierColor;
 	end

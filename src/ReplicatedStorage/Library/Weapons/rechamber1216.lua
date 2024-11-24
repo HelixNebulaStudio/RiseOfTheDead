@@ -79,23 +79,29 @@ local Properties={
 
 local Animations=workspace:GetAttribute("IsDev") and {
 	Core={Id=77499261157109;};
-	PrimaryFire={Id=16311102924;};
-	Reload={Id=16311104731;};
-	Load={Id=16311101004;};
-	Inspect={Id=16311099151;};
+	PrimaryFire={Id=118380959535219;};
+	Rechamber={Id=133157517189762;};
+	Reload={Id=103548743900366;};
+	TacticalReload={Id=74779020772568;}; 
+	Load={Id=137699969780569;};
+	Inspect={Id=110171545664708;};
 	Sprint={Id=16311107195};
-	Empty={Id=16311095884;};
+	Empty={Id=100434657099132;};
+	EmptyFire={Id=99627006103744;};
 	Unequip={Id=16838914873};
 	Idle={Id=17557363942};
 
 } or { -- Main
 	Core={Id=77499261157109;};
-	PrimaryFire={Id=16311102924;};
-	Reload={Id=16311104731;};
-	Load={Id=16311101004;};
-	Inspect={Id=16311099151;};
+	PrimaryFire={Id=118380959535219;};
+	Rechamber={Id=133157517189762;};
+	Reload={Id=103548743900366;};
+	TacticalReload={Id=74779020772568;}; 
+	Load={Id=137699969780569;};
+	Inspect={Id=110171545664708;};
 	Sprint={Id=16311107195};
-	Empty={Id=16311095884;};
+	Empty={Id=100434657099132;};
+	EmptyFire={Id=99627006103744;};
 	Unequip={Id=16838914873};
 	Idle={Id=17557363942};
 	
@@ -103,7 +109,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 
 local Audio={
 	Load={Id=169799883; Pitch=1.3; Volume=0.4;};
-	PrimaryFire={Id=10400758719; Pitch=1; Volume=1;};
+	PrimaryFire={Id=72945517149917; Pitch=1; Volume=1;};
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
 	ShotgunHandle={Id="ShotgunHandle"; Preload=true;};
 	ShotgunPump2={Id="ShotgunPump2"; Preload=true;};

@@ -257,6 +257,9 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 	end
 
 	local itemButtonColor = modItemsLibrary.TierColors[self.ItemLib.Tier];
+	if self.ItemLib.Color then
+		itemButtonColor = self.ItemLib.Color;
+	end
 	
 	local typeIconLabel = self.ImageButton:WaitForChild("TypeIcon");
 	typeIconLabel.Image = self.ItemLib.TypeIcon or self.ItemLib.Type and modItemsLibrary.TypeIcons[self.ItemLib.Type] or "";

@@ -860,7 +860,9 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 				if statusInfo.ModItemId then
 					local modLib = modItemModsLibrary.Get(statusInfo.ModItemId);
 					statusLabel:SetAttribute("Icon", modLib.Icon);
-					statusLabel:SetAttribute("Color", modLib.Color:ToHex());
+					if modLib.Color then
+						statusLabel:SetAttribute("Color", modLib.Color:ToHex());
+					end
 				end
 			end
 
@@ -1139,6 +1141,7 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 				if configurations.BulletMode == modAttributes.BulletModes.Hitscan then
 					shotData.TargetPoints = {};
 					shotData.Victims = {};
+					shotData.HitParts = {};
 					
 				elseif configurations.BulletMode == modAttributes.BulletModes.Projectile then
 					shotData.Projectiles = {};
@@ -1187,7 +1190,7 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 							if humanoid and humanoid.Name == "NavMeshIgnore" then humanoid = nil; end;
 							
 							local isHeadshot = (humanoid or npcStatus) and basePart.Name == "Head" or basePart:GetAttribute("IsHead") == true or nil;
-
+							
 							ProcessItemModifiers("OnBulletHit", {
 								TargetPart=basePart;
 								TargetPoint=position;
@@ -1200,7 +1203,9 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 								TargetNpcStatus=npcStatus;
 								TargetHumanoid=humanoid;
 								IsHeadshot=isHeadshot;
-							})
+							});
+							table.insert(shotData.HitParts, basePart);
+
 
 							if (humanoid and humanoid.Health > 0 or npcStatus) then
 								local weakPointGui = model:FindFirstChild("WeakpointTarget", true);

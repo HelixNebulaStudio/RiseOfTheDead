@@ -39,9 +39,6 @@ if RunService:IsServer() then
 		local classPlayer = shared.modPlayers.Get(player);
 
 		local initDmg = damageSource.InitDamage;
-		local hpDmgRatio = initDmg/classPlayer.MaxHealth;
-
-		print("Frenzy OnPlayerDamaged", initDmg, hpDmgRatio);
 		
 		local profile = shared.modProfile:Get(player);
 		local storageItemID = profile and profile.EquippedTools and profile.EquippedTools.ID;
@@ -53,8 +50,6 @@ if RunService:IsServer() then
 		local itemModifier = weaponModule.ModifierTriggers[script.Name];
 		if itemModifier == nil then return end;
 
-		print("Charge frenzy", itemModifier);
-		
 		itemModifier.Stacks = math.clamp(itemModifier.Stacks + initDmg *0.01, 0, 1);
 		itemModifier.CooldownTick = tick()+10;
 	end)
@@ -81,7 +76,6 @@ if RunService:IsServer() then
 	end
 
 	function itemModifier:OnDeactivate()
-		Debugger:StudioLog("Deactivate");
 		self.Stacks = 0;
 		self.CooldownTick = tick();
 		self.DepleteTick = tick();

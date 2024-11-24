@@ -621,6 +621,7 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 	if configurations.BulletMode == modAttributes.BulletModes.Hitscan then
 		local playersShot = {};
 		local victims, targetPoints = (shotdata.Victims or {}), {};
+		local hitParts = (shotdata.HitParts or {});
 				
 		local targetsPierceable = (properties.Piercing or 0);
 		local maxVictims = math.clamp(
@@ -633,6 +634,17 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 				table.insert(targetPoints, shotdata.TargetPoints[a]);
 			end
 		end
+
+		for a=1, #hitParts do
+			local targetPart = hitParts[a];
+			--MARK: OnBulletHit
+			ProcessItemModifiers("OnBulletHit", {
+				Player=client;
+				TargetPart = targetPart;
+				ToolModule = weaponModule;
+			});
+		end
+
 		for a=1, maxVictims do
 			local targetObject = victims[a].Object;
 			local targetIndex = victims[a].Index;
@@ -642,12 +654,6 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 				targetModel = targetModel.Parent;
 			end
 			
-			--MARK: OnBulletHit
-			ProcessItemModifiers("OnBulletHit", {
-				Player=client;
-				TargetPart = targetObject;
-				ToolModule = weaponModule;
-			});
 
 			-- shot handler;
 			if targetModel and (targetObject:IsDescendantOf(workspace) or targetObject:IsDescendantOf(game.ReplicatedStorage.Replicated)) then

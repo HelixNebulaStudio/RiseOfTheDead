@@ -99,6 +99,7 @@ function ItemsLibrary:Init(super)
 	
 	new(gunBase, {Id="awp"; Name="AWP"; Icon="rbxassetid://5166454078"; Tags={"Sniper"; "Primary Weapon";}; Description="High Damage, high recoil and long ranged rifle.";});
 	new(gunBase, {Id="rec21"; Name="Rec-21"; Icon="rbxassetid://6532745901"; Tags={"Sniper"; "Primary Weapon";}; Description="High power, light weight tactical sniper rifle.";});
+	new(gunBase, {Id="grandgarand"; Name="Grand Garand"; Icon="rbxassetid://118201286435452"; Tags={"Sniper"; "Primary Weapon";}; Description="The good ol' battle tested semi-automatic m1 garand.";});
 	
 	new(gunBase, {Id="minigun"; Name="Minigun"; Icon="rbxassetid://5175211604"; Tags={"Heavy machine gun"; "Primary Weapon";}; Description="It weighs fifty seven kilograms and fires two hundred dollar, custom-tooled cartridges at ten thousand rounds per minute. It costs four hundred thousand dollars to fire this weapon... for twelve seconds.";});
 	new(gunBase, {Id="desolatorheavy"; Name="Desolator Heavy"; Icon="rbxassetid://6244386293"; Tags={"Heavy machine gun"; "Primary Weapon";}; Description="Heavy machine gun that desolates your enemies. Design inspired by the negev LMG, the Desolator Heavy is a high power concentrated machine gun firing heavy rounds with built-in <b>Rapid Fire</b> enabled. Weapon accuracy will increase as the weapon warms up from firing.";});
