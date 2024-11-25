@@ -416,6 +416,42 @@ WorkbenchLibrary.ItemUpgrades={
 			{Rarity=1/3; Stat="HeadshotMultiplier"; Value={Min=10; Max=20;}; Add=true; };
 		};
 	};
+	["rechamber1216"]={
+		Tier=5;
+		Type={"Shotgun"};
+		TraitStats={
+			{Rarity=1/3; Stat="Damage";  Value={Min=1; Max=3;}; };
+			{Rarity=1/2; Stat="FireRate"; Value={Min=1; Max=3;}; Negative=true;};
+			{Rarity=1; Stat="ReloadSpeed"; Value={Min=1; Max=8;}; Negative=true;};
+			GenericTraits.MaxAmmoLimit;
+			{Rarity=1; Stat="Inaccuracy"; Value={Min=1; Max=2;}; Negative=true;};
+			{Rarity=1/2; Stat="HeadshotMultiplier"; Value={Min=10; Max=25;}; Add=true; };
+		};
+	};
+	["uzi"]={
+		Tier=5;
+		Type={"Submachine gun"};
+		TraitStats={
+			{Rarity=1/3; Stat="Damage";  Value={Min=1; Max=3;}; };
+			{Rarity=1/2; Stat="FireRate"; Value={Min=1; Max=3;}; Negative=true;};
+			{Rarity=1; Stat="ReloadSpeed"; Value={Min=5; Max=15;}; Negative=true;};
+			GenericTraits.MaxAmmoLimit;
+			{Rarity=1; Stat="Inaccuracy"; Value={Min=5; Max=20;}; Negative=true;};
+			{Rarity=1/3; Stat="HeadshotMultiplier"; Value={Min=5; Max=25;}; Add=true; };
+		};
+	};
+	["grandgarand"]={
+		Tier=5;
+		Type={"Sniper"};
+		TraitStats={
+			{Rarity=1/3; Stat="Damage";  Value={Min=1; Max=3;}; };
+			{Rarity=1/2; Stat="FireRate"; Value={Min=1; Max=8;}; Negative=true;};
+			{Rarity=1; Stat="ReloadSpeed"; Value={Min=1; Max=8;}; Negative=true;};
+			GenericTraits.MaxAmmoLimit;
+			{Rarity=1; Stat="Inaccuracy"; Value={Min=1; Max=3;}; Negative=true;};
+			{Rarity=1/3; Stat="FocusDuration"; Value={Min=5; Max=15;}; Negative=true;};
+		};
+	};
 	
 	
 	--== Melee

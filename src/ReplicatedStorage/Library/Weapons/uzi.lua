@@ -56,11 +56,11 @@ local Properties={
 }
 
 local Animations=workspace:GetAttribute("IsDev") and {
-	Core={Id=16326513624;};
-	PrimaryFire={Id=16326523513; FocusWeight=0.1};
-	Reload={Id=16326525780;};
-	TacticalReload={Id=16326511005;};
-	Load={Id=16326521475;};
+	Core={Id=81052681585798;};
+	PrimaryFire={Id=113445169479302; FocusWeight=0.1};
+	Reload={Id=113101142371503;};
+	TacticalReload={Id=94780225166213;};
+	Load={Id=129324275336201;};
 	Inspect={Id=16326518316;};
 	Sprint={Id=16326528548};
 	Empty={Id=16326515662;};
@@ -68,11 +68,11 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Idle={Id=17557594451};
 
 } or { -- Main
-	Core={Id=16326513624;};
-	PrimaryFire={Id=16326523513; FocusWeight=0.1};
-	Reload={Id=16326525780;};
-	TacticalReload={Id=16326511005;};
-	Load={Id=16326521475;};
+	Core={Id=81052681585798;};
+	PrimaryFire={Id=113445169479302; FocusWeight=0.1};
+	Reload={Id=113101142371503;};
+	TacticalReload={Id=94780225166213;};
+	Load={Id=129324275336201;};
 	Inspect={Id=16326518316;};
 	Sprint={Id=16326528548};
 	Empty={Id=16326515662;};
