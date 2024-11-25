@@ -63,7 +63,7 @@ local Properties={
 }
 
 local Animations=workspace:GetAttribute("IsDev") and {
-	Core={Id=16654071483;};
+	Core={Id=115169929209429;};
 	PrimaryFire={Id=16654077269; FocusWeight=1};
 	Reload={Id=16654078379;};
 	TacticalReload={Id=16654080664;};
@@ -75,7 +75,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Idle={Id=17557632470};
 	
 } or { -- Main
-	Core={Id=16654071483;};
+	Core={Id=115169929209429;};
 	PrimaryFire={Id=16654077269; FocusWeight=1};
 	Reload={Id=16654078379;};
 	TacticalReload={Id=16654080664;};

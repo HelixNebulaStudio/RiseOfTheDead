@@ -795,6 +795,15 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="ammopouchnight"; Icon="rbxassetid://110108323033027"; SkinPerm="Night"; TargetItemId="ammopouch";});
 	new(skinPermBase, {Id="ammopouchhexcamo"; Icon="rbxassetid://71912683610580"; SkinPerm="Hexcamo"; TargetItemId="ammopouch";});
 
+	-- santahat
+	new(skinPermBase, {Id="santahatred"; Icon="rbxassetid://109459091168301"; SkinPerm="Red"; TargetItemId="santahat";});
+	new(skinPermBase, {Id="santahatblue"; Icon="rbxassetid://112451037655758"; SkinPerm="Blue"; TargetItemId="santahat";});
+	new(skinPermBase, {Id="santahatgreen"; Icon="rbxassetid://107211409672219"; SkinPerm="Green"; TargetItemId="santahat";});
+	new(skinPermBase, {Id="santahatyellow"; Icon="rbxassetid://94254676862025"; SkinPerm="Yellow"; TargetItemId="santahat";});
+
+	-- portableautoturret
+	new(skinPermBase, {Id="portableautoturretblue"; Icon="rbxassetid://71002206778303"; SkinPerm="Blue"; TargetItemId="portableautoturret";});
+
 
 	--==========================================================[[ SUMMONS ]]==========================================================--
 	local summonsBase = {
@@ -914,6 +923,8 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="highvisjacketfallenleaves"; Icon="rbxassetid://12963945448"; SkinPerm="Fallen Leaves"; TargetItemId="highvisjacket"; Tags={"Easter"};});
 	new(skinPermBase, {Id="scraparmorcherryblossom"; Icon="rbxassetid://12963959744"; SkinPerm="Cherry Blossom"; TargetItemId="scraparmor"; Tags={"Easter"};});
 	
+	-- Frostivus 2024
+
 	-- Legacy
 	new(toolBase, {Id="masusplush"; Name="Masus Plush"; Icon="rbxassetid://18158370701"; Tags={"Legacy"}; Description=`Suspiciously cute. Keep an eye on it though.`;});
 	new(toolBase, {Id="rideofthemothena"; Name="Ride of the Mothena"; Icon="rbxassetid://131087152228754"; Tags={"Legacy"}; Description=`Adorable little critter. Now quite huggable, marketable and including some sort of deity!`;});

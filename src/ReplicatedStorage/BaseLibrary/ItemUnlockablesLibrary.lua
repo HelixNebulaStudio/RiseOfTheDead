@@ -1086,6 +1086,105 @@ function ItemUnlockablesLibrary:Init(library)
 	};
 
 	
+	--== MARK: santahat
+	library:Add{
+		Id="santahat";
+		ItemId="santahat";
+		Name="Default";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://11812457660";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="santahatwinterfest";
+		ItemId="santahat";
+		Name="Frostivus";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://11812462035";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="santahatred";
+		ItemId="santahat";
+		Name="Red";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://139295262778673";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="santahatblue";
+		ItemId="santahat";
+		Name="Blue";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://75462174259764";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="santahatgreen";
+		ItemId="santahat";
+		Name="Green";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://132942094935098";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="santahatyellow";
+		ItemId="santahat";
+		Name="Yellow";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://99194637710200";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	
+	--== MARK: portableautoturret
+	library:Add{
+		Id="portableautoturret";
+		ItemId="portableautoturret";
+		Name="Default";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://16449106091";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="portableautoturretblue";
+		ItemId="portableautoturret";
+		Name="Blue";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://16449106091";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
 end
 
 return ItemUnlockablesLibrary;

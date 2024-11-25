@@ -681,26 +681,6 @@ library:Add{
 	};
 };
 
---== santahat
-library:Add{
-	Id="santahat";
-	ItemId="santahat";
-	Name="Default";
-	Textures={
-		["Handle"]="rbxassetid://11812457660";
-	};
-};
-
-library:Add{
-	Id="santahatwinterfest";
-	ItemId="santahat";
-	Name="Frostivus";
-	Textures={
-		["Handle"]="rbxassetid://11812462035";
-	};
-};
-
-
 --== cultisthood
 
 library:Add{

@@ -121,11 +121,11 @@ Configurations.Set("FogRange", {
 --== Events;
 local Months = {"January"; "Feburary"; "March"; "April"; "May"; "June"; "July"; "August"; "September"; "October"; "November"; "December";};
 local SpecialEventsTable = {
-	NewYear = {Month="January";};
+	NewYear = {Month={"Feburary"; "March"};};
 	AprilFools = {Month="April"; DaysBefore=7;}; -- First week of April;
 	Easter = {Month="April"; DaysAfter=8;}; -- Second week of April;
-	Halloween = {Month={"October"; "November"; "December"};}; -- second week of October;
-	Christmas = {Month="December"};
+	Halloween = {Month={"October"; "November"};}; -- second week of October; frostivus2024
+	Christmas = {Month={"December"; "January"};};
 };
 local SpecialEvents = {};
 

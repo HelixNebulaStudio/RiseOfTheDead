@@ -27,19 +27,10 @@ local function leaf(index, data)
 end
 
 function BattlePassLibrary:Init(library)
-	library.Active = "slaughterfest2024";
+	library.Active = "frostivus2024";
 
-	library[`GiftShop2024`] = {
+	library.GiftShop = {
 		{ItemId="apron"; Cost=4;};
-		{ItemId="militarybootsforest"; Cost=5;};
-		{ItemId="armwrapsrat"; Cost=10;};
-		{ItemId="hardhatorigins"; Cost=25;};
-		{ItemId="tophatgold"; Cost=25;};
-		{ItemId="rusty48blaze"; Cost=50;};
-		{ItemId="dufflebagorigins"; Cost=50;};
-		{ItemId="vexglovesinferno"; Cost=100;};
-		{ItemId="zriceraskullinferno"; Cost=100;};
-		{ItemId="survivorsoutpostunlockpapers"; Cost=200;};
 	};
 
 	-- MARK: BP Season 1
@@ -503,6 +494,35 @@ function BattlePassLibrary:Init(library)
 		Icon="rbxassetid://129368759663555";
 	};
 
+
+	-- MARK: Frostivus 2024
+	library:Add{
+		Id="frostivus2024";
+		EndUnixTime=1738371600;
+
+		Title="Frostivus 2024";
+		Icon="rbxassetid://125482397634613";
+		Desc="Unlock the Frostivus 2024 Event Pass to claim more rewards!";
+
+		Price=1000;
+
+		Tree = newTree{
+			leaf(0, {});
+			--
+			leaf(5, {
+				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			});
+			leaf(10, {
+				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			});
+			leaf(15, {
+				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			});
+			leaf(20, {
+				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			});
+		};
+	};
 end
 
 

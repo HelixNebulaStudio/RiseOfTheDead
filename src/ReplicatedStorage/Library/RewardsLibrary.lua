@@ -869,7 +869,6 @@ library:Add{
 
 		{Index=1; ItemId="snowman"; Quantity=1; Chance=1/8;};
 		{Index=1; ItemId="naughtycane"; Quantity=1; Chance=1/8;};
-		{Index=1; ItemId="xmaspresent"; Quantity=1; Chance=1/8;};
 		{Index=1; ItemId="tomeoftweaks"; Quantity=1; Chance=1/8;};
 		
 		{Index=1; ItemId="xmassweater"; Quantity=1; Chance=8/100;};

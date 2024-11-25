@@ -2416,7 +2416,7 @@ function Interface.init(modInterface)
 	local dOYToday = os.date("%j", unixTime); 
 	local dOYEnd = battlepassLib and tonumber(os.date("%j", battlepassLib.EndUnixTime)) or 0;
 	
-	local yearToday = os.date("%Y", unixTime);
+	local yearToday = tonumber(os.date("%Y", unixTime));
 	local yearEnd = battlepassLib and tonumber(os.date("%Y", battlepassLib.EndUnixTime)) or 0;
 	
 	local leftFrameSizeXAnchor = 0.3;
@@ -2424,8 +2424,8 @@ function Interface.init(modInterface)
 	
 	PinnedMissionFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0, 90);
 	
-	local daysLeft = dOYEnd-dOYToday-1;
-	if activeBpId == nil or daysLeft < 0 or yearToday ~= yearEnd then
+	local daysLeft = (dOYEnd+(yearEnd-yearToday)*365)-dOYToday-1;
+	if activeBpId == nil or daysLeft < 0 then
 		BottomFrame.Visible = false;
 		LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, 0);
 		LeftFrame.Position = UDim2.new(0, 0, 1, 0);

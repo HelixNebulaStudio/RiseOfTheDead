@@ -203,6 +203,15 @@ function RewardsLibrary:Init(super)
 		SpecialEvent="Halloween";
 	};
 
+	super:Add{
+		Id="frostivus2024";
+		Rewards={
+			{ItemId="gold"; Quantity=20; Chance=1;};
+
+			{ItemId="liquidmetalpolish"; Quantity=1; Chance=0.5; TokensAmount=2;};
+		};
+	};
+
 end
 
 return RewardsLibrary;
