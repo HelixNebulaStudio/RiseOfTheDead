@@ -13,7 +13,8 @@ local playerGui = localPlayer:WaitForChild("PlayerGui");
 local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local CommandsLibrary = require(game.ReplicatedStorage.Library.CommandsLibrary);
+local modNotificationsLibrary = require(game.ReplicatedStorage.Library.NotificationsLibrary);
+local modCommandsLibrary = require(game.ReplicatedStorage.Library.CommandsLibrary);
 local CommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
 
 local ChatRoomInterface = require(script.Parent:WaitForChild("ChatRoomInterface"));
@@ -43,6 +44,7 @@ local chatButton = chatInterface:WaitForChild("ChatButton");
 local channelButton = chatInterface:WaitForChild("ChannelButton");
 local activeChannelLabel = chatInterface:WaitForChild("activeChannelLabel");
 
+modCommandsLibrary.init();
 ChatClient.init();
 ChatRoomInterface.init(ChatClient);
 
@@ -238,16 +240,16 @@ local function inputBoxChange()
 			if cmd == nil then return end;
 			local cmdId = cmd:sub(2, #cmd):lower();
 
-			local matches = CommandHandler.MatchStringFromDict(cmdId, CommandsLibrary.Library);
+			local matches = CommandHandler.MatchStringFromDict(cmdId, modCommandsLibrary.Library);
 			if #matches > 0 then
 				
 				for _, obj in pairs(cmdFrame:GetChildren()) do
 					if obj:IsA("GuiObject") then obj:Destroy() end;
 				end
 				for a=1, #matches do
-					local lib = CommandsLibrary.Library[matches[a]];
+					local lib = modCommandsLibrary.Library[matches[a]];
 
-					if CommandsLibrary.HasPermissions(game.Players.LocalPlayer, lib) then
+					if modCommandsLibrary.HasPermissions(game.Players.LocalPlayer, lib) then
 						local new = templateLabel:Clone();
 
 						local labelText = " /"..matches[a];
@@ -346,237 +348,137 @@ toggleChatButton.MouseButton1Click:Connect(function()
 	toggleChat(false);
 end)
 
-local function playEmote(id)
-	local character = game.Players.LocalPlayer.Character;
-	local remotePlayEmote = character and character:FindFirstChild("PlayEmote", true);
-	if remotePlayEmote then
-		remotePlayEmote:Invoke(id);
-	end
-end
 
-local ClientCommands = {};
-ClientCommands["ui"] = function(channelId, args)
-	local room = ChatRoomInterface:GetRoom(channelId);
+-- ClientCommands["w"] = function(channelId, args)
+-- 	local playerName = #args > 0 and table.remove(args, 1) or nil;
+-- 	local msg = table.concat(args, " ");
 	
-	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
+-- 	if playerName == nil then return end;
+-- 	local matches = CommandHandler.MatchName(playerName);
+-- 	local room = ChatRoomInterface:GetRoom(channelId);
+-- 	if #matches <= 0 then
+-- 		ChatRoomInterface:NewMessage(room, {
+-- 			Message = "Couldn't find "..playerName.." on this server.";
+-- 			Presist = false;
+-- 			MessageColor=Color3.fromRGB(255, 69, 69);
+-- 		})
+-- 		return;
+-- 	elseif #matches >= 2 then
+-- 		ChatRoomInterface:NewMessage(room, {
+-- 			Message = "Multiple matches for \""..playerName.."\": "..table.concat(matches, " ");
+-- 			Presist = false;
+-- 			MessageColor=Color3.fromRGB(255, 69, 69);
+-- 		})
+-- 		return;
+-- 	end
+-- 	local target = matches[1];
+-- 	local testText = msg:gsub(" ", "")
+-- 	testText = testText:gsub(string.char(32), "")
+-- 	testText = testText:gsub("[\r\n]", "");
 	
-	local inputName = args[1] or "";
+-- 	if #testText > 0 and #msg < 200 then
+-- 		-- remoteSubmitMessage:InvokeServer(target.Name, msg);
+-- 		-- for a=1, 10 do
+-- 		-- 	local room = ChatRoomInterface:GetRoom(target.Name);
+-- 		-- 	if room then
+-- 		-- 		room:SetActive();
+-- 		-- 		room:SwitchWindow();
+-- 		-- 		break;
+-- 		-- 	end
+-- 		-- 	task.wait(0.1);
+-- 		-- end
+-- 	end;
+-- end
+
+-- ClientCommands["f"] = function(channelId, args)
+-- 	local msg = table.concat(args, " ");
+
+-- 	local speakerRoom = ChatRoomInterface:GetRoom(channelId);
 	
-	if modInterface.Windows[inputName] then
-		modInterface:ToggleWindow(inputName);
-		
-	else
-		local similarList = {};
-		for name, _ in pairs(modInterface.Windows) do
-			if string.lower(name):match(string.lower(inputName)) then
-				table.insert(similarList, name);
-			end
-		end
-		ChatRoomInterface:NewMessage(room, {
-			Message = "Unknown interface called "..inputName..". Similar: "..table.concat(similarList, ", ");
-			Presist = false;
-			MessageColor=Color3.fromRGB(255, 69, 69);
-		})
-	end
+-- 	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
-end
-
-ClientCommands["term"] = function(channelId, args)
-	local room = ChatRoomInterface:GetRoom(channelId);
-
-	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-
-	local termCmd = args[1] or "";
+-- 	local factionProfile = modData.Profile.Faction;
+-- 	local channelId = factionProfile.ChannelId;
+-- 	if channelId == nil then
+-- 		ChatRoomInterface:NewMessage(speakerRoom, {
+-- 			Message = "You are not in a faction.";
+-- 			Presist = false;
+-- 			MessageColor=Color3.fromRGB(255, 69, 69);
+-- 		})
+-- 		return 
+-- 	end;
 	
-	if modInterface.Windows.TerminalWindow then
-		modInterface:ToggleWindow("TerminalWindow", nil, termCmd);
+-- 	local testText = msg:gsub(" ", "")
+-- 	testText = testText:gsub(string.char(32), "")
+-- 	testText = testText:gsub("[\r\n]", "");
+-- 	if #testText > 0 and #msg < 200 then
+-- 		-- remoteSubmitMessage:InvokeServer(channelId, msg);
+-- 		-- for a=1, 10 do
+-- 		-- 	local room = ChatRoomInterface:GetRoom(channelId);
+-- 		-- 	if room then
+-- 		-- 		room:SetActive();
+-- 		-- 		room:SwitchWindow();
+-- 		-- 		break;
+-- 		-- 	end
+-- 		-- 	task.wait(0.1);
+-- 		-- end
+-- 	end;
+-- end
 
-	end
+-- ClientCommands["c"] = function(channelId)
+-- 	local room = ChatRoomInterface:GetRoom(channelId);
+-- 	for a=1, #ChatRoomInterface.Channels do
+-- 		if ChatRoomInterface.Channels[a].Id == channelId and a >= 4 then
+-- 			game.Debris:AddItem(ChatRoomInterface.Channels[a].Button, 0);
+-- 			game.Debris:AddItem(ChatRoomInterface.Channels[a].Frame, 0);
+-- 			table.remove(ChatRoomInterface.Channels, a);
+-- 			tabChat();
+-- 			break;
+-- 		else
+-- 			ChatRoomInterface:NewMessage(room, {
+-- 				Message = "You can't close this channel";
+-- 				Presist = false;
+-- 				MessageColor=Color3.fromRGB(255, 69, 69);
+-- 			})
+-- 		end
+-- 	end
+-- end
 
-end
-
-ClientCommands["report"] = function(channelId, args)
-	local room = ChatRoomInterface:GetRoom(channelId);
+-- ClientCommands["s"] = function(channelId, args)
+-- 	local targetChannel = args[1];
+-- 	if targetChannel == nil then return end;
+-- 	local speakerRoom = ChatRoomInterface:GetRoom(channelId);
 	
-	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-	
-	modInterface:ToggleWindow("ReportMenu");
-end
+-- 	local room = ChatRoomInterface:GetRoom(targetChannel);
+-- 	if room then
+-- 		if room.Id == channelId then
+-- 			ChatRoomInterface:NewMessage(room, {
+-- 				Message = "You are already in channel "..channelId;
+-- 				Presist = false;
+-- 				MessageColor=Color3.fromRGB(255, 69, 69);
+-- 			});
+-- 		else
+-- 			room:SetActive();
+-- 			room:SwitchWindow();
+-- 		end
+-- 	else
+-- 		ChatRoomInterface:NewMessage(speakerRoom, {
+-- 			Message = "The channel "..targetChannel.." does not exist.";
+-- 			Presist = false;
+-- 			MessageColor=Color3.fromRGB(255, 69, 69);
+-- 		})
+-- 	end
+-- end
 
-ClientCommands["vote"] = function(channelId, args)
-	local room = ChatRoomInterface:GetRoom(channelId);
-	
-	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-	
-	modInterface:ToggleWindow("VoteWindow");
-end
+function ChatRoomInterface.Notify(player, message, class, key, packet)
+	local room = ChatRoomInterface:GetRoom(ChatClient.ActiveChannelId);
+	if room == nil then return end;
 
-ClientCommands["e"] = function(channelId, args)
-	playEmote(args[1] or "dance");
-end
-
-ClientCommands["w"] = function(channelId, args)
-	local playerName = #args > 0 and table.remove(args, 1) or nil;
-	local msg = table.concat(args, " ");
-	
-	if playerName == nil then return end;
-	local matches = CommandHandler.MatchName(playerName);
-	local room = ChatRoomInterface:GetRoom(channelId);
-	if #matches <= 0 then
-		ChatRoomInterface:NewMessage(room, {
-			Message = "Couldn't find "..playerName.." on this server.";
-			Presist = false;
-			MessageColor=Color3.fromRGB(255, 69, 69);
-		})
-		return;
-	elseif #matches >= 2 then
-		ChatRoomInterface:NewMessage(room, {
-			Message = "Multiple matches for \""..playerName.."\": "..table.concat(matches, " ");
-			Presist = false;
-			MessageColor=Color3.fromRGB(255, 69, 69);
-		})
-		return;
-	end
-	local target = matches[1];
-	local testText = msg:gsub(" ", "")
-	testText = testText:gsub(string.char(32), "")
-	testText = testText:gsub("[\r\n]", "");
-	
-	if #testText > 0 and #msg < 200 then
-		-- remoteSubmitMessage:InvokeServer(target.Name, msg);
-		-- for a=1, 10 do
-		-- 	local room = ChatRoomInterface:GetRoom(target.Name);
-		-- 	if room then
-		-- 		room:SetActive();
-		-- 		room:SwitchWindow();
-		-- 		break;
-		-- 	end
-		-- 	task.wait(0.1);
-		-- end
-	end;
-end
-
-ClientCommands["f"] = function(channelId, args)
-	local msg = table.concat(args, " ");
-
-	local speakerRoom = ChatRoomInterface:GetRoom(channelId);
-	
-	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
-	
-	local factionProfile = modData.Profile.Faction;
-	local channelId = factionProfile.ChannelId;
-	if channelId == nil then
-		ChatRoomInterface:NewMessage(speakerRoom, {
-			Message = "You are not in a faction.";
-			Presist = false;
-			MessageColor=Color3.fromRGB(255, 69, 69);
-		})
-		return 
-	end;
-	
-	local testText = msg:gsub(" ", "")
-	testText = testText:gsub(string.char(32), "")
-	testText = testText:gsub("[\r\n]", "");
-	if #testText > 0 and #msg < 200 then
-		-- remoteSubmitMessage:InvokeServer(channelId, msg);
-		-- for a=1, 10 do
-		-- 	local room = ChatRoomInterface:GetRoom(channelId);
-		-- 	if room then
-		-- 		room:SetActive();
-		-- 		room:SwitchWindow();
-		-- 		break;
-		-- 	end
-		-- 	task.wait(0.1);
-		-- end
-	end;
-end
-
-ClientCommands["c"] = function(channelId)
-	local room = ChatRoomInterface:GetRoom(channelId);
-	for a=1, #ChatRoomInterface.Channels do
-		if ChatRoomInterface.Channels[a].Id == channelId and a >= 4 then
-			game.Debris:AddItem(ChatRoomInterface.Channels[a].Button, 0);
-			game.Debris:AddItem(ChatRoomInterface.Channels[a].Frame, 0);
-			table.remove(ChatRoomInterface.Channels, a);
-			tabChat();
-			break;
-		else
-			ChatRoomInterface:NewMessage(room, {
-				Message = "You can't close this channel";
-				Presist = false;
-				MessageColor=Color3.fromRGB(255, 69, 69);
-			})
-		end
-	end
-end
-
-ClientCommands["s"] = function(channelId, args)
-	local targetChannel = args[1];
-	if targetChannel == nil then return end;
-	local speakerRoom = ChatRoomInterface:GetRoom(channelId);
-	
-	local room = ChatRoomInterface:GetRoom(targetChannel);
-	if room then
-		if room.Id == channelId then
-			ChatRoomInterface:NewMessage(room, {
-				Message = "You are already in channel "..channelId;
-				Presist = false;
-				MessageColor=Color3.fromRGB(255, 69, 69);
-			});
-		else
-			room:SetActive();
-			room:SwitchWindow();
-		end
-	else
-		ChatRoomInterface:NewMessage(speakerRoom, {
-			Message = "The channel "..targetChannel.." does not exist.";
-			Presist = false;
-			MessageColor=Color3.fromRGB(255, 69, 69);
-		})
-	end
-end
-
-ClientCommands["console"] = function(channelId, args)
-	local success, developerConsoleVisible = pcall(function() return StarterGui:GetCore("DevConsoleVisible") end)
-	if success then
-		local success, err = pcall(function() StarterGui:SetCore("DevConsoleVisible", not developerConsoleVisible) end)
-		if not success and err then
-			print("Error making developer console visible: " ..err);
-		end
-	end
-end
-
-ClientCommands["printloadtimes"] = function(channelId, args)
-	Debugger.PrintLoadTimes();
-end
-
-
-ClientCommands["reloadgui"] = function(channelId, args)
-	Debugger:Warn("Reloading UserInterface");
-	shared.ReloadGui();
-end
-
-ClientCommands["unixtime"] = function(channelId, args)
-	args = {};
-	table.insert(args, tostring(DateTime.now().UnixTimestampMillis));
-	
-	return args;
-	--local speakerRoom = ChatRoomInterface:GetRoom(channelId);
-	--ChatRoomInterface:NewMessage(speakerRoom, {
-	--	Message = "Client Unix time: ".. DateTime.now().UnixTimestampMillis;
-	--	Presist = false;
-	--	MessageColor=Color3.fromRGB(90, 255, 208);
-	--})
-end
-
-ClientCommands["dobug"] = function(channelId, args)
-	spawn(function()
-		print(a+0);
-	end)
+	ChatRoomInterface:NewMessage(room, {
+		Message = message;
+		Style = class;
+		Presist = false;
+	});
 end
 
 inputBox.FocusLost:Connect(function(enterPressed, inputThatCausedFocusLoss)
@@ -602,18 +504,6 @@ inputBox.FocusLost:Connect(function(enterPressed, inputThatCausedFocusLoss)
 			end
 			
 			local activeChannel = ChatRoomInterface.Channels[ChatRoomInterface.ActiveChannel];
-			if text:sub(1, 1) == "/" then
-
-				local cmd, args = CommandHandler.ProcessMessage(text);
-				local cmdKey = cmd:sub(2, #cmd);
-				if ClientCommands[cmdKey] then
-					args = ClientCommands[cmdKey](activeChannel.Id, args);
-					if args and #args > 0 then
-						text = cmd.." "..table.concat(args, " ");
-						
-					end
-				end
-			end
 			inputBox.Text = "";
 			
 			if submit == true then
@@ -621,24 +511,10 @@ inputBox.FocusLost:Connect(function(enterPressed, inputThatCausedFocusLoss)
 				if #testText > 0 and #text < 200 then
 					addToChatCache();
 					
-					-- task.spawn(function()
-					-- 	local channelId = activeChannel.Id;
+					local channelId = activeChannel.Id;
 
-					-- 	local room = ChatRoomInterface:GetRoom(channelId);
-					-- 	room:SwitchWindow();
-						
-					-- 	remoteSubmitMessage:InvokeServer(channelId, text, nil, {
-					-- 		Dm=room.Dm;
-					-- 	});
-					-- end)
-
-					task.spawn(function()
-						local channelId = activeChannel.Id;
-
-						local textChannel: TextChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild(channelId);
-						textChannel:SendAsync(text);
-					end)
-
+					local textChannel: TextChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild(channelId);
+					textChannel:SendAsync(text);
 				end;
 			end
 			toggleChat(false);
@@ -763,5 +639,5 @@ end)
 
 onChannelButtonsChange();
 
+shared.Notify = ChatRoomInterface.Notify;
 shared.ChatRoomInterface = ChatRoomInterface;
-shared.ClientCommands = ClientCommands;

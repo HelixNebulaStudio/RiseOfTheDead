@@ -515,181 +515,6 @@ Commands["spawnitem"] = {
 	end;
 };
 
-Commands["term"] = {
-	Permission = PermissionLevel.DevBranch;
-	Description = "Opens terminal and run cmd.";
-	
-	RequiredArgs = 0;
-	UsageInfo = "/term [cmd]";
-	Function = function(speaker, args)
-		return true;
-	end;
-};
-
-Commands["ui"] = {
-	Permission = PermissionLevel.All;
-	Description = "Toggles a user interface.";
-
-	RequiredArgs = 1;
-	UsageInfo = "/ui [interfaceName]";
-	Function = function(speaker, args)
-		return true;
-	end;
-};
-
-Commands["report"] = {
-	Permission = PermissionLevel.All;
-	Description = "Toggles report interface.";
-	
-	UsageInfo = "/report";
-	Function = function(speaker, args)
-		return true;
-	end;
-};
-
-Commands["vote"] = {
-	Permission = PermissionLevel.All;
-	Description = "Toggles vote interface.";
-	
-	UsageInfo = "/vote";
-	Function = function(speaker, args)
-		return true;
-	end;
-};
-
-Commands["config"] = {
-	Permission = PermissionLevel.Admin;
-	Description = "Manually change a config setting.";
-	
-	RequiredArgs = 1;
-	UsageInfo = "/config [config] value";
-	Function = function(speaker, args)
-		local configId = args[1];
-		local value = args[2];
-		
-		if configId then
-			modConfigurations.Set(configId, value);
-			Debugger:Log("client set deprecated");
-			
-		else
-			shared.Notify(speaker, "Unknown configId", "Negative");
-		end
-		return true;
-	end;
-};
-
-Commands["w"] = {
-	Permission = PermissionLevel.All;
-	Description = "Whisper to player.";
-	
-	RequiredArgs = 2;
-	UsageInfo = "/w [playerName] [message]";
-	Function = function(speaker, args)
-		return true;
-	end;
-};
-	
-Commands["f"] = {
-	Permission = PermissionLevel.All;
-	Description = "Chat to faction.";
-
-	RequiredArgs = 2;
-	UsageInfo = "/f [message]";
-	Function = function(speaker, args)
-		return true;
-	end;
-};
-
-Commands["e"] = {
-	Permission = PermissionLevel.All;
-	Description = "Use emotes.";
-	
-	RequiredArgs = 1;
-	UsageInfo = "/e [emote]";
-	Function = function(speaker, args)
-		return true;
-	end;
-};
-
-Commands["c"] = {
-	Permission = PermissionLevel.All;
-	Description = "Close channel.";
-	
-	RequiredArgs = 0;
-	UsageInfo = "/c";
-	Function = function(speaker, args)
-		return true;
-	end;
-};
-
-Commands["s"] = {
-	Permission = PermissionLevel.All;
-	Description = "Switch channel.";
-	
-	RequiredArgs = 1;
-	UsageInfo = "/s [channelId]";
-	Function = function(speaker, args)
-		return true;
-	end;
-};
-
-Commands["reloadgui"] = {
-	Permission = PermissionLevel.All;
-	Description = "Reload general user interface.";
-
-	UsageInfo = "/reloadgui";
-	Function = function(speaker, args)
-		return true;
-	end;
-};
-
-Commands["reloadchar"] = {
-	Permission = PermissionLevel.All;
-	Description = "Reload character script such as character script, interact script, etc..";
-
-	UsageInfo = "/reloadchar";
-	Function = function(speaker, args)
-		shared.ReloadCharacter(speaker);
-		return true;
-	end;
-};
-
-Commands["unixtime"] = {
-	Permission = PermissionLevel.DevBranch;
-	Description = "Print the unix time.";
-
-	UsageInfo = "/unixtime";
-	Function = function(speaker, args)
-		local clientUnixTime = args[1] or "0";
-		local unixTime = DateTime.now().UnixTimestampMillis;
-		shared.Notify(speaker, ("Client Unix time: ".. clientUnixTime)..("\nServer Unix time: ".. unixTime .. "\nDiff: ".. (unixTime-clientUnixTime)) .."ms", "Inform");
-		return true;
-	end;
-};
-
-Commands["console"] = {
-	Permission = PermissionLevel.All;
-	Description = "Opens up Roblox console.";
-
-	UsageInfo = "/console";
-	Function = function(speaker, args)
-		return true;
-	end;
-};
-
-
-
---Commands["unstuck"] = {
---	Permission = PermissionLevel.All;
---	Description = "Unstuck player.";
-	
---	RequiredArgs = 0;
---	UsageInfo = "/unstuck";
---	Function = function(speaker, args)
---		return true;
---	end;
---};
-
 Commands["droptable"] = {
 	Permission = PermissionLevel.All;
 	Description = "Shows the drop table of a drop table.\nTo search for specific droptable: /droptable [search keyword]";
@@ -2426,20 +2251,6 @@ Commands["save"] = {
 		return true;
 	end;
 };
-
-
-Commands["printloadtimes"] = {
-	Permission = PermissionLevel.Admin;
-	Description = "Print load times into console.";
-
-	RequiredArgs = 0;
-	UsageInfo = "/printloadtimes";
-	Function = function(speaker, args)
-		Debugger.PrintLoadTimes();
-		return;
-	end;
-};
-
 
 Commands["printinv"] = {
 	Permission = PermissionLevel.Admin;
@@ -4890,18 +4701,266 @@ Commands["testlaser"] = {
 	end;
 };
 
+-- MARK: Shared Commands;
+Commands["config"] = {
+	Permission = PermissionLevel.Admin;
+	Description = "Manually change a config setting.";
+	
+	RequiredArgs = 1;
+	UsageInfo = "/config [config] value";
+	Function = function(speaker, args)
+		local configId = args[1];
+		local value = args[2];
+		
+		if configId then
+			modConfigurations.Set(configId, value);
+			shared.Notify(speaker, "Server Config Set", "Inform");
+			
+		else
+			shared.Notify(speaker, "Server Unknown configId", "Negative");
+		end
+		return true;
+	end;
+	ClientFunction = function(speaker, args)
+		local configId = args[1];
+		local value = args[2];
+		
+		if configId then
+			modConfigurations.Set(configId, value);
+			shared.Notify(speaker, "Client Config Set", "Inform");
+			
+		else
+			shared.Notify(speaker, "Client Unknown configId", "Negative");
+		end
+		return true;
+	end;
+};
+
+Commands["printloadtimes"] = {
+	Permission = PermissionLevel.Admin;
+	Description = "Print load times into console.";
+
+	RequiredArgs = 0;
+	UsageInfo = "/printloadtimes";
+	Function = function(speaker, args)
+		Debugger.PrintLoadTimes();
+		return;
+	end;
+	ClientFunction = function(speaker, args)
+		Debugger.PrintLoadTimes();
+		return;
+	end;
+};
+
+
+-- MARK: Client Commands;
+Commands["ui"] = {
+	Permission = PermissionLevel.All;
+	Description = "Toggles a user interface.";
+
+	RequiredArgs = 1;
+	UsageInfo = "/ui [interfaceName]";
+	ClientFunction = function(speaker, args)
+		local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+		local modInterface = modData:GetInterfaceModule();
+		
+		local inputName = args[1] or "";
+		
+		if modInterface.Windows[inputName] then
+			modInterface:ToggleWindow(inputName);
+			
+		else
+			local similarList = {};
+			for name, _ in pairs(modInterface.Windows) do
+				if string.lower(name):match(string.lower(inputName)) then
+					table.insert(similarList, name);
+				end
+			end
+
+			shared.Notify(speaker, `Unknown interface called {inputName}. Similar: {table.concat(similarList, ", ")}`, `Negative`, nil, {Presist=false;});
+		end
+	end;
+};
+
+Commands["term"] = {
+	Permission = PermissionLevel.DevBranch;
+	Description = "Opens terminal and run cmd.";
+	
+	RequiredArgs = 0;
+	UsageInfo = "/term [cmd]";
+	ClientFunction = function(speaker, args)
+		local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+		local modInterface = modData:GetInterfaceModule();
+
+		local termCmd = args[1] or "";
+		
+		if modInterface.Windows.TerminalWindow then
+			modInterface:ToggleWindow("TerminalWindow", nil, termCmd);
+
+		end
+	end;
+};
+
+Commands["report"] = {
+	Permission = PermissionLevel.All;
+	Description = "Toggles report interface.";
+	
+	UsageInfo = "/report";
+	ClientFunction = function(speaker, args)
+		local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+		local modInterface = modData:GetInterfaceModule();
+		
+		modInterface:ToggleWindow("ReportMenu");
+	end;
+};
+
+Commands["vote"] = {
+	Permission = PermissionLevel.All;
+	Description = "Toggles vote interface.";
+	
+	UsageInfo = "/vote";
+	ClientFunction = function(speaker, args)
+		local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+		local modInterface = modData:GetInterfaceModule();
+		
+		modInterface:ToggleWindow("VoteWindow");
+	end;
+};
+
+Commands["vote"] = {
+	Permission = PermissionLevel.All;
+	Description = "Toggles vote interface.";
+	
+	UsageInfo = "/vote";
+	ClientFunction = function(speaker, args)
+		local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+		local modInterface = modData:GetInterfaceModule();
+		
+		modInterface:ToggleWindow("VoteWindow");
+	end;
+};
+
+Commands["e"] = {
+	Permission = PermissionLevel.All;
+	Description = "Use emotes.";
+	
+	RequiredArgs = 1;
+	UsageInfo = "/e [emote]";
+	ClientFunction = function(speaker, args)
+		local character = game.Players.LocalPlayer.Character;
+		local remotePlayEmote = character and character:FindFirstChild("PlayEmote", true);
+
+		local emoteId = args[1] or "dance";
+		if remotePlayEmote then
+			remotePlayEmote:Invoke(emoteId);
+		end
+	end;
+};
+
+Commands["w"] = {
+	Permission = PermissionLevel.All;
+	Description = "Whisper to player.";
+	
+	RequiredArgs = 2;
+	UsageInfo = "/w [playerName] [message]";
+	Function = function(speaker, args)
+		return true;
+	end;
+};
+	
+Commands["f"] = {
+	Permission = PermissionLevel.All;
+	Description = "Chat to faction.";
+
+	RequiredArgs = 2;
+	UsageInfo = "/f [message]";
+	Function = function(speaker, args)
+		return true;
+	end;
+};
+
+
+Commands["c"] = {
+	Permission = PermissionLevel.All;
+	Description = "Close channel.";
+	
+	RequiredArgs = 0;
+	UsageInfo = "/c";
+	Function = function(speaker, args)
+		return true;
+	end;
+};
+
+Commands["s"] = {
+	Permission = PermissionLevel.All;
+	Description = "Switch channel.";
+	
+	RequiredArgs = 1;
+	UsageInfo = "/s [channelId]";
+	Function = function(speaker, args)
+		return true;
+	end;
+};
+
+Commands["reloadgui"] = {
+	Permission = PermissionLevel.All;
+	Description = "Reload general user interface.";
+
+	UsageInfo = "/reloadgui";
+	ClientFunction = function(speaker, args)
+		Debugger:Warn("Reloading UserInterface");
+		shared.ReloadGui();
+	end;
+};
+
+Commands["reloadchar"] = {
+	Permission = PermissionLevel.All;
+	Description = "Reload character script such as character script, interact script, etc..";
+
+	UsageInfo = "/reloadchar";
+	Function = function(speaker, args)
+		shared.ReloadCharacter(speaker);
+		return true;
+	end;
+};
+
+Commands["console"] = {
+	Permission = PermissionLevel.All;
+	Description = "Opens up Roblox console.";
+
+	UsageInfo = "/console";
+	ClientFunction = function(speaker, args)
+		local StarterGui = game:GetService("StarterGui");
+		local success, developerConsoleVisible = pcall(function() return StarterGui:GetCore("DevConsoleVisible") end)
+		if success then
+			local success, err = pcall(function() StarterGui:SetCore("DevConsoleVisible", not developerConsoleVisible) end)
+			if not success and err then
+				print("Error making developer console visible: " ..err);
+			end
+		end
+	end;
+};
 
 --== Methods
 function CommandsLibrary:NewTextChatCommand(cmdName, cmdLib)
-	if chatCommandsFolder:FindFirstChild(cmdName) then return end;
+	local textChatCmd = chatCommandsFolder:FindFirstChild(cmdName);
+	if RunService:IsServer() then
+		if textChatCmd then return end;
 
-	local textChatCmd = Instance.new("TextChatCommand");
-	textChatCmd.Name = cmdName;
-	textChatCmd.PrimaryAlias = `/{cmdName}`;
-	textChatCmd.Parent = chatCommandsFolder;
+		textChatCmd = Instance.new("TextChatCommand");
+		textChatCmd.Name = cmdName;
+		textChatCmd.PrimaryAlias = `/{cmdName}`;
+		textChatCmd.Parent = chatCommandsFolder;
+
+	else
+		if textChatCmd:GetAttribute("ClientConnected") then return end;
+		textChatCmd:SetAttribute("ClientConnected", true);
+
+	end
 
 	textChatCmd.Triggered:Connect(function(txtSrc: TextSource, message)
-		print("cmds:",txtSrc.Name, message);
+		if RunService:IsServer() and cmdLib.Function == nil then return end;
+
 		local cmd, args = modCommandHandler.ProcessMessage(message);
 		if cmd == nil then return true end;
 		
@@ -4910,33 +4969,35 @@ function CommandsLibrary:NewTextChatCommand(cmdName, cmdLib)
 
 		local textChannel = txtSrc.Parent :: TextChannel;
 
-		local cmdLib = Commands[cmd:sub(2, #cmd):lower()];
-		if cmdLib then
-			if not CommandsLibrary.HasPermissions(speaker, cmdLib) then 
-				shared.Notify(speaker, `Insufficient permissions.`, `Negative`, nil, {Presist=false;});
-				return;
-			end;
-			
-			if cmdLib.RequiredArgs and #args < cmdLib.RequiredArgs then
-				shared.Notify(speaker, `Missing arguements..\n{(cmdLib.UsageInfo or "")}`, `Negative`, nil, {Presist=false;});
-				return;
-			end;
-			
-			if cmdLib.Cooldown and cmdLib.Debounce == nil then cmdLib.Debounce = {}; end
-			if cmdLib.Debounce == nil or cmdLib.Debounce[speaker.Name] == nil or tick()-cmdLib.Debounce[speaker.Name] >= cmdLib.Cooldown then
-				if cmdLib.Debounce then cmdLib.Debounce[speaker.Name] = tick(); end;
+		if not CommandsLibrary.HasPermissions(speaker, cmdLib) then
+			shared.Notify(speaker, `Insufficient permissions.`, `Negative`, nil, {Presist=false;});
+			return;
+		end;
+		
+		if cmdLib.RequiredArgs and #args < cmdLib.RequiredArgs then
+			shared.Notify(speaker, `Missing arguements..\n{(cmdLib.UsageInfo or "")}`, `Negative`, nil, {Presist=false;});
+			return;
+		end;
+		
+		if cmdLib.Cooldown and cmdLib.Debounce == nil then cmdLib.Debounce = {}; end
+		if cmdLib.Debounce == nil or cmdLib.Debounce[speaker.Name] == nil or tick()-cmdLib.Debounce[speaker.Name] >= cmdLib.Cooldown then
+			if cmdLib.Debounce then cmdLib.Debounce[speaker.Name] = tick(); end;
+			if cmdLib.Function then
 				cmdLib.Function(speaker, args);
-
-			else
-				shared.Notify(speaker, `Command is on a cooldown..`, `Negative`, nil, {Presist=false;});
-				return;
 			end
-			
+			if cmdLib.ClientFunction then
+				cmdLib.ClientFunction(speaker, args);
+			end
+
 		else
-			shared.Notify(speaker, `Unknown Command: {cmd}`, `Negative`, nil, {Presist=false;});
+			shared.Notify(speaker, `Command is on a cooldown..`, `Negative`, nil, {Presist=false;});
+			return;
 		end
+			
 		return;
 	end)
+
+	return textChatCmd;
 end
 
 function CommandsLibrary:HookChatCommand(cmdName, cmdLib)
@@ -4949,7 +5010,11 @@ function CommandsLibrary:HookChatCommand(cmdName, cmdLib)
 		cmdLib.UsageInfo = "/"..cmdName;
 	end
 	
-	CommandsLibrary:NewTextChatCommand(cmdName, cmdLib);
+	local textChatCmd = CommandsLibrary:NewTextChatCommand(cmdName, cmdLib) :: TextChatCommand;
+	
+	if RunService:IsClient() then return end;
+	local cmdLibJson = HttpService:JSONEncode(cmdLib);
+	textChatCmd:SetAttribute("CmdLib", cmdLibJson);
 end
 
 function CommandsLibrary.init()
@@ -4957,6 +5022,29 @@ function CommandsLibrary.init()
 		for cmdName, cmdLib in pairs(Commands) do
 			CommandsLibrary:NewTextChatCommand(cmdName, cmdLib);
 		end
+
+	else
+		for cmdName, cmdLib in pairs(Commands) do
+			if cmdLib.ClientFunction then
+				CommandsLibrary:NewTextChatCommand(cmdName, cmdLib);
+			end
+		end
+
+		local function loadHookCommands(txtChatCmd: TextChatCommand)
+			local jsonCmdLib = txtChatCmd:GetAttribute("CmdLib");
+			if jsonCmdLib == nil then return end;
+			local cmdLib = HttpService:JSONDecode(jsonCmdLib);
+
+			CommandsLibrary:HookChatCommand(txtChatCmd.Name, cmdLib);
+		end
+		for _, txtChatCmd in pairs(chatCommandsFolder:GetChildren()) do
+			loadHookCommands(txtChatCmd);
+		end
+		chatCommandsFolder.ChildAdded:Connect(function(child)
+			if not child:IsA("TextChatCommand") then return end;
+			loadHookCommands(child);
+		end)
+
 	end
 end
 

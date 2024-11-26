@@ -41,22 +41,41 @@ function ChatService.OnServerMessage(senderPlayer: Player, txtChatMsg: TextChatM
 	processCache[msgId] = currTick;
 
 	for mId, msgTick in pairs(processCache) do
-		if (currTick-msgTick) > 300 then
+		if (currTick-msgTick) > 60 then
 			processCache[mId] = nil;
 		end
 	end
 
-	--process
-	print("Msg:", senderPlayer, txtChatMsg.Text, "from",txtChatMsg.TextSource.Name, "mId",msgId);
+	local txtChannel = txtChatMsg.TextChannel;
+	local txtMessage = txtChatMsg.Text;
+
+	if txtMessage:sub(1,1) == "/" then
+		local cmd, args = modCommandHandler.ProcessMessage(txtMessage);
+		if cmd then
+			local cmdKey = (cmd:sub(2, #cmd):lower());
+			local cmdLib = modCommandsLibrary[cmdKey];
+			if cmdLib == nil then
+				shared.Notify(senderPlayer, `Unknown Command: {cmd}`, `Negative`);
+			end
+		end
+	end
+
+	if shared.modProfile.IsBeingRecon(senderPlayer) then
+		local modDiscordWebhook = require(game.ServerScriptService.ServerLibrary.DiscordWebhook);
+		modDiscordWebhook.PostText(modDiscordWebhook.Hooks.ChatLogs, `{senderPlayer.Name}\`{senderPlayer.UserId}\`: [{txtChannel.Name}] {txtMessage}`);
+	end
 end
 
 function ChatService.DefaultShouldDeliverCallback(txtChatMsg, txtSrc)
-	print("s callback", txtChatMsg.Text, txtChatMsg.TextSource.Name,"target", txtSrc.Name);
-
 	local senderTxtSrc: TextSource = txtChatMsg.TextSource;
 	local senderPlayer = game.Players:FindFirstChild(senderTxtSrc.Name);
 
 	ChatService.OnServerMessage(senderPlayer, txtChatMsg, txtSrc);
+
+	local txtMessage = txtChatMsg.Text;
+	if txtMessage:sub(1,1) == "/" then
+		return false;
+	end
 
 	return true;
 end
@@ -72,18 +91,6 @@ function ChatService.Notify(player, message, class, key, packet)
 		local notifyMode = modConfigurations.ForceNotifyStyle or (profile and profile.Settings and profile.Settings.Notifications);
 		
 		if notifyMode == 1 or (notifyMode == 2 and messageData.Imp == true) then
-			
-			-- local packet = {
-			-- 	ChannelId = "Server";
-			-- 	Text = messageData.Message;
-			-- 	MsgTime = tostring(DateTime.now().UnixTimestampMillis);
-			-- 	MessageColor = messageData.ExtraData and messageData.ExtraData.ChatColor or nil;
-			-- 	Font = messageData.ExtraData and messageData.ExtraData.Font or nil;
-			-- 	Presist = messageData.Presist;
-			-- 	Packet=packet;
-			-- 	Notify = true;
-			-- };
-
 			messageData.Chat = true;
 			messageData.Style = class;
 			messageData.Notify = true;

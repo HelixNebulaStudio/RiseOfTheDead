@@ -3152,42 +3152,43 @@ end)
 
 
 task.spawn(function()
-	Debugger.AwaitShared("ClientCommands");
-	
-	local msgTxt = "";
-	local messagePacket = {
-		Message = msgTxt;
-		Presist = false;
-		MessageColor=Color3.fromRGB(85, 255, 255);
-	};
-	
-	shared.ClientCommands["checkbodymovers"] = function(channelId, args)
-		local room = shared.ChatRoomInterface:GetRoom(channelId);
-		
-		msgTxt = "";
-		for _, obj in pairs(rootPart:GetChildren()) do
-			if not obj:IsA("Constraint") and not obj:IsA("BodyMover") then continue end;
-			
-			msgTxt = msgTxt.."\n"..obj.Name..": ";
-			
-			if obj:IsA("Constraint") then
-				msgTxt = msgTxt.."Enabled: "..tostring(obj.Enabled).." Active: "..tostring(obj.Active);
+	Debugger.AwaitShared("modCommandsLibrary");
 
-			elseif obj:IsA("BodyGyro") then
-				msgTxt = msgTxt.."MaxTorque: "..tostring(obj.MaxTorque) .. " P:"..obj.P;
+	shared.modCommandsLibrary:HookChatCommand("checkbodymovers", {
+		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+		Description = [[]];
 
+		RequiredArgs = 0;
+		ClientFunction = function(speaker, args)
+			local msgTxt = "";
+			for _, obj in pairs(rootPart:GetChildren()) do
+				if not obj:IsA("Constraint") and not obj:IsA("BodyMover") then continue end;
+				
+				msgTxt = msgTxt.."\n"..obj.Name..": ";
+				
+				if obj:IsA("Constraint") then
+					msgTxt = msgTxt.."Enabled: "..tostring(obj.Enabled).." Active: "..tostring(obj.Active);
+	
+				elseif obj:IsA("BodyGyro") then
+					msgTxt = msgTxt.."MaxTorque: "..tostring(obj.MaxTorque) .. " P:"..obj.P;
+	
+				end
+				
+				shared.Notify(localPlayer, msgTxt, `Inform`);
 			end
-			
-			messagePacket.Message = msgTxt;
-			shared.ChatRoomInterface:NewMessage(room, messagePacket);
-
-		end
-	end
+		end;
+	});
 	
-	shared.ClientCommands["classplayerproperties"] = function(channelId, args)
-		Debugger:Log("classPlayer.Properties", classPlayer.Properties);
+	shared.modCommandsLibrary:HookChatCommand("classplayerproperties", {
+		Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+		Description = [[]];
 
-	end
+		RequiredArgs = 0;
+		ClientFunction = function(speaker, args)
+			Debugger:Log("classPlayer.Properties", classPlayer.Properties);
+		end;
+	});
+
 end)
 
 currentCamera.CameraSubject = humanoid;
