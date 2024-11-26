@@ -3,8 +3,12 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local ChatClient = {};
 ChatClient.__ChatClient = ChatClient;
 
-ChatClient.ChatCache = {};
+ChatClient.Inited = false;
+ChatClient.MsgReady = false;
+ChatClient.OnNewMessage = nil;
+ChatClient.ActiveChannelId = nil;
 
+ChatClient.ChatCache = {};
 ChatClient.ChatCache["Server"] = {
 	NewMsgs = 0;
 	Messages = {}

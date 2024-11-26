@@ -1,11 +1,10 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
-local TeleportService = game:GetService("TeleportService");
 local RunService = game:GetService("RunService");
-local MemoryStoreService = game:GetService("MemoryStoreService");
 local HttpService = game:GetService("HttpService");
 local MarketplaceService = game:GetService("MarketplaceService");
 local TextService = game:GetService("TextService");
+local TextChatService = game:GetService("TextChatService");
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
@@ -20,18 +19,11 @@ local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 local modCrateLibrary = require(game.ReplicatedStorage.Library.CrateLibrary);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
---local modScheduler = require(game.ReplicatedStorage.Library.Scheduler);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
-
-local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
-
 local modDropRateCalculator = require(game.ReplicatedStorage.Library.DropRateCalculator);
-local modGoldShopLibrary = require(game.ReplicatedStorage.Library.GoldShopLibrary);
-local modRatShopLibrary = require(game.ReplicatedStorage.Library.RatShopLibrary);
 local modSafehomesLibrary = require(game.ReplicatedStorage.Library.SafehomesLibrary);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modDialogueService = require(game.ReplicatedStorage.Library.DialogueService);
 
 if RunService:IsServer() then
 	modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
@@ -46,8 +38,9 @@ if RunService:IsServer() then
 	modRedeemService = require(game.ServerScriptService.ServerLibrary.RedeemService);
 	modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
 	modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
-
 end
+
+local chatCommandsFolder = TextChatService:WaitForChild("TextChatCommands");
 
 local Cache = {Group={};};
 local PermissionLevel = {
@@ -189,31 +182,6 @@ Commands["playcutscene"] = {
 	end;
 };
 
---Commands["mission33"] = {
---	Permission = PermissionLevel.Admin;
---	Description = "mission33.";
---	
---	RequiredArgs = 0;
---	UsageInfo = "/mission33";
---	Function = function(player, args)
---		local gameLib = modGameModeLibrary.GetGameMode("Raid");
---		local stageLib = gameLib and modGameModeLibrary.GetStage("Raid", "BanditOutpost");
---		
---		local system = modRaid.new();
---		local room = modMatchMaking.Room.new();
---		
---		system:Init({
---			Type="Raid";
---			Stage="BanditOutpost";
---			StageLib=stageLib;
---		});
---		room.Mission=true;
---		room:AddPlayer(player);
---		system:Start(room);
---		return true;
---	end;
---};
-
 --== Informational
 Commands["cmds"] = {
 	Permission = PermissionLevel.All;
@@ -277,7 +245,6 @@ Commands["help"] = {
 --		return true;
 --	end;
 --};
-
 
 Commands["item"] = {
 	Permission = PermissionLevel.All;
@@ -4925,41 +4892,72 @@ Commands["testlaser"] = {
 
 
 --== Methods
-local hookedCommands = {};
-function CommandsLibrary:HookChatCommand(cmd, cmdLib)
-	if Commands[cmd] then
-		error("Attempt to hook already existing command ("..cmd..").");
-	end
-	
-	Commands[cmd] = cmdLib;
-	if cmdLib.UsageInfo == nil then
-		cmdLib.UsageInfo = "/"..cmd;
-	end
-	
-	if RunService:IsServer() then
-		hookedCommands[cmd]={
-			Permission=cmdLib.Permission;
-			Description=cmdLib.Description;
-			RequiredArgs=cmdLib.RequiredArgs;
-			UsageInfo=cmdLib.UsageInfo;
-		}
+function CommandsLibrary:NewTextChatCommand(cmdName, cmdLib)
+	if chatCommandsFolder:FindFirstChild(cmdName) then return end;
+
+	local textChatCmd = Instance.new("TextChatCommand");
+	textChatCmd.Name = cmdName;
+	textChatCmd.PrimaryAlias = `/{cmdName}`;
+	textChatCmd.Parent = chatCommandsFolder;
+
+	textChatCmd.Triggered:Connect(function(txtSrc: TextSource, message)
+		print("cmds:",txtSrc.Name, message);
+		local cmd, args = modCommandHandler.ProcessMessage(message);
+		if cmd == nil then return true end;
 		
-		script:SetAttribute("HookedCommands", HttpService:JSONEncode(hookedCommands));
-	end
+		local speaker: Player = game.Players:FindFirstChild(txtSrc.Name);
+		if speaker == nil then return end;
+
+		local textChannel = txtSrc.Parent :: TextChannel;
+
+		local cmdLib = Commands[cmd:sub(2, #cmd):lower()];
+		if cmdLib then
+			if not CommandsLibrary.HasPermissions(speaker, cmdLib) then 
+				shared.Notify(speaker, `Insufficient permissions.`, `Negative`, nil, {Presist=false;});
+				return;
+			end;
+			
+			if cmdLib.RequiredArgs and #args < cmdLib.RequiredArgs then
+				shared.Notify(speaker, `Missing arguements..\n{(cmdLib.UsageInfo or "")}`, `Negative`, nil, {Presist=false;});
+				return;
+			end;
+			
+			if cmdLib.Cooldown and cmdLib.Debounce == nil then cmdLib.Debounce = {}; end
+			if cmdLib.Debounce == nil or cmdLib.Debounce[speaker.Name] == nil or tick()-cmdLib.Debounce[speaker.Name] >= cmdLib.Cooldown then
+				if cmdLib.Debounce then cmdLib.Debounce[speaker.Name] = tick(); end;
+				cmdLib.Function(speaker, args);
+
+			else
+				shared.Notify(speaker, `Command is on a cooldown..`, `Negative`, nil, {Presist=false;});
+				return;
+			end
+			
+		else
+			shared.Notify(speaker, `Unknown Command: {cmd}`, `Negative`, nil, {Presist=false;});
+		end
+		return;
+	end)
 end
 
-if RunService:IsClient() then
-	local function loadServerCommands()
-		local cmdsJson = script:GetAttribute("HookedCommands");
-		if cmdsJson == nil or #cmdsJson <= 0 then return end;
-		local serverCommands = HttpService:JSONDecode(cmdsJson);
+function CommandsLibrary:HookChatCommand(cmdName, cmdLib)
+	if Commands[cmdName] then
+		error("Attempt to hook already existing command ("..cmdName..").");
+	end
+	
+	Commands[cmdName] = cmdLib;
+	if cmdLib.UsageInfo == nil then
+		cmdLib.UsageInfo = "/"..cmdName;
+	end
+	
+	CommandsLibrary:NewTextChatCommand(cmdName, cmdLib);
+end
 
-		for k, v in pairs(serverCommands) do
-			Commands[k] = v;
+function CommandsLibrary.init()
+	if RunService:IsServer() then
+		for cmdName, cmdLib in pairs(Commands) do
+			CommandsLibrary:NewTextChatCommand(cmdName, cmdLib);
 		end
 	end
-	script:GetAttributeChangedSignal("HookedCommands"):Connect(loadServerCommands);
-	loadServerCommands();
 end
 
 shared.modCommandsLibrary = CommandsLibrary;

@@ -568,9 +568,11 @@ function Profile:AwardPremium(temp)
 		"Why did "..player.Name.." become Premium? Because he dares to seek more danger!";
 	};
 	shared.Notify(game.Players, randomMessages[random:NextInteger(1, #randomMessages)], "OnPremium");
+
 	remoteHudNotification:FireClient(self.Player, "PremiumAward");
 	self:UpdateTrustLevel();
 	self:AddPlayPoints(3600, "Gameplay:Unlock");
+	self:Refresh();
 	
 	self:Sync("Premium");
 end
@@ -635,6 +637,10 @@ function Profile:Refresh()
 		spawn(function()
 			local player = self.Player;
 			local userId = player.UserId;
+
+			player:SetAttribute("Premium", self.Premium);
+			player:SetAttribute("PlayerLevel", self.GameSave:GetStat("Level"));
+
 			local s, e = pcall(function()
 				local passPremium = MarketplaceService:UserOwnsGamePassAsync(userId, 2649294);
 				if passPremium then

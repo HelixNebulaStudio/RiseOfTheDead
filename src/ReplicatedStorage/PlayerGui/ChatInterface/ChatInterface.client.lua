@@ -3,15 +3,34 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local TextService = game:GetService("TextService");
 local UserInputService = game:GetService("UserInputService");
-local ChatService = game:GetService("Chat");
-local StarterGui = game:GetService("StarterGui")
+local StarterGui = game:GetService("StarterGui");
+local TextChatService = game:GetService("TextChatService");
+
+local camera = workspace.CurrentCamera;
+local localPlayer = game.Players.LocalPlayer;
+local playerGui = localPlayer:WaitForChild("PlayerGui");
+
+local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
+local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
+local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local CommandsLibrary = require(game.ReplicatedStorage.Library.CommandsLibrary);
+local CommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
+
+local ChatRoomInterface = require(script.Parent:WaitForChild("ChatRoomInterface"));
+local ChatClient = nil;
+local chatClientModule = localPlayer:FindFirstChild("ChatClient");
+if chatClientModule == nil then
+	chatClientModule = script.Parent.ChatClient:Clone();
+	chatClientModule.Parent = localPlayer;
+end
+ChatClient = require(chatClientModule);
+
+local remoteChatService = modRemotesManager:Get("ChatService");
+local remoteNotifyPlayer = modRemotesManager:Get("NotifyPlayer");
 
 local chatInterface = script.Parent;
 local inputFrame = chatInterface:WaitForChild("InputFrame");
 local inputBox = inputFrame:WaitForChild("inputBar"):WaitForChild("inputBox");
-
-local localPlayer = game.Players.LocalPlayer;
-local playerGui = localPlayer:WaitForChild("PlayerGui");
 
 local mainChatFrame = script.Parent:WaitForChild("ChatFrame");
 local mainChannelsFrame = script.Parent:WaitForChild("ChannelsFrame");
@@ -24,65 +43,68 @@ local chatButton = chatInterface:WaitForChild("ChatButton");
 local channelButton = chatInterface:WaitForChild("ChannelButton");
 local activeChannelLabel = chatInterface:WaitForChild("activeChannelLabel");
 
-local CommandsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("CommandsLibrary"));
-local CommandHandler = require(game.ReplicatedStorage.Library:WaitForChild("CommandHandler"));
-local ChatRoomInterface = require(script.Parent:WaitForChild("ChatRoomInterface"));
-ChatRoomInterface.init();
+ChatClient.init();
+ChatRoomInterface.init(ChatClient);
 
-local shiftKeyDown = false;
-
-local library = game.ReplicatedStorage:WaitForChild("Library", 60);
-local modRemotesManager = require(library:WaitForChild("RemotesManager", 60));
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables", 60));
-local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
-
-local remoteSubmitMessage = modRemotesManager:Get("SubmitMessage");
-local remoteChatService = modRemotesManager:Get("ChatService");
 
 local templateLabel = script:WaitForChild("label");
 
-local camera = workspace.CurrentCamera;
+local shiftKeyDown = false;
 
 delay(1, function() 
 	game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false);
 end)
 
-local bubbleSettings = {
-	-- The amount of time, in seconds, to wait before a bubble fades out.
-	BubbleDuration = 5,
+task.spawn(function()
+	function TextChatService.OnIncomingMessage(txtChatMsg: TextChatMessage)
+		Debugger:Warn(txtChatMsg.TextChannel.Name, "msg", txtChatMsg.TextSource, txtChatMsg.Text);
+		
+		if txtChatMsg.Status == Enum.TextChatMessageStatus.Success then
+			local channelId = txtChatMsg.TextChannel.Name;
 
-	-- The amount of messages to be displayed, before old ones disappear
-	-- immediately when a new message comes in.
-	MaxBubbles = 2,
+			local room = ChatRoomInterface:GetRoom(channelId);
+			if room == nil then
+				Debugger:Warn("Missing chat channel:", channelId); 
+				room = ChatRoomInterface:newRoom(channelId);
+			end;
+			
+			ChatRoomInterface:NewTextChatMessage(room, txtChatMsg);
+		end
+	end
 
-	-- Styling for the bubbles. These settings will change various visual aspects.
-	BackgroundColor3 = Color3.fromRGB(250, 250, 250),
-	TextColor3 = Color3.fromRGB(57, 59, 61),
-	TextSize = 14,
-	Font = Enum.Font.GothamSemibold,
-	Transparency = .1,
-	CornerRadius = UDim.new(0, 6),
-	TailVisible = true,
-	Padding = 8, -- in pixels
-	MaxWidth = 300, --in pixels
+	remoteNotifyPlayer.OnClientEvent:Connect(function(key, messageData)
+		if messageData.Chat ~= true then return end;
 
-	-- Extra space between the head and the billboard (useful if you want to
-	-- leave some space for other character billboard UIs)
-	VerticalStudsOffset = 0,
+		local channelId = "Server";
+		local room = ChatRoomInterface:GetRoom(channelId);
+		if room == nil then
+			Debugger:Warn("Missing chat channel:", channelId); 
+			room = ChatRoomInterface:newRoom(channelId);
+		end;
+		
+		ChatRoomInterface:NewMessage(room, messageData);
+		-- local serverTextChannel: TextChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild("Server");
+		-- serverTextChannel:DisplaySystemMessage(messageData.Message);
+	end)
 
-	-- Space in pixels between two bubbles
-	BubblesSpacing = 6,
+	function remoteChatService.OnClientInvoke(action, packet)
+		if action == "notify" then
+			local channelId = packet.ChannelId;
 
-	-- The distance (from the camera) that bubbles turn into a single bubble
-	-- with ellipses (...) to indicate chatter.
-	MinimizeDistance = 40,
-	-- The max distance (from the camera) that bubbles are shown at
-	MaxDistance = 100,
-}
-pcall(function()
-	ChatService:SetBubbleChatSettings(bubbleSettings);
+			local room = ChatRoomInterface:GetRoom(channelId);
+			if room == nil then
+				Debugger:Warn("Missing chat channel:", channelId); 
+				room = ChatRoomInterface:newRoom(channelId);
+			end;
+			
+			--ChatRoomInterface:NewMessage(room, txtChatMsg);
+		end
+
+		return;
+	end
+
 end)
-ChatService.BubbleChatEnabled = true;
+
 --==
 chatButton.Visible = UserInputService.TouchEnabled;
 
@@ -195,12 +217,12 @@ local function inputBoxChange()
 		if tick()-lastInputTick < 2 then return end;
 		if inputBox.Text:sub(1,1) ~= "/" and inputBox.Text ~= "" then
 			local cacheText = inputBox.Text;
-			local filtered = remoteSubmitMessage:InvokeServer(ChatRoomInterface.Channels[ChatRoomInterface.ActiveChannel].Id, cacheText, true);
-			if inputBox.Text == cacheText then
-				--inputBox.Text = filtered;
-				inputBox.TextColor3 = Color3.fromRGB(255, 124, 124);
-				inputBox:SetAttribute("IsFiltered", true);
-			end
+			-- local filtered = remoteSubmitMessage:InvokeServer(ChatRoomInterface.Channels[ChatRoomInterface.ActiveChannel].Id, cacheText, true);
+			-- if inputBox.Text == cacheText then
+			-- 	--inputBox.Text = filtered;
+			-- 	inputBox.TextColor3 = Color3.fromRGB(255, 124, 124);
+			-- 	inputBox:SetAttribute("IsFiltered", true);
+			-- end
 		end
 	end)
 
@@ -299,7 +321,7 @@ local function toggleChat(force)
 	end
 	
 	if playerGui:FindFirstChild("MainInterface") and playerGui.MainInterface:FindFirstChild("InterfaceModule") then
-		require(playerGui.MainInterface.InterfaceModule):RefreshVisibility();
+		require(playerGui.MainInterface.InterfaceModule :: ModuleScript):RefreshVisibility();
 	end
 	inputBoxChange();
 end
@@ -336,7 +358,7 @@ local ClientCommands = {};
 ClientCommands["ui"] = function(channelId, args)
 	local room = ChatRoomInterface:GetRoom(channelId);
 	
-	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 	
 	local inputName = args[1] or "";
@@ -378,7 +400,7 @@ end
 ClientCommands["report"] = function(channelId, args)
 	local room = ChatRoomInterface:GetRoom(channelId);
 	
-	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 	
 	modInterface:ToggleWindow("ReportMenu");
@@ -387,7 +409,7 @@ end
 ClientCommands["vote"] = function(channelId, args)
 	local room = ChatRoomInterface:GetRoom(channelId);
 	
-	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 	
 	modInterface:ToggleWindow("VoteWindow");
@@ -421,20 +443,20 @@ ClientCommands["w"] = function(channelId, args)
 	end
 	local target = matches[1];
 	local testText = msg:gsub(" ", "")
-	testText = testText:gsub(string.byte(32), "")
+	testText = testText:gsub(string.char(32), "")
 	testText = testText:gsub("[\r\n]", "");
 	
 	if #testText > 0 and #msg < 200 then
-		remoteSubmitMessage:InvokeServer(target.Name, msg);
-		for a=1, 10 do
-			local room = ChatRoomInterface:GetRoom(target.Name);
-			if room then
-				room:SetActive();
-				room:SwitchWindow();
-				break;
-			end
-			task.wait(0.1);
-		end
+		-- remoteSubmitMessage:InvokeServer(target.Name, msg);
+		-- for a=1, 10 do
+		-- 	local room = ChatRoomInterface:GetRoom(target.Name);
+		-- 	if room then
+		-- 		room:SetActive();
+		-- 		room:SwitchWindow();
+		-- 		break;
+		-- 	end
+		-- 	task.wait(0.1);
+		-- end
 	end;
 end
 
@@ -443,7 +465,7 @@ ClientCommands["f"] = function(channelId, args)
 
 	local speakerRoom = ChatRoomInterface:GetRoom(channelId);
 	
-	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 	local factionProfile = modData.Profile.Faction;
 	local channelId = factionProfile.ChannelId;
@@ -457,19 +479,19 @@ ClientCommands["f"] = function(channelId, args)
 	end;
 	
 	local testText = msg:gsub(" ", "")
-	testText = testText:gsub(string.byte(32), "")
+	testText = testText:gsub(string.char(32), "")
 	testText = testText:gsub("[\r\n]", "");
 	if #testText > 0 and #msg < 200 then
-		remoteSubmitMessage:InvokeServer(channelId, msg);
-		for a=1, 10 do
-			local room = ChatRoomInterface:GetRoom(channelId);
-			if room then
-				room:SetActive();
-				room:SwitchWindow();
-				break;
-			end
-			task.wait(0.1);
-		end
+		-- remoteSubmitMessage:InvokeServer(channelId, msg);
+		-- for a=1, 10 do
+		-- 	local room = ChatRoomInterface:GetRoom(channelId);
+		-- 	if room then
+		-- 		room:SetActive();
+		-- 		room:SwitchWindow();
+		-- 		break;
+		-- 	end
+		-- 	task.wait(0.1);
+		-- end
 	end;
 end
 
@@ -518,37 +540,6 @@ ClientCommands["s"] = function(channelId, args)
 	end
 end
 
---ClientCommands["config"] = function(channelId, args)
---	local room = ChatRoomInterface:GetRoom(channelId);
---	local configId = args[1];
---	local value = args[2];
-	
---	local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
-	
---	if configId and (modConfigurations[configId] ~= nil) then
---		if modBranchConfigs.CurrentBranch.Name == "Dev" then
---			modConfigurations.Set(configId, value)
---			ChatRoomInterface:NewMessage(room, {
---				Message = "[Client] Client config (".. configId ..")="..tostring(value)..".";
---				Presist = false;
---				MessageColor=Color3.fromRGB(99, 167, 255);
---			})
---		else
---			ChatRoomInterface:NewMessage(room, {
---				Message = "[Client] This is only available in development branch.";
---				Presist = false;
---				MessageColor=Color3.fromRGB(255, 69, 69);
---			})
---		end
---	else
---		ChatRoomInterface:NewMessage(room, {
---			Message = "[Client] configId (".. configId ..") does not exist.";
---			Presist = false;
---			MessageColor=Color3.fromRGB(255, 69, 69);
---		})
---	end
---end
-
 ClientCommands["console"] = function(channelId, args)
 	local success, developerConsoleVisible = pcall(function() return StarterGui:GetCore("DevConsoleVisible") end)
 	if success then
@@ -593,8 +584,6 @@ inputBox.FocusLost:Connect(function(enterPressed, inputThatCausedFocusLoss)
 		matchIndexTab = nil;
 		oldChatIndex = nil;
 		
-		
-		
 		if shiftKeyDown then
 			--inputBox.Text = inputBox.Text.."\n";
 			toggleChat(true);
@@ -628,20 +617,28 @@ inputBox.FocusLost:Connect(function(enterPressed, inputThatCausedFocusLoss)
 			inputBox.Text = "";
 			
 			if submit == true then
-				local testText = text:gsub(" ", ""):gsub(string.byte(32), ""):gsub("[\r\n]", "");
+				local testText = text:gsub(" ", ""):gsub(string.char(32), ""):gsub("[\r\n]", "");
 				if #testText > 0 and #text < 200 then
 					addToChatCache();
 					
+					-- task.spawn(function()
+					-- 	local channelId = activeChannel.Id;
+
+					-- 	local room = ChatRoomInterface:GetRoom(channelId);
+					-- 	room:SwitchWindow();
+						
+					-- 	remoteSubmitMessage:InvokeServer(channelId, text, nil, {
+					-- 		Dm=room.Dm;
+					-- 	});
+					-- end)
+
 					task.spawn(function()
 						local channelId = activeChannel.Id;
 
-						local room = ChatRoomInterface:GetRoom(channelId);
-						room:SwitchWindow();
-						
-						remoteSubmitMessage:InvokeServer(channelId, text, nil, {
-							Dm=room.Dm;
-						});
+						local textChannel: TextChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild(channelId);
+						textChannel:SendAsync(text);
 					end)
+
 				end;
 			end
 			toggleChat(false);

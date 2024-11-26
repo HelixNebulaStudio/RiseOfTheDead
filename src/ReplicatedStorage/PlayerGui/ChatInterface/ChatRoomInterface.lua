@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local parent = script.Parent;
 
-local ChatRoomInterface = {};
+local ChatRoomInterface = {} :: any;
 ChatRoomInterface.__index = ChatRoomInterface;
 
 ChatRoomInterface.ActiveChannel = 1;
@@ -14,7 +14,7 @@ local localPlayer = game.Players.LocalPlayer;
 
 local TextService = game:GetService("TextService");
 local UserInputService = game:GetService("UserInputService");
-local ChatService = game:GetService("Chat");
+local HttpService = game:GetService("HttpService");
 
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 local modNotificationsLibrary = require(game.ReplicatedStorage.Library.NotificationsLibrary);
@@ -29,15 +29,7 @@ local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter
 
 local remoteChatService = modRemotesManager:Get("ChatService");
 
-local chatClientModule = localPlayer:FindFirstChild("ChatClient");
-if chatClientModule == nil then
-	chatClientModule = script.Parent.ChatClient:Clone();
-	chatClientModule.Parent = localPlayer;
-end
---local chatClientModule = localPlayer:WaitForChild("ChatClient", 5);
-
-local ChatClient = require(chatClientModule);
-ChatClient.init();
+local ChatClient = nil;
 
 local mainChatFrame = parent:WaitForChild("ChatFrame");
 local mainChannelsFrame = parent:WaitForChild("ChannelsFrame");
@@ -206,9 +198,55 @@ function ChatRoomInterface:GetRoom(channelId)
 	end
 end
 
-local reportButtonConn;
+function ChatRoomInterface:NewTextChatMessage(room, txtChatMsg: TextChatMessage)
+	local channelId = room.Id;
+	local messageData = {};
+	messageData.RoomId = channelId;
+
+	local txtSrc: TextSource = txtChatMsg.TextSource;
+
+	messageData.Id = txtChatMsg.MessageId;
+	messageData.Message = txtChatMsg.Text;
+	messageData.MsgTime = tostring(txtChatMsg.Timestamp.UnixTimestampMillis);
+
+	if txtSrc then
+		messageData.Name = txtSrc.Name;
+
+		local senderPlayer = game.Players:FindFirstChild(txtSrc.Name);
+		if senderPlayer then
+			if senderPlayer:GetAttribute("Premium") then
+				messageData.Style = "Premium";
+			elseif senderPlayer:GetAttribute("PlayerLevel") then
+				messageData.Style = `Level{senderPlayer:GetAttribute("PlayerLevel")}`;
+			end
+		end
+	end
+
+	self:NewMessage(room, messageData)
+end
+
 function ChatRoomInterface:NewMessage(room, messageData)
-	messageData.RoomId = room.Id;
+	local channelId = room.Id;
+
+	if ChatClient.ChatCache[channelId] == nil then
+		ChatClient.ChatCache[channelId] = {
+			NewMsgs = 0;
+			Messages = {};
+		};
+	end
+	
+	if messageData.Name then
+		table.insert(ChatClient.ChatCache[channelId].Messages, messageData);
+	end
+
+	if room.Active then
+		ChatClient.ChatCache[channelId].NewMsgs = 0;
+		room.Button.Text = channelId;
+	else
+		ChatClient.ChatCache[channelId].NewMsgs = ChatClient.ChatCache[channelId].NewMsgs +1;
+		room.Button.Text = channelId.." ("..ChatClient.ChatCache[channelId].NewMsgs..")";
+	end
+
 	
 	local function processMessage(messageData)
 		local roomId = messageData.RoomId;
@@ -307,7 +345,7 @@ function ChatRoomInterface:NewMessage(room, messageData)
 					local disableHud = game.Players.LocalPlayer:GetAttribute("DisableHud") == true;
 					if disableHud then return end;
 
-					ChatService:Chat(chatBubblePoint, msgString, Enum.ChatColor.White);
+					--ChatService:Chat(chatBubblePoint, msgString, Enum.ChatColor.White);
 				end)
 			end
 			messageData.Bubble = true;
@@ -328,11 +366,13 @@ function ChatRoomInterface:NewMessage(room, messageData)
 
 	local richMsgString = msgString;
 	
-	local msgAlreadyExist = room.Frame:FindFirstChild(msgTime);
+	local msgId = messageData.Id or HttpService:GenerateGUID(false);
+
+	local msgAlreadyExist = room.Frame:FindFirstChild(msgId);
 	if msgAlreadyExist then return end;
 	
 	local msgFrame = templateMessageFrame:Clone();
-	msgFrame.Name = msgTime;
+	msgFrame.Name = msgId;
 	local msgSize = Vector2.new(0, 16);
 
 	local msgLabel = templateMessageLabel:Clone();
@@ -354,30 +394,15 @@ function ChatRoomInterface:NewMessage(room, messageData)
 			msgTimeLabel.Visible = false;
 			msgTimeLabel.Size = UDim2.new(1, 0, 0, 0);
 		end)
-		msgFrame.InputBegan:Connect(function(inputObject)
-			if not mainInputFrame.Visible then return end;
-			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 and messageData.Name ~= nil then
-				local mousePosition = UserInputService:GetMouseLocation();
+		-- msgFrame.InputBegan:Connect(function(inputObject)
+		-- 	if not mainInputFrame.Visible then return end;
+		-- 	if inputObject.UserInputType == Enum.UserInputType.MouseButton1 and messageData.Name ~= nil then
+		-- 		local mousePosition = UserInputService:GetMouseLocation();
 
-				optionsFrame.Visible = true;
-				optionsFrame.Position = UDim2.new(0, mousePosition.X, 0, mousePosition.Y);
-				if reportButtonConn then reportButtonConn:Disconnect() end;
-				reportButtonConn = optionsFrame.reportButton.MouseButton1Click:Connect(function()
-					if remoteSubmitChatReport then
-						remoteSubmitChatReport:FireServer(messageData.Name);
-					end
-					for a=1, #ChatRoomInterface.Channels do
-						local room = ChatRoomInterface.Channels[a];
-						for _, obj in pairs(room.Frame:GetChildren()) do
-							if obj:FindFirstChild(messageData.Name) then
-								game.Debris:AddItem(obj, 0);
-							end
-						end
-					end
-					optionsFrame.Visible = false;
-				end)
-			end
-		end)
+		-- 		optionsFrame.Visible = true;
+		-- 		optionsFrame.Position = UDim2.new(0, mousePosition.X, 0, mousePosition.Y);
+		-- 	end
+		-- end)
 	end
 	
 	msgTimeLabel.Text = DateTime.fromUnixTimestampMillis(msgTime):ToIsoDate();
@@ -503,10 +528,9 @@ function ChatRoomInterface:newRoom(channelId)
 	return room;
 end
 
-function ChatRoomInterface.init()
-	local library = game.ReplicatedStorage:WaitForChild("Library", 60);
-	local modRemotesManager = require(library:WaitForChild("RemotesManager", 60));
-	
+function ChatRoomInterface.init(chatClient)
+	ChatClient = chatClient;
+
 	table.insert(ChatRoomInterface.Channels, Room.new("Server"));
 	table.insert(ChatRoomInterface.Channels, Room.new("Global"));
 
@@ -569,8 +593,7 @@ function ChatRoomInterface.init()
 		
 		ChatRoomInterface:NewMessage(room, newMsg);
 	end
-	
-	ChatClient.OnNewMessage:Connect(onNewMessage);
+	--ChatClient.OnNewMessage:Connect(onNewMessage);
 	
 	mainInputFrame:GetPropertyChangedSignal("Visible"):Connect(function()
 		ChatRoomInterface:RefreshVisibility();
@@ -581,8 +604,6 @@ function ChatRoomInterface.init()
 	end)
 	
 	ChatRoomInterface.Channels[1]:SetActive();
-	
-	remoteSubmitChatReport = modRemotesManager:Get("SubmitChatReport");
 end
 
 

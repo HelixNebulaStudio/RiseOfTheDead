@@ -1,4 +1,189 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+repeat task.wait() until shared.MasterScriptInit == true;
+--==
+local TextChatService = game:GetService("TextChatService");
+
+local modEngineCore = require(game.ReplicatedStorage.EngineCore);
+local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modNotificationsLibrary = require(game.ReplicatedStorage.Library.NotificationsLibrary);
+local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
+local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modCommandsLibrary = require(game.ReplicatedStorage.Library.CommandsLibrary);
+local modCommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
+
+local remoteChatService = modRemotesManager:Get("ChatService");
+local remoteNotifyPlayer = modRemotesManager:Get("NotifyPlayer");
+
+--==
+local ChatService = {};
+ChatService.__index = ChatService;
+ChatService.Channels = {};
+ChatService.GlobalChannels = {
+	Global = {};
+	LookingFor = {};
+	Trade = {};
+}
+
+if modBranchConfigs.CurrentBranch.Name == "Dev" then
+	ChatService.GlobalChannels.LookingFor = nil;
+	ChatService.GlobalChannels.Trade = nil;
+	ChatService.GlobalChannels.Logs = {};
+	ChatService.GlobalChannels.Bugs = {};
+end
+
+
+local processCache = {};
+function ChatService.OnServerMessage(senderPlayer: Player, txtChatMsg: TextChatMessage, txtSrc: TextSource)
+	local currTick = tick();
+	local msgId = txtChatMsg.MessageId;
+
+	if processCache[msgId] then return end;
+	processCache[msgId] = currTick;
+
+	for mId, msgTick in pairs(processCache) do
+		if (currTick-msgTick) > 300 then
+			processCache[mId] = nil;
+		end
+	end
+
+	--process
+	print("Msg:", senderPlayer, txtChatMsg.Text, "from",txtChatMsg.TextSource.Name, "mId",msgId);
+end
+
+function ChatService.DefaultShouldDeliverCallback(txtChatMsg, txtSrc)
+	print("s callback", txtChatMsg.Text, txtChatMsg.TextSource.Name,"target", txtSrc.Name);
+
+	local senderTxtSrc: TextSource = txtChatMsg.TextSource;
+	local senderPlayer = game.Players:FindFirstChild(senderTxtSrc.Name);
+
+	ChatService.OnServerMessage(senderPlayer, txtChatMsg, txtSrc);
+
+	return true;
+end
+
+function ChatService.Notify(player, message, class, key, packet)
+	local function processNotification(player, message, class, key, packet)
+		if player == nil then return end;
+		
+		local messageData = modNotificationsLibrary[class] and modNotificationsLibrary[class](message, player) or nil;
+		if messageData == nil then return end;
+		
+		local profile = shared.modProfile:Find(player.Name);
+		local notifyMode = modConfigurations.ForceNotifyStyle or (profile and profile.Settings and profile.Settings.Notifications);
+		
+		if notifyMode == 1 or (notifyMode == 2 and messageData.Imp == true) then
+			
+			-- local packet = {
+			-- 	ChannelId = "Server";
+			-- 	Text = messageData.Message;
+			-- 	MsgTime = tostring(DateTime.now().UnixTimestampMillis);
+			-- 	MessageColor = messageData.ExtraData and messageData.ExtraData.ChatColor or nil;
+			-- 	Font = messageData.ExtraData and messageData.ExtraData.Font or nil;
+			-- 	Presist = messageData.Presist;
+			-- 	Packet=packet;
+			-- 	Notify = true;
+			-- };
+
+			messageData.Chat = true;
+			messageData.Style = class;
+			messageData.Notify = true;
+
+			remoteNotifyPlayer:FireClient(player, key, messageData or {Message=message; Packet=packet;});
+		
+		elseif notifyMode == nil then -- default;
+			messageData.Packet = packet;
+			remoteNotifyPlayer:FireClient(player, key, messageData or {Message=message; Packet=packet;});
+			
+		end
+	end
+	if type(player) == "table" then
+		for a, p in pairs(player) do
+			player = game.Players:FindFirstChild(p.Name);
+
+			if player then
+				processNotification(player, message, class, key, packet)
+			end
+
+		end
+
+	elseif typeof(player) == "Instance" and player:IsA("Player") then
+		processNotification(player, message, class, key, packet);
+
+	elseif typeof(player) == "Instance" and player:IsA("Players") then
+		local players = player:GetPlayers();
+		for a, p in pairs(players) do
+			processNotification(p, message, class, key, packet)
+		end
+
+	else
+		warn(script.Name..">>  Unknown player type: ".. typeof(player) ..", "..tostring(player) .." message: ".. tostring(message) .. " " .. tostring(class));
+	end
+end
+
+function ChatService.Init()
+	TextChatService:WaitForChild("BubbleChatConfiguration").Enabled = false;
+
+	local textChannelsFolder = Instance.new("Folder");
+	textChannelsFolder.Name = "TextChannels";
+	textChannelsFolder.Parent = TextChatService;
+	
+	textChannelsFolder.ChildAdded:Connect(function(txtChannel: TextChannel)
+		if not txtChannel:IsA("TextChannel") then return end;
+
+		txtChannel.ShouldDeliverCallback = ChatService.DefaultShouldDeliverCallback;
+	end)
+	
+	local serverTextChannel = Instance.new("TextChannel");
+	serverTextChannel.Name = "Server";
+	serverTextChannel:SetAttribute("Public", true);
+	serverTextChannel.Parent = textChannelsFolder;
+	ChatService.Channels["Server"] = serverTextChannel;
+	
+	for k, _ in pairs(ChatService.GlobalChannels) do
+		local textChannel = Instance.new("TextChannel");
+		textChannel.Name = k;
+		textChannel:SetAttribute("Public", true);
+		textChannel.Parent = textChannelsFolder;
+		ChatService.Channels[k] = textChannel;
+	end
+end
+
+
+function OnPlayerConnect(player: Player)
+	for channelId, textChannel: TextChannel in pairs(ChatService.Channels) do
+		if textChannel:GetAttribute("Public") ~= true then continue end;
+		textChannel:AddUserAsync(player.UserId);
+	end
+end
+
+shared.Notify = ChatService.Notify;
+ChatService.Init();
+modCommandsLibrary.init();
+modEngineCore:ConnectOnPlayerAdded(script, OnPlayerConnect);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if true then return end
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
 repeat task.wait() until shared.MasterScriptInit == true;
 local ChannelConfig = {};
@@ -65,6 +250,8 @@ shared.ChatService = ChatService;
 
 local retrivedCacheMsgs = false;
 --== Script;
+
+
 spawn(function()
 	while wait(60) do
 		ChatService.GlobalMsgRecieved = 20;
@@ -84,9 +271,17 @@ spawn(function()
 	end
 end)
 
-local function OnPlayerConnect(player)
+local function OnPlayerConnect(player: Player)
 	local loadCacheMsgs = false;
 	
+	task.spawn(function()
+		for _, textChannel: TextChannel in pairs(textChannelsFolder:GetChildren()) do
+			if not textChannel:GetAttribute("Public") then continue end;
+
+			textChannel:AddUserAsync(player.UserId);
+		end
+	end)
+
 	local function onCharacterSpawn()
 		if player:FindFirstChild("ChatClient") then return end;
 		ChatService.PlayerCache[player.Name] = {};
