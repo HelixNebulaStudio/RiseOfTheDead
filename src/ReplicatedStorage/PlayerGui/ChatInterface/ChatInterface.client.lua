@@ -104,12 +104,14 @@ task.spawn(function()
 				RoomId=channelId;
 				Message=txtMessage;
 				Style=messageData.Style;
+				Presist=messageData.Presist;
 			});
 
 		end
 		
 	end)
 	
+	remoteChatServiceEvent:FireServer("chatready");
 end)
 
 --==

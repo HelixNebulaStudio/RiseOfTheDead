@@ -300,17 +300,52 @@ function ChatService.Init()
 	end)
 
 	remoteChatServiceEvent.OnServerEvent:Connect(function(player, action, ...)
-		if action == "syncfactionchat" then
+		if action == "chatready" then
 			local profile = shared.modProfile:Get(player);
 			
 			local factionProfile = profile and profile.Faction;
 			local factionTag = factionProfile and factionProfile.Tag or nil;
 
-			Debugger:Log("Sync faction chat ", player, factionTag);
-			if factionTag then
-				local cacheMsgJson = ChatService.ChatHistory:Get("["..factionTag.."]");
+			local textChannel = factionTag and ChatService.Channels[`[{factionTag}]`];
+			if textChannel then
+				remoteChatServiceEvent:FireClient(player, "globalchat", {
+					Name="Game";
+					ChannelId=textChannel.Name;
+					Text="Loading messages...";
+					Presist=false;
+				});
+			end
+		end
+
+		if modBranchConfigs.IsWorld("MainMenu") then
+			Debugger:Log("Disabled sync messages in main menu.");
+			return;
+		end
+
+		if action == "syncchat" then
+			local profile = shared.modProfile:Get(player);
+			
+			local factionProfile = profile and profile.Faction;
+			local factionTag = factionProfile and factionProfile.Tag or nil;
+
+			local channelId = ...;
+
+			local txtChannel = ChatService.Channels[channelId];
+			if txtChannel == nil then return end;
+
+			local txtChannelFactionTag = txtChannel:GetAttribute("Faction");
+			Debugger:StudioWarn("syncchat channelId",channelId,"txtChannelFactionTag", txtChannelFactionTag);
+
+			if txtChannelFactionTag then
+				if txtChannelFactionTag ~= factionTag then
+					return;
+				end
+			end
+
+			if txtChannelFactionTag then
+				local cacheMsgJson = ChatService.ChatHistory:Get(channelId);
 				local cacheMsg = cacheMsgJson and HttpService:JSONDecode(cacheMsgJson) or {};
-	
+
 				if cacheMsg then
 					if profile.SyncFacChatInit == nil then
 						profile.SyncFacChatInit = true;
@@ -324,34 +359,58 @@ function ChatService.Init()
 						end
 					end
 				end
-			end
 
-		elseif action == "syncchat" then
-			if modBranchConfigs.IsWorld("MainMenu") then
-				Debugger:Log("Disabled sync messages in main menu.");
-				return;
-			end
-			local channelId = ...;
-
-			if ChatService.MsgCache[channelId] == nil then
-				local cacheMsgJson = ChatService.ChatHistory:Get(channelId);
-				local cacheMsg = cacheMsgJson and HttpService:JSONDecode(cacheMsgJson) or {};
-
-				for a=1, #cacheMsg do
-					ChatService.CacheMsg(cacheMsg[a]);
+			else
+				if ChatService.MsgCache[channelId] == nil then
+					local cacheMsgJson = ChatService.ChatHistory:Get(channelId);
+					local cacheMsg = cacheMsgJson and HttpService:JSONDecode(cacheMsgJson) or {};
+	
+					for a=1, #cacheMsg do
+						ChatService.CacheMsg(cacheMsg[a]);
+					end
 				end
-			end
-			
-			local msgList = ChatService.MsgCache[channelId];
-			if msgList == nil then return end;
-			
-			for a=1, #msgList do
-				local data = msgList[a];
-				Debugger:StudioLog("globalchat",channelId, a, data);
-				if data.Timestamp == nil then continue end;
+				
+				local msgList = ChatService.MsgCache[channelId];
+				if msgList == nil then return end;
+				
+				for a=1, #msgList do
+					local data = msgList[a];
+					Debugger:StudioLog("globalchat",factionTag, a, data);
+					if data.Timestamp == nil then continue end;
+	
+					remoteChatServiceEvent:FireClient(player, "globalchat", data);
+				end
 
-				remoteChatServiceEvent:FireClient(player, "globalchat", data);
 			end
+
+
+			
+		-- elseif action == "syncfactionchat" then
+		-- 	local profile = shared.modProfile:Get(player);
+			
+		-- 	local factionProfile = profile and profile.Faction;
+		-- 	local factionTag = factionProfile and factionProfile.Tag or nil;
+
+		-- 	Debugger:Log("Sync faction chat ", player, factionTag);
+		-- 	if factionTag then
+		-- 		local cacheMsgJson = ChatService.ChatHistory:Get("["..factionTag.."]");
+		-- 		local cacheMsg = cacheMsgJson and HttpService:JSONDecode(cacheMsgJson) or {};
+	
+		-- 		if cacheMsg then
+		-- 			if profile.SyncFacChatInit == nil then
+		-- 				profile.SyncFacChatInit = true;
+						
+		-- 				for a=1, #cacheMsg do
+		-- 					local data = cacheMsg[a];
+		-- 					Debugger:StudioLog("factionchat",factionTag, a, data);
+		-- 					if data.Timestamp == nil then continue end;
+			
+		-- 					remoteChatServiceEvent:FireClient(player, "globalchat", data);
+		-- 				end
+		-- 			end
+		-- 		end
+		-- 	end
+
 		end
 	end)
 end
@@ -370,28 +429,18 @@ function OnPlayerConnect(player: Player)
 
 	if factionTag == nil then return end;
 
-	local textChannel = ChatService.Channels[factionTag];
+	local channelId = `[{factionTag}]`;
+	local textChannel = ChatService.Channels[channelId];
 	if textChannel == nil then
 		textChannel = Instance.new("TextChannel");
-		textChannel.Name = `[{factionTag}]`;
+		textChannel.Name = channelId;
 		textChannel:SetAttribute("Global", true);
 		textChannel:SetAttribute("Faction", factionTag);
 		textChannel.Parent = textChannelsFolder;
-		ChatService.Channels[textChannel.Name] = textChannel;
+		ChatService.Channels[channelId] = textChannel;
 	end
 
 	textChannel:AddUserAsync(player.UserId);
-
-	while Players:IsAncestorOf(player) and player.Character == nil do task.wait(); end
-	task.wait(1);
-	Debugger:StudioLog("Update faction chat");
-
-	remoteChatServiceEvent:FireClient(player, "globalchat", {
-		Name="Game";
-		ChannelId=textChannel.Name;
-		Text="";
-		Presist=false;
-	});
 end
 
 Players.PlayerRemoving:Connect(function(player)

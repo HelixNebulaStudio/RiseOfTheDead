@@ -12,7 +12,7 @@ ChatRoomInterface.SwitchChannelFunc = {};
 
 local localPlayer = game.Players.LocalPlayer;
 
-local TextService = game:GetService("TextService");
+local TextChatService = game:GetService("TextChatService");
 local UserInputService = game:GetService("UserInputService");
 local HttpService = game:GetService("HttpService");
 
@@ -403,15 +403,7 @@ function ChatRoomInterface:NewMessage(room, messageData)
 			msgTimeLabel.Visible = false;
 			msgTimeLabel.Size = UDim2.new(1, 0, 0, 0);
 		end)
-		-- msgFrame.InputBegan:Connect(function(inputObject)
-		-- 	if not mainInputFrame.Visible then return end;
-		-- 	if inputObject.UserInputType == Enum.UserInputType.MouseButton1 and messageData.Name ~= nil then
-		-- 		local mousePosition = UserInputService:GetMouseLocation();
 
-		-- 		optionsFrame.Visible = true;
-		-- 		optionsFrame.Position = UDim2.new(0, mousePosition.X, 0, mousePosition.Y);
-		-- 	end
-		-- end)
 	end
 	
 	msgTimeLabel.Text = DateTime.fromUnixTimestampMillis(msgTime):ToIsoDate();
