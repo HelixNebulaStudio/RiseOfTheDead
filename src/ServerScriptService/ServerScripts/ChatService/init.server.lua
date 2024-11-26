@@ -1,8 +1,12 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 repeat task.wait() until shared.MasterScriptInit == true;
 --==
+local RunService = game:GetService("RunService");
+local TextService = game:GetService("TextService");
 local TextChatService = game:GetService("TextChatService");
 local MessagingService = game:GetService("MessagingService");
+local HttpService = game:GetService("HttpService");
+local Players = game:GetService("Players");
 
 local modEngineCore = require(game.ReplicatedStorage.EngineCore);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
@@ -13,11 +17,14 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modCommandsLibrary = require(game.ReplicatedStorage.Library.CommandsLibrary);
 local modCommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
 
+local modDatabaseService = require(game.ServerScriptService.ServerLibrary.DatabaseService);
 local modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
+local modFactions = require(game.ServerScriptService.ServerLibrary.Factions);
 
 local remoteChatServiceFunction = modRemotesManager:Get("ChatServiceFunction");
 local remoteChatServiceEvent = modRemotesManager:Get("ChatServiceEvent");
 
+local textChannelsFolder;
 --==
 local ChatService = {};
 ChatService.__index = ChatService;
@@ -26,7 +33,12 @@ ChatService.GlobalChannels = {
 	Global = {};
 	LookingFor = {};
 	Trade = {};
-}
+};
+ChatService.MsgCache = {};
+
+ChatService.ChatHistory = modDatabaseService:GetDatabase("ChatHistory");
+ChatService.ChatHistory.ExpireTime = 60;
+ChatService.ChatHistory.PublishTimer = 30;
 
 if modBranchConfigs.CurrentBranch.Name == "Dev" then
 	ChatService.GlobalChannels.LookingFor = nil;
@@ -35,20 +47,51 @@ if modBranchConfigs.CurrentBranch.Name == "Dev" then
 	ChatService.GlobalChannels.Bugs = {};
 end
 
-function ChatService.SendGlobalMessage(speakerName, channelId, text, extra)
+function ChatService.CacheMsg(data)
+	if data == nil or data.ChannelId == nil then return end;
+	local channelId = data.ChannelId;
+	
+	if ChatService.GlobalChannels[channelId] == nil then return end
+	
+	if ChatService.MsgCache[channelId] == nil then 
+		ChatService.MsgCache[channelId] = {};
+	end
+	if #ChatService.MsgCache[channelId] > 16 then
+		table.remove(ChatService.MsgCache[channelId], 1);
+	end
+	
+	table.insert(ChatService.MsgCache[channelId], data);
+end
+
+ChatService.ChatHistory:OnUpdateRequest("addmsg", function(requestPacket)
+	local oldHistory = requestPacket.RawData;
+	local data = requestPacket.Values;
+	
+	local cacheMsgs = oldHistory and HttpService:JSONDecode(oldHistory) or {};
+
+	if #cacheMsgs > 16 then
+		table.remove(cacheMsgs, 1);
+	end
+	table.insert(cacheMsgs, data);
+
+	return HttpService:JSONEncode(cacheMsgs);
+end)
+
+function ChatService.GlobalCacheMsg(data)
+	if data == nil or data.ChannelId == nil then Debugger:Warn("Failed to cache global msg:", data); return end;
+
+	ChatService.ChatHistory:UpdateRequest(data.ChannelId, "addmsg", data);
+end
+
+function ChatService.SendGlobalMessage(messagePacket)
 	if modServerManager.ShadowBanned then return end;
 	
-	local data = {
-		ChannelId = channelId;
-		SpeakerName = speakerName;
-		Text = text:sub(1, 200);
-	};
-	
-	data.Extra = data.Extra or {};
-	data.Extra.MsgTime = tostring(DateTime.now().UnixTimestampMillis);
-	
+	messagePacket.Text = messagePacket.Text:sub(1, 200);
+	messagePacket.Timestamp = tostring(DateTime.now().UnixTimestampMillis);
+
 	task.spawn(function()
-		MessagingService:PublishAsync("ChatService", data);
+		MessagingService:PublishAsync("ChatService", messagePacket);
+		ChatService.GlobalCacheMsg(messagePacket);
 	end)
 end
 
@@ -70,6 +113,11 @@ function ChatService.OnServerMessage(senderPlayer: Player, txtChatMsg: TextChatM
 	local txtChannel = txtChatMsg.TextChannel;
 	local txtMessage = txtChatMsg.Text;
 
+	if shared.modProfile.IsBeingRecon(senderPlayer) then
+		local modDiscordWebhook = require(game.ServerScriptService.ServerLibrary.DiscordWebhook);
+		modDiscordWebhook.PostText(modDiscordWebhook.Hooks.ChatLogs, `{senderPlayer.Name}\`{senderPlayer.UserId}\`: [{txtChannel.Name}] {txtMessage}`);
+	end
+
 	if txtMessage:sub(1,1) == "/" then
 		local cmd, _args = modCommandHandler.ProcessMessage(txtMessage);
 		if cmd then
@@ -79,12 +127,14 @@ function ChatService.OnServerMessage(senderPlayer: Player, txtChatMsg: TextChatM
 				shared.Notify(senderPlayer, `Unknown Command: {cmd}`, `Negative`);
 			end
 		end
+		return;
 	end
 
-	if shared.modProfile.IsBeingRecon(senderPlayer) then
-		local modDiscordWebhook = require(game.ServerScriptService.ServerLibrary.DiscordWebhook);
-		modDiscordWebhook.PostText(modDiscordWebhook.Hooks.ChatLogs, `{senderPlayer.Name}\`{senderPlayer.UserId}\`: [{txtChannel.Name}] {txtMessage}`);
-	end
+	local senderCanChat = false;
+	pcall(function()
+		senderCanChat = TextChatService:CanUserChatAsync(senderPlayer.UserId);
+	end)
+	if not senderCanChat then return end;
 
 	local profile = shared.modProfile:Find(senderPlayer.Name);
 	local factionProfile = profile.Faction;
@@ -94,10 +144,48 @@ function ChatService.OnServerMessage(senderPlayer: Player, txtChatMsg: TextChatM
 	local textChannel = ChatService.Channels[txtChannel.Name];
 	if textChannel:GetAttribute("Global") then
 		Debugger:Warn("Submit global msg", txtMessage);
+		
+		local filteredString = "";
+		pcall(function()
+			filteredString = game.Chat:FilterStringForBroadcast(txtMessage, senderPlayer);
+		end)
+		if #filteredString > 0 then
+			local messageData = {
+				SpeakerName = senderPlayer.Name;
+				ChannelId = textChannel.Name;
+				Text = filteredString;
+			};
+			if senderPlayer:GetAttribute("Premium") then
+				messageData.Style = "Premium";
+			elseif senderPlayer:GetAttribute("PlayerLevel") then
+				messageData.Style = `Level{senderPlayer:GetAttribute("PlayerLevel")}`;
+			end
+
+			local channelFactionTag = textChannel:GetAttribute("Faction")
+			if channelFactionTag then
+				local roleKey = factionRole or "Member";
+				messageData.Style = roleKey;
+			
+				local factionObject = modFactions.Get(factionTag);
+				if factionObject == nil or factionObject:HasPermission(tostring(senderPlayer.UserId), "CanChat") == false then
+					shared.Notify(senderPlayer, `You do not have permission to chat here.`, `Negative`, nil, {Persist=false;});
+					return;
+				end
+			end
+
+			ChatService.SendGlobalMessage(messageData);
+		end
 	end
+
+	ChatService.CacheMsg({
+		SpeakerName=senderPlayer.Name;
+		ChannelId=textChannel.Name;
+		Text=txtMessage;
+	});
 end
 
-function ChatService.DefaultShouldDeliverCallback(txtChatMsg, txtSrc)
+function ChatService.DefaultShouldDeliverCallback(txtChatMsg: TextChatMessage, txtSrc: TextSource)
+	local txtChannel = txtChatMsg.TextChannel;
 	local senderTxtSrc: TextSource = txtChatMsg.TextSource;
 	local senderPlayer = game.Players:FindFirstChild(senderTxtSrc.Name);
 
@@ -105,6 +193,10 @@ function ChatService.DefaultShouldDeliverCallback(txtChatMsg, txtSrc)
 
 	local txtMessage = txtChatMsg.Text;
 	if txtMessage:sub(1,1) == "/" then
+		return false;
+	end
+
+	if txtChannel:GetAttribute("Global") == true then
 		return false;
 	end
 
@@ -165,7 +257,7 @@ end
 function ChatService.Init()
 	TextChatService:WaitForChild("BubbleChatConfiguration").Enabled = false;
 
-	local textChannelsFolder = Instance.new("Folder");
+	textChannelsFolder = Instance.new("Folder");
 	textChannelsFolder.Name = "TextChannels";
 	textChannelsFolder.Parent = TextChatService;
 	
@@ -193,7 +285,6 @@ function ChatService.Init()
 	MessagingService:SubscribeAsync("ChatService", function(payload)
 		local data = payload.Data;
 		
-		local speakerName = data.SpeakerName;
 		local channelId = data.ChannelId;
 		local txtMessage = data.Text;
 
@@ -202,11 +293,66 @@ function ChatService.Init()
 		local textChannel: TextChannel = ChatService.Channels[channelId];
 		if not textChannel:GetAttribute("Global") then return end;
 
-		Debugger:Warn("Global msg", speakerName, channelId, txtMessage);
+		ChatService.CacheMsg(data);
+		Debugger:Warn("Global msg", data);
+
+		remoteChatServiceEvent:FireAllClients("globalchat", data);
 	end)
 
-	remoteChatServiceEvent.OnServerEvent:Connect(function(player, action)
+	remoteChatServiceEvent.OnServerEvent:Connect(function(player, action, ...)
+		if action == "syncfactionchat" then
+			local profile = shared.modProfile:Get(player);
+			
+			local factionProfile = profile and profile.Faction;
+			local factionTag = factionProfile and factionProfile.Tag or nil;
+
+			Debugger:Log("Sync faction chat ", player, factionTag);
+			if factionTag then
+				local cacheMsgJson = ChatService.ChatHistory:Get("["..factionTag.."]");
+				local cacheMsg = cacheMsgJson and HttpService:JSONDecode(cacheMsgJson) or {};
 	
+				if cacheMsg then
+					if profile.SyncFacChatInit == nil then
+						profile.SyncFacChatInit = true;
+						
+						for a=1, #cacheMsg do
+							local data = cacheMsg[a];
+							Debugger:StudioLog("factionchat",factionTag, a, data);
+							if data.Timestamp == nil then continue end;
+			
+							remoteChatServiceEvent:FireClient(player, "globalchat", data);
+						end
+					end
+				end
+			end
+
+		elseif action == "syncchat" then
+			if modBranchConfigs.IsWorld("MainMenu") then
+				Debugger:Log("Disabled sync messages in main menu.");
+				return;
+			end
+			local channelId = ...;
+
+			if ChatService.MsgCache[channelId] == nil then
+				local cacheMsgJson = ChatService.ChatHistory:Get(channelId);
+				local cacheMsg = cacheMsgJson and HttpService:JSONDecode(cacheMsgJson) or {};
+
+				for a=1, #cacheMsg do
+					ChatService.CacheMsg(cacheMsg[a]);
+				end
+			end
+			
+			local msgList = ChatService.MsgCache[channelId];
+			if msgList == nil then return end;
+			
+			for a=1, #msgList do
+				local data = msgList[a];
+				Debugger:StudioLog("globalchat",channelId, a, data);
+				if data.Timestamp == nil then continue end;
+
+				remoteChatServiceEvent:FireClient(player, "globalchat", data);
+			end
+		end
 	end)
 end
 
@@ -215,7 +361,58 @@ function OnPlayerConnect(player: Player)
 		if textChannel:GetAttribute("Public") ~= true then continue end;
 		textChannel:AddUserAsync(player.UserId);
 	end
+	
+	if modBranchConfigs.GetWorld() == "MainMenu" then return end;
+	local profile = shared.modProfile:WaitForProfile(player);
+			
+	local factionProfile = profile and profile.Faction;
+	local factionTag = factionProfile and factionProfile.Tag or nil;
+
+	if factionTag == nil then return end;
+
+	local textChannel = ChatService.Channels[factionTag];
+	if textChannel == nil then
+		textChannel = Instance.new("TextChannel");
+		textChannel.Name = `[{factionTag}]`;
+		textChannel:SetAttribute("Global", true);
+		textChannel:SetAttribute("Faction", factionTag);
+		textChannel.Parent = textChannelsFolder;
+		ChatService.Channels[textChannel.Name] = textChannel;
+	end
+
+	textChannel:AddUserAsync(player.UserId);
+
+	while Players:IsAncestorOf(player) and player.Character == nil do task.wait(); end
+	task.wait(1);
+	Debugger:StudioLog("Update faction chat");
+
+	remoteChatServiceEvent:FireClient(player, "globalchat", {
+		Name="Game";
+		ChannelId=textChannel.Name;
+		Text="";
+		Presist=false;
+	});
 end
+
+Players.PlayerRemoving:Connect(function(player)
+	task.wait(1);
+	for channelId, textChannel in pairs(ChatService.Channels) do
+		if textChannel:GetAttribute("Faction") ~= true then continue end;
+
+		local exist = false;
+		for _, txtSrc in pairs(textChannel:GetChildren()) do
+			if Players:FindFirstChild(txtSrc.Name) then
+				exist = true;
+				break;
+			end
+		end
+
+		if not exist then
+			textChannel:Destroy();
+			ChatService.Channels[channelId] = nil;
+		end
+	end
+end)
 
 shared.Notify = ChatService.Notify;
 shared.ChatService = ChatService;
@@ -226,6 +423,32 @@ modEngineCore:ConnectOnPlayerAdded(script, OnPlayerConnect);
 task.spawn(function()
 	Debugger.AwaitShared("modCommandsLibrary");
 
+	shared.modCommandsLibrary:HookChatCommand("textchatservice", {
+		Permission = shared.modCommandsLibrary.PermissionLevel.Admin;
+		Description = "textchatservice.";
+	
+		RequiredArgs = 1;
+		UsageInfo = "/textchatservice action";
+		Function = function(speaker, args)
+			
+			local action = args[1];
+			local userId = speaker.UserId;
+
+			if action == "canchat" then
+				Debugger:Warn("speaker can chat =", TextChatService:CanUserChatAsync(userId));
+
+			elseif action == "notifycountdown" then
+				for a=10, 1, -1 do
+					shared.Notify(speaker, `Countdown: {a}`, `Inform`, `countdown`);
+					task.wait(1);
+				end
+				shared.Notify(speaker, `Countdown: boom`, `Inform`, `countdown`);
+			end
+			
+			return true;
+		end;
+	});
+
 	shared.modCommandsLibrary:HookChatCommand("globalannounce", {
 		Permission = shared.modCommandsLibrary.PermissionLevel.Admin;
 		Description = "Global broadcast message.";
@@ -235,7 +458,12 @@ task.spawn(function()
 		Function = function(speaker, args)
 			local msg = table.concat(args, " ");
 			
-			ChatService.SendGlobalMessage("Game", "Server", msg, {Style="Announce"});
+			ChatService.SendGlobalMessage{
+				SpeakerName="Game";
+				ChannelId="Server";
+				Text=msg;
+				Style="Announce"
+			};
 			return true;
 		end;
 	});
@@ -695,7 +923,7 @@ function ChatService:ProccessChat(player, channelId, text, extra)
 		Text=text;
 		Extra=extra;
 		ChannelId=channelId;
-	})
+	});
 
 	for _, oPlayer in pairs(game.Players:GetPlayers()) do
 		if not ChatService:IsMuted(oPlayer, player.Name) then

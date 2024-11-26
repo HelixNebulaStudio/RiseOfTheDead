@@ -4927,6 +4927,16 @@ Commands["console"] = {
 	end;
 };
 
+Commands["chatversion"] = {
+	Permission = PermissionLevel.All;
+	Description = "View Roblox chat system version.";
+	
+	UsageInfo = "/chatversion";
+	ClientFunction = function(speaker, args)
+		shared.Notify(speaker, `TextChatService.ChatVersion = {TextChatService.ChatVersion}`, "Inform");
+	end;
+};
+
 --== Methods
 function CommandsLibrary:NewTextChatCommand(cmdName, cmdLib)
 	local textChatCmd = chatCommandsFolder:FindFirstChild(cmdName);
@@ -4939,6 +4949,7 @@ function CommandsLibrary:NewTextChatCommand(cmdName, cmdLib)
 		textChatCmd.Parent = chatCommandsFolder;
 
 	else
+		if textChatCmd == nil then return end;
 		if textChatCmd:GetAttribute("ClientConnected") then return end;
 		textChatCmd:SetAttribute("ClientConnected", true);
 
@@ -4989,7 +5000,8 @@ end
 
 function CommandsLibrary:HookChatCommand(cmdName, cmdLib)
 	if Commands[cmdName] then
-		error("Attempt to hook already existing command ("..cmdName..").");
+		Debugger:StudioWarn("Attempt to hook already existing command ("..cmdName..").");
+		return;
 	end
 	
 	Commands[cmdName] = cmdLib;

@@ -69,18 +69,43 @@ task.spawn(function()
 		end
 	end
 
-	remoteChatServiceEvent.OnClientEvent:Connect(function(key, action, messageData)
+	remoteChatServiceEvent.OnClientEvent:Connect(function(action, ...)
 		if action == "notify" then
+			local key, messageData = ...;
 			if messageData.Chat ~= true then return end;
 
-			local channelId = "Server";
+			local channelId = ChatClient.ActiveChannelId;
 			local room = ChatRoomInterface:GetRoom(channelId);
 			if room == nil then
 				Debugger:Warn("Missing chat channel:", channelId); 
 				room = ChatRoomInterface:newRoom(channelId);
 			end;
 			
+			messageData.Id = key;
 			ChatRoomInterface:NewMessage(room, messageData);
+
+		elseif action == "globalchat" then
+			local messageData = ...;
+
+			local speakerName = messageData.SpeakerName;
+			local channelId = messageData.ChannelId;
+			local txtMessage = messageData.Text;
+
+			Debugger:Warn("GlobalChat", speakerName, channelId, txtMessage);
+
+			local room = ChatRoomInterface:GetRoom(channelId);
+			if room == nil then
+				Debugger:Warn("Missing chat channel:", channelId); 
+				room = ChatRoomInterface:newRoom(channelId);
+			end;
+
+			ChatRoomInterface:NewMessage(room, {
+				Name=speakerName;
+				RoomId=channelId;
+				Message=txtMessage;
+				Style=messageData.Style;
+			});
+
 		end
 		
 	end)

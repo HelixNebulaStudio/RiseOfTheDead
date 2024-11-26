@@ -327,7 +327,7 @@ function ChatRoomInterface:NewMessage(room, messageData)
 
 	if nameString == "Game" then nameString = nil end;
 	
-	messageData.MsgTime = messageData.MsgTime or DateTime.now().UnixTimestampMillis;
+	messageData.MsgTime = messageData.MsgTime or tostring(DateTime.now().UnixTimestampMillis);
 	
 	local msgTime = tonumber(messageData.MsgTime);
 	local msgTimelapsed = msgTime-initTime;
@@ -367,13 +367,23 @@ function ChatRoomInterface:NewMessage(room, messageData)
 	
 	local msgId = messageData.Id or HttpService:GenerateGUID(false);
 
-	local msgAlreadyExist = room.Frame:FindFirstChild(msgId);
-	if msgAlreadyExist then return end;
-	
-	local msgFrame = templateMessageFrame:Clone();
-	msgFrame.Name = msgId;
-	local msgSize = Vector2.new(0, 16);
+	local msgFrame = room.Frame:FindFirstChild(msgId);
+	if msgFrame then
+		local msgLabel = msgFrame:FindFirstChild("messageLabel");
+		if msgLabel then
+			local msgTimeLabel = msgLabel:WaitForChild("msgTimeLabel");
+			msgTimeLabel.Text = DateTime.fromUnixTimestampMillis(msgTime):ToIsoDate();
+		end
+		msgLabel.Text = tostring(msgString);
+		msgFrame:SetAttribute("LastUpdate", tick());
 
+		return;
+	end;
+	
+	msgFrame = templateMessageFrame:Clone();
+	msgFrame.Name = msgId;
+	msgFrame:SetAttribute("LastUpdate", tick());
+	
 	local msgLabel = templateMessageLabel:Clone();
 	local msgTimeLabel = msgLabel:WaitForChild("msgTimeLabel");
 
@@ -501,8 +511,12 @@ function ChatRoomInterface:NewMessage(room, messageData)
 	if packet.SndId then
 		modAudio.Play(packet.SndId, room.Frame);
 	end
-	
-	task.delay(10, function()
+
+	task.spawn(function()
+		while (tick() - msgFrame:GetAttribute("LastUpdate")) < 10 do
+			task.wait(1);
+		end
+
 		if room.Frame.Parent ~= mainChatFrame then return end
 		if mainInputFrame.Visible == false then
 			msgFrame.Visible = false;
@@ -512,6 +526,7 @@ function ChatRoomInterface:NewMessage(room, messageData)
 			msgFrame:Destroy();
 		end
 	end)
+
 end
 
 function ChatRoomInterface:RefreshVisibility()

@@ -20,7 +20,7 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local branchColor = modBranchConfigs.BranchColor;
 
-local remoteNotifyPlayer = modRemotesManager:Get("NotifyPlayer");
+local remoteChatServiceEvent = modRemotesManager:Get("ChatServiceEvent");
 
 local notificationDuration = 10;
 local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut);
@@ -116,7 +116,11 @@ function Interface.init(modInterface)
 		Interface.UpdatePos();
 	end)
 	
-	Interface.Garbage:Tag(remoteNotifyPlayer.OnClientEvent:Connect(Interface.Notify));
+	Interface.Garbage:Tag(remoteChatServiceEvent.OnClientEvent:Connect(function(action, ...)
+		if action == "notify" then
+			Interface.Notify(...);
+		end
+	end));
 
 	return Interface;
 end;
