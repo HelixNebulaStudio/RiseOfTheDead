@@ -50,7 +50,7 @@ local modGuiObjectPlus = require(game.ReplicatedStorage.Library.UI.GuiObjectPlus
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remoteFactionService = modRemotesManager:Get("FactionService");
-local remoteChatService = modRemotesManager:Get("ChatService");
+local remoteChatServiceEvent = modRemotesManager:Get("ChatServiceEvent");
 local remoteLeaderboardService = modRemotesManager:Get("LeaderboardService");
 
 local windowFrameTemplate = script:WaitForChild("FactionsMenu");
@@ -284,9 +284,7 @@ function Interface.init(modInterface)
 				
 				if requestedFactionChat == false then
 					requestedFactionChat = true;
-					task.spawn(function() 
-						remoteChatService:InvokeServer("syncfactionchat");
-					end)
+					remoteChatServiceEvent:FireServer("syncfactionchat");
 				end
 			end
 

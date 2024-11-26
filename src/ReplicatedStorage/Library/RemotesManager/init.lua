@@ -641,10 +641,8 @@ else
 	end
 	
 	--== ChatService
-	RemotesManager:NewFunctionRemote("ChatService", 0.5);
-	RemotesManager:NewEventRemote("NewClientMessage");
-	RemotesManager:NewFunctionRemote("SubmitMessage", 1);
-	RemotesManager:NewEventRemote("SubmitChatReport");
+	RemotesManager:NewFunctionRemote("ChatServiceFunction", 0.5);
+	RemotesManager:NewEventRemote("ChatServiceEvent");
 
 	--== LeaderboardService
 	RemotesManager:NewEventRemote("LeaderboardService");

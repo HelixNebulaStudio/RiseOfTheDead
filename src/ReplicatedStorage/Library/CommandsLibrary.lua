@@ -3895,20 +3895,6 @@ Commands["isdevbranch"] = {
 	end;
 };
 
-Commands["globalannounce"] = {
-	Permission = PermissionLevel.Admin;
-	Description = "Global broadcast message.";
-
-	RequiredArgs = 1;
-	UsageInfo = "/globalannounce msg";
-	Function = function(speaker, args)
-		local msg = table.concat(args, " ");
-		
-		shared.ChatService:ProccessGlobalChat("Game", "Server", msg, {Style="Announce"})
-		return true;
-	end;
-};
-
 Commands["poster"] = {
 	Permission = PermissionLevel.Admin;
 	Description = "Spawn a poster.";
@@ -4958,9 +4944,10 @@ function CommandsLibrary:NewTextChatCommand(cmdName, cmdLib)
 
 	end
 
-	textChatCmd.Triggered:Connect(function(txtSrc: TextSource, message)
-		if RunService:IsServer() and cmdLib.Function == nil then return end;
+	if RunService:IsServer() and cmdLib.Function == nil then return end;
+	if RunService:IsClient() and cmdLib.ClientFunction == nil then return end;
 
+	textChatCmd.Triggered:Connect(function(txtSrc: TextSource, message)
 		local cmd, args = modCommandHandler.ProcessMessage(message);
 		if cmd == nil then return true end;
 		
@@ -5010,6 +4997,13 @@ function CommandsLibrary:HookChatCommand(cmdName, cmdLib)
 		cmdLib.UsageInfo = "/"..cmdName;
 	end
 	
+	if RunService:IsClient() then
+		local textChatCmd = chatCommandsFolder:FindFirstChild(cmdName) or Instance.new("TextChatCommand");
+		textChatCmd.Name = cmdName;
+		textChatCmd.PrimaryAlias = `/{cmdName}`;
+		textChatCmd.Parent = chatCommandsFolder;
+	end
+
 	local textChatCmd = CommandsLibrary:NewTextChatCommand(cmdName, cmdLib) :: TextChatCommand;
 	
 	if RunService:IsClient() then return end;

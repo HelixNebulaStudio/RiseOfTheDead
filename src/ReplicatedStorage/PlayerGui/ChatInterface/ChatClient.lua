@@ -18,22 +18,6 @@ ChatClient.ChatCache["Server"] = {
 function ChatClient.init()
 	if ChatClient.Inited then return end;
 	ChatClient.Inited = true;
-	
-	EventSignal = require(game.ReplicatedStorage.Library.EventSignal);
-	RemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-	
-	ChatClient.OnNewMessage = EventSignal.new("OnNewMessage");
-	
-	local remoteNewClientMessage = RemotesManager:Get("NewClientMessage");
-	remoteNewClientMessage.OnClientEvent:Connect(function(channelId, messageData)
-		if ChatClient.MsgReady == nil then
-			ChatClient.MsgReady = true;
-			remoteNewClientMessage:FireServer();
-		end
-		
-		ChatClient:NewMessage(channelId, messageData);
-	end)
-	remoteNewClientMessage:FireServer();
 end
 
 function ChatClient:NewMessage(channelId, messageData)

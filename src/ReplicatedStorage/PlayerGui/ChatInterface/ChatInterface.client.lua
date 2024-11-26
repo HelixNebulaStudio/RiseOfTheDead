@@ -3,7 +3,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local TextService = game:GetService("TextService");
 local UserInputService = game:GetService("UserInputService");
-local StarterGui = game:GetService("StarterGui");
 local TextChatService = game:GetService("TextChatService");
 
 local camera = workspace.CurrentCamera;
@@ -11,9 +10,7 @@ local localPlayer = game.Players.LocalPlayer;
 local playerGui = localPlayer:WaitForChild("PlayerGui");
 
 local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modNotificationsLibrary = require(game.ReplicatedStorage.Library.NotificationsLibrary);
+local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modCommandsLibrary = require(game.ReplicatedStorage.Library.CommandsLibrary);
 local CommandHandler = require(game.ReplicatedStorage.Library.CommandHandler);
 
@@ -26,8 +23,8 @@ if chatClientModule == nil then
 end
 ChatClient = require(chatClientModule);
 
-local remoteChatService = modRemotesManager:Get("ChatService");
-local remoteNotifyPlayer = modRemotesManager:Get("NotifyPlayer");
+local remoteChatServiceFunction = modRemotesManager:Get("ChatServiceFunction");
+local remoteChatServiceEvent = modRemotesManager:Get("ChatServiceEvent");
 
 local chatInterface = script.Parent;
 local inputFrame = chatInterface:WaitForChild("InputFrame");
@@ -59,8 +56,6 @@ end)
 
 task.spawn(function()
 	function TextChatService.OnIncomingMessage(txtChatMsg: TextChatMessage)
-		Debugger:Warn(txtChatMsg.TextChannel.Name, "msg", txtChatMsg.TextSource, txtChatMsg.Text);
-		
 		if txtChatMsg.Status == Enum.TextChatMessageStatus.Success then
 			local channelId = txtChatMsg.TextChannel.Name;
 
@@ -74,37 +69,22 @@ task.spawn(function()
 		end
 	end
 
-	remoteNotifyPlayer.OnClientEvent:Connect(function(key, messageData)
-		if messageData.Chat ~= true then return end;
-
-		local channelId = "Server";
-		local room = ChatRoomInterface:GetRoom(channelId);
-		if room == nil then
-			Debugger:Warn("Missing chat channel:", channelId); 
-			room = ChatRoomInterface:newRoom(channelId);
-		end;
-		
-		ChatRoomInterface:NewMessage(room, messageData);
-		-- local serverTextChannel: TextChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild("Server");
-		-- serverTextChannel:DisplaySystemMessage(messageData.Message);
-	end)
-
-	function remoteChatService.OnClientInvoke(action, packet)
+	remoteChatServiceEvent.OnClientEvent:Connect(function(key, action, messageData)
 		if action == "notify" then
-			local channelId = packet.ChannelId;
+			if messageData.Chat ~= true then return end;
 
+			local channelId = "Server";
 			local room = ChatRoomInterface:GetRoom(channelId);
 			if room == nil then
 				Debugger:Warn("Missing chat channel:", channelId); 
 				room = ChatRoomInterface:newRoom(channelId);
 			end;
 			
-			--ChatRoomInterface:NewMessage(room, txtChatMsg);
+			ChatRoomInterface:NewMessage(room, messageData);
 		end
-
-		return;
-	end
-
+		
+	end)
+	
 end)
 
 --==
@@ -234,7 +214,6 @@ local function inputBoxChange()
 	if matchIndexTab == nil then
 		cmdMatchs = {};
 		if message:sub(1, 1) == "/" and #message >= 2 then
-			
 			
 			local cmd, args = CommandHandler.ProcessMessage(message);
 			if cmd == nil then return end;
@@ -512,9 +491,10 @@ inputBox.FocusLost:Connect(function(enterPressed, inputThatCausedFocusLoss)
 					addToChatCache();
 					
 					local channelId = activeChannel.Id;
-
-					local textChannel: TextChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild(channelId);
-					textChannel:SendAsync(text);
+					task.spawn(function()
+						local textChannel: TextChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild(channelId);
+						textChannel:SendAsync(text);
+					end)
 				end;
 			end
 			toggleChat(false);

@@ -27,7 +27,8 @@ local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
-local remoteChatService = modRemotesManager:Get("ChatService");
+local remoteChatServiceFunction = modRemotesManager:Get("ChatServiceFunction");
+local remoteChatServiceEvent = modRemotesManager:Get("ChatServiceEvent");
 
 local ChatClient = nil;
 
@@ -180,9 +181,7 @@ function Room:SetActive()
 	
 	if self.Sync ~= true then
 		self.Sync = true;
-		task.spawn(function() 
-			remoteChatService:InvokeServer("syncchat", self.Id);
-		end)
+		remoteChatServiceEvent:FireServer("syncchat", self.Id);
 	end
 	
 	ChatRoomInterface:RefreshVisibility();
