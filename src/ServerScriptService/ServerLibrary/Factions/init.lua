@@ -1063,6 +1063,16 @@ factionsDatabase:OnUpdateRequest("addresource", function(requestPacket)
 	return factionGroup;
 end)
 
+factionsDatabase:OnUpdateRequest("setowner", function(requestPacket)
+	local factionGroup = requestPacket.Data;
+	local values = requestPacket.Values;
+	
+	factionGroup:SetLeader(tostring(values.Id));
+
+	return factionGroup;
+end)
+
+
 factionsDatabase:OnUpdateRequest("addgold", function(requestPacket)
 	local factionGroup = requestPacket.Data;
 	local actionPacket = requestPacket.Values;
@@ -1780,6 +1790,11 @@ function Factions.InvokeHandler(player, action, ...)
 					local factionsMadeFlags = profile.Flags:Get("Factions", {Id="Factions"; List={}});
 					table.insert(factionsMadeFlags.List, newFactionObj.Tag);
 
+					local textChannel = shared.modChatService.NewTextChannel(`[{factionTag}]`);
+					textChannel:SetAttribute("Faction", factionTag);
+
+					newFactionObj:Notify(`Welcome to {factionTag}. Here you can recruit other players to be members to complete faction missions.`, "Inform");
+
 				else
 					shared.Notify(player, "Failed to create faction, looks like someone made it first.", "Negative");
 
@@ -2446,6 +2461,7 @@ task.spawn(function()
 		/faction addgold amount
 		/faction addresource index amount
 		/faction join tag
+		/faction setowner userid;
 		/faction f funcName params
 		]];
 
@@ -2629,6 +2645,22 @@ task.spawn(function()
 					
 				else
 					Debugger:Warn("sendjoinrequest failed", returnPacket.FailMsg);
+				end
+
+			elseif action == "setowner" then
+				local setUserId = args[2];
+
+				local returnPacket = factionsDatabase:UpdateRequest(factionTag, "setowner", {
+					Id=setUserId;
+				});
+
+				if returnPacket.Success then
+					shared.Notify(player, "Set Owner="..setUserId, "Inform");
+					returnPacket.Data:Sync(true);
+
+				else
+					shared.Notify(player, "Set failed: "..returnPacket.FailMsg, "Negative");
+					
 				end
 
 

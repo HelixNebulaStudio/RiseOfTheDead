@@ -481,7 +481,6 @@ else
 	--== Game;
 	RemotesManager:NewUnreliableEventRemote("CharacterRemote");
 	RemotesManager:NewFunctionRemote("ToolHandler", 0.1);
-	RemotesManager:NewEventRemote("NotifyPlayer");
 	RemotesManager:NewEventRemote("DamagePacket");
 	RemotesManager:NewEventRemote("ProgressMission");
 	RemotesManager:NewEventRemote("BodyEquipmentsSync");
@@ -493,7 +492,7 @@ else
 	
 	
 	--== DataControl;
-	RemotesManager:NewEventRemote("PlayerDataSync");
+	RemotesManager:NewEventRemote("PlayerDataSync").Secure = true;
 	RemotesManager:NewFunctionRemote("PlayerDataFetch").Secure = true;
 	
 	RemotesManager:NewEventRemote("GoldStatSync");
@@ -641,10 +640,8 @@ else
 	end
 	
 	--== ChatService
-	RemotesManager:NewFunctionRemote("ChatService", 0.5);
-	RemotesManager:NewEventRemote("NewClientMessage");
-	RemotesManager:NewFunctionRemote("SubmitMessage", 1);
-	RemotesManager:NewEventRemote("SubmitChatReport");
+	RemotesManager:NewFunctionRemote("ChatServiceFunction", 0.5);
+	RemotesManager:NewEventRemote("ChatServiceEvent");
 
 	--== LeaderboardService
 	RemotesManager:NewEventRemote("LeaderboardService");

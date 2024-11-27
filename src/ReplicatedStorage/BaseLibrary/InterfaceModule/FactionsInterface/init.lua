@@ -50,7 +50,7 @@ local modGuiObjectPlus = require(game.ReplicatedStorage.Library.UI.GuiObjectPlus
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remoteFactionService = modRemotesManager:Get("FactionService");
-local remoteChatService = modRemotesManager:Get("ChatService");
+local remoteChatServiceEvent = modRemotesManager:Get("ChatServiceEvent");
 local remoteLeaderboardService = modRemotesManager:Get("LeaderboardService");
 
 local windowFrameTemplate = script:WaitForChild("FactionsMenu");
@@ -255,7 +255,7 @@ function Interface.init(modInterface)
 				end
 			end
 
-			Debugger:Log("FactionData sync:", factionObj);
+			Debugger:StudioLog("FactionData sync:", factionObj);
 			modData.FactionData = factionObj;
 			lastSync = tick();
 
@@ -284,9 +284,7 @@ function Interface.init(modInterface)
 				
 				if requestedFactionChat == false then
 					requestedFactionChat = true;
-					task.spawn(function() 
-						remoteChatService:InvokeServer("syncfactionchat");
-					end)
+					remoteChatServiceEvent:FireServer("syncchat", `[{factionObj.Tag}]`);
 				end
 			end
 
@@ -739,7 +737,7 @@ function Interface.init(modInterface)
 				missionContentScrollList.CanvasPosition = Vector2.new();
 
 			else
-				Debugger:Log("Missing ",missionMenuPage, " missionData", missionData);
+				Debugger:StudioLog("Missing ",missionMenuPage, " missionData", missionData);
 
 				missionMenuPage = "";
 				updateMissionPage();
@@ -1016,16 +1014,16 @@ function Interface.init(modInterface)
 		local roleConfig = factionData.Roles[memberData.Role or "Member"];
 
 		if tostring(localPlayer.UserId) == factionData.Owner then
-			Debugger:Log("Has owner permissions.");
+			Debugger:StudioLog("Has owner permissions.");
 			return true;
 		end
 
 		local r= factionPermissions:Test(key, (roleConfig and roleConfig.Perm or 0));
 		if r == false then
-			Debugger:Log("Insufficient permissions.");
+			Debugger:StudioLog("Insufficient permissions.");
 		end
 		if localPlayer:GetAttribute("FactionBypass") == true then
-			Debugger:Log("FactionBypass permissions.");
+			Debugger:StudioLog("FactionBypass permissions.");
 			return true;
 		end
 		return r;
@@ -1211,7 +1209,7 @@ function Interface.init(modInterface)
 				searchingLabel.Visible = false;
 
 				if searchResults == nil or searchResults.Debounce then return end;
-				Debugger:Log("searchResults", searchResults);
+				Debugger:StudioLog("searchResults", searchResults);
 
 				for _, obj in pairs(noFactionList:GetChildren()) do
 					if obj:IsA("GuiObject") and obj.Name ~= "createListing" and obj.Name ~= "searchingLabel" then
@@ -1304,7 +1302,7 @@ function Interface.init(modInterface)
 
 		else
 			Interface:PromptWarning("Something went wrong, please try again.");
-			Debugger:Log("Error", r);
+			Debugger:StudioLog("Error", r);
 		end
 
 		if promptWindow then
@@ -1366,7 +1364,7 @@ function Interface.init(modInterface)
 	profileNavBar.leaveButton.MouseButton1Click:Connect(function()
 		Interface:PlayButtonClick();
 		if selectedUser.UserId ~= tostring(localPlayer.UserId)  then
-			Debugger:Log("setRoleButton failed, not self")
+			Debugger:StudioLog("setRoleButton failed, not self")
 			return
 		end
 
@@ -1521,7 +1519,7 @@ function Interface.init(modInterface)
 		Interface:PlayButtonClick();
 		missionMenuPage = "";
 		updateMissionPage();
-		Debugger:Log("Available mission");
+		Debugger:StudioLog("Available mission");
 	end))
 
 	Interface.Garbage:Tag(missionNavListScrollList.backButton.MouseButton1Click:Connect(function()
@@ -2372,7 +2370,7 @@ function Interface.init(modInterface)
 									activeMission.Syncing = true;
 
 									sync(nil, function(factionObj)
-										Debugger:Log("mission complete sync completed", factionObj);
+										Debugger:StudioLog("mission complete sync completed", factionObj);
 										missionMenuPage = "";
 										if updateMissionPage then
 											updateMissionPage();
