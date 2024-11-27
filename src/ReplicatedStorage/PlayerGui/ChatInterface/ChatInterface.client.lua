@@ -70,6 +70,8 @@ task.spawn(function()
 	end
 
 	remoteChatServiceEvent.OnClientEvent:Connect(function(action, ...)
+		local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+
 		if action == "notify" then
 			local key, messageData = ...;
 			if messageData.Chat ~= true then return end;
@@ -94,6 +96,11 @@ task.spawn(function()
 			Debugger:Warn("GlobalChat", speakerName, channelId, txtMessage);
 
 			local room = ChatRoomInterface:GetRoom(channelId);
+
+			local factionProfile = modData.FactionData;
+			if string.find(channelId, `^%[.*%]$`) and room == nil and factionProfile == nil then
+				return;
+			end
 			if room == nil then
 				Debugger:Warn("Missing chat channel:", channelId); 
 				room = ChatRoomInterface:newRoom(channelId);
