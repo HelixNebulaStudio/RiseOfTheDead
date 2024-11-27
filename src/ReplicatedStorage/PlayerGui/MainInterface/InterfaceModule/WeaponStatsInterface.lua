@@ -138,6 +138,10 @@ local statTemplates = {
 		{Category="BulletProtection"; Text="<b>Bullet Protection:</b>    $stat%"; Type="percent"};
 		
 		{Category="HotEquipSlots"; Text="<b>Additional Hotbar Slots:</b>    $stat"; Type="int"};
+
+		{Category="BaseMoveSpeed"; Text="<b>Base MoveSpeed:</b>    $stat"; Type="int"};
+		{Category="BaseSprintSpeed"; Text="<b>Base SprintSpeed:</b>    $stat"; Type="int"};
+		{Category="SprintDelay"; Text="<b>Sprint Delay:</b>    $stats"; Type="int"};
 		
 		{Category="TickRepellent"; Text="<b>Ticks Protection:</b>    $stat"; Type="2dp"};
 		{Category="ModNekrosisHeal"; Text="<b>Nekrosis Heal:</b>    $stat hp/s"; Type="2dp"};
@@ -340,6 +344,12 @@ local mouseOverDescription = {
 	};
 	SplashReflection={
 		Desc="Splash effects of enemies such as Ticks' Detonation are reflected."
+	};
+	BaseMoveSpeed={
+		Desc="Set your base movement speed. (Default is 18)";
+	};
+	BaseSprintSpeed={
+		Desc="Set your base sprinting speed. (Default is 22)";
 	};
 };
 

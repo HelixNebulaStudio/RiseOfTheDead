@@ -20,7 +20,7 @@ function StatusClass.OnTick(classPlayer, status)
 	local bodyEquipments = properties.BodyEquipments;
 	local sync = false;
 	
-	local lastDmgedTime = tick()-classPlayer.LastDamageTaken;
+	local lastDmgedTime = workspace:GetServerTimeNow()-classPlayer.LastDamageTaken;
 	if lastDmgedTime < 15 then
 		if properties.HealSources[script.Name] ~= nil then
 			properties.HealSources[script.Name] = nil;

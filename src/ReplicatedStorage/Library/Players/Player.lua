@@ -92,8 +92,8 @@ function Player.new(playerInstance: Player)
 		TemperatureOffset = modLayeredVariable.new(0);
 	};
 	
-	classPlayer.LastDamageTaken = tick()-15;
-	classPlayer.LastDamageDealt = tick()-15;
+	classPlayer.LastDamageTaken = workspace:GetServerTimeNow()-15;
+	classPlayer.LastDamageDealt = workspace:GetServerTimeNow()-15;
 	classPlayer.IsUnderWater = false;
 
 	classPlayer.LowestFps = 999;
@@ -416,7 +416,7 @@ function Player.new(playerInstance: Player)
 						if classPlayer.RootPart then
 							modAudio.Play("ArmorBreak", classPlayer.RootPart).PlaybackSpeed = math.random(90, 110)/100;
 						end
-						classPlayer.LastDamageTaken = tick();
+						classPlayer.LastDamageTaken = workspace:GetServerTimeNow();
 						damageType = "ArmorBreak";
 						
 					end
@@ -506,7 +506,7 @@ function Player.new(playerInstance: Player)
 
 				self:SyncIsAlive();
 			end
-			classPlayer.LastDamageTaken = tick();
+			classPlayer.LastDamageTaken = workspace:GetServerTimeNow();
 
 
 		elseif damage < 0 then
@@ -1242,6 +1242,8 @@ function Player.new(playerInstance: Player)
 				end
 				
 				classPlayer.Humanoid:SetAttribute("Oxygen", classPlayer.Properties.Oxygen);
+				classPlayer.Humanoid:SetAttribute("LastDamageTaken", classPlayer.LastDamageTaken);
+				classPlayer.Humanoid:SetAttribute("LastDamageDealt", classPlayer.LastDamageDealt);
 				
 				local isPlayerInvisible = false;
 				for id, status in pairs(classPlayer.Properties) do

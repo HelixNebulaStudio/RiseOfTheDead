@@ -29,7 +29,7 @@ function StatusClass.OnTick(classPlayer, status, tickPack)
 		if maxPacifistAp > 0 then
 			local equippedTools = classPlayer:GetEquippedTools();
 			local itemId = equippedTools and equippedTools.ItemId;
-			local isPacifist = not ((itemId and modItemsLibrary:HasTag(itemId, "Weapon")) or (tick()-classPlayer.LastDamageDealt) < 5);
+			local isPacifist = not ((itemId and modItemsLibrary:HasTag(itemId, "Weapon")) or (workspace:GetServerTimeNow()-classPlayer.LastDamageDealt) < 5);
 
 			local armorRate = classPlayer.Properties.ArmorRate;
 			if isPacifist then

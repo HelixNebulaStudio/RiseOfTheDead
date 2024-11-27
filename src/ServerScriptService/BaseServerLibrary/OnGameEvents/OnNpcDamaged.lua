@@ -21,7 +21,7 @@ return function(player, damageSource)
 	if damageSource and damageSource.Damage > 0 and damageSource.DamageType ~= "Heal" then
 		local classPlayer = shared.modPlayers.Get(player);
 		if classPlayer then
-			classPlayer.LastDamageDealt = tick();
+			classPlayer.LastDamageDealt = workspace:GetServerTimeNow();
 		end
 	end
 	

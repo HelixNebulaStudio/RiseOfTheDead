@@ -11,6 +11,10 @@ function attirePackage.NewToolLib(handler)
 	toolLib.Warmth = 1;
 	toolLib.HasFlinchProtection = true;
 	
+	toolLib.BaseMoveSpeed = 14;
+	toolLib.BaseSprintSpeed = 24;
+	toolLib.SprintDelay = 5;
+
 	local clothing = modClothingProperties.new(toolLib);
 
 	if not modBranchConfigs.IsWorld("Slaughterfest") then

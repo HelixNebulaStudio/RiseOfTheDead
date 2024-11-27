@@ -12,7 +12,13 @@ function attirePackage.NewToolLib(handler)
 	toolLib.HotEquipSlots = toolLib.BaseHotEquipSlots;
 	toolLib.EquipTimeReduction = 0.4;
 	
-	return modClothingProperties.new(toolLib);
+	local clothing = modClothingProperties.new(toolLib);
+
+	clothing:RegisterPlayerProperty("TacticalHolsters", {
+		Visible = false;
+	});
+
+	return clothing;
 end
 
 return attirePackage;

@@ -182,11 +182,7 @@ modCharacter.RootPart = rootPart;
 
 mouseProperties.DefaultSensitivity = UserGameSettings.MouseSensitivity;
 
-if localPlayer:GetAttribute("hm_1") then
-	characterProperties.DefaultWalkSpeed = 15;
-	characterProperties.DefaultSwimSpeed = 10;
-	characterProperties.DefaultSprintSpeed = 20;
-end
+local hm_1 = localPlayer:GetAttribute("hm_1") and -3 or 0;
 
 characterProperties.WalkSpeed = modLayeredVariable.new(characterProperties.DefaultWalkSpeed);
 characterProperties.JumpPower = modLayeredVariable.new(characterProperties.DefaultJumpPower);
@@ -642,6 +638,7 @@ local function startDashing()
 	local initDashSpeed = characterProperties.DashSpeed;
 	local dashDir = Vector3.new(localInputDir.LookVector.X, 0, localInputDir.LookVector.Z).Unit;
 
+	characterProperties.IsSprinting = true;
 	characterProperties.IsDashing = true;
 	dashDirection = dashDir; 
 	oldDashMomentum = initDashSpeed;
@@ -1719,6 +1716,8 @@ resetCameraEffects();
 -- MARK: RS.Stepped
 RunService.Stepped:Connect(function(total, delta)
 	characterProperties.IsAlive = character:GetAttribute("IsAlive") == true;
+	Cache.LastDamaged = humanoid:GetAttribute("LastDamageTaken");
+
 	local isJumping = getIsJumping();
 
 	local rootCframe = rootPart.CFrame;
@@ -2072,8 +2071,14 @@ RunService.Stepped:Connect(function(total, delta)
 	end
 
 	if modCharacter.SprintMode >= 2 and not characterProperties.IsWounded then
-		if (Cache.LastDamaged == nil or tick()-Cache.LastDamaged > 2) and not characterProperties.IsFocused then
+		characterProperties.DefaultWalkSpeed=14;
+		characterProperties.DefaultSprintSpeed=24;
+
+		local lastDamageTimeLapse = (Cache.LastDamaged == nil and math.huge or workspace:GetServerTimeNow()-Cache.LastDamaged);
+		if (lastDamageTimeLapse > 5) and not characterProperties.IsFocused then
 			characterProperties.IsSprinting = true;
+		elseif characterProperties.IsDashing == false then
+			characterProperties.IsSprinting = false;
 		end
 
 		local maxAirDash = 1;
@@ -2096,6 +2101,10 @@ RunService.Stepped:Connect(function(total, delta)
 			dashDebounce = false;
 
 		end
+	else
+		characterProperties.DefaultWalkSpeed=Cache.DefaultWalkSpeed;
+		characterProperties.DefaultSprintSpeed=Cache.DefaultSprintSpeed;
+
 	end
 
 	local s = pcall(function()
@@ -2646,7 +2655,7 @@ RunService.PostSimulation:Connect(function(deltaTimeSim)
 			animations["crouchWalk"]:Stop();
 			characterProperties.IsCrouching = false;
 			
-			characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, characterProperties.SwimSpeed, 0.6));
+			characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, (characterProperties.SwimSpeed +(hm_1)), 0.6));
 			characterProperties.NewWalkSpeed = humanoid.WalkSpeed;
 			collisionModelId = "Swimming";
 			
@@ -2686,13 +2695,13 @@ RunService.PostSimulation:Connect(function(deltaTimeSim)
 				animations["crouchWalk"]:Stop();
 				
 			elseif characterProperties.IsSprinting then
-				characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, characterProperties.SprintSpeed * adsMulti, 0.6));
+				characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, (characterProperties.SprintSpeed +(hm_1)) * adsMulti, 0.6));
 				characterProperties.NewWalkSpeed = humanoid.WalkSpeed;
 				animations["crouchIdle"]:Stop();
 				animations["crouchWalk"]:Stop();
 				
 			else
-				characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, characterProperties.DefaultWalkSpeed * adsMulti, 0.6));
+				characterProperties.WalkSpeed:Set("default", modMath.Lerp(characterProperties.NewWalkSpeed, (characterProperties.DefaultWalkSpeed +(hm_1)) * adsMulti, 0.6));
 				characterProperties.NewWalkSpeed = humanoid.WalkSpeed;
 				animations["crouchIdle"]:Stop();
 				animations["crouchWalk"]:Stop();
@@ -3043,15 +3052,15 @@ end)
 humanoid.StateChanged:Connect(onHumanoidStateChanged);
 
 -- MARK: Health Changed
-Cache.PreviousHealth = humanoid.Health;
-humanoid:GetPropertyChangedSignal("Health"):Connect(function()
-	local delta = humanoid.Health - Cache.PreviousHealth;
-	if delta < 0 then
-		Cache.LastDamaged = tick();
-		characterProperties.IsSprinting = false;
-	end
-	Cache.PreviousHealth = humanoid.Health;
-end)
+-- Cache.PreviousHealth = humanoid.Health;
+-- humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+-- 	local delta = humanoid.Health - Cache.PreviousHealth;
+-- 	if delta < 0 then
+-- 		Cache.LastDamaged = tick();
+-- 		characterProperties.IsSprinting = false;
+-- 	end
+-- 	Cache.PreviousHealth = humanoid.Health;
+-- end)
 
 
 -- MARK: Humanoid.Jumping
@@ -3192,3 +3201,6 @@ task.spawn(function()
 end)
 
 currentCamera.CameraSubject = humanoid;
+
+Cache.DefaultWalkSpeed = characterProperties.DefaultWalkSpeed
+Cache.DefaultSprintSpeed = characterProperties.DefaultSprintSpeed
