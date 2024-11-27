@@ -1180,7 +1180,7 @@ function StatusEffects.CorruptVision(player, val)
 	else
 		if val == true then
 			modCameraGraphics.TintColor:Set("corrupt", Color3.fromRGB(204, 157, 151), 1);
-			modCameraGraphics:SetAtmosphere(script.CorruptAtmosphere, "corrupt", modCameraGraphics.EffectsPriority.Environment);
+			modCameraGraphics:SetAtmosphere(script.CorruptAtmosphere, "corrupt", modCameraGraphics.EffectsPriority.Sky);
 		else
 			modCameraGraphics.TintColor:Remove("corrupt");
 			modCameraGraphics:ClearAtmosphere("corrupt");
