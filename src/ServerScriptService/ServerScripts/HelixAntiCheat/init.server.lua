@@ -385,9 +385,6 @@ function AntiCheatService:Filter(value, player, filterNames, filterGibberish)
 	local resultValue;
 	local filterS, filterE = pcall(function()
 		local filterType = Enum.TextFilterContext.PublicChat;
-		if player:GetAttribute("HNSGroupRank") and player:GetAttribute("HNSGroupRank") > 101 then
-			filterType = Enum.TextFilterContext.PrivateChat;
-		end
 		resultValue = TextService:FilterStringAsync(value, userId, filterType);
 		resultValue = resultValue:GetChatForUserAsync(userId);
 	end)

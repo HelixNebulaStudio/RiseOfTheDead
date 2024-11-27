@@ -93,8 +93,6 @@ task.spawn(function()
 			local channelId = messageData.ChannelId;
 			local txtMessage = messageData.Text;
 
-			Debugger:Warn("GlobalChat", speakerName, channelId, txtMessage);
-
 			local room = ChatRoomInterface:GetRoom(channelId);
 
 			local factionProfile = modData.FactionData;

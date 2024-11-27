@@ -263,6 +263,23 @@ function ChatService.NewTextChannel(name)
 	return textChannel;
 end
 
+local function QuickTextFilter(text)
+	local filteredTxt;
+	
+	for _, player in (Players:GetPlayers()) do
+		if filteredTxt == nil then
+			pcall(function()
+				local txtFilterResult: TextFilterResult = TextService:FilterStringAsync(text, player.UserId, Enum.TextFilterContext.PublicChat);
+				filteredTxt = txtFilterResult:GetChatForUserAsync(player.UserId);
+			end)
+		else
+			break;
+		end
+	end
+
+	return filteredTxt;
+end
+
 function ChatService.Init()
 	TextChatService:WaitForChild("BubbleChatConfiguration").Enabled = false;
 
@@ -306,7 +323,14 @@ function ChatService.Init()
 		ChatService.CacheMsg(data);
 		Debugger:Warn("Global msg", data);
 
-		remoteChatServiceEvent:FireAllClients("globalchat", data);
+		task.spawn(function()
+			local filteredTxt = QuickTextFilter(data.RawText or data.Text);
+			if filteredTxt == nil then return end;
+			if data.RawText == nil then data.RawText = data.Text; end
+			data.Text = filteredTxt;
+			
+			remoteChatServiceEvent:FireAllClients("globalchat", data);
+		end)
 	end)
 
 	remoteChatServiceEvent.OnServerEvent:Connect(function(player, action, ...)
@@ -388,7 +412,14 @@ function ChatService.Init()
 					Debugger:StudioLog("globalchat",factionTag, a, data);
 					if data.Timestamp == nil then continue end;
 	
-					remoteChatServiceEvent:FireClient(player, "globalchat", data);
+					task.spawn(function()
+						local filteredTxt = QuickTextFilter(data.RawText or data.Text);
+						if filteredTxt == nil then return end;
+						if data.RawText == nil then data.RawText = data.Text; end
+						data.Text = filteredTxt;
+
+						remoteChatServiceEvent:FireClient(player, "globalchat", data);
+					end)
 				end
 
 			end
