@@ -268,6 +268,8 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 		typeIconLabel.Image = "";
 	end
 	
+	local quantityLabel = self.ImageButton:WaitForChild("QuantityLabel");
+
 	if storageItemData then 
 		local storageItemID = storageItemData.ID;
 		local itemValues = storageItemData.Values or {};
@@ -276,7 +278,6 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 			itemButtonColor = modItemsLibrary.TierColors[itemValues.Tier];
 		end
 		
-		local quantityLabel = self.ImageButton:WaitForChild("QuantityLabel");
 
 		if typeof(storageItemData.Quantity) == "table" and storageItemData.Quantity.Min and storageItemData.Quantity.Max then
 			quantityLabel.Visible = true;

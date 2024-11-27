@@ -414,46 +414,69 @@ function UpdateInformation(room)
 		newVertList.Visible = true;
 		newVertList.Name = "crateList";
 		newVertList.LayoutOrder = 99;
-		--newVertList.Size = UDim2.new(0, 60, 1, 0);
 		
 		local gridLayout = newVertList:WaitForChild("UIGridLayout");
 		gridLayout.CellSize = UDim2.new(0, 50, 0, 50);
 		
-		for a=1, #crateList do
-			local itemButtonObject = itemButtonList[crateList[a]] or modItemInterface.newItemButton(crateList[a]);
+		local function newCrateItemButton(crateItemId, param)
+			param = param or {};
+
+			local itemButtonObject = itemButtonList[crateItemId] or modItemInterface.newItemButton(crateItemId);
 			local newItemButton = itemButtonObject.ImageButton;
-			if itemButtonList[crateList[a]] == nil then
+			if itemButtonList[crateItemId] == nil then
 				itemToolTip:BindHoverOver(newItemButton, function()
 					itemToolTip.Frame.Parent = script.Parent;
-					itemToolTip:Update(crateList[a]);
+					itemToolTip:Update(crateItemId);
 					itemToolTip:SetPosition(newItemButton);
 				end);
 				
 				newItemButton.MouseButton1Click:Connect(function()
-					rewardsId = crateList[a];
+					rewardsId = crateItemId;
 					UpdateInformation(room);
 				end)
 				
 				templateUIRatio:Clone().Parent = newItemButton;
+
+				if param.Hard then
+					local uiStroke = Instance.new("UIStroke");
+					uiStroke.Color = Color3.fromRGB(255, 60, 60);
+					uiStroke.Thickness = 2;
+					uiStroke.Parent = newItemButton;
+
+				end
 			end
-			itemButtonList[crateList[a]] = itemButtonObject;
-			itemButtonCaches[crateList[a]] = itemButtonObject;
+			itemButtonList[crateItemId] = itemButtonObject;
+			itemButtonCaches[crateItemId] = itemButtonObject;
 			
-			newItemButton.Name = crateList[a];
+			newItemButton.Name = crateItemId;
 			
-			newItemButton.BackgroundColor3 = rewardsId == crateList[a] and branchColor or Color3.fromRGB(10, 10, 10);
+			newItemButton.BackgroundColor3 = rewardsId == crateItemId and branchColor or Color3.fromRGB(10, 10, 10);
 			newItemButton.BackgroundTransparency = 0.25;
 			newItemButton.Parent = newVertList;
 			
 			itemButtonObject:Update();
+
 		end
+
+		for a=1, #crateList do
+			local crateItemId = crateList[a];
+			newCrateItemButton(crateItemId);
+		end
+		
+		if lobbyInfo.StageLib.HardModeEnabled and lobbyInfo.StageLib.HardRewardId then
+			newCrateItemButton(lobbyInfo.StageLib.HardRewardId, {Hard=true;});
+		end
+		
 		newVertList.Parent = rewardsList;
 	end
 	
 	mainFrame.RewardsButton.Visible = rewardsId ~= nil;
 	if rewardsId then
+		local isHardReward = lobbyInfo.StageLib.HardModeEnabled and lobbyInfo.StageLib.HardRewardId and lobbyInfo.StageLib.HardRewardId == rewardsId;
+
 		local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 		local rewardsLib = modRewardsLibrary:Find(rewardsId);
+
 		if rewardsLib then
 			if rewardsLib.Level then
 				local playerLevel = modData.GameSave and modData.GameSave.Stats and modData.GameSave.Stats.Level or 0;
@@ -586,6 +609,17 @@ function UpdateInformation(room)
 					if rewardInfo.HardMode and not isHardMode then
 						quantityLabel.Text = "Hard Mode";
 						
+					elseif isHardReward and rewardInfo.Wave then
+						quantityLabel.RichText = true;
+						quantityLabel.TextSize = 17;
+						quantityLabel.Text = `<font size="9">Wave</font> {rewardInfo.Wave}`;
+						quantityLabel.TextColor3 = Color3.fromRGB(255, 60, 0);
+						quantityLabel.AnchorPoint = Vector2.new(0.5, 0);
+						quantityLabel.Position = UDim2.new(0.5, 0, 0, 2);
+						quantityLabel.Size = UDim2.new(1, -5, 0.3, 0);
+						quantityLabel.TextScaled = true;
+						quantityLabel.TextStrokeTransparency = 0; 
+
 					elseif rewardInfo.Weekday == nil then
 						quantityLabel.Text = (math.ceil(rewardInfo.Chance/list.TotalChance*10000)/100).."%";
 						

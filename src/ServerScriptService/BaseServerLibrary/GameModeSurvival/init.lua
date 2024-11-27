@@ -20,6 +20,7 @@ local modEventSignal = require(game.ReplicatedStorage.Library.EventSignal);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
@@ -55,6 +56,7 @@ function Survival.new()
 		CompletedOnce = false;
 		RoomData = nil;
 		IsHard = false;
+		GameState = "";
 		
 		Players = {};
 		Characters = {};
@@ -272,6 +274,10 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 	local spawnCf = paramPacket.SpawnCFrame or self.BasicEnemySpawns[math.random(1, #self.BasicEnemySpawns)].CFrame;
 	local level = paramPacket.Level or 1;
 	
+	if self.IsHard then
+		level = math.round(math.pow(2, (self.Wave+2)/2));
+	end
+
 	if self.OnNpcSpawnHooked == nil then
 		self.OnNpcSpawnHooked = modNpc.OnNpcSpawn:Connect(function(npcModule)
 			if modConfigurations.TargetableEntities[npcModule.Humanoid.Name] == nil then return end; -- Not enemy spawn;
@@ -335,7 +341,7 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 		npcModule.Properties.TargetableDistance = 4096;
 		
 		if npcName == "Pathoroth" then
-			local newHealth = 4000 * math.max(math.ceil(self.Wave/2), 1);
+			local newHealth = 4000 * math.max(math.ceil(level/2), 1);
 			npcModule.Humanoid.MaxHealth = math.clamp(newHealth, 1000, math.huge);
 			npcModule.Humanoid.Health = npcModule.Humanoid.MaxHealth;
 		end
@@ -456,6 +462,7 @@ function Survival:GetNextWaveInfo(wave)
 end
 
 function Survival:StartWave(wave)
+	self.GameState = "Active";
 	self.Status = EnumStatus.InProgress;
 
 	self:Hud{
@@ -606,7 +613,37 @@ function Survival:StartWave(wave)
 	if self.Status == EnumStatus.InProgress then
 		self:CompleteWave();
 		
-		local function spawnReward()
+		if self.IsHard and self.StageLib.HardRewardId then
+
+			local rewardLib = modRewardsLibrary:Find(self.StageLib.HardRewardId);
+			if rewardLib and rewardLib.Rewards then
+				local rewardsList = rewardLib.Rewards;
+				local selectRewardInfo;
+				for a=1, #rewardsList do
+					local rewardInfo = rewardsList[a];
+
+					if rewardInfo.Wave == self.Wave then
+						selectRewardInfo = rewardInfo;
+						break;
+					end
+				end
+
+				if selectRewardInfo then
+					local pickRewardId = selectRewardInfo.ItemId;
+					
+					local itemLib = modItemLibrary:Find(pickRewardId);
+					local dropStr = `A {itemLib.Name} has dropped!`;
+		
+					self:Hud{
+						Status=dropStr;
+					};
+
+					Debugger:Warn("Reward Drop self.Wave", self.Wave, "pickRewardId", pickRewardId);
+				end
+
+			end
+
+		elseif self.Wave > 5 and math.fmod(self.Wave, 3) == 0 then
 			local rewardDropsList = {self.StageLib.RewardsId};
 			
 			local spawnCFrame = workspace:FindFirstChildWhichIsA("SpawnLocation");
@@ -620,7 +657,7 @@ function Survival:StartWave(wave)
 				end
 			end
 			
-			if self.IsHard == true and self.StageLib.RewardsIds then
+			if self.StageLib.RewardsIds then
 				for a=1, #self.StageLib.RewardsIds do
 					if table.find(rewardDropsList, self.StageLib.RewardsIds[a]) == nil then
 						table.insert(rewardDropsList, self.StageLib.RewardsIds[a]);
@@ -649,73 +686,38 @@ function Survival:StartWave(wave)
 				Status=dropStr;
 			};
 			shared.Notify(game.Players:GetPlayers(), dropStr, "Reward");
+
 		end
 		
-		
-		if self.Wave == self.NormalEndWave and self.IsHard ~= true then
-			self.Status = EnumStatus.Completed;
-			
-			spawnReward();
-			
-			for a=1, #self.Players do
-				modStatusEffects.FullHeal(self.Players[a]);
-			end
+		local breakLength = math.clamp(10 + (self.ActiveSupCrate and 20 or 0), 10, 30);
 
-			shared.Notify(game.Players:GetPlayers(), "Survival completed!", "Positive");
-			
-			if self.OnComplete then
-				self.OnComplete(self.Players);
-			end
+		self.GameState = "Intermission";
+
+		local nextWave = wave+1;
+		local nextObj, nextHaz = self:GetNextWaveInfo(nextWave);
+		local nextWaveStr = (nextObj and nextObj.Class.Title or "")..(nextHaz and " ("..nextHaz.Class.Title..")" or " (No Hazards)");
+		for a=breakLength, 1, -1 do
+			if a == 1 then self:RespawnDead(); end
+			task.wait(1);
 			self:Hud{
-				StatsCount=self.StatsCount;
-				SurvivalFailed=true;
+				Status=`Wave {nextWave}: {nextWaveStr} starts in {a}s..`;
 			};
-			modConfigurations.Set("DisableMapItems", false);
-			
-		else
-			if self.Wave == self.NormalEndWave then
-				-- complete
-				if self.CompletedOnce == false then
-					self.CompletedOnce = true;
-					if self.OnComplete then
-						self.OnComplete(game.Players:GetPlayers());
-					end
-				end
-			end
-			
-			if self.Wave > 5 and math.fmod(self.Wave, 3) == 0 then
-				spawnReward();
-			end
-			
-			local breakLength = math.clamp(10 + (self.ActiveSupCrate and 20 or 0), 10, 30);
+			if self.Status ~= EnumStatus.InProgress then break; end
+		end
 
-			local nextWave = wave+1;
-			local nextObj, nextHaz = self:GetNextWaveInfo(nextWave);
-			local nextWaveStr = (nextObj and nextObj.Class.Title or "")..(nextHaz and " ("..nextHaz.Class.Title..")" or " (No Hazards)");
-			for a=breakLength, 1, -1 do
-				if a == 1 then self:RespawnDead(); end
-				task.wait(1);
-				self:Hud{
-					Status=`Wave {nextWave}: {nextWaveStr} starts in {a}s..`;
-				};
-				if self.Status ~= EnumStatus.InProgress then break; end
-			end
-
-			if self.ActiveSupCrate then
-				game.Debris:AddItem(self.ActiveSupCrate, 0);
-				self.ActiveSupCrate = nil;
-			end;
-			
-			if self.LootPrefab then
-				self.LootPrefab = nil;
-			end
-			
-			if self.Status == EnumStatus.InProgress then
-				Debugger:Log("Wave continue");
-				self.Wave = self.Wave +1;
-				workspace:SetAttribute("SurvivalWave", self.Wave);
-			end
-			
+		if self.ActiveSupCrate then
+			game.Debris:AddItem(self.ActiveSupCrate, 0);
+			self.ActiveSupCrate = nil;
+		end;
+		
+		if self.LootPrefab then
+			self.LootPrefab = nil;
+		end
+		
+		if self.Status == EnumStatus.InProgress then
+			Debugger:Log("Wave continue");
+			self.Wave = self.Wave +1;
+			workspace:SetAttribute("SurvivalWave", self.Wave);
 		end
 		
 	else
@@ -993,6 +995,7 @@ function Survival:Hud(data)
 		Status=data.Status or "";
 		IsHard=self.IsHard;
 		Wave=self.Wave;
+		GameState=self.GameState;
 
 		WaveObjective=data.WaveObjective or self.HudValues.WaveObjective;
 		WaveHazard=data.WaveHazard or self.HudValues.WaveHazard;

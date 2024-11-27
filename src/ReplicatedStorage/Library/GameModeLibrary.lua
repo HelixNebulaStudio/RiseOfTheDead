@@ -31,6 +31,7 @@ GameModeLibrary.RoomStatesEnums = {
 GameModeLibrary.DefaultReadyLength = 6;
 
 GameModeLibrary.GameModes={
+	-- MARK: Boss
 	Boss={
 		Module="Boss";
 		Stages={
@@ -304,10 +305,11 @@ GameModeLibrary.GameModes={
 		};
 	};
 	
+	-- MARK: Survival
 	Survival={
 		Module="Survival";
-		HardModeText="Endless";
-		HardModeTitleImage="http://www.roblox.com/asset/?id=12409876370";
+		HardModeText="Corrupted";
+		-- HardModeTitleImage="http://www.roblox.com/asset/?id=12409876370";
 		Stages={
 			["Sector F"]={
 				WorldId="SectorF";
@@ -316,6 +318,7 @@ GameModeLibrary.GameModes={
 				MaxPlayers=4;
 				RewardsId="sectorfcrate";
 				RewardsIds={"sectorfcrate"; "ucsectorfcrate"};
+				HardRewardId="corruptedsectorfcrate";
 				
 				SurvivalFailedTrack="SectorFSoundtrack";
 				BossKilledTrack="SectorFBossKilled";
@@ -333,6 +336,7 @@ GameModeLibrary.GameModes={
 				MaxPlayers=4;
 				RewardsId="prisoncrate";
 				RewardsIds={"prisoncrate"; "nprisoncrate"};
+				HardRewardId="corruptedprisoncrate";
 				
 				SurvivalFailedTrack="PrisonSoundtrack";
 				BossKilledTrack="PrisonBossKilled";
@@ -350,6 +354,7 @@ GameModeLibrary.GameModes={
 				MaxPlayers=5;
 				RewardsId="sectordcrate";
 				RewardsIds={"sectordcrate"; "ucsectordcrate"};
+				HardRewardId="corruptedsectordcrate";
 				
 				SurvivalFailedTrack="SectorDSoundtrack";
 				BossKilledTrack="SectorDBossKilled";
@@ -408,6 +413,7 @@ GameModeLibrary.GameModes={
 		};
 	};
 	
+	-- MARK: Raid
 	Raid={
 		Module="Raid";
 		Stages={
@@ -474,7 +480,7 @@ GameModeLibrary.GameModes={
 		};
 	};
 	
-	
+	--MARK: Coop
 	Coop={
 		Module="Coop";
 		Stages={

@@ -13,7 +13,7 @@ local Vars = {
 	BaseFocusKills=30;
 	FocusLinearScale=10;
 	
-	MaxLevels=560;
+	MaxLevels=620;
 	MaxMoney=100000;
 	MaxPerks=10000;
 	MaxTweakPoints=999;

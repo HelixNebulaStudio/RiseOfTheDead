@@ -36,6 +36,47 @@ function RewardsLibrary:Init(super)
 	};
 
 
+	-- MARK: Survival;
+	super:Add{
+		Id="corruptedsectorfcrate";
+		Level=240;
+		Rewards={
+			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
+			{Wave=8; ItemId="apron"; Quantity=1; Chance=0.6;};
+			{Wave=10; ItemId="poster"; Quantity=1; Chance=0.3;};
+			{Wave=11; ItemId="survivorsbackpack"; Quantity=1; Chance=0.15;};
+			{Wave=12; ItemId="hardhat"; Quantity=1; Chance=0.075;};
+			{Wave=13; ItemId="uziparts1"; Quantity=1; Chance=0.075;};
+		};
+	};
+
+	super:Add{
+		Id="corruptedprisoncrate";
+		Level=340;
+		Rewards={
+			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
+			{Wave=8; ItemId="apron"; Quantity=1; Chance=0.6;};
+			{Wave=10; ItemId="poster"; Quantity=1; Chance=0.3;};
+			{Wave=11; ItemId="survivorsbackpack"; Quantity=1; Chance=0.15;};
+			{Wave=12; ItemId="hardhat"; Quantity=1; Chance=0.075;};
+			{Wave=13; ItemId="rechamber1216parts1"; Quantity=1; Chance=0.075;};
+		};
+	};
+
+	super:Add{
+		Id="corruptedsectordcrate";
+		Level=520;
+		Rewards={
+			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
+			{Wave=8; ItemId="apron"; Quantity=1; Chance=0.6;};
+			{Wave=10; ItemId="poster"; Quantity=1; Chance=0.3;};
+			{Wave=11; ItemId="survivorsbackpack"; Quantity=1; Chance=0.15;};
+			{Wave=12; ItemId="hardhat"; Quantity=1; Chance=0.075;};
+			{Wave=13; ItemId="grandgarandparts1"; Quantity=1; Chance=0.075;};
+		};
+	};
+	
+
 	super:Add{
 		Id="npctask:foodscavenge";
 		Rewards={

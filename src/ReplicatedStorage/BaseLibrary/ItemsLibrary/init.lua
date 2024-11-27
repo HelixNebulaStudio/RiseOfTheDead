@@ -83,14 +83,14 @@ function ItemsLibrary:Init(super)
 	new(gunBase, {Id="xm1014"; Name="XM1014"; Icon="rbxassetid://6523762932"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick fire-rate long barrel shotgun.";});
 	new(gunBase, {Id="sawedoff"; Name="Sawed-Off"; Icon="rbxassetid://17007247358"; Tags={"Shotgun"; "Primary Weapon";}; Description="Close range head remover with high multishot.";});
 	new(gunBase, {Id="mariner590"; Name="Mariner 590"; Icon="rbxassetid://17007243924"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick and high damage tactical shotgun.";});
-	new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"; "Primary Weapon";}; Description="Powerful hand made shotgun with built-in <b>Crit Receiver</b>.";});
-	new(gunBase, {Id="rechamber1216"; Name="Rechamber 1216"; Icon="rbxassetid://92627722665597"; Tags={"Shotgun"; "Primary Weapon";}; Description="Military grade mag based shotgun.";});
+	new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 4900; Description="Powerful hand made shotgun with built-in <b>Crit Receiver</b>.";});
+	new(gunBase, {Id="rechamber1216"; Name="Rechamber 1216"; Icon="rbxassetid://92627722665597"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 9900; Description="Military grade mag based shotgun.";});
 
 	new(gunBase, {Id="mp5"; Name="MP5"; Icon="rbxassetid://9960159062"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Quick fire-rate sub-machine gun.";});
 	new(gunBase, {Id="mp7"; Name="MP7"; Icon="rbxassetid://9960161355"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Good accuracy and damage sub-machine gun.";});
 	new(gunBase, {Id="czevo3"; Name="CZ-Scorpion EVO 3"; Icon="rbxassetid://4814129724"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Extremely tactical sub-machine gun with a high base damage. Has built in <b>Damage Rev</b>, which does more damage the lower your ammo count is in your magazine.";});
-	new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine gun"; "Primary Weapon";}; NonPremiumTax = 4900; Description="Elite sub-machine gun with built-in <b>Crit Receiver</b> and suppressor.";});
-	new(gunBase, {Id="uzi"; Name="Uzi"; Icon="rbxassetid://136175981222842"; Tags={"Submachine gun"; "Primary Weapon";}; NonPremiumTax = 4900; Description="";});
+	new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine gun"; "Primary Weapon";}; TradingTax = 4900; Description="Elite sub-machine gun with built-in <b>Crit Receiver</b> and suppressor.";});
+	new(gunBase, {Id="uzi"; Name="Uzi"; Icon="rbxassetid://136175981222842"; Tags={"Submachine gun"; "Primary Weapon";}; TradingTax = 9900; Description="";});
 
 	new(gunBase, {Id="m4a4"; Name="M4A4"; Icon="rbxassetid://5166150878"; Tags={"Rifle"; "Primary Weapon";}; Description="Military grade M4 rifle capable of high damage and long range shooting.";});
 	new(gunBase, {Id="ak47"; Name="AK-47"; Icon="rbxassetid://5166397129"; Tags={"Rifle"; "Primary Weapon";}; Description="High damage, high magazine capacity, and great fire-rate. Quite a noise maker.";});
@@ -99,7 +99,7 @@ function ItemsLibrary:Init(super)
 	
 	new(gunBase, {Id="awp"; Name="AWP"; Icon="rbxassetid://5166454078"; Tags={"Sniper"; "Primary Weapon";}; Description="High Damage, high recoil and long ranged rifle.";});
 	new(gunBase, {Id="rec21"; Name="Rec-21"; Icon="rbxassetid://6532745901"; Tags={"Sniper"; "Primary Weapon";}; Description="High power, light weight tactical sniper rifle.";});
-	new(gunBase, {Id="grandgarand"; Name="Grand Garand"; Icon="rbxassetid://118201286435452"; Tags={"Sniper"; "Primary Weapon";}; Description="The good ol' battle tested semi-automatic m1 garand.";});
+	new(gunBase, {Id="grandgarand"; Name="Grand Garand"; Icon="rbxassetid://118201286435452"; Tags={"Sniper"; "Primary Weapon";}; TradingTax = 9900; Description="The good ol' battle tested semi-automatic m1 garand.";});
 	
 	new(gunBase, {Id="minigun"; Name="Minigun"; Icon="rbxassetid://5175211604"; Tags={"Heavy machine gun"; "Primary Weapon";}; Description="It weighs fifty seven kilograms and fires two hundred dollar, custom-tooled cartridges at ten thousand rounds per minute. It costs four hundred thousand dollars to fire this weapon... for twelve seconds.";});
 	new(gunBase, {Id="desolatorheavy"; Name="Desolator Heavy"; Icon="rbxassetid://6244386293"; Tags={"Heavy machine gun"; "Primary Weapon";}; Description="Heavy machine gun that desolates your enemies. Design inspired by the negev LMG, the Desolator Heavy is a high power concentrated machine gun firing heavy rounds with built-in <b>Rapid Fire</b> enabled. Weapon accuracy will increase as the weapon warms up from firing.";});
@@ -109,8 +109,8 @@ function ItemsLibrary:Init(super)
 	new(gunBase, {Id="grenadelauncher"; Name="Grenade Launcher"; Icon="rbxassetid://17005464588"; Tags={"Explosive"; "Launcher"}; Description="Explosion does area-of-effect damage, meaning the damage is divided by the amount of enemies in the area and overall an amazing killing machine.";});
 	new(gunBase, {Id="at4"; Name="AT4 Rocket Launcher"; Icon="rbxassetid://6436980949"; Tags={"Explosive"; "Launcher"}; Description="Perfectly designed to annihilate hordes and hordes of zombies.";});
 	
-	new(gunBase, {Id="tacticalbow"; Name="Tactical Bow"; Icon="rbxassetid://5456918610"; Tags={"Bow"}; NonPremiumTax = 4900; Description="High damage tactical bow.";});
-	new(gunBase, {Id="arelshiftcross"; Name="Arelshift Cross"; Icon="rbxassetid://13161587904"; Tags={"Bow";}; NonPremiumTax = 9900; Description="A scoped semi-automatic crossbow.";});
+	new(gunBase, {Id="tacticalbow"; Name="Tactical Bow"; Icon="rbxassetid://5456918610"; Tags={"Bow"}; Description="High damage tactical bow.";});
+	new(gunBase, {Id="arelshiftcross"; Name="Arelshift Cross"; Icon="rbxassetid://13161587904"; Tags={"Bow";}; TradingTax = 4900; Description="A scoped semi-automatic crossbow.";});
 
 	
 	local meleeBase = {
@@ -258,7 +258,7 @@ function ItemsLibrary:Init(super)
 		OnAdd = function(data)
 			local gameModeData = data.GameMode;
 			if gameModeData then
-				data.Name = (gameModeData.HardPrefix and gameModeData.HardPrefix.." " or "")..gameModeData.Stage.." "..(gameModeData.CrateSynonym or "Crate");
+				data.Name = (gameModeData.HardPrefix and `<font color="rgb(136, 105, 191)">{gameModeData.HardPrefix}</font>`.." " or "")..gameModeData.Stage.." "..(gameModeData.CrateSynonym or "Crate");
 				data.Description = "Open it to see what you got from "..gameModeData.Mode..": "..gameModeData.Stage.."."
 			end
 		end;
@@ -280,7 +280,23 @@ function ItemsLibrary:Init(super)
 	new(crateBase, {Id="ggenesiscrate"; Icon="rbxassetid://16791016380"; GameMode={Mode="Coop"; Stage="Genesis"; HardPrefix="Golden";}});
 	new(crateBase, {Id="sunkenchest"; Icon="rbxassetid://10971583849"; GameMode={Mode="Coop"; Stage="SunkenShip"; CrateSynonym="Chest";}});
 	new(crateBase, {Id="abandonedbunkercrate"; Icon="rbxassetid://13495111655"; GameMode={Mode="Raid"; Stage="Abandoned Bunker"}});
+
+	-- Corrupted
+	local corruptedCrateBase = table.clone(crateBase);
+	corruptedCrateBase.Stackable = false;
+	corruptedCrateBase.TradingTax = 100;
+	corruptedCrateBase.OnAdd = function(data)
+		local gameModeData = data.GameMode;
+		if gameModeData then
+			data.Name = (gameModeData.HardPrefix and `<font color='#ff3c3c'>{gameModeData.HardPrefix}</font>`.." " or "")..gameModeData.Stage.." "..(gameModeData.CrateSynonym or "Crate");
+			data.Description = "Open it to see what you got from <b><font color='#ff3c3c'>Corrupted</font> "..gameModeData.Mode..": "..gameModeData.Stage.."</b>."
+		end
+	end;
+	new(corruptedCrateBase, {Id="corruptedsectorfcrate"; Icon="rbxassetid://4873382562"; GameMode={Mode="Survival"; Stage="Sector F"; HardPrefix="Corrupted"}});
+	new(corruptedCrateBase, {Id="corruptedprisoncrate"; Icon="rbxassetid://4873382562"; GameMode={Mode="Survival"; Stage="Prison"; HardPrefix="Corrupted"}});
+	new(corruptedCrateBase, {Id="corruptedsectordcrate"; Icon="rbxassetid://4873382562"; GameMode={Mode="Survival"; Stage="Sector D"; HardPrefix="Corrupted"}});
 	
+	-- Misc;
 	new(crateBase, {Id="communitycrate"; Name="Community Crate: Alpha"; Icon="rbxassetid://13967718753"; Description="Obtained from community made maps, check gold shop for maps. Open and see what you get!";});
 	new(crateBase, {Id="communitycrate2"; Name="Community Crate: Beta"; Icon="rbxassetid://13967726501"; Description="Obtained from community made maps, check gold shop for maps. Open and see what you get!";});
 
@@ -529,16 +545,17 @@ function ItemsLibrary:Init(super)
 	--==========================================================[[ CRAFTING COMPONENTS ]]==========================================================--
 	local weaponCompBase = {
 		Type = super.Types.Component;
-		Tradable = super.Tradable.PremiumOnly;
+		Tradable = super.Tradable.Tradable;
 		Stackable = 10;
-		NonPremiumTax = 25;
+		TradingTax = 50;
 		OnAdd = function(data)
 			local craftFor = data.CraftFor;
 			if craftFor then
 				local itemLib = super:Find(craftFor);
-				data.Name = itemLib.Name.." Parts";
-				data.Description = "Parts used to create the "..itemLib.Name.." and mods.";
 				data.Icon = itemLib.Icon;
+
+				data.Name = (data.Prefix and `<font color='#ff3c3c'>{data.Prefix}</font> ` or ``)..`{itemLib.Name} Parts`;
+				data.Description = `Parts used to create the {itemLib.Name} and mods.`;
 			end
 		end;
 	}
@@ -550,7 +567,18 @@ function ItemsLibrary:Init(super)
 	new(weaponCompBase, {Id="rusty48parts"; CraftFor="rusty48";});
 	new(weaponCompBase, {Id="arelshiftcrossparts"; CraftFor="arelshiftcross"; Sources={"Obtained within <b>Abandoned Bunker</b>.";}; });
 	new(weaponCompBase, {Id="deagleparts"; CraftFor="deagle"; Sources={"Obtained from <b>Board Missions</b>.";};});
+
+	new(weaponCompBase, {Id="uziparts1"; Prefix=`Sector F`; CraftFor="uzi";});
+	new(weaponCompBase, {Id="uziparts2"; Prefix=`Prison`; CraftFor="uzi";});
+	new(weaponCompBase, {Id="uziparts3"; Prefix=`Sector D`; CraftFor="uzi";});
 	
+	new(weaponCompBase, {Id="rechamber1216parts1"; Prefix=`Sector F`; CraftFor="rechamber1216";});
+	new(weaponCompBase, {Id="rechamber1216parts2"; Prefix=`Prison`; CraftFor="rechamber1216";});
+	new(weaponCompBase, {Id="rechamber1216parts3"; Prefix=`Sector D`; CraftFor="rechamber1216";});
+	
+	new(weaponCompBase, {Id="grandgarandparts1"; Prefix=`Sector F`; CraftFor="grandgarand";});
+	new(weaponCompBase, {Id="grandgarandparts2"; Prefix=`Prison`; CraftFor="grandgarand";});
+	new(weaponCompBase, {Id="grandgarandparts3"; Prefix=`Sector D`; CraftFor="grandgarand";});
 	
 	--=========================================================[[ AMMO ]]==========================================================--
 	local ammoBase = {

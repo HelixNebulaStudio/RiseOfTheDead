@@ -8,7 +8,11 @@ local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modGameModeLibrary = require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modMarkers = require(game.ReplicatedStorage.Library.Markers);
+local modRewardsLibrary = require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modLeaderboardService = require(game.ReplicatedStorage.Library.LeaderboardService);
+local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+
+local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface);
 local modLeaderboardInterface = require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
 
 local templateEndScreen = script:WaitForChild("templateEndScreen");
@@ -29,6 +33,7 @@ return function(...)
 	
 	local activeLeaderboard;
 	local endScreen;
+	local nextRewardItemButton;
 	
 	function modeHud:Update(data)
 		modConfigurations.Set("AutoMarkEnemies", true);
@@ -104,6 +109,66 @@ return function(...)
 			modAudio.Play(bossKillTrack, script.Parent);
 		end
 
+
+		-- MARK: Show Next Reward
+		if data.IsHard and stageLib.HardRewardId then
+			local nextRewardFrame = self.MainFrame.NextReward; 
+			if data.GameState == "Intermission" then
+
+				local rewardsLib = modRewardsLibrary:Find(stageLib.HardRewardId);
+				if rewardsLib and rewardsLib.Rewards then
+					local rewardsList = rewardsLib.Rewards;
+					local wave = data.Wave;
+					
+					local nextRewardInfo = nil;
+
+					for a=1, #rewardsList do
+						local rewardInfo = rewardsList[a];
+						if rewardInfo.Wave >= wave then
+							nextRewardInfo = rewardInfo;
+							break;
+						end
+					end
+	
+					if nextRewardInfo then
+						local itemId = nextRewardInfo.ItemId;
+						local itemLib = modItemsLibrary:Find(itemId);
+						nextRewardFrame.rewardLabel.Text = `<font size="10">Next Reward</font>\n{itemLib.Name} drops at wave {nextRewardInfo.Wave}`;
+
+						local itemButtonObject = nextRewardItemButton or modItemInterface.newItemButton(itemId);
+						nextRewardItemButton = itemButtonObject;
+						local newItemButton = itemButtonObject.ImageButton;
+
+						newItemButton.Name = itemId;
+						newItemButton.Size = UDim2.new(0, 80, 0, 80);
+						newItemButton.Parent = nextRewardFrame;
+						
+						itemButtonObject:Update();
+
+						if nextRewardFrame:GetAttribute("Hidden") == true then
+							nextRewardFrame:SetAttribute("Hidden", false);
+
+							TweenService:Create(nextRewardFrame, TweenInfo.new(1), {
+								Position=UDim2.new(0.5, 0, 0, 140);
+							}):Play();
+						end
+					end
+				end
+
+			else
+				if nextRewardFrame:GetAttribute("Hidden") == false then
+					nextRewardFrame:SetAttribute("Hidden", true);
+
+					TweenService:Create(nextRewardFrame, TweenInfo.new(1), {
+						Position=UDim2.new(0.5, 0, 0, -140);
+					}):Play();
+				end
+
+			end
+		end
+
+
+		-- MARK: EndScreen
 		local statsBoard = data.StatsCount or data.Stats;
 		if statsBoard ~= nil then
 			if statsBoard ~= false then
@@ -151,7 +216,7 @@ return function(...)
 						end
 					end
 
-					if stageLib.LeaderboardKeyTable and data.IsHard then
+					if stageLib.LeaderboardKeyTable then
 						modLeaderboardService.ClientGamemodeBoardRequest(gameType, gameStage);
 
 						local keyTable = {
