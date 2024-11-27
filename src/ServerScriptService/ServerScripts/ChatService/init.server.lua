@@ -269,8 +269,7 @@ local function QuickTextFilter(text)
 	for _, player in (Players:GetPlayers()) do
 		if filteredTxt == nil then
 			pcall(function()
-				local txtFilterResult: TextFilterResult = TextService:FilterStringAsync(text, player.UserId, Enum.TextFilterContext.PublicChat);
-				filteredTxt = txtFilterResult:GetChatForUserAsync(player.UserId);
+				filteredTxt = game.Chat:FilterStringForBroadcast(text, player);
 			end)
 		else
 			break;
@@ -409,17 +408,15 @@ function ChatService.Init()
 				
 				for a=1, #msgList do
 					local data = msgList[a];
-					Debugger:StudioLog("globalchat",factionTag, a, data);
+					Debugger:StudioLog("globalchat", a, data);
 					if data.Timestamp == nil then continue end;
 	
-					task.spawn(function()
-						local filteredTxt = QuickTextFilter(data.RawText or data.Text);
-						if filteredTxt == nil then return end;
-						if data.RawText == nil then data.RawText = data.Text; end
-						data.Text = filteredTxt;
+					local filteredTxt = QuickTextFilter(data.RawText or data.Text);
+					if filteredTxt == nil then continue end;
+					if data.RawText == nil then data.RawText = data.Text; end
+					data.Text = filteredTxt;
 
-						remoteChatServiceEvent:FireClient(player, "globalchat", data);
-					end)
+					remoteChatServiceEvent:FireClient(player, "globalchat", data);
 				end
 
 			end
@@ -1020,17 +1017,6 @@ function ChatService:ProccessChat(player, channelId, text, extra)
 		ChannelId=channelId;
 	});
 
-	for _, oPlayer in pairs(game.Players:GetPlayers()) do
-		if not ChatService:IsMuted(oPlayer, player.Name) then
-			local filteredResult = TextService:FilterStringAsync(text, player.UserId, Enum.TextFilterContext.PublicChat);
-			local filtered = filteredResult:GetChatForUserAsync(oPlayer.UserId);
-				--filteredResult:GetNonChatStringForBroadcastAsync();
-			extra = extra or {};
-			extra.Name = player.Name;
-
-			ChatService:SendMessage(oPlayer, channelId, filtered, extra);
-		end
-	end
 end
 
 function ChatService:ProccessGlobalChat(speakerName, channelId, text, extra)
