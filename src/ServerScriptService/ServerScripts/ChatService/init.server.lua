@@ -382,36 +382,8 @@ function ChatService.Init()
 				end
 
 			end
-
-
-			
-		-- elseif action == "syncfactionchat" then
-		-- 	local profile = shared.modProfile:Get(player);
-			
-		-- 	local factionProfile = profile and profile.Faction;
-		-- 	local factionTag = factionProfile and factionProfile.Tag or nil;
-
-		-- 	Debugger:Log("Sync faction chat ", player, factionTag);
-		-- 	if factionTag then
-		-- 		local cacheMsgJson = ChatService.ChatHistory:Get("["..factionTag.."]");
-		-- 		local cacheMsg = cacheMsgJson and HttpService:JSONDecode(cacheMsgJson) or {};
-	
-		-- 		if cacheMsg then
-		-- 			if profile.SyncFacChatInit == nil then
-		-- 				profile.SyncFacChatInit = true;
-						
-		-- 				for a=1, #cacheMsg do
-		-- 					local data = cacheMsg[a];
-		-- 					Debugger:StudioLog("factionchat",factionTag, a, data);
-		-- 					if data.Timestamp == nil then continue end;
-			
-		-- 					remoteChatServiceEvent:FireClient(player, "globalchat", data);
-		-- 				end
-		-- 			end
-		-- 		end
-		-- 	end
-
 		end
+		
 	end)
 end
 
