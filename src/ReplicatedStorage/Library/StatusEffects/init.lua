@@ -1172,6 +1172,22 @@ function StatusEffects.VexBile(player, duration)
 	end
 end
 
+function StatusEffects.CorruptVision(player, val)
+	val = val == true;
+
+	if RunService:IsServer() then
+		replicateStatus(player, "CorruptVision", val);
+	else
+		if val == true then
+			modCameraGraphics.TintColor:Set("corrupt", Color3.fromRGB(204, 157, 151), 1);
+			modCameraGraphics:SetAtmosphere(script.CorruptAtmosphere, "corrupt", modCameraGraphics.EffectsPriority.Environment);
+		else
+			modCameraGraphics.TintColor:Remove("corrupt");
+			modCameraGraphics:ClearAtmosphere("corrupt");
+		end
+	end
+end
+
 function StatusEffects.Chained(player, duration, position, anchorHealth, isHardMode)
 	if RunService:IsClient() then return end
 	duration = duration or 10;

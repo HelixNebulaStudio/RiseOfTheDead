@@ -824,6 +824,13 @@ function Survival:Initialize(roomData)
 	self.IsHard = roomData.IsHard == true;
 	self.Seed = math.random(1111, 9999);
 	
+	if self.IsHard then
+		local hardDecor = game.ServerStorage:FindFirstChild("HardDecor");
+		if hardDecor then
+			hardDecor.Parent = workspace.Environment;
+		end
+	end
+
 	local function clearCharacter(character: Model?)
 		for a=#self.Characters, 1, -1 do
 			local char = self.Characters[a];
@@ -910,6 +917,10 @@ function Survival:Initialize(roomData)
 		
 					end
 				end)
+
+				if self.IsHard then
+					modStatusEffects.CorruptVision(player, true);
+				end
 			end)
 
 			if not classPlayer.IsAlive then 
