@@ -254,6 +254,15 @@ function ChatService.Notify(player, message, class, key, packet)
 	end
 end
 
+function ChatService.NewTextChannel(name)
+	local textChannel = Instance.new("TextChannel");
+	textChannel.Name = name;
+	textChannel:SetAttribute("Global", true);
+	textChannel.Parent = textChannelsFolder;
+	ChatService.Channels[name] = textChannel;
+	return textChannel;
+end
+
 function ChatService.Init()
 	TextChatService:WaitForChild("BubbleChatConfiguration").Enabled = false;
 
@@ -291,6 +300,7 @@ function ChatService.Init()
 		if channelId == nil or txtMessage == nil then return end;
 		
 		local textChannel: TextChannel = ChatService.Channels[channelId];
+		if textChannel == nil then return end;
 		if not textChannel:GetAttribute("Global") then return end;
 
 		ChatService.CacheMsg(data);
@@ -418,7 +428,7 @@ end
 Players.PlayerRemoving:Connect(function(player)
 	task.wait(1);
 	for channelId, textChannel in pairs(ChatService.Channels) do
-		if textChannel:GetAttribute("Faction") ~= true then continue end;
+		if textChannel:GetAttribute("Faction") == nil then continue end;
 
 		local exist = false;
 		for _, txtSrc in pairs(textChannel:GetChildren()) do
@@ -436,10 +446,43 @@ Players.PlayerRemoving:Connect(function(player)
 end)
 
 shared.Notify = ChatService.Notify;
-shared.ChatService = ChatService;
+shared.modChatService = ChatService;
 ChatService.Init();
 modCommandsLibrary.init();
 modEngineCore:ConnectOnPlayerAdded(script, OnPlayerConnect);
+
+task.spawn(function()
+	Debugger.AwaitShared("modProfile");
+
+	shared.modProfile.OnPlayerPacketRecieved:Connect(function(profile, ...)
+		local packet = ...;
+
+		if packet and packet.Data and packet.Data.Request == "DirectMessage" then
+			local data = packet.Data;
+			
+			
+			local extra = data.Extra or {};
+			extra.Name = data.SpeakerName;
+
+			local channelId = data.ChannelId;
+			local text = data.Text;
+			local msgExtra = extra;
+
+			local receiverPlayer = game.Players:FindFirstChild(data.ChannelId);
+			if receiverPlayer == nil then return end;
+			
+
+
+			-- if not ChatService:IsMuted(receiverPlayer, data.SpeakerName) then
+			-- 	msgExtra.Name = data.SpeakerName;
+			-- 	ChatService:SendMessage(receiverPlayer, data.SpeakerName, text, msgExtra);
+
+			-- 	shared.Notify(receiverPlayer, "New message from "..tostring(data.SpeakerName)..".", "Inform");
+			-- end
+				
+		end
+	end)
+end)
 
 task.spawn(function()
 	Debugger.AwaitShared("modCommandsLibrary");

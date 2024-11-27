@@ -1790,6 +1790,11 @@ function Factions.InvokeHandler(player, action, ...)
 					local factionsMadeFlags = profile.Flags:Get("Factions", {Id="Factions"; List={}});
 					table.insert(factionsMadeFlags.List, newFactionObj.Tag);
 
+					local textChannel = shared.modChatService.NewTextChannel(`[{factionTag}]`);
+					textChannel:SetAttribute("Faction", factionTag);
+
+					newFactionObj:Notify(`Welcome to {factionTag}. Here you can recruit other players to be members to complete faction missions.`, "Inform");
+
 				else
 					shared.Notify(player, "Failed to create faction, looks like someone made it first.", "Negative");
 

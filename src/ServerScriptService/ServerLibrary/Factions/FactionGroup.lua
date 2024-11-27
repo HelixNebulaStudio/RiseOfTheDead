@@ -300,7 +300,7 @@ end
 
 function FactionGroup:Notify(msg, style)
 	task.spawn(function()
-		shared.ChatService.SendGlobalMessage{
+		shared.modChatService.SendGlobalMessage{
 			Name="Game";
 			ChannelId=`[{self.Tag}]`;
 			Text=msg;
