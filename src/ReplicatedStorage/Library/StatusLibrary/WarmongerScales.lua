@@ -51,9 +51,9 @@ function StatusClass.OnTick(classPlayer, status, tickPack)
 	if RunService:IsServer() then
 		if tickPack.ms100 ~= true then return end;
 
-		local timeSinceDoingDmg = tick()-classPlayer.LastDamageDealt;
+		local timeSinceDoingDmg = workspace:GetServerTimeNow()-classPlayer.LastDamageDealt;
 		
-		if timeSinceDoingDmg >= 10 and (status.Pool and status.Pool > 0) then
+		if timeSinceDoingDmg >= 20 and (status.Pool and status.Pool > 0) then
 			status.Pool = math.max(status.Pool - 0.1, 0);
 		end
 		if status.Buffer and status.Buffer > 0 and classPlayer.Humanoid.Health < classPlayer.Humanoid.MaxHealth then
