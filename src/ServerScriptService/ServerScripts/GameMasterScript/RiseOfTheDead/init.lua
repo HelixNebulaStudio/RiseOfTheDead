@@ -119,38 +119,6 @@ function ModEngine.OnPlayerAdded(player: Player)
 		end
 		
 		if modBranchConfigs.IsWorld("Main Menu") then return end;
-		
-		task.delay(5, function()
-			-- !outline Premium daily bonus free perks
-			if player.MembershipType == Enum.MembershipType.Premium or profile.Premium then
-
-				local rbxPerksFlag = profile.Flags:Get("rbxPremiumPerks") or {Id="rbxPremiumPerks"; JoinTime=0; MissionsComplete=0; CompleteTime=0;};
-				local joinPerks = 15;
-				local cooldown = 72000;
-				
-				if os.time()-(rbxPerksFlag.JoinTime or 0) > cooldown then
-					rbxPerksFlag.JoinTime = os.time();
-					rbxPerksFlag.MissionsComplete = 0;
-					
-					profile.Flags:Add(rbxPerksFlag);
-
-					if playerSave:AddStat("Perks", joinPerks) > 0 then
-						modAnalytics.RecordResource(player.UserId, joinPerks, "Source", "Perks", "Gameplay", "PremiumBonus");
-
-						modAnalyticsService:Source{
-							Player=player;
-							Currency=modAnalyticsService.Currency.Perks;
-							Amount=joinPerks;
-							EndBalance=playerSave:GetStat("Perks");
-							ItemSKU="PremiumDaily";
-						};
-					end
-					
-					shared.Notify(player, "+"..joinPerks.." Perks from Premium Daily Bonus. Complete 0/3 missions for a bonus +35 Perks!", "Positive");
-					
-				end
-			end
-		end)
 	end)
 
 	if #game.Players:GetPlayers() > 1 then
