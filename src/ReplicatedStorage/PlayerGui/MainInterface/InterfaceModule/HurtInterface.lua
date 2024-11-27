@@ -8,11 +8,12 @@ local TweenService = game:GetService("TweenService");
 
 local localplayer = game.Players.LocalPlayer;
 
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 
 local remoteDamagePacket = modRemotesManager:Get("DamagePacket");
@@ -54,7 +55,7 @@ function Interface.init(modInterface)
 		
 		flinchMulti = flinchMulti * flinchProtection;
 
-		if classPlayer.Character and classPlayer.Character:FindFirstChild("GodModeFF") == nil then
+		if classPlayer.Character and classPlayer.Character:FindFirstChild("GodModeFF") == nil and modConfigurations.DisableHurtFlinch == false then
 			if flinchMulti > 5 then
 				flinchMulti = flinchMulti/2;
 				mouseProperties.XAngOffset = mouseProperties.XAngOffset + math.rad(math.abs(math.sin(dirRad)) * flinchMulti);

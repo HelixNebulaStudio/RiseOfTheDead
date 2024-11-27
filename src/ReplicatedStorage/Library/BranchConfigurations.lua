@@ -521,6 +521,7 @@ elseif Branches.WorldInfo.Type == Branches.WorldTypes.General or Branches.WorldI
 	modConfigurations.Set("DisableStatusHud", false);
 	modConfigurations.Set("NotificationViewPos", 1);
 	modConfigurations.Set("DisableSafehomeMenu", true);
+	modConfigurations.Set("DisableHurtFlinch", false);
 	
 	if Branches.WorldInfo.PublicWorld then
 		modConfigurations.Set("DisableUpdateLogs", false);
@@ -561,6 +562,7 @@ elseif Branches.WorldInfo.Type == Branches.WorldTypes.Cutscene then
 	modConfigurations.Set("DisableStatusHud", true);
 	modConfigurations.Set("NotificationViewPos", 2);
 	modConfigurations.Set("DisableMissions", false);
+	modConfigurations.Set("DisableHurtFlinch", false);
 	
 elseif Branches.WorldInfo.Type == Branches.WorldTypes.Menu then
 	modConfigurations.Set("AllowFreecam", true);
@@ -588,6 +590,7 @@ elseif Branches.WorldInfo.Type == Branches.WorldTypes.Slaughterfest then
 	modConfigurations.Set("DisableExperiencebar", false);
 	modConfigurations.Set("RemoveForceFieldOnWeaponFire", true);
 	modConfigurations.Set("DisableGearMods", true);
+	modConfigurations.Set("DisableHurtFlinch", false);
 	
 	modConfigurations.Set("PvpMode", true);
 	

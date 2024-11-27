@@ -67,6 +67,7 @@ Configurations.Set("VelocityTriggerRagdoll", false);
 Configurations.Set("DisableMapItems", true);
 Configurations.Set("DisableHurtInterface", false);
 Configurations.Set("DefaultSprintMode", 1);
+Configurations.Set("DisableHurtFlinch", true);
 
 Configurations.Set("IgnoreModCompatibility", false);
 
