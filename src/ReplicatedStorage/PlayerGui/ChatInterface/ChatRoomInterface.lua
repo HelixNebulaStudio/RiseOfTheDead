@@ -90,10 +90,19 @@ function Room.new(id)
 	end)
 	
 	local frameListLayout = self.Frame:WaitForChild("UIListLayout");
+	local deleteMsgDebounce = tick();
+	-- MARK: Delete old messages;
 	frameListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		if tick()-deleteMsgDebounce <= 5 then return end;
+		deleteMsgDebounce = tick();
+
 		local msgs = self.Frame:GetChildren();
-		table.sort(msgs, function(A, B)
-			return (tonumber(A.Name) or 0) > (tonumber(B.Name) or 0);
+		if #msgs <= 40 then return end;
+		task.wait(0.5);
+
+		table.sort(msgs, function(a, b)
+			return (a:GetAttribute("LastUpdate") or tick()) > (b:GetAttribute("LastUpdate") or tick());
+			--return (tonumber(A.Name) or 0) > (tonumber(B.Name) or 0);
 		end)
 		for a=#msgs, 30, -1 do
 			if msgs[a]:IsA("GuiObject") then
