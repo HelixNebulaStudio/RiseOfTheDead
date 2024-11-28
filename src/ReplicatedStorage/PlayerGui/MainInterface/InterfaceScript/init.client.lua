@@ -45,7 +45,6 @@ modLeaderboardInterface.SetModInterface(modInterface);
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
-local modChatInterface = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("ChatInterface"));
 local modAudio = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("Audio"));
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
