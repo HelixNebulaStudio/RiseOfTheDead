@@ -61,7 +61,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Reload={Id=113101142371503;};
 	TacticalReload={Id=94780225166213;};
 	Load={Id=129324275336201;};
-	Inspect={Id=16326518316;};
+	Inspect={Id=133473762767233;};
 	Sprint={Id=74155200790246};
 	Empty={Id=94131442451868;};
 	Unequip={Id=16838914873};
@@ -73,7 +73,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	Reload={Id=113101142371503;};
 	TacticalReload={Id=94780225166213;};
 	Load={Id=129324275336201;};
-	Inspect={Id=16326518316;};
+	Inspect={Id=133473762767233;};
 	Sprint={Id=74155200790246};
 	Empty={Id=94131442451868;};
 	Unequip={Id=16838914873};
