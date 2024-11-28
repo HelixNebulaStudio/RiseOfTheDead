@@ -90,7 +90,7 @@ function ItemsLibrary:Init(super)
 	new(gunBase, {Id="mp7"; Name="MP7"; Icon="rbxassetid://9960161355"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Good accuracy and damage sub-machine gun.";});
 	new(gunBase, {Id="czevo3"; Name="CZ-Scorpion EVO 3"; Icon="rbxassetid://4814129724"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Extremely tactical sub-machine gun with a high base damage. Has built in <b>Damage Rev</b>, which does more damage the lower your ammo count is in your magazine.";});
 	new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine gun"; "Primary Weapon";}; TradingTax = 4900; Description="Elite sub-machine gun with built-in <b>Crit Receiver</b> and suppressor.";});
-	new(gunBase, {Id="uzi"; Name="Uzi"; Icon="rbxassetid://136175981222842"; Tags={"Submachine gun"; "Primary Weapon";}; TradingTax = 9900; Description="";});
+	new(gunBase, {Id="uzi"; Name="Uzi"; Icon="rbxassetid://70941686222281"; Tags={"Submachine gun"; "Primary Weapon";}; TradingTax = 9900; Description="";});
 
 	new(gunBase, {Id="m4a4"; Name="M4A4"; Icon="rbxassetid://5166150878"; Tags={"Rifle"; "Primary Weapon";}; Description="Military grade M4 rifle capable of high damage and long range shooting.";});
 	new(gunBase, {Id="ak47"; Name="AK-47"; Icon="rbxassetid://5166397129"; Tags={"Rifle"; "Primary Weapon";}; Description="High damage, high magazine capacity, and great fire-rate. Quite a noise maker.";});
@@ -194,8 +194,8 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="clothbagmask"; Name="Cloth Bag Mask"; Icon="rbxassetid://13985462066"; Tags={"Head";}; Description="Cloth bag mask, great for covering hostages' head and limit vision.";});
 	new(clothingBase, {Id="hardhat"; Name="Hard Hat"; Icon="rbxassetid://12439223859"; Tags={"Head";}; Description="A construction hard hat, provides light to the surrounding.";});
 	new(clothingBase, {Id="fedora"; Name="Fedora"; Icon="rbxassetid://14235302470"; Tags={"Head";}; Description="*Tips Fedora*";});
-	new(clothingBase, {Id="santahat"; Name="Santa Hat"; Tradable=super.Tradable.Tradable; Icon="rbxassetid://6108356239"; Tags={"Head"; "Christmas"; "Frostivus"}; Description="Merry Christmas, ho ho ho!";});
-	new(clothingBase, {Id="greensantahat"; Name="Green Santa Hat"; Tradable=super.Tradable.Tradable; Icon="rbxassetid://6122942270"; Tags={"Head"; "Christmas"; "Frostivus"}; Description="Merry Christmas, ho ho ho!";});
+	new(clothingBase, {Id="santahat"; Name="Santa Hat"; Tradable=super.Tradable.Tradable; Icon="rbxassetid://6108356239"; Tags={"Head"; "Christmas"; "Frostivus"}; Description="Merry Christmas, ho ho ho!\n\n<b>[Passive] Colored Gifts:</b> Increases the drop rate of specific colored <b>Frostivus</b> gifts based on your hat color. (Default: Red)";});
+	new(clothingBase, {Id="greensantahat"; Name="Green Santa Hat"; Tradable=super.Tradable.Tradable; Icon="rbxassetid://6122942270"; Tags={"Head"; "Christmas"; "Frostivus"}; Description="Merry Christmas, ho ho ho!\n\n<b>[Passive] Colored Gifts:</b> Increases the drop rate of green <b>Frostivus</b> gifts based on your hat color.";});
 	new(clothingBase, {Id="bunnymanhead"; Name="Bunny Man's Head"; Icon="rbxassetid://4845183167"; Tags={"Head"; "Easter"}; Description="Bunny Man's Headwear. Normal environmental Zombies will ignore you during the Easter event.\nEvent-Active: "..tostring(modConfigurations.SpecialEvent.Easter); Sources={"Obtained from <b>The Bunny Man in Mission: Bunny Man's Eggs</b>";};});
 	new(clothingBase, {Id="jackolantern"; Name="Jack o' Lantern"; Icon="rbxassetid://14951707178"; Tags={"Head"; "Slaughterfest";}; Description="Where Jack watches through the jacks o lanterns.";});
 	new(clothingBase, {Id="ninjashroud"; Name="Ninja Shroud"; Icon="rbxassetid://88409858365523"; Tags={"Head";}; Description="Comfortable cloth shroud.\n\n<b>[Passive] Ninja Fleet:</b> Sprint button is now a dash button. You automatically sprint when you haven't taken damage to your health for an amount of time. Your base move speed is reduced but sprint speed is increased.";});
@@ -233,7 +233,7 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="divingsuit"; Name="Diving Suit"; Icon="rbxassetid://10342826622"; Tags={"FullBody"; "Diving Gear"; "Utility Wear";}; Description="Reduces oxygen cost while being underwater and increases oxygen restore rate.";});
 	new(clothingBase, {Id="inflatablebuoy"; Name="Inflatable Buoy"; Icon="rbxassetid://10393385339"; Tags={"Utility Wear";}; Description="Helps you float to the top when swimming.";});
 	new(clothingBase, {Id="mercskneepads"; Name="Merc's Knee Pads"; Icon="rbxassetid://11026588384"; Tags={"Utility Wear"}; Description="A mercenary's favourite holster and knee pads.\n\n<b>[Passive] Tactical Holsters:</b>Reduces tool equip time by 40%.";});
-	new(clothingBase, {Id="portableautoturret"; TradingTax=9900; Usable="Configure"; CanVanity=false; Name="Portable Auto Turret"; Icon="rbxassetid://16402082812"; Tags={"Utility Wear"}; Description="A wearable portable auto turret designed by the Mysterious Engineer. Requires batteries to run. Configure to equipped your weapon onto the arm and fine tune the P.A.T. to how you want it to function, but due to it's crude nature, the arm's aim accuracy can be underwhelming and reload times are 3x as slow."; Sources={"Obtained in <b>Mission: Belly of the Beast</b>";}; });
+	new(clothingBase, {Id="portableautoturret"; TradingTax=9900; Usable="Configure"; CanVanity=false; Name="Portable Auto Turret"; Icon="rbxassetid://139796387934890"; Tags={"Utility Wear"}; Description="A wearable portable auto turret designed by the Mysterious Engineer. Requires batteries to run. Configure to equipped your weapon onto the arm and fine tune the P.A.T. to how you want it to function, but due to it's crude nature, the arm's aim accuracy can be underwhelming and reload times are 3x as slow."; Sources={"Obtained in <b>Mission: Belly of the Beast</b>";}; });
 
 	local storageBase = {
 		Type = super.Types.Clothing;
@@ -830,7 +830,7 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="santahatyellow"; Icon="rbxassetid://94254676862025"; SkinPerm="Yellow"; TargetItemId="santahat";});
 
 	-- portableautoturret
-	new(skinPermBase, {Id="portableautoturretblue"; Icon="rbxassetid://71002206778303"; SkinPerm="Blue"; TargetItemId="portableautoturret";});
+	new(skinPermBase, {Id="portableautoturretblue"; Icon="rbxassetid://113924290223669"; SkinPerm="Blue"; TargetItemId="portableautoturret";});
 
 
 	--==========================================================[[ SUMMONS ]]==========================================================--
@@ -952,6 +952,34 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="scraparmorcherryblossom"; Icon="rbxassetid://12963959744"; SkinPerm="Cherry Blossom"; TargetItemId="scraparmor"; Tags={"Easter"};});
 	
 	-- Frostivus 2024
+	local frostivusPresentBase = table.clone(resourceBase);
+	frostivusPresentBase.DestroyOnExpire=true;
+	frostivusPresentBase.Sources={"Obtained from general gameplay.";};
+	frostivusPresentBase.Stackable=50;
+	frostivusPresentBase.OnInstantiate=function(storageItem)
+		local itemValues = storageItem.Values;
+		if itemValues.Expire then return end;
+		itemValues.Expire = (math.ceil(workspace:GetServerTimeNow()) + shared.Const.MonthSecs);
+		itemValues.ExpireLength = shared.Const.MonthSecs;
+	end;
+	frostivusPresentBase.OnAdd = function(data)
+		local descStr = "Frostivus event is here! Talk to Mr. Klaws to use these gifts!";
+		if data.Id == "bluegift" then
+			descStr = descStr..`\nWearing the <b><font color="#{data.NameColor:ToHex()}">Blue</font> Santa Hat</b> will increase drop rate of blue gifts.`;
+		elseif data.Id == "redgift" then
+			descStr = descStr..`\nWearing the <b><font color="#{data.NameColor:ToHex()}">Red</font> Santa Hat</b> will increase drop rate of red gifts.`;
+		elseif data.Id == "yellowgift" then
+			descStr = descStr..`\nWearing the <b><font color="#{data.NameColor:ToHex()}">Yellow</font> Santa Hat</b> will increase drop rate of yellow gifts.`;
+		elseif data.Id == "greengift" then
+			descStr = descStr..`\nWearing the <b><font color="#{data.NameColor:ToHex()}">Green</font> Santa Hat</b> will increase drop rate of green gifts.`;
+		end
+		data.Description = descStr;
+	end;
+	new(frostivusPresentBase, {Id="bluegift"; Name="Blue Rocket Gift"; NameColor=Color3.fromHex("2575bb"); Icon="rbxassetid://129530129066564";});
+	new(frostivusPresentBase, {Id="redgift"; Name="Red Burger Gift"; NameColor=Color3.fromHex("f47a6b"); Icon="rbxassetid://93444893261457";});
+	new(frostivusPresentBase, {Id="yellowgift"; Name="Yellow Toilet Paper Gift"; NameColor=Color3.fromHex("ffe6a2"); Icon="rbxassetid://75018461839823";});
+	new(frostivusPresentBase, {Id="greengift"; Name="Green Duck Gift"; NameColor=Color3.fromHex("a1ff95"); Icon="rbxassetid://79205066583327";});
+	
 
 	-- Legacy
 	new(toolBase, {Id="masusplush"; Name="Masus Plush"; Icon="rbxassetid://18158370701"; Tags={"Legacy"}; Description=`Suspiciously cute. Keep an eye on it though.`;});

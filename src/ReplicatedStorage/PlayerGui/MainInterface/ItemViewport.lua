@@ -57,6 +57,7 @@ function ItemViewport.new() : ItemViewport
 		Zoom = 2;
 		OrbitTick = tick();
 		PanTick = tick();
+		PanSensitivity = 1.5;
 		Angles = CFrame.Angles(0, 0, 0);
 		Offset = CFrame.new(0, 0, 0);
 		
@@ -76,6 +77,8 @@ function ItemViewport.new() : ItemViewport
 		if inputObject.UserInputType == Enum.UserInputType.MouseWheel then
 			if self.Camera then
 				self.Zoom = math.clamp(self.Zoom+0.5*-inputObject.Position.Z, 1, 8);
+
+				self.PanSensitivity = math.clamp(self.PanSensitivity -(inputObject.Position.Z*0.2), 1.5, 4); 
 			end
 		end
 	end));
@@ -316,9 +319,10 @@ function ItemViewport:RefreshDisplay()
 				posX, posY = self.Offset.X, self.Offset.Y;
 				spin = false;
 			end
+			
 			self.Offset = CFrame.new(
-				math.clamp(posX + (playerMouse.X-OnClickX)/OnClickX*1.5, -1, 1),
-				math.clamp(posY - (playerMouse.Y-OnClickY)/OnClickY*1.5, -1, 1),
+				math.clamp(posX + (playerMouse.X-OnClickX)/OnClickX*self.PanSensitivity, -4, 4),
+				math.clamp(posY - (playerMouse.Y-OnClickY)/OnClickY*self.PanSensitivity, -4, 4),
 				0
 			):Lerp(CFrame.identity, 0.005);
 		else
