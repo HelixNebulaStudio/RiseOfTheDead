@@ -95,6 +95,11 @@ local toolPackage = {
 
 	WeaponClass="Submachine gun";
 	Tier=5;
+
+	Welds={
+		LeftToolGrip="uzi";
+		RightToolGrip="uzi";
+	}
 };
 
 function toolPackage.NewToolLib(handler)

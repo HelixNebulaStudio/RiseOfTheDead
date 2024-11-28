@@ -807,6 +807,24 @@ WorkbenchLibrary.ItemAppearance={
 		ToolGripOffset=CFrame.new(0, 0, 0);
 		ToolGrip={};
 	};
+	["uzi"]={
+		LeftToolGripModel="uzi";
+		LeftToolGripOffset=CFrame.new(-1, 0, 0) * CFrame.Angles(math.rad(90), 0, 0);
+		LeftToolGrip={};
+		RightToolGripModel="uzi";
+		RightToolGripOffset=CFrame.new(1, 0, 0) * CFrame.Angles(math.rad(90), 0, 0);
+		RightToolGrip={}
+	};
+	["rechamber1216"]={
+		ToolGripModel="rechamber1216";
+		ToolGripOffset=CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(90), 0, 0);
+		ToolGrip={};
+	};
+	["grandgarand"]={
+		ToolGripModel="grandgarand";
+		ToolGripOffset=CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(90), 0, 0);
+		ToolGrip={};
+	};
 	
 	
 	--== Melee

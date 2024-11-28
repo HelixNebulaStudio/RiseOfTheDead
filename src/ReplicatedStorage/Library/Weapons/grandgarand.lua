@@ -12,7 +12,7 @@ local Configurations={
 	
 	AmmoType="sniperammo";
 	
-	BaseInaccuracy=2.4;
+	BaseInaccuracy=2.2;
 	FocusInaccuracyReduction=0.5;
 	CrouchInaccuracyReduction=0.5;
 	MovingInaccuracyScale=8;
@@ -26,11 +26,11 @@ local Configurations={
 	YRecoil=0.6;
 	
 	-- Weapon Properties;
-	MinBaseDamage=650;
-	BaseDamage=16575;
+	MinBaseDamage=580;
+	BaseDamage=24600;
 	
-	AmmoLimit=10;
-	MaxAmmoLimit=(10*3);
+	AmmoLimit=6;
+	MaxAmmoLimit=(6*3);
 	
 	DamageDropoff={
 		MinDistance=256;
@@ -45,8 +45,8 @@ local Configurations={
 	UseScopeGui=true;
 	
 	-- Sniper
-	BaseFocusDuration=4;
-	FocusDuration=4;
+	BaseFocusDuration=3;
+	FocusDuration=3;
 	FocusWalkSpeedReduction=0.65;
 	ChargeDamagePercent=0.2;
 	
@@ -57,9 +57,9 @@ local Configurations={
 local Properties={
 	Ammo=Configurations.AmmoLimit;
 	MaxAmmo=Configurations.MaxAmmoLimit;
-	Rpm=60;
-	FireRate=(60/60);
-	ReloadSpeed=3.2;
+	Rpm=80;
+	FireRate=(60/80);
+	ReloadSpeed=2.8;
 }
 
 local Animations=workspace:GetAttribute("IsDev") and {

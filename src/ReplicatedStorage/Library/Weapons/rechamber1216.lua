@@ -8,7 +8,7 @@ local Configurations={
 	ReloadMode=Library.ReloadModes.Full;
 	WeaponType=Library.WeaponType.Shotgun;
 	
-	EquipLoadTime=2;
+	EquipLoadTime=1;
 	
 	AmmoType="shotgunammo";
 	
