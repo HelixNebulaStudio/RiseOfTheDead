@@ -32,6 +32,21 @@ function attirePackage.NewToolLib(handler)
 		
 		newArm.Parent = accessory;
 		
+		accessory:WaitForChild("Handle").ChildAdded:Connect(function(surfApp)
+			if not surfApp:IsA("SurfaceAppearance") then return end;
+			for _, obj in pairs(newArm:GetChildren()) do
+				if obj:IsA("BasePart") then
+					for _, sf in pairs(obj:GetChildren()) do
+						if sf:IsA("SurfaceAppearance") then
+							sf:Destroy()
+						end
+					end
+
+					surfApp:Clone().Parent = obj;
+				end
+			end
+		end)
+
 		task.spawn(function()
 			local storage = shared.modStorage.Get(storageId, classPlayer:GetInstance());
 			if storage then

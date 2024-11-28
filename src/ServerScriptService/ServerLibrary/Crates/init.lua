@@ -53,7 +53,7 @@ function Crates.Spawn(id, cframe, whitelist, content, visibleToWhitelistOnly)
 	local interactData = require(storageInteractable);
 	
 	interactData.Script = storageInteractable;
-	interactData:SetStorageId(storageId);
+	interactData:SetStorageId(storageId); -- interactData.StorageId;
 	
 	interactData.RefStorageId = crateLib.Id;
 	interactData.StorageName = storageName;

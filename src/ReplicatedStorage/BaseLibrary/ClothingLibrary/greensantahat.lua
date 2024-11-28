@@ -11,7 +11,14 @@ function attirePackage.NewToolLib(handler)
 	toolLib.Warmth = 1;
 	toolLib.HasFlinchProtection = true;
 	
-	return modClothingProperties.new(toolLib);
+	local clothing = modClothingProperties.new(toolLib);
+
+	clothing:RegisterPlayerProperty("ColoredGifts", {
+		Default="green";
+		Visible = false;
+	});
+
+	return clothing;
 end
 
 return attirePackage;

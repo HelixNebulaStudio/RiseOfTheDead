@@ -1,6 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
 local CollectionService = game:GetService("CollectionService");
+local TweenService = game:GetService("TweenService");
+
 
 local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -190,8 +192,9 @@ function ItemDrops.Info(itemId, isFullSearch)
 end
 
 -- MARK: ItemDrops.Spawn
-function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
+function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime, param)
 	if modConfigurations.DisableItemDrops then warn("ItemDrops>> DisableItemDrops is enabled."); return end;
+	param = param or {};
 	
 	local prefabName = itemDrop.Type or itemDrop.ItemId;
 	local dropPrefab: Model = dropPrefabs:FindFirstChild(prefabName);
@@ -214,7 +217,7 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 	newPrefab:AddTag("ItemDrop");
 	
 	for a=1, 60 do if newPrefab.PrimaryPart then break; else task.wait() end end;
-	local primaryPart = newPrefab.PrimaryPart;
+	local primaryPart: BasePart = newPrefab.PrimaryPart;
 	for _, obj in pairs(primaryPart:GetDescendants()) do
 		if not obj:IsA("BasePart") then continue end;
 		obj.CanCollide = false;
@@ -257,6 +260,10 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 			if not obj:IsA("BasePart") then continue end;
 			obj.CanCollide = false;
 		end
+		local weld = Instance.new("Weld");
+		weld.Parent = primaryPart;
+		weld.Part0 = primaryPart;
+		weld.Part1 = newItemPrefab.PrimaryPart;
 		
 		if setPrefabColor then
 			local h,s = setPrefabColor:ToHSV();
@@ -300,7 +307,7 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 	if primaryPart.CanCollide then
 		primaryPart.CollisionGroup = "Debris";
 	end
-	
+
 	newPrefab:PivotTo(CFrame.new(cframe.p) + offset);
 	newPrefab.Name = itemDrop.ItemId or newPrefab.Name;
 	
@@ -441,6 +448,32 @@ function ItemDrops.Spawn(itemDrop, cframe, whitelist, despawnTime)
 	end
 	
 	interactData:Sync();
+
+	-- if param.ApplyForce then
+	-- 	local xzForce = Vector2.new(math.random(-50, 50)/10, math.random(-50, 50)/10).Unit *6;
+	-- 	local force = Vector3.new(xzForce.X, 5, xzForce.Y) * param.ApplyForce;
+	-- 	primaryPart.Anchored = false;
+	-- 	primaryPart.CollisionGroup = "PhysicsClip";
+	-- 	for _, obj in pairs(primaryPart:GetDescendants()) do
+	-- 		if not obj:IsA("BasePart") then continue end;
+	-- 		obj.CollisionGroup = "PhysicsClip";
+	-- 		obj.CanCollide = true;
+	-- 		obj.Anchored = false;
+	-- 	end
+
+	-- 	local linVelocity = Instance.new("LinearVelocity");
+	-- 	linVelocity.ForceLimitMode = Enum.ForceLimitMode.PerAxis;
+	-- 	linVelocity.MaxAxesForce = Vector3.new(5000, 10000, 5000);
+	-- 	linVelocity.Attachment0 = primaryPart:WaitForChild("DropGlow");
+	-- 	linVelocity.VectorVelocity = force * primaryPart.AssemblyMass;
+	-- 	linVelocity.Parent = primaryPart;
+
+	-- 	TweenService:Create(linVelocity, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
+	-- 		MaxAxesForce = Vector3.new(5000, 0, 5000); 
+	-- 		VectorVelocity = Vector3.zero;
+	-- 	}):Play();
+	-- end
+
 	return newPrefab, interactData;
 end
 

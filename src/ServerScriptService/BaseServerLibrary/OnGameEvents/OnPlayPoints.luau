@@ -30,48 +30,60 @@ return function(profile, points: number?, reason: string?)
         local bpLib = modBattlePassLibrary:Find(activeId);
         
         if bpLib.EndUnixTime == nil or unixTime > bpLib.EndUnixTime then return end
-        
+       
 		local activeInventory = profile.ActiveInventory;
         if activeInventory == nil then return end;
 
-        local hasSpace = activeInventory:SpaceCheck{
-            {ItemId="mpbook"; Data={Quantity=1};}
-        };
-        if not hasSpace then
-            return;
-        end
-
-        local dropPacket = modEvents:GetEvent(player, "mpBookDrop") or {
-            Id="mpBookDrop";
+        local eventId = `pointstats_{activeId}`;
+        local dropPacket = modEvents:GetEvent(player, eventId) or {
+            Id=eventId;
+            ActiveBp=activeId;
             LastDrop=os.time();
             NextDrop=os.time()+180;
             Drops=0;
         };
 
+        local function dropTrigger(reasonStr)
+
+            if bpLib.EventBooksActive then
+                local hasSpace = activeInventory:SpaceCheck{
+                    {ItemId="mpbook"; Data={Quantity=1};}
+                };
+                if not hasSpace then return; end
+
+                Debugger:Warn(`Drop mpbook for {player} total {dropPacket.Drops}`);
+    
+                local itemLib = modItemsLibrary:Find("mpbook");
+                activeInventory:Add(itemLib.Id, nil, function(queueEvent, storageItem)
+                    shared.Notify(player, `You recieved a {itemLib.Name}{reasonStr or ""}!`, "Reward", nil, {SndId="Collectible"});
+                    shared.modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+                end);
+
+            end
+        end
+
         if os.time() > dropPacket.NextDrop then
             local oneHour = 3600;
-            local dropDifficulty = dropPacket.Drops;
-            if dropDifficulty <= 3 then
+            local dropCount = dropPacket.Drops;
+            if dropCount <= 3 then
                 dropPacket.NextDrop=os.time()+180;
 
-            elseif dropDifficulty <= 6 then
+            elseif dropCount <= 6 then
                 dropPacket.NextDrop=os.time()+math.random(300-60, 300+60);
 
-            elseif dropDifficulty <= 10 then
+            elseif dropCount <= 10 then
                 dropPacket.NextDrop=os.time()+math.random(600-120, 600+120);
 
-            elseif dropDifficulty <= 20 then
+            elseif dropCount <= 20 then
                 dropPacket.NextDrop=os.time()+math.random(900-240, 900+240);
 
-            elseif dropDifficulty <= 200 then
+            elseif dropCount <= 200 then
                 dropPacket.NextDrop=os.time()+math.random(1200-480, 1200+480);
 
             else
                 dropPacket.NextDrop=os.time()+math.random(1200+960, (oneHour*4)+4800);
 
             end
-
-            Debugger:Warn(`Drop mpbook for {player} total {dropPacket.Drops}`);
 
             local reasonStr;
             if reason == "Gameplay:Minigame:Fotl" then
@@ -128,11 +140,7 @@ return function(profile, points: number?, reason: string?)
                 reasonStr = " for some reason";
             end
 
-            local itemLib = modItemsLibrary:Find("mpbook");
-            activeInventory:Add(itemLib.Id, nil, function(queueEvent, storageItem)
-				shared.Notify(player, `You recieved a {itemLib.Name}{reasonStr or ""}!`, "Reward", nil, {SndId="Collectible"});
-				shared.modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
-			end);
+            dropTrigger(reasonStr);
 
             dropPacket.Drops = dropPacket.Drops +1;
             dropPacket.LastDrop = os.time();
@@ -140,6 +148,5 @@ return function(profile, points: number?, reason: string?)
 
         modEvents:NewEvent(player, dropPacket);
 
-        
     end
 end;

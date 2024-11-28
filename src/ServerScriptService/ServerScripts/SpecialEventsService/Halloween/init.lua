@@ -45,7 +45,7 @@ local candyTypes = {
 SpecialEvent.SlaughterfestGetCandyTrade = nil;
 local npcSeedOverride = nil;
 --==
-repeat wait() until shared.modProfile;
+Debugger.AwaitShared("modProfile");
 
 local loadedDialogues = {};
 function SpecialEvent.LoadSlaughterfestDialogues(trickNpcList, treatNpcList)

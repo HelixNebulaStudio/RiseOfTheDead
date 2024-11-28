@@ -1110,6 +1110,11 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 	end
 	
 	nameTag.Text = itemName;
+	if itemLib.NameColor then
+		nameTag.TextColor3 = itemLib.NameColor;
+	else
+		nameTag.TextColor3 = Color3.fromRGB(255, 255, 255);
+	end
 	
 	itemIcon.Image = itemLibIcon;
 	itemIcon.ImageColor3 = itemColor;

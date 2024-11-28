@@ -74,48 +74,52 @@ if RunService:IsServer() then
 		local inventory = playerSave.Inventory;
 		local playerLevel = playerSave and playerSave:GetStat("Level") or 1;
 		
-		--== 2023 claim;
-		local present23Flag = profile.Flags:Get("xmaspresent2023Claim");
-		if present23Flag == nil then
-			local present23ItemId = "xmaspresent2023";
-			
-			local hasSpace = inventory:SpaceCheck{
-				{ItemId=present23ItemId; Data={Quantity=1}};
-			};
-			
-			local yearVal = os.date("*t")["year"];
-			local dialogPacket = {
-				Face="Happy";
-				Say="Claim your end of ".. yearVal .." present";
-			}
-			
-			local lvlRequirement = math.round(modGlobalVars.MaxLevels/2);
-			if playerLevel < lvlRequirement then
-				dialogPacket.Reply="You need mastery level "..lvlRequirement.." to claim this.";
+
+		--MARK: Yearly Present claim;
+		local yearVal = os.date("*t")["year"];
+		local yearlyPresentItemLib = modItemsLibrary:Find(`xmaspresent{yearVal}`);
+		if yearlyPresentItemLib then
+			local flagId = `xmaspresent{yearVal}Claim`
+			local yearlyPresentId = yearlyPresentItemLib.Id;
+
+			local yearlyPresentFlag = profile.Flags:Get(flagId);
+			if yearlyPresentFlag == nil then
+				local hasSpace = inventory:SpaceCheck{
+					{ItemId=yearlyPresentId; Data={Quantity=1}};
+				};
 				
-			elseif hasSpace == false then
-				dialogPacket.Reply="Your inventory is a bit full.. Ho ho ho!";
+				local dialogPacket = {
+					Face="Happy";
+					Say="Claim your end of ".. yearVal .." present";
+				}
 				
-			else
-				dialogPacket.Reply="Here you go!";
-				profile.Flags:Add({Id="xmaspresent2023Claim"});
-	
-				local itemInfo = modItemsLibrary:Find(present23ItemId);
-	
-				inventory:Add(present23ItemId, nil, function(queueEvent, storageItem)
-					modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
-				end);
-				shared.Notify(player, "You recieved a ".. itemInfo.Name ..".", "Reward");
+				local lvlRequirement = math.round(modGlobalVars.MaxLevels/2);
+				if playerLevel < lvlRequirement then
+					dialogPacket.Reply="You need mastery level "..lvlRequirement.." to claim this.";
+					
+				elseif hasSpace == false then
+					dialogPacket.Reply="Your inventory is a bit full.. Ho ho ho!";
+					
+				else
+					dialogPacket.Reply="Here you go!";
+					profile.Flags:Add({Id=flagId});
+		
+					inventory:Add(yearlyPresentId, nil, function(queueEvent, storageItem)
+						modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+					end);
+					shared.Notify(player, "You recieved a ".. yearlyPresentItemLib.Name ..".", "Reward");
+					
+				end
+				dialog:AddDialog(dialogPacket);
 				
-			end
-			dialog:AddDialog(dialogPacket);
-			
-			if playerLevel > lvlRequirement then
-				dialog:SetInitiate("Merry Christmas! Time to claim your end of ".. yearVal .." present!");
-				return;
+				if playerLevel > lvlRequirement then
+					dialog:SetInitiate("Merry Christmas! Time to claim your end of ".. yearVal .." present!");
+					return;
+				end
 			end
 		end
 		
+
 		--== ActiveSkin
 		local presentsRequired = 2;
 		local total, itemList = inventory:ListQuantity("xmaspresent2022", presentsRequired);
@@ -234,7 +238,7 @@ if RunService:IsServer() then
 			end)
 		end)
 		
-		dialog:AddChoice("general_giftSanta");
+		--dialog:AddChoice("general_giftSanta");
 
 	end 
 end

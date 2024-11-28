@@ -284,6 +284,7 @@ function BattlePassLibrary:Init(library)
 		Title="5 Years Anniversary";
 		Icon="rbxassetid://17271606182";
 		Desc="Unlock the 5 Years Anniversary Event Pass to claim more rewards!";
+		EventBooksActive=true;
 
 		Price=1000;
 
@@ -507,7 +508,9 @@ function BattlePassLibrary:Init(library)
 		Price=1000;
 
 		Tree = newTree{
-			leaf(0, {});
+			leaf(0, {
+				Reward={ItemId="santahat";};
+			});
 			--
 			leaf(5, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
