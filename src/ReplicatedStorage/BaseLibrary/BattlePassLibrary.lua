@@ -512,9 +512,13 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="santahat";};
 			});
 			--
+			leaf(4, {
+				Reward={ItemId="fedoraxmasred";};
+			});
 			leaf(5, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
 			});
+			
 			leaf(10, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
 			});

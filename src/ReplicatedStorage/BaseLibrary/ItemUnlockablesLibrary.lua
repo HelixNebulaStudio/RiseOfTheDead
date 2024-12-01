@@ -209,6 +209,18 @@ function ItemUnlockablesLibrary:Init(library)
 		};
 		SurfaceAppearanceParent=script;
 	};
+	
+	library:Add{
+		Id="fedoraxmasred";
+		ItemId="fedora";
+		Name="Xmas Red";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://118258193267734";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	
 
 
 	--== MARK: maraudersmask

@@ -84,22 +84,22 @@ function ItemsLibrary:Init(super)
 	new(gunBase, {Id="sawedoff"; Name="Sawed-Off"; Icon="rbxassetid://17007247358"; Tags={"Shotgun"; "Primary Weapon";}; Description="Close range head remover with high multishot.";});
 	new(gunBase, {Id="mariner590"; Name="Mariner 590"; Icon="rbxassetid://17007243924"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick and high damage tactical shotgun.";});
 	new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 4900; Description="Powerful hand made shotgun with built-in <b>Crit Receiver</b>.";});
-	new(gunBase, {Id="rechamber1216"; Name="Rechamber 1216"; Icon="rbxassetid://92627722665597"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 9900; Description="Military grade mag based shotgun.";});
+	new(gunBase, {Id="rechamber1216"; Name="Rechamber 1216"; Icon="rbxassetid://92627722665597"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 9900; Description="Military grade mag based shotgun with built-in <b>Knockout Trigger</b> that knocks out enemies on close up headshots.";});
 
 	new(gunBase, {Id="mp5"; Name="MP5"; Icon="rbxassetid://9960159062"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Quick fire-rate sub-machine gun.";});
 	new(gunBase, {Id="mp7"; Name="MP7"; Icon="rbxassetid://9960161355"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Good accuracy and damage sub-machine gun.";});
 	new(gunBase, {Id="czevo3"; Name="CZ-Scorpion EVO 3"; Icon="rbxassetid://4814129724"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Extremely tactical sub-machine gun with a high base damage. Has built in <b>Damage Rev</b>, which does more damage the lower your ammo count is in your magazine.";});
 	new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine gun"; "Primary Weapon";}; TradingTax = 4900; Description="Elite sub-machine gun with built-in <b>Crit Receiver</b> and suppressor.";});
-	new(gunBase, {Id="uzi"; Name="Uzi"; Icon="rbxassetid://70941686222281"; Tags={"Submachine gun"; "Primary Weapon";}; TradingTax = 9900; Description="";});
+	new(gunBase, {Id="dualuzi"; Name="Dual Uzi"; Icon="rbxassetid://70941686222281"; Tags={"Submachine gun"; "Primary Weapon";}; TradingTax = 9900; Description="";});
 
 	new(gunBase, {Id="m4a4"; Name="M4A4"; Icon="rbxassetid://5166150878"; Tags={"Rifle"; "Primary Weapon";}; Description="Military grade M4 rifle capable of high damage and long range shooting.";});
 	new(gunBase, {Id="ak47"; Name="AK-47"; Icon="rbxassetid://5166397129"; Tags={"Rifle"; "Primary Weapon";}; Description="High damage, high magazine capacity, and great fire-rate. Quite a noise maker.";});
 	new(gunBase, {Id="fnfal"; Name="FN FAL"; Icon="rbxassetid://17007249959"; Tags={"Rifle"; "Primary Weapon";}; Description="The FN FAL is a high damage rifle with a very high fire rate.";});
-	new(gunBase, {Id="sr308"; Name="SR-308"; Icon="rbxassetid://16570523670"; Tags={"Rifle"; "Primary Weapon";}; Description="Ergonomic Russian battle rifle. Built with a special type of receiver that has a chance to fire a critical shot.";});
+	new(gunBase, {Id="sr308"; Name="SR-308"; Icon="rbxassetid://16570523670"; Tags={"Rifle"; "Primary Weapon";}; Description="Ergonomic Russian battle rifle with built-in <b>Crit Receiver</b>.";});
 	
 	new(gunBase, {Id="awp"; Name="AWP"; Icon="rbxassetid://5166454078"; Tags={"Sniper"; "Primary Weapon";}; Description="High Damage, high recoil and long ranged rifle.";});
 	new(gunBase, {Id="rec21"; Name="Rec-21"; Icon="rbxassetid://6532745901"; Tags={"Sniper"; "Primary Weapon";}; Description="High power, light weight tactical sniper rifle.";});
-	new(gunBase, {Id="grandgarand"; Name="Grand Garand"; Icon="rbxassetid://118201286435452"; Tags={"Sniper"; "Primary Weapon";}; TradingTax = 9900; Description="The good ol' battle tested semi-automatic m1 garand.";});
+	new(gunBase, {Id="grandgarand"; Name="Grand Garand"; Icon="rbxassetid://118201286435452"; Tags={"Sniper"; "Primary Weapon";}; TradingTax = 9900; Description="The good ol' battle tested semi-automatic m1 garand but has a built-in <b>Ricochet Rifling</b> that allow shots to ricochet to nearby enemies.";});
 	
 	new(gunBase, {Id="minigun"; Name="Minigun"; Icon="rbxassetid://5175211604"; Tags={"Heavy machine gun"; "Primary Weapon";}; Description="It weighs fifty seven kilograms and fires two hundred dollar, custom-tooled cartridges at ten thousand rounds per minute. It costs four hundred thousand dollars to fire this weapon... for twelve seconds.";});
 	new(gunBase, {Id="desolatorheavy"; Name="Desolator Heavy"; Icon="rbxassetid://6244386293"; Tags={"Heavy machine gun"; "Primary Weapon";}; Description="Heavy machine gun that desolates your enemies. Design inspired by the negev LMG, the Desolator Heavy is a high power concentrated machine gun firing heavy rounds with built-in <b>Rapid Fire</b> enabled. Weapon accuracy will increase as the weapon warms up from firing.";});
@@ -568,9 +568,9 @@ function ItemsLibrary:Init(super)
 	new(weaponCompBase, {Id="arelshiftcrossparts"; CraftFor="arelshiftcross"; Sources={"Obtained within <b>Abandoned Bunker</b>.";}; });
 	new(weaponCompBase, {Id="deagleparts"; CraftFor="deagle"; Sources={"Obtained from <b>Board Missions</b>.";};});
 
-	new(weaponCompBase, {Id="uziparts1"; Prefix=`Sector F`; CraftFor="uzi";});
-	new(weaponCompBase, {Id="uziparts2"; Prefix=`Prison`; CraftFor="uzi";});
-	new(weaponCompBase, {Id="uziparts3"; Prefix=`Sector D`; CraftFor="uzi";});
+	new(weaponCompBase, {Id="dualuziparts1"; Prefix=`Sector F`; CraftFor="dualuzi";});
+	new(weaponCompBase, {Id="dualuziparts2"; Prefix=`Prison`; CraftFor="dualuzi";});
+	new(weaponCompBase, {Id="dualuziparts3"; Prefix=`Sector D`; CraftFor="dualuzi";});
 	
 	new(weaponCompBase, {Id="rechamber1216parts1"; Prefix=`Sector F`; CraftFor="rechamber1216";});
 	new(weaponCompBase, {Id="rechamber1216parts2"; Prefix=`Prison`; CraftFor="rechamber1216";});
@@ -732,6 +732,7 @@ function ItemsLibrary:Init(super)
 
 	-- fedora
 	new(skinPermBase, {Id="fedorauvunwrapped"; Icon="rbxassetid://17275939280"; SkinPerm="UV Unwrapped"; TargetItemId="fedora"; });
+	new(skinPermBase, {Id="fedoraxmasred"; Icon="rbxassetid://74409810426341"; SkinPerm="Xmas Red"; TargetItemId="fedora"; });
 	
 	-- greytshirt
 	new(skinPermBase, {Id="greytshirtcamo"; Icon="rbxassetid://6665474794"; SkinPerm="Camo"; TargetItemId="greytshirt"; });
