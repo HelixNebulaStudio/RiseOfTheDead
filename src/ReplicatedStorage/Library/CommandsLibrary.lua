@@ -4959,38 +4959,38 @@ function CommandsLibrary:NewTextChatCommand(cmdName, cmdLib)
 	if RunService:IsClient() and cmdLib.ClientFunction == nil then return end;
 
 	textChatCmd.Triggered:Connect(function(txtSrc: TextSource, message)
-		local cmd, args = modCommandHandler.ProcessMessage(message);
-		if cmd == nil then return true end;
+		-- local cmd, args = modCommandHandler.ProcessMessage(message);
+		-- if cmd == nil then return true end;
 		
-		local speaker: Player = game.Players:FindFirstChild(txtSrc.Name);
-		if speaker == nil then return end;
+		-- local speaker: Player = game.Players:FindFirstChild(txtSrc.Name);
+		-- if speaker == nil then return end;
 
-		local textChannel = txtSrc.Parent :: TextChannel;
+		-- local textChannel = txtSrc.Parent :: TextChannel;
 
-		if not CommandsLibrary.HasPermissions(speaker, cmdLib) then
-			shared.Notify(speaker, `Insufficient permissions.`, `Negative`, nil, {Presist=false;});
-			return;
-		end;
+		-- if not CommandsLibrary.HasPermissions(speaker, cmdLib) then
+		-- 	shared.Notify(speaker, `Insufficient permissions.`, `Negative`, nil, {Presist=false;});
+		-- 	return;
+		-- end;
 		
-		if cmdLib.RequiredArgs and #args < cmdLib.RequiredArgs then
-			shared.Notify(speaker, `Missing arguements..\n{(cmdLib.UsageInfo or "")}`, `Negative`, nil, {Presist=false;});
-			return;
-		end;
+		-- if cmdLib.RequiredArgs and #args < cmdLib.RequiredArgs then
+		-- 	shared.Notify(speaker, `Missing arguements..\n{(cmdLib.UsageInfo or "")}`, `Negative`, nil, {Presist=false;});
+		-- 	return;
+		-- end;
 		
-		if cmdLib.Cooldown and cmdLib.Debounce == nil then cmdLib.Debounce = {}; end
-		if cmdLib.Debounce == nil or cmdLib.Debounce[speaker.Name] == nil or tick()-cmdLib.Debounce[speaker.Name] >= cmdLib.Cooldown then
-			if cmdLib.Debounce then cmdLib.Debounce[speaker.Name] = tick(); end;
-			if cmdLib.Function then
-				cmdLib.Function(speaker, args);
-			end
-			if cmdLib.ClientFunction then
-				cmdLib.ClientFunction(speaker, args);
-			end
+		-- if cmdLib.Cooldown and cmdLib.Debounce == nil then cmdLib.Debounce = {}; end
+		-- if cmdLib.Debounce == nil or cmdLib.Debounce[speaker.Name] == nil or tick()-cmdLib.Debounce[speaker.Name] >= cmdLib.Cooldown then
+		-- 	if cmdLib.Debounce then cmdLib.Debounce[speaker.Name] = tick(); end;
+		-- 	if cmdLib.Function then
+		-- 		cmdLib.Function(speaker, args);
+		-- 	end
+		-- 	if cmdLib.ClientFunction then
+		-- 		cmdLib.ClientFunction(speaker, args);
+		-- 	end
 
-		else
-			shared.Notify(speaker, `Command is on a cooldown..`, `Negative`, nil, {Presist=false;});
-			return;
-		end
+		-- else
+		-- 	shared.Notify(speaker, `Command is on a cooldown..`, `Negative`, nil, {Presist=false;});
+		-- 	return;
+		-- end
 			
 		return;
 	end)

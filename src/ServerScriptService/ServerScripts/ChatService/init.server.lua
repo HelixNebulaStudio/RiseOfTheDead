@@ -119,14 +119,6 @@ function ChatService.OnServerMessage(senderPlayer: Player, txtChatMsg: TextChatM
 	end
 
 	if txtMessage:sub(1,1) == "/" then
-		local cmd, _args = modCommandHandler.ProcessMessage(txtMessage);
-		if cmd then
-			local cmdKey = (cmd:sub(2, #cmd):lower());
-			local cmdLib = modCommandsLibrary[cmdKey];
-			if cmdLib == nil then
-				shared.Notify(senderPlayer, `Unknown Command: {cmd}`, `Negative`);
-			end
-		end
 		return;
 	end
 
@@ -279,6 +271,65 @@ local function QuickTextFilter(text)
 	return filteredTxt;
 end
 
+function ChatService.HandleCommand(message, speaker)
+	local cmd, args = modCommandHandler.ProcessMessage(message);
+	if cmd == nil then return true end;
+	
+	local cmdKey = (cmd:sub(2, #cmd):lower());
+	local cmdLib = modCommandsLibrary.Library[cmdKey];
+
+	if cmdLib == nil then
+		if speaker then
+			shared.Notify(speaker, `Unknown Command: {cmd}`, `Negative`);
+		end
+		return;
+	end
+
+	if speaker then
+		Debugger:Warn(`Player ({speaker.Name}) issued command:/{cmdKey} Args:{Debugger.Stringify(args)}`);
+		if not modCommandsLibrary.HasPermissions(speaker, cmdLib) then
+			shared.Notify(speaker, `Insufficient permissions.`, `Negative`, nil, {Presist=false;});
+			return;
+		end;
+	end
+	
+	if cmdLib.RequiredArgs and #args < cmdLib.RequiredArgs then
+		local str = `Missing arguements..\n{(cmdLib.UsageInfo or "")}`;
+		if speaker then
+			shared.Notify(speaker, str, `Negative`, nil, {Presist=false;});
+		else
+			Debugger:Warn(str);
+		end
+		return;
+	end;
+	
+	if speaker then
+		if cmdLib.Cooldown and cmdLib.Debounce == nil then cmdLib.Debounce = {}; end
+		if cmdLib.Debounce == nil or cmdLib.Debounce[speaker.Name] == nil or tick()-cmdLib.Debounce[speaker.Name] >= cmdLib.Cooldown then
+			if cmdLib.Debounce then cmdLib.Debounce[speaker.Name] = tick(); end;
+			if cmdLib.Function then
+				cmdLib.Function(speaker, args);
+			end
+			if cmdLib.ClientFunction then
+				cmdLib.ClientFunction(speaker, args);
+			end
+	
+		else
+			shared.Notify(speaker, `Command is on a cooldown..`, `Negative`, nil, {Presist=false;});
+			return;
+		end
+
+	else
+		-- Server call
+		if cmdLib.Function then
+			cmdLib.Function(nil, args);
+		end
+
+	end
+
+	return;
+end
+
 function ChatService.Init()
 	TextChatService:WaitForChild("BubbleChatConfiguration").Enabled = false;
 
@@ -348,6 +399,11 @@ function ChatService.Init()
 					Presist=false;
 				});
 			end
+
+		elseif action == "cmd" then
+			local cmdMsg = ...;
+			ChatService.HandleCommand(cmdMsg, player);
+			return;
 		end
 
 		if modBranchConfigs.IsWorld("MainMenu") then

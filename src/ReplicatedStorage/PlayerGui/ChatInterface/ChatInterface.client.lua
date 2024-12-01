@@ -28,7 +28,7 @@ local remoteChatServiceEvent = modRemotesManager:Get("ChatServiceEvent");
 
 local chatInterface = script.Parent;
 local inputFrame = chatInterface:WaitForChild("InputFrame");
-local inputBox = inputFrame:WaitForChild("inputBar"):WaitForChild("inputBox");
+local inputBox = inputFrame:WaitForChild("inputBar"):WaitForChild("inputBox") :: TextBox;
 
 local mainChatFrame = script.Parent:WaitForChild("ChatFrame");
 local mainChannelsFrame = script.Parent:WaitForChild("ChannelsFrame");
@@ -222,24 +222,6 @@ local function inputBoxChange()
 	mainChannelsFrame.Size = UDim2.new(0, maxInputSize.X+40, 0, UserInputService.TouchEnabled and 40 or 20);
 	mainChannelsFrame.Position = UDim2.new(0, 0, 1, -inputY+20 - 40);
 
-	if inputBox:GetAttribute("IsFiltered") then
-		inputBox:SetAttribute("IsFiltered", nil);
-		inputBox.TextColor3 = Color3.fromRGB(255, 255, 255);
-	end
-
-	delay(2, function()
-		if tick()-lastInputTick < 2 then return end;
-		if inputBox.Text:sub(1,1) ~= "/" and inputBox.Text ~= "" then
-			local cacheText = inputBox.Text;
-			-- local filtered = remoteSubmitMessage:InvokeServer(ChatRoomInterface.Channels[ChatRoomInterface.ActiveChannel].Id, cacheText, true);
-			-- if inputBox.Text == cacheText then
-			-- 	--inputBox.Text = filtered;
-			-- 	inputBox.TextColor3 = Color3.fromRGB(255, 124, 124);
-			-- 	inputBox:SetAttribute("IsFiltered", true);
-			-- end
-		end
-	end)
-
 	--Cmd suggest
 	local message = inputBox.Text;
 	
@@ -293,6 +275,15 @@ local function inputBoxChange()
 		end
 	end
 	cmdFrame.Visible = #cmdMatchs > 0;
+
+	local testText = message:gsub(" ", ""):gsub(string.char(32), ""):gsub("[\r\n]", "");
+	if testText:sub(1, 1) == "/" then
+		inputBox.TextColor3 = Color3.fromRGB(255, 238, 178);
+		inputBox.Font = Enum.Font.Code;
+	else
+		inputBox.TextColor3 = Color3.fromRGB(255, 255, 255);
+		inputBox.Font = Enum.Font.Arimo;
+	end
 
 	onChannelButtonsChange();
 end
@@ -522,11 +513,24 @@ inputBox.FocusLost:Connect(function(enterPressed, inputThatCausedFocusLoss)
 				if #testText > 0 and #text < 200 then
 					addToChatCache();
 					
-					local channelId = activeChannel.Id;
-					task.spawn(function()
-						local textChannel: TextChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild(channelId);
-						textChannel:SendAsync(text);
-					end)
+					if testText:sub(1, 1) == "/" then
+						local chainCmds = string.split(text, ";/");
+						for a=1, #chainCmds do
+							local cmdA = chainCmds[a];
+							if a > 1 then
+								cmdA = `/{cmdA}`;
+							end
+							remoteChatServiceEvent:FireServer("cmd", cmdA);
+						end
+
+					else
+						local channelId = activeChannel.Id;
+						task.spawn(function()
+							local textChannel: TextChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild(channelId);
+							textChannel:SendAsync(text);
+						end)
+
+					end
 				end;
 			end
 			toggleChat(false);
