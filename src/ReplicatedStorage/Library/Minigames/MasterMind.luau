@@ -1,7 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local MasterMind = {};
+MasterMind.__index = MasterMind;
 
---[[
+MasterMind.RulesStr = [[
 Game Rules
 
 Objective
@@ -14,9 +16,6 @@ From top to bottom, at each row, click on a circle and pick a color. After filli
 - An orange circle means that the color exists in the combination but the position is not correct.
 - An empty circle means that color is not in the combination at all.
 ]]
-
-local MasterMind = {};
-MasterMind.__index = MasterMind;
 
 MasterMind.States = {
     Active=1;
@@ -144,8 +143,16 @@ task.spawn(function()
         Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
         Description = [[MasterMind Cmds:
         /mastermind start [slots] [choices] [seed]
+            Starts a new game.
         /mastermind submit [...]
         /mastermind reveal
+            Reveals the answer.
+        /mastermind rules
+
+        Examples:
+            /mastermind submit Blue Green
+            /mastermind submit blue green
+            /mastermind submit 2 3
         ]];
 
         RequiredArgs = 0;
@@ -253,6 +260,12 @@ task.spawn(function()
                 local masterMind = playerCache.MasterMindGame;
                 shared.Notify(speaker, `MasterMind Reveal \nAnswer: {table.concat(masterMind.SessionAnswer, ", ")}`, "Inform");
 
+            elseif action == "rules" then
+                local choicesStr = {};
+                for a=1, #MasterMind.Choices do
+                    table.insert(choicesStr, `[{a}] = {MasterMind.Choices[a]}`);
+                end
+                shared.Notify(speaker, `MasterMind {MasterMind.RulesStr}\nOptions:\n\t{table.concat(choicesStr, "\n\t")}`, "Inform");
             end
 
             ---shared.Notify(speaker, "Unknown action for /weather", "Negative");
