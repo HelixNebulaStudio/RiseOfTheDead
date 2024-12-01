@@ -55,6 +55,7 @@ local modAnalytics = Debugger:Require(game.ServerScriptService.ServerLibrary.Gam
 local modCharacterAppearance = Debugger:Require(game.ServerScriptService.ServerLibrary.CharacterAppearance);
 local modEconomyAnalytics = Debugger:Require(game.ServerScriptService.ServerLibrary.EconomyAnalytics);
 local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+local modMasterMind = require(game.ReplicatedStorage.Library.Minigames.MasterMind);
 
 local modOnGameEvents = Debugger:Require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modModerationSystem = Debugger:Require(game.ServerScriptService.ServerLibrary.ModerationSystem);
