@@ -25,11 +25,12 @@ local modCharacter = modData:GetModCharacter();
 
 local toolHandlers = script:WaitForChild("ToolHandlers");
 
+local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modWeapons = require(game.ReplicatedStorage.Library.Weapons);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
+local modWeaponProperties = require(game.ReplicatedStorage.Library.WeaponProperties);
 
 --== Handlers
 local modWeaponHandler = require(script:WaitForChild("WeaponHandler"));
@@ -51,6 +52,7 @@ local instanceCache = {};
 --== Script;
 modWeaponHandler.InstanceCache = instanceCache;
 modWeaponHandler:Initialize(Equipped);
+modWeaponProperties.LoadExternalModifiers();
 
 function getToolHandler(itemId)
 	local handler;
@@ -163,9 +165,14 @@ function equip(equipPacket, toolWelds)
 			end
 		end
 		
+		local toolModule = modData:GetItemClass(id);
+		if toolModule then
+			toolModule:SetActive(true);
+		end
+
 		modCharacter.CharacterProperties.IsEquipped = true;
 		modCharacter.EquippedItem = equipmentItem; -- StorageItem;
-		modCharacter.EquippedToolModule = modData:GetItemClass(id);
+		modCharacter.EquippedToolModule = toolModule;
 		
 		if modCharacter.CharacterProperties.ActiveInteract then
 			modCharacter.CharacterProperties.ActiveInteract:Trigger();
@@ -175,6 +182,7 @@ function equip(equipPacket, toolWelds)
 	end
 end
 
+-- MARK: Unequip()
 function Unequip(unequipPacket)
 	local storageItem = unequipPacket and unequipPacket.StorageItem or nil;
 	local id = storageItem and storageItem.ID or unequipPacket.Id;
@@ -184,11 +192,16 @@ function Unequip(unequipPacket)
 	if modCharacter.EquippedItem == nil or modCharacter.EquippedItem.ID ~= id then return end;
 	
 	local equipmentItem = modData.GetItemById(id) or storageItem;
+	local toolModule = modData:GetItemClass(id);
 	
 	if storageItem and storageItem.MockItem == true then
 		equipmentItem = storageItem;
 	end
-	
+
+	if toolModule then
+		toolModule:SetActive(false);
+	end
+
 	if equipmentItem then
 		local itemId = equipmentItem.ItemId;
 		
@@ -197,6 +210,7 @@ function Unequip(unequipPacket)
 		
 		if modWeapons[itemId] then
 			modWeaponHandler:Unequip(id);
+
 		end
 		if modTools[itemId] then 
 			local handler = getToolHandler(itemId);

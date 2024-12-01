@@ -91,6 +91,9 @@ function ClothingProperties:RegisterTypes(modLib, storageItem)
 	return false;
 end
 
+function ClothingProperties:SetActive()
+end
+
 function ClothingProperties:Reset()
 	for k, _ in pairs(self) do
 		self[k] = nil;

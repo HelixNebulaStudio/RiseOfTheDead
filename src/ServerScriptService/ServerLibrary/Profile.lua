@@ -1515,6 +1515,10 @@ function Profile:GetItemClass(storageItemId, getShadowCopy)
 			class:PostMod();
 		end
 
+		if class.LoadModifiers then
+			class:LoadModifiers(storageItem);
+		end
+
 		if class.CalculateDps then class:CalculateDps(); end
 		if class.CalculateDpm then class:CalculateDpm(); end
 		if class.CalculateMd then class:CalculateMd(); end

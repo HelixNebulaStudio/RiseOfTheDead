@@ -36,10 +36,12 @@ function ClassItemModifier.new(src)
     return self;
 end
 
-function ClassItemModifier:Instance(storageItem)
+function ClassItemModifier:Instance()
     local new = setmetatable({
         Disabled = true;
-        StorageItem = storageItem;
+
+        -- Properties set by mod processor;
+        WeaponModule = nil;
     }, self);
     return new;
 end

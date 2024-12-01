@@ -641,7 +641,6 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 			ProcessItemModifiers("OnBulletHit", {
 				Player=client;
 				TargetPart = targetPart;
-				ToolModule = weaponModule;
 			});
 		end
 

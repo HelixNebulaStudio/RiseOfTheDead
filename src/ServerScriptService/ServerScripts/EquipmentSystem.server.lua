@@ -17,10 +17,10 @@ local modConfigurations = Debugger:Require(game.ReplicatedStorage.Library.Config
 local modItemSkinWear = Debugger:Require(game.ReplicatedStorage.Library.ItemSkinWear);
 local modTools = Debugger:Require(game.ReplicatedStorage.Library.Tools);
 local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
+local modWeaponProperties = require(game.ReplicatedStorage.Library.WeaponProperties);
 
 local modProfile = Debugger:Require(game.ServerScriptService.ServerLibrary.Profile);
 local modOnGameEvents = Debugger:Require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-local modAnalytics = Debugger:Require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 
@@ -36,6 +36,7 @@ shared.EquipmentSystem = {};
 local bindServerUnequipPlayer = remotes.Inventory.ServerUnequipPlayer;
 
 --== Script
+modWeaponProperties.LoadExternalModifiers();
 
 local function OnPlayerAdded(player: Player)
 	player.CharacterRemoving:Connect(function()
@@ -154,10 +155,8 @@ function unequipTool(player, returnPacket)
 		local modGearAttachments = require(player.Character:FindFirstChild("GearAttachments"));
 		
 		local toolModule = profile:GetItemClass(lastId, lastId == "MockStorageItem");
-		if toolModule and toolModule.ModifierTriggers then
-			for k, itemModifier in pairs(toolModule.ModifierTriggers) do
-				itemModifier:SetActive(false);
-			end
+		if toolModule then
+			toolModule:SetActive(false);
 		end
 
 		if profile.EquippedTools.WeaponModels then
@@ -387,6 +386,10 @@ local function equipTool(player, paramPacket)
 			if itemProperties.Equippable and toolLib then
 				local toolModule = profile:GetItemClass(id, mockEquip);
 				
+				if toolModule then
+					toolModule:SetActive(true);
+				end
+
 				task.spawn(function()
 					if toolLib.IsWeapon then
 						if profile.InfAmmo then

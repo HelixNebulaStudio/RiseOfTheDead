@@ -170,14 +170,16 @@ function Weapon.new(configurations, properties, animations, audio)
 		GetProperties=function(key)
 			return Properties[key];
 		end;
+		SetActive=function(self, val)
+			for k, itemModifier in pairs(self.ModifierTriggers) do
+				itemModifier:SetActive(val);
+			end
+		end;
 		Reset=function(self)
 			for k, _ in pairs(configurationCache) do configurationCache[k] = nil; end
 			for k, _ in pairs(propertiesCache) do propertiesCache[k] = nil; end
 			table.clear(self.ArcTracerConfig);
 			table.clear(self.ModHooks);
-			for k, itemModifier in pairs(self.ModifierTriggers) do
-				itemModifier:SetActive(false);
-			end
 		end;
 		CalculateDps=function(self)
 			if self.Configurations.CustomDpsCal then
@@ -265,6 +267,7 @@ function Weapon.new(configurations, properties, animations, audio)
 				self.ModifierTriggers[id] = itemModifier:Instance(storageItem);
 			end
 			local newItemModifier = self.ModifierTriggers[id];
+			newItemModifier.StorageItem = storageItem;
 			newItemModifier:SetActive(true);
 
 			if data then
@@ -273,9 +276,39 @@ function Weapon.new(configurations, properties, animations, audio)
 				end
 			end
 		end;
+		LoadModifiers=function(self, weaponStorageItem)
+			local keysDict = {};
+			for k, v in pairs(configurationCache) do
+				if v ~= "Modifier" then continue end;
+				keysDict[k] = configurationCache[k];
+			end
+			for k, v in pairs(configurations) do
+				if v ~= "Modifier" then continue end;
+				keysDict[k] = configurations[k];
+			end
+			for k, v in pairs(self.Configurations) do
+				if v ~= "Modifier" then continue end;
+				keysDict[k] = self.Configurations[k];
+			end
+
+			for key, _ in pairs(keysDict) do
+				local itemModifier = script[key] and require(script[key]);
+				if itemModifier == nil then continue end;
+
+				if self.ModifierTriggers[key] == nil then
+					self.ModifierTriggers[key] = itemModifier:Instance();
+				end
+			end
+		end;
 	} 
 	
 	return weaponModule;
+end
+
+function Weapon.LoadExternalModifiers()
+	local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
+	local moddedSelf = modModEngineService:GetModule("WeaponModifiers");
+	if moddedSelf then moddedSelf:Init(script); end
 end
 
 Weapon.PenetrationTable = {

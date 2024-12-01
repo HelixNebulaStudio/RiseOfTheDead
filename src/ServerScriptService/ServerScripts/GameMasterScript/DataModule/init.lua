@@ -581,6 +581,10 @@ function Data:GetItemClass(storageItemId, getShadowCopy)
 		if class.PostMod then
 			class:PostMod();
 		end
+		
+		if class.LoadModifiers then
+			class:LoadModifiers(storageItem);
+		end
 
 		if class.CalculateDps then class:CalculateDps(); end
 		if class.CalculateDpm then class:CalculateDpm(); end
