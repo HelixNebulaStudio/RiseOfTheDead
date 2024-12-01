@@ -273,6 +273,8 @@ ShopLibrary.Pages = {
 			{Type="Product"; Id="awp"};
 			{Type="Product"; Id="minigun"};
 			{Type="Product"; Id="flamethrower"};
+			{Type="Product"; Id="mariner590"};
+			{Type="Product"; Id="fnfal"};
 		};
 		
 		ModsPage = {
@@ -340,6 +342,8 @@ ShopLibrary.Products:Add{Id="ak47"; Currency="Perks"; Price=500;};
 ShopLibrary.Products:Add{Id="awp"; Currency="Perks"; Price=1000;};
 ShopLibrary.Products:Add{Id="minigun"; Currency="Perks"; Price=1000;};
 ShopLibrary.Products:Add{Id="flamethrower"; Currency="Perks"; Price=1000;};
+ShopLibrary.Products:Add{Id="mariner590"; Currency="Perks"; Price=2000;};
+ShopLibrary.Products:Add{Id="fnfal"; Currency="Perks"; Price=2000;};
 
 --== Clothing;
 ShopLibrary.Products:Add{Id="greytshirtbp"; Currency="Money"; Price=600;};

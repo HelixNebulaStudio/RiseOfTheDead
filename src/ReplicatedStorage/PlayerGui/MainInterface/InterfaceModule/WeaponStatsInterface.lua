@@ -121,6 +121,13 @@ local statTemplates = {
 		{Category="Configurations"; Tag="ExplosionRadius"; Text="<b>Explosion Radius:</b>    $statu"; Type="int";};
 		{Category="Configurations"; Tag="ExplosionStun"; Text="<b>Explosion Stun:</b>    $stats"; Type="2dp";};
 		
+		-- Knockout Trigger
+		{Category="Configurations"; Tag="KnockoutDistance"; Text="<b>Knockout Distance:</b>    $statu"; Type="2dp"};
+		{Category="Configurations"; Tag="KnockoutDuration"; Text="<b>Knockout Duration:</b>    $stats"; Type="2dp"};
+		-- Ricochet Rifling
+		{Category="Configurations"; Tag="BulletRicochetCount"; Text="<b>Ricochet Count:</b>    $stat"; Type="int";};
+		{Category="Configurations"; Tag="BulletRicochetDistance"; Text="<b>Ricochet Distance:</b>    $statu"; Type="2dp"};
+		
 		
 		{Category="Configurations"; Tag="Element"; Text="<b>Element:</b>    $stat"; Type="string"};
 		{Category="Configurations"; Tag="Tad"; Text="<b>TAD:</b>    $stat"; Type="int"; OnlyExpand=true;};
@@ -225,13 +232,13 @@ local mouseOverDescription = {
 		Desc="Your movement speed is reduced by to the percent when focused. \n\n(Higher is better)";
 	};
 	ChargeDamagePercent={
-		Desc="The additional premod damage multiplier when you fully focused a shot. \n\n(Higher is better)";
+		Desc="<b>[Crit Receiver]</b> The additional premod damage multiplier when you fully focused a shot. \n\n(Higher is better)";
 	};
 	CritChance={
-		Desc="The chance to deal critical damage that multiplies your damage with the Crit Multiplier. \n\n(Higher is better)";
+		Desc="<b>[Crit Receiver]</b> The chance to deal critical damage that multiplies your damage with the Crit Multiplier. \n\n(Higher is better)";
 	};
 	CritMulti={
-		Desc="The additional premod damage multiplier when a crit is proced. \n\n(Higher is better)";
+		Desc="<b>[Crit Receiver]</b> The additional premod damage multiplier when a crit is proced. \n\n(Higher is better)";
 	};
 	Dps={
 		Desc="DPS also known as Damage Per Second, is the amount of damage on average the weapon can do in a second. The value does not take reload time and magazine size in to theoretical calculations. \n\n(Higher is better)";
@@ -263,7 +270,15 @@ local mouseOverDescription = {
 	ExplosionStun={
 		Desc="The duration in which the enemy ragdolls. Enemies are only stunned if they take more than 40% of their max health as damage.\n\n(Higher is better)";
 	};
-	
+	KnockoutDistance={
+		Desc="<b>[Knockout Trigger]</b> Enemies taking a headshot within this distance will be knocked out.\n\n(Higher is better)";
+	};
+	BulletRicochetCount={
+		Desc="<b>[Ricochet Rifling]</b> The amount of times a shot can ricochet between targets.\n\n(Higher is better)";
+	};
+	BulletRicochetDistance={
+		Desc="<b>[Ricochet Rifling]</b> The distance which a ricochet shot will search for a next target.\n\n(Higher is better)";
+	};
 
 	--MARK: Melee desc;
 	ThrowDamagePercent={

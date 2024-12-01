@@ -44,6 +44,10 @@ local Configurations={
 	-- UI Configurations;
 	UISpreadIntensity=6;
 	
+	KnockoutTrigger="Modifier";
+	KnockoutDistance=8;
+	KnockoutDuration=2;
+
 	-- Body
 	RecoilStregth=math.rad(120);
 

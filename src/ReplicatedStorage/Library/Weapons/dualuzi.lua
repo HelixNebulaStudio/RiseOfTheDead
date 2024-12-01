@@ -57,29 +57,58 @@ local Properties={
 
 local Animations=workspace:GetAttribute("IsDev") and {
 	Core={Id=81052681585798;};
-	PrimaryFire={Id=113445169479302; FocusWeight=0.1};
-	Reload={Id=113101142371503;};
-	TacticalReload={Id=94780225166213;};
-	Load={Id=129324275336201;};
-	Inspect={Id=133473762767233;};
-	Sprint={Id=74155200790246};
-	Empty={Id=94131442451868;};
+	Focus={Id=135410447440182; StopOnAction=true;};
+	PrimaryFire={Id=122319771784489; FocusWeight=0.1};
+	Reload={Id=121519497685223;};
+	Reload2={Id=110413405011722;};
+	TacticalReload={Id=70730201697315;};
+	Load={Id=98173490297013;};
+	Inspect={Id=97123269406569;};
+	Sprint={Id=130194448703145};
+	Empty={Id=108041480689779;};
 	Unequip={Id=16838914873};
 	Idle={Id=17557594451};
 
 } or { -- Main
 	Core={Id=81052681585798;};
-	PrimaryFire={Id=113445169479302; FocusWeight=0.1};
-	Reload={Id=113101142371503;};
-	TacticalReload={Id=94780225166213;};
-	Load={Id=129324275336201;};
-	Inspect={Id=133473762767233;};
-	Sprint={Id=74155200790246};
-	Empty={Id=94131442451868;};
+	Focus={Id=135410447440182; StopOnAction=true;};
+	PrimaryFire={Id=122319771784489; FocusWeight=0.1};
+	Reload={Id=121519497685223;};
+	Reload2={Id=110413405011722;};
+	TacticalReload={Id=70730201697315;};
+	Load={Id=98173490297013;};
+	Inspect={Id=97123269406569;};
+	Sprint={Id=130194448703145};
+	Empty={Id=108041480689779;};
 	Unequip={Id=16838914873};
 	Idle={Id=17557594451};
 	
 };
+-- local Animations=workspace:GetAttribute("IsDev") and {
+-- 	Core={Id=81052681585798;};
+-- 	PrimaryFire={Id=113445169479302; FocusWeight=0.1};
+-- 	Reload={Id=113101142371503;};
+-- 	TacticalReload={Id=94780225166213;};
+-- 	Load={Id=129324275336201;};
+-- 	Inspect={Id=133473762767233;};
+-- 	Sprint={Id=74155200790246};
+-- 	Empty={Id=94131442451868;};
+-- 	Unequip={Id=16838914873};
+-- 	Idle={Id=17557594451};
+
+-- } or { -- Main
+-- 	Core={Id=81052681585798;};
+-- 	PrimaryFire={Id=113445169479302; FocusWeight=0.1};
+-- 	Reload={Id=113101142371503;};
+-- 	TacticalReload={Id=94780225166213;};
+-- 	Load={Id=129324275336201;};
+-- 	Inspect={Id=133473762767233;};
+-- 	Sprint={Id=74155200790246};
+-- 	Empty={Id=94131442451868;};
+-- 	Unequip={Id=16838914873};
+-- 	Idle={Id=17557594451};
+	
+-- };
 
 local Audio={
 	Load={Id=169799883; Pitch=1.2; Volume=0.4;};

@@ -419,9 +419,9 @@ function Interface.init(modInterface)
 		if not modCharacter.CharacterProperties.IsAlive then return end;
 		if modData.Storages.Inventory == nil then return end;
 		
-		local slot = Interface.DefaultInterface.Slots[index];
+		local slot = Interface.HotbarInterface.Slots[index];
 		if slot and slot.Table then
-			Interface.DefaultInterface:UseItem(slot.Table);
+			Interface.HotbarInterface:UseItem(slot.Table);
 			
 		end
 	end

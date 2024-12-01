@@ -428,7 +428,7 @@ WorkbenchLibrary.ItemUpgrades={
 			{Rarity=1/2; Stat="HeadshotMultiplier"; Value={Min=10; Max=25;}; Add=true; };
 		};
 	};
-	["uzi"]={
+	["dualuzi"]={
 		Tier=5;
 		Type={"Submachine gun"};
 		TraitStats={
@@ -807,7 +807,7 @@ WorkbenchLibrary.ItemAppearance={
 		ToolGripOffset=CFrame.new(0, 0, 0);
 		ToolGrip={};
 	};
-	["uzi"]={
+	["dualuzi"]={
 		LeftToolGripModel="uzi";
 		LeftToolGripOffset=CFrame.new(-1, 0, 0) * CFrame.Angles(math.rad(90), 0, 0);
 		LeftToolGrip={};

@@ -39,6 +39,11 @@ local Configurations={
 	-- UI Configurations;
 	UISpreadIntensity=4;
 	
+	-- Gimmick
+	BulletRicochet="Modifier";
+	BulletRicochetCount=1;
+	BulletRicochetDistance=64;
+
 	-- Body
 	RecoilStregth=math.rad(90);
 
@@ -64,25 +69,27 @@ local Properties={
 
 local Animations=workspace:GetAttribute("IsDev") and {
 	Core={Id=115169929209429;};
-	PrimaryFire={Id=16654077269; FocusWeight=1};
-	Reload={Id=16654078379;};
-	TacticalReload={Id=16654080664;};
-	Load={Id=16654075429;};
-	Inspect={Id=16654073979;};
-	Sprint={Id=16654079599};
-	Empty={Id=16654072549;};
+	PrimaryFire={Id=76053596239338; FocusWeight=1};
+	EmptyFire={Id=112741517737403;};
+	Reload={Id=102798161524897;};
+	TacticalReload={Id=72036017995391;};
+	Load={Id=71050516325359;};
+	Inspect={Id=88446957745555;};
+	Sprint={Id=97978711950632};
+	Empty={Id=133859969327903;};
 	Unequip={Id=16838937257};
 	Idle={Id=17557632470};
 	
 } or { -- Main
 	Core={Id=115169929209429;};
-	PrimaryFire={Id=16654077269; FocusWeight=1};
-	Reload={Id=16654078379;};
-	TacticalReload={Id=16654080664;};
-	Load={Id=16654075429;};
-	Inspect={Id=16654073979;};
-	Sprint={Id=16654079599};
-	Empty={Id=16654072549;};
+	PrimaryFire={Id=76053596239338; FocusWeight=1};
+	EmptyFire={Id=112741517737403;};
+	Reload={Id=102798161524897;};
+	TacticalReload={Id=72036017995391;};
+	Load={Id=71050516325359;};
+	Inspect={Id=88446957745555;};
+	Sprint={Id=97978711950632};
+	Empty={Id=133859969327903;};
 	Unequip={Id=16838937257};
 	Idle={Id=17557632470};
 	
