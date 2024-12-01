@@ -333,6 +333,7 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 			ammoCounter.Position = UDim2.new(0.5, 0, 0.94, -145);
 		end
 		
+		local oldText = ammoCounter.Text
 		if configurations.NoMaxAmmo then
 			ammoCounter.Text = properties.Ammo .."/".. configurations.AmmoLimit;
 		else
@@ -340,6 +341,7 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 		end
 		
 		task.spawn(function()
+			if oldText == ammoCounter.Text then return end;
 			modStorageInterface.RefreshStorageItemId(weaponId);
 		end)
 	end
@@ -2067,7 +2069,6 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 	end
 	
 	updateValues();
-	updateAmmoCounter();
 	if modWeaponMechanics.EquipUpdateExperience and not modConfigurations.DisableExperiencebar then
 		modData.UpdateProgressionBar(
 			(storageItem.Values.E or 0)/(storageItem.Values.EG or 100), 
@@ -2346,7 +2347,6 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 	task.delay(equipTime, function()
 		if unequiped then return end;
 		updateValues();
-		updateAmmoCounter();
 		properties.CanPrimaryFire = true;
 		properties.CanAimDown = true;
 		equipped = true;

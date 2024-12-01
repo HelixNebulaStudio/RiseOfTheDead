@@ -858,7 +858,15 @@ function SlotItem:Update(storageItemId)
 		self.ItemButtonObject.Itembar = true;
 	end
 	task.spawn(function()
-		self.ItemButtonObject:Update(self.Item); -- Update item button;
+		local update = false;
+
+		if modComponents.IsTrulyVisible(self.Button) then
+			update = true;
+		end
+
+		if update then
+			self.ItemButtonObject:Update(self.Item); -- Update item button;
+		end
 	end)
 
 	if interface.CustomHighlight then
@@ -1318,7 +1326,7 @@ function StorageInterface:Update(storage, storageItemId)
 	end
 	
 	RefreshPremium();
-	
+
 	for id, bt in pairs(self.Buttons) do
 		local storageItem = storage.Container[id];
 		local oldStorageItem = bt.Item;
@@ -1367,39 +1375,47 @@ function StorageInterface:Update(storage, storageItemId)
 		self.Slots[index].Table = nil;
 	end
 
-	for id, storageItem in pairs(storage.Container) do
-		if self.Slots[storageItem.Index] == nil then continue end;
-		if storageItemId and id ~= storageItemId then continue end;
-		
-		if self.Buttons[id] == nil or self.Buttons[id].Button.Parent == nil then
-			self:NewButton(storageItem.ID);
-			
-		else
-			self.Buttons[id]:Update(storageItemId);
-			
-		end
-		self.Slots[storageItem.Index].Table = self.Buttons[id];
+	local update = false;
 
-		if storageItem.Values.IsEquipped then
-			local slotFrame = self.Slots[storageItem.Index].Frame
-			if slotFrame.ClassName == "Frame" then
-				slotFrame.BackgroundTransparency = 0.25;
-				slotFrame.BorderSizePixel = 2;
-
-			elseif slotFrame.ClassName == "ImageLabel" then
-				local new = templateHighlighGradient:Clone();
-				new.Parent = slotFrame;
-				slotFrame.ImageColor3 = Color3.fromRGB(255, 255, 255);
-
-			end
-		end
-		
+	if modComponents.IsTrulyVisible(self.MainFrame) then
+		update = true;
 	end
 
-	for index, _ in pairs(self.Slots) do
-		local slotTable = self.Slots[index];
-		if self.DecorateSlot then
-			self:DecorateSlot(index, slotTable);
+	if update then
+		for id, storageItem in pairs(storage.Container) do
+			if self.Slots[storageItem.Index] == nil then continue end;
+			if storageItemId and id ~= storageItemId then continue end;
+			
+			if self.Buttons[id] == nil or self.Buttons[id].Button.Parent == nil then
+				self:NewButton(storageItem.ID);
+				
+			else
+				self.Buttons[id]:Update(storageItemId);
+				
+			end
+			self.Slots[storageItem.Index].Table = self.Buttons[id];
+	
+			if storageItem.Values.IsEquipped then
+				local slotFrame = self.Slots[storageItem.Index].Frame
+				if slotFrame.ClassName == "Frame" then
+					slotFrame.BackgroundTransparency = 0.25;
+					slotFrame.BorderSizePixel = 2;
+	
+				elseif slotFrame.ClassName == "ImageLabel" then
+					local new = templateHighlighGradient:Clone();
+					new.Parent = slotFrame;
+					slotFrame.ImageColor3 = Color3.fromRGB(255, 255, 255);
+	
+				end
+			end
+			
+		end
+	
+		for index, _ in pairs(self.Slots) do
+			local slotTable = self.Slots[index];
+			if self.DecorateSlot then
+				self:DecorateSlot(index, slotTable);
+			end
 		end
 	end
 	
