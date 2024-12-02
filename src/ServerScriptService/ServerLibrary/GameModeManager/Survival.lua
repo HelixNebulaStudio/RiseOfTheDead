@@ -58,6 +58,8 @@ function GameMode:WorldLoad(modeData)
 		modConfigurations.Set("NpcThinkCycle", 1);
 
 		local gameController = require(gamemodeModule);
+		gameController:Load();
+		
 		shared.GameController = gameController;
 		
 		GameMode.Active = gameController;

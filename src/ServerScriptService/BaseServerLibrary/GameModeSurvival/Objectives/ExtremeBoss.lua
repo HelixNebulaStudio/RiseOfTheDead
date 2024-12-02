@@ -119,8 +119,11 @@ function Objective:Tick()
 		self.LastZombieSpawn = tick();
 		
 		if math.random(1, 100)/100 <= self.ZombieSpawnChance then
-			self.Controller:SpawnEnemy(self.Controller:PickEnemy(), {
-				Level = math.min(self.Controller.Wave, self.Controller.PeekPlayerLevel);
+			local enemyName = self.Controller:PickEnemy();
+			local enemyLevel = self.Controller:GetWaveLevel();
+	
+			self.Controller:SpawnEnemy(enemyName, {
+				Level = enemyLevel;
 			});
 		end
 	end

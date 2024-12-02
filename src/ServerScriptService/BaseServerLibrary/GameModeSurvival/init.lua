@@ -212,6 +212,16 @@ function Survival:Load()
 	end)
 end
 
+-- MARK: GetWaveLevel
+function Survival:GetWaveLevel()
+	local level = self.Wave;
+	if self.IsHard then
+		level = math.round(math.pow(2, (self.Wave+2)/2));
+	end
+	
+	return level;
+end
+
 function Survival:PickEnemy()
 	if self.CurrentWaveEnemyPool == nil or self.CurrentWaveEnemyPool.Wave ~= self.Wave then
 		-- Generate a enemy pool table per wave.
@@ -274,10 +284,6 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 	local spawnCf = paramPacket.SpawnCFrame or self.BasicEnemySpawns[math.random(1, #self.BasicEnemySpawns)].CFrame;
 	local level = paramPacket.Level or 1;
 	
-	if self.IsHard then
-		level = math.round(math.pow(2, (self.Wave+2)/2));
-	end
-
 	if self.OnNpcSpawnHooked == nil then
 		self.OnNpcSpawnHooked = modNpc.OnNpcSpawn:Connect(function(npcModule)
 			if modConfigurations.TargetableEntities[npcModule.Humanoid.Name] == nil then return end; -- Not enemy spawn;

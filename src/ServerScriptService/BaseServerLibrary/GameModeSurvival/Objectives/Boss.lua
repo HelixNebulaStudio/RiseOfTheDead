@@ -122,8 +122,12 @@ function Objective:Tick()
 	
 	if tick()-self.LastZombieSpawn >= 3 and #self.Controller.EnemyModules <= 25 and #Objective.BossNpcModules > 0 then
 		self.LastZombieSpawn = tick();
-		self.Controller:SpawnEnemy(self.Controller:PickEnemy(), {
-			Level = math.min(self.Controller.Wave, self.Controller.PeekPlayerLevel);
+		
+		local enemyName = self.Controller:PickEnemy();
+        local enemyLevel = self.Controller:GetWaveLevel();
+
+		self.Controller:SpawnEnemy(enemyName, {
+			Level = enemyLevel;
 		});
 	end
 

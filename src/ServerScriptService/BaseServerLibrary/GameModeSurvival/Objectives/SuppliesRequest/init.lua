@@ -231,8 +231,10 @@ function Objective:Tick()
 		self.LastSpawn = tick();
 
 		local enemyName = self.Controller:PickEnemy();
+        local enemyLevel = self.Controller:GetWaveLevel();
+
 		self.Controller:SpawnEnemy(enemyName, {
-			Level = math.min(self.Controller.Wave, self.Controller.PeekPlayerLevel)
+			Level = enemyLevel;
 		});
 		
 		self.SpawnCount = self.SpawnCount+1;
