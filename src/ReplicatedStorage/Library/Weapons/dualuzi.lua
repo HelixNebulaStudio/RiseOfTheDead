@@ -9,6 +9,7 @@ local Configurations={
 	WeaponType=Library.WeaponType.SMG;
 	
 	EquipLoadTime=0.6;
+	UseViewModel=false;
 	
 	AmmoType="lightammo";
 	
@@ -28,8 +29,8 @@ local Configurations={
 	MinBaseDamage=66;
 	BaseDamage=960;
 	
-	AmmoLimit=32;
-	MaxAmmoLimit=(32*6);
+	AmmoLimit=80;
+	MaxAmmoLimit=(80*6);
 	
 	DamageDropoff={
 		MinDistance=48;

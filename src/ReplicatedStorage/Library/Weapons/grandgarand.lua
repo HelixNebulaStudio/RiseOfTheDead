@@ -62,8 +62,8 @@ local Configurations={
 local Properties={
 	Ammo=Configurations.AmmoLimit;
 	MaxAmmo=Configurations.MaxAmmoLimit;
-	Rpm=80;
-	FireRate=(60/80);
+	Rpm=250;
+	FireRate=(60/250);
 	ReloadSpeed=2.8;
 }
 
