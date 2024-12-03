@@ -261,6 +261,13 @@ return function(CutsceneSequence)
 					
 					masonModule.CarLoop();
 					--mission.Changed:Disconnect(OnChanged);
+
+				elseif mission.ProgressionPoint == 6 then
+					local p250StorageItem = modStorage.FindItemIdFromStorages("p250", player);
+					if p250StorageItem then
+						p250StorageItem:SetValues("A", 0);
+						p250StorageItem:Sync({"A"});
+					end
 				end
 				
 			elseif mission.Type == 3 then -- OnComplete
