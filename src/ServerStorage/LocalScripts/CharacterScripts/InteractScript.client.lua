@@ -750,6 +750,7 @@ end
 
 -- !outline: signal modSyncTime.GetClock().ValueChanged
 modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
+	if modData:IsMobile() then return end;
 	overlapInteractParam.FilterDescendantsInstances = CollectionService:GetTagged("Interactables");
 	
 	if characterProperties.ActiveInteract ~= nil and (characterProperties.ActiveInteract.Distance or math.huge) <= (characterProperties.ActiveInteract.InteractableRange or interactionRange) then

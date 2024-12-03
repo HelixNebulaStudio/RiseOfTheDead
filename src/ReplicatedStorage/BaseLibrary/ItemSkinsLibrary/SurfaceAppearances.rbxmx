@@ -139,5 +139,39 @@
 			</Item>
 		</Item>
 
+		<!-- MARK: ornaments -->
+		<Item class="Folder">
+			<Properties>
+				<string name="Name">ornaments</string>
+			</Properties>
+
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">grandgarand</string>
+					<Content name="ColorMap"><url>rbxassetid://98802295374797</url></Content>
+					<Content name="MetalnessMap"><url>rbxassetid://83152713299428</url></Content>
+					<Content name="RoughnessMap"><url>rbxassetid://84604497361571</url></Content>
+					<Content name="NormalMap"><url>rbxassetid://84604497361571</url></Content>
+				</Properties>
+			</Item>
+		</Item>
+
+		<!-- MARK: gingerbread -->
+		<Item class="Folder">
+			<Properties>
+				<string name="Name">gingerbread</string>
+			</Properties>
+
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">arelshiftcross</string>
+					<Content name="ColorMap"><url>rbxassetid://109890745426322</url></Content>
+					<Content name="MetalnessMap"><url>rbxassetid://120602091012004</url></Content>
+					<Content name="RoughnessMap"><url>rbxassetid://120264870551628</url></Content>
+					<Content name="NormalMap"><url>rbxassetid://114483436022318</url></Content>
+				</Properties>
+			</Item>
+		</Item>
+
 	</Item>
 </roblox>

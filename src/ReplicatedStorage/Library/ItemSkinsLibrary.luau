@@ -17,6 +17,10 @@ function library:GetSurfaceAppearance(skinId, variantId)
     if folder then
         variantId = string.gsub(variantId, skinId, "");
         return folder:FindFirstChild(variantId);
+
+    else
+        Debugger:Warn("Missing skin folder: ", skinId, variantId);
+
     end
 
     return;
