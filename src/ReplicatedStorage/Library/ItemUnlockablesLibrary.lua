@@ -254,49 +254,6 @@ library:Add{
 	}
 };
 
---== xmassweater
-library:Add{
-	Id="xmassweater";
-	ItemId="xmassweater";
-	Name="Default";
-	Textures={
-		["LLA"]="rbxassetid://6125956699";
-		["LT"]="rbxassetid://6125956699";
-		["LUA"]="rbxassetid://6125956699";
-		["RUA"]="rbxassetid://6125956699";
-		["RLA"]="rbxassetid://6125956699";
-		["UT"]="rbxassetid://6125956699";
-	}
-};
-
-library:Add{
-	Id="xmassweatergreen";
-	ItemId="xmassweater";
-	Name="Green & Red";
-	Textures={
-		["LLA"]="rbxassetid://6538903022";
-		["LT"]="rbxassetid://6538903022";
-		["LUA"]="rbxassetid://6538903022";
-		["RUA"]="rbxassetid://6538903022";
-		["RLA"]="rbxassetid://6538903022";
-		["UT"]="rbxassetid://6538903022";
-	}
-};
-
-library:Add{
-	Id="xmassweateryellow";
-	ItemId="xmassweater";
-	Name="Yellow & Blue";
-	Textures={
-		["LLA"]="rbxassetid://6538911498";
-		["LT"]="rbxassetid://6538911498";
-		["LUA"]="rbxassetid://6538911498";
-		["RUA"]="rbxassetid://6538911498";
-		["RLA"]="rbxassetid://6538911498";
-		["UT"]="rbxassetid://6538911498";
-	}
-};
-
 --== prisonshirt
 library:Add{
 	Id="prisonshirt";
@@ -457,25 +414,6 @@ library:Add{
 	Name="Yellow";
 	Textures={
 		["Handle"]="rbxassetid://13021453507";
-	};
-};
-
---== brownbelt
-library:Add{
-	Id="brownbelt";
-	ItemId="brownbelt";
-	Name="Default";
-	Textures={
-		["Handle"]="rbxassetid://1744577580";
-	};
-};
-
-library:Add{
-	Id="brownbeltwhite";
-	ItemId="brownbelt";
-	Name="White";
-	Textures={
-		["Handle"]="rbxassetid://13021977407";
 	};
 };
 

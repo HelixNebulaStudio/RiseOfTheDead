@@ -1197,6 +1197,115 @@ function ItemUnlockablesLibrary:Init(library)
 		SurfaceAppearanceParent=script;
 	};
 	
+	--== MARK: brownbelt
+	library:Add{
+		Id="brownbelt";
+		ItemId="brownbelt";
+		Name="Default";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://1744577580";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="brownbeltwhite";
+		ItemId="brownbelt";
+		Name="White";
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://13021977407";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="brownbeltxmasorange";
+		ItemId="brownbelt";
+		Name="Xmas Orange";
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://134899340140097";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="brownbeltxmaspink";
+		ItemId="brownbelt";
+		Name="Xmas Pink";
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://124525857578516";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+
+	--== MARK: xmassweater
+	library:Add{
+		Id="xmassweater";
+		ItemId="xmassweater";
+		Name="Default";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://6125956699";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="xmassweatergreen";
+		ItemId="xmassweater";
+		Name="Green & Red";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://6538903022";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
+	library:Add{
+		Id="xmassweateryellow";
+		ItemId="xmassweater";
+		Name="Yellow & Blue";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://6538911498";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
+	library:Add{
+		Id="xmassweatersnowflakered";
+		ItemId="xmassweater";
+		Name="Red Snowflake";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://122563060145000";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
+	library:Add{
+		Id="xmassweatersnowflakegreen";
+		ItemId="xmassweater";
+		Name="Green Snowflake";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://86867273602934";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
+
 end
 
 return ItemUnlockablesLibrary;

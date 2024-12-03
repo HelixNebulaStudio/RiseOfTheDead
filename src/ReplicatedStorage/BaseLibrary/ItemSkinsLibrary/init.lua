@@ -700,6 +700,30 @@ function ItemSkinsLibrary:Init(super)
         };
     };
 
+    super:Add{
+        Id="gingerbread";
+        Type=super.SkinType.Texture;
+
+        Name="Gingerbread";
+        Icon="rbxassetid://85625473582729";
+    
+        Textures={
+            ["arelshiftcross"]={Id="arelshiftcrossgingerbread"; Image="rbxassetid://109890745426322"; Icon="rbxassetid://85625473582729"; };
+        };
+    };
+
+    super:Add{
+        Id="ornaments";
+        Type=super.SkinType.Texture;
+
+        Name="Ornaments";
+        Icon="rbxassetid://76137784853860";
+    
+        Textures={
+            ["grandgarand"]={Id="grandgarandornaments"; Image="rbxassetid://72026395302451"; Icon="rbxassetid://76137784853860"; };
+        };
+    };
+
 end
 
 return ItemSkinsLibrary;
