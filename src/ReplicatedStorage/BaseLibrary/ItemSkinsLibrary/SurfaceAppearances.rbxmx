@@ -173,5 +173,22 @@
 			</Item>
 		</Item>
 
+		<!-- MARK: neondeath -->
+		<Item class="Folder">
+			<Properties>
+				<string name="Name">neondeath</string>
+			</Properties>
+
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">tacticalbow</string>
+					<Content name="ColorMap"><url>rbxassetid://137497922703912</url></Content>
+					<Content name="MetalnessMap"><url>rbxassetid://81096676036471</url></Content>
+					<Content name="RoughnessMap"><url>rbxassetid://92259728609207</url></Content>
+					<Content name="NormalMap"><url>rbxassetid://121705964031996</url></Content>
+				</Properties>
+			</Item>
+		</Item>
+
 	</Item>
 </roblox>

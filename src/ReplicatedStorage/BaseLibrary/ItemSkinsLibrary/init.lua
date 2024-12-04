@@ -723,7 +723,19 @@ function ItemSkinsLibrary:Init(super)
             ["grandgarand"]={Id="grandgarandornaments"; Image="rbxassetid://72026395302451"; Icon="rbxassetid://76137784853860"; };
         };
     };
+    
+    super:Add{
+        Id="neondeath";
+        Type=super.SkinType.Texture;
 
+        Name="Neon Death";
+        Icon="rbxassetid://87806357651434";
+    
+        Textures={
+            ["tacticalbow"]={Id="tacticalbowneondeath"; Image="rbxassetid://137497922703912"; Icon="rbxassetid://87806357651434"; };
+        };
+    };
+    
 end
 
 return ItemSkinsLibrary;

@@ -675,20 +675,33 @@ function ItemsLibrary:Init(super)
 	};
 	
 	-- MARK: Weapon Skin Perms
-
 	-- arelshiftcross
 	new(skinPermBase, {Id="arelshiftcrossantique"; Icon="rbxassetid://13768313905"; SkinPerm="Antique"; TargetItemId="arelshiftcross"; });
 	
+	-- desolatorheavy
 	new(skinPermBase, {Id="desolatorheavytoygun"; Icon="rbxassetid://13787997600"; SkinPerm="Toy Gun"; TargetItemId="desolatorheavy"; });
+
+	-- czevo3
 	new(skinPermBase, {Id="czevo3asiimov"; Icon="rbxassetid://13810605651"; SkinPerm="Asiimov"; TargetItemId="czevo3"; });
+
+	-- rusty48
 	new(skinPermBase, {Id="rusty48blaze"; Icon="rbxassetid://13822423304"; SkinPerm="Blaze"; TargetItemId="rusty48"; });
+
+	-- vectorx
 	new(skinPermBase, {Id="vectorxpossession"; Icon="rbxassetid://15007719867"; SkinPerm="Possession"; TargetItemId="vectorx"; });
 	
+	-- sr308
 	new(skinPermBase, {Id="sr308slaughterwoods"; Icon="rbxassetid://16570530303"; SkinPerm="Slaughter Woods"; TargetItemId="sr308"; });
 	new(skinPermBase, {Id="sr308horde"; Icon="rbxassetid://16570534063"; SkinPerm="Horde"; TargetItemId="sr308"; });
 
+	-- deagle
 	new(skinPermBase, {Id="deaglecryogenics"; Icon="rbxassetid://17227806515"; SkinPerm="Cryogenics"; TargetItemId="deagle"; });
+	
+	-- flamethrower
 	new(skinPermBase, {Id="flamethrowerblaze"; Icon="rbxassetid://17229367894"; SkinPerm="Blaze"; TargetItemId="flamethrower"; });
+	
+	-- tacticalbow
+	new(skinPermBase, {Id="tacticalbowneondeath"; Icon="rbxassetid://87806357651434"; SkinPerm="Neon Death"; TargetItemId="tacticalbow"; });
 	
 	--MARK: Clothing Skin Perms;
 	-- armwraps
