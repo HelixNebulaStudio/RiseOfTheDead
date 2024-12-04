@@ -848,7 +848,7 @@ function ItemsLibrary:Init(super)
 
 	-- portableautoturret
 	new(skinPermBase, {Id="portableautoturretblue"; Icon="rbxassetid://113924290223669"; SkinPerm="Blue"; TargetItemId="portableautoturret";});
-
+	new(skinPermBase, {Id="portableautoturretcryogenics"; Icon="rbxassetid://117404049971970"; SkinPerm="Cryogenics"; TargetItemId="portableautoturret";});
 
 	--==========================================================[[ SUMMONS ]]==========================================================--
 	local summonsBase = {

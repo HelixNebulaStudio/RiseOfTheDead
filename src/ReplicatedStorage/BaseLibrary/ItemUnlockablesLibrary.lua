@@ -1192,7 +1192,19 @@ function ItemUnlockablesLibrary:Init(library)
 		DefaultPackage=true;
 
 		SurfaceAppearance={
-			ColorMap="rbxassetid://16449106091";
+			ColorMap="rbxassetid://100775055891184";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="portableautoturretcryogenics";
+		ItemId="portableautoturret";
+		Name="Cryogenics";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://130868205619066";
 		};
 		SurfaceAppearanceParent=script;
 	};
