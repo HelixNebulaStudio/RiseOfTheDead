@@ -166,7 +166,7 @@ function equip(equipPacket, toolWelds)
 		end
 		
 		local toolModule = modData:GetItemClass(id);
-		if toolModule then
+		if toolModule and toolModule.SetActive then
 			toolModule:SetActive(true);
 		end
 
@@ -198,7 +198,7 @@ function Unequip(unequipPacket)
 		equipmentItem = storageItem;
 	end
 
-	if toolModule then
+	if toolModule and toolModule.SetActive then
 		toolModule:SetActive(false);
 	end
 

@@ -10,6 +10,7 @@ local modAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modWeapons = Debugger:Require(game.ReplicatedStorage.Library.Weapons);
 
 local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
@@ -367,7 +368,7 @@ function TurretRuntime(weaponStorageItem)
 		configurations.InfiniteAmmo = profile.InfAmmo;
 	end
 
-	if configurations.ReloadMode == modAttributes.ReloadModes.Single and targetModel == nil and itemValues.MA > 0 then
+	if configurations.ReloadMode == modAttributes.ReloadModes.Single and targetModel == nil and (itemValues.MA or 1) > 0 then
 		tryReload = itemValues.A and itemValues.A < configurations.AmmoLimit;
 	end
 
@@ -570,9 +571,11 @@ function Update()
 	
 	local weaponStorageItem = modStorage.FindIdFromStorages(weaponStorageItemID, player);
 	local itemId = weaponStorageItem.ItemId;
+	local toolLib = modWeapons[itemId];
 	
 	if isWeaponChanged then
-		local prefabTool = prefabsItems:FindFirstChild(itemId);
+		local _, toolItemId = next(toolLib.Welds);
+		local prefabTool = prefabsItems:FindFirstChild(toolItemId);
 		if prefabTool == nil then
 			Debugger:Warn("Tool prefab for (",itemId,") does not exist for turret!");
 			return;
@@ -619,7 +622,7 @@ function Update()
 	
 	local isOnline = accessoryStorageItem.Values.Online == true;
 	
-	if isOnline then
+	if isOnline and activeWeaponModel then
 		autoTurretClient:SetAttribute("Mode", 1);
 		if onlineLoop == false then
 			onlineLoop = true;

@@ -155,7 +155,7 @@ function unequipTool(player, returnPacket)
 		local modGearAttachments = require(player.Character:FindFirstChild("GearAttachments"));
 		
 		local toolModule = profile:GetItemClass(lastId, lastId == "MockStorageItem");
-		if toolModule then
+		if toolModule and toolModule.SetActive then
 			toolModule:SetActive(false);
 		end
 
@@ -386,7 +386,7 @@ local function equipTool(player, paramPacket)
 			if itemProperties.Equippable and toolLib then
 				local toolModule = profile:GetItemClass(id, mockEquip);
 				
-				if toolModule then
+				if toolModule and toolModule.SetActive then
 					toolModule:SetActive(true);
 				end
 
