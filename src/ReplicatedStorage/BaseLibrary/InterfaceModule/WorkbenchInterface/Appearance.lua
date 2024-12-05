@@ -22,9 +22,10 @@ local modBranchConfigs = require(game.ReplicatedStorage:WaitForChild("Library"):
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
 
-local modColorsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("ColorsLibrary"));
-local modSkinsLibrary = require(game.ReplicatedStorage.Library:WaitForChild("SkinsLibrary"));
+local modColorsLibrary = require(game.ReplicatedStorage.Library.ColorsLibrary);
+local modSkinsLibrary = require(game.ReplicatedStorage.Library.SkinsLibrary);
 local modItemUnlockablesLibrary = require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
+local modGoldShopLibrary = require(game.ReplicatedStorage.Library.GoldShopLibrary);
 
 
 local _appearanceFrameTemplate = script:WaitForChild("AppearanceFrame");
@@ -149,10 +150,12 @@ function Workbench.new(itemId, library, storageItem)
 						local selectedLabel = unlockButton:WaitForChild("SelectedLabel");
 						local titleLabel = unlockButton:WaitForChild("TitleLabel");
 						local chargeLabel = unlockButton:WaitForChild("ChargesLabel");
+						local goldIcon = unlockButton:WaitForChild("GoldIcon");
 
 						local unlockableIcon = unlockItemLib.Icon;
+						local unlockableItemId = unlockItemLib.Id;
 						
-						local itemLib = modItemLibrary:Find(unlockItemLib.Id);
+						local itemLib = modItemLibrary:Find(unlockableItemId);
 						if itemLib then
 							unlockableIcon = itemLib.Icon;
 						end
@@ -164,16 +167,24 @@ function Workbench.new(itemId, library, storageItem)
 						unlockButton.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 						txrLabel.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 
-						local hasCharges = chargesData[unlockItemLib.Id] ~= nil;
+						local hasCharges = chargesData[unlockableItemId] ~= nil;
 						if hasCharges then
 							chargeLabel.Text = `∞`;
 						end
+
+						local goldShopLib = modGoldShopLibrary.Products:Find(unlockableItemId);
+						if goldShopLib and unlockItemLib.Name ~= "Default" then
+							goldIcon.Visible = true;
+						else
+							goldIcon.Visible = false;
+						end
+						
 
 						local function refresh()
 							if ItemValues.ActiveSkin == nil and unlockItemLib.Name == "Default" then
 								selectedLabel.Visible = true;
 							else
-								selectedLabel.Visible = ItemValues.ActiveSkin == unlockItemLib.Id;
+								selectedLabel.Visible = ItemValues.ActiveSkin == unlockableItemId;
 							end
 						end
 						table.insert(refreshButtonFuncs, refresh);
@@ -181,7 +192,7 @@ function Workbench.new(itemId, library, storageItem)
 						local canPreview;
 						local function previewStyle()
 							canPreview = true;
-							setCharacterAccessories(unlockItemLib.Id);
+							setCharacterAccessories(unlockableItemId);
 						end
 
 						unlockButton.MouseEnter:Connect(previewStyle);
@@ -199,10 +210,10 @@ function Workbench.new(itemId, library, storageItem)
 								Interface:PlayButtonClick();
 								
 								local oldActiveId = ItemValues.ActiveSkin;
-								if ItemValues.ActiveSkin == unlockItemLib.Id then
+								if ItemValues.ActiveSkin == unlockableItemId then
 									remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId");
 								else
-									remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId", unlockItemLib.Id);
+									remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId", unlockableItemId);
 								end
 								canPreview = false;
 								
@@ -245,7 +256,7 @@ function Workbench.new(itemId, library, storageItem)
 											Style="Confirm";
 											OnPrimaryClick=function(promptDialogFrame, textButton)
 												promptDialogFrame.statusLabel.Text = "Applying...";
-												remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId", unlockItemLib.Id);
+												remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId", unlockableItemId);
 												task.wait(0.5);
 											end;
 										};
@@ -260,16 +271,16 @@ function Workbench.new(itemId, library, storageItem)
 							end
 
 							if isUnlocked == nil then
-								Interface:OpenWindow("GoldMenu", unlockItemLib.Id);
+								Interface:OpenWindow("GoldMenu", unlockableItemId);
 								
 								return
 							end;
 							
 							local oldActiveId = ItemValues.ActiveSkin;
-							if ItemValues.ActiveSkin == unlockItemLib.Id then
+							if ItemValues.ActiveSkin == unlockableItemId then
 								remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId");
 							else
-								remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId", unlockItemLib.Id);
+								remoteSetAppearance:FireServer(Interface.Object, 9, storageItem.ID, "UnlockableId", unlockableItemId);
 							end
 							canPreview = false;
 							
@@ -302,7 +313,7 @@ function Workbench.new(itemId, library, storageItem)
 						end)
 
 						refresh();
-						listMenu:AddSearchIndex(unlockButton, {unlockItemLib.ItemId; unlockItemLib.Id; titleLabel.Text;});
+						listMenu:AddSearchIndex(unlockButton, {unlockItemLib.ItemId; unlockableItemId; titleLabel.Text;});
 						unlockButton.Parent = unlockablesList.list;
 					end
 				end
