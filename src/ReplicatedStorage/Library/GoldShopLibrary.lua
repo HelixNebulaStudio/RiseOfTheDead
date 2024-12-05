@@ -1665,7 +1665,29 @@ GoldShopLibrary.Products:Add{
 	};
 };
 
+GoldShopLibrary.Products:Add{
+	Id="portableautoturretblue";
+	Product={
+		Type="Gold";
+		Price=990;
+		ItemId="portableautoturretblue";
+		New=true;
+	};
 
+	Trader={Buy=true; Sell=true;};
+};
+
+GoldShopLibrary.Products:Add{
+	Id="ammopouchnight";
+	Product={
+		Type="Gold";
+		Price=990;
+		ItemId="ammopouchnight";
+		New=true;
+	};
+
+	Trader={Buy=true; Sell=true;};
+};
 
 --=== CONTENT PAGES
 
@@ -1847,6 +1869,8 @@ GoldShopLibrary.Pages = {
 	};
 	
 	ClothingSkins = {
+		{Type="Product"; Id="ammopouchnight"};
+		{Type="Product"; Id="portableautoturretblue"};
 		{Type="Product"; Id="nekrostrenchblaze"};
 		{Type="Product"; Id="greytshirtcamo"};
 		

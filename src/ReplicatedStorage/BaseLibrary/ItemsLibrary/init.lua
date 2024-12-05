@@ -675,6 +675,8 @@ function ItemsLibrary:Init(super)
 	};
 	
 	-- MARK: Weapon Skin Perms
+	new(skinPermBase, {Id="p250toygun"; Icon="rbxassetid://94431954099834"; SkinPerm="Toy Gun"; TargetItemId="p250"; });
+	
 	-- arelshiftcross
 	new(skinPermBase, {Id="arelshiftcrossantique"; Icon="rbxassetid://13768313905"; SkinPerm="Antique"; TargetItemId="arelshiftcross"; });
 	

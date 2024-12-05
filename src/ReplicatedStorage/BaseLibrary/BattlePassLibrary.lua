@@ -512,20 +512,40 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="santahat";};
 			});
 			--
-			leaf(4, {
-				Reward={ItemId="fedoraxmasred";};
+			leaf(3, {
+				Reward={ItemId="p250toygun";};
 			});
-			leaf(5, {
-				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			leaf(7, {
+				Reward={ItemId="xmassweater";};
 			});
-			
 			leaf(10, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
 			});
-			leaf(15, {
-				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			leaf(23, {
+				Reward={ItemId="brownbeltxmasorange";};
+			});
+			leaf(27, {
+				Reward={ItemId="xmassweatersnowflakered";};
 			});
 			leaf(20, {
+				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			});
+			leaf(23, {
+				Reward={ItemId="xmaspresent2023";};
+			});
+			leaf(27, {
+				Reward={ItemId="ammopouchnight";};
+			});
+			leaf(30, {
+				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			});
+			leaf(33, {
+				Reward={ItemId="xmaspresent2023";};
+			});
+			leaf(37, {
+				Reward={ItemId="fedoraxmasred";};
+			});
+			leaf(40, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
 			});
 		};

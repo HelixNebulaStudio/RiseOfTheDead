@@ -2410,6 +2410,11 @@ function Interface.init(modInterface)
 	local battlePassContent = BottomFrame:WaitForChild("battlePass");
 	local hintLabel = BottomFrame:WaitForChild("hint");
 
+	local passButton: ImageButton = BottomFrame:WaitForChild("passButton");
+	local passIconLabel = passButton:WaitForChild("EventIcon");
+	local titleLabel = passButton:WaitForChild("Title");
+	local lvlLabel = passButton:WaitForChild("LvlLabel");
+
 	local activeBpId = modBattlePassLibrary.Active;
 	local battlepassLib = modBattlePassLibrary:Find(activeBpId);
 	
@@ -2436,19 +2441,34 @@ function Interface.init(modInterface)
 		
 	else
 		BottomFrame.Visible = true;
-		LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, -60);
-		LeftFrame.Position = UDim2.new(0, 0, 1, -60);
+		LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, -150);
+		LeftFrame.Position = UDim2.new(0, 0, 1, -150);
 		RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, -60);
 		RightFrame.Position = UDim2.new(1, 0, 1, -60);
 		
 		hintLabel.Text = "Event Pass: ".. daysLeft .." Days Left";
 		
+		titleLabel.Text = battlepassLib.Title;
+		passIconLabel.Image = battlepassLib.Icon;
+
 		local bpButtonFunc;
 
 		--== MARK: Event Pass
 		modData:RequestData("BattlePassSave/Passes/"..activeBpId);
 
-		table.clear(levelSlotsInfo)
+		passButton.MouseEnter:Connect(function()
+			passButton.ImageColor3 = Color3.fromRGB(112, 63, 63);
+		end)
+		passButton.MouseLeave:Connect(function()
+			passButton.ImageColor3 = Color3.fromRGB(75, 40, 40);
+		end)
+		passButton.MouseButton1Click:Connect(function()
+			if bpButtonFunc then
+				bpButtonFunc();
+			end
+		end)
+		
+		table.clear(levelSlotsInfo);
 		function Interface.UpdateBattlePass(action)
 			local battlePassData, seasonData;
 
@@ -2459,6 +2479,178 @@ function Interface.init(modInterface)
 			end
 			refreshData();
 			
+			
+			bpButtonFunc = function()
+				refreshData();
+				Interface:PlayButtonClick();
+
+				MissionDisplayFrame:ClearAllChildren();
+
+				local passRewardFrame = templatePassReward:Clone();
+				passRewardFrame.Parent = MissionDisplayFrame;
+
+				local titleLabel = passRewardFrame:WaitForChild("Title");
+				titleLabel.Text =  '<font size="14">'.."Event Pass</font>\n<b>".. battlepassLib.Title .."</b>";
+
+				local contentFrame = passRewardFrame:WaitForChild("Frame");
+				local claimButton = contentFrame:WaitForChild("ClaimButton");
+				local slotFrame = contentFrame:WaitForChild("Slot");
+				local descLabel = contentFrame:WaitForChild("Description");
+
+				local itemIcon = passIconLabel:Clone();
+				itemIcon.Size = UDim2.new(1, 0, 1, 0);
+				itemIcon.Parent = slotFrame;
+
+				slotFrame.AnchorPoint = Vector2.new(0.5, 0);
+				slotFrame.Position = UDim2.new(0.5, 0, 0, -10);
+				slotFrame.Size = UDim2.new(0.7, 0, 0.6, 0);
+
+				descLabel.Position = UDim2.new(0, 0, 0.6, 0);
+				descLabel.Size = UDim2.new(1, 0, 0, 0);
+				descLabel.ClipsDescendants = false;
+
+				descLabel.Text = battlepassLib.Desc;
+
+				local price = battlepassLib.Price;
+				claimButton.Text = "Unlock for ".. modFormatNumber.Beautify(battlepassLib.Price) .." Gold";
+				
+				claimButton.TextScaled = false;
+				claimButton.Position = UDim2.new(0.5, 0, 1, -40);
+				claimButton.Size = UDim2.new(0.6, 0, 0, 40);
+				claimButton.BackgroundColor3 = branchColor;
+				game.Debris:AddItem(claimButton:FindFirstChild("UITextSizeConstraint"), 0);
+
+				claimButton.Visible = false;
+
+				if seasonData.Owned ~= true then
+					claimButton.Visible = true;
+				end
+
+				claimButton.MouseButton1Click:Connect(function()
+					refreshData();
+					Interface:PlayButtonClick();
+
+					local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. price.." Gold</font></b>";
+					local promptWindow = Interface:PromptQuestion("Unlock Event Pass for ".. goldTxt.. "?",
+						"Are you sure you want to unlock Event Pass: ".. battlepassLib.Title .. " for "..goldTxt.."?", 
+						"Purchase", "Cancel");
+					local YesClickedSignal, NoClickedSignal;
+
+					YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
+						Interface:PlayButtonClick();
+						promptWindow.Frame.Yes.buttonText.Text = "Purchasing...";
+
+						local r = remoteBattlepassRemote:InvokeServer("purchase");
+						if r.FailMsg then
+							if r.FailMsg == "Insufficient Gold" then
+								task.wait(2);
+								promptWindow:Close();
+								Interface:OpenWindow("GoldMenu", "GoldPage");
+								return;
+
+							else
+								promptWindow.Frame.Yes.buttonText.Text = r.FailMsg;
+								task.wait(2);
+
+							end
+
+						elseif r.Success == true then
+							promptWindow.Frame.Yes.buttonText.Text = "Unlocked!";
+
+						end
+						promptWindow:Close();
+						Interface:OpenWindow("Missions");
+
+						YesClickedSignal:Disconnect();
+						NoClickedSignal:Disconnect();
+					end);
+
+					NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
+						Interface:PlayButtonClick();
+						promptWindow:Close();
+
+						YesClickedSignal:Disconnect();
+						NoClickedSignal:Disconnect();
+					end);
+				end)
+				
+				
+				local function buyLevelFunc(lvlAmt)
+					local price = modBattlePassLibrary.BuyLevelCost * lvlAmt;
+					
+					local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. price.." Gold</font></b>";
+					local promptWindow = Interface:PromptQuestion("Level up Event Pass for ".. goldTxt.. "?",
+						"Are you sure you want to level up Event Pass by ".. lvlAmt .." for "..goldTxt.."?", 
+						"Level Up", "Cancel");
+					local YesClickedSignal, NoClickedSignal;
+
+					YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
+						Interface:PlayButtonClick();
+						promptWindow.Frame.Yes.buttonText.Text = "Leveling Up...";
+
+						local r = remoteBattlepassRemote:InvokeServer("purchaselvls", lvlAmt);
+						if r.FailMsg then
+							if r.FailMsg == "Insufficient Gold" then
+								task.wait(2);
+								promptWindow:Close();
+								Interface:OpenWindow("GoldMenu", "GoldPage");
+								return;
+
+							else
+								promptWindow.Frame.Yes.buttonText.Text = r.FailMsg;
+								task.wait(2);
+
+							end
+
+						elseif r.Success == true then
+							promptWindow.Frame.Yes.buttonText.Text = "Leveled Up!";
+
+						end
+						promptWindow:Close();
+						Interface:OpenWindow("Missions");
+
+						YesClickedSignal:Disconnect();
+						NoClickedSignal:Disconnect();
+					end);
+
+					NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
+						Interface:PlayButtonClick();
+						promptWindow:Close();
+
+						YesClickedSignal:Disconnect();
+						NoClickedSignal:Disconnect();
+					end);
+				end
+				
+				local buyOneLevelButton = claimButton:Clone();
+				buyOneLevelButton.BackgroundColor3 = Color3.fromRGB(170, 120, 0);
+				buyOneLevelButton.AnchorPoint = Vector2.new(0, 1);
+				buyOneLevelButton.Position = UDim2.new(0, 0, 1, 0);
+				buyOneLevelButton.Size = UDim2.new(0.5, -10, 0, 30);
+				buyOneLevelButton.Text = "Unlock 1 Level";
+				buyOneLevelButton.Parent = contentFrame;
+				buyOneLevelButton.Visible = true;
+				
+				buyOneLevelButton.MouseButton1Click:Connect(function()
+					buyLevelFunc(1);
+				end)
+				
+
+				local buyTenLevelButton = claimButton:Clone();
+				buyTenLevelButton.BackgroundColor3 = Color3.fromRGB(170, 120, 0);
+				buyTenLevelButton.AnchorPoint = Vector2.new(1, 1);
+				buyTenLevelButton.Position = UDim2.new(1, 0, 1, 0);
+				buyTenLevelButton.Size = UDim2.new(0.5, -10, 0, 30);
+				buyTenLevelButton.Text = "Unlock 10 Levels";
+				buyTenLevelButton.Parent = contentFrame;
+				buyTenLevelButton.Visible = true;
+
+				buyTenLevelButton.MouseButton1Click:Connect(function()
+					buyLevelFunc(10);
+				end)
+			end
+
+
 			local seasonLevel = seasonData.Level;
 			local seasonTokens = seasonData.Tokens or 0;
 			local treeList = battlepassLib.Tree;
@@ -2493,189 +2685,19 @@ function Interface.init(modInterface)
 					if lvl == 0 and lvlSlotInfo.btStart == nil then
 						lvlSlotInfo.btStart = true;
 						
-						local frame = Instance.new("Frame");
-						frame.BackgroundTransparency = 1;
-						frame.Size = UDim2.new(0, 70, 0, 70);
-						local bpIconButton = Instance.new("ImageButton");
-						bpIconButton.BackgroundTransparency = 1;
-						bpIconButton.Rotation = 1;
-						bpIconButton.AnchorPoint = Vector2.new(0.5, 0.5);
-						bpIconButton.Position = UDim2.new(0.5, 0, 0.5, 0);
-						bpIconButton.Size = UDim2.new(0, 70, 0, 70);
-						bpIconButton.Image = battlepassLib.Icon;
-						bpIconButton.Parent = frame;
-						frame.Parent = lvlSlot;
-						
-						bpButtonFunc = function()
-							refreshData();
-							Interface:PlayButtonClick();
-
-							MissionDisplayFrame:ClearAllChildren();
-
-							local passRewardFrame = templatePassReward:Clone();
-							passRewardFrame.Parent = MissionDisplayFrame;
-
-							local titleLabel = passRewardFrame:WaitForChild("Title");
-							titleLabel.Text =  '<font size="14">'.."Event Pass</font>\n<b>".. battlepassLib.Title .."</b>";
-
-							local contentFrame = passRewardFrame:WaitForChild("Frame");
-							local claimButton = contentFrame:WaitForChild("ClaimButton");
-							local slotFrame = contentFrame:WaitForChild("Slot");
-							local descLabel = contentFrame:WaitForChild("Description");
-
-							local itemIcon = bpIconButton:Clone();
-							itemIcon.Size = UDim2.new(1, 0, 1, 0);
-							itemIcon.Parent = slotFrame;
-
-							slotFrame.AnchorPoint = Vector2.new(0.5, 0);
-							slotFrame.Position = UDim2.new(0.5, 0, 0, -10);
-							slotFrame.Size = UDim2.new(0.7, 0, 0.6, 0);
-
-							descLabel.Position = UDim2.new(0, 0, 0.6, 0);
-							descLabel.Size = UDim2.new(1, 0, 0, 0);
-							descLabel.ClipsDescendants = false;
-
-							descLabel.Text = battlepassLib.Desc;
-
-							local price = battlepassLib.Price;
-							claimButton.Text = "Unlock for ".. modFormatNumber.Beautify(battlepassLib.Price) .." Gold";
-
-							claimButton.TextScaled = false;
-							claimButton.Position = UDim2.new(0.5, 0, 1, -40);
-							claimButton.Size = UDim2.new(0.6, 0, 0, 40);
-							claimButton.BackgroundColor3 = branchColor;
-							game.Debris:AddItem(claimButton:FindFirstChild("UITextSizeConstraint"), 0);
-
-							claimButton.Visible = false;
-
-							if seasonData.Owned ~= true then
-								claimButton.Visible = true;
-							end
-
-							claimButton.MouseButton1Click:Connect(function()
-								refreshData();
-								Interface:PlayButtonClick();
-
-								local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. price.." Gold</font></b>";
-								local promptWindow = Interface:PromptQuestion("Unlock Event Pass for ".. goldTxt.. "?",
-									"Are you sure you want to unlock Event Pass: ".. battlepassLib.Title .. " for "..goldTxt.."?", 
-									"Purchase", "Cancel");
-								local YesClickedSignal, NoClickedSignal;
-
-								YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-									Interface:PlayButtonClick();
-									promptWindow.Frame.Yes.buttonText.Text = "Purchasing...";
-
-									local r = remoteBattlepassRemote:InvokeServer("purchase", lvl);
-									if r.FailMsg then
-										if r.FailMsg == "Insufficient Gold" then
-											task.wait(2);
-											promptWindow:Close();
-											Interface:OpenWindow("GoldMenu", "GoldPage");
-											return;
-
-										else
-											promptWindow.Frame.Yes.buttonText.Text = r.FailMsg;
-											task.wait(2);
-
-										end
-
-									elseif r.Success == true then
-										promptWindow.Frame.Yes.buttonText.Text = "Unlocked!";
-
-									end
-									promptWindow:Close();
-									Interface:OpenWindow("Missions");
-
-									YesClickedSignal:Disconnect();
-									NoClickedSignal:Disconnect();
-								end);
-
-								NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-									Interface:PlayButtonClick();
-									promptWindow:Close();
-
-									YesClickedSignal:Disconnect();
-									NoClickedSignal:Disconnect();
-								end);
-							end)
-							
-							
-							local function buyLevelFunc(lvlAmt)
-								local price = modBattlePassLibrary.BuyLevelCost * lvlAmt;
-								
-								local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. price.." Gold</font></b>";
-								local promptWindow = Interface:PromptQuestion("Level up Event Pass for ".. goldTxt.. "?",
-									"Are you sure you want to level up Event Pass by ".. lvlAmt .." for "..goldTxt.."?", 
-									"Level Up", "Cancel");
-								local YesClickedSignal, NoClickedSignal;
-
-								YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-									Interface:PlayButtonClick();
-									promptWindow.Frame.Yes.buttonText.Text = "Leveling Up...";
-
-									local r = remoteBattlepassRemote:InvokeServer("purchaselvls", lvlAmt);
-									if r.FailMsg then
-										if r.FailMsg == "Insufficient Gold" then
-											task.wait(2);
-											promptWindow:Close();
-											Interface:OpenWindow("GoldMenu", "GoldPage");
-											return;
-
-										else
-											promptWindow.Frame.Yes.buttonText.Text = r.FailMsg;
-											task.wait(2);
-
-										end
-
-									elseif r.Success == true then
-										promptWindow.Frame.Yes.buttonText.Text = "Leveled Up!";
-
-									end
-									promptWindow:Close();
-									Interface:OpenWindow("Missions");
-
-									YesClickedSignal:Disconnect();
-									NoClickedSignal:Disconnect();
-								end);
-
-								NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-									Interface:PlayButtonClick();
-									promptWindow:Close();
-
-									YesClickedSignal:Disconnect();
-									NoClickedSignal:Disconnect();
-								end);
-							end
-							
-							local buyOneLevelButton = claimButton:Clone();
-							buyOneLevelButton.BackgroundColor3 = Color3.fromRGB(170, 120, 0);
-							buyOneLevelButton.AnchorPoint = Vector2.new(0, 1);
-							buyOneLevelButton.Position = UDim2.new(0, 0, 1, 0);
-							buyOneLevelButton.Size = UDim2.new(0.5, -10, 0, 30);
-							buyOneLevelButton.Text = "Unlock 1 Level";
-							buyOneLevelButton.Parent = contentFrame;
-							buyOneLevelButton.Visible = true;
-							
-							buyOneLevelButton.MouseButton1Click:Connect(function()
-								buyLevelFunc(1);
-							end)
-							
-
-							local buyTenLevelButton = claimButton:Clone();
-							buyTenLevelButton.BackgroundColor3 = Color3.fromRGB(170, 120, 0);
-							buyTenLevelButton.AnchorPoint = Vector2.new(1, 1);
-							buyTenLevelButton.Position = UDim2.new(1, 0, 1, 0);
-							buyTenLevelButton.Size = UDim2.new(0.5, -10, 0, 30);
-							buyTenLevelButton.Text = "Unlock 10 Levels";
-							buyTenLevelButton.Parent = contentFrame;
-							buyTenLevelButton.Visible = true;
-
-							buyTenLevelButton.MouseButton1Click:Connect(function()
-								buyLevelFunc(10);
-							end)
-						end
-						bpIconButton.MouseButton1Click:Connect(bpButtonFunc);
+						-- local frame = Instance.new("Frame");
+						-- frame.BackgroundTransparency = 1;
+						-- frame.Size = UDim2.new(0, 70, 0, 70);
+						-- local bpIconButton = Instance.new("ImageButton");
+						-- bpIconButton.BackgroundTransparency = 1;
+						-- bpIconButton.Rotation = 1;
+						-- bpIconButton.AnchorPoint = Vector2.new(0.5, 0.5);
+						-- bpIconButton.Position = UDim2.new(0.5, 0, 0.5, 0);
+						-- bpIconButton.Size = UDim2.new(0, 70, 0, 70);
+						-- bpIconButton.Image = battlepassLib.Icon;
+						-- bpIconButton.Parent = frame;
+						-- frame.Parent = lvlSlot;
+						-- bpIconButton.MouseButton1Click:Connect(bpButtonFunc);
 					end
 					
 					if rewardInfo then
@@ -2943,6 +2965,7 @@ function Interface.init(modInterface)
 				lvlSlot.Parent = battlePassContent;
 			end
 			
+			lvlLabel.Text = `Pass Level: {modFormatNumber.Beautify(seasonLevel or 0)}`;
 			--== MARK: Post Rewards
 
 			local rewardsLib = modRewardsLibrary:Find(activeBpId);

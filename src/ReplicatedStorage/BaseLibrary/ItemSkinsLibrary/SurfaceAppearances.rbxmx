@@ -107,6 +107,17 @@
 					<Content name="ColorMap"><url>rbxassetid://12929982078</url></Content>
 				</Properties>
 			</Item>
+			
+			<Item class="SurfaceAppearance">
+				<Properties>
+					<string name="Name">p250</string>
+					<Content name="ColorMap"><url>rbxassetid://87318549477842</url></Content>
+					<Content name="MetalnessMap"><url>rbxassetid://89138511877013</url></Content>
+					<Content name="RoughnessMap"><url>rbxassetid://133127749639708</url></Content>
+					<Content name="NormalMap"><url>rbxassetid://89539155897665</url></Content>
+				</Properties>
+			</Item>
+
 		</Item>
 
 		<!-- MARK: horde -->
