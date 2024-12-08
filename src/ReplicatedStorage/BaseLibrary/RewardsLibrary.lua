@@ -103,7 +103,175 @@ function RewardsLibrary:Init(super)
 		};
 	};
 
+	--MARK: Holiday Rewards:
+	super:Add{
+		Id="easteregg";
+		Rewards={
+			{Index=1; ItemId="metal"; Quantity={Min=10; Max=20}; Chance=1;};
+			{Index=1; ItemId="wood"; Quantity={Min=10; Max=20}; Chance=7/10;};
+			{Index=1; ItemId="glass"; Quantity={Min=10; Max=20}; Chance=7/10;};
+			
+			{Index=1; ItemId="bunnyplush"; Quantity=1; Chance=7/10;};
+			{Index=1; ItemId="coloreaster"; Quantity=1; Chance=1/5;};
+			{Index=1; ItemId="skineaster"; Quantity=1; Chance=1/5;};
+			{Index=1; ItemId="crowbar"; Quantity=1; Chance=1/5;};
+			
+			{Index=1; ItemId="m9legacy"; Quantity=1; Chance=4.7/100;};
+		};
+		SpecialEvent="Easter";
+	};
 
+	super:Add{
+		Id="easteregg2021";
+		Rewards={
+			{Index=1; ItemId="metal"; Quantity={Min=10; Max=20}; Chance=1;};
+			{Index=1; ItemId="wood"; Quantity={Min=10; Max=20}; Chance=6/10;};
+			{Index=1; ItemId="glass"; Quantity={Min=10; Max=20}; Chance=6/10;};
+
+			{Index=1; ItemId="m9legacy"; Quantity=1; Chance=6/10;};
+			{Index=1; ItemId="crowbar"; Quantity=1; Chance=6/10;};
+			{Index=1; ItemId="coloreaster"; Quantity=1; Chance=4/10;};
+			{Index=1; ItemId="skineaster"; Quantity=1; Chance=4/10;};
+			{Index=1; ItemId="dufflebageaster1"; Quantity=1; Chance=4/10;};
+			{Index=1; ItemId="dufflebageaster2"; Quantity=1; Chance=4/10;};
+			
+			{Index=1; ItemId="chippyplush"; Quantity=1; Chance=10/100;};
+		};
+		SpecialEvent="Easter";
+	};
+
+	super:Add{
+		Id="easteregg2023";
+		Rewards={
+			{Index=1; ItemId="m9legacy"; Quantity=1; Chance=1;};
+			
+			{Index=1; ItemId="hardhatcherryblossom"; Quantity=1; Chance=2/10;};
+			{Index=1; ItemId="highvisjacketfallenleaves"; Quantity=1; Chance=2/10;};
+			{Index=1; ItemId="scraparmorcherryblossom"; Quantity=1; Chance=2/10;};
+
+			{Index=1; ItemId="liquidmetalpolish"; Quantity=1; Chance=4/10;};
+			{Index=1; ItemId="skineaster2023"; Quantity=1; Chance=4/10;};
+			
+			{Index=1; ItemId="wantedposter"; Quantity=1; Chance=6/10;};
+			{Index=1; ItemId="annihilationsoda"; Quantity=1; Chance=6/10;};
+
+			{Index=1; ItemId="chippyplush"; Quantity=1; Chance=10/100;};
+			{Index=1; ItemId="zriceraskullinferno"; Quantity=1; Chance=4/100;};
+		};
+		SpecialEvent="Easter";
+	};
+
+	super:Add{
+		Id="xmaspresent";
+		Rewards={
+			{Index=1; ItemId="cloth"; Quantity={Min=10; Max=40}; Chance=1;};
+			{Index=1; ItemId="gingerbreadman"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="eggnog"; Quantity=1; Chance=1;};
+			
+			{Index=1; ItemId="shotgunautomod"; Quantity=1; Chance=7/10;};
+			{Index=1; ItemId="sniperpiercingmod"; Quantity=1; Chance=7/10;};
+			{Index=1; ItemId="wood"; Quantity={Min=10; Max=20}; Chance=7/10;};
+			{Index=1; ItemId="glass"; Quantity={Min=10; Max=20}; Chance=7/10;};
+			{Index=1; ItemId="riflehyperdamagemod"; Quantity=1; Chance=1/2;};
+			
+			{Index=1; ItemId="m9legacy"; Quantity=1; Chance=8/100;};
+		};
+		SpecialEvent="Christmas";
+	};
+
+	super:Add{
+		Id="xmaspresent2020";
+		Rewards={
+			{Index=1; ItemId="coal"; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=1; ItemId="wood"; Quantity={Min=10; Max=20}; Chance=7/10;};
+			{Index=1; ItemId="glass"; Quantity={Min=10; Max=20}; Chance=7/10;};
+			{Index=1; ItemId="gps"; Quantity=1; Chance=7/10;};
+			
+			{Index=1; ItemId="gingerbreadman"; Quantity=1; Chance=1/4;};
+			{Index=1; ItemId="eggnog"; Quantity=1; Chance=1/4;};
+
+			{Index=1; ItemId="snowman"; Quantity=1; Chance=1/8;};
+			{Index=1; ItemId="naughtycane"; Quantity=1; Chance=1/8;};
+			{Index=1; ItemId="tomeoftweaks"; Quantity=1; Chance=1/8;};
+			
+			{Index=1; ItemId="xmassweater"; Quantity=1; Chance=8/100;};
+			{Index=1; ItemId="santahat"; Quantity=1; Chance=8/100;};
+			{Index=1; ItemId="greensantahat"; Quantity=1; Chance=1/1000;};
+		};
+		SpecialEvent="Christmas";
+	};
+
+	super:Add{
+		Id="xmaspresent2021";
+		Rewards={
+			{Index=1; ItemId="coal"; Quantity={Min=1; Max=2}; Chance=1;};
+
+			{Index=1; ItemId="snowman"; Quantity=1; Chance=1/4;};
+			{Index=1; ItemId="disguisekitxmas"; Quantity=1; Chance=1/4;};
+			{Index=1; ItemId="leatherglovesxmasred"; Quantity=1; Chance=1/4;};
+			{Index=1; ItemId="leatherglovesxmasgreen"; Quantity=1; Chance=1/4;};
+			{Index=1; ItemId="disguisekit"; Quantity=1; Chance=1/4;};
+			{Index=1; ItemId="santahat"; Quantity=1; Chance=1/4;};
+			
+			{Index=1; ItemId="leatherglovesxmasrgb"; Quantity=1; Chance=1/8;};
+			{Index=1; ItemId="gasmaskxmas"; Quantity=1; Chance=1/8;};
+		};
+		SpecialEvent="Christmas";
+	};
+
+
+	super:Add{
+		Id="xmaspresent2022";
+		Rewards={
+			{Index=1; ItemId="snowballs"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="santahat"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="naughtycane"; Quantity=1; Chance=1;};
+
+			{Index=1; ItemId="xmassweatergreen"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="xmassweateryellow"; Quantity=1; Chance=1;};
+			
+			{Index=1; ItemId="fotlcardgame"; Quantity=1; Chance=1/2;};
+			{Index=1; ItemId="santahatwinterfest"; Quantity=1; Chance=1/2;};
+			{Index=1; ItemId="mercskneepadswinterfest"; Quantity=1; Chance=1/4;};
+			
+		};
+		SpecialEvent="Christmas";
+	};
+
+	super:Add{
+		Id="xmaspresent2023";
+		Rewards={
+			{Index=1; ItemId="desolatorheavytoygun"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="czevo3asiimov"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="rusty48blaze"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="survivorsoutpostunlockpapers"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="bunkerunlockpapers"; Quantity=1; Chance=1;};
+		};
+		SpecialEvent="Christmas";
+	};
+
+	super:Add{
+		Id="xmaspresent2024";
+		Rewards={
+			{Index=1; ItemId="santahatred"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="santahatblue"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="santahatgreen"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="santahatyellow"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="xmassweatersnowflakegreen"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="xmassweatersnowflakeblue"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="brownbeltxmaspink"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="ammopouchnight"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="ammopouchhexcamo"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="p250toygun"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="arelshiftcrossgingerbread"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="grandgarandornaments"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="portableautoturretcryogenics"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="tacticalbowneondeath"; Quantity=1; Chance=1;};
+		};
+		SpecialEvent="Christmas";
+	};
+
+	--MARK: Event Pass
 	super:Add{
 		Id="bpseason1";
 		Rewards={
@@ -247,9 +415,7 @@ function RewardsLibrary:Init(super)
 	super:Add{
 		Id="frostivus2024";
 		Rewards={
-			{ItemId="gold"; Quantity=20; Chance=1;};
-
-			{ItemId="liquidmetalpolish"; Quantity=1; Chance=0.5; TokensAmount=2;};
+			{ItemId="xmaspresent2024"; Quantity=1; Chance=1;}; -- TokensAmount=5;
 		};
 	};
 

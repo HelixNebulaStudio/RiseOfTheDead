@@ -29,9 +29,10 @@ end
 function BattlePassLibrary:Init(library)
 	library.Active = "frostivus2024";
 
-	library.GiftShop = {
-		{ItemId="apron"; Cost=4;};
-	};
+	-- Event pass Token shop
+	-- library.GiftShop = {
+	-- 	{ItemId="apron"; Cost=4;};
+	-- };
 
 	-- MARK: BP Season 1
 	library:Add{
@@ -504,6 +505,7 @@ function BattlePassLibrary:Init(library)
 		Title="Frostivus 2024";
 		Icon="rbxassetid://125482397634613";
 		Desc="Unlock the Frostivus 2024 Event Pass to claim more rewards!";
+		
 
 		Price=1000;
 
@@ -521,17 +523,17 @@ function BattlePassLibrary:Init(library)
 			leaf(10, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
 			});
-			leaf(23, {
-				Reward={ItemId="brownbeltxmasorange";};
+			leaf(13, {
+				Reward={ItemId="santahatblue";};
 			});
-			leaf(27, {
+			leaf(17, {
 				Reward={ItemId="xmassweatersnowflakered";};
 			});
 			leaf(20, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
 			});
 			leaf(23, {
-				Reward={ItemId="xmaspresent2023";};
+				Reward={ItemId="brownbeltxmasorange";};
 			});
 			leaf(27, {
 				Reward={ItemId="ammopouchnight";};
@@ -540,12 +542,21 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
 			});
 			leaf(33, {
-				Reward={ItemId="xmaspresent2023";};
+				Reward={ItemId="santahatgreen";};
 			});
 			leaf(37, {
 				Reward={ItemId="fedoraxmasred";};
 			});
 			leaf(40, {
+				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			});
+			leaf(43, {
+				Reward={ItemId="xmaspresent2024";};
+			});
+			leaf(47, {
+				Reward={ItemId="arelshiftcrossgingerbread";};
+			});
+			leaf(50, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
 			});
 		};

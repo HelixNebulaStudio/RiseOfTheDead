@@ -363,6 +363,17 @@ AddTool{
 }
 
 AddTool{
+	ItemId="xmaspresent2024";
+	Type="StructureTool";
+	Animations={
+		Core={Id=11813098572;};
+		Placing={Id=11813106523};
+	};
+	Audio={
+	};
+}
+
+AddTool{
 	ItemId="banditcrate";
 	Type="StructureTool";
 	Animations={

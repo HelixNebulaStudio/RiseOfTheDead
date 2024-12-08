@@ -842,12 +842,6 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="ammopouchnight"; Icon="rbxassetid://110108323033027"; SkinPerm="Night"; TargetItemId="ammopouch";});
 	new(skinPermBase, {Id="ammopouchhexcamo"; Icon="rbxassetid://71912683610580"; SkinPerm="Hexcamo"; TargetItemId="ammopouch";});
 
-	-- santahat
-	new(skinPermBase, {Id="santahatred"; Icon="rbxassetid://109459091168301"; SkinPerm="Red"; TargetItemId="santahat";});
-	new(skinPermBase, {Id="santahatblue"; Icon="rbxassetid://112451037655758"; SkinPerm="Blue"; TargetItemId="santahat";});
-	new(skinPermBase, {Id="santahatgreen"; Icon="rbxassetid://107211409672219"; SkinPerm="Green"; TargetItemId="santahat";});
-	new(skinPermBase, {Id="santahatyellow"; Icon="rbxassetid://94254676862025"; SkinPerm="Yellow"; TargetItemId="santahat";});
-
 	-- portableautoturret
 	new(skinPermBase, {Id="portableautoturretblue"; Icon="rbxassetid://113924290223669"; SkinPerm="Blue"; TargetItemId="portableautoturret";});
 	new(skinPermBase, {Id="portableautoturretcryogenics"; Icon="rbxassetid://117404049971970"; SkinPerm="Cryogenics"; TargetItemId="portableautoturret";});
@@ -998,13 +992,18 @@ function ItemsLibrary:Init(super)
 	new(frostivusPresentBase, {Id="redgift"; Name="Red Burger Gift"; NameColor=Color3.fromHex("f47a6b"); Icon="rbxassetid://93444893261457";});
 	new(frostivusPresentBase, {Id="yellowgift"; Name="Yellow Toilet Paper Gift"; NameColor=Color3.fromHex("ffe6a2"); Icon="rbxassetid://75018461839823";});
 	new(frostivusPresentBase, {Id="greengift"; Name="Green Duck Gift"; NameColor=Color3.fromHex("a1ff95"); Icon="rbxassetid://79205066583327";});
+	new(skinPermBase, {Id="santahatred"; Icon="rbxassetid://109459091168301"; SkinPerm="Red"; TargetItemId="santahat";});
+	new(skinPermBase, {Id="santahatblue"; Icon="rbxassetid://112451037655758"; SkinPerm="Blue"; TargetItemId="santahat";});
+	new(skinPermBase, {Id="santahatgreen"; Icon="rbxassetid://107211409672219"; SkinPerm="Green"; TargetItemId="santahat";});
+	new(skinPermBase, {Id="santahatyellow"; Icon="rbxassetid://94254676862025"; SkinPerm="Yellow"; TargetItemId="santahat";});
 	new(skinPermBase, {Id="xmassweatersnowflakered"; Icon="rbxassetid://109655819748094"; SkinPerm="Red Snowflake"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="xmassweatersnowflakegreen"; Icon="rbxassetid://78028432874407"; SkinPerm="Green Snowflake"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="xmassweatersnowflakeblue"; Icon="rbxassetid://99198676650490"; SkinPerm="Green Snowflake"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
-	new(skinPermBase, {Id="brownbeltxmasorange"; Icon="rbxassetid://109655819748094"; SkinPerm="Red Snowflake"; TargetItemId="brownbelt"; Tags={"Christmas"; "Frostivus";};});
-	new(skinPermBase, {Id="brownbeltxmaspink"; Icon="rbxassetid://78028432874407"; SkinPerm="Green Snowflake"; TargetItemId="brownbelt"; Tags={"Christmas"; "Frostivus";};});
+	new(skinPermBase, {Id="brownbeltxmasorange"; Icon="rbxassetid://119905732158933"; SkinPerm="Red Snowflake"; TargetItemId="brownbelt"; Tags={"Christmas"; "Frostivus";};});
+	new(skinPermBase, {Id="brownbeltxmaspink"; Icon="rbxassetid://97310653356411"; SkinPerm="Green Snowflake"; TargetItemId="brownbelt"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="arelshiftcrossgingerbread"; Icon="rbxassetid://85625473582729"; SkinPerm="Gingerbread"; TargetItemId="arelshiftcross"; });
 	new(skinPermBase, {Id="grandgarandornaments"; Icon="rbxassetid://76137784853860"; SkinPerm="Ornaments"; TargetItemId="grandgarand"; });
+	new(crateBase, {Id="xmaspresent2024"; Name="Frostivus Present 2024"; Icon="rbxassetid://79457385935728"; Tags={"Christmas"; "Frostivus"}; TradingTax=0; Description="Merry Christmas 2024!\n\nOpen it and see what you get!";});
 
 	-- Legacy
 	new(toolBase, {Id="masusplush"; Name="Masus Plush"; Icon="rbxassetid://18158370701"; Tags={"Legacy"}; Description=`Suspiciously cute. Keep an eye on it though.`;});
