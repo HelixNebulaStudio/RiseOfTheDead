@@ -527,25 +527,23 @@ Commands["droptable"] = {
 		local tableId = args[1];
 		
 		local function listPossibleDropTables()
-			if tableId== nil or #tableId <= 1 then
-				return
-			end
 			local tables = modRewardsLibrary:GetAll();
 			local validIds = {};
 			
 			for id, lib in pairs(tables) do
 				if lib.Hidden then continue end;
 				
-				if string.match(id:lower() , tableId:lower()) then
+				if tableId == nil or string.match(id:lower() , tableId:lower()) then
 					table.insert(validIds, id);
 				end
 			end
 			shared.Notify(player, "Available drop tables:", "Inform");
-			for a=1, math.min(#validIds, 10) do
-				shared.Notify(player, a..": "..validIds[a], "Inform");
-			end
-			if #validIds > 10 then
-				shared.Notify(player, "(10/".. #validIds ..") ...", "Inform");
+
+			for a=1, #validIds do
+				if a % 10 ~= 0 then continue end; 
+				local max = math.min(a+10, #validIds);
+				local str = table.concat(validIds, ", ", a, max);
+				shared.Notify(player, `({a}..{max}): {str}` ,"Inform");
 			end
 		end
 		
