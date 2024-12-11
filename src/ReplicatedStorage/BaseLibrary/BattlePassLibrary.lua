@@ -590,6 +590,19 @@ function BattlePassLibrary:Init(library)
 			leaf(77, {
 				Reward={ItemId="eggnog";};
 			});
+
+			leaf(80, {
+				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			});
+			leaf(83, {
+				Reward={ItemId="snowsledge"; PassOwner=true;};
+			});
+			leaf(87, {
+				Reward={ItemId="gingerbreadman";};
+			});
+
+
+			
 		};
 	};
 end

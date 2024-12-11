@@ -639,7 +639,7 @@ local function startSliding()
 		end
 
 		SlideVars.WaistX = math.rad(-35);
-		SlideVars.WaistXEquipped = math.rad(-65);
+		SlideVars.WaistXEquipped = math.rad(-75);
 		
 	else
 		SlideVars.DownFriction = nil;
@@ -2283,6 +2283,9 @@ RunService.PreSimulation:Connect(function(step)
 				-- sliding
 				if characterProperties.IsEquipped then
 					waistC1.X = SlideVars.WaistXEquipped or deg60;
+					if SlideVars.WaistXEquipped then
+						neckPitchOffset = -SlideVars.WaistXEquipped/2;
+					end
 				else
 					waistC1.X = SlideVars.WaistX or deg60;
 				end
