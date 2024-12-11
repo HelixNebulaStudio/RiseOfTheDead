@@ -11,7 +11,7 @@ local animator = humanoid:WaitForChild("Animator");
 local player = game.Players.LocalPlayer;
 
 --== Modules;
-local modData = require(player:WaitForChild("DataModule"));
+local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
 local modInterface = modData:GetInterfaceModule();
 
@@ -23,7 +23,6 @@ local modConfigurations = require(game.ReplicatedStorage.Library.Configurations)
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 
 --== Remotes;
-local remotes = game.ReplicatedStorage.Remotes;
 local remotePrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
 
 --== Vars;

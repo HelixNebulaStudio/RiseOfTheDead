@@ -1,6 +1,3 @@
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local random = Random.new();
-
 local Christmas = {};
 
 local hairPrefabs = {
@@ -12,8 +9,10 @@ local hairPrefabs = {
 function Christmas.new(self)
 	return function()
 		if self.Prefab.Name == "Mr. Klaws" then return end;
-		if random:NextInteger(1, 10) == 1 then
-			local hair = hairPrefabs[random:NextInteger(1, #hairPrefabs)]:Clone();
+		if self.Prefab.Name == "Wraith" then return end;
+
+		if math.random(1, 10) == 1 then
+			local hair = hairPrefabs[math.random(1, #hairPrefabs)]:Clone();
 			hair.Parent = self.Prefab;
 			if self.Configuration then
 				self.Configuration.SantaHat = true;

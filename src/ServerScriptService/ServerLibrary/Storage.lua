@@ -3,11 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local customNameMaxLen = 30;
 
 --== Variables;
-local HttpService = game:GetService("HttpService");
 local RunService = game:GetService("RunService");
-local TextService = game:GetService("TextService");
 
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local StorageItem = require(game.ReplicatedStorage.Library.StorageItem);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
@@ -17,7 +14,6 @@ local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
 local modUsableItems = require(game.ReplicatedStorage.Library.UsableItems);
 local modStorageItem = require(game.ReplicatedStorage.Library.StorageItem); 
 
-local modProfile = shared.modProfile;
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modStorageHandler = require(game.ServerScriptService.ServerLibrary.StorageHandler);
 local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
@@ -43,7 +39,6 @@ local bindServerUnequipPlayer = remotes.Inventory.ServerUnequipPlayer;
 local itemHandlerModule = game.ServerScriptService.ServerLibrary.ItemHandler;
 
 local PublicStorages = {};
-local InvocationCooldown = {};
 
 local QueueEvents = {
 	Success="Success";
@@ -76,7 +71,7 @@ local function newPublicID()
 	return "s:"..publicIdCount;
 end
 
--- !outline: Storage.new(id, name, size, owner);
+-- MARK:: Storage.new(id, name, size, owner);
 function Storage.new(id, name, size, owner)
 	if type(id) ~= "string" then error("Invalid storage id!"); end;
 	local queue = {};
@@ -252,7 +247,7 @@ local function logRemoteUse(storage, remoteId)
 	end)
 end
 
--- !outline: OnServerInvoke SetSlot
+-- MARK: OnServerInvoke SetSlot
 function remoteSetSlot.OnServerInvoke(player, storageId, id, targetData)
 	if remoteSetSlot:Debounce(player) then return end;
 	local storage = Storage.Get(storageId, player);
@@ -286,7 +281,7 @@ function remoteSetSlot.OnServerInvoke(player, storageId, id, targetData)
 	return storage:SetIndex(player, id, targetData);
 end
 
--- !outline: OnServerInvoke SwapSlot
+-- MARK: OnServerInvoke SwapSlot
 function remoteSwapSlot.OnServerInvoke(player, storageId, itemA, itemB)
 	if remoteSwapSlot:Debounce(player) then return end;
 	local storageA = Storage.Get(storageId, player);
@@ -338,7 +333,7 @@ function remoteSwapSlot.OnServerInvoke(player, storageId, itemA, itemB)
 	return storageA:SwapIndex(player, itemA, itemB);
 end
 
--- !outline: OnServerInvoke Combine
+-- MARK: OnServerInvoke Combine
 function remoteCombine.OnServerInvoke(player, storageId, itemA, itemB)
 	if remoteCombine:Debounce(player) then return end;
 	local storageA = Storage.Get(storageId, player);
@@ -390,7 +385,7 @@ function remoteCombine.OnServerInvoke(player, storageId, itemA, itemB)
 	return storageA:Combine(player, itemA, itemB);
 end
 
--- !outline: OnServerInvoke Split 
+-- MARK: OnServerInvoke Split 
 function remoteSplit.OnServerInvoke(player, storageId, id, quantity, target)
 	if remoteSplit:Debounce(player) then return end;
 	local storageA = Storage.Get(storageId, player);
@@ -430,7 +425,7 @@ function remoteSplit.OnServerInvoke(player, storageId, id, quantity, target)
 	return storageA:Split(player, id, quantity, target);
 end
 
--- !outline: OnServerInvoke RemoveItem
+-- MARK: OnServerInvoke RemoveItem
 function remoteRemoveItem.OnServerInvoke(player, storageId, id, quantity)
 	local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 
@@ -492,7 +487,7 @@ function remoteRemoveItem.OnServerInvoke(player, storageId, id, quantity)
 	return storage:Remove(id, quantity);
 end
 
--- !outline: OnServerEvent ItemActionHandler
+-- MARK: OnServerEvent ItemActionHandler
 remoteItemActionHandler.OnServerEvent:Connect(function(player, storageId, id, action, ...)
 	local storage = Storage.Get(storageId, player);
 
@@ -575,14 +570,14 @@ function Storage.RefreshItem(player, storageItemID, sync)
 	end
 end
 
--- !outline: OnServerEvent StorageItemSync
+-- MARK: OnServerEvent StorageItemSync
 remoteStorageItemSync.OnServerEvent:Connect(function(player, action, storageItemId)
 	if action == "update" then
 		Storage.RefreshItem(player, storageItemId, true);
 	end
 end)
 
--- !outline: OnServerInvoke UseStorageItem
+-- MARK: UseStorageItem
 function remoteUseStorageItem.OnServerInvoke(player, storageId, id, ...)
 	if remoteUseStorageItem:Debounce(player) then return end;
 	local storage = Storage.Get(storageId, player);
@@ -595,7 +590,7 @@ function remoteUseStorageItem.OnServerInvoke(player, storageId, id, ...)
 	return storage:Use(player, id, ...);
 end
 
--- !outline: OnServerInvoke ToggleClothing
+-- MARK: ToggleClothing
 function remoteToggleClothing.OnServerInvoke(player, storageId, id)
 	if remoteToggleClothing:Debounce(player) then return end;
 	local storage = Storage.Get(storageId, player);
@@ -620,7 +615,7 @@ function remoteToggleClothing.OnServerInvoke(player, storageId, id)
 	return storageItem.Values.NoWear;
 end
 
--- !outline: OnServerInvoke RenameItem
+-- MARK: RenameItem
 function remoteRenameItem.OnServerInvoke(player, action, id, customName)
 	if action == nil or id == nil or customName == nil then return end;
 	customName = tostring(customName):sub(1,customNameMaxLen);
@@ -681,12 +676,12 @@ function remoteRenameItem.OnServerInvoke(player, action, id, customName)
 end
 
 
--- MARK: Storage:InitStorage()
 --[[
 	Initialize storage when instantiated and when loaded from save.
 
 	@returns nil
 ]]
+-- MARK: Storage:InitStorage()
 function Storage:InitStorage()
 	local storageId = self.Id;
 	local storageValues = self.Values;
@@ -727,6 +722,7 @@ function Storage:InitStorage()
 	if storageValues == nil then return end;
 end
 
+-- MARK: RentalCheck
 function Storage:RentalCheck()
 	if self.Settings.Rental <= 0 then return false end;
 	
@@ -738,26 +734,26 @@ function Storage:RentalCheck()
 	return true;
 end
 
--- !outline: Storage:ConnectSort(func)
+-- MARK: ConnectSort(func)
 function Storage:ConnectSort(func)
 	local storageMeta = getmetatable(self);
 	storageMeta.CustomSort = func;
 end
 
--- !outline: Storage:Sort()
+-- MARK: Sort()
 function Storage:Sort()
 	if self.CustomSort then
 		self:CustomSort();
 	end
 end
 
--- !outline: Storage:ConnectCheck(func)
+-- MARK: ConnectCheck(func)
 function Storage:ConnectCheck(func)
 	local storageMeta = getmetatable(self);
 	storageMeta.CustomCheck = func;
 end
 
--- !outline: Storage:Check(packet)
+-- MARK: Check(packet)
 function Storage:Check(packet)
 	packet.TargetStorage = self;
 	packet.Allowed = true;
@@ -783,6 +779,7 @@ end
 	@param player Player player
 	@returns list storages
 **--]]
+-- MARK: GetPrivateStorages
 function Storage.GetPrivateStorages(player)
 	local profile = shared.modProfile:Get(player);
 	local playerSave = profile and profile:GetActiveSave();
@@ -808,7 +805,7 @@ function Storage.GetPrivateStorages(player)
 end
 
 
--- Storage auth
+-- MARK: RefreshAuth
 function Storage:RefreshAuth(player, duration)
 	for k, v in pairs(self.AuthList) do
 		if tick()-v >= 120 then
@@ -819,6 +816,7 @@ function Storage:RefreshAuth(player, duration)
 	self.AuthList[player] = tick()+duration;
 end
 
+-- MARK: HasAuth(player)
 function Storage:HasAuth(player)
 	local authTick = self.AuthList[player];
 	if authTick and tick() <= authTick then
@@ -826,7 +824,7 @@ function Storage:HasAuth(player)
 	end
 
 	if self.Virtual then
-		local containerStorageItem, storage = Storage.FindIdFromStorages(self.Id, player);
+		local containerStorageItem, _storage = Storage.FindIdFromStorages(self.Id, player);
 
 		if containerStorageItem then
 			return true;
@@ -843,6 +841,7 @@ function Storage:HasAuth(player)
 	return false;
 end
 
+-- MARK: GetAuthorisedStorages(player)
 function Storage.GetAuthorisedStorages(player)
 	local storages = {};
 	local storageIds = {};
@@ -864,24 +863,12 @@ end
 	@param player Player player
 	@returns Storage storage
 ]]
+-- MARK: Get(id, player)
 function Storage.Get(id, player)
 	if player == nil then 
 		return PublicStorages[id] 
 	end;
 	
-	--local playerSave = profile:GetActiveSave();
-	
-	--if id == "Inventory" then
-	--	return playerSave and playerSave.Inventory;
-		
-	--elseif id == "Clothing" then
-	--	return playerSave and playerSave.Clothing;
-		
-	--elseif id == "Wardrobe" then
-	--	return playerSave and playerSave.Wardrobe;
-		
-	--end
-
 	local storages = Storage.GetPrivateStorages(player); -- Player storages;
 	if storages and storages[id] then
 		return storages[id];
@@ -901,7 +888,7 @@ function Storage.Get(id, player)
 	return nil;
 end
 
-
+-- MARK: Validate(player, storageId, storageItemId)
 function Storage.Validate(player, storageId, storageItemId)
 	local storage = Storage.Get(storageId, player);
 
@@ -911,7 +898,7 @@ function Storage.Validate(player, storageId, storageItemId)
 	end
 
 	if storage.Virtual then
-		local containerStorageItem, storage = Storage.FindIdFromStorages(storageId, player);
+		local containerStorageItem, _storage = Storage.FindIdFromStorages(storageId, player);
 
 		if containerStorageItem == nil then
 			return false, ("Container storage (".. storageId ..") does not exist for player (".. player.Name..").");
@@ -1271,6 +1258,7 @@ function Storage:FindByIndex(index)
 			r = self.Container[storageItem.ID];
 			return r;
 		end
+		return;
 	end)
 	return r;
 end
@@ -1305,7 +1293,7 @@ function Storage:ListStackable(matchStorageItem: modStorageItem.StorageItem) : {
 end
 
 
--- !outline: Storage:ListByItemId(itemId, listFunc)
+-- MARK: Storage:ListByItemId(itemId, listFunc)
 function Storage:ListByItemId(itemId, listFunc)
 	local l = {};
 	self:Loop(function(storageItem)
@@ -1326,7 +1314,7 @@ function Storage:ListOrderedByIndex()
 end
 
 
--- !outline: Storage:CountItemId(itemId, countFunc)
+-- MARK: Storage:CountItemId(itemId, countFunc)
 function Storage:CountItemId(itemId, countFunc)
 	local c = 0;
 	self:Loop(function(storageItem)
@@ -1368,8 +1356,9 @@ function Storage:ListQuantity(itemId, quantityNeeded)
 	return total, enough and items or nil;
 end
 
+-- MARK: Storage:RemoveItemId
 function Storage:RemoveItemId(itemId, quantity)
-	local total, itemList = self:ListQuantity(itemId, quantity);
+	local _total, itemList = self:ListQuantity(itemId, quantity);
 	if itemList then
 		for a=1, #itemList do
 			self:Remove(itemList[a].ID, itemList[a].Quantity);
@@ -1379,10 +1368,12 @@ function Storage:RemoveItemId(itemId, quantity)
 	return false;
 end
 
+-- MARK: Storage:GetValues
 function Storage:GetValues(id, key)
 	return self.Container[id] and self.Container[id]:GetValues(key) or nil;
 end
 
+-- MARK: Storage:SetValues
 function Storage:SetValues(id, data)
 	if id == "MockStorageItem" then return end;
 	
@@ -1400,6 +1391,7 @@ function Storage:SetValues(id, data)
 	end
 end
 
+-- MARK: Storage:DeleteValues
 function Storage:DeleteValues(id, keys)
 	if id == "MockStorageItem" then return end;
 
@@ -1416,12 +1408,14 @@ function Storage:DeleteValues(id, keys)
 	end
 end
 
+-- MARK: Storage.RegisterItemName
 function Storage.RegisterItemName(name)
 	if table.find(Storage.RegisteredItemNames, name) ~= nil then return name end;
 	table.insert(Storage.RegisteredItemNames, name);
 	return name;
 end
 
+-- MARK: Storage:Filter
 function Storage:Filter(id)
 	local storageItem = self.Container[id];
 	if storageItem == nil then return end;
@@ -1450,7 +1444,7 @@ function Storage:Filter(id)
 	end
 end
 
-
+-- MARK: Storage:Transfer
 function Storage:Transfer(player, packageA, packageB) -- A to B;
 	local storageB = Storage.Get(packageB.Id, player);
 	if storageB == nil then Debugger:Warn("Storage B does not exist."); return; end
@@ -1514,6 +1508,7 @@ end
 	@param emptyIndex int index
 	@returns Tuple: QueueEvents eventType, StorageItem item
 **--]]
+-- MARK: Storage:Insert
 function Storage:Insert(item, emptyIndex)
 	self.Debounce = true;
 	
@@ -1558,6 +1553,7 @@ function Storage:Insert(item, emptyIndex)
 	return QueueEvents.Success, new;
 end
 
+-- MARK: Storage:SpaceCheck
 function Storage:SpaceCheck(items)
 	local cacheContainer = {};
 	
@@ -1651,6 +1647,7 @@ function Storage:SpaceCheck(items)
 	return true;
 end
 
+-- MARK: Storage:FitStackableItem
 function Storage:FitStackableItem(item)
 	local cacheContainer = {};
 
@@ -1763,6 +1760,7 @@ function Storage:FitStackableItem(item)
 	return fitList, quantityRemaining;
 end
 
+-- MARK: Storage:Add
 function Storage:Add(itemId, data, callback)
 	data = data or {Quantity=1; Values={}};
 	data.Quantity = data.Quantity or 1;
@@ -1775,14 +1773,14 @@ function Storage:Add(itemId, data, callback)
 	self.Queue:flush();
 end
 
--- !outline: Storage:Delete
+--MARK:Storage:Delete
 function Storage:Delete(id, quantity, callback)
 	local storageItem = self:Find(id);
 	
 	if storageItem then
 		quantity = math.floor(quantity or storageItem.Quantity);
 		if shared.IsNan(quantity) then quantity = 1; end
-		local stackSize = storageItem.Library.Stackable or 1;
+		local _stackSize = storageItem.Library.Stackable or 1;
 		
 		if quantity <= storageItem.Quantity then
 			if storageItem.Quantity > quantity then
@@ -1835,7 +1833,7 @@ function Storage:Delete(id, quantity, callback)
 	end
 end
 
-
+-- MARK:Storage:InsertRequest
 function Storage:InsertRequest(storageItem, ruleset)
 	-- Failed; (1) Inv full;
 	local rPacket = {};
@@ -1846,7 +1844,6 @@ function Storage:InsertRequest(storageItem, ruleset)
 	rPacket.StorageItem = storageItem;
 	
 	local itemId = storageItem.ItemId;
-	local itemLib = modItemsLibrary:Find(itemId);
 	
 	local linkedStorages = self.LinkedStorages;
 	
@@ -1855,7 +1852,7 @@ function Storage:InsertRequest(storageItem, ruleset)
 			local emptyIndex = storage:FindEmpty();
 
 			if emptyIndex then
-				local _, storageItem = storage:Insert(storageItem, emptyIndex);
+				local _, _storageItem = storage:Insert(storageItem, emptyIndex);
 				rPacket.Success = true;
 				
 				return true;
@@ -1953,7 +1950,7 @@ function Storage:InsertRequest(storageItem, ruleset)
 	return rPacket;
 end
 
-
+-- MARK:Storage:Notify
 function Storage:Notify(color, message)
 	if self.Player ~= nil then
 		if color == "red" then
@@ -1974,7 +1971,7 @@ end
 	@param target table Target data.
 	@returns compressed storage data.
 **--]]
--- !outline: Storage:SetIndex
+--MARK: Storage:SetIndex
 function Storage:SetIndex(player, id, target)
 	local isPremium = self.Player and shared.modProfile:IsPremium(self.Player);
 	local storageItem = self:Find(id);
@@ -2046,7 +2043,7 @@ function Storage:SetIndex(player, id, target)
 	return {self:Shrink(); (self.Id ~= targetStorage.Id and targetStorage:Shrink() or nil);};
 end
 
--- !outline: Storage:SwapIndex
+-- MARK: Storage:SwapIndex
 function Storage:SwapIndex(player, itemA, itemB)
 	local storageB = Storage.Get(itemB.Id, player);
 	local storageItemA = self:Find(itemA.ID);
@@ -2080,7 +2077,7 @@ function Storage:SwapIndex(player, itemA, itemB)
 	return {self:Shrink(); self.Id ~= storageB.Id and storageB:Shrink() or nil;};
 end
 
--- !outline: Storage:Combine
+-- MARK: Storage:Combine
 function Storage:Combine(player, itemA, itemB)
 	local storageB = Storage.Get(itemB.Id, player);
 	
@@ -2138,7 +2135,7 @@ end
 	@param callback Function callback
 	@returns table CompressedStorage
 **--]]
--- !outline: Storage:Remove
+-- MARK:: Storage:Remove
 function Storage:Remove(id, quantity, callback)
 	local storageItem = self:Find(id);
 	if storageItem == nil then
@@ -2159,7 +2156,7 @@ function Storage:Remove(id, quantity, callback)
 	return {self:Shrink();};
 end
 
--- !outline: Storage:Use
+-- MARK:: Storage:Use
 function Storage:Use(player, id, ...)
 	if self.Locked then Debugger:Warn("Storage (",self.Id,") locked."); return end;
 	local storageItem = self:Find(id);
@@ -2181,7 +2178,7 @@ function Storage:Use(player, id, ...)
 	return itemHandler:Use(player, storageItem, ...);
 end	
 
--- !outline: Storage:Split(player, id, quantity, target)
+-- MARK:: Storage:Split(player, id, quantity, target)
 function Storage:Split(player, id, quantity, target)
 	quantity = math.floor(quantity or 0);
 	
@@ -2211,7 +2208,7 @@ function Storage:Split(player, id, quantity, target)
 		
 		if target.ID == nil then -- new item from split;
 			storageItem.Quantity = storageItem.Quantity-quantity;
-			local insertStatus, newStorageItem = storageB:Insert({ItemId=storageItem.ItemId; Stackable=true; Data={Quantity=quantity; Values=storageItem.Values};}, target.Index);
+			local _insertStatus, newStorageItem = storageB:Insert({ItemId=storageItem.ItemId; Stackable=true; Data={Quantity=quantity; Values=storageItem.Values};}, target.Index);
 
 			if self.ItemSpawn and newStorageItem then
 				Storage.OnItemSourced:Fire(self, newStorageItem, quantity);
@@ -2241,7 +2238,7 @@ function Storage:Split(player, id, quantity, target)
 	return {self:Shrink(); (storageB and self.Id ~= storageB.Id and storageB:Shrink() or nil);};
 end
 
--- !outline: Storage:Changed
+-- MARK:: Storage:Changed
 function Storage:Changed()
 	self:Sort();
 	self.OnChanged:Fire(self);
@@ -2371,13 +2368,13 @@ function Storage:SwapContainer(storageB)
 	rawset(storageB, "Container", cacheB);
 end
 
--- !outline Storage:SyncValues
+-- MARK: Storage:SyncValues
 function Storage:SyncValues()
 	local storage = self:Shrink();
 	remoteStorageSync:FireAllClients("syncvalues", storage.Id, storage.Values);
 end
 
--- !outline Storage:Sync
+-- MARK: Storage:Sync
 function Storage:Sync(player)
 	local storage = self:Shrink();
 

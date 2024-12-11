@@ -608,7 +608,7 @@ function remoteBattlepassRemote.OnServerInvoke(player, action, ...)
 		local lvlamt = ...;
 		lvlamt = tonumber(lvlamt)
 		
-		if lvlamt ~= 1 and lvlamt ~= 10 then
+		if lvlamt ~= 1 and lvlamt ~= 10 and lvlamt ~= 20 then
 			returnPacket.FailMsg = "Invalid Input";
 			return returnPacket;
 		end

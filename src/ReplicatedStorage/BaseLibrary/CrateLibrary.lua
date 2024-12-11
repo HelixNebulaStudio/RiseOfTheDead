@@ -640,6 +640,22 @@ function CrateLibrary:Init(super)
 	};
 	
 	super.New{
+		Id="xmaspresent2024";
+		Name="Christmas Present 2024";
+		PrefabName="XmasPresent2024";
+		RewardsId="xmaspresent2024";
+
+		EmptyLabel="Empty Present";
+		Configurations={
+			Persistent=false;
+			Settings={
+				WithdrawalOnly=true;
+				DestroyOnEmpty=true;
+			}
+		};
+	};
+	
+	super.New{
 		Id="easteregg";
 		Name="Easter Egg 2020";
 		PrefabName="EasterEgg";

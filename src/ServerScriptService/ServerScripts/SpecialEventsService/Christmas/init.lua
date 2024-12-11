@@ -3,9 +3,15 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local SpecialEvent = {};
 
 local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
+local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
+
 local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
+
+local remoteFrostivus = modRemotesManager:NewFunctionRemote("Frostivus", 1);
 
 local EventSpawns = workspace:WaitForChild("Event");
 
@@ -176,6 +182,163 @@ modOnGameEvents:ConnectEvent("OnDropReward", function(npcModule, deathCframe: CF
 	end
 end)
 
+local modMasterMind = require(game.ReplicatedStorage.Library.Minigames.MasterMind);
+shared.modProfile.OnProfileLoad:Connect(function(player, profile)
+	local activeSave = profile:GetActiveSave();
+	if activeSave == nil then return end;
+
+	local masterMind = modMasterMind.new();
+	profile.Flags:HookGet("Frostivus", function(flagData)
+		local nowTime = workspace:GetServerTimeNow();
+
+
+		flagData = flagData or {
+			Id="Frostivus";
+			MastermindStage=0;
+		};
+
+		flagData.MastermindState = flagData.MastermindState or 0;
+		flagData.MastermindHistory = flagData.MastermindHistory or {};
+		flagData.MastermindLives = flagData.MastermindLives or 5;
+
+		flagData.GetActiveMasterMindObject = function()
+			return masterMind;
+		end;
+
+		return flagData;
+	end)
+
+end)
+
+function remoteFrostivus.OnServerInvoke(player, action, packet)
+	if action ~= "Request" and remoteFrostivus:Debounce(player) then return {FailMsg="Retry after 1 second."} end;
+
+	local profile = shared.modProfile:WaitForProfile(player);
+	local activeInventory = profile.ActiveInventory;
+	local activeSave = profile:GetActiveSave();
+	if activeSave == nil then return end;
+
+	local activeId = modBattlePassLibrary.Active;
+	local battlePassSave = profile.BattlePassSave;
+
+	local frostivusData = profile.Flags:Get("Frostivus");
+
+	--Debugger:Warn(`Mastermind {action} Stage {frostivusData.MastermindStage}\tState {frostivusData.MastermindState}\tLives {frostivusData.MastermindLives}`);
+
+	if action == "getmastermind"  then
+		local mmObj = frostivusData.GetActiveMasterMindObject();
+
+		if mmObj.SessionState == 0 and frostivusData.MastermindState == 1 then
+			mmObj:Start(frostivusData.MastermindStage);
+			mmObj.SessionLives = math.max(frostivusData.MastermindLives, 1);
+		end
+
+		frostivusData.MastermindState = mmObj.SessionState;
+		frostivusData.MastermindLives = mmObj.SessionLives;
+		return mmObj:Sync();
+
+	elseif action == "startmastermind" then
+		local mmObj = frostivusData.GetActiveMasterMindObject();
+
+		if frostivusData.MastermindState ~= 1 then
+			table.clear(frostivusData.MastermindHistory);
+			frostivusData.MastermindStage = frostivusData.MastermindStage+1;
+
+			mmObj:Start(frostivusData.MastermindStage);
+			mmObj.SessionLives = 5;
+		end
+
+		frostivusData.MastermindState = mmObj.SessionState;
+		frostivusData.MastermindLives = mmObj.SessionLives;
+		return mmObj:Sync();
+
+	elseif action == "checkmastermind" then
+		local mmObj = frostivusData.GetActiveMasterMindObject();
+
+		if mmObj.SessionState == 0 then
+			mmObj:Start(frostivusData.MastermindStage);
+			mmObj.SessionLives = math.min(frostivusData.MastermindLives, 1);
+		end
+
+		local hintPacket = {};
+		if mmObj.SessionState == 1 then
+
+			local submitData = packet.SubmitData;
+
+			local checkData = {};
+			local fulfillList = {};
+
+			for a=1, #submitData do
+				local itemId = submitData[a];
+
+				if itemId == "bluegift" or itemId == "redgift" or itemId == "greengift" or itemId == "yellowgift" then
+					if itemId == "bluegift" then
+						table.insert(checkData, "Blue");
+					elseif itemId == "redgift" then
+						table.insert(checkData, "Red");
+					elseif itemId == "greengift" then
+						table.insert(checkData, "Green");
+					elseif itemId == "yellowgift" then
+						table.insert(checkData, "Yellow");
+					end
+				else
+					itemId = "bluegift";
+					table.insert(checkData, "Blue");
+				end
+
+				local fulfillItem = nil;
+				for a=1, #fulfillList do
+					if fulfillList[a].ItemId == itemId then
+						fulfillItem = fulfillList[a];
+						break;
+					end
+				end
+
+				if fulfillItem == nil then
+					fulfillItem = {ItemId=itemId; Amount=0;};
+					table.insert(fulfillList, fulfillItem);
+				end
+				fulfillItem.Amount = fulfillItem.Amount+1;
+			end
+
+			local isFulfilled, itemsList = shared.modStorage.FulfillList(player, fulfillList);
+
+			if isFulfilled then
+				shared.modStorage.ConsumeList(itemsList);
+
+			else
+				for _, giftItem in pairs(itemsList) do
+					local itemLib = modItemsLibrary:Find(giftItem.ItemId);
+					shared.Notify(player, `Not enough {itemLib.Name}, {giftItem.Amount} required.`, "Negative");
+				end
+				return mmObj:Sync();
+			end
+
+			local allCorrect = false;
+			Debugger:Warn("checkData", checkData);
+
+			hintPacket, allCorrect = mmObj:Submit(checkData);
+
+			local historyPacket = {};
+			for a=1, #checkData do
+				historyPacket[a] = {Id=checkData[a]; Hint=hintPacket[a]};
+			end
+			table.insert(frostivusData.MastermindHistory, historyPacket);
+
+			if allCorrect then
+				battlePassSave:AddLevel(activeId, 1);
+			end
+		end
+
+		frostivusData.MastermindState = mmObj.SessionState;
+		frostivusData.MastermindLives = mmObj.SessionLives;
+		return mmObj:Sync(), hintPacket;
+	end
+
+	profile.Flags:Sync("Frostivus");
+
+	return;
+end
 
 task.spawn(function()
 	Debugger.AwaitShared("modCommandsLibrary");

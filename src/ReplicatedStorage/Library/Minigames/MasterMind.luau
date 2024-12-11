@@ -1,5 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+
 local MasterMind = {};
 MasterMind.__index = MasterMind;
 
@@ -18,6 +19,7 @@ From top to bottom, at each row, click on a circle and pick a color. After filli
 ]]
 
 MasterMind.States = {
+    Idle=0;
     Active=1;
     Completed=2;
     Failed=3;
@@ -38,7 +40,7 @@ function MasterMind.new()
         ChoicesCount=4;
         MaxRepeatCount=2;
 
-        SessionState = MasterMind.States.Active;
+        SessionState = MasterMind.States.Idle;
         SessionLives = 8;
         SessionAnswer = {};
     };
@@ -51,6 +53,7 @@ function MasterMind:Start(seed)
     local random = Random.new(seed);
 
     table.clear(self.SessionAnswer);
+    self.SessionState = MasterMind.States.Active;
 
     for a=1, self.Slots do
         local pickedChoice = nil;
@@ -129,12 +132,21 @@ function MasterMind:Submit(submitChoices)
 
         if self.SessionLives <= 0 then
             self.SessionState = MasterMind.States.Failed;
+
+            self.Answer = self.SessionAnswer;
         end
     end
 
     return hintPacket, allCorrect;
 end
 
+function MasterMind:Sync()
+    return {
+        State = self.SessionState;
+        Lives = self.SessionLives;
+        Answer = self.Answer;
+    };
+end
 
 task.spawn(function()
     Debugger.AwaitShared("modCommandsLibrary");

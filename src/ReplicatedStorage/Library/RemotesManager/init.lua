@@ -653,6 +653,7 @@ else
 	RemotesManager:NewFunctionRemote("VoteSystem", 1).Secure = true;
 	RemotesManager:NewFunctionRemote("Halloween", 1);
 	RemotesManager:NewFunctionRemote("LockHydra").Secure = true;
+	RemotesManager:NewFunctionRemote("MasterMind").Secure = true;
 	
 
 	local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));

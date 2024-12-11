@@ -370,7 +370,6 @@ shared.modProfile.OnProfileSave:Connect(function(player, profile)
 			--	SpecialEvent.Cache.CandyPool = tonumber(newVal) or 0;
 			--	return newVal;
 			--end, oneMonthSecs);
-			Debugger:Log("Sumitted SpecialEvent.Cache.CandyPool", SpecialEvent.Cache.CandyPool);
 		end
 		
 		local s,e;

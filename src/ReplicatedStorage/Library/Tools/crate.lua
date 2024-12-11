@@ -24,18 +24,20 @@ return function(handler, itemId, prefab)
 		local owner = self.Player;
 		
 		local rewards = modCrates.GenerateRewards(itemId, owner);
-		if #rewards > 0 then
-			local prefab, interactable = modCrates.Spawn(itemId, cframe, {owner}, rewards);
-			
-			local dropAppearanceLib = modDropAppearance:Find(itemId);
-			if dropAppearanceLib then
-				modDropAppearance.ApplyAppearance(dropAppearanceLib, prefab);
-			end
-							
-			modAudio.Play("StorageWoodPickup", prefab.PrimaryPart, nil, false);
-			interactable:Sync(nil, {EmptyLabel="Owned by: "..owner.Name});
-			Debugger.Expire(prefab, 120);
+		if #rewards <= 0 then
+			rewards = {{Quantity=1; ItemId="metal"}};
 		end
+
+		local prefab, interactable = modCrates.Spawn(itemId, cframe, {owner}, rewards);
+		
+		local dropAppearanceLib = modDropAppearance:Find(itemId);
+		if dropAppearanceLib then
+			modDropAppearance.ApplyAppearance(dropAppearanceLib, prefab);
+		end
+						
+		modAudio.Play("StorageWoodPickup", prefab.PrimaryPart, nil, false);
+		interactable:Sync(nil, {EmptyLabel="Owned by: "..owner.Name});
+		Debugger.Expire(prefab, 120);
 	end
 	
 	setmetatable(Structure, handler);

@@ -50,6 +50,7 @@ local templateRMissionButton = script:WaitForChild("RMissionButton");
 
 local templatePassReward = script:WaitForChild("PassReward");
 local templateLockedLabel = script:WaitForChild("LockedLabel");
+local templateBorders = script:WaitForChild("Borders");
 
 local timerRadialBar = script:WaitForChild("radialBar");
 timerRadialBar.AnchorPoint = Vector2.new(0, 1);
@@ -98,11 +99,11 @@ local bpColors = {
 	CurrentPremium = Color3.fromRGB(255, 220, 112);
 	
 	Normal = Color3.fromRGB(90, 120, 90);
-	PassOwner = Color3.fromRGB(120, 53, 53);
+	PassOwner = Color3.fromRGB(130, 70, 70);
 	Premium = Color3.fromRGB(120, 103, 53);
 	
 	LockedNormal = Color3.fromRGB(80, 80, 80);
-	LockedPassOwner = Color3.fromRGB(80, 49, 49);
+	LockedPassOwner = Color3.fromRGB(110, 60, 60);
 	LockedPremium = Color3.fromRGB(80, 72, 49);
 }
 
@@ -2463,8 +2464,14 @@ function Interface.init(modInterface)
 			passButton.ImageColor3 = Color3.fromRGB(75, 40, 40);
 		end)
 		passButton.MouseButton1Click:Connect(function()
-			if bpButtonFunc then
+			Interface:PlayButtonClick();
+			local bpFrame = MissionDisplayFrame:FindFirstChild("BpFrame");
+			if bpFrame and bpFrame:FindFirstChild("ScrollFrame") and bpFrame.ScrollFrame.CanvasPosition.Y > 0 then
+				bpFrame.ScrollFrame.CanvasPosition = Vector2.new(0, (bpFrame.ScrollFrame.AbsoluteWindowSize.Y/2)-1);
+
+			elseif bpButtonFunc then
 				bpButtonFunc();
+
 			end
 		end)
 		
@@ -2482,36 +2489,54 @@ function Interface.init(modInterface)
 			
 			bpButtonFunc = function()
 				refreshData();
-				Interface:PlayButtonClick();
 
 				MissionDisplayFrame:ClearAllChildren();
 
 				local passRewardFrame = templatePassReward:Clone();
+				passRewardFrame.Name = "BpFrame";
 				passRewardFrame.Parent = MissionDisplayFrame;
 
 				local titleLabel = passRewardFrame:WaitForChild("Title");
 				titleLabel.Text =  '<font size="14">'.."Event Pass</font>\n<b>".. battlepassLib.Title .."</b>";
 
+				local pageScrollFrame = passRewardFrame:WaitForChild("ScrollFrame");
 				local contentFrame = passRewardFrame:WaitForChild("Frame");
-				local claimButton = contentFrame:WaitForChild("ClaimButton");
 				local slotFrame = contentFrame:WaitForChild("Slot");
 				local descLabel = contentFrame:WaitForChild("Description");
 
-				local itemIcon = passIconLabel:Clone();
-				itemIcon.Size = UDim2.new(1, 0, 1, 0);
-				itemIcon.Parent = slotFrame;
+				if battlepassLib.BpPage then
+					local newBpPage = battlepassLib.BpPage:Clone();
+					newBpPage.Parent = pageScrollFrame;
+					local borders = templateBorders:Clone();
+					borders.Parent = pageScrollFrame;
 
-				slotFrame.AnchorPoint = Vector2.new(0.5, 0);
-				slotFrame.Position = UDim2.new(0.5, 0, 0, -10);
-				slotFrame.Size = UDim2.new(0.7, 0, 0.6, 0);
+					pageScrollFrame.Visible = true;
+					contentFrame.Visible = false;
+					titleLabel.Visible = false;
 
-				descLabel.Position = UDim2.new(0, 0, 0.6, 0);
-				descLabel.Size = UDim2.new(1, 0, 0, 0);
-				descLabel.ClipsDescendants = false;
+				else
+					contentFrame.Visible = true;
+					pageScrollFrame.Visible = false;
+					titleLabel.Visible = true;
 
-				descLabel.Text = battlepassLib.Desc;
+					local itemIcon = passIconLabel:Clone();
+					itemIcon.Size = UDim2.new(1, 0, 1, 0);
+					itemIcon.Parent = slotFrame;
+	
+					slotFrame.AnchorPoint = Vector2.new(0.5, 0);
+					slotFrame.Position = UDim2.new(0.5, 0, 0, -10);
+					slotFrame.Size = UDim2.new(0.7, 0, 0.6, 0);
+	
+					descLabel.Position = UDim2.new(0, 0, 0.6, 0);
+					descLabel.Size = UDim2.new(1, 0, 0, 0);
+					descLabel.ClipsDescendants = false;
+					descLabel.Text = battlepassLib.Desc;
 
+				end
+				
 				local price = battlepassLib.Price;
+
+				local claimButton = contentFrame:WaitForChild("ClaimButton");
 				claimButton.Text = "Unlock for ".. modFormatNumber.Beautify(battlepassLib.Price) .." Gold";
 				
 				claimButton.TextScaled = false;
@@ -2531,47 +2556,29 @@ function Interface.init(modInterface)
 					Interface:PlayButtonClick();
 
 					local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. price.." Gold</font></b>";
-					local promptWindow = Interface:PromptQuestion("Unlock Event Pass for ".. goldTxt.. "?",
-						"Are you sure you want to unlock Event Pass: ".. battlepassLib.Title .. " for "..goldTxt.."?", 
-						"Purchase", "Cancel");
-					local YesClickedSignal, NoClickedSignal;
-
-					YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
-						promptWindow.Frame.Yes.buttonText.Text = "Purchasing...";
-
-						local r = remoteBattlepassRemote:InvokeServer("purchase");
-						if r.FailMsg then
-							if r.FailMsg == "Insufficient Gold" then
-								task.wait(2);
-								promptWindow:Close();
-								Interface:OpenWindow("GoldMenu", "GoldPage");
-								return;
-
-							else
-								promptWindow.Frame.Yes.buttonText.Text = r.FailMsg;
-								task.wait(2);
-
-							end
-
-						elseif r.Success == true then
-							promptWindow.Frame.Yes.buttonText.Text = "Unlocked!";
-
-						end
-						promptWindow:Close();
-						Interface:OpenWindow("Missions");
-
-						YesClickedSignal:Disconnect();
-						NoClickedSignal:Disconnect();
-					end);
-
-					NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
-						promptWindow:Close();
-
-						YesClickedSignal:Disconnect();
-						NoClickedSignal:Disconnect();
-					end);
+					modInterface:PromptDialogBox({
+						Title=`Unlock Event Pass for {goldTxt}?`;
+						Desc=`Are you sure you want to unlock Event Pass: {battlepassLib.Title} for {goldTxt}?`;
+						Icon=battlepassLib.Icon;
+						Buttons={
+							{
+								Text="Purchase";
+								Style="Confirm";
+								OnPrimaryClick=function(promptDialogFrame, textButton)
+									local r = remoteBattlepassRemote:InvokeServer("purchase");
+									if r.FailMsg then
+										if r.FailMsg == "Insufficient Gold" then
+											Interface:OpenWindow("GoldMenu", "GoldPage");
+										end
+									end
+								end;
+							};
+							{
+								Text="Cancel";
+								Style="Cancel";
+							};
+						}
+					});
 				end)
 				
 				
@@ -2579,47 +2586,31 @@ function Interface.init(modInterface)
 					local price = modBattlePassLibrary.BuyLevelCost * lvlAmt;
 					
 					local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. price.." Gold</font></b>";
-					local promptWindow = Interface:PromptQuestion("Level up Event Pass for ".. goldTxt.. "?",
-						"Are you sure you want to level up Event Pass by ".. lvlAmt .." for "..goldTxt.."?", 
-						"Level Up", "Cancel");
-					local YesClickedSignal, NoClickedSignal;
-
-					YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
-						promptWindow.Frame.Yes.buttonText.Text = "Leveling Up...";
-
-						local r = remoteBattlepassRemote:InvokeServer("purchaselvls", lvlAmt);
-						if r.FailMsg then
-							if r.FailMsg == "Insufficient Gold" then
-								task.wait(2);
-								promptWindow:Close();
-								Interface:OpenWindow("GoldMenu", "GoldPage");
-								return;
-
-							else
-								promptWindow.Frame.Yes.buttonText.Text = r.FailMsg;
-								task.wait(2);
-
-							end
-
-						elseif r.Success == true then
-							promptWindow.Frame.Yes.buttonText.Text = "Leveled Up!";
-
-						end
-						promptWindow:Close();
-						Interface:OpenWindow("Missions");
-
-						YesClickedSignal:Disconnect();
-						NoClickedSignal:Disconnect();
-					end);
-
-					NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
-						promptWindow:Close();
-
-						YesClickedSignal:Disconnect();
-						NoClickedSignal:Disconnect();
-					end);
+					modInterface:PromptDialogBox({
+						Title=`Level up Event Pass for {goldTxt}?`;
+						Desc=`Are you sure you want to level up Event Pass by {lvlAmt} for {goldTxt}?`;
+						Icon=battlepassLib.Icon;
+						Buttons={
+							{
+								Text="Level Up";
+								Style="Confirm";
+								OnPrimaryClick=function(promptDialogFrame, textButton)
+									local r = remoteBattlepassRemote:InvokeServer("purchaselvls", lvlAmt);
+									if r.FailMsg then
+										if r.FailMsg == "Insufficient Gold" then
+											modInterface:OpenWindow("GoldMenu", "GoldPage");
+										end
+									elseif r.Success then
+										
+									end
+								end;
+							};
+							{
+								Text="Cancel";
+								Style="Cancel";
+							};
+						}
+					});
 				end
 				
 				local buyOneLevelButton = claimButton:Clone();

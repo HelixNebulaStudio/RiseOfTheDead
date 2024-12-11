@@ -505,7 +505,7 @@ function BattlePassLibrary:Init(library)
 		Title="Frostivus 2024";
 		Icon="rbxassetid://125482397634613";
 		Desc="Unlock the Frostivus 2024 Event Pass to claim more rewards!";
-		
+		BpPage=script.BpPages.frostivus2024;
 
 		Price=1000;
 
@@ -520,6 +520,7 @@ function BattlePassLibrary:Init(library)
 			leaf(7, {
 				Reward={ItemId="xmassweater";};
 			});
+
 			leaf(10, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
 			});
@@ -527,8 +528,9 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="santahatblue";};
 			});
 			leaf(17, {
-				Reward={ItemId="xmassweatersnowflakered";};
+				Reward={ItemId="gingerbreadman"; PassOwner=true;};
 			});
+
 			leaf(20, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
 			});
@@ -536,8 +538,9 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="brownbeltxmasorange";};
 			});
 			leaf(27, {
-				Reward={ItemId="ammopouchnight";};
+				Reward={ItemId="xmassweatersnowflakered";};
 			});
+
 			leaf(30, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
 			});
@@ -545,8 +548,9 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="santahatgreen";};
 			});
 			leaf(37, {
-				Reward={ItemId="fedoraxmasred";};
+				Reward={ItemId="eggnog";};
 			});
+
 			leaf(40, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
 			});
@@ -554,10 +558,37 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="xmaspresent2024";};
 			});
 			leaf(47, {
-				Reward={ItemId="arelshiftcrossgingerbread";};
+				Reward={ItemId="arelshiftcrossgingerbread"; PassOwner=true;};
 			});
+
 			leaf(50, {
 				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			});
+			leaf(53, {
+				Reward={ItemId="ammopouchnight";};
+			});
+			leaf(57, {
+				Reward={ItemId="gingerbreadman";};
+			});
+
+			leaf(60, {
+				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			});
+			leaf(63, {
+				Reward={ItemId="fedoraxmasred";};
+			});
+			leaf(67, {
+				Reward={ItemId="eggnog";};
+			});
+
+			leaf(70, {
+				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			});
+			leaf(73, {
+				Reward={ItemId="portableautoturretcryogenics"; PassOwner=true;};
+			});
+			leaf(77, {
+				Reward={ItemId="eggnog";};
 			});
 		};
 	};
