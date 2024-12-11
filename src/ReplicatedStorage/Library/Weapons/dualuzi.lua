@@ -51,8 +51,8 @@ local Configurations={
 local Properties={
 	Ammo=Configurations.AmmoLimit;
 	MaxAmmo=Configurations.MaxAmmoLimit;
-	Rpm=600;
-	FireRate=(60/600);
+	Rpm=700;
+	FireRate=(60/700);
 	ReloadSpeed=2.3;
 }
 
@@ -113,7 +113,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 
 local Audio={
 	Load={Id=169799883; Pitch=1.2; Volume=0.4;};
-	PrimaryFire={Id=1926370458; Pitch=1.7; Volume=1;};
+	PrimaryFire={Id=111641686230503; Pitch=1.7; Volume=1;};
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
 }
 

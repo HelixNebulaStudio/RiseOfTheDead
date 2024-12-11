@@ -97,7 +97,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	
 local Audio={
 	Load={Id=169799883; Pitch=1.2; Volume=0.4;};
-	PrimaryFire={Id=6548742606; Pitch=1.2; Volume=1;};
+	PrimaryFire={Id=988205199; Pitch=1.2; Volume=1;};
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
 	--Reload={Id=142491708; Pitch=1.1; Volume=0.6;};
 }
