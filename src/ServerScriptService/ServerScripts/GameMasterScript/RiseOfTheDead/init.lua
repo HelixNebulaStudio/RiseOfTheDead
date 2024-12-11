@@ -15,19 +15,18 @@ local modConfigurations = require(game.ReplicatedStorage.Library.Configurations)
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modItemSkinWear = require(game.ReplicatedStorage.Library.ItemSkinWear);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modWorkbenchLibrary = require(game.ReplicatedStorage.Library.WorkbenchLibrary);
+local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
+local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
-local modMailObject = require(game.ServerScriptService.ServerLibrary.MailObject);
 local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
 local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 local modWorldNaturalResource = require(game.ServerScriptService.ServerLibrary.WorldNaturalResource);
 local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
-
-require(script.ShortFilmReward23);
+local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
 local NameDisplayGui = script.Parent:WaitForChild("NameDisplay");
 
@@ -171,6 +170,23 @@ function ModEngine.OnPlayerAdded(player: Player)
 			end
 		end
 		classPlayer:Spawn();
+	end
+
+	local eventPart = workspace:WaitForChild("Event");
+	local masusPlushieSpawnAtt = eventPart:FindFirstChild("MasusPlushie"); 
+
+	local worldInfo = modBranchConfigs.WorldLibrary[modBranchConfigs.GetWorld()];
+	if worldInfo and worldInfo.Index then
+
+		local dayName = modSyncTime.GetWeekDay();
+		local dayIndex = modSyncTime.WeekdayIndex[dayName];
+
+		if worldInfo.Index == 0 or dayIndex == worldInfo.Index then
+			if masusPlushieSpawnAtt and profile.Collectibles.masus == nil then
+				local newPrefab, interactData = modItemDrops.Spawn({Type="Tool"; ItemId="masusplush"; Quantity=1}, masusPlushieSpawnAtt.WorldCFrame, {player}, false);
+				interactData.CollectibleId = "masus";
+			end
+		end
 	end
 end
 

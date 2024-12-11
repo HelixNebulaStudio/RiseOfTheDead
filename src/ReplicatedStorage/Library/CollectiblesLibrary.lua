@@ -15,5 +15,6 @@ library:Add{Id="nm"; Name="Nekron Mask"; Tier=2;};
 library:Add{Id="mlc"; Name="Mike's Lucky Coin"; Tier=2;};
 library:Add{Id="vrm"; Name="Vehicle Repair Manual"; Tier=2;};
 library:Add{Id="ttrain"; Name="Toy Train"; Tier=2;};
+library:Add{Id="masus"; Name="Masus Plushie"; Tier=2};
 
 return library;

@@ -172,7 +172,7 @@ Branches.WorldTypes = {
 local isMainBranch = Branches.CurrentBranch.Name == "Live";
 Branches.WorldLibrary = {
 	MainMenu={CanTravelTo=true; TimeCycleEnabled=false; Type=Branches.WorldTypes.Menu; MaxPlayers=25;};
-	BioXResearch={CanTravelTo=true; PrivateWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=10; DevsOnly=isMainBranch;}; -- PublicWorld=true;
+	BioXResearch={Index=0; CanTravelTo=true; PrivateWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=10; DevsOnly=isMainBranch;}; -- PublicWorld=true;
 	NekronsGambit={NoPrivateServers=true; CanTravelTo=true; PublicWorld=true; FreeTravels=true; TimeCycleEnabled=false; WeatherCycle=false; Type=Branches.WorldTypes.NekronsGambit; MaxPlayers=8;};
 
 	-- Cutscene;
@@ -189,11 +189,11 @@ Branches.WorldLibrary = {
 	Safehome={CanTravelTo=true; PrivateWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=10;};
 	Destructibles={CanTravelTo=true; PrivateWorld=false; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=10;};
 	
-	TheWarehouse={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=12; Icon="rbxassetid://5954340695"};
-	TheUnderground={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; Witherer=true; MaxPlayers=12; Icon="rbxassetid://5959082717"};
-	TheMall={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=12; Icon="rbxassetid://5959095409"};
-	TheResidentials={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=12; Icon="rbxassetid://5959099674"};
-	TheHarbor={CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=12; Icon="rbxassetid://7368989503";};
+	TheWarehouse={Index=1; CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=12; Icon="rbxassetid://5954340695"};
+	TheUnderground={Index=2; CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; Witherer=true; MaxPlayers=12; Icon="rbxassetid://5959082717"};
+	TheMall={Index=3; CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=12; Icon="rbxassetid://5959095409"};
+	TheResidentials={Index=4; CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=12; Icon="rbxassetid://5959099674"};
+	TheHarbor={Index=5; CanTravelTo=true; PublicWorld=true; TimeCycleEnabled=true; Type=Branches.WorldTypes.General; MaxPlayers=12; Icon="rbxassetid://7368989503";};
 	
 	--== Game Modes;
 	-- Raid;
