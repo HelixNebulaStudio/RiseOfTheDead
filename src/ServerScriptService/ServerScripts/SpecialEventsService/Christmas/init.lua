@@ -315,8 +315,6 @@ function remoteFrostivus.OnServerInvoke(player, action, packet)
 			end
 
 			local allCorrect = false;
-			Debugger:Warn("checkData", checkData);
-
 			hintPacket, allCorrect = mmObj:Submit(checkData);
 
 			local historyPacket = {};

@@ -17,7 +17,7 @@ function weldAttachments(attach1, attach2)
     weld.C0 = attach1.CFrame
 	weld.C1 = attach2.CFrame
 	
-    weld.Parent = attach2.Parent
+    weld.Parent = attach2.Parent;
     return weld
 end
 

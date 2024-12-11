@@ -461,6 +461,7 @@ local function equipTool(player, paramPacket)
 					for _, part in pairs(cloneTool:GetChildren()) do
 						if part:IsA("BasePart") then
 							part.CollisionGroup = "Tool";
+							part.Massless = true;
 							
 						elseif part:IsA("Humanoid") then
 							part.PlatformStand = true;

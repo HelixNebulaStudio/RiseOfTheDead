@@ -104,8 +104,20 @@ bodyVelocity.Parent = rootPart;
 local slideDirection = Vector3.new();
 local slideCooldown = tick()-5;
 local oldSlideMomentum = 0;
-local slopeUpFriction = 3;
-local slopeDownFriction = 3;
+local SlideVars = {
+	DefaultDownFriction = 3;
+	DefaultUpFriction = 6;
+	DefaultFlatFriction = 0.9;
+
+	DownFriction = nil;
+	UpFriction = nil;
+	FlatFriction = nil;
+
+	FrictionDelay = nil;
+
+	WaistX = nil;
+	WaistXEquipped = nil;
+} :: any;
 
 local dashDirection = Vector3.new();
 local dashCooldown = tick()-5;
@@ -113,6 +125,7 @@ local oldDashMomentum = 0;
 local airDashYForce = 0;
 local dashMomentumDecay = 4;
 local slideFromDashTick = nil;
+local slideFrictionTick = nil;
 
 local heartbeatSecTick = tick()-1;
 
@@ -124,7 +137,7 @@ local minZoomLevel = 4;
 local maxZoomLevel = 20;
 local additionalZoom = 0;
 local lastFOV = 70;
-local prevHipHeight, prevViewModelHeight = 0, 0;
+local prevCamHipHeight, prevViewModelHeight = 0, 0;
 local prevViewModel = characterProperties.DefaultViewModel;
 local shakeAndZoomVars = { canOverrideShakeAndZoom = true; shakingAndZooming = false; breakShakingAndZooming = false;};
 local mouseEnabled = UserInputService.MouseEnabled;
@@ -606,21 +619,38 @@ local function startSliding()
 	end
 	dustParticle.Enabled = true;
 
-	-- OLD SLIDE;
-	-- if slideSound then
-	-- 	slideSound.PlaybackSpeed = random:NextNumber(1.2, 1.5);
-	-- 	slideSound.Volume = 0.15;
-	-- 	slideSound:Play();
-	-- else
-	-- 	slideSound = head:FindFirstChild("BodySlide");
-	-- end
-	-- dustParticle.Enabled = true;
+	local sledding = classPlayer and classPlayer.Properties and classPlayer.Properties.Sledding;
+	if sledding then
+		SlideVars.DownFriction = 1;
+		SlideVars.UpFriction = nil;
+		SlideVars.FlatFriction = 1;
+		SlideVars.FrictionDelay = 2;
+		
+		if sledding.VehicleWearAnimationId then
+			local anim = animations[sledding.VehicleWearAnimationId];
+			if anim == nil then
+				local newAnim = Instance.new("Animation");
+				newAnim.AnimationId = sledding.VehicleWearAnimationId;
+				anim = animator:LoadAnimation(newAnim);
+				animations[sledding.VehicleWearAnimationId] = anim;
+			end
 
-	-- characterProperties.IsSliding = true;
+			SlideVars.SlideAnimation = sledding.VehicleWearAnimationId;
+		end
 
-	-- slideDirection = Vector3.new(rootPart.CFrame.LookVector.X, 0, rootPart.CFrame.LookVector.Z).Unit;
-	-- oldSlideMomentum = characterProperties.SlideSpeed;
-	-- slideForce.Velocity = slideDirection*oldSlideMomentum;
+		SlideVars.WaistX = math.rad(-35);
+		SlideVars.WaistXEquipped = math.rad(-65);
+		
+	else
+		SlideVars.DownFriction = nil;
+		SlideVars.UpFriction = nil;
+		SlideVars.FlatFriction = nil;
+		SlideVars.FrictionDelay = nil;
+		SlideVars.SlideAnimation = nil;
+
+		SlideVars.WaistX = nil;
+		SlideVars.WaistXEquipped = nil;
+	end
 end
 
 -- MARK: startDashing
@@ -661,6 +691,7 @@ local function crouchRequest(value)
 			if characterProperties.IsDashing then
 				slideFromDashTick = tick();
 			end
+			slideFrictionTick = tick();
 			characterProperties.IsDashing = false;
 			startSliding();
 		end
@@ -839,7 +870,11 @@ UserInputService.InputBegan:connect(function(inputObject, gameProcessedEvent)
 	if modKeyBindsHandler:Match(inputObject, "KeyCrouch") then
 		characterProperties.ActionKeyCtrlDown = true;
 		if characterProperties.IsAlive and characterProperties.CanMove and characterProperties.CanCrouch and (tick()-crouchCooldown) > 0.1 then
-			crouchRequest(not characterProperties.CrouchKeyDown);
+			if modData.Settings.ToggleCrouch == 1 then
+				crouchRequest(not characterProperties.CrouchKeyDown);
+			else
+				crouchRequest(true);
+			end
 		end
 		task.spawn(function()
 			remoteCharacterInteractions:InvokeServer("eject");
@@ -1046,6 +1081,7 @@ function stopSliding(delayTime)
 	Cache.lastSlide = nil;
 	characterProperties.IsSliding = false;
 	slideFromDashTick = nil;
+	slideFrictionTick = nil;
 	if slideSound then
 		spawn(function() 
 			repeat 
@@ -1055,19 +1091,20 @@ function stopSliding(delayTime)
 	end
 	dustParticle.Enabled = false;
 	if animations["slide"] then animations["slide"]:Stop(); end
+	if SlideVars.SlideAnimation and animations[SlideVars.SlideAnimation] then animations[SlideVars.SlideAnimation]:Stop() end;
 	slideCooldown = tick();
 
 	task.spawn(function()
-		for a=0, (delayTime or 0), 1/15 do
-			local slopeDot = slideDirection:Dot(characterProperties.GroundNormal);
+		-- for a=0, (delayTime or 0), 1/15 do
+		-- 	local slopeDot = slideDirection:Dot(characterProperties.GroundNormal);
 
-			if slopeDot <= 0.1 then
-				oldSlideMomentum = oldSlideMomentum - math.max(math.abs(slopeDot), 0.3) *(slopeUpFriction*4);
-			end
-			bodyVelocity.Velocity = slideDirection*math.max(oldSlideMomentum, 0);
+		-- 	if slopeDot <= 0.1 then
+		-- 		oldSlideMomentum = oldSlideMomentum - math.max(math.abs(slopeDot), 0.3) *(slopeUpFriction*4);
+		-- 	end
+		-- 	bodyVelocity.Velocity = slideDirection*math.max(oldSlideMomentum, 0);
 
-			task.wait(1/15);
-		end
+		-- 	task.wait(1/15);
+		-- end
 		
 		bodyVelocity.MaxForce = Vector3.new(0, 0, 0);
 		characterProperties.SlideVelocity = Vector3.zero;
@@ -1549,15 +1586,15 @@ local function renderStepped(camera, deltaTime)
 			end
 			characterProperties.BaseFieldOfView = 75;
 
-			local hipHeight = 0;
+			local camHipHeight = 0;
 			if characterProperties.IsCrouching or characterProperties.IsWounded then
-				hipHeight = 2;
+				camHipHeight = 2;
 			elseif characterProperties.IsSliding then
-				hipHeight = 2.5;
+				camHipHeight = 2.5;
 			end
 
-			hipHeight = modMath.Lerp(prevHipHeight, hipHeight, 0.2);
-			prevHipHeight = hipHeight;
+			camHipHeight = modMath.Lerp(prevCamHipHeight, camHipHeight, 0.2);
+			prevCamHipHeight = camHipHeight;
 
 			local cameraCFrame = rootPoint;
 
@@ -1568,7 +1605,7 @@ local function renderStepped(camera, deltaTime)
 
 			cameraCFrame = cameraCFrame * CFrame.Angles(0, 0, (mouseProperties.Z - mouseProperties.ZAngOffset));	--Roll
 			if not characterProperties.IsSwimming then
-				cameraCFrame = cameraCFrame * CFrame.new(0, 2.4+0.6-prevHipHeight, 0)
+				cameraCFrame = cameraCFrame * CFrame.new(0, 2.4+0.6-prevCamHipHeight, 0)
 			end
 
 			cameraCFrame = cameraCFrame * CFrame.Angles((mouseProperties.Y + mouseProperties.YAngOffset)-(characterProperties.Joints.WaistX*0.01), 0, 0) --Pitch
@@ -2244,7 +2281,11 @@ RunService.PreSimulation:Connect(function(step)
 				
 			elseif characterProperties.IsSliding then
 				-- sliding
-				waistC1.X = deg60;
+				if characterProperties.IsEquipped then
+					waistC1.X = SlideVars.WaistXEquipped or deg60;
+				else
+					waistC1.X = SlideVars.WaistX or deg60;
+				end
 				waistC1.Y = waistY - wtY;
 				waistTransform = CFrame.new();
 				
@@ -2589,7 +2630,16 @@ RunService.PostSimulation:Connect(function(deltaTimeSim)
 			end
 
 		elseif characterProperties.IsSliding then -- MARK: IsSliding Mechanics
-			if animations["slide"] then animations["slide"]:Play(); end
+		
+			if SlideVars.SlideAnimation and animations[SlideVars.SlideAnimation] then
+				local slideAnim: AnimationTrack = animations[SlideVars.SlideAnimation];
+				if not slideAnim.IsPlaying then
+					slideAnim:Play();
+				end
+			elseif animations["slide"] and not animations["slide"].IsPlaying then
+				animations["slide"]:Play();
+			end;
+			
 			if animations["dashForward"].IsPlaying then animations["dashForward"]:Stop() end;
 			characterProperties.WalkSpeed:Set("default", 0);
 			
@@ -2599,37 +2649,38 @@ RunService.PostSimulation:Connect(function(deltaTimeSim)
 				local slideMomentum = oldSlideMomentum;
 				local slopeDot = slideDirection:Dot(characterProperties.GroundNormal);
 
-				if slopeDot > 0.15 then
-					-- >0 slide down;
-					slideMomentum = math.min(slideMomentum + (slopeDot/slopeDownFriction) * 60*deltaTimeSim, characterProperties.SlideSpeed*1.5);
-				else
-					-- <0: slide up;
-					if slideFromDashTick == nil or tick()-slideFromDashTick > 0.5 then
-						slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.3) *slopeUpFriction * 60*deltaTimeSim;
-					end
+				local frictionActive = true;
+
+				if slideFromDashTick and tick()-slideFromDashTick <= 0.5 then
+					frictionActive = false;
 				end
+				if SlideVars.FrictionDelay and slideFrictionTick and tick()-slideFrictionTick <= SlideVars.FrictionDelay then
+					frictionActive = false;
+				end
+
+				if slopeDot > 0.15 and slopeDot ~= 0 then
+					-- >0 slide down;
+					local slopeDownFriction = SlideVars.DownFriction or SlideVars.DefaultDownFriction;
+					slideMomentum = math.min(slideMomentum + (slopeDot/slopeDownFriction) * 60*deltaTimeSim, characterProperties.SlideSpeed*1.5);
+
+				elseif slopeDot < 0.15 and slopeDot ~= 0 then
+					-- <0: slide up;
+					if frictionActive then
+						local slopeUpFriction = SlideVars.UpFriction or SlideVars.DefaultUpFriction;
+						slideMomentum = slideMomentum -math.abs(slopeDot) *slopeUpFriction * 60*deltaTimeSim;
+					end
+
+				else
+					-- slide flat;
+					if frictionActive then
+						local slopeFlatFriction = SlideVars.FlatFriction or SlideVars.DefaultFlatFriction;
+						slideMomentum = slideMomentum -slopeFlatFriction * 60*deltaTimeSim;
+					end
+
+				end
+
 				bodyVelocity.Velocity = slideDirection*math.max(slideMomentum, 0);
 				oldSlideMomentum = slideMomentum;
-
-				-- OLD SLIDE
-				-- local rootLookVector = Vector3.new(rootPart.CFrame.LookVector.X, 0, rootPart.CFrame.LookVector.Z).Unit;
-				-- local newSlideDirection = rootLookVector;
-				
-				-- local slideMomentum = oldSlideMomentum;
-
-				-- local slopeDot = newSlideDirection:Dot(characterProperties.GroundNormal);
-				-- if slopeDot > 0.15 then
-				-- 	-- >0 slide down;
-				-- 	slideMomentum = math.min(slideMomentum + (slopeDot/slopeDownFriction) * 60*deltaTimeSim, characterProperties.SlideSpeed*1.5);
-				-- else
-				-- 	-- <0: slide up;
-				-- 	slideMomentum = slideMomentum - math.max(math.abs(slopeDot), 0.25) *slopeUpFriction * 60*deltaTimeSim;
-				-- end
-
-				-- slideForce.Velocity = newSlideDirection*math.max(slideMomentum, 0);
-				-- slideDirection = newSlideDirection;
-
-				-- oldSlideMomentum = slideMomentum;
 				
 				if Cache.lastSlide == nil then
 					Cache.lastSlide = beatTick;

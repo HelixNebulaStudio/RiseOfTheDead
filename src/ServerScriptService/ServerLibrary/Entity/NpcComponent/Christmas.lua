@@ -10,6 +10,8 @@ function Christmas.new(self)
 	return function()
 		if self.Prefab.Name == "Mr. Klaws" then return end;
 		if self.Prefab.Name == "Wraith" then return end;
+		if self.Prefab.Name == "Witherers" then return end;
+		if self.Prefab.Name == "Vein Of Nekron" then return end;
 
 		if math.random(1, 10) == 1 then
 			local hair = hairPrefabs[math.random(1, #hairPrefabs)]:Clone();

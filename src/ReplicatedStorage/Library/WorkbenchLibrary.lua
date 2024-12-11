@@ -672,6 +672,14 @@ WorkbenchLibrary.ItemUpgrades={
 	["inflatablebuoy"]={
 		Type={"Utility Wear"};
 	};
+
+	-- Misc
+	["portableautoturret"]={
+		Type={"Portable Auto Turret"};
+	};
+	["snowsledge"]={
+		Type={"Vechicle Wear"};
+	};
 };
 
 WorkbenchLibrary.ItemAppearance={

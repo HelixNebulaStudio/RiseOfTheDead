@@ -62,7 +62,7 @@ function attirePackage.NewToolLib(handler)
 	
 	function toolLib:OnShopSelect(shopInterface, storageItem)
 		local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-		local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule"));
+		local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 		local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 		
 		local selectedItem = modData.FindIndexFromStorage(storageId, self.StorageIndexEnums.WeaponSlot);

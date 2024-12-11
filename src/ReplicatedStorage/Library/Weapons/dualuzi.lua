@@ -46,6 +46,8 @@ local Configurations={
 	
 	-- Penetration
 	Penetration=WeaponProperties.PenetrationTable["Submachine gun"];
+
+	ToolCycleDelay=(60/700)/2;
 }
 
 local Properties={
@@ -113,7 +115,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 
 local Audio={
 	Load={Id=169799883; Pitch=1.2; Volume=0.4;};
-	PrimaryFire={Id=111641686230503; Pitch=1.7; Volume=1;};
+	PrimaryFire={Id=111641686230503; Pitch=0.8; Volume=1;};
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
 }
 
