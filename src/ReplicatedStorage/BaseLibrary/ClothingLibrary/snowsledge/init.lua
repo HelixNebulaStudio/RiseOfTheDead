@@ -53,8 +53,6 @@ function attirePackage.NewToolLib(handler)
 		local conn = animator.AnimationPlayed:Connect(function(animationTrack: AnimationTrack)
 			if animationTrack.Animation.AnimationId ~= toolLib.VehicleWearAnimationId then return end;
 			
-			print("Sleding");
-
 			local accWeld;
 			for _, obj in pairs(accessoryHandle:GetChildren()) do
 				if not obj:IsA("Weld") then continue end;
@@ -69,8 +67,6 @@ function attirePackage.NewToolLib(handler)
 			vehicleWearMotor.Enabled = true;
 
 			animationTrack:GetPropertyChangedSignal("IsPlaying"):Once(function()
-				print("Stop Sleding");
-
 				accWeld.Enabled = true;
 				vehicleWearMotor.Enabled = false;
 			end)

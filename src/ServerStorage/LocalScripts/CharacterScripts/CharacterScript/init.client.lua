@@ -508,6 +508,9 @@ local function ToggleBodypartTransparency(bodyParts, hide, includeArms)
 		elseif fpVisible == 2 then --Never go invisible, never set DefaultTransparency
 			fpVisible = true;
 			
+		elseif fpVisible == 3 then
+			fpVisible = characterProperties.IsSliding;
+
 		else
 			fpVisible = false;
 			
@@ -651,6 +654,8 @@ local function startSliding()
 		SlideVars.WaistX = nil;
 		SlideVars.WaistXEquipped = nil;
 	end
+	
+	updateCharacterTransparency();
 end
 
 -- MARK: startDashing
@@ -1118,6 +1123,8 @@ function stopSliding(delayTime)
 	if modData:IsMobile() then
 		characterProperties.CrouchKeyDown = false;
 	end
+
+	updateCharacterTransparency();
 end
 
 function CameraShakeAndZoom(shakeStrength, zoomStrength, duration, smoothing, disallowOverride)
@@ -1608,7 +1615,8 @@ local function renderStepped(camera, deltaTime)
 				cameraCFrame = cameraCFrame * CFrame.new(0, 2.4+0.6-prevCamHipHeight, 0)
 			end
 
-			cameraCFrame = cameraCFrame * CFrame.Angles((mouseProperties.Y + mouseProperties.YAngOffset)-(characterProperties.Joints.WaistX*0.01), 0, 0) --Pitch
+			local camPitchRad = (mouseProperties.Y + mouseProperties.YAngOffset)-(characterProperties.Joints.WaistX*0.01);
+			cameraCFrame = cameraCFrame * CFrame.Angles(math.clamp(camPitchRad, characterProperties.IsSliding and -0.88 or -halfPi, halfPi), 0, 0) --Pitch
 
 			if characterProperties.IsRagdoll and not characterProperties.CanAction then
 				cameraCFrame = cameraCFrame * head.CFrame.Rotation;
@@ -2184,7 +2192,7 @@ RunService.PreSimulation:Connect(function(step)
 
 		if characterProperties.AllowLerpBody then
 			pcall(function()
-				local neckTransform = head.Neck.Transform;
+				local neckTransform = CFrame.new() --head.Neck.Transform;
 				local waistTransform: CFrame = character.UpperTorso.Waist.Transform;
 
 				if characterProperties.IsSliding then
@@ -2217,7 +2225,7 @@ RunService.PreSimulation:Connect(function(step)
 
 	if characterProperties.AllowLerpBody then
 		local lerpS, lerpE = pcall(function()
-			local neckTransform = head.Neck.Transform;
+			local neckTransform = CFrame.new() --head.Neck.Transform;
 			local waistTransform = character.UpperTorso.Waist.Transform;
 			local _, wtY, _ = waistTransform:ToEulerAnglesXYZ();
 			vpWtY = wtY;
@@ -2283,9 +2291,9 @@ RunService.PreSimulation:Connect(function(step)
 				-- sliding
 				if characterProperties.IsEquipped then
 					waistC1.X = SlideVars.WaistXEquipped or deg60;
-					if SlideVars.WaistXEquipped then
-						neckPitchOffset = -SlideVars.WaistXEquipped/2;
-					end
+					-- if SlideVars.WaistXEquipped then
+					-- 	neckPitchOffset = -SlideVars.WaistXEquipped;
+					-- end
 				else
 					waistC1.X = SlideVars.WaistX or deg60;
 				end
@@ -2330,17 +2338,21 @@ RunService.PreSimulation:Connect(function(step)
 					-- First Person & not ragdoll
 					prevdata.WaistC1 = prevdata.WaistC1:lerp(CFrame.new(originaldata.WaistC1.p) * waistC1Cf, 0.1);
 
-					local viewModelHeight = modMath.Lerp(prevViewModelHeight, characterProperties.IsSliding and 2.1 or characterProperties.IsCrouching and 1.1 or -0.4, 0.15);
+					local viewModelHeight = modMath.Lerp(
+						prevViewModelHeight, 
+						characterProperties.IsSliding and 2.1 or characterProperties.IsCrouching and 1.1 or -0.4, 
+						0.15
+					);
 					prevViewModelHeight = viewModelHeight;
 					
-					local waistToCamCFrame = (rootPart.CFrame * CFrame.new(0, -viewModelHeight, 0)):ToObjectSpace(
-						CFrame.new(character.LowerTorso.CFrame.p)* CFrame.new(originaldata.WaistC1.p) -- math.rad(rootPart.Orientation.Y)  * CFrame.Angles(0, wtY, 0) 
-					);
+					-- local waistToCamCFrame = (rootPart.CFrame * CFrame.new(0, -viewModelHeight, 0)):ToObjectSpace(
+					-- 	CFrame.new(character.LowerTorso.CFrame.p) * CFrame.new(originaldata.WaistC1.p)
+					-- );
 					if characterProperties.IsWounded then
-						character.UpperTorso.Waist.C1 = waistToCamCFrame;
+						character.UpperTorso.Waist.C1 = CFrame.new(-0, -0.905, 0.061);--waistToCamCFrame;
 						
 					else
-						character.UpperTorso.Waist.C1 = waistToCamCFrame;
+						character.UpperTorso.Waist.C1 = CFrame.new(-0, -0.905, 0.061);-- waistToCamCFrame;
 						character.UpperTorso.Waist.Transform = waistC0Cf;
 
 					end
