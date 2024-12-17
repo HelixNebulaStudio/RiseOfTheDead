@@ -1143,7 +1143,7 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 				if configurations.BulletMode == modAttributes.BulletModes.Hitscan then
 					shotData.TargetPoints = {};
 					shotData.Victims = {};
-					shotData.HitParts = {};
+					shotData.HitInfoList = {};
 					
 				elseif configurations.BulletMode == modAttributes.BulletModes.Projectile then
 					shotData.Projectiles = {};
@@ -1206,7 +1206,12 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 								TargetHumanoid=humanoid;
 								IsHeadshot=isHeadshot;
 							});
-							table.insert(shotData.HitParts, basePart);
+							table.insert(shotData.HitInfoList, {
+								Part=basePart;
+								Position=position;
+								Normal=normal;
+								Index=index;
+							});
 
 
 							if (humanoid and humanoid.Health > 0 or npcStatus) then

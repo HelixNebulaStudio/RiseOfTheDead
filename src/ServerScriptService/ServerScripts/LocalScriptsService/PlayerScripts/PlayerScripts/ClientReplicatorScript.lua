@@ -25,13 +25,13 @@ return function()
 	local modInstrumentModule = require(game.ReplicatedStorage.Library.InstrumentModule);
 	
 	--== Script;
-	local function replicatePrimaryFire(weaponItemId, weapon, data, skipAudio)
+	local function replicatePrimaryFireOld(weaponItemId, weapon, data, skipAudio)
 		if weapon == nil then return end;
 		local handle = weapon:FindFirstChild("Handle");
 		if handle == nil or not handle:IsDescendantOf(workspace) then return end;
-		local weaponData = modWeaponsLibrary[weaponItemId] or modWeaponsLibrary["p250"];
+		local weaponLib = modWeaponsLibrary[weaponItemId] or modWeaponsLibrary["p250"];
 		
-		local weaponModule = weaponData.NewToolLib();
+		local weaponModule = weaponLib.NewToolLib();
 		
 		local weaponConfigurations = weaponModule.Configurations;
 		local audio = weaponModule.Audio;
@@ -79,6 +79,7 @@ return function()
 				if muzzleOrigin and weaponConfigurations.GenerateMuzzle ~= false then
 					modWeaponMechanics.CreateMuzzle(muzzleOrigin, bulletOrigin, data.TargetPoints and #data.TargetPoints or 1);
 				end;
+
 			elseif weaponConfigurations.BulletMode == modAttributes.BulletModes.Projectile then
 				local _projectile = data;
 				if audio.PrimaryFire.Looped then
@@ -89,16 +90,127 @@ return function()
 					end
 				end
 				
-				
 			end
 		end
 	end
+
+	local function replicateWeaponShot(shotPacket)
+		local itemId = shotPacket.ItemId;
+		local toolModel = shotPacket.ToolModel;
+		local targetPoints = shotPacket.TargetPoints;
+		local shotOrigin = shotPacket.ShotOrigin;
+
+		local isRicochet = shotPacket.IsRicochet;
+
+		local weaponLib = modWeaponsLibrary[itemId] or modWeaponsLibrary["p250"];
+		
+		local weaponModule = weaponLib.NewToolLib();
+		
+		local configurations = weaponModule.Configurations;
+		local audio = weaponModule.Audio;
+
+		if configurations == nil then return end;
+		
+		local originAtt = nil;
+
+		local handle = toolModel and toolModel:FindFirstChild("Handle");
+		if isRicochet and shotOrigin then
+			originAtt = Debugger:Point(shotOrigin);
+			originAtt.Name = "Temp";
+
+		elseif toolModel then
+			if handle == nil or not handle:IsDescendantOf(workspace) then return end;
+			originAtt = handle:FindFirstChild("BulletOrigin");
+
+		elseif shotOrigin then
+			originAtt = Debugger:Point(shotOrigin);
+			originAtt.Name = "Temp";
+		end
+
+		if configurations.BulletMode == modAttributes.BulletModes.Hitscan then
+			if audio.PrimaryFire.Looped then
+					
+			else
+				if isRicochet and originAtt then
+					modAudio.Play(`Ricochet{math.random(1, 4)}`, originAtt, nil, math.random(90, 110)/100);
+
+				elseif handle then
+					modAudio.Play(audio.PrimaryFire.Id, handle);
+
+				end
+
+				if originAtt then
+					local raycastParams = RaycastParams.new();
+					raycastParams.FilterType = Enum.RaycastFilterType.Include
+					raycastParams.IgnoreWater = true
+					raycastParams.CollisionGroup = "Raycast";
+					raycastParams.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain};
+					
+					for a=1, #targetPoints do
+						local targetPos = targetPoints[a];
+						local targetDir = (targetPos-originAtt.WorldPosition).Unit;
+
+						if configurations.GenerateTracers ~= false then
+							modWeaponMechanics.CreateTracer(originAtt, targetPos, camera);
+						end;
+						if configurations.GeneratesBulletHoles then
+							local originP = targetPos-(targetDir*0.1);
+							local raycastResult = workspace:Raycast(originP, targetDir, raycastParams);
+							
+							local rayBasePart, rayPoint, rayNormal, _rayMaterial;
+							if raycastResult then
+								rayBasePart = raycastResult.Instance;
+								rayPoint = raycastResult.Position;
+								rayNormal = raycastResult.Normal;
+								_rayMaterial = raycastResult.Material;
+								
+								if isRicochet then
+									modWeaponMechanics.ImpactSound{
+										BasePart = rayBasePart;
+										Point = rayPoint;
+										Normal = rayNormal;
+									};
+
+								else
+									modWeaponMechanics.CreateBulletHole(rayBasePart, rayPoint, rayNormal);
+
+								end
+							end
+						end; 
+					end
+
+					if originAtt.Name == "Temp" then
+						game.Debris:AddItem(originAtt, 1);
+					end
+				end
+				if configurations.GenerateMuzzle ~= false then
+					local muzzleOrigin = toolModel:FindFirstChild("MuzzleOrigin", true);
+					if muzzleOrigin then
+						modWeaponMechanics.CreateMuzzle(muzzleOrigin, originAtt, #targetPoints);
+					end
+				end;
+
+			end
+
+		elseif configurations.BulletMode == modAttributes.BulletModes.Projectile then
+
+		end
+
+	end
 	
-	remotePrimaryFire.OnClientEvent:Connect(function(weaponItemId, weapon, data, skipAudio)
-		if type(data) == "table" and data.ClassName ~= "Projectile" then
-			replicatePrimaryFire(weaponItemId, weapon, {TargetPoints=data}, skipAudio);
-		else
-			replicatePrimaryFire(weaponItemId, weapon, data, skipAudio);
+	remotePrimaryFire.OnClientEvent:Connect(function(action, ...)
+		if action == "oldshot" then
+			local weaponItemId, weapon, data, skipAudio = ...;
+
+			if type(data) == "table" and data.ClassName ~= "Projectile" then
+				replicatePrimaryFireOld(weaponItemId, weapon, {TargetPoints=data}, skipAudio);
+			else
+				replicatePrimaryFireOld(weaponItemId, weapon, data, skipAudio);
+			end
+
+		elseif action == "fire" then
+			local shotPacket = ...;
+			replicateWeaponShot(shotPacket);
 		end
 	end)
 	

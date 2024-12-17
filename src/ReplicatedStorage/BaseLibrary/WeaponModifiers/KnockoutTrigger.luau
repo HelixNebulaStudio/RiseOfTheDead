@@ -10,9 +10,9 @@ if RunService:IsServer() then
 	function itemModifier:OnBulletHit(packet)
         local toolModule = self.WeaponModule;
 		local player = packet.Player;
-        local targetPart = packet.TargetPart;
+        local hitInfo = packet.HitInfo;
 
-        Debugger:StudioLog("OnBulletHit", self.Disabled, player, targetPart, toolModule ~= nil);
+        Debugger:StudioLog("KnockoutTrigger OnBulletHit", self.Disabled, player, hitInfo, toolModule ~= nil);
 
 	end
 

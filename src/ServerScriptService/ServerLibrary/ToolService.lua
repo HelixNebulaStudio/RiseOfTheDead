@@ -58,7 +58,10 @@ function ToolService.PrimaryFireWeapon(firePacket)
 		ReplicateToShotOwner = firePacket.ReplicateToShotOwner;
 		FocusCharge = firePacket.FocusCharge;
 
+		ShotOrigin = firePacket.ShotOrigin;
+
 		IsPat = firePacket.IsPat;
+		IsRicochet = firePacket.IsRicochet;
 	};
 	
 	
@@ -109,21 +112,22 @@ function ToolService.PrimaryFireWeapon(firePacket)
 		
 		properties.Ammo = properties.Ammo - (configurations.InfiniteAmmo == 2 and 0 or ammoCost);
 		
-		if audio.PrimaryFire.Looped then
-			if toolModule.Cache.AudioPrimaryFire == nil or not workspace:IsAncestorOf(toolModule.Cache.AudioPrimaryFire) then
-				local primaryFireSound = modAudio.Play(audio.PrimaryFire.Id, toolHandle);
-				primaryFireSound.Name = "PrimaryFireSound";
-				primaryFireSound.Looped = true;
-				primaryFireSound.Volume = 2;
-				toolModule.Cache.AudioPrimaryFire = primaryFireSound;
+		if firePacket.IsRicochet ~= true then
+			if audio.PrimaryFire.Looped then
+				if toolModule.Cache.AudioPrimaryFire == nil or not workspace:IsAncestorOf(toolModule.Cache.AudioPrimaryFire) then
+					local primaryFireSound = modAudio.Play(audio.PrimaryFire.Id, toolHandle);
+					primaryFireSound.Name = "PrimaryFireSound";
+					primaryFireSound.Looped = true;
+					primaryFireSound.Volume = 2;
+					toolModule.Cache.AudioPrimaryFire = primaryFireSound;
+				end
+				
+			else
+				local primaryFireSound = modAudio.Play(audio.PrimaryFire.Id, toolHandle, false);
+				if configurations.PrimaryFireAudio ~= nil then configurations.PrimaryFireAudio(primaryFireSound, 1); end
+				
 			end
-			
-		else
-			local primaryFireSound = modAudio.Play(audio.PrimaryFire.Id, toolHandle, false);
-			if configurations.PrimaryFireAudio ~= nil then configurations.PrimaryFireAudio(primaryFireSound, 1); end
-			
 		end
-		
 		
 		local multishot = type(properties.Multishot) == "table" and math.random(properties.Multishot.Min, properties.Multishot.Max) or properties.Multishot;
 
@@ -131,8 +135,8 @@ function ToolService.PrimaryFireWeapon(firePacket)
 			multishot = ammoCost;
 		end
 		
-		shotPacket.ShotOrigin = toolHandle:FindFirstChild("BulletOrigin");
-		assert(shotPacket.ShotOrigin, `Missing bullet origin: {toolHandle:GetFullName()}`);
+		-- shotPacket.ShotOrigin = toolHandle:FindFirstChild("BulletOrigin");
+		-- assert(shotPacket.ShotOrigin, `Missing bullet origin: {toolHandle:GetFullName()}`);
 
 		if configurations.BulletMode == modAttributes.BulletModes.Hitscan then
 			shotPacket.TargetPoints = {};
@@ -289,12 +293,15 @@ function ToolService.ProcessWeaponShot(shotPacket)
 	shotPacket.ToolModule = shotPacket.ToolModule;
 	shotPacket.Player = shotPacket.Player;
 	-- BulletMode: Hitscan
+	shotPacket.ShotOrigin = shotPacket.ShotOrigin;
+
 	shotPacket.Victims = shotPacket.Victims;
 	shotPacket.TargetPoints = shotPacket.TargetPoints;
 	-- BulletMode: Projectile
 	shotPacket.Projectiles = shotPacket.Projectiles;
 	shotPacket.FocusCharge = shotPacket.FocusCharge;
 	--
+	shotPacket.IsRicochet = shotPacket.IsRicochet;
 	
 	local storageItem = shotPacket.StorageItem;
 	local toolModel: Model = shotPacket.ToolModel;
@@ -549,20 +556,31 @@ function ToolService.ProcessWeaponShot(shotPacket)
 		
 		
 		local players = game.Players:GetPlayers();
+		local weaponShotPacket = {
+			ItemId=itemId;
+			ToolModel=toolModel;
+			TargetPoints=targetPoints;
+			
+			ShotOrigin=shotPacket.ShotOrigin;
+			IsRicochet=shotPacket.IsRicochet;
+		};
+
 		for a=1, #players do
 			if modConfigurations.PvpMode then
 				if players[a] == shotPacket.Player and shotPacket.ReplicateToShotOwner ~= true then
 					continue;
 				end
 				
-				remotePrimaryFire:FireClient(players[a], itemId, toolModel, shotPacket.TargetPoints);
+				--, "oldshot", itemId, toolModel, shotPacket.TargetPoints
+				remotePrimaryFire:FireClient(players[a], "fire", weaponShotPacket);
 
 			else
 				local pCharacter = players[a].Character;
 				local pRootPart = pCharacter ~= nil and pCharacter:FindFirstChild("HumanoidRootPart") or nil;
 
 				if playersShot[players[a].Name] then
-					remotePrimaryFire:FireClient(players[a], itemId, toolModel, targetPoints);
+					-- , "oldshot", itemId, toolModel, targetPoints
+					remotePrimaryFire:FireClient(players[a], "fire", weaponShotPacket);
 
 				elseif pRootPart then
 					
@@ -571,7 +589,9 @@ function ToolService.ProcessWeaponShot(shotPacket)
 					end
 					
 					if pRootPart and (pRootPart.Position-toolHandle.Position).Magnitude < 64 then
-						remotePrimaryFire:FireClient(players[a], itemId, toolModel, targetPoints);
+
+						-- "oldshot", itemId, toolModel, targetPoints
+						remotePrimaryFire:FireClient(players[a], "fire", weaponShotPacket);
 					end
 
 				end

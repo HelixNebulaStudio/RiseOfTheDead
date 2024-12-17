@@ -395,6 +395,7 @@ function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 			if canPenetrate then
 				newOrigin = newOrigin + direction*0.1;
 				distance = distance -0.1;
+
 			else
 				penCount = penCount +1;
 
@@ -419,6 +420,7 @@ function WeaponsMechanics.CastHitscanRay(properties: HitscanRayProperties)
 			end
 			prevDist = distance;
 		end
+		
 	until distance <= 0 or penCount > maxPierce;
 
 	return newOrigin;
@@ -534,7 +536,7 @@ function WeaponsMechanics.ImpactSound(param)
 		
 		if param.HideMolten ~= true and limitParticles ~= true then
 			local molten = moltenEffect:Clone();
-			molten.Lifetime = NumberRange.new(math.random(15, 25)/10);
+			molten.Lifetime = NumberRange.new(math.random(20, 30)/10);
 			molten.Parent = newAtt;
 			molten:Emit(1);
 		end

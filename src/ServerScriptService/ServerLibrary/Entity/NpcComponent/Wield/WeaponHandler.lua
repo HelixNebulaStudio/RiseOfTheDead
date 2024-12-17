@@ -733,7 +733,7 @@ function Handler:ReplicateFire(shotData)
 				if audio.PrimaryFire.Looped ~= true then
 					modAudio.Play(audio.PrimaryFire.Id, rootPart);
 				end
-				remotePrimaryFire:FireAllClients(self.Wield.ToolModule.Library.Name, self.Wield.Instances.RightModel, targetPoints, true);
+				remotePrimaryFire:FireAllClients("oldshot", self.Wield.ToolModule.Library.Name, self.Wield.Instances.RightModel, targetPoints, true);
 				
 				
 			elseif self.Wield.ToolModule.Configurations.BulletMode == modAttributes.BulletModes.Projectile then

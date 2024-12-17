@@ -23,7 +23,7 @@ local modConfigurations = require(game.ReplicatedStorage.Library.Configurations)
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 
 --== Remotes;
-local remotePrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
+local remoteToolHandlerPrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
 
 --== Vars;
 local mouseProperties = modCharacter.MouseProperties;
@@ -186,14 +186,14 @@ function ToolHandler:Equip(storageItem, toolModels)
 			
 			if startTick == nil then
 				startTick = tick();
-				remotePrimaryFire:FireServer(storageItem.ID, 1);
+				remoteToolHandlerPrimaryFire:FireServer(storageItem.ID, 1);
 			else
 				local progress = (tick()-startTick)/configurations.BuildDuration;
 				updateProgressionBar(progress);
 				if progress >= 1 then
 					mouseProperties.Mouse1Down = false;
 					reset();
-					remotePrimaryFire:FireServer(storageItem.ID, 2);
+					remoteToolHandlerPrimaryFire:FireServer(storageItem.ID, 2);
 					
 					storageItem = modData.GetItemById(storageItem.ID);
 					if storageItem == nil or storageItem.Quantity <= 1 then

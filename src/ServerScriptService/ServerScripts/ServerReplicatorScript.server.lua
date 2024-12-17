@@ -621,7 +621,7 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 	if configurations.BulletMode == modAttributes.BulletModes.Hitscan then
 		local playersShot = {};
 		local victims, targetPoints = (shotdata.Victims or {}), {};
-		local hitParts = (shotdata.HitParts or {});
+		local hitInfoList = (shotdata.HitInfoList or {});
 				
 		local targetsPierceable = (properties.Piercing or 0);
 		local maxVictims = math.clamp(
@@ -635,12 +635,20 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 			end
 		end
 
-		for a=1, #hitParts do
-			local targetPart = hitParts[a];
+		for a=1, #hitInfoList do
+			local hitInfo = hitInfoList[a];
+
 			--MARK: OnBulletHit
 			ProcessItemModifiers("OnBulletHit", {
 				Player=client;
-				TargetPart = targetPart;
+				HitInfo=hitInfo;
+				WeaponModel=weaponModel;
+
+				Index=a;
+				EndIndex=#hitInfoList;
+				
+				ShotDirection=shotdata.Direction;
+				FocusCharge=(shotdata.FocusCharge and math.clamp(shotdata.FocusCharge, 0, 1) or nil);
 			});
 		end
 
@@ -835,7 +843,7 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 		for a=1, #players do
 			if modConfigurations.PvpMode then
 				if players[a] ~= client then
-					remotePrimaryFire:FireClient(players[a], itemId, weaponModel, shotdata.TargetPoints);
+					remotePrimaryFire:FireClient(players[a], "oldshot", itemId, weaponModel, shotdata.TargetPoints);
 				end
 				
 			else
@@ -844,11 +852,11 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 				local cRootPart = clientHumanoid.RootPart;
 				
 				if playersShot[players[a].Name] then
-					remotePrimaryFire:FireClient(players[a], itemId, weaponModel, targetPoints);
+					remotePrimaryFire:FireClient(players[a], "oldshot", itemId, weaponModel, targetPoints);
 					
 				elseif pRootPart and cRootPart then
 					if players[a] ~= client and pRootPart and client:DistanceFromCharacter(pRootPart.CFrame.p) < 64 then
-						remotePrimaryFire:FireClient(players[a], itemId, weaponModel, targetPoints);
+						remotePrimaryFire:FireClient(players[a], "oldshot", itemId, weaponModel, targetPoints);
 					end
 					
 				end

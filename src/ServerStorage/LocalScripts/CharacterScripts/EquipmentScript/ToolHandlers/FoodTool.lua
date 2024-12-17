@@ -22,7 +22,7 @@ local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager)
 
 --== Remotes;
 local remotes = game.ReplicatedStorage.Remotes;
-local remotePrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
+local remoteToolHandlerPrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
 
 --== Vars;
 local mouseProperties = modCharacter.MouseProperties;
@@ -126,7 +126,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 			if startHealingTick == nil then
 				updateProgressionBar();
 				startHealingTick = tick();
-				remotePrimaryFire:FireServer(storageItem.ID, 1);
+				remoteToolHandlerPrimaryFire:FireServer(storageItem.ID, 1);
 				
 			else
 				local progress = (tick()-startHealingTick)/configurations.UseDuration;
@@ -137,7 +137,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 					if storageItem.MockItem ~= true then
 						storageItem = modData.GetItemById(storageItem.ID);
 					end
-					remotePrimaryFire:FireServer(storageItem.ID, 2);
+					remoteToolHandlerPrimaryFire:FireServer(storageItem.ID, 2);
 				end
 				
 			end
