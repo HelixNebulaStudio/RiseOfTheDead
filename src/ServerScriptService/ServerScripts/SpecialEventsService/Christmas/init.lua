@@ -210,6 +210,7 @@ shared.modProfile.OnProfileLoad:Connect(function(player, profile)
 		-- Minesweeper;
 		flagData.MinesweeperStage = flagData.MinesweeperStage or 0;
 		flagData.MinesweeperState = flagData.MinesweeperState or 0;
+		flagData.MinesweeperSave = flagData.MinesweeperSave or {};
 
 		flagData.GetActiveMinesweeperObject = function()
 			return mineSweeper;
@@ -348,6 +349,10 @@ function remoteFrostivus.OnServerInvoke(player, action, packet)
 
 		if msObj.SessionState == 0 then
 			msObj:Start(frostivusData.MinesweeperStage, {UncoverEmpty=true;});
+			for a=1, #frostivusData.MinesweeperSave do
+				local vec = frostivusData.MinesweeperSave[a];
+				msObj:Uncover(vec[1], vec[2]);
+			end
 		end
 
 		frostivusData.MinesweeperState = msObj.SessionState;
@@ -390,6 +395,7 @@ function remoteFrostivus.OnServerInvoke(player, action, packet)
 			end
 		end
 
+		table.insert(frostivusData.MinesweeperSave, {inputX;inputY});
 		local uncoveredMine = msObj:Uncover(inputX, inputY);
 		if uncoveredMine then
 			if msObj.MinesFound >= 4 then
@@ -397,6 +403,8 @@ function remoteFrostivus.OnServerInvoke(player, action, packet)
 				
 				battlePassSave:AddLevel(activeId, 1);
 				shared.Notify(player, `You have earned an Frostivus event pass level from Master Gifts!`, `Reward`);
+
+				table.clear(frostivusData.MinesweeperSave);
 			end
 		end
 
