@@ -212,7 +212,7 @@ function HackingPanel:Render(gameStateUpdate)
 		local button: TextButton = scrollFrame:FindFirstChild(a);
 		if button == nil then
 			button = templateButton:Clone();
-			button.Name = a;
+			button.Name = tostring(a);
 			
 			button.TextSize = self.Rows > 4 and 45 or 52
 			

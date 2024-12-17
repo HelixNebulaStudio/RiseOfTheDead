@@ -532,7 +532,7 @@ function BattlePassLibrary:Init(library)
 			});
 
 			leaf(20, {
-				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+				Reward={ItemId="gold"; Quantity=50; PassOwner=true;};
 			});
 			leaf(23, {
 				Reward={ItemId="brownbeltxmasorange";};
@@ -552,7 +552,7 @@ function BattlePassLibrary:Init(library)
 			});
 
 			leaf(40, {
-				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+				Reward={ItemId="gold"; Quantity=50; PassOwner=true;};
 			});
 			leaf(43, {
 				Reward={ItemId="xmaspresent2024";};
@@ -572,7 +572,7 @@ function BattlePassLibrary:Init(library)
 			});
 
 			leaf(60, {
-				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+				Reward={ItemId="gold"; Quantity=50; PassOwner=true;};
 			});
 			leaf(63, {
 				Reward={ItemId="fedoraxmasred";};
@@ -592,7 +592,7 @@ function BattlePassLibrary:Init(library)
 			});
 
 			leaf(80, {
-				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+				Reward={ItemId="gold"; Quantity=50; PassOwner=true;};
 			});
 			leaf(83, {
 				Reward={ItemId="snowsledge"; PassOwner=true;};
@@ -601,7 +601,19 @@ function BattlePassLibrary:Init(library)
 				Reward={ItemId="gingerbreadman";};
 			});
 
+			leaf(90, {
+				Reward={ItemId="gold"; Quantity=50; RequiresPremium=true;};
+			});
+			leaf(93, {
+				Reward={ItemId="tacticalbowneondeath"; PassOwner=true;};
+			});
+			leaf(97, {
+				Reward={ItemId="eggnog";};
+			});
 
+			leaf(100, {
+				Reward={ItemId="gold"; Quantity=50; PassOwner=true;};
+			});
 			
 		};
 	};

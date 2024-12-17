@@ -265,8 +265,8 @@ function RewardsLibrary:Init(super)
 			{Index=1; ItemId="p250toygun"; Quantity=1; Chance=1;};
 			{Index=1; ItemId="arelshiftcrossgingerbread"; Quantity=1; Chance=1;};
 			{Index=1; ItemId="grandgarandornaments"; Quantity=1; Chance=1;};
-			{Index=1; ItemId="portableautoturretcryogenics"; Quantity=1; Chance=1;};
-			{Index=1; ItemId="tacticalbowneondeath"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="portableautoturretblue"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="snowsledgexmasgreen"; Quantity=1; Chance=1;};
 		};
 		SpecialEvent="Christmas";
 	};

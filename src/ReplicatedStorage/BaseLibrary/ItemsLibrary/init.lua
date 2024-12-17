@@ -847,6 +847,9 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="portableautoturretblue"; Icon="rbxassetid://113924290223669"; SkinPerm="Blue"; TargetItemId="portableautoturret";});
 	new(skinPermBase, {Id="portableautoturretcryogenics"; Icon="rbxassetid://117404049971970"; SkinPerm="Cryogenics"; TargetItemId="portableautoturret";});
 
+	-- snowsledge
+	new(skinPermBase, {Id="snowsledgexmasgreen"; Icon="rbxassetid://111472550573392"; SkinPerm="Xmas Green"; TargetItemId="snowsledge";});
+
 	--==========================================================[[ SUMMONS ]]==========================================================--
 	local summonsBase = {
 		Type = super.Types.Tool;

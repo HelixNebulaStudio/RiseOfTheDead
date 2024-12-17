@@ -1208,7 +1208,7 @@ function ItemUnlockablesLibrary:Init(library)
 		};
 		SurfaceAppearanceParent=script;
 	};
-	
+
 	--== MARK: brownbelt
 	library:Add{
 		Id="brownbelt";
@@ -1313,6 +1313,31 @@ function ItemUnlockablesLibrary:Init(library)
 
 		SurfaceAppearance={
 			ColorMap="rbxassetid://86867273602934";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	--== MARK: snowsledge
+	library:Add{
+		Id="snowsledge";
+		ItemId="snowsledge";
+		Name="Default";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://123967756810685";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="snowsledgexmasgreen";
+		ItemId="snowsledge";
+		Name="Xmas";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://119355925160865";
 		};
 		SurfaceAppearanceParent=script;
 	};

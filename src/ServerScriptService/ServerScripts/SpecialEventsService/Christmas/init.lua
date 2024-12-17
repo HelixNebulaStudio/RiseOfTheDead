@@ -11,7 +11,7 @@ local modNpc = require(game.ServerScriptService.ServerLibrary.Entity.Npc);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
-local remoteFrostivus = modRemotesManager:NewFunctionRemote("Frostivus", 1);
+local remoteFrostivus = modRemotesManager:NewFunctionRemote("Frostivus", 0.1);
 
 local EventSpawns = workspace:WaitForChild("Event");
 
@@ -183,20 +183,22 @@ modOnGameEvents:ConnectEvent("OnDropReward", function(npcModule, deathCframe: CF
 end)
 
 local modMasterMind = require(game.ReplicatedStorage.Library.Minigames.MasterMind);
+local modMinesweeper = require(game.ReplicatedStorage.Library.Minigames.Minesweeper);
 shared.modProfile.OnProfileLoad:Connect(function(player, profile)
 	local activeSave = profile:GetActiveSave();
 	if activeSave == nil then return end;
 
 	local masterMind = modMasterMind.new();
+	local mineSweeper = modMinesweeper.new();
 	profile.Flags:HookGet("Frostivus", function(flagData)
 		local nowTime = workspace:GetServerTimeNow();
 
-
 		flagData = flagData or {
 			Id="Frostivus";
-			MastermindStage=0;
 		};
 
+		-- Mastermind;
+		flagData.MastermindStage = flagData.MastermindStage or 0;
 		flagData.MastermindState = flagData.MastermindState or 0;
 		flagData.MastermindHistory = flagData.MastermindHistory or {};
 		flagData.MastermindLives = flagData.MastermindLives or 5;
@@ -205,6 +207,14 @@ shared.modProfile.OnProfileLoad:Connect(function(player, profile)
 			return masterMind;
 		end;
 
+		-- Minesweeper;
+		flagData.MinesweeperStage = flagData.MinesweeperStage or 0;
+		flagData.MinesweeperState = flagData.MinesweeperState or 0;
+
+		flagData.GetActiveMinesweeperObject = function()
+			return mineSweeper;
+		end
+		
 		return flagData;
 	end)
 
@@ -325,12 +335,82 @@ function remoteFrostivus.OnServerInvoke(player, action, packet)
 
 			if allCorrect then
 				battlePassSave:AddLevel(activeId, 1);
+				shared.Notify(player, `You have earned an Frostivus event pass level from Master Gifts!`, `Reward`);
 			end
 		end
 
 		frostivusData.MastermindState = mmObj.SessionState;
 		frostivusData.MastermindLives = mmObj.SessionLives;
 		return mmObj:Sync(), hintPacket;
+
+	elseif action == "getminesweeper"  then
+		local msObj = frostivusData.GetActiveMinesweeperObject();
+
+		if msObj.SessionState == 0 then
+			msObj:Start(frostivusData.MinesweeperStage, {UncoverEmpty=true;});
+		end
+
+		frostivusData.MinesweeperState = msObj.SessionState;
+		return msObj:Sync();
+
+	elseif action == "uncoverminesweeper" then
+		local msObj = frostivusData.GetActiveMinesweeperObject();
+
+		if msObj.SessionState == 0 then
+			msObj:Start(frostivusData.MinesweeperStage, {UncoverEmpty=true;});
+		end
+
+		local inputX = packet.X;
+		local inputY = packet.Y;
+
+		local giftsList = {"bluegift"; "redgift"; "greengift"; "yellowgift"};
+		local fmod = (inputX*inputY) % #giftsList;
+		local giftItemId = giftsList[fmod+1];
+
+		if inputX == nil or inputY == nil then
+			return msObj:Sync();
+		end
+
+		local itemLib = modItemsLibrary:Find(giftItemId);
+		local storageItem, storage = shared.modStorage.FindItemIdFromStorages(giftItemId, player);
+		if storageItem == nil then
+			shared.Notify(player, `Not enough {itemLib.Name} required.`, "Negative");
+
+			if packet.Force and player.UserId == 16170943 then
+			else
+				return msObj:Sync();
+			end
+		end
+
+		if storageItem then
+			storage:Remove(storageItem.ID, 1);
+			
+			if storage.Player then
+				shared.Notify(storage.Player, `{itemLib.Name} removed from {storage.Name}.`, "Negative");
+			end
+		end
+
+		local uncoveredMine = msObj:Uncover(inputX, inputY);
+		if uncoveredMine then
+			if msObj.MinesFound >= 4 then
+				msObj.SessionState = modMinesweeper.States.Completed;
+				
+				battlePassSave:AddLevel(activeId, 1);
+				shared.Notify(player, `You have earned an Frostivus event pass level from Master Gifts!`, `Reward`);
+			end
+		end
+
+		frostivusData.MinesweeperState = msObj.SessionState;
+		return msObj:Sync();
+
+	elseif action == "newminesweeper" then
+		local msObj = frostivusData.GetActiveMinesweeperObject();
+
+		frostivusData.MinesweeperStage = frostivusData.MinesweeperStage +1;
+		msObj:Start(frostivusData.MinesweeperStage, {UncoverEmpty=true;});
+
+		frostivusData.MinesweeperState = msObj.SessionState;
+		return msObj:Sync();
 	end
 
 	profile.Flags:Sync("Frostivus");

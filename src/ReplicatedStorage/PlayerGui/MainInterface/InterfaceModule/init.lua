@@ -730,6 +730,9 @@ function Interface:PromptDialogBox(params)
 		if optionButtonInfo.Color then
 			newButton.BackgroundColor3 = optionButtonInfo.Color;
 		end
+		if optionButtonInfo.TextStrokeTransparency then
+			newButton.TextStrokeTransparency = optionButtonInfo.TextStrokeTransparency;
+		end
 
 		local debouceTick = tick();
 		newButton.MouseButton1Click:Connect(function()
