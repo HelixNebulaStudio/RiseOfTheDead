@@ -110,9 +110,9 @@ function ToolService.PrimaryFireWeapon(firePacket)
 			ammoCost = infType == 2 and 3 or math.min(properties.Ammo, 3);
 		end
 		
-		properties.Ammo = properties.Ammo - (configurations.InfiniteAmmo == 2 and 0 or ammoCost);
-		
 		if firePacket.IsRicochet ~= true then
+			properties.Ammo = properties.Ammo - (configurations.InfiniteAmmo == 2 and 0 or ammoCost);
+			
 			if audio.PrimaryFire.Looped then
 				if toolModule.Cache.AudioPrimaryFire == nil or not workspace:IsAncestorOf(toolModule.Cache.AudioPrimaryFire) then
 					local primaryFireSound = modAudio.Play(audio.PrimaryFire.Id, toolHandle);
