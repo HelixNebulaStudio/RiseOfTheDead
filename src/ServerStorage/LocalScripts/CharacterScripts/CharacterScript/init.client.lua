@@ -1100,16 +1100,23 @@ function stopSliding(delayTime)
 	slideCooldown = tick();
 
 	task.spawn(function()
-		-- for a=0, (delayTime or 0), 1/15 do
-		-- 	local slopeDot = slideDirection:Dot(characterProperties.GroundNormal);
+		local simDelta = 1/15;
+		local timePool = delayTime or 0;
 
-		-- 	if slopeDot <= 0.1 then
-		-- 		oldSlideMomentum = oldSlideMomentum - math.max(math.abs(slopeDot), 0.3) *(slopeUpFriction*4);
-		-- 	end
-		-- 	bodyVelocity.Velocity = slideDirection*math.max(oldSlideMomentum, 0);
+		while timePool > 0 do
+			local stepT = task.wait(simDelta);
 
-		-- 	task.wait(1/15);
-		-- end
+			local slopeDot = slideDirection:Dot(characterProperties.GroundNormal);
+
+			if slopeDot < 0.15 and slopeDot ~= 0 then
+				-- <0: slide up;
+				local slopeUpFriction = SlideVars.UpFriction or SlideVars.DefaultUpFriction;
+				oldSlideMomentum = oldSlideMomentum -math.abs(slopeDot) *slopeUpFriction * simDelta;
+			end
+			bodyVelocity.Velocity = slideDirection*math.max(oldSlideMomentum, 0);
+
+			timePool = timePool - math.max(stepT, simDelta);
+		end
 		
 		bodyVelocity.MaxForce = Vector3.new(0, 0, 0);
 		characterProperties.SlideVelocity = Vector3.zero;
