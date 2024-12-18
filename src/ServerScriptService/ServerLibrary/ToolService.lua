@@ -93,7 +93,7 @@ function ToolService.PrimaryFireWeapon(firePacket)
 	local ammo = storageItem:GetValues("A") or configurations.AmmoLimit;
 	local maxAmmo = storageItem:GetValues("MA") or configurations.MaxAmmoLimit;
 
-	if ammo <= 0 then 
+	if shotPacket.IsRicochet ~= true and ammo <= 0 then 
 		modAudio.Play(audio.Empty.Id, toolHandle);
 		return; 
 	end
@@ -340,7 +340,7 @@ function ToolService.ProcessWeaponShot(shotPacket)
 	local ammo = storageItem:GetValues("A") or configurations.AmmoLimit;
 	local maxAmmo = storageItem:GetValues("MA") or configurations.MaxAmmoLimit;
 
-	if ammo <= 0 then return; end
+	if shotPacket.IsRicochet ~= true and ammo <= 0 then return; end
 	ammo = math.min(ammo, configurations.AmmoLimit);
 
 	local ammoCost = math.min(configurations.AmmoCost or 1, ammo);
@@ -352,10 +352,12 @@ function ToolService.ProcessWeaponShot(shotPacket)
 		ammoCost = 0;
 	end
 	
-	ammo = ammo -ammoCost;
-	storageItem:SetValues("A", ammo);
-	
+	if shotPacket.IsRicochet ~= true then
+		ammo = ammo -ammoCost;
+		storageItem:SetValues("A", ammo);
 
+	end
+	
 	local shotCache = {
 		WeaponId = storageItemID;
 		Ammo = ammo;
@@ -379,15 +381,11 @@ function ToolService.ProcessWeaponShot(shotPacket)
 
 	if configurations.BulletMode == modAttributes.BulletModes.Hitscan then
 		local playersShot = {};
-		local victims, targetPoints = (shotPacket.Victims or {}), {};
+		local victims = (shotPacket.Victims or {});
 
 		local targetsPierceable = (properties.Piercing or 0);
 		local maxVictims = math.clamp(#victims, 0, (type(properties.Multishot) == "table" and (properties.Multishot.Max + targetsPierceable) or properties.Multishot + targetsPierceable));
-		for a=1, maxVictims do
-			if shotPacket.TargetPoints and shotPacket.TargetPoints[a] then
-				table.insert(targetPoints, shotPacket.TargetPoints[a]);
-			end
-		end
+
 		for a=1, maxVictims do
 			local targetObject = victims[a].Object;
 			local targetIndex = victims[a].Index;
@@ -559,7 +557,7 @@ function ToolService.ProcessWeaponShot(shotPacket)
 		local weaponShotPacket = {
 			ItemId=itemId;
 			ToolModel=toolModel;
-			TargetPoints=targetPoints;
+			TargetPoints=shotPacket.TargetPoints;
 			
 			ShotOrigin=shotPacket.ShotOrigin;
 			IsRicochet=shotPacket.IsRicochet;
@@ -571,7 +569,6 @@ function ToolService.ProcessWeaponShot(shotPacket)
 					continue;
 				end
 				
-				--, "oldshot", itemId, toolModel, shotPacket.TargetPoints
 				remotePrimaryFire:FireClient(players[a], "fire", weaponShotPacket);
 
 			else
@@ -579,7 +576,6 @@ function ToolService.ProcessWeaponShot(shotPacket)
 				local pRootPart = pCharacter ~= nil and pCharacter:FindFirstChild("HumanoidRootPart") or nil;
 
 				if playersShot[players[a].Name] then
-					-- , "oldshot", itemId, toolModel, targetPoints
 					remotePrimaryFire:FireClient(players[a], "fire", weaponShotPacket);
 
 				elseif pRootPart then
@@ -589,8 +585,6 @@ function ToolService.ProcessWeaponShot(shotPacket)
 					end
 					
 					if pRootPart and (pRootPart.Position-toolHandle.Position).Magnitude < 64 then
-
-						-- "oldshot", itemId, toolModel, targetPoints
 						remotePrimaryFire:FireClient(players[a], "fire", weaponShotPacket);
 					end
 

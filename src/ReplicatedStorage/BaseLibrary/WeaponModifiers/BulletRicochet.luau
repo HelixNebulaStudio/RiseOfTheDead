@@ -75,7 +75,11 @@ if RunService:IsServer() then
             end
 
             if direction == nil then
-                direction = shotDirection - 2 * shotDirection:Dot(hitNormal) * hitNormal
+                direction = shotDirection - 2 * shotDirection:Dot(hitNormal) * hitNormal;
+
+                -- local ray = Ray.new(ricochetOrigin, direction*4);
+                -- local dbPoint = Debugger:Ray(ray);
+                -- dbPoint.Parent = workspace.Debris;
             end
 
             local firePacket = {

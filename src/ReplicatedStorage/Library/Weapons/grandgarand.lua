@@ -57,6 +57,19 @@ local Configurations={
 	
 	Penetration=WeaponProperties.PenetrationTable.Sniper;
 	KillImpulseForce=40;
+
+	OnEquip=function()
+		local modAudio = require(game.ReplicatedStorage.Library.Audio);
+		modAudio.Preload("GarandPing", 5);
+	end;
+
+	OnPrimaryFire=function(mainWeaponModel, modWeaponModule)
+		local properties = modWeaponModule.Properties;
+		if properties.Ammo <= 0 then
+			local modAudio = require(game.ReplicatedStorage.Library.Audio);
+			modAudio.Play("GarandPing", mainWeaponModel.PrimaryPart);
+		end
+	end;
 }
 
 local Properties={
@@ -100,6 +113,7 @@ local Audio={
 	PrimaryFire={Id=988205199; Pitch=1; Volume=1;};
 	Empty={Id=154255000; Pitch=1; Volume=0.5;};
 	--Reload={Id=142491708; Pitch=1.1; Volume=0.6;};
+
 }
 
 local toolPackage = {

@@ -199,6 +199,7 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="bunnymanhead"; Name="Bunny Man's Head"; Icon="rbxassetid://4845183167"; Tags={"Head"; "Easter"}; Description="Bunny Man's Headwear. Normal environmental Zombies will ignore you during the Easter event.\nEvent-Active: "..tostring(modConfigurations.SpecialEvent.Easter); Sources={"Obtained from <b>The Bunny Man in Mission: Bunny Man's Eggs</b>";};});
 	new(clothingBase, {Id="jackolantern"; Name="Jack o' Lantern"; Icon="rbxassetid://14951707178"; Tags={"Head"; "Slaughterfest";}; Description="Where Jack watches through the jacks o lanterns.";});
 	new(clothingBase, {Id="ninjashroud"; Name="Ninja Shroud"; Icon="rbxassetid://88409858365523"; Tags={"Head";}; Description="Comfortable cloth shroud.\n\n<b>[Passive] Ninja Fleet:</b> Sprint button is now a dash button. You automatically sprint when you haven't taken damage to your health for an amount of time. Your base move speed is reduced but sprint speed is increased.";});
+	new(clothingBase, {Id="knightshelmet"; Name="Knight's Helmet"; Icon="rbxassetid://134453328061975"; Tags={"Head"; "Unobtainable"}; Description="";});
 
 	-- Chest
 	new(clothingBase, {Id="greytshirt"; Name="T-Shirt"; Icon="rbxassetid://5756503297"; Tags={"Chest"}; Description="Comfy T-Shirt. Gives you 1 armor point for protection.";});
@@ -226,6 +227,7 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="brownleatherboots"; Name="Leather Boots"; Icon="rbxassetid://89716224000012"; Tags={"Shoes"}; Description="These look great on you.\n<b>[Passive] Bull Leaping:</b> Slide jumping adds 10 units/sec launch speed.";});
 	new(clothingBase, {Id="militaryboots"; Name="Military Boots"; Icon="rbxassetid://17022087037"; Tags={"Shoes"}; Description="Military grade boots.\n<b>[Passive] Firm Footing:</b> Reduces movement impairment debuffs by 20%.";});
 	new(clothingBase, {Id="divingfins"; Name="Diving Fins"; Icon="rbxassetid://10334749462"; Tags={"Shoes"; "Diving Gear"}; Description="Swim like a fish.\n<b>[Passive] Dolphin Stride:</b> Improves underwater mobility.";});
+	new(clothingBase, {Id="greavesandsabatons"; Name="Greaves and Sabatons"; Icon="rbxassetid://10334749462"; Tags={"Shoes"; "Unobtainable"}; Description="";});
 
 	-- Misc Wear
 	new(clothingBase, {Id="brownbelt"; Name="Tactical Belt"; Icon="rbxassetid://4789684750"; Tags={"Belt"; "Utility Wear";}; Description="A tactical belt. Adds an extra hot bar slot.";});

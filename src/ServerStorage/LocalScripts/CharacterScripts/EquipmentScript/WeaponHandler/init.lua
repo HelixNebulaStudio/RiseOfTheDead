@@ -2331,7 +2331,9 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 	
 	if configurations.DoCustomLoad then
 		local animId = configurations.DoCustomLoad(modWeaponModule, storageItem, objects);
-		selectedLoadAnim = loadedAnims[animId];
+		if animId then
+			selectedLoadAnim = loadedAnims[animId];
+		end
 	end
 	
 	if selectedLoadAnim then
@@ -2344,6 +2346,10 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 	
 	if audio.Load then
 		playWeaponSound(audio.Load.Id);
+	end
+
+	if configurations.OnEquip then
+		configurations.OnEquip();
 	end
 	
 	characterProperties.HideCrosshair = true;
