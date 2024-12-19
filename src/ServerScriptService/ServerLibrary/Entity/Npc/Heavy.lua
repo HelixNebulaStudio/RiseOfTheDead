@@ -43,7 +43,7 @@ return function(npc, spawnPoint)
 
 		self.Immunity = 0.8;
 
-		self.Move.SetDefaultWalkSpeed = 8+math.floor(level/20);
+		self.Move.SetDefaultWalkSpeed = math.clamp(8 + math.floor(level/20), 1, 30);
 		self.Move:Init();
 		--
 		
