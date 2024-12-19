@@ -640,6 +640,15 @@ function Survival:StartWave(wave)
 					local itemLib = modItemLibrary:Find(pickRewardId);
 					local dropStr = `A {itemLib.Name} has dropped!`;
 		
+					local spawnCFrame = workspace:FindFirstChildWhichIsA("SpawnLocation");
+					if spawnCFrame then
+						spawnCFrame = spawnCFrame.CFrame * CFrame.new(0, 2, 0);
+					end
+
+					local lootPrefab = modItemDrops.Spawn({Type="Custom"; ItemId=pickRewardId; Quantity=1;}, spawnCFrame, self.Players, false);
+					lootPrefab.PrimaryPart.Anchored = true;
+					self.LootPrefab = lootPrefab;
+
 					self:Hud{
 						Status=dropStr;
 					};

@@ -29,6 +29,9 @@ function LevelBadge:Update(iconInstance, level)
 	else
 		color = Color3.fromRGB(255, 255, 255);
 	end
+
+	local padding = iconInstance:WaitForChild("UIPadding") :: UIPadding;
+
 	if tier <= 1 then
 		local fmodLevel = math.fmod(level, 10);
 		if fmodLevel == 0 then
@@ -71,8 +74,15 @@ function LevelBadge:Update(iconInstance, level)
 	elseif tier == 5 then
 		iconInstance.Image = "rbxassetid://7150130564"; --3163061542
 	elseif tier >= 6 then
-		iconInstance.Image = "rbxassetid://7150131437"; --3163061699
+		iconInstance.Image = "rbxassetid://7150131437";
+	elseif tier >= 7 then
+		iconInstance.Image = "rbxassetid://132035424901751"; --3163061699
+		padding.PaddingBottom = UDim.new(0.4, 0);
 	end
+
+	-- 	iconInstance.Image = "rbxassetid://132035424901751";
+	-- 	padding.PaddingBottom = UDim.new(0.4, 0);
+
 	iconInstance.ImageColor3 = color;
 	iconLabel.Text = level;
 	iconLabel.TextColor3 = Color3.fromRGB(math.clamp(color.r*255+20, 0, 255),math.clamp(color.g*255+20, 0, 255),math.clamp(color.b*255+20, 0, 255));

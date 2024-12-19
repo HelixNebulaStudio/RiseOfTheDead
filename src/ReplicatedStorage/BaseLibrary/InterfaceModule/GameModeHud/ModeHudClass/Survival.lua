@@ -118,7 +118,7 @@ return function(...)
 				local rewardsLib = modRewardsLibrary:Find(stageLib.HardRewardId);
 				if rewardsLib and rewardsLib.Rewards then
 					local rewardsList = rewardsLib.Rewards;
-					local wave = data.Wave;
+					local wave = data.Wave+1;
 					
 					local nextRewardInfo = nil;
 
@@ -133,9 +133,10 @@ return function(...)
 					if nextRewardInfo then
 						local itemId = nextRewardInfo.ItemId;
 						local itemLib = modItemsLibrary:Find(itemId);
-						nextRewardFrame.rewardLabel.Text = `<font size="10">Next Reward</font>\n{itemLib.Name} drops at wave {nextRewardInfo.Wave}`;
+						nextRewardFrame.rewardLabel.Text = `<font size="10">Next Reward</font>\n{itemLib.Name} drops after wave {nextRewardInfo.Wave}`;
 
-						local itemButtonObject = nextRewardItemButton or modItemInterface.newItemButton(itemId);
+						local itemButtonObject = nextRewardItemButton or modItemInterface.newItemButton();
+						itemButtonObject:SetItemId(itemId)
 						nextRewardItemButton = itemButtonObject;
 						local newItemButton = itemButtonObject.ImageButton;
 

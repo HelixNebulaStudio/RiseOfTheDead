@@ -112,8 +112,6 @@ function ItemInterface.newProgressBar()
 end
 
 function ItemInterface.newItemButton(itemId, includeAspectRatio)
-	itemId = itemId or "nil";
-	
 	local meta = {};
 	meta.__index = meta;
 	
@@ -124,15 +122,19 @@ function ItemInterface.newItemButton(itemId, includeAspectRatio)
 			self:DefaultUpdateItemButton(storageItemData);
 		end
 	end
+
+	function meta:SetItemId(itemId)
+		itemId = itemId or "nil";
+		
+		self.ItemId = itemId;
+		self.ImageButton.Name = self.ItemId;
+	end
 	
 	local self = {
 		ItemId = itemId;
 		ImageButton = templateItemButton:Clone();
 	};
 	
-	if itemId then
-		self.ImageButton.Name = itemId;
-	end
 	
 	if includeAspectRatio then
 		local new = Instance.new("UIAspectRatioConstraint");
@@ -141,6 +143,8 @@ function ItemInterface.newItemButton(itemId, includeAspectRatio)
 	
 	setmetatable(self, meta);
 	setmetatable(meta, ItemInterface);
+
+	self:SetItemId(itemId);
 	return self;
 end
 

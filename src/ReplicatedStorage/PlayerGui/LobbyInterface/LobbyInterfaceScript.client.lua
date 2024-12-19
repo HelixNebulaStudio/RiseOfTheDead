@@ -415,9 +415,6 @@ function UpdateInformation(room)
 		newVertList.Name = "crateList";
 		newVertList.LayoutOrder = 99;
 		
-		local gridLayout = newVertList:WaitForChild("UIGridLayout");
-		gridLayout.CellSize = UDim2.new(0, 50, 0, 50);
-		
 		local function newCrateItemButton(crateItemId, param)
 			param = param or {};
 
@@ -452,6 +449,7 @@ function UpdateInformation(room)
 			
 			newItemButton.BackgroundColor3 = rewardsId == crateItemId and branchColor or Color3.fromRGB(10, 10, 10);
 			newItemButton.BackgroundTransparency = 0.25;
+			newItemButton.Size = UDim2.new(0, 50, 0, 50);
 			newItemButton.Parent = newVertList;
 			
 			itemButtonObject:Update();
@@ -510,14 +508,9 @@ function UpdateInformation(room)
 					newVertList.LayoutOrder = a;
 					newVertList.Parent = rewardsList;
 
-					local gridLayout = newVertList:WaitForChild("UIGridLayout");
-
-					if vpSize.Y <= 360 then
-						gridLayout.CellSize = UDim2.new(0, 30, 0, 30);
-					elseif vpSize.Y <= 600 then
-						gridLayout.CellSize = UDim2.new(0, 45, 0, 45);
-					else
-						gridLayout.CellSize = UDim2.new(0, 60, 0, 60);
+					local sizeConstraint = newVertList:FindFirstChild("UISizeConstraint");
+					if sizeConstraint then
+						sizeConstraint.MaxSize = Vector2.new(math.huge, vpSize.Y/2.3);
 					end
 					
 					local lineFrame = linesList[a] or templateLine:Clone();
@@ -560,9 +553,16 @@ function UpdateInformation(room)
 					newItemButton.BackgroundTransparency = 0.25;
 					
 					itemButtonObject:Update();
-					
+
 					newItemButton.LayoutOrder = b;
-			
+					if vpSize.Y <= 360 then
+						newItemButton.Size = UDim2.new(0, 30, 0, 30);
+					elseif vpSize.Y <= 600 then
+						newItemButton.Size = UDim2.new(0, 45, 0, 45);
+					else
+						newItemButton.Size = UDim2.new(0, 60, 0, 60);
+					end
+
 					if rewardInfo.HardMode and not isHardMode then
 						hasHardLoot = true;
 						newItemButton.ImageColor3 = Color3.fromRGB(255, 60, 60);

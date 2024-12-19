@@ -105,19 +105,34 @@ function GameMode:WorldLoad(modeData)
 						end
 					end
 					
-					if stageLib.LeaderboardDataKey then
-						spawn(function()
-							local modeKey = gameStage..stageLib.LeaderboardDataKey;
-							-- profile.DailyStats["LD_"..modeKey] = math.max((profile.DailyStats["LD_"..modeKey] or 0), wave);
-							profile.WeeklyStats["LW_"..modeKey] = math.max((profile.WeeklyStats["LW_"..modeKey] or 0), wave);
-							profile.MonthlyStats["LM_"..modeKey] = math.max((profile.MonthlyStats["LM_"..modeKey] or 0), wave);
-							profile.SeasonlyStats["LS_"..modeKey] = math.max((profile.SeasonlyStats["LS_"..modeKey] or 0), wave);
-							profile.YearlyStats["LY_"..modeKey] = math.max((profile.YearlyStats["LY_"..modeKey] or 0), wave);
-							profile.AllTimeStats["LAT_"..modeKey] = math.max((profile.AllTimeStats["LAT_"..modeKey] or 0), wave);
-							
-							modLeaderboardService:SubmitPlayerToBoard(player);
-						end)
+					if modeData.Room.IsHard then
+						if stageLib.LeaderboardDataKey then
+							spawn(function()
+								local modeKey = gameStage..stageLib.LeaderboardDataKey;
+								profile.MonthlyStats["LM_H"..modeKey] = math.max((profile.MonthlyStats["LM_H"..modeKey] or 0), wave);
+								profile.SeasonlyStats["LS_H"..modeKey] = math.max((profile.SeasonlyStats["LS_H"..modeKey] or 0), wave);
+								profile.YearlyStats["LY_H"..modeKey] = math.max((profile.YearlyStats["LY_H"..modeKey] or 0), wave);
+								profile.AllTimeStats["LAT_H"..modeKey] = math.max((profile.AllTimeStats["LAT_H"..modeKey] or 0), wave);
+								
+								modLeaderboardService:SubmitPlayerToBoard(player);
+							end)
+						end
+
+					else
+						if stageLib.LeaderboardDataKey then
+							spawn(function()
+								local modeKey = gameStage..stageLib.LeaderboardDataKey;
+								profile.MonthlyStats["LM_"..modeKey] = math.max((profile.MonthlyStats["LM_"..modeKey] or 0), wave);
+								profile.SeasonlyStats["LS_"..modeKey] = math.max((profile.SeasonlyStats["LS_"..modeKey] or 0), wave);
+								profile.YearlyStats["LY_"..modeKey] = math.max((profile.YearlyStats["LY_"..modeKey] or 0), wave);
+								profile.AllTimeStats["LAT_"..modeKey] = math.max((profile.AllTimeStats["LAT_"..modeKey] or 0), wave);
+								
+								modLeaderboardService:SubmitPlayerToBoard(player);
+							end)
+						end
+
 					end
+
 				end
 				arenaTimer = tick();
 			end)

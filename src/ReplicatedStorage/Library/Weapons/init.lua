@@ -74,6 +74,8 @@ end
 function metaWeapons:LoadToolModule(module)
 	if not module:IsA("ModuleScript") then return end;
 
+	totalWeapons = totalWeapons +1;
+	
 	local itemId = module.Name;
 	local toolPackage = require(module);
 
