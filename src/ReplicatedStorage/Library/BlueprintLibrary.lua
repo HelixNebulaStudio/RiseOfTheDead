@@ -114,6 +114,10 @@ function BlueprintLibrary.New(data)
 		end
 	end
 	
+	if data.Category == "Weapons" and data.TradingTax == nil then
+		data.TradingTax = math.floor(math.max(data.SellPrice or 0, 1000)/100)*10;
+	end
+
 	new(blueprintBase, {
 		Id=data.Id; 
 		Name=data.Name; 
@@ -1024,9 +1028,11 @@ BlueprintLibrary.New{
 		{Type="Stat"; Name="Money"; Amount=20000;};
 		{Type="Stat"; Name="Perks"; Amount=20;};
 		{Type="Stat"; Name="Level"; Amount=350;};
+
 		{Type="Item"; ItemId="metal"; Amount=300;};
 		{Type="Item"; ItemId="glass"; Amount=200;};
 		{Type="Item"; ItemId="steelfragments"; Amount=20;};
+
 		{Type="Item"; ItemId="vectorxparts"; Amount=3;};
 	};
 	Category="Weapons";
@@ -1043,9 +1049,11 @@ BlueprintLibrary.New{
 		{Type="Stat"; Name="Money"; Amount=30000;};
 		{Type="Stat"; Name="Perks"; Amount=20;};
 		{Type="Stat"; Name="Level"; Amount=440;};
+
 		{Type="Item"; ItemId="metal"; Amount=200;};
 		{Type="Item"; ItemId="wood"; Amount=50;};
 		{Type="Item"; ItemId="gears"; Amount=3;};
+
 		{Type="Item"; ItemId="rusty48parts"; Amount=3;};
 	};
 	Category="Weapons";
@@ -1071,6 +1079,31 @@ BlueprintLibrary.New{
 		
 		
 		{Type="Item"; ItemId="arelshiftcrossparts"; Amount=3;};
+	};
+	Category="Weapons";
+};
+
+
+BlueprintLibrary.New{
+	Id="grandgarandbp";
+	Name="Grand Garand Blueprint";
+	Product="grandgarand";
+	Duration=daySec;
+	SellPrice=40000;
+	Requirements={
+		{Type="Stat"; Name="Level"; Amount=500;};
+		{Type="Stat"; Name="Money"; Amount=35000;};
+		{Type="Stat"; Name="Perks"; Amount=50;};
+		
+		{Type="Item"; ItemId="wood"; Amount=50;};
+
+		{Type="Item"; ItemId="screws"; Amount=50;};
+		{Type="Item"; ItemId="steelfragments"; Amount=20;};
+		{Type="Item"; ItemId="gears"; Amount=2;};
+		
+		{Type="Item"; ItemId="grandgarandparts1"; Amount=1;};
+		{Type="Item"; ItemId="grandgarandparts2"; Amount=1;};
+		{Type="Item"; ItemId="grandgarandparts3"; Amount=1;};
 	};
 	Category="Weapons";
 };
