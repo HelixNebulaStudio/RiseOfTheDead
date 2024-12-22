@@ -303,20 +303,31 @@ function OnPlayerAdded(player)
 					for id, missionLib in pairs(modMissionLibrary.List()) do
 						if missionLib.MissionType ~= modMissionLibrary.MissionTypes.Board then continue end;
 						
+						local specialEventId = nil;
 						local canAddSpecialMission = false;
 						if missionLib.AddRequirements then
 							for a=1, #missionLib.AddRequirements do
 								local rType = missionLib.AddRequirements[a].Type;
 								local rValue = missionLib.AddRequirements[a].Value;
-								if rType == "SpecialEvent" and modConfigurations.SpecialEvent[rValue] then
+								if rType == "SpecialEvent" then
+									specialEventId = rValue;
+								end
+								if specialEventId and modConfigurations.SpecialEvent[specialEventId] then
 									canAddSpecialMission = true;
 									break;
 								end
 							end
 						end
 						
-						if canAddSpecialMission and missionProfile:Get(id) == nil and missionProfile:CanAdd(id) then
-							modMission:AddMission(player, id);
+						if specialEventId then
+							local mission = missionProfile:Get(id);
+							if mission == nil and canAddSpecialMission and missionProfile:CanAdd(id) then
+								modMission:AddMission(player, id);
+
+							elseif mission and not canAddSpecialMission then
+								missionProfile:Destroy(mission);
+
+							end
 						end
 					end
 				end)

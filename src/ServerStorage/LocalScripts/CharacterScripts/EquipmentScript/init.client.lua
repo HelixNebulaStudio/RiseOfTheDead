@@ -85,10 +85,9 @@ function equip(equipPacket, toolWelds)
 	end
 	
 	local equipmentItem = modData.GetItemById(id);
-	
 	if equipmentItem then
 		local itemId = equipmentItem.ItemId;
-		
+
 		for k, obj in pairs(instanceCache) do
 			if obj then obj:Destroy() end;
 			instanceCache[k] = nil;
@@ -166,6 +165,7 @@ function equip(equipPacket, toolWelds)
 		end
 		
 		local toolModule = modData:GetItemClass(id);
+		Debugger:Warn("toolModule.Configurations",toolModule.Configurations.BaseDamage);
 		if toolModule and toolModule.SetActive then
 			toolModule:SetActive(true);
 		end

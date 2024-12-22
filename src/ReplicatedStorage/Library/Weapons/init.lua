@@ -8,8 +8,6 @@ metaWeapons.__index = metaWeapons;
 local Weapons = {};
 setmetatable(Weapons, metaWeapons);
 
-local totalWeapons = 0;
-
 function AddWeapon(data)
 	local module = script:WaitForChild(data.ItemId);
 	local toolPackage = require(module);
@@ -30,7 +28,6 @@ function AddWeapon(data)
 	end;
 	
 	Weapons[data.ItemId] = packet;
-	totalWeapons = totalWeapons +1;
 	
 	local newToolModule = packet.NewToolLib();
 	packet.PreloadAudio = newToolModule.PreloadAudio;
@@ -74,8 +71,6 @@ end
 function metaWeapons:LoadToolModule(module)
 	if not module:IsA("ModuleScript") then return end;
 
-	totalWeapons = totalWeapons +1;
-	
 	local itemId = module.Name;
 	local toolPackage = require(module);
 
@@ -153,17 +148,5 @@ end
 local modModEngineService = require(game.ReplicatedStorage.Library:WaitForChild("ModEngineService"));
 local moddedSelf = modModEngineService:GetModule(script.Name);
 if moddedSelf then moddedSelf:Init(Weapons); end
-
-
-
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-if modGlobalVars.MaxLevels < totalWeapons*20 then
-	task.spawn(function()
-		while true do
-			warn("WeaponsLibrary>> Invalid GlobalVar MaxLevels "..modGlobalVars.MaxLevels..". Supposed to be "..totalWeapons*20);
-			task.wait(5)
-		end
-	end)
-end
 
 return Weapons;

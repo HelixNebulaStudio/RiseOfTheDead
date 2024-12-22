@@ -531,7 +531,7 @@ function Data:GetBaseToolModule(itemId)
 	return;
 end
 
--- !outline: Data:GetItemClass(storageItemId, getShadowCopy)
+-- MARK: GetItemClass
 function Data:GetItemClass(storageItemId, getShadowCopy)
 	local storageItem = Data.GetItemById(storageItemId); 
 	if storageItem == nil then return end;
@@ -627,10 +627,15 @@ function Data:GetItemClass(storageItemId, getShadowCopy)
 		if getShadowCopy == true then
 			return update(storageItem, classLib.NewToolLib(), classType), classType;
 		else
-			if Data.ItemClassesCache[storageItemId] == nil then
-				Data.ItemClassesCache[storageItemId] = classLib.NewToolLib();
+			local cacheKey = storageItemId;
+			if storageItemId == "MockStorageItem" then
+				cacheKey = itemId;
 			end
-			return update(storageItem, Data.ItemClassesCache[storageItemId], classType), classType;
+
+			if Data.ItemClassesCache[cacheKey] == nil then
+				Data.ItemClassesCache[cacheKey] = classLib.NewToolLib();
+			end
+			return update(storageItem, Data.ItemClassesCache[cacheKey], classType), classType;
 		end
 		
 	end

@@ -1559,10 +1559,15 @@ function Profile:GetItemClass(storageItemId, getShadowCopy)
 			return update(storageItem, classLib.NewToolLib(), classType), classType;
 			
 		else
-			if self.ItemClassesCache[storageItemId] == nil then
-				self.ItemClassesCache[storageItemId] = classLib.NewToolLib();
+			local cacheKey = storageItemId;
+			if storageItemId == "MockStorageItem" then
+				cacheKey = itemId;
 			end
-			return update(storageItem, self.ItemClassesCache[storageItemId], classType), classType;
+
+			if self.ItemClassesCache[cacheKey] == nil then
+				self.ItemClassesCache[cacheKey] = classLib.NewToolLib();
+			end
+			return update(storageItem, self.ItemClassesCache[cacheKey], classType), classType;
 		end
 	end
 
