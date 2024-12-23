@@ -295,9 +295,9 @@ function ItemsLibrary:Init(super)
 			data.Description = "Open it to see what you got from <b><font color='#ff3c3c'>Corrupted</font> "..gameModeData.Mode..": "..gameModeData.Stage.."</b>."
 		end
 	end;
-	new(corruptedCrateBase, {Id="corruptedsectorfcrate"; Icon="rbxassetid://4873382562"; GameMode={Mode="Survival"; Stage="Sector F"; HardPrefix="Corrupted"}});
-	new(corruptedCrateBase, {Id="corruptedprisoncrate"; Icon="rbxassetid://4873382562"; GameMode={Mode="Survival"; Stage="Prison"; HardPrefix="Corrupted"}});
-	new(corruptedCrateBase, {Id="corruptedsectordcrate"; Icon="rbxassetid://4873382562"; GameMode={Mode="Survival"; Stage="Sector D"; HardPrefix="Corrupted"}});
+	new(corruptedCrateBase, {Id="corruptedsectorfcrate"; Icon="rbxassetid://132628552623171"; GameMode={Mode="Survival"; Stage="Sector F"; HardPrefix="Corrupted"}});
+	new(corruptedCrateBase, {Id="corruptedprisoncrate"; Icon="rbxassetid://132628552623171"; GameMode={Mode="Survival"; Stage="Prison"; HardPrefix="Corrupted"}});
+	new(corruptedCrateBase, {Id="corruptedsectordcrate"; Icon="rbxassetid://132628552623171"; GameMode={Mode="Survival"; Stage="Sector D"; HardPrefix="Corrupted"}});
 	
 	-- Misc;
 	new(crateBase, {Id="communitycrate"; Name="Community Crate: Alpha"; Icon="rbxassetid://13967718753"; Description="Obtained from community made maps, check gold shop for maps. Open and see what you get!";});

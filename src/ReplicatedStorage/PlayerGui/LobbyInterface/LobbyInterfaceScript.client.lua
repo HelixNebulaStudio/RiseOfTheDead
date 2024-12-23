@@ -415,6 +415,7 @@ function UpdateInformation(room)
 		newVertList.Name = "crateList";
 		newVertList.LayoutOrder = 99;
 		
+		local crateOrder = 9;
 		local function newCrateItemButton(crateItemId, param)
 			param = param or {};
 
@@ -454,6 +455,8 @@ function UpdateInformation(room)
 			
 			itemButtonObject:Update();
 
+			crateOrder = crateOrder - 1;
+			newItemButton.LayoutOrder = crateOrder;
 		end
 
 		for a=1, #crateList do
