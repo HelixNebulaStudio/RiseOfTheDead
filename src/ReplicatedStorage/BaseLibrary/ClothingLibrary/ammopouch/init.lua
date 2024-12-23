@@ -6,6 +6,11 @@ local attirePackage = {
 
 function attirePackage.NewToolLib(handler)
 	local toolLib = {};
+
+	toolLib.Configurations = {
+		BaseRefillCharge = 3;
+	};
+
 	return modClothingProperties.new(toolLib);
 end
 

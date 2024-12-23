@@ -103,6 +103,10 @@ ShopLibrary.AmmunitionPrice = {
 	
 	["rusty48"]=100;
 	["arelshiftcross"]=74;
+
+	["grandgarand"]=88;
+	["dualuzi"]=88;
+	["rechamber1216"]=88;
 }
 
 ShopLibrary.RepairPrice = {

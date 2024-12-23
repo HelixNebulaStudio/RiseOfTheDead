@@ -1000,7 +1000,7 @@ function StorageInterface:NewButton(id)
 			if option.Text then
 				local buttonText = tostring(typeof(option.Text) == "function" and option.Text(slotItem) or option.Text);
 
-				if UserInputService.KeyboardEnabled and contextOptionFirstPass then
+				if UserInputService.KeyboardEnabled and contextOptionFirstPass and option.HotInteract then
 					local keyString = tostring(modData.Settings["KeyInteract"] or "E");
 					if #keyString >= 5 then
 						keyString = string.gsub(keyString, "[^A-Z,0-9]", "")
@@ -1682,6 +1682,7 @@ UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
 			for a=1, #interface.ContextOptions do
 				local option = interface.ContextOptions[a];
 				if option.Check and option.Check(slotItem) == false then continue end;
+				if option.HotInteract ~= true then continue end;
 
 				option.Click(slotItem);
 				break;

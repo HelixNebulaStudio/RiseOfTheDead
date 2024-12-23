@@ -317,6 +317,9 @@ UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
 			modInterface:ToggleWindow("ReportMenu");
 			
 		elseif modKeyBindsHandler:Match(inputObject, "KeyInteract") and not modInterface:IsVisible("Settings") then
+			
+			task.wait();
+			if modKeyBindsHandler:Debounce("KeyInteract") then return end;
 			modInterface:HideAll();
 			
 		else

@@ -21,7 +21,7 @@ function toolPackage.NewToolLib(handler)
 		Debugger.Expire(prefab, 60);
 		
 		local newInteractable = script.Interactable:Clone();
-		newInteractable:SetAttribute("UseLimit", 1);
+		newInteractable:SetAttribute("UseLimit", 3);
 		newInteractable.Parent = prefab;
 
 		local interactData = require(newInteractable);

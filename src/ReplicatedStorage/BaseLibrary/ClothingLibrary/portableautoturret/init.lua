@@ -107,7 +107,7 @@ function attirePackage.NewToolLib(handler)
 				purchaseAmmoDebounce = true;
 
 				local serverReply = localplayerStats and (localplayerStats[ammoCurrency] or 0) >= price and 
-					remoteShopService:InvokeServer("buyammo", shopInterface.Object, selectedItem.ID, storageId) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
+					remoteShopService:InvokeServer("buyammo", {StoreObj=shopInterface.Object;}, selectedItem.ID, storageId) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
 				if serverReply == modShopLibrary.PurchaseReplies.Success then
 					modData.OnAmmoUpdate:Fire(selectedItem.ID);
 					

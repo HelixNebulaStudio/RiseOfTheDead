@@ -484,7 +484,7 @@ function Interface.init(modInterface)
 						if purchaseAmmoDebounce then return end;
 						purchaseAmmoDebounce = true;
 						
-						local serverReply = localplayerStats and (localplayerStats[ammoCurrency] or 0) >= price and remoteShopService:InvokeServer("buyammo", Interface.Object, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
+						local serverReply = localplayerStats and (localplayerStats[ammoCurrency] or 0) >= price and remoteShopService:InvokeServer("buyammo", {StoreObj=Interface.Object;}, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
 						if serverReply == modShopLibrary.PurchaseReplies.Success then
 							modData.OnAmmoUpdate:Fire(storageItemID);
 							
@@ -500,6 +500,49 @@ function Interface.init(modInterface)
 				end)
 			end
 			
+			--== MARK: Refill Charges
+			if selectedItem.ItemId == "ammopouch" and selectedItem.Values and selectedItem.Values.C then
+				local itemClass = modData:GetItemClass(selectedItem.ID);
+
+				Interface.NewListing(function(newListing)
+					newListing.Name = "RefillOption";
+					local infoBox = newListing:WaitForChild("infoFrame");
+					local descFrame = infoBox:WaitForChild("descFrame");
+
+					local purchaseButton = newListing:WaitForChild("purchaseButton");
+					local priceLabel = purchaseButton:WaitForChild("buttonText");
+					local iconButton = newListing:WaitForChild("iconButton");
+					local iconLabel = iconButton:WaitForChild("iconLabel");
+					local titleLabel = descFrame:WaitForChild("titleLabel");
+					local labelFrame = descFrame:WaitForChild("labelFrame");
+					local descLabel = labelFrame:WaitForChild("descLabel");
+
+					descLabel.Text = `Do you want to refill {itemClass.Configurations.BaseRefillCharge} ammo pouch charges?`;
+						
+					titleLabel.Text = "Refill Charges";
+					priceLabel.Text = `Refill`;
+					iconLabel.Image = itemLib.Icon;
+
+					local refillDebounce = false;
+					newListing.MouseButton1Click:Connect(function()
+						if refillDebounce then return end;
+						refillDebounce = true;
+						
+						local serverReply = remoteShopService:InvokeServer("refillcharges", Interface.Object, selectedItem.ID);
+
+						if serverReply == modShopLibrary.PurchaseReplies.Success then
+							RunService.Heartbeat:Wait();
+							newListing:Destroy();
+
+						else
+							warn("Refill Purchase>> Error Code:"..serverReply);
+							descLabel.Text = string.gsub(modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply), "$Currency", "Money");
+						end
+						refillDebounce = false;
+					end)
+				end)
+			end
+
 			--== MARK: Repairable
 			local repairPrice = modShopLibrary.RepairPrice[selectedItem.ItemId];
 			if repairPrice and selectedItem.Values and selectedItem.Values.Health and selectedItem.Values.MaxHealth and selectedItem.Values.Health <= selectedItem.Values.MaxHealth then

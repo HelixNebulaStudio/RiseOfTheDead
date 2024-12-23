@@ -183,13 +183,35 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		end
 		
 	elseif action == "buyammo" then -- MARK: buyammo
-		local storeObject, id, storageId = ...;
+		local storeProvider, id, storageId = ...;
 
-		local inRange = IsInShopRange(player, storeObject); if inRange ~= nil then return inRange end;
-		
-		if shared.modAntiCheatService:GetLastTeleport(player) <= 3 then
-			return modShopLibrary.PurchaseReplies.TooFar; 
-		end;
+		local interactModule;
+		local ammoPouchStorageItem;
+
+		if storeProvider.AmmoPouch then
+			ammoPouchStorageItem = modStorage.FindIdFromStorages(storeProvider.AmmoPouch, player);
+			if ammoPouchStorageItem == nil then return modShopLibrary.PurchaseReplies.InvalidProduct; end;
+
+			local charges = ammoPouchStorageItem:GetValues("C");
+			if charges and charges <= 0 then
+				return modShopLibrary.PurchaseReplies.ExhaustedUses;
+			end
+
+		else
+			local storeObject = storeProvider.StoreObj;
+			local inRange = IsInShopRange(player, storeObject);
+			if inRange ~= nil then return inRange end;
+
+			if shared.modAntiCheatService:GetLastTeleport(player) <= 3 then
+				return modShopLibrary.PurchaseReplies.TooFar; 
+			end;
+
+			interactModule = storeObject:FindFirstChild("Interactable") or storeObject.Parent:FindFirstChild("Interactable");
+			if interactModule == nil then
+				Debugger:Warn("Missing interactable");
+				return modShopLibrary.PurchaseReplies.InvalidProduct;
+			end
+		end
 
 		local profile = modProfile:Get(player);
 		local playerSave = profile:GetActiveSave();
@@ -208,23 +230,19 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		local storageItem = storage:Find(id);
 		local weaponModule = profile:GetItemClass(id);
 		
-		local interactModule = storeObject:FindFirstChild("Interactable") or storeObject.Parent:FindFirstChild("Interactable");
-		if interactModule == nil then
-			Debugger:Warn("Missing interactable");
-			return modShopLibrary.PurchaseReplies.InvalidProduct;
-		end
-		
-		local interactData = shared.saferequire(player, interactModule);
-		
-		if interactData and interactData.UseLimit then
-			local playerUses = (interactData.PlayerUses[player.Name] or 0);
+		if interactModule then
+			local interactData = shared.saferequire(player, interactModule);
 			
-			if playerUses >= interactData.UseLimit then
-				return modShopLibrary.PurchaseReplies.ExhaustedUses;
+			if interactData and interactData.UseLimit then
+				local playerUses = (interactData.PlayerUses[player.Name] or 0);
+				
+				if playerUses >= interactData.UseLimit then
+					return modShopLibrary.PurchaseReplies.ExhaustedUses;
+				end
+				
+				interactData.PlayerUses[player.Name] = playerUses +1;
+				interactData:Sync();
 			end
-			
-			interactData.PlayerUses[player.Name] = playerUses +1;
-			interactData:Sync();
 		end
 		
 		if storageItem == nil then
@@ -264,6 +282,15 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		end
 		
 		storageItem:Sync({"A", "MA"});
+
+		if ammoPouchStorageItem then
+			local ammoPouchItemClass = profile:GetItemClass(ammoPouchStorageItem.ID);
+			local maxCharges = ammoPouchItemClass.Configurations.BaseRefillCharge;
+			local charges = ammoPouchStorageItem:GetValues("C") or maxCharges;
+			
+			ammoPouchStorageItem:SetValues("C", charges-1);
+			ammoPouchStorageItem:Sync({"C"});
+		end
 
 		if price > 0 then
 			modAnalytics.RecordResource(player.UserId, price, "Sink", currency, "Gameplay", "Ammo");
@@ -340,6 +367,38 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		shared.Notify(player, itemLib.Name.." repaired.", "Info");
 		
 		return modShopLibrary.PurchaseReplies.Success;
+
+	elseif action == "refillcharges" then -- MARK: refillcharges
+		local storeObject, storageItemID = ...;
+
+		local inRange = IsInShopRange(player, storeObject); if inRange ~= nil then return inRange end;
+		
+		if shared.modAntiCheatService:GetLastTeleport(player) <= 3 then
+			return modShopLibrary.PurchaseReplies.TooFar; 
+		end;
+		
+		local profile = modProfile:Get(player);
+		local activeSave = profile:GetActiveSave();
+
+		local storageItem, storage = modStorage.FindIdFromStorages(storageItemID, player);
+		if storage == nil then 
+			Debugger:Warn("BuyRepair>> Missing storage");
+			return modShopLibrary.PurchaseReplies.InvalidProduct;
+		end;
+		if storageItem == nil then 
+			Debugger:Warn("BuyRepair>> Missing storage");
+			return modShopLibrary.PurchaseReplies.InvalidProduct;
+		end;
+
+		local itemId = storageItem.ItemId;
+
+		if itemId == "ammopouch" then
+			storageItem:DeleteValues("C");
+			storageItem:Sync({"C"});
+			shared.Notify(player, "Ammo pouch refilled.", "Info");
+			
+			return modShopLibrary.PurchaseReplies.Success;
+		end
 
 	elseif action == "exchangefortoken" then -- MARK: exchangefortoken
 		local storeObject, storageItemID, amt = ...;

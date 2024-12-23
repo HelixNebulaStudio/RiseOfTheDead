@@ -250,6 +250,7 @@ function Interface.init(modInterface)
 			end
 		end;
 		Order=1;
+		HotInteract=true;
 	};
 	Interface.DefaultInterface:AddContextOption(equipContextOption);
 	Interface.PremiumInterface:AddContextOption(equipContextOption);
@@ -367,6 +368,7 @@ function Interface.init(modInterface)
 			useDebounce = false;
 		end;
 		Order=5;
+		HotInteract=true;
 	};
 	Interface.DefaultInterface:AddContextOption(usableContextOption);
 	Interface.PremiumInterface:AddContextOption(usableContextOption);

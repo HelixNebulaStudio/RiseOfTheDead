@@ -393,15 +393,20 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 						end);
 					end
 				else
-					local toolInfo, toolType = modData:GetItemClass(storageItemID, true);
-					if toolInfo then
-						if toolType == "Weapon" and toolInfo.Configurations then
-							local barFill = itemValues.A == nil and 1 or itemValues.A/toolInfo.Configurations.AmmoLimit;
+					local itemClass, toolType = modData:GetItemClass(storageItemID, true);
+					if itemClass then
+						if toolType == "Weapon" and itemClass.Configurations then
+							local barFill = itemValues.A == nil and 1 or itemValues.A/itemClass.Configurations.AmmoLimit;
 							setBar(barFill);
 						end
 					end
 
-					if itemValues.Power then
+					if itemId == "ammopouch" then
+						local charges = itemValues.C or itemClass.Configurations.BaseRefillCharge;
+						local barFill = charges/itemClass.Configurations.BaseRefillCharge;
+						setBar(barFill);
+						
+					elseif itemValues.Power then
 						local barFill = itemValues.Power/100;
 						setBar(barFill);
 
@@ -966,6 +971,10 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 				itemDesc = itemDesc..h3O.."\nAmmo: "..h3C.. colorNumberText((itemValues.A or "Full").."/"..(itemValues.MA or "Full"));
 			end
 
+			if itemId == "ammopouch" then
+				local charges = itemValues.C or itemClass.Configurations.BaseRefillCharge;
+				itemDesc = itemDesc..h3O.."\nCharges: "..h3C..`{charges}/{itemClass.Configurations.BaseRefillCharge}`;
+			end
 
 			itemDesc = itemDesc.."\n";
 		end
