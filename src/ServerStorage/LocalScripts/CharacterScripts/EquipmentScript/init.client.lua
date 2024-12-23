@@ -165,7 +165,6 @@ function equip(equipPacket, toolWelds)
 		end
 		
 		local toolModule = modData:GetItemClass(id);
-		Debugger:Warn("toolModule.Configurations",toolModule.Configurations.BaseDamage);
 		if toolModule and toolModule.SetActive then
 			toolModule:SetActive(true);
 		end
@@ -309,6 +308,8 @@ UserInputService.InputBegan:connect(function(inputObject, inputEvent)
 		if typeof(equipment) ~= "table" then continue end;
 		
 		if equipment.OnInputEvent then
+			Equipped.Player = localPlayer;
+			
 			local keyIds = modKeyBindsHandler:GetKeyIds(inputObject);
 			
 			local inputData = {
@@ -337,6 +338,8 @@ UserInputService.InputEnded:Connect(function(inputObject, inputEvent)
 	for _, equipment in pairs(Equipped) do
 		if typeof(equipment) == "table" then
 			if equipment.OnInputEvent then
+				Equipped.Player = localPlayer;
+
 				local keyIds = modKeyBindsHandler:GetKeyIds(inputObject);
 				
 				local inputData = {
@@ -364,6 +367,8 @@ bindCharacterInput.Event:Connect(function(keyId, inputState) -- max rentry pass
 			if triggerEvent then triggerEvent(); end
 			
 			if equipment.OnInputEvent then
+				Equipped.Player = localPlayer;
+
 				local inputData = {
 					InputType=(inputState or "Begin");
 					KeyIds={[keyId]=true};

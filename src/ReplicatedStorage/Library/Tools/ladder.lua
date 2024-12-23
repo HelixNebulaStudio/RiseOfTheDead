@@ -25,7 +25,8 @@ return function()
 		local maxLadderRange = 24;
 		if inputData.InputType ~= "Begin" then return end;
 		
-		local classPlayer = shared.modPlayers.Get(toolHandler.Player);
+		local player = toolHandler.Player;
+		local classPlayer = shared.modPlayers.Get(player);
 		
 		local groundCFrame;
 		local function getGroundCFrame()
@@ -38,7 +39,7 @@ return function()
 		local toolConfig = toolHandler.ToolConfig;
 		if RunService:IsClient() then
 			if inputData.KeyIds.KeyFire then
-				local modData = require(toolHandler.Player:WaitForChild("DataModule"));
+				local modData = require(player:WaitForChild("DataModule"));
 				local modCharacter = modData:GetModCharacter();
 			
 				local mouseProperties = modCharacter.MouseProperties;

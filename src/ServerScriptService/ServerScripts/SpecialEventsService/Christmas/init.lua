@@ -126,7 +126,7 @@ modOnGameEvents:ConnectEvent("OnCrateSpawn", function(newPrefab, interactData, w
 		if crateStorage == nil then continue end;
 
 		local pickItemId, spawnAmount = SpecialEvent.GetPlayerGiftDropItemId(player, {
-			MaxQuantity=math.ceil((interactData.LevelRequired or 1)/100);
+			MaxQuantity=math.ceil((interactData.LevelRequired or 1)/65);
 		});
 
 		if pickItemId then
@@ -170,7 +170,7 @@ modOnGameEvents:ConnectEvent("OnDropReward", function(npcModule, deathCframe: CF
 	end
 
 	local newDrops = {};
-	for a=1, 3 do
+	for a=1, 5 do
 		local itemId = roll();
 		newDrops[itemId] = (newDrops[itemId] or 0) + 1;
 	end
