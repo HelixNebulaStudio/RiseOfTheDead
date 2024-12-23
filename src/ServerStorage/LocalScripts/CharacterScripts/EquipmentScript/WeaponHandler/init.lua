@@ -1352,7 +1352,7 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 						end
 
 						if configurations.GenerateTracers then
-							modWeaponMechanics.CreateTracer(objectTable.BulletOrigin, firstImpactPoint, camera, shotData.TracerColor, configurations.SuppressorAttached)
+							modWeaponMechanics.CreateTracer(objectTable.BulletOrigin, firstImpactPoint, camera, shotData.TracerColor)
 						end;
 						
 						

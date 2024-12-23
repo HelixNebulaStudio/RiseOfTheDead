@@ -56,7 +56,12 @@ local Configurations={
 	FocusWalkSpeedReduction=0.65;
 	ChargeDamagePercent=0.2;
 	
-	Penetration=WeaponProperties.PenetrationTable.Sniper;
+	Penetration={
+		[Enum.Material.Glass]=1;
+		[Enum.Material.Wood]=1;
+		[Enum.Material.WoodPlanks]=1;
+		["Others"]=0.3;
+	};
 	KillImpulseForce=40;
 
 	OnEquip=function()

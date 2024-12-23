@@ -58,6 +58,7 @@ if RunService:IsServer() then
 
                 if targetDamagable == nil then continue end;
                 if not targetDamagable:CanDamage(player) then continue end;
+                if targetDamagable:IsDead() then continue end;
 
                 local targetPosition = targetRootPart.Position;
                 local targetDirection = (targetPosition-ricochetOrigin).Unit;
@@ -69,7 +70,7 @@ if RunService:IsServer() then
                 if rayResult == nil or rayResult.Instance ~= targetRootPart then continue end;
 
                 local dist = (targetRootPart.Position-ricochetOrigin).Magnitude;
-                if dist <= closestRpDist then
+                if dist > 3 and dist <= closestRpDist then
                     closestRpDist = dist;
                     direction = targetDirection;
                 end
@@ -77,11 +78,13 @@ if RunService:IsServer() then
 
             if direction == nil then
                 direction = shotDirection - 2 * shotDirection:Dot(hitNormal) * hitNormal;
-
-                -- local ray = Ray.new(ricochetOrigin, direction*4);
-                -- local dbPoint = Debugger:Ray(ray);
-                -- dbPoint.Parent = workspace.Debris;
             end
+
+            -- local ray = Ray.new(ricochetOrigin, direction*128);
+            -- local dbPoint = Debugger:Ray(ray);
+            -- dbPoint.Color = BrickColor.random().Color;
+            -- dbPoint.Parent = workspace.Debris;
+            -- game.Debris:AddItem(dbPoint, 20);
 
             local firePacket = {
                 StorageItem = storageItem;
@@ -111,8 +114,7 @@ if RunService:IsServer() then
             modToolService.PrimaryFireWeapon(firePacket);
         end
 
-        task.wait();
-        ricochet(hitPosition);
+        task.delay(0.1, ricochet, hitPosition);
 	end
 end
 

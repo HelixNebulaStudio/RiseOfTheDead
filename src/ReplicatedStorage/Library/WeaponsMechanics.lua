@@ -720,8 +720,9 @@ end;
 
 
 -- !outline: function CreateTracer(bulletOrigin, targetPoint, camera, color)
-function WeaponsMechanics.CreateTracer(bulletOrigin, targetPoint, camera, color, suppressed)
-	
+function WeaponsMechanics.CreateTracer(bulletOrigin, targetPoint, camera, color, tracerLag)
+	tracerLag = tonumber(tracerLag) or 0;
+
 	if RunService:IsClient() then
 		modData = getModData();
 		if modData:GetSetting("DisableBulletTracers") == 1 then return end;
@@ -762,7 +763,7 @@ function WeaponsMechanics.CreateTracer(bulletOrigin, targetPoint, camera, color,
 		ColorSequenceKeypoint.new(0.6, Color3.fromHSV(colorbH, 100/255, colorbV)),
 		ColorSequenceKeypoint.new(1, Color3.fromHSV(colorbH, 50/255, colorbV))
 	});
-	local tracerTransparency = suppressed and 0.5 or 0;
+	local tracerTransparency = 0;
 	newTracer.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
 		NumberSequenceKeypoint.new(0.1, tracerTransparency),
@@ -774,7 +775,7 @@ function WeaponsMechanics.CreateTracer(bulletOrigin, targetPoint, camera, color,
 	local hitscanSpeed = 80;
 	local tracerLength = 4;
 	
-	local delayTime = 0.1 * math.clamp(tracerLength/hitscanSpeed, 1, 20);
+	local delayTime = 0.1+(tracerLag) * math.clamp(tracerLength/hitscanSpeed, 1, 20);
 	local travelTime = 0.1 * math.clamp(shotDist/hitscanSpeed, 1, 20);
 	
 	local endPoint = targetPoint-(shotDir*math.min(tracerLength,shotDist));

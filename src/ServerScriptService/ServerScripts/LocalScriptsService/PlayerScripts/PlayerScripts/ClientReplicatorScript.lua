@@ -151,7 +151,7 @@ return function()
 						local targetDir = (targetPos-originAtt.WorldPosition).Unit;
 
 						if configurations.GenerateTracers ~= false then
-							modWeaponMechanics.CreateTracer(originAtt, targetPos, camera);
+							modWeaponMechanics.CreateTracer(originAtt, targetPos, camera, nil, isRicochet and 0.5 or 0);
 						end;
 						if configurations.GeneratesBulletHoles then
 							local originP = targetPos-(targetDir*0.1);
