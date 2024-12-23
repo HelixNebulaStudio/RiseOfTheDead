@@ -352,6 +352,9 @@ function Workbench.new(itemId, library, storageItem)
 			if partInstance:GetAttribute("WorkbenchIgnore") == true then
 				partTitle = "[DB] "..partTitle;
 			end
+			if partInstance:GetAttribute("MatchCustomization") then
+				continue
+			end;
 			
 			local dataKey = prefix..partName;
 			

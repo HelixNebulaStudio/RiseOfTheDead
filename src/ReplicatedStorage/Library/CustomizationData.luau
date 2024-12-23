@@ -344,8 +344,10 @@ function CustomizationData.ApplyCustomPlans(customPlans, partDataList)
             continue;
         end
 
+        local partDataKey = partData.Part:GetAttribute("MatchCustomization") or partData.Key;
+
         local groupPlan = customPlans[partData.Group];
-        local partPlan = customPlans[partData.Key];
+        local partPlan = customPlans[partDataKey];
 
         local finalCustomPlan = CustomizationData.newCustomizationPlan();
 

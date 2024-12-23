@@ -267,6 +267,11 @@ function ItemViewport:RefreshDisplay()
 			self.CurrentHighlightPart = nil;
 		end
 
+		local matchCustomizationKey = self.CurrentHighlightPart and self.CurrentHighlightPart:GetAttribute("MatchCustomization");
+		if matchCustomizationKey then
+			self.CurrentHighlightPart = self.CurrentHighlightPart.Parent:FindFirstChild(matchCustomizationKey);
+		end
+
 		if self.CurrentHighlightPart then
 			self.Frame.highlightedLabel.Text = self.CurrentHighlightPart:GetAttribute("PartLabel") or self.CurrentHighlightPart.Name;
 
