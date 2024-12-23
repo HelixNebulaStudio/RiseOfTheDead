@@ -27,7 +27,7 @@ local Configurations={
 	
 	-- Weapon Properties;
 	MinBaseDamage=580;
-	BaseDamage=24600;
+	BaseDamage=19680;
 	
 	AmmoLimit=6;
 	MaxAmmoLimit=(6*3);
@@ -41,7 +41,7 @@ local Configurations={
 	
 	-- Gimmick
 	BulletRicochet="Modifier";
-	BulletRicochetCount=1;
+	BulletRicochetCount=2;
 	BulletRicochetDistance=64;
 
 	-- Body

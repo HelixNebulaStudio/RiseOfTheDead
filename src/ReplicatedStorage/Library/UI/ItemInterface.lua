@@ -880,7 +880,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 			itemDesc = itemDesc..h3O.."\nWanted: "..h3C.. itemValues.WantedNpc;
 		end
 		if itemValues.Seed and itemValues.Seed ~= 0 then
-			itemName = itemName.." #"..itemValues.Seed;
+			itemName = itemName.." <font size='12'>#"..itemValues.Seed.."</font>";
 			itemDesc = itemDesc..h3O.."\nSeed: "..h3C.. colorNumberText(itemValues.Seed);
 		end
 		

@@ -17,10 +17,12 @@ if RunService:IsServer() then
 
 	function itemModifier:OnBulletHit(packet)
         if packet.Index ~= packet.EndIndex then return end;
+        if packet.RicochetCount and packet.RicochetCount <= 0 then return end;
 
         local toolModule = self.WeaponModule;
 		local player = packet.Player;
         local hitInfo = packet.HitInfo;
+        local weaponModel = packet.WeaponModel;
         
         local configurations = toolModule.Configurations;
         local bulletRicochetCount = configurations.BulletRicochetCount or 1;
@@ -30,8 +32,7 @@ if RunService:IsServer() then
         local hitPosition = hitInfo.Position;
         local hitNormal = hitInfo.Normal;
 
-        local profile = shared.modProfile:Get(player);
-        local equippedSiid = profile.EquippedTools and profile.EquippedTools.ID;
+        local equippedSiid = weaponModel:GetAttribute("StorageItemId");
         if equippedSiid == nil then return end;
 
         local storageItem = shared.modStorage.FindIdFromStorages(equippedSiid, player);
@@ -84,7 +85,7 @@ if RunService:IsServer() then
 
             local firePacket = {
                 StorageItem = storageItem;
-                ToolModel = packet.WeaponModel;
+                ToolModel = weaponModel;
                 ToolModule = toolModule;
 
                 Player = player;
@@ -93,7 +94,7 @@ if RunService:IsServer() then
                 ShotDirection = direction;
 
                 ReplicateToShotOwner = true;
-                IsRicochet = true;
+                RicochetCount = packet.RicochetCount or bulletRicochetCount;
 
                 Targetable = {
                     Zombie = true;

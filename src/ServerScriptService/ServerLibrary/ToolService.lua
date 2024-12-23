@@ -20,7 +20,20 @@ local remotePrimaryFire = modRemotesManager:Get("PrimaryFire");
 --==
 local ToolService = {};
 
--- !outline: ToolService.CancelPrimaryFire(packet)
+-- MARK:
+function ToolService.ProcessItemModifiers(toolModule, processType, ...)
+	if toolModule.ModifierTriggers == nil then return end;
+	
+	for id, itemModifier in pairs(toolModule.ModifierTriggers) do
+		itemModifier.WeaponModule = toolModule;
+
+		if itemModifier[processType] then
+			itemModifier[processType](itemModifier, ...);
+		end
+	end
+end
+
+-- MARK: CancelPrimaryFire
 function ToolService.CancelPrimaryFire(packet)
 	packet.ToolModule = packet.ToolModule;
 	--
@@ -33,7 +46,7 @@ function ToolService.CancelPrimaryFire(packet)
 	end
 end
 
--- !outline: ToolService.PriamryFireWeapon(firePacket)
+-- MARK: PriamryFireWeapon
 function ToolService.PrimaryFireWeapon(firePacket)
 	firePacket.StorageItem = firePacket.StorageItem;
 	firePacket.ToolModel = firePacket.ToolModel;
@@ -61,7 +74,7 @@ function ToolService.PrimaryFireWeapon(firePacket)
 		ShotOrigin = firePacket.ShotOrigin;
 
 		IsPat = firePacket.IsPat;
-		IsRicochet = firePacket.IsRicochet;
+		RicochetCount = firePacket.RicochetCount;
 	};
 	
 	
@@ -93,12 +106,17 @@ function ToolService.PrimaryFireWeapon(firePacket)
 	local ammo = storageItem:GetValues("A") or configurations.AmmoLimit;
 	local maxAmmo = storageItem:GetValues("MA") or configurations.MaxAmmoLimit;
 
-	if shotPacket.IsRicochet ~= true and ammo <= 0 then 
+	local isRicochet = firePacket.RicochetCount ~= nil;
+	if isRicochet then
+		shotPacket.RicochetCount = shotPacket.RicochetCount-1;
+	end
+
+	if isRicochet ~= true and ammo <= 0 then 
 		modAudio.Play(audio.Empty.Id, toolHandle);
 		return; 
 	end
 	
-	if properties.IsPrimaryFiring then return end
+	if isRicochet ~= true and properties.IsPrimaryFiring then return end
 	properties.IsPrimaryFiring = true;
 	local onShotTick = tick();
 
@@ -110,7 +128,7 @@ function ToolService.PrimaryFireWeapon(firePacket)
 			ammoCost = infType == 2 and 3 or math.min(properties.Ammo, 3);
 		end
 		
-		if firePacket.IsRicochet ~= true then
+		if isRicochet ~= true then
 			properties.Ammo = properties.Ammo - (configurations.InfiniteAmmo == 2 and 0 or ammoCost);
 			
 			if audio.PrimaryFire.Looped then
@@ -137,10 +155,11 @@ function ToolService.PrimaryFireWeapon(firePacket)
 		
 		-- shotPacket.ShotOrigin = toolHandle:FindFirstChild("BulletOrigin");
 		-- assert(shotPacket.ShotOrigin, `Missing bullet origin: {toolHandle:GetFullName()}`);
-
 		if configurations.BulletMode == modAttributes.BulletModes.Hitscan then
 			shotPacket.TargetPoints = {};
 			shotPacket.Victims = {};
+			shotPacket.HitInfoList = {};
+
 		elseif configurations.BulletMode == modAttributes.BulletModes.Projectile then
 			shotPacket.Projectiles = {};
 		end
@@ -174,6 +193,13 @@ function ToolService.PrimaryFireWeapon(firePacket)
 				local function onCast(basePart, position, normal, material, index, distance)
 					if basePart == nil then return end;
 
+					table.insert(shotPacket.HitInfoList, {
+						Part=basePart;
+						Position=position;
+						Normal=normal;
+						Index=index;
+					});
+					
 					local humanoid = basePart.Parent:FindFirstChildWhichIsA("Humanoid");
 					local targetRootPart = basePart.Parent:FindFirstChild("HumanoidRootPart");
 
@@ -196,6 +222,8 @@ function ToolService.PrimaryFireWeapon(firePacket)
 							table.insert(shotPacket.Victims, {Object=basePart; Index=index;});
 						end
 					end
+
+					return;
 				end
 
 				local whitelist = {workspace.Environment; workspace.Terrain};
@@ -297,11 +325,13 @@ function ToolService.ProcessWeaponShot(shotPacket)
 
 	shotPacket.Victims = shotPacket.Victims;
 	shotPacket.TargetPoints = shotPacket.TargetPoints;
+	shotPacket.HitInfoList = shotPacket.HitInfoList;
+
 	-- BulletMode: Projectile
 	shotPacket.Projectiles = shotPacket.Projectiles;
 	shotPacket.FocusCharge = shotPacket.FocusCharge;
 	--
-	shotPacket.IsRicochet = shotPacket.IsRicochet;
+	shotPacket.RicochetCount = shotPacket.RicochetCount;
 	
 	local storageItem = shotPacket.StorageItem;
 	local toolModel: Model = shotPacket.ToolModel;
@@ -340,7 +370,8 @@ function ToolService.ProcessWeaponShot(shotPacket)
 	local ammo = storageItem:GetValues("A") or configurations.AmmoLimit;
 	local maxAmmo = storageItem:GetValues("MA") or configurations.MaxAmmoLimit;
 
-	if shotPacket.IsRicochet ~= true and ammo <= 0 then return; end
+	local isRicochet = shotPacket.RicochetCount ~= nil;
+	if isRicochet ~= true and ammo <= 0 then return; end
 	ammo = math.min(ammo, configurations.AmmoLimit);
 
 	local ammoCost = math.min(configurations.AmmoCost or 1, ammo);
@@ -352,7 +383,7 @@ function ToolService.ProcessWeaponShot(shotPacket)
 		ammoCost = 0;
 	end
 	
-	if shotPacket.IsRicochet ~= true then
+	if isRicochet ~= true then
 		ammo = ammo -ammoCost;
 		storageItem:SetValues("A", ammo);
 
@@ -385,6 +416,26 @@ function ToolService.ProcessWeaponShot(shotPacket)
 
 		local targetsPierceable = (properties.Piercing or 0);
 		local maxVictims = math.clamp(#victims, 0, (type(properties.Multishot) == "table" and (properties.Multishot.Max + targetsPierceable) or properties.Multishot + targetsPierceable));
+
+		local hitInfoList = shotPacket.HitInfoList;
+		for a=1, #hitInfoList do
+			local hitInfo = hitInfoList[a];
+
+			--MARK: OnBulletHit
+			ToolService.ProcessItemModifiers(toolModule, "OnBulletHit", {
+				Player=shotPacket.Player;
+				HitInfo=hitInfo;
+				WeaponModel=shotPacket.ToolModel;
+
+				Index=a;
+				EndIndex=#hitInfoList;
+				
+				ShotDirection=shotPacket.Direction;
+				FocusCharge=(shotPacket.FocusCharge and math.clamp(shotPacket.FocusCharge, 0, 1) or nil);
+
+				RicochetCount = shotPacket.RicochetCount;
+			});
+		end
 
 		for a=1, maxVictims do
 			local targetObject = victims[a].Object;
@@ -560,7 +611,7 @@ function ToolService.ProcessWeaponShot(shotPacket)
 			TargetPoints=shotPacket.TargetPoints;
 			
 			ShotOrigin=shotPacket.ShotOrigin;
-			IsRicochet=shotPacket.IsRicochet;
+			IsRicochet=isRicochet;
 		};
 
 		for a=1, #players do

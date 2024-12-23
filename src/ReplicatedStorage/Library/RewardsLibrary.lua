@@ -127,7 +127,7 @@ library:Add{
 
 --== Crate Rewards;
 
--- MARK: !outline: sundaysGift : 20
+-- MARK: sundaysGift : 20
 library:Add{
 	Id="sundaysGift";
 	Level=20;
@@ -137,7 +137,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: underbridgeGift : 50
+-- MARK: underbridgeGift : 50
 library:Add{
 	Id="underbridgeGift";
 	Level=50;
@@ -147,7 +147,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: mallGift : 150
+-- MARK: mallGift : 150
 library:Add{
 	Id="mallGift";
 	Level=150;
@@ -157,7 +157,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: clinicGift : 250
+-- MARK: clinicGift : 250
 library:Add{
 	Id="clinicGift";
 	Level=250;
@@ -167,7 +167,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: residentialGift : 300
+-- MARK: residentialGift : 300
 library:Add{
 	Id="residentialGift";
 	Level=300;
@@ -177,7 +177,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: harborGift : 380
+-- MARK: harborGift : 380
 library:Add{
 	Id="harborGift";
 	Level=380;
@@ -192,7 +192,7 @@ local weaponBpChance = 3/4;
 local componentChance = 1/3;
 local commodityChance = 1/3;
 
--- MARK: !outline: prisoner : 1
+-- MARK: prisoner : 1
 library:Add{
 	Id="prisoner";
 	Level=1;
@@ -213,7 +213,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: tanker : 10
+-- MARK: tanker : 10
 library:Add{
 	Id="tanker";
 	Level=10;
@@ -232,7 +232,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: fumes : 20
+-- MARK: fumes : 20
 library:Add{
 	Id="fumes";
 	Level=20;
@@ -252,7 +252,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: corrosive : 40
+-- MARK: corrosive : 40
 library:Add{
 	Id="corrosive";
 	Level=40;
@@ -268,7 +268,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: zpider : 60
+-- MARK: zpider : 60
 library:Add{
 	Id="zpider";
 	Level=60;
@@ -285,7 +285,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: shadow : 80
+-- MARK: shadow : 80
 library:Add{
 	Id="shadow";
 	Level=80;
@@ -303,7 +303,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: zomborg : 110
+-- MARK: zomborg : 110
 library:Add{
 	Id="zomborg";
 	Level=110;
@@ -321,7 +321,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: billies : 160
+-- MARK: billies : 160
 library:Add{
 	Id="billies";
 	Level=160;
@@ -339,7 +339,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: hectorshot : 180
+-- MARK: hectorshot : 180
 library:Add{
 	Id="hectorshot";
 	Level=180;
@@ -358,7 +358,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: zomborgprime : 280
+-- MARK: zomborgprime : 280
 library:Add{
 	Id="zomborgprime";
 	Level=280;
@@ -384,7 +384,7 @@ library:Add{
 
 --==Extreme;
 
--- MARK: !outline: zricera : 100
+-- MARK: zricera : 100
 library:Add{
 	Id="zricera";
 	Level=100;
@@ -402,7 +402,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: vexeron : 200
+-- MARK: vexeron : 200
 library:Add{
 	Id="vexeron";
 	Level=200;
@@ -427,7 +427,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: mothena : 300
+-- MARK: mothena : 300
 library:Add{
 	Id="mothena";
 	Level=300;
@@ -444,7 +444,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: banditheli : 400
+-- MARK: banditheli : 400
 library:Add{
 	Id="banditheli";
 	Level=400;
@@ -462,7 +462,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: veinofnekron : 500
+-- MARK: : veinofnekron : 500
 library:Add{
 	Id="veinofnekron";
 	Level=500;
@@ -479,7 +479,7 @@ library:Add{
 
 --==Raid
 
--- MARK: !outline: factorycrate : 5
+-- MARK: : factorycrate : 5
 library:Add{
 	Id="factorycrate";
 	Level=5;
@@ -494,7 +494,7 @@ library:Add{
 };
 
 
--- MARK: !outline: officecrate : 30
+-- MARK: : officecrate : 30
 library:Add{
 	Id="officecrate";
 	Level=30;
@@ -510,7 +510,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: tombschest : 120
+-- MARK: : tombschest : 120
 library:Add{
 	Id="tombschest";
 	Level=120;
@@ -527,7 +527,7 @@ library:Add{
 	};
 };
 
--- MARK: MARK: !outline: railwayscrate : 260
+-- MARK: railwayscrate : 260
 library:Add{
 	Id="railwayscrate";
 	Level=260;
@@ -542,7 +542,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: banditcrate : 160
+-- MARK: banditcrate : 160
 library:Add{
 	Id="banditcrate";
 	Level=160;
@@ -558,7 +558,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: hbanditcrate : 360
+-- MARK: hbanditcrate : 360
 library:Add{
 	Id="hbanditcrate";
 	Level=360;
@@ -574,7 +574,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: abandonedbunkercrate : 460
+-- MARK: abandonedbunkercrate : 460
 library:Add{
 	Id="abandonedbunkercrate";
 	Level=460;
@@ -600,7 +600,7 @@ library:Add{
 
 --== Survival;
 
--- MARK: !outline: sectorfcrate : 50
+-- MARK: sectorfcrate : 50
 library:Add{
 	Id="sectorfcrate";
 	Level=50;
@@ -618,7 +618,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: ucsectorfcrate : 220
+-- MARK: ucsectorfcrate : 220
 library:Add{
 	Id="ucsectorfcrate";
 	Level=220;
@@ -633,7 +633,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: prisoncrate : 140
+-- MARK: prisoncrate : 140
 library:Add{
 	Id="prisoncrate";
 	Level=140;
@@ -649,7 +649,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: nprisoncrate : 320
+-- MARK: nprisoncrate : 320
 library:Add{
 	Id="nprisoncrate";
 	Level=320;
@@ -664,7 +664,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: sectordcrate : 240
+-- MARK: sectordcrate : 240
 library:Add{
 	Id="sectordcrate";
 	Level=240;
@@ -680,7 +680,7 @@ library:Add{
 };
 
 
--- MARK: !outline: ucsectordcrate : 420
+-- MARK: ucsectordcrate : 420
 library:Add{
 	Id="ucsectordcrate";
 	Level=420;
@@ -696,7 +696,7 @@ library:Add{
 
 
 --== Coop;
--- MARK: !outline: genesiscrate : 220
+-- MARK: genesiscrate : 220
 library:Add{
 	Id="genesiscrate";
 	Level=220;
@@ -710,7 +710,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: ggenesiscrate : 440
+-- MARK: ggenesiscrate : 440
 library:Add{
 	Id="ggenesiscrate";
 	Level=440;
@@ -725,7 +725,7 @@ library:Add{
 };
 
 
--- MARK: !outline: sunkenchest : 300
+-- MARK: sunkenchest : 300
 library:Add{
 	Id="sunkenchest";
 	Level=300;
@@ -741,7 +741,7 @@ library:Add{
 	};
 };
 
--- MARK: !outline: zenithcrate : maxlevel
+-- MARK: zenithcrate : maxlevel
 library:Add{
 	Id="zenithcrate";
 	Level=math.floor(modGlobalVars.MaxLevels/100)*100;

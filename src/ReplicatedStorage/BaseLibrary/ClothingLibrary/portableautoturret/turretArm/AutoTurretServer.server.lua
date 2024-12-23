@@ -585,6 +585,7 @@ function Update()
 		weaponModel:SetAttribute("TurretWeapon", true);
 		weaponModel:SetAttribute("ItemId", itemId);
 		weaponModel:SetAttribute("Grip", "ToolGrip");
+		weaponModel:SetAttribute("StorageItemId", weaponStorageItemID);
 		weaponModel:ScaleTo( customWeaponScale[itemId] or (weaponModel:GetScale()*0.8) );
 		
 		local handle = weaponModel:WaitForChild("Handle");

@@ -50,6 +50,7 @@ local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEve
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modRedeemService = require(game.ServerScriptService.ServerLibrary.RedeemService);
 local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+local modToolService = require(game.ServerScriptService.ServerLibrary.ToolService);
 
 local dirRemotes = game.ReplicatedStorage.Remotes;
 local bindIsInDuel = dirRemotes.IsInDuel;
@@ -487,19 +488,8 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 	local timeSinceLastShot = (cache.LastShot and tick()-cache.LastShot or 99);
 	local rawRpm = properties.Rpm;
 
-	--MARK: ProcessItemModifiers
-	local function ProcessItemModifiers(processType, ...)
-		for id, itemModifier in pairs(weaponModule.ModifierTriggers) do
-			itemModifier.WeaponModule = weaponModule;
-
-			if itemModifier[processType] then
-				itemModifier[processType](itemModifier, ...);
-			end
-		end
-	end
-
 	local changeRef = {RawRpm=rawRpm};
-	ProcessItemModifiers("OnPrimaryFire", changeRef);
+	modToolService.ProcessItemModifiers(weaponModule, "OnPrimaryFire", changeRef);
 	rawRpm = changeRef.RawRpm;
 	
 	local baseFirerate = 60/rawRpm;
@@ -639,7 +629,7 @@ remotePrimaryFire.OnServerEvent:Connect(function(client, weaponId, weaponModel, 
 			local hitInfo = hitInfoList[a];
 
 			--MARK: OnBulletHit
-			ProcessItemModifiers("OnBulletHit", {
+			modToolService.ProcessItemModifiers(weaponModule, "OnBulletHit", {
 				Player=client;
 				HitInfo=hitInfo;
 				WeaponModel=weaponModel;
