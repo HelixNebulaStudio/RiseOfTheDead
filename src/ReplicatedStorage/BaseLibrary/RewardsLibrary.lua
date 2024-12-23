@@ -48,7 +48,8 @@ function RewardsLibrary:Init(super)
 			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
 			{Wave=11; ItemId="hardhat"; Quantity=1; Chance=0.15;};
 			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
-			{Wave=13; ItemId="grandgarandparts1"; Quantity=1; Chance=0.075;};
+			{Wave=13; ItemId="grandgarandparts1"; Quantity=1; Chance=0.038;};
+			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
 		};
 		WaveBased=true;
 	};
@@ -62,7 +63,8 @@ function RewardsLibrary:Init(super)
 			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
 			{Wave=11; ItemId="hardhat"; Quantity=1; Chance=0.15;};
 			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
-			{Wave=13; ItemId="grandgarandparts2"; Quantity=1; Chance=0.075;};
+			{Wave=13; ItemId="grandgarandparts2"; Quantity=1; Chance=0.038;};
+			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
 		};
 		WaveBased=true;
 	};
@@ -76,7 +78,8 @@ function RewardsLibrary:Init(super)
 			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
 			{Wave=11; ItemId="hardhat"; Quantity=1; Chance=0.15;};
 			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
-			{Wave=13; ItemId="grandgarandparts3"; Quantity=1; Chance=0.075;};
+			{Wave=13; ItemId="grandgarandparts3"; Quantity=1; Chance=0.038;};
+			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
 		};
 		WaveBased=true;
 	};

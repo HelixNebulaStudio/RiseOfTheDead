@@ -48,6 +48,7 @@ local Configurations={
 	RecoilStregth=math.rad(90);
 
 	UseScopeGui=true;
+	KeepScopedWhenFiring=true;
 	
 	-- Sniper
 	BaseFocusDuration=3;
@@ -82,7 +83,7 @@ local Properties={
 
 local Animations=workspace:GetAttribute("IsDev") and {
 	Core={Id=115169929209429;};
-	PrimaryFire={Id=76053596239338; FocusWeight=1};
+	PrimaryFire={Id=76053596239338;};
 	EmptyFire={Id=112741517737403;};
 	Reload={Id=102798161524897;};
 	TacticalReload={Id=72036017995391;};
@@ -95,7 +96,7 @@ local Animations=workspace:GetAttribute("IsDev") and {
 	
 } or { -- Main
 	Core={Id=115169929209429;};
-	PrimaryFire={Id=76053596239338; FocusWeight=1};
+	PrimaryFire={Id=76053596239338;}; -- FocusWeight=1
 	EmptyFire={Id=112741517737403;};
 	Reload={Id=102798161524897;};
 	TacticalReload={Id=72036017995391;};

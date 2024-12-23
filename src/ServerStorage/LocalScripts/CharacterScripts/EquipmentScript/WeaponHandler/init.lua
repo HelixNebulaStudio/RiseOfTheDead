@@ -540,7 +540,7 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 				properties.CanAimDown = false;
 			end
 			
-			if properties.IsPrimaryFiring and configurations.UseScopeGui then
+			if properties.IsPrimaryFiring and configurations.UseScopeGui and configurations.KeepScopedWhenFiring ~= true then
 				properties.CanAimDown = false;
 			end
 			
