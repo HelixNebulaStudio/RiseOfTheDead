@@ -37,8 +37,8 @@ Dialogues.DialogueStrings = {
 	};
 
 	["xmas2019"]={
-		Say="I got 400 coal.";
-		Reply="Ho ho, that's great, here I'll trade you a present for the 400 coal.";
+		Say="I got 300 coal.";
+		Reply="Ho ho, that's great, here I'll trade you a present for the 300 coal.";
 	};
 	["xmas2020"]={
 		Say="I got 200 coal.";
@@ -226,7 +226,7 @@ if RunService:IsServer() then
 			local total = inventory:CountItemId("coal");
 			
 			dialog:AddChoice("xmas2019", function(dialog)
-				gift(400, "xmaspresent")
+				gift(300, "xmaspresent")
 			end)
 			
 			dialog:AddChoice("xmas2020", function(dialog)
