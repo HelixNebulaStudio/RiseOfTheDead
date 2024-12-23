@@ -198,7 +198,7 @@ function Interface.init(modInterface)
 				resupplyButton.buttonText.Text = "Purchasing...";
 				local serverReply = modShopLibrary.PurchaseReplies.InsufficientCurrency;
 				if localplayerStats and (localplayerStats[ammoCurrency] or 0) >= price then
-					serverReply = remoteShopService:InvokeServer("buyammo", {StoreObj=Interface.Object; AmmoPouch=openStorageItem.ID}, selectedItem.ID, storageId);
+					serverReply = remoteShopService:InvokeServer("buyammo", {StoreObj=Interface.Object; AmmoPouch=(openStorageItem and openStorageItem.ID or nil)}, selectedItem.ID, storageId);
 				end
 				resupplyButton.buttonText.Text = defaultText;
 				

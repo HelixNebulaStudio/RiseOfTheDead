@@ -1254,7 +1254,8 @@ function Interactable.SupplyCrate(src, boxName)
 	interact.IndicatorPresist = false;
 
 	function interactMeta:OnTrigger()
-		if self.UseLimit and self.PlayerUses and (self.PlayerUses[game.Players.LocalPlayer.Name] or 0) >= self.UseLimit then
+		local playerUses = self.PlayerUses and (self.PlayerUses[game.Players.LocalPlayer.Name] or 0);
+		if self.UseLimit and playerUses >= self.UseLimit then
 			self.Disabled = "You have exhausted your uses.";
 			
 			if self.Object and self.Object.Parent:FindFirstChild("AmmoBoxBase") then
@@ -1268,7 +1269,8 @@ function Interactable.SupplyCrate(src, boxName)
 			return;
 		end
 
-		self.Label = "Use ".. (boxName or "Supply Crate");
+		local str = "Use ".. (boxName or "Supply Crate");
+		self.Label = str..` ({self.UseLimit-playerUses}/{self.UseLimit} Uses)`;
 	end
 	
 	function interact:OnInteracted(library)
