@@ -315,6 +315,24 @@ function remoteFrostivus.OnServerInvoke(player, action, packet)
 			local isFulfilled, itemsList = shared.modStorage.FulfillList(player, fulfillList);
 
 			if isFulfilled then
+				hintPacket = mmObj:Submit(checkData, true);
+
+				local itemsToConsume = {};
+				for a=1, #submitData do
+					local itemId = submitData[a];
+					local state = hintPacket[a];
+					if state ~= 1 then
+						itemsToConsume[itemId] = true;
+					end
+				end
+
+				for a=#itemsList, 1, -1 do
+					local storageItem = itemsList[a].Item;
+					if itemsToConsume[storageItem.ItemId] then
+						continue;
+					end
+					table.remove(itemsList, a);
+				end
 				shared.modStorage.ConsumeList(itemsList);
 
 			else

@@ -89,7 +89,7 @@ function MasterMind:StringifyAnswer()
     return #self.SessionAnswer > 0 and `\{{table.concat(self.SessionAnswer, ", ")}\}` or "{}";
 end
 
-function MasterMind:Submit(submitChoices)
+function MasterMind:Submit(submitChoices, testOnly)
     local sessionAns = self.SessionAnswer;
 
     local hintPacket = {};
@@ -125,15 +125,17 @@ function MasterMind:Submit(submitChoices)
         end
     end
 
-    if allCorrect then
-        self.SessionState = MasterMind.States.Completed;
-    else
-        self.SessionLives = self.SessionLives -1;
-
-        if self.SessionLives <= 0 then
-            self.SessionState = MasterMind.States.Failed;
-
-            self.Answer = self.SessionAnswer;
+    if testOnly ~= true then
+        if allCorrect then
+            self.SessionState = MasterMind.States.Completed;
+        else
+            self.SessionLives = self.SessionLives -1;
+    
+            if self.SessionLives <= 0 then
+                self.SessionState = MasterMind.States.Failed;
+    
+                self.Answer = self.SessionAnswer;
+            end
         end
     end
 
