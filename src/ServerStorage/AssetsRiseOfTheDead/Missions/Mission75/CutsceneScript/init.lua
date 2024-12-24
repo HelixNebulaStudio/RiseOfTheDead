@@ -622,6 +622,8 @@ return function(CutsceneSequence)
 						local weapons = {"xm1014"; "mp5"; "ak47"; };
 						
 						local function spawnEnemy(spawnPoint)
+							if #enemies >= 6 then return end;
+							
 							modNpc.Spawn("Bandit", spawnPoint, function(npc, npcModule)
 								table.insert(enemies, npcModule);
 								npcModule.Configuration.Level = npcModule.Configuration.Level + 2;
