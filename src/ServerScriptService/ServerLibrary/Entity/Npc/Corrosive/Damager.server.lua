@@ -6,7 +6,7 @@ local modPlayers = require(game.ReplicatedStorage.Library.Players);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 
 local victims = {};
-local damage, rate = 2, 0.1;
+local damage, rate = 2, 0.2;
 
 local function Damage(player)
 	if victims[player] == nil or tick()-victims[player] >= rate then
@@ -23,7 +23,7 @@ local function Damage(player)
 				end
 				
 				classPlayer:TakeDamagePackage(modDamagable.NewDamageSource{
-					Damage=2;
+					Damage=4;
 					OriginPosition=classPlayer:GetCFrame().Position;
 				});
 			end
