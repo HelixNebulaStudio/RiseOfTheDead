@@ -174,7 +174,7 @@ return function()
 			end;
 			
 			local soundList = {};
-			for _, sound in pairs(audioModule:GetChildren()) do
+			for _, sound in pairs(audioModule.ServerAudio:GetChildren()) do
 				if sound.TimeLength > 59 then
 					table.insert(soundList, sound);
 				end
