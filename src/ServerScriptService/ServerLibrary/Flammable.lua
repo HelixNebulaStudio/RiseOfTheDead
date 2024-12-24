@@ -26,9 +26,6 @@ function fireTouchHandler:WhitelistFunc()
 	return whitelist;
 end
 
-local remotes = game.ReplicatedStorage.Remotes;
-local bindIsInDuel = remotes.IsInDuel;
-
 local fireParticle = game.ReplicatedStorage.Particles.Fire2;
 --== Script;
 local Flammable = {};
@@ -42,10 +39,16 @@ function Flammable:Ignite(part)
 	local newFire = fireParticle:Clone();
 	newFire.Parent = part;
 	
-	if math.random(1, 2) == 1 then
+	if math.random(1, 3) == 1 then
 		local sound = modAudio.Play("Fire", part, true);
 		sound.Volume = math.random(1, 3)/10;
 	end;
+	
+	task.spawn(function()
+		task.wait(math.random(0, 2500)/10000);
+		local sound = modAudio.Play(`FireBall{math.random(1,4)}`, part);
+		sound.PlaybackSpeed = math.random(900,1100)/1000;
+	end)
 	
 	fireTouchHandler:AddObject(part);
 end

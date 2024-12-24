@@ -25,7 +25,7 @@ function ExplosionHandler:Cast(position, params)
 	params.Tags = params.Tags or {
 		{"PlayerRootParts"}; -- 1
 		{"EntityRootPart"}; -- 2
-		{"Destructibles"; "EntityDestructibles"}; --"EnvironmentColliders";
+		{"Destructibles"; "EntityDestructibles"; "Flammable"}; --"EnvironmentColliders";
 	};
 	
 	
