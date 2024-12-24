@@ -101,6 +101,7 @@ end
 modConfigurations.OnChanged("DisableWeaponInterface", toggleWeaponInterface)
 modConfigurations.OnChanged("DisableHud", toggleWeaponInterface);
 
+local weaponStatusDisplay = {};
 function WeaponHandler:Equip(toolPackage, weaponId)
 	modAudio.Preload("BulletBodyImpact");
 	modAudio.Preload("BulletBodyImpact2");
@@ -114,8 +115,6 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 		LastSprintAnimationCanPlay = nil;
 	} :: any;
 
-	local weaponStatusDisplay = {};
-	
 	weaponStatusDisplay.Reload = {
 		Order=1;
 		Text="Reload";

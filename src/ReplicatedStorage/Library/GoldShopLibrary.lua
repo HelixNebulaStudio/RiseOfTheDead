@@ -1601,22 +1601,11 @@ GoldShopLibrary.Products:Add{
 };
 
 GoldShopLibrary.Products:Add{
-	Id="boomerang";
+	Id="frenzydamagemod";
 	Product={
 		Type="Gold";
 		Price=4990;
-		ItemId="boomerang";
-		New=true;
-		Desc="\n\n\n<b>[Early Access]</b>  Will be obtainable from drops in the future.";
-	};
-};
-
-GoldShopLibrary.Products:Add{
-	Id="skullburstmod";
-	Product={
-		Type="Gold";
-		Price=4990;
-		ItemId="skullburstmod";
+		ItemId="frenzydamagemod";
 		New=true;
 		Desc="\n\n\n<b>[Early Access]</b>  Will be obtainable from drops in the future.";
 	};

@@ -39,12 +39,14 @@ elseif RunService:IsClient() then
 			self.SkullBurstStacks = 0;
 			self.SkullBurstCooldownTick = tick();
 			self.SkullBurstDepleteTick = tick();
+		end
 
+		if weaponStatusDisplay.SkullBurst == nil then
 			weaponStatusDisplay.SkullBurst = {
 				ModItemId=`skullburstmod`;
 				Order=1;
 				Text="0%";
-			}
+			};
 		end
 
 		if tick()-self.SkullBurstCooldownTick >= 10 then
