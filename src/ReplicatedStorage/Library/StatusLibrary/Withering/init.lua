@@ -25,7 +25,7 @@ function StatusClass.OnApply(classPlayer, status)
 	if RunService:IsServer() then
 		
 	else
-		modData = require(localPlayer:WaitForChild("DataModule"));
+		modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 		modCharacter = modData:GetModCharacter();
 		mainInterface = modData:GetInterfaceModule();
 
@@ -128,6 +128,7 @@ function StatusClass.OnTick(classPlayer, status, tickPack)
 			alpha = math.clamp(alpha, 0, 2);
 			screenEffect:SetAttribute("Alpha", alpha);
 			
+			status.Alpha = math.clamp(alpha, 0, 1);
 			
 			if tickPack.ms500 ~= true then return end;
 			local alpha = screenEffect:GetAttribute("Alpha");
@@ -144,6 +145,8 @@ function StatusClass.OnRelay(classPlayer, status, ...)
 		local maxArmor = classPlayer.Properties.MaxArmor;
 		status.Amount = math.round(maxArmor * 0.0333 * 100)/100;
 	end
+
+	status.Alpha = math.clamp(alpha, 0, 1);
 end
 
 return StatusClass;

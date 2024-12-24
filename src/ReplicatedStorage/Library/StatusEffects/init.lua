@@ -1116,6 +1116,7 @@ function StatusEffects.Withering(player, duration)
 		ExpiresOnDeath=true;
 		Expires=modSyncTime.GetTime()+duration;
 		Duration=duration;
+		Alpha=0;
 	});
 end
 

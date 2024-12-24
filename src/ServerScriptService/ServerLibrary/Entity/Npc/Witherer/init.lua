@@ -48,7 +48,7 @@ return function(npc, spawnPoint)
 	
 	--== Initialize;
 	function self.Initialize()
-		self.Humanoid.MaxHealth = math.max(1024 + 1024*(self.Configuration.Level-1), 1024);
+		self.Humanoid.MaxHealth = math.clamp(1024 + 1024*(self.Configuration.Level-1), 1024, 102400);
 		self.Humanoid.Health = self.Humanoid.MaxHealth;
 		
 		self.EyePrefab = withererEye:Clone();
@@ -89,6 +89,8 @@ return function(npc, spawnPoint)
 				
 				self:TakeDamage("Eyeball", amount);
 			end
+			
+			return;
 		end
 		
 		self.CustomHealthbar:Create("Eyeball", self.Humanoid.MaxHealth, eyeBall);
