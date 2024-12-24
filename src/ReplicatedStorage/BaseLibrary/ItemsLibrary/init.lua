@@ -982,7 +982,7 @@ function ItemsLibrary:Init(super)
 		itemValues.ExpireLength = shared.Const.MonthSecs;
 	end;
 	frostivusPresentBase.OnAdd = function(data)
-		local descStr = "Frostivus event is here! Talk to Mr. Klaws to use these gifts!";
+		local descStr = "Frostivus event is here! Open your mission menu and click Frostivus to use in the minigames!";
 		if data.Id == "bluegift" then
 			descStr = descStr..`\nWearing the <b><font color="#{data.NameColor:ToHex()}">Blue</font> Santa Hat</b> will increase drop rate of blue gifts.`;
 		elseif data.Id == "redgift" then
