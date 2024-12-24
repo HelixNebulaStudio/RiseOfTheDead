@@ -1004,7 +1004,7 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="santahatyellow"; Icon="rbxassetid://94254676862025"; SkinPerm="Yellow"; TargetItemId="santahat";});
 	new(skinPermBase, {Id="xmassweatersnowflakered"; Icon="rbxassetid://109655819748094"; SkinPerm="Red Snowflake"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="xmassweatersnowflakegreen"; Icon="rbxassetid://78028432874407"; SkinPerm="Green Snowflake"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
-	new(skinPermBase, {Id="xmassweatersnowflakeblue"; Icon="rbxassetid://99198676650490"; SkinPerm="Green Snowflake"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
+	new(skinPermBase, {Id="xmassweatersnowflakeblue"; Icon="rbxassetid://99198676650490"; SkinPerm="Blue Snowflake"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="brownbeltxmasorange"; Icon="rbxassetid://119905732158933"; SkinPerm="Red Snowflake"; TargetItemId="brownbelt"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="brownbeltxmaspink"; Icon="rbxassetid://97310653356411"; SkinPerm="Green Snowflake"; TargetItemId="brownbelt"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="arelshiftcrossgingerbread"; Icon="rbxassetid://85625473582729"; SkinPerm="Gingerbread"; TargetItemId="arelshiftcross"; });
