@@ -134,10 +134,11 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 		
 		for _, basePart in pairs(hitList) do
 			if CollectionService:HasTag(basePart, "Flammable") then
-				local modFlammable = require(game.ServerScriptService.ServerLibrary.Flammable);
-				modFlammable:Ignite(basePart);
+				task.spawn(function()
+					local modFlammable = require(game.ServerScriptService.ServerLibrary.Flammable);
+					modFlammable:Ignite(basePart);
+				end)
 			end
-
 			if params.OnPartHit then
 				params.OnPartHit(params, basePart);
 			end
