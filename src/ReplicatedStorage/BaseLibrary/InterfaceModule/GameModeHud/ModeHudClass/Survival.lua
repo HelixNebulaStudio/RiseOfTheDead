@@ -136,7 +136,8 @@ return function(...)
 						nextRewardFrame.rewardLabel.Text = `<font size="10">Next Reward</font>\n{itemLib.Name} drops after wave {nextRewardInfo.Wave}`;
 
 						local itemButtonObject = nextRewardItemButton or modItemInterface.newItemButton();
-						itemButtonObject:SetItemId(itemId)
+						itemButtonObject:SetItemId(itemId);
+
 						nextRewardItemButton = itemButtonObject;
 						local newItemButton = itemButtonObject.ImageButton;
 
@@ -145,6 +146,7 @@ return function(...)
 						newItemButton.Parent = nextRewardFrame;
 						
 						itemButtonObject:Update();
+						newItemButton.Image = itemLib.Icon;
 
 						if nextRewardFrame:GetAttribute("Hidden") == true then
 							nextRewardFrame:SetAttribute("Hidden", false);
