@@ -1172,15 +1172,27 @@ function StatusEffects.VexBile(player, duration)
 	end
 end
 
-function StatusEffects.CorruptVision(player, val)
+function StatusEffects.CorruptVision(player, val, params)
+	params = typeof(params) == "table" and params or {};
 	val = val == true;
 
 	if RunService:IsServer() then
-		replicateStatus(player, "CorruptVision", val);
+		replicateStatus(player, "CorruptVision", val, params);
 	else
 		if val == true then
-			modCameraGraphics.TintColor:Set("corrupt", Color3.fromRGB(204, 157, 151), 1);
-			modCameraGraphics:SetAtmosphere(script.CorruptAtmosphere, "corrupt", modCameraGraphics.EffectsPriority.Sky);
+			modCameraGraphics.TintColor:Set("corrupt", params.TintColor or Color3.fromRGB(204, 157, 151), 1);
+
+			local corruptAtmosphere: Atmosphere = script.CorruptAtmosphere;
+			
+			corruptAtmosphere.Density = params.Density or corruptAtmosphere.Density;
+			corruptAtmosphere.Offset = params.Offset or corruptAtmosphere.Offset;
+
+			corruptAtmosphere.Color = params.Color or corruptAtmosphere.Color;
+			corruptAtmosphere.Decay = params.Decay or corruptAtmosphere.Decay;
+			corruptAtmosphere.Glare = params.Glare or corruptAtmosphere.Glare;
+			corruptAtmosphere.Haze = params.Haze or corruptAtmosphere.Haze;
+
+			modCameraGraphics:SetAtmosphere(corruptAtmosphere, "corrupt", modCameraGraphics.EffectsPriority.Sky);
 		else
 			modCameraGraphics.TintColor:Remove("corrupt");
 			modCameraGraphics:ClearAtmosphere("corrupt");

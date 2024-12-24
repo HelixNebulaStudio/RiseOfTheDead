@@ -139,6 +139,7 @@ function Survival:Load()
 		end
 	end);
 	
+	-- MARK: /survival
 	task.spawn(function()
 		Debugger.AwaitShared("modCommandsLibrary");
 		shared.modCommandsLibrary:HookChatCommand("survival", {
@@ -149,6 +150,7 @@ function Survival:Load()
 		/survival sethazard hazardId
 		/survival setobj objectiveId
 		/survival resupply
+		/survival listwaves [startWave]
 		]];
 
 			RequiredArgs = 0;
@@ -204,6 +206,19 @@ function Survival:Load()
 				elseif action == "resupply" then
 					self.ResupplyEnabled = true;
 					shared.Notify(game.Players:GetPlayers(), "Resupply crate will spawn at the end of the wave.", "Inform");
+
+				elseif action == "listwaves" then
+					local startWave = tonumber(args[2]) or self.Wave;
+					
+					local waveStr = {};
+					for w=startWave, startWave+10 do
+						local pickObjective, pickHazard = self:GetNextWaveInfo(w);
+						
+						table.insert(waveStr, `[{w}] Obj:{pickObjective and pickObjective.Type or "~"} Haz:{pickHazard and pickHazard.Type or "~"}`);
+					end
+
+					shared.Notify(player, "Next 10 waves:\n"..table.concat(waveStr, "\n"), "Inform");
+
 				end
 				
 				return true;
@@ -467,6 +482,7 @@ function Survival:GetNextWaveInfo(wave)
 	return pickObjective, pickHazard;
 end
 
+-- MARK: StartWave
 function Survival:StartWave(wave)
 	self.GameState = "Active";
 	self.Status = EnumStatus.InProgress;
@@ -752,7 +768,7 @@ function Survival:RespawnDead()
 	end
 end
 
--- MARK: Survival:Start()
+-- MARK: Start
 function Survival:Start()
 	Debugger:Warn("start game");
 	self.Status = EnumStatus.InProgress;
@@ -832,7 +848,7 @@ function Survival:Start()
 	end
 end
 
--- MARK: Survival:Initialize(roomData)
+-- MARK: Initialize
 function Survival:Initialize(roomData)
 	self.RoomData = roomData;
 	self.Players = {};
@@ -933,8 +949,8 @@ function Survival:Initialize(roomData)
 					end
 				end)
 
-				if self.IsHard then
-					modStatusEffects.CorruptVision(player, true);
+				if self.IsHard and self.CorruptVision then
+					modStatusEffects.CorruptVision(player, true, self.CorruptVision);
 				end
 			end)
 
@@ -972,6 +988,19 @@ function Survival:Initialize(roomData)
 	
 	if self.FirstStart ~= true then
 		self.FirstStart = true;
+
+		for a=#self.ObjectivesList, 1, -1 do
+			local classObjective = self.ObjectivesList[a].Class;
+			local diffModes = classObjective.DifficultyModes or {};
+			if self.IsHard and diffModes.Hard == false then
+				table.remove(self.ObjectivesList, a);
+
+			elseif self.IsHard == false and diffModes.Easy == false then
+				table.remove(self.ObjectivesList, a);
+
+			end
+		end
+		
 		self:Start();
 	end
 end

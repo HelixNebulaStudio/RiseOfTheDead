@@ -66,7 +66,7 @@ function Objective:Begin()
 		table.insert(Objective.Prefabs, newPrefab);
 		
 		local humanoid = newPrefab:WaitForChild("Structure");
-		humanoid.MaxHealth = 1000;
+		humanoid.MaxHealth = 1000 * (self.Controller.IsHard and 10 or 1);
 		humanoid.Health = humanoid.MaxHealth;
 		
 		local destructible = require(newPrefab:WaitForChild("Destructible"));

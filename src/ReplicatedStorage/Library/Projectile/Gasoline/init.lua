@@ -85,9 +85,9 @@ function Pool.new(owner)
 			end
 			
 			local hitWorldSize = hitPart.CFrame:vectorToWorldSpace(hitPart.Size);
-			local minSize = math.clamp(math.min( math.abs(hitWorldSize.X), math.abs(hitWorldSize.Z), 10), 0.6, 10);
+			local maxSize = math.clamp(math.min( math.abs(hitWorldSize.X), math.abs(hitWorldSize.Z), 10), 0.6, math.random(750, 1100)/100);
 			TweenService:Create(self.Prefab, tweenInfo, {
-				Size = Vector3.new(minSize, 0.6, minSize);
+				Size = Vector3.new(maxSize, 0.6, maxSize);
 			}):Play();
 			
 			

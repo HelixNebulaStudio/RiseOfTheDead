@@ -6,14 +6,7 @@ local CollectionService = game:GetService("CollectionService");
 
 local tweenInfo = TweenInfo.new(3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
 local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
-
-local function spread(maxSpreadAngle)
-	local deflection = math.random(0, 100)/100^2 * math.rad(maxSpreadAngle);
-	local cf = CFrame.lookAt(Vector3.new(), Vector3.new(0, -1, 0))
-	cf = cf*CFrame.Angles(0, 0, math.random(0, 100)/100 *2*math.pi);
-	cf = cf*CFrame.Angles(deflection, 0, 0);
-	return cf.lookVector;
-end
+local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 
 if RunService:IsServer() then
 	modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
@@ -53,7 +46,7 @@ return function()
 						
 						local projectileObject = modProjectile.Fire("Gasoline", origin, Vector3.new(0, -1, 0), nil, self.Player);
 						
-						local spreadLookVec = spread(90);
+						local spreadLookVec = modMath.CFrameSpread(-Vector3.yAxis, 90);
 
 						modProjectile.ServerSimulate(projectileObject, origin.p, spreadLookVec * 20);
 						

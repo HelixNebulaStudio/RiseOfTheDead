@@ -98,6 +98,12 @@ function NpcStatusMeta:TakeDamagePackage(damageSource)
 	local initAmount = amount;
 	local player = dealer or (storageItem and storageItem.Player);
 
+	if damageType == "FireDamage" then
+		if npcModule and npcModule.OnFlammableIgnite then
+			npcModule.OnFlammableIgnite();
+		end
+	end
+
 	local immunity = self:GetImmunity(damageType, damageCate);
 
 	local infoBubblePlayers = self:GetAttackers();

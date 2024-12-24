@@ -78,7 +78,6 @@ function Pool.new(owner)
 			local dmgMulti = self.TargetableEntities[humanoid.Name];
 			
 			if dmgMulti and damagableObj:CanTakeDamageFrom(player) then
-								
 				local newFire = Instance.new("Fire");
 				newFire.Heat = 10;
 				newFire.Size = 8;

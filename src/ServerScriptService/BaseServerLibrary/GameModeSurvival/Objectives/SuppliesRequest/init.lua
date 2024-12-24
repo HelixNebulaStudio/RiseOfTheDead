@@ -4,6 +4,7 @@ local Objective = {};
 Objective.__index = Objective;
 
 Objective.Title = "Supplies Request";
+Objective.DifficultyModes = {Hard=false;};
 
 Objective.Controller = nil;
 
@@ -73,7 +74,7 @@ function Objective:Begin()
 	end);
 	
 	local humanoid = newPrefab:WaitForChild("Structure");
-	humanoid.MaxHealth = 10000;
+	humanoid.MaxHealth = 10000 * (self.Controller.IsHard and 10 or 1);
 	humanoid.Health = humanoid.MaxHealth;
 
 	local destructible = require(newPrefab:WaitForChild("Destructible"));
