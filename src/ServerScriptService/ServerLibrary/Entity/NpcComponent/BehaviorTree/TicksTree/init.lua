@@ -155,6 +155,8 @@ return function(self)
 					ExplosionStun = 1;
 					ExplosionStunThreshold = 0;
 
+					IgniteFlammables=false;
+
 					DamageOrigin = detonatePosition;
 				};
 				
