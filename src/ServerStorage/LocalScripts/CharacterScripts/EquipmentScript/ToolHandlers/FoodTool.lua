@@ -12,16 +12,13 @@ local player = game.Players.LocalPlayer;
 --== Modules;
 local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 local modCharacter = modData:GetModCharacter();
-local modInterface = modData:GetInterfaceModule();
 
 local modFlashlight = require(script.Parent.Parent:WaitForChild("Flashlight"));
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modTools = require(game.ReplicatedStorage.Library.Tools);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 
 --== Remotes;
-local remotes = game.ReplicatedStorage.Remotes;
 local remoteToolHandlerPrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
 
 --== Vars;
@@ -79,6 +76,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 		end
 		
 		animations[key]:GetMarkerReachedSignal("PlaySound"):Connect(function(paramString)
+			modAudio.Preload(paramString, 1);
 			modAudio.Play(paramString, handle, false);
 		end)
 		
@@ -112,6 +110,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 	animSoundConn = animations["Use"].KeyframeReached:Connect(function(keyframe)
 		if keyframe:sub(1, 6) == "Sound_" then
 			local id = keyframe:sub(7, #keyframe);
+			modAudio.Preload(id, 1);
 			modAudio.PlayReplicated(id, handle);
 		end
 	end)

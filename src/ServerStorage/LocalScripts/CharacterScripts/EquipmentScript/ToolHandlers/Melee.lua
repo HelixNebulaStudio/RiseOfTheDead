@@ -33,11 +33,9 @@ local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modToolAnimator = require(script.Parent.Parent.ToolAnimator);
 
 local modRadialImage = require(game.ReplicatedStorage.Library.UI.RadialImage);
-local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 
 --== Remotes;
 local remoteToolPrimaryFire = modRemotesManager:Get("ToolHandlerPrimaryFire");
-local remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler");
 
 --== Vars;
 local mouseProperties = modCharacter.MouseProperties;
@@ -95,6 +93,10 @@ function ToolHandler:Equip(storageItem, toolModels)
 	local configurations = toolConfig.Configurations;
 	local properties = toolConfig.Properties;
 	local audio = toolLib.Audio;
+	
+	for k, audioData in pairs(audio) do
+		modAudio.Preload(audioData.Id);
+	end
 	
 	properties.Disabled = false;
 
@@ -180,47 +182,11 @@ function ToolHandler:Equip(storageItem, toolModels)
 	local colliderOverlapParams = OverlapParams.new();
 	colliderOverlapParams.MaxParts = 4;
 	
-	local function onKeyFrameReached(keyframe)
-		Debugger:Warn("Using deprecated keyframe waist rotation.");
-		if keyframe:sub(1, 14) == "WaistRotation:" then
-			local waist = tonumber(keyframe:sub(15, #keyframe));
-			if waist then
-				characterProperties.Joints.WaistY = math.rad(waist);
-			end
-			
-		end
-	end
-	
-	local function setWaistMarker(paramString)
-		local waist = tonumber(paramString);
-		if waist then
-			characterProperties.Joints.WaistY = math.rad(waist);
-		end
-		if modBranchConfigs.CurrentBranch.Name == "Dev" then
-			Debugger:Warn("[Dev] Set WaistRotation ", waist);
-		end
-	end
-
 	toolAnimator:ConnectMarkerSignal("Event", function(animId, animTrack, value)
 		if configurations.OnMarkerEvent ~= nil then
 			configurations.OnMarkerEvent(self, animId, animTrack, value);
 		end
 	end)
-	-- :GetMarkerReachedSignal("Event"):Connect(function(paramString)
-	-- 	if configurations.OnMarkerEvent ~= nil then
-	-- 		configurations.OnMarkerEvent({Left=leftWeaponModel; Right=rightWeaponModel;}, key, paramString);
-	-- 	end
-	-- end)
-	-- table.insert(Equipped.Connections, animations["PrimaryAttack"]:GetMarkerReachedSignal("SetWaist"):Connect(setWaistMarker));
-	-- if animations["PrimaryAttack2"] then
-	-- 	table.insert(Equipped.Connections, animations["PrimaryAttack2"]:GetMarkerReachedSignal("SetWaist"):Connect(setWaistMarker));
-	-- end;
-	-- -- OLD
-	-- table.insert(Equipped.Connections, animations["PrimaryAttack"].KeyframeReached:Connect(onKeyFrameReached));
-	-- if animations["PrimaryAttack2"] then
-	-- 	table.insert(Equipped.Connections, animations["PrimaryAttack2"].KeyframeReached:Connect(onKeyFrameReached));
-	-- end;
-	-- --
 	
 	Equipped.Cache.HitCache = {};
 	
