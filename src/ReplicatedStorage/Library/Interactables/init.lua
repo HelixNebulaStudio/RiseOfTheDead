@@ -1270,7 +1270,11 @@ function Interactable.SupplyCrate(src, boxName)
 		end
 
 		local str = "Use ".. (boxName or "Supply Crate");
-		self.Label = str..` ({self.UseLimit-playerUses}/{self.UseLimit} Uses)`;
+		if self.UseLimit then
+			self.Label = str..` ({self.UseLimit-playerUses}/{self.UseLimit} Uses)`;
+		else
+			self.Label = str;
+		end
 	end
 	
 	function interact:OnInteracted(library)
