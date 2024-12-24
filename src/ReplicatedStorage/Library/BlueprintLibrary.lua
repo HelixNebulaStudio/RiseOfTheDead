@@ -70,7 +70,7 @@ end;
 
 local blueprintBase = {
 	Type = modItemsLibrary.Types.Blueprint;
-	Tradable = modItemsLibrary.Tradable.Tradable;
+	Tradable = modItemsLibrary.Tradable.PremiumOnly;
 	Stackable = 5;
 };
 
@@ -126,7 +126,7 @@ function BlueprintLibrary.New(data)
 		Sources=data.Sources;
 		Tags=data.Tags;
 		RequireDesc = requireDesc;
-		TradingTax=data.TradingTax;
+		NonPremiumTax=data.TradingTax;
 	});
 	--modItem.new(data.Id, data.Name, modItem.Types.Blueprint, productLib.Icon, 5, desc, "Tradable", data.Tier);
 end
