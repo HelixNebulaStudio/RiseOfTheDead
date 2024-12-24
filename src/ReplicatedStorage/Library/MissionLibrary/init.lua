@@ -2373,7 +2373,7 @@ MissionLibrary.New{
 		{Text="Objectives"; CompleteText="Well done"; Objectives={"CompleteSurvival", "ActivateMonorail"};};
 	};
 	Objectives={
-		["CompleteSurvival"]={Index=1; Description="Complete Sector: D";};
+		["CompleteSurvival"]={Index=1; Description="Reach Wave 5 in Sector: D";};
 		["ActivateMonorail"]={Index=2; Description="Activate the Monorail";};
 	};
 	CompleteAfterObjectives=true; -- complete if all objectives are done.

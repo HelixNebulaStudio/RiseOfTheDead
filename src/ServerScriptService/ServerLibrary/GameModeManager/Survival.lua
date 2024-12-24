@@ -79,7 +79,18 @@ function GameMode:WorldLoad(modeData)
 		end;
 		
 		local arenaTimer = tick();
+		local completedWave5 = false;
 		gameController.OnWaveEnd = function(players, wave)
+			task.spawn(function()
+				if wave >= 5 and not completedWave5 then
+					completedWave5 = true;
+					
+					for _, player in pairs(players) do
+						modOnGameEvents:Fire("OnGameModeComplete", player, gameType, gameStage, modeData.Room);
+						modAnalytics.RecordProgression(player.UserId, "Complete", gameType..":"..(modeData.Room.IsHard and "Hard-" or "")..gameStage);
+					end
+				end
+			end)
 			spawn(function()
 				for _, player in pairs(players) do
 					local profile = modProfile:Get(player);

@@ -1594,7 +1594,6 @@ GoldShopLibrary.Products:Add{
 		Type="Gold";
 		Price=4990;
 		ItemId="apron";
-		New=true;
 	};
 
 	Trader={Buy=true; Sell=true;};
