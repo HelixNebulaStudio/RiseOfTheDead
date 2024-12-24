@@ -74,12 +74,16 @@ return function(CutsceneSequence)
 		end
 		
 		local salvageSpawned = {}
+		local salvalgesSpawned = false;
 		
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
 				
 			elseif mission.Type == 1 then -- OnActive
 				if mission.ProgressionPoint == 1 then
+					if salvalgesSpawned then return end;
+					salvalgesSpawned = true;
+					
 					for a=1, #chosenSpawns do
 						local spawnCframe = chosenSpawns[a];
 						
@@ -93,6 +97,7 @@ return function(CutsceneSequence)
 							profile.Cache.Mission77_OnSunkenSalvagesSpawn(spawnCframe);
 						end
 					end
+
 				end
 				
 			elseif mission.Type == 3 then -- OnComplete

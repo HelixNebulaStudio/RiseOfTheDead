@@ -237,7 +237,7 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="mercskneepads"; Name="Merc's Knee Pads"; Icon="rbxassetid://11026588384"; Tags={"Utility Wear"}; Description="A mercenary's favourite holster and knee pads.\n\n<b>[Passive] Tactical Holsters:</b>Reduces tool equip time by 40%.";});
 	new(clothingBase, {Id="portableautoturret"; TradingTax=9900; Usable="Configure"; CanVanity=false; Name="Portable Auto Turret"; Icon="rbxassetid://139796387934890"; Tags={"Utility Wear"}; Description="A wearable portable auto turret designed by the Mysterious Engineer. Requires batteries to run. Configure to equipped your weapon onto the arm and fine tune the P.A.T. to how you want it to function, but due to it's crude nature, the arm's aim accuracy can be underwhelming and reload times are 3x as slow."; Sources={"Obtained in <b>Mission: Belly of the Beast</b>";}; });
 	new(clothingBase, {Id="snowsledge"; Name="Snow Sledge"; Icon="rbxassetid://81677686649543"; Tags={"Utility Wear"}; Description="A home-made wooden sledge.\n\n<b>[Passive] Sledding:</b>Start sledding when you slide, allows you to slide for 2 extra seconds before you experience friction.";});
-	new(clothingBase, {Id="ammopouch"; Name="Ammo Pouch"; Icon="rbxassetid://122023406947488"; Tags={"Utility Wear"}; Description="A pouch to contain extra ammo refill for your weapons. Refill charges can be restored in the shop."; });
+	new(clothingBase, {Id="ammopouch"; Name="Ammo Pouch"; Icon="rbxassetid://122023406947488"; Tags={"Utility Wear"}; Description="A pouch to contain extra ammo refills for your weapons. Refill charges can be restored in the shop."; });
 
 	local storageBase = {
 		Type = super.Types.Clothing;

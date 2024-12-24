@@ -337,7 +337,7 @@ function BattlePassSave:AddLevel(bpId, addAmt, majorAlert)
 	end
 
 	remoteHudNotification:FireClient(self.Player, "BattlePassLevelUp", {
-		Title=bpLib.HudTitle;
+		Title=(bpLib.Title or bpLib.HudTitle);
 		Level=passData.Level; 
 		HasRewards=newRewardAdded;
 	});
