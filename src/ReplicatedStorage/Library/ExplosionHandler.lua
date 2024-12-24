@@ -95,6 +95,8 @@ export type ExplosionProcessPacket = {
 	ExplosionStunThreshold: number?;
 	ExplosionForce: number?;
 
+	IgniteFlammables: boolean?;
+
 	Owner: Player?;
 	DamageOrigin: Vector3?;
 	OnPartHit: ((packet: ExplosionProcessPacket, basePart: BasePart) -> nil)?;
@@ -116,6 +118,9 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 	params.DamageRatio = params.DamageRatio or nil;
 	params.ExplosionStun = params.ExplosionStun or 0.5;
 	params.ExplosionForce = params.ExplosionForce or 100;
+	
+	params.IgniteFlammables = params.IgniteFlammables == nil or params.IgniteFlammables;
+
 	params.Owner = params.Owner or nil;
 	params.DamageOrigin = position or params.DamageOrigin or nil;
 
@@ -128,6 +133,11 @@ function ExplosionHandler:Process(position: Vector3, hitResultLayers: HitResultL
 		local fireFuncs = {};
 		
 		for _, basePart in pairs(hitList) do
+			if CollectionService:HasTag(basePart, "Flammable") then
+				local modFlammable = require(game.ServerScriptService.ServerLibrary.Flammable);
+				modFlammable:Ignite(basePart);
+			end
+
 			if params.OnPartHit then
 				params.OnPartHit(params, basePart);
 			end
