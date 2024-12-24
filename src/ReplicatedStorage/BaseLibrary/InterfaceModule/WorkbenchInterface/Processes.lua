@@ -191,7 +191,7 @@ function Workbench.new()
 						titleTag.Text = `Polish {itemLib.Name}`;
 
 						local timeLeft = process.Data.T-t;
-						local buildPercent = math.clamp(1-(timeLeft/600), 0, 1);
+						local buildPercent = math.clamp(1-(timeLeft/modWorkbenchLibrary.PolishDuration), 0, 1);
 
 						local initTween = progressBar:GetAttribute("initTween");
 						if initTween == nil then

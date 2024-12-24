@@ -31,7 +31,7 @@ if RunService:IsServer() then
     function LazyLoader:Deliver(player: Player, obj: Instance)
         local new = obj:Clone();
         new.Parent = player.PlayerGui:WaitForChild("ReplicationDelivery");
-        Debugger.Expire(new, 10);
+        Debugger.Expire(new, 60);
 
         return new;
     end
