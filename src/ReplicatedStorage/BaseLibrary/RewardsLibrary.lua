@@ -57,7 +57,7 @@ function RewardsLibrary:Init(super)
 
 	super:Add{
 		Id="corruptedprisoncrate";
-		Level=340;
+		Level=300;
 		Rewards={
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=8; ItemId="apron"; Quantity=1; Chance=0.6;};
@@ -73,7 +73,7 @@ function RewardsLibrary:Init(super)
 
 	super:Add{
 		Id="corruptedsectordcrate";
-		Level=440;
+		Level=300;
 		Rewards={
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=8; ItemId="apron"; Quantity=1; Chance=0.6;};

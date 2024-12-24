@@ -384,10 +384,10 @@ library:Add{
 
 --==Extreme;
 
--- MARK: zricera : 100
+-- MARK: zricera : 50
 library:Add{
 	Id="zricera";
-	Level=100;
+	Level=50;
 	Rewards={
 		{Index=1; Weekday="Monday"; ItemId="hmgdamagemod"; Quantity=1; Chance=1;};
 		{Index=1; Weekday="Tuesday"; ItemId="machete"; Quantity=1; Chance=1;};
@@ -402,10 +402,10 @@ library:Add{
 	};
 };
 
--- MARK: vexeron : 200
+-- MARK: vexeron : 100
 library:Add{
 	Id="vexeron";
-	Level=200;
+	Level=100;
 	Rewards={
 		{Index=1; Weekday="Monday"; ItemId="riflehyperdamagemod"; Quantity=1; Chance=1;};
 		{Index=1; Weekday="Tuesday"; ItemId="shotgunautomod"; Quantity=1; Chance=1;};
@@ -427,10 +427,10 @@ library:Add{
 	};
 };
 
--- MARK: mothena : 300
+-- MARK: mothena : 150
 library:Add{
 	Id="mothena";
-	Level=300;
+	Level=150;
 	Rewards={
 		{Index=1; Weekday="Monday"; ItemId="barbedwoodenbp"; Quantity=1; Chance=1;};
 		{Index=1; Weekday="Tuesday"; ItemId="pacifistamuletmod"; Quantity=1; Chance=1;};
@@ -444,10 +444,10 @@ library:Add{
 	};
 };
 
--- MARK: banditheli : 400
+-- MARK: banditheli : 200
 library:Add{
 	Id="banditheli";
-	Level=400;
+	Level=200;
 	Rewards={
 		{Index=1; Weekday="Monday"; ItemId="bluntdamagebp"; Quantity=1; Chance=1;};
 		{Index=1; Weekday="Tuesday"; ItemId="bluntknockbackmod"; Quantity=1; Chance=1;};
@@ -462,10 +462,10 @@ library:Add{
 	};
 };
 
--- MARK: : veinofnekron : 500
+-- MARK: : veinofnekron : 250
 library:Add{
 	Id="veinofnekron";
-	Level=500;
+	Level=250;
 	Rewards={
 		{Index=1; Weekday="Monday"; ItemId="shovel"; Quantity=1; Chance=1;};
 		{Index=1; Weekday="Tuesday"; ItemId="ammorecyclermod"; Quantity=1; Chance=1;};
@@ -561,7 +561,7 @@ library:Add{
 -- MARK: hbanditcrate : 360
 library:Add{
 	Id="hbanditcrate";
-	Level=360;
+	Level=300;
 	Rewards={
 		{Index=1; ItemId="scraparmorbp"; Recyclable=true; Chance=1;};
 
@@ -577,7 +577,7 @@ library:Add{
 -- MARK: abandonedbunkercrate : 460
 library:Add{
 	Id="abandonedbunkercrate";
-	Level=460;
+	Level=300;
 	Rewards={
 		{Index=1; ItemId="rope"; Quantity={Min=1; Max=2}; Chance=1;};
 		{Index=1; ItemId="abgreenkey"; Recyclable=true; Chance=1;};
@@ -652,7 +652,7 @@ library:Add{
 -- MARK: nprisoncrate : 320
 library:Add{
 	Id="nprisoncrate";
-	Level=320;
+	Level=300;
 	Rewards={
 		{Index=1; ItemId="motor"; Quantity={Min=1; Max=2}; Chance=1;};
 
@@ -683,7 +683,7 @@ library:Add{
 -- MARK: ucsectordcrate : 420
 library:Add{
 	Id="ucsectordcrate";
-	Level=420;
+	Level=300;
 	Rewards={
 		{Index=1; ItemId="wires"; Quantity={Min=1; Max=2}; Chance=1;};
 		
@@ -713,7 +713,7 @@ library:Add{
 -- MARK: ggenesiscrate : 440
 library:Add{
 	Id="ggenesiscrate";
-	Level=440;
+	Level=300;
 	Rewards={
 		{Index=1; ItemId="battery"; Quantity={Min=1; Max=3}; Chance=1;};
 
