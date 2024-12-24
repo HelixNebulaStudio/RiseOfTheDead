@@ -4,8 +4,6 @@ local CollectionService = game:GetService("CollectionService");
 
 --== Modules;
 local modTools = require(game.ReplicatedStorage.Library.Tools);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modGarbageHandler = require(game.ReplicatedStorage.Library.GarbageHandler);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -14,7 +12,6 @@ local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibr
 local modPlannerInterface = require(game.ReplicatedStorage.BaseLibrary.InterfaceModule.PlannerInterface);
 
 local modProfile = require(game.ServerScriptService.ServerLibrary.Profile);
-local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 
 local remoteEngineersPlanner = modRemotesManager:Get("EngineersPlanner");
 
