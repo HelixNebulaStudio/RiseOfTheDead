@@ -94,6 +94,7 @@ function Player.new(playerInstance: Player)
 	
 	classPlayer.LastDamageTaken = workspace:GetServerTimeNow()-15;
 	classPlayer.LastDamageDealt = workspace:GetServerTimeNow()-15;
+	classPlayer.LastArmorDamageTaken = workspace:GetServerTimeNow()-15;
 	classPlayer.IsUnderWater = false;
 
 	classPlayer.LowestFps = 999;
@@ -440,6 +441,7 @@ function Player.new(playerInstance: Player)
 			end
 			
 			if damageType == "ArmorOnly" then
+				classPlayer.LastArmorDamageTaken = workspace:GetServerTimeNow();
 				return;
 			end
 
@@ -864,7 +866,10 @@ function Player.new(playerInstance: Player)
 				local armorRate = classPlayer.Properties.ArmorRate;
 				
 				if classPlayer.IsAlive then
-					if classPlayer.LastDamageTaken == nil or currentTick-classPlayer.LastDamageTaken >= math.max(classPlayer.Properties.ArmorRegenDelay, 1) then
+					local armorRegenDelay = math.max(classPlayer.Properties.ArmorRegenDelay, 1)
+					
+					if (classPlayer.LastDamageTaken == nil or currentTick-classPlayer.LastDamageTaken >= armorRegenDelay)
+					and (classPlayer.LastArmorDamageTaken == nil or currentTick-classPlayer.LastArmorDamageTaken >= armorRegenDelay) then
 						armorRate = classPlayer.Properties.ArmorRate;
 						
 						if classPlayer.Properties.ArmorBreak then
