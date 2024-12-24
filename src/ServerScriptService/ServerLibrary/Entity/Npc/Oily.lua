@@ -73,7 +73,6 @@ return function(npc, spawnPoint)
 			modProjectile.ServerSimulate(projectileObject, origin.p, spreadLookVec * 20);
 		end
 
-		task.wait(0.2);
 		if lastOilProjObj then
 			if lastOilProjObj:HasTag("Flammable") then
 				local modFlammable = require(game.ServerScriptService.ServerLibrary.Flammable);

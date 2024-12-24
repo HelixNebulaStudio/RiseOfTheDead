@@ -50,7 +50,9 @@ function Flammable:Ignite(part)
 		sound.PlaybackSpeed = math.random(900,1100)/1000;
 	end)
 	
-	fireTouchHandler:AddObject(part);
+	task.delay(0.5, function()
+		fireTouchHandler:AddObject(part);
+	end)
 end
 
 function Flammable:FireDamage(target, basePart, hitPart)
