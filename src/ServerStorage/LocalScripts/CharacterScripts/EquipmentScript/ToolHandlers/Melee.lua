@@ -446,10 +446,10 @@ function ToolHandler:Equip(storageItem, toolModels)
 				Equipped.Cache["SwingAudio"] = modAudio.PlayReplicated(audio.PrimarySwing.Id, handle, nil, audio.PrimarySwing.Pitch, audio.PrimarySwing.Volume);
 			end
 			
+			toolAnimator:Play("PrimaryAttack", {FadeTime=0.4});
 			repeat
 				if unequiped then return end;
 				remoteToolPrimaryFire:FireServer(storageItem.ID);
-				--animations["PrimaryAttack"]:Play(0);
 				
 				Stats.LastDrain = tick();
 				toolAnimator:Stop("Inspect");
