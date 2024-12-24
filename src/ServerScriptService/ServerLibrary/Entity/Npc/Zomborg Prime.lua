@@ -124,6 +124,7 @@ return function(npc, spawnPoint)
 		end)
 		
 		if self.Stunned then
+			self.RootPart.Anchored = true;
 			wait(1);
 			self.PlayAnimation("Stun");
 			if self.LastStunnedTick == nil then
@@ -141,6 +142,7 @@ return function(npc, spawnPoint)
 			end
 			return true;
 		end;
+		self.RootPart.Anchored = false;
 		self.StopAnimation("Stun");
 		
 		local rocketBarrageInterval = 10.5;
