@@ -158,8 +158,6 @@ for eventId, dateTable in pairs(SpecialEventsTable) do
 	SpecialEvents[eventId] = isActive;
 end
 
-SpecialEvents.Christmas = true;
-
 Configurations.Set("SpecialEvent", SpecialEvents);
 
 return Configurations;
