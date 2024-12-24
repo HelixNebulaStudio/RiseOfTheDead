@@ -1008,7 +1008,7 @@ BlueprintLibrary.New{
 	Name="Desert Eagle Blueprint";
 	Product="deagle";
 	Duration=daySec;
-	SellPrice=320;
+	SellPrice=9300;
 	Requirements={
 		{Type="Stat"; Name="Money"; Amount=30000;};
 		{Type="Stat"; Name="Perks"; Amount=20;};
