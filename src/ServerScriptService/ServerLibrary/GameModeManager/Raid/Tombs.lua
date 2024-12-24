@@ -423,6 +423,7 @@ function GameController:Start()
 		wait(1);
 	end
 
+	if GameController.Status ~= enumGameStatus.InProgress then return end;
 	GameController:StartStage(GameController.Stage);
 end
 
