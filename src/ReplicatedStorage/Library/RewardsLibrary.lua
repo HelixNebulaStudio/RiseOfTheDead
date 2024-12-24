@@ -744,7 +744,7 @@ library:Add{
 -- MARK: zenithcrate : maxlevel
 library:Add{
 	Id="zenithcrate";
-	Level=math.floor(modGlobalVars.MaxLevels/100)*100;
+	Level=math.round(modGlobalVars.MaxLevels-100);
 	Rewards={
 		{Index=1; ItemId="ziphoningserum"; Quantity=1; Chance=1;};
 		{Index=1; ItemId="mendingmod"; Quantity=1; Chance=1;};

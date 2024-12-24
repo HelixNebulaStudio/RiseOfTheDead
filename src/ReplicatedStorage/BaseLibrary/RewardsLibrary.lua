@@ -50,6 +50,7 @@ function RewardsLibrary:Init(super)
 			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
 			{Wave=13; ItemId="grandgarandparts1"; Quantity=1; Chance=0.038;};
 			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
+			{Wave=15; ItemId="grandgarandbp"; Quantity=1; Chance=0.019;};
 		};
 		WaveBased=true;
 	};
@@ -65,13 +66,14 @@ function RewardsLibrary:Init(super)
 			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
 			{Wave=13; ItemId="grandgarandparts2"; Quantity=1; Chance=0.038;};
 			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
+			{Wave=15; ItemId="grandgarandbp"; Quantity=1; Chance=0.019;};
 		};
 		WaveBased=true;
 	};
 
 	super:Add{
 		Id="corruptedsectordcrate";
-		Level=520;
+		Level=440;
 		Rewards={
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=8; ItemId="apron"; Quantity=1; Chance=0.6;};
@@ -80,6 +82,7 @@ function RewardsLibrary:Init(super)
 			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
 			{Wave=13; ItemId="grandgarandparts3"; Quantity=1; Chance=0.038;};
 			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
+			{Wave=15; ItemId="grandgarandbp"; Quantity=1; Chance=0.019;};
 		};
 		WaveBased=true;
 	};
