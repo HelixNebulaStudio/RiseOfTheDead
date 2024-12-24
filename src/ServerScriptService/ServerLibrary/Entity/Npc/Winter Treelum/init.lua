@@ -205,7 +205,9 @@ return function(npc, spawnPoint)
 						modAudio.Play("ShovelDig", newRoot).PlaybackSpeed = 6;
 
 						local touchHandler = modTouchHandler.get("BarbClips")
-						touchHandler:AddObject(newRoot);
+						if touchHandler then
+							touchHandler:AddObject(newRoot);
+						end
 						
 						task.wait(0.25);
 					end
