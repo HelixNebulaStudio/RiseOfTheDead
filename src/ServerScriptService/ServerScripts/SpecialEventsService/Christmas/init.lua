@@ -15,9 +15,10 @@ local remoteFrostivus = modRemotesManager:NewFunctionRemote("Frostivus", 0.1);
 
 local EventSpawns = workspace:WaitForChild("Event");
 
-local mrKlawsSpawn = EventSpawns:WaitForChild("Mr. Klaws");
---==
-modNpc.Spawn("Mr. Klaws", mrKlawsSpawn.CFrame * CFrame.Angles(0, math.rad(-90), 0) + Vector3.new(0, 2.3, 0));
+task.spawn(function()
+	local mrKlawsSpawn = EventSpawns:WaitForChild("Mr. Klaws");
+	modNpc.Spawn("Mr. Klaws", mrKlawsSpawn.CFrame * CFrame.Angles(0, math.rad(-90), 0) + Vector3.new(0, 2.3, 0));
+end)
 Debugger.AwaitShared("modProfile");
 
 local folderMapEvent = game.ServerStorage:FindFirstChild("MapEvents");
