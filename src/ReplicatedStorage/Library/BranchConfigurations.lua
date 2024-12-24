@@ -53,6 +53,7 @@ local Branches = {
 			HalloweenBasement=5894210737;
 			KlawsWorkshop=8407865225;
 			Slaughterfest=11319107048;
+			NekronsGambit=113036405627921;
 			
 			BioXResearch=4861955160;
 			

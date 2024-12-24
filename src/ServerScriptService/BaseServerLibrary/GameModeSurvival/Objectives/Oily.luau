@@ -18,6 +18,7 @@ function Objective.new()
 end
 
 function Objective:Load()
+	eliminateObjective.Controller = self.Controller;
 end
 
 function Objective:Begin()

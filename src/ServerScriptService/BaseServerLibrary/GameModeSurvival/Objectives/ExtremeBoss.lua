@@ -4,6 +4,7 @@ local Objective = {};
 Objective.__index = Objective;
 
 Objective.Title = "Extreme Boss";
+Objective.DifficultyModes = {Hard=false;};
 
 Objective.Controller = nil;
 --==

@@ -60,7 +60,7 @@ local Configurations={
 		[Enum.Material.Glass]=1;
 		[Enum.Material.Wood]=1;
 		[Enum.Material.WoodPlanks]=1;
-		["Others"]=0.3;
+		["Others"]=0.5;
 	};
 	KillImpulseForce=40;
 
