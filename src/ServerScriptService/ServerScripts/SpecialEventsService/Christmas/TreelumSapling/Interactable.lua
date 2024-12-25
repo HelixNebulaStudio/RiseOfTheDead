@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local Interactable = require(game.ReplicatedStorage.Library.Interactables);
 
 local button = Interactable.Trigger("WinterTreelumSapling", "Dig");
-button.InteractDuration = 5;
+button.InteractDuration = 2;
 button.Script = script;
 button.ItemRequired = "shovel";
 button.Animation = "shoveling";

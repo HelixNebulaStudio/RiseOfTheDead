@@ -471,10 +471,11 @@ return function(player, interactData, ...)
 		local spawnPosition = interactObject.Position;
 		
 		if workspace.Entity:FindFirstChild("Winter Treelum") == nil then
-			modNpc.Spawn("Winter Treelum", CFrame.new(spawnPosition) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0));
 			shared.Notify(game.Players:GetPlayers(), "A Winter Treelum has been awokened.", "Important");
-			
 			game.Debris:AddItem(interactData.Object.Parent, 0);
+			task.wait(1);
+			modNpc.Spawn("Winter Treelum", CFrame.new(spawnPosition + Vector3.new(0, 4, 0)) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0));
+			
 		else
 			shared.Notify(player, "Winter Treelum can not be summoned at the moment.", "Negative");
 			
