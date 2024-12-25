@@ -32,7 +32,7 @@ return function(npc, spawnPoint)
 	function self.Initialize()
 		local level = math.max(self.Configuration.Level, 0);
 
-		self.Humanoid.MaxHealth = math.max(2000*level, 0);
+		self.Humanoid.MaxHealth = math.clamp(2000*level, 2000, 102400);
 		self.Humanoid.Health = self.Humanoid.MaxHealth;
 
 		self.Properties.AttackDamage = 25 + 2*level;
