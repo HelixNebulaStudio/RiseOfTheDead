@@ -87,13 +87,21 @@ function ToolService.PrimaryFireWeapon(firePacket)
 	local toolHandle: BasePart = toolModel.PrimaryPart;
 
 	local infType = toolModel:GetAttribute("InfAmmo") == true;
+	local isRicochet = firePacket.RicochetCount ~= nil;
 	
 	if firePacket.ToolModule then
 		toolModule = firePacket.ToolModule;
 		
 	elseif firePacket.Player then
 		profile = shared.modProfile:Get(firePacket.Player);
-		toolModule = profile:GetItemClass(storageItemID);
+
+		if isRicochet then
+			toolModule = profile:GetItemClass(storageItemID, true);
+
+		else
+			toolModule = profile:GetItemClass(storageItemID);
+
+		end
 		
 	end
 	
@@ -106,7 +114,6 @@ function ToolService.PrimaryFireWeapon(firePacket)
 	local ammo = storageItem:GetValues("A") or configurations.AmmoLimit;
 	local maxAmmo = storageItem:GetValues("MA") or configurations.MaxAmmoLimit;
 
-	local isRicochet = firePacket.RicochetCount ~= nil;
 	if isRicochet then
 		shotPacket.RicochetCount = shotPacket.RicochetCount-1;
 	end
@@ -345,12 +352,21 @@ function ToolService.ProcessWeaponShot(shotPacket)
 	local profile, toolModule;
 	local realShotId = math.random(1, 99)
 	
+	local isRicochet = shotPacket.RicochetCount ~= nil;
+	
 	if shotPacket.ToolModule then
 		toolModule = shotPacket.ToolModule;
 
 	elseif shotPacket.Player then
 		profile = shared.modProfile:Get(shotPacket.Player);
-		toolModule = profile:GetItemClass(storageItemID);
+
+		if isRicochet then
+			toolModule = profile:GetItemClass(storageItemID, true);
+
+		else
+			toolModule = profile:GetItemClass(storageItemID);
+
+		end
 		
 	end
 	
@@ -370,7 +386,6 @@ function ToolService.ProcessWeaponShot(shotPacket)
 	local ammo = storageItem:GetValues("A") or configurations.AmmoLimit;
 	local maxAmmo = storageItem:GetValues("MA") or configurations.MaxAmmoLimit;
 
-	local isRicochet = shotPacket.RicochetCount ~= nil;
 	if isRicochet ~= true and ammo <= 0 then return; end
 	ammo = math.min(ammo, configurations.AmmoLimit);
 
