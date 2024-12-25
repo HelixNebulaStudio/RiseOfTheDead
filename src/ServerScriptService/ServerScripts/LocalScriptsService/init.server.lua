@@ -42,7 +42,7 @@ local function OnPlayerAdded(player)
 	for _, scr in pairs(script:GetChildren()) do
 		if scr.ClassName == "LocalScript" then
 			local new = scr:Clone();
-			new.Parent = player:WaitForChild("PlayerGui");
+			new.Parent = player.PlayerGui:WaitForChild("ReplicationDelivery");
 			new.Disabled = false;
 			new.Archivable = false;
 		end

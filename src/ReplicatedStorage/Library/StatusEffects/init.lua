@@ -47,7 +47,7 @@ end
 local function replicateStatus(player, ...)
 	local classPlayer = modPlayers.GetByName(player.Name);
 	if classPlayer == nil or classPlayer.StatusReady == nil then
-		Debugger:Warn("Player status not ready.", player);
+		Debugger:Warn("Player status not ready.", player, "classPlayer missing:", classPlayer == nil, "StatusReady", classPlayer.StatusReady);
 	end
 	while player:IsDescendantOf(game.Players) and classPlayer.StatusReady == nil do wait(0.5); end
 	remotePlayerStatusEffect:FireClient(player, "do", ...);
