@@ -201,6 +201,15 @@ library:Add{
 	Hidden=true;
 }
 
+library:Add{
+	Id="frostivus2024";
+	Tier=Tiers.Bloodmetal;
+	BadgeId=198525199497730;
+	Announce="$PlayerName Completed: Frostivus 2024 Event Pass.";
+	Hidden=true;
+}
+
+
 
 
 

@@ -315,5 +315,12 @@ library:Add{
 	BpLevels=true;
 };
 
+library:Add{
+	Id="frostivus2024";
+	Title="Frostivus 2024";
+	Unlock=UnlockMethods.Achievement;
+	TitleStyle=TitleStyle.Bloodmetal;
+	BpLevels=true;
+};
 
 return library;

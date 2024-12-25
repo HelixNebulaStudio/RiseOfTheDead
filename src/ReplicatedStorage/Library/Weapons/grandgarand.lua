@@ -74,6 +74,19 @@ local Configurations={
 		if properties.Ammo <= 0 then
 			local modAudio = require(game.ReplicatedStorage.Library.Audio);
 			modAudio.Play("GarandPing", mainWeaponModel.PrimaryPart);
+
+			local magazinePart = mainWeaponModel:FindFirstChild("Magazine");
+			local caseOutPoint = mainWeaponModel:FindFirstChild("CaseOut", true);
+			if magazinePart and caseOutPoint then
+				local newEject = magazinePart:Clone();
+				newEject:ClearAllChildren();
+				game.Debris:AddItem(newEject, 5);
+
+				newEject.CFrame = caseOutPoint.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), math.rad(math.random(-35, 35)));
+				newEject.Parent = workspace.Debris;
+
+				newEject:ApplyImpulse(caseOutPoint.WorldCFrame.RightVector * 0.03);
+			end
 		end
 	end;
 }
