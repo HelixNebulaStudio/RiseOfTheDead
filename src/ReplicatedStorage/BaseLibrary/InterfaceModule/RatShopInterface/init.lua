@@ -736,7 +736,7 @@ function Interface.init(modInterface)
 			local isExchangable = modItemsLibrary:HasTag(itemLib.Id, "Skin Perm") or modItemsLibrary:HasTag(itemLib.Id, "Color Pack") or modItemsLibrary:HasTag(itemLib.Id, "Skin Pack");
 			local activeBpId = modBattlePassLibrary.Active;
 			local battlepassLib = activeBpId and modBattlePassLibrary:Find(activeBpId);
-			if activeBpId and #activeBpId > 0 and isExchangable and battlepassLib and battlepassLib.Tree then
+			if modBattlePassLibrary.Library.GiftShop and activeBpId and #activeBpId > 0 and isExchangable and battlepassLib and battlepassLib.Tree then
 				Interface.NewListing(function(newListing)
 					local infoBox = newListing:WaitForChild("infoFrame");
 					local descFrame = infoBox:WaitForChild("descFrame");
