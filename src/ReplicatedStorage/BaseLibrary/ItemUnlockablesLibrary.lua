@@ -1316,6 +1316,18 @@ function ItemUnlockablesLibrary:Init(library)
 		};
 		SurfaceAppearanceParent=script;
 	};
+	
+	library:Add{
+		Id="xmassweatersnowflakeblue";
+		ItemId="xmassweater";
+		Name="Blue Snowflake";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://136119813822195";
+		};
+		SurfaceAppearanceParent=script;
+	};
 
 	--== MARK: snowsledge
 	library:Add{
