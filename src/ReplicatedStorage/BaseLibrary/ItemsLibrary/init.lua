@@ -1005,8 +1005,8 @@ function ItemsLibrary:Init(super)
 	new(skinPermBase, {Id="xmassweatersnowflakered"; Icon="rbxassetid://109655819748094"; SkinPerm="Red Snowflake"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="xmassweatersnowflakegreen"; Icon="rbxassetid://78028432874407"; SkinPerm="Green Snowflake"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="xmassweatersnowflakeblue"; Icon="rbxassetid://99198676650490"; SkinPerm="Blue Snowflake"; TargetItemId="xmassweater"; Tags={"Christmas"; "Frostivus";};});
-	new(skinPermBase, {Id="brownbeltxmasorange"; Icon="rbxassetid://119905732158933"; SkinPerm="Red Snowflake"; TargetItemId="brownbelt"; Tags={"Christmas"; "Frostivus";};});
-	new(skinPermBase, {Id="brownbeltxmaspink"; Icon="rbxassetid://97310653356411"; SkinPerm="Green Snowflake"; TargetItemId="brownbelt"; Tags={"Christmas"; "Frostivus";};});
+	new(skinPermBase, {Id="brownbeltxmasorange"; Icon="rbxassetid://119905732158933"; SkinPerm="Xmas Orange"; TargetItemId="brownbelt"; Tags={"Christmas"; "Frostivus";};});
+	new(skinPermBase, {Id="brownbeltxmaspink"; Icon="rbxassetid://97310653356411"; SkinPerm="Xmas Pink"; TargetItemId="brownbelt"; Tags={"Christmas"; "Frostivus";};});
 	new(skinPermBase, {Id="arelshiftcrossgingerbread"; Icon="rbxassetid://85625473582729"; SkinPerm="Gingerbread"; TargetItemId="arelshiftcross"; });
 	new(skinPermBase, {Id="grandgarandornaments"; Icon="rbxassetid://76137784853860"; SkinPerm="Ornaments"; TargetItemId="grandgarand"; });
 	new(crateBase, {Id="xmaspresent2024"; Name="Frostivus Present 2024"; Icon="rbxassetid://79457385935728"; Tags={"Christmas"; "Frostivus"}; TradingTax=0; Description="Merry Christmas 2024!\n\nOpen it and see what you get!";});
