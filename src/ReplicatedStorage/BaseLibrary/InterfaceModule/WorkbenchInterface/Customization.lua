@@ -529,7 +529,7 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 		local baseSkinList = modItemSkinsLibrary:GetItemSkinIdList(itemId);
 		if baseSkinList and #baseSkinList > 0 then
 			for a=1, #baseSkinList do
-				table.insert(rareSkinsList, baseSkinList[a]);
+				table.insert(rareSkinsList, baseSkinList[a].Id);
 			end
 		end
 

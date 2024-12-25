@@ -30,6 +30,20 @@ function library:GetItemSkinIdList(itemId)
     return library.ItemSkinIdList[itemId];
 end
 
+function library:GetItemSkinId(targetItemId, skinItemId)
+    local list = self:GetItemSkinIdList(targetItemId);
+    for a=1, #list do
+        local data = list[a];
+        local textureLib = data.Textures and data.Textures[targetItemId];
+        if textureLib then
+            return data;
+        else
+            return;
+        end
+    end
+    return;
+end
+
 library:SetOnAdd(function(data)
     if data.Type ~= library.SkinType.Texture then return end;
 
@@ -40,7 +54,7 @@ library:SetOnAdd(function(data)
             library.ItemSkinIdList[itemId] = itemSkinIdList;
         end
 
-        table.insert(itemSkinIdList, data.Id);
+        table.insert(itemSkinIdList, data);
     end
 end)
 

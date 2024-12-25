@@ -69,11 +69,12 @@ else
 		
 		local permType = nil;
 		local permLib = modItemUnlockablesLibrary:Find(skinPermItemLib.Id);
+
 		if permLib then
 			permType = "Clothing";
 
-		elseif modItemSkinsLibrary:Find(skinPermItemLib.Id) then
-			permLib = modItemSkinsLibrary:Find(skinPermItemLib.Id);
+		elseif modItemSkinsLibrary:GetItemSkinId(targetStorageItem.ItemId, skinPermItemLib.Id) then
+			permLib = modItemSkinsLibrary:GetItemSkinId(targetStorageItem.ItemId, skinPermItemLib.Id);
 			permType = "Tool";
 
 		else
