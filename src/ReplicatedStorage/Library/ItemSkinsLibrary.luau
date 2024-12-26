@@ -35,10 +35,8 @@ function library:GetItemSkinId(targetItemId, skinItemId)
     for a=1, #list do
         local data = list[a];
         local textureLib = data.Textures and data.Textures[targetItemId];
-        if textureLib then
+        if textureLib and textureLib.Id == skinItemId then
             return data;
-        else
-            return;
         end
     end
     return;
