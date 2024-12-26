@@ -437,14 +437,13 @@ else
 end
 
 local function OnPlayerAdded(player: Player)
-	-- if RunService:IsServer() then
-	-- 	local screenGui = Instance.new("ScreenGui");
-	-- 	screenGui.Name = "ReplicationDelivery";
-	-- 	screenGui.ResetOnSpawn = false;
-	-- 	screenGui.Parent = player.PlayerGui;
-	-- end
+	if RunService:IsServer() then
+		local screenGui = Instance.new("ScreenGui");
+		screenGui.Name = "ReplicationDelivery";
+		screenGui.ResetOnSpawn = false;
+		screenGui.Parent = player.PlayerGui;
+	end
 	if RunService:IsClient() then
-		
 		player.CharacterAdded:Connect(LocalSync)
 		LocalSync();
 	end

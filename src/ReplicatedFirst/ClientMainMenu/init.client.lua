@@ -87,6 +87,7 @@ function ResetMenu() -- max reentry logged
 	if script.Parent.Name == "PlayerGui" then script.Parent = game.ReplicatedFirst end;
 	local uiChildren = playerGui:GetChildren();
 	for a=1, #uiChildren do
+		if uiChildren[a]:IsA("ScreenGui") and uiChildren[a].ResetOnSpawn == false then continue end;
 		if uiChildren[a].Name ~= "Chat" and not uiChildren[a]:IsA("LocalScript") then 
 			uiChildren[a]:Destroy();
 		end
