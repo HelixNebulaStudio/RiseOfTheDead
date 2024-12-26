@@ -913,6 +913,7 @@ function Profile:Load(loadOverwrite)
 		end
 	end
 	
+	local rawVersion = nil;
 	if rawData ~= nil then
 		self.IdCounter = rawData.IdCounter or 1;
 		
@@ -937,10 +938,7 @@ function Profile:Load(loadOverwrite)
 				--end
 				
 			elseif key == "GameSave" then
-				self[key]:Load(data);
-				
-			--elseif key == "Cosmetics" then
-			--	self[key] = modCosmetics.load(data);
+				_, rawVersion = self[key]:Load(data);
 				
 			elseif key == "SkillTree" then
 				self[key]:Load(data);
@@ -961,13 +959,6 @@ function Profile:Load(loadOverwrite)
 						self.Settings[k] = modSettings.Fix(self.Player, k, v);
 					end;
 				end
-				
-			--elseif key == "Trader" then
-			--	self[key]:Load(data);
-			--	self[key]:LoadTrades();
-
-			--elseif key == "Safehome" then
-			--	self[key]:Load(data);
 				
 			elseif key == "HardMode" then
 				self[key] = data;
@@ -1025,6 +1016,19 @@ function Profile:Load(loadOverwrite)
 		return;
 	end
 	
+	if rawVersion then
+		local versionObj = modGlobalVars.GetVersion(rawVersion);
+		if versionObj.Major <= 2 and versionObj.Minor <= 0 then -- 2.2.1.0
+			local passData = self.BattlePassSave:GetPassData("frostivus2024");
+			if passData then
+				local claimIndex = table.find(passData.Claim, 47);
+				if claimIndex then
+					table.remove(passData.Claim, claimIndex);
+				end
+			end
+		end
+	end
+
 	if resetReports then self.Reports = 2; end;
 	if self.ShadowBan >= os.time() then self.ShadowBan = 0; end
 	self.Loaded = true;

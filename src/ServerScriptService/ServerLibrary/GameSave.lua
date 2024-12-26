@@ -342,7 +342,7 @@ function SaveData:Load(rawData, isPrimarySave)
 		end
 	end
 	
-	return self;
+	return self, rawData.Version;
 end
 
 function SaveData:Loaded()
