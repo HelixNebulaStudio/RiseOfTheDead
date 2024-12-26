@@ -258,7 +258,7 @@ return function(npc, spawnPoint)
 									
 									if player and touchedPlayer[player] == nil then
 										touchedPlayer[player] = true;
-										self.Throw(player.Character, 100, 20);
+										self.Throw(player.Character, 75, 20);
 									end
 								end)
 
@@ -282,7 +282,7 @@ return function(npc, spawnPoint)
 				
 				
 				if self.Enemy.Distance < self.Properties.AttackRange then
-					self.Throw(targetHumanoid.Parent, 150, 30);
+					self.Throw(targetHumanoid.Parent, 100, 30);
 					
 				end
 				

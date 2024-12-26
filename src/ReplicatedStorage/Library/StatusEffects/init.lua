@@ -21,19 +21,11 @@ if RunService:IsServer() then
 	modSkillTree = require(game.ServerScriptService.ServerLibrary.SkillTree);
 	modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	
-	local waitForReady = false;
 	remotePlayerStatusEffect.OnServerEvent:Connect(function(player, cmd)
 		if cmd == "ready" then
+			local classPlayer = modPlayers.GetByName(player.Name);
+			if classPlayer == nil or classPlayer.StatusReady then return end;
 			
-			if waitForReady then return end;
-			waitForReady = true;
-
-			local classPlayer;
-			while classPlayer == nil do
-				classPlayer = modPlayers.GetByName(player.Name);
-				task.wait();
-			end
-
 			classPlayer.StatusReady = true;
 			remotePlayerStatusEffect:FireClient(player, "isready");
 		end
