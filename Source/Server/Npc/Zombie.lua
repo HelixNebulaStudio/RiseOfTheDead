@@ -40,7 +40,7 @@ return function(npc, spawnPoint)
 
 		self.Properties.AttackDamage = 5 + (level/2);
 
-		self.Move.SetDefaultWalkSpeed = math.clamp(18 + math.floor(level/10), 1, 30);
+		self.Move.SetDefaultWalkSpeed = math.clamp(18 + math.floor(level/10), 1, 35);
 		self.Move:Init();
 		--
 
