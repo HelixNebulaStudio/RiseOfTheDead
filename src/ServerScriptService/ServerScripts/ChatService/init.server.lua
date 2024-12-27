@@ -311,7 +311,7 @@ function ChatService.HandleCommand(message, speaker)
 				cmdLib.Function(speaker, args);
 			end
 			if cmdLib.ClientFunction then
-				cmdLib.ClientFunction(speaker, args);
+				remoteChatServiceEvent:FireClient(speaker, "clientcmd", cmdKey, args);
 			end
 	
 		else

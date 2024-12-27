@@ -53,7 +53,7 @@ local classPlayer = shared.modPlayers.Get(localPlayer);
 
 local rootRigAttachment = rootPart:WaitForChild("RootRigAttachment");
 
-local alignRotation = Instance.new("AlignOrientation");
+local alignRotation = rootPart:FindFirstChild("BodyOrientation") or Instance.new("AlignOrientation");
 alignRotation.Name = "BodyOrientation";
 alignRotation.ReactionTorqueEnabled = true;
 alignRotation.Enabled = false;
@@ -97,7 +97,8 @@ local crouchCooldown = tick()-1;
 local jumpDebounce = false;
 local dashDebounce = false;
 
-local bodyVelocity = Instance.new("BodyVelocity");
+local bodyVelocity = rootPart:FindFirstChild("RootVelocity") or Instance.new("BodyVelocity");
+bodyVelocity.Name = "RootVelocity";
 bodyVelocity.MaxForce = Vector3.new(); 
 bodyVelocity.Parent = rootPart;
 
@@ -129,8 +130,14 @@ local slideFrictionTick = nil;
 
 local heartbeatSecTick = tick()-1;
 
-local footAttachment = Instance.new("Attachment", rootPart); footAttachment.Position = Vector3.new(0, -3, 0);
-local dustParticle = script:WaitForChild("DustParticle"); dustParticle = dustParticle:Clone(); dustParticle.Parent = footAttachment;
+local footAttachment = rootPart:FindFirstChild("FootPoint") or Instance.new("Attachment");
+footAttachment.Name = "FootPoint";
+footAttachment.Position = Vector3.new(0, -3, 0);
+footAttachment.Parent = rootPart;
+
+local dustParticle = script:WaitForChild("DustParticle"); 
+dustParticle = dustParticle:Clone(); 
+dustParticle.Parent = footAttachment;
 local slideSound = head:FindFirstChild("BodySlide");
 
 local minZoomLevel = 4;
@@ -207,16 +214,16 @@ characterProperties.SprintSpeed = characterProperties.DefaultSprintSpeed;
 
 local rootPartAttachment = rootPart:WaitForChild("RootRigAttachment") :: Attachment;
 
-local charBodyForce = Instance.new("VectorForce");
-charBodyForce.Name = "BodyForce";
+local charBodyForce = rootPart:FindFirstChild("RootForce") or Instance.new("VectorForce");
+charBodyForce.Name = "RootForce";
 charBodyForce.ApplyAtCenterOfMass = true;
 charBodyForce.RelativeTo = Enum.ActuatorRelativeTo.World;
 charBodyForce.Attachment0 = rootPartAttachment;
 charBodyForce.Enabled = false;
 charBodyForce.Parent = rootPart;
 
-local charAlignPosition: AlignPosition = Instance.new("AlignPosition");
-charAlignPosition.Name = "BodyPosition";
+local charAlignPosition = rootPart:FindFirstChild("RootPosition") or Instance.new("AlignPosition");
+charAlignPosition.Name = "RootPosition";
 charAlignPosition.Mode = Enum.PositionAlignmentMode.OneAttachment;
 charAlignPosition.ApplyAtCenterOfMass = true;
 charAlignPosition.ForceLimitMode = Enum.ForceLimitMode.PerAxis;
@@ -835,9 +842,15 @@ UserInputService.InputBegan:connect(function(inputObject, gameProcessedEvent)
 		if inputObject.UserInputType == Enum.UserInputType.MouseButton3 or inputObject.KeyCode == Enum.KeyCode.P then
 			if mouseProperties.CanManualLockMouse then
 				mouseProperties.MouseLocked = not mouseProperties.MouseLocked;
-				mainInterface.MouseLockHint.Visible = not mouseProperties.MouseLocked;
+							
+				if mainInterface and mainInterface.Parent then
+					mainInterface.MouseLockHint.Visible = not mouseProperties.MouseLocked;
+				end
 			else
-				mainInterface.MouseLockHint.Visible = false;
+				if mainInterface and mainInterface.Parent then
+					mainInterface.MouseLockHint.Visible = false;
+				end
+
 			end
 		end
 	end

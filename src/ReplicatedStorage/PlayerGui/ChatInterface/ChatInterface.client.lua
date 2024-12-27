@@ -112,6 +112,13 @@ task.spawn(function()
 				Presist=messageData.Presist;
 			});
 
+		elseif action == "clientcmd" then
+			local cmdKey, args = ...;
+
+			local cmdLib = modCommandsLibrary.Library[cmdKey];
+			if cmdLib == nil then return end;
+
+			cmdLib.ClientFunction(localPlayer, args);
 		end
 		
 	end)
@@ -191,9 +198,17 @@ local lastInputTick = tick()-2;
 local lastInput = "";
 
 local oldChatCache = {};
+if shared.ChatInterfaceChatCache then
+	oldChatCache = shared.ChatInterfaceChatCache;
+end
+shared.ChatInterfaceChatCache = oldChatCache or {};
 local oldChatIndex = nil;
 
+if shared.ChatInterfaceLastInputText then
+	inputBox.Text = shared.ChatInterfaceLastInputText;
+end
 local function inputBoxChange()
+	shared.ChatInterfaceLastInputText = inputBox.Text;
 	ChatRoomInterface.Channels[ChatRoomInterface.ActiveChannel]:SetActive();
 	lastInputTick = tick();
 	
