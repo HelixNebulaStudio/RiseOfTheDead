@@ -970,7 +970,7 @@ function ItemUnlockablesLibrary:Init(library)
 		DefaultPackage=true;
 		
 		SurfaceAppearance={
-			ColorMap="rbxassetid://93994020837531";
+			ColorMap="rbxassetid://95196813614980";
 		};
 		SurfaceAppearanceParent=script;
 		Hidden=true;
