@@ -4,6 +4,7 @@ local eliminateObjective = require(script.Parent.Eliminate);
 
 local Objective = {};
 Objective.__index = Objective;
+Objective.DifficultyModes = {Easy=false;};
 
 Objective.Title = "Oily";
 
