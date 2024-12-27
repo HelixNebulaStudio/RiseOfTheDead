@@ -2211,21 +2211,49 @@ RunService.PreSimulation:Connect(function(step)
 		stepBuffer = math.max(stepBuffer-1, 0); 
 
 		if characterProperties.AllowLerpBody then
-			pcall(function()
-				local neckTransform = CFrame.new() --head.Neck.Transform;
-				local waistTransform: CFrame = character.UpperTorso.Waist.Transform;
+			local waistC0 = {X=0; Y=0; Z=0;};
+			local waistC1 = {X=0; Y=0; Z=0;};
 
+			pcall(function()
+				local neckTransform = CFrame.new();
+				local waistTransform = character.UpperTorso.Waist.Transform;
+
+				local _, wtY, _ = waistTransform:ToEulerAnglesXYZ();
+				vpWtY = wtY;
+
+				local waistY = characterProperties.CanMove and characterProperties.Joints.WaistY or 0;
+				local mouseY = (mouseProperties.Y + mouseProperties.YAngOffset);
+				if not characterProperties.CanMove then 
+					mouseY = -0.12;
+				end;
+				
 				if characterProperties.IsSliding then
 					-- sliding
+					if characterProperties.IsEquipped then
+						waistC1.X = SlideVars.WaistXEquipped or deg60;
+					else
+						waistC1.X = SlideVars.WaistX or deg60;
+					end
+					waistC1.Y = waistY - wtY;
 					waistTransform = CFrame.new();
-					
+
 				elseif characterProperties.IsCrouching then
 					-- crouching
+					waistC1.X = characterProperties.IsEquipped and 0 or deg45;
+					waistC1.Y = waistY - wtY;
+
+					waistC0.X = mathClamp(mouseY, -0.7, 0.7);
+
 					waistTransform = CFrame.new();
+					
 				end
 
-				head.Neck.Transform = neckTransform * Cache.NeckC0;
-				character.UpperTorso.Waist.Transform = waistTransform * Cache.WaistC0;
+				if Cache.LastNeckTransform then
+					head.Neck.Transform = neckTransform * Cache.LastNeckTransform;
+				end
+				if Cache.LastWaistTransform then
+					character.UpperTorso.Waist.Transform = waistTransform * Cache.LastWaistTransform;
+				end
 			end)
 		end
 
@@ -2330,7 +2358,6 @@ RunService.PreSimulation:Connect(function(step)
 				waistTransform = CFrame.new();
 				neckPitchOffset = characterProperties.IsEquipped and 0 or -deg45;
 
-
 			else 
 				-- idle
 				waistC1.Y = waistY;
@@ -2386,8 +2413,10 @@ RunService.PreSimulation:Connect(function(step)
 					
 					-- Apply C0
 					Cache.WaistC0 = (Cache.WaistC0 or waistC0Cf):Lerp(waistC0Cf, 0.1);
-					character.UpperTorso.Waist.Transform = waistTransform * (Cache.WaistC0 * CFrame.Angles(0, 0, waistC0.Z));
 
+					local waistCframe = (Cache.WaistC0 * CFrame.Angles(0, 0, waistC0.Z));
+					character.UpperTorso.Waist.Transform = waistTransform * waistCframe;
+					Cache.LastWaistTransform = waistCframe;
 				end
 			end
 			
@@ -2413,7 +2442,7 @@ RunService.PreSimulation:Connect(function(step)
 				-- Apply C0
 				Cache.NeckC0 = (Cache.NeckC0 or neckC0Cf):Lerp(neckC0Cf, 0.1);
 				head.Neck.Transform = neckTransform * Cache.NeckC0;
-				
+				Cache.LastNeckTransform = Cache.NeckC0;
 			end
 		end)
 

@@ -183,7 +183,7 @@ return function()
 						game.Debris:AddItem(originAtt, 1);
 					end
 				end
-				if configurations.GenerateMuzzle ~= false then
+				if configurations.GenerateMuzzle ~= false and isRicochet ~= true then
 					local muzzleOrigin = toolModel:FindFirstChild("MuzzleOrigin", true);
 					if muzzleOrigin then
 						modWeaponMechanics.CreateMuzzle(muzzleOrigin, originAtt, #targetPoints);

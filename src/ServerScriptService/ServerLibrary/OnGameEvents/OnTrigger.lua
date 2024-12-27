@@ -92,22 +92,22 @@ return function(player, interactData, ...)
 			
 			table.insert(statusList, function()
 				modStatusEffects.ForceField(player, 120);
-				shared.Notify(player, "You recieved Forcefield for 60 seconds.", "Reward");
+				shared.Notify(player, "You recieved Forcefield for 2 minutes.", "Reward");
 			end)
 			
 			table.insert(statusList, function()
 				modStatusEffects.Reinforcement(player, 120);
-				shared.Notify(player, "You recieved Reinforcement for 60 seconds.", "Reward");
+				shared.Notify(player, "You recieved Reinforcement for 2 minutes.", "Reward");
 			end)
 			
 			table.insert(statusList, function()
 				modStatusEffects.Superspeed(player, 120);
-				shared.Notify(player, "You recieved Superspeed for 60 seconds.", "Reward");
+				shared.Notify(player, "You recieved Superspeed for 2 minutes.", "Reward");
 			end)
 			
 			table.insert(statusList, function()
 				modStatusEffects.Lifesteal(player, 120);
-				shared.Notify(player, "You recieved Lifesteal for 60 seconds.", "Reward");
+				shared.Notify(player, "You recieved Lifesteal for 2 minutes.", "Reward");
 			end)
 			
 			statusList[math.random(1, #statusList)]();
