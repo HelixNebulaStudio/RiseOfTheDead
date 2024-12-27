@@ -287,10 +287,10 @@ function BattlePassSave:AddLevel(bpId, addAmt, majorAlert)
 		if passData.Level >= #treeList then
 			if passData.Completed == false then
 				passData.Completed = true;
-	
 			end
-			if self.Profile.Achievements[bpLib.Id] == nil then
-				local activeSave = self.Profile:GetActiveSave();
+
+			local activeSave = self.Profile:GetActiveSave();
+			if activeSave and activeSave.Achievements[bpLib.Id] == nil then
 				activeSave:AwardAchievement(bpLib.Id);
 				remoteHudNotification:FireClient(self.Player, "BattlePassComplete", {Title=bpLib.Title;});
 			end
