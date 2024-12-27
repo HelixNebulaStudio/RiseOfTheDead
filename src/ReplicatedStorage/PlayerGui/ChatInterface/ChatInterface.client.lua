@@ -541,7 +541,25 @@ inputBox.FocusLost:Connect(function(enterPressed, inputThatCausedFocusLoss)
 					else
 						local channelId = activeChannel.Id;
 						task.spawn(function()
-							local textChannel: TextChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild(channelId);
+							local textChannel: TextChannel;
+
+							local misConfigured = false;
+							for _, folder in pairs(TextChatService:GetChildren()) do
+								if folder.Name ~= "TextChannels" then continue end;
+								if folder:FindFirstChild(channelId) then
+									textChannel = folder[channelId];
+								elseif folder:FindFirstChild("RBXGeneral") then
+									misConfigured = true;
+								end
+							end
+							if misConfigured then
+								Debugger:Warn("TextChatService unconfigurated. CreateDefaultTextChannels enabled.");
+							end
+							
+							if textChannel == nil then
+								Debugger:Warn("Missing text channel:", channelId);
+								return;
+							end
 							textChannel:SendAsync(text);
 						end)
 
