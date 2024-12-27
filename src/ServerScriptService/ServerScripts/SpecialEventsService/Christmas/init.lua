@@ -419,6 +419,7 @@ function remoteFrostivus.OnServerInvoke(player, action, packet)
 		if uncoveredMine then
 			if msObj.MinesFound >= 4 then
 				msObj.SessionState = modMinesweeper.States.Completed;
+				frostivusData.MinesweeperStage = frostivusData.MinesweeperStage +1;
 				
 				battlePassSave:AddLevel(activeId, 1);
 				shared.Notify(player, `You have earned an Frostivus event pass level from Master Gifts!`, `Reward`);
@@ -433,7 +434,6 @@ function remoteFrostivus.OnServerInvoke(player, action, packet)
 	elseif action == "newminesweeper" then
 		local msObj = frostivusData.GetActiveMinesweeperObject();
 
-		frostivusData.MinesweeperStage = frostivusData.MinesweeperStage +1;
 		msObj:Start(frostivusData.MinesweeperStage, {UncoverEmpty=true;});
 
 		frostivusData.MinesweeperState = msObj.SessionState;
