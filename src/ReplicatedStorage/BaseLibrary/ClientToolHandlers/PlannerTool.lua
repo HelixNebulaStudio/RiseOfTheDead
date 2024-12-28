@@ -133,6 +133,7 @@ function ToolHandler:Equip(storageItem, toolModels)
 	end
 	
 	function toolConfig:ClientItemPrompt()
+		Debugger:StudioWarn("Toggle EngineerPlannerWindow");
 		modInterface:ToggleWindow("EngineerPlannerWindow", nil, toolConfig);
 	end
 	
@@ -317,6 +318,10 @@ function ToolHandler:Equip(storageItem, toolModels)
 	local highlightPlan = false;
 	local lastSelectedPlanModel = nil;
 	RunService:BindToRenderStep(script.Name, Enum.RenderPriority.Character.Value, function()
+		if not workspace:IsAncestorOf(handle) then
+			RunService:UnbindFromRenderStep(script.Name);
+			return;
+		end
 		local mousePosition = UserInputService:GetMouseLocation();
 		local pointRay = camera:ViewportPointToRay(mousePosition.X, mousePosition.Y);
 		if not UserInputService.MouseEnabled and UserInputService.TouchEnabled then
@@ -533,7 +538,6 @@ function ToolHandler:Unequip(storageItem)
 end
 
 function ToolHandler:Initialize(equipped)
-	if Equipped ~= nil then return end;
 	Equipped = equipped;
 end
 

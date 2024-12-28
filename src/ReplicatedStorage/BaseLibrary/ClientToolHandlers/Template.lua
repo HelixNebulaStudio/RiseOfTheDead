@@ -231,7 +231,6 @@ function ToolHandler:Unequip(storageItem)
 end
 
 function ToolHandler:Initialize(equipped)
-	if Equipped ~= nil then return end;
 	Equipped = equipped;
 	
 	character = localPlayer.Character;
