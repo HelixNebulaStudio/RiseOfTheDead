@@ -313,9 +313,6 @@ UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
 				modConfigurations.Set("DisableWeaponInterface", true);
 			end
 			
-		elseif inputObject.KeyCode == Enum.KeyCode.F3 and modGlobalVars.EngineMode == "RiseOfTheDead" then
-			modInterface:ToggleWindow("ReportMenu");
-			
 		elseif modKeyBindsHandler:Match(inputObject, "KeyInteract") and not modInterface:IsVisible("Settings") then
 			modInterface:HideAll();
 			
