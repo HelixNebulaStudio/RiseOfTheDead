@@ -13,7 +13,7 @@ local playerGui = player.PlayerGui;
 local camera = workspace.CurrentCamera;
 local character = script.Parent.Parent;
 local rootPart = character:WaitForChild("HumanoidRootPart");
-local head = character:WaitForChild("Head");
+local head = character:WaitForChild("Head") :: BasePart;
 local humanoid = character:WaitForChild("Humanoid");
 local animator = humanoid:WaitForChild("Animator");
 
@@ -444,83 +444,159 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 				characterProperties.BodyLockToCam = true;
 			end
 			
-			if not modData:IsMobile() then
-				local scanPoint = modWeaponMechanics.CastHitscanRay{
-					Origin = mouseProperties.Focus.p;
-					Direction = mouseProperties.Direction;
-					IncludeList = projRaycast.FilterDescendantsInstances;
-					Range = configurations.BulletRange;
-				};
 
-				-- MARK: 3rd person tilt peek;
-				local motorHeadPoint = (characterProperties.MotorHeadCFrameA * CFrame.Angles(0, 0, aimWaistZ) * characterProperties.MotorHeadCFrameB).Position;
-				
-				local headDir = (scanPoint-motorHeadPoint).Unit;
-				local headDist = (scanPoint-motorHeadPoint).Magnitude;
-				local landPoint = modWeaponMechanics.CastHitscanRay{
-					Origin = motorHeadPoint;
-					Direction = headDir;
-					IncludeList = projRaycast.FilterDescendantsInstances;
-					Range = headDist;
-				};
+			local scanPoint = modWeaponMechanics.CastHitscanRay{
+				Origin = mouseProperties.Focus.p;
+				Direction = mouseProperties.Direction;
+				IncludeList = projRaycast.FilterDescendantsInstances;
+				Range = configurations.BulletRange;
+			};
+			
+			local shotOrigin = head.Position + -Vector3.yAxis*0.4 + head.CFrame.RightVector *(characterProperties.LeftSideCamera and -1 or 1);
+			
+			local headDir = (scanPoint-shotOrigin).Unit;
+			local headDist = (scanPoint-shotOrigin).Magnitude;
+			local landPoint = modWeaponMechanics.CastHitscanRay{
+				Origin = shotOrigin;
+				Direction = headDir;
+				IncludeList = projRaycast.FilterDescendantsInstances;
+				Range = headDist;
+			};
 
-				local secAimWaist = aimWaistZ + (characterProperties.LeftSideCamera and -0.4 or 0.4);
-				local hpSecondPoint = (characterProperties.MotorHeadCFrameA * CFrame.Angles(0, 0, secAimWaist) * characterProperties.MotorHeadCFrameB).Position;
+			if RunService:IsStudio() then
+				-- local scanPp = Debugger:PointPart(scanPoint);
+				-- scanPp.Color = Color3.fromRGB(255, 0, 0);
+				-- game.Debris:AddItem(scanPp, 0.1);
+	
+				-- local scanLp = Debugger:PointPart(landPoint);
+				-- scanLp.Color = Color3.fromRGB(0, 255, 0);
+				-- game.Debris:AddItem(scanLp, 0.1);
 
+				-- local scanSp = Debugger:PointPart(secondPoint);
+				-- scanSp.Color = Color3.fromRGB(0, 0, 255);
+				-- game.Debris:AddItem(scanSp, 0.1);
+			end
+
+			local secAimWaist = aimWaistZ + (characterProperties.LeftSideCamera and -0.4 or 0.4);
+			local hpSecondPoint = (characterProperties.MotorHeadCFrameA * CFrame.Angles(0, 0, secAimWaist) * characterProperties.MotorHeadCFrameB).Position;
+
+
+			local pointsDist = (scanPoint-landPoint).Magnitude;
+			local isAimLineBlocked = pointsDist > 0.1;
+			if isAimLineBlocked then
+				tpBlockFrame.Visible = true;
+			else
+				tpBlockFrame.Visible = false;
+			end
+
+			local secondDist = 0;
+			if characterProperties.IsFocused then
 				local secondPoint = modWeaponMechanics.CastHitscanRay{
 					Origin = hpSecondPoint;
 					Direction = (scanPoint-hpSecondPoint).Unit;
 					IncludeList = projRaycast.FilterDescendantsInstances;
 					Range = (scanPoint-hpSecondPoint).Magnitude;
 				};
+				secondDist = (scanPoint-secondPoint).Magnitude;
+			end
 
-				-- if RunService:IsStudio() then
-				-- 	local scanPp = Debugger:PointPart(scanPoint);
-				-- 	scanPp.Color = Color3.fromRGB(255, 0, 0);
-				-- 	game.Debris:AddItem(scanPp, 0.1);
-		
-				-- 	local scanLp = Debugger:PointPart(landPoint);
-				-- 	scanLp.Color = Color3.fromRGB(0, 255, 0);
-				-- 	game.Debris:AddItem(scanLp, 0.1);
-
-				-- 	local scanSp = Debugger:PointPart(secondPoint);
-				-- 	scanSp.Color = Color3.fromRGB(0, 0, 255);
-				-- 	game.Debris:AddItem(scanSp, 0.1);
-				-- end
-
-				local pointsDist = (scanPoint-landPoint).Magnitude;
-				local secondDist = (scanPoint-secondPoint).Magnitude;
-
-				--local screenPoint, onScreen = camera:WorldToViewportPoint(landPoint);
-				--tpScanFrame.Position = UDim2.new(0, screenPoint.X, 0, screenPoint.Y);
-
-				if pointsDist > 0.1 then
-					tpBlockFrame.Visible = true;
+			local limZ = math.rad(26);
+			if secondDist > 0.1 then
+				-- third person blocked;
+				if characterProperties.LeftSideCamera then
+					aimWaistZ = aimWaistZ +0.02;
 				else
-					tpBlockFrame.Visible = false;
+					aimWaistZ = aimWaistZ -0.02;
 				end
 
-				local limZ = math.rad(26); 
-				if secondDist > 0.1 then
-					-- third person blocked;
+				aimWaistZ = math.clamp(aimWaistZ, -limZ, limZ);
 
-					if characterProperties.LeftSideCamera then
-						aimWaistZ = aimWaistZ +0.02;
-					else
-						aimWaistZ = aimWaistZ -0.02;
-					end
-					aimWaistZ = math.clamp(aimWaistZ, -limZ, limZ);
+			else
+				-- third person not blocked;
+
+				aimWaistZ = modMath.Lerp(aimWaistZ, 0, 0.1);
+
+			end
+
+			characterProperties.Joints.WaistZ = modMath.Lerp(characterProperties.Joints.WaistZ, aimWaistZ, 0.1);
+
+			-- if not modData:IsMobile() then
+			-- 	local scanPoint = modWeaponMechanics.CastHitscanRay{
+			-- 		Origin = mouseProperties.Focus.p;
+			-- 		Direction = mouseProperties.Direction;
+			-- 		IncludeList = projRaycast.FilterDescendantsInstances;
+			-- 		Range = configurations.BulletRange;
+			-- 	};
+
+			-- 	-- MARK: 3rd person tilt peek;
+			-- 	local motorHeadPoint = (characterProperties.MotorHeadCFrameA * CFrame.Angles(0, 0, aimWaistZ) * characterProperties.MotorHeadCFrameB).Position;
+				
+			-- 	local headDir = (scanPoint-motorHeadPoint).Unit;
+			-- 	local headDist = (scanPoint-motorHeadPoint).Magnitude;
+			-- 	local landPoint = modWeaponMechanics.CastHitscanRay{
+			-- 		Origin = motorHeadPoint;
+			-- 		Direction = headDir;
+			-- 		IncludeList = projRaycast.FilterDescendantsInstances;
+			-- 		Range = headDist;
+			-- 	};
+
+			-- 	local secAimWaist = aimWaistZ + (characterProperties.LeftSideCamera and -0.4 or 0.4);
+			-- 	local hpSecondPoint = (characterProperties.MotorHeadCFrameA * CFrame.Angles(0, 0, secAimWaist) * characterProperties.MotorHeadCFrameB).Position;
+
+			-- 	local secondPoint = modWeaponMechanics.CastHitscanRay{
+			-- 		Origin = hpSecondPoint;
+			-- 		Direction = (scanPoint-hpSecondPoint).Unit;
+			-- 		IncludeList = projRaycast.FilterDescendantsInstances;
+			-- 		Range = (scanPoint-hpSecondPoint).Magnitude;
+			-- 	};
+
+			-- 	-- if RunService:IsStudio() then
+			-- 	-- 	local scanPp = Debugger:PointPart(scanPoint);
+			-- 	-- 	scanPp.Color = Color3.fromRGB(255, 0, 0);
+			-- 	-- 	game.Debris:AddItem(scanPp, 0.1);
+		
+			-- 	-- 	local scanLp = Debugger:PointPart(landPoint);
+			-- 	-- 	scanLp.Color = Color3.fromRGB(0, 255, 0);
+			-- 	-- 	game.Debris:AddItem(scanLp, 0.1);
+
+			-- 	-- 	local scanSp = Debugger:PointPart(secondPoint);
+			-- 	-- 	scanSp.Color = Color3.fromRGB(0, 0, 255);
+			-- 	-- 	game.Debris:AddItem(scanSp, 0.1);
+			-- 	-- end
+
+			-- 	local pointsDist = (scanPoint-landPoint).Magnitude;
+			-- 	local secondDist = (scanPoint-secondPoint).Magnitude;
+
+			-- 	--local screenPoint, onScreen = camera:WorldToViewportPoint(landPoint);
+			-- 	--tpScanFrame.Position = UDim2.new(0, screenPoint.X, 0, screenPoint.Y);
+
+			-- 	if pointsDist > 0.1 then
+			-- 		tpBlockFrame.Visible = true;
+			-- 	else
+			-- 		tpBlockFrame.Visible = false;
+			-- 	end
+
+			-- 	local limZ = math.rad(26); 
+			-- 	if secondDist > 0.1 then
+			-- 		-- third person blocked;
+
+			-- 		if characterProperties.LeftSideCamera then
+			-- 			aimWaistZ = aimWaistZ +0.02;
+			-- 		else
+			-- 			aimWaistZ = aimWaistZ -0.02;
+			-- 		end
+			-- 		aimWaistZ = math.clamp(aimWaistZ, -limZ, limZ);
 					
 
-				else
-					-- third person not blocked;
+			-- 	else
+			-- 		-- third person not blocked;
 
-					aimWaistZ = modMath.Lerp(aimWaistZ, 0, 0.1);
+			-- 		aimWaistZ = modMath.Lerp(aimWaistZ, 0, 0.1);
 
-				end
+			-- 	end
 
-				characterProperties.Joints.WaistZ = modMath.Lerp(characterProperties.Joints.WaistZ, aimWaistZ, 0.1);
-			end
+			-- 	characterProperties.Joints.WaistZ = modMath.Lerp(characterProperties.Joints.WaistZ, aimWaistZ, 0.1);
+			-- end
 
 		end
 		
@@ -1299,11 +1375,13 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 							Range = configurations.BulletRange;
 						};
 						
+						local shotOrigin = head.Position + -Vector3.yAxis*0.4 + head.CFrame.RightVector *(characterProperties.LeftSideCamera and -1 or 1);
+
 						local reDirection = (scanPoint-mouseProperties.Focus.Position).Unit;
-						local newDirection = (scanPoint-head.Position).Unit;
+						local newDirection = (scanPoint-shotOrigin).Unit;
 
 						local bulletEnd = modWeaponMechanics.CastHitscanRay{
-							Origin = head.Position;
+							Origin = shotOrigin;
 							Direction = newDirection;
 							IncludeList = rayWhitelist;
 							Range = configurations.BulletRange;

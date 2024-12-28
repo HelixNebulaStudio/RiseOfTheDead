@@ -2202,13 +2202,13 @@ local ragdollActive = true;
 Cache.OneSecTick = tick();
 Cache.LowestFps = math.huge;
 
-local stepBuffer = 0;
+characterProperties.StepBuffer = 0;
 -- MARK: PreSimulation;
 RunService.PreSimulation:Connect(function(step)
 	if not characterProperties.IsAlive then return end;
 
-	if stepBuffer >0 then 
-		stepBuffer = math.max(stepBuffer-1, 0); 
+	if characterProperties.StepBuffer >0 then 
+		characterProperties.StepBuffer = math.max(characterProperties.StepBuffer-1, 0); 
 
 		if characterProperties.AllowLerpBody then
 			local waistC0 = {X=0; Y=0; Z=0;};
@@ -2262,8 +2262,10 @@ RunService.PreSimulation:Connect(function(step)
 
 	local motionStepBuffer = modData:GetSetting("MotionStepBuffer");
 	if motionStepBuffer and motionStepBuffer > 1 then
-		stepBuffer = motionStepBuffer;
+		characterProperties.StepBuffer = motionStepBuffer;
 		step = step *motionStepBuffer;
+	else
+		characterProperties.StepBuffer = 0;
 	end
 
 	local beatTick = tick();

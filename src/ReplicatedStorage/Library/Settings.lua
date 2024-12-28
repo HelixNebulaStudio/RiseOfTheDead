@@ -691,9 +691,9 @@ baseConfigInterface:Add("VisualsGraphics", "SliderOption", {
 	DescProperties={Text="Skip steps on scripted motion of character joints. Increase = more performance. Decrease = smoother motion.";};
 	Config={
 		SettingsKey="MotionStepBuffer"; 
-		RangeInfo={Min=1; Max=3; Default=1; ValueType="Flat";
+		RangeInfo={Min=1; Max=6; Default=1; ValueType="Flat";
 			DisplayValueFunc=function(v)
-				return `Every {math.clamp(v, 1, 3)} step`;
+				return `Every {math.clamp(v, 1, 6)} step`;
 			end;
 		};
 	};
