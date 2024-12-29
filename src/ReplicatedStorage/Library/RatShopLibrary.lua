@@ -17,6 +17,8 @@ ShopLibrary.SellPrice = {
 	["cannedbeans"]=48;
 	["chocobar"]=48;
 	["cannedfish"]=1452;
+	["sandwich"]=120;
+	["ziphoningserum"]=2000;
 	
 	["metalpipes"]=200;
 	["igniter"]=200;
@@ -64,7 +66,10 @@ ShopLibrary.SellPrice = {
 	["rusty48parts"]=5000;
 	["arelshiftcrossparts"]=5000;
 	["deagleparts"]=4000;
-	
+	["grandgarandparts1"]=6000;
+	["grandgarandparts2"]=6000;
+	["grandgarandparts3"]=6000;
+
 	--
 	["wantedposter"]=1000;
 	
