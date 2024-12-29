@@ -29,7 +29,7 @@ return function(player, dialog, data)
 
 			if itemDisplayLib then
 				local modSkinPerm = require(game.ReplicatedStorage.BaseLibrary.UsableItems.Generics.SkinPerm);
-				local fortuneSkinId = 106;
+				local fortuneSkinId = "106";
 
 				if not modSkinPerm:HasSkinPermanent(storageItem, fortuneSkinId) then
 					dialogPacket.Reply="Here you go! The fortune skin permanent is now on your tool.";

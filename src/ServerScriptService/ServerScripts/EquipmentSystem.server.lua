@@ -18,6 +18,7 @@ local modItemSkinWear = Debugger:Require(game.ReplicatedStorage.Library.ItemSkin
 local modTools = Debugger:Require(game.ReplicatedStorage.Library.Tools);
 local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 local modWeaponProperties = require(game.ReplicatedStorage.Library.WeaponProperties);
+local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
 
 local modProfile = Debugger:Require(game.ServerScriptService.ServerLibrary.Profile);
 local modOnGameEvents = Debugger:Require(game.ServerScriptService.ServerLibrary.OnGameEvents);
@@ -374,6 +375,14 @@ local function equipTool(player, paramPacket)
 		
 		if storageItem then
 			modItemSkinWear.Generate(player, storageItem);
+
+			task.spawn(function()
+				-- skinFix;
+				local unlockedSkins = storageItem:GetValues("Skins") or {};
+				if #unlockedSkins > 1 then
+					modTables.CollapseValues(unlockedSkins);
+				end
+			end)
 			
 			local itemId = storageItem.ItemId;
 			local itemProperties = modItemsLibrary:Find(itemId);

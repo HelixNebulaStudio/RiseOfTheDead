@@ -130,4 +130,18 @@ function Tables.HasChanged(old, new)
     return false;
 end
 
+function Tables.CollapseValues(t)
+    local existList = {};
+    for a=#t, 1, -1 do
+        local v = t[a];
+
+        if existList[v] == nil then
+            existList[v] = true;
+            continue;
+        end
+
+        table.remove(t, a);
+    end
+end
+
 return Tables;

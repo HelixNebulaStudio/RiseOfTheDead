@@ -141,7 +141,7 @@ if RunService:IsServer() then
 			
 			if itemDisplayLib then
 				local modSkinPerm = require(game.ReplicatedStorage.BaseLibrary.UsableItems.Generics.SkinPerm);
-				local winterFestSkinId = 105;
+				local winterFestSkinId = "105";
 	
 				if not modSkinPerm:HasSkinPermanent(storageItem, winterFestSkinId) then
 					dialogPacket.Reply="Hope you like it, I've given it a pattern. Oh, and you need to remove any textures before it's visible.";
