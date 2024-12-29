@@ -88,15 +88,18 @@ elseif RunService:IsClient() then
 		local configurations = self.WeaponModule.Configurations;
 
 		local frenzyDmg = configurations.FrenzyDamage;
+		if frenzyDmg == nil then
+			return 
+		end;
 
+		if weaponStatusDisplay.FrenzyDamage == nil then
+			weaponStatusDisplay.FrenzyDamage = {
+				ModItemId=`frenzydamagemod`;
+				Order=1;
+				Text="0%";
+			};
+		end
 		if self.Stacks then
-			if weaponStatusDisplay.FrenzyDamage == nil then
-				weaponStatusDisplay.FrenzyDamage = {
-					ModItemId=`frenzydamagemod`;
-					Order=1;
-					Text="0%";
-				};
-			end
 			local statusInfo = weaponStatusDisplay.FrenzyDamage;
 
 			local alphaRatio = self.Stacks;

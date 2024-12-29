@@ -104,7 +104,12 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 			upgradeFrame:Destroy();
 			upgradesGuiTable[storageItemOfMod.ID] = nil;
 			
-			modData:GetItemClass(storageItemOfMod.ID);
+			local toolModule = modData:GetItemClass(storageItemOfItem.ID, storageItemOfItem.ID == "MockStorageItem");
+			if toolModule and toolModule.ModifierTriggers and toolModule.ModifierTriggers[modLib.Module.Name] then
+				local itemModifier = toolModule.ModifierTriggers[modLib.Module.Name];
+				itemModifier:SetActive(false);
+				toolModule.ModifierTriggers[modLib.Module.Name] = nil;
+			end
 			modData.OnAmmoUpdate:Fire(storageItemOfMod.ID);
 			
 			modStorageInterface.UpdateStorages(success);

@@ -503,7 +503,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modId, id
 				else
 					storageOfMod:ConnectSort(sortModsFunc);
 				end
-
+				
 				table.insert(refreshStorages, storageOfMod:Shrink());
 				activeSave.AppearanceData:Update(activeSave.Clothing);
 				return refreshStorages;
