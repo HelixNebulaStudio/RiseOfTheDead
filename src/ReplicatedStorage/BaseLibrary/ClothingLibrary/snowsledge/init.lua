@@ -15,6 +15,8 @@ function attirePackage.NewToolLib(handler)
 		local accessory = newAccessoryPrefabs and newAccessoryPrefabs[1];
 		if typeof(accessory) ~= "Instance" then return end;
 
+		local character = classPlayer:GetCharacter();
+		
 		local accessoryHandle = accessory:WaitForChild("Handle");
 		local vehicleWearMotor = accessoryHandle:WaitForChild("VehicleWear");
 

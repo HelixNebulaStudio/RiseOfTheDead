@@ -231,10 +231,6 @@ function OnPlayerAdded(player)
 
 	local profile = modProfile:Get(player);
 	local activeSave = profile and profile:GetActiveSave();
-	local equippedAccessory = activeSave and activeSave.AppearanceData
-	if equippedAccessory then
-		activeSave.AppearanceData:Update(activeSave.Clothing);
-	end
 	
 	local function characterAdded(character)
 		charAppear:LoadAppearance(character);

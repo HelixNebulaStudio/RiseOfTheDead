@@ -40,8 +40,6 @@ function CustomHealthbar:Create(name, maxHealth, adornee)
 		game.Debris:AddItem(healthObj.BasePart, 0);
 		healthObj.BasePart = nil;
 		healthObj.OnDeath:Destroy();
-
-		table.clear(healthObj);
 	end);
 	
 	return self.Healths[name];

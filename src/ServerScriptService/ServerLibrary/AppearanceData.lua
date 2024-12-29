@@ -189,7 +189,9 @@ function AppearanceData:Update(storage)
 				end
 
 				if newAccessoryPrefabs and clothingClass.OnAccesorySpawn then
-					clothingClass:OnAccesorySpawn(classPlayer, storageItem, newAccessoryPrefabs);
+					task.spawn(function()
+						clothingClass:OnAccesorySpawn(classPlayer, storageItem, newAccessoryPrefabs);
+					end)
 				end
 				
 				if clothingClass.OnEquip then
