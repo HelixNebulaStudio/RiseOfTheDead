@@ -1610,6 +1610,20 @@ function StorageInterface.RefreshStorageItemId(storageItemId)
 	end
 end
 
+function StorageInterface.RefreshSlotOfItemId(itemId)
+	local modInterface = modData:GetInterfaceModule(true);
+	if modInterface == nil then return end;
+	
+	for index, interface in pairs(modInterface.StorageInterfaces) do
+		for siid, slotItem in pairs(interface.Buttons) do
+			if slotItem.Library == nil or slotItem.Library.Id ~= itemId then continue end;
+
+			slotItem:Update();
+		end
+		
+	end
+end
+
 local refreshQueue = {};
 local isRefreshing = false;
 function StorageInterface.QueueRefreshStorage(storageIds)

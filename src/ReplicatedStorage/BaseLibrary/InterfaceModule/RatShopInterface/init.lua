@@ -18,6 +18,7 @@ local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibr
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
 local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
+local modStorageInterface = require(game.ReplicatedStorage.Library.UI.StorageInterface);
 
 local typeOptionTemplate = script:WaitForChild("TypeOption");
 local listingTemplate = script:WaitForChild("templateOption");
@@ -34,6 +35,13 @@ Interface.RankColors = {
 };
 
 --== Script;
+modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
+	if action ~= "syncevent" or (data and data.Id ~= "AmmoPouchData") then return end;
+	
+	modStorageInterface.RefreshSlotOfItemId("ammopouch");
+end)
+
+
 
 function Interface.init(modInterface)
 	setmetatable(Interface, modInterface);
@@ -501,46 +509,51 @@ function Interface.init(modInterface)
 			end
 			
 			--== MARK: Refill Charges
-			if selectedItem.ItemId == "ammopouch" and selectedItem.Values and selectedItem.Values.C then
+			if selectedItem.ItemId == "ammopouch" then
 				local itemClass = modData:GetItemClass(selectedItem.ID);
 
-				Interface.NewListing(function(newListing)
-					newListing.Name = "RefillOption";
-					local infoBox = newListing:WaitForChild("infoFrame");
-					local descFrame = infoBox:WaitForChild("descFrame");
+				local ammoPouchData = modData:GetEvent("AmmoPouchData");
+				local charges = ammoPouchData and ammoPouchData.Charges or itemClass.Configurations.BaseRefillCharge;
 
-					local purchaseButton = newListing:WaitForChild("purchaseButton");
-					local priceLabel = purchaseButton:WaitForChild("buttonText");
-					local iconButton = newListing:WaitForChild("iconButton");
-					local iconLabel = iconButton:WaitForChild("iconLabel");
-					local titleLabel = descFrame:WaitForChild("titleLabel");
-					local labelFrame = descFrame:WaitForChild("labelFrame");
-					local descLabel = labelFrame:WaitForChild("descLabel");
+				if charges < itemClass.Configurations.BaseRefillCharge then
+					Interface.NewListing(function(newListing)
+						newListing.Name = "RefillOption";
+						local infoBox = newListing:WaitForChild("infoFrame");
+						local descFrame = infoBox:WaitForChild("descFrame");
 
-					descLabel.Text = `Do you want to refill {itemClass.Configurations.BaseRefillCharge} ammo pouch charges?`;
-						
-					titleLabel.Text = "Refill Charges";
-					priceLabel.Text = `Refill`;
-					iconLabel.Image = itemLib.Icon;
+						local purchaseButton = newListing:WaitForChild("purchaseButton");
+						local priceLabel = purchaseButton:WaitForChild("buttonText");
+						local iconButton = newListing:WaitForChild("iconButton");
+						local iconLabel = iconButton:WaitForChild("iconLabel");
+						local titleLabel = descFrame:WaitForChild("titleLabel");
+						local labelFrame = descFrame:WaitForChild("labelFrame");
+						local descLabel = labelFrame:WaitForChild("descLabel");
 
-					local refillDebounce = false;
-					newListing.MouseButton1Click:Connect(function()
-						if refillDebounce then return end;
-						refillDebounce = true;
-						
-						local serverReply = remoteShopService:InvokeServer("refillcharges", Interface.Object, selectedItem.ID);
+						descLabel.Text = `Do you want to refill {itemClass.Configurations.BaseRefillCharge} ammo pouch charges?`;
+							
+						titleLabel.Text = "Refill Charges";
+						priceLabel.Text = `Refill`;
+						iconLabel.Image = itemLib.Icon;
 
-						if serverReply == modShopLibrary.PurchaseReplies.Success then
-							RunService.Heartbeat:Wait();
-							newListing:Destroy();
+						local refillDebounce = false;
+						newListing.MouseButton1Click:Connect(function()
+							if refillDebounce then return end;
+							refillDebounce = true;
+							
+							local serverReply = remoteShopService:InvokeServer("refillcharges", Interface.Object, selectedItem.ID);
 
-						else
-							warn("Refill Purchase>> Error Code:"..serverReply);
-							descLabel.Text = string.gsub(modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply), "$Currency", "Money");
-						end
-						refillDebounce = false;
+							if serverReply == modShopLibrary.PurchaseReplies.Success then
+								RunService.Heartbeat:Wait();
+								newListing:Destroy();
+
+							else
+								warn("Refill Purchase>> Error Code:"..serverReply);
+								descLabel.Text = string.gsub(modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply), "$Currency", "Money");
+							end
+							refillDebounce = false;
+						end)
 					end)
-				end)
+				end
 			end
 
 			--== MARK: Repairable

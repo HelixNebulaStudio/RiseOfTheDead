@@ -15,6 +15,7 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modShopLibrary = require(game.ReplicatedStorage.Library.RatShopLibrary);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modStorageInterface = require(game.ReplicatedStorage.Library.UI.StorageInterface);
 
 local remoteShopService = modRemotesManager:Get("ShopService");
 	
@@ -109,10 +110,13 @@ function Interface.init(modInterface)
 				
 				else
 					if selectItemId == "ammopouch" then
-						if selectedItem.Values.C == nil then
+						local ammoPouchData = modData:GetEvent("AmmoPouchData");
+						local charges = ammoPouchData and ammoPouchData.Charges or itemClass.Configurations.BaseRefillCharge;
+
+						if charges >= itemClass.Configurations.BaseRefillCharge then
 							mainLabel.Text = `This ammo pouch has full charge.`;
 
-						elseif selectedItem.Values.C then -- and selectedItem.Values.C < itemClass.Configurations.BaseRefillCharge
+						else
 							mainLabel.Text = `Do you want to refill {itemClass.Configurations.BaseRefillCharge} ammo pouch charges?`;
 							resupplyButton.buttonText.Text = `Refill`;
 							resupplyButton.Visible = true;
@@ -198,7 +202,8 @@ function Interface.init(modInterface)
 				resupplyButton.buttonText.Text = "Purchasing...";
 				local serverReply = modShopLibrary.PurchaseReplies.InsufficientCurrency;
 				if localplayerStats and (localplayerStats[ammoCurrency] or 0) >= price then
-					serverReply = remoteShopService:InvokeServer("buyammo", {StoreObj=Interface.Object; AmmoPouch=(openStorageItem and openStorageItem.ID or nil)}, selectedItem.ID, storageId);
+					local ammoPouchID = (openStorageItem and openStorageItem.ID or nil)
+					serverReply = remoteShopService:InvokeServer("buyammo", {StoreObj=Interface.Object; AmmoPouch=ammoPouchID}, selectedItem.ID, storageId);
 				end
 				resupplyButton.buttonText.Text = defaultText;
 				

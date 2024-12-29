@@ -15,6 +15,7 @@ local modBlueprintLibrary = require(game.ReplicatedStorage.Library.BlueprintLibr
 local modGoldShopLibrary = require(game.ReplicatedStorage.Library.GoldShopLibrary);
 local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
 
+local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
 local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
 local modItemDrops = require(game.ServerScriptService.ServerLibrary.ItemDrops);
 local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
@@ -186,14 +187,18 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		local storeProvider, id, storageId = ...;
 
 		local interactModule;
-		local ammoPouchStorageItem;
+		local ammoPouchData;
 
 		if storeProvider.AmmoPouch then
-			ammoPouchStorageItem = modStorage.FindIdFromStorages(storeProvider.AmmoPouch, player);
+			local ammoPouchStorageItem = modStorage.FindIdFromStorages(storeProvider.AmmoPouch, player);
 			if ammoPouchStorageItem == nil then return modShopLibrary.PurchaseReplies.InvalidProduct; end;
 
-			local charges = ammoPouchStorageItem:GetValues("C");
-			if charges and charges <= 0 then
+			ammoPouchData = modEvents:GetEvent(player, "AmmoPouchData") or {
+				Id="AmmoPouchData";
+				Charges=3;
+			};
+
+			if ammoPouchData.Charges <= 0 then
 				return modShopLibrary.PurchaseReplies.ExhaustedUses;
 			end
 
@@ -283,13 +288,12 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		
 		storageItem:Sync({"A", "MA"});
 
-		if ammoPouchStorageItem then
-			local ammoPouchItemClass = profile:GetItemClass(ammoPouchStorageItem.ID);
+		if ammoPouchData then
+			local ammoPouchItemClass = profile:GetItemClass(storeProvider.AmmoPouch);
 			local maxCharges = ammoPouchItemClass.Configurations.BaseRefillCharge;
-			local charges = ammoPouchStorageItem:GetValues("C") or maxCharges;
 			
-			ammoPouchStorageItem:SetValues("C", charges-1);
-			ammoPouchStorageItem:Sync({"C"});
+			ammoPouchData.Charges = math.clamp(ammoPouchData.Charges -1, 0, maxCharges);
+			modEvents:NewEvent(player, ammoPouchData, true);
 		end
 
 		if price > 0 then
@@ -393,8 +397,16 @@ function remoteShopService.OnServerInvoke(player, action, ...)
 		local itemId = storageItem.ItemId;
 
 		if itemId == "ammopouch" then
+			local ammoPouchData = modEvents:GetEvent(player, "AmmoPouchData") or {
+				Id="AmmoPouchData";
+				Charges=3;
+			};
+			
+			ammoPouchData.Charges = 3;
+			modEvents:NewEvent(player, ammoPouchData, true);
+
 			storageItem:DeleteValues("C");
-			storageItem:Sync({"C"});
+
 			shared.Notify(player, "Ammo pouch refilled.", "Info");
 			
 			return modShopLibrary.PurchaseReplies.Success;

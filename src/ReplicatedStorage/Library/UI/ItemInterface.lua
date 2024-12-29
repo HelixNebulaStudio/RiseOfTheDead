@@ -402,7 +402,8 @@ function ItemInterface:DefaultUpdateItemButton(storageItemData)
 					end
 
 					if itemId == "ammopouch" then
-						local charges = itemValues.C or itemClass.Configurations.BaseRefillCharge;
+						local ammoPouchData = modData:GetEvent("AmmoPouchData");
+						local charges = ammoPouchData and ammoPouchData.Charges or itemClass.Configurations.BaseRefillCharge;
 						local barFill = charges/itemClass.Configurations.BaseRefillCharge;
 						setBar(barFill);
 						
@@ -950,7 +951,7 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 			end
 		end
 		
-		local itemClass, classType = modData:GetItemClass(storageItemData.ID);
+		local itemClass, classType = modData:GetItemClass(storageItemData.ID, true);
 		
 		if itemClass then
 
@@ -972,7 +973,8 @@ function ItemInterface:DefaultUpdateItemTooltip(itemId, storageItemData)
 			end
 
 			if itemId == "ammopouch" then
-				local charges = itemValues.C or itemClass.Configurations.BaseRefillCharge;
+				local ammoPouchData = modData:GetEvent("AmmoPouchData");
+				local charges = ammoPouchData and ammoPouchData.Charges or itemClass.Configurations.BaseRefillCharge;
 				itemDesc = itemDesc..h3O.."\nCharges: "..h3C..`{charges}/{itemClass.Configurations.BaseRefillCharge}`;
 			end
 

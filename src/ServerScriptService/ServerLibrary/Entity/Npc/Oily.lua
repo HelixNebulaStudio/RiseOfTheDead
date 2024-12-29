@@ -39,7 +39,7 @@ return function(npc, spawnPoint)
 	function self.Initialize()
 		self.Immunity = 1;
 
-		self.Humanoid.MaxHealth = 100 + 20*(self.Configuration.Level-1);
+		self.Humanoid.MaxHealth = math.clamp(100 + 20*(self.Configuration.Level-1), 100, 102400);
 		self.Humanoid.Health = self.Humanoid.MaxHealth;
 		self.Properties.AttackDamage = 10 + 3*(self.Configuration.Level-1);
 		

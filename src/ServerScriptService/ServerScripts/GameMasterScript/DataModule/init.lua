@@ -479,15 +479,10 @@ function Data:GetEvent(id, fetch)
 		end
 	end
 	
+	if id == "AmmoPouchData" then
+		Debugger:StudioWarn("Data.Events[id]", Data.Events[id]);
+	end
 	return Data.Events[id];
-	
-	--if Data.GameSave == nil or Data.GameSave.Events == nil then return end;
-	
-	--for a, eventData in pairs(Data.GameSave.Events) do
-	--	if eventData.Id == id then
-	--		return eventData;
-	--	end
-	--end
 end
 
 function Data:RequestData(hierarchyKey)
@@ -533,7 +528,7 @@ end
 
 -- MARK: GetItemClass
 function Data:GetItemClass(storageItemId, getShadowCopy)
-	local storageItem = Data.GetItemById(storageItemId); 
+	local storageItem = Data.GetItemById(storageItemId);
 	if storageItem == nil then return end;
 	
 	local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
