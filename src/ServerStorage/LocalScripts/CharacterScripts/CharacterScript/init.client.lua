@@ -160,7 +160,7 @@ local deg45 = math.pi/4;
 
 local environmentOnly = {workspace:WaitForChild("Environment"); workspace.Terrain};
 local environmentCollidable = {workspace:FindFirstChild("Environment"); workspace:FindFirstChild("Clips"); workspace:FindFirstChild("Interactables"); workspace:FindFirstChild("Entity"); workspace.Terrain};
-local isCharCamEnabled = false; 
+local activeCameraLayer = nil;
 
 local EditModeTag = false;
 
@@ -914,8 +914,7 @@ UserInputService.InputBegan:connect(function(inputObject, gameProcessedEvent)
 		end
 	end
 	
-	if characterProperties.IsSpectating 
-		and (inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch) then
+	if characterProperties.IsSpectating and (inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch) then
 		
 		Debugger:Warn("Switch spectate");
 		modSpectateManager:SetSpectate();
@@ -1295,9 +1294,13 @@ toggleCameraMode();
 
 
 RunService:BindToRenderStep("OffCamRender", Enum.RenderPriority.Input.Value, function(delta)
-	local activeCameraLayer = modCameraGraphics.RenderLayers:GetTable();
+	local cameraLayer = modCameraGraphics.RenderLayers:GetTable();
 	
-	if activeCameraLayer.Id == "freecam" then
+	if activeCameraLayer == nil then
+		activeCameraLayer = cameraLayer;
+	end
+
+	if cameraLayer.Id == "freecam" then
 		pcall(function()
 			character.LeftUpperArm.LeftShoulder.C0 = originaldata.LeftShoulderC0;
 			character.RightUpperArm.RightShoulder.C0 = originaldata.RightShoulderC0;
@@ -1313,7 +1316,7 @@ RunService:BindToRenderStep("OffCamRender", Enum.RenderPriority.Input.Value, fun
 		end
 		
 		return;
-	elseif activeCameraLayer.Id ~= "default" then
+	elseif cameraLayer.Id ~= "default" then
 		if characterProperties.FirstPersonCamera then
 			pcall(function()
 				character.LeftUpperArm.LeftShoulder.C0 = originaldata.LeftShoulderC0;
@@ -1336,14 +1339,6 @@ local function renderStepped(camera, deltaTime)
 	zoom = characterProperties.ZoomLevel or 8;
 
 	if CameraSubject.RootPart == nil then return; end;
-	if characterProperties.CharacterCameraEnabled == false then 
-		pcall(function()
-			character.LeftUpperArm.LeftShoulder.C0 = originaldata.LeftShoulderC0;
-			character.RightUpperArm.RightShoulder.C0 = originaldata.RightShoulderC0;
-		end)
-		
-		return;
-	end;
 
 	if specFrame and specFrame.Parent ~= nil then
 		specFrame.Visible = characterProperties.IsSpectating;
@@ -2483,10 +2478,6 @@ end)
 RunService.PostSimulation:Connect(function(deltaTimeSim)
 	local beatTick = tick();
 	loadInterface();
-	if modCharacter.CharacterProperties.CharacterCameraEnabled ~= isCharCamEnabled then
-		isCharCamEnabled = modCharacter.CharacterProperties.CharacterCameraEnabled;
-		characterProperties.RefreshTransparency = true;
-	end
 	
 	mouseProperties.XAngOffset = modMath.Lerp(mouseProperties.XAngOffset, 0,  math.clamp( (mouseProperties.XAngOffset/1)*0.3 , 0.05, 0.3) );
 	mouseProperties.YAngOffset = modMath.Lerp(mouseProperties.YAngOffset, 0, math.clamp( (mouseProperties.YAngOffset/1)*0.3 , 0.05, 0.3) );
@@ -2938,7 +2929,7 @@ RunService.PostSimulation:Connect(function(deltaTimeSim)
 			or characterProperties.RefreshTransparency then
 			
 			local bodyParts = CameraSubject.Character:GetDescendants();
-			if characterProperties.FirstPersonCamera and isCharCamEnabled then
+			if characterProperties.FirstPersonCamera and activeCameraLayer.Id == "default" then
 				if characterProperties.IsEquipped or characterProperties.CharacterInteracting then
 					ToggleBodypartTransparency(bodyParts, true);
 				else
@@ -3114,7 +3105,7 @@ end)
 
 updateCharacterTransparency = function()
 	local bodyParts = CameraSubject.Character:GetDescendants();
-	if characterProperties.FirstPersonCamera then
+	if characterProperties.FirstPersonCamera and activeCameraLayer.Id == "default" then
 		if characterProperties.IsEquipped then
 			ToggleBodypartTransparency(bodyParts, true);
 		else
@@ -3133,6 +3124,21 @@ if zoom < minZoomLevel then
 end	
 
 updateCharacterTransparency();
+
+local function onRenderLayerChanged()
+	if not workspace:IsAncestorOf(character) then
+		modCameraGraphics.RenderLayers.Changed:Disconnect(onRenderLayerChanged);
+		return;
+	end
+
+	local newCameraLayer = modCameraGraphics.RenderLayers:GetTable();
+	
+	if activeCameraLayer == nil or activeCameraLayer.Id ~= newCameraLayer.Id then
+		activeCameraLayer = newCameraLayer;
+		characterProperties.RefreshTransparency = true;
+	end
+end
+modCameraGraphics.RenderLayers.Changed:Connect(onRenderLayerChanged)
 
 character.ChildAdded:Connect(function(obj)
 	characterProperties.RefreshTransparency = true;

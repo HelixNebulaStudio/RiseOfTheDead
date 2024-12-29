@@ -4686,6 +4686,47 @@ Commands["testlaser"] = {
 };
 
 -- MARK: Shared Commands;
+Commands["spectate"] = {
+	Permission = PermissionLevel.DevBranchFree;
+	Description = "Set to spectate a player.";
+	
+	RequiredArgs = 0;
+	UsageInfo = "/spectate [name]";
+	ClientFunction = function(speaker, args)
+		local name = args[1];
+
+		-- local entityPrefab = workspace.Entities:FindFirstChild(name);
+		-- if entityPrefab then
+
+		-- end
+
+		-- local matches = modCommandHandler.MatchName(args[1]);
+		-- if matches ~= 1 then
+		-- 	if #matches > 1 then
+		-- 		GenericOutputs.MultipleMatch(speaker, matches);
+		-- 		return false;
+		-- 	elseif #matches < 1 then
+		-- 		GenericOutputs.NoMatch(speaker, args[1]);
+		-- 		return false;
+		-- 	end
+		-- end
+		
+		-- local player = matches[1];
+		-- if player == nil then
+		-- 	shared.Notify(speaker, `No player name match "{args[1]}".`, "Negative");
+		-- 	return;
+		-- end
+
+		-- local modData = require(speaker:WaitForChild("DataModule") :: ModuleScript);
+		-- local modCharacter = modData:GetModCharacter();
+
+		local modSpectateManager = require(game.ReplicatedStorage.Library.SpectateManager);
+		modSpectateManager:SetSpectate();
+
+		return true;
+	end;
+};
+
 Commands["config"] = {
 	Permission = PermissionLevel.Admin;
 	Description = "Manually change a config setting.";
