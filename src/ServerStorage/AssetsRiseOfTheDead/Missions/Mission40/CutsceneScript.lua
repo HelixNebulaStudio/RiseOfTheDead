@@ -2,9 +2,11 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Client Variables;
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
+local TweenService = game:GetService("TweenService");
 
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
+local modEventService = require(game.ReplicatedStorage.Library.EventService);
 
 --== Variables;
 local missionId = 40;
@@ -67,27 +69,65 @@ if RunService:IsServer() then
 			if npcModule.Name ~= "Zricera" then return end;
 
 			for _, player in pairs(players) do
-				local profile = shared.modProfile:Get(player);
-
 				modMission:Progress(player, missionId, function(mission)
 					if mission.ProgressionPoint > 2 then return end;
 					mission.ProgressionPoint = 2;
-					
-					function profile.Cache.GameModeDisconnectOverwrite(menuRoom)
-						if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage ~= "Zricera" then return end;
-						
-						local destination;
-						modMission:Progress(player, missionId, function(mission)
-							if mission.ProgressionPoint >= 2 and mission.ProgressionPoint <= 4 then
-								mission.ProgressionPoint = 3;
-								destination = CFrame.new(352.464, -30.64, 1885.59);
-							end;
-						end)
-
-						return destination;
-					end
 				end)
 				
+			end
+		end)
+
+		modEventService:OnInvoked("GameModeManager.DisconnectPlayer", function(event, packet)
+			local player = event.Player;
+			local menuRoom = packet.MenuRoom;
+			if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage ~= "Zricera" then return end;
+
+			local destination;
+			modMission:Progress(player, missionId, function(mission)
+				if mission.Pinned and mission.ProgressionPoint >= 2 and mission.ProgressionPoint <= 4 then
+					mission.ProgressionPoint = 3;
+					destination = CFrame.new(352.464, -30.64, 1885.59);
+				end;
+			end)
+
+			if destination then
+				packet.SetTeleportCfFunc(destination);
+			end
+		end)
+		
+		modOnGameEvents:ConnectEvent("OnTrigger", function(player, interactData, ...)
+			local triggerId = interactData.TriggerTag;
+
+			if triggerId == "Push Statue" then
+				modMission:Progress(player, 40, function(mission)
+					local statueObject = mission.Cache.Statue;
+					
+					if statueObject then
+						interactData.CanInteract = false;
+						interactData.Label = "";
+						interactData:Sync();
+						interactData.Object.Size = Vector3.new(0, 0, 0);
+						
+						TweenService:Create(statueObject, TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
+							CFrame = CFrame.new(352.495, -30.669, 1923.279);
+						}):Play();
+						
+						delay(30, function()
+							interactData.CanInteract = true;
+							interactData.Label = nil;
+							interactData:Sync();
+							
+							interactData.Object.Size = Vector3.new(0.4, 4.51, 1.38);
+							TweenService:Create(statueObject, TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
+								CFrame = CFrame.new(352.49469, -30.6694565, 1912.8186, 1, 0, 0, 0, 1, 0, 0, 0, 1);
+							}):Play();
+						end)
+					else
+						Debugger:Warn("Statue does not exist.");
+					end
+					
+					if mission.ProgressionPoint == 3 then mission.ProgressionPoint = 4; end;
+				end)
 			end
 		end)
 		

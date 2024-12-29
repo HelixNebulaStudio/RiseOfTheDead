@@ -76,7 +76,7 @@ function ItemsLibrary:Init(super)
 	new(gunBase, {Id="cz75"; Name="CZ75-Auto"; Icon="rbxassetid://17007239643"; Tags={"Pistol"; "Secondary Weapon";}; Description="High fire-rate automatic pistol. Has built in <b>Damage Rev</b>, which does more damage the lower your ammo count is in your magazine.";});
 	new(gunBase, {Id="tec9"; Name="Tec-9"; Icon="rbxassetid://17007237750"; Tags={"Pistol"; "Secondary Weapon";}; Description="High power, high firerate pistol. Has built in <b>Auto Trigger</b>, which sets the firing mode to automatic.";});
 	new(gunBase, {Id="dualp250"; Name="Dual P250"; Icon="rbxassetid://17007236263"; Tags={"Pistol"; "Secondary Weapon";}; Description="Two handy pistols. Is a <b>Dual Wield</b> weapon.";});
-	new(gunBase, {Id="m9legacy"; Name="M9 Legacy"; Icon="rbxassetid://3296446616"; Tags={"Pistol"; "Secondary Weapon";}; Description="A handy legacy pistol.";});
+	new(gunBase, {Id="m9legacy"; Name="M9 Legacy"; Icon="rbxassetid://3296446616"; Tags={"Pistol"; "Secondary Weapon";}; NonPremiumTax=0; Description="A handy legacy pistol.";});
 	new(gunBase, {Id="revolver454"; Name="Revolver 454"; Icon="rbxassetid://2009719243"; Tags={"Pistol"; "Secondary Weapon";}; Description="Also known as the Raging Bull 454, high power, high fire-rate revolver.";});
 	new(gunBase, {Id="deagle"; Name="Desert Eagle"; Icon="rbxassetid://16238188322"; Tags={"Pistol"; "Secondary Weapon";}; Description="The hand cannon. Has built in <b>Focus Charge</b>, which does more damage if you charge your focus by aiming down sights.";}); --rbxassetid://5166288732 
 

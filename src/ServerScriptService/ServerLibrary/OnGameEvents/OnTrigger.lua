@@ -315,37 +315,7 @@ return function(player, interactData, ...)
 		else
 			shared.Notify(player, "That is already built.", "Negative");
 		end
-		
-	elseif triggerId == "Push Statue" then
-		modMission:Progress(player, 40, function(mission)
-			local statueObject = mission.Cache.Statue;
 			
-			if statueObject then
-				interactData.CanInteract = false;
-				interactData.Label = "";
-				interactData:Sync();
-				interactData.Object.Size = Vector3.new(0, 0, 0);
-				if mission.ProgressionPoint == 3 then mission.ProgressionPoint = 4; end;
-				
-				TweenService:Create(statueObject, TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
-					CFrame = CFrame.new(352.495, -30.669, 1923.279);
-				}):Play();
-				
-				delay(30, function()
-					interactData.CanInteract = true;
-					interactData.Label = nil;
-					interactData:Sync();
-					
-					interactData.Object.Size = Vector3.new(0.4, 4.51, 1.38);
-					TweenService:Create(statueObject, TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
-						CFrame = CFrame.new(352.49469, -30.6694565, 1912.8186, 1, 0, 0, 0, 1, 0, 0, 0, 1);
-					}):Play();
-				end)
-			else
-				Debugger:Warn("Statue does not exist.");
-			end
-		end)
-		
 	elseif triggerId == "Tombs NekronMask" then
 		profile:UnlockCollectible("nm");
 		if modEvents:GetEvent(player, "takeNekronMask") == nil then

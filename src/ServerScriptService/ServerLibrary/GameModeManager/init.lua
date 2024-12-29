@@ -15,6 +15,7 @@ local modAnalytics = require(game.ServerScriptService.ServerLibrary.GameAnalytic
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modLeaderboardService = require(game.ReplicatedStorage.Library.LeaderboardService);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
+local modEventService = require(game.ReplicatedStorage.Library.EventService);
 
 local modMatchMaking = require(game.ServerScriptService.ServerLibrary.MatchMaking);
 local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
@@ -763,13 +764,13 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 		local profile = shared.modProfile:Get(player);
 
 		local teleportCFrame = profile.BossDoorCFrame;
-		if profile.Cache.GameModeDisconnectOverwrite then
-			local newCFrame = profile.Cache.GameModeDisconnectOverwrite(oldMenuRoom);
-			if newCFrame then
-				teleportCFrame = newCFrame;
+		
+		modEventService:ServerInvoke("GameModeManager.DisconnectPlayer", player, {
+			MenuRoom=oldMenuRoom;
+			SetTeleportCfFunc=function(newCf)
+				teleportCFrame = newCf;
 			end
-			profile.Cache.GameModeDisconnectOverwrite = nil;
-		end
+		});
 
 		if teleportCFrame then
 			if exitTeleport ~= false then

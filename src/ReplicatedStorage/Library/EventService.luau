@@ -168,8 +168,8 @@ EventService.EventSource = EventSource;
 EventService.Handlers = {};
 
 
-function EventService:GetHandler(key: string, defaultIfNil: boolean?): EventHandler
-    if self.Handlers[key] == nil and defaultIfNil == true then
+function EventService:GetHandler(key: string, newIfNil: boolean?): EventHandler
+    if self.Handlers[key] == nil and newIfNil == true then
         self.Handlers[key] = EventHandler.new(key);
     end
     return self.Handlers[key];

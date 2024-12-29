@@ -7,6 +7,7 @@ local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurat
 local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
 local modPlayers = require(game.ReplicatedStorage.Library.Players);
+local modEventService = require(game.ReplicatedStorage.Library.EventService);
 
 --== Variables;
 local missionId = 7;
@@ -42,8 +43,6 @@ if RunService:IsServer() then
 			if npcModule.Name ~= "The Prisoner" then return end;
 
 			for _, player in pairs(players) do
-				local profile = shared.modProfile:Get(player);
-
 				modMission:Progress(player, missionId, function(mission)
 					if mission.ProgressionPoint < 4 then 
 						mission.ProgressionPoint = 4;
@@ -52,27 +51,29 @@ if RunService:IsServer() then
 							Player=player;
 							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission7_DefeatedBoss;
 						};
-						
-						function profile.Cache.GameModeDisconnectOverwrite(menuRoom)
-							if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage ~= "The Prisoner" then return end;
-							
-							local destination;
-							modMission:Progress(player, missionId, function(mission)
-								if mission.ProgressionPoint ~= 4 then return end;
-
-								local doorInstance = workspace.Interactables:FindFirstChild("securityRoomEntrance");
-								if doorInstance == nil then return end;
-
-								destination = CFrame.new(doorInstance.Destination.WorldPosition + Vector3.new(0, 2.3, 0)) 
-									* CFrame.Angles(0, math.rad(doorInstance.Destination.WorldOrientation.Y-90), 0);
-								
-							end)
-
-							return destination;
-						end
-
 					end;
 				end)
+			end
+		end)
+		
+		modEventService:OnInvoked("GameModeManager.DisconnectPlayer", function(event, packet)
+			local player = event.Player;
+			local menuRoom = packet.MenuRoom;
+			if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage ~= "The Prisoner" then return end;
+
+			local destination;
+			modMission:Progress(player, missionId, function(mission)
+				if mission.Pinned ~= true or mission.ProgressionPoint ~= 4 then return end;
+
+				local doorInstance = workspace.Interactables:FindFirstChild("securityRoomEntrance");
+				if doorInstance == nil then return end;
+
+				destination = CFrame.new(doorInstance.Destination.WorldPosition + Vector3.new(0, 2.3, 0)) 
+					* CFrame.Angles(0, math.rad(doorInstance.Destination.WorldOrientation.Y-90), 0);
+			end)
+
+			if destination then
+				packet.SetTeleportCfFunc(destination);
 			end
 		end)
 
