@@ -69,24 +69,42 @@ local Configurations={
 		modAudio.Preload("GarandPing", 5);
 	end;
 
+	OnReload=function(mainWeaponModel, modWeaponModule)
+		local properties = modWeaponModule.Properties;
+		if properties.Ammo <= 0 then return end;
+
+		local magazinePart = mainWeaponModel:FindFirstChild("Magazine");
+		local caseOutPoint = mainWeaponModel:FindFirstChild("CaseOut", true);
+		if magazinePart and caseOutPoint then
+			local newEject = magazinePart:Clone();
+			newEject:ClearAllChildren();
+			game.Debris:AddItem(newEject, 5);
+
+			newEject.CFrame = caseOutPoint.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), math.rad(math.random(-35, 35)));
+			newEject.Parent = workspace.Debris;
+
+			newEject:ApplyImpulse(caseOutPoint.WorldCFrame.RightVector * 0.5);
+		end
+	end;
+
 	OnPrimaryFire=function(mainWeaponModel, modWeaponModule)
 		local properties = modWeaponModule.Properties;
-		if properties.Ammo <= 0 then
-			local modAudio = require(game.ReplicatedStorage.Library.Audio);
-			modAudio.Play("GarandPing", mainWeaponModel.PrimaryPart);
+		if properties.Ammo > 0 then return end;
 
-			local magazinePart = mainWeaponModel:FindFirstChild("Magazine");
-			local caseOutPoint = mainWeaponModel:FindFirstChild("CaseOut", true);
-			if magazinePart and caseOutPoint then
-				local newEject = magazinePart:Clone();
-				newEject:ClearAllChildren();
-				game.Debris:AddItem(newEject, 5);
+		local modAudio = require(game.ReplicatedStorage.Library.Audio);
+		modAudio.Play("GarandPing", mainWeaponModel.PrimaryPart);
 
-				newEject.CFrame = caseOutPoint.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), math.rad(math.random(-35, 35)));
-				newEject.Parent = workspace.Debris;
+		local magazinePart = mainWeaponModel:FindFirstChild("Magazine");
+		local caseOutPoint = mainWeaponModel:FindFirstChild("CaseOut", true);
+		if magazinePart and caseOutPoint then
+			local newEject = magazinePart:Clone();
+			newEject:ClearAllChildren();
+			game.Debris:AddItem(newEject, 5);
 
-				newEject:ApplyImpulse(caseOutPoint.WorldCFrame.RightVector * 0.03);
-			end
+			newEject.CFrame = caseOutPoint.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), math.rad(math.random(-35, 35)));
+			newEject.Parent = workspace.Debris;
+
+			newEject:ApplyImpulse(caseOutPoint.WorldCFrame.RightVector * 0.5);
 		end
 	end;
 }

@@ -1390,7 +1390,6 @@ function Workbench.new(itemId, appearanceLib, storageItem)
 
 		local function OnSkinSelect(skinId, variantId)
 			local skinLib, skinVariantData = modItemSkinsLibrary:FindVariant(skinId, variantId)
-			Debugger:StudioWarn("Select Skin", skinId, variantId, skinLib~=nil, skinVariantData~=nil);
 			
 			if skinLib then
 				if skinLib.Type == modItemSkinsLibrary.SkinType.Pattern then

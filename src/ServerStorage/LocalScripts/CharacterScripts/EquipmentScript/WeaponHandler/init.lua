@@ -1630,6 +1630,10 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 			loadedAnims["Sprint"]:Stop(0);
 		end
 		
+		if configurations.OnReload then
+			configurations.OnReload(mainWeaponModel, modWeaponModule);
+		end
+
 		if configurations.ReloadMode == modAttributes.ReloadModes.Full then
 			remoteReloadWeapon:FireServer(weaponId, mainWeaponModel, true);
 			
