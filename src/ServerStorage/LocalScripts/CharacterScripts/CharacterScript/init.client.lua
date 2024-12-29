@@ -1296,10 +1296,6 @@ toggleCameraMode();
 RunService:BindToRenderStep("OffCamRender", Enum.RenderPriority.Input.Value, function(delta)
 	local cameraLayer = modCameraGraphics.RenderLayers:GetTable();
 	
-	if activeCameraLayer == nil then
-		activeCameraLayer = cameraLayer;
-	end
-
 	if cameraLayer.Id == "freecam" then
 		pcall(function()
 			character.LeftUpperArm.LeftShoulder.C0 = originaldata.LeftShoulderC0;
@@ -1755,7 +1751,8 @@ modCameraGraphics:Bind("default", {
 	RenderStepped = renderStepped;
 	CameraType = Enum.CameraType.Scriptable;
 });
-
+local cameraLayer = modCameraGraphics.RenderLayers:GetTable();
+activeCameraLayer = cameraLayer;
 
 local dynamicPlatformCframe, dynamicPlatformModel;
 local lastPlatformChange = tick();
