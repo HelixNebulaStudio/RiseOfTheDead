@@ -6,6 +6,7 @@ local RunService = game:GetService("RunService");
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
+local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
@@ -180,19 +181,27 @@ if RunService:IsServer() then
 								CustomName=shared.modStorage.RegisterItemName("Turret Blueprint Piece ".. a.."/2");
 								Values={
 									DescExtend=modRichFormatter.H3Text("\nMission: ").."There only seem to be two pieces of the blueprint inside Elder Vexeron.";
-								};});
+								};
+							});
 							crateStorage.OnChanged:Connect(function()
-								if crateStorage:Loop() <= 0 then
-									if crateFound[a] ~= true then
-										crateFound[a] = true;
-										
-										modMission:Progress(player, missionId, function(mission)
-											mission.SaveData.PieceFound = (mission.SaveData.PieceFound or 0) +1;
-											if mission.SaveData.PieceFound >= 2 then
-												mission.ProgressionPoint = 3;
-											end
-										end)
+								local bpPieceExist = false;
+
+								crateStorage:Loop(function(storageItem)
+									if storageItem.ItemId == "blueprintpiece" then
+										bpPieceExist = true;
 									end
+								end)
+								if bpPieceExist then return end;
+
+								if crateFound[a] ~= true then
+									crateFound[a] = true;
+									
+									modMission:Progress(player, missionId, function(mission)
+										mission.SaveData.PieceFound = (mission.SaveData.PieceFound or 0) +1;
+										if mission.SaveData.PieceFound >= 2 then
+											mission.ProgressionPoint = 3;
+										end
+									end)
 								end
 							end)
 						end
@@ -257,12 +266,19 @@ if RunService:IsServer() then
 									DescExtend=modRichFormatter.H3Text("\nMission: ").."Finally, now the Mysterious Engineer can help make something out of these schematics.";
 								};});
 							crateStorage.OnChanged:Connect(function()
-								if crateStorage:Loop() <= 0 then
-									modMission:Progress(player, missionId, function(mission)
-										mission.ProgressionPoint = 6;
-										Debugger.Expire(newPrefab, 1);
-									end);
-								end
+								local bpPieceExist = false;
+
+								crateStorage:Loop(function(storageItem)
+									if storageItem.ItemId == "blueprintpiece" then
+										bpPieceExist = true;
+									end
+								end)
+								if bpPieceExist then return end;
+								
+								modMission:Progress(player, missionId, function(mission)
+									mission.ProgressionPoint = 6;
+									Debugger.Expire(newPrefab, 1);
+								end);
 							end)
 							
 						end
@@ -276,6 +292,42 @@ if RunService:IsServer() then
 			OnChanged(true);
 
 		end
+	end
+
+	if modBranchConfigs.IsWorld("TheHarbor") and modBranchConfigs.CurrentBranch.Name == "Dev" then
+		task.spawn(function()
+			Debugger.AwaitShared("modCommandsLibrary");
+	
+			shared.modCommandsLibrary:HookChatCommand("mission77", {
+				Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+				Description = [[Mission77 Testing cmds;
+				/mission77 tpcratestome
+				]];
+	
+				RequiredArgs = 0;
+				Function = function(speaker, args)
+					local classPlayer = shared.modPlayers.Get(speaker);
+					local action = args[1];
+					
+					if action == "tpcratestome" then
+						local playerCf = classPlayer:GetCFrame();
+	
+						local list = modReplicationManager.GetReplicated(speaker, "Eaten Sunken Crate");
+						for a=1, #list do
+							local prefab = list[a];
+							prefab:PivotTo(playerCf * CFrame.new(0, 0, 2*a));
+						end
+						
+					else
+						shared.Notify(speaker, "Unknown action for /mission77", "Negative");
+	
+					end
+	
+					return;
+				end;
+			});
+	
+		end)
 	end
 end
 
