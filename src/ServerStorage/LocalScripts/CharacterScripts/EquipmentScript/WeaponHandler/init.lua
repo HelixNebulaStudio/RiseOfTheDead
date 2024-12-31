@@ -2212,6 +2212,25 @@ function WeaponHandler:Equip(toolPackage, weaponId)
 			modAudio.Preload(paramString, 2);
 			playWeaponSound(paramString);
 		end)
+
+		track:GetMarkerReachedSignal("PlayParticle"):Connect(function(paramString)
+			local args = string.split(tostring(paramString), ";");
+
+			local particleObj = mainWeaponModel:FindFirstChild(args[1], true);
+			if particleObj == nil then return end;
+
+			local delaySec = tonumber(args[2]) or 0.1;
+
+			if particleObj:IsA("Attachment") then
+				for _, particle in pairs(particleObj:GetChildren()) do
+					particle.Enabled = true;
+					task.delay(delaySec, function()
+						particle.Enabled = false;
+					end)
+				end
+			end
+		end)
+		
 		
 		local magazine = mainWeaponModel:FindFirstChild("Magazine");
 		if magazine then
