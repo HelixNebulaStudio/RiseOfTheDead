@@ -28,10 +28,17 @@ function LazyLoader.new(src: LuaSourceContainer)
 end
 
 if RunService:IsServer() then
-    function LazyLoader:Deliver(player: Player, obj: Instance)
+    function LazyLoader:Deliver(player: Player, obj: Instance, autoUnload: number? | boolean?)
         local new = obj:Clone();
         new.Parent = player.PlayerGui:WaitForChild("ReplicationDelivery");
-        Debugger.Expire(new, 60);
+
+        if autoUnload == false then
+        elseif tonumber(autoUnload) then
+            Debugger.Expire(new, tonumber(autoUnload));
+        else
+            Debugger.Expire(new, 60);
+        end
+        
 
         return new;
     end

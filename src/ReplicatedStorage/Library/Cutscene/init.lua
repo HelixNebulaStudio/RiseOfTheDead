@@ -401,7 +401,7 @@ if RunService:IsServer() then
 
 		local file = Cutscene.Scenes[key].File;
 		
-		return modLazyLoader:Deliver(player, file);
+		return modLazyLoader:Deliver(player, file, false);
 	end)
 
 end

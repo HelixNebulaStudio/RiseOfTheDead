@@ -659,7 +659,7 @@ function Mission.NewList(profile, gameSave, syncFunc)
 				end
 				
 				task.spawn(function()
-					remoteMissionRemote:InvokeClient(player, "init", missionObject.Id, modLazyLoader:Deliver(player, missionLogic));
+					remoteMissionRemote:InvokeClient(player, "init", missionObject.Id, modLazyLoader:Deliver(player, missionLogic, false));
 				end)
 			end
 			

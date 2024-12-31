@@ -38,7 +38,7 @@ if RunService:IsServer() then
 		local audioInstance = Library[key];
 		if audioInstance == nil then return end;
 
-		return lazyLoader:Deliver(player, audioInstance);
+		return lazyLoader:Deliver(player, audioInstance, 10);
 	end)
 end
 if RunService:IsClient() then
