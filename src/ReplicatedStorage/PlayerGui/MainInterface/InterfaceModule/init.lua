@@ -10,6 +10,8 @@ local localPlayer = game.Players.LocalPlayer;
 local playerGui = localPlayer:WaitForChild("PlayerGui");
 local camera = workspace.CurrentCamera;
 
+local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
+
 local modItemViewport = require(script.Parent:WaitForChild("ItemViewport"));
 local modAudio = require(game.ReplicatedStorage.Library:WaitForChild("Audio"));
 local modEventSignal = require(game.ReplicatedStorage.Library:WaitForChild("EventSignal"));
@@ -74,6 +76,10 @@ Interface.ActiveWindowsKey = nil;
 Interface.BindFuncs = {};
 
 Interface.ScreenEffects = {};
+
+Interface.LocalPlayerProfile = {
+	UserThumbnail = "";
+};
 
 function Interface:Bind(id, func)
 	self.BindFuncs[id] = func;
@@ -953,6 +959,19 @@ function Interface:Get(interfaceName: string)
 	return self["mod"..interfaceName];
 end
 
+function Interface:RefreshLocalPlayerProfile()
+	task.spawn(function()
+		local thumbnailType = Enum.ThumbnailType.HeadShot;
+		local thumbnailSize = Enum.ThumbnailSize.Size420x420;
+
+		local localPlayerId = localPlayer.UserId > 0 and localPlayer.UserId or modGlobalVars.UseRandomId();
+		pcall(function()
+			Interface.LocalPlayerProfile.UserThumbnail = game.Players:GetUserThumbnailAsync(localPlayerId, thumbnailType, thumbnailSize);
+		end)
+	end)
+end
+Interface:RefreshLocalPlayerProfile();
+
 
 local function interfaceRequire(module)
 	local r;
@@ -1031,26 +1050,6 @@ Interface.modVoteInterface = interfaceRequire( script:WaitForChild("VoteInterfac
 Interface.modCardGameInterface = interfaceRequire( script:WaitForChild("CardGameInterface") );
 Interface.modEntityHealthHudInterface = interfaceRequire( script:WaitForChild("EntityHealthHudInterface") );
 Interface.modHurtInterface = interfaceRequire( script:WaitForChild("HurtInterface") );
-
-
---if Interface.modInventoryInterface == nil then
---	Interface.modInventoryInterface = interfaceRequire( script:WaitForChild("InventoryInterface") );
---end
---Interface.modRatShopInterface = interfaceRequire( script:WaitForChild("RatShopInterface") );
---Interface.modFactionsInterface = interfaceRequire( script:WaitForChild("FactionsInterface") );
---Interface.modMissionInterface = interfaceRequire( script:WaitForChild("MissionInterface") );
---if Interface.modExternalStorageInterface == nil then
---	Interface.modExternalStorageInterface = interfaceRequire( script:WaitForChild("ExternalStorageInterface") );
---end
---Interface.modGameModeHud = interfaceRequire( script:WaitForChild("GameModeHud") );
---Interface.modSupplyInterface = interfaceRequire( script:WaitForChild("SupplyInterface") );
---Interface.modWorkbenchInterface = interfaceRequire( script:WaitForChild("WorkbenchInterface") );
---Interface.modStatusInterface = interfaceRequire( script:WaitForChild("StatusInterface") );
---Interface.modMapInterface = interfaceRequire( script:WaitForChild("MapInterface") );
---Interface.modSafehomeInterface = interfaceRequire( script:WaitForChild("SafehomeInterface") );
---Interface.modHealthInterface = interfaceRequire( script:WaitForChild("HealthInterface") );
---Interface.modPosterInterface = interfaceRequire( script:WaitForChild("PosterInterface") );
---Interface.modTradeInterface = interfaceRequire( script:WaitForChild("TradeInterface") );
 
 Interface.modSettingsInterface = interfaceRequire( script:WaitForChild("SettingsInterface") ); -- should always be last for keybind load.
 Interface.modSettingsInterface.LoadSettings();

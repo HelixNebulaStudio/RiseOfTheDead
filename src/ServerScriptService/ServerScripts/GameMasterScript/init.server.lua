@@ -1352,27 +1352,14 @@ function remoteLockHydra.OnServerInvoke(player, action, interactData, ...)
 end
 
 modStorage.OnItemSourced:Connect(function(sourceStorage, storageItem, quantity)
-	if modBranchConfigs.CurrentBranch.Name == "Dev" then
-		Debugger:Warn("src Store", (sourceStorage and sourceStorage.Id or nil), "itemId",storageItem.ItemId, "amt", quantity);
-	end
-	if quantity <= 0 then
-		Debugger:Warn("OnItemSource ",storageItem.ItemId," quantity <= 0");
-		return;
-	end
+	if quantity <= 0 then return; end
 	
 	modEconomyAnalytics.Record(storageItem.ItemId, quantity);
 end)
 
 modStorage.OnItemSunk:Connect(function(sourceStorage, storageItem, quantity)
 	quantity = -quantity;
-
-	if modBranchConfigs.CurrentBranch.Name == "Dev" then
-		Debugger:Warn("sink Store", (sourceStorage and sourceStorage.Id or nil), "itemId",storageItem.ItemId, "amt", quantity);
-	end
-	if quantity >= 0 then
-		Debugger:Warn("OnItemSunk ",storageItem.ItemId," quantity >= 0");
-		return;
-	end
+	if quantity >= 0 then return; end
 	
 	modEconomyAnalytics.Record(storageItem.ItemId, quantity);
 end)

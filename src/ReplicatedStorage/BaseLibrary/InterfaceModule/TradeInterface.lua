@@ -1,7 +1,5 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
-local thumbnailType = Enum.ThumbnailType.HeadShot;
-local thumbnailSize = Enum.ThumbnailSize.Size420x420;
 
 --== Variables;
 local Interface = {};
@@ -10,7 +8,6 @@ local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
 local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
@@ -32,9 +29,6 @@ Interface.TradeSession = nil;
 --== Script;
 function Interface.init(modInterface)
 	setmetatable(Interface, modInterface);
-	
-	local localUserId = localPlayer.UserId;
-	local localAvatar = game.Players:GetUserThumbnailAsync(localUserId > 0 and localUserId or modGlobalVars.UseRandomId(), thumbnailType, thumbnailSize);
 	
 	local windowFrame = windowFrameTemplate:Clone();
 	windowFrame.Parent = modInterface.MainInterface;
@@ -326,7 +320,7 @@ function Interface.init(modInterface)
 		otfObjects.NameLabel.Text = (otherData.Premium and modRichFormatter.GoldText(otherData.Name) or otherData.Name)..
 			(npcLib and " (" ..npcLib.Class..")" or "");
 		
-		ltfObjects.AvatarLabel.Image = localAvatar;
+		ltfObjects.AvatarLabel.Image = Interface.LocalPlayerProfile.UserThumbnail;
 
 		if Interface.TradeSession.ComputerSession ~= true then
 			feeLabel.Visible = true;
@@ -334,7 +328,7 @@ function Interface.init(modInterface)
 			local otherPlayer = game.Players:FindFirstChild(otherData.Name);
 			if otherPlayer then
 				task.spawn(function()
-					otfObjects.AvatarLabel.Image = game.Players:GetUserThumbnailAsync(otherPlayer.UserId, thumbnailType, thumbnailSize);
+					otfObjects.AvatarLabel.Image = game.Players:GetUserThumbnailAsync(otherPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420);
 				end)
 			end
 
