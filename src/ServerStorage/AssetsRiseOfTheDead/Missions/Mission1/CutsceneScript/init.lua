@@ -537,8 +537,8 @@ return function(CutsceneSequence)
 	end);
 	
 	CutsceneSequence:NewScene("UnconsciousWake", function()
-		playerAnimTracks.Unconscious:Stop();
-		playerAnimTracks.UnconsciousWake:Play();
+		if playerAnimTracks.Unconscious then playerAnimTracks.Unconscious:Stop(); end
+		if playerAnimTracks.UnconsciousWake then playerAnimTracks.UnconsciousWake:Play(); end
 
 		local classPlayer = shared.modPlayers.Get(localPlayer);
 		local head = classPlayer.Head;
@@ -547,8 +547,8 @@ return function(CutsceneSequence)
 	end)
 	
 	CutsceneSequence:NewScene("playerWake", function()
-		playerAnimTracks.UnconsciousWake:Stop();
-		playerAnimTracks.CrouchPickUp:Play();
+		if playerAnimTracks.UnconsciousWake then playerAnimTracks.UnconsciousWake:Stop(); end
+		if playerAnimTracks.CrouchPickUp then playerAnimTracks.CrouchPickUp:Play(); end
 		
 		TweenService:Create(blurEffect, TweenInfo.new(3), {Size = 3;}):Play();
 		delay(3, function()
@@ -708,7 +708,7 @@ return function(CutsceneSequence)
 	CutsceneSequence:NewScene("camShake", function()
 		local modCharacter = modData:GetModCharacter();
 		
-		playerAnimTracks.Unconscious:Play();
+		if playerAnimTracks.Unconscious then playerAnimTracks.Unconscious:Play(); end
 		
 		modConfigurations.Set("DisablePinnedMission", true);
 		modConfigurations.Set("DisableHealthbar", true);
