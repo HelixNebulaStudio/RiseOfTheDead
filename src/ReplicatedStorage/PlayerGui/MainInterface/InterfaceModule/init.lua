@@ -369,6 +369,18 @@ function Interface.NewWindow(name, frame)
 		else
 			hotKeyButton.Visible = true;
 		end
+		
+		local UserInputService = game:GetService("UserInputService");
+		local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
+
+		Interface.Garbage:Tag(UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
+			if not self.Visible then return end;
+			if modKeyBindsHandler:Match(inputObject, "KeyInteract") then
+				modKeyBindsHandler:HandleKey("KeyInteract", 5, function()
+					self:Close();
+				end);
+			end
+		end))
 	end
 	
 	function Window:Refresh()

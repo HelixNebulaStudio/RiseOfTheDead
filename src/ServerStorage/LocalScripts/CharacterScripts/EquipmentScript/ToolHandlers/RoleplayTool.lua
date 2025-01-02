@@ -150,8 +150,8 @@ function ToolHandler:Equip(storageItem, toolModels)
 		if not characterProperties.CanAction then return end;
 		if characterProperties.ActiveInteract ~= nil and characterProperties.ActiveInteract.CanInteract and characterProperties.ActiveInteract.Reachable then return end;
 		
-		task.wait(0.03);
-		if modKeyBindsHandler:Debounce("KeyInteract") then return end;
+		-- task.wait(0.03);
+		-- if modKeyBindsHandler:Debounce("KeyInteract") then return end;
 
 		if toolConfig.ClientItemPrompt then
 			toolConfig:ClientItemPrompt();

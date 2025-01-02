@@ -186,8 +186,6 @@ function toolPackage.NewToolLib(handler)
 		local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
 		local modInterface = modData:GetInterfaceModule();
 
-		if modInterface:IsVisible("InstrumentWindow") then return end;
-		wait(0.1);
 		modInterface:ToggleWindow("InstrumentWindow", self.StorageItem, self);
 	end
 	

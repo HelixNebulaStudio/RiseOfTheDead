@@ -298,7 +298,13 @@ UserInputService.InputBegan:connect(function(inputObject, inputEvent)
 		if typeof(equipment) == "table" then
 			for keyId, func in pairs(equipment) do
 				if typeof(func) == "function" and modKeyBindsHandler:Match(inputObject, keyId) then
-					func();
+					if keyId == "KeyInteract" then
+						modKeyBindsHandler:HandleKey("KeyInteract", 10, function()
+							func();
+						end);
+					else
+						func();
+					end
 				end
 			end
 		end

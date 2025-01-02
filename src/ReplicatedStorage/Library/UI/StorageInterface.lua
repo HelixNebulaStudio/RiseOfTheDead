@@ -1687,7 +1687,7 @@ UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
 		if slotItem then
 			local interface = slotItem.Interface;
 			
-			if modKeyBindsHandler:Debounce("KeyInteract") then return end;
+			--if modKeyBindsHandler:Debounce("KeyInteract") then return end;
 			
 			if slotItem.Library and slotItem.Library.ContextOrder then
 			end
@@ -1698,7 +1698,12 @@ UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
 				if option.Check and option.Check(slotItem) == false then continue end;
 				if option.HotInteract ~= true then continue end;
 
-				option.Click(slotItem);
+				--option.Click(slotItem);
+
+				modKeyBindsHandler:HandleKey("KeyInteract", 3, function()
+					option.Click(slotItem);
+				end);
+
 				break;
 			end
 		end

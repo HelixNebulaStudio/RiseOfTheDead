@@ -46,6 +46,7 @@ function Interface.init(modInterface)
 		
 	end
 	
+	window:AddCloseButton(instrFrame);
 	instrFrame:WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
 		Interface:CloseWindow("InstrumentWindow");
 	end)

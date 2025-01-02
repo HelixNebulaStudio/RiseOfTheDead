@@ -570,6 +570,7 @@ function Interface.init(modInterface)
 	workbenchWindow:SetConfigKey("DisableWorkbench", function()
 		return modData.Profile and modData.Profile.GamePass and modData.Profile.GamePass.PortableWorkbench ~= nil;	
 	end);
+	workbenchWindow:AddCloseButton(workbenchFrame);
 	
 	workbenchWindow.OnWindowToggle:Connect(function(visible, packet)
 		packet = packet or {};

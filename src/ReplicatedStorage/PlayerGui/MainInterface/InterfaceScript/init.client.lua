@@ -314,7 +314,9 @@ UserInputService.InputBegan:Connect(function(inputObject, gameProcessed)
 			end
 			
 		elseif modKeyBindsHandler:Match(inputObject, "KeyInteract") and not modInterface:IsVisible("Settings") then
-			modInterface:HideAll();
+			modKeyBindsHandler:HandleKey("KeyInteract", 99, function()
+				modInterface:HideAll();
+			end);
 			
 		else
 			if modCharacter.CharacterProperties.IsAlive and modInterface.ActiveWindowsKey == nil then

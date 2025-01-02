@@ -121,6 +121,7 @@ function Interface.init(modInterface)
 		window:SetOpenClosePosition(UDim2.new(1, -10, 0.5, 0), UDim2.new(2, -10, 0.5, 0));
 	end
 	
+	window:AddCloseButton(shopFrame);
 	window.OnWindowToggle:Connect(function(visible, shopType, ...)
 
 		if visible then

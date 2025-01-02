@@ -596,6 +596,7 @@ function Interface.init(modInterface)
 	if not modConfigurations.CompactInterface then
 		window:AddCloseButton(storageFrame);
 	end
+
 	return Interface;
 end;
 

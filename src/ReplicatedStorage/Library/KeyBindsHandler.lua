@@ -172,4 +172,55 @@ function KeyBindsHandler:Debounce(keyId)
 	return true;
 end
 
+local inputHandlers = {};
+function KeyBindsHandler:HandleKey(keyId, funcPriority, func)
+	if inputHandlers[keyId] == nil then
+		inputHandlers[keyId] = {
+			LastAdd=nil;
+			Funcs={};
+		};
+	end
+	local inputHandler = inputHandlers[keyId];
+
+	if inputHandler.LastAdd == nil or (tick()-inputHandler.LastAdd) >= 1 then
+		task.spawn(function()
+			local listSize = 0;
+			local tickWithoutAdd = 0;
+
+			while true do
+				if listSize ~= #inputHandler.Funcs then
+					listSize = #inputHandler.Funcs;
+				else
+					tickWithoutAdd = tickWithoutAdd+1;
+				end
+				if tickWithoutAdd >= 3 or (inputHandler.LastAdd and tick()-inputHandler.LastAdd >= 0.3) then
+					break;
+				end
+				task.wait();
+			end
+
+			if KeyBindsHandler:Debounce(keyId) then
+				inputHandler.LastAdd = nil;
+				table.clear(inputHandler.Funcs);
+				return;
+			end;
+
+			table.sort(inputHandler.Funcs, function(a, b)
+				return a.Priority < b.Priority;
+			end)
+
+			local newFuncInfo = inputHandler.Funcs[1];
+
+			inputHandler.LastAdd = nil;
+			table.clear(inputHandler.Funcs);
+			
+			newFuncInfo.Func();
+		end)
+	end
+	
+	inputHandler.LastAdd = tick();
+	table.insert(inputHandler.Funcs, {Func=func; Priority=funcPriority});
+end
+
+
 return KeyBindsHandler.new();

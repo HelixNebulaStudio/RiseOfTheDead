@@ -483,6 +483,8 @@ function ActivateInteract(delta)
 			
 			if interactObject ~= nil then
 				hideIndicator = true;
+				modKeyBindsHandler:Debounce("KeyInteract");
+				
 				if interactObject:Interact() then
 					characterProperties.ActiveInteract = nil;
 				end;
