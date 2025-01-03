@@ -9,29 +9,57 @@ local library = modLibraryManager.new();
 
 --==
 function RainPuddleTick(WeatherService)
-    if math.random(1, 4) ~= 1 then return end
+    if math.random(1, 2) ~= 1 then return end
     
+    local rngOrigins = {};
+    local entities = workspace.Entity:GetChildren();
     local players = game.Players:GetPlayers();
-    if #players <= 0 then return end;
 
-    local rngPlayer = players[math.random(1, #players)];
-    if rngPlayer == nil or rngPlayer.Character == nil then return end;
-    local playerPart = rngPlayer.Character:FindFirstChildWhichIsA("BasePart");
-    if playerPart == nil then return end;
+    for a=1, #players do
+        if #entities <= 0 then break end;
+
+        local rngEntity = table.remove(entities, math.random(1, #entities));
+        table.insert(rngOrigins, rngEntity);
+    end
+
+    for _, player in pairs(players) do
+        if player.Character == nil then continue end;
+        table.insert(rngOrigins, player.Character);
+    end
+    if #rngOrigins <= 0 then return end;
+
+    local rngEntity = rngOrigins[math.random(1, #rngOrigins)];
+    if rngEntity == nil or not workspace:IsAncestorOf(rngEntity) then return end;
+    local entityPart = rngEntity:FindFirstChildWhichIsA("BasePart");
+    if entityPart == nil then return end;
 
     local rayParam = RaycastParams.new();
     rayParam.FilterType = Enum.RaycastFilterType.Include;
     rayParam.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain};
 
-    local origin = playerPart.Position;
+    local origin = entityPart.Position;
 
-    local range = 128*10;
+    local range = 32*10;
     local rayResult = workspace:Raycast(origin + Vector3.new(math.random(-range, range)/10, 400, math.random(-range, range)/10), Vector3.yAxis * -800, rayParam);
     if rayResult == nil then return end;
+    if rayResult.Normal:Dot(Vector3.yAxis) <= 0.97 then return end;
+
+    local landPart = rayResult.Instance;
+    local landPartSize = landPart.Size/2;
+    local landPartCf = landPart.CFrame;
+    
+    local topMin = landPartCf * -landPartSize;
+    local topMax = landPartCf * landPartSize;
+
+    local maxSize = math.min(math.max(topMin.X, topMax.X)-math.min(topMin.X, topMax.X), math.max(topMin.Z, topMax.Z)-math.min(topMin.Z, topMax.Z));
+    if maxSize <= 16 then return end;
 
     local landPoint = rayResult.Position;
+    if maxSize < 64 then
+        landPoint = Vector3.new(landPartCf.X, landPoint.Y, landPartCf.Z);
+    end
+
     local existingWaterPuddles = CollectionService:GetTagged("WaterPuddle");
-    
     local isOverlap = false;
     local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
 
@@ -58,13 +86,13 @@ function RainPuddleTick(WeatherService)
     new.Transparency = 1;
     new:AddTag("WaterPuddle");
 
-    local newSize = math.random(1400, 2200)/100;
+    local newSize = math.random(16 *100, math.min(maxSize, 64) *100)/100;
     new.Size = Vector3.new(newSize, 0, newSize);
     new.CFrame = CFrame.new(landPoint+(Vector3.yAxis*0.1)) *CFrame.Angles(0, math.rad(math.random(0, 3600)/10), 0);
     new.Parent = workspace.Debris;
     
     TweenService:Create(new, TweenInfo.new(math.random(40, 120)/10), {
-        Transparency = 0.5;
+        Transparency = 0.15;
     }):Play();
 end
 --==
