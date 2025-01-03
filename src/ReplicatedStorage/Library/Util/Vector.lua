@@ -52,4 +52,12 @@ function Vector.PointBetweenAB(a, b, p)
 	return p-w;
 end
 
+function Vector.WithinRegion2(point: Vector2, minVec2: Vector2, maxVec2: Vector2, b: number)
+	if point.X+b >= minVec2.X and point.X-b <= maxVec2.X
+	and point.Y+b >= minVec2.Y and point.Y-b <= maxVec2.Y then
+		return true;
+	end
+	return false;
+end
+
 return Vector;

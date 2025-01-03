@@ -1,8 +1,72 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local CollectionService = game:GetService("CollectionService");
+local TweenService = game:GetService("TweenService");
+
+--==
 local modLibraryManager = require(game.ReplicatedStorage.Library.LibraryManager);
 local library = modLibraryManager.new();
 
+--==
+function RainPuddleTick(WeatherService)
+    if math.random(1, 4) ~= 1 then return end
+    
+    local players = game.Players:GetPlayers();
+    if #players <= 0 then return end;
+
+    local rngPlayer = players[math.random(1, #players)];
+    if rngPlayer == nil or rngPlayer.Character == nil then return end;
+    local playerPart = rngPlayer.Character:FindFirstChildWhichIsA("BasePart");
+    if playerPart == nil then return end;
+
+    local rayParam = RaycastParams.new();
+    rayParam.FilterType = Enum.RaycastFilterType.Include;
+    rayParam.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain};
+
+    local origin = playerPart.Position;
+
+    local range = 128*10;
+    local rayResult = workspace:Raycast(origin + Vector3.new(math.random(-range, range)/10, 400, math.random(-range, range)/10), Vector3.yAxis * -800, rayParam);
+    if rayResult == nil then return end;
+
+    local landPoint = rayResult.Position;
+    local existingWaterPuddles = CollectionService:GetTagged("WaterPuddle");
+    
+    local isOverlap = false;
+    local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
+
+    for a=1, #existingWaterPuddles do
+        local puddle: BasePart = existingWaterPuddles[a];
+
+        local puddleHalfSize = puddle.Size/2;
+
+        local minVec3 = puddle.CFrame * -puddleHalfSize;
+        local maxVec3 = puddle.CFrame * puddleHalfSize;
+
+        local minVec2 = Vector2.new(math.min(minVec3.X, maxVec3.X), math.min(minVec3.Z, maxVec3.Z));
+        local maxVec2 = Vector2.new(math.max(minVec3.X, maxVec3.X), math.max(minVec3.Z, maxVec3.Z));
+
+        if modVector.WithinRegion2(Vector2.new(landPoint.X, landPoint.Z), minVec2, maxVec2, 2) then
+            isOverlap = true;
+            break;
+        end
+    end
+    if isOverlap then return end;
+
+    local waterPuddles = script:WaitForChild("WaterPuddle"):GetChildren();
+    local new: MeshPart = waterPuddles[math.random(1, #waterPuddles)]:Clone();
+    new.Transparency = 1;
+    new:AddTag("WaterPuddle");
+
+    local newSize = math.random(1400, 2200)/100;
+    new.Size = Vector3.new(newSize, 0, newSize);
+    new.CFrame = CFrame.new(landPoint+(Vector3.yAxis*0.1)) *CFrame.Angles(0, math.rad(math.random(0, 3600)/10), 0);
+    new.Parent = workspace.Debris;
+    
+    TweenService:Create(new, TweenInfo.new(math.random(40, 120)/10), {
+        Transparency = 0.5;
+    }):Play();
+end
 --==
 library:Add{
     Id="rain";
@@ -29,6 +93,8 @@ library:Add{
     };
 
     FadeTime=5;
+
+    OnSeverTick=RainPuddleTick;
 };
 
 library:Add{
@@ -116,6 +182,8 @@ library:Add{
         {Id="Weather:Rain";};
         {Id="Weather:Thunder";};
     };
+
+    OnSeverTick=RainPuddleTick;
 };
 
 return library;

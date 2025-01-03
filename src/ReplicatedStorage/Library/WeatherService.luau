@@ -5,6 +5,7 @@ local WeatherService = {};
 local TweenService = game:GetService("TweenService");
 local RunService = game:GetService("RunService");
 local HttpService = game:GetService("HttpService");
+local CollectionService = game:GetService("CollectionService");
 
 local modEventService = require(game.ReplicatedStorage.Library.EventService);
 local modLayeredVariable = require(game.ReplicatedStorage.Library.LayeredVariable);
@@ -25,7 +26,38 @@ function WeatherService:OnTick()
     local activeWeather = WeatherService.WeatherLayers:Get();
     local activeWeatherId = activeWeather and activeWeather.Id or nil;
     
-    if WeatherService.ActiveWeather and WeatherService.ActiveWeather.Id == activeWeather.Id then return; end;
+    if WeatherService.ActiveWeather and WeatherService.ActiveWeather.Id == activeWeather.Id then 
+        if activeWeatherId then
+            local weatherLib = modWeatherLibrary:Find(activeWeatherId);
+            if weatherLib and weatherLib.OnSeverTick then
+                task.spawn(weatherLib.OnSeverTick, WeatherService);
+            end
+        end
+
+        local waterPuddles = CollectionService:GetTagged("WaterPuddle");
+        for a=1, #waterPuddles do
+            local puddle: BasePart = waterPuddles[a];
+
+            local despawnTick = puddle:GetAttribute("DespawnTick");
+            if despawnTick == nil then
+                despawnTick = tick()+math.random(600, 1200)/10
+                puddle:SetAttribute("DespawnTick", despawnTick);
+
+            elseif despawnTick == 0 then
+
+            elseif tick()>despawnTick then
+                puddle:SetAttribute("DespawnTick", 0);
+
+                local d = math.random(40, 120)/10;
+                TweenService:Create(puddle, TweenInfo.new(d), {
+                    Transparency = 1;
+                }):Play();
+                game.Debris:AddItem(puddle, d);
+                
+            end
+        end
+        return; 
+    end;
     WeatherService.ActiveWeather = activeWeather;
 
     for a=#WeatherService.WeatherLayers.Table, 1, -1 do
@@ -60,8 +92,11 @@ function WeatherService:OnTick()
     script:SetAttribute("Active", HttpService:JSONEncode(activeWeather));
 
     if activeWeatherId == nil then return end;
+
     local weatherLib = modWeatherLibrary:Find(activeWeatherId);
-    if weatherLib and weatherLib.WeatherSounds then
+    if weatherLib == nil then return end;
+
+    if weatherLib.WeatherSounds then
         for a=1, #weatherLib.WeatherSounds do
             local soundData = weatherLib.WeatherSounds[a];
             local sound = modAudio.Play(soundData.Id, workspace);
