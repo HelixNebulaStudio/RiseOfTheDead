@@ -18,7 +18,7 @@ return function(player, damageSource, finalDamage)
         return;
     end
 
-	local npcModule = modNpc.GetNpcModule(dealer);
+	local npcModule = typeof(dealer) == "Instance" and modNpc.GetNpcModule(dealer) or nil;
     if npcModule == nil then -- unknownDealer;
         return;
     end

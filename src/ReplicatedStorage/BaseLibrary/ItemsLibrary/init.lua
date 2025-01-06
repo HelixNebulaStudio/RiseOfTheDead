@@ -377,7 +377,7 @@ function ItemsLibrary:Init(super)
 		Tags = {"Heal";};
 	};
 
-	new(medicalBase, {Id="medkit"; Name="Medkit"; Icon="rbxassetid://492009851"; Stackable=5; Description="Heals you for 35 health.";});
+	new(medicalBase, {Id="medkit"; Name="Medkit"; Icon="rbxassetid://109464224050637"; Stackable=5; Description="Heals you for 35 health.";});
 	new(medicalBase, {Id="largemedkit"; Name="Large Medkit"; Icon="rbxassetid://508762791"; Description="Heals you for 50 health.";});
 	new(medicalBase, {Id="advmedkit"; Name="Advance Medkit"; Icon="rbxassetid://5008764919"; Description="Heals you for 75 health.";});
 
