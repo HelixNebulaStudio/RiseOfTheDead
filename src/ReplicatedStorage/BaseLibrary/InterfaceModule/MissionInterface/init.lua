@@ -32,6 +32,7 @@ local modItemInterface = require(game.ReplicatedStorage.Library.UI.ItemInterface
 local modRadialImage = require(game.ReplicatedStorage.Library.UI.RadialImage);
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 local modComponents = require(game.ReplicatedStorage.Library.UI.Components);
+local modScrollingPageUI = require(game.ReplicatedStorage.Library.UI.ScrollingPageUI);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remotePinMission = remotes.Interface.PinMission;
@@ -50,7 +51,6 @@ local templateRMissionButton = script:WaitForChild("RMissionButton");
 
 local templatePassReward = script:WaitForChild("PassReward");
 local templateLockedLabel = script:WaitForChild("LockedLabel");
-local templateBorders = script:WaitForChild("Borders");
 
 local timerRadialBar = script:WaitForChild("radialBar");
 timerRadialBar.AnchorPoint = Vector2.new(0, 1);
@@ -2499,24 +2499,20 @@ function Interface.init(modInterface)
 				local titleLabel = passRewardFrame:WaitForChild("Title");
 				titleLabel.Text =  '<font size="14">'.."Event Pass</font>\n<b>".. battlepassLib.Title .."</b>";
 
-				local pageScrollFrame = passRewardFrame:WaitForChild("ScrollFrame");
 				local contentFrame = passRewardFrame:WaitForChild("Frame");
 				local slotFrame = contentFrame:WaitForChild("Slot");
 				local descLabel = contentFrame:WaitForChild("Description");
 
 				if battlepassLib.BpPage then
-					local newBpPage = battlepassLib.BpPage:Clone();
-					newBpPage.Parent = pageScrollFrame;
-					local borders = templateBorders:Clone();
-					borders.Parent = pageScrollFrame;
-
-					pageScrollFrame.Visible = true;
 					contentFrame.Visible = false;
 					titleLabel.Visible = false;
 
+					local bpScrollingPage = modScrollingPageUI.new(battlepassLib.BpPage:Clone());
+					bpScrollingPage.ScrollFrame.Parent = passRewardFrame;
+					bpScrollingPage.ScrollFrame.Visible = true;
+
 				else
 					contentFrame.Visible = true;
-					pageScrollFrame.Visible = false;
 					titleLabel.Visible = true;
 
 					local itemIcon = passIconLabel:Clone();
