@@ -222,7 +222,7 @@ function ItemsLibrary:Init(super)
 	new(clothingBase, {Id="leathergloves"; Name="Leather Gloves"; Icon="rbxassetid://16988021003"; Tags={"Gloves"}; Description="Helps reduce pressure on your grips, providing additional 30 max stamina.";});
 	new(clothingBase, {Id="armwraps"; Name="Arm Wraps"; Icon="rbxassetid://7068678585"; Tags={"Gloves"}; Description="Everybody was kung fu fightin'.";});
 	new(clothingBase, {Id="vexgloves"; Name="Vexeron Gloves"; Icon="rbxassetid://7181328504"; Tags={"Gloves"}; Description="Gloves made with Vexeron skin, providing additional 50 max stamina.";});
-	new(clothingBase, {Id="militarygloves"; Name="Military Gloves"; Icon="rbxassetid://104251726752152"; Tags={"Gloves"}; Description="";});
+	new(clothingBase, {Id="militarygloves"; Name="Military Gloves"; Icon="rbxassetid://104251726752152"; Tags={"Gloves"}; Description="Standard digital camouflage gloves, handy for holding guns.";});
 	
 	-- Shoes
 	new(clothingBase, {Id="brownleatherboots"; Name="Leather Boots"; Icon="rbxassetid://89716224000012"; Tags={"Shoes"}; Description="These look great on you.\n<b>[Passive] Bull Leaping:</b> Slide jumping adds 10 units/sec launch speed.";});
