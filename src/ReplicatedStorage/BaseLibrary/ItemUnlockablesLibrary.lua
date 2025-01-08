@@ -1349,11 +1349,37 @@ function ItemUnlockablesLibrary:Init(library)
 		DefaultPackage=true;
 
 		SurfaceAppearance={
-			ColorMap="rbxassetid://119355925160865";
+			ColorMap="rbxassetid://126976540991207";
 		};
 		SurfaceAppearanceParent=script;
 	};
 	
+	--== MARK: militarygloves
+	library:Add{
+		Id="militarygloves";
+		ItemId="militarygloves";
+		Name="Default";
+		DefaultPackage=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://16987783752";
+		};
+		SurfaceAppearanceParent=script;
+	};
+	
+	library:Add{
+		Id="militaryglovesfingerless";
+		ItemId="militarygloves";
+		Name="Fingerless";
+		Icon="rbxassetid://113828757931793";
+		PackageId="militaryglovesfingerless";
+		Unlocked=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://126976540991207";
+		};
+		SurfaceAppearanceParent=script;
+	};
 
 end
 
