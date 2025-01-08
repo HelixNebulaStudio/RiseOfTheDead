@@ -1,0 +1,22 @@
+# Project place file
+/Rojo.rbxlx
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+sourcemap.json
+
+public/
+
+./vscode
+settings.json
+aftman.toml
+default.project.json
+sourcemap.project.json
+
+*./
+!src
+src/*
+!src/ReplicatedStorage
+src/ReplicatedStorage/*
+!src/ReplicatedStorage/BaseLibrary
