@@ -930,6 +930,10 @@ function Interface.init(modInterface)
 	
 	local prevGoldInput = nil;
 	local function checkGoldInput()
+		if Interface.TradeSession == nil then
+			ltfObjects.GoldLabel.Text = 0;
+			return;
+		end
 		local playerGold = modData.Profile and modData.Profile.Trader and modData.Profile.Trader.Gold or 0;
 		local inputNum = tonumber(ltfObjects.GoldLabel.Text) or 0;
 		
