@@ -479,9 +479,6 @@ function Data:GetEvent(id, fetch)
 		end
 	end
 	
-	if id == "AmmoPouchData" then
-		Debugger:StudioWarn("Data.Events[id]", Data.Events[id]);
-	end
 	return Data.Events[id];
 end
 

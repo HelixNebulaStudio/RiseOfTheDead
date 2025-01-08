@@ -133,7 +133,7 @@ function Interface.init(modInterface)
 	hotbarWindow.ReleaseMouse = false;
 	hotbarWindow:SetConfigKey("DisableHotbar");
 	hotbarWindow:Open();
-	
+
 	function Interface:OnToggleHuds(value)
 		if modConfigurations.CompactInterface then
 			hotbarFrame.Visible = (not modConfigurations.DisableHotbar) and value;
@@ -202,6 +202,11 @@ function Interface.init(modInterface)
 	Interface.HotbarInterface = modStorageInterface.new("Inventory", hotbarFrame, hotBarSlots);
 	Interface.HotbarInterface.Name = "HotbarInterface";
 	Interface.HotbarInterface.DisableContextMenu = true;
+	
+	hotbarFrame:GetPropertyChangedSignal("Visible"):Connect(function()
+		if hotbarFrame.Visible == false then return end;
+		Interface.HotbarInterface:Update();
+	end)
 	
 	Interface.ClothingInterface = modStorageInterface.new("Clothing", inventoryFrame, clothingSlots);
 	Interface.ClothingInterface.Name = "ClothingInterface";

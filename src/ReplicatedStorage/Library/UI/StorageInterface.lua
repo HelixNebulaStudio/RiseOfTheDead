@@ -787,12 +787,12 @@ function SlotItem:SetSlot(slotTable)
 
 	if targetInterface.PremiumOnly and not StorageInterface.IsPremium then
 		self.Button:TweenPosition(UDim2.new(), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.1, true);
-		Debugger:Print("Not Premium");
-		--modInterface:PromptWarning("Premium Member Only");
-
+		
 		local MarketplaceService = game:GetService("MarketplaceService");
 		MarketplaceService:PromptGamePassPurchase(player, 2649294);
-		--2649294
+		
+		modData:RequestData("Premium");
+		RefreshPremium();
 		return;
 	end
 	
