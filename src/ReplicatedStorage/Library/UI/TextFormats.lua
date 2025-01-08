@@ -1,5 +1,0 @@
-local TextColors = {};
-
-
-
-return TextColors;

@@ -1,1 +1,0 @@
--- local s = game:GetService("Selection"):Get()[1]; print(s.CFrame) s.CFrame = CFrame.new(0, 1000, 0.67) * CFrame.Angles(0, 0, math.deg(90))

@@ -1,9 +1,0 @@
-# Project place file
-/Rojo.rbxlx
-
-# Roblox Studio lock files
-/*.rbxlx.lock
-/*.rbxl.lock
-sourcemap.json
-
-public/
