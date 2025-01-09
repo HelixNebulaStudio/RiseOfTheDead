@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "pull-subtree",
+            "type": "shell",
+            "command": "git",
+            "args": [
+                "pull",
+                "-s",
+                "subtree",
+                "engine",
+                "public"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+    ]
+}
