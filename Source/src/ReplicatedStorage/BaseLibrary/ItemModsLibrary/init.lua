@@ -20,6 +20,8 @@ local GenericDescs={
 	AmmoCap="Adds <b>Magazine Size</b> to <b>Ammo Capacity</b>.";
 	AmmoMag="Adds bullets to <b>Magazine Size</b>.";
 	HappyAuto="Adds <b>Magazine Size</b> to <b>Ammo Capacity</b> and switch <b>TriggerMode</b> from <b>Semi-automatic</b> to <b>Full-automatic</b>.";
+	HyperDamage="Adds <b>Damage</b> based on <b>Premod Damage</b> and adds <b>Rpm</b> to <b>Fire Rate</b>.";
+	DamageRev="Damage revs up for every shot you have left in your magazine. The last bullet in the magazine will do an additional <b>Multiplier</b> damage.";
 	
 	Skullcracker="Adds multiplier to <b>Headshot Multiplier</b>.";
 	Calibre="Shift your weapon's <b>Fire Rate</b> in proportional from <b>DPS</b> towards <b>Damage</b>.";
