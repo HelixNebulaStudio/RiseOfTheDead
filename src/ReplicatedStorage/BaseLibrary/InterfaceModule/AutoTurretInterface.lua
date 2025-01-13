@@ -18,19 +18,12 @@ local remoteAutoTurret = modRemotesManager:Get("AutoTurret");
 local windowFrameTemplate = script:WaitForChild("AutoTurretFrame");
 
 local patItemLib = modItemsLibrary:Find("portableautoturret");
-<<<<<<< HEAD
-local TurretConfigs = patItemLib.GetTurretConfigs();
-=======
->>>>>>> 01b374c3841948c19aa3971b7a40af546df480ce
 
 local debounce = tick();
 --== Script;
 function Interface.init(modInterface)
 	setmetatable(Interface, modInterface);
-<<<<<<< HEAD
-=======
 	local TurretConfigs = patItemLib.GetTurretConfigs();
->>>>>>> 01b374c3841948c19aa3971b7a40af546df480ce
 	
 	local storageId = "portableautoturret";
 	
