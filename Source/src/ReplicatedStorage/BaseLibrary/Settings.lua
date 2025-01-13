@@ -1,9 +1,5 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-<<<<<<< HEAD
-=======
-
->>>>>>> 01b374c3841948c19aa3971b7a40af546df480ce
 local Settings = {};
 Settings.__index = Settings;
 --==

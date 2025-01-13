@@ -27,3 +27,4 @@ src/ReplicatedStorage/*
 # Update
 # git pull --allow-unrelated-histories --tags origin main
 # git reset
+# git pull --allow-unrelated-histories -s subtree engine public

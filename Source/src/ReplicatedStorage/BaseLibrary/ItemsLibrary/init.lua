@@ -649,11 +649,7 @@ function ItemsLibrary:Init(super)
 		OnAdd = function(data)
 			data.PatPerm = true;
 			data.Name = data.Name .." Skin";
-<<<<<<< HEAD
-			data.Description = "Right click to apply "..data.Name.." skin to a tool.";
-=======
 			data.Description = "Right click to apply "..data.Name.." to a tool.";
->>>>>>> 01b374c3841948c19aa3971b7a40af546df480ce
 		end;
 		TradingTax=100;
 	};

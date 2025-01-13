@@ -2,27 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-<<<<<<< HEAD
----
-local ItemPacket = {};
-
-function ItemPacket.GetTurretConfigs()
-	local modBitFlags = require(game.ReplicatedStorage.Library.BitFlags);
-	
-	local HitListBitFlag = modBitFlags.new();
-	HitListBitFlag:AddFlag("Zombie", 1);
-	HitListBitFlag:AddFlag("Ticks", 2);
-	HitListBitFlag:AddFlag("Leaper", 3);
-	HitListBitFlag:AddFlag("Heavy", 4);
-	HitListBitFlag:AddFlag("Bloater", 5);
-	HitListBitFlag:AddFlag("Growler", 6);
-	HitListBitFlag:AddFlag("Dr. Sinister", 7);
-	HitListBitFlag:AddFlag("Tendrils", 8);
-	HitListBitFlag:AddFlag("Witherer", 9);
-	HitListBitFlag:AddFlag("Bandit", 10);
-	HitListBitFlag:AddFlag("Bosses", 11);
-	
-=======
 local modBitFlags = require(game.ReplicatedStorage.Library.BitFlags);
 
 ---
@@ -30,7 +9,6 @@ local ItemPacket = {};
 local HitListBitFlag;
 
 function ItemPacket.GetTurretConfigs()
->>>>>>> 01b374c3841948c19aa3971b7a40af546df480ce
 	local defaultHitlistBitString = HitListBitFlag.Size; -- all bits =1
 	defaultHitlistBitString = HitListBitFlag:Set(defaultHitlistBitString, "Witherer", false);
 	
@@ -104,8 +82,6 @@ function ItemPacket.GetTurretConfigs()
 end
 
 function ItemPacket.Init(itemLib)
-<<<<<<< HEAD
-=======
 	HitListBitFlag = modBitFlags.new();
 	HitListBitFlag:AddFlag("Zombie", 1);
 	HitListBitFlag:AddFlag("Ticks", 2);
@@ -120,7 +96,6 @@ function ItemPacket.Init(itemLib)
 	HitListBitFlag:AddFlag("Bosses", 11);
 
 	--== MARK: Server
->>>>>>> 01b374c3841948c19aa3971b7a40af546df480ce
 	if RunService:IsClient() then return end;
 	
 	local modAudio = require(game.ReplicatedStorage.Library.Audio);
