@@ -6,17 +6,24 @@
 /*.rbxl.lock
 sourcemap.json
 
-public/
-
-./vscode
+# Editor configurations 
+.vscode
 settings.json
 aftman.toml
 default.project.json
 sourcemap.project.json
 
+# Ignore meta files
+*.meta.json
+
+# RotD Base Local Library
 *./
 !src
 src/*
 !src/ReplicatedStorage
 src/ReplicatedStorage/*
 !src/ReplicatedStorage/BaseLibrary
+
+# Update
+# git pull --allow-unrelated-histories --tags origin main
+# git reset
