@@ -61,7 +61,7 @@ local Animations={ -- Main
 	Core={Id=75922628646137;};
 	PrimaryFire={Id=106438666757082; FocusWeight=0.1};
 	Reload={Id=73499008903463;};
-	TacticalReload={Id=74479906922289;};
+	TacticalReload={Id=105982030297456;};
 	Load={Id=136399982879764;};
 	Inspect={Id=101597938445323;};
 	Sprint={Id=78827692848623};
