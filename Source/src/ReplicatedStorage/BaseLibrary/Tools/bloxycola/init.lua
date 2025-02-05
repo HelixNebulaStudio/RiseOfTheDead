@@ -1,20 +1,20 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
+
 local toolPackage = {
-	ItemId="bloxycola";
-	Type="FoodTool";
+	ItemId=script.Name;
+	Class="Tool";
+	HandlerType="FoodTool";
+
 	Animations={
 		Core={Id=17067020465;};
 		Use={Id=17067021960;};
 	};
-	Audio={
-	};
-};
-
-function toolPackage.NewToolLib(handler)
-	local Tool = {};
-
-	Tool.Configurations = {
+	Audio={};
+	
+	Configurations={
 		EffectDuration = 33;
 		EffectType = "Status";
 
@@ -22,10 +22,11 @@ function toolPackage.NewToolLib(handler)
 
 		UseDuration = 3;
 	};
+	Properties={};
+};
 
-	Tool.__index = Tool;
-	setmetatable(Tool, handler);
-	return Tool;
+function toolPackage.newClass()
+	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
 end
 
 return toolPackage;

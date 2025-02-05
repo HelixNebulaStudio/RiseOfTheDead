@@ -1,18 +1,20 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
+
 local toolPackage = {
-	Type="FoodTool";
+	ItemId=script.Name;
+	Class="Tool";
+	HandlerType="FoodTool";
+
 	Animations={
 		Core={Id=17052988779;};
 		Use={Id=17053001636};
 	};
-};
-
-
-function toolPackage.NewToolLib(handler)
-	local toolLib = {};
-
-	toolLib.Configurations = {
+	Audio={};
+	
+	Configurations={
 		EffectDuration = 30;
 		EffectType = "Heal";
 
@@ -21,10 +23,11 @@ function toolPackage.NewToolLib(handler)
 
 		UseDuration = 3;
 	};
-	
-	toolLib.__index = toolLib;
-	setmetatable(toolLib, handler);
-	return toolLib;
+	Properties={};
+};
+
+function toolPackage.newClass()
+	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
 end
 
 return toolPackage;
