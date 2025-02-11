@@ -1,16 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local toolPackage = {
-	Type="RoleplayTool";
-	Animations={
-		Core={Id=16983037539;};
-		Use={Id=16983106503;};
-		Idle={Id=16982931630;};
-	};
-};
-
 local CollectionService = game:GetService("CollectionService");
 
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
 local FluteTracks = {
 	{Id="rbxassetid://6146211836"; Name="Happy Birthday"};
 	{Id="rbxassetid://6146212207"; Name="Mask Off"};
@@ -19,125 +12,140 @@ local FluteTracks = {
 	{Id="rbxassetid://6146863772"; Name="Coffin Dance"};
 };
 
-function toolPackage.NewToolLib(handler)
-	local Tool = {};
-	
-	Tool.IsActive = false;
-	Tool.Instrument = "Flute";
-	Tool.Index = 1;
-	Tool.ActiveTrack = nil;
+local toolPackage = {
+	ItemId=script.Name;
+	Class="Tool";
+	HandlerType="GenericTool";
 
-	function Tool:ClientPrimaryFire()
-		local player = game.Players.LocalPlayer;
-		local modData = require(player:WaitForChild("DataModule"));
-		local modInterface = modData:GetInterfaceModule();
+	Animations={
+		Core={Id=16983037539;};
+		Use={Id=16983106503;};
+		Idle={Id=16982931630;};
+	};
+	Audio={};
+	Configurations={
+		Instrument = "Flute";
+		Index = 1;
+		ActiveTrack = nil;
+	};
+	Properties={};
+};
 
-		spawn(function()
-			local track = self.Handle:WaitForChild("TuneMusic");
-			if self.Handle:FindFirstChild("fluteConn") == nil then
-				local newTag = Instance.new("BoolValue");
-				newTag.Name = "fluteConn";
-				newTag.Parent = self.Handle;
+function toolPackage.ClientPrimaryFire(handler)
+	local player = game.Players.LocalPlayer;
+	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modInterface = modData:GetInterfaceModule();
 
-				local lastId;
-				local function onChanged()
-					if lastId ~= track.SoundId then
-						lastId = track.SoundId;
+	spawn(function()
+		local handle = handler.Prefabs[1].PrimaryPart;
+		local track = handle:WaitForChild("TuneMusic");
+		if handle:FindFirstChild("fluteConn") == nil then
+			local newTag = Instance.new("BoolValue");
+			newTag.Name = "fluteConn";
+			newTag.Parent = handle;
 
-						for a=1, #FluteTracks do
-							if FluteTracks[a].Id == lastId then
-								modInterface:HintWarning("Tune: "..FluteTracks[a].Name, 2, Color3.fromRGB(255, 255, 255));
-								break;
-							end
+			local lastId;
+			local function onChanged()
+				if lastId ~= track.SoundId then
+					lastId = track.SoundId;
+
+					for a=1, #FluteTracks do
+						if FluteTracks[a].Id == lastId then
+							modInterface:HintWarning("Tune: "..FluteTracks[a].Name, 2, Color3.fromRGB(255, 255, 255));
+							break;
 						end
 					end
 				end
-				onChanged();
-				track:GetPropertyChangedSignal("SoundId"):Connect(onChanged);
 			end
-		end)
+			onChanged();
+			track:GetPropertyChangedSignal("SoundId"):Connect(onChanged);
+		end
+	end)
+end
 
-	end
+function toolPackage.OnClientUnequip()
+	local player = game.Players.LocalPlayer;
+	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modInterface = modData:GetInterfaceModule();
 
-	function Tool:OnPrimaryFire(isActive)
-		self.IsActive = isActive;
+	modInterface:CloseWindow("InstrumentWindow");
+end
 
-		if self.IsActive then
-			for a=1, #self.Prefabs do
-				local prefab = self.Prefabs[a];
-				local handle = prefab.PrimaryPart;
+function toolPackage.ClientItemPrompt(handler)
+	local player = game.Players.LocalPlayer;
+	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modInterface = modData:GetInterfaceModule();
 
-				local sound = handle:FindFirstChild("TuneMusic");
-				local function nextTrack()
-					if self.IsActive then
-						sound.SoundId = FluteTracks[Tool.Index].Id;
-						sound:Play();
-					end
-					Tool.Index = Tool.Index == #FluteTracks and 1 or Tool.Index +1;
+	if modInterface:IsVisible("InstrumentWindow") then return end;
+	modInterface:ToggleWindow("InstrumentWindow", nil, handler);
+end
+
+function toolPackage.OnActionEvent(handler, packet)
+	if packet.ActionIndex ~= 1 then return end;
+	local isActive = packet.IsActive == true;
+
+	handler.IsActive = isActive;
+
+	local equipmentClass = handler.EquipmentClass;
+	local configurations = equipmentClass.Configurations;
+
+	if handler.IsActive then
+		for a=1, #handler.Prefabs do
+			local prefab = handler.Prefabs[a];
+			local handle = prefab.PrimaryPart;
+
+			local sound = handle:FindFirstChild("TuneMusic");
+			local function nextTrack()
+				if handler.IsActive then
+					sound.SoundId = FluteTracks[configurations.Index].Id;
+					sound:Play();
 				end
-
-				if sound == nil then
-					sound = Instance.new("Sound");
-					sound.Ended:Connect(function()
-						wait(1);
-						nextTrack();
-					end)
-				end
-				sound.Name = "TuneMusic";
-				sound.RollOffMaxDistance = 128;
-				sound.RollOffMinDistance = 20;
-				sound.Volume = 1;
-				sound.SoundGroup = game.SoundService:FindFirstChild("InstrumentMusic");
-
-				sound:SetAttribute("SoundOwner", self.Player and self.Player.Name or nil);
-				CollectionService:AddTag(sound, "PlayerNoiseSounds");
-				sound.Parent = handle;
-
-				nextTrack();
-				Tool.ActiveTrack = sound;
-
-				if handle:FindFirstChild("musicParticle") then
-					handle.musicParticle.Enabled = true;
-				end
-
-				break;
+				configurations.Index = configurations.Index == #FluteTracks and 1 or configurations.Index +1;
 			end
-		else
-			for a=1, #self.Prefabs do
-				local prefab = self.Prefabs[a];
-				local handle = prefab.PrimaryPart;
 
-				if handle:FindFirstChild("musicParticle") then
-					handle.musicParticle.Enabled = false;
-				end
+			if sound == nil then
+				sound = Instance.new("Sound");
+				sound.Ended:Connect(function()
+					wait(1);
+					nextTrack();
+				end)
 			end
-			if Tool.ActiveTrack then
-				Tool.ActiveTrack:Stop();
+			sound.Name = "TuneMusic";
+			sound.RollOffMaxDistance = 128;
+			sound.RollOffMinDistance = 20;
+			sound.Volume = 1;
+			sound.SoundGroup = game.SoundService:FindFirstChild("InstrumentMusic");
+
+			sound:SetAttribute("SoundOwner", handler.Player and handler.Player.Name or nil);
+			CollectionService:AddTag(sound, "PlayerNoiseSounds");
+			sound.Parent = handle;
+
+			nextTrack();
+			configurations.ActiveTrack = sound;
+
+			if handle:FindFirstChild("musicParticle") then
+				handle.musicParticle.Enabled = true;
+			end
+
+			break;
+		end
+	else
+		for a=1, #handler.Prefabs do
+			local prefab = handler.Prefabs[a];
+			local handle = prefab.PrimaryPart;
+
+			if handle:FindFirstChild("musicParticle") then
+				handle.musicParticle.Enabled = false;
 			end
 		end
+		if configurations.ActiveTrack then
+			configurations.ActiveTrack:Stop();
+		end
 	end
+end
 
-	function Tool:ClientUnequip()
-		local player = game.Players.LocalPlayer;
-		local modData = require(player:WaitForChild("DataModule"));
-		local modInterface = modData:GetInterfaceModule();
-
-		modInterface:CloseWindow("InstrumentWindow");
-	end
-
-	function Tool:ClientItemPrompt()
-		local player = game.Players.LocalPlayer;
-		local modData = require(player:WaitForChild("DataModule"));
-		local modInterface = modData:GetInterfaceModule();
-
-		if modInterface:IsVisible("InstrumentWindow") then return end;
-		wait(0.1);
-		modInterface:ToggleWindow("InstrumentWindow", self.StorageItem, self);
-	end
-	
-	Tool.__index = Tool;
-	setmetatable(Tool, handler);
-	return Tool;
+function toolPackage.newClass()
+	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
 end
 
 return toolPackage;

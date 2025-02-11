@@ -1,22 +1,24 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
+
 local toolPackage = {
-	Type="RoleplayTool";
+	ItemId=script.Name;
+	Class="Tool";
+	HandlerType="GenericTool";
+
 	Animations={
 		Core={Id=4843250039;};
 		Use={Id=4706454123};
 	};
+	Audio={};
+	Configurations={};
+	Properties={};
 };
 
-
-function toolPackage.NewToolLib(handler)
-	local toolLib = {};
-
-	toolLib.IsActive = false;
-
-	toolLib.__index = toolLib;
-	setmetatable(toolLib, handler);
-	return toolLib;
+function toolPackage.newClass()
+	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
 end
 
 return toolPackage;

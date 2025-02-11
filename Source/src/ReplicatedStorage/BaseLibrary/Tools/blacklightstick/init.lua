@@ -3,16 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local CollectionService = game:GetService("CollectionService");
 local TweenService = game:GetService("TweenService");
 
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
-local toolPackage = {
-	Type="RoleplayTool";
-	Animations={
-		Core={Id=4469912045;};
-		Use={Id=13631843548;};
-	};
-};
-
-
 local loopActive = false;
 CollectionService:GetInstanceAddedSignal("BlacklightLights"):Connect(function()
 	if loopActive then return end;
@@ -75,46 +67,6 @@ CollectionService:GetInstanceAddedSignal("BlacklightLights"):Connect(function()
 						end
 					end
 				end
-				
-				--local closestDist, closestBlacklight = math.huge, nil;
-				
-				--local blacklights = CollectionService:GetTagged("BlacklightLights");
-				--for _, blacklightModel in pairs(blacklights) do
-				--	local lightPos = blacklightModel:GetPivot().Position;
-				--	local dist = math.round((targetPos-lightPos).Magnitude);
-					
-				--	if dist < closestDist then
-				--		closestDist = dist;
-				--		closestBlacklight = blacklightModel;
-				--	end
-				--end
-				
-				--local isVisible = closestDist <= 16;
-				
-				--local interactObj = require(interactableModule);
-				--if isVisible then
-				--	if interactObj.InteractableRange ~= 5 then
-				--		interactObj.InteractableRange = 5;
-				--		interactObj:Sync();
-				--	end
-				--else
-				--	if interactObj.InteractableRange ~= 0 then
-				--		interactObj.InteractableRange = 0;
-				--		interactObj:Sync();
-				--	end
-				--end
-				
-				--for _, textLabel in pairs(parentObj.BlacklightHint:GetChildren()) do
-				--	if not textLabel:IsA("TextLabel") then continue end;
-					
-				--	textLabel.Text = interactObj.Label;
-					
-				--	local isShown: boolean = textLabel:GetAttribute("IsShown");
-				--	if (isShown and isVisible) or (not isShown and not isVisible) then continue; end
-				--	textLabel:SetAttribute("IsShown", isVisible);
-					
-				--	TweenService:Create(textLabel, TweenInfo.new(0.33), {TextTransparency = (isVisible and 0 or 1);}):Play();
-				--end
 			end
 			
 		end
@@ -128,39 +80,46 @@ CollectionService:GetInstanceRemovedSignal("BlacklightLights"):Connect(function(
 	end
 end)
 
-function toolPackage.NewToolLib(handler)
-	local Tool = {};
-	Tool.IsActive = false;
-	--Tool.UseViewmodel = false;
 
-	function Tool:OnPrimaryFire(isActive)
-		local toolModel;
-		for a=1, #self.Prefabs do
-			local prefab = self.Prefabs[a];
-			toolModel = prefab;
+local toolPackage = {
+	ItemId=script.Name;
+	Class="Tool";
+	HandlerType="GenericTool";
 
-			local lightPart = prefab:FindFirstChild("lightStick");
-			if lightPart then
-				lightPart.Color = isActive and Color3.fromRGB(81, 32, 230) or Color3.fromRGB(69, 65, 95);
-				lightPart.Material = isActive and Enum.Material.Neon or Enum.Material.SmoothPlastic;
-				local lights = lightPart._lightPoint:GetChildren();
-				for b=1, #lights do
-					lights[b].Enabled = isActive;
-				end
-			end
+	Animations={
+		Core={Id=4469912045;};
+		Use={Id=13631843548;};
+	};
+	Audio={};
+	Configurations={};
+	Properties={};
+};
+
+function toolPackage.OnActionEvent(handler, packet)
+	if packet.ActionIndex ~= 1 then return end;
+	local isActive = packet.IsActive;
+
+	local toolModel = handler.Prefabs[1];
+	local lightPart = toolModel:FindFirstChild("lightStick");
+	if lightPart then
+		lightPart.Color = isActive and Color3.fromRGB(81, 32, 230) or Color3.fromRGB(69, 65, 95);
+		lightPart.Material = isActive and Enum.Material.Neon or Enum.Material.SmoothPlastic;
+		local lights = lightPart._lightPoint:GetChildren();
+		for b=1, #lights do
+			lights[b].Enabled = isActive;
 		end
-		
-		if isActive then
-			CollectionService:AddTag(toolModel, "BlacklightLights");
-		else
-			CollectionService:RemoveTag(toolModel, "BlacklightLights");
-		end;
-		
 	end
 	
-	Tool.__index = Tool;
-	setmetatable(Tool, handler);
-	return Tool;
+	if isActive then
+		CollectionService:AddTag(toolModel, "BlacklightLights");
+	else
+		CollectionService:RemoveTag(toolModel, "BlacklightLights");
+	end;
+	
+end
+
+function toolPackage.newClass()
+	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
 end
 
 return toolPackage;

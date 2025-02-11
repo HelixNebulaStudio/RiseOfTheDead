@@ -1,39 +1,42 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
+
 local toolPackage = {
-	Type="RoleplayTool";
+	ItemId=script.Name;
+	Class="Tool";
+	HandlerType="GenericTool";
+
 	Animations={
 		Core={Id=13067320148;};
 		Use={Id=13067328329};
 	};
+	Audio={};
+	Configurations={
+		UseViewmodel = false;
+	};
+	Properties={};
 };
 
+function toolPackage.OnClientEquip()
+	local player = game.Players.LocalPlayer;
+	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modInterface = modData:GetInterfaceModule();
 
-function toolPackage.NewToolLib(handler)
-	local Tool = {};
+	modInterface:CloseWindow("MarketNewspaper");
+end
+
+function toolPackage.ClientItemPrompt(handler)
+	local player = game.Players.LocalPlayer;
+	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modInterface = modData:GetInterfaceModule();
 	
-	Tool.IsActive = false;
-	Tool.UseViewmodel = false;
+	modInterface:OpenWindow("MarketNewspaper", handler);
+end
 
-	function Tool:ClientUnequip()
-		local player = game.Players.LocalPlayer;
-		local modData = require(player:WaitForChild("DataModule"));
-		local modInterface = modData:GetInterfaceModule();
-
-		modInterface:CloseWindow("MarketNewspaper");
-	end
-
-	function Tool:ClientItemPrompt()
-		local player = game.Players.LocalPlayer;
-		local modData = require(player:WaitForChild("DataModule"));
-		local modInterface = modData:GetInterfaceModule();
-		
-		modInterface:OpenWindow("MarketNewspaper", self);
-	end
-	
-	Tool.__index = Tool;
-	setmetatable(Tool, handler);
-	return Tool;
+function toolPackage.newClass()
+	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
 end
 
 return toolPackage;

@@ -1,44 +1,31 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
+
 local toolPackage = {
-	Type="Melee";
-	Animations=workspace:GetAttribute("IsDev") and {
-		Core={Id=16855658641;};
-		Load={Id=16855661898;};
-		PrimaryAttack={Id={137947152092729; 91864590162345}};
-		HeavyAttack={Id=4473902088};
-		Inspect={Id=16855689192;};
-		Unequip={Id=16855693138};
-		
-	} or {
-		Core={Id=16855529757;};
-		Load={Id=16855532480;};
-		PrimaryAttack={Id={16855664531; 16855682824}};
-		HeavyAttack={Id=4473902088};
-		Inspect={Id=16855689192;};
-		Unequip={Id=16855693138};
+	ItemId=script.Name;
+	Class="Tool";
+	HandlerType="MeleeTool";
+
+	Animations={
+		Core={Id=122282841438828;};
+		Load={Id=110742733779650;};
+		PrimaryAttack={Id={91842639525261; 70616300336827}};
+		HeavyAttack={Id=115586386679572};
+		Inspect={Id=103025753935487;};
+		Unequip={Id=101946188265103};
 	};
 	Audio={
 		Load={Id=2304904662; Pitch=1; Volume=0.4;};
 		PrimaryHit={Id=9141019032; Pitch=1; Volume=1;};
 		PrimarySwing={Id=158037267; Pitch=0.8; Volume=0.6;};
 	};
-};
-
---==
-local modMeleeProperties = require(game.ReplicatedStorage.Library.Tools.MeleeProperties);
-
-function toolPackage.NewToolLib(handler)
-	local Tool = {};
-	Tool.Class = "Melee";
-	Tool.Category = "Edged";
 	
-	Tool.Holster = {
-		RightSwordAttachment={PrefabName="machete";};
-	}
-
-	Tool.Configurations = {
+	Configurations={
 		Type="Sword";
+
+		Category = "Edged";
 		EquipLoadTime=1;
 		BaseDamage=240;
 
@@ -57,14 +44,15 @@ function toolPackage.NewToolLib(handler)
 		BleedDamagePercent=0.1;
 		BleedSlowPercent=0.1;
 	};
+	Properties={};
 
-	Tool.Properties = {
-		Attacking=false;
+	Holster = {
+		RightSwordAttachment={PrefabName=script.Name;};
 	}
-	
-	Tool.__index = Tool;
-	setmetatable(Tool, handler);
-	return modMeleeProperties.new(Tool);
+};
+
+function toolPackage.newClass()
+	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
 end
 
 return toolPackage;

@@ -1,52 +1,54 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
+
 local toolPackage = {
-	Type="RoleplayTool";
+	ItemId=script.Name;
+	Class="Tool";
+	HandlerType="GenericTool";
+
 	Animations={
 		Core={Id=14471065189;};
 		Use={Id=14471085942};
 	};
+	Audio={};
+	Configurations={
+		UseViewmodel = false;
+
+		ItemPromptHint = " to use tablet.";
+	};
+	Properties={};
 };
 
-local baseInteractable = script:WaitForChild("Interactable");
-
-function toolPackage.NewToolLib(handler)
-	local Tool = {};
-
-	Tool.UseViewmodel = false;
+function toolPackage.OnServerEquip(handler)
+	local weaponModel = handler.Prefabs[1];
+	local handle = weaponModel.Handle;
 	
-	function Tool:OnEquip()
-		local weaponModel = self.Prefabs[1];
-		local handle = weaponModel.Handle;
-		
-		self.InteractScript = baseInteractable:Clone();
-		self.InteractScript.Parent = handle;
-	end
+	local baseInteractable = script:WaitForChild("Interactable");
+	handler.InteractScript = baseInteractable:Clone();
+	handler.InteractScript.Parent = handle;
+end
 
-	function Tool:OnPrimaryFire(isActive, ...)
-		self.IsActive = isActive;
+function toolPackage.OnActionEvent(handler, packet)
+	if packet.ActionIndex ~= 1 then return end;
 
-	end
+	handler.IsActive = packet.IsActive == true;
+end
+
+function toolPackage.ClientItemPrompt(handler)
+	local localPlayer = game.Players.LocalPlayer;
+	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
-	Tool.ItemPromptHint = " to use tablet.";
-
-	function Tool:ClientItemPrompt()
-		local localPlayer = game.Players.LocalPlayer;
-		local classPlayer = shared.modPlayers.Get(localPlayer);
-
-		local storageItem = self.StorageItem;
-		
-		local prefab = self.Prefab;
-		local primaryPart = prefab.PrimaryPart;
-		local interactableModule = primaryPart:FindFirstChild("Interactable");
-		
-		local modData = require(localPlayer:WaitForChild("DataModule"));
-		modData.InteractRequest(interactableModule, primaryPart);
-	end
+	local prefab = handler.Prefabs[1];
+	local primaryPart = prefab.PrimaryPart;
+	local interactableModule = primaryPart:FindFirstChild("Interactable");
 	
-	Tool.__index = Tool;
-	setmetatable(Tool, handler);
-	return Tool;
+	modData.InteractRequest(interactableModule, primaryPart);
+end
+
+function toolPackage.newClass()
+	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
 end
 
 return toolPackage;
