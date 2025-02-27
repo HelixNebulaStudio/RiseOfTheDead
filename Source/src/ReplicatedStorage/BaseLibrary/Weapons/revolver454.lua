@@ -77,6 +77,7 @@ local toolPackage = {
 		-- Physics
 		KillImpulseForce=5;
 	};
+<<<<<<< HEAD
 
 	Properties={
 		OnReloadAnimation=function(weaponModel, track)
@@ -102,6 +103,35 @@ local toolPackage = {
 		end;
 	};
 };
+=======
+
+	Properties={};
+};
+
+function toolPackage.OnReloadAnimation(handler: ToolHandlerInstance, track: AnimationTrack)
+	local weaponModel = handler.Prefabs[1];
+
+	task.spawn(function()
+		local speedloaderPrefab = script:WaitForChild("Speedloader");
+		local speedloaderWeld = script:WaitForChild("SpeedloaderGrip");
+
+		local newPrefab = speedloaderPrefab:Clone();
+		local newWeld = speedloaderWeld:Clone();
+		game.Debris:AddItem(newPrefab, 5);
+		game.Debris:AddItem(newWeld, 5);
+		
+		local modelBase = newPrefab:WaitForChild("Speedloader");
+		newPrefab.Parent = weaponModel;
+		newWeld.Parent = weaponModel.Parent:FindFirstChild("LeftHand");
+		newWeld.Part0 = newWeld.Parent;
+		newWeld.Part1 = modelBase;
+
+		track.Stopped:Wait();
+		game.Debris:AddItem(newPrefab, 0);
+		game.Debris:AddItem(newWeld, 0);
+	end)
+end
+>>>>>>> b7050963ccc669ec5ee00093af9741966adc936a
 
 function toolPackage.newClass()
 	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);

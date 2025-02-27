@@ -124,9 +124,7 @@ function Workbench.UpdateModDesc(storageItem, modLib, containerStorageItem)
 end
 
 function Workbench.new(paramPacket)
-
-	local compatTypes = paramPacket.UpgradeLib.Type
-	local itemTier = paramPacket.UpgradeLib.Tier or 1;
+	local compatTypes = paramPacket.UpgradeLib.Type;
 	
 	local itemHandlerClass = paramPacket.ItemClass;
 	local compatElement = itemHandlerClass.Configurations.Element;

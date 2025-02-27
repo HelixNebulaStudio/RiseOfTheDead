@@ -1,27 +1,28 @@
-local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-
+--==
 local attirePackage = {
+	ItemId=script.Name;
+	Class="Clothing";
+	
 	GroupName="ChestGroup";
-}
+	
+	Configurations={
+		TickRepellent = 2;
+		ArmorPoints = 10;
+		Warmth = 3;
+	};
+	Properties={};
+};
 
-function attirePackage.NewToolLib(handler)
-	local toolLib = {};
-	
-	toolLib.TickRepellent = 2;
-	toolLib.BaseArmorPoints = 10;
-	toolLib.Warmth = 3;
-	
-	
-	local clothing = modClothingProperties.new(toolLib);
-	
+function attirePackage.newClass()
+	local equipmentClass = modEquipmentClass.new(attirePackage.Class, attirePackage.Configurations, attirePackage.Properties);
+
 	if not modBranchConfigs.IsWorld("Slaughterfest") then
-		clothing:RegisterPlayerProperty("TireArmor", {
-			Visible=false;
-		});
+		equipmentClass:AddModifier("TireArmor");
 	end
-	
-	return clothing;
+
+	return equipmentClass;
 end
 
 return attirePackage;

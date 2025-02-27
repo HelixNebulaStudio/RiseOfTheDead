@@ -10,9 +10,9 @@ local RunService = game:GetService("RunService");
 
 local localplayer = game.Players.LocalPlayer;
 local PlayerGui = localplayer.PlayerGui;
-local modData = require(localplayer:WaitForChild("DataModule"));
+local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
+local modGlobalVars = require(game.ReplicatedStorage.GlobalVariables);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modAudio = require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("Audio"));
 local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
@@ -88,14 +88,15 @@ function Interface.init(modInterface)
 		end
 		
 		healthBars.Size = UDim2.new(maxHealth/maxPool, 0, 1, 0);
-		healthBars.Bar:TweenSize(UDim2.new(healthRatio, 0, 1, 0), tweenDirection, tweenStyle, 0.2, true, refresh);
+		healthBars.Bar:TweenSize(UDim2.new(healthRatio, 0, 1, 0), tweenDirection, tweenStyle, 0.1, true, refresh);
 		
 		armorBars.Size = UDim2.new(maxArmor/maxPool, 0, 1, 0);
-		armorBars.Bar:TweenSize(UDim2.new(armorRatio, 0, 1, 0), tweenDirection, tweenStyle, 0.2, true, refresh);
+		armorBars.Bar:TweenSize(UDim2.new(armorRatio, 0, 1, 0), tweenDirection, tweenStyle, 0.1, true, refresh);
+		
 		delay(0.05, function()
 			pcall(function()
-				healthBars.LostBar:TweenSize(UDim2.new(healthRatio, 0, 1, 0), tweenDirection, tweenStyle, 0.5, true, refresh);
-				armorBars.LostBar:TweenSize(UDim2.new(armorRatio, 0, 1, 0), tweenDirection, tweenStyle, 0.5, true, refresh);
+				healthBars.LostBar:TweenSize(UDim2.new(healthRatio, 0, 1, 0), tweenDirection, tweenStyle, 0.4, true, refresh);
+				armorBars.LostBar:TweenSize(UDim2.new(armorRatio, 0, 1, 0), tweenDirection, tweenStyle, 0.4, true, refresh);
 			end)
 		end);
 		

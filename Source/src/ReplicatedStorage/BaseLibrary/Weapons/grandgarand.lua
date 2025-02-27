@@ -89,6 +89,7 @@ local toolPackage = {
 		-- Physics
 		KillImpulseForce=40;
 	};
+<<<<<<< HEAD
 
 	Properties={
 		OnReload=function(mainWeaponModel, modWeaponModule)
@@ -132,6 +133,57 @@ local toolPackage = {
 	};
 };
 
+=======
+
+	Properties={};
+};
+
+function toolPackage.OnReload(handler: ToolHandlerInstance)
+	local weaponModel = handler.Prefabs[1];
+	local equipmentClass = handler.EquipmentClass;
+
+	local properties = equipmentClass.Properties;
+	if properties.Ammo <= 0 then return end;
+
+	local magazinePart = weaponModel:FindFirstChild("Magazine");
+	local caseOutPoint = weaponModel:FindFirstChild("CaseOut", true);
+	if magazinePart and caseOutPoint then
+		local newEject = magazinePart:Clone();
+		newEject:ClearAllChildren();
+		game.Debris:AddItem(newEject, 5);
+
+		newEject.CFrame = caseOutPoint.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), math.rad(math.random(-35, 35)));
+		newEject.Parent = workspace.Debris;
+
+		newEject:ApplyImpulse(caseOutPoint.WorldCFrame.RightVector * 0.5);
+	end
+end
+
+function toolPackage.OnPrimaryFire(handler: ToolHandlerInstance)
+	local weaponModel = handler.Prefabs[1];
+	local equipmentClass = handler.EquipmentClass;
+
+	local properties = equipmentClass.Properties;
+	if properties.Ammo > 0 then return end;
+
+	local modAudio = require(game.ReplicatedStorage.Library.Audio);
+	modAudio.Play("GarandPing", weaponModel.PrimaryPart);
+
+	local magazinePart = weaponModel:FindFirstChild("Magazine");
+	local caseOutPoint = weaponModel:FindFirstChild("CaseOut", true);
+	if magazinePart and caseOutPoint then
+		local newEject = magazinePart:Clone();
+		newEject:ClearAllChildren();
+		game.Debris:AddItem(newEject, 5);
+
+		newEject.CFrame = caseOutPoint.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), math.rad(math.random(-35, 35)));
+		newEject.Parent = workspace.Debris;
+
+		newEject:ApplyImpulse(caseOutPoint.WorldCFrame.RightVector * 0.5);
+	end
+end
+
+>>>>>>> b7050963ccc669ec5ee00093af9741966adc936a
 function toolPackage.newClass()
 	local equipmentClass = modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
 	

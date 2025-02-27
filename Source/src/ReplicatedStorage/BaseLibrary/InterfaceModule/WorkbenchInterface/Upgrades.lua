@@ -38,14 +38,17 @@ local remoteItemModAction = modRemotesManager:Get("ItemModAction");
 local ModUpgrader = {};
 local upgradesGuiTable = {};
 
-function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
+function ModUpgrader.new(modLib, modifierStorageItem, equipmentStorageItem)
 	local self = {} :: any;
 	
-	local itemLib = modItemLibrary:Find(storageItemOfMod.ItemId);
+	local itemModifierSiid = modifierStorageItem.ID;
+	local equipmentSiid = equipmentStorageItem.ID;
+
+	local itemLib = modItemLibrary:Find(modifierStorageItem.ItemId);
 	
 	local tierColor = modItemLibrary.TierColors[itemLib.Tier];
-	if storageItemOfMod.Values.Tier then
-		tierColor = modItemLibrary.TierColors[storageItemOfMod.Values.Tier];
+	if modifierStorageItem.Values.Tier then
+		tierColor = modItemLibrary.TierColors[modifierStorageItem.Values.Tier];
 	end
 	
 	local upgradeFrame = upgradeFrameTemplate:Clone();
@@ -62,30 +65,30 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 	
 	local tierOfItem, tierOfMod;
 	local function updateFrameDetails()
-		self.UpgradeFrame.LayoutOrder = storageItemOfMod.Index or 999;
+		self.UpgradeFrame.LayoutOrder = modifierStorageItem.Index or 999;
 		
 		titleTag.Text = modLib.Name;
 		titleTag.TextColor3 = tierColor;
 		
-		if storageItemOfItem then
-			local upgradeLib = modWorkbenchLibrary.ItemUpgrades[storageItemOfItem.ItemId];
+		if equipmentStorageItem then
+			local upgradeLib = modWorkbenchLibrary.ItemUpgrades[equipmentStorageItem.ItemId];
 			tierOfItem = (upgradeLib and upgradeLib.Tier) or 1;
 			
-			tierOfMod = storageItemOfMod.Values.Tier or modLib.Tier;
+			tierOfMod = modifierStorageItem.Values.Tier or modLib.Tier;
 			
 			if tierOfItem < tierOfMod then
 				titleTag.Text = modLib.Name..' <font color="rgb(221, 97, 97)">(Incompatible Tier)</font>';
 			end
 		end
 
-		if storageItemOfMod.Values.StackConflict then
-			titleTag.Text = modLib.Name..' <font color="rgb(221, 97, 97)">('.. storageItemOfMod.Values.StackConflict ..' Conflict)</font>';
+		if modifierStorageItem.Values.StackConflict then
+			titleTag.Text = modLib.Name..' <font color="rgb(221, 97, 97)">('.. modifierStorageItem.Values.StackConflict ..' Conflict)</font>';
 		end
 	end
 	updateFrameDetails();
 	
 	upgradeFrame.Name = modLib.Name;
-	descTag.Text = Interface.ListMods.UpdateModDesc(storageItemOfMod, modLib, storageItemOfItem)
+	descTag.Text = Interface.ListMods.UpdateModDesc(modifierStorageItem, modLib, equipmentStorageItem)
 	
 	local levelButtons = {};
 		
@@ -99,21 +102,18 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 		detachDebounce = true;
 		Interface:PlayButtonClick();
 		upgradeFrame.Visible = false;
-		local success = remoteModHandler:InvokeServer(Interface.Object, 2, storageItemOfMod.ID);
+		local success = remoteModHandler:InvokeServer(Interface.Object, 2, itemModifierSiid);
 		if type(success) ~= "number" then
 			upgradeFrame:Destroy();
-			upgradesGuiTable[storageItemOfMod.ID] = nil;
-			
-			local toolModule = modData:GetItemClass(storageItemOfItem.ID, storageItemOfItem.ID == "MockStorageItem");
-			if toolModule and toolModule.ModifierTriggers and toolModule.ModifierTriggers[modLib.Module.Name] then
-				local itemModifier = toolModule.ModifierTriggers[modLib.Module.Name];
-				itemModifier:SetActive(false);
-				toolModule.ModifierTriggers[modLib.Module.Name] = nil;
-			end
-			modData.OnAmmoUpdate:Fire(storageItemOfMod.ID);
+			upgradesGuiTable[itemModifierSiid] = nil;
 			
 			modStorageInterface.UpdateStorages(success);
 			if self.RefreshEquippedMods then self.RefreshEquippedMods() end;
+			
+			local equipmentClass = shared.modPlayerEquipment.getEquipmentClass(equipmentSiid);
+			if equipmentClass then
+				equipmentClass.Configurations:Calculate();
+			end
 			
 		else
 			if success == 3 then
@@ -136,7 +136,7 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 	self.Expand = function()
 		expandDebounce = true;
 		for oId, obj in pairs(upgradesGuiTable) do
-			if oId ~= storageItemOfMod.ID then
+			if oId ~= itemModifierSiid then
 				spawn(function()
 				obj.Minimize();
 				end)
@@ -145,7 +145,7 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 		for i=#levelButtons, 1, -1 do
 			if levelButtons[i] then levelButtons[i].Visible = true; else table.remove(levelButtons, i) end
 		end;
-		descTag.Text = Interface.ListMods.UpdateModDesc(storageItemOfMod, modLib, storageItemOfItem);
+		descTag.Text = Interface.ListMods.UpdateModDesc(modifierStorageItem, modLib, equipmentStorageItem);
 		descTag.Size = UDim2.new(1, -30, 0, 0);
 		gapFrame.Visible = true;
 		descTag.Visible = true;
@@ -184,16 +184,16 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 	
 	local LevelObject = {};
 	self.Update = function(siom)
-		storageItemOfMod = modData.GetItemById(storageItemOfMod.ID);
+		modifierStorageItem = modData.GetItemById(itemModifierSiid);
 
 		tierColor = modItemLibrary.TierColors[itemLib.Tier];
 
-		if storageItemOfMod.Values.Tier then
-			tierColor = modItemLibrary.TierColors[storageItemOfMod.Values.Tier];
+		if modifierStorageItem.Values.Tier then
+			tierColor = modItemLibrary.TierColors[modifierStorageItem.Values.Tier];
 		end
 		
 		updateFrameDetails();
-		descTag.Text = Interface.ListMods.UpdateModDesc(storageItemOfMod, modLib, storageItemOfItem);
+		descTag.Text = Interface.ListMods.UpdateModDesc(modifierStorageItem, modLib, equipmentStorageItem);
 		
 		for b=1, #modLib.Upgrades do
 			if LevelObject[b] ~= nil then LevelObject[b].Update(); continue end;
@@ -211,7 +211,7 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 
 			
 			local currencyType = upgradeData.Currency or "Perks";
-			local dataUpgradeLevel = (storageItemOfMod.Values[upgradeData.DataTag] or 0);
+			local dataUpgradeLevel = (modifierStorageItem.Values[upgradeData.DataTag] or 0);
 			local upgradeCost = modWorkbenchLibrary.CalculateCost(upgradeData, dataUpgradeLevel);
 			
 			local upgradeMaxLevel = upgradeData.MaxLevel;
@@ -220,8 +220,8 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 			
 			local sliderObj;
 			if upgradeData.SliderTag then
-				local levelVal = storageItemOfMod.Values[upgradeData.DataTag] or 0;
-				local selectVal = storageItemOfMod.Values[upgradeData.SliderTag] or levelVal;
+				local levelVal = modifierStorageItem.Values[upgradeData.DataTag] or 0;
+				local selectVal = modifierStorageItem.Values[upgradeData.SliderTag] or levelVal;
 				local sliderVal = math.clamp(selectVal / upgradeData.MaxLevel, 0, 1);
 
 				local newBar = templateSliderBar:Clone();
@@ -239,25 +239,25 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 
 					SliderBar = newBar;
 					SetFunc = function(newVal, refresh)
-						levelVal = (storageItemOfMod.Values[upgradeData.DataTag] or 0);
+						levelVal = (modifierStorageItem.Values[upgradeData.DataTag] or 0);
 						
 						local valToLvl = math.clamp(math.round(newVal * upgradeData.MaxLevel +0.475), 0, levelVal);
 
-						storageItemOfMod.Values[upgradeData.SliderTag] = valToLvl;
-						descTag.Text = Interface.ListMods.UpdateModDesc(storageItemOfMod, modLib, storageItemOfItem)
+						modifierStorageItem.Values[upgradeData.SliderTag] = valToLvl;
+						descTag.Text = Interface.ListMods.UpdateModDesc(modifierStorageItem, modLib, equipmentStorageItem)
 						
 						if refresh == true and sliderObj.Disabled ~= true then
 							sliderObj.Disabled = true;
 							
 							local setValuePacket = {
-								StorageItemID=storageItemOfMod.ID;
+								StorageItemID=itemModifierSiid;
 								DataTag=upgradeData.SliderTag;
 								Value=valToLvl;
 								Key=modLib.Module.Name;
 							}
 							
 							remoteItemModAction:InvokeServer("setvalue", setValuePacket);
-							storageItemOfMod.Values[upgradeData.SliderTag] = valToLvl;
+							modifierStorageItem.Values[upgradeData.SliderTag] = valToLvl;
 							
 							self.Update();
 							if self.RefreshEquippedMods then self.RefreshEquippedMods() end;
@@ -284,7 +284,7 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 					return;
 				end
 				
-				local serverReply = remotePurchaseUpgrade:InvokeServer(Interface.Object, storageItemOfMod.ID, upgradeData.DataTag);
+				local serverReply = remotePurchaseUpgrade:InvokeServer(Interface.Object, itemModifierSiid, upgradeData.DataTag);
 				if serverReply == modWorkbenchLibrary.PurchaseReplies.Success then
 					local newLevel = dataUpgradeLevel+1;
 					
@@ -300,8 +300,8 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 					pointFrame.Parent = newLevelList;
 					newLevelButton.Text = "Upgrade Successful!";
 					
-					storageItemOfMod.Values[upgradeData.DataTag] = newLevel;
-					dataUpgradeLevel = storageItemOfMod.Values[upgradeData.DataTag];
+					modifierStorageItem.Values[upgradeData.DataTag] = newLevel;
+					dataUpgradeLevel = modifierStorageItem.Values[upgradeData.DataTag];
 					
 					if dataUpgradeLevel >= upgradeMaxLevel then
 						newLevelButton.Text = upgradeData.Syntax.." Maxed";
@@ -311,7 +311,7 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 					
 					if sliderObj then
 						if upgradeData.SliderTag then
-							storageItemOfMod.Values[upgradeData.SliderTag] = nil;
+							modifierStorageItem.Values[upgradeData.SliderTag] = nil;
 						end
 						
 						sliderObj.MaxValue = math.clamp(newLevel / upgradeData.MaxLevel, 0, 1);
@@ -342,10 +342,10 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 			
 			LevelObject[b].Update = function()
 				for _, c in pairs(newLevelList:GetChildren()) do if c:IsA("GuiObject") then c:Destroy() end; end
-				dataUpgradeLevel = math.min(storageItemOfMod.Values[upgradeData.DataTag] or 0, upgradeMaxLevel);
+				dataUpgradeLevel = math.min(modifierStorageItem.Values[upgradeData.DataTag] or 0, upgradeMaxLevel);
 				upgradeCost = modWorkbenchLibrary.CalculateCost(upgradeData, dataUpgradeLevel);
 				
-				local itemLib = modItemLibrary:Find(storageItemOfMod.ItemId);
+				local itemLib = modItemLibrary:Find(modifierStorageItem.ItemId);
 			
 				for c=1, dataUpgradeLevel do
 					local slotImg = LevelSlotTemplate;
@@ -428,6 +428,7 @@ function ModUpgrader.new(modLib, storageItemOfMod, storageItemOfItem)
 	return self;
 end
 
+local equipmentModCapacity = 5;
 function Workbench.new(itemId, library, storageItem)
 	local listMenu = Interface.List.create();
 	listMenu.Menu.Name = "upgradeMenu";
@@ -437,6 +438,8 @@ function Workbench.new(itemId, library, storageItem)
 	upgradesGuiTable = {};
 	local itemValues = storageItem.Values;
 	local itemLib = modItemLibrary:Find(itemId);
+
+	local equipmentSiid = storageItem.ID;
 	
 	if itemLib.Type == modItemLibrary.Types.Mod then
 		listMenu:SetListPadding(UDim2.new(1, 0, 1, 0));
@@ -451,9 +454,8 @@ function Workbench.new(itemId, library, storageItem)
 		listMenu:Add(upgrader.UpgradeFrame);
 		
 	else
-		local itemClass, classType = modData:GetItemClass(storageItem.ID);
+		local equipmentClass = shared.modPlayerEquipment.getEquipmentClass(equipmentSiid);
 		
-		modData.OnAmmoUpdate:Fire(storageItem.ID);
 		Interface:OpenWindow("WeaponStats", storageItem);
 		
 		local capacityFrame = capacityFrameTemplate:Clone();
@@ -465,10 +467,10 @@ function Workbench.new(itemId, library, storageItem)
 		listMenu:Add(capacityFrame, 1);
 		
 		local function refreshCapcityLabel()
-			titleTag.Text = ("Mod Capacity: $a/$b"):gsub("$a", modsAttached):gsub("$b", itemClass.Configurations.ModCapacity or 5);
+			titleTag.Text = ("Mod Capacity: $a/$b"):gsub("$a", modsAttached):gsub("$b", equipmentModCapacity);
 			pcall(function()
 				bar:TweenSize(
-					UDim2.new(math.clamp((modsAttached or 0)/(itemClass.Configurations.ModCapacity or 5), 0, 1), 0, 1, 0),
+					UDim2.new(math.clamp((modsAttached or 0)/equipmentModCapacity, 0, 1), 0, 1, 0),
 					Enum.EasingDirection.InOut,
 					Enum.EasingStyle.Quad,
 					0.5,
@@ -480,26 +482,26 @@ function Workbench.new(itemId, library, storageItem)
 		local function refreshEquippedMods()
 			modsAttached = 0;
 			
-			local itemStorage = modData.GetItemStorage(storageItem.ID);
+			local itemStorage = modData.GetItemStorage(equipmentSiid);
 			if itemStorage then
 				local pModOrder = {};
 				
-				for modId, storageItemOfMod in pairs(itemStorage.Container) do
+				for modId, modifierStorageItem in pairs(itemStorage.Container) do
 					modsAttached = modsAttached +1;
 					
-					local modLib = modItemModsLibrary.Get(storageItemOfMod.ItemId);
-					if modLib == nil then Debugger:Warn("Mod ("..tostring(storageItemOfMod.ItemId)..") does not exist in library."); continue end;
+					local modLib = modItemModsLibrary.Get(modifierStorageItem.ItemId);
+					if modLib == nil then Debugger:Warn("Mod ("..tostring(modifierStorageItem.ItemId)..") does not exist in library."); continue end;
 					
 					if upgradesGuiTable[modId] == nil then
-						local upgrader = ModUpgrader.new(modLib, storageItemOfMod, storageItem);
+						local upgrader = ModUpgrader.new(modLib, modifierStorageItem, storageItem);
 						upgrader.RefreshEquippedMods = refreshEquippedMods;
 						
-						listMenu:Add(upgrader.UpgradeFrame); --, storageItemOfMod.Index
+						listMenu:Add(upgrader.UpgradeFrame); --, modifierStorageItem.Index
 						upgradesGuiTable[modId] = upgrader;
 					end
 					
-					pModOrder[modLib.Id] = storageItemOfMod.Index;
-					upgradesGuiTable[modId].Update(storageItemOfMod);
+					pModOrder[modLib.Id] = modifierStorageItem.Index;
+					upgradesGuiTable[modId].Update(modifierStorageItem);
 				end
 				
 				for id, upgradeObject in pairs(upgradesGuiTable) do
@@ -525,19 +527,22 @@ function Workbench.new(itemId, library, storageItem)
 		
 		addModuleButton.MouseButton1Click:Connect(function()
 			Interface:PlayButtonClick();
-			itemClass, classType = modData:GetItemClass(storageItem.ID);
-			
-			local modsListMenu = Interface.ListMods.new{UpgradeLib=library; ItemClass=itemClass;};
+			local modsListMenu = Interface.ListMods.new{UpgradeLib=library; ItemClass=equipmentClass;};
 			
 			local addModButtonDebounce = false;
 			modsListMenu.OnItemButtonClick = function(itemMod)
 				if addModButtonDebounce then return end;
 				addModButtonDebounce = true;
 				Interface:PlayButtonClick();
-				local success = remoteModHandler:InvokeServer(Interface.Object, 1, itemMod.ID, storageItem.ID);
+				local success = remoteModHandler:InvokeServer(Interface.Object, 1, itemMod.ID, equipmentSiid);
 				if type(success) ~= "number" then
 					modStorageInterface.UpdateStorages(success);
 					Interface:PlayUpgradeSound();
+
+					local equipmentClass = shared.modPlayerEquipment.getEquipmentClass(equipmentSiid);
+					if equipmentClass then
+						equipmentClass.Configurations:Calculate();
+					end
 					
 				else
 					if success == 1 then

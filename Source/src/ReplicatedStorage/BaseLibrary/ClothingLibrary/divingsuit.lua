@@ -1,17 +1,21 @@
-local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
-
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
 local attirePackage = {
+	ItemId=script.Name;
+	Class="Clothing";
+	
 	GroupName="BodyGroup";
-}
+	
+	Configurations={
+		Warmth = 6;
+		OxygenDrainReduction = 0.7;
+		OxygenRecoveryIncrease = 0.3;
+	};
+	Properties={};
+};
 
-function attirePackage.NewToolLib(handler)
-	local toolLib = {};
-
-	toolLib.Warmth = 6;
-	toolLib.OxygenDrainReduction = 0.7;
-	toolLib.OxygenRecoveryIncrease = 0.3;
-
-	return modClothingProperties.new(toolLib);
+function attirePackage.newClass()
+	return modEquipmentClass.new(attirePackage.Class, attirePackage.Configurations, attirePackage.Properties);
 end
 
 return attirePackage;

@@ -2,12 +2,12 @@
 local modItemModProperties = require(game.ReplicatedStorage.Library.ItemModsLibrary.ItemModProperties);
 local itemMod = modItemModProperties.new();
 
-local modWeaponsAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
+local modWeaponAttributes = require(game.ReplicatedStorage.Library.Weapons.WeaponAttributes);
 
 function itemMod.Activate(packet)
 	local module = packet.WeaponModule;
 
-	module.Configurations.TriggerMode = modWeaponsAttributes.TriggerModes.Automatic;
+	module.Configurations.TriggerMode = modWeaponAttributes.TriggerModes.Automatic;
 end
 
 return itemMod;

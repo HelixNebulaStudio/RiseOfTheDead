@@ -2,95 +2,100 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modItemModProperties = require(game.ReplicatedStorage.Library.ItemModsLibrary.ItemModProperties);
+local modItemModifierClass = require(game.ReplicatedStorage.Library.ItemModifierClass);
 
-local itemModifier = modItemModProperties.new(script);
-itemModifier.TriggerType = itemModifier.Library.TriggerType.OnBulletHit;
+local ItemModifier = modItemModifierClass.new(script);
+--==
 
-function itemModifier.Activate(packet)
-	local storageItemMod = packet.ModStorageItem;
-	local module = packet.WeaponModule;
-	
-	local dLayerInfo = itemModifier.Library.GetLayer("D", packet);
+function ItemModifier:Update()
+	local dLayerInfo = ItemModifier.Library.calculateLayer(self, "D");
 	local dValue, dTweakVal = dLayerInfo.Value, dLayerInfo.TweakValue;
 	
 	if dTweakVal then
 		dValue = dValue + dTweakVal;
 	end
-
-	local fdLayerInfo = itemModifier.Library.GetLayer("FD", packet);
+	
+	local fdLayerInfo = ItemModifier.Library.calculateLayer(self, "FD");
 	local fdValue = fdLayerInfo.Value;
 
-	local baseDamage = module.Configurations.PreModDamage;
+	local configurations = self.EquipmentClass.Configurations;
+
+	local baseDamage = configurations.PreModDamage;
 	local additionalDmg = baseDamage * dValue;
 
-	if module.Configurations.FrenzyDamage == nil then
-		module.Configurations.FrenzyDamage = fdValue;
-		module.Configurations.Damage = module.Configurations.Damage + additionalDmg;
-	
-		module:AddModifierTrigger(storageItemMod, itemModifier);
+	if configurations.FrenzyDamage == nil then
+		self.SetValues.FrenzyDamage = fdValue;
+		self.AddValues.Damage = additionalDmg;
 	end
 end
 
 if RunService:IsServer() then
 	local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-
+	
 	modOnGameEvents:ConnectEvent("OnPlayerDamaged", function(player, damageSource, damage)
-		local classPlayer = shared.modPlayers.Get(player);
-
 		local initDmg = damageSource.InitDamage;
 		
 		local profile = shared.modProfile:Get(player);
 		local storageItemID = profile and profile.EquippedTools and profile.EquippedTools.ID;
 		if storageItemID == nil then return end;
 
-		local weaponModule = profile:GetItemClass(storageItemID);
-		if weaponModule == nil or weaponModule.Configurations == nil or weaponModule.Configurations.FrenzyDamage == nil then return end;
+        local itemModifierList = shared.modPlayerEquipment.getPlayerItemModifiers(player);
 
-		local itemModifier = weaponModule.ModifierTriggers[script.Name];
-		if itemModifier == nil then return end;
+		for siid, itemModifier in pairs(itemModifierList) do
+			if itemModifier.SetValues.FrenzyDamage == nil then continue end;
 
-		itemModifier.Stacks = math.clamp(itemModifier.Stacks + initDmg *0.01, 0, 1);
-		itemModifier.CooldownTick = tick()+10;
+			itemModifier.Stacks = math.clamp(itemModifier.Stacks + initDmg *0.01, 0, 1);
+			itemModifier.CooldownTick = tick()+10;
+		end
 	end)
 
-	function itemModifier:OnUpdate()
+	function ItemModifier:OnNewDamageSource(damageSource)
+		local configurations = self.EquipmentClass.Configurations;
+		local preModDmg = configurations.PreModDamage;
+
+		local stackAlpha = self.Stacks;
+		local additionalDmg = stackAlpha * configurations.FrenzyDamage * preModDmg;
+		damageSource.Damage = damageSource.Damage + additionalDmg;
+	end
+
+	function ItemModifier:OnTick(delta)
 		if self.Stacks == nil then
 			self.Stacks = 0;
 			self.CooldownTick = tick();
 			self.DepleteTick = tick();
 		end
-
+	
 		if tick() >= self.CooldownTick then
 			if tick()-self.DepleteTick >= 0.5 then
 				self.DepleteTick = tick();
 				self.Stacks = math.clamp(self.Stacks -0.01, 0, 1);
 			end
 		end
-
-		if self.StorageItem and self.LastStacks ~= self.Stacks then
+	
+		if self.LastStacks ~= self.Stacks then
 			self.LastStacks = self.Stacks;
-
+	
 			self:Sync({"Stacks"});
 		end
 	end
 
-	function itemModifier:OnDeactivate()
-		self.Stacks = 0;
-		self.CooldownTick = tick();
-		self.DepleteTick = tick();
+	function ItemModifier:Attach()
+		self:SetTickCycle(true);
 	end
 
-elseif RunService:IsClient() then
+	function ItemModifier:Detach()
+		self:SetTickCycle(false);
+	end
 
-	function itemModifier:OnWeaponRender()
-		local weaponStatusDisplay = self.WeaponStatusDisplay;
-		local configurations = self.WeaponModule.Configurations;
+
+elseif RunService:IsClient() then
+	function ItemModifier:OnWeaponRender(weaponStatusDisplay)
+		if self.Enabled == false then return end;
+
+		local configurations = self.EquipmentClass.Configurations;
 
 		local frenzyDmg = configurations.FrenzyDamage;
-		if frenzyDmg == nil then
-			return 
-		end;
+		if frenzyDmg == nil then return; end;
 
 		if weaponStatusDisplay.FrenzyDamage == nil then
 			weaponStatusDisplay.FrenzyDamage = {
@@ -112,4 +117,4 @@ elseif RunService:IsClient() then
 
 end
 
-return itemModifier;
+return ItemModifier;

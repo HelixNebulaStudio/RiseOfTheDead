@@ -1,21 +1,20 @@
-local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
-
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
 local attirePackage = {
+	ItemId=script.Name;
+	Class="Clothing";
+	
 	GroupName="HandGroup";
-}
+	
+	Configurations={
+		AdditionalStamina = 20;
+		Warmth = 2;
+	};
+	Properties={};
+};
 
-function attirePackage.NewToolLib(handler)
-	local toolLib = {};
-
-	toolLib.BaseAdditionalStamina = 20;
-	toolLib.AdditionalStamina = toolLib.BaseAdditionalStamina;
-	toolLib.Warmth = 2;
-
-
-	local clothing = modClothingProperties.new(toolLib);
-	return clothing;
+function attirePackage.newClass()
+	return modEquipmentClass.new(attirePackage.Class, attirePackage.Configurations, attirePackage.Properties);
 end
-
--- roughness texture : rbxassetid://16987783721
 
 return attirePackage;

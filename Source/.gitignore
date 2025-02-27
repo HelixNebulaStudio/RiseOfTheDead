@@ -23,8 +23,10 @@ src/*
 !src/ReplicatedStorage
 src/ReplicatedStorage/*
 !src/ReplicatedStorage/BaseLibrary
+!src/TypeDef.d.lua
+
 
 # Update
 # git pull --allow-unrelated-histories --tags origin main
 # git reset
-# git pull --allow-unrelated-histories -s subtree engine public
+# git pull --no-commit --allow-unrelated-histories -s subtree engine public

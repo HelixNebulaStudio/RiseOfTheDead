@@ -52,6 +52,7 @@ local toolPackage = {
 		Rpm=400;
 		ReloadTime=3;
 		Multishot=1;
+<<<<<<< HEAD
 
 		HeadshotMultiplier=0.5;
 		EquipLoadTime=0.4;
@@ -106,6 +107,64 @@ local toolPackage = {
 		end;
 	};
 };
+=======
+
+		HeadshotMultiplier=0.5;
+		EquipLoadTime=0.4;
+
+		StandInaccuracy=2;
+		FocusInaccuracyReduction=0.5;
+		CrouchInaccuracyReduction=0.6;
+		MovingInaccuracyScale=1.3;
+
+		-- Recoil
+		XRecoil=0.02;
+		YRecoil=0.04;
+		-- Dropoff
+		DamageDropoff={
+			MinDistance=64;
+			MaxDistance=100;
+		};
+		-- UI
+		UISpreadIntensity=5;
+		-- Body
+		RecoilStregth=math.rad(60);
+		-- Penetration
+		Penetration=modWeaponAttributes.PenetrationTable.Pistol;
+		-- Physics
+		KillImpulseForce=5;
+	};
+
+	Properties={};
+};
+
+function toolPackage.DoSpecialLoad(handler: ToolHandlerInstance)
+	local equipmentClass = handler.EquipmentClass;
+	local configurations = equipmentClass.Configurations;
+	local itemValues = handler.StorageItem.Values;
+	
+	if itemValues.MA and itemValues.MA <= configurations.AmmoCapacity then
+		return "SpecialLoad";
+	end
+	return "Load";
+end
+
+function toolPackage.DoSpecialReload(handler: ToolHandlerInstance)
+	local equipmentClass = handler.EquipmentClass;
+	local properties = equipmentClass.Properties;
+	local toolModel = handler.Prefabs[1];
+	
+	local magazine2 = toolModel:FindFirstChild("Magazine2");
+	if magazine2 and magazine2.Transparency == 1 then
+		
+		if properties.Ammo > 0 then
+			return "TacticalReload";
+		end
+		return "SpecialLoad";
+	end
+	return "Reload";
+end
+>>>>>>> b7050963ccc669ec5ee00093af9741966adc936a
 
 function toolPackage.newClass()
 	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);

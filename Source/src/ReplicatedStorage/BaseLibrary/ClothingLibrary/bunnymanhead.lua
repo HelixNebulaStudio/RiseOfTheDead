@@ -1,22 +1,27 @@
-local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-
+--==
 local attirePackage = {
+	ItemId=script.Name;
+	Class="Clothing";
+	
 	GroupName="HeadGroup";
-}
-
-function attirePackage.NewToolLib(handler)
-	local toolLib = {};
-
-	toolLib.Warmth = 6;
-	toolLib.HasFlinchProtection = true;
 	
-	local clothing = modClothingProperties.new(toolLib);
+	Configurations={
+		HasFlinchProtection = true;
+		Warmth = 6;
+	};
+	Properties={};
+};
+
+function attirePackage.newClass()
+	local equipmentClass = modEquipmentClass.new(attirePackage.Class, attirePackage.Configurations, attirePackage.Properties);
+
 	if modConfigurations.SpecialEvent.Easter then
-		clothing:RegisterPlayerProperty("bunnyman", true);
+		equipmentClass:AddModifier("Bunnyman");
 	end
-	
-	return modClothingProperties.new(toolLib);
+
+	return equipmentClass;
 end
 
 return attirePackage;

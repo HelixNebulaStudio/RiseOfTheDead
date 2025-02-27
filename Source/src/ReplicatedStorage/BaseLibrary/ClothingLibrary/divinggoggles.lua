@@ -1,18 +1,22 @@
-local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
-
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
 local attirePackage = {
-	GroupName="HeadGroup";
-}
-
-function attirePackage.NewToolLib(handler)
-	local toolLib = {};
-
-	toolLib.GasProtection = 0.2;
-	toolLib.Warmth = 2;
-	toolLib.UnderwaterVision = 0.1;
-	toolLib.HasFlinchProtection = true;
+	ItemId=script.Name;
+	Class="Clothing";
 	
-	return modClothingProperties.new(toolLib);
+	GroupName="HeadGroup";
+	
+	Configurations={
+		GasProtection = 0.2;
+		Warmth = 2;
+		UnderwaterVision = 0.1;
+		HasFlinchProtection = true;
+	};
+	Properties={};
+};
+
+function attirePackage.newClass()
+	return modEquipmentClass.new(attirePackage.Class, attirePackage.Configurations, attirePackage.Properties);
 end
 
 return attirePackage;

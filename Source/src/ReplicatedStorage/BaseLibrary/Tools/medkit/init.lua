@@ -1,26 +1,28 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
+
 local toolPackage = {
-	Type="HealTool";
+	ItemId=script.Name;
+	Class="Tool";
+	HandlerType="HealTool";
+
 	Animations={
 		Core={Id=17076794599;};
 		Use={Id=17076796044;};
 		UseOthers={Id=16167636769;};
 	};
-};
-
-
-function toolPackage.NewToolLib(handler)
-	local Tool = {};
-
-	Tool.Configurations = {
+	Audio={};
+	Configurations={
 		HealAmount = 35;
 		UseDuration = 4;
 	};
-	
-	Tool.__index = Tool;
-	setmetatable(Tool, handler);
-	return Tool;
+	Properties={};
+};
+
+function toolPackage.newClass()
+	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
 end
 
 return toolPackage;

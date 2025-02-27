@@ -1,68 +1,73 @@
-local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
-local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
-
 local attirePackage = {
+	ItemId=script.Name;
+	Class="Clothing";
+	
 	GroupName="UnoverlappableGroup";
-}
+	
+	VehicleWearAnimationId="rbxassetid://112890221559544";
 
-function attirePackage.NewToolLib(handler)
-	local toolLib = {};
+	Configurations={
+		HasFlinchProtection = true;
+		UnderwaterVision = 0.06;
+	};
+	Properties={};
+};
 
-	toolLib.VehicleWearAnimationId="rbxassetid://112890221559544";
+function attirePackage.OnAccesorySpawn(classPlayer, storageItem, newAccessoryPrefabs)
+	local accessory = newAccessoryPrefabs and newAccessoryPrefabs[1];
+	if typeof(accessory) ~= "Instance" then return end;
 
-	function toolLib:OnAccesorySpawn(classPlayer, storageItem, newAccessoryPrefabs)
-		local accessory = newAccessoryPrefabs and newAccessoryPrefabs[1];
-		if typeof(accessory) ~= "Instance" then return end;
+	local character = classPlayer:GetCharacter();
+	
+	local accessoryHandle = accessory:WaitForChild("Handle");
+	local vehicleWearMotor = accessoryHandle:WaitForChild("VehicleWear");
 
-		local character = classPlayer:GetCharacter();
+	vehicleWearMotor.Part0 = classPlayer.RootPart;
+	vehicleWearMotor.Part1 = accessoryHandle;
+
+	local humanoid: Humanoid = classPlayer.Humanoid;
+	local animator = humanoid:WaitForChild("Animator") :: Animator;
+	
+	local conn = animator.AnimationPlayed:Connect(function(animationTrack: AnimationTrack)
+		if animationTrack.Animation.AnimationId ~= attirePackage.VehicleWearAnimationId then return end;
 		
-		local accessoryHandle = accessory:WaitForChild("Handle");
-		local vehicleWearMotor = accessoryHandle:WaitForChild("VehicleWear");
+		local accWeld;
+		for _, obj in pairs(accessoryHandle:GetChildren()) do
+			if not obj:IsA("Weld") then continue end;
+			if obj.Name == "AccessoryWeld" then
+				obj:Destroy();
+				continue;
+			end;
 
-		vehicleWearMotor.Part0 = classPlayer.RootPart;
-		vehicleWearMotor.Part1 = accessoryHandle;
+			obj.Enabled = false;
+			accWeld = obj;
+		end
+		vehicleWearMotor.Enabled = true;
 
-		local humanoid: Humanoid = classPlayer.Humanoid;
-		local animator = humanoid:WaitForChild("Animator") :: Animator;
-		
-		local conn = animator.AnimationPlayed:Connect(function(animationTrack: AnimationTrack)
-			if animationTrack.Animation.AnimationId ~= toolLib.VehicleWearAnimationId then return end;
-			
-			local accWeld;
-			for _, obj in pairs(accessoryHandle:GetChildren()) do
-				if not obj:IsA("Weld") then continue end;
-				if obj.Name == "AccessoryWeld" then
-					obj:Destroy();
-					continue;
-				end;
-
-				obj.Enabled = false;
-				accWeld = obj;
-			end
-			vehicleWearMotor.Enabled = true;
-
-			animationTrack:GetPropertyChangedSignal("IsPlaying"):Once(function()
-				accWeld.Enabled = true;
-				vehicleWearMotor.Enabled = false;
-			end)
+		animationTrack:GetPropertyChangedSignal("IsPlaying"):Once(function()
+			accWeld.Enabled = true;
+			vehicleWearMotor.Enabled = false;
 		end)
-		accessory.Destroying:Connect(function()
-			conn:Disconnect();
-			conn = nil;
-		end)
-	end
+	end)
+	accessory.Destroying:Connect(function()
+		conn:Disconnect();
+		conn = nil;
+	end)
+end
 
-	local clothing = modClothingProperties.new(toolLib);
+function attirePackage.newClass()
+	local equipmentClass = modEquipmentClass.new(attirePackage.Class, attirePackage.Configurations, attirePackage.Properties);
 
-	clothing:RegisterPlayerProperty("Sledding", {
-		Visible = false;
-
-		VehicleWear="snowsledge";
-		VehicleWearAnimationId=toolLib.VehicleWearAnimationId;
+	equipmentClass:AddModifier("Sledding", {
+		SetValues={
+			VehicleWear="snowsledge";
+			VehicleWearAnimationId=attirePackage.VehicleWearAnimationId;
+		};
 	});
 
-	return clothing;
+	return equipmentClass;
 end
 
 return attirePackage;

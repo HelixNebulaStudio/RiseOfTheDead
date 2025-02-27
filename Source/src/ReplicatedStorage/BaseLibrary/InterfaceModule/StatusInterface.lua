@@ -61,7 +61,7 @@ function Interface.init(modInterface)
 		local status = listings[key] or {};
 		listings[key] = status;
 
-		local statusData = srcTable[key];
+		local statusClass = srcTable[key];
 
 		if status.Button == nil then
 			status.Button = templateStatusItem:Clone();
@@ -75,7 +75,7 @@ function Interface.init(modInterface)
 			end)
 			status.Button.MouseButton1Click:Connect(function()
 				if modBranchConfigs.CurrentBranch.Name == "Dev" then
-					Debugger:Warn("Status id:",key,"table:", statusData);
+					Debugger:Warn("Status id:",key,"table:", statusClass);
 				end
 			end)
 			
@@ -86,32 +86,32 @@ function Interface.init(modInterface)
 			status.Title = status.Button:WaitForChild("title");
 			status.Quan = status.Button:WaitForChild("quantity");
 			
-			status.Icon.Image = lib.Icon;
-			status.Title.Text = lib.Name;
+			status.Icon.Image = lib.Icon or `rbxassetid://484211948`;
+			status.Title.Text = lib.Name or statusId;
 			status.Button.radialBar.ImageColor3 = lib.Buff and Color3.fromRGB(27, 106, 23) or Color3.fromRGB(255, 60, 60);
 		end
 		
 		
 		local alpha = 1;
-		if type(statusData) == "table" then
-			if statusData.Icon then
-				status.Icon.Image = statusData.Icon;
+		if type(statusClass) == "table" then
+			if statusClass.Icon then
+				status.Icon.Image = statusClass.Icon;
 			end
-			if statusData.IconColor then
-				status.Icon.ImageColor3 = statusData.IconColor;
+			if statusClass.IconColor then
+				status.Icon.ImageColor3 = statusClass.IconColor;
 			end
-			if statusData.Name then
-				status.Title.Text = lib.Name;
+			if statusClass.Name then
+				status.Title.Text = lib.Name or ``;
 			end
 
-			if statusData.Alpha then
-				alpha = statusData.Alpha;
+			if statusClass.Alpha then
+				alpha = statusClass.Alpha;
 
-			elseif statusData.Duration and statusData.EndTime then
-				alpha = (statusData.EndTime-smoothTime)/statusData.Duration;
+			elseif statusClass.Duration and statusClass.EndTime then
+				alpha = (statusClass.EndTime-smoothTime)/statusClass.Duration;
 				
-			elseif statusData.Duration and statusData.Expires then
-				alpha = (statusData.Expires-smoothTime)/statusData.Duration;
+			elseif statusClass.Duration and statusClass.Expires then
+				alpha = (statusClass.Expires-smoothTime)/statusClass.Duration;
 				
 			end
 		end
@@ -121,8 +121,8 @@ function Interface.init(modInterface)
 		
 		local statusVisible = true;--alpha >= 0.001;
 		
-		if typeof(statusData) == "table" then
-			if statusData.Visible == false then
+		if typeof(statusClass) == "table" then
+			if statusClass.Visible == false then
 				statusVisible = false;
 			end
 		end
@@ -130,7 +130,7 @@ function Interface.init(modInterface)
 		status.Button.Visible = statusVisible;
 		
 		if lib.QuantityLabel then
-			local stat = statusData[lib.QuantityLabel];
+			local stat = statusClass[lib.QuantityLabel];
 			local str = stat;
 			local v = tonumber(stat);
 			
@@ -148,24 +148,26 @@ function Interface.init(modInterface)
 		end
 		
 		local descStr = lib.Description;
-		if type(statusData) == "table" then
-			if statusData.Duration and statusData.Expires then
-				local timeRatio = (statusData.Expires-smoothTime)/statusData.Duration;
-				descStr = descStr.. " ("..modSyncTime.ToString(timeRatio * statusData.Duration)..")";
+		if descStr then
+			if type(statusClass) == "table" then
+				if statusClass.Duration and statusClass.Expires then
+					local timeRatio = (statusClass.Expires-smoothTime)/statusClass.Duration;
+					descStr = descStr.. " ("..modSyncTime.ToString(timeRatio * statusClass.Duration)..")";
+					
+				end
 				
-			end
-			
-			for k, v in pairs(statusData) do
-				if typeof(v) == "string" or typeof(v) == "number" then
-					if lib.DescProcess and lib.DescProcess[k] then
-						v = lib.DescProcess[k](v);
+				for k, v in pairs(statusClass) do
+					if typeof(v) == "string" or typeof(v) == "number" then
+						if lib.DescProcess and lib.DescProcess[k] then
+							v = lib.DescProcess[k](v);
+						end
+						descStr = descStr:gsub("$"..k, v);
 					end
-					descStr = descStr:gsub("$"..k, v);
 				end
 			end
+			
+			status.Info.Text = descStr;
 		end
-		
-		status.Info.Text = descStr;
 	end
 	
 	Interface.Garbage:Tag(RunService.Heartbeat:Connect(function()
@@ -187,7 +189,10 @@ function Interface.init(modInterface)
 		if classPlayer.Properties.HealSources then
 			for id, src in pairs(classPlayer.Properties.HealSources) do
 				local lib = modStatusLibrary:Find(id);
-				if lib then
+				if lib == nil then continue end;
+
+				local showStatus = lib.ShowOnHud ~= false or localplayer:GetAttribute("ShowHiddenStatus") == true;
+				if showStatus then
 					destroy[id] = false;
 					newStatus(lib, classPlayer.Properties.HealSources, id);
 				end
@@ -203,7 +208,10 @@ function Interface.init(modInterface)
 			end
 
 			local lib = modStatusLibrary:Find(statusId);
-			if lib then
+			if lib == nil then continue end;
+
+			local showStatus = lib.ShowOnHud ~= false or localplayer:GetAttribute("ShowHiddenStatus") == true;
+			if showStatus then
 				destroy[key] = false;
 				newStatus(lib, classPlayer.Properties, key);
 			end

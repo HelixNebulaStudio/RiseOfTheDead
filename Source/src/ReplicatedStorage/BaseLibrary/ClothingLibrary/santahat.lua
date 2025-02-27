@@ -1,23 +1,28 @@
-local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
-
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
 local attirePackage = {
-	GroupName="HeadGroup";
-}
-
-function attirePackage.NewToolLib(handler)
-	local toolLib = {};
-
-	toolLib.Warmth = 1;
-	toolLib.HasFlinchProtection = true;
+	ItemId=script.Name;
+	Class="Clothing";
 	
-	local clothing = modClothingProperties.new(toolLib);
+	GroupName="HeadGroup";
+	
+	Configurations={
+		Warmth = 1;
+		HasFlinchProtection = true;
+	};
+	Properties={};
+};
 
-	clothing:RegisterPlayerProperty("ColoredGifts", {
-		Default="red";
-		Visible = false;
+function attirePackage.newClass()
+	local equipmentClass = modEquipmentClass.new(attirePackage.Class, attirePackage.Configurations, attirePackage.Properties);
+
+	equipmentClass:AddModifier("ColoredGifts", {
+		SetValues={
+			Default="red";
+		};
 	});
 
-	return clothing;
+	return equipmentClass;
 end
 
 return attirePackage;

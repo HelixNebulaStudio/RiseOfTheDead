@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modItemModProperties = require(game.ReplicatedStorage.Library.ItemModsLibrary.ItemModProperties);
 local itemMod = modItemModProperties.new();
 
-local modWeaponsAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
+local modWeaponAttributes = require(game.ReplicatedStorage.Library.Weapons.WeaponAttributes);
 
 function itemMod.Activate(packet)
 	local module = packet.WeaponModule;
@@ -18,7 +18,7 @@ function itemMod.Activate(packet)
 	local ammoLimit = module.Configurations.AmmoLimit;
 
 	module.Configurations.MaxAmmoLimit = module.Configurations.MaxAmmoLimit + math.ceil(ammoLimit * value);
-	module.Configurations.TriggerMode = modWeaponsAttributes.TriggerModes.Automatic;
+	module.Configurations.TriggerMode = modWeaponAttributes.TriggerModes.Automatic;
 end
 
 return itemMod;

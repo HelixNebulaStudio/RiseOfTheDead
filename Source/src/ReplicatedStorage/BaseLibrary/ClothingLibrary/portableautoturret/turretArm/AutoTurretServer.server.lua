@@ -6,7 +6,7 @@ repeat task.wait() until shared.MasterScriptInit == true;
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modDamagable = require(game.ReplicatedStorage.Library.Damagable);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
+local modWeaponAttributes = require(game.ReplicatedStorage.Library.Weapons.WeaponAttributes);
 local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
 local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
@@ -368,7 +368,7 @@ function TurretRuntime(weaponStorageItem)
 		configurations.InfiniteAmmo = profile.InfAmmo;
 	end
 
-	if configurations.ReloadMode == modAttributes.ReloadModes.Single and targetModel == nil and (itemValues.MA or 1) > 0 then
+	if configurations.ReloadMode == modWeaponAttributes.ReloadModes.Single and targetModel == nil and (itemValues.MA or 1) > 0 then
 		tryReload = itemValues.A and itemValues.A < configurations.AmmoLimit;
 	end
 

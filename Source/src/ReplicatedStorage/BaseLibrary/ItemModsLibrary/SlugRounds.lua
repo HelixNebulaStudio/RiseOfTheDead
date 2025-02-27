@@ -14,7 +14,7 @@ function itemMod.Activate(packet)
 	end
 	
 	local baseDamage = module.Configurations.BaseDamage;
-	local baseInaccuracy = module.Configurations.BaseInaccuracy;
+	local baseInaccuracy = module.Configurations.StandInaccuracy;
 	local baseMultishot = module.Properties.BaseMultishot;
 	local maxShots = baseMultishot and baseMultishot.Max or 1;
 

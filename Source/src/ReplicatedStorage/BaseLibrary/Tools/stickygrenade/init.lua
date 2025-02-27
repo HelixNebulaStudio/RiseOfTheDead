@@ -6,7 +6,11 @@ local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass)
 local toolPackage = {
 	ItemId=script.Name;
 	Class="Tool";
+<<<<<<< HEAD
 	HandlerType="Throwable";
+=======
+	HandlerType="ThrowableTool";
+>>>>>>> b7050963ccc669ec5ee00093af9741966adc936a
 
 	Animations={
 		Core={Id=5069636743;};
@@ -40,7 +44,11 @@ local toolPackage = {
 };
 
 function toolPackage.newClass()
+<<<<<<< HEAD
 	return modEquipmentClass.new(toolPackage.Class);
+=======
+	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
+>>>>>>> b7050963ccc669ec5ee00093af9741966adc936a
 end
 
 return toolPackage;

@@ -1,20 +1,25 @@
-local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
-
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+--==
 local attirePackage = {
+	ItemId=script.Name;
+	Class="Clothing";
+	
 	GroupName="HeadGroup";
 	HideFacewear=true;
-}
-
-function attirePackage.NewToolLib(handler)
-	local toolLib = {};
-
-	toolLib.UnderwaterVision = 0.06;
-	toolLib.HasFlinchProtection = true;
-
-	local clothing = modClothingProperties.new(toolLib);
-	clothing:RegisterPlayerProperty("NightVision", true);
 	
-	return clothing;
+	Configurations={
+		HasFlinchProtection = true;
+		UnderwaterVision = 0.06;
+	};
+	Properties={};
+};
+
+function attirePackage.newClass()
+	local equipmentClass = modEquipmentClass.new(attirePackage.Class, attirePackage.Configurations, attirePackage.Properties);
+
+	equipmentClass:AddModifier("NightVision");
+
+	return equipmentClass;
 end
 
 return attirePackage;

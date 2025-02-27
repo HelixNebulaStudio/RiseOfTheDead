@@ -5,7 +5,6 @@ local itemMod = modItemModProperties.new();
 
 local RunService = game:GetService("RunService");
 
-local modWeaponsAttributes = require(game.ReplicatedStorage.Library.WeaponsAttributes);
 local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
 local modMath = require(game.ReplicatedStorage.Library.Util.Math);
 local modAudio = require(game.ReplicatedStorage.Library.Audio);

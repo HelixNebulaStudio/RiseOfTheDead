@@ -39,11 +39,19 @@ local toolPackage = {
 
 		BulletEject="PistolBullet";
 		BulletEjectOffset=CFrame.Angles(math.rad(-90), 0, 0);
+<<<<<<< HEAD
 		
 		-- Stats
 		Damage=200;
 		PotentialDamage=22200;
 		
+=======
+		
+		-- Stats
+		Damage=200;
+		PotentialDamage=22200;
+		
+>>>>>>> b7050963ccc669ec5ee00093af9741966adc936a
 		MagazineSize=1;
 		AmmoCapacity=16;
 	
@@ -58,6 +66,7 @@ local toolPackage = {
 		FocusInaccuracyReduction=0.5;
 		CrouchInaccuracyReduction=0.6;
 		MovingInaccuracyScale=1.3;
+<<<<<<< HEAD
 
 		-- Projectile
 		ProjectileId="arrow";
@@ -123,6 +132,83 @@ local toolPackage = {
 		end;
 	};
 };
+=======
+
+		-- Projectile
+		ProjectileId="arrow";
+
+		-- Focus
+		CanUnfocusFire=false;
+		FocusDuration=4;
+		FocusWalkSpeedReduction=0.55;
+		ChargeDamagePercent=1;
+
+		-- Recoil
+		XRecoil=0.0;
+		YRecoil=0.0;
+		-- Dropoff
+		DamageDropoff={
+			MinDistance=100;
+			MaxDistance=200;
+		};
+		-- UI
+		UISpreadIntensity=4;
+		-- Body
+		RecoilStregth=math.rad(0);
+		-- Penetration
+		Penetration=modWeaponAttributes.PenetrationTable.Pistol;
+		-- Physics
+		KillImpulseForce=5;
+		-- Effects
+		GeneratesBulletHoles=true;
+		GenerateBloodEffect=true;
+		GenerateTracers=false;
+		GenerateMuzzle=false;
+	};
+
+	Properties={};
+};
+
+function toolPackage.OnPrimaryFire(handler: ToolHandlerInstance)
+	local weaponModel = handler.Prefabs[1];
+	local equipmentClass = handler.EquipmentClass;
+
+	local arrow = weaponModel:FindFirstChild("Arrow");
+	if arrow then
+		arrow.Transparency = 1;
+		delay(0.5, function()
+			equipmentClass.Properties.OnAmmoUpdate(weaponModel, equipmentClass);
+		end)
+	end
+end
+
+function toolPackage.OnAmmoUpdate(handler: ToolHandlerInstance)
+	local weaponModel = handler.Prefabs[1];
+	local equipmentClass = handler.EquipmentClass;
+
+	local properties = equipmentClass.Properties;
+	local arrow = weaponModel:FindFirstChild("Arrow");
+	
+	if arrow and properties.Ammo and properties.MaxAmmo then
+		arrow.Transparency = (properties.MaxAmmo <= 0 and properties.Ammo <= 0) and 1 or 0;
+	end
+end
+
+function toolPackage.CustomDpsCal(handler: ToolHandlerInstance)
+	local equipmentClass = handler.EquipmentClass;
+
+	local dmg = equipmentClass.Configurations.Damage;
+	local focusTime = equipmentClass.Configurations.FocusDuration;
+	local reloadspeed = equipmentClass.Properties.ReloadSpeed;
+	
+	return dmg/focusTime;--math.max(focusTime, reloadspeed);
+end
+
+function toolPackage.CustomDpmCal(handler: ToolHandlerInstance)
+	return;
+end
+
+>>>>>>> b7050963ccc669ec5ee00093af9741966adc936a
 
 function toolPackage.newClass()
 	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);

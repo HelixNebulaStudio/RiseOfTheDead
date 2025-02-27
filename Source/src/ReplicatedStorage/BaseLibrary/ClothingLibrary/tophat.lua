@@ -1,18 +1,22 @@
-local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
+local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
 local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-
+--==
 local attirePackage = {
+	ItemId=script.Name;
+	Class="Clothing";
+	
 	GroupName="HeadGroup";
-}
+	
+	Configurations={
+		Slaughterfest=modConfigurations.SpecialEvent.Halloween;
+		Warmth = -1;
+		HasFlinchProtection = true;
+	};
+	Properties={};
+};
 
-function attirePackage.NewToolLib(handler)
-	local toolLib = {};
-
-	toolLib.Slaughterfest=modConfigurations.SpecialEvent.Halloween;
-	toolLib.Warmth = -1;
-	toolLib.HasFlinchProtection = true;
-
-	return modClothingProperties.new(toolLib);
+function attirePackage.newClass()
+	return modEquipmentClass.new(attirePackage.Class, attirePackage.Configurations, attirePackage.Properties);
 end
 
 return attirePackage;

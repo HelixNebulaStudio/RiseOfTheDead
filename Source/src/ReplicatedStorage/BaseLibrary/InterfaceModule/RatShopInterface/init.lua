@@ -448,24 +448,23 @@ function Interface.init(modInterface)
 			end
 
 			local itemLib = modItemsLibrary:Find(selectedItem.ItemId);
-			local weaponInfo = modData:GetItemClass(storageItemID);
-			modData.OnAmmoUpdate:Fire(storageItemID);
+
+			local equipmentClass = shared.modPlayerEquipment.getEquipmentClass(storageItemID);
 			
-			--==
-			if weaponInfo and weaponInfo.OnShopSelect then
-				weaponInfo:OnShopSelect(Interface, selectedItem);
+			if equipmentClass and equipmentClass.Properties.OnShopSelect then
+				equipmentClass.Properties:OnShopSelect(Interface, selectedItem);
 			end
 
 			local localplayerStats = modData.GetStats();
 
 			--== MARK: Ammo
-			local hasAmmoData = (weaponInfo and ((selectedItem.Values.A and selectedItem.Values.A < weaponInfo.Configurations.AmmoLimit)
-				or (selectedItem.Values.MA and selectedItem.Values.MA < weaponInfo.Configurations.MaxAmmoLimit)));
+			local hasAmmoData = (equipmentClass and ((selectedItem.Values.A and selectedItem.Values.A < equipmentClass.Configurations.MagazineSize)
+				or (selectedItem.Values.MA and selectedItem.Values.MA < equipmentClass.Configurations.AmmoCapacity)));
 			
 			if hasAmmoData then
 				local ammoCurrency = modShopLibrary.AmmunitionCurrency or "Money";
 				local localplayerCurrency = localplayerStats and localplayerStats[ammoCurrency] or 0;
-				local price, mags = modShopLibrary.CalculateAmmoPrice(selectedItem.ItemId, selectedItem.Values, weaponInfo.Configurations, localplayerCurrency, modData.Profile.Punishment == modGlobalVars.Punishments.AmmoCostPenalty);
+				local price, mags = modShopLibrary.CalculateAmmoPrice(selectedItem.ItemId, selectedItem.Values, equipmentClass.Configurations, localplayerCurrency, modData.Profile.Punishment == modGlobalVars.Punishments.AmmoCostPenalty);
 
 				Interface.NewListing(function(newListing)
 					newListing.Name = "AmmoRefillOption";
@@ -495,8 +494,6 @@ function Interface.init(modInterface)
 						
 						local serverReply = localplayerStats and (localplayerStats[ammoCurrency] or 0) >= price and remoteShopService:InvokeServer("buyammo", {StoreObj=Interface.Object;}, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
 						if serverReply == modShopLibrary.PurchaseReplies.Success then
-							modData.OnAmmoUpdate:Fire(storageItemID);
-							
 							RunService.Heartbeat:Wait();
 							newListing:Destroy();
 

@@ -84,6 +84,7 @@ local toolPackage = {
 		GenerateMuzzle=false;
 	};
 
+<<<<<<< HEAD
 	Properties={
 		OnPrimaryFire = function(weaponModel, equipmentClass)
 			local arrow = weaponModel:FindFirstChild("Arrow");
@@ -106,6 +107,34 @@ local toolPackage = {
 	};
 };
 
+=======
+	Properties={};
+};
+
+function toolPackage.OnPrimaryFire(handler: ToolHandlerInstance)
+	local weaponModel = handler.Prefabs[1];
+	local arrow = weaponModel:FindFirstChild("Arrow");
+	if arrow then
+		arrow.Transparency = 1;
+		delay(0.5, function()
+			toolPackage.OnAmmoUpdate(handler);
+		end)
+	end
+end
+
+function toolPackage.OnAmmoUpdate(handler: ToolHandlerInstance)
+	local weaponModel = handler.Prefabs[1];
+	local equipmentClass = handler.EquipmentClass;
+
+	local properties = equipmentClass.Properties;
+	local arrow = weaponModel:FindFirstChild("Arrow");
+	
+	if arrow and properties.Ammo and properties.MaxAmmo then
+		arrow.Transparency = (properties.MaxAmmo <= 0 and properties.Ammo <= 0) and 1 or 0;
+	end
+end
+
+>>>>>>> b7050963ccc669ec5ee00093af9741966adc936a
 function toolPackage.newClass()
 	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
 end
