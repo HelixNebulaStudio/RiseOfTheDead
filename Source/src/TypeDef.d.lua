@@ -45,6 +45,21 @@ export type GarbageHandler = {
     Destruct: () -> nil;
 }
 
+--MARK: EventSignal
+export type EventSignal = {
+	Name: string?;
+	Functions: {[number]: (...any)->(...any)};
+} & {
+    new: (name: string?) -> EventSignal;
+    Fire: (self: EventSignal, ...any) -> nil;
+    Wait: (self: EventSignal, timeOut: number?) -> ...any;
+    Connect: (self: EventSignal, func: (...any) -> ...any) -> (() -> nil);
+    Disconnect: (self: EventSignal, func: any) -> nil;
+    Once: (self: EventSignal, func: (...any)-> ...any) -> (() -> nil);
+    Destroy: (self: EventSignal) -> nil;
+    DisconnectAll: (self: EventSignal) -> nil;
+};
+
 --MARK: Profiles
 export type Profiles = {
     Get: (self: Profiles, player: Player) -> Profile;
@@ -101,35 +116,77 @@ export type StorageItem = {
     Values: {[string]: any};
 }
 
-
 --MARK: PlayerClass
 export type PlayerClasses = {
     Get: (Player) -> PlayerClass;
 };
 
 export type PlayerClass = {
+    Name: string;
     Character: Model;
     Humanoid: Humanoid;
     RootPart: BasePart;
     Head: BasePart;
 
     IsAlive: boolean;
+    IsUnderWater: boolean;
+    IsSwimming: boolean;
 
+    Health: number;
+    MaxHealth: number;
+
+    MaxOxygen: number;
+
+    CharacterModule: {[any]: any};
     Configurations: ConfigVariable;
     Properties: {[any]: any};
 
     LastDamageTaken: number;
     LastDamageDealt: number;
     LastArmorDamageTaken: number;
+    LastHealed: number;
 
+    LowestFps: number;
+    AverageFps: number;
+
+    IsTeleporting: boolean;
+    TeleportPlaceId: number;
+
+    Invisible: boolean;
+    CurrentState: Enum.HumanoidStateType;
+
+    OnDamageTaken: EventSignal;
+    OnHealthChanged: EventSignal;
+    OnIsAliveChanged: EventSignal;
+    OnCharacterSpawn: EventSignal;
+    Died: EventSignal;
+
+    Spawn: (self: PlayerClass) -> nil;
+    Kill: (self: PlayerClass, reason: string?) -> nil;
     GetInstance: (self: PlayerClass) -> Player;
     SetProperties: (self: PlayerClass, key: string, value: any) -> nil;
+    SyncProperty: (self: PlayerClass, key: string) -> nil;
+    GetCFrame: (self: PlayerClass) -> CFrame;
 
     GetStatus: (self: PlayerClass, statusId: string) -> StatusClass;
     SyncStatus: (self: PlayerClass, statusId: string) -> nil;
     ListStatus: (self: PlayerClass) -> {StatusClass};
 
-    SetHealSource: (self: PlayerClass, healId: string, packet: {[any]: any}) -> nil;
+    TakeDamagePackage: (self: PlayerClass, damageSource: DamageSource) -> nil;
+    SetHealSource: (self: PlayerClass, srcId: string?, packet: ({[any]: any})?) -> nil;
+    SetArmorSource: (self: PlayerClass, srcId: string?, packet: ({[any]: any})?) -> nil;
+    RefreshHealRate: (self: PlayerClass) -> nil;
+
+    GetEquippedTools: (self: PlayerClass) -> {ItemId: string};
+    UnequipTools: (self: PlayerClass) -> nil;
+
+    SyncIsAlive: (self: PlayerClass) -> nil;
+    OnConfigurationsCalculate: (self: PlayerClass) -> nil;
+    OnNotIsAlive: (self: PlayerClass, func: (character: Model)-> nil) -> nil;
+
+    OnDeathServer: (self: PlayerClass)->nil;
+    OnCharacterAdded: (character: Model)->nil;
+    OnPlayerTeleport: ()->nil;
 }
 
 
@@ -242,10 +299,32 @@ export type ToolAnimator = {
 
 --MARK: ConfigVariable
 export type ConfigVariable = {
-    Modifiers: {ItemModifierInstance};
-    Calculate: (self: ConfigVariable, baseValues: {any}, modifiers: {any}, finalValues: {any}) -> {any};
+    BaseValues: {[any]: any};
+    FinalValues: {[any]: any};
+    Modifiers: {ConfigModifier};
+    GetKeyPairs: (self: ConfigVariable) -> {[any]: any};
+
+    Calculate: (self: ConfigVariable, baseValues: {any}?, modifiers: {any}?, finalValues: {any}?) -> {any};
+
+    GetModifier: (self: ConfigVariable, id: string) -> (number?, ConfigModifier?);
+    AddModifier: (self: ConfigVariable, modifier: ConfigModifier, recalculate: boolean?) -> nil;
+    RemoveModifier: (self: ConfigVariable, id: string, recalculate: boolean?) -> ConfigModifier?;
+
+    newModifier: (id: string) -> ConfigModifier;
+
+    [string]: any;
 };
 
+export type ConfigModifier = {
+    Id: string;
+    Priority: number;
+
+    SetValues: {[any]: any};
+    SumValues: {[any]: any};
+    ProductValues: {[any]: any};
+    MaxValues: {[any]: any};
+    MinValues: {[any]: any};
+};
 
 --MARK: EquipmentClass
 export type EquipmentClass = {
@@ -256,6 +335,7 @@ export type EquipmentClass = {
     Configurations: ConfigVariable;
     Properties: {[any]: any};
 
+    Update: (self: EquipmentClass, storageItem: StorageItem?) -> nil;
     [any]: any;
 };
 
@@ -277,11 +357,23 @@ export type CommandsLibrary = {
         Description: string;
         RequiredArgs: number?;
         UsageInfo: string?;
-        Function: (speaker: Player, args: {any}) -> boolean;
+        Function: ((speaker: Player, args: {any}) -> boolean)?;
+        ClientFunction: ((speaker: Player, args: {any}) -> boolean)?;
     }) -> nil;
 };
 
 --MARK: ItemModifier
+export type ItemModsLibrary = {
+    calculateLayer: (itemModifier: ItemModifier, upgradeKey: string) -> {[any]: any};
+};
+
+export type ItemModifier = {
+    ClassName: string;
+    Library: ItemModsLibrary;
+
+    Update: (self: ItemModifierInstance) -> nil;
+};
+
 export type ItemModifierInstance = {
     Script: ModuleScript;
 
@@ -295,7 +387,7 @@ export type ItemModifierInstance = {
     EquipmentClass: EquipmentClass?;
     EquipmentStorageItem: StorageItem?;
     ItemModStorageItem: StorageItem?;
-};
+} & ConfigModifier;
 
 --MARK: PlayerEquipment
 export type PlayerEquipment = {
@@ -304,4 +396,11 @@ export type PlayerEquipment = {
 
     getItemModifier: (siid: string, player: Player) -> ItemModifierInstance;
     setItemModifier: (modifierId: string, itemModifier: ItemModifierInstance, player: Player) -> nil;
+};
+
+--MARK: DamageSource
+export type DamageSource = {
+    Damage: number;
+    TargetPart: BasePart;
+    DamageType: string;
 };

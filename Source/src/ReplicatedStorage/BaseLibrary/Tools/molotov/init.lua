@@ -14,25 +14,23 @@ local toolPackage = {
 		Throw={Id=5075441987};
 	};
 	Audio={
-		Charge={Id=5082994235; Pitch=1; Volume=1;};
-		ProjectileBounce={Id=5082995723; Pitch=1; Volume=1;};
+		Charge={Id=5088355920; Pitch=1; Volume=1;};
+		ProjectileBounce={Id=5088356214; Pitch=1; Volume=1;};
 		Throw={Id=5083063763; Pitch=1; Volume=1;};
-	};
-	
+    };
+    
 	Configurations={
-		ExplosionRadius = 35;
-		DamageRatio = 0.1;
-		MinDamage = 200;
+		Damage = 5;
 		
-		Velocity = 160;
-		ProjectileBounce = 0;
-		ChargeDuration = 0.7;
-		VelocityBonus = 40;
+		Velocity = 140;
+		ChargeDuration = 1;
+		VelocityBonus = 60;
 		
 		--== Projectile
-		ProjectileId = "stickyGrenade";
-		ProjectileLifeTime = 20;
-		DetonateTimer = 3;
+		ProjectileId = "molotov";
+		ProjectileLifeTime = 30;
+		ProjectileBounce = 0;
+		IgnoreWater=false;
 		
 		ConsumeOnThrow=true;
 	};

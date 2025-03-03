@@ -26,13 +26,13 @@ local remoteUseStorageItem = modRemotesManager:Get("UseStorageItem");
 local remoteToggleClothing = modRemotesManager:Get("ToggleClothing");
 
 --== Script;
-local BodyEquipmentStats = {
+local CharacterConfigurations = {
 	-- Defensive;
-	["ModArmorPoints"] = function(bodyEquips, k)
+	["ArmorPoints"] = function(bodyEquips, k)
 		local value = bodyEquips[k];
 		return {SortKey="AAProtectArmor"; Text=`<b>Armor Points:</b> {value} AP`;}
 	end;
-	["ModHealthPoints"] = function(bodyEquips, k)
+	["HealthPoints"] = function(bodyEquips, k)
 		local value = bodyEquips[k];
 		return {SortKey="AAProtectHealth"; Text=`<b>Health Points:</b> {value} HP`;}
 	end;
@@ -494,17 +494,15 @@ function Interface.init(modInterface)
 	until classPlayer.Humanoid ~= nil;
 	local humanoid = classPlayer.Humanoid;
 	
-	local function updateBodyEquipments()
+	local function listCharacterConfigurations()
 		local classPlayer = shared.modPlayers.Get(localPlayer);
-		local playerBodyEquipments = classPlayer.Properties and classPlayer.Properties.BodyEquipments;
-		if playerBodyEquipments == nil then return end;
-		
+		local configurations = classPlayer.Configurations;
+
 		local label = bodyEquipmentsFrame:WaitForChild("label");
 		local beStr = {};
 
-		for k, v in pairs(playerBodyEquipments) do
-			
-			if k == "Warmth" and playerBodyEquipments.Warmth then
+		for k, v in pairs(configurations) do
+			if k == "Warmth" and configurations.Warmth then
 				local warmth = humanoid and humanoid:GetAttribute("Warmth") or 25;
 				table.insert(beStr, {SortKey="Warmth"; Text=`<b>Warmth:</b> {warmth} °C`;});
 
@@ -513,8 +511,8 @@ function Interface.init(modInterface)
 					table.insert(beStr, {SortKey="ZZPassive"; Text=`<b>+ Passive</b> {activePassive}`;});
 				end
 
-			elseif BodyEquipmentStats[k] then
-				table.insert(beStr, BodyEquipmentStats[k](playerBodyEquipments, k));
+			elseif CharacterConfigurations[k] then
+				table.insert(beStr, CharacterConfigurations[k](configurations, k));
 				
 			end
 		end
@@ -609,7 +607,7 @@ function Interface.init(modInterface)
 		temperatureLabel.Text = "Env: "..(workspace:GetAttribute("GlobalTemperature") or 25).."°C"; 
 	end));
 	Interface.Garbage:Tag(temperatureLabel.MouseLeave:Connect(updateWarmth));
-	Interface.Garbage:Tag(bodyEquipmentsFrame:GetPropertyChangedSignal("Visible"):Connect(updateBodyEquipments));
+	Interface.Garbage:Tag(bodyEquipmentsFrame:GetPropertyChangedSignal("Visible"):Connect(listCharacterConfigurations));
 	
 	toggleClothingButton.MouseButton1Click:Connect(function()
 		Interface:PlayButtonClick();

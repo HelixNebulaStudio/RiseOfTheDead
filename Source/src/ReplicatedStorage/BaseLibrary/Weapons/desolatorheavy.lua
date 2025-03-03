@@ -32,90 +32,6 @@ local toolPackage = {
 		BulletMode=modWeaponAttributes.BulletModes.Hitscan;
 		TriggerMode=modWeaponAttributes.TriggerModes.SpinUp;
 		ReloadMode=modWeaponAttributes.ReloadModes.Full;
-<<<<<<< HEAD
-		
-		AmmoType="heavyammo";
-
-		BulletEject="ChainHeavyBullet";
-		BulletEjectOffset=CFrame.Angles(math.rad(-90), 0, 0);
-		
-		-- Stats
-		Damage=30;
-		PotentialDamage=684;
-		
-		MagazineSize=128;
-		AmmoCapacity=(128*3);
-	
-		Rpm=400;
-		ReloadTime=5;
-		Multishot=1;
-		RapidFire=12;
-
-		HeadshotMultiplier=0.05;
-		EquipLoadTime=1.5;
-
-		StandInaccuracy=18.5;
-		FocusInaccuracyReduction=0.5;
-		CrouchInaccuracyReduction=0.5;
-		MovingInaccuracyScale=3;
-		InaccDecaySpeed=3;
-
-		-- Spin
-		SpinUpTime = 4;
-		SpinDownTime = 2;
-		FullSpinInaccuracyChange=-14;
-		SpinAndFire = true;
-
-		-- Focus
-		FocusWalkSpeedReduction=0.5;
-		
-		-- Recoil
-		XRecoil=0.02;
-		YRecoil=0.06;
-		-- Dropoff
-		DamageDropoff={
-			MinDistance=192;
-			MaxDistance=256;
-		};
-		-- UI
-		UISpreadIntensity=6;
-		-- Body
-		RecoilStregth=math.rad(90);
-		-- Penetration
-		Penetration=modWeaponAttributes.PenetrationTable["Heavy machine gun"];
-		-- Physics
-		KillImpulseForce=5;
-	};
-
-	Properties={
-		OnReloadAnimation=function(weaponModel, track)
-			delay(2,function()
-				pcall(function()
-					for a=1, 9 do
-						weaponModel["Bullet0"..a].Transparency = 0;
-					end
-				end)
-			end)
-		end;
-		
-		OnAmmoUpdate = function(weaponModel, equipmentClass, ammo)
-			local properties = equipmentClass.Properties;
-			
-			if ammo and ammo <= 10 then
-				pcall(function()
-					for a=1, 9 do
-						weaponModel["Bullet0"..a].Transparency = (ammo >= 10-a) and 0 or 1;
-					end
-				end)
-			end
-		end;
-
-		OnPrimaryFire = function(weaponModel, equipmentClass)
-			equipmentClass.Properties.OnAmmoUpdate(weaponModel, equipmentClass);
-		end
-	};
-};
-=======
 		
 		AmmoType="heavyammo";
 
@@ -203,7 +119,6 @@ end;
 function toolPackage.OnPrimaryFire(handler: ToolHandlerInstance)
 	toolPackage.OnAmmoUpdate(handler);
 end
->>>>>>> b7050963ccc669ec5ee00093af9741966adc936a
 
 function toolPackage.newClass()
 	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);

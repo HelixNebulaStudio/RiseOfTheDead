@@ -1,23 +1,14 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---=
-local modItemModProperties = require(game.ReplicatedStorage.Library.ItemModsLibrary.ItemModProperties);
-local itemMod = modItemModProperties.new();
+--==
+local modItemModifierClass = require(game.ReplicatedStorage.Library.ItemModifierClass);
 
-function itemMod.Activate(packet)
-	local module = packet.WeaponModule;
-	local storageItem = packet.ModStorageItem;
+local ItemModifier: ItemModifier = modItemModifierClass.new(script);
 
-	local layerInfo = itemMod.Library.GetLayer("HP", packet);
-	local value, tweakVal = layerInfo.Value, layerInfo.TweakValue;
-	
-	if tweakVal then
-		value = value + tweakVal;
-	end
-	
-	local info = itemMod.Library.Get(storageItem.ItemId);
-	if module:RegisterTypes(info, storageItem) then return end;
-	
-	module.ModHealthPoints = (module.BaseHealthPoints or 0) + value;
+function ItemModifier:Update()
+	local layerInfo = ItemModifier.Library.calculateLayer(self, "HP");
+	local value = layerInfo.Value;
+
+	self.SumValues.HealthPoints = value;
 end
 
-return itemMod;
+return ItemModifier;

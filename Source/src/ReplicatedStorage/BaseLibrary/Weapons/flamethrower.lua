@@ -55,7 +55,6 @@ local toolPackage = {
 		Rpm=600;
 		ReloadTime=5;
 		Multishot=1;
-<<<<<<< HEAD
 
 		HeadshotMultiplier=0.5;
 		EquipLoadTime=1.2;
@@ -71,23 +70,6 @@ local toolPackage = {
 		-- Projectile
 		ProjectileId="liquidFlame";
 
-=======
-
-		HeadshotMultiplier=0.5;
-		EquipLoadTime=1.2;
-
-		StandInaccuracy=4;
-		FocusInaccuracyReduction=1;
-		CrouchInaccuracyReduction=1;
-		MovingInaccuracyScale=2;
-
-		-- Focus
-		FocusWalkSpeedReduction=0.6;
-
-		-- Projectile
-		ProjectileId="liquidFlame";
-
->>>>>>> b7050963ccc669ec5ee00093af9741966adc936a
 		-- Recoil
 		XRecoil=0.01;
 		YRecoil=0.02;
@@ -111,61 +93,6 @@ local toolPackage = {
 		GenerateMuzzle=false;
 	};
 
-<<<<<<< HEAD
-	Properties={
-		PrimaryFireAudio=function(file, state)
-			local TweenService = game:GetService("TweenService");
-
-			local tween = nil;
-			if file ~= nil then
-				if state == 1 then
-					file.Volume = 0;
-					tween = TweenService:Create(file, TweenInfo.new(0.2, Enum.EasingStyle.Linear), {Volume=1;});
-					tween:Play();
-				elseif state == 2 then
-					file.Volume = 1;
-					tween = TweenService:Create(file, TweenInfo.new(0.5, Enum.EasingStyle.Linear), {Volume=0;});
-					tween:Play();
-					tween.Completed:Connect(function()
-						game.Debris:AddItem(file, 0);
-					end)
-				end
-			end
-
-			return tween;
-		end;
-		
-		OnMarkerEvent=function(weaponModel, animationId, markerValue)
-			if animationId == "Reload" then
-				local mainModel = weaponModel.Right;
-				
-				if markerValue == "Detach gastank" and mainModel then
-					mainModel.Magazine.Particle.GasParticle:Emit(10);
-					task.wait();
-					mainModel.Magazine.Particle.GasParticle:Emit(10);
-					task.wait();
-					mainModel.Magazine.Particle.GasParticle:Emit(6);
-					task.wait();
-					mainModel.Magazine.Particle.GasParticle:Emit(4);
-				end
-			end
-		end;
-	
-		OnAmmoUpdate = function(weaponModel, equipmentClass, ammo)
-			local configurations = equipmentClass.Configurations;
-			local properties = equipmentClass.Properties;
-			
-			local magSize = configurations.MagazineSize;
-			
-			local pointerAtt = weaponModel.Pointer.PointerAtt;
-			
-			local ratio = math.clamp(ammo/magSize, 0, 1);
-			pointerAtt.CFrame = CFrame.new(0, 0, -0.049) * CFrame.Angles(0, math.rad((ratio * 180)-90), 0);
-		end;
-	};
-};
-
-=======
 	Properties={};
 };
 
@@ -225,7 +152,6 @@ function toolPackage.OnAmmoUpdate(handler: ToolHandlerInstance)
 end
 
 
->>>>>>> b7050963ccc669ec5ee00093af9741966adc936a
 function toolPackage.newClass()
 	return modEquipmentClass.new(toolPackage.Class, toolPackage.Configurations, toolPackage.Properties);
 end
