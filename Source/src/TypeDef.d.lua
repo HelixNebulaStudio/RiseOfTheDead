@@ -1,4 +1,5 @@
 type notifyTypes = "Inform" | "Positive" | "Negative" | "Reward" | "Message" | "Important";
+export type anydict = {[any]: any};
 
 --MARK: shared
 declare shared: {
@@ -39,10 +40,10 @@ export type GarbageHandler = {
     Trash: {[any]:any};
     new: () -> GarbageHandler;
 
-    Tag: (item: any) -> nil;
-    Untag: (item: any) -> nil;
-    Loop: (loopFunc: ((index: number, trash: any) -> boolean?) ) -> nil;
-    Destruct: () -> nil;
+    Tag: (self:GarbageHandler, item: any) -> nil;
+    Untag: (self:GarbageHandler, item: any) -> nil;
+    Loop: (self:GarbageHandler, loopFunc: ((index: number, trash: any) -> boolean?) ) -> nil;
+    Destruct: (self:GarbageHandler) -> nil;
 }
 
 --MARK: EventSignal
@@ -114,26 +115,21 @@ export type StorageItem = {
     Player: Player;
     Library: {[string]: any};
     Values: {[string]: any};
+    Quantity: number;
 }
+
 
 --MARK: PlayerClass
 export type PlayerClasses = {
     Get: (Player) -> PlayerClass;
 };
 
-export type PlayerClass = {
+export type PlayerClass = CharacterClass & {
     Name: string;
-    Character: Model;
-    Humanoid: Humanoid;
-    RootPart: BasePart;
-    Head: BasePart;
 
     IsAlive: boolean;
     IsUnderWater: boolean;
     IsSwimming: boolean;
-
-    Health: number;
-    MaxHealth: number;
 
     MaxOxygen: number;
 
@@ -172,7 +168,6 @@ export type PlayerClass = {
     SyncStatus: (self: PlayerClass, statusId: string) -> nil;
     ListStatus: (self: PlayerClass) -> {StatusClass};
 
-    TakeDamagePackage: (self: PlayerClass, damageSource: DamageSource) -> nil;
     SetHealSource: (self: PlayerClass, srcId: string?, packet: ({[any]: any})?) -> nil;
     SetArmorSource: (self: PlayerClass, srcId: string?, packet: ({[any]: any})?) -> nil;
     RefreshHealRate: (self: PlayerClass) -> nil;
@@ -187,27 +182,66 @@ export type PlayerClass = {
     OnDeathServer: (self: PlayerClass)->nil;
     OnCharacterAdded: (character: Model)->nil;
     OnPlayerTeleport: ()->nil;
-}
+};
 
+--MARK: CharacterClass
+export type CharacterClass = {
+    ClassName: string;
+
+    Character: Model;
+    Humanoid: Humanoid;
+    RootPart: BasePart;
+    Head: BasePart;
+
+    HealthComp: HealthComp;
+    GetHealthComp: (self: CharacterClass, bodyPart: BasePart) -> HealthComp?;
+
+    Configurations: anydict;
+    Initialize: () -> nil;
+};
 
 --MARK: StatusClass
 export type StatusClass = {
     ClassName: string;
-    Garbage: GarbageHandler;
 
     OnApply: ((self: StatusClass) -> nil);
     OnExpire: ((self: StatusClass) -> nil);
-    OnTick: ((self: StatusClass) -> nil);
+    OnTick: ((self: StatusClass, tickData: TickData) -> nil);
     OnRelay: ((self: StatusClass) -> nil);
+} & StatusClassInstance;
+
+export type StatusClassInstance = {
+    Garbage: GarbageHandler;
+    
+    IsExpired: boolean;
+
+    CharacterClass: CharacterClass;
+    Values: anydict;
 
     PlayerClass: PlayerClass?;
     NpcClass: NpcClass?;
+    Expires: number?;
+    ExpiresOnDeath: boolean?;
+    Duration: number?;
 };
 
+--MARK: EntityStatus
+export type EntityStatus = {
+    Apply: (self: EntityStatus, key: string, value: EntityStatusApplyData) -> StatusClass;
+    GetOrDefault: (self: EntityStatus, key: string, value: anydict?) -> StatusClass;
+};
 
 --MARK: NpcClass
-export type NpcClass = {
-    Prefab: (Model & Actor);
+export type NpcClass = CharacterClass & {
+    EntityStatus: EntityStatus;
+
+    Status: any;
+    Properties: anydict;
+    CustomHealthbar: anydict;
+    KnockbackResistant: any;
+    BleedResistant: any;
+    SpawnTime: number;
+    Detectable: boolean;
 };
 
 --MARK: Interactables
@@ -234,11 +268,6 @@ export type InterfaceClass = {
     ToggleWindow: (self: InterfaceClass, windowName: string, visible: boolean) -> nil;
 };
 
---MARK: CharacterClass
-export type CharacterClass = {
-    [any]: any;
-}
-
 --MARK: ToolHandler
 export type ToolHandler = {
     ClassName: string;
@@ -247,8 +276,10 @@ export type ToolHandler = {
     loadTypeHandler: (ModuleScript) -> any;
     getTypeHandler: (string) -> any?;
     new: () -> ToolHandler,
-    Instance: (self: ToolHandler) -> any;
+    Instance: (self: ToolHandler) -> ToolHandlerInstance;
     Destroy: (self: ToolHandler) -> ();
+
+    OnInit: (self: ToolHandlerInstance) -> nil;
 
     OnClientEquip: (self: ToolHandlerInstance) -> nil;
     OnClientUnequip: (self: ToolHandlerInstance) -> nil;
@@ -257,9 +288,12 @@ export type ToolHandler = {
     OnInputEvent: (self: ToolHandlerInstance, inputData: {[any]: any}) -> nil;
 
     OnServerEquip: (self: ToolHandlerInstance) -> nil;
+    OnServerUnequip: (self: ToolHandlerInstance) -> nil;
 }
 
 export type ToolHandlerInstance = {
+    CharacterClass: CharacterClass;
+
     Binds: {[any]: any};
     Garbage: GarbageHandler;
 
@@ -302,7 +336,10 @@ export type ConfigVariable = {
     BaseValues: {[any]: any};
     FinalValues: {[any]: any};
     Modifiers: {ConfigModifier};
+
     GetKeyPairs: (self: ConfigVariable) -> {[any]: any};
+    GetBase: (self: ConfigVariable, key: string) -> any;
+    GetFinal: (self: ConfigVariable, key: string) -> any;
 
     Calculate: (self: ConfigVariable, baseValues: {any}?, modifiers: {any}?, finalValues: {any}?) -> {any};
 
@@ -318,12 +355,15 @@ export type ConfigVariable = {
 export type ConfigModifier = {
     Id: string;
     Priority: number;
+    Tags: anydict;
+    Values: anydict; 
 
-    SetValues: {[any]: any};
-    SumValues: {[any]: any};
-    ProductValues: {[any]: any};
-    MaxValues: {[any]: any};
-    MinValues: {[any]: any};
+    BaseValues: anydict;
+    SetValues: anydict;
+    SumValues: anydict;
+    ProductValues: anydict;
+    MaxValues: anydict;
+    MinValues: anydict;
 };
 
 --MARK: EquipmentClass
@@ -336,6 +376,14 @@ export type EquipmentClass = {
     Properties: {[any]: any};
 
     Update: (self: EquipmentClass, storageItem: StorageItem?) -> nil;
+    AddModifier: (self: EquipmentClass, modifierId: string, config: {
+        BaseValues: anydict?;
+        SetValues: anydict?;
+        SumValues: anydict?;
+        ProductValues: anydict?;
+        MaxValues: anydict?;
+        MinValues: anydict?;
+    }) -> nil;
     [any]: any;
 };
 
@@ -371,7 +419,13 @@ export type ItemModifier = {
     ClassName: string;
     Library: ItemModsLibrary;
 
+    Tags: {[any]: any};
+    Ready: (self: ItemModifierInstance) -> nil;
     Update: (self: ItemModifierInstance) -> nil;
+    SetTickCycle: (self: ItemModifierInstance, value: boolean) -> nil;
+   
+    Sync: (self: ItemModifier, syncKeys: {string}) -> nil;
+    Hook: (self: ItemModifier, functionId: string, func: (modifier: ItemModifierInstance, ...any)->nil) -> nil;
 };
 
 export type ItemModifierInstance = {
@@ -379,15 +433,15 @@ export type ItemModifierInstance = {
 
     Enabled: boolean;
     SetEnabled: (self: ItemModifierInstance, value: boolean) -> nil;
+    OnEnabledChanged: EventSignal;
     
-    IsAttached: boolean;
-
     Player: Player?;
     ModLibrary: ({any}?);
     EquipmentClass: EquipmentClass?;
     EquipmentStorageItem: StorageItem?;
     ItemModStorageItem: StorageItem?;
-} & ConfigModifier;
+
+} & ItemModifier & ConfigModifier;
 
 --MARK: PlayerEquipment
 export type PlayerEquipment = {
@@ -396,11 +450,92 @@ export type PlayerEquipment = {
 
     getItemModifier: (siid: string, player: Player) -> ItemModifierInstance;
     setItemModifier: (modifierId: string, itemModifier: ItemModifierInstance, player: Player) -> nil;
+
+    getPlayerItemModifiers: (player: Player) -> {ItemModifierInstance};
 };
 
---MARK: DamageSource
-export type DamageSource = {
-    Damage: number;
-    TargetPart: BasePart;
-    DamageType: string;
+--MARK: Destructible
+export type Destructible = {
+    ClassName: string;
+
+    HealthComp: HealthComp;
 };
+
+--MARK: -- Data Models
+-- Data packets
+--
+--
+--
+--
+--i
+--MARK: DamageData
+export type DamageData = {
+    CharacterClass: CharacterClass;
+    Damage: number;
+    DamageType: string;
+
+    Clone: (self: DamageData) -> DamageData;
+
+    TargetPart: BasePart?;
+    DamageCate: string?;
+    ToolHandler: ToolHandlerInstance?;
+    StorageItem: StorageItem?;
+};
+
+export type TickData = {
+    Delta: number;
+    ms100: boolean;
+    ms500: boolean;
+    ms1000: boolean;
+    s5: boolean;
+    s10: boolean;
+};
+
+export type EntityStatusApplyData = {
+    Expires: number?;
+    Duration: number?;
+
+    Values: ({
+        [any]: any;
+
+        ImmunityReduction: number?;
+    })?;
+}
+
+export type OnBulletHitPacket = {
+    OriginPoint: Vector3;
+    
+    TargetPart: BasePart;
+    TargetPoint: Vector3;
+    TargetNormal: Vector3;
+    TargetMaterial: Enum.Material;
+    TargetIndex: number;
+    TargetDistance: number;
+
+    TargetModel: Model;
+    IsHeadshot: boolean;
+}
+
+--MARK: -- Components
+-- Class composition components
+--
+--
+--
+--
+--
+--MARK: HealthComp
+export type HealthComp = {
+    OwnerClass: (Destructible | NpcClass | PlayerClass);
+    IsDead: boolean;
+    
+    CurHealth: number;
+    MaxHealth: number;
+    KillHealth: number;
+
+    GetFromModel: (model: Model) -> HealthComp;
+
+    CanTakeDamageFrom: (self: HealthComp, characterClass: CharacterClass) -> boolean;    
+    TakeDamage: (self: HealthComp, DamageData: DamageData) -> nil;
+    
+    LastDamageCharacterClass: CharacterClass?;
+}
