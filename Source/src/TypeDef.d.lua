@@ -204,37 +204,31 @@ export type CharacterClass = {
 export type StatusClass = {
     ClassName: string;
 
+    Instance: (self: StatusClass) -> StatusClassInstance;
+
     OnApply: ((self: StatusClass) -> nil);
     OnExpire: ((self: StatusClass) -> nil);
     OnTick: ((self: StatusClass, tickData: TickData) -> nil);
     OnRelay: ((self: StatusClass) -> nil);
-} & StatusClassInstance;
+};
 
 export type StatusClassInstance = {
+    StatusComp: StatusComp;
     Garbage: GarbageHandler;
     
+    Values: anydict;
     IsExpired: boolean;
 
-    CharacterClass: CharacterClass;
-    Values: anydict;
-
-    PlayerClass: PlayerClass?;
-    NpcClass: NpcClass?;
     Expires: number?;
     ExpiresOnDeath: boolean?;
     Duration: number?;
-};
-
---MARK: EntityStatus
-export type EntityStatus = {
-    Apply: (self: EntityStatus, key: string, value: EntityStatusApplyData) -> StatusClass;
-    GetOrDefault: (self: EntityStatus, key: string, value: anydict?) -> StatusClass;
-};
+} & StatusClass;
 
 --MARK: NpcClass
 export type NpcClass = CharacterClass & {
-    EntityStatus: EntityStatus;
+    StatusComp: StatusComp;
 
+    GetImmunity: (self: NpcClass, damageType: string?, damageCategory: string?) -> number; 
     Status: any;
     Properties: anydict;
     CustomHealthbar: anydict;
@@ -462,20 +456,22 @@ export type Destructible = {
 };
 
 --MARK: -- Data Models
--- Data packets
+-- Data packs that stores values to be passed into functions.
 --
 --
 --
 --
---i
+--
 --MARK: DamageData
 export type DamageData = {
-    CharacterClass: CharacterClass;
+    DamageBy: CharacterClass;
+
     Damage: number;
     DamageType: string;
 
     Clone: (self: DamageData) -> DamageData;
 
+    DamageTo: CharacterClass?;
     TargetPart: BasePart?;
     DamageCate: string?;
     ToolHandler: ToolHandlerInstance?;
@@ -491,7 +487,7 @@ export type TickData = {
     s10: boolean;
 };
 
-export type EntityStatusApplyData = {
+export type StatusCompApplyData = {
     Expires: number?;
     Duration: number?;
 
@@ -517,7 +513,7 @@ export type OnBulletHitPacket = {
 }
 
 --MARK: -- Components
--- Class composition components
+-- Class composition components, with minimal coupling to external code.
 --
 --
 --
@@ -525,6 +521,9 @@ export type OnBulletHitPacket = {
 --
 --MARK: HealthComp
 export type HealthComp = {
+    -- @static
+    getFromModel: (model: Model) -> HealthComp;
+
     OwnerClass: (Destructible | NpcClass | PlayerClass);
     IsDead: boolean;
     
@@ -532,10 +531,17 @@ export type HealthComp = {
     MaxHealth: number;
     KillHealth: number;
 
-    GetFromModel: (model: Model) -> HealthComp;
-
     CanTakeDamageFrom: (self: HealthComp, characterClass: CharacterClass) -> boolean;    
     TakeDamage: (self: HealthComp, DamageData: DamageData) -> nil;
     
-    LastDamageCharacterClass: CharacterClass?;
+    LastDamagedBy: CharacterClass?;
 }
+
+--MARK: StatusComp
+type StatusCompEnjoyer = (Destructible | NpcClass | PlayerClass); -- Classes with this component.
+export type StatusComp = { 
+    OwnerClass: StatusCompEnjoyer;
+
+    Apply: (self: StatusComp, key: string, value: StatusCompApplyData) -> StatusClassInstance;
+    GetOrDefault: (self: StatusComp, key: string, value: anydict?) -> StatusClassInstance;
+};

@@ -23,6 +23,7 @@ src/*
 !src/ReplicatedStorage
 src/ReplicatedStorage/*
 !src/ReplicatedStorage/BaseLibrary
+!src/ReplicatedStorage/Components
 !src/TypeDef.d.lua
 
 
