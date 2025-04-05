@@ -195,6 +195,8 @@ export type CharacterClass = {
 
     HealthComp: HealthComp;
     GetHealthComp: (self: CharacterClass, bodyPart: BasePart) -> HealthComp?;
+    
+    StatusComp: StatusComp;
 
     Configurations: anydict;
     Initialize: () -> nil;
@@ -214,6 +216,8 @@ export type StatusClass = {
 
 export type StatusClassInstance = {
     StatusComp: StatusComp;
+    StatusOwner: ComponentOwner;
+
     Garbage: GarbageHandler;
     
     Values: anydict;
@@ -453,6 +457,7 @@ export type Destructible = {
     ClassName: string;
 
     HealthComp: HealthComp;
+    StatusComp: StatusComp?;
 };
 
 --MARK: -- Data Models
@@ -462,6 +467,16 @@ export type Destructible = {
 --
 --
 --
+--MARK: ComponentOwner
+export type ComponentOwner = {
+    ClassName: string;
+
+    HealthComp: HealthComp?;
+    StatusComp: StatusComp?;
+    
+    Character: Model?;
+};
+
 --MARK: DamageData
 export type DamageData = {
     DamageBy: CharacterClass;
@@ -522,9 +537,9 @@ export type OnBulletHitPacket = {
 --MARK: HealthComp
 export type HealthComp = {
     -- @static
-    getFromModel: (model: Model) -> HealthComp;
+    getFromModel: (model: Model) -> HealthComp?;
 
-    OwnerClass: (Destructible | NpcClass | PlayerClass);
+    CompOwner: ComponentOwner;
     IsDead: boolean;
     
     CurHealth: number;
@@ -538,9 +553,8 @@ export type HealthComp = {
 }
 
 --MARK: StatusComp
-type StatusCompEnjoyer = (Destructible | NpcClass | PlayerClass); -- Classes with this component.
 export type StatusComp = { 
-    OwnerClass: StatusCompEnjoyer;
+    CompOwner: ComponentOwner;
 
     Apply: (self: StatusComp, key: string, value: StatusCompApplyData) -> StatusClassInstance;
     GetOrDefault: (self: StatusComp, key: string, value: anydict?) -> StatusClassInstance;

@@ -5,9 +5,9 @@ local RunService = game:GetService("RunService");
 local HealthComponent = {};
 HealthComponent.__index = HealthComponent;
 
-function HealthComponent.new(ownerClass)
+function HealthComponent.new(compOwner: ComponentOwner)
     local self = {
-        OwnerClass = ownerClass;
+        CompOwner = compOwner;
         IsDead = false;
 
         CurHealth = 100;
@@ -17,11 +17,16 @@ function HealthComponent.new(ownerClass)
 		LastDamagedBy = nil;
     };
 
+	-- For bound casting
+	local ownerCharacter: Model = compOwner.Character :: Model;
+	if ownerCharacter and ownerCharacter.PrimaryPart then
+		ownerCharacter.PrimaryPart:AddTag("HealthCompRootParts");
+	end
+
     setmetatable(self, HealthComponent);
     return self;
 end
 
--- Get health component of the model.
 function HealthComponent.getFromModel(model: Model)
 	assert(typeof(model) == "Instance", `Invalid model type: {typeof(model)}`);
 	

@@ -22,9 +22,9 @@ statusTickSystem:Update(function(tickData: TickData, statusClass: StatusClassIns
 end)
 
 
-function StatusComponent.new(ownerClass)
+function StatusComponent.new(componentOwner: ComponentOwner)
 	local self = {
-        OwnerClass = ownerClass;
+        CompOwner = componentOwner;
 		
 		List = {};
 		ActiveJob = nil;
@@ -106,7 +106,7 @@ function StatusComponent:Process(fireOnProcess)
 	
         local isDead = false;
 
-        local healthComp: HealthComp? = self.OwnerClass.HealthComp;
+        local healthComp: HealthComp? = self.CompOwner.HealthComp;
         if healthComp then
             isDead = healthComp.IsDead;
         end
