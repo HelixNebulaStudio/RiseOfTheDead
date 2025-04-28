@@ -19,13 +19,6 @@ sourcemap.project.json
 # RotD Base Local Library
 *./
 !src
-src/*
-!src/ReplicatedStorage
-src/ReplicatedStorage/*
-!src/ReplicatedStorage/BaseLibrary
-!src/ReplicatedStorage/Components
-!src/TypeDef.d.lua
-
 
 # Update
 # git pull --allow-unrelated-histories --tags origin main
