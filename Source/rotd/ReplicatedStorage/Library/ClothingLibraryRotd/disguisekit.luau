@@ -4,10 +4,12 @@ local attirePackage = {
 	ItemId=script.Name;
 	Class="Clothing";
 	
-	GroupName="MiscGroup";
+	GroupName="HeadGroup";
+	HideFacewear=true;
 	
 	Configurations={
-		RefillCharge = 3;
+		HasFlinchProtection = true;
+		GasProtection = 0.1;
 	};
 	Properties={};
 };

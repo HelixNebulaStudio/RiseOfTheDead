@@ -1,13 +1,15 @@
 local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 --==
 local attirePackage = {
 	ItemId=script.Name;
 	Class="Clothing";
 	
-	GroupName="MiscGroup";
+	GroupName="HeadGroup";
 	
 	Configurations={
-		RefillCharge = 3;
+		Warmth = -3;
+		HasFlinchProtection = true;
 	};
 	Properties={};
 };

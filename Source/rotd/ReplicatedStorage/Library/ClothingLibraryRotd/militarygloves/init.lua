@@ -14,7 +14,7 @@ local attirePackage = {
 };
 
 function attirePackage.newClass()
-	return modEquipmentClass.new(attirePackage.Class, attirePackage.Configurations, attirePackage.Properties);
+	return modEquipmentClass.new(attirePackage);
 end
 
 return attirePackage;

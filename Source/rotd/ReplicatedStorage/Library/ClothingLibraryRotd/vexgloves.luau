@@ -4,10 +4,12 @@ local attirePackage = {
 	ItemId=script.Name;
 	Class="Clothing";
 	
-	GroupName="MiscGroup";
+	GroupName="HandGroup";
+	HideHands=true;
 	
 	Configurations={
-		RefillCharge = 3;
+		AdditionalStamina = 50;
+		Warmth = 4;
 	};
 	Properties={};
 };

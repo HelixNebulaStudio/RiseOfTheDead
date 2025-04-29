@@ -5,12 +5,10 @@ local attirePackage = {
 	ItemId=script.Name;
 	Class="Clothing";
 	
-	GroupName="ChestGroup";
+	GroupName="FootGroup";
 	
 	Configurations={
-		TickRepellent = 4;
-		ArmorPoints = 10;
-		Warmth = 7;
+		Warmth = 4;
 	};
 	Properties={};
 };
@@ -19,11 +17,7 @@ function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
 	if not modBranchConfigs.IsWorld("Slaughterfest") then
-		equipmentClass:AddModifier("Nekrosis", {
-			SumValues={
-				NekrosisHeal = 2;
-			};
-		});
+		equipmentClass:AddModifier("BullLeaping");
 	end
 
 	return equipmentClass;

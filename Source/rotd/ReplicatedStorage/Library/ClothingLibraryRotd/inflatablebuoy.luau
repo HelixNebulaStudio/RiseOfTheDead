@@ -7,7 +7,7 @@ local attirePackage = {
 	GroupName="MiscGroup";
 	
 	Configurations={
-		RefillCharge = 3;
+		FloatOnWater = true;
 	};
 	Properties={};
 };

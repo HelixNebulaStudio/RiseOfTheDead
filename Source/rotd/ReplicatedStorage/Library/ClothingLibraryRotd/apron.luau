@@ -4,10 +4,14 @@ local attirePackage = {
 	ItemId=script.Name;
 	Class="Clothing";
 	
-	GroupName="MiscGroup";
+	GroupName="ChestGroup";
 	
 	Configurations={
-		RefillCharge = 3;
+		SplashReflection = 2;
+		TickRepellent = 20;
+		
+		ArmorPoints = 10;
+		Warmth = -4;
 	};
 	Properties={};
 };

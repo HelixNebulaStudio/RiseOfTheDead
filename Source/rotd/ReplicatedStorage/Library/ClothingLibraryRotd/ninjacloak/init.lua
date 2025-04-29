@@ -16,7 +16,7 @@ local attirePackage = {
 };
 
 function attirePackage.newClass()
-	local equipmentClass = modEquipmentClass.new(attirePackage.Class, attirePackage.Configurations, attirePackage.Properties);
+	local equipmentClass = modEquipmentClass.new(attirePackage);
 
 	if not modBranchConfigs.IsWorld("Slaughterfest") then
 		equipmentClass:AddModifier("NinjaAgility", {

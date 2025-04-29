@@ -6,9 +6,7 @@ local attirePackage = {
 	
 	GroupName="MiscGroup";
 	
-	Configurations={
-		RefillCharge = 3;
-	};
+	Configurations={};
 	Properties={};
 };
 

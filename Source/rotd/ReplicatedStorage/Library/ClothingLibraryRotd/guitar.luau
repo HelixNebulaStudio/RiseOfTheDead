@@ -5,10 +5,9 @@ local attirePackage = {
 	Class="Clothing";
 	
 	GroupName="MiscGroup";
+	UniversalVanity = true;
 	
-	Configurations={
-		RefillCharge = 3;
-	};
+	Configurations={};
 	Properties={};
 };
 

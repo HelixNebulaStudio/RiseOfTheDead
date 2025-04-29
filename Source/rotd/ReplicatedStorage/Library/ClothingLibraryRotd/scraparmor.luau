@@ -4,10 +4,13 @@ local attirePackage = {
 	ItemId=script.Name;
 	Class="Clothing";
 	
-	GroupName="MiscGroup";
+	GroupName="ChestGroup";
 	
 	Configurations={
-		RefillCharge = 3;
+		TickRepellent = 2;
+		BulletProtection = 0.25;
+		ArmorPoints = 30;
+		Warmth = -8;
 	};
 	Properties={};
 };

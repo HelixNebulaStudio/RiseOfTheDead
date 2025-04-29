@@ -1,16 +1,14 @@
 local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
 --==
 local attirePackage = {
 	ItemId=script.Name;
 	Class="Clothing";
 	
-	GroupName="ChestGroup";
+	GroupName="LegGroup";
 	
 	Configurations={
-		TickRepellent = 4;
-		ArmorPoints = 10;
-		Warmth = 7;
+		HotEquipSlots = 1;
+		EquipTimeReduction = 0.4;
 	};
 	Properties={};
 };
@@ -18,13 +16,7 @@ local attirePackage = {
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	if not modBranchConfigs.IsWorld("Slaughterfest") then
-		equipmentClass:AddModifier("Nekrosis", {
-			SumValues={
-				NekrosisHeal = 2;
-			};
-		});
-	end
+	equipmentClass:AddModifier("TacticalHolsters");
 
 	return equipmentClass;
 end

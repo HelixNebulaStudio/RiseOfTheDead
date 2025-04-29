@@ -4,10 +4,14 @@ local attirePackage = {
 	ItemId=script.Name;
 	Class="Clothing";
 	
-	GroupName="MiscGroup";
+	GroupName="HeadGroup";
 	
 	Configurations={
-		RefillCharge = 3;
+		HasFlinchProtection = true;
+		Warmth = 4;
+		GasProtection = 0.5;
+		UnderwaterVision = 0.03;
+		GasMask = true;
 	};
 	Properties={};
 };

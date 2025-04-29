@@ -58,7 +58,7 @@ function attirePackage.OnAccesorySpawn(classPlayer, storageItem, newAccessoryPre
 end
 
 function attirePackage.newClass()
-	local equipmentClass = modEquipmentClass.new(attirePackage.Class, attirePackage.Configurations, attirePackage.Properties);
+	local equipmentClass = modEquipmentClass.new(attirePackage);
 
 	equipmentClass:AddModifier("Sledding", {
 		SetValues={
