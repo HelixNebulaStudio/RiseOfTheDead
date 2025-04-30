@@ -6,8 +6,8 @@
 		{"type":"text","text":"### BioX\n*Chaotic Good*, Researchers and Scientists\n- Private Pharma Company","id":"daef2419e5d67115","x":-1200,"y":-320,"width":320,"height":300},
 		{"type":"text","text":"Safehome NPCs","id":"b5deb5ef7a7782f3","x":-685,"y":400,"width":250,"height":160},
 		{"type":"text","text":"#### Medics","id":"3f353c24d84ac511","x":-1002,"y":400,"width":245,"height":160},
-		{"type":"file","file":"Game Development/Rise of the Dead/Lore Factions/Rats Profile.md","id":"fdb02af2bc7aac72","x":-240,"y":-620,"width":320,"height":300},
-		{"type":"file","file":"Game Development/Rise of the Dead/Lore Factions/Bandits Profile.md","id":"8593a5a20b788011","x":80,"y":-320,"width":320,"height":300},
+		{"type":"file","file":"docs/Lore Factions/Rats Profile.md","id":"fdb02af2bc7aac72","x":-240,"y":-620,"width":320,"height":300},
+		{"type":"file","file":"docs/Lore Factions/Bandits Profile.md","id":"8593a5a20b788011","x":80,"y":-320,"width":320,"height":300},
 		{"type":"text","text":"### Protagonist\n\n*True Neutral*, Player Determined\n\nBackgrounds:\n- Lost identity\n- Has flash backs of being in BioX labs\n- Nekron mind is buried in the protagonist, it brings the protagonist back to life when they die.","id":"d66943e90dacf161","x":-880,"y":-620,"width":320,"height":300}
 	],
 	"edges":[
