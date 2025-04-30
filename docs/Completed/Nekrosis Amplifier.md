@@ -1,4 +1,8 @@
-#concept 
+---
+tags:
+- concept
+- completed
+---
 
 Amplify Nekrosis effects by 100%
 

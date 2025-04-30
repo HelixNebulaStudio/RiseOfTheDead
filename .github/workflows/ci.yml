@@ -19,6 +19,9 @@ jobs:
           path: .cache
       - run: pip install mkdocs-material
       - run: pip install mkdocs-roamlinks-plugin
-      - run: pip install mkdocs-rss-plugin
       - run: pip install mkdocs-mermaid2-plugin
+      - run: pip install mkdocs-minify-plugin
+      - run: pip install mkdocs-obsidian-interactive-graph-plugin
+      - run: pip install mkdocs-nav-weight
+      - run: pip install mkdocs-include-dir-to-nav
       - run: mkdocs gh-deploy --force

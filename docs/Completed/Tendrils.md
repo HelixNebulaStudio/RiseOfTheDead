@@ -1,4 +1,9 @@
-#concept #completed
+---
+tags:
+- concept
+- completed
+---
+
 - [x] Completed
 Basic enemy
 

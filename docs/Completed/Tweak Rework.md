@@ -1,4 +1,8 @@
-#concept 
+---
+tags:
+- concept
+- completed
+---
 
 (stc) = Subject to change
 

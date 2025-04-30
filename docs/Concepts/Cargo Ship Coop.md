@@ -1,4 +1,8 @@
-#concept
+---
+tags:
+  - concept
+  - game_stage
+---
 
 Checkpoints
 1. Ship idle at harbor

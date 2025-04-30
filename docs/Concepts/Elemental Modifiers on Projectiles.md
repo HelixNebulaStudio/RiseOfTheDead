@@ -1,4 +1,8 @@
-#concept
+---
+tags:
+  - concept
+  - item_modifier
+---
 
 Add elemental effects on projectile weapons.
 

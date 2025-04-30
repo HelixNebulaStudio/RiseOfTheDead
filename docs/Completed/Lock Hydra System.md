@@ -1,11 +1,16 @@
-#concept #completed 
+---
+tags:
+- concept
+- completed
+---
+
 New puzzle mechanic for crackable locked doors.
 
 Greek letters which needs  to be sorted.
 
 ⚪⚫
 
-```lua
+```luau
 
 local greekDictionary = {
 	A={Value="Α";};

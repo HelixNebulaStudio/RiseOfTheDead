@@ -1,4 +1,8 @@
-#concept 
+---
+tags:
+- concept
+- completed
+---
 
 A tool to place plans structure to build defenses.
 

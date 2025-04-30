@@ -1,26 +1,36 @@
-site_name: obsidian-mkdocs template
+site_name: Rise of the Dead
+site_url: https://helixnebulastudio.github.io/RiseOfTheDead/
+repo_url: https://github.com/HelixNebulaStudio/RiseOfTheDead
+
+nav:
+  - Live: LiveBranch
+  - Dev: DevBranch
+  - Concepts: Concepts
+  - Completed: Completed
+  - Source: Source
 
 theme:
     name: 'material'
+    logo: assets/images/RotDIcon_Abr.svg
+    icon:
+      repo: fontawesome/brands/github
+    font:
+      text: Roboto Mono
+
     palette:
+      - media: "(prefers-color-scheme: dark)"
+        scheme: slate
 
-    # Light mode
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: pink
-      accent: indigo
-      toggle:
-        icon: material/toggle-switch-off-outline
-        name: Switch to dark mode
-
-    # Dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: pink
-      accent: blue
-      toggle:
-        icon: material/toggle-switch
-        name: Switch to light mode
+    features:
+      - navigation.instant
+      - navigation.tracking
+      - navigation.tabs
+      - navigation.footer
+      - navigation.path
+      - navigation.prune
+      - navigation.top
+      - content.code.copy
+      - content.code.select
 
 # Extensions
 markdown_extensions:
@@ -44,24 +54,51 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
 
   - toc:
       permalink: true
+  - attr_list
+  - md_in_html
+
 
 plugins:
+  - tags
   - search
+  - mkdocs-nav-weight
+  - include_dir_to_nav:
+      file_name_as_title: true
+      reverse_sort_file: true
   - roamlinks
-  - blog
-  - rss:
-      match_path: blog/posts/.* 
-      date_from_meta:
-        as_creation: date
-      categories:
-        - categories
-        - tags
+  - obsidian-interactive-graph
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/mastodon
+      link: https://mastodon.online/@HelixNebulaDevs
+      name: Official Mastodon
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/Sgs39DTCQX
+      name: Community Discord Server 
 
 extra_javascript:
-  - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
   - https://unpkg.com/mermaid/dist/mermaid.min.js 
+  - https://fastly.jsdelivr.net/npm/jquery/dist/jquery.min.js
+  - https://fastly.jsdelivr.net/npm/echarts/dist/echarts.min.js
+  - assets/javascripts/interactive_graph.js
+
+extra_css:
+  - assets/stylesheets/extra.css
+  - assets/stylesheets/interactive_graph.css

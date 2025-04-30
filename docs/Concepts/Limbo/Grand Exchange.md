@@ -1,4 +1,11 @@
-#concept 
+---
+tags:
+  - concept
+  - limbo
+  - trading
+---
+
+Idea - Grand Exchange
 
 In order to maintain concurrency, only relay on client saves instead of global database.
 

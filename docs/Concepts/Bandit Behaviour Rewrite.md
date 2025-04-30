@@ -1,3 +1,7 @@
+---
+tags:
+- concept
+---
 
 ### Flee (Chance: 20%)
 - Reasons:

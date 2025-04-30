@@ -1,5 +1,12 @@
+---
+tags:
+  - concept
+  - game_mode
+---
 
-# Todo
+# Nekron's Gambit
+
+## Todo
 - [x] Sol orbs
 - [x] Basic Shop
 	- [ ] Weapon Upgrade system

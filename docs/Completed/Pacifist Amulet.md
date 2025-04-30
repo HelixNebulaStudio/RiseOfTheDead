@@ -1,4 +1,8 @@
-#concept 
+---
+tags:
+- concept
+- completed
+---
 
 A replacement mod for Armor Points Mod
 Armor Points mod: +40ap

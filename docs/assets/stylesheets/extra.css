@@ -1,0 +1,61 @@
+:root  > * {
+    --md-primary-fg-color: #4d2020; /* Header */
+    --md-primary-bg-color: #ffffff; /* Header text */
+    
+    --md-default-fg-color: #cccccc; /* Page text color */
+    --md-default-fg-color--light: #eeeeee; /* Page text */
+    --md-default-fg-color--lighter:rgb(110, 55, 55); 
+    --md-default-fg-color--lightest: rgb(110, 0, 0); 
+    
+    --md-default-bg-color: #151515; /* Page background */
+    --md-default-bg-color--light: #cc4cc4;
+    --md-default-bg-color--lighter: #4cc4cc;
+    --md-default-bg-color--lightest: #c4cc4c;
+
+    --md-footer-fg-color: #888888; /* Footer text */
+    --md-footer-bg-color: #101010; /* Footer background */
+  
+    --md-accent-fg-color: #ff0000; /* Link highlight */
+    --md-accent-bg-color: #cc4cc4;
+
+    --md-code-fg-color: #888888; /* Code text unformatted */
+    --md-code-bg-color: #101010; /* Code background */
+
+    --md-code-hl-color: #cc4cc4;
+    --md-code-hl-color--light: #4cc4cc;
+
+    --md-code-hl-color: #cc4cc4; 
+    --md-typeset-a-color: #d17676 !important;
+}
+
+.md-typeset code {
+    border-radius: 10px;
+}
+
+.md-typeset code:not(.md-code__content) {
+    border-radius: 4px;
+    background-color: #3d2f2f;
+    color: #a05959;
+    font-weight: 600;
+}
+
+.highlighttable th.filename span.filename {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.highlighttable .linenos {
+    border-bottom-left-radius: 10px;
+}
+
+.highlight span.filename {
+    border-bottom: .05rem solid #505050;
+}
+
+.highlighttable .linenodiv {
+    box-shadow: -.05rem 0 #505050 inset;
+}
+
+[data-md-color-scheme="slate"] {
+    --md-hue: 0; 
+}

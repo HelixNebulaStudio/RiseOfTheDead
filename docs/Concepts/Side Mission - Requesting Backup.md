@@ -1,4 +1,9 @@
-#concept 
+---
+tags:
+  - concept
+  - side_mission
+---
+
 A side mission that unlocks the ability to use the walkie talkie to call in unique actions. 
 
 #### Point of interests:

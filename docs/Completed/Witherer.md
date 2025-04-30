@@ -1,4 +1,9 @@
-#concept 
+---
+tags:
+- concept
+- completed
+---
+
 A enemy zombie that drains armor when it's alive. It hides in a certain place of the map and makes a continuous screeching sound.
 
 #### Appearance
