@@ -1,7 +1,7 @@
 ---
 tags:
-- concept
-- completed
+  - completed
+  - item_modifier
 ---
 
 Amplify Nekrosis effects by 100%

@@ -1,3 +1,8 @@
+---
+tags:
+- lore
+---
+
 ### Rats
 *Chaotic Neutral*
 

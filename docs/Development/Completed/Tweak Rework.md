@@ -1,7 +1,7 @@
 ---
 tags:
-- concept
-- completed
+  - completed
+  - rework
 ---
 
 (stc) = Subject to change
@@ -58,10 +58,6 @@ Cons
 - It creates case for rare Nekronmical upgrades that adds unexpected mod upgrades to your weapon. E.g. Skullcracker Nekronmical upgrade for snipers(Won’t stack if you have a better skullcracker installed though)
     
 - (Maybe) Adds complexity but only if you want to opt-in
-
-**![[Pasted image 20230804184611.png]]**
-
-![[Pasted image 20230804184621.png]]
 
 ### Development
 

@@ -1,7 +1,7 @@
 ---
 tags:
-- concept
-- completed
+  - completed
+  - item_modifier
 ---
 
 A replacement mod for Armor Points Mod

@@ -1,7 +1,7 @@
 ---
 tags:
-- concept
-- completed
+  - completed
+  - enemy
 ---
 
 - [x] Completed

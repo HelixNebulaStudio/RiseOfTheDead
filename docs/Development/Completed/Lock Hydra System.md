@@ -1,7 +1,7 @@
 ---
 tags:
-- concept
-- completed
+  - completed
+  - game_mechanics
 ---
 
 New puzzle mechanic for crackable locked doors.

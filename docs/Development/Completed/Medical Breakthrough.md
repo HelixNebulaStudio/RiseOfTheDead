@@ -1,7 +1,7 @@
 ---
 tags:
-- concept
-- completed
+  - completed
+  - mission
 ---
 
 sum: Rachel and Dr. Deniski team up to unlock more of the Nekrosis healing properties. But requires your assistance in resource gathering.

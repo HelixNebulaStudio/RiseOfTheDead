@@ -5,9 +5,11 @@ repo_url: https://github.com/HelixNebulaStudio/RiseOfTheDead
 nav:
   - Live: LiveBranch
   - Dev: DevBranch
-  - Concepts: Concepts
-  - Completed: Completed
+  - Development: Development
   - Source: Source
+  - Storyboard: Storyboard
+  - Issues: "https://github.com/HelixNebulaStudio/RiseOfTheDead/issues"
+  - Discussions: "https://github.com/HelixNebulaStudio/RiseOfTheDead/discussions"
 
 theme:
     name: 'material'
@@ -73,6 +75,7 @@ markdown_extensions:
 
 plugins:
   - tags
+  - meta
   - search
   - mkdocs-nav-weight
   - include_dir_to_nav:

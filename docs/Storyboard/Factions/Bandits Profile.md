@@ -1,3 +1,8 @@
+---
+tags:
+- lore
+---
+
 ### Bandits
 *Neutral Evil*
 

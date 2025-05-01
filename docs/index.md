@@ -1,3 +1,9 @@
+---
+hide:
+- navigation
+- footer
+- toc
+---
 # Welcome
 Welcome to the Rise of the Dead repository.
 
@@ -10,3 +16,5 @@ Here you can follow the active development.
 - :simple-devbox: Source code notes
 - :material-notebook-plus-outline: Storyboard & world
 </div>
+
+--8<-- "README.md:8:26"

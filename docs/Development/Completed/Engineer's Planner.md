@@ -1,7 +1,7 @@
 ---
 tags:
-- concept
-- completed
+  - completed
+  - item
 ---
 
 A tool to place plans structure to build defenses.
