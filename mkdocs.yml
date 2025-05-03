@@ -33,6 +33,7 @@ theme:
       - navigation.top
       - content.code.copy
       - content.code.select
+      - search.share
 
 # Extensions
 markdown_extensions:
