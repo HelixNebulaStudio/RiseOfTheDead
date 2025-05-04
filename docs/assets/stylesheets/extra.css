@@ -26,6 +26,30 @@
 
     --md-code-hl-color: #cc4cc4; 
     --md-typeset-a-color: #d17676 !important;
+    
+    --md-mermaid-node-bg-color: #1c0e0e;
+    --md-mermaid-node-fg-color: #7f0000;
+    --md-mermaid-label-fg-color: #ffffff;
+}
+
+.md-typeset h1 {
+    color: #ff8534;
+}
+
+.md-typeset h2 {
+    color: #ff7a7a;
+}
+
+.md-typeset h3 {
+    color: #a53ba8;
+}
+
+.md-typeset h4 {
+    color: #9659ff;
+}
+
+.md-typeset h5 {
+    color: #3f82ff;
 }
 
 .md-typeset code {

@@ -71,5 +71,25 @@ flowchart LR
 
 Here it goes one by one from `HealSelfSequence` and process it to see if it succeeds, if not it continues to `HealNearbySequence`, `IdleTasksSequence` and then `PatrolSequence`
 
+---
+### Bandit's HasEnemySequence
+A useful example. This sequence node handles what happens when a Bandit has an enemy assigned.
+
+```luau
+HasEnemySequence={"And"; "HasEnemy"; "FleeSelect"; "FightSelect";};
+```
+
+```mermaid
+flowchart LR
+	A{{HasEnemySequence}}
+	A-->B>HasEnemy]
+	B-->C[[FleeSelect]]
+	C-->D[[FightSelect]]
+```
+
+Which process as a sequence node (Until false):
+1. `HasEnemy`: If success (true) proceeds to `FleeSelect`, otherwise sequence stops.
+2. `FleeSelect`: Does the `FleeSelect` behavior tree until success true, otherwise proceeds to `FightSelect`.
+3. `FightSelect`: Does the `FightSelect` behavior tree.
 
 ![[BanditDefaultTree.luau]]
