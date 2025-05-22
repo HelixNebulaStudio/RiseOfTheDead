@@ -1,4 +1,4 @@
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 local attirePackage = {
 	ItemId=script.Name;
@@ -60,7 +60,7 @@ end
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	equipmentClass:AddModifier("Sledding", {
+	equipmentClass:AddBaseModifier("Sledding", {
 		SetValues={
 			VehicleWear="snowsledge";
 			VehicleWearAnimationId=attirePackage.VehicleWearAnimationId;

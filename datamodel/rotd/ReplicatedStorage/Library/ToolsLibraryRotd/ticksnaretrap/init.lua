@@ -1,9 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modHealthComponent = require(game.ReplicatedStorage.Components.HealthComponent);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 
 --==
 

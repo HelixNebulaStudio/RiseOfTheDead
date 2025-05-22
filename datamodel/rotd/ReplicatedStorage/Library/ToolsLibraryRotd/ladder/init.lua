@@ -2,9 +2,9 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
+local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local rayParam = RaycastParams.new();
 rayParam.FilterType = Enum.RaycastFilterType.Include;
@@ -54,7 +54,7 @@ function toolPackage.OnInputEvent(toolHandler, inputData)
 
 	if RunService:IsClient() then
 		if inputData.KeyIds.KeyFire then
-			local modData = require(player:WaitForChild("DataModule"));
+			local modData = shared.require(player:WaitForChild("DataModule"));
 			local modCharacter = modData:GetModCharacter();
 		
 			local mouseProperties = modCharacter.MouseProperties;

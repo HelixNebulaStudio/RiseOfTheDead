@@ -3,19 +3,19 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
+local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 --== Variables;
 local MISSION_ID = 0;
 
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
-	modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
-	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
+	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
 else
-	modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+	modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 

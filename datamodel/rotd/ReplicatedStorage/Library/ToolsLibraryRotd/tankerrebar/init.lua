@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 
 local toolPackage = {
@@ -46,9 +46,9 @@ function toolPackage.OnMarkerEvent(wieldData: {any}, trackData: {any}, paramStri
 	
 	if paramString == "SlamImpact" then
 		
-		local modAoeHighlight = require(game.ReplicatedStorage.Particles.AoeHighlight);
-		local modParticleSprinkler = require(game.ReplicatedStorage.Particles.ParticleSprinkler);
-		local modTDParticles = require(game.ReplicatedStorage.Particles.TDParticles);
+		local modAoeHighlight = shared.require(game.ReplicatedStorage.Particles.AoeHighlight);
+		local modParticleSprinkler = shared.require(game.ReplicatedStorage.Particles.ParticleSprinkler);
+		local modTDParticles = shared.require(game.ReplicatedStorage.Particles.TDParticles);
 		
 		local groundCf = modAoeHighlight:Ray(impactPointAtt.WorldPosition + Vector3.yAxis*2, Vector3.yAxis*-4);
 		if groundCf then

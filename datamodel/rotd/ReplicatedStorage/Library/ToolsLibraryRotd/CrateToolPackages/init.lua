@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local modToolsLibrary;
 --==
@@ -26,9 +26,9 @@ local toolPackage = {
 };
 
 function toolPackage.CustomSpawn(handler, cframe)
-	local modCrates = require(game.ServerScriptService.ServerLibrary.Crates);
-	local modDropAppearance = require(game.ReplicatedStorage.Library.DropAppearance);
-	local modAudio = require(game.ReplicatedStorage.Library.Audio);
+	local modCrates = shared.require(game.ServerScriptService.ServerLibrary.Crates);
+	local modDropAppearance = shared.require(game.ReplicatedStorage.Library.DropAppearance);
+	local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 	local itemId = handler.ToolPackage.ItemId;
 	local owner = handler.Player;
@@ -64,7 +64,7 @@ function toolPackage.inherit(packet)
 
 	task.defer(function()
 		local itemLib = modItemsLibrary:Find(itemId);
-		local modCrateLibrary = require(game.ReplicatedStorage.Library.CrateLibrary);
+		local modCrateLibrary = shared.require(game.ReplicatedStorage.Library.CrateLibrary);
 		
 		if modCrateLibrary.Get(itemId) == nil then
 			modCrateLibrary.New{

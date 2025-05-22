@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 local MusicTracks = {
 	{Id=4707123430; Chance=0.8};

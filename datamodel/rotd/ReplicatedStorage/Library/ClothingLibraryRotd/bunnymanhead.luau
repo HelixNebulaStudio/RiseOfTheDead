@@ -1,5 +1,5 @@
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 --==
 local attirePackage = {
 	ItemId=script.Name;
@@ -18,7 +18,7 @@ function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
 	if modConfigurations.SpecialEvent.Easter then
-		equipmentClass:AddModifier("Bunnyman");
+		equipmentClass:AddBaseModifier("Bunnyman");
 	end
 
 	return equipmentClass;

@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modOnEventsHandlers = require(game.ReplicatedStorage.Library.OnEventHandlers);
+local modOnEventsHandlers = shared.require(game.ReplicatedStorage.Library.OnEventHandlers);
 
 for _, m in pairs(script:GetChildren()) do
     modOnEventsHandlers.loadHandler(m);

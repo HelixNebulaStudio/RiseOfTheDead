@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 --==
 local attirePackage = {
 	ItemId=script.Name;

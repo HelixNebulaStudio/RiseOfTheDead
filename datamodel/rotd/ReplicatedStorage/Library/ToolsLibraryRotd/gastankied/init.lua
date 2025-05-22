@@ -1,9 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 --==
 
 local toolPackage = {
@@ -62,7 +62,7 @@ function toolPackage.OnSpawn(handler, prefab: Model)
         clock:Disconnect();
         Debugger.Expire(prefab, 6);
         
-        local modExplosionHandler = require(game.ReplicatedStorage.Library.ExplosionHandler);
+        local modExplosionHandler = shared.require(game.ReplicatedStorage.Library.ExplosionHandler);
         local hitLayers = modExplosionHandler:Cast(lastPosition, {
             Radius = toolPackage.Configurations.Distance;
         });

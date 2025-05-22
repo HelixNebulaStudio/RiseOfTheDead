@@ -2,11 +2,11 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modItemModsLibrary = require(game.ReplicatedStorage.Library.ItemModsLibrary);
-local modItemModifierClass = require(game.ReplicatedStorage.Library.ItemModifierClass);
-local modTables = require(game.ReplicatedStorage.Library.Util.Tables);
+local modItemModsLibrary = shared.require(game.ReplicatedStorage.Library.ItemModsLibrary);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
 
-local EquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local EquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 
 function EquipmentClass:ProcessModifiers(processType, ...)
@@ -34,7 +34,7 @@ function EquipmentClass:ApplyModifiers(storageItem: StorageItem)
 
     if RunService:IsClient() then
         player = game.Players.LocalPlayer;
-        local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+        local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
         attachmentStorage = modData.GetItemStorage(siid);
 
     else
@@ -105,7 +105,7 @@ function EquipmentClass:ApplyModifiers(storageItem: StorageItem)
             local modLib = modItemModsLibrary.Get(itemModStorageItem.ItemId);
             if modLib.Module == nil then continue end;
     
-            local baseItemModifier = require(modLib.Module);
+            local baseItemModifier = shared.require(modLib.Module);
             if baseItemModifier == nil then continue end;
     
             local itemModifier = getOrDefaultModifier(itemModStorageItem.ID, function()

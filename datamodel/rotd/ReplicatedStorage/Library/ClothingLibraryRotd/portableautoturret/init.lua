@@ -1,7 +1,7 @@
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modClothingProperties = require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
-local modFormatNumber = require(game.ReplicatedStorage.Library.FormatNumber);
-local modRemotesManager = require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modClothingProperties = shared.require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
+local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 
 local remoteShopService = modRemotesManager:Get("ShopService");
 --==
@@ -62,9 +62,9 @@ function attirePackage.OnAccesorySpawn(classPlayer, storageItem, newAccessoryPre
 end
 
 function attirePackage.OnShopSelect(shopInterface, storageItem)
-	local modGlobalVars = require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-	local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
-	local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+	local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
+	local modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+	local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 	
 	local selectedItem = modData.FindIndexFromStorage(attirePackage.StorageId, attirePackage.StorageIndexEnums.WeaponSlot);
 	if selectedItem == nil then return end;
@@ -76,7 +76,7 @@ function attirePackage.OnShopSelect(shopInterface, storageItem)
 		or (selectedItem.Values.MA and selectedItem.Values.MA < weaponClass.Configurations.MaxAmmoLimit)));
 	if hasAmmoData ~= true then return end;
 
-	local modShopLibrary = require(game.ReplicatedStorage.Library.RatShopLibrary);
+	local modShopLibrary = shared.require(game.ReplicatedStorage.Library.RatShopLibrary);
 	local ammoCurrency = modShopLibrary.AmmunitionCurrency or "Money";
 
 	local localplayerStats = modData.GetStats();

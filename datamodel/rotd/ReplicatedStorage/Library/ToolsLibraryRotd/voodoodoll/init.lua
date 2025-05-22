@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 
 local toolPackage = {
@@ -44,7 +44,7 @@ function toolPackage.OnActionEvent(handler, packet)
 		local pick = players[math.random(1, #players)];
 		
 		if pick == "npc" or pick:FindFirstChild("Appearance") == nil then
-			local modNpcProfileLibrary = require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
+			local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
 
 			local npcName = modNpcProfileLibrary:GetRandom().Id;
 			local npcPrefabs = game.ServerStorage.Prefabs.Npc;

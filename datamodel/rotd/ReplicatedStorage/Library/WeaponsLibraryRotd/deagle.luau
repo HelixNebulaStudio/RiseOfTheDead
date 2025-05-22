@@ -1,5 +1,5 @@
-local modWeaponAttributes = require(game.ReplicatedStorage.Library.WeaponsLibrary.WeaponAttributes);
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modWeaponAttributes = shared.require(game.ReplicatedStorage.Library.WeaponsLibrary.WeaponAttributes);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 local toolPackage = {
 	ItemId=script.Name;

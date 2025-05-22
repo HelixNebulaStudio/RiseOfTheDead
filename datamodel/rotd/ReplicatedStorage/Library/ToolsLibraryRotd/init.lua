@@ -1,5 +1,5 @@
 
-local ToolsLibrary = require(game.ReplicatedStorage.Library.ToolsLibrary);
+local ToolsLibrary = shared.require(game.ReplicatedStorage.Library.ToolsLibrary);
 
 for _, module in pairs(script:GetChildren()) do
 	ToolsLibrary.LoadToolModule(module);

@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 
 local toolPackage = {
@@ -19,7 +19,7 @@ local toolPackage = {
 
 function toolPackage.OnClientUnequip(handler)
 	local localPlayer = game.Players.LocalPlayer;
-	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 	
 	modInterface:CloseWindow("GpsWindow");
@@ -27,7 +27,7 @@ end
 
 function toolPackage.ClientItemPrompt(handler)
 	local localPlayer = game.Players.LocalPlayer;
-	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 	
 	modInterface:OpenWindow("GpsWindow", handler);

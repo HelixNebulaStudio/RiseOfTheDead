@@ -2,8 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modGuiHighlight = require(game.ReplicatedStorage.Library.UI.GuiHighlight);
+local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modGuiHighlight = shared.require(game.ReplicatedStorage.Library.UI.GuiHighlight);
 
 if RunService:IsClient() then
 	local localPlayer = game.Players.LocalPlayer;

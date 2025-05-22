@@ -4,9 +4,9 @@ local CollectionService = game:GetService("CollectionService");
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modWeaponsMechanics = require(game.ReplicatedStorage.Library.WeaponsMechanics);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modWeaponsMechanics = shared.require(game.ReplicatedStorage.Library.WeaponsMechanics);
 --==
 
 local toolPackage = {
@@ -27,7 +27,7 @@ local toolPackage = {
 
 function toolPackage.ClientPrimaryFire(handler)
 	local localplayer = game.Players.LocalPlayer;
-	local modData = require(localplayer:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(localplayer:WaitForChild("DataModule") :: ModuleScript);
 	local modCharacter = modData:GetModCharacter();
 	
 	local mouseProperties = modCharacter.MouseProperties;
@@ -91,9 +91,9 @@ function toolPackage.ClientPrimaryFire(handler)
 end
 
 function toolPackage.OnActionEvent(handler, packet)
-	local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
-	local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
-	local modHealthComponent = require(game.ReplicatedStorage.Components.HealthComponent)
+	local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
+	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+	local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent)
 
 	local remotes = game.ReplicatedStorage.Remotes;
 	local bindOnDoorEnter = remotes.Interactable.OnDoorEnter;

@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modInteractables = require(game.ReplicatedStorage.Library.Interactables);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --==
 return function(event: EventPacket, playerClass: PlayerClass)
@@ -19,7 +19,7 @@ return function(event: EventPacket, playerClass: PlayerClass)
 
         if interactObject == nil or interactModule == nil or not interactModule:IsA("ModuleScript") then return end;
 
-        local interactData = require(interactModule);
+        local interactData = shared.require(interactModule);
         interactData.Object = interactObject;
         interactData.Script = interactModule;
 

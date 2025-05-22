@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local Dialogues = {};
 --==
@@ -144,9 +144,9 @@ Dialogues.DialogueStrings = {
 if RunService:IsServer() then
 	-- MARK: DialogueHandler
 	Dialogues.DialogueHandler = function(player, dialog, data)
-		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
-		local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
-		local modStorage = require(game.ServerScriptService.ServerLibrary.Storage); 
+		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+		local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
+		local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage); 
 		
 		local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
 		local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");

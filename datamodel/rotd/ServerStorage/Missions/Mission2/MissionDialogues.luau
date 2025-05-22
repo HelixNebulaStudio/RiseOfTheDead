@@ -107,11 +107,11 @@ Dialogues.Nick.DialogueStrings = {
 };
 
 if RunService:IsServer() then
-	local modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+	local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 	-- !outline: Mason Handler
 	Dialogues.Mason.DialogueHandler = function(player, dialog, data, mission)
-		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
 		if mission.Type == 2 then -- Available;
 			
@@ -170,7 +170,7 @@ if RunService:IsServer() then
 	
 	-- MARK: Nick Handler
 	Dialogues.Nick.DialogueHandler = function(player, dialog, data, mission)
-		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
 		if mission.Type == 2 then -- Available;
 

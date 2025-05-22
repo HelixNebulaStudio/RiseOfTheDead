@@ -2,10 +2,10 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
-local modPoster = require(game.ReplicatedStorage.BaseLibrary.Poster);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
+local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
+local modPoster = shared.require(game.ReplicatedStorage.BaseLibrary.Poster);
 
 local remoteSetPoster = modRemotesManager:Get("SetPoster");
 
@@ -17,7 +17,7 @@ rayParam.CollisionGroup = "Raycast";
 if RunService:IsServer() then
 	
 	function remoteSetPoster.OnServerInvoke(player, action, paramPacket)
-		local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
+		local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 		
 		local profile = shared.modProfile:Get(player);
 		if profile == nil or profile.Cache == nil then return end;
@@ -124,7 +124,7 @@ function toolPackage.OnInputEvent(toolHandler, inputData)
 	local classPlayer = shared.modPlayers.get(toolHandler.Player);
 	if RunService:IsClient() then
 		if inputData.KeyIds.KeyFire then
-			local modData = require(toolHandler.Player:WaitForChild("DataModule"));
+			local modData = shared.require(toolHandler.Player:WaitForChild("DataModule"));
 			local modCharacter = modData:GetModCharacter();
 		
 			local mouseProperties = modCharacter.MouseProperties;

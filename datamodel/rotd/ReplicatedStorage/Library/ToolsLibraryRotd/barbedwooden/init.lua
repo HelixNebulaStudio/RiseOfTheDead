@@ -1,13 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modTouchHandler = require(game.ReplicatedStorage.Library.TouchHandler);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modTouchHandler = shared.require(game.ReplicatedStorage.Library.TouchHandler);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
-local modHealthComponent = require(game.ReplicatedStorage.Components.HealthComponent);
+local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
-local DamageData = require(game.ReplicatedStorage.Data.DamageData);
+local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 --==
 local touchHandler = modTouchHandler.new("BarbedFence", 1);
 
@@ -40,7 +40,7 @@ function toolPackage.OnSpawn(handler: ToolHandlerInstance, prefab: Model)
 		Debugger.Expire(prefab, 300);
 	end
 	
-	local modDestructible = require(prefab:WaitForChild("Destructible"));
+	local modDestructible = shared.require(prefab:WaitForChild("Destructible"));
 	modAudio.Play("Repair", prefab.PrimaryPart);
 	
 	local debris = prefab:WaitForChild("debris");

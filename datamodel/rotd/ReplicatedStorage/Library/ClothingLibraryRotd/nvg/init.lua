@@ -1,4 +1,4 @@
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 local attirePackage = {
 	ItemId=script.Name;
@@ -17,7 +17,7 @@ local attirePackage = {
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	equipmentClass:AddModifier("NightVision");
+	equipmentClass:AddBaseModifier("NightVision");
 
 	return equipmentClass;
 end

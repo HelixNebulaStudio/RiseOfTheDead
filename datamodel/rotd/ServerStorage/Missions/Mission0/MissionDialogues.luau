@@ -36,7 +36,7 @@ Dialogues.Rachel.DialogueStrings = {
 if RunService:IsServer() then
 	-- MARK: Rachel Handler
 	Dialogues.Rachel.DialogueHandler = function(player, dialog, data, mission)
-		local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
 		if mission.Type == 1 then -- Active
 

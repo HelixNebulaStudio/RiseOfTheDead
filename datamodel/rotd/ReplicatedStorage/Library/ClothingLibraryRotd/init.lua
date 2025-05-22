@@ -1,8 +1,10 @@
-local ClothingLibrary = require(game.ReplicatedStorage.Library.ClothingLibrary);
+local modClothingLibrary = shared.require(game.ReplicatedStorage.Library.ClothingLibrary);
 
-for _, module in pairs(script:GetChildren()) do
-	ClothingLibrary.LoadToolModule(module);
+function modClothingLibrary.onRequire()
+	for _, module in pairs(script:GetChildren()) do
+		modClothingLibrary.LoadToolModule(module);
+	end
+	script.ChildAdded:Connect(modClothingLibrary.LoadToolModule)
 end
-script.ChildAdded:Connect(ClothingLibrary.LoadToolModule)
 
-return ClothingLibrary;
+return modClothingLibrary;

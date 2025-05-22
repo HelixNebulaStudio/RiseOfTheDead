@@ -1,8 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 --==
 
 local toolPackage = {

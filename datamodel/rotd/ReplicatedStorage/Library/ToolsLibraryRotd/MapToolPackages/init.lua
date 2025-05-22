@@ -1,9 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local remoteGameModeLobbies = modRemotesManager:Get("GameModeLobbies");
 local mapInteractable = script:WaitForChild("Interactable");
@@ -32,7 +32,7 @@ function toolPackage.ClientItemPrompt(handler)
 	local player = game.Players.LocalPlayer;
 	local classPlayer = shared.modPlayers.get(player);
 
-	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 	
 	if classPlayer.Properties.InBossBattle or modConfigurations.DisableMapItems then
@@ -95,7 +95,7 @@ function toolPackage.inherit(packet)
 			newInteractable:SetAttribute("Stage", gameModeInfo.Stage);
 			newInteractable:SetAttribute("Label", `Join {gameModeInfo.Mode}: {gameModeInfo.Stage}`);
 	
-			inheritPackage.InteractData = require(newInteractable);
+			inheritPackage.InteractData = shared.require(newInteractable);
 		end
 
 		return modEquipmentClass.new(inheritPackage.Class, inheritPackage.Configurations, inheritPackage.Properties);

@@ -4,20 +4,20 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 --== Variables;
 local MISSION_ID = 2;
 
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
-	modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
-	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
-	modEvents = require(game.ServerScriptService.ServerLibrary.Events);
-	modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
-	modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
+	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
+	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 	if modBranchConfigs.IsWorld("TheWarehouse") then
 		modOnGameEvents:ConnectEvent("OnDoorEnter", function(player, interactData)
@@ -46,7 +46,7 @@ if RunService:IsServer() then
 			end
 		end)
 
-		local modDamageTag = require(game.ReplicatedStorage.Library.DamageTag);
+		local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 		modOnGameEvents:ConnectEvent("OnNpcDeath", function(npcModule)
 			if npcModule.Name ~= "Zombie" then return end;
 
@@ -111,7 +111,7 @@ if RunService:IsServer() then
 	end
 
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+	modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 

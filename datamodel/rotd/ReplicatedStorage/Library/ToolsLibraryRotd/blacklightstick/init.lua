@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local CollectionService = game:GetService("CollectionService");
 local TweenService = game:GetService("TweenService");
 
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 local loopActive = false;
 CollectionService:GetInstanceAddedSignal("BlacklightLights"):Connect(function()
@@ -20,7 +20,7 @@ CollectionService:GetInstanceAddedSignal("BlacklightLights"):Connect(function()
 				local interactPos = parentObj:IsA("BasePart") and parentObj.Position or parentObj:IsA("Model") and parentObj:GetPivot() or nil;
 
 				if interactPos == nil then continue end;
-				local interactObj = require(interactableModule);
+				local interactObj = shared.require(interactableModule);
 				
 				local blacklights = CollectionService:GetTagged("BlacklightLights");
 				for _, blacklightModel in pairs(blacklights) do

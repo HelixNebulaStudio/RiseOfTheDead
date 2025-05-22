@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
+local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
 return function(event: EventPacket, cratePrefab, interactData, cratePlayers)
 	local storageId = interactData.StorageId;

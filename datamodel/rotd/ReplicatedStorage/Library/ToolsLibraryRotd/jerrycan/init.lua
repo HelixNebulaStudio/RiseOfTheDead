@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 
 local toolPackage = {
@@ -26,8 +26,8 @@ function toolPackage.OnServerUnequip(handler)
 end
 
 function toolPackage.OnActionEvent(handler, packet)
-	local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
-	local modMath = require(game.ReplicatedStorage.Library.Util.Math);
+	local modProjectile = shared.require(game.ReplicatedStorage.Library.Projectile);
+	local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
 
 	handler.IsActive = packet.IsActive == true;
 

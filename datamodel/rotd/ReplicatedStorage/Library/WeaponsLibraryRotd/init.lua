@@ -1,5 +1,5 @@
 
-local WeaponsLibrary = require(game.ReplicatedStorage.Library.WeaponsLibrary);
+local WeaponsLibrary = shared.require(game.ReplicatedStorage.Library.WeaponsLibrary);
 
 for _, module in pairs(script:GetChildren()) do
 	WeaponsLibrary.LoadToolModule(module);

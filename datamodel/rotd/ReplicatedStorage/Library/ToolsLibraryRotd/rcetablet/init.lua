@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 
 local toolPackage = {
@@ -38,7 +38,7 @@ end
 
 function toolPackage.ClientItemPrompt(handler)
 	local localPlayer = game.Players.LocalPlayer;
-	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 	local prefab = handler.Prefabs[1];
 	local primaryPart = prefab.PrimaryPart;

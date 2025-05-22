@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modInteractables = require(game.ReplicatedStorage.Library.Interactables);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 return function(event: EventPacket, interactData, storageItem) -- IsServer();
 	local player: Player? = event.Player;

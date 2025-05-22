@@ -2,11 +2,11 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local MISSION_ID = 0;
 if RunService:IsServer() then
-	local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
 	-- modBranchConfigs.IsWorld("TheMall")
 	

@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 
 local toolPackage = {
@@ -38,7 +38,7 @@ function toolPackage.RenderStep(handler, delta)
 	if tick()-animUpdateTick > 0.5 then
 		animUpdateTick = tick();
 		
-		local modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+		local modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 		local modCharacter = modData:GetModCharacter();
 
 		local characterProperties = modCharacter.CharacterProperties;

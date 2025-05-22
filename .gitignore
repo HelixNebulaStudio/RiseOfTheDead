@@ -3,3 +3,6 @@
 *.meta.json
 sourcemap.json
 .obsidian/*
+
+# Revive Engine source
+src/

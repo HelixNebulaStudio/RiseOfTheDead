@@ -1,23 +1,25 @@
 if not workspace:IsAncestorOf(script) then return end;
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Dependencies;
-repeat task.wait() until shared.MasterScriptInit == true;
 
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modWeaponAttributes = require(game.ReplicatedStorage.Library.Weapons.WeaponAttributes);
-local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modCustomizationData = require(game.ReplicatedStorage.Library.CustomizationData);
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modWeapons = Debugger:Require(game.ReplicatedStorage.Library.Weapons);
-local modHealthComponent = require(game.ReplicatedStorage.Components.HealthComponent);
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modWeaponAttributes = shared.require(game.ReplicatedStorage.Library.WeaponsLibrary.WeaponAttributes);
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modCustomizationData = shared.require(game.ReplicatedStorage.Library.CustomizationData);
+local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modWeapons = shared.require(game.ReplicatedStorage.Library.WeaponsLibrary);
+local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
-local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
-local modRaycastUtil = require(game.ReplicatedStorage.Library.Util.RaycastUtil);
+local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
+local modRaycastUtil = shared.require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 
-local modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
-local modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-local modToolService = require(game.ServerScriptService.ServerLibrary.ToolService);
+local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
+local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+local modToolService = shared.require(game.ServerScriptService.ServerLibrary.ToolService);
+
+shared.waitForIgnition();
+--==
 
 local turretArm: Model = script.Parent;
 local accessory: Accessory = turretArm.Parent :: Accessory;
@@ -349,9 +351,13 @@ function TurretRuntime(weaponStorageItem)
 
 	local itemValues = weaponStorageItem.Values;
 
-	local profile: Profile = shared.modProfile:Get(player);
-	local toolHandler: ToolHandlerInstance = shared.modPlayerEquipment.getToolHandler(weaponStorageItem, {activeWeaponModel});
-
+	local profile: ProfileRotd = shared.modProfile:Get(player) :: ProfileRotd;
+	local toolHandler: ToolHandlerInstance = playerClass.WieldComp:GetToolHandler(
+		weaponStorageItem.ID, 
+		weaponStorageItem.ItemId, 
+		weaponStorageItem, 
+		{activeWeaponModel}
+	);
 
 	local maistPercent = 1;
 	local skill = profile.SkillTree:GetSkill(player, "maist");
@@ -367,8 +373,10 @@ function TurretRuntime(weaponStorageItem)
 	local toolPackage = toolHandler.ToolPackage;
 	local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
 	local configurations = equipmentClass.Configurations;
-	if profile.InfAmmo then
-		configurations.InfiniteAmmo = profile.InfAmmo;
+	local properties = equipmentClass.Properties;
+
+	if profile.Cache.InfAmmo then
+		properties.InfiniteAmmo = profile.Cache.InfAmmo;
 	end
 
 	if configurations.ReloadMode == modWeaponAttributes.ReloadModes.Single and targetModel == nil and (itemValues.MA or 1) > 0 then

@@ -2,13 +2,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionFunctions = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modConfigurations = require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
-local modGuiHighlight = require(game.ReplicatedStorage.Library.UI.GuiHighlight);
+local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
+local modGuiHighlight = shared.require(game.ReplicatedStorage.Library.UI.GuiHighlight);
 
 if RunService:IsClient() then
-	local modWaypoint = require(game.ReplicatedStorage.Library.Waypoint);
-	local modPlayers = require(game.ReplicatedStorage.Library.Players);
+	local modWaypoint = shared.require(game.ReplicatedStorage.Library.Waypoint);
+	local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 
 	MissionFunctions.activeWaypoint = nil;
 	local player = game.Players.LocalPlayer;

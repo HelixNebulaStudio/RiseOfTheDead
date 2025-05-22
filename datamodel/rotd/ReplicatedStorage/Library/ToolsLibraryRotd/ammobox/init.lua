@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 --==
 
 local toolPackage = {
@@ -32,7 +32,7 @@ function toolPackage.OnSpawn(handler, prefab: Model)
 	newInteractable:SetAttribute("UseLimit", 3);
 	newInteractable.Parent = prefab;
 
-	local interactData = require(newInteractable);
+	local interactData = shared.require(newInteractable);
 end;
 
 function toolPackage.newClass()

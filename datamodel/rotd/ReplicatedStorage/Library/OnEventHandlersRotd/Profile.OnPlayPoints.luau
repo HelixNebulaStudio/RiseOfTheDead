@@ -1,10 +1,10 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modItemsLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modBattlePassLibrary = require(game.ReplicatedStorage.Library.BattlePassLibrary);
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.BattlePassLibrary);
 
 return function(event: EventPacket, profile: Profile, points: number?, reason: string?)
-    local modEvents = require(game.ServerScriptService.ServerLibrary.Events);
+    local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
     local player: Player = profile.Player;
 
     local cooldowns = profile.Cache.MpBookPointsCooldown;

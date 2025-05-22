@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local CollectionService = game:GetService("CollectionService");
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 local TuneTracks = {
 	{Id="rbxassetid://6297207526"; Name="Brighter Day"};
@@ -29,7 +29,7 @@ local toolPackage = {
 
 function toolPackage.ClientPrimaryFire(handler)
 	local player = game.Players.LocalPlayer;
-	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 	
 	spawn(function()
@@ -61,7 +61,7 @@ end
 
 function toolPackage.OnClientUnequip()
 	local player = game.Players.LocalPlayer;
-	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 
 	modInterface:CloseWindow("InstrumentWindow");
@@ -69,7 +69,7 @@ end
 
 function toolPackage.ClientItemPrompt(handler)
 	local player = game.Players.LocalPlayer;
-	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 
 	if modInterface:IsVisible("InstrumentWindow") then return end;

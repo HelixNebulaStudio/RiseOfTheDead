@@ -1,5 +1,5 @@
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 --==
 local attirePackage = {
 	ItemId=script.Name;
@@ -19,7 +19,7 @@ function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
 	if not modBranchConfigs.IsWorld("Slaughterfest") then
-		equipmentClass:AddModifier("TireArmor");
+		equipmentClass:AddBaseModifier("TireArmor");
 	end
 
 	return equipmentClass;

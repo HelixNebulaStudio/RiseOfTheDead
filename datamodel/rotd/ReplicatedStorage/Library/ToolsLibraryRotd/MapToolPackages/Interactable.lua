@@ -1,2 +1,2 @@
-local modInteractables: Interactables = require(game.ReplicatedStorage.Library.Interactables);
+local modInteractables: Interactables = shared.require(game.ReplicatedStorage.Library.Interactables);
 return modInteractables:Instance("GameModeEnter", script);

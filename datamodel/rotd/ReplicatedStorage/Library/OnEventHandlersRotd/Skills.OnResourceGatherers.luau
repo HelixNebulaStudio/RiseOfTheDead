@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modSyncTime = require(game.ReplicatedStorage.Library.SyncTime);
+local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 
 local skillKey = "resgat";
 return function(event: EventPacket, player: Player, interactData) -- :IsServer()
@@ -9,7 +9,7 @@ return function(event: EventPacket, player: Player, interactData) -- :IsServer()
 	
 	local profile = shared.modProfile:Get(player);
 	
-	local modSquadService = require(game.ServerScriptService.ServerLibrary.SquadService);
+	local modSquadService = shared.require(game.ServerScriptService.ServerLibrary.SquadService);
 	local squad = modSquadService.GetSquadByPlayer(player);
 	if squad == nil then return end;
 	
@@ -56,7 +56,7 @@ return function(event: EventPacket, player: Player, interactData) -- :IsServer()
 
 		local successful = shared.modProfile.PickUpRequest(squadmatePlayer, interactObject, interactModule);
 		if successful then
-			local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
+			local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 			modReplicationManager.UnreplicateFrom(player, interactObject.Parent);
 		end
 	end)

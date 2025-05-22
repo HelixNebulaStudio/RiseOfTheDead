@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 
 local BaseTracks = {
@@ -67,7 +67,7 @@ function toolPackage.OnInputEvent(toolHandler: ToolHandlerInstance, inputData)
 
 	if RunService:IsClient() then
 		local player = game.Players.LocalPlayer;
-		local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+		local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
 		local modInterface = modData:GetInterfaceModule();
 
 		if not modInterface:IsVisible("InstrumentWindow") then
@@ -163,7 +163,7 @@ end
 
 function toolPackage.ClientUnequip()
 	local player = game.Players.LocalPlayer;
-	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 
 	modInterface:CloseWindow("InstrumentWindow");
@@ -171,7 +171,7 @@ end
 
 function toolPackage.ClientItemPrompt(handler: ToolHandlerInstance)
 	local player = game.Players.LocalPlayer;
-	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 
 	modInterface:ToggleWindow("InstrumentWindow", handler);

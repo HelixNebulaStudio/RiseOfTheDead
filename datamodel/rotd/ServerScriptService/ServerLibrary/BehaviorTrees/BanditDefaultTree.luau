@@ -1,9 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modLogicTree = require(game.ReplicatedStorage.Library.LogicTree);
+local modLogicTree = shared.require(game.ReplicatedStorage.Library.LogicTree);
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
 local treePackage = {
     Logic = {

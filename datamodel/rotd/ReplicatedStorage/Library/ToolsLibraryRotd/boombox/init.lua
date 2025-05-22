@@ -4,15 +4,15 @@ local RunService = game:GetService("RunService");
 local MarketplaceService = game:GetService("MarketplaceService");
 local CollectionService = game:GetService("CollectionService");
 
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local remoteBoomboxRemote = modRemotesManager:Get("BoomboxRemote");
 
 local audioModule = game.ReplicatedStorage.Library.Audio;
 --==
 if RunService:IsServer() then
-	modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 	function onBoomboxRemote(player, action, storageItemId, trackId)
 		local profile = shared.modProfile:Get(player);
@@ -109,7 +109,7 @@ local toolPackage = {
 
 function toolPackage.OnClientUnequip()
 	local player = game.Players.LocalPlayer;
-	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 	
 	modInterface:CloseWindow("BoomboxWindow");
@@ -117,7 +117,7 @@ end
 
 function toolPackage.ClientItemPrompt(handler)
 	local player = game.Players.LocalPlayer;
-	local modData = require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
 	local modInterface = modData:GetInterfaceModule();
 	
 	if modInterface:IsVisible("BoomboxWindow") then return end;

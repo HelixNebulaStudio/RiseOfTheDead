@@ -1,11 +1,11 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local DamageData = require(game.ReplicatedStorage.Data.DamageData);
+local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 --== When a npc takes damage;
 return function(event: EventPacket, damageData: DamageData)
-	local modSkillTree = require(game.ServerScriptService.ServerLibrary.SkillTree);
-	local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+	local modSkillTree = shared.require(game.ServerScriptService.ServerLibrary.SkillTree);
+	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
 	local damageBy: CharacterClass? = damageData.DamageBy;
 	if damageBy == nil or damageBy.ClassName ~= "PlayerClass" then return end;

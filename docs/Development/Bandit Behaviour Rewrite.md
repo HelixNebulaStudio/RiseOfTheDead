@@ -3,7 +3,7 @@ tags:
   - concept
   - rework
 ---
-
+[[2.3]]
 ### Flee (Chance: 20%)
 - Reasons:
 	- Low Health: `CurHealth <= 10%`

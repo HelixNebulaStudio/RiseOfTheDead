@@ -3,8 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
-local modEquipmentClass = require(game.ReplicatedStorage.Library.EquipmentClass);
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 local bladeTweenInfo = TweenInfo.new(0.15);
 --==

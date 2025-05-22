@@ -4,20 +4,20 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
-local modBranchConfigs = require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 --== Variables;
 local MISSION_ID = 1;
 
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
-	modStorage = require(game.ServerScriptService.ServerLibrary.Storage);
-	modMission = require(game.ServerScriptService.ServerLibrary.Mission);
-	modServerManager = require(game.ServerScriptService.ServerLibrary.ServerManager);
-	modAnalyticsService = require(game.ServerScriptService.ServerLibrary.AnalyticsService);
-	modOnGameEvents = require(game.ServerScriptService.ServerLibrary.OnGameEvents);
+	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
+	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
+	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 	modOnGameEvents:ConnectEvent("OnToolEquipped", function(player, storageItem)
 		if storageItem == nil then return end;
@@ -62,7 +62,7 @@ if RunService:IsServer() then
 	end)
 
 else
-	modData = require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+	modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 

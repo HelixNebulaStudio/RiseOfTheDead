@@ -13,10 +13,10 @@ end
 
 local isOwner = character:IsAncestorOf(script);
 
-local modKeyBindsHandler = require(game.ReplicatedStorage.Library.KeyBindsHandler);
-local modRemotesManager = require(game.ReplicatedStorage.Library.RemotesManager);
+local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 
-local modVector = require(game.ReplicatedStorage.Library.Util.Vector);
+local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
 local remoteAutoTurret = modRemotesManager:Get("AutoTurret");
 
@@ -117,7 +117,7 @@ end)
 if isOwner then
 	local debounce = tick()-1;
 
-	local modData = require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 	local storageItem;
 	UserInputService.InputBegan:connect(function(inputObject, inputEvent)
