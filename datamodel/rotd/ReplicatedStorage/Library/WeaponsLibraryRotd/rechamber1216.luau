@@ -96,7 +96,7 @@ function toolPackage.newClass()
 		KnockoutDistance=8;
 		KnockoutDuration=2;
 	};
-    configurations:AddModifier(knockoutModifier);
+    configurations:AddBaseModifier(knockoutModifier);
 	
 	return equipmentClass;
 end

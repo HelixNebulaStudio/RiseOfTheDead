@@ -10,7 +10,7 @@ local npcPackage = {
         ResourceDropId = "bandit";
         MoneyReward={Min=2; Max=4};
         ExperiencePool=40;
-        Hostile = true;
+        IsHostile = true;
     };
 
     Chatter = {
@@ -29,7 +29,6 @@ local npcPackage = {
     
     AddComponents = {
         "TargetHandler";
-        "IsInVision";
         "DropReward";
     };
 };
@@ -41,7 +40,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
     npcClass.HealthComp.MaxHealth = maxHealth;
     npcClass.HealthComp.CurHealth = maxHealth;
     
-
     local weaponChoices = {"tec9"; "xm1014";};
     if properties.Level > 5 then
         table.insert(weaponChoices, "ak47");
@@ -54,9 +52,11 @@ function npcPackage.Spawning(npcClass: NpcClass)
         properties.WeaponId = weaponChoices[math.random(1, #weaponChoices)];
     end
     
+    if game:GetService("RunService"):IsStudio() then
+        properties.WeaponId = "ak47";
+    end
     
     npcClass.Garbage:Tag(npcClass.OnThink:Connect(function()
-        Debugger:Warn("Bandit thinking..");
         npcClass.BehaviorTree:RunTree("BanditDefaultTree", true);
     end)); 
 end

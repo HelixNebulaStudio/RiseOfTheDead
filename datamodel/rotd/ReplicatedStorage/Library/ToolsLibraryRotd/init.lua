@@ -1,9 +1,11 @@
 
-local ToolsLibrary = shared.require(game.ReplicatedStorage.Library.ToolsLibrary);
+local modToolsLibrary = shared.require(game.ReplicatedStorage.Library.ToolsLibrary);
 
-for _, module in pairs(script:GetChildren()) do
-	ToolsLibrary.LoadToolModule(module);
+function modToolsLibrary.onRequire()
+	for _, module in pairs(script:GetChildren()) do
+		modToolsLibrary.LoadToolModule(module);
+	end
+	script.ChildAdded:Connect(modToolsLibrary.LoadToolModule);
 end
-script.ChildAdded:Connect(ToolsLibrary.LoadToolModule)
 
-return ToolsLibrary;
+return modToolsLibrary;

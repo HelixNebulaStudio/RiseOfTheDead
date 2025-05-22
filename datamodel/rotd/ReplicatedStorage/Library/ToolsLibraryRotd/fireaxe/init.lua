@@ -50,7 +50,7 @@ local toolPackage = {
 function toolPackage.newClass()
 	local equipmentClass: EquipmentClass = modEquipmentClass.new(toolPackage);
 
-	equipmentClass:AddModifier("AxeOfFire", {
+	equipmentClass:AddBaseModifier("AxeOfFire", {
 		SetValues={
 			AxeOfFireIgnitionChance = 0.66;
 			AxeOfFireDamage = 50;

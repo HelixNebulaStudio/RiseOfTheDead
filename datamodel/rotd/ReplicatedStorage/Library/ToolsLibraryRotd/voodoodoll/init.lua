@@ -44,7 +44,7 @@ function toolPackage.OnActionEvent(handler, packet)
 		local pick = players[math.random(1, #players)];
 		
 		if pick == "npc" or pick:FindFirstChild("Appearance") == nil then
-			local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.BaseLibrary.NpcProfileLibrary);
+			local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 
 			local npcName = modNpcProfileLibrary:GetRandom().Id;
 			local npcPrefabs = game.ServerStorage.Prefabs.Npc;

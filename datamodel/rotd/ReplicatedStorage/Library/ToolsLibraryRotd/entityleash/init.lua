@@ -207,7 +207,7 @@ function toolPackage.OnActionEvent(handler, packet)
 				fakeHumanoid.Died:Connect(function()
 					clear()
 					if handler.NpcModule then
-						handler.NpcModule:KillNpc();
+						handler.NpcModule:Kill();
 					end
 				end)
 			end

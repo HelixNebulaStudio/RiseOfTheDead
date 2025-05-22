@@ -1,8 +1,8 @@
 export type GAME_EVENT_KEY_ROTD =
-    | "EventPass.OnLevelUp"
-    | "EventPass.PuzzleInvoke"
-    | "GameModeManager.DisconnectPlayer"
-    | "Skills.OnResourceGatherers"
+    | "EventPass_OnLevelUp"
+    | "EventPass_PuzzleInvoke"
+    | "GameModeManager_DisconnectPlayer"
+    | "Skills_OnResourceGatherers"
     ;
 
 export type DAMAGE_TYPE_ROTD =
@@ -24,20 +24,24 @@ export type HUMANOID_TYPE_ROTD =
     | "Military"
     ;
 
---MARK: EquipmentClass
-export type EquipmentClassRotd = EquipmentClass & { 
-    AddModifier: (self: EquipmentClass, modifierId: string, config: {
-        BaseValues: anydict?;
-        SetValues: anydict?;
-        SumValues: anydict?;
-        ProductValues: anydict?;
-        MaxValues: anydict?;
-        MinValues: anydict?;
-    }) -> nil;
-    
-    ApplyModifiers: (self: EquipmentClass, storageItem: StorageItem) -> nil;
-    ProcessModifiers: (self: EquipmentClass, processType: string, ...any) -> nil;
-    GetClassAsModifier: (self: EquipmentClass, siid: string, configModifier: ConfigModifier?) -> ConfigModifier;
+--MARK: ProfileRotd
+export type ProfileRotd = Profile & {
+    SkillTree: anydict;
+    ItemUnlockables: anydict;
+    Trader: anydict;
+    Safehome: anydict;
+    BattlePassSave: anydict;
+    NpcTaskData: anydict;
+    Faction: anydict;
+}
 
+--MARK: GameSaveRotd
+export type GameSaveRotd = GameSave & {
+    Masteries: anydict;
+    Blueprints: anydict;
+}
+
+--MARK: EquipmentClass
+export type EquipmentClassRotd = EquipmentClass & {
     [any]: any;
 };

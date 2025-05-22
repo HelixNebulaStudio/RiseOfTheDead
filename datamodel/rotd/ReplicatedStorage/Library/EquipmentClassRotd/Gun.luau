@@ -14,12 +14,6 @@ function Gun.new(equipmentClass: EquipmentClass)
     return self;
 end
 
-function Gun:LoadWieldConfig(t)
-    for k,v in pairs(t) do
-        self[k] =v;
-    end
-end
-
 function Gun:Update(equipmentClass: EquipmentClass, storageItem: StorageItem)
     self:UpdatePotential(equipmentClass, storageItem.Values.L);
 

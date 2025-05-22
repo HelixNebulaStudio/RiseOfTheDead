@@ -37,7 +37,7 @@ if RunService:IsServer() then
 		end)
 	end)
 	
-	shared.modEventService:OnInvoked("Generic.OnItemPickup", function(
+	shared.modEventService:OnInvoked("Generic_OnItemPickup", function(
 		event: EventPacket, 
 		interactData, 
 		storageItem: StorageItem
@@ -265,7 +265,7 @@ return function(CutsceneSequence)
 	end);
 	
 	local playerDied = false;
-	local masonPrefab, masonNpcModule;
+	local masonPrefab, masonNpcClass;
 	CutsceneSequence:NewServerScene("spawnFriend", function()
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
@@ -283,97 +283,186 @@ return function(CutsceneSequence)
 
 		Debugger:Log("Spawn mason");
 		
+		masonNpcClass = modNpcs.spawn2({
+			Name = "Mason";
+			CFrame = CFrame.new(-1.22, 55.46, -287.322);
+			Owner = player;
+			AddComponents = {
+				"AttractNpcs";
+			}
+		});
+		masonPrefab = masonNpcClass.Character;
 		
-		masonPrefab = modNpcs.spawn("Mason", CFrame.new(-1.22, 55.46, -287.322), function(npc, npcModule)
-			masonNpcModule = npcModule;
+		local attractNpcsComp = masonNpcClass:GetComponent("AttractNpcs");
+		attractNpcsComp.AttractHumanoidType = {"Zombie"};
+		attractNpcsComp.SelfAttractAlert = true;
+		attractNpcsComp:Activate();
+		
+		local actionIndex = 0;
+		local cutsceneActions = {};
+		masonNpcClass.CutsceneActions = cutsceneActions;
+		masonNpcClass.Garbage:Tag(cutsceneActions);
 
-			npcModule.Owner = player;
+		table.insert(masonNpcClass.CutsceneActions, function()
+			Debugger:Log("Run to player.");
+
+			masonNpcClass.Move:SetMoveSpeed("set", "default", 18);
+			masonNpcClass:ToggleInteractable(false);
 			
-			local actionIndex = 0;
-			npcModule.CutsceneActions = {};
+			masonNpcClass.Move:MoveTo(Vector3.new(2.737, 55.387, -192.427));
+			masonNpcClass.Move.MoveToEnded:Wait(10);
+			masonNpcClass:SetCFrame(CFrame.new(2.737, 55.387, -192.427) * CFrame.Angles(0, math.rad(180), 0));
 
-			table.insert(npcModule.CutsceneActions, function()
-				Debugger:Log("Run to player.");
+			Debugger:Warn("Play crouch look");
+			masonNpcClass.PlayAnimation("CrouchLook");
+		end);
 
-				npcModule.Move:SetMoveSpeed("set", "default", 18);
-				npcModule:ToggleInteractable(false);
-				
-				npcModule.Move:MoveTo(Vector3.new(2.737, 55.387, -192.427));
-				npcModule.Move.MoveToEnded:Wait(10);
-				npcModule.Actions:Teleport(CFrame.new(2.737, 55.387, -192.427) * CFrame.Angles(0, math.rad(180), 0));
+		table.insert(masonNpcClass.CutsceneActions, function()
+			Debugger:Log("Stand with player.");
+			masonNpcClass.PlayAnimation("CrouchPickUp");
+		end);
 
-				Debugger:Warn("Play crouch look");
-				npcModule.PlayAnimation("CrouchLook");
-			end);
+		table.insert(masonNpcClass.CutsceneActions, function()
+			Debugger:Log("Handout")
+			masonNpcClass.Move:SetMoveSpeed("set", "default", 13);
+			
+			masonNpcClass.Move:MoveTo(Vector3.new(-3.35487795, 55.2862129, -212.686417));
+			masonNpcClass.Move.MoveToEnded:Wait(4);
+			
+			masonNpcClass:SetCFrame(CFrame.new(-3.35487795, 55.2862129, -212.686417));
+			masonNpcClass.Move:Face(playerClass.RootPart);
 
-			table.insert(npcModule.CutsceneActions, function()
-				Debugger:Log("Stand with player.");
-				npcModule.PlayAnimation("CrouchPickUp");
-			end);
+			masonNpcClass.PlayAnimation("Handout", 1.4);
+		end);
 
-			table.insert(npcModule.CutsceneActions, function()
-				Debugger:Log("Handout")
-				npcModule.Move:SetMoveSpeed("set", "default", 13);
-				
-				npcModule.Move:MoveTo(Vector3.new(-3.35487795, 55.2862129, -212.686417));
-				npcModule.Move.MoveToEnded:Wait(4);
-				
-				npcModule.Actions:Teleport(CFrame.new(-3.35487795, 55.2862129, -212.686417));
-				npcModule.Move:Face(playerClass.RootPart);
+		table.insert(masonNpcClass.CutsceneActions, function()
+			Debugger:Log("Guns out.");
 
-				npcModule.PlayAnimation("Handout", 1.4);
-			end);
+			masonNpcClass.StopAnimation("Handout", 0.5);
 
-			table.insert(npcModule.CutsceneActions, function()
-				Debugger:Log("Guns out.");
+			masonNpcClass.WieldComp:Equip{
+				ItemId = "revolver454";
+				Configurations = {
+					Damage = 25;
+				};
+			}
 
-				npcModule.StopAnimation("Handout", 0.5);
+			masonNpcClass.Move:Face(Vector3.new(4.431, 56.31, -166.753));
+			masonNpcClass.Move:SetMoveSpeed("set", "default", 0);
 
-				npcModule.Wield.Equip("revolver454"); 
-				pcall(function()
-					npcModule.Wield.ToolModule.Configurations.MinBaseDamage = 25;
-				end);
+			local protectOwner = masonNpcClass:GetComponent("ProtectOwner");
+			protectOwner:Activate();
+		end);
 
-				npcModule.Move:Face(Vector3.new(4.431, 56.31, -166.753));
-				npcModule.Move:SetMoveSpeed("set", "default", 0);
+		table.insert(masonNpcClass.CutsceneActions, function()
+			Debugger:Log("Run to car");
 
-				npcModule.IsProtectingOwner = true;
-				npcModule.Actions:ProtectOwner(function()
-					return npcModule.IsProtectingOwner;
-				end)
-			end);
+			masonNpcClass.Move:SetMoveSpeed("set", "default", 20);
+			masonNpcClass.Move:MoveTo(Vector3.new(-8.782, 55.3, -219.586));
+		end);
 
-			table.insert(npcModule.CutsceneActions, function()
-				Debugger:Log("Run to car");
-
-				npcModule.Move:SetMoveSpeed("set", "default", 20);
-				npcModule.Move:MoveTo(Vector3.new(-8.782, 55.3, -219.586));
-			end);
-
-			npcModule.NextAction = function(yield)
-				local done = false;
-				task.spawn(function()
-					actionIndex = actionIndex +1;
-					Debugger:Log("Next action : ", actionIndex);
-					npcModule.CutsceneActions[actionIndex]();
-					done = true;
-				end)
-				if yield == true then
-					repeat 
-						task.wait(0.5);
-					until done == true;
-				end
+		masonNpcClass.NextAction = function(yield)
+			local done = false;
+			task.spawn(function()
+				actionIndex = actionIndex +1;
+				Debugger:Log("Next action : ", actionIndex);
+				masonNpcClass.CutsceneActions[actionIndex]();
+				done = true;
+			end)
+			if yield == true then
+				repeat 
+					task.wait(0.5);
+				until done == true;
 			end
+		end
+		-- masonPrefab = modNpcs.spawn("Mason", CFrame.new(-1.22, 55.46, -287.322), function(npc, npcModule)
+		-- 	masonNpcClass = npcModule;
 
-		end, modNpcs.NpcBaseConstructors.CutsceneHuman);
+		-- 	npcModule.Owner = player;
+			
+		-- 	local actionIndex = 0;
+		-- 	npcModule.CutsceneActions = {};
 
-		masonNpcModule.SetAnimation("CrouchLook", {script.MasonAnimations.CrouchLookAnim});
-		--masonNpcModule.SetAnimation("Running", {script.MasonAnimations.RunAnim});
-		masonNpcModule.SetAnimation("Handout", {script.MasonAnimations.Handout});
-		masonNpcModule.SetAnimation("CrouchPickUp", {script.MasonAnimations.CrouchPickUp});
+		-- 	table.insert(npcModule.CutsceneActions, function()
+		-- 		Debugger:Log("Run to player.");
 
-		masonNpcModule.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None;
+		-- 		npcModule.Move:SetMoveSpeed("set", "default", 18);
+		-- 		npcModule:ToggleInteractable(false);
+				
+		-- 		npcModule.Move:MoveTo(Vector3.new(2.737, 55.387, -192.427));
+		-- 		npcModule.Move.MoveToEnded:Wait(10);
+		-- 		npcModule.Actions:Teleport(CFrame.new(2.737, 55.387, -192.427) * CFrame.Angles(0, math.rad(180), 0));
 
+		-- 		Debugger:Warn("Play crouch look");
+		-- 		npcModule.PlayAnimation("CrouchLook");
+		-- 	end);
+
+		-- 	table.insert(npcModule.CutsceneActions, function()
+		-- 		Debugger:Log("Stand with player.");
+		-- 		npcModule.PlayAnimation("CrouchPickUp");
+		-- 	end);
+
+		-- 	table.insert(npcModule.CutsceneActions, function()
+		-- 		Debugger:Log("Handout")
+		-- 		npcModule.Move:SetMoveSpeed("set", "default", 13);
+				
+		-- 		npcModule.Move:MoveTo(Vector3.new(-3.35487795, 55.2862129, -212.686417));
+		-- 		npcModule.Move.MoveToEnded:Wait(4);
+				
+		-- 		npcModule.Actions:Teleport(CFrame.new(-3.35487795, 55.2862129, -212.686417));
+		-- 		npcModule.Move:Face(playerClass.RootPart);
+
+		-- 		npcModule.PlayAnimation("Handout", 1.4);
+		-- 	end);
+
+		-- 	table.insert(npcModule.CutsceneActions, function()
+		-- 		Debugger:Log("Guns out.");
+
+		-- 		npcModule.StopAnimation("Handout", 0.5);
+
+		-- 		npcModule.Wield.Equip("revolver454"); 
+		-- 		pcall(function()
+		-- 			npcModule.Wield.ToolModule.Configurations.MinBaseDamage = 25;
+		-- 		end);
+
+		-- 		npcModule.Move:Face(Vector3.new(4.431, 56.31, -166.753));
+		-- 		npcModule.Move:SetMoveSpeed("set", "default", 0);
+
+		-- 		npcModule.IsProtectingOwner = true;
+		-- 		npcModule.Actions:ProtectOwner(function()
+		-- 			return npcModule.IsProtectingOwner;
+		-- 		end)
+		-- 	end);
+
+		-- 	table.insert(npcModule.CutsceneActions, function()
+		-- 		Debugger:Log("Run to car");
+
+		-- 		npcModule.Move:SetMoveSpeed("set", "default", 20);
+		-- 		npcModule.Move:MoveTo(Vector3.new(-8.782, 55.3, -219.586));
+		-- 	end);
+
+		-- 	npcModule.NextAction = function(yield)
+		-- 		local done = false;
+		-- 		task.spawn(function()
+		-- 			actionIndex = actionIndex +1;
+		-- 			Debugger:Log("Next action : ", actionIndex);
+		-- 			npcModule.CutsceneActions[actionIndex]();
+		-- 			done = true;
+		-- 		end)
+		-- 		if yield == true then
+		-- 			repeat 
+		-- 				task.wait(0.5);
+		-- 			until done == true;
+		-- 		end
+		-- 	end
+
+		-- end, modNpcs.NpcBaseConstructors.CutsceneHuman);
+
+		masonNpcClass.SetAnimation("CrouchLook", {script.MasonAnimations.CrouchLookAnim});
+		masonNpcClass.SetAnimation("Handout", {script.MasonAnimations.Handout});
+		masonNpcClass.SetAnimation("CrouchPickUp", {script.MasonAnimations.CrouchPickUp});
+
+		masonNpcClass.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None;
 	end);
 	
 	CutsceneSequence:NewScene("studioLogo", function()
@@ -408,13 +497,13 @@ return function(CutsceneSequence)
 		local playerClass = shared.modPlayers.get(player);
 
 		task.delay(3, function()
-			masonNpcModule.Chat(player, sceneDialogues[1].Reply);
+			masonNpcClass.Chat(player, sceneDialogues[1].Reply);
 		end)
 
-		masonNpcModule.NextAction(true);
+		masonNpcClass.NextAction(true);
 		CutsceneSequence:Pause(18);
 		
-		masonNpcModule.Chat(player, sceneDialogues[2].Reply);
+		masonNpcClass.Chat(player, sceneDialogues[2].Reply);
 		CutsceneSequence:NextScene("UnconsciousWake");
 		
 		task.wait(1);
@@ -431,18 +520,18 @@ return function(CutsceneSequence)
 		end)
 		
 		task.wait(1);
-		masonNpcModule.NextAction();
+		masonNpcClass.NextAction();
 		
 		playerClass.Character:SetAttribute("VisibleArms", true);
 		CutsceneSequence:NextScene("playerWake");
-		masonNpcModule.Chat(player, sceneDialogues[3].Reply);
+		masonNpcClass.Chat(player, sceneDialogues[3].Reply);
 		
 		task.wait(2);
 		CutsceneSequence:Pause(18);
 		CutsceneSequence:NextScene("playerAllowMove");
 		
-		masonNpcModule.Chat(player, sceneDialogues[4].Reply);
-		masonNpcModule.NextAction();
+		masonNpcClass.Chat(player, sceneDialogues[4].Reply);
+		masonNpcClass.NextAction();
 
 		task.wait(1.3);
 		
@@ -466,7 +555,7 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			repeat
 				task.wait(0.3);
-				masonNpcModule.Move:Face(playerClass.RootPart);
+				masonNpcClass.Move:Face(playerClass.RootPart);
 			until mission.ProgressionPoint == 4;
 
 		else
@@ -478,9 +567,9 @@ return function(CutsceneSequence)
 		
 		local explosionSoundPart = workspace.Environment:WaitForChild("ExplosionSoundPart");
 		modAudio.Play("HordeGrowl", explosionSoundPart);
-		masonNpcModule.NextAction();
+		masonNpcClass.NextAction();
 
-		masonNpcModule.Chat(players, sceneDialogues[5].Reply);
+		masonNpcClass.Chat(players, sceneDialogues[5].Reply);
 		
 		task.wait(2);
 		
@@ -516,8 +605,8 @@ return function(CutsceneSequence)
 					npcClass.Properties.AttackDamage = math.random(2, 4);
 					npcClass.OnTarget(players);
 
-					if masonNpcModule.Target == nil then
-						masonNpcModule.Target = zombiePrefab;
+					if masonNpcClass.Target == nil then
+						masonNpcClass.Target = zombiePrefab;
 					end
 				end
 			end)
@@ -643,11 +732,11 @@ return function(CutsceneSequence)
 		gasFire2.Enabled = true;
 		modAudio.Play("Fire", GasTankPart, true);
 		wait(3);
-		masonNpcModule.Chat(players, sceneDialogues[6].Reply);
-		masonNpcModule.IsProtectingOwner = false;
-		masonNpcModule.NextAction();
+		masonNpcClass.Chat(players, sceneDialogues[6].Reply);
+		masonNpcClass.IsProtectingOwner = false;
+		masonNpcClass.NextAction();
 		wait(1);
-		workspace.Environment.CarSeat:Sit(masonNpcModule.Humanoid);
+		workspace.Environment.CarSeat:Sit(masonNpcClass.Humanoid);
 		wait(6);
 		disableSecondSpawner = true;
 		originalBridge2:Destroy();
@@ -681,7 +770,7 @@ return function(CutsceneSequence)
 				c.Anchored = false;
 			end;
 		end;
-		masonNpcModule.Chat(players, sceneDialogues[7].Reply);
+		masonNpcClass.Chat(players, sceneDialogues[7].Reply);
 		explosionEffect.Parent = GasTankPart;
 		task.spawn(function() CutsceneSequence.NextScene(CutsceneSequence, "camShake"); end)
 

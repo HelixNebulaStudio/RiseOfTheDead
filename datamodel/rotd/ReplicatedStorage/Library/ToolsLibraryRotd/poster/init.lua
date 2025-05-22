@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService");
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
-local modPoster = shared.require(game.ReplicatedStorage.BaseLibrary.Poster);
+local modPoster = shared.require(game.ReplicatedStorage.Library.Poster);
 
 local remoteSetPoster = modRemotesManager:Get("SetPoster");
 

@@ -15,6 +15,7 @@ sourcemap.project.json
 
 # Ignore meta files
 *.meta.json
+*.rbxmx
 
 # RotD Base Local Library
 *./

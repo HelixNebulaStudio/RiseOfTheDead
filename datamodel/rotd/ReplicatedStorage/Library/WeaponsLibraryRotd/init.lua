@@ -1,9 +1,11 @@
 
-local WeaponsLibrary = shared.require(game.ReplicatedStorage.Library.WeaponsLibrary);
+local modWeaponsLibrary = shared.require(game.ReplicatedStorage.Library.WeaponsLibrary);
 
-for _, module in pairs(script:GetChildren()) do
-	WeaponsLibrary.LoadToolModule(module);
+function modWeaponsLibrary.onRequire()
+	for _, module in pairs(script:GetChildren()) do
+		modWeaponsLibrary.LoadToolModule(module);
+	end
+	script.ChildAdded:Connect(modWeaponsLibrary.LoadToolModule);
 end
-script.ChildAdded:Connect(WeaponsLibrary.LoadToolModule)
 
-return WeaponsLibrary;
+return modWeaponsLibrary;

@@ -141,7 +141,7 @@ end
 function toolPackage.newClass()
 	local equipmentClass = modEquipmentClass.new(toolPackage);
 	
-	equipmentClass:AddModifier("BulletRicochet", {
+	equipmentClass:AddBaseModifier("BulletRicochet", {
 		SetValues={
 			BulletRicochetCount=2;
 			BulletRicochetDistance=64;

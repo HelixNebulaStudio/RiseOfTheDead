@@ -104,7 +104,7 @@ end
 function toolPackage.newClass()
 	local equipmentClass: EquipmentClass = modEquipmentClass.new(toolPackage);
 	
-	equipmentClass:AddModifier("CriticalShot", {
+	equipmentClass:AddBaseModifier("CriticalShot", {
 		BaseValues={
 			CritChance=0.2;
 			CritMulti=0.2;

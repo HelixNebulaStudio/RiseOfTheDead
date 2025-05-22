@@ -1,0 +1,13 @@
+{
+    "search.exclude": {
+        "**/*.meta.json": true
+    },
+    "luau.trace.server": "verbose",
+    "luau-lsp.sourcemap.autogenerate": true,
+    "luau-lsp.sourcemap.enabled": true,
+    "luau-lsp.sourcemap.rojoProjectFile": "sourcemap.project.json",
+    "luau-lsp.types.definitionFiles": [
+        "src/TypeDef.d.lua",
+        "rotd/TypeDefRotd.d.d.lua"
+    ]
+}
