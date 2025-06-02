@@ -34,6 +34,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         frame.Position = UDim2.new(0.5, 5, 1, -20);
         frame.Size = UDim2.new(0.25, 0, 0, 18);
         barTextLabel.TextSize = 9;
+        
+		frame.BackgroundTransparency = 0.5;
+		frame.ImageTransparency = 1;
+		local uiCorner = Instance.new("UICorner");
+		uiCorner.CornerRadius = UDim.new(0, 5);
+		uiCorner.Parent = frame;
     end
 
     local element: InterfaceElement = interface:GetOrDefaultElement("MechanicsBar", {

@@ -133,7 +133,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	interface:BindConfigKey("DisableInventory", {inventoryWindow});
 	
 	if modConfigurations.CompactInterface then
-		inventoryFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+		inventoryFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
 			inventoryWindow:Close();
 		end)
 		inventoryWindow:SetClosePosition(UDim2.new(0, 0, 1, 0), UDim2.new(0, 0, 0, 0));
@@ -460,20 +460,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end
 
-	local function inventoryVisibleChanged(visible)
-		if visible then
-			handleStorage("OpenStorage" ,true);
-			modStorageInterface.UpdateStorages{
-				modData.Storages["Inventory"],
-				modData.Storages["Clothing"]
-			};
-
-		else
-			defaultStorageInterface:ToggleDescriptionFrame(false, nil, 0.3);
-			modStorageInterface.CloseOptionMenus();
-		end
-	end
-
 	interface.Properties.ActiveHotbarKeys = 5;
 	interface.Properties.HotEquip = function(index)
 		if not modCharacter.CharacterProperties.IsAlive then return end;
@@ -560,19 +546,25 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				handleStorage("RequestStorage", true);
 			end
 			
-			inventoryVisibleChanged(inventoryWindow.Visible);
+			handleStorage("OpenStorage" ,true);
+			modStorageInterface.UpdateStorages{
+				modData.Storages["Inventory"],
+				modData.Storages["Clothing"]
+			};
 			updateWarmth();
 			modStorageInterface.QueueRefreshStorage();
-			
+
 		else
-			modStorageInterface.CloseInspectFrame()
 			clothingToggleMenu.Visible = false;
 			defaultStorageInterface:StopDragItem();
+
+			defaultStorageInterface:ToggleDescriptionFrame(false, nil, 0.3);
+			modStorageInterface.CloseOptionMenus();
+
 			if not modConfigurations.CompactInterface then
 				-- or (Interface.modWorkbenchInterface and Interface.modWorkbenchInterface.SelectedSlot == nil) 
 				interface:ToggleWindow("Workbench", false);
 				interface:ToggleWindow("WeaponStats", false);
-
 			end
 			interface:ToggleWindow("ExternalStorage", false);
 			interface:ToggleWindow("SupplyStation", false);

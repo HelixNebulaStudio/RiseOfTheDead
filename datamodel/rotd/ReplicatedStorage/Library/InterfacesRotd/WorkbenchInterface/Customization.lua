@@ -2666,7 +2666,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			if not self.Menu.Visible then
 				garbage:Destruct();
 
-				if workbenchWindow.Visible then
+				if workbenchWindow.Visible and workbenchWindow.Binds.SelectedSlot then
 					interface:ToggleWindow("WeaponStats", true);
 				end
 				return;

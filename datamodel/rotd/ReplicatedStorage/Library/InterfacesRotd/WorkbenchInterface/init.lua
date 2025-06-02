@@ -46,7 +46,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local pageFrame = workbenchFrame.pageFrame;
 	local navBar = workbenchFrame.navBar;
 	local navButtons = navBar:GetChildren();
-	local processesTag = workbenchFrame.processTag;
 	local listFrameTemplate = script:WaitForChild("listFrame");
 	local cateTabTemplate = script:WaitForChild("categoryTab");
 	local gridListTemplate = script:WaitForChild("gridList");
@@ -54,15 +53,29 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local labelTemplate = script:WaitForChild("label");
 	local itemButtonTemplate = script:WaitForChild("itemButton");
 
+	local clearSelectionButton;
 
 	local workbenchWindow: InterfaceWindow = interface:NewWindow("Workbench", workbenchFrame);
 	workbenchWindow.CompactFullscreen = true;
 	workbenchWindow.DisableInteractables = true;
+	workbenchWindow.CloseWithInteract = true;
+
+    local binds = workbenchWindow.Binds;
+	binds.IsPremium = false;
+	binds.Workbenches = {};
+	binds.ActiveWorkbenches = {};
+
 	if modConfigurations.CompactInterface then
+		clearSelectionButton = workbenchFrame.TitleFrame:WaitForChild("clearSelectionButton");
 		workbenchWindow:SetClosePosition(UDim2.new(1, 0, 1, 0), UDim2.new(1, 0, 0, 0));
 		
-		workbenchFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+		workbenchFrame.TitleFrame:WaitForChild("closeButton").MouseButton1Click:Connect(function()
 			workbenchWindow:Close();
+		end)
+		workbenchFrame.TitleFrame:WaitForChild("clearSelectionButton").MouseButton1Click:Connect(function()
+			binds.SelectedSlot = nil;
+			binds.ClearSelection();
+			interface:ToggleWindow("Inventory", true);
 		end)
 	else
 		workbenchWindow:SetClosePosition(UDim2.new(2, 0, 0.5, 0), UDim2.new(1, -10, 0.5, 0));
@@ -72,10 +85,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end)
 	workbenchWindow:AddCloseButton(workbenchFrame);
 	
-    local binds = workbenchWindow.Binds;
-	binds.IsPremium = false;
-	binds.Workbenches = {};
-	binds.ActiveWorkbenches = {};
     
 	workbenchWindow.OnToggle:Connect(function(visible, packet)
 		packet = packet or {};
@@ -141,9 +150,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
             
             if packet.DontCloseInventory ~= true then
-                interface:ToggleWindow("Inventory", false);
+                interface:ToggleWindow("Inventory", false)
             end
             interface:ToggleWindow("WeaponStats", false);
+			interface:ToggleWindow("ItemInspect", false);
         end
 	end)
 	
@@ -176,6 +186,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             if #processes > 0 then
                 binds.LoadProcesses();
             end
+			
+			workbenchTitleLabel.Text = "Workbench ";
             binds.RefreshNavigations();
             
         end
@@ -245,11 +257,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local function onSelectionChange()
 		binds.ClearSelection();
-        local weaponStats: InterfaceWindow = interface:GetWindow("WeaponStats");
-        if weaponStats then
-            weaponStats:Close();
-        end
-		
+	
 		local inspectWindow: InterfaceWindow = interface:GetWindow("ItemInspect");
 		if inspectWindow then
 			if modConfigurations.CompactInterface then
@@ -258,8 +266,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				inspectWindow.Binds.SetStyle("Workbench");
 			end
 		end
-	
+
 		if binds.SelectedSlot then
+			if clearSelectionButton then
+				clearSelectionButton.Visible = true;
+			end
 			local itemId = binds.SelectedSlot.Item.ItemId;
 			local itemLib = modItemLibrary:Find(itemId);
 
@@ -306,6 +317,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 
 		else
+			if clearSelectionButton then
+				clearSelectionButton.Visible = false;
+			end
 			if inspectWindow then
 				inspectWindow:Close();
 			end
@@ -617,7 +631,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			return (processTypeSorting[A.Type] or 999) < (processTypeSorting[B.Type] or 999);
 		end)
 
-		processesTag.Text = ("($c/$t)"):gsub("$c", tostring(#processes)):gsub("$t", binds.IsPremium and "10" or "5");
+		local processCountStr = `({tostring(#processes)}/{binds.IsPremium and "10" or "5"})`;
+		workbenchTitleLabel.Text = `Workbench {processCountStr}`;
 
 		return processes;
 	end
@@ -629,6 +644,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end
 	
 	function binds.ClearSelection()
+		if clearSelectionButton then
+			clearSelectionButton.Visible = false;
+		end
+
 		for k, listMenu in pairs(binds.ActiveWorkbenches) do
 			listMenu:Destroy();
 			binds.ActiveWorkbenches[k] = nil;
@@ -638,6 +657,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		binds.ActiveWorkbenches.Blueprints.Menu.Parent = pageFrame;
 		binds.ActiveWorkbenches.Blueprints.Menu.Name = "bpListFrame";
 		
+        local weaponStats: InterfaceWindow = interface:GetWindow("WeaponStats");
+        if weaponStats then
+            weaponStats:Close();
+        end
 		local inspectWindow: InterfaceWindow = interface:GetWindow("ItemInspect");
 		if inspectWindow then
 			inspectWindow:Close();

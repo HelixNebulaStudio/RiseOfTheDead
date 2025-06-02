@@ -22,18 +22,62 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	window.ReleaseMouse = false;
     interface:BindConfigKey("DisableGeneralStats", {window});
 
-    if modConfigurations.CompactInterface then
-        statsFrame.Size = UDim2.new(0.5, 0, 0, 25);
-        window:SetClosePosition(UDim2.new(0.5, 0, 1, 45), UDim2.new(0.5, 0, 1, -45));
+    function window.Binds.SetStyle(styleId)
+        if modConfigurations.CompactInterface then
+            if styleId == "Inventory" then
+                window.ClosePoint = UDim2.new(0, 0, 0, -40);
+                window.OpenPoint = UDim2.new(0, 0, 0, 0);
+                statsFrame.Position = window.OpenPoint;
+                statsFrame.AnchorPoint = Vector2.new(0, 0);
+                statsFrame.Size = UDim2.new(0.5, 0, 0, 40);
 
-        statsFrame.moneylabel.AnchorPoint = Vector2.new(0, 1);
-        statsFrame.moneylabel.Position = UDim2.new(0.5, 160, 1, 0);
-        statsFrame.moneylabel.TextYAlignment = Enum.TextYAlignment.Bottom;
-        statsFrame.perkslabel.AnchorPoint = Vector2.new(1, 1);
-        statsFrame.perkslabel.Position = UDim2.new(0.5, -160, 1, 0);
-        statsFrame.perkslabel.TextYAlignment = Enum.TextYAlignment.Bottom;
+                statsFrame.moneylabel.AnchorPoint = Vector2.new(0, 0.5);
+                statsFrame.moneylabel.Position = UDim2.new(0.5, 10, 0.5, 0);
+                statsFrame.moneylabel.TextYAlignment = Enum.TextYAlignment.Center;
+                statsFrame.perkslabel.AnchorPoint = Vector2.new(1, 0.5);
+                statsFrame.perkslabel.Position = UDim2.new(0.5, -10, 0.5, 0);
+                statsFrame.perkslabel.TextYAlignment = Enum.TextYAlignment.Center;
+            else
+                statsFrame.AnchorPoint = Vector2.new(0.5, 0);
+                statsFrame.Size = UDim2.new(0.5, 0, 0, 25);
+                window.ClosePoint = UDim2.new(0.5, 0, 1, 70);
+                window.OpenPoint = UDim2.new(0.5, 0, 1, -70);
+                statsFrame.Position = window.OpenPoint;
+
+                statsFrame.moneylabel.AnchorPoint = Vector2.new(0, 1);
+                statsFrame.moneylabel.Position = UDim2.new(0.5, 160, 1, 0);
+                statsFrame.moneylabel.TextYAlignment = Enum.TextYAlignment.Bottom;
+                statsFrame.perkslabel.AnchorPoint = Vector2.new(1, 1);
+                statsFrame.perkslabel.Position = UDim2.new(0.5, -160, 1, 0);
+                statsFrame.perkslabel.TextYAlignment = Enum.TextYAlignment.Bottom;
+            end
+        end
     end
+    window.Binds.SetStyle();
     window:Open();
+
+    interface.OnWindowToggle:Connect(function()
+        if modConfigurations.CompactInterface then
+            local openedWindows = interface:ListWindows(function(win: InterfaceWindow)
+                return win.Visible == true;
+            end)
+
+            local v = false;
+            for a=1, #openedWindows do
+                local win: InterfaceWindow = openedWindows[a];
+                if win.Name == "Inventory" or win.Name == "Workbench" then
+                    v = true;
+                    break;
+                end
+            end
+
+            if v == true then
+                window.Binds.SetStyle("Inventory");
+            else
+                window.Binds.SetStyle();
+            end
+        end
+    end)
 
     local previousStats = {};
     interface:BindEvent("UpdateStats", function()

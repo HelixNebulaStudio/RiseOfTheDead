@@ -470,9 +470,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local inspectWindow: InterfaceWindow = interface:GetWindow("ItemInspect");
             if workbenchWindow and workbenchWindow.Visible and inspectWindow then
                 if visible then
-                    inspectWindow.Binds.SetStyle("LeftHalf");
-                else
                     inspectWindow.Binds.SetStyle("QuadTopLeft");
+                else
+                    inspectWindow.Binds.SetStyle("LeftHalf");
                 end
             end
         end

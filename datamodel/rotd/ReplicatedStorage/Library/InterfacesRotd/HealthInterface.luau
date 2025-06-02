@@ -71,6 +71,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		hpFrame.Size = UDim2.new(0.25, 0, 0, 18);
 		window:SetClosePosition(UDim2.new(0.5, -5, 1, 20), UDim2.new(0.5, -5, 1, -20));
 		
+		hpFrame.BackgroundTransparency = 0.5;
+		hpFrame.ImageTransparency = 1;
+		local uiCorner = Instance.new("UICorner");
+		uiCorner.CornerRadius = UDim.new(0, 5);
+		uiCorner.Parent = hpFrame;
+
+
 		allLabel.TextSize = 11;
 		healthBars.label.TextSize = 11;
 		armorBars.label.TextSize = 11;
