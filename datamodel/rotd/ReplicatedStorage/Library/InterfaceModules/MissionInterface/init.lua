@@ -23,6 +23,7 @@ local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.Battl
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modHeadIcons = shared.require(game.ReplicatedStorage.Library.HeadIcons);
@@ -868,7 +869,7 @@ function Interface.init(modInterface)
 				local debounce = false;
 				newRedoButton.MouseButton1Click:Connect(function()
 					Interface:PlayButtonClick();
-					local promptWindow = Interface:PromptQuestion("Redo "..book.Name, 
+					local promptWindow = modClientGuis.promptQuestion("Redo "..book.Name, 
 						"Are you sure you want to redo mission, <b>"..book.Name.."</b>?\n\n<b>Your choices will be updated after redoing.</b>");
 					local YesClickedSignal, NoClickedSignal;
 
@@ -932,7 +933,7 @@ function Interface.init(modInterface)
 
 					else
 						-- ABORT mission;
-						local promptWindow = Interface:PromptQuestion("Abort "..book.Name, 
+						local promptWindow = modClientGuis.promptQuestion("Abort "..book.Name, 
 							"Are you sure you want to abort mission, <b>"..book.Name.."</b>?\n\n<b>It will be considered as failed mission.</b>");
 						local YesClickedSignal, NoClickedSignal;
 	
@@ -2168,7 +2169,7 @@ function Interface.init(modInterface)
 
 							Interface:PlayButtonClick();
 
-							Interface:PromptDialogBox({
+							modClientGuis.promptDialogBox({
 								Title=`Start <b>{titleLabel.Text}</b>?`;
 								Desc=`{descLabel.Text}`;
 								Buttons={
@@ -2559,7 +2560,7 @@ function Interface.init(modInterface)
 					Interface:PlayButtonClick();
 
 					local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. bpPrice.." Gold</font></b>";
-					modInterface:PromptDialogBox({
+					modClientGuis.promptDialogBox({
 						Title=`Unlock Event Pass for {goldTxt}?`;
 						Desc=`Are you sure you want to unlock Event Pass: {battlepassLib.Title} for {goldTxt}?`;
 						Icon=battlepassLib.Icon;
@@ -2589,7 +2590,7 @@ function Interface.init(modInterface)
 					local price = modBattlePassLibrary.BuyLevelCost * lvlAmt;
 					
 					local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. price.." Gold</font></b>";
-					modInterface:PromptDialogBox({
+					modClientGuis.promptDialogBox({
 						Title=`Level up Event Pass for {goldTxt}?`;
 						Desc=`Are you sure you want to level up Event Pass by {lvlAmt} for {goldTxt}?`;
 						Icon=battlepassLib.Icon;
@@ -3513,7 +3514,7 @@ function Interface.init(modInterface)
 										return;
 									end
 
-									local promptWindow = Interface:PromptQuestion(`Trade For {itemLib.Name}`, 
+									local promptWindow = modClientGuis.promptQuestion(`Trade For {itemLib.Name}`, 
 										`Are you sure you would like to trade in <b>{modFormatNumber.Beautify(tradeCost)} Tokens</b> for a {itemLib.Name}`, "Trade", "Cancel", itemLib.Icon);
 									local YesClickedSignal, NoClickedSignal;
 				

@@ -37,6 +37,7 @@ local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsL
 local modItem = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
 local modMapLibrary = shared.require(game.ReplicatedStorage.Library.MapLibrary);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 
@@ -735,10 +736,10 @@ function Interface.init(modInterface)
 				usableItemLib:ClientUse(storageItem);
 				Interface:CloseWindow("MapMenu");
 			else
-				Interface:PromptWarning("You do not have a GPS to fast travel.");
+				modClientGuis.promptWarning("You do not have a GPS to fast travel.");
 			end
 		else
-			Interface:PromptWarning("You do not have a GPS to fast travel.");
+			modClientGuis.promptWarning("You do not have a GPS to fast travel.");
 		end
 	end)
 

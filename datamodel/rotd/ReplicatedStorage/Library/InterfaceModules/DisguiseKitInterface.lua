@@ -16,6 +16,8 @@ local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchCon
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 local modDisguiseMechanics = shared.require(game.ReplicatedStorage.Library.DisguiseMechanics);
 
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+
 --== Script;
 function Interface.init(modInterface)
 	setmetatable(Interface, modInterface);
@@ -106,7 +108,7 @@ function Interface.init(modInterface)
 				local currency = "Kills";
 				
 				local function purchase()
-					local promptWindow = Interface:PromptQuestion("Unlock Disguise", 
+					local promptWindow = modClientGuis.promptQuestion("Unlock Disguise", 
 						"Are you sure you want to unlock ("..disguiseLib.Name..") for "..
 							(currency == "Gold" and "<b><font color='rgb(170, 120, 0)'>" or "")..disguiseLib.Price.." "..currency.."?"..
 							(currency == "Gold" and "</font></b>" or ""));
@@ -145,7 +147,7 @@ function Interface.init(modInterface)
 				end
 				
 				if playerGold >= disguiseLib.Price then
-					local promptWindow = Interface:PromptQuestion(
+					local promptWindow = modClientGuis.promptQuestion(
 						"Unlock Disguise", 
 						"Do you want to unlock ("..disguiseLib.Name..") with Kills or <b><font color='rgb(170, 120, 0)'>Gold</font></b>?",
 						"Kills",

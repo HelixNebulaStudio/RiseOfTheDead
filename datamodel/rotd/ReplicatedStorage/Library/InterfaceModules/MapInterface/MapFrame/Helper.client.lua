@@ -1,8 +1,7 @@
 
 shared.waitForIgnition();
 --==
-local modInterface = shared.require(script.Parent.Parent.InterfaceModule);
-local modGuiObjectTween = shared.require(script.Parent.Parent.Parent:WaitForChild("GuiObjectTween"));
+local modGuiObjectTween = shared.require(game.ReplicatedStorage.Library.UI.GuiObjectTween);
 
 local helpButton = script.Parent.HelpButton;
 local helpFrame = script.Parent.HelpFrame;

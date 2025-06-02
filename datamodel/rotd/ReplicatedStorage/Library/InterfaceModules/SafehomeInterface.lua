@@ -19,6 +19,7 @@ local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remoteSafehomeRequest = modRemotesManager:Get("SafehomeRequest");
@@ -177,7 +178,7 @@ function Interface.init(modInterface)
 							Interface:PlayButtonClick();
 
 
-							local promptWindow = Interface:PromptQuestion(
+							local promptWindow = modClientGuis.promptQuestion(
 								"Purchase Safehome", 
 								"Are you sure you want to purchase ("..safehomeLib.Name..") for "..modFormatNumber.Beautify(safehomeLib.Price).." Gold?",
 								nil,
@@ -406,7 +407,7 @@ function Interface.init(modInterface)
 					kickButton.MouseButton1Click:Connect(function()
 						Interface:PlayButtonClick();
 
-						local promptWindow = Interface:PromptQuestion(
+						local promptWindow = modClientGuis.promptQuestion(
 							"Kick Survivor", 
 							`Are you sure you want to kick {name} from the safehome?`
 						);

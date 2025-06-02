@@ -1,4 +1,5 @@
 export type anydict = {[any]: any};
+export type anyfunc = ((...any)->...any);
 
 -- constant uniontypes
 export type GAME_EVENT_KEY<U> = U
@@ -86,7 +87,9 @@ export type Const = {
 
 --MARK: EngineCore
 export type EngineCore = {
-    ConnectOnPlayerAdded: (self: EngineCore, src: Script | LocalScript | ModuleScript, func: (...any)->...any, order: number?) -> nil;
+    ConnectOnPlayerAdded: (self: EngineCore, src: Script | LocalScript | ModuleScript, func: (player: Player)->...any, order: number?) -> nil;
+    connectPlayers: () -> nil;
+    loadWorldCore: (worldName: string) -> nil;
 };
 
 --MARK: Class
@@ -282,6 +285,7 @@ export type StorageItem = {
     Sync: (self: StorageItem, keys: {string}?) -> nil;
     GetValues: (self: StorageItem, key: string) -> any;
     SetValues: (self: StorageItem, key: string, value: any?, syncFunc: any?) -> StorageItem;
+    Clone: (self: StorageItem) -> StorageItem;
 }
 
 
@@ -299,14 +303,13 @@ export type PlayerClass = CharacterClass & {
     Name: string;
 
     IsAlive: boolean;
-    IsUnderWater: boolean;
     IsSwimming: boolean;
-
-    MaxOxygen: number;
 
     CharacterVars: anydict;
     Configurations: ConfigVariable;
-    Properties: anydict;
+    Properties: PropertiesVariable<{
+        IsUnderWater: boolean;
+    }>;
 
     LastDamageDealt: number;
     LastHealed: number;
@@ -562,12 +565,136 @@ export type InteractInfo = {
     CharacterVars: anydict?;
 };
 
---MARK: InterfaceClass
-export type InterfaceClass = {
-    TouchControls: Frame;
-    HintWarning: (self: InterfaceClass, label: string) -> nil;
-    ToggleWindow: (self: InterfaceClass, windowName: string, visible: boolean) -> nil;
+--MARK: Scheduler
+export type SchedulerJob = {
+    Routine: any;
+    T: number?;
+    Arguments: anydict;
 };
+
+export type Scheduler = {
+    -- @properties;
+    Name: string;
+    Rate: number;
+
+    -- @methods
+    ScheduleFunction: (self: Scheduler, f: anyfunc, fireTick: number) -> SchedulerJob;
+    Wait: (self: Scheduler, f: anyfunc) -> any;
+    Schedule: (routine: any, fireTick: number, ...any) -> SchedulerJob;
+
+    -- @signals
+    OnStepped: EventSignal<TickData>;
+};
+
+--MARK: Interface
+export type Interface = {
+    -- @properties;
+    Script: Script;
+    ScreenGui: ScreenGui;
+    Garbage: GarbageHandler;
+    Scheduler: Scheduler;
+
+    Windows: {[string]: InterfaceWindow};
+    Elements: {[string]: InterfaceElement};
+
+    Properties: PropertiesVariable<{
+        DisableInteractables: boolean;
+        DisableHotKeys: boolean;
+        DisableHotKeysHint: boolean;
+        PrimaryInputDown: boolean;
+        ShiftInputDown: boolean;
+        AltInputDown: boolean;
+        TopbarInset: Rect;
+        IsCompactFullscreen: boolean;
+    }>;
+
+    GameBlindsFrame: Frame;
+    QuickBarButtons: Frame;
+    CutsceneNextButton: TextButton;
+    MouseLockHint: Frame;
+    AimPointer: ImageLabel;
+    VersionLabel: TextLabel;
+    
+    StorageInterfaces: {StorageInterface};
+    StorageInterfaceIndex: number;
+
+    -- @methods
+    Destroy: (self: InterfaceWindow) -> nil;
+    Init: (self: Interface) -> nil;
+    RefreshInterfaces: (self: Interface) -> nil;
+
+    GetWindow: (self: Interface, name: string) -> InterfaceWindow;
+    NewWindow: (self: Interface, name: string, frame: GuiObject, properties: anydict?) -> InterfaceWindow;
+    ToggleWindow: (self: Interface, name: string, visible: boolean?, ...any) -> InterfaceWindow;
+    BindConfigKey: (self: Interface, key: string, windows: {InterfaceWindow}?, frames: {Instance}?, conditions: ((...any) -> boolean)?) -> nil;
+    BindEvent: (self: Interface, key: string, func: (...any)->nil) -> (()->nil);
+    FireEvent: (self: Interface, key: string, ...any) -> nil;
+
+    NewQuickButton: (self: Interface, name: string, hint: string, image: string) -> ImageButton;
+    ConnectQuickButton: (self: Interface, obj: ImageButton, keyId: string?, onClickFunc: (()->nil)?) -> nil;
+
+    HideAll: (self: Interface, blacklist: anydict?) -> nil;
+
+    GetOrDefaultElement: (self: Interface, name: string, default: anydict?) -> InterfaceElement;
+
+    ToggleGameBlinds: (self: Interface, openBlinds: boolean, duration: number) -> nil;
+    PlayButtonClick: (self: Interface) -> nil;
+
+    -- @signals
+    OnInterfaceEvent: EventSignal<string>;
+    OnWindowToggle: EventSignal<InterfaceWindow, boolean>;
+};
+
+--MARK: InterfaceInstance
+export type InterfaceInstance = {
+    -- @properties
+    Package: anydict;
+} & Interface;
+
+--MARK: InterfaceWindow
+export type InterfaceWindow = {
+    -- @properties
+    Name: string;
+    Frame: Frame;
+    QuickButton: GuiObject;
+    Visible: boolean;
+
+    Binds: anydict;
+    Properties: PropertiesVariable<{
+
+    }>;
+    
+    UseTween: boolean;
+    ReleaseMouse: boolean;
+    DisableInteractables: boolean;
+    DisableOpeningWindows: boolean;
+    DisableHotKeysHint: boolean;
+    CloseWithInteract: boolean;
+    IgnoreHideAll: boolean;
+    UseMenuBlur: boolean;
+    CompactFullscreen: boolean;
+
+    -- @methods
+    Init: (self: InterfaceWindow) -> nil;
+    Open: (self: InterfaceWindow, ...any) -> nil;
+    Close: (self: InterfaceWindow, ...any) -> nil;
+    Update: (self: InterfaceWindow, ...any) -> nil;
+    SetClosePosition: (self: InterfaceWindow, close: UDim2, open: UDim2?) -> nil;
+    AddCloseButton: (self: InterfaceWindow, object: GuiObject) -> nil;
+    Destroy: (self: InterfaceWindow) -> nil;
+
+    -- @signals
+    OnToggle: EventSignal<boolean>;
+    OnUpdate: EventSignal<any>;
+};
+
+--MARK: InterfaceElement
+export type InterfaceElement = PropertiesVariable<anydict> & {
+
+};
+
+--MARK: StorageInterface
+export type StorageInterface = anydict;
 
 --MARK: ToolHandler
 export type ToolHandler = {
@@ -655,6 +782,15 @@ export type ToolAnimator = {
     Init: (...any)->nil;
 };
 
+--MARK: PropertiesVariable
+export type PropertiesVariable<T> = T & {
+    Values: T;
+    OnChanged: EventSignal<any, any, any>;
+    Loop: (self: PropertiesVariable<T>, func: ((any, any)->boolean)) -> nil;
+    Destroy: (self: PropertiesVariable<T>) -> nil;
+
+    [any]: any;
+};
 
 --MARK: ConfigVariable
 export type ConfigVariable = {
@@ -975,16 +1111,16 @@ export type HealthComp = {
     CanTakeDamageFrom: (self: HealthComp, characterClass: CharacterClass) -> boolean;    
     TakeDamage: (self: HealthComp, DamageData: DamageData) -> nil;
     
-    SetHealth: (self: HealthComp, value: number) -> nil;
-    SetMaxHealth: (self: HealthComp, value: number) -> nil;
+    SetHealth: (self: HealthComp, value: number, reason: anydict?) -> nil;
+    SetMaxHealth: (self: HealthComp, value: number, reason: anydict?) -> nil;
 
-    SetArmor: (self: HealthComp, value: number) -> nil;
-    SetMaxArmor: (self: HealthComp, value: number) -> nil;
+    SetArmor: (self: HealthComp, value: number, reason: anydict?) -> nil;
+    SetMaxArmor: (self: HealthComp, value: number, reason: anydict?) -> nil;
    
     -- @signals
-    OnHealthChanged: EventSignal<DamageData?>;
-    OnArmorChanged: EventSignal<any>;
-    OnIsDeadChanged: EventSignal<>;
+    OnHealthChanged: EventSignal<number, number, anydict?>;
+    OnArmorChanged: EventSignal<number, number, anydict?>;
+    OnIsDeadChanged: EventSignal<boolean, boolean, anydict?>;
 }
 
 --MARK: StatusComp

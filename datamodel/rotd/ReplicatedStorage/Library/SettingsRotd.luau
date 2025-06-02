@@ -9,6 +9,15 @@ function modSettings.onRequire()
     modSettings.Add("KeyTogglePat", modSettings.Checks.KeyCheck);
     
 	local uiKeyCheck = modSettings.Checks.IgnoreMouseKeys(modSettings.Checks.KeyCheck);
+
+    modSettings.Add("KeyWindowInventory", uiKeyCheck);
+    modSettings.Add("KeyWindowFactionsMenu", uiKeyCheck);
+    modSettings.Add("KeyWindowMissions", uiKeyCheck);
+    modSettings.Add("KeyWindowSocialMenu", uiKeyCheck);
+    modSettings.Add("KeyWindowMasteryMenu", uiKeyCheck);
+    modSettings.Add("KeyWindowWorkbench", uiKeyCheck);
+    modSettings.Add("KeyWindowMapMenu", uiKeyCheck);
+
 	modSettings.Add("KeyScoreboardToggle", uiKeyCheck);
 	modSettings.Add("KeyWindowGambitShop", uiKeyCheck);
     

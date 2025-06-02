@@ -3,6 +3,8 @@ export type GAME_EVENT_KEY_ROTD =
     | "EventPass_PuzzleInvoke"
     | "GameModeManager_DisconnectPlayer"
     | "Skills_OnResourceGatherers"
+    | "WorkbenchService_InterfaceToggle"
+    | "WorkbenchService_ItemSelect"
     ;
 
 export type DAMAGE_TYPE_ROTD =
@@ -17,11 +19,11 @@ export type DAMAGE_TYPE_ROTD =
     ;
 
 export type HUMANOID_TYPE_ROTD =
-    | "Zombie"
     | "Bandit"
-    | "Rat"
     | "Cultist"
     | "Military"
+    | "Rat"
+    | "Zombie"
     ;
 
 --MARK: ProfileRotd
@@ -45,3 +47,6 @@ export type GameSaveRotd = GameSave & {
 export type EquipmentClassRotd = EquipmentClass & {
     [any]: any;
 };
+
+
+--MARK: 

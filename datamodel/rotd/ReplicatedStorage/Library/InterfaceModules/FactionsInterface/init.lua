@@ -40,6 +40,7 @@ local modMissionLibrary = shared.require(game.ReplicatedStorage.Library.MissionL
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
 
@@ -1266,43 +1267,43 @@ function Interface.init(modInterface)
 	local promptWindow;
 	local function failCreate(r)
 		if r == nil then
-			Interface:PromptWarning("Something went wrong, please try again.");
+			modClientGuis.promptWarning("Something went wrong, please try again.");
 			return;
 		end
 
 		if r.Filtered then
 			noFactionInput.Text = r.Tag;
-			Interface:PromptWarning("Sorry, faction tag got filter.");
+			modClientGuis.promptWarning("Sorry, faction tag got filter.");
 
 		elseif r.TooShort then
-			Interface:PromptWarning("Sorry, faction tag too short. Tags should be more than 3 and less than 10 characters.");
+			modClientGuis.promptWarning("Sorry, faction tag too short. Tags should be more than 3 and less than 10 characters.");
 
 		elseif r.TooLong then
-			Interface:PromptWarning("Sorry, faction tag too long. Tags should be more than 3 and less than 10 characters.");
+			modClientGuis.promptWarning("Sorry, faction tag too long. Tags should be more than 3 and less than 10 characters.");
 
 		elseif r.Taken then
-			Interface:PromptWarning("Sorry, this faction tag has been taken.");
+			modClientGuis.promptWarning("Sorry, this faction tag has been taken.");
 
 		elseif r.AlreadyInFaction then
-			Interface:PromptWarning("You are already in a faction.");
+			modClientGuis.promptWarning("You are already in a faction.");
 
 		elseif r.NotInFaction then
-			Interface:PromptWarning("You are not in a faction.");
+			modClientGuis.promptWarning("You are not in a faction.");
 
 		elseif r.NoPermissions then
-			Interface:PromptWarning("You do not have permissions to do that.");
+			modClientGuis.promptWarning("You do not have permissions to do that.");
 
 		elseif r.TooManyRoles then
-			Interface:PromptWarning("Too many roles.");
+			modClientGuis.promptWarning("Too many roles.");
 
 		elseif r.Mission58 then
-			Interface:PromptWarning("Requires mission \"Double Cross\".");
+			modClientGuis.promptWarning("Requires mission \"Double Cross\".");
 
 		elseif r.InsufficientGold then
-			Interface:PromptWarning("Requires 5'000 Gold.");
+			modClientGuis.promptWarning("Requires 5'000 Gold.");
 
 		else
-			Interface:PromptWarning("Something went wrong, please try again.");
+			modClientGuis.promptWarning("Something went wrong, please try again.");
 			Debugger:StudioLog("Error", r);
 		end
 
@@ -1321,7 +1322,7 @@ function Interface.init(modInterface)
 		createFactionButton.buttonText.Text = "Create a Faction";
 
 		if testCreateReturn and testCreateReturn.Success then
-			promptWindow = Interface:PromptQuestion("Create Faction?",
+			promptWindow = modClientGuis.promptQuestion("Create Faction?",
 				"Creating faction with tag <b>["..testCreateReturn.Tag.."]</b> for <b><font color='rgb(170, 120, 0)'>5'000 Gold</font></b>?", 
 				"Create", "Cancel", "rbxassetid://9890634236");
 			local YesClickedSignal, NoClickedSignal;
@@ -1534,7 +1535,7 @@ function Interface.init(modInterface)
 	Interface.Garbage:Tag(travelToHqButton.MouseButton1Click:Connect(function()
 		Interface:PlayButtonClick();
 		
-		promptWindow = Interface:PromptQuestion("Travel to Headquarters",
+		promptWindow = modClientGuis.promptQuestion("Travel to Headquarters",
 			"You're about to leave this world", 
 			"Travel", "Cancel");
 		local YesClickedSignal, NoClickedSignal;

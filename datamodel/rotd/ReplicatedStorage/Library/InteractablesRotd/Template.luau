@@ -26,11 +26,11 @@ function interactablePackage.init(super) -- Server/Client
         if info.Player == nil then return end;
         if info.Action ~= info.ActionTypes.ClientInteract then return end;
 
-        local interface = info.ClientInterface;
-        if interface == nil or interface:IsVisible("Dialogue") then return end;
+        local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+        local dialogueWindow: InterfaceWindow = modClientGuis.getWindow("Dialogue");
+        if dialogueWindow.Visible then return end;
 
-        interface.Object = interactable.Object;
-        interface:OpenWindow("Dialogue", interactable, info);
+        dialogueWindow:Open(interactable, info);
     end
     
     -- When interactable pops up on screen.

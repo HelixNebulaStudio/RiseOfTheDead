@@ -17,6 +17,7 @@ local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesM
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modClothingLibrary = shared.require(game.ReplicatedStorage.Library.ClothingLibrary);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
 local modStorageInterface = shared.require(game.ReplicatedStorage.Library.UI.StorageInterface);
@@ -185,8 +186,7 @@ function Interface.init(modInterface)
 					addSlotDebounce = tick();
 					
 					cost = modWorkbenchLibrary.StorageCost(storage.Id, storage.Size, storage.Page);
-					
-					Interface:PromptDialogBox({
+					modClientGuis.promptDialogBox({
 						Title=`Purchase storage slot?`;
 						Desc=`Are you sure you want to purchase a storage slot for {cost} Perks?`;
 						Icon=`rbxassetid://3187395807`;
@@ -368,7 +368,7 @@ function Interface.init(modInterface)
 							
 							if timeLeft > 0 then return end;
 							
-							Interface:PromptDialogBox({
+							modClientGuis.promptDialogBox({
 								Title=`Rent Rat Storage for <b><font color='rgb(170, 120, 0)'>{rentCost} Gold</font></b>?`;
 								Desc=`Unlock rat storage for 24 hours, <b><font color='rgb(170, 120, 0)'>{rentalPrice} Gold per slot used</font></b>.\n\n<b>Important: Your items will be inaccessible after 24 hours and it will cost gold to re-unlock the storage.</b>`;
 								Buttons={

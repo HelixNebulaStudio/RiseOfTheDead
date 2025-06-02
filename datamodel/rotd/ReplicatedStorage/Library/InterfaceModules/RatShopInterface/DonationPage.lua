@@ -18,6 +18,7 @@ local modGoldShopLibrary = shared.require(game.ReplicatedStorage.Library.GoldSho
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.LeaderboardService);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modLeaderboardInterface = shared.require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
 
@@ -65,7 +66,7 @@ function PageInterface:Load(interface)
 	local function promptDonate(optionInfo)
 		local opTitle = modFormatNumber.Beautify(optionInfo.Product.Gold) .." Gold";
 		
-		local promptWindow = interface:PromptQuestion("Donate ".. modFormatNumber.Beautify(optionInfo.Product.Gold),
+		local promptWindow = modClientGuis.promptQuestion("Donate ".. modFormatNumber.Beautify(optionInfo.Product.Gold),
 			("Are you sure you want to donate "..opTitle.." to this project?"), 
 			"Donate", "Cancel", optionInfo.Icon);
 		local YesClickedSignal, NoClickedSignal;
@@ -126,7 +127,7 @@ function PageInterface:Load(interface)
 					MarketplaceService:PromptProductPurchase(localplayer, optionInfo.Product.Id);
 					
 				else
-					interface:PromptWarning("Insufficient Gold!");
+					modClientGuis.promptWarning("Insufficient Gold!");
 					
 				end
 				

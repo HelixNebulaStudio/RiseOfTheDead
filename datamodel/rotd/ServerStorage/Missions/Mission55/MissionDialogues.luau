@@ -2,9 +2,9 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local genericDialogueHandler = shared.require(script.Parent.AnotherSurvivor);
+local genericDialogueHandler = require(script.Parent.AnotherSurvivor);
 
-local missionId = 55;
+local MISSION_ID = 55;
 
 local Dialogues = {};
 --==

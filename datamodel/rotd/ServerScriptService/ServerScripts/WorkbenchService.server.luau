@@ -35,6 +35,7 @@ local remoteBlueprintHandler = modRemotesManager:Get("BlueprintHandler");
 local remoteDeconstruct = modRemotesManager:Get("DeconstructItem");
 local remoteTweakItem = modRemotesManager:Get("TweakItem");
 local remotePolishTool = modRemotesManager:Get("PolishTool");
+local remoteWorkbenchService = modRemotesManager:Get("WorkbenchService");
 
 local Interactables = workspace:WaitForChild("Interactables");
 local debounceCache = {};
@@ -57,6 +58,14 @@ function IsInWorkbenchRange(player, interactPart)
 		return true;
 	end
 	return false;
+end
+
+function remoteWorkbenchService.OnServerInvoke(player, action: string, ...)
+	if action == "interfacetoggle" then
+		shared.modEventService:ServerInvoke("WorkbenchService_InterfaceToggle", {ReplicateTo={player}}, ...);
+	elseif action == "itemselect" then
+		shared.modEventService:ServerInvoke("WorkbenchService_ItemSelect", {ReplicateTo={player}}, ...);
+	end
 end
 
 function CheckBlueprintCost(player, bpId)

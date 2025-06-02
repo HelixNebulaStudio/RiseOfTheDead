@@ -271,7 +271,7 @@ function Interface.init(modInterface)
 				end
 
 				taskProcessObj.OnSkipClick = function()
-					Interface:PromptDialogBox({
+					modClientGuis.promptDialogBox({
 						Title=`Skip {taskLib.Name}?`;
 						Desc=`How would you like to skip {taskLib.Name} for {activeNpcName}?`;
 						Buttons={

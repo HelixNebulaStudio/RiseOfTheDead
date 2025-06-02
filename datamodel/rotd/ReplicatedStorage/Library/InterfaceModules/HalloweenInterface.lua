@@ -110,7 +110,7 @@ function Interface.init(modInterface)
 		Interface:PlayButtonClick();
 		if modBranchConfigs.WorldName == "Slaughterfest" then return end;
 		
-		Interface:PromptDialogBox({
+		modClientGuis.promptDialogBox({
 			Title=`Join Slaughterfest`;
 			Desc=`Are you sure you want to travel to <b>Slaughterfest</b>?`;
 			Icon=`rbxassetid://11262940674`;
@@ -410,7 +410,7 @@ function Interface.init(modInterface)
 					local itemLib = modItem:Find(itemId);
 					local optionClickFunc = function()
 						itemToolTip.Frame.Visible = false;
-						Interface:PromptDialogBox({
+						modClientGuis.promptDialogBox({
 							Title=`Cook {itemLib.Name}`;
 							Desc=`Are you sure you want to cook your candies in the cauldron for a {itemLib.Name}.`;
 							Icon=itemLib.Icon;
@@ -613,7 +613,7 @@ function Interface.init(modInterface)
 					itemToolTip.Frame.Visible = false;
 					if alreadyClaimed then return end;
 
-					Interface:PromptDialogBox({
+					modClientGuis.promptDialogBox({
 						Title=`Cook {itemLib.Name}`;
 						Desc=`Are you sure you want to cook your candies in the cauldron for a {itemLib.Name}.`;
 						Icon=itemLib.Icon;
@@ -727,7 +727,7 @@ function Interface.init(modInterface)
 				newOption.Parent = badgesOptionsFrame;
 				
 				local optionClickFunc = function()
-					Interface:PromptDialogBox({
+					modClientGuis.promptDialogBox({
 						Title=`Unlock {eventLib.Title} Level`;
 						Desc=`Are you sure you want to cook your candies for a {eventLib.Title} level? (You will unlock the badge.)`;
 						Icon=eventLib.Icon;

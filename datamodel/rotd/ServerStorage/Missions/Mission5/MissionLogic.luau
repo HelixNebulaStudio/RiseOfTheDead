@@ -8,7 +8,7 @@ local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForC
 local modSyncTime = shared.require(game.ReplicatedStorage.Library:WaitForChild("SyncTime"));
 local modGuiHighlight = shared.require(game.ReplicatedStorage.Library.UI.GuiHighlight);
 
-local missionId = 5;
+local MISSION_ID = 5;
 -- MARK: IsServer()
 if RunService:IsServer() then
 	if not RunService:IsStudio() then
@@ -19,28 +19,27 @@ if RunService:IsServer() then
 	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
-	local remotes = game.ReplicatedStorage.Remotes;
-	local remoteWorkbenchInteract = remotes.Workbench.WorkbenchInteract;
+	shared.modEventService:OnInvoked("WorkbenchService_InterfaceToggle", function(event: EventPacket, ...)
+		local player = event.Player;
+		if player == nil or not modMission:Progress(player, MISSION_ID) then return end;
 
-	remoteWorkbenchInteract.OnServerEvent:Connect(function(player, visible)
-		if not modMission:Progress(player, missionId) then return end;
-
-		modMission:Progress(player, missionId, function(mission)
+		local visible = ...;
+		modMission:Progress(player, MISSION_ID, function(mission)
 			if mission.ProgressionPoint == 1 and visible then
 				mission.ProgressionPoint = 2;
 			end;
 		end)
 	end)
-	
+
 	modOnGameEvents:ConnectEvent("OnCheckBlueprintCost", function(player, eventData)
-		if not modMission:Progress(player, missionId) then return end;
+		if not modMission:Progress(player, MISSION_ID) then return end;
 
 		local fulfilled = true;
 		for a=1, #eventData do
 			if not eventData[a].Fulfilled then fulfilled = false; end;
 		end
 
-		modMission:Progress(player, missionId, function(mission)
+		modMission:Progress(player, MISSION_ID, function(mission)
 			if mission.ProgressionPoint == 2 or mission.ProgressionPoint == 3 then
 
 				modAnalyticsService:LogOnBoarding{
@@ -58,9 +57,9 @@ if RunService:IsServer() then
 	modOnGameEvents:ConnectEvent("OnBlueprintBuild", function(player, userWorkbench, processPacket)
 		local itemId = processPacket.ItemId;
 		if itemId ~= "pistoldamagebp" then return end;
-		if not modMission:Progress(player, missionId) then return end;
+		if not modMission:Progress(player, MISSION_ID) then return end;
 
-		modMission:Progress(player, missionId, function(mission)
+		modMission:Progress(player, MISSION_ID, function(mission)
 			if mission.ProgressionPoint == 3 or mission.ProgressionPoint == 4 then
 				mission.ProgressionPoint = 5;
 				
@@ -69,7 +68,7 @@ if RunService:IsServer() then
 				userWorkbench:Sync();
 				
 				task.delay(buildDuration-1, function()
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 4 or mission.ProgressionPoint == 5 then
 							mission.ProgressionPoint = 6;
 						end
@@ -86,9 +85,9 @@ if RunService:IsServer() then
 
 	modOnGameEvents:ConnectEvent("OnItemBuilt", function(player, blueprintLibrary)
 		if blueprintLibrary.Product ~= "pistoldamagemod" then return end;
-		if not modMission:Progress(player, missionId) then return end
+		if not modMission:Progress(player, MISSION_ID) then return end
 
-		modMission:Progress(player, missionId, function(mission)
+		modMission:Progress(player, MISSION_ID, function(mission)
 			if mission.ProgressionPoint == 5 or mission.ProgressionPoint == 6 then
 				mission.ProgressionPoint = 7;
 			end;
@@ -103,12 +102,12 @@ if RunService:IsServer() then
 
 	modOnGameEvents:ConnectEvent("OnModEquipped", function(player, mod, item)
 		if mod.ItemId ~= "pistoldamagemod" then return end;
-		if not modMission:Progress(player, missionId) then return end
+		if not modMission:Progress(player, MISSION_ID) then return end
 
-		modMission:Progress(player, missionId, function(mission)
+		modMission:Progress(player, MISSION_ID, function(mission)
 			if mission.ProgressionPoint == 7 then
 				--mission.ProgressionPoint = 8;
-				modMission:CompleteMission(player, missionId);
+				modMission:CompleteMission(player, MISSION_ID);
 
 				modAnalyticsService:LogOnBoarding{
 					Player=player;

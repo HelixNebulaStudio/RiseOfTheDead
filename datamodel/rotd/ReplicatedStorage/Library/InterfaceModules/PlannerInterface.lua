@@ -26,6 +26,7 @@ local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForC
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modRadialImage = shared.require(game.ReplicatedStorage.Library.UI.RadialImage);
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
@@ -81,7 +82,7 @@ function Interface.init(modInterface)
 	unlockButton.MouseButton1Click:Connect(function()
 		local itemLib = modItemsLibrary:Find(selectedItemId);
 
-		local promptWindow = Interface:PromptQuestion("Unlock "..itemLib.Name, "A "..itemLib.Name.." Blueprint will be consumed.");
+		local promptWindow = modClientGuis.promptQuestion("Unlock "..itemLib.Name, "A "..itemLib.Name.." Blueprint will be consumed.");
 		local YesClickedSignal, NoClickedSignal;
 		
 		local debounce;

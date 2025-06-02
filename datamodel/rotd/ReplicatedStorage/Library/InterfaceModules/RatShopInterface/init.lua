@@ -294,7 +294,7 @@ function Interface.init(modInterface)
 						if purchaseDebounce then return end;
 						purchaseDebounce = true;
 
-						Interface:PromptDialogBox({
+						modClientGuis.promptDialogBox({
 							Title=`Purchase: {itemLib.Name}`;
 							Desc=`Are you sure you want to purchase <b>{itemLib.Name}</b> for <b>{priceLabel.Text}</b>?\n\n<font size="8">(Right click to enable multi purchase.)</font>`;
 							Icon=itemLib.Icon;
@@ -631,7 +631,7 @@ function Interface.init(modInterface)
 						if sellItemDebounce then return end;
 						sellItemDebounce = true;
 
-						Interface:PromptDialogBox({
+						modClientGuis.promptDialogBox({
 							Title=`Sell: {itemLib.Name}`;
 							Desc=`Are you sure you want to sell <b>{itemLib.Name}</b> for <b>${price}</b>?`;
 							Icon=itemLib.Icon;
@@ -701,7 +701,7 @@ function Interface.init(modInterface)
 							sellItemDebounce = true;
 
 							local allQuantity = selectedItem.Quantity;
-							Interface:PromptDialogBox({
+							modClientGuis.promptDialogBox({
 								Title=`Sell All: {itemLib.Name}`;
 								Desc=`Are you sure you want to sell <b>{allQuantity}</b> <b>{itemLib.Name}</b> for <b>${allPrice}</b>?`;
 								Icon=itemLib.Icon;
@@ -774,7 +774,7 @@ function Interface.init(modInterface)
 						if exchangeItemDebounce then return end;
 						exchangeItemDebounce = true;
 
-						Interface:PromptDialogBox({
+						modClientGuis.promptDialogBox({
 							Title=`Exchange: {itemLib.Name}`;
 							Desc=`Are you sure you want to exchange <b>1 {itemLib.Name}</b> for <b>{tokenReward}</b> token.`;
 							Icon=itemLib.Icon;
@@ -844,7 +844,7 @@ function Interface.init(modInterface)
 							exchangeItemDebounce = true;
 	
 							local exchangeQuantity = selectedItem.Quantity;
-							Interface:PromptDialogBox({
+							modClientGuis.promptDialogBox({
 								Title=`Exchange All: {itemLib.Name}`;
 								Desc=`Are you sure you want to exchange <b>{exchangeQuantity} {itemLib.Name}</b> for <b>{tokenReward}</b> tokens.`;
 								Icon=itemLib.Icon;

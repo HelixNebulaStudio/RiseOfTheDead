@@ -1,14 +1,18 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
+
+local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 local modSkillTree = shared.require(game.ServerScriptService.ServerLibrary.SkillTree);
 local modTraderProfile = shared.require(game.ServerScriptService.ServerLibrary.TraderProfile);
 local modItemUnlockables = shared.require(game.ServerScriptService.ServerLibrary.ItemUnlockables);
 local modSafehomeData = shared.require(game.ServerScriptService.ServerLibrary.SafehomeData);
 local modNpcTaskData = shared.require(game.ServerScriptService.ServerLibrary.NpcTaskData);
 local modBattlePassSave = shared.require(game.ServerScriptService.ServerLibrary.BattlePassSave);
+local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
+local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 --==
 shared.coreBind(modProfile, "_new", function(profile: ProfileRotd, player: Player)
@@ -96,7 +100,93 @@ shared.coreBind(modProfile, "_sync_public", function(profile: ProfileRotd, publi
 end)
 
 function modProfile.onRequire()
+	local remoteProfileService = modRemotesManager:Get("ProfileService");
 
+	local enterCampaignDebounce = {};
+	function remoteProfileService.OnServerInvoke(player, action, ...)
+		local playerClass: PlayerClass = shared.modPlayers.get(player);
+
+		if action == "menu/solo" then
+			if enterCampaignDebounce[player.Name] and tick()-enterCampaignDebounce[player.Name] <= 1 then return end;
+			enterCampaignDebounce[player.Name] = tick();
+			
+			local rPacket = {
+				Success = false;
+			};
+			
+			local profile = modProfile:Get(player);
+			if profile == nil then
+				modServerManager:TeleportToPrivateServer("MainMenu", modServerManager:CreatePrivateServer("MainMenu"), {player});
+				return rPacket;
+			end
+
+			local isGameOnline = false;
+			local s, e = pcall(function()
+				isGameOnline = game:GetService("DataStoreService"):GetDataStore("LiveConfig"):GetAsync("Online") ~= false
+			end)
+			if not s then
+				Debugger:Warn("LiveConfig>>  ", e);
+			end
+
+			if not isGameOnline then
+				if profile == nil or (profile.GroupRank or 0) < 100 then
+					profile:GuiAction("promptwarning", "Servers are currently under maintenance, please wait.", true);
+					return rPacket;
+				else
+					shared.Notify(player, "Joining maintenance servers as Rank:"..(profile.GroupRank or 0), "Inform");
+				end
+			end
+			
+			local saveData = profile:GetActiveSave();
+			if saveData == nil then
+				warn("Player(",player.Name,") does not have any savedata.");
+				return rPacket;
+			end
+
+			if modBranchConfigs.WorldName ~= "MainMenu" then
+				rPacket.Success = true;
+				rPacket.Index = 3;
+
+				task.delay(1, function()
+					playerClass:Spawn();
+				end)
+				return rPacket;
+			end
+
+			local beginningMission = saveData.Missions:Get(1);
+			if beginningMission and beginningMission.Type == 3 then
+				-- if followName and followName ~= "/solo" then
+				-- 	local success = modServerManager:TravelToPlayer(player, followName);
+				-- 	if success then return end;
+				-- end
+				local spawnId = saveData.Spawn;
+				local worldId = modBranchConfigs.GetWorldOfSpawn(spawnId);
+				
+				if worldId == nil then
+					shared.Notify(player, "Invalid SpawnId ("..spawnId.."), spawning in the warehouse.", "Negative");
+					worldId = "TheWarehouse";
+				end
+				modServerManager:Travel(player, worldId);
+				rPacket.Index = 2;
+				
+			else
+				modAnalyticsService:LogOnBoarding{
+					Player=player;
+					OnBoardingStep=modAnalyticsService.OnBoardingSteps.ClickPlay;
+				};
+				saveData.Missions:Start(1);
+				
+				modServerManager:Teleport(player, "TheBeginning");
+				rPacket.Index = 1;
+			end
+
+			rPacket.Success = true;
+			
+			return rPacket;
+		end
+
+		return;
+	end
 end
 
 return modProfile;

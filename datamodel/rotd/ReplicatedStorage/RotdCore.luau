@@ -29,6 +29,26 @@ local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEff
 if RunService:IsServer() then
     local modProfile = shared.require(game.ServerScriptService.ServerLibrary.ProfileRotd);
     local modGameSave = shared.require(game.ServerScriptService.ServerLibrary.GameSaveRotd);
+    local modApiRequestLibrary = shared.require(game.ServerScriptService.ServerLibrary.ApiRequestLibraryRotd);
+
+end
+
+function RotdCore.OnPlayerAdded(player)
+    if RunService:IsServer() then
+    elseif RunService:IsClient() then
+    end
+end
+
+function RotdCore.OnCharacterAdded(player, character)
+    if RunService:IsServer() then
+    elseif RunService:IsClient() then
+    end
+end
+
+function RotdCore.OnPlayerRemoving(player)
+    if RunService:IsServer() then
+    elseif RunService:IsClient() then
+    end
 end
 
 Debugger:Warn("Init RotdCore.");

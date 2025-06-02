@@ -41,14 +41,12 @@ function interactablePackage.init(super) -- Server/Client
     function GameModeEnter.ActionEvent(interactable: InteractableInstance, info: InteractInfo)
         if info.Player == nil then return end;
         if info.Action ~= info.ActionTypes.ClientInteract then return end;
-
-        local interface = info.ClientInterface;
-        if interface == nil then return end;
-
+		
+		local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 		task.delay(1, function()
-			interface:ToggleGameBlinds(true, 0.5);
+			modClientGuis.toggleGameBlinds(true, 0.5);
 		end)
-		interface:ToggleGameBlinds(false, 0.5);
+		modClientGuis.toggleGameBlinds(false, 0.5);
 
 		local timelaspe = tick();
 		local lobbyData = remoteGameModeLobbies:InvokeServer(
@@ -142,16 +140,16 @@ function interactablePackage.init(super) -- Server/Client
         if info.Player == nil then return end;
         if info.Action ~= info.ActionTypes.ClientInteract then return end;
 
-        local interface = info.ClientInterface;
-        if interface == nil or interface:IsVisible("Dialogue") then return end;
-		
 		local mode = interactable.Values.Mode;
 		if mode == "Raid" and workspace:GetAttribute("GameModeComplete") == true then
 			GameModeEnter.ActionEvent(interactable, info);
 		end 
 		
 		local worldName = modBranchConfigs.GetWorldDisplayName(modBranchConfigs.WorldName);
-		interface:PromptDialogBox({
+
+		local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+        local interface: Interface = modClientGuis.ActiveInterface;
+		modClientGuis.promptDialogBox({
 			Title=`Leave {worldName}?`;
 			Desc=`Are you sure you want to leave?`;
 			Buttons={

@@ -977,6 +977,43 @@ function Interface.init(modInterface)
 		itemToolTip:Destroy();
 	end)
 	
+	Interface.Garbage:Tag(remoteTradeRequest.OnClientEvent:Connect(function(requestType, ...)
+		if requestType == "request" then
+			local playerName = ...;
+			modData.TradeRequests[playerName] = tick();
+			
+			interface:FireEvent("UpdateSocialMenu");
+			
+		elseif requestType == "tradesession" then
+			local tradeSessionData = ...;
+			if modInterface then
+				modInterface.modTradeInterface.TradeSession = tradeSessionData;
+				modInterface.modTradeInterface.Update();
+			end
+			
+		elseif requestType == "syncgold" then
+			local tradeSessionData = ...;
+			if modInterface then
+				local gold = tradeSessionData.Players[game.Players.LocalPlayer.Name].Gold;
+				modInterface.modTradeInterface.SyncLocalGold(gold);
+			end
+			
+		elseif requestType == "init" then
+			local tradeSessionData = ...;
+			if modInterface and modInterface.modTradeInterface then
+				modInterface.modTradeInterface.TradeSession = tradeSessionData;
+				modInterface:OpenWindow("Trade");
+			end
+			
+		elseif requestType == "end" then
+			local tradeSessionData = ...;
+			if modInterface then
+				modInterface.modTradeInterface.TradeSession = tradeSessionData;
+			end
+			
+		end
+	end))
+
 	return Interface;
 end;
 

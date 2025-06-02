@@ -16,17 +16,6 @@ local modifierPackage = {
 };
 --==
 
-function modifierPackage.Update(modifier: ItemModifierInstance)
-	local layerInfo = modItemModifierClass.Library.calculateLayer(modifier, "F");
-	local value, tweakVal = layerInfo.Value, layerInfo.TweakValue;
-	
-	if tweakVal then
-		value = value + tweakVal;
-	end
-
-	modifier.SumValues.FlinchProtection = value;
-end
-
 function modifierPackage.Binds.OnNewDamage(modifier: ItemModifierInstance, damageData: DamageData)
     if RunService:IsClient() then return end;
 
