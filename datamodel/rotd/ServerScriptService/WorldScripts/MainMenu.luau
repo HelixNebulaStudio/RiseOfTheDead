@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local WorldCore = {};
+local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new();
 --==
 
 function WorldCore.onRequire()

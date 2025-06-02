@@ -108,14 +108,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     task.spawn(function()
         local creditsJson = workspace:GetAttribute("CreditsJson");
-        for a=1, 5 do
-            if creditsJson then
-                continue;
-            end
+        while creditsJson == nil do
             creditsJson = workspace:GetAttribute("CreditsJson");
             task.wait(10);
         end
-        local creditsTable = HttpService:JSONDecode(creditsJson or {LoadingError={}});
+        local creditsTable = creditsJson and HttpService:JSONDecode(creditsJson) or {LoadingError={}};
 
         local totalY = 340;
         for a=1, #creditsTable do

@@ -25,6 +25,7 @@ local modCrateLibrary = shared.require(game.ReplicatedStorage.Library.CrateLibra
 local modSettings = shared.require(game.ReplicatedStorage.Library.SettingsRotd);
 local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffectsRotd);
+local modWorldCoreClass = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd);
 
 if RunService:IsServer() then
     local modProfile = shared.require(game.ServerScriptService.ServerLibrary.ProfileRotd);

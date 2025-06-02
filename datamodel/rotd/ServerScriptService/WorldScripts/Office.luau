@@ -14,7 +14,7 @@ if RunService:IsServer() then
 
 end
 
-local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClass).new();
+local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new();
 --=
 
 function WorldCore.onRequire()
