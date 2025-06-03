@@ -4,9 +4,9 @@ local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.Equipmen
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 local remoteGameModeLobbies = modRemotesManager:Get("GameModeLobbies");
-local mapInteractable = script:WaitForChild("Interactable");
 
 local modToolsLibrary;
 --==
@@ -88,7 +88,7 @@ function toolPackage.inherit(packet)
 		if inheritPackage.InteractData == nil then
 			local itemLib = modItemsLibrary:Find(itemId);
 	
-			local newInteractable = mapInteractable:Clone();
+			local newInteractable = modInteractables.createInteractable("GameModeEnter");
 	
 			local gameModeInfo = itemLib.GameMode;
 			newInteractable:SetAttribute("Mode", gameModeInfo.Mode);

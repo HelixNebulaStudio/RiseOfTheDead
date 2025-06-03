@@ -2,9 +2,9 @@ local modInteractables = shared.require(game.ReplicatedStorage.Library.Interacta
 
 function modInteractables.onRequire()
     for _, obj in pairs(script:GetChildren()) do
-        modInteractables.loadInteractableModule(obj);
+        modInteractables.loadInteractablePackages(obj);
     end
-    script.ChildAdded:Connect(modInteractables.loadInteractableModule);
+    script.ChildAdded:Connect(modInteractables.loadInteractablePackages);
 end
 
 return modInteractables;
