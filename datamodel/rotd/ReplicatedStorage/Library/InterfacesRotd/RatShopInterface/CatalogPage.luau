@@ -95,7 +95,7 @@ local catInfoLib = {
 local itemDetailCache = {};
 --==
 
-function PageInterface:Load(interface)
+function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 	if organizedItemsList == nil then
 		organizedItemsList = {};
 		
@@ -194,7 +194,7 @@ function PageInterface:Load(interface)
 			end
 			
 			local function updateTooltip()
-				itemToolTip.Frame.Parent = interface.PageFrame.Parent;
+				itemToolTip.Frame.Parent = window.Binds.PageFrame.Parent;
 
 				if unlocked and showLockedInfo == false then
 					itemToolTip.CustomUpdate = nil;
@@ -345,7 +345,7 @@ function PageInterface:Load(interface)
 		
 	end
 	
-	frame.Parent = interface.PageFrame;
+	frame.Parent = window.Binds.PageFrame;
 end
 
 return PageInterface;

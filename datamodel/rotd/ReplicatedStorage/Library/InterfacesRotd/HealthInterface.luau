@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
+local camera = workspace.CurrentCamera;
 
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 
@@ -156,7 +157,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         window:Update();
     end
     
-
 	interface.Garbage:Tag(healthComp.OnArmorChanged:Connect(fireUpdate));
 	interface.Garbage:Tag(healthComp.OnHealthChanged:Connect(fireUpdate));
 	interface.Garbage:Tag(healthComp.OnIsDeadChanged:Connect(fireUpdate));
@@ -164,6 +164,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	interface.Garbage:Tag(humanoid.HealthChanged:Connect(fireUpdate));
 	interface.Garbage:Tag(humanoid:GetAttributeChangedSignal("Oxygen"):Connect(fireUpdate));
 	interface.Garbage:Tag(humanoid:GetAttributeChangedSignal("IsSwimming"):Connect(fireUpdate));
+
+    if modConfigurations.CompactInterface then
+	else
+		interface.OnWindowToggle:Connect(function(win: InterfaceWindow, visible: boolean, ...)
+			if win.Name == "RatShopWindow" then
+				if visible and camera.ViewportSize.Y <= 910 then
+					window:Close();
+				elseif modConfigurations.DisableHealthbar ~= true then
+					window:Open();
+				end
+			end
+		end)
+	end
+	
+
 
 	window:Open();
 	window:Update();

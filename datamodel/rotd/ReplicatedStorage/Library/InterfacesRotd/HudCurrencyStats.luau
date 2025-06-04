@@ -37,7 +37,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 statsFrame.perkslabel.AnchorPoint = Vector2.new(1, 0.5);
                 statsFrame.perkslabel.Position = UDim2.new(0.5, -10, 0.5, 0);
                 statsFrame.perkslabel.TextYAlignment = Enum.TextYAlignment.Center;
+                statsFrame.BackgroundTransparency = 1;
+
             else
+                statsFrame.BackgroundTransparency = 1;
                 statsFrame.AnchorPoint = Vector2.new(0.5, 0);
                 statsFrame.Size = UDim2.new(0.5, 0, 0, 25);
                 window.ClosePoint = UDim2.new(0.5, 0, 1, 70);
@@ -51,36 +54,67 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 statsFrame.perkslabel.Position = UDim2.new(0.5, -160, 1, 0);
                 statsFrame.perkslabel.TextYAlignment = Enum.TextYAlignment.Bottom;
             end
+
+        else
+            if styleId == "Shop" then
+                window.ClosePoint = UDim2.new(1, -10, 1, 275);
+                window.OpenPoint = UDim2.new(1, -10, 0.5, 275);
+                statsFrame.Position = window.OpenPoint;
+
+                statsFrame.AnchorPoint = Vector2.new(1, 0.5);
+                statsFrame.Size = UDim2.new(1, -360, 0, 24);
+                statsFrame.BackgroundTransparency = 0.95;
+
+            else
+                window.ClosePoint = UDim2.new(0.5, 0, 1, 18);
+                window.OpenPoint = UDim2.new(0.5, 0, 1, -18);
+                statsFrame.Position = window.OpenPoint;
+
+                statsFrame.AnchorPoint = Vector2.new(0.5, 1);
+                statsFrame.Size = UDim2.new(0, 600, 0, 24);
+                statsFrame.BackgroundTransparency = 1;
+
+            end
         end
     end
     window.Binds.SetStyle();
     window:Open();
 
-    interface.OnWindowToggle:Connect(function()
+    interface.OnWindowToggle:Connect(function(w: InterfaceWindow, v: boolean)
         if modConfigurations.CompactInterface then
             local openedWindows = interface:ListWindows(function(win: InterfaceWindow)
                 return win.Visible == true;
             end)
 
-            local v = false;
+            local invOpen = false;
             for a=1, #openedWindows do
                 local win: InterfaceWindow = openedWindows[a];
                 if win.Name == "Inventory" or win.Name == "Workbench" then
-                    v = true;
+                    invOpen = true;
                     break;
                 end
             end
 
-            if v == true then
+            if invOpen == true then
                 window.Binds.SetStyle("Inventory");
             else
                 window.Binds.SetStyle();
             end
+
+        else
+            if w.Name == "RatShopWindow" then
+                if w.Visible then
+                    window.Binds.SetStyle("Shop");
+                else
+                    window.Binds.SetStyle();
+                end
+            end
+
         end
     end)
 
     local previousStats = {};
-    interface:BindEvent("UpdateStats", function()
+    window.OnUpdate:Connect(function()
         local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
         local statsData = modData.GameSave and modData.GameSave.Stats;
@@ -149,6 +183,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             statsFrame.Visible = false;
         end
     end)
+
+    interface:BindEvent("UpdateStats", function()
+        window:Update();
+    end)
+    window:Update();
 end
 
 return interfacePackage;

@@ -35,7 +35,7 @@ local donateOptions = {
 	{Product={Gold=50000;};};
 }
 
-function PageInterface:Load(interface)
+function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 	local keyTable = {
 		StatName="Gold";
 		AllTimeTableKey="AllTimeGoldDonor";
@@ -48,7 +48,7 @@ function PageInterface:Load(interface)
 	
 	modLeaderboardService.ClientSyncRequest();
 	local newLeaderboard = modLeaderboardInterface.new(keyTable);
-	newLeaderboard.Frame.Parent = interface.PageFrame;
+	newLeaderboard.Frame.Parent = window.Binds.PageFrame;
 	
 	local leaderboardFrame = newLeaderboard.Frame;
 	local purchaseFrame = leaderboardFrame:WaitForChild("Frame"):WaitForChild("purchase");
@@ -80,21 +80,21 @@ function PageInterface:Load(interface)
 			if serverReply == modShopLibrary.PurchaseReplies.Success then
 				promptWindow.Frame.Yes.buttonText.Text = "Donated!";
 				wait(0.5);
-				interface:OpenWindow("RatShopWindow");
+				interface:ToggleWindow("RatShopWindow", true);
 			else
 				warn("Sell Item>> Error Code:"..serverReply);
 				promptWindow.Frame.Yes.buttonText.Text = (modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply));
 			end
 
 			promptWindow:Close();
-			interface:OpenWindow("RatShopWindow");
+			interface:ToggleWindow("RatShopWindow", true);
 			YesClickedSignal:Disconnect();
 			NoClickedSignal:Disconnect();
 		end);
 		NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
 			interface:PlayButtonClick();
 			promptWindow:Close();
-			interface:OpenWindow("RatShopWindow");
+			interface:ToggleWindow("RatShopWindow", true);
 			YesClickedSignal:Disconnect();
 			NoClickedSignal:Disconnect();
 		end);

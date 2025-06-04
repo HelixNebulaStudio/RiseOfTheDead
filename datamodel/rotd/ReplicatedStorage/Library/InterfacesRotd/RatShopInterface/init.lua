@@ -1,60 +1,49 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Configuration;
-
---== Variables;
-local Interface = {};
-
+--==
 local RunService = game:GetService("RunService");
-local UserInputService = game:GetService("UserInputService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
+
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
+local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modShopLibrary = shared.require(game.ReplicatedStorage.Library.RatShopLibrary);
 local modBlueprintLibrary = shared.require(game.ReplicatedStorage.Library.BlueprintLibraryRotd);
-local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.BattlePassLibrary);
-local modStorageInterface = shared.require(game.ReplicatedStorage.Library.UI.StorageInterface);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
-local typeOptionTemplate = script:WaitForChild("TypeOption");
-local listingTemplate = script:WaitForChild("templateOption");
-
-local remoteShopService = modRemotesManager:Get("ShopService");
-
-local branchColor = modBranchConfigs.BranchColor;	
-
-Interface.RankColors = {
-	Color3.fromRGB(255, 220, 112);
-	Color3.fromRGB(255, 255, 255);
-	Color3.fromRGB(181, 99, 85);
-	Color3.fromRGB(170, 170, 170);
+local interfacePackage = {
+    Type = "Player";
 };
-
---== Script;
-modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
-	if action ~= "syncevent" or (data and data.Id ~= "AmmoPouchData") then return end;
-	
-	modStorageInterface.RefreshSlotOfItemId("ammopouch");
-end)
+--==
 
 
+function interfacePackage.newInstance(interface: InterfaceInstance)
+    local remoteShopService = modRemotesManager:Get("ShopService");
+    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
-function Interface.init(modInterface)
-	setmetatable(Interface, modInterface);
-	
+    local typeOptionTemplate = script:WaitForChild("TypeOption");
+    local listingTemplate = script:WaitForChild("templateOption");
+        
+    local branchColor = modBranchConfigs.BranchColor;	
+
 	local activeShopType = "Rats";
-	local interfaceScreenGui = localPlayer.PlayerGui:WaitForChild("MainInterface");
+	local interfaceScreenGui = interface.ScreenGui;
 	
-	local shopFrame = modConfigurations.CompactInterface and script:WaitForChild("MobileRatShopFrame"):Clone() or script:WaitForChild("RatShopFrame"):Clone();
-	shopFrame.Parent = interfaceScreenGui;
-	
+	local shopFrame = nil;
+	if modConfigurations.CompactInterface then
+        shopFrame = script:WaitForChild("MobileRatShopFrame"):Clone();
+    else
+        shopFrame = script:WaitForChild("RatShopFrame"):Clone();
+    end
+    shopFrame.Parent = interfaceScreenGui;
+
 	local typesListLayout = nil;
 	local shopTitleLabel;
-	
+
 	if modConfigurations.CompactInterface then
 		shopFrame.Name = "RatShopFrame";
 		typeOptionTemplate = script:WaitForChild("TypeOptionMobile");
@@ -66,74 +55,54 @@ function Interface.init(modInterface)
 		typesListLayout = shopFrame:WaitForChild("ShopTypes"):WaitForChild("UIListLayout");
 
 	end
-	
+    
 	local typesFrame = shopFrame:WaitForChild("ShopTypes");
 	local pageFrame = shopFrame:WaitForChild("PageFrame");
 
-	Interface.PageFrame = pageFrame;
-	Interface.SelectedSlot = nil;
-	
-	local defaultInterface, premiumInterface = Interface.modInventoryInterface.DefaultInterface, Interface.modInventoryInterface.PremiumInterface;
-	local clothingInterface = Interface.modInventoryInterface.ClothingInterface;
-	
-	local function clearSlotHighlight(slot)
-		for id, button in pairs(defaultInterface.Buttons) do
-			if (slot == nil or id ~= slot.ID) and button.Button then
-				button.Button.BackgroundTransparency = 1;
-			end
-		end
-		for id, button in pairs(premiumInterface.Buttons) do
-			if (slot == nil or id ~= slot.ID) and button.Button then
-				button.Button.BackgroundTransparency = 1;
-			end
-		end
-		for id, button in pairs(clothingInterface.Buttons) do
-			if (slot == nil or id ~= slot.ID) and button.Button then
-				button.Button.BackgroundTransparency = 1;
-			end
-		end
-	end
 
-	local function onItemSelect(interface, slot)
-		if slot and slot.Button and (Interface.SelectedSlot == nil or Interface.SelectedSlot.ID ~= (slot and slot.ID or 0)) then
-			clearSlotHighlight(slot);
-			Interface.SelectedSlot = slot;
-			Interface:PlayButtonClick();
-
-			slot.Button.BackgroundTransparency = 0.3;
-			slot.Button.BackgroundColor3 = branchColor;
-
-			Interface.Update();
-		else
-			Interface.ClearSelection();
-
-			Interface.Update();
-			Interface.LoadPage("Money");
-		end
-	end
-	
-	
-	local window = Interface.NewWindow("RatShopWindow", shopFrame);
+    --MARK: Window
+	local window: InterfaceWindow = interface:NewWindow("RatShopWindow", shopFrame);
+    window.DisableInteractables = true;
 	if modConfigurations.CompactInterface then
-		window:SetOpenClosePosition(UDim2.new(0.5, 0, 0, 0), UDim2.new(0.5, 0, 1, 0));
+		window.CompactFullscreen = true;
+		window:SetClosePosition(UDim2.new(0.5, 0, 1, 0), UDim2.new(0.5, 0, 0, 0));
+		shopTitleLabel.Parent:WaitForChild("closeButton").MouseButton1Click:Connect(function()
+			window:Close();
+		end)
 		
 	else
-		window:SetOpenClosePosition(UDim2.new(1, -10, 0.5, 0), UDim2.new(2, -10, 0.5, 0));
+		window:SetClosePosition(UDim2.new(2, -10, 0.5, 0), UDim2.new(1, -10, 0.5, 0));
+
 	end
-	
 	window:AddCloseButton(shopFrame);
-	window.OnWindowToggle:Connect(function(visible, shopType, ...)
 
+    local binds = window.Binds;
+
+	binds.PageFrame = pageFrame;
+    binds.RankColors = {
+        Color3.fromRGB(255, 220, 112);
+        Color3.fromRGB(255, 255, 255);
+        Color3.fromRGB(181, 99, 85);
+        Color3.fromRGB(170, 170, 170);
+    };
+	binds.SelectedSlot = nil;
+
+	window.OnToggle:Connect(function(visible, interactable, interactInfo)
 		if visible then
-			local reselectSlot = ...;
+			local shopType = interactable.Values.ShopType;
+			binds.InteractObject = interactable.Object;
 
-			if defaultInterface then defaultInterface.OnItemButton1Click = onItemSelect; end
-			if premiumInterface then premiumInterface.OnItemButton1Click = onItemSelect; end
-			if clothingInterface then clothingInterface.OnItemButton1Click = onItemSelect; end
+			for a=1, #interface.StorageInterfaces do
+				local storageInterface: StorageInterface = interface.StorageInterfaces[a];
+				if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
+					continue;
+				end
+				storageInterface.OnItemButton1Click = binds.onItemSelect;
+			end
 			
 			activeShopType = shopType or "Rats";
 			
-			Debugger:Log("activeShopType", activeShopType, ...);
+			Debugger:Log("activeShopType", activeShopType);
 			
 			if activeShopType == "Bandits" then
 				shopTitleLabel.Text = "Bandit's Market";
@@ -143,51 +112,99 @@ function Interface.init(modInterface)
 				
 			end
 			
-			Interface:HideAll{[window.Name]=true; ["Inventory"]=true;};
-			Interface:ToggleInteraction(false);
-			Interface:OpenWindow("Inventory");
+			interface:HideAll{[window.Name]=true; ["Inventory"]=true;};
+            
+            interface:ToggleWindow("Inventory", true);
+            
 			task.spawn(function()
 				modData:GetFlag("ItemCodex", true);
 			end)
 			task.spawn(function()
-				repeat until not window.Visible or Interface.Object == nil or not Interface.Object:IsDescendantOf(workspace) or Interface.modCharacter.Player:DistanceFromCharacter(Interface.Object.Position) >= 16 or not wait(0.5);
-				Interface:ToggleWindow("RatShopWindow", false);
+				repeat until 
+                    not window.Visible 
+                    or binds.InteractObject == nil 
+                    or not binds.InteractObject:IsDescendantOf(workspace) 
+                    or localPlayer:DistanceFromCharacter(binds.InteractObject.Position) >= 16 
+                    or not wait(0.5);
+
+                window:Close();
 			end)
 
-			if reselectSlot and reselectSlot.Button then
-				onItemSelect(nil, reselectSlot);
+			-- if reselectSlot and reselectSlot.Button then
+			-- 	binds.onItemSelect(nil, reselectSlot);
 	
-			else
-				Interface.Update();
-				Interface.LoadPage("Money");
+			-- else
+                window:Update();
+				binds.LoadPage("Money");
 	
-			end
+			-- end
 			
 		else
 			game.Debris:AddItem(shopFrame:FindFirstChild("ToolTip"), 0);
 			
-			Interface.ClearPage();
-			Interface.SelectedSlot = nil;
-			if defaultInterface then defaultInterface.OnItemButton1Click = Interface.modInventoryInterface.DefaultInterface.BeginDragItem; end
-			if premiumInterface then premiumInterface.OnItemButton1Click = Interface.modInventoryInterface.PremiumInterface.BeginDragItem; end
-			if clothingInterface then clothingInterface.OnItemButton1Click = Interface.modInventoryInterface.ClothingInterface.BeginDragItem; end
-			Interface:CloseWindow("Inventory");
-			Interface:CloseWindow("WeaponStats");
-			task.delay(0.3, function()
-				Interface:ToggleInteraction(true);
-			end)
+			binds.ClearPage();
+			binds.SelectedSlot = nil;
+
+			for a=1, #interface.StorageInterfaces do
+				local storageInterface: StorageInterface = interface.StorageInterfaces[a];
+				if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
+					continue;
+				end
+				storageInterface.OnItemButton1Click = storageInterface.BeginDragItem;
+			end
+
+            interface:ToggleWindow("Inventory", false);
+            interface:ToggleWindow("WeaponStats", false);
 			
 		end
-
 	end)
-	
-	function Interface.ClearSelection()
-		clearSlotHighlight();
-		Interface.SelectedSlot = nil;
+
+
+
+	function binds.onItemSelect(storageInterface, slot)
+		if slot and slot.Button 
+            and (binds.SelectedSlot == nil or binds.SelectedSlot.ID ~= (slot and slot.ID or 0)) then
+			binds.clearSlotHighlight(slot);
+			binds.SelectedSlot = slot;
+			interface:PlayButtonClick();
+
+			slot.Button.BackgroundTransparency = 0.3;
+			slot.Button.BackgroundColor3 = branchColor;
+
+            window:Update();
+		else
+			binds.ClearSelection();
+
+            window:Update();
+			binds.LoadPage("Money");
+		end
+    end
+
+	function binds.clearSlotHighlight(slot)
+		for a=1, #interface.StorageInterfaces do
+			local storageInterface: StorageInterface = interface.StorageInterfaces[a];
+			if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
+				continue;
+			end
+
+			for id, button in pairs(storageInterface.Buttons) do
+				if (slot == nil or id ~= slot.ID) and button.Button then
+					button.Button.BackgroundTransparency = 1;
+				end
+			end
+		end
 	end
 
 
-	function Interface.ClearPage()
+
+
+	function binds.ClearSelection()
+		binds.clearSlotHighlight();
+		binds.SelectedSlot = nil;
+	end
+
+
+	function binds.ClearPage()
 		for _, obj in pairs(pageFrame:GetChildren()) do
 			if obj:IsA("GuiObject") then
 				obj:Destroy();
@@ -195,12 +212,12 @@ function Interface.init(modInterface)
 		end
 	end
 
-	function Interface.LoadPage(catalogType, pageName)
+	function binds.LoadPage(catalogType, pageName)
 		if modShopLibrary.Pages[catalogType] == nil then return end;
 		local cataInfo = modShopLibrary.Pages[catalogType];
 
-		Interface.ClearSelection();
-		Interface.ClearPage();
+		binds.ClearSelection();
+		binds.ClearPage();
 		
 		pageName = pageName or "FrontPage";
 		if cataInfo.Type == "Page" then
@@ -213,7 +230,7 @@ function Interface.init(modInterface)
 			modPage = modPage and shared.require(modPage) or nil;
 
 			if modPage then
-				modPage:Load(Interface);
+				modPage:Load(interface, window);
 			end
 
 			return
@@ -233,7 +250,7 @@ function Interface.init(modInterface)
 			end
 			
 			
-			Interface.NewListing(function(newListing)
+			binds.NewListing(function(newListing)
 				local infoBox = newListing:WaitForChild("infoFrame");
 				local descFrame = infoBox:WaitForChild("descFrame");
 
@@ -263,7 +280,7 @@ function Interface.init(modInterface)
 					purchaseButton.Visible = false;
 
 					newListing.MouseButton1Click:Connect(function()
-						Interface.LoadPage(catalogType, info.Id);
+						binds.LoadPage(catalogType, info.Id);
 					end)
 
 				elseif info.Type == "Product" then
@@ -307,7 +324,7 @@ function Interface.init(modInterface)
 
 										promptDialogFrame.statusLabel.Text = "Purchasing item...";
 				
-										local serverReply = remoteShopService:InvokeServer("buyitem", Interface.Object, info.Id);
+										local serverReply = remoteShopService:InvokeServer("buyitem", binds.InteractObject, info.Id);
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
 											promptDialogFrame.statusLabel.Text = "Purchased!";
 
@@ -322,7 +339,7 @@ function Interface.init(modInterface)
 											return true;
 										end;
 
-										Interface.Update();
+                                        window:Update();
 										return;
 									end;
 									OnSecondaryClick=function(promptDialogFrame, textButton)
@@ -357,8 +374,8 @@ function Interface.init(modInterface)
 		--pageFrame
 	end
 
-	function Interface.Update()
-		local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+    window.OnUpdate:Connect(function()
+        local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
 		local wieldComp: WieldComp = playerClass.WieldComp;
 
 		for _, obj in pairs(typesFrame:GetChildren()) do
@@ -386,8 +403,8 @@ function Interface.init(modInterface)
 				
 			end
 			cataButton.MouseButton1Click:Connect(function()
-				Interface:PlayButtonClick();
-				Interface.LoadPage(cataType);
+				interface:PlayButtonClick();
+				binds.LoadPage(cataType);
 			end)
 
 			if cataInfo.FrontPage and not modConfigurations.CompactInterface then
@@ -432,21 +449,21 @@ function Interface.init(modInterface)
 					newOptButton.Parent = typesFrame;
 
 					cataButtonB.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
-						Interface.LoadPage(cataType, optInfo.Id);
+						interface:PlayButtonClick();
+						binds.LoadPage(cataType, optInfo.Id);
 					end)
 				end
 			end
 		end
 		
-		if Interface.SelectedSlot then
-			Interface.ClearPage();
+		if binds.SelectedSlot then
+			binds.ClearPage();
 
-			local storageItemID = Interface.SelectedSlot.ID;
+			local storageItemID = binds.SelectedSlot.ID;
 			local selectedItem = modData.GetItemById(storageItemID);
 			if selectedItem == nil then
-				Interface.SelectedSlot = nil;
-				Interface.LoadPage("Money");
+				binds.SelectedSlot = nil;
+				binds.LoadPage("Money");
 				return;
 			end
 
@@ -455,7 +472,7 @@ function Interface.init(modInterface)
 			local equipmentClass = wieldComp:GetEquipmentClass(storageItemID);
 			
 			if equipmentClass and equipmentClass.Properties.OnShopSelect then
-				equipmentClass.Properties:OnShopSelect(Interface, selectedItem);
+				equipmentClass.Properties:OnShopSelect(interface, selectedItem);
 			end
 
 			local localplayerStats = modData.GetStats();
@@ -467,9 +484,9 @@ function Interface.init(modInterface)
 			if hasAmmoData then
 				local ammoCurrency = modShopLibrary.AmmunitionCurrency or "Money";
 				local localplayerCurrency = localplayerStats and localplayerStats[ammoCurrency] or 0;
-				local price, mags = modShopLibrary.CalculateAmmoPrice(selectedItem.ItemId, selectedItem.Values, equipmentClass.Configurations, localplayerCurrency, modData.Profile.Punishment == modGlobalVars.Punishments.AmmoCostPenalty);
+				local price, _mags = modShopLibrary.CalculateAmmoPrice(selectedItem.ItemId, selectedItem.Values, equipmentClass.Configurations, localplayerCurrency, modData.Profile.Punishment == modGlobalVars.Punishments.AmmoCostPenalty);
 
-				Interface.NewListing(function(newListing)
+				binds.NewListing(function(newListing)
 					newListing.Name = "AmmoRefillOption";
 					local infoBox = newListing:WaitForChild("infoFrame");
 					local descFrame = infoBox:WaitForChild("descFrame");
@@ -484,8 +501,7 @@ function Interface.init(modInterface)
 
 					local priceTag = "$"..modFormatNumber.Beautify(price);
 					descLabel.Text = `Refill <b>{itemLib.Name}</b> ammunition`..(price > 0 and ` for <b>{priceTag}</b>.` or `.`);
-					--"<b>"..itemLib.Name.."</b>: ".."Buy "..mags.." magazine"..(mags > 1 and "s" or "").." = "..priceTag;
-						
+
 					titleLabel.Text = "Refill Ammunition";
 					priceLabel.Text = priceTag;
 					iconLabel.Image = "rbxassetid://2040144031";
@@ -495,7 +511,7 @@ function Interface.init(modInterface)
 						if purchaseAmmoDebounce then return end;
 						purchaseAmmoDebounce = true;
 						
-						local serverReply = localplayerStats and (localplayerStats[ammoCurrency] or 0) >= price and remoteShopService:InvokeServer("buyammo", {StoreObj=Interface.Object;}, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
+						local serverReply = localplayerStats and (localplayerStats[ammoCurrency] or 0) >= price and remoteShopService:InvokeServer("buyammo", {StoreObj=binds.InteractObject;}, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
 						if serverReply == modShopLibrary.PurchaseReplies.Success then
 							RunService.Heartbeat:Wait();
 							newListing:Destroy();
@@ -517,7 +533,7 @@ function Interface.init(modInterface)
 				local charges = ammoPouchData and ammoPouchData.Charges or itemClass.Configurations.BaseRefillCharge;
 
 				if charges < itemClass.Configurations.BaseRefillCharge then
-					Interface.NewListing(function(newListing)
+					binds.NewListing(function(newListing)
 						newListing.Name = "RefillOption";
 						local infoBox = newListing:WaitForChild("infoFrame");
 						local descFrame = infoBox:WaitForChild("descFrame");
@@ -541,7 +557,7 @@ function Interface.init(modInterface)
 							if refillDebounce then return end;
 							refillDebounce = true;
 							
-							local serverReply = remoteShopService:InvokeServer("refillcharges", Interface.Object, selectedItem.ID);
+							local serverReply = remoteShopService:InvokeServer("refillcharges", binds.InteractObject, selectedItem.ID);
 
 							if serverReply == modShopLibrary.PurchaseReplies.Success then
 								RunService.Heartbeat:Wait();
@@ -561,7 +577,7 @@ function Interface.init(modInterface)
 			local repairPrice = modShopLibrary.RepairPrice[selectedItem.ItemId];
 			if repairPrice and selectedItem.Values and selectedItem.Values.Health and selectedItem.Values.MaxHealth and selectedItem.Values.Health <= selectedItem.Values.MaxHealth then
 				
-				Interface.NewListing(function(newListing)
+				binds.NewListing(function(newListing)
 					newListing.Name = "RepairOption";
 					local infoBox = newListing:WaitForChild("infoFrame");
 					local descFrame = infoBox:WaitForChild("descFrame");
@@ -587,7 +603,7 @@ function Interface.init(modInterface)
 						purchaseRepairDebounce = true;
 						
 						local serverReply = localplayerStats and (localplayerStats.Money or 0) >= repairPrice 
-						and remoteShopService:InvokeServer("buyrepair", Interface.Object, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
+						and remoteShopService:InvokeServer("buyrepair", binds.InteractObject, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
 
 						if serverReply == modShopLibrary.PurchaseReplies.Success then
 							RunService.Heartbeat:Wait();
@@ -608,7 +624,7 @@ function Interface.init(modInterface)
 				or bpLib and (bpLib.SellPrice or (bpLib.Tier and modShopLibrary.SellPrice["Tier"..bpLib.Tier])) or nil;
 
 			if itemLib and price then
-				Interface.NewListing(function(newListing)
+				binds.NewListing(function(newListing)
 					local infoBox = newListing:WaitForChild("infoFrame");
 					local descFrame = infoBox:WaitForChild("descFrame");
 
@@ -649,7 +665,7 @@ function Interface.init(modInterface)
 										end;
 
 										
-										local serverReply = remoteShopService:InvokeServer("sellitem", Interface.Object, storageItemID);
+										local serverReply = remoteShopService:InvokeServer("sellitem", binds.InteractObject, storageItemID);
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
 											promptDialogFrame.statusLabel.Text = "Sold!";
 											wait(0.5);
@@ -659,7 +675,7 @@ function Interface.init(modInterface)
 											wait(1);
 										end
 
-										Interface.Update();
+                                        window:Update();
 									end;
 								};
 								{
@@ -676,7 +692,7 @@ function Interface.init(modInterface)
 				
 				--== MARK:  Sell all
 				if selectedItem.Quantity > 1 then
-					Interface.NewListing(function(newListing)
+					binds.NewListing(function(newListing)
 						local infoBox = newListing:WaitForChild("infoFrame");
 						local descFrame = infoBox:WaitForChild("descFrame");
 
@@ -719,7 +735,7 @@ function Interface.init(modInterface)
 											end;
 	
 											
-											local serverReply = remoteShopService:InvokeServer("sellitem", Interface.Object, storageItemID, allQuantity);
+											local serverReply = remoteShopService:InvokeServer("sellitem", binds.InteractObject, storageItemID, allQuantity);
 											if serverReply == modShopLibrary.PurchaseReplies.Success then
 												promptDialogFrame.statusLabel.Text = `Sold all <b>{allQuantity}</b> {itemLib.Name}!`;
 												wait(1);
@@ -729,7 +745,7 @@ function Interface.init(modInterface)
 												wait(1);
 											end
 	
-											Interface.Update();
+                                            window:Update();
 										end;
 									};
 									{
@@ -750,8 +766,15 @@ function Interface.init(modInterface)
 			local isExchangable = modItemsLibrary:HasTag(itemLib.Id, "Skin Perm") or modItemsLibrary:HasTag(itemLib.Id, "Color Pack") or modItemsLibrary:HasTag(itemLib.Id, "Skin Pack");
 			local activeBpId = modBattlePassLibrary.Active;
 			local battlepassLib = activeBpId and modBattlePassLibrary:Find(activeBpId);
-			if modBattlePassLibrary.Library.GiftShop and activeBpId and #activeBpId > 0 and isExchangable and battlepassLib and battlepassLib.Tree then
-				Interface.NewListing(function(newListing)
+			if modBattlePassLibrary.Library.GiftShop 
+            and activeBpId 
+            and #activeBpId > 0 
+            and isExchangable 
+            and battlepassLib 
+            and battlepassLib.Tree 
+            then
+
+				binds.NewListing(function(newListing)
 					local infoBox = newListing:WaitForChild("infoFrame");
 					local descFrame = infoBox:WaitForChild("descFrame");
 
@@ -792,7 +815,7 @@ function Interface.init(modInterface)
 											return;
 										end;
 
-										local serverReply = remoteShopService:InvokeServer("exchangefortoken", Interface.Object, storageItemID);
+										local serverReply = remoteShopService:InvokeServer("exchangefortoken", binds.InteractObject, storageItemID);
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
 											promptDialogFrame.statusLabel.Text = "Exchanged!";
 											wait(0.5);
@@ -804,7 +827,7 @@ function Interface.init(modInterface)
 
 										end
 
-										Interface.Update();
+                                        window:Update();
 									end;
 								};
 								{
@@ -820,7 +843,7 @@ function Interface.init(modInterface)
 
 				--== MARK: Exchange all for Gift Shop Tokens
 				if selectedItem.Quantity > 1 then
-					Interface.NewListing(function(newListing)
+					binds.NewListing(function(newListing)
 						local infoBox = newListing:WaitForChild("infoFrame");
 						local descFrame = infoBox:WaitForChild("descFrame");
 	
@@ -862,7 +885,7 @@ function Interface.init(modInterface)
 												return;
 											end;
 	
-											local serverReply = remoteShopService:InvokeServer("exchangefortoken", Interface.Object, storageItemID, exchangeQuantity);
+											local serverReply = remoteShopService:InvokeServer("exchangefortoken", binds.InteractObject, storageItemID, exchangeQuantity);
 											if serverReply == modShopLibrary.PurchaseReplies.Success then
 												promptDialogFrame.statusLabel.Text = `Exchanged <b>{exchangeQuantity} {itemLib.Name}</b> for <b>{tokenReward}</b> tokens!`;
 												wait(1);
@@ -874,7 +897,7 @@ function Interface.init(modInterface)
 	
 											end
 	
-											Interface.Update();
+                                            window:Update();
 										end;
 									};
 									{
@@ -897,13 +920,13 @@ function Interface.init(modInterface)
 		else
 			typesFrame.CanvasSize = UDim2.new(0, 0, 0, typesListLayout.AbsoluteContentSize.Y+10);
 		end
-	end
-
-	function Interface.NewListing(func)
+    end)
+    
+	function binds.NewListing(func)
 		local newListing = listingTemplate:Clone();
 		func(newListing);
 		newListing.MouseButton1Click:Connect(function()
-			Interface:PlayButtonClick();
+			interface:PlayButtonClick();
 		end)
 		newListing.MouseMoved:Connect(function()
 			newListing.BackgroundTransparency = 0.6;
@@ -915,7 +938,16 @@ function Interface.init(modInterface)
 		newListing.Parent = pageFrame;
 	end
 
-	return Interface;
-end;
 
-return Interface;
+
+
+-- modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
+-- 	if action ~= "syncevent" or (data and data.Id ~= "AmmoPouchData") then return end;
+	
+-- 	modStorageInterface.RefreshSlotOfItemId("ammopouch");
+-- end)
+
+end
+
+return interfacePackage;
+

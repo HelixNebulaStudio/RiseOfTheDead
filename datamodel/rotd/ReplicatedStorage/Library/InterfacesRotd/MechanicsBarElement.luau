@@ -124,6 +124,18 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
         end
     end)
+    if modConfigurations.CompactInterface then
+    else
+        interface.OnWindowToggle:Connect(function(win: InterfaceWindow)
+            if win.Name == "RatShopWindow" then
+                if win.Visible and camera.ViewportSize.Y <= 910 then
+                    frame.Visible = false;
+                elseif modConfigurations.DisableExperiencebar ~= true then
+                    frame.Visible = true;
+                end
+            end
+        end)
+    end
 
 end
 

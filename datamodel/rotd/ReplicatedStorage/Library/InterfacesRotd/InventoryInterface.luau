@@ -5,6 +5,7 @@ local UserInputService = game:GetService("UserInputService");
 local TweenService = game:GetService("TweenService");
 
 local localPlayer = game.Players.LocalPlayer;
+local camera = workspace.CurrentCamera;
 
 local modItem = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
@@ -202,6 +203,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				elseif modConfigurations.DisableHotbar ~= true then
 					hotbarWindow:Open();
 				end
+
+			elseif window.Name == "RatShopWindow" then
+				if visible and camera.ViewportSize.Y <= 910 then
+					hotbarWindow:Close();
+				elseif modConfigurations.DisableHotbar ~= true then
+					hotbarWindow:Open();
+				end
+
 			end
 		end)
 

@@ -6,7 +6,7 @@ local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.Lead
 local modLeaderboardInterface = shared.require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
 --==
 
-function PageInterface:Load(interface)
+function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 	local keyTable = {
 		StatName="Zombie Kills";
 		AllTimeTableKey="AllTimeZombieKills";
@@ -19,7 +19,7 @@ function PageInterface:Load(interface)
 	
 	modLeaderboardService.ClientSyncRequest();
 	local newLeaderboard = modLeaderboardInterface.new(keyTable);
-	newLeaderboard.Frame.Parent = interface.PageFrame;
+	newLeaderboard.Frame.Parent = window.Binds.PageFrame;
 end
 
 return PageInterface;
