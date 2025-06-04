@@ -1,0 +1,24 @@
+name: commits
+on:
+  push:
+    branches:
+      - main
+jobs:
+  discord_webhook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Discord Commits
+        uses: Sniddl/discord-commits@v1.6
+        with:
+          webhook: ${{ secrets.Discord_Webhook }}
+          message: 'New commit on **${{ github.ref_name }}**'
+          embed: '{
+            "title": "{{ commit.title }}",
+            "description": "{{ commit.description }}\n\n[Rise of the Dead](https://helixnebulastudio.github.io/RiseOfTheDead/)",
+            "url": "{{ commit.url }}",
+            "author": {
+                "name": "{{ commit.author.name }}",
+                "icon_url": "https://github.com/{{ commit.author.username }}.png"
+              }
+            }'
+          include-extras: true
