@@ -9,6 +9,11 @@ return function(event: EventPacket, ...)
     local interactable: InteractableInstance = modInteractables.getOrNew(config, event.Player);
     if interactable == nil then return end
 
-    Debugger:Warn(`BioXResearchButton`, values);
-    modAudio.Play("PartyPopper", interactable.Object);
+    local variantId = interactable.Variant;
+
+    if variantId == "BioXResearchButton" then
+        Debugger:Warn(`BioXResearchButton`, values);
+        modAudio.Play("PartyPopper", interactable.Object);
+        
+    end
 end;

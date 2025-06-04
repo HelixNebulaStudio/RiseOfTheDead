@@ -86,12 +86,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 return win.Visible == true;
             end)
 
+            local goldMenuOpen = false;
             local invOpen = false;
             for a=1, #openedWindows do
                 local win: InterfaceWindow = openedWindows[a];
                 if win.Name == "Inventory" or win.Name == "Workbench" then
                     invOpen = true;
-                    break;
+                elseif win.Name == "GoldMenu" then
+                    goldMenuOpen = true;
                 end
             end
 
@@ -99,6 +101,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 window.Binds.SetStyle("Inventory");
             else
                 window.Binds.SetStyle();
+            end
+            if goldMenuOpen then
+                window:Close();
+            else
+                window:Open();
             end
 
         else

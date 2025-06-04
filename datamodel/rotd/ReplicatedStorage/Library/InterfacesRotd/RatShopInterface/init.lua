@@ -16,7 +16,7 @@ local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.Battl
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local interfacePackage = {
-    Type = "Player";
+    Type = "Character";
 };
 --==
 

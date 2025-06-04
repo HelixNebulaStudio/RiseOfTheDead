@@ -3,12 +3,12 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local interactablePackage = {};
 
 function interactablePackage.init(super) -- Server/Client
-    local Template = {
+    local Shop = {
 		Name = "Shop";
         Type = "Shop";
     };
 
-    function Template.new(interactable: InteractableInstance, player: Player)
+    function Shop.new(interactable: InteractableInstance, player: Player)
         local config: Configuration = interactable.Config;
 		local shopType = config:GetAttribute("ShopType") :: string;
 
@@ -18,7 +18,7 @@ function interactablePackage.init(super) -- Server/Client
     end
 
     -- When interacting with interactable.
-    function Template.BindInteract(interactable: InteractableInstance, info: InteractInfo)
+    function Shop.BindInteract(interactable: InteractableInstance, info: InteractInfo)
         if info.Player == nil then return end;
         if info.Action ~= info.ActionSource.Client then return end;
 
@@ -29,7 +29,7 @@ function interactablePackage.init(super) -- Server/Client
         shopWindow:Open(interactable, info);
     end
     
-    super.registerPackage(Template);
+    super.registerPackage(Shop);
 end
 
 return interactablePackage;

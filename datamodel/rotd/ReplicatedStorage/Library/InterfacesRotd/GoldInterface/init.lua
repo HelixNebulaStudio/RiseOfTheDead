@@ -69,8 +69,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         goldMenuFrame.Size = UDim2.new(1, 0, 1, 0);
         goldMenuFrame:WaitForChild("UICorner"):Destroy();
         
-        goldMenuFrame:WaitForChild("touchCloseButton").Visible = true;
-        goldMenuFrame:WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+        goldMenuFrame:WaitForChild("closeButton").Visible = true;
+        goldMenuFrame:WaitForChild("closeButton").MouseButton1Click:Connect(function()
             goldShopWindow:Close();
         end)
 	else
@@ -80,6 +80,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	goldShopWindow:AddCloseButton(goldMenuFrame);
 	modKeyBindsHandler:SetDefaultKey("KeyWindowGoldMenu", Enum.KeyCode.K);
 	interface:BindConfigKey("DisableGoldMenu", {goldShopWindow}, {goldStatFrame});
+
+
+    interface.Properties.OnChanged:Connect(function(k, v, ov)
+        if k == "IsCompactFullscreen" then
+            if v == true and goldShopWindow.Visible == false then
+                goldStatFrame.Visible = false;
+            else
+                goldStatFrame.Visible = true;
+            end
+        end
+    end)
 
     local goldLerpTag = Instance.new("NumberValue"); 
     goldLerpTag.Parent = script;
@@ -91,6 +102,39 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local nameCaches = {};
 	local initGoldLib = false;
+
+    function goldShopWindow.Binds.SetStyle(styleId)
+        if modConfigurations.CompactInterface then
+            if styleId == "Menu" then
+                goldStatFrame.AnchorPoint = Vector2.new(0, 0);
+                goldStatFrame.Position = UDim2.new(0, interface.Properties.TopbarInset.Min.X+20, 0, 0);
+                goldStatFrame.Size = UDim2.new(0, 200, 0.1, 0);
+
+                goldStatFrame.GoldMenu.AnchorPoint = Vector2.new(0, 0.5);
+                goldStatFrame.GoldMenu.Position = UDim2.new(0, 0, 0.5, 0);
+                goldStatFrame.GoldMenu.Size = UDim2.new(0, 35, 0, 35);
+
+                goldStatFrame.goldLabel.AnchorPoint = Vector2.new(0, 0.5);
+                goldStatFrame.goldLabel.Position = UDim2.new(0, 50, 0.5, 0);
+                goldStatFrame.goldLabel.TextXAlignment = Enum.TextXAlignment.Left;
+
+            else
+                goldStatFrame.AnchorPoint = Vector2.new(1, 0);
+                goldStatFrame.Position = UDim2.new(1, -6, 0, 6);
+                goldStatFrame.Size = UDim2.new(0, 200, 0, 25);
+
+                goldStatFrame.GoldMenu.AnchorPoint = Vector2.new(1, 0.5);
+                goldStatFrame.GoldMenu.Position = UDim2.new(1, 0, 0.5, 0);
+                goldStatFrame.GoldMenu.Size = UDim2.new(0, 26, 0, 26);
+
+                goldStatFrame.goldLabel.AnchorPoint = Vector2.new(1, 0.5);
+                goldStatFrame.goldLabel.Position = UDim2.new(1, -30, 0.5, 0);
+                goldStatFrame.goldLabel.TextXAlignment = Enum.TextXAlignment.Right;
+
+            end
+        end
+    end
+
 	goldShopWindow.OnToggle:Connect(function(visible, productpageId)
 		if visible then
 			if initGoldLib == false then
@@ -124,6 +168,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			interface:HideAll{[goldShopWindow.Name]=true;};
             goldShopWindow:Update();
+            goldShopWindow.Binds.SetStyle("Menu");
 			
 			if productpageId then
 				local lib = modGoldShopLibrary.Products:Find(productpageId);
@@ -135,6 +180,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			else
 				goldShopWindow.Binds.LoadPage(frontPage);
 			end
+
+        else
+            goldShopWindow.Binds.SetStyle();
+
 		end
 	end)
 
@@ -186,6 +235,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         Debugger:Warn(`modData.PlayerGold { modData.PlayerGold}`);
         updateGoldStats(modData.PlayerGold or 0);
     end)
+
 
     local limitedList = {};
     local function fetchProductStock()
