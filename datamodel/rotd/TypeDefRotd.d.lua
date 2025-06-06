@@ -39,6 +39,7 @@ export type ProfileRotd = Profile & {
 
 --MARK: GameSaveRotd
 export type GameSaveRotd = GameSave & {
+    Wardrobe: Storage;
     Masteries: anydict;
     Blueprints: anydict;
 }

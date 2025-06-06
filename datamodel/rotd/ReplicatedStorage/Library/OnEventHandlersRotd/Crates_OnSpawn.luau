@@ -18,7 +18,7 @@ return function(event: EventPacket, cratePrefab, interactData, cratePlayers)
 		local mission = shared.modMission:GetMission(player, 77);
 		if mission then
 			if mission.Type == 2 then
-				if interactData.RefStorageId == "sunkenchest" then
+				if interactData.StoragePresetId == "sunkenchest" then
 					crateStorage:Add("blueprintpiece", {
 						CustomName=shared.modStorage.RegisterItemName("Turret Blueprint Piece");
 						Values={

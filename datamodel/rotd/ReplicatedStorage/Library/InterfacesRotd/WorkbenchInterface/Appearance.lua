@@ -201,9 +201,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 									
 									local oldActiveId = ItemValues.ActiveSkin;
 									if ItemValues.ActiveSkin == unlockableItemId then
-										remoteSetAppearance:FireServer(binds.InteractObject , 9, storageItem.ID, "UnlockableId");
+										remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId");
 									else
-										remoteSetAppearance:FireServer(binds.InteractObject , 9, storageItem.ID, "UnlockableId", unlockableItemId);
+										remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId", unlockableItemId);
 									end
 									canPreview = false;
 									
@@ -246,7 +246,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 												Style="Confirm";
 												OnPrimaryClick=function(promptDialogFrame, textButton)
 													promptDialogFrame.statusLabel.Text = "Applying...";
-													remoteSetAppearance:FireServer(binds.InteractObject , 9, storageItem.ID, "UnlockableId", unlockableItemId);
+													remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId", unlockableItemId);
 													task.wait(0.5);
 												end;
 											};
@@ -268,9 +268,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								
 								local oldActiveId = ItemValues.ActiveSkin;
 								if ItemValues.ActiveSkin == unlockableItemId then
-									remoteSetAppearance:FireServer(binds.InteractObject , 9, storageItem.ID, "UnlockableId");
+									remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId");
 								else
-									remoteSetAppearance:FireServer(binds.InteractObject , 9, storageItem.ID, "UnlockableId", unlockableItemId);
+									remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId", unlockableItemId);
 								end
 								canPreview = false;
 								
@@ -382,7 +382,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					highlightPart();
 
 					textureLabel.BackgroundColor3 = defaultPartColor;
-					remoteSetAppearance:FireServer(binds.InteractObject , 5, storageItem.ID, dataKey);
+					remoteSetAppearance:FireServer(binds.InteractPart , 5, storageItem.ID, dataKey);
 					
 					modColorsLibrary.SetColor(partInstance, nil);
 					modSkinsLibrary.SetTexture(partInstance, nil);
@@ -520,26 +520,26 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 										if packsList == modColorsLibrary.Packs then
 											if activePartColor == packData.List[a].Id then
 												textureLabel.BackgroundColor3 = defaultPartColor;
-												remoteSetAppearance:FireServer(binds.InteractObject , 3, storageItem.ID, dataKey);
+												remoteSetAppearance:FireServer(binds.InteractPart , 3, storageItem.ID, dataKey);
 												activePartColor = nil;
 												canPreview = false;
 											else
 												textureLabel.BackgroundColor3 = packData.List[a].Color;
-												remoteSetAppearance:FireServer(binds.InteractObject , 1, storageItem.ID, dataKey, packData.List[a].Id);
+												remoteSetAppearance:FireServer(binds.InteractPart , 1, storageItem.ID, dataKey, packData.List[a].Id);
 												activePartColor = packData.List[a].Id;
 											end
 											modColorsLibrary.SetColor(itemPartSelected, activePartColor);
 
 										elseif packsList == modSkinsLibrary.Packs then
 											if activePartTexture == packData.List[a].Id then
-												remoteSetAppearance:FireServer(binds.InteractObject , 4, storageItem.ID, dataKey);
+												remoteSetAppearance:FireServer(binds.InteractPart , 4, storageItem.ID, dataKey);
 												textureLabel.Image = "";
 												activePartTexture = nil;
 												canPreview = false;
 
 											else
 												if packData.List[a].Icon == nil then
-													remoteSetAppearance:FireServer(binds.InteractObject , 2, storageItem.ID, dataKey, packData.List[a].Id);
+													remoteSetAppearance:FireServer(binds.InteractPart , 2, storageItem.ID, dataKey, packData.List[a].Id);
 													textureLabel.Image = packData.List[a].Image;
 													textureLabel.ImageColor3 = packData.List[a].Color;
 													textureLabel.TileSize = UDim2.new(packData.List[a].StudsPerTile.X, 0, packData.List[a].StudsPerTile.Y, 0);
@@ -629,7 +629,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 							styleButton.MouseButton1Click:Connect(function()
 								interface:PlayButtonClick();
 
-								remoteSetAppearance:FireServer(binds.InteractObject , 2, storageItem.ID, dataKey, 0);
+								remoteSetAppearance:FireServer(binds.InteractPart , 2, storageItem.ID, dataKey, 0);
 								modSkinsLibrary.SetTexture(itemPartSelected, activePartTexture);
 								activePartTexture = 0;
 								
@@ -688,7 +688,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								styleButton.MouseButton1Click:Connect(function()
 									interface:PlayButtonClick();
 
-									remoteSetAppearance:FireServer(binds.InteractObject , 6, storageItem.ID, dataKey);
+									remoteSetAppearance:FireServer(binds.InteractPart , 6, storageItem.ID, dataKey);
 									
 									local invis = ItemValues.PartAlpha and ItemValues.PartAlpha[dataKey]
 									if invis == true then
@@ -821,9 +821,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 					local oldActiveId = ItemValues.ActiveSkin;
 					if ItemValues.ActiveSkin == skinId then
-						remoteSetAppearance:FireServer(binds.InteractObject , 9, storageItem.ID, "WeaponSkinId");
+						remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "WeaponSkinId");
 					else
-						remoteSetAppearance:FireServer(binds.InteractObject , 9, storageItem.ID, "WeaponSkinId", skinId);
+						remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "WeaponSkinId", skinId);
 					end
 					canPreview = false;
 					

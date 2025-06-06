@@ -13,7 +13,7 @@ return function(event: EventPacket, ...)
 
     if variantId == "BioXResearchButton" then
         Debugger:Warn(`BioXResearchButton`, values);
-        modAudio.Play("PartyPopper", interactable.Object);
+        modAudio.Play("PartyPopper", interactable.Part);
         
     end
 end;

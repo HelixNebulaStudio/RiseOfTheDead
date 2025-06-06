@@ -109,7 +109,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			detachDebounce = true;
 			interface:PlayButtonClick();
 			upgradeFrame.Visible = false;
-			local success = remoteModHandler:InvokeServer(binds.InteractObject, 2, itemModifierSiid);
+			local success = remoteModHandler:InvokeServer(binds.InteractPart, 2, itemModifierSiid);
 			if type(success) ~= "number" then
 				upgradeFrame:Destroy();
 				upgradesGuiTable[itemModifierSiid] = nil;
@@ -296,7 +296,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						return;
 					end
 					
-					local serverReply = remotePurchaseUpgrade:InvokeServer(binds.InteractObject, itemModifierSiid, upgradeData.DataTag);
+					local serverReply = remotePurchaseUpgrade:InvokeServer(binds.InteractPart, itemModifierSiid, upgradeData.DataTag);
 					if serverReply == modWorkbenchLibrary.PurchaseReplies.Success then
 						local newLevel = dataUpgradeLevel+1;
 						
@@ -546,7 +546,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					if addModButtonDebounce then return end;
 					addModButtonDebounce = true;
 					interface:PlayButtonClick();
-					local success = remoteModHandler:InvokeServer(binds.InteractObject, 1, itemMod.ID, equipmentSiid);
+					local success = remoteModHandler:InvokeServer(binds.InteractPart, 1, itemMod.ID, equipmentSiid);
 					if type(success) ~= "number" then
 						modStorageInterface.UpdateStorages(success);
 						binds:PlayUpgradeSound();

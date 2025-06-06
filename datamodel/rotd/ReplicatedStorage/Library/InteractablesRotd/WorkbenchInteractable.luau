@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local interactablePackage = {};
 
 function interactablePackage.init(super) -- Server/Client
-    local Template = {
+    local WorkbenchInteractable = {
 		Name = "Workbench";
         Type = "Workbench";
 
@@ -11,13 +11,13 @@ function interactablePackage.init(super) -- Server/Client
         InteractableRange = 10;
     };
 
-    function Template.new(interactable: InteractableInstance)
+    function WorkbenchInteractable.new(interactable: InteractableInstance)
         interactable.CanInteract = true;
         interactable.Label = `Use Workbench`;
     end
 
     -- When interacting with interactable.
-    function Template.BindInteract(interactable: InteractableInstance, info: InteractInfo)
+    function WorkbenchInteractable.BindInteract(interactable: InteractableInstance, info: InteractInfo)
         if info.Player == nil then return end;
         if info.Action ~= info.ActionSource.Client then return end;
 
@@ -26,12 +26,12 @@ function interactablePackage.init(super) -- Server/Client
         if workbenchWindow.Visible then return end;
 
         workbenchWindow:Open({
-            InteractObject = interactable.Object;
+            Interactable = interactable;
         });
     end
 
 
-    super.registerPackage(Template);
+    super.registerPackage(WorkbenchInteractable);
 end
 
 return interactablePackage;

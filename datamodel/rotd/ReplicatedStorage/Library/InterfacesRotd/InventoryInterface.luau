@@ -13,6 +13,7 @@ local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForC
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modUsableItems = shared.require(game.ReplicatedStorage.Library.UsableItems);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+local modStoragePresetsLibrary = shared.require(game.ReplicatedStorage.Library.StoragePresetsLibrary);
 
 local modStorageInterface = shared.require(game.ReplicatedStorage.Library.UI.StorageInterface);
 
@@ -280,7 +281,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			return Table.Library.Type == "Clothing" and Table.Library.CanVanity ~= false;
 		end;
 		Click=function(Table)
-			interface:ToggleWindow("ExternalStorage", true, "Wardrobe", nil, Table.ID);
+			interface:ToggleWindow("ExternalStorage", true, "Wardrobe", {
+				SetVanitySiid = Table.ID;
+			});
 		end;
 		Order=0;
 	})
@@ -457,9 +460,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	--== Shared Context Options;
 	local function handleStorage(action, request, storageIds)
 		local rPacket = remoteStorageService:InvokeServer({
-			Action=action;
-			StorageIds=(storageIds or {"Inventory"; "Clothing"; "Wardrobe"});
-			Request=request;
+			Action = action;
+			StorageIds = (storageIds or {"Inventory"; "Clothing"; "Wardrobe"});
+			Request = request;
 		});
 
 		if rPacket.Storages then
@@ -552,10 +555,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	inventoryWindow.OnToggle:Connect(function(visible)
 		if visible then
 			if modData.Storages["Inventory"] == nil or modData.Storages["Clothing"] == nil then
-				handleStorage("RequestStorage", true);
+				handleStorage("RequestStorageSync", true);
 			end
 			
-			handleStorage("OpenStorage" ,true);
+			handleStorage("OpenStorage", true);
 			modStorageInterface.UpdateStorages{
 				modData.Storages["Inventory"],
 				modData.Storages["Clothing"]
@@ -592,7 +595,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
 	
 	task.spawn(function()
-		handleStorage("RequestStorage", true);
+		handleStorage("RequestStorageSync", true);
 
 		local storageIds = {};
 		
@@ -603,9 +606,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				table.insert(storageIds, id);
 
 				local usableItemLib = modUsableItems:Find(storageItem.ItemId);
-				if usableItemLib and usableItemLib.PortableStorage then
-					local storageConfig = usableItemLib.PortableStorage;
-					local storageId = storageConfig and storageConfig.StorageId or nil;
+				if usableItemLib and usableItemLib.PortableStoragePresetId then
+					local storageId = usableItemLib.PortableStoragePresetId;
 
 					if storageId then
 						table.insert(storageIds, storageId);
@@ -616,7 +618,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		getRequestSid(modData.Storages["Inventory"].Container);
 		getRequestSid(modData.Storages["Clothing"].Container);
 		
-		handleStorage("RequestStorage", true, storageIds);
+		handleStorage("RequestStorageSync", true, storageIds);
 		
 		defaultStorageInterface:Update(modData.Storages["Inventory"]);
 		premiumStorageInterface:Update(modData.Storages["Inventory"]);

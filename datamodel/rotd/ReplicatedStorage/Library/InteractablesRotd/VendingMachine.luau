@@ -75,7 +75,7 @@ function interactablePackage.init(super) -- Server/Client
             ItemSKU=`t1Vending`;
         };
 
-        modAudio.Play("VendingMachine", interactable.Object);
+        modAudio.Play("VendingMachine", interactable.Part);
         
         if hasSpace then
             local itemLib = modItemsLibrary:Find(itemId);

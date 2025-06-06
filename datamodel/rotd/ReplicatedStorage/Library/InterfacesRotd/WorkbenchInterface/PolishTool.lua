@@ -66,7 +66,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			interface:PlayButtonClick();
 			startButton.Text = "Starting to polish...";
 			
-			local serverReply = remotePolishTool:InvokeServer(binds.InteractObject, 1, storageItem.ID);
+			local serverReply = remotePolishTool:InvokeServer(binds.InteractPart, 1, storageItem.ID);
 			if serverReply == modWorkbenchLibrary.PolishToolReplies.Success then
 				binds.ClearSelection();
 			else

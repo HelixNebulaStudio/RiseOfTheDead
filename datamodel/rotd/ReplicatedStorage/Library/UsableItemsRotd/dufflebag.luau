@@ -4,17 +4,15 @@ local UsablePreset = shared.require(game.ReplicatedStorage.Library.UsableItems.U
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
-local remotes = game.ReplicatedStorage.Remotes;
-local remoteOpenStorageRequest = remotes.Interactable.OpenStorageRequest;
-
-UsablePreset.PortableStorage = {StorageId="dufflebag"; Persistent=true; Size=5; Expandable=true; MaxSize=15;};
+UsablePreset.PortableStoragePresetId = "dufflebag";
 
 function UsablePreset:ClientUse(storageItem)
 	local player = game.Players.LocalPlayer;
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modData = shared.require(player:WaitForChild("DataModule"));
+	local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 	
-	local storage = remoteOpenStorageRequest:InvokeServer(storageItem);
-	if storage and type(storage) == "table" then
+	local storage = modData.RequestStorage{Siid=storageItem.ID};
+	if storage then
 		modAudio.Preload("ZipOpen", 5);
 		modAudio.Play("ZipOpen");
 		
@@ -22,8 +20,7 @@ function UsablePreset:ClientUse(storageItem)
 		
 		modData.SetStorage(storage);
 		
-		local modInterface = modData:GetInterfaceModule();
-		modInterface:OpenWindow("ExternalStorage", storage.Id, storage);
+		modClientGuis.toggleWindow("ExternalStorage", true, storage.Id);
 	else
 		Debugger:Warn("Storage does not exist.");
 	end

@@ -50,7 +50,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			actionButtonDebounce = true;
 			interface:PlayButtonClick();
 			deconstructButton.Text = "Starting to deconstruct...";
-			local serverReply = remoteDeconstruct:InvokeServer(binds.InteractObject, 1, storageItem.ID);
+			local serverReply = remoteDeconstruct:InvokeServer(binds.InteractPart, 1, storageItem.ID);
 			if serverReply == modWorkbenchLibrary.DeconstructModReplies.Success then
 				binds.ClearSelection();
 			else

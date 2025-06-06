@@ -59,7 +59,7 @@ function interactablePackage.init(super) -- Server/Client
 
 		local timelaspe = tick();
 		local lobbyData = remoteGameModeLobbies:InvokeServer(
-			interactable.Object,
+			interactable.Part,
 			interactable.Config,
 			{
 				StageSelect = interactable.Values.Random and interactable.Values.Stage or nil;
@@ -212,7 +212,7 @@ function interactablePackage.init(super) -- Server/Client
 						characterVars.CharacterProperties.CanMove = false;
 						characterVars.CharacterProperties.CanInteract = false;
 
-						local success = remoteGameModeExit:InvokeServer(interactable.Object, interactable.Config);
+						local success = remoteGameModeExit:InvokeServer(interactable.Part, interactable.Config);
 						if success then
 							SoundService:SetListener(Enum.ListenerType.CFrame, CFrame.new(0, 1000, 0));
 

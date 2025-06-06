@@ -89,11 +89,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	workbenchWindow.OnToggle:Connect(function(visible, packet)
 		packet = packet or {};
 
-		packet.InteractObject = packet.InteractObject or nil;
+		packet.InteractPart = packet.InteractPart or nil;
 		packet.DontCloseInventory = packet.DontCloseInventory == true;
 		
         if visible then
-			binds.InteractObject = packet.InteractObject;
+			binds.InteractPart = packet.InteractPart;
 
 			binds.IsPremium = modData.Profile ~= nil and modData.Profile.Premium or false;
 			workbenchTitleLabel.Text = "Workbench";
@@ -106,8 +106,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             binds.ClearSelection();
             binds.RefreshNavigations();
 
-			for a=1, #interface.StorageInterfaces do
+			for a=#interface.StorageInterfaces, 1, -1 do
 				local storageInterface: StorageInterface = interface.StorageInterfaces[a];
+				if storageInterface == nil then continue end;
 				if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
 					continue;
 				end
@@ -121,9 +122,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 spawn(function()
                     repeat until 
                         not workbenchWindow.Visible 
-                        or binds.InteractObject == nil 
-                        or not binds.InteractObject:IsDescendantOf(workspace) 
-                        or localplayer:DistanceFromCharacter(binds.InteractObject.Position) >= 16 
+                        or binds.InteractPart == nil 
+                        or not binds.InteractPart:IsDescendantOf(workspace) 
+                        or localplayer:DistanceFromCharacter(binds.InteractPart.Position) >= 16 
                         or not wait(0.5);
                     interface:ToggleWindow("Inventory", false);
                 end)
@@ -141,8 +142,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             binds.clearSlotHighlight();
             binds.SelectedSlot = nil;
 			
-			for a=1, #interface.StorageInterfaces do
+			for a=#interface.StorageInterfaces, 1, -1 do
 				local storageInterface: StorageInterface = interface.StorageInterfaces[a];
+				if storageInterface == nil then continue end;
 				if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
 					continue;
 				end
@@ -329,8 +331,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end
 
 	function binds.clearSlotHighlight(slot)
-		for a=1, #interface.StorageInterfaces do
+		for a=#interface.StorageInterfaces, 1, -1 do
 			local storageInterface: StorageInterface = interface.StorageInterfaces[a];
+			if storageInterface == nil then continue end;
 			if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
 				continue;
 			end

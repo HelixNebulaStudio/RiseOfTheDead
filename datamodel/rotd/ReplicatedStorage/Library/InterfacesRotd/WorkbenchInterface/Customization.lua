@@ -600,7 +600,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						interface:PlayButtonClick();
 
 						local rPacket = remoteCustomizationData:InvokeServer("setbaseskin", {
-							WorkbenchPart = binds.InteractObject;
+							WorkbenchPart = binds.InteractPart;
 							Siid = storageItem.ID;
 							SkinId = skinId;
 							Force = force;

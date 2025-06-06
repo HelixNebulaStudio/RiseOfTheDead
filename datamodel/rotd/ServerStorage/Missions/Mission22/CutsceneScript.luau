@@ -66,8 +66,7 @@ return function(CutsceneSequence)
 						local activeSave = profile:GetActiveSave();
 						
 						if activeSave and activeSave.Storages[storageId] == nil then
-							activeSave.Storages[storageId] = modStorage.new(storageId, "Wooden Crate", 5, player);
-							activeSave.Storages[storageId].MaxSize = 5;
+							activeSave.Storages[storageId] = modStorage.new(storageId, storageId, player);
 							storage = activeSave.Storages[storageId];
 							storage:Sync();
 						end

@@ -5,16 +5,14 @@ local UsablePreset = shared.require(game.ReplicatedStorage.Library.UsableItems.U
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
-local remotes = game.ReplicatedStorage.Remotes;
-local remoteOpenStorageRequest = remotes.Interactable.OpenStorageRequest;
-
-UsablePreset.PortableStorage = {StorageId="portableautoturret"; Persistent=true; Size=2; MaxSize=2;};
+UsablePreset.PortableStoragePresetId = "portableautoturret";
 
 function UsablePreset:ClientUse(storageItem)
 	local player = game.Players.LocalPlayer;
 	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
+	local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 	
-	local storage = remoteOpenStorageRequest:InvokeServer(storageItem);
+	local storage = modData.RequestStorage{Siid=storageItem.ID};
 	if storage and type(storage) == "table" then
 		modAudio.Preload("TorqueWrench", 5);
 		modAudio.Play("TorqueWrench");
@@ -23,8 +21,7 @@ function UsablePreset:ClientUse(storageItem)
 		
 		modData.SetStorage(storage);
 		
-		local modInterface = modData:GetInterfaceModule();
-		modInterface:OpenWindow("AutoTurretWindow", storageItem);
+		modClientGuis.toggleWindow("AutoTurretWindow", true, storageItem);
 	else
 		Debugger:Warn("Storage does not exist.");
 	end

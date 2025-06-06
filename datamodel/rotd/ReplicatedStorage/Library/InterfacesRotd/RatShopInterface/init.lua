@@ -90,7 +90,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	window.OnToggle:Connect(function(visible, interactable, interactInfo)
 		if visible then
 			local shopType = interactable.Values.ShopType;
-			binds.InteractObject = interactable.Object;
+			binds.InteractPart = interactable.Part;
 
 			for a=1, #interface.StorageInterfaces do
 				local storageInterface: StorageInterface = interface.StorageInterfaces[a];
@@ -122,9 +122,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			task.spawn(function()
 				repeat until 
                     not window.Visible 
-                    or binds.InteractObject == nil 
-                    or not binds.InteractObject:IsDescendantOf(workspace) 
-                    or localPlayer:DistanceFromCharacter(binds.InteractObject.Position) >= 16 
+                    or binds.InteractPart == nil 
+                    or not binds.InteractPart:IsDescendantOf(workspace) 
+                    or localPlayer:DistanceFromCharacter(binds.InteractPart.Position) >= 16 
                     or not wait(0.5);
 
                 window:Close();
@@ -145,8 +145,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			binds.ClearPage();
 			binds.SelectedSlot = nil;
 
-			for a=1, #interface.StorageInterfaces do
+			for a=#interface.StorageInterfaces, 1, -1 do
 				local storageInterface: StorageInterface = interface.StorageInterfaces[a];
+				if storageInterface == nil then continue end;
 				if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
 					continue;
 				end
@@ -181,8 +182,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end
 
 	function binds.clearSlotHighlight(slot)
-		for a=1, #interface.StorageInterfaces do
+		for a=#interface.StorageInterfaces, 1, -1 do
 			local storageInterface: StorageInterface = interface.StorageInterfaces[a];
+			if storageInterface == nil then continue end;
 			if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
 				continue;
 			end
@@ -324,7 +326,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 										promptDialogFrame.statusLabel.Text = "Purchasing item...";
 				
-										local serverReply = remoteShopService:InvokeServer("buyitem", binds.InteractObject, info.Id);
+										local serverReply = remoteShopService:InvokeServer("buyitem", binds.InteractPart, info.Id);
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
 											promptDialogFrame.statusLabel.Text = "Purchased!";
 
@@ -511,7 +513,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						if purchaseAmmoDebounce then return end;
 						purchaseAmmoDebounce = true;
 						
-						local serverReply = localplayerStats and (localplayerStats[ammoCurrency] or 0) >= price and remoteShopService:InvokeServer("buyammo", {StoreObj=binds.InteractObject;}, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
+						local serverReply = localplayerStats and (localplayerStats[ammoCurrency] or 0) >= price and remoteShopService:InvokeServer("buyammo", {StoreObj=binds.InteractPart;}, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
 						if serverReply == modShopLibrary.PurchaseReplies.Success then
 							RunService.Heartbeat:Wait();
 							newListing:Destroy();
@@ -557,7 +559,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							if refillDebounce then return end;
 							refillDebounce = true;
 							
-							local serverReply = remoteShopService:InvokeServer("refillcharges", binds.InteractObject, selectedItem.ID);
+							local serverReply = remoteShopService:InvokeServer("refillcharges", binds.InteractPart, selectedItem.ID);
 
 							if serverReply == modShopLibrary.PurchaseReplies.Success then
 								RunService.Heartbeat:Wait();
@@ -603,7 +605,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						purchaseRepairDebounce = true;
 						
 						local serverReply = localplayerStats and (localplayerStats.Money or 0) >= repairPrice 
-						and remoteShopService:InvokeServer("buyrepair", binds.InteractObject, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
+						and remoteShopService:InvokeServer("buyrepair", binds.InteractPart, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
 
 						if serverReply == modShopLibrary.PurchaseReplies.Success then
 							RunService.Heartbeat:Wait();
@@ -665,7 +667,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 										end;
 
 										
-										local serverReply = remoteShopService:InvokeServer("sellitem", binds.InteractObject, storageItemID);
+										local serverReply = remoteShopService:InvokeServer("sellitem", binds.InteractPart, storageItemID);
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
 											promptDialogFrame.statusLabel.Text = "Sold!";
 											wait(0.5);
@@ -735,7 +737,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 											end;
 	
 											
-											local serverReply = remoteShopService:InvokeServer("sellitem", binds.InteractObject, storageItemID, allQuantity);
+											local serverReply = remoteShopService:InvokeServer("sellitem", binds.InteractPart, storageItemID, allQuantity);
 											if serverReply == modShopLibrary.PurchaseReplies.Success then
 												promptDialogFrame.statusLabel.Text = `Sold all <b>{allQuantity}</b> {itemLib.Name}!`;
 												wait(1);
@@ -815,7 +817,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 											return;
 										end;
 
-										local serverReply = remoteShopService:InvokeServer("exchangefortoken", binds.InteractObject, storageItemID);
+										local serverReply = remoteShopService:InvokeServer("exchangefortoken", binds.InteractPart, storageItemID);
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
 											promptDialogFrame.statusLabel.Text = "Exchanged!";
 											wait(0.5);
@@ -885,7 +887,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 												return;
 											end;
 	
-											local serverReply = remoteShopService:InvokeServer("exchangefortoken", binds.InteractObject, storageItemID, exchangeQuantity);
+											local serverReply = remoteShopService:InvokeServer("exchangefortoken", binds.InteractPart, storageItemID, exchangeQuantity);
 											if serverReply == modShopLibrary.PurchaseReplies.Success then
 												promptDialogFrame.statusLabel.Text = `Exchanged <b>{exchangeQuantity} {itemLib.Name}</b> for <b>{tokenReward}</b> tokens!`;
 												wait(1);

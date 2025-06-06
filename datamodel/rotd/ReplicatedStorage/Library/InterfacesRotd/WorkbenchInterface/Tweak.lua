@@ -117,7 +117,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				interface:PlayButtonClick();
 				local prevText = button.Text;
 				button.Text = "Tweaking..";
-				local serverReply, itemValues = remoteTweakItem:InvokeServer(binds.InteractObject, action, storageItem.ID);
+				local serverReply, itemValues = remoteTweakItem:InvokeServer(binds.InteractPart, action, storageItem.ID);
 				if serverReply == modWorkbenchLibrary.PurchaseReplies.Success then
 					local tweakId = itemValues.Tweak;
 					button.Text = "Tweak Complete!";
@@ -493,7 +493,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				if not RunService:IsStudio() then return end;
 				if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Eight then
 					Debugger:Warn("Debug 8");
-					remoteTweakItem:InvokeServer(binds.InteractObject, 8, storageItem.ID);
+					remoteTweakItem:InvokeServer(binds.InteractPart, 8, storageItem.ID);
 				end
 			end)
 			
@@ -581,7 +581,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					return;
 				end
 
-				local serverReply, itemValues = remoteTweakItem:InvokeServer(binds.InteractObject, 4, storageItem.ID, lockinSlideAmount);
+				local serverReply, itemValues = remoteTweakItem:InvokeServer(binds.InteractPart, 4, storageItem.ID, lockinSlideAmount);
 				if serverReply == modWorkbenchLibrary.PurchaseReplies.Success then
 					
 					if itemValues.Tweak then
@@ -617,7 +617,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				interface:PlayButtonClick();
 				calibrateButton.Text = "Calibrating..";
 
-				local serverReply, newCalibration, newTweakPoints = remoteTweakItem:InvokeServer(binds.InteractObject, 5, storageItem.ID);
+				local serverReply, newCalibration, newTweakPoints = remoteTweakItem:InvokeServer(binds.InteractPart, 5, storageItem.ID);
 				if serverReply == modWorkbenchLibrary.PurchaseReplies.Success then
 					lockinSlideAmount = newCalibration;
 					refreshSlider();
@@ -646,7 +646,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				tweakDebounce = true;
 				interface:PlayButtonClick();
 
-				local serverReply, itemValues = remoteTweakItem:InvokeServer(binds.InteractObject, 3, storageItem.ID);
+				local serverReply, itemValues = remoteTweakItem:InvokeServer(binds.InteractPart, 3, storageItem.ID);
 				if serverReply == modWorkbenchLibrary.PurchaseReplies.Success then
 					
 					if itemValues.Tweak then

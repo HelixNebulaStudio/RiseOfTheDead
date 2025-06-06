@@ -107,7 +107,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			buildButton.Text = "Starting to build...";
 
 			local rPacket = remoteBlueprintHandler:InvokeServer("build", {
-				WorkbenchPart = binds.InteractObject;
+				WorkbenchPart = binds.InteractPart;
 				StorageItemId = (storageItem and storageItem.ID);
 				ItemId = itemId;
 			});

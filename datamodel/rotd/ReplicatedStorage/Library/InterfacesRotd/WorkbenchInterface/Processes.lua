@@ -288,7 +288,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 							if process.Type == "Building" or process.Type == "BuildComplete" then
 
 								local rPacket = remoteBlueprintHandler:InvokeServer("cancelbuild", {
-									WorkbenchPart = binds.InteractObject;
+									WorkbenchPart = binds.InteractPart;
 									Index = process.Index;
 								});
 								
@@ -305,7 +305,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								end
 								
 							elseif process.Type == "Deconstruction" then
-								local serverReply = remoteDeconstruct:InvokeServer(binds.InteractObject, 3, process.Index);
+								local serverReply = remoteDeconstruct:InvokeServer(binds.InteractPart, 3, process.Index);
 								if serverReply == modWorkbenchLibrary.DeconstructModReplies.Success then
 									cancelButtonDown = false;
 									refreshProcessPage();
@@ -316,7 +316,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								end
 								
 							elseif process.Type == "PolishTool" then
-								local serverReply = remotePolishTool:InvokeServer(binds.InteractObject, 3, process.Index);
+								local serverReply = remotePolishTool:InvokeServer(binds.InteractPart, 3, process.Index);
 								if serverReply == modWorkbenchLibrary.PolishToolReplies.Success then
 									cancelButtonDown = false;
 									refreshProcessPage();
@@ -353,7 +353,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				if process.Type == "Building" or process.Type == "BuildComplete" then
 
 					local rPacket = remoteBlueprintHandler:InvokeServer("claimbuild", {
-						WorkbenchPart=binds.InteractObject;
+						WorkbenchPart=binds.InteractPart;
 						Index=process.Index;
 					});
 					
@@ -368,7 +368,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					end
 					
 				elseif process.Type == "Deconstruction" then
-					local serverReply = remoteDeconstruct:InvokeServer(binds.InteractObject, 2, process.Index);
+					local serverReply = remoteDeconstruct:InvokeServer(binds.InteractPart, 2, process.Index);
 					if serverReply == modWorkbenchLibrary.DeconstructModReplies.Success then
 						cancelButtonDown = false;
 						refreshProcessPage();
@@ -380,7 +380,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 				elseif process.Type == "PolishTool" then
 
-					local serverReply = remotePolishTool:InvokeServer(binds.InteractObject, 2, process.Index);
+					local serverReply = remotePolishTool:InvokeServer(binds.InteractPart, 2, process.Index);
 					if serverReply == modWorkbenchLibrary.PolishToolReplies.Success then
 						cancelButtonDown = false;
 						refreshProcessPage();
@@ -447,7 +447,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								OnPrimaryClick=function(promptDialogFrame, textButton)
 									promptDialogFrame.statusLabel.Text = "Skipping...";
 									
-									local serverReply = remotePolishTool:InvokeServer(binds.InteractObject, 4, process.Index);
+									local serverReply = remotePolishTool:InvokeServer(binds.InteractPart, 4, process.Index);
 									if serverReply == modWorkbenchLibrary.PolishToolReplies.Success then
 										promptDialogFrame.statusLabel.Text = "Skipped!";
 										refreshProcessPage();

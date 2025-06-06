@@ -441,8 +441,8 @@ function SafehomeData:GetNpc(npcName: string)
 	end
 	
 	local storageConfig = table.clone(npcData.StorageConfig);
-	local storageId = npcName.."Storage";
-	storageConfig.Name = npcName.." Storage";
+	local storageId = `{npcName}Storage`;
+	storageConfig.Name = `{npcName} Storage`;
 	storageConfig.OwnerNpc = npcName;
 	
 	function storageConfig.InitStorage(storage)
@@ -519,7 +519,12 @@ function SafehomeData:GetNpc(npcName: string)
 		end);
 	end
 
-	local storage = modStorage:OpenStorage(self.Player, storageId, storageConfig);
+	local storage = modStorage.openStorage(storageId, {
+		Player = self.Player;
+		Id = storageId;
+		Name = storageConfig.Name;
+		Configuration = storageConfig;
+	});
 	npcData.GetStorage = function()
 		return storage;
 	end

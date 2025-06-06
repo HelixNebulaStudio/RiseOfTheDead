@@ -6,10 +6,14 @@ local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 
 local modSkillTreeLibrary = shared.require(game.ReplicatedStorage.Library.SkillTreeLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modStoragePresetsLibrary = shared.require(game.ReplicatedStorage.Library.StoragePresetsLibrary);
+local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 
 local modBlueprints = shared.require(game.ServerScriptService.ServerLibrary.Blueprints);
 local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 
 local remoteMasterySync;
 local remoteHudNotification;
@@ -27,6 +31,94 @@ shared.coreBind(modGameSave, "_new", function(gameSave: GameSaveRotd, profile: P
 
 	gameSave.Masteries = {};
 	gameSave.Blueprints = modBlueprints.new(player, function() gameSave:Sync("Blueprints") end);
+
+	local wardrobeStorage: Storage = modStorage.new("Wardrobe", "Wardrobe", player);
+	wardrobeStorage:ConnectCheck(function(packet)
+		local dragStorageItem = packet.DragStorageItem;
+		local targetStorageItem = packet.TargetStorageItem;
+		
+		if packet.DragStorage == gameSave.Wardrobe then packet.Allowed = true; return packet; end;
+		if targetStorageItem and dragStorageItem.ItemId == targetStorageItem.ItemId then packet.Allowed = true; return packet; end;
+		if dragStorageItem then
+			if dragStorageItem.Library.Type == modItemsLibrary.Types.Clothing then
+				packet.Allowed = true;
+				return packet;
+			end
+			packet.FailMsg = "Item "..dragStorageItem.ItemId.." is not allowed in wardrobe storage.";
+		end
+		
+		packet.Allowed = false;
+		return packet;
+	end);
+	gameSave.Storages.Wardrobe = wardrobeStorage;
+	--Adding new storages requires adding sync in inv interface;
+
+end)
+
+shared.coreBind(modGameSave, "_load_storage", function(gameSave: GameSaveRotd, storageId: string, rawStorage)
+	local player = gameSave.Player;
+	--Debugger:Warn("_load_storage GameSave", player, storageId);
+	
+	if storageId == "Safehouse Storage" then
+		storageId = "Safehouse";
+	end
+	if storageId == "Inventory" then
+		rawStorage.Name = "Inventory";
+	elseif storageId == "Safehouse" then
+		rawStorage.Name = "Safehouse Storage";
+	end
+	
+	local storagePresetLib = modStoragePresetsLibrary:Find(storageId);
+	local presetId = rawStorage.PresetId;
+
+	if storagePresetLib then
+		presetId = storagePresetLib.Id;
+	end
+
+	if presetId == nil then
+		-- loaded before v2.3;
+
+		local npcNameTest = storageId:gsub("Storage", "");
+		local storageSuffix = storageId:sub(#storageId-6,#storageId);
+		
+		if storageId:sub(1,1) == "#" and tonumber(storageId:sub(2, #storageId)) ~= nil then
+			presetId = "attachmentmods";
+
+		elseif storageId:sub(1,9) == "Safehouse" then
+			presetId = "Safehouse";
+
+		elseif storageId:sub(1,10) == "RatStorage" then
+			presetId = "RatStorage";
+
+		elseif storageSuffix == "Storage" and modNpcProfileLibrary:Find(npcNameTest) then
+			presetId = "npcstorage";
+
+		elseif storageId:sub(#storageId-3, #storageId) == "Gift" then
+			presetId = "giftcrate";
+
+		end
+
+		if presetId then
+			storagePresetLib = modStoragePresetsLibrary:Find(presetId);
+		end
+	end
+
+	if storagePresetLib == nil then
+		Debugger:Warn(`Storage ({storageId}) type does not exist ({presetId})`);
+		return;
+	end
+
+	if gameSave.Storages[storageId] then
+		Debugger:Warn(`Storage ({storageId}) already instantiated`);
+		return gameSave.Storages[storageId];
+	end
+
+	local storage: Storage = gameSave.Storages[storageId];
+	if storage == nil then
+		storage = modStorage.new(storageId, presetId, player, rawStorage.Name);
+	end
+	
+	return storage;
 end)
 
 function modGameSave:SumMasteries()

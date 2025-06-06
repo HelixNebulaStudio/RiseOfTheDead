@@ -37,7 +37,6 @@ local remoteTweakItem = modRemotesManager:Get("TweakItem");
 local remotePolishTool = modRemotesManager:Get("PolishTool");
 local remoteWorkbenchService = modRemotesManager:Get("WorkbenchService");
 
-local Interactables = workspace:WaitForChild("Interactables");
 local debounceCache = {};
 --== Script;
 if modItemModsLibrary then
@@ -54,7 +53,7 @@ local function clearDebounceCaches() for n, c in pairs(debounceCache) do if tick
 function IsInWorkbenchRange(player, interactPart)
 	local profile = modProfile:Get(player);
 	if profile.GamePass.PortableWorkbench then return true end;
-	if interactPart and interactPart:IsDescendantOf(Interactables) and player:DistanceFromCharacter(interactPart.Position) <= 17 then
+	if interactPart and interactPart:IsDescendantOf(workspace.Interactables) and player:DistanceFromCharacter(interactPart.Position) <= 17 then
 		return true;
 	end
 	return false;
@@ -456,9 +455,8 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 		
 		local storageForMod = activeSave.Storages[siid];
 		if storageForMod == nil then
-			local newModsContainer = modStorage.new(siid, siid, 5, player);
+			local newModsContainer = modStorage.new(siid, "attachmentmods", player, item.ItemId);
 			activeSave.Storages[siid] = newModsContainer;
-			activeSave.Storages[siid].MaxSize = 5;
 			
 			storageForMod = activeSave.Storages[siid];
 		end

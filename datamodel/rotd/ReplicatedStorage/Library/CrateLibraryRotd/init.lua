@@ -26,13 +26,7 @@ function modCrateLibrary.onRequire()
 		Name="Eaten Sunken Crate";
 		PrefabName="Raresunkenchest";
 		RewardsId="empty";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-				DestroyOnEmpty=false;
-			}
-		};
+		StoragePresetId="lootcrate";
 	
 		EmptyLabel="Empty Crate";
 	};
@@ -43,12 +37,7 @@ function modCrateLibrary.onRequire()
 		Name="The Prisoner Crate";
 		PrefabName="Crate";
 		RewardsId="prisoner";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -56,12 +45,7 @@ function modCrateLibrary.onRequire()
 		Name="The Tanker Crate";
 		PrefabName="Crate";
 		RewardsId="tanker";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -69,12 +53,7 @@ function modCrateLibrary.onRequire()
 		Name="The Fumes Crate";
 		PrefabName="Crate";
 		RewardsId="fumes";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -82,12 +61,7 @@ function modCrateLibrary.onRequire()
 		Name="The Corrosive Crate";
 		PrefabName="Crate";
 		RewardsId="corrosive";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -95,12 +69,7 @@ function modCrateLibrary.onRequire()
 		Name="The Zpider Crate";
 		PrefabName="Crate";
 		RewardsId="zpider";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -108,12 +77,7 @@ function modCrateLibrary.onRequire()
 		Name="The Shadow Crate";
 		PrefabName="Crate";
 		RewardsId="shadow";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -121,12 +85,7 @@ function modCrateLibrary.onRequire()
 		Name="The Zomborg Crate";
 		PrefabName="Crate";
 		RewardsId="zomborg";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -134,12 +93,7 @@ function modCrateLibrary.onRequire()
 		Name="The Billies Crate";
 		PrefabName="Crate2";
 		RewardsId="billies";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -149,12 +103,7 @@ function modCrateLibrary.onRequire()
 		RewardsId="hectorshot";
 		
 		EmptyLabel="Empty";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -164,12 +113,7 @@ function modCrateLibrary.onRequire()
 		RewardsId="zomborgprime";
 	
 		EmptyLabel="Empty";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 
 	modCrateLibrary.New{
@@ -177,12 +121,7 @@ function modCrateLibrary.onRequire()
 		Name="The Zricera Crate";
 		PrefabName="Crate2";
 		RewardsId="zricera";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -190,12 +129,7 @@ function modCrateLibrary.onRequire()
 		Name="The Vexeron Crate";
 		PrefabName="Crate2";
 		RewardsId="vexeron";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -203,12 +137,7 @@ function modCrateLibrary.onRequire()
 		Name="Mothena Crate";
 		PrefabName="Crate2";
 		RewardsId="mothena";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -216,12 +145,7 @@ function modCrateLibrary.onRequire()
 		Name="Pathoroth Crate";
 		PrefabName="Crate2";
 		RewardsId="pathoroth";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -229,12 +153,7 @@ function modCrateLibrary.onRequire()
 		Name="The Bandit Helicopter Crate";
 		PrefabName="Crate2";
 		RewardsId="banditheli";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -242,12 +161,7 @@ function modCrateLibrary.onRequire()
 		Name="Vein Of Nekron Crate";
 		PrefabName="Crate2";
 		RewardsId="veinofnekron";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 
 	modCrateLibrary.New{
@@ -255,14 +169,7 @@ function modCrateLibrary.onRequire()
 		Name="Zeniths Reward Crate";
 		PrefabName="Crate4";
 		RewardsId="zenithcrate";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-				DestroyOnEmpty=true;
-			}
-		};
-	
+		StoragePresetId="rewardcrate";
 		EmptyLabel="Empty Crate";
 	};
 
@@ -273,12 +180,7 @@ function modCrateLibrary.onRequire()
 		RewardsId="wintertreelum";
 	
 		EmptyLabel="Empty";
-		Configurations={
-			Persistent=false;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="rewardcrate";
 	};
 	
 
@@ -288,12 +190,7 @@ function modCrateLibrary.onRequire()
 		Name="Sunday's Gift";
 		PrefabName="Crate";
 		RewardsId="sundaysGift";
-		Configurations={
-			Persistent=true;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="giftcrate";
 	};
 
 	modCrateLibrary.New{
@@ -301,12 +198,7 @@ function modCrateLibrary.onRequire()
 		Name="Underbridge's Gift";
 		PrefabName="Crate";
 		RewardsId="underbridgeGift";
-		Configurations={
-			Persistent=true;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="giftcrate";
 	};
 
 	modCrateLibrary.New{
@@ -314,12 +206,7 @@ function modCrateLibrary.onRequire()
 		Name="Mall's Gift";
 		PrefabName="Crate";
 		RewardsId="mallGift";
-		Configurations={
-			Persistent=true;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="giftcrate";
 	};
 
 
@@ -328,12 +215,7 @@ function modCrateLibrary.onRequire()
 		Name="Clinic's Gift";
 		PrefabName="Crate";
 		RewardsId="clinicGift";
-		Configurations={
-			Persistent=true;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="giftcrate";
 	};
 
 
@@ -342,12 +224,7 @@ function modCrateLibrary.onRequire()
 		Name="Harbor's Gift";
 		PrefabName="Crate";
 		RewardsId="harborGift";
-		Configurations={
-			Persistent=true;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="giftcrate";
 	};
 	
 	modCrateLibrary.New{
@@ -355,12 +232,7 @@ function modCrateLibrary.onRequire()
 		Name="Residential's Gift";
 		PrefabName="Crate";
 		RewardsId="residentialGift";
-		Configurations={
-			Persistent=true;
-			Settings={
-				WithdrawalOnly=true;
-			}
-		};
+		StoragePresetId="giftcrate";
 	};
 	
 end
