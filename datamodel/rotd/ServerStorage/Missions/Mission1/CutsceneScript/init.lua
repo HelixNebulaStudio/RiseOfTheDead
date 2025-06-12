@@ -62,6 +62,7 @@ if RunService:IsServer() then
 	end)
 
 else
+	modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 	modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
@@ -93,22 +94,10 @@ local sceneDialogues = modConfigurations.SpecialEvent.AprilFools
 return function(CutsceneSequence)
 	if not modBranchConfigs.IsWorld("TheBeginning") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 
-	local modInterface;
+	
 	local studioLogo, titleLogo, blurEffect, bloomEffect, musicTrack;
 
 	if modData then
-		repeat
-			modInterface = modData:GetInterfaceModule();
-			Debugger:Warn("Waiting for interface..");
-			if modInterface == nil then task.wait(); end
-		until modInterface ~= nil;
-
-		local cutsceneFrame = script:WaitForChild("Cutscene"):Clone();
-		cutsceneFrame.Parent = modInterface.MainInterface;
-
-		studioLogo = cutsceneFrame:WaitForChild("StudioLogo");
-		titleLogo = cutsceneFrame:WaitForChild("TitleLogo");
-
 		local camera = workspace.CurrentCamera;
 		blurEffect = Instance.new("BlurEffect");
 		blurEffect.Name = "CutsceneBlur";
@@ -196,7 +185,7 @@ return function(CutsceneSequence)
 	CutsceneSequence:NewScene("playerSpawns", function()
 		game.Lighting:SetAttribute("FogEnd", 250);
 		
-		modInterface:ToggleGameBlinds(false, 0);
+		modClientGuis.toggleGameBlinds(false, 0);
 		
 		game:GetService("StarterGui"):SetCore("ResetButtonCallback", false);
 		modData.ToggleChat();
@@ -237,7 +226,7 @@ return function(CutsceneSequence)
 		playerAnimTracks.Unconscious:Play();
 		task.wait(5);
 		
-		modInterface:ToggleGameBlinds(true, 15);
+		modClientGuis.toggleGameBlinds(true, 15);
 		
 		TweenService:Create(blurEffect, TweenInfo.new(10), {Size = 15;}):Play();
 		game.Lighting:SetAttribute("FogStart", 40);
@@ -254,7 +243,7 @@ return function(CutsceneSequence)
 			end
 			
 			modCharacter.MouseProperties.CameraSmoothing = 0;
-			modInterface:ToggleGameBlinds(true, 0);
+			modClientGuis.toggleGameBlinds(true, 0);
 		end);
 
 		local bloomTween = TweenService:Create(bloomEffect, TweenInfo.new(6), {Intensity = 0; Size=0;});
@@ -288,15 +277,15 @@ return function(CutsceneSequence)
 			CFrame = CFrame.new(-1.22, 55.46, -287.322);
 			Owner = player;
 			AddComponents = {
-				"AttractNpcs";
+				--"AttractNpcs";
 			}
 		});
 		masonPrefab = masonNpcClass.Character;
 		
-		local attractNpcsComp = masonNpcClass:GetComponent("AttractNpcs");
-		attractNpcsComp.AttractHumanoidType = {"Zombie"};
-		attractNpcsComp.SelfAttractAlert = true;
-		attractNpcsComp:Activate();
+		-- local attractNpcsComp = masonNpcClass:GetComponent("AttractNpcs");
+		-- attractNpcsComp.AttractHumanoidType = {"Zombie"};
+		-- attractNpcsComp.SelfAttractAlert = true;
+		-- attractNpcsComp:Activate();
 		
 		local actionIndex = 0;
 		local cutsceneActions = {};
@@ -340,12 +329,18 @@ return function(CutsceneSequence)
 
 			masonNpcClass.StopAnimation("Handout", 0.5);
 
-			masonNpcClass.WieldComp:Equip{
+			masonNpcClass.WieldComp:Equip({
 				ItemId = "revolver454";
-				Configurations = {
-					Damage = 25;
-				};
-			}
+				OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
+					if toolHandler.EquipmentClass == nil then return end;
+					local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
+
+					local modifier: ConfigModifier = equipmentClass.Configurations.newModifier("npcDmg");
+					modifier.SetValues.Damage = 25;
+					modifier.Priority = 999;
+					equipmentClass.Configurations:AddModifier(modifier, true);
+				end;
+			});
 
 			masonNpcClass.Move:Face(Vector3.new(4.431, 56.31, -166.753));
 			masonNpcClass.Move:SetMoveSpeed("set", "default", 0);
@@ -466,16 +461,25 @@ return function(CutsceneSequence)
 	end);
 	
 	CutsceneSequence:NewScene("studioLogo", function()
+		local activeInterface: InterfaceInstance = modClientGuis.ActiveInterface;
+
+		local cutsceneFrame = script:WaitForChild("Cutscene"):Clone();
+		cutsceneFrame.Parent = activeInterface.ScreenGui;
+
+		studioLogo = cutsceneFrame:WaitForChild("StudioLogo");
+		titleLogo = cutsceneFrame:WaitForChild("TitleLogo");
+
 		TweenService:Create(studioLogo, TweenInfo.new(1), {ImageTransparency = 0;}):Play();
 		task.wait(3.5);
 		TweenService:Create(studioLogo, TweenInfo.new(1), {ImageTransparency = 1;}):Play();
 		task.wait(1);
-		modInterface:ToggleGameBlinds(true, 0);
+		
+		modClientGuis.toggleGameBlinds(true, 0);
 	end);
 	
 	
 	CutsceneSequence:NewScene("titleLogo", function()
-		modInterface:ToggleGameBlinds(true, 0);
+		modClientGuis.toggleGameBlinds(true, 0);
 		
 		TweenService:Create(titleLogo, TweenInfo.new(1), {ImageTransparency = 0;}):Play();
 		task.wait(3.5);
@@ -487,7 +491,7 @@ return function(CutsceneSequence)
 		
 	end);
 
-	local activeZombies, zombieNpcModule = {}, {};
+	local activeZombies, zombieNpcClass = {}, {};
 	local disableSecondSpawner = true;
 	
 	CutsceneSequence:NewServerScene("MasonArrives", function()
@@ -576,40 +580,42 @@ return function(CutsceneSequence)
 		local endSpawnLoop = false;
 		local zombieKilled = 0;
 
-		local function loadZombies(zombiePrefab, npcClass)
+		local function loadZombies(zombiePrefab, npcClass: NpcClass)
 			table.insert(activeZombies, zombiePrefab);
-			table.insert(zombieNpcModule, npcClass);
+			table.insert(zombieNpcClass, npcClass);
 
 			npcClass.SetAggression = 3;
 
-			local moduleIndex = #zombieNpcModule;
+			local moduleIndex = #zombieNpcClass;
 			npcClass.Properties.TargetableDistance = 1024;
 			npcClass.Configuration.Level = 0;
 			
-			npcClass.Move:SetMoveSpeed("set", "default", 16, 0);
+			npcClass.Move:SetMoveSpeed("set", "default", 8, 0);
 
-			npcClass.Humanoid.Died:Connect(function()
+			npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
+				if not isDead then return end;
+
 				zombieKilled = zombieKilled +1;
-				table.remove(zombieNpcModule, moduleIndex);
+				table.remove(zombieNpcClass, moduleIndex);
 				if zombieKilled >= 5 then
 					endSpawnLoop = true;
 				end
 				wait(2);
 				Debugger.Expire(zombiePrefab, 0);
-			end);
-
-			task.spawn(function()
-				npcClass.OnTarget(players);
-				while wait(1) do
-					if npcClass.Humanoid and npcClass.Humanoid.Health <= 0 then return end;
-					npcClass.Properties.AttackDamage = math.random(2, 4);
-					npcClass.OnTarget(players);
-
-					if masonNpcClass.Target == nil then
-						masonNpcClass.Target = zombiePrefab;
-					end
-				end
 			end)
+			
+			-- task.spawn(function()
+			-- 	npcClass.OnTarget(players);
+			-- 	while wait(1) do
+			-- 		if npcClass.Humanoid and npcClass.Humanoid.Health <= 0 then return end;
+			-- 		npcClass.Properties.AttackDamage = math.random(2, 4);
+			-- 		npcClass.OnTarget(players);
+
+			-- 		if masonNpcClass.Target == nil then
+			-- 			masonNpcClass.Target = zombiePrefab;
+			-- 		end
+			-- 	end
+			-- end)
 		end
 
 		local function pickSpawn()
@@ -745,14 +751,19 @@ return function(CutsceneSequence)
 		modAudio.Play("VechicleExplosion", explosionSoundPart);
 		modAudio.Play("Explosion4", explosionSoundPart);
 
-		for a=#activeZombies, 1, -1 do
-			if activeZombies[a] ~= nil and activeZombies[a]:IsDescendantOf(workspace.Entity) then
-				local zombieHumanoid = activeZombies[a]:FindFirstChildWhichIsA("Humanoid");
-				if zombieHumanoid and zombieHumanoid.Name == "Zombie" and zombieHumanoid.Health > 0 then
-					zombieHumanoid.Health = 0;
-				end
-			end
+		for a=#zombieNpcClass, 1, -1 do
+			local zombieNpcClass: NpcClass = zombieNpcClass[a];
+			local healthComp: HealthComp = zombieNpcClass.HealthComp;
+			healthComp:SetHealth(0);
 		end
+		-- for a=#activeZombies, 1, -1 do
+		-- 	if activeZombies[a] ~= nil and activeZombies[a]:IsDescendantOf(workspace.Entity) then
+		-- 		local zombieHumanoid = activeZombies[a]:FindFirstChildWhichIsA("Humanoid");
+		-- 		if zombieHumanoid and zombieHumanoid.Name == "Zombie" and zombieHumanoid.Health > 0 then
+		-- 			zombieHumanoid.Health = 0;
+		-- 		end
+		-- 	end
+		-- end
 		
 		explosionEffect.Hit:Connect(function(basePart)
 			if (basePart:IsDescendantOf(destructableA) or basePart:IsDescendantOf(destructableB)) then
@@ -825,7 +836,7 @@ return function(CutsceneSequence)
 		TweenService:Create(blurEffect, TweenInfo.new(0.4), {Size = 20;}):Play();
 		TweenService:Create(bloomEffect, TweenInfo.new(0.1), {Intensity = 1; Size=30;}):Play();
 
-		modInterface:ToggleGameBlinds(false, 9);
+		modClientGuis.toggleGameBlinds(false, 9);
 		
 		modCharacter.CharacterProperties.CanMove = false;
 		modCharacter.CharacterProperties.CanInteract = false;

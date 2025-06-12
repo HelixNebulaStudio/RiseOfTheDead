@@ -32,7 +32,7 @@ end
 function treePackage.HasEnemy(tree, npcClass: NpcClass)
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
     
-    local enemyTargetData = targetHandlerComp:GetFirstTarget(function(targetData)
+    local enemyTargetData = targetHandlerComp:MatchFirstTarget(function(targetData)
         if targetData.HealthComp == nil then return end;
         local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
 

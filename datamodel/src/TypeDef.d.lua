@@ -7,6 +7,7 @@ export type GAME_EVENT_KEY<U> = U
     | "Generic.OnClockTick"
     | "Generic_OnItemPickup"
     | "Interactables_OnTrigger"
+    | "InteractService_OnButton"
     | "Npcs.OnEnemiesAttract"
     | "Npcs_OnDamaged"
     | "Players_OnSpawn"
@@ -62,7 +63,7 @@ declare shared: {
 
     -- @system globals
     IsNan: (number) -> boolean;
-    Notify: (player: Player, message: string, notifyTypes: NOTIFY_TYPE) -> nil;
+    Notify: (player: Player | {Player}, message: string, notifyTypes: NOTIFY_TYPE, notifyId: string?, notifySettings: anydict?) -> nil;
 
     -- @game globals
     EventSignal: EventSignal<>;
@@ -88,6 +89,7 @@ export type Const = {
 --MARK: EngineCore
 export type EngineCore = {
     ConnectOnPlayerAdded: (self: EngineCore, src: Script | LocalScript | ModuleScript, func: (player: Player)->...any, order: number?) -> nil;
+    ConnectOnPlayerRemoved: (self: EngineCore, src: Script | LocalScript | ModuleScript, func: (player: Player)->...any) -> nil;
     connectPlayers: () -> nil;
     loadWorldCore: (worldName: string) -> nil;
 };
@@ -153,10 +155,32 @@ export type EventPacket = {
 
     Player: Player?;
     Players: {[number]: Player}?;
+
+    Returns: anydict;
 }
+
+--MARK: EventHandler
+export type EventHandler = {
+    Key: string;
+    
+    ReplicateToClients: boolean;
+    RelayToServer: boolean;
+
+    -- @methods
+    SetPermissions: (self: EventHandler, flagTag: string, value: boolean) -> nil;
+    HasPermissions: (self: EventHandler, flagTag: string, player: Player?) -> boolean;
+    SetPlayerPermissions: (self: EventHandler, player: Player, flagTag: string, value: boolean) -> nil;
+};
 
 --MARK: EventService
 export type EventService = {
+    -- @properties
+    EventSource: {
+        Client: number;
+        Server: number;
+    };
+
+    -- @methods
     ClientInvoke: (
         self: EventService, 
         key: GAME_EVENT_KEY<string>, 
@@ -175,6 +199,11 @@ export type EventService = {
         (event: EventPacket, ...any) -> nil, 
         position: number?
     ) -> (()->nil);
+    GetOrNewHandler: (
+        self: EventService,
+        key: GAME_EVENT_KEY<string>,
+        newIfNil: boolean?
+    ) -> EventHandler;
 };
 
 
@@ -186,6 +215,8 @@ export type Profiles = {
     -- @methods
     Get: (self: Profiles, player: Player) -> Profile;
     Find: (self: Profiles, playerName: string) -> Profile;
+    WaitForProfile: (self: Profiles, player: Player, duration: number?) -> Profile;
+    IsPremium: (self: Profiles, player: Player) -> boolean;
 };
 
 export type Profile = {
@@ -204,9 +235,12 @@ export type Profile = {
     Cache: anydict;
     
     -- @methods
+    GetActiveSave: (self: Profile) -> GameSave;
     Sync: (self: Profile, hierarchyKey: string?, paramPacket: anydict?) -> nil;
 
-    -- @coreBinds
+    GetCacheStorages: (self: Profile) -> {[string]: Storage};
+
+    -- @binds
     _new: (self: Profile, player: Player) -> nil;
     _key_load: (self: Profile, key: string, data: any, loadOverwrite: anydict?) -> boolean; -- handled if true;
     _reset_save: (self: Profile) -> nil;
@@ -218,14 +252,22 @@ export type Profile = {
 
 --MARK: GameSave
 export type GameSave = {
+    -- @properties
+    Player: Player;
+
     Inventory: Storage;
     Clothing: Storage;
 
+    Storages: {[string]: Storage};
+
     -- @methods
     Sync: (self: GameSave, hierarchyKey: string?) -> nil;
+    GetStat: (self: GameSave, k: string) -> any;
+    AddStat: (self: GameSave, k: string, v: number, force: boolean?) -> number;
 
-    -- @coreBinds
+    -- @binds
     _new: (gameSave: GameSave, profile: Profile) -> nil;
+    _load_storage: (gameSave: GameSave, storageId: string, rawStorage: anydict) -> nil;
 };
 
 
@@ -250,20 +292,45 @@ export type Storage = {
     -- @properties
     Id: string;
     Name: string;
+    Player: Player;
+    PresetId: string;
 
+    Initialized: boolean;
+    MaxPages: number;
+    Page: number;
     Size: number;
     MaxSize: number;
     PremiumStorage: number;
+    Expandable: boolean;
+    Virtual: boolean;
+    Settings: anydict;
+    Values: anydict;
 
+    Locked: boolean;
     ViewOnly: boolean;
 
     Container: {[string]: StorageItem};
     LinkedStorages: anydict;
 
+    StorageBitString: string;
+    UsersBitString: {[string]: string};
+
+    Garbage: GarbageHandler;
+
     -- @methods
     Find: (self: Storage, id: string) -> StorageItem;
     InsertRequest: (self: Storage, storageItem: StorageItem, ruleset: anydict?) -> anydict;
     Sync: (self: Storage, player: Player) -> nil;
+    SpaceCheck: (self: Storage, items: {any}) -> boolean;
+    Add: (self: Storage, itemId: string, data: {Quantity: number?; Data: anydict?}?, callback: anyfunc) -> nil;
+    Loop: (self: Storage, func: ((storageItem: StorageItem) -> boolean)?) -> number;
+    ConnectCheck: (self: Storage, anyfunc) -> nil;
+
+    SetPermissions: (self: Storage, flagTag: string, value: boolean) -> nil;
+    HasPermissions: (self: Storage, flagTag: string, name: string?) -> boolean;
+    SetUserPermissions: (self: Storage, name: string, flagTag: string, value: boolean) -> nil;
+
+    InitStorage: (self: Storage) -> nil;
 
     -- @signals
     OnChanged: EventSignal<>;
@@ -349,6 +416,10 @@ export type PlayerClass = CharacterClass & {
     OnIsAliveChanged: EventSignal<any>;
     OnCharacterSpawn: EventSignal<any>;
     Died: EventSignal<any>;
+
+    -- @binds
+    _new: (self: Player, playerClass: PlayerClass) -> nil;
+    _character_added: (self: Player, playerClass: PlayerClass, character: Model) -> nil;
 };
 
 --MARK: CharacterClass
@@ -427,6 +498,11 @@ export type StatusClassInstance = {
     Shrink: (self: StatusClassInstance) -> anydict;
 } & StatusClass;
 
+--MARK: AnimationController
+export type AnimationController = {
+    Update: (self: AnimationController) -> nil;
+};
+
 --MARK: NpcClasses
 export type NpcClasses = {
     -- @static
@@ -477,6 +553,7 @@ export type NpcClass = CharacterClass & {
     
     Storages: {[string]: Storage};
 
+    AnimationController: AnimationController;
     Interactable: ModuleScript?;
     
     -- @methods
@@ -518,10 +595,10 @@ export type NpcClass = CharacterClass & {
 
 --MARK: Interactables
 export type Interactables = {
-    new: (ModuleScript, Model?) -> (InteractableInstance, InteractableMeta);
-    register: (name: string, package: anydict) -> nil;
+    new: (Configuration, Model?) -> (InteractableInstance, InteractableMeta);
+    registerPackage: (name: string, package: anydict) -> nil;
 
-    Instance: (name: string, scr: ModuleScript, ...any) -> InteractableInstance;
+    Instance: (name: string, config: Configuration) -> InteractableInstance;
 }
 
 export type InteractableMeta = {
@@ -531,28 +608,56 @@ export type InteractableMeta = {
     TouchInteract: boolean; 
     IndicatorPresist: boolean;
     InteractableRange: number;
+    Remote: RemoteFunction;
+
+    Package: anydict;
+    TypePackage: anydict;
+    Whitelist: {[string]: boolean};
+    
+	RootBitString: string;
+	UserBitString: {[string]: string};
+
+    LastPermChanged: number;
+    LastProximityTrigger: number;
+
+    -- @methods
+    Trigger: (self: InteractableInstance) -> nil;
+
+    SetPermissions: (self: InteractableInstance, flagTag: string, value: boolean) -> nil;
+    HasPermissions: (self: InteractableInstance, flagTag: string, name: string?) -> boolean;
+    SetUserPermissions: (self: InteractableInstance, name: string, flagTag: string, value: boolean) -> nil;
 }
 
 export type InteractableInstance = {
     -- @properties
-    Script: ModuleScript;
-    Prefab: Instance?;
-    Object: BasePart;
+    Id: string;
+
+    Config: Configuration;
+    Part: BasePart;
+
+    Variant: string;
 
     CanInteract: boolean;
     Values: anydict;
 
+    Prefab: Instance?;
     Label: string?;
+    Animation: string?;
 
     -- @methods
-    ActionEvent: ((info: InteractInfo) -> nil)?;
-    PromptEvent: ((info: InteractInfo) -> nil)?;
+    Sync: (self: InteractableInstance, players: {Player}?, data: anydict?) -> nil;
+    SyncPerms: (self: InteractableInstance, player: Player) -> nil;
+
+    BindInteract: (interactable: InteractableInstance, info: InteractInfo) -> nil;
+    BindPrompt: (interactable: InteractableInstance, info: InteractInfo) -> nil;
+    BindSync: (interactable: InteractableInstance, data: anydict) -> nil;
+    
 } & InteractableMeta;
 
 export type InteractInfo = {
-    ActionTypes: {
-        ClientInteract: string;
-        ServerInteract: string;
+    ActionSource: {
+        Client: string;
+        Server: string;
     };
     Values: anydict;
 
@@ -626,6 +731,8 @@ export type Interface = {
     GetWindow: (self: Interface, name: string) -> InterfaceWindow;
     NewWindow: (self: Interface, name: string, frame: GuiObject, properties: anydict?) -> InterfaceWindow;
     ToggleWindow: (self: Interface, name: string, visible: boolean?, ...any) -> InterfaceWindow;
+    ListWindows: (self: Interface, conditionFunc: anyfunc) -> {InterfaceWindow};
+
     BindConfigKey: (self: Interface, key: string, windows: {InterfaceWindow}?, frames: {Instance}?, conditions: ((...any) -> boolean)?) -> nil;
     BindEvent: (self: Interface, key: string, func: (...any)->nil) -> (()->nil);
     FireEvent: (self: Interface, key: string, ...any) -> nil;
@@ -658,6 +765,8 @@ export type InterfaceWindow = {
     Frame: Frame;
     QuickButton: GuiObject;
     Visible: boolean;
+    ClosePoint: UDim2;
+    OpenPoint: UDim2;
 
     Binds: anydict;
     Properties: PropertiesVariable<{
@@ -737,6 +846,7 @@ export type ToolHandlerInstance = {
     EquipmentClass: EquipmentClass;
     Garbage: GarbageHandler;
 
+    MainToolModel: Model;
     Prefabs: {[number]: Model};
     ToolGrips: {[number]: Motor6D};
     Binds: anydict;
@@ -750,7 +860,7 @@ export type GunToolHandler = ToolHandler & {
     PrimaryFireRequest: (toolHandler: GunToolHandlerInstance, direction: Vector3, enemyHumanoid: Humanoid?) -> nil;
     ReloadRequest: (toolHandler: GunToolHandlerInstance) -> nil;
     ToggleIdle: (toolHandler: GunToolHandlerInstance, value: boolean) -> nil;
-    [any]: any;
+    PullTrigger: (toolHandler: ToolHandlerInstance) -> nil;
 };
 export type GunToolHandlerInstance = ToolHandlerInstance & GunToolHandler;
 
@@ -854,7 +964,7 @@ export type EquipmentClass = {
     Package: anydict;
 
     Configurations: ConfigVariable;
-    Properties: {[any]: any};
+    Properties: PropertiesVariable<{}>;
 
     BaseModifiers: {[string]: anydict};
     EquipmentModifier: ConfigModifier;

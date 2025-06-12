@@ -27,6 +27,9 @@ modStoragePresetsLibrary:Add{
         MaxSize = 50;
         PremiumStorage = 30;
     };
+    Permissions = {
+        CanInteract = true;
+    };
 }
 
 modStoragePresetsLibrary:Add{
@@ -48,6 +51,9 @@ modStoragePresetsLibrary:Add{
         Expandable=true;
         MaxPages=4;
         PremiumPage=4;
+    };
+    Permissions = {
+        CanInteract = true;
     };
 };
 
@@ -73,6 +79,9 @@ modStoragePresetsLibrary:Add{
         Id = 62; 
         Type = {3};
     };
+    Permissions = {
+        CanInteract = true;
+    };
 };
 
 modStoragePresetsLibrary:Add{
@@ -84,8 +93,20 @@ modStoragePresetsLibrary:Add{
         Expandable=true; 
         MaxSize=20;
     };
+    Permissions = {
+        CanInteract = true;
+    };
 };
 
+modStoragePresetsLibrary:Add{
+    Id = "ammopouch";
+    Name = "Ammo Pouch";
+    Configuration = {
+        Persistent = true;
+        Size=5;
+        Virtual = true;
+    };
+}
 
 
 modStoragePresetsLibrary:Add{
@@ -154,6 +175,9 @@ modStoragePresetsLibrary:Add{
         Persistent=true; 
         Size=5; 
         MaxSize=5;
+    };
+    Permissions = {
+        CanInteract = true;
     };
 };
 

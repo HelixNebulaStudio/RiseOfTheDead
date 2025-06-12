@@ -1,12 +1,12 @@
 
 local RunService = game:GetService("RunService");
 
-local modReplicationManager = require(game.ReplicatedStorage.Library.ReplicationManager);
+local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modWorldCoreClass = shared.require(game.ReplicatedStorage.Library.WorldCoreClass);
 
 if RunService:IsServer() then
-    modEvents = require(game.ServerScriptService.ServerLibrary.Events);
-    modCrates = require(game.ServerScriptService.ServerLibrary.Crates);
+    modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
+    modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
 
 end
 --==
@@ -23,7 +23,7 @@ function modWorldCoreClass:SpawnGift(player: Player, giftId: string, giftCf: CFr
         content = modCrates.GenerateRewards(giftId);
     end
 
-    profile.Garbage:Tag(modCrates.Spawn(giftId, giftCf, {player}, content, true));
+    profile.Garbage:Tag(modCrates.spawn(giftId, giftCf, {player}, content, true));
 end
 
 function modWorldCoreClass:SpawnPlayerNpc(player: Player, npcName: string)

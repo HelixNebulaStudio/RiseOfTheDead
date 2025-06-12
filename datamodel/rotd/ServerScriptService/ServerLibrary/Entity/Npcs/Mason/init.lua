@@ -12,15 +12,16 @@ local npcPackage = {
     AddComponents = {
         "TargetHandler";
         "ProtectOwner";
+        "Chat";
     };
 };
 
 function npcPackage.Spawning(npcClass: NpcClass)
 
-    if game:GetService("RunService"):IsStudio() then
-        local protectOwnerComp = npcClass:GetComponent("ProtectOwner");
-        protectOwnerComp:Activate();
-    end
+    -- if game:GetService("RunService"):IsStudio() then
+    --     local protectOwnerComp = npcClass:GetComponent("ProtectOwner");
+    --     protectOwnerComp:Activate();
+    -- end
 end
 
 return npcPackage;

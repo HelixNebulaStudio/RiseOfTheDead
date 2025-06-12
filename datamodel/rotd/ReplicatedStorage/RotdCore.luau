@@ -6,6 +6,7 @@ local RotdCore = {};
 --==
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManagerRotd);
 local modOnEventsHandlers = shared.require(game.ReplicatedStorage.Library.OnEventHandlersRotd);
+local modPlayers = shared.require(game.ReplicatedStorage.Library.PlayersRotd);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibraryRotd);
 local modStoragePresetsLibrary = shared.require(game.ReplicatedStorage.Library.StoragePresetsLibraryRotd);
 local modBlueprintLibrary = shared.require(game.ReplicatedStorage.Library.BlueprintLibraryRotd);

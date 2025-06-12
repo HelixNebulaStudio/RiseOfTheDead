@@ -26,7 +26,7 @@ local toolPackage = {
 };
 
 function toolPackage.CustomSpawn(handler, cframe)
-	local modCrates = shared.require(game.ServerScriptService.ServerLibrary.Crates);
+	local modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
 	local modDropAppearance = shared.require(game.ReplicatedStorage.Library.DropAppearance);
 	local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
@@ -35,7 +35,7 @@ function toolPackage.CustomSpawn(handler, cframe)
 
 	local rewards = modCrates.GenerateRewards(itemId, owner);
 	if #rewards > 0 then
-		local prefab, interactable = modCrates.Spawn(itemId, cframe, {owner}, rewards);
+		local prefab, interactable = modCrates.spawn(itemId, cframe, {owner}, rewards);
 
 		local dropAppearanceLib = modDropAppearance:Find(itemId);
 		if dropAppearanceLib then
@@ -73,13 +73,7 @@ function toolPackage.inherit(packet)
 				Prefab=inheritPackage.CratePrefab or itemModel;
 
 				RewardsId=itemId;
-				Configurations={
-					Persistent=false;
-					Settings={
-						WithdrawalOnly=true;
-						DestroyOnEmpty=true;
-					}
-				};
+				StoragePresetId="lootcrate";
 
 				EmptyLabel="Empty Chest";
 			};

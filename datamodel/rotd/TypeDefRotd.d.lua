@@ -46,7 +46,6 @@ export type GameSaveRotd = GameSave & {
 
 --MARK: EquipmentClass
 export type EquipmentClassRotd = EquipmentClass & {
-    [any]: any;
 };
 
 

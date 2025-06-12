@@ -12,7 +12,7 @@ local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFo
 
 local missionId = 77;
 if RunService:IsServer() then
-	local modCrates = shared.require(game.ServerScriptService.ServerLibrary.Crates);
+	local modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	
@@ -152,7 +152,7 @@ if RunService:IsServer() then
 						for a=1, #spawnPoints do
 							local spawnPointAtt: Attachment = spawnPoints[a];
 							
-							local newPrefab, interactData = modCrates.Spawn("raresunkencrate", spawnPointAtt.WorldCFrame, {player}, {});
+							local newPrefab, interactData = modCrates.spawn("raresunkencrate", spawnPointAtt.WorldCFrame, {player}, {});
 							local basePart = newPrefab:WaitForChild("Handle");
 							local baseAtt = basePart:WaitForChild("BaseAttachment");
 							
@@ -248,7 +248,7 @@ if RunService:IsServer() then
 							Debugger:Warn("onSunkenSalvagesSpawn");
 							
 							--Whitelist
-							local newPrefab, interactData = modCrates.Spawn("raresunkencrate", spawnCframe, {player}, {}, true);
+							local newPrefab, interactData = modCrates.spawn("raresunkencrate", spawnCframe, {player}, {}, true);
 							
 							local storageId = interactData.StorageId;
 

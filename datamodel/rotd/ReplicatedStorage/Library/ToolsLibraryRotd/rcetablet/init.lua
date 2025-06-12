@@ -8,6 +8,8 @@ local toolPackage = {
 	Class="Tool";
 	HandlerType="GenericTool";
 
+	ToolWindow = "InstrumentWindow";
+	
 	Animations={
 		Core={Id=14471065189;};
 		Use={Id=14471085942};

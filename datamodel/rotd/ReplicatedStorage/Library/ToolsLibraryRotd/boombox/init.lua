@@ -5,72 +5,99 @@ local MarketplaceService = game:GetService("MarketplaceService");
 local CollectionService = game:GetService("CollectionService");
 
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
-
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
-local remoteBoomboxRemote = modRemotesManager:Get("BoomboxRemote");
 
 local audioModule = game.ReplicatedStorage.Library.Audio;
---==
-if RunService:IsServer() then
-	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
-	function onBoomboxRemote(player, action, storageItemId, trackId)
+local onBoomboxRemote;
+
+local toolPackage = {
+	ItemId=script.Name;
+	Class="Tool";
+	HandlerType="GenericTool";
+
+	ToolWindow = "BoomboxWindow";
+
+	Animations={
+		Core={Id=4997124843;};
+		Use={Id=4997138529};
+	};
+	Audio={};
+	Configurations={};
+	Properties={};
+};
+--==
+
+function toolPackage.onRequire()
+	if RunService:IsClient() then return end;
+	local remoteBoomboxRemote = modRemotesManager:Get("BoomboxRemote");
+	local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+
+	onBoomboxRemote = function(player, action, siid, trackId)
 		local profile = shared.modProfile:Get(player);
 		local playerSave = profile and profile:GetActiveSave();
 		local inventory = playerSave and playerSave.Inventory;
-		local storageItem = inventory and inventory:Find(storageItemId);
+		local storageItem = inventory and inventory:Find(siid);
 		local traderProfile = profile and profile.Trader;
 		local playerGold = traderProfile and traderProfile.Gold;
 		
+		Debugger:Warn(`Boombox Remote`, action, siid, trackId);
+
 		if storageItem and playerGold then
 			if action == "add" then
 				local assetInfo = MarketplaceService:GetProductInfo(trackId, Enum.InfoType.Asset);
 				
-				if playerGold >= 200 and assetInfo then
-					if not assetInfo.IsPublicDomain then
-						shared.Notify(player, "The song you tried to add is not public domain.", "Negative");
-						return 3;
-					end
-					
-					local playList = inventory:GetValues(storageItemId, "Songs") or {};
-					local count = 0;
-					for id, name in pairs(playList) do
-						count = count +1;
-						if id == trackId then
-							return 4;
-						end
-					end
-					if count < 10 then
-						playList[tostring(trackId)] = assetInfo.Name:sub(1, 20);
-						inventory:SetValues(storageItemId, {Songs=playList});
-						traderProfile:AddGold(-200);
-						
-						modAnalyticsService:Sink{
-							Player=player;
-							Currency=modAnalyticsService.Currency.Gold;
-							Amount=200;
-							EndBalance=traderProfile.Gold;
-							ItemSKU=`Usage:boombox`;
-						};
+				if assetInfo == nil then
+					return 3;
+				end
 
-						return 1;
-					else
-						return 5;
+				if not assetInfo.IsPublicDomain then
+					shared.Notify(player, "The song you tried to add is not public domain.", "Negative");
+					return 3;
+				end
+
+				if playerGold < 200 then
+					return 2;
+				end
+
+				local playList = inventory:GetValues(siid, "Songs") or {};
+				local count = 0;
+				for id, name in pairs(playList) do
+					count = count +1;
+					if id == trackId then
+						return 4;
 					end
 				end
+
+				if count >= 10 then
+					return 5;
+				end
+				
+				playList[tostring(trackId)] = assetInfo.Name:sub(1, 20);
+				inventory:SetValues(siid, {Songs=playList});
+				traderProfile:AddGold(-200);
+				
+				modAnalyticsService:Sink{
+					Player=player;
+					Currency=modAnalyticsService.Currency.Gold;
+					Amount=200;
+					EndBalance=traderProfile.Gold;
+					ItemSKU=`Usage:boombox`;
+				};
+				return 1;
 				
 			elseif action == "delete" then
-				local playList = inventory:GetValues(storageItemId, "Songs") or {};
+				local playList = inventory:GetValues(siid, "Songs") or {};
 				playList[trackId] = nil;
-				inventory:SetValues(storageItemId, {Songs=playList});
+				inventory:SetValues(siid, {Songs=playList});
 				
 			elseif action == "contentremoved" then
 				local assetInfo = MarketplaceService:GetProductInfo(trackId, Enum.InfoType.Asset);
 				
 				if assetInfo and assetInfo.Name == "[ Content Deleted ]" and assetInfo.Description == "[ Content Deleted ]" then
-					local playList = inventory:GetValues(storageItemId, "Songs") or {};
+					local playList = inventory:GetValues(siid, "Songs") or {};
 					playList[trackId] = nil;
-					inventory:SetValues(storageItemId, {Songs=playList});
+					inventory:SetValues(siid, {Songs=playList});
 					
 					traderProfile:AddGold(200);
 					
@@ -85,157 +112,154 @@ if RunService:IsServer() then
 	end
 	
 	function remoteBoomboxRemote.OnServerInvoke(player, action, storageItemId, trackId)
-		if action ~= "contentremoved" then
-			onBoomboxRemote(player, action, storageItemId, trackId);
-		end
+		if action == "contentremoved" then return end;
+
+		return onBoomboxRemote(player, action, storageItemId, trackId);
 	end
 end
 
-
-
-local toolPackage = {
-	ItemId=script.Name;
-	Class="Tool";
-	HandlerType="GenericTool";
-
-	Animations={
-		Core={Id=4997124843;};
-		Use={Id=4997138529};
-	};
-	Audio={};
-	Configurations={};
-	Properties={};
-};
-
-function toolPackage.OnClientUnequip()
-	local player = game.Players.LocalPlayer;
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-	
-	modInterface:CloseWindow("BoomboxWindow");
-end
-
-function toolPackage.ClientItemPrompt(handler)
-	local player = game.Players.LocalPlayer;
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-	
-	if modInterface:IsVisible("BoomboxWindow") then return end;
-	modInterface:ToggleWindow("BoomboxWindow", nil, handler);
-end
 
 function toolPackage.ServerEquip(handler)
 	handler.PowerTimer = nil;
 end
 
-function toolPackage.OnServerUnequip(handler)
-	local profile = shared.modProfile:Get(handler.Player);
-	local playerSave = profile:GetActiveSave();
-	local inventory = playerSave.Inventory;
-			
-	for a=1, #handler.Prefabs do
-		local prefab = handler.Prefabs[a];
-		local primaryPart = prefab.PrimaryPart;
+
+function toolPackage.ServerUnequip(handler: ToolHandlerInstance)
+	local equipmentClass: EquipmentClass = handler.EquipmentClass;
+	local storageItem: StorageItem = handler.StorageItem;
+
+	local properties = equipmentClass.Properties;
+
+	local toolModel = handler.MainToolModel;
+	if toolModel.PrimaryPart then
+		local boomboxSound = toolModel.PrimaryPart:FindFirstChild("boomboxSound");
+		if boomboxSound then boomboxSound:Stop(); end
 		
-		if primaryPart then
-			local boomboxSound = primaryPart:FindFirstChild("boomboxSound");
-			if boomboxSound then boomboxSound:Stop(); end
-			
-			local boomboxParticle = primaryPart:FindFirstChild("boomboxParticle");
-			if boomboxParticle then boomboxParticle.Enabled = false; end
-		end
+		local boomboxParticle = toolModel.PrimaryPart:FindFirstChild("boomboxParticle");
+		if boomboxParticle then boomboxParticle.Enabled = false; end
 	end
-	
-	if handler.PowerTimer then
-		handler.Power = math.clamp(math.ceil(handler.Power - (tick()-handler.PowerTimer)/6), 0, 100);
-		inventory:SetValues(handler.StorageItem.ID, {Power=handler.Power});
+
+	if properties.PowerTimer then
+		properties.Power = math.clamp(math.ceil(properties.Power - (tick()-properties.PowerTimer)/6), 0, 100);
+		storageItem:SetValues("Power", properties.Power);
 	end
-	handler.PowerTimer = nil;
+	properties.PowerTimer = nil;
 end
 
-function toolPackage.OnActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 	if packet.ActionIndex ~= 1 then return end;
 	
-	local profile = shared.modProfile:Get(handler.Player);
-	local playerSave = profile:GetActiveSave();
-	local inventory = playerSave.Inventory;
-			
-	local storageItem = handler.StorageItem;
+	local characterClass: CharacterClass = handler.CharacterClass;
+
+	local equipmentClass: EquipmentClass = handler.EquipmentClass;
+	local toolAnimator: ToolAnimator = handler.ToolAnimator;
+	local storageItem: StorageItem = handler.StorageItem;
+
 	local siid = storageItem.ID;
 
-	handler.Power = (inventory:GetValues(siid, "Power") or 100);
-	handler.Songs = inventory:GetValues(siid, "Songs") or {};
-	
-	handler.IsActive = packet.IsActive == true;
-	
+	local properties = equipmentClass.Properties;
+
+	properties.Power = storageItem:GetValues("Power") or 100;
+	properties.Songs = storageItem:GetValues("Songs") or {};
+
+	properties.IsActive = packet.IsActive == true;
+
+	if handler.CharacterClass.ClassName == "NpcClass" then 
+		if properties.IsActive then
+			toolAnimator:Play("Use");
+		else
+			toolAnimator:Stop("Use");
+		end
+	end;
+
 	local songId = packet.SongId;
 
-	if handler.IsActive then
-		if handler.Power <= 0 then
+	if not properties.IsActive then
+		toolPackage.ServerUnequip(handler);
+		return;
+	end
+
+	if characterClass.ClassName == "PlayerClass" then
+		local player = (characterClass :: PlayerClass):GetInstance();
+
+		local profile = shared.modProfile:Get(player);
+		local gameSave = profile:GetActiveSave();
+		local inventory = gameSave.Inventory;
 			
+		if properties.Power <= 0 then
 			local total, itemList = inventory:ListQuantity("battery", 1);
 			if itemList then
 				for a=1, #itemList do
 					inventory:Remove(itemList[a].ID, itemList[a].Quantity);
-					shared.Notify(handler.Player, "1 Battery removed from your Inventory.", "Negative");
-					handler.Power = 100;
-					inventory:SetValues(siid, {Power=handler.Power});
+					shared.Notify(player, "1 Battery removed from your Inventory.", "Negative");
+					properties.Power = 100;
+					inventory:SetValues(siid, {Power=properties.Power});
 				end
 			else
-				shared.Notify(handler.Player, "Boombox is out of power and you do not have a battery in your inventory.", "Negative");
+				shared.Notify(player, "Boombox is out of power and you do not have a battery in your inventory.", "Negative");
 				return;
 			end
 		end;
-		
-		local soundList = {};
-		for _, sound in pairs(audioModule.ServerAudio:GetChildren()) do
-			if sound.TimeLength > 59 then
-				table.insert(soundList, sound);
-			end
-		end
-		
-		for a=1, #handler.Prefabs do
-			local prefab = handler.Prefabs[a];
-			
-			local boomboxSound = prefab.PrimaryPart:FindFirstChild("boomboxSound");
-			
-			if boomboxSound then
-				local songName = nil;
-				if songId and handler.Songs[songId] then
-					boomboxSound.SoundId = "rbxassetid://"..songId;
-					boomboxSound.SoundGroup = game.SoundService:FindFirstChild("InstrumentMusic");
-					
-					delay(0.1, function()
-						if boomboxSound.TimeLength == 0 then
-							if onBoomboxRemote then
-								onBoomboxRemote(handler.Player, "contentremoved", siid, songId);
-							end
-							toolPackage.OnServerUnequip(handler);
-						end
-					end)
-				else
-					
-					local songPicked = soundList[math.random(1, #soundList)];
-					boomboxSound.SoundId = songPicked.SoundId;
-					songName = songPicked:GetAttribute("OfficialName") or "\""..songPicked.Name.."\"";
-				end
-				
-				if songName then
-					shared.Notify(handler.Player, "<b>Boombox Playing:</b> "..songName, "Inform");
-				end
-				boomboxSound:SetAttribute("SoundOwner", handler.Player and handler.Player.Name or nil);
-				CollectionService:AddTag(boomboxSound, "PlayerNoiseSounds");
-				boomboxSound:Play();
-			end
-			
-			local boomboxParticle = prefab.PrimaryPart:FindFirstChild("boomboxParticle");
-			if boomboxParticle then boomboxParticle.Enabled = true; end
-		end
-		if handler.PowerTimer == nil then handler.PowerTimer = tick(); end;
-	else
-		toolPackage.OnServerUnequip(handler);
-		
 	end
+
+
+	local soundList = {};
+	for _, sound in pairs(audioModule.ServerAudio:GetChildren()) do
+		if sound.TimeLength > 59 then
+			table.insert(soundList, sound);
+		end
+	end
+	
+
+	local toolModel = handler.MainToolModel;
+	local boomboxSound: Sound = toolModel.PrimaryPart:FindFirstChild("boomboxSound");
+	if boomboxSound == nil then return; end;
+
+	boomboxSound.Looped = true;
+
+	local songName = nil;
+	if songId and properties.Songs[songId] then
+		boomboxSound.SoundId = "rbxassetid://"..songId;
+		boomboxSound.SoundGroup = game.SoundService:FindFirstChild("InstrumentMusic");
+		
+		if characterClass.ClassName == "PlayerClass" then
+			local player = (characterClass :: PlayerClass):GetInstance();
+
+			boomboxSound.Loaded:Once(function()
+				task.wait(0.1);
+				if boomboxSound.TimeLength == 0 then
+					if onBoomboxRemote then
+						onBoomboxRemote(player, "contentremoved", siid, songId);
+					end
+					toolPackage.ServerUnequip(handler);
+				end
+			end)
+		end
+
+	else
+		local songPicked = soundList[math.random(1, #soundList)];
+		boomboxSound.SoundId = songPicked.SoundId;
+		songName = songPicked:GetAttribute("OfficialName") or `"{songPicked.Name}"`;
+
+	end
+	
+	
+	if characterClass.ClassName == "PlayerClass" then
+		local player = (characterClass :: PlayerClass):GetInstance();
+		if songName then
+			shared.Notify(player, "<b>Boombox Playing:</b> "..songName, "Inform");
+		end
+
+		boomboxSound:SetAttribute("SoundOwner", player.Name);
+		CollectionService:AddTag(boomboxSound, "PlayerNoiseSounds");
+	end
+
+	boomboxSound:Play();
+	
+	local boomboxParticle = toolModel.PrimaryPart:FindFirstChild("boomboxParticle");
+	if boomboxParticle then boomboxParticle.Enabled = true; end
+
+	if properties.PowerTimer == nil then properties.PowerTimer = tick(); end;
 end
 
 function toolPackage.newClass()

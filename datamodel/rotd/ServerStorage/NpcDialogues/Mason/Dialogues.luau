@@ -1,7 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local CollectionService = game:GetService("CollectionService");
 local RunService = game:GetService("RunService");
 
+local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local Dialogues = {};
@@ -153,6 +155,7 @@ if RunService:IsServer() then
 
 		local npcName = dialog.Name;
 		local npcModule = dialog:GetNpcModule();
+		local npcClass: NpcClass = dialog:GetNpcClass();
 	
 		local activeMissionCount = #modMission:GetNpcMissions(player, npcName);
 		local profile = shared.modProfile:Get(player);
@@ -225,6 +228,149 @@ if RunService:IsServer() then
 			end);
 		end
 		
+		if modBranchConfigs.CurrentBranch.Name == "Dev" then
+			local function addDialog(say, reply, func)
+				dialog:AddDialog({
+					Say=say;
+					Reply=reply;
+				}, func);
+			end
+
+			addDialog("Equip revolver454", "Okie dokie", function(dialog)
+				local wieldComp: WieldComp = npcClass.WieldComp;
+				if wieldComp == nil then
+					Debugger:Warn(`Missing wield comp`);
+					return;
+				end
+
+				wieldComp:Equip({
+					ItemId = "revolver454";
+					OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
+						if toolHandler.EquipmentClass == nil then return end;
+						local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
+
+						local modifier: ConfigModifier = equipmentClass.Configurations.newModifier("npcDmg");
+						modifier.SetValues.Damage = 25;
+						modifier.Priority = 999;
+						equipmentClass.Configurations:AddModifier(modifier, true);
+					end;
+				});
+			end)
+
+			addDialog("Equip boombox and use", "Okie dokie", function(dialog)
+				local wieldComp: WieldComp = npcClass.WieldComp;
+				if wieldComp == nil then
+					Debugger:Warn(`Missing wield comp`);
+					return;
+				end
+
+				wieldComp:Equip({
+					ItemId = "boombox";
+					OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
+						if toolHandler.EquipmentClass == nil then return end;
+						
+						wieldComp:InvokeToolAction(
+							"ActionEvent",
+							{ActionIndex=1; IsActive=true;}
+						);
+					end;
+				});
+			end)
+			
+			if npcClass.Properties.IsProtectActive then
+		addDialog("Stand down", "Okie dokie", function(dialog)
+			npcClass.Properties.IsProtectActive = nil;
+		end)
+
+			else
+		addDialog("Stay alert for Zombies", "Okie dokie", function(dialog)
+			local wieldComp: WieldComp = npcClass.WieldComp;
+
+			if npcClass.Owner ~= player then
+				npcClass.Owner = player;
+				Debugger:StudioWarn(`Set owner for {npcName}`);
+			end
+
+			local protectOwnerComp = npcClass:GetComponent("ProtectOwner");
+			if protectOwnerComp then
+				Debugger:Warn(`Activate protect owner`);
+				protectOwnerComp:Activate();
+				return;
+			end
+			
+			local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+
+			if wieldComp.ItemId == nil then
+				Debugger:Warn(`No gun equipped`);
+				return;
+			end
+
+
+			npcClass.Properties.IsProtectActive = true;
+
+			local tagInstanceConn;
+			tagInstanceConn = CollectionService:GetInstanceAddedSignal("DummyZombie"):Connect(function(model)
+				if npcClass.Properties.IsProtectActive ~= true and tagInstanceConn then
+					tagInstanceConn:Disconnect();
+					tagInstanceConn = nil;
+					return;
+				end
+
+				targetHandlerComp:AddTarget(model);
+			end)
+			local dumZombiesList = CollectionService:GetTagged("DummyZombie");
+			for a=1, #dumZombiesList do
+				targetHandlerComp:AddTarget(dumZombiesList[a]);
+			end
+
+			task.spawn(function()
+				while npcClass.Properties.IsProtectActive == true do
+					task.wait(0.1);
+
+					local activeTarget = targetHandlerComp:MatchFirstTarget(function(targetData)
+						if targetData.HealthComp == nil then return end;
+						local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
+						
+						return targetNpcClass.HumanoidType == "Zombie" and targetData.HealthComp.IsDead == false;
+					end);
+
+					if activeTarget then
+						if activeTarget and activeTarget.HealthComp then
+							Debugger:StudioLog(`Active target=`, activeTarget, activeTarget.HealthComp.IsDead, activeTarget.SortValue);
+						else
+							Debugger:StudioLog(`Active target=`, activeTarget);
+						end
+
+						local equipmentClass: EquipmentClassRotd = wieldComp.EquipmentClass :: EquipmentClassRotd;
+						if equipmentClass.Properties.Ammo <= 0 then
+							Debugger:Warn(`Out of ammo`, equipmentClass.Properties.Ammo);
+
+							wieldComp:InvokeToolAction(
+								"ReloadRequest"
+							);
+						end
+
+						local healthComp: HealthComp = activeTarget.HealthComp;
+						local enemyNpcClass: NpcClass = healthComp.CompOwner;
+
+						npcClass.Move:HeadTrack(enemyNpcClass.RootPart, 2);
+						npcClass.Move:Face(enemyNpcClass.RootPart.Position);
+
+						local shootDirection = (enemyNpcClass.RootPart.Position - npcClass.RootPart.Position).Unit;
+						
+						wieldComp:InvokeToolAction(
+							"PrimaryFireRequest", 
+							shootDirection, 
+							enemyNpcClass.Humanoid
+						);
+					end
+
+				end
+			end)
+		end)
+			end
+		end
+
 		if modMission:Progress(player, 54) then return end;
 		if modMission:IsComplete(player, 2) then
 			

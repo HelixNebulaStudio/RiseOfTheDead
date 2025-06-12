@@ -8,6 +8,8 @@ local toolPackage = {
 	Class="Tool";
 	HandlerType="GenericTool";
 
+	ToolWindow = "GpsWindow";
+
 	Animations={
 		Core={Id=5932487712;};
 		Use={Id=5932203028};
@@ -23,14 +25,6 @@ function toolPackage.OnClientUnequip(handler)
 	local modInterface = modData:GetInterfaceModule();
 	
 	modInterface:CloseWindow("GpsWindow");
-end
-
-function toolPackage.ClientItemPrompt(handler)
-	local localPlayer = game.Players.LocalPlayer;
-	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-	
-	modInterface:OpenWindow("GpsWindow", handler);
 end
 
 function toolPackage.newClass()

@@ -34,6 +34,16 @@ return function(player, dialog, data)
 			npcData:CalculateHappiness();
 			Debugger:WarnClient(player, npcData);
 		end);
+		
+		local chatDialog = {
+			Face="Happy";
+			Say=(modBranchConfigs.CurrentBranch.Name == "Dev" and "[Dev Branch]" or "[Dev]").." Say Hello!";
+			Reply="Ok?"
+		};
+		dialog:AddDialog(chatDialog, function(dialog)
+			local npcClass: NpcClass = dialog:GetNpcClass();
+			npcClass.Chat(player, "Hello world!");
+		end)
 	end
 	
 	local npcLevel = npcData.Level or 0;

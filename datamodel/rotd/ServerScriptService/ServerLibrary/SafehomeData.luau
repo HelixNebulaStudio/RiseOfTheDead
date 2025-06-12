@@ -14,6 +14,7 @@ local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibra
 
 local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
+local modStoragePresetLibrary = shared.require(game.ReplicatedStorage.Library.StoragePresetsLibrary);
 
 local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
@@ -519,11 +520,13 @@ function SafehomeData:GetNpc(npcName: string)
 		end);
 	end
 
+	local storagePresetLib = modStoragePresetLibrary:Find("npcstorage");
+
 	local storage = modStorage.openStorage(storageId, {
 		Player = self.Player;
-		Id = storageId;
-		Name = storageConfig.Name;
-		Configuration = storageConfig;
+		
+		StorageName = storageConfig.Name;
+		StoragePresetLib = storagePresetLib;
 	});
 	npcData.GetStorage = function()
 		return storage;

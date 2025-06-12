@@ -14,6 +14,8 @@ local toolPackage = {
 	Class="Tool";
 	HandlerType="MeleeTool";
 
+	ToolWindow = "InstrumentWindow";
+
 	Animations={
 		Core={Id=16971537726; IdRoleplay=16971600436;};
 		Load={Id=16971542912;};
@@ -167,14 +169,6 @@ function toolPackage.ClientUnequip()
 	local modInterface = modData:GetInterfaceModule();
 
 	modInterface:CloseWindow("InstrumentWindow");
-end
-
-function toolPackage.ClientItemPrompt(handler: ToolHandlerInstance)
-	local player = game.Players.LocalPlayer;
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-
-	modInterface:ToggleWindow("InstrumentWindow", handler);
 end
 
 function toolPackage.newClass()

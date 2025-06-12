@@ -34,9 +34,19 @@ function modSettings.onRequire()
 	modSettings.SettingsKeybindControlsTable = {
 		{Order=1; Type="Border"; Text="Rise of the Dead"};
 
+
         {Order=2; Type="Option"; Id="KeyToggleSpecial"; Text="Toggle/Trigger Special"; };
         {Order=3; Type="Option"; Id="KeyTogglePat"; Text="Toggle Portable Auto Turret"; };
-        
+    
+        {Order=115; Type="Option"; Id="KeyWindowFactionsMenu"; Text="Factions Menu"; };
+        {Order=116; Type="Option"; Id="KeyWindowMissions"; Text="Missions Menu"; };
+        {Order=117; Type="Option"; Id="KeyWindowSocialMenu"; Text="Social Menu"; };
+        {Order=118; Type="Option"; Id="KeyWindowMasteryMenu"; Text="Mastery Menu"; };
+        {Order=119; Type="Option"; Id="KeyWindowMapMenu"; Text="Map Menu"; };
+        {Order=120; Type="Option"; Id="KeyWindowGoldMenu"; Text="Gold Menu"; };
+        {Order=121; Type="Option"; Id="KeyWindowWorkbench"; Text="Portable Workbench"; Gamepass="PortableWorkbench";};
+        {Order=122; Type="Option"; Id="KeyWindowSafehome"; Text="Safehome Menu"; };
+
 		{Order=500; Type="Border"; Text="Nekron's Gambit"};
 		{Order=501; Type="Option"; Id="KeyScoreboardToggle"; Text="Scoreboard"; };
 		{Order=502; Type="Option"; Id="KeyWindowGambitShop"; Text="Shop"; };

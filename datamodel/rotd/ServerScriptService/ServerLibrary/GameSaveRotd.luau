@@ -108,16 +108,11 @@ shared.coreBind(modGameSave, "_load_storage", function(gameSave: GameSaveRotd, s
 		return;
 	end
 
-	if gameSave.Storages[storageId] then
-		Debugger:Warn(`Storage ({storageId}) already instantiated`);
-		return gameSave.Storages[storageId];
-	end
-
 	local storage: Storage = gameSave.Storages[storageId];
 	if storage == nil then
 		storage = modStorage.new(storageId, presetId, player, rawStorage.Name);
 	end
-	
+
 	return storage;
 end)
 

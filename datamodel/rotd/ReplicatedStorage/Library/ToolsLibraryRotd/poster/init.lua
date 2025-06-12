@@ -6,6 +6,7 @@ local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.Equipmen
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modPoster = shared.require(game.ReplicatedStorage.Library.Poster);
+local modContentSafety = shared.require(game.ReplicatedStorage.Library.ContentSafety);
 
 local remoteSetPoster = modRemotesManager:Get("SetPoster");
 
@@ -38,7 +39,7 @@ if RunService:IsServer() then
 						if decal then
 							local decalId = paramPacket.DecalId;
 							
-							local productInfo = shared.modAntiCheatService:SafeProductInfo(decalId, Enum.InfoType.Asset, player);
+							local productInfo = modContentSafety.safeProductInfo(decalId, Enum.InfoType.Asset, player);
 							
 							if productInfo then
 								local assetId = productInfo.AssetId;

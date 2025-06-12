@@ -14,6 +14,8 @@ local toolPackage = {
 	Class="Tool";
 	HandlerType="GenericTool";
 
+	ToolWindow = "InstrumentWindow";
+	
 	Animations={
 		Core={Id=6297114327;};
 		Use={Id=6297131484};
@@ -65,15 +67,6 @@ function toolPackage.OnClientUnequip()
 	local modInterface = modData:GetInterfaceModule();
 
 	modInterface:CloseWindow("InstrumentWindow");
-end
-
-function toolPackage.ClientItemPrompt(handler)
-	local player = game.Players.LocalPlayer;
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-
-	if modInterface:IsVisible("InstrumentWindow") then return end;
-	modInterface:ToggleWindow("InstrumentWindow", nil, handler);
 end
 
 function toolPackage.OnActionEvent(handler, packet)

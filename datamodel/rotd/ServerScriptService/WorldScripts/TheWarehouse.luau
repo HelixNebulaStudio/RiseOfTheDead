@@ -2,13 +2,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modConfigurations = require(game.ReplicatedStorage.Library.Configurations);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 
 if RunService:IsServer() then
-    modEvents = require(game.ServerScriptService.ServerLibrary.Events);
-    modCrates = require(game.ServerScriptService.ServerLibrary.Crates);
-    modGameModeManager = require(game.ServerScriptService.ServerLibrary.GameModeManager);
+    modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
+    modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
+    modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
 
 end
 

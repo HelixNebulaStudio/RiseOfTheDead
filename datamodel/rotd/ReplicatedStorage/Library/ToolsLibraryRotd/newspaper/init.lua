@@ -8,6 +8,8 @@ local toolPackage = {
 	Class="Tool";
 	HandlerType="GenericTool";
 
+	ToolWindow = "MarketNewspaper";
+
 	Animations={
 		Core={Id=13067320148;};
 		Use={Id=13067328329};
@@ -25,14 +27,6 @@ function toolPackage.OnClientEquip()
 	local modInterface = modData:GetInterfaceModule();
 
 	modInterface:CloseWindow("MarketNewspaper");
-end
-
-function toolPackage.ClientItemPrompt(handler)
-	local player = game.Players.LocalPlayer;
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-	
-	modInterface:OpenWindow("MarketNewspaper", handler);
 end
 
 function toolPackage.newClass()
