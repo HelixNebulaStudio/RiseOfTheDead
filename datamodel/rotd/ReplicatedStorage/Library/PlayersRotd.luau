@@ -18,32 +18,34 @@ shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
     local player = playerClass:GetInstance();
     local profile: ProfileRotd = shared.modProfile:Get(player) :: ProfileRotd;
 
-	local eventPart = workspace:WaitForChild("Event");
-	local masusPlushieSpawnAtt = eventPart:FindFirstChild("MasusPlushie"); 
+	task.spawn(function()
+		local eventPart = workspace:WaitForChild("Event");
+		local masusPlushieSpawnAtt = eventPart:FindFirstChild("MasusPlushie"); 
 
-	local worldInfo = modBranchConfigs.WorldLibrary[modBranchConfigs.GetWorld()];
-	if worldInfo and worldInfo.Index then
+		local worldInfo = modBranchConfigs.WorldLibrary[modBranchConfigs.GetWorld()];
+		if worldInfo and worldInfo.Index then
 
-		local dayName = modSyncTime.GetWeekDay();
-		local dayIndex = modSyncTime.WeekdayIndex[dayName];
+			local dayName = modSyncTime.GetWeekDay();
+			local dayIndex = modSyncTime.WeekdayIndex[dayName];
 
-		if worldInfo.Index == 0 or dayIndex == worldInfo.Index then
-			if masusPlushieSpawnAtt and profile.Collectibles.masus == nil then
-				task.spawn(function()
-					game.ReplicatedStorage.Prefabs.Items:WaitForChild("masusplush");
-					local newPrefab, interactData = modItemDrops.Spawn({
-                        Type="Tool"; 
-                        ItemId="masusplush"; 
-                        Quantity=1}, 
-                        masusPlushieSpawnAtt.WorldCFrame, 
-                        {player}, 
-                        false
-                    );
-					interactData.CollectibleId = "masus";
-				end)
+			if worldInfo.Index == 0 or dayIndex == worldInfo.Index then
+				if masusPlushieSpawnAtt and profile.Collectibles.masus == nil then
+					task.spawn(function()
+						game.ReplicatedStorage.Prefabs.Items:WaitForChild("masusplush");
+						local newPrefab, interactData = modItemDrops.Spawn({
+							Type="Tool"; 
+							ItemId="masusplush"; 
+							Quantity=1}, 
+							masusPlushieSpawnAtt.WorldCFrame, 
+							{player}, 
+							false
+						);
+						interactData.CollectibleId = "masus";
+					end)
+				end
 			end
 		end
-	end
+	end)
 end)
 
 return modPlayers;

@@ -28,7 +28,7 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnInputEvent(toolHandler, inputData)
+function toolPackage.InputEvent(toolHandler, inputData)
 	local maxLadderRange = 24;
 	if inputData.InputType ~= "Begin" then return end;
 

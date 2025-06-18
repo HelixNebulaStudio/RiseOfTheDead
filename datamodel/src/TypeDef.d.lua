@@ -239,6 +239,7 @@ export type Profile = {
     Sync: (self: Profile, hierarchyKey: string?, paramPacket: anydict?) -> nil;
 
     GetCacheStorages: (self: Profile) -> {[string]: Storage};
+    AddPlayPoints: (self: Profile, points: number?, reason: string?) -> nil;
 
     -- @binds
     _new: (self: Profile, player: Player) -> nil;
@@ -261,6 +262,7 @@ export type GameSave = {
     Storages: {[string]: Storage};
 
     -- @methods
+    GetActiveSave: (self: GameSave) -> GameSave;
     Sync: (self: GameSave, hierarchyKey: string?) -> nil;
     GetStat: (self: GameSave, k: string) -> any;
     AddStat: (self: GameSave, k: string, v: number, force: boolean?) -> number;
@@ -340,6 +342,7 @@ export type Storage = {
 export type StorageItem = {
     -- @properties
     ID: string;
+    Index: number;
     ItemId: string;
     Player: Player;
     Storage: Storage;
@@ -360,6 +363,8 @@ export type StorageItem = {
 export type PlayerClasses = {
     -- @static
     get: (Player) -> PlayerClass;
+    getByName: (name: string) ->  PlayerClass;
+    getAvatar: (userId: number) -> string;
     
     -- @signals
     OnPlayerDied: EventSignal<PlayerClass>;
@@ -691,8 +696,28 @@ export type Scheduler = {
     OnStepped: EventSignal<TickData>;
 };
 
+--MARK: DropdownList
+export type DropdownList = {
+    SetZIndex: (DropdownList, number) -> nil;
+    SetPosition: (DropdownList, Vector2) -> nil;
+    OnOptionClick: (DropdownList, anyfunc) -> nil;
+    Destroy: (DropdownList) -> nil;
+};
+
 --MARK: Interface
 export type Interface = {
+    -- @static;
+    setPositionWithPadding: (guiObject: GuiObject, position: UDim2?, padding: Vector2?) -> nil;
+    newTemplate: (name: string) -> any;
+    newDropdownList: (options: {
+        Text: string?; 
+        LayoutOrder: number?; 
+        Size: UDim2?; 
+        TextColor3: Color3?; 
+        BackgroundColor3: Color3?;
+        OnNewButton: anyfunc?;
+    }, newButtonTemplate: GuiObject?) -> DropdownList;
+
     -- @properties;
     Script: Script;
     ScreenGui: ScreenGui;
@@ -719,6 +744,7 @@ export type Interface = {
     MouseLockHint: Frame;
     AimPointer: ImageLabel;
     VersionLabel: TextLabel;
+    ColorPicker: any;
     
     StorageInterfaces: {StorageInterface};
     StorageInterfaceIndex: number;
@@ -732,7 +758,8 @@ export type Interface = {
     NewWindow: (self: Interface, name: string, frame: GuiObject, properties: anydict?) -> InterfaceWindow;
     ToggleWindow: (self: Interface, name: string, visible: boolean?, ...any) -> InterfaceWindow;
     ListWindows: (self: Interface, conditionFunc: anyfunc) -> {InterfaceWindow};
-
+    Freeze: (self: Interface, value: boolean) -> nil;
+    
     BindConfigKey: (self: Interface, key: string, windows: {InterfaceWindow}?, frames: {Instance}?, conditions: ((...any) -> boolean)?) -> nil;
     BindEvent: (self: Interface, key: string, func: (...any)->nil) -> (()->nil);
     FireEvent: (self: Interface, key: string, ...any) -> nil;
@@ -748,6 +775,7 @@ export type Interface = {
     PlayButtonClick: (self: Interface) -> nil;
 
     -- @signals
+    OnReady: EventSignal<>;
     OnInterfaceEvent: EventSignal<string>;
     OnWindowToggle: EventSignal<InterfaceWindow, boolean>;
 };
@@ -785,6 +813,7 @@ export type InterfaceWindow = {
 
     -- @methods
     Init: (self: InterfaceWindow) -> nil;
+    Toggle: (self: InterfaceWindow, visible: boolean?, ...any) -> nil;
     Open: (self: InterfaceWindow, ...any) -> nil;
     Close: (self: InterfaceWindow, ...any) -> nil;
     Update: (self: InterfaceWindow, ...any) -> nil;
@@ -824,7 +853,7 @@ export type ToolHandler = {
     LoadWieldConfig: (self: ToolHandler) -> nil;
 
     Init: (toolHandler: ToolHandlerInstance) -> nil;
-    Setup: (toolHandler: ToolHandlerInstance) -> nil;
+    Equip: (toolHandler: ToolHandlerInstance) -> nil;
 
     ClientEquip: (toolHandler: ToolHandlerInstance) -> nil;
     ClientUnequip: (toolHandler: ToolHandlerInstance) -> nil;
@@ -969,6 +998,8 @@ export type EquipmentClass = {
     BaseModifiers: {[string]: anydict};
     EquipmentModifier: ConfigModifier;
 
+    ClassSelf: any;
+
     -- @methods
     SetEnabled: (self: EquipmentClass, value: boolean) -> nil;
     Update: (self: EquipmentClass, storageItem: StorageItem?) -> nil;
@@ -1077,6 +1108,51 @@ export type Mission = {
     -- @signals
     OnChanged: EventSignal<any>;
 }
+
+--MARK: TeamsManager
+export type TeamsManager = {
+    -- @properties
+    Teams: {[string]: TeamClass};
+    Teammates: {[string]: TeamMate};
+
+    -- @methods
+    getTeam: (guid: string) -> TeamClass?;
+    getTeamByName: (name: string) -> TeamClass?;
+    getTeamByPlayer: (player: Player, teamType: string) -> TeamClass?;
+};
+
+--MARK: TeamMate
+export type TeamMate = {
+    -- @properties
+    Teams: {[string]: TeamClass};
+};
+
+--MARK: TeamClass
+export type TeamClass = {
+    -- @properties
+    Guid: string;
+    Name: string;
+    Type: string;
+
+    MembersCount: number;
+    Members: {[string]: {
+        Index: number;
+        Name: string;
+        UserId: number;
+        InServer: boolean;
+        Values: anydict;
+    }};
+
+    Values: anydict;
+
+    Private: boolean;
+    DestroyOnZeroMembers: boolean;
+
+    --@methods
+    SetMember: (self: TeamClass, name: string, isSet: boolean, proxyTeammate: anydict?) -> nil;
+    ClientLoad: (self: TeamClass, data: anydict) -> nil;
+    GetTeamAsync: (self: TeamClass) -> nil;
+};
 
 --MARK: -- Data Models
 -- Data packs that stores values to be passed into functions.

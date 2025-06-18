@@ -90,7 +90,7 @@ function toolPackage.ClientPrimaryFire(handler)
 	return shotData;
 end
 
-function toolPackage.OnActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler, packet)
 	local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent)

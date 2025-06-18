@@ -25,8 +25,14 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnSpawn(handler, prefab: Model)
-	local player = handler.Player;
+function toolPackage.BuildStructure(prefab: Model, optionalPacket)
+	optionalPacket = optionalPacket or {};
+
+	local player;
+	if optionalPacket.CharacterClass and optionalPacket.CharacterClass.ClassName == "PlayerClass" then
+		player = optionalPacket.CharacterClass:GetInstance();
+	end;
+	if player == nil then return end;
 
 	modAudio.Play("Repair", prefab.PrimaryPart);
 	local humanoid = prefab:WaitForChild("Structure");

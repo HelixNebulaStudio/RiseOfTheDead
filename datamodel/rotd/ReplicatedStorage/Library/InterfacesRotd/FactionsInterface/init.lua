@@ -1,34 +1,12 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Configuration;
-local factionResourceKeys = {
-	{Key="Food"; Value=0; Icon="rbxassetid://4466508636";};
-	{Key="Ammo"; Value=0; Icon="rbxassetid://10577724784";};
-	{Key="Material"; Value=0; Icon="rbxassetid://1551792125";};
-	{Key="Power"; Value=0; Icon="rbxassetid://3592076927";};
-	{Key="Comfort"; Value=0; Icon="rbxassetid://6734447412";};
-}
-
-local radialConfig = '{"version":1,"size":128,"count":128,"columns":8,"rows":8,"images":["rbxassetid://10577973797","rbxassetid://10577974058"]}';
-local timerRadialConfig = '{"version":1,"size":128,"count":128,"columns":8,"rows":8,"images":["rbxassetid://10606346824","rbxassetid://10606347195"]}';
-local oneDaySecs = 86400;
-
-local oneSecTweenInfo = TweenInfo.new(1);
-
-local BarColors = {
-	Green=Color3.fromRGB(27, 106, 23);
-	Yellow=Color3.fromRGB(163, 143, 27);
-	Red=Color3.fromRGB(118, 54, 54);
-}
---== Variables;
-local Interface = {};
-
+--==
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 local TextService = game:GetService("TextService");
 local UserInputService = game:GetService("UserInputService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
@@ -37,9 +15,8 @@ local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBind
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.LeaderboardService);
 local modMissionLibrary = shared.require(game.ReplicatedStorage.Library.MissionLibrary);
-local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
-local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
+local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
@@ -49,34 +26,71 @@ local modLeaderboardInterface = shared.require(game.ReplicatedStorage.Library.UI
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
 local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
 local modGuiObjectPlus = shared.require(game.ReplicatedStorage.Library.UI.GuiObjectPlus);
+local modDropdownList = shared.require(game.ReplicatedStorage.Library.UI.DropdownList);
 
-local remotes = game.ReplicatedStorage.Remotes;
-local remoteFactionService = modRemotesManager:Get("FactionService");
-local remoteChatServiceEvent = modRemotesManager:Get("ChatServiceEvent");
-local remoteLeaderboardService = modRemotesManager:Get("LeaderboardService");
 
-local windowFrameTemplate = script:WaitForChild("FactionsMenu");
+local RESOURCE_KEYS = {
+	{Key="Food"; Value=0; Icon="rbxassetid://4466508636";};
+	{Key="Ammo"; Value=0; Icon="rbxassetid://10577724784";};
+	{Key="Material"; Value=0; Icon="rbxassetid://1551792125";};
+	{Key="Power"; Value=0; Icon="rbxassetid://3592076927";};
+	{Key="Comfort"; Value=0; Icon="rbxassetid://6734447412";};
+}
 
---== Script;
-function Interface.init(modInterface)
-	setmetatable(Interface, modInterface);
+local RESOURCE_RADIAL_CONFIG = '{"version":1,"size":128,"count":128,"columns":8,"rows":8,"images":["rbxassetid://10577973797","rbxassetid://10577974058"]}';
+local TIMER_RADIAL_CONFIG = '{"version":1,"size":128,"count":128,"columns":8,"rows":8,"images":["rbxassetid://10606346824","rbxassetid://10606347195"]}';
 
-	local colorPickerObj = Interface.ColorPicker;
+local ONE_SEC_TWEENINFO = TweenInfo.new(1);
+
+local BAR_COLORS = {
+	Green=Color3.fromRGB(27, 106, 23);
+	Yellow=Color3.fromRGB(163, 143, 27);
+	Red=Color3.fromRGB(118, 54, 54);
+}
+
+
+local interfacePackage = {
+    Type = "Player";
+};
+--==
+
+
+function interfacePackage.newInstance(interface: InterfaceInstance)
+    local chatRoomInterface = shared.require(localPlayer.PlayerGui:WaitForChild("ChatInterface"):WaitForChild("ChatRoomInterface"));
+
+    local remoteFactionService = modRemotesManager:Get("FactionService");
+    local remoteChatServiceEvent = modRemotesManager:Get("ChatServiceEvent");
+    local remoteLeaderboardService = modRemotesManager:Get("LeaderboardService");
+
+    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
+
+	local branchColor = modBranchConfigs.BranchColor
+	local colorPickerObj = interface.ColorPicker;
 	
-	local windowFrame = windowFrameTemplate:Clone();
-	windowFrame.Parent = modInterface.MainInterface;
+	local windowFrame = script:WaitForChild("FactionsMenu"):Clone();
+	windowFrame.Parent = interface.ScreenGui;
 
-	local window = Interface.NewWindow("FactionsMenu", windowFrame);
+	local window: InterfaceWindow = interface:NewWindow("FactionsMenu", windowFrame);
 	window.CompactFullscreen = true;
-	window:SetConfigKey("DisableFactionsMenu");
+    interface:BindConfigKey("DisableFactionsMenu", {window});
 	
 	if modConfigurations.CompactInterface then
-		window:SetOpenClosePosition(UDim2.new(0.5, 0, 0, 0), UDim2.new(0.5, 0, -1, 0));
+		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0, 0));
 	else
-		window:SetOpenClosePosition(UDim2.new(0.5, 0, 0.1, 0), UDim2.new(0.5, 0, -1, 0));
+		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.1, 0));
 	end
 	
-	local frame = windowFrame:WaitForChild("MainFrame");
+	modKeyBindsHandler:SetDefaultKey("KeyWindowFactionsMenu", Enum.KeyCode.O);
+	local quickButton = interface:NewQuickButton("FactionsMenu", "Factions", "rbxassetid://9890634236");
+	quickButton.LayoutOrder = 4;
+	interface:ConnectQuickButton(quickButton, "KeyWindowFactionsMenu");
+
+    local binds = window.Binds;
+	binds.ActivePage = "";
+	binds.MembersData = {};
+
+
+    local frame = windowFrame:WaitForChild("MainFrame");
 	local windowTitleLabel = windowFrame:WaitForChild("Title");
 
 	local bannerFrame = frame:WaitForChild("Banner");
@@ -140,12 +154,8 @@ function Interface.init(modInterface)
 
 	local auditLogs = shared.require(script:WaitForChild("AuditLogFormats"));
 
-	local branchColor = modBranchConfigs.BranchColor
 	local factionPermissions = modGlobalVars.FactionPermissions;
 
-	Interface.ActivePage = "";
-	Interface.MembersData = {};
-	
 	local missionMenuPage = "";
 	local updateMissionPage;
 	local centerFrameState;
@@ -156,7 +166,7 @@ function Interface.init(modInterface)
 	local firstsynced = false;
 	local requestedFactionChat = false;
 	
-	local newLeaderboard, factionChatRoom, onNewMessage = nil, nil, nil;
+	local newLeaderboard, factionChatRoom = nil, nil;
 	local setRoleDropdownList;
 	local selectedUser = nil;
 
@@ -171,9 +181,8 @@ function Interface.init(modInterface)
 		windowFrame.Size = UDim2.new(1, 0, 1, 0);
 		windowFrame:WaitForChild("UICorner"):Destroy();
 
-		windowFrame:WaitForChild("touchCloseButton").Visible = true;
-		windowFrame:WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
-			Interface:CloseWindow("FactionsMenu");
+		windowFrame:WaitForChild("closeButton").MouseButton1Click:Connect(function()
+            window:Close();
 		end)
 		
 		bannerFrame.Size = UDim2.new(0.26, 0, 1, 0);
@@ -290,7 +299,7 @@ function Interface.init(modInterface)
 				end
 			end
 
-			Interface.Update();
+			window:Update();
 			if onComplete then
 				onComplete(factionObj);
 			end
@@ -311,9 +320,10 @@ function Interface.init(modInterface)
 		end
 	end
 	
-	window.OnWindowToggle:Connect(function(visible)
+    --MARK: OnToggle
+	window.OnToggle:Connect(function(visible)
 		if visible then
-			Interface.ActivePage = "MenuFrame";
+			binds.ActivePage = "MenuFrame";
 			missionMenuPage = "";
 			clearMissionPage();
 			shrinkMissionFrame();
@@ -325,7 +335,7 @@ function Interface.init(modInterface)
 			end
 			
 			if not mission58Complete then
-				Interface.ActivePage = "MissionRequirementFrame";
+				binds.ActivePage = "MissionRequirementFrame";
 				
 			else
 				task.spawn(function()
@@ -358,15 +368,16 @@ function Interface.init(modInterface)
 				newLeaderboard.Frame.Parent = centerFrame;
 			end
 
-			Interface:HideAll{[window.Name]=true;};
-			Interface.Update();
+			interface:HideAll{[window.Name]=true;};
+			window:Update();
+
 			sync();
 			setSelectedUser(localPlayer.UserId);
 
 		else
 
-			Interface.refreshPublicMissions = nil;
-			Interface.refreshActiveMissionInfo = nil;
+			binds.refreshPublicMissions = nil;
+			binds.refreshActiveMissionInfo = nil;
 
 			clearDropdownList();
 			if factionChatRoom then
@@ -375,15 +386,11 @@ function Interface.init(modInterface)
 			end
 
 
-			local serverChatRoom = modData.modChatRoomInterface:GetRoom("Server");
+			local serverChatRoom = chatRoomInterface:GetRoom("Server");
 			serverChatRoom:SetActive();
 		end
 	end)
 	
-	modKeyBindsHandler:SetDefaultKey("KeyWindowFactionsMenu", Enum.KeyCode.O);
-	local quickButton = Interface:NewQuickButton("FactionsMenu", "Factions", "rbxassetid://9890634236");
-	quickButton.LayoutOrder = 4;
-	modInterface:ConnectQuickButton(quickButton, "KeyWindowFactionsMenu");
 	
 	local function loadMissionDesc(descLabel, missionLib)
 		local factionData = modData.FactionData or {};
@@ -437,7 +444,7 @@ function Interface.init(modInterface)
 	end
 	
 	updateMissionPage = function()
-		local unixTime = modSyncTime.GetTime();
+		local unixTime = workspace:GetServerTimeNow();
 
 		local factionData = modData.FactionData;
 		if factionData == nil then return end;
@@ -457,7 +464,6 @@ function Interface.init(modInterface)
 				local titleLabel = new:WaitForChild("Title");
 				titleLabel.Text = missionLib.Name;
 				
-				local tabStr = "    ";
 				local descLabel = new:WaitForChild("Desc");
 				loadMissionDesc(descLabel, missionLib);
 
@@ -479,7 +485,7 @@ function Interface.init(modInterface)
 								missionInfo = missionData.Active[missionIndex];
 
 								if missionInfo == nil then
-									Interface.refreshActiveMissionInfo = nil;
+									binds.refreshActiveMissionInfo = nil;
 									return;
 								end
 
@@ -547,7 +553,7 @@ function Interface.init(modInterface)
 
 					local claimButton = completePanel:WaitForChild("claimButton");
 					claimButton.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
+						interface:PlayButtonClick();
 						claimButton.Text = "Closing Mission..";
 
 						local packet = {
@@ -575,9 +581,9 @@ function Interface.init(modInterface)
 							successCount = successCount +1;
 						end
 
-						local listingFrameTemplate = Interface.MembersData[userId] and Interface.MembersData[userId].ListingFrame;
+						local listingFrameTemplate = binds.MembersData[userId] and binds.MembersData[userId].ListingFrame;
 						if listingFrameTemplate == nil then continue end;
-						playerMissionData.Name = Interface.MembersData[userId] and Interface.MembersData[userId].Name;
+						playerMissionData.Name = binds.MembersData[userId] and binds.MembersData[userId].Name;
 
 						refreshPlayerListing(playersPanel, userId, listingFrameTemplate);
 					end
@@ -669,10 +675,10 @@ function Interface.init(modInterface)
 					local accessLabel = activePanel:WaitForChild("AccessLabel");
 
 					joinMissionButton.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
+						interface:PlayButtonClick();
 						joinMissionButton.Text = "Joining..";
 
-						unixTime = modSyncTime.GetTime()
+						unixTime = workspace:GetServerTimeNow();
 						missionData = factionData.Missions;
 						
 						missionInfo = missionData.Active[missionIndex];
@@ -691,16 +697,16 @@ function Interface.init(modInterface)
 					end)
 
 
-					Interface.refreshActiveMissionInfo = function()
+					binds.refreshActiveMissionInfo = function()
 						local factionData = modData.FactionData;
 						if factionData == nil then return end;
 
-						unixTime = modSyncTime.GetTime()
+						unixTime = workspace:GetServerTimeNow();
 						missionData = factionData.Missions;
 						missionInfo = missionData.Active[missionIndex];
 
 						if missionInfo == nil then
-							Interface.refreshActiveMissionInfo = nil;
+							binds.refreshActiveMissionInfo = nil;
 							return;
 						end
 
@@ -714,7 +720,7 @@ function Interface.init(modInterface)
 								joinMissionButton.Visible = true;
 							end
 
-							local listingFrameTemplate = Interface.MembersData[userId] and Interface.MembersData[userId].ListingFrame;
+							local listingFrameTemplate = binds.MembersData[userId] and binds.MembersData[userId].ListingFrame;
 							if listingFrameTemplate == nil then continue end;
 
 							refreshPlayerListing(playersPanel, userId, listingFrameTemplate);
@@ -731,7 +737,7 @@ function Interface.init(modInterface)
 						
 						accessLabel.Text = "Access: [".. missionInfo.AccessType .."] "..table.concat(missionInfo.AccessValue, ", ")
 					end
-					Interface.refreshActiveMissionInfo();
+					binds.refreshActiveMissionInfo();
 
 				end
 
@@ -781,20 +787,19 @@ function Interface.init(modInterface)
 				local titleLabel = new:WaitForChild("Title");
 				titleLabel.Text = missionLib.Name
 
-				local unixTime =  modSyncTime.GetTime()
 				local timeRemaining = shared.Const.OneDaySecs-(unixTime-availableData.RollTime);
 				
 				local radialBarLabel = new:WaitForChild("radialBar");
-				local radialBar = modRadialImage.new(timerRadialConfig, radialBarLabel);
+				local radialBar = modRadialImage.new(TIMER_RADIAL_CONFIG, radialBarLabel);
 				local timeLeftRatio = timeRemaining/shared.Const.OneDaySecs;
 				
 				radialBar:UpdateLabel(timeLeftRatio);
 				if timeRemaining <= 3600 then
-					radialBarLabel.ImageColor3 = BarColors.Yellow;
+					radialBarLabel.ImageColor3 = BAR_COLORS.Yellow;
 				elseif timeRemaining <= 600 then
-					radialBarLabel.ImageColor3 = BarColors.Red;
+					radialBarLabel.ImageColor3 = BAR_COLORS.Red;
 				else
-					radialBarLabel.ImageColor3 = BarColors.Green;
+					radialBarLabel.ImageColor3 = BAR_COLORS.Green;
 				end
 				
 				local viewButton = new:WaitForChild("viewAvailButton");
@@ -807,7 +812,7 @@ function Interface.init(modInterface)
 				viewButton.MouseButton1Click:Connect(function()
 					if factionCosts == nil then return end;
 
-					Interface:PlayButtonClick();
+					interface:PlayButtonClick();
 					missionMenuPage = "ViewAvailableMission";
 
 					local selectionListFrame;
@@ -829,7 +834,7 @@ function Interface.init(modInterface)
 
 						local timeLeftLabel = availPanel:WaitForChild("TimeLeftLabel");
 						local function tickUpdateLabel()
-							unixTime = modSyncTime.GetTime();
+							unixTime = workspace:GetServerTimeNow();
 							timeRemaining = shared.Const.OneDaySecs-(unixTime-availableData.RollTime);
 							timeLeftLabel.Text = "Available For: ".. modSyncTime.ToString(timeRemaining);
 						end
@@ -845,7 +850,7 @@ function Interface.init(modInterface)
 
 						local accessButton = availPanel:WaitForChild("accessButton");
 						accessButton.MouseButton1Click:Connect(function()
-							Interface:PlayButtonClick();
+							interface:PlayButtonClick();
 
 							if selectionListFrame == nil then
 								selectionListFrame = templateMembersSelectionList:Clone();
@@ -862,7 +867,7 @@ function Interface.init(modInterface)
 								selectionListFrame.Visible = true;
 
 								for roleKey, roleConfig in pairs(factionData.Roles) do
-									local newCheckbox = Interface.Templates.Checkbox:Clone();
+									local newCheckbox = interface.newTemplate("Checkbox");
 									newCheckbox.LayoutOrder = roleConfig.Rank;
 
 									local roleColor = Color3.fromHex(roleConfig.Color) or Color3.fromRGB(255, 255, 255);
@@ -882,7 +887,7 @@ function Interface.init(modInterface)
 								selectionListFrame.Visible = true;
 
 								for userId, memberData in pairs(factionData.Members) do
-									local newCheckbox = Interface.Templates.Checkbox:Clone();
+									local newCheckbox = interface.newTemplate("Checkbox");
 
 									newCheckbox.Name = "CheckboxOption";
 									newCheckbox:SetAttribute("CheckedId", memberData.Name);
@@ -923,7 +928,7 @@ function Interface.init(modInterface)
 						startButton.MouseButton1Click:Connect(function()
 							if startDebounce then return end;
 							startDebounce = true;
-							Interface:PlayButtonClick();
+							interface:PlayButtonClick();
 
 							local checkedOptions = {};
 
@@ -980,7 +985,7 @@ function Interface.init(modInterface)
 	local membersFrameExpandTween = TweenService:Create(memberSizeConstraint, TweenInfo.new(0.2), {MaxSize=Vector2.new(200, math.huge)});
 	local membersFrameShrinkTween = TweenService:Create(memberSizeConstraint, TweenInfo.new(0.2), {MaxSize=Vector2.new(60, math.huge)});
 	local mouseOnMemberFrame = false;
-	function Interface.MemberFrameLayout()
+	function binds.MemberFrameLayout()
 		local factionData = modData.FactionData;
 
 		if factionData then
@@ -1007,7 +1012,7 @@ function Interface.init(modInterface)
 		end
 	end
 	
-	function Interface.HasPermission(key)
+	function binds.HasPermission(key)
 		local factionData = modData.FactionData;
 		if factionData == nil then return false; end;
 		local memberData = factionData.Members[tostring(localPlayer.UserId)];
@@ -1031,7 +1036,7 @@ function Interface.init(modInterface)
 		return r;
 	end
 
-	function Interface.UpdateProfileFrame()
+	function binds.UpdateProfileFrame()
 		if selectedUser == nil then setSelectedUser(localPlayer.UserId); end
 		if selectedUser == nil then return end;
 
@@ -1055,7 +1060,7 @@ function Interface.init(modInterface)
 
 		-- Buttons
 		local setRoleButton = profileFrame.roleLabel.setRoleButton
-		setRoleButton.Visible = Interface.HasPermission("AssignRole");
+		setRoleButton.Visible = binds.HasPermission("AssignRole");
 		if isLocalPlayer or selectedUser.UserId == factionData.Owner then
 			setRoleButton.Visible = false;
 		end
@@ -1092,7 +1097,7 @@ function Interface.init(modInterface)
 		statsLabel.Text = statsStr;
 	end
 
-	function Interface.RefreshMemberSettingsFrame()
+	function binds.RefreshMemberSettingsFrame()
 		local memberSettingsFrame = settingsBodyFrame.MemberSettingsFrame;
 		if not memberSettingsFrame.Visible then return end;
 		local factionData = modData.FactionData;
@@ -1120,25 +1125,25 @@ function Interface.init(modInterface)
 
 			local kickButton = new:WaitForChild("kickButton");
 			kickButton.MouseButton1Click:Connect(function()
-				if not Interface.HasPermission("KickUser") then return end;
-				Interface:PlayButtonClick();
+				if not binds.HasPermission("KickUser") then return end;
+				interface:PlayButtonClick();
 
 				game.Debris:AddItem(new, 0);
 				local rPacket = remoteFactionService:InvokeServer("kickuser", userId);
 				if rPacket and rPacket.Success then
 					if rPacket.FactionObj then
-						sync(rPacket.FactionObj, Interface.RefreshMemberSettingsFrame);
+						sync(rPacket.FactionObj, binds.RefreshMemberSettingsFrame);
 					end
 				end
 			end)
 
 			local userButton = new:WaitForChild("userButton");
 			userButton.MouseButton1Click:Connect(function()
-				Interface:PlayButtonClick();
+				interface:PlayButtonClick();
 				setSelectedUser(userId);
 
-				Interface.ActivePage = "ProfileFrame";
-				Interface.Update();
+				binds.ActivePage = "ProfileFrame";
+				window:Update();
 			end)
 
 			local userRoleConfig = rolesConfig[memberData.Role];
@@ -1158,10 +1163,9 @@ function Interface.init(modInterface)
 			end
 		end
 
-		local liveOsTime = modSyncTime.GetTime();
 		local countJoinRequests = 0;
 		for userId, userData in pairs(factionData.JoinRequests) do
-			local lastTime = userData.LastSent or 0;
+			local _lastTime = userData.LastSent or 0;
 			local userName = userData.Name or "n/a";
 			
 			countJoinRequests = countJoinRequests +1;
@@ -1169,26 +1173,26 @@ function Interface.init(modInterface)
 			new:WaitForChild("JoinRequestTitle").Text = tostring(userName);
 
 			new:WaitForChild("joinAcceptButton").MouseButton1Click:Connect(function()
-				if not Interface.HasPermission("HandleJoinRequests") then return end;
-				Interface:PlayButtonClick();
+				if not binds.HasPermission("HandleJoinRequests") then return end;
+				interface:PlayButtonClick();
 				game.Debris:AddItem(new, 0);
 
 				local rPacket = remoteFactionService:InvokeServer("handlejoinrequest", userId, true);
 				if rPacket and rPacket.Success then
 					if rPacket.FactionObj then
-						sync(rPacket.FactionObj, Interface.RefreshMemberSettingsFrame);
+						sync(rPacket.FactionObj, binds.RefreshMemberSettingsFrame);
 					end
 				end
 			end)
 			new:WaitForChild("joinIgnoreButton").MouseButton1Click:Connect(function()
-				if not Interface.HasPermission("HandleJoinRequests") then return end;
-				Interface:PlayButtonClick();
+				if not binds.HasPermission("HandleJoinRequests") then return end;
+				interface:PlayButtonClick();
 				game.Debris:AddItem(new, 0);
 
 				local rPacket = remoteFactionService:InvokeServer("handlejoinrequest", userId, false);
 				if rPacket and rPacket.Success then
 					if rPacket.FactionObj then
-						sync(rPacket.FactionObj, Interface.RefreshMemberSettingsFrame);
+						sync(rPacket.FactionObj, binds.RefreshMemberSettingsFrame);
 					end
 				end
 			end)
@@ -1200,7 +1204,7 @@ function Interface.init(modInterface)
 	end
 	
 	local tagInputTick = tick();
-	Interface.Garbage:Tag(noFactionInput:GetPropertyChangedSignal("Text"):Connect(function()
+	interface.Garbage:Tag(noFactionInput:GetPropertyChangedSignal("Text"):Connect(function()
 		tagInputTick = tick();
 
 		noFactionInput.Text = string.lower(string.sub(noFactionInput.Text, 1, 10));
@@ -1244,13 +1248,13 @@ function Interface.init(modInterface)
 					end
 
 					joinButton.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
+						interface:PlayButtonClick();
 						joinButton.buttonText.Text = "Requesting...";
 						local rPacket = remoteFactionService:InvokeServer("sendjoinrequest", v.Tag);
 						joinButton.buttonText.Text = "Request Sent";
 
 						if rPacket and rPacket.Success and rPacket.FactionObj then
-							sync(rPacket.FactionObj, Interface.RefreshMemberSettingsFrame);
+							sync(rPacket.FactionObj, binds.RefreshMemberSettingsFrame);
 						end
 						
 						if rPacket and rPacket.FailMsg then
@@ -1264,114 +1268,107 @@ function Interface.init(modInterface)
 		end)
 	end));
 
-	local promptWindow;
-	local function failCreate(r)
+    
+	local function getFailResponse(r)
 		if r == nil then
-			modClientGuis.promptWarning("Something went wrong, please try again.");
-			return;
+			return "Something went wrong, please try again.";
 		end
 
 		if r.Filtered then
 			noFactionInput.Text = r.Tag;
-			modClientGuis.promptWarning("Sorry, faction tag got filter.");
+			return "Sorry, faction tag got filter.";
 
 		elseif r.TooShort then
-			modClientGuis.promptWarning("Sorry, faction tag too short. Tags should be more than 3 and less than 10 characters.");
+			return  "Sorry, faction tag too short. Tags should be more than 3 and less than 10 characters.";
 
 		elseif r.TooLong then
-			modClientGuis.promptWarning("Sorry, faction tag too long. Tags should be more than 3 and less than 10 characters.");
+			return "Sorry, faction tag too long. Tags should be more than 3 and less than 10 characters.";
 
 		elseif r.Taken then
-			modClientGuis.promptWarning("Sorry, this faction tag has been taken.");
+			return "Sorry, this faction tag has been taken.";
 
 		elseif r.AlreadyInFaction then
-			modClientGuis.promptWarning("You are already in a faction.");
+			return "You are already in a faction.";
 
 		elseif r.NotInFaction then
-			modClientGuis.promptWarning("You are not in a faction.");
+			return "You are not in a faction.";
 
 		elseif r.NoPermissions then
-			modClientGuis.promptWarning("You do not have permissions to do that.");
+			return "You do not have permissions to do that.";
 
 		elseif r.TooManyRoles then
-			modClientGuis.promptWarning("Too many roles.");
+			return "Too many roles.";
 
 		elseif r.Mission58 then
-			modClientGuis.promptWarning("Requires mission \"Double Cross\".");
+			return "Requires mission \"Double Cross\".";
 
 		elseif r.InsufficientGold then
-			modClientGuis.promptWarning("Requires 5'000 Gold.");
+			return "Requires 5'000 Gold.";
 
-		else
-			modClientGuis.promptWarning("Something went wrong, please try again.");
-			Debugger:StudioLog("Error", r);
 		end
 
-		if promptWindow then
-			promptWindow:Close();
-		end
-		Interface:OpenWindow("FactionsMenu");
+        Debugger:StudioLog("Error", r);
+        return "Something went wrong, please try again.";
 	end
 
-	local createFactionDebounce = tick();
-	Interface.Garbage:Tag(createFactionButton.MouseButton1Click:Connect(function()
-		if promptWindow then return end;
-		Interface:PlayButtonClick();
+	interface.Garbage:Tag(createFactionButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
+
 		createFactionButton.buttonText.Text = "Create a Faction..";
 		local testCreateReturn = remoteFactionService:InvokeServer("create", string.sub(noFactionInput.Text, 1, 10), true);
 		createFactionButton.buttonText.Text = "Create a Faction";
 
-		if testCreateReturn and testCreateReturn.Success then
-			promptWindow = modClientGuis.promptQuestion("Create Faction?",
-				"Creating faction with tag <b>["..testCreateReturn.Tag.."]</b> for <b><font color='rgb(170, 120, 0)'>5'000 Gold</font></b>?", 
-				"Create", "Cancel", "rbxassetid://9890634236");
-			local YesClickedSignal, NoClickedSignal;
-
-			YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-				if tick()-createFactionDebounce <= 0.2 then return end;
-				createFactionDebounce = tick();
-
-				Interface:PlayButtonClick();
-				promptWindow.Frame.Yes.buttonText.Text = "Creating...";
-
-				local createReturn = remoteFactionService:InvokeServer("create", string.sub(noFactionInput.Text, 1, 10));
-				if createReturn.Success then
-					promptWindow.Frame.Yes.buttonText.Text = "Created!";
-					sync(createReturn.FactionObj, function(factionObj)
-						Interface:OpenWindow("FactionsMenu");
-					end);
-				else
-					failCreate(createReturn);
-				end
-				promptWindow:Close();
-				promptWindow = nil;
-
-				YesClickedSignal:Disconnect();
-				NoClickedSignal:Disconnect();
-			end);
-			NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-				Interface:PlayButtonClick();
-				promptWindow:Close();
-				promptWindow = nil;
-
-				YesClickedSignal:Disconnect();
-				NoClickedSignal:Disconnect();
-			end);
-		else
-			failCreate(testCreateReturn);
+		if testCreateReturn == nil or testCreateReturn.Success ~= true then
+			modClientGuis.promptWarning( getFailResponse(testCreateReturn) );
+            return;
 		end
+        
+        modClientGuis.promptDialogBox({
+            Title = `Create Faction?`;
+            Desc = `Creating faction with tag <b>{testCreateReturn.Tag}</b> for <b><font color='rgb(170, 120, 0)'>5'000 Gold</font></b>?`;
+            Icon = `rbxassetid://9890634236`;
+            Buttons={
+                {
+                    Text="Create";
+                    Style="Confirm";
+                    OnPrimaryClick=function(dialogWindow)
+                        local statusLabel = dialogWindow.Binds.StatusLabel;
+                        statusLabel.Text = "Creating Faction<...>";
+
+                        local createReturn = remoteFactionService:InvokeServer(
+                            "create", 
+                            string.sub(noFactionInput.Text, 1, 10)
+                        );
+                        if createReturn.Success then
+                            statusLabel.Text = "Faction Created!";
+                            sync(createReturn.FactionObj, function(factionObj)
+                                window:Update();
+                            end);
+                        else
+                            statusLabel.Text = getFailResponse(createReturn);
+                        end
+
+                        task.wait(2);
+                    end;
+                };
+                {
+                    Text="Cancel";
+                    Style="Cancel";
+                };
+            }
+        });
 	end))
 
 	--== Profile frame
 	profileNavBar.leaveButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
+		interface:PlayButtonClick();
 		if selectedUser.UserId ~= tostring(localPlayer.UserId)  then
 			Debugger:StudioLog("setRoleButton failed, not self")
 			return
 		end
 
 		modData.FactionData = nil;
-		Interface.Update();
+		window:Update();
 
 		local rPacket = remoteFactionService:InvokeServer("leavefaction");
 		if rPacket and rPacket.Success then
@@ -1382,7 +1379,7 @@ function Interface.init(modInterface)
 
 	local setRoleButton = profileFrame.roleLabel.setRoleButton;
 	local function updateSetRole()
-		if not Interface.HasPermission("AssignRole") then return end;
+		if not binds.HasPermission("AssignRole") then return end;
 		
 		local isMouseHover = modGuiObjectPlus.IsMouseOver(setRoleButton);
 
@@ -1393,8 +1390,8 @@ function Interface.init(modInterface)
 	setRoleButton.MouseLeave:Connect(updateSetRole);
 	
 	setRoleButton.MouseButton1Click:Connect(function()
-		if not Interface.HasPermission("AssignRole") then return end;
-		Interface:PlayButtonClick();
+		if not binds.HasPermission("AssignRole") then return end;
+		interface:PlayButtonClick();
 
 		local factionData = modData.FactionData;
 		if factionData == nil then return end;
@@ -1433,11 +1430,11 @@ function Interface.init(modInterface)
 			rolesList[a].Size = UDim2.new(0, maxLengthSize+20, 0, 25);
 		end
 
-		setRoleDropdownList = Interface:NewDropdownList(rolesList)
+		setRoleDropdownList = interface.newDropdownList(rolesList);
 		setRoleDropdownList.ScrollFrame.Parent = windowFrame;
 		setRoleDropdownList:SetPosition(setRoleButton.AbsolutePosition);
 		setRoleDropdownList:OnOptionClick(function(roleKey)
-			Interface:PlayButtonClick();
+			interface:PlayButtonClick();
 			if roleKey ~= "__close" then
 				task.spawn(function()
 					task.spawn(function()
@@ -1445,7 +1442,7 @@ function Interface.init(modInterface)
 						if targetData then
 							targetData.Role = roleKey;
 						end
-						Interface.Update();
+						window:Update();
 
 					end)
 					local rPacket = remoteFactionService:InvokeServer("setrole", selectedUser.UserId, roleKey);
@@ -1476,27 +1473,27 @@ function Interface.init(modInterface)
 		end)
 	end
 	
-	Interface.Garbage:Tag(centerMissionsFrame.PublicMissions.Content1.InputBegan:Connect(function(input)
+	interface.Garbage:Tag(centerMissionsFrame.PublicMissions.Content1.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			Interface:PlayButtonClick();
+			interface:PlayButtonClick();
 			missionMenuPage = "ActiveMission1";
 			updateMissionPage();
 			onActiveMissionSelect(1);
 
 		end
 	end))
-	Interface.Garbage:Tag(centerMissionsFrame.PublicMissions.Content2.InputBegan:Connect(function(input)
+	interface.Garbage:Tag(centerMissionsFrame.PublicMissions.Content2.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			Interface:PlayButtonClick();
+			interface:PlayButtonClick();
 			missionMenuPage = "ActiveMission2";
 			updateMissionPage();
 			onActiveMissionSelect(2);
 
 		end
 	end))
-	Interface.Garbage:Tag(centerMissionsFrame.PublicMissions.Content3.InputBegan:Connect(function(input)
+	interface.Garbage:Tag(centerMissionsFrame.PublicMissions.Content3.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			Interface:PlayButtonClick();
+			interface:PlayButtonClick();
 			missionMenuPage = "ActiveMission3";
 			updateMissionPage();
 			onActiveMissionSelect(3);
@@ -1504,12 +1501,12 @@ function Interface.init(modInterface)
 		end
 	end))
 
-	Interface.Garbage:Tag(centerMissionsFrame.InputBegan:Connect(function(input)
+	interface.Garbage:Tag(centerMissionsFrame.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			if centerFrameState ~= centerMissionsFrame.Name then
 				centerFrameState = centerMissionsFrame.Name;
 
-				Interface:PlayButtonClick();
+				interface:PlayButtonClick();
 
 				expandMissionFrame();
 				updateMissionPage();
@@ -1517,52 +1514,46 @@ function Interface.init(modInterface)
 		end
 	end))
 
-	Interface.Garbage:Tag(missionNavListScrollList.availableButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
+	interface.Garbage:Tag(missionNavListScrollList.availableButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
 		missionMenuPage = "";
 		updateMissionPage();
 		Debugger:StudioLog("Available mission");
 	end))
 
-	Interface.Garbage:Tag(missionNavListScrollList.backButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
+	interface.Garbage:Tag(missionNavListScrollList.backButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
 
 		centerMissionsFrame.ExpandPanel.Visible = false;
 		centerMissionsFrame:TweenSize(UDim2.new(1, 0, 0.333, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true, shrinkMissionFrame);
 	end))
 	
-	local travelDebounce = tick();
-	Interface.Garbage:Tag(travelToHqButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
+    
+	interface.Garbage:Tag(travelToHqButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
 		
-		promptWindow = modClientGuis.promptQuestion("Travel to Headquarters",
-			"You're about to leave this world", 
-			"Travel", "Cancel");
-		local YesClickedSignal, NoClickedSignal;
+        modClientGuis.promptDialogBox({
+            Title = `Travel to Headquarters?`;
+            Desc = `You're about to leave this world`;
+            Buttons={
+                {
+                    Text="Travel";
+                    Style="Confirm";
+                    OnPrimaryClick=function(dialogWindow)
+                        local statusLabel = dialogWindow.Binds.StatusLabel;
+                        statusLabel.Text = "Traveling<...>";
 
-		YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-			if tick()-travelDebounce <= 0.2 then return end;
-			travelDebounce = tick();
-
-			Interface:PlayButtonClick();
-			promptWindow.Frame.Yes.buttonText.Text = "Traveling...";
-
-			local _travelReturn = remoteFactionService:InvokeServer("travelhq");
-
-			promptWindow:Close();
-			promptWindow = nil;
-
-			YesClickedSignal:Disconnect();
-			NoClickedSignal:Disconnect();
-		end);
-		NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-			Interface:PlayButtonClick();
-			promptWindow:Close();
-			promptWindow = nil;
-
-			YesClickedSignal:Disconnect();
-			NoClickedSignal:Disconnect();
-		end);
+                        local _travelReturn = remoteFactionService:InvokeServer("travelhq");
+                        interface:ToggleGameBlinds(false, 3);
+                        task.wait(5);
+                    end;
+                };
+                {
+                    Text="Cancel";
+                    Style="Cancel";
+                };
+            }
+        });
 	end));
 	
 
@@ -1577,34 +1568,34 @@ function Interface.init(modInterface)
 		end
 	end
 
-	Interface.Garbage:Tag(settingsNav.infoButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
+	interface.Garbage:Tag(settingsNav.infoButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
 		activeSettingsPage = "InfoSettingsFrame";
 		updateSettingsPage()
 	end))
-	Interface.Garbage:Tag(settingsNav.hqButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
+	interface.Garbage:Tag(settingsNav.hqButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
 		activeSettingsPage = "HeadquartersFrame";
 		updateSettingsPage()
 	end))
-	Interface.Garbage:Tag(settingsNav.membersButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
+	interface.Garbage:Tag(settingsNav.membersButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
 		activeSettingsPage = "MemberSettingsFrame";
 		updateSettingsPage()
 	end))
-	Interface.Garbage:Tag(settingsNav.rolesButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
+	interface.Garbage:Tag(settingsNav.rolesButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
 		activeSettingsPage = "RoleSettingsFrame";
 		updateSettingsPage()
 	end))
-	Interface.Garbage:Tag(settingsNav.logsButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
+	interface.Garbage:Tag(settingsNav.logsButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
 		activeSettingsPage = "AuditLogsFrame";
 		updateSettingsPage()
 	end))
 
 	local auditLogFrame = settingsBodyFrame.AuditLogsFrame;
-	Interface.Garbage:Tag(auditLogFrame:GetPropertyChangedSignal("Visible"):Connect(function()
+	interface.Garbage:Tag(auditLogFrame:GetPropertyChangedSignal("Visible"):Connect(function()
 		if not auditLogFrame.Visible then return end;
 
 		local factionData = modData.FactionData;
@@ -1632,19 +1623,19 @@ function Interface.init(modInterface)
 	
 	--======================= InfoSettingsFrame
 	local infoSettingsFrame = settingsBodyFrame.InfoSettingsFrame;
-	Interface.Garbage:Tag(infoSettingsFrame.TitleInput:GetPropertyChangedSignal("Text"):Connect(function()
+	interface.Garbage:Tag(infoSettingsFrame.TitleInput:GetPropertyChangedSignal("Text"):Connect(function()
 		infoSettingsFrame.TitleInput.Text = infoSettingsFrame.TitleInput.Text:sub(1,40);
 	end))
-	Interface.Garbage:Tag(infoSettingsFrame.DescInput:GetPropertyChangedSignal("Text"):Connect(function()
+	interface.Garbage:Tag(infoSettingsFrame.DescInput:GetPropertyChangedSignal("Text"):Connect(function()
 		infoSettingsFrame.DescInput.Text = infoSettingsFrame.DescInput.Text:sub(1,500);
 	end))
 
-	Interface.Garbage:Tag(infoSettingsFrame.saveButton.MouseButton1Click:Connect(function()
-		if not Interface.HasPermission("EditInfo") then return end;
+	interface.Garbage:Tag(infoSettingsFrame.saveButton.MouseButton1Click:Connect(function()
+		if not binds.HasPermission("EditInfo") then return end;
 		local factionData = modData.FactionData;
 		if factionData == nil then return end;
 
-		Interface:PlayButtonClick();
+		interface:PlayButtonClick();
 
 		local titleInput, descInput, iconInput, colorInput;
 
@@ -1676,22 +1667,22 @@ function Interface.init(modInterface)
 		if settingsReturn then
 			if settingsReturn.TitleFail then
 				infoSettingsFrame.TitleInput.BackgroundColor3 = Color3.fromRGB(100, 43, 43);
-				TweenService:Create(infoSettingsFrame.TitleInput, oneSecTweenInfo, {BackgroundColor3=Color3.fromRGB(0,0,0)}):Play();
+				TweenService:Create(infoSettingsFrame.TitleInput, ONE_SEC_TWEENINFO, {BackgroundColor3=Color3.fromRGB(0,0,0)}):Play();
 			end
 			if settingsReturn.DescFail then
 				infoSettingsFrame.DescInput.BackgroundColor3 = Color3.fromRGB(100, 43, 43);
-				TweenService:Create(infoSettingsFrame.DescInput, oneSecTweenInfo, {BackgroundColor3=Color3.fromRGB(0,0,0)}):Play();
+				TweenService:Create(infoSettingsFrame.DescInput, ONE_SEC_TWEENINFO, {BackgroundColor3=Color3.fromRGB(0,0,0)}):Play();
 			end
 
 			if settingsReturn.FactionObj then
 				sync(settingsReturn.FactionObj);
 			end
 		else
-			failCreate(settingsReturn);
+			getFailResponse(settingsReturn);
 
 		end
 	end))
-	Interface.Garbage:Tag(infoSettingsFrame:GetPropertyChangedSignal("Visible"):Connect(function()
+	interface.Garbage:Tag(infoSettingsFrame:GetPropertyChangedSignal("Visible"):Connect(function()
 		if infoSettingsFrame.Visible then
 			local factionData = modData.FactionData;
 			if factionData == nil then return end;
@@ -1703,20 +1694,20 @@ function Interface.init(modInterface)
 			
 		end
 	end))
-	Interface.Garbage:Tag(infoSettingsFrame.ColorInput:GetPropertyChangedSignal("Text"):Connect(function()
+	interface.Garbage:Tag(infoSettingsFrame.ColorInput:GetPropertyChangedSignal("Text"):Connect(function()
 		pcall(function()
 			infoSettingsFrame.ColorInput.ColorSample.BackgroundColor3 = Color3.fromHex(infoSettingsFrame.ColorInput.Text);
 		end)
 	end))
 	
-	Interface.Garbage:Tag(infoSettingsFrame.ColorInput:WaitForChild("ColorSample").MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
+	interface.Garbage:Tag(infoSettingsFrame.ColorInput:WaitForChild("ColorSample").MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
 
-		Interface.SetPositionWithPadding(colorPickerObj.Frame);
+		interface.setPositionWithPadding(colorPickerObj.Frame);
 		colorPickerObj.Frame.Visible = true;
 
 		function colorPickerObj:OnColorSelect(selectColor)
-			Interface:PlayButtonClick();
+			interface:PlayButtonClick();
 			infoSettingsFrame.ColorInput.ColorSample.BackgroundColor3 = selectColor;
 			infoSettingsFrame.ColorInput.Text = selectColor:ToHex();
 			colorPickerObj.Frame.Visible = false;
@@ -1766,8 +1757,8 @@ function Interface.init(modInterface)
 					textureLabel.BackgroundColor3 = savedColor or defaultColor;
 
 					colorButton.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
-						Interface.SetPositionWithPadding(colorPickerObj.Frame);
+						interface:PlayButtonClick();
+						interface.setPositionWithPadding(colorPickerObj.Frame);
 						colorPickerObj.Frame.Visible = true;
 
 						if modConfigurations.CompactInterface then
@@ -1777,7 +1768,7 @@ function Interface.init(modInterface)
 						end
 
 						function colorPickerObj:OnColorSelect(selectColor)
-							Interface:PlayButtonClick();
+							interface:PlayButtonClick();
 							textureLabel.BackgroundColor3 = selectColor;
 							colorPickerObj.Frame.Visible = false;
 
@@ -1797,7 +1788,7 @@ function Interface.init(modInterface)
 					end)
 
 					local function resetColor()
-						Interface:PlayButtonClick();
+						interface:PlayButtonClick();
 						textureLabel.BackgroundColor3 = defaultColor;
 
 						local rPacket = remoteFactionService:InvokeServer("customizeHq", {
@@ -1828,10 +1819,10 @@ function Interface.init(modInterface)
 	end
 
 	if modBranchConfigs.IsWorld("Safehome") then
-		Interface.Garbage:Tag(workspace:GetAttributeChangedSignal("SafehomeMap"):Connect(loadHqCustomizations))
+		interface.Garbage:Tag(workspace:GetAttributeChangedSignal("SafehomeMap"):Connect(loadHqCustomizations))
 	end
 	
-	Interface.Garbage:Tag(hqFrame:GetPropertyChangedSignal("Visible"):Connect(function()
+	interface.Garbage:Tag(hqFrame:GetPropertyChangedSignal("Visible"):Connect(function()
 		if hqFrame.Visible then
 			local factionData = modData.FactionData;
 			if factionData == nil then return end;
@@ -1845,11 +1836,13 @@ function Interface.init(modInterface)
 		end
 	end))
 	
-	local dropdownListObj = Interface.DropdownList;
-	Interface.Garbage:Tag(hqFrame.HqHostInput.setButton.MouseButton1Click:Connect(function()
-		if not Interface.HasPermission("CustomizeHq") then return end;
+	local dropdownListObj = modDropdownList.new();
+    dropdownListObj.Parent = interface.ScreenGui;
+
+	interface.Garbage:Tag(hqFrame.HqHostInput.setButton.MouseButton1Click:Connect(function()
+		if not binds.HasPermission("CustomizeHq") then return end;
 		
-		Interface:PlayButtonClick();
+		interface:PlayButtonClick();
 
 		local factionData = modData.FactionData;
 		if factionData == nil then return end;
@@ -1861,16 +1854,14 @@ function Interface.init(modInterface)
 		
 		dropdownListObj:LoadOptions(membersList);
 		
-		Interface.SetPositionWithPadding(dropdownListObj.Frame);
+		interface.setPositionWithPadding(dropdownListObj.Frame);
 		dropdownListObj.Frame.Visible = true;
 
 		function dropdownListObj:OnOptionSelect(selectIndex, optionButton)
-			Interface:PlayButtonClick();
+			interface:PlayButtonClick();
 
 			local selectName = optionButton.Name;
-			
-			local selectName = optionButton.Name;
-			
+
 			hqFrame.HqHostInput.Text = selectName;
 			dropdownListObj.Frame.Visible = false;
 			task.spawn(function()
@@ -1886,7 +1877,7 @@ function Interface.init(modInterface)
 	--======================= HeadquartersFrame
 	
 	
-	Interface.Garbage:Tag(settingsBodyFrame.MemberSettingsFrame:GetPropertyChangedSignal("Visible"):Connect(Interface.RefreshMemberSettingsFrame))
+	interface.Garbage:Tag(settingsBodyFrame.MemberSettingsFrame:GetPropertyChangedSignal("Visible"):Connect(binds.RefreshMemberSettingsFrame))
 
 	local roleSettingsFrame = settingsBodyFrame.RoleSettingsFrame;
 	local rolesNavFrame = roleSettingsFrame.rolesNavFrame;
@@ -1898,7 +1889,7 @@ function Interface.init(modInterface)
 	end
 	
 	for key, v in pairs(factionPermissions.Flags) do
-		local newButton = Interface.Templates.BasicButton:Clone();
+		local newButton = interface.newTemplate("BasicButton");
 		newButton.Size = UDim2.new(1, 0, 0, 30);
 		newButton.RichText = true;
 		newButton.LayoutOrder = math.log(v, 2)+10;
@@ -1909,7 +1900,7 @@ function Interface.init(modInterface)
 
 		newButton.MouseButton1Click:Connect(function()
 			if roleConfigActive ~= "Owner" then
-				Interface:PlayButtonClick();
+				interface:PlayButtonClick();
 
 				local perm = roleConfigInput.Perm;
 				local flagValue = not factionPermissions:Test(key, perm);
@@ -1934,7 +1925,7 @@ function Interface.init(modInterface)
 
 		-- Members Settings;
 		for roleKey, roleConfig in pairs(factionData.Roles) do
-			local newButton = Interface.Templates.BasicButton:Clone();
+			local newButton = interface.newTemplate("BasicButton");
 			newButton.Font = Enum.Font.Arial;
 			newButton.Size = UDim2.new(1, 0, 0, 30);
 			newButton.RichText = true;
@@ -1965,7 +1956,7 @@ function Interface.init(modInterface)
 			end
 
 			newButton.MouseButton1Click:Connect(function()
-				Interface:PlayButtonClick();
+				interface:PlayButtonClick();
 				roleButtonClick();
 			end)
 			if roleConfigActive == roleKey then
@@ -1975,14 +1966,14 @@ function Interface.init(modInterface)
 			newButton.Parent = rolesNavFrame;
 		end
 
-		local addButton = Interface.Templates.BasicButton:Clone();
+		local addButton = interface.newTemplate("BasicButton");
 		addButton.Font = Enum.Font.Arial;
 		addButton.Size = UDim2.new(1, 0, 0, 30);
 		addButton.LayoutOrder = 100;
 		addButton.Text = "+";
 		addButton.BackgroundColor3=Color3.fromRGB(50, 53, 62);
 		addButton.MouseButton1Click:Connect(function()
-			Interface:PlayButtonClick();
+			interface:PlayButtonClick();
 			roleConfigActive = "__new";
 
 			roleConfigFrame.TitleInput.Text = "Unnamed";
@@ -2003,10 +1994,10 @@ function Interface.init(modInterface)
 	roleConfigInput.Perm = 0;
 	updatePermButtons();
 
-	Interface.Garbage:Tag(roleSettingsFrame:GetPropertyChangedSignal("Visible"):Connect(refreshRoleSettings))
+	interface.Garbage:Tag(roleSettingsFrame:GetPropertyChangedSignal("Visible"):Connect(refreshRoleSettings))
 	roleConfigFrame.saveButton.MouseButton1Click:Connect(function()
-		if not Interface.HasPermission("ConfigRole") then return end;
-		Interface:PlayButtonClick();
+		if not binds.HasPermission("ConfigRole") then return end;
+		interface:PlayButtonClick();
 
 		roleConfigInput.Title = roleConfigFrame.TitleInput.Text;
 		roleConfigInput.Color = roleConfigFrame.ColorInput.ColorSample.BackgroundColor3:ToHex();
@@ -2020,8 +2011,8 @@ function Interface.init(modInterface)
 		end
 	end)
 	roleConfigFrame.deleteButton.MouseButton1Click:Connect(function()
-		if not Interface.HasPermission("ConfigRole") then return end;
-		Interface:PlayButtonClick();
+		if not binds.HasPermission("ConfigRole") then return end;
+		interface:PlayButtonClick();
 
 		game.Debris:AddItem(rolesNavFrame:FindFirstChild(roleConfigActive), 0);
 		local rPacket = remoteFactionService:InvokeServer("deleterole", roleConfigActive);
@@ -2051,13 +2042,13 @@ function Interface.init(modInterface)
 	end)
 	
 	roleConfigFrame.ColorInput:WaitForChild("ColorSample").MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
+		interface:PlayButtonClick();
 		
-		Interface.SetPositionWithPadding(colorPickerObj.Frame);
+		interface.setPositionWithPadding(colorPickerObj.Frame);
 		colorPickerObj.Frame.Visible = true;
 		
 		function colorPickerObj:OnColorSelect(selectColor)
-			Interface:PlayButtonClick();
+			interface:PlayButtonClick();
 			roleConfigFrame.ColorInput.ColorSample.BackgroundColor3 = selectColor;
 			roleConfigFrame.ColorInput.Text = selectColor:ToHex();
 			colorPickerObj.Frame.Visible = false;
@@ -2076,48 +2067,48 @@ function Interface.init(modInterface)
 		end)
 	end
 
-	Interface.Garbage:Tag(bannerNavMenuButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
-		Interface.ActivePage = "MenuFrame";
-		Interface.Update();
+	interface.Garbage:Tag(bannerNavMenuButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
+		binds.ActivePage = "MenuFrame";
+		window:Update();
 	end))
-	Interface.Garbage:Tag(bannerNavChatButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
-		Interface.ActivePage = "FactionChatFrame";
-		Interface.Update();
+	interface.Garbage:Tag(bannerNavChatButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
+		binds.ActivePage = "FactionChatFrame";
+		window:Update();
 	end))
-	Interface.Garbage:Tag(bannerNavLeaderboardsButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
-		Interface.ActivePage = "LeaderboardFrame";
-		Interface.Update();
+	interface.Garbage:Tag(bannerNavLeaderboardsButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
+		binds.ActivePage = "LeaderboardFrame";
+		window:Update();
 	end))
-	Interface.Garbage:Tag(bannerNavSettingsButton.MouseButton1Click:Connect(function()
-		Interface:PlayButtonClick();
+	interface.Garbage:Tag(bannerNavSettingsButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
 
-		if Interface.HasPermission("CanViewSettings") then 
-			Interface.ActivePage = "SettingsFrame";
+		if binds.HasPermission("CanViewSettings") then 
+			binds.ActivePage = "SettingsFrame";
 		else
 			selectedUser = nil;
-			Interface.ActivePage = "ProfileFrame";
+			binds.ActivePage = "ProfileFrame";
 		end;
 
-		Interface.Update();
+		window:Update();
 		updateSettingsPage();
 	end))
 
-
-	Interface.Garbage:Tag(modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
-		if Interface.refreshPublicMissions then
-			Interface.refreshPublicMissions();
+    interface.Scheduler.OnStepped:Connect(function(tickData: TickData)
+        if tickData.ms1000 ~= true then return end;
+        
+        if binds.refreshPublicMissions then
+			binds.refreshPublicMissions();
 		end
-		if Interface.refreshActiveMissionInfo then
-			Interface.refreshActiveMissionInfo();
+		if binds.refreshActiveMissionInfo then
+			binds.refreshActiveMissionInfo();
 		end
+    end);
 
-	end));
-
-	local function memberFrameMouseEnter() mouseOnMemberFrame = true; Interface.MemberFrameLayout() end
-	local function memberFrameMouseLeave() mouseOnMemberFrame = false; Interface.MemberFrameLayout() end
+	local function memberFrameMouseEnter() mouseOnMemberFrame = true; binds.MemberFrameLayout() end
+	local function memberFrameMouseLeave() mouseOnMemberFrame = false; binds.MemberFrameLayout() end
 	memberFrame.MouseEnter:Connect(memberFrameMouseEnter)
 	memberFrame.MouseMoved:Connect(memberFrameMouseEnter)
 	memberFrame.MouseLeave:Connect(memberFrameMouseLeave);
@@ -2132,25 +2123,25 @@ function Interface.init(modInterface)
 		end
 	end
 	
-	function Interface.Update()
-		local unixTime = modSyncTime.GetTime();
+    window.OnUpdate:Connect(function()
+		local unixTime = workspace:GetServerTimeNow();
 		clearDropdownList();
 
-		if Interface.ActivePage == "MissionRequirementFrame" then
+		if binds.ActivePage == "MissionRequirementFrame" then
 			for _, obj in pairs(centerFrame:GetChildren()) do
 				if obj:IsA("GuiObject") then
-					obj.Visible = obj.Name == Interface.ActivePage;
+					obj.Visible = obj.Name == binds.ActivePage;
 				end
 			end
 			return;
 		end
 
 		if not firstsynced then
-			Interface.ActivePage = "LoadingFrame";
+			binds.ActivePage = "LoadingFrame";
 
 			for _, obj in pairs(centerFrame:GetChildren()) do
 				if obj:IsA("GuiObject") then
-					obj.Visible = obj.Name == Interface.ActivePage;
+					obj.Visible = obj.Name == binds.ActivePage;
 				end
 			end
 			return;
@@ -2163,22 +2154,22 @@ function Interface.init(modInterface)
 		local updatedMember = {};
 
 		if factionData == nil then
-			Interface.ActivePage = "JoinFactionFrame";
+			binds.ActivePage = "JoinFactionFrame";
 			bannerSizeConstraint.MaxSize = Vector2.new(0, math.huge);
 			windowTitleLabel.Text = "Factions";
 
 		else
-			if Interface.ActivePage == "FactionChatFrame" then
+			if binds.ActivePage == "FactionChatFrame" then
 				local factionChatChannelId = "["..modData.FactionData.Tag.."]";
-				factionChatRoom = modData.modChatRoomInterface:GetRoom(factionChatChannelId);
+				factionChatRoom = chatRoomInterface:GetRoom(factionChatChannelId);
 
 				if factionChatRoom == nil then
-					factionChatRoom = modData.modChatRoomInterface:newRoom(factionChatChannelId);
+					factionChatRoom = chatRoomInterface:newRoom(factionChatChannelId);
 				end
 
-				modData.modChatRoomInterface.SwitchChannelFunc[factionChatChannelId] = function()
-					Interface.ActivePage = "FactionChatFrame";
-					Interface.Update();
+				chatRoomInterface.SwitchChannelFunc[factionChatChannelId] = function()
+					binds.ActivePage = "FactionChatFrame";
+					window:Update();
 				end
 
 				if factionChatRoom then
@@ -2194,19 +2185,19 @@ function Interface.init(modInterface)
 					factionChatRoom.Frame.UIListLayout.Padding = UDim.new(0, 2);
 				end
 
-				local serverChatRoom = modData.modChatRoomInterface:GetRoom("Server");
+				local serverChatRoom = chatRoomInterface:GetRoom("Server");
 				serverChatRoom:SetActive();
 
 			end
 
-			if Interface.ActivePage == "JoinFactionFrame" or Interface.ActivePage == "LoadingFrame" then
-				Interface.ActivePage = "MenuFrame";
+			if binds.ActivePage == "JoinFactionFrame" or binds.ActivePage == "LoadingFrame" then
+				binds.ActivePage = "MenuFrame";
 
-			elseif Interface.ActivePage == "ProfileFrame" then
-				Interface.UpdateProfileFrame();
+			elseif binds.ActivePage == "ProfileFrame" then
+				binds.UpdateProfileFrame();
 
-			elseif Interface.ActivePage == "SettingsFrame" then
-				Interface.RefreshMemberSettingsFrame();
+			elseif binds.ActivePage == "SettingsFrame" then
+				binds.RefreshMemberSettingsFrame();
 			end
 			bannerSizeConstraint.MaxSize = Vector2.new(280, math.huge);
 
@@ -2225,21 +2216,21 @@ function Interface.init(modInterface)
 			local rolesConfig = factionData.Roles;
 			-- members list;
 			for userId, memberData in pairs(factionData.Members) do
-				if Interface.MembersData[userId] == nil then
-					Interface.MembersData[userId] = {};
+				if binds.MembersData[userId] == nil then
+					binds.MembersData[userId] = {};
 				end
 
-				local data = Interface.MembersData[userId];
+				local data = binds.MembersData[userId];
 
 				local userListing = data.ListingFrame;
 				if userListing == nil then
 					userListing = templateFactionUserFrame:Clone();
 					userListing.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
+						interface:PlayButtonClick();
 
 						setSelectedUser(userId);
-						Interface.ActivePage = "ProfileFrame";
-						Interface.Update();
+						binds.ActivePage = "ProfileFrame";
+						window:Update();
 					end)
 				end
 
@@ -2278,18 +2269,18 @@ function Interface.init(modInterface)
 
 		end
 
-		for userId, memberData in pairs(Interface.MembersData) do
+		for userId, memberData in pairs(binds.MembersData) do
 			if updatedMember[userId] == nil then
 				game.Debris:AddItem(memberData.ListingFrame, 0);
-				Interface.MembersData[userId] = nil;
+				binds.MembersData[userId] = nil;
 			end
 		end
 
-		Interface.MemberFrameLayout()
+		binds.MemberFrameLayout()
 		--======
 
 
-		if Interface.ActivePage == "MenuFrame" then
+		if binds.ActivePage == "MenuFrame" then
 			for _, obj in pairs(centerResourceFrame.Content:GetChildren()) do
 				if obj:IsA("GuiObject") then
 					game.Debris:AddItem(obj, 0);
@@ -2299,8 +2290,8 @@ function Interface.init(modInterface)
 
 			local resourceData = factionData.Resources;
 
-			for a=1, #factionResourceKeys do
-				local statInfo = factionResourceKeys[a];
+			for a=1, #RESOURCE_KEYS do
+				local statInfo = RESOURCE_KEYS[a];
 
 				local newStat = templateResourceStatLabel:Clone();
 				local statLabel = newStat:WaitForChild("StatLabel");
@@ -2309,18 +2300,18 @@ function Interface.init(modInterface)
 				iconLabel.Image = statInfo.Icon;
 
 				local radialBarLabel: ImageLabel = newStat:WaitForChild("radialBar")
-				local radialBar = modRadialImage.new(radialConfig, radialBarLabel);
+				local radialBar = modRadialImage.new(RESOURCE_RADIAL_CONFIG, radialBarLabel);
 
 				local statVal = resourceData[statInfo.Key]/100;
 				radialBar:UpdateLabel(statVal);
 				statLabel.Text = string.format("%.1f%%", statVal*100);
 				
 				if statVal <= 0.2 then
-					radialBarLabel.ImageColor3 = BarColors.Yellow;
+					radialBarLabel.ImageColor3 = BAR_COLORS.Yellow;
 				elseif statVal <= 0.1 then
-					radialBarLabel.ImageColor3 = BarColors.Red;
+					radialBarLabel.ImageColor3 = BAR_COLORS.Red;
 				else
-					radialBarLabel.ImageColor3 = BarColors.Green;
+					radialBarLabel.ImageColor3 = BAR_COLORS.Green;
 				end
 					
 				if UserInputService.TouchEnabled then
@@ -2343,7 +2334,7 @@ function Interface.init(modInterface)
 			
 			local function refreshPublicMissions()
 				local missionData = factionData.Missions;
-				unixTime = modSyncTime.GetTime();
+				unixTime = workspace:GetServerTimeNow();
 				
 				for _, frame in pairs(centerMissionsFrame.PublicMissions:GetChildren()) do
 					if frame.Name:find("Content") and frame.LayoutOrder > 0 then
@@ -2357,7 +2348,7 @@ function Interface.init(modInterface)
 							local missionLib = modMissionLibrary.Get(activeMission.Id);
 							
 							
-							local radialBar = modRadialImage.new(timerRadialConfig, activeFrame.radialBar);
+							local radialBar = modRadialImage.new(TIMER_RADIAL_CONFIG, activeFrame.radialBar);
 							local timeLeft = activeMission.CompletionTick - unixTime;
 							local ratio = 1- math.clamp(timeLeft/missionLib.ExpireTime, 0, 1);
 
@@ -2396,18 +2387,18 @@ function Interface.init(modInterface)
 			end
 
 			refreshPublicMissions();
-			Interface.refreshPublicMissions = refreshPublicMissions;
+			binds.refreshPublicMissions = refreshPublicMissions;
 		end
 
 		for _, obj in pairs(centerFrame:GetChildren()) do
 			if obj:IsA("GuiObject") then
-				obj.Visible = obj.Name == Interface.ActivePage;
+				obj.Visible = obj.Name == binds.ActivePage;
 
 			end
 		end
-	end
-	
-	return Interface;
-end;
+	end)
+    
+end
 
-return Interface;
+return interfacePackage;
+

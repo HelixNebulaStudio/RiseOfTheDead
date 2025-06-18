@@ -229,7 +229,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 
 	if modConfigurations.CompactInterface then
-		missionPinHud.Position = UDim2.new(1, 0, 0, 30);
 		missionPinHud:WaitForChild("Hint").Visible = false;
 		hudSizeConstraint.MaxSize = Vector2.new(camera.ViewportSize.X-100, math.huge);
 
@@ -2157,14 +2156,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 									{
 										Text="Start";
 										Style="Confirm";
-										OnPrimaryClick=function(promptDialogFrame, textButton)
-											promptDialogFrame.statusLabel.Text = "Starting...";
+										OnPrimaryClick=function(dialogWindow)
+											local statusLabel = dialogWindow.Binds.StatusLabel;
+											statusLabel.Text = "Starting<...>";
 											
 											local r = remoteMissionRemote:InvokeServer("MissionBoardStart", missionData.Id);
 											r = r or {};
 
 											if r.FailMsg then
-												promptDialogFrame.statusLabel.Text = `Fail to start: {r.FailMsg}`;
+												statusLabel.Text = `Fail to start: {r.FailMsg}`;
 												task.wait(1);
 											else
 												task.wait(0.5);
@@ -2548,7 +2548,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							{
 								Text="Purchase";
 								Style="Confirm";
-								OnPrimaryClick=function(promptDialogFrame, textButton)
+								OnPrimaryClick=function(dialogWindow)
 									local r = remoteBattlepassRemote:InvokeServer("purchase");
 									if r.FailMsg then
 										if r.FailMsg == "Insufficient Gold" then
@@ -2578,7 +2578,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							{
 								Text="Level Up";
 								Style="Confirm";
-								OnPrimaryClick=function(promptDialogFrame, textButton)
+								OnPrimaryClick=function(dialogWindow)
 									local r = remoteBattlepassRemote:InvokeServer("purchaselvls", lvlAmt);
 									if r.FailMsg then
 										if r.FailMsg == "Insufficient Gold" then

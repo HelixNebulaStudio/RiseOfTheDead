@@ -89,6 +89,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	window.OnToggle:Connect(function(visible, interactable, interactInfo)
 		if visible then
+			binds.Interactable = interactable;
 			local shopType = interactable.Values.ShopType;
 			binds.InteractPart = interactable.Part;
 
@@ -321,19 +322,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								{
 									Text="Purchase";
 									Style="Confirm";
-									OnPrimaryClick=function(promptDialogFrame, textButton)
+									OnPrimaryClick=function(dialogWindow, textButton)
+                                    	local statusLabel = dialogWindow.Binds.StatusLabel;
+
 										local buyMulti = textButton:GetAttribute("SkipClose");
 
-										promptDialogFrame.statusLabel.Text = "Purchasing item...";
+										statusLabel.Text = "Purchasing item<...>";
 				
 										local serverReply = remoteShopService:InvokeServer("buyitem", binds.InteractPart, info.Id);
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
-											promptDialogFrame.statusLabel.Text = "Purchased!";
+											statusLabel.Text = "Purchased!";
 
 											wait(buyMulti and 0.2 or 0.5);
 										else
 											warn("Purchase Item>> Error Code:"..serverReply);
-											promptDialogFrame.statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply)):gsub("$Currency", product.Currency);
+											statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply)):gsub("$Currency", product.Currency);
 											wait(1);
 										end
 	
@@ -458,35 +461,48 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 		end
 		
-		if binds.SelectedSlot then
-			binds.ClearPage();
+		if binds.SelectedSlot == nil then return end;
+		
+		binds.ClearPage();
 
-			local storageItemID = binds.SelectedSlot.ID;
-			local selectedItem = modData.GetItemById(storageItemID);
-			if selectedItem == nil then
-				binds.SelectedSlot = nil;
-				binds.LoadPage("Money");
-				return;
-			end
+		local storageItemID = binds.SelectedSlot.ID;
+		local selectedItem = modData.GetItemById(storageItemID);
+		if selectedItem == nil then
+			binds.SelectedSlot = nil;
+			binds.LoadPage("Money");
+			return;
+		end
 
-			local itemLib = modItemsLibrary:Find(selectedItem.ItemId);
+		local itemLib = modItemsLibrary:Find(selectedItem.ItemId);
 
-			local equipmentClass = wieldComp:GetEquipmentClass(storageItemID);
-			
-			if equipmentClass and equipmentClass.Properties.OnShopSelect then
-				equipmentClass.Properties:OnShopSelect(interface, selectedItem);
-			end
+		local equipmentClass: EquipmentClass = wieldComp:GetEquipmentClass(storageItemID);
+		
+		if equipmentClass and equipmentClass.Properties.OnShopSelect then
+			equipmentClass.Properties:OnShopSelect(interface, selectedItem);
+		end
 
-			local localplayerStats = modData.GetStats();
+		local localplayerStats = modData.GetStats();
+
+		if equipmentClass then
+			local configurations = equipmentClass.Configurations;
 
 			--== MARK: Ammo
-			local hasAmmoData = (equipmentClass and ((selectedItem.Values.A and selectedItem.Values.A < equipmentClass.Configurations.MagazineSize)
-				or (selectedItem.Values.MA and selectedItem.Values.MA < equipmentClass.Configurations.AmmoCapacity)));
+			local ammo = selectedItem:GetValues("A") or configurations.MagazineSize;
+			local maxAmmo = selectedItem:GetValues("MA") or configurations.AmmoCapacity;
+
+			local ammoIsNotFull = (ammo < configurations.MagazineSize)
+								or (maxAmmo < configurations.AmmoCapacity);
 			
-			if hasAmmoData then
+			if ammoIsNotFull then
 				local ammoCurrency = modShopLibrary.AmmunitionCurrency or "Money";
 				local localplayerCurrency = localplayerStats and localplayerStats[ammoCurrency] or 0;
-				local price, _mags = modShopLibrary.CalculateAmmoPrice(selectedItem.ItemId, selectedItem.Values, equipmentClass.Configurations, localplayerCurrency, modData.Profile.Punishment == modGlobalVars.Punishments.AmmoCostPenalty);
+				local price, _mags = modShopLibrary.CalculateAmmoPrice(
+					selectedItem.ItemId, 
+					selectedItem.Values, 
+					configurations, 
+					localplayerCurrency, 
+					modData.Profile.Punishment == modGlobalVars.Punishments.AmmoCostPenalty
+				);
 
 				binds.NewListing(function(newListing)
 					newListing.Name = "AmmoRefillOption";
@@ -513,9 +529,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						if purchaseAmmoDebounce then return end;
 						purchaseAmmoDebounce = true;
 						
-						local serverReply = localplayerStats and (localplayerStats[ammoCurrency] or 0) >= price and remoteShopService:InvokeServer("buyammo", {StoreObj=binds.InteractPart;}, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
+						if localplayerStats == nil or (localplayerStats[ammoCurrency] or 0) < price then
+							purchaseAmmoDebounce = false;
+							descLabel.Text = "Not enough money!";
+							return;
+						end
+
+						local serverReply = remoteShopService:InvokeServer("buyammo", {
+                            InteractConfig = binds.Interactable and binds.Interactable.Config;
+                            Siid = selectedItem.ID;
+                            StorageId = binds.StorageId;
+						});
+
 						if serverReply == modShopLibrary.PurchaseReplies.Success then
 							RunService.Heartbeat:Wait();
+                        	equipmentClass.ClassSelf:RefillAmmo(equipmentClass, selectedItem);
 							newListing:Destroy();
 
 						else
@@ -529,12 +557,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			--== MARK: Refill Charges
 			if selectedItem.ItemId == "ammopouch" then
-				local itemClass = modData:GetItemClass(selectedItem.ID);
-
 				local ammoPouchData = modData:GetEvent("AmmoPouchData");
-				local charges = ammoPouchData and ammoPouchData.Charges or itemClass.Configurations.BaseRefillCharge;
+				local charges = ammoPouchData and ammoPouchData.Charges or configurations.BaseRefillCharge;
 
-				if charges < itemClass.Configurations.BaseRefillCharge then
+				if charges < configurations.BaseRefillCharge then
 					binds.NewListing(function(newListing)
 						newListing.Name = "RefillOption";
 						local infoBox = newListing:WaitForChild("infoFrame");
@@ -548,7 +574,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						local labelFrame = descFrame:WaitForChild("labelFrame");
 						local descLabel = labelFrame:WaitForChild("descLabel");
 
-						descLabel.Text = `Do you want to refill {itemClass.Configurations.BaseRefillCharge} ammo pouch charges?`;
+						descLabel.Text = `Do you want to refill {configurations.BaseRefillCharge} ammo pouch charges?`;
 							
 						titleLabel.Text = "Refill Charges";
 						priceLabel.Text = `Refill`;
@@ -574,58 +600,127 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					end)
 				end
 			end
-
-			--== MARK: Repairable
-			local repairPrice = modShopLibrary.RepairPrice[selectedItem.ItemId];
-			if repairPrice and selectedItem.Values and selectedItem.Values.Health and selectedItem.Values.MaxHealth and selectedItem.Values.Health <= selectedItem.Values.MaxHealth then
-				
-				binds.NewListing(function(newListing)
-					newListing.Name = "RepairOption";
-					local infoBox = newListing:WaitForChild("infoFrame");
-					local descFrame = infoBox:WaitForChild("descFrame");
-
-					local purchaseButton = newListing:WaitForChild("purchaseButton");
-					local priceLabel = purchaseButton:WaitForChild("buttonText");
-					local iconButton = newListing:WaitForChild("iconButton");
-					local iconLabel = iconButton:WaitForChild("iconLabel");
-					local titleLabel = descFrame:WaitForChild("titleLabel");
-					local labelFrame = descFrame:WaitForChild("labelFrame");
-					local descLabel = labelFrame:WaitForChild("descLabel");
-
-					local priceTag = "$"..modFormatNumber.Beautify(repairPrice);
-					descLabel.Text = "<b>"..itemLib.Name.."</b>: Repair for "..priceTag;
-						
-					titleLabel.Text = "Repair Item";
-					priceLabel.Text = priceTag;
-					iconLabel.Image = "";
-
-					local purchaseRepairDebounce = false;
-					newListing.MouseButton1Click:Connect(function()
-						if purchaseRepairDebounce then return end;
-						purchaseRepairDebounce = true;
-						
-						local serverReply = localplayerStats and (localplayerStats.Money or 0) >= repairPrice 
-						and remoteShopService:InvokeServer("buyrepair", binds.InteractPart, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
-
-						if serverReply == modShopLibrary.PurchaseReplies.Success then
-							RunService.Heartbeat:Wait();
-							newListing:Destroy();
-
-						else
-							warn("Repair Purchase>> Error Code:"..serverReply);
-							descLabel.Text = string.gsub(modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply), "$Currency", "Money");
-						end
-						purchaseRepairDebounce = false;
-					end)
-				end)
-			end
+		end
+		--== MARK: Repairable
+		local repairPrice = modShopLibrary.RepairPrice[selectedItem.ItemId];
+		if repairPrice and selectedItem.Values and selectedItem.Values.Health and selectedItem.Values.MaxHealth and selectedItem.Values.Health <= selectedItem.Values.MaxHealth then
 			
-			--== MARK: Can be sold
-			local bpLib = modBlueprintLibrary.Get(selectedItem.ItemId);
-			local price = modShopLibrary.SellPrice[selectedItem.ItemId]
-				or bpLib and (bpLib.SellPrice or (bpLib.Tier and modShopLibrary.SellPrice["Tier"..bpLib.Tier])) or nil;
+			binds.NewListing(function(newListing)
+				newListing.Name = "RepairOption";
+				local infoBox = newListing:WaitForChild("infoFrame");
+				local descFrame = infoBox:WaitForChild("descFrame");
 
-			if itemLib and price then
+				local purchaseButton = newListing:WaitForChild("purchaseButton");
+				local priceLabel = purchaseButton:WaitForChild("buttonText");
+				local iconButton = newListing:WaitForChild("iconButton");
+				local iconLabel = iconButton:WaitForChild("iconLabel");
+				local titleLabel = descFrame:WaitForChild("titleLabel");
+				local labelFrame = descFrame:WaitForChild("labelFrame");
+				local descLabel = labelFrame:WaitForChild("descLabel");
+
+				local priceTag = "$"..modFormatNumber.Beautify(repairPrice);
+				descLabel.Text = "<b>"..itemLib.Name.."</b>: Repair for "..priceTag;
+					
+				titleLabel.Text = "Repair Item";
+				priceLabel.Text = priceTag;
+				iconLabel.Image = "";
+
+				local purchaseRepairDebounce = false;
+				newListing.MouseButton1Click:Connect(function()
+					if purchaseRepairDebounce then return end;
+					purchaseRepairDebounce = true;
+					
+					local serverReply = localplayerStats and (localplayerStats.Money or 0) >= repairPrice 
+					and remoteShopService:InvokeServer("buyrepair", binds.InteractPart, storageItemID) or modShopLibrary.PurchaseReplies.InsufficientCurrency;
+
+					if serverReply == modShopLibrary.PurchaseReplies.Success then
+						RunService.Heartbeat:Wait();
+						newListing:Destroy();
+
+					else
+						warn("Repair Purchase>> Error Code:"..serverReply);
+						descLabel.Text = string.gsub(modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply), "$Currency", "Money");
+					end
+					purchaseRepairDebounce = false;
+				end)
+			end)
+		end
+		
+		--== MARK: Can be sold
+		local bpLib = modBlueprintLibrary.Get(selectedItem.ItemId);
+		local price = modShopLibrary.SellPrice[selectedItem.ItemId]
+			or bpLib and (bpLib.SellPrice or (bpLib.Tier and modShopLibrary.SellPrice["Tier"..bpLib.Tier])) or nil;
+
+		if itemLib and price then
+			binds.NewListing(function(newListing)
+				local infoBox = newListing:WaitForChild("infoFrame");
+				local descFrame = infoBox:WaitForChild("descFrame");
+
+				local purchaseButton = newListing:WaitForChild("purchaseButton");
+				local priceLabel = purchaseButton:WaitForChild("buttonText");
+				local iconButton = newListing:WaitForChild("iconButton");
+				local iconLabel = iconButton:WaitForChild("iconLabel");
+				local titleLabel = descFrame:WaitForChild("titleLabel");
+				local labelFrame = descFrame:WaitForChild("labelFrame");
+				local descLabel = labelFrame:WaitForChild("descLabel");
+
+				local priceTag = "$"..modFormatNumber.Beautify(price);
+				descLabel.Text = "Sell "..itemLib.Name.." for "..priceTag;
+				titleLabel.Text = "Sell";
+				priceLabel.Text = priceTag;
+				iconLabel.Image = itemLib.Icon or "";
+
+				local sellItemDebounce = false;
+				newListing.MouseButton1Click:Connect(function()
+					if sellItemDebounce then return end;
+					sellItemDebounce = true;
+
+					modClientGuis.promptDialogBox({
+						Title=`Sell: {itemLib.Name}`;
+						Desc=`Are you sure you want to sell <b>{itemLib.Name}</b> for <b>${price}</b>?`;
+						Icon=itemLib.Icon;
+						Buttons={
+							{
+								Text="Sell";
+								Style="Confirm";
+								OnPrimaryClick=function(dialogWindow, textButton)
+									local statusLabel = dialogWindow.Binds.StatusLabel;
+									statusLabel.Text = "Selling item<...>";
+			
+									if selectedItem.Fav then
+										statusLabel.Text  = "Can't sell favourited item.";
+										sellItemDebounce = false;
+										return;
+									end;
+
+									
+									local serverReply = remoteShopService:InvokeServer("sellitem", binds.InteractPart, storageItemID);
+									if serverReply == modShopLibrary.PurchaseReplies.Success then
+										statusLabel.Text = "Sold!";
+										wait(0.5);
+									else
+										warn("Sell Item>> Error Code:"..tostring(serverReply));
+										statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply)):gsub("$Currency", "Money");
+										wait(1);
+									end
+
+									window:Update();
+								end;
+							};
+							{
+								Text="Cancel";
+								Style="Cancel";
+							};
+						}
+					});
+
+					sellItemDebounce = false;
+				end)
+			end)
+			
+			
+			--== MARK:  Sell all
+			if selectedItem.Quantity > 1 then
 				binds.NewListing(function(newListing)
 					local infoBox = newListing:WaitForChild("infoFrame");
 					local descFrame = infoBox:WaitForChild("descFrame");
@@ -638,9 +733,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					local labelFrame = descFrame:WaitForChild("labelFrame");
 					local descLabel = labelFrame:WaitForChild("descLabel");
 
-					local priceTag = "$"..modFormatNumber.Beautify(price);
-					descLabel.Text = "Sell "..itemLib.Name.." for "..priceTag;
-					titleLabel.Text = "Sell";
+					local allPrice = price * selectedItem.Quantity;
+					local priceTag = "$"..modFormatNumber.Beautify(allPrice);
+					descLabel.Text = "Sell all "..itemLib.Name.." for "..priceTag;
+					titleLabel.Text = "Sell All";
 					priceLabel.Text = priceTag;
 					iconLabel.Image = itemLib.Icon or "";
 
@@ -649,35 +745,37 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						if sellItemDebounce then return end;
 						sellItemDebounce = true;
 
+						local allQuantity = selectedItem.Quantity;
 						modClientGuis.promptDialogBox({
-							Title=`Sell: {itemLib.Name}`;
-							Desc=`Are you sure you want to sell <b>{itemLib.Name}</b> for <b>${price}</b>?`;
+							Title=`Sell All: {itemLib.Name}`;
+							Desc=`Are you sure you want to sell <b>{allQuantity}</b> <b>{itemLib.Name}</b> for <b>${allPrice}</b>?`;
 							Icon=itemLib.Icon;
 							Buttons={
 								{
 									Text="Sell";
 									Style="Confirm";
-									OnPrimaryClick=function(promptDialogFrame, textButton)
-										promptDialogFrame.statusLabel.Text = "Selling item...";
+									OnPrimaryClick=function(dialogWindow, textButton)
+										local statusLabel = dialogWindow.Binds.StatusLabel;
+										statusLabel.Text = "Selling item<...>";
 				
 										if selectedItem.Fav then
-											promptDialogFrame.statusLabel.Text  = "Can't sell favourited item.";
+											statusLabel.Text  = "Can't sell favourited item.";
 											sellItemDebounce = false;
 											return;
 										end;
 
 										
-										local serverReply = remoteShopService:InvokeServer("sellitem", binds.InteractPart, storageItemID);
+										local serverReply = remoteShopService:InvokeServer("sellitem", binds.InteractPart, storageItemID, allQuantity);
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
-											promptDialogFrame.statusLabel.Text = "Sold!";
-											wait(0.5);
+											statusLabel.Text = `Sold all <b>{allQuantity}</b> {itemLib.Name}!`;
+											wait(1);
 										else
 											warn("Sell Item>> Error Code:"..tostring(serverReply));
-											promptDialogFrame.statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply)):gsub("$Currency", "Money");
+											statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply)):gsub("$Currency", "Money");
 											wait(1);
 										end
 
-                                        window:Update();
+										window:Update();
 									end;
 								};
 								{
@@ -690,92 +788,88 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						sellItemDebounce = false;
 					end)
 				end)
-				
-				
-				--== MARK:  Sell all
-				if selectedItem.Quantity > 1 then
-					binds.NewListing(function(newListing)
-						local infoBox = newListing:WaitForChild("infoFrame");
-						local descFrame = infoBox:WaitForChild("descFrame");
-
-						local purchaseButton = newListing:WaitForChild("purchaseButton");
-						local priceLabel = purchaseButton:WaitForChild("buttonText");
-						local iconButton = newListing:WaitForChild("iconButton");
-						local iconLabel = iconButton:WaitForChild("iconLabel");
-						local titleLabel = descFrame:WaitForChild("titleLabel");
-						local labelFrame = descFrame:WaitForChild("labelFrame");
-						local descLabel = labelFrame:WaitForChild("descLabel");
-
-						local allPrice = price * selectedItem.Quantity;
-						local priceTag = "$"..modFormatNumber.Beautify(allPrice);
-						descLabel.Text = "Sell all "..itemLib.Name.." for "..priceTag;
-						titleLabel.Text = "Sell All";
-						priceLabel.Text = priceTag;
-						iconLabel.Image = itemLib.Icon or "";
-
-						local sellItemDebounce = false;
-						newListing.MouseButton1Click:Connect(function()
-							if sellItemDebounce then return end;
-							sellItemDebounce = true;
-
-							local allQuantity = selectedItem.Quantity;
-							modClientGuis.promptDialogBox({
-								Title=`Sell All: {itemLib.Name}`;
-								Desc=`Are you sure you want to sell <b>{allQuantity}</b> <b>{itemLib.Name}</b> for <b>${allPrice}</b>?`;
-								Icon=itemLib.Icon;
-								Buttons={
-									{
-										Text="Sell";
-										Style="Confirm";
-										OnPrimaryClick=function(promptDialogFrame, textButton)
-											promptDialogFrame.statusLabel.Text = "Selling item...";
-					
-											if selectedItem.Fav then
-												promptDialogFrame.statusLabel.Text  = "Can't sell favourited item.";
-												sellItemDebounce = false;
-												return;
-											end;
-	
-											
-											local serverReply = remoteShopService:InvokeServer("sellitem", binds.InteractPart, storageItemID, allQuantity);
-											if serverReply == modShopLibrary.PurchaseReplies.Success then
-												promptDialogFrame.statusLabel.Text = `Sold all <b>{allQuantity}</b> {itemLib.Name}!`;
-												wait(1);
-											else
-												warn("Sell Item>> Error Code:"..tostring(serverReply));
-												promptDialogFrame.statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply)):gsub("$Currency", "Money");
-												wait(1);
-											end
-	
-                                            window:Update();
-										end;
-									};
-									{
-										Text="Cancel";
-										Style="Cancel";
-									};
-								}
-							});
-
-							sellItemDebounce = false;
-						end)
-					end)
-				end
-				
 			end
+			
+		end
 
-			--== MARK: Exchange Gift Shop Tokens
-			local isExchangable = modItemsLibrary:HasTag(itemLib.Id, "Skin Perm") or modItemsLibrary:HasTag(itemLib.Id, "Color Pack") or modItemsLibrary:HasTag(itemLib.Id, "Skin Pack");
-			local activeBpId = modBattlePassLibrary.Active;
-			local battlepassLib = activeBpId and modBattlePassLibrary:Find(activeBpId);
-			if modBattlePassLibrary.Library.GiftShop 
-            and activeBpId 
-            and #activeBpId > 0 
-            and isExchangable 
-            and battlepassLib 
-            and battlepassLib.Tree 
-            then
+		--== MARK: Exchange Gift Shop Tokens
+		local isExchangable = modItemsLibrary:HasTag(itemLib.Id, "Skin Perm") or modItemsLibrary:HasTag(itemLib.Id, "Color Pack") or modItemsLibrary:HasTag(itemLib.Id, "Skin Pack");
+		local activeBpId = modBattlePassLibrary.Active and #modBattlePassLibrary.Active > 0 and modBattlePassLibrary.Active or nil;
+		local battlepassLib = activeBpId and modBattlePassLibrary:Find(activeBpId);
 
+		local hasBpTree = battlepassLib and battlepassLib.Tree 
+
+		if modBattlePassLibrary.Library.GiftShop and activeBpId and isExchangable and hasBpTree then
+			binds.NewListing(function(newListing)
+				local infoBox = newListing:WaitForChild("infoFrame");
+				local descFrame = infoBox:WaitForChild("descFrame");
+
+				local purchaseButton = newListing:WaitForChild("purchaseButton");
+				local priceLabel = purchaseButton:WaitForChild("buttonText");
+				local iconButton = newListing:WaitForChild("iconButton");
+				local iconLabel = iconButton:WaitForChild("iconLabel");
+				local titleLabel = descFrame:WaitForChild("titleLabel");
+				local labelFrame = descFrame:WaitForChild("labelFrame");
+				local descLabel = labelFrame:WaitForChild("descLabel");
+
+				local tokenReward = 1;
+				descLabel.Text = `Exchange {itemLib.Name} for <b>{tokenReward}</b> Event Pass's Gift Shop Token`;
+				titleLabel.Text = `Exchange {tokenReward} Token`;
+				priceLabel.Text = `{tokenReward} Token`;
+				iconLabel.Image = battlepassLib.Icon;
+
+				local exchangeItemDebounce = false;
+				newListing.MouseButton1Click:Connect(function()
+					if exchangeItemDebounce then return end;
+					exchangeItemDebounce = true;
+
+					modClientGuis.promptDialogBox({
+						Title=`Exchange: {itemLib.Name}`;
+						Desc=`Are you sure you want to exchange <b>1 {itemLib.Name}</b> for <b>{tokenReward}</b> token.`;
+						Icon=itemLib.Icon;
+						Buttons={
+							{
+								Text="Exchange";
+								Style="Confirm";
+								OnPrimaryClick=function(dialogWindow, textButton)
+									local statusLabel = dialogWindow.Binds.StatusLabel;
+									statusLabel.Text = "Exchanging item<...>";
+
+									if selectedItem.Fav then
+										statusLabel.Text = "Can't exchange favorited items.";
+										exchangeItemDebounce = false;
+										
+										return;
+									end;
+
+									local serverReply = remoteShopService:InvokeServer("exchangefortoken", binds.InteractPart, storageItemID);
+									if serverReply == modShopLibrary.PurchaseReplies.Success then
+										statusLabel.Text = "Exchanged!";
+										wait(0.5);
+										
+									else
+										warn("Exchange Item>> Error Code:"..tostring(serverReply));
+										statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply));
+										task.wait(1);
+
+									end
+
+									window:Update();
+								end;
+							};
+							{
+								Text="Cancel";
+								Style="Cancel";
+							};
+						}
+					});
+
+					exchangeItemDebounce = false;
+				end)
+			end)
+
+			--== MARK: Exchange all for Gift Shop Tokens
+			if selectedItem.Quantity > 1 then
 				binds.NewListing(function(newListing)
 					local infoBox = newListing:WaitForChild("infoFrame");
 					local descFrame = infoBox:WaitForChild("descFrame");
@@ -788,8 +882,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					local labelFrame = descFrame:WaitForChild("labelFrame");
 					local descLabel = labelFrame:WaitForChild("descLabel");
 
-					local tokenReward = 1;
-					descLabel.Text = `Exchange {itemLib.Name} for <b>{tokenReward}</b> Event Pass's Gift Shop Token`;
+					local tokenReward = 1 * selectedItem.Quantity;
+					descLabel.Text = `Exchange <b>{itemLib.Name}</b> for <b>{tokenReward}</b> Event Pass's Gift Shop Token`;
 					titleLabel.Text = `Exchange {tokenReward} Token`;
 					priceLabel.Text = `{tokenReward} Token`;
 					iconLabel.Image = battlepassLib.Icon;
@@ -799,37 +893,39 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						if exchangeItemDebounce then return end;
 						exchangeItemDebounce = true;
 
+						local exchangeQuantity = selectedItem.Quantity;
 						modClientGuis.promptDialogBox({
-							Title=`Exchange: {itemLib.Name}`;
-							Desc=`Are you sure you want to exchange <b>1 {itemLib.Name}</b> for <b>{tokenReward}</b> token.`;
+							Title=`Exchange All: {itemLib.Name}`;
+							Desc=`Are you sure you want to exchange <b>{exchangeQuantity} {itemLib.Name}</b> for <b>{tokenReward}</b> tokens.`;
 							Icon=itemLib.Icon;
 							Buttons={
 								{
-									Text="Exchange";
+									Text="Exchange All";
 									Style="Confirm";
-									OnPrimaryClick=function(promptDialogFrame, textButton)
-										promptDialogFrame.statusLabel.Text = "Exchanging item..";
+									OnPrimaryClick=function(dialogWindow, textButton)
+										local statusLabel = dialogWindow.Binds.StatusLabel;
+										statusLabel.Text = "Exchanging item<...>";
 
 										if selectedItem.Fav then
-											promptDialogFrame.statusLabel.Text = "Can't exchange favorited items.";
+											statusLabel.Text = "Can't exchange favorited items.";
 											exchangeItemDebounce = false;
 											
 											return;
 										end;
 
-										local serverReply = remoteShopService:InvokeServer("exchangefortoken", binds.InteractPart, storageItemID);
+										local serverReply = remoteShopService:InvokeServer("exchangefortoken", binds.InteractPart, storageItemID, exchangeQuantity);
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
-											promptDialogFrame.statusLabel.Text = "Exchanged!";
-											wait(0.5);
+											statusLabel.Text = `Exchanged <b>{exchangeQuantity} {itemLib.Name}</b> for <b>{tokenReward}</b> tokens!`;
+											wait(1);
 											
 										else
 											warn("Exchange Item>> Error Code:"..tostring(serverReply));
-											promptDialogFrame.statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply));
+											statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply));
 											task.wait(1);
 
 										end
 
-                                        window:Update();
+										window:Update();
 									end;
 								};
 								{
@@ -838,83 +934,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								};
 							}
 						});
-
+						
 						exchangeItemDebounce = false;
 					end)
 				end)
-
-				--== MARK: Exchange all for Gift Shop Tokens
-				if selectedItem.Quantity > 1 then
-					binds.NewListing(function(newListing)
-						local infoBox = newListing:WaitForChild("infoFrame");
-						local descFrame = infoBox:WaitForChild("descFrame");
-	
-						local purchaseButton = newListing:WaitForChild("purchaseButton");
-						local priceLabel = purchaseButton:WaitForChild("buttonText");
-						local iconButton = newListing:WaitForChild("iconButton");
-						local iconLabel = iconButton:WaitForChild("iconLabel");
-						local titleLabel = descFrame:WaitForChild("titleLabel");
-						local labelFrame = descFrame:WaitForChild("labelFrame");
-						local descLabel = labelFrame:WaitForChild("descLabel");
-	
-						local tokenReward = 1 * selectedItem.Quantity;
-						descLabel.Text = `Exchange <b>{itemLib.Name}</b> for <b>{tokenReward}</b> Event Pass's Gift Shop Token`;
-						titleLabel.Text = `Exchange {tokenReward} Token`;
-						priceLabel.Text = `{tokenReward} Token`;
-						iconLabel.Image = battlepassLib.Icon;
-	
-						local exchangeItemDebounce = false;
-						newListing.MouseButton1Click:Connect(function()
-							if exchangeItemDebounce then return end;
-							exchangeItemDebounce = true;
-	
-							local exchangeQuantity = selectedItem.Quantity;
-							modClientGuis.promptDialogBox({
-								Title=`Exchange All: {itemLib.Name}`;
-								Desc=`Are you sure you want to exchange <b>{exchangeQuantity} {itemLib.Name}</b> for <b>{tokenReward}</b> tokens.`;
-								Icon=itemLib.Icon;
-								Buttons={
-									{
-										Text="Exchange All";
-										Style="Confirm";
-										OnPrimaryClick=function(promptDialogFrame, textButton)
-											promptDialogFrame.statusLabel.Text = "Exchanging item..";
-	
-											if selectedItem.Fav then
-												promptDialogFrame.statusLabel.Text = "Can't exchange favorited items.";
-												exchangeItemDebounce = false;
-												
-												return;
-											end;
-	
-											local serverReply = remoteShopService:InvokeServer("exchangefortoken", binds.InteractPart, storageItemID, exchangeQuantity);
-											if serverReply == modShopLibrary.PurchaseReplies.Success then
-												promptDialogFrame.statusLabel.Text = `Exchanged <b>{exchangeQuantity} {itemLib.Name}</b> for <b>{tokenReward}</b> tokens!`;
-												wait(1);
-												
-											else
-												warn("Exchange Item>> Error Code:"..tostring(serverReply));
-												promptDialogFrame.statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply));
-												task.wait(1);
-	
-											end
-	
-                                            window:Update();
-										end;
-									};
-									{
-										Text="Cancel";
-										Style="Cancel";
-									};
-								}
-							});
-							
-							exchangeItemDebounce = false;
-						end)
-					end)
-				end
 			end
-
 		end
 
 		if modConfigurations.CompactInterface then

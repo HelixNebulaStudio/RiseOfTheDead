@@ -19,14 +19,6 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnClientUnequip(handler)
-	local localPlayer = game.Players.LocalPlayer;
-	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-	
-	modInterface:CloseWindow("GpsWindow");
-end
-
 function toolPackage.newClass()
 	return modEquipmentClass.new(toolPackage);
 end

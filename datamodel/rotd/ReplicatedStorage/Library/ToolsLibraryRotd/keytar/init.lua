@@ -1,13 +1,10 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
---==
+local RunService = game:GetService("RunService");
 
-local BaseTracks = {
-	{Id="rbxassetid://15298676220"; Name="0% Angel"};
-	{Id="rbxassetid://15298676388"; Name="Faded"};
-	{Id="rbxassetid://15298676523"; Name="Coffin Dance"};
-};
+local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+local modGuitarTool = shared.require(game.ReplicatedStorage.Library.ToolsLibraryRotd.guitar);
 
 local toolPackage = {
 	ItemId=script.Name;
@@ -56,25 +53,25 @@ local toolPackage = {
 
 	Holster = {
 		RightSwordAttachment={PrefabName="keytar"; C1=CFrame.new(0.5, 0.699999988, 0.600000024, -0.559192836, -0.829037607, -8.16161929e-08, -0.773973286, 0.522051454, -0.35836795, 0.297100574, -0.200396717, -0.933580399);}; -- C1 attribute on motor6d;
-	}
-};
+	};
 
-local RunService = game:GetService("RunService");
-local CollectionService = game:GetService("CollectionService");
-function toolPackage.OnInputEvent(toolHandler: ToolHandlerInstance, inputData)
+	TuneVolume = 3;
+	TuneTracks = {
+		{Id="rbxassetid://15298676220"; Name="0% Angel"};
+		{Id="rbxassetid://15298676388"; Name="Faded"};
+		{Id="rbxassetid://15298676523"; Name="Coffin Dance"};
+	};
+};
+--==
+
+function toolPackage.InputEvent(handler: ToolHandlerInstance, inputData)
 	if inputData.InputType ~= "Begin" or inputData.KeyIds.KeyFire == nil then return end;
 
-	local properties = toolHandler.EquipmentClass.Properties;
-	local handle = toolHandler.Prefabs[1].PrimaryPart;
+	local properties = handler.EquipmentClass.Properties;
 
 	if RunService:IsClient() then
-		local player = game.Players.LocalPlayer;
-		local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-		local modInterface = modData:GetInterfaceModule();
-
-		if not modInterface:IsVisible("InstrumentWindow") then
-			return;
-		end
+		local window: InterfaceWindow = modClientGuis.getWindow("InstrumentWindow");
+		if window.Visible then return end;
 
 		if properties.IsActive == nil then
 			properties.IsActive = false;
@@ -82,94 +79,22 @@ function toolPackage.OnInputEvent(toolHandler: ToolHandlerInstance, inputData)
 		properties.IsActive = not properties.IsActive;
 		inputData.IsActive = properties.IsActive;
 
-		task.spawn(function()
-			local track = handle:WaitForChild("TuneMusic");
-			if handle:FindFirstChild("musicConn") == nil then
-				local newTag = Instance.new("BoolValue");
-				newTag.Name = "musicConn";
-				newTag.Parent = handle;
-
-				local lastId;
-				local function onChanged()
-					if lastId ~= track.SoundId then
-						lastId = track.SoundId;
-
-						for a=1, #BaseTracks do
-							if BaseTracks[a].Id == lastId then
-								modInterface:HintWarning("Tune: "..BaseTracks[a].Name, 2, Color3.fromRGB(255, 255, 255));
-								break;
-							end
-						end
-					end
-				end
-				onChanged();
-				track:GetPropertyChangedSignal("SoundId"):Connect(onChanged);
-			end
-		end)
+		modGuitarTool.ClientPrimaryFire(handler);
 
 	else
 		if properties.Index == nil then
 			properties.Index = 1;
 		end
-		properties.IsActive = inputData.IsActive;
 
-		if properties.IsActive then
-			local sound = handle:FindFirstChild("TuneMusic");
-			local function nextTrack()
-				if properties.IsActive then
-					sound.SoundId = BaseTracks[properties.Index].Id;
-					sound.Volume = 3;
-					sound:Play();
-				end
-				properties.Index = properties.Index == #BaseTracks and 1 or properties.Index +1;
-			end
-
-			if sound == nil then
-				sound = Instance.new("Sound");
-				sound.Ended:Connect(function()
-					wait(1);
-					nextTrack();
-				end)
-			end
-			sound.Name = "TuneMusic";
-			sound.RollOffMaxDistance = 128;
-			sound.RollOffMinDistance = 20;
-			sound.Volume = 1;
-			sound.SoundGroup = game.SoundService:FindFirstChild("InstrumentMusic");
-
-			sound:SetAttribute("SoundOwner", player and player.Name or nil);
-			CollectionService:AddTag(sound, "PlayerNoiseSounds");
-			sound.Parent = handle;
-
-			nextTrack();
-			properties.ActiveTrack = sound;
-
-			if handle:FindFirstChild("musicParticle") then
-				handle.musicParticle.Enabled = true;
-			end
-
-		else
-			if handle:FindFirstChild("musicParticle") then
-				handle.musicParticle.Enabled = false;
-			end
-				
-			if properties.ActiveTrack then
-				properties.ActiveTrack:Stop();
-			end
-		end
-
+		modGuitarTool.ActionEvent(handler, {
+			ActionIndex = 1;
+			IsActive = inputData.IsActive;
+		});
 	end
 
 	return true; -- submit input to server;
 end
 
-function toolPackage.ClientUnequip()
-	local player = game.Players.LocalPlayer;
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-
-	modInterface:CloseWindow("InstrumentWindow");
-end
 
 function toolPackage.newClass()
 	return modEquipmentClass.new(toolPackage);

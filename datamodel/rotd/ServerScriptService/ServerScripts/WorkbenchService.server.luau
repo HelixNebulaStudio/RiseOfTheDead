@@ -61,9 +61,9 @@ end
 
 function remoteWorkbenchService.OnServerInvoke(player, action: string, ...)
 	if action == "interfacetoggle" then
-		shared.modEventService:ServerInvoke("WorkbenchService_InterfaceToggle", {ReplicateTo={player}}, ...);
+		shared.modEventService:ServerInvoke("WorkbenchService_OnInterfaceToggle", {ReplicateTo={player}}, ...);
 	elseif action == "itemselect" then
-		shared.modEventService:ServerInvoke("WorkbenchService_ItemSelect", {ReplicateTo={player}}, ...);
+		shared.modEventService:ServerInvoke("WorkbenchService_OnItemSelect", {ReplicateTo={player}}, ...);
 	end
 end
 

@@ -73,26 +73,33 @@ if RunService:IsServer() then
 			end
 		end)
 		
-		modOnGameEvents:ConnectEvent("OnRatShopAction", function(player, actionPacket)
-			if actionPacket.Action ~= "BuyAmmo" then return end;
-			if not modMission:Progress(player, MISSION_ID) then return end;
-
-			modMission:Progress(player, MISSION_ID, function(mission)
-				local m2restorepointEvent = modEvents:GetEvent(player, "m2restorepoint");
-				if mission.ProgressionPoint < 7 then
-					mission.ProgressionPoint = 7;
-					modAnalyticsService:LogOnBoarding{
-						Player=player;
-						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_PurchaseAmmo;
-					};
-
-				elseif m2restorepointEvent then
-					mission.ProgressionPoint = m2restorepointEvent.Point;
-					modEvents:RemoveEvent(player, "m2restorepoint");
-				end;
-			end)
+		shared.modEventService:OnInvoked("Shop_OnActionEvent", function(event: EventPacket, action: string, packet: anydict)
+			local player = event.Player;
+			if player == nil then return end;
 			
+			if action == "BuyAmmo" then
+				local storageItem = packet.StorageItem;
+				local cost = packet.Cost;
+
+				if not modMission:Progress(player, MISSION_ID) then return end;
+
+				modMission:Progress(player, MISSION_ID, function(mission)
+					local m2restorepointEvent = modEvents:GetEvent(player, "m2restorepoint");
+					if mission.ProgressionPoint < 7 then
+						mission.ProgressionPoint = 7;
+						modAnalyticsService:LogOnBoarding{
+							Player=player;
+							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_PurchaseAmmo;
+						};
+
+					elseif m2restorepointEvent then
+						mission.ProgressionPoint = m2restorepointEvent.Point;
+						modEvents:RemoveEvent(player, "m2restorepoint");
+					end;
+				end)
+			end
 		end)
+		
 
 		modOnGameEvents:ConnectEvent("OnMedicHeal", function(player, npcName)
 			if not modMission:Progress(player, MISSION_ID) then return end;

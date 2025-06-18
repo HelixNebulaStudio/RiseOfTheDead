@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 --==
 
@@ -25,14 +26,12 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnSpawn(handler, prefab: Model)
+function toolPackage.BuildStructure(prefab: Model, optionalPacket)
 	Debugger.Expire(prefab, 60);
-		
-	local newInteractable = script.Interactable:Clone();
-	newInteractable:SetAttribute("UseLimit", 3);
-	newInteractable.Parent = prefab;
 
-	local interactData = shared.require(newInteractable);
+	local newInteractConfig = modInteractables.createInteractable("ResupplyStation", "AmmoBox");
+	newInteractConfig:SetAttribute("UseLimit", 3);
+	newInteractConfig.Parent = prefab;
 end;
 
 function toolPackage.newClass()

@@ -1,52 +1,51 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Configuration;
-
---== Variables;
-local Interface = {};
-
+--==
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = shared.require(localPlayer:WaitForChild("DataModule")) :: ModuleScript;
-local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
-local remoteLiveFeedRemote = modRemotesManager:Get("LiveFeedRemote") :: UnreliableRemoteEvent;
+local MAX_FEED_COUNT = 5;
 
-local hudTemplate = script:WaitForChild("LiveFeedHud");
+local interfacePackage = {
+    Type = "Player";
+};
+--==
 
-local templateGenericListing = script:WaitForChild("genericListing");
-local templateRightAvatarLabel = script:WaitForChild("RightAvatarLabel");
-local templateLeftAvatarLabel = script:WaitForChild("LeftAvatarLabel");
-local templateAdditionalAvatarLabel = script:WaitForChild("additionalAvatarLabel");
-local templateSymbolLabel = script:WaitForChild("symbolLabel");
 
-local ContTypes = {
-	RAvatarLabel = templateRightAvatarLabel;
-	LAvatarLabel = templateLeftAvatarLabel;
-	AddAva = templateAdditionalAvatarLabel;
+function interfacePackage.newInstance(interface: InterfaceInstance)
+    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
-	KillSym = templateSymbolLabel;
-	Icon = templateSymbolLabel;
-}
+    local remoteLiveFeedRemote = modRemotesManager:Get("LiveFeedRemote");
 
-local maxFeedCount = 5;
---== Script;
-function Interface.init(modInterface)
-	setmetatable(Interface, modInterface);
-	
-	local windowFrame = hudTemplate:Clone();
-	windowFrame.Parent = modInterface.MainInterface;
+    local templateGenericListing = script:WaitForChild("genericListing");
+    local templateRightAvatarLabel = script:WaitForChild("RightAvatarLabel");
+    local templateLeftAvatarLabel = script:WaitForChild("LeftAvatarLabel");
+    local templateAdditionalAvatarLabel = script:WaitForChild("additionalAvatarLabel");
+    local templateSymbolLabel = script:WaitForChild("symbolLabel");
 
-	local window = Interface.NewWindow("StatusWindow", windowFrame);
+    local CONT_TYPES = {
+        RAvatarLabel = templateRightAvatarLabel;
+        LAvatarLabel = templateLeftAvatarLabel;
+        AddAva = templateAdditionalAvatarLabel;
+
+        KillSym = templateSymbolLabel;
+        Icon = templateSymbolLabel;
+    }
+
+
+    local windowFrame = script:WaitForChild("LiveFeedHud"):Clone();
+	windowFrame.Parent = interface.ScreenGui;
+
+	local window: InterfaceWindow = interface:NewWindow("StatusWindow", windowFrame);
 	window.IgnoreHideAll = true;
 	window.ReleaseMouse = false;
-	window:SetOpenClosePosition(UDim2.new(0.02, 0, 0.2, 0), UDim2.new(0.02, 0, -1.1, 0));
+
+	window:SetClosePosition(UDim2.new(0.02, 0, -1.1, 0), UDim2.new(0.02, 0, 0.2, 0));
 	
-	Interface.Garbage:Tag(remoteLiveFeedRemote.OnClientEvent:Connect(function(packet)
+	interface.Garbage:Tag(remoteLiveFeedRemote.OnClientEvent:Connect(function(packet)
 		window:Open();
 
 		packet = packet or {};
@@ -73,7 +72,7 @@ function Interface.init(modInterface)
 				end
 			end
 
-			local contTypeTemplate = ContTypes[contType];
+			local contTypeTemplate = CONT_TYPES[contType];
 			if contTypeTemplate == nil then continue end;
 
 			local new = contTypeTemplate:Clone() :: Frame;
@@ -128,14 +127,14 @@ function Interface.init(modInterface)
 			return a.T < b.T;
 		end)
 
-		while #orderedListing > maxFeedCount do
+		while #orderedListing > MAX_FEED_COUNT do
 			local tObj = table.remove(orderedListing, 1);
 			if tObj == nil then break; end;
 			game.Debris:AddItem(tObj.Obj, 0);
 		end
 	end));
-	
-	return Interface;
-end;
 
-return Interface;
+end
+
+return interfacePackage;
+

@@ -205,7 +205,7 @@ function interactablePackage.init(super) -- Server/Client
 				{
 					Text="Leave";
 					Style="Confirm";
-					OnPrimaryClick=function(promptDialogFrame, textButton)
+					OnPrimaryClick=function(dialogWindow)
 						interface:ToggleGameBlinds(false, 3);
 						
 						local characterVars = info.CharacterVars;

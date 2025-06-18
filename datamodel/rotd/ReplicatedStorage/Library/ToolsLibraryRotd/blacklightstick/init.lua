@@ -95,7 +95,7 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler, packet)
 	if packet.ActionIndex ~= 1 then return end;
 	local isActive = packet.IsActive;
 

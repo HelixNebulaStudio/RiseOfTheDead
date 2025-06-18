@@ -1,66 +1,70 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Configuration;
-
---== Variables;
-local Interface = {};
-
+--==
 local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
-
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
-local remotes = game.ReplicatedStorage.Remotes;
-local remoteSafehomeRequest = modRemotesManager:Get("SafehomeRequest");
-	
-local windowFrameTemplate = script:WaitForChild("Safehome");
-local templateListing = script:WaitForChild("safehomeListing");
-local templateStatsPage = script:WaitForChild("StatsPage");
-local templateSurvivorsListing = script:WaitForChild("survivorsListing");
-local templateNpcCapacity = script:WaitForChild("NpcCapacity");
-local templateAppearanceListing = script:WaitForChild("AppearanceListing");
 
-Interface.Page = "Safehome Stats"
---== Script;
-function Interface.init(modInterface)
-	setmetatable(Interface, modInterface);
+local interfacePackage = {
+    Type = "Character";
+};
+--==
 
-	local colorPickerObj = Interface.ColorPicker;
 
-	local windowFrame = windowFrameTemplate:Clone();
-	windowFrame.Parent = modInterface.MainInterface;
+function interfacePackage.newInstance(interface: InterfaceInstance)
+    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
+    local remoteSafehomeRequest = modRemotesManager:Get("SafehomeRequest");
 
-	local window = Interface.NewWindow("Safehome", windowFrame);
-	window:SetOpenClosePosition(UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0.5, 0, -1.5, 0));
-	window.OnWindowToggle:Connect(function(visible)
+    local templateListing = script:WaitForChild("safehomeListing");
+    local templateStatsPage = script:WaitForChild("StatsPage");
+    local templateSurvivorsListing = script:WaitForChild("survivorsListing");
+    local templateNpcCapacity = script:WaitForChild("NpcCapacity");
+    local templateAppearanceListing = script:WaitForChild("AppearanceListing");
+
+    local colorPickerObj = interface.ColorPicker;
+
+	local windowFrame = script:WaitForChild("Safehome"):Clone();
+	windowFrame.Parent = interface.ScreenGui;
+
+	local window: InterfaceWindow = interface:NewWindow("Safehome", windowFrame);
+    window.CloseWithInteract = true;
+    window.DisableInteractables = true;
+	window:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, 0));
+    interface:BindConfigKey("DisableSafehomeMenu", {window});
+
+	modKeyBindsHandler:SetDefaultKey("KeyWindowSafehome", Enum.KeyCode.U);
+	local quickButton = interface:NewQuickButton("Safehome", "Safehome", "rbxassetid://7045405631");
+	quickButton.LayoutOrder = 10;
+	interface:ConnectQuickButton(quickButton, "KeyWindowSafehome");
+
+	windowFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+		window:Close();
+	end)
+
+    local binds = window.Binds;
+    binds.Page = "Safehome Stats";
+
+    --MARK: OnToggle
+	window.OnToggle:Connect(function(visible)
 		if visible then
 			modData:RequestData("Safehome");
-			Interface:HideAll{[window.Name]=true};
-			Interface:ToggleInteraction(false);
-			Interface.Update();
+
+			interface:HideAll{[window.Name]=true};
+            window:Update();
 
 		else
 			colorPickerObj.Frame.Visible = false;
-			task.delay(0.3, function()
-				Interface:ToggleInteraction(true);
-			end)
 
 		end
 	end)
-
-	window:AddCloseButton(windowFrame);
-	local titleLabel = windowFrame:WaitForChild("TitleFrame"):WaitForChild("Title");
 
 	local optionsScrollList = windowFrame:WaitForChild("OptionsScroll");
 	local scrollFrame = windowFrame:WaitForChild("ScrollingFrame");
@@ -70,10 +74,10 @@ function Interface.init(modInterface)
 			local page = obj.Text;
 
 			obj.MouseButton1Click:Connect(function()
-				Interface:PlayButtonClick();
+				interface:PlayButtonClick();
 
-				Interface.Page = page;
-				Interface.Update();
+				binds.Page = page;
+				window:Update();
 			end)
 		end
 	end
@@ -83,24 +87,14 @@ function Interface.init(modInterface)
 		modConfigurations.Set("DisableSafehomeMenu", true);
 	end
 	
-	window:SetConfigKey("DisableSafehomeMenu");
 	
-	modKeyBindsHandler:SetDefaultKey("KeyWindowSafehome", Enum.KeyCode.U);
-	local quickButton = Interface:NewQuickButton("Safehome", "Safehome", "rbxassetid://7045405631");
-	quickButton.LayoutOrder = 10;
-	modInterface:ConnectQuickButton(quickButton, "KeyWindowSafehome");
-	
-	
-	windowFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
-		Interface:CloseWindow("Safehome");
-	end)
-	
-	Interface.Garbage:Tag(workspace:GetAttributeChangedSignal("SafehomeMap"):Connect(function()
+	interface.Garbage:Tag(workspace:GetAttributeChangedSignal("SafehomeMap"):Connect(function()
 		if windowFrame.Visible then
-			Interface.Update();
+			window:Update();
 		end
 	end))
 	
+
 	local safehomeData = modData and modData.Profile and modData.Profile.Safehome;
 	local lastFetch = tick();
 	local function fetchSafehomeData()
@@ -117,11 +111,12 @@ function Interface.init(modInterface)
 	end
 
 	local debounce = false;
-	function Interface.Update()
+    --MARK: OnUpdate
+    window.OnUpdate:Connect(function()
 		safehomeData = modData and modData.Profile and modData.Profile.Safehome;
 		if safehomeData == nil then return end;
 		local homesData = safehomeData.Homes;
-		local page = Interface.Page;
+		local page = binds.Page;
 
 		debounce = false;
 
@@ -166,7 +161,7 @@ function Interface.init(modInterface)
 						if rPacket.Data then
 							modData.Profile.Safehome = rPacket.Data;
 						end
-						Interface.Update();
+						window:Update();
 					end)
 
 				else
@@ -175,55 +170,51 @@ function Interface.init(modInterface)
 						setButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
 
 						setButton.MouseButton1Click:Connect(function()
-							Interface:PlayButtonClick();
+							interface:PlayButtonClick();
 
+                            modClientGuis.promptDialogBox({
+                                Title = `Purchase Safehome`;
+                                Desc = `Are you sure you want to purchase ({safehomeLib.Name}) for {modFormatNumber.Beautify(safehomeLib.Price)} Gold?`;
+                                Icon = safehomeLib.Image;
+                                Buttons={
+                                    {
+                                        Text="Purchase";
+                                        Style="Gold";
+                                        OnPrimaryClick=function(dialogWindow)
+                                            local statusLabel = dialogWindow.Binds.StatusLabel;
+                                            statusLabel.Text = "Purchasing<...>";
 
-							local promptWindow = modClientGuis.promptQuestion(
-								"Purchase Safehome", 
-								"Are you sure you want to purchase ("..safehomeLib.Name..") for "..modFormatNumber.Beautify(safehomeLib.Price).." Gold?",
-								nil,
-								nil,
-								safehomeLib.Image
-							);
-							local YesClickedSignal, NoClickedSignal;
+                                            local rPacket = remoteSafehomeRequest:InvokeServer("purchaseSafehome", {
+                                                SafehomeId=safehomeLib.Id;
+                                            });
+                                            if rPacket.Data then
+                                                modData.Profile.Safehome = rPacket.Data;
+                                            end
 
-							YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-								if debounce then return end;
-								debounce = true;
-								Interface:PlayButtonClick();
-								local rPacket = remoteSafehomeRequest:InvokeServer("purchaseSafehome", {SafehomeId=safehomeLib.Id;});
-								if rPacket.Data then
-									modData.Profile.Safehome = rPacket.Data;
-								end
+                                            if rPacket.ReplyCode == 1 then
+                                                statusLabel.Text = "Purchased!";
 
-								if rPacket.ReplyCode == 1 then
-									promptWindow.Frame.Yes.buttonText.Text = "Purchased!";
+                                            elseif rPacket.ReplyCode == 2 then
+                                                statusLabel.Text = "Not enough Gold!";
+                                                task.wait(1);
+                                                interface:ToggleWindow("GoldMenu", true, "GoldPage");
+                                                return;
 
-								elseif rPacket.ReplyCode == 2 then
-									promptWindow.Frame.Yes.buttonText.Text = "Not enough Gold!";
-									wait(1);
-									promptWindow:Close();
-									Interface:OpenWindow("GoldMenu", "GoldPage");
-									return;
+                                            else
+                                                statusLabel.Text = "Please try again!";
 
-								else
-									promptWindow.Frame.Yes.buttonText.Text = "Please try again!";
+                                            end
+                                            task.wait(2);
+                                            
+                                        end;
+                                    };
+                                    {
+                                        Text="Cancel";
+                                        Style="Cancel";
+                                    };
+                                }
+                            });
 
-								end
-								wait(1);
-								promptWindow:Close();
-								Interface:OpenWindow("Safehome");
-								YesClickedSignal:Disconnect();
-								NoClickedSignal:Disconnect();
-							end);
-							NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-								if debounce then return end;
-								Interface:PlayButtonClick();
-								promptWindow:Close();
-								Interface:OpenWindow("Safehome");
-								YesClickedSignal:Disconnect();
-								NoClickedSignal:Disconnect();
-							end);
 						end)
 						
 					elseif safehomeLib.UnlockHint then
@@ -234,8 +225,10 @@ function Interface.init(modInterface)
 					end
 
 					inspectButton.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
-						local rPacket = remoteSafehomeRequest:InvokeServer("inspectSafehome", {SafehomeId=safehomeLib.Id;});
+						interface:PlayButtonClick();
+						local _rPacket = remoteSafehomeRequest:InvokeServer("inspectSafehome", {
+                            SafehomeId=safehomeLib.Id;
+                        });
 					end)
 
 				end
@@ -274,8 +267,8 @@ function Interface.init(modInterface)
 						textureLabel.BackgroundColor3 = savedColor or defaultColor;
 						
 						colorButton.MouseButton1Click:Connect(function()
-							Interface:PlayButtonClick();
-							Interface.SetPositionWithPadding(colorPickerObj.Frame);
+							interface:PlayButtonClick();
+							interface.setPositionWithPadding(colorPickerObj.Frame);
 							colorPickerObj.Frame.Visible = true;
 
 							if modConfigurations.CompactInterface then
@@ -285,7 +278,7 @@ function Interface.init(modInterface)
 							end
 							
 							function colorPickerObj:OnColorSelect(selectColor)
-								Interface:PlayButtonClick();
+								interface:PlayButtonClick();
 								textureLabel.BackgroundColor3 = selectColor;
 								colorPickerObj.Frame.Visible = false;
 								
@@ -299,7 +292,7 @@ function Interface.init(modInterface)
 						end)
 						
 						local function resetColor()
-							Interface:PlayButtonClick();
+							interface:PlayButtonClick();
 							textureLabel.BackgroundColor3 = defaultColor;
 							
 							local rPacket = remoteSafehomeRequest:InvokeServer("customizeSafehome", {
@@ -399,50 +392,50 @@ function Interface.init(modInterface)
 
 					local inspectButton = new:WaitForChild("InspectButton");
 					inspectButton.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
-						modInterface:OpenWindow("NpcWindow", name);
+						interface:PlayButtonClick();
+                        interface:ToggleWindow("NpcWindow", true, name);
 					end)
 					
 					local kickButton = new:WaitForChild("KickButton");
 					kickButton.MouseButton1Click:Connect(function()
-						Interface:PlayButtonClick();
+						interface:PlayButtonClick();
 
-						local promptWindow = modClientGuis.promptQuestion(
-							"Kick Survivor", 
-							`Are you sure you want to kick {name} from the safehome?`
-						);
-						local YesClickedSignal, NoClickedSignal;
+                        modClientGuis.promptDialogBox({
+                            Title = `Kick Survivor`;
+                            Desc = `Are you sure you want to kick {name} from the safehome?`;
+                            Buttons={
+                                {
+                                    Text="Kick";
+                                    Style="Confirm";
+                                    OnPrimaryClick=function(dialogWindow)
+                                        local statusLabel = dialogWindow.Binds.StatusLabel;
+                                        statusLabel.Text = "Kicking<...>";
 
-						YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-							if debounce then return end;
-							debounce = true;
-							Interface:PlayButtonClick();
-							local rPacket = remoteSafehomeRequest:InvokeServer("kickSurvivor", {Name=name;});
-							if rPacket.Data then
-								modData.Profile.Safehome = rPacket.Data;
-							end
+                                        local rPacket = remoteSafehomeRequest:InvokeServer("kickSurvivor", {
+                                            Name=name;
+                                        });
+                                        if rPacket.Data then
+                                            modData.Profile.Safehome = rPacket.Data;
+                                        end
 
-							if rPacket.ReplyCode == 1 then
-								promptWindow.Frame.Yes.buttonText.Text = "Kicked!";
+                                        if rPacket.ReplyCode == 1 then
+                                            statusLabel.Text = "Kicked!";
 
-							else
-								promptWindow.Frame.Yes.buttonText.Text = rPacket.FailMsg or "Please try again!";
+                                        else
+                                            statusLabel.Text = rPacket.FailMsg or "Please try again!";
 
-							end
-							wait(1);
-							promptWindow:Close();
-							Interface:OpenWindow("Safehome");
-							YesClickedSignal:Disconnect();
-							NoClickedSignal:Disconnect();
-						end);
-						NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-							if debounce then return end;
-							Interface:PlayButtonClick();
-							promptWindow:Close();
-							Interface:OpenWindow("Safehome");
-							YesClickedSignal:Disconnect();
-							NoClickedSignal:Disconnect();
-						end);
+                                        end
+                                        
+                                        task.wait(2);
+                                        
+                                    end;
+                                };
+                                {
+                                    Text="Cancel";
+                                    Style="Cancel";
+                                };
+                            }
+                        });
 					end)
 
 					new.Parent = scrollFrame;
@@ -458,14 +451,14 @@ function Interface.init(modInterface)
 				capLabel.Text = "Safehome Capacity: "..activeCount.."/5";
 			end)
 		end
-	end
+	end)
 
 	function remoteSafehomeRequest.OnClientInvoke(rPacket)
 		modData.Profile.Safehome = rPacket.Data;
 		return;
 	end
-	
-	return Interface;
-end;
 
-return Interface;
+end
+
+return interfacePackage;
+

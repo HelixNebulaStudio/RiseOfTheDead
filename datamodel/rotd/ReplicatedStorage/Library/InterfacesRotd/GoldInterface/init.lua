@@ -116,25 +116,28 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
                 goldStatFrame.goldLabel.AnchorPoint = Vector2.new(0, 0.5);
                 goldStatFrame.goldLabel.Position = UDim2.new(0, 50, 0.5, 0);
+                goldStatFrame.goldLabel.Size = UDim2.new(0, 85, 0, 36);
                 goldStatFrame.goldLabel.TextXAlignment = Enum.TextXAlignment.Left;
 
             else
-                goldStatFrame.AnchorPoint = Vector2.new(1, 0);
-                goldStatFrame.Position = UDim2.new(1, -6, 0, 6);
+                goldStatFrame.AnchorPoint = Vector2.new(1, 0.5);
+                goldStatFrame.Position = UDim2.new(1, -20, 0, 33);
                 goldStatFrame.Size = UDim2.new(0, 200, 0, 25);
 
                 goldStatFrame.GoldMenu.AnchorPoint = Vector2.new(1, 0.5);
                 goldStatFrame.GoldMenu.Position = UDim2.new(1, 0, 0.5, 0);
-                goldStatFrame.GoldMenu.Size = UDim2.new(0, 26, 0, 26);
+                goldStatFrame.GoldMenu.Size = UDim2.new(0, 32, 0, 32);
 
                 goldStatFrame.goldLabel.AnchorPoint = Vector2.new(1, 0.5);
-                goldStatFrame.goldLabel.Position = UDim2.new(1, -30, 0.5, 0);
+                goldStatFrame.goldLabel.Position = UDim2.new(1, -50, 0.5, 0);
+                goldStatFrame.goldLabel.Size = UDim2.new(0, 85, 0, 36);
                 goldStatFrame.goldLabel.TextXAlignment = Enum.TextXAlignment.Right;
 
             end
         end
     end
 
+    --MARK: OnToggle
 	goldShopWindow.OnToggle:Connect(function(visible, productpageId)
 		if visible then
 			if initGoldLib == false then
@@ -231,6 +234,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end
 	interface.Garbage:Tag(modData.OnGoldUpdate:Connect(updateGoldStats));
 
+    --MARK: OnUpdate
     goldShopWindow.OnUpdate:Connect(function()
         Debugger:Warn(`modData.PlayerGold { modData.PlayerGold}`);
         updateGoldStats(modData.PlayerGold or 0);

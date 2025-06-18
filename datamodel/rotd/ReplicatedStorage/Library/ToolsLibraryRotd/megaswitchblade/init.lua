@@ -61,7 +61,7 @@ local toolPackage = {
 	};
 };
 
-function toolPackage.OnInputEvent(toolHandler: ToolHandlerInstance, inputData)
+function toolPackage.InputEvent(toolHandler: ToolHandlerInstance, inputData)
 	if inputData.InputType ~= "Begin" or inputData.KeyIds.KeyToggleSpecial == nil then return end;
 	
 	local properties = toolHandler.EquipmentClass.Properties;

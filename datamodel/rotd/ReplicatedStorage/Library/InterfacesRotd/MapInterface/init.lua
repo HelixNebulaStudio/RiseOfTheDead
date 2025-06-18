@@ -1,41 +1,19 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local ShowObjectTypes = {
-	Wall=true;
-	RampUp=true;
-	RampDown=true;
-	Door=true;
-	Boss=true;
-	Travel=true;
-	Shop=true;
-	GameMode=true;
-	GameModeExit=true;
-	Tile=true;
-}
-
---== Variables;
-local Interface = {};
-Interface.MapFrameOffset = Vector2.new();
-local DragSmoothness = 0.5; -- 0-1;
-
 local RunService = game:GetService("RunService");
 local TextService = game:GetService("TextService");
 local TweenService = game:GetService("TweenService");
 local UserInputService = game:GetService("UserInputService");
 
-local localplayer = game.Players.LocalPlayer;
-local modData = shared.require(localplayer:WaitForChild("DataModule") :: ModuleScript);
-local modEventSignal = shared.require(game.ReplicatedStorage.Library.EventSignal);
-local modSettings = shared.require(game.ReplicatedStorage.Library.Settings);
+local localPlayer = game.Players.LocalPlayer;
+
 local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
-local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modBranchConfigs = shared.require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modItem = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
 local modMapLibrary = shared.require(game.ReplicatedStorage.Library.MapLibrary);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
@@ -43,34 +21,43 @@ local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcPr
 
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
 
-local remotes = game.ReplicatedStorage.Remotes;
---== Script;
+local SHOW_MAP_OBJECTS = {
+	Wall=true;
+	RampUp=true;
+	RampDown=true;
+	Door=true;
+	Boss=true;
+	Travel=true;
+	Shop=true;
+	GameModeEnter=true;
+	GameModeExit=true;
+	Tile=true;
+};
 
-function Interface.init(modInterface)
-	setmetatable(Interface, modInterface);
-	local interfaceScreenGui = localplayer.PlayerGui:WaitForChild("MainInterface");
-	
-	local mapMenu = script:WaitForChild("MapFrame"):Clone();
-	mapMenu.Parent = interfaceScreenGui;
+local interfacePackage = {
+    Type = "Character";
+};
+--==
+
+
+function interfacePackage.newInstance(interface: InterfaceInstance)
+    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
+
+local mapMenu = script:WaitForChild("MapFrame"):Clone();
+	mapMenu.Parent = interface.ScreenGui;
 	
 	local locationPopup = script:WaitForChild("locationPopup"):Clone();
-	locationPopup.Parent = interfaceScreenGui;
+	locationPopup.Parent = interface.ScreenGui;
 	local locationPopupGradient = locationPopup:WaitForChild("UIGradient");
 
 	local mainFrame = mapMenu:WaitForChild("MainFrame");
 	local mapImage = mainFrame:WaitForChild("mapImage");
 
 	local locationLabel = mapMenu:WaitForChild("locationLabel");
-	local templateFloorButton = script:WaitForChild("FloorButton");
 	local templateObjectFrame = script:WaitForChild("ObjectFrame");
 	local templatePlayerPointer = script:WaitForChild("PlayerPointer");
-	local templateTravelOption = script:WaitForChild("TravelOption");
 
 	local templateNpcToolTip = script:WaitForChild("npcToolTip");
-
-	local fastTravelMenu = mapMenu:WaitForChild("fastTravel");
-	local travelOptionList = fastTravelMenu:WaitForChild("ScrollingFrame");
-	local travelListLayout = travelOptionList:WaitForChild("UIListLayout");
 
 	local pageInfo = mapMenu:WaitForChild("pageInfo");
 	local centerButton = pageInfo:WaitForChild("centerButton");
@@ -84,36 +71,50 @@ function Interface.init(modInterface)
 		mapMenu.Position = UDim2.new(0.5, 0, 0.5, 0);
 		mapMenu.Size = UDim2.new(1, 0, 1, 0);
 		
-		mapMenu:WaitForChild("touchCloseButton").Visible = true;
-		mapMenu:WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
-			Interface:CloseWindow("MapMenu");
-		end)
 		mapMenu:WaitForChild("HelpButton").Visible = false;
 	end
+
+    
+	local window: InterfaceWindow = interface:NewWindow("MapMenu", mapMenu);
+    interface:BindConfigKey("DisableMapMenu", {window});
+	
+	modKeyBindsHandler:SetDefaultKey("KeyWindowMapMenu", Enum.KeyCode.M);
+	local quickButton = interface:NewQuickButton("MapMenu", "Map", "rbxassetid://4615489625");
+	quickButton.LayoutOrder = 4;
+	interface:ConnectQuickButton(quickButton, "KeyWindowMapMenu");
+
+	if modConfigurations.CompactInterface then
+		window:SetClosePosition(UDim2.new(0.5, 0, -2, 0), UDim2.new(0.5, 0, 0.5, 0));
+	else
+		window:SetClosePosition(UDim2.new(0.5, 0, -2, 0), UDim2.new(0.5, 0, 0.5, -35));
+	end
+
+    local binds = window.Binds;
+	binds.Minimized = false;
+    binds.MapFrameOffset = Vector2.new();
+
+	mapMenu:WaitForChild("closeButton").MouseButton1Click:Connect(function()
+        window:Close();
+	end)
 	
 	local transparencyTag = Instance.new("NumberValue", script);
 
 	local mapOverviewLib = modBranchConfigs.MapOverviews[modBranchConfigs.GetWorld()];
 	if mapOverviewLib then
-		ShowObjectTypes.Wall = false;
-		ShowObjectTypes.RampUp = false;
-		ShowObjectTypes.RampDown = false;
+		SHOW_MAP_OBJECTS.Wall = false;
+		SHOW_MAP_OBJECTS.RampUp = false;
+		SHOW_MAP_OBJECTS.RampDown = false;
 	end
 
 	local rats = {};
 	local layerFrames = {};
 	local dynamicObjects = {};
 	local activeLayer = nil;
-	local userLayer = nil;
 	local scaleRatio = 3;
-	local lastPopup = tick()-10;
 
 
 	local mapScale = 1024;
 	local mapRatio = Vector2.new(1, 1);
-	local isDraggingMap = false;
-	local dragStartVec;
-	local newOffsetVec = Vector2.new();
 	local mapLayerLib;
 
 	local itemToolTip = modItemInterface.newItemTooltip();
@@ -181,65 +182,69 @@ function Interface.init(modInterface)
 						
 						customFrame:ClearAllChildren();
 						
-						if objInfo.InteractableModule then
-							local interactData = shared.require(objInfo.InteractableModule);
-							
-							if interactData.Type == "GameMode" then
-								self.Frame.Size = UDim2.new(0, 200, 0, 260);
-								
-								nameTag.Text = interactData.Name..": "..interactData.Values.Stage;
-								
-								local levelLabel = nameTag:Clone();
-								levelLabel.Size = UDim2.new(1, 0, 1, 0);
-								levelLabel.Parent = customFrame;
-								levelLabel.TextXAlignment = Enum.TextXAlignment.Left;
-								levelLabel.TextYAlignment = Enum.TextYAlignment.Top;
-								levelLabel.TextSize = 14;
-								
-								local uiPadding = Instance.new("UIPadding");
-								uiPadding.Parent = levelLabel;
-								uiPadding.PaddingLeft = UDim.new(0, 5);
-								uiPadding.PaddingTop = UDim.new(0, 5);
-								uiPadding.PaddingRight = UDim.new(0, 5);
-								uiPadding.PaddingBottom = UDim.new(0, 5);
-								
-								local stageLib = modGameModeLibrary.GameModes[interactData.Name].Stages[interactData.Values.Stage];
-								local rewardsLib = modRewardsLibrary:Find(stageLib.RewardsId);
-								
-								levelLabel.Text = rewardsLib.Level and "Mastery "..rewardsLib.Level.."+\n\n" or "";
-								
-								local rewardsString = "Rewards:\n";
-								
-								for a=1, #rewardsLib.Rewards do
-									local lib = modItem:Find(rewardsLib.Rewards[a].ItemId);
-									rewardsString = rewardsString.."• "..lib.Name..(a ~= #rewardsLib.Rewards and ",\n" or "");
-								end
-								levelLabel.Text = levelLabel.Text..rewardsString;
-								
-							elseif interactData.Type == "Travel" then
-								self.Frame.Size = UDim2.new(0, 360, 0, 200);
-								
-								local worldName = modBranchConfigs.GetWorldDisplayName(interactData.WorldId);
-								nameTag.Text = "Travel: "..worldName
-								
-								local worldLib = modBranchConfigs.WorldLibrary[interactData.WorldId];
-								
-								local newImage = Instance.new("ImageLabel");
-								newImage.Image = worldLib.Icon or "";
-								newImage.Size = UDim2.new(1, 0, 1, 0);
-								newImage.Parent = customFrame;
-								newImage.BorderSizePixel = 0;
-								newImage.BackgroundTransparency = 1;
-								newImage.ZIndex = 6;
-								
-							elseif interactData.Type == "Shop" then
-								nameTag.Text = "Shop";
+                        if objInfo.InteractableConfig == nil then return end;
+                        
+                        local interactable: InteractableInstance = modInteractables.getOrNew(objInfo.InteractableConfig, localPlayer);
 
-							--elseif interactData.Type == "Door" then
-							--	nameTag.Text = "Door";
-								
-							end
-						end
+                        if interactable.Type == "GameModeEnter" then
+                            self.Frame.Size = UDim2.new(0, 200, 0, 260);
+                            
+                            local mode = interactable.Values.Mode;
+                            local stage = interactable.Values.Stage;
+
+                            nameTag.Text = `{mode}: {stage}`;
+                            
+                            local levelLabel = nameTag:Clone();
+                            levelLabel.Size = UDim2.new(1, 0, 1, 0);
+                            levelLabel.Parent = customFrame;
+                            levelLabel.TextXAlignment = Enum.TextXAlignment.Left;
+                            levelLabel.TextYAlignment = Enum.TextYAlignment.Top;
+                            levelLabel.TextSize = 14;
+                            
+                            local uiPadding = Instance.new("UIPadding");
+                            uiPadding.Parent = levelLabel;
+                            uiPadding.PaddingLeft = UDim.new(0, 5);
+                            uiPadding.PaddingTop = UDim.new(0, 5);
+                            uiPadding.PaddingRight = UDim.new(0, 5);
+                            uiPadding.PaddingBottom = UDim.new(0, 5);
+                            
+                            local stageLib = modGameModeLibrary.GameModes[mode].Stages[stage];
+                            local rewardsLib = modRewardsLibrary:Find(stageLib.RewardsId);
+                            
+                            levelLabel.Text = rewardsLib.Level and "Mastery "..rewardsLib.Level.."+\n\n" or "";
+                            
+                            local rewardsString = "Rewards:\n";
+                            
+                            for a=1, #rewardsLib.Rewards do
+                                local lib = modItem:Find(rewardsLib.Rewards[a].ItemId);
+                                rewardsString = rewardsString.."• "..lib.Name..(a ~= #rewardsLib.Rewards and ",\n" or "");
+                            end
+                            levelLabel.Text = levelLabel.Text..rewardsString;
+                            
+                        elseif interactable.Type == "Travel" then
+                            self.Frame.Size = UDim2.new(0, 360, 0, 200);
+                            
+                            local worldName = modBranchConfigs.GetWorldDisplayName(interactable.Values.WorldId);
+                            nameTag.Text = "Travel: "..worldName
+                            
+                            local worldLib = modBranchConfigs.WorldLibrary[interactable.Values.WorldId];
+                            
+                            local newImage = Instance.new("ImageLabel");
+                            newImage.Image = worldLib.Icon or "";
+                            newImage.Size = UDim2.new(1, 0, 1, 0);
+                            newImage.Parent = customFrame;
+                            newImage.BorderSizePixel = 0;
+                            newImage.BackgroundTransparency = 1;
+                            newImage.ZIndex = 6;
+                            
+                        elseif interactable.Type == "Shop" then
+                            nameTag.Text = "Shop";
+
+                        --elseif interactData.Type == "Door" then
+                        --	nameTag.Text = "Door";
+                            
+                        end
+                            
 					end
 					
 					itemToolTip:Update();
@@ -331,14 +336,14 @@ function Interface.init(modInterface)
 			local objInfo = layerData.Data[a];
 			local objectType = objInfo.Type;
 			
-			if ShowObjectTypes[objectType] then
+			if SHOW_MAP_OBJECTS[objectType] then
 				frameObject(objInfo);
 				
 			end
 		end
 	end
 
-	function Interface.AddDynamic(class, name, basePart)
+	function binds.AddDynamic(class, name, basePart)
 		local id = class.."_"..name;
 		if dynamicObjects[id] then 
 			dynamicObjects[id].Object = basePart;
@@ -355,7 +360,7 @@ function Interface.init(modInterface)
 		new.Frame.Name = id;
 		new.Frame.Size = UDim2.new(0, 10, 0, 10) -- UDim2.new(0, 2 * scaleRatio, 0, 2 * scaleRatio);
 		
-		if class == "Player" and name == localplayer.Name then
+		if class == "Player" and name == localPlayer.Name then
 			new.Frame.ImageColor3 = Color3.fromRGB(255, 238, 0);
 			new.ZIndex = 5;
 			
@@ -428,15 +433,13 @@ function Interface.init(modInterface)
 		return new;
 	end
 
-	function Interface.RemoveDynamic(id)
+	function binds.RemoveDynamic(id)
 		if dynamicObjects[id] == nil then return end;
 		game.Debris:AddItem(dynamicObjects[id].Frame, 0);
 		dynamicObjects[id] = nil;
 	end
 	
-	function Interface.PopupLocationText(text)
-	--	if tick()-lastPopup <= 10 then return end;
-	--	lastPopup = tick();
+	function binds.PopupLocationText(text)
 		locationPopup.Text = text;
 		TweenService:Create(
 			transparencyTag, 
@@ -452,8 +455,9 @@ function Interface.init(modInterface)
 		end)
 	end
 
-	function Interface.Update(lerp)
-		local rootPart = localplayer.Character and localplayer.Character.PrimaryPart;
+    --MARK: OnUpdate
+    window.OnUpdate:Connect(function(lerp)
+		local rootPart = localPlayer.Character and localPlayer.Character.PrimaryPart;
 		if rootPart == nil then Debugger:Warn("Missing RootPart."); return end;
 		
 		local playerYPos = rootPart.Position.Y;
@@ -475,8 +479,8 @@ function Interface.init(modInterface)
 			mapImage.Image = "";
 		end
 		
-		local layerName, layerData = modMapLibrary:GetLayer(rootPart.Position);
-		Interface.LocationName = layerName;
+		local layerName, _layerData = modMapLibrary:GetLayer(rootPart.Position);
+		binds.LocationName = layerName;
 		
 		if layerName then
 			if layerName ~= activeLayer then
@@ -511,7 +515,7 @@ function Interface.init(modInterface)
 					end
 				end
 				
-				Interface.PopupLocationText(layerName);
+				binds.PopupLocationText(layerName);
 			end
 			locationLabel.Text = "Wrighton Dale, ".. modBranchConfigs.WorldName..", "..layerName;
 			activeLayer = layerName;
@@ -532,9 +536,9 @@ function Interface.init(modInterface)
 		end
 		
 		if not mapMenu.Visible then return end;
-		for layerName,_ in pairs(layerFrames) do
-			for a=1, #layerFrames[layerName].Update do
-				layerFrames[layerName].Update[a]();
+		for lN, _ in pairs(layerFrames) do
+			for a=1, #layerFrames[lN].Update do
+				layerFrames[lN].Update[a]();
 			end
 		end
 		
@@ -543,20 +547,19 @@ function Interface.init(modInterface)
 			if objData.Object and objData.Object:IsDescendantOf(workspace) then
 				if objData.Update then objData.Update(lerp) end;
 			else
-				Interface.RemoveDynamic(id);
+				binds.RemoveDynamic(id);
 			end
 		end
 		
-		if Interface.Minimized then
+		if binds.Minimized then
 			local frame = localPlayerPointer.Frame;
 			mapImage.Position = UDim2.new(0.5, -frame.Position.X.Offset, 0.5, -frame.Position.Y.Offset);
 			
 		else
-			local absSize = mapImage.AbsoluteSize/2;
 			local newPosition = UDim2.new(0.5, 
-				0-(rootPart.Position.X * scaleRatio) + Interface.MapFrameOffset.X, 
+				0-(rootPart.Position.X * scaleRatio) + binds.MapFrameOffset.X, 
 				0.5, 
-				0-(rootPart.Position.Z * scaleRatio) + Interface.MapFrameOffset.Y);
+				0-(rootPart.Position.Z * scaleRatio) + binds.MapFrameOffset.Y);
 			
 			mapImage.Position = newPosition;
 			
@@ -564,17 +567,8 @@ function Interface.init(modInterface)
 		
 		mapImage.Size = UDim2.new(0, mapScale*scaleRatio, 0, mapScale*scaleRatio);
 		
-	end
+	end)
 	
-	local window = Interface.NewWindow("MapMenu", mapMenu);
-	window:SetConfigKey("DisableMapMenu");
-	
-	Interface.Minimized = false;
-	if modConfigurations.CompactInterface then
-		window:SetOpenClosePosition(UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0.5, 0, -2, 0));
-	else
-		window:SetOpenClosePosition(UDim2.new(0.5, 0, 0.5, -35), UDim2.new(0.5, 0, -2, 0));
-	end
 	
 	local mapLoaded = false;
 	local function loadMap()
@@ -592,9 +586,10 @@ function Interface.init(modInterface)
 		end
 	end
 	
-	window.OnWindowToggle:Connect(function(visible)
-		Interface.Minimized = false;
-		window.IgnoreHideAll = nil;
+    --MARK: OnToggle
+	window.OnToggle:Connect(function(visible)
+		binds.Minimized = false;
+		window.IgnoreHideAll = false;
 
 		if modConfigurations.CompactInterface then
 			mapMenu.AnchorPoint = Vector2.new(0.5, 0.5);
@@ -614,34 +609,28 @@ function Interface.init(modInterface)
 			
 			scaleRatio = 3;
 			
-			Interface:HideAll{[window.Name]=true;};
+			interface:HideAll{[window.Name]=true;};
 			
-			Interface.MapFrameOffset = getCenterVec();
-			Interface.Update();
+			binds.MapFrameOffset = getCenterVec();
+            window:Update();
 		else
 			window.ReleaseMouse = true;
-			window.ToggleTweenAnimation = true;
-			isDraggingMap = false;
+			window.UseTween = true;
 			
 		end
 	end)
 	
-	modKeyBindsHandler:SetDefaultKey("KeyWindowMapMenu", Enum.KeyCode.M);
-	local quickButton = Interface:NewQuickButton("MapMenu", "Map", "rbxassetid://4615489625");
-	quickButton.LayoutOrder = 4;
-	modInterface:ConnectQuickButton(quickButton, "KeyWindowMapMenu");
-
 	modMapLibrary:Initialize();
 	loadMap()
 	
 	task.defer(function()
-		local rootPart = localplayer.Character and localplayer.Character.PrimaryPart;
+		local rootPart = localPlayer.Character and localPlayer.Character.PrimaryPart;
 		for a=1, 10 do
 			wait(1);
 			if rootPart then break; end;
 		end
 		pcall(function()
-			localPlayerPointer = Interface.AddDynamic("Player", localplayer.Name, rootPart);
+			localPlayerPointer = binds.AddDynamic("Player", localPlayer.Name, rootPart);
 		end)
 		
 		local namesList = modNpcProfileLibrary:GetKeys();
@@ -655,23 +644,23 @@ function Interface.init(modInterface)
 					table.insert(rats, npcName);
 				end
 				if npcLib and npcRootPart then
-					Interface.AddDynamic(npcLib.Class, npcName, npcRootPart)
+					binds.AddDynamic(npcLib.Class, npcName, npcRootPart)
 				end;
 			end
 		end
 		
-		Interface.Update();
+        window:Update();
 		
 		while true do
 			if not mapMenu.Visible then
 				task.wait(3);
 			end
-			Interface.Update();
+            window:Update();
 			task.wait();
 		end
 	end)
 	
-	Interface.Garbage:Tag(mainFrame.InputChanged:Connect(function(inputObject, gameProcessed)
+	interface.Garbage:Tag(mainFrame.InputChanged:Connect(function(inputObject, gameProcessed)
 		if not gameProcessed then
 			if inputObject.UserInputType == Enum.UserInputType.MouseWheel then
 				local preScale = scaleRatio;
@@ -692,27 +681,13 @@ function Interface.init(modInterface)
 					
 					--Interface.MapFrameOffset = newOffsetVec + offset;
 					
-					Interface.MapFrameOffset = getCenterVec();
-					Interface.Update();
+					binds.MapFrameOffset = getCenterVec();
+                    window:Update();
 				end
 			end
 		end
 	end));
 
-	Interface.Garbage:Tag(mainFrame.InputBegan:Connect(function(inputObject, gameProcessed)
-		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
-			if Interface.Minimized then return end;
-			
-			isDraggingMap = true;
-		end
-	end));
-
-	Interface.Garbage:Tag(mainFrame.InputEnded:Connect(function(inputObject, gameProcessed)
-		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
-			isDraggingMap = false;
-		end
-	end));
-	
 	transparencyTag:GetPropertyChangedSignal("Value"):Connect(function()
 		locationPopupGradient.Transparency = NumberSequence.new(transparencyTag.Value);
 	end)
@@ -734,7 +709,8 @@ function Interface.init(modInterface)
 			if storageItem then
 				local usableItemLib = modUsableItems:Find("gps");
 				usableItemLib:ClientUse(storageItem);
-				Interface:CloseWindow("MapMenu");
+                
+                window:Close();
 			else
 				modClientGuis.promptWarning("You do not have a GPS to fast travel.");
 			end
@@ -746,12 +722,12 @@ function Interface.init(modInterface)
 
 	minimizeButton.MouseButton1Click:Connect(function()
 		scaleRatio = 0.5;
-		Interface.Minimized = true;
-		Interface.MapFrameOffset = getCenterVec();
+		binds.Minimized = true;
+		binds.MapFrameOffset = getCenterVec();
 		window.IgnoreHideAll = true;
 		window.ReleaseMouse = false;
-		window.ToggleTweenAnimation = false;
-		Interface:RefreshVisibility();
+		window.UseTween = false;
+        interface:RefreshInterfaces();
 
 		if modConfigurations.CompactInterface then
 			mapMenu.AnchorPoint = Vector2.new(0, 0);
@@ -773,13 +749,14 @@ function Interface.init(modInterface)
 
 	centerButton.MouseButton1Click:Connect(function()
 		scaleRatio = 3;
-		Interface.MapFrameOffset = getCenterVec();
-		Interface.Update();
+		binds.MapFrameOffset = getCenterVec();
+        
+        window:Update();
 	end)
 
 
 	local enemyCounter = 0;
-	Interface.Garbage:Tag(workspace.Entity.ChildAdded:Connect(function(child)
+	interface.Garbage:Tag(workspace.Entity.ChildAdded:Connect(function(child)
 		if not child:IsA("Model") then return end;
 		wait(0.5);
 		
@@ -788,25 +765,24 @@ function Interface.init(modInterface)
 		
 		if child.PrimaryPart then
 			if npcLib and npcLib.Class ~= "Hidden" then
-				Interface.AddDynamic(npcLib.Class, child.Name, child.PrimaryPart);
+				binds.AddDynamic(npcLib.Class, child.Name, child.PrimaryPart);
 				
 			elseif modConfigurations.AutoMarkEnemies == true and npcHumanoid and (npcHumanoid.Name == "Zombie" or npcHumanoid.Name == "Bandit") then
 				enemyCounter = enemyCounter +1;
-				Interface.AddDynamic("Enemy", child.Name..enemyCounter, child.PrimaryPart);
+				binds.AddDynamic("Enemy", child.Name..enemyCounter, child.PrimaryPart);
 				
 			end
 		end;
 	end))
-	Interface.Garbage:Tag(workspace.Entity.ChildRemoved:Connect(function(child)
+	interface.Garbage:Tag(workspace.Entity.ChildRemoved:Connect(function(child)
 		for id, _ in pairs(dynamicObjects) do
 			if child:IsA("Model") and dynamicObjects[id].Object == child.PrimaryPart then
-				Interface.RemoveDynamic(id);
+				binds.RemoveDynamic(id);
 			end
 		end
 	end))
-	
-	return Interface;
-end;
 
+end
 
-return Interface;
+return interfacePackage;
+

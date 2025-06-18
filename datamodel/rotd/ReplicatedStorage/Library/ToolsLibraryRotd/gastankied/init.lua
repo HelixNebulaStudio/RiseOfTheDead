@@ -31,9 +31,14 @@ local toolPackage = {
     Properties={};
 };
 
-function toolPackage.OnSpawn(handler, prefab: Model)
-    local player = handler.Player;
-    local toolPackage = handler.ToolPackage;
+function toolPackage.BuildStructure(prefab: Model, optionalPacket)
+	optionalPacket = optionalPacket or {};
+
+    local player = nil;
+    if optionalPacket.CharacterClass and optionalPacket.CharacterClass.ClassName == "PlayerClass" then
+        player = optionalPacket.CharacterClass:GetInstance();
+    end;
+
     local base = prefab.PrimaryPart;
     
     local textLabel = prefab:WaitForChild("Screen"):WaitForChild("SurfaceGui"):WaitForChild("timer");

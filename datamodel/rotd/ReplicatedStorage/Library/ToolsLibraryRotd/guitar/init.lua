@@ -2,12 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local CollectionService = game:GetService("CollectionService");
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
---==
-local TuneTracks = {
-	{Id="rbxassetid://6297207526"; Name="Brighter Day"};
-	{Id="rbxassetid://6297259879"; Name="Numa numa"};
-	{Id="rbxassetid://6297346365"; Name="Ievan Polkka"};
-};
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local toolPackage = {
 	ItemId=script.Name;
@@ -27,109 +22,110 @@ local toolPackage = {
 		ActiveTrack = nil;
 	};
 	Properties={};
+
+	TuneVolume = 1;
+	TuneTracks = {
+		{Id="rbxassetid://6297207526"; Name="Brighter Day"};
+		{Id="rbxassetid://6297259879"; Name="Numa numa"};
+		{Id="rbxassetid://6297346365"; Name="Ievan Polkka"};
+	};
 };
+--==
 
-function toolPackage.ClientPrimaryFire(handler)
-	local player = game.Players.LocalPlayer;
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-	
-	spawn(function()
-		local handle = handler.Prefabs[1].PrimaryPart;
+function toolPackage.ClientPrimaryFire(handler: ToolHandlerInstance)
+	local handle = handler.MainToolModel.PrimaryPart;
+	if handle == nil then return end;
+
+	task.spawn(function()
 		local track = handle:WaitForChild("TuneMusic");
-		if handle:FindFirstChild("musicConn") == nil then
-			local newTag = Instance.new("BoolValue");
-			newTag.Name = "musicConn";
-			newTag.Parent = handle;
 
-			local lastId;
-			local function onChanged()
-				if lastId ~= track.SoundId then
-					lastId = track.SoundId;
+		if handle:GetAttribute("musicConn") then return end;
+		handle:SetAttribute("musicConn", true);
+		
+		local tuneTracks = handler.ToolPackage.TuneTracks;
 
-					for a=1, #TuneTracks do
-						if TuneTracks[a].Id == lastId then
-							modInterface:HintWarning("Tune: "..TuneTracks[a].Name, 2, Color3.fromRGB(255, 255, 255));
-							break;
-						end
-					end
-				end
+		local lastId;
+		local function onChanged()
+			if lastId == track.SoundId then return end;
+			lastId = track.SoundId;
+
+			for a=1, #tuneTracks do
+				if tuneTracks[a].Id ~= lastId then continue end;
+				
+				modClientGuis.hintWarning(`Tune: {tuneTracks[a].Name}`, function(element)
+					element.TextColor = Color3.fromRGB(255, 255, 255);
+				end);
+				break;
 			end
-			onChanged();
-			track:GetPropertyChangedSignal("SoundId"):Connect(onChanged);
 		end
+		onChanged();
+		track:GetPropertyChangedSignal("SoundId"):Connect(onChanged);
 	end)
 end
 
-function toolPackage.OnClientUnequip()
-	local player = game.Players.LocalPlayer;
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
 
-	modInterface:CloseWindow("InstrumentWindow");
-end
-
-function toolPackage.OnActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 	if packet.ActionIndex ~= 1 then return end;
 	local isActive = packet.IsActive == true;
 
-	handler.IsActive = isActive;
-
-	local equipmentClass = handler.EquipmentClass;
+	local equipmentClass: EquipmentClass = handler.EquipmentClass;
 	local configurations = equipmentClass.Configurations;
+	local properties = equipmentClass.Properties;
 
-	if handler.IsActive then
-		for a=1, #handler.Prefabs do
-			local prefab = handler.Prefabs[a];
-			local handle = prefab.PrimaryPart;
+	local mainToolModel = handler.MainToolModel;
+	local handle = mainToolModel.PrimaryPart;
 
-			local sound = handle:FindFirstChild("TuneMusic");
-			local function nextTrack()
-				if handler.IsActive then
-					sound.SoundId = TuneTracks[configurations.Index].Id;
-					sound:Play();
-				end
-				configurations.Index = configurations.Index == #TuneTracks and 1 or configurations.Index +1;
-			end
+	properties.IsActive = isActive;
 
-			if sound == nil then
-				sound = Instance.new("Sound");
-				sound.Ended:Connect(function()
-					wait(1);
-					nextTrack();
-				end)
-			end
-			sound.Name = "TuneMusic";
-			sound.RollOffMaxDistance = 128;
-			sound.RollOffMinDistance = 20;
-			sound.Volume = 1;
-			sound.SoundGroup = game.SoundService:FindFirstChild("InstrumentMusic");
-
-			sound:SetAttribute("SoundOwner", handler.Player and handler.Player.Name or nil);
-			CollectionService:AddTag(sound, "PlayerNoiseSounds");
-			sound.Parent = handle;
-
-			nextTrack();
-			configurations.ActiveTrack = sound;
-
-			if handle:FindFirstChild("musicParticle") then
-				handle.musicParticle.Enabled = true;
-			end
-
-			break;
-		end
-	else
-		for a=1, #handler.Prefabs do
-			local prefab = handler.Prefabs[a];
-			local handle = prefab.PrimaryPart;
-
-			if handle:FindFirstChild("musicParticle") then
-				handle.musicParticle.Enabled = false;
-			end
+	if properties.IsActive == false then
+		if handle and handle:FindFirstChild("musicParticle") then
+			handle.musicParticle.Enabled = false;
 		end
 		if configurations.ActiveTrack then
 			configurations.ActiveTrack:Stop();
 		end
+
+		return;
+	end
+
+	local tuneTracks = handler.ToolPackage.TuneTracks;
+
+	local sound = handle:FindFirstChild("TuneMusic");
+	local function nextTrack()
+		if properties.IsActive then
+			sound.SoundId = tuneTracks[configurations.Index].Id;
+			sound:Play();
+		end
+		configurations.Index = configurations.Index == #tuneTracks and 1 or configurations.Index +1;
+	end
+
+	if sound == nil then
+		sound = Instance.new("Sound");
+		sound.Ended:Connect(function()
+			wait(1);
+			nextTrack();
+		end)
+	end
+	sound.Name = "TuneMusic";
+	sound.RollOffMaxDistance = 128;
+	sound.RollOffMinDistance = 20;
+	sound.Volume = handler.ToolPackage.TuneVolume or 1;
+	sound.SoundGroup = game.SoundService:FindFirstChild("InstrumentMusic");
+
+	if handler.CharacterClass.ClassName == "PlayerClass" then
+		local player = (handler.CharacterClass :: PlayerClass):GetInstance();
+
+		sound:SetAttribute("SoundOwner", player and player.Name or nil);
+		CollectionService:AddTag(sound, "PlayerNoiseSounds");
+	end
+	
+	sound.Parent = handle;
+
+	nextTrack();
+	configurations.ActiveTrack = sound;
+
+	if handle:FindFirstChild("musicParticle") then
+		handle.musicParticle.Enabled = true;
 	end
 end
 

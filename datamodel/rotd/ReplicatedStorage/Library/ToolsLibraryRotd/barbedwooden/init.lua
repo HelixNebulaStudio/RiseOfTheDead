@@ -33,7 +33,8 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnSpawn(handler: ToolHandlerInstance, prefab: Model)
+function toolPackage.BuildStructure(prefab: Model, optionalPacket)
+	optionalPacket = optionalPacket or {};
 	prefab:AddTag("TrapStructures");
 
 	if modConfigurations.ExpireDeployables == true then
@@ -70,7 +71,7 @@ function toolPackage.OnSpawn(handler: ToolHandlerInstance, prefab: Model)
 		local targetModel = hitPart.Parent;
 		if targetModel == nil or not targetModel:IsA("Model") then return end;
 	
-		local characterClass: CharacterClass = handler.CharacterClass;
+		local characterClass: CharacterClass = optionalPacket.CharacterClass;
 		local healthComp: HealthComp? = modHealthComponent.getByModel(targetModel);
 		if healthComp == nil or healthComp.IsDead or not healthComp:CanTakeDamageFrom(characterClass) then return end;
 
@@ -78,7 +79,7 @@ function toolPackage.OnSpawn(handler: ToolHandlerInstance, prefab: Model)
 		local dmgData = DamageData.new{
 			Damage=damage;
 			DamageBy=characterClass;
-			ToolStorageItem=handler.StorageItem;
+			ToolStorageItem=optionalPacket.StorageItem;
 			TargetPart=hitPart;
 		}
 		healthComp:TakeDamage(dmgData);

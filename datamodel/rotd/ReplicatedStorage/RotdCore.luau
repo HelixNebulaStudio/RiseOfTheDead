@@ -33,7 +33,7 @@ if RunService:IsServer() then
     local modProfile = shared.require(game.ServerScriptService.ServerLibrary.ProfileRotd);
     local modGameSave = shared.require(game.ServerScriptService.ServerLibrary.GameSaveRotd);
     local modApiRequestLibrary = shared.require(game.ServerScriptService.ServerLibrary.ApiRequestLibraryRotd);
-
+    local modShopSystem = shared.require(game.ServerScriptService.ServerLibrary.ShopSystem);
 end
 
 function RotdCore.OnPlayerAdded(player)
@@ -52,6 +52,10 @@ function RotdCore.OnPlayerRemoving(player)
     if RunService:IsServer() then
     elseif RunService:IsClient() then
     end
+end
+
+function RotdCore.onRequire()
+    Debugger:Warn("RotdCore onRequire.");
 end
 
 Debugger:Warn("Init RotdCore.");

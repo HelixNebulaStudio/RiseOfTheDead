@@ -82,7 +82,7 @@ return function(CutsceneSequence)
 		
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
-				barricade = modReplicationManager.GetReplicated(player, "bloxmartBlockage")[1];
+				barricade = modReplicationManager.getReplicated(player, "bloxmartBlockage")[1];
 				Debugger:Warn("A GetReplicated ",barricade);
 
 				if barricade == nil then
@@ -103,7 +103,7 @@ return function(CutsceneSequence)
 				robertModule.PlayAnimation("Holding");
 				
 			elseif mission.Type == 1 then -- OnActive
-				barricade = modReplicationManager.GetReplicated(player, "bloxmartBlockage")[1];
+				barricade = modReplicationManager.getReplicated(player, "bloxmartBlockage")[1];
 				destructible = barricade and barricade:WaitForChild("Destructible") and shared.require(barricade.Destructible) or nil;
 				Debugger:Warn("B GetReplicated ",barricade);
 

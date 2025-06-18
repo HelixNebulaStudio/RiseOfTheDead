@@ -1,9 +1,19 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Configuration;
+--==
+local RunService = game:GetService("RunService");
 
-local timerRadialConfig = '{"version":1,"size":128,"count":128,"columns":8,"rows":8,"images":["rbxassetid://10606346824","rbxassetid://10606347195"]}';
---== Variables;
-local Interface = {};
+local localPlayer = game.Players.LocalPlayer;
+
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+
+local modRadialImage = shared.require(game.ReplicatedStorage.Library.UI.RadialImage);
+local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
+
+
+local TIMER_RADIAL_CONFIG = '{"version":1,"size":128,"count":128,"columns":8,"rows":8,"images":["rbxassetid://10606346824","rbxassetid://10606347195"]}';
+
 local PlannerLibrary = {
 	["metalbarricade"]={Order=1; MaxCharges=3};
 	["barbedwooden"]={Order=2; MaxCharges=4};
@@ -13,111 +23,106 @@ local PlannerLibrary = {
 	["barbedmetal"]={Order=6; MaxCharges=1};
 };
 
-Interface.PlannerLibrary = PlannerLibrary;
+local interfacePackage = {
+    Type = "Character";
+    PlannerLibrary = PlannerLibrary;
+};
+--==
 
-local RunService = game:GetService("RunService");
-if RunService:IsServer() then return Interface end;
+function interfacePackage.newInstance(interface: InterfaceInstance)
+    local remoteEngineersPlanner = modRemotesManager:Get("EngineersPlanner");
+    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
-local localPlayer = game.Players.LocalPlayer;
-local modData = shared.require(localPlayer:WaitForChild("DataModule"));
-local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-
-local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
-local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
-
-local modRadialImage = shared.require(game.ReplicatedStorage.Library.UI.RadialImage);
-local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
-
-local remoteEngineersPlanner = modRemotesManager:Get("EngineersPlanner");
-
-local windowFrameTemplate = script:WaitForChild("PlannerFrame");
-local structureButton = script:WaitForChild("structureButton");
-
---== Script;
-function Interface.init(modInterface)
-	setmetatable(Interface, modInterface);
-	
-	local windowFrame = windowFrameTemplate:Clone();
-	windowFrame.Parent = modInterface.MainInterface;
+	local windowFrame = script:WaitForChild("PlannerFrame"):Clone();
+	windowFrame.Parent = interface.ScreenGui;
 	
 	local scrollFrame = windowFrame:WaitForChild("ScrollingFrame");
 	local infoFrame = windowFrame:WaitForChild("InfoFrame");
-	
-	windowFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
-		Interface:CloseWindow("EngineerPlannerWindow");
-	end)
-	
-	local window = Interface.NewWindow("EngineerPlannerWindow", windowFrame);
-	
-	local activeToolConfig;
-	window:SetOpenClosePosition(UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0.5, 0, -1, 0));
-	window.OnWindowToggle:Connect(function(visible, toolConfig)
+    local structureButton = script:WaitForChild("structureButton");
+        
+	local window: InterfaceWindow = interface:NewWindow("EngineerPlannerWindow", windowFrame);
+    window.DisableInteractables = true;
+    window.CloseWithInteract = true;
+	window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
+
+    local binds = window.Binds;
+
+	local activeToolHandler: ToolHandlerInstance;
+	local selectedItemId = "metalbarricade";
+	local itemButtons = {};
+
+    --MARK: OnToggle
+	window.OnToggle:Connect(function(visible, toolHandler)
+        if toolHandler then
+			activeToolHandler = toolHandler;
+        end
 		if visible then
-			Interface:HideAll{[window.Name]=true;};
-			Interface:ToggleInteraction(false);
-			activeToolConfig = toolConfig;
-			Interface.Update();
+			interface:HideAll{[window.Name]=true;};
+            
+            window:Update();
 			
 			task.spawn(function()
 				while windowFrame.Visible do
-					Interface.RefreshLoop()
+					binds.RefreshLoop()
 					task.wait();
 				end
 			end)
 			
 		else
-			task.delay(0.2, function()
-				Interface:ToggleInteraction(true);
-			end)
 		end
 	end)
 
-	local selectedItemId = "metalbarricade";
-	local itemButtons = {};
+
+	windowFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+        window:Close();
+	end)
 	
-	local unlockButton = infoFrame:WaitForChild("unlockButton");
+
+    local unlockButton = infoFrame:WaitForChild("unlockButton");
 	unlockButton.MouseButton1Click:Connect(function()
 		local itemLib = modItemsLibrary:Find(selectedItemId);
 
-		local promptWindow = modClientGuis.promptQuestion("Unlock "..itemLib.Name, "A "..itemLib.Name.." Blueprint will be consumed.");
-		local YesClickedSignal, NoClickedSignal;
-		
-		local debounce;
-		YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-			if debounce then return end;
-			debounce = true;
-			Interface:PlayButtonClick();
-			local r = remoteEngineersPlanner:InvokeServer(activeToolConfig.StorageItem, "unlock", selectedItemId);
-			
-			if r.Success then
-				activeToolConfig.StorageItem.Values = r.Values;
-			end
-			
-			wait(1.6);
-			debounce = false;
-			promptWindow:Close();
-			Interface:OpenWindow("EngineerPlannerWindow", activeToolConfig);
-			YesClickedSignal:Disconnect();
-			NoClickedSignal:Disconnect();
-		end);
-		NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-			if debounce then return end;
-			Interface:PlayButtonClick();
-			promptWindow:Close();
-			Interface:OpenWindow("EngineerPlannerWindow", activeToolConfig);
-			YesClickedSignal:Disconnect();
-			NoClickedSignal:Disconnect();
-		end);
+        modClientGuis.promptDialogBox({
+            Title=`Unlock {itemLib.Name}?`;
+            Desc=`Your {itemLib.Name} blueprint will be consumed.`;
+            Buttons={
+                {
+                    Text="Unlock";
+                    Style="Confirm";
+                    OnPrimaryClick=function(dialogWindow)
+                        local statusLabel = dialogWindow.Binds.StatusLabel;
+                        statusLabel.Text = "Unlocking building plan<...>";
+
+                        local r = remoteEngineersPlanner:InvokeServer(
+                            activeToolHandler.StorageItem, 
+                            "unlock", 
+                            selectedItemId
+                        );
+                        
+                        if r.Success then
+                            activeToolHandler.StorageItem.Values = r.Values;
+                        else
+                            statusLabel.Text = r.FailMsg or `Please try again!`;
+                            task.wait(2);
+                        end
+                        
+                        window:Update();
+                    end;
+                };
+                {
+                    Text="Cancel";
+                    Style="Cancel";
+                };
+            }
+        });
+
 	end)
 	
 	
-	function Interface.RefreshLoop()
+	function binds.RefreshLoop()
 		local liveTime = workspace:GetServerTimeNow();
 		
-		local storageItem = activeToolConfig.StorageItem;
+		local storageItem = activeToolHandler.StorageItem;
 		local itemValues = storageItem and storageItem.Values;
 		local chargeValues = itemValues.Charges or {};
 		
@@ -128,7 +133,7 @@ function Interface.init(modInterface)
 			local chargesLabel = structureButton:WaitForChild("ChargesLabel");
 			
 			local radialBarLabel = structureButton:WaitForChild("radialBar");
-			local radialBar = modRadialImage.new(timerRadialConfig, radialBarLabel);
+			local radialBar = modRadialImage.new(TIMER_RADIAL_CONFIG, radialBarLabel);
 
 			local plannerInfo = PlannerLibrary[itemId];
 			
@@ -151,7 +156,7 @@ function Interface.init(modInterface)
 		end
 	end
 	
-	function Interface.Select(selectMode)
+	function binds.Select(selectMode)
 		selectMode = selectMode or 2;
 		local itemLib = modItemsLibrary:Find(selectedItemId);
 		
@@ -159,17 +164,20 @@ function Interface.init(modInterface)
 		infoFrame.Desc.Text = itemLib.Description;
 		infoFrame.ItemIcon.Image = itemLib.Icon;
 		
-		if activeToolConfig == nil then return end;
-		local storageItem = activeToolConfig.StorageItem;
+		if activeToolHandler == nil then return end;
+		local storageItem = activeToolHandler.StorageItem;
 		local itemValues = storageItem and storageItem.Values;
 
-		if itemValues == nil then Debugger:Warn("Missing itemvalues") return end;
+		if itemValues == nil then
+            Debugger:Warn("Missing itemvalues");
+            return; 
+        end;
 		local unlocked = itemValues.Unlocked or {};
 		
 		local isUnlocked = unlocked[selectedItemId] == true;
 		
 		if selectMode == 1 and isUnlocked then
-			activeToolConfig:Select(selectedItemId);
+            activeToolHandler.EquipmentClass.Properties.BuildSelectId = selectedItemId;
 			window:Close();
 			return;
 		end
@@ -178,12 +186,14 @@ function Interface.init(modInterface)
 		unlockButton.Visible = not isUnlocked;
 	end
 	
-	function Interface.Update()
-		local storageItem = activeToolConfig.StorageItem;
+    --MARK: OnUpdate
+	window.OnUpdate:Connect(function(toolHandler)
+		local storageItem = activeToolHandler.StorageItem;
 		local itemValues = storageItem and storageItem.Values;
 		
 		Debugger:Warn("Interface.Update()", itemValues);
-		if itemValues == nil then Debugger:Warn("Missing itemvalues") return end;
+		if itemValues == nil then
+            Debugger:Warn("Missing itemvalues"); return end;
 		
 		for itemId, itemInfo in pairs(PlannerLibrary) do
 			local itemButtonObj;
@@ -203,7 +213,7 @@ function Interface.init(modInterface)
 				
 				local function selectClick(selectMode)
 					selectedItemId = itemId;
-					Interface.Select(selectMode);
+					binds.Select(selectMode);
 				end
 				
 				button.MouseButton1Click:Connect(function()
@@ -247,11 +257,10 @@ function Interface.init(modInterface)
 			itemButtonObj:Update();
 		end
 
-		Interface.Select();
-	end
-	--Interface.Garbage:Tag();
-	
-	return Interface;
-end;
+		binds.Select();
+	end)
 
-return Interface;
+end
+
+return interfacePackage;
+

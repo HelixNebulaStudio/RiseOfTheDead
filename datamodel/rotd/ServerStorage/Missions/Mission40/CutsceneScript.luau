@@ -77,7 +77,7 @@ if RunService:IsServer() then
 			end
 		end)
 
-		modEventService:OnInvoked("GameModeManager_DisconnectPlayer", function(event, packet)
+		modEventService:OnInvoked("GameModeManager_OnDisconnectPlayer", function(event, packet)
 			local player = event.Player;
 			local menuRoom = packet.MenuRoom;
 			if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage ~= "Zricera" then return end;

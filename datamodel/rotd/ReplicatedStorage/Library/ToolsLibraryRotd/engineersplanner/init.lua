@@ -6,6 +6,8 @@ local toolPackage = {
 	Class="Tool";
 	HandlerType="PlannerTool";
 
+	ToolWindow = "EngineerPlannerWindow";
+
 	Animations={
 		Core={Id=16357522577;};
 	};

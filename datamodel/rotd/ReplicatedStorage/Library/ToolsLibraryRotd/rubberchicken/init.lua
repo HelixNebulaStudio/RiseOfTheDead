@@ -18,7 +18,7 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage:OnActionEvent(packet)
+function toolPackage:ActionEvent(packet)
 	if packet.ActionIndex ~= 1 then return end;
 	if self.LastFire ~= nil and tick()-self.LastFire < 1 then return end;
 	self.LastFire  = tick();

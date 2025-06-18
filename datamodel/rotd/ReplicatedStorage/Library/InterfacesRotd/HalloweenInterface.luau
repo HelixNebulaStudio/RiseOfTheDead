@@ -1,10 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Configuration;
+--==
+local localPlayer = game.Players.LocalPlayer;
 
---== Variables;
-local Interface = {};
-
-local localplayer = game.Players.LocalPlayer;
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
@@ -16,36 +13,39 @@ local modItem = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
-
-local remoteHalloween = modRemotesManager:Get("Halloween");
-	
-local shopOptionTemplate = script:WaitForChild("ShopOption");
-local candyOptionTemplate = script:WaitForChild("CandyOption");
-local offerListingTemplate = script:WaitForChild("OfferListing");
-local npcListingTemplate = script:WaitForChild("NpcListing");
-local pageButtonTemplate = script:WaitForChild("PageButton");
+local modLeaderboardInterface = shared.require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
 
 local sfGuideImgs = {
-	"rbxassetid://14993666654";
-	"rbxassetid://14993668054";
-	"rbxassetid://14993669673";
+    "rbxassetid://14993666654";
+    "rbxassetid://14993668054";
+    "rbxassetid://14993669673";
 }
---== Script;
-function Interface.init(modInterface)
-	if not modConfigurations.SpecialEvent.Halloween then return; end
-	setmetatable(Interface, modInterface);
-	
-	local itemToolTip = modItemInterface.newItemTooltip();
 
-	local modData = shared.require(localplayer:WaitForChild("DataModule") :: ModuleScript);
-	local modLeaderboardInterface = shared.require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
-	
-	local interfaceScreenGui = localplayer.PlayerGui:WaitForChild("MainInterface");
+local interfacePackage = {
+    Type = "Character";
+};
+--==
+
+
+function interfacePackage.newInstance(interface: InterfaceInstance)
+	if not modConfigurations.SpecialEvent.Halloween then return; end
+	local modData = shared.require(localPlayer:WaitForChild("DataModule"));
+    local remoteHalloween = modRemotesManager:Get("Halloween");
+
+    local shopOptionTemplate = script:WaitForChild("ShopOption");
+    local candyOptionTemplate = script:WaitForChild("CandyOption");
+    local offerListingTemplate = script:WaitForChild("OfferListing");
+    local npcListingTemplate = script:WaitForChild("NpcListing");
+    local pageButtonTemplate = script:WaitForChild("PageButton");
+
+
+    local itemToolTip = modItemInterface.newItemTooltip();
 
 	local mainFrame = script:WaitForChild("Halloween"):Clone();
-	mainFrame.Parent = interfaceScreenGui;
+	mainFrame.Parent = interface.ScreenGui;
 
 	local treatFrame = mainFrame:WaitForChild("TreatFrame");
 	local treatNpcScrollFrame = treatFrame:WaitForChild("Content"):WaitForChild("ScrollList");
@@ -62,24 +62,28 @@ function Interface.init(modInterface)
 	local setPage = "Uncover";
 	local uncoverPageIndex = 1;
 
-	local window = Interface.NewWindow("HalloweenWindow", mainFrame);
+	local window: InterfaceWindow = interface:NewWindow("HalloweenWindow", mainFrame);
 	window.CompactFullscreen = true;
+    window.CloseWithInteract = true;
+    window.DisableInteractables = true;
+
 	if modConfigurations.CompactInterface then
-		window:SetOpenClosePosition(UDim2.new(0.5, 0, 0, 0), UDim2.new(0.5, 0, -1.5, 0));
+		window:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0, 0));
 	else
-		window:SetOpenClosePosition(UDim2.new(0.5, 0, 0, game:GetService("GuiService").TopbarInset.Height+10), UDim2.new(0.5, 0, -1.5, 0));
+		window:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0, interface.Properties.TopbarInset.Height+10));
 	end
 
-	mainFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
-		Interface:CloseWindow("HalloweenWindow");
+	mainFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+        window:Close();
 	end)
 	
-	window.OnWindowToggle:Connect(function(visible)
+    --MARK: OnToggle
+	window.OnToggle:Connect(function(visible)
 		if visible then
 			if modConfigurations.CompactInterface then
 				mainFrame.Size = UDim2.new(1, 0, 1, 0);
 			else
-				mainFrame.Size = UDim2.new(0.7, 0, 0.8, -game:GetService("GuiService").TopbarInset.Height-10);
+				mainFrame.Size = UDim2.new(0.7, 0, 0.8, -interface.Properties.TopbarInset.Height-10);
 			end
 			if modBranchConfigs.WorldName == "Slaughterfest" then
 				travelButton.Visible = false;
@@ -89,25 +93,17 @@ function Interface.init(modInterface)
 				
 			end
 			
-			Interface.Update();
-			Interface:ToggleInteraction(false);
-			spawn(function()
-				repeat until not window.Visible or Interface.Object == nil or not Interface.Object:IsDescendantOf(workspace) or Interface.modCharacter.Player:DistanceFromCharacter(Interface.Object.Position) >= 16 or not wait(0.5);
-				Interface:ToggleWindow("HalloweenWindow", false);
-			end)
-			
+            window:Update();
 			
 		else
 			itemToolTip.Frame.Visible = false;
-			task.delay(0.3, function()
-				Interface:ToggleInteraction(true);
-			end)
+            
 		end
 	end)
 
-	Interface.Garbage:Tag(travelButton.MouseButton1Click:Connect(function()
+	interface.Garbage:Tag(travelButton.MouseButton1Click:Connect(function()
 		itemToolTip.Frame.Visible = false;
-		Interface:PlayButtonClick();
+		interface:PlayButtonClick();
 		if modBranchConfigs.WorldName == "Slaughterfest" then return end;
 		
 		modClientGuis.promptDialogBox({
@@ -118,10 +114,12 @@ function Interface.init(modInterface)
 				{
 					Text="Travel";
 					Style="Confirm";
-					OnPrimaryClick=function(promptDialogFrame, textButton)
-						promptDialogFrame.statusLabel.Text = "Travelling...";
-						local rPacket = remoteHalloween:InvokeServer({Action="Join";});
-						modInterface:ToggleGameBlinds(false, 3);
+					OnPrimaryClick=function(dialogWindow)
+						local statusLabel = dialogWindow.Binds.StatusLabel;
+						statusLabel.Text = "Travelling<...>";
+
+						local _rPacket = remoteHalloween:InvokeServer({Action="Join";});
+                        interface:ToggleGameBlinds(false, 3);
 					end;
 				};
 				{
@@ -131,8 +129,6 @@ function Interface.init(modInterface)
 			}
 		});
 	end))
-	
-	window:AddCloseButton(mainFrame);
 	
 	local candyShopFrame = mainFrame:WaitForChild("CandyShop");
 
@@ -199,17 +195,17 @@ function Interface.init(modInterface)
 
 	uncoverButton.MouseButton1Click:Connect(function()
 		setPage = "Uncover";
-		Interface:PlayButtonClick();
+		interface:PlayButtonClick();
 		updatePage();
 	end)
 	antiqueButton.MouseButton1Click:Connect(function()
 		setPage = "Antique";
-		Interface:PlayButtonClick();
+		interface:PlayButtonClick();
 		updatePage();
 	end)
 	badgeButton.MouseButton1Click:Connect(function()
 		setPage = "Badge";
-		Interface:PlayButtonClick();
+		interface:PlayButtonClick();
 		updatePage();
 	end)
 
@@ -251,18 +247,18 @@ function Interface.init(modInterface)
 		local slaughterfestData = modData:GetFlag("Slaughterfest", true);
 		if slaughterfestData.ShopReroll <= 0 then return; end
 
-		Interface:PlayButtonClick();
+		interface:PlayButtonClick();
 		rerollDebounce = tick();
 
 		local rPacket = remoteHalloween:InvokeServer({Action="Reroll";});
 		if rPacket == nil then return end;
 
 		updateRerollText();
-		Interface.Update();
+        window:Update();
 	end)
 
 	local imgLabelTick = tick();
-	Interface.Garbage:Tag(modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
+	interface.Garbage:Tag(modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 		if not mainFrame.Visible then return end;
 		updateRerollText();
 		task.wait(0.5);
@@ -300,7 +296,8 @@ function Interface.init(modInterface)
 		"wickedtaffy";
 	};
 
-	function Interface.Update()
+    --MARK: OnUpdate
+	window.OnUpdate:Connect(function()
 		local slaughterfestData = modData:GetFlag("Slaughterfest", true);
 
 		local rollSeed = slaughterfestData.RollSeed;
@@ -418,14 +415,16 @@ function Interface.init(modInterface)
 								{
 									Text="Cook";
 									Style="Confirm";
-									OnPrimaryClick=function(promptDialogFrame, textButton)
-										promptDialogFrame.statusLabel.Text = "Cooking...";
+									OnPrimaryClick=function(dialogWindow)
+                                    	local statusLabel = dialogWindow.Binds.StatusLabel;	
+										statusLabel.Text = "Cooking<...>";
+
 										local rPacket = remoteHalloween:InvokeServer({Action="CookNew"; ItemId=rewardInfo.ItemId});
 										if rPacket == nil then
 											return;
 										end
 	
-										Interface.Update();
+                                        window:Update();
 									end;
 								};
 								{
@@ -469,7 +468,7 @@ function Interface.init(modInterface)
 					if tick()-loadPageDebounce <= 0.5 then return end;
 					loadPageDebounce = tick();
 
-					Interface:PlayButtonClick();
+					interface:PlayButtonClick();
 					uncoverPageIndex = a;
 					loadFestPage();
 				end)
@@ -621,15 +620,17 @@ function Interface.init(modInterface)
 							{
 								Text="Cook";
 								Style="Confirm";
-								OnPrimaryClick=function(promptDialogFrame, textButton)
-									promptDialogFrame.statusLabel.Text = "Cooking...";
+								OnPrimaryClick=function(dialogWindow)
+                                    local statusLabel = dialogWindow.Binds.StatusLabel;
+									statusLabel.Text = "Cooking<...>";
+
 									local rPacket = remoteHalloween:InvokeServer({Action="Cook"; ItemId=rewardInfo.ItemId});
 									if rPacket == nil then
 										return;
 									end
 									slaughterfestData.Claimed[rewardInfo.ItemId]=true;
 
-									Interface.Update();
+                                    window:Update();
 								end;
 							};
 							{
@@ -735,14 +736,16 @@ function Interface.init(modInterface)
 							{
 								Text="Cook";
 								Style="Confirm";
-								OnPrimaryClick=function(promptDialogFrame, textButton)
-									promptDialogFrame.statusLabel.Text = "Cooking...";
+								OnPrimaryClick=function(dialogWindow)
+                                    local statusLabel = dialogWindow.Binds.StatusLabel;
+									statusLabel.Text = "Cooking<...>";
+
 									local rPacket = remoteHalloween:InvokeServer({Action="CookBadge"; Index=a;});
 									if rPacket == nil then
 										return;
 									end
 									
-									Interface.Update();
+                                    window:Update();
 								end;
 							};
 							{
@@ -958,10 +961,9 @@ function Interface.init(modInterface)
 			textLabel.Text = pickDesc.Str;
 		end
 
-	end
-	
-	return Interface;
-end;
+	end)
 
---Interface.Garbage is only initialized after .init();
-return Interface;
+end
+
+return interfacePackage;
+

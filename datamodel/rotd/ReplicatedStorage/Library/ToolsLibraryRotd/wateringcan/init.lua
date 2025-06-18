@@ -17,7 +17,7 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler, packet)
 	local prefab = handler.Prefabs[1];
 	local outletHoles = prefab:FindFirstChild("outletHoles");
 	local waterParticle = outletHoles and outletHoles:FindFirstChild("waterParticle");

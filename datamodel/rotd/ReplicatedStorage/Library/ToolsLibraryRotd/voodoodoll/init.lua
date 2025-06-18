@@ -25,7 +25,7 @@ function toolPackage.ServerEquip(handler)
 	Debugger.Expire(character:FindFirstChild("Pants"), 0);
 end
 
-function toolPackage.OnActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler, packet)
 	if packet.ActionIndex ~= 1 then return end;
 	local isActive = packet.IsActive;
 

@@ -1,79 +1,78 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Configuration;
-
---== Variables;
-local Interface = {};
-
+--==
 local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 
-local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
-local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modGoldShopLibrary = shared.require(game.ReplicatedStorage.Library.GoldShopLibrary);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
 
-local remotes = game.ReplicatedStorage.Remotes;
-local remoteTradeRequest = modRemotesManager:Get("TradeRequest");
-local remoteLimitedService = modRemotesManager:Get("LimitedService");
-	
-local windowFrameTemplate = script:WaitForChild("MarketNews");
-local itemListingFrame = script:WaitForChild("itemListingFrame");
 
---== Script;
-function Interface.init(modInterface)
-	setmetatable(Interface, modInterface);
-	
-	local windowFrame = windowFrameTemplate:Clone();
-	windowFrame.Parent = modInterface.MainInterface;
-	
-	local contentList = windowFrame:WaitForChild("ScrollingFrame");
+local interfacePackage = {
+    Type = "Character";
+};
+--==
+
+function interfacePackage.newInstance(interface: InterfaceInstance)
+    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
+
+    local remoteTradeRequest = modRemotesManager:Get("TradeRequest");
+    local remoteLimitedService = modRemotesManager:Get("LimitedService");
+        
+    local itemListingFrame = script:WaitForChild("itemListingFrame");
+
+    
+	local windowFrame = script:WaitForChild("MarketNews"):Clone();
+	windowFrame.Parent = interface.ScreenGui;
+
+    local contentList = windowFrame:WaitForChild("ScrollingFrame");
 	local scrollingTextFrame = windowFrame:WaitForChild("ScrollingTextFrame");
 	local scrollingTextLabel = scrollingTextFrame:WaitForChild("label");
-	local uiPadding = scrollingTextLabel:WaitForChild("UIPadding");
-	
+    
 	scrollingTextLabel:GetPropertyChangedSignal("Text"):Connect(function()
 		task.wait(5);
 		scrollingTextLabel.Active = true;
 	end)
 	
-	local window = Interface.NewWindow("MarketNewspaper", windowFrame);
+    --MARK: Window
+	local window: InterfaceWindow = interface:NewWindow("MarketNewspaper", windowFrame);
 	if modConfigurations.CompactInterface then
 		windowFrame.Size = UDim2.new(1, 0, 1, 0);
 		
-		windowFrame:WaitForChild("touchCloseButton").Visible = true;
-		windowFrame:WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
-			window:Close();
-		end)
 	end
 	window.CompactFullscreen = true;
-	window:SetOpenClosePosition(UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0.5, 0, -1, 0));
-	window:AddCloseButton(windowFrame);
+    window.CloseWithInteract = true;
+	window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
+	
+	windowFrame:WaitForChild("closeButton").MouseButton1Click:Connect(function()
+		window:Close();
+	end)
 	
 	local itemMarketList;
 	local cache = {
 		TopDonor = nil;
 	};
 	
-	window.OnWindowToggle:Connect(function(visible, toolHandler)
+    --MARK: OnToggle
+	window.OnToggle:Connect(function(visible, toolHandler)
 		if visible then
-			Interface:HideAll{[window.Name]=true;};
+            if toolHandler == nil or toolHandler.StorageItem == nil then
+                window:Close();
+                return;
+            end
+			interface:HideAll{[window.Name]=true;};
 			
-			local storageItem = toolHandler and toolHandler.StorageItem and toolHandler.StorageItem.ID and modData.GetItemById(toolHandler.StorageItem.ID) or nil;
-
-			if storageItem == nil then
-				window:Close();
-				return;
-			end;
+			local storageItem = toolHandler.StorageItem;
 
 			remoteTradeRequest:FireServer("marketrequest", storageItem.ID);
 			
@@ -100,8 +99,9 @@ function Interface.init(modInterface)
 		end
 	end)
 	
-	function Interface.Update()
-		for _, obj in pairs(contentList:GetChildren()) do
+    --MARK: Update
+    window.OnUpdate:Connect(function()
+        for _, obj in pairs(contentList:GetChildren()) do
 			if obj:IsA("GuiObject") then
 				game.Debris:AddItem(obj, 0);
 			end
@@ -202,11 +202,12 @@ function Interface.init(modInterface)
 		if #headlineList > 0 then
 			scrollingTextFrame.CanvasPosition = Vector2.zero;
 			scrollingTextLabel.Active = false;
-			scrollingTextLabel.Text = "<b><font size='18'>Headline:</font></b>  ".. headlineList[math.random(1, #headlineList)];
+			scrollingTextLabel.Text = "<b><font size='18'>Headline:</font></b>  ".. 
+                headlineList[math.random(1, #headlineList)];
 		end
-	end
-	
-	Interface.Garbage:Tag(remoteTradeRequest.OnClientEvent:Connect(function(requestType, ...)
+    end)
+    
+	interface.Garbage:Tag(remoteTradeRequest.OnClientEvent:Connect(function(requestType, ...)
 		if requestType == "marketrequest" then
 			local iML = ...;
 			if iML ~= nil then
@@ -227,11 +228,10 @@ function Interface.init(modInterface)
 			
 		end
 		
-		
-		Interface.Update();
+        window:Update();
 	end));
-	
-	return Interface;
-end;
 
-return Interface;
+end
+
+return interfacePackage;
+

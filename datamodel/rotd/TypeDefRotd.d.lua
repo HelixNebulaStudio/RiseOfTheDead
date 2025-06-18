@@ -1,10 +1,11 @@
 export type GAME_EVENT_KEY_ROTD =
     | "EventPass_OnLevelUp"
     | "EventPass_PuzzleInvoke"
-    | "GameModeManager_DisconnectPlayer"
+    | "GameModeManager_OnDisconnectPlayer"
     | "Skills_OnResourceGatherers"
-    | "WorkbenchService_InterfaceToggle"
-    | "WorkbenchService_ItemSelect"
+    | "Shop_OnActionEvent"
+    | "WorkbenchService_OnInterfaceToggle"
+    | "WorkbenchService_OnItemSelect"
     ;
 
 export type DAMAGE_TYPE_ROTD =

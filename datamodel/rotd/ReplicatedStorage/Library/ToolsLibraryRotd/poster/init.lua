@@ -15,6 +15,7 @@ rayParam.FilterType = Enum.RaycastFilterType.Include;
 rayParam.IgnoreWater = true;
 rayParam.CollisionGroup = "Raycast";
 --==
+
 if RunService:IsServer() then
 	
 	function remoteSetPoster.OnServerInvoke(player, action, paramPacket)
@@ -32,39 +33,40 @@ if RunService:IsServer() then
 			local validId = nil;
 			local postersList = modPoster.List;
 			for a=1, #postersList do
-				if postersList[a].Object == posterModel and postersList[a].Player == player then
-					
-					if tick()-postersList[a].Tick >= 1 then 
-						local decal = posterModel:FindFirstChild("Decal", true);
-						if decal then
-							local decalId = paramPacket.DecalId;
-							
-							local productInfo = modContentSafety.safeProductInfo(decalId, Enum.InfoType.Asset, player);
-							
-							if productInfo then
-								local assetId = productInfo.AssetId;
-								
-								if productInfo.Verifying then
-									decal.Texture = productInfo.Placeholder;
-									postersList[a].Tick = tick();
-									validId = assetId;
-									shared.Notify(player, "Decal id is being verified.. ("..modSyncTime.ToString(productInfo.TimeLeft)..")", "Inform");
-									
-								elseif productInfo.AssetTypeId == 1 then
-									decal.Texture = "rbxassetid://"..assetId;
-									postersList[a].Tick = tick();
-									validId = assetId;
-									
-								else
-									shared.Notify(player, "Invalid decal id.", "Negative");
-									
-								end
-							end
-							Debugger:Log("Set Poster id ", decal.Texture);
-						end
-					end
-					break;
+				local posterTable = postersList[a];
+				if posterTable.Object ~= posterModel or posterTable.Player ~= player then continue end;
+				if tick()-posterTable.Tick < 1 then continue end;
+				
+				local posterObj = posterTable.PosterObj;
+
+				local decalId = paramPacket.DecalId;
+				local productInfo = modContentSafety.safeProductInfo(decalId, Enum.InfoType.Asset, player);
+				
+				if productInfo == nil then
+					Debugger:Warn(`Missing product info: {decalId}`);
+					continue;
 				end
+
+				local assetId = productInfo.AssetId;
+				
+				if productInfo.Verifying then
+					posterObj:SetDecal(productInfo.Placeholder);
+					posterTable.Tick = tick();
+					validId = assetId;
+					shared.Notify(player, "Decal id is being verified.. ("..modSyncTime.ToString(productInfo.TimeLeft)..")", "Inform");
+					
+				elseif productInfo.AssetTypeId == 1 then
+					posterObj:SetDecal(`rbxassetid://{assetId}`);
+					posterTable.Tick = tick();
+					validId = assetId;
+					
+				else
+					shared.Notify(player, "Invalid decal id.", "Negative");
+					
+				end
+				Debugger:Log("Set Poster id ", assetId);
+					
+				break;
 			end
 			
 			if validId ~= nil then
@@ -114,7 +116,7 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnInputEvent(toolHandler, inputData)
+function toolPackage.InputEvent(toolHandler, inputData)
 	if inputData.InputType ~= "Begin" then return end;
 	
 	local posterPrefab = modPoster.Script:WaitForChild("PosterModel");
@@ -122,10 +124,14 @@ function toolPackage.OnInputEvent(toolHandler, inputData)
 	local equipmentClass = toolHandler.EquipmentClass;
 	local properties = equipmentClass.Properties;
 
-	local classPlayer = shared.modPlayers.get(toolHandler.Player);
+	if toolHandler.CharacterClass == nil or toolHandler.CharacterClass.ClassName ~= "PlayerClass" then return end;
+
+	local playerClass: PlayerClass = toolHandler.CharacterClass :: PlayerClass;
+	local player = playerClass:GetInstance();
+
 	if RunService:IsClient() then
 		if inputData.KeyIds.KeyFire then
-			local modData = shared.require(toolHandler.Player:WaitForChild("DataModule"));
+			local modData = shared.require(player:WaitForChild("DataModule"));
 			local modCharacter = modData:GetModCharacter();
 		
 			local mouseProperties = modCharacter.MouseProperties;
@@ -194,7 +200,7 @@ function toolPackage.OnInputEvent(toolHandler, inputData)
 							setHighlightColor(colorPlaceable);
 						end
 						
-						local distance = (rayPos-classPlayer.RootPart.Position).Magnitude;
+						local distance = (rayPos-playerClass.RootPart.Position).Magnitude;
 						
 						if rayHit then
 							local placeCf = CFrame.lookAt(rayPos, rayPos + rayNormal) * CFrame.new(0, 0, -0.1);
@@ -230,11 +236,10 @@ function toolPackage.OnInputEvent(toolHandler, inputData)
 	end
 	
 	-- Server;
-	if classPlayer and not classPlayer.IsAlive then return end;
 	properties.IsActive = inputData.IsActive == true;
 	
 	if inputData.KeyIds.KeyFire and not properties.IsActive and inputData.PosterCFrame then
-		modPoster.Spawn(inputData.PosterCFrame, toolHandler.Player);
+		modPoster.Spawn(inputData.PosterCFrame, player);
 	end
 	
 	return;

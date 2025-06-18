@@ -21,11 +21,11 @@ function toolPackage.ServerEquip(handler)
 	handler.Fuel = handler.StorageItem:GetValues("Fuel") or 100;
 end
 
-function toolPackage.OnServerUnequip(handler)
+function toolPackage.ServerUnequip(handler)
 	handler.StorageItem:SetValues("Fuel", (handler.Fuel or 100));
 end
 
-function toolPackage.OnActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler, packet)
 	local modProjectile = shared.require(game.ReplicatedStorage.Library.Projectile);
 	local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
 

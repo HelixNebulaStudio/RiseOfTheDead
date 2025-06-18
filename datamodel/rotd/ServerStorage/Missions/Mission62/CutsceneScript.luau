@@ -51,7 +51,7 @@ return function(CutsceneSequence)
 			local function OnChanged(firstRun)
 				if mission.Type == 1 then -- OnActive
 					if mission.ProgressionPoint == 1 or mission.ProgressionPoint == 2 then
-						local revasDoor = modReplicationManager.GetReplicated(player, "RevasDoorway")[1];
+						local revasDoor = modReplicationManager.getReplicated(player, "RevasDoorway")[1];
 
 						local doorData = shared.require(revasDoor.Door);
 						doorData:SetAccess(player, true);

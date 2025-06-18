@@ -17,7 +17,7 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler, packet)
 	local isActive = packet.IsActive == true;
 	local prefab = handler.Prefabs[1];
 		

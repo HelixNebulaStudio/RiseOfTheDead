@@ -7,8 +7,8 @@ local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 local modSkillTreeLibrary = shared.require(game.ReplicatedStorage.Library.SkillTreeLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modStoragePresetsLibrary = shared.require(game.ReplicatedStorage.Library.StoragePresetsLibrary);
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
+local modStoragePresetsLibrary = shared.require(game.ReplicatedStorage.Library.StoragePresetsLibraryRotd);
 
 local modBlueprints = shared.require(game.ServerScriptService.ServerLibrary.Blueprints);
 local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
@@ -70,7 +70,6 @@ shared.coreBind(modGameSave, "_load_storage", function(gameSave: GameSaveRotd, s
 	
 	local storagePresetLib = modStoragePresetsLibrary:Find(storageId);
 	local presetId = rawStorage.PresetId;
-
 	if storagePresetLib then
 		presetId = storagePresetLib.Id;
 	end
@@ -97,10 +96,10 @@ shared.coreBind(modGameSave, "_load_storage", function(gameSave: GameSaveRotd, s
 			presetId = "giftcrate";
 
 		end
+	end
 
-		if presetId then
-			storagePresetLib = modStoragePresetsLibrary:Find(presetId);
-		end
+	if presetId then
+		storagePresetLib = modStoragePresetsLibrary:Find(presetId);
 	end
 
 	if storagePresetLib == nil then

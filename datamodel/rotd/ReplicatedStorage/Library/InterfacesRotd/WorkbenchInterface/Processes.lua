@@ -407,25 +407,26 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 							{
 								Text="Skip";
 								Style="Confirm";
-								OnPrimaryClick=function(promptDialogFrame, textButton)
-									promptDialogFrame.statusLabel.Text = "Skipping...";
+								OnPrimaryClick=function(dialogWindow, textButton)
+                                    local statusLabel = dialogWindow.Binds.StatusLabel;
+									statusLabel.Text = "Skipping<...>";
 									
 									local rPacket = remoteBlueprintHandler:InvokeServer("skipbuild", {
 										Index=process.Index;
 									});
 									
 									if rPacket and rPacket.Success then
-										promptDialogFrame.statusLabel.Text = "Skipped!";
+										statusLabel.Text = "Skipped!";
 										task.wait(0.5);
 										
 									elseif rPacket.GoldShop then
-										promptDialogFrame.statusLabel.Text = "Not enough Perk";
+										statusLabel.Text = "Not enough Perk";
 										task.wait(1);
 										interface:ToggleWindow("GoldMenu", true, "PerksPage");
 										return;
 										
 									else
-										promptDialogFrame.statusLabel.Text = "Error: ".. rPacket and rPacket.FailMsg or "Unknown";
+										statusLabel.Text = "Error: ".. rPacket and rPacket.FailMsg or "Unknown";
 									end
 								end;
 							};
@@ -444,22 +445,23 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 							{
 								Text="Skip";
 								Style="Confirm";
-								OnPrimaryClick=function(promptDialogFrame, textButton)
-									promptDialogFrame.statusLabel.Text = "Skipping...";
+								OnPrimaryClick=function(dialogWindow, textButton)
+                                    local statusLabel = dialogWindow.Binds.StatusLabel;
+									statusLabel.Text = "Skipping<...>";
 									
 									local serverReply = remotePolishTool:InvokeServer(binds.InteractPart, 4, process.Index);
 									if serverReply == modWorkbenchLibrary.PolishToolReplies.Success then
-										promptDialogFrame.statusLabel.Text = "Skipped!";
+										statusLabel.Text = "Skipped!";
 										refreshProcessPage();
 										task.wait(0.5);
 
 									elseif serverReply == modWorkbenchLibrary.PolishToolReplies.InsufficientPerks then
-										promptDialogFrame.statusLabel.Text = "Not enough Perk";
+										statusLabel.Text = "Not enough Perk";
 										task.wait(1);
 										interface:ToggleWindow("GoldMenu", true, "PerksPage");
 
 									else
-										promptDialogFrame.statusLabel.Text = "Error: "..tostring(serverReply);
+										statusLabel.Text = "Error: "..tostring(serverReply);
 									end
 								end;
 							};

@@ -51,7 +51,7 @@ function toolPackage.ClientItemPrompt(handler)
 	modData.LobbyInterfaceRequest(lobbyData);
 end
 
-function toolPackage.OnActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler, packet)
 	if packet.ActionIndex ~= 1 then return end;
 	handler.IsActive = packet.IsActive == true;
 

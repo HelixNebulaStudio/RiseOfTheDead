@@ -67,8 +67,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     
 	if modConfigurations.CompactInterface then
         window.CompactFullscreen = true;
-		window:AddCloseButton(storageFrame);
-
+        
 		storageTitleTag = storageFrame:WaitForChild("TitleFrame"):WaitForChild("Title");
 		
 		storageFrame.TitleFrame:WaitForChild("closeButton").MouseButton1Click:Connect(function()
@@ -239,22 +238,24 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         {
                             Text="Purchase";
                             Style="Confirm";
-                            OnPrimaryClick=function(promptDialogFrame, textButton)
-                                promptDialogFrame.statusLabel.Text = "Purchasing...";
+                            OnPrimaryClick=function(dialogWindow)
+                                local statusLabel = dialogWindow.Binds.StatusLabel;
+                                statusLabel.Text = "Purchasing<...>";
+
                                 local r = remoteUpgradeStorage:InvokeServer(storage.Id);
                                 if type(r) == "table" and r.Id then
                                     storage = modData.SetStorage(r);
                                     window:Update(true);
 
-                                    promptDialogFrame.statusLabel.Text = "Slot Purchased!";
+                                    statusLabel.Text = "Slot Purchased!";
                                     wait(0.5);
                                     
                                 elseif r == 1 then
-                                    promptDialogFrame.statusLabel.Text = "Purchase Failed!";
+                                    statusLabel.Text = "Purchase Failed!";
                                     wait(2);
                                     
                                 elseif r == 2 then
-                                    promptDialogFrame.statusLabel.Text = "Not enough Perks!";
+                                    statusLabel.Text = "Not enough Perks!";
                                     wait(1);
                                     window:Close();
                                     interface:ToggleWindow("GoldMenu", true, "PerksPage");
@@ -433,8 +434,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                 {
                                     Text="Rent";
                                     Color=Color3.fromRGB(105, 75, 143);
-                                    OnPrimaryClick=function(promptDialogFrame, textButton)
-                                        promptDialogFrame.statusLabel.Text = "Unlocking...";
+                                    OnPrimaryClick=function(dialogWindow)
+                                        local statusLabel = dialogWindow.Binds.StatusLabel;
+                                        statusLabel.Text = "Unlocking<...>";
                                         
                                         local returnPacket = remoteStorageService:InvokeServer({Action="Rental"; StorageId=storage.Id; Request=true;});
                                         if returnPacket.Success then
@@ -450,7 +452,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                             window:Update(true);
                                             
                                         else
-                                            promptDialogFrame.statusLabel.Text = "Insufficient Gold...";
+                                            statusLabel.Text = "Insufficient Gold.";
 
                                             task.wait(2);
                                             window:Close();

@@ -1,19 +1,15 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Configuration;
-
---== Variables;
-local Interface = {};
-
+--==
 local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
+local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables)
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 
@@ -21,17 +17,18 @@ local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemIn
 local modStorageInterface = shared.require(game.ReplicatedStorage.Library.UI.StorageInterface);
 local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
-local remoteTradeRequest = modRemotesManager:Get("TradeRequest");
-	
-local windowFrameTemplate = script:WaitForChild("TradeMenu");
+local interfacePackage = {
+    Type = "Character";
+};
+--==
 
-Interface.TradeSession = nil;
---== Script;
-function Interface.init(modInterface)
-	setmetatable(Interface, modInterface);
-	
-	local windowFrame = windowFrameTemplate:Clone();
-	windowFrame.Parent = modInterface.MainInterface;
+
+function interfacePackage.newInstance(interface: InterfaceInstance)
+    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
+    local remoteTradeRequest = modRemotesManager:Get("TradeRequest");
+
+    local windowFrame = script:WaitForChild("TradeMenu"):Clone();
+    windowFrame.Parent = interface.ScreenGui;
 
 	local titleLabel = windowFrame:WaitForChild("Title");
 	local cancelButton = windowFrame:WaitForChild("cancelButton");
@@ -66,7 +63,8 @@ function Interface.init(modInterface)
 	local customPrompt = otherTraderFrame:WaitForChild("customPrompt");
 	local customListContainer = customPrompt:WaitForChild("rightListContainer");
 	local pageButtons = customPrompt:WaitForChild("pageButtons");
-	
+    
+
 	if modConfigurations.CompactInterface then
 		windowFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20);
 		game.Debris:AddItem(windowFrame:FindFirstChild("UIGradient"), 0);
@@ -129,29 +127,40 @@ function Interface.init(modInterface)
 		otfObjects.GoldLabel.goldIcon.AnchorPoint = Vector2.new(0, 0.5);
 		otfObjects.GoldLabel.goldIcon.Position = UDim2.new(1, 10, 0.5, 1);
 	end
-	
-	
+
+
 	local itemButtonList = {};
 	local itemToolTip = modItemInterface.newItemTooltip();
 	
 	
-	local window = Interface.NewWindow("Trade", windowFrame);
-	
+	local window: InterfaceWindow = interface:NewWindow("Trade", windowFrame);
+    
+    local binds = window.Binds;
+    binds.TradeSession = nil;
+    
 	if modConfigurations.CompactInterface then
-		window:SetOpenClosePosition(UDim2.new(1, 0, 0, 0), UDim2.new(1, 0, -1.5, 0));
+		window:SetClosePosition(UDim2.new(1, 0, -1.5, 0), UDim2.new(1, 0, 0, 0));
 		windowFrame.AnchorPoint = Vector2.new(1, 0);
 		windowFrame.Size = UDim2.new(0.5, 0, 1, 0);
 		
 	else
-		window:SetOpenClosePosition(UDim2.new(0.5, 0, 0.5, -37), UDim2.new(0.5, 0, -1.5, 0));
+		window:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, -37));
 		
 	end
-	
-	local localPlayerSlots = {}; for _, obj in pairs(ltfObjects.StorageFrame:GetChildren()) do if obj.Name == "Slot" then table.insert(localPlayerSlots, obj) end end;
-	local otherPlayerSlots = {}; for _, obj in pairs(otfObjects.StorageFrame:GetChildren()) do if obj.Name == "Slot" then table.insert(otherPlayerSlots, obj) end end;
-	local localStorageInterface = modStorageInterface.new(localPlayer.Name.."Trade", localTradeFrame, localPlayerSlots);
+
+
+	local localPlayerSlots = {}; 
+    for _, obj in pairs(ltfObjects.StorageFrame:GetChildren()) do 
+        if obj.Name == "Slot" then table.insert(localPlayerSlots, obj) end 
+    end;
+	local otherPlayerSlots = {}; 
+    for _, obj in pairs(otfObjects.StorageFrame:GetChildren()) do 
+        if obj.Name == "Slot" then table.insert(otherPlayerSlots, obj) end 
+    end;
+	local localStorageInterface = modStorageInterface.new(`{localPlayer.Name}Trade`, localTradeFrame, localPlayerSlots);
 	local otherStorageInterface = modStorageInterface.new("Empty-Trade", otherTraderFrame, otherPlayerSlots);
 	
+
 	localStorageInterface:ConnectDepositLimit(function(slotInterface, slotTable, slotTableB)
 		local storageOfItem = modData.Storages[slotTable.ID];
 
@@ -165,15 +174,15 @@ function Interface.init(modInterface)
 			end
 			if slotTable then slotTable.Button:TweenPosition(UDim2.new(), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.1, true); end
 			if slotTableB then slotTableB.Button:TweenPosition(UDim2.new(), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.1, true); end
-			if Interface.modNotificationInterface then
-				Interface.modNotificationInterface.Notify(nil, {
-					Imp=true;
-					Message=notifyMsg;
-					ExtraData={
-						ChatColor=Color3.fromRGB(255, 69, 69);
-					};
-				})
-			end
+			-- if Interface.modNotificationInterface then
+			-- 	Interface.modNotificationInterface.Notify(nil, {
+			-- 		Imp=true;
+			-- 		Message=notifyMsg;
+			-- 		ExtraData={
+			-- 			ChatColor=Color3.fromRGB(255, 69, 69);
+			-- 		};
+			-- 	})
+			-- end
 		end
 
 		if slotTable.Item.NonTradeable == 1 then
@@ -204,28 +213,31 @@ function Interface.init(modInterface)
 		return;
 	end);
 
+
 	modData:RequestData("Trader/Gold");
-	window.OnWindowToggle:Connect(function(visible)
+    window.DisableInteractables = true;
+
+    --MARK: OnToggle
+	window.OnToggle:Connect(function(visible)
 		if visible then
-			Interface:HideAll{[window.Name]=true; ["Inventory"]=true;};
-			Interface:ToggleInteraction(false);
-			Interface:OpenWindow("Inventory");
-			Interface:Freeze(true);
+			interface:HideAll{[window.Name]=true; ["Inventory"]=true;};
+            interface:ToggleWindow("Inventory", true);
+			interface:Freeze(true);
 			
 			mainFrame.CanvasPosition = Vector2.zero;
 			
 			ltfObjects.GoldLabel.Text = 0;
 			ltfObjects.NameLabel.Text = localPlayer.Name;
 			
-			Interface.Update();
+            window:Update();
 
 			local function buttonHighlight(buttonTable)
-				if Interface.TradeSession == nil then return end;
+				if binds.TradeSession == nil then return end;
 				local button = buttonTable.Button;
 				local itemLib = buttonTable.Library;
-				local _isPremium = Interface.TradeSession.PremiumTrade;
+				local _isPremium = binds.TradeSession.PremiumTrade;
 				
-				local isComputerSession = Interface.TradeSession.ComputerSession;
+				local isComputerSession = binds.TradeSession.ComputerSession;
 				
 				if isComputerSession and itemLib then
 					button.ImageColor3 = modItemsLibrary.TierColors[itemLib.Tier];
@@ -243,34 +255,40 @@ function Interface.init(modInterface)
 				end
 			end
 
-			Interface.modInventoryInterface.DefaultInterface.CustomHighlight = buttonHighlight;
-			Interface.modInventoryInterface.PremiumInterface.CustomHighlight = buttonHighlight;
-			Interface.modInventoryInterface.HotbarInterface.CustomHighlight = buttonHighlight;
-			Interface.modInventoryInterface.DefaultInterface:Update();
-			Interface.modInventoryInterface.PremiumInterface:Update();
-			Interface.modInventoryInterface.HotbarInterface:Update();
+			for a=1, #interface.StorageInterfaces do
+				local storageInterface: StorageInterface = interface.StorageInterfaces[a];
+				if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
+					continue;
+				end
+				storageInterface.CustomHighlight = buttonHighlight;
+                storageInterface:Update();
+			end
+
 			localStorageInterface:Update();
 			otherStorageInterface:Update();
 			modStorageInterface.SetQuickTarget();
 
 		else
-			Interface:Freeze(false);
+			interface:Freeze(false);
 			remoteTradeRequest:FireServer("cancel");
-			Interface:ToggleInteraction(true);
-			Interface.modInventoryInterface.DefaultInterface.CustomHighlight = nil;
-			Interface.modInventoryInterface.PremiumInterface.CustomHighlight = nil;
-			Interface.modInventoryInterface.HotbarInterface.CustomHighlight = nil;
-			Interface.modInventoryInterface.DefaultInterface.ViewOnly = nil;
-			Interface.modInventoryInterface.PremiumInterface.ViewOnly = nil;
-			Interface.modInventoryInterface.HotbarInterface.ViewOnly = nil;
-			Interface.modInventoryInterface.DefaultInterface:Update();
-			Interface.modInventoryInterface.PremiumInterface:Update();
-			Interface.modInventoryInterface.HotbarInterface:Update();
+            
+			for a=#interface.StorageInterfaces, 1, -1 do
+				local storageInterface: StorageInterface = interface.StorageInterfaces[a];
+				if storageInterface == nil then continue end;
+				if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
+					continue;
+				end
+
+				storageInterface.CustomHighlight = nil;
+                storageInterface.ViewOnly = nil;
+                storageInterface:Update();
+			end
+
 			modStorageInterface.SetQuickTarget();
 			
 		end
 	end)
-	
+
 	local function setSlotColors(color)
 		for a=1, #localStorageInterface.Slots do
 			if localStorageInterface.Slots[a] and localStorageInterface.Slots[a].Frame then
@@ -284,33 +302,34 @@ function Interface.init(modInterface)
 		end
 	end
 	
-	function Interface.SyncLocalGold(gold)
+	function binds.SyncLocalGold(gold)
 		ltfObjects.GoldLabel.Text = gold;
 	end
-	
+
 	local itemButtonCaches;
 	local colorA, colorB, colorC = Color3.fromRGB(255, 255, 255), Color3.fromRGB(200, 200, 200), Color3.fromRGB(100, 100, 100);
 	
-	function Interface.Update()
-		if Interface.TradeSession == nil then return end;
-		local state = Interface.TradeSession.State;
+    --MARK: OnUpdate
+    window.OnUpdate:Connect(function()
+        if binds.TradeSession == nil then return end;
+		local state = binds.TradeSession.State;
 		
 		local _storage = modData.Storages.TradingStorage;
 		itemButtonCaches = {};
 
 		local localData, otherData;
-		for name, _ in pairs(Interface.TradeSession.Players) do
+		for name, _ in pairs(binds.TradeSession.Players) do
 			if name == localPlayer.Name then
-				localData = Interface.TradeSession.Players[localPlayer.Name];
+				localData = binds.TradeSession.Players[localPlayer.Name];
 			else
-				otherData = Interface.TradeSession.Players[name];
+				otherData = binds.TradeSession.Players[name];
 			end
 		end
 
 		if localData == nil then Debugger:Log("Missing localData."); return end;
 		if otherData == nil then Debugger:Log("Missing otherData"); return end;
 		
-		feeLabel.Text = "Tax:    $".. modFormatNumber.Beautify(Interface.TradeSession.Fee) .." + "
+		feeLabel.Text = "Tax:    $".. modFormatNumber.Beautify(binds.TradeSession.Fee) .." + "
 			.. modRichFormatter.GoldText(modFormatNumber.Beautify(localData.GoldTax));
 		
 
@@ -320,9 +339,9 @@ function Interface.init(modInterface)
 		otfObjects.NameLabel.Text = (otherData.Premium and modRichFormatter.GoldText(otherData.Name) or otherData.Name)..
 			(npcLib and " (" ..npcLib.Class..")" or "");
 		
-		ltfObjects.AvatarLabel.Image = Interface.LocalPlayerProfile.UserThumbnail;
+		ltfObjects.AvatarLabel.Image = binds.LocalPlayerProfile.UserThumbnail;
 
-		if Interface.TradeSession.ComputerSession ~= true then
+		if binds.TradeSession.ComputerSession ~= true then
 			feeLabel.Visible = true;
 			
 			local otherPlayer = game.Players:FindFirstChild(otherData.Name);
@@ -445,14 +464,14 @@ function Interface.init(modInterface)
 					end
 				end
 				
-				if otherData.AddPageButtons == true and state ~= 3 and Interface.TradeSession.MaxPage ~= nil then
+				if otherData.AddPageButtons == true and state ~= 3 and binds.TradeSession.MaxPage ~= nil then
 					pageButtons.Visible = true;
 					
-					if Interface.TradeSession.Page and Interface.TradeSession.MaxPage then
-						pageButtons.backButton.Visible = Interface.TradeSession.Page > 1;
-						pageButtons.nextButton.Visible = Interface.TradeSession.Page < Interface.TradeSession.MaxPage;
+					if binds.TradeSession.Page and binds.TradeSession.MaxPage then
+						pageButtons.backButton.Visible = binds.TradeSession.Page > 1;
+						pageButtons.nextButton.Visible = binds.TradeSession.Page < binds.TradeSession.MaxPage;
 						
-						pageButtons.pageInput.PlaceholderText = Interface.TradeSession.Page.."/"..Interface.TradeSession.MaxPage;
+						pageButtons.pageInput.PlaceholderText = binds.TradeSession.Page.."/"..binds.TradeSession.MaxPage;
 						
 					else
 						pageButtons.backButton.Visible = true;
@@ -514,11 +533,11 @@ function Interface.init(modInterface)
 		otherStorageInterface.StorageId = otherData.Name.."Trade";
 		otherStorageInterface.ViewOnly = true;
 
-		local commenceTime = Interface.TradeSession.CommenceTime;
+		local commenceTime = binds.TradeSession.CommenceTime;
 
 		local playerGold = modData.Profile and modData.Profile.Trader and modData.Profile.Trader.Gold or 0;
 		
-		if Interface.TradeSession.Ended and state ~= 3 then
+		if binds.TradeSession.Ended and state ~= 3 then
 			localStorageInterface.ViewOnly = nil;
 			confirmButton.Visible = false;
 			cancelButton.buttonText.Text = "Close";
@@ -556,7 +575,7 @@ function Interface.init(modInterface)
 				ltfObjects.StatusLabel.Text = "Confirmed";
 				ltfObjects.StatusLabel.TextColor3 = Color3.fromRGB(93, 182, 87);
 
-			elseif localData.Money < Interface.TradeSession.Fee then
+			elseif localData.Money < binds.TradeSession.Fee then
 				ltfObjects.StatusLabel.Text = "Not Enough Money";
 				ltfObjects.StatusLabel.TextColor3 = Color3.fromRGB(255, 76, 76);
 
@@ -614,7 +633,7 @@ function Interface.init(modInterface)
 				otfObjects.StatusLabel.Text = "Confirmed";
 				otfObjects.StatusLabel.TextColor3 = Color3.fromRGB(93, 182, 87);
 
-			elseif otherData.Money < Interface.TradeSession.Fee then
+			elseif otherData.Money < binds.TradeSession.Fee then
 				otfObjects.StatusLabel.Text = "Not Enough Money";
 				otfObjects.StatusLabel.TextColor3 = Color3.fromRGB(255, 76, 76);
 
@@ -639,9 +658,9 @@ function Interface.init(modInterface)
 				obj:Destroy();
 			end
 		end
-	end
-	
-	local confirmButtonDown = false;
+    end)
+
+local confirmButtonDown = false;
 	confirmButton.InputEnded:Connect(function(inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
 			confirmButtonDown = false;
@@ -650,11 +669,11 @@ function Interface.init(modInterface)
 	confirmButton.InputBegan:Connect(function(inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
 			confirmButtonDown = true;
-			if Interface.TradeSession == nil then return end;
+			if binds.TradeSession == nil then return end;
 			local localData;
-			for name, _ in pairs(Interface.TradeSession.Players) do
+			for name, _ in pairs(binds.TradeSession.Players) do
 				if name == localPlayer.Name then
-					localData = Interface.TradeSession.Players[localPlayer.Name];
+					localData = binds.TradeSession.Players[localPlayer.Name];
 					break;
 				end
 			end
@@ -670,12 +689,12 @@ function Interface.init(modInterface)
 			confirmGradient.Color = ColorSequence.new(color);
 
 			if isConfirmed then
-				Interface:PlayButtonClick();
+				interface:PlayButtonClick();
 				confirmButton.buttonText.Text = "Confirm";
 				localData.Confirm = false;
 				remoteTradeRequest:FireServer("unconfirm");
 
-			elseif localData.Money < Interface.TradeSession.Fee then
+			elseif localData.Money < binds.TradeSession.Fee then
 				confirmButton.buttonText.Text = "Not Enough Money";
 				delay(1, function()
 					confirmButton.buttonText.Text = "Confirm";
@@ -712,7 +731,7 @@ function Interface.init(modInterface)
 					confirmGradient.Color = ColorSequence.new(color);
 					if confirmPercent >= 0.997 and not confirmDebounce then
 						confirmDebounce = true;
-						Interface:PlayButtonClick();
+						interface:PlayButtonClick();
 						RunService:UnbindFromRenderStep("ConfirmTrade");
 						confirmButton.buttonText.Text = "Unconfirm";
 						localData.Confirm = true;
@@ -738,8 +757,8 @@ function Interface.init(modInterface)
 			end
 		end
 	end)
-	
-	local function holdButton(button, label, onClick)
+
+local function holdButton(button, label, onClick)
 		local isButtonDown = false;
 		
 		button.buttonText.Text = label;
@@ -754,7 +773,7 @@ function Interface.init(modInterface)
 		button.InputBegan:Connect(function(inputObject)
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
 				isButtonDown = true;
-				local _state = Interface.TradeSession and Interface.TradeSession.State;
+				local _state = binds.TradeSession and binds.TradeSession.State;
 
 				local colorA, colorB = Color3.fromRGB(255, 255, 255), Color3.fromRGB(200, 200, 200);
 				local color = {
@@ -778,7 +797,7 @@ function Interface.init(modInterface)
 					if percent >= 0.997 and not debounce then
 						debounce = true;
 						
-						Interface:PlayButtonClick();
+						interface:PlayButtonClick();
 						
 						RunService:UnbindFromRenderStep(button.Name);
 						button.buttonText.Text = label;
@@ -839,7 +858,7 @@ function Interface.init(modInterface)
 	cancelButton.InputBegan:Connect(function(inputObject)
 		if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
 			cancelButtonDown = true;
-			local state = Interface.TradeSession and Interface.TradeSession.State;
+			local state = binds.TradeSession and binds.TradeSession.State;
 
 			local colorA, colorB = Color3.fromRGB(255, 255, 255), Color3.fromRGB(200, 200, 200);
 			local color = {
@@ -867,17 +886,17 @@ function Interface.init(modInterface)
 
 			local function close()
 				storageCheck();
-				Interface:PlayButtonClick();
+				interface:PlayButtonClick();
 				if not hasItems then
-					Interface:Freeze(false);
-					Interface:CloseWindow("Trade");
+					interface:Freeze(false);
+                    interface:ToggleWindow("Trade", false);
 					RunService:UnbindFromRenderStep("CancelTrade");
 				else
 					cancelButton.buttonText.Text = "Remove items!";
 				end
 			end
 
-			if Interface.TradeSession and Interface.TradeSession.Ended then
+			if binds.TradeSession and binds.TradeSession.Ended then
 				close();
 
 			elseif state and state <= 2 then
@@ -915,29 +934,17 @@ function Interface.init(modInterface)
 			end
 		end
 	end)
-	
-	task.spawn(function() 
-		repeat wait(0.5) until Interface.modCharacter and Interface.modCharacter.CharacterProperties;
 
-		local tradeStorage = modData.Storages[localPlayer.Name.."Trade"];
-		if tradeStorage and next(tradeStorage.Container) ~= nil then
-			cancelButton.buttonText.Text = "Remove items!";
-			Interface:OpenWindow("Trade");
-
-			localStorageInterface:Update();
-		end
-	end)
-	
 	local prevGoldInput = nil;
 	local function checkGoldInput()
-		if Interface.TradeSession == nil then
+		if binds.TradeSession == nil then
 			ltfObjects.GoldLabel.Text = 0;
 			return;
 		end
 		local playerGold = modData.Profile and modData.Profile.Trader and modData.Profile.Trader.Gold or 0;
 		local inputNum = tonumber(ltfObjects.GoldLabel.Text) or 0;
 		
-		if Interface.TradeSession and Interface.TradeSession.IgnorePlayerGoldLimit == true then
+		if binds.TradeSession and binds.TradeSession.IgnorePlayerGoldLimit == true then
 			inputNum = math.clamp(inputNum, 0, math.huge);
 			
 		else
@@ -945,9 +952,9 @@ function Interface.init(modInterface)
 			
 		end
 		
-		local state = Interface.TradeSession.State;
+		local state = binds.TradeSession.State;
 		if state > 1 then
-			local gold = Interface.TradeSession.Players[localPlayer.Name].Gold; 
+			local gold = binds.TradeSession.Players[localPlayer.Name].Gold; 
 			ltfObjects.GoldLabel.Text = tostring(gold);
 			return;
 		end;
@@ -965,19 +972,31 @@ function Interface.init(modInterface)
 	end)
 
 	ltfObjects.GoldLabel.FocusLost:Connect(checkGoldInput);
-	
-	Interface.Garbage:Tag(modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
+
+    interface.Garbage:Tag(modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 		if not windowFrame.Visible then return end;
-		Interface.Update()
+        window:Update();
 	end));
 	
-	Interface.Garbage:Tag(function()
+	interface.Garbage:Tag(function()
 		table.clear(itemButtonList);
 		itemButtonCaches = nil;
 		itemToolTip:Destroy();
 	end)
 	
-	Interface.Garbage:Tag(remoteTradeRequest.OnClientEvent:Connect(function(requestType, ...)
+    function binds.updateTradeSessionData(data)
+        if data == nil then
+            binds.TradeSession = nil;
+            return;
+        end
+        
+        if binds.TradeSession == nil then
+            binds.TradeSession = {};
+        end
+        modTables.ReplaceValues(binds.TradeSession, data);
+    end
+
+	interface.Garbage:Tag(remoteTradeRequest.OnClientEvent:Connect(function(requestType, ...)
 		if requestType == "request" then
 			local playerName = ...;
 			modData.TradeRequests[playerName] = tick();
@@ -986,35 +1005,42 @@ function Interface.init(modInterface)
 			
 		elseif requestType == "tradesession" then
 			local tradeSessionData = ...;
-			if modInterface then
-				modInterface.modTradeInterface.TradeSession = tradeSessionData;
-				modInterface.modTradeInterface.Update();
-			end
+
+            binds.updateTradeSessionData(tradeSessionData);
+            window:Update();
 			
 		elseif requestType == "syncgold" then
 			local tradeSessionData = ...;
-			if modInterface then
-				local gold = tradeSessionData.Players[game.Players.LocalPlayer.Name].Gold;
-				modInterface.modTradeInterface.SyncLocalGold(gold);
-			end
+            
+            local gold = tradeSessionData.Players[game.Players.LocalPlayer.Name].Gold;
+            binds.SyncLocalGold(gold);
 			
 		elseif requestType == "init" then
 			local tradeSessionData = ...;
-			if modInterface and modInterface.modTradeInterface then
-				modInterface.modTradeInterface.TradeSession = tradeSessionData;
-				modInterface:OpenWindow("Trade");
-			end
+        
+            binds.updateTradeSessionData(tradeSessionData);
+            interface:ToggleWindow("Trade", true);
+            window:Update();
 			
 		elseif requestType == "end" then
 			local tradeSessionData = ...;
-			if modInterface then
-				modInterface.modTradeInterface.TradeSession = tradeSessionData;
-			end
+            binds.updateTradeSessionData(tradeSessionData);
+            window:Update();
 			
 		end
 	end))
 
-	return Interface;
-end;
 
-return Interface;
+    task.spawn(function() 
+		local tradeStorage = modData.Storages[localPlayer.Name.."Trade"];
+		if tradeStorage and next(tradeStorage.Container) ~= nil then
+			cancelButton.buttonText.Text = "Remove items!";
+            interface:ToggleWindow("Trade", true);
+
+			localStorageInterface:Update();
+		end
+	end)
+end
+
+return interfacePackage;
+

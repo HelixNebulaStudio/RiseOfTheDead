@@ -1,16 +1,19 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local RunService = game:GetService("RunService");
+
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modUnlockPack = shared.require(game.ReplicatedStorage.Library.UsableItemsRotd.Generics.UnlockPack);
 
-return function(event: EventPacket, interactData, ...)
+return function(event: EventPacket, interactable: InteractableInstance, ...)
 	local player: Player? = event.Player;
-    if player == nil or interactData == nil then return end;
+    if player == nil or interactable == nil then return end;
 
     local profile = shared.modProfile:Get(player);
 	local activeSave = profile:GetActiveSave();
 	local inventory = activeSave.Inventory;
-	local triggerId = interactData.TriggerTag;
+
+	local triggerId = interactable.TriggerTag;
 	
 	if triggerId == "UnlockCamoPack" then
 		if profile.SkinsPacks.Camo == nil then
@@ -23,7 +26,7 @@ return function(event: EventPacket, interactData, ...)
 		end
 			
 	elseif triggerId == "RandomDisguise30" then
-		local model = interactData.Object and interactData.Object.Parent;
+		local model = interactable.Part and interactable.Part.Parent;
 
 		local modDisguiseMechanics = shared.require(game.ReplicatedStorage.Library.DisguiseMechanics);
 		
@@ -31,5 +34,6 @@ return function(event: EventPacket, interactData, ...)
 		modDisguiseMechanics:Disguise(player, rollDisguiseId[math.random(1,#rollDisguiseId)], 60);
 		
 		game.Debris:AddItem(model, 0);
+
 	end
 end;

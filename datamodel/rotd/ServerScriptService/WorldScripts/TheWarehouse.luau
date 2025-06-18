@@ -32,7 +32,7 @@ function WorldCore.onRequire()
             end
 
             WorldCore:SpawnGift(player, "sundaysGift", GIFT_SPAWNCF);
-            WorldCore:SpawnPlayerNpc("Wilson");
+            WorldCore:SpawnPlayerNpc(player, "Wilson");
 
         end, 999);
 

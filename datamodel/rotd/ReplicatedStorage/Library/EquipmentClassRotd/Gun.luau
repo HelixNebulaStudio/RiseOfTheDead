@@ -71,4 +71,41 @@ function Gun:UpdatePotential(equipmentClass: EquipmentClass, weaponLevel: number
     configurations:Calculate();
 end
 
+function Gun:RefillAmmo(equipmentClass: EquipmentClass, storageItem: StorageItem)
+    local configurations = equipmentClass.Configurations;
+    local properties = equipmentClass.Properties;
+
+    properties.Ammo = configurations.MagazineSize;
+    properties.MaxAmmo = configurations.AmmoCapacity;
+
+    if storageItem then
+        storageItem:SetValues("A", nil);
+        storageItem:SetValues("MA", nil);
+
+        storageItem:Sync({"A", "MA"});
+    end
+    -- local totalMags = (weaponModule.Configurations.MaxAmmoLimit + weaponModule.Configurations.AmmoLimit)/weaponModule.Configurations.AmmoLimit;
+    -- if totalMags == mags then
+    --     storageItem:SetValues("A", weaponModule.Configurations.AmmoLimit);
+    --     storageItem:SetValues("MA", weaponModule.Configurations.MaxAmmoLimit);
+    -- else
+    --     local currentAmmo = storageItem.Values["A"] or weaponModule.Configurations.AmmoLimit;
+    --     local currentMaxAmmo = storageItem.Values["MA"] or weaponModule.Configurations.MaxAmmoLimit;
+    --     local remainingBullets = mags*weaponModule.Configurations.AmmoLimit;
+
+    --     if weaponModule.Configurations.AmmoLimit > currentAmmo then
+    --         remainingBullets = remainingBullets - (weaponModule.Configurations.AmmoLimit - currentAmmo);
+    --         storageItem:SetValues("A", weaponModule.Configurations.AmmoLimit);
+    --     end
+    --     if weaponModule.Configurations.MaxAmmoLimit > currentMaxAmmo then
+    --         if currentMaxAmmo+remainingBullets >= weaponModule.Configurations.MaxAmmoLimit then
+    --             storageItem:SetValues("MA", weaponModule.Configurations.MaxAmmoLimit);
+    --         else
+    --             storageItem:SetValues("MA", currentMaxAmmo+remainingBullets);
+    --         end
+    --     end
+    -- end
+    
+end
+
 return Gun;

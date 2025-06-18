@@ -1,11 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Configuration;
-
---== Variables;
-local Interface = {};
+--==
 
 local localPlayer = game.Players.LocalPlayer;
-local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -13,22 +9,26 @@ local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configur
 
 local modStorageInterface = shared.require(game.ReplicatedStorage.Library.UI.StorageInterface);
 
-local remoteAutoTurret = modRemotesManager:Get("AutoTurret");
 
-local windowFrameTemplate = script:WaitForChild("AutoTurretFrame");
+local interfacePackage = {
+    Type = "Character";
+};
+--==
 
-local debounce = tick();
---== Script;
-function Interface.init(modInterface)
-	setmetatable(Interface, modInterface);
 
-	local patItemLib = modItemsLibrary:Find("portableautoturret");
+function interfacePackage.newInstance(interface: InterfaceInstance)
+    local remoteAutoTurret = modRemotesManager:Get("AutoTurret");
+
+    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
+
+    local patItemLib = modItemsLibrary:Find("portableautoturret");
 	local TurretConfigs = patItemLib.GetTurretConfigs();
 	
 	local storageId = "portableautoturret";
+    local debounce = tick();
 	
-	local windowFrame = windowFrameTemplate:Clone();
-	windowFrame.Parent = modInterface.MainInterface;
+	local windowFrame = script:WaitForChild("AutoTurretFrame"):Clone();
+	windowFrame.Parent = interface.ScreenGui;
 	
 	local configOpTemplate = script:WaitForChild("ConfigOption");
 	local resetOpTemplate = script:WaitForChild("ResetOption");
@@ -42,13 +42,17 @@ function Interface.init(modInterface)
 	local activateButton = windowFrame:WaitForChild("ControlFrame"):WaitForChild("activateButton");
 	local uiSizeConstraint = windowFrame:WaitForChild("UISizeConstraint");
 
-	windowFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
-		Interface:CloseWindow("AutoTurretWindow");
+	local window: InterfaceWindow = interface:NewWindow("AutoTurretWindow", windowFrame);
+    window.CloseWithInteract = true;
+
+    local binds = window.Binds;
+
+	windowFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+		window:Close();
 	end)
 	
 	local activeStorageInterface, slotLabel, slotLabel2, storageItem;
 	
-	local window = Interface.NewWindow("AutoTurretWindow", windowFrame);
 
 	local dropdownOptions;
 	local function clearOptions()
@@ -63,22 +67,25 @@ function Interface.init(modInterface)
 		windowFrame.Size = UDim2.new(0.5, 0, 1, 0);
 		uiSizeConstraint.Parent = script;
 		
-		window:SetOpenClosePosition(UDim2.new(1, 0, 0, 0), UDim2.new(1, 0, -1, 0));
+		window:SetClosePosition(UDim2.new(1, 0, -1, 0), UDim2.new(1, 0, 0, 0));
 	else
 		uiSizeConstraint.Parent = windowFrame;
-		window:SetOpenClosePosition(UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0.5, 0, -1, 0));
+		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
 		
 	end
-	window.OnWindowToggle:Connect(function(visible, useStorageItem)
+
+    --MARK: OnToggle
+	window.OnToggle:Connect(function(visible, useStorageItem)
 		if visible then
-			Interface:OpenWindow("Inventory");
+            interface:ToggleWindow("Inventory", true);
 			storageItem = modData.GetItemById(useStorageItem.ID);
-			Interface.Update();
+            window:Update();
 		end
 		clearOptions();
 	end)
 	
-	function Interface.Update()
+    --MARK: OnUpdate
+	window.OnUpdate:Connect(function()
 		if activeStorageInterface then activeStorageInterface:Destroy() end;
 		
 		if slotLabel then slotLabel:Destroy() end;
@@ -94,8 +101,8 @@ function Interface.init(modInterface)
 		activeStorageInterface = modStorageInterface.new(storageId, windowFrame, {slotLabel; slotLabel2});
 		activeStorageInterface:Update();
 		
-		Interface.Refresh();
-	end
+        binds.Refresh();
+	end)
 
 
 	local function refreshButton(b)
@@ -111,7 +118,7 @@ function Interface.init(modInterface)
 		end
 	end
 	
-	function Interface.Refresh()
+	function binds.Refresh()
 		local isOnline = storageItem.Values.Online == true;
 		activateButton.Text = isOnline and "Online" or "Offline";
 		activateButton.BackgroundColor3 = isOnline and Color3.fromRGB(50, 100, 50) or Color3.fromRGB(100, 50, 50);
@@ -141,7 +148,7 @@ function Interface.init(modInterface)
 			button.Text = optionText;
 			
 			button.MouseButton1Click:Connect(function()
-				Interface:PlayButtonClick();
+				interface:PlayButtonClick();
 				clearOptions();
 				
 				local optionsList = {};
@@ -165,7 +172,7 @@ function Interface.init(modInterface)
 					});
 				end
 
-				dropdownOptions = Interface:NewDropdownList(optionsList, button);
+				dropdownOptions = interface.newDropdownList(optionsList, button);
 				
 				dropdownOptions.ScrollFrame.Size = UDim2.new(0, button.AbsoluteSize.X+2, 0, 35*math.min(5, #optionsList));
 				dropdownOptions.ScrollFrame.ScrollBarThickness = 5;
@@ -181,7 +188,7 @@ function Interface.init(modInterface)
 				
 				dropdownOptions:SetPosition(button.AbsolutePosition-Vector2.new(2,2));
 				dropdownOptions:OnOptionClick(function(opIndex)
-					Interface:PlayButtonClick();
+					interface:PlayButtonClick();
 
 					local returnPacket = remoteAutoTurret:InvokeServer("config", {
 						ConfigKey=configKey;
@@ -220,12 +227,12 @@ function Interface.init(modInterface)
 					newLabel.Text = tag;
 					newLabel.LayoutOrder = order;
 					newLabel.Parent = newHitList;
-					local button: TextButton = newLabel:WaitForChild("Button");
+					local labelButton: TextButton = newLabel:WaitForChild("Button");
 					
 					local flagVal = configHitlistBitFlags:Test(tag, configHitlistBitString);
-					button.BackgroundColor3 = flagVal and Color3.fromRGB(50, 100, 50) or Color3.fromRGB(100, 50, 50);
+					labelButton.BackgroundColor3 = flagVal and Color3.fromRGB(50, 100, 50) or Color3.fromRGB(100, 50, 50);
 					
-					button.MouseButton1Click:Connect(function()
+					labelButton.MouseButton1Click:Connect(function()
 						if tick()-debounce <= 1 then return end;
 						debounce = tick();
 						
@@ -239,7 +246,7 @@ function Interface.init(modInterface)
 						end
 						
 						flagVal = configHitlistBitFlags:Test(tag, configHitlistBitString);
-						button.BackgroundColor3 = flagVal and Color3.fromRGB(50, 100, 50) or Color3.fromRGB(100, 50, 50);
+						labelButton.BackgroundColor3 = flagVal and Color3.fromRGB(50, 100, 50) or Color3.fromRGB(100, 50, 50);
 						debounce = tick()-1;
 					end)
 				end
@@ -260,7 +267,7 @@ function Interface.init(modInterface)
 				storageItem = modData.GetItemById(storageItem.ID);
 				storageItem.Values.Online = returnPacket.Values.Online;
 				storageItem.Values.Config = returnPacket.Values.Config;
-				Interface.Refresh();
+				binds.Refresh();
 			end
 
 			debounce = tick()-1;
@@ -270,7 +277,7 @@ function Interface.init(modInterface)
 		local newConfigTitle = configTitleTemplate:Clone();
 		newConfigTitle.Parent = configScrollFrame;
 	end
-	
+    
 	activateButton.MouseButton1Click:Connect(function()
 		if tick()-debounce <= 1 then return end;
 		debounce = tick();
@@ -280,7 +287,7 @@ function Interface.init(modInterface)
 			storageItem = modData.GetItemById(storageItem.ID);
 			storageItem.Values.Online = returnPacket.Values.Online;
 			storageItem.Values.Config = returnPacket.Values.Config;
-			Interface.Refresh();
+			binds.Refresh();
 		end
 		
 		debounce = tick()-1;
@@ -291,17 +298,16 @@ function Interface.init(modInterface)
 			if storageItem == nil then return end;
 			storageItem.Values.Online = packet.Online;
 			storageItem.Values.Config = packet.Config;
-			Interface.Refresh();
+			binds.Refresh();
 
 		end
 	end
-	--Interface.Garbage:Tag();
 	
 	configScrollFrame:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
 		clearOptions();
 	end)
-	
-	return Interface;
-end;
 
-return Interface;
+end
+
+return interfacePackage;
+

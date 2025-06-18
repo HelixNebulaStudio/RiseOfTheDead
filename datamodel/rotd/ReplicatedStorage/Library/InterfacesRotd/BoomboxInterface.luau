@@ -94,7 +94,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             Buttons = {
                 {
                     Style = "Gold";
-                    Text = "Add";
+                    Text = "Add Track";
                     HideButtonsOnClick = true;
                     OnPrimaryClick = function(dialogWindow, newButton)
                         local statusLabel = dialogWindow.Binds.StatusLabel;
@@ -126,6 +126,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         end
                         task.wait(2);
                         dialogWindow:Close();
+                        window:Update();
                     end;
                 };
                 {

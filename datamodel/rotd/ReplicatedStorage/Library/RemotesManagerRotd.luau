@@ -22,6 +22,14 @@ function modRemotesManager.onRequire()
 		modRemotesManager:NewFunctionRemote("EngineersPlanner", 0.1);
 		modRemotesManager:NewFunctionRemote("AutoTurret", 0.1).Secure = true;
 		
+		--== GameModes;
+		modRemotesManager:NewFunctionRemote("GameModeLobbies", 1).Secure = true;
+		modRemotesManager:NewFunctionRemote("GameModeRequest", 0.1).Secure = true;
+		modRemotesManager:NewFunctionRemote("GameModeExit", 1);
+		modRemotesManager:NewEventRemote("GameModeUpdate");
+		modRemotesManager:NewEventRemote("GameModeHud");
+		modRemotesManager:NewEventRemote("GameModeAssign");
+
 	end
 end
 

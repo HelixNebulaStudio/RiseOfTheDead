@@ -21,14 +21,6 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnClientEquip()
-	local player = game.Players.LocalPlayer;
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-
-	modInterface:CloseWindow("MarketNewspaper");
-end
-
 function toolPackage.newClass()
 	return modEquipmentClass.new(toolPackage);
 end

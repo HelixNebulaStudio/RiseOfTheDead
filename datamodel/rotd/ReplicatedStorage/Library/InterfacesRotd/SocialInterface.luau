@@ -195,8 +195,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     end
                 end
             end
-            local thumbnail;
-            pcall(function() thumbnail = game.Players:GetUserThumbnailAsync(friends[a].VisitorId, THUMBNAIL_TYPE, THUMBNAIL_SIZE); end)
+            local thumbnail = shared.modPlayers.getAvatar(friends[a].VisitorId);
             friends[a].Avatar = thumbnail;
             friends[a].InUniverse = inUniverse;
             table.insert(IdList, friends[a].VisitorId);
@@ -215,7 +214,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             
             local friend2 = {};
             friend2.VisitorId = modGlobalVars.UseRandomId();
-            local thumbnail2 = game.Players:GetUserThumbnailAsync(friend2.VisitorId, THUMBNAIL_TYPE, THUMBNAIL_SIZE);
+            local thumbnail2 = shared.modPlayers.getAvatar(friend2.VisitorId);
             friend2.UserName = "Random2";
             friend2.Avatar = thumbnail2;
             friend2.InUniverse = true;

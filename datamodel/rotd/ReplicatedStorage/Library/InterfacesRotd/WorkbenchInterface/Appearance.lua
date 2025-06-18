@@ -244,8 +244,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 											{
 												Text="Apply";
 												Style="Confirm";
-												OnPrimaryClick=function(promptDialogFrame, textButton)
-													promptDialogFrame.statusLabel.Text = "Applying...";
+												OnPrimaryClick=function(dialogWindow, textButton)
+                                    				local statusLabel = dialogWindow.Binds.StatusLabel;
+													statusLabel.Text = "Applying<...>";
 													remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId", unlockableItemId);
 													task.wait(0.5);
 												end;

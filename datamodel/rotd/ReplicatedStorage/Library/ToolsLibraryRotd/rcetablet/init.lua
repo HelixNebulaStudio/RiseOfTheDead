@@ -32,7 +32,7 @@ function toolPackage.ServerEquip(handler)
 	handler.InteractScript.Parent = handle;
 end
 
-function toolPackage.OnActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler, packet)
 	if packet.ActionIndex ~= 1 then return end;
 
 	handler.IsActive = packet.IsActive == true;

@@ -659,7 +659,7 @@ function modItemsLibrary.onRequire()
     };
 
     new(instrumentBase, {Id="flute"; Name="Flute"; Icon="rbxassetid://6134172781"; Description="A playable flute instrument similar to Carlos's. Can play premade tunes or with keyboard/touch buttons.";});
-    new(instrumentBase, {Id="guitar"; Name="Guitar"; Type=modItemsLibrary.Types.Clothing; Icon="rbxassetid://6297059208"; Description="A playable guitar instrument. Can play premade tunes or with keyboard/touch buttons.";});
+    new(instrumentBase, {Id="guitar"; Name="Guitar"; Type=modItemsLibrary.Types.Clothing; Equippable=true; Icon="rbxassetid://6297059208"; Description="A playable guitar instrument. Can play premade tunes or with keyboard/touch buttons.";});
     new(instrumentBase, {Id="keytar"; Name="Keytar"; Tags={"Melee"}; Icon="rbxassetid://15338385507"; Description="A playable keyboard guitar while also being a melee weapon, also known as keytar instrument. Can play premade tunes or with keyboard/touch buttons.";});
 
 

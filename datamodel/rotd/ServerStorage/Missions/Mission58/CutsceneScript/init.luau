@@ -242,7 +242,7 @@ return function(CutsceneSequence)
 						end)
 
 					elseif mission.ProgressionPoint == 4 then
-						local revasDoor = modReplicationManager.GetReplicated(player, "RevasDoorway")[1];
+						local revasDoor = modReplicationManager.getReplicated(player, "RevasDoorway")[1];
 
 						local doorData = shared.require(revasDoor.Door);
 						doorData:SetAccess(player, true);

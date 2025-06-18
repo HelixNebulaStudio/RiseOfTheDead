@@ -26,7 +26,9 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnSpawn(handler, prefab: Model)
+function toolPackage.BuildStructure(prefab: Model, optionalPacket)
+	optionalPacket = optionalPacket or {};
+
 	if modConfigurations.ExpireDeployables == true then
 		Debugger.Expire(prefab, 300);
 	end

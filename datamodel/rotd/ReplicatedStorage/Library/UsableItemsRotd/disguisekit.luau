@@ -4,21 +4,13 @@ local CollectionService = game:GetService("CollectionService");
 local RunService = game:GetService("RunService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 --==
 local UsablePreset = shared.require(game.ReplicatedStorage.Library.UsableItems.UsablePreset).new();
 
 function UsablePreset:ClientUse(storageItem)
-	local player = game.Players.LocalPlayer;
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	
-	local modInterface = modData:GetInterfaceModule();
-	
-	if not modInterface:IsVisible("DisguiseKit") then
-		modAudio.Play("StorageClothPickup");
-		modInterface:OpenWindow("DisguiseKit", storageItem);
-
-	end
+	modClientGuis.toggleWindow("DisguiseKit", true, storageItem);
 end
 
 function UsablePreset:ClientInit()
@@ -63,9 +55,8 @@ function UsablePreset:ServerInit()
 			if playerKills then
 				local userId = player.UserId;
 				local kills = storageItem:GetValues("InitKills");
-				local owner = storageItem:GetValues("UserId");
 
-				if kills == nil or owner ~= userId then
+				if kills == nil then
 					storageItem:SetValues("InitKills", playerKills);
 					
 				else -- cap kills

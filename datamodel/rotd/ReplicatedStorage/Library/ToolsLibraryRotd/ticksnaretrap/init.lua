@@ -28,7 +28,9 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnSpawn(handler: ToolHandlerInstance, prefab: Model)
+function toolPackage.BuildStructure(prefab: Model, optionalPacket)
+	optionalPacket = optionalPacket or {};
+
 	prefab:AddTag("TrapStructures");
 
 	if modConfigurations.ExpireDeployables == true then
@@ -54,7 +56,7 @@ function toolPackage.OnSpawn(handler: ToolHandlerInstance, prefab: Model)
 		if targetModel == nil then return end;
 		if not targetModel:IsA("Model") or targetModel.Name ~= "Ticks" then return end;
 
-		local characterClass: CharacterClass = handler.CharacterClass;
+		local characterClass: CharacterClass = optionalPacket.CharacterClass;
 		local healthComp: HealthComp? = modHealthComponent.getByModel(targetModel);
 		if healthComp == nil or healthComp.IsDead or not healthComp:CanTakeDamageFrom(characterClass) then return end;
 

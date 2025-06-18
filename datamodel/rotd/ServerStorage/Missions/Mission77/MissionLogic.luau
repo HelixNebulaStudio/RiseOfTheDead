@@ -306,7 +306,7 @@ if RunService:IsServer() then
 					if action == "tpcratestome" then
 						local playerCf = classPlayer:GetCFrame();
 	
-						local list = modReplicationManager.GetReplicated(speaker, "Eaten Sunken Crate");
+						local list = modReplicationManager.getReplicated(speaker, "Eaten Sunken Crate");
 						for a=1, #list do
 							local prefab = list[a];
 							prefab:PivotTo(playerCf * CFrame.new(0, 0, 2*a));
