@@ -14,7 +14,7 @@ local statusPackage = {
 };
 --==
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if RunService:IsClient() then return end;
     if tickData.ms1000 == false then return end;
     

@@ -13,7 +13,7 @@ local statusPackage = {
 function statusPackage.init()
     if RunService:IsServer() then
         
-        shared.modEventService:OnInvoked("Npcs_OnDamaged", function(event: EventPacket, damageData: DamageData)
+        shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, damageData: DamageData)
             if modBranchConfigs.IsWorld("Slaughterfest") then return end;
 
             local playerClass: CharacterClass? = damageData.DamageBy;
@@ -54,7 +54,7 @@ function statusPackage.init()
     end
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
     local playerClass = statusClass.StatusOwner :: PlayerClass;
     if playerClass == nil then return end;
@@ -63,7 +63,7 @@ function statusPackage.OnExpire(statusClass: StatusClassInstance)
     hoSrcs[statusPackage.Id] = nil;
 end
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if RunService:IsClient() then return end;
     if tickData.ms100 ~= true then return end;
     local playerClass = statusClass.StatusOwner :: PlayerClass;

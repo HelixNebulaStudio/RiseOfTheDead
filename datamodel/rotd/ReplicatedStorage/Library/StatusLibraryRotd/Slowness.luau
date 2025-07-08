@@ -15,7 +15,7 @@ local statusPackage = {
     ExpiresOnDeath = true;
 };
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsServer() then return end;
 
     local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
@@ -28,7 +28,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     modCharacter.CharacterProperties.CanSprint = false;
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
     if RunService:IsServer() then return end;
 
     local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);

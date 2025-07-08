@@ -74,15 +74,6 @@ if RunService:IsServer() then
 			if profile.Premium then
 				cleanEnabled = false;
 			end
-			if profile.PolicyData.IsSubjectToChinaPolicies then
-				cleanEnabled = true;
-			end
-			if profile.PolicyData.AreAdsAllowed then
-				cleanEnabled = true;
-			end
-			if #profile.PolicyData.AllowedExternalLinkReferences <= 0 then
-				cleanEnabled = true;
-			end
 
 			local vexeronRoom = workspace.Environment:WaitForChild("VexeronRoom");
 			local enterPart = vexeronRoom:WaitForChild("Entrance");

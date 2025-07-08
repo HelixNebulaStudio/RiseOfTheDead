@@ -47,6 +47,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         ProgressType = "";
         ProgressText = "";
     });
+    element.Layers = {"CharacterHud"; "CompactHidden"};
     
     local progressionPoint = 0;
     local barText = "";
@@ -87,7 +88,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
         elseif k == "ProgressText" then
 
+        elseif k == "Visible" then
+            if modConfigurations.DisableExperiencebar == true then
+                frame.Visible = false;
+            else
+                frame.Visible = v;
+            end
         end
+    end)
+
+    interface.Garbage:Tag(function()
+        RunService:UnbindFromRenderStep("ProgressionBarRender");
     end)
 
     local prevProgressionValue = progressionPoint;
@@ -99,7 +110,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 prevProgressionValue = math.clamp(prevProgressionValue + 0.1 * (progressionPoint - prevProgressionValue), 0, 1);
                 barImageLabel.Size = UDim2.new(prevProgressionValue, 0, 1, 0);
                 
-                barTextLabel.Text = barText:gsub("$value", element.ProgressValue):gsub("$text", element.ProgressText);
+                barTextLabel.Text = barText:gsub("$value", element.ProgressValue)
+                                           :gsub("$text", element.ProgressText);
 
                 if barImageLabel.AbsoluteSize.X >= 1 then
                     barImageLabel.BorderSizePixel = 2;
@@ -110,32 +122,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
     end)
 
-    frame.Visible = true;
+    element.Visible = true;
     interface:BindConfigKey("DisableExperiencebar", nil, {frame});
 
-    interface.Properties.OnChanged:Connect(function(k, v, ov)
-        if k == "IsCompactFullscreen" then
-            if v == true then
-                frame.Visible = false;
-            else
-                if modConfigurations.DisableExperiencebar ~= true then
-                    frame.Visible = true;
-                end
-            end
-        end
-    end)
-    if modConfigurations.CompactInterface then
-    else
-        interface.OnWindowToggle:Connect(function(win: InterfaceWindow)
-            if win.Name == "RatShopWindow" then
-                if win.Visible and camera.ViewportSize.Y <= 910 then
-                    frame.Visible = false;
-                elseif modConfigurations.DisableExperiencebar ~= true then
-                    frame.Visible = true;
-                end
-            end
-        end)
-    end
+    -- if modConfigurations.CompactInterface then
+    -- else
+    --     interface.OnWindowToggle:Connect(function(win: InterfaceWindow)
+    --         if win.Name == "RatShopWindow" then
+    --             if win.Visible and camera.ViewportSize.Y <= 910 then
+    --                 frame.Visible = false;
+    --             elseif modConfigurations.DisableExperiencebar ~= true then
+    --                 frame.Visible = true;
+    --             end
+    --         end
+    --     end)
+    -- end
 
 end
 

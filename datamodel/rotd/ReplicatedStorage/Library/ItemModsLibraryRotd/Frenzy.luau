@@ -38,7 +38,7 @@ end
 
 if RunService:IsServer() then
 
-	function modifierPackage.OnTick(modifier: ItemModifierInstance, tickData: TickData)
+	function modifierPackage.BindTickUpdate(modifier: ItemModifierInstance, tickData: TickData)
 		if modifier.Values.Stacks == nil then
 			modifier.Values.Stacks = 0;
 			modifier.Values.CooldownTick = tick();
@@ -109,14 +109,14 @@ function modifierPackage.Instancing(modifier: ItemModifierInstance, isFirstTime:
 	modifier.OnEnabledChanged:Connect(function(prevVal: boolean)
 		Debugger:Warn("Frenzy OnEnabledChanged", modifier.Enabled);
 		if modifier.Enabled then
-			modifier:SetTickCycle(true);
+			modifier:EnableTickUpdate(true);
 		else
-			modifier:SetTickCycle(false);
+			modifier:EnableTickUpdate(false);
 		end
 	end)
 
 	if not isFirstTime then return end;
-	shared.modEventService:OnInvoked("Players_OnDamaged", function(event: EventPacket, damageData: DamageData, damage)
+	shared.modEventService:OnInvoked("Players_BindDamaged", function(event: EventPacket, damageData: DamageData, damage)
 		local playerClass: PlayerClass = (damageData.DamageTo :: PlayerClass);
 		if playerClass == nil or playerClass.ClassName ~= "PlayerClass" then return end;
 	

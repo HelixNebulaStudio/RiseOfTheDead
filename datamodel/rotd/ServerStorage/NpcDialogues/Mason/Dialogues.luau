@@ -236,6 +236,15 @@ if RunService:IsServer() then
 				}, func);
 			end
 
+			local randomDialogues = {};
+			for _, dialoguePacket in pairs(Dialogues.DialogueStrings) do
+				if #dialoguePacket.Reply >= 300 then continue end;
+				table.insert(randomDialogues, dialoguePacket.Reply);
+			end
+			addDialog("Hello", "TTS test", function(dialog)
+				npcClass:GetComponent("Chat")(player, randomDialogues[math.random(1, #randomDialogues)]);
+			end)
+
 			addDialog("Equip revolver454", "Okie dokie", function(dialog)
 				local wieldComp: WieldComp = npcClass.WieldComp;
 				if wieldComp == nil then
@@ -277,97 +286,111 @@ if RunService:IsServer() then
 				});
 			end)
 			
+			addDialog("Enter the door", "Okie dokie", function(dialog)
+				npcClass.Properties.DoorUseIndexDevBranch = (npcClass.Properties.DoorUseIndexDevBranch or 0)
+				if npcClass.Properties.DoorUseIndexDevBranch == 0 then
+					npcClass:UseInteractable("bioxMainExit");
+				elseif npcClass.Properties.DoorUseIndexDevBranch == 1 then
+					npcClass:UseInteractable("bioxMetalDoor");
+				end
+				if npcClass.Properties.DoorUseIndexDevBranch >= 1 then
+					npcClass.Properties.DoorUseIndexDevBranch = 0;
+				else
+					npcClass.Properties.DoorUseIndexDevBranch = npcClass.Properties.DoorUseIndexDevBranch +1;
+				end;
+			end)
+
 			if npcClass.Properties.IsProtectActive then
-		addDialog("Stand down", "Okie dokie", function(dialog)
-			npcClass.Properties.IsProtectActive = nil;
-		end)
+				addDialog("Stand down", "Okie dokie", function(dialog)
+					npcClass.Properties.IsProtectActive = nil;
+				end)
 
 			else
-		addDialog("Stay alert for Zombies", "Okie dokie", function(dialog)
-			local wieldComp: WieldComp = npcClass.WieldComp;
+				addDialog("Stay alert for Zombies", "Okie dokie", function(dialog)
+					local wieldComp: WieldComp = npcClass.WieldComp;
 
-			if npcClass.Owner ~= player then
-				npcClass.Owner = player;
-				Debugger:StudioWarn(`Set owner for {npcName}`);
-			end
-
-			local protectOwnerComp = npcClass:GetComponent("ProtectOwner");
-			if protectOwnerComp then
-				Debugger:Warn(`Activate protect owner`);
-				protectOwnerComp:Activate();
-				return;
-			end
-			
-			local targetHandlerComp = npcClass:GetComponent("TargetHandler");
-
-			if wieldComp.ItemId == nil then
-				Debugger:Warn(`No gun equipped`);
-				return;
-			end
-
-
-			npcClass.Properties.IsProtectActive = true;
-
-			local tagInstanceConn;
-			tagInstanceConn = CollectionService:GetInstanceAddedSignal("DummyZombie"):Connect(function(model)
-				if npcClass.Properties.IsProtectActive ~= true and tagInstanceConn then
-					tagInstanceConn:Disconnect();
-					tagInstanceConn = nil;
-					return;
-				end
-
-				targetHandlerComp:AddTarget(model);
-			end)
-			local dumZombiesList = CollectionService:GetTagged("DummyZombie");
-			for a=1, #dumZombiesList do
-				targetHandlerComp:AddTarget(dumZombiesList[a]);
-			end
-
-			task.spawn(function()
-				while npcClass.Properties.IsProtectActive == true do
-					task.wait(0.1);
-
-					local activeTarget = targetHandlerComp:MatchFirstTarget(function(targetData)
-						if targetData.HealthComp == nil then return end;
-						local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
-						
-						return targetNpcClass.HumanoidType == "Zombie" and targetData.HealthComp.IsDead == false;
-					end);
-
-					if activeTarget then
-						if activeTarget and activeTarget.HealthComp then
-							Debugger:StudioLog(`Active target=`, activeTarget, activeTarget.HealthComp.IsDead, activeTarget.SortValue);
-						else
-							Debugger:StudioLog(`Active target=`, activeTarget);
-						end
-
-						local equipmentClass: EquipmentClassRotd = wieldComp.EquipmentClass :: EquipmentClassRotd;
-						if equipmentClass.Properties.Ammo <= 0 then
-							Debugger:Warn(`Out of ammo`, equipmentClass.Properties.Ammo);
-
-							wieldComp:InvokeToolAction(
-								"ReloadRequest"
-							);
-						end
-
-						local healthComp: HealthComp = activeTarget.HealthComp;
-						local enemyNpcClass: NpcClass = healthComp.CompOwner;
-
-						npcClass.Move:HeadTrack(enemyNpcClass.RootPart, 2);
-						npcClass.Move:Face(enemyNpcClass.RootPart.Position);
-
-						local shootDirection = (enemyNpcClass.RootPart.Position - npcClass.RootPart.Position).Unit;
-						
-						wieldComp:InvokeToolAction(
-							"PrimaryFireRequest", 
-							shootDirection, 
-							enemyNpcClass.Humanoid
-						);
+					if npcClass.Owner ~= player then
+						npcClass.Owner = player;
+						Debugger:StudioWarn(`Set owner for {npcName}`);
 					end
 
-				end
-			end)
-		end)
+					local protectOwnerComp = npcClass:GetComponent("ProtectOwner");
+					if protectOwnerComp then
+						Debugger:Warn(`Activate protect owner`);
+						protectOwnerComp:Activate();
+						return;
+					end
+					
+					local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+
+					if wieldComp.ItemId == nil then
+						Debugger:Warn(`No gun equipped`);
+						return;
+					end
+
+
+					npcClass.Properties.IsProtectActive = true;
+
+					local tagInstanceConn;
+					tagInstanceConn = CollectionService:GetInstanceAddedSignal("DummyZombie"):Connect(function(model)
+						if npcClass.Properties.IsProtectActive ~= true and tagInstanceConn then
+							tagInstanceConn:Disconnect();
+							tagInstanceConn = nil;
+							return;
+						end
+
+						targetHandlerComp:AddTarget(model);
+					end)
+					local dumZombiesList = CollectionService:GetTagged("DummyZombie");
+					for a=1, #dumZombiesList do
+						targetHandlerComp:AddTarget(dumZombiesList[a]);
+					end
+
+					task.spawn(function()
+						while npcClass.Properties.IsProtectActive == true do
+							task.wait(0.1);
+
+							local activeTarget = targetHandlerComp:MatchFirstTarget(function(targetData)
+								if targetData.HealthComp == nil then return end;
+								local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
+								
+								return targetNpcClass.HumanoidType == "Zombie" and targetData.HealthComp.IsDead == false;
+							end);
+
+							if activeTarget then
+								if activeTarget and activeTarget.HealthComp then
+									Debugger:StudioLog(`Active target=`, activeTarget, activeTarget.HealthComp.IsDead, activeTarget.SortValue);
+								else
+									Debugger:StudioLog(`Active target=`, activeTarget);
+								end
+
+								local equipmentClass: EquipmentClassRotd = wieldComp.EquipmentClass :: EquipmentClassRotd;
+								if equipmentClass.Properties.Ammo <= 0 then
+									Debugger:Warn(`Out of ammo`, equipmentClass.Properties.Ammo);
+
+									wieldComp:InvokeToolAction(
+										"ReloadRequest"
+									);
+								end
+
+								local healthComp: HealthComp = activeTarget.HealthComp;
+								local enemyNpcClass: NpcClass = healthComp.CompOwner;
+
+								npcClass.Move:HeadTrack(enemyNpcClass.RootPart, 2);
+								npcClass.Move:Face(enemyNpcClass.RootPart.Position);
+
+								local shootDirection = (enemyNpcClass.RootPart.Position - npcClass.RootPart.Position).Unit;
+								
+								wieldComp:InvokeToolAction(
+									"PrimaryFireRequest", 
+									shootDirection, 
+									enemyNpcClass.Humanoid
+								);
+							end
+
+						end
+					end)
+				end)
 			end
 		end
 

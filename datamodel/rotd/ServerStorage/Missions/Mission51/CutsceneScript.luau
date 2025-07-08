@@ -15,7 +15,7 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, ...)
+	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
 		local player: Player? = eventPacket.Player;
 		if player == nil then return end;
 

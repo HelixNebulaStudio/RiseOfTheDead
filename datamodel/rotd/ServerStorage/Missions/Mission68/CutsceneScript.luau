@@ -17,7 +17,7 @@ if RunService:IsServer() then
 
 	if not modBranchConfigs.IsWorld("TheHarbor") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
-	shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, packet)
+	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
 		local triggerPlayer: Player? = eventPacket.Player;
 		if triggerPlayer == nil then return end;
 		

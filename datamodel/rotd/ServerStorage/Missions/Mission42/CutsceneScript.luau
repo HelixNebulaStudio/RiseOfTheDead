@@ -56,15 +56,15 @@ return function(CutsceneSequence)
 		end
 		if not modBranchConfigs.IsWorld("VindictiveTreasure") then return; end;
 		
-		classPlayer.OnIsAliveChanged:Connect(function(isAlive)
-			if not isAlive then
-				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint <= 7 then
-						mission.ProgressionPoint = 2;
-					end;
-				end)
-			end
-		end)
+		local playerClass: PlayerClass = shared.modPlayers.get(player);
+		playerClass.CharacterGarbage:Tag(playerClass.OnIsDeadChanged:Connect(function(isDead)
+			if not isDead then return end;
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint <= 7 then
+					mission.ProgressionPoint = 2;
+				end;
+			end)
+		end))
 		
 		local cutsceneElements = workspace.Environment:WaitForChild("CutsceneElements");
 		

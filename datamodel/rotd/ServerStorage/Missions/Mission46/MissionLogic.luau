@@ -8,7 +8,7 @@ local missionId = 46;
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
-	shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, ...)
+	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
 		local player: Player? = eventPacket.Player;
 		if player == nil then return end;
 

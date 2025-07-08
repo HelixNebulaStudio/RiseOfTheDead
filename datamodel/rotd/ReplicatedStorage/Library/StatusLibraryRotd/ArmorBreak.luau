@@ -11,7 +11,7 @@ local statusPackage = {
     Cleansable=true;
 };
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     local characterClass: CharacterClass = statusClass.StatusOwner;
     if characterClass == nil then return end;
 
@@ -20,7 +20,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     end
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
     local characterClass: CharacterClass = statusClass.StatusOwner;
     if characterClass == nil then return end;
 

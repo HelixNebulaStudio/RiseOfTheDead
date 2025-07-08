@@ -61,8 +61,11 @@ if RunService:IsClient() then
 		RunService.Heartbeat:Wait();
 
 		local highlight = modGuiHighlight.Set("MainInterface", "RatShopFrame", true);
-		highlight.Next("MainInterface", "Inventory"); --, "MainList", "search:p250", "p250"
+		highlight.Next("MainInterface", "Inventory", "MainList"); --, "contains:p250", "p250"
 		highlight.Next("MainInterface", "RatShopFrame", "PageFrame", "AmmoRefillOption");
+
+		highlight.Text = `Select your pistol and refill ammunition`;
+		highlight.TextLayout = "BCI";
 
 		if modBranchConfigs.IsWorld("TheWarehouse") then
 			SetWaypoint(modWaypoint.NewWaypoint(rootPart, workspace:WaitForChild("Interactables"):WaitForChild("ShopWaypoint") ));

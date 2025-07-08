@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService");
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modUnlockPack = shared.require(game.ReplicatedStorage.Library.UsableItemsRotd.Generics.UnlockPack);
 
-return function(event: EventPacket, interactable: InteractableInstance, ...)
+return function(event: EventPacket, triggerId: string, interactable: InteractableInstance, ...)
 	local player: Player? = event.Player;
     if player == nil or interactable == nil then return end;
 
@@ -13,8 +13,6 @@ return function(event: EventPacket, interactable: InteractableInstance, ...)
 	local activeSave = profile:GetActiveSave();
 	local inventory = activeSave.Inventory;
 
-	local triggerId = interactable.TriggerTag;
-	
 	if triggerId == "UnlockCamoPack" then
 		if profile.SkinsPacks.Camo == nil then
 			modUnlockPack.UnlockPack(player, "SkinsPacks", "Camo");

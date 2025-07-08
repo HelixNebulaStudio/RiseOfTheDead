@@ -7,6 +7,9 @@ local TweenService = game:GetService("TweenService");
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+
+local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 --== Variables;
 local MISSION_ID = 1;
@@ -17,27 +20,30 @@ if RunService:IsServer() then
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
-	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
-	modOnGameEvents:ConnectEvent("OnToolEquipped", function(player, storageItem)
-		if storageItem == nil then return end;
-		if storageItem.ItemId ~= "p250" then return end;
+	shared.modEventService:OnInvoked("Players_BindWieldEvent", function(event: EventPacket, ...)
+		local action: string, toolHandler: ToolHandlerInstance = ...;
 
-		local mission1 = modMission:GetMission(player, MISSION_ID);
-		if mission1 == nil or mission1.Type ~= 1 then return end;
+		local playerClass: PlayerClass = toolHandler.CharacterClass :: PlayerClass;
+		local player: Player = (playerClass :: PlayerClass):GetInstance();
 
-		modMission:Progress(player, MISSION_ID, function(mission)
-			if mission.ProgressionPoint < 5 then 
-				mission.ProgressionPoint = 5; 
-				modAnalyticsService:LogOnBoarding{
-					Player=player;
-					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission1_EquipPistol;
-				};
-			end;
-		end)
+		if action == "Equip" then
+			local mission1 = modMission:GetMission(player, MISSION_ID);
+			if mission1 == nil or mission1.Type ~= 1 then return end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint < 5 then 
+					mission.ProgressionPoint = 5; 
+					modAnalyticsService:LogOnBoarding{
+						Player=player;
+						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission1_EquipPistol;
+					};
+				end;
+			end)
+		end
 	end)
 	
-	shared.modEventService:OnInvoked("Generic_OnItemPickup", function(
+	shared.modEventService:OnInvoked("Generic_BindItemPickup", function(
 		event: EventPacket, 
 		interactData, 
 		storageItem: StorageItem
@@ -62,7 +68,6 @@ if RunService:IsServer() then
 	end)
 
 else
-	modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 	modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
@@ -152,14 +157,10 @@ return function(CutsceneSequence)
 		local playerClass = shared.modPlayers.get(player);
 		playerClass:Spawn();
 		playerClass:SetCFrame(CFrame.new(3.6, 55.376, -188.5))
-
-		while not playerClass.IsAlive do
-			task.wait();
-			Debugger:Log("Waiting for player spawn");
-		end
 		
 		Debugger:Log("Scene playerSpawns", debug.traceback());
 		CutsceneSequence:NextScene("playerSpawns");
+		task.wait(5);
 		
 		Debugger:Log("Scene spawnFriend");
 		CutsceneSequence:NextScene("spawnFriend");
@@ -224,6 +225,12 @@ return function(CutsceneSequence)
 		rootPart.Anchored = true;
 		
 		playerAnimTracks.Unconscious:Play();
+
+		local activeInterface: InterfaceInstance = modClientGuis.ActiveInterface;
+		if activeInterface then
+			activeInterface.Properties.AimPointerVisible = false;
+		end
+
 		task.wait(5);
 		
 		modClientGuis.toggleGameBlinds(true, 15);
@@ -259,13 +266,14 @@ return function(CutsceneSequence)
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
 		
-		local playerClass = shared.modPlayers.get(player);
+		local playerClass: PlayerClass = shared.modPlayers.get(player);
 		playerClass.HealthComp.CurHealth = playerClass.HealthComp.MaxHealth;
-		playerClass:OnNotIsAlive(function(character)
-			if playerDied then return end;
+
+		playerClass.CharacterGarbage:Tag(playerClass.OnIsDeadChanged:Connect(function(isDead)
+			if isDead then return end;
 			playerDied = true;
 			modServerManager:Teleport(player, "TheBeginning");
-		end)
+		end))
 		modMission:Progress(player, MISSION_ID, function(mission)
 			mission.ProgressionPoint = 1;
 		end)
@@ -276,9 +284,7 @@ return function(CutsceneSequence)
 			Name = "Mason";
 			CFrame = CFrame.new(-1.22, 55.46, -287.322);
 			Owner = player;
-			AddComponents = {
-				--"AttractNpcs";
-			}
+			AddComponents = {};
 		});
 		masonPrefab = masonNpcClass.Character;
 		
@@ -299,7 +305,7 @@ return function(CutsceneSequence)
 			masonNpcClass:ToggleInteractable(false);
 			
 			masonNpcClass.Move:MoveTo(Vector3.new(2.737, 55.387, -192.427));
-			masonNpcClass.Move.MoveToEnded:Wait(10);
+			masonNpcClass.Move.OnMoveToEnded:Wait(10);
 			masonNpcClass:SetCFrame(CFrame.new(2.737, 55.387, -192.427) * CFrame.Angles(0, math.rad(180), 0));
 
 			Debugger:Warn("Play crouch look");
@@ -316,7 +322,7 @@ return function(CutsceneSequence)
 			masonNpcClass.Move:SetMoveSpeed("set", "default", 13);
 			
 			masonNpcClass.Move:MoveTo(Vector3.new(-3.35487795, 55.2862129, -212.686417));
-			masonNpcClass.Move.MoveToEnded:Wait(4);
+			masonNpcClass.Move.OnMoveToEnded:Wait(4);
 			
 			masonNpcClass:SetCFrame(CFrame.new(-3.35487795, 55.2862129, -212.686417));
 			masonNpcClass.Move:Face(playerClass.RootPart);
@@ -370,88 +376,6 @@ return function(CutsceneSequence)
 				until done == true;
 			end
 		end
-		-- masonPrefab = modNpcs.spawn("Mason", CFrame.new(-1.22, 55.46, -287.322), function(npc, npcModule)
-		-- 	masonNpcClass = npcModule;
-
-		-- 	npcModule.Owner = player;
-			
-		-- 	local actionIndex = 0;
-		-- 	npcModule.CutsceneActions = {};
-
-		-- 	table.insert(npcModule.CutsceneActions, function()
-		-- 		Debugger:Log("Run to player.");
-
-		-- 		npcModule.Move:SetMoveSpeed("set", "default", 18);
-		-- 		npcModule:ToggleInteractable(false);
-				
-		-- 		npcModule.Move:MoveTo(Vector3.new(2.737, 55.387, -192.427));
-		-- 		npcModule.Move.MoveToEnded:Wait(10);
-		-- 		npcModule.Actions:Teleport(CFrame.new(2.737, 55.387, -192.427) * CFrame.Angles(0, math.rad(180), 0));
-
-		-- 		Debugger:Warn("Play crouch look");
-		-- 		npcModule.PlayAnimation("CrouchLook");
-		-- 	end);
-
-		-- 	table.insert(npcModule.CutsceneActions, function()
-		-- 		Debugger:Log("Stand with player.");
-		-- 		npcModule.PlayAnimation("CrouchPickUp");
-		-- 	end);
-
-		-- 	table.insert(npcModule.CutsceneActions, function()
-		-- 		Debugger:Log("Handout")
-		-- 		npcModule.Move:SetMoveSpeed("set", "default", 13);
-				
-		-- 		npcModule.Move:MoveTo(Vector3.new(-3.35487795, 55.2862129, -212.686417));
-		-- 		npcModule.Move.MoveToEnded:Wait(4);
-				
-		-- 		npcModule.Actions:Teleport(CFrame.new(-3.35487795, 55.2862129, -212.686417));
-		-- 		npcModule.Move:Face(playerClass.RootPart);
-
-		-- 		npcModule.PlayAnimation("Handout", 1.4);
-		-- 	end);
-
-		-- 	table.insert(npcModule.CutsceneActions, function()
-		-- 		Debugger:Log("Guns out.");
-
-		-- 		npcModule.StopAnimation("Handout", 0.5);
-
-		-- 		npcModule.Wield.Equip("revolver454"); 
-		-- 		pcall(function()
-		-- 			npcModule.Wield.ToolModule.Configurations.MinBaseDamage = 25;
-		-- 		end);
-
-		-- 		npcModule.Move:Face(Vector3.new(4.431, 56.31, -166.753));
-		-- 		npcModule.Move:SetMoveSpeed("set", "default", 0);
-
-		-- 		npcModule.IsProtectingOwner = true;
-		-- 		npcModule.Actions:ProtectOwner(function()
-		-- 			return npcModule.IsProtectingOwner;
-		-- 		end)
-		-- 	end);
-
-		-- 	table.insert(npcModule.CutsceneActions, function()
-		-- 		Debugger:Log("Run to car");
-
-		-- 		npcModule.Move:SetMoveSpeed("set", "default", 20);
-		-- 		npcModule.Move:MoveTo(Vector3.new(-8.782, 55.3, -219.586));
-		-- 	end);
-
-		-- 	npcModule.NextAction = function(yield)
-		-- 		local done = false;
-		-- 		task.spawn(function()
-		-- 			actionIndex = actionIndex +1;
-		-- 			Debugger:Log("Next action : ", actionIndex);
-		-- 			npcModule.CutsceneActions[actionIndex]();
-		-- 			done = true;
-		-- 		end)
-		-- 		if yield == true then
-		-- 			repeat 
-		-- 				task.wait(0.5);
-		-- 			until done == true;
-		-- 		end
-		-- 	end
-
-		-- end, modNpcs.NpcBaseConstructors.CutsceneHuman);
 
 		masonNpcClass.SetAnimation("CrouchLook", {script.MasonAnimations.CrouchLookAnim});
 		masonNpcClass.SetAnimation("Handout", {script.MasonAnimations.Handout});
@@ -491,7 +415,7 @@ return function(CutsceneSequence)
 		
 	end);
 
-	local activeZombies, zombieNpcClass = {}, {};
+	local zombieNpcClass = {};
 	local disableSecondSpawner = true;
 	
 	CutsceneSequence:NewServerScene("MasonArrives", function()
@@ -558,7 +482,7 @@ return function(CutsceneSequence)
 			
 			local mission = modMission:GetMission(player, MISSION_ID);
 			repeat
-				task.wait(0.3);
+				task.wait(0.1);
 				masonNpcClass.Move:Face(playerClass.RootPart);
 			until mission.ProgressionPoint == 4;
 
@@ -581,7 +505,6 @@ return function(CutsceneSequence)
 		local zombieKilled = 0;
 
 		local function loadZombies(zombiePrefab, npcClass: NpcClass)
-			table.insert(activeZombies, zombiePrefab);
 			table.insert(zombieNpcClass, npcClass);
 
 			npcClass.SetAggression = 3;
@@ -596,7 +519,11 @@ return function(CutsceneSequence)
 				if not isDead then return end;
 
 				zombieKilled = zombieKilled +1;
-				table.remove(zombieNpcClass, moduleIndex);
+				for a=#zombieNpcClass, 1, -1 do
+					if zombieNpcClass[a] == npcClass then
+						table.remove(zombieNpcClass, a);
+					end
+				end
 				if zombieKilled >= 5 then
 					endSpawnLoop = true;
 				end
@@ -604,18 +531,18 @@ return function(CutsceneSequence)
 				Debugger.Expire(zombiePrefab, 0);
 			end)
 			
-			-- task.spawn(function()
-			-- 	npcClass.OnTarget(players);
-			-- 	while wait(1) do
-			-- 		if npcClass.Humanoid and npcClass.Humanoid.Health <= 0 then return end;
-			-- 		npcClass.Properties.AttackDamage = math.random(2, 4);
-			-- 		npcClass.OnTarget(players);
+			task.spawn(function()
+				npcClass.OnTarget(players);
+				while wait(1) do
+					if npcClass.Humanoid and npcClass.Humanoid.Health <= 0 then return end;
+					npcClass.Properties.AttackDamage = math.random(2, 4);
+					npcClass.OnTarget(players);
 
-			-- 		if masonNpcClass.Target == nil then
-			-- 			masonNpcClass.Target = zombiePrefab;
-			-- 		end
-			-- 	end
-			-- end)
+					if masonNpcClass.Target == nil then
+						masonNpcClass.Target = zombiePrefab;
+					end
+				end
+			end)
 		end
 
 		local function pickSpawn()
@@ -626,13 +553,17 @@ return function(CutsceneSequence)
 		disableSecondSpawner = false;
 		task.spawn(function()
 			for a=1, 15 do
-				if endSpawnLoop then break; else
+				if endSpawnLoop then
+					break;
+				else
 					modNpcs.spawn("Zombie", pickSpawn(), loadZombies);
 					task.wait(4);
 				end;
 			end
 			for a=1, 12 do
-				if disableSecondSpawner then break; else
+				if disableSecondSpawner then
+					break;
+				else
 					modNpcs.spawn("Zombie", pickSpawn(), loadZombies);
 					task.wait(2);
 				end;
@@ -670,7 +601,7 @@ return function(CutsceneSequence)
 		
 		rootPart.Anchored = false;
 		rootPart.CFrame = CFrame.new(rootPart.CFrame.p); 
-		--modCharacter.CharacterProperties.FirstPersonCamCFrame = CFrame.new(2.75, 58.1760025, -186.899994, 0.99984777, 4.69082266e-08, 0.0174524002, 0.00152099959, 0.996194899, -0.0871407166, -0.0173859969, 0.0871539935, 0.996043146);
+
 		modConfigurations.Set("DisablePinnedMission", false);
 	end);
 	
@@ -702,6 +633,11 @@ return function(CutsceneSequence)
 		modConfigurations.Set("DisableHotbar", false);
 		modConfigurations.Set("DisableInventory", false);
 		modConfigurations.Set("CanQuickEquip", true);
+		
+		local activeInterface: InterfaceInstance = modClientGuis.ActiveInterface;
+		if activeInterface then
+			activeInterface.Properties.AimPointerVisible = true;
+		end
 	end);
 	
 	
@@ -743,8 +679,9 @@ return function(CutsceneSequence)
 		masonNpcClass.NextAction();
 		wait(1);
 		workspace.Environment.CarSeat:Sit(masonNpcClass.Humanoid);
-		wait(6);
+		task.wait(3);
 		disableSecondSpawner = true;
+		task.wait(3);
 		originalBridge2:Destroy();
 		newBridge2.Parent = workspace.Environment;
 		TweenService:Create(explosionLight, TweenInfo.new(0.2), {Range = 100;}):Play();
@@ -753,17 +690,14 @@ return function(CutsceneSequence)
 
 		for a=#zombieNpcClass, 1, -1 do
 			local zombieNpcClass: NpcClass = zombieNpcClass[a];
-			local healthComp: HealthComp = zombieNpcClass.HealthComp;
-			healthComp:SetHealth(0);
+
+			zombieNpcClass.HealthComp:TakeDamage(DamageData.new{
+				Damage = 10000;
+				DamageBy = explosionEffect;
+				DamageType = "Explosive";
+				DamageCate = DamageData.DamageCategory.ExplosiveBarrel;
+			});
 		end
-		-- for a=#activeZombies, 1, -1 do
-		-- 	if activeZombies[a] ~= nil and activeZombies[a]:IsDescendantOf(workspace.Entity) then
-		-- 		local zombieHumanoid = activeZombies[a]:FindFirstChildWhichIsA("Humanoid");
-		-- 		if zombieHumanoid and zombieHumanoid.Name == "Zombie" and zombieHumanoid.Health > 0 then
-		-- 			zombieHumanoid.Health = 0;
-		-- 		end
-		-- 	end
-		-- end
 		
 		explosionEffect.Hit:Connect(function(basePart)
 			if (basePart:IsDescendantOf(destructableA) or basePart:IsDescendantOf(destructableB)) then
@@ -801,8 +735,6 @@ return function(CutsceneSequence)
 				Player=player;
 				OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission1_Complete;
 			};
-
-			modMission:StartMission(player, 2);
 
 			modServerManager:Travel(player, "TheWarehouse");
 		else

@@ -107,9 +107,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			if activeShopType == "Bandits" then
 				shopTitleLabel.Text = "Bandit's Market";
-				
 			else
 				shopTitleLabel.Text = "R.A.T. Services";
+			end
+
+			if interactable and interactable.Values.ItemId then
 				
 			end
 			

@@ -377,6 +377,8 @@ function TurretRuntime(weaponStorageItem)
 
 	if profile.Cache.InfAmmo then
 		properties.InfiniteAmmo = profile.Cache.InfAmmo;
+	else
+		properties.InfiniteAmmo = nil;
 	end
 
 	if configurations.ReloadMode == modWeaponAttributes.ReloadModes.Single and targetModel == nil and (itemValues.MA or 1) > 0 then
@@ -660,7 +662,7 @@ end
 
 local discOnEnemiesAttract;
 discOnEnemiesAttract = shared.modEventService:OnInvoked(
-	"Npcs.OnEnemiesAttract", 
+	"Npcs_BindEnemiesAttract", 
 	function(event: EventPacket, p: Player, cM: {Model})
 		if modBranchConfigs.IsWorld("Slaughterfest") then return end;
 		if not workspace:IsAncestorOf(turretArm) then discOnEnemiesAttract(); end;

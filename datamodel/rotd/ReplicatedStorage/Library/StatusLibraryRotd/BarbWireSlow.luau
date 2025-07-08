@@ -8,7 +8,7 @@ local statusPackage = {
     Buff=true;
 };
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     local characterClass: CharacterClass =  statusClass.StatusOwner;
 end
 

@@ -8,7 +8,7 @@ local modGuitarTool = shared.require(game.ReplicatedStorage.Library.ToolsLibrary
 
 local toolPackage = {
 	ItemId=script.Name;
-	Class="Tool";
+	Class="Melee";
 	HandlerType="MeleeTool";
 
 	ToolWindow = "InstrumentWindow";

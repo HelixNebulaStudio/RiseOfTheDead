@@ -14,6 +14,8 @@ local WorkbenchClass = {};
 function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: InterfaceWindow)
 	local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
+	local wieldComp = shared.modPlayers.get(localPlayer).WieldComp;
+
 	local binds = workbenchWindow.Binds;
 
 	function WorkbenchClass.UpdateModDesc(storageItem, modLib, containerStorageItem)
@@ -82,9 +84,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						desc = desc..' <font color="#'.. tierColor:ToHex() ..'">'..tweakStr.."</font>";
 					end
 
-					local itemClass = modData:GetItemClass(containerStorageItem.ID);
-					if itemClass and itemClass.Configurations and itemClass.Configurations.PreModDamage then
-						local pmd = itemClass.Configurations.PreModDamage;
+					local equipmentClass: EquipmentClass = wieldComp:GetEquipmentClass(containerStorageItem.ID);
+					if equipmentClass and equipmentClass.Configurations.PreModDamage then
+						local pmd = equipmentClass.Configurations.PreModDamage;
 
 						if upgradeInfo.Name == "Damage" then
 							desc = desc .."\n"

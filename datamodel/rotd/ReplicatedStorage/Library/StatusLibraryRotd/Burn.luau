@@ -15,7 +15,7 @@ local statusPackage = {
     Cleansable=true;
 };
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
 
     local characterClass: CharacterClass = statusClass.StatusOwner;
@@ -42,7 +42,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     end
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
 
     local characterClass: CharacterClass = statusClass.StatusOwner;
@@ -58,7 +58,7 @@ function statusPackage.OnExpire(statusClass: StatusClassInstance)
     end
 end
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if RunService:IsClient() then return end;
     if tickData.ms500 == false then return end;
 

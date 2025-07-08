@@ -1,12 +1,14 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
+
+local localPlayer = game.Players.LocalPlayer;
 
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 --== Variables;
 local MISSION_ID = 2;
@@ -20,11 +22,12 @@ if RunService:IsServer() then
 	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 	if modBranchConfigs.IsWorld("TheWarehouse") then
-		modOnGameEvents:ConnectEvent("OnDoorEnter", function(player, interactData)
-			local doorName = interactData.Name;
-			if doorName == nil then return end;
-	
-			if doorName == "Bedroom Door" then
+		local function onDoorEnter(eventPacket: EventPacket, interactable: InteractableInstance)
+			local player = eventPacket.Player;
+			Debugger:Warn(`onDoorEnter.`, player);
+			if player == nil then return end;
+
+			if interactable.Id == "bedroomdoorMain" then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint < 3 then
 						mission.ProgressionPoint = 3;
@@ -35,22 +38,26 @@ if RunService:IsServer() then
 						};
 					end;
 				end)
-				
-			elseif doorName == "Warehouse Exit Door" then
+
+			elseif interactable.Id == "warehouseExit" then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint == 8 then
 						mission.ProgressionPoint = 9;
 					end;
 				end)
-				
+
 			end
-		end)
+		end
+		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", onDoorEnter)
+
 
 		local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
-		modOnGameEvents:ConnectEvent("OnNpcDeath", function(npcModule)
-			if npcModule.Name ~= "Zombie" then return end;
+		shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, damageData: DamageData)
+			local damageTo: CharacterClass? = damageData.DamageTo;
+			if damageTo == nil then return end;
+			if damageTo.HumanoidType ~= "Zombie" then return end;
 
-			local playerTags = modDamageTag:Get(npcModule.Prefab, "Player");
+			local playerTags = modDamageTag:Get(damageTo.Character, "Player");
 			for _, playerTag in pairs(playerTags) do
 				local player = playerTag.Player;
 				
@@ -73,7 +80,9 @@ if RunService:IsServer() then
 			end
 		end)
 		
-		shared.modEventService:OnInvoked("Shop_OnActionEvent", function(event: EventPacket, action: string, packet: anydict)
+		
+		shared.modEventService:OnInvoked("Shop_BindActionEvent", function(event: EventPacket, ...)
+			local action: string, packet: anydict = ...;
 			local player = event.Player;
 			if player == nil then return end;
 			
@@ -100,8 +109,8 @@ if RunService:IsServer() then
 			end
 		end)
 		
-
-		modOnGameEvents:ConnectEvent("OnMedicHeal", function(player, npcName)
+		shared.modEventService:OnInvoked("Dialogue_BindMedicHeal", function(event: EventPacket, ...)
+			local player: Player, dialog = ...;
 			if not modMission:Progress(player, MISSION_ID) then return end;
 
 			modMission:Progress(player, MISSION_ID, function(mission)
@@ -115,6 +124,7 @@ if RunService:IsServer() then
 				end;
 			end)
 		end)
+		
 	end
 
 else
@@ -126,34 +136,25 @@ end
 return function(CutsceneSequence)
 	if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 
-	local modInterface;
-	if modData then
-		repeat
-			modInterface = modData:GetInterfaceModule();
-			Debugger:Warn("Waiting for interface..");
-			if modInterface == nil then task.wait(); end
-		until modInterface ~= nil;
-	end
-	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
+
+		local playerClass: PlayerClass = shared.modPlayers.get(player);
 		
-		local masonPrefab, masonModule;
-		masonModule = modNpcs.getByOwner(player, "Mason");
-		if masonModule == nil then
-			modNpcs.spawn("Mason", nil, function(npc, npcModule)
-				npcModule.Owner = player;
-				masonPrefab = npc;
-				masonModule = npcModule;
-			end);
-			masonModule:AddComponent("AntiSit");
-			
-			modReplicationManager.ReplicateOut(player, masonPrefab);
+		local masonNpcClass: NpcClass = modNpcs.getByOwner(player, "Mason");
+		if masonNpcClass == nil then
+			masonNpcClass = modNpcs.spawn2({
+				Name = "Mason";
+				CFrame = CFrame.new(-1.22, 55.46, -287.322);
+				Owner = player;
+				AddComponents = {};
+			});
+			modReplicationManager.ReplicateOut(player, masonNpcClass.Character);
 		end
-		
+
 		if not modMission:IsComplete(player, 1) then
 			modMission:CompleteMission(player, 1);
 		end
@@ -172,15 +173,17 @@ return function(CutsceneSequence)
 			modEvents:NewEvent(player, {Id="hasBeginnerP250"});
 		end);
 		
+
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
 				modMission:StartMission(player, 2);
 				
 			elseif mission.Type == 1 then -- OnActive
-				masonModule.StopCarLoop();
+				masonNpcClass.Properties.CutsceneActive = true;
+				
 				if mission.ProgressionPoint == 1 then
 					for a=1, 5 do
-						shared.modAntiCheatService:Teleport(player, CFrame.new(-20.8, 59.7, -40.4, -0.09, 0, -0.99, 0, 1, 0, 1, 0, -0.09));
+						playerClass:SetCFrame(CFrame.new(-20.8, 59.7, -40.4, -0.09, 0, -0.99, 0, 1, 0, 1, 0, -0.09));
 						if player:DistanceFromCharacter(Vector3.new(-20.8, 59.7, -40.4)) <= 16 then
 							break;
 						else
@@ -192,14 +195,12 @@ return function(CutsceneSequence)
 					CutsceneSequence:Pause(20);
 					
 					task.delay(1, function()
-						if masonModule and masonModule.PlayAnimation then
-							masonModule.PlayAnimation("Lean");
-							masonModule.Actions:Teleport(CFrame.new(-16.8199978, 57.6597404, -23.8900318, 1, 0, 0, 0, 1, 0, 0, 0, 1));
-						end
+						masonNpcClass.PlayAnimation("Lean");
+						masonNpcClass:SetCFrame(CFrame.new(-16.8199978, 57.6597404, -23.8900318, 1, 0, 0, 0, 1, 0, 0, 0, 1));
 					end)
 					
 					task.delay(1, function()
-						shared.modAntiCheatService:Teleport(player, CFrame.new(-19.9, 57.6, -35.95, -0.99, 0, 0.037, 0, 1, 0, -0.037, 0, -0.99));
+						playerClass:SetCFrame(CFrame.new(-19.9, 57.6, -35.95, -0.99, 0, 0.037, 0, 1, 0, -0.037, 0, -0.99));
 					end)
 					
 					modAnalyticsService:LogOnBoarding{
@@ -212,61 +213,66 @@ return function(CutsceneSequence)
 				elseif mission.ProgressionPoint == 2 then
 					CutsceneSequence:NextScene("enableInterfaces");
 
-					masonModule.StopAnimation("Lean");
+					masonNpcClass.StopAnimation("Lean");
 					
-					masonModule:ToggleInteractable(false);
-					masonModule.Move:SetMoveSpeed("set", "default", 10);
+					masonNpcClass:ToggleInteractable(false);
+					masonNpcClass.Move:SetMoveSpeed("set", "default", 10);
+					
 					task.wait(2);
 
-					if mission.ProgressionPoint ~= 2 then return end;
-					masonModule.Chat(masonModule.Owner, "Follow me...");
-					masonModule.Move:Face(Vector3.new(-0.619997144, 57.6597404, -25.171896));
+					if mission.ProgressionPoint >= 4 then return end;
+					
+					masonNpcClass.Chat(masonNpcClass.Owner, "Follow me...");
+					masonNpcClass.Move:Face(Vector3.new(-0.619997144, 57.6597404, -25.171896));
+			
 					wait(0.1);
 
-					if mission.ProgressionPoint ~= 2 then return end;
-					masonModule.Move:MoveTo(Vector3.new(-5.81999636, 57.6597404, -24.2718925));
-					masonModule.Move.MoveToEnded:Wait(2);
+					if mission.ProgressionPoint >= 4 then return end;
+							
+					masonNpcClass.Move:MoveTo(Vector3.new(-5.81999636, 57.6597404, -24.2718925));
+					masonNpcClass.Move.OnMoveToEnded:Wait(2);
 					wait(0.2);
 
-					if mission.ProgressionPoint ~= 2 then return end;
-					masonModule.Move:Face(Vector3.new(-5.81999636, 57.6597404, -20.3718967));
+					if mission.ProgressionPoint >= 4 then return end;
+
+					masonNpcClass.Move:Face(Vector3.new(-5.81999636, 57.6597404, -20.3718967));
 					wait(0.5);
 
-					if mission.ProgressionPoint ~= 2 then return end;
-					masonModule.Actions:EnterDoor("bedroomdoorMain");
-					masonModule.Chat(masonModule.Owner);
+					if mission.ProgressionPoint >= 4 then return end;
+
+					masonNpcClass:UseInteractable("bedroomdoorMain");
 					wait(0.5);
 					
-					masonModule.Move:MoveTo(Vector3.new(16.5800056, 57.6597404, -32.6719055));
-					masonModule.Move.MoveToEnded:Wait(3);
+					masonNpcClass.Move:MoveTo(Vector3.new(16.5800056, 57.6597404, -32.6719055));
+					masonNpcClass.Move.OnMoveToEnded:Wait(3);
 
-					if mission.ProgressionPoint ~= 2 then return end;
-					masonModule.Move:Face(Vector3.new(10.5800047, 57.6597404, -28.6719055));
+					if mission.ProgressionPoint >= 4 then return end;
+					masonNpcClass.Move:Face(Vector3.new(10.5800047, 57.6597404, -28.6719055));
 					
-					masonModule.Chat(masonModule.Owner, "Talk to Dr. Deniski");
-					masonModule:ToggleInteractable(true);
+					masonNpcClass.Chat(masonNpcClass.Owner, "Talk to Dr. Deniski");
+					masonNpcClass:ToggleInteractable(true);
 
 				elseif mission.ProgressionPoint == 3 then
 					CutsceneSequence:NextScene("enableInterfaces");
 
 				elseif mission.ProgressionPoint == 4 then
-					masonModule.Chat(masonModule.Owner);
-					masonModule.Actions:Teleport(CFrame.new(15.9152822, 57.6004868, -31.9428711, -0.521899104, 0, 0.853007257, 0, 1, 0, -0.853007257, 0, -0.521899104));
-					masonModule.Actions:FaceOwner();
-					masonModule:ToggleInteractable(true);
+					
+					masonNpcClass:SetCFrame(CFrame.new(15.9152822, 57.6004868, -31.9428711, -0.521899104, 0, 0.853007257, 0, 1, 0, -0.853007257, 0, -0.521899104));
+					masonNpcClass.Move:Face(playerClass:GetCFrame().Position);
+					masonNpcClass:ToggleInteractable(true);
 
 				elseif mission.ProgressionPoint == 5 then
-					masonModule.StopAnimation("Lean");
+					masonNpcClass.StopAnimation("Lean");
 					task.wait(2);
 
-					masonModule.Chat(masonModule.Owner, "I'll go and try to repair the car now..");
-					masonModule.Move:SetMoveSpeed("set", "default", 10);
+					masonNpcClass.Chat(masonNpcClass.Owner, "I'll go and try to repair the car now..");
+					masonNpcClass.Move:SetMoveSpeed("set", "default", 10);
 					
 					task.wait(1);
-					masonModule:ToggleInteractable(true);
-					masonModule.Move:MoveTo(Vector3.new(51.2800293, 57.6597404, 40.0281067));
+					masonNpcClass:ToggleInteractable(true);
+					masonNpcClass.Move:MoveTo(Vector3.new(51.2800293, 57.6597404, 40.0281067));
 					
-					masonModule.CarLoop();
+					masonNpcClass.Properties.CutsceneActive = false;
 
 				elseif mission.ProgressionPoint == 6 then
 					local p250StorageItem = modStorage.FindItemIdFromStorages("p250", player);
@@ -277,9 +283,9 @@ return function(CutsceneSequence)
 				end
 				
 			elseif mission.Type == 3 then -- OnComplete
-				masonModule.Actions:Teleport(CFrame.new(15.9152822, 57.6004868, -31.9428711, -0.521899104, 0, 0.853007257, 0, 1, 0, -0.853007257, 0, -0.521899104));
-				masonModule.StopAnimation("Lean");
-				masonModule.CarLoop();
+				masonNpcClass.Properties.CutsceneActive = false;
+				masonNpcClass:SetCFrame(CFrame.new(15.9152822, 57.6004868, -31.9428711, -0.521899104, 0, 0.853007257, 0, 1, 0, -0.853007257, 0, -0.521899104));
+				masonNpcClass.StopAnimation("Lean", 0.5);
 
 			end
 		end
@@ -303,7 +309,7 @@ return function(CutsceneSequence)
 		blurEffect.Parent = camera;
 
 		rootPart.CFrame = CFrame.new(-20.8, 59.7, -40.4, -0.09, 0, -0.99, 0, 1, 0, 1, 0, -0.09);
-		modInterface:ToggleGameBlinds(false, 0);
+		modClientGuis.toggleGameBlinds(false, 0);
 
 		local unconsciousFace = head:FindFirstChild("face")
 		if unconsciousFace then
@@ -338,9 +344,9 @@ return function(CutsceneSequence)
 			unconsciousAnimation:Play();
 		end
 		task.wait(1);
-		modInterface:ToggleGameBlinds(false, 0);
+		modClientGuis.toggleGameBlinds(false, 0);
 		task.wait(2);
-		modInterface:ToggleGameBlinds(true, 10);
+		modClientGuis.toggleGameBlinds(true, 10);
 		
 		TweenService:Create(blurEffect, TweenInfo.new(10), {Size = 10;}):Play();
 		wait(5);
@@ -363,7 +369,7 @@ return function(CutsceneSequence)
 		
 		local unconsciousAnimation = modCharacter:GetAnimation("Unconscious");
 
-		modInterface:ToggleGameBlinds(false, 1);
+		modClientGuis.toggleGameBlinds(false, 1);
 		task.wait(3.5);
 		
 		if head:FindFirstChild("face") then head.face:Destroy(); end
@@ -375,7 +381,7 @@ return function(CutsceneSequence)
 		rootPart.CFrame = CFrame.new(-20.0200005, 57.6597404, -36.5718994, -1, 0, 0, 0, 1, 0, 0, 0, -1);
 		wakeAnimation:Play();
 		wakeAnimation:AdjustSpeed(0);
-		modInterface:ToggleGameBlinds(true, 2);
+		modClientGuis.toggleGameBlinds(true, 2);
 		
 		wait(0.25);
 		wakeAnimation:AdjustSpeed(0.8);

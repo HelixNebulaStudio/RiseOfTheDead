@@ -14,7 +14,7 @@ if RunService:IsServer() then
     local statusId = statusPackage.Id;
 
     function statusPackage.onRequire()
-        shared.modEventService:OnInvoked("Players_OnWieldEvent", function(event: EventPacket, ...)
+        shared.modEventService:OnInvoked("Players_BindWieldEvent", function(event: EventPacket, ...)
             local action: string, toolHandler: ToolHandlerInstance = ...;
 
             local playerClass: PlayerClass = toolHandler.CharacterClass :: PlayerClass;

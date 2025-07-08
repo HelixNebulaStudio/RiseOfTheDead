@@ -11,7 +11,7 @@ function UsablePreset:ClientUse(storageItem)
 	local modData = shared.require(player:WaitForChild("DataModule"));
 	local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 	
-	local storage = modData.RequestStorage{Siid=storageItem.ID};
+	local storage = modData.RequestStorage{Action="GetStorage"; Siid=storageItem.ID};
 	if storage then
 		modAudio.Preload("ZipOpen", 5);
 		modAudio.Play("ZipOpen");

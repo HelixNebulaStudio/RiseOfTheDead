@@ -97,7 +97,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		for _, frame in pairs(windowFrame:GetChildren()) do
 			if frame.Name ~= activeMode then
 
-				local currentHudObject = gameHudObjects[activeMode];
+				local currentHudObject = gameHudObjects[frame.Name];
 				if currentHudObject then
 					currentHudObject:SetActive(false);
 				end

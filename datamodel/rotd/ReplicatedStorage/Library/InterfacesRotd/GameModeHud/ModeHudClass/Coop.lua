@@ -15,8 +15,8 @@ local templateLabel = script:WaitForChild("label");
 
 local ModeHudClass = shared.require(script.Parent);
 --==
-return function(...)
-	local modeHud = ModeHudClass.new(...);
+return function(interface, window, frame)
+	local modeHud = ModeHudClass.new(interface, window, frame);
 
 	modeHud.Soundtrack = nil;
 	

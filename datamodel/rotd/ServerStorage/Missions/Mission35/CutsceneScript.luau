@@ -44,7 +44,7 @@ return function(CutsceneSequence)
 		end)
 	end);
 	
-	shared.modEventService:OnInvoked("Interactables_OnTrigger", function(event: EventPacket, interactData, ...)
+	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(event: EventPacket, interactData, ...)
 		local triggerPlayer: Player? = event.Player;
 		if triggerPlayer == nil then return end;
 

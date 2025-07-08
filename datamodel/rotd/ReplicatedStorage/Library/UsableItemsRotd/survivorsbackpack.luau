@@ -3,15 +3,15 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local UsablePreset = shared.require(game.ReplicatedStorage.Library.UsableItems.UsablePreset).new();
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 UsablePreset.PortableStoragePresetId = "dufflebag";
 
 function UsablePreset:ClientUse(storageItem)
 	local player = game.Players.LocalPlayer;
 	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 	
-	local storage = modData.RequestStorage{Siid=storageItem.ID};
+	local storage = modData.RequestStorage{Action="GetStorage"; Siid=storageItem.ID};
 	if storage and type(storage) == "table" then
 		modAudio.Preload("ZipOpen", 5);
 		modAudio.Play("ZipOpen");

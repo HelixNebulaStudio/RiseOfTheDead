@@ -20,6 +20,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local window = interface:NewWindow("GeneralStats", statsFrame);
 	window.IgnoreHideAll = true;
 	window.ReleaseMouse = false;
+    window.Layers = {"CharacterHud"; "CompactHidden"};
     interface:BindConfigKey("DisableGeneralStats", {window});
 
     function window.Binds.SetStyle(styleId)
@@ -86,14 +87,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 return win.Visible == true;
             end)
 
-            local goldMenuOpen = false;
             local invOpen = false;
             for a=1, #openedWindows do
                 local win: InterfaceWindow = openedWindows[a];
                 if win.Name == "Inventory" or win.Name == "Workbench" then
                     invOpen = true;
-                elseif win.Name == "GoldMenu" then
-                    goldMenuOpen = true;
                 end
             end
 
@@ -101,11 +99,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 window.Binds.SetStyle("Inventory");
             else
                 window.Binds.SetStyle();
-            end
-            if goldMenuOpen then
-                window:Close();
-            else
-                window:Open();
             end
 
         else
@@ -121,73 +114,72 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end)
 
     local previousStats = {};
+    --MARK: OnUpdate
     window.OnUpdate:Connect(function()
         local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
         local statsData = modData.GameSave and modData.GameSave.Stats;
-        if statsData then
-            statsFrame.Visible = not modConfigurations.DisableGeneralStats;
-            for key, value in pairs(statsData) do
-                local label = (key == "Money" and statsFrame.moneylabel) or (key == "Perks" and statsFrame.perkslabel) or nil;
-                if label then
-                    if previousStats[key] == nil then 
-                        previousStats[key] = Instance.new("NumberValue", label);
-                        previousStats[key]:GetPropertyChangedSignal("Value"):Connect(function()
-                            if label.Name == "moneylabel" then
-                                local money = previousStats[key].Value;
-                                if money >= modGlobalVars.MaxMoney then
-                                    label.Text = "Money Maxed: "..math.floor(money);
-                                else
-                                    label.Text = "Money: "..math.floor(money);
-                                end
-
-                            elseif label.Name == "perkslabel" then
-                                local perks = math.floor(previousStats[key].Value);
-
-                                if perks >= modGlobalVars.MaxPerks then
-                                    label.Text = perks.." :Perks Maxed";
-                                else
-                                    label.Text = perks > 1 and perks.." :Perks" or perks.." :Perk";
-                                end
-                            end
-                        end)
-                    end;
-                    if previousStats[key] then
-                        local duration = 2;
-                        if value > previousStats[key].Value then
-                            label.TextColor3=Color3.fromRGB(149, 221, 115);
-
-                            TweenService:Create(label, TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
-                                TextColor3=Color3.fromRGB(255, 255, 255);
-                            }):Play();
-
-                            delay(duration+0.02, function() label.TextColor3=Color3.fromRGB(255, 255, 255); end);
-                        elseif value < previousStats[key].Value then
-                            label.TextColor3=Color3.fromRGB(147, 49, 49);
-
-                            TweenService:Create(label, TweenInfo.new(duration, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-                                TextColor3=Color3.fromRGB(255, 255, 255);
-                            }):Play();
-
-                            delay(duration+0.02, function() label.TextColor3=Color3.fromRGB(255, 255, 255); end);
+        if statsData == nil then return; end
+        
+        for key, value in pairs(statsData) do
+            local label = (key == "Money" and statsFrame.moneylabel) or (key == "Perks" and statsFrame.perkslabel) or nil;
+            if label == nil then return; end;
+            
+            if previousStats[key] == nil then 
+                previousStats[key] = Instance.new("NumberValue", label);
+                previousStats[key]:GetPropertyChangedSignal("Value"):Connect(function()
+                    if label.Name == "moneylabel" then
+                        local money = previousStats[key].Value;
+                        if money >= modGlobalVars.MaxMoney then
+                            label.Text = "Money Maxed: "..math.floor(money);
+                        else
+                            label.Text = "Money: "..math.floor(money);
                         end
-                        TweenService:Create(previousStats[key], TweenInfo.new(duration, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-                            Value=value;
-                        }):Play();
-                        delay(duration+0.02, function() 
-                            previousStats[key].Value = value;
-                        end)
+
+                    elseif label.Name == "perkslabel" then
+                        local perks = math.floor(previousStats[key].Value);
+
+                        if perks >= modGlobalVars.MaxPerks then
+                            label.Text = perks.." :Perks Maxed";
+                        else
+                            label.Text = perks > 1 and perks.." :Perks" or perks.." :Perk";
+                        end
                     end
+                end)
+            end;
+            if previousStats[key] then
+                local duration = 2;
+                if value > previousStats[key].Value then
+                    label.TextColor3=Color3.fromRGB(149, 221, 115);
+
+                    TweenService:Create(label, TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
+                        TextColor3=Color3.fromRGB(255, 255, 255);
+                    }):Play();
+
+                    delay(duration+0.02, function() label.TextColor3=Color3.fromRGB(255, 255, 255); end);
+                elseif value < previousStats[key].Value then
+                    label.TextColor3=Color3.fromRGB(147, 49, 49);
+
+                    TweenService:Create(label, TweenInfo.new(duration, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                        TextColor3=Color3.fromRGB(255, 255, 255);
+                    }):Play();
+
+                    delay(duration+0.02, function() label.TextColor3=Color3.fromRGB(255, 255, 255); end);
                 end
-                -- if key == "Level" and properties then
-                --     progressionLabel.Text = "Mastery Level: ".. tostring(value or 0);
-                --     if modInterface.modMasteryInterface then
-                --         modInterface.modMasteryInterface.Update();
-                --     end
-                -- end
+                TweenService:Create(previousStats[key], TweenInfo.new(duration, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                    Value=value;
+                }):Play();
+                delay(duration+0.02, function() 
+                    previousStats[key].Value = value;
+                end)
             end
-        else
-            statsFrame.Visible = false;
+                
+            -- if key == "Level" and properties then
+            --     progressionLabel.Text = "Mastery Level: ".. tostring(value or 0);
+            --     if modInterface.modMasteryInterface then
+            --         modInterface.modMasteryInterface.Update();
+            --     end
+            -- end
         end
     end)
 

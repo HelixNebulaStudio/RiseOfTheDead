@@ -61,9 +61,9 @@ end
 
 function remoteWorkbenchService.OnServerInvoke(player, action: string, ...)
 	if action == "interfacetoggle" then
-		shared.modEventService:ServerInvoke("WorkbenchService_OnInterfaceToggle", {ReplicateTo={player}}, ...);
+		shared.modEventService:ServerInvoke("WorkbenchService_BindInterfaceToggle", {ReplicateTo={player}}, ...);
 	elseif action == "itemselect" then
-		shared.modEventService:ServerInvoke("WorkbenchService_OnItemSelect", {ReplicateTo={player}}, ...);
+		shared.modEventService:ServerInvoke("WorkbenchService_BindItemSelect", {ReplicateTo={player}}, ...);
 	end
 end
 
@@ -571,8 +571,6 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 					playerSave:AwardAchievement("titoup");
 					modOnGameEvents:Fire("OnItemUpgraded", player, storageItem);
 					
-					if weaponId ~= "Inventory" then profile:GetItemClass(weaponId); end
-					--storage:SyncValues(id, upgradeInfo.DataTag);
 					storageItem:Sync({upgradeInfo.DataTag});
 					playerSave.AppearanceData:Update(playerSave.Clothing);
 					

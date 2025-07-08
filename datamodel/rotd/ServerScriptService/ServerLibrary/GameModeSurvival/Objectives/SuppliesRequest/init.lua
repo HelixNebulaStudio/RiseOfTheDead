@@ -39,7 +39,7 @@ function Objective:Begin()
 	self.ActiveInteractData = interactData;
 	self.AlertLightPrefab = newPrefab:WaitForChild("alertLight");
 
-	self.DisconnectOnTrigger = shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, packet)
+	self.DisconnectOnTrigger = shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
 		local player: Player? = eventPacket.Player;
 		if player == nil then return end;
 		

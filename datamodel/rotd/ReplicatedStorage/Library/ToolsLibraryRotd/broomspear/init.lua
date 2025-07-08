@@ -5,7 +5,7 @@ local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.Equipmen
 
 local toolPackage = {
 	ItemId=script.Name;
-	Class="Tool";
+	Class="Melee";
 	HandlerType="MeleeTool";
 
 	Animations={
@@ -50,7 +50,7 @@ local toolPackage = {
 		ThrowWaistRotation=math.rad(35);
 
 		--== Projectile
-		ProjectileId = "broomSpear";
+		ProjectileId = "broomspear";
 		ProjectileConfig={
 			Velocity = 60;
 			LifeTime = 30;

@@ -181,13 +181,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		windowFrame.Size = UDim2.new(1, 0, 1, 0);
 		windowFrame:WaitForChild("UICorner"):Destroy();
 
-		windowFrame:WaitForChild("closeButton").MouseButton1Click:Connect(function()
-            window:Close();
-		end)
-		
 		bannerFrame.Size = UDim2.new(0.26, 0, 1, 0);
 	end
 
+	windowFrame:WaitForChild("Title"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+		window:Close();
+	end)
 
 	local function colorBoolText(text)
 		text = tostring(text);

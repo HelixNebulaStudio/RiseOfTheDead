@@ -7,7 +7,7 @@ local MISSION_ID = 65;
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
-	shared.modEventService:OnInvoked("Npcs_OnDamaged", function(event: EventPacket, damageData: DamageData)
+	shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, damageData: DamageData)
 		local damageBy: CharacterClass? = damageData.DamageBy;
 		if damageBy == nil or damageBy.ClassName ~= "PlayerClass" then return end;
 

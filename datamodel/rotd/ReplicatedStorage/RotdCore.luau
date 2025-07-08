@@ -24,6 +24,7 @@ local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemM
 local modItemUnlockablesLibrary = shared.require(game.ReplicatedStorage.Library.ItemUnlockablesLibraryRotd);
 local modStatusLibrary = shared.require(game.ReplicatedStorage.Library.StatusLibraryRotd);
 local modCrateLibrary = shared.require(game.ReplicatedStorage.Library.CrateLibraryRotd);
+local modAchievementLibrary = shared.require(game.ReplicatedStorage.Library.AchievementLibraryRotd);
 local modSettings = shared.require(game.ReplicatedStorage.Library.SettingsRotd);
 local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffectsRotd);
@@ -34,6 +35,8 @@ if RunService:IsServer() then
     local modGameSave = shared.require(game.ServerScriptService.ServerLibrary.GameSaveRotd);
     local modApiRequestLibrary = shared.require(game.ServerScriptService.ServerLibrary.ApiRequestLibraryRotd);
     local modShopSystem = shared.require(game.ServerScriptService.ServerLibrary.ShopSystem);
+    local modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
+    
 end
 
 function RotdCore.OnPlayerAdded(player)

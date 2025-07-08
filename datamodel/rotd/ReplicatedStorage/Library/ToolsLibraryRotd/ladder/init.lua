@@ -38,11 +38,11 @@ function toolPackage.InputEvent(toolHandler, inputData)
 	local prefabSize = ladderPrefab:GetExtentsSize();
 
 	local player = toolHandler.Player;
-	local classPlayer = shared.modPlayers.get(player);
+	local playerClass: PlayerClass = shared.modPlayers.get(player);
 	
 	local groundCFrame;
 	local function getGroundCFrame()
-		local rootCFrame = classPlayer.RootPart.CFrame;
+		local rootCFrame = playerClass.RootPart.CFrame;
 		groundCFrame = rootCFrame + rootCFrame.LookVector + Vector3.new(0, -2.4, 0);
 		return groundCFrame;
 	end
@@ -200,7 +200,7 @@ function toolPackage.InputEvent(toolHandler, inputData)
 	
 	-- Server;
 	--===
-	if classPlayer and not classPlayer.IsAlive then return end;
+	if playerClass and playerClass.HealthComp.IsDead then return end;
 	properties.IsActive = inputData.IsActive == true;
 	
 	maxLadderRange = maxLadderRange +2;

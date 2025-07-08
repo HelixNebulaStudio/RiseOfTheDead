@@ -11,7 +11,7 @@ local statusPackage = {
     ExpiresOnDeath=true;
 };
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
 end
 
 return modStatusClass.new(statusPackage);

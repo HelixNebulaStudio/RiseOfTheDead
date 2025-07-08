@@ -6,6 +6,7 @@ local localPlayer = game.Players.LocalPlayer;
 
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
 
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 --==
@@ -17,6 +18,7 @@ shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
 
     local player = playerClass:GetInstance();
     local profile: ProfileRotd = shared.modProfile:Get(player) :: ProfileRotd;
+	local gameSave: GameSaveRotd = profile:GetActiveSave() :: GameSaveRotd;
 
 	task.spawn(function()
 		local eventPart = workspace:WaitForChild("Event");
@@ -45,6 +47,19 @@ shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
 				end
 			end
 		end
+	end)
+
+	player:GetAttributeChangedSignal("Location"):Connect(function()
+		if gameSave == nil then return end;
+
+		local location = player:GetAttribute("Location");
+		if location == nil then return end;
+
+		local setSpawn = modGpsLibrary.SpawnLocationLibrary[location];
+		if setSpawn == nil then return end;
+		
+		gameSave.Spawn = setSpawn;
+		Debugger:StudioWarn(`Set spawn to {location} = {setSpawn}`);
 	end)
 end)
 

@@ -120,7 +120,7 @@ return function(CutsceneSequence)
 
 			local RatGoons = modNpcs.RatGoons; -- Set by SectorE WorldScript.
 			
-			shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, packet)
+			shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
 				local player: Player? = eventPacket.Player;
 				if player == nil then return end;
 
@@ -435,7 +435,7 @@ return function(CutsceneSequence)
 				revasModule:TeleportHide();
 			end
 
-			shared.modEventService:OnInvoked("Generic_OnItemPickup", function(
+			shared.modEventService:OnInvoked("Generic_BindItemPickup", function(
 				event: EventPacket, 
 				interactData, 
 				storageItem: StorageItem

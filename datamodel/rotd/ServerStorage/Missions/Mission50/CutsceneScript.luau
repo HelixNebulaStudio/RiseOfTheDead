@@ -52,6 +52,8 @@ return function(CutsceneSequence)
 		local player: Player = players[1];
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
+
+		local playerClass: PlayerClass = modPlayers.get(player);
 			
 
 		local bunnymanModule = modNpcs.getByOwner(player, "Bunny Man");
@@ -69,19 +71,14 @@ return function(CutsceneSequence)
 			task.wait(0.1);
 		until character ~= nil;
 		
-		spawn(function()
-			local classPlayer = modPlayers.get(player);
-			
-			classPlayer.OnIsAliveChanged:Connect(function(isAlive)
-				if not isAlive then
-					modMission:Progress(player, MISSION_ID, function(mission)
-						if mission.ProgressionPoint <= 7 then
-							mission.ProgressionPoint = 2;
-						end;
-					end)
-				end
+		playerClass.CharacterGarbage:Tag(playerClass.OnIsDeadChanged:Connect(function(isDead)
+			if not isDead then return end;
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint <= 7 then
+					mission.ProgressionPoint = 2;
+				end;
 			end)
-		end)
+		end))
 		
 		if modMission:IsComplete(player, 50) then return end;
 		
@@ -160,7 +157,7 @@ return function(CutsceneSequence)
 					local origin = CFrame.new(-229.88, 9.397, 7.02);
 					
 					for a=1, 3 do
-						local projectileObject = modProjectile.Fire("firework", origin, Vector3.new());
+						local projectileObject = modProjectile.Fire("fireworks", origin, Vector3.new());
 						if projectileObject.Prefab:CanSetNetworkOwnership() then projectileObject.Prefab:SetNetworkOwner(nil); end
 
 						modProjectile.ServerSimulate(projectileObject, origin.p, Vector3.new(0, 20, 0));
@@ -176,7 +173,7 @@ return function(CutsceneSequence)
 					end);
 					
 					cultist1Module.Move:MoveTo(Vector3.new(-160.850769, 2.70417881, 2.4058733));
-					cultist1Module.Move.MoveToEnded:Wait(3);
+					cultist1Module.Move.OnMoveToEnded:Wait(3);
 					
 					bunnymanModule.Movement:Move(Vector3.new(-170.911606, 2.70417905, 2.40587401)):Wait(5);
 					wait(1);

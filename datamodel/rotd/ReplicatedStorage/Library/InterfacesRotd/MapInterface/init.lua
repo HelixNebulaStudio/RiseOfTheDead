@@ -184,7 +184,7 @@ local mapMenu = script:WaitForChild("MapFrame"):Clone();
 						
                         if objInfo.InteractableConfig == nil then return end;
                         
-                        local interactable: InteractableInstance = modInteractables.getOrNew(objInfo.InteractableConfig, localPlayer);
+                        local interactable: InteractableInstance = modInteractables.getOrNew(objInfo.InteractableConfig);
 
                         if interactable.Type == "GameModeEnter" then
                             self.Frame.Size = UDim2.new(0, 200, 0, 260);

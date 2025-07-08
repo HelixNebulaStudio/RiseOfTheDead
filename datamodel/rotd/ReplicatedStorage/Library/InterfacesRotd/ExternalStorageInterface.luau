@@ -1,8 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 
-
-local localplayer = game.Players.LocalPlayer;
+local localPlayer = game.Players.LocalPlayer;
 local camera = workspace.CurrentCamera;
 
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
@@ -33,7 +32,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local remoteUpgradeStorage = modRemotesManager:Get("UpgradeStorage");
 	local remoteItemActionHandler = modRemotesManager:Get("ItemActionHandler");
 
-    local modData = shared.require(localplayer:WaitForChild("DataModule"));
+    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
 	local interfaceScreenGui = interface.ScreenGui;
 	
@@ -92,11 +91,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         if page == 1 then page = nil; end
         
         local storage = modData.RequestStorage{
+            Action = "GetStorage";
             StorageId = storageId;
             StoragePage = page;
-
             InteractConfig = openSettings.Interactable.Config;
-            InteractPart = openSettings.Interactable.Part;
         };
 
         if storage then
@@ -482,7 +480,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             firstload = false;
             task.delay(0.31, refreshBoundarySize);
         end
-        activeStorageInterface:Update();
         
         if openSettings.SetVanitySiid then
             storageTitleTag.Text = "Set Vanity Clothing";
@@ -524,14 +521,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
         
         updateFrame();
-        
-        task.spawn(function()
-            local _rPacket = remoteStorageService:InvokeServer({
-                Action = "OpenStorage";
-                StorageId = activeStorageId;
-                LastSyncTick = storage.LastSyncTick;
-            });
-        end)
+        activeStorageInterface:Update(nil, nil, true);
 	end)
 
 	storageList.UIGridLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() --not crash
@@ -627,7 +617,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				repeat until not window.Visible
                     or openSettings.Interactable == nil
                     or openSettings.Interactable.Part == nil
-					or localplayer:DistanceFromCharacter(openSettings.Interactable.Part.Position) >= 16
+					or localPlayer:DistanceFromCharacter(openSettings.Interactable.Part.Position) >= 16
 					or not wait(0.1);
 				window:Close();
 			end)

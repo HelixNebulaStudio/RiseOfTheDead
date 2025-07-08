@@ -16,7 +16,7 @@ function statusPackage.onRequire()
     end
 end
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsServer() then return end;
     
     local modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule")); 
@@ -41,7 +41,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     );
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
     if RunService:IsServer() then return end;
 
     modCameraGraphics.TintColor:Remove("vexbile");

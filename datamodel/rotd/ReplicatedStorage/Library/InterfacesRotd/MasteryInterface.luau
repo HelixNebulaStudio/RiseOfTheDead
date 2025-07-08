@@ -755,15 +755,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         masteryFrame:WaitForChild("HelpButton").Visible = false;
     end
 
-
+    --MARK: OnToggle
 	window.OnToggle:Connect(function(visible)
 		selectedId = nil;
 		if visible then
 			modData:RequestData("GameSave/Masteries");
 			
-            window:Update();
 			interface:HideAll{[window.Name]=true;};
 			CenterTreeDisplay();
+            window:Update();
 			
 		else
 			for a=#TreeMenu, 1, -1 do
@@ -780,40 +780,39 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	quickButton.LayoutOrder = 5;
 	interface:ConnectQuickButton(quickButton, "KeyWindowMasteryMenu");
 
+    --MARK: OnUpdate
     window.OnUpdate:Connect(function()
-        if masteryFrame.Visible then
-            if modData.GameSave and modData.GameSave.Masteries then
-                local weaponsList = game.ReplicatedStorage.Library.WeaponsLibraryRotd:GetChildren();
-                
-                for a=1, #weaponsList do
-                    local itemId = weaponsList[a].Name;
-                    local itemInfo = modItemsLibrary:Find(itemId);
+        if modData.GameSave and modData.GameSave.Masteries then
+            local weaponsList = game.ReplicatedStorage.Library.WeaponsLibraryRotd:GetChildren();
+            
+            for a=1, #weaponsList do
+                local itemId = weaponsList[a].Name;
+                local itemInfo = modItemsLibrary:Find(itemId);
 
-                    local listing = masteryList:FindFirstChild(itemId);
-                    if listing == nil then
-                        listing = templateItemFrame:Clone();
-                        listing.Name = itemId;
-                        listing.Parent = masteryList;
-                    end
-                    
-                    local level = modData.GameSave.Masteries[itemId] or 0;
-                    listing.LayoutOrder = itemInfo.LibraryIndex;
-                    local levelBar = listing:WaitForChild("LevelFrame"):WaitForChild("LevelBar");
-                    local itemIcon = listing:WaitForChild("ItemIcon");
-                    local titleTag = listing:WaitForChild("Title");
-                    local valueTag = listing:WaitForChild("Value");
-                    titleTag.Text = itemInfo and itemInfo.Name or itemId;
-                    itemIcon.Image = itemInfo and itemInfo.Icon or "";
-                    valueTag.Text = "("..level.."/20)";
-                    levelBar.Size = UDim2.new(math.clamp(level/20, 0, 1), 0, 1, 0);
+                local listing = masteryList:FindFirstChild(itemId);
+                if listing == nil then
+                    listing = templateItemFrame:Clone();
+                    listing.Name = itemId;
+                    listing.Parent = masteryList;
                 end
                 
-            else
-                Debugger:Warn("Missing mastery data.");
+                local level = modData.GameSave.Masteries[itemId] or 0;
+                listing.LayoutOrder = itemInfo.LibraryIndex;
+                local levelBar = listing:WaitForChild("LevelFrame"):WaitForChild("LevelBar");
+                local itemIcon = listing:WaitForChild("ItemIcon");
+                local titleTag = listing:WaitForChild("Title");
+                local valueTag = listing:WaitForChild("Value");
+                titleTag.Text = itemInfo and itemInfo.Name or itemId;
+                itemIcon.Image = itemInfo and itemInfo.Icon or "";
+                valueTag.Text = "("..level.."/20)";
+                levelBar.Size = UDim2.new(math.clamp(level/20, 0, 1), 0, 1, 0);
             end
+            
+        else
+            Debugger:Warn("Missing mastery data.");
         end
         
-        if masteryFrame.Visible and modData.Profile then
+        if modData.Profile then
             --== Skill tree
             local skillTreeData = modData.Profile and modData.Profile.SkillTree or nil;
             

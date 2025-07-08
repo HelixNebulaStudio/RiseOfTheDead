@@ -40,7 +40,7 @@ function statusPackage.init()
     end
 end
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     local characterClass: CharacterClass = statusClass.StatusOwner;
     if characterClass == nil then return end;
 
@@ -56,14 +56,14 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     statusClass.Values.Modifier = modifier;
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
     local characterClass: CharacterClass = statusClass.StatusOwner;
     if characterClass == nil then return end;
 
     characterClass.Configurations:RemoveModifier(statusPackage.Id);
 end
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if RunService:IsClient() then return end;
     if tickData.ms1000 == false then return end
 

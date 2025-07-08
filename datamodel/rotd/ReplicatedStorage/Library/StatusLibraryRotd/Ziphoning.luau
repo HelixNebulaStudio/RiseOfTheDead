@@ -21,7 +21,7 @@ local statusPackage = {
 function statusPackage.init()
     if RunService:IsClient() then return end;
 
-    shared.modEventService:OnInvoked("Npcs_OnDamaged", function(event: EventPacket, damageData: DamageData)
+    shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, damageData: DamageData)
         local playerClass: CharacterClass? = damageData.DamageBy;
         if playerClass == nil or playerClass.ClassName ~= "PlayerClass" then return end;
         
@@ -52,7 +52,7 @@ function statusPackage.init()
 
 end
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
     local playerClass = statusClass.StatusOwner :: PlayerClass;
     if playerClass == nil then return end;
@@ -68,7 +68,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     end
 end
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if RunService:IsClient() then return end;
     if tickData.ms1000 ~= true then return end;
     local playerClass = statusClass.StatusOwner :: PlayerClass;
@@ -79,8 +79,8 @@ function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickDa
 
     local hpPerTick = 1;
 
-    local conNekrosisAmpMulti = playerClass.Configurations.NekrosisAmpMulti or 0;
-    hpPerTick = hpPerTick + (hpPerTick * conNekrosisAmpMulti);
+    local cNekrosisAmpMulti = playerClass.Configurations.NekrosisAmpMulti or 0;
+    hpPerTick = hpPerTick + (hpPerTick * cNekrosisAmpMulti);
     statusClass.Values.Amount = hpPerTick;
 
     if (statusClass.Values.Pool or 0) >= hpPerTick then

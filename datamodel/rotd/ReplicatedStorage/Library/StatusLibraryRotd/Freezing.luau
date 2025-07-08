@@ -13,7 +13,7 @@ local statusPackage = {
     ExpiresOnDeath=true;
 };
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsServer() then return end;
 
     local playerClass: PlayerClass = statusClass.StatusOwner :: PlayerClass;

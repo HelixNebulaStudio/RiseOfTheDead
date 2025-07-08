@@ -26,7 +26,7 @@ local toolPackage = {
 
 		--== Projectile
 		ProjectileId = "beachball";
-		ProjectileConfig={
+		ArcTracerConfig={
 			Velocity = 50;
 			Bounce = 0.9;
 			LifeTime = 10;

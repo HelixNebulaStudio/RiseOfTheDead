@@ -14,7 +14,7 @@ if RunService:IsServer() then
 	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	local modFactions = shared.require(game.ServerScriptService.ServerLibrary.Factions);
 	
-	shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, packet)
+	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
 		local triggerPlayer: Player? = eventPacket.Player;
 		if triggerPlayer == nil then return end;
 		

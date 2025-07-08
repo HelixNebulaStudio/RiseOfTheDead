@@ -36,10 +36,10 @@ if RunService:IsServer() then
 		local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 		local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
-		dialog:AddChoice("heal_request", function()
+		dialog:AddChoice("heal_request", function(dialog)
 			if not dialog.InRange() then return end;
 			modStatusEffects.FullHeal(player, 0.05);
-			modOnGameEvents:Fire("OnMedicHeal", player, dialog.Name);
+			shared.modEventService:ServerInvoke("Dialogue_BindMedicHeal", {}, player, dialog);
 		end)
 		
 		dialog:AddChoice("shop_ratShop", function()

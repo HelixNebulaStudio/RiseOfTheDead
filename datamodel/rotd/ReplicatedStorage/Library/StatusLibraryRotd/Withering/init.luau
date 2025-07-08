@@ -25,7 +25,7 @@ function statusPackage.onRequire()
 	witheringScreenEffect = script:WaitForChild("witheringEye");
 end
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
 	if RunService:IsClient() then
 		modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 		modCharacter = modData:GetModCharacter();
@@ -40,7 +40,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
 
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
 	if mainInterface == nil then return end;
 	if mainInterface.ScreenEffects.WitheringEye then
 		mainInterface.ScreenEffects.WitheringEye:Destroy();
@@ -48,7 +48,7 @@ function statusPackage.OnExpire(statusClass: StatusClassInstance)
 	end
 end
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
 	local characterClass: CharacterClass = statusClass.StatusOwner;
 	if characterClass == nil then return end;
 
@@ -149,7 +149,7 @@ function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickDa
 	end;
 end
 
-function statusPackage.OnRelay(statusClass: StatusClassInstance, ...)
+function statusPackage.BindRelay(statusClass: StatusClassInstance, ...)
 	local characterClass: CharacterClass = statusClass.StatusOwner;
 	if characterClass == nil then return end;
 

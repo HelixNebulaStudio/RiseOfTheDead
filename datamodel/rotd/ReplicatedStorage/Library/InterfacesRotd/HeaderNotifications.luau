@@ -132,10 +132,22 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 titleLabel.TextColor3 = branchColor;
                 titleLabel.Text = titleText;
                 titleImage.Size = UDim2.new(1, 0, 0.4, 0);
-                displayFrame.Parent = script.Parent;
+                displayFrame.Parent = interface.ScreenGui;
                 displayFrame.Visible = true;
-                titleImage:TweenSize(UDim2.new(1, 0, 0.8, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, timerOveride*3, true);
-                TweenService:Create(titleImage, TweenInfo.new(timerOveride, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {ImageTransparency=0}):Play();
+                TweenService:Create(
+                    titleImage, 
+                    TweenInfo.new(timerOveride*3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), 
+                    {
+                        Size = UDim2.new(1, 0, 0.8, 0);
+                    }
+                ):Play();
+                TweenService:Create(
+                    titleImage, 
+                    TweenInfo.new(timerOveride, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), 
+                    {
+                        ImageTransparency=0;
+                    }
+                ):Play();
                 TweenService:Create(titleLabel, TweenInfo.new(timerOveride, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {TextTransparency=0; TextStrokeTransparency=0.7;}):Play();
                 wait(timerOveride*5);
                 TweenService:Create(titleImage, TweenInfo.new(timerOveride, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {ImageTransparency=1}):Play();

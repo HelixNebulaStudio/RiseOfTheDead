@@ -116,7 +116,7 @@ return function(player, dialog, data)
 			
 			dialog:AddChoice("shelter_medic", function()
 				modStatusEffects.FullHeal(player);
-				modOnGameEvents:Fire("OnMedicHeal", player, dialog.Name);
+				shared.modEventService:ServerInvoke("Dialogue_BindMedicHeal", {}, player, dialog);
 			end)
 			
 		end

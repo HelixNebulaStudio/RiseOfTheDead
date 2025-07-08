@@ -14,14 +14,14 @@ local statusPackage = {
 if RunService:IsServer() then
     local modifierId = statusPackage.Id;
 
-    function statusPackage.OnExpire(statusClass: StatusClassInstance)
+    function statusPackage.BindExpire(statusClass: StatusClassInstance)
         local characterClass: CharacterClass = statusClass.StatusOwner;
         if characterClass == nil then return end;
 
         characterClass.Configurations:RemoveModifier(modifierId);
     end
 
-    function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+    function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
         if tickData.ms100 ~= true then return end;
 
         local characterClass: CharacterClass = statusClass.StatusOwner;

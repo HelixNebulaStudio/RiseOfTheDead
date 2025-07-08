@@ -60,20 +60,20 @@ return function(CutsceneSequence)
 						end)
 
 						robertModule.Move:MoveTo(Vector3.new(306.640442, -17.4503021, -71.8792801));
-						robertModule.Move.MoveToEnded:Wait(10);
+						robertModule.Move.OnMoveToEnded:Wait(10);
 						robertModule.Actions:Teleport(CFrame.new(306.640442, -17.4503021, -71.8792801, 0, 0, 1, 0, 1, 0, -1, 0, 0));
 
 						robertModule.Move:MoveTo(Vector3.new(273.730255, -23.8503113, 51.0707092));
-						robertModule.Move.MoveToEnded:Wait(10);
+						robertModule.Move.OnMoveToEnded:Wait(10);
 						robertModule.Actions:Teleport(CFrame.new(273.730255, -23.8503113, 51.0707092, -1, 0, 0, 0, 1, 0, 0, 0, -1));
 
 						robertModule.Move:MoveTo(Vector3.new(328.187, -20.387, 116.075));
-						robertModule.Move.MoveToEnded:Wait(10);
+						robertModule.Move.OnMoveToEnded:Wait(10);
 						robertModule.Actions:WaitForOwner(40);
 						robertModule.Actions:Teleport(CFrame.new(344.507, -20.387, 118.615, 0, 0, -1, 0, 1, 0, 1, 0, 0));
 
 						robertModule.Move:MoveTo(Vector3.new(385.680115, -23.7978725, 121.620682));
-						robertModule.Move.MoveToEnded:Wait(3);
+						robertModule.Move.OnMoveToEnded:Wait(3);
 						robertModule.Actions:Teleport(CFrame.new(385.680115, -23.7978725, 121.620682, 0, 0, -1, 0, 1, 0, 1, 0, 0));
 
 						robertModule.Actions:WaitForOwner(60);
@@ -175,29 +175,29 @@ return function(CutsceneSequence)
 						wait(3);
 
 						robertModule.Move:MoveTo(Vector3.new(1133.76843, 57.5696716, -82.2993088));
-						robertModule.Move.MoveToEnded:Wait(10);
+						robertModule.Move.OnMoveToEnded:Wait(10);
 
 						robertModule.Actions:Teleport(CFrame.new(1133.76843, 57.5696716, -82.2993088, -0.389456064, 0, -0.921045125, 0, 1, 0, 0.921045125, 0, -0.389456064));
 
 						robertModule.Move:MoveTo(Vector3.new(1174.27808, 57.5696716, -89.7092438));
-						robertModule.Move.MoveToEnded:Wait(10);
+						robertModule.Move.OnMoveToEnded:Wait(10);
 
 						robertModule.Actions:Teleport(CFrame.new(1174.27808, 57.5696716, -89.7092438, 0.981316209, 0, 0.19240205, 0, 1, 0, -0.19240205, 0, 0.981316209));
 
 						robertModule.Move:MoveTo(Vector3.new(1174.27808, 57.5696716, -89.7092438));
-						robertModule.Move.MoveToEnded:Wait(10);
+						robertModule.Move.OnMoveToEnded:Wait(10);
 
 						robertModule.Actions:Teleport(CFrame.new(1174.27808, 57.5696716, -89.7092438, 0.981316209, 0, 0.19240205, 0, 1, 0, -0.19240205, 0, 0.981316209));
 
 						robertModule.Move:MoveTo(Vector3.new(1165.12732, 60.4196625, -106.909111));
-						robertModule.Move.MoveToEnded:Wait(10);
+						robertModule.Move.OnMoveToEnded:Wait(10);
 
 						robertModule.Actions:Teleport(CFrame.new(1165.12732, 60.4196625, -106.909111, 0.0202159919, 0, 0.999795616, 0, 1, 0, -0.999795616, 0, 0.0202159919));
 						wait(1);
 						robertModule.Actions:Teleport(CFrame.new(1158.65759, 60.4196625, -106.909111, 0.0202159919, 0, 0.999795616, 0, 1, 0, -0.999795616, 0, 0.0202159919));
 
 						robertModule.Move:MoveTo(Vector3.new(1138.83765, 60.4196625, -126.609146));
-						robertModule.Move.MoveToEnded:Wait(10);
+						robertModule.Move.OnMoveToEnded:Wait(10);
 
 					end
 

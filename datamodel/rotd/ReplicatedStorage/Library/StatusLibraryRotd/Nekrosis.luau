@@ -13,40 +13,41 @@ local statusPackage = {
     Cleansable=true;
 };
 
-function statusPackage:OnTick()
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
 	if RunService:IsClient() then return end;
-    local playerClass: PlayerClass = self.PlayerClass;
-    if playerClass == nil then return end;
+
+    local playerClass: PlayerClass = statusClass.StatusOwner;
+    if playerClass == nil or playerClass.ClassName ~= "PlayerClass" then return end;
 
 	local humanoid = playerClass.Humanoid;
-	if self.Visible == nil then 
-        self.Visible = false;
+	if statusClass.Visible == nil then 
+        statusClass.Visible = false;
     end
 	
 	local sync = false;
 	
 	local lastDmgedTime = workspace:GetServerTimeNow()-playerClass.HealthComp.LastDamageTaken;
 	if lastDmgedTime < 15 then
-		if self.Values.HealRate ~= nil then
-			self.Values.HealRate = nil;
-			self.Visible = false;
+		if statusClass.Values.HealRate ~= nil then
+			statusClass.Values.HealRate = nil;
+			statusClass.Visible = false;
 			sync = true;
 		end
 		
 	else
-		if self.Values.HealRate == nil and humanoid.Health < humanoid.MaxHealth then
+		if statusClass.Values.HealRate == nil and humanoid.Health < humanoid.MaxHealth then
 			local cNekrosisHeal = (playerClass.Configurations.NekrosisHeal or 0)/10;
 
-			self.Values.HealRate = cNekrosisHeal;
+			statusClass.Values.HealRate = cNekrosisHeal;
 			
-			self.Amount = cNekrosisHeal;
-			self.Visible = true;
+			statusClass.Amount = cNekrosisHeal;
+			statusClass.Visible = true;
 			sync = true;
 			
-		elseif self.Visible == true and humanoid.Health >= humanoid.MaxHealth then
-			self.Values.HealRate = nil;
+		elseif statusClass.Visible == true and humanoid.Health >= humanoid.MaxHealth then
+			statusClass.Values.HealRate = nil;
 
-			self.Visible = false;
+			statusClass.Visible = false;
 			sync = true;
 			
 		end

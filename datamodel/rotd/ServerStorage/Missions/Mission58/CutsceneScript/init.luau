@@ -35,7 +35,7 @@ if RunService:IsServer() then
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 
-	shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, ...)
+	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
 		local player: Player? = eventPacket.Player;
 		if player == nil then return end;
 
@@ -592,7 +592,7 @@ return function(CutsceneSequence)
 						patrickModule.Move:HeadTrack(revasModule.Head);
 						patrickModule.Move:MoveTo(Vector3.new(-0.717552722, -10.0268211, 35.5515823));
 						task.spawn(function()
-							patrickModule.Move.MoveToEnded:Wait(15);
+							patrickModule.Move.OnMoveToEnded:Wait(15);
 							task.wait(0.1);
 							patrickModule.Move:Face(revasModule.RootPart);
 						end)
@@ -711,7 +711,7 @@ return function(CutsceneSequence)
 
 						patrickModule.Move:MoveTo(Vector3.new(1.954, -10.027, 35.552));
 						task.spawn(function()
-							patrickModule.Move.MoveToEnded:Wait();
+							patrickModule.Move.OnMoveToEnded:Wait();
 							task.wait(0.1);
 							patrickModule.Move:Face(revasModule.RootPart);
 						end)

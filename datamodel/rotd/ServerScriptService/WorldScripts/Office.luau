@@ -9,53 +9,54 @@ local modHealthComponents = shared.require(game.ReplicatedStorage.Components.Hea
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 if RunService:IsServer() then
+    modGameModeRaid = shared.require(game.ServerScriptService.ServerLibrary.GameModeRaid);
     modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
     modGameModeManager.GameWorld = true;
-
 end
 
 local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new();
+
+local GAME_MODE, GAME_STAGE = "Raid", "Office";
 --=
+
+function WorldCore.InitGameController()
+    local newGameController = modGameModeRaid.new();
+
+    newGameController.ModeType = GAME_MODE;
+    newGameController.ModeStage = GAME_STAGE;
+
+    newGameController.Objective = {
+        Id="Eliminate";
+        EliminateGoal=100;
+        
+        SpawnPlatformRadius=64;
+        EnemyCap=35;
+        MinSpawnCount=6;
+        MaxSpawnCount=12;
+        
+        HordeWhenEnemiesDropsBelow=4;
+        HordeCycle=300;
+        HordeSpawnRate=0.5;
+    };
+
+    newGameController.EnemiesList = {
+        {Name="Zombie"; Chance=100;};
+        {Name="Leaper"; Chance=15; Fmod=15;};
+        {Name="Ticks"; Chance=10; Fmod=10;};
+        {Name="Heavy"; Chance=0.1; Fmod=10;};
+    };
+
+    task.spawn(function()
+        newGameController:Load();
+    end);
+
+    return newGameController;
+end
 
 function WorldCore.onRequire()
     if RunService:IsClient() then return end;
-
-    modGameModeManager.StudioData = {
-        GameMode={
-            Type="Raid";
-            Stage="Office";
-            Room={
-                MaxPlayers=1;
-                Players={};
-                IsHard=false;
-            };
-        };
-    };
-
-    local waitingforFirstPlayer = true;
-    local gameModeStart = false;
-    shared.modEngineCore:ConnectOnPlayerAdded(script, function(player: Player)
-        if RunService:IsStudio() or modBranchConfigs.CurrentBranch.Name == "Dev" then
-            local lobbyPlayers = modGameModeManager.StudioData.GameMode.Room.Players;
-            for _, player in pairs(game.Players:GetPlayers()) do
-                table.insert(lobbyPlayers, {Name=player.Name; UserId=player.UserId});
-            end
-            Debugger:Warn("LobbyPlayers", lobbyPlayers);
-        end
-        
-        if waitingforFirstPlayer then
-            waitingforFirstPlayer = false;
-
-            task.wait(3);
-            gameModeStart = true;
-            for _, p in pairs(game.Players:GetPlayers()) do
-		        modGameModeManager:OnPlayerJoin(p);
-            end
-
-        elseif gameModeStart then
-		    modGameModeManager:OnPlayerJoin(player);
-        end
-    end)
+    
+    WorldCore:InitGameWorld(GAME_MODE, GAME_STAGE);
 
     task.spawn(function()
         local touchHandler = modTouchHandler.new("BarbedFence", 1);

@@ -12,40 +12,37 @@ local statusPackage = {
     Buff=true;
 };
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if RunService:IsClient() then return end;
-    if tickData.ms500 == false then return end;
+    if tickData.ms1000 == false then return end;
 
     local healthComp: HealthComp? = statusClass.StatusOwner.HealthComp;
     if healthComp == nil then return end;
 
-    local healthPool = healthComp.MaxHealth;
-    local armorPool = healthComp.MaxArmor;
-
     local rate = statusClass.Values.Rate or 0.1;
 
-    local totalHeal = 0;
-
-    if math.ceil(healthComp.CurHealth)+5 <= statusClass.Values.InitHealth then
+    if math.ceil(healthComp.CurHealth) < statusClass.Values.LastHealth then
         statusClass.Expires = workspace:GetServerTimeNow();
         return ;
     end
 
     local healAmount = (healthComp.MaxHealth * rate);
-    healAmount = math.clamp(healAmount, 0, healthComp.MaxHealth-healthComp.CurHealth);
 
-    if healAmount > 0 and healthPool > 0 then
-        local dmgData = DamageData.new{
-            Damage = healAmount;
-            DamageType = "Heal";
-        };
-
-        -- Apply healing
-        healthComp:TakeDamage(dmgData);
-
-        healthPool = healthPool - healAmount;
-        totalHeal = totalHeal + healAmount;
-    end;
+    local healPool = statusClass.Values.HealPool;
+    if healPool == nil then
+        healPool = healthComp.MaxHealth - healthComp.CurHealth;
+    else
+        healPool = math.max(healPool - healAmount, 0);
+    end
+    statusClass.Values.HealPool = healPool;
+    
+    
+    local dmgData = DamageData.new{
+        Damage = healAmount;
+        DamageType = "Heal";
+    };
+    healthComp:TakeDamage(dmgData);
+    statusClass.Values.LastHealth = healthComp.CurHealth;
 
     if healthComp.CurArmor < healthComp.MaxArmor then
         local regenAmount = (healthComp.MaxArmor * (rate or 0.1));
@@ -53,15 +50,13 @@ function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickDa
         regenAmount = math.max(regenAmount, 1);
         regenAmount = math.clamp(regenAmount, 0, healthComp.MaxArmor-healthComp.CurArmor);
 
-        if regenAmount > 0 and armorPool > 0 then
+        if regenAmount > 0 then
             healthComp:SetArmor(healthComp.CurArmor + regenAmount);
-
-            armorPool = armorPool - regenAmount;
-            totalHeal = totalHeal + regenAmount;
         end
     end
 
-    if totalHeal <= 0 then
+    
+    if healPool <= 0 then
         statusClass.Expires = workspace:GetServerTimeNow();
         return;
     end

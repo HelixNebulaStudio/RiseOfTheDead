@@ -10,7 +10,7 @@ local statusPackage = {
     Buff=true;
 };
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
 	if RunService:IsClient() then return end;
 	local playerClass = statusClass.StatusOwner :: PlayerClass;
     if playerClass == nil or playerClass.ClassName ~= "PlayerClass" then return end;

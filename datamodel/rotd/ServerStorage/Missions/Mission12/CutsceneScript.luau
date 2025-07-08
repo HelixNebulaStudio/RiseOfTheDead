@@ -68,7 +68,7 @@ return function(CutsceneSequence)
 						end)
 						
 						masonModule.Move:MoveTo(Vector3.new(-5.8, 57, 19));
-						masonModule.Move.MoveToEnded:Wait(10);
+						masonModule.Move.OnMoveToEnded:Wait(10);
 						task.wait(0.5);
 						masonModule.Move:Face(Vector3.new(-12, 57, 19));
 						
@@ -109,7 +109,7 @@ return function(CutsceneSequence)
 						masonModule.Move:SetMoveSpeed("set", "default", 12);
 
 						masonModule.Move:MoveTo(Vector3.new(59.34, 57.66, -28.03));
-						masonModule.Move.MoveToEnded:Wait(6);
+						masonModule.Move.OnMoveToEnded:Wait(6);
 						
 						masonModule.Actions:WaitForOwner(30);
 						masonModule.Actions:EnterDoor("warehouseExit");
@@ -119,7 +119,7 @@ return function(CutsceneSequence)
 						
 						task.wait(0.1);
 						masonModule.Move:MoveTo(Vector3.new(77.6, 57.6, -20.3));
-						masonModule.Move.MoveToEnded:Wait(10);
+						masonModule.Move.OnMoveToEnded:Wait(10);
 						masonModule.Move:Face(Vector3.new(92.12, 57.62, 66.21));
 
 						task.wait(0.5);
@@ -155,7 +155,7 @@ return function(CutsceneSequence)
 						task.wait(0.2);
 
 						masonModule.Move:MoveTo(Vector3.new(92.12, 57.62, 66.21));
-						masonModule.Move.MoveToEnded:Wait(10);
+						masonModule.Move.OnMoveToEnded:Wait(10);
 						
 						--masonModule.Movement:Move(Vector3.new(92.12, 57.62, 66.21)):Wait(10);
 
@@ -194,7 +194,7 @@ return function(CutsceneSequence)
 
 						--masonModule.Movement:Move(Vector3.new(75.2, 57.7, 156.7)):Wait(10);
 						masonModule.Move:MoveTo(Vector3.new(75.2, 57.7, 156.7));
-						masonModule.Move.MoveToEnded:Wait(10);
+						masonModule.Move.OnMoveToEnded:Wait(10);
 						
 						masonModule.Actions:WaitForOwner(30);
 						masonModule.Actions:EnterDoor("factoryEntrance");
@@ -203,7 +203,7 @@ return function(CutsceneSequence)
 
 						--masonModule.Movement:Move(Vector3.new(18.9, 57.7, 183)):Wait(10);
 						masonModule.Move:MoveTo(Vector3.new(18.9, 57.7, 183));
-						masonModule.Move.MoveToEnded:Wait(10);
+						masonModule.Move.OnMoveToEnded:Wait(10);
 						
 						modMission:Progress(masonModule.Owner, 12, function(mission)
 							if mission.ProgressionPoint < 3 then

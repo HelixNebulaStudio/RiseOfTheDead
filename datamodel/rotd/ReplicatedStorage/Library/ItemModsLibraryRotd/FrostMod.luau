@@ -37,6 +37,8 @@ end
 if RunService:IsServer() then
 
 	function modifierPackage.Binds.OnBulletHit(modifier: ItemModifierInstance, packet: OnBulletHitPacket)
+		if packet.TargetModel == nil then return end;
+		
 		local characterClass: CharacterClass;
 		if modifier.Player then
 			characterClass = shared.modPlayers.get(modifier.Player);
@@ -84,13 +86,16 @@ elseif RunService:IsClient() then
 		if toolStatusHud.Frostbite == nil then
 			toolStatusHud.Frostbite = {
 				ModItemId = "frostmod";
-				Order=1;
+				Order = 1;
+				Text = ``;
 			};
 		end
 
 		local frostbiteHudData = toolStatusHud.Frostbite;
-		frostbiteHudData.Text = `{frostbiteHudData.Counter}`;
-		frostbiteHudData.ColorPercent = frostbiteHudData.Counter/5;
+		if modifier.Values.Counter then
+			frostbiteHudData.Text = `{modifier.Values.Counter}`;
+			frostbiteHudData.ColorPercent = modifier.Values.Counter/5;
+		end
 	end
 
 end

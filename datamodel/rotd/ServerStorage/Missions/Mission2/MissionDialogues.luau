@@ -134,8 +134,8 @@ if RunService:IsServer() then
 				end)
 				
 				modAnalyticsService:LogOnBoarding{
-					Player=player;
-					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_TalkToMason;
+					Player = player;
+					OnBoardingStep = modAnalyticsService.OnBoardingSteps.Mission2_TalkToMason;
 				};
 				
 			elseif checkpoint == 3 or checkpoint == 4 then
@@ -238,8 +238,8 @@ if RunService:IsServer() then
 						
 						modMission:CompleteMission(player, missionId);
 						modAnalyticsService:LogOnBoarding{
-							Player=player;
-							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_Complete;
+							Player = player;
+							OnBoardingStep = modAnalyticsService.OnBoardingSteps.Mission2_Complete;
 						};
 					end)
 					
@@ -255,8 +255,8 @@ if RunService:IsServer() then
 					dialog:AddChoice("whereAmI_taskComplete", function(dialog)
 						modMission:CompleteMission(player, missionId);
 						modAnalyticsService:LogOnBoarding{
-							Player=player;
-							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_Complete;
+							Player = player;
+							OnBoardingStep = modAnalyticsService.OnBoardingSteps.Mission2_Complete;
 						};
 					end)
 				end

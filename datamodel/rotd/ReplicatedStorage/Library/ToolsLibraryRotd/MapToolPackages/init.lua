@@ -5,6 +5,7 @@ local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesM
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local remoteGameModeLobbies = modRemotesManager:Get("GameModeLobbies");
 
@@ -29,44 +30,56 @@ local toolPackage = {
 };
 
 function toolPackage.ClientItemPrompt(handler)
-	local player = game.Players.LocalPlayer;
-	local classPlayer = shared.modPlayers.get(player);
+	local localPlayer = game.Players.LocalPlayer;
+	local playerClass = shared.modPlayers.get(localPlayer);
 
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	local modInterface = modData:GetInterfaceModule();
-	
-	if classPlayer.Properties.InBossBattle or modConfigurations.DisableMapItems then
-		modInterface:HintWarning("Cant use this right now!");
-		Debugger:Warn("InBossBattle", tostring(classPlayer.Properties.InBossBattle), "DisableMapItems", tostring(modConfigurations.DisableMapItems));
+	if playerClass.Properties.InBossBattle or modConfigurations.DisableMapItems then
+		modClientGuis.hintWarning("Cant use this right now!");
+		Debugger:Warn(
+			"InBossBattle", tostring(playerClass.Properties.InBossBattle), 
+			"DisableMapItems", tostring(modConfigurations.DisableMapItems)
+		);
 
 		return;
 	end
-	modInterface:ToggleGameBlinds(false, 0.5);
+	modClientGuis.toggleGameBlinds(false, 0.5);
 	
 	local storageItem = handler.StorageItem;
 	
 	local timeLapse = tick();
-	local lobbyData = remoteGameModeLobbies:InvokeServer("StorageItem", storageItem.ID);
+	local rPacket = remoteGameModeLobbies:InvokeServer("map", storageItem.ID);
 	wait(math.clamp(0.5-(tick()-timeLapse), 0, 0.5));
-	modData.LobbyInterfaceRequest(lobbyData);
+	modClientGuis.toggleGameBlinds(true, 0.5);
+	
+	if rPacket and rPacket.Success then
+		modClientGuis.toggleWindow("GameRoom", true, rPacket.LobbyData);
+	else
+		modClientGuis.promptWarning(rPacket.FailMsg or "Please try again!");
+	end;
+
+	modClientGuis.toggleGameBlinds(true, 0.5);
 end
 
-function toolPackage.ActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 	if packet.ActionIndex ~= 1 then return end;
-	handler.IsActive = packet.IsActive == true;
 
-	local weaponModel = handler.Prefabs[1];
-	local handle = weaponModel.Handle;
+	local equipmentClass: EquipmentClass = handler.EquipmentClass;
+	local properties = equipmentClass.Properties;
+
+	properties.IsActive = packet.IsActive == true;
+
+	local weaponModel = handler.MainToolModel;
+	local handle = weaponModel.PrimaryPart;
 
 	for _, obj in pairs(handle:GetChildren()) do
-		if obj.Name == "Interactable" and obj:IsA("ModuleScript") then
+		if obj.Name == "Interactable" and obj:IsA("Configuration") then
 			obj:Destroy();
 		end
 	end
 
-	if handler.IsActive then
-		local copyInteractable = handler.ToolPackage.InteractData.Script:Clone();
-		copyInteractable.Parent = handle;
+	if properties.IsActive then
+		local newInteractConfig = handler.ToolPackage.Interactable:Clone();
+		newInteractConfig.Parent = handle;
 	end
 end
 
@@ -85,17 +98,17 @@ function toolPackage.inherit(packet)
 	modToolsLibrary.set(inheritPackage);
 
 	function inheritPackage.newClass()
-		if inheritPackage.InteractData == nil then
+		if inheritPackage.Interactable == nil then
 			local itemLib = modItemsLibrary:Find(itemId);
 	
-			local newInteractable = modInteractables.createInteractable("GameModeEnter");
+			local newInteractConfig = modInteractables.createInteractable("GameModeEnter");
 	
 			local gameModeInfo = itemLib.GameMode;
-			newInteractable:SetAttribute("Mode", gameModeInfo.Mode);
-			newInteractable:SetAttribute("Stage", gameModeInfo.Stage);
-			newInteractable:SetAttribute("Label", `Join {gameModeInfo.Mode}: {gameModeInfo.Stage}`);
+			newInteractConfig:SetAttribute("Mode", gameModeInfo.Mode);
+			newInteractConfig:SetAttribute("Stage", gameModeInfo.Stage);
+			newInteractConfig:SetAttribute("Label", `Join {gameModeInfo.Mode}: {gameModeInfo.Stage}`);
 	
-			inheritPackage.InteractData = shared.require(newInteractable);
+			inheritPackage.Interactable = newInteractConfig;
 		end
 
 		return modEquipmentClass.new(inheritPackage.Class, inheritPackage.Configurations, inheritPackage.Properties);

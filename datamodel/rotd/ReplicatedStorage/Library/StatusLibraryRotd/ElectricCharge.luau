@@ -60,7 +60,7 @@ local overlapParams = OverlapParams.new();
 overlapParams.FilterType = Enum.RaycastFilterType.Include;
 overlapParams.MaxParts = 10;
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
     
     local arcOrigin: Vector3 = statusClass.Values.ArcOrigin;

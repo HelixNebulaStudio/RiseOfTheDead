@@ -140,17 +140,16 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
-			local classPlayer = shared.modPlayers.get(player);
-
-			classPlayer.OnIsAliveChanged:Connect(function(isAlive)
-				if not isAlive then
-					modMission:Progress(player, MISSION_ID, function(mission)
-						if mission.ProgressionPoint <= 13 then
-							mission.ProgressionPoint = 4;
-						end;
-					end)
-				end
-			end)
+			local playerClass: PlayerClass = shared.modPlayers.get(player);
+			playerClass.CharacterGarbage:Tag(playerClass.OnIsDeadChanged:Connect(function(isDead)
+				if not isDead then return end;
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint <= 13 then
+						mission.ProgressionPoint = 4;
+					end;
+				end)
+			end))
+			
 
 			if modMission:IsComplete(player, MISSION_ID) then return end;
 			
@@ -300,11 +299,11 @@ return function(CutsceneSequence)
 
 						spawn(function()
 							local position = Vector3.new(-99.4085159, 194.909668, -36.03228);
-							local initMag = (classPlayer.RootPart.Position-position).Magnitude;
+							local initMag = (playerClass.RootPart.Position-position).Magnitude;
 							local shoutCD = tick()-5;
 							local count = 0;
 							repeat
-								local dist = (classPlayer.RootPart.Position-position).Magnitude;
+								local dist = (playerClass.RootPart.Position-position).Magnitude;
 								if dist <= 4 then
 									modMission:Progress(player, MISSION_ID, function(mission)
 										if mission.ProgressionPoint < 7 then mission.ProgressionPoint = 7; end;
@@ -326,8 +325,8 @@ return function(CutsceneSequence)
 
 										elseif count > 3 then
 											jasonModule.Wield.Targetable.Humanoid = 0.5;
-											jasonModule.Wield.SetEnemyHumanoid(classPlayer.Humanoid);
-											jasonModule.Movement:Face(classPlayer.RootPart.Position);
+											jasonModule.Wield.SetEnemyHumanoid(playerClass.Humanoid);
+											jasonModule.Movement:Face(playerClass.RootPart.Position);
 											jasonModule.Wield.PrimaryFireRequest();
 										end
 									end
@@ -340,7 +339,7 @@ return function(CutsceneSequence)
 					elseif mission.ProgressionPoint == 7 then
 						CutsceneSequence:NextScene("freezePlayer");
 						wait(0.1);
-						classPlayer.RootPart.CFrame = CFrame.new(-99.0285263, 194.909668, -36.03228, -0.173647955, 0, -0.984807789, 0, 1, 0, 0.984807789, 0, -0.173647955);
+						playerClass.RootPart.CFrame = CFrame.new(-99.0285263, 194.909668, -36.03228, -0.173647955, 0, -0.984807789, 0, 1, 0, 0.984807789, 0, -0.173647955);
 						zarkModule.Movement:Move(Vector3.new(-92.1926346, 194.99115, -32.4804077)):Wait(5);
 						zarkModule.Actions:Teleport(CFrame.new(-91.4179306, 194.941971, -32.5195656, 0.419815749, 3.3732789e-08, 0.907609344, -8.04018683e-08, 1, 2.33395889e-11, -0.907609344, -7.29832834e-08, 0.419815749))
 
@@ -349,7 +348,7 @@ return function(CutsceneSequence)
 						stanModule.Actions:Teleport(CFrame.new(-96.3242645, 194.604858, -27.8066845, 0.426399022, -7.00883547e-08, -0.904535174, 4.63206042e-08, 1, -5.56498989e-08, 0.904535174, -1.8169553e-08, 0.426399022))
 						wait(1);
 						zarkModule.Actions:FaceOwner();
-						zarkModule.Move:HeadTrack(classPlayer.Head);
+						zarkModule.Move:HeadTrack(playerClass.Head);
 						zarkModule.Chat(player, "Heh heh heh, what do we have here?");
 						jasonModule.Chat(player);
 						wait(3);
@@ -390,7 +389,7 @@ return function(CutsceneSequence)
 						
 						task.wait(1);
 						zarkModule.Actions:FaceOwner();
-						zarkModule.Move:HeadTrack(classPlayer.Head);
+						zarkModule.Move:HeadTrack(playerClass.Head);
 
 						task.wait(1);
 						modDialogueService:InvokeDialogue(player, "talk", {
@@ -413,7 +412,7 @@ return function(CutsceneSequence)
 						
 						wait(1);
 						zarkModule.Actions:FaceOwner();
-						zarkModule.Move:HeadTrack(classPlayer.Head);
+						zarkModule.Move:HeadTrack(playerClass.Head);
 
 						task.wait(1);
 						modDialogueService:InvokeDialogue(player, "talk", {
@@ -445,7 +444,7 @@ return function(CutsceneSequence)
 						task.wait(0.3);
 						
 						zarkModule.Actions:FaceOwner();
-						zarkModule.Move:HeadTrack(classPlayer.Head);
+						zarkModule.Move:HeadTrack(playerClass.Head);
 						task.wait(0.4);
 						
 						task.wait(1);

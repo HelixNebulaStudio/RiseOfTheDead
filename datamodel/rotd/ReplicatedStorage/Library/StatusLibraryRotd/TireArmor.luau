@@ -9,7 +9,7 @@ local statusPackage = {
     Buff=true;
 };
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if statusClass.Visible == nil then
         statusClass.Visible = false;
     end

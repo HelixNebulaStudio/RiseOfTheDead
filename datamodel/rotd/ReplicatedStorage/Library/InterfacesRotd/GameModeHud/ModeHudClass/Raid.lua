@@ -12,15 +12,19 @@ local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumb
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modMarkers = shared.require(game.ReplicatedStorage.Library.Markers);
 
+local HUD_TASK_ID = "RaidHudTask";
+
 local ModeHudClass = shared.require(script.Parent);
 --==
-return function(...)
-	local modeHud = ModeHudClass.new(...);
+return function(interface: InterfaceInstance, window, frame)
+	local modeHud = ModeHudClass.new(interface, window, frame);
 	
 	local stopWatchRs = nil;
 	modeHud.Soundtrack = nil;
 	
 	function modeHud:Update(data)
+		local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+
 		modConfigurations.Set("AutoMarkEnemies", true);
 		local gameType = data.Type;
 		local gameStage = data.Stage;
@@ -28,12 +32,9 @@ return function(...)
 		local gameLib = modGameModeLibrary.GetGameMode(gameType);
 		local stageLib = gameLib and modGameModeLibrary.GetStage(gameType, gameStage);
 
-
-		local headerTag = self.MainFrame.headerTag;
-		local statusTag = self.MainFrame.statusTag;
-
-		headerTag.Text = data.Header or "";
-		statusTag.Text = data.Status or "";
+		local titleText = `{gameType}: {gameStage}`;
+		local headerText = data.Header or ``;
+		local descLabel = data.Status or ``;
 
 		if self.Soundtrack == nil then
 			modAudio.Preload(stageLib.Soundtrack, 5);
@@ -68,41 +69,67 @@ return function(...)
 			modMarkers.ClearMarker("LootPrefab");
 		end
 		
-		local classPlayer = shared.modPlayers.get(localPlayer);
-		if classPlayer.IsAlive == false then
-			self.Interface:ToggleGameBlinds(true, 2);
-			if not self:IsSpectating() then
-				self:Spectate();
+
+		local taskHudWindow: InterfaceWindow = interface:GetWindow("TaskListHud");
+		local raidHudTask = taskHudWindow and taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID) or nil;
+
+		if raidHudTask then
+			raidHudTask.Order = 3;
+			
+			local frame = raidHudTask.Frame;
+			raidHudTask.Properties.TitleText = titleText;
+			raidHudTask.Properties.HeaderText = headerText;
+			raidHudTask.Properties.DescText = descLabel;
+
+			local stopwatchLabel = raidHudTask.StopwatchLabel;
+			if stopwatchLabel == nil then
+				stopwatchLabel = taskHudWindow.Binds.GenericLabel:Clone();
+				stopwatchLabel.Name = "StopwatchLabel";
+				stopwatchLabel.LayoutOrder = 5;
+				stopwatchLabel.Parent = frame;
+				raidHudTask.StopwatchLabel = stopwatchLabel;
 			end
-		end
+			
+			if stopwatchLabel then
+				if stageLib.EnableStopwatch then
+					stopwatchLabel.Visible = true;
 
-		local stopwatchLabel = self.MainFrame.stopwatchLabel;
-		if stageLib.EnableStopwatch then
-			stopwatchLabel.Visible = true;
+					if stopWatchRs == nil then
+						stopwatchLabel.Text = "00:00.000";
+						stopWatchRs = RunService.RenderStepped:Connect(function(delta)
+							if data.StopwatchFinal then
+								stopwatchLabel.Text = `Final Time: {modSyncTime.FormatMs(data.StopwatchFinal *1000)}!`;
+								return;
+							end
 
-			if stopWatchRs == nil then
-				stopwatchLabel.Text = "Stopwatch: Ready";
-				stopWatchRs = RunService.RenderStepped:Connect(function(delta)
-					if data.StopwatchFinal then
-						stopwatchLabel.Text = `Run Time: {modSyncTime.FormatMs(data.StopwatchFinal *1000)}!`;
-						return;
+							if data.StopwatchTick == nil then
+								stopwatchLabel.Text = "00:00.000";
+								return;
+							end
+
+							local timeLapse = (workspace:GetServerTimeNow()-data.StopwatchTick);
+							stopwatchLabel.Text = `{modSyncTime.FormatMs(timeLapse *1000)}`;
+						end)
 					end
 
-					if data.StopwatchTick == nil then
-						stopwatchLabel.Text = "Stopwatch: Ready";
-						return;
-					end
+				else
+					stopwatchLabel.Visible = false;
 
-					local timeLapse = (workspace:GetServerTimeNow()-data.StopwatchTick);
-					stopwatchLabel.Text = `Stopwatch: {modSyncTime.FormatMs(timeLapse *1000)}`;
-				end)
+				end
 			end
-
-		else
-			stopwatchLabel.Visible = false;
-
 		end
 	end
 	
+	modeHud.OnActiveChanged:Connect(function(isActive)
+		local taskHudWindow: InterfaceWindow = interface:GetWindow("TaskListHud");
+		if taskHudWindow == nil then return end;
+
+		if isActive then
+			taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID, true);
+		else
+			taskHudWindow.Binds.destroyHudTask(HUD_TASK_ID);
+		end
+	end)
+
 	return modeHud;
 end

@@ -12,8 +12,8 @@ local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumb
 
 local ModeHudClass = shared.require(script.Parent);
 --==
-return function(...)
-	local modeHud = ModeHudClass.new(...);
+return function(interface, window, frame)
+	local modeHud = ModeHudClass.new(interface, window, frame);
 
 	return modeHud;
 end

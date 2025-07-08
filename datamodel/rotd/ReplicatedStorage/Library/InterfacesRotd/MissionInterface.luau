@@ -21,6 +21,7 @@ local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.Battl
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
+local modPropertiesVariable = shared.require(game.ReplicatedStorage.Library.PropertiesVariable);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
@@ -80,6 +81,8 @@ local MISSION_TYPE_ORDER = {
     Unreleased=8;
 };
 
+local HUD_TASK_ID = "PinnedMissionHudTask";
+
 local interfacePackage = {
     Type = "Character";
 };
@@ -89,13 +92,10 @@ local interfacePackage = {
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
-    local firstSync=false;
+    local firstSync = false;
 
     local remoteMissionRemote = modRemotesManager:Get("MissionRemote");
     local remoteBattlepassRemote = modRemotesManager:Get("BattlepassRemote")
-
-    local windowFrameTemplate = script:WaitForChild("MissionMenu");
-    local missionPinHudTemplate = script:WaitForChild("MissionPinHud");
 
     local templateLevelSlot = script:WaitForChild("LevelSlot");
     local templateStartSlot = script:WaitForChild("LevelSlotStart");
@@ -130,23 +130,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local itemToolTip = modItemInterface.newItemTooltip();
 
 
-	local windowFrame = windowFrameTemplate:Clone();
+	local windowFrame = script:WaitForChild("MissionMenu"):Clone();
 	windowFrame.Parent = interface.ScreenGui;
 	
 	local LeftFrame = windowFrame:WaitForChild("LeftBackground");
 	local MissionListFrame = LeftFrame:WaitForChild("MissionList");
 	local missionListPadding = LeftFrame:WaitForChild("UIPadding");
 	local PinnedMissionFrame = windowFrame:WaitForChild("PinnedBackground");
-
-	local missionPinHud = missionPinHudTemplate:Clone();
-	missionPinHud.Parent = interface.ScreenGui;
 	
-	local hudSizeConstraint = missionPinHud:WaitForChild("UISizeConstraint");
-	local pinnedTitleTag = missionPinHud:WaitForChild("Title");
-	local pinnedTaskTag = missionPinHud:WaitForChild("Task");
-	local pinnedTimerTag = missionPinHud:WaitForChild("Timer");
-	local pinnedHintLabel = missionPinHud:WaitForChild("Hint");
-	local pinnedTasklist = missionPinHud:WaitForChild("Tasklist");
+	local templateHudTaskList = script:WaitForChild("hudTaskList");
 	local taskTemplate = script:WaitForChild("Task");
 
 	local missionListingTemplate = script:WaitForChild("MissionListing");
@@ -211,6 +203,73 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		MISSION_TYPE_ORDER.Unreleased = nil;
 	end
 
+	--MARK: PinHudData
+	local missionHudTask;
+	local pinHudData = {
+		Active = false;
+
+		TitleText = ``;
+		HeaderText = ``;
+		TaskText = ``;
+
+		TimerTextColor = Color3.fromRGB(255, 255, 255);
+		TimerText = ``;
+		TimerVisible = false;
+
+		TaskList = nil;
+		TimerLabel = nil;
+	};
+
+	function pinHudData.setActive(isActive)
+		pinHudData.Active = isActive;
+
+		local taskHudWindow: InterfaceWindow = interface:GetWindow("TaskListHud");
+		missionHudTask = taskHudWindow and taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID) or nil;
+
+		if not isActive then
+			pinHudData.TitleText = ``;
+			pinHudData.HeaderText = ``;
+			pinHudData.TaskText = ``;
+
+			if missionHudTask then
+				taskHudWindow.Binds.destroyHudTask(HUD_TASK_ID);
+				missionHudTask = nil;
+			end
+			return;
+		end
+
+		if missionHudTask == nil then return end;
+
+		missionHudTask.Properties.TitleText = pinHudData.TitleText;
+		missionHudTask.Properties.HeaderText = pinHudData.HeaderText;
+		missionHudTask.Properties.DescText = pinHudData.TaskText;
+
+		if pinHudData.TimerVisible then
+			local timerLabel = pinHudData.TimerLabel;
+			if timerLabel == nil then
+				timerLabel = taskHudWindow.Binds.GenericLabel:Clone();
+				timerLabel.Name = "TimerLabel";
+				timerLabel.LayoutOrder = 4;
+				timerLabel.Parent = missionHudTask.Frame;
+				pinHudData.TimerLabel = timerLabel;
+			end
+			
+			timerLabel.Text = pinHudData.TimerText;
+			timerLabel.TextColor3 = pinHudData.TimerTextColor;
+			timerLabel.Visible = true;
+
+		else
+			if pinHudData.TimerLabel then
+				pinHudData.TimerLabel:Destroy();
+				pinHudData.TimerLabel = nil;
+			end
+			
+		end
+
+		missionHudTask:Update();
+	end
+
+
     --MARK: Window
 	local window: InterfaceWindow = interface:NewWindow("Missions", windowFrame);
 	window.CompactFullscreen = true;
@@ -229,15 +288,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 
 	if modConfigurations.CompactInterface then
-		missionPinHud:WaitForChild("Hint").Visible = false;
-		hudSizeConstraint.MaxSize = Vector2.new(camera.ViewportSize.X-100, math.huge);
-
-		missionPinHud.UIListLayout.Padding = UDim.new(0, 3);
-		pinnedTitleTag.Size = UDim2.new(0, 0, 0, 16);
-		pinnedTaskTag.Size = UDim2.new(0, 0, 0, 11);
 		taskTemplate.Size = UDim2.new(0, 0, 0, 11);
-		pinnedHintLabel.Size = UDim2.new(0, 0, 0, 11);
-		pinnedTimerTag.Size = UDim2.new(0, 0, 0, 11);
 
 
 		windowFrame.Position = UDim2.new(0.5, 0, 0.5, 0);
@@ -1471,7 +1522,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		modAudio.Preload("MissionUpdated", 5);
 		local function createListing(missionInfo, newTab, newList)
 			local missionData = missionInfo.Data;
-			local book = missionInfo.Lib;
+			local missionLib = missionInfo.Lib;
 
 			local key = missionData.StartTime..":"..missionData.Id;
 			local newListing = missionListings[key];
@@ -1585,18 +1636,24 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				titleLabels[key].Color = titleTag.TextColor3;
 			end
 
-			if book then
-				local dbSuffix = " ("..book.MissionId..")";
-				
-				titleTag.Text = book.Name.. (modBranchConfigs.CurrentBranch.Name == "Dev" and dbSuffix or "");
-				fromTag.Text = book.From or "";
+			if missionLib == nil then 
+				warn("Unknown mission ("..missionData.Id..")");
+				titleTag.Text = "Unknown Mission ("..missionData.Id..")";
+				return;
+			end;
 
-				if missionData.Type == 1 then -- Active
-					taskTag.Text = "";
+			local dbSuffix = " ("..missionLib.MissionId..")";
+			
+			titleTag.Text = missionLib.Name.. (modBranchConfigs.CurrentBranch.Name == "Dev" and dbSuffix or "");
+			fromTag.Text = missionLib.From or "";
 
-					if book.Checkpoint then
-						local checkpointInfo = book.Checkpoint[missionData.ProgressionPoint];
+			if missionData.Type == 1 then -- Active
+				taskTag.Text = "";
 
+				if missionLib.Checkpoint then
+					local checkpointInfo = missionLib.Checkpoint[missionData.ProgressionPoint];
+
+					if checkpointInfo then
 						taskTag.Text = "• ".. checkpointInfo.Text;
 						if missionData.SaveData then
 							for k, v in pairs(missionData.SaveData) do
@@ -1611,386 +1668,410 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								end
 							end
 						end
+					end
 
-					elseif book.Progression then
-						local progressionTask = book.Progression[missionData.ProgressionPoint];
+				elseif missionLib.Progression then
+					local progressionTask = missionLib.Progression[missionData.ProgressionPoint];
 
-						taskTag.Text = progressionTask and "• "..progressionTask or "";
-						if missionData.SaveData then
-							for k, v in pairs(missionData.SaveData) do
-								if taskTag.Text:find("$"..k) then
-									taskTag.Text = taskTag.Text:gsub("$"..k, v);
-								end
+					taskTag.Text = progressionTask and "• "..progressionTask or "";
+					if missionData.SaveData then
+						for k, v in pairs(missionData.SaveData) do
+							if taskTag.Text:find("$"..k) then
+								taskTag.Text = taskTag.Text:gsub("$"..k, v);
 							end
 						end
-
-					elseif book.Objectives then
-						local allCompleted = true;
-						for objName, obj in pairs(book.Objectives) do
-							if missionData.ObjectivesCompleted[objName] ~= true then
-								taskTag.Text = loadObjectiveDescription(missionData, objName, obj);
-								allCompleted = false;
-								break;
-							end
-						end
-						if allCompleted then
-							local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
-							taskTag.Text = book.ObjectivesCompleteText:gsub("$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
-						end
-						taskTag.Text = "• "..taskTag.Text;
-
 					end
 
-				elseif missionData.Type == 2 then -- Available
-					taskTag.Text = book.GuideText or "";
-					if book.From and workspace.Entity:FindFirstChild(book.From) then
-						local npcName = book.From;
-						modHeadIcons.Set(npcName, "Mission");
-						headIconUpdated[npcName] = true;
-					end
-
-				elseif missionData.Type == 3 then -- Completed
-					--local playerLevel = modData.GameSave and modData.GameSave.Stats and modData.GameSave.Stats.Level or 0;
-					--taskTag.Text = book.RewardText and string.gsub(book.RewardText, "$dailyPerks", perkAmount) or "";
-
-				elseif missionData.Type == 4 then -- Failed
-					local failedReason = tonumber(missionData.FailTag) or missionData.FailTag;
-					if failedReason == 1 then
-						failedReason = "You ran out of time.";
-					elseif failedReason == 2 then
-						failedReason = "You died.";
-					elseif failedReason == 3 then
-						failedReason = "The mission was removed.";
-					elseif failedReason == 4 then
-						failedReason = "The mission has expired.";
-					end
-
-					taskTag.Text = "Failed: "..tostring(failedReason);
-				end
-
-				if missionData.Pinned then
-					pinnedTitleTag.Text = book.Name;
-
-					if newPinNotification then
-						local titleLabel = newPinNotification:WaitForChild("Title");
-						local taskLabel = newPinNotification:WaitForChild("Task");
-						titleLabel.Text = pinnedMissionName;
-						taskLabel.Text = pinnedTaskTag.Text;
-					end
-
-					local missionTypeTitle = ""
-					for mType, id in pairs(modMissionsLibrary.MissionTypes) do
-						if book.MissionType == id then
-							missionTypeTitle = mType;
+				elseif missionLib.Objectives then
+					local allCompleted = true;
+					for objName, obj in pairs(missionLib.Objectives) do
+						if missionData.ObjectivesCompleted[objName] ~= true then
+							taskTag.Text = loadObjectiveDescription(missionData, objName, obj);
+							allCompleted = false;
 							break;
 						end
 					end
-
-					binds.UpdatePinnedHud = function()
-						missionsList = modTableManager.GetDataHierarchy(modData.Profile, "GameSave/Missions");
-						
-						local missionId = missionData.Id;
-						for a=1, #missionsList do
-							if missionsList[a].Id == missionId then
-								missionData = missionsList[a];
-								break;
-							end
-						end
-						if missionData == nil then
-							Debugger:Warn("Mission data for pinned (",missionId,") no longer exist.");
-							binds.UpdatePinnedHud = nil;
-							missionPinHud.Visible = false;
-							return;
-						end
-						
-						local timeLapsed = os.time()-missionData.StartTime;
-
-						pinnedHintLabel.Text = (timeLapsed <= 10 and "New " or "")..missionTypeTitle.." Mission";
-
-						local missionTimer = book.Timer or missionData.Timer;
-						if missionTimer then
-							local timeLeft = math.clamp(missionTimer-timeLapsed, 0, math.huge);
-							if timeLeft > 0 then
-								if timeLeft < 10 then
-									pinnedTimerTag.TextColor3 = Color3.fromRGB(255, 128, 128);
-								else
-									pinnedTimerTag.TextColor3 = Color3.fromRGB(255, 255, 255);
-								end
-								pinnedTimerTag.Text = modSyncTime.ToString(timeLeft);
-								pinnedTimerTag.Visible = true;
-							else
-								pinnedTimerTag.Text = "";
-								pinnedTimerTag.Visible = false;
-							end 
-						else
-							pinnedTimerTag.Visible = false;
-						end
+					if allCompleted then
+						local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
+						taskTag.Text = missionLib.ObjectivesCompleteText:gsub("$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
 					end
-					binds.UpdatePinnedHud();
+					taskTag.Text = "• "..taskTag.Text;
+
+				end
+
+			elseif missionData.Type == 2 then -- Available
+				taskTag.Text = missionLib.GuideText or "";
+				if missionLib.From and workspace.Entity:FindFirstChild(missionLib.From) then
+					local npcName = missionLib.From;
+					modHeadIcons.Set(npcName, "Mission");
+					headIconUpdated[npcName] = true;
+				end
+
+			elseif missionData.Type == 3 then -- Completed
+				--local playerLevel = modData.GameSave and modData.GameSave.Stats and modData.GameSave.Stats.Level or 0;
+				--taskTag.Text = book.RewardText and string.gsub(book.RewardText, "$dailyPerks", perkAmount) or "";
+
+			elseif missionData.Type == 4 then -- Failed
+				local failedReason = tonumber(missionData.FailTag) or missionData.FailTag;
+				if failedReason == 1 then
+					failedReason = "You ran out of time.";
+				elseif failedReason == 2 then
+					failedReason = "You died.";
+				elseif failedReason == 3 then
+					failedReason = "The mission was removed.";
+				elseif failedReason == 4 then
+					failedReason = "The mission has expired.";
+				end
+
+				taskTag.Text = "Failed: "..tostring(failedReason);
+			end
 
 
-					if missionData.Type == 1 then
-						if book.Checkpoint then
-							local checkpointInfo = book.Checkpoint[missionData.ProgressionPoint];
+			--MARK: Pinned Mission Render
+			if missionData.Pinned ~= true then return end;
+			if missionHudTask == nil then
+				local taskHudWindow: InterfaceWindow = interface:GetWindow("TaskListHud");
+				missionHudTask = taskHudWindow and taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID, true) or nil;
+			end;
+			if missionHudTask == nil then return end;
+			
+			pinHudData.HeaderText = missionLib.Name;
 
-							local incomplete = false;
+			if newPinNotification then
+				local titleLabel = newPinNotification:WaitForChild("Title");
+				local taskLabel = newPinNotification:WaitForChild("Task");
+				titleLabel.Text = pinnedMissionName;
+				taskLabel.Text = pinHudData.TaskText;
+			end
 
-							local objectiveIds = checkpointInfo.Objectives;
-							if objectiveIds then
-								for _, obj in pairs(pinnedTasklist:GetChildren()) do
-									if obj:IsA("GuiObject") then
-										obj:Destroy();
-									end
-								end
+			local missionTypeTitle = ""
+			for mType, id in pairs(modMissionsLibrary.MissionTypes) do
+				if missionLib.MissionType == id then
+					missionTypeTitle = mType;
+					break;
+				end
+			end
 
-								for a=1, #objectiveIds do
-									local objectiveId = objectiveIds[a];
-									local objectiveInfo = book.Objectives[objectiveId];
-
-									local newTask = taskTemplate:Clone();
-									
-									local taskStr = loadObjectiveDescription(missionData, objectiveId, objectiveInfo);
-									newTask.LayoutOrder = objectiveInfo.Index;
-									newTask.Parent = pinnedTasklist;
-
-									if missionData.ObjectivesCompleted[objectiveId] == true then
-										taskStr = `<s>{taskStr}</s>`;
-									else
-										incomplete = true;
-									end
-									newTask.Text = "• "..taskStr;
-								end
-
-								if checkpointInfo.Text then
-									local newTask = taskTemplate:Clone();
-									newTask.LayoutOrder = 0;
-									newTask.Parent = pinnedTasklist;
-									
-									if not incomplete then
-										newTask.Text = `<s>{checkpointInfo.Text}</s>`;
-									else
-										newTask.Text = checkpointInfo.Text;
-									end
-								end
-
-								pinnedTasklist.Visible = true;
-								pinnedTaskTag.Visible = false;
-								pinnedTaskTag.Text = "";
+			binds.UpdatePinnedHud = function()
+				missionsList = modTableManager.GetDataHierarchy(modData.Profile, "GameSave/Missions");
 								
-								if not incomplete then
-									local newTask = taskTemplate:Clone();
-
-									local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
-									local compText = checkpointInfo.CompleteText;
-									compText = string.gsub(compText, "$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
-									
-									newTask.LayoutOrder = 99;
-									newTask.Text = "• "..compText;
-									newTask.Parent = pinnedTasklist;
-								end
-								
-							else
-								pinnedTasklist.Visible = false;
-								pinnedTaskTag.Visible = true;
-
-								pinnedTaskTag.Text = checkpointInfo.Text;
-								if missionData.SaveData then
-									for k, v in pairs(missionData.SaveData) do
-										if pinnedTaskTag.Text:find("$"..k) then
-											local newVal = v;
-											
-											if tonumber(newVal) then
-												newVal = modFormatNumber.Beautify(tonumber(newVal));
-											end
-											
-											pinnedTaskTag.Text = pinnedTaskTag.Text:gsub("$"..k, newVal);
-										end
-									end
-								end
-
-							end
-
-
-							if lastProgressionPoint ~= missionData.ProgressionPoint then
-								lastProgressionPoint = missionData.ProgressionPoint;
-								lastIncompleteFlag = incomplete;
-
-								if missionData.ProgressionPoint > 1 then
-									modAudio.Play("MissionUpdated", nil, nil, false);
-								end
-
-							elseif lastIncompleteFlag ~= incomplete then
-								lastIncompleteFlag = incomplete;
-
-								modAudio.Play("MissionUpdated", nil, nil, false);
-							end
-
-							if book.LogicScript then
-								local missionLogic = shared.require(book.LogicScript);
-								
-								if activeMissionLogic[book.Name] == nil then
-									activeMissionLogic[book.Name] = missionLogic;
-								end;
-
-								local logicCheckpointDebounce = missionLogic.MissionLogicCheckpointDebounce;
-								logicCheckpointDebounce = missionData.ProgressionPoint;
-
-								local missionFunction = missionLogic["Checkpoint"..missionData.ProgressionPoint];
-								if missionFunction and logicCheckpointDebounce ~= missionLogicCheckpointDebounce then
-									missionLogicCheckpointDebounce = missionData.ProgressionPoint;
-									spawn(missionFunction);
-								end;
-							end
-							
-							if checkpointInfo.Notify == true and missionPinHud.Visible and notifyPinnedMission then
-								task.spawn(notifyPinnedMission, true);
-							end
-							
-						elseif book.Progression and missionData.ProgressionPoint and book.Progression[missionData.ProgressionPoint] then
-							pinnedTaskTag.Text = book.Progression[missionData.ProgressionPoint];
-
-							if missionData.SaveData then
-								for k, v in pairs(missionData.SaveData) do
-									if pinnedTaskTag.Text:find("$"..k) then
-
-										local newVal = v;
-
-										if tonumber(newVal) then
-											newVal = modFormatNumber.Beautify(tonumber(newVal));
-										end
-										
-										pinnedTaskTag.Text = pinnedTaskTag.Text:gsub("$"..k, newVal);
-									end
-								end
-							end
-							if lastProgressionPoint ~= missionData.ProgressionPoint then
-								lastProgressionPoint = missionData.ProgressionPoint;
-								if missionData.ProgressionPoint > 1 then
-									modAudio.Play("MissionUpdated", nil, nil, false);
-								end
-							end
-
-							if book.LogicScript then
-								local missionLogic = shared.require(book.LogicScript);
-								
-								if activeMissionLogic[book.Name] == nil then
-									activeMissionLogic[book.Name] = missionLogic;
-								end;
-								local missionFunction = missionLogic["ProgressionPoint"..missionData.ProgressionPoint];
-								if missionFunction then spawn(missionFunction); end;
-							end
-
-							pinnedTasklist.Visible = false;
-							pinnedTaskTag.Visible = true;
-
-
-						elseif book.Objectives then
-							for _, obj in pairs(pinnedTasklist:GetChildren()) do
-								if obj:IsA("GuiObject") then
-									obj:Destroy();
-								end
-							end
-
-							local incomplete = false;
-							for name, objective in pairs(book.Objectives) do
-								local newTask = taskTemplate:Clone();
-
-								newTask.LayoutOrder = objective.Index;
-								newTask.Text = loadObjectiveDescription(missionData, name, objective);
-								newTask.Parent = pinnedTasklist;
-
-								if missionData.ObjectivesCompleted[name] == true then
-									newTask.Text = "<s>"..newTask.Text.."</s>"
-								else
-									incomplete = true;
-								end
-							end
-
-							if incomplete then
-
-								pinnedTasklist.Visible = true;
-								pinnedTaskTag.Text = "Complete the objectives";
-								pinnedTaskTag.Visible = false;
-
-							else
-								pinnedTasklist.Visible = false;
-								pinnedTaskTag.Visible = true;
-
-								local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
-								pinnedTaskTag.Text = book.ObjectivesCompleteText:gsub("$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
-							end
-
-						else
-							pinnedTaskTag.Text = "No available task";
-
-						end
-
-					elseif missionData.Type == 2 or missionData.Type == 4 then
-						pinnedTaskTag.Text = book.GuideText or "";
-
-						pinnedTasklist.Visible = false;
-						pinnedTaskTag.Visible = true;
-					end
-
-
-					if pinnedMissionName ~= book.Name then
-						pinnedMissionName = book.Name;
-
-						notifyPinnedMission = function(checkpointNotify)
-							local mainGui = missionPinHud.Parent;
-							if mainGui == nil then return end;
-							for _,c in pairs(mainGui:GetChildren()) do
-								if c.Name == "NotifyMission" and c:IsA("GuiObject") then
-									c:Destroy();
-								end
-							end
-							
-							local taskText = pinnedTaskTag.Text;
-							newPinNotification = notifyMissionFrame:Clone();
-							newPinNotification.Parent = mainGui;
-							
-							local titleLabel = newPinNotification:WaitForChild("Title");
-							local taskLabel = newPinNotification:WaitForChild("Task");
-							
-							if checkpointNotify == true then
-								titleLabel.Text = "Objective";
-								titleLabel.Size = UDim2.new(1, 0, 0.13, 0);
-								taskLabel.Text = taskText;
-								taskLabel.Size = UDim2.new(1, 0, 0.25, 0);
-								
-							else
-								titleLabel.Text = pinnedMissionName;
-								taskLabel.Text = taskText;
-								
-							end
-							
-							newPinNotification.Position = UDim2.new(0.5, 0, 0.32, 0);
-							modGuiObjectTween.FadeTween(newPinNotification, modGuiObjectTween.FadeDirection.Out, TweenInfo.new(0));
-							newPinNotification.Visible = true;
-							task.wait();
-							
-							modGuiObjectTween.FadeTween(newPinNotification, modGuiObjectTween.FadeDirection.In, TweenInfo.new(2));
-							pcall(function()
-								newPinNotification:TweenPosition(UDim2.new(0.5, 0, 0.3, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 2, true);
-							end)
-							wait(5);
-							
-							pcall(function()
-								newPinNotification:TweenPosition(UDim2.new(0.85, 0, 0, 40), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 2, true);
-							end)
-							modGuiObjectTween.FadeTween(newPinNotification, modGuiObjectTween.FadeDirection.Out, TweenInfo.new(1.8));
-							newPinNotification = nil;
-						end;
-
-						if missionPinHud.Visible and notifyPinnedMission then
-							spawn(notifyPinnedMission);
-						end
+				local missionId = missionData.Id;
+				for a=1, #missionsList do
+					if missionsList[a].Id == missionId then
+						missionData = missionsList[a];
+						break;
 					end
 				end
-			else
-				warn("Unknown mission ("..missionData.Id..")");
-				titleTag.Text = "Unknown Mission ("..missionData.Id..")";
+				if missionData == nil then
+					Debugger:Warn("Mission data for pinned (",missionId,") no longer exist.");
+					binds.UpdatePinnedHud = nil;
+					pinHudData.setActive(false);
+					return;
+				end
+				
+				local timeLapsed = os.time()-missionData.StartTime;
+
+				pinHudData.TitleText = (timeLapsed <= 10 and "New " or "")..missionTypeTitle.." Mission";
+
+				local missionTimer = missionLib.Timer or missionData.Timer;
+				if missionTimer then
+					local timeLeft = math.clamp(missionTimer-timeLapsed, 0, math.huge);
+					if timeLeft > 0 then
+						if timeLeft < 10 then
+							pinHudData.TimerTextColor = Color3.fromRGB(255, 128, 128);
+						else
+							pinHudData.TimerTextColor = Color3.fromRGB(255, 255, 255);
+						end
+						
+						pinHudData.TimerText = modSyncTime.ToString(timeLeft);
+						pinHudData.TimerVisible = true;
+					else
+						pinHudData.TimerText = "";
+						pinHudData.TimerVisible = false;
+					end 
+				else
+					pinHudData.TimerVisible = false;
+				end
 			end
+			binds.UpdatePinnedHud();
+
+			local function destroyTaskList()
+				if pinHudData.TaskList then
+					pinHudData.TaskList:Destroy();
+					pinHudData.TaskList = nil;
+				end
+			end
+
+			if missionData.Type == 1 then
+
+				if missionLib.Checkpoint and missionData.ProgressionPoint and missionLib.Checkpoint[missionData.ProgressionPoint] then
+					local checkpointInfo = missionLib.Checkpoint[missionData.ProgressionPoint];
+
+					local incomplete = false;
+
+					local objectiveIds = checkpointInfo.Objectives;
+					if objectiveIds then
+						local pinnedTaskList = pinHudData.TaskList;
+						if pinnedTaskList == nil then
+							pinnedTaskList = templateHudTaskList:Clone();
+							pinnedTaskList.Parent = missionHudTask.Frame.Content;
+							pinHudData.TaskList = pinnedTaskList;
+						end
+
+						for _, obj in pairs(pinnedTaskList:GetChildren()) do
+							if obj:IsA("GuiObject") then
+								obj:Destroy();
+							end
+						end
+
+						for a=1, #objectiveIds do
+							local objectiveId = objectiveIds[a];
+							local objectiveInfo = missionLib.Objectives[objectiveId];
+
+							local newTask = taskTemplate:Clone();
+							newTask.Name = objectiveId;
+
+							local taskStr = loadObjectiveDescription(missionData, objectiveId, objectiveInfo);
+							newTask.LayoutOrder = objectiveInfo.Index;
+							newTask.Parent = pinnedTaskList;
+
+							if missionData.ObjectivesCompleted[objectiveId] == true then
+								taskStr = `<s>{taskStr}</s>`;
+							else
+								incomplete = true;
+							end
+							newTask.Text = "• "..taskStr;
+						end
+
+						if checkpointInfo.Text then
+							if not incomplete then
+								pinHudData.TaskText = `<s>{checkpointInfo.Text}</s>`;
+							else
+								pinHudData.TaskText = checkpointInfo.Text;
+							end
+						else
+							pinHudData.TaskText = ``;
+						end
+
+						pinnedTaskList.Visible = true;
+						
+						if not incomplete then
+							local newTask = taskTemplate:Clone();
+
+							local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
+							local compText = checkpointInfo.CompleteText;
+							compText = string.gsub(compText, "$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
+							
+							newTask.LayoutOrder = 99;
+							newTask.Text = "• "..compText;
+							newTask.Parent = pinnedTaskList;
+						end
+						
+					else
+						destroyTaskList();
+						pinHudData.TaskText = checkpointInfo.Text;
+
+						if missionData.SaveData then
+							for k, v in pairs(missionData.SaveData) do
+								if pinHudData.TaskText:find("$"..k) then
+									local newVal = v;
+									
+									if tonumber(newVal) then
+										newVal = modFormatNumber.Beautify(tonumber(newVal));
+									end
+									
+									pinHudData.TaskText = pinHudData.TaskText:gsub("$"..k, newVal);
+								end
+							end
+						end
+
+					end
+
+
+					if lastProgressionPoint ~= missionData.ProgressionPoint then
+						lastProgressionPoint = missionData.ProgressionPoint;
+						lastIncompleteFlag = incomplete;
+
+						if missionData.ProgressionPoint > 1 then
+							modAudio.Play("MissionUpdated", nil, nil, false);
+						end
+
+					elseif lastIncompleteFlag ~= incomplete then
+						lastIncompleteFlag = incomplete;
+
+						modAudio.Play("MissionUpdated", nil, nil, false);
+					end
+
+					if missionLib.LogicScript then
+						local missionLogic = shared.require(missionLib.LogicScript);
+						
+						if activeMissionLogic[missionLib.Name] == nil then
+							activeMissionLogic[missionLib.Name] = missionLogic;
+						end;
+
+						local logicCheckpointDebounce = missionLogic.MissionLogicCheckpointDebounce;
+						logicCheckpointDebounce = missionData.ProgressionPoint;
+
+						local missionFunction = missionLogic["Checkpoint"..missionData.ProgressionPoint];
+						if missionFunction and logicCheckpointDebounce ~= missionLogicCheckpointDebounce then
+							missionLogicCheckpointDebounce = missionData.ProgressionPoint;
+							spawn(missionFunction);
+						end;
+					end
+					
+					if checkpointInfo.Notify == true and pinHudData.Active and notifyPinnedMission then
+						task.spawn(notifyPinnedMission, true);
+					end
+					
+				elseif missionLib.Progression and missionData.ProgressionPoint and missionLib.Progression[missionData.ProgressionPoint] then
+					pinHudData.TaskText = missionLib.Progression[missionData.ProgressionPoint];
+
+					if missionData.SaveData then
+						for k, v in pairs(missionData.SaveData) do
+							if pinHudData.TaskText:find("$"..k) then
+
+								local newVal = v;
+
+								if tonumber(newVal) then
+									newVal = modFormatNumber.Beautify(tonumber(newVal));
+								end
+								
+								pinHudData.TaskText = pinHudData.TaskText:gsub("$"..k, newVal);
+							end
+						end
+					end
+					if lastProgressionPoint ~= missionData.ProgressionPoint then
+						lastProgressionPoint = missionData.ProgressionPoint;
+						if missionData.ProgressionPoint > 1 then
+							modAudio.Play("MissionUpdated", nil, nil, false);
+						end
+					end
+
+					if missionLib.LogicScript then
+						local missionLogic = shared.require(missionLib.LogicScript);
+						
+						if activeMissionLogic[missionLib.Name] == nil then
+							activeMissionLogic[missionLib.Name] = missionLogic;
+						end;
+						local missionFunction = missionLogic["ProgressionPoint"..missionData.ProgressionPoint];
+						if missionFunction then spawn(missionFunction); end;
+					end
+
+					destroyTaskList();
+
+
+				elseif missionLib.Objectives then
+					local pinnedTaskList = pinHudData.TaskList;
+					if pinnedTaskList == nil then
+						pinnedTaskList = templateHudTaskList:Clone();
+						pinnedTaskList.Parent = missionHudTask.Frame.Content;
+						pinHudData.TaskList = pinnedTaskList;
+					end
+
+					for _, obj in pairs(pinnedTaskList:GetChildren()) do
+						if obj:IsA("GuiObject") then
+							obj:Destroy();
+						end
+					end
+
+					local incomplete = false;
+					for name, objective in pairs(missionLib.Objectives) do
+						local newTask = taskTemplate:Clone();
+
+						newTask.LayoutOrder = objective.Index;
+						newTask.Text = loadObjectiveDescription(missionData, name, objective);
+						newTask.Parent = pinnedTaskList;
+
+						if missionData.ObjectivesCompleted[name] == true then
+							newTask.Text = "<s>"..newTask.Text.."</s>"
+						else
+							incomplete = true;
+						end
+					end
+
+					if incomplete then
+						pinnedTaskList.Visible = true;
+						pinHudData.TaskText = "Complete the objectives";
+
+					else
+						pinnedTaskList.Visible = false;
+
+						local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
+						pinHudData.TaskText = missionLib.ObjectivesCompleteText:gsub("$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
+					end
+
+				else
+					destroyTaskList();
+					pinHudData.TaskText = "No available task";
+
+				end
+
+			elseif missionData.Type == 2 or missionData.Type == 4 then
+				pinHudData.TaskText = missionLib.GuideText or "";
+
+				destroyTaskList();
+			end
+			
+			pinHudData.setActive(true);
+
+			--MARK: pin notification
+			if pinnedMissionName ~= missionLib.Name then
+				pinnedMissionName = missionLib.Name;
+
+				notifyPinnedMission = function(checkpointNotify)
+					for _,c in pairs(interface.ScreenGui:GetChildren()) do
+						if c.Name == "NotifyMission" and c:IsA("GuiObject") then
+							c:Destroy();
+						end
+					end
+					
+					local taskText = pinHudData.TaskText;
+					newPinNotification = notifyMissionFrame:Clone();
+					newPinNotification.Parent = interface.ScreenGui;
+					
+					local titleLabel = newPinNotification:WaitForChild("Title");
+					local taskLabel = newPinNotification:WaitForChild("Task");
+					
+					if checkpointNotify == true then
+						titleLabel.Text = "Objective";
+						titleLabel.Size = UDim2.new(1, 0, 0.13, 0);
+						taskLabel.Text = taskText;
+						taskLabel.Size = UDim2.new(1, 0, 0.25, 0);
+						
+					else
+						titleLabel.Text = pinnedMissionName;
+						taskLabel.Text = taskText;
+						
+					end
+					
+					newPinNotification.Position = UDim2.new(0.5, 0, 0.32, 0);
+					modGuiObjectTween.FadeTween(newPinNotification, modGuiObjectTween.FadeDirection.Out, TweenInfo.new(0));
+					newPinNotification.Visible = true;
+					task.wait();
+					
+					modGuiObjectTween.FadeTween(newPinNotification, modGuiObjectTween.FadeDirection.In, TweenInfo.new(2));
+					pcall(function()
+						newPinNotification:TweenPosition(UDim2.new(0.5, 0, 0.3, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 2, true);
+					end)
+					wait(5);
+					
+					pcall(function()
+						newPinNotification:TweenPosition(UDim2.new(0.85, 0, 0, 40), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 2, true);
+					end)
+					modGuiObjectTween.FadeTween(newPinNotification, modGuiObjectTween.FadeDirection.Out, TweenInfo.new(1.8));
+					newPinNotification = nil;
+				end;
+
+				local checkpointInfo = missionLib.Checkpoint and missionLib.Checkpoint[missionData.ProgressionPoint] or nil;
+				local showInitNotify = true;
+				if checkpointInfo and checkpointInfo.Notify == false then
+					showInitNotify = false;
+				end
+				if pinHudData.Active and notifyPinnedMission and showInitNotify then
+					spawn(notifyPinnedMission);
+				end
+			end
+
 		end
 		
 		-- MARK: Repeatable Missions;
@@ -2325,7 +2406,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 		else
 			modMarkers.ClearMarker("PinMissionMarker");
-			pinnedTitleTag.Text = "";
+			pinHudData.setActive(false);
 			cancelAllMissionFunctions();
 		end
 
@@ -2344,47 +2425,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end)
 
-	interface.Garbage:Tag(pinnedTitleTag:GetPropertyChangedSignal("Text"):Connect(function()
-		if modConfigurations.DisablePinnedMission then 
-            missionPinHud.Visible = false; 
-            Debugger:Warn("Pinned Mission Disabled"); 
-            return;
-        end;
-		if pinnedTitleTag.Text:len() > 0 then
-			missionPinHud.Visible = true;
-			modGuiObjectTween.FadeTween(missionPinHud, modGuiObjectTween.FadeDirection.In, TweenInfo.new(2));
-		else
-			modGuiObjectTween.FadeTween(missionPinHud, modGuiObjectTween.FadeDirection.Out, TweenInfo.new(2));
-		end
-	end));
+	interface.Scheduler.OnStepped:Connect(function(tickData: TickData)
+		if tickData.ms1000 ~= true then return end;
 
-	interface.Garbage:Tag(modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
 		if binds.UpdatePinnedHud then
 			binds.UpdatePinnedHud();
 		end
-	end));
+	end)
 
 	PinnedMissionFrame.ChildAdded:Connect(refreshPinnedMissionFrame)
 	PinnedMissionFrame.ChildRemoved:Connect(refreshPinnedMissionFrame);
-
-	modGuiObjectTween.FadeTween(missionPinHud, modGuiObjectTween.FadeDirection.Out, TweenInfo.new(0));
-
-	modConfigurations.OnChanged("DisablePinnedMission", function(oldValue, value)
-		Debugger:Warn("DisablePinnedMission changed", oldValue, "v", value);
-		if not value then
-			if pinnedTitleTag.Text:len() > 0 then
-				missionPinHud.Visible = true;
-				modGuiObjectTween.FadeTween(missionPinHud, modGuiObjectTween.FadeDirection.In, TweenInfo.new(2));
-				if notifyPinnedMission then
-					spawn(notifyPinnedMission);
-				end
-			else
-				modGuiObjectTween.FadeTween(missionPinHud, modGuiObjectTween.FadeDirection.Out, TweenInfo.new(2));
-			end
-		else
-			missionPinHud.Visible = false;
-		end
-	end)
 	
 	interface:BindEvent("UpdateMissions", function()
 		if not windowFrame:IsDescendantOf(localPlayer.PlayerGui) then return end;

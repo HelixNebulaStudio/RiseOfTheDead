@@ -9,7 +9,7 @@ local statusPackage = {
 };
 
 local faces = {Enum.NormalId.Back; Enum.NormalId.Bottom; Enum.NormalId.Front; Enum.NormalId.Left; Enum.NormalId.Right; Enum.NormalId.Top;};
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     statusClass.Values.ImmunityReduction = statusClass.Values.ImmunityReduction or 0.5;
 
     local toxinTexture = game.ReplicatedStorage.Prefabs.Textures:WaitForChild("ToxinTexture");

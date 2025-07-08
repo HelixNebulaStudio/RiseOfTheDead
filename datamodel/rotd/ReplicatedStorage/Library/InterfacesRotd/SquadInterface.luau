@@ -39,7 +39,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     --MARK: OnUpdate
     hudWindow.OnUpdate:Connect(function()
-        local squadData: TeamClass = modTeamsManager.getTeamByPlayer(localPlayer, "Party");
+        local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+        local activeSquadType = playerClass.Properties.ActiveTeamType or "Party";
+        local squadData: TeamClass = modTeamsManager.getTeamByPlayer(localPlayer, activeSquadType);
 
         local updatedMember = {};
 
@@ -64,12 +66,22 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 memberFrame.LayoutOrder = squadData.MembersCount - memberData.Index;
                 
                 local radialBar = memberFrame:WaitForChild("radialBar");
+                local avatarButton = memberFrame:WaitForChild("AvatarButton");
+
                 local radialHealthBarObj = hudObjects.RadialHealthBar;
+
                 local squadPlayerClass: PlayerClass = shared.modPlayers.getByName(name);
                 if squadPlayerClass then
                     if radialHealthBarObj == nil then
                         radialHealthBarObj = modRadialImage.new(RADIAL_CONFIG, radialBar);
                         hudObjects.RadialHealthBar = radialHealthBarObj;
+
+                        interface.Garbage:Tag(squadPlayerClass.OnIsDeadChanged:Connect(function(isDead)
+                            avatarButton.ImageColor3 = isDead
+                                                        and Color3.fromRGB(140, 70, 70)
+                                                        or Color3.fromRGB(255, 255, 255);
+                            memberFrame.BackgroundColor3 = avatarButton.ImageColor3;
+                        end));
                     end
 
                     radialHealthBarObj.Humanoid = squadPlayerClass.Humanoid;
@@ -81,7 +93,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     radialBar.Visible = false;
                 end
 
-                local avatarButton = memberFrame:WaitForChild("AvatarButton");
                 if memberData.Values.Color then
                     avatarButton.BackgroundColor3 = modMarkers.Colors[memberData.Values.Color];
 					modMarkers.SetColor(name, memberData.Values.Color);
@@ -105,15 +116,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         binds.HasMembers = next(updatedMember) ~= nil;
     end)
     hudWindow:Open();
-
-    interface.Properties.OnChanged:Connect(function(k, v)
-        if k == "IsCompactFullscreen" then
-            hudWindow:Toggle(not v);
-
-        elseif k == "QuickButtonsWidth" or k == "TopbarInset" then
-            hudWindow:Update();
-        end;
-    end)
     
     interface.Scheduler.OnStepped:Connect(function(tickData: TickData)
         if tickData.ms100 ~= true then return end;
@@ -152,7 +154,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         if k ~= "TeamUpdated" then return end;
         if team.Type ~= "Party" then return end;
 
-        Debugger:Warn(`TeamUpdated`);
         hudWindow:Update();
     end)
 end

@@ -48,7 +48,7 @@ return function(CutsceneSequence)
 				elseif mission.Type == 1 then -- OnActive
 					
 					jesseModule.Move:MoveTo(Vector3.new(-14.4, 57, 29.7));
-					jesseModule.Move.MoveToEnded:Wait(5);
+					jesseModule.Move.OnMoveToEnded:Wait(5);
 
 					wait(0.1);
 					jesseModule.Actions:Teleport(CFrame.new(-5.7, 57.6, 37.6));
@@ -56,7 +56,7 @@ return function(CutsceneSequence)
 					jesseModule.Actions:Teleport(CFrame.new(4.8, 57, 37.6));
 
 					jesseModule.Move:MoveTo(Vector3.new(7.18, 57.6, 30.76));
-					jesseModule.Move.MoveToEnded:Wait(5);
+					jesseModule.Move.OnMoveToEnded:Wait(5);
 
 					jesseModule.Move:Face(Vector3.new(9.56, 57.64, 29.6));
 					task.wait(0.1);
@@ -76,7 +76,7 @@ return function(CutsceneSequence)
 					task.wait(1);
 					
 					jesseModule.Move:MoveTo(Vector3.new(3.43, 57, 37.74));
-					jesseModule.Move.MoveToEnded:Wait(5);
+					jesseModule.Move.OnMoveToEnded:Wait(5);
 					
 					wait(1);
 					jesseModule.Actions:Teleport(CFrame.new(-5.7, 57.6, 37.6));
@@ -84,7 +84,7 @@ return function(CutsceneSequence)
 					jesseModule.Actions:Teleport(CFrame.new(-14.4, 57, 29.7));
 					
 					jesseModule.Move:MoveTo(shopStandCFrame.Position);
-					jesseModule.Move.MoveToEnded:Wait(5);
+					jesseModule.Move.OnMoveToEnded:Wait(5);
 					
 					jesseModule.Actions:Teleport(shopStandCFrame);
 				end

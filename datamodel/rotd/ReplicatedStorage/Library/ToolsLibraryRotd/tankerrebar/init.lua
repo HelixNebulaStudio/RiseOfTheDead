@@ -5,7 +5,7 @@ local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.Equipmen
 
 local toolPackage = {
 	ItemId=script.Name;
-	Class="Tool";
+	Class="Melee";
 	HandlerType="MeleeTool";
 
 	Animations={

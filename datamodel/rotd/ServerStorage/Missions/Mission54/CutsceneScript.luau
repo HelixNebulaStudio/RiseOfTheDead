@@ -110,7 +110,7 @@ return function(CutsceneSequence)
 
 					masonModule.Actions:Teleport(CFrame.new(112.371384, 2.57112098, -88.6676178, 0, 0, 0.999999285, 0, 1, 0, -1, 0, 0));
 					masonModule.Move:MoveTo(Vector3.new(83.326, 2.571, -79.19));
-					masonModule.Move.MoveToEnded:Wait(20);
+					masonModule.Move.OnMoveToEnded:Wait(20);
 					
 					task.wait(0.5);
 					local frontDoors = shared.require(workspace.Environment.Game:WaitForChild("FrontDoubleDoors"):WaitForChild("Door"));
@@ -130,7 +130,7 @@ return function(CutsceneSequence)
 
 					wait(3);
 					masonModule.Move:MoveTo(Vector3.new(61.968, 2.59, -79.037));
-					masonModule.Move.MoveToEnded:Wait(20);
+					masonModule.Move.OnMoveToEnded:Wait(20);
 					
 					wait(0.3);
 					masonModule.Move:Face(Vector3.new(1000, 0, 0));

@@ -23,8 +23,8 @@ local ModeHudClass = shared.require(script.Parent);
 
 local survivalFailTrack: Sound?;
 --==
-return function(...)
-	local modeHud = ModeHudClass.new(...);
+return function(interface, window, frame)
+	local modeHud = ModeHudClass.new(interface, window, frame);
 
 	modeHud.Soundtrack = nil;
 	modeHud.BossHealthBars = {};
@@ -280,7 +280,7 @@ return function(...)
 		if data.SupplyStation ~= nil and data.SupplyStation ~= false then
 			local point = data.SupplyStation and data.SupplyStation.PrimaryPart and data.SupplyStation.PrimaryPart.CFrame.p;
 			if point then
-				modMarkers.SetMarker("SupplyStation", point, "Supply Station", modMarkers.MarkerTypes.Waypoint);
+				modMarkers.SetMarker("SupplyStation", point, "Resupply Station", modMarkers.MarkerTypes.Waypoint);
 
 				modMarkers.SetColor("SupplyStation", Color3.fromRGB(207, 164, 120));
 			end
@@ -292,7 +292,7 @@ return function(...)
 		if data.HookEntity ~= nil and typeof(data.HookEntity) == "table" then
 			for a=1, #data.HookEntity do
 				local prefab = data.HookEntity[a];
-				self.Interface.modEntityHealthHudInterface.TryHookEntity(prefab, 300);
+				interface:FireEvent("TryHookEntity", prefab, 300);
 
 				if prefab:GetAttribute("MarketSet") ~= true then
 					prefab:SetAttribute("MarketSet", true);

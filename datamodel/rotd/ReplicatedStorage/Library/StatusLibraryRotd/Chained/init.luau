@@ -12,7 +12,7 @@ local statusPackage = {
 	ExpiresOnDeath=true;
 };
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if not RunService:IsServer() then return end;
     if tickData.ms100 ~= true then return end;
 

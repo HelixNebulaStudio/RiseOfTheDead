@@ -18,7 +18,7 @@ local statusPackage = {
     ExpiresOnDeath=true;
 };
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsServer() then return end;
 
     local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
@@ -29,7 +29,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     modCharacter.CameraShakeAndZoom(5, 0, 0.5, 0, true);
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
     if RunService:IsServer() then return end;
 
     local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
@@ -38,7 +38,7 @@ function statusPackage.OnExpire(statusClass: StatusClassInstance)
     modCharacter.MouseProperties.MovementNoise = false;
 end
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if RunService:IsClient() then return end;
     if tickData.ms500 == false then return end;
 

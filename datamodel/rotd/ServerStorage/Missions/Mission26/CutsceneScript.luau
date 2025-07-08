@@ -47,13 +47,13 @@ return function(CutsceneSequence)
 					dianaModule.Actions:Teleport(shopStandCFrame);
 					
 					dianaModule.Move:MoveTo(Vector3.new(-137.6, 10.5, 275.6));
-					dianaModule.Move.MoveToEnded:Wait(5);
+					dianaModule.Move.OnMoveToEnded:Wait(5);
 					
 					wait(0.3);
 					dianaModule.Actions:Teleport(CFrame.new(-136.80545, 10.5228777, 268.696259, 0.866024852, 0, -0.500000954, 0, 1, 0, 0.500000954, 0, 0.866024852));
 					
 					dianaModule.Move:MoveTo(Vector3.new(-123.7, 10.5, 276.9));
-					dianaModule.Move.MoveToEnded:Wait(5);
+					dianaModule.Move.OnMoveToEnded:Wait(5);
 					
 					dianaModule.Move:Face(Vector3.new(-118.4, 10.5, 276.9));
 					
@@ -65,13 +65,13 @@ return function(CutsceneSequence)
 					mission.OnChanged:Disconnect(OnChanged);
 					
 					dianaModule.Move:MoveTo(Vector3.new(-136.8, 10.5, 268.7));
-					dianaModule.Move.MoveToEnded:Wait(5);
+					dianaModule.Move.OnMoveToEnded:Wait(5);
 					
 					wait(0.3);
 					dianaModule.Actions:Teleport(CFrame.new(-137.6, 10.5, 275.6));
 					
 					dianaModule.Move:MoveTo(shopStandCFrame.Position);
-					dianaModule.Move.MoveToEnded:Wait(5);
+					dianaModule.Move.OnMoveToEnded:Wait(5);
 					
 					dianaModule.Actions:Teleport(shopStandCFrame);
 					dianaModule.InCutscene = false;

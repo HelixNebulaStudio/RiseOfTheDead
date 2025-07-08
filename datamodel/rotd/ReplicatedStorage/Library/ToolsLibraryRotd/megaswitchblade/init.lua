@@ -11,7 +11,7 @@ local bladeTweenInfo = TweenInfo.new(0.15);
 
 local toolPackage = {
 	ItemId=script.Name;
-	Class="Tool";
+	Class="Melee";
 	HandlerType="MeleeTool";
 
 	Animations={

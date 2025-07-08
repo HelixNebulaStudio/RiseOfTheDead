@@ -49,7 +49,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		};
 		
 		local itemModifierSiid = modifierStorageItem.ID;
-		local equipmentSiid = equipmentStorageItem.ID;
+		local equipmentSiid = equipmentStorageItem and equipmentStorageItem.ID or nil;
 
 		local itemLib = modItemLibrary:Find(modifierStorageItem.ItemId);
 		

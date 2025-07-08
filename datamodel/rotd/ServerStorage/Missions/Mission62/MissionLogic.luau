@@ -15,7 +15,7 @@ if RunService:IsServer() then
 	local logicAssets = script.Parent:WaitForChild("LogicAssets");
 
 	if modBranchConfigs.IsWorld("TheUnderground") then
-		shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, packet)
+		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			

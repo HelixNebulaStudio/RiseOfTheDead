@@ -9,14 +9,13 @@ local npcPackage = {
 
     DialogueInteractable = true;
 
-    Chatter = {
-        Greetings = {
-            "Looking to fix up your weapons?";
-        };
-    };
-
     AddComponents = {
         "TargetHandler";
+        "Chat";
+    };
+
+    IdleRandomChat = {
+		"Zzzz.., zzz.., zz..";
     };
 };
 

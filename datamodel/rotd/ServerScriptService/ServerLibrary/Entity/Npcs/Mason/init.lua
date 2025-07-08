@@ -14,6 +14,13 @@ local npcPackage = {
         "ProtectOwner";
         "Chat";
     };
+
+    Voice = {
+        VoiceId = 3;
+        Pitch = -4;
+        Speed = 1.4;
+        PlaybackSpeed = 0.95;
+    };
 };
 
 function npcPackage.Spawning(npcClass: NpcClass)

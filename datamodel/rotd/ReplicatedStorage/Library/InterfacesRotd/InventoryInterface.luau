@@ -149,7 +149,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	interface:ConnectQuickButton(quickButton, "KeyWindowInventory");
 
 
-	local hotbarFrame = script.Hotbar:Clone(); --interfaceScreenGui:WaitForChild("Hotbar");
+	local hotbarFrame = script:WaitForChild("Hotbar"):Clone();
 	hotbarFrame.Parent = interfaceScreenGui;
 	
 	local templateHotbarSlot = script:WaitForChild("hotbarSlot");
@@ -157,21 +157,22 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local temperatureLabel, bodyEquipmentsFrame;
 	
 	local hotbarWindow: InterfaceWindow = interface:NewWindow("Hotbar", hotbarFrame);
+    hotbarWindow.Layers = {"CharacterHud"; "CompactHidden"};
 	hotbarWindow.IgnoreHideAll = true;
 	hotbarWindow.ReleaseMouse = false;
 	hotbarWindow:Open();
 	interface:BindConfigKey("DisableHotbar", {hotbarWindow});
 
 	if modConfigurations.CompactInterface then
-        interface.Properties.OnChanged:Connect(function(k, v)
-            if k == "IsCompactFullscreen" then
-                if modConfigurations.DisableHotbar then
-                    hotbarFrame.Visible = false;
-                else
-                    hotbarFrame.Visible = not v;
-                end
-            end
-        end)
+        -- interface.Properties.OnChanged:Connect(function(k, v)
+        --     if k == "IsCompactFullscreen" then
+        --         if modConfigurations.DisableHotbar then
+        --             hotbarFrame.Visible = false;
+        --         else
+        --             hotbarFrame.Visible = not v;
+        --         end
+        --     end
+        -- end)
         
 		inventorySlotLists = inventoryFrame:WaitForChild("Inventory");
 
@@ -458,28 +459,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 
 	--== Shared Context Options;
-	local function handleStorage(action, request, storageIds)
-		local rPacket = remoteStorageService:InvokeServer({
-			Action = action;
-			StorageIds = (storageIds or {"Inventory"; "Clothing"; "Wardrobe"});
-			Request = request;
-		});
-
-		if rPacket.Storages then
-			for storageId, _ in pairs(rPacket.Storages) do
-				modData.SetStorage(rPacket.Storages[storageId]);
-			end
-		end
-	end
-
 	interface.Properties.ActiveHotbarKeys = 5;
 	interface.Properties.HotEquip = function(index)
-		if not modCharacter.CharacterProperties.IsAlive then return end;
-		if modData.Storages.Inventory == nil then return end;
+		if playerClass.HealthComp.IsDead then return end;
+		if modData.GetStorage("Inventory") == nil then return end;
 		
 		local slot = hotbarStorageInterface.Slots[index];
-		if slot and slot.Table then
-			hotbarStorageInterface:UseItem(slot.Table);
+		if slot and slot.ItemSlot then
+			hotbarStorageInterface:UseItem(slot.ItemSlot);
 			
 		end
 	end
@@ -555,10 +542,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	inventoryWindow.OnToggle:Connect(function(visible)
 		if visible then
 			if modData.Storages["Inventory"] == nil or modData.Storages["Clothing"] == nil then
-				handleStorage("RequestStorageSync", true);
+				modData.RequestStorage{
+					Action = "GetStorage";
+					StorageId = "Inventory";
+				};
+				modData.RequestStorage{
+					Action = "GetStorage";
+					StorageId = "Clothing";
+				};
+
+			else
+				modData.RequestStorage{Action = "SyncStorages";};
+
 			end
 			
-			handleStorage("OpenStorage", true);
 			modStorageInterface.UpdateStorages{
 				modData.Storages["Inventory"],
 				modData.Storages["Clothing"]
@@ -579,7 +576,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				interface:ToggleWindow("WeaponStats", false);
 			end
 			interface:ToggleWindow("ExternalStorage", false);
-			interface:ToggleWindow("SupplyStation", false);
+			interface:ToggleWindow("ResupplyStation", false);
 			interface:ToggleWindow("RatShopWindow", false);
 			
 			task.spawn(function()
@@ -595,36 +592,41 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
 	
 	task.spawn(function()
-		handleStorage("RequestStorageSync", true);
+		modData.RequestStorage{
+			Action = "GetStorage";
+			StorageId = "Inventory";
+		};
+		modData.RequestStorage{
+			Action = "GetStorage";
+			StorageId = "Clothing";
+		};
+		modStorageInterface.QueueRefreshStorage({"Inventory"});
 
+		local storageIdsPriority = {};
 		local storageIds = {};
 		
 		local function getRequestSid(storageContainer)
 			if storageContainer == nil then return end;
 
 			for id, storageItem in pairs(storageContainer) do
+				storageIdsPriority[id] = storageItem.Index;
 				table.insert(storageIds, id);
-
-				local usableItemLib = modUsableItems:Find(storageItem.ItemId);
-				if usableItemLib and usableItemLib.PortableStoragePresetId then
-					local storageId = usableItemLib.PortableStoragePresetId;
-
-					if storageId then
-						table.insert(storageIds, storageId);
-					end
-				end
 			end
 		end
 		getRequestSid(modData.Storages["Inventory"].Container);
 		getRequestSid(modData.Storages["Clothing"].Container);
 		
-		handleStorage("RequestStorageSync", true, storageIds);
-		
-		defaultStorageInterface:Update(modData.Storages["Inventory"]);
-		premiumStorageInterface:Update(modData.Storages["Inventory"]);
-		clothingStorageInterface:Update(modData.Storages["Clothing"]);
+		table.sort(storageIds, function(a, b) 
+			return (storageIdsPriority[a] or 99) < (storageIdsPriority[b] or 99);
+		end);
 
-		hotbarWindow.Binds.UpdateHotbarSize();
+		modData.RequestStorage{
+			Action = "SyncStorages";
+			StorageIds = storageIds;
+		};
+		
+		modStorageInterface.QueueRefreshStorage({"Inventory"; "Clothing"});
+		-- hotbarWindow.Binds.UpdateHotbarSize();
 	end)
 	
 	
@@ -706,7 +708,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 		end
 	end)
-
 end
 
 return interfacePackage;

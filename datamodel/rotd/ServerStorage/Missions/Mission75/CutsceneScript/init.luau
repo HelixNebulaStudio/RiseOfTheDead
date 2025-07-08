@@ -42,7 +42,7 @@ return function(CutsceneSequence)
 		local jerCan = script:WaitForChild("JerryCan");
 		jerCan.Parent = workspace.Interactables;
 		
-		shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, ...)
+		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			local playerClass: PlayerClass = shared.modPlayers.get(player);
@@ -388,13 +388,14 @@ return function(CutsceneSequence)
 
 			local profile = shared.modProfile:Get(player);
 			
-			playerClass.Died:Connect(function(character)
+			playerClass.OnIsDeadChanged:Connect(function(isDead)
+				if not isDead then return end;
+
 				modMission:FailMission(player, MISSION_ID, "You died and the bandits stole the sample.");
-				
 				modServerManager:Travel(player, profile.PreviousWorldName);
-			end);
+			end)
 			
-			shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, ...)
+			shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
 				local player: Player? = eventPacket.Player;
 				if player == nil then return end;
 				

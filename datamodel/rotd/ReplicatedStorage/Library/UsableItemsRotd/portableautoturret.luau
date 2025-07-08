@@ -4,15 +4,15 @@ local UsablePreset = shared.require(game.ReplicatedStorage.Library.UsableItems.U
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 UsablePreset.PortableStoragePresetId = "portableautoturret";
 
 function UsablePreset:ClientUse(storageItem)
 	local player = game.Players.LocalPlayer;
 	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
-	local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 	
-	local storage = modData.RequestStorage{StorageId=storageItem.ID};
+	local storage = modData.RequestStorage{Action="GetStorage"; StorageIds={storageItem.ID}};
 	if storage and type(storage) == "table" then
 		modAudio.Preload("TorqueWrench", 5);
 		modAudio.Play("TorqueWrench");

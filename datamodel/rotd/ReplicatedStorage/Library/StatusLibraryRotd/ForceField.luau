@@ -13,7 +13,7 @@ local statusPackage = {
     ExpiresOnDeath = true;
 };
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
     local playerClass = statusClass.StatusOwner :: PlayerClass;
     if playerClass == nil then return end;
@@ -29,7 +29,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     end
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
     local playerClass = statusClass.StatusOwner :: PlayerClass;
     if playerClass == nil then return end;

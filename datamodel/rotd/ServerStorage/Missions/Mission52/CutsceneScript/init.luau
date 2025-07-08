@@ -17,7 +17,7 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, ...)
+	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
 		local player: Player? = eventPacket.Player;
 		if player == nil then return end;
 
@@ -242,7 +242,7 @@ return function(CutsceneSequence)
 						josephModule.Movement:SetWalkSpeed("default", 10);
 						wait(0.2);
 						robertModule.Move:MoveTo(Vector3.new(36.017, 162.593, -44.846));
-						robertModule.Move.MoveToEnded:Wait(10);
+						robertModule.Move.OnMoveToEnded:Wait(10);
 						
 						nateModule.Chat(nateModule.Owner, "Hold it right there buddy.");
 						dallasModule.Wield.Equip("m4a4");
@@ -399,7 +399,7 @@ return function(CutsceneSequence)
 						wait(0.8);
 
 						robertModule.Move:MoveTo(dallasModule.RootPart.Position);
-						robertModule.Move.MoveToEnded:Wait(1);
+						robertModule.Move.OnMoveToEnded:Wait(1);
 						
 						josephModule.Chat(josephModule.Owner, "Dallas!");
 						josephModule.Movement:Face(robertModule.RootPart.Position);
@@ -520,7 +520,7 @@ return function(CutsceneSequence)
 						robertModule.RootPart.Anchored = false;
 						
 						robertModule.Move:MoveTo(Vector3.new(-10.408, 162.593, -48.561));
-						robertModule.Move.MoveToEnded:Wait(1);
+						robertModule.Move.OnMoveToEnded:Wait(1);
 						
 						robertModule.PlayAnimation("Punch");
 						modAudio.Play("Punch", robertModule.RootPart);

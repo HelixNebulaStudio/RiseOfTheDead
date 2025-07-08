@@ -13,7 +13,7 @@ if RunService:IsServer() then
 	local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
-	shared.modEventService:OnInvoked("Generic_OnItemPickup", function(
+	shared.modEventService:OnInvoked("Generic_BindItemPickup", function(
 		event: EventPacket, 
 		interactData, 
 		storageItem: StorageItem

@@ -3,14 +3,15 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local SoundService = game:GetService("SoundService");
 
+local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
+local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+
 local interactablePackage = {};
 --==
 
 function interactablePackage.init(super) -- Server/Client
-	local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
-	local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
-	local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-	
 	local remoteGameModeLobbies = modRemotesManager:Get("GameModeLobbies");
 	local remoteGameModeExit = modRemotesManager:Get("GameModeExit");
 
@@ -55,21 +56,20 @@ function interactablePackage.init(super) -- Server/Client
 		task.delay(1, function()
 			modClientGuis.toggleGameBlinds(true, 0.5);
 		end)
-		modClientGuis.toggleGameBlinds(false, 0.5);
 
+		modClientGuis.toggleGameBlinds(false, 0.5);
 		local timelaspe = tick();
-		local lobbyData = remoteGameModeLobbies:InvokeServer(
-			interactable.Part,
-			interactable.Config,
-			{
-				StageSelect = interactable.Values.Random and interactable.Values.Stage or nil;
-			}
-		);
+		local rPacket = remoteGameModeLobbies:InvokeServer("door", interactable.Config);
 		task.wait(math.clamp(0.5-(tick()-timelaspe), 0, 0.5));
 
-		if lobbyData == nil or info.ClientData == nil then return end;
-		info.ClientData.LobbyInterfaceRequest(lobbyData);
+		if rPacket and rPacket.Success then 
+			modClientGuis.toggleWindow("GameRoom", true, rPacket.LobbyData);
+		else
+			modClientGuis.promptWarning(rPacket.FailMsg or "Please try again!");
+		end;
 
+		task.wait(0.1);
+		modClientGuis.toggleGameBlinds(true, 0.5);
     end
     
     -- When interactable pops up on screen.
@@ -196,7 +196,6 @@ function interactablePackage.init(super) -- Server/Client
 		
 		local worldName = modBranchConfigs.GetWorldDisplayName(modBranchConfigs.WorldName);
 
-		local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
         local interface: Interface = modClientGuis.ActiveInterface;
 		modClientGuis.promptDialogBox({
 			Title=`Leave {worldName}?`;

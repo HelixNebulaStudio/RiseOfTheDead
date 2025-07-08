@@ -25,6 +25,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local window: InterfaceWindow = interface:NewWindow("StatusBar", frame);
 	window.IgnoreHideAll = true;
 	window.ReleaseMouse = false;
+    window.Layers = {"CharacterHud"; "CompactHidden"};
     interface:BindConfigKey("DisableStatusHud", {window});
 	
 	if modConfigurations.CompactInterface then
@@ -123,19 +124,22 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		
 		status.Button.Visible = statusVisible;
 		
-		if lib.QuantityLabel then
-			local stat = statusClass[lib.QuantityLabel];
+		if typeof(statusClass.Text) == "string" then
+			status.Quan.Text = statusClass.Text;
+
+		elseif lib.QuantityLabel then
+			local stat = statusClass.Values[lib.QuantityLabel];
 			local str = stat;
 			local v = tonumber(stat);
 			
-			if tonumber(stat) then
+			if v then
 				local statStr = tostring(stat);
 				if #statStr >= 7 then
-					str=(math.round(v/100000)/10).."M";
+					str = (math.round(v/100000)/10).."M";
 				elseif #statStr >= 4 then
-					str=(math.round(v/100)/10).."K";
+					str = (math.round(v/100)/10).."K";
 				else
-					str=math.round(v);
+					str = math.round(v);
 				end
 			end
 			status.Quan.Text = str or "";

@@ -10,10 +10,11 @@ local modGarbageHandler = shared.require(game.ReplicatedStorage.Library.GarbageH
 local ModeHud = {};
 ModeHud.__index = ModeHud;
 
-function ModeHud.new(modInterface, mainFrame)
+function ModeHud.new(interface: InterfaceInstance, window, frame)
 	local self = {
-		Interface = modInterface;
-		MainFrame = mainFrame;
+		Interface = interface;
+		Window = window;
+		MainFrame = frame;
 		
 		Active = false;
 		Garbage = modGarbageHandler.new();
@@ -23,13 +24,22 @@ function ModeHud.new(modInterface, mainFrame)
 		-- Spectate;
 		CurrentSpectate = nil;
 		SpectateIndex = 1;
+
+		OnActiveChanged = shared.EventSignal.new("OnModeHudActiveChanged");
 	}
+
+	interface.Garbage:Tag(function()
+		self.OnActiveChanged:Destroy();
+		self.Garbage:Destruct();
+	end)
 
 	setmetatable(self, ModeHud);
 	return self;
 end
 
 function ModeHud:SetActive(val)
+	if self.Active == val then return end;
+
 	self.Active = val;
 	
 	if self.Active then
@@ -71,6 +81,8 @@ function ModeHud:SetActive(val)
 		self.Garbage:Destruct();
 		
 	end
+
+	self.OnActiveChanged:Fire(self.Active);
 end
 
 --== Spectator;

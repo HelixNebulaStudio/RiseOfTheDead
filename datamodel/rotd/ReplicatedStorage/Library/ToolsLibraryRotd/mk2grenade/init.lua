@@ -28,11 +28,11 @@ local toolPackage = {
 		ChargeDuration = 0.65;
 
 		--== Projectile
-		ProjectileId = "mk2Grenade";
-		ProjectileConfig={
+		ProjectileId = "mk2grenade";
+		ArcTracerConfig = {
 			Velocity = 160;
 			Bounce = 0.6;
-			LifeTime=20;
+			LifeTime = 20;
 		};
 		VelocityBonus = 40;
 

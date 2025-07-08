@@ -11,7 +11,7 @@ if RunService:IsServer() then
 	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	
 
-	shared.modEventService:OnInvoked("Npcs_OnDamaged", function(event: EventPacket, damageData: DamageData)
+	shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, damageData: DamageData)
 		local storageItem: StorageItem? = damageData.StorageItem;
 		if storageItem == nil then return end;
 

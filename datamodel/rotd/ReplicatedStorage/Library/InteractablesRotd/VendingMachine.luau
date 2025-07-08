@@ -24,16 +24,15 @@ function interactablePackage.init(super) -- Server/Client
     };
 
     function VendingMachine.new(interactable: InteractableInstance, player: Player)
-        
     end
 
-    function VendingMachine.destroy(interactable: InteractableInstance, player: Player)
+    function VendingMachine.BindDestroy(interactable: InteractableInstance, player: Player)
         Debugger:Warn(`destroying i`, interactable, `p`, player);
     end
 
     function VendingMachine.BindInteract(interactable: InteractableInstance, info: InteractInfo)
         interactable.TypePackage.BindInteract(interactable, info);
-        if info.Action ~= "Server" then return end;
+        if info.Action == "Client" then return end;
 
         local player = info.Player;
         if player == nil then return end;
@@ -91,7 +90,6 @@ function interactablePackage.init(super) -- Server/Client
             
         end
         
-            
     end
     
     -- When interactable pops up on screen.

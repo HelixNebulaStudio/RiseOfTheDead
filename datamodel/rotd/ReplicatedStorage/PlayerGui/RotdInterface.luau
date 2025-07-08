@@ -33,8 +33,8 @@ function RotdInterface.clientGuisLoad()
             self:ToggleGameBlinds(true, 3);
         end;
 
-        self.Garbage:Tag(playerClass.OnIsAliveChanged:Connect(function(isAlive)
-            if isAlive then return end;
+        self.Garbage:Tag(playerClass.OnIsDeadChanged:Connect(function(isDead)
+            if not isDead then return end;
 
             self:ToggleGameBlinds(false, 4);
         end))

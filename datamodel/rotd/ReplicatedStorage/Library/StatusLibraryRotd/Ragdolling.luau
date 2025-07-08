@@ -8,7 +8,7 @@ local statusPackage = {
     ShowOnHud=false;
 };
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     local playerClass = statusClass.StatusOwner :: PlayerClass;
     if playerClass == nil then return end;
 
@@ -26,7 +26,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     end
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
     local playerClass = statusClass.StatusOwner :: PlayerClass;
     if playerClass == nil then return end;
 

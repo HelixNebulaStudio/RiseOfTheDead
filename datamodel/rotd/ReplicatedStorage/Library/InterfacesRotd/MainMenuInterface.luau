@@ -32,7 +32,6 @@ local HintList = {
 };
 
 
-local mouseEventTween = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut);
 local fadeTween = TweenInfo.new(0.48);
 
 local interfacePackage = {
@@ -48,8 +47,6 @@ end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
 	local remoteProfileService = modRemotesManager:Get("ProfileService");
-    local branchColor = modBranchConfigs.BranchColor;
-
 
     --== Credits Window
     local creditsFrame = script:WaitForChild("CreditsFrame"):Clone();
@@ -94,6 +91,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         pause = false;
     end)
 
+    --MARK: Credits window OnToggle
     creditsWindow.OnToggle:Connect(function(visible)
         if visible then
 			interface:HideAll{[creditsWindow.Name]=true;};
@@ -169,11 +167,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     frame.Parent = interface.ScreenGui;
     
     local loadLabel = frame:WaitForChild("LoadLabel");
-    loadLabel.TextColor3 = branchColor;
+    loadLabel.TextColor3 = interface.Colors.Branch;
     modGuiObjectTween.FadeTween(loadLabel, modGuiObjectTween.FadeDirection.Out, TweenInfo.new(0.01));
 
     local loadingBarObject = modImageProgressBarUI.new(frame:WaitForChild("TitleLogo"));
-    loadingBarObject.Color = branchColor;
+    loadingBarObject.Color = interface.Colors.Branch;
 
     local frontPageFrame = frame:WaitForChild("FrontPage");
     
@@ -183,6 +181,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     menuWindow.CompactFullscreen = true;
     menuWindow.ReleaseMouse = true;
     menuWindow.DisableHotKeysHint = true;
+    menuWindow.BoolStringWhenActive = {String="!CharacterHud"; Priority=6;};
 
     local mainTheme;
     --MARK: OnToggle
@@ -311,26 +310,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     for _, imageButton: ImageButton in pairs(buttons) do
         if not imageButton:IsA("ImageButton") then continue end;
 
-        imageButton.MouseEnter:Connect(function()
-            TweenService:Create(imageButton, mouseEventTween, {
-                ImageColor3 = branchColor;
-            }):Play();
-        end)
-
-        imageButton.MouseLeave:Connect(function() 
-            TweenService:Create(imageButton, mouseEventTween, {
-                ImageColor3 = Color3.fromRGB(255, 255, 255);
-            }):Play();
-        end)
-        
+        interface:ConnectImageButton(imageButton);
         imageButton.MouseButton1Click:Connect(function() 
             if buttonDebounce then return end;
             buttonDebounce = true;
 
-            interface:PlayButtonClick();
-
             if imageButton.Name == "MainCampaign" then
-
                 modGuiObjectTween.FadeTween(frontPageFrame, modGuiObjectTween.FadeDirection.Out, TweenInfo.new(0.48));
                 loadLabel.Visible = true;
                 loadLabel.Text = "Searching for server...";

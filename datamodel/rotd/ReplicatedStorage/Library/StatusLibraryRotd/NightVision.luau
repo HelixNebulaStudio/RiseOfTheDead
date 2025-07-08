@@ -10,7 +10,7 @@ local statusPackage = {
     Buff=true;
 };
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsServer() then return end;
 
     local function setNV()
@@ -23,7 +23,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     setNV();
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
     if RunService:IsServer() then return end;
 
     game.Lighting.Ambient = Color3.fromRGB(10, 10, 10);

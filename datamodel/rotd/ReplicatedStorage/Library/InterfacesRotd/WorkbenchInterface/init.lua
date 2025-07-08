@@ -80,8 +80,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	else
 		workbenchWindow:SetClosePosition(UDim2.new(2, 0, 0.5, 0), UDim2.new(1, -10, 0.5, 0));
 	end
+
+	modKeyBindsHandler:SetDefaultKey("KeyWindowWorkbench", Enum.KeyCode.N);
+	local quickButton = interface:NewQuickButton("Workbench", "Workbench", "rbxassetid://2273400846");
+	quickButton.LayoutOrder = 15;
+	interface:ConnectQuickButton(quickButton, "KeyWindowWorkbench");
+
     interface:BindConfigKey("DisableWorkbench", {workbenchWindow}, nil, function()
-		return modData.Profile and modData.Profile.GamePass and modData.Profile.GamePass.PortableWorkbench ~= nil;	
+		return modData.Profile == nil 
+			or modData.Profile.GamePass == nil 
+			or modData.Profile.GamePass.PortableWorkbench == nil;
     end)
 	workbenchWindow:AddCloseButton(workbenchFrame);
 	
@@ -89,11 +97,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	workbenchWindow.OnToggle:Connect(function(visible, packet)
 		packet = packet or {};
 
-		packet.InteractPart = packet.InteractPart or nil;
 		packet.DontCloseInventory = packet.DontCloseInventory == true;
 		
         if visible then
-			binds.InteractPart = packet.InteractPart;
+			binds.Interactable = packet.Interactable;
+			binds.InteractPart = binds.Interactable and binds.Interactable.Part or nil;
 
 			binds.IsPremium = modData.Profile ~= nil and modData.Profile.Premium or false;
 			workbenchTitleLabel.Text = "Workbench";
@@ -131,14 +139,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
 
 			modData:RequestData("ItemUnlockables");
+
         else
             for k, listMenu in pairs(binds.ActiveWorkbenches) do
                 listMenu.Menu.Visible = false;
             end
 
-            task.delay(0.1, function()
-                binds.ClearSelection();
-            end)
+			binds.ClearSelection();
             binds.clearSlotHighlight();
             binds.SelectedSlot = nil;
 			
@@ -159,10 +166,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
 	end)
 	
-	modKeyBindsHandler:SetDefaultKey("KeyWindowWorkbench", Enum.KeyCode.N);
-	local quickButton = interface:NewQuickButton("Workbench", "Workbench", "rbxassetid://2273400846");
-	quickButton.LayoutOrder = 15;
-	interface:ConnectQuickButton(quickButton, "KeyWindowWorkbench");
 
     interface.Garbage:Tag(modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
         if action ~= "sync" then return end;

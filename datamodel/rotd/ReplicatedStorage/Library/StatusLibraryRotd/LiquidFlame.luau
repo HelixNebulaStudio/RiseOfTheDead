@@ -12,7 +12,7 @@ local statusPackage = {
     ExpiresOnDeath = true;
 };
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     local fireParticle = game.ReplicatedStorage.Particles.Fire2;
 
     if statusClass.Values.TargetPart then 
@@ -24,7 +24,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     end
 end
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if RunService:IsClient() then return end;
     if not tickData.ms500 then return end;
 

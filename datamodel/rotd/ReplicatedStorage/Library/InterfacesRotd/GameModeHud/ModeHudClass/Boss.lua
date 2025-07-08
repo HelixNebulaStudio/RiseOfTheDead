@@ -7,8 +7,8 @@ local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameMod
 
 local ModeHudClass = shared.require(script.Parent);
 --==
-return function(...)
-	local modeHud = ModeHudClass.new(...);
+return function(interface, window, frame)
+	local modeHud = ModeHudClass.new(interface, window, frame);
 	
 	modeHud.Soundtrack = nil;
 	
@@ -31,7 +31,7 @@ return function(...)
 
 			if room.BossPrefabs then
 				for a=1, #room.BossPrefabs do
-					self.Interface.modEntityHealthHudInterface.TryHookEntity(room.BossPrefabs[a], 600);
+    				interface:FireEvent("TryHookEntity", room.BossPrefabs[a], 600);
 				end
 			end
 

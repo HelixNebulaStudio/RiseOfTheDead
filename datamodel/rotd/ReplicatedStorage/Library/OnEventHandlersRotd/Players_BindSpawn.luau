@@ -27,7 +27,7 @@ return function(event: EventPacket, playerClass: PlayerClass)
         if interactData.TouchPickUp == false then return end;
         
         if interactData.Type == modInteractables.Types.Pickup then
-            shared.modEventService:ServerInvoke("Skills_OnResourceGatherers", {ReplicateTo={player}}, player, interactData);
+            shared.modEventService:ServerInvoke("Skills_BindResourceGatherers", {ReplicateTo={player}}, player, interactData);
         end
     end)
 end;

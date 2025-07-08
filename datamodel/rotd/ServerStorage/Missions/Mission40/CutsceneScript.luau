@@ -77,7 +77,7 @@ if RunService:IsServer() then
 			end
 		end)
 
-		modEventService:OnInvoked("GameModeManager_OnDisconnectPlayer", function(event, packet)
+		modEventService:OnInvoked("GameModeManager_BindDisconnectPlayer", function(event, packet)
 			local player = event.Player;
 			local menuRoom = packet.MenuRoom;
 			if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage ~= "Zricera" then return end;
@@ -95,43 +95,33 @@ if RunService:IsServer() then
 			end
 		end)
 		
-		shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, ...)
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
+			local triggerId: string = ...;
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			
-			local triggerId = interactData.TriggerTag;
+			if triggerId ~= "Push Statue" then return end;
 
-			if triggerId == "Push Statue" then
-				modMission:Progress(player, 40, function(mission)
-					local statueObject = mission.Cache.Statue;
+			modMission:Progress(player, 40, function(mission)
+				local statueObject = mission.Cache.Statue;
+				
+				if statueObject then
+					TweenService:Create(statueObject, TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
+						CFrame = CFrame.new(352.495, -30.669, 1923.279);
+					}):Play();
 					
-					if statueObject then
-						interactData.CanInteract = false;
-						interactData.Label = "";
-						interactData:Sync();
-						interactData.Object.Size = Vector3.new(0, 0, 0);
-						
+					delay(30, function()
 						TweenService:Create(statueObject, TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
-							CFrame = CFrame.new(352.495, -30.669, 1923.279);
+							CFrame = CFrame.new(352.49469, -30.6694565, 1912.8186, 1, 0, 0, 0, 1, 0, 0, 0, 1);
 						}):Play();
-						
-						delay(30, function()
-							interactData.CanInteract = true;
-							interactData.Label = nil;
-							interactData:Sync();
-							
-							interactData.Object.Size = Vector3.new(0.4, 4.51, 1.38);
-							TweenService:Create(statueObject, TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
-								CFrame = CFrame.new(352.49469, -30.6694565, 1912.8186, 1, 0, 0, 0, 1, 0, 0, 0, 1);
-							}):Play();
-						end)
-					else
-						Debugger:Warn("Statue does not exist.");
-					end
-					
-					if mission.ProgressionPoint == 3 then mission.ProgressionPoint = 4; end;
-				end)
-			end
+					end)
+				else
+					Debugger:Warn("Statue does not exist.");
+				end
+				
+				if mission.ProgressionPoint == 3 then mission.ProgressionPoint = 4; end;
+			end)
+
 		end)
 		
 	end

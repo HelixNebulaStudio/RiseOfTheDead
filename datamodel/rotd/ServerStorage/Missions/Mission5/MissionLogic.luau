@@ -19,7 +19,7 @@ if RunService:IsServer() then
 	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
-	shared.modEventService:OnInvoked("WorkbenchService_OnInterfaceToggle", function(event: EventPacket, ...)
+	shared.modEventService:OnInvoked("WorkbenchService_BindInterfaceToggle", function(event: EventPacket, ...)
 		local player = event.Player;
 		if player == nil or not modMission:Progress(player, MISSION_ID) then return end;
 

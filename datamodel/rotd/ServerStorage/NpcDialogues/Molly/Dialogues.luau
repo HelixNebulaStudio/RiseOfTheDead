@@ -35,7 +35,7 @@ if RunService:IsServer() then
 		dialog:AddChoice("heal_request", function()
 			if not dialog.InRange() then return end;
 			modStatusEffects.FullHeal(player, 0.3);
-			modOnGameEvents:Fire("OnMedicHeal", player, dialog.Name);
+			shared.modEventService:ServerInvoke("Dialogue_BindMedicHeal", {}, player, dialog);
 		end)
 	end 
 end

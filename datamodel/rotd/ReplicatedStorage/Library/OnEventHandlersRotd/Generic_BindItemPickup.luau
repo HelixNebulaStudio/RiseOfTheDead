@@ -12,6 +12,6 @@ return function(event: EventPacket, interactData, storageItem) -- IsServer();
 		if profile.Cache.OnResourceGathererCooldown and tick()-profile.Cache.OnResourceGathererCooldown <= 1 then return end;
 		profile.Cache.OnResourceGathererCooldown = tick();
 
-		shared.modEventService:ServerInvoke("Skills_OnResourceGatherers", {ReplicateTo={player}}, player, interactData);
+		shared.modEventService:ServerInvoke("Skills_BindResourceGatherers", {ReplicateTo={player}}, player, interactData);
 	end
 end;

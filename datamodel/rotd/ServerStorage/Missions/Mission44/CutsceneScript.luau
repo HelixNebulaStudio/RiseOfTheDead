@@ -20,7 +20,7 @@ if RunService:IsServer() then
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 
 	if modBranchConfigs.IsWorld("TheWarehouse") then
-		shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, ...)
+		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			
@@ -50,7 +50,7 @@ if RunService:IsServer() then
 			end
 		end)
 
-		shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, ...)
+		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			

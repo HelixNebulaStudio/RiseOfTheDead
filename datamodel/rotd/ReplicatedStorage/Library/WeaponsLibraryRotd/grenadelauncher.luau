@@ -58,7 +58,7 @@ local toolPackage = {
 		MovingInaccuracyScale=1.3;
 
 		-- Projectile
-		ProjectileId="50mmGrenade";
+		ProjectileId="grenade50mm";
 		
 		ExplosionRadius=12;
 		ExplosionStun=1;

@@ -57,9 +57,9 @@ function interactablePackage.init(super) -- Server/Client
             end;
             
             shared.modEventService:ServerInvoke(
-                "InteractService_OnButton", 
+                "Generic_BindTrigger", 
                 {ReplicateTo={player}}, 
-                interactConfig, 
+                interactable, 
                 {InputCode = input;}
             );
 

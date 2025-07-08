@@ -20,7 +20,7 @@ local toolPackage = {
 		Damage = 50;
 
 		--== Projectile
-		ProjectileId = "firework";
+		ProjectileId = "fireworks";
 		ProjectileConfig = {
 			Velocity = 100;
 			Bounce = 0;

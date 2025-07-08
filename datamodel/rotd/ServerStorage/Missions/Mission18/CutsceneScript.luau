@@ -51,7 +51,7 @@ return function(CutsceneSequence)
 					robertModule.Humanoid.JumpPower = 0;
 
 					robertModule.Move:MoveTo(Vector3.new(662.87, 57.81, -13.28));
-					robertModule.Move.MoveToEnded:Wait(10);
+					robertModule.Move.OnMoveToEnded:Wait(10);
 					robertModule.Move:Face(Vector3.new(650, 57.8096695, -13.2840099));
 					
 					robertModule.Interactable.Parent = robertModule.Prefab;
@@ -200,7 +200,7 @@ return function(CutsceneSequence)
 						spawn(function() robertModule.Wield.ReloadRequest(); end)
 
 						robertModule.Move:MoveTo(Vector3.new(5.2, 8.65, 177.85));
-						robertModule.Move.MoveToEnded:Wait(15);
+						robertModule.Move.OnMoveToEnded:Wait(15);
 						
 						robertModule.Actions:Teleport(CFrame.new(5.2, 8.65, 177.85));
 						if mission.ProgressionPoint ~= 4 then return end;
@@ -220,7 +220,7 @@ return function(CutsceneSequence)
 						robertModule.Chat(robertModule.Owner, "This way..");
 
 						robertModule.Move:MoveTo(Vector3.new(3.15, 8.071, 257.45));
-						robertModule.Move.MoveToEnded:Wait(6);
+						robertModule.Move.OnMoveToEnded:Wait(6);
 						
 						robertModule.Actions:Teleport(CFrame.new(3.15, 8.071, 257.45));
 						if mission.ProgressionPoint ~= 4 then return end;
@@ -256,7 +256,7 @@ return function(CutsceneSequence)
 							robertModule.Move:SetMoveSpeed("set", "default", 15);
 
 							robertModule.Move:MoveTo(Vector3.new(-101.6, 8.682, 315.75));
-							robertModule.Move.MoveToEnded:Wait(20);
+							robertModule.Move.OnMoveToEnded:Wait(20);
 							
 							robertModule.Move:Face(Vector3.new(-101.25, 8.682, 318.9));
 							
@@ -279,7 +279,7 @@ return function(CutsceneSequence)
 							robertModule.StopAnimation("CrouchLook", 1);
 							
 							robertModule.Move:MoveTo(Vector3.new(-81.5, 8.682, 290));
-							robertModule.Move.MoveToEnded:Wait(10);
+							robertModule.Move.OnMoveToEnded:Wait(10);
 							
 						else
 							robertModule.Actions:Teleport(CFrame.new(-81.5, 8.682, 290));
@@ -295,12 +295,12 @@ return function(CutsceneSequence)
 						robertModule.Move:SetMoveSpeed("set", "default", 15);
 
 						robertModule.Move:MoveTo(Vector3.new(-57.95, 8.682, 279.45));
-						robertModule.Move.MoveToEnded:Wait(10);
+						robertModule.Move.OnMoveToEnded:Wait(10);
 						
 						robertModule.Actions:EnterDoor("safehouse3Exit");
 						
 						robertModule.Move:MoveTo(Vector3.new(1.75, 8.55, 231.1));
-						robertModule.Move.MoveToEnded:Wait(10);
+						robertModule.Move.OnMoveToEnded:Wait(10);
 						
 						robertModule:TeleportHide();
 						

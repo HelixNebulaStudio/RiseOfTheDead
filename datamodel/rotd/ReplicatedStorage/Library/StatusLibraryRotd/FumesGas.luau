@@ -21,11 +21,11 @@ function statusPackage.init()
 end
 
 
-function statusPackage.OnApply()
+function statusPackage.BindApply()
 end
 
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if tickData.ms100 ~= true then return end;
 
     if statusClass.Values.LastRefresh == nil then

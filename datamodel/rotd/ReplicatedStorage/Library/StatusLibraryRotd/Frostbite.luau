@@ -151,7 +151,7 @@ function statusPackage.IceEffect(targetModel: Model, garbageHandler: GarbageHand
     end
 end
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
     
     statusClass.ExpiresOnDeath = true;
@@ -184,7 +184,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
 end
 
 -- When character dies due to reaching health's shatter threshold, status expires.
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
 
     local characterClass: CharacterClass = statusClass.StatusOwner;

@@ -15,7 +15,7 @@ local statusPackage = {
 if RunService:IsServer() then
     local modifierId = statusPackage.Id;
 
-    function statusPackage.OnApply(statusClass: StatusClassInstance)
+    function statusPackage.BindApply(statusClass: StatusClassInstance)
         local characterClass: CharacterClass = statusClass.StatusOwner;
         local configurations = characterClass.Configurations;
 
@@ -29,7 +29,7 @@ if RunService:IsServer() then
         configurations:AddModifier(statusModifier);
     end
 
-    function statusPackage.OnExpire(statusClass: StatusClassInstance)
+    function statusPackage.BindExpire(statusClass: StatusClassInstance)
         local characterClass: CharacterClass = statusClass.StatusOwner;
         local configurations = characterClass.Configurations;
 

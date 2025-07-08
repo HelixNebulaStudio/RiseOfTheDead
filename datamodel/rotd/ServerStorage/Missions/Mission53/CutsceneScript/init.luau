@@ -104,15 +104,15 @@ return function(CutsceneSequence)
 					wilsonModule.InMission = true;
 					
 					wilsonModule.Move:MoveTo(Vector3.new(613.64, 71.458, -94.619));
-					wilsonModule.Move.MoveToEnded:Wait(5);
+					wilsonModule.Move.OnMoveToEnded:Wait(5);
 					
 					wilsonModule.Move:MoveTo(Vector3.new(620.380676, 90.7988586, -95.4239197));
-					wilsonModule.Move.MoveToEnded:Wait(10);
+					wilsonModule.Move.OnMoveToEnded:Wait(10);
 					
 					wilsonModule.Actions:Teleport(CFrame.new(620.380676, 90.7988586, -95.4239197, 2.38419432e-07, 0, -1.00000334, 0, 0.999998569, 0, 1.00000608, 0, -2.38419403e-07));
 					
 					wilsonModule.Move:MoveTo(Vector3.new(640.453, 90.799, -74.582));
-					wilsonModule.Move.MoveToEnded:Wait(5);
+					wilsonModule.Move.OnMoveToEnded:Wait(5);
 					
 					while game.Players:IsAncestorOf(player) and player:DistanceFromCharacter(waypoint1) > 16 do
 						task.wait(1);

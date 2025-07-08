@@ -14,9 +14,9 @@ local statusPackage = {
 };
 
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     statusClass.Values.Amount = 40;
-    statusSetWalkspeed.OnApply(statusClass);
+    statusSetWalkspeed.BindApply(statusClass);
 
     if RunService:IsClient() then return end;
     local characterClass: CharacterClass = statusClass.StatusOwner;
@@ -61,8 +61,8 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     end
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
-    statusSetWalkspeed.OnExpire(statusClass);
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
+    statusSetWalkspeed.BindExpire(statusClass);
 end
 
 

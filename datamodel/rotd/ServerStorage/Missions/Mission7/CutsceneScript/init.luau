@@ -56,7 +56,7 @@ if RunService:IsServer() then
 			end
 		end)
 		
-		modEventService:OnInvoked("GameModeManager_OnDisconnectPlayer", function(event, packet)
+		modEventService:OnInvoked("GameModeManager_BindDisconnectPlayer", function(event, packet)
 			local player = event.Player;
 			local menuRoom = packet.MenuRoom;
 			if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage ~= "The Prisoner" then return end;
@@ -77,11 +77,11 @@ if RunService:IsServer() then
 			end
 		end)
 
-		shared.modEventService:OnInvoked("Interactables_OnTrigger", function(eventPacket: EventPacket, interactData, ...)
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
+			local triggerId: string = ...;
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			
-			local triggerId = interactData.TriggerTag;
 			if triggerId ~= "BloxmartUnlock" then return end;
 			if not modMission:Progress(player, MISSION_ID) then return end;
 
@@ -97,21 +97,23 @@ if RunService:IsServer() then
 			end)
 		end)
 
-		modOnGameEvents:ConnectEvent("OnDoorEnter", function(player, interactData)
-			local doorName = interactData.Name;
-			if doorName == nil then return end;
-	
-			if doorName == "Security Entrance Door" then
+        shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
+            local interactable: InteractableInstance = ...;
+
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+
+			if interactable.Id == "securityRoomEntrance" then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint == 4 then mission.ProgressionPoint = 5; end;
 				end)
-				
-			elseif doorName == "Security Exit Door" then
+
+			elseif interactable.Id == "securityRoomExit" then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint == 6 then mission.ProgressionPoint = 7; end;
 				end)
 
-			elseif doorName == "Sundays Entrance" then
+			elseif interactable.Id == "safehouse2Entrance" then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint == 7 then
 						modMission:CompleteMission(player, 7); 
@@ -124,7 +126,7 @@ if RunService:IsServer() then
 				end)
 
 			end
-		end)
+        end)
 
 		modOnGameEvents:ConnectEvent("OnGameLobbyDisconnect", function(player, menuRoom)
 			if not modMission:Progress(player, MISSION_ID) then return end;
@@ -189,7 +191,7 @@ return function(CutsceneSequence)
 				robertModule.Humanoid.JumpPower = 0;
 				
 				robertModule.Move:MoveTo(Vector3.new(13, 57.5, 39.3));
-				robertModule.Move.MoveToEnded:Wait(10);
+				robertModule.Move.OnMoveToEnded:Wait(10);
 				robertModule.Move:Stop(1);
 				
 				robertModule.Actions:Teleport(CFrame.new(15.6800423, 57.6597404, 42.3099594));
@@ -228,7 +230,7 @@ return function(CutsceneSequence)
 					wait(0.5)
 					
 					robertModule.Move:MoveTo(Vector3.new(58.482, 57.7, -28.756));
-					robertModule.Move.MoveToEnded:Wait(10);
+					robertModule.Move.OnMoveToEnded:Wait(10);
 					
 					-- Run to Warehouse Exit;
 					robertModule.Actions:WaitForOwner(30);
@@ -237,14 +239,14 @@ return function(CutsceneSequence)
 
 					-- Run to Fence Door;
 					robertModule.Move:MoveTo(Vector3.new(107.235, 57.7, -30.3));
-					robertModule.Move.MoveToEnded:Wait(5);
+					robertModule.Move.OnMoveToEnded:Wait(5);
 					
 					robertModule.Actions:WaitForOwner(30);
 					robertModule.Actions:EnterDoor("warehouseFenceExit");
 
 					-- Run to Boss Door;
 					robertModule.Move:MoveTo(Vector3.new(304.6, 57.7, 66.7));
-					robertModule.Move.MoveToEnded:Wait(20);
+					robertModule.Move.OnMoveToEnded:Wait(20);
 					
 					robertModule.Actions:WaitForOwner(50);
 					robertModule.Actions:FaceOwner();
@@ -321,14 +323,14 @@ return function(CutsceneSequence)
 					robertModule.Move:SetMoveSpeed("set", "default", 10);
 
 					robertModule.Move:MoveTo(Vector3.new(288.262, 70.5, -13.902));
-					robertModule.Move.MoveToEnded:Wait(5);
+					robertModule.Move.OnMoveToEnded:Wait(5);
 
 					robertModule.Move:Face(Vector3.new(292.362, 70.5, -8.102));
 					wait(1.5);
 					if modMission:Progress(player, 7).ProgressionPoint ~= 5 then return end;
 					
 					robertModule.Move:MoveTo(Vector3.new(287.8, 70.5, 1.1));
-					robertModule.Move.MoveToEnded:Wait(5);
+					robertModule.Move.OnMoveToEnded:Wait(5);
 					robertModule.Move:Face(Vector3.new(287.8, 70.5, 4.8));
 					
 					robertModule.SetAnimation("CrouchLook", {script:WaitForChild("RobertCrouchLookAnim")});
@@ -366,7 +368,7 @@ return function(CutsceneSequence)
 					end);
 
 					robertModule.Move:MoveTo(Vector3.new(636.112, 55.8, 9.348));
-					robertModule.Move.MoveToEnded:Wait(32);
+					robertModule.Move.OnMoveToEnded:Wait(32);
 					
 					robertModule.Actions:Teleport(CFrame.new(636.112, 57.7, 9.348));
 					robertModule.Move:Face(Vector3.new(624.712, 55.8, 11.148));
@@ -385,7 +387,7 @@ return function(CutsceneSequence)
 					robertModule.Humanoid.JumpPower = 0;
 					
 					robertModule.Move:MoveTo(Vector3.new(662.87, 57.81, -13.28));
-					robertModule.Move.MoveToEnded:Wait(32);
+					robertModule.Move.OnMoveToEnded:Wait(32);
 					
 					robertModule.Move:Face(Vector3.new(650, 57.8096695, -13.2840099));
 					robertModule.Interactable.Parent = robertModule.Prefab;

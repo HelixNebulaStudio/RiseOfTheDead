@@ -49,7 +49,7 @@ function statusPackage.init()
     end
 end
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if RunService:IsServer() then return end;
     local playerClass = statusClass.StatusOwner :: PlayerClass;
     if playerClass == nil then return end;

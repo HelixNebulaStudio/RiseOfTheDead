@@ -202,7 +202,7 @@ function ShopService.onRequire()
                 end
 
             else
-		        interactable = modInteractables.getOrNew(interactConfig, player);
+		        interactable = modInteractables.getOrNew(interactConfig);
                 if interactable == nil then return modShopLibrary.PurchaseReplies.InvalidProduct; end;
 
                 local interactPart = interactable.Part;
@@ -288,7 +288,7 @@ function ShopService.onRequire()
                 
             end
     
-            shared.modEventService:ServerInvoke("Shop_OnActionEvent", {ReplicateTo={player}}, "BuyAmmo", {
+            shared.modEventService:ServerInvoke("Shop_BindActionEvent", {ReplicateTo={player}}, "BuyAmmo", {
                 StorageItem = storageItem;
                 Cost = price;
             });

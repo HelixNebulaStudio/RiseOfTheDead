@@ -13,7 +13,7 @@ function statusPackage.init()
     -- This function is called once when the status package is loaded
 end
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     -- This function is called when the status is applied to a character
     local playerClass = statusClass.StatusOwner :: PlayerClass;
     if playerClass == nil then return end;
@@ -21,7 +21,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
     -- Apply tick protection logic here
 end
 
-function statusPackage.OnExpire(statusClass: StatusClassInstance)
+function statusPackage.BindExpire(statusClass: StatusClassInstance)
     -- This function is called when the status expires or is removed
     local playerClass = statusClass.StatusOwner :: PlayerClass;
     if playerClass == nil then return end;
@@ -29,12 +29,12 @@ function statusPackage.OnExpire(statusClass: StatusClassInstance)
     -- Clean up any tick protection effects
 end
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     -- This function is called periodically while the status is active
     -- No tick processing needed for this status
 end
 
-function statusPackage.OnRelay(statusClass: StatusClassInstance, ...)
+function statusPackage.BindRelay(statusClass: StatusClassInstance, ...)
     -- This function is called when data is relayed to this status
     -- No relay processing needed for this status
 end

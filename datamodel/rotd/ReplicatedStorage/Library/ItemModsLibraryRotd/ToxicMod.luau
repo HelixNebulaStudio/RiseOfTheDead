@@ -37,6 +37,7 @@ end
 if RunService:IsServer() then
 
 	function modifierPackage.Binds.OnBulletHit(modifier: ItemModifierInstance, packet: OnBulletHitPacket)
+		if packet.TargetModel == nil then return end;
 		local duration = modifier.Values.Duration;
 
 		local characterClass: CharacterClass;

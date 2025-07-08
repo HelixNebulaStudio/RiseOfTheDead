@@ -4,7 +4,6 @@ local RunService = game:GetService("RunService");
 
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
-local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 if RunService:IsServer() then
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
@@ -13,19 +12,12 @@ end
 
 return function(event: EventPacket, ...)
 	local player: Player? = event.Player;
-    local config: Configuration, values: anydict = ...;
+    local interactable: InteractableInstance, values: anydict = ...;
     
-    local interactable: InteractableInstance = modInteractables.getOrNew(config, player);
-    if interactable == nil then return end
-
     local variantId = interactable.Variant;
     --==
     
-    if variantId == "BioXResearchButton" then
-        Debugger:Warn(`BioXResearchButton`, values);
-        modAudio.Play("PartyPopper", interactable.Part);
-        
-    elseif variantId == "MallKeypad" and player then
+    if variantId == "MallKeypad" and player then
 		local codeEntered = values and values.InputCode or nil;
 
         if codeEntered ~= "240" then 
@@ -61,6 +53,5 @@ return function(event: EventPacket, ...)
         );
 
         shared.Notify(player, "You found a Mall's Gift from the safe.", "Reward");
-
     end
 end;

@@ -29,6 +29,8 @@ shared.coreBind(modGameSave, "_new", function(gameSave: GameSaveRotd, profile: P
 	local player = profile.Player;
 	Debugger:Warn("_new GameSave", player);
 
+	gameSave.Spawn = "warehouse";
+
 	gameSave.Masteries = {};
 	gameSave.Blueprints = modBlueprints.new(player, function() gameSave:Sync("Blueprints") end);
 

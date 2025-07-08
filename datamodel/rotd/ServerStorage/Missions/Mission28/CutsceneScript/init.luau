@@ -21,7 +21,7 @@ if RunService:IsServer() then
 	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 	if modBranchConfigs.IsWorld("TheUnderground") then
-		shared.modEventService:OnInvoked("Interactables_OnTrigger", function(event: EventPacket, interactData, ...)
+		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(event: EventPacket, interactData, ...)
 			local player: Player? = event.Player;
 			if player == nil then return end;
 

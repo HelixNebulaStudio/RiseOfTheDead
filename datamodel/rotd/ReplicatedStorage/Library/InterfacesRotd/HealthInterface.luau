@@ -34,6 +34,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         PreviewBorderSize = 2;
         PreviewSize = previewBar.Size;
     });
+	window.Layers = {"CharacterHud"; "CompactHidden"};
 	window.IgnoreHideAll = true;
 	window.ReleaseMouse = false;
 	interface:BindConfigKey("DisableHealthbar", {window});
@@ -49,19 +50,19 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end)
 
 	if modConfigurations.CompactInterface then
-        interface.Properties.OnChanged:Connect(function(k, v)
-            if k == "IsCompactFullscreen" then
-                if modConfigurations.DisableHealthbar then
-                    hpFrame.Visible = false;
-                else
-                    if v == true then
-                        hpFrame.Visible = false;
-                    else
-                        hpFrame.Visible = true;
-                    end
-                end
-            end
-        end)
+        -- interface.Properties.OnChanged:Connect(function(k, v)
+        --     if k == "IsCompactFullscreen" then
+        --         if modConfigurations.DisableHealthbar then
+        --             hpFrame.Visible = false;
+        --         else
+        --             if v == true then
+        --                 hpFrame.Visible = false;
+        --             else
+        --                 hpFrame.Visible = true;
+        --             end
+        --         end
+        --     end
+        -- end)
 
 		hpFrame:WaitForChild("UIPadding").PaddingBottom = UDim.new(0, 0);
 		hpFrame.UIPadding.PaddingLeft = UDim.new(0, 0);

@@ -13,7 +13,7 @@ local statusPackage = {
 };
 
 
-function statusPackage.OnApply(statusClass: StatusClassInstance)
+function statusPackage.BindApply(statusClass: StatusClassInstance)
     local fireParticle = game.ReplicatedStorage.Particles.Fire2;
 
     local new: ParticleEmitter = fireParticle:Clone();
@@ -24,7 +24,7 @@ function statusPackage.OnApply(statusClass: StatusClassInstance)
 end
 
 
-function statusPackage.OnTick(statusClass: StatusClassInstance, tickData: TickData)
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
     if RunService:IsClient() then return end;
     if tickData.ms500 == false then return end;
    

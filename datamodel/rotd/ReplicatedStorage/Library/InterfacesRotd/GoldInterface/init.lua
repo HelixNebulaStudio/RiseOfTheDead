@@ -61,6 +61,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local goldShopWindow: InterfaceWindow = interface:NewWindow("GoldMenu", goldMenuFrame);
 	goldShopWindow.CompactFullscreen = true;
+    goldShopWindow.DisableInteractables = true;
 
 	if modConfigurations.CompactInterface then
 		goldShopWindow:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, 0));
@@ -68,14 +69,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         goldMenuFrame.Position = UDim2.new(0.5, 0, 0.5, 0);
         goldMenuFrame.Size = UDim2.new(1, 0, 1, 0);
         goldMenuFrame:WaitForChild("UICorner"):Destroy();
-        
-        goldMenuFrame:WaitForChild("closeButton").Visible = true;
-        goldMenuFrame:WaitForChild("closeButton").MouseButton1Click:Connect(function()
-            goldShopWindow:Close();
-        end)
+        goldMenuFrame:WaitForChild("closeButton").Visible = false;
+
 	else
 		goldShopWindow:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, -35));
 	end
+    goldMenuFrame:WaitForChild("closeButton").MouseButton1Click:Connect(function()
+        goldShopWindow:Close();
+    end)
+
 	interface:ConnectQuickButton(goldButton);
 	goldShopWindow:AddCloseButton(goldMenuFrame);
 	modKeyBindsHandler:SetDefaultKey("KeyWindowGoldMenu", Enum.KeyCode.K);
@@ -105,35 +107,35 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     function goldShopWindow.Binds.SetStyle(styleId)
         if modConfigurations.CompactInterface then
-            if styleId == "Menu" then
-                goldStatFrame.AnchorPoint = Vector2.new(0, 0);
-                goldStatFrame.Position = UDim2.new(0, interface.Properties.TopbarInset.Min.X+20, 0, 0);
-                goldStatFrame.Size = UDim2.new(0, 200, 0.1, 0);
+            -- if styleId == "Menu" then
+            --     goldStatFrame.AnchorPoint = Vector2.new(0, 0);
+            --     goldStatFrame.Position = UDim2.new(0, interface.Properties.TopbarInset.Min.X+20, 0, 0);
+            --     goldStatFrame.Size = UDim2.new(0, 200, 0.1, 0);
 
-                goldStatFrame.GoldMenu.AnchorPoint = Vector2.new(0, 0.5);
-                goldStatFrame.GoldMenu.Position = UDim2.new(0, 0, 0.5, 0);
-                goldStatFrame.GoldMenu.Size = UDim2.new(0, 35, 0, 35);
+            --     goldStatFrame.GoldMenu.AnchorPoint = Vector2.new(0, 0.5);
+            --     goldStatFrame.GoldMenu.Position = UDim2.new(0, 0, 0.5, 0);
+            --     goldStatFrame.GoldMenu.Size = UDim2.new(0, 35, 0, 35);
 
-                goldStatFrame.goldLabel.AnchorPoint = Vector2.new(0, 0.5);
-                goldStatFrame.goldLabel.Position = UDim2.new(0, 50, 0.5, 0);
-                goldStatFrame.goldLabel.Size = UDim2.new(0, 85, 0, 36);
-                goldStatFrame.goldLabel.TextXAlignment = Enum.TextXAlignment.Left;
+            --     goldStatFrame.goldLabel.AnchorPoint = Vector2.new(0, 0.5);
+            --     goldStatFrame.goldLabel.Position = UDim2.new(0, 50, 0.5, 0);
+            --     goldStatFrame.goldLabel.Size = UDim2.new(0, 85, 0, 36);
+            --     goldStatFrame.goldLabel.TextXAlignment = Enum.TextXAlignment.Left;
 
-            else
-                goldStatFrame.AnchorPoint = Vector2.new(1, 0.5);
-                goldStatFrame.Position = UDim2.new(1, -20, 0, 33);
-                goldStatFrame.Size = UDim2.new(0, 200, 0, 25);
+            -- else
+            --     goldStatFrame.AnchorPoint = Vector2.new(1, 0.5);
+            --     goldStatFrame.Position = UDim2.new(1, -20, 0, 33);
+            --     goldStatFrame.Size = UDim2.new(0, 200, 0, 25);
 
-                goldStatFrame.GoldMenu.AnchorPoint = Vector2.new(1, 0.5);
-                goldStatFrame.GoldMenu.Position = UDim2.new(1, 0, 0.5, 0);
-                goldStatFrame.GoldMenu.Size = UDim2.new(0, 32, 0, 32);
+            --     goldStatFrame.GoldMenu.AnchorPoint = Vector2.new(1, 0.5);
+            --     goldStatFrame.GoldMenu.Position = UDim2.new(1, 0, 0.5, 0);
+            --     goldStatFrame.GoldMenu.Size = UDim2.new(0, 32, 0, 32);
 
-                goldStatFrame.goldLabel.AnchorPoint = Vector2.new(1, 0.5);
-                goldStatFrame.goldLabel.Position = UDim2.new(1, -50, 0.5, 0);
-                goldStatFrame.goldLabel.Size = UDim2.new(0, 85, 0, 36);
-                goldStatFrame.goldLabel.TextXAlignment = Enum.TextXAlignment.Right;
+            --     goldStatFrame.goldLabel.AnchorPoint = Vector2.new(1, 0.5);
+            --     goldStatFrame.goldLabel.Position = UDim2.new(1, -50, 0.5, 0);
+            --     goldStatFrame.goldLabel.Size = UDim2.new(0, 85, 0, 36);
+            --     goldStatFrame.goldLabel.TextXAlignment = Enum.TextXAlignment.Right;
 
-            end
+            -- end
         end
     end
 
@@ -1075,7 +1077,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 
     local function updateScrollIndicator()
-        downIndicator.Visible = rScrollFrame.CanvasPosition.Y < (rScrollFrame.CanvasSize.Y.Offset - rScrollFrame.AbsoluteWindowSize.Y)-1;
+        downIndicator.Visible = rScrollFrame.CanvasPosition.Y < (rScrollFrame.AbsoluteCanvasSize.Y - rScrollFrame.AbsoluteWindowSize.Y)-1;
         upIndicator.Visible = rScrollFrame.CanvasPosition.Y > 0;
     end
 
@@ -1085,10 +1087,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         updateScrollIndicator();
     end)
     backButton.MouseMoved:Connect(function()
-        backButton.ImageColor3 = modBranchConfigs.CurrentBranch.Color;
+        backButton.buttonImage.ImageColor3 = modBranchConfigs.CurrentBranch.Color;
     end)
     backButton.MouseLeave:Connect(function()
-        backButton.ImageColor3 = Color3.fromRGB(255,255,255);
+        backButton.buttonImage.ImageColor3 = Color3.fromRGB(255,255,255);
     end)
 
     lScrollFrame:WaitForChild("SearchBox"):WaitForChild("ClearButton").MouseButton1Click:Connect(function()

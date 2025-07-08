@@ -9,7 +9,7 @@ if RunService:IsServer() then
 	local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	shared.modEventService:OnInvoked("Npcs_OnDamaged", function(event: EventPacket, damageData: DamageData)
+	shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, damageData: DamageData)
 		local storageItem: StorageItem? = damageData.StorageItem;
 		if storageItem == nil then return end;
 

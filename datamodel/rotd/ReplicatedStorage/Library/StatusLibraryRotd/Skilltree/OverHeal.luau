@@ -15,9 +15,10 @@ if RunService:IsServer() then
     local statusId = statusPackage.Id;
     
     function statusPackage.onRequire()
-        shared.modEventService:OnInvoked("Players_OnHeal", function(event: EventPacket, ...)
+        shared.modEventService:OnInvoked("Players_BindHeal", function(event: EventPacket, ...)
             local playerClass: PlayerClass, healData: DamageData = ...;
-            
+            if healData.CanOverheal ~= true then return end;
+
             local player: Player = playerClass:GetInstance();
             local healthComp: HealthComp = playerClass.HealthComp;
             local statusComp: StatusComp = playerClass.StatusComp;
@@ -64,13 +65,13 @@ if RunService:IsServer() then
         end);
     end
 
-    function statusPackage.OnUpdate(statusClass: StatusClassInstance)
+    function statusPackage.BindUpdate(statusClass: StatusClassInstance)
         if statusClass.StatusOwner.ClassName == "PlayerClass" then
             statusClass.StatusOwner:UpdateHealthStats();
         end
     end
 
-    statusPackage.OnApply = statusPackage.OnUpdate;
+    statusPackage.BindApply = statusPackage.BindUpdate;
 end
 
 return modStatusClass.new(statusPackage);

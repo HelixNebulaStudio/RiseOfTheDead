@@ -133,12 +133,12 @@ return function(CutsceneSequence)
 							dianaModule.InCutscene = true;
 							dianaModule.Actions:Teleport(CFrame.new(-130.710892, 10.5228786, 284.348938, 0, 0, -1, 0, 1, 0, 1, 0, 0));
 							dianaModule.Move:MoveTo(Vector3.new(-137.6, 10.5, 275.6));
-							dianaModule.Move.MoveToEnded:Wait(5);
+							dianaModule.Move.OnMoveToEnded:Wait(5);
 							
 							wait(0.3);
 							dianaModule.Actions:Teleport(CFrame.new(-136.80545, 10.5228777, 268.696259, 0.866, 0, -0.500000954, 0, 1, 0, 0.500000954, 0, 0.866024852));
 							dianaModule.Move:MoveTo(Vector3.new(-123.7, 10.5, 276.9));
-							dianaModule.Move.MoveToEnded:Wait(5);
+							dianaModule.Move.OnMoveToEnded:Wait(5);
 							dianaModule.Move:Face(Vector3.new(-118.4, 10.5, 276.9));
 						end
 

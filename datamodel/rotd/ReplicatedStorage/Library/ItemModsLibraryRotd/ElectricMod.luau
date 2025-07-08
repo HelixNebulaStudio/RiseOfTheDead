@@ -37,6 +37,8 @@ end
 if RunService:IsServer() then
 
 	function modifierPackage.Binds.OnBulletHit(modifier: ItemModifierInstance, packet: OnBulletHitPacket)
+		if packet.TargetModel == nil then return end;
+		
 		local maxTargets = modifier.Values.Targets;
 		local damagePercent = modifier.Values.DamagePercent;
 
