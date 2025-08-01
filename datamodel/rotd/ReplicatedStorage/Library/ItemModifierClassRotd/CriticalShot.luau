@@ -25,9 +25,9 @@ function modifierPackage.Binds.OnNewDamage(modifier: ItemModifierInstance, damag
     local critChance = configurations.CritChance or 0;
 
     local player = modifier.Player;
-    local classPlayer = player and shared.modPlayers.get(player);
-    if classPlayer and classPlayer.Properties and classPlayer.Properties.CritBoost then
-        critChance = critChance + (classPlayer.Properties.CritBoost.Amount/100);
+    local playerClass: PlayerClass = player and shared.modPlayers.get(player);
+    if playerClass and playerClass.Properties and playerClass.Properties.CritBoost then
+        critChance = critChance + (playerClass.Properties.CritBoost.Amount/100);
     end
     
     if critChance <= 0 then return end;

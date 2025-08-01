@@ -1,5 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local RunService = game:GetService("RunService");
+
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 
@@ -10,9 +12,9 @@ local toolPackage = {
 
 	Animations={
 		Core={Id=16923739633;};
-		PrimaryAttack={Id=17765553002};
+		PrimaryAttack={Id=17765553002;};
 		Load={Id=16923742307};
-		Inspect={Id=16923747582;};
+		Inspect={Id=16923747582; WaistStrength=0.2;};
 		Charge={Id=16923735442;};
 		Throw={Id=16923753693};
 		Unequip={Id=16923756581};
@@ -35,7 +37,7 @@ local toolPackage = {
 		PrimaryAttackSpeed=0.5;
 		PrimaryAttackAnimationSpeed=0.5;
 
-		HitRange=8;
+		HitRange = 8;
 
 		WaistRotation=math.rad(0);
 		StaminaCost = 25;
@@ -45,22 +47,23 @@ local toolPackage = {
 
 		-- Throwable
 		Throwable = true;
+		ThrowRange = 40;
 		ThrowDamagePercent = 0.04;
 
-		ChargeDuration = 0.5;
+		ChargeDuration = 1;
 		ThrowStaminaCost = 25;
-
+		
 		ThrowRate = 1;
 		ThrowWaistRotation=math.rad(0);
 
 		--== Projectile
 		ProjectileId = "pickaxe";
 		ProjectileConfig = {
-			Velocity = 30;
+			Velocity = 60;
 			Bounce = 0;
 			LifeTime = 10;
 		};
-		VelocityBonus = 30;
+		VelocityBonus = 60;
 
 		ConsumeOnThrow=false;
 	};
@@ -69,6 +72,11 @@ local toolPackage = {
 
 function toolPackage.newClass()
 	return modEquipmentClass.new(toolPackage);
+end
+
+function toolPackage.BindMeleePointHit(handler: ToolHandlerInstance, packet)
+	if not game:GetService("RunService"):IsStudio() then return end;
+	Debugger:Warn("MeleePointHit", packet);
 end
 
 return toolPackage;

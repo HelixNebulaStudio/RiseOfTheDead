@@ -3,6 +3,42 @@ tags:
   - source
   - mechanics
 ---
+# Behavior Trees
+Behavior trees determines how a entity make decisions. The current system uses what I call a **LogicString**. 
+
+**LogicString** is a string that creates a chain of boolean logic. Using `&` for AND logic, `|` for OR logic and `!` for a NOT logic. Words in a LogicString are a function name which should return either `true`, `false` or `nil`. A word with the `[word]` brackets are **[Action]** functions, these stop the chain from proceeding regardless of return value. Since it's like boolean logic, curly brackets `()` will reorder the logic sequence. 
+
+### Example:
+
+```lua
+Default = "IsThirsty & HasWater & [DrinkWater] | IdleTree";
+IdleTree = "ShouldIdle & [DoIdle]"
+```
+In this LogicString, it proceeds with the logic from left to right. First look for function called `IsThirsty` and if function returns `true`, the flow continues to `HasWater`, otherwise, it jumps to the OR (`|`) logic which continues with `IdleTree`.
+
+If the tree hits `[DrinkWater]` which is consider an **[Action]**, it ends the flow regardless of what the function returns, hence it will not reach `IdleTree`.
+
+When `ShouldIdle` return false, it will just end the flow and perform no action.
+
+The flow chart would look more like this below.
+```mermaid
+flowchart LR
+	A{Default}
+	A --> B{{IsThirsty}}
+	B --> |true|C{{HasWater}}
+	C --> |true|D>DrinkWater]
+	B --> |false|E{IdleTree}
+	C --> |false|E{IdleTree}
+```
+```mermaid
+flowchart LR
+	A{IdleTree}
+	A --> B{{ShouldIdle}}
+	B --> |true|C>DoIdle]
+```
+More information on the Behavior Tree redesign: [[Behavior Tree Design]]
+
+# Old Behavior Trees 2.2
 Behavior trees are logic trees that determine how a entity make decisions.
 
 ### Tree Nodes

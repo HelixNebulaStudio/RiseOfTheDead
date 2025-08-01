@@ -34,17 +34,17 @@ return function(CutsceneSequence)
 		if mission == nil then return end;
 		
 
-		local walterModule = modNpcs.getByOwner(player, "Walter");
+		local walterModule = modNpcs.getPlayerNpc(player, "Walter");
 		if walterModule == nil then
 			local npc = modNpcs.spawn("Walter", nil, function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				walterModule = npcModule;
 			end);
 			modReplicationManager.ReplicateOut(player, npc);
 			walterModule:TeleportHide();
 		end
 
-		local wilsonModule = modNpcs.getByOwner(player, "Wilson");
+		local wilsonModule = modNpcs.getPlayerNpc(player, "Wilson");
 		local waypoint1 = Vector3.new(641.839, 93.332, -72.035);
 		local cargoScene, helicopterPrefab, heliCfTag, cargoDoorA, cargoDoorB, cargoDoorATag, cargoDoorBTag;
 		
@@ -165,19 +165,19 @@ return function(CutsceneSequence)
 					walterModule.Movement:Move(Vector3.new(648.141, 94.54, -73.628)):Wait();
 					walterModule.Actions:Teleport(CFrame.new(648.140991, 94.5396881, -73.6277466, 0, 0, 1, 0, 1, 0, -1, 0, 0));
 					wilsonModule.Move:Face(walterModule.RootPart.Position);
-					walterModule.Chat(walterModule.Owner, "Why hello Wrighton Dale!");
+					walterModule.Chat(walterModule.Player, "Why hello Wrighton Dale!");
 					wait(5);
-					walterModule.Chat(walterModule.Owner, "What a mess it has became..");
+					walterModule.Chat(walterModule.Player, "What a mess it has became..");
 					wait(5);
-					wilsonModule.Chat(wilsonModule.Owner, "Are you the only inspector they sent?");
+					wilsonModule.Chat(wilsonModule.Player, "Are you the only inspector they sent?");
 					wait(5);
-					walterModule.Chat(walterModule.Owner, "Oh, err, yes. Can you verify that this location is secure?");
+					walterModule.Chat(walterModule.Player, "Oh, err, yes. Can you verify that this location is secure?");
 					wait(5);
-					wilsonModule.Chat(wilsonModule.Owner, "I can verify, we've set up station here for a while now..");
+					wilsonModule.Chat(wilsonModule.Player, "I can verify, we've set up station here for a while now..");
 					wait(5);
-					walterModule.Chat(walterModule.Owner, "Very well, I can begin my tasks.");
+					walterModule.Chat(walterModule.Player, "Very well, I can begin my tasks.");
 					wait(3);
-					walterModule.Chat(walterModule.Owner, "Gas concentration readings.. looks acceptable to breath..");
+					walterModule.Chat(walterModule.Player, "Gas concentration readings.. looks acceptable to breath..");
 					wait(3);
 					walterModule.PlayAnimation("TakeOffMask");
 					wait(0.5);
@@ -191,11 +191,11 @@ return function(CutsceneSequence)
 					nWeld.Part1 = walterModule.Head;
 
 					wait(2);
-					walterModule.Chat(walterModule.Owner, "Oh wow, it stinks..");
+					walterModule.Chat(walterModule.Player, "Oh wow, it stinks..");
 					walterModule.AvatarFace:Set("Question");
 					wait(5);
 					walterModule.Actions:FaceOwner();
-					walterModule.Chat(walterModule.Owner, "You there, come here..");
+					walterModule.Chat(walterModule.Player, "You there, come here..");
 					walterModule.AvatarFace:Set("Confident");
 
 					modMission:Progress(player, MISSION_ID, function(mission)

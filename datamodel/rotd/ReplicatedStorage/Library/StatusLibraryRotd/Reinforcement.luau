@@ -27,7 +27,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
 
     local npcModel = shared.modNpcs.spawn(npcName, playerClass.RootPart.CFrame, function(npc, npcModule)
         npcModule.Humanoid.Name = "Pet";
-        npcModule.Owner = playerClass:GetInstance();
+        npcModule.Player = playerClass:GetInstance();
     end, shared.require(game.ServerStorage.Prefabs.CustomNpcModules.PetNpcModule));
 
     playerClass.Properties.ReinforcementBuff = npcModel;

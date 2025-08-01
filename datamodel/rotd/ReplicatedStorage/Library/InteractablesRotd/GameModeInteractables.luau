@@ -36,15 +36,6 @@ function interactablePackage.init(super) -- Server/Client
 		if stage == "Random" then
 			interactable.Values.Random = true;
 		end
-		
-		--==== Variants
-		if RunService:IsClient() then
-			if interactable.Variant == "LockedByThePrisoner"
-			or interactable.Variant == "LockedByFactoryRaid" then
-				interactable.CanInteract = false;
-			end
-		end
-		--====
     end
 
     -- When interacting with interactable.
@@ -104,35 +95,10 @@ function interactablePackage.init(super) -- Server/Client
     function GameModeEnter.BindPrompt(interactable: InteractableInstance, info: InteractInfo)
 		if RunService:IsServer() then return end;
 
-		--==== Variants
-			local clientData = info.ClientData;
-			if clientData == nil then return end;
+		local clientData = info.ClientData;
+		if clientData == nil then return end;
 
-			if interactable.Variant == "LockedByThePrisoner" then
-				local missionData = clientData:GetMission(7);
-				local missionCompleted = missionData and (missionData.Type == 1 or missionData.Type == 3);
-
-				if not missionCompleted then
-					interactable.CanInteract = false;
-					interactable.Label = `Suspicious looking door...`;
-					return;
-				end;
-
-			elseif interactable.Variant == "LockedByFactoryRaid" then
-				local missionData = clientData:GetMission(12);
-				local missionCompleted = missionData and (missionData.Type == 1 or missionData.Type == 3);
-
-				if not missionCompleted then
-					interactable.CanInteract = false;
-					interactable.Label = `Door is locked, complete "Factory Raid" mission to unlock.`;
-					return;
-				end;
-
-			end
-
-			interactable.CanInteract = true;
-		--====
-
+		interactable.CanInteract = true;
 
 		if interactable.Values.Random == true then
 			shuffleRandom(interactable);

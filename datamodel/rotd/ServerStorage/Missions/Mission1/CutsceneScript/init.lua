@@ -283,15 +283,10 @@ return function(CutsceneSequence)
 		masonNpcClass = modNpcs.spawn2({
 			Name = "Mason";
 			CFrame = CFrame.new(-1.22, 55.46, -287.322);
-			Owner = player;
+			Player = player;
 			AddComponents = {};
 		});
 		masonPrefab = masonNpcClass.Character;
-		
-		-- local attractNpcsComp = masonNpcClass:GetComponent("AttractNpcs");
-		-- attractNpcsComp.AttractHumanoidType = {"Zombie"};
-		-- attractNpcsComp.SelfAttractAlert = true;
-		-- attractNpcsComp:Activate();
 		
 		local actionIndex = 0;
 		local cutsceneActions = {};

@@ -145,7 +145,7 @@ if RunService:IsServer() then
 			local stage = mission.ProgressionPoint;
 			if stage == 12 then
 				dialog:SetInitiate("...");
-				local dallasModule: NpcClass = modNpcs.getByOwner(player, "Dallas");
+				local dallasModule: NpcClass = modNpcs.getPlayerNpc(player, "Dallas");
 				if dallasModule.Humanoid.PlatformStand then
 					dialog:AddChoice("investigation_wakeUp", function(dialog)
 						if dallasModule then

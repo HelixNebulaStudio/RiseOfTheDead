@@ -16,9 +16,9 @@ local npcPackage = {
 
     Voice = {
         VoiceId = 5;
-        Pitch = 1.1;
+        Pitch = 1.05;
         Speed = 1;
-        PlaybackSpeed = 0.95;
+        PlaybackSpeed = 1;
     };
 
     IdleRandomChat = {

@@ -51,6 +51,8 @@ local statTemplates = {
 
 		{Key="BleedDamagePercent"; Text="<b>Bleed Damage Percent:</b>    $stat%"; Type="percent";};
 		{Key="BleedSlowPercent"; Text="<b>Bleed Slow Percent:</b>    $stat%"; Type="percent";};
+
+		{Key="ThrowRange"; Text="<b>Throwing Range:</b>    $stat u"; Type="2dp";};
 	};
 	--MARK: Weapon stats;
 	Gun={
@@ -289,6 +291,9 @@ local mouseOverDescription = {
 	BleedSlowPercent={
 		Desc="Bleed debuff applies a slow by percentage.";
 	};
+    ThrowRange={
+		Desc="The range of accurate melee throws.";
+    };
 
 	--MARK: Clothings desc;
 	HotEquipSlots={

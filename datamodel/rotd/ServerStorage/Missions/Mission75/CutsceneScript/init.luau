@@ -522,7 +522,7 @@ return function(CutsceneSequence)
 					-- patrol bandit
 					local patrolBanditSpawn = CFrame.new(498.821, 136.42, -1123.854) * CFrame.Angles(0, math.rad(-165), 0);
 					modNpcs.spawn("Bandit", patrolBanditSpawn, function(npc, npcModule)
-						npcModule.Owner = player;
+						npcModule.Player = player;
 						patrolBandit = npcModule;
 						
 						npcModule.Allied = banditsAllied;

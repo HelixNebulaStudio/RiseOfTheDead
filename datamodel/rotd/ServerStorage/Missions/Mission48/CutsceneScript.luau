@@ -74,7 +74,7 @@ return function(CutsceneSequence)
 		newBlockage.Parent = workspace.Environment;
 		modReplicationManager.ReplicateOut(player, newBlockage);
 		
-		local strangerModule = modNpcs.getByOwner(player, "Stranger", function(npcModule)
+		local strangerModule = modNpcs.getPlayerNpc(player, "Stranger", function(npcModule)
 			return npcModule.MissionId == MISSION_ID;
 		end);
 		
@@ -83,7 +83,7 @@ return function(CutsceneSequence)
 				npcModule.MissionId = MISSION_ID;
 				npcModule.FollowingOwner = false;
 				npcModule.Seed = (mission.SaveData.Seed or 1);
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				npcModule.Immortal = 1;
 				strangerModule = npcModule;
 			end);

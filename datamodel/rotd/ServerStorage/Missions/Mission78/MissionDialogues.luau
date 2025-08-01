@@ -81,7 +81,7 @@ if RunService:IsServer() then
 		local modNpcs = shared.modNpcs;
 
 		local lydiaModule = modNpcs.getByModel(dialog.Prefab)
-		if lydiaModule == nil or lydiaModule.Owner ~= player then
+		if lydiaModule == nil or lydiaModule.Player ~= player then
 			shared.Notify(player, "[The Killer Hues] You are not in your safehome for this mission.", "Inform"); 
 			return;
 		end;
@@ -107,7 +107,7 @@ if RunService:IsServer() then
 					ToggleWindow="NpcWindow";
 				}, function(dialog)
 					if lydiaModule then
-						lydiaModule.Chat(lydiaModule.Owner, "I hope the gun is pretty. :3");
+						lydiaModule.Chat(lydiaModule.Player, "I hope the gun is pretty. :3");
 					end
 				end, "Lydia");
 				

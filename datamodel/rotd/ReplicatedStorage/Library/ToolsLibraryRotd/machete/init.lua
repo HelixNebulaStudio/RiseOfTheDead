@@ -13,7 +13,7 @@ local toolPackage = {
 		Load={Id=110742733779650;};
 		PrimaryAttack={Id={91842639525261; 70616300336827}};
 		HeavyAttack={Id=115586386679572};
-		Inspect={Id=103025753935487;};
+		Inspect={Id=103025753935487; WaistStrength=0.2;};
 		Unequip={Id=101946188265103};
 	};
 	Audio={

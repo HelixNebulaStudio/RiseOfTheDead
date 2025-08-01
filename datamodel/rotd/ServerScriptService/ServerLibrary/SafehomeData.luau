@@ -222,7 +222,7 @@ function SafehomeData.onRequire()
 			npcData.Active = nil;
 			
 			if modBranchConfigs.IsWorld("Safehome") and isOwner then
-				local survivorNpcClass = shared.modNpcs.getByOwner(player, npcName);
+				local survivorNpcClass = shared.modNpcs.getPlayerNpc(player, npcName);
 				survivorNpcClass:TeleportHide();
 			end
 			
@@ -500,7 +500,7 @@ function SafehomeData:GetNpc(npcName: string)
 		storage.OnChanged:Connect(function()
 			modOnGameEvents:Fire("OnStorageChanged", self.Player, storage);
 			
-			local npcClass = shared.modNpcs.getByOwner(self.Player, npcName);
+			local npcClass = shared.modNpcs.getPlayerNpc(self.Player, npcName);
 			if npcClass then
 				local storageItemIndexList = storage:GetIndexDictionary();
 

@@ -34,7 +34,7 @@ return function(CutsceneSequence)
 		local jesseModule = modNpcs.get(player, "Jesse");
 		if jesseModule == nil then
 			local npc = modNpcs.spawn("Jesse", nil, function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				jesseModule = npcModule;
 			end);
 			modReplicationManager.ReplicateOut(player, npc);

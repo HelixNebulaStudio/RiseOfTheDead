@@ -16,7 +16,7 @@ local toolPackage = {
 	Animations={
 		Core={Id=16971537726; IdRoleplay=16971600436;};
 		Load={Id=16971542912;};
-		Inspect={Id=16971597553;};
+		Inspect={Id=16971597553; WaistStrength=0.2;};
 		Unequip={Id=16971602144};
 		PrimaryAttack={Id=16971526990;};
 		HeavyAttack={Id=16971594147};

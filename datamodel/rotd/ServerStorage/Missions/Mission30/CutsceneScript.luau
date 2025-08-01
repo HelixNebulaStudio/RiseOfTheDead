@@ -30,10 +30,10 @@ return function(CutsceneSequence)
 			local vladimirPrefab = workspace.Entity:FindFirstChild("Vladimir");
 			local vladimirModule = vladimirPrefab and modNpcs.getByModel(vladimirPrefab);
 			
-			local stanModule = modNpcs.getByOwner(player, "Stan");
+			local stanModule = modNpcs.getPlayerNpc(player, "Stan");
 			if stanModule == nil then
 				local npc = modNpcs.spawn("Stan", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					stanModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
@@ -56,7 +56,7 @@ return function(CutsceneSequence)
 					if mission.ProgressionPoint == 1 then
 						stanModule.Interactable.Parent = script;
 						wait(3);
-						stanModule.Chat(stanModule.Owner, "Follow me...");
+						stanModule.Chat(stanModule.Player, "Follow me...");
 						
 						stanModule.Movement:SetWalkSpeed("default", 25);
 						stanModule.Movement:Move(Vector3.new(308.2, 9.83, 1.94)):Wait(20);
@@ -68,7 +68,7 @@ return function(CutsceneSequence)
 						stanModule.Movement:Move(Vector3.new(280, 9.83, -6.45)):Wait(5);
 						stanModule.Movement:Face(Vector3.new(287.25, 9.83, -6.54));
 						wait(1);
-						stanModule.Chat(stanModule.Owner, "Hey ehh, Rachel, I need to patch up again..");
+						stanModule.Chat(stanModule.Player, "Hey ehh, Rachel, I need to patch up again..");
 						wait(1.5);
 						if rachelModule then rachelModule.Chat(player, "You need to be careful out there.."); end;
 						wait(1.5);
@@ -79,19 +79,19 @@ return function(CutsceneSequence)
 						if rachelModule then rachelModule.Chat(player, "There, done."); end;
 						wait(1)
 						stanModule.Humanoid.Health = 100;
-						stanModule.Chat(stanModule.Owner, "Thanks a lot.");
+						stanModule.Chat(stanModule.Player, "Thanks a lot.");
 						wait(1)
 						stanModule.Movement:SetWalkSpeed("default", 14);
 						stanModule.Movement:Move(Vector3.new(224.28, 9.83, -10.46)):Wait(5);
 						stanModule.Movement:SetWalkSpeed("default", 7);
 						wait(1)
-						stanModule.Chat(stanModule.Owner, "Yo Vald! When are you going to have stock of that item I wanted?!");
+						stanModule.Chat(stanModule.Player, "Yo Vald! When are you going to have stock of that item I wanted?!");
 						wait(2)
 						if vladimirModule then vladimirModule.Chat(player, "Ugh.. Not sure, stop asking please. Так раздражает.."); end
 						wait(3)
 						stanModule.Movement:Move(Vector3.new(235.3, 9.8, 10.4)):Wait(8);
 						stanModule.Actions:FaceOwner();
-						stanModule.Chat(stanModule.Owner, "Hey, "..player.Name);
+						stanModule.Chat(stanModule.Player, "Hey, "..player.Name);
 						stanModule.Interactable.Parent = stanModule.Prefab;
 						
 						modMission:Progress(player, MISSION_ID, function(mission)
@@ -119,7 +119,7 @@ return function(CutsceneSequence)
 						stanModule.Movement:Move(Vector3.new(271.33, 25.69, -20.69)):Wait(5);
 						stanModule.Movement:Face(Vector3.new(276.16, 28.8, -40.043));
 						stanModule.Wield.Equip("czevo3");
-						stanModule.Chat(stanModule.Owner, "Oh boy.. we better just save ammo and run past them.");
+						stanModule.Chat(stanModule.Player, "Oh boy.. we better just save ammo and run past them.");
 						wait(5);
 						if stanModule == nil then return end;
 						stanModule.Movement:SetWalkSpeed("default", 25);
@@ -130,7 +130,7 @@ return function(CutsceneSequence)
 						wait(1)
 						if stanModule == nil then return end;
 						stanModule.Actions:FaceOwner();
-						stanModule.Chat(stanModule.Owner, "Ah.. Wrighton Dale Mall.. ");
+						stanModule.Chat(stanModule.Player, "Ah.. Wrighton Dale Mall.. ");
 						
 					elseif mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 9 then
 						if stanModule == nil then return end;
@@ -156,13 +156,13 @@ return function(CutsceneSequence)
 			local patrickModule = patrickPrefab and modNpcs.getByModel(patrickPrefab);
 			
 			local mallStanSpawn = CFrame.new(755.640137, 59.1950226, -805.369812, -1, 0, 0, 0, 1, 0, 0, 0, -1);
-			local stanModule = modNpcs.getByOwner(player, "Stan");
+			local stanModule = modNpcs.getPlayerNpc(player, "Stan");
 			
 			local function OnChanged(firstRun)
 				if mission.Type == 1 then -- OnActive
 					if firstRun and mission.ProgressionPoint >= 4 and stanModule == nil then
 						local npc = modNpcs.spawn("Stan", mallStanSpawn, function(npc, npcModule)
-							npcModule.Owner = player;
+							npcModule.Player = player;
 							stanModule = npcModule;
 						end);
 						modReplicationManager.ReplicateOut(player, npc);
@@ -218,11 +218,11 @@ return function(CutsceneSequence)
 						
 						patrickModule.Chat(player, "HALT! STOP RIGHT THERE OR I SHOOT!");
 						wait(1);
-						stanModule.Chat(stanModule.Owner, "WAIT wait wait!!! We are here to talk!");
+						stanModule.Chat(stanModule.Player, "WAIT wait wait!!! We are here to talk!");
 						wait(2);
 						patrickModule.Chat(player, "What do you want?!");
 						wait(2);
-						stanModule.Chat(stanModule.Owner, "We want to speak to your leader.");
+						stanModule.Chat(stanModule.Player, "We want to speak to your leader.");
 						wait(2);
 						patrickModule.Chat(player, "Not gonna happen. Leave now!");
 						wait(2);

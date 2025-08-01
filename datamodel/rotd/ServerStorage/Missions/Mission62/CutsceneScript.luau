@@ -36,10 +36,10 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 				
-			local revasModule = modNpcs.getByOwner(player, "Revas");
+			local revasModule = modNpcs.getPlayerNpc(player, "Revas");
 			if revasModule == nil then
 				local npc = modNpcs.spawn("Revas", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					revasModule = npcModule;
 
 				end);
@@ -103,10 +103,10 @@ return function(CutsceneSequence)
 			local sound = modAudio.Play("GreyAmbience", workspace);
 			sound.Volume = 0.03;
 			
-			local revasModule = modNpcs.getByOwner(player, "Revas");
+			local revasModule = modNpcs.getPlayerNpc(player, "Revas");
 			if revasModule == nil then
 				local npc = modNpcs.spawn("Revas", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					revasModule = npcModule;
 
 				end);
@@ -423,10 +423,10 @@ return function(CutsceneSequence)
 			if mission == nil then return end;
 				
 
-			local revasModule = modNpcs.getByOwner(player, "Revas");
+			local revasModule = modNpcs.getPlayerNpc(player, "Revas");
 			if revasModule == nil then
 				local npc = modNpcs.spawn("Revas", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					revasModule = npcModule;
 
 				end);

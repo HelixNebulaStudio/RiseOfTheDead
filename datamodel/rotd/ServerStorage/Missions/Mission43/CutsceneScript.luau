@@ -31,10 +31,10 @@ return function(CutsceneSequence)
 			if mission == nil then return end;
 				
 			if not modMission:IsComplete(player, MISSION_ID) and mission.ProgressionPoint < 4 then
-				local jackreap = modNpcs.getByOwner(player, "Jack Reap");
+				local jackreap = modNpcs.getPlayerNpc(player, "Jack Reap");
 				if jackreap == nil then
 					local npc = modNpcs.spawn("Jack Reap", nil, function(npc, npcModule)
-						npcModule.Owner = player;
+						npcModule.Player = player;
 						jackreap = npcModule;
 					end);
 					modReplicationManager.ReplicateOut(player, npc);
@@ -80,7 +80,7 @@ return function(CutsceneSequence)
 						local zombieModule;
 						local npc = modNpcs.spawn("Zombie", CFrame.new(440.02, 103.431, -651.14), function(npc, npcModule)
 							npcModule.NetworkOwners = {player};
-							npcModule.Owner = player;
+							npcModule.Player = player;
 							npcModule.FullNekron = true;
 							npcModule.NekronAppearance = jackReapPrefab;
 							npcModule.JackReapZombie = true;

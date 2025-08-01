@@ -12,6 +12,13 @@ local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 --==
 
 shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
+	local wieldComp: WieldComp = playerClass.WieldComp;
+
+	wieldComp.TargetableTags.Zombie = true;
+	wieldComp.TargetableTags.Bandit = true;
+    wieldComp.TargetableTags.Cultist = true;
+	wieldComp.TargetableTags.Rat = true;
+
     if RunService:IsClient() then return end;
     
     local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);

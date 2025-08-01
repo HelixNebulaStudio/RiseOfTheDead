@@ -155,10 +155,10 @@ return function(CutsceneSequence)
 		if mission == nil then return end;
 		
 		
-		local robertModule = modNpcs.getByOwner(player, "Robert");
+		local robertModule = modNpcs.getPlayerNpc(player, "Robert");
 		if robertModule == nil then
 			local npc = modNpcs.spawn("Robert", nil, function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				robertModule = npcModule;
 			end);
 			modReplicationManager.ReplicateOut(player, npc);
@@ -177,7 +177,7 @@ return function(CutsceneSequence)
 				robertModule.StopAnimation("Holding");
 				robertModule.StopAnimation("Sit");
 				robertModule.Actions:EnterDoor("warehouseEntrance");
-				robertModule.Chat(robertModule.Owner, "Oh thank goodness dude..");
+				robertModule.Chat(robertModule.Player, "Oh thank goodness dude..");
 				local face = robertModule.Prefab:FindFirstChild("face", true);
 				if face then face.Texture = "rbxassetid://15470952" end;
 				
@@ -197,7 +197,7 @@ return function(CutsceneSequence)
 				robertModule.Actions:Teleport(CFrame.new(15.6800423, 57.6597404, 42.3099594));
 				
 				robertModule.Move:Face(Vector3.new(15.6800423, 57.6597404, 37.0099602));
-				robertModule.Chat(robertModule.Owner, "");
+				robertModule.Chat(robertModule.Player, "");
 				
 				task.wait(0.4);
 				robertModule.PlayAnimation("Sit", 0.75);

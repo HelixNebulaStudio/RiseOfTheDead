@@ -273,6 +273,11 @@ if RunService:IsServer() then
 					return;
 				end
 
+				if wieldComp.ItemId == "boombox" then 
+					wieldComp:Unequip();
+					return
+				end;
+
 				wieldComp:Equip({
 					ItemId = "boombox";
 					OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
@@ -309,8 +314,8 @@ if RunService:IsServer() then
 				addDialog("Stay alert for Zombies", "Okie dokie", function(dialog)
 					local wieldComp: WieldComp = npcClass.WieldComp;
 
-					if npcClass.Owner ~= player then
-						npcClass.Owner = player;
+					if npcClass.Player ~= player then
+						npcClass.Player = player;
 						Debugger:StudioWarn(`Set owner for {npcName}`);
 					end
 
@@ -392,6 +397,39 @@ if RunService:IsServer() then
 					end)
 				end)
 			end
+
+			addDialog("Equip machete and swing it if a zombie comes near", "Okie dokie", function(dialog)
+				local wieldComp: WieldComp = npcClass.WieldComp;
+
+				if wieldComp.ItemId ~= "machete" then
+					wieldComp:Equip{
+						ItemId = "machete";
+					};
+				end
+
+				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+				task.spawn(function()
+					while wieldComp.ItemId == "machete" do
+						task.wait(0.1);
+						local enemyTargetData = targetHandlerComp:MatchFirstTarget(function(targetData)
+							if targetData.HealthComp == nil then return end;
+							local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
+							
+							return targetNpcClass.HumanoidType == "Zombie" and targetData.HealthComp.IsDead == false;
+						end);
+						if enemyTargetData == nil then continue end;
+						Debugger:Warn(`enemyTargetDistance = {enemyTargetData.Distance}`);
+						if enemyTargetData.Distance > 6 then continue end;
+
+						local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
+						
+						npcClass.Move:HeadTrack(enemyNpcClass.RootPart, 2);
+						npcClass.Move:Face(enemyNpcClass.RootPart.Position);
+
+						wieldComp:InvokeToolAction("PrimarySwingRequest");
+					end
+				end)
+			end)
 		end
 
 		if modMission:Progress(player, 54) then return end;

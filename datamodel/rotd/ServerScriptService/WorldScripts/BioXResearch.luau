@@ -35,6 +35,7 @@ function WorldCore.onRequire()
             player.CharacterAdded:Once(function()
 			    game.Players:SetAttribute("AutoRespawn", true);
             end)
+
         end, 999);
 
 		shared.modEventService:OnInvoked("Dialogue_BindMedicHeal", function(event: EventPacket, ...)
@@ -49,6 +50,12 @@ function WorldCore.onRequire()
                 Debugger:Warn(`Dialogue_BindMedicHeal additional dialogue callback`);
             end);
 		end)
+
+        shared.modNpcs.spawn2{Name="Mason";};
+        shared.modNpcs.spawn2{Name="Russell";};
+        shared.modNpcs.spawn2{Name="Stephanie";};
+        shared.modNpcs.spawn2{Name="Nick";};
+        shared.modNpcs.spawn2{Name="Dr. Deniski";};
 
     elseif RunService:IsClient() then
 

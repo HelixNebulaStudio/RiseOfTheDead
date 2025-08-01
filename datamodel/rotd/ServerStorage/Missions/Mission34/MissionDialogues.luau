@@ -63,7 +63,7 @@ if RunService:IsServer() then
 			elseif stage == 2 then
 				dialog:SetInitiate("What are you standing around for?");
 				dialog:AddChoice("escort_heal", function(dialog)
-					local strangerModule = modNpcs.getByOwner(player, "Stranger");
+					local strangerModule = modNpcs.getPlayerNpc(player, "Stranger");
 					if strangerModule and strangerModule.Humanoid then
 						strangerModule.Humanoid.Health = strangerModule.Humanoid.MaxHealth;
 					end

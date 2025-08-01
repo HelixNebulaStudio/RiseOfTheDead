@@ -126,7 +126,7 @@ return function(CutsceneSequence)
 					if targetNpcName == "Diana" then
 						Debugger:Warn("Diana walk out");
 
-						local dianaModule = modNpcs.getByOwner(player, "Diana");
+						local dianaModule = modNpcs.getPlayerNpc(player, "Diana");
 						if dianaModule then
 							dianaModule.StopAnimation("Idle");
 

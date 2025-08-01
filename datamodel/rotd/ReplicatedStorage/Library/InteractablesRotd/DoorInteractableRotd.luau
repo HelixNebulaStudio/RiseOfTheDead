@@ -55,27 +55,11 @@ function interactablePackage.init(super) -- Server/Client
             elseif interactable.Id == "warehouseBalconyExit" then
                 interactable.InteractableRange = 8;
 
-            elseif interactable.Id == "warehouseFenceExit" then
-                local mission2 = clientData:GetMission(2);
-                if mission2 and mission2.Type == 1 then
-                    interactable.CanInteract = false;
-                    interactable.Label = `Door is locked, complete "Where am I" mission to unlock.`;
-                    return;
-                end
-
-            elseif interactable.Id == "lockedFactorydoor" then
-                local mission7 = clientData:GetMission(7);
-                if mission7 and mission7.Type == 3 then
-                    interactable.CanInteract = false;
-                    interactable.Label = `Door is locked, complete "The Prisoner" mission to unlock.`;
-                    return;
-                end
-
             elseif interactable.Id == "securityRoomEntrance" then
                 local mission7 = clientData:GetMission(7);
                 if mission7 == nil or (mission7.Type == 1 and mission7.ProgressionPoint < 4) then
                     interactable.CanInteract = false;
-                    interactable.Label = "Door is locked from the inside...";
+                    interactable.Label = "Door is locked, I think Robert might know how to get into this security room..";
                     return;
                 end
 

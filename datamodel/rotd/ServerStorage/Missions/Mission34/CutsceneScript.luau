@@ -35,7 +35,7 @@ return function(CutsceneSequence)
 		end
 		if player.Character == nil then return end;
 		
-		local strangerModule = modNpcs.getByOwner(player, "Stranger", function(npcModule)
+		local strangerModule = modNpcs.getPlayerNpc(player, "Stranger", function(npcModule)
 			return npcModule.MissionId == MISSION_ID;
 		end);
 
@@ -55,7 +55,7 @@ return function(CutsceneSequence)
 								npcModule.MissionId = 34;
 								npcModule.FollowingOwner = true;
 								npcModule.Seed = (mission.SaveData.Seed or 1);
-								npcModule.Owner = player;
+								npcModule.Player = player;
 								strangerModule = npcModule;
 							end
 						);

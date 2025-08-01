@@ -29,7 +29,7 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
-			local robertModule = modNpcs.getByOwner(player, "Robert");
+			local robertModule = modNpcs.getPlayerNpc(player, "Robert");
 
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
@@ -38,7 +38,7 @@ return function(CutsceneSequence)
 					if mission.ProgressionPoint == 2 then
 						if robertModule == nil then
 							local npc = modNpcs.spawn("Robert", CFrame.new(345.23999, 8.55466652, -7.92925215, 1, 0, 0, 0, 1, 0, 0, 0, 1), function(npc, npcModule)
-								npcModule.Owner = player;
+								npcModule.Player = player;
 								robertModule = npcModule;
 								robertModule.StatusComp.Disabled = true;
 							end);
@@ -106,11 +106,11 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
-			local robertModule = modNpcs.getByOwner(player, "Robert");
+			local robertModule = modNpcs.getPlayerNpc(player, "Robert");
 			local function spawnRobert()
 				if robertModule == nil then
 					local npc = modNpcs.spawn("Robert", CFrame.new(1127.07922, 57.5696716, -108.439293, -1, 0, 0, 0, 1, 0, 0, 0, -1), function(npc, npcModule)
-						npcModule.Owner = player;
+						npcModule.Player = player;
 						robertModule = npcModule;
 						robertModule.StatusComp.Disabled = true;
 					end);
@@ -119,7 +119,7 @@ return function(CutsceneSequence)
 					modReplicationManager.ReplicateOut(player, npc);
 
 					robertModule.Garbage:Tag(robertModule.BindOnTalkedTo.Event:Connect(function(prefab, target, choice)
-						if prefab == robertModule.Prefab and target == robertModule.Owner then
+						if prefab == robertModule.Prefab and target == robertModule.Player then
 							robertModule.Actions:FaceOwner();
 						end
 					end));

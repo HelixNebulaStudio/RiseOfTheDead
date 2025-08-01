@@ -35,7 +35,7 @@ return function(CutsceneSequence)
 			local masonModule = modNpcs.get(player, "Mason");
 			if masonModule == nil then
 				local npc = modNpcs.spawn("Mason", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					masonModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
@@ -53,7 +53,7 @@ return function(CutsceneSequence)
 						masonModule.StopAnimation("Lean");
 						masonModule:ToggleInteractable(false);
 
-						masonModule.Chat(masonModule.Owner, "Let me refill my weapons first.");
+						masonModule.Chat(masonModule.Player, "Let me refill my weapons first.");
 						
 						task.wait(1.5);
 						masonModule.Move:Face();
@@ -90,7 +90,7 @@ return function(CutsceneSequence)
 						masonModule.Wield.Unequip();
 						task.wait(0.1);
 						masonModule.Wield.Equip("revolver454");
-						masonModule.Chat(masonModule.Owner, "I'm ready when you are.");
+						masonModule.Chat(masonModule.Player, "I'm ready when you are.");
 						masonModule:ToggleInteractable(true);
 						masonModule.Actions:FaceOwner(function()
 							return mission.ProgressionPoint ~= 1;
@@ -123,7 +123,7 @@ return function(CutsceneSequence)
 						masonModule.Move:Face(Vector3.new(92.12, 57.62, 66.21));
 
 						task.wait(0.5);
-						masonModule.Chat(masonModule.Owner, "Stupid zombies..");
+						masonModule.Chat(masonModule.Player, "Stupid zombies..");
 						masonModule.Move:MoveTo(Vector3.new(92.12, 57.62, 66.21));
 
 						local region = Region3.new(Vector3.new(58.35, 56.65, -63.15), Vector3.new(110.45, 61.75, 69.95));
@@ -205,7 +205,7 @@ return function(CutsceneSequence)
 						masonModule.Move:MoveTo(Vector3.new(18.9, 57.7, 183));
 						masonModule.Move.OnMoveToEnded:Wait(10);
 						
-						modMission:Progress(masonModule.Owner, 12, function(mission)
+						modMission:Progress(masonModule.Player, 12, function(mission)
 							if mission.ProgressionPoint < 3 then
 								mission.ProgressionPoint = 3;
 							end;
@@ -238,7 +238,7 @@ return function(CutsceneSequence)
 							if mission.ProgressionPoint == 4 then
 								masonModule.Actions:Teleport(CFrame.new(18.9, 57.7, 183) * (masonModule.RootPart.CFrame - masonModule.RootPart.CFrame.p));
 								masonModule.Actions:WaitForOwner(30);
-								masonModule.Chat(masonModule.Owner, "Where have you been? Let's go in already..");
+								masonModule.Chat(masonModule.Player, "Where have you been? Let's go in already..");
 							end
 							
 						else
@@ -252,10 +252,10 @@ return function(CutsceneSequence)
 							
 							masonModule.Move:Face(Vector3.new(26, 58, 179));
 							
-							masonModule.Chat(masonModule.Owner, "Here it is. You first, haha!");
+							masonModule.Chat(masonModule.Player, "Here it is. You first, haha!");
 							task.wait(2);
 							if mission.Cache.Blockade then
-								masonModule.Chat(masonModule.Owner, "Destroy the wooden barricades so we can go in.");
+								masonModule.Chat(masonModule.Player, "Destroy the wooden barricades so we can go in.");
 							end
 							masonModule:ToggleInteractable(true);
 						end
@@ -279,7 +279,7 @@ return function(CutsceneSequence)
 					--masonModule.Movement:Move(Vector3.new(51.2800293, 57.6597404, 40.0281067));
 					if not firstRun then
 						masonModule.Move:MoveTo(Vector3.new(51.2800293, 57.6597404, 40.0281067));
-						masonModule.Chat(masonModule.Owner, "Good work, "..masonModule.Owner.Name.."!");
+						masonModule.Chat(masonModule.Player, "Good work, "..masonModule.Player.Name.."!");
 					end
 					masonModule.CarLoop();
 
@@ -301,7 +301,7 @@ return function(CutsceneSequence)
 				local masonModule = modNpcs.get(player, "Mason");
 				if masonModule == nil then
 					local npc = modNpcs.spawn("Mason", CFrame.new(63.452, 45.89, 3.248, 0, 0, 1, 0, 1, 0, -1, 0, 0), function(npc, npcModule)
-						npcModule.Owner = player;
+						npcModule.Player = player;
 						masonModule = npcModule;
 					end);
 					modReplicationManager.ReplicateOut(player, npc);

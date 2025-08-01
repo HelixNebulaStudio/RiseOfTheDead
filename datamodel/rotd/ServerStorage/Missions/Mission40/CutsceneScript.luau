@@ -54,7 +54,7 @@ if RunService:IsServer() then
 			local humanoid = targetModel and targetModel:FindFirstChildWhichIsA("Humanoid");
 			
 			if player then
-				humanoid:TakeDamage(5, self.Owner, self.StorageItem, part);
+				humanoid:TakeDamage(5, self.Player, self.StorageItem, part);
 				remoteCameraShakeAndZoom:FireClient(player, 5, 0, 0.3, 2, false);
 				if player then modStatusEffects.Burn(player, 94, 1); end;
 			end
@@ -148,10 +148,10 @@ return function(CutsceneSequence)
 				return;
 			end
 			
-			local victorModule = modNpcs.getByOwner(player, "Victor");
+			local victorModule = modNpcs.getPlayerNpc(player, "Victor");
 			if victorModule == nil then
 				local npc = modNpcs.spawn("Victor", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					victorModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);

@@ -19,11 +19,11 @@ function WorldCore.onRequire()
             local giftSpawn = CFrame.new(458.299988, 74.8267899, -1165.52124, 0, 0, 1, 0, 1, 0, -1, 0, 0);
             WorldCore:SpawnGift(player, "clinicGift", giftSpawn);
             
-            local mollyNpcClass = shared.modNpcs.getByOwner(player, "Molly");
+            local mollyNpcClass = shared.modNpcs.getPlayerNpc(player, "Molly");
             if mollyNpcClass == nil then
                 mollyNpcClass = shared.modNpcs.spawn2{
                     Name = "Molly";
-                    Owner = player;
+                    Player = player;
                     ReplicateOut = true;
                 };
             end

@@ -41,7 +41,7 @@ return function(CutsceneSequence)
 			
 			local function spawnBandit()
 				modNpcs.spawn("Bandit", CFrame.new(798.55481, 162.668854, -728.297119, 0, 0, 1, 0, 1, 0, -1, 0, 0), function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					gateBandit = npcModule;
 					
 					npcModule.Seed = player.UserId;
@@ -117,7 +117,7 @@ return function(CutsceneSequence)
 						npcModule.Seed = 16170945;
 					end
 					
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					npcModule.Prefab.Name = name;
 					
 					--npcModule.RandomSkin();
@@ -159,7 +159,7 @@ return function(CutsceneSequence)
 			for name, info in pairs(BanditNpcs) do
 				modNpcs.spawn("Bandit", info.SpawnCFrame, function(npc, npcModule)
 					npcModule.Seed = player.UserId + info.Index;
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					
 					npcModule:AddComponent(game.ServerScriptService.ServerLibrary.Entity.Npcs.Bandit.RandomSkin);
 					npcModule.RandomSkin();
@@ -199,13 +199,13 @@ return function(CutsceneSequence)
 
 			local zarkNpcModule;
 			modNpcs.spawn("Zark", CFrame.new(14.7941093, 21.8458672, 37.5151329, -0.999998569, 0, 0, 0, 1, 0, 0, 0, -0.99999845), function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				zarkNpcModule = npcModule;
 			end);
 			
 			local banditPilotModule;
 			modNpcs.spawn("Bandit Pilot", CFrame.new(-2193.129, 123.118, 2147.966), function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				banditPilotModule = npcModule;
 			end, modNpcs.NpcBaseConstructors.CutsceneHuman);
 			extractionHelicopter.PilotSeatModelR.PSeat:Sit(banditPilotModule.Humanoid);
@@ -214,7 +214,7 @@ return function(CutsceneSequence)
 				local banditNpcModule;
 				modNpcs.spawn("Bandit", CFrame.new(-2193.129, 123.118, 2147.966), function(npc, npcModule)
 					npcModule.Seed = player.UserId +10 + a;
-					npcModule.Owner = player;
+					npcModule.Player = player;
 
 					npcModule:AddComponent(game.ServerScriptService.ServerLibrary.Entity.Npcs.Bandit.RandomSkin);
 					npcModule.RandomSkin();
@@ -236,10 +236,10 @@ return function(CutsceneSequence)
 				end
 			end
 
-			local loranModule = modNpcs.getByOwner(player, "Loran");
+			local loranModule = modNpcs.getPlayerNpc(player, "Loran");
 			if loranModule == nil then
 				modNpcs.spawn("Loran", CFrame.new(-2170.40186, 119.44278, 2131.82178, -0.874617875, 0, 0.484808505, 0, 1, 0, -0.484808505, 0, -0.874617875), function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					loranModule = npcModule;
 				end);
 				loranModule.Interactable.Parent = script;

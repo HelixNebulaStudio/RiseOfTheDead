@@ -56,10 +56,10 @@ return function(CutsceneSequence)
 		local playerClass: PlayerClass = modPlayers.get(player);
 			
 
-		local bunnymanModule = modNpcs.getByOwner(player, "Bunny Man");
+		local bunnymanModule = modNpcs.getPlayerNpc(player, "Bunny Man");
 		if bunnymanModule == nil then
 			local npc = modNpcs.spawn("Bunny Man", bmSpawn, function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				bunnymanModule = npcModule;
 			end);
 			modReplicationManager.ReplicateOut(player, npc);
@@ -107,7 +107,7 @@ return function(CutsceneSequence)
 						end
 					end
 					bunnymanModule.Actions:Teleport(bmSpawn);
-					bunnymanModule.Chat(bunnymanModule.Owner);
+					bunnymanModule.Chat(bunnymanModule.Player);
 					bunnymanModule.Wield.Unequip();
 					
 				elseif mission.ProgressionPoint == 3 then
@@ -132,7 +132,7 @@ return function(CutsceneSequence)
 					end)
 					
 				elseif mission.ProgressionPoint == 5 then
-					bunnymanModule.Chat(bunnymanModule.Owner, "Light it up.");
+					bunnymanModule.Chat(bunnymanModule.Player, "Light it up.");
 
 					newTrigger = triggerLightBarrel:Clone();
 					newTrigger.Parent = workspace.Interactables;
@@ -148,9 +148,9 @@ return function(CutsceneSequence)
 					fireBarrel._lightSource.firePoint.Fire.Enabled = true;
 					
 					wait(1);
-					bunnymanModule.Chat(bunnymanModule.Owner, "Well done.");
+					bunnymanModule.Chat(bunnymanModule.Player, "Well done.");
 					wait(3);
-					bunnymanModule.Chat(bunnymanModule.Owner, "Now we wait...");
+					bunnymanModule.Chat(bunnymanModule.Player, "Now we wait...");
 					
 					wait(20);
 					if not character:IsDescendantOf(workspace) then return end;
@@ -169,7 +169,7 @@ return function(CutsceneSequence)
 						cultist1Module = npcModule;
 						cultist1Module.Immunity = 1;
 						cultist1Module.CutsceneMode = true;
-						cultist1Module.Owner = player;
+						cultist1Module.Player = player;
 					end);
 					
 					cultist1Module.Move:MoveTo(Vector3.new(-160.850769, 2.70417881, 2.4058733));
@@ -177,25 +177,25 @@ return function(CutsceneSequence)
 					
 					bunnymanModule.Movement:Move(Vector3.new(-170.911606, 2.70417905, 2.40587401)):Wait(5);
 					wait(1);
-					cultist1Module.Chat(cultist1Module.Owner, "Hey, wait a minute.. You aren't cultists.. What do you want?!");
+					cultist1Module.Chat(cultist1Module.Player, "Hey, wait a minute.. You aren't cultists.. What do you want?!");
 					wait(5);
 					if not character:IsDescendantOf(workspace) then return end;
-					bunnymanModule.Chat(bunnymanModule.Owner, "April first shall prevail..");
+					bunnymanModule.Chat(bunnymanModule.Player, "April first shall prevail..");
 					wait(5);
 					if not character:IsDescendantOf(workspace) then return end;
-					cultist1Module.Chat(cultist1Module.Owner, "Wait, how did you know our phrase?! Were you one of us?");
+					cultist1Module.Chat(cultist1Module.Player, "Wait, how did you know our phrase?! Were you one of us?");
 					wait(5);
 					if not character:IsDescendantOf(workspace) then return end;
-					bunnymanModule.Chat(bunnymanModule.Owner, "Foolish rookie, tell me. Is omega still one of your active leaders?");
+					bunnymanModule.Chat(bunnymanModule.Player, "Foolish rookie, tell me. Is omega still one of your active leaders?");
 					wait(5);
 					if not character:IsDescendantOf(workspace) then return end;
-					cultist1Module.Chat(cultist1Module.Owner, "Err yes. However, psi wants to over haul the rankings.");
+					cultist1Module.Chat(cultist1Module.Player, "Err yes. However, psi wants to over haul the rankings.");
 					wait(5);
 					if not character:IsDescendantOf(workspace) then return end;
-					bunnymanModule.Chat(bunnymanModule.Owner, "Good, good.. Your life ends here now!");
+					bunnymanModule.Chat(bunnymanModule.Player, "Good, good.. Your life ends here now!");
 					wait(3);
 					if not character:IsDescendantOf(workspace) then return end;
-					cultist1Module.Chat(cultist1Module.Owner, "Wait what?! *whistles*");
+					cultist1Module.Chat(cultist1Module.Player, "Wait what?! *whistles*");
 					wait(0.5);
 					if not character:IsDescendantOf(workspace) then return end;
 					
@@ -229,7 +229,7 @@ return function(CutsceneSequence)
 						end
 					end)
 					
-					bunnymanModule.Chat(bunnymanModule.Owner, "Incoming!");
+					bunnymanModule.Chat(bunnymanModule.Player, "Incoming!");
 					modMission:Progress(player, 50, function(mission)
 						if mission.ProgressionPoint == 6 then
 							mission.ProgressionPoint = 7;

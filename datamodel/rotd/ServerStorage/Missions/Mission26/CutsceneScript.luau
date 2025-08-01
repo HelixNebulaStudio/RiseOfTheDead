@@ -29,10 +29,10 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
 			
-		local dianaModule = modNpcs.getByOwner(player, "Diana");
+		local dianaModule = modNpcs.getPlayerNpc(player, "Diana");
 		if dianaModule == nil then
 			local npc = modNpcs.spawn("Diana", nil, function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				dianaModule = npcModule;
 			end);
 			modReplicationManager.ReplicateOut(player, npc);

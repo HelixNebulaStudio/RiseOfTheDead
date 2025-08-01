@@ -31,11 +31,11 @@ end
 
 
 function modWorldCoreClass:SpawnPlayerNpc(player: Player, npcName: string)
-    local npcClass = shared.modNpcs.getByOwner(player, npcName);
+    local npcClass = shared.modNpcs.getPlayerNpc(player, npcName);
     if npcClass == nil then
         npcClass = shared.modNpcs.spawn2{
             Name = npcName;
-            Owner = player;
+            Player = player;
         };
         if npcClass then
             modReplicationManager.ReplicateOut(player, npcClass.Character);

@@ -93,7 +93,8 @@ local mapMenu = script:WaitForChild("MapFrame"):Clone();
 	binds.Minimized = false;
     binds.MapFrameOffset = Vector2.new();
 
-	mapMenu:WaitForChild("closeButton").MouseButton1Click:Connect(function()
+	local closeButton = mapMenu:WaitForChild("closeButton");
+	closeButton.MouseButton1Click:Connect(function()
         window:Close();
 	end)
 	
@@ -552,10 +553,12 @@ local mapMenu = script:WaitForChild("MapFrame"):Clone();
 		end
 		
 		if binds.Minimized then
+			closeButton.Visible = false;
 			local frame = localPlayerPointer.Frame;
 			mapImage.Position = UDim2.new(0.5, -frame.Position.X.Offset, 0.5, -frame.Position.Y.Offset);
 			
 		else
+			closeButton.Visible = true;
 			local newPosition = UDim2.new(0.5, 
 				0-(rootPart.Position.X * scaleRatio) + binds.MapFrameOffset.X, 
 				0.5, 
@@ -728,6 +731,7 @@ local mapMenu = script:WaitForChild("MapFrame"):Clone();
 		window.ReleaseMouse = false;
 		window.UseTween = false;
         interface:RefreshInterfaces();
+		closeButton.Visible = false;
 
 		if modConfigurations.CompactInterface then
 			mapMenu.AnchorPoint = Vector2.new(0, 0);

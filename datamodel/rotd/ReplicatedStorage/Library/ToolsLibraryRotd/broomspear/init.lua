@@ -11,7 +11,7 @@ local toolPackage = {
 	Animations={
 		Core={Id=16923661895;};
 		PrimaryAttack={Id=16923667458};
-		Inspect={Id=16923664864;};
+		Inspect={Id=16923664864; WaistStrength=0.2;};
 		Charge={Id=16923657792;};
 		Throw={Id=16923669399};
 		Equip={Id=18161004108};
@@ -41,6 +41,7 @@ local toolPackage = {
 
 		-- Throwable
 		Throwable = true;
+		ThrowRange = 64;
 		ThrowDamagePercent = 0.04;
 
 		ChargeDuration = 0.5;
@@ -52,11 +53,11 @@ local toolPackage = {
 		--== Projectile
 		ProjectileId = "broomspear";
 		ProjectileConfig={
-			Velocity = 60;
+			Velocity = 160;
 			LifeTime = 30;
 			Bounce = 0;
 		};
-		VelocityBonus = 60;
+		VelocityBonus = 100;
 
 		ConsumeOnThrow=false;
 	};

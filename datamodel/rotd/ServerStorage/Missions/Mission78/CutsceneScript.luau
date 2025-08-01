@@ -40,12 +40,12 @@ if RunService:IsServer() then
 				if tag.Player then 
 					modMission:Progress(tag.Player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 3 then
-							local lydiaNpcModule = modNpcs.getByOwner(tag.Player, "Lydia");
+							local lydiaNpcModule = modNpcs.getPlayerNpc(tag.Player, "Lydia");
 							if lydiaNpcModule then
 								if mission.SaveData.PlayerKills == 4 then
-									lydiaNpcModule.Chat(lydiaNpcModule.Owner, "Hmm, I see..");
+									lydiaNpcModule.Chat(lydiaNpcModule.Player, "Hmm, I see..");
 								elseif mission.SaveData.PlayerKills == 2 then
-									lydiaNpcModule.Chat(lydiaNpcModule.Owner, "Okay, seems simple enough..");
+									lydiaNpcModule.Chat(lydiaNpcModule.Player, "Okay, seems simple enough..");
 								end
 							end
 							
@@ -53,7 +53,7 @@ if RunService:IsServer() then
 							
 							if mission.SaveData.PlayerKills <= 0 then
 								mission.ProgressionPoint = 4;
-								lydiaNpcModule.Chat(lydiaNpcModule.Owner, "Okay, let me give this a try..");
+								lydiaNpcModule.Chat(lydiaNpcModule.Player, "Okay, let me give this a try..");
 							end
 						end
 					end)
@@ -66,7 +66,7 @@ if RunService:IsServer() then
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint == 4 then
 								if lydiaNpcModule and mission.SaveData.LydiaKills > 0 and math.fmod(mission.SaveData.LydiaKills, 2) == 0 then
-									lydiaNpcModule.Chat(lydiaNpcModule.Owner, killDialogues[math.random(1, #killDialogues)]);
+									lydiaNpcModule.Chat(lydiaNpcModule.Player, killDialogues[math.random(1, #killDialogues)]);
 								end
 								mission.SaveData.LydiaKills = math.max(mission.SaveData.LydiaKills -1, 0);
 								
@@ -90,9 +90,9 @@ if RunService:IsServer() then
 						mission.ProgressionPoint = 2;
 						storage.Locked = true;
 
-						local lydiaNpcModule = modNpcs.getByOwner(player, "Lydia");
+						local lydiaNpcModule = modNpcs.getPlayerNpc(player, "Lydia");
 						if lydiaNpcModule then
-							lydiaNpcModule.Chat(lydiaNpcModule.Owner, "Yay, let's go zombies hunting!");
+							lydiaNpcModule.Chat(lydiaNpcModule.Player, "Yay, let's go zombies hunting!");
 						end
 					end
 				end
@@ -119,7 +119,7 @@ return function(CutsceneSequence)
 		
 		local function OnChanged(firstRun)
 			if lydiaModule == nil then
-				lydiaModule = modNpcs.getByOwner(player, "Lydia");
+				lydiaModule = modNpcs.getPlayerNpc(player, "Lydia");
 			end
 			if lydiaModule == nil then
 				Debugger:Warn("Missing lydia module.");
@@ -175,7 +175,7 @@ return function(CutsceneSequence)
 
 					repeat task.wait() until lydiaModule.Wield.ToolModule ~= nil;
 					
-					lydiaModule.Chat(lydiaModule.Owner, "Wow, it's quite heavy..");
+					lydiaModule.Chat(lydiaModule.Player, "Wow, it's quite heavy..");
 					lydiaModule.Wield:ToggleIdle();
 					
 					lydiaModule.Actions:FollowOwner(function()
@@ -229,7 +229,7 @@ return function(CutsceneSequence)
 
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint == 5 then
-								lydiaModule.Chat(lydiaModule.Owner, "Wow, that was fun!");
+								lydiaModule.Chat(lydiaModule.Player, "Wow, that was fun!");
 								mission.ProgressionPoint = 6;
 							end
 						end)

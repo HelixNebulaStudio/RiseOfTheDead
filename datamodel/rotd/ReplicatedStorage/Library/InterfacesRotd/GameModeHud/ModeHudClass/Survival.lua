@@ -29,7 +29,7 @@ return function(interface, window, frame)
 	modeHud.Soundtrack = nil;
 	modeHud.BossHealthBars = {};
 
-	local deathScreen = modeHud.Interface.MainInterface:WaitForChild("DeathScreen");
+    local deathScreenElement: InterfaceElement = interface:GetOrDefaultElement("DeathScreenElement");
 	
 	local activeLeaderboard;
 	local endScreen;
@@ -177,7 +177,7 @@ return function(interface, window, frame)
 			if statsBoard ~= false then
 				if endScreen == nil then
 					endScreen = templateEndScreen:Clone();
-					endScreen.Parent = deathScreen;
+					endScreen.Parent = deathScreenElement.Frame;
 
 					task.delay(60, function()
 						game.Debris:AddItem(endScreen, 0);

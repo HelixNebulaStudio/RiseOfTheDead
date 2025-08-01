@@ -57,7 +57,7 @@ if RunService:IsServer() then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint < 11 then
 						if mission.ProgressionPoint < 10 then
-							local revasModule = modNpcs.getByOwner(player, "Revas");
+							local revasModule = modNpcs.getPlayerNpc(player, "Revas");
 							if revasModule then
 								revasModule.Chat(player, "Oh. You already know what to do.");
 							end
@@ -69,7 +69,7 @@ if RunService:IsServer() then
 			elseif triggerId == "RescuePatrick" then
 
 				local classPlayer = shared.modPlayers.get(player);
-				local patrickModule = modNpcs.getByOwner(player, "Patrick");
+				local patrickModule = modNpcs.getPlayerNpc(player, "Patrick");
 				patrickModule.StopAnimation("injured2");
 
 				patrickModule.Prefab.Head.CanCollide = true;
@@ -147,7 +147,7 @@ if RunService:IsServer() then
 			local player = game.Players:GetPlayerFromCharacter(mountChar);
 			if player then
 
-				local patrickModule = modNpcs.getByOwner(player, "Patrick");
+				local patrickModule = modNpcs.getPlayerNpc(player, "Patrick");
 				patrickModule.StopAnimation("carriedinjured");
 				patrickModule.PlayAnimation("injured2");
 				patrickModule.Chat(player, "Arrgg.. Help..");
@@ -198,10 +198,10 @@ return function(CutsceneSequence)
 			local choiceEventObj = modEvents:GetEvent(player, "mission58choice") or modEvents:NewEvent(player, {Id="mission58choice";});
 
 			local caitlinModule = modNpcs.get(workspace.Entity:FindFirstChild("Caitlin"));
-			local revasModule = modNpcs.getByOwner(player, "Revas");
+			local revasModule = modNpcs.getPlayerNpc(player, "Revas");
 			if revasModule == nil then
 				local npc = modNpcs.spawn("Revas", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					revasModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
@@ -347,13 +347,13 @@ return function(CutsceneSequence)
 
 			local revasModule;
 			modNpcs.spawn("Revas", CFrame.new(-5.3425169, 2.63293743, -9.23565102, 0.939692616, 0, -0.342019618, 0, 1, 0, 0.342020214, 0, 0.939691067), function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				revasModule = npcModule;
 			end);
 
 			local zarkModule;
 			modNpcs.spawn("Zark", CFrame.new(-8.77352238, 2.6205008, 90.7937851, 0, 0, 1, 0, 1, 0, -1, 0, 0), function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				zarkModule = npcModule;
 			end);
 
@@ -361,7 +361,7 @@ return function(CutsceneSequence)
 
 			local patrickModule;
 			modNpcs.spawn("Patrick", CFrame.new(4.555336, 3, 91.5086823, 0.358367682, 0, -0.933580518, 0, 1, 0, 0.933580518, 0, 0.358367682), function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				patrickModule = npcModule;
 			end, modNpcs.NpcBaseConstructors.BasicNpcModule);
 
@@ -369,14 +369,14 @@ return function(CutsceneSequence)
 
 			local eugeneModule;
 			modNpcs.spawn("Eugene", nil, function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				eugeneModule = npcModule;
 			end, modNpcs.NpcBaseConstructors.CutsceneHuman);
 			eugeneModule:TeleportHide();
 
 			local stanModule;
 			modNpcs.spawn("Stan", nil, function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				stanModule = npcModule;
 			end, modNpcs.NpcBaseConstructors.CutsceneHuman);
 			stanModule:TeleportHide();
@@ -505,7 +505,7 @@ return function(CutsceneSequence)
 						for a=1, #ratSpawns do
 							modNpcs.spawn("Rat", ratSpawns[a], function(npc, npcModule)
 								npcModule.Prefab:SetAttribute("Cutscene", a);
-								npcModule.Owner = player;
+								npcModule.Player = player;
 								table.insert(ratGoons, npcModule);
 
 								npcModule:AddComponent(game.ServerScriptService.ServerLibrary.Entity.Npcs.Rat.RandomSkin);
@@ -523,7 +523,7 @@ return function(CutsceneSequence)
 						for a=1, #banditSpawns do
 							modNpcs.spawn("Bandit", banditSpawns[a], function(npc, npcModule)
 								npcModule.Prefab:SetAttribute("Cutscene", a);
-								npcModule.Owner = player;
+								npcModule.Player = player;
 								table.insert(banditGoons, npcModule);
 
 								npcModule:AddComponent(game.ServerScriptService.ServerLibrary.Entity.Npcs.Bandit.RandomSkin);
@@ -1383,11 +1383,11 @@ return function(CutsceneSequence)
 				end
 
 				if spawnPatrick > 0 then
-					patrickModule = modNpcs.getByOwner(player, "Patrick");
+					patrickModule = modNpcs.getPlayerNpc(player, "Patrick");
 
 					if patrickModule == nil then
 						local npc = modNpcs.spawn("Patrick", spawnPatrick == 2 and cp.WorldCFrame or classPlayer:GetCFrame(), function(npc, npcModule)
-							npcModule.Owner = player;
+							npcModule.Player = player;
 							patrickModule = npcModule;
 
 							function npcModule.Initialize()

@@ -88,11 +88,11 @@ return function(CutsceneSequence)
 					mission.SaveData.NpcName = newNpcName;
 
 					Debugger:Warn("Chosen NPC:", newNpcName, " mission.SaveData.NpcName", mission.SaveData.NpcName);
-					local survivorNpcModule = modNpcs.getByOwner(player, newNpcName);
+					local survivorNpcModule = modNpcs.getPlayerNpc(player, newNpcName);
 
 					if survivorNpcModule == nil then
 						modNpcs.spawn(newNpcName, spawnCf, function(npc, npcModule)
-							npcModule.Owner = player;
+							npcModule.Player = player;
 							survivorNpcModule = npcModule;
 						end);
 					end

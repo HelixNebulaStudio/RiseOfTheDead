@@ -57,11 +57,11 @@ return function(CutsceneSequence)
 		if mission == nil then return end;
 		
 		
-		local robertModule = modNpcs.getByOwner(player, "Robert");
+		local robertModule = modNpcs.getPlayerNpc(player, "Robert");
 		local bloxMartCf = CFrame.new(268, 57.71, 33.87, -1, 0, 0.05, 0, 1, 0, -0.05, 0, -1);
 		if robertModule == nil then
 			local npc = modNpcs.spawn("Robert", bloxMartCf, function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				robertModule = npcModule;
 			end);
 			modReplicationManager.ReplicateOut(player, npc);
@@ -140,7 +140,7 @@ return function(CutsceneSequence)
 				elseif mission.ProgressionPoint == 2 then
 					robertModule.RootPart.Anchored = false;
 					robertModule.StopAnimation("Holding");
-					robertModule.Chat(robertModule.Owner, "Please take me somewhere safe.");
+					robertModule.Chat(robertModule.Player, "Please take me somewhere safe.");
 					robertModule.Actions:FollowOwner(function()
 						return mission.Type == 1 and mission.ProgressionPoint == 2
 					end);

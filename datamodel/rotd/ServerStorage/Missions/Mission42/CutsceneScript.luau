@@ -71,7 +71,7 @@ return function(CutsceneSequence)
 		local victorSpawn = CFrame.new(-84.4009476, 105.079651, -5.06139994, -0.813923717, 0, 0.580971837, 0, 1, 0, -0.580971837, 0, -0.813923717);
 		local victorModule;
 		modNpcs.spawn("Victor", victorSpawn, function(npc, npcModule)
-			npcModule.Owner = player;
+			npcModule.Player = player;
 			victorModule = npcModule;
 			victorModule.RootPart.Anchored = false;
 		end);
@@ -116,7 +116,7 @@ return function(CutsceneSequence)
 					elseif mission.ProgressionPoint == 2 then
 						victorModule.Interactable.Parent = victorModule.Prefab;
 						victorModule.Actions:Teleport(victorSpawn);
-						victorModule.Chat(victorModule.Owner);
+						victorModule.Chat(victorModule.Player);
 						CutsceneSequence:NextScene("hideInv");
 						
 						for a=1, #zombies do
@@ -154,14 +154,14 @@ return function(CutsceneSequence)
 						victorModule.Movement:SetWalkSpeed("default", 10);
 						victorModule.Movement:Move(Vector3.new(-77.7885666, 106.959663, -65.7213898)):Wait(7);
 						victorModule.PlayAnimation("Idle");
-						victorModule.Chat(victorModule.Owner, "It's got to be here somewhere.");
+						victorModule.Chat(victorModule.Player, "It's got to be here somewhere.");
 						
 						wait(1.4);
 						if mission.ProgressionPoint ~= 3 then return end;
 						
 						victorModule.Movement:Move(Vector3.new(-89.4285507, 106.959663, -60.8513794)):Wait(7);
 						victorModule.Movement:Face(Vector3.new(-89.4285507, 106.959663, -63.0313835));
-						victorModule.Chat(victorModule.Owner, "Hmmmmm.");
+						victorModule.Chat(victorModule.Player, "Hmmmmm.");
 						victorModule.PlayAnimation("Idle");
 						
 						wait(1);
@@ -173,7 +173,7 @@ return function(CutsceneSequence)
 						wait(0.3);
 						if mission.ProgressionPoint ~= 3 then return end;
 						
-						victorModule.Chat(victorModule.Owner, "Aha! Here it is..");
+						victorModule.Chat(victorModule.Player, "Aha! Here it is..");
 						victorModule.PlayAnimation("PushButton");
 						
 						wait(0.3);
@@ -192,7 +192,7 @@ return function(CutsceneSequence)
 						wait(1.2);
 						if mission.ProgressionPoint ~= 3 then return end;
 						
-						victorModule.Chat(victorModule.Owner, "Woah!");
+						victorModule.Chat(victorModule.Player, "Woah!");
 						
 						wait(1);
 						if mission.ProgressionPoint ~= 3 then return end;
@@ -205,7 +205,7 @@ return function(CutsceneSequence)
 						victorModule.Movement:Move(Vector3.new(-89.3929596, 108.797752, -74.5014954)):Wait(5);
 						victorModule.Actions:Teleport(CFrame.new(-89.3929596, 108.797752, -74.5014954));
 						victorModule.Movement:Move(Vector3.new(-90.3007202, 108.976707, -107.224884)):Wait(5);
-						victorModule.Chat(victorModule.Owner, "Hmmm, there's a button down there..");
+						victorModule.Chat(victorModule.Player, "Hmmm, there's a button down there..");
 						victorModule.PlayAnimation("LookDown");
 						
 						wait(2.5);
@@ -226,14 +226,14 @@ return function(CutsceneSequence)
 							if mission.ProgressionPoint == 3 then
 								victorModule.Movement:Face(classPlayer.RootPart.Position);
 								if pushed then
-									victorModule.Chat(victorModule.Owner, "Oops.. *Smirk*");
+									victorModule.Chat(victorModule.Player, "Oops.. *Smirk*");
 									
 								elseif fellOff then
 									victorModule.PlayAnimation("LookDown");
-									victorModule.Chat(victorModule.Owner, "Oh god, you fell!");
+									victorModule.Chat(victorModule.Player, "Oh god, you fell!");
 									wait(2);
 									if mission.ProgressionPoint ~= 3 then return end;
-									victorModule.Chat(victorModule.Owner, "Press the button so I could get you back up.");
+									victorModule.Chat(victorModule.Player, "Press the button so I could get you back up.");
 									
 									local distance = 100;
 									local timeout = 20;
@@ -244,7 +244,7 @@ return function(CutsceneSequence)
 										timeout = timeout -1;
 									until distance <= 8 or timeout <= 0;
 									
-									victorModule.Chat(victorModule.Owner, "Thanks but sike! I'm not helping you back up.");
+									victorModule.Chat(victorModule.Player, "Thanks but sike! I'm not helping you back up.");
 								end
 								
 								table.insert(tweenObjs, 
@@ -273,29 +273,29 @@ return function(CutsceneSequence)
 								local gaveMask = activeDialogues.Victor and activeDialogues.Victor.gaveMask == true;
 								
 								if gaveMask then
-									victorModule.Chat(victorModule.Owner, "Time to try out this Nekron Mask..");
+									victorModule.Chat(victorModule.Player, "Time to try out this Nekron Mask..");
 									wait(3);
 									if mission.ProgressionPoint ~= 3 then return end;
 									victorModule.PlayAnimation("Focus");
 									nekronMask:Clone().Parent = victorModule.Prefab;
-									victorModule.Chat(victorModule.Owner, "Woow, it feels.. incredible..  But.. how do I use this?!");
+									victorModule.Chat(victorModule.Player, "Woow, it feels.. incredible..  But.. how do I use this?!");
 									wait(2.5);
 									if mission.ProgressionPoint ~= 3 then return end;
 									
-									victorModule.Chat(victorModule.Owner, "Arrghh! It hurts..");
+									victorModule.Chat(victorModule.Player, "Arrghh! It hurts..");
 									victorModule.PlayAnimation("Focus");
 									
 									modMission:Progress(player, MISSION_ID, function(mission)
 										mission.ProgressionPoint = 4;
 									end)
 								else
-									victorModule.Chat(victorModule.Owner, "It's a shame that the mask isn't here, it would've been fun to try it out now.");
+									victorModule.Chat(victorModule.Player, "It's a shame that the mask isn't here, it would've been fun to try it out now.");
 									wait(3);
 									if mission.ProgressionPoint ~= 3 then return end;
-									victorModule.Chat(victorModule.Owner, "I have no clue why you trusted me, and now you will starve down there..");
+									victorModule.Chat(victorModule.Player, "I have no clue why you trusted me, and now you will starve down there..");
 									wait(2.5);
 									if mission.ProgressionPoint ~= 3 then return end;
-									victorModule.Chat(victorModule.Owner, "When I do find that mask, the cultists will pay..");
+									victorModule.Chat(victorModule.Player, "When I do find that mask, the cultists will pay..");
 									wait(10);
 									if mission.ProgressionPoint ~= 3 then return end;
 									modMission:Progress(player, MISSION_ID, function(mission)
@@ -306,7 +306,7 @@ return function(CutsceneSequence)
 						end)
 						
 						if fellOff then return; end
-						victorModule.Chat(victorModule.Owner, "Come take a look.");
+						victorModule.Chat(victorModule.Player, "Come take a look.");
 						
 						local distance = 5;
 						repeat
@@ -363,7 +363,7 @@ return function(CutsceneSequence)
 						workspace.StartSpawn.Enabled = false;
 						workspace.EndSpawn.Enabled = true;
 						victorModule.Interactable.Parent = victorModule.Prefab;
-						victorModule.Chat(victorModule.Owner);
+						victorModule.Chat(victorModule.Player);
 						
 					elseif mission.ProgressionPoint == 8 then
 						modConfigurations.Set("DisableItemDrops", false);
@@ -372,7 +372,7 @@ return function(CutsceneSequence)
 						
 						if saveVictor then
 							cutsceneElements.NekronTrap:Destroy();
-							victorModule.Chat(victorModule.Owner, "Thanks, I promise you will never see me again..");
+							victorModule.Chat(victorModule.Player, "Thanks, I promise you will never see me again..");
 							victorModule.RootPart.Anchored = false;
 							victorModule.StopAnimation("Stuck");
 							victorModule.Movement:Face(classPlayer.RootPart.Position);
@@ -386,7 +386,7 @@ return function(CutsceneSequence)
 							
 							victorModule.Humanoid.PlatformStand = true;
 							victorModule.RootPart.Velocity = Vector3.new(0, 20, 30);
-							victorModule.Chat(victorModule.Owner, "Ahhhhhhhh");
+							victorModule.Chat(victorModule.Player, "Ahhhhhhhh");
 							wait(2);
 							modAudio.Play("HeavySplash", cutsceneElements.splashSound);
 						end

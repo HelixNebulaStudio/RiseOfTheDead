@@ -54,7 +54,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     element.OnChanged:Connect(function(k, v, ov)
         if k == "ProgressType" then
-
             local barType = v;
             if barType == "Heal" then
                 barText = "Healing: $value/100%";
@@ -72,11 +71,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 barText = "Weapon Level: $text"
 
             elseif barType == "MeleeStamina" then
-                if modData.MeleeStats then
-                    barText = "Melee Stamina: $text";
-                end
+                barText = "Melee Stamina: $text";
+
             else
                 barText = "Mastery Level: $text";
+                progressionPoint = 0;
             end
 
         elseif k == "ProgressValue" then
@@ -102,23 +101,18 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end)
 
     local prevProgressionValue = progressionPoint;
-    frame:GetPropertyChangedSignal("Visible"):Connect(function()
-        if frame.Visible then
-            RunService:UnbindFromRenderStep("ProgressionBarRender");
-        else
-            RunService:BindToRenderStep("ProgressionBarRender", Enum.RenderPriority.Last.Value, function(delta)
-                prevProgressionValue = math.clamp(prevProgressionValue + 0.1 * (progressionPoint - prevProgressionValue), 0, 1);
-                barImageLabel.Size = UDim2.new(prevProgressionValue, 0, 1, 0);
-                
-                barTextLabel.Text = barText:gsub("$value", element.ProgressValue)
-                                           :gsub("$text", element.ProgressText);
+    RunService:BindToRenderStep("ProgressionBarRender", Enum.RenderPriority.Last.Value, function(delta)
+        if frame.Visible == false then return end;
+        prevProgressionValue = math.clamp(prevProgressionValue + 0.1 * (progressionPoint - prevProgressionValue), 0, 1);
+        barImageLabel.Size = UDim2.new(prevProgressionValue, 0, 1, 0);
+        
+        barTextLabel.Text = barText:gsub("$value", element.ProgressValue)
+                                    :gsub("$text", element.ProgressText or "");
 
-                if barImageLabel.AbsoluteSize.X >= 1 then
-                    barImageLabel.BorderSizePixel = 2;
-                else
-                    barImageLabel.BorderSizePixel = 0;
-                end
-            end)
+        if barImageLabel.AbsoluteSize.X >= 1 then
+            barImageLabel.BorderSizePixel = 2;
+        else
+            barImageLabel.BorderSizePixel = 0;
         end
     end)
 

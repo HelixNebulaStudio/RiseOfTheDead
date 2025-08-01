@@ -5,7 +5,9 @@ local npcPackage = {
     HumanoidType = "Human";
     
 	Configurations = {};
-    Properties = {};
+    Properties = {
+        Immortal = 1;
+    };
 
     DialogueInteractable = true;
 

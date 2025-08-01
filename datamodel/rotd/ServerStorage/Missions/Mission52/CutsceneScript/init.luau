@@ -52,10 +52,10 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 				
-			local robertModule = modNpcs.getByOwner(player, "Robert");
+			local robertModule = modNpcs.getPlayerNpc(player, "Robert");
 			if robertModule == nil then
 				local npc = modNpcs.spawn("Robert", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					robertModule = npcModule;
 					robertModule.StatusComp.Disabled = true;
 				end);
@@ -82,17 +82,17 @@ return function(CutsceneSequence)
 						end);
 						
 					elseif mission.ProgressionPoint >= 15 then
-						local robertModule = modNpcs.getByOwner(player, "Robert");
+						local robertModule = modNpcs.getPlayerNpc(player, "Robert");
 						if robertModule then
 							robertModule:TeleportHide();
 						end
 						
-						local nateModule = modNpcs.getByOwner(player, "Nate");
+						local nateModule = modNpcs.getPlayerNpc(player, "Nate");
 						if nateModule then
 							modReplicationManager.UnreplicateFrom(player, nateModule.Prefab);
 						end
 						
-						local josephModule = modNpcs.getByOwner(player, "Joseph");
+						local josephModule = modNpcs.getPlayerNpc(player, "Joseph");
 						if josephModule then
 							modReplicationManager.UnreplicateFrom(player, josephModule.Prefab);
 						end
@@ -131,10 +131,10 @@ return function(CutsceneSequence)
 			if mission == nil then return end;
 				
 	
-			local robertModule = modNpcs.getByOwner(player, "Robert");
+			local robertModule = modNpcs.getPlayerNpc(player, "Robert");
 			if robertModule == nil then
 				local npc = modNpcs.spawn("Robert", CFrame.new(12.7279015, 162.617722, -63.8735542, 0, 0, -1, 0, 1, 0, 1, 0, 0), function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					npcModule.Prefab:SetAttribute("LookAtClient", false);
 					robertModule = npcModule;
 					robertModule.StatusComp.Disabled = true;
@@ -142,10 +142,10 @@ return function(CutsceneSequence)
 				modReplicationManager.ReplicateOut(player, npc);
 			end
 			
-			local nateModule = modNpcs.getByOwner(player, "Nate");
+			local nateModule = modNpcs.getPlayerNpc(player, "Nate");
 			if nateModule == nil then
 				local npc = modNpcs.spawn("Nate", CFrame.new(35.2480125, 162.593155, -34.3742752, -1, 0, 0, 0, 1, 0, 0, 0, -1), function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					npcModule.Prefab:SetAttribute("LookAtClient", false);
 					nateModule = npcModule;
 				end);
@@ -153,39 +153,39 @@ return function(CutsceneSequence)
 				nateModule.RootPart.Anchored = false;
 			end
 			
-			local dallasModule = modNpcs.getByOwner(player, "Dallas");
+			local dallasModule = modNpcs.getPlayerNpc(player, "Dallas");
 			if dallasModule == nil then
 				local npc = modNpcs.spawn("Dallas", CFrame.new(38.07024, 176.987366, -44.433876, -1, 0, 0, 0, 1, 0, 0, 0, -1), function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					npcModule.Prefab:SetAttribute("LookAtClient", false);
 					dallasModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
 			end
 			
-			local josephModule = modNpcs.getByOwner(player, "Joseph");
+			local josephModule = modNpcs.getPlayerNpc(player, "Joseph");
 			if josephModule == nil then
 				local npc = modNpcs.spawn("Joseph", CFrame.new(38.07024, 176.987366, -44.433876, -1, 0, 0, 0, 1, 0, 0, 0, -1), function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					npcModule.Prefab:SetAttribute("LookAtClient", false);
 					josephModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
 			end
 			
-			local zarkModule = modNpcs.getByOwner(player, "Zark");
+			local zarkModule = modNpcs.getPlayerNpc(player, "Zark");
 			if zarkModule == nil then
 				local npc = modNpcs.spawn("Zark", CFrame.new(38.07024, 176.987366, -44.433876, -1, 0, 0, 0, 1, 0, 0, 0, -1), function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					zarkModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
 			end
 			
-			local banditModule = modNpcs.getByOwner(player, "Bandit");
+			local banditModule = modNpcs.getPlayerNpc(player, "Bandit");
 			if banditModule == nil then
 				local npc = modNpcs.spawn("Bandit", CFrame.new(38.07024, 176.987366, -44.433876, -1, 0, 0, 0, 1, 0, 0, 0, -1), function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					banditModule = npcModule;
 				end, shared.require(game.ServerScriptService.ServerLibrary.Entity.Npcs.Human));
 				modReplicationManager.ReplicateOut(player, npc);
@@ -209,7 +209,7 @@ return function(CutsceneSequence)
 						robertModule.Interactable.Parent = script;
 						
 					elseif mission.ProgressionPoint == 4 then
-						robertModule.Chat(robertModule.Owner, "What's going on here..");
+						robertModule.Chat(robertModule.Player, "What's going on here..");
 						robertModule.Actions:FollowOwner(function()
 							
 							if (robertModule.RootPart.Position-Vector3.new(37.134, 164.003, -45.589)).Magnitude <= 16 then
@@ -244,7 +244,7 @@ return function(CutsceneSequence)
 						robertModule.Move:MoveTo(Vector3.new(36.017, 162.593, -44.846));
 						robertModule.Move.OnMoveToEnded:Wait(10);
 						
-						nateModule.Chat(nateModule.Owner, "Hold it right there buddy.");
+						nateModule.Chat(nateModule.Player, "Hold it right there buddy.");
 						dallasModule.Wield.Equip("m4a4");
 						nateModule.Wield.Equip("m4a4");
 						nateModule.Movement:Face(robertModule.RootPart.Position);
@@ -256,7 +256,7 @@ return function(CutsceneSequence)
 						
 						wait(0.45);
 						robertModule.PlayAnimation("Surrender");
-						robertModule.Chat(robertModule.Owner, "Huh?!");
+						robertModule.Chat(robertModule.Player, "Huh?!");
 						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 6;
 						end)
@@ -267,33 +267,33 @@ return function(CutsceneSequence)
 						dallasModule.Movement:Face(robertModule.RootPart.Position);
 						josephModule.PlayAnimation("CrossedArm");
 						
-						nateModule.Chat(nateModule.Owner, "WHO ARE YOU?!");
+						nateModule.Chat(nateModule.Player, "WHO ARE YOU?!");
 						wait(5);
-						robertModule.Chat(robertModule.Owner, "What!? What's going on?!");
+						robertModule.Chat(robertModule.Player, "What!? What's going on?!");
 						wait(5);
-						nateModule.Chat(nateModule.Owner, "You are an infector, aren't you!?");
+						nateModule.Chat(nateModule.Player, "You are an infector, aren't you!?");
 						wait(5);
-						robertModule.Chat(robertModule.Owner, "What? What make you think that!? I saved your life!");
+						robertModule.Chat(robertModule.Player, "What? What make you think that!? I saved your life!");
 						robertModule.AvatarFace:Set("Disgusted");
 						wait(5);
-						nateModule.Chat(nateModule.Owner, "YES, but you just wanted to know about this safehouse..");
+						nateModule.Chat(nateModule.Player, "YES, but you just wanted to know about this safehouse..");
 						wait(5);
-						robertModule.Chat(robertModule.Owner, "I SWEAR, I'M NOT AN INFECTOR!! HOW CAN I PROVE MYSELF?!");
+						robertModule.Chat(robertModule.Player, "I SWEAR, I'M NOT AN INFECTOR!! HOW CAN I PROVE MYSELF?!");
 						robertModule.AvatarFace:Set("Grumpy");
 						wait(5);
-						josephModule.Chat(josephModule.Owner, "Shoot him");
+						josephModule.Chat(josephModule.Player, "Shoot him");
 						wait(0.5);
 						dallasModule.AvatarFace:Set("Surprise");
 						nateModule.AvatarFace:Set("Disbelief");
 						wait(0.5);
 						robertModule.AvatarFace:Set("Scared");
-						nateModule.Chat(nateModule.Owner, "Joseph, are you sure?!");
+						nateModule.Chat(nateModule.Player, "Joseph, are you sure?!");
 						wait(1);
-						robertModule.Chat(robertModule.Owner, "WHAT?! NO!");
+						robertModule.Chat(robertModule.Player, "WHAT?! NO!");
 						wait(1);
-						dallasModule.Chat(dallasModule.Owner, "Oof");
+						dallasModule.Chat(dallasModule.Player, "Oof");
 						wait(5);
-						josephModule.Chat(josephModule.Owner, "Yes. Shoot him");
+						josephModule.Chat(josephModule.Player, "Yes. Shoot him");
 						
 						local lastDamaged = tick();
 						robertModule.Garbage:Tag(robertModule.Humanoid.HealthChanged:Connect(function()
@@ -323,7 +323,7 @@ return function(CutsceneSequence)
 						josephModule.StopAnimation("CrossedArm");
 						robertModule.StopAnimation("Surrender");
 						
-						robertModule.Chat(robertModule.Owner, "*Infector Ouch*");
+						robertModule.Chat(robertModule.Player, "*Infector Ouch*");
 						task.spawn(function()
 							for a=1, 3 do
 								local hurtSound = modAudio.Play("ZombieHurt", robertModule.Head);
@@ -342,13 +342,13 @@ return function(CutsceneSequence)
 						wait(1);
 						josephModule.Wield.Equip("pickaxe");
 						wait(1);
-						dallasModule.Chat(dallasModule.Owner, "Oh snap..");
+						dallasModule.Chat(dallasModule.Player, "Oh snap..");
 						wait(1);
-						josephModule.Chat(josephModule.Owner, "Hmmm..");
+						josephModule.Chat(josephModule.Player, "Hmmm..");
 						wait(1);
-						robertModule.Chat(robertModule.Owner, "Heh heh heh...");
+						robertModule.Chat(robertModule.Player, "Heh heh heh...");
 						wait(1);
-						nateModule.Chat(nateModule.Owner, "SHOOT!! SHOOOT!!!");
+						nateModule.Chat(nateModule.Player, "SHOOT!! SHOOOT!!!");
 						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 7;
 						end)
@@ -357,7 +357,7 @@ return function(CutsceneSequence)
 						wait(1);
 						local classPlayer = shared.modPlayers.get(player);
 						
-						robertModule.Chat(robertModule.Owner, "Well, guess there will be a minor setback for my plans..");
+						robertModule.Chat(robertModule.Player, "Well, guess there will be a minor setback for my plans..");
 						
 						nateModule.Wield.SetEnemyHumanoid(robertModule.Humanoid);
 						nateModule.Movement:Face(robertModule.RootPart.Position);
@@ -368,7 +368,7 @@ return function(CutsceneSequence)
 						dallasModule.Wield.PrimaryFireRequest();
 						
 						wait(1.5);
-						robertModule.Chat(robertModule.Owner, "I'm done with this..");
+						robertModule.Chat(robertModule.Player, "I'm done with this..");
 						wait(1.5);
 						robertModule.Move:SetMoveSpeed("set", "default", 30);
 
@@ -388,7 +388,7 @@ return function(CutsceneSequence)
 						remoteCameraShakeAndZoom:FireClient(player, 5, 0, 1, 2, false);
 						josephModule.Movement:Face(robertModule.RootPart.Position);
 						
-						nateModule.Chat(nateModule.Owner, "Uagh!");
+						nateModule.Chat(nateModule.Player, "Uagh!");
 						for _, obj in pairs(waterBarrels:GetDescendants()) do
 							if obj:IsA("BasePart") then
 								obj.Anchored = false;
@@ -401,7 +401,7 @@ return function(CutsceneSequence)
 						robertModule.Move:MoveTo(dallasModule.RootPart.Position);
 						robertModule.Move.OnMoveToEnded:Wait(1);
 						
-						josephModule.Chat(josephModule.Owner, "Dallas!");
+						josephModule.Chat(josephModule.Player, "Dallas!");
 						josephModule.Movement:Face(robertModule.RootPart.Position);
 						robertModule.PlayAnimation("Punch");
 						modAudio.Play("Punch", robertModule.RootPart);
@@ -462,7 +462,7 @@ return function(CutsceneSequence)
 						
 						josephModule.Wield.PrimaryFireRequest();
 						wait(0.1);
-						robertModule.Chat(robertModule.Owner, "AHHHGH");
+						robertModule.Chat(robertModule.Player, "AHHHGH");
 						modAudio.Play("Slice", robertModule.RootPart);
 						local hurtSound = modAudio.Play("ZombieHurt", robertModule.RootPart);
 						hurtSound.Volume = math.random(50,60)/100;
@@ -486,12 +486,12 @@ return function(CutsceneSequence)
 						
 						local investigateTrack = josephModule.GetAnimation("JosephInvestigate1");
 						investigateTrack:GetMarkerReachedSignal("Ugh"):Connect(function()
-							josephModule.Chat(josephModule.Owner, "Ugh");
+							josephModule.Chat(josephModule.Player, "Ugh");
 							josephModule.Wield.Unequip();
 						end)
 						investigateTrack:GetMarkerReachedSignal("LoseArm"):Connect(function()
 							remoteCameraShakeAndZoom:FireClient(player, 5, 0, 1, 2, false);
-							josephModule.Chat(josephModule.Owner, "UGGGHHH");
+							josephModule.Chat(josephModule.Player, "UGGGHHH");
 							modAudio.Play("WeakPointImpact", josephModule.RootPart);
 							
 							delay(0.3, function()
@@ -568,7 +568,7 @@ return function(CutsceneSequence)
 						banditModule.Movement:Face(Vector3.new(34.447, 162.593, -34.47));
 						zarkModule.Movement:SetWalkSpeed("default", 6);
 						zarkModule.PlayAnimation("LookAround");
-						zarkModule.Chat(zarkModule.Owner, "Hmmm, so Robert was indeed one of the infectors.");
+						zarkModule.Chat(zarkModule.Player, "Hmmm, so Robert was indeed one of the infectors.");
 						
 						zarkModule.Movement:Move(Vector3.new(42.254, 162.593, -49.369)):Wait(5);
 						
@@ -587,7 +587,7 @@ return function(CutsceneSequence)
 						newWeld.Part1 = robertLeftHand;
 						wait(1);
 						zarkModule.StopAnimation("CrouchLookAnim");
-						zarkModule.Chat(zarkModule.Owner, "One's already been captured.. Soon we will get our hands on Robert and also put him on a leash.");
+						zarkModule.Chat(zarkModule.Player, "One's already been captured.. Soon we will get our hands on Robert and also put him on a leash.");
 						banditModule.Movement:Face(Vector3.new(44.301, 162.593, -48.655));
 						wait(5);
 						zarkModule.Movement:Move(Vector3.new(14.223, 162.593, -63.75))
@@ -649,7 +649,7 @@ return function(CutsceneSequence)
 						nateModule.Actions:ProtectOwner(function()
 							return true;
 						end)
-						nateModule.Chat(nateModule.Owner, "Let's go, I'll protect you guys..");
+						nateModule.Chat(nateModule.Player, "Let's go, I'll protect you guys..");
 						
 						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 15;
@@ -763,28 +763,28 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 				
-			local nateModule = modNpcs.getByOwner(player, "Nate");
+			local nateModule = modNpcs.getPlayerNpc(player, "Nate");
 			if nateModule == nil then
 				local npc = modNpcs.spawn("Nate", CFrame.new(1105.325, 99.074, -578.587), function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					nateModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
 			end
 			
-			local josephModule = modNpcs.getByOwner(player, "Joseph");
+			local josephModule = modNpcs.getPlayerNpc(player, "Joseph");
 			if josephModule == nil then
 				local npc = modNpcs.spawn("Joseph", CFrame.new(1105.325, 99.074, -578.587), function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					josephModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
 			end
 			
-			local mollyModule = modNpcs.getByOwner(player, "Molly");
+			local mollyModule = modNpcs.getPlayerNpc(player, "Molly");
 			if mollyModule == nil then
 				local npc = modNpcs.spawn("Molly", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					mollyModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
@@ -870,19 +870,19 @@ return function(CutsceneSequence)
 						mollyModule.Interactable.Parent = script;
 						mollyModule.Movement:Move(Vector3.new(502.301, 96.881, -1098.085)):Wait();
 						wait(0.6);
-						mollyModule.Chat(mollyModule.Owner, "Alright.. Hold still..");
+						mollyModule.Chat(mollyModule.Player, "Alright.. Hold still..");
 						josephModule.StopAnimation("JosephNoArm");
 						josephModule.Movement:Face(Vector3.new(506.223, 96.261, -1097.082))
 						wait(1);
-						mollyModule.Chat(mollyModule.Owner, "*Patching*");
+						mollyModule.Chat(mollyModule.Player, "*Patching*");
 						mollyModule.PlayAnimation("Patching");
 						wait(5);
 						mollyModule.StopAnimation("Patching");
-						mollyModule.Chat(mollyModule.Owner, "Done!");
+						mollyModule.Chat(mollyModule.Player, "Done!");
 						
 						josephModule.Prefab.Bandage.Handle.Transparency = 0;
 						wait(2);
-						josephModule.Chat(josephModule.Owner, ".. Thanks..");
+						josephModule.Chat(josephModule.Player, ".. Thanks..");
 						josephModule.AvatarFace:Set("Skeptical");
 						josephModule.Movement:Face(Vector3.new(504.616, 96.781, -1105.925))
 						

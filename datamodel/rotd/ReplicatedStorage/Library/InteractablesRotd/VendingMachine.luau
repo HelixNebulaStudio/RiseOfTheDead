@@ -24,6 +24,9 @@ function interactablePackage.init(super) -- Server/Client
     };
 
     function VendingMachine.new(interactable: InteractableInstance, player: Player)
+        local dropTableId = "t1Vending";
+
+        interactable.Values.DropTableId = dropTableId;
     end
 
     function VendingMachine.BindDestroy(interactable: InteractableInstance, player: Player)
@@ -34,8 +37,27 @@ function interactablePackage.init(super) -- Server/Client
         interactable.TypePackage.BindInteract(interactable, info);
         if info.Action == "Client" then return end;
 
-        local player = info.Player;
-        if player == nil then return end;
+
+        if info.NpcClass then
+            local npcClass: NpcClass = info.NpcClass;
+                
+            modAudio.Play("VendingMachine", interactable.Part);
+            npcClass.PlayAnimation("Press");
+                
+            local rewardsLib = modRewardsLibrary:Find(interactable.Values.DropTableId);
+            local reward = modDropRateCalculator.RollDrop(rewardsLib);
+
+            if reward then
+                info.Values.RewardRoll = reward;
+                info.Values.ItemId = reward[1].ItemId;
+            end
+            return;
+        end
+
+        local player: Player? = info.Player;
+        if player == nil then 
+            return; 
+        end;
 
         local profile: ProfileRotd = shared.modProfile:Get(player) :: ProfileRotd;
         local gameSave: GameSaveRotd = profile:GetActiveSave() :: GameSaveRotd;
@@ -56,8 +78,9 @@ function interactablePackage.init(super) -- Server/Client
             return;
         end
 
-        local rewardsLib = modRewardsLibrary:Find("t1Vending");
+        local rewardsLib = modRewardsLibrary:Find(interactable.Values.DropTableId);
         local reward = modDropRateCalculator.RollDrop(rewardsLib, player);
+
         local itemId = reward[1].ItemId;
         local hasSpace = inventory:SpaceCheck{
             {ItemId=itemId; Data={Quantity=1;}};
@@ -67,11 +90,11 @@ function interactablePackage.init(super) -- Server/Client
         gameSave:AddStat("Money", -500);
         
         modAnalyticsService:Sink{
-            Player=player;
-            Currency=modAnalyticsService.Currency.Money;
-            Amount=500;
-            EndBalance=gameSave:GetStat("Money");
-            ItemSKU=`t1Vending`;
+            Player = player;
+            Currency = modAnalyticsService.Currency.Money;
+            Amount = 500;
+            EndBalance = gameSave:GetStat("Money");
+            ItemSKU = interactable.Values.DropTableId;
         };
 
         modAudio.Play("VendingMachine", interactable.Part);
@@ -84,10 +107,8 @@ function interactablePackage.init(super) -- Server/Client
                 end
             end);
             shared.Notify(player, "You have recieved a "..itemLib.Name..".", "Reward");
-            
         else
             shared.Notify(player, "You do not have enough inventory space.", "Negative");
-            
         end
         
     end

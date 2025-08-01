@@ -42,10 +42,10 @@ return function(CutsceneSequence)
 			local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
 			local patrickModule = patrickPrefab and modNpcs.getByModel(patrickPrefab);
 
-			local stanModule = modNpcs.getByOwner(player, "Stan");
+			local stanModule = modNpcs.getPlayerNpc(player, "Stan");
 			if stanModule == nil and mission.ProgressionPoint <= 13 then
 				local npc = modNpcs.spawn("Stan", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					stanModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
@@ -70,7 +70,7 @@ return function(CutsceneSequence)
 							Debugger:Warn("Redo");
 							if stanModule == nil then
 								local npc = modNpcs.spawn("Stan", nil, function(npc, npcModule)
-									npcModule.Owner = player;
+									npcModule.Player = player;
 									stanModule = npcModule;
 								end);
 								modReplicationManager.ReplicateOut(player, npc);
@@ -84,7 +84,7 @@ return function(CutsceneSequence)
 
 						local waypoint = Vector3.new(735.36, 94.775, -695.904);
 						stanModule.Movement:Move(waypoint):Wait(5);
-						stanModule.Chat(stanModule.Owner, "When you're ready.");
+						stanModule.Chat(stanModule.Player, "When you're ready.");
 						wait(0.1);
 						stanModule.Actions:FaceOwner()
 						stanModule.Actions:WaitForOwner(20);
@@ -98,7 +98,7 @@ return function(CutsceneSequence)
 						end
 
 						wait(1);
-						stanModule.Chat(stanModule.Owner, "Patrick, is there a way in yet?");
+						stanModule.Chat(stanModule.Player, "Patrick, is there a way in yet?");
 						stanModule:ToggleInteractable(true);
 						stanModule.Movement:Face(Vector3.new(796.521973, 162.679657, -730.796265));
 						wait(1);
@@ -118,7 +118,7 @@ return function(CutsceneSequence)
 
 					elseif mission.ProgressionPoint == 3 then
 						stanModule:ToggleInteractable(false);
-						stanModule.Chat(stanModule.Owner, "Alright, let's go..");
+						stanModule.Chat(stanModule.Player, "Alright, let's go..");
 						stanModule.Actions:FollowOwner(function()
 							return mission.Type == 1 and mission.ProgressionPoint == 3
 						end);
@@ -153,39 +153,39 @@ return function(CutsceneSequence)
 
 			if modMission:IsComplete(player, MISSION_ID) then return end;
 			
-			local stanModule = modNpcs.getByOwner(player, "Stan");
+			local stanModule = modNpcs.getPlayerNpc(player, "Stan");
 			if stanModule == nil then
 				local npc = modNpcs.spawn(
 					"Stan", 
 					CFrame.new(-0.0199999996, 163.47496, -38.7299995, 1, 0, 0, 0, 1, 0, 0, 0, 1), 
 					function(npc, npcModule)
-						npcModule.Owner = player;
+						npcModule.Player = player;
 						stanModule = npcModule;
 					end
 				);
 				modReplicationManager.ReplicateOut(player, npc);
 			end
 			
-			local zarkModule = modNpcs.getByOwner(player, "Zark");
+			local zarkModule = modNpcs.getPlayerNpc(player, "Zark");
 			if zarkModule == nil then
 				local npc = modNpcs.spawn(
 					"Zark", 
 					CFrame.new(-66.0924149, 194.864609, -32.347641, -0.0348989964, 0, 0.9993909, 0, 1, 0, -0.9993909, 0, -0.0348989964), 
 					function(npc, npcModule)
-						npcModule.Owner = player;
+						npcModule.Player = player;
 						zarkModule = npcModule;
 					end
 				);
 				modReplicationManager.ReplicateOut(player, npc);
 			end
 
-			local jasonModule = modNpcs.getByOwner(player, "Jason");
+			local jasonModule = modNpcs.getPlayerNpc(player, "Jason");
 			if jasonModule == nil then
 				local npc = modNpcs.spawn(
 					"Jason", 
 					CFrame.new(-113.02739, 194.864609, -44.0382957, -0.422619998, 0, 0.906306982, 0, 1, 0, -0.906306982, 0, -0.422619998), 
 					function(npc, npcModule)
-						npcModule.Owner = player;
+						npcModule.Player = player;
 						jasonModule = npcModule;
 					end
 				);
@@ -194,13 +194,13 @@ return function(CutsceneSequence)
 				modReplicationManager.ReplicateOut(player, npc);
 			end
 
-			local loranModule = modNpcs.getByOwner(player, "Loran");
+			local loranModule = modNpcs.getPlayerNpc(player, "Loran");
 			if loranModule == nil then
 				local npc = modNpcs.spawn(
 					"Loran", 
 					CFrame.new(-115.057365, 194.864609, -31.1187763, 0.694657087, 0, 0.71934104, 0, 1, 0, -0.71934104, 0, 0.694657087), 
 					function(npc, npcModule)
-						npcModule.Owner = player;
+						npcModule.Player = player;
 						loranModule = npcModule;
 					end
 				);
@@ -586,7 +586,7 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 			
-			local patrickModule = modNpcs.getByOwner(player, "Patrick");
+			local patrickModule = modNpcs.getPlayerNpc(player, "Patrick");
 
 			if modMission:IsComplete(player, MISSION_ID) then return end;
 			
@@ -602,7 +602,7 @@ return function(CutsceneSequence)
 								"Patrick", 
 								CFrame.new(25.4873447, 41.7153206, 12.5784693, 0.017451996, 0, 0.99984777, 0, 1, 0, -0.99984777, 0, 0.017451996), 
 								function(npc, npcModule)
-									npcModule.Owner = player;
+									npcModule.Player = player;
 									patrickModule = npcModule;
 								end, 
 								require(game.ServerStorage.Prefabs.CustomNpcModules.CutsceneHuman)
@@ -659,8 +659,8 @@ return function(CutsceneSequence)
 						end)
 
 						patrickModule.Actions:FollowOwner(function()
-							if patrickModule.Owner == nil or patrickModule.Owner.Character == nil 
-								or patrickModule.Owner.Character:FindFirstChild("Humanoid") == nil then return false; end;
+							if patrickModule.Player == nil or patrickModule.Player.Character == nil 
+								or patrickModule.Player.Character:FindFirstChild("Humanoid") == nil then return false; end;
  
 							local entities = workspace.Entity:GetChildren();
 							for a=1, #entities do
@@ -671,7 +671,7 @@ return function(CutsceneSequence)
 								if npcClass == nil or npcClass.HealthComp == nil or npcClass.HealthComp.IsDead then continue end;
 								
 								if npcClass.Wield 
-									and npcClass.Wield.EnemyHumanoid == patrickModule.Owner.Character.Humanoid then
+									and npcClass.Wield.EnemyHumanoid == patrickModule.Player.Character.Humanoid then
 									if npcClass.RootPart and patrickModule.IsInVision(npcClass.RootPart) then
 										patrickModule.Wield.SetEnemyHumanoid(npcClass.Humanoid);
 										patrickModule.Move:Face(npcClass.RootPart);

@@ -173,7 +173,7 @@ function GameMode:Start(room)
 				end
 				
 				local npcs = modNpcs.listNpcClasses(function(npcClass: NpcClass)
-					return npcClass.Owner == player;
+					return npcClass.Player == player;
 				end)
 				if npcs then
 					for a=1, #npcs do -- Make player's assist npcs target boss prefab.

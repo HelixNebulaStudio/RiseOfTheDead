@@ -30,10 +30,10 @@ return function(CutsceneSequence)
 		if mission == nil then return end;
 			
 		if not modMission:IsComplete(player, MISSION_ID) then
-			local hilbertModule = modNpcs.getByOwner(player, "Hilbert");
+			local hilbertModule = modNpcs.getPlayerNpc(player, "Hilbert");
 			if hilbertModule == nil then
 				local npc = modNpcs.spawn("Hilbert", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					hilbertModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);

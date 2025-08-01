@@ -29,10 +29,10 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
-			local robertModule = modNpcs.getByOwner(player, "Robert");
+			local robertModule = modNpcs.getPlayerNpc(player, "Robert");
 			if robertModule == nil then
 				local npc = modNpcs.spawn("Robert", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					robertModule = npcModule;
 				end);
 				modReplicationManager.ReplicateOut(player, npc);
@@ -59,7 +59,7 @@ return function(CutsceneSequence)
 					
 				elseif mission.Type == 1 then -- OnActive
 					if mission.ProgressionPoint == 2 then
-						robertModule.Chat(robertModule.Owner, "I'll follow your lead.");
+						robertModule.Chat(robertModule.Player, "I'll follow your lead.");
 						robertModule.Interactable.Parent = script;
 						robertModule.Wield.Equip("mp5");
 						pcall(function()
@@ -100,34 +100,34 @@ return function(CutsceneSequence)
 			if mission == nil then return end;
 			
 			
-			local carlsonModule = modNpcs.getByOwner(player, "Carlson");
+			local carlsonModule = modNpcs.getPlayerNpc(player, "Carlson");
 			if carlsonModule == nil then
 				modReplicationManager.ReplicateOut(player, modNpcs.spawn("Carlson", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					carlsonModule = npcModule;
 				end));
 			end
 
-			local erikModule = modNpcs.getByOwner(player, "Erik");
+			local erikModule = modNpcs.getPlayerNpc(player, "Erik");
 			if erikModule == nil then
 				modReplicationManager.ReplicateOut(player, modNpcs.spawn("Erik", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					erikModule = npcModule;
 				end));
 			end
 
-			local dianaModule = modNpcs.getByOwner(player, "Diana");
+			local dianaModule = modNpcs.getPlayerNpc(player, "Diana");
 			if dianaModule == nil then
 				modReplicationManager.ReplicateOut(player, modNpcs.spawn("Diana", nil, function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					dianaModule = npcModule;
 				end));
 			end
 
-			local robertModule = modNpcs.getByOwner(player, "Robert");
+			local robertModule = modNpcs.getPlayerNpc(player, "Robert");
 			if robertModule == nil then
 				modReplicationManager.ReplicateOut(player, modNpcs.spawn("Robert", CFrame.new(1.65, 15, -2.57), function(npc, npcModule)
-					npcModule.Owner = player;
+					npcModule.Player = player;
 					robertModule = npcModule;
 				end));
 			end
@@ -196,7 +196,7 @@ return function(CutsceneSequence)
 						
 						robertModule.Move:SetMoveSpeed("set", "default", 15);
 						
-						robertModule.Chat(robertModule.Owner, "I hear something, follow me.");
+						robertModule.Chat(robertModule.Player, "I hear something, follow me.");
 						spawn(function() robertModule.Wield.ReloadRequest(); end)
 
 						robertModule.Move:MoveTo(Vector3.new(5.2, 8.65, 177.85));
@@ -217,7 +217,7 @@ return function(CutsceneSequence)
 						robertModule.Actions:WaitForOwner(30);
 						if mission.ProgressionPoint ~= 4 then return end;
 
-						robertModule.Chat(robertModule.Owner, "This way..");
+						robertModule.Chat(robertModule.Player, "This way..");
 
 						robertModule.Move:MoveTo(Vector3.new(3.15, 8.071, 257.45));
 						robertModule.Move.OnMoveToEnded:Wait(6);
@@ -225,7 +225,7 @@ return function(CutsceneSequence)
 						robertModule.Actions:Teleport(CFrame.new(3.15, 8.071, 257.45));
 						if mission.ProgressionPoint ~= 4 then return end;
 
-						robertModule.Chat(robertModule.Owner, "Woah, look at this place..");
+						robertModule.Chat(robertModule.Player, "Woah, look at this place..");
 						robertModule.Move:Face(Vector3.new(-10.3, 8.071, 262.6));
 						local face = robertModule.Prefab:FindFirstChild("face", true);
 						if face then face.Texture = "rbxassetid://22877631" end;
@@ -250,7 +250,7 @@ return function(CutsceneSequence)
 							robertModule.Move:Stop();
 							
 							robertModule.Actions:EnterDoor("safehouse3Door");
-							robertModule.Chat(robertModule.Owner, "Oh my god! What happened here?!");
+							robertModule.Chat(robertModule.Player, "Oh my god! What happened here?!");
 							robertModule.Wield.Unequip();
 							
 							robertModule.Move:SetMoveSpeed("set", "default", 15);
@@ -262,19 +262,19 @@ return function(CutsceneSequence)
 							
 							robertModule.PlayAnimation("CrouchLook", 1);
 							wait(0.5);
-							robertModule.Chat(robertModule.Owner, "Hey, are you okay?");
+							robertModule.Chat(robertModule.Player, "Hey, are you okay?");
 							wait(1);
-							robertModule.Chat(robertModule.Owner);
-							erikModule.Chat(erikModule.Owner, "Are.. are they gone?");
+							robertModule.Chat(robertModule.Player);
+							erikModule.Chat(erikModule.Player, "Are.. are they gone?");
 							wait(3);
-							erikModule.Chat(erikModule.Owner);
-							robertModule.Chat(robertModule.Owner, "Who are they?");
+							erikModule.Chat(erikModule.Player);
+							robertModule.Chat(robertModule.Player, "Who are they?");
 							wait(3);
-							robertModule.Chat(robertModule.Owner);
-							erikModule.Chat(erikModule.Owner, "The bandits");
+							robertModule.Chat(robertModule.Player);
+							erikModule.Chat(erikModule.Player, "The bandits");
 							wait(3);
-							erikModule.Chat(erikModule.Owner);
-							robertModule.Chat(robertModule.Owner, "Don't worry, I think they're gone now..");
+							erikModule.Chat(erikModule.Player);
+							robertModule.Chat(robertModule.Player, "Don't worry, I think they're gone now..");
 							wait(3);
 							robertModule.StopAnimation("CrouchLook", 1);
 							

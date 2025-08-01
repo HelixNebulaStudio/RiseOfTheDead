@@ -144,15 +144,15 @@ return function(CutsceneSequence)
 
 		local playerClass: PlayerClass = shared.modPlayers.get(player);
 		
-		local masonNpcClass: NpcClass = modNpcs.getByOwner(player, "Mason");
+		local masonNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Mason");
 		if masonNpcClass == nil then
 			masonNpcClass = modNpcs.spawn2({
 				Name = "Mason";
 				CFrame = CFrame.new(-1.22, 55.46, -287.322);
-				Owner = player;
-				AddComponents = {};
+				Player = player;
 			});
 			modReplicationManager.ReplicateOut(player, masonNpcClass.Character);
+			Debugger:Warn(`Spawn Mason`);
 		end
 
 		if not modMission:IsComplete(player, 1) then
@@ -222,7 +222,7 @@ return function(CutsceneSequence)
 
 					if mission.ProgressionPoint >= 4 then return end;
 					
-					masonNpcClass.Chat(masonNpcClass.Owner, "Follow me...");
+					masonNpcClass.Chat(masonNpcClass.Player, "Follow me...");
 					masonNpcClass.Move:Face(Vector3.new(-0.619997144, 57.6597404, -25.171896));
 			
 					wait(0.1);
@@ -249,7 +249,7 @@ return function(CutsceneSequence)
 					if mission.ProgressionPoint >= 4 then return end;
 					masonNpcClass.Move:Face(Vector3.new(10.5800047, 57.6597404, -28.6719055));
 					
-					masonNpcClass.Chat(masonNpcClass.Owner, "Talk to Dr. Deniski");
+					masonNpcClass.Chat(masonNpcClass.Player, "Talk to Dr. Deniski");
 					masonNpcClass:ToggleInteractable(true);
 
 				elseif mission.ProgressionPoint == 3 then
@@ -265,7 +265,7 @@ return function(CutsceneSequence)
 					masonNpcClass.StopAnimation("Lean");
 					task.wait(2);
 
-					masonNpcClass.Chat(masonNpcClass.Owner, "I'll go and try to repair the car now..");
+					masonNpcClass.Chat(masonNpcClass.Player, "I'll go and try to repair the car now..");
 					masonNpcClass.Move:SetMoveSpeed("set", "default", 10);
 					
 					task.wait(1);

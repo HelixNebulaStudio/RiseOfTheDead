@@ -68,10 +68,10 @@ return function(CutsceneSequence)
 		if not isOwner then return end;
 
 		local masonSpawn = shared.modSafehomeService.GetNpcSpot("Mason");
-		local masonModule = modNpcs.getByOwner(player, "Mason");
+		local masonModule = modNpcs.getPlayerNpc(player, "Mason");
 		if masonModule == nil then
 			local npc = modNpcs.spawn("Mason", nil, function(npc, npcModule)
-				npcModule.Owner = player;
+				npcModule.Player = player;
 				masonModule = npcModule;
 			end);
 			modReplicationManager.ReplicateOut(player, npc);

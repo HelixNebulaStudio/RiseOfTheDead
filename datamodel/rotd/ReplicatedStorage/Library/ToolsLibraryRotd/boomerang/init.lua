@@ -12,7 +12,7 @@ local toolPackage = {
 		Core={Id=17791090952;};
 		PrimaryAttack={Id=17791092107};
 		PrimaryAttack2={Id=17791093356};
-		Inspect={Id=17791095270;};
+		Inspect={Id=17791095270; WaistStrength=0.2;};
 		Charge={Id=17791097278;};
 		Throw={Id=17791099691};
 		Equip={Id=18160784201};
@@ -52,10 +52,10 @@ local toolPackage = {
 		--== Projectile
 		ProjectileId = "boomerang";
 		ProjectileConfig={
-			Velocity = 50;
+			Velocity = 120;
 			LifeTime = 10;
 		};
-		VelocityBonus = 80;
+		VelocityBonus = 100;
 
 		ConsumeOnThrow=false;
 	};
