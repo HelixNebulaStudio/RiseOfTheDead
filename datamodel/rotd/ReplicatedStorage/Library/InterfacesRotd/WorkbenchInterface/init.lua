@@ -26,6 +26,9 @@ local interfacePackage = {
 };
 --==
 
+function interfacePackage.onRequire()
+	modKeyBindsHandler:SetDefaultKey("KeyWindowWorkbench", Enum.KeyCode.N);
+end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local remoteStorageItemSync = modRemotesManager:Get("StorageItemSync");
@@ -81,7 +84,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		workbenchWindow:SetClosePosition(UDim2.new(2, 0, 0.5, 0), UDim2.new(1, -10, 0.5, 0));
 	end
 
-	modKeyBindsHandler:SetDefaultKey("KeyWindowWorkbench", Enum.KeyCode.N);
 	local quickButton = interface:NewQuickButton("Workbench", "Workbench", "rbxassetid://2273400846");
 	quickButton.LayoutOrder = 15;
 	interface:ConnectQuickButton(quickButton, "KeyWindowWorkbench");

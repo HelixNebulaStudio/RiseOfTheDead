@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modBitFlags = shared.require(game.ReplicatedStorage.Library.BitFlags);
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 ---
 local itemPackage = {};
@@ -79,6 +80,71 @@ function itemPackage.GetTurretConfigs()
 			DefaultBitString = defaultHitlistBitString;
 		};
 	};
+end
+
+function itemPackage.StorageCheck(packet)
+	local dragStorageItem = packet.DragStorageItem;
+	local targetIndex = packet.TargetIndex;
+	if dragStorageItem.ItemId == "dualp250" then
+		packet.FailMsg = "The P.A.T. only has one arm and cannot equip dual weapons.";
+		packet.Allowed = false;
+		return packet;
+	end;
+	
+	if targetIndex == 1 then
+		if modItemsLibrary:HasTag(dragStorageItem.ItemId, "Gun") then
+			packet.Allowed = true;
+			return packet;
+		else
+			packet.FailMsg = "P.A.T. weapon slot is only for guns.";
+		end
+		
+	elseif targetIndex == 2 then
+		if dragStorageItem.ItemId == "battery" and dragStorageItem.Quantity == 1 then
+			packet.Allowed = true;
+			return packet;
+		elseif dragStorageItem.ItemId == "battery" and dragStorageItem.Quantity > 1 then
+			packet.FailMsg = "Only put one battery in the P.A.T. battery slot.";
+			
+		else
+			packet.FailMsg = "P.A.T. battery slot is only for batteries.";
+			
+		end
+	end
+	
+	packet.Allowed = false;
+	return packet;
+end
+
+
+local function setWeaponId(storage)
+	local player = storage.Player;
+	local profile = shared.modProfile:Find(player.Name);
+	if profile == nil then return end;
+	
+	local playerSave = profile:GetActiveSave();
+	
+	local storageSiid = storage.Values.Siid;
+	if storageSiid == nil then return end;
+	local clothingStorage = playerSave.Clothing;
+	local patStorageItem = clothingStorage:Find(storageSiid);
+	
+	local weaponStorageItem = storage:FindByIndex(1); -- StorageIndexEnums
+	
+	local accessories = playerSave.AppearanceData:GetAccessories(storageSiid);
+	for a=1, #accessories do
+		accessories[a]:SetAttribute("WeaponStorageItemID", weaponStorageItem and weaponStorageItem.ID or nil);
+	end
+	
+	if patStorageItem == nil then return end;
+	patStorageItem:SetValues("EquippedWeapon", weaponStorageItem and weaponStorageItem.ID or nil):Sync{"EquippedWeapon"};
+end
+function itemPackage.InitStorage(storage)
+	setWeaponId(storage);
+end
+
+function itemPackage.ConnectChanged(storage)
+	setWeaponId(storage);
 end
 
 function itemPackage.Init(itemLib)

@@ -39,11 +39,14 @@ local interfacePackage = {
 };
 --==
 
+function interfacePackage.onRequire()
+	modKeyBindsHandler:SetDefaultKey("KeyWindowMapMenu", Enum.KeyCode.M);
+end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
-local mapMenu = script:WaitForChild("MapFrame"):Clone();
+	local mapMenu = script:WaitForChild("MapFrame"):Clone();
 	mapMenu.Parent = interface.ScreenGui;
 	
 	local locationPopup = script:WaitForChild("locationPopup"):Clone();
@@ -78,7 +81,6 @@ local mapMenu = script:WaitForChild("MapFrame"):Clone();
 	local window: InterfaceWindow = interface:NewWindow("MapMenu", mapMenu);
     interface:BindConfigKey("DisableMapMenu", {window});
 	
-	modKeyBindsHandler:SetDefaultKey("KeyWindowMapMenu", Enum.KeyCode.M);
 	local quickButton = interface:NewQuickButton("MapMenu", "Map", "rbxassetid://4615489625");
 	quickButton.LayoutOrder = 4;
 	interface:ConnectQuickButton(quickButton, "KeyWindowMapMenu");

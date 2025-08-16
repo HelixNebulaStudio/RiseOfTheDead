@@ -83,6 +83,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	else
 		storageTitleTag = storageFrame:WaitForChild("Title");
+        window:SetClosePosition(UDim2.new(0.5, 0, 1, 0), UDim2.new(0.5, 0, 0.5, 0));
 	end
 
 	local addSlotDebounce = tick();

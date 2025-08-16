@@ -11,7 +11,7 @@ jobs:
         uses: Sniddl/discord-commits@v1.6
         with:
           webhook: ${{ secrets.Discord_Webhook }}
-          message: 'New commit on **${{ github.ref_name }}**'
+          message: 'New updates on **Rotd: Dev Branch**'
           embed: '{
             "title": "{{ commit.title }}",
             "description": "{{ commit.description }}\n\n[Rise of the Dead](https://helixnebulastudio.github.io/RiseOfTheDead/)",

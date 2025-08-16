@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService");
 local localPlayer = game.Players.LocalPlayer;
 
 local modInfoBubbles = shared.require(game.ReplicatedStorage.Library.InfoBubbles);
-local modStatusEffects = require(game.ReplicatedStorage.Library.StatusEffects);
+local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 --==
 
 function modStatusEffects.onRequire()

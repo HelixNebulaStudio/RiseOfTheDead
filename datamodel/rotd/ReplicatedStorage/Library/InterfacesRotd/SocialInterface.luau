@@ -36,6 +36,9 @@ local interfacePackage = {
 };
 --==
 
+function interfacePackage.onRequire()
+	modKeyBindsHandler:SetDefaultKey("KeyWindowSocialMenu", Enum.KeyCode.G);
+end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local remotes = game.ReplicatedStorage.Remotes;
@@ -106,7 +109,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	else
 		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, -35));
 	end
-	modKeyBindsHandler:SetDefaultKey("KeyWindowSocialMenu", Enum.KeyCode.G);
 	local quickButton = interface:NewQuickButton("SocialMenu", "Social", "rbxassetid://3256270238");
 	quickButton.LayoutOrder = 3;
 	interface:ConnectQuickButton(quickButton, "KeyWindowSocialMenu");

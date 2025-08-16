@@ -25,6 +25,9 @@ local interfacePackage = {
 };
 --==
 
+function interfacePackage.onRequire()
+	modKeyBindsHandler:SetDefaultKey("KeyWindowGoldMenu", Enum.KeyCode.K);
+end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local frontPage = "FrontPage";
@@ -80,7 +83,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	interface:ConnectQuickButton(goldButton);
 	goldShopWindow:AddCloseButton(goldMenuFrame);
-	modKeyBindsHandler:SetDefaultKey("KeyWindowGoldMenu", Enum.KeyCode.K);
 	interface:BindConfigKey("DisableGoldMenu", {goldShopWindow}, {goldStatFrame});
 
 

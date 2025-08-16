@@ -241,7 +241,7 @@ function modItemsLibrary.onRequire()
     new(clothingBase, {Id="divingsuit"; Name="Diving Suit"; Icon="rbxassetid://10342826622"; Tags={"FullBody"; "Diving Gear"; "Utility Wear";}; Description="Reduces oxygen cost while being underwater and increases oxygen restore rate.";});
     new(clothingBase, {Id="inflatablebuoy"; Name="Inflatable Buoy"; Icon="rbxassetid://10393385339"; Tags={"Utility Wear";}; Description="Helps you float to the top when swimming.";});
     new(clothingBase, {Id="mercskneepads"; Name="Merc's Knee Pads"; Icon="rbxassetid://11026588384"; Tags={"Utility Wear"}; Description="A mercenary's favourite holster and knee pads.\n\n<b>[Passive] Tactical Holsters:</b>Reduces tool equip time by 40%.";});
-    new(clothingBase, {Id="portableautoturret"; TradingTax=9900; Usable="Configure"; CanVanity=false; Name="Portable Auto Turret"; Icon="rbxassetid://139796387934890"; Tags={"Utility Wear"}; Description="A wearable portable auto turret designed by the Mysterious Engineer. Requires batteries to run. Configure to equipped your weapon onto the arm and fine tune the P.A.T. to how you want it to function, but due to it's crude nature, the arm's aim accuracy can be underwhelming and reload times are 3x as slow."; Sources={"Obtained in <b>Mission: Belly of the Beast</b>";}; });
+    new(clothingBase, {Id="portableautoturret"; TradingTax=9900; Usable="Configure"; CanVanity=false; Name="Portable Auto Turret"; StoragePresetId="portableautoturret"; Icon="rbxassetid://139796387934890"; Tags={"Utility Wear"}; Description="A wearable portable auto turret designed by the Mysterious Engineer. Requires batteries to run. Configure to equipped your weapon onto the arm and fine tune the P.A.T. to how you want it to function, but due to it's crude nature, the arm's aim accuracy can be underwhelming and reload times are 3x as slow."; Sources={"Obtained in <b>Mission: Belly of the Beast</b>";}; });
     new(clothingBase, {Id="snowsledge"; Name="Snow Sledge"; Icon="rbxassetid://81677686649543"; Tags={"Utility Wear"}; Description="A home-made wooden sledge.\n\n<b>[Passive] Sledding:</b>Start sledding when you slide, allows you to slide for 2 extra seconds before you experience friction.";});
     new(clothingBase, {Id="ammopouch"; Name="Ammo Pouch"; Icon="rbxassetid://122023406947488"; Usable="Use"; Tags={"Utility Wear"}; Description="A pouch to contain extra ammo refills for your weapons. Refill charges can be restored in the shop."; });
 
@@ -249,12 +249,13 @@ function modItemsLibrary.onRequire()
         Type = modItemsLibrary.Types.Clothing;
         Tradable = modItemsLibrary.Tradable.Tradable;
         Tags = {"Storage"};
-        Usable="Open";
-        Description="Portable storage with 15 max slots. Deleting this item will not lose your items. Right-click to open storage.";
+        Usable = "Open";
+        Description = "Portable storage with 15 max slots. Deleting this item will not lose your items. Right-click to open storage and to upgrade.";
+        SlotColor = Color3.fromRGB(73, 75, 50);
     }
 
-    new(storageBase, {Id="dufflebag"; Name="Duffle Bag"; Icon="rbxassetid://8827967921";});
-    new(storageBase, {Id="survivorsbackpack"; Name="Survivor's Backpack"; Icon="rbxassetid://8948320931";});
+    new(storageBase, {Id="dufflebag"; Name="Duffle Bag"; StoragePresetId="dufflebag"; Icon="rbxassetid://8827967921";});
+    new(storageBase, {Id="survivorsbackpack"; Name="Survivor's Backpack"; StoragePresetId="dufflebag"; Icon="rbxassetid://8948320931";});
 
 
 

@@ -7,7 +7,7 @@ local TweenService = game:GetService("TweenService");
 local localPlayer = game.Players.LocalPlayer;
 local camera = workspace.CurrentCamera;
 
-local modItem = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
@@ -106,8 +106,13 @@ local CharacterConfigurations = {
 	end;
 };
 
+function interfacePackage.onRequire()
+	modKeyBindsHandler:SetDefaultKey("KeyWindowInventory", Enum.KeyCode.Tab);
+end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
+	local templateSlot = script:WaitForChild("SlotTemplate");
+
 	local remoteToggleDefaultAccessories = modRemotesManager:Get("ToggleDefaultAccessories");
 	local remoteStorageService = modRemotesManager:Get("StorageService");
 	local remoteItemActionHandler = modRemotesManager:Get("ItemActionHandler");
@@ -123,18 +128,43 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local modCharacter = modData:GetModCharacter();
 	
-	local inventoryFrame = modConfigurations.CompactInterface 
-						and script:WaitForChild("MobileInventory"):Clone() 
-						or script:WaitForChild("Inventory"):Clone();
-	inventoryFrame.Name = "Inventory";
+	local inventoryFrame = script:WaitForChild("Inventory"):Clone(); 
+	-- modConfigurations.CompactInterface 
+	-- 					and script:WaitForChild("MobileInventory"):Clone() 
+	-- 					or 
+	-- inventoryFrame.Name = "Inventory";
 	inventoryFrame.Parent = interfaceScreenGui;
-	local inventorySlotLists = inventoryFrame;
-	
+
+	local invFrameSizeConstraint: UISizeConstraint = inventoryFrame:WaitForChild("UISizeConstraint");
+	local invContainerFrame = inventoryFrame:WaitForChild("Container");
+	local containerUiLayout = invContainerFrame:WaitForChild("UIListLayout");
+
+	containerUiLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		local contentSizeY = containerUiLayout.AbsoluteContentSize.Y;
+		invFrameSizeConstraint.MaxSize = Vector2.new(math.huge, contentSizeY+65);
+	end)
+
+	for _, scrollFrame in pairs(invContainerFrame:GetChildren()) do
+		if not scrollFrame:IsA("ScrollingFrame") then continue end;
+
+		local uiGridLayout = scrollFrame:WaitForChild("UIGridLayout") :: UIGridLayout;
+		if uiGridLayout == nil then continue end;
+
+		uiGridLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			scrollFrame.Size = UDim2.new(1, 0, 0, uiGridLayout.AbsoluteContentSize.Y);
+		end)
+	end
+
 	local inventoryWindow: InterfaceWindow = interface:NewWindow("Inventory", inventoryFrame);
 	inventoryWindow.CompactFullscreen = true;
 	interface:BindConfigKey("DisableInventory", {inventoryWindow});
 	
 	if modConfigurations.CompactInterface then
+		inventoryFrame.AnchorPoint = Vector2.new(0, 0);
+		inventoryFrame.Position = UDim2.new(0, 0, 0, 0);
+		inventoryFrame.Size = UDim2.new(0.5, 0, 1, 0);
+		game.Debris:AddItem(inventoryFrame:FindFirstChild("UISizeConstraint"), 0);
+
 		inventoryFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
 			inventoryWindow:Close();
 		end)
@@ -143,7 +173,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		inventoryWindow:SetClosePosition(UDim2.new(-1, 0, 0.5, 0), UDim2.new(0, 10, 0.5, 0));
 	end
 
-	modKeyBindsHandler:SetDefaultKey("KeyWindowInventory", Enum.KeyCode.Tab);
 	local quickButton = interface:NewQuickButton("Inventory", "Inventory", "rbxassetid://2169843985");
 	quickButton.LayoutOrder = 2;
 	interface:ConnectQuickButton(quickButton, "KeyWindowInventory");
@@ -154,7 +183,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
 	local templateHotbarSlot = script:WaitForChild("hotbarSlot");
 	local templateTClothingOption = script:WaitForChild("toggleClothingOption");
-	local temperatureLabel, bodyEquipmentsFrame;
+
+	local armorTitleLabel: TextLabel = invContainerFrame:WaitForChild("ArmorTitle");
+	local temperatureLabel = armorTitleLabel:WaitForChild("temperatureLabel");
+	local bodyEquipmentsFrame = inventoryFrame:WaitForChild("BodyEquipmentStats");
 	
 	local hotbarWindow: InterfaceWindow = interface:NewWindow("Hotbar", hotbarFrame);
     hotbarWindow.Layers = {"CharacterHud"; "CompactHidden"};
@@ -164,25 +196,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	interface:BindConfigKey("DisableHotbar", {hotbarWindow});
 
 	if modConfigurations.CompactInterface then
-        -- interface.Properties.OnChanged:Connect(function(k, v)
-        --     if k == "IsCompactFullscreen" then
-        --         if modConfigurations.DisableHotbar then
-        --             hotbarFrame.Visible = false;
-        --         else
-        --             hotbarFrame.Visible = not v;
-        --         end
-        --     end
-        -- end)
-        
-		inventorySlotLists = inventoryFrame:WaitForChild("Inventory");
-
-		local armorTitleLabel: TextLabel = inventorySlotLists:WaitForChild("ArmorTitle");
-		temperatureLabel = armorTitleLabel:WaitForChild("temperatureLabel");
-		bodyEquipmentsFrame = armorTitleLabel:WaitForChild("BodyEquipmentStats");
-
 		interface.Garbage:Tag(armorTitleLabel.InputBegan:Connect(function(inputObject)
 			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 
 			or inputObject.UserInputType == Enum.UserInputType.Touch then
+
+				local yPos = armorTitleLabel.AbsolutePosition.Y-inventoryFrame.AbsolutePosition.Y;
+				bodyEquipmentsFrame.Position = UDim2.new(0, 0, 0, yPos);
 				bodyEquipmentsFrame.Visible = not bodyEquipmentsFrame.Visible;
 			end
 		end))
@@ -195,7 +214,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		local padding = Instance.new("UIPadding");
 		padding.PaddingRight = UDim.new(0, 15);
-		padding.Parent = inventorySlotLists;
+		padding.Parent = invContainerFrame;
 
 	else
 		interface.OnWindowToggle:Connect(function(window: InterfaceWindow, visible: boolean, ...)
@@ -216,10 +235,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 		end)
 
-		local armorTitleLabel: TextLabel = inventoryFrame:WaitForChild("ArmorTitle");
-		temperatureLabel = armorTitleLabel:WaitForChild("temperatureLabel");
-		bodyEquipmentsFrame = armorTitleLabel:WaitForChild("BodyEquipmentStats");
-		
 		interface.Garbage:Tag(armorTitleLabel.MouseEnter:Connect(function()
 			bodyEquipmentsFrame.Visible = true;
 		end))
@@ -232,10 +247,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local toggleClothingButton = inventoryFrame:WaitForChild("ToggleClothing");
 	local clothingToggleMenu = toggleClothingButton:WaitForChild("Frame");
 
-	local defaultSlots = {}; for _,value in pairs(inventorySlotLists.MainList:GetChildren()) do if value:IsA("GuiObject") and value.LayoutOrder > 0 then value:SetAttribute("Index", value.LayoutOrder); table.insert(defaultSlots, value) end end;
-	local premiumSlots = {}; for _,value in pairs(inventorySlotLists.PremiumList:GetChildren()) do if value:IsA("GuiObject") and value.LayoutOrder > 0 then value:SetAttribute("Index", value.LayoutOrder); table.insert(premiumSlots, value) end end;
+	local defaultSlots = {}; for _,value in pairs(invContainerFrame.MainList:GetChildren()) do if value:IsA("GuiObject") and value.LayoutOrder > 0 then value:SetAttribute("Index", value.LayoutOrder); table.insert(defaultSlots, value) end end;
+	local premiumSlots = {}; for _,value in pairs(invContainerFrame.PremiumList:GetChildren()) do if value:IsA("GuiObject") and value.LayoutOrder > 0 then value:SetAttribute("Index", value.LayoutOrder); table.insert(premiumSlots, value) end end;
 	local hotBarSlots = {}; for _,value in pairs(hotbarFrame:GetChildren()) do if value:IsA("GuiObject") and value.LayoutOrder > 0 then value:SetAttribute("Index", value.LayoutOrder); table.insert(hotBarSlots, value) end end;
-	local clothingSlots = {}; for _,value in pairs(inventorySlotLists.ArmorList:GetChildren()) do if value:IsA("GuiObject") and value.LayoutOrder > 0 then value:SetAttribute("Index", value.LayoutOrder); table.insert(clothingSlots, value) end end;
+	local clothingSlots = {}; for _,value in pairs(invContainerFrame.ArmorList:GetChildren()) do if value:IsA("GuiObject") and value.LayoutOrder > 0 then value:SetAttribute("Index", value.LayoutOrder); table.insert(clothingSlots, value) end end;
 
 	local defaultStorageInterface = modStorageInterface.new("Inventory", inventoryFrame, defaultSlots);
 	defaultStorageInterface.Name = "DefaultInterface";
@@ -261,7 +276,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local clothingStorageInterface = modStorageInterface.new("Clothing", inventoryFrame, clothingSlots);
 	clothingStorageInterface.Name = "ClothingInterface";
 	clothingStorageInterface:ConnectDepositLimit(function(slotInterface, slotTable, slotTableB)
-		if slotTable.Library.Type ~= modItem.Types.Clothing then
+		if slotTable.Library.Type ~= modItemsLibrary.Types.Clothing then
 			if not slotInterface.WarnLabel.Visible then
 				slotInterface.WarnLabel.Text = "Clothing Only!"
 				slotInterface.WarnLabel.Visible = true;
@@ -275,6 +290,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 		return;
 	end);
+	function clothingStorageInterface:DecorateSlot(index, slotTable)
+		local slotFrame = slotTable.Frame;
+		local itemSlot: ItemSlot = slotTable.ItemSlot;
+		if itemSlot == nil or itemSlot.Item == nil or itemSlot.Item.Library == nil or itemSlot.Item.Library.SlotColor == nil then
+			slotFrame.ImageColor3 = Color3.fromRGB(30, 30, 30);
+			return;
+		end
+		slotFrame.ImageColor3 = itemSlot.Item.Library.SlotColor;
+	end
 	
 	clothingStorageInterface:AddContextOption({
 		Text="Wardrobe";
@@ -456,6 +480,70 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		Order=7;
 	};
 	clothingStorageInterface:AddContextOption(clothingContextOption);
+
+	--== Storage extension;
+	local portableStorageInterfaces: {[string]: StorageInterface} = {};
+	local linkStorageFrame = invContainerFrame:WaitForChild("LinkedList");
+
+	local refreshDebounceIndex = 0;
+	local function RefreshPortableStorages()
+		refreshDebounceIndex = refreshDebounceIndex+1;
+		local cIndex = refreshDebounceIndex;
+		
+		task.wait(0.1);
+		if cIndex ~= refreshDebounceIndex then return end;
+		
+		local linkedStorages = modData.Storages.Inventory.LinkedStorages;
+		
+		for _, obj in pairs(linkStorageFrame:GetChildren()) do
+			if not obj:IsA("GuiObject") then continue end;
+			obj.Parent = nil;
+			game.Debris:AddItem(obj, 0);
+		end
+
+		local showLinkStorageFrame = false;
+		for order=1, #linkedStorages do
+			local linkedStorage = linkedStorages[order];
+
+			local itemLib = modItemsLibrary:Find(linkedStorage.ItemId);
+			local storageId = linkedStorage.StorageId;
+			local storage = modData.GetStorage(storageId);
+			if storage == nil then continue end;
+
+			local slotFrames = {};
+			for a=1, storage.Size do
+				local newSlot: ImageLabel = templateSlot:Clone();
+				newSlot:SetAttribute("Index", a);
+				newSlot.LayoutOrder = a;
+				newSlot.Name = `{newSlot.LayoutOrder}`;
+				newSlot.ImageColor3 = itemLib.SlotColor;
+				newSlot.Parent = linkStorageFrame;
+				
+				table.insert(slotFrames, newSlot);
+				showLinkStorageFrame = true;
+			end
+			
+			if portableStorageInterfaces[storageId] == nil then
+				portableStorageInterfaces[storageId] = modStorageInterface.new(storageId, inventoryFrame, slotFrames);
+				portableStorageInterfaces[storageId]:AddContextOption(usableContextOption);
+
+			else
+				portableStorageInterfaces[storageId]:UpdateSlotFrames(slotFrames);
+				
+			end
+			
+			portableStorageInterfaces[storageId]:Update();
+		end
+
+		linkStorageFrame.Visible = showLinkStorageFrame;
+	end
+	
+	interface.Garbage:Tag(modData.OnStorageUpdate:Connect(function(storage)
+		local storageId = storage.Id;
+		if storageId == "Inventory" or portableStorageInterfaces[storageId] then
+			RefreshPortableStorages();
+		end
+	end))
 
 
 	--== Shared Context Options;

@@ -103,7 +103,7 @@ modStoragePresetsLibrary:Add{
     Name = "Ammo Pouch";
     Configuration = {
         Persistent = true;
-        Size=5;
+        Size = 5;
         Virtual = true;
     };
 }
@@ -147,17 +147,20 @@ modStoragePresetsLibrary:Add{
 --MARK: Item related
 modStoragePresetsLibrary:Add{
     Id = "dufflebag";
+    StaticStorageId = "dufflebag";
+    LinkInventory = true;
     Configuration = {
-        Persistent=true;
-        Expandable=true;
-        Size=5;
-        MaxSize=15;
+        Persistent = true;
+        Expandable = true;
+        Size = 5;
+        MaxSize = 15;
         Virtual = true;
     };
 };
 
 modStoragePresetsLibrary:Add{
     Id = "portableautoturret";
+    StaticStorageId = "portableautoturret";
     Configuration = {
         Persistent=true;
         Expandable=true;

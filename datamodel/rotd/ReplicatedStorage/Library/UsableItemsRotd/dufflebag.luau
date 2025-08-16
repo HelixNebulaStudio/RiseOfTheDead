@@ -4,14 +4,12 @@ local UsablePreset = shared.require(game.ReplicatedStorage.Library.UsableItems.U
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
-UsablePreset.PortableStoragePresetId = "dufflebag";
-
 function UsablePreset:ClientUse(storageItem)
 	local player = game.Players.LocalPlayer;
 	local modData = shared.require(player:WaitForChild("DataModule"));
 	local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 	
-	local storage = modData.RequestStorage{Action="GetStorage"; Siid=storageItem.ID};
+	local storage = modData.RequestStorage{Action="GetStorage"; StorageId="dufflebag"};
 	if storage then
 		modAudio.Preload("ZipOpen", 5);
 		modAudio.Play("ZipOpen");

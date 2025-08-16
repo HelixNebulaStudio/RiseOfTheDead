@@ -27,6 +27,9 @@ local interfacePackage = {
     Type = "Player";
 };
 --==
+function interfacePackage.onRequire()
+	modKeyBindsHandler:SetDefaultKey("KeyWindowMasteryMenu", Enum.KeyCode.L);
+end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
@@ -775,7 +778,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end)
 	
-	modKeyBindsHandler:SetDefaultKey("KeyWindowMasteryMenu", Enum.KeyCode.L);
 	local quickButton = interface:NewQuickButton("MasteryMenu", "Masteries", "rbxassetid://2938848546");
 	quickButton.LayoutOrder = 5;
 	interface:ConnectQuickButton(quickButton, "KeyWindowMasteryMenu");

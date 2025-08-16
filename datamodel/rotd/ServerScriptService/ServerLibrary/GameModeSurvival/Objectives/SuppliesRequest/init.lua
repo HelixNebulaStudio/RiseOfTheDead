@@ -10,8 +10,10 @@ Objective.Controller = nil;
 
 local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modDamagable = shared.require(game.ReplicatedStorage.Library.Damagable);
 local modNpcs = shared.modNpcs;
+local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
+
+local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 --==
 
 function Objective.new()
@@ -80,10 +82,11 @@ function Objective:Begin()
 	humanoid.MaxHealth = 10000 * (self.Controller.IsHard and 10 or 1);
 	humanoid.Health = humanoid.MaxHealth;
 
-	local destructible = shared.require(newPrefab:WaitForChild("Destructible"));
-	self.ActiveDestructibleObj = destructible;
+	local destructibleConfig = shared.require(newPrefab:WaitForChild("Destructible"));
+	local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
+	self.ActiveDestructibleInstance = destructible;
 
-	function destructible:OnDestroy()
+	destructible.OnDestroy:Connect(function()
 		Debugger:Warn("radio destroyed");
 
 		self.ActiveRadioPrefab = nil;
@@ -108,8 +111,7 @@ function Objective:Begin()
 
 			end
 		end
-	end
-	
+	end)
 	
 	newPrefab:PivotTo(CFrame.new(spawnCf) * worldSpawn.CFrame.Rotation);
 	newPrefab.Name = "Resupply Radio";
@@ -165,11 +167,10 @@ function Objective:Tick()
 		if self.StartTick then
 
 			if self.ActiveInteractData.CallInterupted == true then
-				self.ActiveDestructibleObj:TakeDamagePackage(modDamagable.NewDamageSource{
-					Damage=200;
-					Dealer=script.BasicDamager;
-				})
-				--self.ActiveDestructibleObj:TakeDamage(200, script.BasicDamager);
+				local destructibleInstance: DestructibleInstance = self.ActiveDestructibleInstance;
+				destructibleInstance.HealthComp:TakeDamage(DamageData.new{
+					Damage = 200;
+				});
 			end
 
 			local isFiveSecTick = tick()-self.FiveSecTick > 5
@@ -213,11 +214,10 @@ function Objective:Tick()
 			
 		else
 			if timelapseSinceStart > 10 then
-				self.ActiveDestructibleObj:TakeDamagePackage(modDamagable.NewDamageSource{
-					Damage=200;
-					Dealer=script.BasicDamager;
-				})
-				--	:TakeDamage(200, script.BasicDamager);
+				local destructibleInstance: DestructibleInstance = self.ActiveDestructibleInstance;
+				destructibleInstance.HealthComp:TakeDamage(DamageData.new{
+					Damage = 200;
+				});
 			end
 			
 		end

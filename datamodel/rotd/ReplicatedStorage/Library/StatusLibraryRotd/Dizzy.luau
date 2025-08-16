@@ -70,10 +70,17 @@ function statusPackage.BindExpire(statusClass: StatusClassInstance)
 
     if modCharacter then
         if modCharacter.StatusBlur then
-            modCharacter.StatusBlur.Size = 0;
+            TweenService:Create(modCharacter.StatusBlur,
+                TweenInfo.new(tonumber(0.1), Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                {Size = 0;}
+            ):Play();
         end
         modCharacter.MouseProperties.MovementNoise = false;
         modCharacter.DizzyZAim = false;
+
+        if modCharacter.CameraShakeAndZoom then
+            modCharacter.CameraShakeAndZoom(0, 0, 0);
+        end
     end
 end
 

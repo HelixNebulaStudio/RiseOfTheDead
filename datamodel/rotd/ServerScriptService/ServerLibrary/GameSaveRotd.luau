@@ -55,6 +55,67 @@ shared.coreBind(modGameSave, "_new", function(gameSave: GameSaveRotd, profile: P
 	gameSave.Storages.Wardrobe = wardrobeStorage;
 	--Adding new storages requires adding sync in inv interface;
 
+	gameSave.Clothing.OnChanged:Connect(function()
+		local portableStorages = {};
+		local equippedStorageIds = {};
+		local alreadyLinked = {};
+
+		for siid, storageItem in pairs(gameSave.Clothing.Container) do
+			local itemId = storageItem.ItemId;
+
+			local storagePresetId = modItemsLibrary:Find(itemId);
+			storagePresetId = storagePresetId and storagePresetId.StoragePresetId or nil;
+			if storagePresetId == nil then continue end;
+
+			local storagePresetLib = modStoragePresetsLibrary:Find(storagePresetId);
+			if storagePresetLib == nil or storagePresetLib.LinkInventory ~= true then continue; end;
+			
+			local storageId = storagePresetLib.StaticStorageId;
+			if storageId == nil then continue end;
+
+			if alreadyLinked[storageId] then continue end;
+			alreadyLinked[storageId] = true;
+
+			local storageConfig = storagePresetLib.Configuration;
+			
+			local new = {
+				StorageId = storageId;
+				ItemId = itemId;
+				Siid = siid;
+			};
+			table.insert(portableStorages, new);
+			equippedStorageIds[new.StorageId] = new;
+
+			local storageExist = modStorage.get(storageId, player) ~= nil;
+			local storage = modStorage.openStorage(storageId, {
+				Player = player;
+				
+				StoragePresetLib = storagePresetLib;
+				StoragePage = 1;
+			});
+			if storage then
+				storage:Sync(player);
+			end
+			if not storageExist then
+				gameSave.Inventory:Sync(player);
+			end
+		end
+		
+		local unequippedStorages = {};
+		for a=1, #gameSave.Inventory.LinkedStorages do
+			local oldInfo = gameSave.Inventory.LinkedStorages[a];
+			if equippedStorageIds[oldInfo.StorageId] == nil then
+				unequippedStorages[oldInfo.StorageId] = oldInfo;
+			end
+		end
+		
+		table.clear(gameSave.Inventory.LinkedStorages);
+		for a=1, #portableStorages do
+			local linkStorageInfo = portableStorages[a];
+			table.insert(gameSave.Inventory.LinkedStorages, linkStorageInfo);
+		end
+	end)
+
 end)
 
 shared.coreBind(modGameSave, "_load_storage", function(gameSave: GameSaveRotd, storageId: string, rawStorage)

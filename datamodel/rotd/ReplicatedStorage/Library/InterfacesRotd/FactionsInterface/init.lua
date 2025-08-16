@@ -54,6 +54,9 @@ local interfacePackage = {
 };
 --==
 
+function interfacePackage.onRequire()
+	modKeyBindsHandler:SetDefaultKey("KeyWindowFactionsMenu", Enum.KeyCode.O);
+end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local chatRoomInterface = shared.require(localPlayer.PlayerGui:WaitForChild("ChatInterface"):WaitForChild("ChatRoomInterface"));
@@ -80,7 +83,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.1, 0));
 	end
 	
-	modKeyBindsHandler:SetDefaultKey("KeyWindowFactionsMenu", Enum.KeyCode.O);
 	local quickButton = interface:NewQuickButton("FactionsMenu", "Factions", "rbxassetid://9890634236");
 	quickButton.LayoutOrder = 4;
 	interface:ConnectQuickButton(quickButton, "KeyWindowFactionsMenu");

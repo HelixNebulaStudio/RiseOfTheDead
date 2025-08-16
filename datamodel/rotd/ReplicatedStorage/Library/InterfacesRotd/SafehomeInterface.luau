@@ -18,6 +18,9 @@ local interfacePackage = {
 };
 --==
 
+function interfacePackage.onRequire()
+	modKeyBindsHandler:SetDefaultKey("KeyWindowSafehome", Enum.KeyCode.U);
+end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
@@ -40,7 +43,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	window:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, 0));
     interface:BindConfigKey("DisableSafehomeMenu", {window});
 
-	modKeyBindsHandler:SetDefaultKey("KeyWindowSafehome", Enum.KeyCode.U);
 	local quickButton = interface:NewQuickButton("Safehome", "Safehome", "rbxassetid://7045405631");
 	quickButton.LayoutOrder = 10;
 	interface:ConnectQuickButton(quickButton, "KeyWindowSafehome");
