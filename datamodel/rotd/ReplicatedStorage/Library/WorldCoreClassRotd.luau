@@ -1,21 +1,98 @@
-
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
 local RunService = game:GetService("RunService");
 
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modWorldCoreClass = shared.require(game.ReplicatedStorage.Library.WorldCoreClass);
 
 if RunService:IsServer() then
-    modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
-    modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
     modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
 
+    modNpcs = shared.require(game.ServerScriptService.ServerLibrary.Entity.Npcs);
+    modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
+    modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 end
 --==
 function modWorldCoreClass.onRequire()
+    local function onDayChanged()
+        task.spawn(function() 
+            shared.waitForIgnition();
+            if RunService:IsStudio() then return end; -- TODO: Remove
+            modWorldCoreClass.updateWanderers();
+        end)
+    end
 
+    if workspace:GetAttribute("DayOfYear") then onDayChanged(); end
+    workspace:GetAttributeChangedSignal("DayOfYear"):Connect(onDayChanged);
+
+    modConfigurations.Set("UseOldItemDrop.Spawn", true);
 end
 
+function modWorldCoreClass.updateWanderers()
+    if modBranchConfigs.NavLinks == nil then return end;
+    
+    task.spawn(function()
+        local day = workspace:GetAttribute("DayOfYear");
+        local spawnWorldList = {};
+        
+        for worldId, worldNav in pairs(modBranchConfigs.NavLinks) do
+            table.insert(spawnWorldList, {Id=worldId; Nav=worldNav});
+        end
+        
+        local wandererList = {
+            "Icarus";
+        };
+        
+        local spawnWorld = spawnWorldList[math.fmod(day, #spawnWorldList)+1];
+        if modBranchConfigs.CurrentBranch.Name == "Dev" then
+            spawnWorld = {Id=modBranchConfigs.GetWorld(); Nav=modBranchConfigs.NavLinks[modBranchConfigs.GetWorld()]};
+        end
+        
+        if spawnWorld.Nav then
+            local spawnWandererName = wandererList[math.fmod(day, #wandererList)+1];
+            local spawnNavId = nil;
+            
+            for navLocation, info in pairs(spawnWorld.Nav) do
+                if info.Safehouse == true then
+                    spawnNavId = navLocation;
+                    break;
+                end
+            end
+            
+            Debugger:Log("Wanderer (",spawnWandererName,") Spawn World:",spawnWorld.Id, " Spawn safehouse:", spawnWorld.Nav[spawnNavId]);
+            
+            for a=#modNpcs.ActiveNpcClasses, 1, -1 do
+                local npcClass = modNpcs.ActiveNpcClasses[a];
+                if npcClass and npcClass.WanderingTrader then
+                    if npcClass.Prefab then
+                        game.Debris:AddItem(npcClass.Prefab, 0);
+                    end
+                    npcClass:Destroy();
+                end
+            end
+            
+            if modBranchConfigs.IsWorld(spawnWorld.Id) then
+                local doorInstance = workspace.Interactables:FindFirstChild(spawnWorld.Nav[spawnNavId].Entrance);
+                
+                local spawnCFrame = CFrame.new(doorInstance.Destination.WorldPosition + Vector3.new(0, 2.35, 0)) 
+                    * CFrame.Angles(0, math.rad(doorInstance.Destination.WorldOrientation.Y-90), 0);
+                
+                modNpcs.spawn(spawnWandererName, spawnCFrame, function(npc, npcClass)
+                    npcClass.CurrentNav = spawnNavId;
+                    
+                end, modNpcs.NpcBaseConstructors.WanderingTrader);
+            end
+
+            modBranchConfigs.Wanderer = {
+                Name=spawnWandererName;
+                WorldId=spawnWorld.Id;
+            };
+            
+        end
+    end)
+end
 
 function modWorldCoreClass:SpawnGift(player: Player, giftId: string, giftCf: CFrame)
     local profile: ProfileRotd = shared.modProfile:Get(player) :: ProfileRotd;

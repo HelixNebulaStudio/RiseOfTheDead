@@ -624,6 +624,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end)
 			
 		else
+            modData.RequestStorage{
+                Action = "CloseStorage";
+                StorageId = openSettings.StorageId;
+            };
+
             table.clear(openSettings);
             openSettings.Interactable = nil;
 
@@ -639,13 +644,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 			modStorageInterface.SetQuickTarget();
             interface:ToggleWindow("Inventory", false);
-			
-			task.spawn(function()
-				local _rPacket = remoteStorageService:InvokeServer({
-					Action="CloseStorage";
-					StorageId=storageId;
-				});
-			end)
 		end
 	end)
 	

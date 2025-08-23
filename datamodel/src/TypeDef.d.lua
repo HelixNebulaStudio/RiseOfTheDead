@@ -290,7 +290,19 @@ export type GameSave = {
 export type Storages = {
     -- @static
     get: (sid: string, player: Player) -> Storage?;
-    
+
+    fulfillList: (Player, list: {
+        {ItemId: string; Amount: number;}
+    }) -> (boolean, {anydict});
+    consumeList: ({
+        {Item: StorageItem; Amount: number; Storage: Storage;}
+    }) -> nil;
+
+    listItemIdFromStorages: (itemId: string, player: Player, customStorages: {string}?) -> (
+        {{Item: StorageItem, Storage: Storage}}, 
+        number
+    );
+
     GetPrivateStorages: (player: Player) -> {[string]: Storage};
     Get: (id: string, player: Player) -> Storage?;
     FindIdFromStorages: (siid: string, player: Player) -> (StorageItem?, Storage?);
@@ -324,6 +336,7 @@ export type Storage = {
     Virtual: boolean;
     Settings: anydict;
     Values: anydict;
+    Cache: anydict;
 
     Locked: boolean;
     ViewOnly: boolean;
@@ -395,6 +408,7 @@ export type PlayerClasses = {
     get: (Player) -> PlayerClass;
     getByName: (name: string) ->  PlayerClass;
     getAvatar: (userId: number) -> string;
+    getPlayersInRange: (origin: Vector3, radius: number) -> {Player};
     
     -- @signals
     OnPlayerDied: EventSignal<PlayerClass>;
@@ -425,6 +439,8 @@ export type PlayerClass = CharacterClass & {
     CurrentState: Enum.HumanoidStateType;
 
     CharacterGarbage: GarbageHandler;
+
+    Cache: anydict;
 
     -- @methods
     Spawn: (PlayerClass) -> nil;
@@ -689,9 +705,10 @@ export type InteractableMeta = {
 
     InteractServer: (InteractableInstance, values: anydict) -> nil;
 
-    SetPermissions: (self: InteractableInstance, flagTag: string, value: boolean) -> nil;
-    HasPermissions: (self: InteractableInstance, flagTag: string, name: string?) -> boolean;
-    SetUserPermissions: (self: InteractableInstance, name: string, flagTag: string, value: boolean) -> nil;
+    SetPermissions: (InteractableInstance, flagTag: string, value: boolean) -> nil;
+    HasPermissions: (InteractableInstance, flagTag: string, name: string?) -> boolean;
+    SetUserPermissions: (InteractableInstance, name: string, flagTag: string, value: boolean) -> nil;
+    ClearPermissions: (InteractableInstance) -> nil;
 }
 
 export type InteractableInstance = {
@@ -700,6 +717,7 @@ export type InteractableInstance = {
 
     Config: Configuration;
     Part: BasePart;
+    Point: Vector3;
 
     Variant: string;
 
@@ -711,9 +729,10 @@ export type InteractableInstance = {
     Animation: string?;
 
     -- @methods
-    Sync: (self: InteractableInstance, players: {Player}?, data: anydict?) -> nil;
-    SyncPerms: (self: InteractableInstance, player: Player) -> nil;
-    Shrink: (self: InteractableInstance) -> anydict;
+    Sync: (InteractableInstance, players: {Player}?, data: anydict?) -> nil;
+    SyncPerms: (InteractableInstance, player: Player) -> nil;
+    Shrink: (InteractableInstance) -> anydict;
+    IsDebounced: (InteractableInstance, name: string, duration: number?) -> boolean;
 
     BindInteract: (interactable: InteractableInstance, info: InteractInfo) -> nil;
     BindPrompt: (interactable: InteractableInstance, info: InteractInfo) -> nil;
@@ -1030,10 +1049,17 @@ export type ToolAnimator = {
 --MARK: PropertiesVariable
 export type PropertiesVariable<T> = T & {
     Values: T;
+
+    -- @signals
     OnDestroy: EventSignal<>;
     OnChanged: EventSignal<any, any, any>;
-    Loop: (self: PropertiesVariable<T>, func: ((any, any)->boolean)) -> nil;
-    Destroy: (self: PropertiesVariable<T>) -> nil;
+
+    -- @methods
+    Loop: (PropertiesVariable<T>, func: ((any, any)->boolean)) -> nil;
+    Destroy: (PropertiesVariable<T>) -> nil;
+
+    SetMetatable: (PropertiesVariable<T>, mt: anydict) -> nil;
+    GetMetatable: (PropertiesVariable<T>) -> any;
 
     [any]: any;
 };
@@ -1382,11 +1408,11 @@ export type ComponentOwner = {
 --MARK: DamageData
 type damageData = {
     Damage: number;
-    DamageType: DAMAGE_TYPE<string>;
+    TargetPart: BasePart;
 
+    DamageType: DAMAGE_TYPE<string>?;
     DamageBy: CharacterClass?; 
     DamageTo: CharacterClass?;
-    TargetPart: BasePart?;
     TargetModel: Model?;
     DamageCate: string?;
     ToolHandler: ToolHandlerInstance?;
@@ -1529,7 +1555,10 @@ export type HealthComp = {
 }
 
 --MARK: StatusComp
-export type StatusComp = { 
+export type StatusComp = {
+    -- @static
+    getPackage: (statusId: string) -> anydict;
+
     -- @properties
     Id: string;
     CompOwner: ComponentOwner;
