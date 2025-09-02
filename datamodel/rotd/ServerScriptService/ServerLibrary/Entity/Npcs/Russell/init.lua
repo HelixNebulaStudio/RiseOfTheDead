@@ -48,7 +48,7 @@ local npcPackage = {
                     "Who's been messing with my storage organization?";
                     "*grumbles* Everything's in the wrong place again..";
                     "This place is a mess. Nobody respects proper storage protocol.";
-                    "If someone took my stuff without asking again...";
+                    "If someone takes my stuff without asking again...";
                     "Can't believe I have to reorganize this mess. Again.";
                 };
                 Duration = NumberRange.new(20, 30);

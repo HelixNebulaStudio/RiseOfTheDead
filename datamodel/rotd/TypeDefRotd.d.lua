@@ -46,6 +46,10 @@ export type GameSaveRotd = GameSave & {
     Wardrobe: Storage;
     Masteries: anydict;
     Blueprints: anydict;
+
+    -- @methods
+    GetMasteries: (GameSaveRotd, itemId: string) -> number;
+    SetMasteries: (GameSaveRotd, itemId: string, amount: number) -> nil;
 }
 
 --MARK: EquipmentClass

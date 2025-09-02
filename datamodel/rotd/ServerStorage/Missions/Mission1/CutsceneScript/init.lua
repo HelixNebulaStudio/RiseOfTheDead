@@ -290,6 +290,8 @@ return function(CutsceneSequence)
 		
 		local actionIndex = 0;
 		local cutsceneActions = {};
+
+		masonNpcClass.Properties.CutsceneActive = true;
 		masonNpcClass.CutsceneActions = cutsceneActions;
 		masonNpcClass.Garbage:Tag(cutsceneActions);
 
@@ -337,7 +339,7 @@ return function(CutsceneSequence)
 					local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
 
 					local modifier: ConfigModifier = equipmentClass.Configurations.newModifier("npcDmg");
-					modifier.SetValues.Damage = 25;
+					modifier.SetValues.Damage = 20;
 					modifier.Priority = 999;
 					equipmentClass.Configurations:AddModifier(modifier, true);
 				end;

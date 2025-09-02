@@ -48,7 +48,7 @@ if RunService:IsServer() then
 
 			end
 		end
-		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", onDoorEnter)
+		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", onDoorEnter);
 
 
 		local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
@@ -297,10 +297,10 @@ return function(CutsceneSequence)
 	CutsceneSequence:NewScene("onPlayerSpawns", function()
 		local modCharacter = modData:GetModCharacter();
 
-		local classPlayer = shared.modPlayers.get(localPlayer);
-		local rootPart = classPlayer.RootPart;
-		local humanoid = classPlayer.Humanoid;
-		local head = classPlayer.Head;
+		local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+		local rootPart = playerClass.RootPart;
+		local humanoid = playerClass.Humanoid;
+		local head = playerClass.Head;
 		local camera = workspace.CurrentCamera;
 
 		blurEffect = Instance.new("BlurEffect");

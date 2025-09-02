@@ -21,7 +21,6 @@ local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.Battl
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
-local modPropertiesVariable = shared.require(game.ReplicatedStorage.Library.PropertiesVariable);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);

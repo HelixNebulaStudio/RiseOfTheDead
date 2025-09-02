@@ -244,13 +244,13 @@ export type Profile = {
     Cache: anydict;
     
     -- @methods
+    Save: (Profile, overrideData: any?, force: boolean?) -> nil;
     GetActiveSave: (self: Profile) -> GameSave;
     Sync: (self: Profile, hierarchyKey: string?, paramPacket: anydict?) -> nil;
 
     GetCacheStorages: (self: Profile) -> {[string]: Storage};
     AddPlayPoints: (self: Profile, points: number?, reason: string?) -> nil;
 
-    NewCustomSave: (Profile) -> GameSave;
     InitMessaging: (Profile) -> nil;
 
     -- @binds
@@ -266,6 +266,7 @@ export type Profile = {
 export type GameSave = {
     -- @properties
     Player: Player;
+    Profile: Profile;
 
     Inventory: Storage;
     Clothing: Storage;
@@ -273,6 +274,7 @@ export type GameSave = {
     Storages: {[string]: Storage};
 
     AppearanceData: AppearanceData;
+    Events: anydict;
 
     -- @methods
     GetActiveSave: (self: GameSave) -> GameSave;
@@ -283,13 +285,24 @@ export type GameSave = {
     -- @binds
     _new: (gameSave: GameSave, profile: Profile) -> nil;
     _load_storage: (gameSave: GameSave, storageId: string, rawStorage: anydict) -> nil;
+    _loaded: (gameSave: GameSave) -> nil;
 };
 
 
 --MARK: Storage
 export type Storages = {
     -- @static
-    get: (sid: string, player: Player) -> Storage?;
+    get: (sid: string, player: Player?) -> Storage?;
+    openStorage: (storageId: string, params: {
+        StoragePresetId: string;
+
+	    StoragePresetLib: anydict?;
+	    Player: Player?;
+	    InteractConfig: Configuration?;
+	    Siid: string?;
+	    StoragePage: number?;
+	    StorageName: string?;
+    }) -> Storage;
 
     fulfillList: (Player, list: {
         {ItemId: string; Amount: number;}
@@ -303,6 +316,7 @@ export type Storages = {
         number
     );
 
+    -- @methods
     GetPrivateStorages: (player: Player) -> {[string]: Storage};
     Get: (id: string, player: Player) -> Storage?;
     FindIdFromStorages: (siid: string, player: Player) -> (StorageItem?, Storage?);
@@ -318,7 +332,6 @@ export type Storages = {
 };
 
 export type Storage = {
-
     -- @properties
     Id: string;
     Name: string;
@@ -350,21 +363,43 @@ export type Storage = {
     Garbage: GarbageHandler;
 
     -- @methods
-    Find: (self: Storage, id: string) -> StorageItem;
-    InsertRequest: (self: Storage, storageItem: StorageItem, ruleset: anydict?) -> anydict;
-    Sync: (self: Storage, player: Player) -> nil;
-    SpaceCheck: (self: Storage, items: {any}) -> boolean;
-    Add: (self: Storage, itemId: string, data: {Quantity: number?; Data: anydict?}?, callback: anyfunc?) -> nil;
+    Load: (Storage, rawdata: anydict) -> Storage;
+    Find: (Storage, id: string) -> StorageItem;
+    Insert: (Storage, storageItem: StorageItem) -> (string, anydict);
+    InsertRequest: (Storage, storageItem: StorageItem, ruleset: {
+        ForceIndex: number?;
+        CancelIfCantFitAll: boolean?;
+    }?) -> anydict;
+    SpaceCheck: (Storage, items: {any}) -> boolean;
+    Add: (Storage, itemId: string, data: {Quantity: number?; Data: anydict?}?, callback: anyfunc?) -> nil;
     Remove: (Storage, siid: string, amount: number?, callback: anyfunc?) -> nil;
-    Loop: (self: Storage, func: ((storageItem: StorageItem) -> boolean)?) -> number;
-    ConnectCheck: (self: Storage, anyfunc) -> nil;
+    Delete: (Storage, siid: string, amount: number?, callback: anyfunc?) -> nil;
+    Loop: (Storage, func: ((storageItem: StorageItem) -> boolean)?) -> number;
+    ConnectCheck: (Storage, anyfunc) -> nil;
     Destroy: (Storage) -> nil;
 
-    SetPermissions: (self: Storage, flagTag: string, value: boolean) -> nil;
-    HasPermissions: (self: Storage, flagTag: string, name: string?) -> boolean;
-    SetUserPermissions: (self: Storage, name: string, flagTag: string, value: boolean) -> nil;
+    SetPermissions: (Storage, flagTag: string, value: boolean) -> nil;
+    HasPermissions: (Storage, flagTag: string, name: string?) -> boolean;
+    SetUserPermissions: (Storage, name: string, flagTag: string, value: boolean) -> nil;
 
-    InitStorage: (self: Storage) -> nil;
+    InitStorage: (Storage) -> nil;
+    TransferContainer: (Storage, transferTo: Storage) -> nil;
+    SetOwner: (Storage, Player) -> nil;
+    Wipe: (Storage) -> nil;
+    Shrink: (Storage) -> anydict;
+    BindActionHandler: (Storage, actionKey: string, func: ((Storage, {
+        Player: Player;
+        StorageId: string;
+        Id: string;
+        Action: string;
+        [string]: any;
+    })->nil)) -> nil;
+
+    GetIndexDictionary: (Storage) -> {[number]: StorageItem};
+    FindByIndex: (Storage, index: number) -> StorageItem;
+
+    Sync: (Storage, player: Player) -> nil;
+    SyncValues: (Storage, Player?) -> nil;
 
     -- @signals
     OnChanged: EventSignal<>;
@@ -876,6 +911,16 @@ export type Interface = {
 
 --MARK: InterfaceInstance
 export type InterfaceInstance = {
+    -- @static
+    Templates: {
+        Checkbox: Frame;
+        ScrollingFrame: ScrollingFrame;
+        QuickButton: ImageButton;
+        BasicButton: TextButton;
+        ItemSlot: ImageLabel;
+        [string]: GuiObject;
+    };
+
     -- @properties
     Package: anydict;
 } & Interface;
@@ -1048,6 +1093,7 @@ export type ToolAnimator = {
 
 --MARK: PropertiesVariable
 export type PropertiesVariable<T> = T & {
+    IsDestroyed: boolean;
     Values: T;
 
     -- @signals

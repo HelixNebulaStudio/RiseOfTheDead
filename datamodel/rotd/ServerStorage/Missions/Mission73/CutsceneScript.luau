@@ -188,8 +188,6 @@ return function(CutsceneSequence)
 							npcModule:AddComponent(modNpcs.Script.Zombie.Blink);
 						end
 						npcModule.Humanoid.Died:Connect(function()
-							npcModule.OnDeath();
-
 							if npcModule.CrateReward then
 								local coopPlayers = coopMission:GetPlayers();
 								local selectCoopPlayer = coopPlayers[math.random(1, #coopPlayers)];

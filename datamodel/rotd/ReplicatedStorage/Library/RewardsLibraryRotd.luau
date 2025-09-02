@@ -442,20 +442,20 @@ function library.onRequire()
 		Id="zombie";
 		Name="Zombies";
 		Rewards={
-			{Type=ItemDropTypes.Metal; Quantity=quan2m4; Chance=1/2.2;};
-			{Type=ItemDropTypes.Cloth; Quantity=quan2m4; Chance=1/4;};
+			{Type=ItemDropTypes.Metal; ItemId="metal"; Quantity=quan2m4; Chance=1/2.2;};
+			{Type=ItemDropTypes.Cloth; ItemId="cloth"; Quantity=quan2m4; Chance=1/4;};
 			{Type=ItemDropTypes.Tool; ItemId="cannedbeans"; Chance=1/24;};
 			{Type=ItemDropTypes.Tool; ItemId="chocobar"; Chance=1/24;};
 			{Type=ItemDropTypes.Blueprint; ItemId="pistolreloadspeedbp"; Chance=bpItemDropChance;};
 			{Type=ItemDropTypes.Blueprint; ItemId="pistolammocapbp"; Chance=bpItemDropChance;};
 			{Type=ItemDropTypes.Blueprint; ItemId="shotgunreloadspeedbp"; Chance=bpItemDropChance;};
 			{Type=ItemDropTypes.Blueprint; ItemId="shotgunammocapbp"; Chance=bpItemDropChance;};
-			(isPrivateWorld and {Type=ItemDropTypes.Screws; Quantity={Min=4; Max=6}; Chance=1/3;} or nil);
+			(isPrivateWorld and {Type=ItemDropTypes.Screws; ItemId="screws"; Quantity={Min=4; Max=6}; Chance=1/3;} or nil);
 
 			{Type=ItemDropTypes.Tool; ItemId="xm1014"; Chance=1/25; OnceOnly=true;};
 			{Type=ItemDropTypes.Tool; ItemId="mp5"; Chance=1/100; OnceOnly=true;};
 			
-			(SpecialEvent.Easter and {Type=ItemDropTypes.Tool; ItemId="easteregg2023"; Quantity=1; Chance=4/100;} or nil);
+			--(SpecialEvent.Easter and {Type=ItemDropTypes.Tool; ItemId="easteregg2023"; Quantity=1; Chance=4/100;} or nil);
 			--(SpecialEvent.Christmas and {Type=ItemDropTypes.Coal; Quantity=quan2m4; Chance=1/5;} or nil);
 		};
 	};
@@ -464,7 +464,7 @@ function library.onRequire()
 		Id="leaperzombie";
 		Name="Leaper Zombies";
 		Rewards={
-			{Type=ItemDropTypes.Screws; Quantity={Min=10; Max=12}; Chance=1/4;};
+			{Type=ItemDropTypes.Screws; ItemId="screws"; Quantity={Min=10; Max=12}; Chance=1/4;};
 			{Type=ItemDropTypes.Blueprint; ItemId="subdamagebp"; Chance=bpItemDropChance;};
 			{Type=ItemDropTypes.Blueprint; ItemId="subfireratebp"; Chance=bpItemDropChance;};
 			{Type=ItemDropTypes.Blueprint; ItemId="shotgundamagebp"; Chance=bpItemDropChance;};

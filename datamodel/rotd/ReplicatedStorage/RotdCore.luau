@@ -36,7 +36,7 @@ if RunService:IsServer() then
     local modApiRequestLibrary = shared.require(game.ServerScriptService.ServerLibrary.ApiRequestLibraryRotd);
     local modShopSystem = shared.require(game.ServerScriptService.ServerLibrary.ShopSystem);
     local modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
-    
+
 end
 
 function RotdCore.OnPlayerAdded(player)

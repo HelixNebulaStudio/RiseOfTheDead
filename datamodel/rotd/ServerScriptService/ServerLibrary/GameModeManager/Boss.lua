@@ -241,8 +241,6 @@ function GameMode:Start(room)
 					end)
 				end
 				
-				--if npcModule.OnDeath then npcModule.OnDeath(players) end;
-
 				local canRagdoll = npcPrefab:GetAttribute("HasRagdoll") == true;
 				if not canRagdoll then
 					for _, obj in pairs(npcPrefab:GetDescendants()) do

@@ -21,6 +21,7 @@ local npcPackage = {
 
         Level = 1;
         ExperiencePool = 20;
+        DropRewardId = "zombie";
     };
 
     Audio = {};
@@ -43,7 +44,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
 
     local levelstatModifier = configurations.newModifier("LevelStat");
 
-    levelstatModifier.SumValues.MaxHealth = 50*level;
+    levelstatModifier.SumValues.MaxHealth = (50*level)-1;
     levelstatModifier.SumValues.AttackDamage = (level/2);
 
     configurations:AddModifier(levelstatModifier, false);

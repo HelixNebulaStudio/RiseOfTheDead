@@ -13,21 +13,34 @@ if RunService:IsServer() then
     modNpcs = shared.require(game.ServerScriptService.ServerLibrary.Entity.Npcs);
     modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
     modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
+    modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
+
 end
 --==
 function modWorldCoreClass.onRequire()
-    local function onDayChanged()
-        task.spawn(function() 
-            shared.waitForIgnition();
-            if RunService:IsStudio() then return end; -- TODO: Remove
-            modWorldCoreClass.updateWanderers();
-        end)
+    if RunService:IsServer() then
+        local function onDayChanged()
+            task.spawn(function() 
+                shared.waitForIgnition();
+                if RunService:IsStudio() then return end; -- TODO: Remove
+                modWorldCoreClass.updateWanderers();
+            end)
+        end
+
+        if workspace:GetAttribute("DayOfYear") then onDayChanged(); end
+        workspace:GetAttributeChangedSignal("DayOfYear"):Connect(onDayChanged);
+
+        modConfigurations.Set("UseOldItemDrop.Spawn", true);
+
+        modItemDrops.DefaultGlowBrightness = 1;
+        modItemDrops.DefaultRayBrightness = 10;
+        modItemDrops.DefaultGlowColor = Color3.fromRGB(255, 255, 255);
+        modItemDrops.DefaultRayColor = Color3.fromRGB(255, 255, 255);
+        modItemDrops.DefaultGlowSizeDivider = 1.4;
+        modItemDrops.DefaultBillboardBrightness = 10;
+
+    elseif RunService:IsClient() then
     end
-
-    if workspace:GetAttribute("DayOfYear") then onDayChanged(); end
-    workspace:GetAttributeChangedSignal("DayOfYear"):Connect(onDayChanged);
-
-    modConfigurations.Set("UseOldItemDrop.Spawn", true);
 end
 
 function modWorldCoreClass.updateWanderers()

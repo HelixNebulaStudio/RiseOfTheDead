@@ -34,11 +34,6 @@ if RunService:IsServer() then
 	modOnGameEvents:ConnectEvent("OnCheckBlueprintCost", function(player, eventData)
 		if not modMission:Progress(player, MISSION_ID) then return end;
 
-		local fulfilled = true;
-		for a=1, #eventData do
-			if not eventData[a].Fulfilled then fulfilled = false; end;
-		end
-
 		modMission:Progress(player, MISSION_ID, function(mission)
 			if mission.ProgressionPoint == 2 or mission.ProgressionPoint == 3 then
 
@@ -149,6 +144,21 @@ if RunService:IsClient() then
 		local highlight = modGuiHighlight.Set("MainInterface", workbenchFrame, "navBar", "Blueprints")
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "blueprints", "scrollList", "Damage Modslist", "list", "Pistol Damage Mod Blueprint")
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "customBuild", "scrollList", "BuildFrame", "ButtonFrame", "RequirementsFrame")
+	
+		highlight.ContainerTextInfo = {
+			["Blueprints"] = {
+				Text = `Select Build for all your blueprints`;
+				TextLayout = "TCO";
+			};
+			["Pistol Damage Mod Blueprint"] = {
+				Text = "Pistol Damage Mod Blueprint";
+				TextLayout = "BCO";
+			};
+			["RequirementsFrame"] = {
+				Text = "Requirements for building the damage modifier";
+				TextLayout = "BCO";
+			};
+		};
 	end
 
 	function MissionLogic.Checkpoint3()
@@ -156,15 +166,32 @@ if RunService:IsClient() then
 		local highlight = modGuiHighlight.Set("MainInterface", "MissionPinHud");
 		highlight.Next("MainInterface", workbenchFrame, "navBar", "Blueprints");
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "blueprints", "scrollList", "Damage Modslist", "list", "Pistol Damage Mod Blueprint")
-		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "customBuild", "scrollList", "BuildFrame", "ButtonFrame", "BuildButton")
+		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "customBuild", "scrollList", "BuildFrame")
 
+		highlight.ContainerTextInfo = {
+			["Pistol Damage Mod Blueprint"] = {
+				Text = "Pistol Damage Mod Blueprint";
+				TextLayout = "BCO";
+			};
+			["BuildFrame"] = {
+				Text = "Click Build Blueprint when you got the materials";
+				TextLayout = "BCO";
+			};
+		};
 	end
 
 	function MissionLogic.Checkpoint4()
 		SetWaypoint();
 		local highlight = modGuiHighlight.Set("MainInterface", workbenchFrame, "navBar", "Blueprints")
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "blueprints", "scrollList", "Damage Modslist", "list", "Pistol Damage Mod Blueprint")
-		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "customBuild", "scrollList", "BuildFrame", "ButtonFrame", "BuildButton")
+		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "customBuild", "scrollList", "BuildFrame")
+		
+		highlight.ContainerTextInfo = {
+			["BuildFrame"] = {
+				Text = "Click Build Blueprint to start building";
+				TextLayout = "BCO";
+			};
+		};
 	end
 
 	function MissionLogic.Checkpoint5()
@@ -172,6 +199,13 @@ if RunService:IsClient() then
 		local highlight = modGuiHighlight.Set("MainInterface", workbenchFrame, "navBar", "Processes")
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "processList", "scrollList", "Buildinglist")
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "processList", "scrollList", "BuildCompletelist")
+		
+		highlight.ContainerTextInfo = {
+			["BuildCompletelist"] = {
+				Text = "Wait for the building process to complete";
+				TextLayout = "BCO";
+			};
+		};
 	end
 
 	function MissionLogic.Checkpoint6()
@@ -181,28 +215,54 @@ if RunService:IsClient() then
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "processList", "scrollList", "Buildinglist")
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "processList", "scrollList", "BuildCompletelist")
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "processList", "scrollList", "BuildCompletelist");
+
+		highlight.ContainerTextInfo = {
+			["BuildCompletelist"] = {
+				Text = "Collect the completed build";
+				TextLayout = "BCO";
+			};
+		};
 	end
 
 	function MissionLogic.Checkpoint7()
 		SetWaypoint();
 
-		local highlight = compact and modGuiHighlight.Set("MainInterface", "MobileInventory", "Inventory", "MainList", "1")
-			or modGuiHighlight.Set("MainInterface", "Inventory", "MainList", "1");
-
+		local highlight = modGuiHighlight.Set("MainInterface", "Inventory", "Container", "MainList");
 		highlight.Next("MainInterface", workbenchFrame, "navBar", "Upgrades")
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "upgradeMenu", "scrollList", "AddModuleFrame")
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "modsList", "scrollList", "Damage Modslist", "list", "Pistol Damage")
+	
+		highlight.ContainerTextInfo = {
+			["MainList"] = {
+				Text = `Select your pistol to add modifiers`;
+				TextLayout = "BCI";
+			};
+			["Pistol Damage"] = {
+				Text = "Pistol Damage modifier from your inventory";
+				TextLayout = "BCO";
+			};
+		}
 	end
 
 	function MissionLogic.Checkpoint8()
 		SetWaypoint();
 
-		local highlight = compact and modGuiHighlight.Set("MainInterface", "MobileInventory", "Inventory", "MainList", "1")
-			or modGuiHighlight.Set("MainInterface", "Inventory", "MainList", "1");
-
+		local highlight = modGuiHighlight.Set("MainInterface", "Inventory", "Container", "MainList");
+		
 		highlight.Next("MainInterface", workbenchFrame, "navBar", "Upgrades")
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "upgradeMenu", "scrollList", "Pistol Damage")
 		highlight.Next("MainInterface", workbenchFrame, "pageFrame", "upgradeMenu", "scrollList", "Pistol Damage", "Upgrades", "DamageUpgradeButton")
+	
+		highlight.ContainerTextInfo = {
+			["MainList"] = {
+				Text = `Select your pistol to add modifiers`;
+				TextLayout = "BCI";
+			};
+			["Pistol Damage"] = {
+				Text = "Pistol Damage modifier from your inventory";
+				TextLayout = "BCO";
+			};
+		}
 	end
 
 	function MissionLogic.Cancel()

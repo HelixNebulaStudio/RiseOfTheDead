@@ -178,6 +178,55 @@ shared.coreBind(modGameSave, "_load_storage", function(gameSave: GameSaveRotd, s
 	return storage;
 end)
 
+
+shared.coreBind(modGameSave, "_loaded", function(gameSave: GameSaveRotd)
+	local skinPermUpdate = gameSave.Events:Get("skinPermUpdate1");
+	if skinPermUpdate == nil then
+		gameSave.Events:Add({Id="skinPermUpdate1"});
+
+		local function updateItem(storageItem)
+			local itemId = storageItem.ItemId;
+			local itemUnlockables = gameSave.Profile.ItemUnlockables;
+
+			local unlockedSkins = {};
+
+			-- Clothing
+			local oldItemUnlockables = itemUnlockables[itemId] or {};
+			for skinId, _ in pairs(oldItemUnlockables) do
+				table.insert(unlockedSkins, skinId);
+			end
+
+			-- Tools
+			local lockedPattern = storageItem:GetValues("LockedPattern");
+			if lockedPattern then
+				if table.find(unlockedSkins, lockedPattern) == nil then
+					table.insert(unlockedSkins, tostring(lockedPattern));
+				end
+				storageItem:SetValues("ActiveSkin", lockedPattern);
+			end
+
+			local itemUnlock = storageItem:GetValues("ItemUnlock");
+			if itemUnlock then
+				if table.find(unlockedSkins, itemUnlock) == nil then
+					table.insert(unlockedSkins, itemUnlock);
+				end
+				storageItem:SetValues("ActiveSkin", itemUnlock);
+			end
+
+			if #unlockedSkins >0 then
+				for a=1, #unlockedSkins do
+					unlockedSkins[a] = tostring(unlockedSkins[a]);
+				end
+				storageItem:SetValues("Skins", unlockedSkins);
+			end
+		end
+
+		for id, _ in pairs(gameSave.Storages) do
+			gameSave.Storages[id]:Loop(updateItem);
+		end
+	end
+end)
+
 function modGameSave:SumMasteries()
 	local total = 0;
 	for k, v in pairs(self.Masteries) do
