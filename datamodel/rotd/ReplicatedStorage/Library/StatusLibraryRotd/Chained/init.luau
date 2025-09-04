@@ -16,25 +16,24 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     if not RunService:IsServer() then return end;
     if tickData.ms100 ~= true then return end;
 
-    local playerClass = statusClass.StatusOwner :: PlayerClass;
-    if playerClass == nil then return end;
+    local characterClass: CharacterClass = statusClass.StatusOwner;
+    if characterClass == nil then return end;
 
     if statusClass.Values.ExpireIfNoGarbage ~= true then return end;
 
     if #statusClass.Garbage.Trash <= 0 then
         statusClass.Expires = workspace:GetServerTimeNow();
-        playerClass:SyncProperty("Chained");
+		statusClass:Sync();
         Debugger:Warn("Expire Chained");
     end
 end
 
 function statusPackage.Chain(statusClass: StatusClassInstance, duration: number, position: Vector3, anchorHealth: number, isHardMode: boolean)
     if not RunService:IsServer() then return end;
-    local playerClass = statusClass.StatusOwner :: PlayerClass;
-    if playerClass == nil then return end;
+    local characterClass: CharacterClass = statusClass.StatusOwner;
+    if characterClass == nil then return end;
 
-    local player: Player = playerClass:GetInstance();
-    local rootPart = playerClass.RootPart;
+    local rootPart = characterClass.RootPart;
 	local rootAtt = rootPart.RootRigAttachment;
 
 	position = position or rootPart.Position;
@@ -80,6 +79,8 @@ function statusPackage.Chain(statusClass: StatusClassInstance, duration: number,
 	newAnchor.Parent = workspace.Environment;
 
 	pcall(function()
+		if characterClass.ClassName ~= "PlayerClass" then return end;
+		local player: Player = (characterClass :: PlayerClass):GetInstance();
 		newAnchor.Base:SetNetworkOwner(player);
 	end)
 

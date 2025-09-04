@@ -38,6 +38,8 @@ function modWorldCoreClass.onRequire()
         modItemDrops.DefaultRayColor = Color3.fromRGB(255, 255, 255);
         modItemDrops.DefaultGlowSizeDivider = 1.4;
         modItemDrops.DefaultBillboardBrightness = 10;
+        modItemDrops.DefaultMinGlowSize = 2.5;
+        modItemDrops.DefaultMaxGlowSize = 5;
 
     elseif RunService:IsClient() then
     end

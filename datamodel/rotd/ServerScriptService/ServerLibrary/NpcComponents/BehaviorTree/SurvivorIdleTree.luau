@@ -99,7 +99,8 @@ function treePackage.WalkToRest(npcClass: NpcClass)
     if idleData.RestingSeatName then
         local seatPart = workspace.Environment:FindFirstChild(idleData.RestingSeatName);
         if seatPart then
-            restPoint = seatPart.CFrame;
+            local dir = (npcClass.RootPart.Position - seatPart.Position).Unit;
+            restPoint = seatPart.CFrame + (dir * (seatPart.Size.Magnitude));
             idleData.SeatPart = seatPart;
         end
     end
@@ -130,6 +131,12 @@ function treePackage.WalkToRest(npcClass: NpcClass)
         npcClass:Sit(idleData.SeatPart);
     else
         npcClass.PlayAnimation("Idle");
+    end
+    if idleData.RestFunctionName then
+        local restFunction = npcClass.Properties[idleData.RestFunctionName];
+        if restFunction then
+            restFunction();
+        end
     end
 end
 

@@ -581,6 +581,9 @@ function GameModeManager:Initialize(gameType, gameStage)
 		roomMeta.LastPlayerChanged = 0;
 		roomMeta.Prefabs = {};
 		
+		roomMeta.Type = gameType;
+		roomMeta.Stage = gameStage;
+		
 		function roomMeta:SetHard(value)
 			self.IsHard = value;
 			gameTable:Sync();
@@ -642,9 +645,9 @@ function GameModeManager:Initialize(gameType, gameStage)
 					task.spawn(function()
 						local player = room.Players[a] and room.Players[a].Instance;
 						if player then
-							local classPlayer = modPlayers.get(player);
-							if classPlayer and classPlayer.RootPart then
-								classPlayer.RootPart.Anchored = false;
+							local playerClass: PlayerClass = modPlayers.get(player);
+							if playerClass and playerClass.RootPart then
+								playerClass.RootPart.Anchored = false;
 							end
 
 							if room.IsHard then
@@ -673,7 +676,14 @@ function GameModeManager:Initialize(gameType, gameStage)
 				--==
 				
 				room:SetState(enumRoomStates.InProgress);
-				if gameTable.System.Start then gameTable.System:Start(room) end;
+				if gameTable.System.Start then
+					local players = room:GetInstancePlayers();
+					shared.modEventService:ServerInvoke("GameModeManager_BindGameModeStart", {ReplicateTo=players}, {
+						Room = room;
+					});
+
+					gameTable.System:Start(room);
+				end;
 			end
 			gameTable:Sync();
 		end
@@ -1073,7 +1083,6 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 			end
 		end
 
-		modOnGameEvents:Fire("OnGameLobbyDisconnect", player, oldMenuRoom);
 	end
 	local character = player.Character;
 	if character then

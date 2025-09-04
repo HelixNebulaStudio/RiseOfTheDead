@@ -7,13 +7,13 @@ local Dialogues = {
 	Robert={};
 };
 
-local missionId = 6;
+local MISSION_ID = 6;
 --==
 
 -- !outline: Robert Dialogues
 Dialogues.Robert.DialogueStrings = {		
 	["firstRescue_how"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="How can I get you out?!"; 
 		Face="Worried"; 
 		Reply="Ummmm, try destroying this wooden barricade.";
@@ -38,7 +38,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Help!! I'm trapped!");
 			dialog:AddChoice("firstRescue_how", function(dialog)
 				dialog:AddChoice("firstRescue_standback", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 					modAnalyticsService:LogOnBoarding{
 						Player=player;
 						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission6_Start;

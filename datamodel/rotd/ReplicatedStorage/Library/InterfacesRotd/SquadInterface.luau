@@ -150,12 +150,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     end)
 
-    interface.OnInterfaceEvent:Connect(function(k, team) 
-        if k ~= "TeamUpdated" then return end;
+    interface:BindEvent("TeamUpdated", function(team: TeamClass)
         if team.Type ~= "Party" then return end;
-
         hudWindow:Update();
     end)
+
 end
 
 return interfacePackage;

@@ -1,13 +1,14 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
+local TweenService = game:GetService("TweenService");
 local RunService = game:GetService("RunService");
 
+local localPlayer = game.Players.LocalPlayer;
+
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
-local modEventService = shared.require(game.ReplicatedStorage.Library.EventService);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
 local MISSION_ID = 7;
@@ -21,28 +22,36 @@ if RunService:IsServer() then
 	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
-	if modBranchConfigs.IsWorld("TheWarehouse") then
-		modOnGameEvents:ConnectEvent("OnGameModeStart", function(player, gameType, gameStage, room)
-			if gameType ~= "Boss" and gameStage ~= "The Prisoner" then return end;
-			if not modMission:Progress(player, MISSION_ID) then return end;
-
-			modMission:Progress(player, MISSION_ID, function(mission)
-				if mission.ProgressionPoint < 3 then
-					mission.ProgressionPoint = 3;
-
-					modAnalyticsService:LogOnBoarding{
-						Player=player;
-						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission7_EnteredBossFight;
-					};
-				end;
-			end)
+	if modBranchConfigs.IsWorld("TheWarehouse") or modBranchConfigs.IsWorld("BioXResearch") then
+		
+        shared.modEventService:OnInvoked("GameModeManager_BindGameModeStart", function(eventPacket: EventPacket, packet)
+			local room = packet.Room;
+			if room.Type ~= "Boss" or room.Stage ~= "The Prisoner" then return end;
+			if eventPacket.Players == nil then return end;
 			
+			for _, player: Player in pairs(eventPacket.Players) do
+				if not modMission:Progress(player, MISSION_ID) then continue end;
+
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint < 3 then
+						mission.ProgressionPoint = 3;
+
+						modAnalyticsService:LogOnBoarding{
+							Player=player;
+							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission7_EnteredBossFight;
+						};
+					end;
+				end)
+
+			end
 		end)
 
-		modOnGameEvents:ConnectEvent("OnBossDefeated", function(players, npcModule)
-			if npcModule.Name ~= "The Prisoner" then return end;
+        shared.modEventService:OnInvoked("Boss_BindDefeated", function(eventPacket: EventPacket, packet)
+			local npcClass: NpcClass = packet.NpcClass;
+			if npcClass.Name ~= "The Prisoner" then return end;
+			if eventPacket.Players == nil then return end;
 
-			for _, player in pairs(players) do
+			for _, player: Player in pairs(eventPacket.Players) do
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint < 4 then 
 						mission.ProgressionPoint = 4;
@@ -56,7 +65,7 @@ if RunService:IsServer() then
 			end
 		end)
 		
-		modEventService:OnInvoked("GameModeManager_BindDisconnectPlayer", function(event, packet)
+		shared.modEventService:OnInvoked("GameModeManager_BindDisconnectPlayer", function(event, packet)
 			local player = event.Player;
 			local menuRoom = packet.MenuRoom;
 			if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage ~= "The Prisoner" then return end;
@@ -75,33 +84,20 @@ if RunService:IsServer() then
 			if destination then
 				packet.SetTeleportCfFunc(destination);
 			end
-		end)
-
-		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
-			local triggerId: string = ...;
-			local player: Player? = eventPacket.Player;
-			if player == nil then return end;
-			
-			if triggerId ~= "BloxmartUnlock" then return end;
-			if not modMission:Progress(player, MISSION_ID) then return end;
 
 			modMission:Progress(player, MISSION_ID, function(mission)
-				if mission.ProgressionPoint == 5 then
-					mission.ProgressionPoint = 6;
-					
-					modAnalyticsService:LogOnBoarding{
-						Player=player;
-						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission7_UnlockedBloxmartGate;
-					};
+				if mission.ProgressionPoint == 4 then
+					mission.ProgressionPoint = 5;
 				end;
 			end)
+			
 		end)
 
         shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
-            local interactable: InteractableInstance = ...;
-
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
+
+            local interactable: InteractableInstance = ...;
 
 			if interactable.Id == "securityRoomEntrance" then
 				modMission:Progress(player, MISSION_ID, function(mission)
@@ -128,15 +124,28 @@ if RunService:IsServer() then
 			end
         end)
 
-		modOnGameEvents:ConnectEvent("OnGameLobbyDisconnect", function(player, menuRoom)
+		shared.modEventService:OnInvoked("Interactables_BindButtonInteract", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+
+			local interactable: InteractableInstance = ...;
+			if interactable.Id ~= "BloxmartGateButton" then return end;
+
+			Debugger:Warn("BloxmartGateButton pressed");
 			if not modMission:Progress(player, MISSION_ID) then return end;
-			
+
 			modMission:Progress(player, MISSION_ID, function(mission)
-				if mission.ProgressionPoint == 4 then
-					mission.ProgressionPoint = 5;
+				if mission.ProgressionPoint == 5 then
+					mission.ProgressionPoint = 6;
+					
+					modAnalyticsService:LogOnBoarding{
+						Player=player;
+						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission7_UnlockedBloxmartGate;
+					};
 				end;
 			end)
 		end)
+
 	end
 
 else
@@ -146,7 +155,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	--if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
@@ -155,13 +164,13 @@ return function(CutsceneSequence)
 		if mission == nil then return end;
 		
 		
-		local robertModule = modNpcs.getPlayerNpc(player, "Robert");
-		if robertModule == nil then
-			local npc = modNpcs.spawn("Robert", nil, function(npc, npcModule)
-				npcModule.Player = player;
-				robertModule = npcModule;
-			end);
-			modReplicationManager.ReplicateOut(player, npc);
+		local robertNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Robert");
+		if robertNpcClass == nil then
+			robertNpcClass = shared.modNpcs.spawn2{
+				Name = "Robert";
+				Player = player;
+				ReplicateOut = true;
+			};
 		end
 		local warehouseSitCf = CFrame.new(15.6800423, 57.6597404, 42.3099594, 1, 0, 0, 0, 1, 0, 0, 0, 1);
 
@@ -174,88 +183,90 @@ return function(CutsceneSequence)
 			end
 			
 			if mission.Type == 2 then -- OnAvailable
-				robertModule.StopAnimation("Holding");
-				robertModule.StopAnimation("Sit");
-				robertModule.Actions:EnterDoor("warehouseEntrance");
-				robertModule.Chat(robertModule.Player, "Oh thank goodness dude..");
-				local face = robertModule.Prefab:FindFirstChild("face", true);
+				robertNpcClass.StopAnimation("Holding");
+				robertNpcClass.StopAnimation("Sit");
+				robertNpcClass:UseInteractable("warehouseEntrance");
+				robertNpcClass.Chat(robertNpcClass.Player, "Oh thank goodness dude..");
+
+				local face = robertNpcClass.Character:FindFirstChild("face", true);
 				if face then face.Texture = "rbxassetid://15470952" end;
 				
-				robertModule:ToggleInteractable(false);
+				robertNpcClass:ToggleInteractable(false);
 				
-				robertModule.Actions:Teleport(CFrame.new(58.4135704, 57.6597404, -28.7544289, -0.573575675, 0, 0.819152594, 0, 1, 0, -0.819152594, 0, -0.573575675));
-				robertModule.Move:Stop();
+				robertNpcClass:SetCFrame(CFrame.new(58.4135704, 57.6597404, -28.7544289, -0.573575675, 0, 0.819152594, 0, 1, 0, -0.819152594, 0, -0.573575675));
+				robertNpcClass.Move:Stop();
 				task.wait(0.3);
 				
-				robertModule.Move:SetMoveSpeed("set", "default", 10);
-				robertModule.Humanoid.JumpPower = 0;
+				robertNpcClass.Move:SetMoveSpeed("set", "default", 10);
+				robertNpcClass.Humanoid.JumpPower = 0;
 				
-				robertModule.Move:MoveTo(Vector3.new(13, 57.5, 39.3));
-				robertModule.Move.OnMoveToEnded:Wait(10);
-				robertModule.Move:Stop(1);
+				robertNpcClass.Move:MoveTo(Vector3.new(13, 57.5, 39.3));
+				robertNpcClass.Move.OnMoveToEnded:Wait(10);
+				robertNpcClass.Move:Stop(1);
 				
-				robertModule.Actions:Teleport(CFrame.new(15.6800423, 57.6597404, 42.3099594));
+				robertNpcClass:SetCFrame(CFrame.new(15.6800423, 57.6597404, 42.3099594));
 				
-				robertModule.Move:Face(Vector3.new(15.6800423, 57.6597404, 37.0099602));
-				robertModule.Chat(robertModule.Player, "");
+				robertNpcClass.Move:Face(Vector3.new(15.6800423, 57.6597404, 37.0099602));
+				robertNpcClass.Chat(robertNpcClass.Player, "");
 				
 				task.wait(0.4);
-				robertModule.PlayAnimation("Sit", 0.75);
+				robertNpcClass.PlayAnimation("Sit", 0.75);
 				task.wait(0.75);
-				robertModule:ToggleInteractable(true);
+				robertNpcClass:ToggleInteractable(true);
 				
 				
 			elseif mission.Type == 1 then -- OnActive
 				if firstRun then
-					robertModule.StopAnimation("Holding");
-					robertModule.StopAnimation("Sit");
+					robertNpcClass.StopAnimation("Holding");
+					robertNpcClass.StopAnimation("Sit");
 				end
 				
 				if mission.ProgressionPoint == 1 then
-					robertModule.Actions:Teleport(warehouseSitCf);
-					robertModule.StopAnimation("Holding");
+					robertNpcClass:SetCFrame(warehouseSitCf);
+					robertNpcClass.StopAnimation("Holding");
 
-					robertModule.Move:SetMoveSpeed("set", "default", 20);
+					robertNpcClass.Move:SetMoveSpeed("set", "default", 20);
 
-					robertModule.Chat(player, "Follow me");
+					robertNpcClass.Chat(player, "Follow me");
 					wait(1);
-					robertModule.Interactable.Parent = script;
+					
+					robertNpcClass:ToggleInteractable(false);
 
-					local classPlayer = modPlayers.GetByName(player.Name);
-					classPlayer.EnemyDetectionRange = 10;
+					local playerClass: PlayerClass = modPlayers.GetByName(player.Name);
+					playerClass.Properties.EnemyDetectionRange = 10;
 
-					robertModule.StopAnimation("Sit", 0.75);
-					local face = robertModule.Prefab:FindFirstChild("face", true);
+					robertNpcClass.StopAnimation("Sit", 0.75);
+					local face = robertNpcClass.Character:FindFirstChild("face", true);
 					if face then face.Texture = "rbxassetid://277939506" end;
 					wait(0.5)
 					
-					robertModule.Move:MoveTo(Vector3.new(58.482, 57.7, -28.756));
-					robertModule.Move.OnMoveToEnded:Wait(10);
+					robertNpcClass.Move:MoveTo(Vector3.new(58.482, 57.7, -28.756));
+					robertNpcClass.Move.OnMoveToEnded:Wait(10);
 					
 					-- Run to Warehouse Exit;
-					robertModule.Actions:WaitForOwner(30);
+					robertNpcClass:GetComponent("WaitForPlayer")(30);
 					task.wait(0.5);
-					robertModule.Actions:EnterDoor("warehouseExit");
+					robertNpcClass:UseInteractable("warehouseExit");
 
 					-- Run to Fence Door;
-					robertModule.Move:MoveTo(Vector3.new(107.235, 57.7, -30.3));
-					robertModule.Move.OnMoveToEnded:Wait(5);
+					robertNpcClass.Move:MoveTo(Vector3.new(107.235, 57.7, -30.3));
+					robertNpcClass.Move.OnMoveToEnded:Wait(5);
 					
-					robertModule.Actions:WaitForOwner(30);
-					robertModule.Actions:EnterDoor("warehouseFenceExit");
+					robertNpcClass:GetComponent("WaitForPlayer")(30);
+					robertNpcClass:UseInteractable("warehouseFenceExit");
 
 					-- Run to Boss Door;
-					robertModule.Move:MoveTo(Vector3.new(304.6, 57.7, 66.7));
-					robertModule.Move.OnMoveToEnded:Wait(20);
+					robertNpcClass.Move:MoveTo(Vector3.new(304.6, 57.7, 66.7));
+					robertNpcClass.Move.OnMoveToEnded:Wait(20);
 					
-					robertModule.Actions:WaitForOwner(50);
-					robertModule.Actions:FaceOwner();
+					robertNpcClass:GetComponent("WaitForPlayer")(50);
+					robertNpcClass.Move:Face("Player");
 
 					-- Dialogue;
-					robertModule.Actions:Teleport(CFrame.new(304.6, 57.7, 66.7));
-					robertModule.Actions:WaitForOwner(50);
-					robertModule.Chat(player, "Lets go in and put it out of it's misery!");
-					classPlayer.EnemyDetectionRange = nil;
+					robertNpcClass:SetCFrame(CFrame.new(304.6, 57.7, 66.7));
+					robertNpcClass:GetComponent("WaitForPlayer")(50);
+					robertNpcClass.Chat(player, "Lets go in and put it out of it's misery!");
+					playerClass.Properties.EnemyDetectionRange = nil;
 
 					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint < 2 then mission.ProgressionPoint = 2; end;
@@ -263,134 +274,168 @@ return function(CutsceneSequence)
 
 				elseif mission.ProgressionPoint == 2 then
 					if firstRun then
-						robertModule.StopAnimation("Sit");
-						local face = robertModule.Prefab:FindFirstChild("face", true);
+						robertNpcClass.StopAnimation("Sit");
+						local face = robertNpcClass.Character:FindFirstChild("face", true);
 						if face then face.Texture = "rbxassetid://277939506" end;
 					end
-					robertModule.Actions:Teleport(CFrame.new(304.6, 57.7, 66.7));
-					robertModule.Actions:WaitForOwner(50);
+					robertNpcClass:SetCFrame(CFrame.new(304.6, 57.7, 66.7));
+					robertNpcClass:GetComponent("WaitForPlayer")(50);
 					if firstRun then
-						robertModule.Chat(player, "Where have you been man? We need to kill this zombie.");
+						robertNpcClass.Chat(player, "Where have you been man? We need to kill this zombie.");
 					end
-					robertModule.Actions:FaceOwner();
+					robertNpcClass.Move:Face("Player");
 
 				elseif mission.ProgressionPoint == 3 then
 					if firstRun then
-						robertModule.StopAnimation("Sit");
-						robertModule.StopAnimation("Holding");
-						local face = robertModule.Prefab:FindFirstChild("face", true);
+						robertNpcClass.StopAnimation("Sit");
+						robertNpcClass.StopAnimation("Holding");
+						local face = robertNpcClass.Character:FindFirstChild("face", true);
 						if face then face.Texture = "rbxassetid://277939506" end;
 					end
-					robertModule.Actions:Teleport();
-					robertModule.Interactable.Parent = script;
-					robertModule.Chat(player, "");
-					robertModule.Wield.Equip("sawedoff");
-					pcall(function()
-						robertModule.Wield.ToolModule.Configurations.MinBaseDamage = 35;
-					end);
+					robertNpcClass:SetCFrame();
+					robertNpcClass:ToggleInteractable(false);
+					robertNpcClass.Chat(player, "");
+					robertNpcClass.WieldComp:Equip{
+						ItemId = robertNpcClass.Properties.PrimaryGunItemId;
+						OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
+							if toolHandler.EquipmentClass == nil then return end;
+							local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
 
-					robertModule.Actions:FollowOwner(function()
-						if robertModule.Target then
-							local enemyHumanoid = robertModule.Target:FindFirstChildWhichIsA("Humanoid");
-							if enemyHumanoid and enemyHumanoid.Health > 0 and enemyHumanoid.RootPart then
-								robertModule.Wield.SetEnemyHumanoid(enemyHumanoid);
-								robertModule.Move:Face(enemyHumanoid.RootPart);
-								robertModule.Wield.PrimaryFireRequest();
+							local modifier: ConfigModifier = equipmentClass.Configurations.newModifier("npcDmg");
+							modifier.SetValues.Damage = 10;
+							modifier.Priority = 999;
+							equipmentClass.Configurations:AddModifier(modifier, true);
+						end;
+					};
+
+					robertNpcClass:GetComponent("FollowPlayer")(nil, function()
+						local enemyTargetData = robertNpcClass:GetComponent("TargetHandler"):MatchFirstWieldTargettable();
+						if enemyTargetData then
+							local enemyHealthComp: HealthComp = enemyTargetData.HealthComp;
+							local enemyNpcClass: NpcClass = enemyHealthComp.CompOwner;
+
+							if enemyNpcClass
+							and enemyHealthComp.IsDead ~= true
+							and enemyHealthComp:CanTakeDamageFrom(robertNpcClass) then
+								local equipmentClass: EquipmentClass? = robertNpcClass.WieldComp.EquipmentClass;
+								if equipmentClass then
+									if equipmentClass.Properties.Ammo <= 0 then
+										robertNpcClass.WieldComp:InvokeToolAction("ReloadRequest");
+
+									else
+										local shootDirection = (enemyNpcClass.RootPart.Position - robertNpcClass.RootPart.Position).Unit;
+										
+										robertNpcClass.Move:Face(enemyNpcClass.RootPart);
+										robertNpcClass.WieldComp:InvokeToolAction(
+											"PrimaryFireRequest", 
+											shootDirection, 
+											enemyNpcClass.Humanoid 
+										);
+									end
+								end
 							end
+						else
+							robertNpcClass.WieldComp.Controls.Mouse1Down = false;
 						end
+						
 						return mission.Type == 1 and mission.ProgressionPoint == 3;
 					end);
 
 				elseif mission.ProgressionPoint == 4 then
-					robertModule.StopAnimation("Holding");
-					robertModule.StopAnimation("Sit");
-					robertModule.Wield.Unequip();
+					robertNpcClass.StopAnimation("Holding");
+					robertNpcClass.StopAnimation("Sit");
+					robertNpcClass.WieldComp:Unequip();
 
-					local face = robertModule.Prefab:FindFirstChild("face", true);
+					local face = robertNpcClass.Character:FindFirstChild("face", true);
 					if face then face.Texture = "rbxassetid://209713384" end;
-					robertModule.Chat(player, "Woohoo! We did it!");
-					robertModule.Actions:FaceOwner();
+					robertNpcClass.Chat(player, "Woohoo! We did it!");
+					robertNpcClass.Move:Face("Player");
 
 				elseif mission.ProgressionPoint == 5 then
-					robertModule.Chat(player, "");
+					robertNpcClass.Chat(player, "");
 					
 					if modEvents:GetEvent(player, "mission7Money") == nil then
-						modItemDrops.Spawn({Name="Money"; Type=modItemDrops.Types.Money; Quantity=500}, CFrame.new(288.96, 72.39, 3.59), {player}, false);
+						modItemDrops.Spawn({
+							Name="Money"; 
+							Type=modItemDrops.Types.Money; 
+							Quantity=500}, CFrame.new(288.96, 72.39, 3.59), {player}, false);
 						modEvents:NewEvent(player, {Id="mission7Money"});
 					end
 					
-					robertModule.Actions:EnterDoor("securityRoomEntrance");
-					robertModule.Move:SetMoveSpeed("set", "default", 10);
+					robertNpcClass:UseInteractable("securityRoomEntrance");
+					robertNpcClass.Move:SetMoveSpeed("set", "default", 10);
+					
+					robertNpcClass.Move:Stop();
+					robertNpcClass:GetComponent("WaitForPlayer")(10);
 
-					robertModule.Move:MoveTo(Vector3.new(288.262, 70.5, -13.902));
-					robertModule.Move.OnMoveToEnded:Wait(5);
-
-					robertModule.Move:Face(Vector3.new(292.362, 70.5, -8.102));
-					wait(1.5);
+					robertNpcClass.Move:Face(Vector3.new(292.362, 70.5, -8.102));
+					robertNpcClass.SetAnimation("CrouchLook", {script:WaitForChild("RobertCrouchLookAnim")});
 					if modMission:Progress(player, 7).ProgressionPoint ~= 5 then return end;
 					
-					robertModule.Move:MoveTo(Vector3.new(287.8, 70.5, 1.1));
-					robertModule.Move.OnMoveToEnded:Wait(5);
-					robertModule.Move:Face(Vector3.new(287.8, 70.5, 4.8));
+					robertNpcClass.Move:MoveTo(Vector3.new(287.8, 70.5, 1.1)); -- Infront of body
+					robertNpcClass.Move.OnMoveToEnded:Wait(2);
+					robertNpcClass.Move:Face(Vector3.new(287.8, 70.5, 4.8));
 					
-					robertModule.SetAnimation("CrouchLook", {script:WaitForChild("RobertCrouchLookAnim")});
-					robertModule.PlayAnimation("CrouchLook", 1);
-					local face = robertModule.Prefab:FindFirstChild("face", true);
+					robertNpcClass.PlayAnimation("CrouchLook", 1);
+					local face = robertNpcClass.Character:FindFirstChild("face", true);
 					if face then face.Texture = "rbxassetid://2222767231" end;
-					robertModule.Chat(player, "Poor guy...");
-					wait(5);
+
+					robertNpcClass.Chat(player, "Poor guy...");
+					wait(4);
 					if modMission:Progress(player, 7).ProgressionPoint ~= 5 then return end;
-					robertModule.StopAnimation("CrouchLook", 1);
+					robertNpcClass.StopAnimation("CrouchLook", 1);
 					wait(1);
 					if modMission:Progress(player, 7).ProgressionPoint ~= 5 then return end;
-					robertModule.Move:Face(Vector3.new(303.242, 73.489, 10.267));
-					robertModule.Chat(player, "Press that green button to open up the gates.");
+					robertNpcClass.Move:Face(Vector3.new(303.242, 73.489, 10.267));
+					robertNpcClass.Chat(player, "Press that green button to open up the gates.");
 
 				elseif mission.ProgressionPoint == 6 then
 					CutsceneSequence:NextScene("Show Gate Opening");
-					robertModule.StopAnimation("CrouchLook");
-					robertModule.Chat(player, "Great, now let's go back to my safehouse.");
-					robertModule.Actions:FaceOwner();
+					robertNpcClass.StopAnimation("CrouchLook");
+					task.delay(6, function()
+						robertNpcClass.Chat(player, "Great, now let's go back to my safehouse.");
+					end)
+					robertNpcClass.Move:Face("Player");
 
 				elseif mission.ProgressionPoint == 7 then
-					robertModule.Interactable.Parent = script;
-					robertModule.StopAnimation("CrouchLook");
+					robertNpcClass:ToggleInteractable(false);
+					robertNpcClass.StopAnimation("CrouchLook");
 					
-					robertModule.Move:SetMoveSpeed("set", "default", 22);
+					robertNpcClass.Move:SetMoveSpeed("set", "default", 22);
 
-					robertModule.Actions:EnterDoor("securityRoomExit");
+					robertNpcClass:UseInteractable("securityRoomExit");
 
-					local face = robertModule.Prefab:FindFirstChild("face", true);
+					local face = robertNpcClass.Character:FindFirstChild("face", true);
 					if face then face.Texture = "rbxassetid://405704879" end;
-					robertModule.Chat(player, "Follow me and don't stop running!");
+					robertNpcClass.Chat(player, "Follow me and don't stop running!");
 					delay(6, function()
-						robertModule.Chat(player, "RUNNN");
+						robertNpcClass.Chat(player, "RUNNN");
 					end);
 
-					robertModule.Move:MoveTo(Vector3.new(636.112, 55.8, 9.348));
-					robertModule.Move.OnMoveToEnded:Wait(32);
+					robertNpcClass.Move:MoveTo(Vector3.new(636.112, 55.8, 9.348));
+					robertNpcClass.Move.OnMoveToEnded:Wait(32);
 					
-					robertModule.Actions:Teleport(CFrame.new(636.112, 57.7, 9.348));
-					robertModule.Move:Face(Vector3.new(624.712, 55.8, 11.148));
-					robertModule.Chat(player, "Hurry, get in.");
+					robertNpcClass:SetCFrame(CFrame.new(636.112, 57.7, 9.348));
+					robertNpcClass.Move:Face(Vector3.new(624.712, 55.8, 11.148));
+					robertNpcClass.Chat(player, "Hurry, get in.");
 				end
 				
 				
 			elseif mission.Type == 3 then -- OnComplete
 				if not firstRun then
-					robertModule.Actions:EnterDoor("safehouse2Entrance");
-					robertModule.Chat(player, "");
-					local face = robertModule.Prefab:FindFirstChild("face", true);
+					robertNpcClass:UseInteractable("safehouse2Entrance");
+					robertNpcClass.Chat(player, "");
+					local face = robertNpcClass.Character:FindFirstChild("face", true);
 					if face then face.Texture = "rbxassetid://21311520" end;
 					
-					robertModule.Move:SetMoveSpeed("set", "default", 10);
-					robertModule.Humanoid.JumpPower = 0;
+					robertNpcClass.Move:SetMoveSpeed("set", "default", 10);
+					robertNpcClass.Humanoid.JumpPower = 0;
 					
-					robertModule.Move:MoveTo(Vector3.new(662.87, 57.81, -13.28));
-					robertModule.Move.OnMoveToEnded:Wait(32);
+					robertNpcClass.Move:MoveTo(Vector3.new(662.87, 57.81, -13.28));
+					robertNpcClass.Move.OnMoveToEnded:Wait(32);
 					
-					robertModule.Move:Face(Vector3.new(650, 57.8096695, -13.2840099));
-					robertModule.Interactable.Parent = robertModule.Prefab;
+					robertNpcClass.Move:Face(Vector3.new(650, 57.8096695, -13.2840099));
+					robertNpcClass:ToggleInteractable(true);
 					
 				end
 
@@ -401,6 +446,7 @@ return function(CutsceneSequence)
 	end)
 	
 	
+	-- MARK: Open Bloxmart Gate
 	CutsceneSequence:NewScene("Open Bloxmart Gate", function()
 		local gateModel = workspace.Environment:WaitForChild("BloxmartGate", 60);
 		for a=1, 20 do
@@ -410,13 +456,27 @@ return function(CutsceneSequence)
 				break;
 			end
 		end
-		gateModel:SetPrimaryPartCFrame(CFrame.new(286.61203, 69.4899445, 103.898018, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+		gateModel:PivotTo(CFrame.new(286.61203, 69.4899445, 103.898018, 1, 0, 0, 0, 1, 0, 0, 0, 1));
 		if gateModel:FindFirstChild("Interactable") then
 			gateModel.Interactable:Destroy();
 		end
+		
+		local gateButton = workspace.Interactables:WaitForChild("gateButton");
+		local gateButtonInteractable: InteractableInstance = modInteractables.getOrNew(gateButton:WaitForChild("Interactable"));
+		local gateButtonPart = gateButtonInteractable.Part;
+
+		if gateButtonPart then
+			gateButtonPart.ButtonPanel.button.Color = Color3.fromRGB(107, 59, 59);
+			gateButtonPart.ButtonPanel.button.Position = Vector3.new(303.242, 73.349, 10.282);
+
+			gateButtonInteractable.Label = "Bloxmart gates are now opened.";
+			gateButtonInteractable.CanInteract = false;
+		end
+		
 	end)
 	
 	
+	-- MARK: Show Gate Opening
 	CutsceneSequence:NewScene("Show Gate Opening", function()
 		modConfigurations.Set("DisableHotbar", true);
 		modConfigurations.Set("DisableWeaponInterface", true);
@@ -444,23 +504,31 @@ return function(CutsceneSequence)
 			end;
 		}, 2, 6);
 
-		--local camera = workspace.CurrentCamera;
-		--camera.CFrame = CFrame.new(270.571594, 63.6824913, 125.062851, 0.796943724, 0.0513714477, -0.601865232, -0, 0.99637723, 0.0850445181, 0.604053617, -0.0677756965, 0.794056535);
-		--camera.Focus = CFrame.new(271.77533, 63.5124016, 123.474731, 1, 0, 0, 0, 1, 0, 0, 0, 1);
 
-		local gateInteractable = workspace.Interactables:FindFirstChild("lockedBloxmartGate");
-		if gateInteractable then gateInteractable:Destroy() end;
+		local gateButton = workspace.Interactables:WaitForChild("gateButton");
+		local gateButtonInteractable: InteractableInstance = modInteractables.getOrNew(gateButton:WaitForChild("Interactable"));
+		local gateButtonPart = gateButtonInteractable.Part;
 
-		local TweenService = game:GetService("TweenService");
+		if gateButtonPart then
+			gateButtonPart.ButtonPanel.button.Color = Color3.fromRGB(107, 59, 59);
+			gateButtonPart.ButtonPanel.button.Position = Vector3.new(303.242, 73.349, 10.282);
+
+			gateButtonInteractable.Label = "Bloxmart gates are now opened.";
+			gateButtonInteractable.CanInteract = false;
+		end
+
 		local gateModel = workspace.Environment:WaitForChild("BloxmartGate", 60);
 		if gateModel then
-			gateModel:SetPrimaryPartCFrame(CFrame.new(286.61203, 60.7738342, 103.898018, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+			local gateInteractable = gateModel:FindFirstChild("Interactable");
+			if gateInteractable then gateInteractable:Destroy() end;
+
+			gateModel:PivotTo(CFrame.new(286.61203, 60.7738342, 103.898018, 1, 0, 0, 0, 1, 0, 0, 0, 1));
 
 			local cframeValue = Instance.new("CFrameValue", script);
 			cframeValue.Value = gateModel:GetPrimaryPartCFrame();
 
 			local connection = cframeValue:GetPropertyChangedSignal("Value"):Connect(function()
-				gateModel:SetPrimaryPartCFrame(cframeValue.Value);
+				gateModel:PivotTo(cframeValue.Value);
 			end)
 			TweenService:Create(cframeValue, TweenInfo.new(6), {Value=CFrame.new(286.61203, 69.4899445, 103.898018, 1, 0, 0, 0, 1, 0, 0, 0, 1)}):Play();
 			if gateModel:FindFirstChild("Interactable") then

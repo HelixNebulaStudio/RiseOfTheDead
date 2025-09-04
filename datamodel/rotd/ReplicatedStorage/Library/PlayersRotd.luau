@@ -65,8 +65,9 @@ shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
 		local setSpawn = modGpsLibrary.SpawnLocationLibrary[location];
 		if setSpawn == nil then return end;
 		
+		local oldSpawn = gameSave.Spawn;
 		gameSave.Spawn = setSpawn;
-		Debugger:StudioWarn(`Set spawn to {location} = {setSpawn}`);
+		Debugger:StudioWarn(`Set spawn from ({oldSpawn}) to ({location} = {setSpawn})`);
 	end)
 end)
 

@@ -124,6 +124,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	interface.Garbage:Tag(game.Players.PlayerAdded:Connect(updateRequest));
 	interface.Garbage:Tag(game.Players.PlayerRemoving:Connect(updateRequest));
 
+    --MARK: OnToggle
 	window.OnToggle:Connect(function(visible)
 		if visible then
 			interface:HideAll{[window.Name]=true;};
@@ -944,6 +945,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end
 
     local debounce = false;
+    -- MARK: OnUpdate
     window.OnUpdate:Connect(function()
         if debounce then return end;
         debounce = true;

@@ -380,12 +380,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             binds.ViewingRoomId = nil;
             binds.PlayerRoomId = nil;
             interface:ToggleGameBlinds(true, 0.5);
+            clearIndicators();
 
         end
     end)
 
     interface.Garbage:Tag(function()
         modCameraGraphics:Unbind("lobbycamera");
+        clearIndicators();
     end)
 
     function binds.GetRoom(id)

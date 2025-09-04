@@ -91,8 +91,8 @@ export type Const = {
 
 --MARK: EngineCore
 export type EngineCore = {
-    ConnectOnPlayerAdded: (self: EngineCore, src: Script | LocalScript | ModuleScript, func: (player: Player)->...any, order: number?) -> nil;
-    ConnectOnPlayerRemoved: (self: EngineCore, src: Script | LocalScript | ModuleScript, func: (player: Player)->...any) -> nil;
+    ConnectOnPlayerAdded: (EngineCore, src: Script | LocalScript | ModuleScript, func: (player: Player)->...any, order: number?) -> nil;
+    ConnectOnPlayerRemoved: (EngineCore, src: Script | LocalScript | ModuleScript, func: (player: Player)->...any) -> nil;
     connectPlayers: () -> nil;
     loadWorldCore: (worldName: string) -> nil;
 };
@@ -108,17 +108,17 @@ export type Debugger = {
     Expire: (Instance, number?) -> nil;
     new: (ModuleScript) -> Debugger;
 
-    Require: (self: Debugger, ModuleScript, boolean?) -> any;
-    Ray: (self: Debugger, Ray, BasePart?, Vector3?, Vector3?) -> BasePart;
-    Point: (self: Debugger, (CFrame | Vector3), Instance) -> Attachment;
-    PointPart: (self: Debugger, (CFrame | Vector3)) -> BasePart;
+    Require: (Debugger, ModuleScript, boolean?) -> any;
+    Ray: (Debugger, Ray, BasePart?, Vector3?, Vector3?) -> BasePart;
+    Point: (Debugger, (CFrame | Vector3), Instance) -> Attachment;
+    PointPart: (Debugger, (CFrame | Vector3)) -> BasePart;
 
-    Stringify: (self: Debugger, ...any) -> string;
-    StudioLog: (self: Debugger, ...any) -> nil;
-    StudioWarn: (self: Debugger, ...any)  -> nil;
-    Warn: (self: Debugger, ...any) -> nil;
+    Stringify: (Debugger, ...any) -> string;
+    StudioLog: (Debugger, ...any) -> nil;
+    StudioWarn: (Debugger, ...any)  -> nil;
+    Warn: (Debugger, ...any) -> nil;
 
-    Debounce: (self: Debugger, string, number) -> boolean;
+    Debounce: (Debugger, string, number) -> boolean;
 }
 
 --MARK: GarbageHandler
@@ -139,13 +139,13 @@ export type EventSignal<T...> = {
 	Functions: {(T...)->(...any)};
 } & {
     new: (name: string?) -> EventSignal<T...>;
-    Fire: (self: EventSignal<T...>, ...any) -> nil;
-    Wait: (self: EventSignal<T...>, timeOut: number?) -> ...any;
+    Fire: (EventSignal<T...>, ...any) -> nil;
+    Wait: (EventSignal<T...>, timeOut: number?) -> ...any;
     Connect: (EventSignal<T...>, (T...) -> ...any) -> (() -> nil);
-    Disconnect: (self: EventSignal<T...>, func: any) -> nil;
-    Once: (self: EventSignal<T...>, func: (T...)-> ...any) -> (() -> nil);
-    Destroy: (self: EventSignal<T...>) -> nil;
-    DisconnectAll: (self: EventSignal<T...>) -> nil;
+    Disconnect: (EventSignal<T...>, func: any) -> nil;
+    Once: (EventSignal<T...>, func: (T...)-> ...any) -> (() -> nil);
+    Destroy: (EventSignal<T...>) -> nil;
+    DisconnectAll: (EventSignal<T...>) -> nil;
 };
 
 --MARK: EventPacket
@@ -173,9 +173,9 @@ export type EventHandler = {
     RelayToServer: boolean;
 
     -- @methods
-    SetPermissions: (self: EventHandler, flagTag: string, value: boolean) -> nil;
-    HasPermissions: (self: EventHandler, flagTag: string, player: Player?) -> boolean;
-    SetPlayerPermissions: (self: EventHandler, player: Player, flagTag: string, value: boolean) -> nil;
+    SetPermissions: (EventHandler, flagTag: string, value: boolean) -> nil;
+    HasPermissions: (EventHandler, flagTag: string, player: Player?) -> boolean;
+    SetPlayerPermissions: (EventHandler, player: Player, flagTag: string, value: boolean) -> nil;
 };
 
 --MARK: EventService
@@ -188,25 +188,25 @@ export type EventService = {
 
     -- @methods
     ClientInvoke: (
-        self: EventService, 
+        EventService, 
         key: GAME_EVENT_KEY<string>, 
         invokeParam: EventInvokeParam, 
         ...any?
     ) -> EventPacket;
     ServerInvoke: (
-        self: EventService, 
+        EventService, 
         key: GAME_EVENT_KEY<string>, 
         invokeParam: EventInvokeParam, 
         ...any?
     ) -> EventPacket;
     OnInvoked: (
-        self: EventService, 
+        EventService, 
         key: GAME_EVENT_KEY<string>, 
         (event: EventPacket, ...any) -> nil, 
         priority: number?
     ) -> (()->nil);
     GetOrNewHandler: (
-        self: EventService,
+        EventService,
         key: GAME_EVENT_KEY<string>,
         newIfNil: boolean?
     ) -> EventHandler;
@@ -219,10 +219,10 @@ export type Profiles = {
     new: (player: Player) -> Profile;
 
     -- @methods
-    Get: (self: Profiles, player: Player) -> Profile;
-    Find: (self: Profiles, playerName: string) -> Profile;
-    WaitForProfile: (self: Profiles, player: Player, duration: number?) -> Profile;
-    IsPremium: (self: Profiles, player: Player) -> boolean;
+    Get: (Profiles, player: Player) -> Profile;
+    Find: (Profiles, playerName: string) -> Profile;
+    WaitForProfile: (Profiles, player: Player, duration: number?) -> Profile;
+    IsPremium: (Profiles, player: Player) -> boolean;
 };
 
 export type Profile = {
@@ -245,21 +245,21 @@ export type Profile = {
     
     -- @methods
     Save: (Profile, overrideData: any?, force: boolean?) -> nil;
-    GetActiveSave: (self: Profile) -> GameSave;
-    Sync: (self: Profile, hierarchyKey: string?, paramPacket: anydict?) -> nil;
+    GetActiveSave: (Profile) -> GameSave;
+    Sync: (Profile, hierarchyKey: string?, paramPacket: anydict?) -> nil;
 
-    GetCacheStorages: (self: Profile) -> {[string]: Storage};
-    AddPlayPoints: (self: Profile, points: number?, reason: string?) -> nil;
+    GetCacheStorages: (Profile) -> {[string]: Storage};
+    AddPlayPoints: (Profile, points: number?, reason: string?) -> nil;
 
     InitMessaging: (Profile) -> nil;
 
     -- @binds
-    _new: (self: Profile, player: Player) -> nil;
-    _key_load: (self: Profile, key: string, data: any, loadOverwrite: anydict?) -> boolean; -- handled if true;
-    _reset_save: (self: Profile) -> nil;
-    _sync: (self: Profile, hierarchyKey: string?, paramPacket: anydict?) -> nil;
-    _save: (self: Profile, overrideData: any?, force: boolean?) -> nil;
-    _sync_public: (self: Profile, publicData: anydict, caller: Player) -> nil;
+    _new: (Profile, player: Player) -> nil;
+    _key_load: (Profile, key: string, data: any, loadOverwrite: anydict?) -> boolean; -- handled if true;
+    _reset_save: (Profile) -> nil;
+    _sync: (Profile, hierarchyKey: string?, paramPacket: anydict?) -> nil;
+    _save: (Profile, overrideData: any?, force: boolean?) -> nil;
+    _sync_public: (Profile, publicData: anydict, caller: Player) -> nil;
 } & Profiles;
 
 --MARK: GameSave
@@ -267,6 +267,7 @@ export type GameSave = {
     -- @properties
     Player: Player;
     Profile: Profile;
+    Missions: MissionsProfile;
 
     Inventory: Storage;
     Clothing: Storage;
@@ -277,10 +278,10 @@ export type GameSave = {
     Events: anydict;
 
     -- @methods
-    GetActiveSave: (self: GameSave) -> GameSave;
-    Sync: (self: GameSave, hierarchyKey: string?) -> nil;
-    GetStat: (self: GameSave, k: string) -> any;
-    AddStat: (self: GameSave, k: string, v: number, force: boolean?) -> number;
+    GetActiveSave: (GameSave) -> GameSave;
+    Sync: (GameSave, hierarchyKey: string?) -> nil;
+    GetStat: (GameSave, k: string) -> any;
+    AddStat: (GameSave, k: string, v: number, force: boolean?) -> number;
 
     -- @binds
     _new: (gameSave: GameSave, profile: Profile) -> nil;
@@ -288,6 +289,10 @@ export type GameSave = {
     _loaded: (gameSave: GameSave) -> nil;
 };
 
+export type MissionsProfile = {
+    -- @methods
+    Get: (MissionsProfile, missionId: number) -> Mission?;
+};
 
 --MARK: Storage
 export type Storages = {
@@ -419,10 +424,10 @@ export type StorageItem = {
     IsFake: boolean;
     
     -- @methods
-    Sync: (self: StorageItem, keys: {string}?) -> nil;
-    GetValues: (self: StorageItem, key: string) -> any;
-    SetValues: (self: StorageItem, key: string, value: any?, syncFunc: any?) -> StorageItem;
-    Clone: (self: StorageItem) -> StorageItem;
+    Sync: (StorageItem, keys: {string}?) -> nil;
+    GetValues: (StorageItem, key: string) -> any;
+    SetValues: (StorageItem, key: string, value: any?, syncFunc: any?) -> StorageItem;
+    Clone: (StorageItem) -> StorageItem;
 }
 
 
@@ -483,14 +488,14 @@ export type PlayerClass = CharacterClass & {
     Kill: (PlayerClass, reason: string?) -> nil;
     GetInstance: (PlayerClass) -> Player;
     
-    GetCFrame: (self: PlayerClass) -> CFrame;
-    SetCFrame: (self: PlayerClass, cframe: CFrame) -> CFrame;
+    GetCFrame: (PlayerClass) -> CFrame;
+    SetCFrame: (PlayerClass, cframe: CFrame) -> CFrame;
 
-    SyncProperty: (self: PlayerClass, key: string, players: any) -> nil;
+    SyncProperty: (PlayerClass, key: string, players: any) -> nil;
 
-    RefreshHealRate: (self: PlayerClass) -> nil;
+    RefreshHealRate: (PlayerClass) -> nil;
 
-    OnDeathServer: (self: PlayerClass)->nil;
+    OnDeathServer: (PlayerClass)->nil;
     OnCharacterAdded: (character: Model)->nil;
     OnPlayerTeleport: ()->nil;
     
@@ -528,8 +533,9 @@ export type CharacterClass = {
     WieldComp: WieldComp;
 
     -- @methods
-    GetHealthComp: (self: CharacterClass, bodyPart: BasePart) -> HealthComp?;
-    Kill: (self: CharacterClass) -> nil;
+    DistanceFromCharacter: (CharacterClass, pos: Vector3) -> number;
+    GetHealthComp: (CharacterClass, bodyPart: BasePart) -> HealthComp?;
+    Kill: (CharacterClass) -> nil;
 
     Initialize: () -> nil;
 };
@@ -550,7 +556,7 @@ type StatusPackage = {
 export type StatusClass = {
     ClassName: string;
 
-    Instance: (self: StatusClass) -> StatusClassInstance;
+    Instance: (StatusClass) -> StatusClassInstance;
     Func: (StatusClassInstance, ...any) -> nil;
 
     BindApply: (StatusClassInstance) -> nil;
@@ -580,14 +586,14 @@ export type StatusClassInstance = {
 
     
     -- @methods
-    Sync: (self: StatusClassInstance, players: any)->nil; --Server to Client
-    Relay: (self: StatusClassInstance, ...any)->nil; --Client to Server
-    Shrink: (self: StatusClassInstance) -> anydict;
+    Sync: (StatusClassInstance, players: any)->nil; --Server to Client
+    Relay: (StatusClassInstance, ...any)->nil; --Client to Server
+    Shrink: (StatusClassInstance) -> anydict;
 } & StatusClass;
 
 --MARK: AnimationController
 export type AnimationController = {
-    Update: (self: AnimationController) -> nil;
+    Update: (AnimationController) -> nil;
 };
 
 --MARK: NpcClasses
@@ -617,6 +623,13 @@ export type NpcClasses = {
         CFrame: CFrame?;
         Player: Player?;
 
+        AddComponents: {string}?;
+        AddBehaviorTrees: {string}?;
+        
+        CustomNpcPrefab: Instance?;
+        ReplicateOut: boolean?;
+            
+        BindSetup: ((npcClass: NpcClass) -> nil)?;
     }) -> NpcClass;
     
     -- @signals
@@ -625,9 +638,14 @@ export type NpcClasses = {
 
 
 export type NpcMoveComponent = {
+    -- @properties
+    SetDefaultWalkSpeed: number;
+
+    -- @methods
+    Init: anyfunc;
     HeadTrack: (NpcMoveComponent, part: BasePart, expireTime: number) -> nil;
     MoveTo: (NpcMoveComponent, position: Vector3) -> nil;
-    Face: (NpcMoveComponent, target: Vector3 | BasePart, faceSpeed: number?, duration: number?) -> nil;
+    Face: (NpcMoveComponent, target: Vector3 | BasePart | "Player", faceSpeed: number?, duration: number?) -> nil;
     LookAt: (NpcMoveComponent, point: Vector3 | BasePart) -> nil;
     Follow: (NpcMoveComponent, target: (Vector3 | BasePart)?, maxFollowDist: number?, minFollowDist: number?, followGapOffset: number?) -> nil;
     SetMoveSpeed: (NpcMoveComponent, action: string?, id: string?, speed: number?, priority: number?, expire: number?) -> nil;
@@ -637,6 +655,9 @@ export type NpcMoveComponent = {
     Resume: (NpcMoveComponent) -> nil;
     Recompute: (NpcMoveComponent) -> nil;
     Fly: (NpcMoveComponent, trajPoints: ({{Velocity: Vector3;Direction: Vector3;}})?, delta: number, onStepFunc: anyfunc?) -> nil;
+
+    -- @signals
+    OnMoveToEnded: EventSignal<any>;
 }
 
 --MARK: NpcClass
@@ -665,21 +686,21 @@ export type NpcClass = CharacterClass & {
     Interactable: ModuleScript?;
     
     -- @methods
-    Setup: (self: NpcClass, baseNpcModel: Model, npcModel: Model) -> nil;
-    Destroy: (self: NpcClass) -> nil;
-    TeleportHide: (self: NpcClass) -> nil;
+    Setup: (NpcClass, baseNpcModel: Model, npcModel: Model) -> nil;
+    Destroy: (NpcClass) -> nil;
+    TeleportHide: (NpcClass) -> nil;
 
-    AddComponent: (self: NpcClass, component: string | ModuleScript) -> nil;
-    GetComponent: (self: NpcClass, componentName: string) -> any;
-    ListComponents: (self: NpcClass) -> {any};
+    AddComponent: (NpcClass, component: string | ModuleScript) -> nil;
+    GetComponent: (NpcClass, componentName: string) -> any;
+    ListComponents: (NpcClass) -> {any};
     
-    SetCFrame: (self: NpcClass, cframe: CFrame, angle: CFrame?) -> nil;
-    IsInVision: (self: NpcClass, object: BasePart, fov: number?) -> boolean;
-    DistanceFrom: (self: NpcClass, pos: Vector3) -> number;
-    ToggleInteractable: (self: NpcClass, v: boolean) -> nil;
+    SetCFrame: (NpcClass, cframe: CFrame?, angle: CFrame?) -> nil;
+    IsInVision: (NpcClass, object: BasePart, fov: number?) -> boolean;
+    DistanceFrom: (NpcClass, pos: Vector3) -> number;
+    ToggleInteractable: (NpcClass, v: boolean) -> nil;
     UseInteractable: (NpcClass, interactableId: string, ...any) -> ...any;
-    IsRagdolling: (self: NpcClass) -> boolean;
-    GetMapLocation: (self: NpcClass) -> string;
+    IsRagdolling: (NpcClass) -> boolean;
+    GetMapLocation: (NpcClass) -> string;
     Sit: (NpcClass, Seat) -> nil;
 
     -- @signals
@@ -695,7 +716,7 @@ export type NpcClass = CharacterClass & {
 
 
     -- @dev
-    GetImmunity: (self: NpcClass, damageType: string?, damageCategory: string?) -> number; 
+    GetImmunity: (NpcClass, damageType: string?, damageCategory: string?) -> number; 
     Status: any;
     CustomHealthbar: anydict;
     KnockbackResistant: any;
@@ -736,7 +757,7 @@ export type InteractableMeta = {
     LastProximityTrigger: number;
 
     -- @methods
-    Trigger: (self: InteractableInstance) -> nil;
+    Trigger: (InteractableInstance) -> nil;
 
     InteractServer: (InteractableInstance, values: anydict) -> nil;
 
@@ -807,8 +828,8 @@ export type Scheduler = {
     Rate: number;
 
     -- @methods
-    ScheduleFunction: (self: Scheduler, f: anyfunc, fireTick: number) -> SchedulerJob;
-    Wait: (self: Scheduler, f: anyfunc) -> any;
+    ScheduleFunction: (Scheduler, f: anyfunc, fireTick: number) -> SchedulerJob;
+    Wait: (Scheduler, f: anyfunc) -> any;
     Schedule: (routine: any, fireTick: number, ...any) -> SchedulerJob;
     Unschedule: (Scheduler, SchedulerJob) -> boolean;
 
@@ -878,30 +899,30 @@ export type Interface = {
     StorageInterfaceIndex: number;
 
     -- @methods
-    Destroy: (self: InterfaceWindow) -> nil;
-    Init: (self: Interface) -> nil;
-    RefreshInterfaces: (self: Interface) -> nil;
+    Destroy: (InterfaceWindow) -> nil;
+    Init: (Interface) -> nil;
+    RefreshInterfaces: (Interface) -> nil;
 
-    GetWindow: (self: Interface, name: string) -> InterfaceWindow;
-    NewWindow: (self: Interface, name: string, frame: GuiObject, properties: anydict?) -> InterfaceWindow;
-    ToggleWindow: (self: Interface, name: string, visible: boolean?, ...any) -> InterfaceWindow;
-    ListWindows: (self: Interface, conditionFunc: anyfunc) -> {InterfaceWindow};
-    Freeze: (self: Interface, value: boolean) -> nil;
+    GetWindow: (Interface, name: string) -> InterfaceWindow;
+    NewWindow: (Interface, name: string, frame: GuiObject, properties: anydict?) -> InterfaceWindow;
+    ToggleWindow: (Interface, name: string, visible: boolean?, ...any) -> InterfaceWindow;
+    ListWindows: (Interface, conditionFunc: anyfunc) -> {InterfaceWindow};
+    Freeze: (Interface, value: boolean) -> nil;
     
-    BindConfigKey: (self: Interface, key: string, windows: {InterfaceWindow}?, frames: {Instance}?, conditions: ((...any) -> boolean)?) -> nil;
-    BindEvent: (self: Interface, key: string, func: (...any)->nil) -> (()->nil);
-    FireEvent: (self: Interface, key: string, ...any) -> nil;
+    BindConfigKey: (Interface, key: string, windows: {InterfaceWindow}?, frames: {Instance}?, conditions: ((...any) -> boolean)?) -> nil;
+    BindEvent: (Interface, key: string, func: (...any)->nil) -> (()->nil);
+    FireEvent: (Interface, key: string, ...any) -> nil;
 
-    NewQuickButton: (self: Interface, name: string, hint: string, image: string) -> ImageButton;
-    ConnectQuickButton: (self: Interface, obj: ImageButton, keyId: string?, onClickFunc: (()->nil)?) -> nil;
+    NewQuickButton: (Interface, name: string, hint: string, image: string) -> ImageButton;
+    ConnectQuickButton: (Interface, obj: ImageButton, keyId: string?, onClickFunc: (()->nil)?) -> nil;
 
-    HideAll: (self: Interface, blacklist: anydict?) -> nil;
+    HideAll: (Interface, blacklist: anydict?) -> nil;
 
-    GetOrDefaultElement: (self: Interface, name: string, default: anydict?) -> InterfaceElement;
+    GetOrDefaultElement: (Interface, name: string, default: anydict?) -> InterfaceElement;
 
-    ToggleGameBlinds: (self: Interface, openBlinds: boolean, duration: number) -> nil;
-    PlayButtonClick: (self: Interface) -> nil;
-    ConnectImageButton: (self: Interface, button: ImageButton) -> nil;
+    ToggleGameBlinds: (Interface, openBlinds: boolean, duration: number) -> nil;
+    PlayButtonClick: (Interface) -> nil;
+    ConnectImageButton: (Interface, button: ImageButton) -> nil;
 
     -- @signals
     OnReady: EventSignal<>;
@@ -956,14 +977,14 @@ export type InterfaceWindow = {
     CompactFullscreen: boolean;
 
     -- @methods
-    Init: (self: InterfaceWindow) -> nil;
-    Toggle: (self: InterfaceWindow, visible: boolean?, ...any) -> nil;
-    Open: (self: InterfaceWindow, ...any) -> nil;
-    Close: (self: InterfaceWindow, ...any) -> nil;
-    Update: (self: InterfaceWindow, ...any) -> nil;
-    SetClosePosition: (self: InterfaceWindow, close: UDim2, open: UDim2?) -> nil;
-    AddCloseButton: (self: InterfaceWindow, object: GuiObject) -> nil;
-    Destroy: (self: InterfaceWindow) -> nil;
+    Init: (InterfaceWindow) -> nil;
+    Toggle: (InterfaceWindow, visible: boolean?, ...any) -> nil;
+    Open: (InterfaceWindow, ...any) -> nil;
+    Close: (InterfaceWindow, ...any) -> nil;
+    Update: (InterfaceWindow, ...any) -> nil;
+    SetClosePosition: (InterfaceWindow, close: UDim2, open: UDim2?) -> nil;
+    AddCloseButton: (InterfaceWindow, object: GuiObject) -> nil;
+    Destroy: (InterfaceWindow) -> nil;
 
     -- @signals
     OnToggle: EventSignal<boolean>;
@@ -1010,10 +1031,10 @@ export type ToolHandler = {
     Handlers: {[string]: any};
    
     -- @methods
-    Instance: (self: ToolHandler) -> ToolHandlerInstance;
-    Destroy: (self: ToolHandler) -> ();
-    PlayAudio: (self: ToolHandler, audioName: string, parent: Instance, playFunc: ((sound: Sound, audioInfo: anydict)->nil)?) -> Sound?;
-    LoadWieldConfig: (self: ToolHandler) -> nil;
+    Instance: (ToolHandler) -> ToolHandlerInstance;
+    Destroy: (ToolHandler) -> ();
+    PlayAudio: (ToolHandler, audioName: string, parent: Instance, playFunc: ((sound: Sound, audioInfo: anydict)->nil)?) -> Sound?;
+    LoadWieldConfig: (ToolHandler) -> nil;
 
     Init: (toolHandler: ToolHandlerInstance) -> nil;
     Equip: (toolHandler: ToolHandlerInstance) -> nil;
@@ -1060,7 +1081,7 @@ export type GunToolHandlerInstance = ToolHandlerInstance & GunToolHandler;
 
 export type ToolAnimator = {
     Play: (
-        self: ToolAnimator, 
+        ToolAnimator, 
         animName: string, 
         param: ({
             FadeTime: number?;
@@ -1070,22 +1091,22 @@ export type ToolAnimator = {
             [any]: any;
         })?
     ) -> AnimationTrack;
-    Stop: (self: ToolAnimator,
+    Stop: (ToolAnimator,
         animKey: string,
         param: ({
             FadeTime: number?
         })?
     ) -> nil;
-    StopAll: (self: ToolAnimator)->nil;
+    StopAll: (ToolAnimator)->nil;
 
-    GetPlaying: (self: ToolAnimator, animKey: string) -> AnimationTrack;
-    GetKeysPlaying: (self: ToolAnimator, animKeys: {string}) -> {[string]: AnimationTrack};
-    LoadAnimations: (self: ToolAnimator, animations: anydict, default: string, prefabs: {Model}) -> nil;
-    ConnectMarkerSignal: (self: ToolAnimator, markerKey: string, func: ((animKey: string, track: AnimationTrack, value: any)->nil)) -> nil;
+    GetPlaying: (ToolAnimator, animKey: string) -> AnimationTrack;
+    GetKeysPlaying: (ToolAnimator, animKeys: {string}) -> {[string]: AnimationTrack};
+    LoadAnimations: (ToolAnimator, animations: anydict, default: string, prefabs: {Model}) -> nil;
+    ConnectMarkerSignal: (ToolAnimator, markerKey: string, func: ((animKey: string, track: AnimationTrack, value: any)->nil)) -> nil;
     
-    GetState: (self: ToolAnimator) -> string;
+    GetState: (ToolAnimator) -> string;
     SetState: (ToolAnimator, state: string?) -> nil;
-    HasState: (self: ToolAnimator, state: string) -> boolean;
+    HasState: (ToolAnimator, state: string) -> boolean;
     
     Init: (...any)->nil;
     TrackEvent: EventSignal<string, string, string>;
@@ -1121,17 +1142,17 @@ export type ConfigVariable = {
     Modifiers: {ConfigModifier};
 
     -- @methods
-    GetKeyPairs: (self: ConfigVariable) -> {[any]: any};
-    GetBase: (self: ConfigVariable, key: string) -> any;
-    GetFinal: (self: ConfigVariable, key: string) -> any;
+    GetKeyPairs: (ConfigVariable) -> {[any]: any};
+    GetBase: (ConfigVariable, key: string) -> any;
+    GetFinal: (ConfigVariable, key: string) -> any;
 
-    Calculate: (self: ConfigVariable, baseValues: {any}?, modifiers: {any}?, finalValues: {any}?) -> {any};
+    Calculate: (ConfigVariable, baseValues: {any}?, modifiers: {any}?, finalValues: {any}?) -> {any};
 
-    GetModifier: (self: ConfigVariable, id: string) -> (number?, ConfigModifier?);
-    AddModifier: (self: ConfigVariable, modifier: ConfigModifier, recalculate: boolean?) -> nil;
-    RemoveModifier: (self: ConfigVariable, id: string, recalculate: boolean?) -> ConfigModifier?;
+    GetModifier: (ConfigVariable, id: string) -> (number?, ConfigModifier?);
+    AddModifier: (ConfigVariable, modifier: ConfigModifier, recalculate: boolean?) -> nil;
+    RemoveModifier: (ConfigVariable, id: string, recalculate: boolean?) -> ConfigModifier?;
 
-    Destroy: (self: ConfigVariable) -> nil;
+    Destroy: (ConfigVariable) -> nil;
 
     -- @signals
     OnCalculate: EventSignal<anydict>;
@@ -1148,7 +1169,7 @@ export type ConfigModifier = {
     Values: anydict; 
 
     Enabled: boolean;
-    SetEnabled: (self: ConfigModifier, value: boolean) -> nil;
+    SetEnabled: (ConfigModifier, value: boolean) -> nil;
     OnEnabledChanged: EventSignal<boolean>;
 
     BaseValues: anydict;
@@ -1159,7 +1180,7 @@ export type ConfigModifier = {
     MinValues: anydict;
 
     -- @methods
-    Update: (self: ConfigModifier) -> nil;
+    Update: (ConfigModifier) -> nil;
 };
 
 --MARK: EquipmentClass
@@ -1180,11 +1201,11 @@ export type EquipmentClass = {
     ClassSelf: any;
 
     -- @methods
-    SetEnabled: (self: EquipmentClass, value: boolean) -> nil;
-    Update: (self: EquipmentClass, storageItem: StorageItem?) -> nil;
-    Destroy: (self: EquipmentClass) -> nil;
+    SetEnabled: (EquipmentClass, value: boolean) -> nil;
+    Update: (EquipmentClass, storageItem: StorageItem?) -> nil;
+    Destroy: (EquipmentClass) -> nil;
     
-    AddBaseModifier: (self: EquipmentClass, modifierId: string, config: {
+    AddBaseModifier: (EquipmentClass, modifierId: string, config: {
         BaseValues: anydict?;
         SetValues: anydict?;
         SumValues: anydict?;
@@ -1193,9 +1214,9 @@ export type EquipmentClass = {
         MinValues: anydict?;
     }) -> nil;
     
-    UpdateModifiers: (self: EquipmentClass, modifiers: {[string]: ConfigModifier}) -> nil;
-    ProcessModifiers: (self: EquipmentClass, processType: string, ...any) -> nil;
-    GetClassAsModifier: (self: EquipmentClass, siid: string, configModifier: ConfigModifier?) -> ConfigModifier;
+    UpdateModifiers: (EquipmentClass, modifiers: {[string]: ConfigModifier}) -> nil;
+    ProcessModifiers: (EquipmentClass, processType: string, ...any) -> nil;
+    GetClassAsModifier: (EquipmentClass, siid: string, configModifier: ConfigModifier?) -> ConfigModifier;
 };
 
 
@@ -1211,7 +1232,7 @@ export type CommandsLibrary = {
         DevBranchFree: number;
     };
 
-    HookChatCommand: (self: CommandsLibrary, cmd: string, cmdPacket: {
+    HookChatCommand: (CommandsLibrary, cmd: string, cmdPacket: {
         Permission: number;
         Description: string;
         RequiredArgs: number?;
@@ -1235,14 +1256,14 @@ export type ItemModifier = {
     Tags: anydict;
     Binds: anydict;
 
-    Ready: (self: ItemModifierInstance) -> nil;
-    Update: (self: ItemModifierInstance) -> nil;
-    EnableTickUpdate: (self: ItemModifierInstance, value: boolean) -> nil;
+    Ready: (ItemModifierInstance) -> nil;
+    Update: (ItemModifierInstance) -> nil;
+    EnableTickUpdate: (ItemModifierInstance, value: boolean) -> nil;
    
-    Sync: (self: ItemModifier, syncKeys: {string}) -> nil;
+    Sync: (ItemModifier, syncKeys: {string}) -> nil;
     
-    FireBind: (self: ItemModifierInstance, bindName: string, ...any) -> nil;
-    BindTickUpdate: ((self: ItemModifierInstance, tickData: TickData) -> nil)?;
+    FireBind: (ItemModifierInstance, bindName: string, ...any) -> nil;
+    BindTickUpdate: ((ItemModifierInstance, tickData: TickData) -> nil)?;
 };
 
 export type ItemModifierInstance = {
@@ -1276,7 +1297,7 @@ export type DestructibleInstance = {
     Package: anydict;
 
     Enabled: boolean;
-    SetEnabled: (self: DestructibleInstance, value: boolean) -> nil;
+    SetEnabled: (DestructibleInstance, value: boolean) -> nil;
 
     HealthComp: HealthComp;
     StatusComp: StatusComp;
@@ -1418,9 +1439,9 @@ export type TeamClass = {
     DestroyOnZeroMembers: boolean;
 
     --@methods
-    SetMember: (self: TeamClass, name: string, isSet: boolean, proxyTeammate: anydict?) -> nil;
-    ClientLoad: (self: TeamClass, data: anydict) -> nil;
-    GetTeamAsync: (self: TeamClass) -> nil;
+    SetMember: (TeamClass, name: string, isSet: boolean, proxyTeammate: anydict?) -> nil;
+    ClientLoad: (TeamClass, data: anydict) -> nil;
+    GetTeamAsync: (TeamClass) -> nil;
     Sync: (TeamClass) -> nil;
 };
 
@@ -1428,8 +1449,8 @@ export type RadialImage = {
     Config: anydict;
     ImageLabel: ImageLabel;
 
-    GetFromAlpha: (self: RadialImage, alpha: number) -> (number, number, number);
-    UpdateLabel: (self: RadialImage, alpha: number, label: ImageLabel?) -> nil;
+    GetFromAlpha: (RadialImage, alpha: number) -> (number, number, number);
+    UpdateLabel: (RadialImage, alpha: number, label: ImageLabel?) -> nil;
 }
 
 --MARK: -- Data Models
@@ -1476,7 +1497,7 @@ export type DamageData = damageData & {
     -- @properties
 
     -- @methods
-    Clone: (self: DamageData) -> DamageData;
+    Clone: (DamageData) -> DamageData;
 };
 
 --MARK: TickData
@@ -1534,7 +1555,7 @@ export type ArcPoint = {
     Client: boolean;
     
     -- @methods
-    Recast: (self: ArcPoint) -> nil;
+    Recast: (ArcPoint) -> nil;
 }
 
 --MARK: EventInvokeParam
@@ -1578,16 +1599,16 @@ export type HealthComp = {
     
     -- @methods
     Reset: (HealthComp) -> nil;
-    GetModel: (self: HealthComp) -> Model?;
-    CanTakeDamageFrom: (self: HealthComp, characterClass: CharacterClass?) -> boolean;    
-    TakeDamage: (self: HealthComp, DamageData: DamageData) -> nil;
+    GetModel: (HealthComp) -> Model?;
+    CanTakeDamageFrom: (HealthComp, characterClass: CharacterClass?) -> boolean;    
+    TakeDamage: (HealthComp, DamageData: DamageData) -> nil;
     
     SetIsDead: (HealthComp, boolean, reason: anydict?) -> nil;
-    SetHealth: (self: HealthComp, value: number, reason: anydict?) -> nil;
-    SetMaxHealth: (self: HealthComp, value: number, reason: anydict?) -> nil;
+    SetHealth: (HealthComp, value: number, reason: anydict?) -> nil;
+    SetMaxHealth: (HealthComp, value: number, reason: anydict?) -> nil;
 
-    SetArmor: (self: HealthComp, value: number, reason: anydict?) -> nil;
-    SetMaxArmor: (self: HealthComp, value: number, reason: anydict?) -> nil;
+    SetArmor: (HealthComp, value: number, reason: anydict?) -> nil;
+    SetMaxArmor: (HealthComp, value: number, reason: anydict?) -> nil;
    
     SetCanBeHurtBy: (HealthComp, boolString: string?) -> nil;
     CheckCanBeHurtBy: ((HealthComp, {string})->boolean)?;
@@ -1614,12 +1635,12 @@ export type StatusComp = {
     UseScheduler: boolean;
 
     -- @methods
-    Apply: (self: StatusComp, uid: string, value: StatusCompApplyParam?) -> StatusClassInstance;
-    GetOrDefault: (self: StatusComp, uid: string, value: anydict?) -> StatusClassInstance;
+    Apply: (StatusComp, uid: string, value: StatusCompApplyParam?) -> StatusClassInstance;
+    GetOrDefault: (StatusComp, uid: string, value: anydict?) -> StatusClassInstance;
 
-    Process: (self: StatusComp, loopFunc: ((uid: string, statusClass: StatusClassInstance, processData: anydict)->nil)?, fireOnProcess: boolean?) -> nil;
+    Process: (StatusComp, loopFunc: ((uid: string, statusClass: StatusClassInstance, processData: anydict)->nil)?, fireOnProcess: boolean?) -> nil;
     
-    Sync: (self: StatusComp, uid: string, players: any) -> nil;
+    Sync: (StatusComp, uid: string, players: any) -> nil;
 
     -- @signals
     OnProcess: EventSignal<any>;
@@ -1646,16 +1667,16 @@ export type WieldComp = {
     ItemModifierList: {ItemModifierInstance};
     
     -- @methods
-    GetEquipmentClass: (self: WieldComp, siid: string, itemId: string?, storageItem: StorageItem?) -> EquipmentClass;
-    GetToolHandler: (self: WieldComp, siid: string, itemId: string, storageItem: StorageItem?, toolModels: ({Model}?)) -> ToolHandlerInstance;
-    GetOrDefaultItemModifier: (self: WieldComp, siid: string, defaultFunc: (()->ItemModifierInstance)?) -> ItemModifierInstance?;
+    GetEquipmentClass: (WieldComp, siid: string, itemId: string?, storageItem: StorageItem?) -> EquipmentClass;
+    GetToolHandler: (WieldComp, siid: string, itemId: string, storageItem: StorageItem?, toolModels: ({Model}?)) -> ToolHandlerInstance;
+    GetOrDefaultItemModifier: (WieldComp, siid: string, defaultFunc: (()->ItemModifierInstance)?) -> ItemModifierInstance?;
     RefreshCharacterModifiers: (WieldComp) -> nil;
 
     SetCustomization: (WieldComp, mode: string, packet: anydict) -> nil;
 
-    Equip: (self: WieldComp, args: {ItemId: string; MockEquip: boolean?;}) -> nil;
-    Unequip: (self: WieldComp) -> nil;
-    Destroy: (self: WieldComp) -> nil;
+    Equip: (WieldComp, args: {ItemId: string; MockEquip: boolean?;}) -> nil;
+    Unequip: (WieldComp) -> nil;
+    Destroy: (WieldComp) -> nil;
 
-    InvokeToolAction: (self: WieldComp, actionName: string, ...any) -> ...any;
+    InvokeToolAction: (WieldComp, actionName: string, ...any) -> ...any;
 }

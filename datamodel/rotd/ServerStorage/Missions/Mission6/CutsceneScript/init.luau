@@ -3,8 +3,12 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
+
+local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
 --== Variables;
 local MISSION_ID = 6;
@@ -19,12 +23,11 @@ if RunService:IsServer() then
 	storagePrefabs = game.ReplicatedStorage.Prefabs:WaitForChild("Objects");
 	
 	if modBranchConfigs.IsWorld("TheWarehouse") then
-		modOnGameEvents:ConnectEvent("OnDoorEnter", function(player, interactData)
-			local doorName = interactData.Name;
-			if doorName == nil then return end;
-			if not modMission:Progress(player, MISSION_ID) then return end;
-	
-			if doorName == "Warehouse Entrance Door" then
+		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, interactable: InteractableInstance)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+			
+			if interactable.Id == "warehouseEntrance" then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint == 2 then 
 						modMission:CompleteMission(player, 6);
@@ -48,7 +51,10 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigs.IsWorld("TheWarehouse") then
+		Debugger:Warn("Invalid place for cutscene ("..script.Name..")");
+		return;
+	end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
@@ -57,14 +63,15 @@ return function(CutsceneSequence)
 		if mission == nil then return end;
 		
 		
-		local robertModule = modNpcs.getPlayerNpc(player, "Robert");
+		local robertNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Robert");
 		local bloxMartCf = CFrame.new(268, 57.71, 33.87, -1, 0, 0.05, 0, 1, 0, -0.05, 0, -1);
-		if robertModule == nil then
-			local npc = modNpcs.spawn("Robert", bloxMartCf, function(npc, npcModule)
-				npcModule.Player = player;
-				robertModule = npcModule;
-			end);
-			modReplicationManager.ReplicateOut(player, npc);
+		if robertNpcClass == nil then
+			robertNpcClass = shared.modNpcs.spawn2{
+				Name = "Robert";
+				CFrame = bloxMartCf;
+				Player = player;
+				ReplicateOut = true;
+			};
 		end
 
 		local function toggleLights()
@@ -77,83 +84,113 @@ return function(CutsceneSequence)
 		end
 		spawn(toggleLights);
 		
-		local barricade, destructible;
-		
+		local barricade, destructible: DestructibleInstance;
 		
 		local function OnChanged(firstRun)
-			if mission.Type == 2 then -- OnAvailable
+			if firstRun and barricade == nil then
 				barricade = modReplicationManager.getReplicated(player, "bloxmartBlockage")[1];
 				Debugger:Warn("A GetReplicated ",barricade);
 
-				if barricade == nil then
-					Debugger:Warn("New barracade for "..player.Name);
-					barricade = storagePrefabs:WaitForChild("bloxmartBlockage"):Clone();
-					modReplicationManager.ReplicateIn(player, barricade, workspace.Environment);
+				if barricade then
+					destructible = modDestructibles.getOrNew(barricade:WaitForChild("Destructible"));
+							
+					destructible.HealthComp.OnHealthChanged:Connect(function(newHealth: number, prevHealth: number, reason: anydict?)
+						local healthPercent = (destructible.HealthComp.CurHealth/destructible.HealthComp.MaxHealth);
+						Debugger:StudioWarn("barracade HealthChanged", healthPercent);
+
+						modAudio.Play("StorageWoodDrop", barricade:FindFirstChildWhichIsA("BasePart"));
+
+						local rngVec = modVector.RandomUnitVector(3) * math.random(100, 200);
+						if healthPercent <= 0 then
+							barricade.E.Anchored = false;
+							barricade.E:ApplyImpulse(rngVec * barricade.E.AssemblyMass);
+							for _, c in pairs(barricade:GetChildren()) do
+								if c.Name:match("_playerClip") then
+									c:Destroy();
+								elseif c:IsA("BasePart") then
+									c.Anchored = false;
+								end
+							end
+						elseif healthPercent < 0.25 then
+							barricade.D.Anchored = false;
+							barricade.D:ApplyImpulse(rngVec * barricade.D.AssemblyMass);
+						elseif healthPercent < 0.5 then
+							barricade.C.Anchored = false;
+							barricade.C:ApplyImpulse(rngVec * barricade.C.AssemblyMass);
+						elseif healthPercent < 0.75 then
+							barricade.B.Anchored = false;
+							barricade.B:ApplyImpulse(rngVec * barricade.B.AssemblyMass);
+						elseif healthPercent < 1 then
+							barricade.A.Anchored = false;
+							barricade.A:ApplyImpulse(rngVec * barricade.A.AssemblyMass);
+						end
+					end)
+
 				end
+			end
 
-				mission.Cache.Barricade = barricade
+			if mission.Type == 2 then -- OnAvailable
+				robertNpcClass.StopAnimation("Sit");
+				robertNpcClass.RootPart.Anchored = true;
+				robertNpcClass:SetCFrame(bloxMartCf);
 
-				destructible = barricade and barricade:FindFirstChild("Destructible") and shared.require(barricade.Destructible) or nil;
-
-				robertModule.StopAnimation("Sit");
-				robertModule.RootPart.Anchored = true;
-				robertModule.Actions:Teleport(bloxMartCf);
-
-				robertModule.SetAnimation("Holding", {script:WaitForChild("RobertHoldingAnim")});
-				robertModule.PlayAnimation("Holding");
+				robertNpcClass.SetAnimation("Holding", {script:WaitForChild("RobertHoldingAnim")});
+				robertNpcClass.PlayAnimation("Holding");
 				
 			elseif mission.Type == 1 then -- OnActive
-				barricade = modReplicationManager.getReplicated(player, "bloxmartBlockage")[1];
-				destructible = barricade and barricade:WaitForChild("Destructible") and shared.require(barricade.Destructible) or nil;
 				Debugger:Warn("B GetReplicated ",barricade);
 
 				Debugger:Log("mission.ProgressionPoint", mission.ProgressionPoint, "barricade", barricade ~= nil);
 
 				if mission.ProgressionPoint == 1 then
-					robertModule.StopAnimation("Sit");
-					if destructible then
-						Debugger:Log("Set destructible enable");
-						destructible:SetEnabled(true);
-						destructible.OnDestroy = function()
-							game.Debris:AddItem(barricade, 20);
-							modMission:Progress(player, MISSION_ID, function(mission)
-								if mission.ProgressionPoint < 2 then
-									mission.ProgressionPoint = 2;
-									modAnalyticsService:LogOnBoarding{
-										Player=player;
-										OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission6_DestroyedBarricade;
-									};
+					robertNpcClass.StopAnimation("Sit");
+					
+					Debugger:Log("Set destructible enable");
 
-								end;
-							end)
-						end
-					else
-						Debugger:Log("Missing destructible ",barricade);
-					end;
-					robertModule.Actions:Teleport(bloxMartCf);
-					robertModule.StopAnimation("Holding");
-					robertModule.RootPart.Anchored = false;
-					robertModule.Move:MoveTo(Vector3.new(268, 57.71, 20.87));
-					wait(1);
-					robertModule.Actions:FaceOwner();
+					destructible.HealthComp:SetMaxHealth(1000);
+					destructible.HealthComp:SetHealth(1000);
+					destructible:SetEnabled(true);
+
+					destructible.HealthComp.OnIsDeadChanged:Once(function()
+						Debugger:Log("Barricade destroyed");
+						game.Debris:AddItem(barricade, 20);
+						modMission:Progress(player, MISSION_ID, function(mission)
+							if mission.ProgressionPoint < 2 then
+								mission.ProgressionPoint = 2;
+								modAnalyticsService:LogOnBoarding{
+									Player=player;
+									OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission6_DestroyedBarricade;
+								};
+
+							end;
+						end)
+					end)
+
+					robertNpcClass:SetCFrame(bloxMartCf);
+					robertNpcClass.StopAnimation("Holding");
+					robertNpcClass.RootPart.Anchored = false;
+					robertNpcClass.Move:MoveTo(Vector3.new(268, 57.71, 20.87));
+					task.wait(1);
+					robertNpcClass.Move:Face("Player");
 
 				elseif mission.ProgressionPoint == 2 then
-					robertModule.RootPart.Anchored = false;
-					robertModule.StopAnimation("Holding");
-					robertModule.Chat(robertModule.Player, "Please take me somewhere safe.");
-					robertModule.Actions:FollowOwner(function()
+					robertNpcClass.RootPart.Anchored = false;
+					robertNpcClass.StopAnimation("Holding");
+					robertNpcClass.Chat(robertNpcClass.Player, "Please take me somewhere safe.");
+					
+					local followPlayerComp = robertNpcClass:GetComponent("FollowPlayer");
+					followPlayerComp(nil, function()
 						return mission.Type == 1 and mission.ProgressionPoint == 2
-					end);
-					mission.Cache.Barricade = nil;
+					end)
 
 				end
 				
 			elseif mission.Type == 3 then -- OnComplete
 				if firstRun and not modMission:IsComplete(player, 7) then
-					robertModule.Move:Stop();
-					robertModule.Actions:Teleport(CFrame.new(15.6800423, 57.6597404, 42.3099594));
-					robertModule.Move:Face(Vector3.new(15.6800423, 57.6597404, 37.0099602));
-					robertModule.PlayAnimation("Sit", 0.75);
+					robertNpcClass.Move:Stop();
+					robertNpcClass:SetCFrame(CFrame.new(15.6800423, 57.6597404, 42.3099594));
+					robertNpcClass.Move:Face(Vector3.new(15.6800423, 57.6597404, 37.0099602));
+					robertNpcClass.PlayAnimation("Sit", 0.75);
 
 				end
 

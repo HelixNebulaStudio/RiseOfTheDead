@@ -23,8 +23,7 @@ if RunService:IsServer() then
 
 	if modBranchConfigs.IsWorld("TheWarehouse") then
 		local function onDoorEnter(eventPacket: EventPacket, interactable: InteractableInstance)
-			local player = eventPacket.Player;
-			Debugger:Warn(`onDoorEnter.`, player);
+			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 
 			if interactable.Id == "bedroomdoorMain" then
