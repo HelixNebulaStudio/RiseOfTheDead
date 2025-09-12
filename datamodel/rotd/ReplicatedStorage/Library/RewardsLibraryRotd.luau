@@ -461,8 +461,8 @@ function library.onRequire()
 	};
 
 	library:Add{
-		Id="leaperzombie";
-		Name="Leaper Zombies";
+		Id="leaper";
+		Name="Leaper";
 		Rewards={
 			{Type=ItemDropTypes.Screws; ItemId="screws"; Quantity={Min=10; Max=12}; Chance=1/4;};
 			{Type=ItemDropTypes.Blueprint; ItemId="subdamagebp"; Chance=bpItemDropChance;};
@@ -473,8 +473,8 @@ function library.onRequire()
 	};
 
 	library:Add{
-		Id="tickszombie";
-		Name="Ticks Zombies";
+		Id="ticks";
+		Name="Ticks";
 		Rewards={
 			{Type=ItemDropTypes.Adhesive; Quantity={Min=10; Max=12}; Chance=1/4;};
 			{Type=ItemDropTypes.Blueprint; ItemId="binocularsbp"; Chance=bpItemDropChance;};
@@ -488,8 +488,8 @@ function library.onRequire()
 	};
 
 	library:Add{
-		Id="heavyzombie";
-		Name="Heavy Zombies";
+		Id="heavy";
+		Name="Heavy";
 		Rewards={
 			{Type=ItemDropTypes.Blueprint; ItemId="barbedwoodenbp"; Chance=bpItemDropChance;};
 			{Type=ItemDropTypes.Blueprint; ItemId="explosivedamagebp"; Chance=bpItemDropChance;};

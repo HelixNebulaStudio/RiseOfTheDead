@@ -86,7 +86,7 @@ return function(interface: InterfaceInstance, window, frame)
 				stopwatchLabel = taskHudWindow.Binds.GenericLabel:Clone();
 				stopwatchLabel.Name = "StopwatchLabel";
 				stopwatchLabel.LayoutOrder = 5;
-				stopwatchLabel.Parent = frame;
+				stopwatchLabel.Parent = frame:WaitForChild("Content");
 				raidHudTask.StopwatchLabel = stopwatchLabel;
 			end
 			

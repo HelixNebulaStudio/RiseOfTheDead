@@ -9,45 +9,12 @@ local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 local treePackage = {
     LogicString = {
         Default = "AlertTree | PreLogic | RestTree | IdleTree";
-        AlertTree = "HasEnemy & SurvivorCombatTree";
+        AlertTree = "SurvivorCombatTree";
         RestTree = "ShouldRest & [WalkToRest]";
         IdleTree = "HasIdleTask & [WalkToIdleTask]";
     };
-    ActiveUse = {};
+    SharedInteractablesInUse = {};
 };
-
-function treePackage.HasEnemy(npcClass: NpcClass)
-    local targetHandlerComp = npcClass:GetComponent("TargetHandler");
-    if targetHandlerComp == nil then
-        return false;
-    end
-    local properties = npcClass.Properties;
-
-    local enemyTargetData = targetHandlerComp:MatchFirstTarget(function(targetData)
-        if targetData.HealthComp == nil then return end;
-        local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
-
-        if targetNpcClass.HealthComp.IsDead then
-            return false;
-        end;
-
-        local isEnemy = targetNpcClass.HumanoidType == "Zombie" 
-                    or targetNpcClass.HumanoidType == "Cultist"
-                    or targetNpcClass.HumanoidType == "Bandit";
-        if not isEnemy then
-            return false;
-        end
-
-        if not npcClass:IsInVision(targetNpcClass.RootPart) then
-            return false;
-        end
-
-        return true;
-    end)
-    
-    properties.EnemyTargetData = enemyTargetData;
-    return true;
-end
 
 function treePackage.SurvivorCombatTree(npcClass: NpcClass)
     return npcClass.BehaviorTree:RunTree("SurvivorCombatTree", false);
@@ -156,7 +123,7 @@ function treePackage.HasIdleTask(npcClass: NpcClass)
         local id = config:GetAttribute("_Id");
         if id == nil or mapIdleTable[id] == nil then continue end;
         if cache.prevTaskConfig == config then continue end;
-        if treePackage.ActiveUse[config] then continue end;
+        if treePackage.SharedInteractablesInUse[config] then continue end;
 
         local taskTable = {
             Config = config;
@@ -184,7 +151,7 @@ function treePackage.HasIdleTask(npcClass: NpcClass)
     end
 
     properties.IdleTask = rolledTable;
-    treePackage.ActiveUse[rolledTable.Config] = true;
+    treePackage.SharedInteractablesInUse[rolledTable.Config] = true;
     cache.prevTaskConfig = rolledTable.Config;
 
     return true;
@@ -205,7 +172,7 @@ function treePackage.WalkToIdleTask(npcClass: NpcClass)
     end
 
     local interactPart = interactable.Part;
-    local pathFindAtt = interactPart:FindFirstChild("PathFind");
+    local pathFindAtt = interactPart:FindFirstChild("PathToInteract");
 
     local walkTargetPoint = nil;
     if pathFindAtt then
@@ -227,7 +194,7 @@ function treePackage.WalkToIdleTask(npcClass: NpcClass)
 
     if cache.IdleTaskFinishTick then
         if tick() > cache.IdleTaskFinishTick then
-            treePackage.ActiveUse[idleTask.Config] = nil;
+            treePackage.SharedInteractablesInUse[idleTask.Config] = nil;
             properties.IdleTask = nil;
             properties.ProximityChatMessage = nil;
         end

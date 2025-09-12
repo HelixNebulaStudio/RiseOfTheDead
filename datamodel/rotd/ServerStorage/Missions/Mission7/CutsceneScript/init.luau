@@ -22,7 +22,7 @@ if RunService:IsServer() then
 	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
-	if modBranchConfigs.IsWorld("TheWarehouse") or modBranchConfigs.IsWorld("BioXResearch") then
+	if modBranchConfigs.IsWorld("TheWarehouse") then
 		
         shared.modEventService:OnInvoked("GameModeManager_BindGameModeStart", function(eventPacket: EventPacket, packet)
 			local room = packet.Room;
@@ -155,7 +155,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	--if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigs.IsWorld("TheWarehouse") then return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();

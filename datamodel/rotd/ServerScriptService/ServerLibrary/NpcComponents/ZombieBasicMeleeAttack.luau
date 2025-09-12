@@ -4,6 +4,8 @@ local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 local NpcComponent = {};
+NpcComponent.ClassName = "NpcComponent";
+NpcComponent.__index = NpcComponent;
 --==
 
 function NpcComponent.new(npcClass: NpcClass)
@@ -35,14 +37,16 @@ function NpcComponent.new(npcClass: NpcClass)
 			modAudio.Play("ZombieAttack"..math.random(1, 3), enemyClass.RootPart).PlaybackSpeed = (math.random(100, 120)/100);
 		end
 
+		local configurations = npcClass.Configurations;
+
 		npcClass.Move:HeadTrack(enemyClass.Head);
 		npcClass.Move:Face(enemyClass.RootPart.Position, nil, 0.3);
 		npcClass.PlayAnimation("Attack", 0.05, nil, 2);
 
 		local distance = enemyTargetData.Distance or 999;
-		local dmgRange = math.pow((1-math.clamp(distance/npcClass.Properties.AttackRange, 0, 1)), 1/2);
+		local dmgRange = math.pow((1-math.clamp(distance/configurations.AttackRange, 0, 1)), 1/2);
 		
-		local attackDamage = npcClass.Configurations.AttackDamage;
+		local attackDamage = configurations.AttackDamage;
 		attackDamage = attackDamage * dmgRange;
 
 		local dmgData: DamageData = DamageData.new{

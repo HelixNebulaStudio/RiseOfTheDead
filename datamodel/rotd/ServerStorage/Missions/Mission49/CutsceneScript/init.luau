@@ -21,7 +21,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigs.IsWorld("TheWarehouse") then return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();

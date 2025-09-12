@@ -34,7 +34,7 @@ function Gun:UpdatePotential(equipmentClass: EquipmentClass, weaponLevel: number
     local baseDamage = configurations:GetBase("Damage");
     local potentialDamage = configurations:GetBase("PotentialDamage");
 
-    local _, potentialModifier: ItemModifierInstance = configurations:GetModifier("Potential");
+    local potentialModifier: ItemModifierInstance = configurations:GetModifier("Potential");
     if potentialModifier == nil then
         potentialModifier = configurations.newModifier("Potential", 0);
         configurations:AddModifier(potentialModifier, false);

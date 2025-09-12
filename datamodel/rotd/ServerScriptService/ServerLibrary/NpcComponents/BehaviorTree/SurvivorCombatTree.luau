@@ -10,13 +10,49 @@ local treePackage = {
 };
 
 function treePackage.HasEnemy(npcClass: NpcClass)
-    local enemyTargetData = npcClass.Properties.EnemyTargetData;
-    if enemyTargetData == nil then return false end;
+    local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+    if targetHandlerComp == nil then
+        return false;
+    end
+    local properties = npcClass.Properties;
+
+    local enemyTargetData = targetHandlerComp:MatchFirstTarget(function(targetData)
+        if targetData.HealthComp == nil then return end;
+        local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
+
+        if targetNpcClass.HealthComp.IsDead then
+            return false;
+        end;
+
+        local isEnemy = targetNpcClass.HumanoidType == "Zombie" 
+                    or targetNpcClass.HumanoidType == "Cultist"
+                    or targetNpcClass.HumanoidType == "Bandit";
+        if not isEnemy then
+            return false;
+        end
+
+        if not npcClass:IsInVision(targetNpcClass.RootPart) then
+            return false;
+        end
+
+        return true;
+    end)
+    
+    properties.EnemyTargetData = enemyTargetData;
+    if enemyTargetData == nil then 
+
+        if npcClass.Properties.IsProtectingPlayer then
+            npcClass.BehaviorTree:RunTree("FollowPlayer", false);
+        end
+        
+        return false;
+    end;
 
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
     local enemyStatusComp: StatusComp = enemyNpcClass.StatusComp;
     if enemyStatusComp:GetOrDefault("Wounded") then return false end;
 
+    npcClass.Properties.Cache.NextRestTick = nil;
     return true;
 end
 
@@ -112,6 +148,12 @@ end
 
 function treePackage.UnequipWeapon(npcClass: NpcClass)
     local wieldComp: WieldComp = npcClass.WieldComp;
+
+    if npcClass.Properties.IsProtectingPlayer then 
+        wieldComp:InvokeToolAction("ToggleIdle", true);
+        return false;
+    end;
+
     if wieldComp.EquipmentClass == nil then return false; end;
     if wieldComp.EquipmentClass.Class == "Gun" or wieldComp.EquipmentClass.Class == "Melee" then
         wieldComp:Unequip();

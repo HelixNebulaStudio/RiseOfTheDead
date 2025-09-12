@@ -89,16 +89,21 @@ local npcPackage = {
 };
 --==
 
-function npcPackage.Spawned(npcClass: NpcClass)
+function npcPackage.Spawned(npcClass: NpcClass)    
+    local attractNpcsComp = npcClass:GetComponent("AttractNpcs");
+    if attractNpcsComp then
+        attractNpcsComp.AttractHumanoidType = {"Zombie"};
+        attractNpcsComp.SelfAttractAlert = true;
+        attractNpcsComp:Activate();
+    end
+
     local particlesFolder = game.ReplicatedStorage.Particles;
 	local musicParticle1 = particlesFolder:WaitForChild("MusicNotes1"):Clone(); 
     musicParticle1.Parent = npcClass.Head;
 	local musicParticle2 = particlesFolder:WaitForChild("MusicNotes2"):Clone(); 
     musicParticle2.Parent = npcClass.Head;
 
-
-
-	local playFluteCooldown = tick()+20;
+	local playFluteCooldown = tick()-20;
     npcClass.Properties.PlayFluteFunc = function()
         task.spawn(function()
             if tick() < playFluteCooldown then return end;
@@ -114,9 +119,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
             local fluteSong = modAudio.Play("FluteSong"..math.random(1, 2), mainToolModel.PrimaryPart);
             
-            if npcClass.WieldComp.ToolHandler and npcClass.WieldComp.ToolHandler.ToolAnimator then
-                npcClass.WieldComp.ToolHandler.ToolAnimator:Play("Use");
-            end
+            toolHandler.ToolAnimator:Play("Use");
             
             npcClass:GetComponent("AvatarFace"):Set("rbxassetid://2071837798");
 

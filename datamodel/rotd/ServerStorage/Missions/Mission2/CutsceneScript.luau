@@ -149,9 +149,8 @@ return function(CutsceneSequence)
 				Name = "Mason";
 				CFrame = CFrame.new(-1.22, 55.46, -287.322);
 				Player = player;
+				ReplicateOut = true;
 			});
-			modReplicationManager.ReplicateOut(player, masonNpcClass.Character);
-			Debugger:Warn(`Spawn Mason`);
 		end
 
 		if not modMission:IsComplete(player, 1) then

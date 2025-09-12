@@ -39,7 +39,6 @@ local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManag
 
 local modNpcs = shared.modNpcs;
 local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local remoteGameModeHud = modRemotesManager:Get("GameModeHud");
 local remoteDoorInteraction = modRemotesManager:Get("DoorInteraction");
@@ -168,10 +167,9 @@ function Raid:Load()
 		for _, tileModel in pairs(collapseMap:GetChildren()) do
 			if tileModel:FindFirstChild("Layout") then
 				for _, child in pairs(tileModel.Layout:GetChildren()) do
-					if child:FindFirstChild("Door") and child.Door:IsA("ModuleScript") then
-
-						local doorObject = modDoors:GetDoor(child);
-						table.insert(self.Doors, doorObject);
+					if child:FindFirstChild("Door") and child.Door:IsA("Configuration") then
+						local doorInstance: DoorInstance = modDoors.getOrNew(child.Door);
+						table.insert(self.Doors, doorInstance);
 						
 					elseif child.Name == "SpawnPlatform" then
 						self.SpawnPlatforms[child] = {
@@ -274,9 +272,9 @@ function Raid:Load()
 			elseif object.Name == "Doors" then
 				for _, child in pairs(object:GetChildren()) do
 					
-					if child:FindFirstChild("Door") and child.Door:IsA("ModuleScript") then
-						local doorObject = modDoors:GetDoor(child);
-						table.insert(self.Doors, doorObject);
+					if child:FindFirstChild("Door") and child.Door:IsA("Configuration") then
+						local doorInstance: DoorInstance = modDoors.getOrNew(child.Door);
+						table.insert(self.Doors, doorInstance);
 
 					elseif child.Name == "ExtractDoor" then
 						table.insert(self.ExtractDoors, child);
@@ -542,40 +540,101 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 
 	local spawnCf = paramPacket.SpawnCFrame;
 	
-	if self.OnNpcSpawnHooked == nil then
-		self.OnNpcSpawnHooked = modNpcs.OnNpcSpawn:Connect(function(npcModule)
-			if modConfigurations.TargetableEntities[npcModule.Humanoid.Name] == nil then return end; -- Not enemy spawn;
+	-- if self.OnNpcSpawnHooked == nil then
+	-- 	self.OnNpcSpawnHooked = modNpcs.OnNpcSpawn:Connect(function(npcModule)
+	-- 		if modConfigurations.TargetableEntities[npcModule.Humanoid.Name] == nil then return end; -- Not enemy spawn;
 
-			table.insert(self.EnemyClassInstances, npcModule);
+	-- 		table.insert(self.EnemyClassInstances, npcModule);
 
-			npcModule.Garbage:Tag(function()
-				for a=#self.EnemyClassInstances, 1, -1 do
-					if self.EnemyClassInstances[a] == npcModule then
-						table.remove(self.EnemyClassInstances, a);
-						break;
+	-- 		npcModule.Garbage:Tag(function()
+	-- 			for a=#self.EnemyClassInstances, 1, -1 do
+	-- 				if self.EnemyClassInstances[a] == npcModule then
+	-- 					table.remove(self.EnemyClassInstances, a);
+	-- 					break;
+	-- 				end
+	-- 			end
+	-- 		end)
+
+	-- 		npcModule.Humanoid.Died:Connect(function()
+	-- 			self:BeginCount();
+
+	-- 			self.LastKilled = tick();
+	-- 			for a=#self.EnemyClassInstances, 1, -1 do
+	-- 				if self.EnemyClassInstances[a] == npcModule then
+	-- 					table.remove(self.EnemyClassInstances, a);
+	-- 					break;
+	-- 				end
+	-- 			end
+
+	-- 			npcModule.DeathPosition = npcModule.RootPart.CFrame.p;
+
+	-- 			self.LastEnemyDeathPos = npcModule.DeathPosition;
+				
+	-- 			self.EliminateCount = self.EliminateCount +1;
+				
+	-- 			if self.Status == EnumStatus.InProgress then
+					
+	-- 				if self.Objective.Id == "Eliminate" then
+	-- 					local remining = math.max(0, self.EliminateGoal - self.EliminateCount);
+
+	-- 					self.ObjectiveStatusText = `Eliminate {remining} enemies`;
+	-- 					self:Hud({
+	-- 						Status=self.ObjectiveStatusText;
+	-- 					});
+						
+	-- 					if self.EliminateCount >= self.EliminateGoal then
+	-- 						self:CompleteRaid();
+	-- 					end
+	-- 				end
+					
+	-- 			end
+	-- 		end);
+	-- 	end)
+	-- end
+
+	local npcClass: NpcClass = modNpcs.spawn2{
+		Name = npcName;
+		CFrame = spawnCf;
+
+		BindSetup = function(npcClass: NpcClass)
+			self.EnemiesSpawned = self.EnemiesSpawned + 1;
+
+			local properties: PropertiesVariable<{}> = npcClass.Properties;
+			properties.Level = math.max(npcClass.Properties.Level + (self.Difficulty + (self.Wave-1)) + math.random(-2, 0), 1);
+			properties.TargetableDistance = 256;
+			properties.NetworkOwners = self.Players;
+			properties.CanForgetTargets = false;
+			properties.HordeAggression = paramPacket.HordeAggression == true;
+
+			if paramPacket.InfTargeting then
+				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+				if targetHandlerComp then
+					for a=1, #self.Players do
+						targetHandlerComp:AddTarget(self.Players[a].Character);
 					end
 				end
-			end)
+			end
 
-			npcModule.Humanoid.Died:Connect(function()
+			table.insert(self.EnemyClassInstances, npcClass);
+
+			local healthComp: HealthComp = npcClass.HealthComp;
+			healthComp.OnIsDeadChanged:Connect(function()
+				if not healthComp.IsDead then return end;
+
 				self:BeginCount();
 
 				self.LastKilled = tick();
 				for a=#self.EnemyClassInstances, 1, -1 do
-					if self.EnemyClassInstances[a] == npcModule then
+					if self.EnemyClassInstances[a] == npcClass then
 						table.remove(self.EnemyClassInstances, a);
 						break;
 					end
 				end
 
-				npcModule.DeathPosition = npcModule.RootPart.CFrame.p;
-
-				self.LastEnemyDeathPos = npcModule.DeathPosition;
-				
 				self.EliminateCount = self.EliminateCount +1;
+				self.LastEnemyDeathPos = npcClass.RootPart.CFrame.Position;
 				
 				if self.Status == EnumStatus.InProgress then
-					
 					if self.Objective.Id == "Eliminate" then
 						local remining = math.max(0, self.EliminateGoal - self.EliminateCount);
 
@@ -590,41 +649,43 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 					end
 					
 				end
-			end);
-		end)
-	end
-
-	local newNpcModule;
-	local npcPrefab = modNpcs.spawn(npcName, spawnCf, function(npcPrefab, npcModule)
-		self.EnemiesSpawned = self.EnemiesSpawned + 1;
-		
-		newNpcModule = npcModule;
-
-		npcModule.Configuration.Level = math.max(npcModule.Configuration.Level + (self.Difficulty + (self.Wave-1)) + math.random(-2, 0), 1);
-		npcModule.Properties.TargetableDistance = 256;
-		npcModule.NetworkOwners = game.Players:GetPlayers();
-		
-		if paramPacket.InfTargeting then
-			npcModule.SetAggression = 3;
-			npcModule.InfTargeting = true;
-			npcModule.AutoSearch = true;
-			npcModule.ForgetEnemies = false;
-			npcModule.Properties.TargetableDistance = 4096;
-
-			npcModule.OnTarget(self.Players);
+			end)
 		end
+	};
+
+	return npcClass;
+
+	-- local newNpcModule;
+	-- local npcPrefab = modNpcs.spawn(npcName, spawnCf, function(npcPrefab, npcModule)
+	-- 	self.EnemiesSpawned = self.EnemiesSpawned + 1;
+		
+	-- 	newNpcModule = npcModule;
+
+	-- 	npcModule.Configuration.Level = math.max(npcModule.Configuration.Level + (self.Difficulty + (self.Wave-1)) + math.random(-2, 0), 1);
+	-- 	npcModule.Properties.TargetableDistance = 256;
+	-- 	npcModule.NetworkOwners = game.Players:GetPlayers();
+		
+	-- 	if paramPacket.InfTargeting then
+	-- 		npcModule.SetAggression = 3;
+	-- 		npcModule.InfTargeting = true;
+	-- 		npcModule.AutoSearch = true;
+	-- 		npcModule.ForgetEnemies = false;
+	-- 		npcModule.Properties.TargetableDistance = 4096;
+
+	-- 		npcModule.OnTarget(self.Players);
+	-- 	end
 		
 		
-		if npcName == "Pathoroth" then
-			local newHealth = 4000 * math.max(math.ceil(self.Difficulty/2) + math.ceil(self.Wave/2), 1);
-			npcModule.Humanoid.MaxHealth = math.clamp(newHealth, 1000, math.huge);
-			npcModule.Humanoid.Health = npcModule.Humanoid.MaxHealth;
-		end
+	-- 	if npcName == "Pathoroth" then
+	-- 		local newHealth = 4000 * math.max(math.ceil(self.Difficulty/2) + math.ceil(self.Wave/2), 1);
+	-- 		npcModule.Humanoid.MaxHealth = math.clamp(newHealth, 1000, math.huge);
+	-- 		npcModule.Humanoid.Health = npcModule.Humanoid.MaxHealth;
+	-- 	end
 
-		if self.OnEnemySpawn then self:OnEnemySpawn(npcPrefab, npcModule); end
-	end);
+	-- 	if self.OnEnemySpawn then self:OnEnemySpawn(npcPrefab, npcModule); end
+	-- end);
 
-	return npcPrefab, newNpcModule;
+	-- return npcPrefab, newNpcModule;
 end
 
 function Raid:BeginCount()
@@ -686,22 +747,22 @@ function Raid:Start()
 	local destructibleObjs = {};
 	
 	for a=1, #self.Doors do
-		local doorObject = self.Doors[a];
-		local doorPrefab = doorObject.Prefab;
+		local doorInstance: DoorInstance = self.Doors[a];
+		local doorModel = doorInstance.Model;
 		
-		doorObject.Raided = nil;
-		doorObject:Toggle(false);
+		doorInstance.Raided = nil;
+		doorInstance:Toggle(false);
 
 
-		if doorObject.SpawnBlockade == false then continue end;
-		doorObject.CanBreakIn = false;
+		if doorInstance.SpawnBlockade == false then continue end;
+		doorInstance.CanBreakIn = false;
 		
 		local blockadeId = "BlockadeSingle";
-		if doorObject.WidthType == "Double" then
+		if doorInstance.WidthType == "Double" then
 			blockadeId = "BlockadeDouble";
 		end
 		
-		for _, obj in pairs(doorPrefab:GetChildren()) do
+		for _, obj in pairs(doorModel:GetChildren()) do
 			if obj.Name == "Blockade" then
 				game.Debris:AddItem(obj, 0);
 			end
@@ -712,8 +773,8 @@ function Raid:Start()
 		if blockadeFolder then
 			local new = blockadeFolder[blockadeId]:Clone();
 			new.Name = "Blockade";
-			new:PivotTo(doorPrefab:GetPivot());
-			new.Parent = doorPrefab;
+			new:PivotTo(doorModel:GetPivot());
+			new.Parent = doorModel;
 			
 			local destructibleModule = new:WaitForChild("Destructible");
 			local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleModule);
@@ -723,7 +784,7 @@ function Raid:Start()
 			end)
 
 			destructible.OnDestroy:Connect(function()
-				local addStageSpawn = doorPrefab:GetAttribute("AddStageSpawn");
+				local addStageSpawn = doorModel:GetAttribute("AddStageSpawn");
 				if addStageSpawn == nil then return end;
 
 				for _, att in pairs(self.HiddenSpawns) do
@@ -734,7 +795,7 @@ function Raid:Start()
 			end)
 
 			destructible.OnDestroy:Connect(function()
-				local platformName = doorPrefab:GetAttribute("AddSpawnPlatforms");
+				local platformName = doorModel:GetAttribute("AddSpawnPlatforms");
 				if platformName == nil then return end;
 				
 				for platformPart, platformInfo in pairs(self.SpawnPlatforms) do
@@ -1076,7 +1137,10 @@ function Raid:Initialize(roomData)
 						local spawnCf = spawnPlatformInfo.Spawns[a] * CFrame.new(0, 1, 0) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
 						
 						if #self.EnemyClassInstances <= Config.EnemyCap then
-							self:SpawnEnemy(self:PickEnemy(), {SpawnCFrame=spawnCf;});
+							--MARK: Platform spawn
+							self:SpawnEnemy(self:PickEnemy(), {
+								SpawnCFrame = spawnCf;
+							});
 							continue;
 						end
 
@@ -1160,29 +1224,32 @@ function Raid:Initialize(roomData)
 		end
 	end
 	
-	remoteDoorInteraction.OnServerEvent:Connect(function(player, prefab)
-		local doorObject = modDoors:GetDoor(prefab);
-		if doorObject == nil or doorObject.Raided == true then return end;
+	shared.modEventService:OnInvoked("Doors_BindDoorToggle", function(eventPacket: EventPacket, ...)
+		local doorInstance: DoorInstance = ...;
+		if doorInstance == nil or doorInstance.Raided == true then return end;
 		
-		doorObject.Raided = true;
+		doorInstance.Raided = true;
 		self.DoorsOpened = self.DoorsOpened +1;
 		self:BeginCount();
 		
-		shared.Notify(game.Players:GetPlayers(), `{self.DoorsOpened}/{#self.Doors} Doors Opened!{self.DoorsOpened == 1 and "\nThe more doors open, the more frequent hordes occur." or ""}`, "Inform");
+		shared.Notify(
+			game.Players:GetPlayers(), 
+			`{self.DoorsOpened}/{#self.Doors} Doors Opened!{self.DoorsOpened == 1 and "\nThe more doors open, the more frequent hordes occur." or ""}`, 
+			"Inform"
+		);
 		
 		local hordeTimerDeduction = math.random(Config.HordeTimerDeduction.Min, Config.HordeTimerDeduction.Max);
 		shared.WorldCore.HordeTimer = shared.WorldCore.HordeTimer - hordeTimerDeduction;
-		if doorObject.TriggerHorde == true then
+		if doorInstance.TriggerHorde == true then
 			shared.WorldCore.HordeTimer = tick();
 		end
 
-		local nearbyNpcClasses = shared.modNpcs.listInRange(doorObject.Prefab:GetPivot().Position, 64, 32);
+		local nearbyNpcClasses = shared.modNpcs.listInRange(doorInstance.Model:GetPivot().Position, 32, 16);
 		for a=1, #nearbyNpcClasses do
-			local npcModule = nearbyNpcClasses[a];
-
-			if npcModule.OnTarget then
-				npcModule.OnTarget(player);
-			end
+			local npcClass: NpcClass = nearbyNpcClasses[a];
+			if npcClass.HealthComp.IsDead then continue end;
+		
+			npcClass.Properties.HordeAggression = true;
 		end
 	end);
 
@@ -1260,9 +1327,11 @@ function Raid:Initialize(roomData)
 					end
 
 					if closestAtt then
+						--MARK: Horde spawn
 						self:SpawnEnemy(self:PickEnemy({IsHordeWave=true;}), {
-							SpawnCFrame=closestAtt.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
-							InfTargeting=true;
+							SpawnCFrame = closestAtt.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
+							InfTargeting = true;
+							HordeAggression = true;
 						});
 						
 						task.wait(Config.HordeSpawnRate or 0.5);

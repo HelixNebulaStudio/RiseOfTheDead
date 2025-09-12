@@ -51,11 +51,17 @@ function WorldCore.onRequire()
             end);
 		end)
 
+        -- MARK: sh1
         shared.modNpcs.spawn2{Name="Mason";};
         shared.modNpcs.spawn2{Name="Russell";};
         shared.modNpcs.spawn2{Name="Stephanie";};
         shared.modNpcs.spawn2{Name="Nick";};
         shared.modNpcs.spawn2{Name="Dr. Deniski";};
+
+        -- MARK: sh2
+        shared.modNpcs.spawn2{Name="Carlos";};
+        shared.modNpcs.spawn2{Name="Jane";};
+        
 
     elseif RunService:IsClient() then
 

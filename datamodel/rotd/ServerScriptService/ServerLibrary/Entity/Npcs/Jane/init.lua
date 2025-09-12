@@ -104,6 +104,12 @@ local npcPackage = {
 };
 
 function npcPackage.Spawning(npcClass: NpcClass)
+    local attractNpcsComp = npcClass:GetComponent("AttractNpcs");
+    if attractNpcsComp then
+        attractNpcsComp.AttractHumanoidType = {"Zombie"};
+        attractNpcsComp.SelfAttractAlert = true;
+        attractNpcsComp:Activate();
+    end
 end
 
 return npcPackage;

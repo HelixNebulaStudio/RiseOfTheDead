@@ -172,12 +172,13 @@ function interactablePackage.init(super) -- Server/Client
 					Style="Confirm";
 					OnPrimaryClick=function(dialogWindow)
 						interface:ToggleGameBlinds(false, 3);
+						modClientGuis.toggleWindow("GameRoom", false);
 						
 						local characterVars = info.CharacterVars;
 						characterVars.CharacterProperties.CanMove = false;
 						characterVars.CharacterProperties.CanInteract = false;
 
-						local success = remoteGameModeExit:InvokeServer(interactable.Part, interactable.Config);
+						local success = remoteGameModeExit:InvokeServer("lobbyexitgame");
 						if success then
 							SoundService:SetListener(Enum.ListenerType.CFrame, CFrame.new(0, 1000, 0));
 

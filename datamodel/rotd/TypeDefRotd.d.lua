@@ -1,10 +1,11 @@
 export type GAME_EVENT_KEY_ROTD =
     | "Boss_BindDefeated"
+    | "Dialogue_BindMedicHeal"
     | "EventPass_BindLevelUp"
     | "EventPass_BindPuzzleInvoke"
     | "GameModeManager_BindDisconnectPlayer"
     | "GameModeManager_BindGameModeStart"
-    | "Dialogue_BindMedicHeal"
+    | "Interactables_BindCollectibleInteract"
     | "Skills_BindResourceGatherers"
     | "Shop_BindActionEvent"
     | "WorkbenchService_BindInterfaceToggle"

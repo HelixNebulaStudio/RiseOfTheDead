@@ -6,10 +6,11 @@ local CollectionService = game:GetService("CollectionService");
 
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
+local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 
 --== Variables;
-local missionId = 12;
+local MISSION_ID = 12;
 
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
@@ -24,188 +25,211 @@ end
 --== Script;
 return function(CutsceneSequence)
 
+	--MARK: TheWarehouse
 	if modBranchConfigs.IsWorld("TheWarehouse") then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
-			local mission = modMission:GetMission(player, missionId);
+			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
 
-			local masonModule = modNpcs.get(player, "Mason");
-			if masonModule == nil then
-				local npc = modNpcs.spawn("Mason", nil, function(npc, npcModule)
-					npcModule.Player = player;
-					masonModule = npcModule;
-				end);
-				modReplicationManager.ReplicateOut(player, npc);
+			local masonNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Mason");
+			if masonNpcClass == nil then
+				masonNpcClass = modNpcs.spawn2({
+					Name = "Mason";
+					Player = player;
+					ReplicateOut = true;
+				});
 			end
 
+			local function equipPistol()
+				masonNpcClass.WieldComp:Equip{
+					ItemId = "revolver454";
+					OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
+						if toolHandler.EquipmentClass == nil then return end;
+						local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
+						
+						if equipmentClass.Configurations:GetModifier("npcDmg") == nil then
+							local modifier: ConfigModifier = equipmentClass.Configurations.newModifier("npcDmg");
+							modifier.SetValues.Damage = 35;
+							modifier.Priority = 999;
+							equipmentClass.Configurations:AddModifier(modifier, true);
+						end
+					end;
+				};
+			end
 
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
 
 				elseif mission.Type == 1 then -- OnActive
 					if mission.ProgressionPoint == 1 then
-						masonModule.StopCarLoop();
-						masonModule.Move:Stop();
+						masonNpcClass.Properties.CutsceneActive = true;
+						masonNpcClass.Move:Stop();
 						
-						masonModule.StopAnimation("Lean");
-						masonModule:ToggleInteractable(false);
+						masonNpcClass.StopAnimation("Lean");
+						masonNpcClass:ToggleInteractable(false);
 
-						masonModule.Chat(masonModule.Player, "Let me refill my weapons first.");
+						masonNpcClass.Chat(masonNpcClass.Player, "Let me refill my weapons first.");
 						
 						task.wait(1.5);
-						masonModule.Move:Face();
-						masonModule.Move:SetMoveSpeed("set", "default", 12);
+						masonNpcClass.Move:Face("Player");
+						masonNpcClass.Move:SetMoveSpeed("set", "default", 12);
 
 						task.delay(1, function()
-							masonModule.Wield.Equip("revolver454");
-							pcall(function()
-								masonModule.Wield.ToolModule.Configurations.MinBaseDamage = 35;
-								masonModule.Wield.ToolModule.Properties.Ammo = 0;
-							end);
+							masonNpcClass.WieldComp:Equip{
+								ItemId = "revolver454";
+							};
+							if masonNpcClass.WieldComp.ToolHandler then
+								masonNpcClass.WieldComp.ToolHandler.ToolAnimator:Play("Reload");
+							end
 						end)
 						
-						masonModule.Move:MoveTo(Vector3.new(-5.8, 57, 19));
-						masonModule.Move.OnMoveToEnded:Wait(10);
+						masonNpcClass.Move:MoveTo(Vector3.new(-5.8, 57, 19));
+						masonNpcClass.Move.OnMoveToEnded:Wait(10);
 						task.wait(0.5);
-						masonModule.Move:Face(Vector3.new(-12, 57, 19));
+						masonNpcClass.Move:Face(Vector3.new(-12, 57, 19));
 						
-						task.wait(0.5);
-						masonModule.Wield.ReloadRequest();
-						task.wait(1);
-						masonModule.Wield.Unequip();
+						task.wait(2);
+						masonNpcClass.WieldComp:Unequip();
 						task.wait(0.1);
-						masonModule.Wield.Equip("m4a4");
-						
-						pcall(function()
-							masonModule.Wield.ToolModule.Configurations.MinBaseDamage = 10;
-							masonModule.Wield.ToolModule.Properties.Ammo = 0;
-						end);
+						masonNpcClass.WieldComp:Equip{
+							ItemId = "m4a4";
+						};
 						
 						task.wait(1);
-						masonModule.Wield.ReloadRequest();
+						if masonNpcClass.WieldComp.ToolHandler then
+							masonNpcClass.WieldComp.ToolHandler.ToolAnimator:Play("Reload");
+						end
+						
 						task.wait(4);
-						masonModule.Wield.Unequip();
+						masonNpcClass.WieldComp:Unequip();
 						task.wait(0.1);
-						masonModule.Wield.Equip("revolver454");
-						masonModule.Chat(masonModule.Player, "I'm ready when you are.");
-						masonModule:ToggleInteractable(true);
-						masonModule.Actions:FaceOwner(function()
-							return mission.ProgressionPoint ~= 1;
+						equipPistol();
+
+						masonNpcClass.Chat(masonNpcClass.Player, "I'm ready when you are.");
+						masonNpcClass:ToggleInteractable(true);
+
+						masonNpcClass.Move:Face("Player");
+						masonNpcClass.WieldComp:InvokeToolAction("ToggleIdle", true);
+
+						masonNpcClass:GetComponent("WaitForPlayer")(nil, function(pDist)
+							return mission.ProgressionPoint >= 2;
 						end);
+						masonNpcClass.WieldComp:InvokeToolAction("ToggleIdle", false);
 
 					elseif mission.ProgressionPoint == 2 then
-						masonModule.StopCarLoop();
-						masonModule.Move:Stop();
+						masonNpcClass.Properties.CutsceneActive = true;
+						masonNpcClass.Move:Stop();
 						
-						if masonModule.Wield.ToolModule == nil then
-							masonModule.Wield.Equip("revolver454");
+						if masonNpcClass.WieldComp.ItemId then
+							equipPistol();
 						end
-
-						masonModule:ToggleInteractable(false);
 						
-						masonModule.Move:SetMoveSpeed("set", "default", 12);
-
-						masonModule.Move:MoveTo(Vector3.new(59.34, 57.66, -28.03));
-						masonModule.Move.OnMoveToEnded:Wait(6);
+						masonNpcClass:ToggleInteractable(false);
 						
-						masonModule.Actions:WaitForOwner(30);
-						masonModule.Actions:EnterDoor("warehouseExit");
-						masonModule.Move:Stop();
+						masonNpcClass.Move:SetMoveSpeed("set", "default", 12);
 
-						pcall(function() masonModule.Wield.ToolModule.Configurations.MinBaseDamage = 60; end);
+						masonNpcClass.Move:MoveTo(Vector3.new(59.34, 57.66, -28.03));
+						masonNpcClass.Move.OnMoveToEnded:Wait(6);
+						
+						
+						masonNpcClass:GetComponent("WaitForPlayer")(30);
+						masonNpcClass:UseInteractable("warehouseExit");
+						masonNpcClass.Move:Stop();
+
 						
 						task.wait(0.1);
-						masonModule.Move:MoveTo(Vector3.new(77.6, 57.6, -20.3));
-						masonModule.Move.OnMoveToEnded:Wait(10);
-						masonModule.Move:Face(Vector3.new(92.12, 57.62, 66.21));
+						masonNpcClass.Move:MoveTo(Vector3.new(77.6, 57.6, -20.3));
+						masonNpcClass.Move.OnMoveToEnded:Wait(10);
+						masonNpcClass.Move:Face(Vector3.new(92.12, 57.62, 66.21));
 
 						task.wait(0.5);
-						masonModule.Chat(masonModule.Player, "Stupid zombies..");
-						masonModule.Move:MoveTo(Vector3.new(92.12, 57.62, 66.21));
+						masonNpcClass.Chat(masonNpcClass.Player, "Stupid zombies..");
+						masonNpcClass.Move:MoveTo(Vector3.new(92.12, 57.62, 66.21));
 
 						local region = Region3.new(Vector3.new(58.35, 56.65, -63.15), Vector3.new(110.45, 61.75, 69.95));
 						local targets = workspace:FindPartsInRegion3WithWhiteList(region, CollectionService:GetTagged("SpawnerRootParts"), 16);
 						local timeout = tick();
 
-						repeat
-							for a=#targets, 1, -1 do
-								local rootPart = targets[a];
-								local humanoid = rootPart and rootPart.Parent and rootPart.Parent:FindFirstChild("Zombie") or nil;
-								local relativeCFrame = masonModule.RootPart.CFrame:toObjectSpace(rootPart.CFrame);
-								local direction = math.atan2(relativeCFrame.p.X, -relativeCFrame.p.Z);
+						local targetList = {};
+						for a=1, #targets do
+							local rootPart = targets[a];
+							local healthComp: HealthComp = modHealthComponent.getByModel(rootPart.Parent);
+							if healthComp == nil
+							or healthComp.IsDead
+							or healthComp:CanTakeDamageFrom(masonNpcClass) == false then 
+								continue;
+							end;
 
-								if humanoid and humanoid.Health > 0 and direction > -math.pi/3 and direction < math.pi/3 then
-									masonModule.Wield.SetEnemyHumanoid(humanoid);
-									masonModule.Move:Face(rootPart);
-									masonModule.Wield.PrimaryFireRequest();
+							table.insert(targetList, {
+								RootPart = rootPart;
+								HealthComp = healthComp;
+								Distance = (masonNpcClass.RootPart.Position - rootPart.Position).Magnitude;
+							});
+						end
+
+						table.sort(targetList, function(a, b) return a.Distance > b.Distance end);
+						local shotsLeft = 10;
+						repeat
+							for a=#targetList, 1, -1 do
+								local targetInfo = targetList[a];
+								local targetRootPart = targetInfo.RootPart;
+								local healthComp = targetInfo.HealthComp;
+								local tarHumanoid = healthComp.CompOwner.Humanoid;
+
+								local relativeCFrame = masonNpcClass.RootPart.CFrame:ToObjectSpace(targetRootPart.CFrame);
+								local dirAng = math.atan2(relativeCFrame.p.X, -relativeCFrame.p.Z);
+								local dir = (targetRootPart.Position - masonNpcClass.RootPart.Position).Unit;
+
+								if not healthComp.IsDead 
+								and dirAng > -math.pi/3 and dirAng < math.pi/3
+								and tarHumanoid then
+									masonNpcClass.Move:Face(targetRootPart);
+
+									local equipmentClass: EquipmentClass? = masonNpcClass.WieldComp.EquipmentClass;
+									if equipmentClass then
+										if equipmentClass.Properties.Ammo <= 0 then
+											masonNpcClass.WieldComp:InvokeToolAction("ReloadRequest");
+										else
+											masonNpcClass.WieldComp:InvokeToolAction("PrimaryFireRequest", dir, tarHumanoid);
+											shotsLeft = shotsLeft -1;
+										end
+										if shotsLeft <= 0 then break; end;
+									end
 									
 								else
-									table.remove(targets, a);
-									
+									table.remove(targetList, a);
 								end
 							end
-						until #targets <= 0 or tick()-timeout >= 10 or not wait(1);
+						until #targetList <= 0 or tick()-timeout >= 10 or not wait(0.5);
 						
 						RunService.Heartbeat:Wait();
-						
-						masonModule.Wield.ReloadRequest();
 						task.wait(0.2);
 
-						masonModule.Move:MoveTo(Vector3.new(92.12, 57.62, 66.21));
-						masonModule.Move.OnMoveToEnded:Wait(10);
+						masonNpcClass.Move:MoveTo(Vector3.new(92.12, 57.62, 66.21));
+						masonNpcClass.Move.OnMoveToEnded:Wait(10);
+
+						masonNpcClass:GetComponent("WaitForPlayer")(30);
+						masonNpcClass:UseInteractable("lockedFactorydoor");
+						masonNpcClass.Move:Stop();
 						
-						--masonModule.Movement:Move(Vector3.new(92.12, 57.62, 66.21)):Wait(10);
+						masonNpcClass.Move:MoveTo(Vector3.new(75.2, 57.7, 156.7));
 
-						masonModule.Actions:WaitForOwner(30);
-						masonModule.Actions:EnterDoor("lockedFactorydoor");
-						--masonModule.Movement:EndMovement();
-						masonModule.Move:Stop();
-						
-						--masonModule.Movement:Move(Vector3.new(75.2, 57.7, 156.7));
-						masonModule.Move:MoveTo(Vector3.new(75.2, 57.7, 156.7));
-
-						local region = Region3.new(Vector3.new(30.5, 55.9, 76.8), Vector3.new(110.5, 60.3, 158.3));
-						local targets = workspace:FindPartsInRegion3WithWhiteList(region, CollectionService:GetTagged("SpawnerRootParts"), 16);
-						local timeout = tick();
-
-						repeat
-							for a=#targets, 1, -1 do
-								local rootPart = targets[a];
-								local humanoid = rootPart and rootPart.Parent and rootPart.Parent:FindFirstChild("Zombie") or nil;
-								local relativeCFrame = masonModule.RootPart.CFrame:toObjectSpace(rootPart.CFrame);
-								local direction = math.atan2(relativeCFrame.p.X, -relativeCFrame.p.Z);
-
-								if humanoid and humanoid.Health > 0 and direction > -math.pi/3 and direction < math.pi/3 then
-									masonModule.Wield.SetEnemyHumanoid(humanoid);
-									--masonModule.Movement:Face(rootPart.Position);
-									masonModule.Move:Face(rootPart);
-									masonModule.Wield.PrimaryFireRequest();
-								else
-									table.remove(targets, a);
-								end
-							end
-						until #targets <= 0 or tick()-timeout >= 10 or not wait(0.3);
-						RunService.Heartbeat:Wait();
-						masonModule.Wield.ReloadRequest();
 						wait(0.2);
 
-						--masonModule.Movement:Move(Vector3.new(75.2, 57.7, 156.7)):Wait(10);
-						masonModule.Move:MoveTo(Vector3.new(75.2, 57.7, 156.7));
-						masonModule.Move.OnMoveToEnded:Wait(10);
+						masonNpcClass.Move:MoveTo(Vector3.new(75.2, 57.7, 156.7));
+						masonNpcClass.Move.OnMoveToEnded:Wait(10);
 						
-						masonModule.Actions:WaitForOwner(30);
-						masonModule.Actions:EnterDoor("factoryEntrance");
-						--masonModule.Movement:EndMovement();
-						masonModule.Move:Stop();
+						masonNpcClass:GetComponent("WaitForPlayer")(30);
+						masonNpcClass:UseInteractable("factoryEntrance");
+						masonNpcClass.Move:Stop();
 
-						--masonModule.Movement:Move(Vector3.new(18.9, 57.7, 183)):Wait(10);
-						masonModule.Move:MoveTo(Vector3.new(18.9, 57.7, 183));
-						masonModule.Move.OnMoveToEnded:Wait(10);
+						masonNpcClass.Move:MoveTo(Vector3.new(18.9, 57.7, 183));
+						masonNpcClass.Move.OnMoveToEnded:Wait(10);
 						
-						modMission:Progress(masonModule.Player, 12, function(mission)
+						modMission:Progress(masonNpcClass.Player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 3 then
 								mission.ProgressionPoint = 3;
 							end;
@@ -223,66 +247,81 @@ return function(CutsceneSequence)
 							
 							local maxHealth = math.clamp(focusLevel, 1, 56) *100;
 
-							local destructibleObj = shared.require(blockadePrefab:FindFirstChild("Destructible"));
-							destructibleObj:SetHealth(maxHealth, maxHealth);
-							destructibleObj.Enabled = true;
-							destructibleObj.OnDestroySignal:Connect(function()
+							local destructible: DestructibleInstance = modDestructibles.getOrNew(blockadePrefab:WaitForChild("Destructible"));
+
+							destructible.HealthComp:SetMaxHealth(maxHealth);	
+							destructible.HealthComp:SetHealth(maxHealth);
+							destructible:SetEnabled(true);
+							destructible.OnDestroy:Connect(function()
 								Debugger:StudioWarn("Factory Blockade destroyed");
 								mission.Cache.Blockade = nil;
+								modMission:Progress(player, MISSION_ID, function(mission)
+									if mission.ProgressionPoint < 4 then
+										mission.ProgressionPoint = 4;
+									end;
+								end)
 							end)
+
 						else
 							Debugger:Warn("No factory blockade");
 						end
 
+						masonNpcClass.Properties.CutsceneActive = true;
 						if firstRun then
 							if mission.ProgressionPoint == 4 then
-								masonModule.Actions:Teleport(CFrame.new(18.9, 57.7, 183) * (masonModule.RootPart.CFrame - masonModule.RootPart.CFrame.p));
-								masonModule.Actions:WaitForOwner(30);
-								masonModule.Chat(masonModule.Player, "Where have you been? Let's go in already..");
+								masonNpcClass:SetCFrame(CFrame.new(18.9, 57.7, 183) * masonNpcClass.RootPart.CFrame.Rotation);
+								masonNpcClass:GetComponent("WaitForPlayer")(30);
+								masonNpcClass.Chat(masonNpcClass.Player, "Where have you been? Let's go in already..");
+
+								equipPistol();
+								masonNpcClass.WieldComp:InvokeToolAction("ToggleIdle", true);
 							end
 							
 						else
-							masonModule.StopCarLoop();
-							if masonModule.Wield.ToolModule == nil then
-								masonModule.Wield.Equip("revolver454");
+							if masonNpcClass.WieldComp.ItemId == nil then
+								equipPistol();
 							end
-							masonModule:ToggleInteractable(false);
-							masonModule.Actions:Teleport(CFrame.new(18.9, 57.7, 183) * (masonModule.RootPart.CFrame - masonModule.RootPart.CFrame.p));
+							masonNpcClass:ToggleInteractable(false);
+							masonNpcClass:SetCFrame(CFrame.new(18.9, 57.7, 183) * masonNpcClass.RootPart.CFrame.Rotation);
 							RunService.Heartbeat:Wait();
 							
-							masonModule.Move:Face(Vector3.new(26, 58, 179));
+							masonNpcClass.Move:Face(Vector3.new(26, 58, 179));
 							
-							masonModule.Chat(masonModule.Player, "Here it is. You first, haha!");
-							task.wait(2);
-							if mission.Cache.Blockade then
-								masonModule.Chat(masonModule.Player, "Destroy the wooden barricades so we can go in.");
+							masonNpcClass.WieldComp:InvokeToolAction("ToggleIdle", true);
+							if mission.ProgressionPoint == 3 then
+								masonNpcClass.Chat(masonNpcClass.Player, "Here it is. You first, haha!");
+								task.wait(2);
+								if mission.Cache.Blockade then
+									masonNpcClass.Chat(masonNpcClass.Player, "Destroy the wooden barricades so we can go in.");
+								end
 							end
-							masonModule:ToggleInteractable(true);
+							masonNpcClass:ToggleInteractable(true);
 						end
 						
 					elseif mission.ProgressionPoint >= 5 then
-						masonModule.StopCarLoop();
-						modMission:Progress(player, missionId, function(mission)
+						masonNpcClass.Properties.CutsceneActive = true;
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 6 then
 								mission.ProgressionPoint = 6;
 							end;
 						end)
 
-						masonModule.Actions:FollowOwner(function()
+						masonNpcClass:GetComponent("FollowPlayer")(nil, function()
 							return mission.Type == 1 and mission.ProgressionPoint >= 5;
 						end);
 					end
 					
 				elseif mission.Type == 3 then -- OnComplete
-					masonModule.Actions:EnterDoor("warehouseEntrance");
+					masonNpcClass:UseInteractable("warehouseEntrance");
 
-					--masonModule.Movement:Move(Vector3.new(51.2800293, 57.6597404, 40.0281067));
 					if not firstRun then
-						masonModule.Move:MoveTo(Vector3.new(51.2800293, 57.6597404, 40.0281067));
-						masonModule.Chat(masonModule.Player, "Good work, "..masonModule.Player.Name.."!");
+						masonNpcClass.Move:MoveTo(Vector3.new(51.2800293, 57.6597404, 40.0281067));
+						if masonNpcClass.Player then
+							masonNpcClass.Chat(masonNpcClass.Player, `Good work, {masonNpcClass.Player.Name}!`);
+						end
 					end
-					masonModule.CarLoop();
 
+					masonNpcClass.Properties.CutsceneActive = false;
 				end
 			end
 			mission.OnChanged:Connect(OnChanged);
@@ -290,56 +329,34 @@ return function(CutsceneSequence)
 		end)
 		
 		
+	--MARK: Factory
 	elseif modBranchConfigs.IsWorld("Factory") then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
-			local mission = modMission:GetMission(player, missionId);
+			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
-			if not modMission:IsComplete(player, 12) then
-				local masonModule = modNpcs.get(player, "Mason");
-				if masonModule == nil then
-					local npc = modNpcs.spawn("Mason", CFrame.new(63.452, 45.89, 3.248, 0, 0, 1, 0, 1, 0, -1, 0, 0), function(npc, npcModule)
-						npcModule.Player = player;
-						masonModule = npcModule;
-					end);
-					modReplicationManager.ReplicateOut(player, npc);
-				end
+			if modMission:IsComplete(player, 12) then return end;
 
-				masonModule:ToggleInteractable(false);
-				masonModule.Move:SetMoveSpeed("set", "default", 12);
-				
-				masonModule.Wield.Equip("revolver454");
-				
-				masonModule.Actions:FollowOwner(function()
-					if masonModule.Target then
-						local enemyHumanoid = masonModule.Target:FindFirstChildWhichIsA("Humanoid");
-						if enemyHumanoid and enemyHumanoid.Health > 0 and enemyHumanoid.RootPart and masonModule.IsInVision(enemyHumanoid.RootPart) then
-							pcall(function()
-								masonModule.Wield.ToolModule.Configurations.MinBaseDamage = math.max(80, enemyHumanoid.MaxHealth*0.3);
-							end);
-							masonModule.Wield.SetEnemyHumanoid(enemyHumanoid);
-							masonModule.Move:Face(enemyHumanoid.RootPart);
-							masonModule.Wield.PrimaryFireRequest();
-							
-						else
-							masonModule.Target = nil;
-						end
-					end
-					
-					return mission.Type == 1 and (mission.ProgressionPoint >= 3 or mission.ProgressionPoint <= 5);
-				end);
-				
-
-				local function OnChanged()
-					if mission.Type == 1 and mission.ProgressionPoint == 5 then
-						masonModule:ToggleInteractable(true);
-						masonModule.Wield.Unequip();
-					end
-				end
-				mission.OnChanged:Connect(OnChanged);
+			local masonNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Mason");
+			if masonNpcClass == nil then
+				masonNpcClass = modNpcs.spawn2({
+					Name = "Mason";
+					CFrame = CFrame.new(63.452, 45.89, 3.248, 0, 0, 1, 0, 1, 0, -1, 0, 0);
+					Player = player;
+				});
 			end
+
+			masonNpcClass:ToggleInteractable(false);
+			masonNpcClass.Properties.IsProtectingPlayer = true;
+
+			local function OnChanged()
+				if mission.Type == 1 and mission.ProgressionPoint == 5 then
+					masonNpcClass:ToggleInteractable(true);
+				end
+			end
+			mission.OnChanged:Connect(OnChanged);
 		end)
 		
 	else

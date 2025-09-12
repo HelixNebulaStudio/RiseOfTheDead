@@ -64,7 +64,6 @@ function WorldCore.onRequire()
         
         modGameModeManager:Initialize("Raid", "Tombs");
 
-
     elseif RunService:IsClient() then --MARK: IsClient
 
         task.spawn(function()
@@ -119,7 +118,6 @@ function WorldCore:LoadPlayerMissions(player: Player, profile: ProfileRotd)
     -- MARK: Mission 12
     local missionFactoryRaid = missionsProfile:Get(12);
     if missionFactoryRaid == nil or (missionFactoryRaid.Type < 3 and missionFactoryRaid.ProgressionPoint < 4) then
-
         Debugger:Warn("New factory blockade for "..player.Name);
 
         local serverPrefabs = game.ServerStorage:WaitForChild("Prefabs"):WaitForChild("Objects");

@@ -4,10 +4,12 @@ export type anyfunc = ((...any)->...any);
 -- constant uniontypes
 export type GAME_EVENT_KEY<U> = U
     | "Crates_BindSpawn"
+    | "Doors_BindDoorToggle"
     | "Generic_BindClockTick"
     | "Generic_BindItemPickup"
     | "Generic_BindTrigger"
     | "Interactables_BindButtonInteract"
+    | "Interactables_BindButtonPrompt"
     | "Interactables_BindDoorInteract"
     | "Npcs_BindEnemiesAttract"
     | "Npcs_BindDamaged"
@@ -290,8 +292,14 @@ export type GameSave = {
 };
 
 export type MissionsProfile = {
+    -- @properties
+    Player: Player;
+
     -- @methods
     Get: (MissionsProfile, missionId: number) -> Mission?;
+
+    -- @signal
+    OnMissionChanged: EventSignal<Mission>;
 };
 
 --MARK: Storage
@@ -387,6 +395,10 @@ export type Storage = {
     HasPermissions: (Storage, flagTag: string, name: string?) -> boolean;
     SetUserPermissions: (Storage, name: string, flagTag: string, value: boolean) -> nil;
 
+    ListByItemId: (Storage, itemId: string) -> {StorageItem};
+    FindByItemId: (Storage, itemId: string) -> StorageItem;
+    ListQuantity: (Storage, itemId: string, quantityNeeded: number) -> (number, {any});
+
     InitStorage: (Storage) -> nil;
     TransferContainer: (Storage, transferTo: Storage) -> nil;
     SetOwner: (Storage, Player) -> nil;
@@ -449,6 +461,8 @@ export type PlayerClasses = {
     getByName: (name: string) ->  PlayerClass;
     getAvatar: (userId: number) -> string;
     getPlayersInRange: (origin: Vector3, radius: number) -> {Player};
+
+    PositionsOctree: Octree<PlayerClass>;
     
     -- @signals
     OnPlayerDied: EventSignal<PlayerClass>;
@@ -602,12 +616,13 @@ export type NpcClasses = {
     ActiveNpcClasses: {NpcClass};
     NpcBaseConstructors: anydict;
 
+    getNpcPackage: (npcName: string) -> anydict;
     getByModel: (Model) -> NpcClass?;
     getById: (number) -> NpcClass?;
     getPlayerNpc: (player: Player, npcName: string) -> NpcClass?;
     listNpcClasses: (matchFunc: (npcClass: NpcClass) -> boolean) -> {NpcClass};
-    listInRange: (origin: Vector3, radius: number, maxRootpart: number?) -> {NpcClass};
-    attractNpcs: (model: Model, range: number, func: ((npcClass: NpcClass)-> boolean)? ) -> {Model};
+    listInRange: (position: Vector3, radius: number, maxRootpart: number?) -> {NpcClass};
+    attractNpcs: (model: Model, range: number, func: ((npcClass: NpcClass)-> boolean)? ) -> {NpcClass};
 
     getNpcPrefab: (npcName: string) -> Model;
     spawn: (
@@ -643,12 +658,12 @@ export type NpcMoveComponent = {
 
     -- @methods
     Init: anyfunc;
-    HeadTrack: (NpcMoveComponent, part: BasePart, expireTime: number) -> nil;
+    HeadTrack: (NpcMoveComponent, part: BasePart, expireTime: number?) -> nil;
     MoveTo: (NpcMoveComponent, position: Vector3) -> nil;
     Face: (NpcMoveComponent, target: Vector3 | BasePart | "Player", faceSpeed: number?, duration: number?) -> nil;
     LookAt: (NpcMoveComponent, point: Vector3 | BasePart) -> nil;
     Follow: (NpcMoveComponent, target: (Vector3 | BasePart)?, maxFollowDist: number?, minFollowDist: number?, followGapOffset: number?) -> nil;
-    SetMoveSpeed: (NpcMoveComponent, action: string?, id: string?, speed: number?, priority: number?, expire: number?) -> nil;
+    SetMoveSpeed: (NpcMoveComponent, action: ("set" | "remove" | "update")?, id: string?, speed: number?, priority: number?, expire: number?) -> nil;
     IsAtPosition: (NpcMoveComponent, position: Vector3) -> boolean;
     Stop: (NpcMoveComponent, waitForStop: number?) -> nil;
     Pause: (NpcMoveComponent, pauseTime: number?) -> nil;
@@ -684,6 +699,7 @@ export type NpcClass = CharacterClass & {
 
     AnimationController: AnimationController;
     Interactable: ModuleScript?;
+    Remote: UnreliableRemoteEvent;
     
     -- @methods
     Setup: (NpcClass, baseNpcModel: Model, npcModel: Model) -> nil;
@@ -694,6 +710,8 @@ export type NpcClass = CharacterClass & {
     GetComponent: (NpcClass, componentName: string) -> any;
     ListComponents: (NpcClass) -> {any};
     
+    SetNetworkOwner: (NpcClass, player: Player?) -> nil;
+    BreakJoint: (NpcClass, motor: Motor6D) -> nil;
     SetCFrame: (NpcClass, cframe: CFrame?, angle: CFrame?) -> nil;
     IsInVision: (NpcClass, object: BasePart, fov: number?) -> boolean;
     DistanceFrom: (NpcClass, pos: Vector3) -> number;
@@ -702,6 +720,7 @@ export type NpcClass = CharacterClass & {
     IsRagdolling: (NpcClass) -> boolean;
     GetMapLocation: (NpcClass) -> string;
     Sit: (NpcClass, Seat) -> nil;
+    UpdateClothing: (NpcClass) -> nil;
 
     -- @signals
     OnThink: EventSignal<any>;
@@ -1148,7 +1167,7 @@ export type ConfigVariable = {
 
     Calculate: (ConfigVariable, baseValues: {any}?, modifiers: {any}?, finalValues: {any}?) -> {any};
 
-    GetModifier: (ConfigVariable, id: string) -> (number?, ConfigModifier?);
+    GetModifier: (ConfigVariable, id: string) -> (ConfigModifier?, number?);
     AddModifier: (ConfigVariable, modifier: ConfigModifier, recalculate: boolean?) -> nil;
     RemoveModifier: (ConfigVariable, id: string, recalculate: boolean?) -> ConfigModifier?;
 
@@ -1297,14 +1316,25 @@ export type DestructibleInstance = {
     Package: anydict;
 
     Enabled: boolean;
-    SetEnabled: (DestructibleInstance, value: boolean) -> nil;
 
     HealthComp: HealthComp;
     StatusComp: StatusComp;
 
     NetworkOwners: {Player};
     DebrisName: string;
+
+    HealthbarHud: BillboardGui;
     
+    -- @methods
+    SetEnabled: (DestructibleInstance, value: boolean) -> nil;
+    SetupHealthbar: (DestructibleInstance, params: {
+        Size: UDim2;
+        Distance: number;
+        ShowLabel: boolean;
+        OffsetWorldSpace: Vector3;
+    }) -> nil;
+    SetHealthbarEnabled: (DestructibleInstance, value: boolean) -> nil;
+
     -- @signals
     OnDestroy: EventSignal<any>;
     OnEnabledChanged: EventSignal<boolean>;
@@ -1386,6 +1416,27 @@ export type Mission = {
     OnChanged: EventSignal<any>;
 }
 
+--MARK: Octree
+export type Octree<T> = {
+    CreateNode: (Octree<T>, position: Vector3, object: T) -> OctreeNode<T>;
+    GetAllNodes: (Octree<T>) -> {OctreeNode<T>};
+    KNearestNeighborsSearch: (Octree<T>, position: Vector3, searchCount: number, radius: number) -> ({T}, {number});
+    RadiusSearch: (Octree<T>, position: Vector3, radius: number) -> ({T}, {number});
+};
+
+--MARK: OctreeNode
+export type OctreeNode<T> = {
+    Destroy: (OctreeNode<T>) -> nil;
+    GetObject: (OctreeNode<T>) -> T;
+
+    SetPosition: (OctreeNode<T>, position: Vector3) -> nil;
+    GetPosition: (OctreeNode<T>) -> Vector3;
+    GetRawPosition: (OctreeNode<T>) -> (number, number, number);
+
+    KNearestNeighborsSearch: (OctreeNode<T>, searchCount: number, radius: number) -> ({T}, {number});
+    RadiusSearch: (OctreeNode<T>, radius: number) -> ({T}, {number});
+};
+
 --MARK: DoorInstance
 export type DoorInstance = {
     -- @properties
@@ -1394,6 +1445,7 @@ export type DoorInstance = {
 
     Open: boolean;
     DoorType: "Normal" | "Sliding";
+    WidthType: "Single" | "Double";
 
     --@methods
     Toggle: (DoorInstance, open: boolean?, openerCFrame: CFrame?, player: Player?) -> nil;  

@@ -356,7 +356,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 										else
 											textButton:SetAttribute("SkipClose", true);
-											textButton.Text = "Purchase Multiple";
+											textButton.Text = "Purchase Again";
 
 										end
 										return true;

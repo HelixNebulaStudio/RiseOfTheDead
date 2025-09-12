@@ -9,6 +9,7 @@ local npcPackage = {
         PrimaryGunItemId = "revolver454";
         MeleeItemId = "crowbar";
         Immortal = 1;
+        CutsceneActive = false;
     };
 
     DialogueInteractable = true;
@@ -18,8 +19,11 @@ local npcPackage = {
         "ProtectOwner";
         "Chat";
         "AttractNpcs";
+        "WaitForPlayer";
     };
     AddBehaviorTrees = {
+        "FollowPlayer";
+        "ProtectPlayer";
         "SurvivorIdleTree";
         "SurvivorCombatTree";
     };

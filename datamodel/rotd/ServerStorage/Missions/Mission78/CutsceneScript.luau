@@ -185,7 +185,7 @@ return function(CutsceneSequence)
 							end);
 							
 							if #attractedEntities > 0 then
-								local pickEnemyPrefab: Actor = attractedEntities[math.random(1, #attractedEntities)];
+								local pickEnemyPrefab: Actor = attractedEntities[math.random(1, #attractedEntities)].Character;
 								local zombieNpcModule = modNpcs.getByPrefab(pickEnemyPrefab);
 								local isInVision = lydiaModule.IsInVision(pickEnemyPrefab.PrimaryPart);
 	

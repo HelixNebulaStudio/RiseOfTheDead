@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local treePackage = {
     LogicString = {
-        Default = "PreLogic | !InCutscene & SurvivorIdleTree";
+        Default = "PreLogic | ProtectPlayer | !InCutscene & SurvivorIdleTree";
     };
 }
 
@@ -13,6 +13,10 @@ end
 
 function treePackage.InCutscene(npcClass: NpcClass)
     return npcClass.Properties.CutsceneActive == true;
+end
+
+function treePackage.ProtectPlayer(npcClass: NpcClass)
+    return npcClass.BehaviorTree:RunTree("ProtectPlayer", false);
 end
 
 function treePackage.SurvivorIdleTree(npcClass: NpcClass)
