@@ -16,7 +16,7 @@ local npcPackage = {
 
     Voice = {
         VoiceId = 5;
-        Pitch = 1.05;
+        Pitch = 0.95;
         Speed = 1;
         PlaybackSpeed = 1;
     };
@@ -24,7 +24,7 @@ local npcPackage = {
     IdleRandomChat = {
 		"When will there be rescue?!";
 		"Hope there's a rescue team out there...";
-		"I want to put a bullet in every one of them!";
+		"I want to put a bullet in every zombies!";
 		"Never thought that this could ever happen...";
     };
 };

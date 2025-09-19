@@ -16,14 +16,13 @@ local npcPackage = {
 
     AddComponents = {
         "TargetHandler";
-        "ProtectOwner";
         "Chat";
         "AttractNpcs";
+        "ProtectPlayer";
+        "FollowPlayer";
         "WaitForPlayer";
     };
     AddBehaviorTrees = {
-        "FollowPlayer";
-        "ProtectPlayer";
         "SurvivorIdleTree";
         "SurvivorCombatTree";
     };

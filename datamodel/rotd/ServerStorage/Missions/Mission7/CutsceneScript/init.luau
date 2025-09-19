@@ -109,7 +109,7 @@ if RunService:IsServer() then
 					if mission.ProgressionPoint == 6 then mission.ProgressionPoint = 7; end;
 				end)
 
-			elseif interactable.Id == "safehouse2Entrance" then
+			elseif interactable.Id == "sundaysEntrance" then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint == 7 then
 						modMission:CompleteMission(player, 7); 
@@ -294,7 +294,7 @@ return function(CutsceneSequence)
 					end
 					robertNpcClass:SetCFrame();
 					robertNpcClass:ToggleInteractable(false);
-					robertNpcClass.Chat(player, "");
+					
 					robertNpcClass.WieldComp:Equip{
 						ItemId = robertNpcClass.Properties.PrimaryGunItemId;
 						OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
@@ -423,7 +423,7 @@ return function(CutsceneSequence)
 				
 			elseif mission.Type == 3 then -- OnComplete
 				if not firstRun then
-					robertNpcClass:UseInteractable("safehouse2Entrance");
+					robertNpcClass:UseInteractable("sundaysEntrance");
 					robertNpcClass.Chat(player, "");
 					local face = robertNpcClass.Character:FindFirstChild("face", true);
 					if face then face.Texture = "rbxassetid://21311520" end;

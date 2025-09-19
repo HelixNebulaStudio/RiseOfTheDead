@@ -27,6 +27,21 @@ return function(CutsceneSequence)
 
 	--MARK: TheWarehouse
 	if modBranchConfigs.IsWorld("TheWarehouse") then
+		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+
+			local interactable: InteractableInstance = ...;
+			
+			if interactable.Id == "warehouseEntrance" then
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint >= 5 then
+						modMission:CompleteMission(player, MISSION_ID);
+					end
+				end)
+			end
+		end)
+
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
@@ -299,28 +314,30 @@ return function(CutsceneSequence)
 						end
 						
 					elseif mission.ProgressionPoint >= 5 then
+
 						masonNpcClass.Properties.CutsceneActive = true;
+						masonNpcClass:GetComponent("FollowPlayer")(nil, function()
+							return mission.Type == 1;
+						end);
+
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 6 then
 								mission.ProgressionPoint = 6;
 							end;
 						end)
 
-						masonNpcClass:GetComponent("FollowPlayer")(nil, function()
-							return mission.Type == 1 and mission.ProgressionPoint >= 5;
-						end);
 					end
 					
 				elseif mission.Type == 3 then -- OnComplete
 					masonNpcClass:UseInteractable("warehouseEntrance");
 
 					if not firstRun then
-						masonNpcClass.Move:MoveTo(Vector3.new(51.2800293, 57.6597404, 40.0281067));
 						if masonNpcClass.Player then
 							masonNpcClass.Chat(masonNpcClass.Player, `Good work, {masonNpcClass.Player.Name}!`);
 						end
 					end
 
+					masonNpcClass.Properties.Cache.RestFinishTick = nil;
 					masonNpcClass.Properties.CutsceneActive = false;
 				end
 			end

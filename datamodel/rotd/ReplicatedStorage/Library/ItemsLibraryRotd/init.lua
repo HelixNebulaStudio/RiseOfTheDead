@@ -233,7 +233,7 @@ function modItemsLibrary.onRequire()
     new(clothingBase, {Id="brownleatherboots"; Name="Leather Boots"; Icon="rbxassetid://89716224000012"; Tags={"Shoes"}; Description="These look great on you.\n<b>[Passive] Bull Leaping:</b> Slide jumping adds 10 units/sec launch speed.";});
     new(clothingBase, {Id="militaryboots"; Name="Military Boots"; Icon="rbxassetid://17022087037"; Tags={"Shoes"}; Description="Military grade boots.\n<b>[Passive] Firm Footing:</b> Reduces movement impairment debuffs by 20%.";});
     new(clothingBase, {Id="divingfins"; Name="Diving Fins"; Icon="rbxassetid://10334749462"; Tags={"Shoes"; "Diving Gear"}; Description="Swim like a fish.\n<b>[Passive] Dolphin Stride:</b> Improves underwater mobility.";});
-    new(clothingBase, {Id="greavesandsabatons"; Name="Greaves and Sabatons"; Icon="rbxassetid://10334749462"; Tags={"Shoes"; "Unobtainable"}; Description="";});
+    new(clothingBase, {Id="greavesandsabatons"; Name="Greaves and Sabatons"; Icon="rbxassetid://101266147153196"; Tags={"Shoes"; "Unobtainable"}; Description="Polished metal plating wrapped around your legs and feet. <b>[Passive] Chivalrous Kick:</b> Sliding into enemys knocks the away.";});
 
     -- Misc Wear
     new(clothingBase, {Id="brownbelt"; Name="Tactical Belt"; Icon="rbxassetid://4789684750"; Tags={"Belt"; "Utility Wear";}; Description="A tactical belt. Adds an extra hot bar slot.";});

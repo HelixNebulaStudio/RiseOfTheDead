@@ -319,10 +319,10 @@ if RunService:IsServer() then
 						Debugger:StudioWarn(`Set owner for {npcName}`);
 					end
 
-					local protectOwnerComp = npcClass:GetComponent("ProtectOwner");
-					if protectOwnerComp then
+					local protectPlayer = npcClass:GetComponent("ProtectPlayer");
+					if protectPlayer then
 						Debugger:Warn(`Activate protect owner`);
-						protectOwnerComp:Activate();
+						protectPlayer();
 						return;
 					end
 					

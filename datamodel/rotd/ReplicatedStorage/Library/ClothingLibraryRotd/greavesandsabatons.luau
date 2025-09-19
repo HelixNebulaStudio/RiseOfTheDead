@@ -11,7 +11,11 @@ local attirePackage = {
 };
 
 function attirePackage.newClass()
-	return modEquipmentClass.new(attirePackage);
+	local equipmentClass = modEquipmentClass.new(attirePackage);
+
+	equipmentClass:AddBaseModifier("ChivalrousKick");
+
+	return equipmentClass;
 end
 
 return attirePackage;

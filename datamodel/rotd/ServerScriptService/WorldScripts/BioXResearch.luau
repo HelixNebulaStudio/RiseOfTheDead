@@ -55,12 +55,17 @@ function WorldCore.onRequire()
         shared.modNpcs.spawn2{Name="Mason";};
         shared.modNpcs.spawn2{Name="Russell";};
         shared.modNpcs.spawn2{Name="Stephanie";};
-        shared.modNpcs.spawn2{Name="Nick";};
         shared.modNpcs.spawn2{Name="Dr. Deniski";};
+        shared.modNpcs.spawn2{Name="Nick";};
+        shared.modNpcs.spawn2{Name="Jefferson";};
+        shared.modNpcs.spawn2{Name="Jefferson";};
+        shared.modNpcs.spawn2{Name="Jesse";};
 
         -- MARK: sh2
         shared.modNpcs.spawn2{Name="Carlos";};
+        shared.modNpcs.spawn2{Name="Frank";};
         shared.modNpcs.spawn2{Name="Jane";};
+        shared.modNpcs.spawn2{Name="Michael";};
         
 
     elseif RunService:IsClient() then

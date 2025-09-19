@@ -275,7 +275,7 @@ function Spawner:Spawn(cframe: CFrame, playerClasses: {PlayerClass})
                 );
             end
 
-            npcClass.Configurations.Level = spawnLevel;
+            npcClass.Properties.Level = spawnLevel;
         end
     };
 end

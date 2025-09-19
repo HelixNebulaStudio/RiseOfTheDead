@@ -339,7 +339,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						end
 						
 						self.Update();
-						if self.RefreshEquippedMods then self.RefreshEquippedMods() end;
+						if self.RefreshEquippedMods then 
+							self.RefreshEquippedMods();
+						end;
 						
 					else
 						Debugger:Warn("Upgrade Purchase>> Error Code:"..serverReply);
@@ -469,6 +471,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			local equipmentClass = shared.modPlayers.get(localPlayer).WieldComp:GetEquipmentClass(equipmentSiid);
 			
 			interface:ToggleWindow("WeaponStats", true, storageItem);
+			interface:UpdateWindow("WeaponStats", storageItem);
 			
 			local capacityFrame = capacityFrameTemplate:Clone();
 			local modsAttached = 0;
@@ -525,8 +528,13 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				end;
 				refreshCapcityLabel();
 
-				interface:ToggleWindow("WeaponStats", true, storageItem);
-				--modInventoryInterface.UpdateHotbarSize();
+				--TODO: modInventoryInterface.UpdateHotbarSize();
+				local equipmentClass = shared.modPlayers.get(localPlayer).WieldComp:GetEquipmentClass(equipmentSiid); 
+				if equipmentClass then
+					equipmentClass.Configurations:Calculate();
+				end
+				interface:UpdateWindow("WeaponStats", storageItem);
+
 			end
 			refreshEquippedMods();
 			
@@ -555,6 +563,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						if equipmentClass then
 							equipmentClass.Configurations:Calculate();
 						end
+						interface:UpdateWindow("WeaponStats", storageItem);
 						
 					else
 						if success == 1 then

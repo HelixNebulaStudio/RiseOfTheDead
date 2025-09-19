@@ -10,7 +10,7 @@ local Dialogues = {
 	Erik={};
 };
 
-local missionId = 18;
+local MISSION_ID = 18;
 --==
 
 -- !outline: Jane Dialogues
@@ -21,7 +21,7 @@ Dialogues.Jane.DialogueStrings = {
 		Reply="Radio: *Static*..Help!..*Static*..Anyone..out..there....*Static*\n\n*Static*Please..respond..*Static*...We..are..in..the..sewers!..*Static*..";
 	};
 	["aNewCommunity_help"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Oh no, they need help.";
 		Face="Disbelief"; 
 		Reply="Sounds like they're deep inside the sewers. They could be in danger, you need to find them. Oh, and ask Robert to go along with you, he can help..";
@@ -52,6 +52,7 @@ Dialogues.Carlson.DialogueStrings = {
 		Say="Hey, how can I help you?";
 		Face="Frustrated"; 
 		Reply="I just need some medkits please..";
+		ReturnToInit=true;
 	};
 	["aNewCommunity_again"]={
 		Say="Sorry, what do you need again?";
@@ -102,7 +103,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Hey $PlayerName, I found something. Listen to this..");
 			dialog:AddChoice("aNewCommunity_okay", function(dialog)
 				dialog:AddChoice("aNewCommunity_help", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end)
 			
@@ -118,7 +119,7 @@ if RunService:IsServer() then
 			if mission.ProgressionPoint == 1 then
 				dialog:SetInitiate("Yo, $PlayerName.");
 				dialog:AddChoice("aNewCommunity_joinMe", function(dialog)
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint < 2 then
 							mission.ProgressionPoint = 2;
 						end;
@@ -128,7 +129,7 @@ if RunService:IsServer() then
 			elseif mission.ProgressionPoint == 8 then
 				dialog:SetInitiate("$PlayerName, I think I should head back to Sunday's to warn the others..");
 				dialog:AddChoice("aNewCommunity_warn", function(dialog)
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint < 9 then
 							mission.ProgressionPoint = 9;
 						end;
@@ -147,7 +148,7 @@ if RunService:IsServer() then
 			if mission.ProgressionPoint == 6 then
 				dialog:SetInitiate("Ugh.. I'm badly hurt.");
 				dialog:AddChoice("aNewCommunity_help", function()
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 6 then
 							mission.ProgressionPoint = 7;
 						end;
@@ -168,7 +169,7 @@ if RunService:IsServer() then
 								inventory:Remove(itemList[a].ID, itemList[a].Quantity);
 								shared.Notify(player, ("$Amount Medkit removed from your Inventory."):gsub("$Amount", itemList[a].Quantity > 1 and itemList[a].Quantity.." " or ""), "Negative");
 							end
-							modMission:Progress(player, missionId, function(mission)
+							modMission:Progress(player, MISSION_ID, function(mission)
 								if mission.ProgressionPoint == 7 then
 									mission.ProgressionPoint = 8;
 								end;
@@ -185,7 +186,7 @@ if RunService:IsServer() then
 				dialog:SetInitiate("So much better now, thanks again. Man, I owe you, let me know when you need something.");
 				dialog:AddChoice("aNewCommunity_event", function(dialog)
 					dialog:AddChoice("aNewCommunity_bandits", function(dialog)
-						modMission:CompleteMission(player, missionId);
+						modMission:CompleteMission(player, MISSION_ID);
 					end)
 				end)
 

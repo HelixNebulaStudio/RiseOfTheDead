@@ -55,6 +55,8 @@ function WorldCore.onRequire()
         shared.modNpcs.spawn2{Name="Dr. Deniski";};
         shared.modNpcs.spawn2{Name="Nick";};
         shared.modNpcs.spawn2{Name="Jefferson";};
+        shared.modNpcs.spawn2{Name="Jefferson";};
+        shared.modNpcs.spawn2{Name="Jesse";};
 
         -- Safehouse 2
         shared.modNpcs.spawn2{Name="Carlos";};
@@ -147,15 +149,6 @@ function WorldCore:LoadPlayerMissions(player: Player, profile: ProfileRotd)
                 end
             end)
         end
-    end
-
-    local jesseNpcClass = shared.modNpcs.getPlayerNpc(player, "Jesse");
-    if jesseNpcClass == nil then                
-        shared.modNpcs.spawn2{
-            Name = "Jesse";
-            Player = player;
-            ReplicateOut = true;
-        };
     end
 
 end

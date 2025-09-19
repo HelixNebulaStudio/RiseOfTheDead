@@ -476,12 +476,12 @@ function library.onRequire()
 		Id="ticks";
 		Name="Ticks";
 		Rewards={
-			{Type=ItemDropTypes.Adhesive; Quantity={Min=10; Max=12}; Chance=1/4;};
+			{Type=ItemDropTypes.Adhesive; ItemId="adhesive"; Quantity={Min=10; Max=12}; Chance=1/4;};
 			{Type=ItemDropTypes.Blueprint; ItemId="binocularsbp"; Chance=bpItemDropChance;};
-			{Type=ItemDropTypes.Rope; Quantity={Min=2; Max=3}; Chance=1/100;};
-			{Type=ItemDropTypes.MetalPipes; Quantity={Min=1; Max=1}; Chance=1/100;};
-			{Type=ItemDropTypes.Igniter; Quantity={Min=1; Max=1}; Chance=1/100;};
-			{Type=ItemDropTypes.GasTank; Quantity={Min=1; Max=1}; Chance=1/100;};
+			{Type=ItemDropTypes.Rope; ItemId="rope"; Quantity={Min=2; Max=3}; Chance=1/100;};
+			{Type=ItemDropTypes.MetalPipes; ItemId="metalpipes"; Quantity={Min=1; Max=1}; Chance=1/100;};
+			{Type=ItemDropTypes.Igniter; ItemId="igniter"; Quantity={Min=1; Max=1}; Chance=1/100;};
+			{Type=ItemDropTypes.GasTank; ItemId="gastank"; Quantity={Min=1; Max=1}; Chance=1/100;};
 			{Type=ItemDropTypes.Tool; Quantity=1; ItemId="mk2grenade"; Chance=1/100;};
 			
 		};
@@ -493,9 +493,9 @@ function library.onRequire()
 		Rewards={
 			{Type=ItemDropTypes.Blueprint; ItemId="barbedwoodenbp"; Chance=bpItemDropChance;};
 			{Type=ItemDropTypes.Blueprint; ItemId="explosivedamagebp"; Chance=bpItemDropChance;};
-			{Type=ItemDropTypes.Battery; Quantity={Min=1; Max=1}; Chance=1/100;};
-			{Type=ItemDropTypes.Wires; Quantity={Min=1; Max=1}; Chance=1/100;};
-			{Type=ItemDropTypes.Motor; Quantity={Min=1; Max=1}; Chance=1/100;};
+			{Type=ItemDropTypes.Battery; ItemId="battery"; Quantity={Min=1; Max=1}; Chance=1/100;};
+			{Type=ItemDropTypes.Wires; ItemId="wires"; Quantity={Min=1; Max=1}; Chance=1/100;};
+			{Type=ItemDropTypes.Motor; ItemId="motor"; Quantity={Min=1; Max=1}; Chance=1/100;};
 		};
 	};
 
@@ -503,9 +503,9 @@ function library.onRequire()
 		Id="bloater";
 		Name="Bloaters";
 		Rewards={
-			{Type=ItemDropTypes.Glass; Quantity={Min=10; Max=12}; Chance=1/4;};
+			{Type=ItemDropTypes.Glass; ItemId="glass"; Quantity={Min=10; Max=12}; Chance=1/4;};
 			{Type=ItemDropTypes.Blueprint; ItemId="stickygrenadebp"; Chance=1/50;};
-			{Type=ItemDropTypes.Igniter; Quantity={Min=1; Max=1}; Chance=1/100;};
+			{Type=ItemDropTypes.Igniter; ItemId="igniter"; Quantity={Min=1; Max=1}; Chance=1/100;};
 		};
 	};
 
@@ -513,10 +513,10 @@ function library.onRequire()
 		Id="growler";
 		Name="Growler";
 		Rewards={
-			{Type=ItemDropTypes.Wood; Quantity={Min=10; Max=12}; Chance=1/4;};
+			{Type=ItemDropTypes.Wood; ItemId="wood"; Quantity={Min=10; Max=12}; Chance=1/4;};
 			{Type=ItemDropTypes.Tool; ItemId="molotov"; Chance=1/50;};
-			{Type=ItemDropTypes.NekronScales; Quantity={Min=1; Max=2}; Chance=1/100;};
-			{Type=ItemDropTypes.Battery; Quantity={Min=1; Max=1}; Chance=1/100;};
+			{Type=ItemDropTypes.NekronScales; ItemId="nekronscales"; Quantity={Min=1; Max=2}; Chance=1/100;};
+			{Type=ItemDropTypes.Battery; ItemId="battery"; Quantity={Min=1; Max=1}; Chance=1/100;};
 		};
 	};
 
@@ -524,8 +524,8 @@ function library.onRequire()
 		Id="tendrils";
 		Name="Tendrils";
 		Rewards={
-			{Type=ItemDropTypes.Rope; Quantity={Min=3; Max=4}; Chance=1;};
-			{Type=ItemDropTypes.NekronScales; Quantity={Min=10; Max=25}; Chance=1;};
+			{Type=ItemDropTypes.Rope; ItemId="rope"; Quantity={Min=3; Max=4}; Chance=1;};
+			{Type=ItemDropTypes.NekronScales; ItemId="nekronscales"; Quantity={Min=10; Max=25}; Chance=1;};
 		};
 	};
 
@@ -534,10 +534,10 @@ function library.onRequire()
 		Id="bandit";
 		Name="Bandits";
 		Rewards={
-			{Type=ItemDropTypes.Metal; Quantity=quan2m4; Chance=1/4;};
-			{Type=ItemDropTypes.Cloth; Quantity=quan2m4; Chance=1/5;};
-			{Type=ItemDropTypes.Glass; Quantity={Min=1; Max=2}; Chance=1/16;};
-			{Type=ItemDropTypes.Wood; Quantity=quan2m4; Chance=1/16;};
+			{Type=ItemDropTypes.Metal; ItemId="metal"; Quantity=quan2m4; Chance=1/4;};
+			{Type=ItemDropTypes.Cloth; ItemId="cloth"; Quantity=quan2m4; Chance=1/5;};
+			{Type=ItemDropTypes.Glass; ItemId="glass"; Quantity={Min=1; Max=2}; Chance=1/16;};
+			{Type=ItemDropTypes.Wood; ItemId="wood"; Quantity=quan2m4; Chance=1/16;};
 			
 			{Type=ItemDropTypes.Mod; ItemId="beltslotsmod"; Chance=1/32;};
 		};
@@ -1305,7 +1305,7 @@ function library.onRequire()
 	library:Add{
 		Id="michaelkills";
 		Rewards={
-			{Type=ItemDropTypes.Metal; Quantity={Min=1; Max=2}; Chance=1/20;};
+			{Type=ItemDropTypes.Metal; ItemId="metal"; Quantity={Min=1; Max=2}; Chance=1/20;};
 		};
 		IgnoreScan=true;
 	};

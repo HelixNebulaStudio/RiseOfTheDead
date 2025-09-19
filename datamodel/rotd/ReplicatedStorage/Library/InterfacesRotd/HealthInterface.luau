@@ -166,21 +166,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	interface.Garbage:Tag(humanoid:GetAttributeChangedSignal("Oxygen"):Connect(fireUpdate));
 	interface.Garbage:Tag(humanoid:GetAttributeChangedSignal("IsSwimming"):Connect(fireUpdate));
 
-    if modConfigurations.CompactInterface then
-	else
-		interface.OnWindowToggle:Connect(function(win: InterfaceWindow, visible: boolean, ...)
-			if win.Name == "RatShopWindow" then
-				if visible and camera.ViewportSize.Y <= 910 then
-					window:Close();
-				elseif modConfigurations.DisableHealthbar ~= true then
-					window:Open();
-				end
-			end
-		end)
-	end
-	
-
-
 	window:Open();
 	window:Update();
 

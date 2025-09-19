@@ -30,6 +30,7 @@ local npcPackage = {
     Audio = {};
 
     AddComponents = {
+        "DropReward";
         "TargetHandler";
         "RandomClothing";
         "ZombieBasicMeleeAttack";

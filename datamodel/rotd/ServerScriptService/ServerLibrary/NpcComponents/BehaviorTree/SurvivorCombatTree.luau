@@ -42,7 +42,8 @@ function treePackage.HasEnemy(npcClass: NpcClass)
     if enemyTargetData == nil then 
 
         if npcClass.Properties.IsProtectingPlayer then
-            npcClass.BehaviorTree:RunTree("FollowPlayer", false);
+            npcClass.WieldComp:InvokeToolAction("ToggleIdle", true);
+            npcClass:GetComponent("FollowPlayer")();
         end
         
         return false;
@@ -131,7 +132,7 @@ function treePackage.FireGun(npcClass: NpcClass)
     npcClass.Move:Face(enemyNpcClass.RootPart.Position);
 
     local shootDirection = (enemyNpcClass.RootPart.Position - npcClass.RootPart.Position).Unit;
-    
+
     wieldComp:InvokeToolAction(
         "PrimaryFireRequest", 
         shootDirection, 
@@ -149,8 +150,7 @@ end
 function treePackage.UnequipWeapon(npcClass: NpcClass)
     local wieldComp: WieldComp = npcClass.WieldComp;
 
-    if npcClass.Properties.IsProtectingPlayer then 
-        wieldComp:InvokeToolAction("ToggleIdle", true);
+    if npcClass.Properties.IsProtectingPlayer then
         return false;
     end;
 

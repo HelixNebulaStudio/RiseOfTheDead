@@ -9,13 +9,13 @@ local Dialogues = {
 	Carlson={};
 };
 
-local missionId = 24;
+local MISSION_ID = 24;
 --==
 
 -- !outline: Jane Dialogues
 Dialogues.Jane.DialogueStrings = {		
 	["mia_yes"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Yeah, there were 2 survivors outside the other end of the sewers."; 
 		Face="Surprise"; Reply="Oh, under the Wrighton Dale Bridge?";
 		FailResponses = {
@@ -84,7 +84,7 @@ if RunService:IsServer() then
 			dialog:AddChoice("mia_yes", function(dialog)
 				dialog:AddChoice("mia_bridge", function(dialog)
 					dialog:AddChoice("mia_warn", function(dialog)
-						modMission:StartMission(player, missionId);
+						modMission:StartMission(player, MISSION_ID);
 					end)
 				end)
 			end)
@@ -98,7 +98,7 @@ if RunService:IsServer() then
 					if mission.ProgressionPoint >= 5 then
 						dialog:AddChoice("mia_no", function(dialog)
 							dialog:AddChoice("mia_zombie", function(dialog)
-								modMission:CompleteMission(player, missionId);
+								modMission:CompleteMission(player, MISSION_ID);
 							end)
 						end)
 					end
@@ -116,7 +116,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Hmmmmmmm, huh? Oh it's you!", "Happy");
 			dialog:AddChoice("mia_clue", function(dialog)
 				dialog:AddChoice("mia_thanks", function(dialog)
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint <= 1 then
 							mission.ProgressionPoint = 2;
 						end;
@@ -135,7 +135,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Yo $PlayerName, what do you need?", "Confident");
 			dialog:AddChoice("mia_seen", function(dialog)
 				dialog:AddChoice("mia_thanks", function(dialog)
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 3 then
 							mission.ProgressionPoint = 4;
 						end;

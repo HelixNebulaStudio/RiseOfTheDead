@@ -8,13 +8,13 @@ local Dialogues = {
 	Jane={};
 };
 
-local missionId = 14;
+local MISSION_ID = 14;
 --==
 
 -- MARK: Nick Dialogues
 Dialogues.Nick.DialogueStrings = {
 	["pigeonPost_help"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="What do you need help with?"; 
 		Reply="I spoke to Robert before he left about his safehouse. He said they have 4 or 5 survivors, I don't quite remember..";
 		FailResponses = {
@@ -92,7 +92,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("pigeonPost_wrong", function(dialog)
 					dialog:AddChoice("pigeonPost_didntKnow", function(dialog)
 						dialog:AddChoice("pigeonPost_sayHi", function(dialog)
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 						end);
 					end)
 				end)
@@ -105,7 +105,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("pigeonPost_yes", function(dialog)
 						dialog:AddChoice("pigeonPost_sure", function(dialog)
 							dialog:AddChoice("pigeonPost_gotit", function(dialog)
-								modMission:StartMission(player, missionId);
+								modMission:StartMission(player, MISSION_ID);
 							end)
 						end)
 					end)
@@ -123,7 +123,7 @@ if RunService:IsServer() then
 			dialog:AddChoice("pigeonPost_what", function(dialog)
 				dialog:AddChoice("pigeonPost_whosNick", function(dialog)
 					dialog:AddChoice("pigeonPost_oh", function(dialog)
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 3 then
 								mission.ProgressionPoint = 3;
 							end;

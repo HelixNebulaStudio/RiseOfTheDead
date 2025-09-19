@@ -189,7 +189,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local bodyEquipmentsFrame = inventoryFrame:WaitForChild("BodyEquipmentStats");
 	
 	local hotbarWindow: InterfaceWindow = interface:NewWindow("Hotbar", hotbarFrame);
-    hotbarWindow.Layers = {"CharacterHud"; "CompactHidden"};
+    hotbarWindow.Layers = {"CharacterHud"; "CompactHidden"; "Hotbar"};
 	hotbarWindow.IgnoreHideAll = true;
 	hotbarWindow.ReleaseMouse = false;
 	hotbarWindow:Open();
@@ -217,24 +217,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		padding.Parent = invContainerFrame;
 
 	else
-		interface.OnWindowToggle:Connect(function(window: InterfaceWindow, visible: boolean, ...)
-			if window.Name == "WeaponStats" then
-				if visible then
-					hotbarWindow:Close();
-				elseif modConfigurations.DisableHotbar ~= true then
-					hotbarWindow:Open();
-				end
-
-			elseif window.Name == "RatShopWindow" then
-				if visible and camera.ViewportSize.Y <= 910 then
-					hotbarWindow:Close();
-				elseif modConfigurations.DisableHotbar ~= true then
-					hotbarWindow:Open();
-				end
-
-			end
-		end)
-
 		interface.Garbage:Tag(armorTitleLabel.MouseEnter:Connect(function()
 			bodyEquipmentsFrame.Visible = true;
 		end))

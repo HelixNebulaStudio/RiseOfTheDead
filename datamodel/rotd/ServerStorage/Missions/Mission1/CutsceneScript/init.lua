@@ -348,8 +348,7 @@ return function(CutsceneSequence)
 			masonNpcClass.Move:Face(Vector3.new(4.431, 56.31, -166.753));
 			masonNpcClass.Move:SetMoveSpeed("set", "default", 0);
 
-			local protectOwner = masonNpcClass:GetComponent("ProtectOwner");
-			protectOwner:Activate();
+			masonNpcClass:GetComponent("ProtectPlayer")();
 		end);
 
 		table.insert(masonNpcClass.CutsceneActions, function()
@@ -672,7 +671,7 @@ return function(CutsceneSequence)
 		modAudio.Play("Fire", GasTankPart, true);
 		wait(3);
 		masonNpcClass.Chat(players, sceneDialogues[6].Reply);
-		masonNpcClass.IsProtectingOwner = false;
+		masonNpcClass:GetComponent("ProtectPlayer").IsProtecting = false;
 		masonNpcClass.NextAction();
 		wait(1);
 		workspace.Environment.CarSeat:Sit(masonNpcClass.Humanoid);

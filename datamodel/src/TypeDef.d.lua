@@ -4,15 +4,16 @@ export type anyfunc = ((...any)->...any);
 -- constant uniontypes
 export type GAME_EVENT_KEY<U> = U
     | "Crates_BindSpawn"
-    | "Doors_BindDoorToggle"
+    | "Doors_BindDoorToggle" -- Physical doors
     | "Generic_BindClockTick"
     | "Generic_BindItemPickup"
     | "Generic_BindTrigger"
     | "Interactables_BindButtonInteract"
     | "Interactables_BindButtonPrompt"
-    | "Interactables_BindDoorInteract"
+    | "Interactables_BindDoorInteract" -- Teleport doors
     | "Npcs_BindEnemiesAttract"
     | "Npcs_BindDamaged"
+    | "Npcs_BindDeath"
     | "Players_BindSpawn"
     | "Players_BindDamaged"
     | "Players_BindHeal"
@@ -501,9 +502,6 @@ export type PlayerClass = CharacterClass & {
     Despawn: (PlayerClass) -> nil;
     Kill: (PlayerClass, reason: string?) -> nil;
     GetInstance: (PlayerClass) -> Player;
-    
-    GetCFrame: (PlayerClass) -> CFrame;
-    SetCFrame: (PlayerClass, cframe: CFrame) -> CFrame;
 
     SyncProperty: (PlayerClass, key: string, players: any) -> nil;
 
@@ -548,6 +546,10 @@ export type CharacterClass = {
 
     -- @methods
     DistanceFromCharacter: (CharacterClass, pos: Vector3) -> number;
+    
+    GetCFrame: (CharacterClass) -> CFrame;
+    SetCFrame: (CharacterClass, cframe: CFrame?, angle: CFrame?) -> nil;
+
     GetHealthComp: (CharacterClass, bodyPart: BasePart) -> HealthComp?;
     Kill: (CharacterClass) -> nil;
 
@@ -712,8 +714,7 @@ export type NpcClass = CharacterClass & {
     
     SetNetworkOwner: (NpcClass, player: Player?) -> nil;
     BreakJoint: (NpcClass, motor: Motor6D) -> nil;
-    SetCFrame: (NpcClass, cframe: CFrame?, angle: CFrame?) -> nil;
-    IsInVision: (NpcClass, object: BasePart, fov: number?) -> boolean;
+    IsInVision: (NpcClass, object: BasePart | Model, fov: number?) -> boolean;
     DistanceFrom: (NpcClass, pos: Vector3) -> number;
     ToggleInteractable: (NpcClass, v: boolean) -> nil;
     UseInteractable: (NpcClass, interactableId: string, ...any) -> ...any;
@@ -749,6 +750,7 @@ export type NpcClass = CharacterClass & {
 --MARK: Interactables
 export type Interactables = {
     new: (Configuration, Model?) -> (InteractableInstance, InteractableMeta);
+    getById: (id: string) -> Configuration;
     registerPackage: (name: string, package: anydict) -> nil;
 
     Instance: (name: string, config: Configuration) -> InteractableInstance;
@@ -924,6 +926,7 @@ export type Interface = {
 
     GetWindow: (Interface, name: string) -> InterfaceWindow;
     NewWindow: (Interface, name: string, frame: GuiObject, properties: anydict?) -> InterfaceWindow;
+    UpdateWindow: (Interface, name: string, ...any) -> InterfaceWindow?;
     ToggleWindow: (Interface, name: string, visible: boolean?, ...any) -> InterfaceWindow;
     ListWindows: (Interface, conditionFunc: anyfunc) -> {InterfaceWindow};
     Freeze: (Interface, value: boolean) -> nil;
@@ -1291,7 +1294,7 @@ export type ItemModifierInstance = {
 
     WieldComp: WieldComp?;
     Player: Player?;
-    ModLibrary: ({any}?);
+    ModLibrary: (anydict?);
     EquipmentClass: EquipmentClass?;
     EquipmentStorageItem: StorageItem?;
     ItemModStorageItem: StorageItem?;
@@ -1323,6 +1326,7 @@ export type DestructibleInstance = {
     NetworkOwners: {Player};
     DebrisName: string;
 
+    PathfindingModifier: PathfindingModifier;
     HealthbarHud: BillboardGui;
     
     -- @methods
@@ -1411,6 +1415,9 @@ export type Mission = {
     Type: number;
     Expiration: number;
     ProgressionPoint: number;
+
+    ObjectivesCompleted: {[string]: boolean};
+    SaveData: anydict;
     
     -- @signals
     OnChanged: EventSignal<any>;

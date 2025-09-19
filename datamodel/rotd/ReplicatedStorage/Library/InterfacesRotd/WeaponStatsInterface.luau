@@ -369,13 +369,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     weaponStatsFrame.Parent = interface.ScreenGui;
 
     local statsList = weaponStatsFrame:WaitForChild("StatsList");
-    local statsGridLayout = statsList:WaitForChild("UIGridLayout");
     local statsLabelTemplate = script:WaitForChild("StatsLabel");
     local masteryFrame = weaponStatsFrame:WaitForChild("masteryFrame");
     local masteryBar = masteryFrame:WaitForChild("masteryBar");
     local masteryLabel = masteryFrame:WaitForChild("masteryLabel");
     local expandHint = weaponStatsFrame:WaitForChild("expandHint");
     local templateDescLabel = script:WaitForChild("TagDesc");
+
+    local statsTabs = weaponStatsFrame:WaitForChild("StatsTabs");
+    local statLayerButton = statsTabs:WaitForChild("Layer1Button");
+    local modifierLayerButton = statsTabs:WaitForChild("Layer2Button");
 
     local graphView = weaponStatsFrame:WaitForChild("GraphView");
     local barFrameTemplate = script:WaitForChild("barFrame");
@@ -422,6 +425,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             if graphStatTemplates[currentClass] then
                 graphView.Visible = false;
                 statsList.Visible = true;
+                statsTabs.Visible = true;
             end
             refreshLabels();
             if modConfigurations.CompactInterface then
@@ -434,9 +438,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             if graphStatTemplates[currentClass] then
                 graphView.Visible = true;
                 statsList.Visible = false;
+                statsTabs.Visible = false;
             else
                 graphView.Visible = false;
                 statsList.Visible = true;
+                statsTabs.Visible = true;
             end
             refreshLabels();
             if modConfigurations.CompactInterface then
@@ -448,7 +454,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
     end
 
+    local statPage = "Stats";
+
 	local weaponStatsWindow: InterfaceWindow = interface:NewWindow("WeaponStats", weaponStatsFrame);
+    weaponStatsWindow.BoolStringWhenActive = {String="!Hotbar"; Priority=2;};
 	weaponStatsWindow.CompactFullscreen = true;
     weaponStatsWindow.ReleaseMouse = true;
 	
@@ -466,6 +475,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	weaponStatsWindow.ReleaseMouse = false;
 	weaponStatsWindow.OnToggle:Connect(function(visible, storageItem)
 		if visible then
+            statPage = "Stats";
 			refreshFrameSize();
             weaponStatsWindow:Update(storageItem);
 		end
@@ -484,56 +494,50 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end)
 
 
-    -- MARK: OnUpdate
-    local isFirstRun = nil;
-    weaponStatsWindow.OnUpdate:Connect(function(storageItem: StorageItem)
-        if storageItem == nil or typeof(storageItem) ~= "table" then return end;
+    local function formatValue(valueType, rawValue)
+        local statString = rawValue or "n/a";
 
-        for _, obj in pairs(statsList:GetChildren()) do
-            if obj:IsA("GuiObject") then
-                obj:Destroy();
+        if typeof(rawValue) == "string" then
+        elseif type(rawValue) == "table" then
+            if rawValue.Min and rawValue.Max then
+                statString = ("["..
+                    (valueType == "int" and math.ceil(rawValue.Min) or rawValue.Min)
+                    ..", "..
+                    (valueType == "int" and math.ceil(rawValue.Max) or rawValue.Max).."]");
+            else
+                statString = ("["..table.concat(rawValue,", ").."]");
             end
+        else
+            statString = (
+                valueType == "int" and modFormatNumber.Beautify(math.ceil(rawValue))
+                    or valueType == "string" and rawValue
+                    or valueType == "4dp" and modFormatNumber.Beautify(math.ceil(rawValue*10000)/10000, true)
+                    or valueType == "3dp" and modFormatNumber.Beautify(math.ceil(rawValue*1000)/1000, true)
+                    or valueType == "2dp" and modFormatNumber.Beautify(math.ceil(rawValue*100)/100, true)
+                    or valueType == "Rpm" and modFormatNumber.Beautify(math.ceil(60/rawValue*100)/100)
+                    or valueType == "percent" and math.floor(rawValue*100)
+                    or valueType == "percent2dp" and math.floor(rawValue*1000)/10
+                    or valueType == "trigger" and triggerModes[rawValue]
+                    or valueType == "bullet" and bulletTypes[rawValue]
+                    or valueType == "bool" and tostring(rawValue)
+                    or valueType == "rawnum" and modFormatNumber.Beautify(rawValue, true)
+                    or rawValue)
         end
-        barFrameTemplate.BackgroundColor3 = modBranchConfigs.BranchColor;
+
+        return statString;
+    end
 
 
-        local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
-        local wieldComp: WieldComp = playerClass.WieldComp;
-
-        local siid = storageItem.ID;
-
-        local equipmentClass: EquipmentClassRotd = wieldComp:GetEquipmentClass(siid);
-        if equipmentClass == nil then
-            Debugger:Warn(`EquipmentClass not found for siid:{siid}`);
-            return;
-        end
-
+    local isFirstRun = nil;
+    --MARK: Render Stats
+    local function renderStats(equipmentClass: EquipmentClass, storageItem: StorageItem)
         local configurations: ConfigVariable = equipmentClass.Configurations;
-
 
         local classType = equipmentClass.Class;
         currentClass = classType;
 
-        
         local statsTemplate = statTemplates[classType];
         local newShortHandLabel = graphStatTemplates[classType];
-        
-        if statsTemplate == nil then
-            weaponStatsWindow:Close();
-            
-            if statsTemplate == nil then
-                Debugger:Warn("Missing stats template.");
-            else
-                Debugger:Warn("Missing itemClass.");
-            end
-            return;
-        end
-        
-        if classType == "Gun" then
-            modData.OnAmmoUpdate:Fire(storageItem.ID);
-        end
-        
-        refreshFrameSize();
 
         local layoutOrder=1;
         local function createLabel(infoKey, info, statValue)
@@ -555,33 +559,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
 
             local infoText = info.Text;
-            local statString = "n/a";
-
-            if type(statValue) == "table" then
-                if statValue.Min and statValue.Max then
-                    statString = ("["..
-                        (info.Type == "int" and math.ceil(statValue.Min) or statValue.Min)
-                        ..", "..
-                        (info.Type == "int" and math.ceil(statValue.Max) or statValue.Max).."]");
-                else
-                    statString = ("["..table.concat(statValue,", ").."]");
-                end
-            else
-                statString = (
-                    info.Type == "int" and modFormatNumber.Beautify(math.ceil(statValue))
-                        or info.Type == "string" and statValue
-                        or info.Type == "4dp" and modFormatNumber.Beautify(math.ceil(statValue*10000)/10000, true)
-                        or info.Type == "3dp" and modFormatNumber.Beautify(math.ceil(statValue*1000)/1000, true)
-                        or info.Type == "2dp" and modFormatNumber.Beautify(math.ceil(statValue*100)/100, true)
-                        or info.Type == "Rpm" and modFormatNumber.Beautify(math.ceil(60/statValue*100)/100)
-                        or info.Type == "percent" and math.floor(statValue*100)
-                        or info.Type == "percent2dp" and math.floor(statValue*1000)/10
-                        or info.Type == "trigger" and triggerModes[statValue]
-                        or info.Type == "bullet" and bulletTypes[statValue]
-                        or info.Type == "bool" and tostring(statValue)
-                        or info.Type == "rawnum" and modFormatNumber.Beautify(statValue, true)
-                        or statValue)
-            end
+            local statString = formatValue(info.Type, statValue);
 
             infoText = string.gsub(infoText, "$stat", statString);
             if info.PostText then
@@ -877,13 +855,185 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             -- 	Text="<b>Condition Range:</b>    $stat"; Type="rawnum";
             -- }, conditionRange);
         end
+    end
+
+    --MARK: Render Modifiers
+    local function renderModifiers(equipmentClass: EquipmentClass, storageItem: StorageItem)
+        local configurations: ConfigVariable = equipmentClass.Configurations;
+
+        local classType = equipmentClass.Class;
+        currentClass = classType;
+
+        local modificationDict = {};
+        
+        -- BaseValues={};
+        -- SetValues={};
+        -- SumValues={};
+        -- ProductValues={};
+        -- MaxValues={};
+        -- MinValues={};
+
+        for a=1, #configurations.Modifiers do
+            local modifier: ItemModifierInstance = configurations.Modifiers[a] :: ItemModifierInstance;
+
+            local modifierName = modifier.Id;
+            if modifier.ModLibrary and modifier.ModLibrary.Name then
+                modifierName = modifier.ModLibrary.Name;
+            end
+
+            local function newM(k)
+                if modificationDict[k] == nil then
+                    modificationDict[k] = {};
+                end
+            end
+            for k, v in pairs(modifier.SetValues) do
+                newM(k);
+                table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="set";});
+            end
+            for k, v in pairs(modifier.SumValues) do
+                newM(k);
+                table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="sum";});
+            end
+            for k, v in pairs(modifier.ProductValues) do
+                newM(k);
+                table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="product";});
+            end
+            for k, v in pairs(modifier.MaxValues) do
+                newM(k);
+                table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="max";});
+            end
+            for k, v in pairs(modifier.MinValues) do
+                newM(k);
+                table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="min";});
+            end
+
+        end
+        
+        local statsTemplate = statTemplates[classType];
+        for a=1, #statsTemplate do
+            local info = statsTemplate[a];
+            local key = info.Key;
+
+            local modifyList = modificationDict[key];
+            if modifyList == nil then continue end;
+
+            local bValues = configurations.BaseValues[key] or "~";
+            local str = `<b>{(info.Text:gmatch("<b>(.-)</b>")() or key)}</b>  {formatValue(info.Type, bValues)}`;
+            for a=1, #modifyList do
+                local modifyData = modifyList[a];
+
+                local modifyValue = formatValue(info.Type, modifyData.Value);
+                if modifyData.ConfigType == "sum" then
+                    modifyValue = `+{modifyValue}`;
+                elseif modifyData.ConfigType == "product" then
+                    modifyValue = `*{modifyValue}`;
+                elseif modifyData.ConfigType == "max" then
+                    modifyValue = `max({modifyValue})`;
+                elseif modifyData.ConfigType == "min" then
+                    modifyValue = `min({modifyValue})`;
+                end
+                str = str..`\n∟ <b>[{modifyData.Name}]</b>  {modifyValue}`;
+            end
+            str = str..`\n=  <b>{formatValue(info.Type, configurations[key])}</b>`;
+
+            local newLabel: TextLabel = statsLabelTemplate:Clone();
+            newLabel.LayoutOrder = a;
+            newLabel.Name = key;
+            newLabel.Text = str;
+            newLabel.AutomaticSize = Enum.AutomaticSize.Y;
+            newLabel.LineHeight = 1.4;
+            newLabel.Parent = statsList;
+
+            local padding = Instance.new("UIPadding");
+            padding.PaddingBottom = UDim.new(0, 10);
+            padding.Parent = newLabel;
+        end
+
+    end
+
+    -- MARK: OnUpdate
+    weaponStatsWindow.OnUpdate:Connect(function(storageItem: StorageItem)
+        if storageItem == nil or typeof(storageItem) ~= "table" then return end;
+        weaponStatsWindow.Binds.LastStorageItem = storageItem;
+
+        for _, obj in pairs(statsList:GetChildren()) do
+            if obj:IsA("GuiObject") then
+                obj:Destroy();
+            end
+        end
+        barFrameTemplate.BackgroundColor3 = modBranchConfigs.BranchColor;
+
+
+        local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+        local wieldComp: WieldComp = playerClass.WieldComp;
+
+        local siid = storageItem.ID;
+
+        local equipmentClass: EquipmentClassRotd = wieldComp:GetEquipmentClass(siid);
+        if equipmentClass == nil then
+            Debugger:Warn(`EquipmentClass not found for siid:{siid}`);
+            return;
+        end
+
+        local classType = equipmentClass.Class;
+        currentClass = classType;
+
+        local statsTemplate = statTemplates[classType];
+        if statsTemplate == nil then
+            weaponStatsWindow:Close();
+            
+            if statsTemplate == nil then
+                Debugger:Warn("Missing stats template.");
+            else
+                Debugger:Warn("Missing itemClass.");
+            end
+            return;
+        end
+        
+        for a=1, #statsTemplate do
+            local info = statsTemplate[a];
+            if info.Index then continue end;
+            info.Index = a;
+        end
+
+        if classType == "Gun" then
+            modData.OnAmmoUpdate:Fire(storageItem.ID);
+        end
+        
+        refreshFrameSize();
+
+        if weaponStatsWindow.Binds.StatPage ~= statPage then
+            for _, obj in pairs(statsList:GetChildren()) do
+                if not obj:IsA("GuiObject") then continue end;
+                obj:Destroy();
+            end
+        end
+        if statPage == "Stats" then
+            renderStats(equipmentClass, storageItem);
+        elseif statPage == "Modifiers" then
+            renderModifiers(equipmentClass, storageItem);
+        end;
+        
+        statLayerButton.BackgroundColor3 = statPage == "Stats" and modBranchConfigs.BranchColor or Color3.fromRGB(100,100,100);
+        modifierLayerButton.BackgroundColor3 = statPage == "Modifiers" and modBranchConfigs.BranchColor or Color3.fromRGB(100,100,100);
     end)
 
     weaponStatsFrame.MouseButton1Click:Connect(function()
         isExpanded = not isExpanded;
-        statsGridLayout.FillDirectionMaxCells = isExpanded and 0 or 7;
         refreshFrameSize();
     end)
+
+    modifierLayerButton.MouseButton1Click:Connect(function()
+        statPage = "Modifiers";
+        interface:PlayButtonClick();
+        weaponStatsWindow:Update(weaponStatsWindow.Binds.LastStorageItem);
+    end)
+    statLayerButton.MouseButton1Click:Connect(function()
+        statPage = "Stats";
+        interface:PlayButtonClick();
+        weaponStatsWindow:Update(weaponStatsWindow.Binds.LastStorageItem);
+    end)
+    
     
 end
 

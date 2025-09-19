@@ -62,6 +62,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     --MARK: Window
 	local window: InterfaceWindow = interface:NewWindow("RatShopWindow", shopFrame);
+    window.BoolStringWhenActive = {String="!CharacterHud | CurrencyStats"; Priority=2;};
     window.DisableInteractables = true;
 	if modConfigurations.CompactInterface then
 		window.CompactFullscreen = true;
@@ -94,8 +95,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			binds.InteractPart = interactable.Part;
 
 			for a=1, #interface.StorageInterfaces do
-				local storageInterface: StorageInterface = interface.StorageInterfaces[a];
-				if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
+				local storageInterface: StorageInterface? = interface.StorageInterfaces[a];
+				if storageInterface == nil or storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
 					continue;
 				end
 				storageInterface.OnItemButton1Click = binds.onItemSelect;

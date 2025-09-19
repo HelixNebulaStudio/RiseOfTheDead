@@ -21,6 +21,8 @@ function interactablePackage.init(super) -- Server/Client
         local clientData = info.ClientData;
         if clientData == nil then return end;
 
+        if interactable.Values.Locked then return; end
+
         if interactable.Id == "premiumOnlyDoor" then
             if clientData.Profile.Premium == false then
                 interactable.CanInteract = false;

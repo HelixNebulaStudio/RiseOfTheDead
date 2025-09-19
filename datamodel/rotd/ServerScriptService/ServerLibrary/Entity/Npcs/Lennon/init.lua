@@ -1,13 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local npcPackage = {
-    Name = "Robert";
+    Name = "Lennon";
     HumanoidType = "Human";
     
 	Configurations = {};
     Properties = {
-        PrimaryGunItemId = "mp5";
-        MeleeItemId = "shovel";
+        PrimaryGunItemId = "cz75";
+        MeleeItemId = "broomspear";
         Immortal = 1;
     };
 
@@ -16,17 +16,13 @@ local npcPackage = {
     AddComponents = {
         "TargetHandler";
         "Chat";
-        "ProtectPlayer";
-        "FollowPlayer";
-        "WaitForPlayer";
     };
-    AddBehaviorTrees = {};
 
     Voice = {
         VoiceId = 3;
-        Pitch = -1.5;
-        Speed = 1.1;
-        PlaybackSpeed = 1.01;
+        Pitch = 0.85;
+        Speed = 1;
+        PlaybackSpeed = 1.05;
     };
 };
 

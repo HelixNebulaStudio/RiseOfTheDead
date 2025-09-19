@@ -16,7 +16,12 @@ function treePackage.InCutscene(npcClass: NpcClass)
 end
 
 function treePackage.ProtectPlayer(npcClass: NpcClass)
-    return npcClass.BehaviorTree:RunTree("ProtectPlayer", false);
+    if npcClass.Properties.IsProtectingPlayer == true then
+        if npcClass.Properties.EnemyTargetData == nil then 
+            npcClass:GetComponent("FollowPlayer")();
+        end;
+    end
+    return false;
 end
 
 function treePackage.SurvivorIdleTree(npcClass: NpcClass)

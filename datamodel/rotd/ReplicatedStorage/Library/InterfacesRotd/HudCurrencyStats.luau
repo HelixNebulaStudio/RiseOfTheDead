@@ -20,7 +20,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local window = interface:NewWindow("GeneralStats", statsFrame);
 	window.IgnoreHideAll = true;
 	window.ReleaseMouse = false;
-    window.Layers = {"CharacterHud"; "CompactHidden"};
+    window.Layers = {"CharacterHud"; "CompactHidden"; "CurrencyStats"};
     interface:BindConfigKey("DisableGeneralStats", {window});
 
     function window.Binds.SetStyle(styleId)
@@ -123,7 +123,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         for key, value in pairs(statsData) do
             local label = (key == "Money" and statsFrame.moneylabel) or (key == "Perks" and statsFrame.perkslabel) or nil;
-            if label == nil then return; end;
+            if label == nil then continue; end;
             
             if previousStats[key] == nil then 
                 previousStats[key] = Instance.new("NumberValue", label);
