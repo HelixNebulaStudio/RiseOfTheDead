@@ -7,12 +7,8 @@ local CollectionService = game:GetService("CollectionService");
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modMapLibrary = shared.require(game.ReplicatedStorage.Library.MapLibrary);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
-local spaceCheckOverlapParam = OverlapParams.new();
-spaceCheckOverlapParam.FilterType = Enum.RaycastFilterType.Include;
-spaceCheckOverlapParam.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain};
-spaceCheckOverlapParam.MaxParts = 1;
-spaceCheckOverlapParam.RespectCanCollide = true;
 
 local SPAWN_TYPE_SPACING = {
 	Zombie=8;
@@ -112,21 +108,9 @@ function Spawner:GetSpawnCFrame()
     end;
     
     local targetCFrame = CFrame.new(targetPos) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
-    local collisions = workspace:GetPartBoundsInBox(
-        targetCFrame + Vector3.new(0, 0.5, 0), 
-        self.SpawnModelSize, 
-        spaceCheckOverlapParam
-    );
+
+    local isFreeSpace = modVector.IsFreeSpace(targetCFrame + Vector3.new(0, 0.5, 0), self.SpawnModelSize);
     
-    local isFreeSpace = true;
-    for a=1, #collisions do
-        local part = collisions[a];
-        if part.CanCollide == false then continue end;
-
-        isFreeSpace = false;
-        break;
-    end
-
     if isFreeSpace == false then 
         return nil;
     end;

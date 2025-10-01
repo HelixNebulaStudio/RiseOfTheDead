@@ -994,6 +994,28 @@ function BlueprintLibrary.onRequire()
 		Category="Weapons";
 	};
 
+	BlueprintLibrary.New{
+		Id="rechamber1216bp";
+		Name="Rechamber 1216 Blueprint";
+		Product="rechamber1216";
+		Duration=daySec;
+		SellPrice=40000;
+		Requirements={
+			{Type="Stat"; Name="Level"; Amount=500;};
+			{Type="Stat"; Name="Money"; Amount=35000;};
+			{Type="Stat"; Name="Perks"; Amount=50;};
+			
+			{Type="Item"; ItemId="screws"; Amount=50;};
+			{Type="Item"; ItemId="steelfragments"; Amount=25;};
+			{Type="Item"; ItemId="gears"; Amount=3;};
+			
+			{Type="Item"; ItemId="rechamber1216parts1"; Amount=1;};
+			{Type="Item"; ItemId="rechamber1216parts2"; Amount=1;};
+			{Type="Item"; ItemId="rechamber1216parts3"; Amount=1;};
+		};
+		Category="Weapons";
+	};
+
 
 	--== MARK: Melee
 	BlueprintLibrary.New{

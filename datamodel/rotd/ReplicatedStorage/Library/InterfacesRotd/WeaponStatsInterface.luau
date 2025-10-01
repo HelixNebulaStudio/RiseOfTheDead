@@ -5,8 +5,6 @@ local TextService = game:GetService("TextService");
 local localPlayer = game.Players.LocalPlayer;
 
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
-local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modPseudoRandom = shared.require(game.ReplicatedStorage.Library.PseudoRandom);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
@@ -108,6 +106,7 @@ local statTemplates = {
 		{Key="BulletRicochetCount"; Text="<b>Ricochet Count:</b>    $stat"; Type="int";};
 		{Key="BulletRicochetDistance"; Text="<b>Ricochet Distance:</b>    $statu"; Type="2dp"};
 		
+		{Key="PassiveModifiers"; Text="<b>Passives:</b>    $stat"; Type="string"; OnlyExpand=true;};
 		
 		{Key="Element"; Text="<b>Element:</b>    $stat"; Type="string"};
 		{Key="Tad"; Text="<b>TAD:</b>    $stat"; Type="int"; OnlyExpand=true;};
@@ -466,7 +465,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		weaponStatsFrame.Size = UDim2.new(0.5, 0, 0.5, 0);
 		weaponStatsFrame.Position = UDim2.new(0, 0, 1, 0);
 		weaponStatsWindow:SetClosePosition(UDim2.new(0, 0, 1.5, 0), UDim2.new(0, 0, 1, 0));
-		weaponStatsFrame:WaitForChild("StatsList"):WaitForChild("UIGridLayout").FillDirection = Enum.FillDirection.Horizontal;
 		weaponStatsFrame:WaitForChild("UICorner").CornerRadius = UDim.new(0, 0);
 	else
 		weaponStatsWindow:SetClosePosition(UDim2.new(0.5, 0, 1.5, -145));
@@ -876,9 +874,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         for a=1, #configurations.Modifiers do
             local modifier: ItemModifierInstance = configurations.Modifiers[a] :: ItemModifierInstance;
 
-            local modifierName = modifier.Id;
+            local modifierName = modifier.Name or modifier.Id;
             if modifier.ModLibrary and modifier.ModLibrary.Name then
                 modifierName = modifier.ModLibrary.Name;
+            end
+            if modifier.Tags.Base then
+                modifierName = `{modifierName} (Base)`;
             end
 
             local function newM(k)
@@ -906,7 +907,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 newM(k);
                 table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="min";});
             end
-
+            for k, v in pairs(modifier.ArrayValues) do
+                newM(k);
+                table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="array";});
+            end
         end
         
         local statsTemplate = statTemplates[classType];
@@ -931,10 +935,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     modifyValue = `max({modifyValue})`;
                 elseif modifyData.ConfigType == "min" then
                     modifyValue = `min({modifyValue})`;
+                elseif modifyData.ConfigType == "array" then
+                    modifyValue = `{modifyValue}`;
                 end
                 str = str..`\n∟ <b>[{modifyData.Name}]</b>  {modifyValue}`;
             end
-            str = str..`\n=  <b>{formatValue(info.Type, configurations[key])}</b>`;
+            str = str..`\n<font size="18">=  <b>{formatValue(info.Type, configurations[key])}</b></font>`;
 
             local newLabel: TextLabel = statsLabelTemplate:Clone();
             newLabel.LayoutOrder = a;

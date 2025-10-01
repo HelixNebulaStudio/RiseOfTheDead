@@ -5,6 +5,7 @@ export type anyfunc = ((...any)->...any);
 export type GAME_EVENT_KEY<U> = U
     | "Crates_BindSpawn"
     | "Doors_BindDoorToggle" -- Physical doors
+    | "Dialogue_BindTalkedTo"
     | "Generic_BindClockTick"
     | "Generic_BindItemPickup"
     | "Generic_BindTrigger"
@@ -715,7 +716,6 @@ export type NpcClass = CharacterClass & {
     SetNetworkOwner: (NpcClass, player: Player?) -> nil;
     BreakJoint: (NpcClass, motor: Motor6D) -> nil;
     IsInVision: (NpcClass, object: BasePart | Model, fov: number?) -> boolean;
-    DistanceFrom: (NpcClass, pos: Vector3) -> number;
     ToggleInteractable: (NpcClass, v: boolean) -> nil;
     UseInteractable: (NpcClass, interactableId: string, ...any) -> ...any;
     IsRagdolling: (NpcClass) -> boolean;
@@ -1200,6 +1200,7 @@ export type ConfigModifier = {
     ProductValues: anydict;
     MaxValues: anydict;
     MinValues: anydict;
+    ArrayValues: anydict;
 
     -- @methods
     Update: (ConfigModifier) -> nil;
@@ -1622,6 +1623,16 @@ export type EventInvokeParam = {
     SendBy: Player?;
     ReplicateTo: {Player}?
 }
+
+--MARK: NpcTargetData
+export type NpcTargetData = {
+    Model: Model;
+    HealthComp: HealthComp;
+    Distance: number;
+
+    LastAddedTick: number;
+    RemovedTick: number;
+};
 
 --MARK: -- Components
 -- Class composition components, with minimal coupling to external code.

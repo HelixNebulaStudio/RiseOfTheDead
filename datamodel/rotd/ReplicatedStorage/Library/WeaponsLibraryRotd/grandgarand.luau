@@ -141,10 +141,13 @@ end
 function toolPackage.newClass()
 	local equipmentClass = modEquipmentClass.new(toolPackage);
 	
-	equipmentClass:AddBaseModifier("BulletRicochet", {
-		SetValues={
-			BulletRicochetCount=2;
-			BulletRicochetDistance=64;
+	equipmentClass:AddBaseModifier("RicochetRifling", {
+		SetValues = {
+			BulletRicochetCount = 2;
+			BulletRicochetDistance = 64;
+		};
+		ArrayValues = {
+			PassiveModifiers = "RicochetRifling";
 		};
 	});
 

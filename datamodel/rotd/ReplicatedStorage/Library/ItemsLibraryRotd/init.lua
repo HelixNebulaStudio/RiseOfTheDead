@@ -85,19 +85,19 @@ function modItemsLibrary.onRequire()
     new(gunBase, {Id="xm1014"; Name="XM1014"; Icon="rbxassetid://6523762932"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick fire-rate long barrel shotgun.";});
     new(gunBase, {Id="sawedoff"; Name="Sawed-Off"; Icon="rbxassetid://17007247358"; Tags={"Shotgun"; "Primary Weapon";}; Description="Close range head remover with high multishot.";});
     new(gunBase, {Id="mariner590"; Name="Mariner 590"; Icon="rbxassetid://17007243924"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick and high damage tactical shotgun.";});
-    new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 4900; Description="Powerful hand made shotgun with built-in <b>Crit Receiver</b>.";});
-    new(gunBase, {Id="rechamber1216"; Name="Rechamber 1216"; Icon="rbxassetid://92627722665597"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 9900; Description="Military grade mag based shotgun with built-in <b>Knockout Trigger</b> that knocks out enemies on close up headshots.";});
+    new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 4900; Description="Powerful hand made shotgun with built-in <b>Critical Shot</b>.";});
+    new(gunBase, {Id="rechamber1216"; Name="Rechamber 1216"; Icon="rbxassetid://92627722665597"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 9900; Description="Military grade mag based shotgun with built-in <b>Knockout Trigger</b> that knocks out enemies on headshots for 2 seconds.";});
 
     new(gunBase, {Id="mp5"; Name="MP5"; Icon="rbxassetid://9960159062"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Quick fire-rate sub-machine gun.";});
     new(gunBase, {Id="mp7"; Name="MP7"; Icon="rbxassetid://9960161355"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Good accuracy and damage sub-machine gun.";});
     new(gunBase, {Id="czevo3"; Name="CZ-Scorpion EVO 3"; Icon="rbxassetid://4814129724"; Tags={"Submachine gun"; "Primary Weapon";}; Description="Extremely tactical sub-machine gun with a high base damage. Has built in <b>Damage Rev</b>, which does more damage the lower your ammo count is in your magazine.";});
-    new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine gun"; "Primary Weapon";}; TradingTax = 4900; Description="Elite sub-machine gun with built-in <b>Crit Receiver</b> and suppressor.";});
+    new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine gun"; "Primary Weapon";}; TradingTax = 4900; Description="Elite sub-machine gun with built-in <b>Critical Shot</b> and suppressor.";});
     new(gunBase, {Id="dualuzi"; Name="Dual Uzi"; Icon="rbxassetid://70941686222281"; Tags={"Submachine gun"; "Primary Weapon";}; TradingTax = 9900; Description="Light and versatile dual-wielded smgs built with <b>Dual Targetting</b> sights.";});
 
     new(gunBase, {Id="m4a4"; Name="M4A4"; Icon="rbxassetid://5166150878"; Tags={"Rifle"; "Primary Weapon";}; Description="Military grade M4 rifle capable of high damage and long range shooting.";});
     new(gunBase, {Id="ak47"; Name="AK-47"; Icon="rbxassetid://5166397129"; Tags={"Rifle"; "Primary Weapon";}; Description="High damage, high magazine capacity, and great fire-rate. Quite a noise maker.";});
     new(gunBase, {Id="fnfal"; Name="FN FAL"; Icon="rbxassetid://17007249959"; Tags={"Rifle"; "Primary Weapon";}; Description="The FN FAL is a high damage rifle with a very high fire rate.";});
-    new(gunBase, {Id="sr308"; Name="SR-308"; Icon="rbxassetid://16570523670"; Tags={"Rifle"; "Primary Weapon";}; Description="Ergonomic Russian battle rifle with built-in <b>Crit Receiver</b>.";});
+    new(gunBase, {Id="sr308"; Name="SR-308"; Icon="rbxassetid://16570523670"; Tags={"Rifle"; "Primary Weapon";}; Description="Ergonomic Russian battle rifle with built-in <b>Critical Shot</b>.";});
 
     new(gunBase, {Id="awp"; Name="AWP"; Icon="rbxassetid://5166454078"; Tags={"Sniper"; "Primary Weapon";}; Description="High Damage, high recoil and long ranged rifle.";});
     new(gunBase, {Id="rec21"; Name="Rec-21"; Icon="rbxassetid://6532745901"; Tags={"Sniper"; "Primary Weapon";}; Description="High power, light weight tactical sniper rifle.";});
@@ -950,22 +950,32 @@ function modItemsLibrary.onRequire()
     new(skinPermBase, {Id="maraudersmaskcbspumpkins"; Icon="rbxassetid://15016821671"; SkinPerm="Cute But Scary Pumpkins"; TargetItemId="maraudersmask"; Tags={"Slaughterfest";}; });
 
     -- Slaughterfest 2024
-    new(crateBase, {Id="slaughterfestcandybag"; Name="Slaughterfest Candy Bag"; Icon="rbxassetid://122301894594822"; Tags={"Slaughterfest"}; TradingTax=0; Description="Happy Slaughterfest, open it and see what you get!";
-        DestroyOnExpire=true;
-        OnInstantiate=function(storageItem)
-            local itemValues = storageItem.Values;
-            if itemValues.Expire then return end;
-            itemValues.Expire = (math.ceil(workspace:GetServerTimeNow()) + shared.Const.MonthSecs);
-            itemValues.ExpireLength = shared.Const.MonthSecs;
-        end;
+    new(crateBase, {
+        Id="slaughterfestcandybag"; 
+        Name="Slaughterfest Candy Bag"; 
+        Icon="rbxassetid://122301894594822"; 
+        Tags={"Slaughterfest"}; 
+        TradingTax=0; 
+        Description="Happy Slaughterfest, open it and see what you get!";
         Sources={"Obtained from Slaughterfest.";};
+        Stackable=false;
     });
     local candyCaravanStr = "Eatible candies but why not cook them in the Slaughterfest Cauldron for something much more special instead?\n";
-    new(foodBase, {Id="zombiejello"; Name="Zombie Jello"; Icon="rbxassetid://99854271826378"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."Craving for brains.."; Tradable=modItemsLibrary.Tradable.Nontradable;});
-    new(foodBase, {Id="eyeballgummies"; Name="Eyeball Gummies"; Icon="rbxassetid://72634660358826"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."More eyes, more sights.."; Tradable=modItemsLibrary.Tradable.Nontradable;});
-    new(foodBase, {Id="spookmallow"; Name="Spookmallow"; Icon="rbxassetid://93144909042467"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."Spooky marshmallow."; Tradable=modItemsLibrary.Tradable.Nontradable;});
-    new(foodBase, {Id="cherrybloodbar"; Name="Cherry Blood Bar"; Icon="rbxassetid://87358672710754"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."The bleeding chocolate bar."; Tradable=modItemsLibrary.Tradable.Nontradable;});
-    new(foodBase, {Id="wickedtaffy"; Name="Wicked Taffy"; Icon="rbxassetid://125482145777312"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."Taffy that glues your teeth shut."; Tradable=modItemsLibrary.Tradable.Nontradable;});
+    local function candyExpiresBase(t)
+		t.DestroyOnExpire=true;
+		t.OnInstantiate=function(storageItem)
+			local itemValues = storageItem.Values;
+			if itemValues.Expire then return end;
+			itemValues.Expire = (math.ceil(workspace:GetServerTimeNow()) + shared.Const.MonthSecs);
+			itemValues.ExpireLength = shared.Const.MonthSecs;
+		end;
+		return t;
+	end
+    new(foodBase, candyExpiresBase{Id="zombiejello"; Name="Zombie Jello"; Icon="rbxassetid://99854271826378"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."Craving for brains.."; Tradable=modItemsLibrary.Tradable.Nontradable;});
+    new(foodBase, candyExpiresBase{Id="eyeballgummies"; Name="Eyeball Gummies"; Icon="rbxassetid://72634660358826"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."More eyes, more sights.."; Tradable=modItemsLibrary.Tradable.Nontradable;});
+    new(foodBase, candyExpiresBase{Id="spookmallow"; Name="Spookmallow"; Icon="rbxassetid://93144909042467"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."Spooky marshmallow."; Tradable=modItemsLibrary.Tradable.Nontradable;});
+    new(foodBase, candyExpiresBase{Id="cherrybloodbar"; Name="Cherry Blood Bar"; Icon="rbxassetid://87358672710754"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."The bleeding chocolate bar."; Tradable=modItemsLibrary.Tradable.Nontradable;});
+    new(foodBase, candyExpiresBase{Id="wickedtaffy"; Name="Wicked Taffy"; Icon="rbxassetid://125482145777312"; Tags={"Slaughterfest"}; Description=candyCaravanStr.."Taffy that glues your teeth shut."; Tradable=modItemsLibrary.Tradable.Nontradable;});
     new(skinPermBase, {Id="tirearmorhaunted"; Icon="rbxassetid://91499977896252"; SkinPerm="Haunted"; TargetItemId="tirearmor"; Tags={"Slaughterfest";}; });
     new(skinPermBase, {Id="nvghaunted"; Icon="rbxassetid://117993502981374"; SkinPerm="Haunted"; TargetItemId="nvg"; Tags={"Slaughterfest";}; });
     new(skinPermBase, {Id="aproncarnage"; Icon="rbxassetid://97620098577599"; SkinPerm="Carnage"; TargetItemId="apron"; Tags={"Slaughterfest";}; });
@@ -1046,6 +1056,11 @@ function modItemsLibrary.onRequire()
     new(skinPermBase, {Id="arelshiftcrossgingerbread"; Icon="rbxassetid://85625473582729"; SkinPerm="Gingerbread"; TargetItemId="arelshiftcross"; });
     new(skinPermBase, {Id="grandgarandornaments"; Icon="rbxassetid://76137784853860"; SkinPerm="Ornaments"; TargetItemId="grandgarand"; });
     new(crateBase, {Id="xmaspresent2024"; Name="Frostivus Present 2024"; Icon="rbxassetid://79457385935728"; Tags={"Christmas"; "Frostivus"}; TradingTax=0; Description="Merry Christmas 2024!\n\nOpen it and see what you get!";});
+
+    -- Slaughterfest 2025
+    new(skinPermBase, {Id="scraparmorghastlyglow"; Icon="rbxassetid://103295043151448"; SkinPerm="Ghastly Glow"; TargetItemId="scraparmor"; });
+    new(skinPermBase, {Id="maraudersmaskghastlyglow"; Icon="rbxassetid://129920961544669"; SkinPerm="Ghastly Glow"; TargetItemId="maraudersmask"; });
+    new(skinPermBase, {Id="ammopouchghastlyglow"; Icon="rbxassetid://107333942393771"; SkinPerm="Ghastly Glow"; TargetItemId="ammopouch";});
 
     -- Legacy
     new(toolBase, {Id="masusplush"; Name="Masus Plush"; Icon="rbxassetid://18158370701"; Tags={"Legacy"}; Description=`Suspiciously cute. Keep an eye on it though.`;});

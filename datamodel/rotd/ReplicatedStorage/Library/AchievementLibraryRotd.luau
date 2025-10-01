@@ -202,6 +202,14 @@ library:Add{
 }
 
 library:Add{
+	Id="slaughterfest2025";
+	Tier=Tiers.Bloodmetal;
+	BadgeId=2104898683696404;
+	Announce="$PlayerName Unlocked: Slaughterfest 2025";
+	Hidden=true;
+}
+
+library:Add{
 	Id="frostivus2024";
 	Tier=Tiers.Bloodmetal;
 	BadgeId=198525199497730;

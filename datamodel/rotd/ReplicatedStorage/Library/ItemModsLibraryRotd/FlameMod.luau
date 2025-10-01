@@ -33,6 +33,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		Damage = dValue;
 		Duration = tValue;
 	};
+	modifier.ArrayValues.PassiveModifiers = statusKey;
 end
 
 

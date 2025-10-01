@@ -263,6 +263,25 @@ function library.onRequire()
 		SurfaceAppearanceParent=script;
 	};
 
+	library:Add{
+		Id="maraudersmaskghastlyglow";
+		ItemId="maraudersmask";
+		Name="Ghastly Glow";
+		
+		BaseColor = Color3.fromRGB(0, 255, 255);
+		Textures={
+			["Handle"]="rbxassetid://137981872347228";
+		};
+		Materials={
+			["Handle"]=Enum.Material.ForceField;
+		};
+		Effects={
+			["Handle"]={
+				spirits={Type="Spirits";};
+			};
+		};
+	};
+
 	--== MARK: clothbagmask
 	library:Add{
 		Id="clothbagmask";
@@ -577,6 +596,8 @@ function library.onRequire()
 		Id="militaryboots";
 		ItemId="militaryboots";
 		Name="Default";
+		DefaultPackage=true;
+		
 		SurfaceAppearance={
 			ColorMap="rbxassetid://17022794454";
 		};
@@ -975,6 +996,25 @@ function library.onRequire()
 		Hidden=true;
 	};
 
+	library:Add{
+		Id="ammopouchghastlyglow";
+		ItemId="ammopouch";
+		Name="Ghastly Glow";
+		DefaultPackage=true;
+
+		BaseColor = Color3.fromRGB(0, 255, 255);
+		Materials={
+			["Handle"]=Enum.Material.ForceField;
+		};
+		Textures={
+			["Handle"]="rbxassetid://119595119577683";
+		};
+		Effects={
+			["Handle"]={
+				spirits={Type="Spirits";};
+			};
+		};
+	};
 
 	--== MARK: nvg
 	library:Add{
@@ -1380,6 +1420,519 @@ function library.onRequire()
 		SurfaceAppearanceParent=script;
 	};
 
+	--== MARK: scraparmor
+	library:Add{
+		Id="scraparmor";
+		ItemId="scraparmor";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["Handle"]="rbxassetid://8366768416";
+		};
+	};
+
+	library:Add{
+		Id="scraparmorcopper";
+		ItemId="scraparmor";
+		Name="Copper";
+		Textures={
+			["Handle"]="rbxassetid://7021770174";
+		};
+	};
+
+	library:Add{
+		Id="scraparmorbiox";
+		ItemId="scraparmor";
+		Name="BioX";
+		Textures={
+			["Handle"]="rbxassetid://8366899696";
+		};
+	};
+
+	library:Add{
+		Id="scraparmorcherryblossom";
+		ItemId="scraparmor";
+		Name="Cherry Blossom";
+		Textures={
+			["Handle"]="rbxassetid://12964120126";
+		};
+	};
+
+	library:Add{
+		Id="scraparmormissingtextures";
+		ItemId="scraparmor";
+		Name="Missing Textures";
+		Textures={
+			["Handle"]="rbxassetid://15241466985";
+		};
+	};
+
+	library:Add{
+		Id="scraparmorghastlyglow";
+		ItemId="scraparmor";
+		Name="Ghastly Glow";
+		
+		BaseColor = Color3.fromRGB(0, 255, 255);
+		Textures={
+			["Handle"]="rbxassetid://136877410416889";
+		};
+		Materials={
+			["Handle"]=Enum.Material.ForceField;
+		};
+		Effects={
+			["Handle"]={
+				spirits={Type="Spirits";};
+			};
+		};
+	};
+
+	--== MARK: greytshirt
+	library:Add{
+		Id="greytshirt";
+		ItemId="greytshirt";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["UT"]="rbxassetid://1744912817";
+			["LT"]="rbxassetid://1744912817";
+			["LUA"]="rbxassetid://1744912817";
+			["RUA"]="rbxassetid://1744912817";
+		}
+	};
+
+	library:Add{
+		Id="greytshirtblue";
+		ItemId="greytshirt";
+		Name="Blue Color";
+		Textures={
+			["UT"]="rbxassetid://6535180507";
+			["LT"]="rbxassetid://6535180507";
+			["LUA"]="rbxassetid://6535180507";
+			["RUA"]="rbxassetid://6535180507";
+		}
+	};
+
+	library:Add{
+		Id="greytshirticyblue";
+		ItemId="greytshirt";
+		Name="Icy Blue Pattern";
+		Textures={
+			["UT"]="rbxassetid://8532590435";
+			["LT"]="rbxassetid://8532590435";
+			["LUA"]="rbxassetid://8532590435";
+			["RUA"]="rbxassetid://8532590435";
+		};
+		Unlocked=true;
+	};
+
+	library:Add{
+		Id="greytshirticyred";
+		ItemId="greytshirt";
+		Name="Icy Red Pattern";
+		Textures={
+			["UT"]="rbxassetid://8532645802";
+			["LT"]="rbxassetid://8532645802";
+			["LUA"]="rbxassetid://8532645802";
+			["RUA"]="rbxassetid://8532645802";
+		};
+		Unlocked=true;
+	};
+
+	library:Add{
+		Id="greytshirtcamo";
+		ItemId="greytshirt";
+		Name="Camo Pattern";
+		Textures={
+			["UT"]="rbxassetid://6534965799";
+			["LT"]="rbxassetid://6534965799";
+			["LUA"]="rbxassetid://6534965799";
+			["RUA"]="rbxassetid://6534965799";
+		}
+	};
+
+	--== MARK: prisonshirt
+	library:Add{
+		Id="prisonshirt";
+		ItemId="prisonshirt";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["UT"]="rbxassetid://2013710081";
+			["LT"]="rbxassetid://2013710081";
+			["LUA"]="rbxassetid://2013710081";
+			["RUA"]="rbxassetid://2013710081";
+		};
+	};
+
+	library:Add{
+		Id="prisonshirtblue";
+		ItemId="prisonshirt";
+		Name="Blue";
+		Textures={
+			["UT"]="rbxassetid://6665638674";
+			["LT"]="rbxassetid://6665638674";
+			["LUA"]="rbxassetid://6665638674";
+			["RUA"]="rbxassetid://6665638674";
+		};
+	};
+
+	--== MARK: prisonpants
+	library:Add{
+		Id="prisonpants";
+		ItemId="prisonpants";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["LLL"]="rbxassetid://5627732537";
+			["LUL"]="rbxassetid://5627732537";
+			["RLL"]="rbxassetid://5627732537";
+			["RUL"]="rbxassetid://5627732537";
+		};
+	};
+
+	library:Add{
+		Id="prisonpantsblue";
+		ItemId="prisonpants";
+		Name="Blue";
+		Textures={
+			["LLL"]="rbxassetid://6665658904";
+			["LUL"]="rbxassetid://6665658904";
+			["RLL"]="rbxassetid://6665658904";
+			["RUL"]="rbxassetid://6665658904";
+		};
+	};
+
+	--== MARK: bunnymanhead
+	library:Add{
+		Id="bunnymanhead";
+		ItemId="bunnymanhead";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["Handle"]="rbxassetid://50380653";
+		};
+	};
+
+	library:Add{
+		Id="bunnymanheadbenefactor";
+		ItemId="bunnymanhead";
+		Name="The Benefactor";
+		Textures={
+			["Handle"]="rbxassetid://6665865055";
+		};
+	};
+
+	--== MARK: plankarmor
+	library:Add{
+		Id="plankarmor";
+		ItemId="plankarmor";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["Handle"]="rbxassetid://6952680257";
+		};
+	};
+
+	library:Add{
+		Id="plankarmormaple";
+		ItemId="plankarmor";
+		Name="Maple";
+		Textures={
+			["Handle"]="rbxassetid://6956425630";
+		};
+	};
+
+	library:Add{
+		Id="plankarmorash";
+		ItemId="plankarmor";
+		Name="Ash";
+		Textures={
+			["Handle"]="rbxassetid://6956426986";
+		};
+	};
+
+	--== MARK: watch
+	library:Add{
+		Id="watch";
+		ItemId="watch";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["Handle"]="rbxassetid://6306893198";
+		};
+	};
+
+	library:Add{
+		Id="watchyellow";
+		ItemId="watch";
+		Name="Yellow";
+		Textures={
+			["Handle"]="rbxassetid://13021453507";
+		};
+	};
+
+	--== MARK: inflatablebuoy
+	library:Add{
+		Id="inflatablebuoy";
+		ItemId="inflatablebuoy";
+		Name="Default";
+		DefaultPackage=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://10392911200";
+		};
+	};
+
+	library:Add{
+		Id="inflatablebuoyrat";
+		ItemId="inflatablebuoy";
+		Name="R.A.T.";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://13021400982";
+		};
+	};
+
+
+	--== MARK: tophat
+	library:Add{
+		Id="tophat";
+		ItemId="tophat";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["Handle"]="rbxassetid://7558531740";
+		};
+	};
+
+	library:Add{
+		Id="tophatgrey";
+		ItemId="tophat";
+		Name="Grey";
+		Textures={
+			["Handle"]="rbxassetid://7647933560";
+		};
+	};
+
+	library:Add{
+		Id="tophatpurple";
+		ItemId="tophat";
+		Name="Purple";
+		Textures={
+			["Handle"]="rbxassetid://7647969340";
+		};
+	};
+
+	library:Add{
+		Id="tophatred";
+		ItemId="tophat";
+		Name="Red";
+		Textures={
+			["Handle"]="rbxassetid://7647970841";
+		};
+	};
+
+	library:Add{
+		Id="tophatgold";
+		ItemId="tophat";
+		Name="Gold";
+		Textures={
+			["Handle"]="rbxassetid://7647971874";
+		};
+	};
+
+	--== MARK: clownmask
+	library:Add{
+		Id="clownmask";
+		ItemId="clownmask";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["Handle"]="rbxassetid://7558506950";
+		};
+	};
+
+	library:Add{
+		Id="clownmaskus";
+		ItemId="clownmask";
+		Name="Star Spangled Banner";
+		Textures={
+			["Handle"]="rbxassetid://8367138629";
+		};
+	};
+
+	library:Add{
+		Id="clownmaskmissjoyful";
+		ItemId="clownmask";
+		Name="Miss Joyful";
+		Textures={
+			["Handle"]="rbxassetid://11269669005";
+		};
+	};
+
+	--== MARK: disguisekit
+	library:Add{
+		Id="disguisekit";
+		ItemId="disguisekit";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["Handle"]="rbxassetid://8377407358";
+		};
+	};
+
+	library:Add{
+		Id="disguisekitxmas";
+		ItemId="disguisekit";
+		Name="Christmas";
+		Textures={
+			["Handle"]="rbxassetid://8377612797";
+		};
+	};
+
+	library:Add{
+		Id="disguisekitwhite";
+		ItemId="disguisekit";
+		Name="White";
+		Textures={
+			["Handle"]="rbxassetid://8377619853";
+		};
+	};
+
+	--== MARK: zriceraskull
+	library:Add{
+		Id="zriceraskull";
+		ItemId="zriceraskull";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["Handle"]="rbxassetid://8377606395";
+		};
+	};
+
+	library:Add{
+		Id="zriceraskullinferno";
+		ItemId="zriceraskull";
+		Name="Inferno";
+		Textures={
+			["Handle"]="rbxassetid://8378276517";
+		};
+		Effects={
+			["Handle"]={
+				fire1={Type="Fire3"; Properties={ZOffset=0;}; AttachmentCFrame=CFrame.new(0.00879669189, -0.46296978, 0.129806519, 1, 1.75416548e-09, 4.95361885e-09, 1.75417059e-09, 0.777145982, -0.629320443, -4.95361663e-09, 0.629320443, 0.777145982)}
+			}
+		}
+	};
+
+	--== MARK: vexgloves
+	library:Add{
+		Id="vexgloves";
+		ItemId="vexgloves";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["LH"]="rbxassetid://7181335578";
+			["RH"]="rbxassetid://7181335578";
+		};
+	};
+
+	library:Add{
+		Id="vexglovesinferno";
+		ItemId="vexgloves";
+		Name="Inferno";
+		Textures={
+			["LH"]="rbxassetid://13974317312";
+			["RH"]="rbxassetid://13974317312";
+		};
+		Effects={
+			["Handle"]={
+				fire1={Type="Fire3"; Properties={ZOffset=0; LockedToPart=true; Rate=6;}; AttachmentCFrame=CFrame.new(0,0,0)}
+			}
+		}
+	};
+
+
+	--== MARK: survivorsbackpack
+	library:Add{
+		Id="survivorsbackpack";
+		ItemId="survivorsbackpack";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Textures={
+			["Handle"]="rbxassetid://8948195578";
+		};
+	};
+
+	library:Add{
+		Id="survivorsbackpackgalaxy";
+		Icon="rbxassetid://8948315976"; -- unlockable item does not exist;
+		ItemId="survivorsbackpack";
+		Name="Galaxy";
+		Textures={
+			["Handle"]="rbxassetid://8948365095";
+		};
+	};
+
+	library:Add{
+		Id="survivorsbackpackstreetart";
+		ItemId="survivorsbackpack";
+		Name="Street Art";
+		Textures={
+			["Handle"]="rbxassetid://17291375801";
+		};
+	};
+
+	--== MARK: cultisthood
+
+	library:Add{
+		Id="cultisthood";
+		ItemId="cultisthood";
+		Name="Default";
+		DefaultPackage=true;
+		
+		BaseColor=Color3.fromRGB(34, 36, 44);
+	};
+
+	library:Add{
+		Id="cultisthoodnekros";
+		ItemId="cultisthood";
+		Name="Nekros";
+		BaseColor=Color3.fromRGB(89, 0, 1);
+	};
+
+	--== MARK: skullmask
+
+	library:Add{
+		Id="skullmask";
+		ItemId="skullmask";
+		Name="Default";
+		DefaultPackage=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://11235294308";
+		};
+	};
+
+	library:Add{
+		Id="skullmaskgold";
+		ItemId="skullmask";
+		Name="Gold";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://15007537005";
+		};
+	};
 end
 
 return library;

@@ -10,13 +10,12 @@ local overlapParams = OverlapParams.new();
 overlapParams.FilterType = Enum.RaycastFilterType.Include;
 
 local modifierPackage = {
-	Name = "Bullet Ricochet";
+	Name = "Ricochet Rifling";
 	
 	Tags = {};
 	Binds = {};
 };
 --==
-
 function modifierPackage.Binds.OnBulletHit(modifier: ItemModifierInstance, packet: OnBulletHitPacket)
     if RunService:IsClient() then return end;
     local modToolService = shared.require(game.ServerScriptService.ServerLibrary.ToolService);

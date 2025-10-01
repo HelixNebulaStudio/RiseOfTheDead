@@ -430,6 +430,17 @@ if RunService:IsServer() then
 					end
 				end)
 			end)
+
+			addDialog("Head track", "Okie dokie", function(dialog)
+				local playerClass: PlayerClass = shared.modPlayers.get(player);
+				npcClass.Move:HeadTrack(playerClass.Head);
+			end)
+
+			addDialog("Follow me", "Okie dokie", function(dialog)
+				local followPlayerComp = npcClass:GetComponent("FollowPlayer");
+				followPlayerComp.FollowInFront = true;
+				followPlayerComp(player);
+			end)
 		end
 
 		if modMission:Progress(player, 54) then return end;

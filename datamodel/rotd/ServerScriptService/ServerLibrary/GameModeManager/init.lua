@@ -804,7 +804,9 @@ function GameModeManager:Initialize(gameType, gameStage)
 				task.delay((room.EndDuration or endingDuration), function()
 					room:SetState(enumRoomStates.Close);
 				end)
-				if gameTable.System.End then gameTable.System:End(room) end;
+				if gameTable.System.End then 
+					gameTable.System:End(room)
+				end;
 				
 			elseif room.State == enumRoomStates.Close then
 				local players = room:GetInstancePlayers();
@@ -822,7 +824,9 @@ function GameModeManager:Initialize(gameType, gameStage)
 			gameTable:Sync();
 		end)
 		
-		if gameTable.System.Load then gameTable.System:Load(room); end;
+		if gameTable.System.Load then 
+			gameTable.System:Load(room);
+		end;
 		table.insert(self.Lobbies, room);
 		table.insert(GameModeManager.Lobbies, room);
 		return room;

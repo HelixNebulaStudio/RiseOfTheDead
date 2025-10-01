@@ -485,6 +485,14 @@ function library.onRequire()
 		Icon="rbxassetid://129368759663555";
 	};
 
+	library:Add{
+		Id="slaughterfest2025";
+
+		Title="Slaughterfest 2025";
+		HudTitle="Slaughterfest 2025 badge";
+		Icon="rbxassetid://128981081654450";
+	};
+
 
 	-- MARK: Frostivus 2024
 	library:Add{

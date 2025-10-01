@@ -5,11 +5,9 @@ local RunService = game:GetService("RunService");
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
-local missionId = 33;
+local MISSION_ID = 33;
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	
-	-- modBranchConfigs.IsWorld("TheMall")
 	
 	function MissionLogic.Init(missionProfile, mission)
 		local player: Player = missionProfile.Player;
@@ -35,21 +33,23 @@ if RunService:IsServer() then
 					if firstRun then
 						Debugger:Log("Awoken the bear script.");
 					end
+
 				elseif not modBranchConfigs.IsWorld("AwokenTheBear") then
 					if mission.ProgressionPoint > 3 and mission.ProgressionPoint < 13 then
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 3;
 						end)
 
 					elseif mission.ProgressionPoint >= 13 then
-						wait(1);
-						modMission:CompleteMission(player, 33);
+						modMission:Progress(player, MISSION_ID, function(mission)
+							mission.ProgressionPoint = 3;
+						end)
 
 					end
 
 				else
 					if mission.ProgressionPoint <= 3 then
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 3 then
 								mission.ProgressionPoint = 4;
 							end;
@@ -60,6 +60,8 @@ if RunService:IsServer() then
 				
 			elseif mission.Type == 3 then -- OnComplete
 
+			elseif mission.Type == 4 then -- Failed
+				
 			end
 		end
 		

@@ -24,7 +24,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	--if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	if not modBranchConfigs.IsWorld("Safehome") or workspace:GetAttribute("FactionHeadquarters") ~= nil then
 		Debugger:Warn("Invalid place for cutscene ("..script.Name..")");
 

@@ -74,7 +74,7 @@ end
 
 --== Script;
 local sceneDialogues = modConfigurations.SpecialEvent.AprilFools
- and {
+and {
 	{Speaker="Mason"; Reply="Ski-ba-bop-ba-dop-bop.. Oh hey!"};
 	{Speaker="Mason"; Reply="Ey yo, you alive bruh?"};
 	{Speaker="Mason"; Reply="We have to skidaddle, the zombies are coming!"};

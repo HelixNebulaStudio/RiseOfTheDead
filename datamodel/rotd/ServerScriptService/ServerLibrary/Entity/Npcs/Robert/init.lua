@@ -19,7 +19,7 @@ local npcPackage = {
         "ProtectPlayer";
         "FollowPlayer";
         "WaitForPlayer";
-    };
+    }; 
     AddBehaviorTrees = {};
 
     Voice = {

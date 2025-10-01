@@ -2,14 +2,14 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local localPlayer = game.Players.LocalPlayer;
 
-local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
+local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.LeaderboardService);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
-local modItem = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
@@ -28,12 +28,14 @@ local interfacePackage = {
     Type = "Character";
 };
 --==
-
+function interfacePackage.onRequire()
+    remoteHalloween = modRemotesManager:Get("Halloween");
+	
+end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
 	if not modConfigurations.SpecialEvent.Halloween then return; end
 	local modData = shared.require(localPlayer:WaitForChild("DataModule"));
-    local remoteHalloween = modRemotesManager:Get("Halloween");
 
     local shopOptionTemplate = script:WaitForChild("ShopOption");
     local candyOptionTemplate = script:WaitForChild("CandyOption");
@@ -404,7 +406,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						uiLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom;
 					end
 	
-					local itemLib = modItem:Find(itemId);
+					local itemLib = modItemsLibrary:Find(itemId);
 					local optionClickFunc = function()
 						itemToolTip.Frame.Visible = false;
 						modClientGuis.promptDialogBox({
@@ -517,7 +519,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			for a=1, #shopRewardInfoList do
 				local rewardInfo = shopRewardInfoList[a];
 
-				local itemLib = modItem:Find(rewardInfo.ItemId);
+				local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
 
 				local newOption = shopOptionTemplate:Clone();
 				newOption.Name = rewardInfo.ItemId;

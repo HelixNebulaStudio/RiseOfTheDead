@@ -47,6 +47,11 @@ function NpcComponent.new(npcClass: NpcClass)
 		local dmgRange = math.pow((1-math.clamp(distance/configurations.AttackRange, 0, 1)), 1/2);
 		
 		local attackDamage = configurations.AttackDamage;
+
+		if enemyClass.ClassName == "NpcClass" then
+			attackDamage = attackDamage + (enemyHealthComp.MaxHealth * 0.1);
+		end
+
 		attackDamage = attackDamage * dmgRange;
 
 		local dmgData: DamageData = DamageData.new{

@@ -39,11 +39,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 	local firstSync = false;
 	function WorkbenchClass.new(itemId, library, storageItem)
 		local itemDisplay = inspectWindow.Binds.ItemViewport;
-		while #itemDisplay.DisplayModels == 0 and itemDisplay.OnDisplayID == storageItem.ID do
-			task.wait();
-		end
-		if itemDisplay.OnDisplayID ~= storageItem.ID then return end;
-		
+
 		if firstSync == false then
 			firstSync = true;
 
@@ -95,177 +91,114 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		local appearanceListingFrames = {};
 		local styleButtonDebounce = false;
 		
-		for a=1, #itemDisplay.DisplayModels do
-			local basePrefab = itemDisplay.DisplayModels[a].BasePrefab;
-			local prefab = itemDisplay.DisplayModels[a].Prefab;
-			
-			local unlockableLib = modItemUnlockablesLibrary:Find(itemId);
-			if unlockableLib then
-				local itemUnlockables = modItemUnlockablesLibrary:ListByKeyValue("ItemId", itemId);
-				if itemUnlockables then
-					local function setCharacterAccessories(unlockId)
-						for _, obj in pairs(prefab:GetChildren()) do
-							modItemUnlockablesLibrary.UpdateSkin(obj, unlockId);
-						end
+		local unlockableLib = modItemUnlockablesLibrary:Find(itemId);
+		if unlockableLib then
+			local itemUnlockables = modItemUnlockablesLibrary:ListByKeyValue("ItemId", itemId);
+			if itemUnlockables then
+				local function setCharacterAccessories(unlockId)
+					if itemDisplay.OnDisplayID ~= storageItem.ID then return end;
+
+					for a=0, 30 do
+						if itemDisplay.DisplayModels[1] then break; end;
+						task.wait(1/30);
 					end
-					setCharacterAccessories(ItemValues.ActiveSkin);
+					if itemDisplay.DisplayModels[1] == nil then return end;
 					
-					listMenu:SetEnableScrollBar(true);
-					listMenu:SetEnableSearchBar(true);
-					
-					local unlockablesList = listMenu:NewBasicList();
-					local newCateTab = listMenu:NewTab(unlockablesList);
-					newCateTab.titleLabel.Text = "Skins";
-					listMenu:Add(newCateTab, 1);
-					listMenu:Add(unlockablesList, 2);
+					local prefab = itemDisplay.DisplayModels[1].Prefab;
+					for _, obj in pairs(prefab:GetChildren()) do
+						modItemUnlockablesLibrary.UpdateSkin(obj, unlockId);
+					end
+				end
+				setCharacterAccessories(ItemValues.ActiveSkin);
+				
+				listMenu:SetEnableScrollBar(true);
+				listMenu:SetEnableSearchBar(true);
+				
+				local unlockablesList = listMenu:NewBasicList();
+				local newCateTab = listMenu:NewTab(unlockablesList);
+				newCateTab.titleLabel.Text = "Skins";
+				listMenu:Add(newCateTab, 1);
+				listMenu:Add(unlockablesList, 2);
 
-					local refreshButtonFuncs = {};
+				local refreshButtonFuncs = {};
+				
+				local unlockableData = ItemValues.Skins or {};
+				local chargesData = modData.Profile and modData.Profile.ItemUnlockables[itemId] or {};
+				for b=1, #itemUnlockables do
+					local unlockItemLib = itemUnlockables[b];
 					
-					local unlockableData = ItemValues.Skins or {};
-					local chargesData = modData.Profile and modData.Profile.ItemUnlockables[itemId] or {};
-					for b=1, #itemUnlockables do
-						local unlockItemLib = itemUnlockables[b];
+					local isUnlocked = table.find(unlockableData, unlockItemLib.Id);
+					if unlockItemLib.Name == "Default" or unlockItemLib.Unlocked == true then
+						isUnlocked = true;
+					elseif typeof(unlockItemLib.Unlocked) == "string" and table.find(unlockableData, unlockItemLib.Unlocked) then
+						isUnlocked = true;
+					end
+					
+					if unlockItemLib.Hidden ~= true or modBranchConfigs.CurrentBranch.Name == "Dev" or localPlayer.UserId == 16170943 then
+						-- MARK: New UnlockableButton 
+						local unlockButton = unlockButtonTemplate:Clone();
+						local txrLabel = unlockButton:WaitForChild("TextureLabel");
+						local selectedLabel = unlockButton:WaitForChild("SelectedLabel");
+						local titleLabel = unlockButton:WaitForChild("TitleLabel");
+						local chargeLabel = unlockButton:WaitForChild("ChargesLabel");
+						local goldIcon = unlockButton:WaitForChild("GoldIcon");
+
+						local unlockableIcon = unlockItemLib.Icon;
+						local unlockableItemId = unlockItemLib.Id;
 						
-						local isUnlocked = table.find(unlockableData, unlockItemLib.Id);
-						if unlockItemLib.Name == "Default" or unlockItemLib.Unlocked == true then
-							isUnlocked = true;
-						elseif typeof(unlockItemLib.Unlocked) == "string" and table.find(unlockableData, unlockItemLib.Unlocked) then
-							isUnlocked = true;
+						local unlockableItemLib = modItemLibrary:Find(unlockableItemId);
+						if unlockableItemLib then
+							unlockableIcon = unlockableItemLib.Icon;
 						end
 						
-						if unlockItemLib.Hidden ~= true or modBranchConfigs.CurrentBranch.Name == "Dev" or localPlayer.UserId == 16170943 then
-							-- MARK: New UnlockableButton 
-							local unlockButton = unlockButtonTemplate:Clone();
-							local txrLabel = unlockButton:WaitForChild("TextureLabel");
-							local selectedLabel = unlockButton:WaitForChild("SelectedLabel");
-							local titleLabel = unlockButton:WaitForChild("TitleLabel");
-							local chargeLabel = unlockButton:WaitForChild("ChargesLabel");
-							local goldIcon = unlockButton:WaitForChild("GoldIcon");
+						txrLabel.Image = unlockableIcon or "";
+						titleLabel.Text = unlockItemLib.Name;
+						unlockButton.LayoutOrder = unlockItemLib.Name == "Default" and 0 or unlockItemLib.LayoutOrder or 1;
+						unlockButton.LayoutOrder = isUnlocked and unlockButton.LayoutOrder or unlockButton.LayoutOrder + 999;
+						unlockButton.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
+						txrLabel.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
 
-							local unlockableIcon = unlockItemLib.Icon;
-							local unlockableItemId = unlockItemLib.Id;
-							
-							local unlockableItemLib = modItemLibrary:Find(unlockableItemId);
-							if unlockableItemLib then
-								unlockableIcon = unlockableItemLib.Icon;
-							end
-							
-							txrLabel.Image = unlockableIcon or "";
-							titleLabel.Text = unlockItemLib.Name;
-							unlockButton.LayoutOrder = unlockItemLib.Name == "Default" and 0 or unlockItemLib.LayoutOrder or 1;
-							unlockButton.LayoutOrder = isUnlocked and unlockButton.LayoutOrder or unlockButton.LayoutOrder + 999;
-							unlockButton.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
-							txrLabel.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
+						local hasCharges = chargesData[unlockableItemId] ~= nil;
+						if hasCharges then
+							chargeLabel.Text = `∞`;
+						end
 
-							local hasCharges = chargesData[unlockableItemId] ~= nil;
-							if hasCharges then
-								chargeLabel.Text = `∞`;
-							end
+						local goldShopLib = modGoldShopLibrary.Products:Find(unlockableItemId);
+						if goldShopLib and unlockItemLib.Name ~= "Default" then
+							goldIcon.Visible = true;
+						else
+							goldIcon.Visible = false;
+						end
+						
 
-							local goldShopLib = modGoldShopLibrary.Products:Find(unlockableItemId);
-							if goldShopLib and unlockItemLib.Name ~= "Default" then
-								goldIcon.Visible = true;
+						local function refresh()
+							if ItemValues.ActiveSkin == nil and unlockItemLib.Name == "Default" then
+								selectedLabel.Visible = true;
 							else
-								goldIcon.Visible = false;
+								selectedLabel.Visible = ItemValues.ActiveSkin == unlockableItemId;
 							end
-							
+						end
+						table.insert(refreshButtonFuncs, refresh);
+						
+						local canPreview;
+						local function previewStyle()
+							canPreview = true;
+							setCharacterAccessories(unlockableItemId);
+						end
 
-							local function refresh()
-								if ItemValues.ActiveSkin == nil and unlockItemLib.Name == "Default" then
-									selectedLabel.Visible = true;
-								else
-									selectedLabel.Visible = ItemValues.ActiveSkin == unlockableItemId;
-								end
-							end
-							table.insert(refreshButtonFuncs, refresh);
-							
-							local canPreview;
-							local function previewStyle()
-								canPreview = true;
-								setCharacterAccessories(unlockableItemId);
-							end
+						unlockButton.MouseEnter:Connect(previewStyle);
+						unlockButton.MouseMoved:Connect(function()
+							if not canPreview then return end;
+							previewStyle()
+						end);
 
-							unlockButton.MouseEnter:Connect(previewStyle);
-							unlockButton.MouseMoved:Connect(function()
-								if not canPreview then return end;
-								previewStyle()
-							end);
-
-							unlockButton.MouseLeave:Connect(function()
-								setCharacterAccessories(ItemValues.ActiveSkin);
-							end)
-							
-							if localPlayer.UserId == 16170943 or modBranchConfigs.CurrentBranch.Name == "Dev" then
-								unlockButton.MouseButton2Click:Connect(function()
-									interface:PlayButtonClick();
-									
-									local oldActiveId = ItemValues.ActiveSkin;
-									if ItemValues.ActiveSkin == unlockableItemId then
-										remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId");
-									else
-										remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId", unlockableItemId);
-									end
-									canPreview = false;
-									
-									for a=1, 10, 0.1 do
-										storageItem = modData.GetItemById(storageItem.ID);
-										ItemValues = storageItem.Values;
-										if ItemValues.ActiveSkin ~= oldActiveId then break; end;
-										wait(0.1);
-									end
-									
-									if unlockItemLib.PackageId or unlockItemLib.DefaultPackage then
-										-- switch viewport accessory
-										itemDisplay:SetDisplay(storageItem);
-									end
-
-									for b=1, #refreshButtonFuncs do
-										if type(refreshButtonFuncs[b]) == "function" then
-											refreshButtonFuncs[b]();
-										end
-									end
-								end)
-							end
-							
-							unlockButton.MouseButton1Click:Connect(function()
+						unlockButton.MouseLeave:Connect(function()
+							setCharacterAccessories(ItemValues.ActiveSkin);
+						end)
+						
+						if localPlayer.UserId == 16170943 or modBranchConfigs.CurrentBranch.Name == "Dev" then
+							unlockButton.MouseButton2Click:Connect(function()
 								interface:PlayButtonClick();
-
-								if isUnlocked == nil and hasCharges then
-									-- MARK: Use infinite;
-									
-									local name = unlockableItemLib and unlockableItemLib.Name or `{unlockItemLib.ItemId}:{unlockItemLib.Name}`;
-									local icon = unlockableItemLib and unlockableItemLib.Icon or unlockItemLib.Icon;
-									
-									modClientGuis.promptDialogBox({
-										Title=`Apply {name} Skin?`;
-										Desc=`You are about to apply {name} skin on {unlockableItemLib.Name}?`;
-										Icon=icon;
-										Buttons={
-											{
-												Text="Apply";
-												Style="Confirm";
-												OnPrimaryClick=function(dialogWindow, textButton)
-                                    				local statusLabel = dialogWindow.Binds.StatusLabel;
-													statusLabel.Text = "Applying<...>";
-													remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId", unlockableItemId);
-													task.wait(0.5);
-												end;
-											};
-											{
-												Text="Cancel";
-												Style="Cancel";
-											};
-										}
-									});
-
-									return;
-								end
-
-								if isUnlocked == nil then
-									interface:ToggleWindow("GoldMenu", true, unlockableItemId);
-									
-									return
-								end;
 								
 								local oldActiveId = ItemValues.ActiveSkin;
 								if ItemValues.ActiveSkin == unlockableItemId then
@@ -284,6 +217,75 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								
 								if unlockItemLib.PackageId or unlockItemLib.DefaultPackage then
 									-- switch viewport accessory
+									itemDisplay:SetDisplay(storageItem);
+								end
+
+								for b=1, #refreshButtonFuncs do
+									if type(refreshButtonFuncs[b]) == "function" then
+										refreshButtonFuncs[b]();
+									end
+								end
+							end)
+						end
+						
+						unlockButton.MouseButton1Click:Connect(function()
+							interface:PlayButtonClick();
+
+							if isUnlocked == nil and hasCharges then
+								-- MARK: Use infinite;
+								
+								local name = unlockableItemLib and unlockableItemLib.Name or `{unlockItemLib.ItemId}:{unlockItemLib.Name}`;
+								local icon = unlockableItemLib and unlockableItemLib.Icon or unlockItemLib.Icon;
+								
+								modClientGuis.promptDialogBox({
+									Title=`Apply {name} Skin?`;
+									Desc=`You are about to apply {name} skin on {unlockableItemLib.Name}?`;
+									Icon=icon;
+									Buttons={
+										{
+											Text="Apply";
+											Style="Confirm";
+											OnPrimaryClick=function(dialogWindow, textButton)
+												local statusLabel = dialogWindow.Binds.StatusLabel;
+												statusLabel.Text = "Applying<...>";
+												remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId", unlockableItemId);
+												task.wait(0.5);
+											end;
+										};
+										{
+											Text="Cancel";
+											Style="Cancel";
+										};
+									}
+								});
+
+								return;
+							end
+
+							if isUnlocked == nil then
+								interface:ToggleWindow("GoldMenu", true, unlockableItemId);
+								
+								return
+							end;
+							
+							local oldActiveId = ItemValues.ActiveSkin;
+							if ItemValues.ActiveSkin == unlockableItemId then
+								remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId");
+							else
+								remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId", unlockableItemId);
+							end
+							canPreview = false;
+							
+							for a=1, 10, 0.1 do
+								storageItem = modData.GetItemById(storageItem.ID);
+								ItemValues = storageItem.Values;
+								if ItemValues.ActiveSkin ~= oldActiveId then break; end;
+								wait(0.1);
+							end
+							
+							if unlockItemLib.PackageId or unlockItemLib.DefaultPackage then
+								-- switch viewport accessory
+								if itemDisplay.OnDisplayID == storageItem.ID then
 									itemDisplay:SetDisplay(storageItem, function()
 										for a=1, #itemDisplay.DisplayModels do
 											local prefab = itemDisplay.DisplayModels[a].Prefab;
@@ -293,26 +295,31 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 											end
 										end
 									end);
-
 								end
-								
-								for b=1, #refreshButtonFuncs do
-									if type(refreshButtonFuncs[b]) == "function" then
-										refreshButtonFuncs[b]();
-									end
-								end
-							end)
 
-							refresh();
-							listMenu:AddSearchIndex(unlockButton, {unlockItemLib.ItemId; unlockableItemId; titleLabel.Text;});
-							unlockButton.Parent = unlockablesList.list;
-						end
+							end
+							
+							for b=1, #refreshButtonFuncs do
+								if type(refreshButtonFuncs[b]) == "function" then
+									refreshButtonFuncs[b]();
+								end
+							end
+						end)
+
+						refresh();
+						listMenu:AddSearchIndex(unlockButton, {unlockItemLib.ItemId; unlockableItemId; titleLabel.Text;});
+						unlockButton.Parent = unlockablesList.list;
 					end
 				end
 			end
+		end
+
+		for a=1, #itemDisplay.DisplayModels do
+			local basePrefab = itemDisplay.DisplayModels[a].BasePrefab;
+			local prefab = itemDisplay.DisplayModels[a].Prefab;
 			
 			if library == nil then continue end; -- weapon customizations;
-
+			if itemDisplay.OnDisplayID == nil then continue end;
 
 			local weldName = itemDisplay.DisplayModels[a].WeldName;
 			

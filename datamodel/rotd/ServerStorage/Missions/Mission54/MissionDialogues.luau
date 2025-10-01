@@ -7,13 +7,13 @@ local Dialogues = {
 	Mason={};
 };
 
-local missionId = 54;
+local MISSION_ID = 54;
 --==
 
 -- !outline: Mason Dialogues
 Dialogues.Mason.DialogueStrings = {
 	["hsh_init"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Yeah, sure.";
 		Face="Confident"; 
 		Reply="There's this place, I don't think it's been scavenged before.. We should check it out. Let me know when you're ready to head out.";
@@ -84,14 +84,14 @@ if RunService:IsServer() then
 		if mission.Type == 2 then -- Available;
 			dialog:SetInitiate("Hey, $PlayerName. Are you free for a scavenge?");
 			dialog:AddChoice("hsh_init", function(dialog)
-				modMission:StartMission(player, missionId);
+				modMission:StartMission(player, MISSION_ID);
 			end)
 			
 		elseif mission.Type == 1 then -- Active
 			if modBranchConfigs.IsWorld("TheWarehouse") then
 				dialog:SetInitiate("Let's go?");
 				dialog:AddChoice("hsh_letsgo", function(dialog)
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						mission.ProgressionPoint = 2;
 					end)
 					modServerManager:Travel(player, "Safehome");
@@ -100,7 +100,7 @@ if RunService:IsServer() then
 				if mission.ProgressionPoint == 2 then
 					dialog:SetInitiate("Here we are, hope we will find something good here..");
 					dialog:AddChoice("hsh_quiet", function(dialog)
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint == 2 then
 								mission.ProgressionPoint = 3;
 							end;
@@ -119,7 +119,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("hsh_safehouse", function(dialog)
 						dialog:AddChoice("hsh_mine", function(dialog)
 							dialog:AddChoice("hsh_work", function(dialog)
-								modMission:CompleteMission(player, missionId);
+								modMission:CompleteMission(player, MISSION_ID);
 							end)
 						end)
 					end)

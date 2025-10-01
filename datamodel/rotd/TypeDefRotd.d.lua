@@ -5,6 +5,7 @@ export type GAME_EVENT_KEY_ROTD =
     | "EventPass_BindPuzzleInvoke"
     | "GameModeManager_BindDisconnectPlayer"
     | "GameModeManager_BindGameModeStart"
+    | "GameModeManager_BindGameModeComplete"
     | "Interactables_BindCollectibleInteract"
     | "Skills_BindResourceGatherers"
     | "Shop_BindActionEvent"

@@ -6,6 +6,7 @@ local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configur
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modWorldCoreClass = shared.require(game.ReplicatedStorage.Library.WorldCoreClass);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 if RunService:IsServer() then
     modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
@@ -41,6 +42,36 @@ function modWorldCoreClass.onRequire()
         modItemDrops.DefaultMinGlowSize = 2.5;
         modItemDrops.DefaultMaxGlowSize = 5;
 
+        if modConfigurations.SpecialEvent.Halloween then
+            task.spawn(function()
+                while wait(math.random(60, 180)) do
+                    local soundName = `FarThunder{math.random(1, 2)}`;
+                    
+                    modAudio.Preload(soundName, 5);
+                    local sound = modAudio.Play(soundName);
+                    if sound then
+                        sound.Volume = 0.6;
+                    end
+                    
+                    spawn(function()
+                        wait(math.random(200, 400)/1000);
+                        game.Lighting.Ambient = Color3.fromRGB(121, 136, 181);
+                        wait(0.05);
+                        game.Lighting.Ambient = Color3.fromRGB(25, 25, 25);
+                        wait(math.random(50, 100)/1000);
+                        game.Lighting.Ambient = Color3.fromRGB(121, 136, 181);
+                        wait(0.05);
+                        game.Lighting.Ambient = Color3.fromRGB(25, 25, 25);
+                        if math.random(1, 2) == 1 then
+                            wait(math.random(50, 100)/1000);
+                            game.Lighting.Ambient = Color3.fromRGB(121, 136, 181);
+                            wait(0.05);
+                            game.Lighting.Ambient = Color3.fromRGB(25, 25, 25);
+                        end
+                    end)
+                end
+            end)
+        end
     elseif RunService:IsClient() then
     end
 end
@@ -160,6 +191,7 @@ function modWorldCoreClass:InitGameWorld(gameMode, gameStage)
 
     local waitingforFirstPlayer = true;
     local gameModeStart = false;
+    local worldCoreInit = false;
     shared.modEngineCore:ConnectOnPlayerAdded(script, function(player: Player)
         if RunService:IsStudio() or modBranchConfigs.CurrentBranch.Name == "Dev" then
             local lobbyPlayers = studioLobbyData.GameMode.Room.Players;
@@ -180,6 +212,12 @@ function modWorldCoreClass:InitGameWorld(gameMode, gameStage)
         elseif gameModeStart then
 		    modGameModeManager:OnPlayerJoin(player);
         end
+
+        while shared.WorldCore == nil or shared.WorldCore.GameController == nil do task.wait() end;
+        if worldCoreInit then return end;
+        worldCoreInit = true;
+
+        shared.WorldCore.BindGameControllerInited(shared.WorldCore.GameController);
     end)
 end
 

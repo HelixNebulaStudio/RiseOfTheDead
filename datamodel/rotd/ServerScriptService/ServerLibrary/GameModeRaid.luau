@@ -26,12 +26,12 @@ local PathfindingService = game:GetService("PathfindingService");
 
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+local modDoors = shared.require(game.ReplicatedStorage.Library.Doors);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
-local modDoors = shared.require(game.ReplicatedStorage.Library.Doors);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
@@ -39,16 +39,14 @@ local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManag
 
 local modNpcs = shared.modNpcs;
 local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
-
-local remoteGameModeHud = modRemotesManager:Get("GameModeHud");
-local remoteDoorInteraction = modRemotesManager:Get("DoorInteraction");
-
-local serverPrefabs = game.ServerStorage:WaitForChild("Prefabs"):WaitForChild("Objects");
-
-local isDevBranch = modBranchConfigs.CurrentBranch.Name == "Dev";
 --==
 local platformParam = OverlapParams.new();
 platformParam.FilterType = Enum.RaycastFilterType.Include;
+
+function Raid.onRequire()
+	serverPrefabs = game.ServerStorage:WaitForChild("Prefabs"):WaitForChild("Objects");
+	remoteGameModeHud = modRemotesManager:Get("GameModeHud");
+end
 
 function Raid.new()
 	local self = {
@@ -66,6 +64,13 @@ function Raid.new()
 
 		HiddenSpawns = {};
 		SpecialSpawns = {};
+		
+		EnemiesList = {
+			{Name="Zombie"; Chance=100;};
+			{Name="Leaper"; Chance=15; Fmod=15;};
+			{Name="Ticks"; Chance=10; Fmod=10;};
+			{Name="Heavy"; Chance=0.1; Fmod=10;};
+		};
 		
 		Doors = {};
 		Blockades = {};
@@ -238,6 +243,8 @@ function Raid:Load()
 
 		for _, object: Instance in pairs(gameDir:GetChildren()) do
 			if object.Name == "SpawnPlatforms" then
+				object.Parent = workspace.CurrentCamera;
+				
 				local spCount = 0;
 				for _, child in pairs(object:GetChildren()) do
 
@@ -770,7 +777,7 @@ function Raid:Start()
 		
 
 		local blockadeFolder = serverPrefabs:FindFirstChild("DefaultBlockades");
-		if blockadeFolder then
+		if blockadeFolder and doorModel:GetAttribute("ShouldBarricade") ~= false then
 			local new = blockadeFolder[blockadeId]:Clone();
 			new.Name = "Blockade";
 			new:PivotTo(doorModel:GetPivot());
@@ -811,7 +818,7 @@ function Raid:Start()
 	end
 	
 	
-	--MARK: Blockades;
+	--MARK: Destructible Blockades;
 	for a=1, #self.Blockades do
 		local destructibleModel = self.Blockades[a];
 

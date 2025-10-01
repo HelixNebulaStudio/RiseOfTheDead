@@ -6,6 +6,8 @@ local RunService = game:GetService("RunService");
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
+local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
+
 local MISSION_ID = 30;
 
 --== Server Variables;
@@ -25,74 +27,118 @@ return function(CutsceneSequence)
 			if mission == nil then return end;
 			
 			local rachelPrefab = workspace.Entity:FindFirstChild("Rachel");
-			local rachelModule = rachelPrefab and modNpcs.getByModel(rachelPrefab);
+			local rachelNpcClass: NpcClass = rachelPrefab and modNpcs.getByModel(rachelPrefab);
 			
 			local vladimirPrefab = workspace.Entity:FindFirstChild("Vladimir");
-			local vladimirModule = vladimirPrefab and modNpcs.getByModel(vladimirPrefab);
+			local vladimirNpcClass: NpcClass = vladimirPrefab and modNpcs.getByModel(vladimirPrefab);
 			
-			local stanModule = modNpcs.getPlayerNpc(player, "Stan");
-			if stanModule == nil then
-				local npc = modNpcs.spawn("Stan", nil, function(npc, npcModule)
-					npcModule.Player = player;
-					stanModule = npcModule;
-				end);
-				modReplicationManager.ReplicateOut(player, npc);
+			local stanNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Stan");
+			if stanNpcClass == nil then
+				stanNpcClass = modNpcs.spawn2{
+					Name = "Stan";
+					Player = player;
+					ReplicateOut = true;
+				};
 			end
 			
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
-					stanModule.Actions:Teleport(CFrame.new(235.934204, -22.3296394, 92.4541245, 1, 0, 0, 0, 1, 0, 0, 0, 1));
-					stanModule.Wield.Equip("czevo3");
+					stanNpcClass:SetCFrame(CFrame.new(235.934204, -22.3296394, 92.4541245, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+					if stanNpcClass.WieldComp.ItemId == nil then
+						stanNpcClass.WieldComp:Equip{
+							ItemId = "czevo3";
+						};
+					end
 					
-					stanModule.Humanoid.Health = 60;
-					stanModule.Actions:WaitForOwner(30);
+					stanNpcClass:GetComponent("WaitForPlayer")(30);
+					local attractNpcs = stanNpcClass:GetComponent("AttractNpcs");
+					if attractNpcs then
+						attractNpcs.AttractHumanoidType = {"Zombie"};
+						attractNpcs.SelfAttractAlert = true;
+						attractNpcs:Activate();
+					end
+					stanNpcClass:GetComponent("ProtectPlayer")();
+					
 					repeat
-						stanModule.Humanoid.Health = math.random(59, 61);
-						stanModule.Actions:FaceOwner();
-						wait(0.5);
+						stanNpcClass.Humanoid.Health = math.random(59, 61);
+						
+						local targetHandlerComp = stanNpcClass:GetComponent("TargetHandler");
+						if targetHandlerComp == nil then 
+							stanNpcClass.Move:Face("Player");
+						end;
+
+						task.wait(0.5);
 					until player == nil or mission == nil or player.Parent == nil or mission.Type ~= 2;
 					
 				elseif mission.Type == 1 then -- OnActive
 					if mission.ProgressionPoint == 1 then
-						stanModule.Interactable.Parent = script;
-						wait(3);
-						stanModule.Chat(stanModule.Player, "Follow me...");
+						stanNpcClass:ToggleInteractable(false);
+						task.wait(3);
+						stanNpcClass.Chat(stanNpcClass.Player, "Follow me...");
 						
-						stanModule.Movement:SetWalkSpeed("default", 25);
-						stanModule.Movement:Move(Vector3.new(308.2, 9.83, 1.94)):Wait(20);
+						stanNpcClass.Move:SetMoveSpeed("set", "default", 25);
+						stanNpcClass.Move:MoveTo(Vector3.new(308.2, 9.83, 1.94));
+
+						stanNpcClass.Move.OnMoveToEnded:Wait(20);
+						if stanNpcClass == nil then return end;
 						
-						stanModule.Actions:WaitForOwner(30);
-						stanModule.Actions:EnterDoor("safehouse4Entrance");
-						stanModule.Wield.Unequip();
-						stanModule.Movement:SetWalkSpeed("default", 7);
-						stanModule.Movement:Move(Vector3.new(280, 9.83, -6.45)):Wait(5);
-						stanModule.Movement:Face(Vector3.new(287.25, 9.83, -6.54));
-						wait(1);
-						stanModule.Chat(stanModule.Player, "Hey ehh, Rachel, I need to patch up again..");
-						wait(1.5);
-						if rachelModule then rachelModule.Chat(player, "You need to be careful out there.."); end;
-						wait(1.5);
+						stanNpcClass:GetComponent("WaitForPlayer")(30);
+						if stanNpcClass == nil then return end;
+
+						stanNpcClass:GetComponent("ProtectPlayer").IsProtecting = false;
+						
+						stanNpcClass:UseInteractable("trainStationSafehouseEntrance");
+						stanNpcClass.WieldComp:Unequip();
+						stanNpcClass.Move:SetMoveSpeed("set", "default", 7);
+						stanNpcClass.Move:MoveTo(Vector3.new(280, 9.83, -6.45));
+
+						stanNpcClass.Move.OnMoveToEnded:Wait(10);
+						if stanNpcClass == nil then return end;
+
+						stanNpcClass.Move:Face(Vector3.new(287.25, 9.83, -6.54));
+
+						task.wait(1);
+						stanNpcClass.Chat(stanNpcClass.Player, "Hey ehh, Rachel, I need to patch up again..");
+						wait(3.5);
+						if rachelNpcClass then rachelNpcClass.Chat(player, "You need to be careful out there.."); end;
+						wait(3.5);
 						for a=1, 5 do
-							stanModule.Humanoid.Health = stanModule.Humanoid.Health +8;
-							wait(0.5);
+							stanNpcClass.HealthComp:TakeDamage(DamageData.new{
+								Damage = -8;
+								DamageType = "Heal";
+							})
+							task.wait(0.5);
 						end
-						if rachelModule then rachelModule.Chat(player, "There, done."); end;
+						if rachelNpcClass then rachelNpcClass.Chat(player, "There, done."); end;
+						wait(2.5)
+						stanNpcClass.Humanoid.Health = 100;
+						stanNpcClass.Chat(stanNpcClass.Player, "Thanks a lot.");
 						wait(1)
-						stanModule.Humanoid.Health = 100;
-						stanModule.Chat(stanModule.Player, "Thanks a lot.");
+						
+						stanNpcClass.Move:SetMoveSpeed("set", "default", 7);
+						stanNpcClass.Move:MoveTo(Vector3.new(224.28, 9.83, -10.46));
+
+						stanNpcClass.Move.OnMoveToEnded:Wait(5);
+						if stanNpcClass == nil then return end;
+
+						stanNpcClass.Move:SetMoveSpeed("set", "default", 7);
+						
 						wait(1)
-						stanModule.Movement:SetWalkSpeed("default", 14);
-						stanModule.Movement:Move(Vector3.new(224.28, 9.83, -10.46)):Wait(5);
-						stanModule.Movement:SetWalkSpeed("default", 7);
-						wait(1)
-						stanModule.Chat(stanModule.Player, "Yo Vald! When are you going to have stock of that item I wanted?!");
-						wait(2)
-						if vladimirModule then vladimirModule.Chat(player, "Ugh.. Not sure, stop asking please. Так раздражает.."); end
-						wait(3)
-						stanModule.Movement:Move(Vector3.new(235.3, 9.8, 10.4)):Wait(8);
-						stanModule.Actions:FaceOwner();
-						stanModule.Chat(stanModule.Player, "Hey, "..player.Name);
-						stanModule.Interactable.Parent = stanModule.Prefab;
+						stanNpcClass.Chat(stanNpcClass.Player, "Yo Vlad! When are you going to have stock of that item I wanted?!");
+						wait(5.5)
+						if vladimirNpcClass then
+							vladimirNpcClass.Chat(player, "Ugh.. Not sure, stop asking please. Так раздражает..");
+						end
+						wait(4.5);
+
+						stanNpcClass.Move:MoveTo(Vector3.new(235.3, 9.8, 10.4));
+						stanNpcClass.Move.OnMoveToEnded:Wait(5);
+						if stanNpcClass == nil then return end;
+
+						stanNpcClass.Move:Face("Player");
+
+						stanNpcClass.Chat(stanNpcClass.Player, "Hey, "..player.Name);
+						stanNpcClass:ToggleInteractable(true);
 						
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 1 then
@@ -101,43 +147,70 @@ return function(CutsceneSequence)
 						end)
 						
 					elseif mission.ProgressionPoint == 2 then
-						stanModule.Actions:Teleport(CFrame.new(235.310089, 9.83002663, 10.3999949, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+						stanNpcClass:SetCFrame(CFrame.new(235.310089, 9.83002663, 10.3999949, 1, 0, 0, 0, 1, 0, 0, 0, 1));
 						
 					elseif mission.ProgressionPoint == 3 then
-						stanModule.Interactable.Parent = script;
-						stanModule.Actions:Teleport(CFrame.new(235.310089, 9.83002663, 10.3999949, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+						stanNpcClass:ToggleInteractable(false);
+						stanNpcClass:SetCFrame(CFrame.new(235.310089, 9.83002663, 10.3999949, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+
 						wait(2);
-						if stanModule == nil then return end;
-						stanModule.Movement:SetWalkSpeed("default", 7);
-						stanModule.Movement:Move(Vector3.new(230.71, 9.83, 10.74)):Wait(5);
-						stanModule.Movement:Face(Vector3.new(230.65, 12.165, 14.3));
+						if stanNpcClass == nil then return end;
+
+						stanNpcClass.Move:SetMoveSpeed("set", "default", 7);
+						stanNpcClass.Move:MoveTo(Vector3.new(230.71, 9.83, 10.74));
+
+						stanNpcClass.Move.OnMoveToEnded:Wait(5);
+						if stanNpcClass == nil then return end;
+
+						stanNpcClass.Move:Face(Vector3.new(230.65, 12.165, 14.3));
+
 						wait(0.5);
-						if stanModule == nil then return end;
-						stanModule.Actions:EnterDoor("safehouse4Exit2");
+						if stanNpcClass == nil then return end;
+
+						stanNpcClass:UseInteractable("trainStationSafehouseExit2");
+
 						wait(2);
-						if stanModule == nil then return end;
-						stanModule.Movement:Move(Vector3.new(271.33, 25.69, -20.69)):Wait(5);
-						stanModule.Movement:Face(Vector3.new(276.16, 28.8, -40.043));
-						stanModule.Wield.Equip("czevo3");
-						stanModule.Chat(stanModule.Player, "Oh boy.. we better just save ammo and run past them.");
-						wait(5);
-						if stanModule == nil then return end;
-						stanModule.Movement:SetWalkSpeed("default", 25);
-						stanModule.Movement:Move(Vector3.new(268.98, 52.65, -259.39)):Wait(20);
+						if stanNpcClass == nil then return end;
+
+						stanNpcClass.Move:MoveTo(Vector3.new(271.33, 25.69, -20.69));
+
+						stanNpcClass.Move.OnMoveToEnded:Wait(2);
+						if stanNpcClass == nil then return end;
+
+						stanNpcClass.Move:Face(Vector3.new(276.16, 28.8, -40.043));
 						
-						stanModule.Actions:EnterDoor("mallProtect2");
-						stanModule.Movement:Move(Vector3.new(273.25, 55.57, -282.3)):Wait(5);
-						wait(1)
-						if stanModule == nil then return end;
-						stanModule.Actions:FaceOwner();
-						stanModule.Chat(stanModule.Player, "Ah.. Wrighton Dale Mall.. ");
+						if stanNpcClass.WieldComp.ItemId == nil then
+							stanNpcClass.WieldComp:Equip{
+								ItemId = "czevo3";
+							};
+						end
+
+						stanNpcClass.Chat(stanNpcClass.Player, "Oh boy.. we better just save ammo and run past them.");
+
+						wait(5);
+						if stanNpcClass == nil then return end;
+
+						stanNpcClass.Move:SetMoveSpeed("set", "default", 25);
+						stanNpcClass.Move:MoveTo(Vector3.new(268.98, 52.65, -259.39));
+
+						stanNpcClass.Move.OnMoveToEnded:Wait(15);
+						if stanNpcClass == nil then return end;
+
+						stanNpcClass:UseInteractable("mallFenceEntrance");
+						stanNpcClass.Move:MoveTo(Vector3.new(273.25, 55.57, -282.3));
+
+						stanNpcClass.Move.OnMoveToEnded:Wait(2);
+						if stanNpcClass == nil then return end;
+
+						stanNpcClass.Move:Face("Player");
+						stanNpcClass.Chat(stanNpcClass.Player, "Ah.. Wrighton Dale Mall.. ");
 						
 					elseif mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 9 then
-						if stanModule == nil then return end;
-						stanModule:TeleportHide();
+						if stanNpcClass == nil then return end;
+						stanNpcClass:TeleportHide();
 					end
 				elseif mission.Type == 3 then -- OnComplete
-					stanModule:TeleportHide();
+					stanNpcClass:TeleportHide();
 				end
 			end
 			mission.OnChanged:Connect(OnChanged);
@@ -145,6 +218,8 @@ return function(CutsceneSequence)
 		end)
 		
 		return CutsceneSequence;
+
+	--MARK: TheMall
 	elseif modBranchConfigs.IsWorld("TheMall") then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -153,52 +228,52 @@ return function(CutsceneSequence)
 			if mission == nil then return end;
 			
 			local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
-			local patrickModule = patrickPrefab and modNpcs.getByModel(patrickPrefab);
+			local patrickNpcClass: NpcClass = patrickPrefab and modNpcs.getByModel(patrickPrefab);
 			
 			local mallStanSpawn = CFrame.new(755.640137, 59.1950226, -805.369812, -1, 0, 0, 0, 1, 0, 0, 0, -1);
-			local stanModule = modNpcs.getPlayerNpc(player, "Stan");
+			local stanNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Stan");
 			
 			local function OnChanged(firstRun)
 				if mission.Type == 1 then -- OnActive
-					if firstRun and mission.ProgressionPoint >= 4 and stanModule == nil then
-						local npc = modNpcs.spawn("Stan", mallStanSpawn, function(npc, npcModule)
-							npcModule.Player = player;
-							stanModule = npcModule;
-						end);
-						modReplicationManager.ReplicateOut(player, npc);
+					if firstRun and mission.ProgressionPoint >= 4 and stanNpcClass == nil then
+						stanNpcClass = modNpcs.spawn2{
+							Name = "Stan";
+							CFrame = mallStanSpawn;
+							Player = player;
+							ReplicateOut = true;
+						};
 					end
 					
 					if mission.ProgressionPoint == 4 then
-						stanModule.Wield.Equip("czevo3");
-						stanModule.Actions:Teleport(mallStanSpawn);
+						stanNpcClass:SetCFrame(mallStanSpawn);
 						
 					elseif mission.ProgressionPoint == 5 then
-						stanModule.Interactable.Parent = script;
-						stanModule.Actions:Teleport(mallStanSpawn);
-						
-						if stanModule.Wield.ToolModule == nil then
-							stanModule.Wield.Equip("czevo3");
-						end
+						stanNpcClass:ToggleInteractable(false);
+						stanNpcClass:SetCFrame(mallStanSpawn);
 						
 						wait(2);
-						stanModule.Movement:SetWalkSpeed("default", 25);
+						stanNpcClass.Move:SetMoveSpeed("set", "default", 25);
 						
 						local waypoint = Vector3.new(714.962, 95.72, -721.133);
 						
 						waypoint = Vector3.new(731.861, 131.438, -728.346);
-						stanModule.Movement:Move(waypoint):Wait(60);
-						if stanModule.Actions:DistanceFrom(waypoint) > 20 then
-							stanModule.Actions:Teleport(CFrame.new(waypoint));
+						stanNpcClass.Move:MoveTo(waypoint);
+						stanNpcClass.Move.OnMoveToEnded:Wait(20);
+
+						if stanNpcClass:DistanceFromCharacter(waypoint) > 20 then
+							stanNpcClass:SetCFrame(CFrame.new(waypoint));
 						end
 						
-						stanModule.Movement:SetWalkSpeed("default", 10);
-						waypoint = Vector3.new(793.235, 162.864, -726.123);
-						stanModule.Movement:Move(waypoint):Wait(10);
-						stanModule.Movement:Face(Vector3.new(797.496, 160.864, -730.922));
+						stanNpcClass.Move:SetMoveSpeed("set", "default", 10);
+						waypoint = Vector3.new(793.235, 162.864, -726.123);  --Bandit Camp entrance
 						
-						if stanModule.Actions:DistanceFrom(waypoint) > 20 then
-							stanModule.Movement:EndMovement();
-							stanModule.Actions:Teleport(CFrame.new(waypoint));
+						stanNpcClass.Move:MoveTo(waypoint);
+						stanNpcClass.Move.OnMoveToEnded:Wait(15);
+						stanNpcClass.Move:Face(Vector3.new(797.496, 160.864, -730.922));
+						
+						if stanNpcClass:DistanceFromCharacter(waypoint) > 20 then
+							stanNpcClass.Move:Stop();
+							stanNpcClass:SetCFrame(CFrame.new(waypoint));
 						end
 						
 						modMission:Progress(player, MISSION_ID, function(mission)
@@ -208,25 +283,35 @@ return function(CutsceneSequence)
 						end)
 						
 					elseif mission.ProgressionPoint == 6 then
-						stanModule.Interactable.Parent = script;
-						stanModule.Actions:Teleport(CFrame.new(793.235, 160.864, -726.123));
-						stanModule.Movement:Face(Vector3.new(797.496, 160.864, -730.922));
-						stanModule.Actions:WaitForOwner(20);
-						if stanModule == nil then return end;
+						stanNpcClass:ToggleInteractable(false);
+						stanNpcClass:SetCFrame(CFrame.new(793.235, 162.6, -726.123));
+
+						local waitForPlayer = stanNpcClass:GetComponent("WaitForPlayer");
+						waitForPlayer.FacePlayerWhileWaiting = false;
+						waitForPlayer(20);
+						waitForPlayer.FacePlayerWhileWaiting = true;
+						if stanNpcClass == nil then return end;
+						task.wait(0.5);
+					
+						stanNpcClass.WieldComp:Unequip();
 						
-						stanModule.Wield.Unequip();
-						
-						patrickModule.Chat(player, "HALT! STOP RIGHT THERE OR I SHOOT!");
-						wait(1);
-						stanModule.Chat(stanModule.Player, "WAIT wait wait!!! We are here to talk!");
-						wait(2);
-						patrickModule.Chat(player, "What do you want?!");
-						wait(2);
-						stanModule.Chat(stanModule.Player, "We want to speak to your leader.");
-						wait(2);
-						patrickModule.Chat(player, "Not gonna happen. Leave now!");
-						wait(2);
-						stanModule.Actions:FaceOwner();
+						patrickNpcClass.Move:HeadTrack(stanNpcClass.Head, 15);
+						patrickNpcClass.Move:Face(stanNpcClass.RootPart);
+						stanNpcClass.Move:Face(patrickNpcClass.RootPart);
+						stanNpcClass.Move:HeadTrack(patrickNpcClass.Head, 15);
+
+						patrickNpcClass.Chat(player, "HALT! STOP RIGHT THERE OR I SHOOT!");
+						wait(3);
+						stanNpcClass.Chat(stanNpcClass.Player, "WAIT wait wait!!! We are here to talk!");
+						wait(3);
+						patrickNpcClass.Chat(player, "What do you want?!");
+						stanNpcClass.Move:Face(patrickNpcClass.RootPart);
+						wait(3);
+						stanNpcClass.Chat(stanNpcClass.Player, "We want to speak to your leader.");
+						wait(3);
+						patrickNpcClass.Chat(player, "Not gonna happen. Leave now!");
+						wait(3);
+						stanNpcClass.Move:Face("Player");
 						
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 6 then
@@ -235,34 +320,41 @@ return function(CutsceneSequence)
 						end)
 						
 					elseif mission.ProgressionPoint == 7 then
-						stanModule.Interactable.Parent = script;
-						stanModule.Actions:Teleport(CFrame.new(793.235, 162.864, -726.123));
-						stanModule.Actions:WaitForOwner(20);
-						stanModule.Actions:FaceOwner();
+						stanNpcClass:ToggleInteractable(false);
+						stanNpcClass:SetCFrame(CFrame.new(793.235, 162.6, -726.123));
+						stanNpcClass:GetComponent("WaitForPlayer")(20);
+						stanNpcClass.Move:Face("Player");
 						
 					elseif mission.ProgressionPoint == 8 then
-						stanModule.Interactable.Parent = script;
-						stanModule.Actions:Teleport(CFrame.new(793.235, 162.864, -726.123));
-						stanModule.Actions:WaitForOwner(20);
-						stanModule.Actions:FaceOwner();
+						stanNpcClass:ToggleInteractable(false);
+						stanNpcClass:SetCFrame(CFrame.new(793.235, 162.6, -726.123));
+						stanNpcClass:GetComponent("WaitForPlayer")(20);
+						stanNpcClass.Move:Face("Player");
 						
 					elseif mission.ProgressionPoint == 9 then
-						stanModule.Interactable.Parent = stanModule.Prefab;
+						stanNpcClass:ToggleInteractable(true);
 						
 					elseif mission.ProgressionPoint == 10 then
-						stanModule.Interactable.Parent = script;
+						stanNpcClass:ToggleInteractable(false);
 						
-						if stanModule.Wield.ToolModule == nil then
-							stanModule.Wield.Equip("czevo3");
-						end
-						stanModule.Movement:SetWalkSpeed("default", 25);
-						stanModule.Movement:Move(Vector3.new(735.55, 97.3, -711.272)):Wait(10);
-						
+						stanNpcClass.Move:SetMoveSpeed("set", "default", 25);
+						stanNpcClass.Move:MoveTo(Vector3.new(735.55, 93.874, -705.439)); -- mallShopSafehouseEntrance 
+						stanNpcClass.Move.OnMoveToEnded:Wait(20);
+
+						task.wait(0.5);
 						modMission:CompleteMission(player, MISSION_ID);
 					end
+
 				elseif mission.Type == 3 then -- OnComplete
-					if stanModule then
-						stanModule.Interactable.Parent = stanModule.Prefab;
+					if not modMission:IsComplete(player, 33) and stanNpcClass then
+						stanNpcClass:ToggleInteractable(true);
+
+						stanNpcClass:UseInteractable("mallShopSafehouseEntrance");
+						stanNpcClass.WieldComp:Unequip();
+
+						stanNpcClass.Move:MoveTo(Vector3.new(755.09, 94.925, -652.029));
+						stanNpcClass.Move.OnMoveToEnded:Wait(20);
+						stanNpcClass.Move:Face(Vector3.new(755.09, 94.925, -642.626));
 					end
 				end
 			end

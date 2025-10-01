@@ -33,10 +33,7 @@ function WorldCore.onRequire()
         shared.modNpcs.spawn2{Name="Danny";};
 
         -- Bandit Camp
-        shared.modNpcs.spawn2{
-            Name = "Patrick";
-            AddComponents = {"AutoRespawn"};
-        };
+        shared.modNpcs.spawn2{Name = "Patrick";};
         shared.modNpcs.spawn2{
             Name = "Loran";
             CFrame = CFrame.new(795.21051, 162.605835, -668.609192, 1, 0, 0, 0, 1, 0, 0, 0, 1);

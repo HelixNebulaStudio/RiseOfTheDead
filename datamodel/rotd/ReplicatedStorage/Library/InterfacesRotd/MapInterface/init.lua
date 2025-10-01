@@ -482,9 +482,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			mapImage.Image = "";
 		end
 		
-		local layerName, _layerData = modMapLibrary:GetLayer(rootPart.Position);
-		binds.LocationName = layerName;
-		
+		local layerName = localPlayer:GetAttribute("Location");
 		if layerName then
 			if layerName ~= activeLayer then
 				local frameData = layerFrames[layerName];

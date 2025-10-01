@@ -198,7 +198,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     end
                 end
             end
+            
             local thumbnail = shared.modPlayers.getAvatar(friends[a].VisitorId);
+            if binds.FriendsList == nil then return end;
+
             friends[a].Avatar = thumbnail;
             friends[a].InUniverse = inUniverse;
             table.insert(IdList, friends[a].VisitorId);

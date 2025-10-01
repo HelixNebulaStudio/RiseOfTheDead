@@ -25,7 +25,7 @@ function GameMode:Start(room)
 	};
 	
 	if RunService:IsStudio() then
-		Debugger:Log("Studio-mode: Create and send player to ", {
+		Debugger:StudioLog("Create and send player to ", {
 			WorldId = self.GameTable.StageLib.WorldId;
 			Players = room:GetInstancePlayers();
 			TeleportData = teleportData;
@@ -75,6 +75,10 @@ function GameMode:WorldLoad(modeData)
 					profile.Analytics:LogTime("Arena:"..(modeData.Room.IsHard and "Hard-" or "")..gameStage, timePlayed);
 				end
 			end)
+
+			shared.modEventService:ServerInvoke("GameModeManager_BindGameModeComplete", {ReplicateTo=players}, {
+				Room = gameController.RoomData;
+			});
 		end;
 		
 		gameController.OnStart = function(players)
@@ -87,11 +91,13 @@ function GameMode:WorldLoad(modeData)
 
 		if gameController.Initiated == nil then
 			task.spawn(function()
+				modeData.Room.Type = gameType;
+				modeData.Room.Stage = gameStage;
+				
 				gameController:Initialize(modeData.Room);
 				gameController.Initiated = true;
 			end)
 		end
-		--GameMode.Active:Initialize(modeData.Room);
 	end
 end
 
