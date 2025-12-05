@@ -9,7 +9,7 @@ local Dialogues = {
 	Diana={};
 };
 
-local missionId = 71;
+local MISSION_ID = 71;
 --==
 
 -- !outline: Frank Dialogues
@@ -85,14 +85,14 @@ if RunService:IsServer() then
 
 				if itemList then
 
-					if modMission:CanCompleteMission(player, missionId, true) then
+					if modMission:CanCompleteMission(player, MISSION_ID, true) then
 						dialog:AddChoice("hvp_collect", function(dialog)
 							for a=1, #itemList do
 								inventory:Remove(itemList[a].ID, itemList[a].Quantity);
 							end
 							task.wait(0.5);
 
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 						end)
 					else
 						dialog:AddChoice("hvp_collectfull");
@@ -100,7 +100,7 @@ if RunService:IsServer() then
 
 				else
 					dialog:AddChoice("hvp_lost", function(dialog)
-						modMission:FailMission(player, missionId, "You somehow lost the package.");
+						modMission:FailMission(player, MISSION_ID, "You somehow lost the package.");
 					end)
 
 				end
@@ -130,7 +130,7 @@ if RunService:IsServer() then
 						shared.Notify(player, "You received a High Value Package.", "Reward");
 					end);
 
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint < 2 then
 							mission.ProgressionPoint = 2;
 						end;
@@ -144,7 +144,7 @@ if RunService:IsServer() then
 
 				if total <= 0 then
 					dialog:AddChoice("hvp_lost", function(dialog)
-						modMission:FailMission(player, missionId, "You somehow lost the package.");
+						modMission:FailMission(player, MISSION_ID, "You somehow lost the package.");
 					end)
 				end
 
@@ -174,12 +174,12 @@ if RunService:IsServer() then
 						end
 						task.wait(0.5);
 
-						modMission:CompleteMission(player, missionId);
+						modMission:CompleteMission(player, MISSION_ID);
 					end)
 
 				else
 					dialog:AddChoice("hvp_lost", function(dialog)
-						modMission:FailMission(player, missionId, "You somehow lost the package.");
+						modMission:FailMission(player, MISSION_ID, "You somehow lost the package.");
 					end)
 
 				end

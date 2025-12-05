@@ -4,7 +4,6 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 --== Server Variables;
 local MISSION_ID = 34;
@@ -35,8 +34,8 @@ return function(CutsceneSequence)
 		end
 		if player.Character == nil then return end;
 		
-		local strangerModule = modNpcs.getPlayerNpc(player, "Stranger", function(npcModule)
-			return npcModule.MissionId == MISSION_ID;
+		local strangerNpcClass: NpcClass? = shared.modNpcs.getPlayerNpc(player, "Stranger", function(npcClass: NpcClass)
+			return npcClass.Properties.MissionId == MISSION_ID;
 		end);
 
 		local function OnChanged(firstRun)
@@ -46,42 +45,46 @@ return function(CutsceneSequence)
 				if mission.ProgressionPoint == 1 then
 					
 				elseif mission.ProgressionPoint == 2 then
-					if strangerModule == nil then
+					if strangerNpcClass == nil then
 						local playerCframe = player.Character:GetPrimaryPartCFrame();
-						local npc = modNpcs.spawn(
-							"Stranger", 
-							playerCframe, 
-							function(npc, npcModule)
-								npcModule.MissionId = 34;
-								npcModule.FollowingOwner = true;
-								npcModule.Seed = (mission.SaveData.Seed or 1);
-								npcModule.Player = player;
-								strangerModule = npcModule;
-							end
-						);
-						npc:SetAttribute("Player", player.Name);
+
+						strangerNpcClass = shared.modNpcs.spawn2{
+							Name = "Stranger";
+							CFrame = playerCframe;
+							Player = player;
+							BindSetup = function(npcClass: NpcClass)
+								npcClass.Properties.MissionId = MISSION_ID;
+								npcClass.Properties.Seed = (mission.SaveData.Seed or 1);
+							end;
+						};
+						if strangerNpcClass then
+							strangerNpcClass:GetComponent("FollowPlayer")(nil, function() 
+								return mission.ProgressionPoint == 2;
+							end);
+							strangerNpcClass.Character:SetAttribute("Player", player.Name);
+						end
 					end
 					
 				elseif mission.ProgressionPoint == 3 then
-					if strangerModule and strangerModule.Prefab then
-						strangerModule.Immortal = 1;
+					if strangerNpcClass and strangerNpcClass.Character then
+						strangerNpcClass.Properties.Immortal = 1;
 						wait(1);
-						strangerModule.Prefab:Destroy();
-						strangerModule = nil;
+						strangerNpcClass.Character:Destroy();
+						strangerNpcClass = nil;
 					end
 				end
 				
 			elseif mission.Type == 3 then -- OnComplete
 				mission.Changed:Disconnect(OnChanged);
-				if strangerModule and strangerModule.Prefab then
-					strangerModule.Prefab:Destroy();
-					strangerModule = nil;
+				if strangerNpcClass and strangerNpcClass.Character then
+					strangerNpcClass.Character:Destroy();
+					strangerNpcClass = nil;
 				end
 				
 			elseif mission.Type == 4 then -- OnFail
-				if strangerModule and strangerModule.Prefab then
-					strangerModule.Prefab:Destroy();
-					strangerModule = nil;
+				if strangerNpcClass and strangerNpcClass.Character then
+					strangerNpcClass.Character:Destroy();
+					strangerNpcClass = nil;
 				end
 				
 			end

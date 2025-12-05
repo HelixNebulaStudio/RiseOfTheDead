@@ -44,6 +44,10 @@ function treePackage.ShouldRest(npcClass: NpcClass)
         return false;
     end
 
+    if properties.MapIdleTable == nil then
+        return false;
+    end
+
     if cache.NextRestTick == nil or tick() > cache.NextRestTick then
         return true;
     end
@@ -113,6 +117,10 @@ function treePackage.HasIdleTask(npcClass: NpcClass)
 
     local mapIdleTable = properties.MapIdleTable;
 
+    if properties.MapIdleTable == nil then
+        return false;
+    end
+    
     if properties.IdleTask then
         return true;
     end

@@ -411,7 +411,7 @@ return function(CutsceneSequence)
 		
 	end);
 
-	local zombieNpcClass = {};
+	local zombieNpcClasses = {};
 	local disableSecondSpawner = true;
 	
 	CutsceneSequence:NewServerScene("MasonArrives", function()
@@ -500,43 +500,38 @@ return function(CutsceneSequence)
 		local endSpawnLoop = false;
 		local zombieKilled = 0;
 
-		local function loadZombies(zombiePrefab, npcClass: NpcClass)
-			table.insert(zombieNpcClass, npcClass);
+		local function loadZombies(npcClass: NpcClass)
+			table.insert(zombieNpcClasses, npcClass);
 
-			npcClass.SetAggression = 3;
+			local npcChar = npcClass.Character;
+			local properties = npcClass.Properties;
 
-			local moduleIndex = #zombieNpcClass;
-			npcClass.Properties.TargetableDistance = 1024;
-			npcClass.Configuration.Level = 0;
-			
-			npcClass.Move:SetMoveSpeed("set", "default", 8, 0);
+			properties.Level = 0;
+			properties.HordeAggression = true;
+			properties.TargetableDistance = 1024;
+			properties.CanForgetTargets = false;
+
+			npcClass.Move:SetMoveSpeed("set", "forcespeed", 8, 9);
 
 			npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
 				if not isDead then return end;
 
 				zombieKilled = zombieKilled +1;
-				for a=#zombieNpcClass, 1, -1 do
-					if zombieNpcClass[a] == npcClass then
-						table.remove(zombieNpcClass, a);
+				for a=#zombieNpcClasses, 1, -1 do
+					if zombieNpcClasses[a] == npcClass then
+						table.remove(zombieNpcClasses, a);
 					end
 				end
 				if zombieKilled >= 5 then
 					endSpawnLoop = true;
 				end
-				wait(2);
-				Debugger.Expire(zombiePrefab, 0);
 			end)
 			
 			task.spawn(function()
-				npcClass.OnTarget(players);
-				while wait(1) do
-					if npcClass.Humanoid and npcClass.Humanoid.Health <= 0 then return end;
-					npcClass.Properties.AttackDamage = math.random(2, 4);
-					npcClass.OnTarget(players);
-
-					if masonNpcClass.Target == nil then
-						masonNpcClass.Target = zombiePrefab;
-					end
+				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+				targetHandlerComp:AddTarget(masonPrefab);
+				if math.random(1, 2) == 1 then
+					targetHandlerComp:AddTarget(playerClass.Character);
 				end
 			end)
 		end
@@ -552,7 +547,11 @@ return function(CutsceneSequence)
 				if endSpawnLoop then
 					break;
 				else
-					modNpcs.spawn("Zombie", pickSpawn(), loadZombies);
+					shared.modNpcs.spawn2{
+						Name = "Zombie";
+						CFrame = pickSpawn();
+						BindSetup = loadZombies;
+					};
 					task.wait(4);
 				end;
 			end
@@ -560,7 +559,11 @@ return function(CutsceneSequence)
 				if disableSecondSpawner then
 					break;
 				else
-					modNpcs.spawn("Zombie", pickSpawn(), loadZombies);
+					shared.modNpcs.spawn2{
+						Name = "Zombie";
+						CFrame = pickSpawn();
+						BindSetup = loadZombies;
+					};
 					task.wait(2);
 				end;
 			end
@@ -684,8 +687,8 @@ return function(CutsceneSequence)
 		modAudio.Play("VechicleExplosion", explosionSoundPart);
 		modAudio.Play("Explosion4", explosionSoundPart);
 
-		for a=#zombieNpcClass, 1, -1 do
-			local zombieNpcClass: NpcClass = zombieNpcClass[a];
+		for a=#zombieNpcClasses, 1, -1 do
+			local zombieNpcClass: NpcClass = zombieNpcClasses[a];
 
 			zombieNpcClass.HealthComp:TakeDamage(DamageData.new{
 				Damage = 10000;

@@ -9,7 +9,7 @@ local Dialogues = {
 	Lennon={};
 };
 
-local missionId = 29;
+local MISSION_ID = 29;
 --==
 
 -- !outline: Hilbert Dialogues
@@ -19,7 +19,7 @@ Dialogues.Hilbert.DialogueStrings = {
 		Reply="Note: Elr1Orj#996\nVshflphq H55 dqg J85 lv frqiluphg wr kdv hvfdshg. Vljqv vkrzv wkdw wkh lqihfwru kdv ehhq wr wkh vhfwru, lw pxvw kdyh frqwdplqdwhg uhohdvhg wkh vshflphqv.\n-Kloehuw Z.";
 	};
 	["labAssistant_note"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="What is this.. It's totally unintelligible.. *Notices BioX symbol on the back of the note*";
 		Reply="*still dead*";
 		FailResponses = {
@@ -83,7 +83,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("*dead body holding on to a blue note*");
 			dialog:AddChoice("labAssistant_start", function(dialog)
 				dialog:AddChoice("labAssistant_note", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end)
 
@@ -101,7 +101,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("labAssistant_note", function(dialog)
 						dialog:AddChoice("labAssistant_wait", function(dialog)
 							dialog:AddChoice("labAssistant_helped", function(dialog)
-								modMission:CompleteMission(player, missionId);
+								modMission:CompleteMission(player, MISSION_ID);
 							end)
 						end)
 					end)
@@ -120,7 +120,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("labAssistant_yes", function(dialog)
 					dialog:AddChoice("labAssistant_note", function(dialog)
 						dialog:AddChoice("labAssistant_disbelieve", function(dialog)
-							modMission:Progress(player, missionId, function(mission)
+							modMission:Progress(player, MISSION_ID, function(mission)
 								if mission.ProgressionPoint <= 1 then
 									mission.ProgressionPoint = 2;
 								end;

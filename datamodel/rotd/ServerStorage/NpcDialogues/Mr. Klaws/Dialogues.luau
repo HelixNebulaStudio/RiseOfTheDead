@@ -69,6 +69,8 @@ if RunService:IsServer() then
 		local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 		local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 	
+		local playerClass = shared.modPlayers.get(player);
+
 		local profile = modProfile:Get(player);
 		local playerSave = profile:GetActiveSave();
 		local inventory = playerSave.Inventory;
@@ -134,8 +136,8 @@ if RunService:IsServer() then
 				Say="I have ".. presentsRequired .." Christmas Presents 2022 for you.";
 			}
 			
-			local equippedToolID = profile.EquippedTools.ID;
-			local storageItem = inventory:Find(equippedToolID);
+			local equippedToolSiid = playerClass.WieldComp.Siid;
+			local storageItem = inventory:Find(equippedToolSiid);
 	
 			local itemDisplayLib = storageItem and modWorkbenchLibrary.ItemAppearance[storageItem.ItemId];
 			
@@ -148,10 +150,13 @@ if RunService:IsServer() then
 					dialog:AddDialog(dialogPacket, function(dialog)
 						modSkinPerm.AddSkinPermanent(storageItem, winterFestSkinId);
 	
-						for a=1, #profile.EquippedTools.WeaponModels do
-							if profile.EquippedTools.WeaponModels[a]:IsA("Model") then
-								local modColorsLibrary = shared.require(game.ReplicatedStorage.Library.ColorsLibrary);
-								modColorsLibrary.ApplyAppearance(profile.EquippedTools.WeaponModels[a], storageItem.Values);
+						if playerClass.WieldComp.ToolHandler and playerClass.WieldComp.ToolHandler.Prefabs then
+							local toolModels = playerClass.WieldComp.ToolHandler.Prefabs;
+							for a=1, #toolModels do
+								if toolModels.WeaponModels[a]:IsA("Model") then
+									local modColorsLibrary = shared.require(game.ReplicatedStorage.Library.ColorsLibrary);
+									modColorsLibrary.ApplyAppearance(toolModels.WeaponModels[a], storageItem.Values);
+								end
 							end
 						end
 						

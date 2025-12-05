@@ -7,7 +7,7 @@ local Dialogues = {
 	Mike={};
 };
 
-local missionId = 45;
+local MISSION_ID = 45;
 --==
 
 -- MARK: Mike Dialogues
@@ -19,7 +19,7 @@ Dialogues.Mike.DialogueStrings = {
 	};
 
 	["mlc_start"]={
-		CheckMission=missionId; 
+		CheckMission=MISSION_ID; 
 		Face="Smirk";
 		Say="I could help you look for it if you lead me there."; 
 		Reply="Oh, that would be great. Whenever you are ready.";
@@ -43,7 +43,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Ahh god.. Can't believe I left it.");
 			dialog:AddChoice("mlc_init", function(dialog)
 				dialog:AddChoice("mlc_start", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end);
 			
@@ -52,7 +52,7 @@ if RunService:IsServer() then
 			
 			if mission.ProgressionPoint == 4 or profile.Collectibles.mlc then
 				dialog:AddChoice("mlc_found", function(dialog)
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 			end
 			

@@ -4,7 +4,6 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 --== Variables;
 local MISSION_ID = 71;
@@ -70,7 +69,7 @@ return function(CutsceneSequence)
 				if mission.ProgressionPoint == 1 then
 
 				elseif mission.ProgressionPoint == 2 then
-					local classPlayer = shared.modPlayers.get(player);
+					local playerClass: PlayerClass = shared.modPlayers.get(player);
 
 					local spawnCfs = {};
 					task.delay(5, function()
@@ -87,30 +86,29 @@ return function(CutsceneSequence)
 									lastSpawnTick = tick()+math.random(14,32);
 
 								end
-								table.insert(spawnCfs, classPlayer.RootPart.CFrame);
+								table.insert(spawnCfs, playerClass.RootPart.CFrame);
 
 								if #banditSpawned > 3 then continue end;
-								if profile and classPlayer and classPlayer.IsAlive and classPlayer.Properties.InBossBattle == nil then
-									local lastDoorCf = spawnCfs[math.random(1, #spawnCfs)] or profile.LastDoorCFrame;
+								if not playerClass.HealthComp.IsDead and playerClass.Properties.InBossBattle == nil then
+									local lastDoorCf = spawnCfs[math.random(1, #spawnCfs)] or playerClass.Properties.LastDoorCFrame;
 
-									modNpcs.spawn("Bandit", profile.LastDoorCFrame, function(npc, npcModule)
-										npcModule.Properties.TargetableDistance = 4096;
-										npcModule.OnTarget(player);
-										npcModule.Properties.AttackDamage = 500;
-
-										function npcModule.CantFollow(destination)
-											npcModule.Prefab:Destroy();
-										end
-										Debugger.Expire(npcModule.Prefab, 60);
-										table.insert(banditSpawned, npc);
-									end);
+									local banditNpcClass: NpcClass = modNpcs.spawn2{
+										Name = "Bandit";
+										CFrame = lastDoorCf;
+										BindSetup = function(npcClass: NpcClass)
+											npcClass.Properties.TargetableDistance = 4096;
+											Debugger.Expire(npcClass.Character, 60);
+											table.insert(banditSpawned, npcClass);
+										end;
+									};
+									banditNpcClass:GetComponent("TargetHandler"):AddTarget(playerClass.Character);
 								end
 							end
 
 							if mission.ProgressionPoint ~= 2 or mission.Type ~= 1 then
 								break;
 							end
-							if classPlayer.IsAlive == false then
+							if playerClass.HealthComp.IsDead then
 								task.delay(1, function()
 									modMission:FailMission(player, MISSION_ID, "You died and the high value package was stolen.");
 								end)
@@ -126,20 +124,20 @@ return function(CutsceneSequence)
 					if targetNpcName == "Diana" then
 						Debugger:Warn("Diana walk out");
 
-						local dianaModule = modNpcs.getPlayerNpc(player, "Diana");
-						if dianaModule then
-							dianaModule.StopAnimation("Idle");
+						local dianaNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Diana");
+						if dianaNpcClass then
+							dianaNpcClass.StopAnimation("Idle");
 
-							dianaModule.InCutscene = true;
-							dianaModule.Actions:Teleport(CFrame.new(-130.710892, 10.5228786, 284.348938, 0, 0, -1, 0, 1, 0, 1, 0, 0));
-							dianaModule.Move:MoveTo(Vector3.new(-137.6, 10.5, 275.6));
-							dianaModule.Move.OnMoveToEnded:Wait(5);
+							dianaNpcClass.Properties.CutsceneActive = true;
+							dianaNpcClass:SetCFrame(CFrame.new(-130.710892, 10.5228786, 284.348938, 0, 0, -1, 0, 1, 0, 1, 0, 0));
+							dianaNpcClass.Move:MoveTo(Vector3.new(-137.6, 10.5, 275.6));
+							dianaNpcClass.Move.OnMoveToEnded:Wait(5);
 							
 							wait(0.3);
-							dianaModule.Actions:Teleport(CFrame.new(-136.80545, 10.5228777, 268.696259, 0.866, 0, -0.500000954, 0, 1, 0, 0.500000954, 0, 0.866024852));
-							dianaModule.Move:MoveTo(Vector3.new(-123.7, 10.5, 276.9));
-							dianaModule.Move.OnMoveToEnded:Wait(5);
-							dianaModule.Move:Face(Vector3.new(-118.4, 10.5, 276.9));
+							dianaNpcClass:SetCFrame(CFrame.new(-136.80545, 10.5228777, 268.696259, 0.866, 0, -0.500000954, 0, 1, 0, 0.500000954, 0, 0.866024852));
+							dianaNpcClass.Move:MoveTo(Vector3.new(-123.7, 10.5, 276.9));
+							dianaNpcClass.Move.OnMoveToEnded:Wait(5);
+							dianaNpcClass.Move:Face(Vector3.new(-118.4, 10.5, 276.9));
 						end
 
 

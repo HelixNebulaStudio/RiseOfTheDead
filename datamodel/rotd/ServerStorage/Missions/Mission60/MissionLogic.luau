@@ -3,15 +3,16 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
 
+local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
-local modEntity = shared.require(game.ReplicatedStorage.Library.Entity);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 
-local missionId = 60;
+local MISSION_ID = 60;
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	local modFactions = shared.require(game.ServerScriptService.ServerLibrary.Factions);
 	
 	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
@@ -28,7 +29,7 @@ if RunService:IsServer() then
 				local factionTag = tostring(profile.Faction.Tag);
 				
 				if factionTag == interactObjectFactionTag then
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 1 then
 							shared.Notify(player, triggerPlayer.Name .." has repaired the faction banner.", "Reward");
 							mission.ProgressionPoint = 2;
@@ -41,6 +42,16 @@ if RunService:IsServer() then
 				end
 			end
 		end
+	end)
+
+	shared.modEventService:OnInvoked("Generic_BindTrigger", function(event: EventPacket, ...)
+		local player: Player? = event.Player;
+		if player == nil then return end;
+
+		local id: string, interactable: InteractableInstance = ...;
+		if id == nil or interactable == nil then return end;
+
+
 	end)
 	
 	bannersFolder = Instance.new("Folder");
@@ -81,11 +92,19 @@ if RunService:IsServer() then
 					
 					local factionbannerPrefab = game.ReplicatedStorage.Prefabs.Items.factionbanner:Clone();
 					
-					local factionBannerInteractable = script.Parent:WaitForChild("bannerInteractable");
+					local factionBannerInteractConfig = modInteractables.createInteractable("Button");
+					factionBannerInteractConfig:SetAttribute("_Id", "mission60RepairBanner");
+					factionBannerInteractConfig:SetAttribute("_Label", "Repair Faction Banner");
+					factionBannerInteractConfig:SetAttribute("_InteractDuration", 5);
+					factionBannerInteractConfig.Parent = factionbannerPrefab;
 
-					local interactableModule = factionBannerInteractable:Clone();
-					interactableModule.Name = "Interactable";
-					interactableModule.Parent = factionbannerPrefab;
+					local factionBannerInteractable: InteractableInstance = modInteractables.getOrNew(factionBannerInteractConfig);
+
+					local saveData = mission.SaveData;
+					local itemLib = modItemLibrary:Find(saveData.RepairItemId);
+						
+					factionBannerInteractable.Label = `Repair Faction Banner with {saveData.RepairCost} {itemLib.Name}.`;
+					factionBannerInteractable:Sync();
 					
 					local primaryPart = factionbannerPrefab:WaitForChild("Handle");
 					primaryPart.Anchored = true;
@@ -117,11 +136,11 @@ if RunService:IsServer() then
 					factionbannerPrefab.Parent = bannersFolder;
 					
 					task.delay(300, function()
-						local bannerDestructible = modEntity:GetDestructible(factionbannerPrefab);
+						local bannerDestructible: DestructibleInstance = modDestructibles.getOrNew(factionbannerPrefab.Destructible);
 						if bannerDestructible then
-							bannerDestructible.MaxHealth = 10000;
-							bannerDestructible.Health = bannerDestructible.MaxHealth;
-							bannerDestructible.Enabled = true;
+							bannerDestructible.HealthComp:SetMaxHealth(10000);
+							bannerDestructible.HealthComp:Reset();
+							bannerDestructible:SetEnabled(true);
 						end
 					end)
 					
@@ -130,11 +149,11 @@ if RunService:IsServer() then
 					if factionbannerPrefab then
 						factionbannerPrefab:SetAttribute("Repaired", true);
 						
-						local bannerDestructible = modEntity:GetDestructible(factionbannerPrefab);
+						local bannerDestructible: DestructibleInstance = modDestructibles.getOrNew(factionbannerPrefab.Destructible);
 						if bannerDestructible then
-							bannerDestructible.MaxHealth = 10000;
-							bannerDestructible.Health = bannerDestructible.MaxHealth;
-							bannerDestructible.Enabled = true;
+							bannerDestructible.HealthComp:SetMaxHealth(10000);
+							bannerDestructible.HealthComp:Reset();
+							bannerDestructible:SetEnabled(true);
 						end
 					end
 					
@@ -210,16 +229,18 @@ if RunService:IsServer() then
 					enemyBanner.Parent = workspace.Environment;
 					modReplicationManager.ReplicateOut({player}, enemyBanner);
 
-					local bannerDestructible = shared.require(enemyBanner:WaitForChild("Destructible"));
 					
-					bannerDestructible.MaxHealth = 50000;
-					bannerDestructible.Health = bannerDestructible.MaxHealth;
-					
-					bannerDestructible.NetworkOwners = {player};
+					local bannerDestructible: DestructibleInstance = modDestructibles.getOrNew(factionbannerPrefab.Destructible);
+					if bannerDestructible then
+						bannerDestructible.NetworkOwners = {player};
+						bannerDestructible.HealthComp:SetMaxHealth(50000);
+						bannerDestructible.HealthComp:Reset();
+						bannerDestructible:SetEnabled(true);
+					end
 					
 					task.delay(300, function()
 						bannerDestructible.NetworkOwners = nil;
-						bannerDestructible.Enabled = true;
+						bannerDestructible:SetEnabled(true);
 					end)
 					
 					local function onEnemyBannerDestroy()
@@ -233,13 +254,12 @@ if RunService:IsServer() then
 						};
 						
 						if game.Players:IsAncestorOf(player) then
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 						end
 					end
 					enemyBanner.Destroying:Connect(onEnemyBannerDestroy);
-					bannerDestructible.OnDestroy = onEnemyBannerDestroy;
-					bannerDestructible.Enabled = true;
-
+					bannerDestructible.OnDestroy:Connect(onEnemyBannerDestroy);
+					bannerDestructible:SetEnabled(true);
 					
 				end
 			elseif mission.Type == 3 then -- OnComplete

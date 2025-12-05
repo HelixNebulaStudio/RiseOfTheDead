@@ -4,14 +4,23 @@ export type anyfunc = ((...any)->...any);
 -- constant uniontypes
 export type GAME_EVENT_KEY<U> = U
     | "Crates_BindSpawn"
+    | "Character_BindDismount"
     | "Doors_BindDoorToggle" -- Physical doors
+    | "Destructibles_BindDestroyed"
     | "Dialogue_BindTalkedTo"
+    | "FotlCardGame_BindNpcLose"
+    | "FotlCardGame_BindNpcWin"
+    | "FotlCardGame_BindPlayerWin"
     | "Generic_BindClockTick"
     | "Generic_BindItemPickup"
     | "Generic_BindTrigger"
+    | "Generic_BindClientTrigger"
     | "Interactables_BindButtonInteract"
+    | "Interactables_BindHoldInteract"
     | "Interactables_BindButtonPrompt"
     | "Interactables_BindDoorInteract" -- Teleport doors
+    | "Instrument_BindNotesPlayed"
+    | "NpcComponent_BindDropReward"
     | "Npcs_BindEnemiesAttract"
     | "Npcs_BindDamaged"
     | "Npcs_BindDeath"
@@ -72,7 +81,6 @@ declare shared: {
     Notify: (player: Player | {Player}, message: string, notifyTypes: NOTIFY_TYPE, notifyId: string?, notifySettings: anydict?) -> nil;
 
     -- @game globals
-    WorldCore: anydict;
     EventSignal: EventSignal<>;
     modPlayers: PlayerClasses;
     modProfile: Profiles;
@@ -81,6 +89,10 @@ declare shared: {
     modNpcs: NpcClasses;
     modEventService: EventService;
     modEngineCore: EngineCore;
+
+    -- @world globals
+    WorldCore: anydict;
+    GameController: anydict;
 };
 
 --MARK: Const
@@ -227,6 +239,9 @@ export type Profiles = {
     Find: (Profiles, playerName: string) -> Profile;
     WaitForProfile: (Profiles, player: Player, duration: number?) -> Profile;
     IsPremium: (Profiles, player: Player) -> boolean;
+
+    -- @signals
+    OnProfileLoad: EventSignal<Player, Profile>;
 };
 
 export type Profile = {
@@ -291,6 +306,7 @@ export type GameSave = {
     _new: (gameSave: GameSave, profile: Profile) -> nil;
     _load_storage: (gameSave: GameSave, storageId: string, rawStorage: anydict) -> nil;
     _loaded: (gameSave: GameSave) -> nil;
+    _unload: (profile: Profile) -> nil;
 };
 
 export type MissionsProfile = {
@@ -307,7 +323,9 @@ export type MissionsProfile = {
 --MARK: Storage
 export type Storages = {
     -- @static
+    new: (id: string, presetId: string, owner: Player?) -> Storage;
     get: (sid: string, player: Player?) -> Storage?;
+
     openStorage: (storageId: string, params: {
         StoragePresetId: string;
 
@@ -441,6 +459,7 @@ export type StorageItem = {
     Sync: (StorageItem, keys: {string}?) -> nil;
     GetValues: (StorageItem, key: string) -> any;
     SetValues: (StorageItem, key: string, value: any?, syncFunc: any?) -> StorageItem;
+    DeleteValues: (StorageItem, key: string, syncFunc: any?) -> StorageItem;
     Clone: (StorageItem) -> StorageItem;
 }
 
@@ -460,13 +479,23 @@ export type AppearanceData = {
 export type PlayerClasses = {
     -- @static
     get: (Player) -> PlayerClass;
-    getByName: (name: string) ->  PlayerClass;
+    getByName: (name: string) -> PlayerClass;
+    getByModel: (Model) -> PlayerClass;
     getAvatar: (userId: number) -> string;
     getPlayersInRange: (origin: Vector3, radius: number) -> {Player};
+    cameraShakeAndZoom: (
+        players: (anydict | Player)?, 
+        shakeStrength: number?, 
+        zoomStrength: number?, 
+        duration: number?, 
+        smoothing: number?, 
+        disallowOverride: boolean?
+    ) -> nil;
 
     PositionsOctree: Octree<PlayerClass>;
-    
+
     -- @signals
+    OnPlayerSpawn: EventSignal<PlayerClass>;
     OnPlayerDied: EventSignal<PlayerClass>;
 };
 
@@ -508,13 +537,12 @@ export type PlayerClass = CharacterClass & {
 
     RefreshHealRate: (PlayerClass) -> nil;
 
+    BindCharacterAdded: (character: Model)->nil;
     OnDeathServer: (PlayerClass)->nil;
-    OnCharacterAdded: (character: Model)->nil;
     OnPlayerTeleport: ()->nil;
     
     -- @signals
     OnIsDeadChanged: EventSignal<any>;
-    OnDamageTaken: EventSignal<any>;
     OnCharacterSpawn: EventSignal<any>;
 
     -- @binds
@@ -557,8 +585,19 @@ export type CharacterClass = {
     Initialize: () -> nil;
 };
 
+--MARK: Entity
+export type ObjectEntity = {
+    Id: number;
+    Model: Model;
+    Configurations: {Configuration};
+
+    -- @methods
+    GetDoor: (ObjectEntity) -> DoorInstance;
+    GetInteractable: (ObjectEntity) -> InteractableInstance;
+};
+
 --MARK: StatusClass
-type StatusPackage = {
+export type StatusPackage = {
     Id: string;
     Icon: string;
     Name: string;
@@ -601,6 +640,8 @@ export type StatusClassInstance = {
     Alpha: number?;
     Text: string?;
 
+    ApplyBy: CharacterClass?;
+    ApplyTo: CharacterClass?;
     
     -- @methods
     Sync: (StatusClassInstance, players: any)->nil; --Server to Client
@@ -622,7 +663,7 @@ export type NpcClasses = {
     getNpcPackage: (npcName: string) -> anydict;
     getByModel: (Model) -> NpcClass?;
     getById: (number) -> NpcClass?;
-    getPlayerNpc: (player: Player, npcName: string) -> NpcClass?;
+    getPlayerNpc: (player: Player, npcName: string, matchFunc: ((npcClass: NpcClass) -> boolean)?) -> NpcClass?;
     listNpcClasses: (matchFunc: (npcClass: NpcClass) -> boolean) -> {NpcClass};
     listInRange: (position: Vector3, radius: number, maxRootpart: number?) -> {NpcClass};
     attractNpcs: (model: Model, range: number, func: ((npcClass: NpcClass)-> boolean)? ) -> {NpcClass};
@@ -656,12 +697,22 @@ export type NpcClasses = {
 
 
 export type NpcMoveComponent = {
+    -- @enums
+    MoveSpeedPriority: {
+        Movement: number;
+        Action: number;
+        StatusEffect: number;
+    };
+
     -- @properties
-    SetDefaultWalkSpeed: number;
+    IsMoving: boolean;
+    IsFlying: boolean;
+    LinearVelocity: LinearVelocity;
+    AlignOrientation: AlignOrientation;
 
     -- @methods
     Init: anyfunc;
-    HeadTrack: (NpcMoveComponent, part: BasePart, expireTime: number?) -> nil;
+    HeadTrack: (NpcMoveComponent, part: BasePart?, expireTime: number?) -> nil;
     MoveTo: (NpcMoveComponent, position: Vector3) -> nil;
     Face: (NpcMoveComponent, target: Vector3 | BasePart | "Player", faceSpeed: number?, duration: number?) -> nil;
     LookAt: (NpcMoveComponent, point: Vector3 | BasePart) -> nil;
@@ -672,7 +723,7 @@ export type NpcMoveComponent = {
     Pause: (NpcMoveComponent, pauseTime: number?) -> nil;
     Resume: (NpcMoveComponent) -> nil;
     Recompute: (NpcMoveComponent) -> nil;
-    Fly: (NpcMoveComponent, trajPoints: ({{Velocity: Vector3;Direction: Vector3;}})?, delta: number, onStepFunc: anyfunc?) -> nil;
+    Fly: (NpcMoveComponent, trajPoints: ({{Velocity: Vector3;Direction: Vector3;}})?, delta: number?, onStepFunc: anyfunc?) -> nil;
 
     -- @signals
     OnMoveToEnded: EventSignal<any>;
@@ -717,11 +768,12 @@ export type NpcClass = CharacterClass & {
     BreakJoint: (NpcClass, motor: Motor6D) -> nil;
     IsInVision: (NpcClass, object: BasePart | Model, fov: number?) -> boolean;
     ToggleInteractable: (NpcClass, v: boolean) -> nil;
-    UseInteractable: (NpcClass, interactableId: string, ...any) -> ...any;
+    UseInteractable: (NpcClass, interactableIdorConfig: string | Configuration, ...any) -> ...any;
     IsRagdolling: (NpcClass) -> boolean;
     GetMapLocation: (NpcClass) -> string;
-    Sit: (NpcClass, Seat) -> nil;
+    Sit: (NpcClass, Seat?) -> nil;
     UpdateClothing: (NpcClass) -> nil;
+    SendActorMessage: (NpcClass, ...any) -> nil;
 
     -- @signals
     OnThink: EventSignal<any>;
@@ -764,6 +816,7 @@ export type InteractableMeta = {
     IndicatorPresist: boolean;
     InteractableRange: number;
     InteractDuration: number;
+    CaptureHoldRange: number;
     Remote: RemoteFunction;
 
     Package: anydict;
@@ -777,8 +830,13 @@ export type InteractableMeta = {
     LastPermChanged: number;
     LastProximityTrigger: number;
 
+    ActiveCharacters: {Model};
+
     -- @methods
     Trigger: (InteractableInstance) -> nil;
+    Interact: (InteractableInstance, packet: anydict) -> nil;
+    Reset: (InteractableInstance) -> nil;
+    InteractLogic: (InteractableInstance, processType: string, interactInfo: InteractInfo?) -> anydict;
 
     InteractServer: (InteractableInstance, values: anydict) -> nil;
 
@@ -811,6 +869,8 @@ export type InteractableInstance = {
     Shrink: (InteractableInstance) -> anydict;
     IsDebounced: (InteractableInstance, name: string, duration: number?) -> boolean;
 
+    BindReset: (interactable: InteractableInstance) -> nil;
+    BindHold: (interactable: InteractableInstance, info: InteractInfo) -> nil;
     BindInteract: (interactable: InteractableInstance, info: InteractInfo) -> nil;
     BindPrompt: (interactable: InteractableInstance, info: InteractInfo) -> nil;
     BindSync: (interactable: InteractableInstance, data: anydict) -> nil;
@@ -881,6 +941,7 @@ export type Interface = {
     }, newButtonTemplate: GuiObject?) -> DropdownList;
 
     -- @properties;
+    IsDestroyed: boolean;
     ActiveLayerBoolString: string?;
     Script: Script;
     ScreenGui: ScreenGui;
@@ -1097,7 +1158,8 @@ export type GunToolHandler = ToolHandler & {
     PrimaryFireRequest: (toolHandler: GunToolHandlerInstance, direction: Vector3, enemyHumanoid: Humanoid?) -> nil;
     ReloadRequest: (toolHandler: GunToolHandlerInstance) -> nil;
     ToggleIdle: (toolHandler: GunToolHandlerInstance, value: boolean) -> nil;
-    PullTrigger: (toolHandler: ToolHandlerInstance) -> nil;
+    PullTrigger: (toolHandler: GunToolHandlerInstance) -> nil;
+    LoadGun: (toolHandler: GunToolHandlerInstance) -> nil;
 };
 export type GunToolHandlerInstance = ToolHandlerInstance & GunToolHandler;
 
@@ -1125,7 +1187,13 @@ export type ToolAnimator = {
     GetKeysPlaying: (ToolAnimator, animKeys: {string}) -> {[string]: AnimationTrack};
     LoadAnimations: (ToolAnimator, animations: anydict, default: string, prefabs: {Model}) -> nil;
     ConnectMarkerSignal: (ToolAnimator, markerKey: string, func: ((animKey: string, track: AnimationTrack, value: any)->nil)) -> nil;
-    
+    GetTrackData: (ToolAnimator, animKey: string) -> {
+        CategoryId: string;
+        
+        Name: string;
+        Track: AnimationTrack;
+    };
+
     GetState: (ToolAnimator) -> string;
     SetState: (ToolAnimator, state: string?) -> nil;
     HasState: (ToolAnimator, state: string) -> boolean;
@@ -1223,10 +1291,13 @@ export type EquipmentClass = {
 
     ClassSelf: any;
 
+    StorageItem: StorageItem;
+
     -- @methods
     SetEnabled: (EquipmentClass, value: boolean) -> nil;
     Update: (EquipmentClass, storageItem: StorageItem?) -> nil;
     Destroy: (EquipmentClass) -> nil;
+    SetStorageItem: (EquipmentClass, storageItem: StorageItem) -> nil;
     
     AddBaseModifier: (EquipmentClass, modifierId: string, config: {
         BaseValues: anydict?;
@@ -1297,7 +1368,6 @@ export type ItemModifierInstance = {
     Player: Player?;
     ModLibrary: (anydict?);
     EquipmentClass: EquipmentClass?;
-    EquipmentStorageItem: StorageItem?;
     ItemModStorageItem: StorageItem?;
 
 } & ItemModifier & ConfigModifier;
@@ -1315,6 +1385,8 @@ export type DestructibleInstance = {
     -- @properties
     ClassName: string;
     Config: Configuration;
+
+    Id: string?;
     Name: string;
     Model: Model;
     Package: anydict;
@@ -1324,6 +1396,8 @@ export type DestructibleInstance = {
     HealthComp: HealthComp;
     StatusComp: StatusComp;
 
+    Properties: PropertiesVariable<anydict>;
+    
     NetworkOwners: {Player};
     DebrisName: string;
 
@@ -1333,10 +1407,10 @@ export type DestructibleInstance = {
     -- @methods
     SetEnabled: (DestructibleInstance, value: boolean) -> nil;
     SetupHealthbar: (DestructibleInstance, params: {
-        Size: UDim2;
-        Distance: number;
-        ShowLabel: boolean;
-        OffsetWorldSpace: Vector3;
+        Size: UDim2?;
+        Distance: number?;
+        ShowLabel: boolean?;
+        OffsetWorldSpace: Vector3?;
     }) -> nil;
     SetHealthbarEnabled: (DestructibleInstance, value: boolean) -> nil;
 
@@ -1383,6 +1457,7 @@ export type ProjectileInstance = {
 
     Configurations: anydict;
     Properties: PropertiesVariable<anydict>;
+    Garbage: GarbageHandler;
 
     ArcTracer: ArcTracer;
     ArcTracerConfig: {
@@ -1456,7 +1531,8 @@ export type DoorInstance = {
     WidthType: "Single" | "Double";
 
     --@methods
-    Toggle: (DoorInstance, open: boolean?, openerCFrame: CFrame?, player: Player?) -> nil;  
+    Toggle: (DoorInstance, open: boolean?, openerCFrame: CFrame?, player: Player?) -> nil;
+    PlaySlam: (DoorInstance, playbackSpeed: number?) -> nil;
 };
 
 --MARK: TeamsManager
@@ -1586,6 +1662,7 @@ export type StatusCompApplyParam = {
 --MARK: OnBulletHitPacket
 export type OnBulletHitPacket = {
     OriginPoint: Vector3;
+    HitInfo: HitInfo;
     
     TargetPart: BasePart;
     TargetPoint: Vector3;
@@ -1596,6 +1673,13 @@ export type OnBulletHitPacket = {
 
     TargetModel: Model;
     IsHeadshot: boolean;
+}
+
+export type HitInfo = {
+    Part: BasePart?;
+    Position: Vector3?;
+    Normal: Vector3?;
+    Index: number;
 }
 
 --MARK: ArcPoint
@@ -1659,6 +1743,7 @@ export type HealthComp = {
     CurArmor: number;
     MaxArmor: number;
 
+    LastReset: number?;
     FirstDamageTaken: number?;
     LastDamagedBy: CharacterClass?;
     
@@ -1686,9 +1771,9 @@ export type HealthComp = {
     BindCannotTakeDamage: (HealthComp, attackerCharacter: CharacterClass, shotInfo: {Part: BasePart; Index: number;}) -> nil;
 
     -- @signals
-    OnHealthChanged: EventSignal<number, number, anydict?>;
-    OnArmorChanged: EventSignal<number, number, anydict?>;
-    OnIsDeadChanged: EventSignal<boolean, boolean, anydict?>;
+    OnHealthChanged: EventSignal<number, number, DamageData?>;
+    OnArmorChanged: EventSignal<number, number, DamageData?>;
+    OnIsDeadChanged: EventSignal<boolean, boolean, DamageData?>;
 }
 
 --MARK: StatusComp
@@ -1703,6 +1788,7 @@ export type StatusComp = {
     Remote: RemoteEvent;
     ProcessNextStep: boolean;
     UseScheduler: boolean;
+    IsDestroyed: boolean;
 
     -- @methods
     Apply: (StatusComp, uid: string, value: StatusCompApplyParam?) -> StatusClassInstance;
@@ -1728,6 +1814,7 @@ export type WieldComp = {
     TargetableTags: {[string]: boolean};
 
     ToolHandler: ToolHandlerInstance?;
+    StorageItem: StorageItem?;
     Siid: string?;
     ItemId: string?;
     EquipmentClass: EquipmentClass?;

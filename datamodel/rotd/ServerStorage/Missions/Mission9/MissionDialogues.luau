@@ -7,13 +7,13 @@ local Dialogues = {
 	Stephanie={};
 };
 
-local missionId = 9;
+local MISSION_ID = 9;
 --==
 
 -- !outline: Stephanie Dialogues
 Dialogues.Stephanie.DialogueStrings = {		
 	["specialmods_start"]={
-		CheckMission=missionId; 
+		CheckMission=MISSION_ID; 
 		Say="What did you find?";
 		Face="Suspicious"; Reply="I found a way to attach special mods to your weapons.";
 		FailResponses = {
@@ -62,7 +62,7 @@ if RunService:IsServer() then
 			dialog:AddChoice("specialmods_start", function(dialog)
 				dialog:AddChoice("specialmods_like", function(dialog)
 					dialog:AddChoice("specialmods_amazing", function(dialog)
-						modMission:StartMission(player, missionId, function(successful)
+						modMission:StartMission(player, MISSION_ID, function(successful)
 							if successful then
 								modBlueprints.UnlockBlueprint(player, "incendiarybp");
 

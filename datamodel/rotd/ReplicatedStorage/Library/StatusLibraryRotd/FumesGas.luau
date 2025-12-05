@@ -26,6 +26,7 @@ end
 
 
 function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
+    if RunService:IsClient() then return end;
     if tickData.ms100 ~= true then return end;
 
     if statusClass.Values.LastRefresh == nil then
@@ -64,6 +65,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     -- Damage items;
     if characterClass.ClassName ~= "PlayerClass" then return end;
     local playerClass: PlayerClass = (characterClass :: PlayerClass);
+    local wieldComp: WieldComp = playerClass.WieldComp;
 
     local profile = shared.modProfile:Get(playerClass:GetInstance());
     local gameSave = profile:GetActiveSave();
@@ -77,11 +79,14 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
         local storageItem = clothingList[a];
         local siid = storageItem.ID;
 
-        local itemClass = profile:GetItemClass(siid);
-        if itemClass == nil or itemClass.GasProtection == nil then continue end;
-
+        local equipmentClass: EquipmentClassRotd = wieldComp:GetEquipmentClass(siid);
+        if equipmentClass == nil then continue end;
+        
         local itemLib = modItemsLibrary:Find(storageItem.ItemId);
         if itemLib == nil then continue end;
+        
+        local configurations = equipmentClass.Configurations;
+        if configurations.GasProtection == nil then continue end;
 
         local prevHealth = storageItem:GetValues("Health") or 100;
         if prevHealth <= 0 then
@@ -89,9 +94,9 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
             continue;
         end;
 
-        if itemClass.GasProtection > largestGasProtect then
+        if configurations.GasProtection > largestGasProtect then
             largestStorageItem = storageItem;
-            largestGasProtect = itemClass.GasProtection;
+            largestGasProtect = configurations.GasProtection;
         end
     end
 

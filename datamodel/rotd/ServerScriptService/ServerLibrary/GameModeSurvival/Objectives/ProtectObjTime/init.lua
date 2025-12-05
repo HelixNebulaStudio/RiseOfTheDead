@@ -119,11 +119,11 @@ function Objective:Begin()
 end
 
 function Objective:Tick()
-	if tick() > self.EndTime and #self.Controller.EnemyModules <= 0 then
+	if tick() > self.EndTime and #self.Controller.EnemyNpcClasses <= 0 then
 		return true;
 	end
 	
-	if tick()-self.LastZombieSpawn >= 1 and #self.Controller.EnemyModules <= 50 and tick() < self.EndTime then
+	if tick()-self.LastZombieSpawn >= 1 and #self.Controller.EnemyNpcClasses <= 50 and tick() < self.EndTime then
 		self.LastZombieSpawn = tick();
 		
 		local enemyName = self.Controller:PickEnemy();

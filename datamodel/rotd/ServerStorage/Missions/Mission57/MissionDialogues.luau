@@ -7,13 +7,13 @@ local Dialogues = {
 	["Mr. Klaws"]={};
 };
 
-local missionId = 57;
+local MISSION_ID = 57;
 --==
 
 -- MARK: Mr. Klaws Dialogues
 Dialogues["Mr. Klaws"].DialogueStrings = {
 	["klawsWorkshop_init"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Sure, but where is your workshop?";
 		Reply="Here's a map, good luck!";
 	};
@@ -31,7 +31,7 @@ if RunService:IsServer() then
 		if mission.Type == 1 then -- Active
 			if mission.ProgressionPoint == 3 then
 				dialog:AddChoice("klawsWorkshop_done", function(dialog)
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 			end
 		
@@ -48,7 +48,7 @@ if RunService:IsServer() then
 				
 				if hasSpace then
 					activeInventory:Add("klawsmap");
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 					shared.Notify(player, "You have received Mr. Klaw's Workshop Map!", "Positive");
 					
 				else

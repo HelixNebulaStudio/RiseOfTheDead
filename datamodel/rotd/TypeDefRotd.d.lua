@@ -9,6 +9,7 @@ export type GAME_EVENT_KEY_ROTD =
     | "Interactables_BindCollectibleInteract"
     | "Skills_BindResourceGatherers"
     | "Shop_BindActionEvent"
+    | "Survivor_BindInventoryChanged"
     | "WorkbenchService_BindInterfaceToggle"
     | "WorkbenchService_BindItemSelect"
     ;

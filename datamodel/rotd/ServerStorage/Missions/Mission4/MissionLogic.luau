@@ -18,7 +18,7 @@ function MissionLogic.onRequire()
 	local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
 	if not modBranchConfigs.IsWorld("TheWarehouse") then return; end;
-	 
+	
 	shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
 		local npcClass: NpcClass = ...;
 		if npcClass == nil or npcClass.HumanoidType ~= "Zombie" then return end;

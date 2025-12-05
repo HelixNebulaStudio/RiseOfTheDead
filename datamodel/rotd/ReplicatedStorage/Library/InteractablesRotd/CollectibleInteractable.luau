@@ -12,7 +12,7 @@ local modReplicationManager = shared.require(game.ReplicatedStorage.Library.Repl
 local interactablePackage = {};
 --==
 function interactablePackage.init(super) -- Server/Client
-    local Collectible = {
+    local Collectible = super.newPackage{
 		Name = "Collectible";
         Type = "Button";
     };
@@ -27,7 +27,7 @@ function interactablePackage.init(super) -- Server/Client
 			modAudio.Play("Collectible", nil, nil, false);
         end
 
-        interactable.TypePackage.BindInteract(interactable, info);
+        Collectible.TypePackage.BindInteract(interactable, info);
 
         -- MARK: Server side
         if info.Action == "Client" then return end;

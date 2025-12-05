@@ -7,9 +7,7 @@ local Dialogues = {
 	["Mysterious Engineer"]={};
 };
 
-local missionId = 77;
-local cache = {};
-
+local MISSION_ID = 77;
 --==
 
 -- !outline: Mysterious Engineer Dialogues
@@ -118,7 +116,6 @@ if RunService:IsServer() then
 	Dialogues["Mysterious Engineer"].DialogueHandler = function(player, dialog, data, mission)
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-		local playerSave = shared.modProfile:Get(player):GetActiveSave();
 
 		local profile = shared.modProfile:Get(player);
 		local inventory = profile.ActiveInventory;
@@ -157,7 +154,7 @@ if RunService:IsServer() then
 										shared.Notify(player, `{itemsList[a]:GetCustomName() or itemsList[a].Library.Name} was removed from your Inventory.`, `Negative`);
 									end
 									
-									modMission:StartMission(player, missionId);
+									modMission:StartMission(player, MISSION_ID);
 								end)
 								
 							end)
@@ -180,7 +177,7 @@ if RunService:IsServer() then
 
 				dialog:AddChoice("bofb_4washed", function(dialog)
 					dialog:AddChoice("bofb_4washed2", function(dialog)
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 5 then
 								mission.ProgressionPoint = 5;
 							end
@@ -213,7 +210,7 @@ if RunService:IsServer() then
 									inventory:Add("portableautoturretbp");
 									shared.Notify(player, `Portable Auto Turret Blueprint was added to your Inventory.`, `Inform`);
 									
-									modMission:CompleteMission(player, missionId);
+									modMission:CompleteMission(player, MISSION_ID);
 								end)
 								
 							end

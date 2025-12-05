@@ -44,9 +44,8 @@ function modifierPackage.Kick(modifier: ItemModifierInstance, targetModel)
 	statusComp:Apply("ChivalrousKick", {
 		Expires = workspace:GetServerTimeNow() + 3;
 		Duration = 3;
-		Values = {
-			ApplyBy = ownerClass;
-		};
+		ApplyBy = ownerClass;
+		Values = {};
 	});
 
 	local rootPart: BasePart = targetModel.PrimaryPart;

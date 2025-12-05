@@ -5,7 +5,7 @@ local localPlayer = game.Players.LocalPlayer;
 local interactablePackage = {};
 
 function interactablePackage.init(super) -- Server/Client
-    local ResupplyStation = {
+    local ResupplyStation = super.newPackage{
 		Name = "ResupplyStation";
         Type = "ResupplyStation";
 

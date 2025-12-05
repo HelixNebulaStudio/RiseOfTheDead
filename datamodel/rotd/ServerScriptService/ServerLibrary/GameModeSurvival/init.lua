@@ -16,7 +16,6 @@ local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchCon
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
-local modEventSignal = shared.require(game.ReplicatedStorage.Library.EventSignal);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 local modItemLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -61,7 +60,7 @@ function Survival.new()
 		Players = {};
 		Characters = {};
 		
-		EnemyModules = {};
+		EnemyNpcClasses = {};
 		EnemiesSpawned = 0;
 		
 		Wave = 1;
@@ -300,33 +299,34 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 	local level = paramPacket.Level or 1;
 	
 	if self.OnNpcSpawnHooked == nil then
-		self.OnNpcSpawnHooked = modNpcs.OnNpcSpawn:Connect(function(npcModule)
-			if modConfigurations.TargetableEntities[npcModule.Humanoid.Name] == nil then return end; -- Not enemy spawn;
+		self.OnNpcSpawnHooked = modNpcs.OnNpcSpawn:Connect(function(npcClass: NpcClass)
+			local humanoidType = npcClass.HumanoidType;
+			if modConfigurations.TargetableEntities[humanoidType] == nil then return end; -- Not enemy spawn;
 			
-			table.insert(self.EnemyModules, npcModule);
+			table.insert(self.EnemyNpcClasses, npcClass);
 			
-			npcModule.Garbage:Tag(function()
-				for a=#self.EnemyModules, 1, -1 do
-					if self.EnemyModules[a] == npcModule then
-						table.remove(self.EnemyModules, a);
+			npcClass.Garbage:Tag(function()
+				for a=#self.EnemyNpcClasses, 1, -1 do
+					if self.EnemyNpcClasses[a] == npcClass then
+						table.remove(self.EnemyNpcClasses, a);
 						break;
 					end
 				end
 			end)
 			
-			npcModule:Died(function()
+			npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
+				if not isDead then return end;
+
 				self.LastKilled = tick();
-				for a=#self.EnemyModules, 1, -1 do
-					if self.EnemyModules[a] == npcModule then
-						table.remove(self.EnemyModules, a);
+				for a=#self.EnemyNpcClasses, 1, -1 do
+					if self.EnemyNpcClasses[a] == npcClass then
+						table.remove(self.EnemyNpcClasses, a);
 						break;
 					end
 				end
-
-				npcModule.DeathPosition = npcModule.RootPart.CFrame.p;
-
-				self.LastEnemyDeathPos = npcModule.DeathPosition;
-			end);
+				
+				self.LastEnemyDeathPos = npcClass:GetCFrame().Position;
+			end)
 		end)
 	end
 	
@@ -336,45 +336,49 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 	end
 
 	local currWave = self.Wave;
-	local newNpcModule;
-	local npcPrefab = modNpcs.spawn(npcName, spawnCf, function(npcPrefab, npcModule)
-		task.spawn(function()
-			while currWave == self.Wave do
-				task.wait(1);
-			end
-			if npcModule.IsDead then return end;
-			npcModule:Destroy();
-		end)
-		self.EnemiesSpawned = self.EnemiesSpawned + 1;
-		newNpcModule = npcModule;
-		
-		npcModule.SetAggression = 3;
-		
-		if hardMode then
-			--npcModule.HardMode = true;
-		end
-		
-		npcModule.NetworkOwners = game.Players:GetPlayers();
-		local levelRng = npcModule.Properties and npcModule.Properties.BasicEnemy == true and math.random(-2, 0) or 0;
-		npcModule.Configuration.Level = math.max(npcModule.Configuration.Level + level + levelRng, 1);
-		npcModule.ForgetEnemies = false;
-		npcModule.AutoSearch = true;
-		npcModule.Properties.TargetableDistance = 4096;
-		
-		if npcName == "Pathoroth" then
-			local newHealth = 4000 * math.max(math.ceil(level/2), 1);
-			npcModule.Humanoid.MaxHealth = math.clamp(newHealth, 1000, math.huge);
-			npcModule.Humanoid.Health = npcModule.Humanoid.MaxHealth;
-		end
-		
-		npcModule.OnTarget(self.Players);
 
-		if self.OnEnemySpawn then
-			self:OnEnemySpawn(npcPrefab, npcModule);
+	local newNpcClass: NpcClass = modNpcs.spawn2{
+		Name = npcName;
+		CFrame = spawnCf;
+		NetworkOwners = game.Players:GetPlayers();
+		BindSetup = function(npcClass: NpcClass)
+			task.spawn(function()
+				while currWave == self.Wave do
+					task.wait(1);
+				end
+				if npcClass.HealthComp.IsDead then return end;
+				npcClass:Destroy();
+			end)
+			self.EnemiesSpawned = self.EnemiesSpawned + 1;
+			
+			local properties = npcClass.Properties;
+			properties.HordeAggression = true;
+			
+			local levelRng = properties.BasicEnemy == true and math.random(-2, 0) or 0;
+			properties.Level = math.max(properties.Level + level + levelRng, 1);
+			properties.TargetableDistance = 4096;
+			
+			if npcName == "Pathoroth" then
+				local newHealth = 4000 * math.max(math.ceil(level/2), 1);
+				local newMaxHealth = math.clamp(newHealth, 1000, math.huge);
+				npcClass.HealthComp:SetMaxHealth(newMaxHealth);
+				npcClass.HealthComp:SetHealth(newMaxHealth);
+			end
+			
+			local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+			if targetHandlerComp then
+				for _, player in pairs(self.Players) do
+					targetHandlerComp:AddTarget(player.Character);
+				end
+			end
+			
+			if self.OnEnemySpawn then
+				self:OnEnemySpawn(npcClass);
+			end
 		end
-	end);
+	};
 	
-	return npcPrefab, newNpcModule;
+	return newNpcClass;
 end
 
 function Survival:CompleteWave()
@@ -532,7 +536,7 @@ function Survival:StartWave(wave)
 	local newHazard = pickHazard and pickHazard.Class.new() or nil;
 	
 	local hazardTitle = (newHazard and newHazard.Title or "None");
-	shared.Notify(game.Players:GetPlayers(), "Wave ".. self.Wave ..", Objective: ".. newObjective.Title ..", Hazard: ".. hazardTitle, "Defeated");
+	shared.Notify(game.Players:GetPlayers(), "Wave ".. self.Wave ..", Objective: ".. newObjective.Title ..", Hazard: ".. hazardTitle, "Important");
 
 	self:Hud{
 		WaveObjective=newObjective.Title;
@@ -620,10 +624,10 @@ function Survival:StartWave(wave)
 	end)
 	Debugger:Log("Wave fin");
 	
-	for a=#self.EnemyModules, 1, -1 do
-		game.Debris:AddItem(self.EnemyModules[a].Prefab, 0);
-		self.EnemyModules[a]:Destroy();
-		table.remove(self.EnemyModules, a);
+	for a=#self.EnemyNpcClasses, 1, -1 do
+		game.Debris:AddItem(self.EnemyNpcClasses[a].Character, 0);
+		self.EnemyNpcClasses[a]:Destroy();
+		table.remove(self.EnemyNpcClasses, a);
 	end
 	
 	
@@ -762,10 +766,10 @@ function Survival:RespawnDead()
 	for _, player in pairs(self.Players) do
 		if player == nil or not player:IsDescendantOf(game.Players) then continue end;
 		
-		local classPlayer = shared.modPlayers.get(player);
-		if classPlayer.IsAlive then continue end;
+		local playerClass: PlayerClass = shared.modPlayers.get(player);
+		if playerClass.Character and not playerClass.HealthComp.IsDead then continue end;
 		
-		classPlayer:Spawn();
+		playerClass:Spawn();
 	end
 end
 
@@ -889,26 +893,27 @@ function Survival:Initialize(roomData)
 			
 			table.insert(self.Players, player);
 
-			local classPlayer = shared.modPlayers.get(player);
-			classPlayer.OnCharacterSpawn:Connect(function(character: Model)
+			local playerClass: PlayerClass = shared.modPlayers.get(player);
+			playerClass.OnCharacterSpawn:Connect(function(character: Model)
 				Debugger:Warn("OnCharacterSpawn", player, character);
 	
 				clearCharacter(character);
 				table.insert(self.Characters, character);
 
-				classPlayer:OnNotIsAlive(function(character)
-					shared.Notify(game.Players:GetPlayers(), character.Name .. " died!", "Negative");
+				playerClass.OnIsDeadChanged:Connect(function(isDead, ov, reason)
+					if not isDead then return end
+					shared.Notify(game.Players:GetPlayers(), `{character.Name} died!`, "Negative");
 		
 					clearCharacter(character);
-					Debugger:Warn(character.Name,"died", "Players alive",#self.Characters);
+					Debugger:Warn(character.Name, "died", "Players alive", #self.Characters);
 		
 					if #self.Characters <= 0 and self.Status == EnumStatus.InProgress then
 						self.Status = EnumStatus.Restarting;
 						Debugger:Warn("Status set restarting..");
 						
-						for a=#self.EnemyModules, 1, -1 do
-							game.Debris:AddItem(self.EnemyModules[a].Prefab, 0);
-							table.remove(self.EnemyModules, a);
+						for a=#self.EnemyNpcClasses, 1, -1 do
+							game.Debris:AddItem(self.EnemyNpcClasses[a].Character, 0);
+							table.remove(self.EnemyNpcClasses, a);
 						end
 						table.clear(self.Modifier);
 						
@@ -930,12 +935,12 @@ function Survival:Initialize(roomData)
 						
 						for a=30, 1, -1 do
 							self:Hud{
-								Header="Survival failed!";
-								Status="Restarting in "..a.."..";
-								SurvivalFailed=a==30;
+								Header = "Survival failed!";
+								Status = `Restarting in {a}..`;
+								SurvivalFailed = a==30;
 							};
 							
-							shared.Notify(game.Players:GetPlayers(), "Restarting in "..a.."..", "Negative", "ModeRestarting");
+							shared.Notify(game.Players:GetPlayers(), `Restarting in {a}..`, "Negative", "ModeRestarting");
 							task.wait(1);
 						end
 						
@@ -955,8 +960,8 @@ function Survival:Initialize(roomData)
 				end
 			end)
 
-			if not classPlayer.IsAlive then 
-				classPlayer:Spawn();
+			if playerClass.HealthComp.IsDead then
+				playerClass:Spawn();
 			end;
 		end)
 	end

@@ -220,6 +220,9 @@ function GameMode:Start(room)
 				
 				task.spawn(function()
 					local crateRewardComp = bossNpcClass:GetComponent("CrateReward");
+					if crateRewardComp == nil then
+						crateRewardComp = bossNpcClass:AddComponent("CrateReward");
+					end
 					if crateRewardComp then
 						local crateSpawnPos = bossArena.PrimaryPart:FindFirstChild("CrateSpawn") and bossArena.PrimaryPart.CrateSpawn.WorldPosition;
 						local spawnCFrame = crateSpawnPos and CFrame.new(crateSpawnPos) or nil;
@@ -235,6 +238,8 @@ function GameMode:Start(room)
 
 						local cratePrefab = crateRewardComp(spawnCFrame, players);
 						Debugger.Expire(cratePrefab, 15);
+					else
+						Debugger:Warn(`Missing CrateReward component for {bossNpcClass.Name}`);
 					end
 					
 					for _, player in pairs(players) do

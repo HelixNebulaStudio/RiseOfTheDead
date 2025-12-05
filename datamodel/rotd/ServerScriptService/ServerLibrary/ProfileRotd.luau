@@ -99,6 +99,11 @@ shared.coreBind(modProfile, "_sync_public", function(profile: ProfileRotd, publi
 	publicData.Stats["TraderRep"] = math.floor(profile.Trader:CalRep()*100).."%";
 end)
 
+shared.coreBind(modProfile, "_unload", function(profile: ProfileRotd)
+    profile.Safehome:Destroy();
+end)
+
+
 function modProfile.onRequire()
 	local remoteProfileService = modRemotesManager:Get("ProfileService");
 

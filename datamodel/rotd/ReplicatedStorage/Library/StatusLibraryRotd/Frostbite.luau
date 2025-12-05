@@ -22,11 +22,10 @@ local statusPackage = {
 };
 
 
-function statusPackage.IceBlast(packet: anydict)
+function statusPackage.IceBlast(applyBy: CharacterClass?, packet: anydict)
     local targetCharacterClass: CharacterClass = packet.ApplyTo;
     local maxTargets: number = packet.Targets;
     local maxRadius: number = packet.Radius;
-    local dealerCharacterClass: CharacterClass = packet.ApplyBy;
     local totalSplashDamage: number = packet.TotalSplashDamage;
     
     local blastOrigin = targetCharacterClass.Character:GetPivot().Position;
@@ -82,7 +81,7 @@ function statusPackage.IceBlast(packet: anydict)
         if targetModel == targetCharacterClass.Character then continue end;
 
         local healthComp: HealthComp? = modHealthComp.getByModel(targetModel);
-        if healthComp == nil or healthComp.IsDead or not healthComp:CanTakeDamageFrom(dealerCharacterClass) then continue end;
+        if healthComp == nil or healthComp.IsDead or not healthComp:CanTakeDamageFrom(applyBy) then continue end;
 
         if healthComp.CompOwner.StatusComp == nil then continue end;
         local statusComp: StatusComp = healthComp.CompOwner.StatusComp;
@@ -106,7 +105,7 @@ function statusPackage.IceBlast(packet: anydict)
         local healthComp: HealthComp = hitHealthComps[a];
 
         local damageData: DamageData = DamageData.new{ 
-            DamageBy = dealerCharacterClass;
+            DamageBy = applyBy;
             
             Damage = totalSplashDamage/#hitHealthComps;
             DamageType = "Frost";
@@ -173,13 +172,11 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
     if statusClass.Values.DoIceBlast == nil then return end;
 
     local packet = {
-        ApplyBy = statusClass.Values.ApplyBy;
-
         Targets = statusClass.Values.Targets;
         Radius = statusClass.Values.Radius;
         TotalSplashDamage = statusClass.Values.Damage;
     };
-    statusPackage.IceBlast(packet);    
+    statusPackage.IceBlast(statusClass.ApplyBy, packet);
 
 end
 

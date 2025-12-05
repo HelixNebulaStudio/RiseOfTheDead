@@ -43,7 +43,7 @@ function modifierPackage.Binds.OnNewDamage(modifier: ItemModifierInstance, damag
 	local roll = math.random(0, 1000)/1000;
 	if roll > modifier.Values.AmmoRecycler then return end;
 
-	local storageItem: StorageItem? = modifier.EquipmentStorageItem;
+	local storageItem: StorageItem? = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem or nil;
 	if storageItem == nil then return end;
 
 	local toolHandler: ToolHandlerInstance? = characterClass.WieldComp:GetToolHandler(

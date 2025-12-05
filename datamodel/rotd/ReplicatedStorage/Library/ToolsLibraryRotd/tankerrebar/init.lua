@@ -10,6 +10,7 @@ local toolPackage = {
 
 	Animations={
 		Core={Id=16798872611;};
+		PrimaryAttack={Id=78050388072797;};
 		SlamAttack={Id=16805205137; Markers={"SlamImpact"};};
 		SpinAttack={Id=16805046629; Markers={"SpinStart"; "SpinEnd";}};
 	};
@@ -24,7 +25,7 @@ local toolPackage = {
 		Type="Sword";
 
 		EquipLoadTime=1.25;
-		Damage=5;
+		Damage=10;
 
 		PrimaryAttackSpeed=0.5;
 		PrimaryAttackAnimationSpeed=1.1;
@@ -38,14 +39,12 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.OnMarkerEvent(wieldData: {any}, trackData: {any}, paramString: string)
-	local toolModel = wieldData.Instances[1];
+function toolPackage.OnMarkerEvent(handler: ToolHandlerInstance, animId: string, animTrack: AnimationTrack, paramString: string)
+	local toolModel = handler.MainToolModel;
 	local handle = toolModel.PrimaryPart;
 	local impactPointAtt = handle.ImpactPoint;
 	
-	
 	if paramString == "SlamImpact" then
-		
 		local modAoeHighlight = shared.require(game.ReplicatedStorage.Particles.AoeHighlight);
 		local modParticleSprinkler = shared.require(game.ReplicatedStorage.Particles.ParticleSprinkler);
 		local modTDParticles = shared.require(game.ReplicatedStorage.Particles.TDParticles);

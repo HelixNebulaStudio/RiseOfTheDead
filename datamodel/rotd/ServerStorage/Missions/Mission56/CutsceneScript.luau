@@ -30,7 +30,7 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
 		
-		local classPlayer = shared.modPlayers.get(player);
+		local playerClass: PlayerClass = shared.modPlayers.get(player);
 			
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
@@ -39,17 +39,17 @@ return function(CutsceneSequence)
 				if mission.ProgressionPoint == 1 then
 
 				elseif mission.ProgressionPoint == 2 then
-					
 					local coopEntrancePos = Vector3.new(1060.251, -20.875, -126.729);
 					local distFromEntrance = math.huge;
 					repeat
 						wait(1);
-						distFromEntrance = (classPlayer.RootPart.Position-coopEntrancePos).Magnitude;
+						distFromEntrance = (playerClass.RootPart.Position-coopEntrancePos).Magnitude;
 					until not player:IsDescendantOf(game.Players) or distFromEntrance <= 14;
 					
 					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 2 then mission.ProgressionPoint = 3; end;
 					end)
+					
 				end
 			elseif mission.Type == 3 then -- OnComplete
 

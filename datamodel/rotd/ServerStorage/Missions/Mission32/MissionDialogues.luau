@@ -7,13 +7,13 @@ local Dialogues = {
 	["Bunny Man"]={};
 };
 
-local missionId = 32;
+local MISSION_ID = 32;
 --==
 
 -- MARK: Bunny Man Dialogues
 Dialogues["Bunny Man"].DialogueStrings = {
 	["reborn_init"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Yeah, what do you need me for?"; 
 		Reply="You helped me, I will help you back, you need to be reborn. Complete my challenge and you will be reborn..";
 	};
@@ -77,7 +77,7 @@ if RunService:IsServer() then
 			if not modBranchConfigs.IsWorld("EasterButchery") then
 				dialog:AddChoice("reborn_travel", function(dialog)
 					data:Set("World", modBranchConfigs.WorldName);
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 1 then
 							mission.ProgressionPoint = 2;
 						end;
@@ -89,7 +89,7 @@ if RunService:IsServer() then
 					dialog:SetInitiate("You have been reborn. You are now a Bunny Man. You are me.");
 					
 					dialog:AddChoice("reborn_complete", function(dialog)
-						modMission:CompleteMission(player, missionId);
+						modMission:CompleteMission(player, MISSION_ID);
 						addLoreOptions(dialog);
 					end)
 					
@@ -101,7 +101,7 @@ if RunService:IsServer() then
 			dialog:AddChoice("reborn_init", function(dialog)
 				dialog:AddChoice("reborn_what", function(dialog)
 					dialog:AddChoice("reborn_alright", function(dialog)
-						modMission:StartMission(player, missionId);
+						modMission:StartMission(player, MISSION_ID);
 					end)
 				end)
 			end)

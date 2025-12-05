@@ -82,7 +82,7 @@ local toolPackage = {
 };
 
 function toolPackage.OnReloadAnimation(handler: ToolHandlerInstance, track: AnimationTrack)
-	local weaponModel = handler.Prefabs[1];
+	local weaponModel = handler.MainToolModel;
 
 	task.spawn(function()
 		local speedloaderPrefab = script:WaitForChild("Speedloader");

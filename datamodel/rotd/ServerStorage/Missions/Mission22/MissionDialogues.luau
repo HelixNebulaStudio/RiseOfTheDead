@@ -7,13 +7,13 @@ local Dialogues = {
 	Carlson={};
 };
 
-local missionId = 22;
+local MISSION_ID = 22;
 --==
 
 -- MARK: Carlson Dialogues
 Dialogues.Carlson.DialogueStrings = {
 	["thebackup_help"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Yup, what do you need help with?";
 		Face="Serious"; 
 		Reply="We are in deep trouble, we won't have enough food for the bandits the next time they attack.. I need you to help me get my hidden metal supplies to fortify this safehouse.";
@@ -55,8 +55,8 @@ if RunService:IsServer() then
 				dialog:SetInitiate("$PlayerName, did you get the 1000 metal?");
 				
 				local profile = shared.modProfile:Get(player);
-				local playerSave = profile:GetActiveSave();
-				local inventory = playerSave.Inventory;
+				
+				local inventory = profile.ActiveInventory
 				local total, itemList = inventory:ListQuantity("metal", 1000);
 				if total >= 1000 then
 					dialog:AddChoice("thebackup_gotit", function(dialog)
@@ -67,16 +67,17 @@ if RunService:IsServer() then
 							shared.Notify(player, "Removed 1000 Metal Scraps from your inventory.", "Negative");
 							
 							data:Set("thebackup_gaveMetal", true);
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 						else
 							shared.Notify(player, ("Unable to find items from inventory."), "Negative");
 						end
 					end);
 				end
+				
 				dialog:AddChoice("thebackup_wait");
 				dialog:AddChoice("thebackup_stolen", function(dialog)
 					data:Set("thebackup_gaveMetal", false);
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end);
 				
 			else
@@ -87,7 +88,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Hey, err.. $PlayerName was it?");
 			dialog:AddChoice("thebackup_help", function(dialog)
 				dialog:AddChoice("thebackup_thekey", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end)
 			

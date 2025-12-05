@@ -7,9 +7,6 @@ local TweenService = game:GetService("TweenService");
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
-local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
-local remoteCameraShakeAndZoom = remotes.CameraShakeAndZoom;
-
 --== Variables;
 local MISSION_ID = 53;
 
@@ -34,17 +31,17 @@ return function(CutsceneSequence)
 		if mission == nil then return end;
 		
 
-		local walterModule = modNpcs.getPlayerNpc(player, "Walter");
-		if walterModule == nil then
-			local npc = modNpcs.spawn("Walter", nil, function(npc, npcModule)
-				npcModule.Player = player;
-				walterModule = npcModule;
-			end);
-			modReplicationManager.ReplicateOut(player, npc);
-			walterModule:TeleportHide();
+		local walterNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Walter");
+		if walterNpcClass == nil then
+			walterNpcClass = modNpcs.spawn2{
+				Name = "Walter";
+				Player = player;
+				ReplicateOut = true;
+			};
+			walterNpcClass:TeleportHide();
 		end
 
-		local wilsonModule = modNpcs.getPlayerNpc(player, "Wilson");
+		local wilsonNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Wilson");
 		local waypoint1 = Vector3.new(641.839, 93.332, -72.035);
 		local cargoScene, helicopterPrefab, heliCfTag, cargoDoorA, cargoDoorB, cargoDoorATag, cargoDoorBTag;
 		
@@ -61,7 +58,8 @@ return function(CutsceneSequence)
 
 				if mission.ProgressionPoint == 1 then
 					if cargoScene == nil then
-						remoteCameraShakeAndZoom:FireClient(player, 5, 0, 1, 2, false);
+						shared.modPlayers.cameraShakeAndZoom(player, 5, 0, 1, 2, false);
+						
 						cargoScene = script:WaitForChild("CargoScene"):Clone();
 						cargoScene.Parent = workspace;
 						modReplicationManager.ReplicateOut(player, cargoScene);
@@ -98,21 +96,21 @@ return function(CutsceneSequence)
 						clientEffect.Parent = player.Character;
 					end
 
-					wilsonModule:ToggleInteractable(false);
-					walterModule.Actions:Teleport(CFrame.new(659.80249, 94.9728851, -64.4730988, 0.275637239, 0, 0.961261749, 0, 1, 0, -0.961261749, 0, 0.275637239));
+					wilsonNpcClass:ToggleInteractable(false);
+					walterNpcClass:SetCFrame(CFrame.new(659.80249, 94.9728851, -64.4730988, 0.275637239, 0, 0.961261749, 0, 1, 0, -0.961261749, 0, 0.275637239));
 
-					wilsonModule.InMission = true;
+					wilsonNpcClass.Properties.CutsceneActive = true;
 					
-					wilsonModule.Move:MoveTo(Vector3.new(613.64, 71.458, -94.619));
-					wilsonModule.Move.OnMoveToEnded:Wait(5);
+					wilsonNpcClass.Move:MoveTo(Vector3.new(613.64, 71.458, -94.619));
+					wilsonNpcClass.Move.OnMoveToEnded:Wait(5);
 					
-					wilsonModule.Move:MoveTo(Vector3.new(620.380676, 90.7988586, -95.4239197));
-					wilsonModule.Move.OnMoveToEnded:Wait(10);
+					wilsonNpcClass.Move:MoveTo(Vector3.new(620.380676, 90.7988586, -95.4239197));
+					wilsonNpcClass.Move.OnMoveToEnded:Wait(10);
 					
-					wilsonModule.Actions:Teleport(CFrame.new(620.380676, 90.7988586, -95.4239197, 2.38419432e-07, 0, -1.00000334, 0, 0.999998569, 0, 1.00000608, 0, -2.38419403e-07));
+					wilsonNpcClass:SetCFrame(CFrame.new(620.380676, 90.7988586, -95.4239197, 2.38419432e-07, 0, -1.00000334, 0, 0.999998569, 0, 1.00000608, 0, -2.38419403e-07));
 					
-					wilsonModule.Move:MoveTo(Vector3.new(640.453, 90.799, -74.582));
-					wilsonModule.Move.OnMoveToEnded:Wait(5);
+					wilsonNpcClass.Move:MoveTo(Vector3.new(640.453, 90.799, -74.582));
+					wilsonNpcClass.Move.OnMoveToEnded:Wait(5);
 					
 					while game.Players:IsAncestorOf(player) and player:DistanceFromCharacter(waypoint1) > 16 do
 						task.wait(1);
@@ -125,7 +123,7 @@ return function(CutsceneSequence)
 
 				elseif mission.ProgressionPoint == 2 then
 
-					walterModule.SetAnimation("TakeOffMask", {script:WaitForChild("TakeOffMask")});
+					walterNpcClass.SetAnimation("TakeOffMask", {script:WaitForChild("TakeOffMask")});
 
 					TweenService:Create(heliCfTag, TweenInfo.new(1), {
 						Value=CFrame.new(665.327759, 122.156693, -65.71595, -0.949426413, 0.150374383, 0.275639594, 0.156434491, 0.987688363, -3.7252903e-09, -0.272246003, 0.0431195311, -0.961261153);
@@ -162,41 +160,42 @@ return function(CutsceneSequence)
 					}):Play();
 					wait(2)
 
-					walterModule.Movement:Move(Vector3.new(648.141, 94.54, -73.628)):Wait();
-					walterModule.Actions:Teleport(CFrame.new(648.140991, 94.5396881, -73.6277466, 0, 0, 1, 0, 1, 0, -1, 0, 0));
-					wilsonModule.Move:Face(walterModule.RootPart.Position);
-					walterModule.Chat(walterModule.Player, "Why hello Wrighton Dale!");
+					walterNpcClass.Move:MoveTo(Vector3.new(648.141, 94.54, -73.628));
+					walterNpcClass.Move.OnMoveToEnded:Wait();
+					walterNpcClass:SetCFrame(CFrame.new(648.140991, 94.5396881, -73.6277466, 0, 0, 1, 0, 1, 0, -1, 0, 0));
+					wilsonNpcClass.Move:Face(walterNpcClass.RootPart.Position);
+					walterNpcClass.Chat(walterNpcClass.Player, "Why hello Wrighton Dale!");
 					wait(5);
-					walterModule.Chat(walterModule.Player, "What a mess it has became..");
+					walterNpcClass.Chat(walterNpcClass.Player, "What a mess it has became..");
 					wait(5);
-					wilsonModule.Chat(wilsonModule.Player, "Are you the only inspector they sent?");
+					wilsonNpcClass.Chat(wilsonNpcClass.Player, "Are you the only inspector they sent?");
 					wait(5);
-					walterModule.Chat(walterModule.Player, "Oh, err, yes. Can you verify that this location is secure?");
+					walterNpcClass.Chat(walterNpcClass.Player, "Oh, err, yes. Can you verify that this location is secure?");
 					wait(5);
-					wilsonModule.Chat(wilsonModule.Player, "I can verify, we've set up station here for a while now..");
+					wilsonNpcClass.Chat(wilsonNpcClass.Player, "I can verify, we've set up station here for a while now..");
 					wait(5);
-					walterModule.Chat(walterModule.Player, "Very well, I can begin my tasks.");
+					walterNpcClass.Chat(walterNpcClass.Player, "Very well, I can begin my tasks.");
 					wait(3);
-					walterModule.Chat(walterModule.Player, "Gas concentration readings.. looks acceptable to breath..");
+					walterNpcClass.Chat(walterNpcClass.Player, "Gas concentration readings.. looks acceptable to breath..");
 					wait(3);
-					walterModule.PlayAnimation("TakeOffMask");
+					walterNpcClass.PlayAnimation("TakeOffMask");
 					wait(0.5);
 					local weldSwap = script:WaitForChild("MaskWeld");
 					local nWeld = weldSwap:Clone();
-					local oWeld = walterModule.Prefab:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
+					local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
 
 					oWeld.Enabled = false;
 					nWeld.Parent = oWeld.Parent;
 					nWeld.Part0 = nWeld.Parent;
-					nWeld.Part1 = walterModule.Head;
+					nWeld.Part1 = walterNpcClass.Head;
 
 					wait(2);
-					walterModule.Chat(walterModule.Player, "Oh wow, it stinks..");
-					walterModule.AvatarFace:Set("Question");
+					walterNpcClass.Chat(walterNpcClass.Player, "Oh wow, it stinks..");
+					walterNpcClass:GetComponent("AvatarFace"):Set("Question");
 					wait(5);
-					walterModule.Actions:FaceOwner();
-					walterModule.Chat(walterModule.Player, "You there, come here..");
-					walterModule.AvatarFace:Set("Confident");
+					walterNpcClass.Move:Face("Player");
+					walterNpcClass.Chat(walterNpcClass.Player, "You there, come here..");
+					walterNpcClass:GetComponent("AvatarFace"):Set("Confident");
 
 					modMission:Progress(player, MISSION_ID, function(mission)
 						mission.ProgressionPoint = 3;
@@ -213,25 +212,25 @@ return function(CutsceneSequence)
 						local cargoDoorA = cargoScene:WaitForChild("cargoDoorA");
 						local cargoDoorB = cargoScene:WaitForChild("cargoDoorB");
 
-						cargoDoorA:SetPrimaryPartCFrame(CFrame.new(654.471191, 97.3799973, -74.124527) * CFrame.Angles(0, math.rad(-125), 0));
-						cargoDoorB:SetPrimaryPartCFrame(CFrame.new(651.385498, 97.3799973, -63.7809982) * CFrame.Angles(0, math.rad(125), 0));
+						cargoDoorA:PivotTo(CFrame.new(654.471191, 97.3799973, -74.124527) * CFrame.Angles(0, math.rad(-125), 0));
+						cargoDoorB:PivotTo(CFrame.new(651.385498, 97.3799973, -63.7809982) * CFrame.Angles(0, math.rad(125), 0));
 
 						local weldSwap = script:WaitForChild("MaskWeld");
 						local nWeld = weldSwap:Clone();
-						local oWeld = walterModule.Prefab:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
+						local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
 
 						oWeld.Enabled = false;
 						nWeld.Parent = oWeld.Parent;
 						nWeld.Part0 = nWeld.Parent;
-						nWeld.Part1 = walterModule.Head;
+						nWeld.Part1 = walterNpcClass.Head;
 
 					end
 
-					wilsonModule.InMission = true;
-					wilsonModule:ToggleInteractable(true);
+					wilsonNpcClass.Properties.CutsceneActive = true;
+					wilsonNpcClass:ToggleInteractable(true);
 					
-					wilsonModule.Actions:Teleport(CFrame.new( 639.822266, 90.7045059, -75.1730194, -0.1926018, 0, -0.981276989, 0, 1, 0, 0.981276989, 0, -0.1926018));
-					walterModule.Actions:Teleport(CFrame.new(648.140991, 94.5396881, -73.6277466, 0, 0, 1, 0, 1, 0, -1, 0, 0));
+					wilsonNpcClass:SetCFrame(CFrame.new( 639.822266, 90.7045059, -75.1730194, -0.1926018, 0, -0.981276989, 0, 1, 0, 0.981276989, 0, -0.1926018));
+					walterNpcClass:SetCFrame(CFrame.new(648.140991, 94.5396881, -73.6277466, 0, 0, 1, 0, 1, 0, -1, 0, 0));
 
 
 				end
@@ -252,15 +251,15 @@ return function(CutsceneSequence)
 
 					local weldSwap = script:WaitForChild("MaskWeld");
 					local nWeld = weldSwap:Clone();
-					local oWeld = walterModule.Prefab:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
+					local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
 
 					oWeld.Enabled = false;
 					nWeld.Parent = oWeld.Parent;
 					nWeld.Part0 = nWeld.Parent;
-					nWeld.Part1 = walterModule.Head;
+					nWeld.Part1 = walterNpcClass.Head;
 
 				end
-				walterModule.Actions:Teleport(CFrame.new(648.140991, 94.5396881, -73.6277466, 0, 0, 1, 0, 1, 0, -1, 0, 0));
+				walterNpcClass:SetCFrame(CFrame.new(648.140991, 94.5396881, -73.6277466, 0, 0, 1, 0, 1, 0, -1, 0, 0));
 
 			end
 		end

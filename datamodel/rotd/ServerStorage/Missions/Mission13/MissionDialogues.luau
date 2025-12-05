@@ -7,7 +7,7 @@ local Dialogues = {
 	Wilson={};
 };
 
-local missionId = 13;
+local MISSION_ID = 13;
 --==
 
 -- !outline: Wilson Dialogues
@@ -18,7 +18,7 @@ Dialogues.Wilson.DialogueStrings = {
 		Reply="I have intel that the population of the zombies is growing rapidly.. I've heard you are very capable of taking out large amount of zombies.";
 	};
 	["crowdcontrol_yeah"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Yeah, I can."; 
 		Face="Joyful"; Reply="Great! This will really help me out in finding my partner. Kill about a hundred zombies will do.";
 		FailResponses = {
@@ -50,7 +50,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("crowdcontrol_stillWorking");
 			elseif stage == 2 then
 				dialog:AddChoice("crowdcontrol_return", function(dialog)
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 			end
 			
@@ -58,7 +58,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Hey, you! I need your help.");
 			dialog:AddChoice("crowdcontrol_what", function(dialog)
 				dialog:AddChoice("crowdcontrol_yeah", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end)
 			

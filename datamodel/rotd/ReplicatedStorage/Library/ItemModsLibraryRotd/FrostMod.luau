@@ -67,9 +67,8 @@ if RunService:IsServer() then
 		if frostbiteStatusClass == nil then
 			statusComp:Apply(statusId, {
 				Expires = workspace:GetServerTimeNow() + 5;
+				ApplyBy = characterClass;
 				Values = {
-					ApplyBy = characterClass;
-
 					Damage = configurations.Damage; 
 					Radius = modifier.Values.Radius;
 					Targets = modifier.Values.Targets;

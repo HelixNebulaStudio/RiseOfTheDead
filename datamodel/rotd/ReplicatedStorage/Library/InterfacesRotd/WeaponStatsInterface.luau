@@ -912,6 +912,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="array";});
             end
         end
+
+        if #configurations.Modifiers <= 0 then
+            local newLabel: TextLabel = statsLabelTemplate:Clone();
+            newLabel.LayoutOrder = 0;
+            newLabel.Name = "NoModifiers";
+            newLabel.Text = "No modifiers";
+            newLabel.AutomaticSize = Enum.AutomaticSize.Y;
+            newLabel.LineHeight = 1.4;
+            newLabel.Parent = statsList;
+
+            local padding = Instance.new("UIPadding");
+            padding.PaddingBottom = UDim.new(0, 10);
+            padding.Parent = newLabel;
+        end
         
         local statsTemplate = statTemplates[classType];
         for a=1, #statsTemplate do

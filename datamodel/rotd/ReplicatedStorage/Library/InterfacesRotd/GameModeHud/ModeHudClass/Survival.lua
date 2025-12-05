@@ -11,6 +11,7 @@ local modMarkers = shared.require(game.ReplicatedStorage.Library.Markers);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.LeaderboardService);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
 local modLeaderboardInterface = shared.require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
@@ -312,14 +313,14 @@ return function(interface, window, frame)
 		--== Objective Boss;
 		if typeof(data.BossList) == "table" then
 			for a=1, #data.BossList do
-				self.Interface.modEntityHealthHudInterface.TryHookEntity(data.BossList[a], 300);
+				--self.Interface.modEntityHealthHudInterface.TryHookEntity(data.BossList[a], 300);
 			end
 		end
 		
 		-- Spectator;
-		local classPlayer = shared.modPlayers.get(localPlayer);
-		if classPlayer.IsAlive == false then
-			self.Interface:ToggleGameBlinds(true, 2);
+		local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+		if playerClass.HealthComp.IsDead then
+			modClientGuis.toggleGameBlinds(true, 2);
 			if not self:IsSpectating() then
 				self:Spectate();
 			end

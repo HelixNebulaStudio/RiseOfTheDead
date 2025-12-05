@@ -18,7 +18,7 @@ local interactablePackage = {};
 --==
 
 function interactablePackage.init(super) -- Server/Client
-    local VendingMachine = {
+    local VendingMachine = super.newPackage{
 		Name = "VendingMachine";
         Type = "Button";
     };
@@ -34,7 +34,7 @@ function interactablePackage.init(super) -- Server/Client
     end
 
     function VendingMachine.BindInteract(interactable: InteractableInstance, info: InteractInfo)
-        interactable.TypePackage.BindInteract(interactable, info);
+        VendingMachine.TypePackage.BindInteract(interactable, info);
         if info.Action == "Client" then return end;
 
 

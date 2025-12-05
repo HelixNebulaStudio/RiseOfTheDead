@@ -5,14 +5,12 @@ local RunService = game:GetService("RunService");
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
-local missionId = 3;
+local MISSION_ID = 3;
 
 if RunService:IsServer() then
 	if not modBranchConfigs.IsWorld("TheWarehouse") then return {}; end;
 	
-	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
-	
 
 	function MissionLogic.Init(missionProfile, mission)
 		local player: Player = missionProfile.Player;

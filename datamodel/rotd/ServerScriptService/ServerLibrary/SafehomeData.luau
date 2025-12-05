@@ -4,7 +4,9 @@ local SafehomeData = {};
 SafehomeData.__index = SafehomeData;
 
 --==
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService");
+local Server = require(ReplicatedStorage.Dependencies.BridgeNet2.src.Server)
 
 local audioModule = game.ReplicatedStorage.Library.Audio;
 
@@ -21,6 +23,7 @@ local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission
 local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+local modSafehomeService = shared.require(game.ServerScriptService.ServerLibrary.SafehomeService);
 
 local remoteSafehomeRequest;
 
@@ -44,25 +47,19 @@ function SafehomeData.onRequire()
 	remoteSafehomeRequest = modRemotesManager:Get("SafehomeRequest");
 
 	function remoteSafehomeRequest.OnServerInvoke(player, actionId, packet)
-		--Debugger:StudioWarn("remoteSafehomeRequest", player, actionId, packet);
-		
-		local ownerPlayer = shared.modSafehomeService and shared.modSafehomeService.OwnerPlayer;
-		local isOwner = ownerPlayer and player == ownerPlayer;
-		
+		Debugger:StudioWarn("remoteSafehomeRequest", player, actionId, packet);
 		if remoteSafehomeRequest:Debounce(player) then return {ReplyCode=3;} end;
 		local profile = shared.modProfile:Get(player);
 		if profile == nil then return {ReplyCode=5;} end;
-		
-		local traderProfile = profile.Trader;
-		local safehomeData = profile.Safehome;
-		
-		
-		if actionId == "fetch" then
-			local oprofile = shared.modProfile:Get(ownerPlayer);
 
-			if oprofile then
-				return {ReplyCode=1; Data=oprofile.Safehome;};
-			end
+		local traderProfile = profile.Trader;
+
+		local safehomeData = profile.Safehome;
+		local safehomeClass = safehomeData.SafehomeClass;
+
+		local worldSafehomeClass = shared.WorldCore.SafehomeClass;
+
+		if actionId == "fetch" then
 			if safehomeData then
 				safehomeData.UpdateFoodSupply();
 				return {ReplyCode=1; Data=safehomeData;};
@@ -70,6 +67,7 @@ function SafehomeData.onRequire()
 			
 			return {ReplyCode=5;};
 			
+
 		elseif actionId == "purchaseSafehome" then
 			local safehomeId = packet.SafehomeId;
 			if safehomeId == nil then return {ReplyCode=5;} end;
@@ -80,8 +78,8 @@ function SafehomeData.onRequire()
 			
 			local playerGold = traderProfile.Gold;
 			local price = safehomeLib.Price;
+
 			if playerGold >= price then
-				
 				safehomeData.Homes[safehomeId] = {};
 				
 				traderProfile:AddGold(-price);
@@ -110,8 +108,7 @@ function SafehomeData.onRequire()
 				return {ReplyCode=4;};
 			end
 
-			local factionGroup = shared.modSafehomeService and shared.modSafehomeService.FactionGroupCache;
-			
+			local factionGroup = shared.WorldCore.FactionGroupCache; -- faction world;
 			if factionGroup then
 				if factionGroup.HqHost ~= player.Name then
 					shared.Notify(player, "Headquarters hosted by ".. factionGroup.HqHost ..", cannot set headquarters.", "Negative");
@@ -119,7 +116,7 @@ function SafehomeData.onRequire()
 				end
 				
 			else
-				if not isOwner then
+				if not modBranchConfigs.IsWorld("Safehome") or safehomeClass == nil then
 					shared.Notify(player, "This is not your safehome.", "Negative");
 					return {ReplyCode=4;};
 				end;
@@ -149,15 +146,7 @@ function SafehomeData.onRequire()
 			end
 				
 			if modBranchConfigs.IsWorld("Safehome") then
-				if shared.modSafehomeService then
-					if shared.modSafehomeService.FactionTag == nil then
-						shared.modSafehomeService.LoadMap(safehomeId);
-						
-					else
-						shared.modSafehomeService.LoadHeadquarters(factionGroup);
-						
-					end
-				end
+				safehomeClass:ChangeMap(safehomeId);
 			end
 			
 			return {ReplyCode=1; Data=safehomeData;};
@@ -188,7 +177,7 @@ function SafehomeData.onRequire()
 			
 			local returnColor = Color3.fromHex(groupData.Color);
 			
-			if modBranchConfigs.IsWorld("Safehome") and isOwner and workspace:GetAttribute("FactionHeadquarters") == nil then
+			if modBranchConfigs.IsWorld("Safehome") and safehomeClass then
 				local safehomeCustomizableFolder = workspace.Environment:FindFirstChild("Customizable");
 				local groupFolder = safehomeCustomizableFolder and safehomeCustomizableFolder:FindFirstChild(groupId);
 				
@@ -221,9 +210,12 @@ function SafehomeData.onRequire()
 
 			npcData.Active = nil;
 			
-			if modBranchConfigs.IsWorld("Safehome") and isOwner then
-				local survivorNpcClass = shared.modNpcs.getPlayerNpc(player, npcName);
-				survivorNpcClass:TeleportHide();
+			if modBranchConfigs.IsWorld("Safehome") and safehomeClass then
+				local npcClass: NpcClass = safehomeClass.NpcClassList[npcName];
+				if npcClass then
+					npcClass:Destroy();
+				end
+				safehomeClass.NpcClassList[npcName] = nil;
 			end
 			
 			return {ReplyCode=1; Data=safehomeData;};
@@ -233,8 +225,8 @@ function SafehomeData.onRequire()
 		--== Safehome only functions;
 		
 		if actionId == "inspectSafehome" then
-			if not isOwner then
-				shared.Notify(player, "This is not your safehome.", "Negative");
+			if safehomeClass == nil or safehomeClass.Owner ~= player or safehomeClass.FactionTag then
+				shared.Notify(player, "You are not at your safehome world.", "Negative");
 				return {ReplyCode=4;};
 			end;
 			
@@ -242,22 +234,12 @@ function SafehomeData.onRequire()
 			local safehomeLib = modSafehomesLibrary:Find(safehomeId);
 			if safehomeLib == nil then return {ReplyCode=5;} end;
 			
-			if shared.modSafehomeService then
-				if shared.modSafehomeService.FactionTag then
-					return {ReplyCode=4;};
-				end
-				
-				local inspectMode = true;
-				
-				safehomeId = safehomeLib.Id;
-				
-				if safehomeLib.Unlocked == true or safehomeData.Homes[safehomeId] ~= nil then
-					inspectMode = nil;
-				end;
-			
-				shared.modSafehomeService.LoadMap(safehomeId, inspectMode);
+			if safehomeLib.Unlocked ~= true or safehomeData.Homes[safehomeId] == nil then
+				safehomeClass:SetInspectMode(true);
 			end
+			safehomeClass:ChangeMap(safehomeId);
 			
+
 		elseif actionId == "playSound" and safehomeData.ActiveId ~= "default" then
 			local soundId = packet.SoundId;
 			local interactObject = packet.Object;
@@ -339,6 +321,7 @@ function SafehomeData.onRequire()
 				globalSound:Play();
 			end
 			
+
 		elseif actionId == "togglePartyLights" and safehomeData.ActiveId ~= "default" then
 			local interactObject = packet.Object;
 			if interactObject == nil then return end;
@@ -405,8 +388,9 @@ end
 
 function SafehomeData.new(player)
 	local meta = {
-		Player=player;
-		UpdateFoodSupply=function()end;
+		Player = player;
+		UpdateFoodSupply = function()end;
+		SafehomeClass = nil;
 	};
 	meta.__index=meta;
 	
@@ -420,6 +404,14 @@ function SafehomeData.new(player)
 	setmetatable(meta, SafehomeData);
 	
 	return self;
+end
+
+function SafehomeData:Destroy()
+	Debugger:StudioWarn(`SafehomeData:Destroy()`);
+end
+
+function SafehomeData:SetMetaSafehomeClass(safehomeClass)
+	getmetatable(self).SafehomeClass = safehomeClass;
 end
 
 --[[
@@ -498,24 +490,27 @@ function SafehomeData:GetNpc(npcName: string)
 		end)
 
 		storage.OnChanged:Connect(function()
-			modOnGameEvents:Fire("OnStorageChanged", self.Player, storage);
+			local npcClass: NpcClass? = shared.modNpcs.getPlayerNpc(self.Player, npcName);
+			if npcClass == nil then return end;
+
+			shared.modEventService:ServerInvoke("Survivor_BindInventoryChanged", {ReplicateTo={self.Player}}, npcClass, storage);
 			
-			local npcClass = shared.modNpcs.getPlayerNpc(self.Player, npcName);
-			if npcClass then
-				local storageItemIndexList = storage:GetIndexDictionary();
+			local storageItemIndexList = storage:GetIndexDictionary();
 
-				local activeWeapon = storageItemIndexList[1] or storageItemIndexList[2];
-				if activeWeapon then
-					npcClass.Wield.Equip(activeWeapon.ItemId);
-					npcClass.Wield.SetSkin(activeWeapon.Values);
+			local activeWeapon = storageItemIndexList[1] or storageItemIndexList[2];
+			if activeWeapon then
+				npcClass.WieldComp:Equip{
+					ItemId = activeWeapon.ItemId;
+				};
 
-					self.Wield.SetCustomization(activeWeapon.Values["_Customs"], activeWeapon.Values["ActiveSkin"]);
-					npcClass.Wield:ToggleIdle();
+				-- npcClass.Wield.SetSkin(activeWeapon.Values);
+				-- self.Wield.SetCustomization(activeWeapon.Values["_Customs"], activeWeapon.Values["ActiveSkin"]);
 
-				else
-					npcClass.Wield.Unequip();
+				npcClass.WieldComp:InvokeToolAction("ToggleIdle");
 
-				end
+			else
+				npcClass.WieldComp:Unequip();
+
 			end
 		end);
 	end

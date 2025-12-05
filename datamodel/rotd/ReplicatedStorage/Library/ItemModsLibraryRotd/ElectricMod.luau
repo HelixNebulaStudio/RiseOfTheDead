@@ -43,7 +43,7 @@ if RunService:IsServer() then
 		local damagePercent = modifier.Values.DamagePercent;
 
 		local configurations = modifier.EquipmentClass and modifier.EquipmentClass.Configurations;
-		local weaponSiid = modifier.EquipmentStorageItem and modifier.EquipmentStorageItem.ID;
+		local weaponSiid = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem.ID;
 
 
 		local characterClass: CharacterClass;
@@ -62,10 +62,9 @@ if RunService:IsServer() then
 		if statusClass then return end;
 
 		statusComp:Apply(statusKey, {
-			Expires = workspace:GetServerTimeNow()+1; 
+			Expires = workspace:GetServerTimeNow()+1;
+			ApplyBy = characterClass;
 			Values = {
-				ApplyBy = characterClass;
-
 				MaxTargets = maxTargets;
 				WeaponSiid = weaponSiid;
 				

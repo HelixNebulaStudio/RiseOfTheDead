@@ -23,6 +23,11 @@ local npcPackage = {
 };
 
 function npcPackage.Spawning(npcClass: NpcClass)
+    
+    local triggerPart = Instance.new("Part");
+    triggerPart.Size = Vector3.new(49.2, 0.2, 18);
+    triggerPart.CFrame = CFrame.new(628.6, 55.3, 15.2);
+    
 end
 
 return npcPackage;

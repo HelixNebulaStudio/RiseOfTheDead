@@ -7,7 +7,7 @@ local Dialogues = {
 	Diana={};
 };
 
-local missionId = 26;
+local MISSION_ID = 26;
 --==
 
 -- !outline: Diana Dialogues
@@ -19,7 +19,7 @@ Dialogues.Diana.DialogueStrings = {
 	};
 	
 	["blueprint_start"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Sure, what is it?";
 		Face="Confident"; 
 		Reply="Got some demands for this item, see if you can find it..";
@@ -56,7 +56,7 @@ if RunService:IsServer() then
 		if mission.Type == 2 then -- Available;
 			local function m26Dialogues(dialog)
 				dialog:AddChoice("blueprint_start", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end
 
@@ -74,11 +74,10 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Soo, you got the goods?");
 			if mission.ObjectivesCompleted["Search"] == true then
 
-				if modMission:CanCompleteMission(player, missionId, true) then
+				if modMission:CanCompleteMission(player, MISSION_ID, true) then
 					dialog:AddChoice("blueprint_done", function(dialog)
 						local profile = shared.modProfile:Get(player);
-						local playerSave = profile:GetActiveSave();
-						local inventory = playerSave.Inventory;
+						local inventory = profile.ActiveInventory;
 
 						local total, itemList = inventory:ListQuantity(mission.SaveData.ItemId, mission.SaveData.Amount);
 						if itemList then
@@ -87,7 +86,7 @@ if RunService:IsServer() then
 								inventory:Remove(itemList[a].ID, itemList[a].Quantity);
 								shared.Notify(player, ("$Amount$Item removed from your Inventory."):gsub("$Item", itemLib.Name):gsub("$Amount", itemList[a].Quantity > 1 and itemList[a].Quantity.." " or ""), "Negative");
 							end
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 						else
 							shared.Notify(player, ("Unable to find items from inventory."), "Negative");
 						end

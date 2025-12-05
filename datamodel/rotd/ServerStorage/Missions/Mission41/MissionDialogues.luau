@@ -7,7 +7,7 @@ local Dialogues = {
 	Victor={};
 };
 
-local missionId = 41;
+local MISSION_ID = 41;
 --==
 
 -- MARK: Victor Dialogues
@@ -54,7 +54,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("vt2_cultist2", function(dialog)
 						dialog:AddChoice("vt2_cultist3", function(dialog)
 							dialog:AddChoice("vt2_outfit", function(dialog)
-								modMission:Progress(player, missionId, function(mission)
+								modMission:Progress(player, MISSION_ID, function(mission)
 									if mission.ProgressionPoint <= 3 then
 										mission.ProgressionPoint = 4;
 									end;

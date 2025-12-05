@@ -662,14 +662,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
 	
 	task.spawn(function()
-		modData.RequestStorage{
-			Action = "GetStorage";
-			StorageId = "Inventory";
-		};
-		modData.RequestStorage{
-			Action = "GetStorage";
-			StorageId = "Clothing";
-		};
+		modData.RequestStorage{Action = "SyncStorages";};
 		modStorageInterface.QueueRefreshStorage({"Inventory"});
 
 		local storageIdsPriority = {};

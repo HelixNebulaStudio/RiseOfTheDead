@@ -7,7 +7,7 @@ local Dialogues = {
 	Wilson={};
 };
 
-local missionId = 19;
+local MISSION_ID = 19;
 --==
 
 -- MARK: Wilson Dialogues
@@ -18,7 +18,7 @@ Dialogues.Wilson.DialogueStrings = {
 	};
 
 	["medbre_start"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Hey, it's okay. I have some news about Stan.";
 		Face="Worried"; 
 		Reply="News.. about Stan?";
@@ -39,7 +39,7 @@ Dialogues.Wilson.DialogueStrings = {
 		Reply="This annonying type of zombies keeps ticking, they run at you and tries to blow you up. I need you to get rid of them.";
 	};
 	["tickhunting_yeah"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="I'm on it."; 
 		Face="Smirk"; 
 		Reply="Off you go solider, get back here as soon as you are done.";
@@ -69,7 +69,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("tickhunting_stillWorking");
 			elseif stage == 2 then
 				dialog:AddChoice("tickhunting_return", function(dialog)
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 			end
 			
@@ -77,7 +77,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("You up for another task, solider?");
 			dialog:AddChoice("tickhunting_sure", function(dialog)
 				dialog:AddChoice("tickhunting_yeah", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end)
 			

@@ -13,7 +13,7 @@ local Dialogues = {
 	["Dr. Deniski"]={};
 };
 
-local missionId = 75;
+local MISSION_ID = 75;
 local cache = {
 	SecondBribe=nil;
 };
@@ -28,7 +28,7 @@ Dialogues.Rachel.DialogueStrings = {
 	};
 
 	["medbre_start"]={
-		CheckMission=missionId; 
+		CheckMission=MISSION_ID; 
 		Say="Hey, it's okay. I have some news about Stan.";
 		Face="Worried"; 
 		Reply="News.. about Stan?";
@@ -196,7 +196,7 @@ if RunService:IsServer() then
 				end
 
 				if mission.Type == 4 then
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end
 				
 				inventory:Add("bloodsample", {
@@ -210,7 +210,7 @@ if RunService:IsServer() then
 						table.insert(mission.SaveData.MissionItems, storageItem.ID);
 					end);
 				
-				modMission:Progress(player, missionId, function(mission)
+				modMission:Progress(player, MISSION_ID, function(mission)
 					mission.ProgressionPoint = 2;
 				end);
 
@@ -225,7 +225,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("medbre_start3", function(dialog)
 						dialog:AddChoice("medbre_start4", function(dialog)
 							dialog:AddChoice("medbre_start5", function(dialog)
-								modMission:StartMission(player, missionId);
+								modMission:StartMission(player, MISSION_ID);
 							end)
 						end)
 					end)
@@ -248,7 +248,7 @@ if RunService:IsServer() then
 								inventory:Remove(storageItem.ID, 1);
 							end
 							
-							modMission:Progress(player, missionId, function(mission)
+							modMission:Progress(player, MISSION_ID, function(mission)
 								if mission.ProgressionPoint <= 13 then
 									mission.ProgressionPoint = 13;
 								end
@@ -358,7 +358,7 @@ if RunService:IsServer() then
 									table.clear(mission.SaveData.MissionItems);
 								end
 								
-								modMission:Progress(player, missionId, function(mission)
+								modMission:Progress(player, MISSION_ID, function(mission)
 									if mission.ProgressionPoint <= 14 then
 										mission.ProgressionPoint = 14;
 									end
@@ -431,7 +431,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 						task.wait(4);
 						patrolBanditNpcModule:TeleportHide();
 	
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 11 then
 								mission.ProgressionPoint = 11;
 							end
@@ -453,7 +453,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 						task.wait(4);
 						patrolBanditNpcModule:TeleportHide();
 	
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 11 then
 								mission.ProgressionPoint = 11;
 							end
@@ -517,7 +517,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 										end
 									end
 									
-									modMission:Progress(player, missionId, function(mission)
+									modMission:Progress(player, MISSION_ID, function(mission)
 										if mission.ProgressionPoint == 9 then
 											mission.ProgressionPoint = 10;
 										end
@@ -555,7 +555,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 								task.wait(3);
 								
 								if not patrolBanditNpcModule.IsDead then
-									modMission:Progress(player, missionId, function(mission)
+									modMission:Progress(player, MISSION_ID, function(mission)
 										if mission.ProgressionPoint == 9 then
 											mission.ProgressionPoint = 10;
 										end
@@ -591,7 +591,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 							end
 						end
 
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint == 9 then
 								mission.ProgressionPoint = 10;
 							end

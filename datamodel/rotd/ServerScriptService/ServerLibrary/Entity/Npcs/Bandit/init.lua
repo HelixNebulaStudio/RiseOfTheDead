@@ -174,6 +174,7 @@ local npcPackage = {
         "DropReward";
         "AttractNpcs";
         "Chat";
+        "RandomClothing";
     };
 
     Voice = {
@@ -185,11 +186,13 @@ local npcPackage = {
 };
 
 function npcPackage.Spawning(npcClass: NpcClass)
-    local properties = npcClass.Properties;
+    local configurations: ConfigVariable = npcClass.Configurations;
+    local properties: PropertiesVariable<{}> = npcClass.Properties;
 
-    local maxHealth = 400 + 200*(properties.Level-1);
-    npcClass.HealthComp.MaxHealth = maxHealth;
-    npcClass.HealthComp.CurHealth = maxHealth;
+    local level = math.max(properties.Level, 0);
+
+    local maxHealth = 400 + 200*(level-1);
+    configurations.BaseValues.MaxHealth = maxHealth;
     
     local weaponChoices = {"machete"; "tec9"; "xm1014";};
     if properties.Level > 5 then
@@ -228,10 +231,12 @@ function npcPackage.Spawning(npcClass: NpcClass)
 
     local attractNpcsComp = npcClass:GetComponent("AttractNpcs");
     if attractNpcsComp then
-        attractNpcsComp.AttractHumanoidType = {"Zombie"; "Human"; "Bandit"};
+        attractNpcsComp.AttractHumanoidType = {"Zombie"; "Human"; "Bandit"; "Rat"};
         attractNpcsComp.SelfAttractAlert = true;
         attractNpcsComp:Activate();
     end
+
+    npcClass:GetComponent("RandomClothing")();
 end
 
 function npcPackage.Despawning(npcClass: NpcClass)

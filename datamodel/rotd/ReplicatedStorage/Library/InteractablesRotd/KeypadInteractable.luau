@@ -7,14 +7,16 @@ local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.Client
 
 local interactablePackage = {};
 --==
-
-function interactablePackage.init(super) -- Server/Client
+function interactablePackage.onRequire()
     if RunService:IsServer() then
         modRemotesManager:NewEventRemote("KeypadInput");
     end
-    local remoteKeypadInput = modRemotesManager:Get("KeypadInput");
 
-    local Keypad = {
+    remoteKeypadInput = modRemotesManager:Get("KeypadInput");
+end
+
+function interactablePackage.init(super) -- Server/Client
+    local Keypad = super.newPackage{
 		Name = "Keypad";
         Type = "Keypad";
 

@@ -36,18 +36,20 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     local stackedDamage = damage + damage * (stacks or 0);
 
     local npcClass: NpcClass = statusClass.StatusOwner :: NpcClass;
-    local healthComp: HealthComp? = npcClass:GetHealthComp(targetPart);
+    local healthComp: HealthComp? = npcClass.HealthComp;
     if healthComp == nil or healthComp.IsDead then return end;
     
+    local finalDamage = stackedDamage;
+
     if useCurrentHpDmg ~= false then
-        stackedDamage = stackedDamage + useCurrentHpDmg;
+        finalDamage = finalDamage + math.ceil(healthComp.CurHealth * 0.01);
     end
     if stackedDamage <= 0 then return; end
     
     local dmgData: DamageData = DamageData.new{
-        DamageBy = statusClass.Values.ApplyBy;
+        DamageBy = statusClass.ApplyBy;
 
-        Damage = stackedDamage;
+        Damage = finalDamage;
         DamageType = "Fire";
     };
     healthComp:TakeDamage(dmgData);

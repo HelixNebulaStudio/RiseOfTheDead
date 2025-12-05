@@ -7,13 +7,13 @@ local Dialogues = {
 	["Bunny Man"]={};
 };
 
-local missionId = 50;
+local MISSION_ID = 50;
 --==
 
 -- MARK: Bunny Man Dialogues
 Dialogues["Bunny Man"].DialogueStrings = {
 	["eb2_greet"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="What task do you have for me?"; 
 		Reply="The people who caused this apocalypse, is no single person. The groups that are responsible.. are powerful people. But not powerful enough to contain what they have created.";
 	};
@@ -60,6 +60,7 @@ if RunService:IsServer() then
 		local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
+		local playerClass: PlayerClass = shared.modPlayers.get(player);
 		local profile = shared.modProfile:Get(player);
 		local activeSave = profile:GetActiveSave();
 
@@ -67,7 +68,7 @@ if RunService:IsServer() then
 			if not modBranchConfigs.IsWorld("EasterButchery") then
 				dialog:AddChoice("eb2_letsgo", function(dialog)
 					data:Set("World", modBranchConfigs.WorldName);
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 1 then
 							mission.ProgressionPoint = 2;
 						end;
@@ -80,7 +81,7 @@ if RunService:IsServer() then
 				end)
 			else
 				if mission.ProgressionPoint == 1 then
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 1 then
 							mission.ProgressionPoint = 2;
 						end;
@@ -92,7 +93,7 @@ if RunService:IsServer() then
 					
 					local spawnPart = workspace:FindFirstChild("EasterButchery2");
 					if spawnPart then
-						shared.modAntiCheatService:Teleport(player, spawnPart.CFrame * CFrame.new(0, 2, 0));
+						playerClass:SetCFrame(spawnPart.CFrame * CFrame.new(0, 2, 0));
 					end
 					
 				elseif mission.ProgressionPoint == 2 then
@@ -100,7 +101,7 @@ if RunService:IsServer() then
 					
 					dialog:AddChoice("eb2_lead", function(dialog)
 						
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint == 2 then
 								mission.ProgressionPoint = 3;
 							end;
@@ -111,7 +112,7 @@ if RunService:IsServer() then
 					dialog:SetInitiate("You did well, looks like I know how to make the cultists crumple.");
 					dialog:AddChoice("eb2_end1", function(dialog)
 						dialog:AddChoice("eb2_end2", function(dialog)
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 
 							-- MARK: To do: bunnymanheadbenefactor
 						end)
@@ -130,7 +131,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("eb2_greet3", function(dialog)
 						dialog:AddChoice("eb2_greet4", function(dialog)
 							dialog:AddChoice("eb2_start", function(dialog)
-								modMission:StartMission(player, missionId);
+								modMission:StartMission(player, MISSION_ID);
 							end)
 						end)
 					end)

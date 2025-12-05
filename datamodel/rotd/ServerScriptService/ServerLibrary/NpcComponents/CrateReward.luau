@@ -21,13 +21,13 @@ end
 
 function Component:__call(cframe: CFrame, winners: {Player})
 	local npcClass: NpcClass = self.NpcClass;
-	local properties = npcClass.Properties;
+	local rawProperties = npcClass.Properties.Values;
 
-	local crateId = properties.CrateId;
+	local crateId = rawProperties.CrateId;
 	local crateLib = modCrateLibrary.Get(crateId);
 	if crateLib == nil then Debugger:Warn("Missing crate library for id:",crateId); end;
 	
-	local rewards = modCrates.GenerateRewards(crateId, nil, {HardMode=properties.HardMode;});
+	local rewards = modCrates.GenerateRewards(crateId, nil, {HardMode=rawProperties.HardMode;});
 	if #rewards <= 0 then return end;
 		
 	local rewardsLib = modRewardsLibrary:Find(crateId);

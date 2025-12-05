@@ -9,13 +9,13 @@ local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchCon
 local interactablePackage = {};
 --==
 function interactablePackage.init(super) -- Server/Client
-    local DoorRotd = {
+    local DoorRotd = super.newPackage{
 		Name = "DoorRotd";
         Type = "Door";
     };
     
     function DoorRotd.BindPrompt(interactable: InteractableInstance, info: InteractInfo)
-        interactable.TypePackage.BindPrompt(interactable, info);
+        DoorRotd.TypePackage.BindPrompt(interactable, info);
         if RunService:IsServer() then return end;
 
         local clientData = info.ClientData;

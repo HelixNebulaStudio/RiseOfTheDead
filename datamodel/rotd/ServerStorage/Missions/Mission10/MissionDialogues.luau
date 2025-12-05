@@ -8,7 +8,7 @@ local Dialogues = {
 	Wilson={};
 };
 
-local missionId = 10;
+local MISSION_ID = 10;
 --==
 
 -- !outline: Jefferson Dialogues
@@ -52,16 +52,15 @@ Dialogues.Wilson.DialogueStrings = {
 if RunService:IsServer() then
 	-- !outline: Jefferson Handler
 	Dialogues.Jefferson.DialogueHandler = function(player, dialog, data, mission)
-		local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 		local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 		local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 
+		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission.Type == 2 then -- Available;
 			
 		elseif mission.Type == 1 then -- Active
 			dialog:SetInitiate("Found the antibiotics yet?");
-			local mission = modMission:GetMission(player, 10);
 			local item, storage = modStorage.FindItemIdFromStorages("antibiotics", player);
 
 			if item then
@@ -70,7 +69,7 @@ if RunService:IsServer() then
 					modUnlockPack.UnlockPack(player, "ColorPacks", "Army");
 
 					storage:Remove(item.ID);
-					modMission:CompleteMission(player, 10);
+					modMission:CompleteMission(player, MISSION_ID);
 				end);
 			elseif (os.time()-mission.StartTime) > 300 then
 				dialog:AddChoice("infected_helper", function(dialog)

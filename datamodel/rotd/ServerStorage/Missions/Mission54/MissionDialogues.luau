@@ -88,7 +88,7 @@ if RunService:IsServer() then
 			end)
 			
 		elseif mission.Type == 1 then -- Active
-			if modBranchConfigs.IsWorld("TheWarehouse") then
+			if not modBranchConfigs.IsWorld("Safehome") then
 				dialog:SetInitiate("Let's go?");
 				dialog:AddChoice("hsh_letsgo", function(dialog)
 					modMission:Progress(player, MISSION_ID, function(mission)
@@ -96,7 +96,8 @@ if RunService:IsServer() then
 					end)
 					modServerManager:Travel(player, "Safehome");
 				end)
-			else
+
+			elseif modBranchConfigs.IsWorld("Safehome") then
 				if mission.ProgressionPoint == 2 then
 					dialog:SetInitiate("Here we are, hope we will find something good here..");
 					dialog:AddChoice("hsh_quiet", function(dialog)
@@ -106,7 +107,6 @@ if RunService:IsServer() then
 							end;
 						end)
 					end)
-
 
 				elseif mission.ProgressionPoint == 3 then
 					dialog:SetInitiate("Here they come..");

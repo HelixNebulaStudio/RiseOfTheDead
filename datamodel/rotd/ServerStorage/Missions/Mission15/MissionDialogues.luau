@@ -7,13 +7,13 @@ local Dialogues = {
 	Stephanie={};
 };
 
-local missionId = 15;
+local MISSION_ID = 15;
 --==
 
 -- MARK: Stephanie Dialogues
 Dialogues.Stephanie.DialogueStrings = {
 	["chainReaction_start"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Interesting, what is it?";
 		Face="Confident"; 
 		Reply="Well, this one's called Electric Charge, I believe it damages nearby enemeis, seems useful for taking out multiple enemies.";
@@ -64,7 +64,7 @@ if RunService:IsServer() then
 			dialog:AddChoice("chainReaction_start", function(dialog)
 				dialog:AddChoice("chainReaction_useful", function(dialog)
 					dialog:AddChoice("chainReaction_otherTwo", function(dialog)
-						modMission:StartMission(player, missionId, function(successful)
+						modMission:StartMission(player, MISSION_ID, function(successful)
 							if successful then
 								modBlueprints.UnlockBlueprint(player, "electricbp");
 								

@@ -7,13 +7,13 @@ local Dialogues = {
 	Jesse={};
 };
 
-local missionId = 17;
+local MISSION_ID = 17;
 --==
 
 -- !outline: Jesse Dialogues
 Dialogues.Jesse.DialogueStrings = {		
 	["partTime_start"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="What do you need this time?";
 		Face="Skeptical"; 
 		Reply="Get me this list of items, and make it snappy.";
@@ -45,14 +45,14 @@ if RunService:IsServer() then
 			dialog:AddChoice("aGoodDeal_org");
 			dialog:AddChoice("aGoodDeal_why");
 			dialog:AddChoice("partTime_start", function(dialog)
-				modMission:StartMission(player, missionId);
+				modMission:StartMission(player, MISSION_ID);
 			end)
 			
 		elseif mission.Type == 1 then -- Active
 			dialog:SetInitiate("Have you found the items yet?");
 			if mission.ObjectivesCompleted["Search"] == true then
 
-				if modMission:CanCompleteMission(player, missionId, true) then
+				if modMission:CanCompleteMission(player, MISSION_ID, true) then
 					dialog:AddChoice("restock_done", function(dialog)
 						local profile = shared.modProfile:Get(player);
 						local playerSave = profile:GetActiveSave();
@@ -66,7 +66,7 @@ if RunService:IsServer() then
 								shared.Notify(player, ("$Amount$Item removed from your Inventory."):gsub("$Item", itemLib.Name):gsub("$Amount", itemList[a].Quantity > 1 and itemList[a].Quantity.." " or ""), "Negative");
 
 							end
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 						else
 							shared.Notify(player, ("Unable to find items from inventory."), "Negative");
 						end

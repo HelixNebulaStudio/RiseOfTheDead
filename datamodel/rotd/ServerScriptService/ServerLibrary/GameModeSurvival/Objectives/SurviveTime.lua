@@ -34,7 +34,7 @@ function Objective:Tick()
 	local timeRemain = math.max(self.EndTime-tick(), 0);
 	local maxSpawnRate = math.max(timeRemain*0.05, 2/(math.max(self.Controller.Wave/5, 1)), 0.1);
 	
-	local canSpawn = timeRemain > 1 and tick()-self.LastSpawn > maxSpawnRate and #self.Controller.EnemyModules <= 100;
+	local canSpawn = timeRemain > 1 and tick()-self.LastSpawn > maxSpawnRate and #self.Controller.EnemyNpcClasses <= 100;
 	if self.PauseTick and tick() < self.PauseTick then
 		canSpawn = false;
 	end
@@ -66,7 +66,7 @@ function Objective:Tick()
 		
 	end
 
-	if tick() > self.EndTime and #self.Controller.EnemyModules <= 0 then
+	if tick() > self.EndTime and #self.Controller.EnemyNpcClasses <= 0 then
 		return true;
 	end
 	
@@ -74,9 +74,9 @@ function Objective:Tick()
 end
 
 function Objective:End()
-	for a=#self.Controller.EnemyModules, 1, -1 do
-		game.Debris:AddItem(self.Controller.EnemyModules[a].Prefab, 0);
-		table.remove(self.Controller.EnemyModules, a);
+	for a=#self.Controller.EnemyNpcClasses, 1, -1 do
+		game.Debris:AddItem(self.Controller.EnemyNpcClasses[a].Character, 0);
+		table.remove(self.Controller.EnemyNpcClasses, a);
 	end
 end
 

@@ -19,7 +19,7 @@ end
 local DEADBODY_ID = 1;
 local GIFT_SPAWNCF = CFrame.new(689.499939, 69.1379852, -74.0011292, 1, 0, 0, 0, 1, 0, 0, 0, 1);
 
-local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new();
+local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new(script);
 --==
 
 function WorldCore.onRequire()
@@ -35,9 +35,9 @@ function WorldCore.onRequire()
                 DEADBODY_MODEL.Parent = game.ServerStorage;
             end
 
+            WorldCore:LoadPlayerMissions(player, profile);
             WorldCore:SpawnGift(player, "sundaysGift", GIFT_SPAWNCF);
             WorldCore:SpawnPlayerNpc(player, "Wilson");
-            WorldCore:LoadPlayerMissions(player, profile);
 
         end, 999);
 
@@ -54,7 +54,6 @@ function WorldCore.onRequire()
         shared.modNpcs.spawn2{Name="Stephanie";};
         shared.modNpcs.spawn2{Name="Dr. Deniski";};
         shared.modNpcs.spawn2{Name="Nick";};
-        shared.modNpcs.spawn2{Name="Jefferson";};
         shared.modNpcs.spawn2{Name="Jefferson";};
         shared.modNpcs.spawn2{Name="Jesse";};
 

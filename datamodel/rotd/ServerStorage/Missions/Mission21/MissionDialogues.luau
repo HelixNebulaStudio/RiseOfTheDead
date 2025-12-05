@@ -7,13 +7,13 @@ local Dialogues = {
 	Jane={};
 };
 
-local missionId = 21;
+local MISSION_ID = 21;
 --==
 
 -- MARK: Jane Dialogues
 Dialogues.Jane.DialogueStrings = {
 	["springkill_yes"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Yes, I'm up for it.";
 		Face="Happy"; 
 		Reply="Bloxmart, the bank and the factory. You know the places..";
@@ -42,7 +42,7 @@ if RunService:IsServer() then
 			and mission.ObjectivesCompleted["Tanker"] == true
 			and mission.ObjectivesCompleted["Fumes"] == true then
 				dialog:AddChoice("springkill_done", function(dialog)
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 			else
 				dialog:AddChoice("springkill_notYet");
@@ -51,7 +51,7 @@ if RunService:IsServer() then
 		elseif mission.Type == 2 then -- Available
 			dialog:SetInitiate("Hey, you up for some killing?");
 			dialog:AddChoice("springkill_yes", function(dialog)
-				modMission:StartMission(player, missionId);
+				modMission:StartMission(player, MISSION_ID);
 			end)
 			
 		end

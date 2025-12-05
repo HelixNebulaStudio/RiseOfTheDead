@@ -14,7 +14,8 @@ function Gun.new(equipmentClass: EquipmentClass)
     return self;
 end
 
-function Gun:Update(equipmentClass: EquipmentClass, storageItem: StorageItem)
+function Gun:Update(equipmentClass: EquipmentClass)
+    local storageItem: StorageItem = equipmentClass.StorageItem;
     self:UpdatePotential(equipmentClass, storageItem.Values.L);
 
     -- MARK: TODO CalculateDps()

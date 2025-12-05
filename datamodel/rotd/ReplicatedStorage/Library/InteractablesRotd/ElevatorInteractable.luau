@@ -3,6 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+
 local ElevatorList = {};
 if RunService:IsServer() then
     
@@ -14,8 +16,8 @@ function InitElevator(interactable: InteractableInstance)
     local elevatorId = interactable.Values.ElevatorId;
 
     local elevatorModel = workspace.Environment:WaitForChild(elevatorId);
-    local base = elevatorModel:WaitForChild("Base");
-    local liftBase = elevatorModel:WaitForChild("LiftBase");
+    local basePart = elevatorModel:WaitForChild("Base");
+    local liftBasePart = elevatorModel:WaitForChild("LiftBase");
 
     local elevatorObj = ElevatorList[elevatorId];
     if elevatorObj == nil then
@@ -27,7 +29,7 @@ function InitElevator(interactable: InteractableInstance)
         ElevatorList[elevatorId] = elevatorObj;
 
         elevatorObj.Model = elevatorModel;
-        elevatorObj.BaseCFrame = base.CFrame;
+        elevatorObj.BaseCFrame = basePart.CFrame;
 
         elevatorModel:SetAttribute("CurrentFloor", 1);
         elevatorModel:SetAttribute("IsActive", false);
@@ -41,8 +43,11 @@ function InitElevator(interactable: InteractableInstance)
 
             elevatorModel:SetAttribute("IsActive", true);
 
-            local travelTweenInfo = TweenInfo.new(8);
-            local tween: Tween = TweenService:Create(liftBase, travelTweenInfo, {
+            local distance = (liftBasePart.CFrame.Position-floorCf.Position).Magnitude;
+            local travelTime = distance/15;
+
+            local travelTweenInfo = TweenInfo.new(travelTime);
+            local tween: Tween = TweenService:Create(liftBasePart, travelTweenInfo, {
                 CFrame = elevatorObj.BaseCFrame * floorCf;
             });
             tween.Completed:Once(function(status)
@@ -59,13 +64,14 @@ function InitElevator(interactable: InteractableInstance)
     local floorCFrame = interactable.Values.FloorCFrame;
     
     if setFloor and floorCFrame then
-        elevatorObj.FloorCFrames[setFloor] = floorCFrame;
+        local toObjSpaceCf = elevatorObj.BaseCFrame:ToObjectSpace(floorCFrame);
+        elevatorObj.FloorCFrames[setFloor] = toObjSpaceCf;
     end
     Debugger:StudioLog(`InitElevator {setFloor}`, elevatorObj);
 end
 
 function interactablePackage.init(super) -- Server/Client
-    local Elevator = {
+    local Elevator = super.newPackage{
 		Name = "Elevator";
         Type = "Button";
 
@@ -97,7 +103,7 @@ function interactablePackage.init(super) -- Server/Client
     end
 
     function Elevator.BindInteract(interactable: InteractableInstance, info: InteractInfo)
-        interactable.TypePackage.BindInteract(interactable, info);
+        Elevator.TypePackage.BindInteract(interactable, info);
         if info.Action ~= "Server" then return end;
 
         local elevatorId = interactable.Values.ElevatorId;
@@ -111,6 +117,7 @@ function interactablePackage.init(super) -- Server/Client
         local curFloor = elevatorModel:GetAttribute("CurrentFloor", 1);
         local isActive = elevatorModel:GetAttribute("IsActive", false);
 
+        if elevatorModel:GetAttribute("IsPowered") == false then return end;
         Debugger:StudioLog(`Elevator elevatorId({elevatorId}) curFloor({curFloor}) isActive({isActive}) setFloor({setFloor}) setDir({setDir})`, elevatorObj);
 
         if isActive then return end;
@@ -122,10 +129,17 @@ function interactablePackage.init(super) -- Server/Client
                 newFloor = curFloor + 1;
             elseif setDir == "Down" then
                 newFloor = curFloor - 1;
+            elseif setDir == "Reverse" then
+                if curFloor == 1 then
+                    newFloor = 2;
+                else
+                    newFloor = 1;
+                end
             end
         end
         elevatorObj.GoToFloor(newFloor);
 
+        modAudio.Play("Completion", interactable.Part).PlaybackSpeed = 0.5;
     end
     
     -- When interactable pops up on screen.
@@ -143,7 +157,11 @@ function interactablePackage.init(super) -- Server/Client
 			interactable.Label = "Lift is moving..";
 			
         else
-            if interactable.Values.SetFloor then
+            if elevatorModel:GetAttribute("IsPowered") == false then
+                interactable.CanInteract = false;
+                interactable.Label = "Lift is not powered";
+
+            elseif interactable.Values.SetFloor then
                 if curFloor == interactable.Values.SetFloor then
                     interactable.CanInteract = false;
                     interactable.Label = "Lift Arrived";
@@ -156,8 +174,17 @@ function interactablePackage.init(super) -- Server/Client
                 interactable.CanInteract = true;
                 if interactable.Values.SetDir == "Up" then
                     interactable.Label = "Go Up";
+                    
                 elseif interactable.Values.SetDir == "Down" then
                     interactable.Label = "Go Down";
+
+                elseif interactable.Values.SetDir == "Reverse" then
+                    if curFloor == 1 then
+                        interactable.Label = "Go Up";
+                    else
+                        interactable.Label = "Go Down";
+                    end
+
                 end
             end
 		end

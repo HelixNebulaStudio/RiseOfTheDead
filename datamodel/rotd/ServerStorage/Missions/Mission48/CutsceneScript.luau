@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService");
 
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 
 --== Variables;
 local MISSION_ID = 48;
@@ -13,7 +14,6 @@ if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	
 	barricadeFolder = script.Parent:WaitForChild("Barricades");
 	for _, obj in pairs(barricadeFolder:GetDescendants()) do
@@ -23,20 +23,24 @@ if RunService:IsServer() then
 	end
 	
 	if modBranchConfigs.IsWorld("TheMall") then
-		modOnGameEvents:ConnectEvent("OnDestructibleDestroy", function(destructible, player, storageItem)
-			if destructible.MissionIdTag ~= MISSION_ID then return; end
-			local player = destructible.NetworkOwners and destructible.NetworkOwners[1];
-			
-			if modMission:IsAvailable(player, MISSION_ID) then
-				modMission:StartMission(player, MISSION_ID);
+		shared.modEventService:OnInvoked("Destructibles_BindDestroyed", function(event: EventPacket, ...) 
+			local destructible: DestructibleInstance = ...;
+			if destructible.Properties.MissionIdTag ~= MISSION_ID then return; end
+			if destructible.NetworkOwners == nil then return end;
+
+			for a=1, #destructible.NetworkOwners do
+				local player = destructible.NetworkOwners[a];
+
+				if modMission:IsAvailable(player, MISSION_ID) then
+					modMission:StartMission(player, MISSION_ID);
+				end
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint < 2 then
+						mission.ProgressionPoint = 2;
+					end;
+				end)
 			end
-			modMission:Progress(player, MISSION_ID, function(mission)
-				if mission.ProgressionPoint < 2 then
-					mission.ProgressionPoint = 2;
-				end;
-			end)
-			
-		end);
+		end)
 	end
 
 else
@@ -69,27 +73,31 @@ return function(CutsceneSequence)
 		CutsceneSequence:NextScene("loadCheck");
 		
 		local newBlockage = barricadeFolder:FindFirstChild(blockageName):Clone();
-		local destructible = shared.require(newBlockage:WaitForChild("Destructible"));
-		destructible.NetworkOwners = {player};
+
+		local destructibleConfig = newBlockage:WaitForChild("Destructible");
+		local destructibleInstance: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
+		destructibleInstance.NetworkOwners = {player};
+		destructibleInstance.Properties.MissionIdTag = MISSION_ID;
+
 		newBlockage.Parent = workspace.Environment;
 		modReplicationManager.ReplicateOut(player, newBlockage);
 		
-		local strangerModule = modNpcs.getPlayerNpc(player, "Stranger", function(npcModule)
-			return npcModule.MissionId == MISSION_ID;
+		local strangerNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Stranger", function(npcClass: NpcClass)
+			return npcClass.Properties.MissionId == MISSION_ID;
 		end);
 		
-		if strangerModule == nil then
-			local npc = modNpcs.spawn("Stranger", chosenSpawn, function(npc, npcModule)
-				npcModule.MissionId = MISSION_ID;
-				npcModule.FollowingOwner = false;
-				npcModule.Seed = (mission.SaveData.Seed or 1);
-				npcModule.Player = player;
-				npcModule.Immortal = 1;
-				strangerModule = npcModule;
-			end);
-			npc:SetAttribute("Player", player.Name);
-			
-			modReplicationManager.ReplicateOut(player, npc);
+		if strangerNpcClass == nil then
+			strangerNpcClass = modNpcs.spawn2{
+				Name = "Stranger";
+				CFrame = chosenSpawn;
+				Player = player;
+				BindSetup = function(npcClass: NpcClass)
+					npcClass.Properties.MissionId = MISSION_ID;
+					npcClass.Properties.Seed = (mission.SaveData.Seed or 1);
+					npcClass.Properties.Immortal = 1;
+				end;
+			};
+			strangerNpcClass.Character:SetAttribute("Player", player.Name);
 		end
 		
 		local function OnChanged(firstRun)
@@ -99,20 +107,21 @@ return function(CutsceneSequence)
 				if mission.ProgressionPoint == 1 then
 					
 				elseif mission.ProgressionPoint == 2 then
-					if strangerModule then
-						strangerModule.Immortal = 0;
-						modReplicationManager.ReplicateDefault(strangerModule.Prefab, workspace.Entity);
-						
-						strangerModule.FollowingOwner = true;
-						strangerModule.StopAnimation("Panic");
+					if strangerNpcClass then
+						strangerNpcClass.Properties.Immortal = 0;
+						modReplicationManager.ReplicateDefault(strangerNpcClass.Character, workspace.Entity);
+
+						strangerNpcClass:GetComponent("FollowPlayer")(nil, function() 
+							return mission.ProgressionPoint == 2;
+						end);
+						strangerNpcClass.StopAnimation("Panic");
 					end
 				end
 				
 			elseif mission.Type == 3 then -- OnComplete
 				delay(2, function()
-					if strangerModule and strangerModule.Prefab then
-						strangerModule.Prefab:Destroy();
-						strangerModule = nil;
+					if strangerNpcClass and strangerNpcClass.Character then
+						strangerNpcClass.Character:Destroy();
 					end
 				end)
 				mission.OnChanged:Disconnect(OnChanged);

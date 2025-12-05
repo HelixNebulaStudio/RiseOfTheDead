@@ -5,34 +5,44 @@ local RunService = game:GetService("RunService");
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
-local missionId = 45;
+local MISSION_ID = 45;
 if RunService:IsServer() then
 	if not modBranchConfigs.IsWorld("Prison") then return {}; end;
 
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-	
-	modOnGameEvents:ConnectEvent("OnGameModeStart", function(player, gameType, gameStage, room)
-		if gameType == "Survival" and gameStage == "Prison" then
-			modMission:Progress(player, missionId, function(mission)
+
+	shared.modEventService:OnInvoked("GameModeManager_BindGameModeStart", function(eventPacket: EventPacket, packet)
+		local room = packet.Room;
+		if room.Type ~= "Survival" or room.Stage ~= "Prison" then return end;
+		if eventPacket.Players == nil then return end;
+		
+		for _, player: Player in pairs(eventPacket.Players) do
+			if not modMission:Progress(player, MISSION_ID) then continue end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
 				if mission.ProgressionPoint == 1 then
 					mission.ProgressionPoint = 2;
 				end;
 			end)
-
 		end
-	end);
-	
+	end)
 
-	modOnGameEvents:ConnectEvent("OnGameModeComplete", function(player, gameType, gameStage, room)
-		if gameType == "Survival" and gameStage == "Prison" then
-			modMission:Progress(player, missionId, function(mission)
+	shared.modEventService:OnInvoked("GameModeManager_BindGameModeComplete", function(eventPacket: EventPacket, packet)
+		local room = packet.Room;
+
+		if room.Type ~= "Survival" or room.Stage ~= "Prison" then return end;
+		if eventPacket.Players == nil then return end;
+		
+		for _, player: Player in pairs(eventPacket.Players) do
+			if not modMission:Progress(player, MISSION_ID) then continue end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
 				mission.ProgressionPoint = 3;
 			end)
-			
 		end
 	end)
 	
+
 	local luckyCoin = script.Parent:WaitForChild("Mike's Lucky Coin");
 
 	function MissionLogic.Init(missionProfile, mission)

@@ -7,13 +7,13 @@ local Dialogues = {
 	Erik={};
 };
 
-local missionId = 20;
+local MISSION_ID = 20;
 --==
 
 -- MARK: Erik Dialogues
 Dialogues.Erik.DialogueStrings = {
 	["eightlegs_sure"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="What do you need help with?";
 		Face="Worried"; 
 		Reply="The Zpider is making a lot of noise and I have a hard time sleeping because of it..\nCould you kill it for me please?";
@@ -52,7 +52,7 @@ if RunService:IsServer() then
 
 			elseif stage == 2 then
 				dialog:AddChoice("eightlegs_return", function(dialog)
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 
 			end
@@ -61,7 +61,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Hey, can you help me with something?");
 			dialog:AddChoice("eightlegs_sure", function(dialog)
 				dialog:AddChoice("eightlegs_yeah", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 
 			end)

@@ -1,8 +1,11 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
+local RunService = game:GetService("RunService");
+
+local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local MissionLogic = {};
-local RunService = game:GetService("RunService");
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+--==
 
 local MISSION_ID = 81;
 if RunService:IsServer() then
@@ -11,25 +14,41 @@ if RunService:IsServer() then
 	local modNpcs = shared.modNpcs;
 
 	--if not modBranchConfigs.IsWorld("TheHarbor") then return MissionLogic end;
+	if modBranchConfigs.IsWorld("BioXResearch") then
+		modNpcs.spawn2{
+			Name = "Joseph";
+			CFrame = CFrame.new(-50.208, -16.75, 23.504);
+		};
+		modNpcs.spawn2{
+			Name = "Cooper";
+			CFrame = CFrame.new(-55.208, -16.75, 23.504);
+		};
+		modNpcs.spawn2{
+			Name = "David";
+			CFrame = CFrame.new(-60.208, -16.75, 23.504);
+		};
+	end
 
-	modOnGameEvents:ConnectEvent("OnFotlLossNpc", function(npcPrefab)
-		for _, player in pairs(game.Players:GetPlayers()) do
+	shared.modEventService:OnInvoked("FotlCardGame_BindNpcLose", function(eventPacket: EventPacket, ...)
+		local gameLobby, loserNpcChar = ...;
+		if eventPacket.Players == nil then return end;
 
-			if npcPrefab.Name == "David" then
+		for _, player in pairs(eventPacket.Players) do
+			if loserNpcChar.Name == "David" then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint == 3 then
 						mission.ProgressionPoint = 4;
 					end
 
-					local npcModule = modNpcs.getByModel(npcPrefab);
-					if npcModule and npcModule.Chat then
-						npcModule.Chat(player, `Well played {player.Name}!`);
+					local npcClass: NpcClass = modNpcs.getByModel(loserNpcChar);
+					if npcClass then
+						npcClass.Chat(player, `Well played {player.Name}!`);
 						task.wait(3);
-						npcModule.Chat(player, `Hope you can beat Cooper now.`);
+						npcClass.Chat(player, `Hope you can beat Cooper now.`);
 					end
 				end)
 
-			elseif npcPrefab.Name == "Cooper" then
+			elseif loserNpcChar.Name == "Cooper" then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint == 4 then
 						mission.ProgressionPoint = 5;
@@ -40,19 +59,20 @@ if RunService:IsServer() then
 			end
 		end
 	end)
+	shared.modEventService:OnInvoked("FotlCardGame_BindNpcWin", function(eventPacket: EventPacket, ...)
+		local gameLobby, winnerNpcChar = ...;
+		if eventPacket.Players == nil then return end;
 
-	modOnGameEvents:ConnectEvent("OnFotlWonNpc", function(npcPrefab)
-		for _, player in pairs(game.Players:GetPlayers()) do
-
-			if npcPrefab.Name == "Cooper" then
+		for _, player in pairs(eventPacket.Players) do
+			if winnerNpcChar.Name == "Cooper" then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.SaveData.CooperRematch == 1 then
 						if mission.ProgressionPoint == 4 then
 							mission.ProgressionPoint = 5;
 
-							local npcModule = modNpcs.getByModel(npcPrefab);
-							if npcModule and npcModule.Chat then
-								npcModule.Chat(player, `Begineer's luck!`);
+							local npcClass: NpcClass = modNpcs.getByModel(winnerNpcChar);
+							if npcClass then
+								npcClass.Chat(player, `Begineer's luck!`);
 							end
 						end
 					end
@@ -61,10 +81,15 @@ if RunService:IsServer() then
 				end)
 			end
 		end
-		
 	end)
 
-	modOnGameEvents:ConnectEvent("OnEmote", function(player, emoteId)
+	shared.modEventService:OnInvoked("Character_BindEmote", function(eventPacket: EventPacket, ...)
+		local player = eventPacket.Player;
+		if player == nil then return end;
+
+		local emoteId = ...;
+		if emoteId == nil then return end;
+
 		local modEmotesLibrary = shared.require(game.ReplicatedStorage.Library.EmotesLibrary);
 		local emoteLib = modEmotesLibrary:Find(emoteId);
 
@@ -88,8 +113,8 @@ if RunService:IsServer() then
 
 				else
 
-					local npcModule = cooperPrefab and modNpcs.getByModel(cooperPrefab);
-					if npcModule and npcModule.Chat then
+					local npcClass: NpcClass = cooperPrefab and modNpcs.getByModel(cooperPrefab);
+					if npcClass then
 						local notDanceMsg = {
 							"You call that a dance?";
 							"That's not exactly a dance..";
@@ -98,14 +123,13 @@ if RunService:IsServer() then
 						
 						if mission.CarlsonNotDanceTick == nil or tick()-mission.CarlsonNotDanceTick >= 1 then
 							mission.CarlsonNotDanceTick = tick();
-							npcModule.Chat(player, notDanceMsg[math.random(1,#notDanceMsg)]);
+							npcClass.Chat(player, notDanceMsg[math.random(1,#notDanceMsg)]);
 						end
 					end
 
 				end
 			end
 		end)
-
 	end)
 
 end

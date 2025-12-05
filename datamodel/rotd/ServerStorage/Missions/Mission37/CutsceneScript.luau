@@ -18,11 +18,14 @@ if RunService:IsServer() then
 	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 
-	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
+	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, ...)
 		local player: Player? = eventPacket.Player;
 		if player == nil then return end;
 
-		local triggerId = interactData.TriggerTag;
+		local interactable: InteractableInstance = ...;
+		if interactable == nil then return end;
+			
+		local triggerId = interactable.Id;
 
 		if triggerId == "jlLettuce1" or triggerId == "jlLettuce2" or triggerId == "jlLettuce3" then
 			local event = modEvents:GetEvent(player, triggerId);
@@ -31,8 +34,8 @@ if RunService:IsServer() then
 			if lastEventTime == nil or modSyncTime.GetTime() >= lastEventTime then
 				modEvents:NewEvent(player, {Id=triggerId; Time=modSyncTime.GetTime()+600;});
 				shared.Notify(player, "The plants have been watered.", "Reward");
-				if modMission:Progress(player, 37) then
-					modMission:Progress(player, 37, function(mission)
+				if modMission:Progress(player, MISSION_ID) then
+					modMission:Progress(player, MISSION_ID, function(mission)
 						mission.ObjectivesCompleted[triggerId] = true;
 					end)
 				end
@@ -51,7 +54,10 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheResidentials") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigs.IsWorld("TheResidentials") then 
+		Debugger:Warn("Invalid place for cutscene ("..script.Name..")");
+		return;
+	end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();

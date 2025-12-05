@@ -1,7 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Client Variables;
 local localPlayer = game.Players.LocalPlayer;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService");
+local Configurations = require(ReplicatedStorage.Library.Configurations)
 
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
@@ -17,13 +19,19 @@ if RunService:IsServer() then
 	modCoopMission = shared.require(game.ServerScriptService.ServerLibrary.CoopMission);
 	modFactions = shared.require(game.ServerScriptService.ServerLibrary.Factions);
 
-	modOnGameEvents:ConnectEvent("OnNpcDeath", function(npcModule)
-		local coopMission = npcModule.CoopId and modCoopMission:Get(npcModule.CoopId.GroupId, npcModule.CoopId.MissionId) or nil;
+	shared.modEventService:OnInvoked("Npcs_BindDeath", function(event: EventPacket, ...) 
+		local npcClass: NpcClass = ...;
+		if npcClass == nil then return end;
+		
+		local coopData = npcClass.Properties.CoopId;
+		if coopData == nil then return end;
+		
+		local coopMission = modCoopMission:Get(coopData.GroupId, coopData.MissionId) or nil;
 		if coopMission == nil then return end;
 		
 		modMission:CompleteMission(coopMission:GetPlayers(), MISSION_ID);
 		coopMission:Destroy();
-	end);
+	end)
 	
 
 	shared.modPlayers.OnPlayerDied:Connect(function(playerClass: PlayerClass)
@@ -33,7 +41,6 @@ if RunService:IsServer() then
 
 		local profile = shared.modProfile:Get(player);
 		local factionTag = tostring(profile.Faction.Tag);
-
 
 		local coopMission = modCoopMission:Get(factionTag, MISSION_ID);
 		if coopMission == nil then Debugger:Warn("No coop mission OnPlayerDied"); return end;
@@ -75,7 +82,7 @@ return function(CutsceneSequence)
 		coopMission = modCoopMission.new(factionTag, MISSION_ID);
 		coopMission:AddPlayer(hostPlayer);
 		
-		local activeBossNpcModule = nil;
+		local activeBossNpcClass: NpcClass = nil;
 
 		local function OnChanged(firstRun, coopMission)
 			Debugger:Warn("coopMission OnChanged ", coopMission);
@@ -112,105 +119,118 @@ return function(CutsceneSequence)
 					end)
 					
 					
-					if activeBossNpcModule then
-						activeBossNpcModule:Destroy();
-						Debugger.Expire(activeBossNpcModule.Prefab, 0);
+					if activeBossNpcClass then
+						activeBossNpcClass:Destroy();
+						Debugger.Expire(activeBossNpcClass.Character, 0);
 					end
 					
 					local bossSpawnCf = workspace:FindFirstChildWhichIsA("SpawnLocation").CFrame * CFrame.new(0, 10, 0);
-					modNpcs.spawn(pickBossName, bossSpawnCf, function(npc, npcModule)
-						activeBossNpcModule = npcModule;
+					activeBossNpcClass = modNpcs.spawn2{
+						Name = pickBossName;
+						CFrame = bossSpawnCf;
+						BindSetup = function(npcClass: NpcClass)
+							npcClass.Name = "Zenith ".. tostring(pickBossName);
 
-						npc:SetAttribute("Soundtrack", "Soundtrack:StadiumOfDreams");
-						npc:SetAttribute("EntityHudHealth", true);
-						
-						npc.Name = "Zenith ".. tostring(pickBossName);
-						
-						npcModule.Configuration.CrateId = "zenithcrate";
-						
-						npcModule.Properties.TargetableDistance = 4096;
-						npcModule.OnTarget(coopMission:GetPlayers());
-						npcModule.Properties.AttackDamage = 1;
-						
-						npcModule.CoopId = {GroupId=factionTag; MissionId=MISSION_ID;};
-						
-						local maxHpVal = 5000000;
-						if RunService:IsStudio() then
-							maxHpVal = 100000;
-						end
-						npcModule.Humanoid.MaxHealth = maxHpVal;
-						npcModule.Humanoid.Health = maxHpVal;
-						
-						if npcModule.Immunity == nil or npcModule.Immunity <= 1 then
-							npcModule.Immunity = 0.7;
-						end
-						npcModule.WeakenImmunity = 0.8;
-						npcModule.DisabledImmunity = 0.5;
-						
-						task.spawn(function()
-							while true do
-								task.wait(3);
-								if not workspace:IsAncestorOf(npc) or npcModule.Humanoid.Health <= 0 then
-									break;
-								end
-								
-								npcModule.OnTarget(coopMission:GetPlayers());
-								npcModule.Properties.AttackDamage = math.clamp(npcModule.Properties.AttackDamage +1, 1, 100);
+							local configuration = npcClass.Configurations;
+							configuration.BaseValues.AttackDamage = 1;
+
+							local properties = npcClass.Properties;
+							properties.TargetableDistance = 4096;
+							properties.CrateId = "zenithcrate";
+							properties.CoopId = {GroupId=factionTag; MissionId=MISSION_ID;};
+
+
+							local npcChar = npcClass.Character;
+							npcChar:SetAttribute("Soundtrack", "Soundtrack:StadiumOfDreams");
+							npcChar:SetAttribute("EntityHudHealth", true);
+
+							local maxHpVal = 5000000;
+							if RunService:IsStudio() then
+								maxHpVal = 100000;
 							end
-						end)
-						task.spawn(function()
-							npcModule.LastBlinkUse = tick();
-							npcModule.LastForceBlink = tick();
-							while true do
-								task.wait(1);
-								if not workspace:IsAncestorOf(npc) or npcModule.Humanoid.Health <= 0 then
-									break;
-								end
-								
-								if tick()-npcModule.LastForceBlink >= 10 then
-									npcModule.LastForceBlink = tick();
-									if npcModule.Enemy and npcModule.Enemy.Humanoid then
-										npcModule.Blink(npcModule.Enemy.Humanoid);
-									end
-									
-								elseif tick()-npcModule.LastDamageTaken >= 3 and tick()-npcModule.LastBlinkUse >= 3 then
-									npcModule.LastBlinkUse = tick();
-									if npcModule.Enemy and npcModule.Enemy.Humanoid then
-										npcModule.Blink(npcModule.Enemy.Humanoid);
-									end
-									
-								end
-							end
+							npcClass.HealthComp:SetMaxHealth(maxHpVal);
+							npcClass.HealthComp:Reset();
 							
-						end)
-						
-						if npcModule.Blink == nil then
-							npcModule:AddComponent(modNpcs.Script.Zombie.Blink);
-						end
-						npcModule.Humanoid.Died:Connect(function()
-							if npcModule.CrateReward then
+							if properties.Immunity == nil or properties.Immunity <= 1 then
+								properties.Immunity = 0.7;
+							end
+							properties.WeakenImmunity = 0.8;
+							properties.DisabledImmunity = 0.5;
+
+							if npcClass:GetComponent("BlinkTeleport") == nil then
+								npcClass:AddComponent("BlinkTeleport");
+							end
+
+							-- task.spawn(function()
+							-- 	npcModule.LastBlinkUse = tick();
+							-- 	npcModule.LastForceBlink = tick();
+							-- 	while true do
+							-- 		task.wait(1);
+							-- 		if not workspace:IsAncestorOf(npc) or npcModule.Humanoid.Health <= 0 then
+							-- 			break;
+							-- 		end
+									
+							-- 		if tick()-npcModule.LastForceBlink >= 10 then
+							-- 			npcModule.LastForceBlink = tick();
+							-- 			if npcModule.Enemy and npcModule.Enemy.Humanoid then
+							-- 				npcModule.Blink(npcModule.Enemy.Humanoid);
+							-- 			end
+										
+							-- 		elseif tick()-npcModule.LastDamageTaken >= 3 and tick()-npcModule.LastBlinkUse >= 3 then
+							-- 			npcModule.LastBlinkUse = tick();
+							-- 			if npcModule.Enemy and npcModule.Enemy.Humanoid then
+							-- 				npcModule.Blink(npcModule.Enemy.Humanoid);
+							-- 			end
+										
+							-- 		end
+							-- 	end
+								
+							-- end)
+							
+							npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
+								if not isDead then return end;
+								if npcClass:GetComponent("CrateReward") == nil then return end;
+								
 								local coopPlayers = coopMission:GetPlayers();
 								local selectCoopPlayer = coopPlayers[math.random(1, #coopPlayers)];
-								local classPlayer = shared.modPlayers.get(selectCoopPlayer);
+								local playerClass: PlayerClass = shared.modPlayers.get(selectCoopPlayer);
 
 								local spawnCFrame;
 								if spawnCFrame == nil then
-									local _dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(Ray.new(npcModule.DeathPosition, Vector3.new(0, -32, 0)), {workspace.Environment; workspace.Terrain}, true);
+									local _dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(Ray.new(properties.DeathPosition, Vector3.new(0, -32, 0)), {workspace.Environment; workspace.Terrain}, true);
 									spawnCFrame = CFrame.new(dropRayPos);
 								end
-								
-								if classPlayer and classPlayer.SafeCFrame and spawnCFrame == nil then
-									local _dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(Ray.new(classPlayer.SafeCFrame.Position, Vector3.new(0, -32, 0)), {workspace.Environment; workspace.Terrain}, true);
+
+								if playerClass and spawnCFrame == nil then
+									local _dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(Ray.new(playerClass:GetCFrame().Position, Vector3.new(0, -32, 0)), {workspace.Environment; workspace.Terrain}, true);
 									spawnCFrame = CFrame.new(dropRayPos);
 								end
 
 								spawnCFrame = spawnCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
 
-								local _cratePrefab, _crateInteractable = npcModule:CrateReward(spawnCFrame, coopPlayers);
+								local _cratePrefab, _crateInteractable = npcClass:GetComponent("CrateReward")(spawnCFrame, coopPlayers);
+							end)
+						end
+					};
+
+					local targetHandlerComp = activeBossNpcClass:GetComponent("TargetHandler");
+					activeBossNpcClass:GetComponent("Blink")();
+					task.spawn(function()
+						while true do
+							task.wait(3);
+							if activeBossNpcClass.HealthComp.IsDead then
+								break;
 							end
-						end);
-						
-					end);
+							
+							for _, player in pairs(coopMission:GetPlayers()) do
+								if player.Character == nil then continue end;
+								targetHandlerComp:AddTarget(player.Character);
+							end
+							
+							local configurations = activeBossNpcClass.Configurations;
+							configurations.BaseValues.AttackDamage = math.clamp(configurations.BaseValues.AttackDamage +1, 1, 100);
+						end
+					end)
 					
 				end
 				
@@ -220,10 +240,10 @@ return function(CutsceneSequence)
 					Debugger:Warn("failing ", player);
 					modMission:FailMission(player, MISSION_ID, coopMission.FailReason);
 					
-					if activeBossNpcModule then
-						activeBossNpcModule:Destroy();
-						Debugger.Expire(activeBossNpcModule.Prefab, 0);
-						activeBossNpcModule = nil;
+					if activeBossNpcClass then
+						activeBossNpcClass:Destroy();
+						Debugger.Expire(activeBossNpcClass.Character, 0);
+						activeBossNpcClass = nil;
 					end
 				end)
 

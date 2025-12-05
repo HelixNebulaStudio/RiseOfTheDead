@@ -227,7 +227,7 @@ function Objective:Tick()
 	
 	local maxSpawnRate = math.max(1-(timelapseSinceStart/60), 1);
 	
-	local canSpawn = tick()-self.LastSpawn > maxSpawnRate and #self.Controller.EnemyModules <= 50
+	local canSpawn = tick()-self.LastSpawn > maxSpawnRate and #self.Controller.EnemyNpcClasses <= 50
 	if self.PauseTick and tick() < self.PauseTick then
 		canSpawn = false;
 	end

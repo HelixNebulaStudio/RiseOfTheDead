@@ -7,13 +7,13 @@ local Dialogues = {
 	Danny={};
 };
 
-local missionId = 39;
+local MISSION_ID = 39;
 --==
 
 -- MARK: Danny Dialogues
 Dialogues.Danny.DialogueStrings = {
 	["spikingUp_start"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Face="Skeptical";
 		Say="Sure, what do you need?";
 		Reply="The zombies are often walking into the store gate and causing a lot of noise, could you build something to prevent that?";
@@ -47,7 +47,7 @@ if RunService:IsServer() then
 			and mission.ObjectivesCompleted["addWall4"]
 			and mission.ObjectivesCompleted["addWall5"] then
 				dialog:AddChoice("spikingUp_complete", function(dialog)
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 			end
 			
@@ -56,7 +56,7 @@ if RunService:IsServer() then
 			
 			dialog:AddChoice("spikingUp_start", function(dialog)
 				dialog:AddChoice("spikingUp_sure", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end)
 		

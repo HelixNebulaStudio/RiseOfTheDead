@@ -104,13 +104,11 @@ function UsablePreset:ServerUse(player, storageItem, packet)
 	
 	task.spawn(function()
 		if permType == "Clothing" then
-			local profile = shared.modProfile:Get(player);
 			local activeSave = profile:GetActiveSave();
 			activeSave.AppearanceData:Update(activeSave.Clothing);
 
 		elseif permType == "Tool" then
-			if profile.EquippedTools.WeaponModels == nil then return end;
-			
+
 		end
 	end)
 

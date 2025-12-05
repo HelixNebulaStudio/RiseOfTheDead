@@ -10,7 +10,7 @@ local Dialogues = {
 	Stan={};
 };
 
-local missionId = 62;
+local MISSION_ID = 62;
 --==
 
 -- MARK: Patrick Dialogues
@@ -151,7 +151,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("theRecruit_settleR", function(dialog)
 					dialog:AddChoice("theRecruit_settle2R", function(dialog)
 						dialog:AddChoice("theRecruit_revas1", function(dialog)
-							modMission:StartMission(player, missionId);
+							modMission:StartMission(player, MISSION_ID);
 						end)
 					end)
 				end);
@@ -180,7 +180,7 @@ if RunService:IsServer() then
 								shared.Notify(player, "2 Nekron Particulate Cache removed from your Inventory.", "Negative");
 							end
 							
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 						end)
 						
 					else
@@ -205,7 +205,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("theRecruit_revas1", function(dialog)
 						dialog:AddChoice("theRecruit_revas2", function(dialog)
 							dialog:AddChoice("theRecruit_revas3", function(dialog)
-								modMission:Progress(player, missionId, function(mission)
+								modMission:Progress(player, MISSION_ID, function(mission)
 									if mission.ProgressionPoint < 2 then
 										mission.ProgressionPoint = 2;
 									end;
@@ -231,7 +231,7 @@ if RunService:IsServer() then
 				if stage == 3 then
 					dialog:SetInitiate("Here we are.");
 					dialog:AddChoice("theRecruit_secE", function(dialog)
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 4 then
 								mission.ProgressionPoint = 4;
 							end
@@ -242,7 +242,7 @@ if RunService:IsServer() then
 					dialog:SetInitiate("Eugene requires some items. Maybe you can be of service.");
 
 					dialog:AddChoice("theRecruit_retrieve1", function(dialog)
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 11 then
 								mission.ProgressionPoint = 12;
 							end
@@ -275,7 +275,7 @@ if RunService:IsServer() then
 								shared.Notify(player, "Research papers removed from your Inventory.", "Negative");
 							end
 
-							modMission:Progress(player, missionId, function(mission)
+							modMission:Progress(player, MISSION_ID, function(mission)
 								mission.ProgressionPoint = 15;
 							end)
 						end)
@@ -303,7 +303,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("ratRecruit_chamber1", function(dialog)
 						dialog:AddChoice("ratRecruit_chamber2", function(dialog)
 							dialog:AddChoice("ratRecruit_chamber3", function(dialog)
-								modMission:Progress(player, missionId, function(mission)
+								modMission:Progress(player, MISSION_ID, function(mission)
 									mission.ProgressionPoint = 8;
 								end)
 
@@ -319,7 +319,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("ratRecruit_chamber4", function(dialog)
 						dialog:AddChoice("ratRecruit_chamber5", function(dialog)
 							dialog:AddChoice("ratRecruit_chamber6", function(dialog)
-								modMission:Progress(player, missionId, function(mission)
+								modMission:Progress(player, MISSION_ID, function(mission)
 									mission.ProgressionPoint = 10;
 								end)
 								

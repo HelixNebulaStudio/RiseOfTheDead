@@ -25,6 +25,23 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
     modCharacter.UpdateWalkSpeed();
 end
 
+function statusPackage.BindUpdate(statusClass: StatusClassInstance)
+    if RunService:IsServer() then return end;
+    local characterClass: CharacterClass = statusClass.StatusOwner;
+    if characterClass == nil then return end;
+
+    local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+    local modCharacter = modData:GetModCharacter();
+    
+    local walkSpeed = statusClass.Values.Amount;
+
+    characterClass.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, walkSpeed > 0);
+    modCharacter.CharacterProperties.CanSprint = false;
+
+    modCharacter.CharacterProperties.WalkSpeed:Set("forceWalkspeed", walkSpeed, 10);
+    modCharacter.UpdateWalkSpeed();
+end
+
 function statusPackage.BindExpire(statusClass: StatusClassInstance)
     if RunService:IsServer() then return end;
     local characterClass: CharacterClass = statusClass.StatusOwner;

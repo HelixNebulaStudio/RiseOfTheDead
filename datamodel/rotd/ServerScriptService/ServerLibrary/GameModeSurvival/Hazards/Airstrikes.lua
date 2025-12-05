@@ -55,8 +55,8 @@ function Hazard:Tick()
 	repeat
 		local randomChar = self.Controller.Characters[math.random(1, #self.Controller.Characters)];
 		randomCFrame = randomChar:GetPivot();
-		if math.random(1, 3) == 1 and #self.Controller.EnemyModules > 0 then
-			local randomNpcModule = self.Controller.EnemyModules[math.random(1, #self.Controller.EnemyModules)];
+		if math.random(1, 3) == 1 and #self.Controller.EnemyNpcClasses > 0 then
+			local randomNpcModule = self.Controller.EnemyNpcClasses[math.random(1, #self.Controller.EnemyNpcClasses)];
 			randomCFrame = randomNpcModule.RootPart.CFrame;
 		end
 		groundCframe = modAoeHighlight:Ray(randomCFrame.Position + Vector3.new(0, 128, 0), Vector3.new(0, -256, 0));

@@ -22,8 +22,8 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     local healthComp: HealthComp? = characterClass.HealthComp;
     if healthComp == nil or healthComp.IsDead then return end;
     
-    local applyBy: CharacterClass = statusClass.Values.ApplyBy;
-    if not healthComp:CanTakeDamageFrom(applyBy) then return end;
+    local applyBy: CharacterClass? = statusClass.ApplyBy;
+    if applyBy == nil or not healthComp:CanTakeDamageFrom(applyBy) then return end;
 
     modDamageTag.Tag(characterClass.Character, applyBy.Character, {
         WeaponItemId = statusClass.Values.WeaponSiid;

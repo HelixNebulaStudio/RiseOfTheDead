@@ -8,13 +8,13 @@ local Dialogues = {
 	Carlos={};
 };
 
-local missionId = 8;
+local MISSION_ID = 8;
 --==
 
 -- !outline: Dr. Deniski Dialogues
 Dialogues["Dr. Deniski"].DialogueStrings = {		
 	["bandageup_start"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Hey doctor, how can I heal myself when I'm outside?"; 
 		Face="Surprise"; 
 		Reply="I was researching the zombie blood from the arm you gave me earlier, it was pretty strange. They are apparently not infectious, something else must be turning people into zombies..";

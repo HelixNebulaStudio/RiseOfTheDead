@@ -3185,7 +3185,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 							itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
 								if itemButtonObj.DimOut then return end;
-								if workspace:GetAttribute("IsDev") == true then
+								if workspace:GetAttribute("DebugModeToggled") == true then
 									Debugger:Warn(`Level {lvl} RewardInfo`,rewardInfo);
 								end
 

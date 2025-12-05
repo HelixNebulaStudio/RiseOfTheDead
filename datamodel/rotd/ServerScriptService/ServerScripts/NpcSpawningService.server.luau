@@ -43,6 +43,7 @@ function Spawner.new(spawnConfig: Configuration)
         SpawnMinLevel = spawnConfig:GetAttribute("SpawnMinLevel");
         SpawnMaxLevel = spawnConfig:GetAttribute("SpawnMaxLevel");
         LevelTier = spawnConfig:GetAttribute("LevelTier") or 1;
+        Immortal = spawnConfig:GetAttribute("Imortal");
 
         SpawnModelSize = nil;
         SpawnRegion = nil;
@@ -260,6 +261,10 @@ function Spawner:Spawn(cframe: CFrame, playerClasses: {PlayerClass})
             end
 
             npcClass.Properties.Level = spawnLevel;
+
+            if self.Immortal ~= nil then
+                npcClass.Properties.Immortal = self.Immortal;
+            end
         end
     };
 end

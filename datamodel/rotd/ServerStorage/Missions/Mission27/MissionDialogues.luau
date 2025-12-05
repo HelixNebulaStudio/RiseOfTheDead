@@ -7,7 +7,7 @@ local Dialogues = {
 	Mason={};
 };
 
-local missionId = 27;
+local MISSION_ID = 27;
 --==
 
 -- !outline: Mason DialogueStrings
@@ -33,7 +33,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("$PlayerName, you are one top notch zombie killer and I need your help on killing some specific zombie.");
 			dialog:AddChoice("focusLevels_request", function(dialog)
 				dialog:AddChoice("focusLevels_okay", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end)
 			

@@ -28,18 +28,21 @@ function Objective:Begin()
 	
 	local bossList = {};
 	
-	local bossPrefab, npcModule = self.Controller:SpawnEnemy("Oily", {
+	local npcClass: NpcClass = self.Controller:SpawnEnemy("Oily", {
 		Level = self.Controller:GetWaveLevel();
 	});
 	
-	npcModule.IsBoss = true;
-	npcModule.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Subject;
+	npcClass.Properties.IsBoss = true;
+	npcClass.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Subject;
 
-	npcModule:Died(function()
-		game.Debris:AddItem(bossPrefab, 10);
+	local npcChar = npcClass.Character;
+	npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead) 
+		if not isDead then return end;
+
+		game.Debris:AddItem(npcChar, 10);
 
 		for a=#bossList, 1, -1 do
-			if bossList[a] == bossPrefab then
+			if bossList[a] == npcChar then
 				table.remove(bossList, a);
 			end
 		end
@@ -49,8 +52,8 @@ function Objective:Begin()
 		};
 	end)
 
-	bossPrefab:SetAttribute("EntityHudHealth", true);
-	table.insert(bossList, bossPrefab);
+	npcChar:SetAttribute("EntityHudHealth", true);
+	table.insert(bossList, npcChar);
 
 	self.Controller:Hud{
 		BossList = bossList;

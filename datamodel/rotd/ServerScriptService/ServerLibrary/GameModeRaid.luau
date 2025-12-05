@@ -413,6 +413,7 @@ end
 
 function Raid:DropReward(spawnCf)
 	local spawnLocation = workspace:FindFirstChildWhichIsA("SpawnLocation");
+	local rewardSpawnPart = workspace.Environment.Game:FindFirstChild("RewardSpawn");
 	
 	if spawnCf == nil then
 		local playersCenterPos = nil;
@@ -461,7 +462,10 @@ function Raid:DropReward(spawnCf)
 			end
 		end
 		
-		if closestExtractDoor then
+		if rewardSpawnPart then
+			spawnCf = rewardSpawnPart.CFrame;
+			
+		elseif closestExtractDoor then
 			spawnCf = closestExtractDoor.PrimaryPart.LootSpawn.WorldCFrame;
 			
 		else
@@ -473,7 +477,10 @@ function Raid:DropReward(spawnCf)
 	
 	local rewardDropsList = {self.StageLib.RewardsId;};
 
-	self.LootPrefab = modItemDrops.Spawn({Type="Tool"; ItemId=rewardDropsList[math.random(1, #rewardDropsList)]}, spawnCf, self.Players, false);
+	self.LootPrefab = modItemDrops.Spawn({
+		Type="Tool"; 
+		ItemId=rewardDropsList[math.random(1, #rewardDropsList)]
+	}, spawnCf, self.Players, false);
 
 	self:Hud{
 		Status="A reward package has dropped!";
@@ -661,38 +668,6 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 	};
 
 	return npcClass;
-
-	-- local newNpcModule;
-	-- local npcPrefab = modNpcs.spawn(npcName, spawnCf, function(npcPrefab, npcModule)
-	-- 	self.EnemiesSpawned = self.EnemiesSpawned + 1;
-		
-	-- 	newNpcModule = npcModule;
-
-	-- 	npcModule.Configuration.Level = math.max(npcModule.Configuration.Level + (self.Difficulty + (self.Wave-1)) + math.random(-2, 0), 1);
-	-- 	npcModule.Properties.TargetableDistance = 256;
-	-- 	npcModule.NetworkOwners = game.Players:GetPlayers();
-		
-	-- 	if paramPacket.InfTargeting then
-	-- 		npcModule.SetAggression = 3;
-	-- 		npcModule.InfTargeting = true;
-	-- 		npcModule.AutoSearch = true;
-	-- 		npcModule.ForgetEnemies = false;
-	-- 		npcModule.Properties.TargetableDistance = 4096;
-
-	-- 		npcModule.OnTarget(self.Players);
-	-- 	end
-		
-		
-	-- 	if npcName == "Pathoroth" then
-	-- 		local newHealth = 4000 * math.max(math.ceil(self.Difficulty/2) + math.ceil(self.Wave/2), 1);
-	-- 		npcModule.Humanoid.MaxHealth = math.clamp(newHealth, 1000, math.huge);
-	-- 		npcModule.Humanoid.Health = npcModule.Humanoid.MaxHealth;
-	-- 	end
-
-	-- 	if self.OnEnemySpawn then self:OnEnemySpawn(npcPrefab, npcModule); end
-	-- end);
-
-	-- return npcPrefab, newNpcModule;
 end
 
 function Raid:BeginCount()

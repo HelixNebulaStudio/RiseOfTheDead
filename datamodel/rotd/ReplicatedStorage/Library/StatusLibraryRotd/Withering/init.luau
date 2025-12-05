@@ -1,14 +1,14 @@
 local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
 
-local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
+local localPlayer = game.Players.LocalPlayer;
+local camera = workspace.CurrentCamera;
 
+local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
-local localPlayer = game.Players.LocalPlayer;
-
-local modData, modCharacter, mainInterface = nil, nil, nil;
-local witheringScreenEffect;
+local WITHERING_SCREEN_EFFECT;
 --==
 local statusPackage = {
 	Id="Withering";
@@ -22,29 +22,30 @@ local statusPackage = {
 };
 
 function statusPackage.onRequire()
-	witheringScreenEffect = script:WaitForChild("witheringEye");
+	WITHERING_SCREEN_EFFECT = script:WaitForChild("witheringEye");
 end
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)
-	if RunService:IsClient() then
-		modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-		modCharacter = modData:GetModCharacter();
-		mainInterface = modData:GetInterfaceModule();
+	if RunService:IsServer() then return end;
+	
+	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+	local modCharacter = modData:GetModCharacter();
 
-		if mainInterface.ScreenEffects.WitheringEye == nil then
-			mainInterface.ScreenEffects.WitheringEye = witheringScreenEffect:Clone();
-			mainInterface.ScreenEffects.WitheringEye.Parent = mainInterface.CameraInterface;
-		end
-
+	local screenGui = modClientGuis.ActiveInterface.CameraScreenGui;
+	if screenGui:FindFirstChild(WITHERING_SCREEN_EFFECT.Name) == nil then
+		local new = WITHERING_SCREEN_EFFECT:Clone();
+		new.Parent = screenGui;
 	end
-
 end
 
 function statusPackage.BindExpire(statusClass: StatusClassInstance)
-	if mainInterface == nil then return end;
-	if mainInterface.ScreenEffects.WitheringEye then
-		mainInterface.ScreenEffects.WitheringEye:Destroy();
-		mainInterface.ScreenEffects.WitheringEye = nil;
+	if RunService:IsServer() then return end;
+
+	local screenGui = modClientGuis.ActiveInterface.CameraScreenGui;
+	for _, obj in pairs(screenGui:GetChildren()) do
+		if obj.Name == WITHERING_SCREEN_EFFECT.Name then
+			obj:Destroy();
+		end
 	end
 end
 
@@ -71,10 +72,9 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
 	elseif RunService:IsClient() then
 		if (characterClass :: PlayerClass):GetInstance() ~= localPlayer then return; end
 
-		if mainInterface.ScreenEffects.WitheringEye then
-			local screenEffect = mainInterface.ScreenEffects.WitheringEye;
-			local camera = workspace.CurrentCamera;
-
+		local screenGui = modClientGuis.ActiveInterface.CameraScreenGui;
+		local screenEffect = screenGui:FindFirstChild(WITHERING_SCREEN_EFFECT.Name);
+		if screenEffect == nil then
 			local witherers = CollectionService:GetTagged("Witherer");
 
 			local minRad = math.pi;

@@ -150,10 +150,12 @@ function GameModeManager.onRequire()
 			return rPacket;
 		end;
 		
-		if playerClass.GameModeAccess == nil then
-			playerClass.GameModeAccess = {};
+		local gamemodeAccess = playerClass.Properties.GameModeAccess;
+		if gamemodeAccess == nil then
+			gamemodeAccess = {};
+			playerClass.Properties.GameModeAccess = gamemodeAccess;
 		end
-		playerClass.GameModeAccess[gameMode..":"..gameStage] = true;
+		gamemodeAccess[gameMode..":"..gameStage] = true;
 			
 
 		local gameTable = GameModeManager:GetActive(gameMode, gameStage);
@@ -225,8 +227,9 @@ function GameModeManager.onRequire()
 				return
 			end
 
-			local classPlayer = modPlayers.get(player);
-			if classPlayer.GameModeAccess == nil or classPlayer.GameModeAccess[gameType..":"..gameStage] ~= true then
+			local playerClass: PlayerClass = modPlayers.get(player);
+			local gamemodeAccess = playerClass.Properties.GameModeAccess;
+			if gamemodeAccess == nil or gamemodeAccess[gameType..":"..gameStage] ~= true then
 				Debugger:WarnClient(player, `Invalid game room. {gameType}:{gameStage}`);
 				return;
 			end
@@ -371,9 +374,8 @@ function GameModeManager.onRequire()
 		return false;
 	end
 
-	modPlayers.OnPlayerDied:Connect(function(classPlayer)
-		--Debugger:Log(classPlayer.Name," died, removing from room.")
-		GameModeManager:Purge(classPlayer:GetInstance());
+	modPlayers.OnPlayerDied:Connect(function(playerClass: PlayerClass)
+		GameModeManager:Purge(playerClass:GetInstance());
 	end)
 
 	game.Players.PlayerRemoving:Connect(function(player)
@@ -762,12 +764,9 @@ function GameModeManager:Initialize(gameType, gameStage)
 			if #room.Players > 0 then
 				local hostPlayer = room.Players[1].Instance;
 
-				local profile = shared.modProfile:Get(hostPlayer);
-				local equippedTools = profile and profile.EquippedTools or nil;
-				local storageItem = equippedTools and equippedTools.StorageItem or nil;
-				
-				if storageItem and storageItem.ItemId == stageLib.MapItemId then
-					room.MapStorageItem = storageItem;
+				local playerClass = shared.modPlayers.get(hostPlayer);
+				if playerClass and playerClass.WieldComp and playerClass.WieldComp.ItemId == stageLib.MapItemId then
+					room.MapStorageItem = playerClass.WieldComp.StorageItem;
 				end
 
 				local highestFocusLevel = 0;
@@ -1023,10 +1022,12 @@ function GameModeManager:Assign(player, gameType, gameStage)
 	
 	local playerClass: PlayerClass = modPlayers.get(player);
 	if playerClass then
-		if playerClass.GameModeAccess == nil then
-			playerClass.GameModeAccess = {};
+		local gamemodeAccess = playerClass.Properties.GameModeAccess;
+		if gamemodeAccess == nil then
+			gamemodeAccess = {};
+			playerClass.Properties.GameModeAccess = gamemodeAccess;
 		end
-		playerClass.GameModeAccess[gameType..":"..gameStage] = true; 
+		gamemodeAccess[gameType..":"..gameStage] = true; 
 	end
 	
 	local lobbyData = GameModeManager:GetActive(gameType, gameStage);

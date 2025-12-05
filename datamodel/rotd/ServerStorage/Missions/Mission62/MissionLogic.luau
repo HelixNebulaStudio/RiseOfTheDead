@@ -1,14 +1,18 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-
-local MissionLogic = {};
+--==
 local RunService = game:GetService("RunService");
+
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
-local missionId = 62;
+local MISSION_ID = 62;
+
+local MissionLogic = {};
+--==
+
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 	local modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
 	
@@ -42,7 +46,7 @@ if RunService:IsServer() then
 				else
 					if mission.ProgressionPoint >= 3 and mission.ProgressionPoint <= 11 then
 						if firstRun then
-							modMission:Progress(player, missionId, function(mission)
+							modMission:Progress(player, MISSION_ID, function(mission)
 								mission.ProgressionPoint = 2;
 								Debugger:Log("Rewind mission 62 to point 2.");
 							end)
@@ -53,7 +57,7 @@ if RunService:IsServer() then
 
 					elseif mission.ProgressionPoint == 13 or mission.ProgressionPoint == 14 then
 						if firstRun then
-							modMission:Progress(player, missionId, function(mission)
+							modMission:Progress(player, MISSION_ID, function(mission)
 								mission.ProgressionPoint = 12;
 								Debugger:Log("Rewind mission 62 to point 12.");
 							end)
@@ -66,19 +70,20 @@ if RunService:IsServer() then
 					if mission.ProgressionPoint >= 13 then
 						--game.Debris:AddItem(workspace.Interactables:FindFirstChild("gameExit"), 0);
 						
-						local pickUpInteractable = logicAssets:WaitForChild("PickUpInteractable");
 						local researchPaper = workspace.Interactables:WaitForChild("researchPapers");
 						
 						researchPaper.Parent = game.ReplicatedStorage.Replicated;
 						
-						if mission.ProgressionPoint == 13 and workspace.Interactables:FindFirstChild("mission62ResearchPapers") == nil then
+						if mission.ProgressionPoint == 13 
+						and workspace.Interactables:FindFirstChild("mission62ResearchPapers") == nil then
 							Debugger:Warn("Spawn research papers pickup")
 							local newResearchPaper = researchPaper:Clone();
 							newResearchPaper:WaitForChild("Interactable"):Destroy();
 							
-							local newInteractableModule = pickUpInteractable:Clone();
-							newInteractableModule.Name = "Interactable";
-							newInteractableModule.Parent = newResearchPaper;
+							local pickUpInteractConfig = modInteractables.createInteractable("Pickupable");
+							pickUpInteractConfig:SetAttribute("_IndicatorPresist", true);
+							pickUpInteractConfig:SetAttribute("ItemId", "researchpapers");
+							pickUpInteractConfig.Parent = newResearchPaper;
 
 							local pointLight = Instance.new("PointLight");
 							pointLight.Color = Color3.fromRGB(255, 239, 158);

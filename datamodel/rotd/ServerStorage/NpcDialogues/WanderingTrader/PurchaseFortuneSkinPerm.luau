@@ -13,12 +13,13 @@ return function(player, dialog, data)
 	local playerSave = profile:GetActiveSave();
 	local traderProfile = profile and profile.Trader;
 	local inventory = playerSave.Inventory;
-	
+	local playerClass = shared.modPlayers.get(player);
 	
 	local fortuneSkinCost = 100000;
 	if traderProfile.Gold >= fortuneSkinCost then
-		local equippedToolID = profile.EquippedTools.ID;
-		local storageItem = inventory:Find(equippedToolID);
+
+		local equippedToolSiid = playerClass.WieldComp.Siid;
+		local storageItem = inventory:Find(equippedToolSiid);
 		local itemDisplayLib = storageItem and modWorkbenchLibrary.ItemAppearance[storageItem.ItemId];
 
 		local function purchase1mPattern(dialog)

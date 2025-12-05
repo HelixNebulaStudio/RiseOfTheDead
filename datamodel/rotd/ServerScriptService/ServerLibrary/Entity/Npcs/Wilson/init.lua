@@ -25,6 +25,9 @@ local npcPackage = {
 };
 
 function npcPackage.Spawning(npcClass: NpcClass)
+end
+
+function npcPackage.Spawned(npcClass: NpcClass)
     npcClass.WieldComp:Equip{ ItemId = "walkietalkie" };
     --npcClass.WieldComp:InvokeToolAction("PrimaryFireRequest", true);
 end

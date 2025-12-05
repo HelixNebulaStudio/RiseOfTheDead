@@ -253,50 +253,6 @@ function modStatusEffects.TiedUp(player: Player, duration: number)
 
     applyParams.Expires = workspace:GetServerTimeNow() + applyParams.Duration;
     statusComp:Apply("TiedUp", applyParams);
-
-    -- TODO Deprecated;
-    if true then return end;
-	if RunService:IsServer() then
-
-        modStatusEffects.Replicate(player, "TiedUp", applyParams.Duration);
-
-		local rootPart = playerClass.RootPart;
-		if rootPart then
-            game.Debris:AddItem(playerClass.Character:FindFirstChild("rope") , 0);
-
-            local newRope = script:WaitForChild("rope"):Clone();
-			local joint = newRope:WaitForChild("Weld");
-			newRope.Parent = playerClass.Character;
-			joint.Part0 = newRope;
-			joint.Part1 = rootPart;
-			Debugger.Expire(newRope, applyParams.Duration);
-		end
-
-	else
-		local modData = shared.require(localPlayer:WaitForChild("DataModule"));
-		local modCharacter = modData:GetModCharacter();
-
-		local animator = playerClass.Humanoid:WaitForChild("Animator");
-		local track = animator:LoadAnimation(script.TiedUp);
-		track:Play(0.25);
-		modCharacter.CharacterProperties.CanMove = false;
-		modCharacter.CharacterProperties.CanAction = false;
-		modCharacter.MouseProperties.Mouse1Down = false;
-		modCharacter.MouseProperties.Mouse2Down = false;
-		modCharacter.UpdateWalkSpeed();
-		spawn(function()
-			if playerClass.Properties["isTiedUp"] then return end;
-			playerClass.Properties["isTiedUp"] = true;
-			repeat until modSyncTime.Clock.Value >= (playerClass.Properties.TiedUp and playerClass.Properties.TiedUp.Expires or modSyncTime.Clock.Value-1) or not RunService.Heartbeat:Wait();
-			if modCharacter then
-				track:Stop(0.25);
-				modCharacter.CharacterProperties.CanMove = true;
-				modCharacter.CharacterProperties.CanAction = true;
-				modCharacter.UpdateWalkSpeed();
-			end
-			playerClass.Properties["isTiedUp"] = false;
-		end)
-	end
 end
 
 

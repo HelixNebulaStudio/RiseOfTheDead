@@ -9,7 +9,7 @@ local Dialogues = {
 	Joseph={};
 };
 
-local missionId = 64;
+local MISSION_ID = 64;
 --==
 
 -- MARK: Joseph Dialogues
@@ -39,27 +39,18 @@ if RunService:IsServer() then
 		local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 
 		local profile = shared.modProfile:Get(player);
+		local playerClass: PlayerClass = shared.modPlayers.get(player);
 
 		if mission.Type == 1 then -- Active
 		
 			if mission.Type == 1 then
-				if profile.EquippedTools.WeaponModels == nil then return end;
-		
-				local crossBowId = nil;
-				for a=1, #profile.EquippedTools.WeaponModels do
-					if profile.EquippedTools.WeaponModels[a]:IsA("Model") and profile.EquippedTools.WeaponModels[a]:GetAttribute("ItemId") == "arelshiftcross" then
-						crossBowId = profile.EquippedTools.WeaponModels[a]:GetAttribute("StorageItemId");
-						break;
-		
-					end
-				end
-				if crossBowId == nil then return end;
+				local equipmentSiid = playerClass.WieldComp.Siid;
+				if equipmentSiid == nil then return end;
 				
-				local storageItem, storage = modStorage.FindIdFromStorages(crossBowId, player);
+				local storageItem = modStorage.FindIdFromStorages(equipmentSiid, player);
 				if storageItem == nil then return end;
 				
-				local crossbowModStorage = modStorage.Get(crossBowId, player)
-				
+				local crossbowModStorage = modStorage.Get(equipmentSiid, player)
 				
 				local listOfMods = {
 					bowdamagemod=false;
@@ -91,7 +82,7 @@ if RunService:IsServer() then
 				
 				if correctBuild then
 					dialog:AddChoice("josephcrossbow_corectBuild", function(dialog)
-						modMission:CompleteMission(player, missionId);
+						modMission:CompleteMission(player, MISSION_ID);
 					end)
 					
 				else

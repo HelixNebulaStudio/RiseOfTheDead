@@ -26,8 +26,8 @@ local npcPackage = {
     Voice = {
         VoiceId = 6;
         Pitch = 3;
-        Speed = 0.9;
-        PlaybackSpeed = 1.1;
+        Speed = 0.7;
+        PlaybackSpeed = 0.8;
     };
     
     SurvivorIdleData = {

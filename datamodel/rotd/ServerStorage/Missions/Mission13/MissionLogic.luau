@@ -4,18 +4,23 @@ local MissionLogic = {};
 local RunService = game:GetService("RunService");
 local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 
-local missionId = 13;
+local MISSION_ID = 13;
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	
-	modOnGameEvents:ConnectEvent("OnZombieDeath", function(zombieNpcModule)
-		local playerTags = modDamageTag:Get(zombieNpcModule.Prefab, "Player");
-		for _, playerTag in pairs(playerTags) do
-			local player = playerTag.Player;
-			if modMission:IsComplete(player, missionId) then continue end
+	shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
+		local npcClass: NpcClass = ...;
+		if npcClass == nil or npcClass.HumanoidType ~= "Zombie" then return end;
+	
+		local playerTags = modDamageTag:Get(npcClass.Character, "Player");
+		for a=1, #playerTags do
+			local playerTag = playerTags[a];
+			local player: Player = playerTag.Player;
+			if player == nil or not game.Players:IsAncestorOf(player) then continue end;
 
-			modMission:Progress(player, missionId, function(mission)
+			if modMission:IsComplete(player, MISSION_ID) then continue end
+
+			modMission:Progress(player, MISSION_ID, function(mission)
 				if mission.ProgressionPoint == 1 then
 					mission.SaveData.Kills = mission.SaveData.Kills -1;
 					if mission.SaveData.Kills <= 0 then
@@ -23,6 +28,7 @@ if RunService:IsServer() then
 					end
 				end;
 			end)
+
 		end
 	end)
 end

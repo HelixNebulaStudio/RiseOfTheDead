@@ -8,7 +8,7 @@ if RunService:IsServer() then
     modGameModeManager.GameWorld = true;
 end
 
-local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new();
+local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new(script);
 
 local GAME_MODE, GAME_STAGE = "Raid", "BanditOutpost";
 --=

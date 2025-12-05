@@ -30,9 +30,9 @@ function NpcComponent.new(npcClass: NpcClass)
 			return;
 		end
 
-		if npcAudio.BasicMeleeAttack ~= false then
+		if npcAudio and npcAudio.BasicMeleeAttack ~= false then
 			modAudio.Play(npcAudio.BasicMeleeAttack, enemyClass.RootPart).PlaybackSpeed = (math.random(100, 120)/100);
-		elseif npcAudio.BasicMeleeAttack == false then
+		elseif npcAudio and npcAudio.BasicMeleeAttack == false then
 		else
 			modAudio.Play("ZombieAttack"..math.random(1, 3), enemyClass.RootPart).PlaybackSpeed = (math.random(100, 120)/100);
 		end

@@ -7,13 +7,13 @@ local Dialogues = {
 	Jesse={};
 };
 
-local missionId = 16;
+local MISSION_ID = 16;
 --==
 
 -- MARK: Jesse Dialogues
 Dialogues.Jesse.DialogueStrings = {
 	["aGoodDeal_start"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Sure, I can help."; 
 		Face="Skeptical"; Reply="Alright, find me 2 Igniters but don't take too long. I got customers waiting..";
 	};
@@ -68,7 +68,7 @@ if RunService:IsServer() then
 							shared.Notify(player, ("$Amount$Item removed from your Inventory."):gsub("$Item", itemLib.Name):gsub("$Amount", itemList[a].Quantity > 1 and itemList[a].Quantity.." " or ""), "Negative");
 						
 						end
-						modMission:CompleteMission(player, missionId);
+						modMission:CompleteMission(player, MISSION_ID);
 						delay(20, function()
 							if modMission:GetMission(player, 17) == nil then
 								modMission:AddMission(player, 17);
@@ -88,7 +88,7 @@ if RunService:IsServer() then
 			dialog:AddChoice("aGoodDeal_org");
 			dialog:AddChoice("aGoodDeal_why");
 			dialog:AddChoice("aGoodDeal_start", function(dialog)
-				modMission:StartMission(player, missionId);
+				modMission:StartMission(player, MISSION_ID);
 			end)
 			
 		end

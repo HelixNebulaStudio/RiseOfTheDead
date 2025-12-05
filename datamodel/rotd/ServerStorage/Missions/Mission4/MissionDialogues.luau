@@ -7,13 +7,13 @@ local Dialogues = {
 	["Dr. Deniski"]={};
 };
 
-local missionId = 4;
+local MISSION_ID = 4;
 --==
 
 -- MARK: Dr. Deniski Dialogues
 Dialogues["Dr. Deniski"].DialogueStrings = {
 	["lendAHand_start"]={
-		CheckMission=missionId; 
+		CheckMission=MISSION_ID; 
 		Say="Sure, how can I help you?"; 
 		Reply="I'm doing some experiments and I need a zombie arm, if you can find me one, that would be great!";
 		FailResponses = {
@@ -38,7 +38,7 @@ if RunService:IsServer() then
 				Face="Smirk";
 			}
 			dialog:AddChoice("lendAHand_start", function(dialog)
-				modMission:StartMission(player, missionId);
+				modMission:StartMission(player, MISSION_ID);
 			end);
 			
 		elseif mission.Type == 1 then -- Active
@@ -52,7 +52,7 @@ if RunService:IsServer() then
 					for a=1, #list do
 						list[a].Storage:Remove(list[a].Item.ID);
 					end
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end);
 				
 			end

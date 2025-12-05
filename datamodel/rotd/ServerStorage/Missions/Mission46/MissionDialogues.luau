@@ -7,7 +7,7 @@ local Dialogues = {
 	["Mr. Klaws"]={};
 };
 
-local missionId = 46;
+local MISSION_ID = 46;
 --==
 
 -- MARK: Mr. Klaws Dialogues
@@ -17,7 +17,7 @@ Dialogues["Mr. Klaws"].DialogueStrings = {
 		Reply="You'll need coal. The zombies has been pretty naughty so they might drop some coal when you kill them.";
 	};
 	["warmup_start"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="I'm on it.";
 		Reply="Chip chop!";
 	};
@@ -39,7 +39,7 @@ if RunService:IsServer() then
 					local modUnlockPack = shared.require(game.ReplicatedStorage.Library.UsableItems.Generics.UnlockPack);
 					modUnlockPack.UnlockPack(player, "SkinsPacks", "FestiveWrapping");
 
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 			end
 		
@@ -48,7 +48,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Welp, looks like I'm stuck here for a while with the outside being so dum cold. I notice you guys do not have a fireplace before, so I created one, but I need your help igniting it.", "Surprise");
 			dialog:AddChoice("warmup_init", function(dialog)
 				dialog:AddChoice("warmup_start", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end);
 			end);
 			

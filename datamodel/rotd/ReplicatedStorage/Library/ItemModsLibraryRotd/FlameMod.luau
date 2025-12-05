@@ -41,14 +41,17 @@ if RunService:IsServer() then
 
 	function modifierPackage.Binds.OnBulletHit(modifier: ItemModifierInstance, packet: OnBulletHitPacket)
 		local duration = modifier.Values.Duration;
-		if packet.TargetModel == nil then return end;
-
+		if packet.HitInfo == nil then return end;
+		
 		local characterClass: CharacterClass;
-		if modifier.Player then
-			characterClass = shared.modPlayers.get(modifier.Player);
+		if modifier.ItemModStorageItem and modifier.ItemModStorageItem.Player then
+			characterClass = shared.modPlayers.get(modifier.ItemModStorageItem.Player);
 		end
 		
-		local healthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
+		local targetPart = packet.HitInfo.Part;
+		if targetPart == nil or targetPart.Parent == nil then return end;
+
+		local healthComp: HealthComp? = modHealthComp.getByModel(targetPart.Parent);
 		if healthComp == nil or not healthComp:CanTakeDamageFrom(characterClass) then return end;
 
 		local targetClass: ComponentOwner = healthComp.CompOwner;
@@ -60,7 +63,6 @@ if RunService:IsServer() then
 			if targetImmunity >= 1 then return end;
 
 		elseif targetClass.ClassName == "Destructible" then
-			local targetPart = packet.TargetPart;
 			if CollectionService:HasTag(targetPart, "Flammable") then
 				local modFlammable = shared.require(game.ServerScriptService.ServerLibrary.Flammable);
 				modFlammable:Ignite(targetPart);
@@ -78,12 +80,12 @@ if RunService:IsServer() then
 
 		statusComp:Apply(statusKey, {
 			Expires = workspace:GetServerTimeNow() + duration;
+			ApplyBy = characterClass;
 			Values = {
-				ApplyBy = characterClass;
-
 				Damage = modifier.Values.Damage;
-				TargetPart = packet.TargetPart;
+				TargetPart = targetPart;
 				Stacks = 0;
+				UseCurrHpDmg = true;
 			};
 		});
 

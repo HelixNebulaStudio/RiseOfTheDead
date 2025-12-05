@@ -6,13 +6,10 @@ local TweenService = game:GetService("TweenService");
 
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
-local modEventService = shared.require(game.ReplicatedStorage.Library.EventService);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 --== Variables;
 local MISSION_ID = 40;
-
-local remotes = game.ReplicatedStorage.Remotes;
-local remoteCameraShakeAndZoom = remotes.CameraShakeAndZoom;
 
 
 if RunService:IsServer() then
@@ -24,8 +21,6 @@ if RunService:IsServer() then
 	modTouchHandler = shared.require(game.ReplicatedStorage.Library.TouchHandler);
 	modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 	modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
-	modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
-	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 	statuePrefab = script.Parent:WaitForChild("statue");
 	tombsInteractable = script.Parent:WaitForChild("Raid_Tombs");
@@ -35,14 +30,17 @@ if RunService:IsServer() then
 		local caveTpTouch = modTouchHandler.new("CaveTP", 1);
 		
 		function caveTpTouch:OnPlayerTouch(player, basePart, part)
+			local playerClass: PlayerClass = shared.modPlayers.get(player);
+			Debugger:Warn(`caveTpTouch`, player.Name);
+
 			modMission:Progress(player, MISSION_ID, function(mission)
 				if mission.ProgressionPoint < 5 then mission.ProgressionPoint = 5; end;
 				modGameModeManager:Assign(player, "Raid", "Tombs");
 				
 				local exitCf = CFrame.new(442.671, 69.39, 220.038);
-				shared.modAntiCheatService:Teleport(player, exitCf);
+				playerClass:SetCFrame(exitCf);
 				
-				local profile = modProfile:Get(player);
+				local profile = shared.modProfile:Get(player); 
 				profile.BossDoorCFrame = exitCf;
 			end)
 		end
@@ -55,8 +53,10 @@ if RunService:IsServer() then
 			
 			if player then
 				humanoid:TakeDamage(5, self.Player, self.StorageItem, part);
-				remoteCameraShakeAndZoom:FireClient(player, 5, 0, 0.3, 2, false);
-				if player then modStatusEffects.Burn(player, 94, 1); end;
+				shared.modPlayers.cameraShakeAndZoom(player, 5, 0, 0.3, 2, false);
+				if player then
+					modStatusEffects.Burn(player, 94, 1);
+				end;
 			end
 		end
 		
@@ -65,19 +65,22 @@ if RunService:IsServer() then
 		end
 		
 
-		modOnGameEvents:ConnectEvent("OnBossDefeated", function(players, npcModule)
-			if npcModule.Name ~= "Zricera" then return end;
+        shared.modEventService:OnInvoked("Boss_BindDefeated", function(eventPacket: EventPacket, packet)
+			local npcClass: NpcClass = packet.NpcClass;
+			if npcClass.Name ~= "Zricera" then return end;
+			if eventPacket.Players == nil then return end;
 
-			for _, player in pairs(players) do
+			for _, player: Player in pairs(eventPacket.Players) do
 				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint > 2 then return end;
-					mission.ProgressionPoint = 2;
+					if mission.ProgressionPoint < 2 then 
+						mission.ProgressionPoint = 2;
+
+					end;
 				end)
-				
 			end
 		end)
 
-		modEventService:OnInvoked("GameModeManager_BindDisconnectPlayer", function(event, packet)
+		shared.modEventService:OnInvoked("GameModeManager_BindDisconnectPlayer", function(event, packet)
 			local player = event.Player;
 			local menuRoom = packet.MenuRoom;
 			if menuRoom == nil or menuRoom.Type ~= "Boss" or menuRoom.Stage ~= "Zricera" then return end;
@@ -93,6 +96,12 @@ if RunService:IsServer() then
 			if destination then
 				packet.SetTeleportCfFunc(destination);
 			end
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint == 4 then
+					mission.ProgressionPoint = 5;
+				end;
+			end)
 		end)
 		
 		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
@@ -100,9 +109,9 @@ if RunService:IsServer() then
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			
-			if triggerId ~= "Push Statue" then return end;
+			if triggerId ~= "PushStatue" then return end;
 
-			modMission:Progress(player, 40, function(mission)
+			modMission:Progress(player, MISSION_ID, function(mission)
 				local statueObject = mission.Cache.Statue;
 				
 				if statueObject then
@@ -119,11 +128,62 @@ if RunService:IsServer() then
 					Debugger:Warn("Statue does not exist.");
 				end
 				
-				if mission.ProgressionPoint == 3 then mission.ProgressionPoint = 4; end;
+				if mission.ProgressionPoint == 3 then
+					mission.ProgressionPoint = 4;
+				end;
 			end)
+		end)
 
+	elseif modBranchConfigs.IsWorld("Tombs") then
+		
+		shared.modEventService:OnInvoked("GameModeManager_BindGameModeComplete", function(eventPacket: EventPacket, packet)
+			local room = packet.Room;
+			Debugger:Warn("GameModeManager_BindGameModeComplete", room.Type, room.Stage);
+
+			if room.Type ~= "Raid" or room.Stage ~= "Tombs" then return end;
+			if eventPacket.Players == nil then return end;
+			
+			for _, player: Player in pairs(eventPacket.Players) do
+				if not modMission:Progress(player, MISSION_ID) then continue end;
+
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint <= 5 then
+						mission.ProgressionPoint = 6;
+					end;
+				end)
+			end
 		end)
 		
+		shared.modEventService:OnInvoked("Interactables_BindCollectibleInteract", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+
+			local interactable: InteractableInstance = ...;
+			if interactable.Id ~= "nm" then return end;
+
+			local profile = shared.modProfile:Get(player);
+			local inventory = profile.ActiveInventory;
+
+			if modEvents:GetEvent(player, "takeNekronMask") == nil then
+				local hasSpace = inventory:SpaceCheck{{ItemId="nekronmask"; Data={Quantity=1;}}};
+				if hasSpace then
+					inventory:Add("nekronmask");
+					modEvents:NewEvent(player, {Id="takeNekronMask"});
+					shared.Notify(player, "You picked up a Nekron Mask.", "Reward");
+				else
+					
+					shared.Notify(player, "Inventory full!", "Negative");
+				end
+				
+			end
+			
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint < 7 then
+					mission.ProgressionPoint = 7;
+				end;
+			end)
+		end)
+
 	end
 
 else
@@ -142,25 +202,30 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 				
-			if modMission:IsComplete(player, 42) then
+			local function spawnTombRaidInteractable()
+				if mission.Cache.TombsInteractable then return end;
+				
 				local newTombsInteractable = tombsInteractable:Clone();
 				modReplicationManager.ReplicateIn(player, newTombsInteractable, workspace.Interactables);
+				mission.Cache.TombsInteractable = newTombsInteractable;
+			end
+
+			if modMission:IsComplete(player, 42) then
+				spawnTombRaidInteractable();
 				return;
 			end
 			
-			local victorModule = modNpcs.getPlayerNpc(player, "Victor");
-			if victorModule == nil then
-				local npc = modNpcs.spawn("Victor", nil, function(npc, npcModule)
-					npcModule.Player = player;
-					victorModule = npcModule;
-				end);
-				modReplicationManager.ReplicateOut(player, npc);
+			local victorNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Victor");
+			if victorNpcClass == nil then
+				victorNpcClass = modNpcs.spawn2{
+					Name = "Victor";
+					Player = player;
+				};
 			end
-			victorModule.PlayAnimation("Sit");
+			victorNpcClass.PlayAnimation("Sit");
 
 			local newstatuePrefab = statuePrefab:Clone();
-			newstatuePrefab.Parent = workspace.Environment;
-			modReplicationManager.ReplicateOut(player, newstatuePrefab);
+			modReplicationManager.ReplicateIn(players, newstatuePrefab, workspace.Environment.Game);
 			mission.Cache.Statue = newstatuePrefab;
 			
 			if modMission:IsComplete(player, MISSION_ID) then
@@ -171,6 +236,9 @@ return function(CutsceneSequence)
 				if mission.Type == 2 then -- OnAvailable
 					
 				elseif mission.Type == 1 then -- OnActive
+					if mission.ProgressionPoint >= 5 then
+						spawnTombRaidInteractable();
+					end
 					if mission.ProgressionPoint >= 5 and modEvents:GetEvent(player, "takeNekronMask") then
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 7 then mission.ProgressionPoint = 7; end;
@@ -211,7 +279,9 @@ return function(CutsceneSequence)
 				elseif mission.Type == 1 then -- OnActive
 					if mission.ProgressionPoint >= 5 and modEvents:GetEvent(player, "takeNekronMask") then
 						modMission:Progress(player, MISSION_ID, function(mission)
-							if mission.ProgressionPoint <= 7 then mission.ProgressionPoint = 7; end;
+							if mission.ProgressionPoint <= 7 then
+								mission.ProgressionPoint = 7;
+							end;
 						end)
 					end
 				elseif mission.Type == 3 then -- OnComplete

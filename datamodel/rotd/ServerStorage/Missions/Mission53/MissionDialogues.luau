@@ -9,13 +9,13 @@ local Dialogues = {
 	Michael={};
 };
 
-local missionId = 53;
+local MISSION_ID = 53;
 --==
 
 -- !outline: Wilson Dialogues
 Dialogues.Wilson.DialogueStrings = {		
 	["qa2_arrive"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Face="Joyful"; 
 		Say="Alright."; 
 		Reply="Let's head up to the roof.";
@@ -96,7 +96,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("qa2_goodnews", function(dialog)
 					dialog:AddChoice("qa2_badnews", function(dialog)
 						dialog:AddChoice("qa2_walter", function(dialog)
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 						end)
 					end)
 				end)
@@ -105,7 +105,7 @@ if RunService:IsServer() then
 		elseif mission.Type == 2 then -- Available
 			dialog:SetInitiate("$PlayerName, the assessment team is arriving soon.");
 			dialog:AddChoice("qa2_arrive", function(dialog)
-				modMission:StartMission(player, missionId);
+				modMission:StartMission(player, MISSION_ID);
 			end)
 
 		end
@@ -115,7 +115,6 @@ if RunService:IsServer() then
 	-- !outline: Walter Handler
 	Dialogues.Walter.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-		local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 		local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 
 		if mission.Type == 1 then -- Active
@@ -125,7 +124,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("qa2_yes", function(dialog)
 					dialog:AddChoice("qa2_how", function(dialog)
 						dialog:AddChoice("qa2_entityleash", function(dialog)
-							modMission:Progress(player, missionId, function(mission)
+							modMission:Progress(player, MISSION_ID, function(mission)
 								mission.ProgressionPoint = 4;
 							end)
 						end)
@@ -149,7 +148,7 @@ if RunService:IsServer() then
 					local toolModel = character.entityleash;
 					local storageItemId = toolModel:GetAttribute("StorageItemId");
 
-					local profile = modProfile:Get(player);
+					local profile = shared.modProfile:Get(player);
 					local storageItem = storageItemId and modStorage.FindIdFromStorages(storageItemId, player);
 					local handler = profile:GetToolHandler(storageItem);
 
@@ -161,7 +160,7 @@ if RunService:IsServer() then
 				if npcModule then
 					dialog:AddChoice("qa2_caught", function(dialog)
 						Debugger.Expire(npcModule.Prefab, 0);
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint == 8 then
 								mission.ProgressionPoint = 9;
 							end
@@ -188,7 +187,7 @@ if RunService:IsServer() then
 			if stage >= 5 and stage < 8 then
 				dialog:SetInitiate("Heard a helicopter flew by..");
 				dialog:AddChoice("qa2_catch", function(dialog)
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						mission.ProgressionPoint = 8;
 					end)
 				end)

@@ -7,7 +7,7 @@ local Dialogues = {
 	Victor={};
 };
 
-local missionId = 40;
+local MISSION_ID = 40;
 --==
 
 -- MARK: Victor Dialogues
@@ -25,7 +25,7 @@ Dialogues.Victor.DialogueStrings = {
 	};
 
 	["vt1_sure"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Face="Happy";
 		Say="Sure."; 
 		Reply="Thats rad dude, let me know if you find anything.";
@@ -60,7 +60,7 @@ if RunService:IsServer() then
 			dialog:AddChoice("vt1_init", function(dialog)
 				dialog:AddChoice("vt1_beast", function(dialog)
 					dialog:AddChoice("vt1_sure", function(dialog)
-						modMission:StartMission(player, missionId);
+						modMission:StartMission(player, MISSION_ID);
 					end)
 				end)
 			end)
@@ -71,7 +71,7 @@ if RunService:IsServer() then
 				
 			elseif mission.ProgressionPoint >= 3 and mission.ProgressionPoint <= 4 then
 				dialog:SetInitiate("You need to kill the beast in the park.", "Bored");
-				modMission:Progress(player, missionId, function(mission)
+				modMission:Progress(player, MISSION_ID, function(mission)
 					mission.ProgressionPoint = 2;
 				end)
 				
@@ -90,13 +90,13 @@ if RunService:IsServer() then
 							inventory:Remove(itemList[a].ID, itemList[a].Quantity);
 						end
 						shared.Notify(player, "Removed Nekron Mask from your inventory.", "Negative");
-						modMission:CompleteMission(player, missionId);
+						modMission:CompleteMission(player, MISSION_ID);
 					end)
 				end
 				
 				dialog:AddChoice("vt1_notfind", function(dialog)
 					data:Set("gaveMask", false);
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 			end
 			

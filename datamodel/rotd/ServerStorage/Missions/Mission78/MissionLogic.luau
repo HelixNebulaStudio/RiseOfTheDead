@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService");
 
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
-local missionId = 78;
+local MISSION_ID = 78;
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
@@ -18,7 +18,7 @@ if RunService:IsServer() then
     
                 elseif mission.Type == 1 then -- OnActive
                     if mission.ProgressionPoint >= 2 and mission.ProgressionPoint <= 5 then
-                        modMission:Progress(player, missionId, function(mission)
+                        modMission:Progress(player, MISSION_ID, function(mission)
                             mission.ProgressionPoint = 1;
                         end)
 

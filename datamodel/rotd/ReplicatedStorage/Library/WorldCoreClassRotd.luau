@@ -7,6 +7,7 @@ local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchCon
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modWorldCoreClass = shared.require(game.ReplicatedStorage.Library.WorldCoreClass);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modCutscene = shared.require(game.ReplicatedStorage.Library.Cutscene);
 
 if RunService:IsServer() then
     modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
@@ -72,6 +73,7 @@ function modWorldCoreClass.onRequire()
                 end
             end)
         end
+
     elseif RunService:IsClient() then
     end
 end
@@ -188,6 +190,9 @@ function modWorldCoreClass:InitGameWorld(gameMode, gameStage)
         };
     };
     modGameModeManager.StudioData = studioLobbyData;
+    if workspace:GetAttribute("DisableGameMode") == true then
+        modGameModeManager.StudioData = nil;
+    end
 
     local waitingforFirstPlayer = true;
     local gameModeStart = false;
@@ -217,9 +222,20 @@ function modWorldCoreClass:InitGameWorld(gameMode, gameStage)
         if worldCoreInit then return end;
         worldCoreInit = true;
 
-        shared.WorldCore.BindGameControllerInited(shared.WorldCore.GameController);
+        if shared.WorldCore.BindGameControllerInited then
+            shared.WorldCore.BindGameControllerInited(shared.WorldCore.GameController);
+        end
     end)
 end
 
+shared.coreBind(modWorldCoreClass, "_new", function(worldCoreClass)
+    local worldScr = worldCoreClass.Script;
+
+    local cutsceneScript = worldScr:FindFirstChild("CutsceneScript");
+    if cutsceneScript then
+        cutsceneScript.Name = worldScr.Name;
+        cutsceneScript.Parent = modCutscene.Script;
+    end
+end)
 
 return modWorldCoreClass;

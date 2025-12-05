@@ -7,7 +7,7 @@ local Dialogues = {
 	Erik={};
 };
 
-local missionId = 36;
+local MISSION_ID = 36;
 --==
 
 -- MARK: Erik Dialogues
@@ -19,7 +19,7 @@ Dialogues.Erik.DialogueStrings = {
 	};
 
 	["calmingtunes_musicbox"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Okay, I have an idea. Wait here."; 
 		Reply="Okay..";
 	};
@@ -50,8 +50,8 @@ if RunService:IsServer() then
 
 		if mission.Type == 1 then -- Active
 			local profile = shared.modProfile:Get(player);
-			local playerSave = profile:GetActiveSave();
-			local inventory = playerSave.Inventory;
+			local gameSave = profile:GetActiveSave();
+			local inventory = gameSave.Inventory;
 			
 			dialog:SetInitiate("Did you find the music box yet?");
 			if mission.ObjectivesCompleted["Musicbox"] == true then
@@ -65,7 +65,7 @@ if RunService:IsServer() then
 							shared.Notify(player, "Music box removed from your Inventory.", "Negative");
 						
 						end
-						modMission:CompleteMission(player, missionId);
+						modMission:CompleteMission(player, MISSION_ID);
 					else
 						shared.Notify(player, ("Unable to find items from inventory."), "Negative");
 					end
@@ -85,7 +85,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Ahh, I can't stand the noise. The growling, I can't stop panicing when I hear it..");
 			dialog:AddChoice("calmingtunes_start", function(dialog)
 				dialog:AddChoice("calmingtunes_musicbox", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end)
 			

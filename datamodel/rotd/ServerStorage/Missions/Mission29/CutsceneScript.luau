@@ -30,13 +30,17 @@ return function(CutsceneSequence)
 		if mission == nil then return end;
 			
 		if not modMission:IsComplete(player, MISSION_ID) then
-			local hilbertModule = modNpcs.getPlayerNpc(player, "Hilbert");
-			if hilbertModule == nil then
-				local npc = modNpcs.spawn("Hilbert", nil, function(npc, npcModule)
-					npcModule.Player = player;
-					hilbertModule = npcModule;
-				end);
-				modReplicationManager.ReplicateOut(player, npc);
+			local hilbertNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Hilbert");
+			if hilbertNpcClass == nil then
+				hilbertNpcClass = modNpcs.spawn2{
+					Name = "Hilbert";
+					Player = player;
+					ReplicateOut = true;
+					BindSetup = function(npcClass: NpcClass)
+						npcClass.RootPart.Anchored = true;
+					end;
+				};
+				
 			end
 
 			local function OnChanged(firstRun)
@@ -50,7 +54,7 @@ return function(CutsceneSequence)
 					end
 				elseif mission.Type == 3 then
 					mission.OnChanged:Disconnect(OnChanged);
-					hilbertModule.Prefab:Destroy();
+					hilbertNpcClass.Character:Destroy();
 				end
 			end
 			mission.OnChanged:Connect(OnChanged);

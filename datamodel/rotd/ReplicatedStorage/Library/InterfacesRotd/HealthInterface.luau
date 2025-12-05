@@ -86,7 +86,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end
 
 	local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
-    local healthComp: HealthComp = playerClass.HealthComp;
+	local healthComp: HealthComp = playerClass.HealthComp;
 	local humanoid = playerClass.Humanoid;
 
     window.OnUpdate:Connect(function()
@@ -168,7 +168,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	window:Open();
 	window:Update();
-
 end
 
 return interfacePackage;

@@ -58,12 +58,12 @@ function Hazard:Tick()
 		local spawnCf = spawnPart.CFrame;
 		
 		if spawnCf then
-			local npcPrefab, npcModule = self.Controller:SpawnEnemy(spawnName, {
+			local npcClass: NpcClass = self.Controller:SpawnEnemy(spawnName, {
 				Level = math.min(self.Controller.Wave-1, self.Controller.PeekPlayerLevel);
 				SpawnCFrame = spawnCf;
 			});
 
-			npcPrefab:SetAttribute("EntityHudHealth", true);
+			npcClass.Character:SetAttribute("EntityHudHealth", true);
 			Debugger:Warn("Spawned fog entity",self.HazardSpawns);
 		end
 	end

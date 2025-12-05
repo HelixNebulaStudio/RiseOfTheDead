@@ -6,6 +6,7 @@ local RunService = game:GetService("RunService");
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
 local MISSION_ID = 68;
@@ -17,28 +18,31 @@ if RunService:IsServer() then
 
 	if not modBranchConfigs.IsWorld("TheHarbor") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
-	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
-		local triggerPlayer: Player? = eventPacket.Player;
-		if triggerPlayer == nil then return end;
-		
-		if interactData.TriggerTag == "m68PickupSalvage" then
-			if interactData.Object:GetAttribute("Triggered") then return end;
-			interactData.Object:SetAttribute("Triggered", true);
-			game.Debris:AddItem(interactData.Object.Parent, 0);
-			
-			modMission:Progress(triggerPlayer, MISSION_ID, function(mission)
-				if mission.ProgressionPoint == 1 then
-					mission.SaveData.SalvagesLeft = mission.SaveData.SalvagesLeft -1;
-					modAudio.Play("StorageItemPickup", interactData.Object.Position); 
-					
-				end;
-				if mission.SaveData.SalvagesLeft <= 0 then
-					modMission:CompleteMission(triggerPlayer, MISSION_ID);
+	shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
+		local player: Player? = eventPacket.Player;
+		if player == nil then return end;
 
-				end
-			end)
-		end
-	end);
+		local triggerId: string, interactable: InteractableInstance = ...;
+		if triggerId ~= "m68PickupSalvage" then return end;
+
+		local interactConfig = interactable.Config;
+
+		if interactConfig:GetAttribute("Triggered") then return end;
+		interactConfig:SetAttribute("Triggered", true);
+		game.Debris:AddItem(interactable.Part.Parent, 0);
+		
+		modMission:Progress(player, MISSION_ID, function(mission)
+			if mission.ProgressionPoint == 1 then
+				mission.SaveData.SalvagesLeft = mission.SaveData.SalvagesLeft -1;
+				modAudio.Play("StorageItemPickup", interactable.Part.Position); 
+				
+			end;
+			if mission.SaveData.SalvagesLeft <= 0 then
+				modMission:CompleteMission(player, MISSION_ID);
+
+			end
+		end)
+	end)
 
 	cutsceneAssets = script.Parent:WaitForChild("CutsceneAssets");
 
@@ -52,7 +56,11 @@ return function(CutsceneSequence)
 	if not modBranchConfigs.IsWorld("TheHarbor") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	local salvagePrefab = cutsceneAssets:WaitForChild("LockedSalvage");
-	cutsceneAssets:WaitForChild("Interactable"):Clone().Parent = salvagePrefab;
+
+	local interactableConfig = modInteractables.createInteractable("Button");
+	interactableConfig:SetAttribute("_Id", "m68PickupSalvage");
+	interactableConfig:SetAttribute("_Label", "Retrieve Locked Salvage");
+	interactableConfig.Parent = salvagePrefab;
 	
 	local salvageSpawns = {};
 	for _, obj in pairs(cutsceneAssets:WaitForChild("SalvageSpawns"):GetChildren()) do

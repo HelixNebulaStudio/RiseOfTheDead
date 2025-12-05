@@ -8,7 +8,7 @@ if RunService:IsServer() then
     modGameModeManager.GameWorld = true;
 end
 
-local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new();
+local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new(script);
 
 local GAME_MODE, GAME_STAGE = "Raid", "Tombs";
 --==
@@ -23,16 +23,16 @@ function WorldCore.InitGameController()
         Id = "Eliminate";
         EliminateGoal = 100;
         
-        SpawnPlatformRadius = 64;
+        SpawnPlatformRadius = 100;
         EnemyCap = 40;
         MinSpawnCount = 4;
         MaxSpawnCount = 8;
         
-        HordeWhenEnemiesDropsBelow = 15;
+        HordeWhenEnemiesDropsBelow = 5;
         HordeCycle = 120;
-        HordeSpawnRate = 0.5;
+        HordeSpawnRate = 1;
 
-        HordeTimerDeduction = NumberRange.new(30, 55);
+        HordeTimerDeduction = NumberRange.new(25, 35);
     };
 
     newGameController.EnemiesList = {

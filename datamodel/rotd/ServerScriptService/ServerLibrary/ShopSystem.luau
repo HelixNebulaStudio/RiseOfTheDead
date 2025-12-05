@@ -108,10 +108,10 @@ function ShopService.onRequire()
                     
                     local finalPrice = sellPrice + bonus;
                     if finalPrice > 0 then
-                        modOnGameEvents:Fire("OnEventPoint", "ShopService_Sell", {
-                            Player=player;
-                            FinalPrice=finalPrice;
-                            StorageItem=storageItem;
+                        shared.modEventService:ServerInvoke("Generic_BindTrigger", {ReplicateTo={player}}, "ShopService_Sell", {
+                            Player = player;
+                            FinalPrice = finalPrice;
+                            StorageItem = storageItem;
                         });
                     end
 

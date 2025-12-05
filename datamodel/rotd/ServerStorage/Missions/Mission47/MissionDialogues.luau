@@ -7,7 +7,7 @@ local Dialogues = {
 	Carlos={};
 };
 
-local missionId = 47;
+local MISSION_ID = 47;
 --==
 
 -- MARK: Carlos Dialogues
@@ -17,7 +17,7 @@ Dialogues.Carlos.DialogueStrings = {
 		Reply="Oh, I'm glad you asked. I want to spread hope with music, I'd gladly give you one of my extra new flute if you can learn to play it.";
 	};
 	["soundOfMusic_sure"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Sure, can you teach me?";
 		Reply="Of course, give me a second to find it.";
 	};
@@ -74,7 +74,7 @@ if RunService:IsServer() then
 			elseif stage == 3 then
 				dialog:SetInitiate("That was great! Please share your musical knowledge with others too!");
 				dialog:AddChoice("soundOfMusic_done", function(dialog)
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 				
 			end
@@ -83,7 +83,7 @@ if RunService:IsServer() then
 		elseif mission.Type == 2 then -- Available;
 			dialog:AddChoice("soundOfMusic_get", function(dialog)
 				dialog:AddChoice("soundOfMusic_sure", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end)
 			

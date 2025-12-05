@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
+
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 local modBitFlags = shared.require(game.ReplicatedStorage.Library.BitFlags);
 local modCardGame = shared.require(game.ReplicatedStorage.Library.CardGame);
@@ -17,7 +18,7 @@ local Dialogues = {
 	Lewis={};
 };
 
-local missionId = 81;
+local MISSION_ID = 81;
 
 
 local checkpointFlags = modBitFlags.new();
@@ -36,12 +37,12 @@ Dialogues.Joseph.DialogueStrings = {
 		Reply="Should be here by now.. Oh hello, $PlayerName.";
 	};
 	["fotl_prologue1"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Face="Skeptical"; 
 		Say="Hey Joseph, what was that about something should be here now?";
 		Reply="Yeah, these Rats.. I made a deal with them for some walkie talkies a while ago..";
 		FailResponses = {
-			{Reply="We'll wait a while and see when it will be delivered."};
+			{Reply="We'll wait a while and see when it will be delivered first."};
 		};
 	};
 	["fotl_prologue2"]={
@@ -72,7 +73,7 @@ Dialogues.Joseph.DialogueHandler = function(player, dialog, data, mission)
 			dialog:AddChoice("fotl_prologue2", function(dialog)
 				dialog:AddChoice("fotl_prologue3", function(dialog)
 					dialog:AddChoice("fotl_prologue4", function(dialog)
-						modMission:StartMission(player, missionId);
+						modMission:StartMission(player, MISSION_ID);
 					end)
 				end)
 			end)
@@ -111,7 +112,7 @@ Dialogues.Joseph.DialogueHandler = function(player, dialog, data, mission)
 							Reply="*Shhh* We'll talk about it later, and not near the Rat shop keeper stationed here.";
 							
 						}, function(dialog)
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 				
 						end);
 			
@@ -131,7 +132,7 @@ end
 
 -- MARK: David Handler
 Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
-	local cooperPrefab = workspace.Entity:FindFirstChild("Cooper");
+	local cooperChar = workspace.Entity:FindFirstChild("Cooper");
 
 	local saveFlag = mission.SaveData.Flags;
 
@@ -140,7 +141,7 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 	local activeCardGameLobby = modCardGame.GetLobby(player);
 	
 	if activeCardGameLobby then
-		if activeCardGameLobby.Host == dialog.Prefab then
+		if activeCardGameLobby.Host == dialog.Character then
 			dialog:SetInitiate("You're going down.", "Smirk");
 
 		else
@@ -159,7 +160,7 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 			}, function(dialog)
 				mission.SaveData.Flags = checkpointFlags:Set(saveFlag, "david_revealCooperHas", true);
 				
-				dialog:TalkTo(cooperPrefab);
+				dialog:TalkTo(cooperChar);
 	
 			end);
 	
@@ -174,7 +175,7 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 			}, function(dialog)
 				mission.SaveData.Flags = checkpointFlags:Set(saveFlag, "david_askWalkieTalkie", true);
 	
-				dialog:TalkTo(cooperPrefab);
+				dialog:TalkTo(cooperChar);
 	
 			end);
 	
@@ -188,7 +189,7 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 				
 			}, function(dialog)
 				mission.SaveData.Flags = checkpointFlags:Set(saveFlag, "david_winBack", true);
-				dialog:TalkTo(cooperPrefab);
+				dialog:TalkTo(cooperChar);
 
 			end);
 
@@ -259,13 +260,13 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 								Reply="Alright then, play against me and lets test your skill.";
 								
 							}, function(dialog)
-								modMission:Progress(player, missionId, function()
+								modMission:Progress(player, MISSION_ID, function()
 									if mission.ProgressionPoint <= 2 then
 										mission.ProgressionPoint = 3;
 									end
 								end)
 		
-								dialog:TalkTo(dialog.Prefab);
+								dialog:TalkTo(dialog.Character);
 							end);
 
 						end
@@ -300,7 +301,7 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 				Reply="Like I said, can't do anything about it..";
 				
 			}, function(dialog)
-				modMission:Progress(player, missionId, function()
+				modMission:Progress(player, MISSION_ID, function()
 					if mission.ProgressionPoint <= 9 then
 						mission.ProgressionPoint = 10;
 					end
@@ -313,12 +314,12 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 	
 	local function StartCardGame(dialog)
 		local npcName = dialog.Name;
-		local npcPrefab = dialog.Prefab;
+		local npcChar = dialog.Character;
 		
-		local cardGameLobby = modCardGame.NewLobby(npcPrefab);
-		local npcTable = cardGameLobby:GetPlayer(npcPrefab);
+		local cardGameLobby = modCardGame.NewLobby(npcChar);
+		local npcTable = cardGameLobby:GetPlayer(npcChar);
 
-		local npcModule = dialog:GetNpcModule();
+		local npcClass: NpcClass = dialog:GetNpcClass();
 
 		local npcQuips = {
 			CaughtNotBluffing = {
@@ -363,11 +364,11 @@ Dialogues.David.DialogueHandler = function(player, dialog, data, mission)
 			local pickQuip = quipsList[math.random(1, #quipsList)];
 			pickQuip = string.gsub(pickQuip, "$PlayerName", (param.PlayerName or "pal"));
 
-			npcModule.Chat(game.Players:GetPlayers(), pickQuip);
+			npcClass.Chat(game.Players:GetPlayers(), pickQuip);
  		end
 
 		-- MARK: David Fotl Agent
-		npcTable.ComputerAutoPlay = modCardGame.NewComputerAgentFunc(npcPrefab, cardGameLobby, {
+		npcTable.ComputerAutoPlay = modCardGame.NewComputerAgentFunc(npcChar, cardGameLobby, {
 			BluffChance=0;
 			CheatChance=0;
 			Actions = {
@@ -433,13 +434,12 @@ end
 
 -- MARK: Cooper Handler
 Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
-	local davidPrefab = workspace.Entity:FindFirstChild("David");
+	local davidChar = workspace.Entity:FindFirstChild("David");
 	local saveFlag = mission.SaveData.Flags;
 
 	if mission.Type ~= 1 then return end;
 
 	if mission.ProgressionPoint == 1 then
-		
 		if checkpointFlags:Test("david_winBack", saveFlag) == true then
 			dialog:SetInitiate("David won't be winning them back any time soon.", "Smirk");
 			
@@ -461,13 +461,13 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 						Reply="...";
 					}, function(dialog)
 						
-						modMission:Progress(player, missionId, function()
+						modMission:Progress(player, MISSION_ID, function()
 							if mission.ProgressionPoint <= 1 then
 								mission.ProgressionPoint = 2;
 							end
 						end)
 
-						dialog:TalkTo(davidPrefab);
+						dialog:TalkTo(davidChar);
 
 					end)
 
@@ -485,13 +485,13 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 						Reply="...";
 					}, function(dialog)
 						
-						modMission:Progress(player, missionId, function()
+						modMission:Progress(player, MISSION_ID, function()
 							if mission.ProgressionPoint <= 1 then
 								mission.ProgressionPoint = 3;
 							end
 						end)
 
-						dialog:TalkTo(davidPrefab);
+						dialog:TalkTo(davidChar);
 
 					end)
 					
@@ -510,7 +510,7 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 			}, function(dialog)
 				mission.SaveData.Flags = checkpointFlags:Set(saveFlag, "cooper_betAway", true);
 				
-				dialog:TalkTo(davidPrefab);
+				dialog:TalkTo(davidChar);
 	
 			end)
 	
@@ -541,13 +541,13 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 							Reply="...";
 						}, function(dialog)
 							
-							modMission:Progress(player, missionId, function()
+							modMission:Progress(player, MISSION_ID, function()
 								if mission.ProgressionPoint <= 1 then
 									mission.ProgressionPoint = 2;
 								end
 							end)
 	
-							dialog:TalkTo(davidPrefab);
+							dialog:TalkTo(davidChar);
 	
 						end)
 	
@@ -559,13 +559,13 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 						Reply="Alright, ";
 					}, function(dialog)
 						
-						modMission:Progress(player, missionId, function()
+						modMission:Progress(player, MISSION_ID, function()
 							if mission.ProgressionPoint <= 1 then
 								mission.ProgressionPoint = 3;
 							end
 						end)
 	
-						dialog:TalkTo(dialog.Prefab);
+						dialog:TalkTo(dialog.Character);
 	
 					end)
 	
@@ -585,7 +585,7 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 			}, function(dialog)
 				mission.SaveData.Flags = checkpointFlags:Set(saveFlag, "cooper_askWalkie", true);
 	
-				dialog:TalkTo(davidPrefab);
+				dialog:TalkTo(davidChar);
 	
 			end)
 	
@@ -601,12 +601,12 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 		
 		local function StartCardGame(dialog)
 			local npcName = dialog.Name;
-			local npcPrefab = dialog.Prefab;
+			local npcChar = dialog.Character;
 			
-			local cardGameLobby = modCardGame.NewLobby(npcPrefab);
-			local npcTable = cardGameLobby:GetPlayer(npcPrefab);
+			local cardGameLobby = modCardGame.NewLobby(npcChar);
+			local npcTable = cardGameLobby:GetPlayer(npcChar);
 
-			local npcModule = dialog:GetNpcModule();
+			local npcClass: NpcClass = dialog:GetNpcClass();
 
 
 			local npcQuips = {
@@ -644,11 +644,11 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 				local pickQuip = quipsList[math.random(1, #quipsList)];
 				pickQuip = string.gsub(pickQuip, "$PlayerName", (param.PlayerName or "pal"));
 
-				npcModule.Chat(game.Players:GetPlayers(), pickQuip);
+				npcClass.Chat(game.Players:GetPlayers(), pickQuip);
 			end
 
 			-- MARK: Cooper Fotl Agent
-			npcTable.ComputerAutoPlay = modCardGame.NewComputerAgentFunc(npcPrefab, cardGameLobby, {
+			npcTable.ComputerAutoPlay = modCardGame.NewComputerAgentFunc(npcChar, cardGameLobby, {
 				BluffChance=0.5;
 				CheatChance=1;
 				Actions = {
@@ -723,7 +723,7 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 		dialog:SetInitiate("Welp.. I did say I don't ask for much, how about you dance for me too and I'll give you your box of walkies.", "Smirk");
 
 		if mission.ProgressionPoint == 5 then
-			modMission:Progress(player, missionId, function(mission)
+			modMission:Progress(player, MISSION_ID, function(mission)
 				if mission.ProgressionPoint <= 5 then
 					mission.ProgressionPoint = 6;
 				end
@@ -748,13 +748,13 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 				Reply="...";
 			}, function(dialog)
 			
-				modMission:Progress(player, missionId, function()
+				modMission:Progress(player, MISSION_ID, function()
 					if mission.ProgressionPoint <= 7 then
 						mission.ProgressionPoint = 8;
 					end
 				end)
 
-				dialog:TalkTo(dialog.Prefab);
+				dialog:TalkTo(dialog.Character);
 
 			end);
 		end);
@@ -774,13 +774,13 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 				Reply="...";
 			}, function(dialog)
 			
-				modMission:Progress(player, missionId, function()
+				modMission:Progress(player, MISSION_ID, function()
 					if mission.ProgressionPoint <= 7 then
 						mission.ProgressionPoint = 8;
 					end
 				end)
 
-				dialog:TalkTo(dialog.Prefab);
+				dialog:TalkTo(dialog.Character);
 
 			end);
 		end);
@@ -788,7 +788,7 @@ Dialogues.Cooper.DialogueHandler = function(player, dialog, data, mission)
 	elseif mission.ProgressionPoint == 8 then
 		dialog:SetInitiate("Yeah, now get lost!", "Hehe");
 		
-		modMission:Progress(player, missionId, function()
+		modMission:Progress(player, MISSION_ID, function()
 			if mission.ProgressionPoint <= 8 then
 				mission.ProgressionPoint = 9;
 			end

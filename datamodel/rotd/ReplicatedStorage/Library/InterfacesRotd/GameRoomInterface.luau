@@ -6,19 +6,15 @@ local RunService = game:GetService("RunService");
 local camera = workspace.CurrentCamera;
 local localPlayer = game.Players.LocalPlayer;
 
-local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
-local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.LeaderboardService);
 local modCameraGraphics = shared.require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modLeaderboardInterface = shared.require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
-local modGuiTween = shared.require(game.ReplicatedStorage.Library.UI.GuiObjectTween);
-local modGuiObjectPlus = shared.require(game.ReplicatedStorage.Library.UI.GuiObjectPlus);
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
 
 
@@ -43,6 +39,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local remoteGameModeRequest = modRemotesManager:Get("GameModeRequest");
 	local remoteGameModeUpdate = modRemotesManager:Get("GameModeUpdate");
+	local remoteGameModeAssign = modRemotesManager:Get("GameModeAssign");
 
     local gameRoomFrame = script:WaitForChild("GameRoom"):Clone();
     gameRoomFrame.Parent = interface.ScreenGui;
@@ -792,6 +789,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
         end
 
+        if viewingRoom.BossPrefabs then
+            for a=1, #viewingRoom.BossPrefabs do
+                interface:FireEvent("TryHookEntity", viewingRoom.BossPrefabs[a], 1.1);
+            end
+        end
+
         --MARK: Leaderboards
         if activeLeaderboard == nil then
             if stageLib.LeaderboardKeyTable then
@@ -971,6 +974,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
     end))
     
+    interface.Garbage:Tag(remoteGameModeAssign.OnClientEvent:Connect(function(lobbyData)
+		modClientGuis.toggleGameBlinds(false, 0.5);
+		wait(0.51);
+        modClientGuis.toggleWindow("GameRoom", true, lobbyData);
+
+		task.wait(0.1);
+		modClientGuis.toggleGameBlinds(true, 0.5);
+	end))
 end
 
 return interfacePackage;

@@ -10,16 +10,20 @@ local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modMarkers = shared.require(game.ReplicatedStorage.Library.Markers);
 
-local templateLabel = script:WaitForChild("label");
+local HUD_TASK_ID = "RaidHudTask";
 
 local ModeHudClass = shared.require(script.Parent);
 --==
-return function(interface, window, frame)
+return function(interface: InterfaceInstance, window, frame)
 	local modeHud = ModeHudClass.new(interface, window, frame);
-
+	
+	local stopWatchRs = nil;
 	modeHud.Soundtrack = nil;
 	
+	local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+
 	function modeHud:Update(data)
 		modConfigurations.Set("AutoMarkEnemies", true);
 		local gameType = data.Type;
@@ -27,6 +31,10 @@ return function(interface, window, frame)
 
 		local gameLib = modGameModeLibrary.GetGameMode(gameType);
 		local stageLib = gameLib and modGameModeLibrary.GetStage(gameType, gameStage);
+
+		local titleText = `{gameType}: {gameStage}`;
+		local headerText = data.Header or ``;
+		local descLabel = data.Status or ``;
 
 		if self.Soundtrack == nil then
 			modAudio.Preload(stageLib.Soundtrack, 5);
@@ -36,34 +44,92 @@ return function(interface, window, frame)
 			end
 		end
 
-		local labelsList = self.MainFrame.Labels;
-		if data.TimeLimit then
-			local timeLimitLabel = labelsList:FindFirstChild("TimeLimitLabel")
-			if timeLimitLabel == nil then
-				timeLimitLabel = templateLabel:Clone();
-				timeLimitLabel.Name = "TimeLimitLabel";
-				timeLimitLabel.Parent = labelsList;
+		if data.NextStageSound == true then
+			modAudio.Play("MissionUpdated");
+		end
 
+		if data.PlayMusic == true and not self.IsPlaying then
+			self.Soundtrack.TimePosition = 0;
+			TweenService:Create(self.Soundtrack, TweenInfo.new(5), {Volume=0.5}):Play();
+			self.IsPlaying = true;
+
+		elseif data.PlayMusic == false and self.IsPlaying then
+			TweenService:Create(self.Soundtrack, TweenInfo.new(5), {Volume=0}):Play();
+			self.IsPlaying = false;
+
+		end
+
+		if data.LootPrefab ~= nil and data.LootPrefab ~= false then
+			local point = data.LootPrefab and data.LootPrefab:GetPivot().Position;
+			if point then
+				modMarkers.SetMarker("LootPrefab", point, gameStage.." Loot", modMarkers.MarkerTypes.Waypoint);
+				modMarkers.SetColor("LootPrefab", Color3.fromRGB(55, 234, 181));
 			end
-
-			local timeLeft = math.clamp(data.TimeLimit-modSyncTime.GetTime(), 0, 300);
-			timeLimitLabel.Text = modSyncTime.ToString(timeLeft);
-			timeLimitLabel.TextColor3 = timeLeft <= 0 and Color3.fromRGB(144, 70, 70) or Color3.fromRGB(255,255,255);
-
-			if math.fmod(timeLeft, 60) == 0 then
-				modAudio.Preload("Sonar", 5);
-				modAudio.Play("Sonar", script.Parent);
-			end
+		else
+			modMarkers.ClearMarker("LootPrefab");
 		end
 		
-		local classPlayer = shared.modPlayers.get(localPlayer);
-		if classPlayer.IsAlive == false then
-			self.Interface:ToggleGameBlinds(true, 2);
-			if not self:IsSpectating() then
-				self:Spectate();
+
+		local taskHudWindow: InterfaceWindow = interface:GetWindow("TaskListHud");
+		local raidHudTask = taskHudWindow and taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID) or nil;
+
+		if raidHudTask then
+			raidHudTask.Order = 3;
+			
+			local frame = raidHudTask.Frame;
+			raidHudTask.Properties.TitleText = titleText;
+			raidHudTask.Properties.HeaderText = headerText;
+			raidHudTask.Properties.DescText = descLabel;
+
+			local stopwatchLabel = raidHudTask.StopwatchLabel;
+			if stopwatchLabel == nil then
+				stopwatchLabel = taskHudWindow.Binds.GenericLabel:Clone();
+				stopwatchLabel.Name = "StopwatchLabel";
+				stopwatchLabel.LayoutOrder = 5;
+				stopwatchLabel.Parent = frame:WaitForChild("Content");
+				raidHudTask.StopwatchLabel = stopwatchLabel;
+			end
+			
+			if stopwatchLabel then
+				if stageLib.EnableStopwatch then
+					stopwatchLabel.Visible = true;
+
+					if stopWatchRs == nil then
+						stopwatchLabel.Text = "00:00.000";
+						stopWatchRs = RunService.RenderStepped:Connect(function(delta)
+							if data.StopwatchFinal then
+								stopwatchLabel.Text = `Final Time: {modSyncTime.FormatMs(data.StopwatchFinal *1000)}!`;
+								return;
+							end
+
+							if data.StopwatchTick == nil then
+								stopwatchLabel.Text = "00:00.000";
+								return;
+							end
+
+							local timeLapse = (workspace:GetServerTimeNow()-data.StopwatchTick);
+							stopwatchLabel.Text = `{modSyncTime.FormatMs(timeLapse *1000)}`;
+						end)
+					end
+
+				else
+					stopwatchLabel.Visible = false;
+
+				end
 			end
 		end
 	end
+	
+	modeHud.OnActiveChanged:Connect(function(isActive)
+		local taskHudWindow: InterfaceWindow = interface:GetWindow("TaskListHud");
+		if taskHudWindow == nil then return end;
+
+		if isActive then
+			taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID, true);
+		else
+			taskHudWindow.Binds.destroyHudTask(HUD_TASK_ID);
+		end
+	end)
 
 	return modeHud;
 end

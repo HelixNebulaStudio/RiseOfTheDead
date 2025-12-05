@@ -18,7 +18,7 @@ function Objective.new()
 end
 
 function Objective:Load()
-	Objective.BossNpcModules = {};
+	Objective.BossNpcClasses = {};
 	Objective.BossSpawns = {};
 	
 	for _, obj in pairs(self.Controller.StageElements:WaitForChild("BossSpawns"):GetChildren()) do
@@ -61,30 +61,36 @@ function Objective:Begin()
 		local bossLib = modGameModeLibrary.GameModes.Boss.Stages[bossId];
 		
 		for prefabName, _ in pairs(bossLib.Prefabs) do
-			local bossPrefab, npcModule = self.Controller:SpawnEnemy(prefabName, {
+			local npcClass: NpcClass = self.Controller:SpawnEnemy(prefabName, {
 				SpawnCFrame = Objective.BossSpawns[math.random(1, #Objective.BossSpawns)].CFrame;
 			})
 
 			local newHealth = 5000 * math.max(math.ceil(self.Controller.Wave/5), 1);
 
-			npcModule.IsBoss = true;
-			npcModule.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Subject;
-			npcModule.Humanoid.MaxHealth = math.clamp(newHealth, 1000, math.huge);
-			npcModule.Humanoid.Health = npcModule.Humanoid.MaxHealth;
+			npcClass.Properties.IsBoss = true;
+			npcClass.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Subject;
 
-			bossPrefab:SetAttribute("EntityHudHealth", true);
-			table.insert(bossList, bossPrefab);
+			local newMaxHealth = math.clamp(newHealth, 1000, math.huge);
+			npcClass.HealthComp:SetMaxHealth(newMaxHealth);
+			npcClass.HealthComp:SetHealth(newMaxHealth);
+			npcClass.HealthComp:Reset();
 
-			npcModule:Died(function()
-				game.Debris:AddItem(bossPrefab, 30);
-				for a=#Objective.BossNpcModules, 1, -1 do
-					if Objective.BossNpcModules[a] == npcModule then
-						table.remove(Objective.BossNpcModules, a);
+			local bossChar = npcClass.Character;
+			bossChar:SetAttribute("EntityHudHealth", true);
+			table.insert(bossList, bossChar);
+
+			npcClass.HealthComp.OnIsDeadChanged:Connect(function()
+				if not npcClass.HealthComp.IsDead then return end;
+
+				game.Debris:AddItem(bossChar, 30);
+				for a=#Objective.BossNpcClasses, 1, -1 do
+					if Objective.BossNpcClasses[a] == npcClass then
+						table.remove(Objective.BossNpcClasses, a);
 						break;
 					end
 				end
 				for a=#bossList, 1, -1 do
-					if bossList[a] == bossPrefab then
+					if bossList[a] == bossChar then
 						table.remove(bossList, a);
 					end
 				end
@@ -94,16 +100,16 @@ function Objective:Begin()
 					--LootPrefab=lootPrefab;
 				};
 
-				local canRagdoll = bossPrefab:GetAttribute("HasRagdoll") == true;
+				local canRagdoll = bossChar:GetAttribute("HasRagdoll") == true;
 				if not canRagdoll then
-					for _, obj in pairs(bossPrefab:GetDescendants()) do
+					for _, obj in pairs(bossChar:GetDescendants()) do
 						if obj:IsA("Motor6D") or obj:IsA("BodyMover") then
 							game.Debris:AddItem(obj, 0);
 						end
 					end
 				end
 			end)
-			table.insert(Objective.BossNpcModules, npcModule);
+			table.insert(Objective.BossNpcClasses, npcClass);
 		end
 		
 	end
@@ -113,14 +119,8 @@ function Objective:Begin()
 	};
 end
 
-function Objective:Tick()
-	--Debugger:Display{
-	--	Objective="Boss";
-	--	Wave=self.Controller.Wave;
-	--	NumOfEnemy=#self.Controller.EnemyModules;
-	--};
-	
-	if tick()-self.LastZombieSpawn >= 3 and #self.Controller.EnemyModules <= 25 and #Objective.BossNpcModules > 0 then
+function Objective:Tick()	
+	if tick()-self.LastZombieSpawn >= 3 and #self.Controller.EnemyNpcClasses <= 25 and #Objective.BossNpcClasses > 0 then
 		self.LastZombieSpawn = tick();
 		
 		local enemyName = self.Controller:PickEnemy();
@@ -131,7 +131,7 @@ function Objective:Tick()
 		});
 	end
 
-	if tick() > self.StartTime and #self.Controller.EnemyModules <= 0 then
+	if tick() > self.StartTime and #self.Controller.EnemyNpcClasses <= 0 then
 		return true;
 	end
 
@@ -139,7 +139,7 @@ function Objective:Tick()
 end
 
 function Objective:End()
-	table.clear(Objective.BossNpcModules);
+	table.clear(Objective.BossNpcClasses);
 end
 
 return Objective;

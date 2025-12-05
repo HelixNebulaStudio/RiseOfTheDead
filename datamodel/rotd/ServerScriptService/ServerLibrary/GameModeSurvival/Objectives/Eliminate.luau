@@ -30,13 +30,13 @@ function Objective:Begin()
 end
 
 function Objective:Tick()
-    local activeEnemyCount = #self.Controller.EnemyModules;
+    local activeEnemyCount = #self.Controller.EnemyNpcClasses;
     
 	local canSpawn = true;
     if tick()-self.LastSpawnTick <= math.max(self.Controller.IsHard and 0.1 or 1, activeEnemyCount/20) then
         canSpawn = false;
     end
-    if #self.Controller.EnemyModules > 100 then
+    if #self.Controller.EnemyNpcClasses > 100 then
         canSpawn = false;
     end
 	if self.PauseTick and tick() < self.PauseTick then
@@ -75,7 +75,7 @@ function Objective:Tick()
 		
 	end
 
-	if self.SpawnCount >= self.EliminateCount and #self.Controller.EnemyModules <= 0 then
+	if self.SpawnCount >= self.EliminateCount and #self.Controller.EnemyNpcClasses <= 0 then
 		return true;
 	end
 	
@@ -83,9 +83,9 @@ function Objective:Tick()
 end
 
 function Objective:End()
-	for a=#self.Controller.EnemyModules, 1, -1 do
-		game.Debris:AddItem(self.Controller.EnemyModules[a].Prefab, 0);
-		table.remove(self.Controller.EnemyModules, a);
+	for a=#self.Controller.EnemyNpcClasses, 1, -1 do
+		game.Debris:AddItem(self.Controller.EnemyNpcClasses[a].Character, 0);
+		table.remove(self.Controller.EnemyNpcClasses, a);
 	end
 end
 

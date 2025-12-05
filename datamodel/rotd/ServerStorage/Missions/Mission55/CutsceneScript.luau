@@ -16,6 +16,7 @@ if RunService:IsServer() then
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
+	modSafehomeService = shared.require(game.ServerScriptService.ServerLibrary.SafehomeService);
 	
 else
 	modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
@@ -25,7 +26,6 @@ end
 --== Script;
 return function(CutsceneSequence)
 	if not modBranchConfigs.IsWorld("Safehome") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
-	if workspace:GetAttribute("FactionHeadquarters") ~= nil then Debugger:Warn("Is faction world"); return end;
 
 	local spawnCf = CFrame.new(109.12, 2.55, -79.31) * CFrame.Angles(0, math.pi/2, 0);
 	CutsceneSequence:Initialize(function()
@@ -34,13 +34,11 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
 			
-		while not shared.modSafehomeService.MapLoaded do wait(1); end
-		while modServerManager.PrivateWorldCreator == nil do wait(1); end
-		
-		if modServerManager.PrivateWorldCreator ~= player then return end;
-		
 		local profile = shared.modProfile:Get(player);
 		local safehomeData = profile.Safehome;
+
+		local safehomeClass = safehomeData.SafehomeClass;
+		if safehomeClass == nil then Debugger:Warn("Missing safehomeClass"); return end;
 		
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
@@ -88,16 +86,17 @@ return function(CutsceneSequence)
 					mission.SaveData.NpcName = newNpcName;
 
 					Debugger:Warn("Chosen NPC:", newNpcName, " mission.SaveData.NpcName", mission.SaveData.NpcName);
-					local survivorNpcModule = modNpcs.getPlayerNpc(player, newNpcName);
+					local survivorNpcClass: NpcClass = modNpcs.getPlayerNpc(player, newNpcName);
 
-					if survivorNpcModule == nil then
-						modNpcs.spawn(newNpcName, spawnCf, function(npc, npcModule)
-							npcModule.Player = player;
-							survivorNpcModule = npcModule;
-						end);
+					if survivorNpcClass == nil then
+						survivorNpcClass = modNpcs.spawn2{
+							Name = newNpcName;
+							CFrame = spawnCf;
+							Player = player;
+						};
 					end
 
-					survivorNpcModule:Teleport(spawnCf);
+					survivorNpcClass:SetCFrame(spawnCf);
 
 					task.spawn(function()
 						local remotes = game.ReplicatedStorage.Remotes;

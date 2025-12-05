@@ -9,7 +9,9 @@ if RunService:IsServer() then
 	local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, damageData: DamageData)
+	shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, ...)
+		local damageData: DamageData = ...;
+
 		local storageItem: StorageItem? = damageData.StorageItem;
 		if storageItem == nil then return end;
 
@@ -25,7 +27,8 @@ if RunService:IsServer() then
 		local toolWorkbenchLib = storageItem and modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId] or nil;
 
 		local mission = modMission:GetMission(player, MISSION_ID);
-		if mission and mission.Type == 1 and toolWorkbenchLib and (mission.SaveData.WeaponItemId or table.find(toolWorkbenchLib.Type, mission.SaveData.WeaponType) ~= nil) then
+		if mission and mission.Type == 1 and toolWorkbenchLib 
+		and (mission.SaveData.WeaponItemId or table.find(toolWorkbenchLib.Type, mission.SaveData.WeaponType) ~= nil) then
 			modMission:Progress(player, MISSION_ID, function(mission)
 				mission.SaveData.Kills = mission.SaveData.Kills -1;
 				if mission.SaveData.Kills <= 0 then

@@ -6,8 +6,8 @@ local EquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentCl
 --==
 
 local _Update = EquipmentClass.Update;
-function EquipmentClass:Update(storageItem: StorageItem)
-    _Update(self, storageItem);
+function EquipmentClass:Update()
+    _Update(self);
 end
 
 function EquipmentClass.onRequire()

@@ -6,7 +6,7 @@ local interactablePackage = {};
 --==
 
 function interactablePackage.init(super) -- Server/Client
-    local Shop = {
+    local Shop = super.newPackage{
 		Name = "Shop";
         Type = "Shop";
     };

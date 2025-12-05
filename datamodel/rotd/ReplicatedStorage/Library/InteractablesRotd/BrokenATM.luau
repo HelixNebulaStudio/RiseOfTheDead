@@ -12,7 +12,7 @@ local interactablePackage = {};
 --==
 
 function interactablePackage.init(super) -- Server/Client
-    local BrokenAtm = {
+    local BrokenAtm = super.newPackage{
 		Name = "BrokenATM";
         Type = "Button";
 
@@ -21,7 +21,7 @@ function interactablePackage.init(super) -- Server/Client
     };
 
     function BrokenAtm.BindInteract(interactable: InteractableInstance, info: InteractInfo)
-        interactable.TypePackage.BindInteract(interactable, info);
+        BrokenAtm.TypePackage.BindInteract(interactable, info);
         if info.Action ~= "Server" then return end;
 
         local player = info.Player;

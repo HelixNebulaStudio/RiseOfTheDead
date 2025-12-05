@@ -328,7 +328,7 @@ if RunService:IsServer() then
 							end;
 						end)
 						
-						dialog:SetExpireTime(workspace:GetServerTimeNow()+3);
+						dialog:SetExpireTime(workspace:GetServerTimeNow()+1);
 					end)
 				end);
 

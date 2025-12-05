@@ -2,24 +2,26 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 local modNpcs = shared.require(game.ServerScriptService.ServerLibrary.Entity.Npcs);
 
 --==
 return function(player, dialog, data, mission)
 	if not modBranchConfigs.IsWorld("Safehome") then return end;
-	local ownerPlayer = modServerManager.PrivateWorldCreator;
-	local isOwner = ownerPlayer == player;
-	
-	if not isOwner then 
-		dialog:SetInitiate("I'm so glad "..ownerPlayer.Name.." rescued me..", "Excited");
+
+	local survivorNpcClass: NpcClass = dialog:GetNpcClass();
+	if survivorNpcClass.Player ~= player then
+		if survivorNpcClass.Player then
+			dialog:SetInitiate(`I'm so glad {survivorNpcClass.Player.Name} rescued me..`, "Excited");
+		else
+			dialog:SetInitiate(`I'm so glad I got rescued..`, "Excited");
+		end
 		return;
 	end
-	
+
 	Debugger:Warn("mission", mission);
 	
-	if mission.SaveData and mission.SaveData.NpcName ~= dialog.Name then return end;
+	if mission.SaveData and mission.SaveData.NpcName ~= survivorNpcClass.Name then return end;
 	
 	if mission.Type == 1 then -- Active
 		if mission.ProgressionPoint == 1 then

@@ -4,15 +4,19 @@ local MissionLogic = {};
 local RunService = game:GetService("RunService");
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
-local missionId = 47;
+local MISSION_ID = 47;
+
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-	
+
 	if not modBranchConfigs.IsWorld("TheWarehouse") then return {} end;
 
+	shared.modEventService:OnInvoked("Instrument_BindNotesPlayed", function(event: EventPacket, ...)
+		local player = event.Player;
+		if player == nil then return end;
 
-	modOnGameEvents:ConnectEvent("OnInstrumentPlay", function(player, instrumentType, notesChanged)
+		local instrumentType, notesChanged = ...;
+	
 		local carlosPrefab = workspace.Entity:FindFirstChild("Carlos");
 		if carlosPrefab == nil or carlosPrefab.PrimaryPart == nil then return end;
 
@@ -39,7 +43,7 @@ if RunService:IsServer() then
 		for a=1, #profile.Junk.M47List do
 			if profile.Junk.M47List[a] == songNotes[a] then
 				if #songNotes == a then
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 2 then
 							shared.Notify(player, "[Carlos] Wow, you did it!", "Message");
 							mission.ProgressionPoint = 3;
@@ -47,7 +51,7 @@ if RunService:IsServer() then
 					end)
 					
 				elseif activeNote ~= nil and a == #profile.Junk.M47List then
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 2 then
 							shared.Notify(player, "[Carlos] Nice, now play the ["..songNotes[a+1].."] note.", "Message");
 						end;
@@ -55,7 +59,7 @@ if RunService:IsServer() then
 					
 				end
 			else
-				modMission:Progress(player, missionId, function(mission)
+				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint == 2 then
 						shared.Notify(player, "[Carlos] Oh, that was the wrong note "..player.Name..", let's try that again.", "Message");
 					end;
@@ -64,7 +68,6 @@ if RunService:IsServer() then
 				break;
 			end
 		end
-			
 	end)
 end
 

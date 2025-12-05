@@ -7,13 +7,13 @@ local Dialogues = {
 	Lennon={};
 };
 
-local missionId = 23;
+local MISSION_ID = 23;
 --==
 
 -- MARK: Lennon Dialogues
 Dialogues.Lennon.DialogueStrings = {
 	["snipernest_help"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Ummm ok?";
 		Face="Smirk"; 
 		Reply="Good good, are you good at killing zombies?";
@@ -53,16 +53,13 @@ if RunService:IsServer() then
 
 		if mission.Type == 1 then -- Active
 			dialog:SetInitiate("Errr, were you suppose to be doing something for me? I forgot..");
-			local mission = modMission:Progress(player, missionId);
-			if mission.Type == 1 then
-				if mission.ProgressionPoint == 2 then
-					if modMission:CanCompleteMission(player, missionId) then
-						dialog:AddChoice("snipernest_done", function(dialog)
-							modMission:CompleteMission(player, missionId);
-						end);
-					else
-						dialog:AddChoice("fail_invFull");
-					end
+			if mission.ProgressionPoint == 2 then
+				if modMission:CanCompleteMission(player, MISSION_ID) then
+					dialog:AddChoice("snipernest_done", function(dialog)
+						modMission:CompleteMission(player, MISSION_ID);
+					end);
+				else
+					dialog:AddChoice("fail_invFull");
 				end
 			end
 			
@@ -70,10 +67,10 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Kiddddo, ehhh can you help me out?", "Confident");
 			dialog:AddChoice("snipernest_help", function(dialog)
 				dialog:AddChoice("snipernest_many", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 				dialog:AddChoice("snipernest_yes", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 				dialog:AddChoice("snipernest_no");
 			end)

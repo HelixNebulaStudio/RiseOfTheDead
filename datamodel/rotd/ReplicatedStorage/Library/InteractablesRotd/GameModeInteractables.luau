@@ -16,7 +16,7 @@ function interactablePackage.init(super) -- Server/Client
 	local remoteGameModeExit = modRemotesManager:Get("GameModeExit");
 
 	-- MARK: GameModeEnter
-	local GameModeEnter = {
+	local GameModeEnter = super.newPackage{
 		Name = "GameModeEnter";
         Type = "GameModeEnter";
     };

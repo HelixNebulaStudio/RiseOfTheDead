@@ -7,7 +7,7 @@ local Dialogues = {
 	Molly={};
 };
 
-local missionId = 34;
+local MISSION_ID = 34;
 --==
 
 -- MARK: Molly Dialogues
@@ -52,7 +52,7 @@ if RunService:IsServer() then
 				dialog:SetInitiate("Hey, I need a favor, and you owe me from all the healing I've done for you..");
 				dialog:AddChoice("escort_init", function(dialog)
 					dialog:AddChoice("escort_alright", function(dialog)
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 2 then
 								mission.ProgressionPoint = 2;
 							end;
@@ -63,16 +63,18 @@ if RunService:IsServer() then
 			elseif stage == 2 then
 				dialog:SetInitiate("What are you standing around for?");
 				dialog:AddChoice("escort_heal", function(dialog)
-					local strangerModule = modNpcs.getPlayerNpc(player, "Stranger");
-					if strangerModule and strangerModule.Humanoid then
-						strangerModule.Humanoid.Health = strangerModule.Humanoid.MaxHealth;
+					local strangerNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Stranger", function(npcClass: NpcClass)
+						return npcClass.Properties.MissionId == MISSION_ID;
+					end);
+					if strangerNpcClass then
+						strangerNpcClass.HealthComp:Reset();
 					end
 				end)
 				
 			elseif stage == 3 then
 				dialog:SetInitiate("Took you a while.. Well?");
 				dialog:AddChoice("escort_complete", function(dialog)
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 				
 			end
@@ -81,11 +83,10 @@ if RunService:IsServer() then
 			
 			
 		elseif mission.Type == 4 then -- Failed
-			local stage = mission.ProgressionPoint;
 			dialog:SetInitiate("You are suppose to protect them!");
 			dialog:AddChoice("escort_retry",  function(dialog)
 				mission.ProgressionPoint = 1;
-				modMission:StartMission(player, missionId);
+				modMission:StartMission(player, MISSION_ID);
 			end);
 				
 		end

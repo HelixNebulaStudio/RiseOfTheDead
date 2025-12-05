@@ -245,19 +245,9 @@ function treePackage.Detonate(npcClass: NpcClass)
                 healthComp:TakeDamage(dmgData);
 
                 task.spawn(function()
-                    local remotes = game.ReplicatedStorage.Remotes;
-                    local remoteCameraShakeAndZoom = remotes.CameraShakeAndZoom;
-
                     if characterClass.ClassName == "PlayerClass" then
                         local player: Player = (characterClass :: PlayerClass):GetInstance();
-                        remoteCameraShakeAndZoom:FireClient(
-                            player,
-                            10 * math.clamp(targetDistance/32, 0, 1), 
-                            0, 
-                            0.5, 
-                            0.01, 
-                            false
-                        );
+						shared.modPlayers.cameraShakeAndZoom(player, 10 * math.clamp(targetDistance/32, 0, 1), 0, 0.5, 0.01, false);
                     end
                 end)
 

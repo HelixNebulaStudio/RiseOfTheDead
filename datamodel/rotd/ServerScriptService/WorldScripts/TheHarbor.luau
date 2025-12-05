@@ -4,13 +4,14 @@ local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 if RunService:IsServer() then
     modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
 
 end
 
-local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new();
+local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new(script);
 --==
 
 function WorldCore.onRequire()
@@ -22,6 +23,10 @@ function WorldCore.onRequire()
             local revasDoorTemplate = script:WaitForChild("RevasDoorway");
 		    local newRevasDoor = revasDoorTemplate:Clone();
             newRevasDoor.Parent = workspace.Interactables;
+            
+            local doorInteractConfig = newRevasDoor:FindFirstChild("Interactable");
+            local doorInteractable: InteractableInstance = modInteractables.getOrNew(doorInteractConfig);
+            doorInteractable:SetPermissions("CanInteract", false);
             
             modReplicationManager.ReplicateOut({player}, newRevasDoor);
 

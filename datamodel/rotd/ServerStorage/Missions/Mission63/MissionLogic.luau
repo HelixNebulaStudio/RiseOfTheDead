@@ -5,7 +5,7 @@ local MissionLogic = {};
 local RunService = game:GetService("RunService");
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
-local missionId = 63;
+local MISSION_ID = 63;
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
@@ -17,7 +17,7 @@ if RunService:IsServer() then
 				if not modBranchConfigs.IsWorld("BanditsRecruitment") then
 					if mission.ProgressionPoint >= 3 and mission.ProgressionPoint <= 11 then
 						if firstRun then
-							modMission:Progress(player, missionId, function(mission)
+							modMission:Progress(player, MISSION_ID, function(mission)
 								mission.ProgressionPoint = 2;
 								Debugger:Log("Rewind mission 62 to point 2.");
 							end)

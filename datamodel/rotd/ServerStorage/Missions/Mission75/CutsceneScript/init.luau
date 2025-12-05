@@ -9,6 +9,7 @@ local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configur
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modStorageItem = shared.require(game.ReplicatedStorage.Library.StorageItem);
 local modDialogueService = shared.require(game.ReplicatedStorage.Library.DialogueService);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
 local MISSION_ID = 75;
@@ -17,7 +18,6 @@ if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 end
@@ -27,7 +27,7 @@ return function(CutsceneSequence)
 	--if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	local modClothingLibrary = shared.require(game.ReplicatedStorage.Library.ClothingLibrary);
 
-	local patrolBandit;
+	local patrolBandit: NpcClass;
 
 	if RunService:IsServer() then
 		modStorage.RegisterItemName("Stan's Blood Samples");
@@ -315,27 +315,35 @@ return function(CutsceneSequence)
 			
 		end)
 
-		modOnGameEvents:ConnectEvent("OnToolEquipped", function(player, storageItem)
+		shared.modEventService:OnInvoked("Players_BindWieldEvent", function(event: EventPacket, ...)
+			local action: string, toolHandler: ToolHandlerInstance = ...;
 
-			local missionData = modMission:GetMission(player, MISSION_ID);
-			if missionData.Type ~= 1 then return end;
-			if missionData.ProgressionPoint ~= 9 then return end;
-			
-			if patrolBandit then
-				if patrolBandit.Allied then
-					patrolBandit.Chat(player, "What the!");
-					
-				else
-					patrolBandit.Chat(player, "He's got a gun!");
-					
+			local playerClass: PlayerClass = toolHandler.CharacterClass :: PlayerClass;
+			local player: Player = (playerClass :: PlayerClass):GetInstance();
+
+			if action == "Equip" then
+
+				local missionData = modMission:GetMission(player, MISSION_ID);
+				if missionData.Type ~= 1 then return end;
+				if missionData.ProgressionPoint ~= 9 then return end;
+				
+				if patrolBandit then
+					if patrolBandit.Properties.Allied then
+						patrolBandit.Chat(player, "What the!");
+						
+					else
+						patrolBandit.Chat(player, "He's got a gun!");
+						
+					end
 				end
+				
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint <= 10 then
+						mission.ProgressionPoint = 10;
+					end
+				end);
+
 			end
-			
-			modMission:Progress(player, MISSION_ID, function(mission)
-				if mission.ProgressionPoint <= 10 then
-					mission.ProgressionPoint = 10;
-				end
-			end);
 		end)
 	end
 	
@@ -347,7 +355,9 @@ return function(CutsceneSequence)
 			
 		
 		local playerClass: PlayerClass = shared.modPlayers.get(player);
-		playerClass.OnDamageTaken:Connect(function(dmg)
+		playerClass.HealthComp.OnHealthChanged:Connect(function(newHealth, oldHealth, damageData)
+			if newHealth > oldHealth then return end;
+
 			if mission.Type ~= 1 then return end;
 			if not (mission.ProgressionPoint == 2 
 				or mission.ProgressionPoint == 9 
@@ -355,7 +365,6 @@ return function(CutsceneSequence)
 				or mission.ProgressionPoint == 11) then 
 				return 
 			end;
-			if dmg <= 0 then return end;
 			
 			local storageItemId = mission.SaveData.SampleId;
 
@@ -380,7 +389,6 @@ return function(CutsceneSequence)
 				end
 			end
 		end)
-		
 
 		if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 			local generatorPoint = workspace:WaitForChild("CutscenePoints"):WaitForChild("Generator");
@@ -521,48 +529,50 @@ return function(CutsceneSequence)
 					task.wait(math.random(3, 4));
 					-- patrol bandit
 					local patrolBanditSpawn = CFrame.new(498.821, 136.42, -1123.854) * CFrame.Angles(0, math.rad(-165), 0);
-					modNpcs.spawn("Bandit", patrolBanditSpawn, function(npc, npcModule)
-						npcModule.Player = player;
-						patrolBandit = npcModule;
-						
-						npcModule.Allied = banditsAllied;
+					patrolBandit = modNpcs.spawn2{
+						Name = "Bandit";
+						CFrame = patrolBanditSpawn;
+						Player = player;
+						BindSetup = function(npcClass: NpcClass)
+							npcClass.Properties.Allied = banditsAllied;
+							npcClass.Properties.CutsceneActive = true;
+								
+							local bandanaHandle = npcClass.Character:WaitForChild("Bandana"):WaitForChild("Handle");
+							bandanaHandle.Color = Color3.fromRGB(85, 85, 85);
 
-						npcModule:AddComponent(game.ServerScriptService.ServerLibrary.Entity.Npcs.Bandit.RandomSkin);
-						npcModule.RandomSkin();
-						npcModule.Movement:SetWalkSpeed("default", 8);
-						
-						local newInteractable = script:WaitForChild("BanditInteractable"):Clone();
-						newInteractable.Name = "Interactable"
-						newInteractable.Parent = npc;
-						
-						local bandanaHandle = npc:WaitForChild("Bandana"):WaitForChild("Handle");
-						bandanaHandle.Color = Color3.fromRGB(85, 85, 85);
-						
-						npcModule.Interactable = newInteractable;
-						
-						npcModule.Humanoid.Died:Connect(function()
-							modMission:Progress(player, MISSION_ID, function(mission)
-								if mission.ProgressionPoint <= 9 then
-									mission.ProgressionPoint = 10;
-								end
-							end);
-						end)
-					end, modNpcs.NpcBaseConstructors.CutsceneHuman);
-					
+							local interactConfig = modInteractables.createInteractable("Dialogue");
+							interactConfig:SetAttribute("NpcName", npcClass.Name);
+							interactConfig.Parent = npcClass.Character;
+							npcClass.Interactable = interactConfig;
+
+							npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
+								if not isDead then return end;
+
+								modMission:Progress(player, MISSION_ID, function(mission)
+									if mission.ProgressionPoint <= 9 then
+										mission.ProgressionPoint = 10;
+									end
+								end);
+							end)
+						end
+					};
+					patrolBandit.Move:SetMoveSpeed("set", "default", 8);
+
 					Debugger:Warn("walking to point");
 					patrolBandit:ToggleInteractable(false);
-					patrolBandit.Movement:Move(Vector3.new(498.82, 136.42, -1119.558)):Wait(1);
+					patrolBandit.Move:MoveTo(Vector3.new(498.82, 136.42, -1119.558));
+					patrolBandit.Move.OnMoveToEnded:Wait(1);
 					
 					Debugger:Warn("walking to point2");
 					
 					patrolBandit:ToggleInteractable(true);
 					CutsceneSequence:NextScene("BanditScout");
 					patrolBandit.Chat(player, "What the?! Who are you?!");
-					patrolBandit.Wield.Equip("ak47");
-					pcall(function()
-						patrolBandit.Wield.ToolModule.Configurations.MinBaseDamage = 3;
-					end);
-					patrolBandit.Immortal = nil;
+					
+					patrolBandit.WieldComp:Equip{
+						ItemId = "ak47";
+					};
+					patrolBandit.Properties.Immortal = nil;
 					
 					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint <= 9 then
@@ -570,12 +580,12 @@ return function(CutsceneSequence)
 						end
 					end);
 
-					patrolBandit.Movement:Move(Vector3.new(507.441, 136.42, -1112.584));
+					patrolBandit.Move:MoveTo(Vector3.new(507.441, 136.42, -1112.584));
 					task.wait(1);
-					patrolBandit.Movement:Face(playerClass:GetCFrame().Position);
+					patrolBandit.Move:Face(playerClass:GetCFrame().Position);
 
 					modDialogueService:InvokeDialogue(player, "talk", {
-						NpcModel=patrolBandit.Prefab;
+						NpcModel = patrolBandit.Character;
 					});
 					
 					local threatenMsgs = {
@@ -613,13 +623,11 @@ return function(CutsceneSequence)
 					mission.SaveData.FightBandits = true;
 					patrolBandit:ToggleInteractable(false);
 					
-					patrolBandit.Follow(playerClass.RootPart, 10);
+					patrolBandit.Move:Follow(playerClass.RootPart, 10);
 					
-					patrolBandit.Wield.Targetable.Humanoid = 1;
-					patrolBandit.Wield.SetEnemyHumanoid(playerClass.Humanoid);
-					patrolBandit.Movement:Face(playerClass.RootPart.Position);
+					patrolBandit.Move:Face(playerClass.RootPart.Position);
 					
-					patrolBandit.Wield.PrimaryFireRequest();
+					patrolBandit.WieldComp:InvokeToolAction("PrimaryFireRequest", nil, playerClass.Humanoid);
 					task.wait(4);
 					Debugger:Warn("4s");
 					
@@ -630,72 +638,59 @@ return function(CutsceneSequence)
 						local function spawnEnemy(spawnPoint)
 							if #enemies >= 6 then return end;
 							
-							modNpcs.spawn("Bandit", spawnPoint, function(npc, npcModule)
-								table.insert(enemies, npcModule);
-								npcModule.Configuration.Level = npcModule.Configuration.Level + 2;
-								npcModule.Properties.AttackDamage = math.clamp(npcModule.Configuration.Level*40, 1*40, 15*40);
-								npcModule.ForgetEnemies = false;
-								npcModule.Properties.IsHostile = true;
-								npcModule.AutoSearch = true;
-								npcModule.Properties.TargetableDistance = 4096;
-								npcModule.Properties.WalkSpeed={Min=8; Max=16};
-								npcModule.OnTarget(player);
+							modNpcs.spawn2{
+								Name = "Bandit";
+								CFrame = spawnPoint;
+								BindSetup = function(npcClass: NpcClass)
+									table.insert(enemies, npcClass);
 
-								npcModule.Properties.WeaponId = weapons[math.random(1, #weapons)];
-
-								npcModule.Speeches = {
-									"Come on out!";
-									"You're dead meat!";
-								}
-
-								npcModule.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Subject;
-								npcModule.Humanoid.Health = npcModule.Humanoid.MaxHealth;
-
-								local bandanaHandle = npc:WaitForChild("Bandana"):WaitForChild("Handle");
-								bandanaHandle.Color = Color3.fromRGB(85, 85, 85);
-								
-								--local isAlive = true;
-								npcModule.Humanoid.Died:Connect(function()
-									--isAlive = false;
-									for a=#enemies, 1, -1 do
-										if enemies[a] == npcModule then
-											table.remove(enemies, a);
-										end
-									end
-									npcModule.DeathPosition = npcModule.RootPart.CFrame.p;
-
-									game.Debris:AddItem(npc, 10);
-								end);
-								
-								
-								npcModule.BaseArmor = 100;
-								npcModule:AddComponent("ArmorSystem");
-
-								local banditarmorLib = modClothingLibrary:Find("banditarmor");
-								for _, accessory in pairs(banditarmorLib.Accessories) do
-									local newAccessory = accessory:Clone();
+									local npcChar = npcClass.Character;
+									local properties = npcClass.Properties;
+									properties.Level = properties.Level + 2;
+									properties.TargetableDistance = 4096;
 									
-									npcModule.ArmorSystem.OnArmorChanged:Connect(function()
-										if npcModule.ArmorSystem.Armor > 0 then return end;
-										local handle = newAccessory:FindFirstChildWhichIsA("BasePart");
-										if handle then 
-											local cf = handle.CFrame;
-											handle.Parent = workspace.Debris;
-											handle.CanCollide = true;
-											handle.CFrame = cf;
-										end;
-										game.Debris:AddItem(handle, 10);
-										newAccessory:Destroy();
+									local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
+									local banditarmorLib = modClothingLibrary:Find("banditarmor");
+									for _, accessory in pairs(banditarmorLib.Accessories) do
+										local newAccessory = accessory:Clone();
+										
+										local destructible: DestructibleInstance = bodyDestructiblesComp:Create("Bandit Armor", newAccessory);
+										destructible.HealthComp:SetMaxHealth(100);
+										destructible.HealthComp:Reset();
+										destructible.OnDestroy:Connect(function()
+											local handle = newAccessory:FindFirstChildWhichIsA("BasePart");
+											if handle then 
+												local cf = handle.CFrame;
+												handle.Parent = workspace.Debris;
+												handle.CanCollide = true;
+												handle.CFrame = cf;
+											end;
+											game.Debris:AddItem(handle, 10);
+											newAccessory:Destroy();
+										end)
+
+										newAccessory.Parent = npcChar;
+									end
+
+
+									npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
+										if not isDead then return end;
+
+										for a=#enemies, 1, -1 do
+											if enemies[a] == npcClass then
+												table.remove(enemies, a);
+											end
+										end
 									end)
 
-									newAccessory.Parent = npc;
+									local bandanaHandle = npcChar:WaitForChild("Bandana"):WaitForChild("Handle");
+									bandanaHandle.Color = Color3.fromRGB(85, 85, 85);
 								end
-								
-							end);
+							};
 						end
 						
 						
-						patrolBandit.Movement:SetWalkSpeed("default", 16);
+						patrolBandit.Move:SetMoveSpeed("set", "default", 16);
 						while true do
 							task.wait(1);
 							if patrolBandit.Humanoid.Health <= 0 then
@@ -706,12 +701,11 @@ return function(CutsceneSequence)
 								break;
 							end
 
-							patrolBandit.Wield.SetEnemyHumanoid(playerClass.Humanoid);
-							patrolBandit.Movement:Face(playerClass.RootPart.Position);
+							patrolBandit.Move:Face(playerClass.RootPart.Position);
 							
-							if patrolBandit.IsInVision(playerClass.RootPart) then
-								patrolBandit.Wield.PrimaryFireRequest();
-							end
+							-- if patrolBandit.IsInVision(playerClass.RootPart) then
+							-- 	patrolBandit.Wield.PrimaryFireRequest();
+							-- end
 						end
 						
 						local spawnPoints = {

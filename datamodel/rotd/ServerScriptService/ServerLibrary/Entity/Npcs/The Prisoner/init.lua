@@ -9,7 +9,7 @@ local npcPackage = {
         AttackRange = 8;
         AttackSpeed = 2.3;
 
-        --MaxHealth = 2000;
+        MaxHealth = 100;
     };
     
     Properties = {
@@ -32,21 +32,17 @@ function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
     local properties: PropertiesVariable<{}> = npcClass.Properties;
 
-    local levelstatModifier: ConfigModifier = configurations.newModifier("LevelStat");
     local level = math.max(properties.Level, 0);
 
     if properties.HardMode then
-        levelstatModifier.SetValues.MaxHealth = math.max(123000 + 4000*level, 100);
-        levelstatModifier.SetValues.AttackDamage = 30;
-        npcClass.Move.SetDefaultWalkSpeed = 16;
+        configurations.BaseValues.MaxHealth = math.max(123000 + 4000*level, 100);
+        configurations.BaseValues.AttackDamage = 30;
+        configurations.BaseValues.WalkSpeed = 16;
     else
-        levelstatModifier.SetValues.MaxHealth = math.max(1000 + 500*level, 100);
-        levelstatModifier.SetValues.AttackDamage = 10;
-        npcClass.Move.SetDefaultWalkSpeed = 10;
+        configurations.BaseValues.MaxHealth = math.max(1000 + 500*level, 100);
+        configurations.BaseValues.AttackDamage = 10;
+        configurations.BaseValues.WalkSpeed = 10;
     end
-    configurations:AddModifier(levelstatModifier, false);
-
-    npcClass.Move:Init();
 
     task.spawn(function()
         local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1, true);

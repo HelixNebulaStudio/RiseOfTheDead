@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local interactablePackage = {};
 
 function interactablePackage.init(super) -- Server/Client
-    local Template = {
+    local Template = super.newPackage{
 		Name = "Template";
         Type = "Template";
 

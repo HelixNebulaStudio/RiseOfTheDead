@@ -6,7 +6,7 @@ local interactablePackage = {};
 --==
 
 function interactablePackage.init(super) -- Server/Client
-    local PowerBox = {
+    local PowerBox = super.newPackage{
 		Name = "PowerBox";
         Type = "Button";
 

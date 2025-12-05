@@ -7,7 +7,7 @@ local Dialogues = {
 	Stephanie={};
 };
 
-local missionId = 3;
+local MISSION_ID = 3;
 --==
 
 -- !outline: Stephanie Dialogues
@@ -24,7 +24,7 @@ Dialogues.Stephanie.DialogueStrings = {
 	};
 	
 	["findBook_letMeHelp"]={
-		CheckMission=missionId; 
+		CheckMission=MISSION_ID; 
 		Say="Umm no, but I can help you find it."; 
 		Face="Skeptical"; Reply="It's an odd looking blue book, please try to find it, it's important.";
 		FailResponses = {
@@ -72,10 +72,10 @@ if RunService:IsServer() then
 		if mission.Type == 2 then -- Available;
 			dialog:SetInitiate("Hey, have you seen an odd looking blue book?..");
 			dialog:AddChoice("findBook_letMeHelp", function(dialog)
-				modMission:StartMission(player, missionId, function(successful)
+				modMission:StartMission(player, MISSION_ID, function(successful)
 					if successful then
 						task.delay(300, function()
-							if not modMission:IsComplete(player, missionId) then
+							if not modMission:IsComplete(player, MISSION_ID) then
 								remoteSetHeadIcon:FireClient(player, 1, "Stephanie", "Guide");
 							end
 						end)
@@ -93,7 +93,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("findBook_foundBook", function(dialog)
 					dialog:AddChoice("findBook_whatsInTheBook")
 					storage:Remove(item.ID);
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end);
 				
 			elseif (os.time()-mission.StartTime) > 300 then

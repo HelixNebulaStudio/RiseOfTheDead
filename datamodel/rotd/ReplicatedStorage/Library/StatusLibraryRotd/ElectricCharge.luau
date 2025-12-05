@@ -28,9 +28,7 @@ local Arc = {
 };
 
 
-function statusPackage.StrikeTarget(statusValues: anydict, character: Model)
-    local applyBy: CharacterClass = statusValues.ApplyBy;
-
+function statusPackage.StrikeTarget(applyBy: CharacterClass, statusValues: anydict, character: Model)
     local healthComp: HealthComp? = modHealthComp.getByModel(character);
     if healthComp == nil or healthComp.IsDead or not healthComp:CanTakeDamageFrom(applyBy) then return end;
 
@@ -73,7 +71,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
     end
 
     local applyTo: ComponentOwner = statusClass.StatusOwner;
-    local applyBy: CharacterClass = statusClass.Values.ApplyBy;
+    local applyBy: CharacterClass = statusClass.ApplyBy;
     if applyBy.Character and applyTo.Character then
         modDamageTag.Tag(applyTo.Character, applyBy.Character, {
             WeaponItemId = statusClass.Values.WeaponSiid;
@@ -107,7 +105,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
         local character = rootPart.Parent;
         if character == applyTo.Character then continue end;
 
-        statusPackage.StrikeTarget(statusClass.Values, character);
+        statusPackage.StrikeTarget(applyBy, statusClass.Values, character);
 
         if statusClass.Values.TargetsHit >= statusClass.Values.MaxTargets then break; end;
     end

@@ -17,9 +17,9 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.ActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 	local isActive = packet.IsActive == true;
-	local prefab = handler.Prefabs[1];
+	local prefab = handler.MainToolModel;
 		
 	if prefab then
 		local rope = prefab:FindFirstChild("rope");
@@ -29,6 +29,15 @@ function toolPackage.ActionEvent(handler, packet)
 		local ropeCoil = prefab:FindFirstChild("ropeCoil");
 		if ropeCoil then
 			ropeCoil.Transparency = isActive and 1 or 0;
+		end
+	end
+
+	local characterClass: CharacterClass = handler.CharacterClass;
+	if characterClass and characterClass.ClassName == "NpcClass" then
+		if isActive then
+			handler.ToolAnimator:Play("Use");
+		else
+			handler.ToolAnimator:Stop("Use");
 		end
 	end
 end

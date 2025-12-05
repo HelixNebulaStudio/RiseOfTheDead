@@ -7,7 +7,7 @@ local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchCon
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 --== Variables;
-local missionId = 10;
+local MISSION_ID = 10;
 
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
@@ -26,10 +26,10 @@ return function(CutsceneSequence)
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
-		local mission = modMission:GetMission(player, missionId);
+		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
 			
-		if modMission:IsComplete(player, missionId) then
+		if modMission:IsComplete(player, MISSION_ID) then
 			modReplicationManager.SetClientParent(player, workspace.Entity.Jefferson, nil);
 			return;
 		end

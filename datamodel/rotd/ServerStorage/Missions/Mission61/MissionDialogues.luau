@@ -7,7 +7,7 @@ local Dialogues = {
 	Patrick={};
 };
 
-local missionId = 61;
+local MISSION_ID = 61;
 --==
 
 -- MARK: Patrick Dialogues
@@ -19,19 +19,19 @@ if RunService:IsServer() then
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
 		local profile = shared.modProfile:Get(player);
-		local playerSave = profile:GetActiveSave();
+		local gameSave = profile:GetActiveSave();
 		
 		if mission.Type == 1 then -- Active
 			dialog:SetInitiate("We're gonna need more ammunition to sustain our defense..", "Serious");
 			
-			local inventory = playerSave.Inventory;
+			local inventory = gameSave.Inventory;
 			local total, itemList = inventory:ListQuantity("ammobox", 1);
 			if total >= 1 then
 				local dialogPacket = {
 					Face="Happy";
 					Say="Here's a box of ammo.";
 					Reply="Great, that'll do.";
-					MissionId=missionId;
+					MissionId=MISSION_ID;
 				};
 	
 				dialog:AddDialog(dialogPacket, function(dialog)
@@ -40,7 +40,7 @@ if RunService:IsServer() then
 						shared.Notify(player, "Ammo Box removed from your Inventory.", "Negative");
 					end
 					
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 			end
 			

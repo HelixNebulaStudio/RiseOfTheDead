@@ -8,7 +8,7 @@ local interactablePackage = {};
 function interactablePackage.init(super) -- Server/Client
     if not modConfigurations.SpecialEvent.Halloween then return end;
 
-    local Cauldron = {
+    local Cauldron = super.newPackage{
 		Name = "HalloweenCauldron";
         Type = "HalloweenCauldron";
     };

@@ -47,7 +47,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     
     local dmgData = DamageData.new{
         Damage=2;
-        DamageBy = statusClass.Values.ApplyBy;
+        DamageBy = statusClass.ApplyBy;
     };
     healthComp:TakeDamage(dmgData);
 end

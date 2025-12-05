@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService");
 
 local GIFT_SPAWNCF = CFrame.new(1071.313, 55.012, -162.888) * CFrame.Angles(0, math.rad(90), 0);
 
-local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new();
+local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new(script);
 --==
 
 function WorldCore.onRequire()

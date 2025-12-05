@@ -17,6 +17,40 @@ if RunService:IsServer() then
 	triggerLightBarrel = script.Parent:WaitForChild("lightFirebarrel");
 	bmSpawn = CFrame.new(-26.1658859, 2.54966354, -114.670898, -1, 0, 0, 0, 1, 0, 0, 0, -1);
 
+	shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
+        local player: Player? = eventPacket.Player;
+        if player == nil then return end;
+
+        local interactable: InteractableInstance = ...;
+
+        if interactable.Id == "eb2Door" then
+            modMission:Progress(player, MISSION_ID, function(mission)
+                if mission.ProgressionPoint == 3 then
+					mission.ProgressionPoint = 4;
+				end;
+            end)
+        end
+    end)
+
+	if modBranchConfigs.IsWorld("EasterButchery") then
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(event: EventPacket, ...)
+			local player: Player? = event.Player;
+			if player == nil then return end;
+
+			local triggerId: string = ...;
+			if triggerId == "lightFirebarrel" then 
+				local mission = modMission:Progress(player, MISSION_ID);
+				if mission and mission.ProgressionPoint == 5 then
+					modMission:Progress(player, MISSION_ID, function(mission)
+						mission.ProgressionPoint = 6;
+					end)
+				end
+			end;
+
+		end)
+
+	end
+
 else
 	modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
@@ -56,13 +90,14 @@ return function(CutsceneSequence)
 		local playerClass: PlayerClass = modPlayers.get(player);
 			
 
-		local bunnymanModule = modNpcs.getPlayerNpc(player, "Bunny Man");
-		if bunnymanModule == nil then
-			local npc = modNpcs.spawn("Bunny Man", bmSpawn, function(npc, npcModule)
-				npcModule.Player = player;
-				bunnymanModule = npcModule;
-			end);
-			modReplicationManager.ReplicateOut(player, npc);
+		local bunnymanNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Bunny Man");
+		if bunnymanNpcClass == nil then
+			bunnymanNpcClass = modNpcs.spawn2{
+				Name = "Bunny Man";
+				CFrame = bmSpawn;
+				Player = player;
+				ReplicateOut = true;
+			};
 		end
 		
 		local character;
@@ -80,7 +115,7 @@ return function(CutsceneSequence)
 			end)
 		end))
 		
-		if modMission:IsComplete(player, 50) then return end;
+		if modMission:IsComplete(player, MISSION_ID) then return end;
 		
 		
 		local newTrigger;
@@ -100,39 +135,41 @@ return function(CutsceneSequence)
 				if mission.ProgressionPoint == 1 then
 
 				elseif mission.ProgressionPoint == 2 then
-					bunnymanModule.Interactable.Parent = bunnymanModule.Prefab;
+					bunnymanNpcClass:ToggleInteractable(true);
 					for _, obj in pairs(workspace.Entity:GetChildren()) do
 						if obj.Name == "Cultist" then
 							obj:Destroy();
 						end
 					end
-					bunnymanModule.Actions:Teleport(bmSpawn);
-					bunnymanModule.Chat(bunnymanModule.Player);
-					bunnymanModule.Wield.Unequip();
+					
+					bunnymanNpcClass:SetCFrame(bmSpawn);
+					bunnymanNpcClass.WieldComp:Unequip();
 					
 				elseif mission.ProgressionPoint == 3 then
-					bunnymanModule.Interactable.Parent = script;
+					bunnymanNpcClass:ToggleInteractable(false);
 					wait(1);
-					bunnymanModule.Movement:Move(Vector3.new(-32.4848175, 2.54966402, -108.732132)):Wait(1);
-					bunnymanModule.Actions:Teleport(CFrame.new(-32.4848175, 2.54966402, -108.732132, 0, 0, 1, 0, 1, 0, -1, 0, 0));
+					bunnymanNpcClass.Move:MoveTo(Vector3.new(-32.4848175, 2.54966402, -108.732132));
+					bunnymanNpcClass.Move.OnMoveToEnded:Wait(1);
+					bunnymanNpcClass:SetCFrame(CFrame.new(-32.4848175, 2.54966402, -108.732132, 0, 0, 1, 0, 1, 0, -1, 0, 0));
 					
 					wait(1.5);
-					bunnymanModule.Actions:Teleport(CFrame.new(-58.9206924, 2.54966402, -108.732132, 0, 0, 1, 0, 1, 0, -1, 0, 0));
+					bunnymanNpcClass:SetCFrame(CFrame.new(-58.9206924, 2.54966402, -108.732132, 0, 0, 1, 0, 1, 0, -1, 0, 0));
 					
 				elseif mission.ProgressionPoint == 4 then
 					wait(1);
-					bunnymanModule.Movement:Move(Vector3.new(-188.224518, 2.70417404, 7.9118042)):Wait(20);
-					bunnymanModule.Movement:Face(Vector3.new(-183.797638, 2.70417881, 2.54900455));
+					bunnymanNpcClass.Move:MoveTo(Vector3.new(-188.224518, 2.70417404, 7.9118042));
+					bunnymanNpcClass.Move.OnMoveToEnded:Wait(20);
+					bunnymanNpcClass.Move:Face(Vector3.new(-183.797638, 2.70417881, 2.54900455));
 					
-					bunnymanModule.Actions:WaitForOwner(30);
-					modMission:Progress(player, 50, function(mission)
+					bunnymanNpcClass:GetComponent("WaitForPlayer")(30);
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 4 then
 							mission.ProgressionPoint = 5;
 						end;
 					end)
 					
 				elseif mission.ProgressionPoint == 5 then
-					bunnymanModule.Chat(bunnymanModule.Player, "Light it up.");
+					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "Light it up.");
 
 					newTrigger = triggerLightBarrel:Clone();
 					newTrigger.Parent = workspace.Interactables;
@@ -148,69 +185,77 @@ return function(CutsceneSequence)
 					fireBarrel._lightSource.firePoint.Fire.Enabled = true;
 					
 					wait(1);
-					bunnymanModule.Chat(bunnymanModule.Player, "Well done.");
-					wait(3);
-					bunnymanModule.Chat(bunnymanModule.Player, "Now we wait...");
+					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "Well done.");
+					wait(5);
+					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "Now we wait...");
 					
 					wait(20);
 					if not character:IsDescendantOf(workspace) then return end;
-					local origin = CFrame.new(-229.88, 9.397, 7.02);
-					
-					for a=1, 3 do
-						local projectileObject = modProjectile.Fire("fireworks", origin, Vector3.new());
-						if projectileObject.Prefab:CanSetNetworkOwnership() then projectileObject.Prefab:SetNetworkOwner(nil); end
 
-						modProjectile.ServerSimulate(projectileObject, origin.p, Vector3.new(0, 20, 0));
+					local origin = CFrame.new(-229.88, 9.397, 7.02);
+				
+					for a=1, 3 do
+
+						local projectileInstance: ProjectileInstance = modProjectile.fire("fireworks", {
+							OriginCFrame = origin;
+						});
+						modProjectile.serverSimulate(projectileInstance, {
+							Velocity = Vector3.new(0, 20, 0);
+						});
+
 						wait(1);
 					end
 					
-					local cultist1Module
-					modNpcs.spawn("Cultist", CFrame.new(-59.21, 2.53, -8.22, 0, 0, 1, 0, 1, 0, -1, 0, 0), function(npc, npcModule)
-						cultist1Module = npcModule;
-						cultist1Module.Immunity = 1;
-						cultist1Module.CutsceneMode = true;
-						cultist1Module.Player = player;
-					end);
+					local cultistNpcClass: NpcClass = modNpcs.spawn2{
+						Name = "Cultist";
+						CFrame = CFrame.new(-59.21, 2.53, -8.22, 0, 0, 1, 0, 1, 0, -1, 0, 0);
+						Player = player;
+						BindSetup = function(npcClass: NpcClass)
+							npcClass.Properties.Immunity = 1;
+							npcClass.Properties.CutsceneActive = true;
+						end;
+					};
 					
-					cultist1Module.Move:MoveTo(Vector3.new(-160.850769, 2.70417881, 2.4058733));
-					cultist1Module.Move.OnMoveToEnded:Wait(3);
+					cultistNpcClass.Move:MoveTo(Vector3.new(-160.850769, 2.70417881, 2.4058733));
+					cultistNpcClass.Move.OnMoveToEnded:Wait(3);
 					
-					bunnymanModule.Movement:Move(Vector3.new(-170.911606, 2.70417905, 2.40587401)):Wait(5);
+					bunnymanNpcClass.Move:MoveTo(Vector3.new(-170.911606, 2.70417905, 2.40587401));
+					bunnymanNpcClass.Move.OnMoveToEnded:Wait(5);
 					wait(1);
-					cultist1Module.Chat(cultist1Module.Player, "Hey, wait a minute.. You aren't cultists.. What do you want?!");
+					cultistNpcClass.Chat(cultistNpcClass.Player, "Hey, wait a minute.. You aren't cultists.. What do you want?!");
+					wait(7);
+					if not character:IsDescendantOf(workspace) then return end;
+					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "April first shall prevail..");
 					wait(5);
 					if not character:IsDescendantOf(workspace) then return end;
-					bunnymanModule.Chat(bunnymanModule.Player, "April first shall prevail..");
+					cultistNpcClass.Chat(cultistNpcClass.Player, "Wait, how did you know our phrase?! Were you one of us?");
+					wait(6);
+					if not character:IsDescendantOf(workspace) then return end;
+					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "Foolish rookie, tell me. Is omega still one of your active leaders?");
+					wait(8);
+					if not character:IsDescendantOf(workspace) then return end;
+					cultistNpcClass.Chat(cultistNpcClass.Player, "Err yes. However, psi wants to over haul the rankings.");
+					wait(6);
+					if not character:IsDescendantOf(workspace) then return end;
+					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "Good, good.. Your life ends here now!");
 					wait(5);
 					if not character:IsDescendantOf(workspace) then return end;
-					cultist1Module.Chat(cultist1Module.Player, "Wait, how did you know our phrase?! Were you one of us?");
-					wait(5);
-					if not character:IsDescendantOf(workspace) then return end;
-					bunnymanModule.Chat(bunnymanModule.Player, "Foolish rookie, tell me. Is omega still one of your active leaders?");
-					wait(5);
-					if not character:IsDescendantOf(workspace) then return end;
-					cultist1Module.Chat(cultist1Module.Player, "Err yes. However, psi wants to over haul the rankings.");
-					wait(5);
-					if not character:IsDescendantOf(workspace) then return end;
-					bunnymanModule.Chat(bunnymanModule.Player, "Good, good.. Your life ends here now!");
-					wait(3);
-					if not character:IsDescendantOf(workspace) then return end;
-					cultist1Module.Chat(cultist1Module.Player, "Wait what?! *whistles*");
-					wait(0.5);
+					cultistNpcClass.Chat(cultistNpcClass.Player, "Wait what?! *whistles*");
+					wait(4);
 					if not character:IsDescendantOf(workspace) then return end;
 					
-					bunnymanModule.Wield.Equip("czevo3");
-					bunnymanModule.Wield.Targetable.Cultist = 1;
-					cultist1Module.Immortal = nil;
-					cultist1Module.Immunity = nil;
+					bunnymanNpcClass.WieldComp:Equip{
+						ItemId = "czevo3";
+					};
+					
+					cultistNpcClass.Properties.Immortal = nil;
+					cultistNpcClass.Properties.Immunity = nil;
 					
 					repeat
-						bunnymanModule.Wield.SetEnemyHumanoid(cultist1Module.Humanoid);
-						bunnymanModule.Movement:Face(cultist1Module.RootPart.Position);
-						bunnymanModule.Wield.PrimaryFireRequest();
+						bunnymanNpcClass.WieldComp:InvokeToolAction("PrimaryFireRequest", nil, cultistNpcClass.Humanoid);
 						wait(0.1);
 						if not character:IsDescendantOf(workspace) then return end;
-					until cultist1Module.IsDead;
+					until cultistNpcClass.HealthComp.IsDead;
 
 					wait(2);
 					if not character:IsDescendantOf(workspace) then return end;
@@ -219,39 +264,32 @@ return function(CutsceneSequence)
 						local timer = tick();
 
 						while true do
-							modNpcs.spawn("Cultist", cultspawns[math.random(1, #cultspawns)].CFrame, function(npc, npcModule)
-								npcModule.Properties.TargetableDistance = 4096;
-								npcModule.OnTarget(player);
-							end);
+							modNpcs.spawn2{
+								Name = "Cultist";
+								CFrame = cultspawns[math.random(1, #cultspawns)].CFrame;
+								BindSetup = function(npcClass: NpcClass)
+									npcClass.Properties.TargetableDistance = 4096;
+									npcClass:GetComponent("TargetHandler"):AddTarget(playerClass.Character);
+								end;
+							};
 							wait(0.1);
 							if tick()-timer > 5 then break; end;
 							if not character:IsDescendantOf(workspace) then break end;
 						end
 					end)
 					
-					bunnymanModule.Chat(bunnymanModule.Player, "Incoming!");
-					modMission:Progress(player, 50, function(mission)
+					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "Incoming!");
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 6 then
 							mission.ProgressionPoint = 7;
 						end;
 					end)
 					
 				elseif mission.ProgressionPoint == 7 then
-					bunnymanModule.Actions:FollowOwner(function()
-						if bunnymanModule.Target then
-							local enemyHumanoid = bunnymanModule.Target:FindFirstChildWhichIsA("Humanoid");
-							if enemyHumanoid and enemyHumanoid.Health > 0 and enemyHumanoid.RootPart and bunnymanModule.IsInVision(enemyHumanoid.RootPart) then
-								bunnymanModule.Wield.SetEnemyHumanoid(enemyHumanoid);
-								bunnymanModule.Movement:Face(enemyHumanoid.RootPart.Position);
-								bunnymanModule.Wield.PrimaryFireRequest();
-							else
-								bunnymanModule.Target = nil;
-							end
-						else
-							bunnymanModule.Wield.ReloadRequest();
-						end
+					bunnymanNpcClass:GetComponent("ProtectPlayer")(function() 
 						return mission.ProgressionPoint == 7;
 					end);
+					
 					spawn(function()
 						while true do
 							local endLoop = true;
@@ -267,7 +305,7 @@ return function(CutsceneSequence)
 							print("cultist alive");
 						end
 
-						modMission:Progress(player, 50, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint == 7 then
 								mission.ProgressionPoint = 8;
 							end;
@@ -275,13 +313,13 @@ return function(CutsceneSequence)
 					end)
 
 				elseif mission.ProgressionPoint == 8 then
-					bunnymanModule.Interactable.Parent = bunnymanModule.Prefab;
-					
+					bunnymanNpcClass:ToggleInteractable(true);
 					
 				end
-			elseif mission.Type == 3 then -- OnComplete
 
+			elseif mission.Type == 3 then -- OnComplete
 				mission.OnChanged:Disconnect(OnChanged);
+				
 			end
 		end
 		mission.OnChanged:Connect(OnChanged);

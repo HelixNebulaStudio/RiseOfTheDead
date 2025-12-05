@@ -19,7 +19,7 @@ local npcPackage = {
     Voice = {
         VoiceId = 3;
         Pitch = -7;
-        Speed = 0.8;
+        Speed = 1.15;
         PlaybackSpeed = 1.2;
     };
 };

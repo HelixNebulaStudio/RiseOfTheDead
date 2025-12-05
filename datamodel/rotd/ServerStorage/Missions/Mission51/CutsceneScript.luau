@@ -15,99 +15,104 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
-		local player: Player? = eventPacket.Player;
+	shared.modEventService:OnInvoked("Generic_BindTrigger", function(event: EventPacket, ...)
+		local player: Player? = event.Player;
 		if player == nil then return end;
 
-		local triggerTag = interactData.TriggerTag;
-		local triggerObj = interactData.Object;
+		local triggerId: string, interactable: InteractableInstance = ...;
+		if triggerId == nil or interactable == nil then return end;
 
-		if triggerTag == "QA1_Radio" then
-			local mission = modMission:Progress(player, 51);
-			if mission and mission.ProgressionPoint == 1 then
-				interactData.CanInteract = false;
-				interactData.Label = "Broadcasting... *Static* *Static* Hmmm.. Seems like the radio strength is still not strong enough..";
-				interactData:Sync();
-				wait(1)
-				modMission:Progress(player, 51, function(mission)
-					if mission.ProgressionPoint < 2 then mission.ProgressionPoint = 2; end;
+		local mission = modMission:Progress(player, MISSION_ID);
+		if mission == nil then return end
+
+		if triggerId == "QA1_Radio" then
+			if mission.ProgressionPoint == 1 then
+				interactable.CanInteract = false;
+				interactable.Label = "Broadcasting... *Static* *Static* Hmmm.. Seems like the radio strength is still not strong enough..";
+				interactable:Sync();
+				modAudio.Play("RadioStatic", interactable.Part);
+				task.wait(1);
+
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint < 2 then
+						mission.ProgressionPoint = 2;
+					end;
 				end)
 			end
-			
-		elseif triggerTag == "QA2_Radio" then
-			local mission = modMission:Progress(player, 51);
-			if mission then
-				if mission.ProgressionPoint == 3 then
-					interactData.CanInteract = false;
-					interactData.Label = "*Broadcasting..*";
-					interactData:Sync();
-					
-					wait(0.5);
-					modAudio.Play("RadioChatter", triggerObj);
-					local radioMsg = "[Radio] *Static* Yep, ten-four. We copy loud and clear. Please identify yourself. *Static*";
-					interactData.Label = radioMsg;
-					shared.Notify(player, radioMsg, "Message");
-					interactData:Sync();
-					
-					wait(8.5);
-					modMission:Progress(player, 51, function(mission)
-						if mission.ProgressionPoint == 3 then mission.ProgressionPoint = 4; end;
-					end)
-					interactData.CanInteract = true;
-					interactData.Label = "*Static* I am "..player.Name..", I am requesting for help. I was sent by Wilson from squad B. He is still alive.";
-					interactData:Sync();
 
-				elseif mission.ProgressionPoint == 4 then
-					interactData.CanInteract = false;
-					interactData.Label = "*Broadcasting..*";
-					interactData:Sync();
+		elseif triggerId == "QA2_Radio" then
 
-					wait(0.5);
-					modAudio.Play("RadioChatter", triggerObj);
-					local radioMsg = "[Radio] Copy. Commander, we have a survivor on the radio. He claims Wilson from squad B is alive and sent him.";
-					interactData.Label = radioMsg;
-					shared.Notify(player, radioMsg, "Message");
-					interactData:Sync();
+			if mission.ProgressionPoint == 3 then
+				interactable.CanInteract = false;
+				interactable.Label = "*Broadcasting..*";
+				interactable:Sync();
+				task.wait(0.5);
 
-					wait(12.5);
-					modAudio.Play("RadioChatter2", triggerObj);
-					
-					radioMsg = "[Radio] Commander: Wilson is still alive?! Hello? This is commander Leo. Please state your location.";
-					interactData.Label = radioMsg;
-					shared.Notify(player, radioMsg, "Message");
-					interactData:Sync();
+				modAudio.Play("RadioChatter", interactable.Part);
 
-					wait(12.5);
-					modMission:Progress(player, 51, function(mission)
-						if mission.ProgressionPoint == 4 then mission.ProgressionPoint = 5; end;
-					end)
-					interactData.CanInteract = true;
-					interactData.Label = "*Static* We are located in the Sunday's Convenience Store near the Wrighton Dale Bank..";
-					interactData:Sync();
+				local radioMsg = "[Radio] *Static* Yep, ten-four. We copy loud and clear. Please identify yourself. *Static*";
+				interactable.Label = radioMsg;
+				shared.Notify(player, radioMsg, "Message");
+				interactable:Sync();
+				task.wait(8.5);
 
-				elseif mission.ProgressionPoint == 5 then
-					interactData.CanInteract = false;
-					interactData.Label = "*Broadcasting..*";
-					interactData:Sync();
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint == 3 then mission.ProgressionPoint = 4; end;
+				end)
 
-					wait(0.5);
-					modAudio.Play("RadioChatter", triggerObj);
-					local radioMsg = "[Radio] Copy. We will be dispatching an inspection team there.";
-					interactData.Label = radioMsg;
-					shared.Notify(player, radioMsg, "Message");
-					interactData:Sync();
-					
-					wait(1);
-					modMission:Progress(player, 51, function(mission)
-						if mission.ProgressionPoint == 5 then mission.ProgressionPoint = 6; end;
-					end)
-					modAudio.Play("RadioStatic", triggerObj);
-				end
+				interactable.CanInteract = true;
+				interactable.Label = `*Static* I am {player.Name}, I am requesting for help. I was sent by Wilson from squad B. He is still alive.`;
+				interactable:Sync();
+
+			elseif mission.ProgressionPoint == 4 then
+				interactable.CanInteract = false;
+				interactable.Label = "*Broadcasting..*";
+				interactable:Sync();
+				task.wait(0.5);
+
+				modAudio.Play("RadioChatter", interactable.Part);
+				local radioMsg = "[Radio] Copy. Commander, we have a survivor on the radio. He claims Wilson from squad B is alive and sent him.";
+				interactable.Label = radioMsg;
+				shared.Notify(player, radioMsg, "Message");
+				interactable:Sync();
+				task.wait(12.5);
+
+				modAudio.Play("RadioChatter2", interactable.Part);
+				radioMsg = "[Radio] Commander: Wilson is still alive?! Hello? This is commander Leo. Please state your location.";
+				interactable.Label = radioMsg;
+				shared.Notify(player, radioMsg, "Message");
+				interactable:Sync();
+				task.wait(12.5);
+				if player.Parent == nil then return end;
+
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint == 4 then mission.ProgressionPoint = 5; end;
+				end)
+				interactable.CanInteract = true;
+				interactable.Label = "*Static* We are located in the Sunday's Convenience Store near the Wrighton Dale Bank..";
+				interactable:Sync();
+
+			elseif mission.ProgressionPoint == 5 then
+				interactable.CanInteract = false;
+				interactable.Label = "*Broadcasting..*";
+				interactable:Sync();
+				task.wait(0.5);
+
+				modAudio.Play("RadioChatter", interactable.Part);
+				local radioMsg = "[Radio] Copy. We will be dispatching an inspection team there.";
+				interactable.Label = radioMsg;
+				shared.Notify(player, radioMsg, "Message");
+				interactable:Sync();
+				task.wait(1);
+
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint == 5 then mission.ProgressionPoint = 6; end;
+				end)
+				modAudio.Play("RadioStatic", interactable.Part);
 			end
-
 		end
-	end)
 
+	end)
 
 	templateRadioInteractable1 = script.Parent:WaitForChild("militaryRadioInteractable");
 	templateRadioInteractable2 = script.Parent:WaitForChild("militaryRadioInteractable2");

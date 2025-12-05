@@ -11,8 +11,8 @@ local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modEntity = shared.require(game.ReplicatedStorage.Library.Entity);
 local modRegion = shared.require(game.ReplicatedStorage.Library.Region);
 
---== Variables;
 local MISSION_ID = 62;
+--== Variables;
 
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
@@ -21,31 +21,31 @@ if RunService:IsServer() then
 	modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
 	
 else
-	modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+	modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 
 --== Script;
 return function(CutsceneSequence)
 	
+
+	-- MARK: TheHarbor
 	if modBranchConfigs.IsWorld("TheHarbor") then
-		-- MARK: TheHarbor
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 				
-			local revasModule = modNpcs.getPlayerNpc(player, "Revas");
-			if revasModule == nil then
-				local npc = modNpcs.spawn("Revas", nil, function(npc, npcModule)
-					npcModule.Player = player;
-					revasModule = npcModule;
+			local revasNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Revas");
+			if revasNpcClass == nil then
+				modNpcs.spawn2{
+					Name = "Revas";
+					Player = player;
+					ReplicateOut = true;
+				};
+				revasNpcClass:TeleportHide();
 
-				end);
-				modReplicationManager.ReplicateOut(player, npc);
-				
-				revasModule:TeleportHide();
 			end
 			
 			local function OnChanged(firstRun)
@@ -53,11 +53,12 @@ return function(CutsceneSequence)
 					if mission.ProgressionPoint == 1 or mission.ProgressionPoint == 2 then
 						local revasDoor = modReplicationManager.getReplicated(player, "RevasDoorway")[1];
 
-						local doorData = shared.require(revasDoor.Door);
-						doorData:SetAccess(player, true);
+						local revasDoorInteractConfig = revasDoor:FindFirstChild("Interactable");
+						local revasDoorInteractable: InteractableInstance = modInteractables.getOrNew(revasDoorInteractConfig);
+						revasDoorInteractable:SetPermissions("CanInteract", true);
 						
-						revasModule.PlayAnimation("foldbackhands");
-						revasModule.Actions:Teleport(CFrame.new(-299.5242, 105.296021, 296.464844, -1, 0, 0, 0, 1, 0, 0, 0, -1));
+						revasNpcClass.PlayAnimation("foldbackhands");
+						revasNpcClass:SetCFrame(CFrame.new(-299.5242, 105.296021, 296.464844, -1, 0, 0, 0, 1, 0, 0, 0, -1));
 						
 					end
 				end
@@ -67,8 +68,9 @@ return function(CutsceneSequence)
 		end)
 
 
+	-- MARK: SectorE
 	elseif modBranchConfigs.IsWorld("SectorE") then
-		-- MARK: SectorE
+		
 
 		CutsceneSequence:NewScene("enableInterfaces", function()
 			modConfigurations.Set("DisableMissions", false);
@@ -81,9 +83,13 @@ return function(CutsceneSequence)
 		end);
 		
 		
-		local mechDoor1 = modEntity:GetEntity(workspace.Environment.Game:WaitForChild("mechDoor1"));
-		local mechDoor2 = modEntity:GetEntity(workspace.Environment.Game:WaitForChild("mechDoor2"));
-		local mechDoor3 = modEntity:GetEntity(workspace.Environment.Game:WaitForChild("mechDoor3"));
+		local mechDoor1: ObjectEntity = modEntity.getOrNew(workspace.Environment.Game:WaitForChild("MechDoubleDoors1"));
+		local mechDoor2: ObjectEntity = modEntity.getOrNew(workspace.Environment.Game:WaitForChild("MechDoubleDoors2"));
+		local mechDoor3: ObjectEntity = modEntity.getOrNew(workspace.Environment.Game:WaitForChild("MechDoubleDoors3"));
+
+		mechDoor1:GetInteractable():SetPermissions("CanInteract", false);
+		mechDoor2:GetInteractable():SetPermissions("CanInteract", false);
+		mechDoor3:GetInteractable():SetPermissions("CanInteract", false);
 		
 		local chamberParticles = workspace.Environment.Game.Chamber.Glass.ParticleEmitter;
 		local chamberMonitorScreen = workspace.Environment.Game.hangingMonitor._screen;
@@ -94,6 +100,7 @@ return function(CutsceneSequence)
 
 		Chamber Temperature: Heating ($percent°)]];
 
+
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
@@ -103,126 +110,132 @@ return function(CutsceneSequence)
 			local sound = modAudio.Play("GreyAmbience", workspace);
 			sound.Volume = 0.03;
 			
-			local revasModule = modNpcs.getPlayerNpc(player, "Revas");
-			if revasModule == nil then
-				local npc = modNpcs.spawn("Revas", nil, function(npc, npcModule)
-					npcModule.Player = player;
-					revasModule = npcModule;
-
-				end);
-				modReplicationManager.ReplicateOut(player, npc);
-
-				revasModule:TeleportHide();
+			local revasNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Revas");
+			if revasNpcClass == nil then
+				revasNpcClass = modNpcs.spawn2{
+					Name = "Revas";
+					Player = player;
+					ReplicateOut = true;
+				};
+				revasNpcClass:TeleportHide();
 			end
 
-			local eugeneModule = modNpcs.getByModel(workspace.Entity:FindFirstChild("Eugene"));
-			local stanModule = modNpcs.getByModel(workspace.Entity:FindFirstChild("Stan"));
+			local eugeneNpcClass: NpcClass = modNpcs.getByModel(workspace.Entity:FindFirstChild("Eugene"));
+			local stanNpcClass: NpcClass = modNpcs.getByModel(workspace.Entity:FindFirstChild("Stan"));
 
-			local RatGoons = modNpcs.RatGoons; -- Set by SectorE WorldScript.
+			local ratGoons = shared.WorldCore.RatGoons; -- Set by SectorE WorldScript.
 			
-			shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
+			shared.modEventService:OnInvoked("Generic_BindClientTrigger", function(eventPacket: EventPacket, ...)
+				local triggerId: string, packet: anydict = ...;
 				local player: Player? = eventPacket.Player;
 				if player == nil then return end;
-
+				
 				local temp = packet.Temp or nil;
-				local triggerId = interactData.TriggerTag;
 
-				if triggerId == "RatRecruit1" then
+				if triggerId == "shutDownHeating" then
 					if temp and temp < 80 then
 
 						chamberParticles.Rate = 4;
 						chamberMonitorLabel.Text = chamberMonitorText:gsub("$percent", temp);
 						
 						if temp == 40 then
-							if modMission:Progress(player, 62) then
-								modMission:Progress(player, 62, function(mission)
+							if modMission:Progress(player, MISSION_ID) then
+								modMission:Progress(player, MISSION_ID, function(mission)
 									mission.ProgressionPoint = 9;
 								end)
 							end
-							stanModule.Chat(player, "Much better..");
+							stanNpcClass.Chat(player, "Much better..");
 							
 						else
-							stanModule.Chat(player, "Certainly better, but I don't think that's the right temperature..");
+							stanNpcClass.Chat(player, "Certainly better, but I don't think that's the right temperature..");
 							
 						end
 					end
-
-
 				end
-			end);
+			end)
+
 			
 			local mechDoor3Clip = script.Parent:WaitForChild("_playerClip");
 			local terminalInteractable = script.Parent:WaitForChild("shutDownHeating");
 
 			local function OnChanged(firstRun)
+				local rat1NpcClass: NpcClass = ratGoons.Name1.NpcClass;
+
 				if mission.Type == 2 then -- OnAvailable
 
 				elseif mission.Type == 1 then -- OnActive
 					Debugger:Log("progress", mission, firstRun);
 
+					local playerClass: PlayerClass = shared.modPlayers.get(player);
 					if mission.ProgressionPoint <= 2 then
-						modMission:Progress(player, 62, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 3;
 						end)
 						
 					elseif mission.ProgressionPoint == 3 then
 						CutsceneSequence:NextScene("enableInterfaces");
 						
-						revasModule.Actions:Teleport(CFrame.new(12.7711039, -11.299139, -18.2030602, -0.615661502, 0, 0.788010776, 0, 1, 0, -0.788010776, 0, -0.615661502));
-						revasModule.Chat(player, "Here we are..");
+						revasNpcClass:SetCFrame(CFrame.new(12.7711039, -11.299139, -18.2030602, -0.615661502, 0, 0.788010776, 0, 1, 0, -0.788010776, 0, -0.615661502));
+						revasNpcClass.Chat(player, "Here we are..");
 
 					elseif mission.ProgressionPoint == 4 then
-						revasModule:ToggleInteractable(false);
+						revasNpcClass:ToggleInteractable(false);
 						task.wait(4);
 						
-						revasModule.Movement:SetWalkSpeed("default", 6);
-						
-						revasModule.Prefab:SetAttribute("LookAtClient", false);
-						revasModule.Movement:Move(Vector3.new(28.638, -11.299, -12.154)):OnComplete(function()
-							revasModule.Movement:Face(Vector3.new(31.444, -10.267, -17.967));
-							
-							RatGoons.Name1.NpcModule.Movement:Face(Vector3.new(31.444, -10.267, -17.967));
-							revasModule.Move:HeadTrack(RatGoons.Name1.NpcModule.Head);
-							
-							task.wait(0.5);
-							RatGoons.Name1.NpcModule.StopAnimation("foldbackhands");
-							RatGoons.Name1.NpcModule.PlayAnimation("Press");
-							
-							task.wait(0.5);
-							mechDoor1.Door:Toggle(true);
-							mechDoor2.Door:Toggle(true);
-							mechDoor3.Door:Toggle(true);
-							
-							eugeneModule.PlayAnimation("useterminal");
-							stanModule.AvatarFace:Set("Unconscious");
+						revasNpcClass.Move:SetMoveSpeed("set", "default", 6);
 
-							RatGoons.Name1.NpcModule.Movement:Face(revasModule.RootPart.Position);
-							revasModule.Movement:Face(Vector3.new(31.91, -8.913, -12.25));
+						revasNpcClass.Character:SetAttribute("LookAtClient", false);
+						revasNpcClass.Move:MoveTo(Vector3.new(28.638, -11.299, -12.154));
+						revasNpcClass.Move.OnMoveToEnded:Once(function()
+							revasNpcClass.Move:Face(Vector3.new(31.444, -10.267, -17.967));
+							
+							rat1NpcClass.Move:Face(Vector3.new(31.444, -10.267, -17.967));
+							revasNpcClass.Move:HeadTrack(rat1NpcClass.Head, 1);
+							
+							task.wait(0.5);
+							rat1NpcClass.StopAnimation("foldbackhands");
+							rat1NpcClass.PlayAnimation("Press");
+							
+							task.wait(0.5);
+							mechDoor1:GetDoor():Toggle(true);
+							mechDoor2:GetDoor():Toggle(true);
+							mechDoor3:GetDoor():Toggle(true);
+							
+							eugeneNpcClass.PlayAnimation("useterminal");
+							stanNpcClass:GetComponent("AvatarFace"):Set("Unconscious");
+
+							rat1NpcClass.Move:Face(revasNpcClass.RootPart.Position);
+							revasNpcClass.Move:Face(Vector3.new(31.91, -8.913, -12.25));
 							
 							task.wait(1);
 							
-							revasModule.Movement:Move(Vector3.new(113.896, -11.299, -79.031)):OnComplete(function()
-								modMission:Progress(player, 62, function(mission)
+							revasNpcClass.Move:MoveTo(Vector3.new(113.896, -11.299, -79.031));
+							revasNpcClass.Move.OnMoveToEnded:Once(function()
+								modMission:Progress(player, MISSION_ID, function(mission)
 									mission.ProgressionPoint = 5;
 								end)
 							end);
 							
 							task.wait(3);
-							revasModule.Chat(player, "Unlike Sector F, this sector was surprisingly well contained.");
+							revasNpcClass.Chat(player, "Unlike Sector F, this sector was surprisingly well contained.");
 						end);
 
 					elseif mission.ProgressionPoint == 5 then
-						eugeneModule:ToggleInteractable(false);
-						eugeneModule.Chat(player, "Hmmm.. Not responding, turning up the heat.");
+						eugeneNpcClass:ToggleInteractable(false);
+
+						revasNpcClass.Move:HeadTrack(eugeneNpcClass.Head);
+						eugeneNpcClass.Chat(player, "Hmmm.. Not responding, turning up the heat.");
 						
 						task.wait(4);
-						revasModule.Chat(player, "Looks like Eugene is a bit busy..");
+						revasNpcClass.Move:HeadTrack(playerClass.Head, 2);
+						revasNpcClass.Chat(player, "Looks like Eugene is a bit busy..");
 						task.wait(3);
 						
-						eugeneModule.StopAnimation("useterminal");
+						eugeneNpcClass.StopAnimation("useterminal");
 						task.wait(0.5);
-						eugeneModule.Movement:Move(Vector3.new(137.072, -8.217, -81.746));
-						eugeneModule.Chat(player, "Oh greetings, Mr. Revas.");
+						eugeneNpcClass.Move:MoveTo(Vector3.new(137.072, -8.217, -81.746));
+						eugeneNpcClass.Chat(player, "Oh greetings, Mr. Revas.");
+						eugeneNpcClass.Move:HeadTrack(revasNpcClass.Head, 3);
 						
 						task.wait(2);
 						mechDoor3Clip.Parent = workspace.Clips;
@@ -237,33 +250,38 @@ return function(CutsceneSequence)
 						end
 						
 						if not playerIsInRegion then
-							local playerClass = shared.modPlayers.get(player);
 							playerClass:SetCFrame(CFrame.new(113.366264, -11.299139, -82.7207794));
 						end
 						
-						eugeneModule.Movement:SetWalkSpeed("default", 6);
-						eugeneModule.Chat(player, "Progress are being made sir. But I have to discuss some matters with you in private.");
-						
+						eugeneNpcClass.Move:SetMoveSpeed("set", "default", 6);
+						eugeneNpcClass.Chat(player, "Progress are being made sir. But I have to discuss some matters with you in private.");
+						eugeneNpcClass.Move:HeadTrack(revasNpcClass.Head, 5);
 						task.wait(5);
-						revasModule.Chat(player, "Very well..");
-						
+
+						revasNpcClass.Chat(player, "Very well..");
+						revasNpcClass.Move:HeadTrack(eugeneNpcClass.Head, 6);
 						task.wait(5);
-						eugeneModule.Movement:Move(Vector3.new(85.143, -11.299, -75.072)):OnComplete(function()
-							mechDoor3.Door:Toggle(false);
+
+						eugeneNpcClass.Move:MoveTo(Vector3.new(85.143, -11.299, -75.072));
+						eugeneNpcClass.Move.OnMoveToEnded:Once(function()
+							mechDoor3:GetDoor():Toggle(false);
 							
-							modMission:Progress(player, 62, function(mission)
+							modMission:Progress(player, MISSION_ID, function(mission)
 								mission.ProgressionPoint = 6;
 							end)
 						end)
 
-						revasModule.Actions:FaceOwner()
-						revasModule.Move:HeadTrack();
-						revasModule.Prefab:SetAttribute("LookAtClient", nil);
+						revasNpcClass.Move:Face("Player");
+						revasNpcClass.Move:HeadTrack();
+						revasNpcClass.Character:SetAttribute("LookAtClient", nil);
 						task.wait(0.5);
-						revasModule.Chat(player, player.Name..", please give us a moment..");
+
+						revasNpcClass.Chat(player, `{player.Name}, please give us a moment..`);
+						revasNpcClass.Move:HeadTrack(playerClass.Head, 2);
 						task.wait(2);
-						revasModule.Movement:Move(Vector3.new(80.143, -11.299, -75.072));
-						
+
+						revasNpcClass.Move:MoveTo(Vector3.new(80.143, -11.299, -75.072));
+						revasNpcClass.Move:HeadTrack(eugeneNpcClass.Head, 4);
 
 					elseif mission.ProgressionPoint == 6 then
 						
@@ -271,7 +289,6 @@ return function(CutsceneSequence)
 						for a=40, 80, 0.3 do
 							local percent = math.floor(a*10)/10;
 							
-							Debugger:Log("Chamber ",percent,"%");
 							chamberMonitorLabel.Text = chamberMonitorText:gsub("$percent", percent);
 							
 							if tick()-clockTick >= 1 then
@@ -285,16 +302,17 @@ return function(CutsceneSequence)
 						end
 						chamberMonitorLabel.Text = chamberMonitorText:gsub("$percent", 80);
 
-						local stanHitbox = stanModule.RootPart:Clone();
+						local stanHitbox = stanNpcClass.RootPart:Clone();
 						stanHitbox.Name = "Hitbox";
 						stanHitbox.Size = Vector3.new(3.527, 4.343, 3.543);
-						stanHitbox.Parent = stanModule.Prefab;
+						stanHitbox.Parent = stanNpcClass.Character;
 						
-						local hurtSound = modAudio.Play("ZombieHurt", stanHitbox);
+						local hurtSound = modAudio.Play("ZombieHurt2", stanHitbox);
 						hurtSound.Volume = 0.5;
 						hurtSound.PlaybackSpeed = 1.1;
-						stanModule.AvatarFace:Set("Frustrated");
-						stanModule.Chat(player, "Ugghh.. My.. Head..");
+
+						stanNpcClass:GetComponent("AvatarFace"):Set("Frustrated");
+						stanNpcClass.Chat(player, "Ugghh.. My.. Head..");
 						
 						modMission:Progress(player, 62, function(mission)
 							mission.ProgressionPoint = 7;
@@ -303,7 +321,6 @@ return function(CutsceneSequence)
 					elseif mission.ProgressionPoint == 7 then
 						
 					elseif mission.ProgressionPoint == 8 then
-						
 						terminalInteractable.Parent = workspace.Interactables;
 
 					elseif mission.ProgressionPoint == 9 then
@@ -312,48 +329,52 @@ return function(CutsceneSequence)
 					elseif mission.ProgressionPoint == 10 then
 						task.wait(4);
 						
-						stanModule:ToggleInteractable(false);
-						stanModule.AvatarFace:Set("Unconscious");
+						stanNpcClass:ToggleInteractable(false);
+						stanNpcClass:GetComponent("AvatarFace"):Set("Unconscious");
 						
 						mechDoor3Clip.Parent = script;
-						mechDoor3.Door:Toggle(true);
+						mechDoor3:GetDoor():Toggle(true);
 						
-						eugeneModule.Movement:Move(Vector3.new(115.657, -11.299, -75.823)):OnComplete(function()
-							eugeneModule.Movement:Face(Vector3.new(118.124, -11.299, -79.48));
+						eugeneNpcClass.Move:MoveTo(Vector3.new(115.657, -11.299, -75.823));
+						eugeneNpcClass.Move.OnMoveToEnded:Once(function()
+							eugeneNpcClass.Move:Face(Vector3.new(118.124, -11.299, -79.48));
 							
 						end)
-						revasModule.Movement:Move(Vector3.new(109.39, -11.299, -80.801)):OnComplete(function()
-							revasModule.Movement:Face(Vector3.new(118.124, -11.299, -79.48));
+						revasNpcClass.Move:MoveTo(Vector3.new(109.39, -11.299, -80.801));
+						revasNpcClass.Move.OnMoveToEnded:Once(function()
+							revasNpcClass.Move:Face(Vector3.new(118.124, -11.299, -79.48));
 						end)
-						
-						task.wait(3);
-						revasModule.Chat(player, "Alright.. I have the perfect scavenger for the job.");
-						
 						task.wait(3);
 
-						modMission:Progress(player, 62, function(mission)
+						revasNpcClass.Chat(player, "Alright.. I have the perfect scavenger for the job.");
+						task.wait(3);
+
+						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 11;
 						end)
 
 					elseif mission.ProgressionPoint == 11 then
-						revasModule:ToggleInteractable(true);
+						revasNpcClass:ToggleInteractable(true);
 
 					elseif mission.ProgressionPoint == 12 then
 						task.wait(4);
 						
-						eugeneModule.Movement:Move(Vector3.new(141.05, -8.217, -80.159)):OnComplete(function()
-							eugeneModule.Movement:Face(Vector3.new(143.568, -8.194, -80.346));
+						eugeneNpcClass.Move:MoveTo(Vector3.new(141.05, -8.217, -80.159));
+						eugeneNpcClass.Move.OnMoveToEnded:Once(function()
+							eugeneNpcClass.Move:Face(Vector3.new(143.568, -8.194, -80.346));
 							task.wait(1);
-							eugeneModule.PlayAnimation("useterminal");
-							
+
+							eugeneNpcClass.PlayAnimation("useterminal");
 							task.wait(math.random(5,10));
-							eugeneModule.Chat(player, "Hmmm, why is the heating disabled..");
+
+							eugeneNpcClass.Chat(player, "Hmmm, why is the heating disabled..");
 						end)
 						
-						revasModule:ToggleInteractable(false);
-						revasModule.Movement:Move(Vector3.new(4.766, -11.295, -4.694)):OnComplete(function()
+						revasNpcClass:ToggleInteractable(false);
+						revasNpcClass.Move:MoveTo(Vector3.new(4.766, -11.295, -4.694));
+						revasNpcClass.Move.OnMoveToEnded:Once(function()
 							task.wait(0.5);
-							revasModule:TeleportHide();
+							revasNpcClass:TeleportHide();
 						end)
 						
 					elseif mission.ProgressionPoint == 15 then
@@ -361,30 +382,28 @@ return function(CutsceneSequence)
 						
 						Debugger:Log("Mission changed");
 						if firstRun then
-							eugeneModule.PlayAnimation("useterminal");
-							stanModule.AvatarFace:Set("Unconscious");
-							
-							local classPlayer = shared.modPlayers.get(player);
+							eugeneNpcClass.PlayAnimation("useterminal");
+							stanNpcClass:GetComponent("AvatarFace"):Set("Unconscious");
 							
 							local distFromPlayer = 128;
 							repeat
 								task.wait(1);
-								distFromPlayer = RatGoons.Name1.NpcModule.Actions:DistanceFrom(classPlayer.RootPart.Position);
+								distFromPlayer = rat1NpcClass:DistanceFromCharacter(playerClass:GetCFrame().Position);
 								Debugger:Log("distFromPlayer", distFromPlayer);
 							until distFromPlayer <= 8;
 
-							RatGoons.Name1.NpcModule.Movement:Face(Vector3.new(31.444, -10.267, -17.967));
+							rat1NpcClass.Move:Face(Vector3.new(31.444, -10.267, -17.967));
 							
 							task.wait(0.5);
-							RatGoons.Name1.NpcModule.StopAnimation("foldbackhands");
-							RatGoons.Name1.NpcModule.PlayAnimation("Press");
+							rat1NpcClass.StopAnimation("foldbackhands");
+							rat1NpcClass.PlayAnimation("Press");
 
 							task.wait(0.5);
-							mechDoor1.Door:Toggle(true);
-							mechDoor2.Door:Toggle(true);
-							mechDoor3.Door:Toggle(true);
+							mechDoor1:GetDoor():Toggle(true);
+							mechDoor2:GetDoor():Toggle(true);
+							mechDoor3:GetDoor():Toggle(true);
 
-							RatGoons.Name1.NpcModule.Movement:Face(Vector3.new(12.09, -10.2, -3.52));
+							rat1NpcClass.Move:Face(Vector3.new(12.09, -10.2, -3.52));
 						end
 						
 						
@@ -400,8 +419,9 @@ return function(CutsceneSequence)
 		end)
 
 
+	-- MARK: SectorF
 	elseif modBranchConfigs.IsWorld("SectorF") then
-		-- MARK: SectorF
+		
 		CutsceneSequence:NewScene("enableInterfaces", function()
 			modConfigurations.Set("DisablePinnedMission", false);
 			modConfigurations.Set("DisableDialogue", false);
@@ -410,6 +430,7 @@ return function(CutsceneSequence)
 		end);
 
 		CutsceneSequence:Initialize(function()
+			Debugger:Warn(`RatsRecruitment SectorF`)
 			while modGameModeManager.IsGameWorld == nil do
 				task.wait(0.5);
 				Debugger:Warn("Waiting for IsGameWorld to set")
@@ -423,33 +444,27 @@ return function(CutsceneSequence)
 			if mission == nil then return end;
 				
 
-			local revasModule = modNpcs.getPlayerNpc(player, "Revas");
-			if revasModule == nil then
-				local npc = modNpcs.spawn("Revas", nil, function(npc, npcModule)
-					npcModule.Player = player;
-					revasModule = npcModule;
+			local revasNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Revas");
+			if revasNpcClass == nil then
+				revasNpcClass = modNpcs.spawn2{
+					Name = "Revas";
+					Player = player;
+					ReplicateOut = true;
+				};
 
-				end);
-				modReplicationManager.ReplicateOut(player, npc);
-
-				revasModule:TeleportHide();
+				revasNpcClass:TeleportHide();
 			end
 
-			shared.modEventService:OnInvoked("Generic_BindItemPickup", function(
-				event: EventPacket, 
-				interactData, 
-				storageItem: StorageItem
-			)
+			shared.modEventService:OnInvoked("Generic_BindItemPickup", function(event: EventPacket, ...)
+				local interactable: InteractableInstance = ...;
 				local player: Player? = event.Player;
 				if player == nil then return end;
 				
 				task.spawn(function()
-					if interactData.Type ~= modInteractables.Types.Pickup then return end;
-
-					local itemId = interactData.ItemId;
+					local itemId = interactable.Values.ItemId;
 					if itemId ~= "researchpapers" then return end;
 
-					modMission:Progress(player, 62, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						mission.ProgressionPoint = 14;
 					end)
 				end);
@@ -462,25 +477,25 @@ return function(CutsceneSequence)
 					Debugger:Log("progress", mission, firstRun);
 					
 					if mission.ProgressionPoint == 12 then
-						modMission:Progress(player, 62, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 13;
 						end)
 						
 					elseif mission.ProgressionPoint == 13 then
 						CutsceneSequence:NextScene("enableInterfaces");
 						
-						revasModule.PlayAnimation("foldbackhands");
-						revasModule.Actions:Teleport(CFrame.new(-3.47873974, 60.2009239, -9.81020737, -0.981627166, 0, -0.190808967, 0, 1, 0, 0.190808967, 0, -0.981627166));
+						revasNpcClass.PlayAnimation("foldbackhands");
+						revasNpcClass:SetCFrame(CFrame.new(-3.47873974, 60.2009239, -9.81020737, -0.981627166, 0, -0.190808967, 0, 1, 0, 0.190808967, 0, -0.981627166));
 						
 						task.wait(10);
-						revasModule.Chat(player, "I will wait here while you search for the papers..");
+						revasNpcClass.Chat(player, "I will wait here while you search for the papers..");
 						
 					elseif mission.ProgressionPoint == 15 then
 						
 						task.wait(1);
-						revasModule.Chat(player, "Get back to Sector E once you have acquired the items.");
+						revasNpcClass.Chat(player, "Get back to Sector E once you have acquired the items.");
 						task.wait(5);
-						revasModule:TeleportHide();
+						revasNpcClass:TeleportHide();
 						
 					end
 				elseif mission.Type == 3 then -- OnComplete

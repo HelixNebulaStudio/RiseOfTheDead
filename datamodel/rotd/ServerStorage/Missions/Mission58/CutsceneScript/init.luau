@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Client Variables;
 local localPlayer = game.Players.LocalPlayer;
+
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
@@ -13,20 +14,19 @@ local modReplicationManager = shared.require(game.ReplicatedStorage.Library.Repl
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modCharacterInteractions = shared.require(game.ReplicatedStorage.Library.CharacterInteractions);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+local modDoors = shared.require(game.ReplicatedStorage.Entity.Doors);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
-local envelopeInteractable = script:WaitForChild("envelopeInteractable");
-
-local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
-local remoteCameraShakeAndZoom = remotes:FindFirstChild("CameraShakeAndZoom");
-
 local activeEnemies = {};
 local enemiesSpawned = false;
---== Variables;
+
 local MISSION_ID = 58;
+--== Variables;
 
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
@@ -34,126 +34,159 @@ if RunService:IsServer() then
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
+	modSafehomeService = shared.require(game.ServerScriptService.ServerLibrary.SafehomeService);
 
-	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
-		local player: Player? = eventPacket.Player;
-		if player == nil then return end;
+	if modBranchConfigs.IsWorld("TheHarbor") then
+		shared.modEventService:OnInvoked("Interactables_BindButtonInteract", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
 
-		local triggerId = interactData.TriggerTag;
+			local interactable: InteractableInstance = ...;
+			if interactable == nil then return end;
 
-		if modMission:Progress(player, MISSION_ID) then
-			if triggerId == "RevasEnvelope" then
+			if interactable.Id == "mission58_TakeEnvelope" then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint < 7 then
 						mission.ProgressionPoint = 7;
 					end;
 				end)
 
-			elseif triggerId == "DoubleCrossHide" then
-				Debugger:Warn("DoubleCrossHide");
-
-				game.Debris:AddItem(interactData.Script, 0);
-				shared.modAntiCheatService:Teleport(player, CFrame.new(-14.968, 2.044, -7.641));
-				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint < 11 then
-						if mission.ProgressionPoint < 10 then
-							local revasModule = modNpcs.getPlayerNpc(player, "Revas");
-							if revasModule then
-								revasModule.Chat(player, "Oh. You already know what to do.");
-							end
-						end
-						mission.ProgressionPoint = 11;
-					end
-				end)
-
-			elseif triggerId == "RescuePatrick" then
-
-				local classPlayer = shared.modPlayers.get(player);
-				local patrickModule = modNpcs.getPlayerNpc(player, "Patrick");
-				patrickModule.StopAnimation("injured2");
-
-				patrickModule.Prefab.Head.CanCollide = true;
-				patrickModule.Prefab.UpperTorso.CanCollide = true;
-				patrickModule.Prefab.LowerTorso.CanCollide = true;
-				patrickModule.RescueInteractable.Parent = nil;
-
-				patrickModule.PlayAnimation("carriedinjured");
-				modCharacterInteractions.Mount(player.Character, patrickModule.Prefab);
-
-				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint < 16 then
-						mission.ProgressionPoint = 16;
-					end
-				end)
 			end
-		end
-	end);
-
-	if modBranchConfigs.IsWorld("DoubleCross") then
-
-		modOnGameEvents:ConnectEvent("OnToggle", function(player, interactData)
-			local triggerId = interactData.TriggerTag;
-
-			if triggerId == "DoubleCrossLever" then
-				local mission = modMission:GetMission(player, MISSION_ID);
-				if mission.ProgressionPoint == 14 then
-					modMission:Progress(player, MISSION_ID, function(mission)
-						if mission.ProgressionPoint == 14 then
-							local stanChamber = workspace.Environment:WaitForChild("StansRejuvenation"):WaitForChild("RejuvenationChamber");
-
-
-							task.wait(5);
-							if mission.ProgressionPoint ~= 14 then return end;
-							task.spawn(function()
-								repeat
-									task.wait()
-								until stanChamber.Base.Position.Y <= -11;
-
-								local basePos = stanChamber.Base.Position;
-								game.Debris:AddItem(stanChamber.ChamberGlass, 0);
-								for _, obj in pairs(stanChamber:GetDescendants()) do
-									if obj:IsA("Motor6D") or obj:IsA("Weld") then
-										game.Debris:AddItem(obj, 0);
-									end
-								end
-								for _, obj in pairs(stanChamber:GetChildren()) do
-									if obj:IsA("BasePart") and obj.Name ~= "Base" then
-										local dir = (obj.Position-basePos).Unit;
-										obj:ApplyImpulse(dir * 1000);
-										obj:ApplyAngularImpulse(dir * 500);
-									end
-								end
-							end)
-
-							for a=1, 4 do
-								game.Debris:AddItem(stanChamber.Base:FindFirstChild("Attachment"..a), 0);
-							end
-
-							modMission:Progress(player, MISSION_ID, function(mission)
-								mission.ProgressionPoint = 15;
-
-								modEvents:GetEvent(player, "mission58choice").ClosedGates = true;
-							end)
-						end
-					end)
-				end
-			end
-
 		end)
 
-		modOnGameEvents:ConnectEvent("OnDismount", function(mountChar, passengerChar)
-			Debugger:Log("OnDismount", mountChar, passengerChar);
+	elseif modBranchConfigs.IsWorld("DoubleCross") then
+
+		shared.modEventService:OnInvoked("Character_BindDismount", function(eventPacket: EventPacket, ...)
+			local packet = ...;
+			local mountChar = packet.MountCharacter;
+			local passengerChar = packet.PassengerCharacter;
+			local mountStyle = packet.MountStyle;
 
 			local player = game.Players:GetPlayerFromCharacter(mountChar);
-			if player then
+			if player == nil then return end;
 
-				local patrickModule = modNpcs.getPlayerNpc(player, "Patrick");
-				patrickModule.StopAnimation("carriedinjured");
-				patrickModule.PlayAnimation("injured2");
-				patrickModule.Chat(player, "Arrgg.. Help..");
-				patrickModule.RescueInteractable.Parent = patrickModule.Prefab;
+			local patrickNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Patrick");
+			if patrickNpcClass == nil then return end;
 
+			patrickNpcClass.StopAnimation("carriedinjured");
+			patrickNpcClass.PlayAnimation("injured2");
+			patrickNpcClass.Chat(player, "Arrgg.. Help..");
+
+			if patrickNpcClass.Properties.CarryInteractable == nil then
+				local newInteractable = modInteractables.createInteractable("Button");
+				newInteractable:SetAttribute("_Id", "mission58_RescuePatrick");
+				newInteractable:SetAttribute("_Label", "Carry Patrick");
+				newInteractable:SetAttribute("_Animation", "pickupcharacter");
+				newInteractable:SetAttribute("_InteractDuration", 2.95);
+
+				patrickNpcClass.Properties.CarryInteractable = newInteractable;
+				newInteractable.Parent = patrickNpcClass.Character;
 			end
+		end)
+		
+		shared.modEventService:OnInvoked("Interactables_BindButtonInteract", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+
+			local interactable: InteractableInstance = ...;
+			if interactable == nil then return end;
+
+			task.spawn(function()
+				local playerClass: PlayerClass = shared.modPlayers.get(player);
+				if playerClass == nil then return end;
+
+				if interactable.Id == "mission58_GatesLever" then
+					local mission = modMission:GetMission(player, MISSION_ID);
+					if mission.ProgressionPoint == 14 then
+						modMission:Progress(player, MISSION_ID, function(mission)
+							if mission.ProgressionPoint == 14 then
+								local stanModel = workspace.Environment.StansRejuvenation.Stan;
+								local stanChamber = workspace.Environment:WaitForChild("StansRejuvenation"):WaitForChild("RejuvenationChamber");
+
+								task.wait(5);
+								if mission.ProgressionPoint ~= 14 then return end;
+
+								task.spawn(function()
+									repeat
+										task.wait()
+									until stanChamber.Base.Position.Y <= -11;
+
+									local basePos = stanChamber.Base.Position;
+									game.Debris:AddItem(stanChamber.ChamberGlass, 0);
+
+									for _, obj in pairs(stanChamber:GetDescendants()) do
+										if obj:IsA("Motor6D") or obj:IsA("Weld") and not stanModel:IsAncestorOf(obj) then
+											game.Debris:AddItem(obj, 0);
+										end
+									end
+									for _, obj in pairs(stanChamber:GetChildren()) do
+										if obj:IsA("BasePart") and obj.Name ~= "Base" and not stanModel:IsAncestorOf(obj) then
+											local dir = (obj.Position-basePos).Unit;
+											obj:ApplyImpulse(dir * 1000);
+											obj:ApplyAngularImpulse(dir * 500);
+										end
+									end
+								end)
+
+								for a=1, 4 do
+									game.Debris:AddItem(stanChamber.Base:FindFirstChild(`Attachment{a}`), 0);
+								end
+
+								modMission:Progress(player, MISSION_ID, function(mission)
+									mission.ProgressionPoint = 15;
+									modEvents:GetEvent(player, "mission58choice").ClosedGates = true;
+								end)
+							end
+						end)
+					end
+
+				elseif interactable.Id == "mission58_DoubleCrossHide" then
+					Debugger:Warn("DoubleCrossHide");
+
+					game.Debris:AddItem(interactable.Config, 0);
+					playerClass:SetCFrame(CFrame.new(-14.968, 2.044, -7.641));
+
+					modMission:Progress(player, MISSION_ID, function(mission)
+						if mission.ProgressionPoint < 11 then
+							if mission.ProgressionPoint < 10 then
+								local revasNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Revas");
+								if revasNpcClass then
+									revasNpcClass.Chat(player, "Oh. You already know what to do.");
+								end
+
+							end
+							mission.ProgressionPoint = 11;
+						end
+					end)
+
+				elseif interactable.Id == "mission58_RescuePatrick" then
+					local patrickNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Patrick");
+					patrickNpcClass.StopAnimation("injured2");
+
+					patrickNpcClass.Head.CanCollide = true;
+
+					local patrickChar = patrickNpcClass.Character;
+					patrickChar.UpperTorso.CanCollide = true;
+					patrickChar.LowerTorso.CanCollide = true;
+
+					if patrickNpcClass.Properties.CarryInteractable then
+						patrickNpcClass.Properties.CarryInteractable:Destroy();
+						patrickNpcClass.Properties.CarryInteractable = nil;
+					end
+
+					patrickNpcClass:ToggleInteractable(false);
+
+					patrickNpcClass.PlayAnimation("carriedinjured");
+					modCharacterInteractions.Mount(player.Character, patrickNpcClass.Character);
+
+					modMission:Progress(player, MISSION_ID, function(mission)
+						if mission.ProgressionPoint < 16 then
+							mission.ProgressionPoint = 16;
+						end
+					end)
+
+				end
+			end)
 		end)
 
 		for _, obj in pairs(workspace.Environment:GetChildren()) do
@@ -180,35 +213,43 @@ if RunService:IsServer() then
 	end
 	
 else
-	modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
+	modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
 end
 
 --== Script;
 return function(CutsceneSequence)
-	local modInterface;
+	local function initEventPackge(player)
+		local choiceEventObj = modEvents:GetEvent(player, "mission58choice");
+		if choiceEventObj == nil then
+			choiceEventObj = modEvents:NewEvent(player, {Id="mission58choice";});
+		end
+	end
 
+	--MARK: TheHarbor
 	if modBranchConfigs.IsWorld("TheHarbor") then
+
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player = players[1];
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
-			local choiceEventObj = modEvents:GetEvent(player, "mission58choice") or modEvents:NewEvent(player, {Id="mission58choice";});
+			initEventPackge(player);
+			local choiceEventObj = modEvents:GetEvent(player, "mission58choice");
+			local caitlinNpcClass: NpcClass = modNpcs.getByModel(workspace.Entity:FindFirstChild("Caitlin"));
 
-			local caitlinModule = modNpcs.get(workspace.Entity:FindFirstChild("Caitlin"));
-			local revasModule = modNpcs.getPlayerNpc(player, "Revas");
-			if revasModule == nil then
-				local npc = modNpcs.spawn("Revas", nil, function(npc, npcModule)
-					npcModule.Player = player;
-					revasModule = npcModule;
-				end);
-				modReplicationManager.ReplicateOut(player, npc);
-
-				revasModule:TeleportHide();
+			local revasNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Revas");
+			if revasNpcClass == nil then
+				revasNpcClass = shared.modNpcs.spawn2{
+					Name = "Revas";
+					Player = player;
+					ReplicateOut = true;
+				};
+				revasNpcClass:TeleportHide();
 			end
 
+			
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
 
@@ -216,24 +257,38 @@ return function(CutsceneSequence)
 					if mission.ProgressionPoint == 1 then
 
 					elseif mission.ProgressionPoint == 2 then
-						if caitlinModule then
+						if caitlinNpcClass then
+
+							caitlinNpcClass.Chat(player, "Is that so.. I'll pass the information up the chain, if he wants to talk to you, he will let you know.");
+							task.wait(8);
+
+							caitlinNpcClass.Character:SetAttribute("LookAtClient", false);
+							caitlinNpcClass.WieldComp:Equip{
+								ItemId = "walkietalkie";
+							};
 							task.wait(0.3);
-							caitlinModule.Prefab:SetAttribute("LookAtClient", false);
-							caitlinModule.Wield.Equip("walkietalkie");
-							task.wait(0.3);
-							caitlinModule.Wield.PrimaryFireRequest(true);
+
+							caitlinNpcClass.WieldComp:InvokeToolAction("PrimaryUse", true);
 							task.wait(1);
-							caitlinModule.Chat(player, "...");
+
+							caitlinNpcClass.Chat(player, "...");
 							task.wait(5);
-							caitlinModule.Chat(player, "Mhm..");
+
+							caitlinNpcClass.Chat(player, "Mhm..");
 							task.wait(5);
-							caitlinModule.Chat(player, "Yes, sir");
-							task.wait(3);
-							caitlinModule.Wield.PrimaryFireRequest(false);
-							caitlinModule.Prefab:SetAttribute("LookAtClient", nil);
+
+							caitlinNpcClass.Chat(player, "Yes, sir");
+							task.wait(5);
+
+							caitlinNpcClass.WieldComp:InvokeToolAction("PrimaryUse", false);
+							caitlinNpcClass.Character:SetAttribute("LookAtClient", nil);
+
+							caitlinNpcClass.Chat(player, "Looks like it's your lucky day..");
+
 						else
 							Debugger:Log("Missing caitlin");
 							task.wait(5);
+
 						end
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 3 then
@@ -241,24 +296,30 @@ return function(CutsceneSequence)
 							end;
 						end)
 
+
 					elseif mission.ProgressionPoint == 4 then
 						local revasDoor = modReplicationManager.getReplicated(player, "RevasDoorway")[1];
 
-						local doorData = shared.require(revasDoor.Door);
-						doorData:SetAccess(player, true);
+						local doorInteractConfig = revasDoor:FindFirstChild("Interactable");
+						local doorInteractable: InteractableInstance = modInteractables.getOrNew(doorInteractConfig);
+						doorInteractable:SetUserPermissions(player.Name, "CanInteract", true);
 
-						revasModule.Interactable.Parent = script;
-						revasModule.Actions:Teleport(CFrame.new(-275.068512, 105.362907, 292.467896, -0.999996185, 0, 0, 0, 1, 0, 0, 0, -0.999995351))
-						revasModule.Actions:WaitForOwner(40);
+						revasNpcClass:ToggleInteractable(false);
+						
+						revasNpcClass:SetCFrame(CFrame.new(-275.068512, 105.362907, 292.467896, -0.999996185, 0, 0, 0, 1, 0, 0, 0, -0.999995351))
+						
+						local waitForPlayerComp = revasNpcClass:GetComponent("WaitForPlayer");
+						waitForPlayerComp(40);
 
-						revasModule.Movement:SetWalkSpeed("default", 6);
-						revasModule.Chat(player, "So you are the person I've been hearing so much about...");
+						revasNpcClass.Move:SetMoveSpeed("set", "default", 6);
+						revasNpcClass.Chat(player, "So you are the person I've been hearing so much about...");
 						task.wait(1);
-						revasModule.Movement:Move(Vector3.new(-282.269379, 105.362907, 283.569366));
+						revasNpcClass.Move:MoveTo(Vector3.new(-282.269379, 105.362907, 283.569366));
 						task.wait(4);
-						revasModule.Chat(player, "What brings you to me?");
-						revasModule.Actions:Teleport(CFrame.new(-282.269379, 105.362907, 283.569366, 0.990268052, 0, 0.139173105, 0, 1, 0, -0.139173105, 0, 0.990268052))
-						revasModule.Actions:FaceOwner();
+						revasNpcClass.Chat(player, "What brings you to me?");
+						revasNpcClass:SetCFrame(CFrame.new(-282.269379, 105.362907, 283.569366, 0.990268052, 0, 0.139173105, 0, 1, 0, -0.139173105, 0, 0.990268052))
+						revasNpcClass.Move:Face("Player");
+						
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 5 then
 								mission.ProgressionPoint = 5;
@@ -266,35 +327,45 @@ return function(CutsceneSequence)
 						end)
 
 					elseif mission.ProgressionPoint == 5 then
-						revasModule.Interactable.Parent = revasModule.Prefab;
-						revasModule.Actions:Teleport(CFrame.new(-282.269379, 105.362907, 283.569366, 0.990268052, 0, 0.139173105, 0, 1, 0, -0.139173105, 0, 0.990268052))
-						revasModule.Actions:FaceOwner();
+						
+						revasNpcClass:ToggleInteractable(true);
+						revasNpcClass:SetCFrame(CFrame.new(-282.269379, 105.362907, 283.569366, 0.990268052, 0, 0.139173105, 0, 1, 0, -0.139173105, 0, 0.990268052))
+						revasNpcClass.Move:Face("Player");
 
 					elseif mission.ProgressionPoint == 6 then
-						revasModule.Interactable.Parent = nil;
-						revasModule.Actions:Teleport(CFrame.new(-282.269379, 105.362907, 283.569366, 0.990268052, 0, 0.139173105, 0, 1, 0, -0.139173105, 0, 0.990268052))
-						revasModule.Actions:FaceOwner();
+						
+						revasNpcClass:ToggleInteractable(false);
+						revasNpcClass:SetCFrame(CFrame.new(-282.269379, 105.362907, 283.569366, 0.990268052, 0, 0.139173105, 0, 1, 0, -0.139173105, 0, 0.990268052))
+						revasNpcClass.Move:Face("Player");
 
 						task.wait(0.3);
-						revasModule.Wield.Equip("envelope");
+						revasNpcClass.WieldComp:Equip{
+							ItemId = "envelope";
+						};
 						task.wait(0.3);
-						revasModule.Wield.PrimaryFireRequest(true);
+						revasNpcClass.WieldComp:InvokeToolAction("PrimaryUse", true);
 
-						local newInteractable = envelopeInteractable:Clone();
-						newInteractable.Name = "Interactable";
-						newInteractable.Parent = revasModule.Wield.Instances[1];
+						local newInteractable = modInteractables.createInteractable("Button");
+						newInteractable:SetAttribute("_Label", "Take Envelope");
+						newInteractable:SetAttribute("_Id", "mission58_TakeEnvelope");
+						if revasNpcClass.WieldComp.ToolHandler then
+							newInteractable.Parent = revasNpcClass.WieldComp.ToolHandler.MainToolModel.PrimaryPart;
+						else
+							newInteractable.Parent = revasNpcClass.Character;
+						end
 
 					elseif mission.ProgressionPoint == 7 then
-						revasModule.Chat(player, "Close the door on your way out, please.");
+						revasNpcClass.Chat(player, "Close the door on your way out, please.");
 
-						revasModule.Actions:Teleport(CFrame.new(-282.269379, 105.362907, 283.569366, 0.990268052, 0, 0.139173105, 0, 1, 0, -0.139173105, 0, 0.990268052))
-						revasModule.Actions:FaceOwner();
-						revasModule.Wield.Unequip();
+						revasNpcClass:SetCFrame(CFrame.new(-282.269379, 105.362907, 283.569366, 0.990268052, 0, 0.139173105, 0, 1, 0, -0.139173105, 0, 0.990268052));
+						revasNpcClass.Move:Face("Player");
+						revasNpcClass.WieldComp:Unequip();
 
 					elseif mission.ProgressionPoint >= 9 then
 						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 8;
 						end)
+
 					end
 				elseif mission.Type == 3 then -- OnComplete
 
@@ -302,27 +373,24 @@ return function(CutsceneSequence)
 				end
 			end
 			mission.OnChanged:Connect(OnChanged);
-			OnChanged(true, mission);
+			OnChanged(true);
+
 		end)
 		
 		
+	--MARK: DoubleCross
 	elseif modBranchConfigs.IsWorld("DoubleCross") then
 		
-		if modData then
-			repeat
-				modInterface = modData:GetInterfaceModule();
-				Debugger:Warn("Waiting for interface..");
-				if modInterface == nil then task.wait(); end
-			until modInterface ~= nil;
-		end
-
 		local stanChamber = workspace.Environment:WaitForChild("StansRejuvenation"):WaitForChild("RejuvenationChamber");
 		local chamberBodyGyro = stanChamber.Base.BodyGyro
 		local chamberBodyPosition = stanChamber.Base.BodyPosition;
 
 		local gateLever = workspace.Environment:WaitForChild("CargoShip"):WaitForChild("GateLever");
-		local gateInteractData = shared.require(gateLever:WaitForChild("Interactable"));
+		local gateInteractConfig = gateLever:WaitForChild("Interactable");
+		local gateInteractable: InteractableInstance = modInteractables.getOrNew(gateInteractConfig);
 
+		gateInteractable:SetPermissions("CanInteract", false);
+		
 		for _, obj in pairs(gateLever.LeftGate:GetChildren()) do
 			if obj:IsA("BasePart") then obj.CanCollide = false; end;
 		end
@@ -333,7 +401,7 @@ return function(CutsceneSequence)
 		local tweenInfo = TweenInfo.new(12, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut);
 
 		local stanModel = workspace.Environment.StansRejuvenation.Stan;
-		stanModel.Human.PlatformStand = true;
+		stanModel.FakeHuman.PlatformStand = true;
 
 		local patrick = modNpcProfileLibrary:Find("Patrick");
 		patrick.Class="Survivor";
@@ -345,107 +413,84 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
-			local revasModule;
-			modNpcs.spawn("Revas", CFrame.new(-5.3425169, 2.63293743, -9.23565102, 0.939692616, 0, -0.342019618, 0, 1, 0, 0.342020214, 0, 0.939691067), function(npc, npcModule)
-				npcModule.Player = player;
-				revasModule = npcModule;
-			end);
+			initEventPackge(player);
 
-			local zarkModule;
-			modNpcs.spawn("Zark", CFrame.new(-8.77352238, 2.6205008, 90.7937851, 0, 0, 1, 0, 1, 0, -1, 0, 0), function(npc, npcModule)
-				npcModule.Player = player;
-				zarkModule = npcModule;
-			end);
+			local revasNpcClass: NpcClass = modNpcs.spawn2{
+				Name = "Revas";
+				Player = player;
+				CFrame = CFrame.new(-5.3425169, 2.63293743, -9.23565102, 0.939692616, 0, -0.342019618, 0, 1, 0, 0.342020214, 0, 0.939691067);
+			};
 
-			zarkModule:TeleportHide();
+			local zarkNpcClass: NpcClass = modNpcs.spawn2{
+				Name = "Zark";
+				Player = player;
+				CFrame = CFrame.new(-8.77352238, 2.6205008, 90.7937851, 0, 0, 1, 0, 1, 0, -1, 0, 0);
+			};
+			zarkNpcClass:TeleportHide();
 
-			local patrickModule;
-			modNpcs.spawn("Patrick", CFrame.new(4.555336, 3, 91.5086823, 0.358367682, 0, -0.933580518, 0, 1, 0, 0.933580518, 0, 0.358367682), function(npc, npcModule)
-				npcModule.Player = player;
-				patrickModule = npcModule;
-			end, modNpcs.NpcBaseConstructors.BasicNpcModule);
+			local patrickNpcClass: NpcClass = modNpcs.spawn2{
+				Name = "Patrick";
+				Player = player;
+				CFrame = CFrame.new(4.555336, 3, 91.5086823, 0.358367682, 0, -0.933580518, 0, 1, 0, 0.933580518, 0, 0.358367682);
+			};
+			patrickNpcClass:TeleportHide();
 
-			patrickModule:TeleportHide();
+			local eugeneNpcClass: NpcClass = modNpcs.spawn2{
+				Name = "Eugene";
+				Player = player;
+			};
+			eugeneNpcClass:TeleportHide();
 
-			local eugeneModule;
-			modNpcs.spawn("Eugene", nil, function(npc, npcModule)
-				npcModule.Player = player;
-				eugeneModule = npcModule;
-			end, modNpcs.NpcBaseConstructors.CutsceneHuman);
-			eugeneModule:TeleportHide();
+			local stanNpcClass: NpcClass = modNpcs.spawn2{
+				Name = "Stan";
+				Player = player;
+			};
+			stanNpcClass:TeleportHide();
+			stanNpcClass.SetAnimation("Scream", script.Aggro:GetChildren());
+			stanNpcClass.SetAnimation("Attack", script.Attack:GetChildren());
 
-			local stanModule;
-			modNpcs.spawn("Stan", nil, function(npc, npcModule)
-				npcModule.Player = player;
-				stanModule = npcModule;
-			end, modNpcs.NpcBaseConstructors.CutsceneHuman);
-			stanModule:TeleportHide();
-			stanModule.SetAnimation("Scream", script.Aggro:GetChildren());
-			stanModule.SetAnimation("Attack", script.Attack:GetChildren());
-
-			local playerProfile = shared.modProfile:Get(player);
-			local classPlayer = shared.modPlayers.get(player);
+			local profile: ProfileRotd = shared.modProfile:Get(player) :: ProfileRotd;
+			local playerClass: PlayerClass = shared.modPlayers.get(player);
 
 			local enemyLevel = 1;
-			if playerProfile then
-				local playerSave = playerProfile:GetActiveSave();
-				local playerLevel = playerSave and playerSave:GetStat("Level") or 1;
+			if profile then
+				local gameSave: GameSaveRotd = profile:GetActiveSave() :: GameSaveRotd;
+				local playerLevel = gameSave and gameSave:GetStat("Level") or 1;
 				enemyLevel = modGlobalVars.GetLevelToFocus(playerLevel);
 			end
 
 			local function spawnEnemy(enemyName, spawnPoint)
-				modNpcs.spawn(enemyName, spawnPoint, function(npc, npcModule)
-					table.insert(activeEnemies, npcModule);
-					npcModule.Configuration.Level = npcModule.Configuration.Level + enemyLevel + math.random(-1, 1);
-					npcModule.Properties.AttackDamage = 3;
-					npcModule.ForgetEnemies = false;
-					npcModule.Properties.IsHostile = true;
-					npcModule.Properties.TargetableDistance = 4096;
-					npcModule.Properties.WalkSpeed={Min=8; Max=16};
-					npcModule.Wield.Targetable.Humanoid = 0.05;
+				modNpcs.spawn2{
+					Name = enemyName;
+					CFrame = spawnPoint;
+					BindSetup = function(npcClass: NpcClass)
+						table.insert(activeEnemies, npcClass);
 
-					task.delay(1, function()
-						npcModule.Properties.FeelsSafe = tick()+30000;
-						npcModule.Wield.Equip(npcModule.Properties.WeaponId);
-					end)
+						local properties = npcClass.Properties;
+						properties.Level = properties.Level + enemyLevel + math.random(-1,1);
+						properties.IsHostile = true;
+						properties.TargetableDistance = 4096;
 
-					if enemyName == "Bandit" then
-						local weapons = {"ak47"};
+						local configurations = npcClass.Configurations;
+						local cutsceneModifier = configurations.newModifier("CutsceneModifier");
+						cutsceneModifier.SetValues = {
+							AttackDamage = 3;
+						};
+						configurations:AddModifier(cutsceneModifier);
 
-						npcModule.Properties.WeaponId = weapons[math.random(1, #weapons)];
-						npcModule.Speeches = {}
-
-					elseif enemyName == "Rat" then
-						local weapons = {"m4a4"};
-
-						npcModule.Properties.WeaponId = weapons[math.random(1, #weapons)];
-						npcModule.Speeches = {}
+						npcClass.HealthComp.OnIsDeadChanged:Connect(function()
+							if not npcClass.HealthComp.IsDead then return end;
+						end)
 					end
+				};
 
-					npcModule.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Subject;
-					npcModule.Humanoid.Health = npcModule.Humanoid.MaxHealth;
+			end
 
-					local isAlive = true;
-					npcModule.Humanoid.Died:Connect(function()
-						isAlive = false;
-						npcModule.DeathPosition = npcModule.RootPart.CFrame.p;
-
-						game.Debris:AddItem(npc, 10);
-					end);
-					task.spawn(function()
-						npcModule.VisionDistance = 128;
-						while not npcModule.IsDead do
-							if npcModule.IsInVision(classPlayer.RootPart) then
-								npcModule.OnTarget(player);
-								break;
-							end
-							task.wait(math.random(10, 50)/100);
-						end
-					end);
-
-					npcModule:AddComponent("ObjectScan");
-				end);
-
+			local shipDoors = workspace.Environment.CargoShip.ShipDoors:GetChildren();
+			for a=1, #shipDoors do
+				local doorInteractConfig = shipDoors[a]:FindFirstChild("Interactable");
+				local doorInteractable = modInteractables.getOrNew(doorInteractConfig);
+				doorInteractable:SetPermissions("CanInteract", false);
 			end
 
 			local ratGoons = {};
@@ -467,34 +512,45 @@ return function(CutsceneSequence)
 
 					elseif mission.ProgressionPoint == 10 then
 						CutsceneSequence:NextScene("enableInterfaces");
-						revasModule.Movement:SetWalkSpeed("default", 6);
-						revasModule.Movement:Move(Vector3.new(-4.593, 2.633, -20.375)):Wait();
-						revasModule.Movement:Face(Vector3.new(-18.414, 2.727, -8.107));
+
+						revasNpcClass:ToggleInteractable(false);
+						revasNpcClass.Move:SetMoveSpeed("set", "default", 6);
+						revasNpcClass.Move:MoveTo(Vector3.new(-4.593, 2.633, -20.375));
+						revasNpcClass.Move.OnMoveToEnded:Wait(10);
+						revasNpcClass.Move:Face(Vector3.new(-18.414, 2.727, -8.107));
 
 					elseif mission.ProgressionPoint == 11 then
-						revasModule.Chat(player, "Alright good.");
+						revasNpcClass.Chat(player, "Alright good.");
 						task.wait(3);
-						revasModule.Movement:Move(Vector3.new(-1.041, 1.807, -0.298)):Wait();
-						revasModule.Chat(player, "*Pulls Lever*");
-						gateInteractData:OnToggle();
+
+						revasNpcClass.Move:MoveTo(Vector3.new(-1.041, 1.807, -0.298));
+						revasNpcClass.Move.OnMoveToEnded:Wait(5);
+						revasNpcClass.Chat(player, "*Pulls Lever*");
+
+						revasNpcClass:UseInteractable(gateInteractConfig);
 						task.wait(1);
-						revasModule.Movement:Move(Vector3.new(20.126, 1.013, -42.771)):OnComplete(function()
-							revasModule:TeleportHide();
-						end);
+
+						revasNpcClass.Move:MoveTo(Vector3.new(20.126, 1.013, -42.771));
+
+						revasNpcClass.Move.OnMoveToEnded:Once(function()
+							revasNpcClass:TeleportHide();
+						end)
 						task.wait(3);
 
 						CutsceneSequence:NextScene("showBinds");
 						task.wait(6);
+						
 						shared.Notify(player, '<b><font size="16" color="#634335">Bandit</font></b>: Control room looks clear.. *walkie talkie clicks*', "Message");
 						task.wait(4);
+						
 						CutsceneSequence:NextScene("hideBinds");
 						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 12;
 						end)
 
 					elseif mission.ProgressionPoint == 12 then
-						revasModule.Actions:Teleport(CFrame.new(15.0913296, -10.0268202, 19.9245567, -0.48480919, 0, 0.874619484, 0, 1, 0, -0.874619484, 0, -0.48480919));
-						revasModule.Movement:Move(Vector3.new(5.16559792, -10.0268202, 25.8680305));
+						revasNpcClass:SetCFrame(CFrame.new(15.0913296, -10.0268202, 19.9245567, -0.48480919, 0, 0.874619484, 0, 1, 0, -0.874619484, 0, -0.48480919));
+						revasNpcClass.Move:MoveTo(Vector3.new(5.16559792, -10.0268202, 25.8680305));
 
 						local ratSpawns = {
 							CFrame.new(8.09436226, -10.0268202, 19.3195877, -0.601814806, 0, 0.798635602, 0, 1, 0, -0.798635602, 0, -0.601814866);
@@ -503,15 +559,23 @@ return function(CutsceneSequence)
 						}
 
 						for a=1, #ratSpawns do
-							modNpcs.spawn("Rat", ratSpawns[a], function(npc, npcModule)
-								npcModule.Prefab:SetAttribute("Cutscene", a);
-								npcModule.Player = player;
-								table.insert(ratGoons, npcModule);
+							local ratNpcClass: NpcClass = modNpcs.spawn2{
+								Name = "Rat";
+								CFrame = ratSpawns[a];
+								Player = player;
 
-								npcModule:AddComponent(game.ServerScriptService.ServerLibrary.Entity.Npcs.Rat.RandomSkin);
-								npcModule.RandomSkin();
-								npcModule.Movement:SetWalkSpeed("default", 8);
-							end, modNpcs.NpcBaseConstructors.CutsceneHuman);
+								BindSetup = function(npcClass: NpcClass)
+									npcClass.Character:SetAttribute("Cutscene", a);
+
+									local properties = npcClass.Properties;
+									properties.CutsceneActive = true;
+
+									npcClass:GetComponent("AttractNpcs").IsActive = false;
+
+									table.insert(ratGoons, npcClass);
+									npcClass.Move:SetMoveSpeed("set", "default", 8);
+								end
+							};
 						end
 
 						local banditSpawns = {
@@ -521,19 +585,28 @@ return function(CutsceneSequence)
 						}
 
 						for a=1, #banditSpawns do
-							modNpcs.spawn("Bandit", banditSpawns[a], function(npc, npcModule)
-								npcModule.Prefab:SetAttribute("Cutscene", a);
-								npcModule.Player = player;
-								table.insert(banditGoons, npcModule);
+							local banditNpcClass: NpcClass = modNpcs.spawn2{
+								Name = "Bandit";
+								CFrame = banditSpawns[a];
+								Player = player;
 
-								npcModule:AddComponent(game.ServerScriptService.ServerLibrary.Entity.Npcs.Bandit.RandomSkin);
-								npcModule.RandomSkin();
-								npcModule.Movement:SetWalkSpeed("default", 8);
-							end, modNpcs.NpcBaseConstructors.CutsceneHuman);
+								BindSetup = function(npcClass: NpcClass)
+									npcClass.Character:SetAttribute("Cutscene", a);
+
+									local properties = npcClass.Properties;
+									properties.CutsceneActive = true;
+
+									npcClass:GetComponent("AttractNpcs").IsActive = false;
+
+									table.insert(banditGoons, npcClass);
+
+									npcClass.Move:SetMoveSpeed("set", "default", 8);
+								end
+							};
 						end
 
-						zarkModule.Actions:Teleport(CFrame.new(-8.77352238, 2.6205008, 90.7937851, 0, 0, 1, 0, 1, 0, -1, 0, 0));
-						patrickModule.Actions:Teleport(CFrame.new(4.555336, 2.63293743, 91.5086823, 0.358367682, 0, -0.933580518, 0, 1, 0, 0.933580518, 0, 0.358367682));
+						zarkNpcClass:SetCFrame(CFrame.new(-8.77352238, 2.6205008, 90.7937851, 0, 0, 1, 0, 1, 0, -1, 0, 0));
+						patrickNpcClass:SetCFrame(CFrame.new(4.555336, 2.63293743, 91.5086823, 0.358367682, 0, -0.933580518, 0, 1, 0, 0.933580518, 0, 0.358367682));
 
 						CutsceneSequence:Pause(10);
 						modMission:Progress(player, MISSION_ID, function(mission)
@@ -541,7 +614,7 @@ return function(CutsceneSequence)
 						end)
 
 					elseif mission.ProgressionPoint == 13 then
-						shared.modAntiCheatService:Teleport(player, CFrame.new(-14.416, 2.633, -11.506));
+						playerClass:SetCFrame(CFrame.new(-14.416, 2.633, -11.506));
 
 						task.spawn(function()
 							local f=500;
@@ -559,75 +632,77 @@ return function(CutsceneSequence)
 						stanChamber.Base.Anchored = true;
 
 						local heliAnimationController = workspace.Environment.BanditHelicopterRig.AnimationController
-						local animator = heliAnimationController:WaitForChild("Animator");
+						local heliAnimator = heliAnimationController:WaitForChild("Animator");
 
-						local heliTrack = animator:LoadAnimation(script:WaitForChild("HeliDescentAnim"));
+						local heliTrack = heliAnimator:LoadAnimation(script:WaitForChild("HeliDescentAnim"));
 						heliTrack:Play(nil, nil, 0);
 
-						local animator = stanChamber:WaitForChild("AnimationController"):WaitForChild("Animator");
-						local chamberTrack = animator:LoadAnimation(script:WaitForChild("ChamberOpenAnim"));
+						local chamberAnimator = stanChamber:WaitForChild("AnimationController"):WaitForChild("Animator");
+						local chamberTrack = chamberAnimator:LoadAnimation(script:WaitForChild("ChamberOpenAnim"));
 						chamberTrack:Play(nil, nil, 0);
 
-						zarkModule.Movement:SetWalkSpeed("default", 8);
-						patrickModule.Move:SetMoveSpeed("set", "default", 8);
-						eugeneModule.Movement:SetWalkSpeed("default", 8);
-
+						zarkNpcClass.Move:SetMoveSpeed("set", "default", 8);
+						patrickNpcClass.Move:SetMoveSpeed("set", "default", 8);
+						eugeneNpcClass.Move:SetMoveSpeed("set", "default", 8);
 						task.wait(1);
+
 						modAudio.Play("WoodDoorOpen", workspace.Environment.SoundPart);
 						modAudio.Play("HeavyMetalDoor", workspace.Environment.SoundPart);
-						playerProfile.Cache.LowTension = modAudio.Play("Soundtrack:LowTension", workspace)
-						playerProfile.Cache.LowTension.Volume = 0.4;
+						profile.Cache.LowTension = modAudio.Play("Soundtrack:LowTension", workspace)
+						profile.Cache.LowTension.Volume = 0.4;
 
 						task.delay(3, function()
-							zarkModule.Chat(player, "Well well well..");
+							zarkNpcClass.Chat(player, "Well well well..");
 							task.wait(2);
 							if math.random(1, 2) == 1 then
-								revasModule.Chat(player, "Oh? You’re approaching me?");
+								revasNpcClass.Chat(player, "Oh? You’re approaching me?");
 							end
 							task.wait(2);
-							zarkModule.Chat(player, "Revas, we finally meet. Hahah..");
+							zarkNpcClass.Chat(player, "Revas, we finally meet. Hahah..");
 						end)
 
-						revasModule.Move:HeadTrack(zarkModule.Head);
-						patrickModule.Move:HeadTrack(revasModule.Head);
-						patrickModule.Move:MoveTo(Vector3.new(-0.717552722, -10.0268211, 35.5515823));
+						revasNpcClass.Move:HeadTrack(zarkNpcClass.Head);
+						patrickNpcClass.Move:HeadTrack(revasNpcClass.Head);
+						patrickNpcClass.Move:MoveTo(Vector3.new(-0.717552722, -10.0268211, 35.5515823));
 						task.spawn(function()
-							patrickModule.Move.OnMoveToEnded:Wait(15);
+							patrickNpcClass.Move.OnMoveToEnded:Wait(15);
 							task.wait(0.1);
-							patrickModule.Move:Face(revasModule.RootPart);
+							patrickNpcClass.Move:Face(revasNpcClass.RootPart);
 						end)
 						task.spawn(function()
-							banditGoons[1].Movement:Move(Vector3.new(-16.5431557, -10.0268211, 25.0535679)):Wait()
-							banditGoons[1].Movement:Face(Vector3.new(8.09436226, -10.0268202, 19.3195877));
+							banditGoons[1].Move:MoveTo(Vector3.new(-16.5431557, -10.0268211, 25.0535679))
+							banditGoons[1].Move.OnMoveToEnded:Wait(10);
+							banditGoons[1].Move:Face(Vector3.new(8.09436226, -10.0268202, 19.3195877));
 						end)
-						zarkModule.Move:HeadTrack(revasModule.Head);
-						zarkModule.Movement:Move(Vector3.new(-10.8155708, -10.0268202, 30.3059406)):Wait();
-						zarkModule.Movement:Face(Vector3.new(5.16559792, -10.0268202, 25.8680305));
+						zarkNpcClass.Move:HeadTrack(revasNpcClass.Head);
+						zarkNpcClass.Move:MoveTo(Vector3.new(-10.8155708, -10.0268202, 30.3059406))
+						zarkNpcClass.Move.OnMoveToEnded:Wait(10);
+						zarkNpcClass.Move:Face(Vector3.new(5.16559792, -10.0268202, 25.8680305));
 
 						task.wait(2);
-						revasModule.Chat(player, "Zark..");
+						revasNpcClass.Chat(player, "Zark..");
 
 						task.wait(4);
-						zarkModule.Chat(player, "You made the right choice agreeing to the offer.");
+						zarkNpcClass.Chat(player, "You made the right choice agreeing to the offer.");
 						task.wait(6);
-						revasModule.Chat(player, "You made quite a compelling offer..");
+						revasNpcClass.Chat(player, "You made quite a compelling offer..");
 						task.wait(6);
-						zarkModule.Chat(player, "The payload should be here any minute now..");
+						zarkNpcClass.Chat(player, "The payload should be here any minute now..");
 						task.wait(2);
 
 						task.delay(math.random(25, 100)/100, function()
-							zarkModule.Movement:Face(Vector3.new(-0.704, 22.936, 55.041));
-							zarkModule.Move:HeadTrack(stanChamber.Base);
+							zarkNpcClass.Move:Face(Vector3.new(-0.704, 22.936, 55.041));
+							zarkNpcClass.Move:HeadTrack(stanChamber.Base);
 						end)
 
 						task.delay(math.random(25, 100)/100, function()
-							patrickModule.Move:Face(Vector3.new(-0.704, 22.936, 55.041));
-							patrickModule.Move:HeadTrack(stanChamber.Base);
+							patrickNpcClass.Move:Face(Vector3.new(-0.704, 22.936, 55.041));
+							patrickNpcClass.Move:HeadTrack(stanChamber.Base);
 						end)
 
 						task.delay(math.random(25, 100)/100, function()
-							revasModule.Movement:Face(Vector3.new(-0.704, 22.936, 55.041));
-							revasModule.Move:HeadTrack(stanChamber.Base);
+							revasNpcClass.Move:Face(Vector3.new(-0.704, 22.936, 55.041));
+							revasNpcClass.Move:HeadTrack(stanChamber.Base);
 						end)
 
 						stanChamber.Base.Anchored = false;
@@ -646,196 +721,222 @@ return function(CutsceneSequence)
 						task.wait(8);
 
 						task.delay(math.random(25, 100)/100, function()
-							zarkModule.Movement:Face(revasModule.RootPart.Position);
-							zarkModule.Move:HeadTrack(revasModule.Head);
+							zarkNpcClass.Move:Face(revasNpcClass.RootPart.Position);
+							zarkNpcClass.Move:HeadTrack(revasNpcClass.Head);
 						end)
 
 						task.delay(math.random(25, 100)/100, function()
-							patrickModule.Move:Face(revasModule.RootPart.Position);
-							patrickModule.Move:HeadTrack(revasModule.Head);
+							patrickNpcClass.Move:Face(revasNpcClass.RootPart.Position);
+							patrickNpcClass.Move:HeadTrack(revasNpcClass.Head);
 						end)
 
 						task.delay(math.random(25, 100)/100, function()
-							revasModule.Movement:Face(zarkModule.RootPart.Position);
-							revasModule.Move:HeadTrack(zarkModule.Head);
+							revasNpcClass.Move:Face(zarkNpcClass.RootPart.Position);
+							revasNpcClass.Move:HeadTrack(zarkNpcClass.Head);
 						end)
 
 
-						zarkModule.Chat(player, "As promised.. An infector, in exchange for the location of Sector C..");
+						zarkNpcClass.Chat(player, "As promised.. An infector, in exchange for the location of Sector C..");
 						task.wait(6);
-						revasModule.Chat(player, "Is it alive?");
+						revasNpcClass.Chat(player, "Is it alive?");
 						task.wait(4);
-						zarkModule.Chat(player, "Yes, it's just unconscious inside this rejuvenation chamber.");
+						zarkNpcClass.Chat(player, "Yes, it's just unconscious inside this rejuvenation chamber.");
 						task.wait(6);
-						revasModule.Chat(player, "Eugene, please verify the specimen for me.");
-						eugeneModule.Actions:Teleport(CFrame.new(-5.34416199, -10.0268211, 2.89855337, -1, 0, 0, 0, 1, 0, 0, 0, -1));
-						revasModule.Movement:Face(eugeneModule.RootPart.Position);
-						revasModule.Move:HeadTrack(eugeneModule.Head);
+						revasNpcClass.Chat(player, "Eugene, please verify the specimen for me.");
+						eugeneNpcClass:SetCFrame(CFrame.new(-5.34416199, -10.0268211, 2.89855337, -1, 0, 0, 0, 1, 0, 0, 0, -1));
+						revasNpcClass.Move:Face(eugeneNpcClass.RootPart.Position);
+						revasNpcClass.Move:HeadTrack(eugeneNpcClass.Head);
 						task.wait(3);
 						task.delay(1, function()
-							eugeneModule.Chat(player, "Yes, sir.");
+							eugeneNpcClass.Chat(player, "Yes, sir.");
 						end)
 
-						revasModule.Move:HeadTrack(eugeneModule.Head);
-						zarkModule.Move:HeadTrack(eugeneModule.Head);
-						patrickModule.Move:HeadTrack(eugeneModule.Head);
+						revasNpcClass.Move:HeadTrack(eugeneNpcClass.Head);
+						zarkNpcClass.Move:HeadTrack(eugeneNpcClass.Head);
+						patrickNpcClass.Move:HeadTrack(eugeneNpcClass.Head);
 
 						task.delay(2.5, function()
-							patrickModule.Move:MoveTo(Vector3.new(4.528, -10.027, 35.273));
+							patrickNpcClass.Move:MoveTo(Vector3.new(4.528, -10.027, 35.273));
 						end)
 
 						local eugeneWalk = true;
-						eugeneModule.Movement:Move(stanChamber.Base.InteractPoint.WorldPosition):OnComplete(function()
+						eugeneNpcClass.Move:MoveTo(stanChamber.Base.PathToInteract.WorldPosition);
+						eugeneNpcClass.Move.OnMoveToEnded:Once(function()
 							eugeneWalk = false;
 						end)
 
 						while eugeneWalk do
-							revasModule.Movement:Face(eugeneModule.RootPart.Position);
-							patrickModule.Move:Face(eugeneModule.RootPart.Position);
-							zarkModule.Movement:Face(eugeneModule.RootPart.Position);
+							revasNpcClass.Move:Face(eugeneNpcClass.RootPart.Position);
+							patrickNpcClass.Move:Face(eugeneNpcClass.RootPart.Position);
+							zarkNpcClass.Move:Face(eugeneNpcClass.RootPart.Position);
 
 							task.wait(0.1);
 						end
 
-						eugeneModule.PlayAnimation("useterminal");
+						eugeneNpcClass.PlayAnimation("useterminal");
 						task.wait(2);
 
 						TweenService:Create(chamberTrack, TweenInfo.new(5), {
 							TimePosition=4.99;
 						}):Play();
 
-						eugeneModule.Chat(player, "Hmm.. Vitals are stable, but it seems that the parasite has yet to take over the body?!");
-
+						eugeneNpcClass.Chat(player, "Hmm.. Vitals are stable, but..");
 						task.wait(6);
-						eugeneModule.StopAnimation("useterminal");
 
-						patrickModule.Move:MoveTo(Vector3.new(1.954, -10.027, 35.552));
+						eugeneNpcClass.Chat(player, "It seems that the parasite has yet to take over the body?!");
+						task.wait(6);
+
+						eugeneNpcClass.StopAnimation("useterminal");
+
+						patrickNpcClass.Move:MoveTo(Vector3.new(1.954, -10.027, 35.552));
 						task.spawn(function()
-							patrickModule.Move.OnMoveToEnded:Wait();
+							patrickNpcClass.Move.OnMoveToEnded:Wait();
 							task.wait(0.1);
-							patrickModule.Move:Face(revasModule.RootPart);
+							patrickNpcClass.Move:Face(revasNpcClass.RootPart);
 						end)
 
 						eugeneWalk = true;
-						eugeneModule.Movement:Move(Vector3.new(12.714, -10.027, 31.405)):OnComplete(function()
-							eugeneModule.Movement:Face(revasModule.RootPart.Position);
-							revasModule.Movement:Face(eugeneModule.RootPart.Position);
+						eugeneNpcClass.Move:MoveTo(Vector3.new(12.714, -10.027, 31.405));
+						eugeneNpcClass.Move.OnMoveToEnded:Once(function()
+							eugeneNpcClass.Move:Face(revasNpcClass.RootPart.Position);
+							revasNpcClass.Move:Face(eugeneNpcClass.RootPart.Position);
 							eugeneWalk = false;
 						end)
 
 						while eugeneWalk do
-							revasModule.Movement:Face(eugeneModule.RootPart.Position);
-							patrickModule.Move:Face(eugeneModule.RootPart);
-							zarkModule.Movement:Face(eugeneModule.RootPart.Position);
+							revasNpcClass.Move:Face(eugeneNpcClass.RootPart.Position);
+							patrickNpcClass.Move:Face(eugeneNpcClass.RootPart);
+							zarkNpcClass.Move:Face(eugeneNpcClass.RootPart.Position);
 
 							task.wait(0.1);
 						end
 
 
-						revasModule.Chat(player, "What do you mean doc?");
+						revasNpcClass.Chat(player, "What do you mean doc?");
 						task.wait(6);
-						eugeneModule.Chat(player, "The parasite may still be incubating in the host.. We have no clue when it will complete.");
-						eugeneModule.Move:HeadTrack(revasModule.Head);
+						eugeneNpcClass.Chat(player, "The parasite may still be incubating in the host..");
+						eugeneNpcClass.Move:HeadTrack(revasNpcClass.Head);
 						task.wait(6);
-						revasModule.Chat(player, "Hmmm.. Is that so..");
-						revasModule.Move:HeadTrack(patrickModule.Head);
-						patrickModule.Move:HeadTrack(revasModule.Head);
+						eugeneNpcClass.Chat(player, "We have no clue when it will complete.");
+						task.wait(8);
 
-						task.wait(4);
+						revasNpcClass.Chat(player, "Hmmm.. Is that so..");
+						revasNpcClass.Move:HeadTrack(patrickNpcClass.Head);
+						patrickNpcClass.Move:HeadTrack(revasNpcClass.Head);
 
-						revasModule.Move:HeadTrack(zarkModule.Head);
-						revasModule.Chat(player, "Change of plans.");
-						revasModule.Wield.Equip("revolver454");
-						revasModule.Movement:Face(zarkModule.RootPart.Position);
+						task.wait(6);
+
+						revasNpcClass.Move:HeadTrack(zarkNpcClass.Head);
+						revasNpcClass.Chat(player, "Change of plans.");
+						revasNpcClass.WieldComp:Equip{
+							ItemId = "revolver454";
+						}
+						revasNpcClass.Move:Face(zarkNpcClass.RootPart.Position);
 
 						task.wait(1);
-						eugeneModule.Movement:Face(zarkModule.RootPart.Position);
+						eugeneNpcClass.Move:Face(zarkNpcClass.RootPart.Position);
 
 						task.delay(math.random(10, 60)/100,function()
-							patrickModule.Wield.Equip("ak47");
-							patrickModule.Move:Face(zarkModule.RootPart);
-							patrickModule.Move:HeadTrack(zarkModule.Head);
+							patrickNpcClass.WieldComp:Equip{
+								ItemId = "ak47";
+							};
+							patrickNpcClass.Move:Face(zarkNpcClass.RootPart);
+							patrickNpcClass.Move:HeadTrack(zarkNpcClass.Head);
 						end)
 
 						task.wait(0.5);
-						zarkModule.Move:HeadTrack(patrickModule.Head);
-						zarkModule.Wield.Equip("deagle")
+						zarkNpcClass.Move:HeadTrack(patrickNpcClass.Head);
+						zarkNpcClass.WieldComp:Equip{
+							ItemId = "deagle";
+						};
 
 						for a=1, #banditGoons do
 							task.delay(math.random(45, 150)/100,function()
-								banditGoons[a].Wield.Equip("ak47");
+								banditGoons[a].WieldComp:Equip{
+									ItemId = "ak47";
+								};
 							end)
 						end
 						for a=1, #ratGoons do
 							task.delay(math.random(45, 150)/100,function()
-								ratGoons[a].Wield.Equip("m4a4");
+								ratGoons[a].WieldComp:Equip{
+									ItemId = "m4a4";
+								}
 							end)
 						end
 
 
-						eugeneModule.Move:HeadTrack();
+						eugeneNpcClass.Move:HeadTrack();
 						task.wait(2);
-						zarkModule.Movement:Face(patrickModule.RootPart.Position);
-						zarkModule.Chat(player, "Woah there.. Hah hah!");
 
+						zarkNpcClass.Move:Face(patrickNpcClass.RootPart.Position);
+						zarkNpcClass.Chat(player, "Woah there.. Hah hah!");
 						task.wait(6);
-						zarkModule.Chat(player, "What is this?");
 
-						task.wait(3);
-						zarkModule.Chat(player, "A traitor in our midst?");
-
+						zarkNpcClass.Chat(player, "What is this?");
 						task.wait(6);
-						patrickModule.Chat(player, "I'm done with the Bandits..");
 
-
+						zarkNpcClass.Chat(player, "A traitor in our midst?");
 						task.wait(6);
-						revasModule.Chat(player, "Here's the new deal. You hand over your military contacts, and I keep the infector in return for Sector C..");
-						zarkModule.Movement:Face(revasModule.RootPart.Position);
-						zarkModule.Move:HeadTrack(revasModule.Head);
 
+						patrickNpcClass.Chat(player, "I'm done with the Bandits..");
 						task.wait(6);
-						zarkModule.Chat(player, "No deal, no dice..");
 
+						revasNpcClass.Chat(player, "Here's the new deal.");
 						task.wait(6);
-						revasModule.Chat(player, "How about I sweeten the deal?");
 
+						revasNpcClass.Chat(player, "You hand over your military contacts, and I keep the infector in return for Sector C..");
+						task.wait(1);
+
+						zarkNpcClass.Move:Face(revasNpcClass.RootPart.Position);
+						zarkNpcClass.Move:HeadTrack(revasNpcClass.Head);
+						task.wait(9);
+
+						zarkNpcClass.Chat(player, "No deal, no dice..");
+						task.wait(6);
+
+						revasNpcClass.Chat(player, "How about I sweeten the deal?");
 						task.wait(2.5);
-						revasModule.Movement:Face(patrickModule.RootPart.Position);
+						revasNpcClass.Move:Face(patrickNpcClass.RootPart.Position);
 						task.wait(0.5);
-						revasModule.Wield.SetEnemyHumanoid(patrickModule.Humanoid);
-						revasModule.Wield.PrimaryFireRequest();
 
-						patrickModule.Move:HeadTrack();
-						patrickModule.PlayAnimation("injured2");
-						patrickModule.AvatarFace:Set("Frustrated", player);
-						patrickModule.Chat(player, "Arrgg.. Why..");
-						patrickModule.Wield.Unequip();
+						revasNpcClass.WieldComp:InvokeToolAction("PrimaryFireRequest", nil, patrickNpcClass.Humanoid)
 
-						patrickModule.Prefab.Head.CanCollide = false;
-						patrickModule.Prefab.UpperTorso.CanCollide = false;
-						patrickModule.Prefab.LowerTorso.CanCollide = false;
+						patrickNpcClass.Move:HeadTrack();
+						patrickNpcClass.PlayAnimation("injured2");
+						patrickNpcClass:GetComponent("AvatarFace"):Set("Frustrated", player);
+						patrickNpcClass.Chat(player, "Arrgg.. Why..");
+						patrickNpcClass.WieldComp:Unequip();
 
-						zarkModule.Movement:Face(patrickModule.RootPart.Position);
-						zarkModule.Move:HeadTrack(patrickModule.Head);
+						patrickNpcClass.Head.CanCollide = false;
+
+						local patrickChar = patrickNpcClass.Character;
+						patrickChar.UpperTorso.CanCollide = false;
+						patrickChar.LowerTorso.CanCollide = false;
+
+						zarkNpcClass.Move:Face(patrickNpcClass.RootPart.Position);
+						zarkNpcClass.Move:HeadTrack(patrickNpcClass.Head);
 
 						task.wait(1.5);
-						revasModule.Movement:Face(zarkModule.RootPart.Position);
+						revasNpcClass.Move:Face(zarkNpcClass.RootPart.Position);
 
 						task.wait(1.5);
-						zarkModule.Movement:Face(revasModule.RootPart.Position);
-						zarkModule.Move:HeadTrack(revasModule.Head);
-						zarkModule.Chat(player, "Oooh, it's tempting but still no deal..");
+						zarkNpcClass.Move:Face(revasNpcClass.RootPart.Position);
+						zarkNpcClass.Move:HeadTrack(revasNpcClass.Head);
 
-						task.wait(3);
-						zarkModule.Chat(player, "*whistles*");
+						zarkNpcClass.Chat(player, "Oooh, it's tempting but still no deal..");
+						task.wait(6);
+						
+						zarkNpcClass.Chat(player, "*whistles*");
 						task.wait(1.5);
-						zarkModule.Movement:SetWalkSpeed("default", 16);
-						patrickModule.Move:SetMoveSpeed("set", "default", 0);
-						eugeneModule.Movement:SetWalkSpeed("default", 16);
 
-						zarkModule.Wield.Unequip();
-						zarkModule.Chat(player, "Farewell Revas, we both know you are not going to shoot me.");
-						zarkModule.Move:HeadTrack();
+						zarkNpcClass.Move:SetMoveSpeed("set", "default", 16);
+						patrickNpcClass.Move:SetMoveSpeed("set", "default", 0);
+						eugeneNpcClass.Move:SetMoveSpeed("set", "default", 16);
+
+						zarkNpcClass.WieldComp:Unequip();
+						zarkNpcClass.Chat(player, "Farewell Revas, we both know you are not going to shoot me.");
+						zarkNpcClass.Move:HeadTrack();
 
 
 						heliTrack.TimePosition = 7.6;
@@ -844,41 +945,45 @@ return function(CutsceneSequence)
 						}):Play();
 
 						task.wait(1.3);
-						eugeneModule.Chat(player, "Ahhh!!");
-						eugeneModule.Movement:Move(Vector3.new(-25.928, -7.538, -12.168)):OnComplete(function() 
-							eugeneModule:TeleportHide();
+						eugeneNpcClass.Chat(player, "Ahhh!!");
+						eugeneNpcClass.Move:MoveTo(Vector3.new(-25.928, -10.738, -7.868));
+						eugeneNpcClass.Move.OnMoveToEnded:Once(function() 
+							eugeneNpcClass:TeleportHide();
 						end)
 
-						gateInteractData.GateLocked = nil;
-						gateInteractData:Sync();
+						gateInteractable:SetPermissions("CanInteract", true);
 
 						task.delay(1.2, function()
-							zarkModule.Movement:Move(Vector3.new(-18.351, 1.88, 110.928)):OnComplete(function() 
-								zarkModule:TeleportHide();
+							zarkNpcClass.Move:MoveTo(Vector3.new(-18.351, 1.88, 110.928));
+							zarkNpcClass.Move.OnMoveToEnded:Once(function() 
+								zarkNpcClass:TeleportHide();
 							end)
 
-							local mainRatGoon = ratGoons[1];
-							mainRatGoon.Movement:SetWalkSpeed("default", 16);
-							mainRatGoon.Movement:Move(Vector3.new(-25.928, -7.538, -12.168)):OnComplete(function()
+							local mainRatGoon: NpcClass = ratGoons[1];
+							mainRatGoon.Move:SetMoveSpeed("set", "default", 16);
+							mainRatGoon.Move:MoveTo(Vector3.new(-25.928, -10.738, -7.868));
+							mainRatGoon.Move.OnMoveToEnded:Once(function()
 								mainRatGoon:TeleportHide();
 							end)
 							task.wait(0.2);
 
-							ratGoons[2].Movement:SetWalkSpeed("default", 12);
-							ratGoons[2].Movement:Move(Vector3.new(27.919, 1.028, 50.847)):OnComplete(function()
-								ratGoons[2].Wield.SetEnemyHumanoid(banditGoons[3].Humanoid);
+							ratGoons[2].Move:SetMoveSpeed("set", "default", 12);
+							ratGoons[2].Move:MoveTo(Vector3.new(27.919, 1.028, 50.847));
+							ratGoons[2].Move.OnMoveToEnded:Once(function()
+								ratGoons[2].Move:Face(banditGoons[3]:GetCFrame().Position);
+
 								local c = 0;
 								while true do
 									task.wait();
 									task.spawn(function()
-										if ratGoons[2] == nil then return end;
-										if banditGoons[2] == nil or banditGoons[2].RootPart == nil then return end;
-										ratGoons[2].Movement:Face(banditGoons[2].RootPart.Position);
-										ratGoons[2].Wield.PrimaryFireRequest();
+										if ratGoons[2].HealthComp.IsDead then return end;
+										if banditGoons[2].HealthComp.IsDead then return end;
+										ratGoons[2].Move:Face(banditGoons[3]:GetCFrame().Position);
+										ratGoons[2].WieldComp:InvokeToolAction("PrimaryFireRequest", nil, banditGoons[3].Humanoid);
 									end)
 									c = c+1;
 									if c == 6 then
-										remoteCameraShakeAndZoom:FireClient(player, 8, 1, 10, 2, false);
+										shared.modPlayers.cameraShakeAndZoom(player, 8, 1, 10, 2, false);
 
 										local explosiveBarrel = workspace.Environment.Destructible.ExplosiveBarrel;
 										local explosiveBarrelHealthComp: HealthComp? = modHealthComponent.getByModel(explosiveBarrel);
@@ -912,110 +1017,106 @@ return function(CutsceneSequence)
 												modAlertLight:Toggle(true);
 											end
 
-											if playerProfile.Cache.LowTension then
-												playerProfile.Cache.LowTension.PlaybackSpeed = 2;
+											if profile.Cache.LowTension then
+												profile.Cache.LowTension.PlaybackSpeed = 2;
 											end
 										end)
 									end
 
-									if stanModule.AttackMode then
+									if stanNpcClass.Properties.AttackMode then
 										break;
 									end
 								end
 
-								ratGoons[2].Wield.ReloadRequest()
+								ratGoons[2].WieldComp:InvokeToolAction("ReloadRequest");
 								task.wait(1);
-								ratGoons[2].Wield.SetEnemyHumanoid(stanModule.Humanoid);
-								while not ratGoons[2].IsDead do
+								while not ratGoons[2].HealthComp.IsDead do
+									ratGoons[2].Move:Face(stanNpcClass.RootPart.Position);
+									ratGoons[2].WieldComp:InvokeToolAction("PrimaryFireRequest", nil, stanNpcClass.Humanoid);
 									task.wait();
-									ratGoons[2].Movement:Face(stanModule.RootPart.Position);
-									ratGoons[2].Wield.PrimaryFireRequest();
 								end
 							end)
-							banditGoons[2].Movement:SetWalkSpeed("default", 12);
-							banditGoons[2].Movement:Move(Vector3.new(-9.1372118, -10.0268211, 77.6050186)):OnComplete(function()
-								banditGoons[2].Wield.SetEnemyHumanoid(ratGoons[2].Humanoid);
-								while true do
-									task.wait();
-									banditGoons[2].Movement:Face(ratGoons[2].RootPart.Position);
-									banditGoons[2].Wield.PrimaryFireRequest();
 
-									if stanModule.AttackMode then
+							banditGoons[2].Move:SetMoveSpeed("set", "default", 12);
+							banditGoons[2].Move:MoveTo(Vector3.new(-9.1372118, -10.0268211, 77.6050186));
+							banditGoons[2].Move.OnMoveToEnded:Once(function()
+								while true do
+									banditGoons[2].Move:Face(ratGoons[2].RootPart.Position);
+									banditGoons[2].WieldComp:InvokeToolAction("PrimaryFireRequest", nil, ratGoons[2].Humanoid);
+
+									if stanNpcClass.Properties.AttackMode then
 										break;
 									end
+									task.wait();
 								end
 
-								banditGoons[2].Wield.SetEnemyHumanoid(stanModule.Humanoid);
-								while not banditGoons[2].IsDead do
+								while not banditGoons[2].HealthComp.IsDead do
+									banditGoons[2].Move:Face(stanNpcClass.RootPart.Position);
+									banditGoons[2].WieldComp:InvokeToolAction("PrimaryFireRequest", nil, stanNpcClass.Humanoid);
 									task.wait();
-									banditGoons[2].Movement:Face(stanModule.RootPart.Position);
-									banditGoons[2].Wield.PrimaryFireRequest();
 								end
 							end)
 
 							task.spawn(function()
-								ratGoons[3].Wield.SetEnemyHumanoid(banditGoons[3].Humanoid);
-								while true do
-									task.wait();
-									ratGoons[3].Movement:Face(banditGoons[3].RootPart.Position);
-									ratGoons[3].Wield.PrimaryFireRequest();
+								while not ratGoons[3].HealthComp.IsDead do
+									ratGoons[3].Move:Face(banditGoons[3].RootPart.Position);
+									ratGoons[3].WieldComp:InvokeToolAction("PrimaryFireRequest", nil, banditGoons[3].Humanoid);
 
-									if stanModule.AttackMode then
+									if stanNpcClass.Properties.AttackMode then
 										break;
 									end
+									task.wait();
 								end
 							end)
 							task.spawn(function()
-								banditGoons[3].Wield.SetEnemyHumanoid(ratGoons[3].Humanoid);
-								while true do
-									task.wait();
-									banditGoons[3].Movement:Face(ratGoons[3].RootPart.Position);
-									banditGoons[3].Wield.PrimaryFireRequest();
+								while not banditGoons[3].HealthComp.IsDead do
+									banditGoons[3].Move:Face(ratGoons[3].RootPart.Position);
+									banditGoons[3].WieldComp:InvokeToolAction("PrimaryFireRequest", nil, ratGoons[3].Humanoid);
 
-									if stanModule.AttackMode then
+									if stanNpcClass.Properties.AttackMode then
 										break;
 									end
+									task.wait();
 								end
 
-								banditGoons[3].Wield.ReloadRequest()
+								banditGoons[3].WieldComp:InvokeToolAction("ReloadRequest");
 								task.wait(2);
-								banditGoons[3].Wield.SetEnemyHumanoid(stanModule.Humanoid);
-								while not banditGoons[3].IsDead do
+								while not banditGoons[3].HealthComp.IsDead do
+									banditGoons[3].Move:Face(stanNpcClass.RootPart.Position);
+									banditGoons[3].WieldComp:InvokeToolAction("PrimaryFireRequest", nil, stanNpcClass.Humanoid);
 									task.wait();
-									banditGoons[3].Movement:Face(stanModule.RootPart.Position);
-									banditGoons[3].Wield.PrimaryFireRequest();
 								end
 							end)
 
-							local mainBanditGoon = banditGoons[1];
-							mainBanditGoon.Movement:SetWalkSpeed("default", 12);
-							mainBanditGoon.Wield.SetEnemyHumanoid(mainRatGoon.Humanoid);
+							local mainBanditGoon: NpcClass = banditGoons[1];
+							mainBanditGoon.Move:SetMoveSpeed("set", "default", 12);
 							repeat
 								task.wait();
-								mainBanditGoon.Movement:Face(mainRatGoon.RootPart.Position);
-								mainBanditGoon.Wield.PrimaryFireRequest();
-							until stanModule.AttackMode;
+								mainBanditGoon.Move:Face(mainRatGoon.RootPart.Position);
+								mainBanditGoon.WieldComp:InvokeToolAction("PrimaryFireRequest", nil, mainRatGoon.Humanoid);
+							until stanNpcClass.Properties.AttackMode;
 
-							mainBanditGoon.Movement:Move(Vector3.new(-18.351, 1.88, 110.928)):OnComplete(function() 
+							mainBanditGoon.Move:MoveTo(Vector3.new(-18.351, 1.88, 110.928));
+							mainBanditGoon.Move.OnMoveToEnded:Once(function() 
 								mainBanditGoon:TeleportHide();
 							end)
 						end)
 
-						revasModule.Chat(player, "Pull the lever now!");
-						revasModule.Movement:Face(Vector3.new(-1.268, 6.636, 5.186));
+						revasNpcClass.Chat(player, "Pull the lever now!");
+						revasNpcClass.Move:Face(Vector3.new(-1.268, 6.636, 5.186));
 
-						local classPlayer = shared.modPlayers.get(player);
-						local playerHead = classPlayer.Head;
+						local playerHead = playerClass.Head;
 
-						revasModule.Move:HeadTrack(playerHead);
+						revasNpcClass.Move:HeadTrack(playerHead);
 						task.delay(2, function()
-							revasModule.Move:HeadTrack(playerHead);
-							revasModule.Prefab:SetAttribute("LookAtClient", false);
+							revasNpcClass.Move:HeadTrack(playerHead);
+							revasNpcClass.Character:SetAttribute("LookAtClient", false);
 						end)
 						task.delay(4, function()
-							revasModule.Movement:SetWalkSpeed("default", 16);
-							revasModule.Movement:Move(Vector3.new(-25.928, -7.538, -12.168)):OnComplete(function()
-								revasModule:TeleportHide();
+							revasNpcClass.Move:SetMoveSpeed("set", "default", 16);
+							revasNpcClass.Move:MoveTo(Vector3.new(-25.928, -10.738, -7.868));
+							revasNpcClass.Move.OnMoveToEnded:Once(function()
+								revasNpcClass:TeleportHide();
 							end)
 						end)
 
@@ -1053,58 +1154,70 @@ return function(CutsceneSequence)
 
 						Debugger:Warn("missionChoice", missionChoice);
 
-						patrickModule.Prefab:SetAttribute("LookAtClient", false);
-						patrickModule.Humanoid.PlatformStand = false;
+						patrickNpcClass.Character:SetAttribute("LookAtClient", false);
+						patrickNpcClass.Humanoid.PlatformStand = false;
 
-						local interactPoint = Instance.new("Attachment");
-						interactPoint.Name = "InteractPoint";
-						interactPoint.Parent = patrickModule.RootPart;
-						interactPoint.Position = Vector3.new(2.108, -0.03, 0.001);
+						local pathToInteract = Instance.new("Attachment");
+						pathToInteract.Name = "PathToInteract";
+						pathToInteract.Parent = patrickNpcClass.RootPart;
+						pathToInteract.Position = Vector3.new(2.108, -0.03, 0.001);
 
 						if closedGates then -- Helped Rats
 							local fakeStanModel = workspace.Environment:WaitForChild("StansRejuvenation"):WaitForChild("Stan");
 
 							task.wait(3);
-							stanModule.Actions:Teleport(fakeStanModel.PrimaryPart.CFrame);
-							stanModule.Interactable.Parent = script;
-							stanModule.Movement:Face(Vector3.new(-1.322, -0.012, 0.781));
+							stanNpcClass:SetCFrame(fakeStanModel:GetPivot());
+							stanNpcClass:ToggleInteractable(false);
+							stanNpcClass.Move:Face(Vector3.new(-1.322, -0.012, 0.781));
 
 							game.Debris:AddItem(fakeStanModel, 0);
-							stanModule.AvatarFace:Set("Infector");
-							stanModule.PlayAnimation("Scream");
+							stanNpcClass:GetComponent("AvatarFace"):Set("Infector");
+							stanNpcClass.PlayAnimation("Scream");
 
 							local s = modAudio.Play("ZombieGroan", workspace);
 							s.Volume = 1;
 							local reverb = Instance.new("ReverbSoundEffect");
 							reverb.Parent = s;
 
-							stanModule.Movement:SetWalkSpeed("default", 30);
+							stanNpcClass.Move:SetMoveSpeed("set", "default", 30);
 
 							task.spawn(function()
-								local targetGoon = banditGoons[1];
+								local targetGoon: NpcClass = banditGoons[1];
 
 								local function hunt(playScream)
 									repeat
-										stanModule.AttackMode = true;
-										stanModule.Movement:Move(targetGoon.RootPart.Position);
-										if (stanModule.RootPart.Position-targetGoon.RootPart.Position).Magnitude <= 6 then
-											stanModule.PlayAnimation("Attack");
+										stanNpcClass.Properties.AttackMode = true;
+
+										local targetPosition = targetGoon.RootPart.Position;
+										local targetDist = stanNpcClass:DistanceFromCharacter(targetPosition);
+
+										if targetDist <= 100 then
+											stanNpcClass.Move:MoveTo(targetGoon.RootPart.Position);
+										end
+										if targetDist <= 6 then
+											stanNpcClass.PlayAnimation("Attack");
 											modAudio.Play("Slice", workspace).PlaybackSpeed = 0.5;
 											modAudio.Play("Punch", workspace).PlaybackSpeed = 0.7;
 											task.wait(0.2);
-											targetGoon.Humanoid.Health = 0;
+
+											targetGoon.HealthComp:SetIsDead(true);
 											modAudio.Play("HumanDeath", workspace);
 											task.wait(0.4);
 
 											if playScream then
-												stanModule.PlayAnimation("Scream");
+												stanNpcClass.PlayAnimation("Scream");
 												modAudio.Play("ZombieGroan", workspace);
 												task.wait(0.4);
 											end
 											task.wait(0.4);
 										end
 										task.wait();
-									until targetGoon.IsDead == true;
+
+										if targetDist > 256 then
+											Debugger:Warn(`Target {targetGoon.Name}#{targetGoon.Character:GetAttribute("Cutscene")} too far!`);
+											break;
+										end
+									until targetGoon.HealthComp.IsDead == true;
 								end
 								hunt(true);
 
@@ -1115,59 +1228,68 @@ return function(CutsceneSequence)
 								hunt(true);
 
 								task.wait(2);
-								stanModule.Movement:Move(Vector3.new(-18.351, 1.88, 110.928)):OnComplete(function() 
-									stanModule:TeleportHide();
+								stanNpcClass.Move:MoveTo(Vector3.new(-18.351, 1.88, 110.928));
+								stanNpcClass.Move.OnMoveToEnded:Once(function() 
+									stanNpcClass:TeleportHide();
 								end)
 							end)
 
 							local lastDamaged = tick();
-							stanModule.Garbage:Tag(stanModule.Humanoid.HealthChanged:Connect(function()
-								stanModule.Humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOn; lastDamaged = tick();
-								delay(2, function()
-									if tick()-lastDamaged > 2 and stanModule.Humanoid then
-										stanModule.Humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff
+							stanNpcClass.Properties.Immortal = 0.2;
+							stanNpcClass.HealthComp.OnHealthChanged:Connect(function()
+								stanNpcClass.Humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOn; lastDamaged = tick();
+								task.delay(2, function()
+									if tick()-lastDamaged > 2 and stanNpcClass.Humanoid then
+										stanNpcClass.Humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff;
 									end;
 								end);
 
 								task.wait();
-								local hurtSound = modAudio.Play("ZombieHurt", stanModule.RootPart);
+								local hurtSound = modAudio.Play("ZombieHurt", stanNpcClass.RootPart);
 								hurtSound.Volume = math.random(50, 60)/100;
 								hurtSound.PlaybackSpeed = math.random(110, 120)/100;
-							end));
-
-							ratGoons[3].Movement:SetWalkSpeed("default", 12);
-							ratGoons[3].Movement:Move(Vector3.new(-31.179, 5.066, -11.033)):OnComplete(function()
-								ratGoons[3]:TeleportHide();
 							end)
+
+							local ratGoon3: NpcClass = ratGoons[3];
+							if not ratGoon3.HealthComp.IsDead then
+								ratGoon3.Move:SetMoveSpeed("set", "default", 12);
+								ratGoon3.Move:MoveTo(Vector3.new(-31.179, 5.066, -11.033));
+								ratGoon3.Move.OnMoveToEnded:Once(function()
+									ratGoon3:TeleportHide();
+								end)
+							end
 							for a=1, #banditGoons do
-								banditGoons[a].Immortal = nil;
+								banditGoons[a].Properties.Immortal = nil;
 							end
 
 						else -- Helped Bandits;
 							for a=1, #ratGoons do
-								ratGoons[a].Immortal = nil;
+								ratGoons[a].Properties.Immortal = nil;
 							end
-							stanModule.AttackMode = true;
+							stanNpcClass.Properties.AttackMode = true;
 
-							ratGoons[2].Movement:SetWalkSpeed("default", 12);
-							ratGoons[2].Movement:Move(Vector3.new(28.452, 5.066, -11)):OnComplete(function()
+							ratGoons[2].Move:SetMoveSpeed("set", "default", 12);
+							ratGoons[2].Move:MoveTo(Vector3.new(28.452, 5.066, -11));
+							ratGoons[2].Move.OnMoveToEnded:Once(function()
 								ratGoons[2]:TeleportHide();
 							end)
 
-							ratGoons[3].Movement:SetWalkSpeed("default", 12);
-							ratGoons[3].Movement:Move(Vector3.new(-31.179, 5.066, -11.033)):OnComplete(function()
+							ratGoons[3].Move:SetMoveSpeed("set", "default", 12);
+							ratGoons[3].Move:MoveTo(Vector3.new(-31.179, 5.066, -11.033));
+							ratGoons[3].Move.OnMoveToEnded:Once(function()
 								ratGoons[3]:TeleportHide();
 							end)
 
-							banditGoons[3].Movement:SetWalkSpeed("default", 12);
-							banditGoons[3].Movement:Move(Vector3.new(-18.351, 1.88, 110.928)):OnComplete(function()
+							banditGoons[3].Move:SetMoveSpeed("set", "default", 12);
+							banditGoons[3].Move:MoveTo(Vector3.new(-18.351, 1.88, 110.928));
+							banditGoons[3].Move.OnMoveToEnded:Once(function()
 								banditGoons[3]:TeleportHide();
 							end)
 
 						end
 
 						task.spawn(function()
-							local clientEffect = game.ServerScriptService.ServerLibrary.Entity.Npc["Bandit Pilot"].HelicopterEffect:Clone();
+							local clientEffect = game.ServerScriptService.ServerLibrary.Entity.Npcs["Bandit Pilot"].HelicopterEffect:Clone();
 
 							local prefabTag = clientEffect:WaitForChild("Prefab");
 							prefabTag.Value = workspace.Environment.BanditHelicopterRig;
@@ -1176,22 +1298,33 @@ return function(CutsceneSequence)
 						end)
 
 
-						patrickModule.Interactable.Parent = script;
+						patrickNpcClass:ToggleInteractable(false);
 
-						if patrickModule.RescueInteractable == nil then
-							local new = script:WaitForChild("rescuePatrickInteractable"):Clone();
-							new.Name = "Interactable";
-							new.Parent = patrickModule.Prefab;
-							patrickModule.RescueInteractable = new;
+						if patrickNpcClass.Properties.CarryInteractable == nil then
+							local newInteractable = modInteractables.createInteractable("Button");
+							newInteractable:SetAttribute("_Id", "mission58_RescuePatrick");
+							newInteractable:SetAttribute("_Label", "Carry Patrick");
+							newInteractable:SetAttribute("_Animation", "pickupcharacter");
+							newInteractable:SetAttribute("_InteractDuration", 2.95);
+
+							patrickNpcClass.Properties.CarryInteractable = newInteractable;
+							newInteractable.Parent = patrickNpcClass.Character;
 						end
 
 						task.delay(5, function()
 							local shipDoors = workspace.Environment.CargoShip.ShipDoors:GetChildren();
 							for a=1, #shipDoors do
-								if shipDoors[a]:GetAttribute("DoubleCross") == "A" then
-									local doorObj = shared.require(shipDoors[a].Door);
-									doorObj:Toggle(true);
-								end
+								if shipDoors[a]:GetAttribute("DoubleCross") ~= "A" then continue end;
+								local doorConfig = shipDoors[a]:FindFirstChild("Door");
+								
+								local doorObj = modDoors.getOrNew(doorConfig);
+								doorObj:Toggle(true);
+							end
+							
+							for a=1, #shipDoors do
+								local doorInteractConfig = shipDoors[a]:FindFirstChild("Interactable");
+								local doorInteractable = modInteractables.getOrNew(doorInteractConfig);
+								doorInteractable:SetPermissions("CanInteract", true);
 							end
 						end)
 
@@ -1205,7 +1338,8 @@ return function(CutsceneSequence)
 							local playerCf;
 							repeat
 								task.wait(0.2);
-								playerCf = classPlayer:GetCFrame();
+								if playerClass.Character == nil then return end;
+								playerCf = playerClass:GetCFrame();
 							until playerCf.Y >= 12.5 and playerCf.Z >= 33;
 
 							Debugger:Log("Helicopter leaves");
@@ -1216,16 +1350,20 @@ return function(CutsceneSequence)
 							task.wait(3);
 
 							for ct=18.2, 18.6, 0.008 do
-								game.Lighting.ClockTime =ct;
+								game.Lighting.ClockTime = ct;
 								task.wait(0.1);
 							end
 						end)
 
 						for _, obj in pairs(gateLever.LeftGate:GetChildren()) do
-							if obj:IsA("BasePart") then obj.CanCollide = true; end;
+							if obj:IsA("BasePart") then 
+								obj.CanCollide = true;
+							end;
 						end
 						for _, obj in pairs(gateLever.RightGate:GetChildren()) do
-							if obj:IsA("BasePart") then obj.CanCollide = true; end;
+							if obj:IsA("BasePart") then 
+								obj.CanCollide = true;
+							end;
 						end
 
 						local enemySpawns = game.ServerStorage.EnemySpawns:GetChildren()
@@ -1243,18 +1381,17 @@ return function(CutsceneSequence)
 						end
 						CutsceneSequence:NextScene("endCutscene");
 
-
 					elseif mission.ProgressionPoint == 16 then
-
 						local eventObj = modEvents:GetEvent(player, "mission58choice");
 						local closedGates = eventObj.ClosedGates == true;
 
 						local shipDoors = workspace.Environment.CargoShip.ShipDoors:GetChildren();
 						for a=1, #shipDoors do
-							if shipDoors[a]:GetAttribute("DoubleCross") == "B" then
-								local doorObj = shared.require(shipDoors[a].Door);
-								doorObj:Toggle(true);
-							end
+							if shipDoors[a]:GetAttribute("DoubleCross") ~= "B" then continue end;
+							local doorConfig = shipDoors[a]:FindFirstChild("Door");
+							
+							local doorObj = modDoors.getOrNew(doorConfig);
+							doorObj:Toggle(true);
 						end
 
 						local enemySpawns = game.ServerStorage.EnemySpawns:GetChildren()
@@ -1273,10 +1410,10 @@ return function(CutsceneSequence)
 
 					elseif mission.ProgressionPoint == 17 then
 						CutsceneSequence:NextScene("escapeCargoShip");
+
 					end
+
 				elseif mission.Type == 3 then -- OnComplete
-
-
 				end
 			end
 			mission.Changed:Connect(OnChanged);
@@ -1291,11 +1428,11 @@ return function(CutsceneSequence)
 		end);
 
 		CutsceneSequence:NewScene("showBinds", function()
-			modInterface:ToggleGameBlinds(false, 5);
+			modClientGuis.toggleGameBlinds(false, 0.5);
 			modData.ToggleChat();
 		end);
 		CutsceneSequence:NewScene("hideBinds", function()
-			modInterface:ToggleGameBlinds(true, 1);
+			modClientGuis.toggleGameBlinds(true, 1);
 			modData.ToggleChat();
 		end);
 
@@ -1331,31 +1468,32 @@ return function(CutsceneSequence)
 		end);
 
 		CutsceneSequence:NewScene("escapeCargoShip", function()
-			modInterface:ToggleGameBlinds(false, 3);
+			modClientGuis.toggleGameBlinds(false, 3);
 		end)
 		
 
+	--MARK: Safehome
 	elseif modBranchConfigs.IsWorld("Safehome") then
-
+		
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player = players[1];
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
-			local npcSpawns = workspace:FindFirstChild("Spawns");
+			local safehomeClass = shared.WorldCore.SafehomeClass;
 			repeat
-				npcSpawns = workspace:FindFirstChild("Spawns");
-				Debugger:Log("Waiting for (workspace.Spawns).")
+				safehomeClass = shared.WorldCore.SafehomeClass;
+				Debugger:Log("Waiting for (safehomeClass).")
 				task.wait(0.1);
-			until npcSpawns ~= nil;
+			until safehomeClass ~= nil;
 
-			local cp = shared.modSafehomeService.GetNpcSpot("Patrick");
+			local playerClass: PlayerClass = shared.modPlayers.get(player);
 
-			local classPlayer = shared.modPlayers.get(player);
-			local patrickModule;
+			local patrickNpcClass: NpcClass;
 			local function OnChanged(firstRun)
 				local spawnPatrick = 0;
+				local spawnAtt = safehomeClass:GetNpcSpot("Patrick");
 
 				if mission.Type == 1 then -- Active
 					if mission.ProgressionPoint > 16 then
@@ -1372,31 +1510,26 @@ return function(CutsceneSequence)
 				elseif mission.Type == 3 then -- OnComplete
 					spawnPatrick = 2;
 
-					if patrickModule then
-						patrickModule.Move:MoveTo(cp.WorldPosition);
+					if patrickNpcClass then
+						patrickNpcClass.Move:MoveTo(spawnAtt.WorldPosition);
 						task.spawn(function()
 							task.wait(0.1);
-							patrickModule.Move:Face(patrickModule.RootPart.Position + cp.WorldCFrame.LookVector);
+							patrickNpcClass.Move:Face(patrickNpcClass.RootPart.Position + spawnAtt.WorldCFrame.LookVector);
 						end)
 
 					end
 				end
 
 				if spawnPatrick > 0 then
-					patrickModule = modNpcs.getPlayerNpc(player, "Patrick");
+					patrickNpcClass = modNpcs.getPlayerNpc(player, "Patrick");
 
-					if patrickModule == nil then
-						local npc = modNpcs.spawn("Patrick", spawnPatrick == 2 and cp.WorldCFrame or classPlayer:GetCFrame(), function(npc, npcModule)
-							npcModule.Player = player;
-							patrickModule = npcModule;
+					if patrickNpcClass == nil then
+						modNpcs.spawn2{
+							Name = "Patrick";
+							CFrame = spawnPatrick == 2 and spawnAtt.WorldCFrame or playerClass:GetCFrame();
+							Player = player;
+						};
 
-							function npcModule.Initialize()
-								npcModule:AddComponent("ObjectScan");
-								npcModule:AddComponent("SafehomeSurvivor");
-								coroutine.yield();
-							end
-						end, modNpcs.NpcBaseConstructors.CutsceneHuman);
-						modReplicationManager.ReplicateOut(player, npc);
 					end
 				end
 			end

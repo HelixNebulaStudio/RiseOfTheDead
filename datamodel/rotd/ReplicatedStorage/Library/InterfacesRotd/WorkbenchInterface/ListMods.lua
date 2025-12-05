@@ -89,9 +89,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						local pmd = equipmentClass.Configurations.PreModDamage;
 
 						if upgradeInfo.Name == "Damage" then
-							desc = desc .."\n"
-							desc = desc ..'<font size="16"><b>'.."Flat Damage:  "..'</b></font>';
-							desc = desc.. "+".. math.round((pmd * (upgradeValue + tweakBonusValue))*100)/100;
+							desc = desc ..`    <b>≈</b>   +{math.round((pmd * (upgradeValue + tweakBonusValue))*100)/100}`;
 						end
 					end
 

@@ -7,7 +7,7 @@ local Dialogues = {
 	Wilson={};
 };
 
-local missionId = 51;
+local MISSION_ID = 51;
 --==
 
 -- MARK: Wilson Dialogues
@@ -33,7 +33,7 @@ Dialogues.Wilson.DialogueStrings = {
 		Reply="We need to make contact. If we can prove ourselves useful, they will protect us. We can give them information in exchange for their help.";
 	};
 	["qa1_radio"]={
-		CheckMission=missionId; 
+		CheckMission=MISSION_ID; 
 		Face="Confident"; 
 		Say="Okay, I'm on it."; 
 		Reply="We need a stronger radio to try to broadcast our message to them.. Look for any military grade radio to try to make contact and tell them Wilson from squad B is still alive.";
@@ -78,7 +78,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("qa1_done", function(dialog)
 					dialog:AddChoice("qa1_done2", function(dialog)
 						dialog:AddChoice("qa1_done3", function(dialog)
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 						end)
 					end)
 				end)
@@ -91,7 +91,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("qa1_sample", function(dialog)
 						dialog:AddChoice("qa1_contact", function(dialog)
 							dialog:AddChoice("qa1_radio", function(dialog)
-								modMission:StartMission(player, missionId);
+								modMission:StartMission(player, MISSION_ID);
 							end)
 						end)
 					end)

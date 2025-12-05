@@ -8,8 +8,6 @@ local MISSION_ID = 70;
 if RunService:IsServer() then
 	local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-	
 
 	shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, damageData: DamageData)
 		local storageItem: StorageItem? = damageData.StorageItem;
@@ -28,7 +26,7 @@ if RunService:IsServer() then
 
 		local mission: Mission = modMission:GetMission(player, MISSION_ID);
 		if mission and mission.Type == 1 and toolWorkbenchLib and table.find(toolWorkbenchLib.Type, "Melee") ~= nil then
-			if damageTo.Immunity == nil or damageTo.Immunity <= 0 then return end;
+			if damageTo.Properties.Immunity == nil or damageTo.Properties.Immunity <= 0 then return end;
 			
 			modMission:Progress(player, MISSION_ID, function(mission)
 				mission.SaveData.Kills = mission.SaveData.Kills -1;

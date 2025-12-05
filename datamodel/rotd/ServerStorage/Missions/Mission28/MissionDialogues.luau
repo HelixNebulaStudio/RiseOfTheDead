@@ -7,19 +7,19 @@ local Dialogues = {
 	Carlson={};
 };
 
-local missionId = 28;
+local MISSION_ID = 28;
 --==
 
 -- !outline: Carlson Dialogues
 Dialogues.Carlson.DialogueStrings = {
 	--== Safety Safehouse
 	["safetysafehouse_goodGotTime"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Yeah, I got time."; 
 		Reply="Good, I think we should fortify the front with some metal walls.";
 	};
 	["safetysafehouse_badGotTime"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Say="Yeah, I got time."; 
 		Reply="Good, since the bandits took our metal, we'll need metal to build some metal walls in the front.";
 	};
@@ -75,7 +75,7 @@ if RunService:IsServer() then
 			and mission.ObjectivesCompleted["addWall3"]
 			and mission.ObjectivesCompleted["addWall4"] then
 				dialog:AddChoice("safetysafehouse_complete", function(dialog)
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 					if data:Get("thebackup_gaveMetal") then
 						data:Set("thebackup_claimedMetal", false);
 					end
@@ -89,7 +89,7 @@ if RunService:IsServer() then
 			
 			local function start(dialog)
 				dialog:AddChoice("safetysafehouse_start", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 					data:Set("Karma", (data:Get("Karma") or 0) + karma);
 				end)
 			end

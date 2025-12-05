@@ -7,13 +7,13 @@ local Dialogues = {
 	Joseph={};
 };
 
-local missionId = 37;
+local MISSION_ID = 37;
 --==
 
 -- MARK: Joseph Dialogues
 Dialogues.Joseph.DialogueStrings = {
 	["josephsLettuce_start"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Face="Joyful";
 		Say="Sure, how do I help make the watering can?"; 
 		Reply="Here's a blueprint, after you're done please also water the plants for me.";
@@ -43,14 +43,14 @@ if RunService:IsServer() then
 			or mission.ObjectivesCompleted["jlLettuce2"] == true
 			or mission.ObjectivesCompleted["jlLettuce3"] == true then
 				dialog:AddChoice("josephsLettuce_end", function(dialog)
-					modMission:CompleteMission(player, missionId);
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 			end
 			
 		elseif mission.Type == 2 then -- Available
 			dialog:SetInitiate("Ooh Howdy partner, my old watering can broke, do you mind helping me out?");
 			dialog:AddChoice("josephsLettuce_start", function(dialog)
-				modMission:StartMission(player, missionId, function(successful)
+				modMission:StartMission(player, MISSION_ID, function(successful)
 					if successful then
 						modBlueprints.UnlockBlueprint(player, "wateringcanbp");
 					end

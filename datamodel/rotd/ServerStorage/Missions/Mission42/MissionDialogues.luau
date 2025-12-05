@@ -7,13 +7,13 @@ local Dialogues = {
 	Victor={};
 };
 
-local missionId = 42;
+local MISSION_ID = 42;
 --==
 
 -- MARK: Victor Dialogues
 Dialogues.Victor.DialogueStrings = {
 	["vt3_check"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Face="Happy";
 		Say="Sure?"; 
 		Reply="Cool, just let me know when you're ready to travel.";
@@ -68,7 +68,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Hey dude, I checked out the tombs after you cleared it. I need some help again in the tombs.", gaveMask and "Happy" or "Skeptical");
 			
 			dialog:AddChoice("vt3_check", function(dialog)
-				modMission:StartMission(player, missionId);
+				modMission:StartMission(player, MISSION_ID);
 			end)
 			
 		elseif mission.Type == 1 then -- Active;
@@ -84,7 +84,7 @@ if RunService:IsServer() then
 					end);
 				end
 			elseif modBranchConfigs.IsWorld("VindictiveTreasure") then
-				modMission:Progress(player, missionId, function(mission)
+				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint <= 2 then
 						mission.ProgressionPoint = 2;
 					end;
@@ -92,7 +92,7 @@ if RunService:IsServer() then
 				if mission.ProgressionPoint == 2 then
 					dialog:SetInitiate("Alright, I know there's another secret passage somewhere..", "Skeptical");
 					dialog:SetExpireTime(workspace:GetServerTimeNow()+6);
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint <= 2 then
 							mission.ProgressionPoint = 3;
 						end;
@@ -103,7 +103,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("vt3_bargain", function(dialog)
 						dialog:AddChoice("vt3_depress", function(dialog)
 							dialog:AddChoice("vt3_save", function(dialog)
-								modMission:Progress(player, missionId, function(mission)
+								modMission:Progress(player, MISSION_ID, function(mission)
 									if mission.ProgressionPoint <= 8 then
 										mission.SaveData.SaveVictor = 1;
 										mission.ProgressionPoint = 8;
@@ -111,7 +111,7 @@ if RunService:IsServer() then
 								end)
 							end)
 							dialog:AddChoice("vt3_dontsave", function(dialog)
-								modMission:Progress(player, missionId, function(mission)
+								modMission:Progress(player, MISSION_ID, function(mission)
 									if mission.ProgressionPoint <= 8 then
 										mission.SaveData.SaveVictor = 2;
 										mission.ProgressionPoint = 8;
@@ -127,7 +127,7 @@ if RunService:IsServer() then
 		elseif mission.Type == 4 then -- Failed
 			dialog:SetInitiate("Where did you go?!", "Angry");
 			dialog:AddChoice("vt3_vttravel", function(dialog)
-				modMission:StartMission(player, missionId);
+				modMission:StartMission(player, MISSION_ID);
 			end)
 			
 		end

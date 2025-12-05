@@ -7,7 +7,7 @@ local Dialogues = {
 	Joseph={};
 };
 
-local missionId = 56;
+local MISSION_ID = 56;
 --==
 
 -- MARK: Joseph Dialogues
@@ -22,7 +22,7 @@ Dialogues.Joseph.DialogueStrings = {
 		Reply="Thank god it was just my arm, it could have been worse.";
 	};
 	["eotl_patchup"]={
-		CheckMission=missionId; 
+		CheckMission=MISSION_ID; 
 		Face="Skeptical";
 		Say="Good to hear it, what should I do about Robert and the hole he escaped through?"; 
 		Reply="Nate patched up the hole a bit, I don't recommend going after him alone.. But it's up to you, I know you can take care of yourself.";
@@ -42,7 +42,7 @@ if RunService:IsServer() then
 			dialog:SetInitiateTag("eotl_init");
 			dialog:AddChoice("eotl_howsarm", function(dialog)
 				dialog:AddChoice("eotl_patchup", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end)
 			

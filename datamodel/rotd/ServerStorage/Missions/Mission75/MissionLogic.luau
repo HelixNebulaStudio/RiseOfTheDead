@@ -3,9 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local MissionFunctions = {};
 local RunService = game:GetService("RunService");
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modMapLibrary = shared.require(game.ReplicatedStorage.Library.MapLibrary);
 
-local missionId = 75;
+local MISSION_ID = 75;
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
@@ -28,25 +27,21 @@ if RunService:IsServer() then
 									task.wait(2.5);
 									if not game.Players:IsAncestorOf(player) then break; end;
 									
-									local classPlayer = shared.modPlayers.get(player);
-
-									local layerName, layerData = modMapLibrary:GetLayer(classPlayer:GetCFrame().Position);
-									if layerName == "Clinic Safehouse" then
-										modMission:Progress(player, missionId, function(mission)
+									local location = player:GetAttribute("Location");
+									if location == "Clinic Safehouse" then 
+										modMission:Progress(player, MISSION_ID, function(mission)
 											if mission.ProgressionPoint <= 3 then
 												mission.ProgressionPoint = 3;
 											end
-										end);
-										break;
+										end)
 									end
-
 								end
 							end)
 						end
 					end
 					
 				elseif mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 11 and not modBranchConfigs.IsWorld("MedicalBreakthrough") then
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						mission.ProgressionPoint = 3;
 					end);
 					

@@ -10,27 +10,36 @@ local modReplicationManager = shared.require(game.ReplicatedStorage.Library.Repl
 
 local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
-local missionId = 77;
+local MISSION_ID = 77;
 if RunService:IsServer() then
 	local modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-	
+
 	if modBranchConfigs.IsWorld("SunkenShip") then
-		modOnGameEvents:ConnectEvent("OnDoorEnter", function(player, interactData)
-			if interactData and interactData.Id == "ElderVexeronExit" then
-				modMission:Progress(player, missionId, function(mission)
-					if mission.ProgressionPoint <= 4 then
-						mission.ProgressionPoint = 4;
-					end
-				end);
-				
-				modStatusEffects.VexBile(player, 0);
-			end
+		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(event: EventPacket, ...)
+			local player = event.Player;
+			if player == nil then return end;
+
+			local interactable: InteractableInstance = ...;
+			if interactable.Id ~= "ElderVexeronExit" then return end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint <= 4 then
+					mission.ProgressionPoint = 4;
+				end
+			end);
+			
+			modStatusEffects.VexBile(player, 0);
 		end)
 		
-		modOnGameEvents:ConnectEvent("OnEatenByVexeron", function(player, npcModule)
-			local mission = modMission:GetMission(player, missionId);
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(event: EventPacket, ...)
+			local player = event.Player;
+			if player == nil then return end;
+
+			local triggerId: string, vexeronNpcClass: NpcClass = ...;
+			if triggerId ~= "EatenByVexeron" then return end;
+
+			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
 			if not (mission.Type == 1 and mission.ProgressionPoint == 1) then return end;
@@ -39,30 +48,33 @@ if RunService:IsServer() then
 			modStatusEffects.VexBile(player, 10);
 			
 			modAudio.Play("JawsChomp", workspace);
+
+			local playerClass: PlayerClass = shared.modPlayers.get(player);
 			
 			local vexeronRoom = workspace.Environment:WaitForChild("VexeronRoom");
 			local enterPart = vexeronRoom:WaitForChild("Entrance");
 			local destination = enterPart:WaitForChild("Destination");
 			local tpCframe = CFrame.new(destination.WorldPosition) * CFrame.Angles(0, 0, 0);
-			shared.modAntiCheatService:Teleport(player, tpCframe);
+			playerClass:SetCFrame(tpCframe);
 			
-			modMission:Progress(player, missionId, function(mission)
+			modMission:Progress(player, MISSION_ID, function(mission)
 				if mission.ProgressionPoint <= 2 then
 					mission.ProgressionPoint = 2;
 				end
 			end);
 			
-			if npcModule.SnoozeState == 1 then return end;
-			npcModule.SnoozeState = 1;
+			if vexeronNpcClass.Properties.SnoozeState == 1 then return end;
+			vexeronNpcClass.Properties.SnoozeState = 1;
 
 			task.spawn(function()
 				while mission.ProgressionPoint <= 2 do
-					npcModule.SnoozeTimer = tick();
+					vexeronNpcClass.Properties.SnoozeTimer = tick();
 					task.wait(1);
 				end
-				npcModule.SnoozeTimer = tick()-240;
+				vexeronNpcClass.Properties.SnoozeTimer = tick()-240;
 			end)
 		end)
+		
 	end
 	
 	function MissionFunctions.Init(missionProfile, mission)
@@ -176,7 +188,7 @@ if RunService:IsServer() then
 								if crateFound[a] ~= true then
 									crateFound[a] = true;
 									
-									modMission:Progress(player, missionId, function(mission)
+									modMission:Progress(player, MISSION_ID, function(mission)
 										mission.SaveData.PieceFound = (mission.SaveData.PieceFound or 0) +1;
 										if mission.SaveData.PieceFound >= 2 then
 											mission.ProgressionPoint = 3;
@@ -208,13 +220,13 @@ if RunService:IsServer() then
 	
 				elseif mission.Type == 1 then -- OnActive
 					if mission.ProgressionPoint == 2 then
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 1;
 						end);
 
 
 					elseif mission.ProgressionPoint == 3 then
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 4;
 						end);
 						
@@ -260,7 +272,7 @@ if RunService:IsServer() then
 								end)
 								if bpPieceExist then return end;
 								
-								modMission:Progress(player, missionId, function(mission)
+								modMission:Progress(player, MISSION_ID, function(mission)
 									mission.ProgressionPoint = 6;
 									Debugger.Expire(newPrefab, 1);
 								end);

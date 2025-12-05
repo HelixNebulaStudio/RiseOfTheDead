@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local CollectionService = game:GetService("CollectionService");
+local RunService = game:GetService("RunService")
 
 local modArcTracing = shared.require(game.ReplicatedStorage.Library.ArcTracing);
 
@@ -15,7 +16,9 @@ local treePackage = {
 
 function treePackage.onRequire()
 	local arcTracer = modArcTracing.new();
-	--arcTracer.DebugArc = true;
+    if RunService:IsStudio() then
+	    arcTracer.DebugArc = true;
+    end
 	arcTracer.RayRadius = 0.5;
 	arcTracer.Acceleration = Vector3.new(0, -workspace.Gravity+90, 0);
 	arcTracer.Delta = 1/7;
@@ -234,13 +237,13 @@ function treePackage.ThrowZombie(npcClass: NpcClass)
 
             throwNpcModule.Humanoid.PlatformStand = true;
             arcPoint.AlignCFrame = arcPoint.AlignCFrame * downAng;
-            stunStatus.Expires=tick()+0.2;
+            stunStatus.Expires = tick()+0.2;
             lastVelocity = arcPoint.Velocity;
 
             return;
         end);
 
-        throwNpcModule.SetAggression = 3;
+        throwNpcModule.Properties.HordeAggression = true;
         task.spawn(function()
             throwNpcModule.RootPart.Massless = false;
             if lastVelocity then

@@ -22,9 +22,9 @@ return function(interface: InterfaceInstance, window, frame)
 	local stopWatchRs = nil;
 	modeHud.Soundtrack = nil;
 	
-	function modeHud:Update(data)
-		local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+	local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
 
+	function modeHud:Update(data)
 		modConfigurations.Set("AutoMarkEnemies", true);
 		local gameType = data.Type;
 		local gameStage = data.Stage;

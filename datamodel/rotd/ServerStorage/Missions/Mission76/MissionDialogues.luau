@@ -7,7 +7,7 @@ local Dialogues = {
 	Rachel={};
 };
 
-local missionId = 76;
+local MISSION_ID = 76;
 local cache = {};
 
 --==
@@ -89,7 +89,7 @@ if RunService:IsServer() then
 					tradingSession:BindStateUpdate(function()
 						Debugger:Warn("Tradding State", tradingSession.State);
 						if tradingSession.State == 3 then
-							modMission:CompleteMission(player, 76);
+							modMission:CompleteMission(player, MISSION_ID);
 						end
 					end)
 

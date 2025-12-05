@@ -6,9 +6,9 @@ local RunService = game:GetService("RunService");
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 local wallTriggers = script:WaitForChild("WallTriggers");
-local templateInteractable = script:WaitForChild("Interactable");
 
 --== Variables;
 local MISSION_ID = 28;
@@ -18,17 +18,16 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modDialogues = shared.require(game.ServerScriptService.ServerLibrary.DialogueSave);
-	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-
+	
 	if modBranchConfigs.IsWorld("TheUnderground") then
-		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(event: EventPacket, interactData, ...)
-			local player: Player? = event.Player;
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(event: EventPacket, ...) 
+			local player = event.Player;
 			if player == nil then return end;
 
-			local triggerId = interactData.TriggerTag;
+			local triggerId: string, interactable: InteractableInstance = ...;
 			if triggerId ~= "SafetySafehouse:Add" then return end;
 
-			local subId = interactData.SubId;
+			local subId = interactable.Values.SubId;
 			if subId == nil then Debugger:Warn("SafetySafehouse:Add>>  Missing sub id."); return end;
 			
 			local mission = modMission:Progress(player, MISSION_ID);
@@ -40,10 +39,9 @@ if RunService:IsServer() then
 			end
 
 			local profile = shared.modProfile:Get(player);
-			local playerSave = profile:GetActiveSave();
-			local inventory = playerSave.Inventory;
+			local inventory = profile.ActiveInventory;
 
-			local playerGaveMetal = interactData.GaveMetal == true;
+			local playerGaveMetal = interactable.Values.GaveMetal == true;
 			local build = false;
 			
 			if not playerGaveMetal then
@@ -63,13 +61,15 @@ if RunService:IsServer() then
 			else
 				build = true;
 			end
+
 			if build then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					mission.ObjectivesCompleted[subId] = true;
 				end)
 				
-				local wallObjects = interactData.Object and interactData.Object:FindFirstChild("Objects");
-				local interactables = interactData.Object and interactData.Object:FindFirstChild("Interactables");
+				local interactPart = interactable.Part;
+				local wallObjects = interactPart and interactPart:FindFirstChild("Objects");
+				local interactables = interactPart and interactPart:FindFirstChild("Interactables");
 				
 				if interactables then 
 					modReplicationManager.ReplicateIn(player, interactables, workspace.Interactables);
@@ -85,7 +85,8 @@ if RunService:IsServer() then
 				if wallObjects and wallObjects.PrimaryPart then
 					modAudio.Play("Repair", wallObjects.PrimaryPart);
 				end
-				interactData.Object:Destroy();
+
+				interactPart:Destroy();
 			end
 				
 		end)
@@ -126,22 +127,21 @@ return function(CutsceneSequence)
 							parts[a].Transparency = 0.5;
 						end
 					end
-					local newInteractable = templateInteractable:Clone();
-					newInteractable.Parent = newObj;
-					
-					local modInteractable = shared.require(newInteractable);
-					modInteractable.Object = newObj;
-					modInteractable.GaveMetal = gaveMetal;
-					modInteractable.SubId = obj.Name;
+
+					local newInteractConfig = modInteractables.createInteractable("ButtonRotd");
+					newInteractConfig:SetAttribute("_Id", "SafetySafehouse:Add");
 
 					if gaveMetal then
-						modInteractable.Label = obj.Name == "addDoorway" and "Build doorway" or "Build wall";
+						newInteractConfig:SetAttribute("_Label", obj.Name == "addDoorway" and "Build doorway" or "Build wall");
 					else
-						modInteractable.Label = obj.Name == "addDoorway" and "Build doorway with 100 metal scrap" or "Build wall with 100 metal scrap";
+						newInteractConfig:SetAttribute("_Label", obj.Name == "addDoorway" and "Build doorway with 100 metal scrap" or "Build wall with 100 metal scrap");
 					end
-					
+
+					newInteractConfig:SetAttribute("SubId", obj.Name);
+					newInteractConfig:SetAttribute("GaveMetal", gaveMetal);
+					newInteractConfig.Parent = newObj;
+
 					modReplicationManager.ReplicateIn(player, newObj, workspace.Interactables);
-					modInteractable:Sync();
 					
 				else
 					modReplicationManager.ReplicateIn(player, newObj:WaitForChild("Objects"), workspace.Environment);

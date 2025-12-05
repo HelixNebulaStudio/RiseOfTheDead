@@ -39,31 +39,22 @@ local npcPackage = {
 function npcPackage.LevelSet(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
     local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local healthComp: HealthComp = npcClass.HealthComp;
 
     local level = math.max(properties.Level, 0);
 
-    local lvlHealth = math.max(50 + 50*level, 50)-1;
     local lvlMoveSpeed = math.clamp(18 + math.floor(level/10), 1, 35);
-    local lvlAttackDamage = (level/2);
+    configurations.BaseValues.WalkSpeed = lvlMoveSpeed;
     
-    npcClass.Move.SetDefaultWalkSpeed = lvlMoveSpeed;
-    npcClass.Move:Init();
-    
-    local healthComp: HealthComp = npcClass.HealthComp;
-    healthComp:SetMaxHealth(lvlHealth);
+    local lvlHealth = 50+(math.max(50 + 50*level, 50)-1);
+    configurations.BaseValues.MaxHealth = lvlHealth;
+
+    local lvlAttackDamage = 5+(level/2);
+    configurations.BaseValues.AttackDamage = lvlAttackDamage;
+
     if healthComp.LastDamagedBy == nil then
         healthComp:Reset();
     end
-
-    local levelstatModifier = configurations:GetModifier("LevelStat");
-    if levelstatModifier == nil then
-        levelstatModifier = configurations.newModifier("LevelStat");
-    end
-    
-    levelstatModifier.SumValues.MaxHealth = lvlHealth;
-    levelstatModifier.SumValues.AttackDamage = lvlAttackDamage;
-
-    configurations:AddModifier(levelstatModifier, false);
 end
 
 function npcPackage.Spawning(npcClass: NpcClass)

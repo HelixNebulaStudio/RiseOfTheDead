@@ -10,7 +10,7 @@ local Dialogues = {
 	Patrick={};
 };
 
-local missionId = 73;
+local MISSION_ID = 73;
 --==
 
 -- MARK: Patrick Dialogues
@@ -55,7 +55,13 @@ if RunService:IsServer() then
 			local profile = shared.modProfile:Get(player);
 			local factionTag = tostring(profile.Faction.Tag);
 			
-			if shared.modSafehomeService.FactionTag == nil then
+			local safehomeClass = shared.WorldCore.SafehomeClass;
+			if safehomeClass == nil then
+				Debugger:Warn("Missing safehomeClass");
+				return;
+			end
+
+			if safehomeClass.FactionTag == nil or safehomeClass.FactionTag ~= factionTag then
 				Debugger:Warn("Not faction headquarters");
 				
 				dialog:AddChoice("dps_goToHq", function(dialog)
@@ -65,7 +71,7 @@ if RunService:IsServer() then
 				return;
 			end
 		
-			local coopMission = modCoopMission:Get(factionTag, missionId);
+			local coopMission = modCoopMission:Get(factionTag, MISSION_ID);
 			
 			if coopMission == nil then 
 				Debugger:Warn("no coop mission yet")

@@ -2,6 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
+local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 --==
 local statusPackage = {
     Id="Chained";
@@ -24,7 +25,6 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     if #statusClass.Garbage.Trash <= 0 then
         statusClass.Expires = workspace:GetServerTimeNow();
 		statusClass:Sync();
-        Debugger:Warn("Expire Chained");
     end
 end
 
@@ -65,16 +65,23 @@ function statusPackage.Chain(statusClass: StatusClassInstance, duration: number,
 
 	tarRpValue.Value = rootPart;
 
-	local destructibleObj = shared.require(newAnchor:WaitForChild("Destructible"));
+	local destructConfig: Configuration = modDestructibles.createDestructible();
+	destructConfig.Parent = newAnchor;
 
-	destructibleObj:SetHealth(anchorHealth, anchorHealth);
-	function destructibleObj:OnDestroy()
+	local destructible: DestructibleInstance = modDestructibles.getOrNew(destructConfig);
+	destructible.Properties.DestroyModel = false;
+
+	destructible.HealthComp:SetMaxHealth(anchorHealth);
+	destructible.HealthComp:Reset();
+
+	destructible.OnDestroy:Connect(function()
 		game.Debris:AddItem(newAnchor, 0);
 		game.Debris:AddItem(anchorAtt, 0);
 		game.Debris:AddItem(newRope, 0);
 		game.Debris:AddItem(newChains, 0);
-	end
-	destructibleObj.Enabled = true;
+
+		Debugger.Expire(destructible.Model, 5);
+	end)
 
 	newAnchor.Parent = workspace.Environment;
 
@@ -87,7 +94,7 @@ function statusPackage.Chain(statusClass: StatusClassInstance, duration: number,
     statusClass.Garbage:Tag(newAnchor);
 
 	newAnchor.Destroying:Connect(function()
-		destructibleObj:OnDestroy();
+		destructible.HealthComp:SetIsDead(true);
         statusClass.Garbage:Untag(newAnchor);
 	end)
 

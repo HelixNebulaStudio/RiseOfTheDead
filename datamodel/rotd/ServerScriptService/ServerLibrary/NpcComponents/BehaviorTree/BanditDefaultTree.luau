@@ -6,7 +6,8 @@ local TALK_ANIMATIONS = {"nodyes"; "nodno"; "shrug2"; "laugh"; "point"; "bored";
 
 local treePackage = {
     LogicString = {
-        Default = "HasEnemy & ShareIntel & EquipWeapon & AlertTree | IdleTree";
+        Default = "!InCutscene & DefaultTree | [DoNothing]";
+        DefaultTree = "HasEnemy & ShareIntel & EquipWeapon & AlertTree | IdleTree";
         AlertTree = "IsUsingMelee & MeleeTree | RangeTree";
         MeleeTree = "InMeleeRange & [SwingMelee] | [RunToMeleeRange]";
         RangeTree = "CanFireGun & (RunToFireRange & [FireGun]) | (RunToCover & [ReloadGun])";
@@ -16,6 +17,10 @@ local treePackage = {
         ConverseTree = "ShareIntel & IsSpokenTo & [Converse]";
     };
 };
+
+function treePackage.InCutscene(npcClass: NpcClass)
+    return npcClass.Properties.CutsceneActive == true;
+end
 
 function treePackage.HasEnemy(npcClass: NpcClass)
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
@@ -116,10 +121,11 @@ function treePackage.InMeleeRange(npcClass: NpcClass)
 end
 
 function treePackage.RunToMeleeRange(npcClass: NpcClass)
+    local properties = npcClass.Properties;
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
 
-    npcClass.Move:SetMoveSpeed("set", "sprint", 18, 2, 5);
+    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 18, 2, 5);
     npcClass.Move:Follow(enemyNpcClass.RootPart, 2);
 end
 
@@ -144,10 +150,11 @@ function treePackage.CanFireGun(npcClass: NpcClass)
 end
 
 function treePackage.RunToFireRange(npcClass: NpcClass)
+    local properties = npcClass.Properties;
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
 
-    npcClass.Move:SetMoveSpeed("set", "sprint", 14, 2, 5);
+    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 14, 2, 5);
     npcClass.Move:Follow(enemyNpcClass.RootPart, 16, 24);
 
     return true;
@@ -174,10 +181,11 @@ function treePackage.FireGun(npcClass: NpcClass)
 end
 
 function treePackage.RunToCover(npcClass: NpcClass)
+    local properties = npcClass.Properties;
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
 
-    npcClass.Move:SetMoveSpeed("set", "sprint", 18, 2, 5);
+    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 18, 2, 5);
     npcClass.Move:Follow(enemyNpcClass.RootPart, 24, 32);
 
     return true;
@@ -228,7 +236,7 @@ function treePackage.Patrol(npcClass: NpcClass)
     
     if math.random(1, 100) == 1 
     and not npcClass.Move:IsAtPosition(npcClass.SpawnPoint.Position) and npcClass.Properties.SpokeByMeData == nil then
-        npcClass.Move:SetMoveSpeed("set", "walk", 8, 2, 2);
+        npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, 2, 2);
         npcClass.Move:MoveTo(npcClass.SpawnPoint.Position);
 
     else
@@ -243,7 +251,7 @@ function treePackage.Patrol(npcClass: NpcClass)
             end
 
             local patrolConverse = npcClass.NpcPackage.Chatter.PatrolConverse;
-            local pickedDialogue = patrolConverse[math.random(1, #patrolConverse)];
+            local pickedDialogue = patrolConverse and patrolConverse[math.random(1, #patrolConverse)] or nil;
             if pickedDialogue then
                 local nearbyBanditTargetData: NpcTargetData? = npcClass:GetComponent("TargetHandler"):MatchFirstTarget(function(targetData: NpcTargetData)
                     if targetData.HealthComp == nil then return end;
@@ -271,7 +279,7 @@ function treePackage.Patrol(npcClass: NpcClass)
                     };
 
                     if nearbyBanditTargetData.Distance > 10 then
-                        npcClass.Move:SetMoveSpeed("set", "walk", 8, 2, 3);
+                        npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, 2, 3);
 
                         local dir = (targetNpcClass.RootPart.Position - npcClass.RootPart.Position).Unit;
                         npcClass.Move:MoveTo(npcClass.RootPart.Position + (dir * 8));
@@ -357,14 +365,14 @@ function treePackage.ShareIntel(npcClass: NpcClass)
         if math.random(1, 3) == 1 then
             local alertPhrases = npcClass.NpcPackage.Chatter.AlertPhrases;
             local filteredAlertPhrases = {};
-            for a=1, #alertPhrases do
+            for a=1, #(alertPhrases or {}) do
                 local alertPhrase = alertPhrases[a];
                 if alertPhrase.HumanoidType == nil or alertPhrase.HumanoidType == enemyNpcClass.HumanoidType then
                     table.insert(filteredAlertPhrases, alertPhrase);
                 end
             end
 
-            local alertPhrase = filteredAlertPhrases[math.random(1, #filteredAlertPhrases)];
+            local alertPhrase = #filteredAlertPhrases >0 and filteredAlertPhrases[math.random(1, #filteredAlertPhrases)] or nil;
             if alertPhrase then
                 npcClass.Chat(nil, alertPhrase.Say);
             end
@@ -432,6 +440,10 @@ function treePackage.Converse(npcClass: NpcClass)
 
     local aniList = spokenToMeData.Dialogue.ReplyAnimations or TALK_ANIMATIONS;
     npcClass.PlayAnimation(aniList[math.random(1, #aniList)]);
+end
+
+function treePackage.DoNothing(npcClass: NpcClass)
+    return true;
 end
 
 return treePackage;
