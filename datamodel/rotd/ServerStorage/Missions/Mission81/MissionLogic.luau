@@ -90,7 +90,7 @@ if RunService:IsServer() then
 		local emoteId = ...;
 		if emoteId == nil then return end;
 
-		local modEmotesLibrary = shared.require(game.ReplicatedStorage.Library.EmotesLibrary);
+		local modEmotesLibrary = shared.require(game.ReplicatedStorage.Library.EmoteAnimationsLibrary);
 		local emoteLib = modEmotesLibrary:Find(emoteId);
 
 		local isDance = emoteLib and emoteLib.IsDance == true;

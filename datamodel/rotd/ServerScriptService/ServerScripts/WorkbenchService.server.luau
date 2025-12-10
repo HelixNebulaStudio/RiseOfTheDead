@@ -191,7 +191,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		local itemId = packet.ItemId;
 
 		local fulfillment = CheckBlueprintCost(player, itemId);
-		modOnGameEvents:Fire("OnCheckBlueprintCost", player, fulfillment);
+		shared.modEventService:ServerInvoke("WorkbenchService_BindCheckBlueprintCost", {ReplicateTo={player}}, itemId, fulfillment);
 
 		rPacket.Success = true;
 		rPacket.Fulfillment = fulfillment;
@@ -248,7 +248,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		end
 		
 		local buildDuration = bpLib.Duration;
-		modSkillTree:TriggerSkills(player, "OnBlueprintBuild", buildDuration, function(newDuration) buildDuration = newDuration; end);
+		modSkillTree:TriggerSkills(player, "SkillEvent_StartBuild", buildDuration, function(newDuration) buildDuration = newDuration; end);
 
 		local processPacket = {
 			Type=userWorkbench.ProcessTypes.Building;
@@ -260,7 +260,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		};
 		userWorkbench:NewProcess(processPacket);
 		
-		modOnGameEvents:Fire("OnBlueprintBuild", player, userWorkbench, processPacket);
+		shared.modEventService:ServerInvoke("WorkbenchService_BindStartBuild", {ReplicateTo={player}}, userWorkbench, processPacket);
 		
 		rPacket.Success = true;
 		return rPacket;
@@ -337,7 +337,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 			modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
 		end);
 
-		modOnGameEvents:Fire("OnItemBuilt", player, bpLib);
+		shared.modEventService:ServerInvoke("WorkbenchService_BindClaimBuild", {ReplicateTo={player}}, bpLib);
 
 		userWorkbench:RemoveProcess(buildIndex);
 		userBlueprints:UnlockBlueprint(itemId);
@@ -402,10 +402,10 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 
 	local playerClass: PlayerClass = shared.modPlayers.get(player);
 	
-	local mod, storageOfMod = activeSave:FindItemFromStorages(modifierSiid);
-	if mod == nil then return 3; end
+	local modifierStorageItem, storageOfModifier = activeSave:FindItemFromStorages(modifierSiid);
+	if modifierStorageItem == nil then return 3; end
 	
-	local modLib = modItemModsLibrary.Get(mod.ItemId);
+	local modLib = modItemModsLibrary.Get(modifierStorageItem.ItemId);
 	
 	local function sortModsFunc(self)
 		local sortedList = {};
@@ -413,9 +413,9 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 			local modLib = modItemModsLibrary.Get(storageItemMod.ItemId);
 
 			table.insert(sortedList, {
-				StorageItem=storageItemMod;
-				Lib=modLib;
-				Index=(modLib.Tier or 1)*10000 + (modLib.Layer or 1)*1000 + (modLib.Order or 1);
+				StorageItem = storageItemMod;
+				Lib = modLib;
+				Index = (modLib.Tier or 1)*10000 + (modLib.Layer or 1)*1000 + (modLib.Order or 1);
 			});
 		end
 		table.sort(sortedList, function(a, b) return a.Index < b.Index; end);
@@ -430,9 +430,9 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 	
 	if action == 1 then --== Equip;
 		if modLib == nil then return 3; end
-		local item, _itemStorage = activeSave:FindItemFromStorages(siid);
+		local storageItem, _itemStorage = activeSave:FindItemFromStorages(siid);
 		
-		local toolWorkbenchLib = modWorkbenchLibrary.ItemUpgrades[item.ItemId];
+		local toolWorkbenchLib = modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId];
 		local toolCompatType = toolWorkbenchLib and toolWorkbenchLib.Type or nil;
 		if toolCompatType == nil then return 4; end
 		
@@ -455,7 +455,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 		
 		local storageForMod = activeSave.Storages[siid];
 		if storageForMod == nil then
-			local newModsContainer = modStorage.new(siid, "attachmentmods", player, item.ItemId);
+			local newModsContainer = modStorage.new(siid, "attachmentmods", player, storageItem.ItemId);
 			activeSave.Storages[siid] = newModsContainer;
 			
 			storageForMod = activeSave.Storages[siid];
@@ -479,14 +479,15 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 			end
 		end
 		
-		if item and mod and storageOfMod.Id ~= siid then
+		if storageItem and modifierStorageItem and storageOfModifier.Id ~= siid then
 			local emptyIndex = storageForMod:FindEmpty();
 			if emptyIndex then
-				modOnGameEvents:Fire("OnModEquipped", player, mod, item);
-				storageOfMod:SetIndex(player, modifierSiid, {Id=siid; Index=emptyIndex;});
+				shared.modEventService:ServerInvoke("WorkbenchService_BindModEquip", {ReplicateTo={player}}, modifierStorageItem, storageItem);
+
+				storageOfModifier:SetIndex(player, modifierSiid, {Id=siid; Index=emptyIndex;});
 				
 				local refreshStorages = {
-					storageOfMod:Shrink();
+					storageOfModifier:Shrink();
 					storageForMod:Shrink();
 				};
 				activeSave.AppearanceData:Update(activeSave.Clothing);
@@ -506,19 +507,19 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 		end
 
 	elseif action == 2 then --== Unequip;
-		local item = activeSave:FindItemFromStorages(storageOfMod.Id);
+		local item = activeSave:FindItemFromStorages(storageOfModifier.Id);
 		
-		if mod and item then
+		if modifierStorageItem and item then
 			local emptyIndex = inventory:FindEmpty();
 			if emptyIndex then
-				local refreshStorages = storageOfMod:SetIndex(player, modifierSiid, {Id=inventory.Id; Index=emptyIndex;});
-				if storageOfMod:Loop() <= 0 then
-					storageOfMod:Destroy();
+				local refreshStorages = storageOfModifier:SetIndex(player, modifierSiid, {Id=inventory.Id; Index=emptyIndex;});
+				if storageOfModifier:Loop() <= 0 then
+					storageOfModifier:Destroy();
 				else
-					storageOfMod:ConnectSort(sortModsFunc);
+					storageOfModifier:ConnectSort(sortModsFunc);
 				end
 				
-				table.insert(refreshStorages, storageOfMod:Shrink());
+				table.insert(refreshStorages, storageOfModifier:Shrink());
 				activeSave.AppearanceData:Update(activeSave.Clothing);
 				
 				local equipmentClass = playerClass.WieldComp:GetEquipmentClass(siid);
@@ -569,7 +570,7 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 					end
 					
 					playerSave:AwardAchievement("titoup");
-					modOnGameEvents:Fire("OnItemUpgraded", player, storageItem);
+					shared.modEventService:ServerInvoke("WorkbenchService_BindItemUpgraded", {ReplicateTo={player}}, storageItem);
 					
 					storageItem:Sync({upgradeInfo.DataTag});
 					playerSave.AppearanceData:Update(playerSave.Clothing);

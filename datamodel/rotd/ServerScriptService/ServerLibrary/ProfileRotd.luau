@@ -192,6 +192,7 @@ function modProfile.onRequire()
 
 		return;
 	end
+
 end
 
 return modProfile;

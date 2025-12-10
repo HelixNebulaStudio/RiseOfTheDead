@@ -15,7 +15,6 @@ local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 local modRaycastUtil = shared.require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 
 local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modToolService = shared.require(game.ServerScriptService.ServerLibrary.ToolService);
 
 shared.waitForIgnition();

@@ -31,84 +31,110 @@ if RunService:IsServer() then
 		end)
 	end)
 
-	modOnGameEvents:ConnectEvent("OnCheckBlueprintCost", function(player, eventData)
-		if not modMission:Progress(player, MISSION_ID) then return end;
+	shared.modEventService:OnInvoked("WorkbenchService_BindCheckBlueprintCost", function(eventPacket: EventPacket, ...)
+		local player = eventPacket.Player;
+		if player == nil then return end;
 
-		modMission:Progress(player, MISSION_ID, function(mission)
-			if mission.ProgressionPoint == 2 or mission.ProgressionPoint == 3 then
+		local itemId, fulfillment = ...;
 
-				modAnalyticsService:LogOnBoarding{
-					Player=player;
-					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_CheckBlueprintCost;
-				};
+		task.spawn(function()
+			if not modMission:Progress(player, MISSION_ID) then return end;
 
-			end;
-			if mission.ProgressionPoint == 2 then
-				mission.ProgressionPoint = 3;
-			end
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint == 2 or mission.ProgressionPoint == 3 then
+					modAnalyticsService:LogOnBoarding{
+						Player=player;
+						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_CheckBlueprintCost;
+					};
+					
+				end;
+				if mission.ProgressionPoint == 2 then
+					mission.ProgressionPoint = 3;
+				end
+			end)
 		end)
 	end)
 	
-	modOnGameEvents:ConnectEvent("OnBlueprintBuild", function(player, userWorkbench, processPacket)
-		local itemId = processPacket.ItemId;
-		if itemId ~= "pistoldamagebp" then return end;
-		if not modMission:Progress(player, MISSION_ID) then return end;
+	shared.modEventService:OnInvoked("WorkbenchService_BindStartBuild", function(eventPacket: EventPacket, ...)
+		local player = eventPacket.Player;
+		if player == nil then return end;
 
-		modMission:Progress(player, MISSION_ID, function(mission)
-			if mission.ProgressionPoint == 3 or mission.ProgressionPoint == 4 then
-				mission.ProgressionPoint = 5;
-				
-				local buildDuration = 10;
-				processPacket.BT=modSyncTime.GetTime()+buildDuration;
-				userWorkbench:Sync();
-				
-				task.delay(buildDuration-1, function()
-					modMission:Progress(player, MISSION_ID, function(mission)
-						if mission.ProgressionPoint == 4 or mission.ProgressionPoint == 5 then
-							mission.ProgressionPoint = 6;
-						end
+		local userWorkbench, processPacket = ...;
+
+		task.spawn(function()
+			local itemId = processPacket.ItemId;
+			if itemId ~= "pistoldamagebp" then return end;
+			if not modMission:Progress(player, MISSION_ID) then return end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint == 3 or mission.ProgressionPoint == 4 then
+					mission.ProgressionPoint = 5;
+					
+					local buildDuration = 10;
+					processPacket.BT=modSyncTime.GetTime()+buildDuration;
+					userWorkbench:Sync();
+					
+					task.delay(buildDuration-1, function()
+						modMission:Progress(player, MISSION_ID, function(mission)
+							if mission.ProgressionPoint == 4 or mission.ProgressionPoint == 5 then
+								mission.ProgressionPoint = 6;
+							end
+						end)
 					end)
-				end)
-				
-				modAnalyticsService:LogOnBoarding{
-					Player=player;
-					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_BuildDamageMod;
-				};
-			end;
+					
+					modAnalyticsService:LogOnBoarding{
+						Player=player;
+						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_BuildDamageMod;
+					};
+				end;
+			end)
 		end)
 	end)
 
-	modOnGameEvents:ConnectEvent("OnItemBuilt", function(player, blueprintLibrary)
-		if blueprintLibrary.Product ~= "pistoldamagemod" then return end;
-		if not modMission:Progress(player, MISSION_ID) then return end
+	shared.modEventService:OnInvoked("WorkbenchService_BindClaimBuild", function(eventPacket: EventPacket, ...)
+		local player = eventPacket.Player;
+		if player == nil then return end;
 
-		modMission:Progress(player, MISSION_ID, function(mission)
-			if mission.ProgressionPoint == 5 or mission.ProgressionPoint == 6 then
-				mission.ProgressionPoint = 7;
-			end;
+		local bpLib = ...;
 
-			modAnalyticsService:LogOnBoarding{
-				Player=player;
-				OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_CollectDamageMod;
-			};
-		end)
-			
-	end);
+		task.spawn(function()
+			if bpLib.Product ~= "pistoldamagemod" then return end;
+			if not modMission:Progress(player, MISSION_ID) then return end
 
-	modOnGameEvents:ConnectEvent("OnModEquipped", function(player, mod, item)
-		if mod.ItemId ~= "pistoldamagemod" then return end;
-		if not modMission:Progress(player, MISSION_ID) then return end
-
-		modMission:Progress(player, MISSION_ID, function(mission)
-			if mission.ProgressionPoint == 7 then
-				--mission.ProgressionPoint = 8;
-				modMission:CompleteMission(player, MISSION_ID);
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint == 5 or mission.ProgressionPoint == 6 then
+					mission.ProgressionPoint = 7;
+				end;
 
 				modAnalyticsService:LogOnBoarding{
 					Player=player;
-					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_Complete;
+					OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission5_CollectDamageMod;
 				};
-			end;
+			end)
+		end)
+	end)
+
+	shared.modEventService:OnInvoked("WorkbenchService_BindModEquip", function(eventPacket: EventPacket, ...) 
+		local player = eventPacket.Player;
+		if player == nil then return end;
+
+		local modifierStorageItem, storageItem = ...;
+
+		task.spawn(function()
+			if modifierStorageItem.ItemId ~= "pistoldamagemod" then return end;
+			if not modMission:Progress(player, MISSION_ID) then return end
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint == 7 then
+					--mission.ProgressionPoint = 8;
+					modMission:CompleteMission(player, MISSION_ID);
+
+					modAnalyticsService:LogOnBoarding{
+						Player = player;
+						OnBoardingStep = modAnalyticsService.OnBoardingSteps.Mission5_Complete;
+					};
+				end;
+			end)
 		end)
 	end)
 	

@@ -13,14 +13,12 @@ if RunService:IsServer() then
 	local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
-	shared.modEventService:OnInvoked("Generic_BindItemPickup", function(
-		event: EventPacket, 
-		interactData, 
-		storageItem: StorageItem
-	)
+	shared.modEventService:OnInvoked("Generic_BindItemPickup", function(event: EventPacket, ...)
 		local player: Player? = event.Player;
 		if player == nil then return end;
 		
+		local interactData, storageItem: StorageItem = ...;
+
 		task.spawn(function()
 			if interactData.Type ~= modInteractables.Types.Pickup then return end;
 			local itemId = interactData.ItemId;
@@ -39,6 +37,17 @@ if RunService:IsServer() then
 		end)
 	end)
 
+	shared.modEventService:OnInvoked("WorkbenchService_BindClaimBuild", function(eventPacket: EventPacket, ...)
+		local player = eventPacket.Player;
+		if player == nil then return end;
+
+		local bpLib = ...;
+		task.spawn(function()
+			if bpLib.Product ~= "electricmod" then return end;
+			if not modMission:Progress(player, MISSION_ID) then return end;
+			modMission:CompleteMission(player, MISSION_ID);
+		end)
+	end)
 
 	function MissionLogic.Init(missionProfile, mission)
 		local player: Player = missionProfile.Player;

@@ -12,6 +12,11 @@ export type GAME_EVENT_KEY_ROTD =
     | "Survivor_BindInventoryChanged"
     | "WorkbenchService_BindInterfaceToggle"
     | "WorkbenchService_BindItemSelect"
+    | "WorkbenchService_BindModEquip"
+    | "WorkbenchService_BindStartBuild"
+    | "WorkbenchService_BindClaimBuild"
+    | "WorkbenchService_BindCheckBlueprintCost"
+    | "WorkbenchService_BindItemUpgraded"
     ;
 
 export type DAMAGE_TYPE_ROTD =

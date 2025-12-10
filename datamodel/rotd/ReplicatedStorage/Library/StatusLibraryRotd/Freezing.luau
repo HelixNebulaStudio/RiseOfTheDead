@@ -29,7 +29,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
         modCharacter.CharacterProperties.CanSprint = false;
         modCharacter.CharacterProperties.CanAction = false;
 
-        local modEmotes = shared.require(game.ReplicatedStorage.Library.EmotesLibrary);
+        local modEmotes = shared.require(game.ReplicatedStorage.Library.EmoteAnimationsLibrary);
         local animLib = modEmotes:Find("feelingcold");
         if animLib then
             local animator = playerClass.Humanoid:WaitForChild("Animator");
