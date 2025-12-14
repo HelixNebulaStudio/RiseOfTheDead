@@ -34,12 +34,13 @@ function MissionLogic.onRequire()
 				mission.SaveData.Kills = (mission.SaveData.Kills or 0) +1;
 				if math.random(1, 6) > 1 and mission.SaveData.Kills <= 10 then return end;
 
-				local new = modItemDrops.Spawn(
-					{ItemId="zombiearm"; OnceOnly=true;}, 
-					npcClass.RootPart.CFrame, 
-					player
-				);
-				modReplicationManager.ReplicateIn(player, new, workspace.Interactables);
+				modItemDrops.spawn{
+					ItemId = "zombiearm";
+					SpawnCFrame = npcClass.RootPart.CFrame;
+					DropIfNotOwned = true;
+					DisableTouchPickup = true;
+					Players = {player};
+				};
 			end)
 
 		end

@@ -19,6 +19,8 @@ function modItemsLibrary.onRequire()
     };
 
     -- Common
+    new(resourceBase, {Id="money"; Name="Money"; Icon="rbxassetid://86537766971763"; Stackable=100000; Description="$$$.";});
+    
     new(resourceBase, {Id="metal"; Name="Metal Scraps"; Icon="rbxassetid://1551792125"; Description="Metallic scraps used in crafting metal objects.";});
     new(resourceBase, {Id="glass"; Name="Glass Shards"; Icon="rbxassetid://1551792117"; Description="Glass shards and pieces used in crafting glass objects.";});
     new(resourceBase, {Id="wood"; Name="Wooden Parts"; Icon="rbxassetid://1551280660"; Description="Wooden parts used in crafting wooden objects.";});

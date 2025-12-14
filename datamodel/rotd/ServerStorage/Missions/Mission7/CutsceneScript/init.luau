@@ -355,10 +355,13 @@ return function(CutsceneSequence)
 					robertNpcClass.Chat(player, "");
 					
 					if modEvents:GetEvent(player, "mission7Money") == nil then
-						modItemDrops.Spawn({
-							Name="Money"; 
-							Type=modItemDrops.Types.Money; 
-							Quantity=500}, CFrame.new(288.96, 72.39, 3.59), {player}, false);
+						modItemDrops.spawn{
+							ItemId = "money";
+							Quantity = 500;
+							SpawnCFrame = CFrame.new(288.96, 72.39, 3.59);
+							Player = {player};
+							DespawnDuration = false;
+						};
 						modEvents:NewEvent(player, {Id="mission7Money"});
 					end
 					

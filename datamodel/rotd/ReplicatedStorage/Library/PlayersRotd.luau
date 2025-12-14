@@ -7,9 +7,32 @@ local localPlayer = game.Players.LocalPlayer;
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
+local modCollectiblesLibrary = shared.require(game.ReplicatedStorage.Library.CollectiblesLibrary);
 
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 --==
+
+function modPlayers.onRequire()
+	Debugger:Warn("PlayersRotd onRequire.");
+	
+	shared.modEventService:OnInvoked("Generic_BindItemPickup", function(eventPacket: EventPacket, ...)
+		local interactable: InteractableInstance = ...;
+
+		task.spawn(function()
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+			
+			local collectibleId = interactable.Values.CollectibleId;
+			if collectibleId == nil then return end;
+
+			local lib = modCollectiblesLibrary:Find(collectibleId);
+			if lib == nil then return; end;
+			
+			local profile = shared.modProfile:Get(player);
+			profile:UnlockCollectible(collectibleId);
+		end)
+	end)
+end
 
 shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
 	local wieldComp: WieldComp = playerClass.WieldComp;
@@ -41,15 +64,15 @@ shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
 				if masusPlushieSpawnAtt and profile.Collectibles.masus == nil then
 					task.spawn(function()
 						game.ReplicatedStorage.Prefabs.Items:WaitForChild("masusplush");
-						local newPrefab, interactData = modItemDrops.Spawn({
-							Type="Tool"; 
-							ItemId="masusplush"; 
-							Quantity=1}, 
-							masusPlushieSpawnAtt.WorldCFrame, 
-							{player}, 
-							false
-						);
-						interactData.CollectibleId = "masus";
+						local dropPrefab, interactable = modItemDrops.spawn{
+							ItemId = "masusplush";
+							Quantity = 1;
+							SpawnCFrame = masusPlushieSpawnAtt.WorldCFrame;
+							Players = {player};
+							DespawnDuration = false;
+							Anchored = true;
+						};
+						interactable.Values.CollectibleId = "masus";
 					end)
 				end
 			end

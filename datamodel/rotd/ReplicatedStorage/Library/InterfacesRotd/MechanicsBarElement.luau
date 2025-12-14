@@ -106,7 +106,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         prevProgressionValue = math.clamp(prevProgressionValue + 0.1 * (progressionPoint - prevProgressionValue), 0, 1);
         barImageLabel.Size = UDim2.new(prevProgressionValue, 0, 1, 0);
         
-        barTextLabel.Text = barText:gsub("$value", element.ProgressValue)
+        barTextLabel.Text = barText:gsub("$value", string.format("%.1f", element.ProgressValue*100))
                                     :gsub("$text", element.ProgressText or "");
 
         if barImageLabel.AbsoluteSize.X >= 1 then

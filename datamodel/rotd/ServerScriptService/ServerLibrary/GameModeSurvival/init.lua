@@ -665,8 +665,15 @@ function Survival:StartWave(wave)
 						spawnCFrame = spawnCFrame.CFrame * CFrame.new(0, 2, 0);
 					end
 
-					local lootPrefab = modItemDrops.Spawn({Type="Custom"; ItemId=pickRewardId; Quantity=1;}, spawnCFrame, self.Players, false);
-					lootPrefab.PrimaryPart.Anchored = true;
+					local lootPrefab = modItemDrops.spawn{
+						ItemId = pickRewardId;
+						Quantity = 1;
+						SpawnCFrame = spawnCFrame;
+						Players = self.Players;
+						DespawnDuration = false;
+						Anchored = true;
+						DisableTouchPickup = true;
+					};
 					self.LootPrefab = lootPrefab;
 
 					self:Hud{
@@ -706,7 +713,15 @@ function Survival:StartWave(wave)
 			local bonusQuantity = math.floor(self.Wave/9);
 			local quantity = math.clamp(1 + bonusQuantity, 1, 5);
 
-			local lootPrefab = modItemDrops.Spawn({Type="Tool"; ItemId=pickRewardId; Quantity=quantity;}, spawnCFrame, self.Players, false);
+			local lootPrefab = modItemDrops.spawn{
+				ItemId = pickRewardId;
+				Quantity = quantity;
+				SpawnCFrame = spawnCFrame;
+				Players = self.Players;
+				DespawnDuration = false;
+				Anchored = true;
+				DisableTouchPickup = true;
+			};
 			self.LootPrefab = lootPrefab;
 			
 			local dropStr = "A reward package has dropped!";

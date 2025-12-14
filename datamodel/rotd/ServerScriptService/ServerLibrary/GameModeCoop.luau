@@ -702,10 +702,15 @@ function Coop:DropReward()
 		rewardDropsList = {self.StageLib.HardRewardId;};
 	end
 	
-	self.LootPrefab = modItemDrops.Spawn({
-		Type = "Tool"; 
-		ItemId = rewardDropsList[math.random(1, #rewardDropsList)]
-	}, spawnCf, self.Players, false);
+	local lootPrefab = modItemDrops.spawn{
+		ItemId = rewardDropsList[math.random(1, #rewardDropsList)];
+		SpawnCFrame = spawnCf;
+		Players = self.Players;
+		DespawnDuration = false;
+		Anchored = true;
+		DisableTouchPickup = true;
+	};
+	self.LootPrefab = lootPrefab;
 
 	self:Hud{
 		Status="A reward package has dropped!";

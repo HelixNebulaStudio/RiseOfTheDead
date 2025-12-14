@@ -88,6 +88,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     };
 	binds.SelectedSlot = nil;
 
+	--MARK: OnToggle
 	window.OnToggle:Connect(function(visible, interactable, interactInfo)
 		if visible then
 			binds.Interactable = interactable;
@@ -382,6 +383,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		--pageFrame
 	end
 
+	--MARK: OnUpdate
     window.OnUpdate:Connect(function()
         local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
 		local wieldComp: WieldComp = playerClass.WieldComp;
@@ -464,9 +466,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 		end
 		
-		if binds.SelectedSlot == nil then return end;
-		
 		binds.ClearPage();
+
+		if binds.SelectedSlot == nil then return end;
 
 		local storageItemID = binds.SelectedSlot.ID;
 		local selectedItem = modData.GetItemById(storageItemID);
@@ -654,7 +656,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local price = modShopLibrary.SellPrice[selectedItem.ItemId]
 			or bpLib and (bpLib.SellPrice or (bpLib.Tier and modShopLibrary.SellPrice["Tier"..bpLib.Tier])) or nil;
 
-		if itemLib and price then
+		if itemLib and price and selectedItem.Quantity > 0 then
 			binds.NewListing(function(newListing)
 				local infoBox = newListing:WaitForChild("infoFrame");
 				local descFrame = infoBox:WaitForChild("descFrame");
@@ -696,10 +698,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 										return;
 									end;
 
-									
 									local serverReply = remoteShopService:InvokeServer("sellitem", binds.InteractPart, storageItemID);
 									if serverReply == modShopLibrary.PurchaseReplies.Success then
 										statusLabel.Text = "Sold!";
+										selectedItem.Quantity -= 1;
+
+										if selectedItem.Quantity <= 1 then
+											binds.ClearPage();
+										end
 										wait(0.5);
 									else
 										warn("Sell Item>> Error Code:"..tostring(serverReply));
@@ -771,6 +777,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 										local serverReply = remoteShopService:InvokeServer("sellitem", binds.InteractPart, storageItemID, allQuantity);
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
 											statusLabel.Text = `Sold all <b>{allQuantity}</b> {itemLib.Name}!`;
+											selectedItem.Quantity = 0;
+											binds.ClearPage();
 											wait(1);
 										else
 											warn("Sell Item>> Error Code:"..tostring(serverReply));
@@ -787,7 +795,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								};
 							}
 						});
-
+						
 						sellItemDebounce = false;
 					end)
 				end)

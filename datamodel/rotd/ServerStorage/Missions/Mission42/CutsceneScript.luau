@@ -80,7 +80,12 @@ return function(CutsceneSequence)
 			end
 			
 			if modEvents:GetEvent(player, "mission42Bp2") == nil and mission.Type == 3 then
-				modItemDrops.Spawn({Type=modItemDrops.Types.Blueprint; ItemId="tacticalbowbp";}, playerClass.RootPart.CFrame, {player}, false);
+				local dropPrefab, interactable = modItemDrops.spawn{
+					ItemId = "tacticalbowbp";
+					SpawnCFrame = playerClass.RootPart.CFrame;
+					Players = {player};
+					DespawnDuration = false;
+				};
 			end
 		end
 		if not modBranchConfigs.IsWorld("VindictiveTreasure") then return; end;

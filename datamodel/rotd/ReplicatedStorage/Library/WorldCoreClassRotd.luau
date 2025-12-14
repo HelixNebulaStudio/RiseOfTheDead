@@ -24,7 +24,6 @@ function modWorldCoreClass.onRequire()
         local function onDayChanged()
             task.spawn(function() 
                 shared.waitForIgnition();
-                if RunService:IsStudio() then return end; -- TODO: Remove
                 modWorldCoreClass.updateWanderers();
             end)
         end
@@ -90,7 +89,7 @@ function modWorldCoreClass.updateWanderers()
         end
         
         local wandererList = {
-            "Icarus";
+            --"Icarus";
         };
         
         local spawnWorld = spawnWorldList[math.fmod(day, #spawnWorldList)+1];
@@ -98,7 +97,7 @@ function modWorldCoreClass.updateWanderers()
             spawnWorld = {Id=modBranchConfigs.GetWorld(); Nav=modBranchConfigs.NavLinks[modBranchConfigs.GetWorld()]};
         end
         
-        if spawnWorld.Nav then
+        if spawnWorld.Nav and #wandererList > 0 then
             local spawnWandererName = wandererList[math.fmod(day, #wandererList)+1];
             local spawnNavId = nil;
             

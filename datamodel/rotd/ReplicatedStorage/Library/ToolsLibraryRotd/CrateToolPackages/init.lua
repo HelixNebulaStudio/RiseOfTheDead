@@ -7,8 +7,8 @@ local modToolsLibrary;
 --==
 
 local toolPackage = {
-	Class="Tool";
-	HandlerType="StructureTool";
+	Class = "Tool";
+	HandlerType = "StructureTool";
 
 	Animations={
 		Core={Id=103715768327613;};
@@ -24,33 +24,31 @@ local toolPackage = {
 	};
 	Properties={};
 };
+toolPackage.__index = toolPackage;
 
-function toolPackage.CustomSpawn(handler, cframe)
+function toolPackage.CustomSpawn(handler: ToolHandlerInstance, cframe)
 	local modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
-	local modDropAppearance = shared.require(game.ReplicatedStorage.Library.DropAppearance);
 	local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 	local itemId = handler.ToolPackage.ItemId;
-	local owner = handler.Player;
 
-	local rewards = modCrates.GenerateRewards(itemId, owner);
+	local charClass: CharacterClass = handler.CharacterClass;
+	if charClass.ClassName ~= "PlayerClass" then return end;
+
+	local player = (charClass :: PlayerClass):GetInstance();
+
+	local rewards = modCrates.GenerateRewards(itemId, player);
 	if #rewards > 0 then
-		local prefab, interactable = modCrates.spawn(itemId, cframe, {owner}, rewards);
-
-		local dropAppearanceLib = modDropAppearance:Find(itemId);
-		if dropAppearanceLib then
-			modDropAppearance.ApplyAppearance(dropAppearanceLib, prefab);
-		end
+		local prefab, interactable = modCrates.spawn(itemId, cframe, {player}, rewards);
+		Debugger.Expire(prefab, 120);
 
 		modAudio.Play("StorageWoodPickup", prefab.PrimaryPart, nil, false);
-		interactable:Sync(nil, {EmptyLabel="Owned by: "..owner.Name});
-		Debugger.Expire(prefab, 120);
+		interactable:Sync(nil, {EmptyLabel=`Owned by: {player.Name}`});
 	end
 end
 
 
 function toolPackage.inherit(packet)
-	toolPackage.__index = toolPackage;
 	local inheritPackage = packet;
 
 	local itemId = packet.ItemId;
@@ -68,14 +66,14 @@ function toolPackage.inherit(packet)
 		
 		if modCrateLibrary.Get(itemId) == nil then
 			modCrateLibrary.New{
-				Id=itemId;
-				Name=itemLib.Name;
-				Prefab=inheritPackage.CratePrefab or itemModel;
+				Id = itemId;
+				Name = itemLib.Name;
+				Prefab = inheritPackage.CratePrefab or itemModel;
 
-				RewardsId=itemId;
-				StoragePresetId="lootcrate";
+				RewardsId = itemId;
+				StoragePresetId = "lootcrate";
 
-				EmptyLabel="Empty Chest";
+				EmptyLabel = "Empty Chest";
 			};
 		end
 	end)
@@ -83,7 +81,7 @@ function toolPackage.inherit(packet)
 	modToolsLibrary.set(inheritPackage);
 
 	function inheritPackage.newClass()
-		return modEquipmentClass.new(inheritPackage.Class, inheritPackage.Configurations, inheritPackage.Properties);
+		return modEquipmentClass.new(inheritPackage);
 	end
 
 	return inheritPackage;
@@ -94,173 +92,171 @@ function toolPackage.init(super)
 
 	-- warehouse
 	toolPackage.inherit({
-		ItemId="factorycrate";
+		ItemId = "factorycrate";
 	});
 
 	toolPackage.inherit({
-		ItemId="officecrate";
+		ItemId = "officecrate";
 	});
 
 	toolPackage.inherit({
-		ItemId="tombschest";
+		ItemId = "tombschest";
 	});
 
 	-- underground
 	toolPackage.inherit({
-		ItemId="sectorfcrate";
-		GenericItemModelName="crate";
+		ItemId = "sectorfcrate";
 	});
 	
 	toolPackage.inherit({
-		ItemId="ucsectorfcrate";
-		GenericItemModelName="crate";
+		ItemId = "ucsectorfcrate";
 	});
 
 	toolPackage.inherit({
-		ItemId="railwayscrate";
+		ItemId = "railwayscrate";
 	});
 	
 	toolPackage.inherit({
-		ItemId="prisoncrate";
+		ItemId = "prisoncrate";
 	});
 	
 	toolPackage.inherit({
-		ItemId="nprisoncrate";
+		ItemId = "nprisoncrate";
 	});
 
 	toolPackage.inherit({
-		ItemId="banditcrate";
+		ItemId = "banditcrate";
 	});
 
 	toolPackage.inherit({
-		ItemId="hbanditcrate";
+		ItemId = "hbanditcrate";
 	});
 
 	-- residentials
 	toolPackage.inherit({
-		ItemId="sectordcrate";
+		ItemId = "sectordcrate";
 	});
 
 	toolPackage.inherit({
-		ItemId="ucsectordcrate";
+		ItemId = "ucsectordcrate";
 	});
 
 	toolPackage.inherit({
-		ItemId="abandonedbunkercrate";
+		ItemId = "abandonedbunkercrate";
 	});
 
 	toolPackage.inherit({
-		ItemId="genesiscrate";
+		ItemId = "genesiscrate";
 	});
 
 	toolPackage.inherit({
-		ItemId="ggenesiscrate";
+		ItemId = "ggenesiscrate";
 	});
 	
 	-- harbor
 	toolPackage.inherit({
-		ItemId="sunkenchest";
+		ItemId = "sunkenchest";
 	});
 	
 	
 	-- MARK: Resource Crate
 	local ResourceCrate = {
-		Animations={
-			Core={Id=89974091773254;};
-			Placing={Id=119557034210474};
+		Animations = {
+			Core = {Id=89974091773254;};
+			Placing = {Id=119557034210474};
 		};
 	};
 	toolPackage.inherit({
-		ItemId="metalpackage";
-		GenericItemModelName="resourcecrate";
-		Animations=ResourceCrate.Animations;
+		ItemId = "metalpackage";
+		GenericItemModelName = "resourcecrate";
+		Animations = ResourceCrate.Animations;
 	});
 	
 	toolPackage.inherit({
-		ItemId="clothpackage";
-		GenericItemModelName="resourcecrate";
-		Animations=ResourceCrate.Animations;
+		ItemId = "clothpackage";
+		GenericItemModelName = "resourcecrate";
+		Animations = ResourceCrate.Animations;
 	});
 	
 	toolPackage.inherit({
-		ItemId="glasspackage";
-		GenericItemModelName="resourcecrate";
-		Animations=ResourceCrate.Animations;
+		ItemId = "glasspackage";
+		GenericItemModelName = "resourcecrate";
+		Animations = ResourceCrate.Animations;
 	});
 	
 	toolPackage.inherit({
-		ItemId="woodpackage";
-		GenericItemModelName="resourcecrate";
-		Animations=ResourceCrate.Animations;
+		ItemId = "woodpackage";
+		GenericItemModelName = "resourcecrate";
+		Animations = ResourceCrate.Animations;
 	});
 
 	toolPackage.inherit({
-		ItemId="communitycrate";
-		GenericItemModelName="resourcecrate";
-		Animations=ResourceCrate.Animations;
+		ItemId = "communitycrate";
+		GenericItemModelName = "resourcecrate";
+		Animations = ResourceCrate.Animations;
 	});
 
 	toolPackage.inherit({
-		ItemId="communitycrate2";
-		GenericItemModelName="resourcecrate";
-		Animations=ResourceCrate.Animations;
+		ItemId = "communitycrate2";
+		GenericItemModelName = "resourcecrate";
+		Animations = ResourceCrate.Animations;
 	});
 
 
 	-- MARK: Event Crates
 	-- frostivus
 	toolPackage.inherit({
-		ItemId="xmaspresent";
-		Animations=ResourceCrate.Animations;
+		ItemId = "xmaspresent";
+		Animations = ResourceCrate.Animations;
 	});
 
 	toolPackage.inherit({
-		ItemId="xmaspresent2020";
-		Animations=ResourceCrate.Animations;
+		ItemId = "xmaspresent2020";
+		Animations = ResourceCrate.Animations;
 	});
 
 	toolPackage.inherit({
-		ItemId="xmaspresent2021";
-		Animations=ResourceCrate.Animations;
+		ItemId = "xmaspresent2021";
+		Animations = ResourceCrate.Animations;
 	});
 
 	toolPackage.inherit({
-		ItemId="xmaspresent2022";
-		Animations=ResourceCrate.Animations;
+		ItemId = "xmaspresent2022";
+		Animations = ResourceCrate.Animations;
 	});
 
 	toolPackage.inherit({
-		ItemId="xmaspresent2023";
-		Animations=ResourceCrate.Animations;
+		ItemId = "xmaspresent2023";
+		Animations = ResourceCrate.Animations;
 	});
 
 	toolPackage.inherit({
-		ItemId="xmaspresent2024";
-		Animations=ResourceCrate.Animations;
+		ItemId = "xmaspresent2024";
+		Animations = ResourceCrate.Animations;
 	});
 
 	-- easter
 	toolPackage.inherit({
-		ItemId="easteregg";
-		Animations=ResourceCrate.Animations;
+		ItemId = "easteregg";
+		Animations = ResourceCrate.Animations;
 	});
 
 	toolPackage.inherit({
-		ItemId="easteregg2021";
-		Animations=ResourceCrate.Animations;
+		ItemId = "easteregg2021";
+		Animations = ResourceCrate.Animations;
 	});
 
 	toolPackage.inherit({
-		ItemId="easteregg2023";
-		Animations=ResourceCrate.Animations;
+		ItemId = "easteregg2023";
+		Animations = ResourceCrate.Animations;
 	});
 
 	-- slaughterfest
 	toolPackage.inherit({
-		ItemId="slaughterfestcandybag";
-		Animations={
-			Core={Id=85979089955779;};
-			Placing={Id=4527422890};
+		ItemId = "slaughterfestcandybag";
+		Animations = {
+			Core = {Id=85979089955779;};
+			Placing = {Id=4527422890};
 		};
 	});
 end

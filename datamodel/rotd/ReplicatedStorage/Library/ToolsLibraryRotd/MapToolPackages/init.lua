@@ -28,6 +28,7 @@ local toolPackage = {
 	};
 	Properties={};
 };
+toolPackage.__index = toolPackage;
 
 function toolPackage.ClientItemPrompt(handler)
 	local localPlayer = game.Players.LocalPlayer;
@@ -84,7 +85,6 @@ function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 end
 
 function toolPackage.inherit(packet)
-	toolPackage.__index = toolPackage;
 	local inheritPackage = packet;
 
 	local itemId = packet.ItemId;
@@ -111,7 +111,7 @@ function toolPackage.inherit(packet)
 			inheritPackage.Interactable = newInteractConfig;
 		end
 
-		return modEquipmentClass.new(inheritPackage.Class, inheritPackage.Configurations, inheritPackage.Properties);
+		return modEquipmentClass.new(inheritPackage);
 	end
 
 	return inheritPackage;

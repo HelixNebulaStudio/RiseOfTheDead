@@ -510,8 +510,9 @@ return function(CutsceneSequence)
 			properties.HordeAggression = true;
 			properties.TargetableDistance = 1024;
 			properties.CanForgetTargets = false;
+			properties.DropRewardId = nil;
 
-			npcClass.Move:SetMoveSpeed("set", "forcespeed", 8, 9);
+			npcClass.Move:SetMoveSpeed("set", "forcespeed", 6, 9);
 
 			npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
 				if not isDead then return end;
@@ -530,8 +531,15 @@ return function(CutsceneSequence)
 			task.spawn(function()
 				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
 				targetHandlerComp:AddTarget(masonPrefab);
-				if math.random(1, 2) == 1 then
-					targetHandlerComp:AddTarget(playerClass.Character);
+				targetHandlerComp:AddTarget(playerClass.Character);
+			end)
+			task.spawn(function()
+				npcClass.Move:MoveTo(masonPrefab:GetPivot().Position);
+			end)
+			task.spawn(function()
+				while not npcClass.HealthComp.IsDead do
+					task.wait(1);
+					npcClass.OnThink:Fire();
 				end
 			end)
 		end
@@ -692,10 +700,10 @@ return function(CutsceneSequence)
 
 			zombieNpcClass.HealthComp:TakeDamage(DamageData.new{
 				Damage = 10000;
-				DamageBy = explosionEffect;
 				DamageType = "Explosive";
 				DamageCate = DamageData.DamageCategory.ExplosiveBarrel;
 			});
+			zombieNpcClass.HealthComp:SetIsDead(true);
 		end
 		
 		explosionEffect.Hit:Connect(function(basePart)
