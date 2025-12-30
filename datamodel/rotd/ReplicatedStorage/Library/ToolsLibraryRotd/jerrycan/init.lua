@@ -43,19 +43,24 @@ function toolPackage.ActionEvent(handler, packet)
 
 				local attachPoint = emitter.Parent;
 				repeat
-
 					local origin = CFrame.new(attachPoint.WorldPosition+Vector3.new(0, 1, 0));
 
-					local projectileObject = modProjectile.Fire("Gasoline", origin, Vector3.new(0, -1, 0), nil, handler.Player);
-
+					local projectileInstance: ProjectileInstance = modProjectile.fire("gasoline", {
+						OriginCFrame = origin;
+						SpreadDirection = Vector3.new(0, -1, 0);
+					});
+							
 					local spreadLookVec = modMath.CFrameSpread(-Vector3.yAxis, 90);
-
-					modProjectile.ServerSimulate(projectileObject, origin.p, spreadLookVec * 20);
+					modProjectile.serverSimulate(projectileInstance, {
+						Velocity = spreadLookVec * 20;
+						RayWhitelist = {workspace.Environment; workspace.Terrain};
+						IgnoreEntities = true;
+					});
 
 					handler.Fuel = handler.Fuel - 5;
 					handler.StorageItem:SetValues("Fuel", handler.Fuel):Sync("Fuel");
 
-					wait(0.5);
+					task.wait(0.5);
 				until not handler.IsActive or handler.Fuel <= 0 or not prefab:IsDescendantOf(workspace);
 			end
 		end

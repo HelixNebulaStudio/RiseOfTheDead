@@ -6,6 +6,7 @@ local CollectionService = game:GetService("CollectionService");
 
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
+local modStrings = shared.require(game.ReplicatedStorage.Library.Util.Strings);
 
 local audioModule = game.ReplicatedStorage.Library.Audio;
 
@@ -73,7 +74,7 @@ function toolPackage.onRequire()
 					return 5;
 				end
 				
-				playList[tostring(trackId)] = assetInfo.Name:sub(1, 20);
+				playList[tostring(trackId)] = modStrings.FilterNonBasicUtf8(assetInfo.Name:sub(1, 20));
 				inventory:SetValues(siid, {Songs=playList});
 				traderProfile:AddGold(-200);
 				
@@ -237,6 +238,8 @@ function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 		end
 
 	else
+		if #soundList <= 0 then return end;
+		
 		local songPicked = soundList[math.random(1, #soundList)];
 		boomboxSound.SoundId = songPicked.SoundId;
 		songName = songPicked:GetAttribute("OfficialName") or `"{songPicked.Name}"`;

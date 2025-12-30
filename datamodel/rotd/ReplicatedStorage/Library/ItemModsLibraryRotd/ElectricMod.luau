@@ -46,20 +46,19 @@ if RunService:IsServer() then
 		local weaponSiid = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem.ID;
 
 
-		local characterClass: CharacterClass;
-		if modifier.Player then
-			characterClass = shared.modPlayers.get(modifier.Player);
-		end
+		local characterClass: CharacterClass? = modifier.WieldComp and modifier.WieldComp.CompOwner or nil;
 		
 		local healthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
 		if healthComp == nil or healthComp.IsDead or not healthComp:CanTakeDamageFrom(characterClass) then return end;
 		
-		local targetClass: ComponentOwner = healthComp.CompOwner;
-		local statusComp: StatusComp? = targetClass.StatusComp;
+		local targetCharClass: ComponentOwner = healthComp.CompOwner;
+		local statusComp: StatusComp? = targetCharClass.StatusComp;
 		if statusComp == nil then return end;
 
 		local statusClass: StatusClassInstance? = statusComp:GetOrDefault(statusKey);
 		if statusClass then return end;
+
+		local hitInfo: HitInfo = packet.HitInfo;
 
 		statusComp:Apply(statusKey, {
 			Expires = workspace:GetServerTimeNow()+1;
@@ -68,9 +67,9 @@ if RunService:IsServer() then
 				MaxTargets = maxTargets;
 				WeaponSiid = weaponSiid;
 				
-				ArcOrigin = packet.OriginPoint;
-				ArcPoint = packet.TargetPoint;
-
+				OriginAtt = packet.OriginAtt;
+				HitPart = hitInfo.Part;
+				
 				Damage = configurations.PreModDamage;
 				DamagePercent = damagePercent;
 

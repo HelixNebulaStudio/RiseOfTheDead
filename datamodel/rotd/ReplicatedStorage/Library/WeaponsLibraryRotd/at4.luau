@@ -57,10 +57,11 @@ local toolPackage = {
 		FocusWalkSpeedReduction=0.5;
 
 		-- Projectile
-		ProjectileId="rpgRocket";
+		ProjectileId="rpgrocket";
 
-		ExplosionRadius=20;
-		ExplosionStun=2.5;
+		ExplosionRadius = 20;
+		ExplosionStun = 2.5;
+		DamageRatio = 0;
 
 		-- Recoil
 		XRecoil=0.05;

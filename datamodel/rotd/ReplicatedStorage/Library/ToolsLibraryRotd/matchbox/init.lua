@@ -27,7 +27,7 @@ local toolPackage = {
 		ThrowRate = 1;
 
 		--== Projectile
-		ProjectileId = "matchStick";
+		ProjectileId = "matchstick";
 		ProjectileConfig = {
 			Velocity = 100;
 			Bounce = 0;

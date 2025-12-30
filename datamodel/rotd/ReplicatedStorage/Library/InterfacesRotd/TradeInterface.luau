@@ -222,7 +222,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		if visible then
 			interface:HideAll{[window.Name]=true; ["Inventory"]=true;};
             interface:ToggleWindow("Inventory", true);
-			interface:Freeze(true);
+			window:Freeze(true);
 			
 			mainFrame.CanvasPosition = Vector2.zero;
 			
@@ -269,7 +269,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			modStorageInterface.SetQuickTarget();
 
 		else
-			interface:Freeze(false);
+			window:Freeze(false);
 			remoteTradeRequest:FireServer("cancel");
             
 			for a=#interface.StorageInterfaces, 1, -1 do
@@ -339,7 +339,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		otfObjects.NameLabel.Text = (otherData.Premium and modRichFormatter.GoldText(otherData.Name) or otherData.Name)..
 			(npcLib and " (" ..npcLib.Class..")" or "");
 		
-		ltfObjects.AvatarLabel.Image = binds.LocalPlayerProfile.UserThumbnail;
+		ltfObjects.AvatarLabel.Image = shared.modPlayers.getAvatar(localPlayer.UserId);
 
 		if binds.TradeSession.ComputerSession ~= true then
 			feeLabel.Visible = true;
@@ -347,7 +347,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			local otherPlayer = game.Players:FindFirstChild(otherData.Name);
 			if otherPlayer then
 				task.spawn(function()
-					otfObjects.AvatarLabel.Image = game.Players:GetUserThumbnailAsync(otherPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420);
+					otfObjects.AvatarLabel.Image = shared.modPlayers.getAvatar(otherPlayer.UserId);
 				end)
 			end
 
@@ -888,7 +888,7 @@ local function holdButton(button, label, onClick)
 				storageCheck();
 				interface:PlayButtonClick();
 				if not hasItems then
-					interface:Freeze(false);
+					window:Freeze(false);
                     interface:ToggleWindow("Trade", false);
 					RunService:UnbindFromRenderStep("CancelTrade");
 				else

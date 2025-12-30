@@ -367,14 +367,14 @@ GameModeLibrary.GameModes={
 
 				HardModeEnabled=true;
 			};
-			["Swampland"]={
-				WorldId="Swampland";
+			["Swamplands"]={
+				WorldId="Swamplands";
 				ExitSpawn="sectorDToRes";
 				TitleImage="http://www.roblox.com/asset/?id=7145049831";
 				MaxPlayers=5;
-				RewardsId="sectordcrate";
-				RewardsIds={"sectordcrate"; "ucsectordcrate"};
-				HardRewardId="corruptedsectordcrate";
+				-- RewardsId="sectordcrate";
+				-- RewardsIds={"sectordcrate"; "ucsectordcrate"};
+				-- HardRewardId="corruptedsectordcrate";
 				
 				SurvivalFailedTrack="SectorDSoundtrack";
 				BossKilledTrack="SectorDBossKilled";

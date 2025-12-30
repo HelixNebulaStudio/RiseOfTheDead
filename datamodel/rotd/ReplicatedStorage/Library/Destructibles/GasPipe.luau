@@ -28,6 +28,7 @@ function destructiblePackage.BindNew(destructible: DestructibleInstance)
 			local origin = CFrame.new(targetPart.Position);
 			
             local projectileInstance: ProjectileInstance = modProjectile.fire("gasoline", {
+                CharacterClass = reasonData.DamageBy;
                 OriginCFrame = origin;
                 SpreadDirection = Vector3.new(0, -1, 0);
             });
@@ -39,7 +40,7 @@ function destructiblePackage.BindNew(destructible: DestructibleInstance)
 			
             modProjectile.serverSimulate(projectileInstance, {
                 Velocity = dirCf * 20;
-                RayWhitelist = {workspace.Environment};
+                RayWhitelist = {workspace.Environment; workspace.Terrain};
                 IgnoreEntities = true;
             });
 			

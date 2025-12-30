@@ -91,6 +91,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local function openStorage(storageId, page)
         if page == 1 then page = nil; end
         
+        Debugger:StudioLog(`OpenStorage storageId({storageId})`);
         local storage = modData.RequestStorage{
             Action = "GetStorage";
             StorageId = storageId;
@@ -297,14 +298,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local isOnButtonPage = a == (storage.Page or 1);
                 local pageStorageId = a==1 and storagePresetId or `{storagePresetId}#p{a}`;
 
-                local newButton = pageButton:Clone();
-                newButton.Text = a;
+                local newPageButton = pageButton:Clone();
+                newPageButton.Text = a;
                 
-                newButton.LayoutOrder = a;
-                newButton.Parent = buttonsFrame;
+                newPageButton.LayoutOrder = a;
+                newPageButton.Parent = buttonsFrame;
 
                 if modConfigurations.CompactInterface then
-                    newButton.ZIndex = 4;
+                    newPageButton.ZIndex = 4;
                 end
                 
                 local pageStorage = modData.GetStorage(pageStorageId);
@@ -314,28 +315,28 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         local isLocked = timeLeft <= 0;
                         
                         if a == (storage.Page or 1) then
-                            newButton.BackgroundColor3 = isLocked and Color3.fromRGB(105, 75, 143) or Color3.fromRGB(50, 50, 50);
+                            newPageButton.BackgroundColor3 = isLocked and Color3.fromRGB(105, 75, 143) or Color3.fromRGB(50, 50, 50);
                         else
-                            newButton.BackgroundColor3 = isLocked and Color3.fromRGB(75, 64, 90) or Color3.fromRGB(100, 100, 100);
+                            newPageButton.BackgroundColor3 = isLocked and Color3.fromRGB(75, 64, 90) or Color3.fromRGB(100, 100, 100);
                         end
                         
                     else
-                        newButton.BackgroundColor3 = Color3.fromRGB(75, 64, 90);
+                        newPageButton.BackgroundColor3 = Color3.fromRGB(75, 64, 90);
 
                     end
                 else
                     local isPremiumPage = a >= (storage.PremiumPage or 10)
                     if isOnButtonPage then
                         if isPremiumPage then
-                            newButton.BackgroundColor3 = Color3.fromRGB(160, 128, 53);
+                            newPageButton.BackgroundColor3 = Color3.fromRGB(160, 128, 53);
                         else
-                            newButton.BackgroundColor3 = Color3.fromRGB(160, 160, 160);
+                            newPageButton.BackgroundColor3 = Color3.fromRGB(160, 160, 160);
                         end
                     else
                         if isPremiumPage then
-                            newButton.BackgroundColor3 = Color3.fromRGB(100, 81, 33);
+                            newPageButton.BackgroundColor3 = Color3.fromRGB(100, 81, 33);
                         else
-                            newButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
+                            newPageButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100);
                         end
                     end
 
@@ -343,7 +344,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
                 local onButtonClick;
 
-                newButton.MouseButton1Click:Connect(function()
+                newPageButton.MouseButton1Click:Connect(function()
                     interface:PlayButtonClick();
                     local newStorageId = storagePresetId;
                     
@@ -353,7 +354,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     
                     if activeStorageId ~= newStorageId then
                         openStorage(newStorageId, a);
-                        window:Update();
+                        window:Update(true);
 
                         return;
                     end
@@ -388,11 +389,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
                         if timeLeft <= 0 then
                             activeStorageInterface.ViewOnly = true;
-                            newButton.Text = `Unlock {a} (<b><font color='rgb(170, 120, 0)'>{rentCost}{goldSuffix}</font></b>)`
+                            newPageButton.Text = `Unlock {a} (<b><font color='rgb(170, 120, 0)'>{rentCost}{goldSuffix}</font></b>)`
 
                         else
                             activeStorageInterface.ViewOnly = false;
-                            newButton.Text = `{a} (<b><font color='rgb(170, 120, 0)'>{rentCost}{goldSuffix}</font></b>)`;
+                            newPageButton.Text = `{a} (<b><font color='rgb(170, 120, 0)'>{rentCost}{goldSuffix}</font></b>)`;
                             
                         end
                         

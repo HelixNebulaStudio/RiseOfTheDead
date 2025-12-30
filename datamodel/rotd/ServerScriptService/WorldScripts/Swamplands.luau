@@ -10,7 +10,7 @@ end
 
 local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new(script);
 
-local GAME_MODE, GAME_STAGE = "Survival", "Sector F";
+local GAME_MODE, GAME_STAGE = "Survival", "Swamplands";
 --==
 
 function WorldCore.InitGameController()
@@ -29,7 +29,7 @@ function WorldCore.InitGameController()
 
     newGameController.BossConfig = {
         List={
-            {Name="Tanker"; Chance=100;};
+            {Name="Zpider"; Chance=100;};
             {Name="Fumes"; Chance=100;};
             {Name="Corrosive"; Chance=100;};
             {Name="The Prisoner"; Chance=100;};
@@ -49,28 +49,12 @@ function WorldCore.InitGameController()
 
     newGameController.HazardsList = {
         {Type="Fog"; Fmod=4;};
-        {Type="Witherers"; Fmod=3;};
-        {Type="ToxicGas"; Fmod=6;};
     };
 
-    newGameController.CorruptVision = {};
-
-    newGameController.IntroMessage = "Sparks from exposed wiring sizzles the floor in Sector F";
+    newGameController.IntroMessage = "A low pitched humming vibrates the water in the Swamplands";
 
     function newGameController:OnEnemySpawn(npcClass: NpcClass)
         local npcChar = npcClass.Character;
-        if npcChar.Name ~= "Zombie"
-            and npcChar.Name ~= "Leaper Zombie"
-            and npcChar.Name ~= "Heavy Zombie" then return end;
-        
-        local shirtList = {
-            "rbxassetid://2240854863";
-            "rbxassetid://981391795";
-        }
-        
-        if math.random(1, 4) == 1 then
-            npcClass.Properties.PresetShirt = {Id=shirtList[math.random(1, #shirtList)]};
-        end
     end
 
     task.spawn(function()
@@ -85,23 +69,24 @@ function WorldCore.onRequire()
 
     WorldCore:InitGameWorld(GAME_MODE, GAME_STAGE);
 
-    shared.modNpcs.spawn2{
-        Name = "Lennon";
-        CFrame = CFrame.new(9.44034672, 60.2189713, -17.7514229, -1, 0, 0, 0, 1, 0, 0, 0, -1);
-    };
-    
-	script:WaitForChild("sewersWindow"):Clone().Parent = workspace.Interactables;
-
     shared.modEngineCore:ConnectOnPlayerAdded(script, function(player: Player)
-        local profile: ProfileRotd = shared.modProfile:WaitForProfile(player) :: ProfileRotd;
-        if profile == nil then return end;
+        local playerClass: PlayerClass = shared.modPlayers.get(player);
 
-        task.delay(10, function()
-            local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
-            local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");
-            remoteSetHeadIcon:FireAllClients(1, "Lennon", "HideAll");
+        task.spawn(function()
+            while true do
+                task.wait(1);
+                if playerClass.Character == nil then continue end;
+
+                local cf = playerClass:GetCFrame();
+                if cf.Position.Y > -2 then continue end;
+
+                playerClass.StatusComp:Apply("RedCrowToxin", {
+                    Expires = workspace:GetServerTimeNow() + 1.2;
+                    Duration = 1.2;
+                });
+            end
         end)
-    end, 999);
+    end)
 end
 
 

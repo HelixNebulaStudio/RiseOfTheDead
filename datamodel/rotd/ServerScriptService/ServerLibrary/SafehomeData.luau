@@ -424,13 +424,34 @@ function SafehomeData:GetNpc(npcName: string)
 	local npcLib = modNpcProfileLibrary:Find(npcName);
 	if npcLib == nil then return end;
 
+	local npcPropLib = modNpcProfileLibrary:GetProperties(npcName);
 	local npcData = self.Npc[npcName];
+
+	local npcDataMeta = {};
+	function npcDataMeta:__index(k)
+		local v = rawget(self, k);
+		if v ~= nil then
+			return v;
+		end
+
+		v = npcDataMeta[k];
+		if v ~= nil then
+			return v;
+		end
+
+		return npcPropLib[k];
+	end
+
+	function npcDataMeta:SetGetStorage(f)
+		npcDataMeta.GetStorage = f;
+	end
+
 	if npcData == nil then
-		npcData = setmetatable({}, modNpcProfileLibrary:GetProperties(npcName));
+		npcData = setmetatable({}, npcDataMeta);
 		self.Npc[npcName] = npcData;
 
 	else
-		setmetatable(npcData, modNpcProfileLibrary:GetProperties(npcName));
+		setmetatable(npcData, npcDataMeta);
 	end
 	
 	local storageConfig = table.clone(npcData.StorageConfig);
@@ -523,9 +544,9 @@ function SafehomeData:GetNpc(npcName: string)
 		StorageName = storageConfig.Name;
 		StoragePresetLib = storagePresetLib;
 	});
-	npcData.GetStorage = function()
+	npcData:SetGetStorage(function()
 		return storage;
-	end
+	end);
 
 	return npcData;
 end

@@ -206,8 +206,9 @@ end
 function library:GetProperties(name)
 	local lib = self:Find(name);
 	local module = script:FindFirstChild(name);
+
 	if lib and module then
-		lib.Properties=require(module);
+		lib.Properties = shared.require(module);
 		return lib.Properties;
 	end
 	return;

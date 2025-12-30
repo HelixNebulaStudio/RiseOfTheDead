@@ -492,11 +492,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			local configurations = equipmentClass.Configurations;
 
 			--== MARK: Ammo
+			local usesAmmo = configurations.MagazineSize ~= nil or configurations.AmmoCapacity ~= nil;
 			local ammo = selectedItem:GetValues("A") or configurations.MagazineSize;
 			local maxAmmo = selectedItem:GetValues("MA") or configurations.AmmoCapacity;
 
-			local ammoIsNotFull = (ammo < configurations.MagazineSize)
-								or (maxAmmo < configurations.AmmoCapacity);
+			local ammoIsNotFull = usesAmmo 
+								and (ammo < configurations.MagazineSize or maxAmmo < configurations.AmmoCapacity);
 			
 			if ammoIsNotFull then
 				local ammoCurrency = modShopLibrary.AmmunitionCurrency or "Money";

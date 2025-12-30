@@ -472,7 +472,7 @@ function library.onRequire()
 			{Type=ItemDropTypes.Tool; ItemId="xm1014"; Chance=1/25; DropIfNotOwned=true;};
 			{Type=ItemDropTypes.Tool; ItemId="mp5"; Chance=1/100; DropIfNotOwned=true;};
 			
-			(SpecialEvent.Christmas and {Type=ItemDropTypes.Coal; Quantity=quan2m4; Chance=1/10;} or nil);
+			(SpecialEvent.Christmas and {Type=ItemDropTypes.Coal; ItemId="coal"; Quantity=quan2m4; Chance=1/10;} or nil);
 			--(SpecialEvent.Easter and {Type=ItemDropTypes.Tool; ItemId="easteregg2023"; Quantity=1; Chance=4/100;} or nil);
 		};
 	};

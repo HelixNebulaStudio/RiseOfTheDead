@@ -260,6 +260,7 @@ export type Profile = {
     Premium: boolean;
     GamePass: anydict;
 
+    Collectibles: anydict;
     Cache: anydict;
     
     -- @methods
@@ -295,6 +296,11 @@ export type GameSave = {
 
     AppearanceData: AppearanceData;
     Events: anydict;
+    Statistics: {
+        AddStat: (anydict, category: string, key: string, value: number) -> nil;
+        SetStat: (anydict, category: string, key: string, value: number) -> nil;
+        GetStat: (anydict, category: string, key: string) -> number;
+    };
 
     -- @methods
     GetActiveSave: (GameSave) -> GameSave;
@@ -859,7 +865,6 @@ export type InteractableInstance = {
     CanInteract: boolean;
     Values: anydict;
 
-    Prefab: Instance?;
     Label: string?;
     Animation: string?;
 
@@ -1068,6 +1073,7 @@ export type InterfaceWindow = {
     SetClosePosition: (InterfaceWindow, close: UDim2, open: UDim2?) -> nil;
     AddCloseButton: (InterfaceWindow, object: GuiObject) -> nil;
     Destroy: (InterfaceWindow) -> nil;
+    Freeze: (InterfaceWindow, value: boolean) -> nil;
 
     -- @signals
     OnToggle: EventSignal<boolean>;
@@ -1365,7 +1371,7 @@ export type ItemModifierInstance = {
     Name: string;
 
     WieldComp: WieldComp?;
-    Player: Player?;
+    
     ModLibrary: (anydict?);
     EquipmentClass: EquipmentClass?;
     ItemModStorageItem: StorageItem?;
@@ -1662,6 +1668,8 @@ export type StatusCompApplyParam = {
 --MARK: OnBulletHitPacket
 export type OnBulletHitPacket = {
     OriginPoint: Vector3;
+
+    OriginAtt: Attachment;
     HitInfo: HitInfo;
     
     TargetPart: BasePart;
@@ -1827,6 +1835,7 @@ export type WieldComp = {
     GetEquipmentClass: (WieldComp, siid: string, itemId: string?, storageItem: StorageItem?) -> EquipmentClass;
     GetToolHandler: (WieldComp, siid: string, itemId: string, storageItem: StorageItem?, toolModels: ({Model}?)) -> ToolHandlerInstance;
     GetOrDefaultItemModifier: (WieldComp, siid: string, defaultFunc: (()->ItemModifierInstance)?) -> ItemModifierInstance?;
+    GetToolModel: (WieldComp, args: {ModelName: string; Siid: string; ItemId: string?; PrefabName: string?;}) -> Model?;
     RefreshCharacterModifiers: (WieldComp) -> nil;
 
     SetCustomization: (WieldComp, mode: string, packet: anydict) -> nil;

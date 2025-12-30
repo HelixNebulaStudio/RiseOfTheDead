@@ -89,14 +89,16 @@ local toolPackage = {
 
 function toolPackage.newClass()
 	local equipmentClass: EquipmentClass = modEquipmentClass.new(toolPackage);
-	local configurations = equipmentClass.Configurations;
 
-	local knockoutModifier = configurations.newModifier("KnockoutTrigger", 0);
-	knockoutModifier.SetValues={
-		KnockoutDistance=8;
-		KnockoutDuration=2;
-	};
-    configurations:AddBaseModifier(knockoutModifier);
+    equipmentClass:AddBaseModifier("KnockoutTrigger", {
+		SetValues = {
+			KnockoutDistance = 8;
+			KnockoutDuration = 2;
+		};
+		ArrayValues = {
+			PassiveModifiers = "KnockoutTrigger";
+		};
+	});
 	
 	return equipmentClass;
 end

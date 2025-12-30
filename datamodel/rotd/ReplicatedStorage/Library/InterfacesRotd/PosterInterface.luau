@@ -6,6 +6,7 @@ local MarketplaceService = game:GetService("MarketplaceService");
 local localPlayer = game.Players.LocalPlayer;
 
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
+local modStrings = shared.require(game.ReplicatedStorage.Library.Util.Strings);
 
 local TEMPLATE_DECALS = {
     {Title="Poster"; ImageId="9242720986"};
@@ -79,7 +80,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						productInfo = MarketplaceService:GetProductInfo(item.ImageId, Enum.InfoType.Asset);
 					end)
 
-					table.insert(savedDecals, {Title=productInfo.Name; ImageId=item.ImageId;});
+					table.insert(savedDecals, {Title=modStrings.FilterNonBasicUtf8(productInfo.Name:sub(1, 20)); ImageId=item.ImageId;});
 				end
 			end
 
