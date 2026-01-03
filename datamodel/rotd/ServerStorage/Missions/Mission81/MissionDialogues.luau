@@ -106,15 +106,7 @@ Dialogues.Joseph.DialogueHandler = function(player, dialog, data, mission)
 						Reply="We exchanged money and this time, we're going to get what we paid for..\nWe'll plan something..";
 						
 					}, function(dialog)
-						dialog:AddDialog({
-							Face="Smirk";
-							Say="Plans to steal back from the Rats?";
-							Reply="*Shhh* We'll talk about it later, and not near the Rat shop keeper stationed here.";
-							
-						}, function(dialog)
-							modMission:CompleteMission(player, MISSION_ID);
-				
-						end);
+						modMission:CompleteMission(player, MISSION_ID);
 			
 					end);
 		
@@ -807,7 +799,7 @@ Dialogues.Caitlin.DialogueHandler = function(player, dialog, data, mission)
 
 		dialog:AddDialog({
 			Face="Suspicious";
-			Say="Hey, Joseph has been waiting for his box of walkie talkies delivered.";
+			Say="Hey, who do I talk to about undelivered goods?";
 			Reply="Hmm, not my department. Talk to the guys upstairs..";
 		})
 	end
@@ -835,7 +827,7 @@ Dialogues.Lewis.DialogueHandler = function(player, dialog, data, mission)
 
 		dialog:AddDialog({
 			Face="Suspicious";
-			Say="Hey, Joseph has been waiting for his box of walkie talkies delivered.";
+			Say="Hey, Do you know anything about a box of walkie talkies that should had been delivered.";
 			Reply="Hmm, I think one of the guys had it on the table for a bet. Guess who won, hah!";
 		})
 	end

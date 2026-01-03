@@ -780,11 +780,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 											statusLabel.Text = `Sold all <b>{allQuantity}</b> {itemLib.Name}!`;
 											selectedItem.Quantity = 0;
 											binds.ClearPage();
-											wait(1);
+											task.wait(1);
 										else
 											warn("Sell Item>> Error Code:"..tostring(serverReply));
 											statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply)):gsub("$Currency", "Money");
-											wait(1);
+											task.wait(1);
 										end
 
 										window:Update();

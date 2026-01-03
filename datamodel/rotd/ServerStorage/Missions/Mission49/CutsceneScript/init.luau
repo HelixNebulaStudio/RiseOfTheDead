@@ -4,6 +4,7 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 --== Variables;
@@ -38,6 +39,12 @@ return function(CutsceneSequence)
 					if mission.ProgressionPoint == 4 then
 						local new = script.Parent:WaitForChild("Vehicle Repair Manual"):Clone();
 						new.Parent = workspace.Interactables;
+
+						local newInteractConfig = modInteractables.createInteractable("Collectible");
+						newInteractConfig:SetAttribute("_Id", "vrm");
+						newInteractConfig:SetAttribute("Label", "Vehicle Repair Manual");
+						newInteractConfig.Parent = new;
+						
 						modReplicationManager.ReplicateOut(player, new);
 					end
 

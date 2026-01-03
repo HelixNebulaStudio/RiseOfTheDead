@@ -23,7 +23,7 @@ function WorldCore.onRequire()
         shared.modNpcs.spawn2{Name="Dallas";};
         shared.modNpcs.spawn2{Name="Kelly";};
         shared.modNpcs.spawn2{Name="Zep";};
-        shared.modNpcs.spawn2{Name="Joseph";};
+        WorldCore.JosephClass = shared.modNpcs.spawn2{Name="Joseph";};
         shared.modNpcs.spawn2{Name="Nate";};
 
     end

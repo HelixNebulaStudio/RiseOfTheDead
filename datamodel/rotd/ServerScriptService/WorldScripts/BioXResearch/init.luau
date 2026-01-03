@@ -66,6 +66,10 @@ function WorldCore.onRequire()
         shared.modNpcs.spawn2{Name="Jane";};
         shared.modNpcs.spawn2{Name="Michael";};
         
+        -- WorldCore.JosephClass = shared.modNpcs.spawn2{
+        --     Name = "Joseph";
+        --     CFrame = CFrame.new(-31.709, -13.642, 31.994);
+        -- };
 
     elseif RunService:IsClient() then
 

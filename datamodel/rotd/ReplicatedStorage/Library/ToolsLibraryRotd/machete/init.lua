@@ -24,7 +24,7 @@ local toolPackage = {
 	
 	Configurations={
 		Category = "Edged";
-		Type="Sword";
+		Type = "Sword";
 
 		EquipLoadTime=1;
 		Damage=240;

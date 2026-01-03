@@ -10,7 +10,6 @@ local MissionLogic = {};
 local MISSION_ID = 81;
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	local modNpcs = shared.modNpcs;
 
 	--if not modBranchConfigs.IsWorld("TheHarbor") then return MissionLogic end;

@@ -9,6 +9,7 @@ local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibra
 local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.BattlePassLibrary);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modBlueprintLibrary = shared.require(game.ReplicatedStorage.Library.BlueprintLibraryRotd);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
@@ -116,6 +117,8 @@ function ShopService.onRequire()
                     end
 
                     profile:AddPlayPoints(sellPrice/1000, "Source:Money");
+                    modAudio.Play("MoneyPickup", playerClass.Head);
+                    
                     return modShopLibrary.PurchaseReplies.Success;
                 else
                     return modShopLibrary.PurchaseReplies.InvalidItem;
@@ -169,6 +172,8 @@ function ShopService.onRequire()
                 };
 
                 profile:AddPlayPoints(price/1000, "Sink:Money");
+                modAudio.Play("Purchase", playerClass.Head);
+
                 return modShopLibrary.PurchaseReplies.Success;
             else
                 return modShopLibrary.PurchaseReplies.InsufficientCurrency;
@@ -294,6 +299,7 @@ function ShopService.onRequire()
             });
 
             profile:AddPlayPoints(price/1000, "Sink:Money");
+            modAudio.Play("Purchase", playerClass.Head);
             
             shared.Notify(player, `{storageItem.Library.Name} ammunition refilled.`, "Inform");
             
@@ -344,6 +350,9 @@ function ShopService.onRequire()
 
             local itemLib = modItemsLibrary:Find(storageItem.ItemId);
             shared.Notify(player, itemLib.Name.." repaired.", "Inform");
+
+            profile:AddPlayPoints(repairPrice/1000, "Sink:Money");
+            modAudio.Play("Crafting1", playerClass.Head);
             
             return modShopLibrary.PurchaseReplies.Success;
 
@@ -434,6 +443,7 @@ function ShopService.onRequire()
 
             battlePassSave:AddTokens(activeId, totalTokens);
             profile:AddPlayPoints(totalTokens/10, "Source:Reward");
+            modAudio.Play("Purchase", playerClass.Head);
             
             return modShopLibrary.PurchaseReplies.Success;
 

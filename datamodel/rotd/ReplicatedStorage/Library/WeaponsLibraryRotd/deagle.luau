@@ -57,6 +57,8 @@ local toolPackage = {
 		CrouchInaccuracyReduction=0.7;
 		MovingInaccuracyScale=1.6;
 
+		Piercing=2;
+
 		-- Focus
 		FocusDuration=0.5;
 		FocusWalkSpeedReduction=0.65;
