@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modifierPackage = {
 	Name = "Hyper Damage";
@@ -25,12 +25,14 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	end
 
 	assert(modifier.EquipmentClass, `Missing equipment class: {modifier}`);
+	local tierDmg = modItemModifierClass.AddTierDamage(modifier);
+
 	local configurations = modifier.EquipmentClass.Configurations;
 
 	local baseDamage = configurations.PreModDamage;
 	local additionalDmg = baseDamage * dValue;
 
-	modifier.SumValues.Damage = additionalDmg;
+	modifier.SumValues.Damage = additionalDmg + tierDmg;
 	modifier.SumValues.Rpm = frValue;
 end
 

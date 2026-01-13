@@ -112,15 +112,17 @@ if RunService:IsServer() then
 			local player: Player, dialog = ...;
 			if not modMission:Progress(player, MISSION_ID) then return end;
 
-			modMission:Progress(player, MISSION_ID, function(mission)
-				if mission.ProgressionPoint < 4 then
-					mission.ProgressionPoint = 4;
-	
-					modAnalyticsService:LogOnBoarding{
-						Player=player;
-						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_DrDeniskiHeal;
-					};
-				end;
+			task.spawn(function()
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint < 4 then
+						mission.ProgressionPoint = 4;
+		
+						modAnalyticsService:LogOnBoarding{
+							Player=player;
+							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_DrDeniskiHeal;
+						};
+					end;
+				end)
 			end)
 		end)
 		

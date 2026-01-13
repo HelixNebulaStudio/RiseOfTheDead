@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modifierPackage = {
 	Name = "Frenzy";
@@ -14,6 +14,8 @@ local modifierPackage = {
 
 function modifierPackage.Update(modifier: ItemModifierInstance)
 	if modifier.EquipmentClass == nil then return end;
+	modItemModifierClass.AddTierDamage(modifier);
+
 	local dLayerInfo = modItemModifierClass.Library.calculateLayer(modifier, "D");
 	local dValue, dTweakVal = dLayerInfo.Value, dLayerInfo.TweakValue;
 	
@@ -25,13 +27,8 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	local fdValue = fdLayerInfo.Value;
 
 	local configurations = modifier.EquipmentClass.Configurations;
-
-	local baseDamage = configurations.PreModDamage;
-	local additionalDmg = baseDamage * dValue;
-
 	if configurations.FrenzyDamage == nil then
 		modifier.SetValues.FrenzyDamage = fdValue;
-		modifier.SumValues.Damage = additionalDmg;
 		modifier.MaxValues.FrenzyRate = 0.01;
 	end
 end
@@ -59,7 +56,7 @@ if RunService:IsServer() then
 		end
 	end
 
-	function modifierPackage.Binds.OnNewDamage(modifier: ItemModifierInstance, damageData: DamageData)
+	function modifierPackage.Binds.OnNewDamageData(modifier: ItemModifierInstance, damageData: DamageData)
         if modifier.EquipmentClass == nil then return end;
 		local configurations = modifier.EquipmentClass.Configurations;
 		local preModDmg = configurations.PreModDamage;

@@ -697,7 +697,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local modUsableItems = shared.require(game.ReplicatedStorage.Library.UsableItems);
 	gpsButton.MouseButton1Click:Connect(function()
-		local listOfGps = modData.ListItemIdFromCharacter("gps");
+		local listOfGps = modData.ListItemIdOnCharacter("gps");
 		if #listOfGps > 0 then
 			local storageItem;
 			for a=1, #listOfGps do

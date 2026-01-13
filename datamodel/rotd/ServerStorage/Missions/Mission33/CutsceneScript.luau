@@ -26,15 +26,15 @@ if RunService:IsServer() then
 	modRaid = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager.Raid);
 	
 	if modBranchConfigs.IsWorld("TheMall") then
-		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
-			local triggerId: string = ...;
+		shared.modEventService:OnInvoked("Interactables_BindButtonInteract", function(eventPacket: EventPacket, ...)
+			local interactable: InteractableInstance = ...;
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			
-			if triggerId ~= "awokenTheBearVentLadder" then return end;
+			if interactable.Id ~= "awokenTheBearVentLadder" then return end;
 
 			local mission = modMission:GetMission(player, MISSION_ID);
-			if mission.Type == 2 and mission.ProgressionPoint > 2 then
+			if mission.Type == 1 and mission.ProgressionPoint > 2 then
 				modServerManager:Travel(player, "AwokenTheBear");
 			end
 		end)
@@ -107,7 +107,7 @@ return function(CutsceneSequence)
 
 			local stanNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Stan");
 			local stanMallShopSpawnCf = CFrame.new(755.090332, 94.8246002, -653.329224, -1, 0, 0, 0, 1, 0, 0, 0, -1);
-			if stanNpcClass == nil and mission.ProgressionPoint <= 13 then
+			if stanNpcClass == nil and (mission.Type == 4 or mission.ProgressionPoint <= 13) then
 				stanNpcClass = modNpcs.spawn2{
 					Name = "Stan";
 					CFrame = stanMallShopSpawnCf;
@@ -330,7 +330,7 @@ return function(CutsceneSequence)
 						stanNpcClass:SetCFrame(CFrame.new(-119.893661, 194.634567, -33.8498764, 0, 0, -1, 0, 1, 0, 1, 0, 0));
 
 					elseif mission.ProgressionPoint == 6 then
-						stanNpcClass:SetCFrame(CFrame.new(-119.893661, 194.634567, -33.8498764, 0, 0, -1, 0, 1, 0, 1, 0, 0));
+						stanNpcClass:SetCFrame(CFrame.new(-119.893661, 194.634567, -35.8498764, 0, 0, -1, 0, 1, 0, 1, 0, 0));
 						stanNpcClass.PlayAnimation("Surrender");
 
 						loranNpcClass.Chat(player, "STAY RIGHT THERE!");
@@ -565,7 +565,7 @@ return function(CutsceneSequence)
 						task.wait(5);
 						
 						zarkNpcClass.Move:HeadTrack(jasonNpcClass.Head);
-						zarkNpcClass.Chat(player, "JASON, Team delta has been taken out by the infector, find some replacements now!");
+						zarkNpcClass.Chat(player, "JASON, Delta team has been taken out by the infector, find some replacements now!");
 						task.wait(7.5);
 						
 						jasonNpcClass.Chat(player, "Sure thing boss.");

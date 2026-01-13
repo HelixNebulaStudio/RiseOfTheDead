@@ -6,6 +6,17 @@ local modSettings = require(game.ReplicatedStorage.Library.Settings);
 function modSettings.onRequire()
 	local baseConfigInterface = modSettings.DefaultConfigInterface;
 
+    modSettings.Add("AimAssist", modSettings.Checks.BooleanOrNil);
+
+    baseConfigInterface:Add("GameplayGeneral", "ToggleOption", {
+        TitleProperties={Text="Aim Assist";};
+        DescProperties={Text="Aim assistance for touch or controller users when focused.";};
+        Config={
+            SettingsKey="AimAssist"; 
+            Type="Toggle;Enabled;Disabled";
+        };
+    });
+
     modSettings.Add("KeyTogglePat", modSettings.Checks.KeyCheck);
     
 	local uiKeyCheck = modSettings.Checks.IgnoreMouseKeys(modSettings.Checks.KeyCheck);

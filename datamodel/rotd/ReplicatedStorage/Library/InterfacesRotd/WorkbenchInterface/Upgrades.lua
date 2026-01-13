@@ -83,9 +83,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				
 				tierOfMod = modifierStorageItem.Values.Tier or modLib.Tier;
 				
-				if tierOfItem < tierOfMod then
-					titleTag.Text = modLib.Name..' <font color="rgb(221, 97, 97)">(Incompatible Tier)</font>';
-				end
+				-- if tierOfItem < tierOfMod then
+				-- 	titleTag.Text = modLib.Name..' <font color="rgb(221, 97, 97)">(Incompatible Tier)</font>';
+				-- end
 			end
 
 			if modifierStorageItem.Values.StackConflict then
@@ -373,17 +373,17 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						if itemLib.Tier then
 							levelSlot.ImageColor3 = tierColor;
 							
-							if tierOfItem and tierOfItem < tierOfMod then
-								local disabledImageLabel = levelSlot:WaitForChild("Disabled");
-								local tierDiff = (tierOfMod-tierOfItem);
-								local disablePoint = upgradeMaxLevel-tierDiff;
+							-- if tierOfItem and tierOfItem < tierOfMod then
+							-- 	local disabledImageLabel = levelSlot:WaitForChild("Disabled");
+							-- 	local tierDiff = (tierOfMod-tierOfItem);
+							-- 	local disablePoint = upgradeMaxLevel-tierDiff;
 								
-								if c > disablePoint then
-									disabledImageLabel.Visible = true;
-								else
-									disabledImageLabel.Visible = false;
-								end
-							end
+							-- 	if c > disablePoint then
+							-- 		disabledImageLabel.Visible = true;
+							-- 	else
+							-- 		disabledImageLabel.Visible = false;
+							-- 	end
+							-- end
 						end
 
 						levelSlot.Size = UDim2.new(0, newPointSize, 1, 0);

@@ -1,6 +1,8 @@
 local RunService = game:GetService("RunService");
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+
+local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 --==
 local statusPackage = {
     Id = "PacifistsAmulet";
@@ -12,16 +14,8 @@ local statusPackage = {
 };
 
 if RunService:IsServer() then
-    local modifierId = statusPackage.Id;
-
-    function statusPackage.BindExpire(statusClass: StatusClassInstance)
-        local characterClass: CharacterClass = statusClass.StatusOwner;
-        if characterClass == nil then return end;
-
-        characterClass.Configurations:RemoveModifier(modifierId);
-    end
-
     function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
+        if RunService:IsClient() then return end;
         if tickData.ms100 ~= true then return end;
 
         local characterClass: CharacterClass = statusClass.StatusOwner;
@@ -32,14 +26,23 @@ if RunService:IsServer() then
         local shouldRemove = false;
         local sync = false;
 
-        local maxAddAp = statusClass.Values.AddAp;
-        local addAr = statusClass.Values.AddAr;
+        local mSiid = statusClass.Values.Siid;
 
         if statusClass.StatusComp:GetOrDefault("WarmongerScales") ~= nil then -- disable if warmonger present;
-            maxAddAp = 0;
+            statusClass.IsExpired = true;
+            return;
         end
 
-        statusClass.Values.Ap = (statusClass.Values.Ap or 0);
+        local modifierInstance: ItemModifierInstance? = characterClass.WieldComp:GetOrDefaultItemModifier(mSiid);
+        if modifierInstance == nil or not modifierInstance.Enabled then
+            statusClass.IsExpired = true;
+            return;
+        end
+
+        local maxAddAp = modifierInstance.Values.AddAp;
+        local addAr = modifierInstance.Values.AddAr;
+
+        statusClass.Values.MaxArmorOverCharge = (statusClass.Values.MaxArmorOverCharge or 0);
 
         if maxAddAp <= 0 then
             shouldRemove = true;
@@ -50,40 +53,33 @@ if RunService:IsServer() then
                                 and (modItemsLibrary:HasTag(equippedItemId, "Heal") 
                                 or modItemsLibrary:HasTag(equippedItemId, "Food")))
 
-            local armorRate = configurations.ArmorRate;
+            local newArmorRate = (configurations.ArmorRate + addAr)/10;
             if isPacifist then
-                statusClass.Values.Ap = math.clamp(statusClass.Values.Ap + armorRate, 0, maxAddAp);
-            else
-                statusClass.Values.Ap = math.clamp(statusClass.Values.Ap - 0.2, 0, maxAddAp); -- 2 per sec
-            end
-
-            if statusClass.Values.Ap <= 0 then
-                shouldRemove = true;
-
-            else
-
-                local statusModifier: ConfigModifier = configurations:GetModifier(modifierId);
-                if statusModifier == nil then
-                    statusModifier = configurations.newModifier(modifierId);
-                    statusModifier.MaxValues.MaxArmorOverCharge = statusClass.Values.Ap;
-                    statusModifier.SumValues.ArmorRate = addAr/10;
-                    statusModifier.Tags.StatusMod = true;
+                if statusClass.Values.OverChargePool == nil then
+                    statusClass.Values.OverChargePool = maxAddAp;
                 end
-                configurations:AddModifier(statusModifier);
+                if statusClass.Values.OverChargePool > 0 then
+                    local add = newArmorRate;
 
-                if not statusClass.Visible then
-                    statusClass.Visible = true;
+                    statusClass.Values.OverChargePool -= add;
+                    statusClass.Values.MaxArmorOverCharge = math.clamp(statusClass.Values.MaxArmorOverCharge + add, 0, maxAddAp);
+
+                    characterClass.HealthComp:SetArmor(characterClass.HealthComp.CurArmor + newArmorRate);
+                end
+
+            else
+                statusClass.Values.MaxArmorOverCharge = math.clamp(statusClass.Values.MaxArmorOverCharge - 1, 0, maxAddAp); 
+
+                if statusClass.Values.MaxArmorOverCharge <= 0 and statusClass.Expires == nil then
+                    statusClass.Expires = workspace:GetServerTimeNow() + 60;
+                    statusClass.Duration = 60;
                     sync = true;
                 end
             end
         end
 
         if shouldRemove then
-            configurations:RemoveModifier(modifierId);
-            if statusClass.Visible then
-                statusClass.Visible = false;
-                sync = true;
-            end
+            statusClass.IsExpired = true;
         end
 
         if sync then

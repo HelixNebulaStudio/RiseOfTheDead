@@ -2,11 +2,11 @@ local modWeaponAttributes = shared.require(game.ReplicatedStorage.Library.Weapon
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 local toolPackage = {
-	ItemId=script.Name;
-	Class="Gun";
-	HandlerType="GunTool";
-	WeaponClass="Pistol";
-	Tier=1;
+	ItemId = script.Name;
+	Class = "Gun";
+	HandlerType = "GunTool";
+	WeaponClass = "Pistol";
+	Tier = 1;
 
 	Animations={
 		Core={Id=106976440089912;};
@@ -37,14 +37,14 @@ local toolPackage = {
 		TriggerMode=modWeaponAttributes.TriggerModes.Semi;
 		ReloadMode=modWeaponAttributes.ReloadModes.Full;
 		
-		AmmoType="lightammo";
+		AmmoType = "lightammo";
 
-		BulletEject="PistolBullet";
-		BulletEjectOffset=CFrame.Angles(math.rad(-90), 0, 0);
+		BulletEject = "PistolBullet";
+		BulletEjectOffset = CFrame.Angles(math.rad(-90), 0, 0);
 		
 		-- Stats
 		Damage=25;
-		PotentialDamage=365;
+		PotentialDamage=315;
 		
 		MagazineSize=15;
 		AmmoCapacity=(15*5);

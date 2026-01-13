@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
 
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 local modStatusLibrary = shared.require(game.ReplicatedStorage.Library.StatusLibrary);
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 
@@ -74,7 +74,7 @@ function modifierPackage.Kick(modifier: ItemModifierInstance, targetModel)
 	end
 end
 
-function modifierPackage.Binds.CharacterClassPropertiesChanged(modifier: ItemModifierInstance, propertyName: string, isSliding: boolean)
+function modifierPackage.Binds.CharacterClassIsSlidingChanged(modifier: ItemModifierInstance, isSliding: boolean)
 	if propertyName ~= "IsSliding" then return end;
 	if modifier.WieldComp == nil then return end;
 

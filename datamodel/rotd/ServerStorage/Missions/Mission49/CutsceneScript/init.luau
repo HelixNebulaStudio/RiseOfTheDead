@@ -42,7 +42,7 @@ return function(CutsceneSequence)
 
 						local newInteractConfig = modInteractables.createInteractable("Collectible");
 						newInteractConfig:SetAttribute("_Id", "vrm");
-						newInteractConfig:SetAttribute("Label", "Vehicle Repair Manual");
+						newInteractConfig:SetAttribute("_Label", "Vehicle Repair Manual");
 						newInteractConfig.Parent = new;
 						
 						modReplicationManager.ReplicateOut(player, new);

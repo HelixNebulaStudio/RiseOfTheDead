@@ -44,7 +44,7 @@ local toolPackage = {
 		
 		-- Stats
 		Damage=580;
-		PotentialDamage=19680;
+		PotentialDamage=18620;
 		
 		MagazineSize=6;
 		AmmoCapacity=(6*3);

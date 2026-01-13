@@ -24,8 +24,8 @@ local GenericDescs={
 	Calibre="Shift your weapon's <b>Fire Rate</b> in proportional from <b>DPS</b> towards <b>Damage</b>.";
 	CritMulti="Adds multiplier to <b>Crit Multiplier</b> for weapons with existing <b>Crit Chance</b>.";
 	
-	ShotSplitter="Splits a shot into two by settings <b>Multishot</b> to 2. <b>Damage</b> will be re-scaled to the new ratio and adds <b>Rpm</b> to <b>Fire Rate</b>.";
-	Deadeye="Increases aim-down accuracy and recoil control and adds <b>Damage</b> based on <b>Premod Damage</b>.";
+	ShotSplitter="Splits a shot into two by settings <b>Multishot</b> to 2. Adds <b>Rpm</b> to <b>Fire Rate</b>.";
+	Deadeye="Increases aim-down accuracy and recoil control.";
 	
 	RapidFire="Revs up the longer you fire towards max fire rate. Upgrading decreases the rev up time.";
 }
@@ -48,8 +48,8 @@ function library.onRequire()
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.Damage;
 		Category="Damage Mods";
-		Upgrades={	
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.05; MaxValue=0.5; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
+		Upgrades={
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.05; MaxValue=0.1; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
 		};
 	}
 
@@ -109,8 +109,8 @@ function library.onRequire()
 		Name="Pistol Magazine";
 		Desc=GenericDescs.AmmoMag;
 		Icon="rbxassetid://3551129663";
-		BaseTier=1;
-		Tier=1;
+		BaseTier=3;
+		Tier=3;
 		Stackable=true;
 		Type={"Pistol"};
 		EffectTrigger=library.EffectTrigger.Passive;
@@ -127,8 +127,8 @@ function library.onRequire()
 		Name="Pistol Automatic Trigger";
 		Desc="Switch <b>TriggerMode</b> from <b>Semi-automatic</b> to <b>Full-automatic</b>.";
 		Icon="rbxassetid://4523393772";
-		BaseTier=1;
-		Tier=1;
+		BaseTier=2;
+		Tier=2;
 		Stackable=false;
 		Type={"Pistol"};
 		EffectTrigger=library.EffectTrigger.Passive;
@@ -168,7 +168,7 @@ function library.onRequire()
 		Module=script.Damage;
 		Category="Damage Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.05; MaxValue=0.5; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.05; MaxValue=0.1; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 	}
 
@@ -228,8 +228,8 @@ function library.onRequire()
 		Name="Submachine Gun Skullcracker";
 		Desc=GenericDescs.Skullcracker;
 		Icon="http://www.roblox.com/asset/?id=4824432272";
-		BaseTier=1;
-		Tier=1;
+		BaseTier=2;
+		Tier=2;
 		Stackable=false;
 		Type={"Submachine gun"};
 		EffectTrigger=library.EffectTrigger.Passive;
@@ -288,7 +288,6 @@ function library.onRequire()
 		Module=script.ShotSplitter;
 		Category="Rare Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Split Damage"; MaxLevel=10; BaseCost=8; MaxCost=80; BaseValue=0.35; MaxValue=0.7; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 			{DataTag="FR"; Name="Fire Rate"; Syntax="Upgrade Fire Rate"; ValueType="Normal"; MaxLevel=10; BaseCost=8; MaxCost=80; BaseValue=5; MaxValue=75; TweakBonus=10; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.1;};
 		};
 		--Layer=90;
@@ -307,12 +306,11 @@ function library.onRequire()
 		Module=script.Deadeye;
 		Category="Rare Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.05; MaxValue=0.4; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;}; -- from 8;
 			{DataTag="A"; Name="Accuracy"; Syntax="Upgrade Accuracy"; MaxLevel=10; BaseCost=5; MaxCost=50; BaseValue=0.05; MaxValue=0.4; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 	}
 
-	-- MARK: Submachine Gun Mods 100-149;
+	-- MARK: Shotgun Mods 100-149;
 	library:Add{
 		Id="shotgundamagemod";
 		Name="Shotgun Damage";
@@ -326,7 +324,7 @@ function library.onRequire()
 		Module=script.Damage;
 		Category="Damage Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.05; MaxValue=0.3; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.05; MaxValue=0.1; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 	}
 
@@ -463,7 +461,6 @@ function library.onRequire()
 		Module=script.Deadeye;
 		Category="Rare Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.05; MaxValue=0.2; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 			{DataTag="A"; Name="Accuracy"; Syntax="Upgrade Accuracy"; MaxLevel=10; BaseCost=5; MaxCost=50; BaseValue=0.05; MaxValue=0.9; TweakBonus=0.05; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 	}
@@ -482,7 +479,7 @@ function library.onRequire()
 		Module=script.Damage;
 		Category="Damage Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=6; MaxCost=110; BaseValue=0.05; MaxValue=0.3; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=6; MaxCost=110; BaseValue=0.05; MaxValue=0.1; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 	}
 
@@ -550,7 +547,7 @@ function library.onRequire()
 		Module=script.HyperDamage;
 		Category="Rare Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.05; MaxValue=0.25; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.05; MaxValue=0.1; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 			{DataTag="FR"; Name="Fire Rate"; Syntax="Upgrade Fire Rate"; ValueType="Normal"; MaxLevel=10; BaseCost=7; MaxCost=70; BaseValue=10; MaxValue=75; TweakBonus=10; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
 		};
 	}
@@ -620,7 +617,7 @@ function library.onRequire()
 		Module=script.Damage;
 		Category="Damage Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.05; MaxValue=0.2; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.05; MaxValue=0.1; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 	}
 
@@ -740,7 +737,7 @@ function library.onRequire()
 		Module=script.Damage;
 		Category="Damage Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.05; MaxValue=0.5; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.05; MaxValue=0.1; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 	}
 
@@ -749,8 +746,8 @@ function library.onRequire()
 		Name="Heavy Machine Gun Reload Speed";
 		Desc=GenericDescs.ReloadSpeed;
 		Icon="http://www.roblox.com/asset/?id=3818054442";
-		BaseTier=1;
-		Tier=1;
+		BaseTier=3;
+		Tier=3;
 		Stackable=false;
 		Type={"Heavy machine gun"};
 		EffectTrigger=library.EffectTrigger.Passive;
@@ -766,8 +763,8 @@ function library.onRequire()
 		Name="Heavy Machine Gun Ammo Capacity";
 		Desc=GenericDescs.AmmoCap;
 		Icon="http://www.roblox.com/asset/?id=3818054835";
-		BaseTier=1;
-		Tier=1;
+		BaseTier=2;
+		Tier=2;
 		Stackable=true;
 		Type={"Heavy machine gun"};
 		EffectTrigger=library.EffectTrigger.Passive;
@@ -795,6 +792,21 @@ function library.onRequire()
 		};
 	}
 
+	library:Add{
+		Id = "pointguardbulwark";
+		Name = "Heavy Machine Gun Point-Guard Bulwark";
+		Desc = "[Beta] Additional <b>Armor Points</b> build up while in focus at the reduction of your <b>Focus Movespeed</b>.";
+		Icon = library.PlaceholderIcon;
+		BaseTier = 2;
+		Tier = 2;
+		Stackable = false;
+		Type = {"Heavy machine gun";};
+		Module = script.PointGuardBulwark;
+		Category = "Rare Mods";
+		Upgrades = {
+			{DataTag="AP"; Name="Armor Points"; Syntax="Upgrade Armor Points"; ValueType="Normal"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=20; MaxValue=100; TweakBonus=20; Scaling=library.ScalingStyle.Linear;};
+		};
+	}
 
 	-- MARK: Pyrotechnic;
 	library:Add{
@@ -810,7 +822,7 @@ function library.onRequire()
 		Module=script.Damage;
 		Category="Damage Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0; MaxValue=0.3; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0; MaxValue=0.1; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 	}
 
@@ -819,8 +831,8 @@ function library.onRequire()
 		Name="Pyrotechnic Ammo Capacity";
 		Desc=GenericDescs.AmmoCap;
 		Icon="http://www.roblox.com/asset/?id=4535764993";
-		BaseTier=1;
-		Tier=1;
+		BaseTier=2;
+		Tier=2;
 		Stackable=true;
 		Type={"Pyrotechnic"};
 		EffectTrigger=library.EffectTrigger.Passive;
@@ -836,8 +848,8 @@ function library.onRequire()
 		Name="Pyrotechnic Everlast";
 		Desc="Increase burning duration of lingering flames while increasing ammo cost per shot.";
 		Icon="http://www.roblox.com/asset/?id=4938813087";
-		BaseTier=1;
-		Tier=1;
+		BaseTier=2;
+		Tier=2;
 		Stackable=true;
 		Type={"Pyrotechnic"};
 		EffectTrigger=library.EffectTrigger.Passive;
@@ -845,7 +857,7 @@ function library.onRequire()
 		Category="Rare Mods";
 		Layer=99;
 		Upgrades={
-			{DataTag="BD"; Name="Duration"; Syntax="Increase Duration"; ValueType="Normal"; Suffix="s"; MaxLevel=9; BaseCost=9; MaxCost=90; BaseValue=3; MaxValue=30; TweakBonus=10; Scaling=library.ScalingStyle.Linear;};
+			{DataTag="BD"; Name="Duration"; Syntax="Increase Duration"; ValueType="Normal"; Suffix="s"; MaxLevel=9; BaseCost=9; MaxCost=90; BaseValue=3; MaxValue=15; TweakBonus=10; Scaling=library.ScalingStyle.Linear;};
 		};
 	}
 
@@ -854,8 +866,8 @@ function library.onRequire()
 		Name="Flamethrower Flame Burst";
 		Desc="Converts projectile from liquid flame to gas flame. Increases impact damge by <b>x5 impact damage, x0.5 burn tick damage</b> and applys knockback on impact. Burn time last for 25 seconds and can be extended with <b>Everlast</b>.";
 		Icon="http://www.roblox.com/asset/?id=14286986692";
-		BaseTier=1;
-		Tier=1;
+		BaseTier=3;
+		Tier=3;
 		Stackable=false;
 		Type={"Flamethrower"};
 		EffectTrigger=library.EffectTrigger.Passive;
@@ -872,15 +884,15 @@ function library.onRequire()
 		Name="Explosive Damage";
 		Desc=GenericDescs.Damage;
 		Icon="http://www.roblox.com/asset/?id=3818101661";
-		BaseTier=2;
-		Tier=2;
+		BaseTier=1;
+		Tier=1;
 		Stackable=true;
 		Type={"Explosive"};
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.Damage;
 		Category="Damage Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.1; MaxValue=0.2; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.1; MaxValue=0.1; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 	}
 
@@ -906,8 +918,8 @@ function library.onRequire()
 		Name="Explosive Radius";
 		Desc="Increase explosion range by adding radius to <b>Explosion Radius</b>.";
 		Icon="http://www.roblox.com/asset/?id=6839719422";
-		BaseTier=2;
-		Tier=2;
+		BaseTier=3;
+		Tier=3;
 		Stackable=true;
 		Type={"Explosive"};
 		EffectTrigger=library.EffectTrigger.Passive;
@@ -923,8 +935,8 @@ function library.onRequire()
 		Name="Rocketman";
 		Desc="While player is in the air, reload time is reduced to zero. Adds <b>Rpm</b> to <b>Fire Rate</b>.";
 		Icon="http://www.roblox.com/asset/?id=12505260876";
-		BaseTier=3;
-		Tier=3;
+		BaseTier=2;
+		Tier=2;
 		Stackable=false;
 		Type={"Rocket"};
 		EffectTrigger=library.EffectTrigger.Passive;
@@ -941,15 +953,15 @@ function library.onRequire()
 		Name="Bow Damage";
 		Desc=GenericDescs.Damage;
 		Icon="http://www.roblox.com/asset/?id=5525819158";
-		BaseTier=3;
-		Tier=3;
+		BaseTier=1;
+		Tier=1;
 		Stackable=true;
 		Type={"Bow"};
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.Damage;
 		Category="Damage Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.05; MaxValue=0.2; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.05; MaxValue=0.1; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
 		};
 	}
 
@@ -958,8 +970,8 @@ function library.onRequire()
 		Name="Bow Ammo Capacity";
 		Desc="Adds <b>Ammo Capacity</b> based on <b>Premod Ammo Capacity</b>.";
 		Icon="http://www.roblox.com/asset/?id=5525831865";
-		BaseTier=3;
-		Tier=3;
+		BaseTier=2;
+		Tier=2;
 		Stackable=true;
 		Type={"Bow"};
 		EffectTrigger=library.EffectTrigger.Passive;
@@ -991,7 +1003,7 @@ function library.onRequire()
 	library:Add{
 		Id="bowdeadweightmod";
 		Name="Bow Deadweight";
-		Desc="Allows projectiles to pierce enemies at the cost of projectile speed. Also adds <b>Damage</b> based on <b>Premod Damage</b>.";
+		Desc="Allows projectiles to pierce enemies at the cost of projectile speed.";
 		Icon="http://www.roblox.com/asset/?id=13257333197";
 		BaseTier=2;
 		Tier=2;
@@ -1001,7 +1013,6 @@ function library.onRequire()
 		Module=script.BowDeadweight;
 		Category="Rare Mods";
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.03; MaxValue=0.25; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 			{DataTag="W"; Name="Piercing"; Syntax="Increase Piercing"; ValueType="Normal"; MaxLevel=7; BaseCost=10; MaxCost=100; BaseValue=1; MaxValue=8; TweakBonus=1; Scaling=library.ScalingStyle.Linear;};
 		};
 	}
@@ -1064,12 +1075,11 @@ function library.onRequire()
 	library:Add{
 		Id="frenzydamagemod";
 		Name="Frenzy Damage";
-		Desc="Adds <b>Damage</b> based on <b>Premod Damage</b>. Additional <b>Damage</b> is built up when you take damage.\n<b>Stack Rate:</b> 1% per Damage Taken\n<b>Decay Delay:</b> 10s";
+		Desc="Additional <b>Damage</b> is built up when you take damage.\n<b>Stack Rate:</b> 1% per Damage Taken\n<b>Decay Delay:</b> 10s";
 		Icon="rbxassetid://105743703562476";
-		BaseTier=4;
-		Tier=4;
+		BaseTier=2;
+		Tier=2;
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.05; MaxValue=0.2; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
 			{DataTag="FD"; Name="Frenzy Damage"; Syntax="Upgrade Frenzy Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.1; MaxValue=0.6; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
 		};
 		Stackable=false;
@@ -1334,20 +1344,20 @@ function library.onRequire()
 	}
 
 	library:Add{
-		Id="thornmod";
-		Name="Thorn Plating";
-		Desc="When taking melee damage with armor > 0, attacker takes reflected damage based on a percent of their health. Reflected damage only affects basic enemies. Minimum reflected damage is 10.";
-		Icon="http://www.roblox.com/asset/?id=5720010211";
-		BaseTier=1;
-		Tier=1;
-		Upgrades={
+		Id = "thornmod";
+		Name = "Thorn Plating";
+		Desc = "When taking melee damage with armor > 0, attacker takes reflected damage based on a percent of their health. Reflected damage only affects basic enemies. Minimum reflected damage is 10.";
+		Icon = "http://www.roblox.com/asset/?id=5720010211";
+		BaseTier = 1;
+		Tier = 1;
+		Upgrades = {
 			{DataTag="R"; Name="Reflected Percent"; Syntax="Upgrade Percent"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.1; MaxValue=0.7; TweakBonus=0.05; Scaling=library.ScalingStyle.NaturalCurve; Rate=2;};
 		};
-		Stackable=false;
-		Type={"Chest"};
-		EffectTrigger=library.EffectTrigger.Passive;
-		Module=script.ThornPlating;
-		Category="Rare Mods";
+		Stackable = false;
+		Type = {"Chest"};
+		EffectTrigger = library.EffectTrigger.Passive;
+		Module = script.ThornPlating;
+		Category = "Rare Mods";
 	};
 
 	library:Add{
@@ -1370,20 +1380,20 @@ function library.onRequire()
 	}
 
 	library:Add{
-		Id="nekrosampmod";
-		Name="Nekrosis Amplifier";
-		Desc="Increase <b>Nekrosis Heal</b> by a percentage to Nekrosis effect and Ziphoning Heal."; 
-		Icon="rbxassetid://16045442080";
-		BaseTier=1;
-		Tier=1;
-		Upgrades={
+		Id = "nekrosampmod";
+		Name = "Nekrosis Amplifier";
+		Desc = "Increase <b>Nekrosis Heal</b> by a percentage to Nekrosis effect and Ziphoning Heal."; 
+		Icon = "rbxassetid://16045442080";
+		BaseTier = 1;
+		Tier = 1;
+		Upgrades = {
 			{DataTag="A"; Name="Amplifier"; Syntax="Upgrade"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.1; MaxValue=1; Scaling=library.ScalingStyle.NaturalCurve;Rate=1.1;};
 		};
-		Stackable=false;
-		Type={"Chest"};
-		EffectTrigger=library.EffectTrigger.Passive;
-		Module=script.NekrosisAmp;
-		Category="Rare Mods";
+		Stackable = false;
+		Type = {"Chest"};
+		EffectTrigger = library.EffectTrigger.Passive;
+		Module = script.NekrosisAmp;
+		Category = "Rare Mods";
 	};
 
 	library:Add{

@@ -120,6 +120,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local remoteToggleClothing = modRemotesManager:Get("ToggleClothing");
 
 	local modData = shared.require(localPlayer:WaitForChild("DataModule"));
+	modData.StoragesOnCharacter = {"Inventory"; "Clothing"; "Wardrobe"};
 
 	local interfaceScreenGui = interface.ScreenGui;
 
@@ -129,10 +130,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local modCharacter = modData:GetModCharacter();
 	
 	local inventoryFrame = script:WaitForChild("Inventory"):Clone(); 
-	-- modConfigurations.CompactInterface 
-	-- 					and script:WaitForChild("MobileInventory"):Clone() 
-	-- 					or 
-	-- inventoryFrame.Name = "Inventory";
 	inventoryFrame.Parent = interfaceScreenGui;
 
 	local invFrameSizeConstraint: UISizeConstraint = inventoryFrame:WaitForChild("UISizeConstraint");
@@ -160,6 +157,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	interface:BindConfigKey("DisableInventory", {inventoryWindow});
 	
 	if modConfigurations.CompactInterface then
+		inventoryWindow.BoolStringWhenActive = {String="!CharacterHud | CurrencyStats"; Priority=5;};
+
 		inventoryFrame.AnchorPoint = Vector2.new(0, 0);
 		inventoryFrame.Position = UDim2.new(0, 0, 0, 0);
 		inventoryFrame.Size = UDim2.new(0.5, 0, 1, 0);
@@ -214,6 +213,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		local padding = Instance.new("UIPadding");
 		padding.PaddingRight = UDim.new(0, 15);
+		padding.PaddingBottom = UDim.new(0, 25);
 		padding.Parent = invContainerFrame;
 
 	else

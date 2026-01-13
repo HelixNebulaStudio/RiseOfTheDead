@@ -47,7 +47,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 		local playerStats = modData.GameSave and modData.GameSave.Stats;
 		
-		local lmpCountOnChar = modData.CountItemIdFromCharacter("liquidmetalpolish");
+		local lmpCountOnChar = modData.CountItemIdOnCharacter("liquidmetalpolish");
 		local lmpCountAll = modData.CountItemIdFromStorages("liquidmetalpolish");
 		
 		lmpLabel.Text = `• 1 Liquid Metal Polish (Storage: {lmpCountAll})`;

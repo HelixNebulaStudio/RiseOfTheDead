@@ -1,6 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService");
+local StorageItem = require(ReplicatedStorage.Library.StorageItem)
 
 local localPlayer = game.Players.LocalPlayer;
 
@@ -180,11 +182,25 @@ elseif RunService:IsServer() then -- MARK: Server
 				return;
 			end
 
+			local player: Player? = characterClass.ClassName == "PlayerClass" and (characterClass :: PlayerClass):GetInstance() or nil;
+
 			local effectDuration = configurations.EffectDuration;
 			local changeRef = {
 				EffectDuration = effectDuration;
 			};
-			shared.modEventService:ServerInvoke("Tools_BindFoodTool", {}, "Consume", handler, changeRef);
+
+			local event: EventPacket = shared.modEventService:ServerInvoke(
+				"Tools_BindFoodTool", 
+				{ReplicateTo = player;}, 
+				"Consume", 
+				handler, 
+				changeRef
+			);
+			if event.Cancelled then 
+				Debugger:Warn(`Cancelled foodtool consume. EventPacket:`, Debugger:Stringify(event));
+				return;
+			end;
+
 			effectDuration = changeRef.EffectDuration;
 			
 			local maxHealthRate = 30;
@@ -256,7 +272,9 @@ elseif RunService:IsServer() then -- MARK: Server
 
 			end
 	
-			characterClass.WieldComp:Unequip();
+			if handler.StorageItem.Quantity <= 1 then
+				characterClass.WieldComp:Unequip();
+			end
 
 			if characterClass.ClassName == "PlayerClass" then
 				local player = (characterClass :: PlayerClass):GetInstance();
@@ -266,8 +284,6 @@ elseif RunService:IsServer() then -- MARK: Server
 				inventory:Remove(handler.StorageItem.ID, 1);
 				shared.Notify(player, ("1 $Item removed from your Inventory."):gsub("$Item", itemLib.Name), "Negative");
 			end
-
-			modOnGameEvents:Fire("OnFoodToolConsume", handler);
 
 		end
 

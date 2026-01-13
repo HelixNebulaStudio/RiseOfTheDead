@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modifierPackage = {
 	Name = "Reload Speed";
@@ -19,6 +19,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	end
 
 	assert(modifier.EquipmentClass, `Missing equipment class: {modifier}`);
+	modItemModifierClass.AddTierDamage(modifier);
 	local configurations = modifier.EquipmentClass.Configurations;
 	
 	local baseReloadTime = configurations:GetBase("ReloadTime");

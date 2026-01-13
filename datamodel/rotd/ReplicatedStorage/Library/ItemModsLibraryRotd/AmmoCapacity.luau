@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modifierPackage = {
 	Name = "Ammo Capacity";
@@ -15,6 +15,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	local value, tweakVal = layerInfo.Value, layerInfo.TweakValue;
 
 	assert(modifier.EquipmentClass, `Missing equipment class: {modifier}`);
+	modItemModifierClass.AddTierDamage(modifier);
 	local configurations = modifier.EquipmentClass.Configurations;
 	
 	if layerInfo.UpgradeInfo.Scaling == 0 then

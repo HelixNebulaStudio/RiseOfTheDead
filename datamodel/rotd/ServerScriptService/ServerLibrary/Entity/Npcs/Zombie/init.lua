@@ -53,6 +53,7 @@ function npcPackage.LevelSet(npcClass: NpcClass)
     configurations.BaseValues.AttackDamage = lvlAttackDamage;
 
     if healthComp.LastDamagedBy == nil then
+        healthComp:SetMaxHealth(configurations.MaxHealth);
         healthComp:Reset();
     end
 end

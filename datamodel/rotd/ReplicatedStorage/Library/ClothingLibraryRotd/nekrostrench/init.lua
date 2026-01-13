@@ -20,8 +20,11 @@ function attirePackage.newClass()
 
 	if not modBranchConfigs.IsWorld("Slaughterfest") then
 		equipmentClass:AddBaseModifier("Nekrosis", {
-			SumValues={
+			SetValues = {
 				NekrosisHeal = 2;
+			};
+			ArrayValues = {
+				PassiveModifiers = "Nekrosis";
 			};
 		});
 	end

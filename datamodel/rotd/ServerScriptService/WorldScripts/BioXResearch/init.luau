@@ -40,15 +40,16 @@ function WorldCore.onRequire()
 
 		shared.modEventService:OnInvoked("Dialogue_BindMedicHeal", function(event: EventPacket, ...)
 			local player: Player, dialog = ...;
+            task.spawn(function()
+                Debugger:StudioLog(`Dialogue_BindMedicHeal`, event, player, dialog);
 
-            Debugger:StudioLog(`Dialogue_BindMedicHeal`, event, player, dialog);
-
-            dialog:AddDialog({
-                Say = "So BindMedicHeal works.";
-                Reply = "Indeed";
-            }, function(dialog)
-                Debugger:Warn(`Dialogue_BindMedicHeal additional dialogue callback`);
-            end);
+                dialog:AddDialog({
+                    Say = "So BindMedicHeal works.";
+                    Reply = "Indeed";
+                }, function(dialog)
+                    Debugger:Warn(`Dialogue_BindMedicHeal additional dialogue callback`);
+                end);
+            end)
 		end)
 
         -- MARK: sh1

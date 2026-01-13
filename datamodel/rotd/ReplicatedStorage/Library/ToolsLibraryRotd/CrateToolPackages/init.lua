@@ -132,6 +132,18 @@ function toolPackage.init(super)
 		ItemId = "hbanditcrate";
 	});
 
+	toolPackage.inherit({
+		ItemId = "corruptedsectorfcrate";
+	});
+
+	toolPackage.inherit({
+		ItemId = "corruptedprisoncrate";
+	});
+
+	toolPackage.inherit({
+		ItemId = "corruptedsectordcrate";
+	});
+
 	-- residentials
 	toolPackage.inherit({
 		ItemId = "sectordcrate";

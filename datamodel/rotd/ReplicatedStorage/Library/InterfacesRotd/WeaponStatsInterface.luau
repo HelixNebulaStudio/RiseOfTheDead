@@ -147,6 +147,7 @@ local statTemplates = {
 		{Key="FlinchProtection"; Text="<b>Flinch Protection:</b>    $stat%"; Type="percent"};
 		{Key="SplashReflection"; Text="<b>Splash Reflection:</b>    $stat%"; Type="percent"};
 		
+		{Key="PassiveModifiers"; Text="<b>Passives:</b>    $stat"; Type="string"; OnlyExpand=true;};
 	}
 };
 

@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modHealthComp = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
@@ -16,6 +16,8 @@ local modifierPackage = {
 --==
 
 function modifierPackage.Update(modifier: ItemModifierInstance)
+	modItemModifierClass.AddTierDamage(modifier);
+
 	local rLayerInfo = modItemModifierClass.Library.calculateLayer(modifier, "R");
 	local rValue, rTweakVal = rLayerInfo.Value, rLayerInfo.TweakValue;
 	if rTweakVal then
@@ -41,8 +43,8 @@ if RunService:IsServer() then
 		local duration = modifier.Values.Duration;
 
 		local characterClass: CharacterClass;
-		if modifier.Player then
-			characterClass = shared.modPlayers.get(modifier.Player);
+		if modifier.WieldComp and modifier.WieldComp.CompOwner then
+			characterClass = modifier.WieldComp.CompOwner;
 		end
 		
 		local healthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);

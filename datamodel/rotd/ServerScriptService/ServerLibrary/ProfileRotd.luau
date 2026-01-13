@@ -153,6 +153,7 @@ function modProfile.onRequire()
 				rPacket.Index = 3;
 
 				task.delay(1, function()
+					playerClass = shared.modPlayers.get(player);
 					playerClass:Spawn();
 				end)
 				return rPacket;

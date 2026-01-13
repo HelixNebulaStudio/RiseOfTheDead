@@ -25,7 +25,7 @@ local modRadialImage = shared.require(game.ReplicatedStorage.Library.UI.RadialIm
 local modLeaderboardInterface = shared.require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
 local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
-local modGuiObjectPlus = shared.require(game.ReplicatedStorage.Library.UI.GuiObjectPlus);
+local modUIUtil = shared.require(game.ReplicatedStorage.Library.UI.UIUtil);
 local modDropdownList = shared.require(game.ReplicatedStorage.Library.UI.DropdownList);
 
 
@@ -1382,7 +1382,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local function updateSetRole()
 		if not binds.HasPermission("AssignRole") then return end;
 		
-		local isMouseHover = modGuiObjectPlus.IsMouseOver(setRoleButton);
+		local isMouseHover = modUIUtil.IsMouseOver(setRoleButton);
 
 		setRoleButton.BackgroundTransparency = isMouseHover and 0 or 1;
 		setRoleButton.TextTransparency = isMouseHover and 0 or 1;

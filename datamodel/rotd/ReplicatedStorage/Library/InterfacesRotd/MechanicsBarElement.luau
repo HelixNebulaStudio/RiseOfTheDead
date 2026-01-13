@@ -74,7 +74,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 barText = "Melee Stamina: $text";
 
             else
-                barText = "Mastery Level: $text";
+                local statsData = modData.GameSave and modData.GameSave.Stats;
+                if statsData == nil then
+                    barText = "";
+                else
+                barText = `Mastery Level: {statsData.Level or 0}`;
+                end
                 progressionPoint = 0;
             end
 

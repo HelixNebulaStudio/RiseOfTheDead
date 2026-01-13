@@ -74,6 +74,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local hostIcon = gameRoomFrame:WaitForChild("HostIcon");
 
     local itemToolTip = modItemInterface.newItemTooltip();
+    itemToolTip.Frame.Name = `GameRoomItemToolTip`;
 
     local window: InterfaceWindow = interface:NewWindow("GameRoom", gameRoomFrame)
     window.UseTween = false;
@@ -551,7 +552,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local newItemButton = itemButtonObject.ImageButton;
                 if binds.ItemButtonList[crateItemId] == nil then
                     itemToolTip:BindHoverOver(newItemButton, function()
-                        itemToolTip.Frame.Parent = script.Parent;
+                        itemToolTip.Frame.Parent = interface.ScreenGui;
                         itemToolTip:Update(crateItemId);
                         itemToolTip:SetPosition(newItemButton);
                     end);
@@ -682,7 +683,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         
                         if binds.ItemButtonList[rewardInfo.ItemId..b] == nil then
                             itemToolTip:BindHoverOver(newItemButton, function()
-                                itemToolTip.Frame.Parent = script.Parent;
+                                itemToolTip.Frame.Parent = interface.ScreenGui;
                                 itemToolTip:Update(rewardInfo.ItemId);
                                 itemToolTip:SetPosition(newItemButton);
                             end);

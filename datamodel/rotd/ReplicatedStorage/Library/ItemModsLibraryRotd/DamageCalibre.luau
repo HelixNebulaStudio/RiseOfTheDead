@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 
 local modifierPackage = {
@@ -14,6 +14,8 @@ local modifierPackage = {
 --==
 
 function modifierPackage.Update(modifier: ItemModifierInstance)
+	modItemModifierClass.AddTierDamage(modifier);
+	
 	local layerInfo = modItemModifierClass.Library.calculateLayer(modifier, "DS");
 	local value, tweakVal = layerInfo.Value, layerInfo.TweakValue;
 	if tweakVal then

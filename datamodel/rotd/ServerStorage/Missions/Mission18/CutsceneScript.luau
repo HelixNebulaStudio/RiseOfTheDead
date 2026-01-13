@@ -146,28 +146,31 @@ return function(CutsceneSequence)
 			if mission == nil then return end;
 			
 			
-			local carlsonModule = modNpcs.getPlayerNpc(player, "Carlson");
-			if carlsonModule == nil then
-				modReplicationManager.ReplicateOut(player, modNpcs.spawn("Carlson", nil, function(npc, npcModule)
-					npcModule.Player = player;
-					carlsonModule = npcModule;
-				end));
+			local carlsonNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Carlson");
+			if carlsonNpcClass == nil then
+				carlsonNpcClass = modNpcs.spawn2{
+					Name = "Carlson";
+					Player = player;
+					ReplicateOut = true;
+				};
 			end
 
-			local erikModule = modNpcs.getPlayerNpc(player, "Erik");
-			if erikModule == nil then
-				modReplicationManager.ReplicateOut(player, modNpcs.spawn("Erik", nil, function(npc, npcModule)
-					npcModule.Player = player;
-					erikModule = npcModule;
-				end));
+			local erikNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Erik");
+			if erikNpcClass == nil then
+				erikNpcClass = modNpcs.spawn2{
+					Name = "Erik";
+					Player = player;
+					ReplicateOut = true;
+				};
 			end
 
-			local dianaModule = modNpcs.getPlayerNpc(player, "Diana");
-			if dianaModule == nil then
-				modReplicationManager.ReplicateOut(player, modNpcs.spawn("Diana", nil, function(npc, npcModule)
-					npcModule.Player = player;
-					dianaModule = npcModule;
-				end));
+			local dianaNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Diana");
+			if dianaNpcClass == nil then
+				dianaNpcClass = modNpcs.spawn2{
+					Name = "Diana";
+					Player = player;
+					ReplicateOut = true;
+				};
 			end
 
 			local robertNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Robert");
@@ -184,14 +187,14 @@ return function(CutsceneSequence)
 				if mission.Type == 2 then -- OnAvailable
 
 				elseif mission.Type == 1 then -- OnActive
-					dianaModule.Actions:Teleport(CFrame.new(-200.6, 49.5, 245.7));
+					dianaNpcClass:SetCFrame(CFrame.new(-200.6, 49.5, 245.7));
 
-					carlsonModule.PlayAnimation("Injured");
-					local carlsonFace = carlsonModule.Prefab:FindFirstChild("face", true);
+					carlsonNpcClass.PlayAnimation("Injured");
+					local carlsonFace = carlsonNpcClass.Character:FindFirstChild("face", true);
 					if carlsonFace then carlsonFace.Texture = "rbxassetid://168332209" end;
 					
-					erikModule.PlayAnimation("Scared");
-					local erikFace = erikModule.Prefab:FindFirstChild("face", true);
+					erikNpcClass.PlayAnimation("Scared");
+					local erikFace = erikNpcClass.Character:FindFirstChild("face", true);
 					if erikFace then erikFace.Texture = "rbxassetid://2222767231" end;
 
 					if mission.ProgressionPoint >= 4 then
@@ -335,19 +338,17 @@ return function(CutsceneSequence)
 							robertNpcClass.Move:Face(Vector3.new(-101.25, 8.682, 318.9));
 							
 							robertNpcClass.PlayAnimation("CrouchLook", 1);
-							wait(0.5);
+							task.wait(0.5);
 							robertNpcClass.Chat(robertNpcClass.Player, "Hey, are you okay?");
-							wait(1);
-							erikModule.Chat(erikModule.Player, "Are.. are they gone?");
-							wait(3);
-							erikModule.Chat(erikModule.Player);
+							task.wait(1);
+							erikNpcClass.Chat(erikNpcClass.Player, "Are.. are they gone?");
+							task.wait(3);
 							robertNpcClass.Chat(robertNpcClass.Player, "Who are they?");
-							wait(3);
-							erikModule.Chat(erikModule.Player, "The bandits");
-							wait(3);
-							erikModule.Chat(erikModule.Player);
+							task.wait(3);
+							erikNpcClass.Chat(erikNpcClass.Player, "The bandits");
+							task.wait(3);
 							robertNpcClass.Chat(robertNpcClass.Player, "Don't worry, I think they're gone now..");
-							wait(3);
+							task.wait(3);
 							robertNpcClass.StopAnimation("CrouchLook", 1);
 							
 							robertNpcClass.Move:MoveTo(Vector3.new(-81.5, 8.682, 290));
@@ -361,7 +362,7 @@ return function(CutsceneSequence)
 						robertNpcClass:ToggleInteractable(true);
 						
 					elseif mission.ProgressionPoint == 9 then
-						carlsonModule.StopAnimation("Injured");
+						carlsonNpcClass.StopAnimation("Injured");
 						robertNpcClass:ToggleInteractable(false);
 						
 						robertNpcClass.Move:SetMoveSpeed("set", "default", 15);
@@ -379,16 +380,16 @@ return function(CutsceneSequence)
 					end
 					
 				elseif mission.Type == 3 then -- OnComplete
-					dianaModule.Actions:Teleport(dianaModule.SpawnPoint);
+					dianaNpcClass:SetCFrame(dianaNpcClass.SpawnPoint);
 					if modMission:GetMission(player, 38) == nil then
 						robertNpcClass:TeleportHide();
 					end
 
-					local carlsonFace = carlsonModule.Prefab:FindFirstChild("face", true);
+					local carlsonFace = carlsonNpcClass.Character:FindFirstChild("face", true);
 					if carlsonFace then carlsonFace.Texture = "rbxassetid://21311520" end; 
 
 					if firstRun then
-						erikModule.PlayAnimation("ScaredPeek");
+						erikNpcClass.PlayAnimation("ScaredPeek");
 					end
 					robertNpcClass:TeleportHide();
 

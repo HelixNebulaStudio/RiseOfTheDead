@@ -110,7 +110,14 @@ return function(CutsceneSequence)
 						end)
 						
 					else
-						mission.Cache.BeaniePrefab = script:WaitForChild("robertsbeanie"):Clone();
+						local newBeanie = script:WaitForChild("robertsbeanie"):Clone();
+						
+						local newInteractConfig = modInteractables.createInteractable("Collectible");
+						newInteractConfig:SetAttribute("_Id", "rb");
+						newInteractConfig:SetAttribute("_Label", "Oh no... This is Robert's beanie...");
+						newInteractConfig.Parent = newBeanie;
+
+						mission.Cache.BeaniePrefab = newBeanie;
 						modReplicationManager.ReplicateIn(player, mission.Cache.BeaniePrefab, workspace.Interactables);
 
 					end

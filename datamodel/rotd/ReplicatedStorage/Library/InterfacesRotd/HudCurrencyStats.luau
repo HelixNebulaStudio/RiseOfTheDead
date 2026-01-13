@@ -27,18 +27,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         if modConfigurations.CompactInterface then
             if styleId == "Inventory" then
                 window.ClosePoint = UDim2.new(0, 0, 0, -40);
-                window.OpenPoint = UDim2.new(0, 0, 0, 0);
+                window.OpenPoint = UDim2.new(0, 0, 1, 0);
                 statsFrame.Position = window.OpenPoint;
-                statsFrame.AnchorPoint = Vector2.new(0, 0);
-                statsFrame.Size = UDim2.new(0.5, 0, 0, 40);
-
-                statsFrame.moneylabel.AnchorPoint = Vector2.new(0, 0.5);
-                statsFrame.moneylabel.Position = UDim2.new(0.5, 10, 0.5, 0);
-                statsFrame.moneylabel.TextYAlignment = Enum.TextYAlignment.Center;
-                statsFrame.perkslabel.AnchorPoint = Vector2.new(1, 0.5);
-                statsFrame.perkslabel.Position = UDim2.new(0.5, -10, 0.5, 0);
-                statsFrame.perkslabel.TextYAlignment = Enum.TextYAlignment.Center;
-                statsFrame.BackgroundTransparency = 1;
+                statsFrame.AnchorPoint = Vector2.new(0, 1);
+                statsFrame.Size = UDim2.new(0.5, 0, 0, 24);
+                statsFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10);
+                statsFrame.BackgroundTransparency = 0.1;
 
             else
                 statsFrame.BackgroundTransparency = 1;
@@ -48,22 +42,18 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 window.OpenPoint = UDim2.new(0.5, 0, 1, -70);
                 statsFrame.Position = window.OpenPoint;
 
-                statsFrame.moneylabel.AnchorPoint = Vector2.new(0, 1);
-                statsFrame.moneylabel.Position = UDim2.new(0.5, 160, 1, 0);
-                statsFrame.moneylabel.TextYAlignment = Enum.TextYAlignment.Bottom;
-                statsFrame.perkslabel.AnchorPoint = Vector2.new(1, 1);
-                statsFrame.perkslabel.Position = UDim2.new(0.5, -160, 1, 0);
-                statsFrame.perkslabel.TextYAlignment = Enum.TextYAlignment.Bottom;
             end
 
         else
-            if styleId == "Shop" then
-                window.ClosePoint = UDim2.new(1, -10, 1, 275);
-                window.OpenPoint = UDim2.new(1, -10, 0.5, 275);
-                statsFrame.Position = window.OpenPoint;
+            statsFrame.Parent = interface.ScreenGui;
+            
+            local ratShopWindow = interface:GetWindow("RatShopWindow");
+            if styleId == "Shop" and ratShopWindow then
+                local shopFrameContainer = ratShopWindow.Frame:WaitForChild("StatsFrame");
 
-                statsFrame.AnchorPoint = Vector2.new(1, 0.5);
-                statsFrame.Size = UDim2.new(1, -360, 0, 24);
+                statsFrame.Parent = shopFrameContainer;
+                statsFrame.Position = UDim2.new(0.5, 0, 1, 0);
+                statsFrame.Size = UDim2.new(1, 0, 0, 24);
                 statsFrame.BackgroundTransparency = 0.95;
 
             else
@@ -156,7 +146,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         TextColor3=Color3.fromRGB(255, 255, 255);
                     }):Play();
 
-                    delay(duration+0.02, function() label.TextColor3=Color3.fromRGB(255, 255, 255); end);
+                    task.delay(duration+0.02, function() label.TextColor3=Color3.fromRGB(255, 255, 255); end);
                 elseif value < previousStats[key].Value then
                     label.TextColor3=Color3.fromRGB(147, 49, 49);
 
@@ -164,22 +154,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         TextColor3=Color3.fromRGB(255, 255, 255);
                     }):Play();
 
-                    delay(duration+0.02, function() label.TextColor3=Color3.fromRGB(255, 255, 255); end);
+                    task.delay(duration+0.02, function() label.TextColor3=Color3.fromRGB(255, 255, 255); end);
                 end
                 TweenService:Create(previousStats[key], TweenInfo.new(duration, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
                     Value=value;
                 }):Play();
-                delay(duration+0.02, function() 
+                task.delay(duration+0.02, function() 
                     previousStats[key].Value = value;
                 end)
             end
-                
-            -- if key == "Level" and properties then
-            --     progressionLabel.Text = "Mastery Level: ".. tostring(value or 0);
-            --     if modInterface.modMasteryInterface then
-            --         modInterface.modMasteryInterface.Update();
-            --     end
-            -- end
+            
         end
     end)
 

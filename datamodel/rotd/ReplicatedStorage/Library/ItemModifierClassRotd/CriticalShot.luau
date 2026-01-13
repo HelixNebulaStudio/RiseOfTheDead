@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modPseudoRandom = shared.require(game.ReplicatedStorage.Library.PseudoRandom);
 
@@ -16,7 +16,7 @@ local modifierPackage = {
 };
 --==
 
-function modifierPackage.Binds.OnNewDamage(modifier: ItemModifierInstance, damageData: DamageData)
+function modifierPackage.Binds.OnNewDamageData(modifier: ItemModifierInstance, damageData: DamageData)
     if RunService:IsClient() then return end;
 
     if modifier.EquipmentClass == nil then return end;
@@ -24,10 +24,9 @@ function modifierPackage.Binds.OnNewDamage(modifier: ItemModifierInstance, damag
 
     local critChance = configurations.CritChance or 0;
 
-    local player = modifier.Player;
-    local playerClass: PlayerClass = player and shared.modPlayers.get(player);
-    if playerClass and playerClass.Properties and playerClass.Properties.CritBoost then
-        critChance = critChance + (playerClass.Properties.CritBoost.Amount/100);
+    local characterClass: CharacterClass? = modifier.WieldComp and modifier.WieldComp.CompOwner or nil;
+    if characterClass and characterClass.Properties and characterClass.Properties.CritBoost then
+        critChance = critChance + (characterClass.Properties.CritBoost.Amount/100);
     end
     
     if critChance <= 0 then return end;

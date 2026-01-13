@@ -459,6 +459,7 @@ MissionLibrary.New{
 	GuideText="Talk to Wilson to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
+		{Type="Mission"; Id=19};
 	};
 	StartRequirements={
 		Level=20;
@@ -597,7 +598,6 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
-		{Type="Mission"; Id=19};
 		{Type="Mission"; Id=22};
 		{Type="Mission"; Id=23};
 		{Type="Mission"; Id=24};
@@ -795,7 +795,7 @@ MissionLibrary.New{
 	};
 	LinkNextMission=30;
 	StartRequirements={
-		Level=15;
+		Level=13;
 	};
 	Markers={
 		[1]={World="TheUnderground"; Label="Lennon"; Target="Lennon"; Type=modMarkers.MarkerTypes.Npc;};
@@ -967,9 +967,9 @@ MissionLibrary.New{
 		{Text="Reason with Patrick";};
 		{Text="Bribe Patrick with some Canned Beans";};
 		{Text="Talk to Stan";};
-		
+		{Text="Follow Stan";};
 	};
-	GuideText="Talk to Stan";
+	GuideText="Explore the Train Station";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
@@ -977,7 +977,7 @@ MissionLibrary.New{
 	};
 	LinkNextMission=33;
 	StartRequirements={
-		Level=20;
+		Level=16;
 	};
 	Markers={
 		[1]={World="TheUnderground"; Label="Stan"; Target="Stan"; Type=modMarkers.MarkerTypes.Npc;};
@@ -1082,7 +1082,7 @@ MissionLibrary.New{
 	};
 	LinkNextMission=38;
 	StartRequirements={
-		Level=30;
+		Level=20;
 	};
 	Markers={
 		[1]={World="TheMall"; Label="Stan"; Target="Stan"; Type=modMarkers.MarkerTypes.Npc;};
@@ -1285,8 +1285,9 @@ MissionLibrary.New{
 		{Type="Mission"; Id=39};
 		{Type="Mission"; Id=52};
 	};
+	LinkNextMission=52;
 	StartRequirements={
-		Level=35;
+		Level=25;
 	};
 	Markers={
 		[1]={World="TheUnderground"; Label="Rachel"; Target="Rachel"; Type=modMarkers.MarkerTypes.Npc;};
@@ -1792,6 +1793,7 @@ MissionLibrary.New{
 		{Type="Mission"; Id=51};
 		{Type="Mission"; Id=56};
 	};
+	LinkNextMission=56;
 	Markers={
 		[1]={World="TheResidentials"; Label="Nate"; Target="Nate"; Type=modMarkers.MarkerTypes.Npc;};
 		[2]={World="TheResidentials"; Label="Robert"; Target="Robert"; Type=modMarkers.MarkerTypes.Npc;};
@@ -1935,6 +1937,7 @@ MissionLibrary.New{
 		{Type="Mission"; Id=58};
 		{Type="Mission"; Id=77};
 	};
+	LinkNextMission=58;
 	Markers={
 		[1]={World="TheResidentials"; Label="Basement"; Target=Vector3.new(1169.292, 50.515, -137.749); Type=modMarkers.MarkerTypes.Waypoint;};
 		[2]={World="TheResidentials"; Label="Enter"; Target=Vector3.new(1060.251, -20.875, -126.729); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -2787,6 +2790,7 @@ MissionLibrary.New{
 	StartRequirements = {
 		MissionCompleted={58};
 	};
+	LinkNextMission=87;
 	SaveData={
 		Flags=0;
 		CooperRematch=0;

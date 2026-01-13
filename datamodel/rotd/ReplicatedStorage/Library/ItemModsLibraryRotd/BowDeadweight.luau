@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modifierPackage = {
 	Name = "Bow Deadweight";
@@ -25,18 +25,13 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	end
 	
 	assert(modifier.EquipmentClass, `Missing equipment class: {modifier}`);
-	local configurations = modifier.EquipmentClass.Configurations;
+	modItemModifierClass.AddTierDamage(modifier);
 
 	modifier.SetValues.ProjectileConfig = {
 		Velocity = 100;
 		MaxBounce = wValue;
 		KeepAcceleration = true;
 	};
-
-	local baseDamage = configurations.PreModDamage;
-	local additionalDmg = baseDamage * dValue;
-
-	modifier.SumValues.Damage = additionalDmg; --MARK: TODO stacking check.
 end
 
 return modifierPackage;

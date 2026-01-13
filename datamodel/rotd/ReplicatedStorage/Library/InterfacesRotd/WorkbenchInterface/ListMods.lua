@@ -12,9 +12,11 @@ local WorkbenchClass = {};
 --==
 
 function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: InterfaceWindow)
+	local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
+
 	local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
-	local wieldComp = shared.modPlayers.get(localPlayer).WieldComp;
+	local wieldComp: WieldComp = shared.modPlayers.get(localPlayer).WieldComp;
 
 	local binds = workbenchWindow.Binds;
 
@@ -34,11 +36,12 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 				local upgradeInfo = modLib.Upgrades[a];
 				local layerInfo = modItemModsLibrary.GetLayer(upgradeInfo.DataTag, {
-					ModStorageItem=storageItem;
+					ModStorageItem = storageItem;
 					StorageItem = containerStorageItem;
 					ItemTier = tierOfItem or modLib.BaseTier;
 					TweakStat = tweakValues and tweakValues[storageItem.Index];
 				});
+
 				
 				local upgradeLvl = (storageItem.Values[upgradeInfo.DataTag] or 0);
 				local maxLvl = layerInfo.MaxLevel; --modLib.Upgrades[a].MaxLevel;
@@ -118,6 +121,21 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					desc = desc ..(upgradeInfo.Prefix or "+").. statActiveStr ..(upgradeInfo.Suffix or "%");
 				end
 				
+			end
+
+			--Tier Damage
+			local modifier: ItemModifierInstance? = wieldComp:GetOrDefaultItemModifier(storageItem.ID);
+			if modifier then
+				local additionalDmg, scale = modItemModifierClass.AddTierDamage(modifier);
+				
+				if additionalDmg then
+					if #modLib.Upgrades <= 0 then
+						desc = desc .."\n";
+					end
+					desc = desc ..`\n<font size="16"><b>Tier {modLib.BaseTier} Mod Damage:  </b></font>`;
+					desc = desc ..`+{math.round(scale*100)}%`;
+					desc = desc ..`    <b>≈</b>   +{math.round(additionalDmg*100)/100}`;
+				end
 			end
 			
 			return desc;

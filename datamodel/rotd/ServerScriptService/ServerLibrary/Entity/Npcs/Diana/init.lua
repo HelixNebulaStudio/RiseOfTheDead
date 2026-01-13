@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local npcPackage = {
-    Name = "Nick";
+    Name = "Diana";
     HumanoidType = "Human";
     
 	Configurations = {};
@@ -15,17 +15,10 @@ local npcPackage = {
     };
 
     Voice = {
-        VoiceId = 5;
-        Pitch = 0.95;
-        Speed = 1;
-        PlaybackSpeed = 1.05;
-    };
-
-    IdleRandomChat = {
-		"When will there be rescue?!";
-		"Hope there's a rescue team out there...";
-		"I want to put a bullet in every zombie!";
-		"Never thought that this could ever happen...";
+        VoiceId = 2;
+        Pitch = 1;
+        Speed = 1.03;
+        PlaybackSpeed = 1;
     };
 };
 

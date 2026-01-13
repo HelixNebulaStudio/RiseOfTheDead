@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modifierPackage = {
 	Name = "Shot Splitter";
@@ -11,11 +11,13 @@ local modifierPackage = {
 --==
 
 function modifierPackage.Update(modifier: ItemModifierInstance)
-	local dmgLayerInfo = modItemModifierClass.Library.calculateLayer(modifier, "D");
-	local dmgValue, dmgTweak = dmgLayerInfo.Value, dmgLayerInfo.TweakValue;
-	if dmgTweak then
-		dmgValue = dmgValue + dmgTweak;
-	end
+	modItemModifierClass.AddTierDamage(modifier);
+	
+	-- local dmgLayerInfo = modItemModifierClass.Library.calculateLayer(modifier, "D");
+	-- local dmgValue, dmgTweak = dmgLayerInfo.Value, dmgLayerInfo.TweakValue;
+	-- if dmgTweak then
+	-- 	dmgValue = dmgValue + dmgTweak;
+	-- end
 
 	local frLayerInfo = modItemModifierClass.Library.calculateLayer(modifier, "FR");
 	local frValue, frTweak = frLayerInfo.Value, frLayerInfo.TweakValue;
@@ -23,7 +25,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		frValue = frValue + frTweak;
 	end
 
-	modifier.SumValues.DamageScaler = dmgValue;
+	modifier.SumValues.DamageScaler = 0.35;
 	modifier.SumValues.Rpm = frValue;
 	
 	modifier.SetValues.Multishot = 2;

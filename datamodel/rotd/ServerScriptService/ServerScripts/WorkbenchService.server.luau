@@ -20,7 +20,6 @@ local modItemModsLibrary = shared.require(game.ReplicatedStorage.Library.ItemMod
 local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modSkillTree = shared.require(game.ServerScriptService.ServerLibrary.SkillTree);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
@@ -304,8 +303,8 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 			local item = itemsRefund[a];
 			local itemLib = modItemsLibrary:Find(item.ItemId);
 			inventory:Add(item.ItemId, {Quantity=(item.Data and item.Data.Quantity or 1);}, function(event, storageItem)
-				shared.Notify(player, (item.CostAmount) > 1 and itemLib.Name.." ("..item.CostAmount..")" or itemLib.Name, "PickUp");
 				modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+				shared.Notify(player, (item.CostAmount or 1) > 1 and itemLib.Name.." ("..item.CostAmount..")" or itemLib.Name, "PickUp");
 			end);
 		end
 		userWorkbench:RemoveProcess(buildIndex);
@@ -394,7 +393,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 	if modItemModsLibrary == nil then return end;
 	if not IsInWorkbenchRange(player, interactPart) then return modWorkbenchLibrary.PurchaseReplies.TooFar; end;
 	if debounceCache[player.Name] and tick()-debounceCache[player.Name]<0.1 then return modWorkbenchLibrary.PurchaseReplies.TooFrequentRequest end;
-	debounceCache[player.Name]=tick();
+	debounceCache[player.Name] = tick();
 
 	local profile = modProfile:Get(player);
 	local activeSave = profile:GetActiveSave();
@@ -486,16 +485,23 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 
 				storageOfModifier:SetIndex(player, modifierSiid, {Id=siid; Index=emptyIndex;});
 				
+				local equipmentClass = playerClass.WieldComp:GetEquipmentClass(siid); 
+				if equipmentClass then
+					equipmentClass.Configurations:Calculate();
+				end
+
+				local modifier: ItemModifierInstance? = playerClass.WieldComp:GetOrDefaultItemModifier(modifierSiid);
+				if modifier and playerClass.WieldComp.Siid == siid then
+					modifier:SetEnabled(true);
+				end
+
 				local refreshStorages = {
 					storageOfModifier:Shrink();
 					storageForMod:Shrink();
 				};
 				activeSave.AppearanceData:Update(activeSave.Clothing);
 				
-				local equipmentClass = playerClass.WieldComp:GetEquipmentClass(siid); 
-				if equipmentClass then
-					equipmentClass.Configurations:Calculate();
-				end
+				playerClass.Configurations:Calculate();
 
 				return refreshStorages;
 			else
@@ -519,13 +525,20 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 					storageOfModifier:ConnectSort(sortModsFunc);
 				end
 				
-				table.insert(refreshStorages, storageOfModifier:Shrink());
-				activeSave.AppearanceData:Update(activeSave.Clothing);
-				
 				local equipmentClass = playerClass.WieldComp:GetEquipmentClass(siid);
 				if equipmentClass then
 					equipmentClass.Configurations:Calculate();
 				end
+
+				local modifier: ItemModifierInstance? = playerClass.WieldComp:GetOrDefaultItemModifier(modifierSiid);
+				if modifier and playerClass.WieldComp.Siid ~= siid then
+					modifier:SetEnabled(false);
+				end
+				
+				table.insert(refreshStorages, storageOfModifier:Shrink());
+				activeSave.AppearanceData:Update(activeSave.Clothing);
+				
+				playerClass.Configurations:Calculate();
 				
 				return refreshStorages;
 			else
@@ -544,10 +557,11 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 	debounceCache[player.Name] = tick();
 	if not IsInWorkbenchRange(player, interactPart) then return modWorkbenchLibrary.PurchaseReplies.TooFar; end;
 	
+	local playerClass: PlayerClass = shared.modPlayers.get(player);
 	local profile = modProfile:Get(player);
 	local playerSave = profile:GetActiveSave();
 	local storageItem, storage = playerSave:FindItemFromStorages(id);
-	local weaponId = storage.Id;
+	local storageId = storage.Id;
 	local modLib = modItemModsLibrary.Get(storageItem.ItemId);
 	
 	if storageItem and modLib then
@@ -572,17 +586,22 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 					playerSave:AwardAchievement("titoup");
 					shared.modEventService:ServerInvoke("WorkbenchService_BindItemUpgraded", {ReplicateTo={player}}, storageItem);
 					
+					local equipmentClass = playerClass.WieldComp:GetOrDefaultItemModifier(storageId)
+					if equipmentClass then
+						Debugger:StudioWarn(`Recalculate equipment class {storageId} configurations.`);
+						equipmentClass.Configurations:Calculate();
+					end
 					storageItem:Sync({upgradeInfo.DataTag});
 					playerSave.AppearanceData:Update(playerSave.Clothing);
 					
 					modAnalytics.RecordResource(player.UserId, upgradeCost, "Sink", "Perks", "Gameplay", "ModUpgrade");
 					
 					modAnalyticsService:Sink{
-						Player=player;
-						Currency=modAnalyticsService.Currency.Perks;
-						Amount=upgradeCost;
-						EndBalance=playerSave:GetStat("Perks");
-						ItemSKU="ModUpgrade";
+						Player = player;
+						Currency = modAnalyticsService.Currency.Perks;
+						Amount = upgradeCost;
+						EndBalance = playerSave:GetStat("Perks");
+						ItemSKU = "ModUpgrade";
 					};
 					
 					return modWorkbenchLibrary.PurchaseReplies.Success;

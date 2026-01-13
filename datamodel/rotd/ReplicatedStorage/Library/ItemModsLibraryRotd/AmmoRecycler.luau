@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modHealthComp = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
@@ -17,7 +17,8 @@ local modifierPackage = {
 
 function modifierPackage.Update(modifier: ItemModifierInstance)
 	if modifier.EquipmentClass == nil then return end;
-
+	modItemModifierClass.AddTierDamage(modifier);
+	
 	local layerInfo = modItemModifierClass.Library.calculateLayer(modifier, "C");
 	local value, tweakVal = layerInfo.Value, layerInfo.TweakValue;
 	if tweakVal then
@@ -27,13 +28,13 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	modifier.Values.AmmoRecycler = value;
 end
 
-function modifierPackage.Binds.OnNewDamage(modifier: ItemModifierInstance, damageData: DamageData)
+function modifierPackage.Binds.OnNewDamageData(modifier: ItemModifierInstance, damageData: DamageData)
 	if RunService:IsClient() then return end;
 	if damageData.TargetModel == nil then return end;
 	
 	local characterClass: CharacterClass;
-	if modifier.Player then
-		characterClass = shared.modPlayers.get(modifier.Player);
+	if modifier.WieldComp and modifier.WieldComp.CompOwner then
+		characterClass = modifier.WieldComp.CompOwner;
 	end
 	
 	local healthComp: HealthComp? = modHealthComp.getByModel(damageData.TargetModel);

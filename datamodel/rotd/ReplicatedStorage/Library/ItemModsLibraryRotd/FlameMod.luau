@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
 
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClass);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modHealthComp = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
@@ -17,6 +17,8 @@ local modifierPackage = {
 --==
 
 function modifierPackage.Update(modifier: ItemModifierInstance)
+	modItemModifierClass.AddTierDamage(modifier);
+	
 	local dLayerInfo = modItemModifierClass.Library.calculateLayer(modifier, "D");
 	local dValue, dTweakVal = dLayerInfo.Value, dLayerInfo.TweakValue;
 	if dTweakVal then

@@ -40,7 +40,7 @@ local toolPackage = {
 		
 		-- Stats
 		Damage=20;
-		PotentialDamage=456;
+		PotentialDamage=400;
 		
 		MagazineSize=128;
 		AmmoCapacity=(128*4);
@@ -63,7 +63,7 @@ local toolPackage = {
 		SpinDownTime = 1.1;
 
 		-- Focus
-		FocusWalkSpeedReduction=0.5;
+		FocusWalkSpeedReduction=0.3;
 
 		-- Recoil
 		XRecoil=0.03;
