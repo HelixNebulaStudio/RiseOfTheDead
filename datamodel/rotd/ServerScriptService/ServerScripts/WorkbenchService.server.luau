@@ -491,7 +491,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 				end
 
 				local modifier: ItemModifierInstance? = playerClass.WieldComp:GetOrDefaultItemModifier(modifierSiid);
-				if modifier and playerClass.WieldComp.Siid == siid then
+				if modifier and equipmentClass and equipmentClass.Enabled == true then
 					modifier:SetEnabled(true);
 				end
 
@@ -531,7 +531,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 				end
 
 				local modifier: ItemModifierInstance? = playerClass.WieldComp:GetOrDefaultItemModifier(modifierSiid);
-				if modifier and playerClass.WieldComp.Siid ~= siid then
+				if modifier and (equipmentClass == nil or equipmentClass.Enabled == false) then
 					modifier:SetEnabled(false);
 				end
 				

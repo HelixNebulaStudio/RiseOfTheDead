@@ -246,7 +246,7 @@ function treePackage.Sleep(npcClass: NpcClass)
             properties.SleepHealPool = properties.SleepHealPool -math.max(healAmt, 1);
 
             npcClass.HealthComp:TakeDamage(DamageData.new{
-                Damage = healAmt;
+                Damage = -healAmt;
                 DamageType = "Heal";
                 TargetPart = npcClass.RootPart;
             });

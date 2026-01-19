@@ -322,7 +322,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
 				end
 				
 				healthComp:TakeDamage(DamageData.new{
-					Damage = healAmt;
+					Damage = -healAmt;
 					TargetPart = randomPlaquePart;
                     DamageType = "Heal";
 				});

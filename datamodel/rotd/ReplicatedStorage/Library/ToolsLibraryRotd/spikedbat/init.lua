@@ -39,6 +39,8 @@ local toolPackage = {
 
 		StaminaCost = 15;
 		StaminaDeficiencyPenalty = 0.65;
+		
+		DamageBlock = 10;
 	};
 	Properties={};
 
@@ -48,7 +50,8 @@ local toolPackage = {
 };
 
 function toolPackage.newClass()
-	return modEquipmentClass.new(toolPackage);
+	local equipmentClass = modEquipmentClass.new(toolPackage);
+	return equipmentClass;
 end
 
 return toolPackage;

@@ -39,6 +39,8 @@ local toolPackage = {
 
 		StaminaCost = 16;
 		StaminaDeficiencyPenalty = 0.65;
+		
+		DamageBlock = 25;
 	};
 	Properties={};
 };

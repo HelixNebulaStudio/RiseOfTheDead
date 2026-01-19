@@ -796,10 +796,10 @@ function library.onRequire()
 		Id = "pointguardbulwark";
 		Name = "Heavy Machine Gun Point-Guard Bulwark";
 		Desc = "[Beta] Additional <b>Armor Points</b> build up while in focus at the reduction of your <b>Focus Movespeed</b>.";
-		Icon = library.PlaceholderIcon;
+		Icon = shared.Const.PlaceholderIcon;
 		BaseTier = 2;
 		Tier = 2;
-		Stackable = false;
+		Stackable = true;
 		Type = {"Heavy machine gun";};
 		Module = script.PointGuardBulwark;
 		Category = "Rare Mods";
@@ -1075,12 +1075,12 @@ function library.onRequire()
 	library:Add{
 		Id="frenzydamagemod";
 		Name="Frenzy Damage";
-		Desc="Additional <b>Damage</b> is built up when you take damage.\n<b>Stack Rate:</b> 1% per Damage Taken\n<b>Decay Delay:</b> 10s";
+		Desc="Additional <b>Damage</b> is built up when you take damage.\n<b>Stack Rate:</b> 1% per Damage\n<b>Decay Delay:</b> 10s";
 		Icon="rbxassetid://105743703562476";
 		BaseTier=2;
 		Tier=2;
 		Upgrades={
-			{DataTag="FD"; Name="Frenzy Damage"; Syntax="Upgrade Frenzy Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.1; MaxValue=0.6; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
+			{DataTag="FD"; Name="Frenzy Damage"; Syntax="Upgrade Frenzy Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.01; MaxValue=0.09; TweakBonus=0.01; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
 		};
 		Stackable=false;
 		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun";};
@@ -1420,7 +1420,7 @@ function library.onRequire()
 	library:Add{
 		Id="warmongerscalesmod";
 		Name="Warmonger's Scales";
-		Desc="<b>Pacifists & Warmongers</b>\nFor every percent damaged, temporary increases max health. Heals only if health pool was newly increased.";
+		Desc="<b>Pacifists & Warmongers</b>\nFor every percent damage done, temporary increases max health. Heals only if health pool was newly increased.";
 		Icon="rbxassetid://16084490297";
 		BaseTier=1;
 		Tier=1;
@@ -1457,6 +1457,23 @@ function library.onRequire()
 
 	-- DoubleEdged rbxassetid://16049544633
 
+	library:Add{
+		Id = "damagedividermod";
+		Name = "Damage Divider";
+		Desc = "The damage you take is divided to health and armor damage with an additional damage reduction.";
+		Icon = shared.Const.PlaceholderIcon;
+		BaseTier = 2;
+		Tier = 2;
+		Upgrades = {
+			{DataTag="R"; Name="Reduction"; Syntax="Damage Reduction"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.01; MaxValue=0.2; Scaling=library.ScalingStyle.NaturalCurve;};
+		};
+		Stackable = false;
+		Type = {"Chest"};
+		EffectTrigger = library.EffectTrigger.Passive;
+		Module = script.DamageDivider;
+		Category = "Rare Mods";
+	};
+
 	-- MARK: Head wear;
 	library:Add{
 		Id="flinchcushioning";
@@ -1476,26 +1493,10 @@ function library.onRequire()
 	};
 
 	library:Add{
-		Id="frenzyaccelerator";
-		Name="Frenzy Accelerator";
-		Desc="Increase the charge rate of Frenzy item modifiers.";
-		Icon=library.PlaceholderIcon;
-		BaseTier=4;
-		Tier=4;
-		Stackable=false;
-		Type={"Head";};
-		Module=script.FrenzyAccelerator;
-		Category="Rare Mods";
-		Upgrades={
-			{DataTag="R"; Name="Rate"; Syntax="Upgrade Rate"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.01; MaxValue=0.2; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
-		};
-	}
-
-	library:Add{
 		Id="armortrigger";
 		Name="Armor Trigger";
 		Desc="DevBranchOnly: Bonus Armor when equipped.";
-		Icon=library.PlaceholderIcon;
+		Icon=shared.Const.PlaceholderIcon;
 		BaseTier=1;
 		Tier=1;
 		Stackable=false;

@@ -272,7 +272,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			local cancelButtonDown = false;
 			
 			cancelButton.InputBegan:Connect(function(inputObject, gameProcessed)
-				if not gameProcessed and inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
+				if not gameProcessed and inputObject.UserInputType == Enum.UserInputType.MouseButton1 
+				or inputObject.UserInputType == Enum.UserInputType.Touch
+				or inputObject.KeyCode == Enum.KeyCode.ButtonA then
 					cancelButtonDown = true;
 					cancelInitTick = tick();
 					interface:PlayButtonClick();
@@ -311,7 +313,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 									refreshProcessPage();
 								else
 									cancelButton.Text = modWorkbenchLibrary.DeconstructModReplies[serverReply] or ("Error Code: "..serverReply);
-									wait(1);
+									task.wait(1);
 									cancelButton.Text = "Cancel";
 								end
 								
@@ -322,19 +324,19 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 									refreshProcessPage();
 								else
 									cancelButton.Text = modWorkbenchLibrary.PolishToolReplies[serverReply] or ("Error Code: "..serverReply);
-									wait(1);
+									task.wait(1);
 									cancelButton.Text = "Cancel";
 								end
 								
 							end
-							delay(1, function() actionButtonDebounce = false; end);
+							task.delay(1, function() actionButtonDebounce = false; end);
 						else
 							cancelButton.Text = "Hold To Cancel";
 						end
 						if not cancelButtonDown then
 							RunService:UnbindFromRenderStep("CancelConfirm");
 							cancelingBar.Size = UDim2.new(0, 0, 1, 0);
-							delay(0.2, function()
+							task.delay(0.2, function()
 								if cancelButton then cancelButton.Text = "Cancel"; end
 							end)
 						end

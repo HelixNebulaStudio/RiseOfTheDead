@@ -19,7 +19,17 @@ function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
 	if not modBranchConfigs.IsWorld("Slaughterfest") then
-		equipmentClass:AddBaseModifier("TireArmor");
+		equipmentClass:AddBaseModifier("MeleeDampening", {
+			MaxValues = {
+				BlockChance = 0.73;
+			};
+			SumValues = {
+				DamageBlock = 40;
+			};
+			ArrayValues = {
+				PassiveModifiers = "MeleeDampening";
+			};
+		});
 	end
 
 	return equipmentClass;

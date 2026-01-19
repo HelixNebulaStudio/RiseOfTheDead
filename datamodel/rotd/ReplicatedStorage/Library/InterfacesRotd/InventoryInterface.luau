@@ -68,7 +68,7 @@ local CharacterConfigurations = {
 	end;
 	["HotEquipSlots"] = function(bodyEquips, k)
 		local value = bodyEquips[k];
-		return {SortKey="EnhanceHS"; Text=`<b>Hotbar Slots:</b> {5+math.max(value, 0)}`;}
+		return {SortKey="EnhanceHS"; Text=`<b>Hotbar Slots:</b> {math.max(value, 0)}`;}
 	end;
 
 	-- Melee;
@@ -154,6 +154,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local inventoryWindow: InterfaceWindow = interface:NewWindow("Inventory", inventoryFrame);
 	inventoryWindow.CompactFullscreen = true;
+	inventoryWindow.CloseWithInteract = true;
 	interface:BindConfigKey("DisableInventory", {inventoryWindow});
 	
 	if modConfigurations.CompactInterface then
@@ -174,6 +175,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local quickButton = interface:NewQuickButton("Inventory", "Inventory", "rbxassetid://2169843985");
 	quickButton.LayoutOrder = 2;
+	quickButton.SelectionOrder = -2;
 	interface:ConnectQuickButton(quickButton, "KeyWindowInventory");
 
 
@@ -541,6 +543,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end
 	
+	local lastHotEquipSlots = nil;
+	playerClass.Configurations.OnCalculate:Connect(function()
+		if lastHotEquipSlots ~= playerClass.Configurations.HotEquipSlots then
+			lastHotEquipSlots = playerClass.Configurations.HotEquipSlots;
+			hotbarWindow.Binds.UpdateHotbarSize();
+		end
+	end)
+
 	function hotbarWindow.Binds.UpdateHotbarSize()
 		interface.Properties.ActiveHotbarKeys = configurations.HotEquipSlots;
 		
@@ -579,14 +589,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local label = bodyEquipmentsFrame:WaitForChild("label");
 		local beStr = {};
 
+		configurations:Calculate();
 		for k, v in pairs(configurations:GetKeyPairs()) do
 			if k == "Warmth" and configurations.Warmth then
 				local warmth = localPlayer:GetAttribute("Warmth") or 25;
 				table.insert(beStr, {SortKey="Warmth"; Text=`<b>Warmth:</b> {warmth} °C`;});
 
-			elseif k == "ActiveProperties" then
-				for activePassive, _ in pairs(v) do
-					table.insert(beStr, {SortKey="ZZPassive"; Text=`<b>+ Passive</b> {activePassive}`;});
+			elseif k == "PassiveModifiers" then
+				for _, passive in pairs(v) do
+					table.insert(beStr, {SortKey="ZZPassive"; Text=`<b>+ Passive</b> {passive}`;});
 				end
 
 			elseif CharacterConfigurations[k] then

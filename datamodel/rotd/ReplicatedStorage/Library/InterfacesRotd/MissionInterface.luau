@@ -283,6 +283,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	modKeyBindsHandler:SetDefaultKey(keyId, Enum.KeyCode.B);
 	local quickButton = interface:NewQuickButton("Missions", "Missions", "rbxassetid://2273398923");
 	local amtLabel = quickButton:WaitForChild("AmtFrame"):WaitForChild("AmtLabel");
+	quickButton.LayoutOrder = 4;
 	interface:ConnectQuickButton(quickButton, keyId);
 
 

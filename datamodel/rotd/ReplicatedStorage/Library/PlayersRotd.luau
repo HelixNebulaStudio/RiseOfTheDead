@@ -92,6 +92,9 @@ shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
 		gameSave.Spawn = setSpawn;
 		Debugger:StudioWarn(`Set spawn from ({oldSpawn}) to ({location} = {setSpawn})`);
 	end)
+
+	local properties = playerClass.Properties;
+	properties.CanOverheal = true;
 end)
 
 return modPlayers;

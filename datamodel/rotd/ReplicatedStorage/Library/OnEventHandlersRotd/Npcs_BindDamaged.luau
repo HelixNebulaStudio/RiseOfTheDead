@@ -4,7 +4,6 @@ local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 --== When a npc takes damage;
 return function(event: EventPacket, damageData: DamageData)
-	local modSkillTree = shared.require(game.ServerScriptService.ServerLibrary.SkillTree);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
 	local damageBy: CharacterClass? = damageData.DamageBy;
@@ -12,8 +11,6 @@ return function(event: EventPacket, damageData: DamageData)
 
 	local player: Player = (damageBy :: PlayerClass):GetInstance();
 	if player == nil then return end;
-
-	modSkillTree:TriggerSkills(player, script.Name, damageData);
 
 	local damageTo: CharacterClass? = damageData.DamageTo;
 	if damageTo == nil then return end;

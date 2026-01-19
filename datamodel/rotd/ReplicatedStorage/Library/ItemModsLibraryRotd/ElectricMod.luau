@@ -38,7 +38,7 @@ end
 
 if RunService:IsServer() then
 
-	function modifierPackage.Binds.OnBulletHit(modifier: ItemModifierInstance, packet: OnBulletHitPacket)
+	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
 		if packet.TargetModel == nil then return end;
 		
 		local maxTargets = modifier.Values.Targets;

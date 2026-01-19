@@ -108,11 +108,11 @@ return function(CutsceneSequence)
 					masonNpcClass.Move:Face("Player");
 					masonNpcClass.Chat(player, "We better be ready to defend. Go inside and look for ammo.");
 
-					wait(3);
+					task.wait(3);
 					masonNpcClass.Move:MoveTo(Vector3.new(61.968, 2.59, -79.037));
 					masonNpcClass.Move.OnMoveToEnded:Wait(20);
 					
-					wait(0.3);
+					task.wait(0.3);
 					masonNpcClass.Move:Face(Vector3.new(1000, 0, 0));
 
 					masonNpcClass.Chat(player, "I'll watch your back..");
@@ -148,7 +148,7 @@ return function(CutsceneSequence)
 
 					local allSpawned = false;
 					local function spawnEnemy(enemyName, spawnPoint)
-						local npcClass: NpcClass = modNpcs.spawn2{
+						local zombieNpcClass: NpcClass = modNpcs.spawn2{
 							Name = enemyName;
 							CFrame = spawnPoint;
 
@@ -173,18 +173,19 @@ return function(CutsceneSequence)
 									end
 								end)
 
-								npcClass.Properties.HordeAggression = true;
-								npcClass.Properties.TargetableDistance = 4096;
 							end
 						};
 
-						local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+						zombieNpcClass.Properties.HordeAggression = true;
+						zombieNpcClass.Properties.TargetableDistance = 4096;
+
+						local targetHandlerComp = zombieNpcClass:GetComponent("TargetHandler");
 						targetHandlerComp:AddTarget(playerClass.Character);
 
-						npcClass.OnThink:Fire();
+						zombieNpcClass.OnThink:Fire();
 					end
 
-					for a=1, 50 do
+					for a=1, 120 do
 						local newSpawnCf: CFrame = safehomeClass:GetSpawnPlatform(
 							Vector3.new(3, 6, 1),
 							function(spawnPlatformPart)
@@ -192,8 +193,12 @@ return function(CutsceneSequence)
 							end
 						);
 
+						while #enemySpawns > 60 do
+							task.wait(0.1);
+						end
+
 						task.spawn(spawnEnemy, "Zombie", newSpawnCf);
-						task.wait(0.1);
+						task.wait(1);
 					end
 					allSpawned = true;
 

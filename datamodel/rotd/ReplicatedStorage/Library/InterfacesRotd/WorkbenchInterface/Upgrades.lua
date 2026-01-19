@@ -162,7 +162,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			gapFrame.Visible = true;
 			descTag.Visible = true;
 			descTag.RichText = true;
-			wait(0.1);
+			task.wait(0.1);
 			expanded = true;
 			expandDebounce = false;
 		end
@@ -175,7 +175,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			gapFrame.Visible = false;
 			descTag.Visible = false;
 			descTag.RichText = false;
-			wait(0.1);
+			task.wait(0.1);
 			expanded = false;
 			expandDebounce = false;
 		end
@@ -183,7 +183,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		upgradeFrame.InputBegan:Connect(function(inputObject, gameProcessed)
 			if self.Clickable == false then return end;
 			if not gameProcessed and not expandDebounce then
-				if inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch then
+				if inputObject.UserInputType == Enum.UserInputType.MouseButton1 
+				or inputObject.UserInputType == Enum.UserInputType.Touch
+				or inputObject.KeyCode == Enum.KeyCode.ButtonA then
 					interface:PlayButtonClick();
 					if not expanded then
 						self.Expand();

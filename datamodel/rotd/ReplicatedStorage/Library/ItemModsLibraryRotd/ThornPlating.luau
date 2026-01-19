@@ -19,7 +19,7 @@ function modifierPackage.onRequire()
 	if RunService:IsClient() then return end;
 	if modBranchConfigs.IsWorld("Slaughterfest") then return end;
 
-	function modifierPackage.Binds.CharacterClassTakeDamage(modifier: ItemModifierInstance, damageData: DamageData)
+	function modifierPackage.Binds.CharacterClassTakenDamage(modifier: ItemModifierInstance, damageData: DamageData)
 		local initDamage = damageData.InitDamage;
 		if initDamage <= 0 then return end;
 

@@ -159,7 +159,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
 
                 local healAmt = destructible.HealthComp.MaxHealth*0.3;
                 destructible.HealthComp:TakeDamage(DamageData.new{
-                    Damage = healAmt;
+                    Damage = -healAmt;
                     DamageType = "Heal";
                 })
             end

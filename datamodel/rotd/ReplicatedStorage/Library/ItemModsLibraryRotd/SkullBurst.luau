@@ -31,7 +31,7 @@ if RunService:IsServer() then
 
 elseif RunService:IsClient() then
 
-	function modifierPackage.Binds.OnWeaponRender(modifier: ItemModifierInstance, toolStatusHud: anydict)
+	function modifierPackage.Binds.WeaponRenderStepped(modifier: ItemModifierInstance, toolStatusHud: anydict)
 		if modifier.Enabled == false then return end;
 
 		local equipmentClass: EquipmentClass? = modifier.EquipmentClass;
@@ -60,7 +60,7 @@ elseif RunService:IsClient() then
 		toolStatusHud.SkullBurst.ColorPercent = alphaRatio;
 	end
 
-	function modifierPackage.Binds.OnBulletHit(modifier: ItemModifierInstance, packet: OnBulletHitPacket)
+	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
 		local isHeadshot = packet.IsHeadshot;
 		if not isHeadshot then return end;
 

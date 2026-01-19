@@ -87,7 +87,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
         statusClass.Values.Pool = math.clamp(math.round((statusClass.Values.Pool or 0) - hpPerTick), 0, healthComp.MaxHealth);
 
         local dmgData = DamageData.new{
-            Damage = hpPerTick;
+            Damage = -hpPerTick;
             TargetPart = playerClass.RootPart;
             DamageType = "Heal";
         };

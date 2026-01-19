@@ -37,7 +37,7 @@ function statusPackage.init()
                 if healthComp == nil then continue end;
                 
                 local dmgData = DamageData.new{
-                    Damage = healAmount;
+                    Damage = -healAmount;
                     DamageBy = player;
                     DamageType = "Heal";
                 };

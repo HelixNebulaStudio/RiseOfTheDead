@@ -23,7 +23,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	modifier.SetValues.Rocketman = true;
 end
 
-function modifierPackage.Binds.PreProcessShot(modifier: ItemModifierInstance, packet)
+function modifierPackage.Binds.WeaponShotPreProcess(modifier: ItemModifierInstance, packet)
 	if modifier.EquipmentClass == nil then return end;
 
 	local equipmentClass = modifier.EquipmentClass;

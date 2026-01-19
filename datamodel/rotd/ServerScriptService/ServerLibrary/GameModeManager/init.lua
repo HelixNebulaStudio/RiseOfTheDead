@@ -202,7 +202,6 @@ function GameModeManager.onRequire()
 			
 		elseif requestEnum == enumRequests.JoinRoom then
 			local roomId = ...;
-			Debugger:Log("JoinRoom", ...);
 			
 			local gameTable = GameModeManager:GetPlayerMenuRoom(player);
 			if gameTable == nil then

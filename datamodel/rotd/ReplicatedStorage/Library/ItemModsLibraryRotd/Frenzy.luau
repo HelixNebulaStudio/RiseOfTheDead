@@ -16,25 +16,14 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	if modifier.EquipmentClass == nil then return end;
 	modItemModifierClass.AddTierDamage(modifier);
 
-	local dLayerInfo = modItemModifierClass.Library.calculateLayer(modifier, "D");
-	local dValue, dTweakVal = dLayerInfo.Value, dLayerInfo.TweakValue;
-	
-	if dTweakVal then
-		dValue = dValue + dTweakVal;
-	end
-	
 	local fdLayerInfo = modItemModifierClass.Library.calculateLayer(modifier, "FD");
 	local fdValue = fdLayerInfo.Value;
 
-	local configurations = modifier.EquipmentClass.Configurations;
-	if configurations.FrenzyDamage == nil then
-		modifier.SetValues.FrenzyDamage = fdValue;
-		modifier.MaxValues.FrenzyRate = 0.01;
-	end
+	modifier.Values.FrenzyDamage = fdValue;
+	modifier.Values.FrenzyRate = 0.2;
 end
 
 if RunService:IsServer() then
-
 	function modifierPackage.BindTickUpdate(modifier: ItemModifierInstance, tickData: TickData)
 		if modifier.Values.Stacks == nil then
 			modifier.Values.Stacks = 0;
@@ -56,27 +45,36 @@ if RunService:IsServer() then
 		end
 	end
 
-	function modifierPackage.Binds.OnNewDamageData(modifier: ItemModifierInstance, damageData: DamageData)
+	function modifierPackage.Binds.CharacterClassTakenDamage(modifier: ItemModifierInstance, damageData: DamageData)
+		local characterClass: CharacterClass? = modifier.WieldComp and modifier.WieldComp.CompOwner or nil;
+		if characterClass == nil then return end;
+
+		local frenzyRate = modifier.Values.FrenzyRate;
+
+		modifier.Values.Stacks = math.clamp(modifier.Values.Stacks + frenzyRate, 0, 1);
+		modifier.Values.CooldownTick = tick()+10;
+	end
+
+	function modifierPackage.Binds.WeaponShotDamageData(modifier: ItemModifierInstance, damageData: DamageData)
         if modifier.EquipmentClass == nil then return end;
 		local configurations = modifier.EquipmentClass.Configurations;
 		local preModDmg = configurations.PreModDamage;
+		local frenzyDmg = modifier.Values.FrenzyDamage;
 
 		local stackAlpha = modifier.Values.Stacks;
-		local additionalDmg = stackAlpha * configurations.FrenzyDamage * preModDmg;
+		local additionalDmg = stackAlpha * (frenzyDmg * preModDmg);
 		damageData.Damage = damageData.Damage + additionalDmg;
 	end
 
 elseif RunService:IsClient() then
 
-	function modifierPackage.Binds.OnWeaponRender(modifier: ItemModifierInstance, toolStatusHud: anydict)
+	function modifierPackage.Binds.WeaponRenderStepped(modifier: ItemModifierInstance, toolStatusHud: anydict)
 		if modifier.Enabled == false then return end;
 
 		local equipmentClass: EquipmentClass? = modifier.EquipmentClass;
 		if equipmentClass == nil then return end;
 
-		local configurations = equipmentClass.Configurations;
-
-		local frenzyDmg = configurations.FrenzyDamage;
+		local frenzyDmg = modifier.Values.FrenzyDamage;
 		if frenzyDmg == nil then return; end;
 
 		if toolStatusHud.FrenzyDamage == nil then
@@ -102,41 +100,13 @@ end
 function modifierPackage.Instancing(modifier: ItemModifierInstance, isFirstTime: boolean)
 	if RunService:IsClient() then return end;
 
-	Debugger:Warn("Frenzy Instancing");
 	modifier.OnEnabledChanged:Connect(function(prevVal: boolean)
-		Debugger:Warn("Frenzy OnEnabledChanged", modifier.Enabled);
 		if modifier.Enabled then
 			modifier:EnableTickUpdate(true);
 		else
 			modifier:EnableTickUpdate(false);
 		end
 	end)
-
-	if not isFirstTime then return end;
-	shared.modEventService:OnInvoked("Players_BindDamaged", function(event: EventPacket, damageData: DamageData, damage)
-		local playerClass: PlayerClass = (damageData.DamageTo :: PlayerClass);
-		if playerClass == nil or playerClass.ClassName ~= "PlayerClass" then return end;
-	
-		local player: Player = playerClass:GetInstance();
-		if player == nil then return end;
-
-		local storageItem: StorageItem? = damageData.StorageItem;
-		if storageItem == nil then return end;
-
-        local itemModifierList = playerClass.WieldComp.ItemModifierList;
-
-		for siid, modifier: ItemModifierInstance in pairs(itemModifierList) do
-			if modifier.SetValues.FrenzyDamage == nil then continue end;
-
-			if modifier.EquipmentClass == nil then continue end;
-			local configurations = modifier.EquipmentClass.Configurations;
-			local frenzyRate = configurations.FrenzyRate;
-
-			modifier.Values.Stacks = math.clamp(modifier.Values.Stacks + frenzyRate, 0, 1);
-			modifier.Values.CooldownTick = tick()+10;
-		end
-	end)
-
 end
 
 return modifierPackage;

@@ -82,7 +82,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     interface:BindConfigKey("DisableMapMenu", {window});
 	
 	local quickButton = interface:NewQuickButton("MapMenu", "Map", "rbxassetid://4615489625");
-	quickButton.LayoutOrder = 4;
+	quickButton.LayoutOrder = 9;
 	interface:ConnectQuickButton(quickButton, "KeyWindowMapMenu");
 
 	if modConfigurations.CompactInterface then

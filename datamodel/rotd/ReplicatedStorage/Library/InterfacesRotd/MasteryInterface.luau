@@ -779,7 +779,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end)
 	
 	local quickButton = interface:NewQuickButton("MasteryMenu", "Masteries", "rbxassetid://2938848546");
-	quickButton.LayoutOrder = 5;
+	quickButton.LayoutOrder = 7;
 	interface:ConnectQuickButton(quickButton, "KeyWindowMasteryMenu");
 
     --MARK: OnUpdate

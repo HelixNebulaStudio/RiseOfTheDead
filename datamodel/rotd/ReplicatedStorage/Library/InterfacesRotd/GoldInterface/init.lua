@@ -2,6 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
+local GuiService = game:GetService("GuiService");
 local MarketplaceService = game:GetService("MarketplaceService");
 
 local localPlayer = game.Players.LocalPlayer;
@@ -18,6 +19,7 @@ local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBind
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
+local modUIUtil = shared.require(game.ReplicatedStorage.Library.UI.UIUtil);
 
 
 local interfacePackage = {
@@ -31,7 +33,6 @@ end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local frontPage = "FrontPage";
-    local pageHistory = {};
 
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
@@ -45,7 +46,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     goldStatFrame.Parent = interface.ScreenGui;
 
     local goldLabel = goldStatFrame:WaitForChild("goldLabel");
-    local goldButton = goldStatFrame:WaitForChild("GoldMenu");
+    local goldButton: ImageButton = goldStatFrame:WaitForChild("GoldMenu");
     local exclaimIcon = goldButton:WaitForChild("exclaimImage");
 
     local mainMenu = goldMenuFrame:WaitForChild("Main");
@@ -61,10 +62,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local templatePageButton = script:WaitForChild("templatePageButton")
     local searchOption = script:WaitForChild("searchOption");
 
+    goldButton.LayoutOrder = 1000;
+    goldButton.NextSelectionDown = rScrollFrame;
 
     local goldShopWindow: InterfaceWindow = interface:NewWindow("GoldMenu", goldMenuFrame);
 	goldShopWindow.CompactFullscreen = true;
     goldShopWindow.DisableInteractables = true;
+    goldShopWindow.CloseWithInteract = true;
 
 	if modConfigurations.CompactInterface then
 		goldShopWindow:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, 0));
@@ -77,12 +81,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	else
 		goldShopWindow:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, -35));
 	end
-    goldMenuFrame:WaitForChild("closeButton").MouseButton1Click:Connect(function()
+    local goldMenuCloseButton = goldMenuFrame:WaitForChild("closeButton");
+    goldMenuCloseButton.MouseButton1Click:Connect(function()
         goldShopWindow:Close();
     end)
+    goldMenuCloseButton.NextSelectionDown = rScrollFrame;
 
 	interface:ConnectQuickButton(goldButton);
-	goldShopWindow:AddCloseButton(goldMenuFrame);
 	interface:BindConfigKey("DisableGoldMenu", {goldShopWindow}, {goldStatFrame});
 
 
@@ -109,35 +114,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     function goldShopWindow.Binds.SetStyle(styleId)
         if modConfigurations.CompactInterface then
-            -- if styleId == "Menu" then
-            --     goldStatFrame.AnchorPoint = Vector2.new(0, 0);
-            --     goldStatFrame.Position = UDim2.new(0, interface.Properties.TopbarInset.Min.X+20, 0, 0);
-            --     goldStatFrame.Size = UDim2.new(0, 200, 0.1, 0);
-
-            --     goldStatFrame.GoldMenu.AnchorPoint = Vector2.new(0, 0.5);
-            --     goldStatFrame.GoldMenu.Position = UDim2.new(0, 0, 0.5, 0);
-            --     goldStatFrame.GoldMenu.Size = UDim2.new(0, 35, 0, 35);
-
-            --     goldStatFrame.goldLabel.AnchorPoint = Vector2.new(0, 0.5);
-            --     goldStatFrame.goldLabel.Position = UDim2.new(0, 50, 0.5, 0);
-            --     goldStatFrame.goldLabel.Size = UDim2.new(0, 85, 0, 36);
-            --     goldStatFrame.goldLabel.TextXAlignment = Enum.TextXAlignment.Left;
-
-            -- else
-            --     goldStatFrame.AnchorPoint = Vector2.new(1, 0.5);
-            --     goldStatFrame.Position = UDim2.new(1, -20, 0, 33);
-            --     goldStatFrame.Size = UDim2.new(0, 200, 0, 25);
-
-            --     goldStatFrame.GoldMenu.AnchorPoint = Vector2.new(1, 0.5);
-            --     goldStatFrame.GoldMenu.Position = UDim2.new(1, 0, 0.5, 0);
-            --     goldStatFrame.GoldMenu.Size = UDim2.new(0, 32, 0, 32);
-
-            --     goldStatFrame.goldLabel.AnchorPoint = Vector2.new(1, 0.5);
-            --     goldStatFrame.goldLabel.Position = UDim2.new(1, -50, 0.5, 0);
-            --     goldStatFrame.goldLabel.Size = UDim2.new(0, 85, 0, 36);
-            --     goldStatFrame.goldLabel.TextXAlignment = Enum.TextXAlignment.Right;
-
-            -- end
         end
     end
 
@@ -205,7 +181,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     TextColor3=Color3.fromRGB(255, 255, 255);
                 }):Play();
                 
-                delay(duration+0.02, function() goldLabel.TextColor3=Color3.fromRGB(255, 255, 255); end);
+                task.delay(duration+0.02, function() goldLabel.TextColor3=Color3.fromRGB(255, 255, 255); end);
             elseif value < goldLerpTag.Value then
                 goldLabel.TextColor3=Color3.fromRGB(147, 49, 49);
                 
@@ -213,12 +189,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     TextColor3=Color3.fromRGB(255, 255, 255);
                 }):Play();
                 
-                delay(duration+0.02, function() goldLabel.TextColor3=Color3.fromRGB(255, 255, 255); end);
+                task.delay(duration+0.02, function() goldLabel.TextColor3=Color3.fromRGB(255, 255, 255); end);
             end
             TweenService:Create(goldLerpTag, statTweenInfo, {
                 Value=value;
             }):Play();
-            delay(duration+0.02, function() 
+            task.delay(duration+0.02, function() 
                 goldLerpTag.Value = value;
             end)
         end
@@ -250,19 +226,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         limitedList = remoteLimitedService:InvokeServer("fetch");
     end
 
+    local pageHistory = goldShopWindow.ReturnPageStack;
     function goldShopWindow.Binds.Back(clear)
         if #pageHistory > 1 and clear ~= true then
             local pageId = pageHistory[#pageHistory-1];
             
             if pageId == frontPage then
-                pageHistory = {};
+                table.clear(pageHistory);
             else
                 table.remove(pageHistory, #pageHistory);
                 table.remove(pageHistory, #pageHistory);
             end
             goldShopWindow.Binds.LoadPage(pageId);
         else
-            pageHistory = {};
+            table.clear(pageHistory);
             goldShopWindow.Binds.LoadPage(frontPage);
         end
     end
@@ -417,6 +394,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local itemButtonObj = modItemInterface.newItemButton(productLib.ItemId);
             itemButtonObj.ImageButton.Position = iconLabel.Position;
             itemButtonObj.ImageButton.Size = iconLabel.Size;
+            itemButtonObj.ImageButton.Selectable = false;
             itemButtonObj.ImageButton.Parent = iconButton;
             itemButtonObj:Update();
             
@@ -465,11 +443,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     if result == 0 then
                         MarketplaceService:PromptGamePassPurchase(localPlayer, productLib.Id);
                         buttonText.Text = "Item can be claimed here after purchased.";
-                        wait(5);
+                        task.wait(5);
                         task.spawn(function()
                             for a=1, 60 do
                                 task.wait(1);
-                                spawn(refreshPurchaseButton);
+                                task.spawn(refreshPurchaseButton);
                                 local result = remoteGoldShopPurchase:InvokeServer(lib.Id);
                                 if result == 1 or result == 4 then
                                     buttonText.Text = "Thank you for claiming your item!";
@@ -484,22 +462,22 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     elseif result == 1 then
                         buttonText.Text = "Thank you for claiming your item!";
                         interface:ToggleWindow("Inventory", true);
-                        wait(2);
+                        task.wait(2);
                         buttonText.Text = purchaseText;
 
                     elseif result == 4 then
                         buttonText.Text = "Already own item!";
-                        wait(2);
+                        task.wait(2);
                         buttonText.Text = purchaseText;
                         
                     elseif result == 3 then
                         buttonText.Text = "Inventory full!";
-                        wait(1);
+                        task.wait(1);
                         buttonText.Text = purchaseText;
 
                     else
                         buttonText.Text = "An error occured, see chat logs.";
-                        wait(1);
+                        task.wait(1);
                         buttonText.Text = purchaseText;
                         
                     end
@@ -524,34 +502,34 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                 goldShopWindow.Binds.LoadProduct(productId);
                             end);
                         else
-                            wait(1);
+                            task.wait(1);
                             buttonText.Text = purchaseText;
                         end
                         
                     elseif result == 1 then
                         buttonText.Text = "Not enough Gold!";
-                        wait(1);
+                        task.wait(1);
                         goldShopWindow.Binds.LoadPage("GoldPage");
                         return;
                         
                     elseif result == 2 then
                         buttonText.Text = "Woah there..";
-                        wait(1);
+                        task.wait(1);
                         buttonText.Text = purchaseText;
                         
                     elseif result == 3 then
                         buttonText.Text = "Inventory full!";
-                        wait(1);
+                        task.wait(1);
                         buttonText.Text = purchaseText;
                         
                     elseif result == 4 then
                         buttonText.Text = "Internal error..";
-                        wait(1);
+                        task.wait(1);
                         buttonText.Text = purchaseText;
 
                     elseif result == 5 then
                         buttonText.Text = "Out of stock..";
-                        wait(3);
+                        task.wait(3);
                         buttonText.Text = purchaseText;
                         
                     end
@@ -567,7 +545,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
                     elseif result == 1 then
                         buttonText.Text = "Not enough Gold!";
-                        wait(1);
+                        task.wait(1);
                         goldShopWindow.Binds.LoadPage("GoldPage");
                         return;
 
@@ -627,7 +605,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
         
         if pageHistory[#pageHistory] ~= pageId then
-            table.insert(pageHistory, pageId);
+            if pageId ~= "FrontPage" then
+                table.insert(pageHistory, pageId);
+            end
         end
         for a=1, #pageInfo do
             local pageDetails = pageInfo[a];
@@ -641,7 +621,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 lib = modGoldShopLibrary.Products:Find(pageDetails.Id);
 
                 if lib.Product and lib.Product.Type == "GamePass" then
-                    spawn(function()
+                    task.spawn(function()
                         local own = false;
                         pcall(function() 
                             own = MarketplaceService:UserOwnsGamePassAsync(localPlayer.UserId, lib.Product.Id);
@@ -741,6 +721,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local itemButtonObj = modItemInterface.newItemButton(productInfo.ItemId);
                 itemButtonObj.ImageButton.Position = iconLabel.Position;
                 itemButtonObj.ImageButton.Size = iconLabel.Size;
+                itemButtonObj.ImageButton.Selectable = false;
                 itemButtonObj.ImageButton.Parent = iconButton;
                 itemButtonObj.ImageButton.MouseButton1Click:Connect(onClickFunction);
                 itemButtonObj:Update();
@@ -777,20 +758,25 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             new.MouseButton1Click:Connect(onClickFunction)
             
             local highlighted = false;
-            new.MouseMoved:Connect(function()
+            local function onHighlightEnter()
                 if not highlighted then
                     TweenService:Create(bkFrame, TweenInfo.new(0.5), {BackgroundColor3=Color3.fromRGB(60, 60, 60)}):Play();
                     TweenService:Create(iconButton, TweenInfo.new(0.5), {Size=UDim2.new(1, 0, 1.2, -35)}):Play();
                     highlighted = true;
                 end
-            end)
-            new.MouseLeave:Connect(function()
+            end
+            new.MouseMoved:Connect(onHighlightEnter);
+            new.SelectionGained:Connect(onHighlightEnter);
+
+            local function onHighlightExit()
                 if highlighted then
                     highlighted = false;
                     TweenService:Create(bkFrame, TweenInfo.new(0.5), {BackgroundColor3=Color3.fromRGB(30, 30, 30)}):Play();
                     TweenService:Create(iconButton, TweenInfo.new(0.5), {Size=UDim2.new(1, 0, 1, -35)}):Play();
                 end
-            end)
+            end
+            new.MouseLeave:Connect(onHighlightExit);
+            new.SelectionLost:Connect(onHighlightExit);
             
             if exclaimImage.Visible then
                 local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true, 0);
@@ -798,6 +784,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
             
             new.Parent = rScrollFrame;
+            if a == 1 then
+                GuiService.SelectedObject = new;
+            end
         end
         backButton.Visible = #pageHistory > 0 and pageId ~= frontPage;
         
@@ -951,7 +940,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             new.Visible = matchSearch;
             
             if lib.Product and lib.Product.Type == "GamePass" then
-                spawn(function()
+                task.spawn(function()
                     local own = false;
                     pcall(function() 
                         own = MarketplaceService:UserOwnsGamePassAsync(localPlayer.UserId, lib.Product.Id);
@@ -1027,6 +1016,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local itemButtonObj = modItemInterface.newItemButton(productInfo.ItemId);
                 itemButtonObj.ImageButton.Position = iconLabel.Position;
                 itemButtonObj.ImageButton.Size = iconLabel.Size;
+                itemButtonObj.ImageButton.Selectable = false;
                 itemButtonObj.ImageButton.Parent = iconButton;
                 itemButtonObj.ImageButton.MouseButton1Click:Connect(onClickFunction);
                 itemButtonObj:Update();
@@ -1051,20 +1041,25 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             new.MouseButton1Click:Connect(onClickFunction)
 
             local highlighted = false;
-            new.MouseMoved:Connect(function()
+            local function onHighlightEnter()
                 if not highlighted then
                     TweenService:Create(bkFrame, TweenInfo.new(0.5), {BackgroundColor3=Color3.fromRGB(60, 60, 60)}):Play();
                     TweenService:Create(iconButton, TweenInfo.new(0.5), {Size=UDim2.new(1, 0, 1.2, -35)}):Play();
                     highlighted = true;
                 end
-            end)
-            new.MouseLeave:Connect(function()
+            end
+            new.MouseMoved:Connect(onHighlightEnter);
+            new.SelectionGained:Connect(onHighlightEnter);
+            
+            local function onHighlightExit()
                 if highlighted then
                     highlighted = false;
                     TweenService:Create(bkFrame, TweenInfo.new(0.5), {BackgroundColor3=Color3.fromRGB(30, 30, 30)}):Play();
                     TweenService:Create(iconButton, TweenInfo.new(0.5), {Size=UDim2.new(1, 0, 1, -35)}):Play();
                 end
-            end)
+            end
+            new.MouseLeave:Connect(onHighlightExit);
+            new.SelectionLost:Connect(onHighlightExit);
 
             if exclaimImage.Visible then
                 local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true, 0);
@@ -1072,8 +1067,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
 
             new.Parent = rScrollFrame;
+            if a == 1 then
+                GuiService.SelectedObject = new;
+            end
         end
-        
     end
 
 
@@ -1083,16 +1080,22 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         upIndicator.Visible = rScrollFrame.CanvasPosition.Y > 0;
     end
 
-    backButton.MouseButton1Click:Connect(function()
+    local function backClick()
         interface:PlayButtonClick();
         goldShopWindow.Binds.Back();
         updateScrollIndicator();
-    end)
+    end
+    backButton.NextSelectionRight = rScrollFrame;
+    backButton.MouseButton1Click:Connect(backClick)
     backButton.MouseMoved:Connect(function()
         backButton.buttonImage.ImageColor3 = modBranchConfigs.CurrentBranch.Color;
     end)
     backButton.MouseLeave:Connect(function()
         backButton.buttonImage.ImageColor3 = Color3.fromRGB(255,255,255);
+    end)
+    interface.OnReturnBackRequest:Connect(function()
+        if not modUIUtil.IsTrulyVisible(backButton) then return end;
+        backClick();
     end)
 
     lScrollFrame:WaitForChild("SearchBox"):WaitForChild("ClearButton").MouseButton1Click:Connect(function()

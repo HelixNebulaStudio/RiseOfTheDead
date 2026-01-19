@@ -38,7 +38,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     
     
     local dmgData = DamageData.new{
-        Damage = healAmount;
+        Damage = -healAmount;
         DamageType = "Heal";
     };
     healthComp:TakeDamage(dmgData);

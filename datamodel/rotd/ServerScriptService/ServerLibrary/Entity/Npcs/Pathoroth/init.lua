@@ -114,7 +114,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
         local isHeal = newHealth > oldHealth;
         if isHeal then 
             healthComp:TakeDamage(DamageData.new{
-                Damage = healthComp.MaxHealth*0.1;
+                Damage = -healthComp.MaxHealth*0.1;
                 DamageType = "Heal";
             });
             return

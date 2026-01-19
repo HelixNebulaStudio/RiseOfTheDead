@@ -84,7 +84,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end
 	
 	local quickButton = interface:NewQuickButton("FactionsMenu", "Factions", "rbxassetid://9890634236");
-	quickButton.LayoutOrder = 4;
+	quickButton.LayoutOrder = 8;
 	interface:ConnectQuickButton(quickButton, "KeyWindowFactionsMenu");
 
     local binds = window.Binds;

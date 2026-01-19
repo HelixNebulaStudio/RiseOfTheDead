@@ -16,7 +16,7 @@ local modifierPackage = {
 	Binds = {};
 };
 --==
-function modifierPackage.Binds.OnBulletHit(modifier: ItemModifierInstance, packet: OnBulletHitPacket)
+function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
     if RunService:IsClient() then return end;
     local modToolService = shared.require(game.ServerScriptService.ServerLibrary.ToolService);
     

@@ -15,7 +15,7 @@ local modifierPackage = {
 function modifierPackage.onRequire()
 	if RunService:IsClient() then return end;
 
-	function modifierPackage.Binds.CharacterClassTakeDamage(modifier: ItemModifierInstance, damageData: DamageData)
+	function modifierPackage.Binds.CharacterClassTakenDamage(modifier: ItemModifierInstance, damageData: DamageData)
 		local characterClass: CharacterClass? = modifier.WieldComp and modifier.WieldComp.CompOwner or nil;
 		if characterClass == nil then return end;
 

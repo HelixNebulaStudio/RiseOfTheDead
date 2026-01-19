@@ -36,7 +36,7 @@ return function(event: EventPacket, action: string, toolHandler: ToolHandlerInst
 
             if medicMulti > 0 then
                 byHealthComp:TakeDamage(DamageData.new{
-                    Damage = healAmount;
+                    Damage = -healAmount;
                     DamageBy = byCharacterClass;
                     ToolStorageItem = toolHandler.StorageItem;
                     DamageType = "Heal";

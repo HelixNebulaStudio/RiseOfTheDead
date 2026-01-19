@@ -17,7 +17,6 @@ function modifierPackage.onRequire()
 	if RunService:IsClient() then return end;
 
 	function modifierPackage.Binds.CharacterClassIsFocusedChanged(modifier: ItemModifierInstance, isFocused: boolean)
-		Debugger:Warn(`CharacterClassIsFocusedChanged {isFocused}`);
 		if isFocused == false then return; end;
 		if modifier.WieldComp == nil then return end;
 
@@ -45,6 +44,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 
 	modifier.SumValues.PGBArmor = value;
 	modifier.ProductValues.FocusWalkSpeedReduction = 0.5;
+	modifier.ArrayValues.PassiveModifiers = "PointGuardBulwark";
 end
 
 return modifierPackage;

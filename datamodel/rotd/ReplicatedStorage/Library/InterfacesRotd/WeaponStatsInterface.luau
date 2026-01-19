@@ -51,6 +51,8 @@ local statTemplates = {
 		{Key="BleedSlowPercent"; Text="<b>Bleed Slow Percent:</b>    $stat%"; Type="percent";};
 
 		{Key="ThrowRange"; Text="<b>Throwing Range:</b>    $stat u"; Type="2dp";};
+
+        {Key="DamageBlock"; Text="<b>[Melee Dampening] Additional Damage Block:</b>    $stat"; Type="2dp"; OnlyExpand=true;};
 	};
 	--MARK: Weapon stats;
 	Gun={
@@ -148,6 +150,9 @@ local statTemplates = {
 		{Key="SplashReflection"; Text="<b>Splash Reflection:</b>    $stat%"; Type="percent"};
 		
 		{Key="PassiveModifiers"; Text="<b>Passives:</b>    $stat"; Type="string"; OnlyExpand=true;};
+
+		{Key="BlockChance"; Text="<b>[Melee Dampening] Chance:</b>    $stat%"; Type="percent";};
+        {Key="DamageBlock"; Text="<b>[Melee Dampening] Damage Block:</b>    $stat"; Type="2dp";};
 	}
 };
 
@@ -349,6 +354,12 @@ local mouseOverDescription = {
 	SprintSpeed={
 		Desc="Set your base sprinting speed. (Default is 22)";
 	};
+    BlockChance={
+        Desc="The chance for the passive <b>Melee Dampening</b> to activate.\n\n(Higher is better)";
+    };
+    DamageBlock={
+        Desc="The amount of damage additionally blocked for <b>Melee Dampening</b>.\n\n(Higher is better)";
+    };
 };
 
 local triggerModes = {"Semi-automatic"; "Bolt-action"; "Full-automatic"; "Burstfire"; "Spin-up";};
@@ -362,6 +373,7 @@ local interfacePackage = {
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
+    local playerClass: PlayerClass, wieldComp: WieldComp;
 
     local casualPseudoRandom = modPseudoRandom.new();
 
@@ -876,6 +888,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local modifier: ItemModifierInstance = configurations.Modifiers[a] :: ItemModifierInstance;
 
             local modifierName = modifier.Name or modifier.Id;
+            if wieldComp and wieldComp.Siid == modifier.Id then
+                modifierName = `{modifierName} (Equipped)`;
+            end
             if modifier.ModLibrary and modifier.ModLibrary.Name then
                 modifierName = modifier.ModLibrary.Name;
             end
@@ -984,9 +999,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
         barFrameTemplate.BackgroundColor3 = modBranchConfigs.BranchColor;
 
-
-        local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
-        local wieldComp: WieldComp = playerClass.WieldComp;
+        playerClass = shared.modPlayers.get(localPlayer);
+        wieldComp = playerClass.WieldComp;
 
         local siid = storageItem.ID;
 

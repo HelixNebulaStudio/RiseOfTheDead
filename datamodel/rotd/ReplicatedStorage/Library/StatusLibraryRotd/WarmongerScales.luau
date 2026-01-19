@@ -28,7 +28,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     end
     if statusClass.Values.Buffer and statusClass.Values.Buffer > 0 and healthComp.CurHealth < healthComp.MaxHealth then
         healthComp:TakeDamage(DamageData.new{
-            Damage = statusClass.Values.Buffer;
+            Damage = -statusClass.Values.Buffer;
             DamageType = "Heal";
         });
         statusClass.Values.Buffer = 0;

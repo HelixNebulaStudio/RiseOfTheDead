@@ -1,5 +1,4 @@
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
-local modClothingProperties = shared.require(game.ReplicatedStorage.Library.ClothingLibrary:WaitForChild("ClothingProperties"));
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 

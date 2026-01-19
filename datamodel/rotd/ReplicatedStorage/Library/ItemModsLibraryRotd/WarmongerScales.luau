@@ -13,7 +13,7 @@ local modifierPackage = {
 };
 --==
 if RunService:IsServer() then
-	function modifierPackage.Binds.OnNewDamageData(modifier: ItemModifierInstance, damageData: DamageData)
+	function modifierPackage.Binds.WeaponShotDamageData(modifier: ItemModifierInstance, damageData: DamageData)
 		if modBranchConfigs.IsWorld("Slaughterfest") then return end;
 		
 		task.spawn(function()

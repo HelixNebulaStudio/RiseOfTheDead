@@ -41,7 +41,7 @@ end
 
 if RunService:IsServer() then
 
-	function modifierPackage.Binds.OnBulletHit(modifier: ItemModifierInstance, packet: OnBulletHitPacket)
+	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitPacket)
 		local duration = modifier.Values.Duration;
 		if packet.HitInfo == nil then return end;
 		

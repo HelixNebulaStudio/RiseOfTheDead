@@ -38,7 +38,7 @@ end
 
 if RunService:IsServer() then
 
-	function modifierPackage.Binds.OnBulletHit(modifier: ItemModifierInstance, packet: OnBulletHitPacket)
+	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
 		if packet.TargetModel == nil then return end;
 		
 		local characterClass: CharacterClass;
@@ -81,7 +81,7 @@ if RunService:IsServer() then
 
 elseif RunService:IsClient() then
 
-	function modifierPackage.Binds.OnWeaponRender(modifier: ItemModifierInstance, toolStatusHud: anydict)
+	function modifierPackage.Binds.WeaponRenderStepped(modifier: ItemModifierInstance, toolStatusHud: anydict)
 		if modifier.Enabled == false then return end;
 
 		if toolStatusHud.Frostbite == nil then
