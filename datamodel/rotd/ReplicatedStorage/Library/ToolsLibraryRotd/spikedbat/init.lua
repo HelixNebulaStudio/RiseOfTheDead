@@ -32,7 +32,7 @@ local toolPackage = {
 		PrimaryAttackAnimationSpeed=0.3;
 
 		HitRange=15;
-		BaseKnockback=100;
+		Knockback=100;
 
 		WaistRotation=math.rad(75);
 		FirstPersonWaistOffset=math.rad(-30);

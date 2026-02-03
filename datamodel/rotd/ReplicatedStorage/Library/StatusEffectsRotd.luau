@@ -33,10 +33,10 @@ function modStatusEffects.Slowness(player: Player, amount: number, duration: num
 		};
 	};
 
-    shared.modEventService:ServerInvoke("Status_OnMovementImpairment", {ReplicateTo={player}}, player, applyParams);
-	modSkillTree:TriggerSkills(player, "OnMovementImpairment", applyParams.Duration, function(newDuration)
-        applyParams.Duration = newDuration;
-    end);
+	local cMoveImpairReduction = playerClass.Configurations.MoveImpairReduction;
+	if cMoveImpairReduction then
+		applyParams.Duration = duration * (1-math.clamp(cMoveImpairReduction, 0, 1));
+	end
 
 	applyParams.Expires = workspace:GetServerTimeNow() + applyParams.Duration;
     statusComp:Apply("Slowness", applyParams)
@@ -62,10 +62,10 @@ function modStatusEffects.Stun(player: Player, duration: number)
 		ExpiresOnDeath = true;
 	};
 
-    shared.modEventService:ServerInvoke("Status_OnMovementImpairment", {ReplicateTo={player}}, player, applyParams);
-	modSkillTree:TriggerSkills(player, "OnMovementImpairment", applyParams.Duration, function(newDuration)
-		applyParams.Duration = newDuration;
-	end);
+	local cMoveImpairReduction = playerClass.Configurations.MoveImpairReduction;
+	if cMoveImpairReduction then
+		applyParams.Duration = duration * (1-math.clamp(cMoveImpairReduction, 0, 1));
+	end
 
 	applyParams.Expires = workspace:GetServerTimeNow() + applyParams.Duration;
     statusComp:Apply("Stun", applyParams);
@@ -246,11 +246,11 @@ function modStatusEffects.TiedUp(player: Player, duration: number)
         Duration = duration;
     };
 
-    shared.modEventService:ServerInvoke("Status_OnMovementImpairment", {ReplicateTo={player}}, player, applyParams);
-    modSkillTree:TriggerSkills(player, "OnMovementImpairment", applyParams.Duration, function(newDuration)
-        applyParams.Duration = newDuration;
-    end);
-
+	local cMoveImpairReduction = playerClass.Configurations.MoveImpairReduction;
+	if cMoveImpairReduction then
+		applyParams.Duration = duration * (1-math.clamp(cMoveImpairReduction, 0, 1));
+	end
+	
     applyParams.Expires = workspace:GetServerTimeNow() + applyParams.Duration;
     statusComp:Apply("TiedUp", applyParams);
 end

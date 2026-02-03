@@ -33,7 +33,7 @@ local toolPackage = {
 		PrimaryAttackAnimationSpeed=0.43;
 
 		HitRange=15;
-		BaseKnockback=70;
+		Knockback=70;
 
 		Combos = {
 			[3]={TimeSlot=3; ResetCombo=true; AnimationSpeed=1.38;}; -- Every third attack within 3 seconds

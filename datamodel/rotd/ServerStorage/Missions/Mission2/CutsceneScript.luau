@@ -19,7 +19,6 @@ if RunService:IsServer() then
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
-	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 	if modBranchConfigs.IsWorld("TheWarehouse") then
 		local function onDoorEnter(eventPacket: EventPacket, interactable: InteractableInstance)

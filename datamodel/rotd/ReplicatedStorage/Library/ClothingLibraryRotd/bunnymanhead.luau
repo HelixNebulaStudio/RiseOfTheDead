@@ -1,3 +1,5 @@
+local RunService = game:GetService("RunService");
+
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 --==
@@ -9,6 +11,7 @@ local attirePackage = {
 	
 	Configurations={
 		HasFlinchProtection = true;
+		EnemyDetectionRange = (modConfigurations.SpecialEvent.Easter == true or RunService:IsStudio()) and 2 or nil;
 		Warmth = 6;
 	};
 	Properties={};
@@ -16,10 +19,6 @@ local attirePackage = {
 
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
-
-	if modConfigurations.SpecialEvent.Easter then
-		equipmentClass:AddBaseModifier("Bunnyman");
-	end
 
 	return equipmentClass;
 end

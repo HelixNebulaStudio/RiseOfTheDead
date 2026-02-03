@@ -27,7 +27,7 @@ function treePackage.BurpConfusionGas(npcClass: NpcClass)
 
     local targetRootPart = enemyTargetData.HealthComp.CompOwner.RootPart;
 
-    npcClass.Move:SetMoveSpeed("set", "burp", 0, 9);
+    npcClass.Move:SetMoveSpeed("set", "burp", 0, npcClass.Move.MoveSpeedPriority.Action);
     task.wait(0.1);
     npcClass.Move:Face(targetRootPart);
     

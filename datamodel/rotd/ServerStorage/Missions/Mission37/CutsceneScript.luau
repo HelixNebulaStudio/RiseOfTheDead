@@ -15,7 +15,6 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modDialogues = shared.require(game.ServerScriptService.ServerLibrary.DialogueSave);
-	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 
 	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, ...)

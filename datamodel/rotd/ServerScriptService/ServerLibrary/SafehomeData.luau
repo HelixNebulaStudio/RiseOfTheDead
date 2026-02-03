@@ -20,8 +20,6 @@ local modStoragePresetLibrary = shared.require(game.ReplicatedStorage.Library.St
 
 local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 local modSafehomeService = shared.require(game.ServerScriptService.ServerLibrary.SafehomeService);
 
@@ -83,14 +81,13 @@ function SafehomeData.onRequire()
 				safehomeData.Homes[safehomeId] = {};
 				
 				traderProfile:AddGold(-price);
-				modAnalytics.RecordResource(player.UserId, price, "Sink", "Gold", "Purchase", "Safehome_"..safehomeId);
 				
 				modAnalyticsService:Sink{
-					Player=player;
-					Currency=modAnalyticsService.Currency.Gold;
-					Amount=price;
-					EndBalance=traderProfile.Gold;
-					ItemSKU=`Unlock:{safehomeId}`;
+					Player = player;
+					Currency = modAnalyticsService.Currency.Gold;
+					Amount = price;
+					EndBalance = traderProfile.Gold;
+					ItemSKU = `Unlock:{safehomeId}`;
 				};
 
 				return {ReplyCode=1; Data=safehomeData;};

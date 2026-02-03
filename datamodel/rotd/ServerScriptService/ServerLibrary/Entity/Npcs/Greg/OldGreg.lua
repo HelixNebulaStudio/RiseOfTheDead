@@ -19,7 +19,7 @@ return function(npc, spawnPoint)
 	};
 	
 	local pathPoints = {
-		self.SpawnPoint.p;
+		Vector3.new(-253.952, 62.67, 193.196);
 		Vector3.new(-212.43, 62.67, 241.518);
 		Vector3.new(-246.074, 62.67, 310.532);
 		Vector3.new(-272.843, 63.993, 443.957);

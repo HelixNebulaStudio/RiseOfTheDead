@@ -97,7 +97,10 @@ function Raid:Load()
 	self.GameLib = modGameModeLibrary.GetGameMode(self.ModeType);
 	self.StageLib = self.GameLib and modGameModeLibrary.GetStage(self.ModeType, self.ModeStage);
 
-	local mapWaveCollapse = shared.WorldCore.RaidMapWc;
+	local worldCore = shared.WorldCore;
+	local tilePrototypePackages = worldCore.Script:FindFirstChild("TilePrototypePackages");
+
+	local mapWaveCollapse = worldCore.MapWaveCollapse;
 	if mapWaveCollapse then
 		-- GenerateDynamicMap;
 		self.DynamicMap = {};
@@ -204,11 +207,15 @@ function Raid:Load()
 							
 						end
 						
-					elseif child.Name == "TileModule" then
-						local tileObj = shared.require(child);
-						tileObj:Init(self, mapWaveCollapse);
-						
 					end
+				end
+
+				local tilePrototypePackage = tilePrototypePackages:FindFirstChild(tileModel.Name);
+				if tilePrototypePackage then
+					local tilePackage = shared.require(tilePrototypePackage);
+
+					local tileObj = tilePackage.new(tileModel);
+					tileObj:Init(self, mapWaveCollapse);
 				end
 			end
 		end
@@ -430,7 +437,7 @@ function Raid:DropReward(spawnCf)
 		playersCenterPos = playersCenterPos / #self.Characters;
 
 
-		local mapWaveCollapse = shared.WorldCore.RaidMapWc;
+		local mapWaveCollapse = shared.WorldCore.MapWaveCollapse;
 		
 		local closestExtractDoor = nil
 		local closestDist = math.huge;
@@ -559,58 +566,6 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 
 	local spawnCf = paramPacket.SpawnCFrame;
 	
-	-- if self.OnNpcSpawnHooked == nil then
-	-- 	self.OnNpcSpawnHooked = modNpcs.OnNpcSpawn:Connect(function(npcModule)
-	-- 		if modConfigurations.TargetableEntities[npcModule.Humanoid.Name] == nil then return end; -- Not enemy spawn;
-
-	-- 		table.insert(self.EnemyClassInstances, npcModule);
-
-	-- 		npcModule.Garbage:Tag(function()
-	-- 			for a=#self.EnemyClassInstances, 1, -1 do
-	-- 				if self.EnemyClassInstances[a] == npcModule then
-	-- 					table.remove(self.EnemyClassInstances, a);
-	-- 					break;
-	-- 				end
-	-- 			end
-	-- 		end)
-
-	-- 		npcModule.Humanoid.Died:Connect(function()
-	-- 			self:BeginCount();
-
-	-- 			self.LastKilled = tick();
-	-- 			for a=#self.EnemyClassInstances, 1, -1 do
-	-- 				if self.EnemyClassInstances[a] == npcModule then
-	-- 					table.remove(self.EnemyClassInstances, a);
-	-- 					break;
-	-- 				end
-	-- 			end
-
-	-- 			npcModule.DeathPosition = npcModule.RootPart.CFrame.p;
-
-	-- 			self.LastEnemyDeathPos = npcModule.DeathPosition;
-				
-	-- 			self.EliminateCount = self.EliminateCount +1;
-				
-	-- 			if self.Status == EnumStatus.InProgress then
-					
-	-- 				if self.Objective.Id == "Eliminate" then
-	-- 					local remining = math.max(0, self.EliminateGoal - self.EliminateCount);
-
-	-- 					self.ObjectiveStatusText = `Eliminate {remining} enemies`;
-	-- 					self:Hud({
-	-- 						Status=self.ObjectiveStatusText;
-	-- 					});
-						
-	-- 					if self.EliminateCount >= self.EliminateGoal then
-	-- 						self:CompleteRaid();
-	-- 					end
-	-- 				end
-					
-	-- 			end
-	-- 		end);
-	-- 	end)
-	-- end
-
 	local npcClass: NpcClass = modNpcs.spawn2{
 		Name = npcName;
 		CFrame = spawnCf;
@@ -839,15 +794,16 @@ function Raid:Start()
 			local nearbyNpcClasses = shared.modNpcs.listInRange(pivot.Position, 64, 32);
 
 			for a=1, #nearbyNpcClasses do
-				local npcModule = nearbyNpcClasses[a];
+				local npcClass = nearbyNpcClasses[a];
 
-				if npcModule.OnTarget == nil then continue end;
+				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+				if targetHandlerComp == nil then continue end;
 
 				if reasonData and reasonData.DamageBy then
 					Debugger:StudioWarn(`Destroy by`, reasonData.DamageBy.Name);
 					if reasonData.DamageBy.ClassName == "PlayerClass" then
-						local player = reasonData.DamageBy:GetInstance();
-						npcModule.OnTarget(player);
+						local playerClass = reasonData.DamageBy;
+						targetHandlerComp:AddTarget(playerClass.Character);
 					end
 				end
 			end
@@ -1132,27 +1088,27 @@ function Raid:Initialize(roomData)
 						end
 
 						for a=1, 4 do
-							local chosenNpcModule;
+							local chosenNpcClass;
 							
 							for b=1, 3 do
-								chosenNpcModule = self.EnemyClassInstances[math.random(1, #self.EnemyClassInstances)]
-								if chosenNpcModule.BasicEnemy == true then break; end;
+								chosenNpcClass = self.EnemyClassInstances[math.random(1, #self.EnemyClassInstances)]
+								if chosenNpcClass.Properties.BasicEnemy == true then break; end;
 							end
 							
-							if chosenNpcModule.BasicEnemy ~= true then continue end;
-							if chosenNpcModule.RootPart == nil then continue end;
+							if chosenNpcClass.Properties.BasicEnemy ~= true then continue end;
+							if chosenNpcClass.RootPart == nil then continue end;
 
 							local tooClose = false;
 							for _, player in pairs(game.Players:GetPlayers()) do
-								if player:DistanceFromCharacter(chosenNpcModule.RootPart.Position) <= 128 then
+								if player:DistanceFromCharacter(chosenNpcClass.RootPart.Position) <= 128 then
 									tooClose = true;
 									break;
 								end
 							end
 							
 							if not tooClose then
-								chosenNpcModule.Target = nil;
-								chosenNpcModule.RootPart.CFrame = spawnCf;
+								chosenNpcClass.Target = nil;
+								chosenNpcClass.RootPart.CFrame = spawnCf;
 							end
 						end
 					end

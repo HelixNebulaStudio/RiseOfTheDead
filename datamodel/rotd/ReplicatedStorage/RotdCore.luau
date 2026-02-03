@@ -32,6 +32,7 @@ local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEff
 local modWorldCoreClass = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modEmotesCommsLibrary = shared.require(game.ReplicatedStorage.Library.EmoteCommsLibraryRotd);
+local modSkillTreeLibrary = shared.require(game.ReplicatedStorage.Library.SkillTreeLibraryRotd);
 
 if RunService:IsServer() then
     local modProfile = shared.require(game.ServerScriptService.ServerLibrary.ProfileRotd);

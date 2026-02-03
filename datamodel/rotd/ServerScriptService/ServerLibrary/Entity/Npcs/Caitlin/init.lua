@@ -4,9 +4,15 @@ local npcPackage = {
     Name = "Caitlin";
     HumanoidType = "Human";
     
-	Configurations = {};
+	Configurations = {
+        WalkSpeed = 19;
+    };
     Properties = {
+        PrimaryGunItemId = "mp7";
+        MeleeItemId = "survivalknife";
+        MeleeRange = 8;
         Immortal = 1;
+        CutsceneActive = false;
     };
 
     DialogueInteractable = true;
@@ -14,6 +20,13 @@ local npcPackage = {
     AddComponents = {
         "TargetHandler";
         "Chat";
+        "AttractNpcs";
+        "FollowPlayer";
+        "WaitForPlayer";
+    };
+    AddBehaviorTrees = {
+        "SurvivorCombatTree";
+        "CutsceneTree";
     };
 
     Voice = {
@@ -25,6 +38,12 @@ local npcPackage = {
 };
 
 function npcPackage.Spawning(npcClass: NpcClass)
+    local attractNpcsComp = npcClass:GetComponent("AttractNpcs");
+    if attractNpcsComp then
+        attractNpcsComp.AttractHumanoidType = {"Zombie"; "Bandit"};
+        attractNpcsComp.SelfAttractAlert = true;
+        attractNpcsComp:Activate();
+    end
 end
 
 return npcPackage;

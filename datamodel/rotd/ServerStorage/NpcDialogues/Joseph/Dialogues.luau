@@ -34,7 +34,6 @@ if RunService:IsServer() then
 	Dialogues.DialogueHandler = function(player, dialog, data)
 		local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-		local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 		
 		if modBranchConfigs.IsWorld("TheInvestigation") then return end;
 
@@ -99,7 +98,7 @@ if RunService:IsServer() then
 			local cardGameLobby = modCardGame.NewLobby(npcPrefab);
 			local npcTable = cardGameLobby:GetPlayer(npcPrefab);
 
-			local npcModule = dialog:GetNpcModule();
+			local npcModule = dialog:GetNpcClass();
 
 
 			local npcQuips = {

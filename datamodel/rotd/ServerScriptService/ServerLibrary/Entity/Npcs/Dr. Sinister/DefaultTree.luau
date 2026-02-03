@@ -35,7 +35,7 @@ function treePackage.HasZombies(npcClass: NpcClass)
     for a=1, #zombieClasses do
         local zNpcClass: NpcClass = zombieClasses[a];
 
-        local validNpcModule = (zNpcClass ~= nil
+        local validNpcClass = (zNpcClass ~= nil
             and zNpcClass ~= npcClass
             and not zNpcClass.HealthComp.IsDead
             and zNpcClass.HumanoidType == "Zombie"
@@ -43,7 +43,7 @@ function treePackage.HasZombies(npcClass: NpcClass)
             and zNpcClass.Properties.BasicEnemy == true
             and zNpcClass.Name ~= "Ticks");
         
-        if not validNpcModule then continue end;
+        if not validNpcClass then continue end;
         local zCharacter = zNpcClass.Character;
         local zPosition = zCharacter:GetPivot().Position;
         

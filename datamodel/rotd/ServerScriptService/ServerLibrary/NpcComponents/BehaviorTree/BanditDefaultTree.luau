@@ -125,7 +125,7 @@ function treePackage.RunToMeleeRange(npcClass: NpcClass)
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
 
-    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 18, 2, 5);
+    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 18, npcClass.Move.MoveSpeedPriority.Movement, 5);
     npcClass.Move:Follow(enemyNpcClass.RootPart, 2);
 end
 
@@ -154,7 +154,7 @@ function treePackage.RunToFireRange(npcClass: NpcClass)
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
 
-    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 14, 2, 5);
+    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 14, npcClass.Move.MoveSpeedPriority.Movement, 5);
     npcClass.Move:Follow(enemyNpcClass.RootPart, 16, 24);
 
     return true;
@@ -185,7 +185,7 @@ function treePackage.RunToCover(npcClass: NpcClass)
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
 
-    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 18, 2, 5);
+    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 18, npcClass.Move.MoveSpeedPriority.Movement, 5);
     npcClass.Move:Follow(enemyNpcClass.RootPart, 24, 32);
 
     return true;
@@ -236,7 +236,7 @@ function treePackage.Patrol(npcClass: NpcClass)
     
     if math.random(1, 100) == 1 
     and not npcClass.Move:IsAtPosition(npcClass.SpawnPoint.Position) and npcClass.Properties.SpokeByMeData == nil then
-        npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, 2, 2);
+        npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, npcClass.Move.MoveSpeedPriority.Movement, 2);
         npcClass.Move:MoveTo(npcClass.SpawnPoint.Position);
 
     else
@@ -279,7 +279,7 @@ function treePackage.Patrol(npcClass: NpcClass)
                     };
 
                     if nearbyBanditTargetData.Distance > 10 then
-                        npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, 2, 3);
+                        npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, npcClass.Move.MoveSpeedPriority.Movement, 3);
 
                         local dir = (targetNpcClass.RootPart.Position - npcClass.RootPart.Position).Unit;
                         npcClass.Move:MoveTo(npcClass.RootPart.Position + (dir * 8));

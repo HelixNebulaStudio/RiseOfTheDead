@@ -33,7 +33,7 @@ function WorldCore.onRequire()
         end, 999);
 
         -- Harbor Rat Safehouse
-        shared.modNpcs.spawn2{Name="Caitlin";};
+        WorldCore.CaitlinClass = shared.modNpcs.spawn2{Name="Caitlin";};
         shared.modNpcs.spawn2{Name="Greg";};
         shared.modNpcs.spawn2{Name="Cooper";};
         shared.modNpcs.spawn2{Name="Lewis";};

@@ -762,6 +762,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	window.OnToggle:Connect(function(visible)
 		selectedId = nil;
 		if visible then
+            modData:RequestData("SkillTree");
 			modData:RequestData("GameSave/Masteries");
 			
 			interface:HideAll{[window.Name]=true;};
@@ -826,6 +827,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             refreshTree();
         end
     end)
+
 end
 
 return interfacePackage;

@@ -13,64 +13,10 @@ local modNpcComponent = shared.require(game.ServerScriptService.ServerLibrary.En
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 
 local fireCooldown = tick();
-modOnGameEvents:ConnectEvent("OnTouchEvent", function(touchEventId, hitPart)
-	if tick() <= fireCooldown+0.5 then return end;
-	fireCooldown = tick();
-
-	local model = hitPart.Parent;
-	if not model:IsA("Model") then return end;
-
-	local modNpcs = shared.modNpcs
-	
-	local player = game.Players:GetPlayerFromCharacter(model);
-	if player then
-		local playerClass = shared.modPlayers.get(player);
-		if playerClass and playerClass.HealthComp and playerClass.HealthComp.CurHealth > 0 then
-			
-			local missionCache = modEvents:GetEvent(player, "MissionCache");
-			local isEnemy = false;
-			if missionCache and missionCache.Value then
-				if missionCache.Value.BanditsAllied == true then
-					isEnemy = true;
-				end
-				if missionCache.Value.RatsAllied == true then
-					isEnemy = false;
-				end
-			end
-			local missionChoice = modEvents:GetEvent(player, "mission58choice");
-			if missionChoice and missionChoice.Rats == true then
-				isEnemy = false;
-			end
-			
-			if not isEnemy then return end;
-			
-			
-			local rats = CollectionService:GetTagged("Rats");
-			for a=1, #rats do
-				local ratNpcModule = modNpcs.getByModel(rats[a]);
-				
-				if ratNpcModule.Enemies then
-					local exist = false;
-					for b=1, #ratNpcModule.Enemies do
-						if ratNpcModule.Enemies[b].Character == model then
-							exist = true;
-							break;
-						end
-					end
-
-					if not exist then
-						ratNpcModule.OnTarget(model);
-					end
-				end
-			end
-		end
-	end
-end)
 
 -- Note; Function called for each zombie before zombie parented to workspace;
 return function(npc, spawnPoint)

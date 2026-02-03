@@ -16,7 +16,6 @@ if RunService:IsServer() then
 	end
 
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 	shared.modEventService:OnInvoked("WorkbenchService_BindInterfaceToggle", function(event: EventPacket, ...)

@@ -45,7 +45,7 @@ local toolPackage = {
 		HeavyAttackSpeed=1.4;
 		HitRange=14;
 
-		BaseKnockback=80;
+		Knockback=80;
 
 		WaistRotation=math.rad(25);
 		FirstPersonWaistOffset=math.rad(0);
@@ -55,6 +55,8 @@ local toolPackage = {
 
 		BleedDamagePercent=0.2;
 		BleedSlowPercent=0.2;
+
+		DamageBlock = 10;
 	};
 	Properties={
 		ActiveCategory = "Edged";

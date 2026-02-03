@@ -22,6 +22,7 @@ if RunService:IsServer() then
         local statusModifier: ConfigModifier = configurations:GetModifier(modifierId);
         if statusModifier == nil then
             statusModifier = configurations.newModifier(modifierId);
+            statusModifier.Name = statusPackage.Name;
             statusModifier.MaxValues.SprintSpeed = 26.4;
             statusModifier.Tags.StatusMod = true;
         end

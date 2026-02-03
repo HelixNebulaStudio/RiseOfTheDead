@@ -22,8 +22,17 @@ local graphStatTemplates = {
 	Gun="<b>Damage:</b> $Damage      <b>Fire Rate:</b> $Rpm RPM      <b>Ammo:</b> $MagazineSize/$AmmoCapacity      <b>Reload Time:</b> $ReloadTimes";
 }
 
+local initCharStats;
 local statTemplates = {
 	--MARK: Melee stats;
+    Character={
+		{Key="MaxHealth"; Text="<b>Max Health:</b>    $stat"; Type="int"};
+		{Key="MaxArmor"; Text="<b>Max Armor:</b>    $stat"; Type="int"};
+		{Key="HealRate"; Text="<b>Healing Rate:</b>    $stat"; Type="2dp"};
+		{Key="ArmorRate"; Text="<b>Armor Regeneration Rate:</b>    $stat"; Type="2dp"};
+        
+		{Key="Oxygen"; Text="<b>Max Oxygen:</b>    $stat"; Type="int"};
+    };
 	Melee={
 		{Key="Damage"; Text="<b>Damage:</b>    $stat"; Type="3dp"};
 		{Key="PrimaryAttackSpeed"; Text="<b>Attack Speed:</b>    $stat"; Type="3dp"};
@@ -125,7 +134,7 @@ local statTemplates = {
 		{Key="DamageReflection"; Text="<b>Damage Reflection:</b>    $stat%"; Type="percent"};
 		{Key="BulletProtection"; Text="<b>Bullet Protection:</b>    $stat%"; Type="percent"};
 		
-		{Key="HotEquipSlots"; Text="<b>Additional Hotbar Slots:</b>    $stat"; Type="int"};
+		{Key="HotEquipSlots"; Text="<b>Hotbar Slots:</b>    $stat"; Type="int"};
 
 		{Key="MoveSpeed"; Text="<b>Base MoveSpeed:</b>    $stat"; Type="int"};
 		{Key="SprintSpeed"; Text="<b>Base SprintSpeed:</b>    $stat"; Type="int"};
@@ -149,6 +158,7 @@ local statTemplates = {
 		{Key="FlinchProtection"; Text="<b>Flinch Protection:</b>    $stat%"; Type="percent"};
 		{Key="SplashReflection"; Text="<b>Splash Reflection:</b>    $stat%"; Type="percent"};
 		
+        {Key="EnemyDetectionRange"; Text="<b>Enemy Detection Range:</b>    $stat radius"; Type="int";};
 		{Key="PassiveModifiers"; Text="<b>Passives:</b>    $stat"; Type="string"; OnlyExpand=true;};
 
 		{Key="BlockChance"; Text="<b>[Melee Dampening] Chance:</b>    $stat%"; Type="percent";};
@@ -322,10 +332,10 @@ local mouseOverDescription = {
 		Desc="Reduces damage from hitscan projectiles from enemy by this percent.";
 	};
 	MoveImpairReduction={
-		Desc="Multiplied, reduction to the duration of movement impairment debuffs.";
+		Desc="Reduction to the duration of movement impairment debuffs.";
 	};
 	EquipTimeReduction={
-		Desc="Multiplied, reduction to the time it takes to equip a tool.";
+		Desc="Reduction to the time it takes to equip a tool.";
 	};
 	AdditionalStamina={
 		Desc="Additional stamina added to your maximum stamina.";
@@ -380,6 +390,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local weaponStatsFrame = script:WaitForChild("WeaponStats"):Clone();
     weaponStatsFrame.Parent = interface.ScreenGui;
 
+
+    local titleLabel = weaponStatsFrame:WaitForChild("Title");
     local statsList = weaponStatsFrame:WaitForChild("StatsList");
     local statsLabelTemplate = script:WaitForChild("StatsLabel");
     local masteryFrame = weaponStatsFrame:WaitForChild("masteryFrame");
@@ -484,9 +496,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end
 	
 	weaponStatsWindow.ReleaseMouse = false;
+    --MARK: OnToggle
 	weaponStatsWindow.OnToggle:Connect(function(visible, storageItem)
 		if visible then
             statPage = "Stats";
+
 			refreshFrameSize();
             weaponStatsWindow:Update(storageItem);
 		end
@@ -538,13 +552,32 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         return statString;
     end
 
+    if initCharStats == nil then
+        initCharStats = true;
+
+        for class, dict in pairs(statTemplates) do
+            if class == "Character" then continue end;
+            for k, v in pairs(dict) do
+                statTemplates.Character[k] = v;
+            end
+        end
+    end
 
     local isFirstRun = nil;
     --MARK: Render Stats
-    local function renderStats(equipmentClass: EquipmentClass, storageItem: StorageItem)
-        local configurations: ConfigVariable = equipmentClass.Configurations;
+    local function renderStats(configOwner: EquipmentClass | CharacterClass, storageItem: StorageItem?)
+        local equipmentClass: EquipmentClass;
+        local classType = nil;
 
-        local classType = equipmentClass.Class;
+        local configurations: ConfigVariable = configOwner.Configurations;
+        if configOwner.ClassName ~= "PlayerClass" then
+            equipmentClass = configOwner :: EquipmentClass;
+            classType = equipmentClass.Class;
+
+        else
+            classType = "Character";
+
+        end
         currentClass = classType;
 
         local statsTemplate = statTemplates[classType];
@@ -670,6 +703,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         --     end
         -- end
         
+        local itemId = storageItem and storageItem.ItemId or "~";
         if classType == "Gun" then
             if isFirstRun == nil then
                 isFirstRun = true;
@@ -733,7 +767,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local critBonus = nil;
                 if critMulti then
                     local critChance = configurations.CritChance;
-                    if a == ammoMag or casualPseudoRandom:FairCrit(storageItem.ItemId, critChance) then -- math.fmod(a, math.floor(1/critChance)) == 0
+                    if a == ammoMag or casualPseudoRandom:FairCrit(itemId, critChance) then -- math.fmod(a, math.floor(1/critChance)) == 0
                         critBonus = preModDamage * critMulti;
                         damage = damage + critBonus;
                     end
@@ -857,7 +891,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             
         end
         
-        local workbenchUpgradesLib = modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId];
+        local workbenchUpgradesLib = modWorkbenchLibrary.ItemUpgrades[itemId];
         if workbenchUpgradesLib then
             -- local conditionRange = workbenchUpgradesLib.SkinWear and workbenchUpgradesLib.SkinWear.Wear or {Min=0.000001; Max=0.999999;};
             
@@ -869,10 +903,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end
 
     --MARK: Render Modifiers
-    local function renderModifiers(equipmentClass: EquipmentClass, storageItem: StorageItem)
-        local configurations: ConfigVariable = equipmentClass.Configurations;
+    local function renderModifiers(configOwner: EquipmentClass | CharacterClass, storageItem: StorageItem?)
+        local equipmentClass: EquipmentClass;
+        local classType = nil;
 
-        local classType = equipmentClass.Class;
+        local configurations: ConfigVariable = configOwner.Configurations;
+
+        if configOwner.ClassName ~= "PlayerClass" then
+            equipmentClass = configOwner :: EquipmentClass;
+            classType = equipmentClass.Class;
+
+        else
+            classType = "Character";
+
+        end
         currentClass = classType;
 
         local modificationDict = {};
@@ -944,9 +988,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
         
         local statsTemplate = statTemplates[classType];
+        local dupStatsDebounce = {};
         for a=1, #statsTemplate do
             local info = statsTemplate[a];
             local key = info.Key;
+
+            if dupStatsDebounce[key] then continue end;
+            dupStatsDebounce[key] = true;
 
             local modifyList = modificationDict[key];
             if modifyList == nil then continue end;
@@ -989,9 +1037,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     -- MARK: OnUpdate
     weaponStatsWindow.OnUpdate:Connect(function(storageItem: StorageItem)
-        if storageItem == nil or typeof(storageItem) ~= "table" then return end;
-        weaponStatsWindow.Binds.LastStorageItem = storageItem;
-
         for _, obj in pairs(statsList:GetChildren()) do
             if obj:IsA("GuiObject") then
                 obj:Destroy();
@@ -1002,15 +1047,31 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         playerClass = shared.modPlayers.get(localPlayer);
         wieldComp = playerClass.WieldComp;
 
-        local siid = storageItem.ID;
+        local configOwner;
+        local siid;
+        local classType = "Character";
+        if not (storageItem == nil or typeof(storageItem) ~= "table") then
+            siid = storageItem.ID;
 
-        local equipmentClass: EquipmentClassRotd = wieldComp:GetEquipmentClass(siid);
-        if equipmentClass == nil then
-            Debugger:Warn(`EquipmentClass not found for siid:{siid}`);
-            return;
+            local equipmentClass: EquipmentClassRotd = wieldComp:GetEquipmentClass(siid);
+            if equipmentClass == nil then
+                classType = equipmentClass.Class;
+                Debugger:Warn(`EquipmentClass not found for siid:{siid}`);
+                return;
+            end
+
+            weaponStatsWindow.Binds.LastStorageItem = storageItem;
+
+            titleLabel.Text = `Item Stats`;
+            configOwner = equipmentClass;
+
+        else
+            playerClass.Configurations:Calculate();
+            configOwner = playerClass;
+            titleLabel.Text = `Character Stats`;
+
         end
 
-        local classType = equipmentClass.Class;
         currentClass = classType;
 
         local statsTemplate = statTemplates[classType];
@@ -1044,9 +1105,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
         end
         if statPage == "Stats" then
-            renderStats(equipmentClass, storageItem);
+            renderStats(configOwner, storageItem);
         elseif statPage == "Modifiers" then
-            renderModifiers(equipmentClass, storageItem);
+            renderModifiers(configOwner, storageItem);
         end;
         
         statLayerButton.BackgroundColor3 = statPage == "Stats" and modBranchConfigs.BranchColor or Color3.fromRGB(100,100,100);

@@ -25,6 +25,10 @@ local toolPackage = {
 	Properties={};
 };
 
+function toolPackage.onRequire()
+
+end
+
 function toolPackage.ClientPrimaryFire(handler)
 	local localplayer = game.Players.LocalPlayer;
 	local modData = shared.require(localplayer:WaitForChild("DataModule") :: ModuleScript);
@@ -92,8 +96,8 @@ end
 
 function toolPackage.ActionEvent(handler, packet)
 	local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
+	local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent)
 
 	local remotes = game.ReplicatedStorage.Remotes;
 	local bindOnDoorEnter = remotes.Interactable.OnDoorEnter;

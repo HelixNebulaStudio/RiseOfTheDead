@@ -271,9 +271,9 @@ if RunService:IsServer() then
 								task.wait(5);
 								modServerManager:Travel(player, "TheMall");
 
-								local zarkModule = dialog:GetNpcModule();
-								if zarkModule then
-									zarkModule.Chat(player, "Bring it to Loran in the Bandit Camp once you obtained them.");
+								local zarkNpcClass = dialog:GetNpcClass();
+								if zarkNpcClass then
+									zarkNpcClass.Chat(player, "Bring it to Loran in the Bandit Camp once you obtained them.");
 								end
 								
 							end)

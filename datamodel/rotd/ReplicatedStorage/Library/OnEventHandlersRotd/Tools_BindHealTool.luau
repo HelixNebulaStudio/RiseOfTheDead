@@ -19,7 +19,8 @@ return function(event: EventPacket, action: string, toolHandler: ToolHandlerInst
     if action == "UseStart" then
         local fiaitrStatusClass: StatusClassInstance = statusComp:GetOrDefault("fiaitr");
         if fiaitrStatusClass then
-            properties.UseDuration = configurations.UseDuration * (100-fiaitrStatusClass.Values.Percent)/100;
+            local skillStats = fiaitrStatusClass.Values.SkillData.Stats;
+            properties.UseDuration = configurations.UseDuration * (100-skillStats.Percent.Value)/100;
         end
 
     elseif action == "UseComplete" then
@@ -29,8 +30,8 @@ return function(event: EventPacket, action: string, toolHandler: ToolHandlerInst
         local skillData = profile.SkillTree:GetSkill(player, "methme");
 
         if skillData and toCharacterClass and toCharacterClass ~= byCharacterClass then
-            local level, stats = profile.SkillTree:CalStats(skillData.Library, skillData.Points);
-            local medicMulti = (level > 0 and stats.Percent.Value or 0)/100;
+            local level, skillStats = profile.SkillTree:CalStats(skillData.Library, skillData.Points);
+            local medicMulti = (level > 0 and skillStats.Percent.Value or 0)/100;
             
             local healAmount = properties.HealAmount * medicMulti;
 

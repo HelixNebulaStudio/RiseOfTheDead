@@ -11,7 +11,7 @@ if RunService:IsServer() then
 
 	shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
 		local npcClass: NpcClass = ...;
-		if npcClass == nil or npcClass.HumanoidType ~= "Zpider" then return end;
+		if npcClass == nil or npcClass.Name ~= "Zpider" then return end;
 	
 		local playerTags = modDamageTag:Get(npcClass.Character, "Player");
 		for a=1, #playerTags do

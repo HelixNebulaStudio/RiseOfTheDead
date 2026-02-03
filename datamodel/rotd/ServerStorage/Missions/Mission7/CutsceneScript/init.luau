@@ -19,7 +19,6 @@ if RunService:IsServer() then
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
-	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 	if modBranchConfigs.IsWorld("TheWarehouse") then

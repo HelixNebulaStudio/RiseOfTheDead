@@ -54,11 +54,11 @@ function treePackage.ThrowZombie(npcClass: NpcClass)
     local rootPos = npcClass.RootPart.Position;
     local zombiesList: {NpcClass} = shared.modNpcs.listInRange(rootPos, maxRange, maxScan);
     
-    local sortedNpcModules = {};
+    local sortedNpcClasses = {};
     for a=1, #zombiesList do
         local zNpcClass: NpcClass = zombiesList[a];
 
-        local validNpcModule = zNpcClass ~= nil
+        local validNpcClass = zNpcClass ~= nil
             and zNpcClass ~= npcClass
             and not zNpcClass.HealthComp.IsDead
             and zNpcClass.Name == "Zombie"
@@ -67,22 +67,22 @@ function treePackage.ThrowZombie(npcClass: NpcClass)
         
         local healthRatio = zNpcClass.Humanoid.Health/zNpcClass.Humanoid.MaxHealth;
 
-        if validNpcModule then
+        if validNpcClass then
             local prefab = zNpcClass.Character;
             local prefabPosition = prefab:GetPivot().Position;
 
             local dist = (prefabPosition-rootPos).Magnitude;
             
-            table.insert(sortedNpcModules, {
-                NpcModule=zNpcClass;
-                SortValue=((dist * 0.3) + math.clamp(1-healthRatio, 0, 1)*0.7);
+            table.insert(sortedNpcClasses, {
+                zNpcClass = zNpcClass;
+                SortValue = ((dist * 0.3) + math.clamp(1-healthRatio, 0, 1)*0.7);
             });
         end
     end
-    table.sort(sortedNpcModules, function(a, b) return a.SortValue < b.SortValue; end);
+    table.sort(sortedNpcClasses, function(a, b) return a.SortValue < b.SortValue; end);
     
-    local throwNpcModule = sortedNpcModules[1] and sortedNpcModules[1].NpcModule or nil;
-    table.clear(sortedNpcModules);
+    local throwNpcClass = sortedNpcClasses[1] and sortedNpcClasses[1].zNpcClass or nil;
+    table.clear(sortedNpcClasses);
 
     local newGrip, stunStatus, throwDiedConn;
     
@@ -91,10 +91,10 @@ function treePackage.ThrowZombie(npcClass: NpcClass)
         if npcClass.HealthComp.IsDead == true then
             isCancelled = true;
         end
-        if throwNpcModule == nil 
-            or throwNpcModule.Humanoid == nil 
-            or throwNpcModule.Humanoid.Health <= 0 
-            or throwNpcModule.IsDead 
+        if throwNpcClass == nil 
+            or throwNpcClass.Humanoid == nil 
+            or throwNpcClass.Humanoid.Health <= 0 
+            or throwNpcClass.IsDead 
         then
             isCancelled = true;
         end;
@@ -117,10 +117,10 @@ function treePackage.ThrowZombie(npcClass: NpcClass)
                 npcClass.Move:Stop();
             end
 
-            if throwNpcModule then
-                if throwNpcModule.IsDead ~= true then
-                    throwNpcModule.Humanoid.PlatformStand = false;
-                    throwNpcModule.RootPart.Massless = false;
+            if throwNpcClass then
+                if throwNpcClass.IsDead ~= true then
+                    throwNpcClass.Humanoid.PlatformStand = false;
+                    throwNpcClass.RootPart.Massless = false;
                 end
             end
         end
@@ -130,21 +130,21 @@ function treePackage.ThrowZombie(npcClass: NpcClass)
 
     if cancel() then return false; end;
 
-    throwDiedConn = throwNpcModule.Humanoid.Died:Connect(function()
+    throwDiedConn = throwNpcClass.Humanoid.Died:Connect(function()
         cancel(true);
     end)
     
     local stunDuration = 5;
-    stunStatus = throwNpcModule.StatusComp:GetOrDefault("Stun", {
+    stunStatus = throwNpcClass.StatusComp:GetOrDefault("Stun", {
         Expires=tick()+stunDuration;
     });
     
-    throwNpcModule.Move:Follow(npcClass.RootPart);
-    npcClass.Move:Follow(throwNpcModule.RootPart);
+    throwNpcClass.Move:Follow(npcClass.RootPart);
+    npcClass.Move:Follow(throwNpcClass.RootPart);
     
     local reachDist = 5;
     for a=1, (4 *10) do
-        local dist = (throwNpcModule.RootPart.Position-npcClass.RootPart.Position).Magnitude;
+        local dist = (throwNpcClass.RootPart.Position-npcClass.RootPart.Position).Magnitude;
         if dist <= reachDist then
             break;
         else
@@ -157,13 +157,13 @@ function treePackage.ThrowZombie(npcClass: NpcClass)
     
     if cancel() then return false; end;
     
-    local dist = (throwNpcModule.RootPart.Position-npcClass.RootPart.Position).Magnitude;
+    local dist = (throwNpcClass.RootPart.Position-npcClass.RootPart.Position).Magnitude;
     if dist > reachDist then
         cancel(true);
         return false; 
     end;
 
-    npcClass.Move:SetMoveSpeed("set", "throw", 0, 9);
+    npcClass.Move:SetMoveSpeed("set", "throw", 0, npcClass.Move.MoveSpeedPriority.Action);
     task.wait(0.3);
     if cancel() then return false; end;
     
@@ -177,21 +177,21 @@ function treePackage.ThrowZombie(npcClass: NpcClass)
         npcClass:SetNetworkOwner(nil);
     end
     if not npcClass.HealthComp.IsDead then
-        throwNpcModule:SetNetworkOwner(nil);
+        throwNpcClass:SetNetworkOwner(nil);
     end
     
-    throwNpcModule.RootPart.Massless = true;
-    throwNpcModule.Humanoid.PlatformStand = true;
+    throwNpcClass.RootPart.Massless = true;
+    throwNpcClass.Humanoid.PlatformStand = true;
 
     newGrip = Instance.new("Motor6D");
     newGrip.C0 = CFrame.new(0.007, -0.769, -0.789) * CFrame.fromOrientation(38.921, -92.903, -93.362);
     newGrip.C1 = CFrame.new(0.401, 0, 0.266) * CFrame.fromOrientation(-0, -60, 0);
 
-    throwNpcModule.Garbage:Tag(newGrip);
+    throwNpcClass.Garbage:Tag(newGrip);
     npcClass.Garbage:Tag(newGrip);
     newGrip.Parent = rightHand;
     newGrip.Part0 = rightHand;
-    newGrip.Part1 = throwNpcModule.RootPart;
+    newGrip.Part1 = throwNpcClass.RootPart;
     newGrip.Enabled = true;
     
     task.wait(0.3);
@@ -228,14 +228,14 @@ function treePackage.ThrowZombie(npcClass: NpcClass)
         newGrip:Destroy();
         task.wait(0.1);
 
-        throwNpcModule.RootPart.Massless = false;
+        throwNpcClass.RootPart.Massless = false;
         
         local downAng = CFrame.Angles(-math.pi/2, 0, 0);
         local lastVelocity: Vector3;
-        throwNpcModule.Move:Fly(arcPoints, throwArcTracer.Delta, function(index, arcPoint)
+        throwNpcClass.Move:Fly(arcPoints, throwArcTracer.Delta, function(index, arcPoint)
             if index >= (#arcPoints-1) then return true; end;
 
-            throwNpcModule.Humanoid.PlatformStand = true;
+            throwNpcClass.Humanoid.PlatformStand = true;
             arcPoint.AlignCFrame = arcPoint.AlignCFrame * downAng;
             stunStatus.Expires = tick()+0.2;
             lastVelocity = arcPoint.Velocity;
@@ -243,18 +243,18 @@ function treePackage.ThrowZombie(npcClass: NpcClass)
             return;
         end);
 
-        throwNpcModule.Properties.HordeAggression = true;
+        throwNpcClass.Properties.HordeAggression = true;
         task.spawn(function()
-            throwNpcModule.RootPart.Massless = false;
+            throwNpcClass.RootPart.Massless = false;
             if lastVelocity then
-                throwNpcModule.RootPart:ApplyImpulse(lastVelocity);
+                throwNpcClass.RootPart:ApplyImpulse(lastVelocity);
             end
             
             task.wait(0.3);
-            if throwNpcModule.IsDead then return end;
+            if throwNpcClass.IsDead then return end;
             
-            throwNpcModule.Humanoid.PlatformStand = false;
-            throwNpcModule.Move:Recompute();
+            throwNpcClass.Humanoid.PlatformStand = false;
+            throwNpcClass.Move:Recompute();
         end)
     end
     

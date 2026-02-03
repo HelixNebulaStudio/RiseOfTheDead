@@ -15,20 +15,27 @@ export type GAME_EVENT_KEY<U> = U
     | "Generic_BindItemPickup"
     | "Generic_BindTrigger"
     | "Generic_BindClientTrigger"
+    | "Generic_BindWorldTravel"
+    | "GameTime_DayStart"
+    | "GameTime_NightStart"
     | "Interactables_BindButtonInteract"
     | "Interactables_BindHoldInteract"
     | "Interactables_BindButtonPrompt"
     | "Interactables_BindDoorInteract" -- Teleport doors
     | "Instrument_BindNotesPlayed"
+    | "Minigames_BindLockHydra"
     | "NpcComponent_BindDropReward"
     | "Npcs_BindEnemiesAttract"
     | "Npcs_BindDamaged"
     | "Npcs_BindDeath"
     | "Players_BindSpawn"
     | "Players_BindDamaged"
+    | "Players_BindDisconnect"
     | "Players_BindHeal"
+    | "Players_BindPreTakeDamage"
     | "Profile_BindPlayPoints"
     | "Players_BindWieldEvent"
+    | "Players_BindStatusApply"
     | "Tools_BindHealTool"
     | "Tools_BindFoodTool"
     | "WeatherService_BindWeatherSet"
@@ -54,6 +61,19 @@ export type HUMANOID_TYPE<U> = U
     | "Human"
     | "Player"
     ;
+
+export type MODIFIER_BIND_KEY<U> = U 
+    | "CharacterClassDoneDamage" -- After CC has done <params> targetClass: CharacterClass, cloneDmgData: DamageData
+    | "CharacterClassTakenDamage" -- After CC has taken damage <params> damageData: DamageData
+    | "CharacterClassIsSlidingChanged"
+    | "CharacterClassIsFocusedChanged"
+    | "DeathHandler"
+    | "WeaponRenderStepped"
+    | "WeaponShotDamageData" 
+    | "WeaponShotPreProcess"
+    | "WeaponShotBulletHit" 
+    | "GunPullTrigger"
+    ; 
 
 --MARK: shared
 declare shared: {
@@ -103,6 +123,8 @@ export type Const = {
     OneDaySecs: number;
     WeekSecs: number;
     MonthSecs: number;
+
+    PlaceholderIcon: string;
 }
 
 --MARK: EngineCore
@@ -116,6 +138,7 @@ export type EngineCore = {
 --MARK: Class
 export type Class = {
     Script: LuaSourceContainer;
+    ClassName: string;
 } & anydict;
 
 --MARK: Debugger
@@ -132,6 +155,7 @@ export type Debugger = {
     Stringify: (Debugger, ...any) -> string;
     StudioLog: (Debugger, ...any) -> nil;
     StudioWarn: (Debugger, ...any)  -> nil;
+    Print: (Debugger, ...any) -> nil;
     Warn: (Debugger, ...any) -> nil;
 
     Debounce: (Debugger, string, number) -> boolean;
@@ -256,6 +280,7 @@ export type Profile = {
     GameSave: GameSave;
     ActiveGameSave: GameSave;
     ActiveInventory: Storage;
+    SkillTree: anydict;
 
     Premium: boolean;
     GamePass: anydict;
@@ -272,6 +297,7 @@ export type Profile = {
     AddPlayPoints: (Profile, points: number?, reason: string?) -> nil;
 
     InitMessaging: (Profile) -> nil;
+    GuiAction: (Profile, action: string, ...any) -> nil;
 
     -- @binds
     _new: (Profile, player: Player) -> nil;
@@ -389,6 +415,8 @@ export type Storage = {
     Settings: anydict;
     Values: anydict;
     Cache: anydict;
+    BasePart: BasePart?;
+    InteractConfig: Configuration?;
 
     Locked: boolean;
     ViewOnly: boolean;
@@ -517,7 +545,6 @@ export type PlayerClass = CharacterClass & {
         IsUnderWater: boolean;
     }>;
 
-    LastDamageDealt: number;
     LastHealed: number;
 
     LowestFps: number;
@@ -532,6 +559,8 @@ export type PlayerClass = CharacterClass & {
     CharacterGarbage: GarbageHandler;
 
     Cache: anydict;
+
+    SafeCFrame: CFrame;
 
     -- @methods
     Spawn: (PlayerClass) -> nil;
@@ -589,6 +618,8 @@ export type CharacterClass = {
     Kill: (CharacterClass) -> nil;
 
     Initialize: () -> nil;
+
+    FireAllModifiersBind: (CharacterClass, bindName: string, ...any) -> nil;
 };
 
 --MARK: Entity
@@ -705,6 +736,7 @@ export type NpcClasses = {
 export type NpcMoveComponent = {
     -- @enums
     MoveSpeedPriority: {
+        Idle: number;
         Movement: number;
         Action: number;
         StatusEffect: number;
@@ -878,6 +910,7 @@ export type InteractableInstance = {
     BindHold: (interactable: InteractableInstance, info: InteractInfo) -> nil;
     BindInteract: (interactable: InteractableInstance, info: InteractInfo) -> nil;
     BindPrompt: (interactable: InteractableInstance, info: InteractInfo) -> nil;
+    BindEvent: (Interactable: InteractableInstance, info: InteractInfo, eventName: string) -> nil;
     BindSync: (interactable: InteractableInstance, data: anydict) -> nil;
     
 } & InteractableMeta;
@@ -1016,6 +1049,7 @@ export type Interface = {
     OnReady: EventSignal<>;
     OnInterfaceEvent: EventSignal<string>;
     OnWindowToggle: EventSignal<InterfaceWindow, boolean>;
+    OnReturnBackRequest: EventSignal<>;
 };
 
 --MARK: InterfaceInstance
@@ -1054,6 +1088,8 @@ export type InterfaceWindow = {
     Binds: anydict;
     Properties: PropertiesVariable<{}>;
     
+    ReturnPageStack: {any};
+
     UseTween: boolean;
     ReleaseMouse: boolean;
     DisableInteractables: boolean;
@@ -1281,7 +1317,7 @@ export type ConfigModifier = {
 };
 
 --MARK: EquipmentClass
-export type EquipmentClass = {
+export type EquipmentClass = Class & {
     -- @properties
     Enabled: boolean;
 
@@ -1315,7 +1351,7 @@ export type EquipmentClass = {
     }) -> nil;
     
     UpdateModifiers: (EquipmentClass, modifiers: {[string]: ConfigModifier}) -> nil;
-    ProcessModifiers: (EquipmentClass, processType: string, ...any) -> nil;
+    FireModifierBind: (EquipmentClass, processType: string, ...any) -> nil;
     GetClassAsModifier: (EquipmentClass, siid: string, configModifier: ConfigModifier?) -> ConfigModifier;
 };
 
@@ -1348,7 +1384,6 @@ export type ItemModsLibrary = {
     calculateLayer: (itemModifier: ItemModifier, upgradeKey: string) -> {[any]: any};
 };
 
-type ModifierHookNames = "OnBulletHit" | "OnNewDamage" | "OnWeaponRender";
 export type ItemModifier = {
     ClassName: string;
     Library: ItemModsLibrary;
@@ -1535,6 +1570,7 @@ export type DoorInstance = {
     Open: boolean;
     DoorType: "Normal" | "Sliding";
     WidthType: "Single" | "Double";
+    Values: anydict;
 
     --@methods
     Toggle: (DoorInstance, open: boolean?, openerCFrame: CFrame?, player: Player?) -> nil;
@@ -1551,6 +1587,7 @@ export type TeamsManager = {
     getTeam: (guid: string) -> TeamClass?;
     getTeamByName: (name: string) -> TeamClass?;
     getTeamByPlayer: (player: Player, teamType: string) -> TeamClass?;
+    getTeamByMemberName: (name: string, teamType: string) -> TeamClass?;
 };
 
 --MARK: TeamMate
@@ -1573,6 +1610,7 @@ export type TeamClass = {
         UserId: number;
         InServer: boolean;
         Values: anydict;
+        IsNpc: boolean;
     }};
 
     Values: anydict;
@@ -1585,6 +1623,7 @@ export type TeamClass = {
     ClientLoad: (TeamClass, data: anydict) -> nil;
     GetTeamAsync: (TeamClass) -> nil;
     Sync: (TeamClass) -> nil;
+    GetMemberCharacterClass: (TeamClass, name: string) -> CharacterClass?;
 };
 
 export type RadialImage = {
@@ -1665,8 +1704,8 @@ export type StatusCompApplyParam = {
     })?;
 }
 
---MARK: OnBulletHitPacket
-export type OnBulletHitPacket = {
+--MARK: BulletHitData
+export type BulletHitData = {
     OriginPoint: Vector3;
 
     OriginAtt: Attachment;
@@ -1688,6 +1727,7 @@ export type HitInfo = {
     Position: Vector3?;
     Normal: Vector3?;
     Index: number;
+    MultiIndex: number;
 }
 
 --MARK: ArcPoint
@@ -1713,7 +1753,7 @@ export type ArcPoint = {
 --MARK: EventInvokeParam
 export type EventInvokeParam = {
     SendBy: Player?;
-    ReplicateTo: {Player}?
+    ReplicateTo: ({Player} | Player)?;
 }
 
 --MARK: NpcTargetData
@@ -1776,7 +1816,7 @@ export type HealthComp = {
     SetCanBeHurtBy: (HealthComp, boolString: string?) -> nil;
     CheckCanBeHurtBy: ((HealthComp, {string})->boolean)?;
 
-    BindCannotTakeDamage: (HealthComp, attackerCharacter: CharacterClass, shotInfo: {Part: BasePart; Index: number;}) -> nil;
+    BindCannotTakeDamage: (HealthComp, attackerCharacter: CharacterClass, hitInfo: HitInfo) -> nil;
 
     -- @signals
     OnHealthChanged: EventSignal<number, number, DamageData?>;
@@ -1830,6 +1870,7 @@ export type WieldComp = {
     EquipmentClassList: {EquipmentClass};
     ToolHandlerList: {ToolHandlerInstance};
     ItemModifierList: {ItemModifierInstance};
+    ProxyStorageItemList: {[string]: StorageItem};
     
     -- @methods
     GetEquipmentClass: (WieldComp, siid: string, itemId: string?, storageItem: StorageItem?) -> EquipmentClass;

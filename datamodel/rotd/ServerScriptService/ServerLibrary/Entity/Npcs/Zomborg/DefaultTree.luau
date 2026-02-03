@@ -5,6 +5,7 @@ local TweenService = game:GetService("TweenService")
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modArcParticles = shared.require(game.ReplicatedStorage.Particles.ArcParticles);
+local modLaserParticle = shared.require(game.ReplicatedStorage.Particles.LaserParticle);
 
 local treePackage = {
     LogicString = {

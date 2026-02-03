@@ -17,6 +17,9 @@ local treePackage = {
 };
 
 function treePackage.SurvivorCombatTree(npcClass: NpcClass)
+    if npcClass.Humanoid.WalkSpeed == 5 then
+        npcClass.Move:SetMoveSpeed("remove", "walk");
+    end
     return npcClass.BehaviorTree:RunTree("SurvivorCombatTree", false);
 end
 
@@ -77,7 +80,7 @@ function treePackage.WalkToRest(npcClass: NpcClass)
     end
     
     if not npcClass.Move:IsAtPosition(restPoint.Position) then
-        npcClass.Move:SetMoveSpeed("set", "default", 5);
+        npcClass.Move:SetMoveSpeed("set", "walk", 5, npcClass.Move.MoveSpeedPriority.Movement);
         npcClass.Move:MoveTo(restPoint.Position);
         return;
     end
@@ -194,7 +197,7 @@ function treePackage.WalkToIdleTask(npcClass: NpcClass)
     end
     
     if not npcClass.Move:IsAtPosition(walkTargetPoint) then
-        npcClass.Move:SetMoveSpeed("set", "default", 5);
+        npcClass.Move:SetMoveSpeed("set", "walk", 5, npcClass.Move.MoveSpeedPriority.Movement);
         npcClass.Move:MoveTo(walkTargetPoint);
         cache.IdleTaskFinishTick = nil;
         return;

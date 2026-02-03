@@ -19,7 +19,7 @@ function treePackage.BlockIfExposed(npcClass: NpcClass)
 
     local angle = targetDir:Angle(targetRootPart.CFrame.LookVector);
     if math.abs(angle) < 1.5 then
-        npcClass.Move:SetMoveSpeed("set", "walk", 4, 1);
+        npcClass.Move:SetMoveSpeed("set", "walk", 4, npcClass.Move.MoveSpeedPriority.Action);
         npcClass.PlayAnimation("Block");
         
     else

@@ -808,11 +808,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                 
                             else
                                 newOptionButton(
-                                    targetName ~= localPlayer.Name,
+                                    targetName ~= localPlayer.Name and game.Players:FindFirstChild(targetName) == nil,
                                     "Travel to Player",
                                     function()
                                         if travelDisabled then return end;
-                                        interface:PlayButtonClick();	
+                                        interface:PlayButtonClick();
                                         local promptWindow = modClientGuis.promptQuestion("You are about to leave this world",
                                             "Are you sure you want to travel to ".. modBranchConfigs.GetWorldDisplayName(selectionWorldName) .."?");
                                         local YesClickedSignal, NoClickedSignal;
@@ -831,7 +831,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                             promptWindow:Close();
                                             YesClickedSignal:Disconnect();
                                             NoClickedSignal:Disconnect();
-                                        end);
+                                    end);
                                 end)
                             end
                         end

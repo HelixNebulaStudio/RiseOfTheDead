@@ -5,7 +5,6 @@ local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcPr
 local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local remotes = game.ReplicatedStorage.Remotes;
 local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");

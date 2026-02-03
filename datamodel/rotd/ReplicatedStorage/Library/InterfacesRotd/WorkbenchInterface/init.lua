@@ -145,6 +145,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
 
 			modData:RequestData("ItemUnlockables");
+			interface:ToggleWindow("WeaponStats", true);
 
         else
             for k, listMenu in pairs(binds.ActiveWorkbenches) do

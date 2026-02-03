@@ -8,7 +8,6 @@ Objective.DifficultyModes = {Hard=false;};
 
 Objective.Controller = nil;
 
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modNpcs = shared.modNpcs;
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);

@@ -10,6 +10,7 @@ function interactablePackage.init(super) -- Server/Client
     local Terminal = super.newPackage{
 		Name = "Terminal";
         Type = "Terminal";
+        IndicatorPresist = false;
     };
 
     function Terminal.new(interactable: InteractableInstance)
@@ -64,7 +65,7 @@ function interactablePackage.init(super) -- Server/Client
         	terminalBinds:AddCommand{
                 CmdId = "settemp";
                 Desc = "Set the temperature of chamber.";
-                Run=function(args)
+                Run = function(args)
                     local temp = tonumber(args[1]);
 
                     Debugger:Log("Set temp", args);

@@ -247,20 +247,20 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		end
 		
 		local buildDuration = bpLib.Duration;
-		modSkillTree:TriggerSkills(player, "SkillEvent_StartBuild", buildDuration, function(newDuration) buildDuration = newDuration; end);
 
 		local processPacket = {
-			Type=userWorkbench.ProcessTypes.Building;
-			ItemId=itemId;
-			BT=modSyncTime.GetTime()+buildDuration;
-			Blueprint=bpStorageItem ~= nil;
+			Type = userWorkbench.ProcessTypes.Building;
+			ItemId = itemId;
+			BT = modSyncTime.GetTime()+buildDuration;
+			Blueprint = bpStorageItem ~= nil;
 
-			PlayProcessSound=true;
+			PlayProcessSound = true;
 		};
+		
+		shared.modEventService:ServerInvoke("WorkbenchService_BindStartBuild", {ReplicateTo={player}}, userWorkbench, processPacket, buildDuration);
+		
 		userWorkbench:NewProcess(processPacket);
-		
-		shared.modEventService:ServerInvoke("WorkbenchService_BindStartBuild", {ReplicateTo={player}}, userWorkbench, processPacket);
-		
+
 		rPacket.Success = true;
 		return rPacket;
 		

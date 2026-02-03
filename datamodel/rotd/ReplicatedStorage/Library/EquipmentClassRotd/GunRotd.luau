@@ -64,6 +64,7 @@ function Gun:UpdatePotential(equipmentClass: EquipmentClass, weaponLevel: number
     
     local preModDamage = math.clamp(potentialDamage * properties.Potential, baseDamage, math.huge);
 
+    potentialModifier.EquipmentClass = equipmentClass;
     potentialModifier.SetValues.PreModDamage = preModDamage;
     potentialModifier.SetValues.Damage = preModDamage;
     potentialModifier.Tags.Base = true;

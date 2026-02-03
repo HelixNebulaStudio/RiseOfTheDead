@@ -153,8 +153,8 @@ function GameMode:Start(room)
 		properties.CrateId = bossLib.CrateId;
 		properties.TargetableDistance = 4096;
 		
-		roomMeta.BossNpcModules = {};
-		table.insert(roomMeta.BossNpcModules, bossNpcClass);
+		roomMeta.BossNpcClasses = {};
+		table.insert(roomMeta.BossNpcClasses, bossNpcClass);
 
 		for _, player in pairs(players) do
 			bossCharacter:AddPersistentPlayer(player);

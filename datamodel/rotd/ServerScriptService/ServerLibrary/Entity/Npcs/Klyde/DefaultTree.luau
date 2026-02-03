@@ -51,7 +51,7 @@ function treePackage.LaunchGrenades(npcClass: NpcClass)
     local toolHandler: ToolHandlerInstance? = npcClass.WieldComp.ToolHandler;
     if toolHandler == nil then return; end;
 
-    npcClass.Move:SetMoveSpeed("set", "shootingstop", 0, 9, 5);
+    npcClass.Move:SetMoveSpeed("set", "shootingstop", 0, npcClass.Move.MoveSpeedPriority.Action, 5);
 
     local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;

@@ -620,6 +620,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		temperatureLabel.Text = warmth.."°C";
 	end
 	
+	local weaponStatsWindow: InterfaceWindow;
 	inventoryWindow.OnToggle:Connect(function(visible)
 		if visible then
 			if modData.Storages["Inventory"] == nil or modData.Storages["Clothing"] == nil then
@@ -643,6 +644,30 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			};
 			updateWarmth();
 			modStorageInterface.QueueRefreshStorage();
+
+			if weaponStatsWindow == nil then
+				weaponStatsWindow = interface:GetWindow("WeaponStats");
+				if weaponStatsWindow then
+					task.spawn(function()
+						armorTitleLabel.InputBegan:Connect(function(inputObject)
+							if inputObject.UserInputType == Enum.UserInputType.MouseButton1 
+							or inputObject.UserInputType == Enum.UserInputType.Touch
+							or inputObject.KeyCode == Enum.KeyCode.ButtonA then
+								interface:PlayButtonClick();
+
+								local wbWindow = interface:GetWindow("Workbench");
+								if wbWindow and wbWindow.Visible and wbWindow.Binds.ClearSelection then
+									wbWindow.Binds.SelectedSlot = nil;
+									wbWindow.Binds.ClearSelection();
+								end
+
+								weaponStatsWindow:Open();
+								weaponStatsWindow:Update();
+							end
+						end)
+					end)
+				end
+			end
 
 		else
 			clothingToggleMenu.Visible = false;

@@ -262,27 +262,27 @@ function Stronghold:Initialize(roomData)
 						end
 
 						for a=1, 4 do
-							local chosenNpcModule;
+							local chosenNpcClass;
 							
 							for b=1, 3 do
-								chosenNpcModule = self.EnemyClassInstances[math.random(1, #self.EnemyClassInstances)]
-								if chosenNpcModule.BasicEnemy == true then break; end;
+								chosenNpcClass = self.EnemyClassInstances[math.random(1, #self.EnemyClassInstances)]
+								if chosenNpcClass.Properties.BasicEnemy == true then break; end;
 							end
 							
-							if chosenNpcModule.BasicEnemy ~= true then continue end;
-							if chosenNpcModule.RootPart == nil then continue end;
+							if chosenNpcClass.Properties.BasicEnemy ~= true then continue end;
+							if chosenNpcClass.RootPart == nil then continue end;
 
 							local tooClose = false;
 							for _, player in pairs(game.Players:GetPlayers()) do
-								if player:DistanceFromCharacter(chosenNpcModule.RootPart.Position) <= 128 then
+								if player:DistanceFromCharacter(chosenNpcClass.RootPart.Position) <= 128 then
 									tooClose = true;
 									break;
 								end
 							end
 							
 							if not tooClose then
-								chosenNpcModule.Target = nil;
-								chosenNpcModule.RootPart.CFrame = spawnCf;
+								chosenNpcClass.Target = nil;
+								chosenNpcClass.RootPart.CFrame = spawnCf;
 							end
 						end
 					end

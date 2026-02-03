@@ -33,7 +33,6 @@ if RunService:IsServer() then
 	Dialogues.DialogueHandler = function(player, dialog, data)
 		local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 		local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
-		local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 		if not modBranchConfigs.IsWorld("TheUnderground") then return end;
 	

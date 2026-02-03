@@ -40,7 +40,6 @@ export type HUMANOID_TYPE_ROTD =
 
 --MARK: ProfileRotd
 export type ProfileRotd = Profile & {
-    SkillTree: anydict;
     ItemUnlockables: anydict;
     Trader: anydict;
     Safehome: anydict;

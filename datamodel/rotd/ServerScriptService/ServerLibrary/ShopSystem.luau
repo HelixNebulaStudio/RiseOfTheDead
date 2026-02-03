@@ -15,7 +15,6 @@ local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local ShopService = {};

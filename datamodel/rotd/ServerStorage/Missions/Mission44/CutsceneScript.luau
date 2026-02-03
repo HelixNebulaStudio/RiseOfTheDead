@@ -16,11 +16,11 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
-	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 
 	if modBranchConfigs.IsWorld("TheWarehouse") then
-		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
+		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, ...)
+			local interactData = ...;
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			
@@ -36,19 +36,21 @@ if RunService:IsServer() then
 		end)
 		
 	elseif modBranchConfigs.IsWorld("TheResidentials") then
-		modOnGameEvents:ConnectEvent("OnDoorEnter", function(player, interactData)
-			local doorName = interactData.Name;
+		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(event: EventPacket, ...) 
+			local player: Player? = event.Player;
+			if player == nil then return end;
 
-			if doorName == "Office2BasementRoom" then
-				if not modMission:IsComplete(player, MISSION_ID) then
-					modMission:Progress(player, MISSION_ID, function(mission)
-						if mission.ProgressionPoint == 1 then
-							mission.ProgressionPoint = 2;
-						end
-					end)
-				end
+			local interactable: InteractableInstance = ...;
+			if interactable.Id ~= "Office2BasementRoom" then return end; -- TODO:
+
+			if not modMission:IsComplete(player, MISSION_ID) then
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint == 1 then
+						mission.ProgressionPoint = 2;
+					end
+				end)
 			end
-		end)
+		end);
 
 		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
 			local player: Player? = eventPacket.Player;

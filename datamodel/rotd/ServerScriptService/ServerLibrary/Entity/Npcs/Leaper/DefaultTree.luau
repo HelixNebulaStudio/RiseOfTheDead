@@ -71,7 +71,7 @@ function treePackage.Leap(npcClass: NpcClass)
     properties.LastLeap = tick();
     properties.LeapTryCounter = (properties.LeapTryCounter or 0) + 1;
 
-    npcClass.Move:SetMoveSpeed("set", "leap", 0, 9);
+    npcClass.Move:SetMoveSpeed("set", "leap", 0, npcClass.Move.MoveSpeedPriority.Action);
 
     local downAng = CFrame.Angles(-math.pi/2, 0, 0);
 

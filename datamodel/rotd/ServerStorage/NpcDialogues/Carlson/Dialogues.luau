@@ -32,7 +32,6 @@ if RunService:IsServer() then
 	Dialogues.DialogueHandler = function(player, dialog, data)
 		local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-		local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 		local mission18 = modMission:GetMission(player, 18);
 		if mission18 == nil or mission18.Type ~= 1 or mission18.ProgressionPoint >= 9 then

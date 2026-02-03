@@ -17,7 +17,6 @@ local modInteractables = shared.require(game.ReplicatedStorage.Library.Interacta
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 
 local modMatchMaking = shared.require(game.ServerScriptService.ServerLibrary.MatchMaking);
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 local GameModeManager = {};
 GameModeManager.Load = nil;
@@ -358,16 +357,12 @@ function GameModeManager.onRequire()
 		if interactData == nil then Debugger:StudioWarn("Missing interactable data."); return end;
 		
 		if GameModeManager.GameWorldInfo == nil then
-			Debugger:Warn("Exiting non-game world.")
-			modOnGameEvents:Fire("OnGameModeExit", player, interactData);
-				
+			Debugger:Warn("Exiting non-game world.");
 			return modServerManager:Travel(player, "MainMenu");
 		end;
 		
 		
 		if interactData.Enabled then
-			modOnGameEvents:Fire("OnGameModeExit", player, interactData);
-			
 			return GameModeManager:ExitGamemodeWorld(player);
 		end
 		return false;

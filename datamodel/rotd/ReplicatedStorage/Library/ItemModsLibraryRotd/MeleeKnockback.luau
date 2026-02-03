@@ -11,6 +11,8 @@ local modifierPackage = {
 --==
 
 function modifierPackage.Update(modifier: ItemModifierInstance)
+	if modifier.EquipmentClass == nil then return end;
+
 	local layerInfo = modItemModifierClass.Library.calculateLayer(modifier, "KB");
 	local value, tweakVal = layerInfo.Value, layerInfo.TweakValue;
 	
@@ -18,7 +20,10 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		value = value + tweakVal;
 	end
 
-	modifier.SumValues.Knockback = value;
+    local configurations = modifier.EquipmentClass.Configurations;
+    local baseKnockback = configurations:GetBase("Knockback");
+
+	modifier.SumValues.Knockback = baseKnockback * value;
 end
 
 return modifierPackage;

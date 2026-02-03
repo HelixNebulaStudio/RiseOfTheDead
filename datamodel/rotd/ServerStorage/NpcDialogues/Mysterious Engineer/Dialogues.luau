@@ -79,7 +79,7 @@ if RunService:IsServer() then
 			else
 				SunkenShipCache.Stage = 1;
 				
-				local npcModule = dialog:GetNpcModule();
+				local npcModule = dialog:GetNpcClass();
 				npcModule.Wield.Equip("walkietalkie");
 	
 				shared.Notify(game.Players:GetPlayers(), mysteriousEngineerTag.. "Hello hello! Okay, here we go again. Destroy those Nekron matter and go on down.. Good luck!", "Message");
@@ -89,29 +89,23 @@ if RunService:IsServer() then
 			if SunkenShipCache.Stage == 0 then
 				dialog:SetInitiate("What the heck?? Who are you?!", "Question");
 	
-				dialog:AddChoice("sunkenShip_stumbled", function(dialog)
-					dialog:AddChoice("sunkenShip_itleft", function(dialog)
-						dialog:AddChoice("sunkenShip_getout", function(dialog)
-							dialog:AddChoice("sunkenShip_death", function(dialog)
-								dialog:AddChoice("sunkenShip_why", function(dialog)
-									dialog:AddChoice("sunkenShip_whattodo", function(dialog)
-										if SunkenShipCache.Stage == 0 then
-											SunkenShipCache.Stage = 1;
-											
-											task.delay(3, function()
-												local npcModule = dialog:GetNpcModule();
-												npcModule.Wield.Equip("walkietalkie");
-	
-												shared.Notify(game.Players:GetPlayers(), mysteriousEngineerTag.. "Hello hello! Okay, walkie talkie works. Destroy those Nekron matter and go on down.. Good luck!", "Message");
-	
-											end)
-										end
-									end);
-								end);
-							end);
-						end);
-					end);
-				end);
+				dialog:AddChoice(
+					{"sunkenShip_stumbled"; "sunkenShip_itleft"; "sunkenShip_getout"; 
+					"sunkenShip_death"; "sunkenShip_why"; "sunkenShip_whattodo"}, 
+					function(dialog)
+						if SunkenShipCache.Stage == 0 then
+							SunkenShipCache.Stage = 1;
+							
+							task.delay(3, function()
+								local npcModule = dialog:GetNpcClass();
+								npcModule.Wield.Equip("walkietalkie");
+
+								shared.Notify(game.Players:GetPlayers(), mysteriousEngineerTag.. "Hello hello! Okay, walkie talkie works. Destroy those Nekron matter and go on down.. Good luck!", "Message");
+
+							end)
+						end
+					end
+				);
 				
 			elseif SunkenShipCache.Stage == 1 then
 				dialog:SetInitiate("I'll keep in touch with this walkie talkie..", "Serious");

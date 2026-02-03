@@ -114,7 +114,6 @@ if RunService:IsServer() then
 	Dialogues.DialogueHandler = function(player, dialog, data)
 		local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 		local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-		local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 		if modBranchConfigs.IsWorld("Safehome") then
 			local survivorDialogueHandler = shared.require(script.Parent.Parent.Survivor);

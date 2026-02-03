@@ -5,7 +5,6 @@ local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchCon
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 
 local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
-local modSkillTree = shared.require(game.ServerScriptService.ServerLibrary.SkillTree);
 local modTraderProfile = shared.require(game.ServerScriptService.ServerLibrary.TraderProfile);
 local modItemUnlockables = shared.require(game.ServerScriptService.ServerLibrary.ItemUnlockables);
 local modSafehomeData = shared.require(game.ServerScriptService.ServerLibrary.SafehomeData);
@@ -16,7 +15,6 @@ local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrar
 
 --==
 shared.coreBind(modProfile, "_new", function(profile: ProfileRotd, player: Player)
-    profile.SkillTree = modSkillTree.new(player);
     profile.ItemUnlockables = modItemUnlockables.new(player);
     profile.Trader = modTraderProfile.new(player);
 
@@ -34,10 +32,6 @@ shared.coreBind(modProfile, "_new", function(profile: ProfileRotd, player: Playe
 end)
 
 shared.coreBind(modProfile, "_key_load", function(profile: ProfileRotd, key: string, data: any, loadOverwrite: anydict?)
-    if key == "SkillTree" then
-        profile[key]:Load(data);
-        return true;
-    end
 
     return false;
 end)
@@ -56,7 +50,6 @@ shared.coreBind(modProfile, "_save", function(profile: ProfileRotd, overrideData
 end)
 
 shared.coreBind(modProfile, "_reset_save", function(profile: ProfileRotd)
-	profile.SkillTree:ClearTrees();
 end)
 
 shared.coreBind(modProfile, "_sync", function(profile: ProfileRotd, hierarchyKey: string?, paramPacket: anydict?)
@@ -64,7 +57,6 @@ shared.coreBind(modProfile, "_sync", function(profile: ProfileRotd, hierarchyKey
 		if profile.Trader then
 			profile.Trader:SyncGold();
 		end
-	    profile:Sync("SkillTree");
     end
 end)
 

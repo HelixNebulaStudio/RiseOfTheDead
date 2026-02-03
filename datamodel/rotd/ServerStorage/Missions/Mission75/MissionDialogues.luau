@@ -400,7 +400,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 		local missionCache = modEvents:GetEvent(player, "MissionCache");
 		local banditsAllied = missionCache and missionCache.Value and missionCache.Value.BanditsAllied == true;
 
-		local patrolBanditNpcModule = dialog:GetNpcModule();
+		local patrolBanditNpcModule = dialog:GetNpcClass();
 		
 		--if RunService:IsStudio() then
 		--	Debugger:Warn("Set banditsAllied", false);
@@ -579,7 +579,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 					dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
 					
 					local function leaveNow5Sec()
-						local patrolBanditNpcModule = dialog:GetNpcModule();
+						local patrolBanditNpcModule = dialog:GetNpcClass();
 						patrolBanditNpcModule.Wield.LoadRequest();
 
 						task.wait(2);
@@ -621,7 +621,7 @@ if modBranchConfigs.IsWorld("MedicalBreakthrough") then
 								}, function(dialog)
 									playerSave:AddStat("Money", -bribeCost);
 	
-									local patrolBanditNpcModule = dialog:GetNpcModule();
+									local patrolBanditNpcModule = dialog:GetNpcClass();
 									patrolBanditNpcModule:ToggleInteractable(false);
 									
 									cache.SecondBribe = true;

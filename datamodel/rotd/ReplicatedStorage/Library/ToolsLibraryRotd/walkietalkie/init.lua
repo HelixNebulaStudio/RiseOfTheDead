@@ -4,13 +4,13 @@ local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.Equipmen
 --==
 
 local toolPackage = {
-	ItemId=script.Name;
-	Class="Tool";
-	HandlerType="GenericTool";
+	ItemId = script.Name;
+	Class = "Tool";
+	HandlerType = "GenericTool";
 
-	Animations={
-		Core={Id=4706146901;};
-		Use={Id=4706147696};
+	Animations = {
+		Core = {Id=4706146901;};
+		Use = {Id=4706147696};
 	};
 	Audio={};
 	Configurations={};

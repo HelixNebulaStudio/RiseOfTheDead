@@ -21,7 +21,6 @@ local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 local modItemLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modNpcs = shared.modNpcs;
 local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
@@ -36,7 +35,17 @@ local StageElements = game.ServerStorage:WaitForChild("StageElements");
 local Modifiers = {};
 --==
 Survival.OnWaveChanged = shared.EventSignal.new("OnWaveChanged");
+Survival.OnNpcDeath = shared.EventSignal.new("OnNpcDeath");
 Survival.Active = nil;
+
+function Survival.onRequire()
+	shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
+		local npcClass: NpcClass = ...;
+		if npcClass == nil then return end;
+	
+		Survival.OnNpcDeath:Fire(npcClass);
+	end)
+end
 
 function Survival.new()
 	local self = {
@@ -126,17 +135,20 @@ function Survival:Load()
 		obj.Transparency = 1;
 	end
 	
-	modOnGameEvents:ConnectEvent("OnZombieDeath", function(npcModule)
-		local playerTags = modDamageTag:Get(npcModule.Prefab, "Player");
-
+	shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
+		local npcClass: NpcClass = ...;
+		if npcClass == nil or npcClass.HumanoidType ~= "Zombie" then return end;
+	
+		local playerTags = modDamageTag:Get(npcClass.Character, "Player");
 		for a=1, #playerTags do
 			local playerTag = playerTags[a];
-			local player = playerTag.Player;
+			local player: Player = playerTag.Player;
+			if player == nil or not game.Players:IsAncestorOf(player) then continue end;
 
 			local playerName = player.Name;
 			self.StatsCount[playerName] = (self.StatsCount[playerName] or 0) + 1;
 		end
-	end);
+	end)
 	
 	-- MARK: /survival
 	task.spawn(function()

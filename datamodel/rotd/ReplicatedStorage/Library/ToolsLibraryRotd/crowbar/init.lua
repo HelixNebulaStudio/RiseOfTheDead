@@ -31,10 +31,12 @@ local toolPackage = {
 		PrimaryAttackAnimationSpeed=0.2;
 
 		HitRange=8;
-		BaseKnockback=100;
+		Knockback=100;
 
 		StaminaCost = 10;
 		StaminaDeficiencyPenalty = 0.5;
+
+		DamageBlock = 15;
 	};
 	Properties={};
 

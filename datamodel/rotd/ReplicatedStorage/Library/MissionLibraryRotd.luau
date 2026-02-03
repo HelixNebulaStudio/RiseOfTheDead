@@ -1489,29 +1489,29 @@ MissionLibrary.New{
 
 -- MARK: 44 - Missing Body 2 TODO
 MissionLibrary.New{
-	MissionId=44;
+	MissionId = 44;
 	MissionType = MissionLibrary.MissionTypes.Event;
-	Name="Missing Body 2";
-	From="Jack Reap";
-	Description="Did you see a ghost?! Investigate further.";
-	Persistent=true;
-	Progression={
+	Name = "Missing Body 2";
+	From = "Jack Reap";
+	Description = "Did you see a ghost?! Investigate further.";
+	Persistent = true;
+	Progression = {
 		"Follow the footsteps";
 		"Investigate the area";
 		"A mysterious green gas fills the room";
 		"Escape";
 	};
-	World={"TheWarehouse"; "TheResidentials";};
-	SaveData={};
-	GuideText="Go to the office and read the note";
-	AddRequirements={
+	World = {"TheWarehouse"; "TheResidentials";};
+	SaveData = {};
+	GuideText = "Go to the office and read the note";
+	AddRequirements = {
 		{Type="SpecialEvent"; Value="Halloween"};
 	};
-	Rewards={
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="TweakPoints"; Amount=10};
 	};
-	Markers={
+	Markers = {
 	};
 	
 };
@@ -3037,12 +3037,67 @@ MissionLibrary.New{
 	Persistent = true;
 	Checkpoint = {
 		{Text="Talk to Joseph when you are ready";};
-		{Text="Head to the Rat's Headquarters in The Harbor";};
+		{Text="Follow and defend Joseph";};
+		{Text="Talk to Caitlin";};
+		{Text="Talk to Joseph";};
+		{Text="Talk to Caitlin";};
+
+		{Text="Talk to Joseph waiting at the Rat's Headquarters";};
+		{Text="Head to The Residentials safehouse with Joseph and Caitlin";};
+		{Text="Talk to Caitlin waiting at the Community Safehouse";};
+		{Text="Talk to Caitlin when you are ready to go";};
+		{Text="Follow Caitlin";};
+
+		{Text="Objectives"; CompleteText="Talk to Caitlin"; Objectives={"PaperBox1"; "PaperBox2"; "PaperBox3";};};
+		{Text="Wait for Caitlin";};
+		{Text="Enter the library backroom";};
+		{Text="Open the box";};
+		{Text="Wait for Joseph";};
+
+		{Text="Leave the library backroom";};
+		{Text="Head back to the Residentials Safehouse";};
+		{Text="Talk to Caitlin";};
+		{Text="Talk to Caitlin";};
+		{Text="Talk to Caitlin";};
+	};
+	Objectives={
+		["PaperBox1"]={Index=1; Description="Open the first box";};
+		["PaperBox2"]={Index=2; Description="Open the second box";};
+		["PaperBox3"]={Index=3; Description="Open the third box";};
 	};
 	LogEntry = {
 	};
 	StartRequirements = {
 		MissionCompleted={81};
+	};
+	LinkNextMission=88;
+	SaveData = {};
+	GuideText = "Talk to Joseph";
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Core};
+	};
+	Markers = {
+		[2]={Label="Joseph"; Target="Joseph"; Type=modMarkers.MarkerTypes.Npc;};
+		[12]={World="TheHarbor"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
+	};
+	CanFastTravelWhenActive=false;
+};
+
+-- MARK: 88 - Shadows of Trust
+MissionLibrary.New{
+	MissionId = 88;
+	MissionType = MissionLibrary.MissionTypes.Core;
+	Name = "Shadows of Trust";
+	From = "Joseph";
+	Description = "Caitlin urgently needs Joseph's help, but he doesn't trusts her.";
+	Persistent = true;
+	Checkpoint = {
+		{Text="WIP";};
+	};
+	LogEntry = {
+	};
+	StartRequirements = {
+		MissionCompleted={87};
 	};
 	SaveData = {};
 	GuideText = "Talk to Joseph";
@@ -3050,9 +3105,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Core};
 	};
 	Markers = {
-		[12]={World="TheHarbor"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	CanFastTravelWhenActive=false;
 };
 
 return MissionLibrary;

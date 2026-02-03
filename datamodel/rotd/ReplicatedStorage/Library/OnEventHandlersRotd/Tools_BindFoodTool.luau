@@ -13,7 +13,8 @@ return function(event: EventPacket, action: string, toolHandler: ToolHandlerInst
         -- MARK: Skill: Efficient Metabolism;
         local effmetStatus: StatusClassInstance = statusComp:GetOrDefault("effmet");
         if effmetStatus and effectDuration then
-            effectDuration = effectDuration * ((effmetStatus.Values.Percent/100)+1);
+            local skillStats = effmetStatus.Values.SkillData.Stats;
+            effectDuration = effectDuration * ((skillStats.Percent.Value/100)+1);
         end
 
         Debugger:Warn(`EffectDuration {effectDuration}`);

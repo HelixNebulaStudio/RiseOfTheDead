@@ -141,6 +141,23 @@ Dialogues.DialogueStrings = {
 		Reply="Make sure you got food, there should be a freezer somewhere, keep some food there.. As long as you have enough food to feed everyone everyday, you should be good. (1 food per survivor daily)";
 		ReturnToInit=true;
 	};
+
+
+	["test_chainTags1"]={
+		Face="Joyful";
+		Say="How do I buy ammo for my weapons?"; 
+		Reply="Go to the shop and pick your weapon that you want refilled.";
+	};
+	["test_chainTags2"]={
+		Face="Happy";
+		Say="How do I get new weapons?";
+		Reply="The shop sells blueprints for building weapons.";
+	};
+	["test_chainTags3"]={
+		Face="Joyful";
+		Say="How do I level up?"; 
+		Reply="Kill zombies to level up your weapons and you will level up your mastery level.";
+	};
 };
 
 if RunService:IsServer() then
@@ -154,7 +171,7 @@ if RunService:IsServer() then
 		local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");
 
 		local npcName = dialog.Name;
-		local npcModule = dialog:GetNpcModule();
+		local npcModule = dialog:GetNpcClass();
 		local npcClass: NpcClass = dialog:GetNpcClass();
 	
 		local activeMissionCount = #modMission:GetNpcMissions(player, npcName);
@@ -243,6 +260,16 @@ if RunService:IsServer() then
 			end
 			addDialog("Hello", "TTS test", function(dialog)
 				npcClass:GetComponent("Chat")(player, randomDialogues[math.random(1, #randomDialogues)]);
+			end)
+
+			addDialog("TestChainTags", "Ok", function(dialog)
+				dialog:AddChoice({"test_chainTags1"; "test_chainTags2"; "test_chainTags3"}, function(dialog)
+					print("Chain tags");
+					dialog:AddDialog({
+						Say="Done";
+						Reply="Done!";
+					});
+				end);
 			end)
 
 			addDialog("Equip revolver454", "Okie dokie", function(dialog)

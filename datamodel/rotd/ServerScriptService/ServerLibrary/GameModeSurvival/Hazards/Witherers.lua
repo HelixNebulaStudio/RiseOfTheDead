@@ -1,6 +1,5 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 --==
 local Hazard = {
@@ -22,18 +21,25 @@ end
 
 function Hazard:Begin()
 	self.Counter = 0;
-	self.OnZombieDeathDisconnect = modOnGameEvents:ConnectEvent("OnZombieDeath", function(npcModule)
-		local deathPosition = npcModule.DeathPosition;
-		local config = npcModule.Configuration;
+
+	self.OnZombieDeathDisconnect = self.Controller.OnNpcDeath:Connect(function(npcClass: NpcClass) 
+		if npcClass == nil or npcClass.HumanoidType ~= "Zombie" then return end;
+		local rawProperties: anydict = npcClass.Properties.Values;
+		local deathPosition = rawProperties.DeathPosition;
+		if deathPosition == nil then return end;
 
 		self.Counter = self.Counter+1;
 
 		if self.Counter >= 20 then
 			self.Counter = 0;
 
-			shared.modNpcs.spawn("Witherer", CFrame.new(deathPosition), function(npc, withererNpcModule)
-				withererNpcModule.Configuration.Level = config.Level;
-			end)
+			shared.modNpcs.spawn2{
+				Name = "Witherer";
+				CFrame = CFrame.new(deathPosition);
+				BindSetup = function(npcClass: NpcClass)
+					npcClass.Properties.Level = rawProperties.Level;
+				end;
+			};
 		end
 	end)
 end

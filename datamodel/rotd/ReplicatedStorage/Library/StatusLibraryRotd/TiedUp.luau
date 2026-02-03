@@ -19,7 +19,7 @@ local statusPackage = {
 };
 function statusPackage.onRequire()
     ropePrefab = game.ReplicatedStorage.Prefabs.Objects:WaitForChild("TieUpRope");
-    tiedUpAnimation = game.ReplicatedStorage.Prefabs.Animations:WaitForChild("TiedUpStatus");
+    tiedUpAnimation = game.ReplicatedStorage.Prefabs.Animations.Generic:WaitForChild("TiedUpStatus");
 
     if RunService:IsClient() then
         modData = shared.require(localPlayer:WaitForChild("DataModule"));

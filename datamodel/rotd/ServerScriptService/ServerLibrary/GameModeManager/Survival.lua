@@ -8,8 +8,6 @@ local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.Lead
 
 local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
-local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 --==
@@ -80,12 +78,6 @@ function GameMode:WorldLoad(modeData)
 			end)
 		end
 		gameController.OnComplete = function(players)
-			task.spawn(function()
-				for _, player in pairs(players) do
-					modOnGameEvents:Fire("OnGameModeComplete", player, gameType, gameStage, modeData.Room);
-					modAnalytics.RecordProgression(player.UserId, "Complete", gameType..":"..(modeData.Room.IsHard and "Hard-" or "")..gameStage);
-				end
-			end)
 		end;
 		
 		local arenaTimer = tick();
@@ -95,10 +87,6 @@ function GameMode:WorldLoad(modeData)
 				if wave >= 5 and not completedWave5 then
 					completedWave5 = true;
 					
-					for _, player in pairs(players) do
-						modOnGameEvents:Fire("OnGameModeComplete", player, gameType, gameStage, modeData.Room);
-						modAnalytics.RecordProgression(player.UserId, "Complete", gameType..":"..(modeData.Room.IsHard and "Hard-" or "")..gameStage);
-					end
 				end
 			end)
 			spawn(function()
@@ -111,13 +99,12 @@ function GameMode:WorldLoad(modeData)
 						if math.fmod(wave, 3) == 0 then
 							local perksReward = math.min(math.ceil(wave/3), 3);
 							if playerSave:AddStat("Perks", perksReward) > 0 then
-								modAnalytics.RecordResource(player.UserId, perksReward, "Source", "Perks", "Gameplay", "Survival");
 								modAnalyticsService:Source{
-									Player=player;
-									Currency=modAnalyticsService.Currency.Perks;
-									Amount=perksReward;
-									EndBalance=playerSave:GetStat("Perks");
-									ItemSKU=`{gameType}:{gameStage}`;
+									Player = player;
+									Currency = modAnalyticsService.Currency.Perks;
+									Amount = perksReward;
+									EndBalance = playerSave:GetStat("Perks");
+									ItemSKU = `{gameType}:{gameStage}`;
 								};
 						
 							end
@@ -160,11 +147,6 @@ function GameMode:WorldLoad(modeData)
 		end
 		
 		gameController.OnStart = function(players)
-			task.spawn(function()
-				for _, player in pairs(players) do
-					modOnGameEvents:Fire("OnGameModeStart", player, gameType, gameStage, modeData.Room);
-				end
-			end);
 		end
 		
 	end

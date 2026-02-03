@@ -1601,6 +1601,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				pinStatus.BackgroundColor3 = missionMarkerColor;
 				pinStatus.Visible = true;
 				newListing.Parent = PinnedMissionFrame;
+				newListing.Visible = true;
 
 			else
 				newListing.Parent = newList;

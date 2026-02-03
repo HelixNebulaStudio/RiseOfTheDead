@@ -34,6 +34,14 @@ Dialogues.DialogueStrings = {
 if RunService:IsServer() then
 	-- MARK: DialogueHandler
 	Dialogues.DialogueHandler = function(player, dialog, data)
+		local npcClass: NpcClass = dialog:GetNpcClass();
+		local statusComp: StatusComp = npcClass.StatusComp;
+
+		local sleepingStatus = statusComp:GetOrDefault("Sleeping");
+		if sleepingStatus then
+			dialog:SetInitiate("Are you seriously waking me up for nothing?!", "Angry");
+		end
+		
 		dialog:AddChoice("shop_ratShop", function()
 			local npcModel = dialog.Prefab;
 			if npcModel:FindFirstChild("shopInteractable") then

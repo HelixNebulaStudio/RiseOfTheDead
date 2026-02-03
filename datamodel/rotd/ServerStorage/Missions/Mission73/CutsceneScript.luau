@@ -15,7 +15,6 @@ if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 	modCoopMission = shared.require(game.ServerScriptService.ServerLibrary.CoopMission);
 	modFactions = shared.require(game.ServerScriptService.ServerLibrary.Factions);
 

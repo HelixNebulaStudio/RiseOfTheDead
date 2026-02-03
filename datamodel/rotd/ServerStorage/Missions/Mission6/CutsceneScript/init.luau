@@ -18,7 +18,6 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
-	modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 	storagePrefabs = game.ReplicatedStorage.Prefabs:WaitForChild("Objects");
 	

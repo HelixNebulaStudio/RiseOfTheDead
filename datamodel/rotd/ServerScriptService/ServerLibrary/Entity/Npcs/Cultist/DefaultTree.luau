@@ -39,7 +39,7 @@ function treePackage.RunToMeleeRange(npcClass: NpcClass)
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
 
-    npcClass.Move:SetMoveSpeed("set", "sprint", 18, 2, 5);
+    npcClass.Move:SetMoveSpeed("set", "sprint", 18, npcClass.Move.MoveSpeedPriority.Action, 5);
     npcClass.Move:Follow(enemyNpcClass.RootPart, 2);
 end
 

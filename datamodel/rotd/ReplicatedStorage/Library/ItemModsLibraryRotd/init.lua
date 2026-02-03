@@ -1460,7 +1460,7 @@ function library.onRequire()
 	library:Add{
 		Id = "damagedividermod";
 		Name = "Damage Divider";
-		Desc = "The damage you take is divided to health and armor damage with an additional damage reduction.";
+		Desc = "When armor > 0, the damage you take is divided to health and armor damage with an additional damage reduction.";
 		Icon = shared.Const.PlaceholderIcon;
 		BaseTier = 2;
 		Tier = 2;

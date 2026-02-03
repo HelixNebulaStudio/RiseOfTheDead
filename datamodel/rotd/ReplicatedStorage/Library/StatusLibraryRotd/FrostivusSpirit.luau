@@ -15,13 +15,17 @@ local statusPackage = {
 
 function statusPackage.init()
     if RunService:IsServer() then
-        local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
-        modOnGameEvents:ConnectEvent("OnZombieDeath", function(zombieNpcModule)
-            local playerTags = modDamageTag:Get(zombieNpcModule.Prefab, "Player");
-            for _, playerTag in pairs(playerTags) do
-                local player = playerTag.Player;
+        shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
+            local npcClass: NpcClass = ...;
+            if npcClass == nil or npcClass.HumanoidType ~= "Zombie" then return end;
+        
+            local playerTags = modDamageTag:Get(npcClass.Character, "Player");
+            for a=1, #playerTags do
+                local playerTag = playerTags[a];
+                local player: Player = playerTag.Player;
+                if player == nil or not game.Players:IsAncestorOf(player) then continue end;
 
-		        local playerClass: PlayerClass = shared.modPlayers.get(player);
+                local playerClass: PlayerClass = shared.modPlayers.get(player);
                 if playerClass == nil then continue end;
 
                 local statusClass: StatusClassInstance = playerClass.StatusComp:GetOrDefault(statusPackage.Id);

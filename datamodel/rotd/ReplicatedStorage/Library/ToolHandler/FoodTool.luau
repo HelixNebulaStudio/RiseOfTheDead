@@ -12,14 +12,13 @@ local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 
-local toolHandler: ToolHandler = modToolHandler.new();
+local toolHandler = modToolHandler.new();
 --==
 
 function toolHandler.onRequire()
     remoteToolInputHandler = modRemotesManager:Get("ToolInputHandler");
 
 	if RunService:IsServer() then
-		modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 		modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 		
 	elseif RunService:IsClient() then
@@ -150,6 +149,29 @@ if RunService:IsClient() then -- MARK: Client
 
 
 elseif RunService:IsServer() then -- MARK: Server
+	function toolHandler.ServerEquip(handler: ToolHandlerInstance)
+		local equipmentClass: EquipmentClass = handler.EquipmentClass;
+		local toolAnimator: ToolAnimator = handler.ToolAnimator;
+
+		local toolPackage = handler.ToolPackage;
+
+		local animations = toolPackage.Animations;
+		local audio = toolPackage.Audio;
+
+		local configurations = equipmentClass.Configurations;
+		local properties = equipmentClass.Properties;
+
+		
+		--MARK: Npc equip
+		if handler.CharacterClass.ClassName ~= "NpcClass" then return end;
+
+		local npcClass: NpcClass = handler.CharacterClass :: NpcClass;
+		local mainToolModel = handler.MainToolModel;
+
+		toolAnimator:LoadAnimations(animations, toolPackage.DefaultAnimatorState, handler.Prefabs);
+		toolAnimator:Play("Core");
+	end
+
 	function toolHandler.ActionEvent(handler: ToolHandlerInstance, packet)
 		local characterClass: CharacterClass = handler.CharacterClass;
 		local actionIndex = packet.ActionIndex;
@@ -242,7 +264,8 @@ elseif RunService:IsServer() then -- MARK: Server
 				
 			elseif configurations.EffectType == "Status" then
 				local statusId = typeof(configurations.StatusId) == "table" 
-					and configurations.StatusId[math.random(1, #configurations.StatusId)] or configurations.StatusId;
+							 and configurations.StatusId[math.random(1, #configurations.StatusId)] 
+							  or configurations.StatusId;
 				if modStatusEffects[statusId] and characterClass.ClassName == "PlayerClass" then
 					modStatusEffects[statusId]((characterClass :: PlayerClass):GetInstance(), effectDuration);
 				end
@@ -286,8 +309,39 @@ elseif RunService:IsServer() then -- MARK: Server
 			end
 
 		end
-
 	end
+
+	--MARK: Server Use
+	function toolHandler.UseRequest(handler: ToolHandlerInstance)
+		local wieldComp: WieldComp = handler.WieldComp;
+		local characterClass: CharacterClass = handler.CharacterClass;
+		local healthComp: HealthComp = characterClass.HealthComp;
+
+		local properties = handler.EquipmentClass.Properties;
+		local toolAnimator: ToolAnimator = handler.ToolAnimator;
+
+		if properties.Active == true then return end;
+		properties.Active = true;
+
+		toolAnimator:Play("Use");
+
+		handler.ActionEvent(handler, {
+			ActionIndex = 1;
+		});
+		task.delay(properties.UseDuration, function()
+			if wieldComp.EquipmentClass ~= handler.EquipmentClass or healthComp.IsDead then 
+				properties.Active = false;
+				return;
+			end;
+
+			handler.ActionEvent(handler, {
+				ActionIndex = 2;
+			});
+			toolAnimator:Stop("Use");
+			properties.Active = false;
+		end);
+	end
+
 end
 
 return toolHandler;

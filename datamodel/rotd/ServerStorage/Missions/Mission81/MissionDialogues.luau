@@ -794,6 +794,8 @@ end
 
 -- MARK: Caitlin Handler
 Dialogues.Caitlin.DialogueHandler = function(player, dialog, data, mission)
+	if mission.Type ~= 1 then return end;
+
 	if mission.ProgressionPoint == 1 then
 		dialog:SetInitiate("On look out duty again.. So boring.", "Bored");
 
@@ -808,6 +810,8 @@ end
 
 -- MARK: Greg Handler
 Dialogues.Greg.DialogueHandler = function(player, dialog, data, mission)
+	if mission.Type ~= 1 then return end;
+
 	if mission.ProgressionPoint == 1 then
 		dialog:SetInitiate("What do you want?!", "Angry");
 
@@ -822,6 +826,8 @@ end
 
 -- MARK: Lewis Handler
 Dialogues.Lewis.DialogueHandler = function(player, dialog, data, mission)
+	if mission.Type ~= 1 then return end;
+	
 	if mission.ProgressionPoint == 1 then
 		dialog:SetInitiate("Hmm?", "Skeptical");
 

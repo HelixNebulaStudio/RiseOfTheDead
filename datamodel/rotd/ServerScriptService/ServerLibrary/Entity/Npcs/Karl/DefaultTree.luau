@@ -75,7 +75,7 @@ function treePackage.PlantExplosive(npcClass: NpcClass)
         modAudio.Play("Explosion4", dbPoint);
     end)
 
-    npcClass.Move:SetMoveSpeed("set", "placingstop", 0, 9, 2);
+    npcClass.Move:SetMoveSpeed("set", "placingstop", 0, npcClass.Move.MoveSpeedPriority.Action, 2);
     
     task.wait(0.2);
     if npcClass.HealthComp.IsDead then return end;

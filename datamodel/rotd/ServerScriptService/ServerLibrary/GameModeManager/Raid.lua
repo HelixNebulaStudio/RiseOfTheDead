@@ -3,8 +3,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
-local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
-local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 
@@ -67,9 +65,6 @@ function GameMode:WorldLoad(modeData)
 		gameController.OnComplete = function(players)
 			task.spawn(function()
 				for _, player in pairs(players) do
-					modOnGameEvents:Fire("OnGameModeComplete", player, gameType, gameStage, modeData.Room);
-					modAnalytics.RecordProgression(player.UserId, "Complete", gameType..":"..(modeData.Room.IsHard and "Hard-" or "")..gameStage);
-					
 					local profile = modProfile:Get(player);
 					local timePlayed = math.ceil(tick()-arenaTimer);
 					profile.Analytics:LogTime("Arena:"..(modeData.Room.IsHard and "Hard-" or "")..gameStage, timePlayed);
@@ -82,11 +77,6 @@ function GameMode:WorldLoad(modeData)
 		end;
 		
 		gameController.OnStart = function(players)
-			task.spawn(function()
-				for _, player in pairs(players) do
-					modOnGameEvents:Fire("OnGameModeStart", player, gameType, gameStage, modeData.Room);
-				end
-			end);
 		end
 
 		if gameController.Initiated == nil then

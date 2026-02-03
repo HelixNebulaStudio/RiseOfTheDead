@@ -30,7 +30,6 @@ if RunService:IsServer() then
 	-- MARK: DialogueHandler
 	Dialogues.DialogueHandler = function(player, dialog, data)
 		local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
-		local modOnGameEvents = shared.require(game.ServerScriptService.ServerLibrary.OnGameEvents);
 
 		dialog:AddChoice("heal_request", function()
 			if not dialog.InRange() then return end;

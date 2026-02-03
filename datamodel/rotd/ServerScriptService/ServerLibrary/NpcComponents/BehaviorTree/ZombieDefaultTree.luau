@@ -103,7 +103,7 @@ function treePackage.WasDamaged(npcClass: NpcClass)
     if wasDamaged then
         npcClass.Move:SetMoveSpeed("remove", "walk");
     else
-        npcClass.Move:SetMoveSpeed("set", "walk", math.random(5, 9), 2);
+        npcClass.Move:SetMoveSpeed("set", "walk", math.random(5, 9), npcClass.Move.MoveSpeedPriority.Idle);
     end
 
     return wasDamaged;
@@ -203,7 +203,7 @@ function treePackage.Idle(npcClass: NpcClass)
             modAudio.Play(`ZombieIdle{math.random(1,4)}`, npcClass.RootPart).PlaybackSpeed = math.random(80, 120)/100;
             
         elseif math.random(1, idleMoveRandom) == 1 then
-            npcClass.Move:SetMoveSpeed("set", "walk", math.random(3, 6), 2);
+            npcClass.Move:SetMoveSpeed("set", "walk", math.random(3, 6), npcClass.Move.MoveSpeedPriority.Idle);
 
             local castHitResults = modRaycastUtil.SplashCast(npcClass.RootPart.Position, {
                 Radius = 16;

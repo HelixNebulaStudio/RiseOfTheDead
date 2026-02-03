@@ -17,51 +17,52 @@ if RunService:IsServer() then
     function statusPackage.onRequire()
         shared.modEventService:OnInvoked("Players_BindHeal", function(event: EventPacket, ...)
             local playerClass: PlayerClass, healData: DamageData = ...;
-            if healData.CanOverheal ~= true then return end;
+            task.spawn(function()
+                if healData.CanOverheal ~= true then return end;
 
-            local player: Player = playerClass:GetInstance();
-            local healthComp: HealthComp = playerClass.HealthComp;
-            local statusComp: StatusComp = playerClass.StatusComp;
+                local player: Player = playerClass:GetInstance();
+                local healthComp: HealthComp = playerClass.HealthComp;
+                local statusComp: StatusComp = playerClass.StatusComp;
 
-            local healAmount: number = math.abs(healData.Damage);
+                local healAmount: number = math.abs(healData.Damage);
 
-            local profile: ProfileRotd = shared.modProfile:Get(player) :: ProfileRotd;
-            local oveheaSkillData = profile.SkillTree:GetSkill(player, statusId);
+                local profile: ProfileRotd = shared.modProfile:Get(player) :: ProfileRotd;
+                local oveheaSkillData = profile.SkillTree:GetSkill(player, statusId);
 
-            if oveheaSkillData then
-                local level, values = profile.SkillTree:CalStats(oveheaSkillData.Library, oveheaSkillData.Points);
-                local skillMaxOverHeal: number = values.Amount.Default + (level > 0 and values.Amount.Value or 0);
-                
-                local newHealth = healthComp.CurHealth + healAmount;
-                if newHealth > healthComp.MaxHealth and skillMaxOverHeal > 0 then
+                if oveheaSkillData then
+                    local level, values = profile.SkillTree:CalStats(oveheaSkillData.Library, oveheaSkillData.Points);
+                    local skillMaxOverHeal: number = values.Amount.Default + (level > 0 and values.Amount.Value or 0);
                     
-                    local overhealDuration = 60;
-                    local healthChange = newHealth-healthComp.MaxHealth;
-                    
-                    local newMaxHealthOverCharge = math.min(healthChange, skillMaxOverHeal);
+                    local newHealth = healthComp.CurHealth + healAmount;
+                    if newHealth > healthComp.MaxHealth and skillMaxOverHeal > 0 then
+                        
+                        local overhealDuration = 60;
+                        local healthChange = newHealth-healthComp.MaxHealth;
+                        
+                        local newMaxHealthOverCharge = math.min(healthChange, skillMaxOverHeal);
 
-                    local oveheaStatus = statusComp:GetOrDefault(statusId);
-                    if oveheaStatus == nil then
-                        local cMaxHealth = playerClass.Configurations.MaxHealth;
-                        local cHealthPoints = (playerClass.Configurations.HealthPoints or 0);
+                        local oveheaStatus = statusComp:GetOrDefault(statusId);
+                        if oveheaStatus == nil then
+                            local cMaxHealth = playerClass.Configurations.MaxHealth;
+                            local cHealthPoints = (playerClass.Configurations.HealthPoints or 0);
 
-                        local healthSurplus = healthComp.MaxHealth - (cMaxHealth + cHealthPoints);
-                        newMaxHealthOverCharge = math.min(healthSurplus + healthChange, skillMaxOverHeal);
-                    else
-                        newMaxHealthOverCharge = math.min(oveheaStatus.Values.MaxHealthOverCharge + healthChange, skillMaxOverHeal);
-                    end
-        
-                    local statusApplyParam: StatusCompApplyParam = {
-                        Expires = workspace:GetServerTimeNow() + overhealDuration;
-                        Duration = overhealDuration;
-                        Values = {
-                            MaxHealthOverCharge = newMaxHealthOverCharge;
+                            local healthSurplus = healthComp.MaxHealth - (cMaxHealth + cHealthPoints);
+                            newMaxHealthOverCharge = math.min(healthSurplus + healthChange, skillMaxOverHeal);
+                        else
+                            newMaxHealthOverCharge = math.min(oveheaStatus.Values.MaxHealthOverCharge + healthChange, skillMaxOverHeal);
+                        end
+            
+                        local statusApplyParam: StatusCompApplyParam = {
+                            Expires = workspace:GetServerTimeNow() + overhealDuration;
+                            Duration = overhealDuration;
+                            Values = {
+                                MaxHealthOverCharge = newMaxHealthOverCharge;
+                            };
                         };
-                    };
-                    statusComp:Apply(statusId, statusApplyParam);
-
+                        statusComp:Apply(statusId, statusApplyParam);
+                    end
                 end
-            end
+            end)
         end);
     end
 
