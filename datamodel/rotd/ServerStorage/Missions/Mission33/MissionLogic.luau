@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local MISSION_ID = 33;
@@ -14,7 +14,7 @@ if RunService:IsServer() then
 
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
-				if modBranchConfigs.IsWorld("TheMall") then
+				if modBranchConfigurations.IsWorld("TheMall") then
 					local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
 					if patrickPrefab then
 						modReplicationManager.SetClientParent(player, patrickPrefab, workspace.Entity);
@@ -22,19 +22,19 @@ if RunService:IsServer() then
 				end
 				
 			elseif mission.Type == 1 then -- OnActive
-				if modBranchConfigs.IsWorld("TheMall") then
+				if modBranchConfigurations.IsWorld("TheMall") then
 					local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
 					if patrickPrefab then
 						modReplicationManager.SetClientParent(player, patrickPrefab, workspace.Entity);
 					end
 				end
 
-				if modBranchConfigs.IsWorld("BanditOutpost") then
+				if modBranchConfigurations.IsWorld("BanditOutpost") then
 					if firstRun then
 						Debugger:Log("Awoken the bear script.");
 					end
 
-				elseif not modBranchConfigs.IsWorld("AwokenTheBear") then
+				elseif not modBranchConfigurations.IsWorld("AwokenTheBear") then
 					if mission.ProgressionPoint > 3 and mission.ProgressionPoint < 13 then
 						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 3;

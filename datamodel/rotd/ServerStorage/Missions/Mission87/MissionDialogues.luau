@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 --=
 local Dialogues = {
@@ -207,14 +207,14 @@ if RunService:IsServer() then
 				end)
 
 			elseif mission.ProgressionPoint == 2 then
-				if modBranchConfigs.IsWorld("TheResidentials") then
+				if modBranchConfigurations.IsWorld("TheResidentials") then
 					local josephNpcClass: NpcClass = dialog:GetNpcClass();
 
 					if josephNpcClass:DistanceFromCharacter(Vector3.new(787.386, 41.301, 441.39)) <= 32 then
 						dialog:SetInitiate("Head on in..", "Confident");
 					end
 					
-				elseif modBranchConfigs.IsWorld("TheHarbor") then
+				elseif modBranchConfigurations.IsWorld("TheHarbor") then
 					local josephNpcClass: NpcClass = dialog:GetNpcClass();
 
 					if josephNpcClass:DistanceFromCharacter(Vector3.new(-271.475, 40.961, 230.21)) <= 32 then

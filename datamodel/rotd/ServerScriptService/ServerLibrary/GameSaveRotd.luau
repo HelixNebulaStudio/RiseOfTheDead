@@ -9,11 +9,15 @@ local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesM
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modStoragePresetsLibrary = shared.require(game.ReplicatedStorage.Library.StoragePresetsLibraryRotd);
+local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
+local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local modBlueprints = shared.require(game.ServerScriptService.ServerLibrary.Blueprints);
 local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
+local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
 local remoteMasterySync;
 local remoteHudNotification;
@@ -180,13 +184,16 @@ end)
 
 
 shared.coreBind(modGameSave, "_loaded", function(gameSave: GameSaveRotd)
+    local profile: ProfileRotd = gameSave.Profile :: ProfileRotd;
+	local player = gameSave.Player;
+
 	local skinPermUpdate = gameSave.Events:Get("skinPermUpdate1");
 	if skinPermUpdate == nil then
 		gameSave.Events:Add({Id="skinPermUpdate1"});
 
 		local function updateItem(storageItem)
 			local itemId = storageItem.ItemId;
-			local itemUnlockables = gameSave.Profile.ItemUnlockables;
+			local itemUnlockables = profile.ItemUnlockables;
 
 			local unlockedSkins = {};
 
@@ -225,6 +232,49 @@ shared.coreBind(modGameSave, "_loaded", function(gameSave: GameSaveRotd)
 			gameSave.Storages[id]:Loop(updateItem);
 		end
 	end
+
+	player:GetAttributeChangedSignal("Location"):Connect(function()
+		if gameSave == nil then return end;
+
+		local location = player:GetAttribute("Location");
+		if location == nil then return end;
+
+		local setSpawn = modGpsLibrary.SpawnLocationLibrary[location];
+		if setSpawn == nil then return end;
+		
+		local oldSpawn = gameSave.Spawn;
+		gameSave.Spawn = setSpawn;
+		Debugger:StudioWarn(`Set spawn from ({oldSpawn}) to ({location} = {setSpawn})`);
+	end)
+
+	task.spawn(function()
+		local eventPart = workspace:WaitForChild("Event");
+		local masusPlushieSpawnAtt = eventPart:FindFirstChild("MasusPlushie"); 
+
+		local worldInfo = modBranchConfigurations.Worlds[modBranchConfigurations.WorldName];
+		if worldInfo and worldInfo.Index then
+
+			local dayName = modSyncTime.GetWeekDay();
+			local dayIndex = modSyncTime.WeekdayIndex[dayName];
+
+			if worldInfo.Index == 0 or dayIndex == worldInfo.Index then
+				if masusPlushieSpawnAtt and profile.Collectibles.masus == nil then
+					task.spawn(function()
+						game.ReplicatedStorage.Prefabs.Items:WaitForChild("masusplush");
+						local dropPrefab, interactable = modItemDrops.spawn{
+							ItemId = "masusplush";
+							Quantity = 1;
+							SpawnCFrame = masusPlushieSpawnAtt.WorldCFrame;
+							Players = {player};
+							DespawnDuration = false;
+							Anchored = true;
+						};
+						interactable.Values.CollectibleId = "masus";
+					end)
+				end
+			end
+		end
+	end)
 end)
 
 function modGameSave:SumMasteries()

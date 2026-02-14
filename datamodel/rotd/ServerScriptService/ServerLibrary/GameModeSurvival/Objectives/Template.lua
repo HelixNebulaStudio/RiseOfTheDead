@@ -4,6 +4,7 @@ local Objective = {};
 Objective.__index = Objective;
 
 Objective.Title = "Template";
+Objective.Description = "Template";
 
 Objective.Controller = nil;
 --==

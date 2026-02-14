@@ -4,16 +4,61 @@ local Objective = {};
 Objective.__index = Objective;
 
 Objective.Title = "Supplies Request";
+Objective.Description = "Call in resupply";
+
 Objective.DifficultyModes = {Hard=false;};
 
 Objective.Controller = nil;
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modNpcs = shared.modNpcs;
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 --==
+function Objective.onRequire()
+	shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
+		local player: Player? = eventPacket.Player;
+		if player == nil then return end;
+
+		local triggerId: string, interactable: InteractableInstance = ...;
+		if triggerId ~= "ResupplyRadio" then return end;
+		
+		local objective = interactable.Values.s_Objective;
+		if objective == nil then
+			Debugger:StudioWarn(`{triggerId} Missing objective`, interactable);
+			return;
+		end
+
+		if objective.StartTick == nil then
+			objective.TenSecTick = tick();
+			objective.StartTick = tick();
+
+			interactable.Values.RadioActive = true;
+			objective.LastReactivate = tick();
+
+			modAudio.Play("Sonar", workspace);
+			modAudio.Play("HordeGrowl", workspace);
+			
+			shared.Notify(game.Players:GetPlayers(), "Resupply has been requested!", "Important");
+
+		elseif interactable.Values.CallInterupted == true then
+			objective.LastReactivate = tick();
+			objective.TimesReactivated = objective.TimesReactivated +1;
+			interactable.Values.CallInterupted = false;
+			
+			modAudio.Play("Sonar", workspace);
+			
+			shared.Notify(game.Players:GetPlayers(), "Resupply beacon has been reactivated!", "Important");
+
+		end
+
+		objective.FiveSecTick = tick();
+		objective.AlertLightPrefab:SetAttribute("Active", false);
+		interactable:Sync();
+		
+	end);
+end
 
 function Objective.new()
 	local self = {};
@@ -34,102 +79,65 @@ function Objective:Begin()
 	local worldSpawn = workspace:FindFirstChildWhichIsA("SpawnLocation");
 	local spawnCf = worldSpawn.Position + Vector3.new(0, worldSpawn.Size.Y/2, 0);
 	
-	local interactableModule = newPrefab:WaitForChild("MilitaryRadio"):WaitForChild("Interactable");
-	local interactData = shared.require(interactableModule);
+	newPrefab:PivotTo(CFrame.new(spawnCf) * worldSpawn.CFrame.Rotation);
+	newPrefab.Name = "Resupply Radio";
 
-	self.ActiveInteractData = interactData;
-	self.AlertLightPrefab = newPrefab:WaitForChild("alertLight");
-
-	self.DisconnectOnTrigger = shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
-		local player: Player? = eventPacket.Player;
-		if player == nil then return end;
-		
-		if not self.ResupplyObjectiveActive then return end;
-		local triggerId = interactData.TriggerTag;
-
-		if triggerId == "ResupplyRadio" then
-			if self.StartTick == nil then
-				self.TenSecTick = tick();
-				self.StartTick = tick();
-
-				interactData.RadioActive = true;
-				self.LastReactivate = tick();
-
-				modAudio.Play("Sonar", workspace);
-				modAudio.Play("HordeGrowl", workspace);
-				
-				shared.Notify(game.Players:GetPlayers(), "Resupply has been requested!", "Important");
-
-			elseif interactData.CallInterupted == true then
-				self.LastReactivate = tick();
-				self.TimesReactivated = self.TimesReactivated +1;
-				interactData.CallInterupted = false;
-				
-				modAudio.Play("Sonar", workspace);
-				
-				shared.Notify(game.Players:GetPlayers(), "Resupply beacon has been reactivated!", "Important");
-
-			end
-
-			self.FiveSecTick = tick();
-			self.AlertLightPrefab:SetAttribute("Active", false);
-			interactData:Sync();
-		end
-	end);
+	newPrefab:SetAttribute("EntityHudHealth", true);
+	newPrefab.Parent = workspace.Environment.Game;
 	
-	local humanoid = newPrefab:WaitForChild("Structure");
-	humanoid.MaxHealth = 10000 * (self.Controller.IsHard and 10 or 1);
-	humanoid.Health = humanoid.MaxHealth;
+	local interactConfig = newPrefab:WaitForChild("MilitaryRadio"):WaitForChild("Interactable");
+	local interactable: InteractableInstance = modInteractables.getOrNew(interactConfig);
 
-	local destructibleConfig = shared.require(newPrefab:WaitForChild("Destructible"));
+	interactable.Values.s_Objective = self;
+	interactable.Values.CallInterupted = false;
+	interactable.Values.RadioActive = false;
+
+	self.ActiveInteractData = interactable;
+	self.AlertLightPrefab = newPrefab:WaitForChild("alertLight");
+	
+	local destructibleConfig = modDestructibles.createDestructible("Scarecrow");
+	destructibleConfig:SetAttribute("_AttractRange", 999);
+	destructibleConfig:SetAttribute("_ExpiringDamageTick", false);
+	destructibleConfig.Parent = newPrefab;
+	
 	local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
+	destructible.BroadcastHealth = true;
+	destructible.HealthComp:SetCanBeHurtBy("!Player&!Human"); -- not HumanoidType == Player & not Survivors
+	destructible.HealthComp:SetMaxHealth(10000 * (self.Controller.IsHard and 10 or 1));
+	destructible.HealthComp:Reset();
+
+	destructible:SetupHealthbar{
+		Size = UDim2.new(6, 0, 1, 0);
+		Distance = 128;
+		OffsetWorldSpace = Vector3.new(0, 8, 0);
+		ShowLabel = true;
+	};
+	
 	self.ActiveDestructibleInstance = destructible;
 
 	destructible.OnDestroy:Connect(function()
-		Debugger:Warn("radio destroyed");
+		local destroyPos = destructible.Model:GetPivot().Position;
 
 		self.ActiveRadioPrefab = nil;
 		game.Debris:AddItem(self.Prefab, 5);
 
 		shared.Notify(game.Players:GetPlayers(), "The resupply radio has been destroyed, the request failed!", "Negative");
 
-		modAudio.Play("VechicleExplosion", self.Prefab.PrimaryPart.Position);
-		modAudio.Play("Explosion4", self.Prefab.PrimaryPart.Position);
+		modAudio.Play("VechicleExplosion", destroyPos);
+		modAudio.Play("Explosion4", destroyPos);
 
 		local ex = Instance.new("Explosion");
 		ex.BlastRadius = 16;
 		ex.DestroyJointRadiusPercent = 0;
 		ex.BlastPressure = 0;
-		ex.Position = self.Prefab.PrimaryPart.Position;
-
-		for _, obj in pairs(self.Prefab:GetDescendants()) do
-			if obj:IsA("BasePart") then
-				obj.Anchored = false;
-				obj.CanCollide = true;
-				obj:ApplyImpulse(Vector3.new(math.random(-50, 50), 20, math.random(-50, 50))*10);
-
-			end
-		end
+		ex.Position = destroyPos;
+		ex.Parent = workspace;
 	end)
 	
-	newPrefab:PivotTo(CFrame.new(spawnCf) * worldSpawn.CFrame.Rotation);
-	newPrefab.Name = "Resupply Radio";
-
-	newPrefab:SetAttribute("EntityHudHealth", true);
-	newPrefab.Parent = workspace.Environment;
 	
 	task.spawn(function()
 		while self.ResupplyObjectiveActive do
 			task.wait(1);
-			
-			for a=#modNpcs.ActiveNpcClasses, 1, -1  do
-				local npcClass = modNpcs.ActiveNpcClasses[a];
-				if npcClass == nil then continue end;	
-				if npcClass.Humanoid == nil or npcClass.Humanoid.Name ~= "Zombie" then continue end;
-				if npcClass.HealthComp.IsDead or npcClass.OnTarget == nil then continue end;
-			
-				npcClass.OnTarget(newPrefab);
-			end
 		end
 	end)
 
@@ -152,22 +160,26 @@ function Objective:Begin()
 	self.SpawnCount = 0;
 	self.SpawnPattern = 1;
 	self.PauseTick = tick()+10;
+	
+	interactable:Sync();
 end
 
 function Objective:Tick()
-	if self.ActiveRadioPrefab == nil or self.ActiveDestructibleObj.Destroyed == true then
+	local destructible: DestructibleInstance = self.ActiveDestructibleInstance;
+	if self.ActiveRadioPrefab == nil or destructible == nil or destructible.HealthComp.IsDead == true then
 		return true;
 	end
 	
+	local interactable: InteractableInstance = self.ActiveInteractData;
+
 	local timelapseSinceStart = tick()-self.WaveStartTick;
 	if tick()-self.OneSecTick > 1 then
 		self.OneSecTick = tick();
 		
 		if self.StartTick then
 
-			if self.ActiveInteractData.CallInterupted == true then
-				local destructibleInstance: DestructibleInstance = self.ActiveDestructibleInstance;
-				destructibleInstance.HealthComp:TakeDamage(DamageData.new{
+			if interactable.Values.CallInterupted == true then
+				destructible.HealthComp:TakeDamage(DamageData.new{
 					Damage = 200;
 				});
 			end
@@ -176,14 +188,14 @@ function Objective:Tick()
 			if isFiveSecTick then
 				self.FiveSecTick = tick();
 
-				if self.ActiveInteractData.CallInterupted ~= true then
+				if interactable.Values.CallInterupted ~= true then
 					if tick()-self.LastReactivate > 10 and math.random(1, 6) == 1 and self.TimesReactivated < 2 then
 						modAudio.Play("DoomAlarm", workspace).PlaybackSpeed = 0.2;
 						shared.Notify(game.Players:GetPlayers(), "Transmission for resupply has been interrupted and needs to be reactivated!", "Important");
 						
 						self.AlertLightPrefab:SetAttribute("Active", true);
-						self.ActiveInteractData.CallInterupted = true;
-						self.ActiveInteractData:Sync();
+						interactable.Values.CallInterupted = true;
+						interactable:Sync();
 						
 					else
 						modAudio.Play("Sonar", workspace);
@@ -193,9 +205,9 @@ function Objective:Tick()
 				end
 			end
 
-			if self.ActiveInteractData.CallInterupted ~= true and tick()-self.StartTick > 60 then
+			if interactable.Values.CallInterupted ~= true and tick()-self.StartTick > 60 then
 				if math.random(1, 10) == 1 then
-					self.ActiveDestructibleObj:SetEnabled(false);
+					destructible:SetEnabled(false);
 
 					shared.Notify(game.Players:GetPlayers(), "Resupply transmission has been received, supply crate incoming!", "Important");
 					self.Controller.ResupplyEnabled = true;
@@ -258,11 +270,6 @@ function Objective:End()
 	self.ResupplyObjectiveActive = false;
 	
 	self.ActiveInteractData = nil;
-	
-	if self.DisconnectOnTrigger then
-		self.DisconnectOnTrigger();
-		self.DisconnectOnTrigger = nil;
-	end
 	
 	game.Debris:AddItem(self.ActiveRadioPrefab, 0);
 end

@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
@@ -30,7 +30,7 @@ return function(CutsceneSequence)
 	
 
 	-- MARK: TheHarbor
-	if modBranchConfigs.IsWorld("TheHarbor") then
+	if modBranchConfigurations.IsWorld("TheHarbor") then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
@@ -69,7 +69,7 @@ return function(CutsceneSequence)
 
 
 	-- MARK: SectorE
-	elseif modBranchConfigs.IsWorld("SectorE") then
+	elseif modBranchConfigurations.IsWorld("SectorE") then
 		
 
 		CutsceneSequence:NewScene("enableInterfaces", function()
@@ -420,7 +420,7 @@ return function(CutsceneSequence)
 
 
 	-- MARK: SectorF
-	elseif modBranchConfigs.IsWorld("SectorF") then
+	elseif modBranchConfigurations.IsWorld("SectorF") then
 		
 		CutsceneSequence:NewScene("enableInterfaces", function()
 			modConfigurations.Set("DisablePinnedMission", false);

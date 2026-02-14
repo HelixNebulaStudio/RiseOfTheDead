@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modTouchHandler = shared.require(game.ReplicatedStorage.Library.TouchHandler);
 local modHealthComponents = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 local modProjectile = require(game.ReplicatedStorage.Library.Projectile);

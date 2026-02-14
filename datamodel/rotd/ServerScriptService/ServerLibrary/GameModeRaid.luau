@@ -1,19 +1,5 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local Config = {
-	EnemyCap=300;
-	
-	SpawnPlatformRadius=128;
-	MinSpawnCount=2;
-	MaxSpawnCount=3;
-
-	HordeTimerDeduction = NumberRange.new(10, 30);
-
-	HordeCycle=nil;
-	HordeSpawnRate=nil;
-	HordeWhenEnemiesDropsBelow=nil;
-}
-
 local Raid = {};
 Raid.__index = Raid;
 Raid.Active = nil;
@@ -26,8 +12,7 @@ local PathfindingService = game:GetService("PathfindingService");
 
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
-local modDoors = shared.require(game.ReplicatedStorage.Library.Doors);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modDoors = shared.require(game.ReplicatedStorage.Entity.Doors);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
@@ -36,9 +21,14 @@ local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManager);
+local modChunks = shared.require(game.ReplicatedStorage.Library.Chunks);
+local modOctree = shared.require(game.ReplicatedStorage.Library.Util.Octree);
+local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
 local modNpcs = shared.modNpcs;
 local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
+
+local ActiveChunks = {};
 --==
 local platformParam = OverlapParams.new();
 platformParam.FilterType = Enum.RaycastFilterType.Include;
@@ -46,6 +36,18 @@ platformParam.FilterType = Enum.RaycastFilterType.Include;
 function Raid.onRequire()
 	serverPrefabs = game.ServerStorage:WaitForChild("Prefabs"):WaitForChild("Objects");
 	remoteGameModeHud = modRemotesManager:Get("GameModeHud");
+end
+
+function Raid:__newindex(k, v)
+	if k == "Objective" then
+		for k2, v2 in pairs(v) do
+			self.Objective[k2] = v2;
+		end
+
+		return;
+	end
+	
+	rawset(self, k, v);
 end
 
 function Raid.new()
@@ -60,9 +62,22 @@ function Raid.new()
 		EliminateGoal=0;
 		EliminateCount=0;
 		
-		SpawnPlatforms = {};
+		SpawnChunkCount = 0;
 
-		HiddenSpawns = {};
+		Objective = {
+			Id = "Eliminate";
+			EliminateGoal = 100;
+			EnemyCap = 35;
+
+			SpawnsPerChunk = NumberRange.new(1, 2);
+			
+			HordeWhenEnemiesDropsBelow = 4;
+			HordeCycle = 300;
+			HordeSpawnRate = 0.5;
+			HordeTimerDeduction = NumberRange.new(25, 35);
+		};
+
+		HiddenSpawns = modOctree.new();
 		SpecialSpawns = {};
 		
 		EnemiesList = {
@@ -82,7 +97,8 @@ function Raid.new()
 		StopwatchTick = nil;
 		Path = PathfindingService:CreatePath();
 
-		ObjectiveStatusText = "";
+		HeaderText = "";
+		StatusText = "";
 	};
 
 	if Raid.Active == nil then
@@ -98,8 +114,13 @@ function Raid:Load()
 	self.StageLib = self.GameLib and modGameModeLibrary.GetStage(self.ModeType, self.ModeStage);
 
 	local worldCore = shared.WorldCore;
-	local tilePrototypePackages = worldCore.Script:FindFirstChild("TilePrototypePackages");
 
+	self.SpawnChunks = modChunks.new(shared.gameConfig.SpawnChunkSize or Vector3.new(16, 64, 16));
+	self.SpawnChunkOffset = shared.gameConfig.SpawnChunkOffset or Vector3.zero;
+	self.SpawnsPerChunk = shared.gameConfig.SpawnsPerChunk or NumberRange.new(1, 2);
+
+
+	local tilePrototypePackages = worldCore.Script:FindFirstChild("TilePrototypePackages");
 	local mapWaveCollapse = worldCore.MapWaveCollapse;
 	if mapWaveCollapse then
 		-- GenerateDynamicMap;
@@ -165,6 +186,10 @@ function Raid:Load()
 		
 	end
 
+	local spawnPlatformFolder = Instance.new("Folder");
+	spawnPlatformFolder.Name = "SpawnPlatforms";
+	spawnPlatformFolder.Parent = workspace.CurrentCamera;
+
 	if workspace.Environment:FindFirstChild("CollapseMap") then
 		local collapseMap = workspace.Environment.CollapseMap;
 
@@ -180,13 +205,7 @@ function Raid:Load()
 						table.insert(self.Doors, doorInstance);
 						
 					elseif child.Name == "SpawnPlatform" then
-						self.SpawnPlatforms[child] = {
-							Name=tileModel.Name;
-							Part=child;
-							Index=(child:GetAttribute("Index") or 999);
-							Spawns={};
-							Enabled=true;
-						};
+						child.Parent = spawnPlatformFolder;						
 						
 						if mapTotalVec == nil then
 							mapTotalVec = child.Position;
@@ -203,7 +222,7 @@ function Raid:Load()
 							if not obj:IsA("Attachment") then continue end;
 
 							obj:SetAttribute("Enabled", obj.Name == "HiddenSpawn");
-							table.insert(self.HiddenSpawns, obj);
+							self.HiddenSpawns:CreateNode(obj.Position, obj);
 							
 						end
 						
@@ -244,43 +263,20 @@ function Raid:Load()
 	end
 
 	-- MARK: Load Static Game Elements
+	local spawnsFolder = Instance.new("Folder");
+	spawnsFolder.Name = "Spawns";
+	spawnsFolder.Parent = workspace.CurrentCamera;
+
+	local debugSpawnPlatforms = shared.gameConfig.DebugSpawnPlatforms == true;
+
 	self.GameDir = workspace.Environment:FindFirstChild("Game");
-	if workspace.Environment:FindFirstChild("Game") then
-		local gameDir: Folder = self.GameDir;
+	local gameDir: Folder = self.GameDir;
+	if gameDir then
 
 		for _, object: Instance in pairs(gameDir:GetChildren()) do
 			if object.Name == "SpawnPlatforms" then
-				object.Parent = workspace.CurrentCamera;
-				
-				local spCount = 0;
 				for _, child in pairs(object:GetChildren()) do
-
-					if child:IsA("Folder") then
-						for _, plat in pairs(child:GetChildren()) do
-							spCount = spCount +1;
-							self.SpawnPlatforms[plat] = {
-								Name="SpawnPlatform"..spCount;
-								Part=plat;
-								Index=(plat:GetAttribute("Index") or 999);
-								Spawns={};
-
-								PlatformGroup=child.Name;
-								Enabled=false;
-							};
-						end
-
-					else
-						spCount = spCount +1;
-						self.SpawnPlatforms[child] = {
-							Name="SpawnPlatform"..spCount;
-							Part=child;
-							Index=(child:GetAttribute("Index") or 999);
-							Spawns={};
-							Enabled=true;
-						};
-
-					end
-
+					child.Parent = spawnPlatformFolder;
 				end
 
 			elseif object.Name == "Doors" then
@@ -311,7 +307,7 @@ function Raid:Load()
 					if not obj:IsA("Attachment") then continue end;
 					
 					obj:SetAttribute("Enabled", obj.Name == "HiddenSpawn");
-					table.insert(self.HiddenSpawns, obj);
+					self.HiddenSpawns:CreateNode(obj.Position, obj);
 					
 				end
 
@@ -323,8 +319,86 @@ function Raid:Load()
 
 			end
 		end
+
+
+		--MARK: Spawn Chunks
+		local chunkIndex = 0;
+		local chunkSize = 16;
+		for _, spawnPlatform in ipairs(spawnPlatformFolder:GetDescendants()) do
+			if not spawnPlatform:IsA("BasePart") then continue end;
+
+			local center = spawnPlatform.Position;
+			local size = spawnPlatform.Size/chunkSize;
+
+			local regionSize = Vector3.new(math.max(math.floor(size.X)-1, 1), 0, math.max(math.floor(size.Z)-1, 1));
+			self.SpawnChunks:GetRegion(center, regionSize);
+		end
+		for point, node in pairs(self.SpawnChunks.Nodes) do
+			local chunk = node:GetObject();
+			if chunk.init == true then continue end;
+			chunk.init = true;
+			self.SpawnChunkCount += 1;
+
+			chunkIndex += 1;
+			chunk.Index = chunkIndex;
+			chunk.LastTouched = tick()-60;
+			chunk.Points = {};
+			chunk.EnemyList = {};
+
+			if debugSpawnPlatforms == true then
+				local dbPart = Debugger:PointPart(point + self.SpawnChunkOffset);
+				dbPart.Size = self.SpawnChunks.Size;
+				dbPart.CastShadow = false;
+				dbPart.Shape = Enum.PartType.Block;
+				dbPart.Transparency = 0.95;
+				dbPart.Name = `Spawn_{point}`;
+				dbPart.Parent = spawnsFolder;
+			end
+
+			local avgPos;
+			for b=1, 5 do
+				local localRandomPoint = Vector3.new(
+					math.random(-chunkSize/2, chunkSize/2),
+					0,
+					math.random(-chunkSize/2, chunkSize/2)
+				);
+
+				local rngPoint = point + localRandomPoint + self.SpawnChunkOffset;
+				local _, surfacePt = modVector.getSurface(
+					{spawnPlatformFolder}, 
+					rngPoint + Vector3.yAxis * (self.SpawnChunks.Size.Y/2), 
+					-Vector3.yAxis * self.SpawnChunks.Size.Y
+				);
+				if debugSpawnPlatforms == true then
+					local dbPart = Debugger:PointPart(rngPoint + Vector3.yAxis * (self.SpawnChunks.Size.Y/2));
+					dbPart.Name = `({rngPoint})_{b}`;
+					dbPart.Color = Color3.fromRGB(255, 0, 0);
+					dbPart.Size = Vector3.one * 0.5;
+					dbPart.Parent = spawnsFolder;
+					
+					if surfacePt then
+						dbPart.CFrame = CFrame.new(surfacePt + Vector3.yAxis);
+						dbPart.Color = Color3.fromRGB(0, 255, 0);
+					end
+				end
+
+				if surfacePt then
+					surfacePt = surfacePt + Vector3.yAxis;
+					if avgPos == nil then
+						avgPos = surfacePt;
+					else
+						avgPos = avgPos + surfacePt;
+					end
+					table.insert(chunk.Points, surfacePt);
+				end
+			end
+
+			if avgPos then avgPos = avgPos/#chunk.Points; end;
+			chunk.Position = avgPos;
+		end
 	end
 
+	spawnPlatformFolder.Parent = script;
 	self.Loaded = true;
 
 	task.spawn(function()
@@ -380,6 +454,9 @@ end
 
 
 function Raid:CompleteRaid()
+	if self.Status == EnumStatus.Completed then return end;
+	self.Status = EnumStatus.Completed;
+
 	workspace:SetAttribute("GameModeComplete", true);
 
 	local runTimeStr = "";
@@ -390,11 +467,11 @@ function Raid:CompleteRaid()
 		runTimeStr = ` Run time: {modSyncTime.FormatMs(timeLapse *1000)}!`;
 	end
 
-	self.Status = EnumStatus.Completed;
 	shared.Notify(game.Players:GetPlayers(), `Raid Complete!{runTimeStr}`, "Positive");
 	self:Hud{
-		Status="Raid Complete!";
-		PlayMusic=false;
+		Status = "Raid Complete!";
+		PlayMusic = false;
+		EndStageSound = true;
 	};
 
 	self:RespawnDead();
@@ -559,18 +636,65 @@ function Raid:PickEnemy(paramPacket)
 	return "Zombie";
 end
 
-
+--MARK: SpawnEnemy
 function Raid:SpawnEnemy(npcName, paramPacket)
-	if self.EliminateCount >= self.EliminateGoal then return end;
 	paramPacket = paramPacket or {};
-
 	local spawnCf = paramPacket.SpawnCFrame;
-	
+
+	if #self.EnemyClassInstances > self.Objective.EnemyCap then
+		local playerPositions = {};
+
+		for _, player in pairs(self.Players) do
+			local playerClass: PlayerClass = shared.modPlayers.get(player);
+			table.insert(playerPositions, playerClass:GetCFrame().Position);
+		end
+
+		local function filterFunc(npcClass: NpcClass)
+			local reRespawnThreshold = #self.EnemyClassInstances > 100 and 3 or #self.EnemyClassInstances > 50 and 6 or 9;
+			if npcClass.LastRespawnTick and (tick() - npcClass.LastRespawnTick) < reRespawnThreshold then return false; end;
+			if modVector.DistanceSqrdXZ(npcClass:GetCFrame().Position, spawnCf.Position) <= 4096 then return false; end;
+			return npcClass.Name == npcName;
+		end
+		local npcClass: NpcClass = shared.modNpcs.Octree:GetFurthestNodeFromPoints(playerPositions, filterFunc) :: NpcClass;
+		if npcClass then
+			
+			for a=#ActiveChunks, 1, -1 do
+				local chunk = ActiveChunks[a];
+				if chunk.EnemyList == nil or chunk.EnemyList[npcClass] == nil then continue end;
+
+				chunk.EnemyList[npcClass] = nil;
+
+				if next(chunk.EnemyList) == nil then
+					table.remove(ActiveChunks, a);
+					--Debugger:StudioLog(`Chunk ({chunk.Index}) resetted.`);
+				end
+				break;
+			end
+			if paramPacket.Chunk then
+				paramPacket.Chunk.EnemyList[npcClass] = true;
+			end
+			npcClass:Respawn(spawnCf);
+
+			local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+			if targetHandlerComp then
+				for a=1, #self.Players do
+					targetHandlerComp:AddTarget(self.Players[a].Character);
+				end
+			end
+			--Debugger:StudioLog(`Respawned {npcClass.Name} ({npcClass.Id})`);
+		end
+	end
+
+	if self.Objective.Id == "Eliminate" then
+		if self.EliminateCount >= self.EliminateGoal then return end;
+	end
+
 	local npcClass: NpcClass = modNpcs.spawn2{
 		Name = npcName;
 		CFrame = spawnCf;
 
 		BindSetup = function(npcClass: NpcClass)
+			npcClass.SpawnCFrame = spawnCf;
 			self.EnemiesSpawned = self.EnemiesSpawned + 1;
 
 			local properties: PropertiesVariable<{}> = npcClass.Properties;
@@ -590,6 +714,9 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 			end
 
 			table.insert(self.EnemyClassInstances, npcClass);
+			if paramPacket.Chunk then
+				paramPacket.Chunk.EnemyList[npcClass] = true;
+			end
 
 			local healthComp: HealthComp = npcClass.HealthComp;
 			healthComp.OnIsDeadChanged:Connect(function()
@@ -612,16 +739,30 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 					if self.Objective.Id == "Eliminate" then
 						local remining = math.max(0, self.EliminateGoal - self.EliminateCount);
 
-						self.ObjectiveStatusText = `Eliminate {remining} enemies`;
+						self.StatusText = `Eliminate {remining} enemies`;
 						self:Hud({
-							Status=self.ObjectiveStatusText;
+							Status = self.StatusText;
 						});
 						
 						if self.EliminateCount >= self.EliminateGoal then
 							self:CompleteRaid();
 						end
+
+					elseif self.Objective.Id == "Objective" then
+						
 					end
-					
+				end
+
+				for a=#ActiveChunks, 1, -1 do
+					local chunk = ActiveChunks[a];
+					if chunk.EnemyList == nil or chunk.EnemyList[npcClass] == nil then continue end;
+
+					chunk.EnemyList[npcClass] = nil;
+
+					-- if next(chunk.EnemyList) == nil then
+					-- 	Debugger:StudioLog(`Chunk ({chunk.Index}) died.`);
+					-- end
+					break;
 				end
 			end)
 		end
@@ -640,12 +781,15 @@ function Raid:BeginCount()
 	end
 
 	self:Hud({
-		Status=self.ObjectiveStatusText;
-		PlayMusic=true;
+		Status = self.StatusText;
+		PlayMusic = true;
 	});
 end
 
+--MARK: Start()
 function Raid:Start()
+	Debugger:StudioLog(`Initialize Raid Config`, self.Objective);
+
 	self.StopwatchTick = nil;
 	Debugger:Warn("Raid:Start");
 
@@ -692,12 +836,12 @@ function Raid:Start()
 		local doorInstance: DoorInstance = self.Doors[a];
 		local doorModel = doorInstance.Model;
 		
-		doorInstance.Raided = nil;
+		doorInstance.Values.Raided = nil;
 		doorInstance:Toggle(false);
 
 
-		if doorInstance.SpawnBlockade == false then continue end;
-		doorInstance.CanBreakIn = false;
+		if doorInstance.Values.SpawnBlockade == false then continue end;
+		doorInstance.Values.CanBreakIn = false;
 		
 		local blockadeId = "BlockadeSingle";
 		if doorInstance.WidthType == "Double" then
@@ -729,24 +873,14 @@ function Raid:Start()
 				local addStageSpawn = doorModel:GetAttribute("AddStageSpawn");
 				if addStageSpawn == nil then return end;
 
-				for _, att in pairs(self.HiddenSpawns) do
+				for _, node in ipairs(self.HiddenSpawns:GetAllNodes()) do
+					local att = node:GetObject();
 					if att.Name == addStageSpawn then
 						att:SetAttribute("Enabled", true);
 					end
 				end
 			end)
 
-			destructible.OnDestroy:Connect(function()
-				local platformName = doorModel:GetAttribute("AddSpawnPlatforms");
-				if platformName == nil then return end;
-				
-				for platformPart, platformInfo in pairs(self.SpawnPlatforms) do
-					if platformInfo.PlatformGroup == platformName then
-						platformInfo.Enabled = true;
-					end
-				end
-			end)
-			
 			destructible:SetEnabled(false);
 			table.insert(destructibleObjs, destructible);
 		end
@@ -771,7 +905,8 @@ function Raid:Start()
 			local addStageSpawn = new:GetAttribute("AddStageSpawn");
 			if addStageSpawn == nil then return end;
 
-			for _, att in pairs(self.HiddenSpawns) do
+			for _, node in ipairs(self.HiddenSpawns:GetAllNodes()) do
+				local att = node:GetObject();
 				if att.Name == addStageSpawn then
 					att:SetAttribute("Enabled", true);
 				end
@@ -782,11 +917,11 @@ function Raid:Start()
 			local platformName = new:GetAttribute("AddSpawnPlatforms");
 			if platformName == nil then return end;
 			
-			for platformPart, platformInfo in pairs(self.SpawnPlatforms) do
-				if platformInfo.PlatformGroup == platformName then
-					platformInfo.Enabled = true;
-				end
-			end
+			-- for platformPart, platformInfo in pairs(self.SpawnPlatforms) do
+			-- 	if platformInfo.PlatformGroup == platformName then
+			-- 		platformInfo.Enabled = true;
+			-- 	end
+			-- end
 		end)
 
 		destructible.OnDestroy:Connect(function(reasonData)
@@ -808,69 +943,22 @@ function Raid:Start()
 				end
 			end
 
-			local hordeTimerDeduction = math.random(Config.HordeTimerDeduction.Min, Config.HordeTimerDeduction.Max);
-			shared.WorldCore.HordeTimer = shared.WorldCore.HordeTimer - hordeTimerDeduction;
+			local hordeTimerDeduction = math.random(
+				self.Objective.HordeTimerDeduction.Min, 
+				self.Objective.HordeTimerDeduction.Max
+			);
+			shared.gameConfig.HordeTimer = shared.gameConfig.HordeTimer - hordeTimerDeduction;
 		end)
 		
 		table.insert(destructibleObjs, destructible);
 	end
 
-
-	for _, att in pairs(self.HiddenSpawns) do
+	for _, node in ipairs(self.HiddenSpawns:GetAllNodes()) do
+		local att = node:GetObject();
 		att:SetAttribute("Enabled", att.Name == "HiddenSpawn");
 	end
 
-	local spawnPlatformCount = 0;
-	for spawnPart, spawnInfo in pairs(self.SpawnPlatforms) do
-		spawnInfo.SpawnedAmbientZombies = nil;
-		spawnPlatformCount = spawnPlatformCount +1;
-		
-		if spawnInfo.PlatformGroup then
-			spawnInfo.Enabled = false;
-		end
-	end
-	
-	-- MARK: Initializing Config;
-	Debugger:StudioLog(`Initialize Raid Config`, self.Objective);
-	if self.Objective.MaxSpawnCount then
-		Config.MaxSpawnCount = self.Objective.MaxSpawnCount;
-	end
-	if self.Objective.MinSpawnCount then
-		Config.MinSpawnCount = self.Objective.MinSpawnCount;
-	end
-	if self.Objective.EnemyCap then
-		Config.EnemyCap = self.Objective.EnemyCap;
-	end
-	if self.Objective.SpawnPlatformRadius then
-		Config.SpawnPlatformRadius = self.Objective.SpawnPlatformRadius
-	end
-	if self.Objective.HordeCycle then
-		Config.HordeCycle = self.Objective.HordeCycle;
-	end
-	if self.Objective.HordeSpawnRate then
-		Config.HordeSpawnRate = self.Objective.HordeSpawnRate;
-	end
-	if self.Objective.HordeWhenEnemiesDropsBelow then
-		Config.HordeWhenEnemiesDropsBelow = self.Objective.HordeWhenEnemiesDropsBelow;
-	end
-	if self.Objective.HordeTimerDeduction then
-		Config.HordeTimerDeduction = self.Objective.HordeTimerDeduction;
-	end
-
-	local minTotalZombieCount = spawnPlatformCount * Config.MinSpawnCount;
-	
-	self.EliminateCount = 0;
-	self.EliminateGoal = math.min(Config.EnemyCap, math.max(1, math.floor(minTotalZombieCount*0.98)));
-
-	if self.Objective.EliminateGoal then
-		self.EliminateGoal = self.Objective.EliminateGoal;
-	end
-
-	if self.Objective.Id == "Eliminate" then
-		
-	end
-
-	shared.WorldCore.HordeTimer = tick()+Config.HordeCycle;
+	shared.gameConfig.HordeTimer = tick() + self.Objective.HordeCycle;
 
 	for a=5, 1, -1 do
 		self:Hud({
@@ -890,76 +978,24 @@ function Raid:Start()
 
 	self.Status = EnumStatus.InProgress;
 
-	self.ObjectiveStatusText = `Eliminate {self.EliminateGoal} enemies`;
-	self:Hud({
-		Status=self.ObjectiveStatusText;
-	})
-end
+	self.EliminateCount = 0;
+	local minTotalZombieCount = self.SpawnChunkCount * self.SpawnsPerChunk.Max;
+	self.EliminateGoal = math.min(self.Objective.EnemyCap, math.max(1, math.floor(minTotalZombieCount*0.98)));
 
-local spawnCfCaches = {};
-function Raid:LoadSpawnPlatform(spawnPart)
-	local spawnPlatformInfo = self.SpawnPlatforms[spawnPart];
-	
-	if spawnPlatformInfo == nil and spawnPlatformInfo.Enabled ~= true then return end;
+	if self.Objective.EliminateGoal then
+		self.EliminateGoal = self.Objective.EliminateGoal;
+	end
 
-	if spawnPlatformInfo.Load ~= nil then return end;
-	spawnPlatformInfo.Load = 1;
-	
-	task.spawn(function()
-		local platformTopCf = spawnPart.CFrame * CFrame.new(0, (spawnPart.Size.Y/2) +0.3, 0);
-
-		local worldSpaceSize = spawnPart.CFrame:vectorToWorldSpace(spawnPart.Size * Vector3.new(0.9, 1, 0.9));
-		worldSpaceSize = Vector3.new(math.abs(worldSpaceSize.X), math.abs(worldSpaceSize.Y), math.abs(worldSpaceSize.Z));
-
-		local protoTypeId = spawnPlatformInfo.Name;
-		local cacheSpawns = spawnCfCaches[protoTypeId];
-
-		if cacheSpawns == nil then
-			local loopCount = 0;
-			local newSpawnCFrame;
-
-			local maxSpawns = math.ceil((worldSpaceSize.X * worldSpaceSize.Z)/512)+4; --16;
-			if RunService:IsStudio() then
-				Debugger:Warn("[Studio] LoadSpawnPlatform maxSpawns", maxSpawns);
-			end
-
-			while newSpawnCFrame == nil do
-				newSpawnCFrame = platformTopCf * CFrame.new(
-					math.random((-worldSpaceSize.X/2) *100, (worldSpaceSize.X/2) *100)/100, 
-					0, 
-					math.random((-worldSpaceSize.Z/2) *100, (worldSpaceSize.Z/2) *100)/100
-				);
-
-				--self.Path:ComputeAsync(newSpawnCFrame.Position, platformTopCf.Position);
-				--if self.Path.Status == Enum.PathStatus.Success then
-				--end
-				table.insert(spawnPlatformInfo.Spawns, newSpawnCFrame);
-				
-				newSpawnCFrame = nil;
-
-				if #spawnPlatformInfo.Spawns >= maxSpawns then
-					break;
-				end
-				loopCount = loopCount + 1;
-				--Debugger:Warn(protoTypeId,"loopCount", loopCount, math.round((tick()-loadTimelapsed) * 1000)/1000);
-				if loopCount > maxSpawns+4 then break end;
-			end
-
-			cacheSpawns = {};
-			for a=1, #spawnPlatformInfo.Spawns do
-				table.insert(cacheSpawns, platformTopCf:ToObjectSpace(spawnPlatformInfo.Spawns[a]));
-			end
-			spawnCfCaches[protoTypeId] = cacheSpawns;
-
-		else
-			for a=1, #cacheSpawns do
-				table.insert(spawnPlatformInfo.Spawns, platformTopCf * cacheSpawns[a]);
-			end
-
-		end
+	if self.Objective.Id == "Eliminate" then
+		self.StatusText = `Eliminate {self.EliminateGoal} enemies`;
 		
-		spawnPlatformInfo.Load = 2;
-	end)
+	elseif self.Objective.Id == "Objective" then
+
+	end
+	
+	self:Hud({
+		Status = self.StatusText;
+	});
 end
 
 function Raid:Restart()
@@ -1009,8 +1045,6 @@ function Raid:Initialize(roomData)
 	local raidTeam: TeamClass = modTeamsManager.newTeam(nil, "RaidTeam");
 	raidTeam.Type = "Game";
 
-	local wlInstances = {};
-
     shared.modEngineCore:ConnectOnPlayerAdded(script, function(player: Player)
 		local playerName = player.Name;
 
@@ -1038,83 +1072,78 @@ function Raid:Initialize(roomData)
 			clearCharacter(character);
 			table.insert(self.Characters, character);
 
-			local rootPart = playerClass.RootPart;
-
 			activeLoop = true;
 			while activeLoop do
 				if self.Status ~= EnumStatus.InProgress then
-					task.wait(3);
+					task.wait(1);
 					continue;
 				end;
 
-				if #wlInstances <= 0 then
-					for part, _ in pairs(self.SpawnPlatforms) do
-						table.insert(wlInstances, part);
-					end
-					
-					platformParam.FilterDescendantsInstances = wlInstances;
-				end
+				local playerPosition = playerClass:GetCFrame().Position;
 
-				local hitList = workspace:GetPartBoundsInRadius(
-					rootPart.Position, 
-					Config.SpawnPlatformRadius, 
-					platformParam
+				local chunksList = self.SpawnChunks.Octree:RadiusSearch(
+					playerPosition, 
+					shared.gameConfig.SpawnActivateRadius or 128
 				);
+				local chunkAccessed = 0;
+				local maxChunkAccess = 5;
+
+				local sortedChunks = {};
+				for a=1, #chunksList do
+					local chunk = chunksList[a];
+
+					chunk.LastTouched = tick();
+					if chunk.Position == nil then continue end;
+					
+					local dist = modVector.DistanceSqrdXZ(playerPosition, chunk.Position);
+					local floor = math.abs(playerPosition.Y-chunk.Position.Y)^2 *3;
+
+					table.insert(sortedChunks, {
+						Chunk = chunk;
+						Dist = dist;
+						Floor = floor;
+					})
+				end
+				table.sort(sortedChunks, function(a, b)
+					return (a.Dist + a.Floor) < (b.Dist + b.Floor);
+				end)
 				
-				for a=1, #hitList do
-					local spawnPlatformPart = hitList[a];
+				for _, sortData in ipairs(sortedChunks) do
+					local chunk = sortData.Chunk;
 
-					self:LoadSpawnPlatform(spawnPlatformPart);
+					if table.find(ActiveChunks, chunk) then continue end;
+					table.insert(ActiveChunks, chunk);
+					
+					chunkAccessed += 1;
 
-					local spawnPlatformInfo = self.SpawnPlatforms[spawnPlatformPart];
-					if spawnPlatformInfo == nil or spawnPlatformInfo.Enabled ~= true then continue end;
-
-					if spawnPlatformInfo.Load ~= 2 or spawnPlatformInfo.SpawnedAmbientZombies == true then continue end;
-					spawnPlatformInfo.SpawnedAmbientZombies = true;
-
+					local pickPoints = {};
 					local numToSpawn = math.min(
-						math.random(Config.MinSpawnCount, Config.MaxSpawnCount), 
-						#spawnPlatformInfo.Spawns
+						math.random(self.SpawnsPerChunk.Min, self.SpawnsPerChunk.Max), 
+						#chunk.Points
 					);
-					for a=1, numToSpawn do
-						local spawnCf = spawnPlatformInfo.Spawns[a] * CFrame.new(0, 1, 0) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
-						
-						if #self.EnemyClassInstances <= Config.EnemyCap then
-							--MARK: Platform spawn
-							self:SpawnEnemy(self:PickEnemy(), {
-								SpawnCFrame = spawnCf;
-							});
-							continue;
+					for a=1, numToSpawn*2 do
+						local pickPoint = chunk.Points[math.random(1, #chunk.Points)];
+						if pickPoint == nil then break; end;
+						if table.find(pickPoints, pickPoint) == nil then
+							table.insert(pickPoints, pickPoint);
 						end
+						if #pickPoints >= numToSpawn then break; end;
+					end
 
-						for a=1, 4 do
-							local chosenNpcClass;
-							
-							for b=1, 3 do
-								chosenNpcClass = self.EnemyClassInstances[math.random(1, #self.EnemyClassInstances)]
-								if chosenNpcClass.Properties.BasicEnemy == true then break; end;
-							end
-							
-							if chosenNpcClass.Properties.BasicEnemy ~= true then continue end;
-							if chosenNpcClass.RootPart == nil then continue end;
+					if #pickPoints > 0 then
+						for a=1, #pickPoints do
+							local spawnPoint: Vector3 = pickPoints[a];
+							local newSpawnCf: CFrame = CFrame.new(spawnPoint) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
 
-							local tooClose = false;
-							for _, player in pairs(game.Players:GetPlayers()) do
-								if player:DistanceFromCharacter(chosenNpcClass.RootPart.Position) <= 128 then
-									tooClose = true;
-									break;
-								end
-							end
-							
-							if not tooClose then
-								chosenNpcClass.Target = nil;
-								chosenNpcClass.RootPart.CFrame = spawnCf;
-							end
+							self:SpawnEnemy(self:PickEnemy(), {
+								SpawnCFrame = newSpawnCf;
+								Chunk = chunk;
+							});
 						end
 					end
 				end
 				
-				task.wait(1);
+				task.wait(0.1);
 			end
 		end)
 
@@ -1169,9 +1198,9 @@ function Raid:Initialize(roomData)
 	
 	shared.modEventService:OnInvoked("Doors_BindDoorToggle", function(eventPacket: EventPacket, ...)
 		local doorInstance: DoorInstance = ...;
-		if doorInstance == nil or doorInstance.Raided == true then return end;
+		if doorInstance == nil or doorInstance.Values.Raided == true then return end;
 		
-		doorInstance.Raided = true;
+		doorInstance.Values.Raided = true;
 		self.DoorsOpened = self.DoorsOpened +1;
 		self:BeginCount();
 		
@@ -1181,10 +1210,13 @@ function Raid:Initialize(roomData)
 			"Inform"
 		);
 		
-		local hordeTimerDeduction = math.random(Config.HordeTimerDeduction.Min, Config.HordeTimerDeduction.Max);
-		shared.WorldCore.HordeTimer = shared.WorldCore.HordeTimer - hordeTimerDeduction;
-		if doorInstance.TriggerHorde == true then
-			shared.WorldCore.HordeTimer = tick();
+		local hordeTimerDeduction = math.random(
+			self.Objective.HordeTimerDeduction.Min, 
+			self.Objective.HordeTimerDeduction.Max
+		);
+		shared.gameConfig.HordeTimer = shared.gameConfig.HordeTimer - hordeTimerDeduction;
+		if doorInstance.Values.TriggerHorde == true then
+			shared.gameConfig.HordeTimer = tick();
 		end
 
 		local nearbyNpcClasses = shared.modNpcs.listInRange(doorInstance.Model:GetPivot().Position, 32, 16);
@@ -1198,99 +1230,91 @@ function Raid:Initialize(roomData)
 
 	self:Start();
 	
-	local lastHordeScream = tick();
 	task.spawn(function()
 		while true do
 			while self.Status ~= EnumStatus.InProgress do task.wait() end;
 			repeat
-				wait(1);
+				task.wait(1);
 
-				if Config.HordeWhenEnemiesDropsBelow and #self.EnemyClassInstances <= Config.HordeWhenEnemiesDropsBelow and self.DoorsOpened >= math.floor(#self.Doors * 0.88) then
-					shared.WorldCore.HordeTimer = tick();
+				if self.Objective.HordeWhenEnemiesDropsBelow 
+				and #self.EnemyClassInstances <= self.Objective.HordeWhenEnemiesDropsBelow 
+				and self.DoorsOpened >= math.floor(#self.Doors * 0.88) then
+					shared.gameConfig.HordeTimer = tick();
 				end
 				
 				if RunService:IsStudio() then
 					Debugger:Display{
-						["Studio HordeTimer"]=math.ceil((shared.WorldCore.HordeTimer -tick()));
+						["Studio HordeTimer"]=math.ceil((shared.gameConfig.HordeTimer -tick()));
+						["EliminateGoal"] = self.EliminateGoal or "~";
+						["EliminateCount"] = self.EliminateCount or "~";
+						["LiveEnemies"] = #self.EnemyClassInstances;
 					}
 				end
-			until tick() >= shared.WorldCore.HordeTimer;
+			until tick() >= shared.gameConfig.HordeTimer;
 			--
 			while self.Status ~= EnumStatus.InProgress do task.wait(1) end;
 
-			if tick()-lastHordeScream > 180 then
-				lastHordeScream = tick();
-				modAudio.Play("HordeGrowl", workspace).PlaybackSpeed = math.random(90,110)/100;
-			end
+			modAudio.Play("HordeGrowl", workspace).PlaybackSpeed = math.random(90,110)/100;
 			self.Wave = self.Wave +1;
+
+			for a=1, #self.Characters do
+				task.spawn(function()
+					shared.modNpcs.attractNpcs(self.Characters[a], 128);
+				end)
+			end
+            
 			
 			local hordeZombieCount = #self.Characters * 25;
-			hordeZombieCount = math.max(math.min(hordeZombieCount, Config.EnemyCap-#self.EnemyClassInstances), 0);
-			
+			while hordeZombieCount > 0 and self.Status == EnumStatus.InProgress do
+				local targetChar = self.Characters[math.random(1, #self.Characters)];
+				local characterPosition = targetChar:GetPivot().Position;
 
-			if hordeZombieCount > 0 and self.EliminateCount < self.EliminateGoal then
-				for a=1, hordeZombieCount do
-					
-					local validSpawns = {};
-					for c=1, #self.HiddenSpawns do
-						if self.HiddenSpawns[c]:GetAttribute("Enabled") then
-							table.insert(validSpawns, self.HiddenSpawns[c]);
-						end
-					end
+				local spawnAttsInRange = self.HiddenSpawns:RadiusSearch(characterPosition, 192);
 
-					if #validSpawns <= 0 then break; end;
-					if self.EliminateCount > self.EliminateGoal then break end;
-
-					local closestAtt, closestDist = nil, math.huge;
-					if #self.Characters > 0 then
-						local targetChar = self.Characters[math.random(1, #self.Characters)];
-						local charCFrame = targetChar:GetPivot();
-						local player = game.Players:GetPlayerFromCharacter(targetChar);
-						
-	
-						for b=1, 5 do
-							if #validSpawns <= 0 then break end;
-	
-							local spawnAtt = table.remove(validSpawns, math.random(1, #validSpawns));
-							local dist = player:DistanceFromCharacter(spawnAtt.WorldCFrame.Position);
-	
-							if charCFrame.Y > spawnAtt.WorldCFrame.Y+8 then
-								dist = dist + 50;
-							end
-	
-							if dist < closestDist then
-								closestAtt = spawnAtt;
-								closestDist = dist;
-							end
-						end
-
-					else
-						closestAtt = table.remove(validSpawns, math.random(1, #validSpawns));
-
-					end
-
-					if closestAtt then
-						--MARK: Horde spawn
-						self:SpawnEnemy(self:PickEnemy({IsHordeWave=true;}), {
-							SpawnCFrame = closestAtt.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
-							InfTargeting = true;
-							HordeAggression = true;
+				local validSpawnAtts = {};
+				for a=1, #spawnAttsInRange do
+					local spawnAtt = spawnAttsInRange[a];
+					if spawnAtt:GetAttribute("Enabled") then
+						local dist2 = modVector.DistanceSqrdXZ(spawnAtt.WorldCFrame.Position, characterPosition);
+						local floor = math.abs(spawnAtt.WorldCFrame.Position.Y-characterPosition.Y)^2 *3;
+						table.insert(validSpawnAtts, {
+							Att = spawnAtt;
+							Dist2 = dist2 + floor;
 						});
-						
-						task.wait(Config.HordeSpawnRate or 0.5);
 					end
-					
 				end
+				table.sort(validSpawnAtts, function(a, b)
+					return a.Dist2 < b.Dist2;
+				end)
+
+				if #validSpawnAtts <= 0 then
+					task.wait(1);
+					continue;
+				end
+
+				local pickSpawnAtt = validSpawnAtts[1].Att;
+				if #validSpawnAtts > 1 then
+					pickSpawnAtt = validSpawnAtts[math.random(1, math.min(#validSpawnAtts, 3))].Att;
+				end
+
+				local spawnCf = pickSpawnAtt.WorldCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
+				self:SpawnEnemy(self:PickEnemy({IsHordeWave=true;}), {
+					SpawnCFrame = spawnCf;
+					InfTargeting = true;
+				});
 				
+				task.wait(self.Objective.HordeSpawnRate or 0.5);
+				hordeZombieCount -= 1;
 			end
+
 			
 			--
 			local hordeCycle = math.random(150, 200);
-			if Config.HordeCycle then
-				hordeCycle = Config.HordeCycle;
+			if self.Objective.HordeCycle then
+				hordeCycle = self.Objective.HordeCycle;
 			end
 
-			shared.WorldCore.HordeTimer = tick()+hordeCycle;
+			shared.gameConfig.HordeTimer = tick()+hordeCycle;
 		end
 	end)
 end
@@ -1299,25 +1323,37 @@ function Raid:Hud(data)
 	if not self.Loaded then return end;
 	data = data or {};
 	
-	if self.HudValues == nil then
-		self.HudValues = {};
+	if data.HeaderText then
+		self.HeaderText = data.HeaderText;
 	end
-	
+	if data.StatusText then
+		self.StatusText = data.StatusText;
+	end
+	if data.RaidMarker then
+		self.RaidMarker = data.RaidMarker;
+	end
+	if data.HookEntity then
+		self.HookEntity = data.HookEntity;
+	end
+
 	remoteGameModeHud:FireAllClients({
-		Action="Open";
-		Type=self.ModeType;
-		Stage=self.ModeStage;
-		Header=data.Header or `Elimination`; --modBranchConfigs.GetWorldDisplayName(self.StageLib.WorldId)
-		Status=data.Status or "";
-		IsHard=self.IsHard;
+		Action = "Open";
+		Type = self.ModeType;
+		Stage = self.ModeStage;
+		Header = self.HeaderText or `Elimination`;
+		Status = self.StatusText or "";
+		IsHard = self.IsHard;
 		
-		HookEntity=data.HookEntity or false;
 		
-		LootPrefab=self.LootPrefab;
-		PlayMusic=data.PlayMusic;
+		LootPrefab = self.LootPrefab;
+		PlayMusic = data.PlayMusic;
+		EndStageSound = data.EndStageSound;
 
 		StopwatchTick = self.StopwatchTick;
 		StopwatchFinal = self.StopwatchFinal;
+
+		HookEntity = self.HookEntity or false;
+		RaidMarker = self.RaidMarker or false;
 	});
 end
 

@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local MissionFunctions = {};
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local MISSION_ID = 78;
 if RunService:IsServer() then
@@ -12,7 +12,7 @@ if RunService:IsServer() then
 	function MissionFunctions.Init(missionProfile, mission)
 		local player: Player = missionProfile.Player;
 
-        if not modBranchConfigs.IsWorld("Safehome") then
+        if not modBranchConfigurations.IsWorld("Safehome") then
             local function OnChanged(firstRun)
                 if mission.Type == 2 then -- OnAvailable
     

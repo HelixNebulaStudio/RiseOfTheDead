@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modEntity = shared.require(game.ReplicatedStorage.Library.Entity);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
@@ -24,7 +24,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	--if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	--if not modBranchConfigurations.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	local modClothingLibrary = shared.require(game.ReplicatedStorage.Library.ClothingLibrary);
 
 	local patrolBandit: NpcClass;
@@ -38,11 +38,11 @@ return function(CutsceneSequence)
 		modStorage.RegisterItemName("Stan's Blood Samples Report #4");
 	end
 	
-	if RunService:IsServer() and modBranchConfigs.IsWorld("MedicalBreakthrough") then
+	if RunService:IsServer() and modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 		local jerCan = script:WaitForChild("JerryCan");
 		jerCan.Parent = workspace.Interactables;
 		
-		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			local playerClass: PlayerClass = shared.modPlayers.get(player);
@@ -384,13 +384,13 @@ return function(CutsceneSequence)
 				inventory:Remove(storageItemId);
 				modMission:FailMission(player, MISSION_ID, "Stan's blood samples were destroyed.");
 
-				if modBranchConfigs.IsWorld("MedicalBreakthrough") then
+				if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 					modServerManager:Travel(player, profile.PreviousWorldName);
 				end
 			end
 		end)
 
-		if modBranchConfigs.IsWorld("MedicalBreakthrough") then
+		if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 			local generatorPoint = workspace:WaitForChild("CutscenePoints"):WaitForChild("Generator");
 			local generatorLights = workspace:WaitForChild("Generator"):WaitForChild("Lights"):GetChildren();
 
@@ -403,7 +403,7 @@ return function(CutsceneSequence)
 				modServerManager:Travel(player, profile.PreviousWorldName);
 			end)
 			
-			shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
+			shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
 				local player: Player? = eventPacket.Player;
 				if player == nil then return end;
 				
@@ -474,7 +474,7 @@ return function(CutsceneSequence)
 
 				end
 				
-				if not (stage >= 3 and modBranchConfigs.IsWorld("MedicalBreakthrough")) then
+				if not (stage >= 3 and modBranchConfigurations.IsWorld("MedicalBreakthrough")) then
 					return;
 				end
 				
@@ -761,7 +761,7 @@ return function(CutsceneSequence)
 		mission.OnChanged:Connect(OnChanged);
 		OnChanged(true);
 		
-		if modBranchConfigs.IsWorld("MedicalBreakthrough") then
+		if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 			CutsceneSequence:NextScene("enableInterfaces");
 		end
 	end)

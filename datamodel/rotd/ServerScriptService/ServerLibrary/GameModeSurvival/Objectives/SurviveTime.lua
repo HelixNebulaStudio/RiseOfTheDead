@@ -4,6 +4,7 @@ local Objective = {};
 Objective.__index = Objective;
 
 Objective.Title = "Time Survival";
+Objective.Description = "Survive the duration";
 
 Objective.Controller = nil;
 --==

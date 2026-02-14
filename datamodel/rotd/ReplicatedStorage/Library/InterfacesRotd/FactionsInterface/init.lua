@@ -10,7 +10,7 @@ local localPlayer = game.Players.LocalPlayer;
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.LeaderboardService);
@@ -67,7 +67,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
-	local branchColor = modBranchConfigs.BranchColor
+	local branchColor = modBranchConfigurations.BranchColor
 	local colorPickerObj = interface.ColorPicker;
 	
 	local windowFrame = script:WaitForChild("FactionsMenu"):Clone();
@@ -1819,7 +1819,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end
 
-	if modBranchConfigs.IsWorld("Safehome") then
+	if modBranchConfigurations.IsWorld("Safehome") then
 		interface.Garbage:Tag(workspace:GetAttributeChangedSignal("SafehomeMap"):Connect(loadHqCustomizations))
 	end
 	

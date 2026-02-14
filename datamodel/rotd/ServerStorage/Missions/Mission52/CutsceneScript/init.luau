@@ -4,7 +4,7 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
@@ -17,7 +17,7 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	if modBranchConfigs.IsWorld("TheInvestigation") then
+	if modBranchConfigurations.IsWorld("TheInvestigation") then
 		shared.modEventService:OnInvoked("Interactables_BindButtonInteract", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -41,7 +41,7 @@ if RunService:IsServer() then
 		end)
 		
 
-	elseif modBranchConfigs.IsWorld("TheMall") then
+	elseif modBranchConfigurations.IsWorld("TheMall") then
 		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -69,7 +69,7 @@ return function(CutsceneSequence)
 	local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
 	local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");
 	
-	if modBranchConfigs.IsWorld("TheResidentials") then
+	if modBranchConfigurations.IsWorld("TheResidentials") then
 		-- MARK: TheResidentials
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -135,7 +135,7 @@ return function(CutsceneSequence)
 		end)
 
 
-	elseif modBranchConfigs.IsWorld("TheInvestigation") then
+	elseif modBranchConfigurations.IsWorld("TheInvestigation") then
 		-- MARK: TheInvestigation
 		local waterBarrels = workspace.Environment:WaitForChild("CutsceneBarrels");
 		local cutsceneWallDestroy = workspace.Environment:WaitForChild("cutsceneWallDestroy");
@@ -844,7 +844,7 @@ return function(CutsceneSequence)
 
 
 
-	elseif modBranchConfigs.IsWorld("TheMall") then
+	elseif modBranchConfigurations.IsWorld("TheMall") then
 		-- MARK: TheMall
 	
 		CutsceneSequence:Initialize(function()

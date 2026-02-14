@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService");
 
 local RotdCore = {};
 --==
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("BranchConfigurationsRotd"));
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManagerRotd);
 local modOnEventsHandlers = shared.require(game.ReplicatedStorage.Library.OnEventHandlersRotd);
 local modPlayers = shared.require(game.ReplicatedStorage.Library.PlayersRotd);

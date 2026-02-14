@@ -7,6 +7,7 @@ Objective.__index = Objective;
 Objective.DifficultyModes = {Easy=false;};
 
 Objective.Title = "Oily";
+Objective.Description = "Oily causes chaos";
 
 Objective.Controller = nil;
 --==

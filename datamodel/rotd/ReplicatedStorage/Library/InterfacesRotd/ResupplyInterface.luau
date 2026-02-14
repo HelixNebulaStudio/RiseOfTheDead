@@ -6,7 +6,7 @@ local localPlayer = game.Players.LocalPlayer;
 
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modShopLibrary = shared.require(game.ReplicatedStorage.Library.RatShopLibrary);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -20,7 +20,7 @@ local interfacePackage = {
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
     local remoteShopService = modRemotesManager:Get("ShopService");
-    local branchColor = modBranchConfigs.BranchColor;
+    local branchColor = modBranchConfigurations.BranchColor;
 
 	local mainFrame = script:WaitForChild("ResupplyStation"):Clone();
 	mainFrame.Parent = interface.ScreenGui;

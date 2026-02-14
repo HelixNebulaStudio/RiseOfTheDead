@@ -9,7 +9,7 @@ local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("Global
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modGoldShopLibrary = shared.require(game.ReplicatedStorage.Library.GoldShopLibrary);
@@ -146,13 +146,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		--== headlines
 		local headlineList = {};
 		
-		if modBranchConfigs.Wanderer ~= nil then
-			local npcProfileLib = modNpcProfileLibrary:Find(modBranchConfigs.Wanderer.Name);
+		if modBranchConfigurations.Wanderer ~= nil then
+			local npcProfileLib = modNpcProfileLibrary:Find(modBranchConfigurations.Wanderer.Name);
 			
 			local str = "Wanderer ".. npcProfileLib.Class 
 				..", <b><font color='#".. modNpcProfileLibrary.ClassColors[npcProfileLib.Class]:ToHex()
-				.."'>".. modBranchConfigs.Wanderer.Name 
-				.."</font></b>, was recently spotted in <b>".. modBranchConfigs.GetWorldDisplayName(modBranchConfigs.Wanderer.WorldId)
+				.."'>".. modBranchConfigurations.Wanderer.Name 
+				.."</font></b>, was recently spotted in <b>".. modBranchConfigurations.GetWorldDisplayName(modBranchConfigurations.Wanderer.WorldId)
 				.."</b>."
 			table.insert(headlineList, str);
 		end
@@ -217,7 +217,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		elseif requestType == "wandererrequest" then
 			local wanderer = ...;
 			if wanderer ~= nil then
-				modBranchConfigs.Wanderer = wanderer;
+				modBranchConfigurations.Wanderer = wanderer;
 			end
 			
 		elseif requestType == "topdonorrequest" then

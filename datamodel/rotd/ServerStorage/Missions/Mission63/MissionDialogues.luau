@@ -122,7 +122,7 @@ Dialogues.Zark.DialogueStrings = {
 
 
 if RunService:IsServer() then
-	local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+	local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
 	
@@ -190,7 +190,7 @@ if RunService:IsServer() then
 	Dialogues.Loran.DialogueHandler = function(player, dialog, data, mission)
 		local stage = mission.ProgressionPoint;
 	
-		if modBranchConfigs.IsWorld("BanditsRecruitment") then
+		if modBranchConfigurations.IsWorld("BanditsRecruitment") then
 			if mission.Type == 1 then -- Active
 				if stage == 5 then
 					
@@ -206,7 +206,7 @@ if RunService:IsServer() then
 				end
 			end
 			
-		elseif modBranchConfigs.IsWorld("TheMall") then
+		elseif modBranchConfigurations.IsWorld("TheMall") then
 			if mission.Type == 1 then -- Active
 				if stage == 12 then
 					dialog:SetInitiate("What took you so long?");
@@ -239,7 +239,7 @@ if RunService:IsServer() then
 	
 
 	-- MARK: Zark Handler
-	if modBranchConfigs.IsWorld("BanditsRecruitment") then
+	if modBranchConfigurations.IsWorld("BanditsRecruitment") then
 		Dialogues.Zark.DialogueHandler = function(player, dialog, data, mission)
 			local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 

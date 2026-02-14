@@ -2,13 +2,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local MISSION_ID = 44;
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
-	-- modBranchConfigs.IsWorld("TheMall")
+	-- modBranchConfigurations.IsWorld("TheMall")
 	
 	function MissionLogic.Init(missionProfile, mission)
 		local player: Player = missionProfile.Player;

@@ -37,15 +37,20 @@ return function(interface: InterfaceInstance, window, frame)
 		local descLabel = data.Status or ``;
 
 		if self.Soundtrack == nil then
-			modAudio.Preload(stageLib.Soundtrack, 5);
-			self.Soundtrack = modAudio.Play(stageLib.Soundtrack, script.Parent);
-			if self.Soundtrack then
-				self.Soundtrack.Volume = 0;
-			end
+			task.spawn(function() 
+				modAudio.Preload(stageLib.Soundtrack, 5);
+				self.Soundtrack = modAudio.Play(stageLib.Soundtrack, script.Parent);
+				if self.Soundtrack then
+					self.Soundtrack.Volume = 0;
+				end
+			end)
 		end
 
 		if data.NextStageSound == true then
-			modAudio.Play("MissionUpdated");
+			task.spawn(function() 
+				modAudio.Preload("MissionUpdated", 5);
+				modAudio.Play("MissionUpdated");
+			end)
 		end
 
 		if data.PlayMusic == true and not self.IsPlaying then

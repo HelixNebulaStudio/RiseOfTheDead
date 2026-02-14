@@ -7,7 +7,7 @@ local UserInputService = game:GetService("UserInputService");
 local localPlayer = game.Players.LocalPlayer;
 
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local interfacePackage = {
     Type = "Character";
@@ -17,7 +17,7 @@ local interfacePackage = {
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local socialMenuWindow: InterfaceWindow;
 
-    local branchColor = modBranchConfigs.BranchColor;
+    local branchColor = modBranchConfigurations.BranchColor;
 
     local mailboxFrame = script:WaitForChild("MailboxFrame"):Clone();
     mailboxFrame.Parent = interface.ScreenGui;

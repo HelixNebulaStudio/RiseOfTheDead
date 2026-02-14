@@ -57,7 +57,7 @@ function TilePrototypePackage:Start(player)
 		voxelPoint:SetTraversable(gateAxis, true);
 	end
 	
-	local specialSpawn = script.Parent.SpecialSpawn:WaitForChild("SpawnPoint");
+	local specialSpawn = script.Parent.SpecialSpawn:WaitForChild("RewardSpawn");
 	
 	local miniBossName = "Jaws";
 	local npcClass: NpcClass = shared.modNpcs.spawn2{

@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 
 local MISSION_ID = 32;
@@ -12,7 +12,7 @@ local MissionLogic = {};
 if RunService:IsServer() then
     local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-    if modBranchConfigs.IsWorld("EasterButchery") then
+    if modBranchConfigurations.IsWorld("EasterButchery") then
         shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
             local player: Player? = eventPacket.Player;
             if player == nil then return end;

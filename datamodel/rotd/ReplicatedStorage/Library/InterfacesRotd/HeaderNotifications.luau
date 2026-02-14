@@ -8,7 +8,7 @@ local localPlayer = game.Players.LocalPlayer;
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local interfacePackage = {
     Type = "Player";
@@ -16,7 +16,7 @@ local interfacePackage = {
 --==
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
-    local branchColor = modBranchConfigs.BranchColor;
+    local branchColor = modBranchConfigurations.BranchColor;
     local remoteHudNotification = modRemotesManager:Get("HudNotification");
     
     local frame: Frame = Instance.new("Frame");

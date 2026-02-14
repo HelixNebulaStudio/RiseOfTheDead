@@ -2,7 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modTouchHandler = shared.require(game.ReplicatedStorage.Library.TouchHandler);
 local modHealthComponents = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
@@ -26,17 +25,14 @@ function WorldCore.InitGameController()
     newGameController.ModeStage = GAME_STAGE;
 
     newGameController.Objective = {
-        Id="Eliminate";
-        EliminateGoal=100;
-        
-        SpawnPlatformRadius=64;
-        EnemyCap=35;
-        MinSpawnCount=6;
-        MaxSpawnCount=12;
-        
-        HordeWhenEnemiesDropsBelow=4;
-        HordeCycle=300;
-        HordeSpawnRate=0.5;
+        Id = "Eliminate";
+        EliminateGoal = 100;
+        EnemyCap = 35;
+
+        HordeWhenEnemiesDropsBelow = 4;
+        HordeCycle = 300;
+        HordeSpawnRate = 0.5;
+        HordeTimerDeduction = NumberRange.new(25, 35);
     };
 
     newGameController.EnemiesList = {

@@ -1,7 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);

@@ -6,7 +6,7 @@ local modNpcComponent = shared.require(game.ServerScriptService.ServerLibrary.En
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 -- Note; Function called for each zombie before zombie parented to workspace;
 return function(npc, spawnPoint)
@@ -16,7 +16,7 @@ return function(npc, spawnPoint)
 		Head = npc:WaitForChild("Head");
 		Humanoid = npc:WaitForChild("Bandit");
 		RootPart = npc.PrimaryPart;
-		SpawnPoint = spawnPoint; -- CFrame;
+		SpawnCFrame = spawnPoint; -- CFrame;
 		Smart = true;
 		
 		Properties = {

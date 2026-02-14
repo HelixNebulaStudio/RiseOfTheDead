@@ -4,6 +4,7 @@ local Objective = {};
 Objective.__index = Objective;
 
 Objective.Title = "Eliminate";
+Objective.Description = "Kill all enemies";
 
 Objective.Controller = nil;
 --==

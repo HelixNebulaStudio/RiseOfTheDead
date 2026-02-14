@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 --== Variables;
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 
 local modDatabaseService = shared.require(game.ServerScriptService.ServerLibrary.DatabaseService);
@@ -19,10 +19,10 @@ return function(player, dialog, data)
 	local npcData = safehomeData:GetNpc(npcName);	
 	local traderMem = modDatabaseService:GetDatabase(npcName);
 	
-	if modBranchConfigs.CurrentBranch.Name == "Dev" or player.UserId == 16170943 then
+	if shared.gameConfig.BranchName == "Dev" or player.UserId == 16170943 then
 		local reportDialog = {
 			Face="Skeptical";
-			Say=(modBranchConfigs.CurrentBranch.Name == "Dev" and "[Dev Branch]" or "[Dev]").." Status report";
+			Say=(shared.gameConfig.BranchName == "Dev" and "[Dev Branch]" or "[Dev]").." Status report";
 			Reply="Arr, what report?"
 		};
 
@@ -37,7 +37,7 @@ return function(player, dialog, data)
 		
 		local chatDialog = {
 			Face="Happy";
-			Say=(modBranchConfigs.CurrentBranch.Name == "Dev" and "[Dev Branch]" or "[Dev]").." Say Hello!";
+			Say=(shared.gameConfig.BranchName == "Dev" and "[Dev Branch]" or "[Dev]").." Say Hello!";
 			Reply="Ok?"
 		};
 		dialog:AddDialog(chatDialog, function(dialog)
@@ -49,7 +49,7 @@ return function(player, dialog, data)
 	local npcLevel = npcData.Level or 0;
 	local levelUpTimer = npcLevel * 60
 	
-	if modBranchConfigs.CurrentBranch.Name == "Dev" then
+	if shared.gameConfig.BranchName == "Dev" then
 		levelUpTimer = 10;
 		Debugger:StudioWarn("npcData", npcData);
 	end;

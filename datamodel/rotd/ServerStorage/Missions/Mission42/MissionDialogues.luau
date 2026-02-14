@@ -60,7 +60,7 @@ Dialogues.Victor.DialogueStrings = {
 if RunService:IsServer() then
 	-- MARK: Victor Handler
 	Dialogues.Victor.DialogueHandler = function(player, dialog, data, mission)
-		local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+		local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
 		if mission.Type == 2 then -- Available	
@@ -72,7 +72,7 @@ if RunService:IsServer() then
 			end)
 			
 		elseif mission.Type == 1 then -- Active;
-			if modBranchConfigs.IsWorld("TheWarehouse") then
+			if modBranchConfigurations.IsWorld("TheWarehouse") then
 				if mission.ProgressionPoint == 1 then
 					dialog:AddChoice("vt3_vttravel", function()
 						local npcModel = dialog.Prefab;
@@ -83,7 +83,7 @@ if RunService:IsServer() then
 
 					end);
 				end
-			elseif modBranchConfigs.IsWorld("VindictiveTreasure") then
+			elseif modBranchConfigurations.IsWorld("VindictiveTreasure") then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint <= 2 then
 						mission.ProgressionPoint = 2;

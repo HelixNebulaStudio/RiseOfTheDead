@@ -2,12 +2,10 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Script;
 local modDoors = shared.require(game.ReplicatedStorage.Entity.Doors);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
-local modPseudoRandom = shared.require(game.ReplicatedStorage.Library.PseudoRandom);
 
 local Component = {};
 Component.ClassName = "NpcComponent";
 Component.__index = Component;
-Component.BreakDoorRandom = modPseudoRandom.new();
 
 function Component.new(npcClass: NpcClass)
 	local self = {
@@ -43,32 +41,12 @@ function Component:__call(pathFindingLink: PathfindingLink, position: Vector3)
 		return;	
 	end
 
-	local interactable: InteractableInstance = modInteractables.getOrNew(interactConfig);
-	if interactable == nil then return end;
-	
-	local breakDoorChance = 0.1;
-
-	local hasPerm = interactable:HasPermissions("CanInteract", self.NpcClass.Name);
-	if hasPerm == false and properties.EnemyTargetData then
-		local enemyHealthComp = properties.EnemyTargetData.HealthComp;
-		local enemyNpcClass: NpcClass = enemyHealthComp and enemyHealthComp.CompOwner;
-		
-		if enemyNpcClass then
-			hasPerm = interactable:HasPermissions("CanInteract", enemyNpcClass.Name);
-		end
+	local obstacleHandler = self.NpcClass:GetComponent("MoveObstacleHandler");
+	if obstacleHandler then
+		obstacleHandler{
+			InteractConfig = interactConfig;
+		};
 	end
-	
-	local brokeDoor = self.BreakDoorRandom:PrdRandom(nil, breakDoorChance);
-	
-	self.NpcClass.PlayAnimation("WallSlam");
-
-	if not hasPerm or not brokeDoor then
-		doorInstance:PlaySlam(math.random(130,160)/100);
-		return;
-	end
-
-	doorInstance:PlaySlam();
-	doorInstance:Toggle(true, self.NpcClass:GetCFrame());
 end
 
 return Component;

@@ -1224,37 +1224,36 @@ MissionLibrary.New{
 
 -- MARK: 37 - Joseph's Lettuce
 MissionLibrary.New{
-	MissionId=37;
+	MissionId = 37;
 	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="Joseph's Lettuce";
-	From="Joseph";
-	Description="Help Joseph water his lettuce.";
-	Persistent=true;
-	World="TheResidentials";
-	Objectives={
+	Name = "Joseph's Lettuce";
+	From = "Joseph";
+	Description = "Help Joseph water his lettuce.";
+	Persistent = true;
+	World = "TheResidentials";
+	Objectives = {
 		["wateringcan"]={Index=1; Description="Make a watering can";};
 		["jlLettuce1"]={Index=2; Description="Water the plants";};
 		["jlLettuce2"]={Index=3; Description="Water the plants";};
 		["jlLettuce3"]={Index=4; Description="Water the plants";};
 	};
-	ObjectivesCompleteText="Return to Joseph";
-	SaveData={};
-	LogEntry={
+	ObjectivesCompleteText = "Return to Joseph";
+	SaveData = {};
+	LogEntry = {
 	};
-	GuideText="Talk to Joseph to start";
-	Rewards={
+	GuideText = "Talk to Joseph to start";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
-	StartRequirements={
+	StartRequirements = {
 		Level=36;
 	};
-	Markers={
+	Markers = {
 		["wateringcan"]={World="TheResidentials"; Label="Make Watering Can"; Target=Vector3.new(1146.179, 57.015, -93.945); Type=modMarkers.MarkerTypes.Waypoint;};
 		["jlLettuce1"]={World="TheResidentials"; Label="Water plants"; Target=Vector3.new(1242.081, 57.213, -71.899); Type=modMarkers.MarkerTypes.Waypoint;};
 		["jlLettuce2"]={World="TheResidentials"; Label="Water plants"; Target=Vector3.new(1242.231, 57.213, -56.169); Type=modMarkers.MarkerTypes.Waypoint;};
 		["jlLettuce3"]={World="TheResidentials"; Label="Water plants"; Target=Vector3.new(1235.111, 57.213, -56.169); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	
 };
 
 
@@ -3043,7 +3042,7 @@ MissionLibrary.New{
 		{Text="Talk to Caitlin";};
 
 		{Text="Talk to Joseph waiting at the Rat's Headquarters";};
-		{Text="Head to The Residentials safehouse with Joseph and Caitlin";};
+		{Text="Head to The Residentials safehouse with Joseph and Caitlin";}; --7
 		{Text="Talk to Caitlin waiting at the Community Safehouse";};
 		{Text="Talk to Caitlin when you are ready to go";};
 		{Text="Follow Caitlin";};
@@ -3055,7 +3054,7 @@ MissionLibrary.New{
 		{Text="Wait for Joseph";};
 
 		{Text="Leave the library backroom";};
-		{Text="Head back to the Residentials Safehouse";};
+		{Text="Head back to the Residentials Safehouse";}; --17
 		{Text="Talk to Caitlin";};
 		{Text="Talk to Caitlin";};
 		{Text="Talk to Caitlin";};

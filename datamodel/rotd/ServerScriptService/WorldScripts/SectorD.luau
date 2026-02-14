@@ -2,6 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+
 if RunService:IsServer() then
     modGameModeSurvival = shared.require(game.ServerScriptService.ServerLibrary.GameModeSurvival);
     modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
@@ -10,7 +12,7 @@ end
 
 local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new(script);
 
-local GAME_MODE, GAME_STAGE = "Survival", "SectorD";
+local GAME_MODE, GAME_STAGE = "Survival", "Sector D";
 --==
 
 function WorldCore.InitGameController()
@@ -79,7 +81,7 @@ function WorldCore.InitGameController()
         }
         
         if math.random(1, 3) == 1 then
-            npcClass.SetShirt = shirtList[math.random(1, #shirtList)];
+            npcClass.Properties.PresetShirt = {Id=shirtList[math.random(1, #shirtList)]};
         end
     end
 
@@ -94,6 +96,38 @@ function WorldCore.onRequire()
     if RunService:IsClient() then return end;
 
     WorldCore:InitGameWorld(GAME_MODE, GAME_STAGE);
+    
+	Debugger:Log("Initiate BioXTram");
+	local modRailwaySystem = shared.require(game.ServerScriptService.ServerLibrary.RailwaySystem);
+	modRailwaySystem.init();
+    
+	local trainPrefab = workspace.Environment.Game:WaitForChild("BioXTram");
+	local trainObject = modRailwaySystem:NewTrain(trainPrefab);
+	trainObject.Silent = true;
+
+    local monorailInteractable: InteractableInstance = modInteractables.getById("StartMonorail");
+    local monorailInteractConfig: Configuration = monorailInteractable.Config;
+
+	trainObject.OnSpeedSet:Connect(function()
+		if trainObject.NewSpeed <= 0 then
+			repeat RunService.Heartbeat:Wait() until trainObject.Speed <= 0;
+			task.wait(1);
+            monorailInteractConfig:SetAttribute(monorailInteractConfig:GetAttribute("_Toggle") :: string, false);
+		end
+	end)
+
+    monorailInteractConfig:GetAttributeChangedSignal("ActiveSpeed"):Connect(function()
+        local activeSpeed = monorailInteractConfig:GetAttribute("ActiveSpeed") or 0;
+        trainObject:SetSpeed(activeSpeed);
+    end)
+
+    monorailInteractable.Values.OnChanged:Connect(function(k, v, ov)
+        if k == "ScreenText" then
+            local screenUILabel = trainPrefab.trainControls._screen.SurfaceGui.Frame.TextLabel;
+            screenUILabel.Text = v;
+        end
+    end)
+
 end
 
 

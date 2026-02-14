@@ -5,7 +5,7 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
@@ -26,7 +26,7 @@ if RunService:IsServer() then
 	nekronMask = script.Parent:WaitForChild("Nekron Mask");
 	vtExit = script.Parent:WaitForChild("Travel_TheWarehouse");
 
-	if modBranchConfigs.IsWorld("VindictiveTreasure") then
+	if modBranchConfigurations.IsWorld("VindictiveTreasure") then
 
 		shared.modEventService:OnInvoked("Generic_BindItemPickup", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
@@ -63,7 +63,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	--if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	--if not modBranchConfigurations.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
@@ -73,7 +73,7 @@ return function(CutsceneSequence)
 
 		local playerClass: PlayerClass = shared.modPlayers.get(player);
 		
-		if not modBranchConfigs.IsWorld("VindictiveTreasure") and mission.ProgressionPoint >= 2 then
+		if not modBranchConfigurations.IsWorld("VindictiveTreasure") and mission.ProgressionPoint >= 2 then
 			if mission.ProgressionPoint >= 1 then
 				mission.ProgressionPoint = 1
 				modMission:FailMission(player, MISSION_ID, "You left Victor behind..");
@@ -88,7 +88,7 @@ return function(CutsceneSequence)
 				};
 			end
 		end
-		if not modBranchConfigs.IsWorld("VindictiveTreasure") then return; end;
+		if not modBranchConfigurations.IsWorld("VindictiveTreasure") then return; end;
 		
 		playerClass.CharacterGarbage:Tag(playerClass.OnIsDeadChanged:Connect(function(isDead)
 			if not isDead then return end;

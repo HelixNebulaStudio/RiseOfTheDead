@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionFunctions = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local MISSION_ID = 75;
 if RunService:IsServer() then
@@ -18,7 +18,7 @@ if RunService:IsServer() then
 
 			elseif mission.Type == 1 then -- OnActive
 				if mission.ProgressionPoint == 2 then
-					if modBranchConfigs.IsWorld("TheMall") then
+					if modBranchConfigurations.IsWorld("TheMall") then
 						if clinicLoop == false then
 							clinicLoop = true;
 							
@@ -40,7 +40,7 @@ if RunService:IsServer() then
 						end
 					end
 					
-				elseif mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 11 and not modBranchConfigs.IsWorld("MedicalBreakthrough") then
+				elseif mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 11 and not modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 					modMission:Progress(player, MISSION_ID, function(mission)
 						mission.ProgressionPoint = 3;
 					end);

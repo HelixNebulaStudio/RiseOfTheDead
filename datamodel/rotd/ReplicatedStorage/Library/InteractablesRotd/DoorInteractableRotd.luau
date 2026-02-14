@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local interactablePackage = {};
 --==
@@ -43,9 +43,9 @@ function interactablePackage.init(super) -- Server/Client
             interactable.Label = interactable.Config:GetAttribute("Label") :: string;
         end
 
-        if modBranchConfigs.IsWorld("TheUnderground") then
+        if modBranchConfigurations.IsWorld("TheUnderground") then
 
-        elseif modBranchConfigs.IsWorld("TheMall") then
+        elseif modBranchConfigurations.IsWorld("TheMall") then
             if interactable.Id == "awokenTheBearEntrance" then
                 local mission33 = clientData:GetMission(33);
                 if mission33.ProgressionPoint <= 2 or mission33.Type ~= 1 then
@@ -55,7 +55,7 @@ function interactablePackage.init(super) -- Server/Client
                 end
             end
 
-        elseif modBranchConfigs.IsWorld("BanditOutpost") then
+        elseif modBranchConfigurations.IsWorld("BanditOutpost") then
             if interactable.Id == "hostageRoom" then
                 local mission33 = clientData:GetMission(33);
                 if mission33.Type == 1 and mission33.ProgressionPoint == 13 then

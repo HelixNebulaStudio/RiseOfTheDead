@@ -40,9 +40,12 @@ function treePackage.Leap(npcClass: NpcClass)
     table.insert(leapArcTracer.RayWhitelist, workspace.Environment);
 
     local enemyHealthComp: HealthComp = enemyTargetData.HealthComp;
-    local enemyNpcClass: NpcClass = enemyHealthComp.CompOwner;
+    local entityClass: EntityClass = enemyHealthComp.CompOwner;
 
-    local targetRootPart = enemyNpcClass.Humanoid.RootPart;
+    if entityClass.ClassName ~= "PlayerClass" and entityClass.ClassName ~= "NpcClass" then return false; end;
+    
+    local characterClass: CharacterClass = entityClass :: CharacterClass;
+    local targetRootPart = characterClass.Humanoid.RootPart;
 
     local tarVec = targetRootPart.AssemblyLinearVelocity;
     local origin = npcClass.RootPart.Position;

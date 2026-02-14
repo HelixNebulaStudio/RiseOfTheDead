@@ -82,16 +82,33 @@ function npcPackage.Spawning(npcClass: NpcClass)
         end
     end
 
+    npcClass:GetComponent("RandomClothing"){
+        AddHair = false;
+    };
+end
 
+function npcPackage.Respawn(npcClass: NpcClass)
+    local character = npcClass.Character;
     local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
 
-    local shieldPrefix = {"Left"; "Right"};
-    for a=1, #shieldPrefix do
-        local prefix = shieldPrefix[a];
-        local name = `{prefix} Scale Claw`;
-        
-        local shieldAccessory = npcClass.Character:FindFirstChild(name);
-        
+    local clawsPrefab = script:WaitForChild("Claws"):GetChildren();
+    for _, model in pairs(clawsPrefab) do
+        local armPart;
+        if model.Name:sub(1,4) == "Left" then
+            armPart = character:FindFirstChild("LeftLowerArm");
+        else
+            armPart = character:FindFirstChild("RightLowerArm");
+        end
+        if armPart == nil then continue end;
+
+        local shieldAccessory = model:Clone();
+        local name = shieldAccessory.Name;
+        shieldAccessory.Parent = npcClass.Character;
+
+        local weld = shieldAccessory:WaitForChild("PrimaryPart"):WaitForChild("AccessoryWeld");
+        weld.Part1 = armPart;
+        weld.Enabled = true;
+
         local destructible: DestructibleInstance = bodyDestructiblesComp:Create(name, shieldAccessory);
         destructible.DebrisName = name;
         destructible.HealthComp:SetMaxHealth(math.max(npcClass.HealthComp.MaxHealth*0.1, 50));
@@ -110,12 +127,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
             hurtSound.PlaybackSpeed = math.random(90, 100)/100;
         end)
     end
-
-    
-    npcClass:GetComponent("RandomClothing"){
-        AddHair = false;
-    };
 end
-
 
 return npcPackage;

@@ -133,7 +133,7 @@ Dialogues.Robert.DialogueStrings = {
 
 
 if RunService:IsServer() then
-	local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+	local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
 
@@ -211,7 +211,7 @@ if RunService:IsServer() then
 			end
 
 		elseif mission.Type == 3 then
-			if modBranchConfigs.IsWorld("TheResidentials") then
+			if modBranchConfigurations.IsWorld("TheResidentials") then
 				if data:Get("lostArm") == nil then
 					dialog:SetInitiate("You're back, $PlayerName..");
 					

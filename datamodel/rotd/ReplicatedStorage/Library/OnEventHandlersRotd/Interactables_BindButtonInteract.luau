@@ -39,7 +39,7 @@ return function(event: EventPacket, ...)
         
         local spawnPoint = CFrame.new(702.059998, 10.0209656, -693.022827, -1, 0, 0, 0, 1, 0, 0, 0, -1);
 
-        local spawnAtt = interactable.Part:FindFirstChild("SpawnPoint");
+        local spawnAtt = interactable.Part:FindFirstChild("RewardSpawn");
         if spawnAtt then
             spawnPoint = spawnAtt.WorldCFrame;
         end

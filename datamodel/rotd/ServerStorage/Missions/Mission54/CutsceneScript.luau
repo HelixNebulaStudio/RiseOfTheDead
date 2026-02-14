@@ -4,7 +4,7 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modDoors = shared.require(game.ReplicatedStorage.Entity.Doors);
 
@@ -25,7 +25,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("Safehome") or workspace:GetAttribute("FactionHeadquarters") ~= nil then
+	if not modBranchConfigurations.IsWorld("Safehome") or workspace:GetAttribute("FactionHeadquarters") ~= nil then
 		Debugger:Warn("Invalid place for cutscene ("..script.Name..")");
 
 		CutsceneSequence:Initialize(function()

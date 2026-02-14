@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 
 --== Variables;
@@ -29,7 +29,7 @@ if RunService:IsServer() then
 		"I am the best survivor!";
 	};
 
-	if modBranchConfigs.IsWorld("Safehome") or modBranchConfigs.IsWorld("BioXResearch") then
+	if modBranchConfigurations.IsWorld("Safehome") or modBranchConfigurations.IsWorld("BioXResearch") then
 
 		shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
 			local npcClass: NpcClass = ...;
@@ -115,7 +115,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("Safehome") and not modBranchConfigs.IsWorld("BioXResearch") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigurations.IsWorld("Safehome") and not modBranchConfigurations.IsWorld("BioXResearch") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();

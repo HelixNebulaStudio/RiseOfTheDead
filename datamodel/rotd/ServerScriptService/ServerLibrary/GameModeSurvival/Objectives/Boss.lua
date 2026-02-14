@@ -6,6 +6,7 @@ local Objective = {};
 Objective.__index = Objective;
 
 Objective.Title = "Boss";
+Objective.Description = "Kill the boss";
 
 Objective.Controller = nil;
 --==
@@ -68,6 +69,7 @@ function Objective:Begin()
 			local newHealth = 5000 * math.max(math.ceil(self.Controller.Wave/5), 1);
 
 			npcClass.Properties.IsBoss = true;
+			npcClass.Properties.HordeAggression = true;
 			npcClass.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Subject;
 
 			local newMaxHealth = math.clamp(newHealth, 1000, math.huge);
@@ -97,7 +99,6 @@ function Objective:Begin()
 
 				self.Controller:Hud{
 					BossKilled=true;
-					--LootPrefab=lootPrefab;
 				};
 
 				local canRagdoll = bossChar:GetAttribute("HasRagdoll") == true;
@@ -109,13 +110,21 @@ function Objective:Begin()
 					end
 				end
 			end)
+
+			local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+			if targetHandlerComp then
+				for _, player in pairs(self.Controller.Players) do
+					targetHandlerComp:AddTarget(player.Character);
+				end
+			end
+			
 			table.insert(Objective.BossNpcClasses, npcClass);
 		end
 		
 	end
 	
 	self.Controller:Hud{
-		BossList = bossList;
+		HookEntity = bossList;
 	};
 end
 

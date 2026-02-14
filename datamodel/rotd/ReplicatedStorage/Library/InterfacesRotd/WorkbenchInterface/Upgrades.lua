@@ -6,7 +6,7 @@ local localPlayer = game.Players.LocalPlayer;
 
 local modItemModsLibrary = shared.require(game.ReplicatedStorage.Library.ItemModsLibrary);
 local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library:WaitForChild("WorkbenchLibrary"));
-local modBranchConfigs = shared.require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
+local modBranchConfigurations = shared.require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modItemLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
@@ -479,7 +479,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			local modsAttached = 0;
 			local titleTag = capacityFrame:WaitForChild("TitleTag");
 			local bar = capacityFrame:WaitForChild("frameBar"):WaitForChild("Bar");
-			bar.BackgroundColor3 = modBranchConfigs.BranchColor;
+			bar.BackgroundColor3 = modBranchConfigurations.BranchColor;
 			capacityFrame.Visible = true;
 			listMenu:Add(capacityFrame, 1);
 			

@@ -136,7 +136,7 @@ Dialogues.Stan.DialogueStrings = {
 };
 
 if RunService:IsServer() then
-	local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+	local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
 	-- MARK: Patrick Handler
@@ -161,7 +161,7 @@ if RunService:IsServer() then
 	end
 
 	-- MARK: Eugene Handler
-	if modBranchConfigs.IsWorld("SectorE") then
+	if modBranchConfigurations.IsWorld("SectorE") then
 		Dialogues.Eugene.DialogueHandler = function(player, dialog, data, mission)
 			if mission.Type == 1 then -- Active
 				local stage = mission.ProgressionPoint;
@@ -194,7 +194,7 @@ if RunService:IsServer() then
 	end
 	
 	-- MARK: Revas Handler
-	if modBranchConfigs.IsWorld("TheHarbor") then
+	if modBranchConfigurations.IsWorld("TheHarbor") then
 		local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 
 		Dialogues.Revas.DialogueHandler = function(player, dialog, data, mission)
@@ -224,7 +224,7 @@ if RunService:IsServer() then
 				end
 			end
 		end
-	elseif modBranchConfigs.IsWorld("SectorE") then
+	elseif modBranchConfigurations.IsWorld("SectorE") then
 		Dialogues.Revas.DialogueHandler = function(player, dialog, data, mission)
 			if mission.Type == 1 then -- Active
 				local stage = mission.ProgressionPoint;
@@ -252,7 +252,7 @@ if RunService:IsServer() then
 				end
 			end
 		end
-	elseif modBranchConfigs.IsWorld("SectorF") then
+	elseif modBranchConfigurations.IsWorld("SectorF") then
 		Dialogues.Revas.DialogueHandler = function(player, dialog, data, mission)
 			if mission.Type == 1 then -- Active
 				local stage = mission.ProgressionPoint;
@@ -291,7 +291,7 @@ if RunService:IsServer() then
 	end
 
 	-- MARK: Stan Handler
-	if modBranchConfigs.IsWorld("SectorE") then
+	if modBranchConfigurations.IsWorld("SectorE") then
 		Dialogues.Stan.DialogueHandler = function(player, dialog, data, mission)
 			if mission.Type == 1 then -- Active
 				local stage = mission.ProgressionPoint;

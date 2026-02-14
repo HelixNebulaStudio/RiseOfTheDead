@@ -50,7 +50,7 @@ if RunService:IsServer() then
 		local healthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
 		if healthComp == nil or healthComp.IsDead or not healthComp:CanTakeDamageFrom(characterClass) then return end;
 	
-		local targetClass: ComponentOwner = healthComp.CompOwner;
+		local targetClass: EntityClass = healthComp.CompOwner;
 		local statusComp: StatusComp? = targetClass.StatusComp;
 		if statusComp == nil then return end;
 			

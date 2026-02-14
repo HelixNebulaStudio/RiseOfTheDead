@@ -24,6 +24,7 @@ return function(interface: InterfaceInstance, window, frame)
 	
 	local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
 
+	local soundTrackActive = false;
 	function modeHud:Update(data)
 		modConfigurations.Set("AutoMarkEnemies", true);
 		local gameType = data.Type;
@@ -36,27 +37,41 @@ return function(interface: InterfaceInstance, window, frame)
 		local headerText = data.Header or ``;
 		local descLabel = data.Status or ``;
 
-		if self.Soundtrack == nil then
-			modAudio.Preload(stageLib.Soundtrack, 5);
-			self.Soundtrack = modAudio.Play(stageLib.Soundtrack, script.Parent);
-			if self.Soundtrack then
-				self.Soundtrack.Volume = 0;
-			end
+		if self.Soundtrack == nil and not soundTrackActive then
+			soundTrackActive = true;
+			task.spawn(function() 
+				modAudio.Preload(stageLib.Soundtrack, 5);
+				self.Soundtrack = modAudio.Play(stageLib.Soundtrack, script.Parent);
+				if self.Soundtrack then
+					self.Soundtrack.Volume = 0;
+				end
+			end)
 		end
 
 		if data.NextStageSound == true then
-			modAudio.Play("MissionUpdated");
+			task.spawn(function() 
+				modAudio.Preload("MissionUpdated", 5);
+				modAudio.Play("MissionUpdated");
+			end)
+
+		elseif data.EndStageSound == true then
+			data.EndStageSound = false;
+
+			modAudio.Preload("MissionComplete", 5);
+			modAudio.Play("MissionComplete");
 		end
 
-		if data.PlayMusic == true and not self.IsPlaying then
-			self.Soundtrack.TimePosition = 0;
-			TweenService:Create(self.Soundtrack, TweenInfo.new(5), {Volume=0.5}):Play();
-			self.IsPlaying = true;
+		if self.Soundtrack then
+			if data.PlayMusic == true and not self.IsPlaying then
+				self.Soundtrack.TimePosition = 0;
+				TweenService:Create(self.Soundtrack, TweenInfo.new(5), {Volume=0.5}):Play();
+				self.IsPlaying = true;
 
-		elseif data.PlayMusic == false and self.IsPlaying then
-			TweenService:Create(self.Soundtrack, TweenInfo.new(5), {Volume=0}):Play();
-			self.IsPlaying = false;
+			elseif data.PlayMusic == false and self.IsPlaying then
+				TweenService:Create(self.Soundtrack, TweenInfo.new(5), {Volume=0}):Play();
+				self.IsPlaying = false;
 
+			end
 		end
 
 		if data.LootPrefab ~= nil and data.LootPrefab ~= false then
@@ -70,6 +85,34 @@ return function(interface: InterfaceInstance, window, frame)
 		end
 		
 
+		if data.RaidMarker ~= nil and typeof(data.RaidMarker) == "table" then
+			local marker = data.RaidMarker;
+			modMarkers.SetMarker("RaidMarker", marker.Target, marker.Label, modMarkers.MarkerTypes.Waypoint);
+			modMarkers.SetColor("RaidMarker", Color3.fromRGB(255, 255, 255));
+		else
+			modMarkers.ClearMarker("RaidMarker");
+		end
+
+		if data.HookEntity ~= nil and typeof(data.HookEntity) == "table" then
+			for a=1, #data.HookEntity do
+				local prefab = data.HookEntity[a];
+				interface:FireEvent("TryHookEntity", prefab, 600);
+
+				if prefab:GetAttribute("MarketSet") ~= true then
+					prefab:SetAttribute("MarketSet", true);
+
+					local markerName = prefab.Name;
+
+					modMarkers.SetMarker(markerName, prefab, markerName, modMarkers.MarkerTypes.Object);
+					modMarkers.SetColor(markerName, Color3.fromRGB(36, 140, 49));
+
+					prefab.Destroying:Connect(function()
+						modMarkers.ClearMarker(markerName);
+					end)
+				end
+			end
+		end
+		
 		local taskHudWindow: InterfaceWindow = interface:GetWindow("TaskListHud");
 		local raidHudTask = taskHudWindow and taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID) or nil;
 

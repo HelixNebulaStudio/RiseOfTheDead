@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modDialogueService = shared.require(game.ReplicatedStorage.Library.DialogueService);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
@@ -17,7 +17,7 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
-	if modBranchConfigs.IsWorld("TheResidentials") then
+	if modBranchConfigurations.IsWorld("TheResidentials") then
 		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(event: EventPacket, ...)
 			local player: Player? = event.Player;
 			if player == nil then return end;
@@ -126,7 +126,7 @@ return function(CutsceneSequence)
 			};
 			if josephClass == nil then return end;
 
-			if modBranchConfigs.IsWorld("TheResidentials") and josephClass then
+			if modBranchConfigurations.IsWorld("TheResidentials") and josephClass then
 				modReplicationManager.ReplicateOut(player, josephClass.Character);
 			end
 			task.delay(1, function()
@@ -160,13 +160,13 @@ return function(CutsceneSequence)
 			};
 			if caitlinClass == nil then return end;
 
-			if modBranchConfigs.IsWorld("TheHarbor") then
+			if modBranchConfigurations.IsWorld("TheHarbor") then
 				modReplicationManager.ReplicateOut(player, caitlinClass.Character);
 			end
 			Debugger:StudioWarn(`Spawned local caitlin {caitlinClass.Id}`);
 		end
 
-		if modBranchConfigs.IsWorld("TheHarbor") then
+		if modBranchConfigurations.IsWorld("TheHarbor") then
 			caitlinClass = modNpcs.getByModel(workspace.Entity:FindFirstChild("Caitlin"));
 		end
 
@@ -177,7 +177,7 @@ return function(CutsceneSequence)
 			if mission.Type ~= 1 then return end;
 
 			if josephClass == nil then
-				if mission.ProgressionPoint >= 2 or modBranchConfigs.IsWorld("TheResidentials") then
+				if mission.ProgressionPoint >= 2 or modBranchConfigurations.IsWorld("TheResidentials") then
 					spawnLocalJosephClass();
 				end
 			end
@@ -188,7 +188,7 @@ return function(CutsceneSequence)
 				end
 			end
 
-			if not modBranchConfigs.IsWorld("TheHarbor") and mission.ProgressionPoint > 2 and mission.ProgressionPoint < 6 then
+			if not modBranchConfigurations.IsWorld("TheHarbor") and mission.ProgressionPoint > 2 and mission.ProgressionPoint < 6 then
 				modMission:Progress(player, MISSION_ID, function(mission)
 					mission.ProgressionPoint = 2;
 				end)
@@ -200,7 +200,7 @@ return function(CutsceneSequence)
 			elseif mission.ProgressionPoint == 2 then
 
 				-- ver2
-				if modBranchConfigs.IsWorld("TheResidentials") then
+				if modBranchConfigurations.IsWorld("TheResidentials") then
 					if firstRun then
 						josephClass:SetCFrame(CFrame.new(787.386, 41.301, 441.39) * CFrame.Angles(0, math.rad(-53), 0));
 						return;
@@ -265,7 +265,7 @@ return function(CutsceneSequence)
 					waitForPlayerComp(15);
 
 
-				elseif modBranchConfigs.IsWorld("TheHarbor") then
+				elseif modBranchConfigurations.IsWorld("TheHarbor") then
 
 					josephClass.Properties.CutsceneActive = true;
 					josephClass:ToggleInteractable(false);
@@ -330,7 +330,7 @@ return function(CutsceneSequence)
 
 
 			elseif mission.ProgressionPoint == 3 then
-				if not modBranchConfigs.IsWorld("TheHarbor") then
+				if not modBranchConfigurations.IsWorld("TheHarbor") then
 					return;
 				end
 
@@ -356,7 +356,7 @@ return function(CutsceneSequence)
 				caitlinClass.Chat(player, "Stop right there!");
 
 			elseif mission.ProgressionPoint == 4 then
-				if not modBranchConfigs.IsWorld("TheHarbor") then
+				if not modBranchConfigurations.IsWorld("TheHarbor") then
 					return;
 				end
 
@@ -399,14 +399,14 @@ return function(CutsceneSequence)
 				});
 
 			elseif mission.ProgressionPoint == 5 then
-				if not modBranchConfigs.IsWorld("TheHarbor") then
+				if not modBranchConfigurations.IsWorld("TheHarbor") then
 					return;
 				end
 
 				caitlinClass.Move:HeadTrack(playerClass.Head, 3);
 				
 			elseif mission.ProgressionPoint == 6 then
-				if not modBranchConfigs.IsWorld("TheHarbor") then
+				if not modBranchConfigurations.IsWorld("TheHarbor") then
 					return;
 				end
 
@@ -437,8 +437,10 @@ return function(CutsceneSequence)
 				josephFollowPlayerComp(nil, function()
 					return mission.Type == 1 and mission.ProgressionPoint == 7;
 				end)
+				josephClass:ToggleInteractable(false);
+				caitlinClass:ToggleInteractable(false);
 
-				if modBranchConfigs.IsWorld("TheResidentials") then
+				if modBranchConfigurations.IsWorld("TheResidentials") then
 					task.spawn(function()
 						while mission.Type == 1 and mission.ProgressionPoint == 7 do
 							task.wait(1);
@@ -458,13 +460,15 @@ return function(CutsceneSequence)
 				end
 
 			elseif mission.ProgressionPoint == 8 then
-				if not modBranchConfigs.IsWorld("TheResidentials") then
+				if not modBranchConfigurations.IsWorld("TheResidentials") then
 					return;
 				end
 				spawnLocalCaitlinClass();
 
 				caitlinClass.Properties.CutsceneActive = true;
 				josephClass.Properties.CutsceneActive = true;
+				josephClass:ToggleInteractable(true);
+				caitlinClass:ToggleInteractable(true);
 
 				task.wait(0.5);
 
@@ -517,7 +521,7 @@ return function(CutsceneSequence)
 				josephClass.Properties.CutsceneActive = false;
 
 			elseif mission.ProgressionPoint == 9 then
-				if not modBranchConfigs.IsWorld("TheResidentials") then
+				if not modBranchConfigurations.IsWorld("TheResidentials") then
 					return;
 				end
 				spawnLocalCaitlinClass();
@@ -526,7 +530,7 @@ return function(CutsceneSequence)
 				caitlinClass.PlayAnimation("Point");
 
 			elseif mission.ProgressionPoint == 10 then
-				if not modBranchConfigs.IsWorld("TheResidentials") then
+				if not modBranchConfigurations.IsWorld("TheResidentials") then
 					return;
 				end
 				spawnLocalCaitlinClass();
@@ -545,8 +549,7 @@ return function(CutsceneSequence)
 				task.wait(2);
 				josephClass.Chat(player, "About time..");
 
-				local interactConfig = modInteractables.getById("resCommunityExit");
-				local interactable: InteractableInstance = modInteractables.getOrNew(interactConfig);
+				local interactable: InteractableInstance = modInteractables.getById("resCommunityExit");
 				local interactPart = interactable.Part;
 				local pathFindAtt = interactPart:FindFirstChild("PathToInteract");
 
@@ -556,7 +559,7 @@ return function(CutsceneSequence)
 				caitlinClass.Properties.CutsceneWalkTo = nil;
 
 				caitlinClass:GetComponent("WaitForPlayer")(20);
-				caitlinClass:UseInteractable(interactConfig, {});
+				caitlinClass:UseInteractable(interactable.Config, {});
 
 				caitlinClass.Properties.CutsceneWalkTo = Vector3.new(950.263, 56.695, -10.288);
 				caitlinClass.Move.OnMoveToEnded:Wait(35);
@@ -576,7 +579,7 @@ return function(CutsceneSequence)
 				end)
 
 			elseif mission.ProgressionPoint == 11 then
-				if not modBranchConfigs.IsWorld("TheResidentials") then
+				if not modBranchConfigurations.IsWorld("TheResidentials") then
 					return;
 				end
 
@@ -706,7 +709,7 @@ return function(CutsceneSequence)
 
 
 			elseif mission.ProgressionPoint == 12 then
-				if not modBranchConfigs.IsWorld("TheResidentials") then
+				if not modBranchConfigurations.IsWorld("TheResidentials") then
 					return;
 				end
 				if firstRun then
@@ -791,7 +794,7 @@ return function(CutsceneSequence)
 				end)
 
 			elseif mission.ProgressionPoint == 15 then
-				if not modBranchConfigs.IsWorld("TheResidentials") then
+				if not modBranchConfigurations.IsWorld("TheResidentials") then
 					return;
 				end
 
@@ -836,7 +839,7 @@ return function(CutsceneSequence)
 				end)
 
 			elseif mission.ProgressionPoint == 17 then
-				if not modBranchConfigs.IsWorld("TheResidentials") then
+				if not modBranchConfigurations.IsWorld("TheResidentials") then
 					return;
 				end
 
@@ -862,7 +865,7 @@ return function(CutsceneSequence)
 
 				
 			elseif mission.ProgressionPoint == 18 then
-				if not modBranchConfigs.IsWorld("TheResidentials") then
+				if not modBranchConfigurations.IsWorld("TheResidentials") then
 					return;
 				end
 
@@ -877,9 +880,6 @@ return function(CutsceneSequence)
 				josephClass:SetCFrame(CFrame.new(1127.165, 55.389, 107.03) * CFrame.Angles(0, math.rad(90), 0));
 				caitlinClass:SetCFrame(CFrame.new(1127.165, 55.389, 107.03) * CFrame.Angles(0, math.rad(90), 0));
 
-				josephClass.Move:SetMoveSpeed("set", "cutscene", 5, josephClass.Move.MoveSpeedPriority.Action, 13);
-				caitlinClass.Move:SetMoveSpeed("set", "cutscene", 5, caitlinClass.Move.MoveSpeedPriority.Action, 10);
-				
 				caitlinClass.Properties.CutsceneWalkTo = Vector3.new(1143.839, 57.916, 28.544);
 				josephClass.Properties.CutsceneWalkTo = Vector3.new(1132.459, 57.839, 26.241);
 				josephClass.Move.OnMoveToEnded:Wait(25);
@@ -891,7 +891,7 @@ return function(CutsceneSequence)
 				end)
 
 			elseif mission.ProgressionPoint == 19 then
-				if not modBranchConfigs.IsWorld("TheResidentials") then
+				if not modBranchConfigurations.IsWorld("TheResidentials") then
 					return;
 				end
 
@@ -916,7 +916,7 @@ return function(CutsceneSequence)
 				caitlinClass.Properties.CutsceneLookAt = playerClass:GetCFrame().Position;
 				
 			elseif mission.ProgressionPoint == 20 then
-				if not modBranchConfigs.IsWorld("TheResidentials") then
+				if not modBranchConfigurations.IsWorld("TheResidentials") then
 					return;
 				end
 

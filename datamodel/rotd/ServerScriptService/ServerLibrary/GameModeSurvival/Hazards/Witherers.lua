@@ -4,6 +4,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Hazard = {
 	Title = "Witherers";
+	Description = "They disintegrate armor";
 	Controller = nil;
 };
 Hazard.__index = Hazard;

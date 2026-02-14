@@ -3,13 +3,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 
 local MISSION_ID = 23;
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	if not modBranchConfigs.IsWorld("TheUnderground") then return {}; end;
+	if not modBranchConfigurations.IsWorld("TheUnderground") then return {}; end;
 
 	shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
 		local npcClass: NpcClass = ...;

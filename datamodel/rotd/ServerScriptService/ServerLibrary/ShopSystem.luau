@@ -4,7 +4,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modShopLibrary = shared.require(game.ReplicatedStorage.Library.RatShopLibrary);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.BattlePassLibrary);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
@@ -90,7 +90,7 @@ function ShopService.onRequire()
                     
 
                     local bonus = 0;
-                    if modBranchConfigs.IsWorld("Safehome") then
+                    if modBranchConfigurations.IsWorld("Safehome") then
                         bonus = math.ceil(sellPrice*0.15);
                         shared.Notify(player, ("You got $"..bonus.." bonus for selling in safehome.") , "Reward");
                         

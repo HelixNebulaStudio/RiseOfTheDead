@@ -31,7 +31,7 @@ function statusPackage.StrikeTarget(applyBy: CharacterClass, statusValues: anydi
     local healthComp: HealthComp? = modHealthComp.getByModel(character);
     if healthComp == nil or healthComp.IsDead or not healthComp:CanTakeDamageFrom(applyBy) then return end;
 
-    local ownerClass: ComponentOwner = healthComp.CompOwner;
+    local ownerClass: EntityClass = healthComp.CompOwner;
     local statusComp: StatusComp? = ownerClass.StatusComp;
     if statusComp == nil then return end;
 
@@ -56,7 +56,7 @@ overlapParams.MaxParts = 10;
 function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
     
-    local applyTo: ComponentOwner = statusClass.StatusOwner;
+    local applyTo: EntityClass = statusClass.StatusOwner;
     local applyBy: CharacterClass? = statusClass.ApplyBy;
     if applyBy and applyBy.Character and applyTo.Character then
         modDamageTag.Tag(applyTo.Character, applyBy.Character, {

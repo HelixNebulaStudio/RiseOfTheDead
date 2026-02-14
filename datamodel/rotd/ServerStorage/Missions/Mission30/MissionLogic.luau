@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local missionId = 30;
@@ -16,7 +16,7 @@ if RunService:IsServer() then
 			if mission.Type == 3 then -- OnComplete
 				
 			else
-				if modBranchConfigs.IsWorld("TheMall") then
+				if modBranchConfigurations.IsWorld("TheMall") then
 					local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
 					if patrickPrefab then
 						modReplicationManager.SetClientParent(player, patrickPrefab, workspace.Entity);

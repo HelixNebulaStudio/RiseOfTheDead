@@ -3,7 +3,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService");
 
-local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modProjectile = shared.require(game.ReplicatedStorage.Library.Projectile);
 local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
@@ -106,8 +105,6 @@ function npcPackage.createHelicopter(isHard: boolean, spawnPoint: Vector3)
         Animations = {
             OpenDoors = animator:LoadAnimation(animationsFolder:WaitForChild("OpenDoors"));
         };
-        
-        Destructibles = {};
     };
 	
     local circleRad = -math.pi/2;
@@ -276,90 +273,6 @@ function npcPackage.createHelicopter(isHard: boolean, spawnPoint: Vector3)
     )
 
 	heliModel:PivotTo(newSpawnCf);
-    local heliParts = heliModel:GetChildren();
-    for a=1, #heliParts do
-        local heliPartGroup = heliParts[a];
-        if not heliPartGroup:IsA("Model") then continue end;
-
-        local newDestructInfo;
-
-        local groupName = heliPartGroup.Name;
-        if groupName == "TopCover" then
-            newDestructInfo = {
-                Health = isHard and 25000 or 10000;
-            };
-
-        elseif groupName == "FrontTip" then
-            newDestructInfo = {
-                Health = isHard and 50000 or 10000;
-            };
-
-        elseif groupName == "TailPart" then
-            newDestructInfo = {
-                Health = isHard and 25000 or 25000;
-            };
-
-        elseif groupName == "LeftLauncher" or groupName == "RightLauncher" then
-            newDestructInfo = {
-                Health = isHard and 40000 or 40000;
-            };
-
-        elseif groupName == "ScrapPlating" then
-            newDestructInfo = {
-                Name = "ScrapPlating";
-                Health = isHard and 10000 or 5000;
-            };
-        end
-
-        if newDestructInfo then
-            local destructibleConfig = modDestructibles.createDestructible(newDestructInfo.Name);
-            destructibleConfig.Parent = heliPartGroup;
-
-            local destructibleInstance: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
-            destructibleInstance.Properties.DestroyModel = false;
-
-            destructibleInstance.HealthComp:SetMaxHealth(newDestructInfo.Health);
-            destructibleInstance.HealthComp:Reset();
-
-            destructibleInstance:SetupHealthbar{
-                Size = UDim2.new(1.2, 0, 0.25, 0);
-                Distance = 128;
-                OffsetWorldSpace = Vector3.new(0, 1, 0);
-                ShowLabel = false;
-            };
-            destructibleInstance:SetHealthbarEnabled(true);
-
-            destructibleInstance.OnDestroy:Connect(function()
-                local parts = {};
-                for _, obj in pairs(destructibleInstance.Model:GetChildren()) do
-                    if not obj:IsA("BasePart") then continue end;
-
-				    obj.Color = Color3.fromRGB(25, 25, 25);
-                    table.insert(parts, obj);
-                end
-                if #parts <= 0 then return end;
-
-                local part = parts[math.random(1, #parts)];
-                if part == nil then return end;
-
-				local smoke = Instance.new("Smoke");
-				smoke.Color = Color3.fromRGB(0, 0, 0);
-				smoke.Size = 5;
-				smoke.RiseVelocity = 10;
-				smoke.Opacity = 1;
-				smoke.Parent = part;
-
-				local fire = Instance.new("Fire");
-				fire.Heat = 15;
-				fire.Size = 10;
-				fire.Parent = part;
-				
-				modAudio.Play("VechicleExplosion", part).PlaybackSpeed = math.random(90,110)/100;
-            end)
-
-            table.insert(self.Destructibles, destructibleInstance);
-        end
-    end
 
     return self;
 end
@@ -386,7 +299,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
         configurations.BaseValues.MaxArmor = 1000;
     end
 
-    local heliInstance = npcPackage.createHelicopter(isHard, npcClass.SpawnPoint.Position);
+    local heliInstance = npcPackage.createHelicopter(isHard, npcClass.SpawnCFrame.Position);
     local heliModel = heliInstance.Model;
     heliInstance.Model.Parent = npcChar;
 
@@ -394,8 +307,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
     helicopterTag.Name = "Helicopter";
     helicopterTag.Value = heliModel;
     helicopterTag.Parent = npcClass.Character;
-
-    local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
 
     healthComp.OnArmorChanged:Connect(function(newArmor, oldArmor, damageData)
         if newArmor > oldArmor then return end;
@@ -405,114 +316,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
         end
     end)
 
-    for a=1, #heliInstance.Destructibles do
-        local destructibleInstance: DestructibleInstance = heliInstance.Destructibles[a];
-        local destructModel = destructibleInstance.Model;
-        bodyDestructiblesComp:Add(destructModel.Name, destructibleInstance);
-
-        if destructModel.Name == "ScrapPlating" then 
-            local debrisParts = {};
-            for _, part in pairs(destructibleInstance.Model:GetChildren()) do
-                if part.Name ~= "DebrisParts" then continue end;
-                table.insert(debrisParts, part);
-            end
-            
-            destructibleInstance.HealthComp.OnHealthChanged:Connect(function(curHealth, oldHealth, damageData)
-                if curHealth > oldHealth then return end;
-                healthComp:TakeDamage(DamageData.new{
-                    Damage = 1;
-                    DamageBy = damageData.DamageBy;
-                });
-
-                local total = #debrisParts;
-                local alive = 0;
-                for a=1, #debrisParts do
-                    if debrisParts[a].Transparency == 1 then continue end;
-                    alive = alive +1;
-                end
-                Debugger:Warn(`Immunity update {alive}/{total}`);
-                properties.Immunity = math.clamp(alive/total, 0.1, 1);
-            end)
-
-
-        else
-            destructibleInstance.HealthComp.OnHealthChanged:Connect(function(curHealth, oldHealth, damageData)
-                if curHealth > oldHealth then return end;
-                local properties = destructibleInstance.Properties;
-
-                healthComp:TakeDamage(DamageData.new{
-                    Damage = 20;
-                    DamageBy = damageData.DamageBy;
-                });
-
-                if properties.LastExplosionTick and tick()-properties.LastExplosionTick < 1.5 then return end;
-                properties.LastExplosionTick = tick();
-
-                local snd = modAudio.Play("VechicleExplosion", destructModel.PrimaryPart);
-                snd.Volume = snd.Volume * 0.5;
-                snd.PlaybackSpeed = math.random(100,115)/100;
-            end)
-
-            destructibleInstance.OnDestroy:Connect(function()
-                shared.modPlayers.cameraShakeAndZoom(npcClass.NetworkOwners, 30, 0, 2, 2, true);
-
-                if destructModel.Name == "TopCover" then
-                    healthComp:TakeDamage(DamageData.new{
-						Damage = 400;
-						TargetPart = destructModel.PrimaryPart;
-					});
-					
-					heliInstance.Altitude = 50;
-
-                elseif destructModel.Name == "TailPart" then
-                    healthComp:TakeDamage(DamageData.new{
-						Damage = 300;
-						TargetPart = destructModel.PrimaryPart;
-					});
-
-                elseif destructModel.Name == "FrontTip" then
-                    healthComp:TakeDamage(DamageData.new{
-						Damage = 300;
-						TargetPart = destructModel.PrimaryPart;
-					});
-
-                elseif destructModel.Name == "LeftLauncher" or destructModel.Name == "RightLauncher" then
-
-                    if destructModel.Name == "LeftLauncher" then
-                        heliInstance.LeftLaunchers = nil;
-                    else
-                        heliInstance.RightLaunchers = nil;
-                    end
-                    destructModel:BreakJoints();
-
-                    if properties.State == "RocketSpam" then
-                        properties.State = "Molotov";
-                        properties.StateChangedTick = tick();
-                    end
-
-                end
-            end)
-
-            if destructModel.Name == "LeftLauncher" then
-                heliInstance.LeftLaunchers = {};
-                for _, obj in pairs(destructModel:WaitForChild("LLauncherBase"):GetChildren()) do
-                    if obj.Name == "LauncherPoint" then
-                        table.insert(heliInstance.LeftLaunchers, obj);
-                    end
-                end
-
-            elseif destructModel.Name == "RightLauncher" then
-                heliInstance.RightLaunchers = {};
-                for _, obj in pairs(destructModel:WaitForChild("RLauncherBase"):GetChildren()) do
-                    if obj.Name == "LauncherPoint" then
-                        table.insert(heliInstance.RightLaunchers, obj);
-                    end
-                end
-
-            end
-
-        end;
-    end
     properties.HelicopterInstance = heliInstance;
 
 end
@@ -521,6 +324,9 @@ end
 --MARK: Spawned
 function npcPackage.Spawned(npcClass: NpcClass)
     local properties = npcClass.Properties;
+    local healthComp = npcClass.HealthComp;
+
+    local isHard = properties.HardMode;
 
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
 
@@ -529,6 +335,201 @@ function npcPackage.Spawned(npcClass: NpcClass)
     local heliInstance = properties.HelicopterInstance;
     local heliModel = heliInstance.Model;
     local heliRoot = heliInstance.PrimaryPart;
+
+
+    local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
+
+    local heliParts = heliModel:GetChildren();
+    for a=1, #heliParts do
+        local heliPartGroup = heliParts[a];
+        if not heliPartGroup:IsA("Model") then continue end;
+
+        local newDestructInfo;
+
+        local groupName = heliPartGroup.Name;
+        if groupName == "TopCover" then
+            newDestructInfo = {
+                Name = groupName;
+                Health = isHard and 25000 or 10000;
+            };
+
+        elseif groupName == "FrontTip" then
+            newDestructInfo = {
+                Name = groupName;
+                Health = isHard and 50000 or 10000;
+            };
+
+        elseif groupName == "TailPart" then
+            newDestructInfo = {
+                Name = groupName;
+                Health = isHard and 25000 or 25000;
+            };
+
+        elseif groupName == "LeftLauncher" or groupName == "RightLauncher" then
+            newDestructInfo = {
+                Name = groupName;
+                Health = isHard and 40000 or 40000;
+            };
+
+        elseif groupName == "ScrapPlating" then
+            newDestructInfo = {
+                Name = "ScrapPlating";
+                Health = isHard and 10000 or 5000;
+            };
+        end
+
+        if newDestructInfo then
+            local destructibleName = newDestructInfo.Name;
+            local destructibleModel = heliPartGroup;
+            local destructible: DestructibleInstance = bodyDestructiblesComp:Create(destructibleName, destructibleModel);
+            destructible.Properties.DestroyModel = false;
+
+            destructible.HealthComp:SetMaxHealth(newDestructInfo.Health);
+            destructible.HealthComp:Reset();
+
+            destructible:SetupHealthbar{
+                Size = UDim2.new(1.2, 0, 0.25, 0);
+                Distance = 128;
+                OffsetWorldSpace = Vector3.new(0, 1, 0);
+                ShowLabel = false;
+            };
+            destructible:SetHealthbarEnabled(true);
+
+            destructible.OnDestroy:Connect(function()
+                local parts = {};
+                for _, obj in pairs(destructible.Model:GetChildren()) do
+                    if not obj:IsA("BasePart") then continue end;
+
+				    obj.Color = Color3.fromRGB(25, 25, 25);
+                    table.insert(parts, obj);
+                end
+                if #parts <= 0 then return end;
+
+                local part = parts[math.random(1, #parts)];
+                if part == nil then return end;
+
+				local smoke = Instance.new("Smoke");
+				smoke.Color = Color3.fromRGB(0, 0, 0);
+				smoke.Size = 5;
+				smoke.RiseVelocity = 10;
+				smoke.Opacity = 1;
+				smoke.Parent = part;
+
+				local fire = Instance.new("Fire");
+				fire.Heat = 15;
+				fire.Size = 10;
+				fire.Parent = part;
+				
+				modAudio.Play("VechicleExplosion", part).PlaybackSpeed = math.random(90,110)/100;
+            end)
+
+            if destructibleName == "ScrapPlating" then 
+                local debrisParts = {};
+                for _, part in pairs(destructibleModel:GetChildren()) do
+                    if part.Name ~= "DebrisParts" then continue end;
+                    table.insert(debrisParts, part);
+                end
+                
+                destructible.HealthComp.OnHealthChanged:Connect(function(curHealth, oldHealth, damageData)
+                    if curHealth > oldHealth then return end;
+                    healthComp:TakeDamage(DamageData.new{
+                        Damage = 1;
+                        DamageBy = damageData.DamageBy;
+                    });
+
+                    local total = #debrisParts;
+                    local alive = 0;
+                    for a=1, #debrisParts do
+                        if debrisParts[a].Transparency == 1 then continue end;
+                        alive = alive +1;
+                    end
+                    Debugger:Warn(`Immunity update {alive}/{total}`);
+                    properties.Immunity = math.clamp(alive/total, 0.1, 1);
+                end)
+
+
+            else
+                destructible.HealthComp.OnHealthChanged:Connect(function(curHealth, oldHealth, damageData)
+                    if curHealth > oldHealth then return end;
+                    local properties = destructible.Properties;
+
+                    healthComp:TakeDamage(DamageData.new{
+                        Damage = 20;
+                        DamageBy = damageData.DamageBy;
+                    });
+
+                    if properties.LastExplosionTick and tick()-properties.LastExplosionTick < 1.5 then return end;
+                    properties.LastExplosionTick = tick();
+
+                    local snd = modAudio.Play("VechicleExplosion", destructibleModel.PrimaryPart);
+                    snd.Volume = snd.Volume * 0.5;
+                    snd.PlaybackSpeed = math.random(100,115)/100;
+                end)
+
+                destructible.OnDestroy:Connect(function()
+                    shared.modPlayers.cameraShakeAndZoom(npcClass.NetworkOwners, 30, 0, 2, 2, true);
+
+                    if destructibleName == "TopCover" then
+                        healthComp:TakeDamage(DamageData.new{
+                            Damage = 400;
+                            TargetPart = destructibleModel.PrimaryPart;
+                        });
+                        
+                        heliInstance.Altitude = 50;
+
+                    elseif destructibleName == "TailPart" then
+                        healthComp:TakeDamage(DamageData.new{
+                            Damage = 300;
+                            TargetPart = destructibleModel.PrimaryPart;
+                        });
+
+                    elseif destructibleName == "FrontTip" then
+                        healthComp:TakeDamage(DamageData.new{
+                            Damage = 300;
+                            TargetPart = destructibleModel.PrimaryPart;
+                        });
+
+                    elseif destructibleName == "LeftLauncher" or destructibleName == "RightLauncher" then
+
+                        if destructibleName == "LeftLauncher" then
+                            heliInstance.LeftLaunchers = nil;
+                        else
+                            heliInstance.RightLaunchers = nil;
+                        end
+                        destructibleModel:BreakJoints();
+
+                        if properties.State == "RocketSpam" then
+                            properties.State = "Molotov";
+                            properties.StateChangedTick = tick();
+                        end
+
+                    end
+                end)
+
+                if destructibleName == "LeftLauncher" then
+                    heliInstance.LeftLaunchers = {};
+                    for _, obj in pairs(destructibleModel:WaitForChild("LLauncherBase"):GetChildren()) do
+                        if obj.Name == "LauncherPoint" then
+                            table.insert(heliInstance.LeftLaunchers, obj);
+                        end
+                    end
+
+                elseif destructibleName == "RightLauncher" then
+                    heliInstance.RightLaunchers = {};
+                    for _, obj in pairs(destructibleModel:WaitForChild("RLauncherBase"):GetChildren()) do
+                        if obj.Name == "LauncherPoint" then
+                            table.insert(heliInstance.RightLaunchers, obj);
+                        end
+                    end
+
+                end
+
+            end;
+
+        end
+    end
+
+
 
     local dropAttachments = {};
 
@@ -855,6 +856,22 @@ function npcPackage.Spawned(npcClass: NpcClass)
         end
     end)
     
+    local lastVoiceLine = tick()+10;
+    local voicePitch = math.random(95, 120)/100;
+    properties.OnChanged:Connect(function(k, v)
+        if k == "StateChangedTick" then
+            if tick() <= lastVoiceLine then return end;
+            lastVoiceLine = tick() + math.random(10, 20);
+
+            local voiceLineId = `BanditPilot_Taunt0{math.random(1, 7)}`;
+            local voiceTrack = script:WaitForChild("TauntTracks"):FindFirstChild(voiceLineId);
+            if voiceTrack then
+                local sndVoiceLine = modAudio.Play(voiceTrack, npcClass.RootPart);
+                sndVoiceLine.PlaybackSpeed = voicePitch;
+                npcClass.Garbage:Tag(sndVoiceLine);
+            end
+        end
+    end)
 end
 
 return npcPackage;

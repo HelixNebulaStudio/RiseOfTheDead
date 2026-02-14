@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 --== Variables;
 local MISSION_ID = 16;
@@ -15,7 +15,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheWarehouse") and not modBranchConfigs.IsWorld("BioXResearch") then return; end;
+	if not modBranchConfigurations.IsWorld("TheWarehouse") and not modBranchConfigurations.IsWorld("BioXResearch") then return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();

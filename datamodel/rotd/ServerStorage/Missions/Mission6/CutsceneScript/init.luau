@@ -4,7 +4,7 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 
@@ -21,7 +21,7 @@ if RunService:IsServer() then
 
 	storagePrefabs = game.ReplicatedStorage.Prefabs:WaitForChild("Objects");
 	
-	if modBranchConfigs.IsWorld("TheWarehouse") then
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
 		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, interactable: InteractableInstance)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -50,7 +50,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheWarehouse") then
+	if not modBranchConfigurations.IsWorld("TheWarehouse") then
 		Debugger:Warn("Invalid place for cutscene ("..script.Name..")");
 		return;
 	end;

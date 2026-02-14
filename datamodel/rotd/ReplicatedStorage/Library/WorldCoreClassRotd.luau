@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modWorldCoreClass = shared.require(game.ReplicatedStorage.Library.WorldCoreClass);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
@@ -44,7 +44,7 @@ function modWorldCoreClass.onRequire()
 
         if modConfigurations.SpecialEvent.Halloween then
             task.spawn(function()
-                while wait(math.random(60, 180)) do
+                while task.wait(math.random(60, 180)) do
                     local soundName = `FarThunder{math.random(1, 2)}`;
                     
                     modAudio.Preload(soundName, 5);
@@ -53,19 +53,19 @@ function modWorldCoreClass.onRequire()
                         sound.Volume = 0.6;
                     end
                     
-                    spawn(function()
-                        wait(math.random(200, 400)/1000);
+                    task.spawn(function()
+                        task.wait(math.random(200, 400)/1000);
                         game.Lighting.Ambient = Color3.fromRGB(121, 136, 181);
-                        wait(0.05);
+                        task.wait(0.05);
                         game.Lighting.Ambient = Color3.fromRGB(25, 25, 25);
-                        wait(math.random(50, 100)/1000);
+                        task.wait(math.random(50, 100)/1000);
                         game.Lighting.Ambient = Color3.fromRGB(121, 136, 181);
-                        wait(0.05);
+                        task.wait(0.05);
                         game.Lighting.Ambient = Color3.fromRGB(25, 25, 25);
                         if math.random(1, 2) == 1 then
-                            wait(math.random(50, 100)/1000);
+                            task.wait(math.random(50, 100)/1000);
                             game.Lighting.Ambient = Color3.fromRGB(121, 136, 181);
-                            wait(0.05);
+                            task.wait(0.05);
                             game.Lighting.Ambient = Color3.fromRGB(25, 25, 25);
                         end
                     end)
@@ -78,13 +78,13 @@ function modWorldCoreClass.onRequire()
 end
 
 function modWorldCoreClass.updateWanderers()
-    if modBranchConfigs.NavLinks == nil then return end;
+    if modBranchConfigurations.PathfindingNavLinks == nil then return end;
     
     task.spawn(function()
         local day = workspace:GetAttribute("DayOfYear");
         local spawnWorldList = {};
         
-        for worldId, worldNav in pairs(modBranchConfigs.NavLinks) do
+        for worldId, worldNav in pairs(modBranchConfigurations.PathfindingNavLinks) do
             table.insert(spawnWorldList, {Id=worldId; Nav=worldNav});
         end
         
@@ -93,8 +93,8 @@ function modWorldCoreClass.updateWanderers()
         };
         
         local spawnWorld = spawnWorldList[math.fmod(day, #spawnWorldList)+1];
-        if modBranchConfigs.CurrentBranch.Name == "Dev" then
-            spawnWorld = {Id=modBranchConfigs.GetWorld(); Nav=modBranchConfigs.NavLinks[modBranchConfigs.GetWorld()]};
+        if shared.gameConfig.BranchName == "Dev" then
+            spawnWorld = {Id=modBranchConfigurations.WorldName; Nav=modBranchConfigurations.PathfindingNavLinks[modBranchConfigurations.WorldName]};
         end
         
         if spawnWorld.Nav and #wandererList > 0 then
@@ -120,7 +120,7 @@ function modWorldCoreClass.updateWanderers()
                 end
             end
             
-            if modBranchConfigs.IsWorld(spawnWorld.Id) then
+            if modBranchConfigurations.IsWorld(spawnWorld.Id) then
                 local doorInstance = workspace.Interactables:FindFirstChild(spawnWorld.Nav[spawnNavId].Entrance);
                 
                 local spawnCFrame = CFrame.new(doorInstance.Destination.WorldPosition + Vector3.new(0, 2.35, 0)) 
@@ -132,7 +132,7 @@ function modWorldCoreClass.updateWanderers()
                 end, modNpcs.NpcBaseConstructors.WanderingTrader);
             end
 
-            modBranchConfigs.Wanderer = {
+            modBranchConfigurations.Wanderer = {
                 Name=spawnWandererName;
                 WorldId=spawnWorld.Id;
             };
@@ -170,6 +170,9 @@ end
 
 
 function modWorldCoreClass:InitGameWorld(gameMode, gameStage)
+    shared.gameConfig.Config:SetAttribute("GameMode", gameMode);
+    shared.gameConfig.Config:SetAttribute("GameStage", gameStage);
+    
     local isHard = false;
     if RunService:IsStudio() then
         if workspace:GetAttribute("IsHard") == true then
@@ -197,7 +200,7 @@ function modWorldCoreClass:InitGameWorld(gameMode, gameStage)
     local gameModeStart = false;
     local worldCoreInit = false;
     shared.modEngineCore:ConnectOnPlayerAdded(script, function(player: Player)
-        if RunService:IsStudio() or modBranchConfigs.CurrentBranch.Name == "Dev" then
+        if RunService:IsStudio() or shared.gameConfig.BranchName == "Dev" then
             local lobbyPlayers = studioLobbyData.GameMode.Room.Players;
             for _, player in pairs(game.Players:GetPlayers()) do
                 table.insert(lobbyPlayers, {Name=player.Name; UserId=player.UserId});

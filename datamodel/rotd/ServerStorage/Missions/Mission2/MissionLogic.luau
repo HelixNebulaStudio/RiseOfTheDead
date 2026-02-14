@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionFunctions = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modGuiHighlight = shared.require(game.ReplicatedStorage.Library.UI.GuiHighlight);
 
@@ -41,7 +41,7 @@ if RunService:IsClient() then
 		local rootPart = character:WaitForChild("HumanoidRootPart");
 
 		modGuiHighlight.Set("MainInterface");
-		if modBranchConfigs.IsWorld("TheWarehouse") then
+		if modBranchConfigurations.IsWorld("TheWarehouse") then
 			SetWaypoint(modWaypoint.NewWaypoint(rootPart, workspace:WaitForChild("Entity"):WaitForChild("Dr. Deniski"):WaitForChild("HumanoidRootPart") ));
 		else
 			SetWaypoint();
@@ -75,7 +75,7 @@ if RunService:IsClient() then
 			};
 		}
 
-		if modBranchConfigs.IsWorld("TheWarehouse") then
+		if modBranchConfigurations.IsWorld("TheWarehouse") then
 			SetWaypoint(modWaypoint.NewWaypoint(rootPart, workspace:WaitForChild("Interactables"):WaitForChild("ShopWaypoint") ));
 		else
 			SetWaypoint();

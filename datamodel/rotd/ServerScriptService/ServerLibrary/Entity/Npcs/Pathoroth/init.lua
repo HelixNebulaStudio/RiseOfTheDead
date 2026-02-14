@@ -65,8 +65,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
         configurations.BaseValues.MaxHealth = math.max(10000 + 500*level, 10000);
     end
 
-    local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
-
     local horrorParticle = HORROR_PARTICLE:Clone();
     horrorParticle.Parent = npcClass.RootPart;
     properties.HorrorParticle = horrorParticle;
@@ -84,8 +82,6 @@ end
 function npcPackage.Spawned(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local healthComp = npcClass.HealthComp;
-
-    local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
 
     npcClass.WieldComp.TargetableTags = {
         Zombie = true;

@@ -4,9 +4,6 @@ local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
 local modCollectiblesLibrary = shared.require(game.ReplicatedStorage.Library.CollectiblesLibrary);
 
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
@@ -35,6 +32,8 @@ function modPlayers.onRequire()
 end
 
 shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
+    local player = playerClass:GetInstance();
+
 	local wieldComp: WieldComp = playerClass.WieldComp;
 
 	wieldComp.TargetableTags.Zombie = true;
@@ -44,57 +43,13 @@ shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
 
     if RunService:IsClient() then return end;
     
-    local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
-
-    local player = playerClass:GetInstance();
-    local profile: ProfileRotd = shared.modProfile:Get(player) :: ProfileRotd;
-	local gameSave: GameSaveRotd = profile:GetActiveSave() :: GameSaveRotd;
-
-	task.spawn(function()
-		local eventPart = workspace:WaitForChild("Event");
-		local masusPlushieSpawnAtt = eventPart:FindFirstChild("MasusPlushie"); 
-
-		local worldInfo = modBranchConfigs.WorldLibrary[modBranchConfigs.GetWorld()];
-		if worldInfo and worldInfo.Index then
-
-			local dayName = modSyncTime.GetWeekDay();
-			local dayIndex = modSyncTime.WeekdayIndex[dayName];
-
-			if worldInfo.Index == 0 or dayIndex == worldInfo.Index then
-				if masusPlushieSpawnAtt and profile.Collectibles.masus == nil then
-					task.spawn(function()
-						game.ReplicatedStorage.Prefabs.Items:WaitForChild("masusplush");
-						local dropPrefab, interactable = modItemDrops.spawn{
-							ItemId = "masusplush";
-							Quantity = 1;
-							SpawnCFrame = masusPlushieSpawnAtt.WorldCFrame;
-							Players = {player};
-							DespawnDuration = false;
-							Anchored = true;
-						};
-						interactable.Values.CollectibleId = "masus";
-					end)
-				end
-			end
-		end
-	end)
-
-	player:GetAttributeChangedSignal("Location"):Connect(function()
-		if gameSave == nil then return end;
-
-		local location = player:GetAttribute("Location");
-		if location == nil then return end;
-
-		local setSpawn = modGpsLibrary.SpawnLocationLibrary[location];
-		if setSpawn == nil then return end;
-		
-		local oldSpawn = gameSave.Spawn;
-		gameSave.Spawn = setSpawn;
-		Debugger:StudioWarn(`Set spawn from ({oldSpawn}) to ({location} = {setSpawn})`);
-	end)
-
 	local properties = playerClass.Properties;
 	properties.CanOverheal = true;
+end)
+
+shared.coreBind(modPlayers.Player, "_character_added", function(playerClass: PlayerClass, character: Model)
+    local characterComp = playerClass.CharacterComp;
+
 end)
 
 return modPlayers;

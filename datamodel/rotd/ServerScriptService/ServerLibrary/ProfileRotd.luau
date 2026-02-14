@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 
 local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
@@ -38,7 +38,7 @@ end)
 
 shared.coreBind(modProfile, "_save", function(profile: ProfileRotd, overrideData: any?, force: boolean?)
     
-	if modBranchConfigs.IsWorld("Safehome") then
+	if modBranchConfigurations.IsWorld("Safehome") then
 		if profile.Safehome then
 			profile.Safehome.LastActive = os.time();
 		end 
@@ -140,7 +140,7 @@ function modProfile.onRequire()
 				return rPacket;
 			end
 
-			if modBranchConfigs.WorldName ~= "MainMenu" then
+			if modBranchConfigurations.WorldName ~= "MainMenu" then
 				rPacket.Success = true;
 				rPacket.Index = 3;
 
@@ -158,7 +158,7 @@ function modProfile.onRequire()
 				-- 	if success then return end;
 				-- end
 				local spawnId = saveData.Spawn;
-				local worldId = modBranchConfigs.GetWorldOfSpawn(spawnId);
+				local worldId = modBranchConfigurations.GetWorldOfSpawn(spawnId);
 				
 				if worldId == nil then
 					shared.Notify(player, "Invalid SpawnId ("..spawnId.."), spawning in the warehouse.", "Negative");

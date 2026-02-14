@@ -5,13 +5,13 @@ local HumanModule = script.Parent.Human;
 --== Modules
 local modNpcComponent = shared.require(game.ServerScriptService.ServerLibrary.Entity.NpcClass);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 -- Note; Function called for each NPC before parented to workspace;
 return function(npc, spawnPoint)
 	local self = modNpcComponent{
 		Prefab = npc;
-		SpawnPoint = spawnPoint;
+		SpawnCFrame = spawnPoint;
 		Immortal = 1;
 		
 	};
@@ -22,7 +22,7 @@ return function(npc, spawnPoint)
 		self.Humanoid.WalkSpeed = 6;
 		self.Humanoid.JumpPower = 50;
 		
-		if modBranchConfigs.IsWorld("TheResidentials") then
+		if modBranchConfigurations.IsWorld("TheResidentials") then
 			repeat until not self.Update();
 		else
 			coroutine.yield();

@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
@@ -21,7 +21,7 @@ if RunService:IsServer() then
 	modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
-	if modBranchConfigs.IsWorld("TheWarehouse") then
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
 		
         shared.modEventService:OnInvoked("GameModeManager_BindGameModeStart", function(eventPacket: EventPacket, packet)
 			local room = packet.Room;
@@ -154,7 +154,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheWarehouse") then return; end;
+	if not modBranchConfigurations.IsWorld("TheWarehouse") then return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();

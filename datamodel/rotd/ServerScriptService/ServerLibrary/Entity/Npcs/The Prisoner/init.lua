@@ -24,7 +24,10 @@ local npcPackage = {
 
     AddComponents = {
         "TargetHandler";
-        "MeleeAttack";
+        "ZombieBasicMeleeAttack";
+    };
+    AddBehaviorTrees = {
+        "ZombieBossDefaultTree";
     };
 };
 
@@ -56,6 +59,29 @@ function npcPackage.Spawning(npcClass: NpcClass)
             rad = rad + (rate * task.wait());
             chainMotor1.C1 = CFrame.Angles(0, rad, 0);
             chainMotor2.C1 = CFrame.Angles(0, rad, 0);
+        end
+    end)
+
+    npcClass.OnThink:Connect(function() 
+        if npcClass.HealthComp.CurHealth <= npcClass.HealthComp.MaxHealth*0.5 then
+            if npcClass.WieldComp.EquipmentClass == nil then
+                npcClass.WieldComp:Equip{
+                    ItemId = "survivalknife";
+                    OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
+                        if toolHandler.EquipmentClass == nil then return end;
+                        local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
+
+                        local modifier = equipmentClass.Configurations.newModifier("PrisonerMelee");
+                        modifier.SetValues.Damage = 25;
+                        modifier.SetValues.NpcPercentHealthDamage = 0.35;
+                        equipmentClass.Configurations:AddModifier(modifier, true);
+                    end;
+                };
+            end
+        else
+            if npcClass.WieldComp.EquipmentClass then
+                npcClass.WieldComp:Unequip();
+            end
         end
     end)
 end

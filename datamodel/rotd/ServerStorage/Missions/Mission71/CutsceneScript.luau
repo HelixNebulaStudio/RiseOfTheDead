@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 --== Variables;
 local MISSION_ID = 71;
@@ -20,7 +20,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if modBranchConfigs.IsWorld("MainMenu") then return end;
+	if modBranchConfigurations.IsWorld("MainMenu") then return end;
 
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();

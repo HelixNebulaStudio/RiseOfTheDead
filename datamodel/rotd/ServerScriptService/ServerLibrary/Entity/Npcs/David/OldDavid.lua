@@ -11,7 +11,7 @@ local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 return function(npc, spawnPoint)
 	local self = modNpcComponent{
 		Prefab = npc;
-		SpawnPoint = spawnPoint;
+		SpawnCFrame = spawnPoint;
 		Immortal = 1;
 		
 		Properties = {

@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 
@@ -22,7 +22,7 @@ if RunService:IsServer() then
 		end
 	end
 	
-	if modBranchConfigs.IsWorld("TheMall") then
+	if modBranchConfigurations.IsWorld("TheMall") then
 		shared.modEventService:OnInvoked("Destructibles_BindDestroyed", function(event: EventPacket, ...) 
 			local destructible: DestructibleInstance = ...;
 			if destructible.Properties.MissionIdTag ~= MISSION_ID then return; end
@@ -50,7 +50,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheMall") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigurations.IsWorld("TheMall") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();

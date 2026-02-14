@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
@@ -14,7 +14,7 @@ local modifierPackage = {
 --==
 if RunService:IsServer() then
 	function modifierPackage.Binds.WeaponShotDamageData(modifier: ItemModifierInstance, damageData: DamageData)
-		if modBranchConfigs.IsWorld("Slaughterfest") then return end;
+		if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
 		
 		task.spawn(function()
 			local damage = damageData.Damage;

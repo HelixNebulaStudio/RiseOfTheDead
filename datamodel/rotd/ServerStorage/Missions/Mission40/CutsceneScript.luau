@@ -4,7 +4,7 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
@@ -26,7 +26,7 @@ if RunService:IsServer() then
 	tombsInteractable = script.Parent:WaitForChild("Raid_Tombs");
 	tombRaidPickup = script.Parent:WaitForChild("TombRaidPickup");
 
-	if modBranchConfigs.IsWorld("TheWarehouse") then
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
 		local caveTpTouch = modTouchHandler.new("CaveTP", 1);
 		
 		function caveTpTouch:OnPlayerTouch(player, basePart, part)
@@ -134,7 +134,7 @@ if RunService:IsServer() then
 			end)
 		end)
 
-	elseif modBranchConfigs.IsWorld("Tombs") then
+	elseif modBranchConfigurations.IsWorld("Tombs") then
 		
 		shared.modEventService:OnInvoked("GameModeManager_BindGameModeComplete", function(eventPacket: EventPacket, packet)
 			local room = packet.Room;
@@ -194,7 +194,7 @@ end
 --== Script;
 return function(CutsceneSequence)
 
-	if modBranchConfigs.IsWorld("TheWarehouse") then
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -255,7 +255,7 @@ return function(CutsceneSequence)
 		end)
 		
 
-	elseif modBranchConfigs.IsWorld("Tombs") then
+	elseif modBranchConfigurations.IsWorld("Tombs") then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();

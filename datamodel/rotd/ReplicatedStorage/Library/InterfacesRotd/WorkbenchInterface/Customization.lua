@@ -9,7 +9,7 @@ local modGarbageHandler = shared.require(game.ReplicatedStorage.Library.GarbageH
 local modCustomizationData = shared.require(game.ReplicatedStorage.Library.CustomizationData);
 local modColorsLibrary = shared.require(game.ReplicatedStorage.Library.ColorsLibrary);
 local modItemSkinsLibrary = shared.require(game.ReplicatedStorage.Library.ItemSkinsLibrary)
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemSkinWear = shared.require(game.ReplicatedStorage.Library.ItemSkinWear);
 
 local modDropdownList = shared.require(game.ReplicatedStorage.Library.UI.DropdownList);
@@ -38,7 +38,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 	local binds = workbenchWindow.Binds;
 	function WorkbenchClass.new(itemId, appearanceLib, storageItem)
-		local isDevBranch = modBranchConfigs.CurrentBranch.Name == "Dev";
+		local isDevBranch = shared.gameConfig.BranchName == "Dev";
 		if firstSync == false then
 			firstSync = true;
 

@@ -8,7 +8,7 @@ local localPlayer = game.Players.LocalPlayer;
 
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modStatusLibrary = shared.require(game.ReplicatedStorage.Library.StatusLibrary);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 
@@ -23,7 +23,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
     local remoteKeypadInput = modRemotesManager:Get("KeypadInput");
 
-    local branchColor = modBranchConfigs.BranchColor;
+    local branchColor = modBranchConfigurations.BranchColor;
     local activeInput = "";
 
 	local menu = script:WaitForChild("Keypad"):Clone();

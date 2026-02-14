@@ -6,7 +6,7 @@ local GameModeLibrary = {};
 ---==
 
 local Shuffle = {
-	SurvivalFailed={};
+	SurvivalEnded={};
 	BossKilledTrack={};
 	WaveStartTrack={};
 	WaveEndTrack={};
@@ -314,22 +314,23 @@ GameModeLibrary.GameModes={
 		-- HardModeTitleImage="http://www.roblox.com/asset/?id=12409876370";
 		Stages={
 			["Sector F"]={
-				WorldId="SectorF";
-				ExitSpawn="CXsecF2";
-				TitleImage="http://www.roblox.com/asset/?id=4817414130";
-				MaxPlayers=4;
-				RewardsId="sectorfcrate";
-				RewardsIds={"sectorfcrate"; "ucsectorfcrate"};
-				HardRewardId="corruptedsectorfcrate";
+				WorldId = "SectorF";
+				ExitSpawn = "CXsecF2";
+				TitleImage = "http://www.roblox.com/asset/?id=4817414130";
+				MaxPlayers = 4;
+				RewardsId = "sectorfcrate";
+				RewardsIds = {"sectorfcrate"; "ucsectorfcrate"};
+				HardRewardId = "corruptedsectorfcrate";
 				
-				SurvivalFailedTrack="SectorFSoundtrack";
-				BossKilledTrack="SectorFBossKilled";
-				WaveStartTrack="SectorFWaveStart";
-				WaveEndTrack="SectorFWaveEnd";
+				SurvivalEndedTrack = "SectorFSoundtrack";
+				BossKilledTrack = "SectorFBossKilled";
+				WaveStartTrack = "SectorFWaveStart";
+				WaveEndTrack = "SectorFWaveEnd";
 				
-				LeaderboardDataKey="Waves";
+				LeaderboardDataKey = "Waves";
 				
-				HardModeEnabled=true;
+				HardModeEnabled = true;
+				WavePassMode = true;
 			};
 			["Prison"]={
 				WorldId="Prison";
@@ -340,7 +341,7 @@ GameModeLibrary.GameModes={
 				RewardsIds={"prisoncrate"; "nprisoncrate"};
 				HardRewardId="corruptedprisoncrate";
 				
-				SurvivalFailedTrack="PrisonSoundtrack";
+				SurvivalEndedTrack="PrisonSoundtrack";
 				BossKilledTrack="PrisonBossKilled";
 				WaveStartTrack="PrisonWaveStart";
 				WaveEndTrack="PrisonWaveEnd";
@@ -348,6 +349,7 @@ GameModeLibrary.GameModes={
 				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
+				WavePassMode = true;
 			};
 			["Sector D"]={
 				WorldId="SectorD";
@@ -358,7 +360,7 @@ GameModeLibrary.GameModes={
 				RewardsIds={"sectordcrate"; "ucsectordcrate"};
 				HardRewardId="corruptedsectordcrate";
 				
-				SurvivalFailedTrack="SectorDSoundtrack";
+				SurvivalEndedTrack="SectorDSoundtrack";
 				BossKilledTrack="SectorDBossKilled";
 				WaveStartTrack="SectorDWaveStart";
 				WaveEndTrack="SectorDWaveEnd";
@@ -366,6 +368,7 @@ GameModeLibrary.GameModes={
 				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
+				WavePassMode = true;
 			};
 			["Swamplands"]={
 				WorldId="Swamplands";
@@ -376,7 +379,7 @@ GameModeLibrary.GameModes={
 				-- RewardsIds={"sectordcrate"; "ucsectordcrate"};
 				-- HardRewardId="corruptedsectordcrate";
 				
-				SurvivalFailedTrack="SectorDSoundtrack";
+				SurvivalEndedTrack="SectorDSoundtrack";
 				BossKilledTrack="SectorDBossKilled";
 				WaveStartTrack="SectorDWaveStart";
 				WaveEndTrack="SectorDWaveEnd";
@@ -384,51 +387,55 @@ GameModeLibrary.GameModes={
 				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
+				WavePassMode = true;
 			};
-			["Community WaySide"]={
+			["CommunityWaySide"]={
 				WorldId="CommunityWaySide";
 				TitleImage="http://www.roblox.com/asset/?id=10976370766";
 				MaxPlayers=5;
-				RewardsId="communitycrate";
+				RewardsIds = {"communitycrate"; "communitycrate2"};
 
-				SurvivalFailedTrack="Soundtrack:Sin Doctor";
-				BossKilledTrack=Shuffle.BossKilledTrack;
-				WaveStartTrack=Shuffle.WaveStartTrack;
-				WaveEndTrack=Shuffle.WaveEndTrack;
+				SurvivalEndedTrack = "Soundtrack:Sin Doctor";
+				BossKilledTrack = Shuffle.BossKilledTrack;
+				WaveStartTrack = Shuffle.WaveStartTrack;
+				WaveEndTrack = Shuffle.WaveEndTrack;
 
 				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
+				WavePassMode = true;
 			};
-			["Community FissionBay"]={
+			["CommunityFissionBay"]={
 				WorldId="CommunityFissionBay";
 				TitleImage="http://www.roblox.com/asset/?id=12401525448";
 				MaxPlayers=5;
-				RewardsId="communitycrate";
+				RewardsIds = {"communitycrate"; "communitycrate2"};
 
-				SurvivalFailedTrack=Shuffle.SurvivalFailed;
-				BossKilledTrack=Shuffle.BossKilledTrack;
-				WaveStartTrack=Shuffle.WaveStartTrack;
-				WaveEndTrack=Shuffle.WaveEndTrack;
+				SurvivalEndedTrack = Shuffle.SurvivalEnded;
+				BossKilledTrack = Shuffle.BossKilledTrack;
+				WaveStartTrack = Shuffle.WaveStartTrack;
+				WaveEndTrack = Shuffle.WaveEndTrack;
 
 				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
+				WavePassMode = true;
 			};
-			["Community Rooftops"]={
+			["CommunityRooftops"]={
 				WorldId="CommunityRooftops";
 				TitleImage="http://www.roblox.com/asset/?id=13951712046";
 				MaxPlayers=5;
-				RewardsId="communitycrate2";
+				RewardsIds = {"communitycrate"; "communitycrate2"};
 
-				SurvivalFailedTrack=Shuffle.SurvivalFailed;
-				BossKilledTrack=Shuffle.BossKilledTrack;
-				WaveStartTrack=Shuffle.WaveStartTrack;
-				WaveEndTrack=Shuffle.WaveEndTrack;
+				SurvivalEndedTrack = Shuffle.SurvivalEnded;
+				BossKilledTrack = Shuffle.BossKilledTrack;
+				WaveStartTrack = Shuffle.WaveStartTrack;
+				WaveEndTrack = Shuffle.WaveEndTrack;
 
 				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
+				WavePassMode = true;
 			};
 		};
 	};
@@ -523,13 +530,13 @@ GameModeLibrary.GameModes={
 			};
 			
 			["Mr. Klaw's Workshop"]={
-				WorldId="KlawsWorkshop";
-				TitleImage="http://www.roblox.com/asset/?id=8402447350";
+				WorldId = "KlawsWorkshop";
+				TitleImage = "http://www.roblox.com/asset/?id=8402447350";
 				
-				MaxPlayers=4;
-				RewardsId= modConfigurations.SpecialEvent.Christmas and "xmaspresent2021" or nil;
-				RewardsIds= modConfigurations.SpecialEvent.Christmas and {"xmaspresent2021";} or nil;
-				EnableStopwatch=true;
+				MaxPlayers = 4;
+				RewardsId = modConfigurations.SpecialEvent.Christmas and "xmaspresent2021" or nil;
+				RewardsIds = modConfigurations.SpecialEvent.Christmas and {"xmaspresent2021";} or nil;
+				EnableStopwatch = true;
 			};
 
 			["SunkenShip"]={
@@ -632,8 +639,8 @@ function GameModeLibrary.onRequire()
                 -- };
             end
             
-            if stageLib.SurvivalFailedTrack and typeof(stageLib.SurvivalFailedTrack) == "string" then
-                table.insert(Shuffle.SurvivalFailed, stageLib.SurvivalFailedTrack)
+            if stageLib.SurvivalEndedTrack and typeof(stageLib.SurvivalEndedTrack) == "string" then
+                table.insert(Shuffle.SurvivalEnded, stageLib.SurvivalEndedTrack)
             end
             if stageLib.BossKilledTrack and typeof(stageLib.BossKilledTrack) == "string" then
                 table.insert(Shuffle.BossKilledTrack, stageLib.BossKilledTrack)
@@ -648,7 +655,7 @@ function GameModeLibrary.onRequire()
         end
     end
 
-    table.insert(Shuffle.SurvivalFailed, "ErrorSoundtrack");
+    table.insert(Shuffle.SurvivalEnded, "ErrorSoundtrack");
     table.insert(Shuffle.BossKilledTrack, "ErrorBossKilled");
     table.insert(Shuffle.WaveStartTrack, "ErrorWaveStart");
     table.insert(Shuffle.WaveEndTrack, "ErrorWaveEnd");

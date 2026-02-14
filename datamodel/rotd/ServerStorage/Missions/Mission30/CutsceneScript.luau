@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
@@ -19,7 +19,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if modBranchConfigs.IsWorld("TheUnderground") then
+	if modBranchConfigurations.IsWorld("TheUnderground") then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player = players[1];
@@ -220,7 +220,7 @@ return function(CutsceneSequence)
 		return CutsceneSequence;
 
 	--MARK: TheMall
-	elseif modBranchConfigs.IsWorld("TheMall") then
+	elseif modBranchConfigurations.IsWorld("TheMall") then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player = players[1];

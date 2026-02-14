@@ -61,7 +61,7 @@ if RunService:IsServer() then
 		local configurations = modifier.EquipmentClass and modifier.EquipmentClass.Configurations;
 
 		
-		local targetClass: ComponentOwner = healthComp.CompOwner;
+		local targetClass: EntityClass = healthComp.CompOwner;
 		local statusComp: StatusComp? = targetClass.StatusComp;
 		if statusComp == nil then return end;
 		

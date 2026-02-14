@@ -8,7 +8,7 @@ local localPlayer = game.Players.LocalPlayer;
 local camera = workspace.CurrentCamera;
 
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
@@ -113,7 +113,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 
 
-	local branchColor = modBranchConfigs.BranchColor;
+	local branchColor = modBranchConfigurations.BranchColor;
 	local missionLogicCheckpointDebounce = {};
 	local missionListings = {};
 	local tabAndLists = {};
@@ -198,7 +198,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end
 
-	if modBranchConfigs.CurrentBranch.Name == "Live" then
+	if shared.gameConfig.BranchName == "Live" then
 		MISSION_TYPE_ORDER.Unreleased = nil;
 	end
 
@@ -268,7 +268,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		missionHudTask:Update();
 	end
 
-
+	local initMissionPass;
     --MARK: Window
 	local window: InterfaceWindow = interface:NewWindow("Missions", windowFrame);
 	window.CompactFullscreen = true;
@@ -403,8 +403,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end
 
 
+	--MARK: OnToggle
 	window.OnToggle:Connect(function(visible, action)
 		if visible then
+			if initMissionPass then initMissionPass() end;
 			if action == "giftshop" then
 				interface:HideAll{[window.Name]=true; ["Inventory"]=true;};
 			else
@@ -700,7 +702,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				newEntry.Name = id;
 
 				newEntry.MouseButton1Click:Connect(function()
-					if modBranchConfigs.CurrentBranch.Name == "Dev" then
+					if shared.gameConfig.BranchName == "Dev" then
 						Debugger:Warn("Id",id,"ChildCount",countChildren(node),"Order",node.Order, "missionData", missionData);
 					end
 					if missionData == nil then return end;
@@ -797,7 +799,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			local titleLabel: TextLabel = newEntry:WaitForChild("Title") :: TextLabel;
 			local dbSuffix = " ("..lib.MissionId..")";
-			titleLabel.Text = lib.Name.. (modBranchConfigs.CurrentBranch.Name == "Dev" and dbSuffix or "");
+			titleLabel.Text = lib.Name.. (shared.gameConfig.BranchName == "Dev" and dbSuffix or "");
 			
 			local npcLib = modNpcProfileLibrary:Find(lib.From);
 			local avatarLabel: ImageButton = newEntry:WaitForChild("Avatar") :: ImageButton;
@@ -1343,6 +1345,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
 	local pinRequestDebounce = false;
 
+	--MARK: OnUpdate
     window.OnUpdate:Connect(function()
 		hideComplete = modData.Settings and modData.Settings["HideCM"] == 1;
 		local _maxActiveMissions = modData.Profile and modData.Profile.Premium and 5 or 3;
@@ -1645,7 +1648,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 			local dbSuffix = " ("..missionLib.MissionId..")";
 			
-			titleTag.Text = missionLib.Name.. (modBranchConfigs.CurrentBranch.Name == "Dev" and dbSuffix or "");
+			titleTag.Text = missionLib.Name.. (shared.gameConfig.BranchName == "Dev" and dbSuffix or "");
 			fromTag.Text = missionLib.From or "";
 
 			if missionData.Type == 1 then -- Active
@@ -2332,7 +2335,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		--== Markers
 		if pinnedMission then
 			local function setPinnedMarker(missionWorld, markInfo)
-				if missionWorld == nil or missionWorld == modBranchConfigs.WorldName then
+				if missionWorld == nil or missionWorld == modBranchConfigurations.WorldName then
 					if markInfo.Type == modMarkers.MarkerTypes.Waypoint then
 						modMarkers.SetMarker("PinMissionMarker", markInfo.Target, markInfo.Label, markInfo.Type);
 
@@ -2344,7 +2347,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						end
 					end
 				else
-					modMarkers.SetMarker("PinMissionMarker", missionWorld, modBranchConfigs.GetWorldDisplayName(missionWorld), modMarkers.MarkerTypes.Travel);
+					modMarkers.SetMarker("PinMissionMarker", missionWorld, modBranchConfigurations.GetWorldDisplayName(missionWorld), modMarkers.MarkerTypes.Travel);
 				end
 				modMarkers.SetColor("PinMissionMarker", markInfo.Color or missionMarkerColor);
 			end
@@ -2362,9 +2365,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						local npcLib = modNpcProfileLibrary:Find(pinnedMissionLib.From);
 						local npcWorld = pinnedMissionLib.NpcWorld or (npcLib and npcLib.World) or nil;
 
-						if npcWorld ~= modBranchConfigs.WorldName then
+						if npcWorld ~= modBranchConfigurations.WorldName then
 
-							modMarkers.SetMarker("PinMissionMarker", npcWorld, modBranchConfigs.GetWorldDisplayName(npcWorld), modMarkers.MarkerTypes.Travel);
+							modMarkers.SetMarker("PinMissionMarker", npcWorld, modBranchConfigurations.GetWorldDisplayName(npcWorld), modMarkers.MarkerTypes.Travel);
 							modMarkers.SetColor("PinMissionMarker", missionMarkerColor);
 						else
 							modMarkers.ClearMarker("PinMissionMarker");
@@ -2443,323 +2446,588 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		countAvailableMissions();
 	end)
 	
-	--== MissionPrize;
-	local unixTime = modSyncTime.GetTime();
-	
-	local BottomFrame = windowFrame:WaitForChild("BottomBackground");
-	local battlePassContent = BottomFrame:WaitForChild("battlePass");
-	local hintLabel = BottomFrame:WaitForChild("hint");
-
-	local passButton: ImageButton = BottomFrame:WaitForChild("passButton");
-	local passIconLabel = passButton:WaitForChild("EventIcon");
-	local titleLabel = passButton:WaitForChild("Title");
-	local lvlLabel = passButton:WaitForChild("LvlLabel");
-
-	local activeBpId = modBattlePassLibrary.Active;
-	local battlepassLib = modBattlePassLibrary:Find(activeBpId);
-	
-	local dOYToday = os.date("%j", unixTime); 
-	local dOYEnd = battlepassLib and tonumber(os.date("%j", battlepassLib.EndUnixTime)) or 0;
-	
-	local yearToday = tonumber(os.date("%Y", unixTime));
-	local yearEnd = battlepassLib and tonumber(os.date("%Y", battlepassLib.EndUnixTime)) or 0;
-	
-	local leftFrameSizeXAnchor = 0.3;
-	local rightFrameSizeXAnchor = 1-leftFrameSizeXAnchor;
-	
-	PinnedMissionFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0, 90);
-	
-	local daysLeft = (dOYEnd+(yearEnd-yearToday)*365)-dOYToday-1;
-	if activeBpId == nil or daysLeft < 0 then
-		BottomFrame.Visible = false;
-		LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, 0);
-		LeftFrame.Position = UDim2.new(0, 0, 1, 0);
-		RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, 0);
-		RightFrame.Position = UDim2.new(1, 0, 1, 0);
+	initMissionPass = function()
+		local unixTime = modSyncTime.GetTime();
 		
-		hintLabel.Text = "Event Pass has ended";
+		local BottomFrame = windowFrame:WaitForChild("BottomBackground");
+		local battlePassContent = BottomFrame:WaitForChild("battlePass");
+		local hintLabel = BottomFrame:WaitForChild("hint");
+
+		local passButton: ImageButton = BottomFrame:WaitForChild("passButton");
+		local passIconLabel = passButton:WaitForChild("EventIcon");
+		local titleLabel = passButton:WaitForChild("Title");
+		local lvlLabel = passButton:WaitForChild("LvlLabel");
+
+		local activeBpId = modBattlePassLibrary.Active;
+		local battlepassLib = modBattlePassLibrary:Find(activeBpId);
 		
-	else
-		BottomFrame.Visible = true;
-		LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, -150);
-		LeftFrame.Position = UDim2.new(0, 0, 1, -150);
-		RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, -60);
-		RightFrame.Position = UDim2.new(1, 0, 1, -60);
+		local dOYToday = os.date("%j", unixTime); 
+		local dOYEnd = battlepassLib and tonumber(os.date("%j", battlepassLib.EndUnixTime)) or 0;
 		
-		hintLabel.Text = "Event Pass: ".. daysLeft .." Days Left";
+		local yearToday = tonumber(os.date("%Y", unixTime));
+		local yearEnd = battlepassLib and tonumber(os.date("%Y", battlepassLib.EndUnixTime)) or 0;
 		
-		titleLabel.Text = battlepassLib.Title;
-		passIconLabel.Image = battlepassLib.Icon;
-
-		local bpButtonFunc;
-
-		--== MARK: Event Pass
-		modData:RequestData("BattlePassSave/Passes/"..activeBpId);
-
-		passButton.MouseEnter:Connect(function()
-			passButton.ImageColor3 = Color3.fromRGB(112, 63, 63);
-		end)
-		passButton.MouseLeave:Connect(function()
-			passButton.ImageColor3 = Color3.fromRGB(75, 40, 40);
-		end)
-		passButton.MouseButton1Click:Connect(function()
-			interface:PlayButtonClick();
-			local bpFrame = MissionDisplayFrame:FindFirstChild("BpFrame");
-			if bpFrame and bpFrame:FindFirstChild("ScrollFrame") and bpFrame.ScrollFrame.CanvasPosition.Y > 0 then
-				bpFrame.ScrollFrame.CanvasPosition = Vector2.new(0, (bpFrame.ScrollFrame.AbsoluteWindowSize.Y/2)-1);
-
-			elseif bpButtonFunc then
-				bpButtonFunc();
-
-			end
-		end)
+		local leftFrameSizeXAnchor = 0.3;
+		local rightFrameSizeXAnchor = 1-leftFrameSizeXAnchor;
 		
-		table.clear(levelSlotsInfo);
-		function binds.UpdateBattlePass(action)
-			local battlePassData, seasonData;
-
-			local function refreshData()
-				battlePassData = modData.Profile and modData.Profile.BattlePassSave or nil;
-				seasonData = battlePassData and battlePassData.Passes and battlePassData.Passes[activeBpId] or {Claim={}; Level=0;};
-				return battlePassData, seasonData;
-			end
-			refreshData();
+		PinnedMissionFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0, 90);
+		
+		local daysLeft = (dOYEnd+(yearEnd-yearToday)*365)-dOYToday-1;
+		if activeBpId == nil or daysLeft < 0 then
+			BottomFrame.Visible = false;
+			LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, 0);
+			LeftFrame.Position = UDim2.new(0, 0, 1, 0);
+			RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, 0);
+			RightFrame.Position = UDim2.new(1, 0, 1, 0);
 			
+			hintLabel.Text = "Event Pass has ended";
 			
-			bpButtonFunc = function()
+		else
+			BottomFrame.Visible = true;
+			LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, -150);
+			LeftFrame.Position = UDim2.new(0, 0, 1, -150);
+			RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, -60);
+			RightFrame.Position = UDim2.new(1, 0, 1, -60);
+			
+			hintLabel.Text = "Event Pass: ".. daysLeft .." Days Left";
+			
+			titleLabel.Text = battlepassLib.Title;
+			passIconLabel.Image = battlepassLib.Icon;
+
+			local bpButtonFunc;
+
+			--== MARK: Event Pass
+			modData:RequestData("BattlePassSave/Passes/"..activeBpId);
+
+			passButton.MouseEnter:Connect(function()
+				passButton.ImageColor3 = Color3.fromRGB(112, 63, 63);
+			end)
+			passButton.MouseLeave:Connect(function()
+				passButton.ImageColor3 = Color3.fromRGB(75, 40, 40);
+			end)
+			passButton.MouseButton1Click:Connect(function()
+				interface:PlayButtonClick();
+				local bpFrame = MissionDisplayFrame:FindFirstChild("BpFrame");
+				if bpFrame and bpFrame:FindFirstChild("ScrollFrame") and bpFrame.ScrollFrame.CanvasPosition.Y > 0 then
+					bpFrame.ScrollFrame.CanvasPosition = Vector2.new(0, (bpFrame.ScrollFrame.AbsoluteWindowSize.Y/2)-1);
+
+				elseif bpButtonFunc then
+					bpButtonFunc();
+
+				end
+			end)
+			
+			table.clear(levelSlotsInfo);
+			function binds.UpdateBattlePass(action)
+				local battlePassData, seasonData;
+
+				local function refreshData()
+					battlePassData = modData.Profile and modData.Profile.BattlePassSave or nil;
+					seasonData = battlePassData and battlePassData.Passes and battlePassData.Passes[activeBpId] or {Claim={}; Level=0;};
+					return battlePassData, seasonData;
+				end
 				refreshData();
-
-				MissionDisplayFrame:ClearAllChildren();
-
-				local passRewardFrame = templatePassReward:Clone();
-				passRewardFrame.Name = "BpFrame";
-				passRewardFrame.Parent = MissionDisplayFrame;
-
-				local titleLabel = passRewardFrame:WaitForChild("Title");
-				titleLabel.Text =  '<font size="14">'.."Event Pass</font>\n<b>".. battlepassLib.Title .."</b>";
-
-				local contentFrame = passRewardFrame:WaitForChild("Frame");
-				local slotFrame = contentFrame:WaitForChild("Slot");
-				local descLabel = contentFrame:WaitForChild("Description");
-
-				if battlepassLib.BpPage then
-					contentFrame.Visible = false;
-					titleLabel.Visible = false;
-
-					local bpScrollingPage = modScrollingPageUI.new(battlepassLib.BpPage:Clone());
-					bpScrollingPage.ScrollFrame.Parent = passRewardFrame;
-					bpScrollingPage.ScrollFrame.Visible = true;
-
-				else
-					contentFrame.Visible = true;
-					titleLabel.Visible = true;
-
-					local itemIcon = passIconLabel:Clone();
-					itemIcon.Size = UDim2.new(1, 0, 1, 0);
-					itemIcon.Parent = slotFrame;
-	
-					slotFrame.AnchorPoint = Vector2.new(0.5, 0);
-					slotFrame.Position = UDim2.new(0.5, 0, 0, -10);
-					slotFrame.Size = UDim2.new(0.7, 0, 0.6, 0);
-	
-					descLabel.Position = UDim2.new(0, 0, 0.6, 0);
-					descLabel.Size = UDim2.new(1, 0, 0, 0);
-					descLabel.ClipsDescendants = false;
-					descLabel.Text = battlepassLib.Desc;
-
-				end
 				
-				local bpPrice = 1000;
-
-				local claimButton = contentFrame:WaitForChild("ClaimButton");
-				claimButton.Text = "Unlock for ".. modFormatNumber.Beautify(bpPrice) .." Gold";
 				
-				claimButton.TextScaled = false;
-				claimButton.Position = UDim2.new(0.5, 0, 1, -40);
-				claimButton.Size = UDim2.new(0.6, 0, 0, 40);
-				claimButton.BackgroundColor3 = branchColor;
-				game.Debris:AddItem(claimButton:FindFirstChild("UITextSizeConstraint"), 0);
-
-				claimButton.Visible = false;
-
-				if seasonData.Owned ~= true then
-					claimButton.Visible = true;
-				end
-
-				claimButton.MouseButton1Click:Connect(function()
+				bpButtonFunc = function()
 					refreshData();
-					interface:PlayButtonClick();
 
-					local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. bpPrice.." Gold</font></b>";
-					modClientGuis.promptDialogBox({
-						Title=`Unlock Event Pass for {goldTxt}?`;
-						Desc=`Are you sure you want to unlock Event Pass: {battlepassLib.Title} for {goldTxt}?`;
-						Icon=battlepassLib.Icon;
-						Buttons={
-							{
-								Text="Purchase";
-								Style="Confirm";
-								OnPrimaryClick=function(dialogWindow)
-									local r = remoteBattlepassRemote:InvokeServer("purchase");
-									if r.FailMsg then
-										if r.FailMsg == "Insufficient Gold" then
-											interface:ToggleWindow("GoldMenu", true, "GoldPage");
-										end
-									end
-								end;
-							};
-							{
-								Text="Cancel";
-								Style="Cancel";
-							};
-						}
-					});
-				end)
-				
-				
-				local function buyLevelFunc(lvlAmt)
-					local price = modBattlePassLibrary.BuyLevelCost * lvlAmt;
-					
-					local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. price.." Gold</font></b>";
-					modClientGuis.promptDialogBox({
-						Title=`Level up Event Pass for {goldTxt}?`;
-						Desc=`Are you sure you want to level up Event Pass by {lvlAmt} for {goldTxt}?`;
-						Icon=battlepassLib.Icon;
-						Buttons={
-							{
-								Text="Level Up";
-								Style="Confirm";
-								OnPrimaryClick=function(dialogWindow)
-									local r = remoteBattlepassRemote:InvokeServer("purchaselvls", lvlAmt);
-									if r.FailMsg then
-										if r.FailMsg == "Insufficient Gold" then
-											interface:ToggleWindow("GoldMenu", true, "GoldPage");
-										end
-									elseif r.Success then
-										
-									end
-								end;
-							};
-							{
-								Text="Cancel";
-								Style="Cancel";
-							};
-						}
-					});
-				end
-				
-				local buyOneLevelButton = claimButton:Clone();
-				buyOneLevelButton.BackgroundColor3 = Color3.fromRGB(170, 120, 0);
-				buyOneLevelButton.AnchorPoint = Vector2.new(0, 1);
-				buyOneLevelButton.Position = UDim2.new(0, 0, 1, 0);
-				buyOneLevelButton.Size = UDim2.new(0.5, -10, 0, 30);
-				buyOneLevelButton.Text = "Unlock 1 Level";
-				buyOneLevelButton.Parent = contentFrame;
-				buyOneLevelButton.Visible = true;
-				
-				buyOneLevelButton.MouseButton1Click:Connect(function()
-					buyLevelFunc(1);
-				end)
-				
+					MissionDisplayFrame:ClearAllChildren();
 
-				local buyTenLevelButton = claimButton:Clone();
-				buyTenLevelButton.BackgroundColor3 = Color3.fromRGB(170, 120, 0);
-				buyTenLevelButton.AnchorPoint = Vector2.new(1, 1);
-				buyTenLevelButton.Position = UDim2.new(1, 0, 1, 0);
-				buyTenLevelButton.Size = UDim2.new(0.5, -10, 0, 30);
-				buyTenLevelButton.Text = "Unlock 10 Levels";
-				buyTenLevelButton.Parent = contentFrame;
-				buyTenLevelButton.Visible = true;
+					local passRewardFrame = templatePassReward:Clone();
+					passRewardFrame.Name = "BpFrame";
+					passRewardFrame.Parent = MissionDisplayFrame;
 
-				buyTenLevelButton.MouseButton1Click:Connect(function()
-					buyLevelFunc(10);
-				end)
-			end
+					local titleLabel = passRewardFrame:WaitForChild("Title");
+					titleLabel.Text =  '<font size="14">'.."Event Pass</font>\n<b>".. battlepassLib.Title .."</b>";
 
+					local contentFrame = passRewardFrame:WaitForChild("Frame");
+					local slotFrame = contentFrame:WaitForChild("Slot");
+					local descLabel = contentFrame:WaitForChild("Description");
 
-			local seasonLevel = seasonData.Level;
-			local seasonTokens = seasonData.Tokens or 0;
-			local treeList = battlepassLib.Tree;
-			local treeCount = #treeList;
+					if battlepassLib.BpPage then
+						contentFrame.Visible = false;
+						titleLabel.Visible = false;
 
-			local totalDist = 0;
-			
-			for lvl=0, treeCount do
-				local lvlSlotInfo = levelSlotsInfo[lvl];
+						local bpScrollingPage = modScrollingPageUI.new(battlepassLib.BpPage:Clone());
+						bpScrollingPage.ScrollFrame.Parent = passRewardFrame;
+						bpScrollingPage.ScrollFrame.Visible = true;
 
-				if lvlSlotInfo == nil then
-					local info = {};
-					
-					info.LevelSlot = lvl == 0 and templateStartSlot:Clone() or templateLevelSlot:Clone();
-					info.LevelSlot.LayoutOrder = lvl;
-					
-					levelSlotsInfo[lvl] = info;
-					lvlSlotInfo = info;
-				end
-				
-				local lvlSlot = lvlSlotInfo.LevelSlot;
-				
-				local leafLib = treeList[lvl] or {};
-				local rewardInfo = leafLib.Reward;
-				
-				if leafLib.Empty == true then
-					lvlSlot.Size = UDim2.new(0, 20, 1, 0);
-					
-				else
-					lvlSlot.Size = UDim2.new(0, 80, 1, 0);
-					
-					if lvl == 0 and lvlSlotInfo.btStart == nil then
-						lvlSlotInfo.btStart = true;
-						
-						-- local frame = Instance.new("Frame");
-						-- frame.BackgroundTransparency = 1;
-						-- frame.Size = UDim2.new(0, 70, 0, 70);
-						-- local bpIconButton = Instance.new("ImageButton");
-						-- bpIconButton.BackgroundTransparency = 1;
-						-- bpIconButton.Rotation = 1;
-						-- bpIconButton.AnchorPoint = Vector2.new(0.5, 0.5);
-						-- bpIconButton.Position = UDim2.new(0.5, 0, 0.5, 0);
-						-- bpIconButton.Size = UDim2.new(0, 70, 0, 70);
-						-- bpIconButton.Image = battlepassLib.Icon;
-						-- bpIconButton.Parent = frame;
-						-- frame.Parent = lvlSlot;
-						-- bpIconButton.MouseButton1Click:Connect(bpButtonFunc);
+					else
+						contentFrame.Visible = true;
+						titleLabel.Visible = true;
+
+						local itemIcon = passIconLabel:Clone();
+						itemIcon.Size = UDim2.new(1, 0, 1, 0);
+						itemIcon.Parent = slotFrame;
+		
+						slotFrame.AnchorPoint = Vector2.new(0.5, 0);
+						slotFrame.Position = UDim2.new(0.5, 0, 0, -10);
+						slotFrame.Size = UDim2.new(0.7, 0, 0.6, 0);
+		
+						descLabel.Position = UDim2.new(0, 0, 0.6, 0);
+						descLabel.Size = UDim2.new(1, 0, 0, 0);
+						descLabel.ClipsDescendants = false;
+						descLabel.Text = battlepassLib.Desc;
+
 					end
 					
-					if rewardInfo then
+					local bpPrice = 1000;
+
+					local claimButton = contentFrame:WaitForChild("ClaimButton");
+					claimButton.Text = "Unlock for ".. modFormatNumber.Beautify(bpPrice) .." Gold";
+					
+					claimButton.TextScaled = false;
+					claimButton.Position = UDim2.new(0.5, 0, 1, -40);
+					claimButton.Size = UDim2.new(0.6, 0, 0, 40);
+					claimButton.BackgroundColor3 = branchColor;
+					game.Debris:AddItem(claimButton:FindFirstChild("UITextSizeConstraint"), 0);
+
+					claimButton.Visible = false;
+
+					if seasonData.Owned ~= true then
+						claimButton.Visible = true;
+					end
+
+					claimButton.MouseButton1Click:Connect(function()
+						refreshData();
+						interface:PlayButtonClick();
+
+						local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. bpPrice.." Gold</font></b>";
+						modClientGuis.promptDialogBox({
+							Title=`Unlock Event Pass for {goldTxt}?`;
+							Desc=`Are you sure you want to unlock Event Pass: {battlepassLib.Title} for {goldTxt}?`;
+							Icon=battlepassLib.Icon;
+							Buttons={
+								{
+									Text="Purchase";
+									Style="Confirm";
+									OnPrimaryClick=function(dialogWindow)
+										local r = remoteBattlepassRemote:InvokeServer("purchase");
+										if r.FailMsg then
+											if r.FailMsg == "Insufficient Gold" then
+												interface:ToggleWindow("GoldMenu", true, "GoldPage");
+											end
+										end
+									end;
+								};
+								{
+									Text="Cancel";
+									Style="Cancel";
+								};
+							}
+						});
+					end)
+					
+					
+					local function buyLevelFunc(lvlAmt)
+						local price = modBattlePassLibrary.BuyLevelCost * lvlAmt;
+						
+						local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. price.." Gold</font></b>";
+						modClientGuis.promptDialogBox({
+							Title=`Level up Event Pass for {goldTxt}?`;
+							Desc=`Are you sure you want to level up Event Pass by {lvlAmt} for {goldTxt}?`;
+							Icon=battlepassLib.Icon;
+							Buttons={
+								{
+									Text="Level Up";
+									Style="Confirm";
+									OnPrimaryClick=function(dialogWindow)
+										local r = remoteBattlepassRemote:InvokeServer("purchaselvls", lvlAmt);
+										if r.FailMsg then
+											if r.FailMsg == "Insufficient Gold" then
+												interface:ToggleWindow("GoldMenu", true, "GoldPage");
+											end
+										elseif r.Success then
+											
+										end
+									end;
+								};
+								{
+									Text="Cancel";
+									Style="Cancel";
+								};
+							}
+						});
+					end
+					
+					local buyOneLevelButton = claimButton:Clone();
+					buyOneLevelButton.BackgroundColor3 = Color3.fromRGB(170, 120, 0);
+					buyOneLevelButton.AnchorPoint = Vector2.new(0, 1);
+					buyOneLevelButton.Position = UDim2.new(0, 0, 1, 0);
+					buyOneLevelButton.Size = UDim2.new(0.5, -10, 0, 30);
+					buyOneLevelButton.Text = "Unlock 1 Level";
+					buyOneLevelButton.Parent = contentFrame;
+					buyOneLevelButton.Visible = true;
+					
+					buyOneLevelButton.MouseButton1Click:Connect(function()
+						buyLevelFunc(1);
+					end)
+					
+
+					local buyTenLevelButton = claimButton:Clone();
+					buyTenLevelButton.BackgroundColor3 = Color3.fromRGB(170, 120, 0);
+					buyTenLevelButton.AnchorPoint = Vector2.new(1, 1);
+					buyTenLevelButton.Position = UDim2.new(1, 0, 1, 0);
+					buyTenLevelButton.Size = UDim2.new(0.5, -10, 0, 30);
+					buyTenLevelButton.Text = "Unlock 10 Levels";
+					buyTenLevelButton.Parent = contentFrame;
+					buyTenLevelButton.Visible = true;
+
+					buyTenLevelButton.MouseButton1Click:Connect(function()
+						buyLevelFunc(10);
+					end)
+				end
+
+
+				local seasonLevel = seasonData.Level;
+				local seasonTokens = seasonData.Tokens or 0;
+				local treeList = battlepassLib.Tree;
+				local treeCount = #treeList;
+
+				local totalDist = 0;
+				
+				for lvl=0, treeCount do
+					local lvlSlotInfo = levelSlotsInfo[lvl];
+
+					if lvlSlotInfo == nil then
+						local info = {};
+						
+						info.LevelSlot = lvl == 0 and templateStartSlot:Clone() or templateLevelSlot:Clone();
+						info.LevelSlot.LayoutOrder = lvl;
+						
+						levelSlotsInfo[lvl] = info;
+						lvlSlotInfo = info;
+					end
+					
+					local lvlSlot = lvlSlotInfo.LevelSlot;
+					
+					local leafLib = treeList[lvl] or {};
+					local rewardInfo = leafLib.Reward;
+					
+					if leafLib.Empty == true then
+						lvlSlot.Size = UDim2.new(0, 20, 1, 0);
+						
+					else
+						lvlSlot.Size = UDim2.new(0, 80, 1, 0);
+						
+						if lvl == 0 and lvlSlotInfo.btStart == nil then
+							lvlSlotInfo.btStart = true;
+							
+							-- local frame = Instance.new("Frame");
+							-- frame.BackgroundTransparency = 1;
+							-- frame.Size = UDim2.new(0, 70, 0, 70);
+							-- local bpIconButton = Instance.new("ImageButton");
+							-- bpIconButton.BackgroundTransparency = 1;
+							-- bpIconButton.Rotation = 1;
+							-- bpIconButton.AnchorPoint = Vector2.new(0.5, 0.5);
+							-- bpIconButton.Position = UDim2.new(0.5, 0, 0.5, 0);
+							-- bpIconButton.Size = UDim2.new(0, 70, 0, 70);
+							-- bpIconButton.Image = battlepassLib.Icon;
+							-- bpIconButton.Parent = frame;
+							-- frame.Parent = lvlSlot;
+							-- bpIconButton.MouseButton1Click:Connect(bpButtonFunc);
+						end
+						
+						if rewardInfo then
+							if lvlSlotInfo.ItemButton == nil then
+								local itemButtonObj = modItemInterface.newItemButton(rewardInfo.ItemId);
+								local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
+								
+								local aspectRatioConstraint = Instance.new("UIAspectRatioConstraint");
+								aspectRatioConstraint.Parent = itemButtonObj.ImageButton;
+
+								itemButtonObj.ImageButton.AnchorPoint = Vector2.new(0.5, 0.5);
+								itemButtonObj.ImageButton.Position = UDim2.new(0.5, 0, 0.5, 0);
+								itemButtonObj.ImageButton.Size = UDim2.new(0, 50, 0, 50);
+								itemButtonObj.ImageButton.Parent = lvlSlot;
+								
+								lvlSlotInfo.ItemButton = itemButtonObj;
+								
+								lvlSlotInfo.GetClaimState = function(l)
+									refreshData();
+									seasonLevel = seasonData.Level;
+									
+									local r = "n/a";
+									if seasonLevel > l then
+										if table.find(seasonData.Claim, l) then
+											r = "Claimed";
+										else
+											r = "CanClaim";
+										end
+									else
+										r ="Locked";
+									end
+									return r;
+								end
+								
+								itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
+									if itemButtonObj.DimOut then return end;
+									itemToolTip.Frame.Visible = false;
+									refreshData();
+									interface:PlayButtonClick();
+
+									MissionDisplayFrame:ClearAllChildren();
+
+									local passRewardFrame = templatePassReward:Clone();
+									passRewardFrame.Parent = MissionDisplayFrame;
+
+									local titleLabel = passRewardFrame:WaitForChild("Title");
+									local titleStr = '<font size="10">'.."Level "..lvl
+
+									if rewardInfo.PassOwner then
+										titleLabel.TextColor3 = BP_COLORS.CurrentPassOwner
+										titleStr = titleStr.." (Event Pass)";
+										
+									elseif rewardInfo.RequiresPremium then
+										titleLabel.TextColor3 = BP_COLORS.CurrentPremium;
+										titleStr = titleStr.." (Premium)";
+										
+									end
+									titleLabel.Text = titleStr.."</font>\n<b>".. (rewardInfo.ItemNameOverwrite or itemLib.Name) .."</b>";
+									
+									local contentFrame = passRewardFrame:WaitForChild("Frame");
+									local claimButton = contentFrame:WaitForChild("ClaimButton");
+									local slotFrame = contentFrame:WaitForChild("Slot");
+									local descLabel = contentFrame:WaitForChild("Description");
+									
+									local cloneItemButton = itemButtonObj.ImageButton:Clone();
+									cloneItemButton.Size = UDim2.new(1, 0, 1, 0);
+									cloneItemButton.Parent = slotFrame;
+									
+									itemToolTip:BindHoverOver(cloneItemButton, function()
+										itemToolTip.Frame.Parent = windowFrame;
+										itemToolTip:Update(itemLib.Id);
+										itemToolTip:SetPosition(cloneItemButton);
+									end);
+
+									local function h3(txt)
+										return '<b><font size="18">' .. txt .. '</font></b>'
+									end
+									
+									local descText = "";
+									descText = descText..h3("Unlock Level: ").. lvl;
+									
+									if leafLib.Requirements then
+										descText = descText.."\n"..h3("Unlock Requirements: ");
+										for a=1, #leafLib.Requirements do
+											local rInfo = leafLib.Requirements[a];
+											
+											if rInfo.Type == "Stats" then
+												if rInfo.Key == "Level" then
+													descText = descText.."\n    • ".. rInfo.Key.." ".. rInfo.Value;
+												else
+													descText = descText.."\n    • ".. rInfo.Value.." ".. rInfo.Key;
+												end
+
+											elseif rInfo.Type == "Mission" then
+												local missionLib = modMissionsLibrary.Get(rInfo.Key);
+
+												descText = descText.."\n    • Mission: ".. missionLib.Name .." ".. rInfo.Value;
+												
+											elseif rInfo.Type == "Premium" then
+												descText = descText.."\n    • Premium Member";
+												
+											end
+											
+										end
+										
+									end
+									
+									descText = descText.."\n\n"..h3("Name: ").. (rewardInfo.ItemNameOverwrite or itemLib.Name);
+									descText = descText.."\n"..h3("Type: ").. itemLib.Type;
+									descText = descText.."\n"..h3("Description: ").. (rewardInfo.ItemDescriptionOverwrite or itemLib.Description);
+									
+									descLabel.Text = descText;
+
+									if lvlSlotInfo.GetClaimState(lvl) ~= "CanClaim" then return end;
+									
+									claimButton.Visible = true;
+									
+									local requiresMP = seasonData.Owned ~= true and rewardInfo.PassOwner == true
+									if requiresMP then
+										claimButton.Text = "Requires Event Pass";
+									end
+									
+									if rewardInfo.RequiresPremium == true and modData.IsPremium == false then
+										claimButton.Text = "Requires Premium";
+									end
+									
+									local  claimText = claimButton.Text;
+									claimButton.MouseButton1Click:Connect(function()
+										if requiresMP then
+											bpButtonFunc();
+											return;
+										end
+										refreshData();
+										if lvlSlotInfo.GetClaimState(lvl) ~= "CanClaim" then return end;
+										
+										claimButton.Text = "Claiming...";
+										local r = remoteBattlepassRemote:InvokeServer("claim", lvl);
+										if r.FailMsg then
+											if r.FailMsg == "Requires Event Pass" then
+												bpButtonFunc();
+												
+											elseif r.FailMsg == "Requires Premium" then
+												interface:ToggleWindow("GoldMenu", true, "premium");
+												return;
+												
+											else
+												claimButton.Text = r.FailMsg;
+												task.wait(2);
+												
+											end
+											
+										elseif r.Success == true then
+											game.Debris:AddItem(lvlSlotInfo.GlowLabel, 0);
+											itemButtonObj.DimOut = true;
+											
+											interface:ToggleWindow("Inventory", true);
+											claimButton.Visible = false;
+											
+										end
+										claimButton.Text = claimText;
+									end)
+								end)
+							end
+							
+							local itemButtonObj = lvlSlotInfo.ItemButton;
+							
+							local claimState = lvlSlotInfo.GetClaimState(lvl);
+							
+							if claimState == "CanClaim" then
+								game.Debris:AddItem(itemButtonObj.ImageButton:FindFirstChild("LockLabel"), 0);
+
+								local newGlow = itemButtonObj.ImageButton:FindFirstChild("ClaimGlow") or modItemInterface.newGlowEffect();
+								newGlow.Name = "ClaimGlow"
+								newGlow.ImageColor3 = Color3.fromRGB(255, 255, 255);
+								newGlow.ImageTransparency = 0.6;
+								newGlow.Parent = itemButtonObj.ImageButton;
+								lvlSlotInfo.GlowLabel = newGlow;
+								itemButtonObj.DimOut = nil;
+								
+								
+							elseif claimState == "Claimed" then
+								game.Debris:AddItem(itemButtonObj.ImageButton:FindFirstChild("LockLabel"), 0);
+								game.Debris:AddItem(lvlSlotInfo.GlowLabel, 0);
+								itemButtonObj.DimOut = true;
+								
+								
+							elseif claimState == "Locked" then
+								if leafLib.Requirements then
+									itemButtonObj.DimOut = nil;
+
+									local lockLabel = itemButtonObj.ImageButton:FindFirstChild("LockLabel") or templateLockedLabel:Clone();
+									lockLabel.Name = "LockLabel";
+									lockLabel:SetAttribute("DimOutIgnore", true);
+									lockLabel.Parent = itemButtonObj.ImageButton;
+								end
+								
+								
+							end
+							
+							local itemData = rewardInfo.Data or {};
+							itemData.ItemId = rewardInfo.ItemId;
+							itemData.Quantity = rewardInfo.Quantity or 1;
+							itemButtonObj:Update(itemData);
+						end
+					end
+
+					if lvl <= seasonLevel then
+						totalDist = totalDist + lvlSlot.AbsoluteSize.X;
+					end
+						
+					
+					if seasonLevel > lvl then
+						if rewardInfo == nil then
+							lvlSlot.ImageColor3 = BP_COLORS.Normal
+							
+						else
+							if rewardInfo.PassOwner then
+								lvlSlot.ImageColor3 = BP_COLORS.PassOwner;
+
+							elseif rewardInfo.RequiresPremium then
+								lvlSlot.ImageColor3 = BP_COLORS.Premium;
+
+							else
+								lvlSlot.ImageColor3 = BP_COLORS.Normal;
+								
+							end
+						end
+						
+					elseif seasonLevel == lvl then
+						if rewardInfo == nil then
+							lvlSlot.ImageColor3 = BP_COLORS.CurrentNormal
+
+						else
+							if rewardInfo.PassOwner then
+								lvlSlot.ImageColor3 = BP_COLORS.CurrentPassOwner;
+
+							elseif rewardInfo.RequiresPremium then
+								lvlSlot.ImageColor3 = BP_COLORS.CurrentPremium;
+
+							else
+								lvlSlot.ImageColor3 = BP_COLORS.CurrentNormal;
+								
+							end
+						end
+						
+					else
+						if rewardInfo == nil then
+							lvlSlot.ImageColor3 = BP_COLORS.LockedNormal
+
+						else
+							if rewardInfo.PassOwner then
+								lvlSlot.ImageColor3 = BP_COLORS.LockedPassOwner;
+
+							elseif rewardInfo.RequiresPremium then
+								lvlSlot.ImageColor3 = BP_COLORS.LockedPremium;
+								
+							else
+								lvlSlot.ImageColor3 = BP_COLORS.LockedNormal;
+								
+							end
+						end
+						
+					end
+					
+					lvlSlot.Parent = battlePassContent;
+				end
+				
+				lvlLabel.Text = `Pass Level: {modFormatNumber.Beautify(seasonLevel or 0)}`;
+				--== MARK: Post Rewards
+				local giftShopRewards = modBattlePassLibrary.GiftShop;
+
+				local rewardsLib = modRewardsLibrary:Find(activeBpId);
+				if rewardsLib then
+					local postRewardInfo = "rewardlib";
+					local lvlSlotInfo = levelSlotsInfo[postRewardInfo];
+
+					if lvlSlotInfo == nil then
+						local info = {};
+
+						info.LevelSlot = templateLevelSlot:Clone();
+						info.LevelSlot.LayoutOrder = #treeList;
+						info.LevelSlot.Size = UDim2.new(0, 120, 1, 0);
+
+						levelSlotsInfo[postRewardInfo] = info;
+						lvlSlotInfo = info;
+						
 						if lvlSlotInfo.ItemButton == nil then
-							local itemButtonObj = modItemInterface.newItemButton(rewardInfo.ItemId);
-							local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
+							local itemButtonObj = modItemInterface.newItemButton("unknowncrate");
 							
 							local aspectRatioConstraint = Instance.new("UIAspectRatioConstraint");
 							aspectRatioConstraint.Parent = itemButtonObj.ImageButton;
 
 							itemButtonObj.ImageButton.AnchorPoint = Vector2.new(0.5, 0.5);
 							itemButtonObj.ImageButton.Position = UDim2.new(0.5, 0, 0.5, 0);
-							itemButtonObj.ImageButton.Size = UDim2.new(0, 50, 0, 50);
-							itemButtonObj.ImageButton.Parent = lvlSlot;
-							
+							itemButtonObj.ImageButton.Size = UDim2.new(0, 100, 0, 100);
+							itemButtonObj.ImageButton.Rotation = 1;
+							itemButtonObj.ImageButton.Parent = info.LevelSlot;
+
 							lvlSlotInfo.ItemButton = itemButtonObj;
 							
-							lvlSlotInfo.GetClaimState = function(l)
-								refreshData();
-								seasonLevel = seasonData.Level;
-								
-								local r = "n/a";
-								if seasonLevel > l then
-									if table.find(seasonData.Claim, l) then
-										r = "Claimed";
-									else
-										r = "CanClaim";
-									end
-								else
-									r ="Locked";
-								end
-								return r;
-							end
-							
 							itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
-								if itemButtonObj.DimOut then return end;
 								itemToolTip.Frame.Visible = false;
 								refreshData();
 								interface:PlayButtonClick();
@@ -2770,901 +3038,637 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								passRewardFrame.Parent = MissionDisplayFrame;
 
 								local titleLabel = passRewardFrame:WaitForChild("Title");
-								local titleStr = '<font size="10">'.."Level "..lvl
+								local titleStr = "<b>Post Rewards!</b>";
+								titleLabel.TextColor3 = BP_COLORS.CurrentPassOwner;
 
-								if rewardInfo.PassOwner then
-									titleLabel.TextColor3 = BP_COLORS.CurrentPassOwner
-									titleStr = titleStr.." (Event Pass)";
-									
-								elseif rewardInfo.RequiresPremium then
-									titleLabel.TextColor3 = BP_COLORS.CurrentPremium;
-									titleStr = titleStr.." (Premium)";
-									
-								end
-								titleLabel.Text = titleStr.."</font>\n<b>".. (rewardInfo.ItemNameOverwrite or itemLib.Name) .."</b>";
+								local contentFrame = passRewardFrame:WaitForChild("Frame");
+								local claimButton = contentFrame:WaitForChild("ClaimButton");
+								local slotFrame = contentFrame:WaitForChild("Slot");
+								local descLabel = contentFrame:WaitForChild("Description") :: TextLabel;
+								local scrollFrame = contentFrame:WaitForChild("ScrollFrame");
 								
+								slotFrame.Visible = false;
+								claimButton.Visible = false;
+								scrollFrame.Visible = true;
+								descLabel.Size = UDim2.new(1, 0, 1, 0);
+								
+								local descText = "";
+								if seasonData.Owned ~= true then
+									titleStr = titleStr.." (Event Pass)";
+									descText = "Requires Event Pass!\n"..descText;
+								end
+
+								descText = descText.. modRichFormatter.RichFontSize(`Unlock a reward every {modBattlePassLibrary.PostRewardLvlFmod} levels.`, 20);
+								
+								local str = "\nPossible Rewards: \n";
+								
+								descText = descText.. modRichFormatter.RichFontSize("\nReward drops will expire after 24 hours.", 11);
+								titleLabel.Text = titleStr;
+								
+								local groups = modDropRateCalculator.Calculate(rewardsLib);
+
+								for a=1, #groups do
+
+									for b=1, #groups[a] do
+										local rewardInfo = groups[a][b];
+										
+										if rewardInfo.ItemId or rewardInfo.Type then
+											local lib = modItemsLibrary:Find(rewardInfo.ItemId or rewardInfo.Type);
+											if lib then
+												local oddsProb = rewardInfo.Chance/groups[a].TotalChance;
+
+												local itemButtonObject = modItemInterface.newItemButton(lib.Id);
+												local newItemButton = itemButtonObject.ImageButton;
+												
+												itemToolTip:BindHoverOver(newItemButton, function()
+													itemToolTip.Frame.Parent = windowFrame;
+													itemToolTip:Update(lib.Id);
+													itemToolTip:SetPosition(newItemButton);
+												end);
+												
+												newItemButton.Parent = scrollFrame;
+
+												itemButtonObject:Update();
+												
+												local quantityLabel = newItemButton:WaitForChild("QuantityLabel");
+												quantityLabel.Font = Enum.Font.Arial;
+												quantityLabel.TextSize = 10;
+												quantityLabel.Visible = true;
+												
+												quantityLabel.Text = math.ceil(oddsProb *1000)/10 .."%";
+											end
+										end
+									end
+								end
+
+								descText = descText.."\n\n"..str;
+								descLabel.Text = descText;
+								descLabel.LineHeight = 1.2;
+								
+							end)
+
+							itemButtonObj:Update();
+						end
+						
+						info.LevelSlot.Parent = battlePassContent;
+					end
+					
+					if seasonLevel > treeCount then
+						lvlSlotInfo.LevelSlot.ImageColor3 = BP_COLORS.CurrentPassOwner;
+						
+					else
+						lvlSlotInfo.LevelSlot.ImageColor3 = BP_COLORS.LockedPassOwner;
+						
+					end
+					
+					local postRewards = seasonData.PostRewards;
+					if seasonLevel > treeCount then
+						for lvl, rewardInfo in pairs(postRewards) do
+							local postLvlSlotInfo = levelSlotsInfo[lvl];
+
+							if postLvlSlotInfo == nil then
+								local info = {};
+
+								info.LevelSlot = templateLevelSlot:Clone();
+
+								levelSlotsInfo[lvl] = info;
+								postLvlSlotInfo = info;
+							end
+
+							local lvlSlot = postLvlSlotInfo.LevelSlot;
+							lvlSlot.LayoutOrder = tonumber(lvl);
+							
+							if postLvlSlotInfo.ItemButton == nil then
+								local itemButtonObj = modItemInterface.newItemButton(rewardInfo.ItemId);
+								local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
+
+								local aspectRatioConstraint = Instance.new("UIAspectRatioConstraint");
+								aspectRatioConstraint.Parent = itemButtonObj.ImageButton;
+
+								itemButtonObj.ImageButton.AnchorPoint = Vector2.new(0.5, 0.5);
+								itemButtonObj.ImageButton.Position = UDim2.new(0.5, 0, 0.5, 0);
+								itemButtonObj.ImageButton.Size = UDim2.new(1, 0, 1, 0);
+								itemButtonObj.ImageButton.Parent = lvlSlot;
+								
+								postLvlSlotInfo.ItemButton = itemButtonObj;
+
+								postLvlSlotInfo.GetClaimState = function(l)
+									refreshData();
+									seasonLevel = seasonData.Level;
+
+									local r = "n/a";
+									if seasonData.PostRewards[l] ~= nil then
+										r = "CanClaim";
+									else
+										r = "Claimed";
+									end
+									
+									return r;
+								end
+
+								local radialBarLabel = timerRadialBar:Clone();
+								radialBarLabel.Parent = itemButtonObj.ImageButton;
+
+								local radialBar = modRadialImage.new(TIMER_RADIAL_CONFIG, radialBarLabel);
+								local itemUpdateFunc = itemButtonObj.Update;
+
+								itemButtonObj.Update = function(self, storageItemData)
+									itemUpdateFunc(self, storageItemData);
+									if rewardInfo.ExpireTime == nil then return end;
+									local timeRemaining = rewardInfo.ExpireTime - workspace:GetServerTimeNow();
+									local timeLeftRatio = timeRemaining/shared.Const.OneDaySecs;
+									radialBar:UpdateLabel(math.max(timeLeftRatio, 0.1));
+
+									if timeRemaining <= (3600*4) then
+										radialBarLabel.ImageColor3 = BAR_COLORS.Yellow;
+									elseif timeRemaining <= 3600 then
+										radialBarLabel.ImageColor3 = BAR_COLORS.Red;
+									else
+										radialBarLabel.ImageColor3 = BAR_COLORS.Green;
+									end
+								end
+
+								itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
+									if itemButtonObj.DimOut then return end;
+									if workspace:GetAttribute("DebugModeToggled") == true then
+										Debugger:Warn(`Level {lvl} RewardInfo`,rewardInfo);
+									end
+
+									itemToolTip.Frame.Visible = false;
+									refreshData();
+									interface:PlayButtonClick();
+
+									MissionDisplayFrame:ClearAllChildren();
+
+									local passRewardFrame = templatePassReward:Clone();
+									passRewardFrame.Parent = MissionDisplayFrame;
+
+									local titleLabel = passRewardFrame:WaitForChild("Title");
+									titleLabel.Text = '<font size="12">'.."Level "..lvl.."</font>\n<b>".. itemLib.Name .."</b>";
+									
+									if rewardInfo.RequiresPremium then
+										titleLabel.Text = titleLabel.Text.." (Premium)";
+									end
+									
+									local contentFrame = passRewardFrame:WaitForChild("Frame");
+									local claimButton = contentFrame:WaitForChild("ClaimButton") :: TextButton;
+									local slotFrame = contentFrame:WaitForChild("Slot");
+									local descLabel = contentFrame:WaitForChild("Description");
+
+									if rewardInfo.ItemId ~= "gold" then
+										claimButton.AnchorPoint = Vector2.new(1, 1);
+										claimButton.Position = UDim2.new(1, 0, 1, 0);
+		
+										if giftShopRewards then
+											local holdDownScrapObj = modComponents.CreateHoldDownButton(interface, {
+												Text = `<b>Trade in for {rewardInfo.TokensAmount or "1"} Gift Shop Tokens</b>`;
+												Color = Color3.fromRGB(165, 140, 75);
+											})
+			
+											local holdDownScrapButton: TextButton = holdDownScrapObj.Button;
+											holdDownScrapButton.AnchorPoint = Vector2.new(0, 1);
+											holdDownScrapButton.Position = UDim2.new(0, 0, 1, 0);
+											holdDownScrapButton.Size = UDim2.new(0.5, -10, 0, 30);
+											holdDownScrapButton.TextSize = 16;
+											holdDownScrapButton.Parent = contentFrame;
+
+											local noteLabel = Instance.new("TextLabel");
+											noteLabel.Text = "";
+											noteLabel.AnchorPoint = Vector2.new(0, 1);
+											noteLabel.Position = UDim2.new(0, 0, 1, -40);
+											noteLabel.BackgroundTransparency = 1;
+											noteLabel.TextColor3 = Color3.fromRGB(200, 200, 200);
+											noteLabel.TextSize = 9;
+											noteLabel.Size = UDim2.new(1, 0, 0, 20);
+											if modItemsLibrary:HasTag(itemLib.Id, "Skin Perm") then
+												noteLabel.Text = "* Once claimed, each skin permanents can only be traded for 1 gift shop token in Rat shop.";
+											else
+												noteLabel.Text = "* Once claimed, this is no longer tradable for gift shop tokens.";
+											end
+											noteLabel.Parent = contentFrame;
+
+											local lastMoved = tick();
+											claimButton.MouseMoved:Connect(function()
+												noteLabel.TextTransparency = 0;
+												lastMoved = tick();
+												task.wait(1);
+												if tick()-lastMoved < 1 then return end;
+												TweenService:Create(noteLabel, TweenInfo.new(1), {TextTransparency=1}):Play();
+											end)
+				
+											holdDownScrapObj.OnHoldDownConfirm = function()
+												holdDownScrapButton.Text = "Trading in...";
+												local r = remoteBattlepassRemote:InvokeServer("tradeinreward", lvl);
+												if r.FailMsg then
+													
+													
+												elseif r.Success == true then
+													game.Debris:AddItem(postLvlSlotInfo.GlowLabel, 0);
+													itemButtonObj.DimOut = true;
+													itemButtonObj:Update();
+													
+													task.delay(3, function()
+														lvlSlot.ClipsDescendants = true;
+														lvlSlot.AutomaticSize = Enum.AutomaticSize.None;
+														lvlSlot:TweenSize(UDim2.new(0, 0, 1, 0));
+														
+														task.wait(1);
+														game.Debris:AddItem(lvlSlot, 0);
+														levelSlotsInfo[lvl] = nil;
+														itemButtonObj:Destroy();
+													end)
+			
+													holdDownScrapButton.Visible = false;
+													claimButton.Visible = false;
+												end
+											end;
+										end
+
+									end
+									
+									local cloneItemButton = itemButtonObj.ImageButton:Clone();
+									cloneItemButton.Parent = slotFrame;
+
+									itemToolTip:BindHoverOver(cloneItemButton, function()
+										itemToolTip.Frame.Parent = windowFrame;
+										itemToolTip:Update(rewardInfo.ItemId);
+										itemToolTip:SetPosition(cloneItemButton);
+									end); 
+
+									local function h3(txt)
+										return '<b><font size="18">' .. txt .. '</font></b>'
+									end
+
+									local descText = "";
+									descText = descText..h3("Unlock Level: ").. lvl;
+
+									descText = descText.."\n\n"..h3("Name: ").. itemLib.Name;
+									descText = descText.."\n"..h3("Type: ").. itemLib.Type;
+									descText = descText.."\n"..h3("Description: ").. itemLib.Description;
+
+									if rewardInfo.ExpireTime then
+										local timeLeft = rewardInfo.ExpireTime-workspace:GetServerTimeNow();
+										descText = descText.."\n\n"..h3("Expires: ").. modSyncTime.ToString(timeLeft);
+									end
+
+									descLabel.Text = descText;
+
+									if postLvlSlotInfo.GetClaimState(lvl) ~= "CanClaim" then return end;
+
+									claimButton.Visible = true;
+
+									local requiresMP = seasonData.Owned ~= true;
+									if requiresMP then
+										claimButton.Text = "Requires Event Pass";
+									end
+
+									local  claimText = claimButton.Text;
+									claimButton.MouseButton1Click:Connect(function()
+										if requiresMP then
+											bpButtonFunc();
+											return;
+										end
+										refreshData();
+										if postLvlSlotInfo.GetClaimState(lvl) ~= "CanClaim" then return end;
+
+										claimButton.Text = "Claiming...";
+										local r = remoteBattlepassRemote:InvokeServer("claimpostreward", lvl);
+										if r.FailMsg then
+											if r.FailMsg == "Requires Event Pass" then
+												bpButtonFunc();
+
+											else
+												claimButton.Text = r.FailMsg;
+												task.wait(2);
+
+											end
+
+										elseif r.Success == true then
+											game.Debris:AddItem(postLvlSlotInfo.GlowLabel, 0);
+											itemButtonObj.DimOut = true;
+											itemButtonObj:Update();
+											
+											task.delay(3, function()
+												lvlSlot.ClipsDescendants = true;
+												lvlSlot.AutomaticSize = Enum.AutomaticSize.None;
+												lvlSlot:TweenSize(UDim2.new(0, 0, 1, 0));
+												
+												task.wait(1);
+												game.Debris:AddItem(lvlSlot, 0);
+												levelSlotsInfo[lvl] = nil;
+												itemButtonObj:Destroy();
+											end)
+
+											interface:ToggleWindow("Inventory", true);
+											claimButton.Visible = false;
+
+										end
+										claimButton.Text = claimText;
+									end)
+								end)
+							end
+
+							local itemButtonObj = postLvlSlotInfo.ItemButton;
+
+							local claimState = postLvlSlotInfo.GetClaimState(lvl);
+
+							if claimState == "CanClaim" then
+								game.Debris:AddItem(itemButtonObj.ImageButton:FindFirstChild("LockLabel"), 0);
+
+								local newGlow = itemButtonObj.ImageButton:FindFirstChild("ClaimGlow") or modItemInterface.newGlowEffect();
+								newGlow.Name = "ClaimGlow"
+								newGlow.ImageColor3 = Color3.fromRGB(255, 255, 255);
+								newGlow.ImageTransparency = 0.6;
+								newGlow.Parent = itemButtonObj.ImageButton;
+								postLvlSlotInfo.GlowLabel = newGlow;
+								itemButtonObj.DimOut = nil;
+								itemButtonObj.ImageButton.radialBar.Visible = true;
+
+
+							elseif claimState == "Claimed" then
+								game.Debris:AddItem(itemButtonObj.ImageButton:FindFirstChild("LockLabel"), 0);
+								game.Debris:AddItem(postLvlSlotInfo.GlowLabel, 0);
+								itemButtonObj.DimOut = true;
+								itemButtonObj.ImageButton.radialBar.Visible = false;
+
+							end
+
+							local itemData = rewardInfo.Data or {};
+							itemData.ItemId = rewardInfo.ItemId;
+							itemData.Quantity = rewardInfo.Quantity or 1;
+							itemButtonObj:Update(itemData);
+
+							lvlSlot.ImageColor3 = BP_COLORS.CurrentPassOwner;
+							lvlSlot.Parent = battlePassContent;
+							
+							
+						end
+					end
+				end
+
+				--== MARK: Gift Shop
+				local giftShop = "giftshop";
+				local lvlSlotInfo = levelSlotsInfo[giftShop];
+
+				if giftShopRewards then
+					if lvlSlotInfo == nil then
+						local info = {};
+
+						info.LevelSlot = templateLevelSlot:Clone() :: ImageLabel;
+						info.LevelSlot.LayoutOrder = 9999-1;
+						info.LevelSlot.Size = UDim2.new(0, 120, 1, 0);
+
+						levelSlotsInfo[giftShop] = info;
+						lvlSlotInfo = info;
+						
+						if lvlSlotInfo.ItemButton == nil then
+							local itemButtonObj = modItemInterface.newItemButton("unknowngift");
+							
+							local aspectRatioConstraint = Instance.new("UIAspectRatioConstraint");
+							aspectRatioConstraint.Parent = itemButtonObj.ImageButton;
+
+							itemButtonObj.ImageButton.AnchorPoint = Vector2.new(0, 0.5);
+							itemButtonObj.ImageButton.Position = UDim2.new(0, 0, 0.5, 0);
+							itemButtonObj.ImageButton.Size = UDim2.new(0, 100, 0, 100);
+							itemButtonObj.ImageButton.Rotation = 1;
+							itemButtonObj.ImageButton.Parent = info.LevelSlot;
+
+							info.LevelSlot.AutomaticSize = Enum.AutomaticSize.X;
+
+							local tokenLabel = Instance.new("TextLabel");
+							tokenLabel.RichText = true;
+							tokenLabel.AutomaticSize = Enum.AutomaticSize.X;
+							tokenLabel.Font = Enum.Font.Arial;
+							tokenLabel.TextColor3 = Color3.fromRGB(255,255,255);
+							tokenLabel.BackgroundTransparency = 1;
+							tokenLabel.TextScaled = true;
+							tokenLabel.Size = UDim2.new(0, 0, 1, 0);
+							tokenLabel.Position = UDim2.new(0, 100, 0, 0);
+							tokenLabel.Parent = info.LevelSlot;
+							lvlSlotInfo.Label = tokenLabel;
+
+							local padding = Instance.new("UIPadding");
+							padding.PaddingLeft = UDim.new(0, 0);
+							padding.PaddingRight = UDim.new(0, 15);
+							padding.PaddingTop = UDim.new(0, 15);
+							padding.PaddingBottom = UDim.new(0, 15);
+							padding.Parent = tokenLabel;
+
+							local slotPadding = Instance.new("UIPadding");
+							slotPadding.PaddingLeft = UDim.new(0, 10);
+							slotPadding.PaddingRight = UDim.new(0, 10);
+							slotPadding.Parent = info.LevelSlot;
+
+							lvlSlotInfo.ItemButton = itemButtonObj;
+							
+							local function loadGiftShop()
+								itemToolTip.Frame.Visible = false;
+								refreshData();
+								interface:PlayButtonClick();
+
+								MissionDisplayFrame:ClearAllChildren();
+								local passRewardFrame = templatePassReward:Clone();
+								passRewardFrame.Parent = MissionDisplayFrame;
+
+								local titleLabel = passRewardFrame:WaitForChild("Title");
+								local titleStr = "<b>Gift Shop!</b>";
+								titleLabel.TextColor3 = BP_COLORS.CurrentPremium;
+
 								local contentFrame = passRewardFrame:WaitForChild("Frame");
 								local claimButton = contentFrame:WaitForChild("ClaimButton");
 								local slotFrame = contentFrame:WaitForChild("Slot");
 								local descLabel = contentFrame:WaitForChild("Description");
+								local scrollFrame = contentFrame:WaitForChild("ScrollFrame");
 								
-								local cloneItemButton = itemButtonObj.ImageButton:Clone();
-								cloneItemButton.Size = UDim2.new(1, 0, 1, 0);
-								cloneItemButton.Parent = slotFrame;
+								slotFrame.Visible = false;
+								claimButton.Visible = false;
+								scrollFrame.Visible = true;
+								descLabel.Size = UDim2.new(1, 0, 1, 0);
 								
-								itemToolTip:BindHoverOver(cloneItemButton, function()
-									itemToolTip.Frame.Parent = windowFrame;
-									itemToolTip:Update(itemLib.Id);
-									itemToolTip:SetPosition(cloneItemButton);
-								end);
+								local descText = "Trade in your rewards for past event pass rewards! You can also trade in skin permanents in the Rat shop. Accumulated Tokens will only be usable during current event pass.";
 
-								local function h3(txt)
-									return '<b><font size="18">' .. txt .. '</font></b>'
-								end
-								
-								local descText = "";
-								descText = descText..h3("Unlock Level: ").. lvl;
-								
-								if leafLib.Requirements then
-									descText = descText.."\n"..h3("Unlock Requirements: ");
-									for a=1, #leafLib.Requirements do
-										local rInfo = leafLib.Requirements[a];
-										
-										if rInfo.Type == "Stats" then
-											if rInfo.Key == "Level" then
-												descText = descText.."\n    • ".. rInfo.Key.." ".. rInfo.Value;
-											else
-												descText = descText.."\n    • ".. rInfo.Value.." ".. rInfo.Key;
-											end
+								-- if modData.IsPremium ~= true then
+								-- 	titleStr = titleStr.." (Premium)";
+								-- 	descText = "Requires Premium!\n"..descText;
+								-- end
 
-										elseif rInfo.Type == "Mission" then
-											local missionLib = modMissionsLibrary.Get(rInfo.Key);
-
-											descText = descText.."\n    • Mission: ".. missionLib.Name .." ".. rInfo.Value;
-											
-										elseif rInfo.Type == "Premium" then
-											descText = descText.."\n    • Premium Member";
-											
-										end
-										
-									end
-									
-								end
-								
-								descText = descText.."\n\n"..h3("Name: ").. (rewardInfo.ItemNameOverwrite or itemLib.Name);
-								descText = descText.."\n"..h3("Type: ").. itemLib.Type;
-								descText = descText.."\n"..h3("Description: ").. (rewardInfo.ItemDescriptionOverwrite or itemLib.Description);
-								
+								titleLabel.Text = titleStr;
 								descLabel.Text = descText;
 
-								if lvlSlotInfo.GetClaimState(lvl) ~= "CanClaim" then return end;
-								
-								claimButton.Visible = true;
-								
-								local requiresMP = seasonData.Owned ~= true and rewardInfo.PassOwner == true
-								if requiresMP then
-									claimButton.Text = "Requires Event Pass";
-								end
-								
-								if rewardInfo.RequiresPremium == true and modData.IsPremium == false then
-									claimButton.Text = "Requires Premium";
-								end
-								
-								local  claimText = claimButton.Text;
-								claimButton.MouseButton1Click:Connect(function()
-									if requiresMP then
-										bpButtonFunc();
-										return;
-									end
-									refreshData();
-									if lvlSlotInfo.GetClaimState(lvl) ~= "CanClaim" then return end;
+								local uiGridLayout = scrollFrame:WaitForChild("UIGridLayout") :: UIGridLayout;
+								uiGridLayout.CellPadding = UDim2.new(0, 10, 0, 10);
+								uiGridLayout.CellSize = UDim2.new(0, 120, 0, 120);
+								uiGridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center;
+
+								scrollFrame.Size = UDim2.new(1, 0, 1, -50);
+
+								local giftShopButtonTemplate = script:WaitForChild("GiftShopButton");
+
+								for a=1, #giftShopRewards do
+									local shopLib = giftShopRewards[a];
+
+									local newButton = giftShopButtonTemplate:Clone() :: TextButton;
+									local slotLabel = newButton:WaitForChild("ItemSlot");
+									local costLabel = newButton:WaitForChild("Title") :: TextLabel;
+
+									local giftItemButtonObj = modItemInterface.newItemButton(shopLib.ItemId);
+									giftItemButtonObj.ImageButton.Parent = slotLabel;
+									giftItemButtonObj:Update();
+
+									newButton.Parent = scrollFrame;
+
+									itemToolTip:BindHoverOver(giftItemButtonObj.ImageButton, function()
+										itemToolTip.Frame.Parent = windowFrame;
+										itemToolTip:Update(shopLib.ItemId);
+										itemToolTip:SetPosition(giftItemButtonObj.ImageButton);
+									end);
 									
-									claimButton.Text = "Claiming...";
-									local r = remoteBattlepassRemote:InvokeServer("claim", lvl);
-									if r.FailMsg then
-										if r.FailMsg == "Requires Event Pass" then
-											bpButtonFunc();
-											
-										elseif r.FailMsg == "Requires Premium" then
-											interface:ToggleWindow("GoldMenu", true, "premium");
+
+									local tradeCost = shopLib.Cost;
+									costLabel.Text = `{tradeCost} Tokens`;
+
+									local itemLib = modItemsLibrary:Find(shopLib.ItemId);
+									local function onButtonClick()
+										interface:PlayButtonClick();
+
+										if tradeCost == nil then
+											costLabel.TextColor3 = Color3.fromRGB(200, 50, 50);
+											TweenService:Create(costLabel, TweenInfo.new(1), {
+												TextColor3 = Color3.fromRGB(255, 255, 255);
+											}):Play();
 											return;
-											
-										else
-											claimButton.Text = r.FailMsg;
-											task.wait(2);
-											
 										end
-										
-									elseif r.Success == true then
-										game.Debris:AddItem(lvlSlotInfo.GlowLabel, 0);
-										itemButtonObj.DimOut = true;
-										
-										interface:ToggleWindow("Inventory", true);
-										claimButton.Visible = false;
-										
+
+										seasonTokens = seasonData.Tokens or 0;
+										if seasonTokens < tradeCost then
+											lvlSlotInfo.Label.TextColor3 = Color3.fromRGB(200, 50, 50);
+											TweenService:Create(lvlSlotInfo.Label, TweenInfo.new(1), {
+												TextColor3 = Color3.fromRGB(255, 255, 255);
+											}):Play();
+											return;
+										end
+
+										local promptWindow = modClientGuis.promptQuestion(`Trade For {itemLib.Name}`, 
+											`Are you sure you would like to trade in <b>{modFormatNumber.Beautify(tradeCost)} Tokens</b> for a {itemLib.Name}`, "Trade", "Cancel", itemLib.Icon);
+										local YesClickedSignal, NoClickedSignal;
+					
+										local debounce = false;
+										YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
+											if debounce then return end;
+											debounce = true;
+											interface:PlayButtonClick();
+					
+											local _r = remoteBattlepassRemote:InvokeServer("purchasegiftshop", shopLib.ItemId);
+											interface:ToggleWindow("Inventory", true);
+											interface:ToggleWindow("Missions", true, "giftshop");
+
+											promptWindow:Close();
+											YesClickedSignal:Disconnect();
+											NoClickedSignal:Disconnect();
+										end);
+										NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
+											if debounce then return end;
+											interface:PlayButtonClick();
+											promptWindow:Close();
+											interface:ToggleWindow("Missions", true, "giftshop");
+											YesClickedSignal:Disconnect();
+											NoClickedSignal:Disconnect();
+										end);
 									end
-									claimButton.Text = claimText;
-								end)
-							end)
-						end
-						
-						local itemButtonObj = lvlSlotInfo.ItemButton;
-						
-						local claimState = lvlSlotInfo.GetClaimState(lvl);
-						
-						if claimState == "CanClaim" then
-							game.Debris:AddItem(itemButtonObj.ImageButton:FindFirstChild("LockLabel"), 0);
-
-							local newGlow = itemButtonObj.ImageButton:FindFirstChild("ClaimGlow") or modItemInterface.newGlowEffect();
-							newGlow.Name = "ClaimGlow"
-							newGlow.ImageColor3 = Color3.fromRGB(255, 255, 255);
-							newGlow.ImageTransparency = 0.6;
-							newGlow.Parent = itemButtonObj.ImageButton;
-							lvlSlotInfo.GlowLabel = newGlow;
-							itemButtonObj.DimOut = nil;
-							
-							
-						elseif claimState == "Claimed" then
-							game.Debris:AddItem(itemButtonObj.ImageButton:FindFirstChild("LockLabel"), 0);
-							game.Debris:AddItem(lvlSlotInfo.GlowLabel, 0);
-							itemButtonObj.DimOut = true;
-							
-							
-						elseif claimState == "Locked" then
-							if leafLib.Requirements then
-								itemButtonObj.DimOut = nil;
-
-								local lockLabel = itemButtonObj.ImageButton:FindFirstChild("LockLabel") or templateLockedLabel:Clone();
-								lockLabel.Name = "LockLabel";
-								lockLabel:SetAttribute("DimOutIgnore", true);
-								lockLabel.Parent = itemButtonObj.ImageButton;
-							end
-							
-							
-						end
-						
-						local itemData = rewardInfo.Data or {};
-						itemData.ItemId = rewardInfo.ItemId;
-						itemData.Quantity = rewardInfo.Quantity or 1;
-						itemButtonObj:Update(itemData);
-					end
-				end
-
-				if lvl <= seasonLevel then
-					totalDist = totalDist + lvlSlot.AbsoluteSize.X;
-				end
-					
-				
-				if seasonLevel > lvl then
-					if rewardInfo == nil then
-						lvlSlot.ImageColor3 = BP_COLORS.Normal
-						
-					else
-						if rewardInfo.PassOwner then
-							lvlSlot.ImageColor3 = BP_COLORS.PassOwner;
-
-						elseif rewardInfo.RequiresPremium then
-							lvlSlot.ImageColor3 = BP_COLORS.Premium;
-
-						else
-							lvlSlot.ImageColor3 = BP_COLORS.Normal;
-							
-						end
-					end
-					
-				elseif seasonLevel == lvl then
-					if rewardInfo == nil then
-						lvlSlot.ImageColor3 = BP_COLORS.CurrentNormal
-
-					else
-						if rewardInfo.PassOwner then
-							lvlSlot.ImageColor3 = BP_COLORS.CurrentPassOwner;
-
-						elseif rewardInfo.RequiresPremium then
-							lvlSlot.ImageColor3 = BP_COLORS.CurrentPremium;
-
-						else
-							lvlSlot.ImageColor3 = BP_COLORS.CurrentNormal;
-							
-						end
-					end
-					
-				else
-					if rewardInfo == nil then
-						lvlSlot.ImageColor3 = BP_COLORS.LockedNormal
-
-					else
-						if rewardInfo.PassOwner then
-							lvlSlot.ImageColor3 = BP_COLORS.LockedPassOwner;
-
-						elseif rewardInfo.RequiresPremium then
-							lvlSlot.ImageColor3 = BP_COLORS.LockedPremium;
-							
-						else
-							lvlSlot.ImageColor3 = BP_COLORS.LockedNormal;
-							
-						end
-					end
-					
-				end
-				
-				lvlSlot.Parent = battlePassContent;
-			end
-			
-			lvlLabel.Text = `Pass Level: {modFormatNumber.Beautify(seasonLevel or 0)}`;
-			--== MARK: Post Rewards
-			local giftShopRewards = modBattlePassLibrary.GiftShop;
-
-			local rewardsLib = modRewardsLibrary:Find(activeBpId);
-			if rewardsLib then
-				local postRewardInfo = "rewardlib";
-				local lvlSlotInfo = levelSlotsInfo[postRewardInfo];
-
-				if lvlSlotInfo == nil then
-					local info = {};
-
-					info.LevelSlot = templateLevelSlot:Clone();
-					info.LevelSlot.LayoutOrder = #treeList;
-					info.LevelSlot.Size = UDim2.new(0, 120, 1, 0);
-
-					levelSlotsInfo[postRewardInfo] = info;
-					lvlSlotInfo = info;
-					
-					if lvlSlotInfo.ItemButton == nil then
-						local itemButtonObj = modItemInterface.newItemButton("unknowncrate");
-						
-						local aspectRatioConstraint = Instance.new("UIAspectRatioConstraint");
-						aspectRatioConstraint.Parent = itemButtonObj.ImageButton;
-
-						itemButtonObj.ImageButton.AnchorPoint = Vector2.new(0.5, 0.5);
-						itemButtonObj.ImageButton.Position = UDim2.new(0.5, 0, 0.5, 0);
-						itemButtonObj.ImageButton.Size = UDim2.new(0, 100, 0, 100);
-						itemButtonObj.ImageButton.Rotation = 1;
-						itemButtonObj.ImageButton.Parent = info.LevelSlot;
-
-						lvlSlotInfo.ItemButton = itemButtonObj;
-						
-						itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
-							itemToolTip.Frame.Visible = false;
-							refreshData();
-							interface:PlayButtonClick();
-
-							MissionDisplayFrame:ClearAllChildren();
-
-							local passRewardFrame = templatePassReward:Clone();
-							passRewardFrame.Parent = MissionDisplayFrame;
-
-							local titleLabel = passRewardFrame:WaitForChild("Title");
-							local titleStr = "<b>Post Rewards!</b>";
-							titleLabel.TextColor3 = BP_COLORS.CurrentPassOwner;
-
-							local contentFrame = passRewardFrame:WaitForChild("Frame");
-							local claimButton = contentFrame:WaitForChild("ClaimButton");
-							local slotFrame = contentFrame:WaitForChild("Slot");
-							local descLabel = contentFrame:WaitForChild("Description") :: TextLabel;
-							local scrollFrame = contentFrame:WaitForChild("ScrollFrame");
-							
-							slotFrame.Visible = false;
-							claimButton.Visible = false;
-							scrollFrame.Visible = true;
-							descLabel.Size = UDim2.new(1, 0, 1, 0);
-							
-							local descText = "";
-							if seasonData.Owned ~= true then
-								titleStr = titleStr.." (Event Pass)";
-								descText = "Requires Event Pass!\n"..descText;
-							end
-
-							descText = descText.. modRichFormatter.RichFontSize(`Unlock a reward every {modBattlePassLibrary.PostRewardLvlFmod} levels.`, 20);
-							
-							local str = "\nPossible Rewards: \n";
-							
-							descText = descText.. modRichFormatter.RichFontSize("\nReward drops will expire after 24 hours.", 11);
-							titleLabel.Text = titleStr;
-							
-							local groups = modDropRateCalculator.Calculate(rewardsLib);
-
-							for a=1, #groups do
-
-								for b=1, #groups[a] do
-									local rewardInfo = groups[a][b];
 									
-									if rewardInfo.ItemId or rewardInfo.Type then
-										local lib = modItemsLibrary:Find(rewardInfo.ItemId or rewardInfo.Type);
-										if lib then
-											local oddsProb = rewardInfo.Chance/groups[a].TotalChance;
-
-											local itemButtonObject = modItemInterface.newItemButton(lib.Id);
-											local newItemButton = itemButtonObject.ImageButton;
-											
-											itemToolTip:BindHoverOver(newItemButton, function()
-												itemToolTip.Frame.Parent = windowFrame;
-												itemToolTip:Update(lib.Id);
-												itemToolTip:SetPosition(newItemButton);
-											end);
-											
-											newItemButton.Parent = scrollFrame;
-
-											itemButtonObject:Update();
-											
-											local quantityLabel = newItemButton:WaitForChild("QuantityLabel");
-											quantityLabel.Font = Enum.Font.Arial;
-											quantityLabel.TextSize = 10;
-											quantityLabel.Visible = true;
-											
-											quantityLabel.Text = math.ceil(oddsProb *1000)/10 .."%";
-										end
-									end
+									giftItemButtonObj.ImageButton.MouseButton1Click:Connect(onButtonClick);
+									newButton.MouseButton1Click:Connect(onButtonClick);
 								end
 							end
 
-							descText = descText.."\n\n"..str;
-							descLabel.Text = descText;
-							descLabel.LineHeight = 1.2;
-							
-						end)
-
-						itemButtonObj:Update();
-					end
-					
-					info.LevelSlot.Parent = battlePassContent;
-				end
-				
-				if seasonLevel > treeCount then
-					lvlSlotInfo.LevelSlot.ImageColor3 = BP_COLORS.CurrentPassOwner;
-					
-				else
-					lvlSlotInfo.LevelSlot.ImageColor3 = BP_COLORS.LockedPassOwner;
-					
-				end
-				
-				local postRewards = seasonData.PostRewards;
-				if seasonLevel > treeCount then
-					for lvl, rewardInfo in pairs(postRewards) do
-						local postLvlSlotInfo = levelSlotsInfo[lvl];
-
-						if postLvlSlotInfo == nil then
-							local info = {};
-
-							info.LevelSlot = templateLevelSlot:Clone();
-
-							levelSlotsInfo[lvl] = info;
-							postLvlSlotInfo = info;
-						end
-
-						local lvlSlot = postLvlSlotInfo.LevelSlot;
-						lvlSlot.LayoutOrder = tonumber(lvl);
-						
-						if postLvlSlotInfo.ItemButton == nil then
-							local itemButtonObj = modItemInterface.newItemButton(rewardInfo.ItemId);
-							local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
-
-							local aspectRatioConstraint = Instance.new("UIAspectRatioConstraint");
-							aspectRatioConstraint.Parent = itemButtonObj.ImageButton;
-
-							itemButtonObj.ImageButton.AnchorPoint = Vector2.new(0.5, 0.5);
-							itemButtonObj.ImageButton.Position = UDim2.new(0.5, 0, 0.5, 0);
-							itemButtonObj.ImageButton.Size = UDim2.new(1, 0, 1, 0);
-							itemButtonObj.ImageButton.Parent = lvlSlot;
-							
-							postLvlSlotInfo.ItemButton = itemButtonObj;
-
-							postLvlSlotInfo.GetClaimState = function(l)
-								refreshData();
-								seasonLevel = seasonData.Level;
-
-								local r = "n/a";
-								if seasonData.PostRewards[l] ~= nil then
-									r = "CanClaim";
-								else
-									r = "Claimed";
+							lvlSlotInfo.Label.InputBegan:Connect(function(inputObject)
+								if (inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch) 
+									and inputObject.UserInputState == Enum.UserInputState.Begin then
+									loadGiftShop();
 								end
-								
-								return r;
-							end
-
-							local radialBarLabel = timerRadialBar:Clone();
-							radialBarLabel.Parent = itemButtonObj.ImageButton;
-
-							local radialBar = modRadialImage.new(TIMER_RADIAL_CONFIG, radialBarLabel);
-							local itemUpdateFunc = itemButtonObj.Update;
-
-							itemButtonObj.Update = function(self, storageItemData)
-								itemUpdateFunc(self, storageItemData);
-								if rewardInfo.ExpireTime == nil then return end;
-								local timeRemaining = rewardInfo.ExpireTime - workspace:GetServerTimeNow();
-								local timeLeftRatio = timeRemaining/shared.Const.OneDaySecs;
-								radialBar:UpdateLabel(math.max(timeLeftRatio, 0.1));
-
-								if timeRemaining <= (3600*4) then
-									radialBarLabel.ImageColor3 = BAR_COLORS.Yellow;
-								elseif timeRemaining <= 3600 then
-									radialBarLabel.ImageColor3 = BAR_COLORS.Red;
-								else
-									radialBarLabel.ImageColor3 = BAR_COLORS.Green;
-								end
-							end
-
-							itemButtonObj.ImageButton.MouseButton1Click:Connect(function()
-								if itemButtonObj.DimOut then return end;
-								if workspace:GetAttribute("DebugModeToggled") == true then
-									Debugger:Warn(`Level {lvl} RewardInfo`,rewardInfo);
-								end
-
-								itemToolTip.Frame.Visible = false;
-								refreshData();
-								interface:PlayButtonClick();
-
-								MissionDisplayFrame:ClearAllChildren();
-
-								local passRewardFrame = templatePassReward:Clone();
-								passRewardFrame.Parent = MissionDisplayFrame;
-
-								local titleLabel = passRewardFrame:WaitForChild("Title");
-								titleLabel.Text = '<font size="12">'.."Level "..lvl.."</font>\n<b>".. itemLib.Name .."</b>";
-								
-								if rewardInfo.RequiresPremium then
-									titleLabel.Text = titleLabel.Text.." (Premium)";
-								end
-								
-								local contentFrame = passRewardFrame:WaitForChild("Frame");
-								local claimButton = contentFrame:WaitForChild("ClaimButton") :: TextButton;
-								local slotFrame = contentFrame:WaitForChild("Slot");
-								local descLabel = contentFrame:WaitForChild("Description");
-
-								if rewardInfo.ItemId ~= "gold" then
-									claimButton.AnchorPoint = Vector2.new(1, 1);
-									claimButton.Position = UDim2.new(1, 0, 1, 0);
-	
-									if giftShopRewards then
-										local holdDownScrapObj = modComponents.CreateHoldDownButton(interface, {
-											Text = `<b>Trade in for {rewardInfo.TokensAmount or "1"} Gift Shop Tokens</b>`;
-											Color = Color3.fromRGB(165, 140, 75);
-										})
-		
-										local holdDownScrapButton: TextButton = holdDownScrapObj.Button;
-										holdDownScrapButton.AnchorPoint = Vector2.new(0, 1);
-										holdDownScrapButton.Position = UDim2.new(0, 0, 1, 0);
-										holdDownScrapButton.Size = UDim2.new(0.5, -10, 0, 30);
-										holdDownScrapButton.TextSize = 16;
-										holdDownScrapButton.Parent = contentFrame;
-
-										local noteLabel = Instance.new("TextLabel");
-										noteLabel.Text = "";
-										noteLabel.AnchorPoint = Vector2.new(0, 1);
-										noteLabel.Position = UDim2.new(0, 0, 1, -40);
-										noteLabel.BackgroundTransparency = 1;
-										noteLabel.TextColor3 = Color3.fromRGB(200, 200, 200);
-										noteLabel.TextSize = 9;
-										noteLabel.Size = UDim2.new(1, 0, 0, 20);
-										if modItemsLibrary:HasTag(itemLib.Id, "Skin Perm") then
-											noteLabel.Text = "* Once claimed, each skin permanents can only be traded for 1 gift shop token in Rat shop.";
-										else
-											noteLabel.Text = "* Once claimed, this is no longer tradable for gift shop tokens.";
-										end
-										noteLabel.Parent = contentFrame;
-
-										local lastMoved = tick();
-										claimButton.MouseMoved:Connect(function()
-											noteLabel.TextTransparency = 0;
-											lastMoved = tick();
-											task.wait(1);
-											if tick()-lastMoved < 1 then return end;
-											TweenService:Create(noteLabel, TweenInfo.new(1), {TextTransparency=1}):Play();
-										end)
-			
-										holdDownScrapObj.OnHoldDownConfirm = function()
-											holdDownScrapButton.Text = "Trading in...";
-											local r = remoteBattlepassRemote:InvokeServer("tradeinreward", lvl);
-											if r.FailMsg then
-												
-												
-											elseif r.Success == true then
-												game.Debris:AddItem(postLvlSlotInfo.GlowLabel, 0);
-												itemButtonObj.DimOut = true;
-												itemButtonObj:Update();
-												
-												task.delay(3, function()
-													lvlSlot.ClipsDescendants = true;
-													lvlSlot.AutomaticSize = Enum.AutomaticSize.None;
-													lvlSlot:TweenSize(UDim2.new(0, 0, 1, 0));
-													
-													task.wait(1);
-													game.Debris:AddItem(lvlSlot, 0);
-													levelSlotsInfo[lvl] = nil;
-													itemButtonObj:Destroy();
-												end)
-		
-												holdDownScrapButton.Visible = false;
-												claimButton.Visible = false;
-											end
-										end;
-									end
-
-								end
-								
-								local cloneItemButton = itemButtonObj.ImageButton:Clone();
-								cloneItemButton.Parent = slotFrame;
-
-								itemToolTip:BindHoverOver(cloneItemButton, function()
-									itemToolTip.Frame.Parent = windowFrame;
-									itemToolTip:Update(rewardInfo.ItemId);
-									itemToolTip:SetPosition(cloneItemButton);
-								end); 
-
-								local function h3(txt)
-									return '<b><font size="18">' .. txt .. '</font></b>'
-								end
-
-								local descText = "";
-								descText = descText..h3("Unlock Level: ").. lvl;
-
-								descText = descText.."\n\n"..h3("Name: ").. itemLib.Name;
-								descText = descText.."\n"..h3("Type: ").. itemLib.Type;
-								descText = descText.."\n"..h3("Description: ").. itemLib.Description;
-
-								if rewardInfo.ExpireTime then
-									local timeLeft = rewardInfo.ExpireTime-workspace:GetServerTimeNow();
-									descText = descText.."\n\n"..h3("Expires: ").. modSyncTime.ToString(timeLeft);
-								end
-
-								descLabel.Text = descText;
-
-								if postLvlSlotInfo.GetClaimState(lvl) ~= "CanClaim" then return end;
-
-								claimButton.Visible = true;
-
-								local requiresMP = seasonData.Owned ~= true;
-								if requiresMP then
-									claimButton.Text = "Requires Event Pass";
-								end
-
-								local  claimText = claimButton.Text;
-								claimButton.MouseButton1Click:Connect(function()
-									if requiresMP then
-										bpButtonFunc();
-										return;
-									end
-									refreshData();
-									if postLvlSlotInfo.GetClaimState(lvl) ~= "CanClaim" then return end;
-
-									claimButton.Text = "Claiming...";
-									local r = remoteBattlepassRemote:InvokeServer("claimpostreward", lvl);
-									if r.FailMsg then
-										if r.FailMsg == "Requires Event Pass" then
-											bpButtonFunc();
-
-										else
-											claimButton.Text = r.FailMsg;
-											task.wait(2);
-
-										end
-
-									elseif r.Success == true then
-										game.Debris:AddItem(postLvlSlotInfo.GlowLabel, 0);
-										itemButtonObj.DimOut = true;
-										itemButtonObj:Update();
-										
-										task.delay(3, function()
-											lvlSlot.ClipsDescendants = true;
-											lvlSlot.AutomaticSize = Enum.AutomaticSize.None;
-											lvlSlot:TweenSize(UDim2.new(0, 0, 1, 0));
-											
-											task.wait(1);
-											game.Debris:AddItem(lvlSlot, 0);
-											levelSlotsInfo[lvl] = nil;
-											itemButtonObj:Destroy();
-										end)
-
-										interface:ToggleWindow("Inventory", true);
-										claimButton.Visible = false;
-
-									end
-									claimButton.Text = claimText;
-								end)
 							end)
+							itemButtonObj.ImageButton.MouseButton1Click:Connect(loadGiftShop);
+							itemButtonObj.ImageButton:GetAttributeChangedSignal("FireClick"):Connect(loadGiftShop);
+
+							itemButtonObj:Update();
 						end
 
-						local itemButtonObj = postLvlSlotInfo.ItemButton;
-
-						local claimState = postLvlSlotInfo.GetClaimState(lvl);
-
-						if claimState == "CanClaim" then
-							game.Debris:AddItem(itemButtonObj.ImageButton:FindFirstChild("LockLabel"), 0);
-
-							local newGlow = itemButtonObj.ImageButton:FindFirstChild("ClaimGlow") or modItemInterface.newGlowEffect();
-							newGlow.Name = "ClaimGlow"
-							newGlow.ImageColor3 = Color3.fromRGB(255, 255, 255);
-							newGlow.ImageTransparency = 0.6;
-							newGlow.Parent = itemButtonObj.ImageButton;
-							postLvlSlotInfo.GlowLabel = newGlow;
-							itemButtonObj.DimOut = nil;
-							itemButtonObj.ImageButton.radialBar.Visible = true;
-
-
-						elseif claimState == "Claimed" then
-							game.Debris:AddItem(itemButtonObj.ImageButton:FindFirstChild("LockLabel"), 0);
-							game.Debris:AddItem(postLvlSlotInfo.GlowLabel, 0);
-							itemButtonObj.DimOut = true;
-							itemButtonObj.ImageButton.radialBar.Visible = false;
-
-						end
-
-						local itemData = rewardInfo.Data or {};
-						itemData.ItemId = rewardInfo.ItemId;
-						itemData.Quantity = rewardInfo.Quantity or 1;
-						itemButtonObj:Update(itemData);
-
-						lvlSlot.ImageColor3 = BP_COLORS.CurrentPassOwner;
-						lvlSlot.Parent = battlePassContent;
-						
-						
+						lvlSlotInfo.LevelSlot.ImageColor3 = BP_COLORS.Premium;
+						info.LevelSlot.Parent = battlePassContent;
+					end
+					lvlSlotInfo.Label.Text = "<b>".. modFormatNumber.Beautify(seasonTokens or 0) .." Tokens</b>";
+					if action == "giftshop" then
+						lvlSlotInfo.ItemButton.ImageButton:SetAttribute("FireClick", not lvlSlotInfo.ItemButton.ImageButton:GetAttribute("FireClick") );
 					end
 				end
-			end
 
-			--== MARK: Gift Shop
-			local giftShop = "giftshop";
-			local lvlSlotInfo = levelSlotsInfo[giftShop];
+				--== MARK: Final Level 
+				if seasonLevel > treeCount then
+					if finalSlotInfo.Slot == nil then
+						finalSlotInfo.Slot = templateLevelSlot:Clone();
+						finalSlotInfo.Slot.Size = UDim2.new(0, 160, 1, 0);
+						finalSlotInfo.Slot.LayoutOrder = 9999;
 
-			if giftShopRewards then
-				if lvlSlotInfo == nil then
-					local info = {};
-
-					info.LevelSlot = templateLevelSlot:Clone() :: ImageLabel;
-					info.LevelSlot.LayoutOrder = 9999-1;
-					info.LevelSlot.Size = UDim2.new(0, 120, 1, 0);
-
-					levelSlotsInfo[giftShop] = info;
-					lvlSlotInfo = info;
-					
-					if lvlSlotInfo.ItemButton == nil then
-						local itemButtonObj = modItemInterface.newItemButton("unknowngift");
+						local finalLabel = Instance.new("TextLabel");
+						finalLabel.RichText = true;
+						finalLabel.Size = UDim2.new(1, 0, 1, 0);
+						finalLabel.Font = Enum.Font.Arial;
+						finalLabel.TextColor3 = Color3.fromRGB(255,255,255);
+						finalLabel.BackgroundTransparency = 1;
+						finalLabel.TextScaled = true;
+						finalLabel.TextStrokeColor3 = Color3.fromRGB(255,255,255);
+						finalLabel.TextStrokeTransparency = 1;
 						
-						local aspectRatioConstraint = Instance.new("UIAspectRatioConstraint");
-						aspectRatioConstraint.Parent = itemButtonObj.ImageButton;
-
-						itemButtonObj.ImageButton.AnchorPoint = Vector2.new(0, 0.5);
-						itemButtonObj.ImageButton.Position = UDim2.new(0, 0, 0.5, 0);
-						itemButtonObj.ImageButton.Size = UDim2.new(0, 100, 0, 100);
-						itemButtonObj.ImageButton.Rotation = 1;
-						itemButtonObj.ImageButton.Parent = info.LevelSlot;
-
-						info.LevelSlot.AutomaticSize = Enum.AutomaticSize.X;
-
-						local tokenLabel = Instance.new("TextLabel");
-						tokenLabel.RichText = true;
-						tokenLabel.AutomaticSize = Enum.AutomaticSize.X;
-						tokenLabel.Font = Enum.Font.Arial;
-						tokenLabel.TextColor3 = Color3.fromRGB(255,255,255);
-						tokenLabel.BackgroundTransparency = 1;
-						tokenLabel.TextScaled = true;
-						tokenLabel.Size = UDim2.new(0, 0, 1, 0);
-						tokenLabel.Position = UDim2.new(0, 100, 0, 0);
-						tokenLabel.Parent = info.LevelSlot;
-						lvlSlotInfo.Label = tokenLabel;
-
 						local padding = Instance.new("UIPadding");
-						padding.PaddingLeft = UDim.new(0, 0);
-						padding.PaddingRight = UDim.new(0, 15);
+						padding.PaddingLeft = UDim.new(0, 10);
+						padding.PaddingRight = UDim.new(0, 10);
 						padding.PaddingTop = UDim.new(0, 15);
 						padding.PaddingBottom = UDim.new(0, 15);
-						padding.Parent = tokenLabel;
-
-						local slotPadding = Instance.new("UIPadding");
-						slotPadding.PaddingLeft = UDim.new(0, 10);
-						slotPadding.PaddingRight = UDim.new(0, 10);
-						slotPadding.Parent = info.LevelSlot;
-
-						lvlSlotInfo.ItemButton = itemButtonObj;
+						padding.Parent = finalLabel;
 						
-						local function loadGiftShop()
-							itemToolTip.Frame.Visible = false;
-							refreshData();
-							interface:PlayButtonClick();
-
-							MissionDisplayFrame:ClearAllChildren();
-							local passRewardFrame = templatePassReward:Clone();
-							passRewardFrame.Parent = MissionDisplayFrame;
-
-							local titleLabel = passRewardFrame:WaitForChild("Title");
-							local titleStr = "<b>Gift Shop!</b>";
-							titleLabel.TextColor3 = BP_COLORS.CurrentPremium;
-
-							local contentFrame = passRewardFrame:WaitForChild("Frame");
-							local claimButton = contentFrame:WaitForChild("ClaimButton");
-							local slotFrame = contentFrame:WaitForChild("Slot");
-							local descLabel = contentFrame:WaitForChild("Description");
-							local scrollFrame = contentFrame:WaitForChild("ScrollFrame");
-							
-							slotFrame.Visible = false;
-							claimButton.Visible = false;
-							scrollFrame.Visible = true;
-							descLabel.Size = UDim2.new(1, 0, 1, 0);
-							
-							local descText = "Trade in your rewards for past event pass rewards! You can also trade in skin permanents in the Rat shop. Accumulated Tokens will only be usable during current event pass.";
-
-							-- if modData.IsPremium ~= true then
-							-- 	titleStr = titleStr.." (Premium)";
-							-- 	descText = "Requires Premium!\n"..descText;
-							-- end
-
-							titleLabel.Text = titleStr;
-							descLabel.Text = descText;
-
-							local uiGridLayout = scrollFrame:WaitForChild("UIGridLayout") :: UIGridLayout;
-							uiGridLayout.CellPadding = UDim2.new(0, 10, 0, 10);
-							uiGridLayout.CellSize = UDim2.new(0, 120, 0, 120);
-							uiGridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center;
-
-							scrollFrame.Size = UDim2.new(1, 0, 1, -50);
-
-							local giftShopButtonTemplate = script:WaitForChild("GiftShopButton");
-
-							for a=1, #giftShopRewards do
-								local shopLib = giftShopRewards[a];
-
-								local newButton = giftShopButtonTemplate:Clone() :: TextButton;
-								local slotLabel = newButton:WaitForChild("ItemSlot");
-								local costLabel = newButton:WaitForChild("Title") :: TextLabel;
-
-								local giftItemButtonObj = modItemInterface.newItemButton(shopLib.ItemId);
-								giftItemButtonObj.ImageButton.Parent = slotLabel;
-								giftItemButtonObj:Update();
-
-								newButton.Parent = scrollFrame;
-
-								itemToolTip:BindHoverOver(giftItemButtonObj.ImageButton, function()
-									itemToolTip.Frame.Parent = windowFrame;
-									itemToolTip:Update(shopLib.ItemId);
-									itemToolTip:SetPosition(giftItemButtonObj.ImageButton);
-								end);
-								
-
-								local tradeCost = shopLib.Cost;
-								costLabel.Text = `{tradeCost} Tokens`;
-
-								local itemLib = modItemsLibrary:Find(shopLib.ItemId);
-								local function onButtonClick()
-									interface:PlayButtonClick();
-
-									if tradeCost == nil then
-										costLabel.TextColor3 = Color3.fromRGB(200, 50, 50);
-										TweenService:Create(costLabel, TweenInfo.new(1), {
-											TextColor3 = Color3.fromRGB(255, 255, 255);
-										}):Play();
-										return;
-									end
-
-									seasonTokens = seasonData.Tokens or 0;
-									if seasonTokens < tradeCost then
-										lvlSlotInfo.Label.TextColor3 = Color3.fromRGB(200, 50, 50);
-										TweenService:Create(lvlSlotInfo.Label, TweenInfo.new(1), {
-											TextColor3 = Color3.fromRGB(255, 255, 255);
-										}):Play();
-										return;
-									end
-
-									local promptWindow = modClientGuis.promptQuestion(`Trade For {itemLib.Name}`, 
-										`Are you sure you would like to trade in <b>{modFormatNumber.Beautify(tradeCost)} Tokens</b> for a {itemLib.Name}`, "Trade", "Cancel", itemLib.Icon);
-									local YesClickedSignal, NoClickedSignal;
-				
-									local debounce = false;
-									YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
-										if debounce then return end;
-										debounce = true;
-										interface:PlayButtonClick();
-				
-										local _r = remoteBattlepassRemote:InvokeServer("purchasegiftshop", shopLib.ItemId);
-										interface:ToggleWindow("Inventory", true);
-										interface:ToggleWindow("Missions", true, "giftshop");
-
-										promptWindow:Close();
-										YesClickedSignal:Disconnect();
-										NoClickedSignal:Disconnect();
-									end);
-									NoClickedSignal = promptWindow.Frame.No.MouseButton1Click:Connect(function()
-										if debounce then return end;
-										interface:PlayButtonClick();
-										promptWindow:Close();
-										interface:ToggleWindow("Missions", true, "giftshop");
-										YesClickedSignal:Disconnect();
-										NoClickedSignal:Disconnect();
-									end);
-								end
-								
-								giftItemButtonObj.ImageButton.MouseButton1Click:Connect(onButtonClick);
-								newButton.MouseButton1Click:Connect(onButtonClick);
-							end
-						end
-
-						lvlSlotInfo.Label.InputBegan:Connect(function(inputObject)
-							if (inputObject.UserInputType == Enum.UserInputType.MouseButton1 or inputObject.UserInputType == Enum.UserInputType.Touch) 
-								and inputObject.UserInputState == Enum.UserInputState.Begin then
-								loadGiftShop();
-							end
-						end)
-						itemButtonObj.ImageButton.MouseButton1Click:Connect(loadGiftShop);
-						itemButtonObj.ImageButton:GetAttributeChangedSignal("FireClick"):Connect(loadGiftShop);
-
-						itemButtonObj:Update();
+						finalSlotInfo.Label = finalLabel;
+						finalLabel.Parent = finalSlotInfo.Slot;
 					end
 
-					lvlSlotInfo.LevelSlot.ImageColor3 = BP_COLORS.Premium;
-					info.LevelSlot.Parent = battlePassContent;
-				end
-				lvlSlotInfo.Label.Text = "<b>".. modFormatNumber.Beautify(seasonTokens or 0) .." Tokens</b>";
-				if action == "giftshop" then
-					lvlSlotInfo.ItemButton.ImageButton:SetAttribute("FireClick", not lvlSlotInfo.ItemButton.ImageButton:GetAttribute("FireClick") );
-				end
-			end
-
-			--== MARK: Final Level 
-			if seasonLevel > treeCount then
-				if finalSlotInfo.Slot == nil then
-					finalSlotInfo.Slot = templateLevelSlot:Clone();
-					finalSlotInfo.Slot.Size = UDim2.new(0, 160, 1, 0);
-					finalSlotInfo.Slot.LayoutOrder = 9999;
-
-					local finalLabel = Instance.new("TextLabel");
-					finalLabel.RichText = true;
-					finalLabel.Size = UDim2.new(1, 0, 1, 0);
-					finalLabel.Font = Enum.Font.Arial;
-					finalLabel.TextColor3 = Color3.fromRGB(255,255,255);
-					finalLabel.BackgroundTransparency = 1;
-					finalLabel.TextScaled = true;
-					finalLabel.TextStrokeColor3 = Color3.fromRGB(255,255,255);
-					finalLabel.TextStrokeTransparency = 1;
+					finalSlotInfo.BackgroundColor3 = BP_COLORS.CurrentPassOwner;
+					finalSlotInfo.Label.Text = "<b>Level ".. tostring(seasonLevel) .."</b>";
+					finalSlotInfo.Slot.Parent = battlePassContent;
 					
-					local padding = Instance.new("UIPadding");
-					padding.PaddingLeft = UDim.new(0, 10);
-					padding.PaddingRight = UDim.new(0, 10);
-					padding.PaddingTop = UDim.new(0, 15);
-					padding.PaddingBottom = UDim.new(0, 15);
-					padding.Parent = finalLabel;
+					battlePassContent.UIPadding.PaddingRight = UDim.new(0, 0);
 					
-					finalSlotInfo.Label = finalLabel;
-					finalLabel.Parent = finalSlotInfo.Slot;
-				end
-
-				finalSlotInfo.BackgroundColor3 = BP_COLORS.CurrentPassOwner;
-				finalSlotInfo.Label.Text = "<b>Level ".. tostring(seasonLevel) .."</b>";
-				finalSlotInfo.Slot.Parent = battlePassContent;
+				else
+					battlePassContent.UIPadding.PaddingRight = UDim.new(0, 100);
+				end 
 				
-				battlePassContent.UIPadding.PaddingRight = UDim.new(0, 0);
-				
-			else
-				battlePassContent.UIPadding.PaddingRight = UDim.new(0, 100);
-			end 
-			
 
-			if seasonLevel > treeCount then
-				battlePassContent.CanvasPosition = battlePassContent.AbsoluteCanvasSize;
-					
-			else
-				local midCanvasPoint = totalDist- (battlePassContent.AbsoluteSize.X/2);
-				battlePassContent.CanvasPosition = Vector2.new(midCanvasPoint, 0);
+				if seasonLevel > treeCount then
+					battlePassContent.CanvasPosition = battlePassContent.AbsoluteCanvasSize;
+						
+				else
+					local midCanvasPoint = totalDist- (battlePassContent.AbsoluteSize.X/2);
+					battlePassContent.CanvasPosition = Vector2.new(midCanvasPoint, 0);
+				end
 			end
 		end
+		
+		battlePassContent:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+			for _, info in pairs(levelSlotsInfo) do
+				if info.GlowLabel == nil then continue end;
+				local rays = info.GlowLabel:FindFirstChild("Rays");
+				if rays == nil then continue end;
+				
+				local offset = BottomFrame:GetAttribute("RayRange") or Vector2.new(-60, -60);
+				if rays.AbsolutePosition.X <= (BottomFrame.AbsolutePosition.X + offset.X)
+					or rays.AbsolutePosition.X >= (BottomFrame.AbsolutePosition.X+BottomFrame.AbsoluteSize.X + offset.Y) then
+					rays.Visible = false;
+				else
+					rays.Visible = true;
+				end
+				
+			end
+		end)
 	end
-	
-	battlePassContent:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
-		for _, info in pairs(levelSlotsInfo) do
-			if info.GlowLabel == nil then continue end;
-			local rays = info.GlowLabel:FindFirstChild("Rays");
-			if rays == nil then continue end;
-			
-			local offset = BottomFrame:GetAttribute("RayRange") or Vector2.new(-60, -60);
-			if rays.AbsolutePosition.X <= (BottomFrame.AbsolutePosition.X + offset.X)
-				or rays.AbsolutePosition.X >= (BottomFrame.AbsolutePosition.X+BottomFrame.AbsoluteSize.X + offset.Y) then
-				rays.Visible = false;
-			else
-				rays.Visible = true;
-			end
-			
-		end
-	end)
-	
+
     interface.Garbage:Tag(modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
         if action ~= "sync" then return end;
         

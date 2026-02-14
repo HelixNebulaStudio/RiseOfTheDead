@@ -55,6 +55,35 @@ function npcPackage.Spawning(npcClass: NpcClass)
         configurations.BaseValues.AttackDamage = 5;
     end
 
+    if not isHard then
+        for _, obj in pairs(npcClass.Character:GetDescendants()) do
+            if obj:IsA("BasePart") and obj.Material == Enum.Material.Foil then
+                obj.Material = Enum.Material.Sand;
+                obj.Color = Color3.fromRGB(90, 76, 66);
+            end
+        end
+    end
+
+    npcClass.Garbage:Tag(rootPart:WaitForChild("BodyPosition"));
+    npcClass.Garbage:Tag(rootPart:WaitForChild("BodyGyro"));
+
+    local poisonIvyModel = Instance.new("Model");
+    poisonIvyModel.Name = `PoisonIvyModel`;
+    poisonIvyModel.Parent = npcClass.Character;
+    properties.PoisonIvyModel = poisonIvyModel;
+
+    properties.FacePoint = npcClass.SpawnCFrame.Position;
+    properties.HoverPoint = properties.FacePoint + Vector3.new(0, 32, 0);
+    properties.MoveState = "Follow";
+    properties.MoveStateChangedTick = tick();
+end
+
+function npcPackage.Spawned(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    local npcChar = npcClass.Character;
+    local rootPart = npcClass.RootPart;
+    local isHard = properties.HardMode;
+
     local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
 
     local wingModels = {"LeftWing"; "RightWing"};
@@ -83,34 +112,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
             properties.MovementFrequency = math.clamp(properties.MovementFrequency - 20, 10, 50);
         end)
     end
-
-    if not isHard then
-        for _, obj in pairs(npcClass.Character:GetDescendants()) do
-            if obj:IsA("BasePart") and obj.Material == Enum.Material.Foil then
-                obj.Material = Enum.Material.Sand;
-                obj.Color = Color3.fromRGB(90, 76, 66);
-            end
-        end
-    end
-
-    npcClass.Garbage:Tag(rootPart:WaitForChild("BodyPosition"));
-    npcClass.Garbage:Tag(rootPart:WaitForChild("BodyGyro"));
-
-    local poisonIvyModel = Instance.new("Model");
-    poisonIvyModel.Name = `PoisonIvyModel`;
-    poisonIvyModel.Parent = npcClass.Character;
-    properties.PoisonIvyModel = poisonIvyModel;
-
-    properties.FacePoint = npcClass.SpawnPoint.Position;
-    properties.HoverPoint = properties.FacePoint + Vector3.new(0, 32, 0);
-    properties.MoveState = "Follow";
-    properties.MoveStateChangedTick = tick();
-end
-
-function npcPackage.Spawned(npcClass: NpcClass)
-    local properties = npcClass.Properties;
-    local npcChar = npcClass.Character;
-    local rootPart = npcClass.RootPart;
 
     local bodyPosition = rootPart:WaitForChild("BodyPosition");
 	local bodyGyro = rootPart:WaitForChild("BodyGyro");

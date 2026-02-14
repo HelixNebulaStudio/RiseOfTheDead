@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local TALK_ANIMATIONS = {"nodyes"; "nodno"; "shrug2"; "laugh"; "point"; "bored"; "PullLever"};
 
@@ -232,9 +232,9 @@ function treePackage.Patrol(npcClass: NpcClass)
     properties.LastAlertShout = nil;
     
     if math.random(1, 100) == 1 
-    and not npcClass.Move:IsAtPosition(npcClass.SpawnPoint.Position) and npcClass.Properties.SpokeByMeData == nil then
+    and not npcClass.Move:IsAtPosition(npcClass.SpawnCFrame.Position) and npcClass.Properties.SpokeByMeData == nil then
         npcClass.Move:SetMoveSpeed("set", "walk", 8, npcClass.Move.MoveSpeedPriority.Movement, 2);
-        npcClass.Move:MoveTo(npcClass.SpawnPoint.Position);
+        npcClass.Move:MoveTo(npcClass.SpawnCFrame.Position);
 
     else
         npcClass.Move:Stop();
@@ -243,7 +243,7 @@ function treePackage.Patrol(npcClass: NpcClass)
         and npcClass.Properties.SpokeByMeData == nil 
         and (properties.PassiveTalkCooldown == nil or tick() > properties.PassiveTalkCooldown) then
             properties.PassiveTalkCooldown = tick() + math.random(20, 45);
-            if modBranchConfigs.IsWorld("BioXResearch") then
+            if modBranchConfigurations.IsWorld("BioXResearch") then
                 properties.PassiveTalkCooldown = tick() + 15;
             end
 
@@ -427,7 +427,7 @@ function treePackage.Converse(npcClass: NpcClass)
     end
 
     spokenToMeData.LastResponseTick = tick() + math.random(10, 11);
-    if modBranchConfigs.IsWorld("BioXResearch") then
+    if modBranchConfigurations.IsWorld("BioXResearch") then
         properties.LastResponseTick = tick() + 11;
     end
 

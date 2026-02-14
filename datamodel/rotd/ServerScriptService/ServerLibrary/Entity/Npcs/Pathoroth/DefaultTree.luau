@@ -58,13 +58,13 @@ function treePackage.Morph(npcClass: NpcClass)
     local rootPart = npcClass.RootPart;
 
     local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
-    local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
+    local targetEntityClass: EntityClass = enemyTargetData.HealthComp.CompOwner;
 
     properties.MorphTimer = tick();
-    if enemyNpcClass.ClassName ~= "PlayerClass" then return; end;
-    if properties.MorphTarget == enemyNpcClass.Character then return; end;
+    if targetEntityClass.ClassName ~= "PlayerClass" then return; end;
+    if properties.MorphTarget == targetEntityClass.Character then return; end;
 
-    local morphTarget = enemyNpcClass.Character;
+    local morphTarget = targetEntityClass.Character;
     properties.MorphTarget = morphTarget;
 
     local horrorParticle = properties.HorrorParticle;
@@ -358,7 +358,9 @@ function treePackage.EquipWeapon(npcClass: NpcClass)
     end;
 
     local targetHealthComp: HealthComp = modHealthComponent.getByModel(properties.MorphTarget);
-    local targetPlayerClass: PlayerClass = targetHealthComp and targetHealthComp.CompOwner;
+    local targetEntityClass: EntityClass = targetHealthComp.CompOwner;
+    
+    local targetPlayerClass: PlayerClass = (targetEntityClass :: PlayerClass);
     local primaryWeaponItemId = targetPlayerClass and targetPlayerClass.WieldComp.ItemId or nil;
     if primaryWeaponItemId == nil then return false end;
 
@@ -405,7 +407,7 @@ end
 function treePackage.CanFireGun(npcClass: NpcClass)
     local wieldComp: WieldComp = npcClass.WieldComp;
     if wieldComp.EquipmentClass == nil then return false end;
-    if wieldComp.EquipmentClass.Properties.Ammo <= 0 then return false end;
+    if (wieldComp.EquipmentClass.Properties.Ammo :: number) <= 0 then return false end;
 
     return true;
 end
@@ -427,7 +429,7 @@ function treePackage.FireGun(npcClass: NpcClass)
     local allyTargetData = npcClass.Properties.EnemyTargetData;
 
     local allyHealthComp: HealthComp = allyTargetData.HealthComp;
-    local allyNpcClass: NpcClass = allyHealthComp.CompOwner;
+    local allyNpcClass: NpcClass = allyHealthComp.CompOwner :: NpcClass;
 
     npcClass.Move:Face(allyNpcClass.RootPart, nil, 0.5);
     npcClass.Move:HeadTrack(allyNpcClass.Head, 2);
@@ -457,7 +459,7 @@ function treePackage.ReloadGun(npcClass: NpcClass)
     if wieldComp.EquipmentClass == nil then return end;
     
     if wieldComp.EquipmentClass.Class == "Gun" 
-    and wieldComp.EquipmentClass.Properties.MaxAmmo <= 0 then
+    and (wieldComp.EquipmentClass.Properties.MaxAmmo :: number) <= 0 then
 
         wieldComp:Equip{
             ItemId = "machete";

@@ -10,7 +10,7 @@ local Server = require(ReplicatedStorage.Dependencies.BridgeNet2.src.Server)
 
 local audioModule = game.ReplicatedStorage.Library.Audio;
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
@@ -113,7 +113,7 @@ function SafehomeData.onRequire()
 				end
 				
 			else
-				if not modBranchConfigs.IsWorld("Safehome") or safehomeClass == nil then
+				if not modBranchConfigurations.IsWorld("Safehome") or safehomeClass == nil then
 					shared.Notify(player, "This is not your safehome.", "Negative");
 					return {ReplyCode=4;};
 				end;
@@ -142,7 +142,7 @@ function SafehomeData.onRequire()
 				factionGroup = setReturnPacket.Data;
 			end
 				
-			if modBranchConfigs.IsWorld("Safehome") then
+			if modBranchConfigurations.IsWorld("Safehome") then
 				safehomeClass:ChangeMap(safehomeId);
 			end
 			
@@ -174,7 +174,7 @@ function SafehomeData.onRequire()
 			
 			local returnColor = Color3.fromHex(groupData.Color);
 			
-			if modBranchConfigs.IsWorld("Safehome") and safehomeClass then
+			if modBranchConfigurations.IsWorld("Safehome") and safehomeClass then
 				local safehomeCustomizableFolder = workspace.Environment:FindFirstChild("Customizable");
 				local groupFolder = safehomeCustomizableFolder and safehomeCustomizableFolder:FindFirstChild(groupId);
 				
@@ -207,7 +207,7 @@ function SafehomeData.onRequire()
 
 			npcData.Active = nil;
 			
-			if modBranchConfigs.IsWorld("Safehome") and safehomeClass then
+			if modBranchConfigurations.IsWorld("Safehome") and safehomeClass then
 				local npcClass: NpcClass = safehomeClass.NpcClassList[npcName];
 				if npcClass then
 					npcClass:Destroy();
@@ -218,7 +218,7 @@ function SafehomeData.onRequire()
 			return {ReplyCode=1; Data=safehomeData;};
 		end
 		
-		if not modBranchConfigs.IsWorld("Safehome") then return end;
+		if not modBranchConfigurations.IsWorld("Safehome") then return end;
 		--== Safehome only functions;
 		
 		if actionId == "inspectSafehome" then

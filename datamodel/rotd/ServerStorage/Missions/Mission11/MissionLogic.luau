@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 local MISSION_ID = 11;
@@ -11,7 +11,7 @@ local MissionLogic = {};
 --==
 
 function MissionLogic.onRequire()
-	if not modBranchConfigs.IsWorld("TheWarehouse") then return end;
+	if not modBranchConfigurations.IsWorld("TheWarehouse") then return end;
 
 	if RunService:IsServer() then
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);

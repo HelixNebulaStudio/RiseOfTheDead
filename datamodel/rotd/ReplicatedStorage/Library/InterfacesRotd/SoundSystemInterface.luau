@@ -4,7 +4,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 
 local interfacePackage = {
@@ -32,7 +32,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end)
 
 	window.OnToggle:Connect(function(visible, toolHandler)
-		if visible and not modBranchConfigs.IsWorld("Safehome") then 
+		if visible and not modBranchConfigurations.IsWorld("Safehome") then 
             window:Close();
             return;
         end

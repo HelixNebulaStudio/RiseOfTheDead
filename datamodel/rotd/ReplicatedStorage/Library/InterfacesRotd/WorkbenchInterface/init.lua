@@ -6,7 +6,7 @@ local localplayer = game.Players.LocalPlayer;
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 local modItemLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modBlueprintLibrary = shared.require(game.ReplicatedStorage.Library.BlueprintLibraryRotd);
@@ -35,7 +35,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local remoteWorkbenchService = modRemotesManager:Get("WorkbenchService");
 
     local modData = shared.require(localplayer:WaitForChild("DataModule"));
-	local branchColor = modBranchConfigs.BranchColor;
+	local branchColor = modBranchConfigurations.BranchColor;
 	
 	local workbenchFrame;
 	if modConfigurations.CompactInterface then

@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
@@ -61,7 +61,7 @@ return function(CutsceneSequence)
 		end
 	end)
 	
-	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(event: EventPacket, ...)
+	shared.modEventService:OnInvoked("Generic_BindTrigger", function(event: EventPacket, ...)
 		local triggerPlayer: Player? = event.Player;
 		if triggerPlayer == nil then return end;
 
@@ -90,7 +90,7 @@ return function(CutsceneSequence)
 		if mission == nil then return end;
 			
 		Debugger:Log("mission.SaveData", mission.SaveData);
-		if not modBranchConfigs.IsWorld(mission.SaveData.Location) then Debugger:Log("Wrong world"); return end;
+		if not modBranchConfigurations.IsWorld(mission.SaveData.Location) then Debugger:Log("Wrong world"); return end;
 
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable

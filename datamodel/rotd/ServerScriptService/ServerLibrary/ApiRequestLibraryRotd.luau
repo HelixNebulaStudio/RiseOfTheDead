@@ -1,5 +1,5 @@
 local modApiRequestLibrary = require(game.ServerScriptService.ServerLibrary.ApiRequestLibrary);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 --== Script;
 function modApiRequestLibrary.onRequire()
@@ -7,7 +7,7 @@ function modApiRequestLibrary.onRequire()
         Id="updatelog";
         
         Api="Github";
-        Url=modBranchConfigs.CurrentBranch.Name == "Dev"
+        Url=shared.gameConfig.BranchName == "Dev"
         and `https://raw.githubusercontent.com/HelixNebulaStudio/RiseOfTheDead/main/docs/DevBranch/{ modApiRequestLibrary.DevVersion }.md`
         or `https://raw.githubusercontent.com/HelixNebulaStudio/RiseOfTheDead/main/docs/LiveBranch/{ modApiRequestLibrary.GameVersion }.md`;
     }

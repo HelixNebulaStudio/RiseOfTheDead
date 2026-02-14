@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local MissionLogic = {};
 
 local RunService = game:GetService("RunService");
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modSyncTime = shared.require(game.ReplicatedStorage.Library:WaitForChild("SyncTime"));
 local modGuiHighlight = shared.require(game.ReplicatedStorage.Library.UI.GuiHighlight);
@@ -12,7 +12,7 @@ local MISSION_ID = 5;
 -- MARK: IsServer()
 if RunService:IsServer() then
 	if not RunService:IsStudio() then
-		if not modBranchConfigs.IsWorld("TheWarehouse") then return {}; end;
+		if not modBranchConfigurations.IsWorld("TheWarehouse") then return {}; end;
 	end
 
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
@@ -142,7 +142,7 @@ end
 -- MARK: IsClient()
 if RunService:IsClient() then
 	if not RunService:IsStudio() then
-		if not modBranchConfigs.IsWorld("TheWarehouse") then return {}; end;
+		if not modBranchConfigurations.IsWorld("TheWarehouse") then return {}; end;
 	end
 	
 	local modWaypoint = shared.require(game.ReplicatedStorage.Library.Waypoint);

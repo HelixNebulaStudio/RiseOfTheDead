@@ -7,7 +7,7 @@ local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("Global
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
@@ -433,7 +433,7 @@ function GameModeManager:OnPlayerJoin(player)
 	local joinData = player:GetJoinData();
 	local teleportData = joinData.TeleportData;
 	
-	if modBranchConfigs.CurrentBranch.Name == "Dev" 
+	if shared.gameConfig.BranchName == "Dev" 
 	and GameModeManager.StudioData 
 	and GameModeManager.StudioData.ForceDevBranchTpData == true then
 		Debugger:Warn(`Overriding teleport data ({ Debugger:Stringify(teleportData) })`);
@@ -441,7 +441,7 @@ function GameModeManager:OnPlayerJoin(player)
 
 
 	elseif teleportData == nil 
-	and (modBranchConfigs.CurrentBranch.Name == "Dev" or RunService:IsStudio()) 
+	and (shared.gameConfig.BranchName == "Dev" or RunService:IsStudio()) 
 	and GameModeManager.StudioData then
 		Debugger:Warn("No teleport data, using studio teleport data.");
 		teleportData = GameModeManager.StudioData;
@@ -1100,7 +1100,7 @@ function GameModeManager:ExitGamemodeWorld(player)
 	local playerSave = profile:GetActiveSave();
 	
 	local spawnId = (GameModeManager.GameWorldInfo and GameModeManager.GameWorldInfo.StageLib.ExitSpawn) or playerSave.Spawn;
-	local worldId = modBranchConfigs.GetWorldOfSpawn(spawnId);
+	local worldId = modBranchConfigurations.GetWorldOfSpawn(spawnId);
 	playerSave.Spawn = spawnId;
 	
 	if worldId == nil then

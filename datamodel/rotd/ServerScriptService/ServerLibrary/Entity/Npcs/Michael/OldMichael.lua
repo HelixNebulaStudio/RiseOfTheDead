@@ -11,7 +11,7 @@ return function(npc, spawnPoint)
 	local self = modNpcComponent{
 		Name = npc.Name;
 		Prefab = npc;
-		SpawnPoint = spawnPoint;
+		SpawnCFrame = spawnPoint;
 		Humanoid = npc:FindFirstChildWhichIsA("Humanoid");
 		RootPart = npc.PrimaryPart;
 		Immortal = 1;

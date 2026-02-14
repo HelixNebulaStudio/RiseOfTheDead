@@ -4,6 +4,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Hazard = {
 	Title = "Ticks Galore";
+	Description = "Only Ticks spawns";
 	Controller = nil;
 };
 Hazard.__index = Hazard;

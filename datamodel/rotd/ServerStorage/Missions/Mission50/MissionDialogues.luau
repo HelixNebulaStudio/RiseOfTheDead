@@ -56,7 +56,7 @@ Dialogues["Bunny Man"].DialogueStrings = {
 if RunService:IsServer() then
 	-- MARK: Bunny Man Handler
 	Dialogues["Bunny Man"].DialogueHandler = function(player, dialog, data, mission)
-		local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+		local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 		local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
@@ -65,9 +65,9 @@ if RunService:IsServer() then
 		local activeSave = profile:GetActiveSave();
 
 		if mission.Type == 1 then -- Active
-			if not modBranchConfigs.IsWorld("EasterButchery") then
+			if not modBranchConfigurations.IsWorld("EasterButchery") then
 				dialog:AddChoice("eb2_letsgo", function(dialog)
-					data:Set("World", modBranchConfigs.WorldName);
+					data:Set("World", modBranchConfigurations.WorldName);
 					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 1 then
 							mission.ProgressionPoint = 2;
@@ -139,9 +139,9 @@ if RunService:IsServer() then
 			end)
 			
 		elseif mission.Type == 3 then -- Complete
-			if not modBranchConfigs.IsWorld("EasterButchery") then
+			if not modBranchConfigurations.IsWorld("EasterButchery") then
 				dialog:AddChoice("reborn_travel", function(dialog)
-					data:Set("World", modBranchConfigs.WorldName);
+					data:Set("World", modBranchConfigurations.WorldName);
 					modServerManager:Travel(player, "EasterButchery");
 				end)
 

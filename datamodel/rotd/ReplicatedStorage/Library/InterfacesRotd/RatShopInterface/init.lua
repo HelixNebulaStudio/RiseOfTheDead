@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService");
 local localPlayer = game.Players.LocalPlayer;
 
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modShopLibrary = shared.require(game.ReplicatedStorage.Library.RatShopLibrary);
@@ -28,7 +28,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local typeOptionTemplate = script:WaitForChild("TypeOption");
     local listingTemplate = script:WaitForChild("templateOption");
         
-    local branchColor = modBranchConfigs.BranchColor;	
+    local branchColor = modBranchConfigurations.BranchColor;	
 
 	local activeShopType = "Rats";
 	local interfaceScreenGui = interface.ScreenGui;

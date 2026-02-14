@@ -9,7 +9,7 @@ local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("Global
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
@@ -36,7 +36,7 @@ if RunService:IsServer() then
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 	modSafehomeService = shared.require(game.ServerScriptService.ServerLibrary.SafehomeService);
 
-	if modBranchConfigs.IsWorld("TheHarbor") then
+	if modBranchConfigurations.IsWorld("TheHarbor") then
 		shared.modEventService:OnInvoked("Interactables_BindButtonInteract", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -54,7 +54,7 @@ if RunService:IsServer() then
 			end
 		end)
 
-	elseif modBranchConfigs.IsWorld("DoubleCross") then
+	elseif modBranchConfigurations.IsWorld("DoubleCross") then
 
 		shared.modEventService:OnInvoked("Character_BindDismount", function(eventPacket: EventPacket, ...)
 			local packet = ...;
@@ -227,7 +227,7 @@ return function(CutsceneSequence)
 	end
 
 	--MARK: TheHarbor
-	if modBranchConfigs.IsWorld("TheHarbor") then
+	if modBranchConfigurations.IsWorld("TheHarbor") then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -379,7 +379,7 @@ return function(CutsceneSequence)
 		
 		
 	--MARK: DoubleCross
-	elseif modBranchConfigs.IsWorld("DoubleCross") then
+	elseif modBranchConfigurations.IsWorld("DoubleCross") then
 		
 		local stanChamber = workspace.Environment:WaitForChild("StansRejuvenation"):WaitForChild("RejuvenationChamber");
 		local chamberBodyGyro = stanChamber.Base.BodyGyro
@@ -1473,7 +1473,7 @@ return function(CutsceneSequence)
 		
 
 	--MARK: Safehome
-	elseif modBranchConfigs.IsWorld("Safehome") then
+	elseif modBranchConfigurations.IsWorld("Safehome") then
 		
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();

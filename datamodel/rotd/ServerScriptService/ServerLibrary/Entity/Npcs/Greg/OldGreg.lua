@@ -12,7 +12,7 @@ local remotes = game.ReplicatedStorage.Remotes;
 return function(npc, spawnPoint)
 	local self = modNpcComponent{
 		Prefab = npc;
-		SpawnPoint = spawnPoint;
+		SpawnCFrame = spawnPoint;
 		Immortal = 1;
 		
 		PathIndex = 2;

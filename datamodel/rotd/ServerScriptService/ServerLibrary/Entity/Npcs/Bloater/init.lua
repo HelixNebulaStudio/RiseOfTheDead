@@ -95,16 +95,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
         end
     end
 
-    local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
-
-    local destructible: DestructibleInstance = bodyDestructiblesComp:Create("Spores", sporesModel);
-    destructible.HealthComp:SetMaxHealth(math.max(npcClass.HealthComp.MaxHealth*0.1, 50));
-    destructible.HealthComp:Reset();
-
-    destructible.OnDestroy:Connect(function()
-        local hurtSound = modAudio.Play(`ZombieHurt2`, npcClass.RootPart);
-        hurtSound.PlaybackSpeed = math.random(60, 70)/100;
-    end)
 
     npcClass.HealthComp.OnIsDeadChanged:Connect(function()
         if not npcClass.HealthComp.IsDead then return end;
@@ -118,5 +108,18 @@ function npcPackage.Spawning(npcClass: NpcClass)
     };
 end
 
+function npcPackage.Spawned(npcClass: NpcClass)
+    local sporesModel = npcClass.Character:WaitForChild("Spores");
+
+    local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
+    local destructible: DestructibleInstance = bodyDestructiblesComp:Create("Spores", sporesModel);
+    destructible.HealthComp:SetMaxHealth(math.max(npcClass.HealthComp.MaxHealth*0.1, 50));
+    destructible.HealthComp:Reset();
+
+    destructible.OnDestroy:Connect(function()
+        local hurtSound = modAudio.Play(`ZombieHurt2`, npcClass.RootPart);
+        hurtSound.PlaybackSpeed = math.random(60, 70)/100;
+    end)
+end
 
 return npcPackage;

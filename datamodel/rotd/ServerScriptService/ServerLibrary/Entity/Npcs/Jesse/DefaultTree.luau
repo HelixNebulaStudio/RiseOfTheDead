@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local PathfindingService = game:GetService("PathfindingService");
 
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local treePackage = {
     LogicString = {
@@ -26,14 +26,13 @@ function treePackage.DoCutsceneState(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local cutscenePlayersComp = npcClass:GetComponent("CutscenePlayers");
 
-    if modBranchConfigs.IsWorld("TheWarehouse") or modBranchConfigs.IsWorld("BioXResearch") then
+    if modBranchConfigurations.IsWorld("TheWarehouse") or modBranchConfigurations.IsWorld("BioXResearch") then
         if cutscenePlayersComp:IsCutsceneActive("16")
         or cutscenePlayersComp:IsCutsceneActive("17") then
             
             local isInsideShop = properties.IsInsideShop;
             if isInsideShop then
-                local shopExitInteractConfig = modInteractables.getById("warehouseShopExit");
-                local shopExitInteractable: InteractableInstance = modInteractables.getOrNew(shopExitInteractConfig);
+                local shopExitInteractable: InteractableInstance = modInteractables.getById("warehouseShopExit");
                 shopExitInteractable:SetUserPermissions(npcClass.Name, "CanInteract", true);
                 local shopExitPoint = shopExitInteractable.Part:WaitForChild("PathToInteract");
 
@@ -68,8 +67,7 @@ function treePackage.Idle(npcClass: NpcClass)
 
     local isInsideShop = properties.IsInsideShop;
     if isInsideShop == false then
-        local shopInteractConfig = modInteractables.getById("warehouseShopEntrance");
-        local shopInteractable: InteractableInstance = modInteractables.getOrNew(shopInteractConfig);
+        local shopInteractable: InteractableInstance = modInteractables.getById("warehouseShopEntrance");
         shopInteractable:SetUserPermissions(npcClass.Name, "CanInteract", true);
         local shopPoint = shopInteractable.Part:WaitForChild("PathToInteract");
 

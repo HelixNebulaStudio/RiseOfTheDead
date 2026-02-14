@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Variables;
 local Blueprints = {};
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modBlueprintLibrary = shared.require(game.ReplicatedStorage.Library.BlueprintLibraryRotd);
@@ -94,7 +94,7 @@ function Blueprints.new(player, syncFunc)
 	local function newBuild(itemId, library, usingBlueprint)
 		local buildTime = os.time()+library.Duration;
 		
-		if modBranchConfigs.CurrentBranch.Name == "Dev" then
+		if shared.gameConfig.BranchName == "Dev" then
 			buildTime = os.time()+5;
 		end;
 		

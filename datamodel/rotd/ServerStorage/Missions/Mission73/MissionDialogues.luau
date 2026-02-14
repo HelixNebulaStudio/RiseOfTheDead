@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 --=
 local Dialogues = {
@@ -47,7 +47,7 @@ Dialogues.Patrick.DialogueStrings = {
 if RunService:IsServer() then
 
 	-- MARK: Patrick Handler
-	if modBranchConfigs.IsWorld("Safehome") then 
+	if modBranchConfigurations.IsWorld("Safehome") then 
 		Dialogues.Patrick.DialogueHandler = function(player, dialog, data, mission)
 			local modCoopMission = shared.require(game.ServerScriptService.ServerLibrary.CoopMission);
 			local modFactions = shared.require(game.ServerScriptService.ServerLibrary.Factions);

@@ -127,7 +127,8 @@ modStoragePresetsLibrary:Add{
     Configuration = {
         Persistent=false;
         Settings={
-            WithdrawalOnly=true;
+            WithdrawalOnly = true;
+            ScaleByContent = true;
         }
     };
 };

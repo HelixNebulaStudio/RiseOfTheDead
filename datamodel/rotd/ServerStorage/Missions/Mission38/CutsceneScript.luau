@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 --== Variables;
 local MISSION_ID = 38;
@@ -13,7 +13,7 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
-	if modBranchConfigs.IsWorld("TheResidentials") then
+	if modBranchConfigurations.IsWorld("TheResidentials") then
 		shared.modEventService:OnInvoked("Dialogue_BindTalkedTo", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -38,7 +38,7 @@ end
 --== Script;
 return function(CutsceneSequence)
 	--MARK: TheUnderground
-	if modBranchConfigs.IsWorld("TheUnderground") then
+	if modBranchConfigurations.IsWorld("TheUnderground") then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -121,7 +121,7 @@ return function(CutsceneSequence)
 
 
 	--MARK: TheResidentials
-	elseif modBranchConfigs.IsWorld("TheResidentials") then
+	elseif modBranchConfigurations.IsWorld("TheResidentials") then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();

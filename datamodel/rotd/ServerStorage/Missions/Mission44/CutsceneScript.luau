@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
@@ -18,8 +18,8 @@ if RunService:IsServer() then
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 
-	if modBranchConfigs.IsWorld("TheWarehouse") then
-		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, ...)
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
 			local interactData = ...;
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -35,7 +35,7 @@ if RunService:IsServer() then
 			end
 		end)
 		
-	elseif modBranchConfigs.IsWorld("TheResidentials") then
+	elseif modBranchConfigurations.IsWorld("TheResidentials") then
 		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(event: EventPacket, ...) 
 			local player: Player? = event.Player;
 			if player == nil then return end;
@@ -52,7 +52,7 @@ if RunService:IsServer() then
 			end
 		end);
 
-		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			
@@ -117,7 +117,7 @@ end
 --== Script;
 return function(CutsceneSequence)
 	
-	if modBranchConfigs.IsWorld("TheWarehouse") then
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
@@ -151,7 +151,7 @@ return function(CutsceneSequence)
 		end)
 
 
-	elseif modBranchConfigs.IsWorld("TheResidentials") then
+	elseif modBranchConfigurations.IsWorld("TheResidentials") then
 
 
 		CutsceneSequence:Initialize(function()

@@ -5,6 +5,7 @@ local modToxicClip = shared.require(game.ReplicatedStorage.Library.WorldClipsHan
 --==
 local Hazard = {
 	Title = "Toxic Gas";
+	Description = "Toxic gas is leaking from the pipes";	
 	Controller = nil;
 };
 Hazard.__index = Hazard;

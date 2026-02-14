@@ -7,7 +7,7 @@ local CollectionService = game:GetService("CollectionService");
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
-local modDoors = shared.require(game.ReplicatedStorage.Library.Doors);
+local modDoors = shared.require(game.ReplicatedStorage.Entity.Doors);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManager);
@@ -207,11 +207,11 @@ function Coop:Load()
 
     end
 
-	for _, config in pairs(CollectionService:GetTagged("Interactable")) do
-		local interactable: InteractableInstance = modInteractables.getOrNew(config);
+	table.clear(self.Interactables);
+	for _, interactable in ipairs(modInteractables.getAllInteractables()) do
 		table.insert(self.Interactables, interactable);
 	end
-
+	
 	self.Loaded = true;
 end
 
@@ -416,110 +416,112 @@ function Coop:Initialize(roomData)
 
 	self:Start();
 
-	local hordeSpawns = gameObjects.HordeSpawns:GetChildren();
-	task.spawn(function()
-		self.HordeTimer = tick()+300;
-		while true do
-			repeat
-				wait(1);
-			until tick() >= self.HordeTimer;
-			if Config.HordeTimerEnabled ~= true then
-				self.HordeTimer = tick()+60;
-				continue;
-			end
-			
-			local totalPos;
-			local playersCount = 0;
-			for _, player in pairs(game.Players:GetPlayers()) do
-				if player and player.Character and player.Character.PrimaryPart then
-					if totalPos == nil then
-						totalPos = player.Character.PrimaryPart.Position;
-					else
-						totalPos = totalPos + player.Character.PrimaryPart.Position;
-					end
-					playersCount = playersCount+1;
-				end
-			end
-			
-			local avgPos = (totalPos or Vector3.zero)/playersCount;
-			
-			local tLapsed = math.ceil(workspace:GetServerTimeNow()-self.StartTime);
-			
-			local hordeAmt = math.random(math.clamp(tLapsed, 10, 40), math.clamp(tLapsed, 11, 70));
-			if not self.IsHard then
-				hordeAmt = math.ceil(hordeAmt * 0.5);
-			end
-			Debugger:Log("Spawning horde of ",hordeAmt);
-			
-			local removedHorde = 0;
-			for _, npcClass: NpcClass in pairs(self.HordeEnemyClasses) do
-				if npcClass:DistanceFromCharacter(avgPos) <= (Config.SpawnRadius+100) then continue end;
-
-				npcClass:Destroy();
-				removedHorde = removedHorde +1;
-				if removedHorde >= hordeAmt then
-					break;
-				end
-			end
-			
-
-			for a=1, hordeAmt do
-				local spawnPart;
-				
+	if gameObjects:FindFirstChild("HordeSpawns") then
+		local hordeSpawns = gameObjects.HordeSpawns:GetChildren();
+		task.spawn(function()
+			self.HordeTimer = tick()+300;
+			while true do
 				repeat
-					local pickSpawn = hordeSpawns[math.random(1,#hordeSpawns)];
-					local path = PathfindingService:FindPathAsync(pickSpawn.CFrame.p, avgPos);
-					if path.Status == Enum.PathStatus.Success then
-						spawnPart = pickSpawn;
+					task.wait(1);
+				until tick() >= self.HordeTimer;
+				if Config.HordeTimerEnabled ~= true then
+					self.HordeTimer = tick()+60;
+					continue;
+				end
+				
+				local totalPos;
+				local playersCount = 0;
+				for _, player in pairs(game.Players:GetPlayers()) do
+					if player and player.Character and player.Character.PrimaryPart then
+						if totalPos == nil then
+							totalPos = player.Character.PrimaryPart.Position;
+						else
+							totalPos = totalPos + player.Character.PrimaryPart.Position;
+						end
+						playersCount = playersCount+1;
 					end
-				until spawnPart;
+				end
 				
-				local spawnCf = (spawnPart.CFrame + Vector3.new(0, 2.5, 0)) * CFrame.Angles(0, math.rad(math.random(1, 360)), 0);
+				local avgPos = (totalPos or Vector3.zero)/playersCount;
 				
-				--MARK: Spawn horde
-				local npcClass: NpcClass = self:SpawnEnemy("Zombie", {
-					SpawnCFrame = spawnCf;
-				});
-				if npcClass then
-					npcClass.Properties.HordeAggression = true;
+				local tLapsed = math.ceil(workspace:GetServerTimeNow()-self.StartTime);
+				
+				local hordeAmt = math.random(math.clamp(tLapsed, 10, 40), math.clamp(tLapsed, 11, 70));
+				if not self.IsHard then
+					hordeAmt = math.ceil(hordeAmt * 0.5);
+				end
+				Debugger:Log("Spawning horde of ",hordeAmt);
+				
+				local removedHorde = 0;
+				for _, npcClass: NpcClass in pairs(self.HordeEnemyClasses) do
+					if npcClass:DistanceFromCharacter(avgPos) <= (Config.SpawnRadius+100) then continue end;
 
-					table.insert(self.HordeEnemyClasses, npcClass);
-					npcClass.HealthComp.OnIsDeadChanged:Connect(function()
-						if not npcClass.HealthComp.IsDead then return end;
+					npcClass:Destroy();
+					removedHorde = removedHorde +1;
+					if removedHorde >= hordeAmt then
+						break;
+					end
+				end
+				
+
+				for a=1, hordeAmt do
+					local spawnPart;
+					
+					repeat
+						local pickSpawn = hordeSpawns[math.random(1,#hordeSpawns)];
+						local path = PathfindingService:FindPathAsync(pickSpawn.CFrame.p, avgPos);
+						if path.Status == Enum.PathStatus.Success then
+							spawnPart = pickSpawn;
+						end
+					until spawnPart;
+					
+					local spawnCf = (spawnPart.CFrame + Vector3.new(0, 2.5, 0)) * CFrame.Angles(0, math.rad(math.random(1, 360)), 0);
+					
+					--MARK: Spawn horde
+					local npcClass: NpcClass = self:SpawnEnemy("Zombie", {
+						SpawnCFrame = spawnCf;
+					});
+					if npcClass then
+						npcClass.Properties.HordeAggression = true;
+
+						table.insert(self.HordeEnemyClasses, npcClass);
+						npcClass.HealthComp.OnIsDeadChanged:Connect(function()
+							if not npcClass.HealthComp.IsDead then return end;
+							
+							for a=#self.HordeEnemyClasses, 1, -1 do
+								if self.HordeEnemyClasses[a] == npcClass then
+									table.remove(self.HordeEnemyClasses, a);
+									break;
+								end
+							end
+						end)
 						
-						for a=#self.HordeEnemyClasses, 1, -1 do
-							if self.HordeEnemyClasses[a] == npcClass then
-								table.remove(self.HordeEnemyClasses, a);
-								break;
+						local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+						if targetHandlerComp then
+							for _, player in pairs(self.Players) do
+								targetHandlerComp:AddTarget(player.Character);
 							end
 						end
-					end)
+					end
 					
-					local targetHandlerComp = npcClass:GetComponent("TargetHandler");
-					if targetHandlerComp then
-						for _, player in pairs(self.Players) do
-							targetHandlerComp:AddTarget(player.Character);
-						end
+					if self.IsHard then
+						task.wait(0.5);
+						if #self.HordeEnemyClasses >= 80 then break; end;
+					else
+						task.wait(3);
+						if #self.HordeEnemyClasses >= 40 then break; end;
 					end
 				end
-				
+
 				if self.IsHard then
-					task.wait(0.5);
-					if #self.HordeEnemyClasses >= 80 then break; end;
+					self.HordeTimer = tick()+ math.random(90, 180);
 				else
-					task.wait(3);
-					if #self.HordeEnemyClasses >= 40 then break; end;
+					self.HordeTimer = tick()+ math.random(120, 240);
 				end
 			end
-
-			if self.IsHard then
-				self.HordeTimer = tick()+ math.random(90, 180);
-			else
-				self.HordeTimer = tick()+ math.random(120, 240);
-			end
-		end
-		
-	end)
+			
+		end)
+	end
 end
 
 --MARK: PickEnemy
@@ -641,8 +643,8 @@ function Coop:CompleteCoop()
 	self.Status = EnumStatus.Completed;
 	shared.Notify(game.Players:GetPlayers(), `Coop Complete!{runTimeStr}`, "Positive");
 	self:Hud{
-		Status="Coop Complete!";
-		PlayMusic=false;
+		Status = "Coop Complete!";
+		PlayMusic = false;
 	};
 
 	self:RespawnDead();
@@ -653,6 +655,8 @@ function Coop:CompleteCoop()
 	if self.OnComplete then
 		self.OnComplete(self.Players);
 	end
+
+	modConfigurations.Set("DisableMapItems", false);
 end
 
 --MARK: DropReward
@@ -804,16 +808,22 @@ function Coop:Start()
 		obj.CollisionGroup = "IgnoreRaycast";
 	end
 
-	for _, obj in pairs(gameObjects.AmbientSpawns:GetChildren()) do
-		loadSpawn(obj);
-	
-		self.AmbientSpawns:CreateNode(obj.Position, obj);
+	if gameObjects:FindFirstChild("AmbientSpawns") then
+		for _, obj in pairs(gameObjects.AmbientSpawns:GetChildren()) do
+			loadSpawn(obj);
+		
+			self.AmbientSpawns:CreateNode(obj.Position, obj);
+		end
 	end
-	for _, obj in pairs(gameObjects.HordeSpawns:GetChildren()) do
-		loadSpawn(obj);
+	if gameObjects:FindFirstChild("HordeSpawns") then
+		for _, obj in pairs(gameObjects.HordeSpawns:GetChildren()) do
+			loadSpawn(obj);
+		end
 	end
-	for _, obj in pairs(gameObjects.BossSpawns:GetChildren()) do
-		loadSpawn(obj);
+	if gameObjects:FindFirstChild("BossSpawns") then
+		for _, obj in pairs(gameObjects.BossSpawns:GetChildren()) do
+			loadSpawn(obj);
+		end
 	end
     
 	for a=5, 1, -1 do

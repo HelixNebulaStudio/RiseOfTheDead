@@ -10,7 +10,7 @@ local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("Global
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modSkillTreeLibrary = shared.require(game.ReplicatedStorage.Library.SkillTreeLibrary);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
@@ -74,7 +74,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end
 
     --==
-    local branchColor = modBranchConfigs.BranchColor;
+    local branchColor = modBranchConfigurations.BranchColor;
 
     local isDragging = false;
     local dragStartVector = Vector2.new();
@@ -305,6 +305,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local function TogglePageButtons()
         local savedTree = modData.Profile.SkillTree.Trees[PageCache.CurrentPage] or {};
         local match = savedTree.Name == PageCache.Tree.Name;
+        if savedTree.Name == nil then return; end;
         
         if match then
             for k, v in pairs(PageCache.Tree.Data) do
@@ -579,8 +580,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local function refreshTree()
         local playerLevel = modData.GameSave and modData.GameSave.Stats and modData.GameSave.Stats.Level or 0;
-        
-        pageNameInput.Text = PageCache.Tree.Name;
+
+        pageNameInput.Text = PageCache.Tree.Name or "";
         nodeMenu.Clockwise = false;
         nodeMenu.Radius = TreeScaling.TreeRadius.Value;
         nodeMenu.NodePadding = script.NodePadding.Value;
@@ -597,40 +598,24 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             TreeMenu[a]:Destroy();
         end
         
-        local nextLevelTier = nil;
         local function generateTreeNode(treeType, lib, index)
-            local create = false;
-            local disabled = false;
-            if playerLevel >= lib.Level then
-                create = true;
-            elseif nextLevelTier == nil then
-                nextLevelTier = lib.Level;
-                disabled = true;
-                create = true;
-            elseif lib.Level == nextLevelTier then
-                disabled = true;
-                create = true;
+            local disabled = playerLevel < lib.Level;
+            
+            local newSkillButton = SkillButton.new(lib, disabled);
+            if lib.Id == selectedId then
+                UpdateDescription(newSkillButton.Button);
             end
-            if create then
-                local newSkillButton = SkillButton.new(lib, disabled);
-                if lib.Id == selectedId then
-                    UpdateDescription(newSkillButton.Button);
-                end
-                table.insert(TreeMenu, newSkillButton);
-                newSkillButton.Button.Name = lib.Id;
-                newSkillButton.Node = nodeMenu:NewNode(newSkillButton.Button, lib.Id, lib.Link or treeType, index);
-            end
+            table.insert(TreeMenu, newSkillButton);
+            newSkillButton.Button.Name = lib.Id;
+            newSkillButton.Node = nodeMenu:NewNode(newSkillButton.Button, lib.Id, lib.Link or treeType, index);
         end
         
-        nextLevelTier = nil;
         for a=1, #authTreeList do
             generateTreeNode("Authority", authTreeList[a], a);
         end
-        nextLevelTier = nil;
         for a=1, #enduTreeList do
             generateTreeNode("Endurance", enduTreeList[a], a);
         end
-        nextLevelTier = nil;
         for a=1, #syneTreeList do
             generateTreeNode("Synergy", syneTreeList[a], a);
         end
@@ -671,6 +656,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     savePageButton.MouseButton1Click:Connect(function()
         selectedId = nil;
         local savedTree = modData.Profile.SkillTree.Trees[PageCache.CurrentPage];
+        if savedTree.Name == nil then return; end; 
         savedTree.Name = PageCache.Tree.Name;
         
         savedTree.Data = {};
@@ -785,47 +771,37 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     --MARK: OnUpdate
     window.OnUpdate:Connect(function()
-        if modData.GameSave and modData.GameSave.Masteries then
-            local weaponsList = game.ReplicatedStorage.Library.WeaponsLibraryRotd:GetChildren();
-            
-            for a=1, #weaponsList do
-                local itemId = weaponsList[a].Name;
-                local itemInfo = modItemsLibrary:Find(itemId);
+        local weaponsList = game.ReplicatedStorage.Library.WeaponsLibraryRotd:GetChildren();
+        for a=1, #weaponsList do
+            local itemId = weaponsList[a].Name;
+            local itemInfo = modItemsLibrary:Find(itemId);
 
-                local listing = masteryList:FindFirstChild(itemId);
-                if listing == nil then
-                    listing = templateItemFrame:Clone();
-                    listing.Name = itemId;
-                    listing.Parent = masteryList;
-                end
-                
-                local level = modData.GameSave.Masteries[itemId] or 0;
-                listing.LayoutOrder = itemInfo.LibraryIndex;
-                local levelBar = listing:WaitForChild("LevelFrame"):WaitForChild("LevelBar");
-                local itemIcon = listing:WaitForChild("ItemIcon");
-                local titleTag = listing:WaitForChild("Title");
-                local valueTag = listing:WaitForChild("Value");
-                titleTag.Text = itemInfo and itemInfo.Name or itemId;
-                itemIcon.Image = itemInfo and itemInfo.Icon or "";
-                valueTag.Text = "("..level.."/20)";
-                levelBar.Size = UDim2.new(math.clamp(level/20, 0, 1), 0, 1, 0);
+            local listing = masteryList:FindFirstChild(itemId);
+            if listing == nil then
+                listing = templateItemFrame:Clone();
+                listing.Name = itemId;
+                listing.Parent = masteryList;
             end
             
-        else
-            Debugger:Warn("Missing mastery data.");
+            local level = modData.GameSave and modData.GameSave.Masteries and modData.GameSave.Masteries[itemId] or 0;
+            listing.LayoutOrder = itemInfo.LibraryIndex;
+            local levelBar = listing:WaitForChild("LevelFrame"):WaitForChild("LevelBar");
+            local itemIcon = listing:WaitForChild("ItemIcon");
+            local titleTag = listing:WaitForChild("Title");
+            local valueTag = listing:WaitForChild("Value");
+            titleTag.Text = itemInfo and itemInfo.Name or itemId;
+            itemIcon.Image = itemInfo and itemInfo.Icon or "";
+            valueTag.Text = "("..level.."/20)";
+            levelBar.Size = UDim2.new(math.clamp(level/20, 0, 1), 0, 1, 0);
         end
         
         if modData.Profile then
-            --== Skill tree
             local skillTreeData = modData.Profile and modData.Profile.SkillTree or nil;
-            
             if PageCache.CurrentPage == nil then PageCache.CurrentPage = skillTreeData.ActiveTree; end;
             LoadTree();
-
             updateSkillPoints();
-            
-            refreshTree();
         end
+        refreshTree();
     end)
 
 end

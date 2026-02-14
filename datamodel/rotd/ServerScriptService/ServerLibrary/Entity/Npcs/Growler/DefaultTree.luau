@@ -13,11 +13,15 @@ function treePackage.BlockIfExposed(npcClass: NpcClass)
     if enemyTargetData.Distance > 50 then return false; end;
 
     local enemyHealthComp: HealthComp = enemyTargetData.HealthComp;
-    local targetRootPart = enemyHealthComp.CompOwner.RootPart;
+    local targetEntityClass: EntityClass = enemyHealthComp.CompOwner;
+    if targetEntityClass.ClassName == "Destructible" then return false; end;
 
-    local targetDir = (npcClass.RootPart.Position - targetRootPart.Position).Unit;
+    local targetCharacterClass: CharacterClass = targetEntityClass :: CharacterClass;
+    local targetCFrame = targetCharacterClass:GetCFrame();
 
-    local angle = targetDir:Angle(targetRootPart.CFrame.LookVector);
+    local targetDir = (npcClass:GetCFrame().Position - targetCFrame.Position).Unit;
+
+    local angle = targetDir:Angle(targetCFrame.CFrame.LookVector);
     if math.abs(angle) < 1.5 then
         npcClass.Move:SetMoveSpeed("set", "walk", 4, npcClass.Move.MoveSpeedPriority.Action);
         npcClass.PlayAnimation("Block");

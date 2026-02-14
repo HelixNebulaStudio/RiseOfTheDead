@@ -4,7 +4,7 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
@@ -25,7 +25,7 @@ if RunService:IsServer() then
 	modMatchMaking = shared.require(game.ServerScriptService.ServerLibrary.MatchMaking);
 	modRaid = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager.Raid);
 	
-	if modBranchConfigs.IsWorld("TheMall") then
+	if modBranchConfigurations.IsWorld("TheMall") then
 		shared.modEventService:OnInvoked("Interactables_BindButtonInteract", function(eventPacket: EventPacket, ...)
 			local interactable: InteractableInstance = ...;
 			local player: Player? = eventPacket.Player;
@@ -39,7 +39,7 @@ if RunService:IsServer() then
 			end
 		end)
 
-	elseif modBranchConfigs.IsWorld("AwokenTheBear") then
+	elseif modBranchConfigurations.IsWorld("AwokenTheBear") then
 		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
 			local triggerId: string = ...;
 			local player: Player? = eventPacket.Player;
@@ -69,7 +69,7 @@ if RunService:IsServer() then
 			end
 		end)
 
-	elseif modBranchConfigs.IsWorld("BanditOutpost") then
+	elseif modBranchConfigurations.IsWorld("BanditOutpost") then
         shared.modEventService:OnInvoked("GameModeManager_BindGameModeComplete", function(eventPacket: EventPacket, packet)
 			local room = packet.Room;
 			Debugger:Warn("GameModeManager_BindGameModeComplete", room.Type, room.Stage);
@@ -95,7 +95,7 @@ end
 --== Script;
 return function(CutsceneSequence)
 	-- MARK: TheMall
-	if modBranchConfigs.IsWorld("TheMall") then
+	if modBranchConfigurations.IsWorld("TheMall") then
 		local stanNpcProfile = modNpcProfileLibrary:Find("Stan");
 		stanNpcProfile.World = "TheMall";
 
@@ -214,7 +214,7 @@ return function(CutsceneSequence)
 		
 
 	-- MARK: AwokenTheBear
-	elseif modBranchConfigs.IsWorld("AwokenTheBear") then
+	elseif modBranchConfigurations.IsWorld("AwokenTheBear") then
 
 		CutsceneSequence:Initialize(function()
 			local players: {Player} = CutsceneSequence:GetPlayers();
@@ -683,7 +683,7 @@ return function(CutsceneSequence)
 		
 		
 	--MARK: BanditOutpost
-	elseif modBranchConfigs.IsWorld("BanditOutpost") then
+	elseif modBranchConfigurations.IsWorld("BanditOutpost") then
 		if RunService:IsServer() then
 			modGamemodeStronghold = shared.require(game.ServerScriptService.ServerLibrary.GameModeStronghold);
 		end

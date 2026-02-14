@@ -5,7 +5,7 @@ local SoundService = game:GetService("SoundService");
 
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local interactablePackage = {};
@@ -155,17 +155,24 @@ function interactablePackage.init(super) -- Server/Client
         if info.Player == nil then return end;
         if info.Action ~= info.ActionSource.Client then return end;
 
-		local mode = interactable.Values.Mode;
-		if mode == "Raid" and workspace:GetAttribute("GameModeComplete") == true then
+		if interactable.Values.Mode == nil then
+			interactable.Values.Mode = shared.gameConfig.GameMode;
+		end
+		if interactable.Values.Stage == nil then
+			interactable.Values.Stage = shared.gameConfig.GameStage;
+		end
+		if workspace:GetAttribute("GameModeComplete") == true then
 			GameModeEnter.BindInteract(interactable, info);
 		end 
 		
-		local worldName = modBranchConfigs.GetWorldDisplayName(modBranchConfigs.WorldName);
+		local worldName = modBranchConfigurations.GetWorldDisplayName(modBranchConfigurations.WorldName);
+
+		local hasClaimedRewards = interactable.Config:GetAttribute("ClaimedRewards") == true;
 
         local interface: Interface = modClientGuis.ActiveInterface;
 		modClientGuis.promptDialogBox({
 			Title=`Leave {worldName}?`;
-			Desc=`Are you sure you want to leave?`;
+			Desc=`Are you sure you want to leave?{hasClaimedRewards == false and ` Unclaimed rewards will be forfeited!` or ""}`;
 			Buttons={
 				{
 					Text="Leave";

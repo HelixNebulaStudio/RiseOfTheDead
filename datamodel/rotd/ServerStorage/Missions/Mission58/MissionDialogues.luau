@@ -156,12 +156,12 @@ if RunService:IsServer() then
 	-- MARK: Patrick Handler
 	Dialogues.Patrick.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-		local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+		local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 		local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 
 		if mission.Type == 1 then -- Active
 			if mission.ProgressionPoint == 17 then
-				if modBranchConfigs.IsWorld("DoubleCross") then
+				if modBranchConfigurations.IsWorld("DoubleCross") then
 					dialog:SetInitiate("*groan* Bring me somewhere safe..");
 				else
 					dialog:SetInitiateTag("doubleCross_17");

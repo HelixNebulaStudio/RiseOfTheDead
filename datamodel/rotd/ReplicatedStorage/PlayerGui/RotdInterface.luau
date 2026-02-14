@@ -14,7 +14,7 @@ local localPlayer = game.Players.LocalPlayer;
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modCameraGraphics = shared.require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
 
 local RotdInterface = shared.require(game.ReplicatedStorage.Library.UI.InterfaceClass).new(script.Parent);
@@ -40,7 +40,7 @@ function RotdInterface.clientGuisLoad()
         end))
     
     else
-        if modBranchConfigs.WorldName == "MainMenu" or modBranchConfigs.WorldName == "BioXResearch" then
+        if modBranchConfigurations.IsWorld("MainMenu") or modBranchConfigurations.IsWorld("BioXResearch") then
             local mainMenuWindow: InterfaceWindow = interface:GetWindow("MainMenu");
             if mainMenuWindow then
                 mainMenuWindow:Open();

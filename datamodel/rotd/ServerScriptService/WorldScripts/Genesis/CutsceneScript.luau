@@ -9,7 +9,7 @@ local SoundService = game:GetService("SoundService");
 local CollectionService = game:GetService("CollectionService");
 
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modMarkers = shared.require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("Markers"));
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
@@ -72,7 +72,7 @@ end
 --== Script;
 local MISSION_ID = 56;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("Genesis") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigurations.IsWorld("Genesis") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 		
 	local cutsceneAssets = game.ReplicatedStorage:WaitForChild("CutsceneAssets");
 

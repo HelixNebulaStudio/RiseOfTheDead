@@ -7,12 +7,10 @@ local RatModule = script;
 local EnemyModule = script.Parent.Enemy;
 local HumanModule = script.Parent.Human;
 --== Modules
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modNpcComponent = shared.require(game.ServerScriptService.ServerLibrary.Entity.NpcClass);
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 
@@ -26,7 +24,7 @@ return function(npc, spawnPoint)
 		Head = npc:WaitForChild("Head");
 		Humanoid = npc:WaitForChild("Rat");
 		RootPart = npc.PrimaryPart;
-		SpawnPoint = spawnPoint; -- CFrame;
+		SpawnCFrame = spawnPoint; -- CFrame;
 		Smart = true;
 		
 		Properties = {

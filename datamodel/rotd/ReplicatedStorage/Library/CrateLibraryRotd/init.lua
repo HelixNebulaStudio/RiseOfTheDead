@@ -234,7 +234,6 @@ function modCrateLibrary.onRequire()
 		RewardsId="residentialGift";
 		StoragePresetId="giftcrate";
 	};
-	
 end
 
 return modCrateLibrary;

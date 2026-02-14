@@ -30,11 +30,11 @@ Dialogues.Joseph.DialogueStrings = {
 if RunService:IsServer() then
 	-- MARK: Joseph Handler
 	Dialogues.Joseph.DialogueHandler = function(player, dialog, data, mission)
-		local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+		local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 		local modBlueprints = shared.require(game.ServerScriptService.ServerLibrary.Blueprints);
 
-		if modBranchConfigs.IsWorld("TheInvestigation") then return end;
+		if modBranchConfigurations.IsWorld("TheInvestigation") then return end;
 
 		if mission.Type == 1 then -- Active
 			dialog:SetInitiate("You got it done?");

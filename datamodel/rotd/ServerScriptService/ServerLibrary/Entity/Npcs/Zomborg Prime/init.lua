@@ -62,8 +62,18 @@ function npcPackage.Spawning(npcClass: NpcClass)
         configurations.BaseValues.AttackDamage = 45;
         configurations.BaseValues.WalkSpeed = 6;
     end
+end
+
+
+function npcPackage.Spawned(npcClass: NpcClass)
+    local configurations = npcClass.Configurations;
+    local properties = npcClass.Properties;
+    
+    -- Shield
+    local healthComp: HealthComp = npcClass.HealthComp;
 
     local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
+
     local maxHealth = configurations.BaseValues.MaxHealth;
 
     local powerSource = npcClass.Character:WaitForChild("PowerSource");
@@ -165,14 +175,8 @@ function npcPackage.Spawning(npcClass: NpcClass)
             end
         end
     end)
-end
 
 
-function npcPackage.Spawned(npcClass: NpcClass)
-    local properties = npcClass.Properties;
-    
-    -- Shield
-    local healthComp: HealthComp = npcClass.HealthComp;
 
     local shieldsTable = {};
     for a=1, 3 do

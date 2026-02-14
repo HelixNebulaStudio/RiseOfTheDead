@@ -7,7 +7,7 @@ local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modWeaponAttributes = shared.require(game.ReplicatedStorage.Library.WeaponsLibrary.WeaponAttributes);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modCustomizationData = shared.require(game.ReplicatedStorage.Library.CustomizationData);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modWeapons = shared.require(game.ReplicatedStorage.Library.WeaponsLibrary);
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
@@ -663,7 +663,7 @@ local discOnEnemiesAttract;
 discOnEnemiesAttract = shared.modEventService:OnInvoked(
 	"Npcs_BindEnemiesAttract", 
 	function(event: EventPacket, p: Player, cM: {Model})
-		if modBranchConfigs.IsWorld("Slaughterfest") then return end;
+		if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
 		if not workspace:IsAncestorOf(turretArm) then discOnEnemiesAttract(); end;
 		if p ~= player then return end;
 		

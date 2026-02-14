@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
 local modGarbageHandler = shared.require(game.ReplicatedStorage.Library.GarbageHandler);
@@ -37,7 +37,7 @@ SafehomeClass.__index = SafehomeClass;
 function SafehomeClass.new(player: Player?)
     local self = {
         IsLoading = false;
-        IsSafehomeWorld = modBranchConfigs.IsWorld("Safehome");
+        IsSafehomeWorld = modBranchConfigurations.IsWorld("Safehome");
 
         Owner = player;
         FactionTag = nil;

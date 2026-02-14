@@ -4,6 +4,7 @@ local Hazard = {};
 Hazard.__index = Hazard;
 
 Hazard.Title = "High Seas";
+Hazard.Description = "High tides floods the area";
 
 local TweenService = game:GetService("TweenService");
 

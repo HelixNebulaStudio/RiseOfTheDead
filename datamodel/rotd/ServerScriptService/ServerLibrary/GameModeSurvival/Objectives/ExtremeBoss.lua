@@ -4,6 +4,8 @@ local Objective = {};
 Objective.__index = Objective;
 
 Objective.Title = "Extreme Boss";
+Objective.Description = "Kill the extreme boss";
+
 Objective.DifficultyModes = {Hard=false;};
 
 Objective.Controller = nil;

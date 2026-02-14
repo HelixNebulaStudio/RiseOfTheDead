@@ -4,6 +4,7 @@ local Hazard = {};
 Hazard.__index = Hazard;
 
 Hazard.Title = "Heavy Rain";
+Hazard.Description = "Poor visibility and slippery conditions";
 
 local modWeatherService = shared.require(game.ReplicatedStorage.Library.WeatherService);
 local TweenService = game:GetService("TweenService");

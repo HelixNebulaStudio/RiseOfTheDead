@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService");
 
 local modItemLibrary = require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
@@ -15,7 +15,7 @@ if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	local modFactions = shared.require(game.ServerScriptService.ServerLibrary.Factions);
 	
-	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
+	shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
 		local triggerPlayer: Player? = eventPacket.Player;
 		if triggerPlayer == nil then return end;
 		
@@ -74,7 +74,7 @@ if RunService:IsServer() then
 		
 		local gpsLib = modGpsLibrary:FindByKeyValue("Name", mission.SaveData.Location);
 		
-		if not modBranchConfigs.IsWorld(gpsLib.WorldName) then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+		if not modBranchConfigurations.IsWorld(gpsLib.WorldName) then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 		
 		local spawnPart = workspace:FindFirstChild(gpsLib.SetSpawn);
 		

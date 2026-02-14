@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
@@ -18,8 +18,8 @@ if RunService:IsServer() then
 	
 	local logicAssets = script.Parent:WaitForChild("LogicAssets");
 
-	if modBranchConfigs.IsWorld("TheUnderground") then
-		shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
+	if modBranchConfigurations.IsWorld("TheUnderground") then
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			
@@ -41,7 +41,7 @@ if RunService:IsServer() then
 		local function OnChanged(firstRun)
 			if mission.Type == 1 then -- OnActive
 			
-				if modBranchConfigs.IsWorld("SectorE") then
+				if modBranchConfigurations.IsWorld("SectorE") then
 
 				else
 					if mission.ProgressionPoint >= 3 and mission.ProgressionPoint <= 11 then
@@ -66,7 +66,7 @@ if RunService:IsServer() then
 					end
 				end
 				
-				if modBranchConfigs.IsWorld("SectorF") and modGameModeManager.IsGameWorld ~= true then
+				if modBranchConfigurations.IsWorld("SectorF") and modGameModeManager.IsGameWorld ~= true then
 					if mission.ProgressionPoint >= 13 then
 						--game.Debris:AddItem(workspace.Interactables:FindFirstChild("gameExit"), 0);
 						
@@ -105,7 +105,7 @@ if RunService:IsServer() then
 						end
 					end
 					
-				elseif modBranchConfigs.IsWorld("TheUnderground") then
+				elseif modBranchConfigurations.IsWorld("TheUnderground") then
 					if mission.ProgressionPoint == 12 then
 						local secFEntrance = logicAssets:WaitForChild("sectorFEntrance"):Clone();
 						secFEntrance.Parent = workspace.Interactables;

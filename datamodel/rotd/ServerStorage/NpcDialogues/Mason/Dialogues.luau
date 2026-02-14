@@ -4,7 +4,7 @@ local CollectionService = game:GetService("CollectionService");
 local RunService = game:GetService("RunService");
 
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local Dialogues = {};
 --==
@@ -245,7 +245,7 @@ if RunService:IsServer() then
 			end);
 		end
 		
-		if modBranchConfigs.CurrentBranch.Name == "Dev" then
+		if shared.gameConfig.BranchName == "Dev" then
 			local function addDialog(say, reply, func)
 				dialog:AddDialog({
 					Say=say;
@@ -473,7 +473,7 @@ if RunService:IsServer() then
 		if modMission:Progress(player, 54) then return end;
 		if modMission:IsComplete(player, 2) then
 			
-			if modBranchConfigs.IsWorld("Safehome") then
+			if modBranchConfigurations.IsWorld("Safehome") then
 				if modMission:IsComplete(player, 54) then
 					dialog:AddChoice("guide_safehomeNpcs");
 					dialog:AddChoice("guide_safehomeSustain");

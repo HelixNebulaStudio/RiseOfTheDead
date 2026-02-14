@@ -555,7 +555,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         itemToolTip.Frame.Parent = interface.ScreenGui;
                         itemToolTip:Update(crateItemId);
                         itemToolTip:SetPosition(newItemButton);
-                    end);
+                    end, 0.5);
                     
                     newItemButton.MouseButton1Click:Connect(function()
                         rewardsId = crateItemId;
@@ -686,7 +686,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                 itemToolTip.Frame.Parent = interface.ScreenGui;
                                 itemToolTip:Update(rewardInfo.ItemId);
                                 itemToolTip:SetPosition(newItemButton);
-                            end);
+                            end, 0.5);
                             
                             templateUIRatio:Clone().Parent = newItemButton;
                         end

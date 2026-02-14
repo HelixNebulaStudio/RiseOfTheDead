@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 --== Variables;
@@ -14,7 +14,7 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
-	if modBranchConfigs.IsWorld("TheUnderground") then
+	if modBranchConfigurations.IsWorld("TheUnderground") then
         shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -38,7 +38,7 @@ end
 return function(CutsceneSequence)
 	
 	--MARK: TheWarehouse
-	if modBranchConfigs.IsWorld("TheWarehouse") then
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
@@ -138,7 +138,7 @@ return function(CutsceneSequence)
 		end)
 		
 	--MARK: TheUnderground
-	elseif modBranchConfigs.IsWorld("TheUnderground") then
+	elseif modBranchConfigurations.IsWorld("TheUnderground") then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
@@ -380,7 +380,7 @@ return function(CutsceneSequence)
 					end
 					
 				elseif mission.Type == 3 then -- OnComplete
-					dianaNpcClass:SetCFrame(dianaNpcClass.SpawnPoint);
+					dianaNpcClass:SetCFrame(dianaNpcClass.SpawnCFrame);
 					if modMission:GetMission(player, 38) == nil then
 						robertNpcClass:TeleportHide();
 					end

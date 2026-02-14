@@ -24,7 +24,7 @@ local npcPackage = {
     };
 };
 
-function npcPackage.Spawning(npcClass: NpcClass)
+function npcPackage.Spawned(npcClass: NpcClass)
     npcClass.PlayAnimation("Unconscious");
 end
 

@@ -39,7 +39,7 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 	local triggerTag = `SpiralChamber{self.WaveCollapseSystem.SpiralChamberIndex}`;
 	
 	local newModel = self.Model:WaitForChild("Layout");
-	local lootSpawns = {newModel.LootSpawn:WaitForChild("SpawnPoint")}
+	local lootSpawns = {newModel.LootSpawn:WaitForChild("RewardSpawn")}
 	
 	local chosenNum = math.random(2, 7);
 	local binStr = modMath.NumberToBinStr(chosenNum, "000");

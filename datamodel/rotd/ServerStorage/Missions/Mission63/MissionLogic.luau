@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local MissionLogic = {};
 
 local RunService = game:GetService("RunService");
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local MISSION_ID = 63;
 if RunService:IsServer() then
@@ -14,7 +14,7 @@ if RunService:IsServer() then
 
 		local function OnChanged(firstRun)
 			if mission.Type == 1 then -- OnActive
-				if not modBranchConfigs.IsWorld("BanditsRecruitment") then
+				if not modBranchConfigurations.IsWorld("BanditsRecruitment") then
 					if mission.ProgressionPoint >= 3 and mission.ProgressionPoint <= 11 then
 						if firstRun then
 							modMission:Progress(player, MISSION_ID, function(mission)

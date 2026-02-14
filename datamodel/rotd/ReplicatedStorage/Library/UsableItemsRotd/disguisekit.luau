@@ -30,7 +30,7 @@ if RunService:IsClient() then return UsablePreset; end;
 function UsablePreset:ServerInit()
 	local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 	local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
-	local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+	local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 	local modDisguiseMechanics = shared.require(game.ReplicatedStorage.Library.DisguiseMechanics);
 
 	local remoteDisguiseKitRemote = modRemotesManager:Get("DisguiseKitRemote");
@@ -71,7 +71,7 @@ function UsablePreset:ServerInit()
 			return;
 
 		elseif disguiseLib and action == "disguise" then
-			if modBranchConfigs.IsWorld("Slaughterfest") then
+			if modBranchConfigurations.IsWorld("Slaughterfest") then
 				Debugger:Warn("Can't manual disguise in Slaughterfest");
 				return;
 			end

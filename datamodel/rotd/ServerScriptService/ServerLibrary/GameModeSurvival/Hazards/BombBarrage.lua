@@ -10,6 +10,7 @@ local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEff
 --==
 local Hazard = {
 	Title = "BombBarrage";
+	Description = "Bombs from the sky";
 	Controller = nil;
 };
 Hazard.__index = Hazard;

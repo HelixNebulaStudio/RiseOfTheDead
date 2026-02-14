@@ -9,7 +9,7 @@ local TweenService = game:GetService("TweenService");
 local localPlayer = game.Players.LocalPlayer;
 
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
+local modBranchConfigurations = shared.require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modRemotesManager = shared.require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("RemotesManager"));
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modLevelBadge = shared.require(game.ReplicatedStorage.Library.LevelBadge);
@@ -53,7 +53,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local remotePlayerSearch = modRemotesManager:Get("PlayerSearch");
     
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
-    local branchColor = modBranchConfigs.BranchColor
+    local branchColor = modBranchConfigurations.BranchColor
 
     local friendsTabTemplate = script:WaitForChild("FriendsTab");
     local playerListingTemplate = script:WaitForChild("PlayerListing");
@@ -125,9 +125,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	interface.Garbage:Tag(game.Players.PlayerAdded:Connect(updateRequest));
 	interface.Garbage:Tag(game.Players.PlayerRemoving:Connect(updateRequest));
 
+    
+    local mission1Data;
+
     --MARK: OnToggle
 	window.OnToggle:Connect(function(visible)
 		if visible then
+            mission1Data = modData:GetMission(1);
+
 			interface:HideAll{[window.Name]=true;};
 			binds.SelectPlayer(localPlayer.Name, true);
 			window:Update();
@@ -192,12 +197,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         for a=1, #friends do
             local inUniverse = false;
             if friends[a].LocationType == 1 or friends[a].LocationType == 4 then
-                for worldName, worldId in pairs(modBranchConfigs.CurrentBranch.Worlds) do
-                    if worldId == friends[a].PlaceId then
-                        inUniverse = true;
-                        break;
-                    end
-                end
+                inUniverse = modBranchConfigurations.IsPlaceIdThisGame(friends[a].PlaceId);
+
             end
             
             local thumbnail = shared.modPlayers.getAvatar(friends[a].VisitorId);
@@ -631,13 +632,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             profileDisplayList.focusLevels.Visible = false;
         end
         
-        selectionWorldName = modBranchConfigs.GetWorld();
+        selectionWorldName = modBranchConfigurations.WorldName;
         if modData.Squad and modData.Squad.Members and modData.Squad.Members[playerName] then
             selectionWorldName = (modData.Squad.Members[playerName].World or "Unknown");
         elseif binds.FriendsList and binds.FriendsList[playerName] and binds.FriendsList[playerName].InUniverse then
-            selectionWorldName = (modBranchConfigs.GetWorldName(binds.FriendsList[playerName].PlaceId) or "Unknown");
+            selectionWorldName = (modBranchConfigurations.GetWorldName(binds.FriendsList[playerName].PlaceId) or "Unknown");
         end
-        profileLocationLabel.Text = (selectionWorldName and modBranchConfigs.GetWorldDisplayName(selectionWorldName) or "Unknown");
+        profileLocationLabel.Text = (selectionWorldName and modBranchConfigurations.GetWorldDisplayName(selectionWorldName) or "Unknown");
         
     end
 
@@ -770,26 +771,35 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     if modData.Squad and modData.Squad.Members and modData.Squad.Members[targetName] then
                         selectionWorldName = (modData.Squad.Members[targetName].World or "Unknown");
                     elseif binds.FriendsList and binds.FriendsList[targetName] and binds.FriendsList[targetName].InUniverse then
-                        selectionWorldName = (modBranchConfigs.GetWorldName(binds.FriendsList[targetName].PlaceId) or "Unknown");
+                        selectionWorldName = (modBranchConfigurations.GetWorldName(binds.FriendsList[targetName].PlaceId) or "Unknown");
                     end
                     
                     local travelDisabled = false;
-                    if selectionWorldName ~= modBranchConfigs.GetWorld() or game.Players:FindFirstChild(targetName) == nil then
-                        local worldLib = modBranchConfigs.WorldLibrary[selectionWorldName];
-                        if worldLib and worldLib.CanTravelTo and binds.FriendsList[targetName] then
+                    if selectionWorldName ~= modBranchConfigurations.WorldName or game.Players:FindFirstChild(targetName) == nil then
+                        local worldInfo = modBranchConfigurations.Worlds[selectionWorldName];
+                        if worldInfo and worldInfo.CanTravelTo and binds.FriendsList[targetName] then
                             if binds.FriendsList[targetName].SearchedPlayer then
                                 newOptionButton(
                                     targetName ~= localPlayer.Name,
                                     "Request to Travel",
                                     function()
+                                        if mission1Data == nil or mission1Data.Type ~= 3 then
+                                            modClientGuis.promptWarning("Please complete the first mission.");
+                                            return;
+                                        end
                                         remoteWorldTravelRequest:InvokeServer("TravelRequest", targetName)
-                                end)
+                                    end
+                                )
                                 
                             elseif binds.FriendsList[targetName].TravelRequest then
                                 newOptionButton(
                                     targetName ~= localPlayer.Name,
                                     "Accept Travel Request",
                                     function()
+                                        if mission1Data == nil or mission1Data.Type ~= 3 then
+                                            modClientGuis.promptWarning("Please complete the first mission.");
+                                            return;
+                                        end
                                         remoteWorldTravelRequest:InvokeServer("AcceptTravel", targetName)
                                         binds.FriendsList[targetName] = nil;
                                 end)
@@ -813,8 +823,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                     function()
                                         if travelDisabled then return end;
                                         interface:PlayButtonClick();
+                                        if mission1Data == nil or mission1Data.Type ~= 3 then
+                                            modClientGuis.promptWarning("Please complete the first mission.");
+                                            return;
+                                        end
+                                        
                                         local promptWindow = modClientGuis.promptQuestion("You are about to leave this world",
-                                            "Are you sure you want to travel to ".. modBranchConfigs.GetWorldDisplayName(selectionWorldName) .."?");
+                                            "Are you sure you want to travel to ".. modBranchConfigurations.GetWorldDisplayName(selectionWorldName) .."?");
                                         local YesClickedSignal, NoClickedSignal;
                                         
                                         YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
@@ -914,8 +929,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 --healthBarFrame.Visible = false;
                 locationLabel.Visible = true;
                 titleLabel.Visible = false;
-                local worldId = data.PlaceId and modBranchConfigs.GetWorldName(data.PlaceId) or data.WorldId;
-                locationLabel.Text = modBranchConfigs.GetWorldDisplayName(worldId) or "Unknown";
+                local worldId = data.PlaceId and modBranchConfigurations.GetWorldName(data.PlaceId) or data.WorldId;
+                locationLabel.Text = modBranchConfigurations.GetWorldDisplayName(worldId) or "Unknown";
             end
             if modData.Players[data.Name] then
                 if playerData.Role then

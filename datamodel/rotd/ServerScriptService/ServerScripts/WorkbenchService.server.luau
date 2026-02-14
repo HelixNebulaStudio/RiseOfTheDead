@@ -6,7 +6,7 @@ local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibra
 local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 local modColorsLibrary = shared.require(game.ReplicatedStorage.Library.ColorsLibrary);
 local modSkinsLibrary = shared.require(game.ReplicatedStorage.Library.SkinsLibrary);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modBlueprintLibrary = shared.require(game.ReplicatedStorage.Library.BlueprintLibraryRotd) :: any;
 local modSyncTime = shared.require(game.ReplicatedStorage.Library:WaitForChild("SyncTime"));
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
@@ -775,7 +775,7 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 						end
 					end
 
-					if player.UserId == 16170943 or modBranchConfigs.CurrentBranch.Name == "Dev" then
+					if player.UserId == 16170943 or shared.gameConfig.BranchName == "Dev" then
 						isUnlocked = true;
 
 						if table.find(unlockedSkins, unlockableItemLib.Id) == nil then
@@ -1107,7 +1107,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 				end);
 				
 				local duration = modSyncTime.GetTime()+900;
-				if modBranchConfigs.CurrentBranch.Name == "Dev" then duration = modSyncTime.GetTime()+5; end;
+				if shared.gameConfig.BranchName == "Dev" then duration = modSyncTime.GetTime()+5; end;
 				
 				playerSave.Workbench:NewProcess{
 					Type=playerSave.Workbench.ProcessTypes.DeconstructMod;
@@ -1130,7 +1130,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 				
 				--local rewardTiers = math.floor(levels/5);
 				local duration = modSyncTime.GetTime()+60;
-				if modBranchConfigs.CurrentBranch.Name == "Dev" then duration = modSyncTime.GetTime()+5; end;
+				if shared.gameConfig.BranchName == "Dev" then duration = modSyncTime.GetTime()+5; end;
 				
 				playerSave.Workbench:NewProcess{
 					Type=playerSave.Workbench.ProcessTypes.DeconstructWeapon;

@@ -9,7 +9,7 @@ local modNpcComponent = shared.require(game.ServerScriptService.ServerLibrary.En
 return function(npc, spawnPoint)
 	local self = modNpcComponent{
 		Prefab = npc;
-		SpawnPoint = spawnPoint;
+		SpawnCFrame = spawnPoint;
 		Immortal = 1;
 		
 		Properties = {

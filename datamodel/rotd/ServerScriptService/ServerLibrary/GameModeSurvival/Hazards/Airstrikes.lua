@@ -4,12 +4,12 @@ local TweenService = game:GetService("TweenService");
 
 local modAoeHighlight = shared.require(game.ReplicatedStorage.Particles.AoeHighlight);
 local modProjectile = shared.require(game.ReplicatedStorage.Library.Projectile);
-local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 
 
 --==
 local Hazard = {
 	Title = "Airstrikes";
+	Description = "Airstrikes from the military";
 	Controller = nil;
 };
 Hazard.__index = Hazard;
@@ -94,13 +94,6 @@ function Hazard:Tick()
 	local timeToImpact = 2 - (timeLapsed * 1.2);
 	local impactRadius = 26;
 
-	-- if self.Controller.Wave >= 10 then
-	-- 	local maxRadius = 64;
-	-- 	impactRadius = math.clamp(34 + (self.Controller.Wave-10), 34, maxRadius);
-		
-	-- 	timeToImpact = math.clamp((impactRadius/maxRadius*4) - (timeLapsed * 2), 2, 6);
-	-- end
-
 	local targetCFrame = groundCframe;
 	
 	task.delay(1, function()
@@ -114,20 +107,22 @@ function Hazard:Tick()
 
 			TweenService:Create(new, TweenInfo.new(timeToImpact, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {Size = Vector3.new(impactRadius, impactRadius, 4)}):Play();
 
-			local projectileObject = modProjectile.Fire("rpgRocket", self.JetPrimary.CFrame);
-			projectileObject.TargetableEntities = {Humanoid=1; Zombie=1; Bandit=1; Rat=1;};
-			
+			local projectile: ProjectileInstance = modProjectile.fire("rpgrocket", {
+				OriginCFrame = self.JetPrimary.CFrame;
+			});
+			projectile.Properties.TargetableTags = {Humanoid=1; Zombie=1; Bandit=1; Rat=1;};
+
 			local dmgRatio = 0.5;
-			
 			if self.Controller.Wave >= 10 then
 				dmgRatio = 0.75;
 			end
-			projectileObject.Configurations.DamageRatio = dmgRatio;
-			
-			projectileObject.Configurations.ExplosionRadius = impactRadius/2;
+			projectile.Properties.ExplosionRadius = impactRadius/2;
+			projectile.Properties.DamageRatio = dmgRatio;
 
-			local velocity = projectileObject.ArcTracer:GetVelocityByTime(self.JetPrimary.Position, targetCFrame.Position, timeToImpact);
-			modProjectile.ServerSimulate(projectileObject, self.JetPrimary.Position, velocity);
+			local velocity = projectile.ArcTracer:GetVelocityByTime(self.JetPrimary.Position, targetCFrame.Position, timeToImpact);
+			modProjectile.serverSimulate(projectile, {
+				Velocity = velocity;
+			});
 
 			task.wait(0.2);
 			targetCFrame = modAoeHighlight:Ray(randomCFrame.Position + Vector3.new(0, 128, 0) - (randomDir*32*a), Vector3.new(0, -256, 0));

@@ -55,8 +55,12 @@ end
 
 function treePackage.LookAtEnemy(npcClass: NpcClass)
     local properties = npcClass.Properties;
-    local enemyTargetData = npcClass.Properties.EnemyTargetData;
-    local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
+    local targetData = npcClass.Properties.EnemyTargetData;
+    local targetEntityClass: EntityClass = targetData.HealthComp.CompOwner;
+
+    if targetEntityClass.ClassName == "Destructible" then
+        return false;
+    end
 
     local curTick = tick();
     if properties.LookAtEnemyTick == nil then
@@ -65,7 +69,7 @@ function treePackage.LookAtEnemy(npcClass: NpcClass)
         return true;
 
     elseif properties.LookAtEnemyTick > curTick then
-        npcClass.Move:Face(enemyNpcClass.RootPart);
+        npcClass.Move:Face((targetEntityClass :: CharacterClass).RootPart);
         return true;
 
     end
@@ -75,11 +79,10 @@ end
 
 function treePackage.IgniteDetonation(npcClass: NpcClass)
     local properties = npcClass.Properties;
-    local enemyTargetData = npcClass.Properties.EnemyTargetData;
+    local targetData = npcClass.Properties.EnemyTargetData;
 
-    local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
-
-    local targetRootPart = enemyNpcClass.RootPart;
+    local targetEntityClass: EntityClass = targetData.HealthComp.CompOwner;
+    local targetRootPart = targetEntityClass.RootPart;
     
     local detonTime = npcClass.Character:GetAttribute("DetonationTime");
     if detonTime == nil then

@@ -64,6 +64,12 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     local characterClass = statusClass.StatusOwner;
     local rootPart = characterClass.RootPart;
 
+    local oldSporeDestructConfig = statusClass.Values.SporeDestructConfig;
+    if oldSporeDestructConfig == nil or not game:IsAncestorOf(oldSporeDestructConfig) then
+        statusClass.IsExpired = true;
+        return;
+    end;
+
     local healthComp = characterClass.HealthComp;
     if healthComp == nil or healthComp.IsDead then return end;    
 

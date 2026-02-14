@@ -39,16 +39,19 @@ end
 function treePackage.PlantSpore(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
-    local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
+    local targetEntityClass: EntityClass = enemyTargetData.HealthComp.CompOwner;
 
+    if targetEntityClass.ClassName == "Destructible" then return end;
+    
+    local targetNpcClass: NpcClass = targetEntityClass :: NpcClass;
     local isHard = properties.HardMode;
 
     properties.PlantCooldown = tick() + math.random(2, 4);
 
     local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
 
-    local targetPart = enemyNpcClass.RootPart;
-    local targetPoint = enemyNpcClass:GetCFrame().Position;
+    local targetPart = targetNpcClass.RootPart;
+    local targetPoint = targetNpcClass:GetCFrame().Position;
 
     local raycastResult;
     

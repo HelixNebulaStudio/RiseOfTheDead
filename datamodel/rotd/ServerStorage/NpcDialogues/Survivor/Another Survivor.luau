@@ -1,13 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Variables;
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 
 --==
 return function(player, dialog, data, mission)
-	if not modBranchConfigs.IsWorld("Safehome") then return end;
+	if not modBranchConfigurations.IsWorld("Safehome") then return end;
 	local ownerPlayer = modServerManager.PrivateWorldCreator;
 	local isOwner = ownerPlayer == player;
 	

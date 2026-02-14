@@ -4,7 +4,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
@@ -292,7 +292,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     end
                 end)
                 
-                if gpsLib.WorldName == modBranchConfigs.WorldName then
+                if gpsLib.WorldName == modBranchConfigurations.WorldName then
                     modMarkers.SetMarker("GpsMarker", gpsLib.Position, "GPS", modMarkers.MarkerTypes.Waypoint);
                     
                 else

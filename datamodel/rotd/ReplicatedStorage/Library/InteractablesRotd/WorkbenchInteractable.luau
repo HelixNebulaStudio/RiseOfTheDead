@@ -12,6 +12,10 @@ function interactablePackage.init(super) -- Server/Client
     };
 
     function WorkbenchInteractable.new(interactable: InteractableInstance)
+        local config = interactable.Config;
+        local workbenchType = config:GetAttribute("WorkbenchType") :: string;
+
+        interactable.Values.WorkbenchType = workbenchType;
         interactable.CanInteract = true;
         interactable.Label = `Use Workbench`;
     end

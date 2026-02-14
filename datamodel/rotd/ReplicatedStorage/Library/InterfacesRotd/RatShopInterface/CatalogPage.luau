@@ -7,7 +7,7 @@ local localplayer = game.Players.LocalPlayer;
 
 local TextService = game:GetService("TextService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
@@ -25,7 +25,7 @@ local tabTemplate = script:WaitForChild("tabTemplate");
 local organizedItemsList;
 local itemToolTip;
 
-local isDevBranch = modBranchConfigs.CurrentBranch.Name == "Dev";
+local isDevBranch = shared.gameConfig.BranchName == "Dev";
 
 local catInfoLib = {
 	Resource={Order=10; Title="Resources";};

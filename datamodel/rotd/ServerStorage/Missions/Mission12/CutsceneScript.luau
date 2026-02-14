@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
 
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 
@@ -26,7 +26,7 @@ end
 return function(CutsceneSequence)
 
 	--MARK: TheWarehouse
-	if modBranchConfigs.IsWorld("TheWarehouse") then
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
 		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -347,7 +347,7 @@ return function(CutsceneSequence)
 		
 		
 	--MARK: Factory
-	elseif modBranchConfigs.IsWorld("Factory") then
+	elseif modBranchConfigurations.IsWorld("Factory") then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];

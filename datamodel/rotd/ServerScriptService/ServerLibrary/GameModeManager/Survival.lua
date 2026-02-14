@@ -89,7 +89,7 @@ function GameMode:WorldLoad(modeData)
 					
 				end
 			end)
-			spawn(function()
+			task.spawn(function()
 				for _, player in pairs(players) do
 					local profile = modProfile:Get(player);
 					profile.Analytics:LogTime("Arena:"..(modeData.Room.IsHard and "Hard-" or "")..gameStage, math.ceil(tick()-arenaTimer));

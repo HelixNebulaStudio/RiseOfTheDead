@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibraryRotd);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 
 local library = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
@@ -42,53 +42,6 @@ function library.onRequire()
 	-- MARK: Survival;
 		--{Wave=13; ItemId="dualuziparts1"; Quantity=1; Chance=0.075;};
 		--{Wave=13; ItemId="rechamber1216parts1"; Quantity=1; Chance=0.075;};
-	library:Add{
-		Id="corruptedsectorfcrate";
-		Level=240;
-		Rewards={
-			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
-			{Wave=8; ItemId="apron"; Quantity=1; Chance=0.6;};
-			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
-			{Wave=11; ItemId="hardhat"; Quantity=1; Chance=0.15;};
-			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
-			{Wave=13; ItemId="rechamber1216parts1"; Quantity=1; Chance=0.038;};
-			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
-			{Wave=15; ItemId="rechamber1216bp"; Quantity=1; Chance=0.001;};
-		};
-		WaveBased=true;
-	};
-
-	library:Add{
-		Id="corruptedprisoncrate";
-		Level=300;
-		Rewards={
-			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
-			{Wave=8; ItemId="apron"; Quantity=1; Chance=0.6;};
-			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
-			{Wave=11; ItemId="hardhat"; Quantity=1; Chance=0.15;};
-			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
-			{Wave=13; ItemId="rechamber1216parts2"; Quantity=1; Chance=0.038;};
-			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
-			{Wave=15; ItemId="rechamber1216bp"; Quantity=1; Chance=0.001;};
-		};
-		WaveBased=true;
-	};
-
-	library:Add{
-		Id="corruptedsectordcrate";
-		Level=300;
-		Rewards={
-			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
-			{Wave=8; ItemId="apron"; Quantity=1; Chance=0.6;};
-			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
-			{Wave=11; ItemId="hardhat"; Quantity=1; Chance=0.15;};
-			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
-			{Wave=13; ItemId="rechamber1216parts3"; Quantity=1; Chance=0.038;};
-			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
-			{Wave=15; ItemId="rechamber1216bp"; Quantity=1; Chance=0.001;};
-		};
-		WaveBased=true;
-	};
 	
 
 	library:Add{
@@ -453,7 +406,7 @@ function library.onRequire()
 	local ItemDropTypes = modGlobalVars.ItemDropsTypes;
 	local SpecialEvent = modConfigurations.SpecialEvent;
 
-	local isPrivateWorld = not modBranchConfigs.WorldInfo.PublicWorld;
+	local isPrivateWorld = not modBranchConfigurations.WorldInfo.PublicWorld;
 
 	library:Add{
 		Id="zombie";
@@ -1040,9 +993,9 @@ function library.onRequire()
 		Id="sectorfcrate";
 		Level=50;
 		Rewards={
-			{Index=1; ItemId="advmedkit"; Quantity=1; Chance=1;};
-			{Index=1; ItemId="battery"; Quantity=1; Chance=1;};
-			{Index=1; ItemId="wires"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="advmedkit"; Level=0; Quantity=1; Chance=1;};
+			{Index=1; ItemId="battery"; Level=0; Quantity=1; Chance=1;};
+			{Index=1; ItemId="wires"; Level=0; Quantity=1; Chance=1;};
 			
 			{Index=2; ItemId="toxiccontainer"; Recyclable=true; Quantity=1; Chance=0.4;};
 			{Index=2; ItemId="toxicbp"; Recyclable=true; Quantity=1; Chance=0.3;};
@@ -1053,19 +1006,42 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: ucsectorfcrate : 220
+	-- MARK: ucsectorfcrate
 	library:Add{
 		Id="ucsectorfcrate";
 		Level=220;
 		Rewards={
-			{Index=1; ItemId="crowbar"; Recyclable=true; Quantity=1; Chance=1;};
-			{Index=1; ItemId="militarybootsbp"; Recyclable=true; Quantity=1; Chance=0.7;};
-			{Index=1; ItemId="gasmask"; Recyclable=true; Quantity=1; Chance=0.7;};
-			{Index=1; ItemId="rifledmgcalibremod"; Recyclable=true; Quantity=1; Chance=0.7;};
-			{Index=1; ItemId="subdmgcalibremod"; Recyclable=true; Quantity=1; Chance=0.7;};
+			{Index=1; ItemId="crowbar"; Level=0; Recyclable=true; Quantity=1; Chance=1;};
+			{Index=1; ItemId="subdmgcalibremod"; Level=30; Recyclable=true; Quantity=1; Chance=0.7;};
+			{Index=1; ItemId="militarybootsbp"; Level=50; Recyclable=true; Quantity=1; Chance=0.7;};
+			{Index=1; ItemId="gasmask"; Level=70; Recyclable=true; Quantity=1; Chance=0.7;};
+			{Index=1; ItemId="rifledmgcalibremod"; Level=90; Recyclable=true; Quantity=1; Chance=0.7;};
 
 			{Index=2; ItemId="czevo3bp"; Recyclable=true; Quantity=1; Chance=0.5;};
 		};
+	};
+	
+	-- MARK: corruptedsectorfcrate
+	library:Add{
+		Id="corruptedsectorfcrate";
+		Level=240;
+		Rewards={
+			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
+			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
+			{Wave=4; ItemId="abgreenkey"; Quantity=1; Chance=1;};
+
+			{Wave=8; ItemId="apron"; Quantity=1; Chance=1;};
+			{Wave=8; ItemId="walkietalkie"; Quantity=1; Chance=1;};
+			{Wave=8; ItemId="sandwich"; Quantity=1; Chance=1;};
+
+			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
+			{Wave=11; ItemId="hardhat"; Quantity=1; Chance=0.15;};
+			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
+			{Wave=13; ItemId="rechamber1216parts1"; Quantity=1; Chance=0.038;};
+			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
+			{Wave=15; ItemId="rechamber1216bp"; Quantity=1; Chance=0.001;};
+		};
+		WaveBased=true;
 	};
 
 	-- MARK: prisoncrate : 140
@@ -1073,9 +1049,9 @@ function library.onRequire()
 		Id="prisoncrate";
 		Level=140;
 		Rewards={
-			{Index=1; ItemId="advmedkit"; Quantity=1; Chance=1;};
-			{Index=1; ItemId="bloxycola"; Quantity=1; Chance=1/3;};
-			{Index=1; ItemId="disguisekit"; Quantity=1; Chance=1/3;};
+			{Index=1; ItemId="advmedkit"; Level=0; Quantity=1; Chance=1;};
+			{Index=1; ItemId="bloxycola"; Level=0; Quantity=1; Chance=1/3;};
+			{Index=1; ItemId="disguisekit"; Level=0; Quantity=1; Chance=1/3;};
 
 			{Index=2; ItemId="matchbox"; Recyclable=true; Quantity=1; Chance=1/3;};
 			{Index=2; ItemId="molotov"; Recyclable=true; Quantity=1; Chance=0.4;};
@@ -1084,12 +1060,12 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: nprisoncrate : 320
+	-- MARK: nprisoncrate
 	library:Add{
 		Id="nprisoncrate";
 		Level=300;
 		Rewards={
-			{Index=1; ItemId="motor"; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=1; ItemId="motor"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
 
 			{Index=2; ItemId="smgcritmultimod"; Recyclable=true; Quantity=1; Chance=1;};
 			{Index=2; ItemId="thornmod"; Recyclable=true; Quantity=1; Chance=1/3;};
@@ -1099,34 +1075,81 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: sectordcrate : 240
+	-- MARK: corruptedprisoncrate
+	library:Add{
+		Id="corruptedprisoncrate";
+		Level=300;
+		Rewards={
+			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
+			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
+			{Wave=4; ItemId="abgreenkey"; Quantity=1; Chance=1;};
+
+			{Wave=8; ItemId="apron"; Quantity=1; Chance=1;};
+			{Wave=8; ItemId="walkietalkie"; Quantity=1; Chance=1;};
+			{Wave=8; ItemId="sandwich"; Quantity=1; Chance=1;};
+			
+			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
+			{Wave=11; ItemId="hardhat"; Quantity=1; Chance=0.15;};
+			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
+			{Wave=13; ItemId="rechamber1216parts2"; Quantity=1; Chance=0.038;};
+			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
+			{Wave=15; ItemId="rechamber1216bp"; Quantity=1; Chance=0.001;};
+		};
+		WaveBased=true;
+	};
+
+	-- MARK: sectordcrate
 	library:Add{
 		Id="sectordcrate";
 		Level=240;
 		Rewards={
-			{Index=1; ItemId="cannedfish"; Quantity={Min=1; Max=2}; Chance=1;};
-			{Index=1; ItemId="mk2grenade"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="cannedfish"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=1; ItemId="mk2grenade"; Level=0; Quantity=1; Chance=1;};
 			
-			{Index=2; ItemId="bluntknockoutmod"; Recyclable=true; Quantity=1; Chance=1;};
-			{Index=2; ItemId="healthmod"; Recyclable=true; Quantity=1; Chance=1;};
-			{Index=2; ItemId="vexling"; Recyclable=true; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=2; ItemId="healthmod"; Level=30; Recyclable=true; Quantity=1; Chance=1;};
+			{Index=2; ItemId="vexling"; Level=50; Recyclable=true; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=2; ItemId="bluntknockoutmod"; Level=70; Recyclable=true; Quantity=1; Chance=1;};
 			{Index=2; ItemId="vexgloves"; Recyclable=true; Quantity=1; Chance=0.5;};
 		};
 	};
 
 
-	-- MARK: ucsectordcrate : 420
+	-- MARK: ucsectordcrate
 	library:Add{
 		Id="ucsectordcrate";
 		Level=300;
 		Rewards={
-			{Index=1; ItemId="wires"; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=1; ItemId="wires"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=1; ItemId="sandwich"; Level=0; Quantity=1; Chance=1;};
 			
-			{Index=2; ItemId="armwraps"; Recyclable=true; Quantity=1; Chance=1;};
-			{Index=2; ItemId="riflecritmultimod"; Recyclable=true; Quantity=1; Chance=1;};
-			{Index=2; ItemId="sr308bp"; Recyclable=true; Quantity=1; Chance=1;};
+			{Index=2; ItemId="armwraps"; Level=40; Recyclable=true; Quantity=1; Chance=1;};
+			{Index=2; ItemId="riflecritmultimod"; Level=100; Recyclable=true; Quantity=1; Chance=1;};
+			{Index=2; ItemId="sr308bp"; Level=200; Recyclable=true; Quantity=1; Chance=1;};
 			{Index=2; ItemId="hazmathood"; Recyclable=true; Quantity=1; Chance=1/100;};
 		};
+	};
+
+	-- MARK: corruptedsectordcrate
+	library:Add{
+		Id="corruptedsectordcrate";
+		Level=300;
+		Rewards={
+			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
+			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
+			{Wave=4; ItemId="abgreenkey"; Quantity=1; Chance=1;};
+
+			{Wave=8; ItemId="apron"; Quantity=1; Chance=1;};
+			{Wave=8; ItemId="walkietalkie"; Quantity=1; Chance=1;};
+			{Wave=8; ItemId="sandwich"; Quantity=1; Chance=1;};
+
+			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
+			{Wave=11; ItemId="hardhat"; Quantity=1; Chance=0.15;};
+			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
+			{Wave=13; ItemId="rechamber1216parts3"; Quantity=1; Chance=0.038;};
+			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
+			{Wave=15; ItemId="rechamber1216bp"; Quantity=1; Chance=0.001;};
+		};
+		WaveBased=true;
 	};
 
 
@@ -1231,9 +1254,9 @@ function library.onRequire()
 	library:Add{
 		Id="communitycrate";
 		Rewards={
-			{Index=1; ItemId="advmedkit"; Quantity=1; Chance=1;};
-			{Index=1; ItemId="gears"; Quantity={Min=1; Max=3}; Chance=1;};
-			{Index=1; ItemId="liquidmetalpolish"; Quantity=2; Chance=1;};
+			{Index=1; ItemId="advmedkit"; Level=0; Quantity=1; Chance=1;};
+			{Index=1; ItemId="gears"; Level=0; Quantity={Min=1; Max=3}; Chance=1;};
+			{Index=1; ItemId="liquidmetalpolish"; Level=0; Quantity=2; Chance=1;};
 			
 			{Index=2; ItemId="explosives"; Recyclable=true; Quantity=1; Chance=1;};
 			{Index=2; ItemId="fotlcardgame"; Recyclable=true; Quantity=1; Chance=1;};
@@ -1246,9 +1269,9 @@ function library.onRequire()
 	library:Add{
 		Id="communitycrate2";
 		Rewards={
-			{Index=1; ItemId="advmedkit"; Quantity=1; Chance=1;};
-			{Index=1; ItemId="gears"; Quantity={Min=1; Max=3}; Chance=1;};
-			{Index=1; ItemId="liquidmetalpolish"; Quantity=2; Chance=1;};
+			{Index=1; ItemId="advmedkit"; Level=0; Quantity=1; Chance=1;};
+			{Index=1; ItemId="gears"; Level=0; Quantity={Min=1; Max=3}; Chance=1;};
+			{Index=1; ItemId="liquidmetalpolish"; Level=0; Quantity=2; Chance=1;};
 			
 			{Index=2; ItemId="sandwich"; Recyclable=true; Quantity=1; Chance=1/2;};
 			{Index=2; ItemId="skinwindtrails"; Recyclable=true; Quantity=1; Chance=1/4;};

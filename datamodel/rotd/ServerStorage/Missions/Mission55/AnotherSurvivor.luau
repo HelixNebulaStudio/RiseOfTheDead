@@ -1,13 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 local modNpcs = shared.require(game.ServerScriptService.ServerLibrary.Entity.Npcs);
 
 --==
 return function(player, dialog, data, mission)
-	if not modBranchConfigs.IsWorld("Safehome") then return end;
+	if not modBranchConfigurations.IsWorld("Safehome") then return end;
 
 	local survivorNpcClass: NpcClass = dialog:GetNpcClass();
 	if survivorNpcClass.Player ~= player then

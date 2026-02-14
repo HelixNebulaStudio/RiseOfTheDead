@@ -8,7 +8,7 @@ local UserInputService = game:GetService("UserInputService");
 local localPlayer = game.Players.LocalPlayer;
 
 local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
-local modBranchConfigs = shared.require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
+local modBranchConfigurations = shared.require(game.ReplicatedStorage:WaitForChild("Library"):WaitForChild("BranchConfigurations"));
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
@@ -102,7 +102,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
 	local transparencyTag = Instance.new("NumberValue", script);
 
-	local mapOverviewLib = modBranchConfigs.MapOverviews[modBranchConfigs.GetWorld()];
+	local mapOverviewLib = modBranchConfigurations.MapOverviews[modBranchConfigurations.WorldName];
 	if mapOverviewLib then
 		SHOW_MAP_OBJECTS.Wall = false;
 		SHOW_MAP_OBJECTS.RampUp = false;
@@ -227,13 +227,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         elseif interactable.Type == "Travel" then
                             self.Frame.Size = UDim2.new(0, 360, 0, 200);
                             
-                            local worldName = modBranchConfigs.GetWorldDisplayName(interactable.Values.WorldId);
+                            local worldName = modBranchConfigurations.GetWorldDisplayName(interactable.Values.WorldId);
                             nameTag.Text = "Travel: "..worldName
                             
-                            local worldLib = modBranchConfigs.WorldLibrary[interactable.Values.WorldId];
+                            local worldInfo = modBranchConfigurations.Worlds[interactable.Values.WorldId];
                             
                             local newImage = Instance.new("ImageLabel");
-                            newImage.Image = worldLib.Icon or "";
+                            newImage.Image = worldInfo.Icon or "";
                             newImage.Size = UDim2.new(1, 0, 1, 0);
                             newImage.Parent = customFrame;
                             newImage.BorderSizePixel = 0;
@@ -518,7 +518,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				
 				binds.PopupLocationText(layerName);
 			end
-			locationLabel.Text = "Wrighton Dale, ".. modBranchConfigs.WorldName..", "..layerName;
+			locationLabel.Text = "Wrighton Dale, ".. modBranchConfigurations.WorldName..", "..layerName;
 			activeLayer = layerName;
 			
 		else
@@ -532,7 +532,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					alphaData.Object.ZIndex = alphaData.ZIndex-1;
 				end
 			end
-			locationLabel.Text = "Wrighton Dale, "..(modBranchConfigs.GetWorldDisplayName(modBranchConfigs.WorldName) or "");
+			locationLabel.Text = "Wrighton Dale, "..(modBranchConfigurations.GetWorldDisplayName(modBranchConfigurations.WorldName) or "");
 			
 		end
 		

@@ -6,7 +6,7 @@ local TweenService = game:GetService("TweenService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
@@ -97,7 +97,7 @@ and {
 };
 
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheBeginning") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigurations.IsWorld("TheBeginning") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 
 	
 	local studioLogo, titleLogo, blurEffect, bloomEffect, musicTrack;

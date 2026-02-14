@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local MISSION_ID = 49;
 
@@ -12,7 +12,7 @@ local MissionLogic = {};
 --==
 
 function MissionLogic.onRequire()
-	if not modBranchConfigs.IsWorld("TheWarehouse") then return end;
+	if not modBranchConfigurations.IsWorld("TheWarehouse") then return end;
 
 	if RunService:IsServer() then
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
@@ -68,7 +68,7 @@ function MissionLogic.onRequire()
 			local highlight = modGuiHighlight.Set("MainInterface", "RatShopFrame", "PageFrame", "AccessoriesPage");
 			highlight.Next("MainInterface", "RatShopFrame", "PageFrame", "gps");
 
-			if modBranchConfigs.IsWorld("TheWarehouse") then
+			if modBranchConfigurations.IsWorld("TheWarehouse") then
 				SetWaypoint(modWaypoint.NewWaypoint(rootPart, workspace:WaitForChild("Interactables"):WaitForChild("ShopWaypoint") ));
 			end
 		end

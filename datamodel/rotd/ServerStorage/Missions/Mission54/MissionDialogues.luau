@@ -65,12 +65,12 @@ Dialogues.Mason.DialogueStrings = {
 if RunService:IsServer() then
 	-- !outline: Mason Handler
 	Dialogues.Mason.DialogueHandler = function(player, dialog, data, mission)
-		local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+		local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 		local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 		--==
 		
-		if modBranchConfigs.IsWorld("Safehome") then
+		if modBranchConfigurations.IsWorld("Safehome") then
 			local ownerPlayer = modServerManager.PrivateWorldCreator;
 			local isOwner = ownerPlayer == player;
 
@@ -88,7 +88,7 @@ if RunService:IsServer() then
 			end)
 			
 		elseif mission.Type == 1 then -- Active
-			if not modBranchConfigs.IsWorld("Safehome") then
+			if not modBranchConfigurations.IsWorld("Safehome") then
 				dialog:SetInitiate("Let's go?");
 				dialog:AddChoice("hsh_letsgo", function(dialog)
 					modMission:Progress(player, MISSION_ID, function(mission)
@@ -97,7 +97,7 @@ if RunService:IsServer() then
 					modServerManager:Travel(player, "Safehome");
 				end)
 
-			elseif modBranchConfigs.IsWorld("Safehome") then
+			elseif modBranchConfigurations.IsWorld("Safehome") then
 				if mission.ProgressionPoint == 2 then
 					dialog:SetInitiate("Here we are, hope we will find something good here..");
 					dialog:AddChoice("hsh_quiet", function(dialog)
@@ -128,12 +128,12 @@ if RunService:IsServer() then
 			end
 			
 		elseif mission.Type == 3 then -- Complete
-			if modBranchConfigs.IsWorld("Safehome") then
+			if modBranchConfigurations.IsWorld("Safehome") then
 				dialog:AddChoice("tpwarehouse", function(dialog)
 					modServerManager:Travel(player, "TheWarehouse");
 				end)
 
-			elseif modBranchConfigs.IsWorld("TheWarehouse") then
+			elseif modBranchConfigurations.IsWorld("TheWarehouse") then
 				dialog:AddChoice("tpsafehome", function(dialog)
 					modServerManager:Travel(player, "Safehome");
 				end)

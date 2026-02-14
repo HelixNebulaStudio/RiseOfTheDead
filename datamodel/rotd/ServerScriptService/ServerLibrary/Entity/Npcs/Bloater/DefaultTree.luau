@@ -29,10 +29,13 @@ function treePackage.BurpConfusionGas(npcClass: NpcClass)
 
     npcClass.Move:SetMoveSpeed("set", "burp", 0, npcClass.Move.MoveSpeedPriority.Action);
     task.wait(0.1);
+    if npcClass.HealthComp.IsDead then return false; end;
+
     npcClass.Move:Face(targetRootPart);
     
     npcClass.PlayAnimation("Burp");
     task.wait(math.random(350,450)/1000);
+    if npcClass.HealthComp.IsDead then return false; end;
     
     local level = (properties.Level-1);
     for a=1, math.random(4,6) do
@@ -57,11 +60,11 @@ function treePackage.BurpConfusionGas(npcClass: NpcClass)
         task.wait(math.random(500,700)/1000);
         if npcClass.HealthComp.IsDead then break end;
     end
-    if npcClass.HealthComp.IsDead then
-        return false;
-    end;
+    if npcClass.HealthComp.IsDead then return false; end;
 
     task.wait(math.random(250,350)/1000);
+    if npcClass.HealthComp.IsDead then return false; end;
+
     npcClass.Move:SetMoveSpeed("remove", "burp");
 
     return false;

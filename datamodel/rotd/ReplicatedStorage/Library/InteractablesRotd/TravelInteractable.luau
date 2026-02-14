@@ -5,7 +5,7 @@ local SoundService = game:GetService("SoundService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 if RunService:IsServer() then
     modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
@@ -36,7 +36,7 @@ function interactablePackage.init(super) -- Server/Client
 
         local worldName = interactable.Values.WorldName;
         local setSpawn = interactable.Values.SetSpawn;
-		local worldDisplayName = modBranchConfigs.GetWorldDisplayName(worldName);
+		local worldDisplayName = modBranchConfigurations.GetWorldDisplayName(worldName);
 
         if RunService:IsClient() then 
             if info.Action == "Client" then 
@@ -118,7 +118,7 @@ function interactablePackage.init(super) -- Server/Client
         end
 
         local worldName = interactable.Values.WorldName;
-        local worldDisplayName = modBranchConfigs.GetWorldDisplayName(worldName);
+        local worldDisplayName = modBranchConfigurations.GetWorldDisplayName(worldName);
         interactable.Label = `Travel to {worldDisplayName}`;
 
         interactable.CanInteract = true;

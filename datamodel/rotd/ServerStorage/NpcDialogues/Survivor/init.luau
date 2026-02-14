@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 --== Variables;
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
@@ -22,12 +22,12 @@ return function(player, dialog, data)
 	local npcHappiness = npcData.Happiness or 0;
 	npcData:CalculateHappiness();
 
-	if modBranchConfigs.CurrentBranch.Name == "Dev" or player.UserId == 16170943 then
+	if shared.gameConfig.BranchName == "Dev" or player.UserId == 16170943 then
 		local reportMsg = `\n\nLevel: {npcLevel}\tHappiness: {npcHappiness}`;
 
 		local reportDialog = {
 			Face="Skeptical";
-			Say=(modBranchConfigs.CurrentBranch.Name == "Dev" and "[Dev Branch]" or "[Dev]").." Status report";
+			Say=(shared.gameConfig.BranchName == "Dev" and "[Dev Branch]" or "[Dev]").." Status report";
 			Reply=reportMsg;
 		};
 		dialog:AddDialog(reportDialog, function(dialog)
@@ -39,7 +39,7 @@ return function(player, dialog, data)
 	local npcLib = modNpcProfileLibrary:Find(npcName);
 	local levelUpTimer = npcLevel * 60;
 	
-	if modBranchConfigs.CurrentBranch.Name == "Dev" then
+	if shared.gameConfig.BranchName == "Dev" then
 		levelUpTimer = 6;
 		if npcLevel == 0 then
 			npcLevel = 1;

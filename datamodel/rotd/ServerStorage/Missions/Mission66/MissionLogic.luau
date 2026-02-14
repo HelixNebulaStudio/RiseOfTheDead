@@ -2,12 +2,12 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local MISSION_ID = 66;
 
 if RunService:IsServer() then
-	if not modBranchConfigs.IsWorld("SectorD") then return {}; end;
+	if not modBranchConfigurations.IsWorld("SectorD") then return {}; end;
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
 	shared.modEventService:OnInvoked("GameModeManager_BindGameModeComplete", function(eventPacket: EventPacket, packet)
@@ -26,7 +26,7 @@ if RunService:IsServer() then
 	end)
 
 	shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, triggerId, ...)
-		if triggerId ~= "Monorail_Activate" then return end;
+		if triggerId ~= "StartMonorail" then return end;
 
 		for _, p in pairs(game.Players:GetPlayers()) do
 			modMission:Progress(p, MISSION_ID, function(mission)

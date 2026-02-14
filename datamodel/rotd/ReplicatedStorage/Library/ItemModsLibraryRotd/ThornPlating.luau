@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
@@ -17,7 +17,7 @@ local modifierPackage = {
 --==
 function modifierPackage.onRequire()
 	if RunService:IsClient() then return end;
-	if modBranchConfigs.IsWorld("Slaughterfest") then return end;
+	if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
 
 	function modifierPackage.Binds.CharacterClassTakenDamage(modifier: ItemModifierInstance, damageData: DamageData)
 		local initDamage = damageData.InitDamage;

@@ -38,8 +38,7 @@ function treePackage.GoTo(npcClass: NpcClass)
 
     local interactId = npcClass.Properties.CutsceneWalkToInteract;
     if interactId then
-        local interactConfig: Configuration = modInteractables.getById(interactId);
-        local interactable: InteractableInstance = modInteractables.getOrNew(interactConfig);
+        local interactable: InteractableInstance = modInteractables.getById(interactId);
         if interactable == nil then
             npcClass.Properties.CutsceneWalkToInteract = nil;
         else

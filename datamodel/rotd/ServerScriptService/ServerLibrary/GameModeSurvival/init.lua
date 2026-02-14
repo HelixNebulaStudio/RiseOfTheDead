@@ -12,7 +12,7 @@ local EnumStatus = {Initialized=-1; Restarting=0; InProgress=1; Completed=2;};
 Survival.EnumStatus = EnumStatus;
 
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
@@ -20,6 +20,8 @@ local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configur
 local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 local modItemLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
+local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
+local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local modNpcs = shared.modNpcs;
 local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
@@ -28,6 +30,7 @@ local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemD
 local remoteGameModeHud = modRemotesManager:Get("GameModeHud");
 
 local StageElements = game.ServerStorage:WaitForChild("StageElements");
+local cratePallet = game.ServerStorage.Prefabs.Objects.Crates.CratePallet;
 
 
 -- local Objectives = {};
@@ -39,11 +42,72 @@ Survival.OnNpcDeath = shared.EventSignal.new("OnNpcDeath");
 Survival.Active = nil;
 
 function Survival.onRequire()
+	shared.modEventService:OnInvoked("Storage_OnOpen", function(event: EventPacket, ...)
+		local player: Player? = event.Player;
+		if player == nil then return end;
+
+		local storage: Storage = ...;
+		if storage == nil then return end
+
+		Debugger:Warn("Survival rewards opened", player.Name, "storage.Id", storage.Id);
+		if storage.Id ~= "survivalrewards" then return end;
+
+		for config, interactable: InteractableInstance in pairs(modInteractables.InstanceList) do
+			if interactable.Name ~= "GameModeExit" then continue end;
+
+			modReplicationManager:SetClientAttribute(player, config, "ClaimedRewards", true);
+		end
+	end)
+
 	shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
 		local npcClass: NpcClass = ...;
 		if npcClass == nil then return end;
 	
 		Survival.OnNpcDeath:Fire(npcClass);
+	end)
+
+	remoteGameModeHud.OnServerEvent:Connect(function(player: Player, action, ...)
+		local gameController = Survival.Active;
+		local userId = tostring(player.UserId);
+
+		local wavePass = gameController and gameController.WavePass or nil;
+
+		if action == "selectReward" then
+			if gameController == nil then return end;
+
+			local rewardPick = ...;
+
+			if wavePass == nil or wavePass.Active ~= true then return end;
+			if wavePass.Players[userId] == nil or wavePass.Players[userId].RewardPick == rewardPick then return end;
+			if typeof(rewardPick) ~= "number" then return end;
+
+			local profile = shared.modProfile:Get(player);
+			local gameSave = profile and profile:GetActiveSave();
+			local playerLevel = gameSave and gameSave:GetStat("Level") or 1;
+
+			if wavePass.Rewards[rewardPick].Level and playerLevel < wavePass.Rewards[rewardPick].Level then return end;
+
+			local noOfRewards = #wavePass.Rewards;
+			local rewardIndex = math.clamp(rewardPick, 1, noOfRewards);
+			
+			wavePass.Players[userId].RewardPick = rewardIndex;
+			gameController:Hud();
+
+		elseif action == "vote" then
+			if gameController == nil then return end;
+
+			local votePick = ...;
+
+			if wavePass == nil or wavePass.Active ~= true then return end;
+			if wavePass.Players[userId] == nil then return end;
+			if typeof(votePick) ~= "number" then return end;
+
+			local voteIndex = math.clamp(votePick, 1, 2);
+			wavePass.Players[userId].VotePick = voteIndex;
+			wavePass.Players[userId].HasVoted = true;
+			gameController:Hud();
+
+		end
 	end)
 end
 
@@ -86,12 +150,20 @@ function Survival.new()
 		SetHazard = nil;
 		SetObjective = nil;
 		SkipWave = false;
+
+		--Shared
+		WavePass = {
+			Active = false;
+			Rewards = {};
+			Players = {};
+			TimeLeft = 30;
+		};
+		Storages = {};
 	};
 	
 	if Survival.Active == nil then
 		Survival.Active = self;
 	end
-	self = Survival.Active;
 	
 	setmetatable(self, Survival);
 	return self;
@@ -395,7 +467,6 @@ end
 
 function Survival:CompleteWave()
 	self:RespawnDead();
-	task.wait(1);
 	
 	--local wavesLapsedSinceSupply = self.LastSupplyWave-self.Wave; --(math.random(1, 10) == 1 and wavesLapsedSinceSupply > 4) or wavesLapsedSinceSupply >= 15
 	if self.Wave == 1 or self.ResupplyEnabled then
@@ -417,8 +488,11 @@ function Survival:CompleteWave()
 	end;
 
 	self:Hud{
-		PlayWaveEnd=true;
+		Status = "A supply station has been discovered!";
+		PlayWaveEnd = true;
 	};
+
+	task.wait(1);
 end
 
 function Survival:GetNextWaveInfo(wave)
@@ -487,12 +561,10 @@ function Survival:GetNextWaveInfo(wave)
 	
 	if self.SetHazard then
 		pickHazard = self.SetHazard;
-		self.SetHazard = nil;
 	end
 	
 	if self.SetObjective then
 		pickObjective = self.SetObjective;
-		self.SetObjective = nil;
 	end
 
 	return pickObjective, pickHazard;
@@ -513,7 +585,7 @@ function Survival:StartWave(wave)
 			shared.Notify(game.Players:GetPlayers(), self.IntroMessage, "Positive");
 		end
 
-		if modBranchConfigs.CurrentBranch.Name == "Dev" then
+		if shared.gameConfig.BranchName == "Dev" then
 			-- Dev branch
 			local function printChatCalculator(title, list)
 				shared.Notify(game.Players:GetPlayers(), "Dev-branch Info: ".. title .." Table:", "Inform");
@@ -542,6 +614,9 @@ function Survival:StartWave(wave)
 	local pickObjective, pickHazard;
 	
 	pickObjective, pickHazard = self:GetNextWaveInfo(wave);
+	
+	self.SetHazard = nil;
+	self.SetObjective = nil;
 	--===
 	
 	local newObjective = pickObjective.Class.new();
@@ -551,8 +626,12 @@ function Survival:StartWave(wave)
 	shared.Notify(game.Players:GetPlayers(), "Wave ".. self.Wave ..", Objective: ".. newObjective.Title ..", Hazard: ".. hazardTitle, "Important");
 
 	self:Hud{
-		WaveObjective=newObjective.Title;
-		WaveHazard=hazardTitle;
+		HeaderText = `Wave {self.Wave}`;
+		Status = false;
+		WaveObjective = newObjective.Title;
+		ObjectiveDesc = newObjective.Description;
+		WaveHazard = hazardTitle;
+		HazardDesc = hazardTitle ~= "None" and newHazard.Description or "";
 	}
 	
 	self.ObjectiveType = pickObjective.Type;
@@ -644,15 +723,111 @@ function Survival:StartWave(wave)
 	
 	
 	self:Hud{
-		WaveObjective=false;
-		WaveHazard=false;
+		Status = `Wave {self.Wave} complete!`;
+		WaveObjective = false;
+		WaveHazard = false;
 	}
 	
 	if self.Status == EnumStatus.InProgress then
 		self:CompleteWave();
 		
-		if self.IsHard and self.StageLib.HardRewardId then
+		if self.StageLib.WavePassMode == true then
+			if (self.IsHard and self.StageLib.HardRewardId) or self.Wave >= 5 and self.Wave % 5 == 0 then
+				self.WavePass.Active = true;
 
+				local rewardDroptableIds = {self.StageLib.RewardsId};
+				if self.StageLib.RewardsIds then
+					for a=1, #self.StageLib.RewardsIds do
+						if table.find(rewardDroptableIds, self.StageLib.RewardsIds[a]) == nil then
+							table.insert(rewardDroptableIds, self.StageLib.RewardsIds[a]);
+						end
+					end
+				end
+
+				self.DropCycleIndex = (self.DropCycleIndex or -1) +1;
+				local activeDropTableId = rewardDroptableIds[math.fmod(self.DropCycleIndex, #rewardDroptableIds)+1];
+				if self.IsHard and self.StageLib.HardRewardId then
+					activeDropTableId = self.StageLib.HardRewardId;
+				end
+
+				local rewardsTable = {};
+				local rewardsList = modRewardsLibrary:Find(activeDropTableId);
+				if rewardsList.WaveBased then
+					for a=1, #rewardsList.Rewards do
+						local rewardInfo = rewardsList.Rewards[a];
+
+						if rewardInfo.Wave ~= self.Wave then continue end;
+						local clone = table.clone(rewardInfo);
+						clone.Chance = 1;
+						table.insert(rewardsTable, clone);
+					end
+
+				elseif rewardsList and rewardsList.Rewards then
+					for b=1, #rewardsList.Rewards do
+						local clone = table.clone(rewardsList.Rewards[b]);
+						if clone.Level == nil then
+							clone.Level = rewardsList.Level;
+						end
+						table.insert(rewardsTable, clone);
+					end
+				end
+				
+				local waveBonusChance = math.clamp(math.floor(self.Wave/5)/12, 0, 1) *1;
+				for a=1, #rewardsTable do
+					rewardsTable[a].Chance = rewardsTable[a].Chance + waveBonusChance;
+					rewardsTable[a].BonusChance = waveBonusChance;
+				end
+
+				local lowestPlayerLevel = math.huge;
+				for _, player in ipairs(self.Players) do
+					local profile = shared.modProfile:Get(player);
+					local gameSave = profile and profile:GetActiveSave();
+					local playerLevel = gameSave and gameSave:GetStat("Level") or 1;
+					if playerLevel < lowestPlayerLevel then
+						lowestPlayerLevel = playerLevel;
+					end
+				end
+
+				Debugger:StudioLog(`rewardsTable`, rewardsTable, "lowestPlayerLevel", lowestPlayerLevel);
+
+				if #rewardsTable > 0 then
+					local pickRewardsList = {};
+					repeat
+						local rewardInfo = modDropRateCalculator.roll(rewardsTable);
+						if rewardInfo and #pickRewardsList <= 0 and (rewardInfo.Level or 0) > lowestPlayerLevel then
+							rewardInfo = nil;
+						end
+						if rewardInfo then
+							table.insert(pickRewardsList, rewardInfo);
+						end
+					until #pickRewardsList >= math.min(3, #rewardsTable);
+
+					self.WavePass.Rewards = pickRewardsList;
+					self.WavePass.TimeLeft = 30;
+					if self.Wave <= 5 then
+					elseif #self.WavePass.Rewards <= 1 then
+						self.WavePass.TimeLeft = 10;
+					elseif self.Wave > 20 then
+						self.WavePass.TimeLeft = 15;
+					end
+
+					self.WavePass.Players = {};
+					for _, player in ipairs(self.Players) do
+						self.WavePass.Players[tostring(player.UserId)] = {
+							HasVoted = false;
+							VotePick = 1; -- continue
+							RewardPick = 1; -- default choice
+						};
+					end
+				else
+					self.WavePass.Active = false;
+				end
+				self:Hud{
+					Status = `Wave passed!`;
+				};
+			end
+
+		elseif self.IsHard and self.StageLib.HardRewardId then
 			local rewardLib = modRewardsLibrary:Find(self.StageLib.HardRewardId);
 			if rewardLib and rewardLib.Rewards then
 				local rewardsList = rewardLib.Rewards;
@@ -752,20 +927,134 @@ function Survival:StartWave(wave)
 
 		end
 		
-		local breakLength = math.clamp(10 + (self.ActiveSupCrate and 20 or 0), 10, 30);
+		local breakLength = 10 + (self.ActiveSupCrate and 20 or 0);
+		if self.WavePass.Active == true then
+			breakLength = self.WavePass.TimeLeft;
+		end
 
 		self.GameState = "Intermission";
 
 		local nextWave = wave+1;
 		local nextObj, nextHaz = self:GetNextWaveInfo(nextWave);
-		local nextWaveStr = (nextObj and nextObj.Class.Title or "")..(nextHaz and " ("..nextHaz.Class.Title..")" or " (No Hazards)");
-		for a=breakLength, 1, -1 do
-			if a == 1 then self:RespawnDead(); end
+
+		for a=breakLength, 0, -1 do
+			self:RespawnDead();
 			task.wait(1);
+			self.WavePass.TimeLeft = a;
 			self:Hud{
-				Status=`Wave {nextWave}: {nextWaveStr} starts in {a}s..`;
+				HeaderText = `Wave {nextWave}`;
+				Status = `Next wave starts in {a}s..`;
+				WaveObjective = nextObj and nextObj.Class.Title or "";
+				ObjectiveDesc = nextObj and nextObj.Class.Description or "";
+				WaveHazard = nextHaz and nextHaz.Class.Title or "";
+				HazardDesc = nextHaz and nextHaz.Class.Description or "";
 			};
 			if self.Status ~= EnumStatus.InProgress then break; end
+		end
+
+		local wavePass;
+		if self.WavePass.Active == true then
+			wavePass = self.WavePass;
+		end
+
+		if wavePass then
+			self.WavePass.Active = false;
+			self.WavePass.TimeLeft = 0;
+			self:Hud{
+				Status = false;
+			};
+			task.wait(1);
+
+			local endCount, continueCount = 0, 0;
+			for _, playerInfo in pairs(wavePass.Players) do
+				if playerInfo.VotePick == 1 then
+					continueCount = continueCount +1;
+				else
+					endCount = endCount +1;
+				end
+			end
+			Debugger:Warn(`WavePass Vote EndCount: {endCount} ContinueCount: {continueCount}`);
+
+			for _, player in ipairs(self.Players) do
+				local playerWavePass = self.WavePass.Players[tostring(player.UserId)];
+				if playerWavePass == nil then continue end;
+
+				local rewardIndex = math.clamp(playerWavePass.RewardPick, 1, #wavePass.Rewards);
+				local rewardInfo = wavePass.Rewards[rewardIndex];
+				
+				task.spawn(function() 
+					if rewardInfo == nil then return end;
+
+					local STORAGE_ID = "survivalrewards";
+
+					local profile = shared.modProfile:Get(player);
+					local storages = profile:GetCacheStorages();
+					
+					local storage: Storage = storages[player] or self.Storages[player];
+					if storage == nil then
+						storage = shared.modStorage.new(STORAGE_ID, "rewardcrate", player, "Survival Rewards");
+						storage.Values.ItemSpawn = true;
+
+						storage:SetPermissions("CanRemove", false);
+						self.Storages[player] = storage;
+					end
+					storages[STORAGE_ID] = storage;
+
+					storage:Add(rewardInfo.ItemId, {Quantity=rewardInfo.DropQuantity;});
+					storage:Sync(player);
+					Debugger:Warn(`WavePass RewardPick ({player.Name}) picked {rewardInfo.ItemId} x {rewardInfo.DropQuantity}`);
+				end)
+			end
+
+			if endCount >= continueCount then
+				self.Status = EnumStatus.Completed;
+
+				--MARK: WavePass End
+				Debugger:Warn("WavePass End");
+				local rewardSpawnAtt = StageElements:WaitForChild("RewardSpawn");
+
+				local cratePrefab = cratePallet:Clone();
+				cratePrefab.Name = "WavePassCrate";
+				cratePrefab:PivotTo(rewardSpawnAtt.WorldCFrame);
+
+				local interactConfig = modInteractables.createInteractable("Storage");
+				interactConfig:SetAttribute("StorageId", "survivalrewards");
+				interactConfig:SetAttribute("StorageName", "Survival Rewards");
+				interactConfig:SetAttribute("StoragePresetId", "rewardcrate");
+				interactConfig.Parent = cratePrefab;
+				
+				local interactable: InteractableInstance = modInteractables.getOrNew(interactConfig);
+				for _, player in ipairs(self.Players) do
+					interactable:SetUserPermissions(player.Name, "CanInteract", true);
+				end
+
+				cratePrefab.Parent = workspace.Interactables;
+				self.LootPrefab = cratePrefab;
+
+				self:Hud{
+					LastWave = self.Wave;
+					StatsCount = self.StatsCount;
+					SurvivalEnded = true;
+					HeaderText = "Survival Complete!";
+					Status = `Survived until wave {self.Wave}!`;
+					WaveObjective = false;
+					WaveHazard = false;
+				};
+				
+				shared.Notify(game.Players:GetPlayers(), `Survived until wave {self.Wave}!`, "Positive");
+				for _, storage: Storage in pairs(self.Storages) do
+					storage:SetPermissions("CanRemove", true);
+					storage:Sync(storage.Player);
+				end
+
+				workspace:SetAttribute("GameModeComplete", true);
+				return;
+
+			else
+				--MARK: WavePass Continue
+				Debugger:Warn("WavePass Continue");
+
+			end
 		end
 
 		if self.ActiveSupCrate then
@@ -830,7 +1119,8 @@ function Survival:Start()
 	self:RespawnDead();
 	for a=1, 20, 0.5 do
 		self:Hud{
-			Status="Waiting for ("..#self.Characters.."/"..#self.Players..") characters.."
+			HeaderText = `{self.ModeType}: {self.ModeStage}`;
+			Status = "Waiting for ("..#self.Characters.."/"..#self.Players..") characters.."
 		};
 		
 		if #self.Characters >= #self.Players then
@@ -842,7 +1132,9 @@ function Survival:Start()
 	
 	for a=5, 1, -1 do
 		self:Hud{
-			Status="Survival is starting in "..a.."s.."
+			WaveObjective = false;
+			WaveHazard = false;
+			Status = "Survival is starting in "..a.."s.."
 		};
 		task.wait(1);
 	end
@@ -954,17 +1246,21 @@ function Survival:Initialize(roomData)
 						table.clear(self.JobsList);
 						
 						self:Hud{
-							LastWave=self.Wave;
-							StatsCount=self.StatsCount;
+							LastWave = self.Wave;
+							StatsCount = self.StatsCount;
+							SurvivalEnded = true;
 						};
 						
+						for _, storage: Storage in pairs(self.Storages) do
+							storage:Wipe();
+							storage:Sync(storage.Player);
+						end
 						shared.Notify(game.Players:GetPlayers(), "Survival failed at wave ".. self.Wave .."!", "Negative");
 						
 						for a=30, 1, -1 do
 							self:Hud{
 								Header = "Survival failed!";
 								Status = `Restarting in {a}..`;
-								SurvivalFailed = a==30;
 							};
 							
 							shared.Notify(game.Players:GetPlayers(), `Restarting in {a}..`, "Negative", "ModeRestarting");
@@ -975,8 +1271,7 @@ function Survival:Initialize(roomData)
 		
 					else
 						self:Hud{
-							Header="You died!";
-							Status="";
+							Status="You died!";
 						};
 		
 					end
@@ -1064,41 +1359,47 @@ end
 function Survival:Hud(data)
 	data = data or {};
 	
-	if self.HudValues == nil then
-		self.HudValues = {};
-	end
-	
 	if data.WaveObjective ~= nil then
-		self.HudValues.WaveObjective = data.WaveObjective;
+		self.WaveObjective = data.WaveObjective;
+		self.ObjectiveDesc = data.ObjectiveDesc or "";
 	end
 	if data.WaveHazard ~= nil then
-		self.HudValues.WaveHazard = data.WaveHazard;
+		self.WaveHazard = data.WaveHazard;
+		self.HazardDesc = data.HazardDesc or "";
 	end
-	
+	if data.HeaderText ~= nil then
+		self.HeaderText = data.HeaderText;
+	end
+	if data.Status ~= nil then
+		self.StatusText = data.Status;
+	end
+
 	remoteGameModeHud:FireAllClients({
-		Action="Open";
-		Type=self.ModeType;
-		Stage=self.ModeStage;
-		Header=data.Header or modBranchConfigs.GetWorldDisplayName(self.StageLib.WorldId);
-		Status=data.Status or "";
-		IsHard=self.IsHard;
-		Wave=self.Wave;
-		GameState=self.GameState;
+		Action = "Open";
+		Type = self.ModeType;
+		Stage = self.ModeStage;
+		Header = self.HeaderText;
+		Status = self.StatusText;
+		IsHard = self.IsHard;
+		Wave = self.Wave;
+		GameState = self.GameState;
 
-		WaveObjective=data.WaveObjective or self.HudValues.WaveObjective;
-		WaveHazard=data.WaveHazard or self.HudValues.WaveHazard;
+		WaveObjective = self.WaveObjective;
+		WaveHazard = self.WaveHazard;
+		ObjectiveDesc = self.ObjectiveDesc;
+		HazardDesc = self.HazardDesc;
 
-		LastWave=data.LastWave;
-		StatsCount=data.StatsCount;
-		PlayWaveStart=data.PlayWaveStart or false;
-		PlayWaveEnd=data.PlayWaveEnd or false;
-		SurvivalFailed=data.SurvivalFailed or false;
-		BossList=data.BossList or false;
-		SupplyStation=self.ActiveSupCrate or false;
-		BossKilled=data.BossKilled or false;
-		LootPrefab=self.LootPrefab or false;
+		LastWave = data.LastWave;
+		StatsCount = data.StatsCount;
+		PlayWaveStart = data.PlayWaveStart or false;
+		PlayWaveEnd = data.PlayWaveEnd or false;
+		SurvivalEnded = data.SurvivalEnded or false;
+		SupplyStation = self.ActiveSupCrate or false;
+		BossKilled = data.BossKilled or false;
+		LootPrefab = self.LootPrefab or false;
 		
-		HookEntity=data.HookEntity or false;
+		HookEntity = data.HookEntity or false;
+		WavePass = self.WavePass.Active == true and self.WavePass or false;
 	});
 end
 

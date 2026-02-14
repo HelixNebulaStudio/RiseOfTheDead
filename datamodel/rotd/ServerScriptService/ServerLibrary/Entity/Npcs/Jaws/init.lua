@@ -13,7 +13,7 @@ local npcPackage = {
         WalkSpeed = 0;
     };
     Properties = {
-        BasicEnemy = true;
+        BasicEnemy = false;
         IsHostile = true;
 
         TargetableDistance = 75;
@@ -60,23 +60,10 @@ function npcPackage.Spawning(npcClass: NpcClass)
 
     npcClass.Move:SetMoveSpeed("set", "default", 0);
 
-    local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
-
     local jawModels = {
         character:WaitForChild("LJaw");
         character:WaitForChild("RJaw");
     }
-
-    for a=1, #jawModels do
-        local key = jawModels[a].Name:sub(1,1);
-        local insideModel = jawModels[a]:WaitForChild("JawInsides");
-        
-        local jawDestructible: DestructibleInstance = bodyDestructiblesComp:Create(`${key} Jaw`, insideModel);
-        
-        function jawDestructible.HealthComp:TakeDamage(damageData: DamageData)
-            npcClass.HealthComp:TakeDamage(damageData);
-        end
-    end
 
     local jawMotors = {};
     for _, obj in pairs(npcClass.Head:GetChildren()) do
@@ -97,7 +84,23 @@ end
 
 function npcPackage.Spawned(npcClass: NpcClass)
     local properties = npcClass.Properties;
+
     npcClass.Character:SetAttribute("EntityHudHealth", true);
+
+    
+    local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
+
+    local jawModels = properties.JawModels;
+    for a=1, #jawModels do
+        local key = jawModels[a].Name:sub(1,1);
+        local insideModel = jawModels[a]:WaitForChild("JawInsides");
+        
+        local jawDestructible: DestructibleInstance = bodyDestructiblesComp:Create(`${key} Jaw`, insideModel);
+        
+        function jawDestructible.HealthComp:TakeDamage(damageData: DamageData)
+            npcClass.HealthComp:TakeDamage(damageData);
+        end
+    end
 end
 
 return npcPackage;

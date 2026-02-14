@@ -33,6 +33,10 @@ function treePackage.HasEnemy(npcClass: NpcClass)
             return false;
         end
 
+        if targetNpcClass.Properties.Detectable == false then
+            return false;
+        end
+        
         if not npcClass:IsInVision(targetNpcClass.RootPart) then
             return false;
         end

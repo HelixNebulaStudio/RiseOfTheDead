@@ -118,8 +118,8 @@ function GameMode:Start(room)
 	Debugger:Warn("Boss started with level:", bossLevel);
 		
 	for a=1, #players do
-		local classPlayer = modPlayers.get(players[a]);
-		classPlayer:SetProperties("InBossBattle", self.GameTable.Stage);
+		local playerClass: PlayerClass = modPlayers.get(players[a]);
+		playerClass.Properties.InBossBattle = self.GameTable.Stage;
 		
 		remoteGameModeUpdate:FireClient(players[a], "closemenu");
 		remoteGameModeHud:FireClient(players[a], {
@@ -346,8 +346,8 @@ function GameMode:End(room)
 	local players = room:GetInstancePlayers();
 	
 	for a=1, #players do
-		local classPlayer = modPlayers.get(players[a]);
-		classPlayer:SetProperties("InBossBattle", nil);
+		local playerClass: PlayerClass = modPlayers.get(players[a]);
+		playerClass.Properties.InBossBattle = nil;
 		
 		remoteGameModeHud:FireClient(players[a], {
 			Action="Open";

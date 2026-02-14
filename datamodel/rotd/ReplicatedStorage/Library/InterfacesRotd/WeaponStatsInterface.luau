@@ -4,7 +4,7 @@ local TextService = game:GetService("TextService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modPseudoRandom = shared.require(game.ReplicatedStorage.Library.PseudoRandom);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
@@ -1042,7 +1042,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 obj:Destroy();
             end
         end
-        barFrameTemplate.BackgroundColor3 = modBranchConfigs.BranchColor;
+        barFrameTemplate.BackgroundColor3 = modBranchConfigurations.BranchColor;
 
         playerClass = shared.modPlayers.get(localPlayer);
         wieldComp = playerClass.WieldComp;
@@ -1110,8 +1110,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             renderModifiers(configOwner, storageItem);
         end;
         
-        statLayerButton.BackgroundColor3 = statPage == "Stats" and modBranchConfigs.BranchColor or Color3.fromRGB(100,100,100);
-        modifierLayerButton.BackgroundColor3 = statPage == "Modifiers" and modBranchConfigs.BranchColor or Color3.fromRGB(100,100,100);
+        statLayerButton.BackgroundColor3 = statPage == "Stats" and modBranchConfigurations.BranchColor or Color3.fromRGB(100,100,100);
+        modifierLayerButton.BackgroundColor3 = statPage == "Modifiers" and modBranchConfigurations.BranchColor or Color3.fromRGB(100,100,100);
     end)
 
     weaponStatsFrame.MouseButton1Click:Connect(function()

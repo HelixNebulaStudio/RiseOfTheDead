@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local MissionLogic = {};
 --==
@@ -12,8 +12,8 @@ if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	local modNpcs = shared.modNpcs;
 
-	--if not modBranchConfigs.IsWorld("TheHarbor") then return MissionLogic end;
-	if modBranchConfigs.IsWorld("BioXResearch") then
+	--if not modBranchConfigurations.IsWorld("TheHarbor") then return MissionLogic end;
+	if modBranchConfigurations.IsWorld("BioXResearch") then
 		modNpcs.spawn2{
 			Name = "Joseph";
 			CFrame = CFrame.new(-50.208, -16.75, 23.504);

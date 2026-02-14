@@ -5,7 +5,7 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
@@ -30,7 +30,7 @@ end
 --== Script;
 return function(CutsceneSequence)
 	-- MARK: TheMall / BioXResearch
-	if modBranchConfigs.IsWorld("TheMall") or modBranchConfigs.IsWorld("BioXResearch") then
+	if modBranchConfigurations.IsWorld("TheMall") or modBranchConfigurations.IsWorld("BioXResearch") then
 		
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -52,7 +52,7 @@ return function(CutsceneSequence)
 						npcClass.Properties.CutsceneActive = true;
 					end
 				};
-				if modBranchConfigs.IsWorld("BioXResearch") then
+				if modBranchConfigurations.IsWorld("BioXResearch") then
 					gateBanditNpcClass:SetCFrame(playerClass:GetCFrame());
 				end
 				
@@ -102,7 +102,7 @@ return function(CutsceneSequence)
 
 
 	-- MARK: BanditsRecruitment
-	elseif modBranchConfigs.IsWorld("BanditsRecruitment") then
+	elseif modBranchConfigurations.IsWorld("BanditsRecruitment") then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();

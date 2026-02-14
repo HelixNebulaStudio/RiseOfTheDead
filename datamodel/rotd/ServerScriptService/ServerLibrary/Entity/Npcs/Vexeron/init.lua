@@ -148,70 +148,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
         new.Parent = character;
     end
 
-    local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
 
-    local bodyParts = character:GetChildren();
-    for a=1, #bodyParts do
-        local bodyPart: BasePart = bodyParts[a];
-        if not bodyParts[a]:IsA("BasePart") then continue end;
-
-        if bodyPart.Name:match("Vexeworm") then
-            local newWormModel = Instance.new("Model");
-            newWormModel.Name = bodyPart.Name;
-            newWormModel.Parent = character;
-            bodyPart.Name = "PrimaryPart";
-            bodyPart.Parent = newWormModel;
-            newWormModel.PrimaryPart = bodyPart;
-
-            local destructible: DestructibleInstance = bodyDestructiblesComp:Create(newWormModel.Name, newWormModel);
-            destructible.Properties.DestroyModel = false;
-            local newHealth = isHard and 50000 or 25000;
-            
-            destructible:SetupHealthbar{
-                Size = UDim2.new(1.2, 0, 0.25, 0);
-                Distance = 64;
-                OffsetWorldSpace = Vector3.new(0, 1, 0);
-                ShowLabel = false;
-            };
-            destructible:SetHealthbarEnabled(true);
-
-            local limbHealthComp: HealthComp = destructible.HealthComp;
-            limbHealthComp:SetMaxHealth(newHealth);
-            limbHealthComp:Reset();
-
-            limbHealthComp.OnHealthChanged:Connect(function(newHealth, prevHealth, damageData)
-                if limbHealthComp.IsDead then return end;
-                if newHealth == prevHealth then return end;
-                if damageData.Damage == nil then return end;
-
-                healthComp:TakeDamage(damageData);
-            end)
-
-            destructible.OnDestroy:Connect(function()
-                bodyPart.Color = Color3.fromRGB(50, 50, 50);
-
-                healthComp:TakeDamage(DamageData.new{
-                    Damage = isHard and 100000 or 7500;
-                    DamageBy = limbHealthComp.LastDamagedBy;
-                });
-
-                properties.SpeedRatio = math.clamp(properties.SpeedRatio-0.05, 0.5, 1);
-                
-                modAudio.Play("TicksZombieExplode", bodyPart).PlaybackSpeed = math.random(30,40)/100;
-                modAudio.Play("VexeronPain", bodyPart).PlaybackSpeed = math.random(90,110)/100;
-                modParticleSprinkler:Emit{
-                    Type = 1;
-                    Origin = CFrame.new(bodyPart.Position);
-                    Velocity = Vector3.new(0, 1, 0);
-                    SizeRange = {Min=1; Max=3};
-                    Material = bodyPart.Material;
-                    DespawnTime = 5;
-                    Speed = 60;
-                    Color = bodyPart.Color;
-                };
-            end)
-        end
-    end
 
     local vexeronRemote = Instance.new("RemoteEvent");
     vexeronRemote.Name = "VexeronRemote";
@@ -286,10 +223,77 @@ function npcPackage.Spawned(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local healthComp = npcClass.HealthComp;
     local rootPart = npcClass.RootPart;
+    local character = npcClass.Character;
 
     local isHard = properties.HardMode;
     local bodyVelocity = properties.BodyVelocity;
     local bodyGyro = properties.BodyGyro;
+
+
+    local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
+    local bodyParts = character:GetChildren();
+    for a=1, #bodyParts do
+        local bodyPart: BasePart = bodyParts[a];
+        if not bodyParts[a]:IsA("BasePart") then continue end;
+
+        if bodyPart.Name:match("Vexeworm") then
+            local newWormModel = Instance.new("Model");
+            newWormModel.Name = bodyPart.Name;
+            newWormModel.Parent = character;
+            bodyPart.Name = "PrimaryPart";
+            bodyPart.Parent = newWormModel;
+            newWormModel.PrimaryPart = bodyPart;
+
+            local destructible: DestructibleInstance = bodyDestructiblesComp:Create(newWormModel.Name, newWormModel);
+            destructible.Properties.DestroyModel = false;
+            local newHealth = isHard and 50000 or 25000;
+            
+            destructible:SetupHealthbar{
+                Size = UDim2.new(1.2, 0, 0.25, 0);
+                Distance = 64;
+                OffsetWorldSpace = Vector3.new(0, 1, 0);
+                ShowLabel = false;
+            };
+            destructible:SetHealthbarEnabled(true);
+
+            local limbHealthComp: HealthComp = destructible.HealthComp;
+            limbHealthComp:SetMaxHealth(newHealth);
+            limbHealthComp:Reset();
+
+            limbHealthComp.OnHealthChanged:Connect(function(newHealth, prevHealth, damageData)
+                if limbHealthComp.IsDead then return end;
+                if newHealth == prevHealth then return end;
+                if damageData.Damage == nil then return end;
+
+                healthComp:TakeDamage(damageData);
+            end)
+
+            destructible.OnDestroy:Connect(function()
+                bodyPart.Color = Color3.fromRGB(50, 50, 50);
+
+                healthComp:TakeDamage(DamageData.new{
+                    Damage = isHard and 100000 or 7500;
+                    DamageBy = limbHealthComp.LastDamagedBy;
+                });
+
+                properties.SpeedRatio = math.clamp(properties.SpeedRatio-0.05, 0.5, 1);
+                
+                modAudio.Play("TicksZombieExplode", bodyPart).PlaybackSpeed = math.random(30,40)/100;
+                modAudio.Play("VexeronPain", bodyPart).PlaybackSpeed = math.random(90,110)/100;
+                modParticleSprinkler:Emit{
+                    Type = 1;
+                    Origin = CFrame.new(bodyPart.Position);
+                    Velocity = Vector3.new(0, 1, 0);
+                    SizeRange = {Min=1; Max=3};
+                    Material = bodyPart.Material;
+                    DespawnTime = 5;
+                    Speed = 60;
+                    Color = bodyPart.Color;
+                };
+            end)
+        end
+    end
+
 
     function properties.PointTo(point: Vector3, lerpIntensity: number?)
 		local newFrontCf = CFrame.new(rootPart.Position, point) * CFrame.Angles(-math.pi/2, 0, 0);
@@ -305,7 +309,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
         bodyPart:SetNetworkOwner(nil);
     end
     
-    local spawnPoint = npcClass.SpawnPoint;
+    local spawnPoint = npcClass.SpawnCFrame;
     task.spawn(function() 
         while not healthComp.IsDead do
 			bodyVelocity.P = (isHard and 90 or 50) * properties.SpeedRatio;

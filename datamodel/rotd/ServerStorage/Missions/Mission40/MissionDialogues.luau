@@ -104,10 +104,10 @@ if RunService:IsServer() then
 		
 		--
 		local modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
-		local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+		local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 		local mission42 = modMission:GetMission(player, 42);
-		if mission.ProgressionPoint >= 5 and (mission42 == nil or mission42.ProgressionPoint ~= 1) and not modBranchConfigs.IsWorld("VindictiveTreasure") then
+		if mission.ProgressionPoint >= 5 and (mission42 == nil or mission42.ProgressionPoint ~= 1) and not modBranchConfigurations.IsWorld("VindictiveTreasure") then
 			dialog:AddChoice("vt1_tombs", function(dialog)
 				modGameModeManager:Assign(player, "Raid", "Tombs");
 			end)

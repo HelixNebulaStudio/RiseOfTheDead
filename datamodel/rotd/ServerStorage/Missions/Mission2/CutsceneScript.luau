@@ -6,7 +6,7 @@ local TweenService = game:GetService("TweenService");
 local localPlayer = game.Players.LocalPlayer;
 
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
@@ -20,7 +20,7 @@ if RunService:IsServer() then
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
-	if modBranchConfigs.IsWorld("TheWarehouse") then
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
 		local function onDoorEnter(eventPacket: EventPacket, interactable: InteractableInstance)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -134,7 +134,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigurations.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();

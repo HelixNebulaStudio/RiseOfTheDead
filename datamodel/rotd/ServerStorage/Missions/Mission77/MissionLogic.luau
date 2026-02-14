@@ -4,7 +4,7 @@ local MissionFunctions = {};
 local RunService = game:GetService("RunService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
@@ -15,7 +15,7 @@ if RunService:IsServer() then
 	local modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	if modBranchConfigs.IsWorld("SunkenShip") then
+	if modBranchConfigurations.IsWorld("SunkenShip") then
 		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(event: EventPacket, ...)
 			local player = event.Player;
 			if player == nil then return end;
@@ -81,7 +81,7 @@ if RunService:IsServer() then
 		local player: Player = missionProfile.Player;
 		local profile = shared.modProfile:Get(player);
 
-		if modBranchConfigs.IsWorld("SunkenShip") then
+		if modBranchConfigurations.IsWorld("SunkenShip") then
 			local cleanEnabled = true;
 			if profile.Premium then
 				cleanEnabled = false;
@@ -291,7 +291,7 @@ if RunService:IsServer() then
 		end
 	end
 
-	if modBranchConfigs.IsWorld("TheHarbor") and modBranchConfigs.CurrentBranch.Name == "Dev" then
+	if modBranchConfigurations.IsWorld("TheHarbor") and shared.gameConfig.BranchName == "Dev" then
 		task.spawn(function()
 			Debugger.AwaitShared("modCommandsLibrary");
 	

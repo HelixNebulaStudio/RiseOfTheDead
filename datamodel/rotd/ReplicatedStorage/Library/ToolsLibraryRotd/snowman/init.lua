@@ -2,6 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 --==
 
 local toolPackage = {
@@ -35,14 +36,10 @@ function toolPackage.BuildStructure(prefab: Model, optionalPacket)
 	if player == nil then return end;
 
 	modAudio.Play("Repair", prefab.PrimaryPart);
-	local humanoid = prefab:WaitForChild("Structure");
-	humanoid.Parent = nil;
 	
-	prefab.Name = player.Name.."'s Snowman";
+	prefab.Name = `{player.Name}'s Snowman`;
 	local rootPart = prefab:WaitForChild("root");
 	rootPart.Name = "HumanoidRootPart";
-	
-	humanoid.Parent = prefab;
 	
 	local appearance = player:FindFirstChild("Appearance");
 	local head = prefab:FindFirstChild("Head");
@@ -60,17 +57,8 @@ function toolPackage.BuildStructure(prefab: Model, optionalPacket)
 		head.CollisionGroup = "Debris";
 	end
 	
-	spawn(function()
-		repeat
-			humanoid.Health = humanoid.Health -0.2;
-			shared.modNpcs.attractNpcs(prefab, 64, function(npcClass: NpcClass)
-				local isZombie = npcClass.Humanoid and npcClass.Humanoid.Name == "Zombie";
-				local isBasicEnemy = npcClass.Properties and npcClass.Properties.BasicEnemy == true;
-
-				return isZombie and isBasicEnemy;
-			end);
-		until humanoid.Health <= 0 or not wait(1);
-	end)
+	local destructibleConfig = modDestructibles.createDestructible("Scarecrow");
+	destructibleConfig.Parent = prefab;
 end;
 
 function toolPackage.newClass()

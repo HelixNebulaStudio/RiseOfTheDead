@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
@@ -22,7 +22,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if modBranchConfigs.IsWorld("TheWarehouse") then
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -43,7 +43,7 @@ return function(CutsceneSequence)
 		end)
 
 
-	elseif modBranchConfigs.IsWorld("TheMall") then
+	elseif modBranchConfigurations.IsWorld("TheMall") then
 
 		local npcPrefabs = game.ServerStorage.Prefabs.Npc;
 		local triggerPrefab = script.Parent:WaitForChild("summonTrigger");

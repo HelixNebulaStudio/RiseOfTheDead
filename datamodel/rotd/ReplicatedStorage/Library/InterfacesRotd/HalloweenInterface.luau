@@ -4,7 +4,7 @@ local localPlayer = game.Players.LocalPlayer;
 
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.LeaderboardService);
@@ -57,7 +57,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local cauldronRewardLib = modRewardsLibrary:Find("slaughterfestcauldron");
 	local festRewardLib = modRewardsLibrary:Find(`slaughterfestcandyrecipes{modGlobalVars.Year}`);
 
-	if modBranchConfigs.WorldName == "Slaughterfest" then
+	if modBranchConfigurations.IsWorld("Slaughterfest") then
 
 	end
 
@@ -87,7 +87,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			else
 				mainFrame.Size = UDim2.new(0.7, 0, 0.8, -interface.Properties.TopbarInset.Height-10);
 			end
-			if modBranchConfigs.WorldName == "Slaughterfest" then
+			if modBranchConfigurations.IsWorld("Slaughterfest") then
 				travelButton.Visible = false;
 				
 			else
@@ -106,7 +106,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	interface.Garbage:Tag(travelButton.MouseButton1Click:Connect(function()
 		itemToolTip.Frame.Visible = false;
 		interface:PlayButtonClick();
-		if modBranchConfigs.WorldName == "Slaughterfest" then return end;
+		if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
 		
 		modClientGuis.promptDialogBox({
 			Title=`Join Slaughterfest`;
@@ -796,7 +796,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 		for a=1, #tradeNpcList do
 			local npcInfo = tradeNpcList[a];
-			local worldName = modBranchConfigs.GetWorldDisplayName(npcInfo.World) or "Unknown";
+			local worldName = modBranchConfigurations.GetWorldDisplayName(npcInfo.World) or "Unknown";
 
 			local newListing = offerListingTemplate:Clone();
 			newListing.Name = npcInfo.Id;

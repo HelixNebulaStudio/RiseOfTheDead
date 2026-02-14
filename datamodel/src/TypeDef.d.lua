@@ -92,6 +92,12 @@ declare shared: {
     saferequire: (player: Player, moduleScript: ModuleScript) -> any;
     getI: (path: string) -> Instance?;
 
+    gameConfig: {
+        Config: Configuration;
+        BranchName: string;
+        UseWorldScript: string?;
+    } & anydict;
+
     gameCore: string?;
     coreCall: (class: anydict, key: string, ...any) -> any;
     coreBind: (class: anydict, key: string, func: (...any)->...any) -> any;
@@ -101,6 +107,7 @@ declare shared: {
     Notify: (player: Player | {Player}, message: string, notifyTypes: NOTIFY_TYPE, notifyId: string?, notifySettings: anydict?) -> nil;
 
     -- @game globals
+    ZScript: ZScript;
     EventSignal: EventSignal<>;
     modPlayers: PlayerClasses;
     modProfile: Profiles;
@@ -355,7 +362,7 @@ export type MissionsProfile = {
 --MARK: Storage
 export type Storages = {
     -- @static
-    new: (id: string, presetId: string, owner: Player?) -> Storage;
+    new: (id: string, presetId: string, owner: Player?, name: string?) -> Storage;
     get: (sid: string, player: Player?) -> Storage?;
 
     openStorage: (storageId: string, params: {
@@ -539,6 +546,7 @@ export type PlayerClass = CharacterClass & {
 
     IsSwimming: boolean;
 
+    CharacterComp: anydict;
     CharacterVars: anydict;
     Configurations: ConfigVariable;
     Properties: PropertiesVariable<{
@@ -598,6 +606,7 @@ export type CharacterClass = {
     HumanoidType: HUMANOID_TYPE<string>;
     RootPart: BasePart;
     Head: BasePart;
+    PositionalOctreeNode: OctreeNode<NpcClass>;
     
     Configurations: ConfigVariable;
     Properties: anydict;
@@ -620,7 +629,7 @@ export type CharacterClass = {
     Initialize: () -> nil;
 
     FireAllModifiersBind: (CharacterClass, bindName: string, ...any) -> nil;
-};
+} & EntityClass;
 
 --MARK: Entity
 export type ObjectEntity = {
@@ -663,12 +672,13 @@ export type StatusClassInstance = {
     -- @properties
     Uid: string;
     StatusComp: StatusComp;
-    StatusOwner: ComponentOwner;
+    StatusOwner: EntityClass;
 
     Garbage: GarbageHandler;
     
     Visible: boolean;
     IsExpired: boolean;
+    IsReset: boolean;
     Values: anydict;
 
     Expires: number?;
@@ -696,6 +706,7 @@ export type NpcClasses = {
     -- @static
     ActiveNpcClasses: {NpcClass};
     NpcBaseConstructors: anydict;
+    Octree: Octree<NpcClass>;
 
     getNpcPackage: (npcName: string) -> anydict;
     getByModel: (Model) -> NpcClass?;
@@ -748,6 +759,10 @@ export type NpcMoveComponent = {
     LinearVelocity: LinearVelocity;
     AlignOrientation: AlignOrientation;
 
+    TargetPart: BasePart?;
+    TargetPoint: Vector3?;
+    TargetNormal: Vector3?;
+
     -- @methods
     Init: anyfunc;
     HeadTrack: (NpcMoveComponent, part: BasePart?, expireTime: number?) -> nil;
@@ -771,7 +786,7 @@ export type NpcMoveComponent = {
 export type NpcClass = CharacterClass & {
     -- @properties
     Id: number;
-    SpawnPoint: CFrame;
+    SpawnCFrame: CFrame;
     IsReady: boolean;
 
     Player: Player?;
@@ -792,11 +807,13 @@ export type NpcClass = CharacterClass & {
     AnimationController: AnimationController;
     Interactable: ModuleScript?;
     Remote: UnreliableRemoteEvent;
+    LastRespawnTick: number?;
     
     -- @methods
     Setup: (NpcClass, baseNpcModel: Model, npcModel: Model) -> nil;
     Destroy: (NpcClass) -> nil;
     TeleportHide: (NpcClass) -> nil;
+    Respawn: (NpcClass, cframe: CFrame?) -> nil;
 
     AddComponent: (NpcClass, component: string | ModuleScript) -> nil;
     GetComponent: (NpcClass, componentName: string) -> any;
@@ -899,6 +916,7 @@ export type InteractableInstance = {
 
     Label: string?;
     Animation: string?;
+    Sound: string?;
 
     -- @methods
     Sync: (InteractableInstance, players: {Player}?, data: anydict?) -> nil;
@@ -979,6 +997,7 @@ export type Interface = {
     }, newButtonTemplate: GuiObject?) -> DropdownList;
 
     -- @properties;
+    ActiveScale: number;
     IsDestroyed: boolean;
     ActiveLayerBoolString: string?;
     Script: Script;
@@ -1430,13 +1449,18 @@ export type DestructibleInstance = {
     Id: string?;
     Name: string;
     Model: Model;
+    RootPart: BasePart;
     Package: anydict;
+    IsDestroyed: boolean;
 
     Enabled: boolean;
+    BroadcastHealth: boolean;
 
     HealthComp: HealthComp;
     StatusComp: StatusComp;
+    Garbage: GarbageHandler;
 
+    Configurations: ConfigVariable;
     Properties: PropertiesVariable<anydict>;
     
     NetworkOwners: {Player};
@@ -1454,11 +1478,12 @@ export type DestructibleInstance = {
         OffsetWorldSpace: Vector3?;
     }) -> nil;
     SetHealthbarEnabled: (DestructibleInstance, value: boolean) -> nil;
+    Destroy: (DestructibleInstance) -> nil;
 
     -- @signals
     OnDestroy: EventSignal<any>;
     OnEnabledChanged: EventSignal<boolean>;
-}
+} & EntityClass;
 
 --MARK: ArcTracer
 export type ArcTracer = {
@@ -1546,6 +1571,7 @@ export type Octree<T> = {
     GetAllNodes: (Octree<T>) -> {OctreeNode<T>};
     KNearestNeighborsSearch: (Octree<T>, position: Vector3, searchCount: number, radius: number) -> ({T}, {number});
     RadiusSearch: (Octree<T>, position: Vector3, radius: number) -> ({T}, {number});
+    GetFurthestNodeFromPoints: (Octree<T>, points: {Vector3}, filterFunc: ((T) -> boolean)?) -> (T?, number?);
 };
 
 --MARK: OctreeNode
@@ -1641,17 +1667,19 @@ export type RadialImage = {
 --
 --
 --
---MARK: ComponentOwner
-export type ComponentOwner = {
-    ClassName: string;
-    Script: Script?;
+--MARK: EntityClass
+export type EntityClass = {
+    ClassName: "PlayerClass" | "NpcClass" | "Destructible";
+    Config: Configuration?;
 
-    HealthComp: HealthComp?;
+    RootPart: BasePart;
+
+    HealthComp: HealthComp;
     StatusComp: StatusComp?;
     
     Character: Model?;
     Model: Model?;
-} & anydict;
+};
 
 --MARK: DamageData
 type damageData = {
@@ -1764,6 +1792,8 @@ export type NpcTargetData = {
 
     LastAddedTick: number;
     RemovedTick: number;
+
+    TargetPart: BasePart;
 };
 
 --MARK: -- Components
@@ -1781,7 +1811,7 @@ export type HealthComp = {
 
     -- @properties
     Id: string;
-    CompOwner: ComponentOwner;
+    CompOwner: EntityClass;
     IsDead: boolean;
     
     CurHealth: number;
@@ -1814,7 +1844,7 @@ export type HealthComp = {
     SetMaxArmor: (HealthComp, value: number, reason: anydict?) -> nil;
    
     SetCanBeHurtBy: (HealthComp, boolString: string?) -> nil;
-    CheckCanBeHurtBy: ((HealthComp, {string})->boolean)?;
+    CheckCanBeHurtBy: ((HealthComp, {string})->boolean);
 
     BindCannotTakeDamage: (HealthComp, attackerCharacter: CharacterClass, hitInfo: HitInfo) -> nil;
 
@@ -1831,7 +1861,7 @@ export type StatusComp = {
 
     -- @properties
     Id: string;
-    CompOwner: ComponentOwner;
+    CompOwner: EntityClass;
     List: {[string]: StatusClassInstance};
     Remote: RemoteEvent;
     ProcessNextStep: boolean;
@@ -1843,7 +1873,8 @@ export type StatusComp = {
     GetOrDefault: (StatusComp, uid: string, value: anydict?) -> StatusClassInstance;
 
     Process: (StatusComp, loopFunc: ((uid: string, statusClass: StatusClassInstance, processData: anydict)->nil)?, fireOnProcess: boolean?) -> nil;
-    
+    Reset: (StatusComp) -> nil;
+
     Sync: (StatusComp, uid: string, players: any) -> nil;
 
     -- @signals
@@ -1853,7 +1884,7 @@ export type StatusComp = {
 --MARK: WieldComp
 export type WieldComp = {
     -- @properties
-    CompOwner: ComponentOwner;
+    CompOwner: EntityClass;
     
     Controls: {
         Mouse1Down: boolean;
@@ -1887,3 +1918,8 @@ export type WieldComp = {
 
     InvokeToolAction: (WieldComp, actionName: string, ...any) -> ...any;
 }
+
+--MARK: ZScript
+export type ZScript = {
+    findZInstance: (name: string) -> Instance?;
+};

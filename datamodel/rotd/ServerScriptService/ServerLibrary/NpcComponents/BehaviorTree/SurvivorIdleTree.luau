@@ -16,6 +16,14 @@ local treePackage = {
     SharedInteractablesInUse = {};
 };
 
+function treePackage.setup(npcClass: NpcClass)
+    npcClass.Properties.OnChanged:Connect(function(k, v, ov)
+        if k == "TaskAnimationId" and v ~= ov then
+            npcClass.StopAnimation(ov);
+        end
+    end)
+end
+
 function treePackage.SurvivorCombatTree(npcClass: NpcClass)
     if npcClass.Humanoid.WalkSpeed == 5 then
         npcClass.Move:SetMoveSpeed("remove", "walk");
@@ -68,7 +76,7 @@ function treePackage.WalkToRest(npcClass: NpcClass)
     local cache = properties.Cache;
 
     local idleData = properties.MapIdleTable.Data;
-    local restPoint = idleData.RestPoint or npcClass.SpawnPoint;
+    local restPoint = idleData.RestPoint or npcClass.SpawnCFrame;
 
     if idleData.RestingSeatName then
         local seatPart = workspace.Environment:FindFirstChild(idleData.RestingSeatName);
@@ -131,6 +139,7 @@ function treePackage.HasIdleTask(npcClass: NpcClass)
     local rollTable = {};
     local totalChance = 0;
     for _, config in pairs(CollectionService:GetTagged("Interactable")) do
+        if not workspace:IsAncestorOf(config) then continue end;
         local id = config:GetAttribute("_Id");
         if id == nil or mapIdleTable[id] == nil then continue end;
         if cache.prevTaskConfig == config then continue end;
@@ -252,6 +261,8 @@ function treePackage.WalkToIdleTask(npcClass: NpcClass)
 
                 npcClass.Chat(npcClass.Player or game.Players:GetPlayers(), sayMsg);
             end
+
+            properties.TaskAnimationId = nil;
         end
 
         if idleTask.InteractTime < 0 then
@@ -262,6 +273,7 @@ function treePackage.WalkToIdleTask(npcClass: NpcClass)
 
     if interactable and interactable.Animation then
         npcClass.PlayAnimation(interactable.Animation);
+        properties.TaskAnimationId = interactable.Animation;
     end
 end
 

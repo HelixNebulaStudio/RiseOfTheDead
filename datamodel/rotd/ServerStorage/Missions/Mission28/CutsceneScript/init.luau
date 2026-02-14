@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
@@ -19,7 +19,7 @@ if RunService:IsServer() then
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modDialogues = shared.require(game.ServerScriptService.ServerLibrary.DialogueSave);
 	
-	if modBranchConfigs.IsWorld("TheUnderground") then
+	if modBranchConfigurations.IsWorld("TheUnderground") then
 		shared.modEventService:OnInvoked("Generic_BindTrigger", function(event: EventPacket, ...) 
 			local player = event.Player;
 			if player == nil then return end;
@@ -99,7 +99,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheUnderground") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigurations.IsWorld("TheUnderground") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();

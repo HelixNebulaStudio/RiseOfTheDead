@@ -61,7 +61,7 @@ if RunService:IsServer() then
 	-- MARK: DialogueHandler
 	Dialogues.DialogueHandler = function(player, dialog, data)
 		local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
-		local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+		local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 		local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 		local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 		local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
@@ -72,7 +72,7 @@ if RunService:IsServer() then
 
 		local mysteriousEngineerTag = '<b><font size="16" color="#ddcbb2">Mysterious Engineer</font></b>: ';
 
-		if modBranchConfigs.IsWorld("SunkenShip") then 
+		if modBranchConfigurations.IsWorld("SunkenShip") then 
 			if modEvents:GetEvent(player, "mysteriousEngineerIntro") == nil then
 				modEvents:NewEvent(player, {Id="mysteriousEngineerIntro"});
 				

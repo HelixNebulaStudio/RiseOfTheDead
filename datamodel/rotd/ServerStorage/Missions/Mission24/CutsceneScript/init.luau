@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
@@ -15,40 +15,42 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	shared.modEventService:OnInvoked("Interactables_BindCollectibleInteract", function(eventPacket: EventPacket, ...)
-		local player: Player? = eventPacket.Player;
-		if player == nil then return end;
+	if modBranchConfigurations.IsWorld("TheUnderground") then
+		shared.modEventService:OnInvoked("Interactables_BindCollectibleInteract", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
 
-		local interactable: InteractableInstance = ...;
+			local interactable: InteractableInstance = ...;
 
-		if interactable.Id == "rb" then
+			if interactable.Id == "rb" then
+				if modMission:Progress(player, MISSION_ID) then
+					modMission:Progress(player, MISSION_ID, function(mission)
+						if mission.ProgressionPoint <= 2 then
+							mission.ProgressionPoint = 3;
+						end;
+					end)
+				end
+			end
+		
+		end)
+
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
+			local id: string, interactable: InteractableInstance = ...;
+			if id ~= "MissingInAction_BanditZombie" then return end;
+
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+
 			if modMission:Progress(player, MISSION_ID) then
 				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint <= 2 then
-						mission.ProgressionPoint = 3;
+					if mission.ProgressionPoint == 4 then
+						mission.ProgressionPoint = 5; 
 					end;
 				end)
 			end
-		end
-	
-	end)
 
-	shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
-		local id: string, interactable: InteractableInstance = ...;
-		if id ~= "MissingInAction_BanditZombie" then return end;
-
-		local player: Player? = eventPacket.Player;
-		if player == nil then return end;
-
-		if modMission:Progress(player, MISSION_ID) then
-			modMission:Progress(player, MISSION_ID, function(mission)
-				if mission.ProgressionPoint == 4 then
-					mission.ProgressionPoint = 5; 
-				end;
-			end)
-		end
-
-	end)
+		end)
+	end
 
 else
 	modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
@@ -57,7 +59,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheUnderground") then return end;
+	if not modBranchConfigurations.IsWorld("TheUnderground") then return end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();

@@ -7,7 +7,7 @@ local HttpService = game:GetService("HttpService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modImageProgressBarUI = shared.require(game.ReplicatedStorage.Library.UI.ImageProgressBarUI);
 local modGuiObjectTween = shared.require(game.ReplicatedStorage.Library.UI.GuiObjectTween);
@@ -53,7 +53,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     creditsFrame.Parent = interface.ScreenGui;
 
     local creditsWindow: InterfaceWindow = interface:NewWindow("CreditsWindow", creditsFrame);
-    creditsWindow.CompactFullscreen = true;
+    --creditsWindow.CompactFullscreen = true;
     creditsWindow.CloseWithInteract = true;
     creditsWindow:SetClosePosition(UDim2.new(0.5, 0, -0.5, 0));
 
@@ -159,7 +159,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     --== Credits Window
 
 
-    if not (modBranchConfigs.WorldName == "MainMenu" or modBranchConfigs.WorldName == "BioXResearch") then return end;
+    if not (modBranchConfigurations.IsWorld("MainMenu") or modBranchConfigurations.IsWorld("BioXResearch")) then return end;
     local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
 	local enteredCampaign = false;
 
@@ -178,7 +178,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local menuWindow: InterfaceWindow = interface:NewWindow("MainMenu", frame);
     menuWindow.IgnoreHideAll = true;
-    menuWindow.CompactFullscreen = true;
+    --menuWindow.CompactFullscreen = true;
     menuWindow.ReleaseMouse = true;
     menuWindow.DisableHotKeysHint = true;
     menuWindow.BoolStringWhenActive = {String="!CharacterHud"; Priority=6;};

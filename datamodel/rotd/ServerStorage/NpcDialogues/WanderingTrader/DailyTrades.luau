@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 --== Variables;
 local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modGoldShopLibrary = shared.require(game.ReplicatedStorage.Library.GoldShopLibrary);
 local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -41,7 +41,7 @@ for a=1, #goldItemList do
 end
 
 
-local tradeCooldown = modBranchConfigs.CurrentBranch.Name == "Dev" and 10 or 3600;
+local tradeCooldown = shared.gameConfig.BranchName == "Dev" and 10 or 3600;
 return function(player, dialog, data)
 	local profile = shared.modProfile:Get(player);
 	local playerSave = profile:GetActiveSave();
@@ -53,7 +53,7 @@ return function(player, dialog, data)
 	local traderMem = modDatabaseService:GetDatabase(npcName);
 	
 	
-	local weekOfYear = modBranchConfigs.CurrentBranch.Name == "Dev" and os.date("%M") or os.date("%W");
+	local weekOfYear = shared.gameConfig.BranchName == "Dev" and os.date("%M") or os.date("%W");
 	local dayOfYear = workspace:GetAttribute("DayOfYear");
 	
 	local buyIndex, sellIndex = {}, {};
@@ -147,7 +147,7 @@ return function(player, dialog, data)
 			if traderGold >= goldPrice then
 				
 				--Rigged to support the poor;
-				if traderProfile.Gold >= 15000 and modBranchConfigs.CurrentBranch.Name ~= "Dev" then
+				if traderProfile.Gold >= 15000 and shared.gameConfig.BranchName ~= "Dev" then
 					local mappedChance = modMath.MapNum(traderProfile.Gold, 19000, 50000, 1, 0.1);
 					Debugger:Warn("Roll dice", luckTable.HasGold, "mappedChance", mappedChance);
 					if luckTable.HasGold > mappedChance then

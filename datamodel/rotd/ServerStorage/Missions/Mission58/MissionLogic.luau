@@ -4,7 +4,7 @@ local MissionLogic = {};
 local RunService = game:GetService("RunService");
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local MISSION_ID = 58;
@@ -24,7 +24,7 @@ if RunService:IsServer() then
 
 				Debugger:Log("Update patrick class")
 
-				if modBranchConfigs.IsWorld("TheMall") then
+				if modBranchConfigurations.IsWorld("TheMall") then
 
 					local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
 					if patrickPrefab then
@@ -35,7 +35,7 @@ if RunService:IsServer() then
 				end
 
 			else
-				if modBranchConfigs.IsWorld("TheMall") then
+				if modBranchConfigurations.IsWorld("TheMall") then
 					local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
 					if patrickPrefab then
 						modReplicationManager.SetClientParent(player, patrickPrefab, workspace.Entity);
@@ -43,7 +43,7 @@ if RunService:IsServer() then
 				end
 
 				if mission.Type == 1 then -- OnActive
-					if modBranchConfigs.IsWorld("DoubleCross") then
+					if modBranchConfigurations.IsWorld("DoubleCross") then
 
 					else
 						if mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 6 then
@@ -66,13 +66,13 @@ if RunService:IsServer() then
 			end
 
 			if mission.ProgressionPoint >= 17 then
-				if modBranchConfigs.IsWorld("Safehome") then
+				if modBranchConfigurations.IsWorld("Safehome") then
 					local patrick = modNpcProfileLibrary:Find("Patrick");
 					patrick.Class="Survivor";
 					patrick.World="Safehome";
 
 					Debugger:Log("Update patrick class")
-				elseif modBranchConfigs.IsWorld("TheMall") then
+				elseif modBranchConfigurations.IsWorld("TheMall") then
 
 					local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
 					if patrickPrefab then
@@ -99,7 +99,7 @@ else
 
 			Debugger:Log("Client>> Update patrick class");
 			
-			if modBranchConfigs.IsWorld("TheMall") then
+			if modBranchConfigurations.IsWorld("TheMall") then
 				local patrickPrefab;
 				repeat
 					patrickPrefab = workspace.Entity:FindFirstChild("Patrick");

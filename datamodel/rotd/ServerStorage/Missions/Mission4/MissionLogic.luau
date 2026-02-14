@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
@@ -17,7 +17,7 @@ function MissionLogic.onRequire()
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
-	if not modBranchConfigs.IsWorld("TheWarehouse") then return; end;
+	if not modBranchConfigurations.IsWorld("TheWarehouse") then return; end;
 	
 	shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
 		local npcClass: NpcClass = ...;

@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modDialogueService = shared.require(game.ReplicatedStorage.Library.DialogueService);
 
 --=
@@ -389,7 +389,7 @@ if RunService:IsServer() then
 	
 end
 
-if modBranchConfigs.IsWorld("MedicalBreakthrough") then
+if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 	
 	Dialogues.Bandit = {};
 	-- !outline: Bandit Handler

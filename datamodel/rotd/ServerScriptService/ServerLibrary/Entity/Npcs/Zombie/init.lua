@@ -13,6 +13,7 @@ local npcPackage = {
     };
     
     Properties = {
+        PositionOctrees = {"Zombie"};
         BasicEnemy = true;
         IsHostile = true;
 

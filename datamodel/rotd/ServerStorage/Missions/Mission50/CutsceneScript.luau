@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 --== Variables;
@@ -32,7 +32,7 @@ if RunService:IsServer() then
         end
     end)
 
-	if modBranchConfigs.IsWorld("EasterButchery") then
+	if modBranchConfigurations.IsWorld("EasterButchery") then
 		shared.modEventService:OnInvoked("Generic_BindTrigger", function(event: EventPacket, ...)
 			local player: Player? = event.Player;
 			if player == nil then return end;
@@ -58,7 +58,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("EasterButchery") then
+	if not modBranchConfigurations.IsWorld("EasterButchery") then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();

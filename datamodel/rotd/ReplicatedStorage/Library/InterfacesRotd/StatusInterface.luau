@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService");
 local localPlayer = game.Players.LocalPlayer;
 
 local modStatusLibrary = shared.require(game.ReplicatedStorage.Library.StatusLibrary);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 
@@ -72,7 +72,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				status.Info.Visible = false;
 			end)
 			status.Button.MouseButton1Click:Connect(function()
-				if modBranchConfigs.CurrentBranch.Name == "Dev" then
+				if shared.gameConfig.BranchName == "Dev" then
 					Debugger:Warn("Status id:",statusId,"table:", statusClass);
 				end
 			end)

@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 
@@ -17,31 +17,33 @@ if RunService:IsServer() then
 	modDialogues = shared.require(game.ServerScriptService.ServerLibrary.DialogueSave);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 
-	shared.modEventService:OnInvoked("Interactables_BindTrigger", function(eventPacket: EventPacket, ...)
-		local player: Player? = eventPacket.Player;
-		if player == nil then return end;
+	if modBranchConfigurations.IsWorld("TheResidentials") then
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
 
-		local interactable: InteractableInstance = ...;
-		if interactable == nil then return end;
-			
-		local triggerId = interactable.Id;
+			local interactable: InteractableInstance = ...;
+			if interactable == nil then return end;
+				
+			local triggerId = interactable.Id;
 
-		if triggerId == "jlLettuce1" or triggerId == "jlLettuce2" or triggerId == "jlLettuce3" then
-			local event = modEvents:GetEvent(player, triggerId);
-			local lastEventTime = event and event.Time;
+			if triggerId == "jlLettuce1" or triggerId == "jlLettuce2" or triggerId == "jlLettuce3" then
+				local event = modEvents:GetEvent(player, triggerId);
+				local lastEventTime = event and event.Time;
 
-			if lastEventTime == nil or modSyncTime.GetTime() >= lastEventTime then
-				modEvents:NewEvent(player, {Id=triggerId; Time=modSyncTime.GetTime()+600;});
-				shared.Notify(player, "The plants have been watered.", "Reward");
-				if modMission:Progress(player, MISSION_ID) then
-					modMission:Progress(player, MISSION_ID, function(mission)
-						mission.ObjectivesCompleted[triggerId] = true;
-					end)
+				if lastEventTime == nil or modSyncTime.GetTime() >= lastEventTime then
+					modEvents:NewEvent(player, {Id=triggerId; Time=modSyncTime.GetTime()+600;});
+					shared.Notify(player, "The plants have been watered.", "Reward");
+					if modMission:Progress(player, MISSION_ID) then
+						modMission:Progress(player, MISSION_ID, function(mission)
+							mission.ObjectivesCompleted[triggerId] = true;
+						end)
+					end
 				end
-			end
 
-		end
-	end);
+			end
+		end);
+	end
 
 	cutsceneAssets = script.Parent:WaitForChild("CutsceneAssets");
 	plantInteractables = cutsceneAssets:WaitForChild("plantInteractables");
@@ -53,7 +55,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigs.IsWorld("TheResidentials") then 
+	if not modBranchConfigurations.IsWorld("TheResidentials") then 
 		Debugger:Warn("Invalid place for cutscene ("..script.Name..")");
 		return;
 	end;

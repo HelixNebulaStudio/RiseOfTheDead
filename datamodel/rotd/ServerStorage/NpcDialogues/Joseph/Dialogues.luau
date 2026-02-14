@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local Dialogues = {};
 --==
@@ -35,7 +35,7 @@ if RunService:IsServer() then
 		local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 		
-		if modBranchConfigs.IsWorld("TheInvestigation") then return end;
+		if modBranchConfigurations.IsWorld("TheInvestigation") then return end;
 
 		dialog:AddChoice("heal_request", function()
 			if not dialog.InRange() then return end;

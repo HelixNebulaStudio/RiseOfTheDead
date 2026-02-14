@@ -6,10 +6,13 @@ Objective.__index = Objective;
 local CollectionService = game:GetService("CollectionService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 
 local templatePrefab = script:WaitForChild("DestructibleGenerator");
 
 Objective.Title = "Protect Generator";
+Objective.Description = "Protect the generators";
+
 Objective.Controller = nil;
 --==
 
@@ -56,29 +59,42 @@ function Objective:Begin()
 		local newPrefab = templatePrefab:Clone();
 		newPrefab:PivotTo(spawnCf);
 		
-		newPrefab.Name = "Generator ".. nameTags[a];
+		newPrefab.Name = `Generator {nameTags[a]}`;
 		
 		newPrefab:SetAttribute("EntityHudHealth", true);
 		newPrefab.Parent = workspace.Entity;
 		
 		self.PrefabsSpawned = self.PrefabsSpawned +1;
 		table.insert(Objective.Prefabs, newPrefab);
-		
-		local humanoid = newPrefab:WaitForChild("Structure");
-		humanoid.MaxHealth = 1000 * (self.Controller.IsHard and 10 or 1);
-		humanoid.Health = humanoid.MaxHealth;
-		
-		local destructible = shared.require(newPrefab:WaitForChild("Destructible"));
+			
+		local destructibleConfig = modDestructibles.createDestructible("Scarecrow");
+		destructibleConfig:SetAttribute("_AttractRange", 999);
+		destructibleConfig:SetAttribute("_ExpiringDamageTick", false);
+		destructibleConfig.Parent = newPrefab;
 
-		function destructible:OnDestroy()
-			game.Debris:AddItem(self.Prefab, 5);
+		local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
+		destructible.BroadcastHealth = true;
+		destructible.HealthComp:SetCanBeHurtBy("!Player&!Human");
+		destructible.HealthComp:SetMaxHealth(1000 * (self.Controller.IsHard and 10 or 1));
+		destructible.HealthComp:SetMaxArmor(100);
+		destructible.HealthComp:Reset();
+
+		destructible:SetupHealthbar{
+			Size = UDim2.new(4, 0, 1, 0);
+			Distance = 128;
+			OffsetWorldSpace = Vector3.new(0, 3, 0);
+			ShowLabel = true;
+		};
+
+		destructible.OnDestroy:Connect(function() 
+			local destroyPos = destructible.Model:GetPivot().Position;
 			for a=#Objective.Prefabs, 1, -1 do
 				if Objective.Prefabs[a] == newPrefab then
 					table.remove(Objective.Prefabs, a);
 					break;
 				end
 			end
-			
+
 			Debugger:Warn("generator destroyed", #Objective.Prefabs, "remaining");
 
 			shared.Notify(game.Players:GetPlayers(), "A generator has been destroyed!", "Negative");
@@ -90,25 +106,27 @@ function Objective:Begin()
 			ex.BlastRadius = 16;
 			ex.DestroyJointRadiusPercent = 0;
 			ex.BlastPressure = 0;
-			ex.Position = self.Prefab.PrimaryPart.Position;
-			
-			for _, obj in pairs(self.Prefab:GetDescendants()) do
-				if obj:IsA("BasePart") then
-					obj.Anchored = false;
-					obj.CanCollide = true;
-					obj:ApplyImpulse(Vector3.new(math.random(-50, 50), 20, math.random(-50, 50))*10);
-
-				end
-			end
-		end
+			ex.Position = destroyPos;
+			ex.Parent = workspace;
+		end)
 		
 		task.spawn(function()
 			while self.Active do
 				task.wait(1);
 
-				shared.modNpcs.attractNpcs(newPrefab, 256, function(npcClass: NpcClass)
-					return npcClass.Humanoid and npcClass.Humanoid.Name == "Zombie";
-				end);
+				shared.modNpcs.listNpcClasses(function(npcClass)
+					if not destructible.HealthComp:CanTakeDamageFrom(npcClass) then return end;
+					if npcClass.HealthComp.IsDead then return end;
+
+					local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+					if targetHandlerComp then
+						targetHandlerComp:AddTarget(destructible.Model, destructible.HealthComp);
+					end
+
+					npcClass.OnThink:Fire();
+
+					return false; -- no need to return list;
+				end)
 			end
 		end)
 	end
@@ -147,10 +165,11 @@ function Objective:End()
 	
 	local prefabDestroyed = self.PrefabsSpawned - #Objective.Prefabs;
 	if prefabDestroyed > 0 then
-		shared.Notify(game.Players:GetPlayers(), 
-			(#Objective.Prefabs <= 0 and "All" or prefabDestroyed) .." generators were destroyed.\nBlackout will be in effect for ".. prefabDestroyed .." waves, disrupting senses."
-			, "Negative");
-			
+		shared.Notify(game.Players:GetPlayers(),
+			`{#Objective.Prefabs <= 0 and "All" or prefabDestroyed} generators were destroyed.\nBlackout will be in effect for {prefabDestroyed} waves, disrupting senses.`, 
+			"Negative"
+		);
+
 		modAudio.Play("LightsOff", workspace);
 
 		for _, lightPart in pairs(CollectionService:GetTagged("LightSourcePart")) do
@@ -167,11 +186,11 @@ function Objective:End()
 		end
 
 		self.Controller:Schedule({
-			Id="Blackout";
-			EndWave=self.Controller.Wave + prefabDestroyed;
+			Id = "Blackout";
+			EndWave = self.Controller.Wave + prefabDestroyed;
 
-			Modifier={Id="Blackout"; Value=prefabDestroyed;};
-			Task=function(job)
+			Modifier = {Id="Blackout"; Value=prefabDestroyed;};
+			Task = function(job)
 				Debugger:Log("Blackout Task");
 				for _, lightPart in pairs(CollectionService:GetTagged("LightSourcePart")) do
 					if lightPart:IsA("BasePart") and lightPart.Material == Enum.Material.Plastic then
@@ -187,7 +206,7 @@ function Objective:End()
 				end
 				shared.Notify(game.Players:GetPlayers(), "[Blackout] is no longer in effect.", "Inform");
 			end;
-			Tick=function(job)
+			Tick = function(job)
 				local wavesLeft = job.EndWave - self.Controller.Wave;
 				if wavesLeft <= 0 then return end;
 

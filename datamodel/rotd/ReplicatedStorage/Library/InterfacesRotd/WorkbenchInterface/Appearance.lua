@@ -5,7 +5,7 @@ local UserInputService = game:GetService("UserInputService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local modColorsLibrary = shared.require(game.ReplicatedStorage.Library.ColorsLibrary);
@@ -134,7 +134,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						isUnlocked = true;
 					end
 					
-					if unlockItemLib.Hidden ~= true or modBranchConfigs.CurrentBranch.Name == "Dev" or localPlayer.UserId == 16170943 then
+					if unlockItemLib.Hidden ~= true or shared.gameConfig.BranchName == "Dev" or localPlayer.UserId == 16170943 then
 						-- MARK: New UnlockableButton 
 						local unlockButton = unlockButtonTemplate:Clone();
 						local txrLabel = unlockButton:WaitForChild("TextureLabel");
@@ -196,7 +196,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 							setCharacterAccessories(ItemValues.ActiveSkin);
 						end)
 						
-						if localPlayer.UserId == 16170943 or modBranchConfigs.CurrentBranch.Name == "Dev" then
+						if localPlayer.UserId == 16170943 or shared.gameConfig.BranchName == "Dev" then
 							unlockButton.MouseButton2Click:Connect(function()
 								interface:PlayButtonClick();
 								
@@ -326,7 +326,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			local sortedAppearLib = {};
 			for _, weaponPart in pairs(prefab:GetChildren()) do
 				if not weaponPart:IsA("BasePart") then continue end
-				if modBranchConfigs.CurrentBranch.Name ~= "Dev" and weaponPart:GetAttribute("WorkbenchIgnore") == true then continue end;
+				if shared.gameConfig.BranchName ~= "Dev" and weaponPart:GetAttribute("WorkbenchIgnore") == true then continue end;
 				table.insert(sortedAppearLib, weaponPart.Name);
 			end
 			table.sort(sortedAppearLib, function(a, b) return a:lower() < b:lower() end);
@@ -656,7 +656,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						end
 						
 						-- ToggleVisibility
-						if true then--partData.ToggleVisibility == true or modBranchConfigs.CurrentBranch.Name == "Dev" then
+						if true then--partData.ToggleVisibility == true or shared.gameConfig.BranchName == "Dev" then
 							do
 								local styleButton = styleButtonTemplate:Clone();
 								local txrLabel = styleButton:WaitForChild("TextureLabel");

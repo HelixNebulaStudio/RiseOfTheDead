@@ -9,7 +9,7 @@ local localPlayer = game.Players.LocalPlayer;
 
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -424,7 +424,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             debounce = true;
 
             interface:PlayButtonClick();
-            if modBranchConfigs.CurrentBranch.Name == "Live" or RunService:IsStudio() or not productLib.Disabled or modGlobalVars.IsCreator(localPlayer) or localPlayer.UserId == productLib.CreatorId then
+            
+			local missionData = modData:GetMission(1);
+            if missionData == nil or missionData.Type ~= 3 then
+                modClientGuis.promptWarning("Please complete the first mission of the campaign before using the Gold Shop..");
+                debounce = false;
+                return;
+            end
+
+            if shared.gameConfig.BranchName == "Live" or RunService:IsStudio() or not productLib.Disabled or modGlobalVars.IsCreator(localPlayer) or localPlayer.UserId == productLib.CreatorId then
                 if productLib.Type == "GamePass" then
                     MarketplaceService:PromptGamePassPurchase(localPlayer, productLib.Id);
                     
@@ -656,7 +664,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local productInfo = lib.Product;
 
             if lib.LoadLimited then
-                if modBranchConfigs.CurrentBranch.Name == "Dev" and not RunService:IsStudio() then
+                if shared.gameConfig.BranchName == "Dev" and not RunService:IsStudio() then
                     continue;
                 end
                 task.spawn(fetchProductStock);
@@ -891,7 +899,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local itemTags = itemLib and modItemsLibrary:GetTags(productInfo.ItemId) or {};
 
             if lib.LoadLimited then
-                if modBranchConfigs.CurrentBranch.Name == "Dev" and not RunService:IsStudio() then
+                if shared.gameConfig.BranchName == "Dev" and not RunService:IsStudio() then
                     continue;
                 end
                 task.spawn(fetchProductStock);
@@ -1088,7 +1096,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     backButton.NextSelectionRight = rScrollFrame;
     backButton.MouseButton1Click:Connect(backClick)
     backButton.MouseMoved:Connect(function()
-        backButton.buttonImage.ImageColor3 = modBranchConfigs.CurrentBranch.Color;
+        backButton.buttonImage.ImageColor3 = interface.Colors.Branch;
     end)
     backButton.MouseLeave:Connect(function()
         backButton.buttonImage.ImageColor3 = Color3.fromRGB(255,255,255);

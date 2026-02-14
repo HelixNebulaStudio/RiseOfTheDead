@@ -26,12 +26,12 @@ function treePackage.HasEnemy(npcClass: NpcClass)
 
     local curServerTime = workspace:GetServerTimeNow();
 
-    local enemyTargetData = targetHandlerComp:MatchFirstTarget(function(targetData)
+    local enemyTargetData = targetHandlerComp:MatchFirstTarget(function(targetData: NpcTargetData)
         if targetData.HealthComp == nil then return end;
-        local targetCharacterClass: CharacterClass = targetData.HealthComp.CompOwner;
+        local targetEntityClass: EntityClass = targetData.HealthComp.CompOwner;
 
-        if targetCharacterClass.ClassName == "PlayerClass" then
-            local player: Player = (targetCharacterClass :: PlayerClass):GetInstance();
+        if targetEntityClass.ClassName == "PlayerClass" then
+            local player: Player = (targetEntityClass :: PlayerClass):GetInstance();
 
             if npcClass.NetworkOwners then
                 local isNetOwner = table.find(npcClass.NetworkOwners, player) ~= nil;
@@ -41,10 +41,10 @@ function treePackage.HasEnemy(npcClass: NpcClass)
             end
         end
 
-        local isAlive = targetCharacterClass.HealthComp.IsDead ~= true;
+        local isAlive = targetEntityClass.HealthComp.IsDead ~= true;
         if not isAlive then return false end;
 
-        local isTargettable = targetCharacterClass.HealthComp:CanTakeDamageFrom(npcClass);
+        local isTargettable = targetEntityClass.HealthComp:CanTakeDamageFrom(npcClass);
         if not isTargettable then return false end;
 
         if properties.HordeAggression then return true; end;
@@ -53,8 +53,10 @@ function treePackage.HasEnemy(npcClass: NpcClass)
         local isInRange = (targetData.Distance <= properties.TargetableDistance);
         if not isInRange then return false end;
 
-        local isInVision = npcClass:IsInVision(targetCharacterClass.RootPart, 75);
-        if not isInVision then return false end;
+        if targetEntityClass.ClassName ~= "Destructible" then
+            local isInVision = targetData.Model.PrimaryPart and npcClass:IsInVision(targetData.Model.PrimaryPart, 75) or false;
+            if not isInVision then return false end;
+        end
 
         return true;
     end);
@@ -111,27 +113,29 @@ end
 
 function treePackage.LookAtEnemy(npcClass: NpcClass)
     local properties = npcClass.Properties;
-    local enemyTargetData = npcClass.Properties.EnemyTargetData;
-    local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
+    local targetData = npcClass.Properties.EnemyTargetData;
 
-    local curTick = tick();
-    if properties.LookAtEnemyTick == nil then
-        properties.LookAtEnemyTick = curTick + math.random(2000, 3200)/1000;
-		npcClass.PlayAnimation("Aggro");
-        return true;
+    local enemyCharClass: CharacterClass = targetData.HealthComp.CompOwner;
+    if enemyCharClass.ClassName == "NpcClass" or enemyCharClass.ClassName == "PlayerClass" then
+        local curTick = tick();
+        if properties.LookAtEnemyTick == nil then
+            properties.LookAtEnemyTick = curTick + math.random(2000, 3200)/1000;
+            npcClass.PlayAnimation("Aggro");
+            return true;
 
-    elseif properties.LookAtEnemyTick > curTick then
-        npcClass.Move:Face(enemyNpcClass.RootPart);
-        return true;
+        elseif properties.LookAtEnemyTick > curTick then
+            npcClass.Move:Face(enemyCharClass.RootPart);
+            return true;
 
+        end
     end
 
     return false;
 end
 
 function treePackage.InMeleeRange(npcClass: NpcClass)
-    local enemyTargetData = npcClass.Properties.EnemyTargetData;
-    return enemyTargetData.Distance <= npcClass.Configurations.AttackRange;
+    local targetData = npcClass.Properties.EnemyTargetData;
+    return targetData.Distance <= npcClass.Configurations.AttackRange;
 end
 
 function treePackage.CanAttack(npcClass: NpcClass)
@@ -143,41 +147,44 @@ function treePackage.Attack(npcClass: NpcClass)
     local configurations = npcClass.Configurations;
     local properties = npcClass.Properties;
 
-    local enemyTargetData = npcClass.Properties.EnemyTargetData;
+    local targetData = npcClass.Properties.EnemyTargetData;
 
-    local enemyHealthComp: HealthComp = enemyTargetData.HealthComp;
-    local enemyNpcClass: NpcClass = enemyHealthComp.CompOwner;
+    local targetHealthComp: HealthComp = targetData.HealthComp;
+    local targetEntityClass: EntityClass = targetHealthComp.CompOwner;
 
-    local targetPosition = enemyNpcClass.RootPart.Position;
-    local relativeCframe = npcClass.RootPart.CFrame:ToObjectSpace(CFrame.new(targetPosition));
-    
-    local dirAngle = math.deg(math.atan2(relativeCframe.X, -relativeCframe.Z));
-    if math.abs(dirAngle) > 50 then
-        properties.AttackCooldown = tick() + math.random(10, 20)/100;
-        return false;
-    end;
+    if targetEntityClass.Model and targetEntityClass.ClassName == "PlayerClass" then
+        local targetPosition = targetEntityClass.Model:GetPivot().Position;
+        local relativeCframe = npcClass.RootPart.CFrame:ToObjectSpace(CFrame.new(targetPosition));
+        
+        local dirAngle = math.deg(math.atan2(relativeCframe.X, -relativeCframe.Z));
+        if math.abs(dirAngle) > 50 then
+            properties.AttackCooldown = tick() + math.random(10, 20)/100;
+            return false;
+        end;
+    end
     
     properties.AttackCooldown = tick() + (configurations.AttackSpeed * math.random(90, 110)/100);
     
     local attackComp = npcClass:GetComponent("ZombieBasicMeleeAttack");
     if attackComp then
-        attackComp();
+        attackComp(targetData.TargetPart);
     end
     
     return true;
 end
 
 function treePackage.FollowEnemy(npcClass: NpcClass)
-    local enemyTargetData = npcClass.Properties.EnemyTargetData;
-    local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
+    local targetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
 
-    npcClass.Move:Follow(enemyNpcClass.RootPart);
+    local targetPart = targetData.TargetPart or targetData.Model.PrimaryPart;
+
+    npcClass.Move:Follow(targetPart);
     return true;
 end
 
 function treePackage.Idle(npcClass: NpcClass)
     local properties = npcClass.Properties;
-    local spawnPoint = npcClass.SpawnPoint.Position;
+    local spawnPoint = npcClass.SpawnCFrame.Position;
 
     properties.LookAtEnemyState = nil;
 

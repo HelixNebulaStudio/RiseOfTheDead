@@ -31,10 +31,10 @@ Dialogues.DialogueStrings = {
 if RunService:IsServer() then
 	-- MARK: DialogueHandler
 	Dialogues.DialogueHandler = function(player, dialog, data)
-		local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+		local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 		local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 
-		if not modBranchConfigs.IsWorld("TheUnderground") then return end;
+		if not modBranchConfigurations.IsWorld("TheUnderground") then return end;
 	
 		dialog:AddChoice("heal_request", function()
 			if not dialog.InRange() then return end;

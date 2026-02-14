@@ -6,7 +6,7 @@ local Component = {};
 function Component.new(self)
 	return {
 		Begin=function()
-			if (self.SpawnPoint.p-self.RootPart.Position).Magnitude <= 16 then
+			if (self.SpawnCFrame.p-self.RootPart.Position).Magnitude <= 16 then
 				self.Movement:EndMovement();
 				
 				self.PlayAnimation("Idle");
@@ -20,7 +20,7 @@ function Component.new(self)
 					end);
 				end)
 			else
-				self.Movement:Move(self.SpawnPoint.p);
+				self.Movement:Move(self.SpawnCFrame.p);
 			end
 		end;
 		Cancel=function()

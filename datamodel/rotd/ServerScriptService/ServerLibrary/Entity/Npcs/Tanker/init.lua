@@ -24,7 +24,7 @@ local npcPackage = {
 
     AddComponents = {
         "TargetHandler";
-        "MeleeAttack";
+        "ZombieBasicMeleeAttack";
         "ThrowTarget";
     };
     AddBehaviorTrees = {

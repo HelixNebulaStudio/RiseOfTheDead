@@ -1,9 +1,10 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local TweenService = game:GetService("TweenService");
+local RunService = game:GetService("RunService");
 
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
-local modBranchConfigs = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modMarkers = shared.require(game.ReplicatedStorage.Library.Markers);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
@@ -12,6 +13,60 @@ local interfacePackage = {
 };
 --==
 
+function interfacePackage.onRequire()
+	if RunService:IsStudio() then
+		shared.modCommandsLibrary.bind{
+			["gamemodehud"]={
+				Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+				Description = [[GameModeHud commands.
+				/gamemodehud test
+				]];
+
+				RequiredArgs = 0;
+				UsageInfo = "/gamemodehud test";
+				Function = function() end;
+				ClientFunction = function(player, args)
+					local interface = modClientGuis.ActiveInterface;
+					local window: InterfaceWindow = interface:GetWindow("GameModeHud");
+
+					local action = args[1];
+					if action == "test" then
+						window.Binds.HudActionHandler{
+							Action = "Open";
+							Type = "Survival";
+							Stage = "Swamplands";
+							WavePass = {
+								TimeLeft = math.random(0, 30);
+								Players = {
+									["16170943"] = {
+										HasVoted = math.random(1, 2) == 1;
+										VotePick = math.random(1, 2);
+										RewardPick = math.random(1, 3);
+									};
+									["123321123"] = {
+										HasVoted = math.random(1, 2) == 1;
+										VotePick = math.random(1, 2);
+										RewardPick = math.random(1, 3);
+									};
+									["1212121212"] = {
+										HasVoted = math.random(1, 2) == 1;
+										VotePick = math.random(1, 2);
+										RewardPick = math.random(1, 3);
+									};
+								};
+								Rewards = {
+									{ItemId="p250"; Quantity=math.random(1, 32);};
+									{ItemId="tacticalbow"; Quantity=1;};
+									{ItemId="minigun"; Quantity=1;};
+								};
+							};
+						}
+					end
+				end;
+			};
+		};
+	end
+end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local remoteGameModeExit = modRemotesManager:Get("GameModeExit");
@@ -31,7 +86,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
     local binds = window.Binds;
 
-	interface.Garbage:Tag(remoteGameModeHud.OnClientEvent:Connect(function(data)
+	function binds.FireServer(action, ...)
+		remoteGameModeHud:FireServer(action, ...);
+	end
+
+	function binds.HudActionHandler(data)
 		for k, _ in pairs(data) do
 			hudData[k] = data[k];
 		end
@@ -61,7 +120,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 		
 		binds.UpdateGameHud();
-	end))
+	end
+	interface.Garbage:Tag(remoteGameModeHud.OnClientEvent:Connect(binds.HudActionHandler));
 	
     interface.Scheduler.OnStepped:Connect(function(tickData: TickData)
         if tickData.ms1000 ~= true then return end;
@@ -82,6 +142,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 hudModules = {};
                 local modeHudClass = script:WaitForChild("ModeHudClass");
                 for _, modeModule in pairs(modeHudClass:GetChildren()) do
+					if not modeModule:IsA("ModuleScript") then continue end;
                     hudModules[modeModule.Name] = shared.require(modeModule);
                 end
             end
@@ -133,7 +194,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	interface.OnReady:Once(function()
     	local spectatorUIElement: InterfaceElement = interface:GetOrDefaultElement("SpectatorScreenElement");
 		spectatorUIElement.SpectatorLeaveClick = function() 
-			local worldName = modBranchConfigs.GetWorldDisplayName(modBranchConfigs.WorldName);
+			local worldName = modBranchConfigurations.GetWorldDisplayName(modBranchConfigurations.WorldName);
 
 			modClientGuis.promptDialogBox({
 				Title=`Leave {worldName}?`;
