@@ -1,0 +1,1686 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://helixnebulastudio.github.io/RiseOfTheDead/DevBranch/2.0/">
+      
+      
+        <link rel="prev" href="../2.1/">
+      
+      
+        <link rel="next" href="../../Development/Pages/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>2.0.* - Rise of the Dead</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/interactive_graph.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#20" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Rise of the Dead" class="md-header__button md-logo" aria-label="Rise of the Dead" data-md-component="logo">
+      
+  <img src="../../assets/images/RotDIcon_Abr.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Rise of the Dead
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              2.0.*
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../LiveBranch/2.3/" class="md-tabs__link">
+          
+  
+  
+  Live
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../2.3/" class="md-tabs__link">
+          
+  
+  
+  Dev
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Development/Pages/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Source/Pages/" class="md-tabs__link">
+          
+  
+  
+  Source
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Storyboard/Pages/" class="md-tabs__link">
+          
+  
+  
+  Storyboard
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Issues
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/discussions" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Discussions
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Rise of the Dead" class="md-nav__button md-logo" aria-label="Rise of the Dead" data-md-component="logo">
+      
+  <img src="../../assets/images/RotDIcon_Abr.svg" alt="logo">
+
+    </a>
+    Rise of the Dead
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../LiveBranch/2.3/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Live
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dev
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Dev
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.3.x Dev
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.2.x
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.1.*
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.0.*
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../Development/Pages/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../Source/Pages/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../Storyboard/Pages/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Storyboard
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Issues
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/discussions" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discussions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="20">2.0.*<a class="headerlink" href="#20" title="Permanent link">&para;</a></h1>
+<p>Update: Version number standard: [major].[minor].[live branch build].[dev branch build]</p>
+<hr />
+<blockquote>
+<p>2.0.7.17 Push to live.</p>
+</blockquote>
+<ul>
+<li>Fixed some item unlockables not showing particle effects. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/216">#216</a>]</li>
+<li>Fixed <code>enginersplanner</code>'s plans having collision. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/159">#159</a>]</li>
+<li>Fixed <code>Bloater</code> clouds instantly dissapearing. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/183">#183</a>]</li>
+<li><code>tacticalbow</code> and <code>arelshiftcross</code> RopeConstraints are now hidden in first person when mounted on <code>portableautoturret</code>. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/210">#210</a>] </li>
+<li>Fixed a case where players falling into the void doesn't get killed. Similar to [#213]. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/215">#215</a>]</li>
+<li>Fixed vanity not loading properly. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/205">#205</a>]</li>
+<li>Fixed Npc falling into the void not firing kill event. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/213">#213</a>]<ul>
+<li>I don't understand why Roblox's <code>workspace.FallenPartsDestroyHeight</code> does not trigger <code>.Destroying</code> event on the part, may be engine bug or something. </li>
+</ul>
+</li>
+<li>Leapers should now stop a couple units short in order to not clip into walls when leaping. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/213">#213</a>]<blockquote>
+<p>2.0.6.17</p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>2.0.6.16 Push to live.</p>
+</blockquote>
+<ul>
+<li>
+<p>Moved ragdoll simulation to server side for the first 5s of death to improve physics sync with all clients at the cost of ragdoll smoothness until Roblox implements a method to <a href="https://devforum.roblox.com/t/method-to-syncdesync-instances-from-server/2919530/9">desync models for each client</a>.
+[<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/109">#109</a>]</p>
+<blockquote>
+<p>2.0.5.16</p>
+</blockquote>
+</li>
+<li>
+<p>Fixed ui bugging out when attempting to stack items together. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/203">#203</a>]</p>
+</li>
+<li>Fixed clothing with statuses not correctly applied to player. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/200">#200</a>]
+[<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/201">#201</a>] </li>
+<li>
+<p>Fixed syncing item values unintentionally desync other values. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/199">#199</a>]</p>
+<blockquote>
+<p>2.0.4.15</p>
+</blockquote>
+</li>
+<li>
+<p>Fixed <code>chainsaw</code> not equippable.</p>
+<blockquote>
+<p>2.0.3.15</p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>2.0.2.15 Push to live
+- Fixed invetory context menu toggling clothing not updating properly. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/157">#157</a>] 
+- Migrated all clothing assets and packages out of Revive Engine.
+    - This is the continuous process of seperating Rise of the Dead content from the Revive Engine so that the Revive Engine is more flexible to be used in other projects. 
+- Fixed cases where tool's masses affecting character rotations. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/193">#193</a>]
+- Fixed Npc ReplicationManager setting setting replication model to Atomic instead of PersistentPerPlayer. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/198">#198</a>]
+- Readded <code>healthmod</code> and <code>armorpointsmod</code> to droptables <code>sectordcrate</code> and <code>banditcrate</code> respectively. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/195">#195</a>]
+- Removed <code>thornmod</code> from all droptable temporarily. Currently only obtainable from the Wandering Trader.
+- Fixed survivor not spawning in another survivor. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/190">#190</a>]
+- Fixed mod conflict not removing mod passive from player status. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/162">#162</a>]
+[<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/191">#191</a>]
+[<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/192">#192</a>]
+- Fixed a case where quick transfer was successful when either storage interfaces (Inventory or External Storage) weren't visible.
+- Disabled quick transfer on trading menu which may be causing some unexpected item mistransfers.
+- Fixed ReplicationManager attempt to set model streaming mode for non-models [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/188">#188</a>]
+- Fixed a case where client was not updating Boss hud data for ending coundown. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/197">#197</a>]
+- At least one game lobby will now be preloaded. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/196">#196</a>] 
+- Increased <code>dualp250</code> max base damage from 510 to 600.
+- Added <code>stickygrenadebp</code>. Droped from <code>Bloater</code>, cost a mk2grenade and 5 adhesive to craft.
+- <code>Bloater</code> now drops <code>stickygrenadebp</code> instead of <code>stickygrenade</code>.
+- <code>sectordcrate</code> now drops <code>mk2grenade</code> instead of <code>mk2grenade</code>.
+- Horde Attacks no longer drop <code>stickygrenade</code>.
+- Increased <code>stickygrenade</code> damage ratio from 5% to 10%. Minimum damage from 100 to 200.
+- Fixed a strange case when requesting for game mode lobby data. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/187">#187</a>]
+2.0.1.15</p>
+<p>2.0.1.14 Update pushed to live.
+- Fixed <code>nekrostrench</code> heal calculation. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/161">#161</a>]
+- Fixed incorrect damage multiplier value on Rat. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/178">#178</a>]
+- Fixed a bug where BowRicochet mod not setting arrow projectile MaxBounce to 1. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/171">#171</a>] 
+- Made some adjustments on how faction system handles join request by only clearing caches on data publish. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/166">#166</a>]
+- Ticks explosion effects are now clientsided. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/154">#154</a>]
+- Reverted mod tier changes. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/153">#153</a>]
+[<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/174">#174</a>]
+- Fixed loading issue for customization on dual weapons. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/172">#172</a>]
+- Updated <code>ThePrisoner</code> description. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/181">#181</a>]
+- Fixed unintended collision on item drops. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/182">#182</a>]
+- Fixed nekron vein attached to player having collision leading to player getting pushed through walls and floors. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/179">#179</a>]
+2.0.0.14
+- Enabled more optimizations. Set multiple models to StreamingMesh in <code>TheWarehouse</code>. Enabled streaming for <code>TheWarehouse</code>, Dev branch only.
+2.0.0.13
+- Added <strong>Daniil</strong>'s updated <code>gumball</code>, <code>eggnog</code>, <code>gingerbreadman</code>, <code>cannedfish</code> and <code>chocobar</code>.
+- NaturalSpawnLimit set for <code>TheWarehouse</code> reduced to 60 from default 75.
+- Deadbody Despawn Timer no longer able to be disabled unless you are in dev branch. Max despawn timer for live branch is now 60s.
+- Fixed a bug where social menu not showing the accurate max players.
+2.0.0.12
+- Added <code>ticksnaretrapbp</code> to <code>genesiscrate</code> droptable. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/165">#165</a>]
+- Optimized server side ragdolls and fixed a case of server side ragdoll collision. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/164">#164</a>]
+- Fixed typo causing weapon mounted on <code>portableautoturret</code> to gains exp. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/150">#150</a>]
+- Cultist now only has a 10% spawn chance every 10 minutes after 3 days of completing Vindictive Treasure 2.
+- During horde attacks, Zombies are now instantly aggro'ed.
+- If you get too close to a zombie, they now aggro quicker.
+- NaturalSpawnLimit now counts per spawn type. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/167">#167</a>]
+2.0.0.11
+- Fixed character fingers render not correctly on other players characters.
+2.0.0.10
+- Fixed a case where you could be attempting to load other player's rare sunken treasure. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/149">#149</a>]
+2.0.0.9
+- Fixed <code>mercskneepad</code> not showing base hotbar slots stat. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/155">#155</a>]
+2.0.0.8
+- Found a case where <code>portableautoturret</code> stops shooting because target's missing its head. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/141">#141</a>]
+- Weapon mounted on <code>portableautoturret</code> no longer gains exp. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/150">#150</a>]
+- Added client side log for reason why OpenStorageRequest failed for debugging. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/149">#149</a>]
+- Player's RootPart are no longer unanchored when joining a lobby. Only unanchors when the lobby starts or leaving it. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/151">#151</a>]
+- Limit max naturally <code>Witherer</code> spawns per server to 5.
+- Fixed Factory showing abandon bunker lobby when interacting with extract door.
+- Fixed Factory raid not progressing mission 12.
+- Lowered NaturalSpawnLimit from 200 to 100.
+- Enabled ragdoll for <code>Bloater</code>, <code>Growler</code> and <code>Dr. Sinister</code>.
+2.0.0.7
+- Fixed Cultist not using new movement system. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/148">#148</a>]
+2.0.0.6
+- Fixed a issue where hidden npcs dies for no reason cause continuation issues.
+[<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/144">#144</a>]
+[<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/146">#146</a>]
+[<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/147">#147</a>]
+2.0.0.5
+- Inverted back mod tier compatiblity.
+- <code>portableautoturret</code>'s power will now deplete if you take out the battery. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/143">#143</a>]
+- Weapon ammo will now be shown on item description.
+- Moved <code>flinchcushioning</code> to <code>Zomborg</code> drop table.
+- Fixed <code>bloxycola</code> and <code>energydrink</code> missing toolgrip.
+- Fixed a bug where character forces are miscalculated when client fps changes. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/140">#140</a>] 
+- Added natural spawn limit for naturally spawnning npcs due to spawn rate scales by player count now. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/142">#142</a>]
+2.0.0.4
+- Fixed mislocated Mission 38 dialogue script. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/138">#138</a>]
+- Fix server responding with the wrong data when joining game rooms. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/137">#137</a>]
+- Fixed missiong WieldConfig WieldConfig.meta.json to ignoreUnknownInstances. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/135">#135</a>]
+- Fixed and changed up a few issues with Medical Breakthrough. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/48">#48</a>]
+    - Patrol Bandit spawns closer and no longer blockable.
+    - Fixed failing mission travel to nil.
+    - Patrol bandit dying will now close dialogue menu.
+    - Fixed bribe cost check.
+    - Fixed dialogue typos and grammar.
+- Fixed statuses not calling OnExpire on death. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/132">#132</a>]
+- Witherers no longer detectable by PAT. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/133">#133</a>]
+- Fixed crouch check optimizations. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/134">#134</a>]
+- Added optimizations for low fps players by reducing rate of auto crouch detections, camera wall raycasts, interactable scan rate.
+- Improved performance for weapons with high multishots and peneration for player with lower fps.
+- <code>Heavy</code> grip on <code>Zombie</code> now properly destroys when either of them dies. May relate to: [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/80">#80</a>]
+- It should now kick you out if entering game room fails for unknown reason. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/124">#124</a>]
+    - Console will log the reason for debugging.
+- Added ragdoll support to <code>Cultist</code>. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/128">#128</a>]
+- Fixed <code>Zombie</code> minimum follow distance.
+- Fixed old fake <code>Zombie</code> not dissapearing after death. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/123">#123</a>]
+- Fixed <code>Tendril</code> death spawning clones when attempting to spawn missing ragdoll. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/131">#131</a>]
+- Fixed <code>Tick</code> continue ticking after death [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/129">#129</a>]
+- Fixed Boss mode hud room end timer not updating. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/127">#127</a>]
+- Fixed <code>Jaws</code> spawning. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/130">#130</a>]
+- Fixed <code>Mothena</code> spawning and despawning. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/125">#125</a>]
+- <code>Factory</code> Raid now uses new raid director. 
+- Made a change to deadbody idle behavior. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/110">#110</a>]
+- Fixed survival failed triggering twice. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/115">#115</a>]
+- Fixed survival ending when one player dies even though the lobby has more due to connecting late. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/113">#113</a>]
+- Fixed survival failed soundtrack not fading out after 30s. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/114">#114</a>]
+- Changed mission title names with the slash symbol tempoarily. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/122">#122</a>]
+    - Mission titles with slashes causes a bug which will take a lot of time to fix and is unimportant for now.
+- Default setting for Deadbody Despawn Timer set to 4s for mobile and 8s for others.
+- Limited Inventory Full pickup attempt spam.
+- Fixed missing ToolGrip for <code>medkit</code> and <code>largemedkit</code>.
+- Fixed script runcontext on <code>portableautoturret</code>. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/120">#120</a>]
+- Reduced chance for shotgun to break off limbs.</p>
+<ul>
+<li>Attempted to desync instances from server and client for smoother client dead bodies physics. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/102">#102</a>]
+[<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/109">#109</a>] </li>
+<li><code>Zombie</code> wearing <code>hardhat</code> will be despawned on death. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/108">#108</a>]</li>
+<li>Changed Settings More Particles to Limit Particles.</li>
+<li>Default settings are will now depend on what device you are on.<ul>
+<li>Mobile users will have demanding graphic settings limited or disabled by default.</li>
+</ul>
+</li>
+<li>Fixed <code>Mason</code> stuck running. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/119">#119</a>]</li>
+<li><code>/itemvalues equip [killImpulseForce]</code> gives a weapon custom KillImpulseForce.</li>
+<li>Fixed <code>Zombie</code> death getting connected parts included parts not inside the model. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/80">#80</a>]</li>
+<li>Fixed <code>jerrycan</code> resetting Fuel value when equipping. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/84">#84</a>]</li>
+<li><strong>Daniil</strong> updated <code>medkit</code> &amp; <code>largemedkit</code> animations.</li>
+<li>Fixed a case where storage still not accessible after syncing. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/66">#66</a>]</li>
+<li>Fixed <code>medkit</code> not equipping when in wounded state. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/116">#116</a>]</li>
+<li>
+<p>Added Deadbody Despawn Timer to settings for more control of dead bodies.</p>
+</li>
+<li>
+<p><code>Heavy</code> no longer able to grab and throw <code>Zombie</code> if they are missing their throwing arm. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/104">#104</a>]</p>
+</li>
+<li><code>Heavy</code> should now cancel throw if its arm gets shot off. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/103">#103</a>]</li>
+<li><code>Zombie</code> will now attack with only limbs they have.</li>
+<li><code>Ticks</code> now explode into pieces.</li>
+<li>Fixed max dead bodies slider. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/117">#117</a>]</li>
+<li>Shotguns dealing lethal shots can now break more limbs than just arms and legs.</li>
+<li><strong>Daniil</strong> updated <code>bloxycola</code> &amp; <code>energydrink</code> animations.</li>
+<li>Client no longer be able to play animations to dead bodies. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/105">#105</a>]</li>
+<li>Added fps counter to the bottom right.</li>
+<li>Added Max Dead Bodies to settings ranging from 0 to 64. Bodies are counted per entity type.</li>
+<li>Dead bodies now anchors and becomes uncollidable after it stops moving. </li>
+<li>Threat Sense skill range reduced to 40 to 320 from 64 to 512. Highlight despawns in 10s.<ul>
+<li>Since there's a 31 max limit to Highlights, despawning them often should naturally priority the closer threats.</li>
+</ul>
+</li>
+<li>Ragdolls now destroys threat sense highlight on death. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/107">#107</a>]</li>
+<li>Threat Sense now works on mobile.<ul>
+<li>For mobile, the visuals will be different so that it meets the criteria to be visible.</li>
+</ul>
+</li>
+<li>Weakpoint targets should now be destroyed server side rather than client. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/106">#106</a>]</li>
+<li>Fixed despawn order to be based on entity death time. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/112">#112</a>]</li>
+<li>
+<p>Fixed another edge case deadbodies not despawning hud entity health bar. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/98">#98</a>]</p>
+</li>
+<li>
+<p>Reduced damage rate when lached by Nekron Vein.</p>
+</li>
+<li>Improved Nekron Vein launch and lach projectile smoothness.</li>
+<li>Nekron Vein now becomes rigid if it misses instead of crumpling so you can walk on it.</li>
+<li>Fixed zombie core animations not playing when first joining the game.</li>
+<li>Fixed FlameMod doing damage based on overall health instead of health of the part shot when a target has independent health seperated from overall. E.g. Vein of Nekron's roots. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/75">#75</a>]<ul>
+<li>FlameMod also now expires quicker if the independent health dies from FlameMod tick.</li>
+</ul>
+</li>
+<li><strong>Daniil</strong> updated <code>cannedbeans</code> animations.</li>
+<li>Added custom despawn timer for survival bosses. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/99">#99</a>]</li>
+<li>Added <code>Idle</code> emote to emote menu. This is for NPCs to use the same idle animations as players.</li>
+<li>Fixed <code>Bandit</code> continues reloading after death.</li>
+<li>Capped minimum spawner to be half the max spawn amount for overworld spawners, used to be 1.</li>
+<li>Fixed another despawning issue HudEntity Hp bar from the server side. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/98">#98</a>]</li>
+<li>
+<p><strong>Daniil</strong> added a second inspect animation for <code>arelshiftcross</code>.</p>
+</li>
+<li>
+<p>HudEntity Hp bar should now despawn after the boss dies. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/98">#98</a>]</p>
+</li>
+<li>Fixed some unintended clientside despawning for survival generators, reward crates, zricera's fire puddles, molotov puddles, bloater gas cloud. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/97">#97</a>]</li>
+<li>Smoothed out mission alert popup for when starting a mission. It can now pop up for certain mission points too.</li>
+<li><code>/delmission</code> now syncs after running the cmd.</li>
+<li>Updated <code>Tanker</code> to support ragdoll.</li>
+<li>Updated <code>Bandit</code> model to be compatible with ragdoll.</li>
+<li>Npc equipping a tool and die will drop their tool model as decor on the floor.</li>
+<li>Updated <code>Bandit</code> to use new movement system.</li>
+<li>Disabled old npc deadbody despawn mechanic. Server now deletes npc models if it exceeds 64 copies.<ul>
+<li>Client side setting to limit the max number of deadbodies will be added later.</li>
+</ul>
+</li>
+<li>Added back <code>leathergloves</code> skins: <code>leatherglovesxmasred</code>, <code>leatherglovesxmasgreen</code>, <code>leatherglovesxmasrgb</code></li>
+<li>Removed the setting to use old hand models due to clothing incompatibility.</li>
+<li><code>armwraps</code> hand models updated.</li>
+<li>
+<p>Fixed a BeltSlots calculation bug. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/95">#95</a>]</p>
+</li>
+<li>
+<p><code>Bandit</code> should now only be hostile if you helped the Rats and not yet helpped the Bandits. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/79">#79</a>]</p>
+</li>
+<li><code>Eternal Inferno (65)</code> should now properly count instant kills with weapons that applies <code>flamemod</code> effect. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/82">#82</a>]<ul>
+<li>Including <code>fireaxe</code> which uses the <code>flamemod</code> on hit.</li>
+</ul>
+</li>
+<li><strong>Daniil</strong> has remodeled the <code>militaryboots</code>! And it looks amazing.</li>
+<li>Tidied up shop mods' long descriptions. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/53">#53</a>]</li>
+<li>Fixed player IsAlive status desync.</li>
+<li>Rewrote old GameModeHud used in raid, survival, coop and bosses. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/91">#91</a>]</li>
+<li>Adjusted weapon ammo syncing for shooting right after reloading. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/74">#74</a>]</li>
+<li>
+<p>Fixed TireArmor visibility when equipped. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/16">#16</a>]</p>
+</li>
+<li>
+<p>Fixed <code>Heavy</code> throwing <code>Zombie</code> cancel if <code>Zombie</code> or <code>Heavy</code> dies. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/80">#80</a>]</p>
+</li>
+<li>Witherering status now stops draining armor once you looked away from a Witherer for a while. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/64">#64</a>]</li>
+<li>Fixed assigning weak point could cause a server side freeze.</li>
+<li>Fixed bosses in hard <code>Coop: Genesis</code> to scale level based on difficulty. [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/73">#73</a>]</li>
+<li>Fixed dialogue lock in <code>Quarantine Assesment 2 (53)</code> [<a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues/92">#92</a>]</li>
+<li>Updated item icon for <code>p250</code>, <code>cz75</code>, <code>tec9</code>, <code>dualp250</code>, <code>sawedoff</code>, <code>mariner590</code> and <code>fnfal</code>.</li>
+<li>Fixed <code>Ticks</code> exploding not killing the fake model captured by <code>entityleash</code>.</li>
+<li>Increased <code>sniperfocusrate</code> to tier 3 from 1.</li>
+<li>Increased <code>bowricochetmod</code> to tier 3 from 1.</li>
+<li>Increased <code>explosivedamagemod</code>, <code>explosiveammocapmod</code> and <code>explosiveradiusmod</code> to tier 2 from 1.<ul>
+<li>Since lowest explosive weapon tier is 2.</li>
+</ul>
+</li>
+<li>Increased <code>rocketmanmod</code> to tier 3 from 1.</li>
+<li>Increased <code>shotgunslugmod</code> to tier 4 from 1.</li>
+<li>Increased <code>smgcritmultimod</code> to tier 4 from 3.<ul>
+<li>Adjusted to match the first crit smg is the <code>vectorx</code>.</li>
+</ul>
+</li>
+<li>Increased <code>pistolreloadspeedmod</code> max value to 75% from 60%.</li>
+<li>Increased <code>pistolammomagmod</code> max value from 200% to 300%, and to tier 2 from 1.</li>
+<li>Increased <code>pistolhappyautomod</code>, <code>pistolautomod</code>, <code>shotgunhappyautomod</code>, <code>shotgunautomod</code> to tier 2 from 1.</li>
+<li>Increased <code>bowdamagemod</code>, <code>bowammocapmod</code> to tier 3 from 1.<ul>
+<li>Adjusted to match base tier 3 of bow weapons is <code>tacticalbow</code>.</li>
+</ul>
+</li>
+<li>Increased <code>bowdeadweightmod</code> from tier 3 to 4.</li>
+<li>Increased <code>subskullcrackmod</code> and <code>sniperskullcrackmod</code> to tier 2 from 1. </li>
+<li>Increased <code>sniperpiercingmod</code>, <code>hmgrapidfiremod</code>, <code>sniperdmgrevmod</code>, <code>pyroeverlastmod</code> and <code>flamethrowerflameburstmod</code> to tier 2 from 1.</li>
+<li>Fixed taking damage &lt;1 show immune damage bubble.</li>
+<li>Fixed Cultist melee damage calculations.</li>
+<li>Taking melee tool damage now causes flinch.</li>
+<li>Fixed weapon sprint animation playing over inspect animation.</li>
+<li>Fixed <code>sledgehammer</code> not showing up on workbench.</li>
+<li>
+<p>Fixed using clothing vanity on a item using a variant.</p>
+</li>
+<li>
+<p>Mission <code>Something's Not Right (38)</code> now uses the new asset system.</p>
+</li>
+<li>Added pistol to <code>sniperfocusrate</code> compatibility.</li>
+<li>Fixed basement door in <code>TheResidentials</code>.</li>
+<li>Rewrote <code>Quanrantine Assesment 2 (53)</code> wilson moving to the roof. </li>
+<li>Fixed <code>Medical Breakthrough (75)</code> not detecting sample tubes when restart after failing the mission.</li>
+<li>Fixed Genesis Hard mode not dropping <code>ggensiscrate</code>.</li>
+<li>Increased <code>flinchcushioning</code> max value to 75% from 50%.</li>
+<li>Reduced <code>Zomborg</code> stun duration from 2.5 to 2s.</li>
+<li>Reduced camera flinch strength by half. Flinching now affects weapon accuracy.</li>
+<li>Clothing items now shows flinch protection in item description.</li>
+<li>Reduced <code>Zomborg Prime</code> stun duration from 5 to 3s.</li>
+<li>Added <code>mendingmod</code> to <code>zenithcrate</code> droptable.</li>
+<li>Added <code>nekrosampmod</code> to <code>veinofnekron</code> droptable for Sunday. </li>
+<li>Item unlockable <code>leatherglovesred</code> will now unlock both Red and Red Fingerless variant.</li>
+<li><code>nekrostrench</code> now has a Hoodie variant.</li>
+<li>Clothing variants such as <code>leathergloves</code>'s Fingless variant now functional.</li>
+<li><strong>Daniil</strong> has remodeled the <code>leathergloves</code>.<ul>
+<li>It comes in the fingless variant that is unlocked in appearance by default.</li>
+<li>Appearance switching clothing variant models is in work in progress. </li>
+</ul>
+</li>
+<li>Toggling hud now also hides crosshair.</li>
+<li>Fixed custom pickup not initially loading.</li>
+<li>Fixed Freecam, it should not check if freecam is allowed when attempting to enter freecam instead of at the start of the game.</li>
+<li>Fixed <code>cultistnote1</code> pickup.</li>
+<li>Fixed multiple <code>Ticks</code> exploding disabling other <code>Ticks</code>.</li>
+<li>Added <code>flinchcushioning</code> into <code>genesiscrate</code>.</li>
+<li>Updated all hand models with a new uv mapping to hide misaligned texture under the hands.</li>
+<li>Fixed old npc holding props (Carlos holding the flute) now uses new wielding system.</li>
+<li>Adjusted weapon sound origin so it no longer sounds like it just coming from the right.</li>
+<li>Fixed Pet's enemies target list for targetting and damaging.</li>
+<li>Fixed weapons not marked as equipped properly when equipped by npcs.</li>
+<li>Fixed <code>Zombie</code> not responding to horde event.</li>
+<li>Readded idle movement to <code>Zombie</code>.</li>
+<li><code>fireaxe</code> attack speed increased from 1.3 to 1s. Equip time decreased to 1s.</li>
+<li>Updated <code>Lifesteal</code> buff to use new heal mechanic that medkits uses.</li>
+<li>Improved <code>ziphoningserum</code> item description.</li>
+<li><code>Ziphoning Serum (76)</code> board mission now drops 5 <code>ziphoningserum</code> instead of 3.</li>
+<li>Added <strong>Daniil</strong>'s new <code>fireaxe</code>, <code>sledgehammer</code>, <code>keytar</code> and <code>naughtycane</code> animations.</li>
+<li>Fixed medkits not healing.</li>
+<li>Fixed <code>Coming To The Rescue (48)</code> reward configuration.</li>
+<li>Fixed <code>ticksnaretrap</code> interactions with Ticks.</li>
+<li>Fixed clothing statuses like TireArmor equipping and unequipping.</li>
+<li>Fixed <code>grenadelauncher</code> grenade projectile instantly despawning.</li>
+<li>Fixed looping unequip <code>flamethrower</code> animation.</li>
+<li>Rewrote Pet behavior tree.<ul>
+<li>Pet uses healing items when &lt; 50% health.</li>
+<li>Pet uses melee weapons when enemies are within 12 units.</li>
+</ul>
+</li>
+<li>Added Npc <code>HealTool</code> handler to be able to use e.g. <code>medkits</code>.</li>
+<li>Updated <code>Diana</code> movement engine.</li>
+<li>Emotes renamed <code>lean</code> to <code>leanforward</code>.</li>
+<li>Added <code>leanbackwards</code> emote.</li>
+<li>Updated <code>Frank</code> movement engine.</li>
+<li>Updated <code>Jesse</code> movement engine.</li>
+<li>Fixed <code>Human</code> entities not using appropreciate walking animation speed.</li>
+<li>Fixed dialogues not loading properly.</li>
+<li><code>Medical Breakthrough (75)</code> now uses a dialogue timer when the patroling bandit talks to you.</li>
+<li>Dialogues can now be initiated by the server without player interacting with an interactable.</li>
+<li>Added <code>/talktome npcName</code> for testing server initiated dialogue popups.</li>
+<li>Fixed unknown upgradeKey for <code>armorpointsmod</code>.</li>
+<li>Fixed unknown upgradeKey for <code>rocketmanmod</code> and <code>pyroeverlastmod</code>.</li>
+<li>Added a dialogue timer, when the timer expires, the dialogue menu closes.<ul>
+<li>If <code>Mason</code> is working on his car, talking to him will show you the dialogue timer.</li>
+<li>Will be used in <code>Medical Breakthrough (75)</code> cutscene when not answering the bandit.</li>
+</ul>
+</li>
+<li><code>Mason</code> now shrugs if you are disturbing him fixing the car.</li>
+<li>Fixed Mission <code>Medical Breakthrough (75)</code> not traveling back to previous world when failing in cutscene world.</li>
+<li>Fixed missing exit interactable when doing Mission <code>Rats Recruitment (62)</code>.</li>
+<li>Fixed Objective task list on pinned mission hud. </li>
+<li>Mission <code>Double Cross (58)</code> now uses new asset system.</li>
+<li>Fixed <code>/spawnitem</code> not handling other item cases.</li>
+<li><code>portableautoturret</code> no longer detects <code>Jaws</code>.</li>
+<li>Added <strong>Daniil</strong>'s new <code>broomspear</code> animations.</li>
+<li>Added <strong>Daniil</strong>'s new <code>pickaxe</code> animations.</li>
+<li>Fixed <code>Vein of Nekron</code> not taking damage.</li>
+<li>Fixed premature despawning due to hitting debris limit by replacing the method used.</li>
+<li>Disabled npc accessories hitscan detection.</li>
+<li>Fixed shotgun shell customizations.</li>
+<li>Added <strong>Daniil</strong>'s new <code>inquistiorsword</code> animations.</li>
+<li>Removed <code>deagle</code> from shop.</li>
+<li>
+<p>Fixed workbench building blueprints result in "BlueprintLocked".</p>
+</li>
+<li>
+<p>Added <code>tier2augment</code>, <code>tier3augment</code>, <code>tier4augment</code>. Tier Augment will be used to upgrade mods to another tier. </p>
+</li>
+<li>Rewrote all mod handlers, these are scripts that carries out mod functionalities from damage mods to thorns mod.</li>
+<li><code>thornmod</code> reworked:<ul>
+<li>When taking melee damage, attacker takes reflected damage based on a percent of their health. Reflected damage only affects basic enemeis. Minimum reflected damage is 10.</li>
+<li>Taking reflected damage is now lethal has a minimum damage of 10.</li>
+</ul>
+</li>
+<li>Moved one point from piercing to tweak value for <code>bowdeadweightmod</code>.</li>
+<li>Adjusted <code>chainsaw</code> sound volumes.</li>
+<li>Mod tier incompatibility scaling are now reversed. A tier 1 mod equipping on to a tier 3 weapon will be stated as Inferior.<ul>
+<li>Mods tier upgrades is work in progress..</li>
+</ul>
+</li>
+<li>Added <strong>Daniil</strong>'s new <code>shovel</code> animations.</li>
+<li><code>ammorecyclermod</code> is now chance based and uses raw random to roll a chance to recover an ammo.</li>
+<li>Removed <code>Pistol</code> and <code>Shotgun</code> from <code>ammorecyclermod</code> compatibility. </li>
+<li>
+<p>Melee colliders now only show up in customization in Dev Branch with the [DB] tag.</p>
+</li>
+<li>
+<p>Added <strong>Daniil</strong>'s new <code>crowbar</code> animations.</p>
+</li>
+<li>
+<p>Polished up the cutscene for <code>Bandits Recruitment</code>.</p>
+</li>
+<li>Fixed <code>Mission 63: Bandits Recruitment</code>'s cutscene world <code>Bandits Recruitment</code> not loading stranger NPCs.</li>
+<li>Fixed <code>Mission 33: Awoken The Bear</code>'s cutscene <code>TheMall</code> typo.</li>
+<li>Added <strong>Daniil</strong>'s new <code>jacksscythe</code> animations.</li>
+<li>Fixed <code>Mission 58: DoubleCross</code> not able to help the bandits.</li>
+<li>Crowd fire check on <code>portableautoturret</code> relocated after reload attempt check.</li>
+<li>Customizing bullet on weapons now hides the default bullet texture.</li>
+<li>
+<p>Fixed <code>chainsaw</code> audio. Increased equip time from 0.5 to 1s.</p>
+</li>
+<li>
+<p>Added <strong>Daniil</strong>'s new <code>chainsaw</code> animations.</p>
+</li>
+<li>Fixed <code>portableautoturret</code> attempting to reload without reserve ammo disabling shooting even with magazine ammo.</li>
+<li>Fixed <code>Tanker</code> not spinning on the first rebar tornado.</li>
+<li>Mission <code>58</code>: "Pull the lever" mission task changed to "Do you want to pull the lever?"</li>
+<li>Updated lever description in <code>DoubleCross</code> world.</li>
+<li>Fixed emote animations not playing for NPCs.</li>
+<li>Updated <code>Patrick</code> to use new parallel movement engine.</li>
+<li>Polished <code>blacklight</code> text fade in and out.</li>
+<li>Added blacklight notes on Lennon's house door.</li>
+<li>
+<p>Added <strong>Daniil</strong>'s new <code>spikedbat</code> animations.</p>
+</li>
+<li>
+<p>Added <strong>Daniil</strong>'s new <code>survivalknife</code> &amp; <code>machete</code> animations.</p>
+</li>
+<li>Fixed mission <code>58</code> freezing in <code>Waiting for Revas's Response</code>.</li>
+<li>
+<p>Clicking next and back on the mission map menu will now blink the selected mission.</p>
+</li>
+<li>
+<p>Fixed melee weapon colliders showing up.</p>
+</li>
+<li>Updated weapons unequip animation with <strong>Daniil</strong>'s new unequip animations.</li>
+<li>Added melee damage tag for melee weapons for when Players &amp; NPC are attacking with melee weapons.</li>
+<li><code>tirearmor</code> now plays a sound when proc'ed.</li>
+<li>Added <code>tires</code> drop from <code>Hector Shot</code>.</li>
+<li>
+<p><code>tirearmorbp</code> now cost <code>tires</code>.</p>
+</li>
+<li>
+<p>Updated mission <code>29</code> to use new asset systems.</p>
+</li>
+<li><code>largemedkitbp</code> now require 5 <code>adhesive</code> to craft.</li>
+<li><code>ggenesiscrate</code> <code>tirearmor</code> drop updated to <code>tirearmorbp</code>.</li>
+<li>Added new resource Sticky Adhesive, <code>adhesive</code>.</li>
+<li>Added <code>adhesive</code> to <code>tickszombie</code> droptable.</li>
+<li>Added <code>Power Station</code> map data for <code>TheHarbor</code>.</li>
+<li>Added <code>screws</code> to <code>leaperzombie</code> droptable.</li>
+<li>Increased <code>wood</code> drop count for <code>growler</code> droptable.</li>
+<li>Added <code>molotov</code> to <code>growler</code> droptable.</li>
+<li>Added <code>Growler</code> spawns in <code>TheHarbor</code>.</li>
+<li>Increased <code>glass</code> drop count for <code>bloater</code> droptable.</li>
+<li>Added <code>Bloater</code> spawns to <code>TheHarbor</code>.</li>
+<li>Moved <code>Bloater</code> spawn in <code>TheUndergrounds</code> and increased spawn count.</li>
+<li>Increased spawn count for <code>TheHarbor</code>'s <code>Bloater</code> spawn.</li>
+<li>Droptable <code>heavyzombie</code> no longer drops <code>pyrodamagebp</code>. Now drops <code>barbedwooden</code> instead.</li>
+<li>Droptable <code>zenithcrate</code> now drops <code>ziphoningserum</code>.</li>
+<li>Droptable Hard Mode <code>Tanker</code> now drops <code>barbedmetalbp</code>.</li>
+<li>Mission <code>27</code> is now a side mission.</li>
+<li>Fixed Gold Shop's Premium Pass description about deconstruction perk return percent.</li>
+<li><code>Tanker</code>:<code>Rebar Slam</code> now scales damage with distance from impact.</li>
+<li><code>Tanker</code>:<code>Rebar Tornado (Hard)</code> now slows instead of knock back.</li>
+<li>
+<p>Npcs are now no longer blocked by <code>Tanker</code>'s <code>Rebar Fence</code>.</p>
+</li>
+<li>
+<p>Fixed teleporting when <code>Chained</code>.</p>
+</li>
+<li>Tweaked <code>The Prisoner</code>, <code>Tanker</code> health scaling per level.</li>
+<li><code>Boss</code> lobbies are now affect by level scaling. It will now use the highest level player's focus level as boss level.</li>
+<li>Updated <code>Tanker</code> Behavior.<ul>
+<li><code>Tanker</code> doesn't have a basic attack. He will just follow you.</li>
+<li><code>Tanker</code> Rebar Slam: Slams the rebar on to the ground, doing 45(Hard: 200) damage knocking away nearby players and creates a wall of rebars. Blocking off a path. </li>
+<li><code>Tanker</code> Rebar Tornado: Tanker spins the concrete rebar and moves faster. Doing 5(Hard: 10) damage per 0.5s.</li>
+</ul>
+</li>
+<li>
+<p>Enabled Hard Mode for <code>Boss: Tanker</code>;</p>
+</li>
+<li>
+<p>Added new melee <code>tankerrebar</code>.</p>
+</li>
+<li>Updated <code>Tanker</code> appearance.</li>
+<li>Updated all <code>Robert</code>'s movement code to new movement system.</li>
+<li>Rewrote <code>Infector Robert</code> behavior tree.</li>
+<li>
+<p>Enabled Hard Mode to <code>Coop: Genesis</code>.</p>
+</li>
+<li>
+<p>Polished <code>tirearmor</code> texture and added LowerTorso clothing piece.</p>
+</li>
+<li>Added <code>tirearmorred</code> for <code>tirearmor</code>'s first unlockable.</li>
+<li>Added <code>ggenesiscraate</code> Icon.</li>
+<li>Added <code>ggenesiscrate</code> to Genesis Lobby Hud drop rewards.</li>
+<li>Added <strong>Daniil</strong>'s new <code>m9legacy</code> animations.</li>
+<li>Removed explosion damage from <code>Genesis</code> airstrike.</li>
+<li>Removed all old uses of bindToggleGameBlinds.</li>
+<li><code>Coop: Genesis</code> now spawns in other bosses if there's no player in the lobby with mission 56 active.</li>
+<li>Fixed certain interactable syncing issues.</li>
+<li><code>/tppos</code> now ignores commas in the vector3 position.</li>
+<li><code>ChainedAnchor</code> can now move around.</li>
+<li><code>TireArmor</code> now shows passive on hud when melee is equipped.</li>
+<li>Fixed clothing statuses not showing up.</li>
+<li>
+<p>Fixed <code>Tendrils</code> missing range check.</p>
+</li>
+<li>
+<p><code>residentialGift</code> now spawns inside the wooden shack.</p>
+</li>
+<li>
+<p>Added <strong>Daniil</strong>'s new <code>arelshiftcross</code> animations.</p>
+</li>
+<li>Redistributed the level requirements for different drop tables. <a href="https://docs.google.com/spreadsheets/d/1US9AP_SZCdBuXudQKh7k-9SlsHIlBEZ1cKJC3mh69tQ/edit#gid=0">details</a></li>
+<li>
+<p>Added new drop table <code>residentialGift</code>.</p>
+</li>
+<li>
+<p>Fixed <code>Coop: Genesis</code> zombie spawn aggression level.</p>
+</li>
+<li>
+<p>Added <code>tirearmor</code> passive. When equipping a melee, zombie basic attacks has a <code>60%</code> chance to deduct 20 damage from the full damage. Final damage is capped at 1. </p>
+</li>
+<li>
+<p>New item <code>tirearmor</code>. Added item, icon and model.</p>
+</li>
+<li>
+<p>Fixed <code>gastankied</code> led timer display.</p>
+</li>
+<li>
+<p>Fixed <code>engineersplanner</code> interactable tooltip to update when pointing at another plan.</p>
+</li>
+<li>
+<p>Fixed destroyed barbed fences not breaking apart and despawning visual model after 60s.</p>
+</li>
+<li>
+<p>Fixed <code>Zricera</code>'s fire barrage not doing damage on impact.</p>
+</li>
+<li>
+<p>Improved boss lobby ready lights. </p>
+</li>
+<li>
+<p>Improved <code>CrouchWalk</code>, <code>WoundIdle</code> and <code>WoundCrawl</code> animation smoothness.</p>
+</li>
+<li>
+<p>Fixed <code>arelshiftcross</code>'s ropes not visible in first person mode.</p>
+</li>
+<li>
+<p>Fixed status: <code>Chained</code> not expiring when anchor is destroyed.</p>
+</li>
+<li>
+<p>Increased <code>arrow</code> &amp; <code>boltarrow</code>'s KillForce to 1000units.</p>
+</li>
+<li>
+<p>Fixed <code>tacticalbow</code> rope visibility in first person.</p>
+</li>
+<li>
+<p>Fixed <code>tacticalbow</code> reload/load animation when holding down <code>KeyFocus</code>.</p>
+</li>
+<li>
+<p>Tweaked <code>The Prisoner</code> difficulty balance.</p>
+</li>
+<li>
+<p>Added <strong>Daniil</strong>'s new <code>tacticalbow</code> animations.</p>
+</li>
+<li>
+<p>Updated <code>The Prisoner</code> behavior.</p>
+<ul>
+<li>No longer spawns jail cells, instead, you are chained to an anchor when attacked by the prisoner. The anchors can be destroyed to break free of the chains.</li>
+<li><code>The Prisoner</code> can sprint for 1.5s every 6s.</li>
+<li><code>The Prisoner</code> equips a <code>survivalknife</code> when it's <code>&lt; 50%</code> health.</li>
+</ul>
+</li>
+<li>
+<p>Updated <code>The Prisoner</code> visuals.</p>
+</li>
+<li>
+<p><code>at4</code> updated with Daniil's new animations.</p>
+</li>
+<li>
+<p>Planner now checks if the space is already occupied by a structure when building a plan.</p>
+</li>
+<li>
+<p>Unlocking a structure on the planner now gives a charge to begin with.</p>
+</li>
+<li>Planner plans now shows if you have enough resources to build the placed plans.</li>
+<li>
+<p>Rewritten backend code for building, skipping and canceling blueprints/builds.</p>
+</li>
+<li>
+<p>Fixed completed board missions showing the abort button. </p>
+</li>
+<li>Fixed board missions counting completed board missions when checking for max available to restock.</li>
+<li>
+<p>Dev branch restocking board mission timer now 10s and live branch is still 3600s.</p>
+</li>
+<li>
+<p>Mission <strong>A Good Deal</strong> <code>16</code> now <em>"I might have some interesting items to offer for more of your work."</em></p>
+</li>
+<li>
+<p>Readded <code>Zombie</code> flinch animations.</p>
+</li>
+<li>
+<p>Fixed Npc weapon animations not using markers.</p>
+</li>
+<li>
+<p>Fixed Npc fingers not matching hand's color and transparency.</p>
+</li>
+<li>Fixed <code>Survivor Npcs</code> would shoot other survivors npcs during mission cutscenes.</li>
+<li>
+<p>Fixed <code>Heavy</code> and <code>Zombies</code> network ownership when throwing <code>Zombies</code>.</p>
+</li>
+<li>
+<p><code>Heavy</code> attack speed reduced from 2 to 2.5s.</p>
+</li>
+<li>Fixed Zombies not using the correct damage calculations.</li>
+<li>
+<p>Added a <strong>Barbed Wooden Fence</strong> in <strong>Raid: Office</strong> to introduce the use of barb fences.</p>
+</li>
+<li>
+<p>Added <strong>Grenade Launcher</strong> reload and chamber sounds.</p>
+</li>
+<li>
+<p>Added <strong>Daniil</strong>'s new <strong>Grenade Launcher</strong> model &amp; animations.</p>
+</li>
+<li>Rewrite blinds screen.</li>
+<li>Refreshed selected missions on <strong>Missions Menu</strong>.</li>
+<li>
+<p>Improved mission <strong>Awoken The Bear (33)</strong> cutscene.</p>
+</li>
+<li>
+<p>Fixed npc weapon animations for <code>tec9</code>, <code>deagle</code>, <code>xm1014</code>, <code>mariner590</code>, <code>dualp250</code>, <code>fnfal</code>.</p>
+</li>
+<li><code>Zombie</code> AttackDamage is now: <code>5 + (level/2)</code>;</li>
+<li>Fixed <code>Stan</code> equipping <code>czevo3</code> animations.</li>
+</ul>
+</blockquote>
+<hr />
+<ul>
+<li><code>deagleparts</code> source updated to Obtained from <strong>Board Missions</strong>.</li>
+<li><code>deagleparts</code> now obtainable from mission <code>17</code>, <code>26</code> and <code>71</code>.</li>
+<li><strong>Board Mission</strong> can now drop item rewards and state reward items.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../2.1/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 2.1.*">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                2.1.*
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../Development/Pages/" class="md-footer__link md-footer__link--next" aria-label="Next: Pages">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Pages
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+      
+    
+    
+    
+    <a href="https://mastodon.online/@HelixNebulaDevs" target="_blank" rel="noopener me" title="Official Mastodon" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M433 179.1c0-97.2-63.7-125.7-63.7-125.7-62.5-28.7-228.6-28.4-290.5 0 0 0-63.7 28.5-63.7 125.7 0 115.7-6.6 259.4 105.6 289.1 40.5 10.7 75.3 13 103.3 11.4 50.8-2.8 79.3-18.1 79.3-18.1l-1.7-36.9s-36.3 11.4-77.1 10.1c-40.4-1.4-83-4.4-89.6-54-.6-4.6-.9-9.3-.9-13.9 85.6 20.9 158.7 9.1 178.7 6.7 56.1-6.7 105-41.3 111.2-72.9 9.8-49.8 9-121.5 9-121.5zm-75.1 125.2h-46.6V190.1c0-49.7-64-51.6-64 6.9v62.5H201V197c0-58.5-64-56.6-64-6.9v114.2H90.3c0-122.1-5.2-147.9 18.4-175 25.9-28.9 79.8-30.8 103.8 6.1l11.6 19.5 11.6-19.5c24.1-37.1 78.1-34.8 103.8-6.1 23.7 27.3 18.4 53 18.4 175"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://discord.gg/Sgs39DTCQX" target="_blank" rel="noopener" title="Community Discord Server" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.footer", "navigation.path", "navigation.prune", "navigation.top", "content.code.copy", "content.code.select", "search.share"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+      
+        <script src="https://fastly.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+      
+        <script src="https://fastly.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+      
+        <script src="../../assets/javascripts/interactive_graph.js"></script>
+      
+    
+  </body>
+</html>
