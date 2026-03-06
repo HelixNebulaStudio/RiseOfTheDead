@@ -80,7 +80,7 @@ if RunService:IsServer() then
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 		local modNpcs = shared.modNpcs;
 
-		local lydiaModule = modNpcs.getByModel(dialog.Prefab)
+		local lydiaModule = modNpcs.getByModel(dialog.Character)
 		if lydiaModule == nil or lydiaModule.Player ~= player then
 			shared.Notify(player, "[The Killer Hues] You are not in your safehome for this mission.", "Inform"); 
 			return;

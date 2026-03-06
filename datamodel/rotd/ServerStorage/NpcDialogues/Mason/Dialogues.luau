@@ -4,6 +4,7 @@ local CollectionService = game:GetService("CollectionService");
 local RunService = game:GetService("RunService");
 
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local Dialogues = {};
@@ -285,10 +286,12 @@ if RunService:IsServer() then
 						if toolHandler.EquipmentClass == nil then return end;
 						local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
 
-						local modifier: ConfigModifier = equipmentClass.Configurations.newModifier("npcDmg");
-						modifier.SetValues.Damage = 25;
-						modifier.Priority = 999;
-						equipmentClass.Configurations:AddModifier(modifier, true);
+						equipmentClass:AddBaseModifier("npcDmg", {
+							SetValues = {
+								Damage = 25;
+							};
+							Priority = 999;
+						});
 					end;
 				});
 			end)
@@ -467,6 +470,20 @@ if RunService:IsServer() then
 				local followPlayerComp = npcClass:GetComponent("FollowPlayer");
 				followPlayerComp.FollowInFront = true;
 				followPlayerComp(player);
+			end)
+
+			addDialog("Shop", "yeah yeah.", function(dialog) 
+				local npcModel = dialog.Character;
+
+				local shopInteractConfig = npcModel:FindFirstChild("ShopInteractable");
+				if shopInteractConfig == nil then
+					shopInteractConfig = modInteractables.createInteractable("Shop");
+					shopInteractConfig.Name = "ShopInteractable";
+					shopInteractConfig:SetAttribute("ShopType", "Rats");
+					shopInteractConfig.Parent = npcModel;
+				end
+				dialog:InteractRequest(shopInteractConfig);
+
 			end)
 		end
 

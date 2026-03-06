@@ -73,17 +73,22 @@ function npcPackage.Spawning(npcClass: NpcClass)
         if equipmentClass == nil then return end;
 
         if equipmentClass.Class == "Gun" then
-            local modifier = equipmentClass.Configurations.newModifier("RatGun");
-            modifier.SetValues.Damage = math.random(3, 5);
-            modifier.SetValues.AmmoCapacity = math.random(60, 120);
-            modifier.SetValues.NpcPercentHealthDamage = 0.1;
-            equipmentClass.Configurations:AddModifier(modifier, true);
+            equipmentClass:AddBaseModifier("RatGun", {
+                SetValues = {
+                    Damage = math.random(3, 5);
+                    AmmoCapacity = math.random(60, 120);
+                    NpcPercentHealthDamage = 0.1;
+                };
+            });
 
         elseif equipmentClass.Class == "Melee" then
-            local modifier = equipmentClass.Configurations.newModifier("RatMelee");
-            modifier.SetValues.Damage = math.random(10, 15);
-            modifier.SetValues.NpcPercentHealthDamage = 0.3;
-            equipmentClass.Configurations:AddModifier(modifier, true);
+            equipmentClass:AddBaseModifier("RatMelee", {
+                SetValues = {
+                    Damage = math.random(10, 15);
+                    NpcPercentHealthDamage = 0.3;
+                };
+            });
+
         end
     end
 

@@ -24,7 +24,7 @@ library:Add{
 	Id="fiaitr";
 	Icon="rbxassetid://4493354290";
 	Name="First Aid Training";
-	Link="morbir";
+	Link="thrsen";
 	
 	Description="Using medkits are $Percent% faster.";
 	Stats={
@@ -32,7 +32,7 @@ library:Add{
 	};
 	
 	Level=15;
-	UpgradeCost=5;
+	UpgradeCost=10;
 	MaxLevel=5;
 	
 	EventLogicTriggers = {"Players_BindWieldEvent"};
@@ -108,7 +108,7 @@ library:Add{
 	Id = "tougup";
 	Icon = "rbxassetid://6561811265";
 	Name = "Toughening Up";
-	Link = "remres";
+	Link = "fiaitr";
 
 	Description = "When your armor is more than 0, every percent of damage dealt to your enemies recovers $Amount armor points.";
 	Stats = {
@@ -128,7 +128,7 @@ library:Add{
 	Name="Threat Sense";
 	Link="morbir";
 
-	Description="Enemies that targets you are revealed within $Amount units away.";
+	Description="Enemies that target you are revealed within $Amount units away.";
 	Stats={
 		Amount={Base=40; Max=320};
 	};

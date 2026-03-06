@@ -24,13 +24,13 @@ end
 
 function modifierPackage.Kick(modifier: ItemModifierInstance, targetModel)
 	if modifier.WieldComp == nil then return end;
-	local ownerClass: CharacterClass = modifier.WieldComp.CompOwner;
+	local ownerClass: CharacterClass = modifier.WieldComp.CompOwner :: CharacterClass;
 
 	local healthComp: HealthComp? = modHealthComponent.getByModel(targetModel);
 	if healthComp == nil or healthComp.IsDead then return end;
 	targetModel = healthComp:GetModel();
 
-	local targetClass: CharacterClass = healthComp.CompOwner;
+	local targetClass: CharacterClass = healthComp.CompOwner :: CharacterClass;
 	if targetClass.ClassName ~= "NpcClass" then return end;
 
 	if targetClass.HealthComp:CanTakeDamageFrom(ownerClass) == false then return end;

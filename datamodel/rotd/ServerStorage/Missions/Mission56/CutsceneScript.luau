@@ -14,6 +14,20 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
+	if modBranchConfigurations.IsWorld("TheResidentials") then
+		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+
+			local interactable: InteractableInstance = ...;
+			if interactable.Id ~= "residentialSafehomeBasement" then return end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint == 1 then mission.ProgressionPoint = 2; end;
+			end)
+		end)
+	end
+
 else
 	modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
@@ -22,8 +36,8 @@ end
 --== Script;
 return function(CutsceneSequence)
 	if not modBranchConfigurations.IsWorld("TheResidentials") then return end;
-	-- MARK: TheResidentials
 
+	-- MARK: TheResidentials
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
@@ -42,7 +56,7 @@ return function(CutsceneSequence)
 					local coopEntrancePos = Vector3.new(1060.251, -20.875, -126.729);
 					local distFromEntrance = math.huge;
 					repeat
-						wait(1);
+						task.wait(1);
 						distFromEntrance = (playerClass.RootPart.Position-coopEntrancePos).Magnitude;
 					until not player:IsDescendantOf(game.Players) or distFromEntrance <= 14;
 					

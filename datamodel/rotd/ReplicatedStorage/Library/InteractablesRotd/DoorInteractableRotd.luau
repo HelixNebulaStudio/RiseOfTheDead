@@ -43,30 +43,6 @@ function interactablePackage.init(super) -- Server/Client
             interactable.Label = interactable.Config:GetAttribute("Label") :: string;
         end
 
-        if modBranchConfigurations.IsWorld("TheUnderground") then
-
-        elseif modBranchConfigurations.IsWorld("TheMall") then
-            if interactable.Id == "awokenTheBearEntrance" then
-                local mission33 = clientData:GetMission(33);
-                if mission33.ProgressionPoint <= 2 or mission33.Type ~= 1 then
-                    interactable.CanInteract = false;
-                    interactable.Label = `Door is locked, start "Awoken The Bear" mission to unlock.`;
-                    return;
-                end
-            end
-
-        elseif modBranchConfigurations.IsWorld("BanditOutpost") then
-            if interactable.Id == "hostageRoom" then
-                local mission33 = clientData:GetMission(33);
-                if mission33.Type == 1 and mission33.ProgressionPoint == 13 then
-                    interactable.CanInteract = false;
-                    interactable.Label = `Talk to the stranger first.`;
-                    return;
-                end
-            end
-            
-        end
-
         interactable.CanInteract = true;
     end
 

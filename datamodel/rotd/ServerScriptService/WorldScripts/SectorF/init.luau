@@ -45,7 +45,7 @@ function WorldCore.InitGameController()
         {Type="Boss"; Fmod=6;};
         {Type="SuppliesRequest"; Fmod=9;};
         {Type="ProtectObjTime"; Fmod=10;};
-        -- {Type="Oily"; Fmod=3;};
+        {Type="Oily"; Fmod=3;};
     };
 
     newGameController.HazardsList = {

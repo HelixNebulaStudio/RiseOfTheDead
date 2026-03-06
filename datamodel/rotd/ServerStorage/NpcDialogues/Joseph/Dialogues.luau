@@ -93,7 +93,7 @@ if RunService:IsServer() then
 		if playerLobby and playerLobby.State >= 2 and playerLobby.State <= 3 then return end;
 
 		local function StartCardGame(dialog)
-			local npcPrefab = dialog.Prefab;
+			local npcPrefab = dialog.Character;
 			
 			local cardGameLobby = modCardGame.NewLobby(npcPrefab);
 			local npcTable = cardGameLobby:GetPlayer(npcPrefab);

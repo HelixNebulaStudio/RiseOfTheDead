@@ -199,9 +199,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			colorFrame.Content.Advance.Visible = false;
 			colorFrame.Content.ColorPalette.Size = UDim2.new(1, 0, 1, 0);
 			colorFrame.NameTag.Visible = false;
-			colorFrame.touchCloseButton.Visible = false;
 			garbage:Tag(function()
-				colorPickerObj:Destroy();
+				colorFrame.Visible = false;
 			end);
 
 			local newDropDownList = modDropdownList.new();
@@ -215,7 +214,6 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					newDropDownList.ScrollFrame.CanvasPosition = Vector2.zero;
 					return 
 				end;
-				colorPickerObj.Frame.Parent = nil;
 				colorFrame.Visible = false;
 			end)
 

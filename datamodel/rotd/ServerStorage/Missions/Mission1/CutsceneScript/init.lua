@@ -337,11 +337,13 @@ return function(CutsceneSequence)
 				OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
 					if toolHandler.EquipmentClass == nil then return end;
 					local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
-
-					local modifier: ConfigModifier = equipmentClass.Configurations.newModifier("npcDmg");
-					modifier.SetValues.Damage = 20;
-					modifier.Priority = 999;
-					equipmentClass.Configurations:AddModifier(modifier, true);
+								
+					equipmentClass:AddBaseModifier("npcDmg", {
+						SetValues = {
+							Damage = 20;
+						};
+						Priority = 999;
+					});
 				end;
 			});
 

@@ -47,13 +47,13 @@ if RunService:IsServer() then
 		local configurations = modifier.EquipmentClass and modifier.EquipmentClass.Configurations;
 		local weaponSiid = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem.ID;
 
+		local characterClass: CharacterClass? = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass;
+		if characterClass == nil then return end;
 
-		local characterClass: CharacterClass? = modifier.WieldComp and modifier.WieldComp.CompOwner or nil;
+		local targetHealthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
+		if targetHealthComp == nil or targetHealthComp.IsDead or not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
 		
-		local healthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
-		if healthComp == nil or healthComp.IsDead or not healthComp:CanTakeDamageFrom(characterClass) then return end;
-		
-		local targetCharClass: EntityClass = healthComp.CompOwner;
+		local targetCharClass: EntityClass = targetHealthComp.CompOwner;
 		local statusComp: StatusComp? = targetCharClass.StatusComp;
 		if statusComp == nil then return end;
 

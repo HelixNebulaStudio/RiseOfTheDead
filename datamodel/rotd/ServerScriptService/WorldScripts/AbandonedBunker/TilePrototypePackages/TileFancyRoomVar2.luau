@@ -16,7 +16,7 @@ function TilePrototypePackage.onRequire()
 		Debugger:Warn("OnDoorToggle");
 
 		local lootSpawnAtt: Attachment = doorInstance.Values.LootSpawn;
-		if lootSpawnAtt:GetAttribute("Spawned") == true then return end;
+		if lootSpawnAtt == nil or lootSpawnAtt:GetAttribute("Spawned") == true then return end;
 		lootSpawnAtt:SetAttribute("Spawned", true);
 		
 		local itemDrop = modItemDrops.ChooseDrop(modRewardsLibrary:Find("ab:arelshiftpartsdrop"));
@@ -53,11 +53,15 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 	local chosenLootSpawn = lootSpawns[math.random(1, #lootSpawns)];
 	
 	for _, child in pairs(newModel:GetChildren()) do
+		if child.Name ~= "SingleDoor" then continue end;
+
 		local doorConfig = child:FindFirstChild("Door");
 		if doorConfig == nil or not doorConfig:IsA("Configuration") then continue end;
 
 		local door: DoorInstance = modDoors.getOrNew(doorConfig);
 		door.Values.LootSpawn = chosenLootSpawn;
+
+		Debugger:Warn(`Set up door`, door.Values);
 		table.insert(self.Doors, door);
 	end
 end

@@ -99,9 +99,6 @@ function toolPackage.ActionEvent(handler, packet)
 	local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	local remotes = game.ReplicatedStorage.Remotes;
-	local bindOnDoorEnter = remotes.Interactable.OnDoorEnter;
-
 	if packet.ActionIndex ~= 1 then return end;
 
 	local shotdata = packet.ClientPacket;
@@ -162,13 +159,13 @@ function toolPackage.ActionEvent(handler, packet)
 		end)
 	end
 	if handler.DoorEnterConn == nil then
-		handler.DoorEnterConn = bindOnDoorEnter.Event:Connect(function(player, interactData)
-			local classPlayer = shared.modPlayers.get(player);
+		-- handler.DoorEnterConn = bindOnDoorEnter.Event:Connect(function(player, interactData)
+		-- 	local classPlayer = shared.modPlayers.get(player);
 			
-			if handler.NpcModule and not handler.NpcModule.IsDead then
-				handler.NpcModule.RootPart.CFrame = classPlayer.RootPart.CFrame;
-			end
-		end)
+		-- 	if handler.NpcModule and not handler.NpcModule.IsDead then
+		-- 		handler.NpcModule.RootPart.CFrame = classPlayer.RootPart.CFrame;
+		-- 	end
+		-- end)
 	end
 	
 	if shotdata.Target then

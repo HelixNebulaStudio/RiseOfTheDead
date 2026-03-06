@@ -7,13 +7,13 @@ local Dialogues = {
 	Mason={};
 };
 
-local missionId = 12;
+local MISSION_ID = 12;
 --==
 
 -- !outline: Mason Dialogues
 Dialogues.Mason.DialogueStrings = {
 	["restock_factory"]={
-		CheckMission=missionId; 
+		CheckMission=MISSION_ID; 
 		Say="Sure, where are we going?"; 
 		Face="Confident"; Reply="I recently scouted out the factory, it seems like there might be some supplies there.";
 		FailResponses = {
@@ -70,7 +70,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Hey $PlayerName, we are running low on supplies. Do you want to go scavenge for some supplies?");
 			dialog:AddChoice("restock_factory", function(dialog)
 				dialog:AddChoice("restock_holdOn", function(dialog)
-					modMission:StartMission(player, missionId);
+					modMission:StartMission(player, MISSION_ID);
 				end)
 			end)
 			
@@ -81,7 +81,7 @@ if RunService:IsServer() then
 				
 				dialog:SetInitiate("Have you refilled your weapons yet?");
 				dialog:AddChoice("restock_refilled", function(dialog)
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint < 2 then
 							mission.ProgressionPoint = 2;
 						end;
@@ -98,7 +98,7 @@ if RunService:IsServer() then
 			elseif stage == 5 then
 				dialog:SetInitiate("That was quite a fight, are you alright?");
 				dialog:AddChoice("restock_imAlright", function(dialog)
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint < 6 then
 							mission.ProgressionPoint = 6;
 						end;

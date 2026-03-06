@@ -110,6 +110,8 @@ local statTemplates = {
 		{Key="ExplosionRadius"; Text="<b>Explosion Radius:</b>    $statu"; Type="int";};
 		{Key="ExplosionStun"; Text="<b>Explosion Stun:</b>    $stats"; Type="2dp";};
 		
+		{Key="FireAlertRange"; Text="<b>Fire Alert Range:</b>    $statu"; Type="int";};
+
 		-- Knockout Trigger
 		{Key="KnockoutDistance"; Text="<b>Knockout Distance:</b>    $statu"; Type="2dp"};
 		{Key="KnockoutDuration"; Text="<b>Knockout Duration:</b>    $stats"; Type="2dp"};
@@ -235,6 +237,9 @@ local mouseOverDescription = {
 	CritMulti={
 		Desc="<b>[Crit Receiver]</b> The additional premod damage multiplier when a crit is proced. \n\n(Higher is better)";
 	};
+    FireAlertRange={
+        Desc="The range in which enemies will be alerted to your position when you fire. Default is 128 units.\n\n(Higher is better)";
+    };
 	Dps={
 		Desc="DPS also known as Damage Per Second, is the amount of damage on average the weapon can do in a second. The value does not take reload time and magazine size in to theoretical calculations. \n\n(Higher is better)";
 	};

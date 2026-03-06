@@ -2,6 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+
 --=
 local Dialogues = {
 	Patrick={};
@@ -9,7 +11,7 @@ local Dialogues = {
 	Caitlin={};
 };
 
-local missionId = 58;
+local MISSION_ID = 58;
 --==
 
 -- MARK: Patrick Dialogues
@@ -39,7 +41,7 @@ Dialogues.Patrick.DialogueStrings = {
 		Reply="I got to defect, the Bandits are chaotic, disorganized and I can't leave on my own, they will hunt me down.";
 	};
 	["doubleCross_5"]={
-		CheckMission=missionId;
+		CheckMission=MISSION_ID;
 		Face="Confident";
 		Say="What can I do to help?";
 		Reply="I need you to help me convince Revas to let me into their ranks by telling them about the trap.";
@@ -165,7 +167,7 @@ if RunService:IsServer() then
 					dialog:SetInitiate("*groan* Bring me somewhere safe..");
 				else
 					dialog:SetInitiateTag("doubleCross_17");
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 17 then
 							mission.ProgressionPoint = 18;
 						end;
@@ -176,29 +178,36 @@ if RunService:IsServer() then
 
 			dialog:SetInitiate("Well..?");
 
+			local travelInteractConfig;
+			if mission.ProgressionPoint == 7 or mission.ProgressionPoint == 8 then
+				local npcModel = dialog.Character;
+
+				travelInteractConfig = npcModel:FindFirstChild("doubleCrossInteractable");
+				if travelInteractConfig == nil then
+					travelInteractConfig = modInteractables.createInteractable("Travel");
+					travelInteractConfig.Name = "doubleCrossInteractable";
+					travelInteractConfig:SetAttribute("WorldName", "DoubleCross");
+					travelInteractConfig.Parent = npcModel;
+				end
+			end
+
 			if mission.ProgressionPoint == 7 then
 				dialog:SetInitiateTag("doubleCross_6");
 				dialog:AddChoice("doubleCross_7", function(dialog)
 					dialog:AddChoice("doubleCross_travelToCargoShip", function(dialog)
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 7 then
 								mission.ProgressionPoint = 8;
 							end;
 						end)
 						
-						local npcModel = dialog.Prefab;
-						if npcModel:FindFirstChild("doubleCrossInteractable") then
-							dialog:InteractRequest(npcModel.doubleCrossInteractable, npcModel.PrimaryPart);
-						end
+						dialog:InteractRequest(travelInteractConfig);
 					end)
 				end)
 
 			elseif mission.ProgressionPoint == 8 then
 				dialog:AddChoice("doubleCross_travelToCargoShip", function()
-					local npcModel = dialog.Prefab;
-					if npcModel:FindFirstChild("doubleCrossInteractable") then
-						dialog:InteractRequest(npcModel.doubleCrossInteractable, npcModel.PrimaryPart);
-					end
+					dialog:InteractRequest(travelInteractConfig);
 				end);
 
 			elseif mission.ProgressionPoint == 18 then
@@ -227,7 +236,7 @@ if RunService:IsServer() then
 							end
 
 							task.wait(2);
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 							shared.Notify(player, "You have unlocked factions! Open your faction menu to join or create a faction.", "Inform");
 						end)
 					end)
@@ -241,7 +250,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("doubleCross_3", function(dialog)
 						dialog:AddChoice("doubleCross_4", function(dialog)
 							dialog:AddChoice("doubleCross_5", function(dialog)
-								modMission:StartMission(player, missionId);
+								modMission:StartMission(player, MISSION_ID);
 							end)
 						end)
 					end)
@@ -284,7 +293,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("doubleCross_1", function(dialog)
 					dialog:AddChoice("doubleCross_2", function(dialog)
 						dialog:AddChoice("doubleCross_3", function(dialog)
-							modMission:Progress(player, missionId, function(mission)
+							modMission:Progress(player, MISSION_ID, function(mission)
 								if mission.ProgressionPoint < 6 then
 									mission.ProgressionPoint = 6;
 								end;
@@ -299,7 +308,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("doubleCross_6", function(dialog)
 						dialog:AddChoice("doubleCross_7", function(dialog)
 							dialog:AddChoice("doubleCross_8", function(dialog)
-								modMission:Progress(player, missionId, function(mission)
+								modMission:Progress(player, MISSION_ID, function(mission)
 									if mission.ProgressionPoint < 10 then
 										mission.ProgressionPoint = 10;
 									end;
@@ -322,7 +331,7 @@ if RunService:IsServer() then
 			if stage == 1 then
 				dialog:AddChoice("doubleCross_1", function(dialog)
 					dialog:AddChoice("doubleCross_2", function(dialog)
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 2 then
 								mission.ProgressionPoint = 2;
 							end;
@@ -334,7 +343,7 @@ if RunService:IsServer() then
 
 			elseif stage == 3 then
 				dialog:AddChoice("doubleCross_3", function(dialog)
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint < 4 then
 							mission.ProgressionPoint = 4;
 						end;

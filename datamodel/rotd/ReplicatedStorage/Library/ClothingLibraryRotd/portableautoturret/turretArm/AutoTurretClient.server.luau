@@ -122,21 +122,14 @@ if isOwner then
 	local storageItem;
 	UserInputService.InputBegan:connect(function(inputObject, inputEvent)
 		if UserInputService:GetFocusedTextBox() ~= nil then return end;
-		if modKeyBindsHandler:Match(inputObject, "KeyTogglePat") then
-			if turretArm.Parent == nil or turretArm.Parent.Parent ~= character then return end;
+		if not modKeyBindsHandler:Match(inputObject, "KeyTogglePat") then return end;
+		if turretArm.Parent == nil or turretArm.Parent.Parent ~= character then return end;
 
-			if tick()-debounce <= 1 then return end;
-			debounce = tick();
-			local returnPacket = remoteAutoTurret:InvokeServer("toggleonline");
+		if tick()-debounce <= 1 then return end;
+		debounce = tick();
+		local returnPacket = remoteAutoTurret:InvokeServer("toggleonline");
 
-			if returnPacket and returnPacket.Success then
-				storageItem = modData.GetItemById(returnPacket.ID);
-				storageItem.Values.Online = returnPacket.Values.Online;
-				storageItem.Values.Config = returnPacket.Values.Config;
-			end
-
-			debounce = tick()-0.5;
-		end
+		debounce = tick()-0.5;
 	end)
 
 end

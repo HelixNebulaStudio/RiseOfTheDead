@@ -3,7 +3,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
 
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 local modHealthComp = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
 local overlapParams = OverlapParams.new();
@@ -20,14 +19,22 @@ function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstanc
     if RunService:IsClient() then return end;
     local modToolService = shared.require(game.ServerScriptService.ServerLibrary.ToolService);
     
+    local hitInfo = packet.HitInfo;
     if packet.Index ~= packet.EndIndex then return end;
     if packet.RicochetCount and packet.RicochetCount <= 0 then return end;
 
+    local wieldComp: WieldComp? = modifier.WieldComp;
+    if wieldComp == nil then return end;
+
+    local characterClass: CharacterClass = wieldComp.CompOwner :: CharacterClass;
+    if characterClass == nil then return end;
+
     local equipmentClass = modifier.EquipmentClass;
-    local player = packet.Player;
-    local hitInfo = packet.HitInfo;
-    local weaponModel = packet.WeaponModel;
-    
+    if equipmentClass == nil then return end;
+
+    local storageItem: StorageItem = equipmentClass.StorageItem;
+    local toolHandler: ToolHandlerInstance = wieldComp:GetToolHandler(storageItem.ID, storageItem.ItemId);
+
     local configurations = equipmentClass.Configurations;
     local bulletRicochetCount = configurations.BulletRicochetCount or 1;
     local bulletRicochetDistance = configurations.BulletRicochetDistance or 64;
@@ -36,22 +43,12 @@ function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstanc
     local hitPosition = hitInfo.Position;
     local hitNormal = hitInfo.Normal;
 
-    local equippedSiid = weaponModel:GetAttribute("StorageItemId");
-    if equippedSiid == nil then return end;
-
-    local storageItem = shared.modStorage.FindIdFromStorages(equippedSiid, player);
-    if storageItem == nil then return end;
-
-    local toolHandler: ToolHandlerInstance = characterClass.WieldComp:GetToolHandler(storageItem.ID, storageItem.ItemId, storageItem);
-
-    overlapParams.FilterDescendantsInstances = CollectionService:GetTagged("Enemies");
-    overlapParams.MaxParts = math.max(5, bulletRicochetCount*2);
-
     local raycastParam = RaycastParams.new();
     raycastParam.IgnoreWater = true;
     raycastParam.FilterType = Enum.RaycastFilterType.Include;
 
-    local playerClass: PlayerClass = shared.modPlayers.get(player);
+    overlapParams.FilterDescendantsInstances = CollectionService:GetTagged("Enemies");
+    overlapParams.MaxParts = math.max(5, bulletRicochetCount*2);
 
     local function ricochet(ricochetOrigin)
         local rootParts = workspace:GetPartBoundsInRadius(ricochetOrigin, bulletRicochetDistance, overlapParams);
@@ -64,7 +61,7 @@ function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstanc
             local targetModel = targetRootPart.Parent;
             local targetHealthComp: HealthComp? = modHealthComp.getByModel(targetModel);
 
-            if targetHealthComp == nil or not targetHealthComp:CanTakeDamageFrom(playerClass) then continue end
+            if targetHealthComp == nil or not targetHealthComp:CanTakeDamageFrom(characterClass) then continue end
             if targetHealthComp.IsDead then continue end
 
             local targetPosition = targetRootPart.Position;
@@ -95,23 +92,18 @@ function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstanc
 
         local firePacket = {
             StorageItem = storageItem;
-            ToolModel = weaponModel;
             ToolHandler = toolHandler;
 
-            ShotBy = playerClass;
+            ShotBy = characterClass;
 
-            ShotOrigin = ricochetOrigin;
+            ShotOriginPos = ricochetOrigin;
             ShotDirection = direction;
 
             ReplicateToShotOwner = true;
             RicochetCount = packet.RicochetCount or bulletRicochetCount;
 
-            Targetable = {
-                Zombie = true;
-                Bandit = true;
-                Cultist = true;
-                Rat = true;
-            };
+            ToolModel = packet.ToolModel;
+			TargetableTags = table.clone(toolHandler.WieldComp.TargetableTags);
         };
         
         if packet.FocusCharge then

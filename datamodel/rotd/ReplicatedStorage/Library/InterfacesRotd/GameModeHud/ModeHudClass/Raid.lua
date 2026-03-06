@@ -57,8 +57,6 @@ return function(interface: InterfaceInstance, window, frame)
 		elseif data.EndStageSound == true then
 			data.EndStageSound = false;
 
-			modAudio.Preload("MissionComplete", 5);
-			modAudio.Play("MissionComplete");
 		end
 
 		if self.Soundtrack then

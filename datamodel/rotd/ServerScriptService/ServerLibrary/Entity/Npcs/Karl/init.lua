@@ -76,10 +76,12 @@ function npcPackage.Spawned(npcClass: NpcClass)
             local equipmentClass: EquipmentClass? = toolHandler.EquipmentClass;
             if equipmentClass == nil then return end;
             
-            local modifier = equipmentClass.Configurations.newModifier("MacheteMelee");
-            modifier.SetValues.Damage = configurations.AttackDamage;
-            modifier.SetValues.NpcPercentHealthDamage = 0.25;
-            equipmentClass.Configurations:AddModifier(modifier, true);
+            equipmentClass:AddBaseModifier("MacheteMelee", {
+                SetValues = {
+                    Damage = configurations.AttackDamage;
+                    NpcPercentHealthDamage = 0.25;
+                };
+            });
         end;
     };
 end

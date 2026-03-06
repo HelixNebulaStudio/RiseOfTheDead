@@ -41,13 +41,12 @@ if RunService:IsServer() then
 	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
 		if packet.TargetModel == nil then return end;
 		
-		local characterClass: CharacterClass;
-		if modifier.Player then
-			characterClass = shared.modPlayers.get(modifier.Player);
-		end
+		local characterClass: CharacterClass = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass;
+		if characterClass == nil then return end;
 		
-		local healthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
-		if healthComp == nil or healthComp.IsDead or not healthComp:CanTakeDamageFrom(characterClass) then return end;
+		local targetHealthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
+		if targetHealthComp == nil then return end;
+		if targetHealthComp.IsDead or not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
 	
 		if modifier.Values.Counter > 1 then
 			modifier.Values.Counter = modifier.Values.Counter -1;
@@ -59,9 +58,8 @@ if RunService:IsServer() then
 		end
 
 		local configurations = modifier.EquipmentClass and modifier.EquipmentClass.Configurations;
-
 		
-		local targetClass: EntityClass = healthComp.CompOwner;
+		local targetClass: EntityClass = targetHealthComp.CompOwner;
 		local statusComp: StatusComp? = targetClass.StatusComp;
 		if statusComp == nil then return end;
 		
@@ -69,6 +67,7 @@ if RunService:IsServer() then
 		if frostbiteStatusClass == nil then
 			statusComp:Apply(statusId, {
 				Expires = workspace:GetServerTimeNow() + 5;
+				Duration = 5;
 				ApplyBy = characterClass;
 				Values = {
 					Damage = configurations.Damage; 

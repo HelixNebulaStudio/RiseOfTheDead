@@ -513,6 +513,7 @@ export type AppearanceData = {
     -- @methods
     Update: (AppearanceData, Storage) -> nil;
     GetAccessories: (AppearanceData, siid: string) -> {Accessory};
+    GetAccessoriesByItemId: (AppearanceData, itemId: string) -> {Accessory};
 };
 
 
@@ -807,7 +808,7 @@ export type NpcClass = CharacterClass & {
     AnimationController: AnimationController;
     Interactable: ModuleScript?;
     Remote: UnreliableRemoteEvent;
-    LastRespawnTick: number?;
+    LastRespawnTick: number;
     
     -- @methods
     Setup: (NpcClass, baseNpcModel: Model, npcModel: Model) -> nil;
@@ -1735,20 +1736,17 @@ export type StatusCompApplyParam = {
 --MARK: BulletHitData
 export type BulletHitData = {
     OriginPoint: Vector3;
-
     OriginAtt: Attachment;
-    HitInfo: HitInfo;
-    
-    TargetPart: BasePart;
-    TargetPoint: Vector3;
-    TargetNormal: Vector3;
-    TargetMaterial: Enum.Material;
-    TargetIndex: number;
-    TargetDistance: number;
+    ShotDirection: Vector3;
 
+    HitInfo: HitInfo;
+
+    ToolModel: Model;
     TargetModel: Model;
-    IsHeadshot: boolean;
-}
+    
+    Index: number;
+    EndIndex: number;
+} & anydict;
 
 export type HitInfo = {
     Part: BasePart?;
@@ -1756,7 +1754,7 @@ export type HitInfo = {
     Normal: Vector3?;
     Index: number;
     MultiIndex: number;
-}
+} & anydict;
 
 --MARK: ArcPoint
 export type ArcPoint = {

@@ -1,18 +1,32 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Client Variables;
+--==
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
---== Server Variables;
 local MISSION_ID = 34;
+--==
 
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
+	shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
+		local player: Player? = eventPacket.Player;
+		if player == nil then return end;
+
+		local mission = modMission:GetMission(player, MISSION_ID);
+		if mission == nil then return end;
+		
+		local playerLocation = player:GetAttribute("Location");
+		if mission.SaveData.Location ~= playerLocation then return end;
+
+		modMission:Progress(player, MISSION_ID, function(mission)
+			if mission.ProgressionPoint == 2 then mission.ProgressionPoint = 3; end;
+		end)
+	end)
 	
 end
 
@@ -30,7 +44,7 @@ return function(CutsceneSequence)
 	
 		for a=1, 5 do
 			if player.Character ~= nil then break; end;
-			wait(1)
+			task.wait(1);
 		end
 		if player.Character == nil then return end;
 		
@@ -68,7 +82,7 @@ return function(CutsceneSequence)
 				elseif mission.ProgressionPoint == 3 then
 					if strangerNpcClass and strangerNpcClass.Character then
 						strangerNpcClass.Properties.Immortal = 1;
-						wait(1);
+						task.wait(1);
 						strangerNpcClass.Character:Destroy();
 						strangerNpcClass = nil;
 					end

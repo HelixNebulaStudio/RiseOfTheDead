@@ -93,16 +93,20 @@ function npcPackage.Spawned(npcClass: NpcClass)
         if equipmentClass == nil then return end;
 
         if equipmentClass.Class == "Gun" then
-            local modifier = equipmentClass.Configurations.newModifier("PathorothGun");
-            modifier.SetValues.NpcPercentHealthDamage = 0.05;
-            modifier.SetValues.DamageType = "Heal";
-            equipmentClass.Configurations:AddModifier(modifier, true);
+            equipmentClass:AddBaseModifier("PathorothGun", {
+                SetValues = {
+                    DamageType = "Heal";
+                    NpcPercentHealthDamage = 0.05;
+                };
+            });
 
         elseif equipmentClass.Class == "Melee" then
-            local modifier = equipmentClass.Configurations.newModifier("PathorothMelee");
-            modifier.SetValues.NpcPercentHealthDamage = 0.1;
-            modifier.SetValues.DamageType = "Heal";
-            equipmentClass.Configurations:AddModifier(modifier, true);
+            equipmentClass:AddBaseModifier("PathorothMelee", {
+                SetValues = {
+                    DamageType = "Heal";
+                    NpcPercentHealthDamage = 0.1;
+                };
+            });
         end
     end
 

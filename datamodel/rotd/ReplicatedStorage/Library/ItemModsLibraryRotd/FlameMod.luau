@@ -40,23 +40,25 @@ end
 
 
 if RunService:IsServer() then
+	local modFlammable = shared.require(game.ServerScriptService.ServerLibrary.Flammable);
 
-	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitPacket)
+	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
 		local duration = modifier.Values.Duration;
 		if packet.HitInfo == nil then return end;
 		
-		local characterClass: CharacterClass;
-		if modifier.ItemModStorageItem and modifier.ItemModStorageItem.Player then
-			characterClass = shared.modPlayers.get(modifier.ItemModStorageItem.Player);
-		end
-		
+		local characterClass: CharacterClass = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass;
+		if characterClass == nil then return end;
+
+		local targetModel = packet.TargetModel;
+		if targetModel == nil then return end;
+
 		local targetPart = packet.HitInfo.Part;
-		if targetPart == nil or targetPart.Parent == nil then return end;
+		if targetPart == nil then return end;
+		
+		local targetHealthComp: HealthComp? = modHealthComp.getByModel(targetModel);
+		if targetHealthComp == nil or not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
 
-		local healthComp: HealthComp? = modHealthComp.getByModel(targetPart.Parent);
-		if healthComp == nil or not healthComp:CanTakeDamageFrom(characterClass) then return end;
-
-		local targetClass: EntityClass = healthComp.CompOwner;
+		local targetClass: EntityClass = targetHealthComp.CompOwner;
 		local statusComp: StatusComp? = targetClass.StatusComp;
 		if statusComp == nil then return end;
 
@@ -66,7 +68,6 @@ if RunService:IsServer() then
 
 		elseif targetClass.ClassName == "Destructible" then
 			if CollectionService:HasTag(targetPart, "Flammable") then
-				local modFlammable = shared.require(game.ServerScriptService.ServerLibrary.Flammable);
 				modFlammable:Ignite(targetPart);
 			end
 
@@ -82,6 +83,7 @@ if RunService:IsServer() then
 
 		statusComp:Apply(statusKey, {
 			Expires = workspace:GetServerTimeNow() + duration;
+			Duration = duration;
 			ApplyBy = characterClass;
 			Values = {
 				Damage = modifier.Values.Damage;

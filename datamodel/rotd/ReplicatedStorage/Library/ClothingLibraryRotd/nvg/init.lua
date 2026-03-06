@@ -1,23 +1,27 @@
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 local attirePackage = {
-	ItemId=script.Name;
-	Class="Clothing";
+	ItemId = script.Name;
+	Class = "Clothing";
 	
-	GroupName="HeadGroup";
-	HideFacewear=true;
+	GroupName = "HeadGroup";
+	HideFacewear = true;
 	
-	Configurations={
+	Configurations = {
 		HasFlinchProtection = true;
 		UnderwaterVision = 0.06;
 	};
-	Properties={};
+	Properties = {};
 };
 
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	equipmentClass:AddBaseModifier("NightVision");
+	equipmentClass:AddBaseModifier("NightVision", {
+		ArrayValues = {
+			PassiveModifiers = "NightVision";
+		};
+	});
 
 	return equipmentClass;
 end

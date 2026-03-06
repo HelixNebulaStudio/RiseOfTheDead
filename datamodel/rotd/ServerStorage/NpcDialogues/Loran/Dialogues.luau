@@ -2,6 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+
 local Dialogues = {};
 --==
 
@@ -31,10 +33,16 @@ if RunService:IsServer() then
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 		if modMission:IsComplete(player, 63) then
 			dialog:AddChoice("shop_banditShop", function()
-				local npcModel = dialog.Prefab;
-				if npcModel:FindFirstChild("shopInteractable") then
-					dialog:InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart, "interact");
+				local npcChar = dialog.Character;
+
+				local shopInteractConfig = npcChar:FindFirstChild("ShopInteractable");
+				if shopInteractConfig == nil then
+					shopInteractConfig = modInteractables.createInteractable("Shop");
+					shopInteractConfig.Name = "ShopInteractable";
+					shopInteractConfig:SetAttribute("ShopType", "Bandits");
+					shopInteractConfig.Parent = npcChar;
 				end
+				dialog:InteractRequest(shopInteractConfig);
 			end);
 			
 		end

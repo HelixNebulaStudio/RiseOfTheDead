@@ -11,8 +11,6 @@ local statusPackage = {
 };
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)
-    local characterClass: CharacterClass = statusClass.StatusOwner;
-
     local skillStats = statusClass.Values.SkillData.Stats;
     statusClass.Values.MaxHealthOverCharge = skillStats.MaxHealth.Value;
 end

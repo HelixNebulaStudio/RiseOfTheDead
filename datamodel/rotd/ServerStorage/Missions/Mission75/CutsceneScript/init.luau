@@ -1,17 +1,18 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
+--==
 local RunService = game:GetService("RunService");
 
+local localPlayer = game.Players.LocalPlayer;
+
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modEntity = shared.require(game.ReplicatedStorage.Library.Entity);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modStorageItem = shared.require(game.ReplicatedStorage.Library.StorageItem);
 local modDialogueService = shared.require(game.ReplicatedStorage.Library.DialogueService);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+local modDoors = shared.require(game.ReplicatedStorage.Entity.Doors);
 
---== Variables;
+--==
 local MISSION_ID = 75;
 
 if RunService:IsServer() then
@@ -22,10 +23,12 @@ if RunService:IsServer() then
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 end
 
---== Script;
+--==
 return function(CutsceneSequence)
 	--if not modBranchConfigurations.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	local modClothingLibrary = shared.require(game.ReplicatedStorage.Library.ClothingLibrary);
+
+	local gameFolder = workspace:WaitForChild("Environment"):WaitForChild("Game");
 
 	local patrolBandit: NpcClass;
 
@@ -40,9 +43,14 @@ return function(CutsceneSequence)
 	
 	if RunService:IsServer() and modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 		local jerCan = script:WaitForChild("JerryCan");
+		local pickupConfig = modInteractables.createInteractable("Pickupable");
+		pickupConfig:SetAttribute("ItemId", "jerrycan");
+		pickupConfig.Parent = jerCan;
 		jerCan.Parent = workspace.Interactables;
 		
-		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
+			local id: string, interactable: InteractableInstance = ...;
+
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
 			local playerClass: PlayerClass = shared.modPlayers.get(player);
@@ -53,16 +61,14 @@ return function(CutsceneSequence)
 			local playerSave = profile:GetActiveSave();
 			local inventory = playerSave.Inventory;
 
-			local triggerTag = interactData.TriggerTag;
-			if triggerTag ~= "m75bloodmachine" then return end;
+			if id ~= "m75bloodmachine" then return end;
 
-			local bloodMachineInteractData = interactData;
-			local state = bloodMachineInteractData.State;
+			local bloodMachineInteractable: InteractableInstance = interactable;
+			local state = bloodMachineInteractable.Values.State;
 			
 			Debugger:Warn("bloodMachineInteractData state", state);
 			
 			if state == 1 then
-
 				local _, itemList = inventory:ListQuantity("bloodsample", 1);
 
 				if itemList and #itemList > 0 then
@@ -73,25 +79,26 @@ return function(CutsceneSequence)
 					--inventory:Remove(listItem.ID, 1);
 					playerClass.WieldComp:Unequip();
 
-					bloodMachineInteractData.Label = "Scanning Sample..";
-					bloodMachineInteractData.CanInteract = false;
-					bloodMachineInteractData.ItemRequired = "";
-					bloodMachineInteractData.State = 2;
-					bloodMachineInteractData:Sync();
+					bloodMachineInteractable.Config:SetAttribute("_EquipItemId", nil);
+					bloodMachineInteractable.Label = "Scanning Sample..";
+					bloodMachineInteractable.CanInteract = false;
+					bloodMachineInteractable.Values.State = 2;
+					bloodMachineInteractable:Sync();
+
 					task.spawn(function()
 						task.wait(1);
 						for a=1, 30 do
-							bloodMachineInteractData.Label = "Scanning Sample (".. math.round((a/30)*100) .."%)";
+							bloodMachineInteractable.Config:SetAttribute("_Label", `Scanning Sample ({math.round((a/30)*100)}%)`);
 							task.wait(1);
 						end
-						bloodMachineInteractData.State = 3;
-						bloodMachineInteractData.Label = "Scan Complete (Take Printed Report)";
-						bloodMachineInteractData.CanInteract = true;
-						bloodMachineInteractData:Sync();
+						bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
+						bloodMachineInteractable.Values.State = 3;
+						bloodMachineInteractable.Label = "Scan Complete (Take Printed Report)";
+						bloodMachineInteractable.CanInteract = true;
+						bloodMachineInteractable:Sync();
 					end)
 					
-					shared.Notify(game.Players:GetPlayers(), sampleName.." inserted into blood scanner.", "Inform");
-
+					shared.Notify(game.Players:GetPlayers(), `{sampleName} inserted into blood scanner.`, "Inform");
 				else
 					shared.Notify(game.Players:GetPlayers(), "You do not have any test samples.", "Negative");
 				end
@@ -108,7 +115,7 @@ return function(CutsceneSequence)
 					return;
 				end
 				
-				bloodMachineInteractData.State = 4;
+				bloodMachineInteractable.Values.State = 4;
 				
 				inventory:Add("samplereport", {
 					CustomName="Stan's Blood Samples Report #1";
@@ -126,7 +133,7 @@ return function(CutsceneSequence)
 					end
 				end);
 
-			elseif state == 4 and bloodMachineInteractData.CanInteract then
+			elseif state == 4 and bloodMachineInteractable.CanInteract then
 				Debugger:Warn("4: Insert 2nd sample");
 
 				local _, itemList = inventory:ListQuantity("bloodsample", 1);
@@ -138,23 +145,23 @@ return function(CutsceneSequence)
 
 					playerClass.WieldComp:Unequip();
 
-					bloodMachineInteractData.Label = "Scanning Sample..";
-					bloodMachineInteractData.CanInteract = false;
-					bloodMachineInteractData.ItemRequired = "";
-					bloodMachineInteractData.State = 5;
-					bloodMachineInteractData:Sync();
+					bloodMachineInteractable.Label = "Scanning Sample..";
+					bloodMachineInteractable.CanInteract = false;
+					bloodMachineInteractable.Values.State = 5;
+					bloodMachineInteractable:Sync();
 					
 					task.spawn(function()
 						task.wait(1);
 						for a=1, 60 do
-							bloodMachineInteractData.Label = "Scanning Sample (".. math.round((a/60)*100) .."%)";
+							bloodMachineInteractable.Config:SetAttribute("_Label", `Scanning Sample ({math.round((a/60)*100)}%)`);
 							task.wait(1);
 						end
 						
-						bloodMachineInteractData.State = 6;
-						bloodMachineInteractData.Label = "Scan Complete (Take Printed Report)";
-						bloodMachineInteractData.CanInteract = true;
-						bloodMachineInteractData:Sync();
+						bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
+						bloodMachineInteractable.Values.State = 6;
+						bloodMachineInteractable.Label = "Scan Complete (Take Printed Report)";
+						bloodMachineInteractable.CanInteract = true;
+						bloodMachineInteractable:Sync();
 					end)
 
 					modMission:Progress(player, MISSION_ID, function(mission)
@@ -175,11 +182,11 @@ return function(CutsceneSequence)
 					return;
 				end
 
-				bloodMachineInteractData.State = 7;
-				bloodMachineInteractData.Label = "Insert sample 3/4";
-				bloodMachineInteractData.CanInteract = true;
-				bloodMachineInteractData.ItemRequired = "bloodsample";
-				bloodMachineInteractData:Sync();
+				bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
+				bloodMachineInteractable.Values.State = 7;
+				bloodMachineInteractable.Label = "Insert sample 3/4";
+				bloodMachineInteractable.CanInteract = true;
+				bloodMachineInteractable:Sync();
 
 				inventory:Add("samplereport", {
 					CustomName="Stan's Blood Samples Report #2";
@@ -190,7 +197,7 @@ return function(CutsceneSequence)
 					end);
 				shared.Notify(player, "Sample report #2 added to your inventory.", "Inform");
 
-			elseif state == 7 and bloodMachineInteractData.CanInteract then
+			elseif state == 7 and bloodMachineInteractable.CanInteract then
 				Debugger:Warn("7: Insert 3rd sample");
 
 				local _, itemList = inventory:ListQuantity("bloodsample", 1);
@@ -202,26 +209,26 @@ return function(CutsceneSequence)
 
 					playerClass.WieldComp:Unequip();
 
-					bloodMachineInteractData.Label = "Scanning Sample..";
-					bloodMachineInteractData.CanInteract = false;
-					bloodMachineInteractData.ItemRequired = "";
-					bloodMachineInteractData.State = 7;
-					bloodMachineInteractData:Sync();
+					bloodMachineInteractable.Label = "Scanning Sample..";
+					bloodMachineInteractable.CanInteract = false;
+					bloodMachineInteractable.Values.State = 7;
+					bloodMachineInteractable:Sync();
 
 					task.spawn(function()
 						task.wait(1);
 						for a=1, 10 do
-							bloodMachineInteractData.Label = "Scanning Sample (".. math.round((a/10)*100) .."%)";
+							bloodMachineInteractable.Config:SetAttribute("_Label", `Scanning Sample ({math.round((a/10)*100)}%)`);
 							task.wait(1);
 						end
 
-						bloodMachineInteractData.State = 8;
-						bloodMachineInteractData.Label = "Scan Complete (Take Printed Report)";
-						bloodMachineInteractData.CanInteract = true;
-						bloodMachineInteractData:Sync();
+						bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
+						bloodMachineInteractable.Values.State = 8;
+						bloodMachineInteractable.Label = "Scan Complete (Take Printed Report)";
+						bloodMachineInteractable.CanInteract = true;
+						bloodMachineInteractable:Sync();
 					end)
 
-					shared.Notify(game.Players:GetPlayers(), sampleName.." inserted into blood scanner.", "Inform");
+					shared.Notify(game.Players:GetPlayers(), `{sampleName} inserted into blood scanner.`, "Inform");
 				end
 
 			elseif state == 8 then
@@ -233,11 +240,11 @@ return function(CutsceneSequence)
 					return;
 				end
 
-				bloodMachineInteractData.State = 9;
-				bloodMachineInteractData.Label = "Insert sample 4/4";
-				bloodMachineInteractData.CanInteract = true;
-				bloodMachineInteractData.ItemRequired = "bloodsample";
-				bloodMachineInteractData:Sync();
+				bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
+				bloodMachineInteractable.Values.State = 9;
+				bloodMachineInteractable.Label = "Insert sample 4/4";
+				bloodMachineInteractable.CanInteract = true;
+				bloodMachineInteractable:Sync();
 
 				inventory:Add("samplereport", {
 					CustomName="Stan's Blood Samples Report #3";
@@ -248,7 +255,7 @@ return function(CutsceneSequence)
 					end);
 				shared.Notify(player, "Sample report #3 added to your inventory.", "Inform");
 
-			elseif state == 9 and bloodMachineInteractData.CanInteract then
+			elseif state == 9 and bloodMachineInteractable.CanInteract then
 				Debugger:Warn("9: Test sample 4/4");
 
 				local _, itemList = inventory:ListQuantity("bloodsample", 1);
@@ -260,26 +267,26 @@ return function(CutsceneSequence)
 
 					playerClass.WieldComp:Unequip();
 
-					bloodMachineInteractData.Label = "Scanning Sample..";
-					bloodMachineInteractData.CanInteract = false;
-					bloodMachineInteractData.ItemRequired = "";
-					bloodMachineInteractData.State = 9;
-					bloodMachineInteractData:Sync();
+					bloodMachineInteractable.Label = "Scanning Sample..";
+					bloodMachineInteractable.CanInteract = false;
+					bloodMachineInteractable.Values.State = 9;
+					bloodMachineInteractable:Sync();
 
 					task.spawn(function()
 						task.wait(1);
 						for a=1, 25 do
-							bloodMachineInteractData.Label = "Scanning Sample (".. math.round((a/25)*100) .."%)";
+							bloodMachineInteractable.Config:SetAttribute("_Label", `Scanning Sample ({math.round((a/25)*100)}%)`);
 							task.wait(1);
 						end
 
-						bloodMachineInteractData.State = 10;
-						bloodMachineInteractData.Label = "Scan Complete (Take Printed Report)";
-						bloodMachineInteractData.CanInteract = true;
-						bloodMachineInteractData:Sync();
+						bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
+						bloodMachineInteractable.Values.State = 10;
+						bloodMachineInteractable.Label = "Scan Complete (Take Printed Report)";
+						bloodMachineInteractable.CanInteract = true;
+						bloodMachineInteractable:Sync();
 					end)
 
-					shared.Notify(game.Players:GetPlayers(), sampleName.." inserted into blood scanner.", "Inform");
+					shared.Notify(game.Players:GetPlayers(), `{sampleName} inserted into blood scanner.`, "Inform");
 				end
 				
 			elseif state == 10 then
@@ -291,11 +298,10 @@ return function(CutsceneSequence)
 					return;
 				end
 
-				bloodMachineInteractData.State = 11;
-				bloodMachineInteractData.Label = "Idle";
-				bloodMachineInteractData.CanInteract = false;
-				bloodMachineInteractData.ItemRequired = "";
-				bloodMachineInteractData:Sync();
+				bloodMachineInteractable.Values.State = 11;
+				bloodMachineInteractable.Label = "Idle";
+				bloodMachineInteractable.CanInteract = false;
+				bloodMachineInteractable:Sync();
 
 				inventory:Add("samplereport", {
 					CustomName="Stan's Blood Samples Report #4";
@@ -322,7 +328,6 @@ return function(CutsceneSequence)
 			local player: Player = (playerClass :: PlayerClass):GetInstance();
 
 			if action == "Equip" then
-
 				local missionData = modMission:GetMission(player, MISSION_ID);
 				if missionData.Type ~= 1 then return end;
 				if missionData.ProgressionPoint ~= 9 then return end;
@@ -345,18 +350,98 @@ return function(CutsceneSequence)
 
 			end
 		end)
+
+		local generatorPoint = workspace:WaitForChild("CutscenePoints"):WaitForChild("Generator");
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+			
+			local profile = shared.modProfile:Get(player);
+			local playerSave = profile:GetActiveSave();
+			local inventory = playerSave.Inventory;
+			
+			local triggerTag = interactData.TriggerTag;
+			if triggerTag == "m75Generator" then
+
+				local _, itemList = inventory:ListQuantity("jerrycan", 1);
+
+				if itemList and #itemList > 0 then
+					inventory:Remove(itemList[1].ID, 1);
+					
+					modAudio.Play("PouringLiquid", generatorPoint);
+					
+					modMission:Progress(player, MISSION_ID, function(mission)
+						if mission.ProgressionPoint <= 5 then
+							mission.ProgressionPoint = 5;
+						end
+					end);
+					
+					interactData.TriggerTag = "StartGenerator";
+					interactData.Label = "Start Generator";
+					interactData.ItemRequired = "";
+					interactData:Sync();
+					shared.Notify(game.Players:GetPlayers(), "Generator now has enough fuel to operate.", "Inform");
+				
+				else
+					shared.Notify(game.Players:GetPlayers(), "You do not have any jerrycans, look for some around.", "Negative");
+				end
+				
+			end
+		end)
+		
+		local generatorActive = false;
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
+			local id: string, interactable: InteractableInstance = ...;
+			if id ~= "m75Generator" then return end;
+
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.Type ~= 1 then return end;
+
+				if mission.ProgressionPoint == 3 then
+					if generatorActive then return end;
+					generatorActive = true;
+					shared.Notify(player, `<b>Generator:</b> `, "Inform");
+					task.wait(2);
+					mission.ProgressionPoint = 4;
+				end;
+			end)
+		end)
+
+		shared.modEventService:OnInvoked("Interactables_BindPickupableInteract", function(event: EventPacket, ...)
+			local interactable: InteractableInstance = ...;
+			local player: Player? = event.Player;
+			if player == nil then return end;
+
+			if interactable.Values.ItemId == "jerrycan" then
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.Type ~= 1 then return end;
+					if mission.ProgressionPoint <= 4 then
+						mission.ProgressionPoint = 5;
+					end
+				end)
+			end
+		end)
 	end
 	
+	--MARK: Initialize
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
 		local player = players[1];
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
 			
+		local profile = shared.modProfile:Get(player);
+		local inventory = profile.ActiveInventory;
 		
 		local playerClass: PlayerClass = shared.modPlayers.get(player);
 		playerClass.HealthComp.OnHealthChanged:Connect(function(newHealth, oldHealth, damageData)
 			if newHealth > oldHealth then return end;
+			if damageData.Damage == nil then return end;
+
+			local damage = math.max(math.ceil(damageData.Damage * 0.5), 1);
 
 			if mission.Type ~= 1 then return end;
 			if not (mission.ProgressionPoint == 2 
@@ -367,16 +452,12 @@ return function(CutsceneSequence)
 			end;
 			
 			local storageItemId = mission.SaveData.SampleId;
-
 			if storageItemId == nil then return end;
 
-			local profile = shared.modProfile:Get(player);
-			local inventory = profile.ActiveInventory;
 			local storageItem = inventory:Find(storageItemId);
-			
 			if storageItem == nil then return end;
 			
-			storageItem.Values.Health = math.max(storageItem.Values.Health-dmg, 0);
+			storageItem.Values.Health = math.max(storageItem.Values.Health-damage, 0);
 			storageItem:Sync({"Health"});
 			modStorageItem.PopupItemStatus(storageItem);
 			
@@ -390,11 +471,33 @@ return function(CutsceneSequence)
 			end
 		end)
 
-		if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
-			local generatorPoint = workspace:WaitForChild("CutscenePoints"):WaitForChild("Generator");
-			local generatorLights = workspace:WaitForChild("Generator"):WaitForChild("Lights"):GetChildren();
+		local generatorInteractable: InteractableInstance, bloodMachineInteractable: InteractableInstance;
 
-			local profile = shared.modProfile:Get(player);
+		if modBranchConfigurations.IsWorld("TheMall") then
+			player:GetAttributeChangedSignal("Location"):Connect(function()
+				local locationId = player:GetAttribute("Location");
+				if locationId ~= "Clinic Safehouse" then return end;
+
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.Type ~= 1 then return end;
+					if mission.ProgressionPoint <= 2 then
+						mission.ProgressionPoint = 3;
+					end
+				end)
+			end)
+
+		elseif modBranchConfigurations.IsWorld("MedicalBreakthrough") then
+			player:GetAttributeChangedSignal("Location"):Connect(function()
+				local locationId = player:GetAttribute("Location");
+				if locationId ~= "Clinic Laboratory" then return end;
+
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.Type ~= 1 then return end;
+					if mission.ProgressionPoint <= 3 then
+						mission.ProgressionPoint = 4;
+					end
+				end)
+			end)
 			
 			playerClass.OnIsDeadChanged:Connect(function(isDead)
 				if not isDead then return end;
@@ -402,66 +505,39 @@ return function(CutsceneSequence)
 				modMission:FailMission(player, MISSION_ID, "You died and the bandits stole the sample.");
 				modServerManager:Travel(player, profile.PreviousWorldName);
 			end)
+
+			local mainHospitalDoorModel = workspace.Environment.Game:WaitForChild("MainHospitalDoor");
+			local mainHospitalDoor: DoorInstance = modDoors.getOrNew(mainHospitalDoorModel:WaitForChild("Door"));
+			mainHospitalDoor:Toggle(true);
 			
-			shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, interactData, ...)
-				local player: Player? = eventPacket.Player;
-				if player == nil then return end;
-				
-				local playerSave = profile:GetActiveSave();
-				local inventory = playerSave.Inventory;
-				
-				local triggerTag = interactData.TriggerTag;
-				if triggerTag == "m75Generator" then
+			generatorInteractable = modInteractables.getById("m75Generator");
+			bloodMachineInteractable = modInteractables.getById("m75bloodmachine");
+			bloodMachineInteractable.CanInteract = false;
 
-					local _, itemList = inventory:ListQuantity("jerrycan", 1);
+			generatorInteractable.Values.OnChanged:Connect(function(k, nv, ov)
+				if k ~= "IsPowered" then return end;
+				if nv ~= true then return end;
 
-					if itemList and #itemList > 0 then
-						inventory:Remove(itemList[1].ID, 1);
-						
-						modAudio.Play("PouringLiquid", generatorPoint);
-						
-						modMission:Progress(player, MISSION_ID, function(mission)
-							if mission.ProgressionPoint <= 5 then
-								mission.ProgressionPoint = 5;
-							end
-						end);
-						
-						interactData.TriggerTag = "StartGenerator";
-						interactData.Label = "Start Generator";
-						interactData.ItemRequired = "";
-						interactData:Sync();
-						shared.Notify(game.Players:GetPlayers(), "Generator now has enough fuel to operate.", "Inform");
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.Type ~= 1 then return end;
+					if mission.ProgressionPoint <= 5 then
+						mission.ProgressionPoint = 6;
+
+						generatorInteractable.Label = "Generator is active";
+						generatorInteractable.CanInteract = false;
+						generatorInteractable:Sync();
 					
-					else
-						shared.Notify(game.Players:GetPlayers(), "You do not have any jerrycans, look for some around.", "Negative");
-					end
-					
-				elseif triggerTag == "StartGenerator" then
-
-					modMission:Progress(player, MISSION_ID, function(mission)
-						if mission.ProgressionPoint <= 6 then
-							mission.ProgressionPoint = 6;
+						for _, lightPart in ipairs(gameFolder:WaitForChild("Lights"):GetChildren()) do
+							lightPart.Material = Enum.Material.Neon;
+							lightPart:WaitForChild("_lightPoint"):WaitForChild("PointLight").Enabled = true;
 						end
-					end);
-					modAudio.Play("GeneratorStart", generatorPoint);
-					
-					interactData.TriggerTag = "StartGenerator";
-					interactData.Label = "Generator is active";
-					interactData.CanInteract = false;
-					interactData.ItemRequired = "";
-					interactData:Sync();
-					
-					for _, obj in pairs(generatorLights) do
-						local lightPoint: PointLight = obj:WaitForChild("_lightPoint"):WaitForChild("PointLight");
-						obj.Material = Enum.Material.Neon;
-						lightPoint.Enabled = true;
 					end
-					
-				end
+				end)
 			end)
+
 		end
 		
-		
+
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
 				
@@ -478,36 +554,24 @@ return function(CutsceneSequence)
 					return;
 				end
 				
-				local _generatorPoint = workspace:WaitForChild("CutscenePoints"):WaitForChild("Generator");
-				local interactData = modEntity:GetEntity(workspace.Interactables:WaitForChild("generator")).Interactable;
-
-				local bloodMachineInteractData = modEntity:GetEntity(workspace.Interactables:WaitForChild("bloodmachine")).Interactable;
-				
-				local doubleDoor = modEntity:GetEntity(workspace.Interactables:WaitForChild("OpenedHospitalDoor"));
-				doubleDoor.Door:Toggle(true);
 				
 				if stage == 3 then
 					
 				elseif stage == 4 then
-					interactData.Label = "Use Jerrycan"
-					interactData.CanInteract = true;
-					interactData.ItemRequired = "jerrycan";
-					interactData:Sync();
-					
 
 				elseif stage == 6 then
 					
 					-- Insert first sample
-					local scannerState = bloodMachineInteractData.State or 0;
+					local scannerState = bloodMachineInteractable.Values.State or 0;
 					if scannerState == 0 then
-						bloodMachineInteractData.State = 1;
-						bloodMachineInteractData.Label = "Insert sample 1/4";
-						bloodMachineInteractData.CanInteract = true;
-						bloodMachineInteractData.ItemRequired = "bloodsample";
-						bloodMachineInteractData:Sync();
+						bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
+						bloodMachineInteractable.Values.State = 1;
+						bloodMachineInteractable.Label = "Insert sample 1/4";
+						bloodMachineInteractable.CanInteract = true;
+						bloodMachineInteractable:Sync();
 					end
 					
-					local bmLight:BasePart = workspace:WaitForChild("BloodMachine"):WaitForChild("Light");
+					local bmLight:BasePart = gameFolder:WaitForChild("BloodMachine"):WaitForChild("Light");
 					bmLight.Color = Color3.fromRGB(102, 199, 102);
 					bmLight.Material = Enum.Material.Neon;
 					
@@ -516,10 +580,10 @@ return function(CutsceneSequence)
 
 				elseif stage == 7 then
 
-					bloodMachineInteractData.Label = "Insert sample 2/4";
-					bloodMachineInteractData.CanInteract = true;
-					bloodMachineInteractData.ItemRequired = "bloodsample";
-					bloodMachineInteractData:Sync();
+					bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
+					bloodMachineInteractable.Label = "Insert sample 2/4";
+					bloodMachineInteractable.CanInteract = true;
+					bloodMachineInteractable:Sync();
 
 				elseif stage == 8 then
 
@@ -527,8 +591,9 @@ return function(CutsceneSequence)
 					local banditsAllied = missionCache and missionCache.Value and missionCache.Value.BanditsAllied == true;
 					
 					task.wait(math.random(3, 4));
+
 					-- patrol bandit
-					local patrolBanditSpawn = CFrame.new(498.821, 136.42, -1123.854) * CFrame.Angles(0, math.rad(-165), 0);
+					local patrolBanditSpawn = CFrame.new(498.82, 136.42, -1134.768) * CFrame.Angles(0, math.rad(-165), 0);
 					patrolBandit = modNpcs.spawn2{
 						Name = "Bandit";
 						CFrame = patrolBanditSpawn;
@@ -547,7 +612,7 @@ return function(CutsceneSequence)
 
 							npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
 								if not isDead then return end;
-
+								npcClass:ToggleInteractable(false);
 								modMission:Progress(player, MISSION_ID, function(mission)
 									if mission.ProgressionPoint <= 9 then
 										mission.ProgressionPoint = 10;
@@ -560,9 +625,10 @@ return function(CutsceneSequence)
 
 					Debugger:Warn("walking to point");
 					patrolBandit:ToggleInteractable(false);
+					task.wait(0.5);
 					patrolBandit.Move:MoveTo(Vector3.new(498.82, 136.42, -1119.558));
-					patrolBandit.Move.OnMoveToEnded:Wait(1);
-					
+
+					task.wait(3);
 					Debugger:Warn("walking to point2");
 					
 					patrolBandit:ToggleInteractable(true);
@@ -571,6 +637,16 @@ return function(CutsceneSequence)
 					
 					patrolBandit.WieldComp:Equip{
 						ItemId = "ak47";
+						OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
+							local equipmentClass: EquipmentClass? = toolHandler.EquipmentClass;
+							if equipmentClass == nil then return end;
+
+							equipmentClass:AddBaseModifier("BanditGun", {
+								SetValues = {
+									Damage = 2
+								};
+							});
+						end
 					};
 					patrolBandit.Properties.Immortal = nil;
 					
@@ -594,18 +670,19 @@ return function(CutsceneSequence)
 						"Are you going to speak or not?!";
 					}
 					local lastTalkedToTick = nil;
-					patrolBandit.BindOnTalkedTo.Event:Connect(function(prefab, target, choice)
-						if prefab ~= patrolBandit.Prefab then return end;
+					patrolBandit.ActorEvent.Event:Connect(function(action, player)
+						Debugger:StudioLog(`ActorEvent`, action, player);
 						if mission.ProgressionPoint ~= 9 then return end;
-						
-						lastTalkedToTick = tick();
-						task.delay(5, function()
-							if lastTalkedToTick == nil or tick()-lastTalkedToTick > 4 then
-								patrolBandit.Chat(player, threatenMsgs[math.random(1, #threatenMsgs)]);
-							end
-						end)
-						
-						if choice == "close" then
+
+						if action == "dialogueopen" then
+							lastTalkedToTick = tick();
+							task.delay(5, function()
+								if lastTalkedToTick == nil or tick()-lastTalkedToTick > 4 then
+									patrolBandit.Chat(player, threatenMsgs[math.random(1, #threatenMsgs)]);
+								end
+							end)
+
+						elseif action == "dialogueclose" then
 							patrolBandit.Chat(player, "Okay, you asked for this!");
 
 							modMission:Progress(player, MISSION_ID, function(mission)
@@ -613,9 +690,9 @@ return function(CutsceneSequence)
 									mission.ProgressionPoint = 10;
 								end
 							end);
-							
+
 						end
-					end);
+					end)
 
 				elseif stage == 10 then
 
@@ -633,11 +710,11 @@ return function(CutsceneSequence)
 					
 					task.spawn(function()
 						local enemies = {};
-						local weapons = {"xm1014"; "mp5"; "ak47"; };
 						
 						local function spawnEnemy(spawnPoint)
 							if #enemies >= 6 then return end;
 							
+							Debugger:StudioLog(`Spawn Aggro Bandit`);
 							modNpcs.spawn2{
 								Name = "Bandit";
 								CFrame = spawnPoint;
@@ -685,6 +762,9 @@ return function(CutsceneSequence)
 
 									local bandanaHandle = npcChar:WaitForChild("Bandana"):WaitForChild("Handle");
 									bandanaHandle.Color = Color3.fromRGB(85, 85, 85);
+
+									local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+									targetHandlerComp:AddTarget(playerClass.Character);
 								end
 							};
 						end
@@ -693,7 +773,7 @@ return function(CutsceneSequence)
 						patrolBandit.Move:SetMoveSpeed("set", "default", 16);
 						while true do
 							task.wait(1);
-							if patrolBandit.Humanoid.Health <= 0 then
+							if patrolBandit.HealthComp.IsDead then
 								patrolBandit.Chat(player, "You.. have no idea who you're messing with..");
 								break;
 							elseif playerClass.Humanoid.Health <= 0 then
@@ -702,10 +782,6 @@ return function(CutsceneSequence)
 							end
 
 							patrolBandit.Move:Face(playerClass.RootPart.Position);
-							
-							-- if patrolBandit.IsInVision(playerClass.RootPart) then
-							-- 	patrolBandit.Wield.PrimaryFireRequest();
-							-- end
 						end
 						
 						local spawnPoints = {

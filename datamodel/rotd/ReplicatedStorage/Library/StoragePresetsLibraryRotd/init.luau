@@ -144,33 +144,6 @@ modStoragePresetsLibrary:Add{
     };
 };
 
-
---MARK: Item related
-modStoragePresetsLibrary:Add{
-    Id = "dufflebag";
-    StaticStorageId = "dufflebag";
-    LinkInventory = true;
-    Configuration = {
-        Persistent = true;
-        Expandable = true;
-        Size = 5;
-        MaxSize = 15;
-        Virtual = true;
-    };
-};
-
-modStoragePresetsLibrary:Add{
-    Id = "portableautoturret";
-    StaticStorageId = "portableautoturret";
-    Configuration = {
-        Persistent=true;
-        Expandable=true;
-        Size=2;
-        MaxSize=2;
-        Virtual = true;
-    };
-};
-
 --MARK: Mission related
 modStoragePresetsLibrary:Add{
 	Id = "thebackupplan";
@@ -209,5 +182,14 @@ modStoragePresetsLibrary:Add{
     };
 }
 
+function modStoragePresetsLibrary.onRequire()
+    for _, m in pairs(script:GetChildren()) do
+        if not m:IsA("ModuleScript") then continue end;
+        if m.Name == "Template" then continue end;
+        
+        local presetPackage = shared.require(m);
+        modStoragePresetsLibrary:Add(presetPackage);
+    end
+end
 
 return modStoragePresetsLibrary;

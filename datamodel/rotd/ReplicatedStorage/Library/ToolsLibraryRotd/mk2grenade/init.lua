@@ -29,14 +29,14 @@ local toolPackage = {
 
 		--== Projectile
 		ProjectileId = "mk2grenade";
-		ArcTracerConfig = {
+		ProjectileConfig = {
 			Velocity = 160;
 			Bounce = 0.6;
 			LifeTime = 20;
 		};
 		VelocityBonus = 40;
 
-		ConsumeOnThrow=true;
+		ConsumeOnThrow = true;
 	};
 	Properties={};
 };

@@ -119,7 +119,8 @@ function treePackage.LookAtEnemy(npcClass: NpcClass)
     if enemyCharClass.ClassName == "NpcClass" or enemyCharClass.ClassName == "PlayerClass" then
         local curTick = tick();
         if properties.LookAtEnemyTick == nil then
-            properties.LookAtEnemyTick = curTick + math.random(2000, 3200)/1000;
+            local lockOnEnemyDuration = properties.LockEnemyOnDuration or NumberRange.new(2, 3.2);
+            properties.LookAtEnemyTick = curTick + math.random(lockOnEnemyDuration.Min * 1000, lockOnEnemyDuration.Max *1000)/1000;
             npcClass.PlayAnimation("Aggro");
             return true;
 
@@ -192,7 +193,7 @@ function treePackage.Idle(npcClass: NpcClass)
         spawnPoint = properties.FakeSpawnPoint.Position;
     end
 
-    if properties.IsMoving == false then
+    if properties.IsMoving == false and (tick()-npcClass.LastRespawnTick) > 10 then
         local idleGrowlRandom = properties.IdleGrowlRandom;
         if idleGrowlRandom == nil then
             idleGrowlRandom = math.random(20, 40);

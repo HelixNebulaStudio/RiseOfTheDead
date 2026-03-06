@@ -12,7 +12,7 @@ local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumb
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modMarkers = shared.require(game.ReplicatedStorage.Library.Markers);
 
-local HUD_TASK_ID = "RaidHudTask";
+local HUD_TASK_ID = "CoopHudTask";
 
 local ModeHudClass = shared.require(script.Parent);
 --==
@@ -76,23 +76,23 @@ return function(interface: InterfaceInstance, window, frame)
 		
 
 		local taskHudWindow: InterfaceWindow = interface:GetWindow("TaskListHud");
-		local raidHudTask = taskHudWindow and taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID) or nil;
+		local coopHudTask = taskHudWindow and taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID) or nil;
 
-		if raidHudTask then
-			raidHudTask.Order = 3;
+		if coopHudTask then
+			coopHudTask.Order = 3;
 			
-			local frame = raidHudTask.Frame;
-			raidHudTask.Properties.TitleText = titleText;
-			raidHudTask.Properties.HeaderText = headerText;
-			raidHudTask.Properties.DescText = descLabel;
+			local frame = coopHudTask.Frame;
+			coopHudTask.Properties.TitleText = titleText;
+			coopHudTask.Properties.HeaderText = headerText;
+			coopHudTask.Properties.DescText = descLabel;
 
-			local stopwatchLabel = raidHudTask.StopwatchLabel;
+			local stopwatchLabel = coopHudTask.StopwatchLabel;
 			if stopwatchLabel == nil then
 				stopwatchLabel = taskHudWindow.Binds.GenericLabel:Clone();
 				stopwatchLabel.Name = "StopwatchLabel";
 				stopwatchLabel.LayoutOrder = 5;
 				stopwatchLabel.Parent = frame:WaitForChild("Content");
-				raidHudTask.StopwatchLabel = stopwatchLabel;
+				coopHudTask.StopwatchLabel = stopwatchLabel;
 			end
 			
 			if stopwatchLabel then
@@ -128,6 +128,9 @@ return function(interface: InterfaceInstance, window, frame)
 	modeHud.OnActiveChanged:Connect(function(isActive)
 		local taskHudWindow: InterfaceWindow = interface:GetWindow("TaskListHud");
 		if taskHudWindow == nil then return end;
+
+		local stageLib = modGameModeLibrary.GetStage(modeHud.GameType, modeHud.GameStage);
+		if stageLib.HideHudTask then return end;
 
 		if isActive then
 			taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID, true);

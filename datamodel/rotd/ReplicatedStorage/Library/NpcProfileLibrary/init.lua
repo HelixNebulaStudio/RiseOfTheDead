@@ -32,6 +32,7 @@ library.ClassIcons = {
 
 function library.onRequire()
 	-- Blank Avatar: rbxassetid://15641359355
+	library:Add{Id="Tom Greyman"; Avatar="rbxassetid://15641359355";};
 	--==
 	library:Add{Id="Mason"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641265681";
 		Descriptors={

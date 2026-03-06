@@ -932,7 +932,7 @@ function modItemsLibrary.onRequire()
     new(skinPermBase, {Id="bunnymanheadbenefactor"; Icon="rbxassetid://6665870074"; SkinPerm="The Benefactor"; TargetItemId="bunnymanhead"; Tags={"Easter"}; Sources={"Obtained from <b>The Bunny Man in Mission: Easter Butchery 2</b>";};});
 
     -- Summer 2020
-    new(toolBase, {Id="beachball"; Name="Beachball"; Icon="rbxassetid://5441513828"; Tags={"Summer"}; Description="Does 100 damage on hit.";});
+    new(toolBase, {Id="beachball"; Name="Beachball"; Icon="rbxassetid://5441513828"; Tags={"Summer"; "Throwable"}; Description="Does 100 damage on hit.";});
 
     -- Halloween 2020
     new(toolBase, {Id="voodoodoll"; Name="Voodoo Doll"; Icon="rbxassetid://5816461591"; Tags={"Slaughterfest";}; Description="Creepy little voodoo doll that mimic players or characters. It is so cursed that holding it out can cause distortion of forces around you causing you to move unpredictabily.";});

@@ -2,6 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+
 local Dialogues = {};
 --==
 
@@ -35,10 +37,16 @@ if RunService:IsServer() then
 	-- MARK: DialogueHandler
 	Dialogues.DialogueHandler = function(player, dialog, data)
 		dialog:AddChoice("shop_ratShop", function()
-			local npcModel = dialog.Prefab;
-			if npcModel:FindFirstChild("shopInteractable") then
-				dialog:InteractRequest(npcModel.shopInteractable, npcModel.PrimaryPart, "interact");
+			local npcChar = dialog.Character;
+
+			local shopInteractConfig = npcChar:FindFirstChild("ShopInteractable");
+			if shopInteractConfig == nil then
+				shopInteractConfig = modInteractables.createInteractable("Shop");
+				shopInteractConfig.Name = "ShopInteractable";
+				shopInteractConfig:SetAttribute("ShopType", "Rats");
+				shopInteractConfig.Parent = npcChar;
 			end
+			dialog:InteractRequest(shopInteractConfig);
 		end);
 		dialog:AddChoice("general_win");
 	end 

@@ -61,7 +61,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     window.CloseWithInteract = true;
 
     local colorPicker = modColorPicker.new(interface);
-    colorPicker.Parent = interface.ScreenGui;
 
     local binds = window.Binds;
     
@@ -159,7 +158,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end;
 
 				if activeStorageInterface then activeStorageInterface:Destroy(); end;
-				activeStorageInterface = modStorageInterface.new(activeNpcName.."Storage", equipmentsFrame, equipmentSlots);
+				activeStorageInterface = modStorageInterface.new(`{activeNpcName}Storage`, equipmentsFrame, equipmentSlots);
 
 				function activeStorageInterface:DecorateSlot(index, slotTable)
 					local slotFrame = slotTable.Frame;

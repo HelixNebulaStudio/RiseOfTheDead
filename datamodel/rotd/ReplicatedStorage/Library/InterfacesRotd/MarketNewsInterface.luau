@@ -152,7 +152,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			local str = "Wanderer ".. npcProfileLib.Class 
 				..", <b><font color='#".. modNpcProfileLibrary.ClassColors[npcProfileLib.Class]:ToHex()
 				.."'>".. modBranchConfigurations.Wanderer.Name 
-				.."</font></b>, was recently spotted in <b>".. modBranchConfigurations.GetWorldDisplayName(modBranchConfigurations.Wanderer.WorldId)
+				.."</font></b>, was recently spotted in <b>".. modBranchConfigurations.Wanderer.WorldName
 				.."</b>."
 			table.insert(headlineList, str);
 		end

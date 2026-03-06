@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService");
 local TextService = game:GetService("TextService");
 local TweenService = game:GetService("TweenService");
 local UserInputService = game:GetService("UserInputService");
+local CollectionService = game:GetService("CollectionService");
 
 local localPlayer = game.Players.LocalPlayer;
 
@@ -15,6 +16,8 @@ local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameMod
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modItem = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modMapLibrary = shared.require(game.ReplicatedStorage.Library.MapLibrary);
+local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManager);
+local modMarkers = shared.require(game.ReplicatedStorage.Library.Markers);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
@@ -124,7 +127,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	itemToolTip:SetZIndex(6);
 
 	local localPlayerPointer;
-	
+	local localPlayerClass = shared.modPlayers.get(localPlayer);
 	--==
 	
 	local function getCenterVec()
@@ -347,7 +350,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end
 
 	function binds.AddDynamic(class, name, basePart)
-		local id = class.."_"..name;
+		local id = `{class}_{name}`
 		if dynamicObjects[id] then 
 			dynamicObjects[id].Object = basePart;
 			dynamicObjects[id].Update();
@@ -363,34 +366,78 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		new.Frame.Name = id;
 		new.Frame.Size = UDim2.new(0, 10, 0, 10) -- UDim2.new(0, 2 * scaleRatio, 0, 2 * scaleRatio);
 		
-		if class == "Player" and name == localPlayer.Name then
-			new.Frame.ImageColor3 = Color3.fromRGB(255, 238, 0);
-			new.ZIndex = 5;
-			
+		if class == "Player" then
+			local uiStroke = Instance.new("UIStroke");
+			uiStroke.Parent = new.Frame;
+			uiStroke.Enabled = false;
+
 		elseif modNpcProfileLibrary.ClassColors[class] then
 			new.Frame.ImageColor3 = modNpcProfileLibrary.ClassColors[class];
 			
 		end
 		
 		new.Frame.Parent = mapImage;
-		
+	
 		new.Update = function(lerp)
 			local baseCenterOffset = getCenterVec();
 			
-			new.Frame.Size = UDim2.new(0, 10, 0, 10) -- UDim2.new(0, 2 * scaleRatio, 0, 2 * scaleRatio);
+			if class == "Player" then
+				local uiStroke = new.Frame:FindFirstChild("UIStroke");
+				local activeSquadType = localPlayerClass.Properties.ActiveTeamType or "Party";
+				local localSquadData: TeamClass = modTeamsManager.getTeamByPlayer(localPlayer, activeSquadType);
+
+				local playerClass = shared.modPlayers.getByName(name);
+				if playerClass and (new.Object == nil or not game:IsAncestorOf(new.Object)) then
+					new.Object = playerClass.RootPart;
+				end
+
+				if name == localPlayer.Name then
+					new.Frame.Size = UDim2.new(0, 6, 0, 6);
+					new.Frame.ImageColor3 = Color3.fromRGB(255, 238, 0);
+					new.ZIndex = 5;
+
+				else
+					new.Frame.Size = UDim2.new(0, 25, 0, 25);
+					new.Frame.ImageColor3 = Color3.fromRGB(255, 255, 255);
+					
+					local memberData = localSquadData.Members[name];
+					if memberData and memberData.Values.Color then
+						if uiStroke then
+							uiStroke.Enabled = true;
+							uiStroke.Color = modMarkers.Colors[memberData.Values.Color];
+							uiStroke.Thickness = 2;
+						end
+					end
+
+					local player: Player = playerClass:GetInstance();
+					if player then
+						new.Frame.Image = shared.modPlayers.getAvatar(player.UserId);
+					else
+						new.Frame.Image = "";
+					end
+					new.ZIndex = 3;
+
+				end
+			else
+				new.Frame.Size = UDim2.new(0, 10, 0, 10);
+			end
 			
-			local newPosition = UDim2.new(
-				0.5, 
-				((new.Object.Position.X * scaleRatio) - baseCenterOffset.X)*mapRatio.X, 
-				0.5, 
-				((new.Object.Position.Z * scaleRatio) - baseCenterOffset.Y)*mapRatio.Y
-			);
-			new.Frame.Position = newPosition;
+			if new.Object then
+				local newPosition = UDim2.new(
+					0.5, 
+					((new.Object.Position.X * scaleRatio) - baseCenterOffset.X)*mapRatio.X, 
+					0.5, 
+					((new.Object.Position.Z * scaleRatio) - baseCenterOffset.Y)*mapRatio.Y
+				);
+				new.Frame.Position = newPosition;
+			end
 		end
 		
 		new.Frame.Size = UDim2.new(0, 10, 0, 10);
-		new.Frame.Position = UDim2.new(0.5, new.Object.Position.X * scaleRatio, 0.5, new.Object.Position.Z * scaleRatio);
-		
+		if new.Object then
+			new.Frame.Position = UDim2.new(0.5, new.Object.Position.X * scaleRatio, 0.5, new.Object.Position.Z * scaleRatio);
+		end
+
 		if modNpcProfileLibrary.ClassColors[class] then
 			itemToolTip:BindHoverOver(new.Frame, function()
 				itemToolTip.Frame.Parent = mapMenu;
@@ -554,8 +601,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		
 		if binds.Minimized then
 			closeButton.Visible = false;
-			local frame = localPlayerPointer.Frame;
-			mapImage.Position = UDim2.new(0.5, -frame.Position.X.Offset, 0.5, -frame.Position.Y.Offset);
+			local frame = localPlayerPointer and localPlayerPointer.Frame;
+			if frame then
+				mapImage.Position = UDim2.new(0.5, -frame.Position.X.Offset, 0.5, -frame.Position.Y.Offset);
+			end
 			
 		else
 			closeButton.Visible = true;
@@ -588,8 +637,29 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			renderLayer(layerName, layerData);
 		end
 	end
+
+	local function updatePlayerPointers()
+		local myTeams = modTeamsManager.getTeamsOfMember(localPlayer.Name);
+
+		for a=1, #myTeams do
+			local team = myTeams[a];
+			
+			for name, memberData in pairs(team.Members) do
+				if name == localPlayer.Name then continue; end;
+
+				local player = game.Players:FindFirstChild(name);
+				if player == nil then
+					binds.RemoveDynamic(name);
+					continue;
+				end
+
+				binds.AddDynamic("Player", name);
+			end
+		end
+	end
 	
     --MARK: OnToggle
+	local initBasePointers = false;
 	window.OnToggle:Connect(function(visible)
 		binds.Minimized = false;
 		window.IgnoreHideAll = false;
@@ -616,6 +686,36 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			binds.MapFrameOffset = getCenterVec();
             window:Update();
+
+
+			task.defer(function()
+				if initBasePointers then return end
+				initBasePointers = true;
+
+				local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+				local rootPart = playerClass.RootPart;
+
+				localPlayerPointer = binds.AddDynamic("Player", localPlayer.Name, rootPart);
+				
+				local namesList = modNpcProfileLibrary:GetKeys();
+				for a=1, #namesList do
+					local npcName = namesList[a];
+					local npcRootPart = workspace.Entity:FindFirstChild(npcName) and workspace.Entity[npcName].PrimaryPart;
+
+					local npcLib = modNpcProfileLibrary:Find(npcName);
+					if npcLib.Class ~= "Hidden" then
+						if npcLib.Class == "RAT" then
+							table.insert(rats, npcName);
+						end
+						if npcLib and npcRootPart then
+							binds.AddDynamic(npcLib.Class, npcName, npcRootPart)
+						end;
+					end
+				end
+
+				updatePlayerPointers();
+			end)
+
 		else
 			window.ReleaseMouse = true;
 			window.UseTween = true;
@@ -624,43 +724,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end)
 	
 	modMapLibrary:Initialize();
-	loadMap()
-	
-	task.defer(function()
-		local rootPart = localPlayer.Character and localPlayer.Character.PrimaryPart;
-		for a=1, 10 do
-			wait(1);
-			if rootPart then break; end;
-		end
-		pcall(function()
-			localPlayerPointer = binds.AddDynamic("Player", localPlayer.Name, rootPart);
-		end)
-		
-		local namesList = modNpcProfileLibrary:GetKeys();
-		for a=1, #namesList do
-			local npcName = namesList[a];
-			local npcRootPart = workspace.Entity:FindFirstChild(npcName) and workspace.Entity[npcName].PrimaryPart;
+	loadMap();
 
-			local npcLib = modNpcProfileLibrary:Find(npcName);
-			if npcLib.Class ~= "Hidden" then
-				if npcLib.Class == "RAT" then
-					table.insert(rats, npcName);
-				end
-				if npcLib and npcRootPart then
-					binds.AddDynamic(npcLib.Class, npcName, npcRootPart)
-				end;
-			end
-		end
-		
-        window:Update();
-		
-		while true do
-			if not mapMenu.Visible then
-				task.wait(3);
-			end
-            window:Update();
-			task.wait();
-		end
+	interface.Scheduler.OnStepped:Connect(function(tickData: TickData)
+		if mapMenu.Visible == false then return end;
+		window:Update();
 	end)
 	
 	interface.Garbage:Tag(mainFrame.InputChanged:Connect(function(inputObject, gameProcessed)
@@ -762,7 +830,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local enemyCounter = 0;
 	interface.Garbage:Tag(workspace.Entity.ChildAdded:Connect(function(child)
 		if not child:IsA("Model") then return end;
-		wait(0.5);
+		task.wait(0.5);
 		
 		local npcLib = modNpcProfileLibrary:Find(child.Name);
 		local npcHumanoid = child:FindFirstChildWhichIsA("Humanoid");
@@ -785,7 +853,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 		end
 	end))
-
+	interface.Garbage:Tag(CollectionService:GetInstanceAddedSignal("PlayerCharacters"):Connect(function(character)
+		updatePlayerPointers();
+	end))
 end
 
 return interfacePackage;

@@ -114,6 +114,21 @@ if RunService:IsServer() then
 
 	end)
 
+	if modBranchConfigurations.IsWorld("TheResidentials") then
+		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(event: EventPacket, ...) 
+			local player: Player? = event.Player;
+			if player == nil then return end;
+
+			local interactable: InteractableInstance = ...;
+			if interactable.Id ~= "RadioRoofDoor" then return end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint == 2 then mission.ProgressionPoint = 3; end;
+			end)
+		end)
+	end
+
+	
 	templateRadioInteractable1 = script.Parent:WaitForChild("militaryRadioInteractable");
 	templateRadioInteractable2 = script.Parent:WaitForChild("militaryRadioInteractable2");
 

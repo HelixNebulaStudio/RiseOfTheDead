@@ -138,7 +138,26 @@ library:Add{
 	MaxLevel=5;
 };
 
+library:Add{
+	Id = "seered";
+	Icon = "rbxassetid://105295368698384";
+	Name = "Seeing Red";
+	Link = "ovehea";
 
+	Requirements = {};
+	Description = "Killing enemies enhances your vision in the dark for $Time seconds.";
+	Stats={
+		Time={Base=3; Max=18};
+	};
+
+	Level=25;
+	UpgradeCost=20;
+	MaxLevel=5;
+
+	EventLogicTriggers = {"Npcs_BindDamaged"};
+	TriggerAction = "ApplyStatus";
+	TriggerStatusId = "seered";
+}
 
 --library:Add{
 --	Id="ammsca";

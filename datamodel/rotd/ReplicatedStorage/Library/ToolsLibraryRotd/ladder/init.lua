@@ -28,7 +28,7 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.InputEvent(toolHandler, inputData)
+function toolPackage.InputEvent(toolHandler: ToolHandlerInstance, inputData)
 	local maxLadderRange = 24;
 	if inputData.InputType ~= "Begin" then return end;
 
@@ -37,8 +37,9 @@ function toolPackage.InputEvent(toolHandler, inputData)
 	local ladderPrefab = game.ReplicatedStorage.Prefabs.Objects.Ladder;
 	local prefabSize = ladderPrefab:GetExtentsSize();
 
-	local player = toolHandler.Player;
-	local playerClass: PlayerClass = shared.modPlayers.get(player);
+	local playerClass: PlayerClass = toolHandler.CharacterClass :: PlayerClass;
+	if playerClass.ClassName ~= "PlayerClass" then return end;
+	local player: Player = playerClass:GetInstance();
 	
 	local groundCFrame;
 	local function getGroundCFrame()
@@ -54,7 +55,7 @@ function toolPackage.InputEvent(toolHandler, inputData)
 
 	if RunService:IsClient() then
 		if inputData.KeyIds.KeyFire then
-			local modData = shared.require(player:WaitForChild("DataModule"));
+			local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
 			local modCharacter = modData:GetModCharacter();
 		
 			local mouseProperties = modCharacter.MouseProperties;
@@ -233,7 +234,7 @@ function toolPackage.InputEvent(toolHandler, inputData)
 					
 					if configurations.PropModel == nil then
 						configurations.PropModel = Instance.new("Model");
-						configurations.PropModel.Name = toolHandler.Player.Name.."_ladder";
+						configurations.PropModel.Name = `{player.Name}_ladder`;
 						Debugger.Expire(configurations.PropModel, 300);
 						
 						local conn
@@ -244,7 +245,7 @@ function toolPackage.InputEvent(toolHandler, inputData)
 						end)
 						
 						
-						local profile = shared.modProfile:Get(toolHandler.Player);
+						local profile = shared.modProfile:Get(player);
 						if profile and profile.Junk and profile.Junk.CacheInstances then
 							table.insert(profile.Junk.CacheInstances, configurations.PropModel);
 						end
@@ -275,7 +276,7 @@ function toolPackage.InputEvent(toolHandler, inputData)
 			
 		end
 		
-		local players = modGlobalVars.GetPlayersExlude(toolHandler.Player);
+		local players = modGlobalVars.GetPlayersExlude(player);
 		modReplicationManager:SetClientProperties(players, { -- sets tool properties;
 			Instances=toolHandler.Prefabs;
 			ClassName={

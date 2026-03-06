@@ -252,12 +252,12 @@ shared.coreBind(modGameSave, "_loaded", function(gameSave: GameSaveRotd)
 		local masusPlushieSpawnAtt = eventPart:FindFirstChild("MasusPlushie"); 
 
 		local worldInfo = modBranchConfigurations.Worlds[modBranchConfigurations.WorldName];
-		if worldInfo and worldInfo.Index then
+		if worldInfo and worldInfo.OverWorldIndex then
 
 			local dayName = modSyncTime.GetWeekDay();
 			local dayIndex = modSyncTime.WeekdayIndex[dayName];
 
-			if worldInfo.Index == 0 or dayIndex == worldInfo.Index then
+			if worldInfo.OverWorldIndex == 0 or dayIndex == worldInfo.OverWorldIndex then
 				if masusPlushieSpawnAtt and profile.Collectibles.masus == nil then
 					task.spawn(function()
 						game.ReplicatedStorage.Prefabs.Items:WaitForChild("masusplush");

@@ -28,6 +28,7 @@ function interactablePackage.init(super) -- Server/Client
     function XmasFireplace.BindPrompt(interactable: InteractableInstance, info: InteractInfo)
         if RunService:IsServer() then return end;
         local config: Configuration = interactable.Config;
+        local fireplaceModel = config.Parent;
 
         local player = game.Players.LocalPlayer;
         local modData = Debugger:Require(player:WaitForChild("DataModule"));
@@ -44,7 +45,7 @@ function interactablePackage.init(super) -- Server/Client
             
             interactable.Label = isLit and "Extinguish fireplace" or "Light fireplace";
 
-            local lightSource = script.Parent:FindFirstChild("_lightSource")
+            local lightSource = fireplaceModel:FindFirstChild("_lightSource")
             if lightSource then
                 lightSource._lightPoint.PointLight.Enabled = isLit;
                 lightSource.firePoint.Fire.Enabled = isLit;

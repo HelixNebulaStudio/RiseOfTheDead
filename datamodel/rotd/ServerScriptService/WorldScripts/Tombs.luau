@@ -21,12 +21,7 @@ function WorldCore.InitGameController()
 
     newGameController.Objective = {
         Id = "Eliminate";
-        EliminateGoal = 100;
-        
-        SpawnPlatformRadius = 100;
-        EnemyCap = 40;
-        MinSpawnCount = 4;
-        MaxSpawnCount = 8;
+        EnemyCap = 55;
         
         HordeWhenEnemiesDropsBelow = 5;
         HordeCycle = 120;

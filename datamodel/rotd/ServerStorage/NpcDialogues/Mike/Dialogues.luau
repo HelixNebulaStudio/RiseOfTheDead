@@ -2,6 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+
 local Dialogues = {};
 --==
 
@@ -48,10 +50,17 @@ if RunService:IsServer() then
 		local mission45 = modMission:GetMission(player, 45);
 		if mission45 and mission45.ProgressionPoint >= 1 then
 			dialog:AddChoice("travel_prison", function()
-				local npcModel = dialog.Prefab;
-				if npcModel:FindFirstChild("prisonInteractable") then
-					dialog:InteractRequest(npcModel.prisonInteractable, npcModel.PrimaryPart);
+				local npcChar = dialog.Character;
+
+				local shopInteractConfig = npcChar:FindFirstChild("prisonInteractable");
+				if shopInteractConfig == nil then
+					shopInteractConfig = modInteractables.createInteractable("GameModeEnter");
+					shopInteractConfig.Name = "prisonInteractable";
+					shopInteractConfig:SetAttribute("Mode", "Survival");
+					shopInteractConfig:SetAttribute("Stage", "Prison");
+					shopInteractConfig.Parent = npcChar;
 				end
+				dialog:InteractRequest(shopInteractConfig);
 			end);
 		end
 		

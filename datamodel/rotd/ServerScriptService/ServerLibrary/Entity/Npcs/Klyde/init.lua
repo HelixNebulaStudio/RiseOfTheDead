@@ -82,11 +82,13 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
             equipmentClass.Properties.InfiniteAmmo = 1;
 
-            local modifier = equipmentClass.Configurations.newModifier("BanditGun");
-            modifier.SetValues.Damage = 5;
-            modifier.SetValues.Rpm = 999;
-            modifier.SetValues.NpcPercentHealthDamage = 0.1;
-            equipmentClass.Configurations:AddModifier(modifier, true);
+            equipmentClass:AddBaseModifier("BanditGun", {
+                SetValues = {
+                    Damage = 5;
+                    Rpm = 999;
+                    NpcPercentHealthDamage = 0.1;
+                };
+            });
         end
     };
 end

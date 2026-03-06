@@ -1,14 +1,15 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Client Variables;
+--==
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
+local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
 
---== Variables;
 local MISSION_ID = 48;
+--==
 
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
@@ -41,6 +42,21 @@ if RunService:IsServer() then
 				end)
 			end
 		end)
+
+		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+
+			local playerLocation = player:GetAttribute("Location");
+			local setSpawn = modGpsLibrary.SpawnLocationLibrary[playerLocation];
+			if setSpawn == nil then return end;
+			
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint >= 2 then 
+					modMission:CompleteMission(player, MISSION_ID);
+				end
+			end)
+		end)
 	end
 
 else
@@ -68,7 +84,7 @@ return function(CutsceneSequence)
 
 		local missionDataSpawnId = (mission.SaveData.Id or 1);
 		local chosenSpawn = spawns[missionDataSpawnId];
-		local blockageName = "blockage"..missionDataSpawnId;
+		local blockageName = `blockage{missionDataSpawnId}`;
 		
 		CutsceneSequence:NextScene("loadCheck");
 		

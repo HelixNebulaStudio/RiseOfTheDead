@@ -42,6 +42,19 @@ if RunService:IsServer() then
 		end
 	end)
 	
+	shared.modEventService:OnInvoked("Interactables_BindCollectibleInteract", function(eventPacket: EventPacket, ...)
+		local player: Player? = eventPacket.Player;
+		if player == nil then return end;
+
+		local interactable: InteractableInstance = ...;
+		if interactable.Id ~= "mlc" then return end;
+
+		modMission:Progress(player, MISSION_ID, function(mission)
+			if mission.ProgressionPoint <= 4 then
+				mission.ProgressionPoint = 4;
+			end;
+		end)
+	end)
 
 	local luckyCoin = script.Parent:WaitForChild("Mike's Lucky Coin");
 

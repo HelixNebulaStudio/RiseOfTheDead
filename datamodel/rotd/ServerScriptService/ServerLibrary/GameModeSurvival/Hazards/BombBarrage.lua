@@ -71,7 +71,7 @@ function Hazard:Tick()
 		end
 	end
 	
-	if groundCframe == nil then Debugger:Warn("Failed to find ground for airstrike.") return end;
+	if groundCframe == nil then Debugger:Warn("Failed to find ground for airstrike."); return end;
 	
 	local timeToImpact = 3 - (timeLapsed * 2);
 	local impactRadius = 24;
@@ -90,13 +90,17 @@ function Hazard:Tick()
 	local origin = groundCframe.Position + Vector3.new(0, 128, 0);
 	local targetPoint = groundCframe.Position;
 
-	local projectileObject = modProjectile.Fire("rpgRocket", CFrame.new(origin));
-	projectileObject.TargetableEntities = {Humanoid=1; Zombie=1; Bandit=1; Rat=1;};
-	projectileObject.Configurations.DamageRatio = 0.25 - (timeLapsed * 0.1);
-	projectileObject.Configurations.ExplosionRadius = impactRadius/2;
+	local projectile: ProjectileInstance = modProjectile.fire("rpgrocket", {
+		OriginCFrame = CFrame.new(origin);
+	});
+	projectile.Properties.TargetableTags = {Humanoid=1; Zombie=1; Bandit=1; Rat=1;};
+	projectile.Properties.ExplosionRadius = impactRadius/2;
+	projectile.Properties.DamageRatio = 0.25 - (timeLapsed * 0.1);
 
-	local velocity = projectileObject.ArcTracer:GetVelocityByTime(origin, targetPoint, timeToImpact);
-	modProjectile.ServerSimulate(projectileObject, origin, velocity);
+	local velocity = projectile.ArcTracer:GetVelocityByTime(origin, targetPoint, timeToImpact);
+	modProjectile.serverSimulate(projectile, {
+		Velocity = velocity;
+	});
 end
 
 function Hazard:End()

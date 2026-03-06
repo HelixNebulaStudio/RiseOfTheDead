@@ -101,9 +101,9 @@ Dialogues.DialogueStrings = {
 	
 	--== Shop
 	["shelter_shop"]={
-		Face="Smirk";
-		Say="What do you have for sale?";
-		Reply="We got all the time to trade.";
+		Face = "Smirk";
+		Say = "What do you have for sale?";
+		Reply = "We got all the time to trade.";
 	};
 };
 

@@ -5,7 +5,9 @@ local CollectionService = game:GetService("CollectionService");
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+
 local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
+local modRegionMission = shared.require(game.ServerScriptService.ServerLibrary.RegionMission);
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
@@ -21,6 +23,8 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 	if self.Initiated == true then return; end;
 	self.Initiated = true;
 	
+	local regionMission = modRegionMission.new(89);
+
 	Debugger:Warn("Init Dark Room");
 	self.Controller = raidController;
 	self.WaveCollapseSystem = waveCollapseSystem;
@@ -30,8 +34,13 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 	local newModel = self.Model:WaitForChild("Layout");
 	local rewardSpawnPart = newModel:WaitForChild("RewardSpawn");
 	local lockedDoorPrefab = newModel:WaitForChild("LockedDoor");
+
+	local gameFolder = newModel:WaitForChild("Game");
+	local mapRegion = gameFolder:WaitForChild("MissionRegion");
+	mapRegion.Parent = script;
+	regionMission:UpdateRegion(mapRegion);
 	
-	local hitVolume = script:WaitForChild("HitVolume");
+	local hitVolume = gameFolder:WaitForChild("HitVolume");
 	hitVolume.Parent = nil;
 	
 	local darkRoomKey = `DarkRoomLever{self.WaveCollapseSystem.DarkRoomIndex}`;
@@ -42,6 +51,7 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 			local interactConfig = obj:FindFirstChild("Interactable");
 			if interactConfig == nil or not interactConfig:IsA("Configuration") then continue end;
 
+			interactConfig:SetAttribute("_Uses", 1);
 			local interactable: InteractableInstance = modInteractables.getOrNew(interactConfig);
 			
 			interactable.Id = darkRoomKey;
@@ -72,32 +82,27 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 	end
 	
 	local gasLeakStage = 0;
+	local gasLeakTimer = 120;
 	
 	local function startGasLeak()
 		task.spawn(function()
-			local header = "Toxic Leak Detected";
-			local status = "Toxic leak detected in the dark room.";
-
-			self.Controller:Hud{
-				Header=header;
-				Status=status;
-				PlayMusic=false;
-			};
+			local startTime = workspace:GetServerTimeNow();
+			regionMission:Progress(function(coopMission)
+				coopMission.SaveData.Timers = {
+					Timer1 = {
+						Duration = gasLeakTimer;
+						StartTime = startTime;
+						DefaultText = "Toxic leak detected!";
+						TimeoutText = "Toxic Gas imminent, get out of there!";
+					};
+				};
+			end)
 			modAudio.Play("DeathCertificate", workspace);
 			
-			for a=60, 0, -1 do
-				self.Controller:Hud{
-					Header=header;
-					Status=status.." "..a.."s ";
-				};
+			while workspace:GetServerTimeNow() <= startTime+gasLeakTimer do
 				task.wait(1);
 			end
-			
-			self.Controller:Hud{
-				Header=header;
-				Status=status.." Toxic imminent!";
-			};
-			
+
 			local effectList = {};
 			gasLeakStage = 2;
 			while gasLeakStage == 2 do
@@ -132,7 +137,7 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 				if #hitList > 0 then
 					local pointAtt = Debugger:Point(Vector3.new(randomRootPart.Position.X, hitVolume.Position.Y-16, randomRootPart.Position.Z));
 					
-					local newEffect = script.ParticleEmitter:Clone();
+					local newEffect = gameFolder.ParticleEmitter:Clone();
 					game.Debris:AddItem(pointAtt, 60);
 					newEffect.Parent = pointAtt;
 					
@@ -172,11 +177,24 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 	local function onLeverToggle()
 		local activeCount = 0;
 		for a=1, #self.Levers do
-			if self.Levers[a].Active then
+			local interactable: InteractableInstance = self.Levers[a];
+			if interactable.Values.IsActive then
 				activeCount = activeCount +1;
 			end
 		end
 		
+		regionMission:Progress(function(coopMission)
+			if coopMission.CheckPoint <= 2 then
+				coopMission.CheckPoint = 2;
+
+				coopMission.SaveData.Count = activeCount;
+				coopMission.SaveData.Total = #self.Levers;
+
+				if activeCount >= 4 then
+					coopMission.CheckPoint = 3;
+				end
+			end
+		end)
 		Debugger:Warn("Active: ", activeCount, "/", #self.Levers);
 		
 		if activeCount >= 4 then
@@ -195,17 +213,10 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 					DisableTouchPickup = true;
 				};
 			end
-			lockedDoorPrefab:SetAttribute("StateRequired", nil);
-			shared.Notify(game.Players:GetPlayers(), "Dark Room: Door Unlocked!", "Inform");
-			self.Controller:Hud{
-				PlayMusic=true;
-			};
+			lockedDoorPrefab.Interactable:SetAttribute("Locked", false);
 			
 		else
 			if wonReward == true then return end;
-			lockedDoorPrefab:SetAttribute("StateRequired", "Unlock with "..activeCount.."/"..maxLevers.." Levers");
-			shared.Notify(game.Players:GetPlayers(), lockedDoorPrefab:GetAttribute("StateRequired"), "Inform");
-			
 		end
 		
 		if gasLeakStage == 0 then

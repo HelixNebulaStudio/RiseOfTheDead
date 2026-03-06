@@ -17,13 +17,6 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		wValue = wValue + wTweakVal;
 	end
 
-
-	local dLayerInfo = modItemModifierClass.Library.calculateLayer(modifier, "D");
-	local dValue, dTweakVal = dLayerInfo.Value, dLayerInfo.TweakValue;
-	if dTweakVal then
-		dValue = dValue + dTweakVal;
-	end
-	
 	assert(modifier.EquipmentClass, `Missing equipment class: {modifier}`);
 	modItemModifierClass.AddTierDamage(modifier);
 

@@ -47,23 +47,27 @@ elseif RunService:IsClient() then
 			};
 		end
 
-		if tick()-modifier.Values.SkullBurstCooldownTick >= 10 then
-			if tick()-modifier.Values.SkullBurstDepleteTick >= 0.5 then
-				modifier.Values.SkullBurstDepleteTick = tick();
-				modifier.Values.SkullBurstStacks = math.clamp(modifier.Values.SkullBurstStacks -0.04, 0, 1);
+		local modifierValues = modifier.Values;
+		if modifierValues.SkullBurstCooldownTick == nil or tick()-modifierValues.SkullBurstCooldownTick >= 10 then
+			if modifierValues.SkullBurstDepleteTick == nil or (tick()-modifierValues.SkullBurstDepleteTick >= 0.5) then
+				modifierValues.SkullBurstDepleteTick = tick();
+				modifierValues.SkullBurstStacks = math.clamp(modifierValues.SkullBurstStacks -0.04, 0, 1);
 			end
 		end
+		if modifierValues.SkullBurstStacks == nil then
+			modifierValues.SkullBurstStacks = 0;
+		end
 
-		local alphaRatio = math.clamp(modifier.Values.SkullBurstStacks/1, 0, 1);
+		local alphaRatio = math.clamp(modifierValues.SkullBurstStacks/1, 0, 1);
 		local percentRpm = math.round(math.clamp(configurations.SkullBurst * alphaRatio, 0, configurations.SkullBurst)*100);
 		toolStatusHud.SkullBurst.Text = `{percentRpm > 0 and "+" or ""}{percentRpm}%`;
 		toolStatusHud.SkullBurst.ColorPercent = alphaRatio;
 	end
 
 	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
-		local isHeadshot = packet.IsHeadshot;
-		if not isHeadshot then return end;
-
+		local targetPart = packet.HitInfo.Part;
+		if targetPart == nil then return end;
+		if targetPart.Name ~= "Head" and targetPart:GetAttribute("IsHead") ~= true then return end;
 		if tick()-modifier.Values.SkullBurstCooldownTick <= 0.1 then return end;
 
 		modifier.Values.SkullBurstCooldownTick = tick();

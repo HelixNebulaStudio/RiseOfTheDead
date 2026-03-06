@@ -45,7 +45,7 @@ function WorldCore.InitGameController()
 
     newGameController.ObjectivesList = {
         {Type="Eliminate"; Fmod=1;};
-        --{Type="Oily"; Fmod=2;};	
+        {Type="Oily"; Fmod=2;};	
         {Type="ProtectObjTime"; Fmod=4;};	
         {Type="Boss"; Fmod=6;};
         {Type="SuppliesRequest"; Fmod=9;};

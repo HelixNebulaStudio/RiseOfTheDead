@@ -20,7 +20,7 @@ local cache = {
 
 --==
 
--- !outline: Rachel Dialogues
+--MARK: Rachel Dialogues
 Dialogues.Rachel.DialogueStrings = {
 	["medbre_init"]={
 		Face="Worried"; 
@@ -123,7 +123,7 @@ Dialogues.Rachel.DialogueStrings = {
 	};
 };
 
--- !outline: Mike Dialogues
+--MARK: Mike Dialogues
 Dialogues.Mike.DialogueStrings = {
 	["medbre_init"]={
 		Face="Bored"; 
@@ -136,7 +136,7 @@ Dialogues.Mike.DialogueStrings = {
 	};
 };
 
--- !outline: Molly Dialogues
+--MARK: Molly Dialogues
 Dialogues.Molly.DialogueStrings = {
 	["medbre_init"]={
 		Face="Bored"; 
@@ -149,7 +149,7 @@ Dialogues.Molly.DialogueStrings = {
 	};
 };
 
--- !outline: Dr. Deniski Dialogues
+--MARK: Dr. Deniski Dialogues
 Dialogues["Dr. Deniski"].DialogueStrings = {
 	["medbre_init"]={
 		Face="Confident"; 
@@ -178,7 +178,7 @@ Dialogues["Dr. Deniski"].DialogueStrings = {
 };
 
 if RunService:IsServer() then
-	-- !outline: Rachel Handler
+	--MARK: Rachel Handler
 	Dialogues.Rachel.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 		local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
@@ -204,14 +204,19 @@ if RunService:IsServer() then
 					Values={
 						Health=100;
 						MaxHealth=100;
-					};}, function(queueEvent, storageItem)
-						mission.SaveData.SampleId = storageItem.ID;
-						mission.SaveData.MissionItems = {};
-						table.insert(mission.SaveData.MissionItems, storageItem.ID);
-					end);
+					};
+				}, function(queueEvent, storageItem)
+					mission.SaveData.SampleId = storageItem.ID;
+					mission.SaveData.MissionItems = {};
+					table.insert(mission.SaveData.MissionItems, storageItem.ID);
+				end);
 				
 				modMission:Progress(player, MISSION_ID, function(mission)
-					mission.ProgressionPoint = 2;
+					if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
+						mission.ProgressionPoint = 4;
+					else
+						mission.ProgressionPoint = 2;
+					end
 				end);
 
 			end)
@@ -312,7 +317,7 @@ if RunService:IsServer() then
 		end
 	end
 
-	-- !outline: Mike Handler
+	--MARK: Mike Handler
 	Dialogues.Mike.DialogueHandler = function(player, dialog, data, mission)
 		if mission.Type == 1 then -- Active
 			if mission.ProgressionPoint == 3 then
@@ -323,7 +328,7 @@ if RunService:IsServer() then
 		end
 	end
 
-	-- !outline: Molly Handler
+	--MARK: Molly Handler
 	Dialogues.Molly.DialogueHandler = function(player, dialog, data, mission)
 		if mission.Type == 1 then -- Active
 			if mission.ProgressionPoint == 3 then
@@ -334,7 +339,7 @@ if RunService:IsServer() then
 		end
 	end
 	
-	-- !outline: Dr. Deniski Handler
+	--MARK: Dr. Deniski Handler
 	Dialogues["Dr. Deniski"].DialogueHandler = function(player, dialog, data, mission)
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 		
@@ -392,7 +397,7 @@ end
 if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 	
 	Dialogues.Bandit = {};
-	-- !outline: Bandit Handler
+	--MARK: Bandit Handler
 	Dialogues.Bandit.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 		local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
@@ -411,13 +416,13 @@ if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 			local playerSave = shared.modProfile:Get(player):GetActiveSave();
 
 			if cache.SecondBribe then
-				local bribeCost = 5000;
-				dialog:SetInitiate("You know what.. Another $5'000 and I'll leave you alone.");
+				local bribeCost = 1000;
+				dialog:SetInitiate("You know what.. Another $1'000 and I'll leave you alone.");
 
 				if playerSave:GetStat("Money") >= bribeCost then
 					dialog:AddDialog({
 						Face="Hehe";
-						Say=".. *Give $5'000 to bandit*";
+						Say=".. *Give $1'000 to bandit*";
 						Reply="Alright, haha, see you next time.";
 					}, function(dialog)
 						dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
@@ -571,20 +576,20 @@ if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 			else --
 				
 				dialog:AddDialog({
-					Face="Serious";
-					Say="Oh, I'm a new survivor here..";
-					Reply="Oh really? What are you doing here?";
+					Face = "Serious";
+					Say = "Oh, I'm a new survivor here..";
+					Reply = "Oh really? What are you doing here?";
 					
 				}, function(dialog)
 					dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
 					
 					local function leaveNow5Sec()
-						local patrolBanditNpcModule = dialog:GetNpcClass();
-						patrolBanditNpcModule.Wield.LoadRequest();
+						local patrolBanditNpcClass: NpcClass = dialog:GetNpcClass();
+						patrolBanditNpcClass.WieldComp:InvokeToolAction("LoadGun");
 
 						task.wait(2);
 						for a=5, 1, -1 do
-							patrolBanditNpcModule.Chat(player, a..string.rep("!",4-a));
+							patrolBanditNpcClass.Chat(player, a..string.rep("!",4-a));
 							task.wait(1);
 							if mission.ProgressionPoint == 10 then
 								break;
@@ -608,15 +613,15 @@ if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 						dialog:AddDialog({
 							Face="Serious";
 							Say="Please, I need to do this.. Maybe we can work something out?";
-							Reply="...\n\nIf you can cough up $10'000 then sure, I can pretend nothing happened here.";
+							Reply="...\n\nIf you can cough up $2'000 then sure, I can pretend nothing happened here.";
 						}, function(dialog)
 							dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
 							
-							local bribeCost = 10000;
+							local bribeCost = 2000;
 							if playerSave:GetStat("Money") >= bribeCost then
 								dialog:AddDialog({
 									Face="Serious";
-									Say="Fine, here.. *Give $10'000 to bandit*";
+									Say="Fine, here.. *Give $2'000 to bandit*";
 									Reply="Alright, you get 5 minutes!";
 								}, function(dialog)
 									playerSave:AddStat("Money", -bribeCost);

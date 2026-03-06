@@ -43,16 +43,16 @@ return function(player, dialog, data, mission)
 				dialog:AddChoice("shelter_decline", function(dialog)
 					modMission:CompleteMission(player, 55);
 
-					if dialog.Prefab then
-						if dialog.Prefab:FindFirstChild("Interactable") then
-							dialog.Prefab.Interactable:Destroy();
+					if dialog.Character then
+						if dialog.Character:FindFirstChild("Interactable") then
+							dialog.Character.Interactable:Destroy();
 						end
-						local face = dialog.Prefab:FindFirstChild("face", true);
+						local face = dialog.Character:FindFirstChild("face", true);
 						if face then
 							face.Texture = "rbxassetid://141728515";
 						end
 
-						local npcClass = shared.modNpcs.getByModel(dialog.Prefab);
+						local npcClass = shared.modNpcs.getByModel(dialog.Character);
 						delay(3, function()
 							npcClass:TeleportHide();
 						end)

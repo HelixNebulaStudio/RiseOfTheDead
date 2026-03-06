@@ -2,6 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+
 --=
 local Dialogues = {
 	Victor={};
@@ -75,11 +77,17 @@ if RunService:IsServer() then
 			if modBranchConfigurations.IsWorld("TheWarehouse") then
 				if mission.ProgressionPoint == 1 then
 					dialog:AddChoice("vt3_vttravel", function()
-						local npcModel = dialog.Prefab;
-						local lowerTorso = npcModel.LowerTorso;
-						if lowerTorso:FindFirstChild("Interactable") then
-							dialog:InteractRequest(lowerTorso.Interactable, lowerTorso, "interact");
+						local npcChar = dialog.Character;
+
+						local raidInteractConfig = npcChar:FindFirstChild("raidInteractable");
+						if raidInteractConfig == nil then
+							raidInteractConfig = modInteractables.createInteractable("GameModeEnter");
+							raidInteractConfig.Name = "raidInteractable";
+							raidInteractConfig:SetAttribute("Mode", "Raid");
+							raidInteractConfig:SetAttribute("Stage", "Tombs");
+							raidInteractConfig.Parent = npcChar;
 						end
+						dialog:InteractRequest(raidInteractConfig);
 
 					end);
 				end

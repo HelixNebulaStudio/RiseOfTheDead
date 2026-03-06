@@ -2,16 +2,16 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
-local modMissionLibrary = require(game.ReplicatedStorage.Library.MissionLibrary);
-local modCutscene = require(game.ReplicatedStorage.Library.Cutscene);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modMissionLibrary = shared.require(game.ReplicatedStorage.Library.MissionLibrary);
+local modCutscene = shared.require(game.ReplicatedStorage.Library.Cutscene);
 
-local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClass).new();
+local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClass).new(script);
 --==
 
 function WorldCore.onRequire()
     if RunService:IsServer() then
-        local modMission = require(game.ServerScriptService.ServerLibrary.Mission);
+        local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
         shared.modEngineCore:ConnectOnPlayerAdded(script, function(player: Player)
             task.delay(5, function()

@@ -6,6 +6,7 @@ local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManag
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 if RunService:IsServer() then
+    modRegionMission = shared.require(game.ServerScriptService.ServerLibrary.RegionMission);
 
 end
 
@@ -52,6 +53,10 @@ function WorldCore.onRequire()
             end)
 		end)
 
+        shared.modEventService:OnInvoked("Minigames_BindLockHydra", function(event: EventPacket, ...)
+            Debugger:StudioLog(`Event`, event, `\n...`, ...);
+        end)
+
         -- MARK: sh1
         shared.modNpcs.spawn2{Name="Mason";};
         shared.modNpcs.spawn2{Name="Russell";};
@@ -71,6 +76,10 @@ function WorldCore.onRequire()
         --     Name = "Joseph";
         --     CFrame = CFrame.new(-31.709, -13.642, 31.994);
         -- };
+
+        local regionMission = modRegionMission.new(89, "bioxtest");
+        regionMission:UpdateRegion(workspace.Clips:WaitForChild("MissionRegion"));
+
 
     elseif RunService:IsClient() then
 

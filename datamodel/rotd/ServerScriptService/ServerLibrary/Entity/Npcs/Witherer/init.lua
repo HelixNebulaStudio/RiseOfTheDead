@@ -32,6 +32,7 @@ local npcPackage = {
 
         KnockbackResistant = 1;
         SkipMoveInit = true;
+        SkipNpcAnimatorInit = true;
     };
 
     AddComponents = {
@@ -60,8 +61,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
 
     local level = math.max(properties.Level, 0);
     configurations.BaseValues.MaxHealth = math.clamp(1024 + 1024*(level-1), 1024, 102400);
-
-    npcClass.Move:SetMoveSpeed("set", "default", 0);
 
     properties.EyePrefab = WITHERERS_EYE_PREFAB:Clone();
     npcClass.Garbage:Tag(properties.EyePrefab);

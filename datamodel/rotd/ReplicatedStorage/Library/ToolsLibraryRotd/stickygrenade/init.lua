@@ -29,7 +29,7 @@ local toolPackage = {
 
 		--== Projectile
 		ProjectileId = "stickygrenade";
-		ArcTracerConfig = {
+		ProjectileConfig = {
 			Velocity = 160;
 			Bounce = 0;
 			LifeTime = 20;

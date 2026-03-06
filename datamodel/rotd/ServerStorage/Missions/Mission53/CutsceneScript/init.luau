@@ -15,6 +15,25 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
+		shared.modEventService:OnInvoked("Players_BindWieldEvent", function(event: EventPacket, ...) 
+			local action: string, toolHandler: ToolHandlerInstance = ...;
+
+			local playerClass: PlayerClass = toolHandler.CharacterClass :: PlayerClass;
+			local player: Player = (playerClass :: PlayerClass):GetInstance();
+
+			if action ~= "Equip" then return end;
+			if toolHandler.StorageItem.ItemId ~= "entityleash" then return end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.Type ~= 1 then return end;
+				if mission.ProgressionPoint <= 4 then
+					mission.ProgressionPoint = 5;
+				end
+			end)
+		end)
+	end
+
 else
 	modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
 	

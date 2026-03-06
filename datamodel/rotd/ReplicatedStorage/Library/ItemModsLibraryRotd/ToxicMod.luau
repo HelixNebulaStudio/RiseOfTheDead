@@ -42,15 +42,14 @@ if RunService:IsServer() then
 		if packet.TargetModel == nil then return end;
 		local duration = modifier.Values.Duration;
 
-		local characterClass: CharacterClass;
-		if modifier.WieldComp and modifier.WieldComp.CompOwner then
-			characterClass = modifier.WieldComp.CompOwner;
-		end
+		local characterClass: CharacterClass = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass;
+		if characterClass == nil then return end;
 		
-		local healthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
-		if healthComp == nil or healthComp.IsDead or not healthComp:CanTakeDamageFrom(characterClass) then return end;
+		local targetHealthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
+		if targetHealthComp == nil then return end;
+		if targetHealthComp.IsDead or not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
 	
-		local targetClass: EntityClass = healthComp.CompOwner;
+		local targetClass: EntityClass = targetHealthComp.CompOwner;
 		local statusComp: StatusComp? = targetClass.StatusComp;
 		if statusComp == nil then return end;
 			
@@ -62,6 +61,7 @@ if RunService:IsServer() then
 
 		statusComp:Apply(statusKey, {
 			Expires = workspace:GetServerTimeNow() + duration;
+			Duration = duration;
 			Values = {
 				ImmunityReduction = modifier.Values.Reduction;
 			};

@@ -62,7 +62,7 @@ function NpcComponent.new(npcClass: NpcClass)
 		end
 
 		local npcAudio = npcClass.NpcPackage.Audio;
-		if npcAudio and npcAudio.BasicMeleeAttack ~= false then
+		if npcAudio and typeof(npcAudio.BasicMeleeAttack) == "string" then
 			modAudio.Play(npcAudio.BasicMeleeAttack, npcClass.RootPart).PlaybackSpeed = (math.random(100, 120)/100);
 		elseif npcAudio and npcAudio.BasicMeleeAttack == false then
 		else

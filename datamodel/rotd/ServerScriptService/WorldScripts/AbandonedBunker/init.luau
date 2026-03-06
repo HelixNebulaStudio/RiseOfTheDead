@@ -13,10 +13,11 @@ local modWaveCollapseSystem = shared.require(game.ReplicatedStorage.Library.Wave
 local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new(script);
 
 local GAME_MODE, GAME_STAGE = "Raid", "Abandoned Bunker";
-local MAP_SEED = math.random(1, 9999); --if RunService:IsStudio() then MAP_SEED = 4262; end;
+local MAP_SEED = math.random(1, 9999);
 --==
 
 function WorldCore.InitGameController()
+    MAP_SEED = shared.gameConfig.MapSeed ~= 0 and shared.gameConfig.MapSeed or MAP_SEED;
     local newGameController = modGameModeRaid.new();
 
     newGameController.ModeType = GAME_MODE;
@@ -24,16 +25,13 @@ function WorldCore.InitGameController()
 
     newGameController.Objective = {
         Id = "Eliminate";
-        EliminateGoal = 50;
+        EnemyCap = 45;
         
-        SpawnPlatformRadius = 64;
-        EnemyCap = 20;
-        MinSpawnCount = 2;
-        MaxSpawnCount = 4;
-        
-        HordeWhenEnemiesDropsBelow = 2;
+        HordeWhenEnemiesDropsBelow = 3;
         HordeCycle = 120;
         HordeSpawnRate = 1;
+
+        HordeTimerDeduction = NumberRange.new(25, 35);
     };
 
     newGameController.EnemiesList = {

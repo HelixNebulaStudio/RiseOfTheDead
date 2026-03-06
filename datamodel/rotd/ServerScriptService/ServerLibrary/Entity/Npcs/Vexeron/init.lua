@@ -75,6 +75,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
 	properties.BodyGyro = bodyGyro;	
 
     npcClass.Humanoid.PlatformStand = true;
+    npcClass.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false);
     npcClass.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true);
     npcClass.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true);
 

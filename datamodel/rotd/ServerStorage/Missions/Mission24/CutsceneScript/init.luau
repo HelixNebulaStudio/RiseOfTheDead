@@ -175,10 +175,13 @@ return function(CutsceneSequence)
 								if toolHandler.EquipmentClass == nil then return end;
 								local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
 
-								local modifier: ConfigModifier = equipmentClass.Configurations.newModifier("npcDmg");
-								modifier.SetValues.Damage = 2;
-								modifier.SetValues.StandInaccuracy = 14;
-								equipmentClass.Configurations:AddModifier(modifier, true);
+								equipmentClass:AddBaseModifier("npcDmg", {
+									SetValues = {
+										Damage = 2;
+										StandInaccuracy = 14;
+									};
+									Priority = 999;
+								});
 							end;
 						};
 

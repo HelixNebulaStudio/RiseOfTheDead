@@ -16,16 +16,7 @@ if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	
-else
-	modData = shared.require(localPlayer :: ModuleScript);
-	
-end
 
---== Script;
-return function(CutsceneSequence)
-
-	--MARK: TheWarehouse
 	if modBranchConfigurations.IsWorld("TheWarehouse") then
 		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
@@ -42,6 +33,46 @@ return function(CutsceneSequence)
 			end
 		end)
 
+	elseif modBranchConfigurations.IsWorld("Factory") then
+		shared.modEventService:OnInvoked("GameModeManager_BindGameModeStart", function(event: EventPacket, packet)
+			local room = packet.Room;
+			if room.Type ~= "Raid" or room.Stage ~= "Factory" then return end;
+
+			if event.Player == nil then return end;
+			local player = event.Player;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint < 4 then
+					mission.ProgressionPoint = 4;
+				end;
+			end)
+		end)
+
+		shared.modEventService:OnInvoked("GameModeManager_BindGameModeComplete", function(event: EventPacket, packet)
+			local room = packet.Room;
+			if room.Type ~= "Raid" or room.Stage ~= "Factory" then return end;
+
+			if event.Player == nil then return end;
+			local player = event.Player;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint < 5 then
+					mission.ProgressionPoint = 5;
+				end;
+			end)
+		end)
+	end
+
+else
+	modData = shared.require(localPlayer :: ModuleScript);
+	
+end
+
+--== Script;
+return function(CutsceneSequence)
+
+	--MARK: TheWarehouse
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
@@ -65,12 +96,12 @@ return function(CutsceneSequence)
 						if toolHandler.EquipmentClass == nil then return end;
 						local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
 						
-						if equipmentClass.Configurations:GetModifier("npcDmg") == nil then
-							local modifier: ConfigModifier = equipmentClass.Configurations.newModifier("npcDmg");
-							modifier.SetValues.Damage = 35;
-							modifier.Priority = 999;
-							equipmentClass.Configurations:AddModifier(modifier, true);
-						end
+						equipmentClass:AddBaseModifier("npcDmg", {
+							SetValues = {
+								Damage = 35;
+							};
+							Priority = 999;
+						});
 					end;
 				};
 			end

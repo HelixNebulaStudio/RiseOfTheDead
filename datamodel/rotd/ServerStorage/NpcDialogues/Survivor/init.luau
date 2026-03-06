@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Variables;
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
@@ -197,10 +198,17 @@ return function(player, dialog, data)
 		elseif npcLevel == 5 then
 			
 			dialog:AddChoice("shelter_shop", function()
-				local npcModel = dialog.Prefab;
-				if npcModel:FindFirstChild("ShopInteractable") then
-					dialog:InteractRequest(npcModel.ShopInteractable, npcModel.PrimaryPart, "interact");
+				local npcModel = dialog.Character;
+
+				local shopInteractConfig = npcModel:FindFirstChild("ShopInteractable");
+				if shopInteractConfig == nil then
+					shopInteractConfig = modInteractables.createInteractable("Shop");
+					shopInteractConfig.Name = "ShopInteractable";
+					shopInteractConfig:SetAttribute("ShopType", "Rats");
+					shopInteractConfig.Parent = npcModel;
 				end
+				dialog:InteractRequest(shopInteractConfig);
+
 			end);
 			
 		end

@@ -19,6 +19,9 @@ function ModeHud.new(interface: InterfaceInstance, window, frame)
 		Active = false;
 		Garbage = modGarbageHandler.new();
 		
+		GameType = nil;
+		GameStage = nil;
+		
 		Update = function() end;-- override;
 		
 		-- Spectate;

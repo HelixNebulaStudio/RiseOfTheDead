@@ -2,6 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+
 --=
 local Dialogues = {
 	Stan={};
@@ -109,7 +111,9 @@ Dialogues.Patrick.DialogueStrings = {
 };
 
 if RunService:IsServer() then
-	-- !outline: Stan Handler
+	local modSafehomeService = shared.require(game.ServerScriptService.ServerLibrary.SafehomeService);
+
+	-- MARK: Stan Handler
 	Dialogues.Stan.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
@@ -237,16 +241,23 @@ if RunService:IsServer() then
 				
 			else
 				if mission58.Type ~= 1 then
-					if shared.modSafehomeService == nil or shared.modSafehomeService.FactionTag == nil then
-						
+					if modSafehomeService.SafehomeClass.IsSafehomeWorld == false
+					and modSafehomeService.SafehomeClass.FactionTag == nil then
 						dialog:AddDialog({
 							Say="Could you take me to the Bandit Outpost?";
 							Reply="Sure..";
 						}, function(dialog)
-							local npcModel = dialog.Prefab;
-							if npcModel:FindFirstChild("banditOutpostInteractable") then
-								dialog:InteractRequest(npcModel.banditOutpostInteractable, npcModel.PrimaryPart);
+							local npcChar = dialog.Character;
+
+							local raidInteractConfig = npcChar:FindFirstChild("raidInteractable");
+							if raidInteractConfig == nil then
+								raidInteractConfig = modInteractables.createInteractable("GameModeEnter");
+								raidInteractConfig.Name = "raidInteractable";
+								raidInteractConfig:SetAttribute("Mode", "Raid");
+								raidInteractConfig:SetAttribute("Stage", "BanditOutpost");
+								raidInteractConfig.Parent = npcChar;
 							end
+							dialog:InteractRequest(raidInteractConfig);
 						end);
 						
 					end

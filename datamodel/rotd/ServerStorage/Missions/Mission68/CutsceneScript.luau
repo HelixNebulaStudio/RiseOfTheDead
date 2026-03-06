@@ -16,34 +16,33 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	if not modBranchConfigurations.IsWorld("TheHarbor") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
-	
-	shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
-		local player: Player? = eventPacket.Player;
-		if player == nil then return end;
+	if modBranchConfigurations.IsWorld("TheHarbor") then
+		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
 
-		local triggerId: string, interactable: InteractableInstance = ...;
-		if triggerId ~= "m68PickupSalvage" then return end;
+			local triggerId: string, interactable: InteractableInstance = ...;
+			if triggerId ~= "m68PickupSalvage" then return end;
 
-		local interactConfig = interactable.Config;
+			local interactConfig = interactable.Config;
 
-		if interactConfig:GetAttribute("Triggered") then return end;
-		interactConfig:SetAttribute("Triggered", true);
-		game.Debris:AddItem(interactable.Part.Parent, 0);
-		
-		modMission:Progress(player, MISSION_ID, function(mission)
-			if mission.ProgressionPoint == 1 then
-				mission.SaveData.SalvagesLeft = mission.SaveData.SalvagesLeft -1;
-				modAudio.Play("StorageItemPickup", interactable.Part.Position); 
-				
-			end;
-			if mission.SaveData.SalvagesLeft <= 0 then
-				modMission:CompleteMission(player, MISSION_ID);
+			if interactConfig:GetAttribute("Triggered") then return end;
+			interactConfig:SetAttribute("Triggered", true);
+			game.Debris:AddItem(interactable.Part.Parent, 0);
+			
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint == 1 then
+					mission.SaveData.SalvagesLeft = mission.SaveData.SalvagesLeft -1;
+					modAudio.Play("StorageItemPickup", interactable.Part.Position); 
+					
+				end;
+				if mission.SaveData.SalvagesLeft <= 0 then
+					modMission:CompleteMission(player, MISSION_ID);
 
-			end
+				end
+			end)
 		end)
-	end)
-
+	end;
 	cutsceneAssets = script.Parent:WaitForChild("CutsceneAssets");
 
 else

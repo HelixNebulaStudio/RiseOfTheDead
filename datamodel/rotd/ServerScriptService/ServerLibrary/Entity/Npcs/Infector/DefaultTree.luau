@@ -84,7 +84,7 @@ function treePackage.FollowEnemy(npcClass: NpcClass)
         npcClass.Move:SetMoveSpeed("set", "sprint", 100, 2, 2);
     end
 
-    npcClass.Move:Follow(enemyNpcClass.RootPart);    
+    npcClass.Move:Follow(enemyNpcClass.RootPart); 
 end
 
 function treePackage.Idle(npcClass: NpcClass)

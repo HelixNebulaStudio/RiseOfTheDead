@@ -8,6 +8,7 @@ local modReplicationManager = shared.require(game.ReplicatedStorage.Library.Repl
 local modWorldCoreClass = shared.require(game.ReplicatedStorage.Library.WorldCoreClass);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modCutscene = shared.require(game.ReplicatedStorage.Library.Cutscene);
+local modDialogueService = shared.require(game.ReplicatedStorage.Library.DialogueService);
 
 if RunService:IsServer() then
     modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
@@ -55,18 +56,18 @@ function modWorldCoreClass.onRequire()
                     
                     task.spawn(function()
                         task.wait(math.random(200, 400)/1000);
-                        game.Lighting.Ambient = Color3.fromRGB(121, 136, 181);
+                        game.Lighting:SetAttribute("InvertAmbient", true);
                         task.wait(0.05);
-                        game.Lighting.Ambient = Color3.fromRGB(25, 25, 25);
+                        game.Lighting:SetAttribute("InvertAmbient", false);
                         task.wait(math.random(50, 100)/1000);
-                        game.Lighting.Ambient = Color3.fromRGB(121, 136, 181);
+                        game.Lighting:SetAttribute("InvertAmbient", true);
                         task.wait(0.05);
-                        game.Lighting.Ambient = Color3.fromRGB(25, 25, 25);
+                        game.Lighting:SetAttribute("InvertAmbient", false);
                         if math.random(1, 2) == 1 then
                             task.wait(math.random(50, 100)/1000);
-                            game.Lighting.Ambient = Color3.fromRGB(121, 136, 181);
+                            game.Lighting:SetAttribute("InvertAmbient", true);
                             task.wait(0.05);
-                            game.Lighting.Ambient = Color3.fromRGB(25, 25, 25);
+                            game.Lighting:SetAttribute("InvertAmbient", false);
                         end
                     end)
                 end
@@ -78,66 +79,78 @@ function modWorldCoreClass.onRequire()
 end
 
 function modWorldCoreClass.updateWanderers()
-    if modBranchConfigurations.PathfindingNavLinks == nil then return end;
-    
     task.spawn(function()
+        local wandererList = {
+            "Icarus";
+        };
+
         local day = workspace:GetAttribute("DayOfYear");
         local spawnWorldList = {};
         
-        for worldId, worldNav in pairs(modBranchConfigurations.PathfindingNavLinks) do
-            table.insert(spawnWorldList, {Id=worldId; Nav=worldNav});
+        for _, worldInfo in pairs(modBranchConfigurations.Worlds) do
+            if worldInfo.OverWorldIndex == nil then continue end;
+            spawnWorldList[worldInfo.OverWorldIndex] = worldInfo;
         end
         
-        local wandererList = {
-            --"Icarus";
-        };
-        
-        local spawnWorld = spawnWorldList[math.fmod(day, #spawnWorldList)+1];
+        local spawnWorldInfo = spawnWorldList[math.fmod(day, #spawnWorldList)+1];
         if shared.gameConfig.BranchName == "Dev" then
-            spawnWorld = {Id=modBranchConfigurations.WorldName; Nav=modBranchConfigurations.PathfindingNavLinks[modBranchConfigurations.WorldName]};
+            spawnWorldInfo = modBranchConfigurations.WorldInfo;
         end
         
-        if spawnWorld.Nav and #wandererList > 0 then
-            local spawnWandererName = wandererList[math.fmod(day, #wandererList)+1];
-            local spawnNavId = nil;
-            
-            for navLocation, info in pairs(spawnWorld.Nav) do
-                if info.Safehouse == true then
-                    spawnNavId = navLocation;
-                    break;
+        local spawnWandererName = wandererList[math.fmod(day, #wandererList)+1];
+        Debugger:Log("Wanderer (",spawnWandererName,") Spawn World:",spawnWorldInfo);
+        
+        for a=#modNpcs.ActiveNpcClasses, 1, -1 do
+            local npcClass: NpcClass = modNpcs.ActiveNpcClasses[a];
+            if npcClass and npcClass.Properties.WanderingTrader then
+                if npcClass.Character then
+                    game.Debris:AddItem(npcClass.Character, 0);
                 end
             end
-            
-            Debugger:Log("Wanderer (",spawnWandererName,") Spawn World:",spawnWorld.Id, " Spawn safehouse:", spawnWorld.Nav[spawnNavId]);
-            
-            for a=#modNpcs.ActiveNpcClasses, 1, -1 do
-                local npcClass = modNpcs.ActiveNpcClasses[a];
-                if npcClass and npcClass.WanderingTrader then
-                    if npcClass.Prefab then
-                        game.Debris:AddItem(npcClass.Prefab, 0);
-                    end
-                    npcClass:Destroy();
-                end
-            end
-            
-            if modBranchConfigurations.IsWorld(spawnWorld.Id) then
-                local doorInstance = workspace.Interactables:FindFirstChild(spawnWorld.Nav[spawnNavId].Entrance);
-                
-                local spawnCFrame = CFrame.new(doorInstance.Destination.WorldPosition + Vector3.new(0, 2.35, 0)) 
-                    * CFrame.Angles(0, math.rad(doorInstance.Destination.WorldOrientation.Y-90), 0);
-                
-                modNpcs.spawn(spawnWandererName, spawnCFrame, function(npc, npcClass)
-                    npcClass.CurrentNav = spawnNavId;
-                    
-                end, modNpcs.NpcBaseConstructors.WanderingTrader);
+        end
+
+        modBranchConfigurations.Wanderer = {
+            Name = spawnWandererName;
+            WorldName = spawnWorldInfo.DisplayName;
+        };
+
+        if spawnWorldInfo.OverWorldIndex == nil then
+            Debugger:Warn("Cancelled wanderer spawn, not overworld.");
+            return;
+        end;
+        if modBranchConfigurations.WorldInfo ~= spawnWorldInfo then
+            Debugger:Warn("Cancelled wanderer spawn, wrong world.");
+            return;
+        end
+
+        local spawnsLib = modBranchConfigurations.SpawnLibrary[modBranchConfigurations.WorldName];
+        local spawnPart = workspace:FindFirstChildWhichIsA("SpawnLocation");
+        if spawnsLib then
+            Debugger:Warn("Wanderer spawn, no spawn library.");
+            local spawnLocationParts = {};
+            for spawnName, _ in pairs(spawnsLib) do
+                local spawnPart = workspace:FindFirstChild(spawnName);
+                if spawnPart == nil then continue end;
+                table.insert(spawnLocationParts, spawnPart); 
             end
 
-            modBranchConfigurations.Wanderer = {
-                Name=spawnWandererName;
-                WorldId=spawnWorld.Id;
-            };
-            
-        end
+            spawnPart = spawnLocationParts[math.random(1, #spawnLocationParts)];
+        end;
+
+        if spawnPart == nil then 
+            Debugger:Warn(`Cancelled wanderer spawn, no spawn part ({spawnsLib}).`);
+            return 
+        end;
+
+        local spawnSurfacePos = spawnPart.Position + Vector3.new(0, spawnPart.Size.Y/2, 0);
+        local spawnCFrame = CFrame.new(spawnSurfacePos + Vector3.new(0, 2.35, 0)) 
+            * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
+        
+        modNpcs.spawn2{
+            Name = spawnWandererName;
+            CFrame = spawnCFrame;
+            PackageOverride = "WanderingTrader";
+        };
     end)
 end
 
@@ -237,6 +250,12 @@ shared.coreBind(modWorldCoreClass, "_new", function(worldCoreClass)
     if cutsceneScript then
         cutsceneScript.Name = worldScr.Name;
         cutsceneScript.Parent = modCutscene.Script;
+    end
+
+    local dialoguesScript = worldScr:FindFirstChild("DialoguesScript");
+    if dialoguesScript then
+        local dialogueHandlers = shared.require(dialoguesScript);
+        modDialogueService:LoadHandlers(dialogueHandlers);
     end
 end)
 

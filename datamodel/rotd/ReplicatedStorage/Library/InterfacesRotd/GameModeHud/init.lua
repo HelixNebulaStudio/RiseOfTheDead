@@ -176,6 +176,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			currentHudObject = gameHudObjects[activeMode];
 
 			if currentHudObject then
+				currentHudObject.GameType = hudData.Type;
+				currentHudObject.GameStage = hudData.Stage;
+
 				currentHudObject:SetActive(true);
 				currentHudObject:Update(hudData);
 			end

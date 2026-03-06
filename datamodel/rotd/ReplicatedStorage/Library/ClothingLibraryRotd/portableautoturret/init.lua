@@ -5,10 +5,10 @@ local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForC
 local remoteShopService = modRemotesManager:Get("ShopService");
 --==
 local attirePackage = {
-	ItemId=script.Name;
-	Class="Clothing";
+	ItemId = script.Name;
+	Class = "Clothing";
 	
-	GroupName="UnoverlappableGroup";
+	GroupName = "UnoverlappableGroup";
 	
 	StorageId = "portableautoturret";
 	StorageIndexEnums = {
@@ -16,12 +16,12 @@ local attirePackage = {
 		BatterySlot = 2;
 	};
 
-	Configurations={};
-	Properties={};
+	Configurations = {};
+	Properties = {};
 };
 
 local turretArmPrefab = script:WaitForChild("turretArm");
-function attirePackage.OnAccesorySpawn(classPlayer, storageItem, newAccessoryPrefabs)
+function attirePackage.OnAccesorySpawn(playerClass: PlayerClass, storageItem: StorageItem, newAccessoryPrefabs)
 	local accessory = newAccessoryPrefabs and newAccessoryPrefabs[1];
 	if typeof(accessory) ~= "Instance" then return end;
 	
@@ -53,7 +53,7 @@ function attirePackage.OnAccesorySpawn(classPlayer, storageItem, newAccessoryPre
 	end)
 
 	task.spawn(function()
-		local storage = shared.modStorage.Get(attirePackage.StorageId, classPlayer:GetInstance());
+		local storage = shared.modStorage.Get(attirePackage.StorageId, playerClass:GetInstance());
 		if storage then
 			storage:Changed();
 		end

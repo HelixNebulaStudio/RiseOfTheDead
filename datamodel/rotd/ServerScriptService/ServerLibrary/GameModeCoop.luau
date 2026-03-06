@@ -21,6 +21,7 @@ local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 local modOctree = shared.require(game.ReplicatedStorage.Library.Util.Octree);
 
 local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
+local modRegionMission = shared.require(game.ServerScriptService.ServerLibrary.RegionMission);
 
 local Config = {
 	SpawnRadius = 256;
@@ -116,6 +117,7 @@ function Coop.new()
         StageLib = nil;
         RoomData = nil;
 
+		RegionMission = nil;
         StopwatchTick = nil;
 
 		Wave = 1;
@@ -139,6 +141,10 @@ end
 function Coop:Load()
     self.GameLib = modGameModeLibrary.GetGameMode(self.ModeType);
 	self.StageLib = self.GameLib and modGameModeLibrary.GetStage(self.ModeType, self.ModeStage);
+
+	if self.StageLib.RegionMissionId then
+		self.RegionMission = modRegionMission.new(self.StageLib.RegionMissionId, "CoopMission");
+	end
 
     local gameDir: Folder = workspace.Environment:FindFirstChild("Game");
     self.GameDir = gameDir
@@ -423,7 +429,7 @@ function Coop:Initialize(roomData)
 			while true do
 				repeat
 					task.wait(1);
-				until tick() >= self.HordeTimer;
+				until tick() >= self.HordeTimer and #hordeSpawns > 0;
 				if Config.HordeTimerEnabled ~= true then
 					self.HordeTimer = tick()+60;
 					continue;
@@ -646,6 +652,7 @@ function Coop:CompleteCoop()
 		Status = "Coop Complete!";
 		PlayMusic = false;
 	};
+	modAudio.Play("GameCompletion", workspace);
 
 	self:RespawnDead();
 	task.wait(1);
@@ -948,6 +955,15 @@ function Coop:Hud(data)
 		StopwatchTick = self.StopwatchTick;
 		StopwatchFinal = self.StopwatchFinal;
 	});
+
+	if self.RegionMission then
+		self.RegionMission.CoopMission.SaveData.TitleText = `{self.ModeType}: {self.ModeStage}`;
+		self.RegionMission.CoopMission.SaveData.StopwatchInfo = {
+			StopwatchTick = self.StopwatchTick;
+			StopwatchFinal = self.StopwatchFinal;
+		};
+		self.RegionMission:Sync();
+	end
 end
 
 local spawnCfCaches = {};

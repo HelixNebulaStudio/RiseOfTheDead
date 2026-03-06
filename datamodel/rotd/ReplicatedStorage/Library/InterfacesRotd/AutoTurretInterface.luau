@@ -74,6 +74,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		
 	end
 
+
+
     --MARK: OnToggle
 	window.OnToggle:Connect(function(visible, useStorageItem)
 		if visible then
@@ -84,6 +86,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		clearOptions();
 	end)
 	
+
+
     --MARK: OnUpdate
 	window.OnUpdate:Connect(function()
 		if activeStorageInterface then activeStorageInterface:Destroy() end;
@@ -99,7 +103,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		slotLabel2.Parent = windowFrame.ControlFrame;
 		
 		activeStorageInterface = modStorageInterface.new(storageId, windowFrame, {slotLabel; slotLabel2});
-		activeStorageInterface:Update();
+		activeStorageInterface:Update(nil, nil, true);
 		
         binds.Refresh();
 	end)
@@ -295,11 +299,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
 	function remoteAutoTurret.OnClientInvoke(action, packet)
 		if action == "refresh" then
-			if storageItem == nil then return end;
-			storageItem.Values.Online = packet.Online;
-			storageItem.Values.Config = packet.Config;
 			binds.Refresh();
-
 		end
 	end
 	

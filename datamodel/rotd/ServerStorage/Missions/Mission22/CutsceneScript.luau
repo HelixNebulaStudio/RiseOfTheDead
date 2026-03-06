@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService");
 
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
 local MISSION_ID = 22;
@@ -14,6 +15,39 @@ if RunService:IsServer() then
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	
+	if modBranchConfigurations.IsWorld("TheUnderground") then
+		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+
+			local interactable: InteractableInstance = ...;
+			if interactable.Id == "sewersMaintenanceRoom" then
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint == 2 then
+						mission.ProgressionPoint = 3;
+					end
+				end)
+			end
+		end)
+
+		shared.modEventService:OnInvoked("Generic_BindItemPickup", function(event: EventPacket, ...)
+			local interactable: InteractableInstance = ...;
+			local player: Player? = event.Player;
+			if player == nil then return end;
+			
+			task.spawn(function()
+				local itemId = interactable.Values.ItemId;
+				if itemId ~= "sewerskey1" then return end;
+
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint == 1 then
+						mission.ProgressionPoint = 2;
+					end
+				end)
+			end)
+		end);
+	end
+
 else
 	modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
@@ -34,12 +68,19 @@ return function(CutsceneSequence)
 		local spawned = false;
 		local function Spawn()
 			if spawned then return end;
+
 			local item = modStorage.FindItemIdFromStorages("sewerskey1", player);
 			if item == nil then
 				local prefab = script.Parent:WaitForChild("sewersKey"):Clone();
+
+				local pickupableConfig = modInteractables.createInteractable("PickupableRotd");
+				pickupableConfig:SetAttribute("ItemId", "sewerskey1");
+				pickupableConfig.Parent = prefab;
+
 				modReplicationManager.ReplicateIn(player, prefab, workspace.Interactables);
 				spawned = true;
 			end
+
 		end
 		local storageId = "thebackupplan";
 		local storage = modStorage.Get(storageId, player);

@@ -323,7 +323,7 @@ function Raid:Load()
 
 		--MARK: Spawn Chunks
 		local chunkIndex = 0;
-		local chunkSize = 16;
+		local chunkSize = self.SpawnChunks.Size.X;
 		for _, spawnPlatform in ipairs(spawnPlatformFolder:GetDescendants()) do
 			if not spawnPlatform:IsA("BasePart") then continue end;
 
@@ -337,7 +337,6 @@ function Raid:Load()
 			local chunk = node:GetObject();
 			if chunk.init == true then continue end;
 			chunk.init = true;
-			self.SpawnChunkCount += 1;
 
 			chunkIndex += 1;
 			chunk.Index = chunkIndex;
@@ -345,8 +344,9 @@ function Raid:Load()
 			chunk.Points = {};
 			chunk.EnemyList = {};
 
+			local dbPart;
 			if debugSpawnPlatforms == true then
-				local dbPart = Debugger:PointPart(point + self.SpawnChunkOffset);
+				dbPart = Debugger:PointPart(point + self.SpawnChunkOffset);
 				dbPart.Size = self.SpawnChunks.Size;
 				dbPart.CastShadow = false;
 				dbPart.Shape = Enum.PartType.Block;
@@ -356,7 +356,7 @@ function Raid:Load()
 			end
 
 			local avgPos;
-			for b=1, 5 do
+			for b=1, math.ceil(chunkSize/4)+4 do
 				local localRandomPoint = Vector3.new(
 					math.random(-chunkSize/2, chunkSize/2),
 					0,
@@ -370,15 +370,16 @@ function Raid:Load()
 					-Vector3.yAxis * self.SpawnChunks.Size.Y
 				);
 				if debugSpawnPlatforms == true then
-					local dbPart = Debugger:PointPart(rngPoint + Vector3.yAxis * (self.SpawnChunks.Size.Y/2));
-					dbPart.Name = `({rngPoint})_{b}`;
-					dbPart.Color = Color3.fromRGB(255, 0, 0);
-					dbPart.Size = Vector3.one * 0.5;
-					dbPart.Parent = spawnsFolder;
+					local dbSpawnPart = Debugger:PointPart(rngPoint + Vector3.yAxis * (self.SpawnChunks.Size.Y/2));
+					dbSpawnPart.Name = `badSpawn`;
+					dbSpawnPart.Color = Color3.fromRGB(255, 0, 0);
+					dbSpawnPart.Size = Vector3.one * 0.5;
+					dbSpawnPart.Parent = spawnsFolder;
 					
 					if surfacePt then
-						dbPart.CFrame = CFrame.new(surfacePt + Vector3.yAxis);
-						dbPart.Color = Color3.fromRGB(0, 255, 0);
+						dbSpawnPart.Name = `goodSpawn`;
+						dbSpawnPart.CFrame = CFrame.new(surfacePt + Vector3.yAxis);
+						dbSpawnPart.Color = Color3.fromRGB(0, 255, 0);
 					end
 				end
 
@@ -393,8 +394,14 @@ function Raid:Load()
 				end
 			end
 
-			if avgPos then avgPos = avgPos/#chunk.Points; end;
-			chunk.Position = avgPos;
+			if #chunk.Points > 0 then
+				self.SpawnChunkCount += 1;
+				if avgPos then avgPos = avgPos/#chunk.Points; end;
+				chunk.Position = avgPos;
+			else
+				game.Debris:AddItem(dbPart, 0);
+				node:Destroy();
+			end
 		end
 	end
 
@@ -471,8 +478,8 @@ function Raid:CompleteRaid()
 	self:Hud{
 		Status = "Raid Complete!";
 		PlayMusic = false;
-		EndStageSound = true;
 	};
+	modAudio.Play("GameCompletion", workspace);
 
 	self:RespawnDead();
 	task.wait(1);
@@ -563,7 +570,7 @@ function Raid:DropReward(spawnCf)
 
 	local lootPrefab = modItemDrops.spawn{
 		ItemId = rewardDropsList[math.random(1, #rewardDropsList)];
-		SpawnCFrame = spawnCf;
+		SpawnCFrame = spawnCf * CFrame.new(0, 1, 0);
 		Players = self.Players;
 		DespawnDuration = false;
 		Anchored = true;
@@ -650,7 +657,7 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 		end
 
 		local function filterFunc(npcClass: NpcClass)
-			local reRespawnThreshold = #self.EnemyClassInstances > 100 and 3 or #self.EnemyClassInstances > 50 and 6 or 9;
+			local reRespawnThreshold = #self.EnemyClassInstances > 100 and 1 or #self.EnemyClassInstances > 50 and 3 or 6;
 			if npcClass.LastRespawnTick and (tick() - npcClass.LastRespawnTick) < reRespawnThreshold then return false; end;
 			if modVector.DistanceSqrdXZ(npcClass:GetCFrame().Position, spawnCf.Position) <= 4096 then return false; end;
 			return npcClass.Name == npcName;
@@ -699,10 +706,11 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 
 			local properties: PropertiesVariable<{}> = npcClass.Properties;
 			properties.Level = math.max(npcClass.Properties.Level + (self.Difficulty + (self.Wave-1)) + math.random(-2, 0), 1);
-			properties.TargetableDistance = 256;
+			properties.TargetableDistance = 1024;
 			properties.NetworkOwners = self.Players;
-			properties.CanForgetTargets = false;
+			
 			properties.HordeAggression = paramPacket.HordeAggression == true;
+			properties.LockEnemyOnDuration = NumberRange.new(0.3, 0.8);
 
 			if paramPacket.InfTargeting then
 				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
@@ -722,7 +730,6 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 			healthComp.OnIsDeadChanged:Connect(function()
 				if not healthComp.IsDead then return end;
 
-				self:BeginCount();
 
 				self.LastKilled = tick();
 				for a=#self.EnemyClassInstances, 1, -1 do
@@ -732,9 +739,12 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 					end
 				end
 
-				self.EliminateCount = self.EliminateCount +1;
-				self.LastEnemyDeathPos = npcClass.RootPart.CFrame.Position;
-				
+				if healthComp.LastDamagedBy ~= nil and healthComp.LastDamagedBy.ClassName == "PlayerClass" then
+					self:BeginCount();
+					self.EliminateCount = self.EliminateCount +1;
+					self.LastEnemyDeathPos = npcClass.RootPart.CFrame.Position;
+				end
+
 				if self.Status == EnumStatus.InProgress then
 					if self.Objective.Id == "Eliminate" then
 						local remining = math.max(0, self.EliminateGoal - self.EliminateCount);
@@ -935,7 +945,6 @@ function Raid:Start()
 				if targetHandlerComp == nil then continue end;
 
 				if reasonData and reasonData.DamageBy then
-					Debugger:StudioWarn(`Destroy by`, reasonData.DamageBy.Name);
 					if reasonData.DamageBy.ClassName == "PlayerClass" then
 						local playerClass = reasonData.DamageBy;
 						targetHandlerComp:AddTarget(playerClass.Character);
@@ -979,8 +988,10 @@ function Raid:Start()
 	self.Status = EnumStatus.InProgress;
 
 	self.EliminateCount = 0;
-	local minTotalZombieCount = self.SpawnChunkCount * self.SpawnsPerChunk.Max;
-	self.EliminateGoal = math.min(self.Objective.EnemyCap, math.max(1, math.floor(minTotalZombieCount*0.98)));
+
+	local range = (self.SpawnsPerChunk.Max + self.SpawnsPerChunk.Min)/2;
+	local minTotalZombieCount = math.max(1, math.floor(self.SpawnChunkCount * math.ceil(range) * 0.99));
+	self.EliminateGoal = math.clamp(minTotalZombieCount, 100, 666);
 
 	if self.Objective.EliminateGoal then
 		self.EliminateGoal = self.Objective.EliminateGoal;
@@ -1086,7 +1097,6 @@ function Raid:Initialize(roomData)
 					shared.gameConfig.SpawnActivateRadius or 128
 				);
 				local chunkAccessed = 0;
-				local maxChunkAccess = 5;
 
 				local sortedChunks = {};
 				for a=1, #chunksList do
@@ -1121,6 +1131,9 @@ function Raid:Initialize(roomData)
 						math.random(self.SpawnsPerChunk.Min, self.SpawnsPerChunk.Max), 
 						#chunk.Points
 					);
+					if self.SpawnsPerChunk.Max < 1 then
+						numToSpawn = math.random(0, 100)/100 <= self.SpawnsPerChunk.Max and 1 or 0;
+					end
 					for a=1, numToSpawn*2 do
 						local pickPoint = chunk.Points[math.random(1, #chunk.Points)];
 						if pickPoint == nil then break; end;
@@ -1263,8 +1276,7 @@ function Raid:Initialize(roomData)
 				end)
 			end
             
-			
-			local hordeZombieCount = #self.Characters * 25;
+			local hordeZombieCount = #self.Characters * math.random(20, 30);
 			while hordeZombieCount > 0 and self.Status == EnumStatus.InProgress do
 				local targetChar = self.Characters[math.random(1, #self.Characters)];
 				local characterPosition = targetChar:GetPivot().Position;
@@ -1276,7 +1288,7 @@ function Raid:Initialize(roomData)
 					local spawnAtt = spawnAttsInRange[a];
 					if spawnAtt:GetAttribute("Enabled") then
 						local dist2 = modVector.DistanceSqrdXZ(spawnAtt.WorldCFrame.Position, characterPosition);
-						local floor = math.abs(spawnAtt.WorldCFrame.Position.Y-characterPosition.Y)^2 *3;
+						local floor = math.floor(math.abs(spawnAtt.WorldCFrame.Position.Y-characterPosition.Y)/8)^2 *3;
 						table.insert(validSpawnAtts, {
 							Att = spawnAtt;
 							Dist2 = dist2 + floor;
@@ -1301,6 +1313,7 @@ function Raid:Initialize(roomData)
 				self:SpawnEnemy(self:PickEnemy({IsHordeWave=true;}), {
 					SpawnCFrame = spawnCf;
 					InfTargeting = true;
+					HordeAggression = true;
 				});
 				
 				task.wait(self.Objective.HordeSpawnRate or 0.5);

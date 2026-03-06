@@ -207,11 +207,13 @@ function treePackage.Lasso(npcClass: NpcClass)
 
                 equipmentClass.Properties.InfiniteAmmo = 1;
 
-                local modifier = equipmentClass.Configurations.newModifier("BanditGun");
-                modifier.SetValues.Damage = isHard and 95 or 65;
-                modifier.SetValues.Rpm = 999;
-                modifier.SetValues.NpcPercentHealthDamage = 0.6;
-                equipmentClass.Configurations:AddModifier(modifier, true);
+                equipmentClass:AddBaseModifier("BanditGun", {
+                    SetValues = {
+                        Damage = isHard and 95 or 65;
+                        Rpm = 999;
+                        NpcPercentHealthDamage = 0.6;
+                    };
+                });
             end
         });
         npcClass.Chat(nil, npcClass.NpcPackage.LassoedSpeech[math.random(1, #npcClass.NpcPackage.LassoedSpeech)]);

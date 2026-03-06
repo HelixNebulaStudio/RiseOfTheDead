@@ -24,6 +24,7 @@ local npcPackage = {
     AddComponents = {
         "TargetHandler";
         "Chat";
+        "RandomClothing";
         "FollowPlayer";
     };
 
@@ -57,16 +58,23 @@ function npcPackage.Spawning(npcClass: NpcClass)
 end
 
 function npcPackage.Spawned(npcClass: NpcClass)
+    npcClass:GetComponent("RandomClothing"){
+        Name = npcPackage.Name; 
+        AddHair = false;
+    };
+
     npcClass.WieldComp:Equip{
         ItemId = "survivalknife";
         OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
             local equipmentClass: EquipmentClass? = toolHandler.EquipmentClass;
             if equipmentClass == nil then return end;
 
-            local modifier = equipmentClass.Configurations.newModifier("CultistMelee");
-            modifier.SetValues.Damage = math.random(5, 10);
-            modifier.SetValues.NpcPercentHealthDamage = 0.15;
-            equipmentClass.Configurations:AddModifier(modifier, true);
+            equipmentClass:AddBaseModifier("CultistMelee", {
+                SetValues = {
+                    Damage = math.random(5, 10);
+                    NpcPercentHealthDamage = 0.15;
+                };
+            });
         end
     };
 end

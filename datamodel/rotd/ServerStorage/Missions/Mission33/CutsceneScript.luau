@@ -442,10 +442,12 @@ return function(CutsceneSequence)
 								if toolHandler.EquipmentClass == nil then return end;
 								local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
 
-								local modifier: ConfigModifier = equipmentClass.Configurations.newModifier("npcDmg");
-								modifier.SetValues.Damage = 45;
-								modifier.Priority = 999;
-								equipmentClass.Configurations:AddModifier(modifier, true);
+								equipmentClass:AddBaseModifier("npcDmg", {
+									SetValues = {
+										Damage = 45;
+									};
+									Priority = 999;
+								});
 							end;
 						};
 						stanNpcClass.Properties.Immotal = 0.1;
@@ -739,11 +741,13 @@ return function(CutsceneSequence)
 								if toolHandler.EquipmentClass == nil then return end;
 								local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
 
-								local modifier: ConfigModifier = equipmentClass.Configurations.newModifier("npcDmg");
-								modifier.SetValues.Damage = 40;
-								modifier.SetValues.ReloadTime = 1;
-								modifier.Priority = 999;
-								equipmentClass.Configurations:AddModifier(modifier, true);
+								equipmentClass:AddBaseModifier("npcDmg", {
+									SetValues = {
+										Damage = 40;
+										ReloadTime = 1;
+									};
+									Priority = 999;
+								});
 							end;
 						};
 						patrickNpcClass.WieldComp.TargetableTags.Bandit = true;

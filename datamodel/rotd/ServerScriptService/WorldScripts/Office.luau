@@ -26,7 +26,8 @@ function WorldCore.InitGameController()
 
     newGameController.Objective = {
         Id = "Eliminate";
-        EliminateGoal = 100;
+
+        --EliminateGoal = 100;
         EnemyCap = 35;
 
         HordeWhenEnemiesDropsBelow = 4;

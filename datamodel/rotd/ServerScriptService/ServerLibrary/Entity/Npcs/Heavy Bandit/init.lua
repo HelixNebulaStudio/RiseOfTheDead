@@ -65,16 +65,21 @@ function npcPackage.Spawning(npcClass: NpcClass)
         if equipmentClass == nil then return end;
 
         if equipmentClass.Class == "Gun" then
-            local modifier = equipmentClass.Configurations.newModifier("BanditGun");
-            modifier.SetValues.Damage = math.random(1, 2);
-            modifier.SetValues.NpcPercentHealthDamage = 0.1;
-            equipmentClass.Configurations:AddModifier(modifier, true);
+            equipmentClass:AddBaseModifier("BanditGun", {
+                SetValues = {
+                    Damage = math.random(1, 2);
+                    NpcPercentHealthDamage = 0.1;
+                };
+            });
 
         elseif equipmentClass.Class == "Melee" then
-            local modifier = equipmentClass.Configurations.newModifier("BanditMelee");
-            modifier.SetValues.Damage = math.random(20, 25);
-            modifier.SetValues.NpcPercentHealthDamage = 0.3;
-            equipmentClass.Configurations:AddModifier(modifier, true);
+            equipmentClass:AddBaseModifier("BanditMelee", {
+                SetValues = {
+                    Damage = math.random(20, 25);
+                    NpcPercentHealthDamage = 0.3;
+                };
+            });
+            
         end
     end
 

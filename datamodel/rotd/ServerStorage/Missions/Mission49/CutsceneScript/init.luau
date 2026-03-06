@@ -15,6 +15,22 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
+	if modBranchConfigurations.IsWorld("TheWarehouse") then
+		shared.modEventService:OnInvoked("Interactables_BindCollectibleInteract", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+
+			local interactable: InteractableInstance = ...;
+			if interactable.Id ~= "vrm" then return end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint <= 4 then
+					mission.ProgressionPoint = 5;
+				end;
+			end)
+		end)
+	end
+
 else
 	modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
@@ -29,7 +45,6 @@ return function(CutsceneSequence)
 		local player: Player = players[1];
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
-		
 		
 		if not modMission:IsComplete(player, MISSION_ID) then
 			local function OnChanged(firstRun)

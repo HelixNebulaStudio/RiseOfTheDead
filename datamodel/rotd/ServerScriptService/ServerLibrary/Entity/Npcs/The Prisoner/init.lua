@@ -71,10 +71,12 @@ function npcPackage.Spawning(npcClass: NpcClass)
                         if toolHandler.EquipmentClass == nil then return end;
                         local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
 
-                        local modifier = equipmentClass.Configurations.newModifier("PrisonerMelee");
-                        modifier.SetValues.Damage = 25;
-                        modifier.SetValues.NpcPercentHealthDamage = 0.35;
-                        equipmentClass.Configurations:AddModifier(modifier, true);
+                        equipmentClass:AddBaseModifier("PrisonerMelee", {
+                            SetValues = {
+                                Damage = 25;
+                                NpcPercentHealthDamage = 0.35;
+                            };
+                        });
                     end;
                 };
             end

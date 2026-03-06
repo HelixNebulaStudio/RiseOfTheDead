@@ -513,23 +513,23 @@ GameModeLibrary.GameModes={
 	Coop={
 		Module="Coop";
 		Stages={
-			["Genesis"]={
-				WorldId="Genesis";
-				ExitSpawn="communitySh";
-				TitleImage="http://www.roblox.com/asset/?id=7431603916";
+			["Genesis"] = {
+				WorldId = "Genesis";
+				ExitSpawn = "communitySh";
+				TitleImage = "http://www.roblox.com/asset/?id=7431603916";
 				
-				MaxPlayers=4;
-				RewardsId="genesiscrate";
-				RewardsIds={"genesiscrate"; "ggenesiscrate"};
-				HardRewardId="ggenesiscrate";
+				MaxPlayers = 4;
+				RewardsId = "genesiscrate";
+				RewardsIds = {"genesiscrate"; "ggenesiscrate"};
+				HardRewardId = "ggenesiscrate";
 				
-				Soundtrack="Soundtrack:Void";
+				Soundtrack = "Soundtrack:Void";
 
-				HardModeEnabled=true;
-				EnableStopwatch=true;
+				HardModeEnabled = true;
+				EnableStopwatch = true;
 			};
 			
-			["Mr. Klaw's Workshop"]={
+			["Mr. Klaw's Workshop"] = {
 				WorldId = "KlawsWorkshop";
 				TitleImage = "http://www.roblox.com/asset/?id=8402447350";
 				
@@ -539,18 +539,20 @@ GameModeLibrary.GameModes={
 				EnableStopwatch = true;
 			};
 
-			["SunkenShip"]={
-				WorldId="SunkenShip";
-				ExitSpawn="sewersToharbor";
-				TitleImage="http://www.roblox.com/asset/?id=11114580671";
-				Description="I think I'm going to need some diving goggles..";
+			["SunkenShip"] = {
+				WorldId = "SunkenShip";
+				ExitSpawn = "sewersToharbor";
+				TitleImage = "http://www.roblox.com/asset/?id=11114580671";
+				Description = "I think I'm going to need some diving goggles..";
 
-				MaxPlayers=4;
-				RewardsId="sunkenchest";
-				RewardsIds={"sunkenchest";};
+				MaxPlayers = 4;
+				RewardsId = "sunkenchest";
+				RewardsIds= {"sunkenchest";};
 
-				Soundtrack="Soundtrack:Drowning World";
-				EnableStopwatch=true;
+				Soundtrack = "Soundtrack:Drowning World";
+				EnableStopwatch = true;
+				RegionMissionId = 90;
+				HideHudTask = true;
 			};
 
 			["CargoShip"]={

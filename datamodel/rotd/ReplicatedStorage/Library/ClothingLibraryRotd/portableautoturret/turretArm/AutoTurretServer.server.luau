@@ -8,7 +8,7 @@ local modWeaponAttributes = shared.require(game.ReplicatedStorage.Library.Weapon
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modCustomizationData = shared.require(game.ReplicatedStorage.Library.CustomizationData);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modWeapons = shared.require(game.ReplicatedStorage.Library.WeaponsLibrary);
+local modWeaponsLibrary = shared.require(game.ReplicatedStorage.Library.WeaponsLibrary);
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
@@ -25,10 +25,8 @@ local accessory: Accessory = turretArm.Parent :: Accessory;
 local accessoryHandle = accessory:WaitForChild("Handle") :: BasePart;
 local character: Model = accessory.Parent :: Model;
 local player: Player = game.Players:GetPlayerFromCharacter(character);
-local handlePoint: Attachment = turretArm:WaitForChild("Arm2"):WaitForChild("HandlePoint") :: Attachment;
 
-local accessorySiid = accessory:GetAttribute("StorageItemId");
-local accessoryStorageItem = modStorage.FindIdFromStorages(accessorySiid, player);
+local handlePoint: Attachment = turretArm:WaitForChild("Arm2"):WaitForChild("HandlePoint") :: Attachment;
 
 local autoTurretClient: Script = turretArm:WaitForChild("AutoTurretClient") :: Script;
 local targetValue: ObjectValue = autoTurretClient:WaitForChild("Target") :: ObjectValue;
@@ -57,6 +55,8 @@ local remoteAutoTurret = modRemotesManager:Get("AutoTurret");
 
 local patItemLib = modItemsLibrary:Find("portableautoturret");
 local TurretConfigs = patItemLib.GetTurretConfigs();
+
+local patStorage: Storage = nil;
 
 local onlineLoop: boolean = false;
 local lastWeaponId: string = nil;
@@ -113,13 +113,12 @@ function TurretRuntime(weaponStorageItem)
 		
 	end
 	
-	--hydraulicRod.HydraulicRod.CFrame = CFrame.Angles(0, hydraulicYaw, 0);
 	hydraulicRod.JointHRA.CFrame  = jointHarCf * CFrame.Angles(hydraulicPitch, 0, 0);
 	arm1.JointAA2.CFrame = jointAa2Cf * CFrame.Angles(armPitch, 0, 0);
 	
-	weaponStorageItem:Sync({"A"; "MA"});
+	--weaponStorageItem:Sync({"A"; "MA"});
 	--==
-	local configValues = accessoryStorageItem:GetValues("Config") or {};
+	local configValues = patStorage.Values.Config or {};
 	
 	local isSec = tick()-lastSec >= 3;
 	if isSec then
@@ -128,7 +127,6 @@ function TurretRuntime(weaponStorageItem)
 		
 		task.spawn(function()
 			local profile = shared.modProfile:Get(player);
-			local patStorage = modStorage.Get("portableautoturret", player);
 
 			local _weaponStorageItem = patStorage:FindByIndex(1);
 			local batteryStorageItem = patStorage:FindByIndex(2);
@@ -163,8 +161,9 @@ function TurretRuntime(weaponStorageItem)
 			if noBattery == true then
 				shared.Notify(player, "Your Portable Auto Turret battery is depleted.", "Inform");
 
-				modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
-				accessoryStorageItem:SetValues("Online", false):Sync{"Online"};
+				modAudio.Play("TurretOffline", turretArm.PrimaryPart);
+				patStorage.Values.IsOnline = false;
+				patStorage:SyncValues();
 
 				task.wait(0.2);
 				Update();
@@ -215,7 +214,7 @@ function TurretRuntime(weaponStorageItem)
 			
 			local statusComp: StatusComp = npcClass.StatusComp;
 			
-			if npcClass.Detectable == false then continue end;
+			if npcClass.Properties.Detectable == false then continue end;
 			if npcClass.SpawnTime and tick()-npcClass.SpawnTime <= 0.3 then continue end;
 			
 			if npcClass and npcClass.Properties and npcClass.Properties.BasicEnemy ~= true then
@@ -427,7 +426,10 @@ function TurretRuntime(weaponStorageItem)
 
 		if sucess == false then
 			modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
-			accessoryStorageItem:SetValues("Online", false):Sync{"Online"};
+
+			patStorage.Values.IsOnline = false;
+			patStorage:SyncValues();
+
 			shared.Notify(player, "Your Portable Auto Turret ammo is depleted.", "Inform");
 
 			task.wait(0.2);
@@ -453,7 +455,7 @@ function TurretRuntime(weaponStorageItem)
 	local bulletOriginAtt: Attachment = activeWeaponModel.PrimaryPart:WaitForChild("BulletOrigin") :: Attachment;
 
 	while onlineLoop do
-		local origin = bulletOriginAtt.WorldPosition;
+		local originPos = bulletOriginAtt.WorldPosition;
 		
 		local targetHead = npcClass.Head;
 		if targetHead == nil then break; end;
@@ -462,7 +464,7 @@ function TurretRuntime(weaponStorageItem)
 		if targetPos.Y < (targetHead.Position.Y-0.5) then
 			targetPos = targetPos + Vector3.new(0, math.random(0, 150)/100, 0);
 		end
-		local direction = (targetPos-origin).Unit;
+		local direction = (targetPos-originPos).Unit;
 		
 
 		local firePacket = {
@@ -472,23 +474,19 @@ function TurretRuntime(weaponStorageItem)
 
 			ShotBy = playerClass;
 
-			ShotOrigin = origin;
+			ShotOriginPos = originPos;
+			ShotOriginAtt = bulletOriginAtt;
 			ShotDirection = direction;
 
 			ReplicateToShotOwner = true;
 
-			Targetable = {
-				Zombie = true;
-				Bandit = true;
-				Cultist = true;
-				Rat = true;
-			};
+			TargetableTags = table.clone(playerClass.WieldComp.TargetableTags);
 
 			IsPat = true;
 			MaistPercent = maistPercent;
 		};
 		
-		if configurations.FocusDuration > 0 then
+		if configurations.FocusDuration and configurations.FocusDuration > 0 then
 			if chargeFocus == 2 then -- true;
 				task.wait(configurations.FocusDuration);
 				canReactivate = tick();
@@ -512,7 +510,7 @@ function TurretRuntime(weaponStorageItem)
 		end
 
 		firerate = math.clamp(firerate, configurations.RapidFireMax or delta, 999);
-		weaponStorageItem:Sync({"A"; "MA"});
+		--weaponStorageItem:Sync({"A"; "MA"});
 		task.wait(firerate);
 		
 		if sortForToxicMod == 2 and checkForRecompute then
@@ -555,10 +553,11 @@ end
 
 function Update()
 	if accessory.Parent and accessory.Parent.Name == "voodoodoll" then return end;
-	accessoryStorageItem = modStorage.FindIdFromStorages(accessorySiid, player);
-	local weaponStorageItemID = accessory:GetAttribute("WeaponStorageItemID");
-	
-	local isWeaponChanged = lastWeaponId ~= weaponStorageItemID;
+
+	local weaponSiid = patStorage.Values.WeaponSiid;
+	if weaponSiid == nil then Debugger:StudioLog("No weapon siid"); return end;
+
+	local isWeaponChanged = lastWeaponId ~= weaponSiid;
 	if isWeaponChanged then
 		for _, obj in pairs(turretArm:GetChildren()) do
 			if obj:GetAttribute("TurretWeapon") ~= true then continue end;
@@ -567,20 +566,23 @@ function Update()
 		activeWeaponModel = nil;
 		
 		onlineLoop = false;
-		accessoryStorageItem:SetValues("Online", false):Sync{"Online"};
+
+		patStorage.Values.IsOnline = false;
+		patStorage:SyncValues();
 	end
-	lastWeaponId = weaponStorageItemID;
+	lastWeaponId = weaponSiid;
 	
-	if weaponStorageItemID == nil then
+	if weaponSiid == nil then
 		task.spawn(function()
-			remoteAutoTurret:InvokeClient(player, "refresh", accessoryStorageItem.Values);
+			patStorage:SyncValues();
+			remoteAutoTurret:InvokeClient(player, "refresh");
 		end)
 		return;
 	end
 	
-	local weaponStorageItem = modStorage.FindIdFromStorages(weaponStorageItemID, player);
+	local weaponStorageItem: StorageItem = modStorage.FindIdFromStorages(weaponSiid, player);
 	local itemId = weaponStorageItem.ItemId;
-	local toolLib = modWeapons[itemId];
+	local toolLib = modWeaponsLibrary[itemId];
 	
 	if isWeaponChanged then
 		local _, toolItemId = next(toolLib.Welds);
@@ -594,7 +596,7 @@ function Update()
 		weaponModel:SetAttribute("TurretWeapon", true);
 		weaponModel:SetAttribute("ItemId", itemId);
 		weaponModel:SetAttribute("Grip", "ToolGrip");
-		weaponModel:SetAttribute("StorageItemId", weaponStorageItemID);
+		weaponModel:SetAttribute("StorageItemId", weaponSiid);
 		weaponModel:ScaleTo( customWeaponScale[itemId] or (weaponModel:GetScale()*0.8) );
 		
 		local handle = weaponModel:WaitForChild("Handle");
@@ -629,7 +631,7 @@ function Update()
 	end
 	
 	
-	local isOnline = accessoryStorageItem.Values.Online == true;
+	local isOnline = patStorage.Values.IsOnline == true;
 	
 	if isOnline and activeWeaponModel then
 		autoTurretClient:SetAttribute("Mode", 1);
@@ -659,23 +661,23 @@ function Update()
 	
 end
 
-local discOnEnemiesAttract;
-discOnEnemiesAttract = shared.modEventService:OnInvoked(
-	"Npcs_BindEnemiesAttract", 
-	function(event: EventPacket, p: Player, cM: {Model})
-		if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
-		if not workspace:IsAncestorOf(turretArm) then discOnEnemiesAttract(); end;
-		if p ~= player then return end;
-		
-		selectedTargets = cM or {};
-	end
-)
+while patStorage == nil do
+	task.wait(0.1);
+	patStorage = shared.modStorage.Get("portableautoturret", player) :: Storage;
+end
 
-accessory:GetAttributeChangedSignal("Update"):Connect(function()
-	if accessory:GetAttribute("Update") == nil then return end;
-	accessory:SetAttribute("Update", nil);
+local discOnEnemiesAttract;
+discOnEnemiesAttract = shared.modEventService:OnInvoked("Npcs_BindEnemiesAttract", function(event: EventPacket, p: Player, characterModels: {Model})
+	if not workspace:IsAncestorOf(turretArm) then discOnEnemiesAttract(); end;
+	if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
+	if p ~= player then return end;
 	
-	Update();
+	selectedTargets = characterModels or {};
 end)
-accessory:GetAttributeChangedSignal("WeaponStorageItemID"):Connect(Update);
+
+local patOnChangeCon;
+patOnChangeCon = patStorage.Values.OnChanged:Connect(function(k, v, ov) 
+	if not workspace:IsAncestorOf(turretArm) then patOnChangeCon(); end;
+	Update();
+end);
 Update();

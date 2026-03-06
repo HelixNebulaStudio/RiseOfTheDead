@@ -12,7 +12,7 @@ local statusPackage = {
 
 local modifierId = statusPackage.Id;
 function statusPackage.BindApply(statusClass: StatusClassInstance)
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     local configurations = characterClass.Configurations;
 
     local skillStats = statusClass.Values.SkillData.Stats;
@@ -41,7 +41,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
 end
 
 function statusPackage.BindExpire(statusClass: StatusClassInstance)
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     local configurations = characterClass.Configurations;
 
     configurations:RemoveModifier(modifierId);

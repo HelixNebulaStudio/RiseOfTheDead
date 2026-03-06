@@ -3,7 +3,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modBitFlags = shared.require(game.ReplicatedStorage.Library.BitFlags);
-local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 ---
 local itemPackage = {};
@@ -82,71 +81,6 @@ function itemPackage.GetTurretConfigs()
 	};
 end
 
-function itemPackage.StorageCheck(packet)
-	local dragStorageItem = packet.DragStorageItem;
-	local targetIndex = packet.TargetIndex;
-	if dragStorageItem.ItemId == "dualp250" then
-		packet.FailMsg = "The P.A.T. only has one arm and cannot equip dual weapons.";
-		packet.Allowed = false;
-		return packet;
-	end;
-	
-	if targetIndex == 1 then
-		if modItemsLibrary:HasTag(dragStorageItem.ItemId, "Gun") then
-			packet.Allowed = true;
-			return packet;
-		else
-			packet.FailMsg = "P.A.T. weapon slot is only for guns.";
-		end
-		
-	elseif targetIndex == 2 then
-		if dragStorageItem.ItemId == "battery" and dragStorageItem.Quantity == 1 then
-			packet.Allowed = true;
-			return packet;
-		elseif dragStorageItem.ItemId == "battery" and dragStorageItem.Quantity > 1 then
-			packet.FailMsg = "Only put one battery in the P.A.T. battery slot.";
-			
-		else
-			packet.FailMsg = "P.A.T. battery slot is only for batteries.";
-			
-		end
-	end
-	
-	packet.Allowed = false;
-	return packet;
-end
-
-
-local function setWeaponId(storage)
-	local player = storage.Player;
-	local profile = shared.modProfile:Find(player.Name);
-	if profile == nil then return end;
-	
-	local playerSave = profile:GetActiveSave();
-	
-	local storageSiid = storage.Values.Siid;
-	if storageSiid == nil then return end;
-	local clothingStorage = playerSave.Clothing;
-	local patStorageItem = clothingStorage:Find(storageSiid);
-	
-	local weaponStorageItem = storage:FindByIndex(1); -- StorageIndexEnums
-	
-	local accessories = playerSave.AppearanceData:GetAccessories(storageSiid);
-	for a=1, #accessories do
-		accessories[a]:SetAttribute("WeaponStorageItemID", weaponStorageItem and weaponStorageItem.ID or nil);
-	end
-	
-	if patStorageItem == nil then return end;
-	patStorageItem:SetValues("EquippedWeapon", weaponStorageItem and weaponStorageItem.ID or nil):Sync{"EquippedWeapon"};
-end
-function itemPackage.InitStorage(storage)
-	setWeaponId(storage);
-end
-
-function itemPackage.ConnectChanged(storage)
-	setWeaponId(storage);
-end
-
 function itemPackage.Init(itemLib)
 	HitListBitFlag = modBitFlags.new();
 	HitListBitFlag:AddFlag("Zombie", 1);
@@ -171,34 +105,28 @@ function itemPackage.Init(itemLib)
 	local TurretConfigs = itemLib.GetTurretConfigs();
 	
 	function remoteAutoTurret.OnServerInvoke(player, action, ...)
+		local rPacket = {};
+
 		local profile = shared.modProfile:Get(player);
 		local playerSave = profile:GetActiveSave();
 
 		local patStorage = shared.modStorage.Get("portableautoturret", player);
-		local accessorySiid = patStorage.Values.Siid;
-		
-		local accessoryStorageItem = shared.modStorage.FindIdFromStorages(accessorySiid, player);
+		if patStorage == nil then return end;
 
-		local accessories = playerSave.AppearanceData:GetAccessories(accessorySiid);
-		if accessories == nil then return end;
-		
+		local accessories = playerSave.AppearanceData:GetAccessoriesByItemId("portableautoturret");
 		local accessory = accessories[1];
 		local turretArm = accessory:WaitForChild("turretArm");
-		
-		----
-		local rPacket = {};
 
 		local accessorySiid = accessory:GetAttribute("StorageItemId");
 		if accessorySiid == nil then
-			Debugger:Warn("Missing WeaponStorageItemID");
 			return rPacket;
 		end
-
+		
 		local weaponStorageItem = patStorage:FindByIndex(1);
 		local batteryStorageItem = patStorage:FindByIndex(2);
 
 		if action == "toggleonline" then
-			local onlineBool = not (accessoryStorageItem:GetValues("Online") == true);
+			local onlineBool = patStorage.Values.IsOnline == true;
 
 			if onlineBool then
 				if weaponStorageItem == nil then
@@ -218,10 +146,9 @@ function itemPackage.Init(itemLib)
 				modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
 			end
 
-			accessoryStorageItem:SetValues("Online", onlineBool):Sync{"Online"};
+			patStorage.Values.IsOnline = not onlineBool;
+			patStorage:SyncValues();
 			
-			rPacket.ID = accessoryStorageItem.ID;
-			rPacket.Values = accessoryStorageItem.Values;
 			rPacket.Success = true;
 			
 			accessory:SetAttribute("Update", true);
@@ -230,8 +157,9 @@ function itemPackage.Init(itemLib)
 
 		elseif action == "resetconfig" then
 
-			accessoryStorageItem:SetValues("Config", {}):Sync{"Config"};
-			rPacket.Values = accessoryStorageItem.Values;
+			patStorage.Values.Config = {};
+			patStorage:SyncValues();
+			
 			rPacket.Success = true;
 
 			return rPacket;
@@ -242,7 +170,7 @@ function itemPackage.Init(itemLib)
 			local configKey = packet.ConfigKey;
 			local optionIndex = packet.OptionIndex;
 
-			local configValues = accessoryStorageItem:GetValues("Config") or {};
+			local configValues = patStorage.Values.Config or {};
 			local configInfo = TurretConfigs[packet.ConfigKey];
 
 			if configInfo == nil then return rPacket end;
@@ -252,8 +180,9 @@ function itemPackage.Init(itemLib)
 				configValues[configKey] = nil;
 			end
 
-			accessoryStorageItem:SetValues("Config", configValues):Sync{"Config"};
-			rPacket.Values = accessoryStorageItem.Values;
+			patStorage.Values.Config = configValues;
+			patStorage:SyncValues();
+			
 			rPacket.Success = true;
 
 			return rPacket;
@@ -269,12 +198,13 @@ function itemPackage.Init(itemLib)
 
 			if configHitlistBitFlags:HasFlag(flagTag) == nil then return rPacket end;
 
-			local configValues = accessoryStorageItem:GetValues("Config") or {};
+			local configValues = patStorage.Values.Config or {};
 
 			local userHitlistBitString = configValues.Hitlist or configInfo.DefaultBitString;
 
 			configValues.Hitlist = configHitlistBitFlags:Set(userHitlistBitString, flagTag, flagVal);
-			accessoryStorageItem:SetValues("Config", configValues):Sync{"Config"};
+			patStorage.Values.Config = configValues;
+			patStorage:SyncValues();
 
 			rPacket.FlagVal = configHitlistBitFlags:Test(flagTag, userHitlistBitString);
 			rPacket.Success = true;
@@ -295,6 +225,7 @@ function itemPackage.Init(itemLib)
 			return;
 		end
 
+		return;
 	end
 	
 end

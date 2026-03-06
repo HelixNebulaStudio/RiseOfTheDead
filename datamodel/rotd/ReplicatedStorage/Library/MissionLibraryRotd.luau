@@ -2591,7 +2591,7 @@ MissionLibrary.New{
 	Persistent=true;
 	Checkpoint={
 		{Text="Talk to Rachel to pick up the blood samples";};
-		{Text="Head to W.D. Mall's Clinic Safehouse"; Notify=true;};
+		{Text="Head to W.D. Mall's Clinic Safehouse without destroying the blood samples"; Notify=true;};
 		{Text="Find the laboratory in the Clinic Safehouse";};
 		{Text="Look for fuel for the generator";};
 		{Text="Activate the generator";};
@@ -3104,6 +3104,44 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Core};
 	};
 	Markers = {
+	};
+};
+
+-- MARK: 89 - AB: Shadow Basement
+MissionLibrary.New{
+	MissionId = 89;
+	MissionType = MissionLibrary.MissionTypes.Mini;
+	Name = "AB: Shadow Basement";
+	Description = "Find and activate all the levers before the room is filled with toxic gas.";
+	SaveData = {
+		TitleText = "Raid: Abandoned Bunker";
+	};
+	Checkpoint = {
+		{Text = "Find and activate all the levers";};
+		{Text = "Find and activate $Count/$Total levers"};
+		{Text = "Loot the locked room"};
+	};
+};
+
+-- MARK: 90 - The Sunken Catalysts
+MissionLibrary.New{
+	MissionId = 90;
+	MissionType = MissionLibrary.MissionTypes.Mini;
+	Name = "The Sunken Catalysts";
+	Description = "Salvage the items from the sunken ship.";
+	SaveData = {
+		Count = 0;
+		Total = 3;
+	};
+	Checkpoint = {
+		{Text = "Find a way into the sunken ship";};
+		{Text = "Find a way to get rid of the Elder Vexeron"};
+		{Text = "Enter the sunken ship"};
+		{Text = "Talk to the Mysterious Engineer"};
+		{Text = "Find and activate $Count/$Total levers"};
+
+		{Text = "Find and salvage the Nekron Particulate tubes"};
+		{Text = "Leave before the Elder Vexeron comes back"};
 	};
 };
 
