@@ -145,7 +145,7 @@ library:Add{
 	Link = "ovehea";
 
 	Requirements = {};
-	Description = "Killing enemies enhances your vision in the dark for $Time seconds.";
+	Description = "Damaging enemies enhances your vision in the dark for $Time seconds.";
 	Stats={
 		Time={Base=3; Max=18};
 	};
