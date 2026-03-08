@@ -8,6 +8,7 @@ local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
@@ -195,7 +196,7 @@ return function(CutsceneSequence)
 		repeat
 			modCharacter = modData:GetModCharacter();
 			Debugger:Log("Waiting for character module..");
-			wait(0.1);
+			task.wait(0.1);
 		until modCharacter ~= nil;
 
 		local playerClass = shared.modPlayers.get(localPlayer);
@@ -469,6 +470,10 @@ return function(CutsceneSequence)
 			
 			local rightHandAtt = masonPrefab:FindFirstChild("RightHandAttachment", true);
 			local newPickup: BasePart = script:WaitForChild("Mission1Pickup"):Clone();
+
+			local pickupableConfig = modInteractables.createInteractable("Pickupable");
+			pickupableConfig:SetAttribute("ItemId", "p250");
+			pickupableConfig.Parent = newPickup;
 
 			local ridgidConst = newPickup:WaitForChild("RigidConstraint");
 			local dropGlow = newPickup:WaitForChild("DropGui");
