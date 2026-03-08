@@ -69,6 +69,12 @@ end
 
 function Objective:Load()
 	self.ResupplyRadio = script:WaitForChild("RadioSystem");
+	local milRadio = self.ResupplyRadio:WaitForChild("MilitaryRadio");
+
+	local radioInteractConfig = modInteractables.createInteractable("ResupplyRadio");
+	radioInteractConfig:SetAttribute("_Id", "ResupplyRadio");
+	radioInteractConfig:SetAttribute("_InteractDuration", 3);
+	radioInteractConfig.Parent = milRadio;
 end
 
 function Objective:Begin()

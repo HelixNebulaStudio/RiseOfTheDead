@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService");
 
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
 local MISSION_ID = 10;
@@ -40,6 +41,11 @@ return function(CutsceneSequence)
 			local item = modStorage.FindItemIdFromStorages("antibiotics", player);
 			if item == nil then
 				local prefab = script:WaitForChild("antibioticsBottle"):Clone();
+
+				local pickupableConfig = modInteractables.createInteractable("PickupableRotd");
+				pickupableConfig:SetAttribute("ItemId", "antibiotics");
+				pickupableConfig.Parent = prefab;
+
 				modReplicationManager.ReplicateIn(player, prefab, workspace.Interactables);
 				spawned = true;
 			end

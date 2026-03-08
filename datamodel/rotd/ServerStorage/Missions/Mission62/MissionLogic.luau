@@ -100,6 +100,13 @@ if RunService:IsServer() then
 						
 						if mission.ProgressionPoint == 15 then
 							local newExit = logicAssets:WaitForChild("Travel_TheUnderground"):Clone();
+
+							local interactConfig = modInteractables.createInteractable("Travel");
+							interactConfig:SetAttribute("_Label", "Exit to Underground");
+							interactConfig:SetAttribute("WorldName", "TheUnderground");
+							interactConfig:SetAttribute("SetSpawn", "CXsecF2");
+							interactConfig.Parent = newExit;
+
 							newExit.Parent = workspace.Interactables;
 							
 						end
@@ -108,6 +115,14 @@ if RunService:IsServer() then
 				elseif modBranchConfigurations.IsWorld("TheUnderground") then
 					if mission.ProgressionPoint == 12 then
 						local secFEntrance = logicAssets:WaitForChild("sectorFEntrance"):Clone();
+
+						local interactConfig = modInteractables.createInteractable("ButtonRotd");
+						interactConfig:SetAttribute("_Id", "RatsRecruitment_SectorF");
+						interactConfig:SetAttribute("_Label", "[Rats Recruitment] Enter Sector F");
+							-- Title="You are about to leave this world";
+							-- Description="Are you sure you want to travel to Sector F?";
+						interactConfig.Parent = secFEntrance;
+
 						secFEntrance.Parent = workspace.Interactables;
 						
 						modReplicationManager.ReplicateOut(player, secFEntrance);

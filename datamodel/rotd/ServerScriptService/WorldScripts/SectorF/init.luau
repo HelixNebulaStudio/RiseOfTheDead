@@ -2,6 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+
 if RunService:IsServer() then
     modGameModeSurvival = shared.require(game.ServerScriptService.ServerLibrary.GameModeSurvival);
     modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
@@ -91,7 +93,11 @@ function WorldCore.onRequire()
         CFrame = CFrame.new(9.44034672, 60.2189713, -17.7514229, -1, 0, 0, 0, 1, 0, 0, 0, -1);
     };
     
-	script:WaitForChild("sewersWindow"):Clone().Parent = workspace.Interactables;
+    local newSewersMsg = script:WaitForChild("sewersWindow"):Clone();
+	newSewersMsg.Parent = workspace.Interactables;
+    local sewersMsgConfig = modInteractables.createInteractable("Message");
+    sewersMsgConfig:SetAttribute("Text", "Lennon: You can do it!");
+    sewersMsgConfig.Parent = newSewersMsg;
 
     shared.modEngineCore:ConnectOnPlayerAdded(script, function(player: Player)
         local profile: ProfileRotd = shared.modProfile:WaitForProfile(player) :: ProfileRotd;

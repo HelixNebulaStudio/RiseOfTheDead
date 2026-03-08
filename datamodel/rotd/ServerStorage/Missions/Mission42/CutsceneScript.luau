@@ -10,6 +10,7 @@ local modReplicationManager = shared.require(game.ReplicatedStorage.Library.Repl
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
 local MISSION_ID = 42;
@@ -268,14 +269,14 @@ return function(CutsceneSequence)
 						
 						local pushed = false;
 						local fellOff = false;
-						spawn(function()
+						task.spawn(function()
 							while mission.ProgressionPoint == 3 do
-								if playerClass.RootPart.Position.Y <= 103 then
+								if playerClass:GetCFrame().Position.Y <= 103 then
 									fellOff = true;
 									break;
 								end
 								victorNpcClass.Move:Face(playerClass.RootPart.Position);
-								wait(0.2);
+								task.wait(0.2);
 							end
 							
 							if mission.ProgressionPoint == 3 then
@@ -464,6 +465,11 @@ return function(CutsceneSequence)
 
 				elseif mission.Type == 3 then -- OnComplete
 					local newVtExit = vtExit:Clone();
+					local interactConfig = modInteractables.createInteractable("Travel");
+					interactConfig:SetAttribute("_Label", "Travel to The Warehouse");
+					interactConfig:SetAttribute("WorldName", "TheWarehouse");
+					interactConfig:SetAttribute("SetSpawn", "officeExit");
+					interactConfig.Parent = newVtExit;
 					modReplicationManager.ReplicateIn(player, newVtExit, workspace.Interactables);
 					mission.OnChanged:Disconnect(OnChanged);
 

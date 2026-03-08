@@ -7,6 +7,7 @@ local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.Br
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
 local MISSION_ID = 44;
@@ -129,6 +130,12 @@ return function(CutsceneSequence)
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
 					local newNoteTrigger = noteTrigger:Clone();
+
+					local interactConfig = modInteractables.createInteractable("ButtonRotd");
+					interactConfig:SetAttribute("_Id", "MB2 Note");
+					interactConfig:SetAttribute("_Label", `"Thank you for freeing my spirit from the zombie body. My soul is no longer tormented and will no longer haunt the world." ~ Jack, Pick Up Note`);
+					interactConfig.Parent = newNoteTrigger;
+
 					newNoteTrigger.Parent = workspace.Interactables;
 					modReplicationManager.ReplicateOut(player, newNoteTrigger);
 
@@ -188,7 +195,13 @@ return function(CutsceneSequence)
 							
 						elseif mission.ProgressionPoint == 2 then
 							local trapTrigger = trapTriggerPrefab:Clone();
+
+							local interactConfig = modInteractables.createInteractable("ButtonRotd");
+							interactConfig:SetAttribute("_Id", "MB2 Trap Door");
+							interactConfig:SetAttribute("_Label", "Enter Door");
+							interactConfig.Parent = trapTrigger;
 							trapTrigger.Parent = workspace.Interactables;
+							
 							modReplicationManager.ReplicateOut(player, trapTrigger);
 							
 						elseif mission.ProgressionPoint == 3 then
@@ -224,7 +237,13 @@ return function(CutsceneSequence)
 			else -- Loading Completed
 				if modEvents:GetEvent(player, "mb2_scythepickup") == nil then
 					local freeScythe = freeScythePrefab:Clone();
+
+					local interactConfig = modInteractables.createInteractable("ButtonRotd");
+					interactConfig:SetAttribute("_Id", "MB2_TakeScythe");
+					interactConfig:SetAttribute("_Label", "Take Jack's Scythe");
+					interactConfig.Parent = freeScythe;
 					freeScythe.Parent = workspace.Interactables;
+
 					modReplicationManager.ReplicateOut(player, freeScythe);
 				end
 				

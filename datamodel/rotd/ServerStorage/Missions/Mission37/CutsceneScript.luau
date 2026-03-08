@@ -6,6 +6,8 @@ local RunService = game:GetService("RunService");
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+local modZScripting = shared.require(game.ReplicatedStorage.Plugin.ZScript.Scripting);
 
 --== Variables;
 local MISSION_ID = 37;
@@ -70,8 +72,39 @@ return function(CutsceneSequence)
 		local function loadInteractables()
 			if loaded then return end;
 			loaded = true;
-			local clone = plantInteractables:Clone();
-			modReplicationManager.ReplicateIn(player, clone, workspace.Interactables);
+			local newPlantInteractables = plantInteractables:Clone();
+
+			for _, interactPart in ipairs(newPlantInteractables:GetChildren()) do
+				local interactConfig = modInteractables.createInteractable("ButtonRotd");
+				interactConfig:SetAttribute("_Id", interactPart.Name);
+				interactConfig:SetAttribute("_Label", "Water Lettuce");
+				interactConfig:SetAttribute("_Toggle", "IsWatered");
+				interactConfig:SetAttribute("_ToggleAtZeroUses", true);
+				interactConfig:SetAttribute("_Uses", 1);
+				interactConfig:SetAttribute("_InteractDuration", 5);
+				interactConfig:SetAttribute("_EquipItemId", "watercan");
+
+				local interactPackageZScript = modZScripting.createZScript(`InteractPackage`, [[
+					local interactPackage = {};
+
+					function interactPackage.BindPrompt(interactable: Interactable, interactData: InteractionData)
+						if interactable.IsToggled then
+							interactable.Label = `You have watered these plants`;
+							interactable.CanInteract = false;
+							return true;
+						end
+						
+						interactable.Label = `Water Lettuce`;
+					end
+
+					return interactPackage;
+				]]);
+				
+				interactPackageZScript.Parent = interactConfig;
+				interactConfig.Parent = interactPart;
+			end
+
+			modReplicationManager.ReplicateIn(player, newPlantInteractables, workspace.Interactables);
 		end
 		
 		local function OnChanged(firstRun)

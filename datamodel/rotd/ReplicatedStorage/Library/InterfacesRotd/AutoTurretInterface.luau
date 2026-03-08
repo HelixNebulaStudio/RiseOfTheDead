@@ -122,12 +122,26 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end
 	
+	local function updateStorageValues(storageValues)
+		if storageValues == nil then return end;
+		
+		local patStorage = modData.GetStorage(storageId);
+		if patStorage == nil then return end
+		
+		for k, v in pairs(storageValues) do
+			patStorage.Values[k] = v;
+		end
+	end
+
 	function binds.Refresh()
-		local isOnline = storageItem.Values.Online == true;
+		local patStorage = modData.GetStorage(storageId);
+		local patStorageValues = patStorage.Values;
+
+		local isOnline = patStorageValues.Online == true;
 		activateButton.Text = isOnline and "Online" or "Offline";
 		activateButton.BackgroundColor3 = isOnline and Color3.fromRGB(50, 100, 50) or Color3.fromRGB(100, 50, 50);
 		
-		local configValues = storageItem.Values.Config or {};
+		local configValues = patStorageValues.Config or {};
 		
 		for _, obj in pairs(configScrollFrame:GetChildren()) do
 			if obj:IsA("GuiObject") then
@@ -165,7 +179,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						Text=opText; 
 						LayoutOrder=a;
 						OnNewButton=function(optionInfo, newButton)
-							configValues = storageItem.Values.Config or {};
+							configValues = patStorageValues.Config or {};
 							configIndex = configValues[configKey] or 1;
 							
 							newButton.Size = UDim2.new(1, 0, 0, 30);
@@ -204,6 +218,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						
 						local opText = configInfo.Options[opIndex];
 						button.Text = opText;
+						updateStorageValues(returnPacket.StorageValues);
 					end
 					
 					clearOptions();
@@ -247,6 +262,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						if returnPacket and returnPacket.Success then
 							flagVal = returnPacket.FlagValue;
 							configHitlistBitString = configHitlistBitFlags:Set(configHitlistBitString, tag, flagVal);
+											
+							updateStorageValues(returnPacket.StorageValues);
 						end
 						
 						flagVal = configHitlistBitFlags:Test(tag, configHitlistBitString);
@@ -268,9 +285,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			local returnPacket = remoteAutoTurret:InvokeServer("resetconfig");
 
 			if returnPacket and returnPacket.Success then
-				storageItem = modData.GetItemById(storageItem.ID);
-				storageItem.Values.Online = returnPacket.Values.Online;
-				storageItem.Values.Config = returnPacket.Values.Config;
+				updateStorageValues(returnPacket.StorageValues);
 				binds.Refresh();
 			end
 
@@ -288,9 +303,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local returnPacket = remoteAutoTurret:InvokeServer("toggleonline");
 		
 		if returnPacket and returnPacket.Success then
-			storageItem = modData.GetItemById(storageItem.ID);
-			storageItem.Values.Online = returnPacket.Values.Online;
-			storageItem.Values.Config = returnPacket.Values.Config;
+			updateStorageValues(returnPacket.StorageValues);
 			binds.Refresh();
 		end
 		

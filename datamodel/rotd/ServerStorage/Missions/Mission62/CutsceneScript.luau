@@ -157,6 +157,8 @@ return function(CutsceneSequence)
 			
 			local mechDoor3Clip = script.Parent:WaitForChild("_playerClip");
 			local terminalInteractable = script.Parent:WaitForChild("shutDownHeating");
+			local shutDownConfig = modInteractables.createInteractable("NekronChamberTerminal01");
+			shutDownConfig.Parent = terminalInteractable;
 
 			local function OnChanged(firstRun)
 				local rat1NpcClass: NpcClass = ratGoons.Name1.NpcClass;

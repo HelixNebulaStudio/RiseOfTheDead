@@ -79,8 +79,9 @@ return function(CutsceneSequence)
 				NetworkOwners = {player};
 				ReplicateOut = true;
 				BindSetup = function(npcClass: NpcClass)
-					local interactConfig = script:WaitForChild("banditZombieInteractable"):Clone();
-					interactConfig.Name = "Interactable";
+					local interactConfig = modInteractables.createInteractable("ButtonRotd");
+					interactConfig:SetAttribute("_Id", "MissingInAction_BanditZombie");
+					interactConfig:SetAttribute("_Label", "Oh my god, this is one of the bandits.. Looks like he is turning..");
 					interactConfig.Parent = npcClass.Character;
 					npcClass.Interactable = interactConfig;
 					

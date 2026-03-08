@@ -8,6 +8,7 @@ local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.Br
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
 local MISSION_ID = 52;
@@ -295,7 +296,7 @@ return function(CutsceneSequence)
 						josephNpcClass:GetComponent("AvatarFace"):Set("Skeptical");
 						robertNpcClass.Move:Face(nateNpcClass.RootPart);
 						
-						wait(0.45);
+						task.wait(0.45);
 						robertNpcClass.PlayAnimation("Surrender");
 						task.wait(1.5);
 						robertNpcClass.Chat(player, "Huh?!");
@@ -316,31 +317,31 @@ return function(CutsceneSequence)
 						dallasNpcClass.Move:HeadTrack(robertNpcClass.Head, 60);
 
 						nateNpcClass.Chat(player, "WHO ARE YOU?!");
-						wait(5);
+						task.wait(5);
 						robertNpcClass.Chat(player, "What!? What's going on?!");
-						wait(5);
+						task.wait(5);
 						nateNpcClass.Chat(player, "You are an infector, aren't you!?");
-						wait(5);
+						task.wait(5);
 						robertNpcClass.Chat(player, "What? What make you think that!? I saved your life!");
 						robertNpcClass:GetComponent("AvatarFace"):Set("Disgusted");
-						wait(5);
+						task.wait(5);
 						nateNpcClass.Chat(player, "YES, but you just wanted to know about this safehouse..");
-						wait(5);
+						task.wait(5);
 						robertNpcClass.Chat(player, "I SWEAR, I'M NOT AN INFECTOR!! HOW CAN I PROVE MYSELF?!");
 						robertNpcClass:GetComponent("AvatarFace"):Set("Grumpy");
-						wait(5);
+						task.wait(5);
 						josephNpcClass.Chat(player, "Shoot him");
-						wait(0.5);
+						task.wait(0.5);
 						dallasNpcClass:GetComponent("AvatarFace"):Set("Surprise");
 						nateNpcClass:GetComponent("AvatarFace"):Set("Disbelief");
-						wait(0.5);
+						task.wait(0.5);
 						robertNpcClass:GetComponent("AvatarFace"):Set("Scared");
 						nateNpcClass.Chat(player, "Joseph, are you sure?!");
-						wait(1);
+						task.wait(1);
 						robertNpcClass.Chat(player, "WHAT?! NO!");
-						wait(1);
+						task.wait(1);
 						dallasNpcClass.Chat(player, "Oof");
-						wait(5);
+						task.wait(5);
 						josephNpcClass.Chat(player, "Yes. Shoot him");
 						josephNpcClass.Move:HeadTrack(nateNpcClass.Head, 5);
 						
@@ -348,7 +349,7 @@ return function(CutsceneSequence)
 						robertNpcClass.Garbage:Tag(robertNpcClass.HealthComp.OnHealthChanged:Connect(function(oldHp, newHp, reason)
 							robertNpcClass.Humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOn;
 							lastDamaged = tick();
-							delay(2, function()
+							task.delay(2, function()
 								if tick()-lastDamaged > 2 and robertNpcClass.Humanoid then
 									robertNpcClass.Humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff
 								end;
@@ -362,14 +363,14 @@ return function(CutsceneSequence)
 						
 						task.wait(1.2);
 						
-						local dir = (robertNpcClass.RootPart.Position - nateNpcClass.RootPart.Position).Unit;
+						local dir = (robertNpcClass:GetCFrame().Position - nateNpcClass:GetCFrame().Position).Unit;
 						nateNpcClass.WieldComp:InvokeToolAction("PrimaryFireRequest", dir, robertNpcClass.Humanoid);
 						josephNpcClass.Move:HeadTrack(robertNpcClass.Head, 5);
-						delay(0.6, function()
+						task.delay(0.6, function()
 							nateNpcClass.WieldComp.Controls.Mouse1Down = false;
 						end)
 						
-						wait(0.3);
+						task.wait(0.3);
 						josephNpcClass.Move:HeadTrack(nateNpcClass.Head, 5);
 						josephNpcClass.StopAnimation("CrossedArm");
 						robertNpcClass.StopAnimation("Surrender");
@@ -390,38 +391,38 @@ return function(CutsceneSequence)
 						nateNpcClass:GetComponent("AvatarFace"):Set("Scared");
 						dallasNpcClass:GetComponent("AvatarFace"):Set("Scared");
 						josephNpcClass:GetComponent("AvatarFace"):Set("Serious");
-						wait(1);
+						task.wait(1);
 						josephNpcClass.WieldComp:Equip{ItemId = "pickaxe"};
-						wait(1);
+						task.wait(1);
 						dallasNpcClass.Chat(player, "Oh snap..");
-						wait(1);
+						task.wait(1);
 						josephNpcClass.Chat(player, "Hmmm..");
-						wait(1);
+						task.wait(1);
 						robertNpcClass.Chat(player, "Heh heh heh...");
-						wait(1);
+						task.wait(1);
 						nateNpcClass.Chat(player, "SHOOT!! SHOOOT!!!");
 						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 7;
 						end)
 						
 					elseif mission.ProgressionPoint == 7 then
-						wait(1);
+						task.wait(1);
 						local playerClass: PlayerClass = shared.modPlayers.get(player);
 						
 						robertNpcClass.Chat(player, "Well, guess there will be a minor setback for my plans..");
 						robertNpcClass.Move:HeadTrack(nateNpcClass.Head, 10);
 						
-						local nateDir = (robertNpcClass.RootPart.Position - nateNpcClass.RootPart.Position).Unit;
+						local nateDir = (robertNpcClass:GetCFrame().Position - nateNpcClass:GetCFrame().Position).Unit;
 						nateNpcClass.WieldComp:InvokeToolAction("PrimaryFireRequest", nateDir, robertNpcClass.Humanoid);
 						nateNpcClass.Move:HeadTrack(robertNpcClass.Head, 10);
 						
-						local dallasDir = (robertNpcClass.RootPart.Position - nateNpcClass.RootPart.Position).Unit;
+						local dallasDir = (robertNpcClass:GetCFrame().Position - nateNpcClass:GetCFrame().Position).Unit;
 						dallasNpcClass.WieldComp:InvokeToolAction("PrimaryFireRequest", dallasDir, robertNpcClass.Humanoid);
 						dallasNpcClass.Move:HeadTrack(robertNpcClass.Head, 10);
 						
-						wait(1.5);
+						task.wait(1.5);
 						robertNpcClass.Chat(player, "I'm done with this..");
-						wait(1.5);
+						task.wait(1.5);
 						robertNpcClass.Move:SetMoveSpeed("set", "default", 30);
 
 						robertNpcClass.Move:MoveTo(nateNpcClass.RootPart.Position);
@@ -454,7 +455,7 @@ return function(CutsceneSequence)
 						modAudio.Play("PlasticBarrelHit", nateNpcClass.RootPart);
 						
 						robertNpcClass.Move:HeadTrack(dallasNpcClass.Head, 10);
-						wait(0.8);
+						task.wait(0.8);
 
 						robertNpcClass.Move:MoveTo(dallasNpcClass.RootPart.Position);
 						robertNpcClass.Move.OnMoveToEnded:Wait(1);
@@ -465,7 +466,7 @@ return function(CutsceneSequence)
 						robertNpcClass.PlayAnimation("Punch");
 						modAudio.Play("Punch", robertNpcClass.RootPart);
 						
-						wait(0.2);
+						task.wait(0.2);
 						
 						dallasNpcClass.Humanoid.PlatformStand = true;
 						
@@ -491,7 +492,7 @@ return function(CutsceneSequence)
 						
 						robertNpcClass.PlayAnimation("Punch");
 						modAudio.Play("Punch", robertNpcClass.RootPart);
-						wait(0.2);
+						task.wait(0.2);
 						
 						playerClass.WieldComp:Unequip();
 						josephNpcClass.Move:HeadTrack(nil);
@@ -506,7 +507,7 @@ return function(CutsceneSequence)
 						
 						shared.modPlayers.cameraShakeAndZoom(player, 5, 0, 1, 2, false);
 						robertNpcClass:SetCFrame(CFrame.new(41.6181221, 162.593155, -48.860527, 0, 0, -1, 0, 1, 0, 1, 0, 0));
-						wait(1);
+						task.wait(1);
 
 						josephNpcClass.Move:HeadTrack(robertNpcClass.Head, 4);
 						robertNpcClass.Move:HeadTrack(josephNpcClass.Head, 4);
@@ -514,7 +515,7 @@ return function(CutsceneSequence)
 						josephNpcClass.Move:MoveTo(Vector3.new(39.078, 162.593, -50.709))
 						josephNpcClass.Move.OnMoveToEnded:Wait();
 						robertNpcClass.Move:Face(josephNpcClass.RootPart);
-						wait(0.2);
+						task.wait(0.2);
 						
 						robertNpcClass.PlayAnimation("RobertLoseHand")
 						robertNpcClass.AnimationController:LoopTracks("RobertLoseHand", function(trackData)
@@ -523,7 +524,7 @@ return function(CutsceneSequence)
 								local robertChar = robertNpcClass.Character;
 
 								robertChar.RightLowerArm.Wound.Blood.Enabled = true;
-								delay(0.1, function()
+								task.delay(0.1, function()
 									robertChar.RightHand.Transparency = 1;
 								end)
 								for a=1, 10 do
@@ -536,7 +537,7 @@ return function(CutsceneSequence)
 						end)
 						
 						josephNpcClass.WieldComp:InvokeToolAction("PrimarySwingRequest");
-						wait(0.1);
+						task.wait(0.1);
 
 						robertNpcClass.Chat(player, "AHHHGH");
 						modAudio.Play("Slice", robertNpcClass.RootPart);
@@ -545,10 +546,10 @@ return function(CutsceneSequence)
 						hurtSound.PlaybackSpeed = 0.7;
 						robertLeftHand.Parent = workspace.Environment;
 						
-						wait(1);
-						spawn(function()
+						task.wait(1);
+						task.spawn(function()
 							for a=1, 2 do
-								wait(0.1);
+								task.wait(0.1);
 								robertNpcClass.Humanoid.Health = robertNpcClass.Humanoid.Health -1;
 							end
 						end)
@@ -573,7 +574,7 @@ return function(CutsceneSequence)
 							
 							local josephChar = josephNpcClass.Character;
 							
-							delay(0.3, function()
+							task.delay(0.3, function()
 								josephChar.LeftLowerArm.LeftElbow:Destroy();
 								josephChar.LeftLowerArm.CanCollide = true;
 							end)
@@ -595,7 +596,7 @@ return function(CutsceneSequence)
 						end
 						
 						josephNpcClass.PlayAnimation("JosephDown", 0);
-						wait(1);
+						task.wait(1);
 						robertNpcClass.RootPart.Anchored = false;
 						
 						robertNpcClass.Move:MoveTo(Vector3.new(-10.408, 162.593, -48.561));
@@ -603,9 +604,9 @@ return function(CutsceneSequence)
 						
 						robertNpcClass.PlayAnimation("Punch");
 						modAudio.Play("Punch", robertNpcClass.RootPart);
-						wait(0.2);
+						task.wait(0.2);
 						modAudio.Play("ConcreteSmash", robertNpcClass.RootPart);
-						wait(0.35);
+						task.wait(0.35);
 						cutsceneWallDestroy:Destroy();
 						shared.modPlayers.cameraShakeAndZoom(player, 10, 0, 1, 2, false);
 						local new = assetTheInvestigation.rockDebris:Clone();
@@ -618,15 +619,15 @@ return function(CutsceneSequence)
 						end
 						
 						robertNpcClass.Move:MoveTo(Vector3.new(-16.408, 162.593, -48.561));
-						wait(1.5);
+						task.wait(1.5);
 						robertNpcClass:TeleportHide();
 						--robertModule.Actions:Teleport(CFrame.new(38.07024, 176.987366, -44.433876, -1, 0, 0, 0, 1, 0, 0, 0, -1));
 						
-						wait(3);
+						task.wait(3);
 						shared.Notify(player, "*Helicopter lands upstairs..*", "Message");
 						TweenService:Create(heliSound, TweenInfo.new(5), {Volume = 0;}):Play();
 						CutsceneSequence:NextScene("faint");
-						wait(5);
+						task.wait(5);
 						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 8;
 						end)
@@ -638,7 +639,7 @@ return function(CutsceneSequence)
 						banditNpcClass.WieldComp:Equip{ItemId = "fnfal"};
 						banditNpcClass.Move:SetMoveSpeed("set", "default", 0);
 						banditNpcClass.Move:MoveTo(Vector3.new(34.447, 162.593, -41.027));
-						delay(1, function()
+						task.delay(1, function()
 							banditNpcClass.Move:SetMoveSpeed("set", "default", 6);
 						end)
 						
@@ -654,7 +655,7 @@ return function(CutsceneSequence)
 						zarkNpcClass.Move.OnMoveToEnded:Wait(10);
 						
 						zarkNpcClass:GetComponent("AvatarFace"):Set("Confident");
-						wait(0.5);
+						task.wait(0.5);
 						zarkNpcClass:SetCFrame(CFrame.new(41.462471, 162.593445, -49.2249641, 0.0611268133, -2.64448197e-09, -0.998130023, 4.32557741e-08, 1, -3.95256121e-13, 0.998130023, -4.3174861e-08, 0.0611268133));
 						
 						zarkNpcClass.PlayAnimation("CrouchLookAnim");
@@ -667,22 +668,22 @@ return function(CutsceneSequence)
 						robertLeftHand.Anchored = false;
 						newWeld.Part0 = zarkChar.RightHand;
 						newWeld.Part1 = robertLeftHand;
-						wait(1);
+						task.wait(1);
 
 						zarkNpcClass.StopAnimation("CrouchLookAnim");
 						zarkNpcClass.Chat(zarkNpcClass.Player, "One's already been captured.. Soon we will get our hands on Robert and also put him on a leash.");
 						banditNpcClass.Move:Face(Vector3.new(44.301, 162.593, -48.655));
-						wait(5);
+						task.wait(5);
 
 						zarkNpcClass.Move:MoveTo(Vector3.new(14.223, 162.593, -63.75))
-						wait(3);
+						task.wait(3);
 
 						banditNpcClass.Move:MoveTo(Vector3.new(14.223, 162.593, -63.75));
-						wait(3);
+						task.wait(3);
 
 						CutsceneSequence:NextScene("faint");
 						CutsceneSequence:NextScene("playerWake");
-						wait(3);
+						task.wait(3);
 
 						zarkNpcClass:SetCFrame(CFrame.new(38.07024, 176.987366, -44.433876, -1, 0, 0, 0, 1, 0, 0, 0, -1));
 						banditNpcClass:SetCFrame(CFrame.new(38.07024, 176.987366, -44.433876, -1, 0, 0, 0, 1, 0, 0, 0, -1));
@@ -697,6 +698,11 @@ return function(CutsceneSequence)
 						
 					elseif mission.ProgressionPoint == 10 then
 						local newStrap = cutStrap:Clone();
+
+						local strapInteractConfig = modInteractables.createInteractable("ButtonRotd");
+						strapInteractConfig:SetAttribute("_Id", "mission52_CutStrap");
+						strapInteractConfig:SetAttribute("_Label", "Cut Strap");
+
 						newStrap.Parent = workspace.Interactables;
 						
 					elseif mission.ProgressionPoint == 12 then
@@ -747,6 +753,13 @@ return function(CutsceneSequence)
 						
 					elseif mission.ProgressionPoint == 15 then
 						local new = radioStationTravel:Clone();
+						
+						local interactConfig = modInteractables.createInteractable("Travel");
+						interactConfig:SetAttribute("_Label", "Fast Travel To Radio Station");
+						interactConfig:SetAttribute("WorldName", "TheMall");
+						interactConfig:SetAttribute("SetSpawn", "radioStationExit");
+						interactConfig.Parent = new;
+
 						new.Parent = workspace.Interactables;
 						
 					end
@@ -944,17 +957,17 @@ return function(CutsceneSequence)
 						remoteSetHeadIcon:FireClient(player, 1, "Joseph", "HideAll");
 						
 					elseif mission.ProgressionPoint == 16 then
-						wait(0.5);
+						task.wait(0.5);
 						nateNpcClass:SetCFrame(CFrame.new(525.922974, 96.880806, -1094.84497, 1, 0, 0, 0, 1, 0, 0, 0, 1));
 						josephNpcClass:SetCFrame(CFrame.new(530.039429, 96.880806, -1094.13831, 1, 0, 0, 0, 1, 0, 0, 0, 1));
 						
-						spawn(function()
+						task.spawn(function()
 							josephNpcClass.Move:MoveTo(Vector3.new(499.114, 96.781, -1096.703));
 							josephNpcClass.Move.OnMoveToEnded:Wait(5);
 							josephNpcClass.Move:Face(Vector3.new(502.829, 96.781, -1100.442));
 							
 						end)
-						spawn(function()
+						task.spawn(function()
 							nateNpcClass.Move:MoveTo(Vector3.new(510.818, 96.781, -1094.263));
 							nateNpcClass.Move.OnMoveToEnded:Wait(5);
 							nateNpcClass.Move:Face(Vector3.new(512.225, 96.781, -1100.017))
@@ -1017,7 +1030,7 @@ return function(CutsceneSequence)
 				elseif mission.Type == 3 then -- OnComplete
 					if not firstRun then
 						josephNpcClass.Move:MoveTo(Vector3.new(525.61, 99.44, -1089.824));
-						wait(1);
+						task.wait(1);
 						nateNpcClass.Move:MoveTo(Vector3.new(525.61, 99.44, -1089.824));
 						nateNpcClass.Move.OnMoveToEnded:Wait(5);
 

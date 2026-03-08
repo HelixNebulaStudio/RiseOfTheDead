@@ -4,6 +4,7 @@ local MissionLogic = {};
 local RunService = game:GetService("RunService");
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 local MISSION_ID = 3;
 
@@ -23,7 +24,13 @@ if RunService:IsServer() then
 			if item == nil then
 				local oddBlueReplicated = modReplicationManager.getReplicated(player, "OddBlueBook");
 				if oddBlueReplicated == nil or #oddBlueReplicated <= 0 then
+
 					local prefab = script:WaitForChild("OddBlueBook"):Clone();
+
+					local pickupableConfig = modInteractables.createInteractable("PickupableRotd");
+					pickupableConfig:SetAttribute("ItemId", "oddbluebook");
+					pickupableConfig.Parent = prefab;
+
 					modReplicationManager.ReplicateIn(player, prefab, workspace.Interactables);
 				end
 			end

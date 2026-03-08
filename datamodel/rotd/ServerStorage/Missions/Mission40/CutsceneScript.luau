@@ -7,6 +7,7 @@ local TweenService = game:GetService("TweenService");
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
 local MISSION_ID = 40;
@@ -206,6 +207,10 @@ return function(CutsceneSequence)
 				if mission.Cache.TombsInteractable then return end;
 				
 				local newTombsInteractable = tombsInteractable:Clone();
+				local interactConfig = modInteractables.createInteractable("GameModeEnter");
+				interactConfig:SetAttribute("Mode", "Raid");
+				interactConfig:SetAttribute("Stage", "Tombs");
+				interactConfig.Parent = newTombsInteractable;
 				modReplicationManager.ReplicateIn(player, newTombsInteractable, workspace.Interactables);
 				mission.Cache.TombsInteractable = newTombsInteractable;
 			end
@@ -225,6 +230,10 @@ return function(CutsceneSequence)
 			victorNpcClass.PlayAnimation("Sit");
 
 			local newstatuePrefab = statuePrefab:Clone();
+			local interactConfig = modInteractables.createInteractable("ButtonRotd");
+			interactConfig:SetAttribute("_Id", "PushStatue");
+			interactConfig:SetAttribute("_Label", "Push Statue");
+			interactConfig.Parent = newstatuePrefab;
 			modReplicationManager.ReplicateIn(players, newstatuePrefab, workspace.Environment.Game);
 			mission.Cache.Statue = newstatuePrefab;
 			
@@ -265,6 +274,10 @@ return function(CutsceneSequence)
 				
 			if modEvents:GetEvent(player, "takeNekronMask") == nil then
 				local new = tombRaidPickup:Clone();
+				local interactConfig = modInteractables.createInteractable("Collectible");
+				interactConfig:SetAttribute("_Id", "nm");
+				interactConfig:SetAttribute("_Label", "What.. Nekron Mask.. Why do the cultists have this?");
+				interactConfig.Parent = new;
 				new.Parent = workspace.Interactables;
 				modReplicationManager.ReplicateOut(player, new);
 			end

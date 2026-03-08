@@ -149,6 +149,7 @@ function itemPackage.Init(itemLib)
 			patStorage.Values.IsOnline = not onlineBool;
 			patStorage:SyncValues();
 			
+			rPacket.StorageValues = patStorage.Values;
 			rPacket.Success = true;
 			
 			accessory:SetAttribute("Update", true);
@@ -160,6 +161,7 @@ function itemPackage.Init(itemLib)
 			patStorage.Values.Config = {};
 			patStorage:SyncValues();
 			
+			rPacket.StorageValues = patStorage.Values;
 			rPacket.Success = true;
 
 			return rPacket;
@@ -183,6 +185,7 @@ function itemPackage.Init(itemLib)
 			patStorage.Values.Config = configValues;
 			patStorage:SyncValues();
 			
+			rPacket.StorageValues = patStorage.Values;
 			rPacket.Success = true;
 
 			return rPacket;
@@ -207,6 +210,8 @@ function itemPackage.Init(itemLib)
 			patStorage:SyncValues();
 
 			rPacket.FlagVal = configHitlistBitFlags:Test(flagTag, userHitlistBitString);
+			
+			rPacket.StorageValues = patStorage.Values;
 			rPacket.Success = true;
 
 			return rPacket;

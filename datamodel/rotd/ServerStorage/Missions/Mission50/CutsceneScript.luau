@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService");
 
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
 local MISSION_ID = 50;
@@ -147,16 +148,16 @@ return function(CutsceneSequence)
 					
 				elseif mission.ProgressionPoint == 3 then
 					bunnymanNpcClass:ToggleInteractable(false);
-					wait(1);
+					task.wait(1);
 					bunnymanNpcClass.Move:MoveTo(Vector3.new(-32.4848175, 2.54966402, -108.732132));
 					bunnymanNpcClass.Move.OnMoveToEnded:Wait(1);
 					bunnymanNpcClass:SetCFrame(CFrame.new(-32.4848175, 2.54966402, -108.732132, 0, 0, 1, 0, 1, 0, -1, 0, 0));
 					
-					wait(1.5);
+					task.wait(1.5);
 					bunnymanNpcClass:SetCFrame(CFrame.new(-58.9206924, 2.54966402, -108.732132, 0, 0, 1, 0, 1, 0, -1, 0, 0));
 					
 				elseif mission.ProgressionPoint == 4 then
-					wait(1);
+					task.wait(1);
 					bunnymanNpcClass.Move:MoveTo(Vector3.new(-188.224518, 2.70417404, 7.9118042));
 					bunnymanNpcClass.Move.OnMoveToEnded:Wait(20);
 					bunnymanNpcClass.Move:Face(Vector3.new(-183.797638, 2.70417881, 2.54900455));
@@ -172,6 +173,11 @@ return function(CutsceneSequence)
 					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "Light it up.");
 
 					newTrigger = triggerLightBarrel:Clone();
+					local interactConfig = modInteractables.createInteractable("ButtonRotd");
+					interactConfig:SetAttribute("_Id", "EB2_LightBarrel");
+					interactConfig:SetAttribute("_Label", "Light Fire Barrel");
+					interactConfig:SetAttribute("_InteractDuration", 5);
+					interactConfig.Parent = newTrigger;
 					newTrigger.Parent = workspace.Interactables;
 					modReplicationManager.ReplicateOut(player, newTrigger);
 
@@ -184,12 +190,12 @@ return function(CutsceneSequence)
 					fireBarrel._lightSource._lightPoint.PointLight.Enabled = true;
 					fireBarrel._lightSource.firePoint.Fire.Enabled = true;
 					
-					wait(1);
+					task.wait(1);
 					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "Well done.");
-					wait(5);
+					task.wait(5);
 					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "Now we wait...");
 					
-					wait(20);
+					task.wait(20);
 					if not character:IsDescendantOf(workspace) then return end;
 
 					local origin = CFrame.new(-229.88, 9.397, 7.02);
@@ -203,7 +209,7 @@ return function(CutsceneSequence)
 							Velocity = Vector3.new(0, 20, 0);
 						});
 
-						wait(1);
+						task.wait(1);
 					end
 					
 					local cultistNpcClass: NpcClass = modNpcs.spawn2{
@@ -221,27 +227,27 @@ return function(CutsceneSequence)
 					
 					bunnymanNpcClass.Move:MoveTo(Vector3.new(-170.911606, 2.70417905, 2.40587401));
 					bunnymanNpcClass.Move.OnMoveToEnded:Wait(5);
-					wait(1);
+					task.wait(1);
 					cultistNpcClass.Chat(cultistNpcClass.Player, "Hey, wait a minute.. You aren't cultists.. What do you want?!");
-					wait(7);
+					task.wait(7);
 					if not character:IsDescendantOf(workspace) then return end;
 					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "April first shall prevail..");
-					wait(5);
+					task.wait(5);
 					if not character:IsDescendantOf(workspace) then return end;
 					cultistNpcClass.Chat(cultistNpcClass.Player, "Wait, how did you know our phrase?! Were you one of us?");
-					wait(6);
+					task.wait(6);
 					if not character:IsDescendantOf(workspace) then return end;
 					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "Foolish rookie, tell me. Is omega still one of your active leaders?");
-					wait(8);
+					task.wait(8);
 					if not character:IsDescendantOf(workspace) then return end;
 					cultistNpcClass.Chat(cultistNpcClass.Player, "Err yes. However, psi wants to over haul the rankings.");
-					wait(6);
+					task.wait(6);
 					if not character:IsDescendantOf(workspace) then return end;
 					bunnymanNpcClass.Chat(bunnymanNpcClass.Player, "Good, good.. Your life ends here now!");
-					wait(5);
+					task.wait(5);
 					if not character:IsDescendantOf(workspace) then return end;
 					cultistNpcClass.Chat(cultistNpcClass.Player, "Wait what?! *whistles*");
-					wait(4);
+					task.wait(4);
 					if not character:IsDescendantOf(workspace) then return end;
 					
 					bunnymanNpcClass.WieldComp:Equip{
@@ -253,13 +259,13 @@ return function(CutsceneSequence)
 					
 					repeat
 						bunnymanNpcClass.WieldComp:InvokeToolAction("PrimaryFireRequest", nil, cultistNpcClass.Humanoid);
-						wait(0.1);
+						task.wait(0.1);
 						if not character:IsDescendantOf(workspace) then return end;
 					until cultistNpcClass.HealthComp.IsDead;
 
-					wait(2);
+					task.wait(2);
 					if not character:IsDescendantOf(workspace) then return end;
-					spawn(function()
+					task.spawn(function()
 						local cultspawns = workspace.Environment.Cutscene.Spawns:GetChildren();
 						local timer = tick();
 
@@ -272,7 +278,7 @@ return function(CutsceneSequence)
 									npcClass:GetComponent("TargetHandler"):AddTarget(playerClass.Character);
 								end;
 							};
-							wait(0.1);
+							task.wait(0.1);
 							if tick()-timer > 5 then break; end;
 							if not character:IsDescendantOf(workspace) then break end;
 						end
@@ -290,7 +296,7 @@ return function(CutsceneSequence)
 						return mission.ProgressionPoint == 7;
 					end);
 					
-					spawn(function()
+					task.spawn(function()
 						while true do
 							local endLoop = true;
 							for _, obj in pairs(workspace.Entity:GetChildren()) do
@@ -301,7 +307,7 @@ return function(CutsceneSequence)
 							end
 							if endLoop then break; end;
 							if not character:IsDescendantOf(workspace) then return end;
-							wait(1);
+							task.wait(1);
 							print("cultist alive");
 						end
 

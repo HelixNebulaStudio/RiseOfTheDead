@@ -6,6 +6,7 @@ local RunService = game:GetService("RunService");
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library:WaitForChild("Audio"));
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
 local MISSION_ID = 51;
@@ -130,7 +131,18 @@ if RunService:IsServer() then
 
 	
 	templateRadioInteractable1 = script.Parent:WaitForChild("militaryRadioInteractable");
+	local interactConfig = modInteractables.createInteractable("ButtonRotd");
+	interactConfig:SetAttribute("_Id", "QA1_Radio");
+	interactConfig:SetAttribute("_Label", "Interact With Radio");
+	interactConfig:SetAttribute("_InteractDuration", 5);
+	interactConfig.Parent = templateRadioInteractable1;
+
 	templateRadioInteractable2 = script.Parent:WaitForChild("militaryRadioInteractable2");
+	local interactConfig2 = modInteractables.createInteractable("ButtonRotd");
+	interactConfig2:SetAttribute("_Id", "QA2_Radio");
+	interactConfig2:SetAttribute("_Label", `Broadcast "Hello?! Does anyone copy on this frequency?"`);
+	interactConfig2:SetAttribute("_InteractDuration", 5);
+	interactConfig2.Parent = templateRadioInteractable1;
 
 else
 	modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
