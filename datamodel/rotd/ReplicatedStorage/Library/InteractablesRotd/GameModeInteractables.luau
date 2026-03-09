@@ -3,6 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local SoundService = game:GetService("SoundService");
 
+local localPlayer = game.Players.LocalPlayer;
+
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
@@ -132,7 +134,7 @@ function interactablePackage.init(super) -- Server/Client
 	
 
 	-- MARK: GameModeExit
-    local GameModeExit = {
+    local GameModeExit = super.newPackage{
 		Name = "GameModeExit";
         Type = "GameModeExit";
     };
@@ -206,6 +208,53 @@ function interactablePackage.init(super) -- Server/Client
     end
     
     super.registerPackage(GameModeExit);
+
+	
+	-- MARK: BossExit
+    local BossExit = super.newPackage{
+		Name = "BossExit";
+        Type = "BossExit";
+    };
+
+    function BossExit.new(interactable: InteractableInstance)
+		local config = interactable.Config;
+		
+		interactable:SetPermissions("CanInteract", true);
+	end
+
+    function BossExit.BindInteract(interactable: InteractableInstance, info: InteractInfo)
+        local config: Configuration = interactable.Config;
+
+        if info.Action == "Client" then 
+            if info.Player == nil then return end;
+            interactable:InteractServer(info.Values);
+            return;
+        end 
+        if RunService:IsClient() then return end;
+        --MARK: Server
+
+        if interactable.Values.ExitFunc then
+            interactable.Values.ExitFunc(info.Player);
+        end
+    end
+
+	function BossExit.BindPrompt(interactable: InteractableInstance, info: InteractInfo)
+        if RunService:IsServer() then return end;
+		local config = interactable.Config;
+
+		local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+        if playerClass.Properties.InBossBattle then
+            interactable.CanInteract = false;
+            interactable.Label = `Door's locked until you defeat {config:GetAttribute("Stage")}`;
+            return;
+        end
+
+		interactable.CanInteract = true;
+		interactable.Label = "Exit";
+	end
+
+    super.registerPackage(BossExit);
+
 end
 
 return interactablePackage;
