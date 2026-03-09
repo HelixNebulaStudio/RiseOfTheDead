@@ -109,7 +109,7 @@ return function(CutsceneSequence)
 		end
 		local josephClass: NpcClass = modNpcs.getPlayerNpc(player, "Joseph");
 		local function spawnLocalJosephClass()
-			if josephClass and josephClass.Player ~= player then josephClass = nil; end;
+			if josephClass and josephClass.Player ~= player then josephClass = nil :: any; end;
 			if josephClass then return end;
 			if worldJosephModel then
 				modReplicationManager.UnreplicateFrom(player, worldJosephModel);
@@ -142,7 +142,7 @@ return function(CutsceneSequence)
 			worldCaitlinModel = shared.WorldCore.CaitlinClass.Character;
 		end
 		local function spawnLocalCaitlinClass()
-			if caitlinClass and caitlinClass.Player ~= player then caitlinClass = nil; end;
+			if caitlinClass and caitlinClass.Player ~= player then caitlinClass = nil :: any; end;
 			if caitlinClass then return end;
 
 			if worldCaitlinModel then
@@ -862,6 +862,22 @@ return function(CutsceneSequence)
 				task.wait(1);
 				caitlinClass.Properties.CutsceneWalkTo = Vector3.new(1123.452, 57.701, 119.099);
 				josephClass.Move.OnMoveToEnded:Wait(40);
+
+				task.spawn(function() 
+					while mission.ProgressionPoint == 17 do
+						task.wait(1);
+						if not game.Players:IsAncestorOf(player) then break end;
+						
+						local location = player:GetAttribute("Location");
+						if location == "Community Safehouse" then 
+							modMission:Progress(player, MISSION_ID, function(mission) 
+								if mission.ProgressionPoint < 18 then 
+									mission.ProgressionPoint = 18;
+								end;
+							end);
+						end
+					end
+				end)
 
 				
 			elseif mission.ProgressionPoint == 18 then
