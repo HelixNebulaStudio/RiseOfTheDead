@@ -34,6 +34,7 @@ local modWorldCoreClass = shared.require(game.ReplicatedStorage.Library.WorldCor
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modEmotesCommsLibrary = shared.require(game.ReplicatedStorage.Library.EmoteCommsLibraryRotd);
 local modSkillTreeLibrary = shared.require(game.ReplicatedStorage.Library.SkillTreeLibraryRotd);
+local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
 
 if RunService:IsServer() then
     local modProfile = shared.require(game.ServerScriptService.ServerLibrary.ProfileRotd);
