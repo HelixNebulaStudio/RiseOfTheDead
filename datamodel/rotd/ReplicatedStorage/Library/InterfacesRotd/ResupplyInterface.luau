@@ -240,6 +240,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             
 			for a=1, #interface.StorageInterfaces do
 				local storageInterface: StorageInterface = interface.StorageInterfaces[a];
+                if storageInterface == nil then continue end;
 				if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
 					continue;
 				end
@@ -259,7 +260,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 or binds.Interactable == nil or binds.Interactable.Part == nil 
                 or not workspace:IsAncestorOf(binds.Interactable.Part)
                 or localPlayer:DistanceFromCharacter(binds.Interactable.Part.Position) >= 16 
-                or not wait(0.5);
+                or not task.wait(0.5);
 
                 window:Close();
                 interface:ToggleWindow("Inventory", false);

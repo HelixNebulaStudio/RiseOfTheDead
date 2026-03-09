@@ -278,11 +278,11 @@ function toolPackage.InputEvent(toolHandler: ToolHandlerInstance, inputData)
 		
 		local players = modGlobalVars.GetPlayersExlude(player);
 		modReplicationManager:SetClientProperties(players, { -- sets tool properties;
-			Instances=toolHandler.Prefabs;
-			ClassName={
-				BasePart={
-					CollisionGroupId=(properties.IsActive and 0 or 10);
-					CanCollide=properties.IsActive;
+			Instances = toolHandler.Prefabs;
+			ClassName = {
+				BasePart = {
+					CollisionGroupId = (properties.IsActive and 0 or 10);
+					CanCollide = properties.IsActive;
 				};
 			};
 		});

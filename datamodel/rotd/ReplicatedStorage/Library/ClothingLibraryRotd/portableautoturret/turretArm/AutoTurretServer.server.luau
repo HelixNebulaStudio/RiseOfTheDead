@@ -385,14 +385,6 @@ function TurretRuntime(weaponStorageItem)
 
 	if tryReload then
 		modAudio.Play(toolPackage.Audio.Empty.Id, turretArm.PrimaryPart);
-
-		local reloadPacket = {
-			StorageItem = weaponStorageItem;
-			ToolModel = activeWeaponModel;
-			ToolHandler = toolHandler;
-
-			IsPat = true;
-		};
 		autoTurretClient:SetAttribute("Mode", 4);
 
 		modAudio.Play("BattleRifleUnload", turretArm.PrimaryPart);
@@ -406,16 +398,22 @@ function TurretRuntime(weaponStorageItem)
 		reloadLoop2.PlaybackSpeed = 2;
 
 		local sucess;
-		task.spawn(function()
-			sucess = modToolService.ReloadWeapon(reloadPacket);
-		end)
-		while sucess == nil do
-			task.wait();
-			canReactivate = tick();
+		if properties.Ammo <= 0
+		and properties.MaxAmmo <= 0 then
+			sucess = false;
+			
+		else
+			task.spawn(function()
+				sucess = (toolHandler :: GunToolHandlerInstance):ReloadRequest();
+			end)
+			while sucess == nil do
+				task.wait();
+				canReactivate = tick();
 
-			if onlineLoop == false then
-				sucess = false;
-				break;
+				if onlineLoop == false then
+					sucess = false;
+					break;
+				end
 			end
 		end
 
@@ -494,6 +492,7 @@ function TurretRuntime(weaponStorageItem)
 			end
 		end
 		
+		properties.ToolModelIndex = 1;
 		modToolService.PrimaryFireWeapon(firePacket);
 		canReactivate = tick();
 
