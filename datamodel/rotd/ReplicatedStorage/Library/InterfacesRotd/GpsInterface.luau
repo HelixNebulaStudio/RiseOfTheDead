@@ -244,7 +244,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
                                     elseif r == 2 then
                                         interface:ToggleGameBlinds(false, 1);
-                                        wait(0.5);
+                                        task.wait(0.5);
+                                        dialogWindow:Close();
+                                        window:Close();
                                         interface:ToggleGameBlinds(true, 1);
                                     end
 
