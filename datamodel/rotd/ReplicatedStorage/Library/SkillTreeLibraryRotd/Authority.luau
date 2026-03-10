@@ -96,7 +96,7 @@ library:Add{
 	Name="Over Heal";
 	Link="trinar";
 	
-	Description="Default Passive: Heal over max health by $Default health with medkits. Upgrading increases maximum over heal by $Amount.";
+	Description="<b>Passive:</b> Heal over max health by $Default health with medkits.\nUpgrading adds $Amount over heal.";
 	Stats={
 		Amount={Default=15; Base=30; Max=70};
 	};
@@ -112,7 +112,7 @@ library:Add{
 	Name="Weak Point";
 	Link="ovehea";
 
-	Description="Default Passive: Shooting weak points deals an additional $Default% of base damage. Upgrading adds $Percent%.";
+	Description="<b>Passive:</b> Shooting weak points deals an additional $Default% of base damage.\nUpgrading adds $Percent%.";
 	Stats={
 		Percent={Default=15; Base=10; Max=40}; --{Default=100; Base=15; Max=90};
 	};
