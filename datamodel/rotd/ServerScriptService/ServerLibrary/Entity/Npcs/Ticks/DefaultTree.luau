@@ -7,7 +7,7 @@ local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 local treePackage = {
     LogicString = {
-        Default = "PreLogic | HasEnemy & (AlertTree | AggroTree) | [Idle]";
+        Default = "PreLogic | HasEnemy & (AlertTree | AggroTree) | (ShouldDetonate & [Detonate]) | [Idle]";
         AlertTree = "LookAtEnemy";
         AggroTree = "IgniteDetonation & [Detonate] | [FollowEnemy]";
     };
@@ -101,7 +101,6 @@ function treePackage.IgniteDetonation(npcClass: NpcClass)
                 detonTime = npcClass.Character:GetAttribute("DetonationTime");
 
                 while workspace:GetServerTimeNow() <= detonTime do
-
                     if npcClass.Character:GetAttribute("DetonationTime") == nil then return end;
                     local timeLeft = npcClass.Character:GetAttribute("DetonationTime")-workspace:GetServerTimeNow();
                     
@@ -113,7 +112,8 @@ function treePackage.IgniteDetonation(npcClass: NpcClass)
                     if npcClass.HealthComp.IsDead then break end;
                 end
 
-                properties.DetonationReady = true; 
+                properties.DetonationReady = true;
+                npcClass.OnThink:Fire();
             end)
         end
     end
@@ -125,9 +125,12 @@ function treePackage.IgniteDetonation(npcClass: NpcClass)
     return false;
 end
 
-function treePackage.Detonate(npcClass: NpcClass)
-    local enemyTargetData = npcClass.Properties.EnemyTargetData;
+function treePackage.ShouldDetonate(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    return properties.DetonationReady == true;
+end
 
+function treePackage.Detonate(npcClass: NpcClass)
     local configurations = npcClass.Configurations;
     local properties = npcClass.Properties;
     if properties.IsDetonating then return end;
@@ -151,115 +154,116 @@ function treePackage.Detonate(npcClass: NpcClass)
     local speed = 0.5;
     local range = 60;
 
-    npcClass.Remote:FireAllClients("Ticks", "detonate", {effectMesh, speed, range});
+    npcClass.Remote:FireAllClients(npcClass.Name, "detonate", {effectMesh, speed, range});
     Debugger.Expire(newEffect, 1);
     
     local detonatePosition = npcClass.RootPart.Position;
-    local targetDistance = enemyTargetData.Distance;
 
-    local damage = configurations.AttackDamage * (1-math.clamp(targetDistance or 15, 0, 30)/30);
-    if damage >= 1  then
-        local splashReflectedValue = nil;
-        task.spawn(function()
-            local hitLayers = modExplosionHandler:Cast(detonatePosition, {
-                Radius = 20;
-            });
+    local splashReflectedValue = nil;
+    task.spawn(function()
+        local hitLayers = modExplosionHandler:Cast(detonatePosition, {
+            Radius = 20;
+        });
 
-            local newExplosionProcessPacket = {
-                ExplosionBy = npcClass;
-                TargetableEntities = {
-                    Humanoid=1;
-                    Zombie=1;
-                    Bandit=1;
-                    Cultist=1;
-                    Rat=1;
-                };
-
-                Damage = damage;
-                ExplosionStun = 1;
-                ExplosionStunThreshold = 0;
-
-                IgniteFlammables=false;
-
-                DamageOrigin = detonatePosition;
+        local newExplosionProcessPacket = {
+            ExplosionBy = npcClass;
+            TargetableEntities = {
+                Humanoid=1;
+                Zombie=1;
+                Bandit=1;
+                Cultist=1;
+                Rat=1;
             };
-            
-            newExplosionProcessPacket.OnHealthHit = function(healthComp: HealthComp, damage: number)
-                local characterClass: CharacterClass = healthComp.CompOwner;
-                if characterClass.Character == npcClass.Character then return true end;
-                if healthComp:CanTakeDamageFrom(npcClass) == false then return true end;
 
-                if characterClass.ClassName == "NpcClass" then
-                    local npcClass: NpcClass = characterClass :: NpcClass;
-                    
-                    if npcClass.Properties.BasicEnemy then
-                        damage = healthComp.MaxHealth * 0.2;
+            Damage = (configurations.AttackDamage or 30);
+            ExplosionStun = 1;
+            ExplosionStunThreshold = 0;
 
-                        if splashReflectedValue then
-                            damage = damage*splashReflectedValue;
-                        end
-                        task.spawn(function()
-                            if healthComp.IsDead then return end;
-                            if npcClass.Name ~= "Ticks" then return end;
+            IgniteFlammables=false;
 
-                            task.wait(math.random(50, 250)/1000);
-                            npcClass.BehaviorTree:RunTreeLeaf("TicksTree", "Detonate");
-                        end)
+            DamageOrigin = detonatePosition;
+        };
+        
+        newExplosionProcessPacket.OnHealthCompHit = function(healthComp: HealthComp, damage: number)
+            local characterClass: CharacterClass = healthComp.CompOwner :: CharacterClass;
+            if characterClass.Character == npcClass.Character then return true end;
+            if healthComp:CanTakeDamageFrom(npcClass) == false then return true end;
 
-                    else
-                        damage = healthComp.MaxHealth * 0.05;
+            local dist = characterClass:DistanceFromCharacter(detonatePosition);
+            if dist >= 30 then return true end;
+
+            local dmgMulti = (1-math.clamp(dist, 0, 30)/30);
+
+            if characterClass.ClassName == "NpcClass" then
+                local npcClass: NpcClass = characterClass :: NpcClass;
+                
+                if npcClass.Properties.BasicEnemy then
+                    damage = healthComp.MaxHealth * 0.2;
+
+                    if splashReflectedValue then
+                        damage = damage*splashReflectedValue;
                     end
-                    
-                elseif characterClass.ClassName == "PlayerClass" then
-                    local playerClass: PlayerClass = characterClass :: PlayerClass;
+                    task.spawn(function()
+                        if healthComp.IsDead then return end;
+                        if npcClass.Name ~= "Ticks" then return end;
 
-                    local conGasProtection = playerClass.Configurations.GasProtection;
-                    if conGasProtection then
-                        damage = damage * (1-conGasProtection);
-                    end
+                        task.wait(math.random(50, 250)/1000);
+                        npcClass.BehaviorTree:RunTreeLeaf("TicksTree", "Detonate");
+                    end)
 
-                    local conSplashReflection = playerClass.Configurations.SplashReflection;
-                    if conSplashReflection then
-                        splashReflectedValue = conSplashReflection;
-                        newExplosionProcessPacket.ExplosionStun = newExplosionProcessPacket.ExplosionStun*conSplashReflection;
-                    end
-                    
-                    if playerClass.Properties.tickre then
-                        return true;
-                    end
+                else
+                    damage = healthComp.MaxHealth * 0.05;
+                end
+                
+            elseif characterClass.ClassName == "PlayerClass" then
+                local playerClass: PlayerClass = characterClass :: PlayerClass;
 
-                    local conTickRepellent = playerClass.Configurations.TickRepellent;
-                    if conTickRepellent then
-                        playerClass.StatusComp:Apply("tickre", {
-                            Expires = workspace:GetServerTimeNow() + conTickRepellent;
-                            Duration = conTickRepellent;
-                            Values = {
-                                Amount = conTickRepellent;
-                            }
-                        });
-                    end
-
+                local conGasProtection = playerClass.Configurations.GasProtection;
+                if conGasProtection then
+                    damage = damage * (1-conGasProtection);
                 end
 
-                local dmgData = DamageData.new{
-                    DamageBy = npcClass;
-                    Damage = damage;
-                };
-                healthComp:TakeDamage(dmgData);
+                local conSplashReflection = playerClass.Configurations.SplashReflection;
+                if conSplashReflection then
+                    splashReflectedValue = conSplashReflection;
+                    newExplosionProcessPacket.ExplosionStun = newExplosionProcessPacket.ExplosionStun*conSplashReflection;
+                end
+                
+                if playerClass.Properties.tickre then
+                    return true;
+                end
 
-                task.spawn(function()
-                    if characterClass.ClassName == "PlayerClass" then
-                        local player: Player = (characterClass :: PlayerClass):GetInstance();
-						shared.modPlayers.cameraShakeAndZoom(player, 10 * math.clamp(targetDistance/32, 0, 1), 0, 0.5, 0.01, false);
-                    end
-                end)
+                local conTickRepellent = playerClass.Configurations.TickRepellent;
+                if conTickRepellent then
+                    playerClass.StatusComp:Apply("tickre", {
+                        Expires = workspace:GetServerTimeNow() + conTickRepellent;
+                        Duration = conTickRepellent;
+                        Values = {
+                            Amount = conTickRepellent;
+                        }
+                    });
+                end
 
-                return true;
             end
 
-            modExplosionHandler:Process(detonatePosition, hitLayers, newExplosionProcessPacket);
-        end)
-    end
+            local dmgData = DamageData.new{
+                DamageBy = npcClass;
+                Damage = damage * dmgMulti;
+            };
+            healthComp:TakeDamage(dmgData);
+
+            task.spawn(function()
+                if characterClass.ClassName == "PlayerClass" then
+                    local player: Player = (characterClass :: PlayerClass):GetInstance();
+                    shared.modPlayers.cameraShakeAndZoom(player, 10 * math.clamp(dist/32, 0, 1), 0, 0.5, 0.01, false);
+                end
+            end)
+
+            return true;
+        end
+
+        modExplosionHandler:Process(detonatePosition, hitLayers, newExplosionProcessPacket);
+    end)
 
     task.spawn(function()
         game.Debris:AddItem(npcClass.Character:FindFirstChild("ExplosiveTickBlobs"), 0);
