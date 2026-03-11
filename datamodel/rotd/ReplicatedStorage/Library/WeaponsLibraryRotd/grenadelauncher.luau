@@ -33,11 +33,6 @@ local toolPackage = {
 		TriggerMode=modWeaponAttributes.TriggerModes.Semi;
 		ReloadMode=modWeaponAttributes.ReloadModes.Full;
 		
-		AmmoType="lightammo";
-
-		BulletEject="PistolBullet";
-		BulletEjectOffset=CFrame.Angles(math.rad(-90), 0, 0);
-		
 		-- Stats
 		Damage=420;
 		PotentialDamage=10500;
@@ -62,6 +57,7 @@ local toolPackage = {
 		
 		ExplosionRadius=12;
 		ExplosionStun=1;
+		DamageRatio = 0;
 
 		-- Focus
 		FocusWalkSpeedReduction=0.55;
