@@ -1,13 +1,21 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local RunService = game:GetService("RunService");
+
+local localPlayer = game.Players.LocalPlayer;
+
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local remoteGameModeLobbies = modRemotesManager:Get("GameModeLobbies");
+local remoteGameModeRequest = modRemotesManager:Get("GameModeRequest");
+
+local REQUESTS_ENUM = modGameModeLibrary.RequestEnums;
 
 local modToolsLibrary;
 --==
@@ -30,8 +38,7 @@ local toolPackage = {
 };
 toolPackage.__index = toolPackage;
 
-function toolPackage.ClientItemPrompt(handler)
-	local localPlayer = game.Players.LocalPlayer;
+function toolPackage.ClientItemPrompt(handler: ToolHandlerInstance)
 	local playerClass = shared.modPlayers.get(localPlayer);
 
 	if playerClass.Properties.InBossBattle or modConfigurations.DisableMapItems then
@@ -43,13 +50,24 @@ function toolPackage.ClientItemPrompt(handler)
 
 		return;
 	end
+	
+	local gameRoomWindow: InterfaceWindow = modClientGuis.getWindow("GameRoom");
+	if gameRoomWindow.Visible then
+		modClientGuis.toggleGameBlinds(false, 0.5);
+        task.wait(0.5);
+        remoteGameModeRequest:InvokeServer(REQUESTS_ENUM.CloseInterface);
+        gameRoomWindow:Close();
+		return
+	end;
+	gameRoomWindow.QuickButton = handler.EquipmentClass.Properties.QuickButton;
+
 	modClientGuis.toggleGameBlinds(false, 0.5);
 	
 	local storageItem = handler.StorageItem;
 	
 	local timeLapse = tick();
 	local rPacket = remoteGameModeLobbies:InvokeServer("map", storageItem.ID);
-	wait(math.clamp(0.5-(tick()-timeLapse), 0, 0.5));
+	task.wait(math.clamp(0.5-(tick()-timeLapse), 0, 0.5));
 	modClientGuis.toggleGameBlinds(true, 0.5);
 	
 	if rPacket and rPacket.Success then
@@ -62,6 +80,7 @@ function toolPackage.ClientItemPrompt(handler)
 end
 
 function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
+	if RunService:IsClient() then return end;
 	if packet.ActionIndex ~= 1 then return end;
 
 	local equipmentClass: EquipmentClass = handler.EquipmentClass;
