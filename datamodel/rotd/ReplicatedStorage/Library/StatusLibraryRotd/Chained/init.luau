@@ -67,6 +67,7 @@ function statusPackage.Chain(statusClass: StatusClassInstance, duration: number,
 
 	local destructConfig: Configuration = modDestructibles.createDestructible();
 	destructConfig.Parent = newAnchor;
+	newAnchor.Parent = workspace.Environment;
 
 	local destructible: DestructibleInstance = modDestructibles.getOrNew(destructConfig);
 	destructible.Properties.DestroyModel = false;
@@ -83,7 +84,6 @@ function statusPackage.Chain(statusClass: StatusClassInstance, duration: number,
 		Debugger.Expire(destructible.Model, 5);
 	end)
 
-	newAnchor.Parent = workspace.Environment;
 
 	pcall(function()
 		if characterClass.ClassName ~= "PlayerClass" then return end;
