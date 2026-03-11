@@ -564,9 +564,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			--== MARK: Refill Charges
 			if selectedItem.ItemId == "ammopouch" then
 				local ammoPouchData = modData:GetEvent("AmmoPouchData");
-				local charges = ammoPouchData and ammoPouchData.Charges or configurations.BaseRefillCharge;
+				local charges = ammoPouchData and ammoPouchData.Charges or configurations.RefillCharge;
 
-				if charges < configurations.BaseRefillCharge then
+				if charges < configurations.RefillCharge then
 					binds.NewListing(function(newListing)
 						newListing.Name = "RefillOption";
 						local infoBox = newListing:WaitForChild("infoFrame");
@@ -580,7 +580,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						local labelFrame = descFrame:WaitForChild("labelFrame");
 						local descLabel = labelFrame:WaitForChild("descLabel");
 
-						descLabel.Text = `Do you want to refill {configurations.BaseRefillCharge} ammo pouch charges?`;
+						descLabel.Text = `Do you want to refill {configurations.RefillCharge} ammo pouch charges?`;
 							
 						titleLabel.Text = "Refill Charges";
 						priceLabel.Text = `Refill`;

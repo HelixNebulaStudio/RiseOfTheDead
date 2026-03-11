@@ -6,7 +6,9 @@ local UsablePreset = shared.require(game.ReplicatedStorage.Library.UsableItems.U
 --==
 
 function UsablePreset:ClientUse(storageItem)
-	modClientGuis.toggleWindow("ResupplyStation", true, nil, nil, storageItem);
+	modClientGuis.toggleWindow("ResupplyStation", true, nil, nil, {
+		SupplierSiid = storageItem.ID;
+	});
 end
 
 return UsablePreset;

@@ -46,9 +46,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local binds = window.Binds;
     binds.Interactable = nil;
     binds.StorageId = nil;
-    binds.SupplyStorageItem = nil;
     binds.SelectStorageItem = nil;
     binds.ResupplyButtonClick = nil;
+    binds.SupplierSiid = nil;
 
 
     function binds.selectionChange()
@@ -75,7 +75,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         if equipmentClass == nil then return end;
         local configurations = equipmentClass.Configurations;
 
-        if binds.SupplyStorageItem and binds.SupplyStorageItem.ID == selectedItem.ID then
+        if binds.SupplierSiid == selectedItem.ID then
             mainLabel.Text = `You can't refill an ammo pouch from an ammo pouch..`;
 
         elseif equipmentClass.Class == "Gun" then
@@ -113,7 +113,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     if (localplayerCurrency or 0) >= price then
                         serverReply = remoteShopService:InvokeServer("buyammo", {
                             InteractConfig = binds.Interactable and binds.Interactable.Config;
-                            AmmoPouchSiid = binds.SupplyStorageItem and binds.SupplyStorageItem.ID or nil;
+                            SupplierSiid = binds.SupplierSiid;
 
                             Siid = selectedItem.ID;
                             StorageId = binds.StorageId;
@@ -148,13 +148,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         else
             if selectItemId == "ammopouch" then
                 local ammoPouchData = modData:GetEvent("AmmoPouchData");
-                local charges = ammoPouchData and ammoPouchData.Charges or configurations.BaseRefillCharge;
+                local charges = ammoPouchData and ammoPouchData.Charges or configurations.RefillCharge;
 
-                if charges >= configurations.BaseRefillCharge then
+                if charges >= configurations.RefillCharge then
                     mainLabel.Text = `This ammo pouch has full charge.`;
 
                 else
-                    mainLabel.Text = `Do you want to refill {configurations.BaseRefillCharge} ammo pouch charges?`;
+                    mainLabel.Text = `Do you want to refill {configurations.RefillCharge} ammo pouch charges?`;
                     resupplyButton.buttonText.Text = `Refill`;
                     resupplyButton.Visible = true;
                     
@@ -226,12 +226,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 
     --MARK: OnToggle
-	window.OnToggle:Connect(function(visible, interactable, info, supplierStorageItem)
+	window.OnToggle:Connect(function(visible, interactable, info, params)
+        params = params or {};
         if interactable then
             binds.Interactable = interactable;
         end
-        if supplierStorageItem then
-            binds.SupplyStorageItem = supplierStorageItem;
+        if params.SupplierSiid then
+            binds.SupplierSiid = params.SupplierSiid;
         end
 
 		if visible then
@@ -247,14 +248,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				storageInterface.OnItemButton1Click = binds.onItemSelect;
 			end
 
-			if binds.SupplyStorageItem and binds.SupplyStorageItem.ItemId == "ammopouch" then
+			if binds.SupplierSiid then
 				titleLabel.Text = `Ammo Pouch`;
 			else
 				titleLabel.Text = `Supply Station`;
 			end
 
             task.spawn(function()
-				if binds.SupplyStorageItem then return end;
+				if binds.SupplierSiid then return end;
 
                 repeat until not window.Visible 
                 or binds.Interactable == nil or binds.Interactable.Part == nil 
@@ -270,7 +271,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             binds.clearSlotHighlight();
             
 			binds.SelectStorageItem = nil;
-            binds.SupplyStorageItem = nil;
+            binds.SupplierSiid = nil;
             binds.StorageId = nil;
 
 			for a=#interface.StorageInterfaces, 1, -1 do
