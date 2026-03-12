@@ -2,6 +2,7 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes:
+- Fixed calculation errors in volume settings.
 - Fixed TargetDummy missing destructible.
 - Fixed item description not checking equipment configurations and properties.
 - Disabled client game events relaying to server by default.
