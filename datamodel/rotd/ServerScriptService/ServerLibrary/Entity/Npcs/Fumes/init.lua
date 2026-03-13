@@ -52,6 +52,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
 
         properties.FumesCloudSize = 70;
         properties.KnockbackResistant = 0.5;
+        properties.CloudSpawnDelay = tick()+5;
     end
 
     properties.ThreatSenseHidden = true;
@@ -59,9 +60,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
     properties.Immunity = 2;
 
     properties.CloudState = 0;
-end
-
-function npcPackage.Spawned(npcClass: NpcClass)
 end
 
 return npcPackage;

@@ -22,19 +22,35 @@ end
 function treePackage.FumesCloud(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local enemyTargetData: NpcTargetData = properties.EnemyTargetData;
-    local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
+    local enemyEntityClass: EntityClass = enemyTargetData.HealthComp.CompOwner :: EntityClass;
+    if enemyEntityClass.ClassName ~= "PlayerClass" and enemyEntityClass.ClassName ~= "NpcClass" then return false; end;
 
     local fumesCloud = game.ServerStorage.Prefabs.Objects:WaitForChild("fumesCloud");
     local isHard = properties.HardMode;
 
-    if properties.CloudState == 0 then
+    if properties.CloudSpawnDelay then
+        if tick() > properties.CloudSpawnDelay then
+            properties.CloudSpawnDelay = nil;
+
+        elseif tick() > (properties.CloudSpawnDelay-1) then
+            npcClass.Move:SetMoveSpeed("set", "stop", 0, npcClass.Move.MoveSpeedPriority.Action, 2);
+            npcClass.Move:Face(enemyEntityClass.RootPart);
+
+            npcClass.PlayAnimation("ChannelFumes");
+
+        end
+        return false;
+
+    elseif properties.CloudState == 0 then
         if enemyTargetData.Distance > 100 then return false; end;
         properties.CloudState = 1;
 
         properties.Immunity = 0;
 
-        npcClass.Move:Stop();
-        npcClass.Move:Face(enemyNpcClass.RootPart);
+        npcClass.Move:SetMoveSpeed("set", "stop", 0, npcClass.Move.MoveSpeedPriority.Action, 2);
+        npcClass.Move:Face(enemyEntityClass.RootPart);
+
+        npcClass.PlayAnimation("ChannelFumes");
 
         local newFumeCloud: MeshPart = fumesCloud:Clone();
         local offsetCFrame = CFrame.new(math.random(-16, 16), 0, math.random(-16, 16));
@@ -53,7 +69,7 @@ function treePackage.FumesCloud(npcClass: NpcClass)
                     local delta = game:GetService("RunService").Heartbeat:Wait();
                     if not workspace:IsAncestorOf(newFumeCloud) then break end;
 
-                    local tarPos = enemyNpcClass.RootPart.Position;
+                    local tarPos = enemyEntityClass.RootPart.Position;
                     local directionBias = (tarPos-npcClass:GetCFrame().Position).Unit or Vector3.zero;
                     properties.FumesCloudPoint = properties.FumesCloudPoint + directionBias * 2 * delta;
                     newFumeCloud.Position = newFumeCloud.Position:Lerp(properties.FumesCloudPoint, 0.1);
@@ -68,8 +84,6 @@ function treePackage.FumesCloud(npcClass: NpcClass)
 
         newFumeCloud.Parent = workspace.Entities;
         npcClass.Garbage:Tag(newFumeCloud);
-
-        npcClass.PlayAnimation("ChannelFumes");
 
     elseif properties.CloudState == 1 then
         local cancelChanneling = false;
@@ -105,7 +119,7 @@ function treePackage.FumesCloud(npcClass: NpcClass)
 
         if npcClass.Move.IsMoving == false then
             npcClass.PlayAnimation("ChannelFumes", 0.5);
-            npcClass.Move:Face(enemyNpcClass.RootPart);
+            npcClass.Move:Face(enemyEntityClass.RootPart);
         end
     end
 

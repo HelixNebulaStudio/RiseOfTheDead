@@ -141,139 +141,138 @@ function GameMode:Start(room)
 	
 	local arenaTimer = tick();
 	
-	local function npcSpawnSetup(bossNpcClass: NpcClass)
-		local bossCharacter = bossNpcClass.Character;
-
-		table.insert(room.BossPrefabs, bossCharacter);
-		table.insert(room.Prefabs, bossCharacter);
-		bossCharacter:SetAttribute("EntityHudHealth", true);
-
-		bossNpcClass.NetworkOwners = players;
-
-		local properties = bossNpcClass.Properties;
-		properties.Level = math.max(bossLevel, 1);
-
-		properties.Arena = bossArena;
-		properties.HardMode = room.IsHard;
-		properties.CrateId = bossLib.CrateId;
-		properties.TargetableDistance = 4096;
-		
-		roomMeta.BossNpcClasses = {};
-		table.insert(roomMeta.BossNpcClasses, bossNpcClass);
-
-		for _, player in pairs(players) do
-			bossCharacter:AddPersistentPlayer(player);
-
-			local playerClass: PlayerClass = modPlayers.get(player);
-			if playerClass and playerClass.Humanoid then
-				bossNpcClass.Garbage:Tag(playerClass.Humanoid.Died:Connect(function()
-					if bossNpcClass.NetworkOwners == nil then
-						return;
-					end
-					for a=#bossNpcClass.NetworkOwners, 1, -1 do
-						if bossNpcClass.NetworkOwners[a] == player then
-							table.remove(bossNpcClass.NetworkOwners, a);
-						end
-					end
-				end));
-			end
-			
-			local playerNpcsList = modNpcs.listNpcClasses(function(npcClass: NpcClass)
-				return npcClass.Player == player;
-			end)
-			if playerNpcsList then
-				for a=1, #playerNpcsList do
-					local playerNpcClass: NpcClass = playerNpcsList[a];
-					if playerNpcClass.Properties.FollowingPlayer ~= player then
-						continue;
-					end
-
-					local targetHandlerComp = playerNpcClass:GetComponent("TargetHandler");
-					if targetHandlerComp then
-						targetHandlerComp:AddTarget(bossNpcClass.Character, bossNpcClass.HealthComp)
-					else
-						playerNpcsList[a].Target = bossCharacter; -- MARK: Using deprecated .Target field
-					end
-				end
-			end
-		end
-
-		local healthComp: HealthComp = bossNpcClass.HealthComp;
-		healthComp.OnIsDeadChanged:Connect(function()
-			players = room:GetInstancePlayers();
-
-			Debugger:Warn("Boss IsDeadChanged", #players);
-			local deathPos = bossNpcClass.RootPart.Position;
-
-			for a=#room.BossPrefabs, 1, -1 do
-				if room.BossPrefabs[a] == bossCharacter then
-					table.remove(room.BossPrefabs, a);
-				end
-			end
-
-			if #players > 0 then
-				for _, player in pairs(players) do
-					shared.Notify(player, bossNpcClass.Name, "BossDefeat");
-				end
-				shared.modEventService:ServerInvoke("Boss_BindDefeated", {ReplicateTo=players}, {
-					NpcClass = bossNpcClass;
-				});
-			end
-
-			if room.State == modGameModeLibrary.RoomStatesEnums.InProgress and #room.BossPrefabs <= 0 then
-				room:SetState(modGameModeLibrary.RoomStatesEnums.Ending);
-				
-				if died then return end;
-				died = true;
-				
-				task.spawn(function()
-					if #players < 0 then return end;
-					local crateRewardComp = bossNpcClass:GetComponent("CrateReward");
-					if crateRewardComp == nil then
-						crateRewardComp = bossNpcClass:AddComponent("CrateReward");
-					end
-					if crateRewardComp then
-						local crateSpawnPos = bossArena.PrimaryPart:FindFirstChild("CrateSpawn") and bossArena.PrimaryPart.CrateSpawn.WorldPosition;
-						local spawnCFrame = crateSpawnPos and CFrame.new(crateSpawnPos) or nil;
-						if crateSpawnPos == nil then
-							local _dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(
-								Ray.new(deathPos, Vector3.new(0, -32, 0)), 
-								{workspace.Environment; workspace.Terrain}, 
-								true
-							);
-							spawnCFrame = CFrame.new(dropRayPos);
-						end
-						spawnCFrame = spawnCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
-
-						local cratePrefab = crateRewardComp(spawnCFrame, players);
-						Debugger.Expire(cratePrefab, 15);
-					else
-						Debugger:Warn(`Missing CrateReward component for {bossNpcClass.Name}`);
-					end
-					
-					for _, player in pairs(players) do
-						modAnalytics.RecordProgression(player.UserId, "Complete", "Boss:"..(room.IsHard and "Hard-" or "")..self.GameTable.Stage);
-						
-						local profile = modProfile:Get(player);
-						local timePlayed = math.ceil(tick()-arenaTimer);
-						profile.Analytics:LogTime("Arena:"..(room.IsHard and "Hard-" or "")..self.GameTable.Stage, timePlayed);
-					end
-				end)
-			end
-
-		end)
-	end
-
 	for npcName, _ in pairs(bossLib.Prefabs) do
 		newSpawnPoint = modNpcs.GetCFrameFromPlatform(bossSpawnObject);
 		
-		modNpcs.spawn2{
+		if roomMeta.BossNpcClasses == nil then
+			roomMeta.BossNpcClasses = {};
+		end
+		local bossNpcClass: NpcClass = modNpcs.spawn2{
 			Name = npcName;
 			CFrame = newSpawnPoint;
 
 			AddComponents = {"CrateReward"};
-			BindSetup = npcSpawnSetup;
+			BindPreSetup = function(npcClass: NpcClass)
+				local properties = npcClass.Properties;
+				npcClass.NetworkOwners = players;
+
+				properties.Level = math.max(bossLevel, 1);
+
+				properties.Arena = bossArena;
+				properties.HardMode = room.IsHard;
+				properties.CrateId = bossLib.CrateId;
+				properties.TargetableDistance = 4096;
+			end;
+			BindSetup = function(npcClass: NpcClass)
+				local bossCharacter = npcClass.Character;
+
+				table.insert(room.BossPrefabs, bossCharacter);
+				table.insert(room.Prefabs, bossCharacter);
+				bossCharacter:SetAttribute("EntityHudHealth", true);
+			
+				for _, player in pairs(players) do
+					bossCharacter:AddPersistentPlayer(player);
+
+					local playerClass: PlayerClass = modPlayers.get(player);
+					if playerClass and playerClass.Humanoid then
+						npcClass.Garbage:Tag(playerClass.Humanoid.Died:Connect(function()
+							if npcClass.NetworkOwners == nil then
+								return;
+							end
+							for a=#npcClass.NetworkOwners, 1, -1 do
+								if npcClass.NetworkOwners[a] == player then
+									table.remove(npcClass.NetworkOwners, a);
+								end
+							end
+						end));
+					end
+					
+					local playerNpcsList = modNpcs.listNpcClasses(function(npcClass: NpcClass)
+						return npcClass.Player == player;
+					end)
+					if playerNpcsList then
+						for a=1, #playerNpcsList do
+							local playerNpcClass: NpcClass = playerNpcsList[a];
+							if playerNpcClass.Properties.FollowingPlayer ~= player then
+								continue;
+							end
+
+							local targetHandlerComp = playerNpcClass:GetComponent("TargetHandler");
+							if targetHandlerComp then
+								targetHandlerComp:AddTarget(npcClass.Character, npcClass.HealthComp);
+							end
+						end
+					end
+				end
+
+				local healthComp: HealthComp = npcClass.HealthComp;
+				healthComp.OnIsDeadChanged:Connect(function()
+					players = room:GetInstancePlayers();
+
+					Debugger:Warn("Boss IsDeadChanged", #players);
+					local deathPos = npcClass.RootPart.Position;
+
+					for a=#room.BossPrefabs, 1, -1 do
+						if room.BossPrefabs[a] == bossCharacter then
+							table.remove(room.BossPrefabs, a);
+						end
+					end
+
+					if #players > 0 then
+						for _, player in pairs(players) do
+							shared.Notify(player, npcClass.Name, "BossDefeat");
+						end
+						shared.modEventService:ServerInvoke("Boss_BindDefeated", {ReplicateTo=players}, {
+							NpcClass = npcClass;
+						});
+					end
+
+					if room.State == modGameModeLibrary.RoomStatesEnums.InProgress and #room.BossPrefabs <= 0 then
+						room:SetState(modGameModeLibrary.RoomStatesEnums.Ending);
+						
+						if died then return end;
+						died = true;
+						
+						task.spawn(function()
+							if #players < 0 then return end;
+							local crateRewardComp = npcClass:GetComponent("CrateReward");
+							if crateRewardComp == nil then
+								crateRewardComp = npcClass:AddComponent("CrateReward");
+							end
+							if crateRewardComp then
+								local crateSpawnPos = bossArena.PrimaryPart:FindFirstChild("CrateSpawn") and bossArena.PrimaryPart.CrateSpawn.WorldPosition;
+								local spawnCFrame = crateSpawnPos and CFrame.new(crateSpawnPos) or nil;
+								if crateSpawnPos == nil then
+									local _dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(
+										Ray.new(deathPos, Vector3.new(0, -32, 0)), 
+										{workspace.Environment; workspace.Terrain}, 
+										true
+									);
+									spawnCFrame = CFrame.new(dropRayPos);
+								end
+								spawnCFrame = spawnCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
+
+								local cratePrefab = crateRewardComp(spawnCFrame, players);
+								Debugger.Expire(cratePrefab, 15);
+							else
+								Debugger:Warn(`Missing CrateReward component for {npcClass.Name}`);
+							end
+							
+							for _, player in pairs(players) do
+								modAnalytics.RecordProgression(player.UserId, "Complete", "Boss:"..(room.IsHard and "Hard-" or "")..self.GameTable.Stage);
+								
+								local profile = modProfile:Get(player);
+								local timePlayed = math.ceil(tick()-arenaTimer);
+								profile.Analytics:LogTime("Arena:"..(room.IsHard and "Hard-" or "")..self.GameTable.Stage, timePlayed);
+							end
+						end)
+					end
+
+				end)
+			end;
 		};
+		
+		table.insert(roomMeta.BossNpcClasses, bossNpcClass);
 	end
 	
 	task.spawn(function()
