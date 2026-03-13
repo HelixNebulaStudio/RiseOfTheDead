@@ -2,6 +2,7 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes:
+- Fixed skins and customizations not loading with new equipment system.
 - Fixed calculation errors in volume settings.
 - Fixed TargetDummy missing destructible.
 - Fixed item description not checking equipment configurations and properties.
