@@ -17,6 +17,7 @@ local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 local modNpcs = shared.modNpcs;
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
@@ -47,12 +48,16 @@ function GameMode:Load(room)
 	
 	for a=1, #arenaInteractables do
 		if arenaInteractables[a]:IsA("BasePart") then
-			arenaInteractables[a].Parent = workspace.Interactables;
+			--arenaInteractables[a].Parent = workspace.Interactables;
 			arenaInteractables[a].Transparency = 1;
 			
 			table.insert(room.Prefabs, arenaInteractables[a]);
 			if arenaInteractables[a].Name == "ExitDoor" then
 				room.ExitDoor = arenaInteractables[a];
+				
+				local exitDoorInteractConfig = modInteractables.createInteractable("BossExit");
+				exitDoorInteractConfig:SetAttribute("Stage", self.GameTable.Stage);
+				exitDoorInteractConfig.Parent = room.ExitDoor;
 				
 			elseif arenaInteractables[a].Name == "neonSign" then
 				room.NeonSign = arenaInteractables[a]:FindFirstChild("ExitSign", true);
@@ -195,7 +200,9 @@ function GameMode:Start(room)
 
 		local healthComp: HealthComp = bossNpcClass.HealthComp;
 		healthComp.OnIsDeadChanged:Connect(function()
-			Debugger:Warn("Boss defeated");
+			players = room:GetInstancePlayers();
+
+			Debugger:Warn("Boss IsDeadChanged", #players);
 			local deathPos = bossNpcClass.RootPart.Position;
 
 			for a=#room.BossPrefabs, 1, -1 do
@@ -204,13 +211,14 @@ function GameMode:Start(room)
 				end
 			end
 
-			players = room:GetInstancePlayers();
-			for _, player in pairs(players) do
-				shared.Notify(player, bossNpcClass.Name, "BossDefeat");
+			if #players > 0 then
+				for _, player in pairs(players) do
+					shared.Notify(player, bossNpcClass.Name, "BossDefeat");
+				end
+				shared.modEventService:ServerInvoke("Boss_BindDefeated", {ReplicateTo=players}, {
+					NpcClass = bossNpcClass;
+				});
 			end
-			shared.modEventService:ServerInvoke("Boss_BindDefeated", {ReplicateTo=players}, {
-				NpcClass = bossNpcClass;
-			});
 
 			if room.State == modGameModeLibrary.RoomStatesEnums.InProgress and #room.BossPrefabs <= 0 then
 				room:SetState(modGameModeLibrary.RoomStatesEnums.Ending);
@@ -219,6 +227,7 @@ function GameMode:Start(room)
 				died = true;
 				
 				task.spawn(function()
+					if #players < 0 then return end;
 					local crateRewardComp = bossNpcClass:GetComponent("CrateReward");
 					if crateRewardComp == nil then
 						crateRewardComp = bossNpcClass:AddComponent("CrateReward");
@@ -359,17 +368,17 @@ function GameMode:End(room)
 	end
 	
 	if room.ExitDoor then
-		local remoteExit = Instance.new("RemoteFunction");
-		remoteExit.Name = "ExitBossArena";
-		remoteExit.Parent = room.ExitDoor;
+		local exitDoorInteractConfig = room.ExitDoor:FindFirstChild("Interactable");
 		
-		function remoteExit.OnServerInvoke(player)
+		local exitDoorInteractable: InteractableInstance = modInteractables.getOrNew(exitDoorInteractConfig);
+		function exitDoorInteractable.Values.ExitFunc(player)
 			remoteGameModeHud:FireClient(player, {
 				Action="Close";
 			});
 			self.GameTable:DisconnectPlayer(player);
 			room:RemovePlayer(player);
 		end
+
 	else
 		for a=1, #players do
 			self.GameTable:DisconnectPlayer(players[a], false);
