@@ -91,13 +91,11 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
 
         local dmgRatio = math.clamp(damagePercent - 0.02*targetsHit, 0.05, 1);
         
-        local dmgData: DamageData = DamageData.new();
-        dmgData.Damage = math.max(damage*dmgRatio, 1);
-        
-        local damageType: DAMAGE_TYPE<DAMAGE_TYPE_ROTD> = "Electric";
-        dmgData.DamageType = damageType;
-
-        healthComp:TakeDamage(dmgData);
+        healthComp:TakeDamage(DamageData.new{
+            DamageBy = applyBy;
+            Damage = math.max(damage*dmgRatio, 1);
+            DamageType = "Electric" :: DAMAGE_TYPE<DAMAGE_TYPE_ROTD>;
+        });
     end 
 
     statusClass.Values.TargetsHit = statusClass.Values.TargetsHit +1;

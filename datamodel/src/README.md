@@ -2,6 +2,7 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes:
+- Fixed Toxic damage type handling missing damageBy value. [#1010]
 - Fixed skins and customizations not loading with new equipment system.
 - Fixed calculation errors in volume settings.
 - Fixed TargetDummy missing destructible.
