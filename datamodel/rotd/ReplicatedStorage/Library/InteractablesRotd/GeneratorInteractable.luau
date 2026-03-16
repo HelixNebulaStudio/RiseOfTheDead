@@ -30,6 +30,7 @@ function interactablePackage.init(super) -- Server/Client
     function Generator.BindEvent(interactable: InteractableInstance, info: InteractInfo, eventName: string)
         local interactPart = interactable.Part;
         if RunService:IsClient() then return end;
+        if eventName ~= "BeforeInteract" then return end;
 
         local player = info.Player;
         if player == nil then return true; end
