@@ -116,7 +116,6 @@ function TurretRuntime(weaponStorageItem)
 	hydraulicRod.JointHRA.CFrame  = jointHarCf * CFrame.Angles(hydraulicPitch, 0, 0);
 	arm1.JointAA2.CFrame = jointAa2Cf * CFrame.Angles(armPitch, 0, 0);
 	
-	--weaponStorageItem:Sync({"A"; "MA"});
 	--==
 	local configValues = patStorage.Values.Config or {};
 	
@@ -347,8 +346,6 @@ function TurretRuntime(weaponStorageItem)
 	end;
 	
 
-	local itemValues = weaponStorageItem.Values;
-
 	local profile: ProfileRotd = shared.modProfile:Get(player) :: ProfileRotd;
 	local toolHandler: ToolHandlerInstance = playerClass.WieldComp:GetToolHandler(
 		weaponStorageItem.ID, 
@@ -366,12 +363,13 @@ function TurretRuntime(weaponStorageItem)
 	end
 
 
-	local tryReload = itemValues.A and itemValues.A <= 0;
 
 	local toolPackage = toolHandler.ToolPackage;
 	local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
 	local configurations = equipmentClass.Configurations;
 	local properties = equipmentClass.Properties;
+
+	local tryReload = properties.Ammo and properties.Ammo <= 0;
 
 	if profile.Cache.InfAmmo then
 		properties.InfiniteAmmo = profile.Cache.InfAmmo;
@@ -379,10 +377,15 @@ function TurretRuntime(weaponStorageItem)
 		properties.InfiniteAmmo = nil;
 	end
 
-	if configurations.ReloadMode == modWeaponAttributes.ReloadModes.Single and targetModel == nil and (itemValues.MA or 1) > 0 then
-		tryReload = itemValues.A and itemValues.A < configurations.AmmoLimit;
+	properties.ToolModelIndex = 1;
+	properties.Ammo = weaponStorageItem:GetValues("A") or configurations.AmmoLimit;
+	properties.MaxAmmo = weaponStorageItem:GetValues("MA") or configurations.MaxAmmoLimit;
+
+	if configurations.ReloadMode == modWeaponAttributes.ReloadModes.Single and targetModel == nil and (properties.MaxAmmo or 1) > 0 then
+		tryReload = properties.Ammo and properties.Ammo < configurations.AmmoLimit;
 	end
 
+	if properties.Reloading then return end;
 	if tryReload then
 		modAudio.Play(toolPackage.Audio.Empty.Id, turretArm.PrimaryPart);
 		autoTurretClient:SetAttribute("Mode", 4);
@@ -397,21 +400,23 @@ function TurretRuntime(weaponStorageItem)
 		reloadLoop2.Looped = true;
 		reloadLoop2.PlaybackSpeed = 2;
 
-		local sucess;
+		local success;
 		if properties.Ammo <= 0
 		and properties.MaxAmmo <= 0 then
-			sucess = false;
+			success = false;
 			
 		else
 			task.spawn(function()
-				sucess = (toolHandler :: GunToolHandlerInstance):ReloadRequest();
+				success = (toolHandler :: GunToolHandlerInstance):ReloadRequest();
 			end)
-			while sucess == nil do
+			while success == nil do
 				task.wait();
 				canReactivate = tick();
 
-				if onlineLoop == false then
-					sucess = false;
+				if properties.Reloading == false then
+					break;	
+				elseif onlineLoop == false then
+					success = false;
 					break;
 				end
 			end
@@ -419,10 +424,19 @@ function TurretRuntime(weaponStorageItem)
 
 		reloadLoop:Stop();
 		reloadLoop2:Stop();
-		modAudio.Play("BattleRifleLoad", turretArm.PrimaryPart);
-		autoTurretClient:SetAttribute("Mode", 1);
 
-		if sucess == false then
+		if configurations.ReloadMode == modWeaponAttributes.ReloadModes.Full then
+			modAudio.Play("BattleRifleLoad", turretArm.PrimaryPart);
+
+		elseif configurations.ReloadMode == modWeaponAttributes.ReloadModes.Single then
+			if targetModel == nil then
+				return;
+			end
+			autoTurretClient:SetAttribute("Mode", 1);
+			task.wait();
+		end
+
+		if properties.Ammo <= 0 and properties.MaxAmmo <= 0 then
 			modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
 
 			patStorage.Values.IsOnline = false;
@@ -436,6 +450,7 @@ function TurretRuntime(weaponStorageItem)
 		end
 	end
 
+	autoTurretClient:SetAttribute("Mode", 1);
 	if canCrowdFire then return end;
 	
 	if targetModel == nil then return end;
@@ -492,7 +507,6 @@ function TurretRuntime(weaponStorageItem)
 			end
 		end
 		
-		properties.ToolModelIndex = 1;
 		modToolService.PrimaryFireWeapon(firePacket);
 		canReactivate = tick();
 
@@ -537,7 +551,7 @@ function TurretRuntime(weaponStorageItem)
 		end
 		if breakRequest then break; end;
 		
-		if itemValues.A and itemValues.A <= 0 then break; end;
+		if properties.Ammo and properties.Ammo <= 0 then break; end;
 		if npcClass.HealthComp.IsDead then break; end;
 		
 		local hitList = modRaycastUtil.GetHittable(handlePoint.WorldPosition, 64, targetPart);
@@ -554,7 +568,6 @@ function Update()
 	if accessory.Parent and accessory.Parent.Name == "voodoodoll" then return end;
 
 	local weaponSiid = patStorage.Values.WeaponSiid;
-	if weaponSiid == nil then Debugger:StudioLog("No weapon siid"); return end;
 
 	local isWeaponChanged = lastWeaponId ~= weaponSiid;
 	if isWeaponChanged then
@@ -572,6 +585,8 @@ function Update()
 	lastWeaponId = weaponSiid;
 	
 	if weaponSiid == nil then
+		Debugger:StudioLog("No weapon siid");
+		
 		task.spawn(function()
 			patStorage:SyncValues();
 			remoteAutoTurret:InvokeClient(player, "refresh");
@@ -587,7 +602,7 @@ function Update()
 		local _, toolItemId = next(toolLib.Welds);
 		local prefabTool = prefabsItems:FindFirstChild(toolItemId);
 		if prefabTool == nil then
-			Debugger:Warn("Tool prefab for (",itemId,") does not exist for turret!");
+			Debugger:Warn(`Tool prefab for ({itemId}) does not exist for turret!`);
 			return;
 		end;
 
