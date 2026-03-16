@@ -65,18 +65,20 @@ if RunService:IsServer() then
 
 			if item then
 				dialog:AddChoice("infected_foundit", function(dialog)
-					local modUnlockPack = shared.require(game.ReplicatedStorage.Library.UsableItems.Generics.UnlockPack);
+					local modUnlockPack = shared.require(game.ReplicatedStorage.Library.UsableItemsRotd.Generics.UnlockPack);
 					modUnlockPack.UnlockPack(player, "ColorPacks", "Army");
 
 					storage:Remove(item.ID);
 					modMission:CompleteMission(player, MISSION_ID);
 				end);
+
 			elseif (os.time()-mission.StartTime) > 300 then
 				dialog:AddChoice("infected_helper", function(dialog)
 					if modEvents:GetEvent(player, "mission10_antibiotics") == nil then
 						modEvents:NewEvent(player, {Id="mission10_antibiotics"});
 					end
 				end);
+
 			end
 			
 		elseif mission.Type == 3 then -- Complete
