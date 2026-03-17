@@ -185,6 +185,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                         local r = remoteGpsRemote:InvokeServer(storageItem.ID, "unlockGold", gpsLib.Id);
                                         if r == 1 then
                                             statusLabel.Text = "Location unlocked";
+                                            binds.SetDestinationMarker(nil);
 
                                         elseif r == 2 then
                                             statusLabel.Text= "Already purchased";
