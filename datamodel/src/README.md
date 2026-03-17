@@ -2,6 +2,7 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes:
+- Fixed HealTool handling heal request when interactable is available. [#1017]
 - Fixed InterfaceClass now properly creating dropdown options. [#1064]
 - Fixed Toxic damage type handling missing damageBy value. [#1010]
 - Fixed skins and customizations not loading with new equipment system.
