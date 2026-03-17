@@ -130,7 +130,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     or binds.InteractPart == nil 
                     or not binds.InteractPart:IsDescendantOf(workspace) 
                     or localPlayer:DistanceFromCharacter(binds.InteractPart.Position) >= 16 
-                    or not wait(0.5);
+                    or not task.wait(0.5);
 
                 window:Close();
 			end)
@@ -337,11 +337,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
 											statusLabel.Text = "Purchased!";
 
-											wait(buyMulti and 0.2 or 0.5);
+											task.wait(buyMulti and 0.2 or 0.5);
 										else
 											warn("Purchase Item>> Error Code:"..serverReply);
 											statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply)):gsub("$Currency", product.Currency);
-											wait(1);
+											task.wait(1);
 										end
 	
 										if buyMulti == true then
@@ -398,7 +398,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			local cataButton = newCataButton:WaitForChild("Button");
 
 			local cataLabel = cataButton:WaitForChild("TextLabel");
-			cataLabel.Text = "<b>"..cataType.."</b>";
+			cataLabel.Text = `<b>{cataType}</b>`;
 			if not modConfigurations.CompactInterface then
 				cataLabel.Size = UDim2.new(1, -35, 1, -10);
 			end
@@ -472,6 +472,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		local storageItemID = binds.SelectedSlot.ID;
 		local selectedItem = modData.GetItemById(storageItemID);
+
+        local patStorageId = "portableautoturret";
+        if selectedItem.ItemId == patStorageId then
+            selectedItem = modData.FindIndexFromStorage(patStorageId, 1);
+			storageItemID = selectedItem.ID;
+            binds.StorageId = patStorageId;
+        end
+
 		if selectedItem == nil then
 			binds.SelectedSlot = nil;
 			binds.LoadPage("Money");
@@ -492,12 +500,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			local configurations = equipmentClass.Configurations;
 
 			--== MARK: Ammo
-			local usesAmmo = configurations.MagazineSize ~= nil or configurations.AmmoCapacity ~= nil;
-			local ammo = selectedItem:GetValues("A") or configurations.MagazineSize;
-			local maxAmmo = selectedItem:GetValues("MA") or configurations.AmmoCapacity;
+			local usesAmmo = configurations.AmmoLimit ~= nil or configurations.MaxAmmoLimit ~= nil;
+			local ammo = selectedItem:GetValues("A") or configurations.AmmoLimit;
+			local maxAmmo = selectedItem:GetValues("MA") or configurations.MaxAmmoLimit;
 
 			local ammoIsNotFull = usesAmmo 
-								and (ammo < configurations.MagazineSize or maxAmmo < configurations.AmmoCapacity);
+								and (ammo < configurations.AmmoLimit or maxAmmo < configurations.MaxAmmoLimit);
 			
 			if ammoIsNotFull then
 				local ammoCurrency = modShopLibrary.AmmunitionCurrency or "Money";
@@ -707,11 +715,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 										if selectedItem.Quantity <= 1 then
 											binds.ClearPage();
 										end
-										wait(0.5);
+										task.wait(0.5);
 									else
 										warn("Sell Item>> Error Code:"..tostring(serverReply));
 										statusLabel.Text = (modShopLibrary.PurchaseReplies[serverReply] or tostring(serverReply)):gsub("$Currency", "Money");
-										wait(1);
+										task.wait(1);
 									end
 
 									window:Update();
@@ -857,7 +865,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 									local serverReply = remoteShopService:InvokeServer("exchangefortoken", binds.InteractPart, storageItemID);
 									if serverReply == modShopLibrary.PurchaseReplies.Success then
 										statusLabel.Text = "Exchanged!";
-										wait(0.5);
+										task.wait(0.5);
 										
 									else
 										warn("Exchange Item>> Error Code:"..tostring(serverReply));
@@ -928,7 +936,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 										local serverReply = remoteShopService:InvokeServer("exchangefortoken", binds.InteractPart, storageItemID, exchangeQuantity);
 										if serverReply == modShopLibrary.PurchaseReplies.Success then
 											statusLabel.Text = `Exchanged <b>{exchangeQuantity} {itemLib.Name}</b> for <b>{tokenReward}</b> tokens!`;
-											wait(1);
+											task.wait(1);
 											
 										else
 											warn("Exchange Item>> Error Code:"..tostring(serverReply));
@@ -975,15 +983,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		newListing.Parent = pageFrame;
 	end
-
-
-
-
--- modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
--- 	if action ~= "syncevent" or (data and data.Id ~= "AmmoPouchData") then return end;
-	
--- 	modStorageInterface.RefreshSlotOfItemId("ammopouch");
--- end)
 
 end
 

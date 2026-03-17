@@ -140,14 +140,14 @@ function itemPackage.Init(itemLib)
 				end
 			end
 
-			if onlineBool then
+
+			patStorage.Values.IsOnline = not onlineBool;
+			patStorage:SyncValues();
+			if patStorage.Values.IsOnline then
 				modAudio.Play("TurretOnline", turretArm.PrimaryPart); 
 			else
 				modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
 			end
-
-			patStorage.Values.IsOnline = not onlineBool;
-			patStorage:SyncValues();
 			
 			rPacket.StorageValues = patStorage.Values;
 			rPacket.Success = true;
