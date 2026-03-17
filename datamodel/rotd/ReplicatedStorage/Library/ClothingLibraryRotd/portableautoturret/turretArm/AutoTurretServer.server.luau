@@ -435,6 +435,7 @@ function TurretRuntime(weaponStorageItem)
 			autoTurretClient:SetAttribute("Mode", 1);
 			task.wait();
 		end
+		weaponStorageItem:Sync({"A"; "MA"});
 
 		if properties.Ammo <= 0 and properties.MaxAmmo <= 0 then
 			modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
@@ -508,6 +509,7 @@ function TurretRuntime(weaponStorageItem)
 		end
 		
 		modToolService.PrimaryFireWeapon(firePacket);
+		weaponStorageItem:Sync({"A"; "MA"});
 		canReactivate = tick();
 
 		local baseFr = 60/math.max(capFireRate, configurations.Rpm);
