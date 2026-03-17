@@ -30,6 +30,7 @@ function Component:NewTendril(targetAtt: Attachment, isFake: boolean)
 	local newRope = Instance.new("RopeConstraint");
 	newRope.Name = "GrapplerHook".. targetAtt.Name;
 	newRope.Parent = npcClass.RootPart;
+	npcClass.Garbage:Tag(newRope);
 
 	newRope.Attachment0 = self.TendrilRoot;
 	newRope.Attachment1 = targetAtt;
@@ -43,16 +44,16 @@ function Component:NewTendril(targetAtt: Attachment, isFake: boolean)
 		newRope.Color = BrickColor.new(Color3.fromRGB(86, 36, 36));
 	end
 
-	local pullTimer = 10;
+	local pullTimer = 8;
 	local level = npcClass.Properties.Level or 1;
 	if level >= 10 then
-		pullTimer = 8;
-
-	elseif level >= 35 then
 		pullTimer = 6;
 
-	elseif level >= 50 then
+	elseif level >= 35 then
 		pullTimer = 4;
+
+	elseif level >= 50 then
+		pullTimer = 3;
 
 	end
 
@@ -74,6 +75,7 @@ function Component:__call(enemyCharacterClass: CharacterClass)
 	local targetCharacter = enemyCharacterClass.Character;
 	if self.TendrilRoot == nil then
 		self.TendrilRoot = Instance.new("Attachment");
+		npcClass.Garbage:Tag(self.TendrilRoot);
 
 		local linkPart: BasePart = Debugger:CFrameLinkPart(npcClass.Character:WaitForChild("UpperTorso"));
 		linkPart.Transparency = 1;
@@ -88,9 +90,12 @@ function Component:__call(enemyCharacterClass: CharacterClass)
 
 			npcClass.Properties.LastGrappleTick = tick();
 		end)
+		npcClass.Garbage:Tag(function() 
+			targetCharacter:SetAttribute("GrapplerHooked", nil);
+		end)
 
-		npcClass.Garbage:Tag(enemyCharacterClass.HealthComp.OnIsDeadChanged:Connect(function()
-			if not enemyCharacterClass.HealthComp.IsDead then return end;
+		npcClass.Garbage:Tag(enemyCharacterClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
+			if not isDead then return end;
 			game.Debris:AddItem(linkPart, 0);
 		end))
 

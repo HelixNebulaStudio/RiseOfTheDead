@@ -30,6 +30,12 @@ local npcPackage = {
         Level = 1;
         ExperiencePool = 45;
         DropRewardId = "tendrils";
+
+        JointsStrength = {
+            RootStump = true; -- true = only breaks on lethal damage
+            TorsoVoid = true;
+            ArmVoid = true;
+        };
     };
 
     Audio = {};
@@ -39,37 +45,19 @@ local npcPackage = {
         "TargetHandler";
         "ZombieBasicMeleeAttack";
         "TendrilsGrapple";
+        "DynamicLevel";
     };
     AddBehaviorTrees = {};
+
+    DynamicLevelScaling = {
+        WalkSpeed = 0;
+        MaxHealth = function(lvl) return (math.max(200*lvl, 200)); end;
+        AttackDamage = function(lvl) return math.min(20+(lvl*2), 100); end;
+    };
 };
 --==
 
-function npcPackage.LevelSet(npcClass: NpcClass)
-    local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
-    local healthComp: HealthComp = npcClass.HealthComp;
-
-    local level = math.max(properties.Level, 0);
-
-    local lvlMoveSpeed = 0;
-    configurations.BaseValues.WalkSpeed = lvlMoveSpeed;
-    
-    local lvlHealth = math.max(200*level, 200);
-    configurations.BaseValues.MaxHealth = lvlHealth;
-
-    local lvlAttackDamage = 20 + 2*level;
-    configurations.BaseValues.AttackDamage = lvlAttackDamage;
-
-    if healthComp.LastDamagedBy == nil then
-        healthComp:Reset();
-    end
-end
-
 function npcPackage.Spawning(npcClass: NpcClass)
-    local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
-
-    npcPackage.LevelSet(npcClass);
 end
 
 
