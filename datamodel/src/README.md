@@ -2,6 +2,7 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes:
+- Fixed duplicated explosion forces when applied to npc body destructibles. [#1036]
 - Fixed HealTool handling heal request when interactable is available. [#1017]
 - Fixed InterfaceClass now properly creating dropdown options. [#1064]
 - Fixed Toxic damage type handling missing damageBy value. [#1010]

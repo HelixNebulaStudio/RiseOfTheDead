@@ -162,6 +162,7 @@ function GameMode:Start(room)
 				properties.HardMode = room.IsHard;
 				properties.CrateId = bossLib.CrateId;
 				properties.TargetableDistance = 4096;
+				properties.HordeAggression = true;
 			end;
 			BindSetup = function(npcClass: NpcClass)
 				local bossCharacter = npcClass.Character;

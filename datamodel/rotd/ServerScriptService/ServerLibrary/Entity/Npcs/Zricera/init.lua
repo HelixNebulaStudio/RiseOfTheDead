@@ -20,7 +20,7 @@ local npcPackage = {
         AttackRange = 20;
         AttackSpeed = 4;
 
-        MaxHealth = 100;
+        MaxHealth = 100000;
         
         ThrowCooldown = 7;
     };
@@ -38,7 +38,9 @@ local npcPackage = {
         DropRewardId = "heavy";
     };
 
-    Audio = {};
+    Audio = {
+        Hurt = "ZriceriaHurt";
+    };
 
     AddComponents = {
         "DropReward";
@@ -96,8 +98,8 @@ function npcPackage.Spawning(npcClass: NpcClass)
 
     configurations.BaseValues.WalkSpeed = 16;
 
-    local lvlHealth = math.max(10000 + 500*level, 10000);
-    if isHard then
+    local lvlHealth = math.max(100000 + 500*level, 100000);
+    if isHard == true then
         lvlHealth = 1200300;
     end
 
@@ -115,7 +117,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
     configurations.BaseValues.MaxHealth = lvlHealth;
 
 
-    if not isHard then
+    if isHard ~= true then
         for _, obj in pairs(character:GetDescendants()) do
             if obj:IsA("BasePart") and obj.Material == Enum.Material.Foil then
                 obj.Material = Enum.Material.Pebble;
@@ -202,7 +204,9 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
         local destructible: DestructibleInstance = bodyDestructiblesComp:Create(limb.Name, limbModel);
         destructible.Properties.DestroyModel = false;
-        local newHealth = limb.Health * (isHard and limb.HardHealthMulti or 1);
+        destructible.HealthbarAutoHide = 1;
+        destructible:SetHealthbarEnabled(true);
+        local newHealth = limb.Health * (isHard == true and limb.HardHealthMulti or 1);
         
         local limbHealthComp: HealthComp = destructible.HealthComp;
         limbHealthComp:SetMaxHealth(newHealth);
@@ -213,13 +217,15 @@ function npcPackage.Spawned(npcClass: NpcClass)
             if newHealth == prevHealth then return end;
             if damageData.Damage == nil then return end;
 
+            damageData.HideBubble = true;
             healthComp:TakeDamage(damageData);
         end)
 
         destructible.OnDestroy:Connect(function()
-            local hurtSound = modAudio.Play(`ZombieHurt1`, npcClass.RootPart);
-            hurtSound.PlaybackSpeed = math.random(85, 95)/100;
+            local hurtSound = modAudio.Play(`ChargeRoar`, npcClass.RootPart);
+            hurtSound.PlaybackSpeed = math.random(55, 65)/100;
 
+            limbModel:SetAttribute("DestructibleParent", true);
             if limbModel.PrimaryPart then
                 limbModel.PrimaryPart.Color = Color3.fromRGB(50, 50, 50);
             end
@@ -234,6 +240,8 @@ function npcPackage.Spawned(npcClass: NpcClass)
         npcClass.Garbage:Tag(track:GetMarkerReachedSignal("Step"):Connect(function(paramString)
             if paramString == "1" then
                 local rightArmDestructible: DestructibleInstance = bodyDestructiblesComp:Get("RightArm");
+                if rightArmDestructible == nil then return end;
+
                 local rightPaw = rightArmDestructible.Model:FindFirstChild("RightHand");
                 if rightPaw and not rightArmDestructible.HealthComp.IsDead then
                     spawnLava(rightPaw.Position);
@@ -241,6 +249,8 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
             elseif paramString == "2" then
                 local leftArmDestructible: DestructibleInstance = bodyDestructiblesComp:Get("LeftArm");
+                if leftArmDestructible == nil then return end;
+
                 local leftPaw = leftArmDestructible.Model:FindFirstChild("LeftHand");
                 if leftPaw and not leftArmDestructible.HealthComp.IsDead then
                     spawnLava(leftPaw.Position);
@@ -248,6 +258,15 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
             end
         end));
+    end
+
+    npcClass.GetAnimation("Sleep");
+    local sleepTracks = npcClass.AnimationController:GetTrackGroup("Sleep");
+    for a=1, #sleepTracks do
+        local track: AnimationTrack = sleepTracks[a].Track;
+        npcClass.Garbage:Tag(track:GetMarkerReachedSignal("Loop"):Connect(function(paramString)
+            track.TimePosition -= 2;
+        end))
     end
 
     modAudio.Play("ZriceriaRoar", npcClass.RootPart).Volume = 1;

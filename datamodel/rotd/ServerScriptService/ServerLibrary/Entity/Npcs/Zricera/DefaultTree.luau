@@ -1,8 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local CollectionService = game:GetService("CollectionService");
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Configurations = require(ReplicatedStorage.Library.Configurations)
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modProjectile = shared.require(game.ReplicatedStorage.Library.Projectile);
@@ -69,7 +67,8 @@ function treePackage.CanLeap(npcClass: NpcClass)
     local rightLegDestructible: DestructibleInstance = bodyDestructiblesComp:Get("RightLeg");
     local leftLegDestructible: DestructibleInstance = bodyDestructiblesComp:Get("LeftLeg");
 
-    if leftLegDestructible.HealthComp.IsDead and rightLegDestructible.HealthComp.IsDead then
+    if (leftLegDestructible == nil or leftLegDestructible.HealthComp.IsDead) 
+    and (rightLegDestructible == nil or rightLegDestructible.HealthComp.IsDead) then
         npcClass.Move:SetMoveSpeed("set", "default", 20);
         return false;
     end
@@ -118,7 +117,7 @@ function treePackage.CanSpitFire(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local isHard = properties.HardMode;
 
-    if isHard == false then return false; end;
+    if isHard ~= true then return false; end;
     if properties.SpitFireCooldown and tick()-properties.SpitFireCooldown <= 10 then return false; end;
 
     return true;
@@ -157,7 +156,7 @@ function treePackage.SpitFire(npcClass: NpcClass)
     end);
 
     if #targetDataList <= 0 then return end;
-    wait(0.2);
+    task.wait(0.2);
     if npcClass.HealthComp.IsDead then return end;
 
     for a=1, 14 do
@@ -181,6 +180,10 @@ function treePackage.SpitFire(npcClass: NpcClass)
         for b=1, 4 do
             local projectileInstance: ProjectileInstance = modProjectile.fire("liquidflame", {
                 OriginCFrame = originCf;
+                CharacterClass = npcClass;
+                Properties = {
+                    FixedLifeTime = 3;
+                };
             });
             projectileInstance.Properties.Damage = math.max(configMaxDamage/45, 1);
             projectileInstance.ArcTracer.Acceleration = Vector3.new(0, -100, 0);
@@ -209,10 +212,10 @@ function treePackage.ShouldSleep(npcClass: NpcClass)
     local isHard = properties.HardMode;
 
     if properties.SleepHealPool > 0 then return true end;
-    if isHard == false then return false; end;
+    if isHard ~= true then return false; end;
 
-    if properties.SleepHealCooldown and tick()-properties.SleepHealCooldown <= 20 then return false; end;
-    if npcClass.HealthComp.CurHealth <= npcClass.HealthComp.MaxHealth*0.045 then return false; end;
+    if properties.SleepHealCooldown and tick()-properties.SleepHealCooldown <= 30 then return false; end;
+    if (npcClass.HealthComp.CurHealth :: number) <= npcClass.HealthComp.MaxHealth*0.045 then return false; end;
     if properties.SleepHealCount >= 5 then return false; end;
 
     return true;
@@ -220,20 +223,20 @@ end
 
 function treePackage.Sleep(npcClass: NpcClass)
     local properties = npcClass.Properties;
-    local maxHp = npcClass.HealthComp.MaxHealth;
-    local curHp = npcClass.HealthComp.CurHealth;
+    local healthComp: HealthComp = npcClass.HealthComp;
+    local maxHp = healthComp.MaxHealth;
+    local curHp = healthComp.CurHealth;
 
     if properties.SleepHealPool <= 0 then
         local healPool = ((maxHp/properties.SleepHealCount)-(maxHp*0.045));
 
+        properties.SleepHealCount = properties.SleepHealCount +1;
         properties.SleepHealPool = healPool;
-
         properties.SleepHealCooldown = tick();
         
-        npcClass.Move:SetMoveSpeed("set", "sleepstop", 0, 99, 5);
+        npcClass.Move:SetMoveSpeed("set", "sleepstop", 0, npcClass.Move.MoveSpeedPriority.Action, 5);
         npcClass.PlayAnimation("Sleep");
-
-        properties.SleepHealCount = properties.SleepHealCount +1;
+        properties.SleepHealTick = nil;
 
     else
         if properties.SleepHealTick == nil then
@@ -242,16 +245,18 @@ function treePackage.Sleep(npcClass: NpcClass)
         if tick()-properties.SleepHealTick >= 0.5 then
             properties.SleepHealTick = tick();
 
+            npcClass.Move:SetMoveSpeed("set", "sleepstop", 0, npcClass.Move.MoveSpeedPriority.Action, 1);
             local healAmt = (maxHp-curHp)*0.1;
             properties.SleepHealPool = properties.SleepHealPool -math.max(healAmt, 1);
 
-            npcClass.HealthComp:TakeDamage(DamageData.new{
+            healthComp:TakeDamage(DamageData.new{
                 Damage = -healAmt;
                 DamageType = "Heal";
                 TargetPart = npcClass.RootPart;
             });
 
-            if properties.SleepHealPool <= 0 then
+            if properties.SleepHealPool <= 0 or healthComp.CurHealth >= (maxHp * 0.9) then
+                properties.SleepHealPool = 0;
                 npcClass.StopAnimation("Sleep");
             end
         end
