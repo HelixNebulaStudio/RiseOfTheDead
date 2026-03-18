@@ -3,39 +3,43 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
 
-local MISSION_ID = 69;
+local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 
+local MISSION_ID = 69;
 if RunService:IsServer() then
-	local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, ...)
-		local damageData: DamageData = ...;
-
+	shared.modEventService:OnInvoked("Npcs_BindDeath", function(event: EventPacket, ...)
+		local npcClass: NpcClass, reasonData: anydict? = ...;
+		if npcClass == nil or npcClass.HumanoidType ~= "Zombie" then return end;
+		if reasonData == nil then return end;
+	
+		local damageData: DamageData = reasonData;
 		local storageItem: StorageItem? = damageData.StorageItem;
 		if storageItem == nil then return end;
 
-		local damageBy: CharacterClass? = damageData.DamageBy;
-		if damageBy == nil or damageBy.ClassName ~= "PlayerClass" then return end;
+		local playerClass: PlayerClass? = damageData.DamageBy :: PlayerClass;
+		if playerClass == nil or playerClass.ClassName ~= "PlayerClass" then return end;
 
-		local player: Player = (damageBy :: PlayerClass):GetInstance();
-		if modMission:IsComplete(player, MISSION_ID) then return end;
+		local player: Player = playerClass:GetInstance();
+		local mission = modMission:GetMission(player, MISSION_ID);
+		if mission == nil or mission.Type ~= 1 then return end;
+		if mission.SaveData.WeaponType == nil then return end;
 
 		local damageTo: CharacterClass? = damageData.DamageTo;
-		if damageTo == nil or damageTo.HumanoidType ~= "Zombie" or damageTo.HealthComp.IsDead then return end;
+		if damageTo == nil or damageTo.HumanoidType ~= "Zombie" then return end;
 		
-		local toolWorkbenchLib = storageItem and modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId] or nil;
+		local equipmentClass: EquipmentClass? = playerClass.WieldComp.EquipmentClass;
+		if equipmentClass == nil then return end;
+		if equipmentClass.StorageItem ~= storageItem then return end;
+		if equipmentClass.Package.WeaponClass ~= mission.SaveData.WeaponType then return end;
 
-		local mission = modMission:GetMission(player, MISSION_ID);
-		if mission and mission.Type == 1 and toolWorkbenchLib 
-		and (mission.SaveData.WeaponItemId or table.find(toolWorkbenchLib.Type, mission.SaveData.WeaponType) ~= nil) then
-			modMission:Progress(player, MISSION_ID, function(mission)
-				mission.SaveData.Kills = mission.SaveData.Kills -1;
-				if mission.SaveData.Kills <= 0 then
-					modMission:CompleteMission(player, MISSION_ID);
-				end
-			end)
-		end
+		modMission:Progress(player, MISSION_ID, function(mission)
+			mission.SaveData.Kills = mission.SaveData.Kills -1;
+			if mission.SaveData.Kills <= 0 then
+				modMission:CompleteMission(player, MISSION_ID);
+			end
+		end)
 	end)
 end
 

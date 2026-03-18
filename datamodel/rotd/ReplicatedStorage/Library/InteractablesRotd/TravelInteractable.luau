@@ -55,7 +55,7 @@ function interactablePackage.init(super) -- Server/Client
                             OnPrimaryClick=function(dialogWindow)
                                 interface:ToggleGameBlinds(false, 3);
                                 
-                                local characterVars = info.CharacterVars;
+                                local characterVars = shared.modPlayers.get(localPlayer).CharacterVars;
                                 characterVars.CharacterProperties.CanMove = false;
                                 characterVars.CharacterProperties.CanInteract = false;
 

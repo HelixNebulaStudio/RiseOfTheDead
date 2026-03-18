@@ -1,7 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
+--==
 local RunService = game:GetService("RunService");
+
+local localPlayer = game.Players.LocalPlayer;
 
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
@@ -42,75 +43,11 @@ if RunService:IsServer() then
 			end
 
 		elseif triggerId == "QA2_Radio" then
-
 			if mission.ProgressionPoint == 3 then
-				interactable.CanInteract = false;
 				interactable.Label = "*Broadcasting..*";
 				interactable:Sync();
-				task.wait(0.5);
-
-				modAudio.Play("RadioChatter", interactable.Part);
-
-				local radioMsg = "[Radio] *Static* Yep, ten-four. We copy loud and clear. Please identify yourself. *Static*";
-				interactable.Label = radioMsg;
-				shared.Notify(player, radioMsg, "Message");
-				interactable:Sync();
-				task.wait(8.5);
-
-				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint == 3 then mission.ProgressionPoint = 4; end;
-				end)
-
-				interactable.CanInteract = true;
-				interactable.Label = `*Static* I am {player.Name}, I am requesting for help. I was sent by Wilson from squad B. He is still alive.`;
-				interactable:Sync();
-
-			elseif mission.ProgressionPoint == 4 then
-				interactable.CanInteract = false;
-				interactable.Label = "*Broadcasting..*";
-				interactable:Sync();
-				task.wait(0.5);
-
-				modAudio.Play("RadioChatter", interactable.Part);
-				local radioMsg = "[Radio] Copy. Commander, we have a survivor on the radio. He claims Wilson from squad B is alive and sent him.";
-				interactable.Label = radioMsg;
-				shared.Notify(player, radioMsg, "Message");
-				interactable:Sync();
-				task.wait(12.5);
-
-				modAudio.Play("RadioChatter2", interactable.Part);
-				radioMsg = "[Radio] Commander: Wilson is still alive?! Hello? This is commander Leo. Please state your location.";
-				interactable.Label = radioMsg;
-				shared.Notify(player, radioMsg, "Message");
-				interactable:Sync();
-				task.wait(12.5);
-				if player.Parent == nil then return end;
-
-				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint == 4 then mission.ProgressionPoint = 5; end;
-				end)
-				interactable.CanInteract = true;
-				interactable.Label = "*Static* We are located in the Sunday's Convenience Store near the Wrighton Dale Bank..";
-				interactable:Sync();
-
-			elseif mission.ProgressionPoint == 5 then
-				interactable.CanInteract = false;
-				interactable.Label = "*Broadcasting..*";
-				interactable:Sync();
-				task.wait(0.5);
-
-				modAudio.Play("RadioChatter", interactable.Part);
-				local radioMsg = "[Radio] Copy. We will be dispatching an inspection team there.";
-				interactable.Label = radioMsg;
-				shared.Notify(player, radioMsg, "Message");
-				interactable:Sync();
-				task.wait(1);
-
-				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint == 5 then mission.ProgressionPoint = 6; end;
-				end)
-				modAudio.Play("RadioStatic", interactable.Part);
 			end
+			
 		end
 
 	end)
@@ -134,15 +71,16 @@ if RunService:IsServer() then
 	local interactConfig = modInteractables.createInteractable("ButtonRotd");
 	interactConfig:SetAttribute("_Id", "QA1_Radio");
 	interactConfig:SetAttribute("_Label", "Interact With Radio");
-	interactConfig:SetAttribute("_InteractDuration", 5);
+	interactConfig:SetAttribute("_InteractDuration", 1);
 	interactConfig.Parent = templateRadioInteractable1;
 
 	templateRadioInteractable2 = script.Parent:WaitForChild("militaryRadioInteractable2");
-	local interactConfig2 = modInteractables.createInteractable("ButtonRotd");
+	local interactConfig2 = modInteractables.createInteractable("Dialogue");
 	interactConfig2:SetAttribute("_Id", "QA2_Radio");
-	interactConfig2:SetAttribute("_Label", `Broadcast "Hello?! Does anyone copy on this frequency?"`);
-	interactConfig2:SetAttribute("_InteractDuration", 5);
-	interactConfig2.Parent = templateRadioInteractable1;
+	interactConfig2:SetAttribute("NpcName", "M51Radio");
+	interactConfig2:SetAttribute("_Label", `Broadcast`);
+	interactConfig2:SetAttribute("_InteractDuration", 1);
+	interactConfig2.Parent = templateRadioInteractable2;
 
 else
 	modData = shared.require(game.Players.LocalPlayer:WaitForChild("DataModule") :: ModuleScript);
@@ -175,7 +113,6 @@ return function(CutsceneSequence)
 						
 					end
 				elseif mission.Type == 3 then -- OnComplete
-
 					mission.OnChanged:Disconnect(OnChanged);
 				end
 			end
@@ -212,24 +149,10 @@ return function(CutsceneSequence)
 							modReplicationManager.ReplicateOut(player, newInteractable);
 						end
 						
-					elseif mission.ProgressionPoint == 4 then
-						if newInteractable == nil then
-							newInteractable = templateRadioInteractable2:Clone();
-							newInteractable.Parent = workspace.Interactables;
-							modReplicationManager.ReplicateOut(player, newInteractable);
-						end
-						
-					elseif mission.ProgressionPoint == 5 then
-						if newInteractable == nil then
-							newInteractable = templateRadioInteractable2:Clone();
-							newInteractable.Parent = workspace.Interactables;
-							modReplicationManager.ReplicateOut(player, newInteractable);
-						end
-						
 					end
 				elseif mission.Type == 3 then -- OnComplete
-
 					mission.OnChanged:Disconnect(OnChanged);
+
 				end
 			end
 			mission.OnChanged:Connect(OnChanged);

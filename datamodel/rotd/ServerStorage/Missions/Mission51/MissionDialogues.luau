@@ -2,9 +2,12 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+
 --=
 local Dialogues = {
 	Wilson={};
+	["Military Radio"]={};
 };
 
 local MISSION_ID = 51;
@@ -63,6 +66,40 @@ Dialogues.Wilson.DialogueStrings = {
 	
 };
 
+
+-- MARK: Military Radio Dialogues
+Dialogues["Military Radio"].DialogueStrings = {
+	["qa1_radio1s"] = {
+		Say = `Hello?! Does anyone copy on this frequency?`;
+		Reply = `*Static* ... *Static*`;
+	};
+	["qa1_radio1r"] = {
+		Say = `*Listens*`;
+		Reply = `*Static*\nYep, ten-four. We copy loud and clear. Please identify yourself. *Static*`;
+	};
+	["qa1_radio2s"] = {
+		Say = `I am $PlayerName, I am requesting for help. I was sent by Wilson from squad B. He is still alive.`;
+		Reply = `*Static* ... *Static*`;
+	};
+	["qa1_radio2r"] = {
+		Say = `*Listens*`;
+		Reply = `*Static*\nCopy, please hold.\n\n<i>Commander, we have a survivor on the radio. He claims Wilson from squad B is alive and sent him.</i>`;
+	};
+	["qa1_radio3s"] = {
+		Say = "*Listens*";
+		Reply = `*Static* ... *Static*`;
+	};
+	["qa1_radio3r"] = {
+		Say = "*Listens*";
+		Reply = "*Static*\nCommander: Wilson is still alive?! Hello? This is commander Leo. Please state your location.";
+	};
+	["qa1_radio4"] = {
+		Say = "We are located in the Sunday's Convenience Store near the Wrighton Dale Bank..";
+		Reply = "*Static*\nCopy. We will be dispatching an inspection team there... *static*";
+	};
+};
+
+
 if RunService:IsServer() then
 	-- MARK: Wilson Handler
 	Dialogues.Wilson.DialogueHandler = function(player, dialog, data, mission)
@@ -74,13 +111,9 @@ if RunService:IsServer() then
 			if stage == 1 then
 				dialog:AddChoice("qa1_notyet");
 				
-			elseif stage == 6 then
-				dialog:AddChoice("qa1_done", function(dialog)
-					dialog:AddChoice("qa1_done2", function(dialog)
-						dialog:AddChoice("qa1_done3", function(dialog)
-							modMission:CompleteMission(player, MISSION_ID);
-						end)
-					end)
+			elseif stage == 4 then
+				dialog:AddChoice({"qa1_done"; "qa1_done2"; "qa1_done3"}, function(dialog)
+					modMission:CompleteMission(player, MISSION_ID);
 				end)
 			end
 			
@@ -98,6 +131,39 @@ if RunService:IsServer() then
 				end)
 			end)
 			
+		end
+	end
+
+	-- MARK: Radio Interactable Handler
+	Dialogues["Military Radio"].DialogueHandler = function(player, dialog, data, mission)
+		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+
+		if mission.Type == 1 then -- Active
+			dialog:SetInitiate(`*static* *static*`);
+
+			if mission.ProgressionPoint == 3 then
+				dialog:AddChoice({"qa1_radio1s"; "qa1_radio1r";}, function(dialog)
+					modAudio.Play("RadioChatter", dialog.Character);
+
+					dialog:AddChoice({"qa1_radio2s"; "qa1_radio2r";}, function(dialog)
+						modAudio.Play("RadioChatter2", dialog.Character);
+
+						dialog:AddChoice({"qa1_radio3s"; "qa1_radio3r"}, function(dialog)
+							modAudio.Play("RadioChatter3", dialog.Character);
+
+							dialog:AddChoice("qa1_radio4", function(dialog)
+								modAudio.Play("RadioStatic", dialog.Character);
+								modMission:Progress(player, MISSION_ID, function(mission)
+									if mission.ProgressionPoint == 3 then
+										mission.ProgressionPoint = 4;
+									end;
+								end)
+
+							end)
+						end)
+					end)
+				end)
+			end
 		end
 	end
 
