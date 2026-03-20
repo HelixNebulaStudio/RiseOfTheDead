@@ -6,7 +6,7 @@ local RunService = game:GetService("RunService");
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
-local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
+local modMapLibrary = shared.require(game.ReplicatedStorage.Library.MapLibrary);
 
 local MISSION_ID = 48;
 --==
@@ -42,21 +42,6 @@ if RunService:IsServer() then
 				end)
 			end
 		end)
-
-		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
-			local player: Player? = eventPacket.Player;
-			if player == nil then return end;
-
-			local playerLocation = player:GetAttribute("Location");
-			local setSpawn = modGpsLibrary.SpawnLocationLibrary[playerLocation];
-			if setSpawn == nil then return end;
-			
-			modMission:Progress(player, MISSION_ID, function(mission)
-				if mission.ProgressionPoint >= 2 then 
-					modMission:CompleteMission(player, MISSION_ID);
-				end
-			end)
-		end)
 	end
 
 else
@@ -90,13 +75,16 @@ return function(CutsceneSequence)
 		
 		local newBlockage = barricadeFolder:FindFirstChild(blockageName):Clone();
 
-		local destructibleConfig = newBlockage:WaitForChild("Destructible");
+		local destructibleConfig = modDestructibles.createDestructible();
+		destructibleConfig:SetAttribute("Enabled", false);
+		destructibleConfig.Parent = newBlockage;
+		newBlockage.Parent = workspace.Environment;
 		local destructibleInstance: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
 		destructibleInstance.NetworkOwners = {player};
 		destructibleInstance.Properties.MissionIdTag = MISSION_ID;
 
-		newBlockage.Parent = workspace.Environment;
 		modReplicationManager.ReplicateOut(player, newBlockage);
+		destructibleInstance:SetEnabled(true);
 		
 		local strangerNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Stranger", function(npcClass: NpcClass)
 			return npcClass.Properties.MissionId == MISSION_ID;
@@ -127,7 +115,18 @@ return function(CutsceneSequence)
 						strangerNpcClass.Properties.Immortal = 0;
 						modReplicationManager.ReplicateDefault(strangerNpcClass.Character, workspace.Entity);
 
-						strangerNpcClass:GetComponent("FollowPlayer")(nil, function() 
+						strangerNpcClass:GetComponent("FollowPlayer")(nil, function()
+							local playerLocation = player:GetAttribute("Location");
+
+        					local layerData = modMapLibrary:GetLayerDataByName(playerLocation);
+							if layerData and layerData.IsSafehouse then
+								modMission:Progress(player, MISSION_ID, function(mission)
+									if mission.ProgressionPoint < 2 then return end;
+									modMission:CompleteMission(player, MISSION_ID);
+								end)
+								return false;
+							end
+
 							return mission.ProgressionPoint == 2;
 						end);
 						strangerNpcClass.StopAnimation("Panic");
@@ -135,7 +134,7 @@ return function(CutsceneSequence)
 				end
 				
 			elseif mission.Type == 3 then -- OnComplete
-				delay(2, function()
+				task.delay(2, function()
 					if strangerNpcClass and strangerNpcClass.Character then
 						strangerNpcClass.Character:Destroy();
 					end

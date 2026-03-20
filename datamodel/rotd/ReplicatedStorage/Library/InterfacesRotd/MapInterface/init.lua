@@ -135,10 +135,40 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		return mapLayerLib and centerVec*scaleRatio or Vector2.new();
 	end
 
+	local MapObj = {};
+	MapObj.__index = MapObj;
+
+	function MapObj.new(guiObj, layerData)
+		local self = {
+			LayerData = layerData;
+			GuiObject = guiObj;
+		};
+
+		setmetatable(self, MapObj);
+		return self;
+	end
+
+	function MapObj:Update()
+		local baseCenterOffset = getCenterVec();
+		local layerData = self.LayerData;
+		local cframe, size = layerData.CFrame, layerData.Size;
+
+		local guiObj = self.GuiObject;
+		guiObj.Size = UDim2.new(0, size.X*scaleRatio, 0, size.Z*scaleRatio);
+		guiObj.Position = UDim2.new(
+			0.5, 
+			((cframe.X*scaleRatio) - baseCenterOffset.X)*mapRatio.X, 
+			0.5, 
+			((cframe.Z*scaleRatio) - baseCenterOffset.Y)*mapRatio.Y
+		);
+	end
+
+
 	local function renderLayer(layerName, layerData)
+		local mapObjects = {};
 		layerFrames[layerName] = {
 			Alpha = {};
-			Update = {};
+			MapObjects = mapObjects;
 		};
 		local frameData = layerFrames[layerName];
 		
@@ -146,11 +176,22 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		frame.Name = layerName;
 		frame.BackgroundTransparency = 1;
 		frame.BorderSizePixel = 0;
-		frame.Position = UDim2.new(0.5, 0, 0.5, 0);
 		frame.AnchorPoint = Vector2.new(0.5, 0.5);
-		frame.Size = UDim2.new(1, 0, 1, 0);
+		frame.ZIndex = 3;
+		
+		local uiStroke = Instance.new("UIStroke");
+		uiStroke.Color = Color3.fromRGB(255, 255, 255);
+		uiStroke.Enabled = RunService:IsStudio();
+		uiStroke.Thickness = 1;
+		uiStroke.ZIndex = 3;
+		uiStroke.Parent = frame;
+			
 		frame.Parent = mapImage;
 		frameData.Frame = frame;
+
+		local boundMapObj = MapObj.new(frame, layerData);
+		boundMapObj:Update();
+		table.insert(mapObjects, boundMapObj);
 		
 		local function frameObject(objInfo)
 			local objPart = objInfo.Object;
@@ -163,6 +204,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			new:SetAttribute("ObjectName", objPart and objPart.Name or "nil");
 				
+			iconLabel.Size = UDim2.new(0, 25, 0, 25);
+			new.ZIndex = 3;
 			new.Parent = frame;
 			obj.Rotation = -(tonumber(orientation) or 0);
 
@@ -259,7 +302,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 			
 			local lastSizeUpdate;
-			local function updateObjInfo()
+			local mapObj = MapObj.new(new, layerData);
+			function mapObj:Update()
 				local baseCenterOffset = getCenterVec();
 				
 				if lastSizeUpdate == nil or tick()-lastSizeUpdate > 1 then
@@ -276,11 +320,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					0.5, 
 					((cframe.Z*scaleRatio) - baseCenterOffset.Y)*mapRatio.Y
 				);
-
-				iconLabel.Size = UDim2.new(0, 25, 0, 25);
 			end
-			updateObjInfo();
-			table.insert(frameData.Update, updateObjInfo);
+			mapObj:Update();
 			
 			local layerAlphaPacket = {
 				Active = nil;
@@ -346,6 +387,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				frameObject(objInfo);
 				
 			end
+		end
+
+		if layerData.IsSafehouse then
+			local shLogo = Instance.new("ImageLabel");
+			shLogo.AnchorPoint = Vector2.new(0.5, 0.5);
+			shLogo.BackgroundTransparency = 1;
+			shLogo.Size = UDim2.new(0.3, 0, 0.3, 0);
+			shLogo.Position = UDim2.new(0.5, 0, 0.5, 0);
+			shLogo.Image = math.random(1,2) == 1 and `rbxassetid://2105306527` or `rbxassetid://2105306294`;
+			shLogo.ZIndex = 3;
+			shLogo.Parent = frame;
+			uiStroke.Color = Color3.fromRGB(123, 173, 121);
+			uiStroke.Thickness = 1.5;
+			uiStroke.Enabled = true;
 		end
 	end
 
@@ -561,6 +616,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							
 						end
 					end
+
+					for _, mapObj in ipairs(frameData.MapObjects) do
+						mapObj:Update();
+					end
 				end
 				
 				binds.PopupLocationText(layerName);
@@ -585,8 +644,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		
 		if not mapMenu.Visible then return end;
 		for lN, _ in pairs(layerFrames) do
-			for a=1, #layerFrames[lN].Update do
-				layerFrames[lN].Update[a]();
+			local frameData = layerFrames[lN];
+			for _, mapObj in ipairs(frameData.MapObjects) do
+				mapObj:Update();
 			end
 		end
 		
@@ -740,17 +800,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				
 				if scaleRatio ~= preScale then
 					
-					--local mousePosition = UserInputService:GetMouseLocation();
+					-- local mousePosition = UserInputService:GetMouseLocation();
 					
-					--local localMousePos = mousePosition - (mapImage.AbsolutePosition + mapImage.AbsoluteSize/2);
-					--local rawMousePos = localMousePos/mapImage.AbsoluteSize;
+					-- local localMousePos = mousePosition - (mapImage.AbsolutePosition + mapImage.AbsoluteSize/2);
+					-- local rawMousePos = localMousePos/mapImage.AbsoluteSize;
 					
-					--mapImage.Size = UDim2.new(0, mapScale*scaleRatio, 0, mapScale*scaleRatio);
+					-- mapImage.Size = UDim2.new(0, mapScale*scaleRatio, 0, mapScale*scaleRatio);
 					
-					--local new = rawMousePos*mapImage.AbsoluteSize;
-					--local offset = localMousePos-new;
+					-- local new = rawMousePos*mapImage.AbsoluteSize;
+					-- local offset = localMousePos-new;
 					
-					--Interface.MapFrameOffset = newOffsetVec + offset;
+					-- binds.MapFrameOffset = binds.MapFrameOffset + offset;
 					
 					binds.MapFrameOffset = getCenterVec();
                     window:Update();

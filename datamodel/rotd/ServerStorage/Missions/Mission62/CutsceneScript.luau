@@ -39,7 +39,7 @@ return function(CutsceneSequence)
 				
 			local revasNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Revas");
 			if revasNpcClass == nil then
-				modNpcs.spawn2{
+				revasNpcClass = modNpcs.spawn2{
 					Name = "Revas";
 					Player = player;
 					ReplicateOut = true;
