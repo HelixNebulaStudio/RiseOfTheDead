@@ -74,17 +74,16 @@ if RunService:IsServer() then
 			end)
 			
 		elseif mission.Type == 1 then -- Active;
-			if modBranchConfigurations.IsWorld("TheWarehouse") then
+			if modBranchConfigurations.IsWorld("TheWarehouse") or RunService:IsStudio() then
 				if mission.ProgressionPoint == 1 then
 					dialog:AddChoice("vt3_vttravel", function()
 						local npcChar = dialog.Character;
 
 						local raidInteractConfig = npcChar:FindFirstChild("raidInteractable");
 						if raidInteractConfig == nil then
-							raidInteractConfig = modInteractables.createInteractable("GameModeEnter");
+							raidInteractConfig = modInteractables.createInteractable("Travel");
 							raidInteractConfig.Name = "raidInteractable";
-							raidInteractConfig:SetAttribute("Mode", "Raid");
-							raidInteractConfig:SetAttribute("Stage", "Tombs");
+							raidInteractConfig:SetAttribute("WorldName", "VindictiveTreasure");
 							raidInteractConfig.Parent = npcChar;
 						end
 						dialog:InteractRequest(raidInteractConfig);

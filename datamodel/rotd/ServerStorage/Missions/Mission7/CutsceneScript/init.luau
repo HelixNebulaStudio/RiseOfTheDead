@@ -227,7 +227,7 @@ return function(CutsceneSequence)
 					robertNpcClass.Move:SetMoveSpeed("set", "default", 20);
 
 					robertNpcClass.Chat(player, "Follow me");
-					wait(1);
+					task.wait(1);
 					
 					robertNpcClass:ToggleInteractable(false);
 
@@ -237,7 +237,7 @@ return function(CutsceneSequence)
 					robertNpcClass.StopAnimation("Sit", 0.75);
 					local face = robertNpcClass.Character:FindFirstChild("face", true);
 					if face then face.Texture = "rbxassetid://277939506" end;
-					wait(0.5)
+					task.wait(0.5)
 					
 					robertNpcClass.Move:MoveTo(Vector3.new(58.482, 57.7, -28.756));
 					robertNpcClass.Move.OnMoveToEnded:Wait(10);
@@ -313,18 +313,18 @@ return function(CutsceneSequence)
 						local enemyTargetData = robertNpcClass:GetComponent("TargetHandler"):MatchFirstWieldTargettable();
 						if enemyTargetData then
 							local enemyHealthComp: HealthComp = enemyTargetData.HealthComp;
-							local enemyNpcClass: NpcClass = enemyHealthComp.CompOwner;
+							local enemyNpcClass: NpcClass = enemyHealthComp.CompOwner :: NpcClass;
 
 							if enemyNpcClass
 							and enemyHealthComp.IsDead ~= true
 							and enemyHealthComp:CanTakeDamageFrom(robertNpcClass) then
 								local equipmentClass: EquipmentClass? = robertNpcClass.WieldComp.EquipmentClass;
 								if equipmentClass then
-									if equipmentClass.Properties.Ammo <= 0 then
+									if (equipmentClass.Properties.Ammo :: number) <= 0 then
 										robertNpcClass.WieldComp:InvokeToolAction("ReloadRequest");
 
 									else
-										local shootDirection = (enemyNpcClass.RootPart.Position - robertNpcClass.RootPart.Position).Unit;
+										local shootDirection = (enemyNpcClass:GetCFrame().Position - robertNpcClass:GetCFrame().Position).Unit;
 										
 										robertNpcClass.Move:Face(enemyNpcClass.RootPart);
 										robertNpcClass.WieldComp:InvokeToolAction(
@@ -385,10 +385,11 @@ return function(CutsceneSequence)
 					if face then face.Texture = "rbxassetid://2222767231" end;
 
 					robertNpcClass.Chat(player, "Poor guy...");
-					wait(4);
+					task.wait(4);
 					if modMission:Progress(player, 7).ProgressionPoint ~= 5 then return end;
 					robertNpcClass.StopAnimation("CrouchLook", 1);
-					wait(1);
+
+					task.wait(1);
 					if modMission:Progress(player, 7).ProgressionPoint ~= 5 then return end;
 					robertNpcClass.Move:Face(Vector3.new(303.242, 73.489, 10.267));
 					robertNpcClass.Chat(player, "Press that green button to open up the gates.");
@@ -412,7 +413,7 @@ return function(CutsceneSequence)
 					local face = robertNpcClass.Character:FindFirstChild("face", true);
 					if face then face.Texture = "rbxassetid://405704879" end;
 					robertNpcClass.Chat(player, "Follow me and don't stop running!");
-					delay(6, function()
+					task.delay(6, function()
 						robertNpcClass.Chat(player, "RUNNN");
 					end);
 
@@ -426,7 +427,7 @@ return function(CutsceneSequence)
 				
 				
 			elseif mission.Type == 3 then -- OnComplete
-				if not firstRun then
+				if not modMission:IsComplete(player, 18) then
 					robertNpcClass:UseInteractable("sundaysEntrance");
 					robertNpcClass.Chat(player, "");
 					local face = robertNpcClass.Character:FindFirstChild("face", true);
@@ -455,7 +456,7 @@ return function(CutsceneSequence)
 		local gateModel = workspace.Environment:WaitForChild("BloxmartGate", 60);
 		for a=1, 20 do
 			if gateModel.PrimaryPart == nil then
-				wait(1);
+				task.wait(1);
 			else
 				break;
 			end
@@ -531,18 +532,18 @@ return function(CutsceneSequence)
 			local cframeValue = Instance.new("CFrameValue", script);
 			cframeValue.Value = gateModel:GetPrimaryPartCFrame();
 
-			local connection = cframeValue:GetPropertyChangedSignal("Value"):Connect(function()
+			local cfvCon = cframeValue:GetPropertyChangedSignal("Value"):Connect(function()
 				gateModel:PivotTo(cframeValue.Value);
 			end)
 			TweenService:Create(cframeValue, TweenInfo.new(6), {Value=CFrame.new(286.61203, 69.4899445, 103.898018, 1, 0, 0, 0, 1, 0, 0, 0, 1)}):Play();
 			if gateModel:FindFirstChild("Interactable") then
 				gateModel.Interactable:Destroy();
 			end
-			wait(6);
-			connection:Disconnect();
+			task.wait(6);
+			cfvCon:Disconnect();
 		else
 			Debugger:Warn("Missing Bloxmart Gate.");
-			wait(2);
+			task.wait(2);
 		end
 		modCharacter.CharacterProperties.CanMove = true;
 		modCharacter.CharacterProperties.CanInteract = true;

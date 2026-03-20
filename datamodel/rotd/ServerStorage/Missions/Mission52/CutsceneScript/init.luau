@@ -71,6 +71,9 @@ return function(CutsceneSequence)
 	local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");
 	
 	if modBranchConfigurations.IsWorld("TheResidentials") then
+		local assetTheInvestigation = script:WaitForChild("TheInvestigationAssets");
+		local missionWorldTravel = assetTheInvestigation:WaitForChild("TheInvestigationTravel");
+
 		-- MARK: TheResidentials
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -106,6 +109,13 @@ return function(CutsceneSequence)
 						robertNpcClass:GetComponent("FollowPlayer")(nil, function() 
 							return mission.Type == 1 and mission.ProgressionPoint == 3;
 						end)
+
+						local newTravelInteract = missionWorldTravel:Clone();
+						local travelInteractConfig = modInteractables.createInteractable("Travel");
+						travelInteractConfig:SetAttribute("WorldName", "TheInvestigation");
+						travelInteractConfig:SetAttribute("_Label", "Enter the basement with Robert");
+						travelInteractConfig.Parent = newTravelInteract;
+						modReplicationManager.ReplicateIn(player, newTravelInteract, workspace.Interactables);
 						
 					elseif mission.ProgressionPoint >= 15 then
 						robertNpcClass:TeleportHide()
@@ -702,6 +712,7 @@ return function(CutsceneSequence)
 						local strapInteractConfig = modInteractables.createInteractable("ButtonRotd");
 						strapInteractConfig:SetAttribute("_Id", "mission52_CutStrap");
 						strapInteractConfig:SetAttribute("_Label", "Cut Strap");
+						strapInteractConfig.Parent = newStrap;
 
 						newStrap.Parent = workspace.Interactables;
 						
