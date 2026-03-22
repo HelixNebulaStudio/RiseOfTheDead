@@ -17,28 +17,33 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.ServerEquip(handler)
-	handler.Fuel = handler.StorageItem:GetValues("Fuel") or 100;
+function toolPackage.ServerEquip(toolHandler: ToolHandlerInstance)
+	local properties = toolHandler.EquipmentClass.Properties;
+	properties.Fuel = toolHandler.StorageItem:GetValues("Fuel") or 100;
 end
 
-function toolPackage.ServerUnequip(handler)
-	handler.StorageItem:SetValues("Fuel", (handler.Fuel or 100));
+function toolPackage.ServerUnequip(toolHandler: ToolHandlerInstance)
+	local properties = toolHandler.EquipmentClass.Properties;
+	toolHandler.StorageItem:SetValues("Fuel", (properties.Fuel or 100));
 end
 
-function toolPackage.ActionEvent(handler, packet)
+function toolPackage.ActionEvent(toolHandler: ToolHandlerInstance, packet)
 	local modProjectile = shared.require(game.ReplicatedStorage.Library.Projectile);
 	local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
 
-	handler.IsActive = packet.IsActive == true;
+	local properties = toolHandler.EquipmentClass.Properties;
+	local storageItem: StorageItem = toolHandler.StorageItem;
 
-	local prefab = handler.Prefabs[1];
+	properties.IsActive = packet.IsActive == true;
+
+	local prefab = toolHandler.Prefabs[1];
 	local emitter = prefab:FindFirstChild("gasolineParticle", true);
 
-	handler.Fuel = handler.StorageItem:GetValues("Fuel") or 100;
+	properties.Fuel = storageItem:GetValues("Fuel") or 100;
 
 	if emitter then
-		if handler.IsActive then
-			if handler.Fuel > 0 then
+		if properties.IsActive then
+			if properties.Fuel > 0 then
 				emitter.Enabled = true;
 
 				local attachPoint = emitter.Parent;
@@ -57,11 +62,12 @@ function toolPackage.ActionEvent(handler, packet)
 						IgnoreEntities = true;
 					});
 
-					handler.Fuel = handler.Fuel - 5;
-					handler.StorageItem:SetValues("Fuel", handler.Fuel):Sync("Fuel");
+					properties.Fuel = properties.Fuel - 5;
+					storageItem:SetValues("Fuel", properties.Fuel);
+					storageItem:Sync({"Fuel"});
 
 					task.wait(0.5);
-				until not handler.IsActive or handler.Fuel <= 0 or not prefab:IsDescendantOf(workspace);
+				until not properties.IsActive or properties.Fuel <= 0 or not prefab:IsDescendantOf(workspace);
 			end
 		end
 		emitter.Enabled = false;
