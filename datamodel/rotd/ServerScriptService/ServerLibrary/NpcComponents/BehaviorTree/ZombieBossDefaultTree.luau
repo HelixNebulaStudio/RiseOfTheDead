@@ -16,10 +16,10 @@ function treePackage.HasEnemy(npcClass: NpcClass)
 
     local enemyTargetData: NpcTargetData = targetHandlerComp:MatchFirstTarget(function(targetData)
         if targetData.HealthComp == nil then return end;
-        local targetCharacterClass: CharacterClass = targetData.HealthComp.CompOwner;
+        local targetEntityClass: EntityClass = targetData.HealthComp.CompOwner;
 
-        if targetCharacterClass.ClassName == "PlayerClass" then
-            local player: Player = (targetCharacterClass :: PlayerClass):GetInstance();
+        if targetEntityClass.ClassName == "PlayerClass" then
+            local player: Player = (targetEntityClass :: PlayerClass):GetInstance();
 
             if npcClass.NetworkOwners then
                 local isNetOwner = table.find(npcClass.NetworkOwners, player) ~= nil;
@@ -27,12 +27,17 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                     return false;
                 end
             end
+        elseif targetEntityClass.ClassName == "NpcClass" then
+            local targetNpcClass: NpcClass = targetEntityClass :: NpcClass;
+            if targetNpcClass.HumanoidType == npcClass.HumanoidType then
+                return false;
+            end
         end
 
-        local isAlive = targetCharacterClass.HealthComp.IsDead ~= true;
+        local isAlive = targetEntityClass.HealthComp.IsDead ~= true;
         if not isAlive then return false end;
 
-        local isTargettable = targetCharacterClass.HealthComp:CanTakeDamageFrom(npcClass);
+        local isTargettable = targetEntityClass.HealthComp:CanTakeDamageFrom(npcClass);
         if not isTargettable then return false end;
 
         if properties.HordeAggression then return true; end;
@@ -44,6 +49,10 @@ function treePackage.HasEnemy(npcClass: NpcClass)
 
         local isInRange = (targetData.Distance <= properties.TargetableDistance);
         if not isInRange then return false end;
+
+        if targetEntityClass.Character and targetEntityClass.Character:FindFirstChild("GodModeFF") then
+            return false;
+        end
 
         return true;
     end);
