@@ -50,15 +50,16 @@ if RunService:IsServer() then
 
 
 		local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
-		shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, damageData: DamageData)
-			local damageTo: CharacterClass? = damageData.DamageTo;
-			if damageTo == nil then return end;
-			if damageTo.HumanoidType ~= "Zombie" then return end;
+		shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
+			local npcClass: NpcClass = ...;
+			if npcClass == nil or npcClass.HumanoidType ~= "Zombie" then return end;
+		
+			local playerTags = modDamageTag:Get(npcClass.Character, "Player");
+			for a=1, #playerTags do
+				local playerTag = playerTags[a];
+				local player: Player = playerTag.Player;
+				if player == nil or not game.Players:IsAncestorOf(player) then continue end;
 
-			local playerTags = modDamageTag:Get(damageTo.Character, "Player");
-			for _, playerTag in pairs(playerTags) do
-				local player = playerTag.Player;
-				
 				if modMission:IsComplete(player, MISSION_ID) then continue end;
 
 				modMission:Progress(player, MISSION_ID, function(mission)
@@ -77,7 +78,6 @@ if RunService:IsServer() then
 				
 			end
 		end)
-		
 		
 		shared.modEventService:OnInvoked("Shop_BindActionEvent", function(event: EventPacket, ...)
 			local action: string, packet: anydict = ...;

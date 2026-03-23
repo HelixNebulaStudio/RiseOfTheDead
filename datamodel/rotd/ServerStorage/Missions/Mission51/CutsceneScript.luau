@@ -77,9 +77,9 @@ if RunService:IsServer() then
 	templateRadioInteractable2 = script.Parent:WaitForChild("militaryRadioInteractable2");
 	local interactConfig2 = modInteractables.createInteractable("Dialogue");
 	interactConfig2:SetAttribute("_Id", "QA2_Radio");
-	interactConfig2:SetAttribute("NpcName", "M51Radio");
 	interactConfig2:SetAttribute("_Label", `Broadcast`);
 	interactConfig2:SetAttribute("_InteractDuration", 1);
+	interactConfig2:SetAttribute("DialogueName", "Military Radio");
 	interactConfig2.Parent = templateRadioInteractable2;
 
 else
