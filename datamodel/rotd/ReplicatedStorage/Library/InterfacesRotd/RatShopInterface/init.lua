@@ -475,6 +475,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
         local patStorageId = "portableautoturret";
         if selectedItem.ItemId == patStorageId then
+			local patStorage = modData.GetStorage(patStorageId);
+			if patStorage == nil then
+				patStorage = modData.RequestStorage{Action = "GetStorage"; StorageId=patStorageId;};
+			end
             selectedItem = modData.FindIndexFromStorage(patStorageId, 1);
 			storageItemID = selectedItem.ID;
             binds.StorageId = patStorageId;
@@ -561,7 +565,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							newListing:Destroy();
 
 						else
-							warn("Ammunition Purchase>> Error Code:"..serverReply);
+							Debugger:Warn("Ammunition Purchase>> Error Code:"..serverReply);
 							descLabel.Text = string.gsub(modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply), "$Currency", "Money");
 						end
 						purchaseAmmoDebounce = false;

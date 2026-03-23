@@ -68,6 +68,8 @@ local drainRate = (60*60)/3
 
 local delta = 1/30;
 local canReactivate = tick();
+
+local lastSyncA, lastSyncMA;
 --==
 
 local halfPi = math.pi/2;
@@ -117,7 +119,7 @@ function TurretRuntime(weaponStorageItem)
 	arm1.JointAA2.CFrame = jointAa2Cf * CFrame.Angles(armPitch, 0, 0);
 	
 	--==
-	local configValues = patStorage.Values.Config or {};
+	local configValues = patStorage.Properties.Config or {};
 	
 	local isSec = tick()-lastSec >= 3;
 	if isSec then
@@ -161,8 +163,8 @@ function TurretRuntime(weaponStorageItem)
 				shared.Notify(player, "Your Portable Auto Turret battery is depleted.", "Inform");
 
 				modAudio.Play("TurretOffline", turretArm.PrimaryPart);
-				patStorage.Values.IsOnline = false;
-				patStorage:SyncValues();
+				patStorage.Properties.IsOnline = false;
+				patStorage:SyncProperties();
 
 				task.wait(0.2);
 				Update();
@@ -199,6 +201,13 @@ function TurretRuntime(weaponStorageItem)
 	local canCrowdFire;
 
 	local playerClass: PlayerClass = shared.modPlayers.get(player);
+	if playerClass.HealthComp.IsDead then
+		modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
+
+		patStorage.Properties.IsOnline = false;
+		patStorage:SyncProperties();
+		return;
+	end
 
 	if #selectedTargets > 0 then
 		local _computeCost = tick();
@@ -425,6 +434,7 @@ function TurretRuntime(weaponStorageItem)
 		reloadLoop:Stop();
 		reloadLoop2:Stop();
 
+		weaponStorageItem:Sync({"A"; "MA"});
 		if configurations.ReloadMode == modWeaponAttributes.ReloadModes.Full then
 			modAudio.Play("BattleRifleLoad", turretArm.PrimaryPart);
 
@@ -435,13 +445,12 @@ function TurretRuntime(weaponStorageItem)
 			autoTurretClient:SetAttribute("Mode", 1);
 			task.wait();
 		end
-		weaponStorageItem:Sync({"A"; "MA"});
 
 		if properties.Ammo <= 0 and properties.MaxAmmo <= 0 then
 			modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
 
-			patStorage.Values.IsOnline = false;
-			patStorage:SyncValues();
+			patStorage.Properties.IsOnline = false;
+			patStorage:SyncProperties();
 
 			shared.Notify(player, "Your Portable Auto Turret ammo is depleted.", "Inform");
 
@@ -509,7 +518,12 @@ function TurretRuntime(weaponStorageItem)
 		end
 		
 		modToolService.PrimaryFireWeapon(firePacket);
-		weaponStorageItem:Sync({"A"; "MA"});
+
+		if lastSyncMA ~= weaponStorageItem:GetValues("MA") or lastSyncA ~= weaponStorageItem:GetValues("A") then
+			lastSyncMA = weaponStorageItem:GetValues("MA");
+			lastSyncA = weaponStorageItem:GetValues("A");
+			weaponStorageItem:Sync({"A"; "MA"});
+		end
 		canReactivate = tick();
 
 		local baseFr = 60/math.max(capFireRate, configurations.Rpm);
@@ -525,7 +539,6 @@ function TurretRuntime(weaponStorageItem)
 		end
 
 		firerate = math.clamp(firerate, configurations.RapidFireMax or delta, 999);
-		--weaponStorageItem:Sync({"A"; "MA"});
 		task.wait(firerate);
 		
 		if sortForToxicMod == 2 and checkForRecompute then
@@ -569,7 +582,7 @@ end
 function Update()
 	if accessory.Parent and accessory.Parent.Name == "voodoodoll" then return end;
 
-	local weaponSiid = patStorage.Values.WeaponSiid;
+	local weaponSiid = patStorage.Properties.WeaponSiid;
 
 	local isWeaponChanged = lastWeaponId ~= weaponSiid;
 	if isWeaponChanged then
@@ -581,8 +594,8 @@ function Update()
 		
 		onlineLoop = false;
 
-		patStorage.Values.IsOnline = false;
-		patStorage:SyncValues();
+		patStorage.Properties.IsOnline = false;
+		patStorage:SyncProperties();
 	end
 	lastWeaponId = weaponSiid;
 	
@@ -590,7 +603,7 @@ function Update()
 		Debugger:StudioLog("No weapon siid");
 		
 		task.spawn(function()
-			patStorage:SyncValues();
+			patStorage:SyncProperties();
 			remoteAutoTurret:InvokeClient(player, "refresh");
 		end)
 		return;
@@ -647,12 +660,13 @@ function Update()
 	end
 	
 	
-	local isOnline = patStorage.Values.IsOnline == true;
+	local isOnline = patStorage.Properties.IsOnline == true;
 	
 	if isOnline and activeWeaponModel then
 		autoTurretClient:SetAttribute("Mode", 1);
 		if onlineLoop == false then
 			onlineLoop = true;
+			lastSyncA, lastSyncMA = nil;
 
 			lastSec = tick()-3;
 			task.spawn(function()
@@ -665,6 +679,9 @@ function Update()
 				end
 				canReactivate = tick();
 				autoTurretClient:SetAttribute("Mode", 3);
+				if weaponStorageItem then
+					weaponStorageItem:Sync({"A"; "MA"});
+				end
 			end)
 		end
 		
@@ -692,7 +709,7 @@ discOnEnemiesAttract = shared.modEventService:OnInvoked("Npcs_BindEnemiesAttract
 end)
 
 local patOnChangeCon;
-patOnChangeCon = patStorage.Values.OnChanged:Connect(function(k, v, ov) 
+patOnChangeCon = patStorage.Properties.OnChanged:Connect(function(k, v, ov) 
 	if not workspace:IsAncestorOf(turretArm) then patOnChangeCon(); end;
 	Update();
 end);

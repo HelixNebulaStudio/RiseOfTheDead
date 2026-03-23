@@ -61,6 +61,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         local patStorageId = "portableautoturret";
         if selectedItem.ItemId == patStorageId then
+            local patStorage = modData.GetStorage(patStorageId);
+			if patStorage == nil then
+				patStorage = modData.RequestStorage{Action = "GetStorage"; StorageId=patStorageId;};
+			end
             selectedItem = modData.FindIndexFromStorage(patStorageId, 1);
             binds.StorageId = patStorageId;
         end
@@ -79,11 +83,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             mainLabel.Text = `You can't refill an ammo pouch from an ammo pouch..`;
 
         elseif equipmentClass.Class == "Gun" then
-            local ammo = selectedItem:GetValues("A") or configurations.MagazineSize;
-            local maxAmmo = selectedItem:GetValues("MA") or configurations.AmmoCapacity;
+            local ammo = selectedItem:GetValues("A") or configurations.AmmoLimit;
+            local maxAmmo = selectedItem:GetValues("MA") or configurations.MaxAmmoLimit;
 
-            local ammoIsNotFull = (ammo < configurations.MagazineSize)
-                                or (maxAmmo < configurations.AmmoCapacity);
+            local ammoIsNotFull = (ammo < configurations.AmmoLimit)
+                                or (maxAmmo < configurations.MaxAmmoLimit);
 
             if ammoIsNotFull then
                 local ammoCurrency = modShopLibrary.AmmunitionCurrency or "Money";
@@ -134,7 +138,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         task.wait(1);
 
                     else
-                        warn("Ammunition Purchase>> Error Code:"..serverReply);
+                        Debugger:Warn("Ammunition Purchase>> Error Code:"..serverReply);
                         resupplyButton.buttonText.Text = (modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply)):gsub("$Currency", "Money");
                         task.wait(1);
                     end
@@ -172,7 +176,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                             resupplyButton.Visible = false;
             
                         else
-                            warn("Ammunition Purchase>> Error Code:"..serverReply);
+                            Debugger:Warn("Ammunition Purchase>> Error Code:"..serverReply);
                             resupplyButton.buttonText.Text = (modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply)):gsub("$Currency", "Money");
                             task.wait(1);
                         end

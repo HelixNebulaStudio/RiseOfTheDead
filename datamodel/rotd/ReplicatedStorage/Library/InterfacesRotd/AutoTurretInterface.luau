@@ -129,13 +129,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		if patStorage == nil then return end
 		
 		for k, v in pairs(storageValues) do
-			patStorage.Values[k] = v;
+			patStorage.Properties[k] = v;
 		end
 	end
 
 	function binds.Refresh()
 		local patStorage = modData.GetStorage(storageId);
-		local patStorageValues = patStorage.Values;
+		if patStorage == nil then return end;
+		
+		local patStorageValues = patStorage.Properties;
 
 		local isOnline = patStorageValues.Online == true;
 		activateButton.Text = isOnline and "Online" or "Offline";
