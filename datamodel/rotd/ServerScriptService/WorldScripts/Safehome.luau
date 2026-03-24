@@ -68,7 +68,13 @@ function WorldCore.loadFactionSafehome(headquarterData)
     local safehomeClass = modSafehomeService.SafehomeClass.new();
     safehomeClass.FactionTag = factionTag;
     WorldCore.SafehomeClass = safehomeClass;
+
+    safehomeClass:ChangeMap(activeSafehomeId);
+    Debugger:StudioLog(`loadSafehome`, safehomeClass);
 	
+    local safehomeCustomizations = {Customization=factionGroup.SafehomeCustomizations;};
+    safehomeClass:LoadCustomization(safehomeCustomizations);
+
 	Debugger:Log("Host data Safehome activeSafehomeId", activeSafehomeId);
 
 end
@@ -86,8 +92,9 @@ function WorldCore.onRequire()
             local headquarterData = teleportData and teleportData.FactionHeadquarter or nil;
             
             if headquarterData == nil and workspace:GetAttribute("TestFactionHq") == true and RunService:IsStudio() then
+	            local factionUser = modFactions.GetUser(player.UserId);
                 headquarterData = {
-                    FactionTag = "test";
+                    FactionTag = factionUser and factionUser.IsInFaction and factionUser.Tag or "nofactiontag_headquarterData";
                     FactionOwnerId = "16170943";
                     SafehomeId = "default";
                 };
