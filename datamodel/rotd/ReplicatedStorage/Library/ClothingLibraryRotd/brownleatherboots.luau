@@ -17,7 +17,14 @@ function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
 	if not modBranchConfigurations.IsWorld("Slaughterfest") then
-		equipmentClass:AddBaseModifier("BullLeaping");
+		equipmentClass:AddBaseModifier("BullLeaping", {
+			SetValues = {
+				BullLeapingVelocity = 20;
+			};
+			ArrayValues = {
+				PassiveModifiers = "BullLeaping";
+			};
+		}); 
 	end
 
 	return equipmentClass;

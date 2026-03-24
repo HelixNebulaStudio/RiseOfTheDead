@@ -48,6 +48,10 @@ local toolPackage = {
 
 		-- Roleplay;
 		RoleplayStateWindow = "InstrumentWindow";
+
+		Instrument = "Keytar";
+		Index = 1;
+		ActiveTrack = nil;
 	};
 	Properties={};
 

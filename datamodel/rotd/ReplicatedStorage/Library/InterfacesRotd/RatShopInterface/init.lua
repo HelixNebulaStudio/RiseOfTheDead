@@ -482,6 +482,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             selectedItem = modData.FindIndexFromStorage(patStorageId, 1);
 			storageItemID = selectedItem.ID;
             binds.StorageId = patStorageId;
+		else
+			binds.StorageId = nil;
         end
 
 		if selectedItem == nil then

@@ -23,10 +23,12 @@ function interactablePackage.init(super) -- Server/Client
         local localplayerStats = modData.GetStats();
         
         local levelRequired = interactable.Values.LevelRequired;
-        if not (levelRequired and localplayerStats and localplayerStats.Level and localplayerStats.Level >= levelRequired) then
-            interactable.CanInteract = false;
-            interactable.Label = `Mastery Level {levelRequired} Required`;
-            return;
+        if levelRequired then
+            if not (localplayerStats and localplayerStats.Level and localplayerStats.Level >= levelRequired) then
+                interactable.CanInteract = false;
+                interactable.Label = `Mastery Level {levelRequired} Required`;
+                return;
+            end
         end
     end
 

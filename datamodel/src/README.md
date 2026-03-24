@@ -1,7 +1,9 @@
 Revive Engine source code is located here and is closed source.
 
 
-Recent changes:
+Recent changes to code in Engine codebase:
+- Fixed `molotov`, `broomspear`, `fireworks` and `snowball` not checking if target can take damage. [#1093] [#1092]
+- Fixed projectile not using correct variable for lifetime [#1095]
 - Fixed some weapons having collidable parts. [#1077]
 - Fixed Storage.Properties being a public table instead of private. [#1080]
 - Fixed duplicated explosion forces when applied to npc body destructibles. [#1036]

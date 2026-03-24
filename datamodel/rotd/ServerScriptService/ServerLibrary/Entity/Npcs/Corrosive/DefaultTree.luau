@@ -42,7 +42,7 @@ function treePackage.Charge(npcClass: NpcClass)
     Debugger:Warn(`{npcClass.Name} Charge`);
     task.wait(0.1);
     local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
-    local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
+    local enemyNpcClass: CharacterClass = enemyTargetData.HealthComp.CompOwner :: CharacterClass;
 
     if isHard then
         npcClass.Move:Face(enemyNpcClass.RootPart, nil, 2);
@@ -64,15 +64,16 @@ function treePackage.Charge(npcClass: NpcClass)
 
     npcClass.PlayAnimation("Charging");
 
-    local targetNpcClasses = {};
-    npcClass:GetComponent("TargetHandler"):MatchTargets(function(targetNpcClass: NpcClass)
-        local targetHealthComp: HealthComp = targetNpcClass.HealthComp;
+    local targetCharClasses = {};
+    npcClass:GetComponent("TargetHandler"):MatchTargets(function(targetCharNpc: EntityClass)
+        local targetHealthComp: HealthComp = targetCharNpc.HealthComp;
         if targetHealthComp == nil or targetHealthComp.IsDead then return end;
+        if targetCharNpc.ClassName == "Destructible" then return end;
 
         local isTargettable = targetHealthComp:CanTakeDamageFrom(npcClass);
         if not isTargettable then return end;
 
-        table.insert(targetNpcClasses, targetHealthComp.CompOwner);
+        table.insert(targetCharClasses, targetHealthComp.CompOwner :: CharacterClass);
     end)
 
     local hitNpcClassDebounce = {};
@@ -91,18 +92,18 @@ function treePackage.Charge(npcClass: NpcClass)
         task.spawn(function()
             while npcClass.Move.IsFlying do
                 RunService.PostSimulation:Wait();
-                for a=1, #targetNpcClasses do
-                    local targetNpcClass: NpcClass = targetNpcClasses[a];
-                    local targetRootPart = targetNpcClass.RootPart;
+                for a=1, #targetCharClasses do
+                    local targetCharClass: CharacterClass = targetCharClasses[a];
+                    local targetRootPart = targetCharClass.RootPart;
 
                     local distance = npcClass:DistanceFromCharacter(targetRootPart.Position);
                     local relativeCframe = npcClass.RootPart.CFrame:ToObjectSpace(targetRootPart.CFrame);
                     local absAngle = math.abs(math.deg(math.atan2(relativeCframe.X, -relativeCframe.Z)));
 
                     if absAngle <= 33 and distance <= 6 then
-                        if hitNpcClassDebounce[targetNpcClass] then continue end;
-                        hitNpcClassDebounce[targetNpcClass] = true;
-                        throwTargetComp(targetNpcClass, 100, isHard and 40 or 20);
+                        if hitNpcClassDebounce[targetCharClass] then continue end;
+                        hitNpcClassDebounce[targetCharClass] = true;
+                        throwTargetComp(targetCharClass, 100, isHard and 40 or 20);
                     end
                 end
             end

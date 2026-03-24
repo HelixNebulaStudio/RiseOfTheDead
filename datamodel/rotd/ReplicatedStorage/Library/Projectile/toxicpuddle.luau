@@ -25,6 +25,10 @@ local projectilePackage = {
 	Properties = {
 		Damage = 5;
 	};
+
+    TouchHandler = nil;
+    PartList = {};
+    CleanupTick = tick()+60;
 };
 --==
 
@@ -45,23 +49,32 @@ function projectilePackage.onRequire()
     if RunService:IsServer() then
         local toxicPuddleTouchHandler = modTouchHandler.new("ToxicPuddle", 0.2);
 
-        function toxicPuddleTouchHandler:OnPlayerTouch(player, touchedPart, toucherPart)
-            local npcChar = touchedPart.Parent and touchedPart.Parent.Parent or nil;
-            if npcChar == nil or npcChar:FindFirstChildWhichIsA("Humanoid") == nil then return end;
+        function toxicPuddleTouchHandler:OnHumanoidTouch(humanoid, hitbox, part)
+            local projectile: ProjectileInstance? = projectilePackage.PartList[hitbox];
+            if projectile == nil then return end;
 
-            local npcClass: NpcClass? = shared.modNpcs.getByModel(npcChar);
-            if npcClass == nil or not npcClass.HealthComp:CanTakeDamageFrom(npcClass) then return end;
+            local targetModel = part.Parent;
+            if not targetModel then return end;
 
-            local playerClass: PlayerClass = shared.modPlayers.get(player);
-            if playerClass == nil then return end;
-            
-            shared.modPlayers.cameraShakeAndZoom(player, 5, 0, 0.3, 2, false);
+            local healthComp: HealthComp = modHealthComponent.getByModel(targetModel);
+            if not healthComp then return end;
+            targetModel = healthComp:GetModel();
 
-            playerClass.HealthComp:TakeDamage(DamageData.new{
+            local damageBy: CharacterClass? = projectile.CharacterClass;
+            local damageTo: CharacterClass = healthComp.CompOwner :: CharacterClass;
+
+            if not healthComp:CanTakeDamageFrom(damageBy) then return end;
+    
+            if damageTo.ClassName == "PlayerClass" then
+                local player = (damageTo :: PlayerClass):GetInstance();
+                shared.modPlayers.cameraShakeAndZoom(player, 5, 0, 0.3, 2, false);
+            end
+
+            healthComp:TakeDamage(DamageData.new{
                 Damage = 2;
-                TargetPart = toucherPart;
+                TargetPart = part;
             });
-            modAudio.Play("AcidHit", toucherPart).PlaybackSpeed = math.random(90, 110)/100;
+            modAudio.Play("AcidHit", part).PlaybackSpeed = math.random(90, 110)/100;
         end
 
         projectilePackage.TouchHandler = toxicPuddleTouchHandler;
@@ -137,6 +150,21 @@ function projectilePackage.BindArcContact(projectile: ProjectileInstance, arcPoi
         Size = Vector3.new(maxSize, 2, maxSize);
     }):Play();
 
+    projectilePackage.PartList[projectilePart] = projectile;
+    projectilePackage.TouchHandler:AddObject(projectilePart);
+    projectile.Garbage:Tag(function()
+        projectilePackage.PartList[projectilePart] = nil;
+    end)
+
+    task.spawn(function() 
+        if tick() <= projectilePackage.CleanupTick then return end;
+        projectilePackage.CleanupTick = tick()+60;
+
+        for part, projectile in pairs(projectilePackage.PartList) do
+            if workspace:IsAncestorOf(part) then continue end;
+            projectilePackage.PartList[part] = nil;
+        end
+    end)
 end
 
 return projectilePackage;

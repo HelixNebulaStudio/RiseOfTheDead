@@ -67,6 +67,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
             selectedItem = modData.FindIndexFromStorage(patStorageId, 1);
             binds.StorageId = patStorageId;
+		else
+			binds.StorageId = nil;
         end
         
         local selectItemId = selectedItem.ItemId;
