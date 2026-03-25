@@ -2,6 +2,9 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes to code in Engine codebase:
+- Fixed npcs keeping idle stance when firing weapons. [#1029]
+- Fixed Bosses not aggro-ing player if they do not have a npc following them. [#1031]
+- Fixed `Pickupable` interactables missing notification and not visible when inventory is full. [#1040]
 - Fixed `molotov`, `broomspear`, `fireworks` and `snowball` not checking if target can take damage. [#1093] [#1092]
 - Fixed projectile not using correct variable for lifetime [#1095]
 - Fixed some weapons having collidable parts. [#1077]

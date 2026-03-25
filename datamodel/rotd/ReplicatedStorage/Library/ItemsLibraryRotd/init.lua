@@ -651,7 +651,7 @@ function modItemsLibrary.onRequire()
             itemValues.Seed = math.random(1, 9999);
         end;
     });
-
+    new(mapBase, {Id="swamplandsmap"; Name="Swamplands Map"; Icon="rbxassetid://124314469144006"; GameMode={Mode="Survival"; Stage="Swamplands"}; Tradable=modItemsLibrary.Tradable.PremiumOnly;});
 
 
     --==========================================================[[ INSTRUMENT ]]==========================================================--
@@ -740,6 +740,7 @@ function modItemsLibrary.onRequire()
     -- tacticalbow
     new(skinPermBase, {Id="tacticalbowneondeath"; Icon="rbxassetid://87806357651434"; SkinPerm="Neon Death"; TargetItemId="tacticalbow"; });
 
+    
     --MARK: Clothing Skin Perms;
     -- armwraps
     new(skinPermBase, {Id="armwrapsrat"; Icon="rbxassetid://13021422822"; SkinPerm="R.A.T."; TargetItemId="armwraps"; });

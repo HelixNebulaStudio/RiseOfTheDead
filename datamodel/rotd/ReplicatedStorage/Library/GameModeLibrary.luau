@@ -40,7 +40,7 @@ GameModeLibrary.GameModes={
 			["The Prisoner"]={
 				Index=1;
 				MaxPlayers=3;
-				TitleImage="http://www.roblox.com/asset/?id=1978092491";
+				TitleImage="rbxassetid://1978092491";
 				Description="A prisoner zombie.. His right arm appears to be wrapped around with chains, maybe he can shackle me with those chains. But I wonder why this zombie is different from the others.";
 				
 				CrateId="prisoner";
@@ -54,7 +54,7 @@ GameModeLibrary.GameModes={
 			["Tanker"]={
 				Index=2;
 				MaxPlayers=3;
-				TitleImage="http://www.roblox.com/asset/?id=3187524766";
+				TitleImage="rbxassetid://3187524766";
 				Description="This zombie looks like someone I wouldn't mess with. Fortunately, he's a zombie now.";
 				
 				CrateId="tanker";
@@ -68,7 +68,7 @@ GameModeLibrary.GameModes={
 			["Fumes"]={
 				Index=3;
 				MaxPlayers=3;
-				TitleImage="http://www.roblox.com/asset/?id=2034733375";
+				TitleImage="rbxassetid://2034733375";
 				Description="This one's a smelly one.";
 				
 				CrateId="fumes";
@@ -82,7 +82,7 @@ GameModeLibrary.GameModes={
 			["Corrosive"]={
 				Index=4;
 				MaxPlayers=3;
-				TitleImage="http://www.roblox.com/asset/?id=2034744144";
+				TitleImage="rbxassetid://2034744144";
 				Description="It spills corrosive goo everywhere. What has it been feasting on?!";
 				
 				CrateId="corrosive";
@@ -95,7 +95,7 @@ GameModeLibrary.GameModes={
 			["Zpider"]={
 				Index=5;
 				MaxPlayers=3;
-				TitleImage="http://www.roblox.com/asset/?id=2034740441";
+				TitleImage="rbxassetid://2034740441";
 				Description="This is one big spider, there were rumors of BioX experimenting with spiders. I'm guessing this is it...";
 				
 				CrateId="zpider";
@@ -108,7 +108,7 @@ GameModeLibrary.GameModes={
 			["Shadow"]={
 				Index=6;
 				MaxPlayers=3;
-				TitleImage="http://www.roblox.com/asset/?id=3621243641";
+				TitleImage="rbxassetid://3621243641";
 				Description="It's really hard to see him, watch your backs.. It won't move unless it has to.";
 				
 				CrateId="shadow";
@@ -121,7 +121,7 @@ GameModeLibrary.GameModes={
 			["Zomborg"]={
 				Index=7;
 				MaxPlayers=3;
-				TitleImage="http://www.roblox.com/asset/?id=4320205133";
+				TitleImage="rbxassetid://4320205133";
 				Description="Which insane person decided it was a good idea to upgrade the zombies!?";
 				
 				CrateId="zomborg";
@@ -134,7 +134,7 @@ GameModeLibrary.GameModes={
 			["The Billies"]={
 				Index=8;
 				MaxPlayers=3;
-				TitleImage="http://www.roblox.com/asset/?id=4517207657";
+				TitleImage="rbxassetid://4517207657";
 				Description="Someone should put these two lunatics to sleep. I think I'm up for it.";
 				
 				CrateId="billies";
@@ -149,7 +149,7 @@ GameModeLibrary.GameModes={
 			["Hector Shot"]={
 				Index=9;
 				MaxPlayers=3;
-				TitleImage="http://www.roblox.com/asset/?id=4982655356";
+				TitleImage="rbxassetid://4982655356";
 				Description="He has yee'd his last haw.";
 				
 				CrateId="hectorshot";
@@ -163,7 +163,7 @@ GameModeLibrary.GameModes={
 			["Zomborg Prime"]={
 				Index=10;
 				MaxPlayers=3;
-				TitleImage="http://www.roblox.com/asset/?id=6805877114";
+				TitleImage="rbxassetid://6805877114";
 				Description="Looks like Zomborg has a mecha upgrade...";
 
 				CrateId="zomborgprime";
@@ -179,7 +179,7 @@ GameModeLibrary.GameModes={
 			--== Extreme Bosses
 			["Zricera"]={
 				MaxPlayers=8;
-				TitleImage="http://www.roblox.com/asset/?id=3640418603";
+				TitleImage="rbxassetid://3640418603";
 				Description="I think I better get some help for this.";
 				
 				CrateId="zricera";
@@ -201,7 +201,7 @@ GameModeLibrary.GameModes={
 			
 			["Vexeron"]={
 				MaxPlayers=8;
-				TitleImage="http://www.roblox.com/asset/?id=4601671040";
+				TitleImage="rbxassetid://4601671040";
 				Description="Fight it in it's domain, sure, why not..";
 				
 				CrateId="vexeron";
@@ -223,7 +223,7 @@ GameModeLibrary.GameModes={
 			
 			["Pathoroth"]={
 				MaxPlayers=8;
-				TitleImage="http://www.roblox.com/asset/?id=5712929087";
+				TitleImage="rbxassetid://5712929087";
 				Description="Appears to be stronger with zombies around it, and it just morphed into one of us!";
 
 				CrateId="pathoroth";
@@ -241,7 +241,7 @@ GameModeLibrary.GameModes={
 			
 			["Mothena"]={
 				MaxPlayers=8;
-				TitleImage="http://www.roblox.com/asset/?id=6313471097";
+				TitleImage="rbxassetid://6313471097";
 				Description="Lamps";
 
 				CrateId="mothena";
@@ -261,7 +261,7 @@ GameModeLibrary.GameModes={
 			
 			["Bandit Helicopter"]={
 				MaxPlayers=8;
-				TitleImage="http://www.roblox.com/asset/?id=5101726655";
+				TitleImage="rbxassetid://5101726655";
 				Description="Should I bring a knife to fight a helicopter?";
 				
 				CrateId="banditheli";
@@ -286,7 +286,7 @@ GameModeLibrary.GameModes={
 			
 			["Vein Of Nekron"]={
 				MaxPlayers=8;
-				TitleImage="http://www.roblox.com/asset/?id=8750128901";
+				TitleImage="rbxassetid://8750128901";
 				Description="Looks like it's trying to spread, we should probably stop it from spreading..";
 				
 				CrateId="veinofnekron";
@@ -311,12 +311,12 @@ GameModeLibrary.GameModes={
 	Survival={
 		Module="Survival";
 		HardModeText="Corrupted";
-		-- HardModeTitleImage="http://www.roblox.com/asset/?id=12409876370";
+		-- HardModeTitleImage="rbxassetid://12409876370";
 		Stages={
 			["Sector F"]={
 				WorldId = "SectorF";
 				ExitSpawn = "CXsecF2";
-				TitleImage = "http://www.roblox.com/asset/?id=4817414130";
+				TitleImage = "rbxassetid://4817414130";
 				MaxPlayers = 4;
 				RewardsId = "sectorfcrate";
 				RewardsIds = {"sectorfcrate"; "ucsectorfcrate"};
@@ -335,7 +335,7 @@ GameModeLibrary.GameModes={
 			["Prison"]={
 				WorldId="Prison";
 				ExitSpawn="hacClinic1";
-				TitleImage="http://www.roblox.com/asset/?id=5943256940";
+				TitleImage="rbxassetid://5943256940";
 				MaxPlayers=4;
 				RewardsId="prisoncrate";
 				RewardsIds={"prisoncrate"; "nprisoncrate"};
@@ -354,7 +354,7 @@ GameModeLibrary.GameModes={
 			["Sector D"]={
 				WorldId="SectorD";
 				ExitSpawn="sectorDToRes";
-				TitleImage="http://www.roblox.com/asset/?id=7145049831";
+				TitleImage="rbxassetid://7145049831";
 				MaxPlayers=5;
 				RewardsId="sectordcrate";
 				RewardsIds={"sectordcrate"; "ucsectordcrate"};
@@ -371,27 +371,28 @@ GameModeLibrary.GameModes={
 				WavePassMode = true;
 			};
 			["Swamplands"]={
-				WorldId="Swamplands";
-				ExitSpawn="sectorDToRes";
-				TitleImage="http://www.roblox.com/asset/?id=7145049831";
-				MaxPlayers=5;
-				-- RewardsId="sectordcrate";
-				-- RewardsIds={"sectordcrate"; "ucsectordcrate"};
-				-- HardRewardId="corruptedsectordcrate";
+				WorldId = "Swamplands";
+				ExitSpawn = "sectorDToRes";
+				TitleImage = "rbxassetid://78769778825277";
+				MaxPlayers = 5;
+				-- RewardsId = "sectordcrate";
+				-- RewardsIds = {"sectordcrate"; "ucsectordcrate"};
+				-- HardRewardId = "corruptedsectordcrate";
 				
-				SurvivalEndedTrack="SectorDSoundtrack";
-				BossKilledTrack="SectorDBossKilled";
-				WaveStartTrack="SectorDWaveStart";
-				WaveEndTrack="SectorDWaveEnd";
+				SurvivalEndedTrack = "SectorDSoundtrack";
+				BossKilledTrack = "SectorDBossKilled";
+				WaveStartTrack = "SectorDWaveStart";
+				WaveEndTrack = "SectorDWaveEnd";
 				
-				LeaderboardDataKey="Waves";
+				LeaderboardDataKey = "Waves";
 
-				HardModeEnabled=true;
+				HardModeEnabled = true;
 				WavePassMode = true;
+				MapItemId="swamplandsmap";
 			};
 			["CommunityWaySide"]={
 				WorldId="CommunityWaySide";
-				TitleImage="http://www.roblox.com/asset/?id=10976370766";
+				TitleImage="rbxassetid://10976370766";
 				MaxPlayers=5;
 				RewardsIds = {"communitycrate"; "communitycrate2"};
 
@@ -407,7 +408,7 @@ GameModeLibrary.GameModes={
 			};
 			["CommunityFissionBay"]={
 				WorldId="CommunityFissionBay";
-				TitleImage="http://www.roblox.com/asset/?id=12401525448";
+				TitleImage="rbxassetid://12401525448";
 				MaxPlayers=5;
 				RewardsIds = {"communitycrate"; "communitycrate2"};
 
@@ -423,7 +424,7 @@ GameModeLibrary.GameModes={
 			};
 			["CommunityRooftops"]={
 				WorldId="CommunityRooftops";
-				TitleImage="http://www.roblox.com/asset/?id=13951712046";
+				TitleImage="rbxassetid://13951712046";
 				MaxPlayers=5;
 				RewardsIds = {"communitycrate"; "communitycrate2"};
 
@@ -448,7 +449,7 @@ GameModeLibrary.GameModes={
 				WorldId="Factory";
 				ExitSpawn="factoryExit";
 				MaxPlayers=1;
-				TitleImage="http://www.roblox.com/asset/?id=4664135775";
+				TitleImage="rbxassetid://4664135775";
 				RewardsId="factorycrate";
 				Soundtrack="Soundtrack:Falster Trap";
 				EnableStopwatch=true;
@@ -458,7 +459,7 @@ GameModeLibrary.GameModes={
 				WorldId="Office";
 				ExitSpawn="officeExit";
 				MaxPlayers=6;
-				TitleImage="http://www.roblox.com/asset/?id=4665901752";
+				TitleImage="rbxassetid://4665901752";
 				RewardsId="officecrate";
 				Soundtrack=(modConfigurations.SpecialEvent.Halloween and "Soundtrack:Creepy" or "Soundtrack:High Velocity");
 				EnableStopwatch=true;
@@ -468,7 +469,7 @@ GameModeLibrary.GameModes={
 				WorldId="BanditOutpost";
 				ExitSpawn="patrick";
 				MaxPlayers=6;
-				TitleImage="http://www.roblox.com/asset/?id=4930132199";
+				TitleImage="rbxassetid://4930132199";
 				RewardsId="banditcrate";
 				RewardsIds={"banditcrate"; "hbanditcrate"};
 				Soundtrack="Soundtrack:Born With It";
@@ -480,7 +481,7 @@ GameModeLibrary.GameModes={
 				WorldId="Tombs";
 				ExitSpawn="officeExit";
 				MaxPlayers=6;
-				TitleImage="http://www.roblox.com/asset/?id=5496384877";
+				TitleImage="rbxassetid://5496384877";
 				RewardsId="tombschest";
 				Soundtrack="Soundtrack:Kill or Be Killed";
 				EnableStopwatch=true;
@@ -490,7 +491,7 @@ GameModeLibrary.GameModes={
 				WorldId="Railways";
 				ExitSpawn="trainstation";
 				MaxPlayers=6;
-				TitleImage="http://www.roblox.com/asset/?id=6471930503";
+				TitleImage="rbxassetid://6471930503";
 				RewardsId="railwayscrate";
 				Soundtrack="Soundtrack:Born Ready";
 				EnableStopwatch=true;
@@ -500,7 +501,7 @@ GameModeLibrary.GameModes={
 				WorldId="AbandonedBunker";
 				ExitSpawn="communitySh";
 				MaxPlayers=6;
-				TitleImage="http://www.roblox.com/asset/?id=13496701772";
+				TitleImage="rbxassetid://13496701772";
 				RewardsId="abandonedbunkercrate";
 				Soundtrack="Soundtrack:Into The Abyss";
 				MapItemId="abandonedbunkermap";
@@ -516,7 +517,7 @@ GameModeLibrary.GameModes={
 			["Genesis"] = {
 				WorldId = "Genesis";
 				ExitSpawn = "communitySh";
-				TitleImage = "http://www.roblox.com/asset/?id=7431603916";
+				TitleImage = "rbxassetid://7431603916";
 				
 				MaxPlayers = 4;
 				RewardsId = "genesiscrate";
@@ -531,7 +532,7 @@ GameModeLibrary.GameModes={
 			
 			["Mr. Klaw's Workshop"] = {
 				WorldId = "KlawsWorkshop";
-				TitleImage = "http://www.roblox.com/asset/?id=8402447350";
+				TitleImage = "rbxassetid://8402447350";
 				
 				MaxPlayers = 4;
 				RewardsId = modConfigurations.SpecialEvent.Christmas and "xmaspresent2021" or nil;
@@ -542,7 +543,7 @@ GameModeLibrary.GameModes={
 			["SunkenShip"] = {
 				WorldId = "SunkenShip";
 				ExitSpawn = "sewersToharbor";
-				TitleImage = "http://www.roblox.com/asset/?id=11114580671";
+				TitleImage = "rbxassetid://11114580671";
 				Description = "I think I'm going to need some diving goggles..";
 
 				MaxPlayers = 4;

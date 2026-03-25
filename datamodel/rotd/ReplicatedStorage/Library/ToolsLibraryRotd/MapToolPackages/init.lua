@@ -139,6 +139,7 @@ end
 function toolPackage.init(super)
 	modToolsLibrary = super;
 
+	--MARK: Raid
 	toolPackage.inherit({
 		ItemId="abandonedbunkermap";
 	});
@@ -146,7 +147,21 @@ function toolPackage.init(super)
 	toolPackage.inherit({
 		ItemId="banditoutpostmap";
 	});
+
+
+	--MARK: Survival
+	toolPackage.inherit({
+		ItemId="swamplandsmap";
+	});
 	
+	
+	--MARK: Events
+	toolPackage.inherit({
+		ItemId="klawsmap";
+	});
+
+
+	--MARK: Community
 	toolPackage.inherit({
 		ItemId="communityfissionbaymap";
 	});
@@ -159,10 +174,6 @@ function toolPackage.init(super)
 		ItemId="communitywaysidemap";
 	});
 	
-	toolPackage.inherit({
-		ItemId="klawsmap";
-	});
-
 end
 
 return toolPackage;

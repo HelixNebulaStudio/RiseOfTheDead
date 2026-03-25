@@ -21,18 +21,17 @@ function WorldCore.InitGameController()
 
     newGameController.EnemiesList = {
         {Name="Zombie"; Chance=100;};
-        {Name="Ticks Zombie"; Chance=50; Fmod=2;};
-        {Name="Leaper Zombie"; Chance=25; Fmod=3;};
-        {Name="Heavy Zombie"; Chance=15; Fmod=4;};
-        {Name="Bloater"; Chance=10; Fmod=5;};
+        {Name="Ticks"; Chance=50; Fmod=2;};
+        {Name="Bloater"; Chance=35; Fmod=3;};
+        {Name="Leaper"; Chance=25; Fmod=3;};
+        {Name="Heavy"; Chance=15; Fmod=5;};
     }
 
     newGameController.BossConfig = {
         List={
             {Name="Zpider"; Chance=100;};
-            {Name="Fumes"; Chance=100;};
             {Name="Corrosive"; Chance=100;};
-            {Name="The Prisoner"; Chance=100;};
+            {Name="Shadow"; Chance=100;};
         };
     };
 
@@ -75,7 +74,7 @@ function WorldCore.onRequire()
         task.spawn(function()
             while true do
                 task.wait(1);
-                if playerClass.Character == nil then continue end;
+                if playerClass.Character == nil or playerClass.HealthComp.IsDead then continue end;
 
                 local cf = playerClass:GetCFrame();
                 if cf.Position.Y > -2 then continue end;

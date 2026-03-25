@@ -188,6 +188,11 @@ function GameMode:Start(room)
 						end));
 					end
 					
+					local bossTargetHandlerComp = npcClass:GetComponent("TargetHandler");
+					if bossTargetHandlerComp then
+						bossTargetHandlerComp:AddTarget(playerClass.Character, playerClass.HealthComp);
+					end
+
 					local playerNpcsList = modNpcs.listNpcClasses(function(npcClass: NpcClass)
 						return npcClass.Player == player;
 					end)
@@ -202,8 +207,12 @@ function GameMode:Start(room)
 							if targetHandlerComp then
 								targetHandlerComp:AddTarget(npcClass.Character, npcClass.HealthComp);
 							end
+							if bossTargetHandlerComp then
+								bossTargetHandlerComp:AddTarget(playerNpcClass.Character, playerNpcClass.HealthComp);
+							end
 						end
 					end
+					
 				end
 
 				local healthComp: HealthComp = npcClass.HealthComp;
