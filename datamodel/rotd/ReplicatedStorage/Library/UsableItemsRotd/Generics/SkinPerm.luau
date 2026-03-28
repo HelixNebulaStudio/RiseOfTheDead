@@ -7,17 +7,15 @@ local modColorsLibrary = shared.require(game.ReplicatedStorage.Library.ColorsLib
 local modSkinsLibrary = shared.require(game.ReplicatedStorage.Library.SkinsLibrary);
 local modItemUnlockablesLibrary = shared.require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
 local modItemSkinsLibrary = shared.require(game.ReplicatedStorage.Library.ItemSkinsLibrary);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local UsablePreset = shared.require(game.ReplicatedStorage.Library.UsableItems.UsablePreset).new();
 
 function UsablePreset:ClientUse(storageItem)
-	local player = game.Players.LocalPlayer;
-	local modData = shared.require(player:WaitForChild("DataModule") :: ModuleScript);
+	local skinPermWindow = modClientGuis.getWindow("SkinPerm");
+	skinPermWindow:Open(storageItem);
 
-	local modInterface = modData:GetInterfaceModule();
-	modInterface:OpenWindow("SkinPerm", storageItem);
-
-	return false;
+	return false; -- skip invoke ServerUse
 end
 
 --== MARK: Server

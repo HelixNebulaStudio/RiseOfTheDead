@@ -51,7 +51,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local skinPermItem, skinPermStorageId;
 	local activeStorageItem;
 	
-	function binds.onItemSelect(interface, slot)
+	function binds.onItemSelect(storageInterface, slot)
 		if skinPermItem == nil then 
 			selectImgButton.Visible = false;
 			return 
@@ -112,7 +112,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             window:Close();
 			
 		else
-			applyButton.Text = "Failed to apply"..(returnPacket.FailMsg and ": "..returnPacket.FailMsg or "");
+			applyButton.Text = `Failed to apply{returnPacket.FailMsg and `: {returnPacket.FailMsg}` or ""}`;
 			task.wait(2);
 			applyButton.Text = "Apply Skin Permanent";
 			
@@ -130,11 +130,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				return;
 			end
 			
-            interface:ToggleWindow("Workbench", true, {DontCloseInventory=true;});
             interface:ToggleWindow("Inventory", true);
 			skinPermItem = storageItem;
 
 			selectImgButton.Visible = false;
+			applyButton.Text = "Apply Skin Permanent";
 			
 			local skinPermStorage = modData.GetStorageOfItem(skinPermItem.ID);
 			skinPermStorageId = skinPermStorage.Id;
@@ -149,7 +149,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				storageInterface.OnItemButton1Click = binds.onItemSelect;
 
                 if skinPermItemLib.PatPerm then
-                    titleLabel.Text = "Apply ".. skinPermItemLib.Name .." Permanent";
+                    titleLabel.Text = `Apply {skinPermItemLib.Name} Permanent`;
 
                     for id, buttonTable in pairs(storageInterface.Buttons) do
                         if modItemsLibrary:HasTag(buttonTable.Item.ItemId, "Skinnable") then continue end;
@@ -158,7 +158,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     end
 
                 else
-                    titleLabel.Text = "Apply ".. skinPermItemLib.SkinPerm .." Skin Permanent";
+                    titleLabel.Text = `Apply {skinPermItemLib.SkinPerm} Skin Permanent`;
 
                     for id, buttonTable in pairs(storageInterface.Buttons) do
                         if buttonTable.Item.ItemId == skinPermItemLib.TargetItemId then continue end;

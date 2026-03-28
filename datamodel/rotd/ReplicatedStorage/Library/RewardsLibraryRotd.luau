@@ -403,6 +403,88 @@ function library.onRequire()
 		};
 	};
 
+	--MARK: Offerings
+	library:Add{
+		Id = "crimsonofferings";
+		Rewards = {
+			-- 1
+			{ItemId="leatherglovesred"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="gasmaskwhite"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="p250toygun"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="divinggogglesred"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="plankarmormaple"; Quantity=1; Chance=1; Tier=1;};
+
+			-- 2
+			{ItemId="clownmaskus"; Quantity=1; Chance=1/2; Tier=2;};
+			{ItemId="scraparmorcopper"; Quantity=1; Chance=1/2; Tier=2;};
+			{ItemId="armwrapsrat"; Quantity=1; Chance=1/2; Tier=2;};
+
+			-- 3
+			{ItemId="rusty48blaze"; Quantity=1; Chance=1/4; Tier=3;};
+			{ItemId="gasmaskunionjack"; Quantity=1; Chance=1/4; Tier=3;};
+
+			-- 4
+			{ItemId="nekrostrenchblaze"; Quantity=1; Chance=1/8; Tier=4;};
+
+			-- 5
+			{ItemId="tirearmorred"; Quantity=1; Chance=1/16; Tier=5;};
+		};
+	};
+	library:Add{
+		Id = "azureofferings";
+		Rewards = {
+			-- 1
+			{ItemId = "gasmaskblue"; Quantity = 1; Chance = 1; Tier=1;};
+			{ItemId = "disguisekitwhite"; Quantity = 1; Chance = 1; Tier=1;};
+			{ItemId = "inflatablebuoyrat"; Quantity = 1; Chance = 1; Tier=1;};
+			{ItemId = "ammopouchnight"; Quantity = 1; Chance = 1; Tier=1;};
+			{ItemId = "divinggogglesyellow"; Quantity = 1; Chance = 1; Tier=1;};
+			
+			-- 2
+			{ItemId = "portableautoturretblue"; Quantity = 1; Chance = 1/2; Tier=2;};
+			{ItemId = "prisonshirtblue"; Quantity = 1; Chance = 1/2; Tier=2;};
+			{ItemId = "prisonpantsblue"; Quantity = 1; Chance = 1/2; Tier=2;};
+
+			-- 3
+			{ItemId = "dufflebagstreetart"; Quantity = 1; Chance = 1/4; Tier=3;};
+			{ItemId = "dufflebagarticscape"; Quantity = 1; Chance = 1/4; Tier=3;};
+
+			-- 4
+			{ItemId = "scraparmorbiox"; Quantity = 1; Chance = 1/8; Tier=4;};
+
+			-- 5
+			{ItemId = "tophatgold"; Quantity = 1; Chance = 1/16; Tier=5;};
+		};
+	};
+	library:Add{
+		Id = "sageofferings";
+		Rewards = {
+			-- 1
+			{ItemId = "gasmaskyellow"; Quantity = 1; Chance = 1; Tier=1;};
+			{ItemId = "brownbeltwhite"; Quantity = 1; Chance = 1; Tier=1;};
+			{ItemId = "plankarmorash"; Quantity = 1; Chance = 1; Tier=1;};
+			{ItemId = "arelshiftcrossantique"; Quantity = 1; Chance = 1; Tier=1;};
+			{ItemId = "desolatorheavytoygun"; Quantity = 1; Chance = 1; Tier=1;};
+
+			-- 2
+			{ItemId = "watchyellow"; Quantity = 1; Chance = 1/2; Tier=2;};
+			{ItemId = "ammopouchhexcamo"; Quantity = 1; Chance = 1/2; Tier=2;};
+			{ItemId = "militarybootsforest"; Quantity = 1; Chance = 1/2; Tier=2;};
+
+			-- 3
+			{ItemId = "dufflebagvintage"; Quantity = 1; Chance = 1/4; Tier=3;};
+			{ItemId = "dufflebagfancy"; Quantity = 1; Chance = 1/4; Tier=3;};
+			{ItemId = "czevo3asiimov"; Quantity = 1; Chance = 1/4; Tier=3;};
+
+			-- 4
+			{ItemId = "survivorsbackpackstreetart"; Quantity = 1; Chance = 1/8; Tier=4;};
+
+			-- 5
+			{ItemId = "dufflebagfirstaidgreen"; Quantity = 1; Chance = 1/16; Tier=5;};
+		};
+	};
+
+
 	local ItemDropTypes = modGlobalVars.ItemDropsTypes;
 	local SpecialEvent = modConfigurations.SpecialEvent;
 
