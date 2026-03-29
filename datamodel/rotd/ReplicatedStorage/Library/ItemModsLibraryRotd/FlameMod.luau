@@ -31,10 +31,8 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		tValue = tValue + tTweakVal;
 	end
 
-	modifier.Values = {
-		Damage = dValue;
-		Duration = tValue;
-	};
+	modifier.Properties.Damage = dValue;
+	modifier.Properties.Duration = tValue;
 	modifier.ArrayValues.PassiveModifiers = statusKey;
 end
 
@@ -43,7 +41,7 @@ if RunService:IsServer() then
 	local modFlammable = shared.require(game.ServerScriptService.ServerLibrary.Flammable);
 
 	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
-		local duration = modifier.Values.Duration;
+		local duration = modifier.Properties.Duration;
 		if packet.HitInfo == nil then return end;
 		
 		local characterClass: CharacterClass = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass;
@@ -86,13 +84,58 @@ if RunService:IsServer() then
 			Duration = duration;
 			ApplyBy = characterClass;
 			Values = {
-				Damage = modifier.Values.Damage;
+				Damage = modifier.Properties.Damage;
 				TargetPart = targetPart;
 				Stacks = 0;
 				UseCurrHpDmg = true;
 			};
 		});
 
+	end
+
+
+	function modifierPackage.Binds.WeaponShotProjectileNew(
+		modifier: ItemModifierInstance, 
+		projectile: ProjectileInstance
+	)
+    	local projectilePart = projectile.Part;
+
+		projectilePart.Color = Color3.fromRGB(255, 94, 0);
+		projectilePart.Material = Enum.Material.Neon;
+
+		local bulletTracer = projectilePart:FindFirstChild("BulletTracer");
+		if bulletTracer then
+			bulletTracer.Color = ColorSequence.new(Color3.fromRGB(255, 94, 0));
+		end
+
+		local fireParticle = Instance.new("Fire");
+		fireParticle.Size = 2;
+		fireParticle.Heat = 10;
+		fireParticle.Parent = projectilePart;
+	end
+
+
+	function modifierPackage.Binds.WeaponShotProjectileHit(
+		modifier: ItemModifierInstance, 
+		projectile: ProjectileInstance, 
+		arcPoint: ArcPoint
+	)
+		if arcPoint.Hit == nil then return end;
+
+		local targetModel = arcPoint.Hit.Parent;
+		if targetModel == nil then return end;
+
+
+		local targetHealthComp: HealthComp? = modHealthComp.getByModel(targetModel);
+		if targetHealthComp == nil then return end;
+		targetModel = targetHealthComp:GetModel();
+
+		modifierPackage.Binds.WeaponShotBulletHit(modifier, {
+			TargetModel = targetModel;
+			HitInfo = {
+				Part = arcPoint.Hit;
+			};
+		} :: BulletHitData);
 	end
 
 end

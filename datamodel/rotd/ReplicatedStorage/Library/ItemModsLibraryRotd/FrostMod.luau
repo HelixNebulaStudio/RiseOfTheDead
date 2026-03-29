@@ -101,8 +101,43 @@ if RunService:IsServer() then
 		});
 	end
 
+	function modifierPackage.Binds.WeaponShotProjectileNew(
+		modifier: ItemModifierInstance, 
+		projectile: ProjectileInstance
+	)
+		if not modifier.Properties.Active then return end;
+    	local projectilePart = projectile.Part;
+
+		projectilePart.Color = Color3.fromRGB(0, 170, 255);
+		projectilePart.Material = Enum.Material.Ice;
+
+		local bulletTracer = projectilePart:FindFirstChild("BulletTracer");
+		if bulletTracer then
+			bulletTracer.Color = ColorSequence.new(Color3.fromRGB(0, 170, 255));
+		end
+	end
+
+	function modifierPackage.Binds.WeaponShotProjectileHit(
+		modifier: ItemModifierInstance, 
+		projectile: ProjectileInstance, 
+		arcPoint: ArcPoint
+	)
+		if arcPoint.Hit == nil then return end;
+
+		local targetModel = arcPoint.Hit.Parent;
+		if targetModel == nil then return end;
+
+
+		local targetHealthComp: HealthComp? = modHealthComp.getByModel(targetModel);
+		if targetHealthComp == nil then return end;
+		targetModel = targetHealthComp:GetModel();
+
+		modifierPackage.Binds.WeaponShotBulletHit(modifier, {
+			TargetModel = targetModel;
+		} :: BulletHitData);
+	end
+
 	function modifierPackage.Binds.WeaponTriggerSpecial(modifier: ItemModifierInstance)
-		Debugger:Warn("Trigger Special", modifier.Properties.Ready);
 		if modifier.Properties.Active then return end;
 		if not modifier.Properties.Ready then return end;
 
@@ -114,7 +149,6 @@ if RunService:IsServer() then
 	function modifierPackage.Binds.PatPrimaryFire(modifier: ItemModifierInstance)
 		if not modifier.Properties.Ready then return end;
 
-		Debugger:StudioLog(`PAT activate modifier`);
 		modifier.Properties.Active = true;
 		modifier.Properties.Ready = false;
 		modifier:Sync({"Active"; "Ready"; "Charge"});
@@ -137,15 +171,17 @@ elseif RunService:IsClient() then
 		local frostbiteHudData = toolStatusHud.Frostbite;
 		if modifier.Properties.Active then
 			frostbiteHudData.Rays = true;
+			frostbiteHudData.Glow = true;
+			frostbiteHudData.KeyString = nil;
 		else
 			frostbiteHudData.Rays = false;
-		end
-		if modifier.Properties.Ready then
-			frostbiteHudData.KeyString = "KeyToggleSpecial";
-			frostbiteHudData.Glow = true;
-		else
-			frostbiteHudData.KeyString = nil;
-			frostbiteHudData.Glow = nil;
+			if modifier.Properties.Ready then
+				frostbiteHudData.KeyString = "KeyToggleSpecial";
+				frostbiteHudData.Glow = true;
+			else
+				frostbiteHudData.KeyString = nil;
+				frostbiteHudData.Glow = nil;
+			end
 		end
 		local chargeRatio = math.clamp(modifier.Properties.Charge or 0, 0, 1);
 		frostbiteHudData.Text = `{math.round(chargeRatio*100)}%`;

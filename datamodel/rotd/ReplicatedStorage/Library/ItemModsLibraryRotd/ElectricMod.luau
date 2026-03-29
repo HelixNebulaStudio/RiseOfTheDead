@@ -30,10 +30,8 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		tValue = tValue + tTweakVal;
 	end
 
-	modifier.Values = {
-		Targets = math.ceil(tValue);
-		DamagePercent = dValue;
-	};
+	modifier.Properties.Targets = math.ceil(tValue);
+	modifier.Properties.DamagePercent = dValue;
 end
 
 if RunService:IsServer() then
@@ -41,8 +39,8 @@ if RunService:IsServer() then
 	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
 		if packet.TargetModel == nil then return end;
 		
-		local maxTargets = modifier.Values.Targets;
-		local damagePercent = modifier.Values.DamagePercent;
+		local maxTargets = modifier.Properties.Targets;
+		local damagePercent = modifier.Properties.DamagePercent;
 
 		local configurations = modifier.EquipmentClass and modifier.EquipmentClass.Configurations;
 		local weaponSiid = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem.ID;
@@ -52,7 +50,7 @@ if RunService:IsServer() then
 
 		local targetHealthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
 		if targetHealthComp == nil or targetHealthComp.IsDead or not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
-		
+
 		local targetCharClass: EntityClass = targetHealthComp.CompOwner;
 		local statusComp: StatusComp? = targetCharClass.StatusComp;
 		if statusComp == nil then return end;
@@ -81,6 +79,42 @@ if RunService:IsServer() then
 
 	end
 	
+	function modifierPackage.Binds.WeaponShotProjectileNew(
+		modifier: ItemModifierInstance, 
+		projectile: ProjectileInstance
+	)
+    	local projectilePart = projectile.Part;
+
+		projectilePart.Color = Color3.fromRGB(255, 253, 139);
+		projectilePart.Material = Enum.Material.Cobblestone;
+
+		local bulletTracer = projectilePart:FindFirstChild("BulletTracer");
+		if bulletTracer then
+			bulletTracer.Color = ColorSequence.new(Color3.fromRGB(255, 253, 139));
+		end
+	end
+
+	function modifierPackage.Binds.WeaponShotProjectileHit(
+		modifier: ItemModifierInstance, 
+		projectile: ProjectileInstance, 
+		arcPoint: ArcPoint
+	)
+		if arcPoint.Hit == nil then return end;
+
+		local targetModel = arcPoint.Hit.Parent;
+		if targetModel == nil then return end;
+
+		local bulletOriginAtt: Attachment = projectile.;
+		
+		modifierPackage.Binds.WeaponShotBulletHit(modifier, {
+			TargetModel = targetModel;
+			OriginAtt = arcTracer.Origin;
+			HitInfo = {
+				Part = arcPoint.Hit;
+			}
+		} :: BulletHitData);
+	end
+
 end
 
 return modifierPackage;

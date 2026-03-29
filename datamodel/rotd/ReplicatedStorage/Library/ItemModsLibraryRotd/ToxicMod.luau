@@ -30,17 +30,15 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		tValue = tValue + tTweakVal;
 	end
 
-	modifier.Values = {
-		Reduction = rValue;
-		Duration = tValue;
-	}
+	modifier.Properties.Reduction = rValue;
+	modifier.Properties.Duration = tValue;
 end
 
 if RunService:IsServer() then
 
 	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
 		if packet.TargetModel == nil then return end;
-		local duration = modifier.Values.Duration;
+		local duration = modifier.Properties.Duration;
 
 		local characterClass: CharacterClass = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass;
 		if characterClass == nil then return end;
@@ -60,13 +58,45 @@ if RunService:IsServer() then
 		end
 
 		statusComp:Apply(statusKey, {
+			ApplyBy = characterClass;
 			Expires = workspace:GetServerTimeNow() + duration;
 			Duration = duration;
 			Values = {
-				ImmunityReduction = modifier.Values.Reduction;
+				ImmunityReduction = modifier.Properties.Reduction;
 			};
 		});
 
+	end
+
+	function modifierPackage.Binds.WeaponShotProjectileNew(
+		modifier: ItemModifierInstance, 
+		projectile: ProjectileInstance
+	)
+    	local projectilePart = projectile.Part;
+
+		projectilePart.Color = Color3.fromRGB(87, 211, 83);
+		projectilePart.Material = Enum.Material.Cobblestone;
+
+		local bulletTracer = projectilePart:FindFirstChild("BulletTracer");
+		if bulletTracer then
+			bulletTracer.Color = ColorSequence.new(Color3.fromRGB(87, 211, 83));
+		end
+	end
+
+
+	function modifierPackage.Binds.WeaponShotProjectileHit(
+		modifier: ItemModifierInstance, 
+		projectile: ProjectileInstance, 
+		arcPoint: ArcPoint
+	)
+		if arcPoint.Hit == nil then return end;
+
+		local targetModel = arcPoint.Hit.Parent;
+		if targetModel == nil then return end;
+
+		modifierPackage.Binds.WeaponShotBulletHit(modifier, {
+			TargetModel = targetModel;
+		} :: BulletHitData);
 	end
 
 end
