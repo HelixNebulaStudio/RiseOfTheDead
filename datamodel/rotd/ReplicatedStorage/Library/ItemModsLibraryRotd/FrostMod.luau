@@ -30,10 +30,8 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		tValue = tValue + tTweakVal;
 	end
 
-	modifier.Values = {
-		Radius = sValue;
-		Targets = tValue;
-	}
+	modifier.Properties.Radius = sValue;
+	modifier.Properties.Targets = tValue;
 end
 
 if RunService:IsServer() then
@@ -48,34 +46,78 @@ if RunService:IsServer() then
 		if targetHealthComp == nil then return end;
 		if targetHealthComp.IsDead or not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
 	
-		if modifier.Values.Counter > 1 then
-			modifier.Values.Counter = modifier.Values.Counter -1;
-			modifier:Sync({"Counter"});
-			return;
-		else
-			modifier.Values.Counter = 5;
-			modifier:Sync({"Counter"})
-		end
-
-		local configurations = modifier.EquipmentClass and modifier.EquipmentClass.Configurations;
-		
 		local targetClass: EntityClass = targetHealthComp.CompOwner;
 		local statusComp: StatusComp? = targetClass.StatusComp;
 		if statusComp == nil then return end;
+
+		local configurations = modifier.EquipmentClass and modifier.EquipmentClass.Configurations;
+
 		
-		local frostbiteStatusClass: StatusClassInstance = statusComp:GetOrDefault(statusId);
-		if frostbiteStatusClass == nil then
-			statusComp:Apply(statusId, {
-				Expires = workspace:GetServerTimeNow() + 5;
-				Duration = 5;
-				ApplyBy = characterClass;
-				Values = {
-					Damage = configurations.Damage; 
-					Radius = modifier.Values.Radius;
-					Targets = modifier.Values.Targets;
-				};
-			});
+		if modifier.Properties.Charge == nil then
+			modifier.Properties.Charge = 0;
 		end
+
+		local rate = (60/configurations.Rpm)/5;
+		if modifier.Properties.Cooldown and workspace:GetServerTimeNow() <= modifier.Properties.Cooldown then return end;
+		if modifier.Properties.Active ~= true then
+			if modifier.Properties.Charge < 1 then
+				modifier.Properties.Charge = math.clamp(modifier.Properties.Charge + rate, 0, 1);
+				modifier:Sync({"Charge"; "Ready"; "Active"});
+				return;
+			else
+				modifier.Properties.Ready = true;
+				modifier:Sync({"Charge"; "Ready"; "Active"});
+			end
+
+			return;
+		end
+		modifier.Properties.Charge = math.clamp(modifier.Properties.Charge - (rate*4), 0, 1);
+		if modifier.Properties.Charge <= 0 then
+			modifier.Properties.Active = false;
+			modifier.Properties.Ready = false;
+			modifier.Properties.Cooldown = workspace:GetServerTimeNow()+1;
+			modifier:Sync({"Charge"; "Ready"; "Active"});
+		else
+			modifier:Sync({"Charge";});
+		end
+
+
+		local frostbiteStatusClass: StatusClassInstance = statusComp:GetOrDefault(statusId);
+		if frostbiteStatusClass then
+			frostbiteStatusClass.Expires = workspace:GetServerTimeNow() + 5;
+			return;
+		end;
+
+		statusComp:Apply(statusId, {
+			Expires = workspace:GetServerTimeNow() + 5;
+			Duration = 5;
+			ApplyBy = characterClass;
+			Values = {
+				DoIceBlast = true;
+				Damage = configurations.PreModDamage;
+				Radius = modifier.Properties.Radius;
+				Targets = modifier.Properties.Targets;
+			};
+		});
+	end
+
+	function modifierPackage.Binds.WeaponTriggerSpecial(modifier: ItemModifierInstance)
+		Debugger:Warn("Trigger Special", modifier.Properties.Ready);
+		if modifier.Properties.Active then return end;
+		if not modifier.Properties.Ready then return end;
+
+		modifier.Properties.Active = true;
+		modifier.Properties.Ready = false;
+		modifier:Sync({"Active"; "Ready"; "Charge"});
+	end
+
+	function modifierPackage.Binds.PatPrimaryFire(modifier: ItemModifierInstance)
+		if not modifier.Properties.Ready then return end;
+
+		Debugger:StudioLog(`PAT activate modifier`);
+		modifier.Properties.Active = true;
+		modifier.Properties.Ready = false;
+		modifier:Sync({"Active"; "Ready"; "Charge"});
 	end
 
 elseif RunService:IsClient() then
@@ -85,6 +127,7 @@ elseif RunService:IsClient() then
 
 		if toolStatusHud.Frostbite == nil then
 			toolStatusHud.Frostbite = {
+				ModifierId = modifier.Id;
 				ModItemId = "frostmod";
 				Order = 1;
 				Text = ``;
@@ -92,12 +135,30 @@ elseif RunService:IsClient() then
 		end
 
 		local frostbiteHudData = toolStatusHud.Frostbite;
-		if modifier.Values.Counter then
-			frostbiteHudData.Text = `{modifier.Values.Counter}`;
-			frostbiteHudData.ColorPercent = modifier.Values.Counter/5;
+		if modifier.Properties.Active then
+			frostbiteHudData.Rays = true;
+		else
+			frostbiteHudData.Rays = false;
 		end
+		if modifier.Properties.Ready then
+			frostbiteHudData.KeyString = "KeyToggleSpecial";
+			frostbiteHudData.Glow = true;
+		else
+			frostbiteHudData.KeyString = nil;
+			frostbiteHudData.Glow = nil;
+		end
+		local chargeRatio = math.clamp(modifier.Properties.Charge or 0, 0, 1);
+		frostbiteHudData.Text = `{math.round(chargeRatio*100)}%`;
+		frostbiteHudData.ColorPercent = chargeRatio;
 	end
 
+end
+
+function modifierPackage.Binds.ApplyWeaponShotTracerColor(modifier: ItemModifierInstance)
+	if modifier.Properties.Active then
+		return Color3.fromRGB(0, 213, 255);
+	end
+	return;
 end
 
 return modifierPackage;

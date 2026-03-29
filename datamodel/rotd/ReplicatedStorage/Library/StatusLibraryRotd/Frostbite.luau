@@ -14,16 +14,25 @@ local modHealthComp = shared.require(game.ReplicatedStorage.Components.HealthCom
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 --
 local statusPackage = {
-    Id="Frostbite";
-    Icon="";
-    Name="Hit by Frostbite bullet.";
-    Description="Frostbite causing slow and stun.";
-    Buff=false;
+    Id = "Frostbite";
+    Icon = "";
+    Name = "Hit by Frostbite bullet.";
+    Description = "Frostbite causing stun and lethal damage.";
+    Buff = false;
 };
 
+function statusPackage.onRequire()
+    frostParticle = game.ReplicatedStorage.Particles:WaitForChild("Frost");
+    iceDecor = game.ReplicatedStorage.Prefabs.Objects:WaitForChild("IceDecor");
+    frostTexture = game.ReplicatedStorage.Prefabs.Textures:WaitForChild("FrostTexture");
+end
 
 function statusPackage.IceBlast(applyBy: CharacterClass?, packet: anydict)
     local targetCharacterClass: CharacterClass = packet.ApplyTo;
+    if targetCharacterClass.Character == nil then
+        Debugger:Warn("Target character is nil.", targetCharacterClass == nil or targetCharacterClass.ClassName);
+        return;
+    end
     local maxTargets: number = packet.Targets;
     local maxRadius: number = packet.Radius;
     local totalSplashDamage: number = packet.TotalSplashDamage;
@@ -87,12 +96,18 @@ function statusPackage.IceBlast(applyBy: CharacterClass?, packet: anydict)
         local statusComp: StatusComp = healthComp.CompOwner.StatusComp;
 
         local frostStatusClass: StatusClassInstance = statusComp:GetOrDefault(statusPackage.Id);
-        if frostStatusClass then continue end;
+        if frostStatusClass then
+            frostStatusClass.Expires = workspace:GetServerTimeNow() + 5;
+            continue; 
+        end;
 
         statusComp:Apply(statusPackage.Id, {
             Expires = workspace:GetServerTimeNow() + 5;
+            Duration = 5;
+			ApplyBy = applyBy;
             Values = {
-                DoIceBlaster = false;
+                DoIceBlast = false;
+                Damage = packet.Damage;
             };
         });
         table.insert(hitHealthComps, healthComp);
@@ -117,36 +132,45 @@ end
 
 local faces = {Enum.NormalId.Back; Enum.NormalId.Bottom; Enum.NormalId.Front; Enum.NormalId.Left; Enum.NormalId.Right; Enum.NormalId.Top;};
 function statusPackage.IceEffect(targetModel: Model, garbageHandler: GarbageHandler)
-    local frostParticle = game.ReplicatedStorage.Particles:WaitForChild("Frost");
-    local iceDecor = game.ReplicatedStorage.Prefabs.Objects:WaitForChild("IceDecor");
-    local frostTexture = game.ReplicatedStorage.Prefabs.Textures:WaitForChild("FrostTexture");
-
     local bodyParts = targetModel:GetChildren();
-    for a=1, #bodyParts do
-        if bodyParts[a]:IsA("BasePart") and bodyParts[a].Name ~= "HumanoidRootPart" and bodyParts[a].Transparency ~= 1 then
-            for b=1, #faces do
-                local new = frostTexture:Clone();
-                new.Face = faces[b];
-                new.Parent = bodyParts[a];
-                garbageHandler:Tag(new);
-            end
-            if bodyParts[a].Name == "Head" then
-                local newFrostParticle = frostParticle:Clone();
-                newFrostParticle.Parent = bodyParts[a];
-                garbageHandler:Tag(newFrostParticle);
-            end
-            if bodyParts[a].Name:find("Foot") then
-                local newIceRock = iceDecor:Clone();
 
-                local newVal = Instance.new("ObjectValue");
-                newVal.Name = "TargetFoot";
-                newVal.Value = bodyParts[a];
-                newVal.Parent = newIceRock;
-
-                Debugger.Expire(newIceRock, 10);
-                garbageHandler:Tag(newIceRock);
-            end
+    local function applyIceShader(bodyPart: BasePart)
+        for b=1, #faces do
+            local new = frostTexture:Clone();
+            new.Face = faces[b];
+            new.Parent = bodyPart;
+            garbageHandler:Tag(new);
         end
+        if bodyPart.Name == "Head" then
+            local newFrostParticle = frostParticle:Clone();
+            newFrostParticle.Parent = bodyPart;
+            garbageHandler:Tag(newFrostParticle);
+        end
+        if bodyPart.Name:find("Foot") then
+            local newIceRock = iceDecor:Clone();
+
+            local newVal = Instance.new("ObjectValue");
+            newVal.Name = "TargetFoot";
+            newVal.Value = bodyPart;
+            newVal.Parent = newIceRock;
+
+            Debugger.Expire(newIceRock, 10);
+            garbageHandler:Tag(newIceRock);
+        end
+    end
+
+    for a=1, #bodyParts do
+        local bodyPart: BasePart = bodyParts[a];
+        if not bodyPart:IsA("BasePart") then 
+            if bodyPart:IsA("Accessory") and bodyPart:FindFirstChild("Handle") then
+                applyIceShader(bodyPart.Handle);
+            end
+            continue
+        end;
+        if bodyPart.Name == "HumanoidRootPart" then continue end;
+        if bodyPart.Transparency == 1 then continue end;
+
+        applyIceShader(bodyPart);
     end
 end
 
@@ -154,9 +178,9 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
     
     statusClass.ExpiresOnDeath = true;
-    statusClass.Values.SlowValue = 0;
+    statusClass.Values.WeakStun = true;
 
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     local healthComp: HealthComp? = characterClass.HealthComp;
     if healthComp == nil or healthComp.IsDead then return end;
     
@@ -169,22 +193,21 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
         end
     end
     
-    if statusClass.Values.DoIceBlast == nil then return end;
-
-    local packet = {
+    if statusClass.Values.DoIceBlast ~= true then return end;
+    statusPackage.IceBlast(statusClass.ApplyBy, {
+        ApplyTo = statusClass.StatusOwner;
         Targets = statusClass.Values.Targets;
         Radius = statusClass.Values.Radius;
         TotalSplashDamage = statusClass.Values.Damage;
-    };
-    statusPackage.IceBlast(statusClass.ApplyBy, packet);
-
+        Damage = statusClass.Values.Damage;
+    });
 end
 
 -- When character dies due to reaching health's shatter threshold, status expires.
 function statusPackage.BindExpire(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
 
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     if characterClass.Character == nil or not characterClass.HealthComp.IsDead then return end;
    
     local rootPart: BasePart = characterClass.RootPart;
@@ -208,6 +231,22 @@ function statusPackage.BindExpire(statusClass: StatusClassInstance)
     };
     modParticleSprinkler:Emit(particlePacket);
 
+end
+
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
+    if RunService:IsClient() then return end;
+    if tickData.ms1000 == false then return end;
+
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
+    local healthComp: HealthComp? = characterClass.HealthComp;
+    if healthComp == nil then return end;
+
+    local damage = statusClass.Values.Damage or 1;
+    healthComp:TakeDamage(DamageData.new{
+        DamageBy = statusClass.ApplyBy;
+        Damage = damage;
+        DamageType = "Frost";
+    });
 end
 
 

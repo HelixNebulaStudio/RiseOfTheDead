@@ -32,7 +32,7 @@ local GenericDescs={
 
 function library.onRequire()
 	local GenericUpgrades = {
-		AmmoCapacity={DataTag="AC"; Name="Ammo Capacity"; Syntax="Upgrade Ammo Capacity"; MaxLevel=10; BaseCost=5; MaxCost=50; BaseValue=0.3; MaxValue=3; TweakBonus=1; Scaling=library.ScalingStyle.NaturalCurve; Rate=1;};
+		MaxAmmoLimit={DataTag="AC"; Name="Ammo Capacity"; Syntax="Upgrade Ammo Capacity"; MaxLevel=10; BaseCost=5; MaxCost=50; BaseValue=0.3; MaxValue=3; TweakBonus=1; Scaling=library.ScalingStyle.NaturalCurve; Rate=1;};
 	}
 
 	-- MARK: Pistol Mods 1-49;
@@ -771,7 +771,7 @@ function library.onRequire()
 		Module=script.AmmoCapacity;
 		Category="Ammo Capacity Mods";
 		Upgrades={
-			GenericUpgrades.AmmoCapacity;
+			GenericUpgrades.MaxAmmoLimit;
 		};
 	}
 
@@ -1143,15 +1143,17 @@ function library.onRequire()
 	library:Add{
 		Id="frostmod";
 		Name="Frostbite";
-		Desc="Continuous firing will <b>Freeze</b> enemies and causes an <b>Ice Blast</b> freezing nearby enemies. <b>Frostbitten</b> enemies will shatter if dropped below a theshold of max health.";
+		Desc="Every damaging shot charges <b>Frostbite</b>. Once charged and activated, shooting enemies causes an <b>Ice Blast</b> freezing nearby enemies and applies <b>Frostbitten</b> debuff.";
 		ModDesc=[[
-		Continuous firing at enemies will slow and <b>Freeze</b> them for 5 seconds and causes an <b>Ice Blast</b>.
+		Every damaging shot charges the modifier. When active, enemies shot causes an <b>Ice Blast</b> and apply <b>Frostbitten</b> to each enemy hit.
 		
 		<b>Ice Blast</b>
-			Area of effect explosion that freezes <b>Targets</b> within the <b>Radius</b> and apply <b>Frostbitten</b> to each enemy.
+			Duration: 5s
+			Area of effect explosion that weak-stuns <b>Targets</b> within the <b>Radius</b> and apply <b>Frostbitten</b> to each enemy. <i>(Weak-stun only stuns basic enemies.)</i>
 			
 		<b>Frostbitten</b>
-			Take weapon damage as frost damage twice per second and when enemies dropped below 10% of max health will instantly shatter and die.
+			Enemy Debuff:
+			Take <b>Premod Damage</b> as frost damage once per second and when enemies dropped below 10% of max health will instantly shatter and die.
 		]];
 		Icon="rbxassetid://3576197517";
 		BaseTier=1;
