@@ -10,24 +10,21 @@ local attirePackage = {
 
 	Configurations={
 		HasFlinchProtection = true;
-		UnderwaterVision = 0.06;
 	};
 	Properties={};
 };
 
-function attirePackage.OnAccesorySpawn(classPlayer, storageItem, newAccessoryPrefabs)
+function attirePackage.OnAccesorySpawn(playerClass: PlayerClass, storageItem: StorageItem, newAccessoryPrefabs)
 	local accessory = newAccessoryPrefabs and newAccessoryPrefabs[1];
 	if typeof(accessory) ~= "Instance" then return end;
 
-	local character = classPlayer:GetCharacter();
-	
 	local accessoryHandle = accessory:WaitForChild("Handle");
 	local vehicleWearMotor = accessoryHandle:WaitForChild("VehicleWear");
 
-	vehicleWearMotor.Part0 = classPlayer.RootPart;
+	vehicleWearMotor.Part0 = playerClass.RootPart;
 	vehicleWearMotor.Part1 = accessoryHandle;
 
-	local humanoid: Humanoid = classPlayer.Humanoid;
+	local humanoid: Humanoid = playerClass.Humanoid;
 	local animator = humanoid:WaitForChild("Animator") :: Animator;
 	
 	local conn = animator.AnimationPlayed:Connect(function(animationTrack: AnimationTrack)
@@ -62,8 +59,8 @@ function attirePackage.newClass()
 
 	equipmentClass:AddBaseModifier("Sledding", {
 		SetValues={
-			VehicleWear="snowsledge";
-			VehicleWearAnimationId=attirePackage.VehicleWearAnimationId;
+			VehicleWear = "snowsledge";
+			VehicleWearAnimationId = attirePackage.VehicleWearAnimationId;
 		};
 	});
 

@@ -1,25 +1,65 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
-local CollectionService = game:GetService("CollectionService");
+local PhysicsService = game:GetService("PhysicsService");
 
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 local modStatusLibrary = shared.require(game.ReplicatedStorage.Library.StatusLibrary);
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
+local modTouchHandler = shared.require(game.ReplicatedStorage.Library.TouchHandler);
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modifierPackage = {
 	Name = "Chivalrous Kick";
 	
 	Tags = {};
 	Binds = {};
+
+	TouchHandler = nil;
 };
+local templateGreavesAndSabatonsModel;
 --==
 
 function modifierPackage.onRequire()
 	modStatusLibrary:Add(modStatusClass.new{
 		Id = "ChivalrousKick";
 	});
+
+	if RunService:IsClient() then return end;
+
+	templateGreavesAndSabatonsModel = game.ReplicatedStorage.Prefabs.Effects:WaitForChild("GreavesAndSabatons");
+
+	local chivKickKnockbackTouchHandler = modTouchHandler.new("ChivKickKnockback", 0.1);
+
+	function chivKickKnockbackTouchHandler:OnHumanoidTouch(humanoid, hitbox, part)
+		if hitbox.Parent == nil then return end;
+
+		local characterTag = hitbox.Parent:FindFirstChild("CharacterTag");
+		if characterTag == nil then return end;
+
+		local character: Model = characterTag.Value;
+
+		local characterClass: CharacterClass = shared.modPlayers.getByModel(character);
+		if characterClass == nil then return end;
+
+		local targetModel = part.Parent;
+		if not targetModel then return end;
+
+		local healthComp: HealthComp = modHealthComponent.getByModel(targetModel);
+		if not healthComp then return end;
+		targetModel = healthComp:GetModel();
+
+		local damageTo: CharacterClass = healthComp.CompOwner :: CharacterClass;
+		if not healthComp:CanTakeDamageFrom(characterClass) then return end;
+
+		local modifierId = characterTag:GetAttribute("mId");
+		local modifier: ItemModifierInstance? = characterClass.WieldComp:GetOrDefaultItemModifier(modifierId);
+		if modifier == nil then return end;
+
+		modifierPackage.Kick(modifier, targetModel);
+	end
+
+	modifierPackage.TouchHandler = chivKickKnockbackTouchHandler;
 end
 
 function modifierPackage.Kick(modifier: ItemModifierInstance, targetModel)
@@ -53,10 +93,10 @@ function modifierPackage.Kick(modifier: ItemModifierInstance, targetModel)
 		local position = ownerClass:GetCFrame().Position;
 		local dir = (rootPart.Position-position).Unit;
 		
-		local dForce = dir * 200;
+		local dForce = (dir * 100) + Vector3.new(0, 50, 0);
 
 		local knockbackResistance = targetClass.Configurations.KnockbackResistant or 0;
-		if targetClass.HealthComp.CurArmor <= 0 and knockbackResistance < 1 then
+		if targetClass.Properties.BasicEnemy and targetClass.HealthComp.CurArmor <= 0 and knockbackResistance < 1 then
 			targetClass.StatusComp:Apply("ExplosionRagdoll", {
 				Expires = workspace:GetServerTimeNow() + 1;
 				Values = {
@@ -75,33 +115,52 @@ function modifierPackage.Kick(modifier: ItemModifierInstance, targetModel)
 end
 
 function modifierPackage.Binds.CharacterClassIsSlidingChanged(modifier: ItemModifierInstance, isSliding: boolean)
-	if propertyName ~= "IsSliding" then return end;
 	if modifier.WieldComp == nil then return end;
 
-	local ownerClass: CharacterClass = modifier.WieldComp.CompOwner;
+	local playerClass: PlayerClass = modifier.WieldComp.CompOwner :: PlayerClass;
 	if isSliding == false then return end
 
-	task.spawn(function()
-		local r = 8;
+	local character: Model = playerClass.Character;
 
-		while ownerClass.Properties.IsSliding == true do
-			local pos = ownerClass.RootPart.Position;
-			local lookVec = ownerClass:GetCFrame().LookVector;
+	if RunService:IsServer() then 
+		task.spawn(function()
+			local newGreavesAndSabatons: Model = templateGreavesAndSabatonsModel:Clone();
+			
+			local charTag = Instance.new("ObjectValue");
+			charTag.Name = "CharacterTag";
+			charTag.Value = character;
+			charTag:SetAttribute("mId", modifier.Id);
+			charTag.Parent = newGreavesAndSabatons;
 
-			local overlapParams = OverlapParams.new();
-			overlapParams.FilterType = Enum.RaycastFilterType.Include;
-			overlapParams.FilterDescendantsInstances = CollectionService:GetTagged("Enemies");
-			overlapParams.MaxParts = 8;
+			local rigidConstraint = Instance.new("RigidConstraint");
+			rigidConstraint.Attachment0 = newGreavesAndSabatons:WaitForChild("sabatons"):WaitForChild("RightFootAttachment");
+			rigidConstraint.Attachment1 = character:WaitForChild("RightFoot"):WaitForChild("RightFootAttachment");
+			rigidConstraint.Parent = newGreavesAndSabatons;
 
-			local rootParts = workspace:GetPartBoundsInRadius(pos + lookVec*(r/2), r, overlapParams);
+			newGreavesAndSabatons.Parent = workspace.Debris;
 
-			for a=1, #rootParts do
-				modifierPackage.Kick(modifier, rootParts[a].Parent);
+			local hitBox = newGreavesAndSabatons:WaitForChild("hitBox");
+			modifierPackage.TouchHandler:AddObject(hitBox);
+			playerClass.CharacterGarbage:Tag(newGreavesAndSabatons);
+
+			while playerClass.Properties.IsSliding == true do
+				task.wait(0.1);
 			end
+			Debugger.Expire(newGreavesAndSabatons, 0);
+			playerClass.CharacterGarbage:Untag(newGreavesAndSabatons);
+		end)
 
-			task.wait(0.1);
-		end
-	end)
+	elseif RunService:IsClient() then
+		task.spawn(function()
+			local collisionRootPart = character:WaitForChild("CollisionRootPart");
+			collisionRootPart.CollisionGroup = "PlayersPhase";
+			while playerClass.Properties.IsSliding == true do
+				task.wait(0.1);
+			end
+			collisionRootPart.CollisionGroup = "Players";
+		end)
+
+	end;
 end
 
 

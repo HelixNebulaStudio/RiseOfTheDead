@@ -38,7 +38,7 @@ function modItemsLibrary.onRequire()
     new(resourceBase, {Id="nekronscales"; Name="Nekron Scales"; Icon="rbxassetid://14479314520"; Description="Dead and dried scales of Nekron."; Sources={"Obtainable from <b>Elder Vexeron's Tumours</b>"; "Obtainable from <b>Tendrils</b>"; "Mined from <b>Sector F</b>";};});
 
 
-
+    --MARK: COMPONENTS
     --=========================================================[[ COMPONENTS ]]==========================================================--
     local componentsBase = {
         Type = modItemsLibrary.Types.Component;
@@ -67,7 +67,7 @@ function modItemsLibrary.onRequire()
     -- new(componentsBase, {Id="tier4augment"; Name="Tier 4 Augment"; TradingTax = 200; Icon="rbxassetid://16910121022"; Description="An augment to upgrade mods to tier 4."; });
 
 
-
+    --MARK: WEAPONS
     --==========================================================[[ WEAPONS ]]==========================================================--
     local gunBase = {
         Type = modItemsLibrary.Types.Tool;
@@ -145,8 +145,8 @@ function modItemsLibrary.onRequire()
     new(meleeBase, {Id="tankerrebar"; Name="Tanker's Rebar"; Icon="rbxassetid://16798723165"; Tradable=modItemsLibrary.Tradable.Nontradable; Tags={"Blunt Melee"; "Unobtainable"}; Description="Rebar with a slab of concrete stuck to its end. Used by the Tanker.";});
 
 
-
-    --==========================================================[[ Throwables ]]==========================================================--
+    --MARK: THROWABLES
+    --==========================================================[[ THROWABLES ]]==========================================================--
     local throwableBase = {
         Type = modItemsLibrary.Types.Tool;
         Tradable = modItemsLibrary.Tradable.Tradable;
@@ -235,7 +235,7 @@ function modItemsLibrary.onRequire()
     new(clothingBase, {Id="brownleatherboots"; Name="Leather Boots"; Icon="rbxassetid://89716224000012"; Tags={"Shoes"}; Description="These look great on you.\n<b>[Passive] Bull Leaping:</b> Slide jumping adds 10 units/sec launch speed.";});
     new(clothingBase, {Id="militaryboots"; Name="Military Boots"; Icon="rbxassetid://17022087037"; Tags={"Shoes"}; Description="Military grade boots.\n<b>[Passive] Firm Footing:</b> Reduces movement impairment debuffs by 20%.";});
     new(clothingBase, {Id="divingfins"; Name="Diving Fins"; Icon="rbxassetid://10334749462"; Tags={"Shoes"; "Diving Gear"}; Description="Swim like a fish.\n<b>[Passive] Dolphin Stride:</b> Improves underwater mobility.";});
-    new(clothingBase, {Id="greavesandsabatons"; Name="Greaves and Sabatons"; Icon="rbxassetid://101266147153196"; Tags={"Shoes"; "Unobtainable"}; Description="Polished metal plating wrapped around your legs and feet. <b>[Passive] Chivalrous Kick:</b> Sliding into enemys knocks the away.";});
+    new(clothingBase, {Id="greavesandsabatons"; Name="Greaves and Sabatons"; Icon="rbxassetid://101266147153196"; Tags={"Shoes"; "Unobtainable"}; Description="Polished metal plating wrapped around your legs and feet. <b>[Passive] Chivalrous Kick:</b> Sliding allows you to go through enemies and knocks them away.";});
 
     -- Misc Wear
     new(clothingBase, {Id="brownbelt"; Name="Tactical Belt"; Icon="rbxassetid://4789684750"; Tags={"Belt"; "Utility Wear";}; Description="A tactical belt. Adds an extra hot bar slot.";});
@@ -260,7 +260,7 @@ function modItemsLibrary.onRequire()
     new(storageBase, {Id="survivorsbackpack"; Name="Survivor's Backpack"; StoragePresetId="dufflebag"; Icon="rbxassetid://8948320931";});
 
 
-
+    --MARK: CRATES
     --==========================================================[[ CRATES ]]==========================================================--
     local crateBase = {
         Type = modItemsLibrary.Types.Structure;
@@ -315,7 +315,7 @@ function modItemsLibrary.onRequire()
     new(crateBase, {Id="communitycrate2"; Name="Community Crate: Beta"; Icon="rbxassetid://13967726501"; Description="Obtained from community made maps, check gold shop for maps. Open and see what you get!";});
 
 
-
+    --MARK: RESOURCE PACKAGES
     --==========================================================[[ RESOURCE PACKAGES ]]==========================================================--
     local resourcePackageBase = {
         Type = modItemsLibrary.Types.Structure;
@@ -342,7 +342,7 @@ function modItemsLibrary.onRequire()
     new(resourcePackageBase, {Id="clothpackage"; Icon="rbxassetid://11809442095"; ResourceItemId="cloth";});
 
 
-
+    --MARK: COMMODITY
     --=========================================================[[ COMMODITY ]]==========================================================--
     local commodityBase = {
         Type = modItemsLibrary.Types.Commodity;
@@ -366,7 +366,7 @@ function modItemsLibrary.onRequire()
     new(commodityBase, {Id="rcetablet"; Name="RCE Tablet"; Tags={"Tool";}; Icon="rbxassetid://14405843549"; Stackable=false; Equippable=true; Tradable=modItemsLibrary.Tradable.PremiumOnly; Description="Revive Command Executor tablet, a portable computer that has built in capabilities to hack other devices.";});
 
 
-
+    --MARK: STRUCTURE
     --=========================================================[[ STRUCTURE ]]==========================================================--
     local structureBase = {
         Type = modItemsLibrary.Types.Structure;
@@ -384,8 +384,8 @@ function modItemsLibrary.onRequire()
     new(structureBase, {Id="barbedmetal"; Name="Barbed Metal Fence"; Icon="rbxassetid://16521233112"; Description="Placable barbed metal fence that does 1% damage per second to enemies and slows them to 2 units/s when touched.";});
 
 
-
-    --==========================================================[[ Medical ]]==========================================================--
+    --MARK: MEDICAL
+    --==========================================================[[ MEDICAL ]]==========================================================--
     local medicalBase = {
         Type = modItemsLibrary.Types.Tool;
         Tradable = modItemsLibrary.Tradable.Tradable;
@@ -398,8 +398,8 @@ function modItemsLibrary.onRequire()
     new(medicalBase, {Id="advmedkit"; Name="Advance Medkit"; Icon="rbxassetid://5008764919"; Description="Heals you for 75 health.";});
 
 
-
-    --==========================================================[[ Tools ]]==========================================================--
+    --MARK: TOOLS
+    --==========================================================[[ TOOLS ]]==========================================================--
     local toolBase = {
         Type = modItemsLibrary.Types.Tool;
         Tradable = modItemsLibrary.Tradable.Tradable;
@@ -432,7 +432,7 @@ function modItemsLibrary.onRequire()
     new(toolBase, {Id="engineersplanner"; Name="Engineer's Planner"; Icon="rbxassetid://8894342011"; Description="Used to quickly build structures. Unlock structure plans with their respective blueprints to place plans. Interact with the plans to build with the required resources.";});
 
 
-
+    --MARK: FOOD
     --==========================================================[[ FOOD ]]==========================================================--
     local foodBase = {
         Type = modItemsLibrary.Types.Food;
@@ -452,7 +452,7 @@ function modItemsLibrary.onRequire()
     new(foodBase, {Id="ziphoningserum"; Name="Ziphoning Serum"; Icon="rbxassetid://17816751372"; NonPremiumTax = 10; Description="Cleanse cleansable debuffs and gives you the Ziphoning buff for <b>3 minutes</b>.\nThe Ziphoning buff gives you <b>+1 hp/s</b> <i>(Increasable by Nekrosis Amplifier)</i> consumed from the ziphon health pool, the ziphon health pool only fills up when you do damage to enemies.";});
 
 
-
+    --MARK: MISSION
     --==========================================================[[ MISSION ]]==========================================================--
     local missionBase = {
         Type = modItemsLibrary.Types.Mission;
@@ -471,7 +471,7 @@ function modItemsLibrary.onRequire()
     new(missionBase, {Id="blueprintpiece"; Name="Blueprint Piece"; MissionIds={77}; StorageIncludeList={"Inventory"}; CanDelete=0; Icon="rbxassetid://16537824817"; Description="A piece of torn up blueprint."; });
 
 
-
+    --MARK: USABLE
     --==========================================================[[ USABLE ]]==========================================================--
     local customizationPack = {
         Type = modItemsLibrary.Types.Usable;
@@ -567,7 +567,35 @@ function modItemsLibrary.onRequire()
     new(unlockPapers, {Id="bunkerunlockpapers"; UnlockData={Id="bunker"; Name="Bunker"; Type="Safehome"}; Icon="rbxassetid://15565813997";});
 
 
+    local offerings = {
+        Type = modItemsLibrary.Types.Usable;
+        Tradable = modItemsLibrary.Tradable.Tradable;
+        Stackable = false;
+        TradingTax = 20;
+        Tags = {"Offerings"};
+        SigilType = "Greek";
+        Description = "Use this to get special skins for a calibrated gold offer. This offering will be not tradable and expires in 3 days after use.";
+    };
+    new(offerings, {
+        Id = "crimsonofferings";
+        Name = "Crimson Offerings";
+        Icon = "rbxassetid://108694283982293";
+        FrameColor = Color3.fromRGB(128, 0, 0);
+    });
+    new(offerings, {
+        Id = "azureofferings";
+        Name = "Azure Offerings";
+        Icon = "rbxassetid://105154948178907";
+        FrameColor = Color3.fromRGB(0, 0, 128);
+    });
+    new(offerings, {
+        Id = "sageofferings";
+        Name = "Sage Offerings";
+        Icon = "rbxassetid://74098791602041";
+        FrameColor = Color3.fromRGB(0, 128, 0);
+    });
 
+    --MARK: CRAFTING COMPONENTS
     --==========================================================[[ CRAFTING COMPONENTS ]]==========================================================--
     local weaponCompBase = {
         Type = modItemsLibrary.Types.Component;
