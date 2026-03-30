@@ -168,24 +168,24 @@ elseif RunService:IsClient() then
 			};
 		end
 
-		local frostbiteHudData = toolStatusHud.Frostbite;
+		local hudData = toolStatusHud.Frostbite;
 		if modifier.Properties.Active then
-			frostbiteHudData.Rays = true;
-			frostbiteHudData.Glow = true;
-			frostbiteHudData.KeyString = nil;
+			hudData.Rays = true;
+			hudData.Glow = true;
+			hudData.KeyString = nil;
 		else
-			frostbiteHudData.Rays = false;
+			hudData.Rays = false;
 			if modifier.Properties.Ready then
-				frostbiteHudData.KeyString = "KeyToggleSpecial";
-				frostbiteHudData.Glow = true;
+				hudData.KeyString = "KeyToggleSpecial";
+				hudData.Glow = true;
 			else
-				frostbiteHudData.KeyString = nil;
-				frostbiteHudData.Glow = nil;
+				hudData.KeyString = nil;
+				hudData.Glow = nil;
 			end
 		end
 		local chargeRatio = math.clamp(modifier.Properties.Charge or 0, 0, 1);
-		frostbiteHudData.Text = `{math.round(chargeRatio*100)}%`;
-		frostbiteHudData.ColorPercent = chargeRatio;
+		hudData.Text = `{math.round(chargeRatio*100)}%`;
+		hudData.ColorPercent = chargeRatio;
 	end
 
 end

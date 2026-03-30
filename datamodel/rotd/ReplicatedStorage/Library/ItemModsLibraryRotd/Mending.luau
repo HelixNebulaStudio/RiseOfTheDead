@@ -16,7 +16,7 @@ function modifierPackage.onRequire()
 	function modifierPackage.Binds.DeathHandler(modifier: ItemModifierInstance, npcClass: NpcClass)
 		if modifier.WieldComp == nil then return end;
 
-		local characterClass: CharacterClass = modifier.WieldComp.CompOwner;
+		local characterClass: CharacterClass = modifier.WieldComp.CompOwner :: CharacterClass;
 		if characterClass == nil then return end;
 
 		local statusComp: StatusComp = characterClass.StatusComp;
@@ -24,10 +24,13 @@ function modifierPackage.onRequire()
 		local statusClass = statusComp:GetOrDefault("ArmorBreak");
 		if statusClass == nil then return end;
 
-		local timeReduction = modifier.Values.Time;
+		local timeReduction = modifier.Properties.Time;
 		if timeReduction == nil or timeReduction <= 0 then return end;
 
 		local newTime = statusClass.Expires - timeReduction;
+		local curTime = workspace:GetServerTimeNow();
+		if curTime > statusClass.Expires then return end;
+		
 		newTime = math.clamp(newTime, workspace:GetServerTimeNow(), statusClass.Expires);
 
 		statusClass.Expires = newTime;
@@ -43,7 +46,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		value = value + tweakVal;
 	end
 
-	modifier.Values.Time = value;
+	modifier.Properties.Time = value;
 	modifier.ArrayValues.PassiveModifiers = "Mending";
 end
 

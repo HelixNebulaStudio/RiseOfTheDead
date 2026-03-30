@@ -4,7 +4,6 @@ local RunService = game:GetService("RunService");
 
 local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
-local modHealthComp = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 local statusKey = "ElectricCharge";
 
 local modifierPackage = {
@@ -12,8 +11,14 @@ local modifierPackage = {
 	
 	Tags = {};
 	Binds = {};
+	Properties = {
+		CooldownDuration = 2;
+	};
 };
 --==
+function modifierPackage.onRequire()
+	templateElectricCharge = game.ReplicatedStorage.Particles:WaitForChild("ElectricCharge");
+end
 
 function modifierPackage.Update(modifier: ItemModifierInstance)
 	modItemModifierClass.AddTierDamage(modifier);
@@ -36,21 +41,30 @@ end
 
 if RunService:IsServer() then
 
-	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
-		if packet.TargetModel == nil then return end;
+	function modifierPackage.Binds.WeaponShotPreProcess(modifier: ItemModifierInstance, packet)
+		if modifier.Properties.CooldownTick and workspace:GetServerTimeNow() <= modifier.Properties.CooldownTick then return end;
+		modifier.Properties.CooldownTick = workspace:GetServerTimeNow() + modifier.Properties.CooldownDuration;
+		modifier:Sync({"CooldownTick"});
+		modifier.Properties.Active = true;
+	end
+
+	function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)
+		local damageTo: EntityClass? = damageData.DamageTo;
+		if damageTo == nil then return end;
+
+		if not modifier.Properties.Active then return end;
+		modifier.Properties.Active = false;
+		modifier:Sync({"CooldownTick"});
+
+		if modifier.WieldComp == nil or modifier.WieldComp.CompOwner == nil then return end;
+		local characterClass: CharacterClass = modifier.WieldComp.CompOwner :: CharacterClass;
+
+		local targetHealthComp: HealthComp? = damageTo.HealthComp;
+		if targetHealthComp == nil then return end;
+
+		local targetPart = damageData.TargetPart;
+		if targetPart == nil then return end;
 		
-		local maxTargets = modifier.Properties.Targets;
-		local damagePercent = modifier.Properties.DamagePercent;
-
-		local configurations = modifier.EquipmentClass and modifier.EquipmentClass.Configurations;
-		local weaponSiid = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem.ID;
-
-		local characterClass: CharacterClass? = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass;
-		if characterClass == nil then return end;
-
-		local targetHealthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
-		if targetHealthComp == nil or targetHealthComp.IsDead or not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
-
 		local targetCharClass: EntityClass = targetHealthComp.CompOwner;
 		local statusComp: StatusComp? = targetCharClass.StatusComp;
 		if statusComp == nil then return end;
@@ -58,17 +72,26 @@ if RunService:IsServer() then
 		local statusClass: StatusClassInstance? = statusComp:GetOrDefault(statusKey);
 		if statusClass then return end;
 
-		local hitInfo: HitInfo = packet.HitInfo;
+		local maxTargets = modifier.Properties.Targets;
+		local damagePercent = modifier.Properties.DamagePercent;
+		local configurations = modifier.EquipmentClass and modifier.EquipmentClass.Configurations;
+		local weaponSiid = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem.ID;
+
+		local mainToolModel = modifier.WieldComp.ToolHandler and modifier.WieldComp.ToolHandler.MainToolModel or nil;
+		local originAtt = mainToolModel and mainToolModel.PrimaryPart and mainToolModel.PrimaryPart:FindFirstChild("BulletOrigin");
+		if originAtt == nil then return end;
 
 		statusComp:Apply(statusKey, {
 			Expires = workspace:GetServerTimeNow()+1;
 			ApplyBy = characterClass;
 			Values = {
+				WeakRoot = 0.5;
+
 				MaxTargets = maxTargets;
 				WeaponSiid = weaponSiid;
 				
-				OriginAtt = packet.OriginAtt;
-				HitPart = hitInfo.Part;
+				OriginAtt = originAtt;
+				HitPart = targetPart;
 				
 				Damage = configurations.PreModDamage;
 				DamagePercent = damagePercent;
@@ -76,43 +99,49 @@ if RunService:IsServer() then
 				TargetsHit = 0;
 			};
 		});
-
 	end
 	
-	function modifierPackage.Binds.WeaponShotProjectileNew(
-		modifier: ItemModifierInstance, 
-		projectile: ProjectileInstance
-	)
+	function modifierPackage.Binds.WeaponShotProjectileNew(modifier: ItemModifierInstance, projectile: ProjectileInstance)
+		if not modifier.Properties.Active then return end;
     	local projectilePart = projectile.Part;
 
 		projectilePart.Color = Color3.fromRGB(255, 253, 139);
 		projectilePart.Material = Enum.Material.Cobblestone;
+		if projectilePart:IsA("MeshPart") then
+			projectilePart.TextureID = "";
+		end
 
 		local bulletTracer = projectilePart:FindFirstChild("BulletTracer");
 		if bulletTracer then
 			bulletTracer.Color = ColorSequence.new(Color3.fromRGB(255, 253, 139));
 		end
+
+		local newElectricParticle = templateElectricCharge:Clone();
+		newElectricParticle.Parent = projectilePart;
 	end
 
-	function modifierPackage.Binds.WeaponShotProjectileHit(
-		modifier: ItemModifierInstance, 
-		projectile: ProjectileInstance, 
-		arcPoint: ArcPoint
-	)
-		if arcPoint.Hit == nil then return end;
+else
+	
+	function modifierPackage.Binds.WeaponRenderStepped(modifier: ItemModifierInstance, toolStatusHud: anydict)
+		if modifier.Enabled == false then return end;
 
-		local targetModel = arcPoint.Hit.Parent;
-		if targetModel == nil then return end;
+		if toolStatusHud.ElectricCharge == nil then
+			toolStatusHud.ElectricCharge = {
+				ModifierId = modifier.Id;
+				ModItemId = "electricmod";
+				Order = 1;
+				Text = ``;
+			};
+		end
 
-		local bulletOriginAtt: Attachment = projectile.;
-		
-		modifierPackage.Binds.WeaponShotBulletHit(modifier, {
-			TargetModel = targetModel;
-			OriginAtt = arcTracer.Origin;
-			HitInfo = {
-				Part = arcPoint.Hit;
-			}
-		} :: BulletHitData);
+		local hudData = toolStatusHud.ElectricCharge;
+
+		local cooldownTick = modifier.Properties.CooldownTick;
+		local charge = 1;
+		if cooldownTick then
+			charge = 1-math.clamp((cooldownTick-workspace:GetServerTimeNow())/modifier.Properties.CooldownDuration, 0, 1);
+		end
+		hudData.ColorPercent = charge;
 	end
 
 end

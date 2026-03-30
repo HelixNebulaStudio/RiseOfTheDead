@@ -4,8 +4,6 @@ local RunService = game:GetService("RunService");
 
 local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
-local modHealthComp = shared.require(game.ReplicatedStorage.Components.HealthComponent);
-
 local statusKey = "ToxicBarrage";
 local modifierPackage = {
 	Name = "Toxic Barrage";
@@ -36,14 +34,14 @@ end
 
 if RunService:IsServer() then
 
-	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
-		if packet.TargetModel == nil then return end;
-		local duration = modifier.Properties.Duration;
+	function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)
+		local damageTo: EntityClass? = damageData.DamageTo;
+		if damageTo == nil then return end;
 
 		local characterClass: CharacterClass = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass;
 		if characterClass == nil then return end;
-		
-		local targetHealthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
+
+		local targetHealthComp: HealthComp? = damageTo.HealthComp;
 		if targetHealthComp == nil then return end;
 		if targetHealthComp.IsDead or not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
 	
@@ -51,6 +49,8 @@ if RunService:IsServer() then
 		local statusComp: StatusComp? = targetClass.StatusComp;
 		if statusComp == nil then return end;
 			
+		local duration = modifier.Properties.Duration;
+
 		local statusClass: StatusClassInstance? = statusComp:GetOrDefault(statusKey);
 		if statusClass then
 			statusClass.Expires = workspace:GetServerTimeNow() + duration;
@@ -76,27 +76,14 @@ if RunService:IsServer() then
 
 		projectilePart.Color = Color3.fromRGB(87, 211, 83);
 		projectilePart.Material = Enum.Material.Cobblestone;
+		if projectilePart:IsA("MeshPart") then
+			projectilePart.TextureID = "";
+		end
 
 		local bulletTracer = projectilePart:FindFirstChild("BulletTracer");
 		if bulletTracer then
 			bulletTracer.Color = ColorSequence.new(Color3.fromRGB(87, 211, 83));
 		end
-	end
-
-
-	function modifierPackage.Binds.WeaponShotProjectileHit(
-		modifier: ItemModifierInstance, 
-		projectile: ProjectileInstance, 
-		arcPoint: ArcPoint
-	)
-		if arcPoint.Hit == nil then return end;
-
-		local targetModel = arcPoint.Hit.Parent;
-		if targetModel == nil then return end;
-
-		modifierPackage.Binds.WeaponShotBulletHit(modifier, {
-			TargetModel = targetModel;
-		} :: BulletHitData);
 	end
 
 end

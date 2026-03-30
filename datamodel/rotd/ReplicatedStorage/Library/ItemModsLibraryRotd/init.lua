@@ -1041,12 +1041,12 @@ function library.onRequire()
 	library:Add{
 		Id="ammorecyclermod";
 		Name="Ammo Recycler";
-		Desc="Chance to recover ammo into reserve if your damage exceeds enemy's max health.";
+		Desc="Chance to recover ammo into reserve if your damage exceeds enemy's max health. (Cooldown: 0.1s)";
 		Icon="rbxassetid://13787902901";
 		BaseTier=2;
 		Tier=2;
 		Stackable=false;
-		Type={"Sniper"; "Bow"};
+		Type={"Sniper"; "Bow"; "Launcher";};
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.AmmoRecycler;
 		Category="Rare Mods";
@@ -1102,7 +1102,7 @@ function library.onRequire()
 			{DataTag="T"; Name="Duration"; Syntax="Upgrade Duration"; ValueType="Normal"; Suffix="s"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=5; MaxValue=25; TweakBonus=5; Scaling=library.ScalingStyle.Linear;};
 		};
 		Stackable=false;
-		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow";};
+		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
 		
 		EffectTrigger=library.EffectTrigger.Passive;
 		ActivationDuration=60;
@@ -1118,7 +1118,7 @@ function library.onRequire()
 	library:Add{
 		Id="electricmod";
 		Name="Electric Charge";
-		Desc="Electrocute nearby enemies and deal an additional <b>Damage</b> based on the weapon's <b>Premod Damage</b> as electric damage. For every enemies hit, damage percent is reduced by 2%.";
+		Desc="Electrocute nearby enemies and deal an additional <b>Damage</b> based on the weapon's <b>Premod Damage</b> as electric damage. For every enemies hit, damage percent is reduced by 2%. (Cooldown: 2s)";
 		Icon="rbxassetid://3576196956";
 		BaseTier=1;
 		Tier=1;
@@ -1127,11 +1127,11 @@ function library.onRequire()
 			{DataTag="T"; Name="Targets"; Syntax="Increase Targets"; ValueType="Normal"; MaxLevel=5; BaseCost=10; MaxCost=100; BaseValue=1; MaxValue=6; Scaling=library.ScalingStyle.Linear;};
 		};
 		Stackable=false;
-		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow";};
+		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
 
-		EffectTrigger=library.EffectTrigger.Passive;
-		ActivationDuration=10;
-		CooldownDuration=30;
+		EffectTrigger = library.EffectTrigger.Passive;
+		ActivationDuration=2;
+		CooldownDuration=2;
 
 		Module=script.ElectricMod;
 		Category="Elemental Mods";
@@ -1163,7 +1163,7 @@ function library.onRequire()
 			{DataTag="T"; Name="Targets"; Syntax="Increase Targets"; ValueType="Normal"; MaxLevel=7; BaseCost=10; MaxCost=100; BaseValue=1; MaxValue=8; TweakBonus=2; Scaling=library.ScalingStyle.Linear;};
 		};
 		Stackable=false;
-		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow";};
+		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
 
 		EffectTrigger=library.EffectTrigger.Passive;
 		ActivationDuration=60;
@@ -1189,7 +1189,7 @@ function library.onRequire()
 			{DataTag="T"; Name="Duration"; Syntax="Increase Duration"; ValueType="Normal"; Suffix="s"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=3; MaxValue=30; TweakBonus=10; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 		Stackable=false;
-		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow";};
+		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
 		
 		EffectTrigger=library.EffectTrigger.Passive;
 		ActivationDuration=10;

@@ -5,8 +5,6 @@ local CollectionService = game:GetService("CollectionService");
 
 local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
-local modHealthComp = shared.require(game.ReplicatedStorage.Components.HealthComponent);
-
 local statusKey = "IncendiaryRounds";
 local modifierPackage = {
 	Name = "Incendiary Rounds";
@@ -40,36 +38,35 @@ end
 if RunService:IsServer() then
 	local modFlammable = shared.require(game.ServerScriptService.ServerLibrary.Flammable);
 
-	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
-		local duration = modifier.Properties.Duration;
-		if packet.HitInfo == nil then return end;
-		
-		local characterClass: CharacterClass = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass;
-		if characterClass == nil then return end;
+	function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)
+		local damageTo: EntityClass? = damageData.DamageTo;
+		if damageTo == nil then return end;
 
-		local targetModel = packet.TargetModel;
-		if targetModel == nil then return end;
+		if modifier.WieldComp == nil or modifier.WieldComp.CompOwner == nil then return end;
+		local characterClass: CharacterClass = modifier.WieldComp.CompOwner :: CharacterClass;
 
-		local targetPart = packet.HitInfo.Part;
+		local targetHealthComp: HealthComp? = damageTo.HealthComp;
+		if targetHealthComp == nil then return end;
+
+		local targetPart = damageData.TargetPart;
 		if targetPart == nil then return end;
-		
-		local targetHealthComp: HealthComp? = modHealthComp.getByModel(targetModel);
-		if targetHealthComp == nil or not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
 
-		local targetClass: EntityClass = targetHealthComp.CompOwner;
-		local statusComp: StatusComp? = targetClass.StatusComp;
+		local statusComp: StatusComp? = damageTo.StatusComp;
 		if statusComp == nil then return end;
 
-		if targetClass.ClassName == "NpcClass" then
-			local targetImmunity = (targetClass :: NpcClass):GetImmunity("Fire"); 
+		if damageTo.ClassName == "NpcClass" then
+			local targetImmunity = (damageTo :: NpcClass):GetImmunity("Fire"); 
 			if targetImmunity >= 1 then return end;
 
-		elseif targetClass.ClassName == "Destructible" then
+		elseif damageTo.ClassName == "Destructible" then
 			if CollectionService:HasTag(targetPart, "Flammable") then
 				modFlammable:Ignite(targetPart);
 			end
 
 		end
+		if not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
+
+		local duration = modifier.Properties.Duration;
 
 		local statusClass: StatusClassInstance? = statusComp:GetOrDefault(statusKey);
 		if statusClass then
@@ -90,9 +87,7 @@ if RunService:IsServer() then
 				UseCurrHpDmg = true;
 			};
 		});
-
 	end
-
 
 	function modifierPackage.Binds.WeaponShotProjectileNew(
 		modifier: ItemModifierInstance, 
@@ -102,6 +97,9 @@ if RunService:IsServer() then
 
 		projectilePart.Color = Color3.fromRGB(255, 94, 0);
 		projectilePart.Material = Enum.Material.Neon;
+		if projectilePart:IsA("MeshPart") then
+			projectilePart.TextureID = "";
+		end
 
 		local bulletTracer = projectilePart:FindFirstChild("BulletTracer");
 		if bulletTracer then
@@ -113,31 +111,7 @@ if RunService:IsServer() then
 		fireParticle.Heat = 10;
 		fireParticle.Parent = projectilePart;
 	end
-
-
-	function modifierPackage.Binds.WeaponShotProjectileHit(
-		modifier: ItemModifierInstance, 
-		projectile: ProjectileInstance, 
-		arcPoint: ArcPoint
-	)
-		if arcPoint.Hit == nil then return end;
-
-		local targetModel = arcPoint.Hit.Parent;
-		if targetModel == nil then return end;
-
-
-		local targetHealthComp: HealthComp? = modHealthComp.getByModel(targetModel);
-		if targetHealthComp == nil then return end;
-		targetModel = targetHealthComp:GetModel();
-
-		modifierPackage.Binds.WeaponShotBulletHit(modifier, {
-			TargetModel = targetModel;
-			HitInfo = {
-				Part = arcPoint.Hit;
-			};
-		} :: BulletHitData);
-	end
-
+	
 end
 
 return modifierPackage;
