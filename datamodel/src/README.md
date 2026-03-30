@@ -2,6 +2,7 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes to code in Engine codebase:
+- Fixed `snowsledge` not activating on slide. [#994]
 - Fixed npcs keeping idle stance when firing weapons. [#1029]
 - Fixed Bosses not aggro-ing player if they do not have a npc following them. [#1031]
 - Fixed `Pickupable` interactables missing notification and not visible when inventory is full. [#1040]
