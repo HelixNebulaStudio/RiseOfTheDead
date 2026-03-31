@@ -81,7 +81,7 @@ return function(CutsceneSequence)
 				workspace.Environment.CeilingLightsB._lightSource._lightPoint.PointLight.Enabled = true;
 			end)
 		end
-		spawn(toggleLights);
+		task.spawn(toggleLights);
 		
 		local barricade, destructible: DestructibleInstance;
 		

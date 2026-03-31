@@ -64,8 +64,8 @@ function RotdCore.OnPlayerRemoving(player)
 end
 
 function RotdCore.onRequire()
-    Debugger:Warn("RotdCore onRequire.");
+    Debugger:Print("RotdCore onRequire.");
 end
 
-Debugger:Warn("Init RotdCore.");
+Debugger:Print("Init RotdCore.");
 return RotdCore;

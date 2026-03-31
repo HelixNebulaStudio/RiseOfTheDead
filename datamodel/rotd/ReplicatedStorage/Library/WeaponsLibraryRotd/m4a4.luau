@@ -43,8 +43,8 @@ local toolPackage = {
 		Damage=30;
 		PotentialDamage=515;
 		
-		MagazineSize=30;
-		AmmoCapacity=(30*5);
+		AmmoLimit=30;
+		MaxAmmoLimit=(30*5);
 	
 		Rpm=666;
 		ReloadTime=3;

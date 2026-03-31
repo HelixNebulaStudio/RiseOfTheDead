@@ -20,12 +20,6 @@ function presetPackage.BindStorageCheck(packet)
 	local dragStorageItem = packet.DragStorageItem;
 	local targetIndex = packet.TargetIndex;
 
-	if dragStorageItem.ItemId == "dualp250" then
-		packet.FailMsg = "The P.A.T. only has one arm and cannot equip dual weapons.";
-		packet.Allowed = false;
-		return packet;
-	end;
-	
 	if targetIndex == 1 then
 		if modItemsLibrary:HasTag(dragStorageItem.ItemId, "Gun") then
 			packet.Allowed = true;
@@ -55,18 +49,17 @@ end
 function presetPackage.BindInit(storage: Storage)
     local function setWeaponSiid()
         local weaponStorageItem: StorageItem = storage:FindByIndex(1);
-        if weaponStorageItem == nil then return end;
+        if weaponStorageItem then 
+        	storage.Properties.WeaponSiid = weaponStorageItem.ID;
+		else
+			storage.Properties.WeaponSiid = nil;
+		end;
         
-        storage.Values.WeaponSiid = weaponStorageItem.ID;
-        storage:SyncValues();
-        
-        Debugger:StudioLog(`SetWeaponSiid for portableautoturret storage.`);
+        storage:SyncProperties();
     end
 
     storage.OnChanged:Connect(setWeaponSiid);
     setWeaponSiid();
-
-    Debugger:StudioLog(`Init storage {script.Name}.`);
 end
 
 return presetPackage;

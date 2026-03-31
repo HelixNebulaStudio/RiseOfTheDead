@@ -6,8 +6,8 @@ function Gun.new(equipmentClass: EquipmentClass)
     local configurations = equipmentClass.Configurations;
     local properties = equipmentClass.Properties;
 
-	properties.Ammo = configurations.MagazineSize;
-	properties.MaxAmmo = configurations.AmmoCapacity;
+	properties.Ammo = configurations.AmmoLimit;
+	properties.MaxAmmo = configurations.MaxAmmoLimit;
 
     setmetatable(self, Gun);
     return self;
@@ -76,8 +76,8 @@ function Gun:RefillAmmo(equipmentClass: EquipmentClass, storageItem: StorageItem
     local configurations = equipmentClass.Configurations;
     local properties = equipmentClass.Properties;
 
-    properties.Ammo = configurations.MagazineSize;
-    properties.MaxAmmo = configurations.AmmoCapacity;
+    properties.Ammo = configurations.AmmoLimit;
+    properties.MaxAmmo = configurations.MaxAmmoLimit;
 
     if storageItem then
         storageItem:SetValues("A", nil);

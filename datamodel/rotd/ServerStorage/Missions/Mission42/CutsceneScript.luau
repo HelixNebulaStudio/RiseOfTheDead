@@ -28,7 +28,6 @@ if RunService:IsServer() then
 	vtExit = script.Parent:WaitForChild("Travel_TheWarehouse");
 
 	if modBranchConfigurations.IsWorld("VindictiveTreasure") then
-
 		shared.modEventService:OnInvoked("Generic_BindItemPickup", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -81,7 +80,7 @@ return function(CutsceneSequence)
 			end
 			
 			if modEvents:GetEvent(player, "mission42Bp2") == nil and mission.Type == 3 then
-				local dropPrefab, interactable = modItemDrops.spawn{
+				modItemDrops.spawn{
 					ItemId = "tacticalbowbp";
 					SpawnCFrame = playerClass.RootPart.CFrame;
 					Players = {player};

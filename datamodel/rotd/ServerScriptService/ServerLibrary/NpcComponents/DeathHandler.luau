@@ -31,12 +31,15 @@ function Component:__call()
 	self._called = true;
 
 	local npcClass: NpcClass = self.NpcClass;
+	local healthComp: HealthComp = npcClass.HealthComp;
 
 	local npcPackage: anydict = npcClass.NpcPackage;
 	local character: Model = npcClass.Character;
 	local rawProperties: anydict = npcClass.Properties.Values;
 
 	CollectionService:RemoveTag(character, "TargetableEntities");
+	
+	if healthComp.CurHealth > healthComp.KillHealth then return end;
 
 	local humanoidType = npcClass.HumanoidType;
 	if humanoidType == "Zombie" then
@@ -59,11 +62,11 @@ function Component:__call()
 	local dropRewardComp = npcClass:GetComponent("DropReward");
 	if dropRewardComp and #playerTags > 0 then
 		dropRewardComp(CFrame.new(deathPosition) 
-		* CFrame.Angles(
-			math.rad(math.random(0, 360)), 
-			math.rad(math.random(0, 360)), 
-			math.rad(math.random(0, 360))
-		));
+			* CFrame.Angles(
+				math.rad(math.random(0, 360)), 
+				math.rad(math.random(0, 360)), 
+				math.rad(math.random(0, 360)))
+		);
 	end
 
 	local npcLevel = rawProperties.Level;
@@ -80,7 +83,7 @@ function Component:__call()
 
 		gameSave:AddStat("Kills", 1);
 		
-		local killNotice = {`Killed {npcClass.Name} [{npcLevel}]`};
+		local killNotice = {`Killed {npcClass.Name} [{npcLevel or "?"}]`};
 
 		if humanoidType == "Zombie" then
 			gameSave:AddStat("ZombieKills", 1);
@@ -109,7 +112,7 @@ function Component:__call()
 			table.insert(killNotice, `+${moneyReward}`);
 		end
 
-		if humanoidType == "Zombie" then -- Focus levels
+		if humanoidType == "Zombie" and npcLevel then -- Focus levels
 			local levelKey = `LevelKills-{npcLevel}`;
 			gameSave:AddStat(levelKey, 1);
 
@@ -131,7 +134,7 @@ function Component:__call()
 			end
 		end
 
-		if gameSave.Statistics then
+		if gameSave.Statistics and npcLevel then
 			local killKey = `L{npcLevel}-{npcClass.Name}-Kills`;
 			gameSave.Statistics:AddStat("KillTracker", killKey, 1);
 		end
@@ -160,7 +163,7 @@ function Component:__call()
 				local expGain = math.clamp(expPool - weaponLevel, 1, expPool);
 
 				if storageItem.StorageId == "portableautoturret" then
-					expGain = math.ceil(expGain * 0.1);
+					expGain = math.ceil(expGain * 0.25);
 				end
 
 				modExperience.Add(storageItem, expGain, npcClass.Name);

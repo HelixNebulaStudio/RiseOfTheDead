@@ -44,17 +44,15 @@ if RunService:IsServer() then
 		end
 	end)
 	
-	shared.modEventService:OnInvoked("Generic_BindItemPickup", function(
-		event: EventPacket, 
-		interactData, 
-		storageItem: StorageItem
-	)
+	shared.modEventService:OnInvoked("Generic_BindItemPickup", function(event: EventPacket, ...)
 		local player: Player? = event.Player;
 		if player == nil then return end;
+
+		local interactable: InteractableInstance = ...;
+		if interactable == nil then return end;
 		
 		task.spawn(function()
-			if storageItem == nil then return end;
-			if storageItem.ItemId ~= "p250" then return end;
+			if interactable.Values.ItemId ~= "p250" then return end;
 			
 			modMission:Progress(player, MISSION_ID, function(mission)
 				if mission.ProgressionPoint >= 4 then return end;
@@ -262,7 +260,7 @@ return function(CutsceneSequence)
 	end);
 	
 	local playerDied = false;
-	local masonPrefab, masonNpcClass;
+	local masonPrefab, masonNpcClass: NpcClass;
 	CutsceneSequence:NewServerScene("spawnFriend", function()
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
@@ -289,14 +287,16 @@ return function(CutsceneSequence)
 		});
 		masonPrefab = masonNpcClass.Character;
 		
-		local actionIndex = 0;
-		local cutsceneActions = {};
-
 		masonNpcClass.Properties.CutsceneActive = true;
-		masonNpcClass.CutsceneActions = cutsceneActions;
-		masonNpcClass.Garbage:Tag(cutsceneActions);
 
-		table.insert(masonNpcClass.CutsceneActions, function()
+		local cutsceneActions = {
+			Index = 0;
+			Actions = {};
+		};
+		masonNpcClass.Properties.CutsceneActions = cutsceneActions;
+		masonNpcClass.Garbage:Tag(cutsceneActions.Actions);
+
+		cutsceneActions.Actions[1] = function()
 			Debugger:Log("Run to player.");
 
 			masonNpcClass.Move:SetMoveSpeed("set", "default", 18);
@@ -308,14 +308,14 @@ return function(CutsceneSequence)
 
 			Debugger:Warn("Play crouch look");
 			masonNpcClass.PlayAnimation("CrouchLook");
-		end);
+		end;
 
-		table.insert(masonNpcClass.CutsceneActions, function()
+		cutsceneActions.Actions[2] = function()
 			Debugger:Log("Stand with player.");
 			masonNpcClass.PlayAnimation("CrouchPickUp");
-		end);
+		end;
 
-		table.insert(masonNpcClass.CutsceneActions, function()
+		cutsceneActions.Actions[3] = function()
 			Debugger:Log("Handout")
 			masonNpcClass.Move:SetMoveSpeed("set", "default", 13);
 			
@@ -326,9 +326,9 @@ return function(CutsceneSequence)
 			masonNpcClass.Move:Face(playerClass.RootPart);
 
 			masonNpcClass.PlayAnimation("Handout", 1.4);
-		end);
+		end;
 
-		table.insert(masonNpcClass.CutsceneActions, function()
+		cutsceneActions.Actions[4] = function()
 			Debugger:Log("Guns out.");
 
 			masonNpcClass.StopAnimation("Handout", 0.5);
@@ -352,21 +352,25 @@ return function(CutsceneSequence)
 			masonNpcClass.Move:SetMoveSpeed("set", "default", 0);
 
 			masonNpcClass:GetComponent("ProtectPlayer")();
-		end);
+		end;
 
-		table.insert(masonNpcClass.CutsceneActions, function()
+		cutsceneActions.Actions[5] = function()
 			Debugger:Log("Run to car");
 
 			masonNpcClass.Move:SetMoveSpeed("set", "default", 20);
 			masonNpcClass.Move:MoveTo(Vector3.new(-8.782, 55.3, -219.586));
-		end);
+		end;
 
-		masonNpcClass.NextAction = function(yield)
+		cutsceneActions.SkipAction = function()
+			Debugger:Log("Skip action index : ", cutsceneActions.Index);
+			cutsceneActions.Index = cutsceneActions.Index +1;
+		end
+		cutsceneActions.NextAction = function(yield)
 			local done = false;
 			task.spawn(function()
-				actionIndex = actionIndex +1;
-				Debugger:Log("Next action : ", actionIndex);
-				masonNpcClass.CutsceneActions[actionIndex]();
+				cutsceneActions.Index = cutsceneActions.Index +1;
+				Debugger:Log("Next action : ", cutsceneActions.Index);
+				cutsceneActions.Actions[cutsceneActions.Index]();
 				done = true;
 			end)
 			if yield == true then
@@ -427,7 +431,9 @@ return function(CutsceneSequence)
 			masonNpcClass.Chat(player, sceneDialogues[1].Reply);
 		end)
 
-		masonNpcClass.NextAction(true);
+		local masonCutsceneActions = masonNpcClass.Properties.CutsceneActions;
+		
+		masonCutsceneActions.NextAction(true);
 		CutsceneSequence:Pause(18);
 		
 		masonNpcClass.Chat(player, sceneDialogues[2].Reply);
@@ -447,7 +453,7 @@ return function(CutsceneSequence)
 		end)
 		
 		task.wait(1);
-		masonNpcClass.NextAction();
+		masonCutsceneActions.NextAction();
 		
 		playerClass.Character:SetAttribute("VisibleArms", true);
 		CutsceneSequence:NextScene("playerWake");
@@ -457,13 +463,14 @@ return function(CutsceneSequence)
 		CutsceneSequence:Pause(18);
 		CutsceneSequence:NextScene("playerAllowMove");
 		
-		masonNpcClass.Chat(player, sceneDialogues[4].Reply);
-		masonNpcClass.NextAction();
-
-		task.wait(1.3);
 		
 		local item, _storage = modStorage.FindItemIdFromStorages("p250", player);
 		if item == nil then
+			masonNpcClass.Chat(player, sceneDialogues[4].Reply);
+			masonCutsceneActions.NextAction();
+
+			task.wait(1.3);
+
 			modMission:Progress(player, MISSION_ID, function(mission)
 				if mission.ProgressionPoint < 3 then mission.ProgressionPoint = 3; end;
 			end)
@@ -490,6 +497,7 @@ return function(CutsceneSequence)
 			until mission.ProgressionPoint == 4;
 
 		else
+			masonCutsceneActions.SkipAction();
 			modMission:Progress(player, MISSION_ID, function(mission)
 				if mission.ProgressionPoint < 4 then mission.ProgressionPoint = 4; end;
 			end)
@@ -498,7 +506,7 @@ return function(CutsceneSequence)
 		
 		local explosionSoundPart = workspace.Environment:WaitForChild("ExplosionSoundPart");
 		modAudio.Play("HordeGrowl", explosionSoundPart);
-		masonNpcClass.NextAction();
+		masonCutsceneActions.NextAction();
 
 		masonNpcClass.Chat(players, sceneDialogues[5].Reply);
 		
@@ -604,7 +612,7 @@ return function(CutsceneSequence)
 		if playerAnimTracks.CrouchPickUp then playerAnimTracks.CrouchPickUp:Play(); end
 		
 		TweenService:Create(blurEffect, TweenInfo.new(3), {Size = 3;}):Play();
-		delay(3, function()
+		task.delay(3, function()
 			blurEffect.Size = 2;
 		end)
 		
@@ -634,7 +642,7 @@ return function(CutsceneSequence)
 				modCharacter.CharacterProperties.DefaultWalkSpeed = 7+(11*(a/1));
 				modCharacter.CharacterProperties.WalkingSpeed = 5+(9*(a/1));
 				modCharacter.CharacterProperties.CrouchSpeed = 3+(7*(a/1));
-				wait(1);
+				task.wait(1);
 			end
 			modCharacter.CharacterProperties.DefaultWalkSpeed = 18;
 			modCharacter.CharacterProperties.WalkingSpeed = 14;
@@ -687,11 +695,12 @@ return function(CutsceneSequence)
 		gasFire1.Enabled = true;
 		gasFire2.Enabled = true;
 		modAudio.Play("Fire", GasTankPart, true);
-		wait(3);
+		task.wait(3);
 		masonNpcClass.Chat(players, sceneDialogues[6].Reply);
 		masonNpcClass:GetComponent("ProtectPlayer").IsProtecting = false;
-		masonNpcClass.NextAction();
-		wait(1);
+		local masonCutsceneActions = masonNpcClass.Properties.CutsceneActions;
+		masonCutsceneActions.NextAction();
+		task.wait(1);
 		workspace.Environment.CarSeat:Sit(masonNpcClass.Humanoid);
 		task.wait(3);
 		disableSecondSpawner = true;
@@ -737,7 +746,7 @@ return function(CutsceneSequence)
 		playerClass.WieldComp:Unequip();
 
 		TweenService:Create(explosionLight, TweenInfo.new(3), {Range = 0;}):Play();
-		wait(5);
+		task.wait(5);
 
 		local char = player.Character;
 		if char and char:FindFirstChild("Humanoid") then
@@ -762,7 +771,7 @@ return function(CutsceneSequence)
 		musicTrack.TimePosition = 133;
 		musicTrack:Resume()
 		TweenService:Create(musicTrack, TweenInfo.new(3), {Volume = 1;}):Play();
-		delay(13, function()
+		task.delay(13, function()
 			TweenService:Create(musicTrack, TweenInfo.new(5), {Volume = 0.1;}):Play();
 		end)
 	end)

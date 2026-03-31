@@ -45,7 +45,6 @@ function modSettings.onRequire()
 	modSettings.SettingsKeybindControlsTable = {
 		{Order=1; Type="Border"; Text="Rise of the Dead"};
 
-
         {Order=2; Type="Option"; Id="KeyToggleSpecial"; Text="Toggle/Trigger Special"; };
         {Order=3; Type="Option"; Id="KeyTogglePat"; Text="Toggle Portable Auto Turret"; };
     

@@ -575,6 +575,7 @@ function Raid:DropReward(spawnCf)
 		DespawnDuration = false;
 		Anchored = true;
 		DisableTouchPickup = true;
+		SharedDrop = true;
 	};
 	self.LootPrefab = lootPrefab;
 
@@ -739,7 +740,18 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 					end
 				end
 
-				if healthComp.LastDamagedBy ~= nil and healthComp.LastDamagedBy.ClassName == "PlayerClass" then
+				local lastDamageBy: EntityClass? = healthComp.LastDamagedBy;
+				local canCount = false;
+				if lastDamageBy ~= nil then
+					if lastDamageBy.ClassName == "PlayerClass" then
+						canCount = true;
+					elseif lastDamageBy.ClassName == "NpcClass" then
+						if (lastDamageBy :: NpcClass).Player then
+							canCount = true;
+						end
+					end
+				end
+				if canCount then
 					self:BeginCount();
 					self.EliminateCount = self.EliminateCount +1;
 					self.LastEnemyDeathPos = npcClass.RootPart.CFrame.Position;

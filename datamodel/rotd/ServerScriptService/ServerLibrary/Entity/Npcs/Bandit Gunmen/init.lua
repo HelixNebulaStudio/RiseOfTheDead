@@ -89,7 +89,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
                 SetValues = {
                     Damage = isHard and 4 or 2;
                     NpcPercentHealthDamage = 0.1;
-                    MagazineSize = 45;
+                    AmmoLimit = 45;
                 };
             });
         end

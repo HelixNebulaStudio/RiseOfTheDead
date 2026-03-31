@@ -31,8 +31,6 @@ local toolPackage = {
 		ProjectileId = "stickygrenade";
 		ProjectileConfig = {
 			Velocity = 160;
-			Bounce = 0;
-			LifeTime = 20;
 		};
 		VelocityBonus = 40;
 

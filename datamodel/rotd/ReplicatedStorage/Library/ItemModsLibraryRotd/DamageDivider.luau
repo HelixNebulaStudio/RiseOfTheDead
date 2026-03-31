@@ -24,7 +24,7 @@ function modifierPackage.onRequire()
         
 		if healthComp.CurArmor <= 0 then return end;
 
-        local reduction = modifier.Values.DamageDividerReduction or 0;
+        local reduction = modifier.Properties.DamageDividerReduction or 0;
         if reduction <= 0 then return end;
 
         local damage = damageData.Damage;
@@ -49,7 +49,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		value = value + tweakVal;
 	end
 
-	modifier.Values.DamageDividerReduction = value;
+	modifier.Properties.DamageDividerReduction = value;
 	modifier.ArrayValues.PassiveModifiers = "Damage Divider";
 end
 

@@ -32,45 +32,19 @@ local npcPackage = {
         "DropReward";
         "TargetHandler";
         "RandomClothing";
+        "DynamicLevel";
     };
     AddBehaviorTrees = {};
+
+    DynamicLevelScaling = {
+        WalkSpeed = 35;
+        MaxHealth = function(lvl) return 49+(math.max(50*lvl, 50)); end;
+        AttackDamage = function(lvl) return math.min(35+(lvl), 200); end;
+    };
 };
 --==
 
-function npcPackage.LevelSet(npcClass: NpcClass)
-    local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
-    local healthComp: HealthComp = npcClass.HealthComp;
-
-    local level = math.max(properties.Level, 0);
-
-    local lvlMoveSpeed = 35;
-    configurations.BaseValues.WalkSpeed = lvlMoveSpeed;
-    
-    local lvlHealth = 50+math.max(50*level, 50)-1;
-    configurations.BaseValues.MaxHealth = lvlHealth;
-
-    local lvlAttackDamage = 35 + (1*level);
-    configurations.BaseValues.AttackDamage = lvlAttackDamage;
-
-    if healthComp.LastDamagedBy == nil then
-        healthComp:Reset();
-    end
-end
-
 function npcPackage.Spawning(npcClass: NpcClass)
-    local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
-
-    properties.OnChanged:Connect(function(k, v)
-        if npcClass.HealthComp.IsDead then return end;
-        if k == "Level" then
-            npcPackage.LevelSet(npcClass);
-        end
-    end)
-    npcPackage.LevelSet(npcClass);
-
-
     local ticksModel = npcClass.Character:WaitForChild("ExplosiveTickBlobs");
     local tickBlobs = ticksModel:GetChildren();
     

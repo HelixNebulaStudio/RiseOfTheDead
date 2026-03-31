@@ -126,7 +126,7 @@ function itemPackage.Init(itemLib)
 		local batteryStorageItem = patStorage:FindByIndex(2);
 
 		if action == "toggleonline" then
-			local onlineBool = patStorage.Values.IsOnline == true;
+			local onlineBool = patStorage.Properties.IsOnline == true;
 
 			if onlineBool then
 				if weaponStorageItem == nil then
@@ -141,15 +141,15 @@ function itemPackage.Init(itemLib)
 			end
 
 
-			patStorage.Values.IsOnline = not onlineBool;
-			patStorage:SyncValues();
-			if patStorage.Values.IsOnline then
+			patStorage.Properties.IsOnline = not onlineBool;
+			patStorage:SyncProperties();
+			if patStorage.Properties.IsOnline then
 				modAudio.Play("TurretOnline", turretArm.PrimaryPart); 
 			else
 				modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
 			end
 			
-			rPacket.StorageValues = patStorage.Values;
+			rPacket.StorageValues = patStorage.Properties;
 			rPacket.Success = true;
 			
 			accessory:SetAttribute("Update", true);
@@ -158,10 +158,10 @@ function itemPackage.Init(itemLib)
 
 		elseif action == "resetconfig" then
 
-			patStorage.Values.Config = {};
-			patStorage:SyncValues();
+			patStorage.Properties.Config = {};
+			patStorage:SyncProperties();
 			
-			rPacket.StorageValues = patStorage.Values;
+			rPacket.StorageValues = patStorage.Properties;
 			rPacket.Success = true;
 
 			return rPacket;
@@ -172,7 +172,7 @@ function itemPackage.Init(itemLib)
 			local configKey = packet.ConfigKey;
 			local optionIndex = packet.OptionIndex;
 
-			local configValues = patStorage.Values.Config or {};
+			local configValues = patStorage.Properties.Config or {};
 			local configInfo = TurretConfigs[packet.ConfigKey];
 
 			if configInfo == nil then return rPacket end;
@@ -182,10 +182,10 @@ function itemPackage.Init(itemLib)
 				configValues[configKey] = nil;
 			end
 
-			patStorage.Values.Config = configValues;
-			patStorage:SyncValues();
+			patStorage.Properties.Config = configValues;
+			patStorage:SyncProperties();
 			
-			rPacket.StorageValues = patStorage.Values;
+			rPacket.StorageValues = patStorage.Properties;
 			rPacket.Success = true;
 
 			return rPacket;
@@ -201,17 +201,17 @@ function itemPackage.Init(itemLib)
 
 			if configHitlistBitFlags:HasFlag(flagTag) == nil then return rPacket end;
 
-			local configValues = patStorage.Values.Config or {};
+			local configValues = patStorage.Properties.Config or {};
 
 			local userHitlistBitString = configValues.Hitlist or configInfo.DefaultBitString;
 
 			configValues.Hitlist = configHitlistBitFlags:Set(userHitlistBitString, flagTag, flagVal);
-			patStorage.Values.Config = configValues;
-			patStorage:SyncValues();
+			patStorage.Properties.Config = configValues;
+			patStorage:SyncProperties();
 
 			rPacket.FlagVal = configHitlistBitFlags:Test(flagTag, userHitlistBitString);
 			
-			rPacket.StorageValues = patStorage.Values;
+			rPacket.StorageValues = patStorage.Properties;
 			rPacket.Success = true;
 
 			return rPacket;

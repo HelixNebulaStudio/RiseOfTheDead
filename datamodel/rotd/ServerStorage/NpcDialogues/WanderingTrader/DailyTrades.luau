@@ -195,7 +195,7 @@ return function(player, dialog, data)
 		if tradingSession == nil then return end;
 
 		local npcTradeStorage = tradingSession.Storages[npcName];
-		npcTradeStorage.Values.HideSeeds = true;
+		npcTradeStorage.Properties.HideSeeds = true;
 		
 		tradingSession:SetData(npcName, "Demands", demandList);
 

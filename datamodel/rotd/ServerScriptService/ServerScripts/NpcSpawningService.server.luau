@@ -38,6 +38,7 @@ function Spawner.new(spawnConfig: Configuration)
         SpawnMax = spawnConfig:GetAttribute("SpawnMax");
         SpawnMin = spawnConfig:GetAttribute("SpawnMin");
         SpawnSpacing = spawnConfig:GetAttribute("SpawnSpacing");
+        AreaDifficulty = spawnConfig:GetAttribute("AreaDifficulty");
 
         SpawnLevel = spawnConfig:GetAttribute("SpawnLevel");
         SpawnMinLevel = spawnConfig:GetAttribute("SpawnMinLevel");
@@ -241,26 +242,28 @@ function Spawner:Spawn(cframe: CFrame, playerClasses: {PlayerClass})
 
                 avgPlayerLevel = math.clamp(avgPlayerLevel or 0, 0, maxLevel);
 
-                local areaDifficulty = 1;
+                local areaDifficulty = self.AreaDifficulty or 1;
 
                 local mapLibFolder = layerName and game.ReplicatedStorage:FindFirstChild("MapLibraryData");
                 if mapLibFolder then
                     local layerFolder = mapLibFolder:FindFirstChild(layerName);
-                    areaDifficulty = layerFolder and layerFolder:GetAttribute("LevelDifficulty") or 1;
+                    areaDifficulty = layerFolder and (layerFolder:GetAttribute("LevelDifficulty") or layerFolder:GetAttribute("AreaDifficulty")) or 1;
 
                     if RunService:IsStudio() then
                         self.Config:SetAttribute("_AreaDifficulty", areaDifficulty);
                     end
                 end
 
-                spawnLevel = math.clamp(
-                    math.round(avgPlayerLevel * (areaDifficulty/10)), 
-                    self.SpawnMinLevel or 1, 
-                    self.SpawnMaxLevel or maxLevel
-                );
+                npcClass.Properties.AreaDifficulty = math.random((areaDifficulty-0.999)*1000, (areaDifficulty)*1000)/1000;
+                if RunService:IsStudio() then
+                    npcClass.Character:SetAttribute("_AreaDifficculty", areaDifficulty);
+                end
             end
 
             npcClass.Properties.Level = spawnLevel;
+            if RunService:IsStudio() then
+                npcClass.Character:SetAttribute("_Level", spawnLevel);
+            end
 
             if self.Immortal ~= nil then
                 npcClass.Properties.Immortal = self.Immortal;

@@ -19,27 +19,27 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	local fdLayerInfo = modItemModifierClass.Library.calculateLayer(modifier, "FD");
 	local fdValue = fdLayerInfo.Value;
 
-	modifier.Values.FrenzyDamage = fdValue;
-	modifier.Values.FrenzyRate = 0.2;
+	modifier.Properties.FrenzyDamage = fdValue;
+	modifier.Properties.FrenzyRate = 0.2;
 end
 
 if RunService:IsServer() then
 	function modifierPackage.BindTickUpdate(modifier: ItemModifierInstance, tickData: TickData)
-		if modifier.Values.Stacks == nil then
-			modifier.Values.Stacks = 0;
-			modifier.Values.CooldownTick = tick();
-			modifier.Values.DepleteTick = tick();
+		if modifier.Properties.Stacks == nil then
+			modifier.Properties.Stacks = 0;
+			modifier.Properties.CooldownTick = tick();
+			modifier.Properties.DepleteTick = tick();
 		end
 
-		if tick() >= modifier.Values.CooldownTick then
-			if tick()-modifier.Values.DepleteTick >= 0.5 then
-				modifier.Values.DepleteTick = tick();
-				modifier.Values.Stacks = math.clamp(modifier.Values.Stacks -0.01, 0, 1);
+		if tick() >= modifier.Properties.CooldownTick then
+			if tick()-modifier.Properties.DepleteTick >= 0.5 then
+				modifier.Properties.DepleteTick = tick();
+				modifier.Properties.Stacks = math.clamp(modifier.Properties.Stacks -0.01, 0, 1);
 			end
 		end
 
-		if modifier.Values.LastStacks ~= modifier.Values.Stacks then
-			modifier.Values.LastStacks = modifier.Values.Stacks;
+		if modifier.Properties.LastStacks ~= modifier.Properties.Stacks then
+			modifier.Properties.LastStacks = modifier.Properties.Stacks;
 
 			modifier:Sync({"Stacks"});
 		end
@@ -49,19 +49,19 @@ if RunService:IsServer() then
 		local characterClass: CharacterClass? = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass;
 		if characterClass == nil then return end;
 
-		local frenzyRate = modifier.Values.FrenzyRate;
+		local frenzyRate = modifier.Properties.FrenzyRate;
 
-		modifier.Values.Stacks = math.clamp(modifier.Values.Stacks + frenzyRate, 0, 1);
-		modifier.Values.CooldownTick = tick()+10;
+		modifier.Properties.Stacks = math.clamp(modifier.Properties.Stacks + frenzyRate, 0, 1);
+		modifier.Properties.CooldownTick = tick()+10;
 	end
 
-	function modifierPackage.Binds.WeaponShotDamageData(modifier: ItemModifierInstance, damageData: DamageData)
+	function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)
         if modifier.EquipmentClass == nil then return end;
 		local configurations = modifier.EquipmentClass.Configurations;
 		local preModDmg = configurations.PreModDamage;
-		local frenzyDmg = modifier.Values.FrenzyDamage;
+		local frenzyDmg = modifier.Properties.FrenzyDamage;
 
-		local stackAlpha = modifier.Values.Stacks;
+		local stackAlpha = modifier.Properties.Stacks;
 		local additionalDmg = stackAlpha * (frenzyDmg * preModDmg);
 		damageData.Damage = damageData.Damage + additionalDmg;
 	end
@@ -74,7 +74,7 @@ elseif RunService:IsClient() then
 		local equipmentClass: EquipmentClass? = modifier.EquipmentClass;
 		if equipmentClass == nil then return end;
 
-		local frenzyDmg = modifier.Values.FrenzyDamage;
+		local frenzyDmg = modifier.Properties.FrenzyDamage;
 		if frenzyDmg == nil then return; end;
 
 		if toolStatusHud.FrenzyDamage == nil then
@@ -85,10 +85,10 @@ elseif RunService:IsClient() then
 			};
 		end
 
-		if modifier.Values.Stacks then
+		if modifier.Properties.Stacks then
 			local statusInfo = toolStatusHud.FrenzyDamage;
 
-			local alphaRatio = modifier.Values.Stacks;
+			local alphaRatio = modifier.Properties.Stacks;
 			local percentFrenzy = math.round(math.clamp(frenzyDmg * alphaRatio, 0, frenzyDmg)*100);
 			statusInfo.Text = `{percentFrenzy > 0 and "+" or ""}{percentFrenzy}%`;
 			statusInfo.ColorPercent = alphaRatio;

@@ -14,6 +14,26 @@ local treePackage = {
 }
 
 function treePackage.PreLogic(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+
+    local processStatusesComp = npcClass:GetComponent("ProcessStatuses");
+    if processStatusesComp then
+        local skipTree = processStatusesComp();
+        
+        if skipTree then
+            if properties.TickingSound then
+                properties.TickingSound:Stop();
+                game.Debris:AddItem(properties.TickingSound, 0);
+                properties.TickingSound = nil;
+                npcClass.Character:SetAttribute("DetonationTime", nil);
+            end
+
+            properties.DetonationReady = nil;
+        end
+
+        return skipTree;
+    end
+    
     return false;
 end
 
@@ -111,7 +131,7 @@ function treePackage.IgniteDetonation(npcClass: NpcClass)
                     task.wait(0.2);
                     if npcClass.HealthComp.IsDead then break end;
                 end
-
+                
                 properties.DetonationReady = true;
                 npcClass.OnThink:Fire();
             end)

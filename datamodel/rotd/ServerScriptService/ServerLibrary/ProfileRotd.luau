@@ -70,7 +70,7 @@ shared.coreBind(modProfile, "_sync_public", function(profile: ProfileRotd, publi
 		activeSave:AwardAchievement("theeng", false);
 	end
 	if profile.GamePass.VipTraveler then
-		activeSave:AwardAchievement("theeng", false);
+		activeSave:AwardAchievement("viptra", false);
 	end
 	if profile.GamePass.DbTinker then
 		activeSave:AwardAchievement("dbtinker", false);

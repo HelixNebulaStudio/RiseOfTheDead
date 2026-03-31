@@ -48,7 +48,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     if healthComp == nil then return end;
     
     local dmgData = DamageData.new{
-        Damage = 4;
+        Damage = 1;
         DamageType = "IgnoreArmor";
     };
     healthComp:TakeDamage(dmgData);

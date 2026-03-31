@@ -17,6 +17,11 @@ local treePackage = {
 --==
 
 function treePackage.PreLogic(npcClass: NpcClass)
+    local processStatusesComp = npcClass:GetComponent("ProcessStatuses");
+    if processStatusesComp then
+        return processStatusesComp();
+    end
+
     return false;
 end
 
@@ -27,9 +32,13 @@ function treePackage.HasEnemy(npcClass: NpcClass)
     local curServerTime = workspace:GetServerTimeNow();
 
     local enemyTargetData = targetHandlerComp:MatchFirstTarget(function(targetData: NpcTargetData)
-        if targetData.HealthComp == nil then return end;
-        local targetEntityClass: EntityClass = targetData.HealthComp.CompOwner;
+        local targetHealthComp: HealthComp = targetData.HealthComp;
+        if targetHealthComp == nil then return false; end;
 
+        local isAlive = targetHealthComp.IsDead ~= true;
+        if not isAlive then return false end;
+
+        local targetEntityClass: EntityClass = targetHealthComp.CompOwner;
         if targetEntityClass.ClassName == "PlayerClass" then
             local player: Player = (targetEntityClass :: PlayerClass):GetInstance();
 
@@ -41,10 +50,7 @@ function treePackage.HasEnemy(npcClass: NpcClass)
             end
         end
 
-        local isAlive = targetEntityClass.HealthComp.IsDead ~= true;
-        if not isAlive then return false end;
-
-        local isTargettable = targetEntityClass.HealthComp:CanTakeDamageFrom(npcClass);
+        local isTargettable = targetHealthComp:CanTakeDamageFrom(npcClass);
         if not isTargettable then return false end;
 
         if properties.HordeAggression then return true; end;
@@ -56,6 +62,10 @@ function treePackage.HasEnemy(npcClass: NpcClass)
         if targetEntityClass.ClassName ~= "Destructible" then
             local isInVision = targetData.Model.PrimaryPart and npcClass:IsInVision(targetData.Model.PrimaryPart, 75) or false;
             if not isInVision then return false end;
+        end
+
+        if targetEntityClass.Character and targetEntityClass.Character:FindFirstChild("GodModeFF") then
+            return false;
         end
 
         return true;
@@ -238,6 +248,11 @@ function treePackage.Idle(npcClass: NpcClass)
 
             npcClass.Move:MoveTo(wanderTargetPoint);
         end
+    end
+
+    local healthComp = npcClass.HealthComp;
+    if healthComp.LastDamagedBy == nil and healthComp.CurHealth < healthComp.MaxHealth then
+        healthComp:SetHealth(healthComp.CurHealth + math.ceil(healthComp.MaxHealth * 0.1));
     end
 
     return true;

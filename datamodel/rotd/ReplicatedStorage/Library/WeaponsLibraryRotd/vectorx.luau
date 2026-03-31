@@ -5,7 +5,7 @@ local toolPackage = {
 	ItemId=script.Name;
 	Class="Gun";
 	HandlerType="GunTool";
-	WeaponClass="Submachine gun";
+	WeaponClass="Submachine Gun";
 	Tier=4;
 
 	Animations={
@@ -45,8 +45,8 @@ local toolPackage = {
 		Damage=36;
 		PotentialDamage=285;
 		
-		MagazineSize=32;
-		AmmoCapacity=(32*3);
+		AmmoLimit=32;
+		MaxAmmoLimit=(32*3);
 	
 		Rpm=1000;
 		ReloadTime=3.5;
@@ -74,7 +74,7 @@ local toolPackage = {
 		-- Body
 		RecoilStregth=math.rad(80);
 		-- Penetration
-		Penetration=modWeaponAttributes.PenetrationTable["Submachine gun"];
+		Penetration=modWeaponAttributes.PenetrationTable["Submachine Gun"];
 		-- Physics
 		KillImpulseForce=5;
 		-- Effects

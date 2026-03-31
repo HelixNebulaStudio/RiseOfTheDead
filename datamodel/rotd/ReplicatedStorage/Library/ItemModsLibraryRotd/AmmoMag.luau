@@ -17,7 +17,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		value = value + tweakVal;
 	end
 
-	modifier.SumValues.MagazineSize = math.ceil(value);
+	modifier.SumValues.AmmoLimit = math.ceil(value);
 end
 
 return modifierPackage;

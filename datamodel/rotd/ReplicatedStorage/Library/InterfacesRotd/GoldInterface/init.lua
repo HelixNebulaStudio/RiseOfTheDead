@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 local GuiService = game:GetService("GuiService");
 local MarketplaceService = game:GetService("MarketplaceService");
+local UserInputService = game:GetService("UserInputService");
 
 local localPlayer = game.Players.LocalPlayer;
 
@@ -792,7 +793,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
             
             new.Parent = rScrollFrame;
-            if a == 1 then
+            if a == 1 and #UserInputService:GetConnectedGamepads() >0 then
                 GuiService.SelectedObject = new;
             end
         end
@@ -1075,7 +1076,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
 
             new.Parent = rScrollFrame;
-            if a == 1 then
+            if a == 1 and #UserInputService:GetConnectedGamepads() >0 then
                 GuiService.SelectedObject = new;
             end
         end

@@ -76,7 +76,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
             equipmentClass:AddBaseModifier("RatGun", {
                 SetValues = {
                     Damage = math.random(3, 5);
-                    AmmoCapacity = math.random(60, 120);
+                    MaxAmmoLimit = math.random(60, 120);
                     NpcPercentHealthDamage = 0.1;
                 };
             });

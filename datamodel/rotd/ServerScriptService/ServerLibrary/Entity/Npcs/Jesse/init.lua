@@ -7,6 +7,7 @@ local npcPackage = {
 	Configurations = {};
     Properties = {
         IsInsideShop = true;
+        Immortal = 1;
     };
 
     DialogueInteractable = true;

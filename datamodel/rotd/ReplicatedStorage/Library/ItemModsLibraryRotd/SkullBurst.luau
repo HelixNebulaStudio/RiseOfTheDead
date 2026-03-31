@@ -20,13 +20,13 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		value = value + tweakVal;
 	end
 
-	modifier.Values.SkullBurst = value;
+	modifier.Properties.SkullBurst = value;
 end
 
 if RunService:IsServer() then
 
 	function modifierPackage.Binds.OnPrimaryFire(modifier: ItemModifierInstance, packet)
-		packet.RawRpm = packet.RawRpm + modifier.Values.SkullBurst;
+		packet.RawRpm = packet.RawRpm + modifier.Properties.SkullBurst;
 	end
 
 elseif RunService:IsClient() then
@@ -47,19 +47,19 @@ elseif RunService:IsClient() then
 			};
 		end
 
-		local modifierValues = modifier.Values;
+		local modifierValues = modifier.Properties;
+		if modifierValues.SkullBurstStacks == nil then
+			modifierValues.SkullBurstStacks = 0;
+		end
 		if modifierValues.SkullBurstCooldownTick == nil or tick()-modifierValues.SkullBurstCooldownTick >= 10 then
 			if modifierValues.SkullBurstDepleteTick == nil or (tick()-modifierValues.SkullBurstDepleteTick >= 0.5) then
 				modifierValues.SkullBurstDepleteTick = tick();
 				modifierValues.SkullBurstStacks = math.clamp(modifierValues.SkullBurstStacks -0.04, 0, 1);
 			end
 		end
-		if modifierValues.SkullBurstStacks == nil then
-			modifierValues.SkullBurstStacks = 0;
-		end
 
 		local alphaRatio = math.clamp(modifierValues.SkullBurstStacks/1, 0, 1);
-		local percentRpm = math.round(math.clamp(configurations.SkullBurst * alphaRatio, 0, configurations.SkullBurst)*100);
+		local percentRpm = math.round(math.clamp(modifierValues.SkullBurst * alphaRatio, 0, modifierValues.SkullBurst)*100);
 		toolStatusHud.SkullBurst.Text = `{percentRpm > 0 and "+" or ""}{percentRpm}%`;
 		toolStatusHud.SkullBurst.ColorPercent = alphaRatio;
 	end
@@ -68,14 +68,14 @@ elseif RunService:IsClient() then
 		local targetPart = packet.HitInfo.Part;
 		if targetPart == nil then return end;
 		if targetPart.Name ~= "Head" and targetPart:GetAttribute("IsHead") ~= true then return end;
-		if tick()-modifier.Values.SkullBurstCooldownTick <= 0.1 then return end;
+		if tick()-modifier.Properties.SkullBurstCooldownTick <= 0.1 then return end;
 
-		modifier.Values.SkullBurstCooldownTick = tick();
-		modifier.Values.SkullBurstStacks = math.clamp(modifier.Values.SkullBurstStacks +0.05, 0, 1);
+		modifier.Properties.SkullBurstCooldownTick = tick();
+		modifier.Properties.SkullBurstStacks = math.clamp(modifier.Properties.SkullBurstStacks +0.05, 0, 1);
 	end
 
 	function modifierPackage.Binds.OnPrimaryFire(modifier: ItemModifierInstance, packet)
-		if modifier.Values.SkullBurstStacks <= 0 then return end;
+		if modifier.Properties.SkullBurstStacks <= 0 then return end;
 		
 		local equipmentClass: EquipmentClass? = modifier.EquipmentClass;
 		assert(equipmentClass, `Missing equipment class: {modifier}`);
@@ -83,7 +83,7 @@ elseif RunService:IsClient() then
 		local configurations = equipmentClass.Configurations;
 
 		local baseRpm = configurations.Rpm;
-		local skullBurstRpm = baseRpm * (configurations.SkullBurst * modifier.Values.SkullBurstStacks/1);
+		local skullBurstRpm = baseRpm * (configurations.SkullBurst * modifier.Properties.SkullBurstStacks/1);
 	
 		packet.RawRpm = packet.RawRpm + skullBurstRpm;
 	end

@@ -35,12 +35,12 @@ function modifierPackage.Binds.WeaponShotPreProcess(modifier: ItemModifierInstan
 	if shotPacket.Rocketman ~= true then return end;
 
 	local storageItem = equipmentClass.StorageItem;
-	local maxAmmo = storageItem:GetValues("MA") or configurations.AmmoCapacity;
+	local maxAmmo = storageItem:GetValues("MA") or configurations.MaxAmmoLimit;
 	if maxAmmo <= 0 then return end;
 
 	local overrideTable = packet.OverrideTable;
 
-	local ammo = storageItem:GetValues("A") or configurations.MagazineSize;
+	local ammo = storageItem:GetValues("A") or configurations.AmmoLimit;
 	local ammoCost = math.min(configurations.AmmoCost or 1, ammo);
 	
 	local shotBy = shotPacket.ShotBy;

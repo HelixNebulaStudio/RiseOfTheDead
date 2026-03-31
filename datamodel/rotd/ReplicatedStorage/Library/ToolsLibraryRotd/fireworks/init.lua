@@ -23,15 +23,10 @@ local toolPackage = {
 		ProjectileId = "fireworks";
 		ProjectileConfig = {
 			Velocity = 100;
-			Bounce = 0;
-			LifeTime=10;
-			Acceleration = Vector3.new(0, 296.2, 0);
-			KeepAcceleration = true;
-			ThrowingMode="Directional";
+			ThrowingMode = "Directional";
 		};
 		VelocityBonus = 40;
 
-		--ShowFocusTraj=false;
 		ConsumeOnThrow=true;
 	};
 	Properties={};

@@ -31,8 +31,6 @@ local toolPackage = {
 		ProjectileId = "mk2grenade";
 		ProjectileConfig = {
 			Velocity = 160;
-			Bounce = 0.6;
-			LifeTime = 20;
 		};
 		VelocityBonus = 40;
 

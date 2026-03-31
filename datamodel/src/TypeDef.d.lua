@@ -68,11 +68,13 @@ export type MODIFIER_BIND_KEY<U> = U
     | "CharacterClassIsSlidingChanged"
     | "CharacterClassIsFocusedChanged"
     | "DeathHandler"
-    | "WeaponRenderStepped"
-    | "WeaponShotDamageData" 
-    | "WeaponShotPreProcess"
-    | "WeaponShotBulletHit" 
-    | "GunPullTrigger"
+    | "WeaponRenderStepped" -- [C] <params> toolHud: anydict
+    | "WeaponShotDamageDataNew" -- [S] <params> damageData: DamageData
+    | "WeaponShotPreProcess" -- [C/S] Before shot&ammo is processed <params> shotPacket: anydict
+    | "WeaponShotBulletHit" -- [C/S] <params> bulletData: BulletHitData
+    | "WeaponShotProjectileNew" -- [S] On projectile instance <params> projectile: ProjectileInstance
+    | "WeaponShotProjectileHit" -- [S] On arc tracer contact <params> projectile: ProjectileInstance, arcPoint: ArcPoint
+    | "GunPullTrigger" -- [C/S] Before rpm calc <params> changeRef: anydict
     ; 
 
 --MARK: shared
@@ -404,6 +406,9 @@ export type Storages = {
 };
 
 export type Storage = {
+    -- @meta
+    Properties: anydict;
+
     -- @properties
     Id: string;
     Name: string;
@@ -420,7 +425,6 @@ export type Storage = {
     Expandable: boolean;
     Virtual: boolean;
     Settings: anydict;
-    Values: anydict;
     Cache: anydict;
     BasePart: BasePart?;
     InteractConfig: Configuration?;
@@ -477,7 +481,7 @@ export type Storage = {
     FindByIndex: (Storage, index: number) -> StorageItem;
 
     Sync: (Storage, player: Player) -> nil;
-    SyncValues: (Storage, Player?) -> nil;
+    SyncProperties: (Storage, Player?) -> nil;
 
     -- @signals
     OnChanged: EventSignal<>;
@@ -491,6 +495,7 @@ export type StorageItem = {
     ItemId: string;
     Player: Player;
     Storage: Storage;
+    StorageId: string;
     Library: {[string]: any};
     Values: {[string]: any};
     Quantity: number;
@@ -568,6 +573,7 @@ export type PlayerClass = CharacterClass & {
     CharacterGarbage: GarbageHandler;
 
     Cache: anydict;
+    ActiveInteractable: InteractableInstance?;
 
     SafeCFrame: CFrame;
 
@@ -731,6 +737,7 @@ export type NpcClasses = {
         CFrame: CFrame?;
         Player: Player?;
 
+        Properties: anydict?;
         AddComponents: {string}?;
         AddBehaviorTrees: {string}?;
         
@@ -839,6 +846,7 @@ export type NpcClass = CharacterClass & {
     GetAnimation: (animName: string) -> AnimationTrack?;
     PlayAnimation: (animName: string, ...any) -> AnimationTrack; 
     StopAnimation: (animName: string, ...any) -> nil;
+    SetAnimationTimescale: (timescale: number) -> nil;
     Move: NpcMoveComponent;
     Chat: (player: Player?, message: string) -> nil;
 
@@ -945,9 +953,7 @@ export type InteractInfo = {
     Player: Player?;
 
     -- @client
-    ClientData: anydict?;
-    ClientInterface: anydict?;
-    CharacterVars: anydict?;
+    ClientData: anydict;
 
     -- @server
     NpcClass: NpcClass?;
@@ -992,10 +998,11 @@ export type Interface = {
         Text: string?; 
         LayoutOrder: number?; 
         Size: UDim2?; 
-        TextColor3: Color3?; 
+        TextColor3: Color3?;
         BackgroundColor3: Color3?;
         OnNewButton: anyfunc?;
     }, newButtonTemplate: GuiObject?) -> DropdownList;
+    beautifyNumber: (number) -> string;
 
     -- @properties;
     ActiveScale: number;
@@ -1106,7 +1113,7 @@ export type InterfaceWindow = {
     BoolStringWhenActive: {String: string; Priority: number;};
 
     Binds: anydict;
-    Properties: PropertiesVariable<{}>;
+    Properties: PropertiesVariable<anydict>;
     
     ReturnPageStack: {any};
 
@@ -1279,8 +1286,6 @@ export type PropertiesVariable<T> = T & {
 
     SetMetatable: (PropertiesVariable<T>, mt: anydict) -> nil;
     GetMetatable: (PropertiesVariable<T>) -> any;
-
-    [any]: any;
 };
 
 --MARK: ConfigVariable
@@ -1318,7 +1323,7 @@ export type ConfigModifier = {
     Name: string;
     Priority: number;
     Tags: anydict;
-    Values: anydict; 
+    Properties: PropertiesVariable<anydict>; 
 
     Enabled: boolean;
     SetEnabled: (ConfigModifier, value: boolean) -> nil;
@@ -1346,7 +1351,7 @@ export type EquipmentClass = Class & {
     Package: anydict;
 
     Configurations: ConfigVariable;
-    Properties: PropertiesVariable<{}>;
+    Properties: PropertiesVariable<anydict>;
 
     BaseModifiers: {[string]: anydict};
     EquipmentModifier: ConfigModifier;
@@ -1465,10 +1470,13 @@ export type DestructibleInstance = {
     Properties: PropertiesVariable<anydict>;
     
     NetworkOwners: {Player};
+    DestructibleOwner: Instance?;
+    
     DebrisName: string;
 
     PathfindingModifier: PathfindingModifier;
     HealthbarHud: BillboardGui;
+    HealthbarAutoHide: number?;
     
     -- @methods
     SetEnabled: (DestructibleInstance, value: boolean) -> nil;
@@ -1535,8 +1543,11 @@ export type ProjectileInstance = {
 		Delta: number;
         Acceleration: Vector3;
     };
+    ShotOriginAtt: Attachment?;
+    Binds: anydict;
 
     --@methods
+    PreTakeDamageDamageData: (ProjectileInstance, damageData: DamageData) -> nil;
     Destroy: (ProjectileInstance) -> nil;
 
     BindInstance: (ProjectileInstance) -> nil;
@@ -1904,9 +1915,11 @@ export type WieldComp = {
     -- @methods
     GetEquipmentClass: (WieldComp, siid: string, itemId: string?, storageItem: StorageItem?) -> EquipmentClass;
     GetToolHandler: (WieldComp, siid: string, itemId: string, storageItem: StorageItem?, toolModels: ({Model}?)) -> ToolHandlerInstance;
+    GetEquipmentModifier: (WieldComp, equipmentClass: EquipmentClass, storageItem: StorageItem) -> ItemModifierInstance;
     GetOrDefaultItemModifier: (WieldComp, siid: string, defaultFunc: (()->ItemModifierInstance)?) -> ItemModifierInstance?;
     GetToolModel: (WieldComp, args: {ModelName: string; Siid: string; ItemId: string?; PrefabName: string?;}) -> Model?;
     RefreshCharacterModifiers: (WieldComp) -> nil;
+    SyncEquipmentProperties: (WieldComp, siid: string, keys: {string}) -> nil;
 
     SetCustomization: (WieldComp, mode: string, packet: anydict) -> nil;
 

@@ -426,6 +426,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			uiStroke.Parent = new.Frame;
 			uiStroke.Enabled = false;
 
+			if name ~= localPlayer.Name then
+				local uiCorner = Instance.new("UICorner");
+				uiCorner.CornerRadius = UDim.new(1, 0);
+				uiCorner.Parent = new.Frame;
+			end
+
 		elseif modNpcProfileLibrary.ClassColors[class] then
 			new.Frame.ImageColor3 = modNpcProfileLibrary.ClassColors[class];
 			

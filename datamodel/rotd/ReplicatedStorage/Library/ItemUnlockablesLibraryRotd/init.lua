@@ -987,7 +987,7 @@ function library.onRequire()
 		ItemId="ammopouch";
 		Icon="rbxassetid://98882966031889";
 		Name="Dark Carbon";
-		DefaultPackage=true;
+		PackageId="ammopouchlegacy";
 		
 		SurfaceAppearance={
 			ColorMap="rbxassetid://95196813614980";

@@ -187,7 +187,7 @@ local npcPackage = {
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local level = math.max(properties.Level, 0);
 
@@ -214,7 +214,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
             equipmentClass:AddBaseModifier("BanditGun", {
                 SetValues = {
                     Damage = math.random(3, 5);
-                    AmmoCapacity = math.random(60, 120);
+                    MaxAmmoLimit = math.random(60, 120);
                     NpcPercentHealthDamage = 0.1;
                 };
             });

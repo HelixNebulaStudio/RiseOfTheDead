@@ -53,7 +53,6 @@ local toolPackage = {
 		ProjectileId = "boomerang";
 		ProjectileConfig = {
 			Velocity = 120;
-			LifeTime = 10;
 		};
 		VelocityBonus = 100;
 

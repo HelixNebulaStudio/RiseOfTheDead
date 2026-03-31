@@ -96,7 +96,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             Action = "GetStorage";
             StorageId = storageId;
             StoragePage = page;
-            InteractConfig = openSettings.Interactable.Config;
+            InteractConfig = openSettings.Interactable and openSettings.Interactable.Config or nil;
         };
 
         if storage then
@@ -166,8 +166,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
         activeStorageId = openSettings.StorageId;
         local storage = modData.GetStorage(activeStorageId);
-
 		Debugger:Log("Opening storage:",activeStorageId,"(",storage and storage.Name or nil,")");
+        if storage == nil then
+            window:Close();
+            return;
+        end
 		
 		local storageName = storage.Name or activeStorageId or "nil";
 		storageTitleTag.Text = storageName;
@@ -187,7 +190,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		
 		local slotFrames = {};
 		local yieldTick = tick(); 
-        repeat until storage.Size or tick()-yieldTick >1 or not wait(1/60);
+        repeat until storage.Size or tick()-yieldTick >1 or not task.wait(1/60);
 
         if storage.Size == nil then
             Debugger:Warn(`Failed to load external storage: {activeStorageId}`);
@@ -248,15 +251,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                     window:Update(true);
 
                                     statusLabel.Text = "Slot Purchased!";
-                                    wait(0.5);
+                                    task.wait(0.5);
                                     
                                 elseif r == 1 then
                                     statusLabel.Text = "Purchase Failed!";
-                                    wait(2);
+                                    task.wait(2);
                                     
                                 elseif r == 2 then
                                     statusLabel.Text = "Not enough Perks!";
-                                    wait(1);
+                                    task.wait(1);
                                     window:Close();
                                     interface:ToggleWindow("GoldMenu", true, "PerksPage");
                                     return;
@@ -368,7 +371,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     local rentalPrice = storage.Settings.Rental;
                     
                     local function updateRental()
-                        local storage = modData.Storages[activeStorageInterface.StorageId];
+                        local storage = modData.GetStorage(activeStorageId);
                         if storage.Settings == nil or storage.Settings.Rental <= 0 then
                             return;
                         end
@@ -405,7 +408,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         return itemCount, timeLeft;
                     end
 
-                    activeStorageInterface:ConnectOnUpdate(updateRental);
+                    activeStorageInterface:HookUpdateBind(updateRental);
                     
                     local function updateRentalJob()
                         if not window.Visible or activeStorageId == nil then 
@@ -489,24 +492,26 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local storageItemA = modData.GetItemById(openSettings.SetVanitySiid)
             local clothingLibA = modClothingLibrary:Find(storageItemA.ItemId);
             
-            for id, buttonTable in pairs(activeStorageInterface.Buttons) do
-                local clothingLibB = modClothingLibrary:Find(buttonTable.Item.ItemId);
-                
-                local canSetVanity = true;
+            activeStorageInterface:HookUpdateBind(function()
+                for id, buttonTable in pairs(activeStorageInterface.Buttons) do
+                    local clothingLibB = modClothingLibrary:Find(buttonTable.Item.ItemId);
+                    
+                    local canSetVanity = true;
 
-                if clothingLibB.CanVanity == false then 
-                    canSetVanity = false;
-                end;
-                if clothingLibA.GroupName ~= clothingLibB.GroupName and clothingLibB.UniversalVanity ~= true then
-                    canSetVanity = false;
+                    if clothingLibB.CanVanity == false then 
+                        canSetVanity = false;
+                    end;
+                    if clothingLibA.GroupName ~= clothingLibB.GroupName and clothingLibB.UniversalVanity ~= true then
+                        canSetVanity = false;
+                    end
+                    
+                    buttonTable.ItemButtonObject.HideTypeIcon = true;
+                    buttonTable.ItemButtonObject.HideFavIcon = true;
+                    buttonTable.ItemButtonObject.HideAttachmentIcons = true;
+                    buttonTable.ItemButtonObject.DimOut = not canSetVanity;
+                    buttonTable.ItemButtonObject:Update(buttonTable.Item);
                 end
-                
-                buttonTable.ItemButtonObject.HideTypeIcon = true;
-                buttonTable.ItemButtonObject.HideFavIcon = true;
-                buttonTable.ItemButtonObject.HideAttachmentIcons = true;
-                buttonTable.ItemButtonObject.DimOut = not canSetVanity;
-                buttonTable.ItemButtonObject:Update(buttonTable.Item);
-            end
+            end)
 
             activeStorageInterface.OnItemButton1Click = function(interface, slot)
                 local slotId = (slot and slot.ID or 0);
@@ -589,6 +594,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             openSettings.StorageId = storageId;
 
             local storage = modData.GetStorage(storageId);
+            storage = openStorage(storageId)
+
 			if openSettings.SetVanitySiid then
 				local function cancelWardrobe()
 					window:Close();
@@ -610,7 +617,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			window:Update(true);
 			refreshBoundarySize();
 
-			spawn(function()
+			task.spawn(function()
 				if storageId == "Wardrobe" then
 					if openSettings.SetVanitySiid then return end;
 					return;
@@ -620,7 +627,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     or openSettings.Interactable == nil
                     or openSettings.Interactable.Part == nil
 					or localPlayer:DistanceFromCharacter(openSettings.Interactable.Part.Position) >= 16
-					or not wait(0.1);
+					or not task.wait(0.1);
 				window:Close();
 			end)
 			

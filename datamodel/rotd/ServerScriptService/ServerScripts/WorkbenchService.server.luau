@@ -16,6 +16,7 @@ local modItemSkinWear = shared.require(game.ReplicatedStorage.Library.ItemSkinWe
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 local modItemModsLibrary = shared.require(game.ReplicatedStorage.Library.ItemModsLibrary);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
@@ -178,6 +179,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		end;
 	end
 	
+	local playerClass: PlayerClass = shared.modPlayers.get(player);
 	
 	local profile = modProfile:Get(player);
 	local playerSave = profile:GetActiveSave();
@@ -341,6 +343,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		userWorkbench:RemoveProcess(buildIndex);
 		userBlueprints:UnlockBlueprint(itemId);
 		profile:AddPlayPoints(bpLib.Duration or 60, "Gameplay:Workbench");
+		modAudio.Play("Purchase", playerClass.Head);
 		
 		rPacket.Success = true;
 		return rPacket;
@@ -579,7 +582,7 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 					storageItem.Values[upgradeInfo.DataTag] = upgradeLevel + 1;
 					if upgradeInfo.SliderTag then
 						storageItem.Values[upgradeInfo.SliderTag] = nil;
-						--storage:SyncValues(id, upgradeInfo.SliderTag);
+						--storage:SyncProperties(id, upgradeInfo.SliderTag);
 						storageItem:Sync({upgradeInfo.SliderTag});
 					end
 					

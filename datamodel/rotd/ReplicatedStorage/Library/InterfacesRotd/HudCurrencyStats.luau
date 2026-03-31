@@ -106,6 +106,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local previousStats = {};
     --MARK: OnUpdate
     window.OnUpdate:Connect(function()
+        if statsFrame.Parent == nil then return end;
         local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
         local statsData = modData.GameSave and modData.GameSave.Stats;

@@ -31,7 +31,7 @@ end
 
 shared.coreBind(modGameSave, "_new", function(gameSave: GameSaveRotd, profile: ProfileRotd)
 	local player = profile.Player;
-	Debugger:Warn("_new GameSave", player);
+	Debugger:Print("_new GameSave", player);
 
 	gameSave.Spawn = "warehouse";
 

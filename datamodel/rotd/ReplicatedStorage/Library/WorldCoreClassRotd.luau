@@ -126,7 +126,7 @@ function modWorldCoreClass.updateWanderers()
         local spawnsLib = modBranchConfigurations.SpawnLibrary[modBranchConfigurations.WorldName];
         local spawnPart = workspace:FindFirstChildWhichIsA("SpawnLocation");
         if spawnsLib then
-            Debugger:Warn("Wanderer spawn, no spawn library.");
+            Debugger:Print("Wanderer spawn, no spawn library.");
             local spawnLocationParts = {};
             for spawnName, _ in pairs(spawnsLib) do
                 local spawnPart = workspace:FindFirstChild(spawnName);

@@ -860,6 +860,7 @@ function Survival:StartWave(wave)
 						DespawnDuration = false;
 						Anchored = true;
 						DisableTouchPickup = true;
+						SharedDrop = true;
 					};
 					self.LootPrefab = lootPrefab;
 
@@ -993,7 +994,7 @@ function Survival:StartWave(wave)
 					local storage: Storage = storages[player] or self.Storages[player];
 					if storage == nil then
 						storage = shared.modStorage.new(STORAGE_ID, "rewardcrate", player, "Survival Rewards");
-						storage.Values.ItemSpawn = true;
+						storage.Properties.ItemSpawn = true;
 
 						storage:SetPermissions("CanRemove", false);
 						self.Storages[player] = storage;

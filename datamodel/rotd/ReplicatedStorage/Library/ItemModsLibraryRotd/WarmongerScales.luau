@@ -13,7 +13,7 @@ local modifierPackage = {
 };
 --==
 if RunService:IsServer() then
-	function modifierPackage.Binds.WeaponShotDamageData(modifier: ItemModifierInstance, damageData: DamageData)
+	function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)
 		if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
 		
 		task.spawn(function()
@@ -36,8 +36,8 @@ if RunService:IsServer() then
 			if statusClass == nil then 
 				statusClass = statusComp:Apply("WarmongerScales", {
 					Values = {
-						HealthPerKill = modifier.Values.HealthPerKill;
-						Max = modifier.Values.Max;
+						HealthPerKill = modifier.Properties.HealthPerKill;
+						Max = modifier.Properties.Max;
 						Pool = 0;
 						Buffer = 0;
 						LastDeduct = tick();
@@ -79,8 +79,8 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		hpValue = hpValue + hpTweakVal;
 	end
 
-	modifier.Values.HealthPerKill = hpkValue;
-	modifier.Values.Max = hpValue;
+	modifier.Properties.HealthPerKill = hpkValue;
+	modifier.Properties.Max = hpValue;
 end
 
 return modifierPackage;

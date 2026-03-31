@@ -74,7 +74,7 @@ if RunService:IsServer() then
 			end)
 			
 		elseif mission.Type == 1 then -- Active;
-			if modBranchConfigurations.IsWorld("TheWarehouse") or RunService:IsStudio() then
+			if modBranchConfigurations.IsWorld("TheWarehouse") then
 				if mission.ProgressionPoint == 1 then
 					dialog:AddChoice("vt3_vttravel", function()
 						local npcChar = dialog.Character;

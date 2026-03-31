@@ -37,7 +37,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 	local remotes = game.ReplicatedStorage.Remotes;
 	local remotePurchaseUpgrade = remotes.Workbench:WaitForChild("PurchaseUpgrade");
 	local remoteModHandler = remotes.Workbench:WaitForChild("ModHandler");
-	local remoteItemModAction = modRemotesManager:Get("ItemModAction");
+	local remoteEquipmentClass = modRemotesManager:Get("EquipmentClass");
 
 	local ModUpgrader = {};
 	local upgradesGuiTable = {};
@@ -264,13 +264,13 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								sliderObj.Disabled = true;
 								
 								local setValuePacket = {
-									StorageItemID=itemModifierSiid;
-									DataTag=upgradeData.SliderTag;
-									Value=valToLvl;
-									Key=modLib.Module.Name;
+									Siid = itemModifierSiid;
+									DataTag = upgradeData.SliderTag;
+									Value = valToLvl;
+									Key = modLib.Module.Name;
 								}
 								
-								remoteItemModAction:InvokeServer("setvalue", setValuePacket);
+								remoteEquipmentClass:FireServer("modifiersetvalue", setValuePacket);
 								modifierStorageItem.Values[upgradeData.SliderTag] = valToLvl;
 								
 								self.Update();

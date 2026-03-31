@@ -160,7 +160,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 
     if not (modBranchConfigurations.IsWorld("MainMenu") or modBranchConfigurations.IsWorld("BioXResearch")) then return end;
-    local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
 	local enteredCampaign = false;
 
     local frame = script:WaitForChild("MainMenu"):Clone();
@@ -189,7 +188,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         if visible then
             interface:ToggleGameBlinds(true, 3);
 
-            modGuiObjectTween.FadeTween(frontPageFrame, modGuiObjectTween.FadeDirection.In, fadeTween);
+            task.spawn(function()
+                modGuiObjectTween.FadeTween(frontPageFrame, modGuiObjectTween.FadeDirection.In, fadeTween);
+            end)
             local sceneModel, focusPart, cameraBlur;
             local spinTick = tick()+3;
             local lastBlur = 20;

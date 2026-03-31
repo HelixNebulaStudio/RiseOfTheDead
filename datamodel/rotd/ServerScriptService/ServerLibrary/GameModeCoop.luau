@@ -720,6 +720,7 @@ function Coop:DropReward()
 		DespawnDuration = false;
 		Anchored = true;
 		DisableTouchPickup = true;
+		SharedDrop = true;
 	};
 	self.LootPrefab = lootPrefab;
 

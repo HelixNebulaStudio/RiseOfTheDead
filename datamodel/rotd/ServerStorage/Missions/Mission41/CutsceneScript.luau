@@ -32,11 +32,12 @@ if RunService:IsServer() then
 				
 			elseif mission.Type == 1 and mission.ProgressionPoint <= 2 then
 				local function spawnCultistNote()
-					local dropPrefab = modItemDrops.spawn{
+					modItemDrops.spawn{
 						ItemId = "cultistnote1";
 						SpawnCFrame = CFrame.new(npcClass.Properties.DeathPosition);
+						Players = {player};
+						DisableTouchPickup = true;
 					};
-					modReplicationManager.ReplicateIn(player, dropPrefab, workspace.Interactables);
 				end
 				
 				modMission:Progress(player, MISSION_ID, function(mission)
@@ -53,11 +54,12 @@ if RunService:IsServer() then
 				
 			elseif mission.Type == 1 and (mission.ProgressionPoint == 4 or mission.ProgressionPoint == 5) then
 				local function spawnCultistHood()
-					local dropPrefab = modItemDrops.spawn{
+					modItemDrops.spawn{
 						ItemId = "cultisthood";
 						SpawnCFrame = CFrame.new(npcClass.Properties.DeathPosition);
+						Players = {player};
+						DisableTouchPickup = true;
 					};
-					modReplicationManager.ReplicateIn(player, dropPrefab, workspace.Interactables);
 				end
 				
 				modMission:Progress(player, MISSION_ID, function(mission)

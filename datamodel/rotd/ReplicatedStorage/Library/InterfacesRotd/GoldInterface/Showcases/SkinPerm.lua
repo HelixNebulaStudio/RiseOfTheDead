@@ -2,6 +2,7 @@ local ShowcaseObject = {}
 
 local modItemSkinsLibrary = shared.require(game.ReplicatedStorage.Library.ItemSkinsLibrary);
 local modCustomizationData = shared.require(game.ReplicatedStorage.Library.CustomizationData);
+local modItemViewport = shared.require(game.ReplicatedStorage.Library.UI.ItemViewport);
 
 function ShowcaseObject.new(interface, parent, library)
 	if library == nil then return end;
@@ -12,7 +13,7 @@ function ShowcaseObject.new(interface, parent, library)
 
     local self = {};
 
-    local itemViewportObject = interface.ItemViewport.new();
+    local itemViewportObject = modItemViewport.new();
     itemViewportObject:SetZIndex(3);
     local frame = itemViewportObject.Frame :: Frame;
 

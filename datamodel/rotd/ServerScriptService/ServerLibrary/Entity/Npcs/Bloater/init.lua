@@ -38,40 +38,22 @@ local npcPackage = {
         "RandomClothing";
         "BodyDestructibles";
         "DizzyCloud";
+        "DynamicLevel";
     };
     AddBehaviorTrees = {
         "ZombieDefaultTree";
     };
+
+    DynamicLevelScaling = {
+        WalkSpeed = 10;
+        MaxHealth = function(lvl) return 49+(math.max(100*lvl, 100)); end;
+        AttackDamage = function(lvl) return math.min(30+(lvl*2), 100); end;
+    };
 };
 --==
 
-function npcPackage.LevelSet(npcClass: NpcClass)
-    local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
-    local healthComp: HealthComp = npcClass.HealthComp;
-
-    local level = math.max(properties.Level, 0);
-
-    local lvlMoveSpeed = 10;
-    configurations.BaseValues.WalkSpeed = lvlMoveSpeed;
-    
-    local lvlHealth = 50+math.max(0 + 100*level, 100);
-    configurations.BaseValues.MaxHealth = lvlHealth;
-
-    local lvlAttackDamage = 30 + 2*level;
-    configurations.BaseValues.AttackDamage = lvlAttackDamage;
-
-    if healthComp.LastDamagedBy == nil then
-        healthComp:Reset();
-    end
-end
-
 function npcPackage.Spawning(npcClass: NpcClass)
-    local configurations: ConfigVariable = npcClass.Configurations;
     local properties: PropertiesVariable<{}> = npcClass.Properties;
-
-    npcPackage.LevelSet(npcClass);
-		
 
     local sporesModel = npcClass.Character:WaitForChild("Spores");
     local sporesParts = sporesModel:GetChildren();

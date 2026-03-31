@@ -40,7 +40,7 @@ local npcPackage = {
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local level = math.max(properties.Level, 0);
 
@@ -77,6 +77,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
         local projectileInstance: ProjectileInstance = modProjectile.fire("toxicpuddle", {
             OriginCFrame = origin;
             SpreadDirection = Vector3.new(0, 1, 0);
+            CharacterClass = npcClass;
         });
 
         local dirCf = CFrame.lookAlong(origin.Position, dir+Vector3.new(
@@ -87,14 +88,10 @@ function npcPackage.Spawned(npcClass: NpcClass)
         modProjectile.serverSimulate(projectileInstance, {
             Velocity = dirCf * 40;
             RayWhitelist = {workspace.Environment; workspace.Terrain};
-            IgnoreEntities = true;
         });
 
         local projectilePart = projectileInstance.Part;
         projectilePart.Parent = toxicPuddle;
-
-        local projectilePackage = projectileInstance;
-        projectilePackage.TouchHandler:AddObject(projectilePart);
     end)
 end
 

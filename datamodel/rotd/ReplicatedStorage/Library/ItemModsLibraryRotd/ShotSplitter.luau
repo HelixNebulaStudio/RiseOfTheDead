@@ -13,19 +13,13 @@ local modifierPackage = {
 function modifierPackage.Update(modifier: ItemModifierInstance)
 	modItemModifierClass.AddTierDamage(modifier);
 	
-	-- local dmgLayerInfo = modItemModifierClass.Library.calculateLayer(modifier, "D");
-	-- local dmgValue, dmgTweak = dmgLayerInfo.Value, dmgLayerInfo.TweakValue;
-	-- if dmgTweak then
-	-- 	dmgValue = dmgValue + dmgTweak;
-	-- end
-
 	local frLayerInfo = modItemModifierClass.Library.calculateLayer(modifier, "FR");
 	local frValue, frTweak = frLayerInfo.Value, frLayerInfo.TweakValue;
 	if frTweak then
 		frValue = frValue + frTweak;
 	end
 
-	modifier.SumValues.DamageScaler = 0.35;
+	modifier.ProductValues.Damage = 0.35;
 	modifier.SumValues.Rpm = frValue;
 	
 	modifier.SetValues.Multishot = 2;

@@ -1,3 +1,5 @@
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
@@ -115,7 +117,7 @@ function attirePackage.OnShopSelect(shopInterface, storageItem)
 				newListing:Destroy();
 
 			else
-				warn("Ammunition Purchase>> Error Code:"..serverReply);
+				Debugger:Warn("Ammunition Purchase>> Error Code:"..serverReply);
 				descLabel.Text = string.gsub(modShopLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply), "$Currency", ammoCurrency);
 			end
 			purchaseAmmoDebounce = false;

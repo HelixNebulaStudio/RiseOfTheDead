@@ -193,7 +193,7 @@ function npcPackage.createHelicopter(isHard: boolean, spawnPoint: Vector3)
                 self.IsAtTarget = true;
                 self.TargetPoint = nil;
                 self.MoveState = "Idle";
-                Debugger:Warn(`IsAtTarget`);
+                Debugger:Print(`IsAtTarget`);
 
             else
                 bodyPosition.Position = self.TargetStartPoint:Lerp(targetPoint, lerpAlpha);
@@ -443,7 +443,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
                         if debrisParts[a].Transparency == 1 then continue end;
                         alive = alive +1;
                     end
-                    Debugger:Warn(`Immunity update {alive}/{total}`);
+                    Debugger:Print(`Immunity update {alive}/{total}`);
                     properties.Immunity = math.clamp(alive/total, 0.1, 1);
                 end)
 
@@ -780,21 +780,21 @@ function npcPackage.Spawned(npcClass: NpcClass)
             if dist > 60 and properties.State == "Circle" then
                 heliInstance.CirclingPoint = avgPosition;
                 heliInstance.MoveState = "TransitionToCircle";
-                Debugger:Warn("New circling point", avgPosition, "dist", dist);
+                Debugger:Print("New circling point", avgPosition, "dist", dist);
             end
         end
         heliInstance.Altitude = avgAltitude and (avgAltitude+60) or 60;
     end)
     --========
 
-    npcClass.OnThink:Connect(function()
-        Debugger:Warn(properties.HardMode == true and "H" or "", 
-            "State", properties.State, 
-            "MoveState", heliInstance.MoveState,
-            "DeployState", properties.DeployState,
-            "MolotovState", properties.MolotovState
-        );
-    end)
+    -- npcClass.OnThink:Connect(function()
+    --     Debugger:Print(properties.HardMode == true and "H" or "", 
+    --         "State", properties.State, 
+    --         "MoveState", heliInstance.MoveState,
+    --         "DeployState", properties.DeployState,
+    --         "MolotovState", properties.MolotovState
+    --     );
+    -- end)
 
     --MARK: Death Effects
     npcClass.Garbage:Tag(function()

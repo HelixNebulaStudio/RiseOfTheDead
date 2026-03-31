@@ -119,7 +119,6 @@ if isOwner then
 
 	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
-	local storageItem;
 	UserInputService.InputBegan:connect(function(inputObject, inputEvent)
 		if UserInputService:GetFocusedTextBox() ~= nil then return end;
 		if not modKeyBindsHandler:Match(inputObject, "KeyTogglePat") then return end;
@@ -127,6 +126,7 @@ if isOwner then
 
 		if tick()-debounce <= 1 then return end;
 		debounce = tick();
+				
 		local returnPacket = remoteAutoTurret:InvokeServer("toggleonline");
 
 		debounce = tick()-0.5;

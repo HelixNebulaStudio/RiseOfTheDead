@@ -63,7 +63,7 @@ if RunService:IsServer() then
 					end)
 
 				elseif killerTag.Prefab then
-					local lydiaNpcClass: NpcClass = modNpcs.getByPrefab(killerTag.Prefab);
+					local lydiaNpcClass: NpcClass = modNpcs.getByModel(killerTag.Prefab);
 					if lydiaNpcClass == nil or lydiaNpcClass.Name ~= "Lydia" then continue end;
 
 					for _, player in pairs(game.Players:GetPlayers()) do

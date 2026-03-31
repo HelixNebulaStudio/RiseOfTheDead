@@ -211,6 +211,7 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 					DespawnDuration = false;
 					Anchored = true;
 					DisableTouchPickup = true;
+					SharedDrop = true;
 				};
 			end
 			lockedDoorPrefab.Interactable:SetAttribute("Locked", false);

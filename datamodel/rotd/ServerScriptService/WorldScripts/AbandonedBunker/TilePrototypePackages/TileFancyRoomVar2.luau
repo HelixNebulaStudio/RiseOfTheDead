@@ -28,6 +28,7 @@ function TilePrototypePackage.onRequire()
 				DespawnDuration = false;
 				Anchored = true;
 				DisableTouchPickup = true;
+				SharedDrop = true;
 			}
 		end
 	end)

@@ -19,12 +19,12 @@ function treePackage.HasEnemy(npcClass: NpcClass)
     local properties = npcClass.Properties;
 
     local enemyTargetData = targetHandlerComp:MatchFirstTarget(function(targetData)
-        if targetData.HealthComp == nil then return end;
-        local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
+        local targetHealthComp: HealthComp = targetData.HealthComp;
+        if targetHealthComp == nil or targetHealthComp.IsDead then return false; end;
 
-        if targetNpcClass.HealthComp.IsDead then
-            return false;
-        end;
+        local targetNpcClass: NpcClass = targetHealthComp.CompOwner :: NpcClass;
+        if targetNpcClass.ClassName ~= "NpcClass" then return false; end;
+
 
         local isEnemy = targetNpcClass.HumanoidType == "Zombie" 
                     or targetNpcClass.HumanoidType == "Cultist"
@@ -201,17 +201,22 @@ function treePackage.FireGun(npcClass: NpcClass)
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
 
     local healthComp: HealthComp = enemyTargetData.HealthComp;
-    local enemyNpcClass: NpcClass = healthComp.CompOwner;
+    local targetEntityClass: EntityClass = healthComp.CompOwner :: EntityClass;
 
-    npcClass.Move:HeadTrack(enemyNpcClass.RootPart, 2);
-    npcClass.Move:Face(enemyNpcClass.RootPart.Position);
+    npcClass.Move:HeadTrack(targetEntityClass.RootPart, 2);
+    npcClass.Move:Face(targetEntityClass.RootPart.Position);
 
-    local shootDirection = (enemyNpcClass.RootPart.Position - npcClass.RootPart.Position).Unit;
+    local shootDirection = (targetEntityClass.RootPart.Position - npcClass.RootPart.Position).Unit;
+
+    local targetHumanoid = nil;
+    if targetEntityClass.ClassName == "NpcClass" or targetEntityClass.ClassName == "PlayerClass" then
+        targetHumanoid = (targetEntityClass :: CharacterClass).Humanoid;
+    end
 
     wieldComp:InvokeToolAction(
         "PrimaryFireRequest", 
         shootDirection, 
-        enemyNpcClass.Humanoid
+        targetHumanoid
     );
 end
 

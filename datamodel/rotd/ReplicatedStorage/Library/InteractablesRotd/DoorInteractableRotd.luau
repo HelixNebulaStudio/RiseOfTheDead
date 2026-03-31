@@ -14,6 +14,10 @@ function interactablePackage.init(super) -- Server/Client
         Type = "Door";
     };
     
+    function DoorRotd.BindInteract(interactable: InteractableInstance, info: InteractInfo)
+        DoorRotd.TypePackage.BindInteract(interactable, info);
+    end
+
     function DoorRotd.BindPrompt(interactable: InteractableInstance, info: InteractInfo)
         DoorRotd.TypePackage.BindPrompt(interactable, info);
         if RunService:IsServer() then return end;

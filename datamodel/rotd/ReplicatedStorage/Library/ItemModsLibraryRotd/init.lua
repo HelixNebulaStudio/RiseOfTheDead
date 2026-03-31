@@ -163,7 +163,7 @@ function library.onRequire()
 		BaseTier=1;
 		Tier=1;
 		Stackable=true;
-		Type={"Submachine gun"};
+		Type={"Submachine Gun"};
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.Damage;
 		Category="Damage Mods";
@@ -180,7 +180,7 @@ function library.onRequire()
 		BaseTier=1;
 		Tier=1;
 		Stackable=true;
-		Type={"Submachine gun"};
+		Type={"Submachine Gun"};
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.FireRateRpm;
 		Category="Fire Rate Mods";
@@ -197,7 +197,7 @@ function library.onRequire()
 		BaseTier=1;
 		Tier=1;
 		Stackable=false;
-		Type={"Submachine gun"};
+		Type={"Submachine Gun"};
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.ReloadSpeed;
 		Category="Reload Speed Mods";
@@ -214,7 +214,7 @@ function library.onRequire()
 		BaseTier=1;
 		Tier=1;
 		Stackable=true;
-		Type={"Submachine gun"};
+		Type={"Submachine Gun"};
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.AmmoCapacity;
 		Category="Ammo Capacity Mods";
@@ -231,7 +231,7 @@ function library.onRequire()
 		BaseTier=2;
 		Tier=2;
 		Stackable=false;
-		Type={"Submachine gun"};
+		Type={"Submachine Gun"};
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.Skullcracker;
 		Category="Rare Mods";
@@ -248,7 +248,7 @@ function library.onRequire()
 		BaseTier=2;
 		Tier=2;
 		Stackable=false;
-		Type={"Submachine gun"};
+		Type={"Submachine Gun"};
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.DamageCalibre;
 		Category="Rare Mods";
@@ -266,7 +266,7 @@ function library.onRequire()
 		BaseTier=4;
 		Tier=4;
 		Stackable=false;
-		Type={"Submachine gun"};
+		Type={"Submachine Gun"};
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.CritMulti;
 		Category="Rare Mods";
@@ -283,7 +283,7 @@ function library.onRequire()
 		BaseTier=4;
 		Tier=4;
 		Stackable=false;
-		Type={"Submachine gun"};
+		Type={"Submachine Gun"};
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.ShotSplitter;
 		Category="Rare Mods";
@@ -301,7 +301,7 @@ function library.onRequire()
 		BaseTier=4;
 		Tier=4;
 		Stackable=true;
-		Type={"Submachine gun"};
+		Type={"Submachine Gun"};
 		EffectTrigger=library.EffectTrigger.Passive;
 		Module=script.Deadeye;
 		Category="Rare Mods";
@@ -553,18 +553,18 @@ function library.onRequire()
 	}
 
 	library:Add{
-		Id="rifledmgcalibremod";
-		Name="Rifle Damage Calibre";
-		Desc=GenericDescs.Calibre;
-		Icon="http://www.roblox.com/asset/?id=4877039158";
-		BaseTier=2;
-		Tier=2;
-		Stackable=false;
-		Type={"Rifle"};
-		EffectTrigger=library.EffectTrigger.Passive;
-		Module=script.DamageCalibre;
-		Category="Rare Mods";
-		Upgrades={
+		Id = "rifledmgcalibremod";
+		Name = "Rifle Damage Calibre";
+		Desc = GenericDescs.Calibre;
+		Icon = "http://www.roblox.com/asset/?id=4877039158";
+		BaseTier = 2;
+		Tier = 2;
+		Stackable = false;
+		Type = {"Rifle"};
+		EffectTrigger = library.EffectTrigger.Passive;
+		Module = script.DamageCalibre;
+		Category = "Rare Mods";
+		Upgrades ={
 			{DataTag="DS"; SliderTag="DSS"; Name="Scaler"; Prefix=""; Syntax="Upgrade Damage Scaler"; MaxLevel=10; BaseCost=7; MaxCost=70; BaseValue=-0.5; MaxValue=0.5; Scaling=library.ScalingStyle.NaturalCurve; Rate=1;};
 		};
 	}
@@ -1066,7 +1066,7 @@ function library.onRequire()
 			{DataTag="F"; Name="Fire Rate"; Syntax="Upgrade Fire Rate"; MaxLevel=10; BaseCost=8; MaxCost=80; BaseValue=0.1; MaxValue=0.5; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
 		};
 		Stackable=false;
-		Type={"Pistol"; "Submachine gun"; "Rifle"; "Sniper";};
+		Type={"Pistol"; "Submachine Gun"; "Rifle"; "Sniper";};
 		EffectTrigger=library.EffectTrigger.OnBulletHit;
 		Module=script.SkullBurst;
 		Category="Rare Mods";
@@ -1083,7 +1083,7 @@ function library.onRequire()
 			{DataTag="FD"; Name="Frenzy Damage"; Syntax="Upgrade Frenzy Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.01; MaxValue=0.09; TweakBonus=0.01; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
 		};
 		Stackable=false;
-		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun";};
+		Type={"Pistol"; "Submachine Gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun";};
 		EffectTrigger=library.EffectTrigger.OnBulletHit;
 		Module=script.Frenzy;
 		Category="Rare Mods";
@@ -1102,7 +1102,7 @@ function library.onRequire()
 			{DataTag="T"; Name="Duration"; Syntax="Upgrade Duration"; ValueType="Normal"; Suffix="s"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=5; MaxValue=25; TweakBonus=5; Scaling=library.ScalingStyle.Linear;};
 		};
 		Stackable=false;
-		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
+		Type={"Pistol"; "Submachine Gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
 		
 		EffectTrigger=library.EffectTrigger.Passive;
 		ActivationDuration=60;
@@ -1127,7 +1127,7 @@ function library.onRequire()
 			{DataTag="T"; Name="Targets"; Syntax="Increase Targets"; ValueType="Normal"; MaxLevel=5; BaseCost=10; MaxCost=100; BaseValue=1; MaxValue=6; Scaling=library.ScalingStyle.Linear;};
 		};
 		Stackable=false;
-		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
+		Type={"Pistol"; "Submachine Gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
 
 		EffectTrigger = library.EffectTrigger.Passive;
 		ActivationDuration=2;
@@ -1163,7 +1163,7 @@ function library.onRequire()
 			{DataTag="T"; Name="Targets"; Syntax="Increase Targets"; ValueType="Normal"; MaxLevel=7; BaseCost=10; MaxCost=100; BaseValue=1; MaxValue=8; TweakBonus=2; Scaling=library.ScalingStyle.Linear;};
 		};
 		Stackable=false;
-		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
+		Type={"Pistol"; "Submachine Gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
 
 		EffectTrigger=library.EffectTrigger.Passive;
 		ActivationDuration=60;
@@ -1189,7 +1189,7 @@ function library.onRequire()
 			{DataTag="T"; Name="Duration"; Syntax="Increase Duration"; ValueType="Normal"; Suffix="s"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=3; MaxValue=30; TweakBonus=10; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 		Stackable=false;
-		Type={"Pistol"; "Submachine gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
+		Type={"Pistol"; "Submachine Gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
 		
 		EffectTrigger=library.EffectTrigger.Passive;
 		ActivationDuration=10;

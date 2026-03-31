@@ -8,7 +8,7 @@ local TierDamageLibrary = {
         0.55;
         0.6;
     };
-    ["Submachine gun"] = {
+    ["Submachine Gun"] = {
         0.5;
         0.55;
         0.6;

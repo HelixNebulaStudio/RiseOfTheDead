@@ -2,11 +2,11 @@ local modWeaponAttributes = shared.require(game.ReplicatedStorage.Library.Weapon
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 local toolPackage = {
-	ItemId=script.Name;
-	Class="Gun";
-	HandlerType="GunTool";
-	WeaponClass="Rifle";
-	Tier=2;
+	ItemId = script.Name;
+	Class = "Gun";
+	HandlerType = "GunTool";
+	WeaponClass = "Rifle";
+	Tier = 2;
 
 	Animations={
 		Core={Id=136087224487951;};
@@ -44,8 +44,8 @@ local toolPackage = {
 		Damage=42;
 		PotentialDamage=715;
 		
-		MagazineSize=25;
-		AmmoCapacity=(25*4);
+		AmmoLimit=25;
+		MaxAmmoLimit=(25*4);
 	
 		Rpm=700;
 		ReloadTime=1.5;

@@ -33,40 +33,20 @@ local npcPackage = {
     AddComponents = {
         "TargetHandler";
         "ZombieBasicMeleeAttack";
+        "DynamicLevel";
     };
     AddBehaviorTrees = {
         "ZombieDefaultTree";
     };
+
+    DynamicLevelScaling = {
+        WalkSpeed = 15;
+        MaxHealth = function(lvl) return 499+(math.max(1500*lvl, 50)); end;
+        AttackDamage = function(lvl) return math.min(25+(lvl*2), 100); end;
+    };
 };
 --==
-
-function npcPackage.LevelSet(npcClass: NpcClass)
-    local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
-    local healthComp: HealthComp = npcClass.HealthComp;
-
-    local level = math.max(properties.Level, 0);
-
-    local lvlMoveSpeed = 15;
-    configurations.BaseValues.WalkSpeed = lvlMoveSpeed;
-
-    local lvlHealth = math.clamp(2000*level, 2000, 102400);
-    configurations.BaseValues.MaxHealth = lvlHealth;
-
-    local lvlAttackDamage = 25 + 2*level;
-    configurations.BaseValues.AttackDamage = lvlAttackDamage;
-    
-    if healthComp.LastDamagedBy == nil then
-        healthComp:Reset();
-    end
-end
-
 function npcPackage.Spawning(npcClass: NpcClass)
-    local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
-
-    npcPackage.LevelSet(npcClass);
-
     npcClass.Character:SetAttribute("EntityHudHealth", true);
 end
 

@@ -36,7 +36,7 @@ function modifierPackage.onRequire()
         
         local percentageDamage = math.clamp(damage/targetMaxHealth, 0, 1);
         
-        local skillData = modifier.Values.SkillData;
+        local skillData = modifier.Properties.SkillData;
         if skillData == nil then return end;
 
         local amt = skillData.Stats.Amount;

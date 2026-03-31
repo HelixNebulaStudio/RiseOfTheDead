@@ -38,8 +38,8 @@ local toolPackage = {
 		Damage=960;
 		PotentialDamage=18360;
 		
-		MagazineSize=1;
-		AmmoCapacity=(1*8);
+		AmmoLimit=1;
+		MaxAmmoLimit=(1*8);
 	
 		Rpm=120;
 		ReloadTime=2.6;
@@ -85,6 +85,8 @@ local toolPackage = {
 		GenerateTracers=false;
 		-- Potential
 		BasePotential=0.1;
+		
+		AutoReload = true;
 	};
 
 	Properties={};

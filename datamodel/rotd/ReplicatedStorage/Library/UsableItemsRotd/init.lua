@@ -78,8 +78,21 @@ function library.onRequire()
 		local safehomeLib = papersList[a];
 
 		add{
-			Id=`{safehomeLib.Id}unlockpapers`;
-			Type="UnlockPapers";
+			Id = `{safehomeLib.Id}unlockpapers`;
+			Type = "UnlockPapers";
+		};
+	end
+
+	--== Offerings
+	local offeringsList = modItemsLibrary.Library:ListByMatchFunc(function(itemLib)
+		return modItemsLibrary:HasTag(itemLib.Id, "Offerings");
+	end)
+	for a=1, #offeringsList do
+		local offeringItemlib = offeringsList[a];
+
+		add{
+			Id = offeringItemlib.Id;
+			Type = "Offerings";
 		};
 	end
 end

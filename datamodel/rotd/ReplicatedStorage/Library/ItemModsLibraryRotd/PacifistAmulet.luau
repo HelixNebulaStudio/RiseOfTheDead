@@ -51,8 +51,8 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		arValue = arValue + arTweakVal;
 	end
 
-	modifier.Values.AddAp = apValue;
-	modifier.Values.AddAr = arValue;
+	modifier.Properties.AddAp = apValue;
+	modifier.Properties.AddAr = arValue;
 end
 
 return modifierPackage;

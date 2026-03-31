@@ -259,7 +259,9 @@ function treePackage.WalkToIdleTask(npcClass: NpcClass)
                     end
                 end
 
-                npcClass.Chat(npcClass.Player or game.Players:GetPlayers(), sayMsg);
+                if math.random(1, 5) == 1 then
+                    npcClass.Chat(npcClass.Player or game.Players:GetPlayers(), sayMsg);
+                end
             end
 
             properties.TaskAnimationId = nil;

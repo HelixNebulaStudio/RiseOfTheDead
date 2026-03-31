@@ -22,9 +22,9 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	
 	local configurations = modifier.EquipmentClass.Configurations;
 
-	local baseAmmoCapacity = configurations:GetBase("AmmoCapacity");
+	local baseMaxAmmoLimit = configurations:GetBase("MaxAmmoLimit");
 
-	modifier.SumValues.AmmoCapacity = math.ceil(baseAmmoCapacity * value);
+	modifier.SumValues.MaxAmmoLimit = math.ceil(baseMaxAmmoLimit * value);
 end
 
 return modifierPackage;

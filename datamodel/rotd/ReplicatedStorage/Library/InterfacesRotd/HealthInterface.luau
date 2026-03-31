@@ -100,6 +100,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local armorRatio = maxArmor > 0 and math.clamp(armor/maxArmor, 0, 1) or 0;
 		
 		local function refresh()
+			if healthBars.Parent == nil then return end;
 			if maxArmor > 0 then
 				healthBars.Bar.Image = healthRatio < 1 and "rbxassetid://2678743976" or "rbxassetid://5639144727";
 			else

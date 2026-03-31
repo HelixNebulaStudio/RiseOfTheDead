@@ -33,46 +33,21 @@ local npcPackage = {
         "TargetHandler";
         "RandomClothing";
         "ZombieBasicMeleeAttack";
+        "DynamicLevel";
     };
     AddBehaviorTrees = {
         "ZombieDefaultTree";
     };
+
+    DynamicLevelScaling = {
+        WalkSpeed = function(lvl) return math.clamp(16 + math.floor(lvl/15), 1, 30); end;
+        MaxHealth = function(lvl) return 59+(math.max(40*lvl, 60)); end;
+        AttackDamage = function(lvl) return math.min(10+(lvl/10), 100); end;
+    };
 };
 --==
 
-function npcPackage.LevelSet(npcClass: NpcClass)
-    local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
-    local healthComp: HealthComp = npcClass.HealthComp;
-
-    local level = math.max(properties.Level, 0);
-
-    local lvlMoveSpeed = math.clamp(16 + math.floor(level/15), 1, 30);
-    configurations.BaseValues.WalkSpeed = lvlMoveSpeed;
-    
-    local lvlHealth = 50+math.max(60 + 40*level, 60);
-    configurations.BaseValues.MaxHealth = lvlHealth;
-
-    local lvlAttackDamage = 10 + (level/10);
-    configurations.BaseValues.AttackDamage = lvlAttackDamage;
-
-    if healthComp.LastDamagedBy == nil then
-        healthComp:Reset();
-    end
-end
-
 function npcPackage.Spawning(npcClass: NpcClass)
-    local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
-
-    properties.OnChanged:Connect(function(k, v)
-        if npcClass.HealthComp.IsDead then return end;
-        if k == "Level" then
-            npcPackage.LevelSet(npcClass);
-        end
-    end)
-    npcPackage.LevelSet(npcClass);
-
     npcClass:GetComponent("RandomClothing")();
 end
 

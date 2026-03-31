@@ -109,7 +109,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		-- MARK: saveCustomizations()
 		local function saveCustomizations()
 			local serialized = generateSerialized();
-			Debugger:Warn("Save customizations (",storageItem.ID,"):", isDevBranch and serialized or "");
+			Debugger:Print(`Save customizations (`,storageItem.ID,"):", isDevBranch and serialized or "");
 
 			local _rPacket = remoteCustomizationData:InvokeServer("savecustomizations", {
 				Siid=storageItem.ID;

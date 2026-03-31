@@ -183,7 +183,7 @@ function interactablePackage.init(super) -- Server/Client
 						interface:ToggleGameBlinds(false, 3);
 						modClientGuis.toggleWindow("GameRoom", false);
 						
-						local characterVars = info.CharacterVars;
+						local characterVars = shared.modPlayers.get(localPlayer).CharacterVars;
 						characterVars.CharacterProperties.CanMove = false;
 						characterVars.CharacterProperties.CanInteract = false;
 

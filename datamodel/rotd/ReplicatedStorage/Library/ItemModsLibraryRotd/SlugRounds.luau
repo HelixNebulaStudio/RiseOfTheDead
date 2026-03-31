@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modifierPackage = {
-	Name = "Flinch Protection";
+	Name = "Slug Rounds";
 	
 	Tags = {};
 	Binds = {};
@@ -26,7 +26,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	local baseMultishot = configurations:GetBase("Multishot");
 	local maxShots = baseMultishot and baseMultishot.Max or 1;
 
-	modifier.SetValues.DamageScaler = (maxShots-1)/3;
+	modifier.ProductValues.Damage = maxShots/3;
 	modifier.SetValues.Multishot = 3;
 	modifier.SetValues.Inaccuracy = baseInaccuracy*0.2;
 

@@ -52,6 +52,7 @@ local customWeaponScale = {
 }
 
 local remoteAutoTurret = modRemotesManager:Get("AutoTurret");
+local remoteEquipmentClass = modRemotesManager:Get("EquipmentClass");
 
 local patItemLib = modItemsLibrary:Find("portableautoturret");
 local TurretConfigs = patItemLib.GetTurretConfigs();
@@ -356,8 +357,9 @@ function TurretRuntime(weaponStorageItem)
 	
 
 	local profile: ProfileRotd = shared.modProfile:Get(player) :: ProfileRotd;
+	local siid = weaponStorageItem.ID;
 	local toolHandler: ToolHandlerInstance = playerClass.WieldComp:GetToolHandler(
-		weaponStorageItem.ID, 
+		siid, 
 		weaponStorageItem.ItemId, 
 		weaponStorageItem, 
 		{activeWeaponModel}
@@ -377,6 +379,14 @@ function TurretRuntime(weaponStorageItem)
 	local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
 	local configurations = equipmentClass.Configurations;
 	local properties = equipmentClass.Properties;
+
+	if toolHandler.EquipmentClass.Enabled == false then
+		toolHandler.EquipmentClass:SetEnabled(true);
+		if playerClass.ClassName == "PlayerClass" then
+			local player = playerClass:GetInstance();
+			remoteEquipmentClass:FireClient(player, "setenable", siid, true);
+		end
+	end
 
 	local tryReload = properties.Ammo and properties.Ammo <= 0;
 
@@ -659,6 +669,14 @@ function Update()
 		activeWeaponModel = weaponModel;
 	end
 	
+	local playerClass: PlayerClass = shared.modPlayers.get(player);
+	local siid = weaponStorageItem.ID;
+	local toolHandler: ToolHandlerInstance = playerClass.WieldComp:GetToolHandler(
+		siid, 
+		weaponStorageItem.ItemId, 
+		weaponStorageItem, 
+		{activeWeaponModel}
+	);
 	
 	local isOnline = patStorage.Properties.IsOnline == true;
 	
@@ -691,7 +709,14 @@ function Update()
 		selectedTargets = {};
 		
 	end
-	
+
+	if toolHandler.EquipmentClass.Enabled == true then
+		toolHandler.EquipmentClass:SetEnabled(false);
+        if playerClass.ClassName == "PlayerClass" then
+            local player = playerClass:GetInstance();
+            remoteEquipmentClass:FireClient(player, "setenable", siid, false);
+		end
+	end
 end
 
 while patStorage == nil do

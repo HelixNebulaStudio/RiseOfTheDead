@@ -165,7 +165,7 @@ Dialogues.Caitlin.DialogueStrings = {
 	["buyre_joseph6"] = {
 		Face = "Serious";
 		Say = "I see.. and you think Joseph might be him?";
-		Reply = "Yes, and my sister -- she's running out of time. I was lucky to stumble on someone who might actually be Joseph Mahma.";
+		Reply = "Yes, and my sister.. She's running out of time. I was lucky to stumble on someone who might actually be Joseph Mahma.";
 	};
 	["buyre_joseph7"] = {
 		Face = "Smile";

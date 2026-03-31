@@ -33,9 +33,6 @@ local toolPackage = {
 		ProjectileId = "explosives";
 		ProjectileConfig={
 			Velocity = 200;
-			LifeTime = 2;
-			Bounce = 0;
-			Acceleration = Vector3.new(0, -workspace.Gravity, 0);
 		};
 		VelocityBonus = 20;
 

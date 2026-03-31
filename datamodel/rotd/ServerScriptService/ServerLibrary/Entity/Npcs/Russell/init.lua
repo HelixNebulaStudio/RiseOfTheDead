@@ -58,7 +58,7 @@ local npcPackage = {
                 Say = {
                     "*grumbles* These modifications better be worth my time..";
                     "Who keeps leaving their tools all over MY workbench?";
-                    "If someone touched my minigun again, I swear...";
+                    "If someone touched my mini-gun again, I swear...";
                     "*mutters* Can't even work in peace around here.";
                     "This would go faster if people stopped interrupting me.";
                     "These parts aren't going to assemble themselves...";

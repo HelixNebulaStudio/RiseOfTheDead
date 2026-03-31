@@ -16,7 +16,7 @@ local modifierPackage = {
 };
 --==
 
-function modifierPackage.Binds.WeaponShotDamageData(modifier: ItemModifierInstance, damageData: DamageData)
+function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)
     if RunService:IsClient() then return end;
 
     if modifier.EquipmentClass == nil then return end;

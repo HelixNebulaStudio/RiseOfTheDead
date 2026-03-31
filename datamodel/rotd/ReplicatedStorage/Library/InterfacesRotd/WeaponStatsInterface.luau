@@ -9,6 +9,7 @@ local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForC
 local modPseudoRandom = shared.require(game.ReplicatedStorage.Library.PseudoRandom);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library.WorkbenchLibrary);
+local modItemLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local postTextFunc = {
 	PreModDamageAdd=function(config, info, infoText, statValue)
@@ -19,7 +20,7 @@ local postTextFunc = {
 };
 
 local graphStatTemplates = {
-	Gun="<b>Damage:</b> $Damage      <b>Fire Rate:</b> $Rpm RPM      <b>Ammo:</b> $MagazineSize/$AmmoCapacity      <b>Reload Time:</b> $ReloadTimes";
+	Gun="<b>Damage:</b> $Damage      <b>Fire Rate:</b> $Rpm RPM      <b>Ammo:</b> $AmmoLimit/$MaxAmmoLimit      <b>Reload Time:</b> $ReloadTimes";
 }
 
 local initCharStats;
@@ -83,10 +84,10 @@ local statTemplates = {
 		--};
 		{Key="CritChance"; Text="<b>Crit Chance:</b>    $stat%"; Type="percent2dp"};
 		
-		{Key="Rpm"; Text="<b>Fire Rate:</b>    $stat RPM"; Type="int"};
+		{Key="Rpm"; Text="<b>Fire Rate:</b>    $stat RPM"; Type="1dp"};
 		{Key="ReloadTime"; Text="<b>Reload Time:</b>    $stats"; Type="3dp"};
-		{Key="MagazineSize"; Text="<b>Magazine Size:</b>    $stat"; Type="int"};
-		{Key="AmmoCapacity"; Text="<b>Ammo Capacity:</b>    $stat"; Type="int"};
+		{Key="AmmoLimit"; Text="<b>Magazine Size:</b>    $stat"; Type="int"};
+		{Key="MaxAmmoLimit"; Text="<b>Ammo Capacity:</b>    $stat"; Type="int"};
 		{Key="Multishot"; Text="<b>Multishot:</b>    $stat"; Type="int"};
 		{Key="Piercing"; Text="<b>Piercing:</b>    $stat"; Type="int"};
 		
@@ -192,10 +193,10 @@ local mouseOverDescription = {
 	ReloadSpeed={
 		Desc="Reload Time the time it takes to complete a reload.\n\nNon-stackable stat, higher tier mods will overwrite this value.\n\n(Lower is better)";
 	};
-	MagazineSize={
+	AmmoLimit={
 		Desc="Magazine Size is the amount of bullets you can shoot before having to reload.\n\nStacks additionally with additional magazine size mods.\n\n(Higher is better)";
 	};
-	AmmoCapacity={
+	MaxAmmoLimit={
 		Desc="Ammo Capacity is the amount of total bullets you can shoot before having to restock in ammo.\n\nStacks additionally with additional ammo capacity mods.\n\n(Higher is better)";
 	};
 	Multishot={
@@ -544,6 +545,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     or valueType == "4dp" and modFormatNumber.Beautify(math.ceil(rawValue*10000)/10000, true)
                     or valueType == "3dp" and modFormatNumber.Beautify(math.ceil(rawValue*1000)/1000, true)
                     or valueType == "2dp" and modFormatNumber.Beautify(math.ceil(rawValue*100)/100, true)
+                    or valueType == "1dp" and modFormatNumber.Beautify(math.ceil(rawValue*10)/10, true)
                     or valueType == "Rpm" and modFormatNumber.Beautify(math.ceil(60/rawValue*100)/100)
                     or valueType == "percent" and math.floor(rawValue*100)
                     or valueType == "percent2dp" and math.floor(rawValue*1000)/10
@@ -723,7 +725,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             
             local preModDamage = configurations.PreModDamage;
             local moddedDamage = configurations.Damage;
-            local ammoMag = configurations.MagazineSize;
+            local ammoMag = configurations.AmmoLimit;
             
             local columnSize = sizeRef.X/ammoMag;
             local columnPoint = columnSize/2;
@@ -883,7 +885,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
         end
         
-        if classType == "Weapon" then
+        if classType == "Weapon" and storageItem then
             local weaponLevel = storageItem.Values.L or 0;
             local wExp = storageItem.Values.E or 0;
             local wExpGoal = storageItem.Values.EG or 0;
@@ -924,7 +926,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
         currentClass = classType;
 
-        local modificationDict = {};
+        local modificationDict = setmetatable({}, {
+            __index = function(t, k)
+                if rawget(t, k) == nil then
+                    rawset(t, k, {});
+                end;
+                return rawget(t, k);
+            end;
+        });
         
         -- BaseValues={};
         -- SetValues={};
@@ -933,6 +942,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         -- MaxValues={};
         -- MinValues={};
 
+        configurations:Calculate();
         for a=1, #configurations.Modifiers do
             local modifier: ItemModifierInstance = configurations.Modifiers[a] :: ItemModifierInstance;
 
@@ -947,34 +957,32 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 modifierName = `{modifierName} (Base)`;
             end
 
-            local function newM(k)
-                if modificationDict[k] == nil then
-                    modificationDict[k] = {};
-                end
+            local modColor = nil;
+            if modifier.ModLibrary and modifier.ModLibrary.Tier then
+                modColor = modItemLibrary.TierColors[modifier.ModLibrary.Tier];
             end
+
             for k, v in pairs(modifier.SetValues) do
-                newM(k);
-                table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="set";});
+                table.insert(modificationDict[k], {Name=modifierName; Value=v; TextColor=modColor; ConfigType="set";});
             end
             for k, v in pairs(modifier.SumValues) do
-                newM(k);
-                table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="sum";});
+                table.insert(modificationDict[k], {Name=modifierName; Value=v; TextColor=modColor; ConfigType="sum";});
             end
             for k, v in pairs(modifier.ProductValues) do
-                newM(k);
-                table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="product";});
+                table.insert(modificationDict[k], {Name=modifierName; Value=v; TextColor=modColor; ConfigType="product";});
             end
             for k, v in pairs(modifier.MaxValues) do
-                newM(k);
-                table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="max";});
+                table.insert(modificationDict[k], {Name=modifierName; Value=v; TextColor=modColor; ConfigType="max";});
             end
             for k, v in pairs(modifier.MinValues) do
-                newM(k);
-                table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="min";});
+                table.insert(modificationDict[k], {Name=modifierName; Value=v; TextColor=modColor; ConfigType="min";});
             end
             for k, v in pairs(modifier.ArrayValues) do
-                newM(k);
-                table.insert(modificationDict[k], {Name=modifierName; Value=v; ConfigType="array";});
+                table.insert(modificationDict[k], {Name=modifierName; Value=v; TextColor=modColor; ConfigType="array";});
+            end
+
+            if modifier.Binds.WeaponStatsRenderModifiers then
+                modifier.Binds.WeaponStatsRenderModifiers(modifier, modifierName, modificationDict);
             end
         end
 
@@ -1002,26 +1010,35 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             dupStatsDebounce[key] = true;
 
             local modifyList = modificationDict[key];
-            if modifyList == nil then continue end;
+            if #modifyList <= 0 then continue end;
 
             local bValues = configurations.BaseValues[key] or "~";
             local str = `<b>{(info.Text:gmatch("<b>(.-)</b>")() or key)}</b>  {formatValue(info.Type, bValues)}`;
             for a=1, #modifyList do
                 local modifyData = modifyList[a];
 
+                local modifyName = modifyData.Name;
+                if equipmentClass.Package.WeaponClass then
+                    modifyName = modifyName:gsub(`{equipmentClass.Package.WeaponClass} `, "");
+                end
+
                 local modifyValue = formatValue(info.Type, modifyData.Value);
                 if modifyData.ConfigType == "sum" then
                     modifyValue = `+{modifyValue}`;
                 elseif modifyData.ConfigType == "product" then
-                    modifyValue = `*{modifyValue}`;
+                    modifyValue = `x{modifyValue}`;
                 elseif modifyData.ConfigType == "max" then
                     modifyValue = `max({modifyValue})`;
                 elseif modifyData.ConfigType == "min" then
                     modifyValue = `min({modifyValue})`;
                 elseif modifyData.ConfigType == "array" then
                     modifyValue = `{modifyValue}`;
+                elseif modifyData.ConfigType == "set" then
+                    modifyValue = `={modifyValue}`;
                 end
-                str = str..`\n∟ <b>[{modifyData.Name}]</b>  {modifyValue}`;
+                local colorStrStart = modifyData.TextColor and `<font color="#{modifyData.TextColor:ToHex()}">` or "";
+                local colorStrEnd = modifyData.TextColor and `</font>` or "";
+                str = str..colorStrStart..`\n∟ <b>[{modifyName}]</b>  {modifyValue}`..colorStrEnd;
             end
             str = str..`\n<font size="18">=  <b>{formatValue(info.Type, configurations[key])}</b></font>`;
 

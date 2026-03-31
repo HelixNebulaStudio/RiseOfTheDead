@@ -28,8 +28,6 @@ local toolPackage = {
 		ProjectileId = "beachball";
 		ProjectileConfig = {
 			Velocity = 50;
-			Bounce = 0.9;
-			LifeTime = 10;
 		};
 		VelocityBonus = 100;
 

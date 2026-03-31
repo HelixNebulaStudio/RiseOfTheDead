@@ -44,8 +44,8 @@ local toolPackage = {
 		Damage = 2;
 		PotentialDamage = 85;
 
-		MagazineSize = 50;
-		AmmoCapacity = (50*4);
+		AmmoLimit = 50;
+		MaxAmmoLimit = (50*4);
 
 		Rpm = 600;
 		ReloadTime = 5;
@@ -144,7 +144,7 @@ function toolPackage.OnAmmoUpdate(handler: ToolHandlerInstance)
 	local configurations = equipmentClass.Configurations;
 	local properties = equipmentClass.Properties;
 
-	local magSize = configurations.MagazineSize;
+	local magSize = configurations.AmmoLimit;
 
 	local pointerAtt = weaponModel.Pointer.PointerAtt;
 

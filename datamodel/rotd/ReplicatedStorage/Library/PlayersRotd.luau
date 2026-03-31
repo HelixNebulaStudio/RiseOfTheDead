@@ -10,8 +10,6 @@ local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 --==
 
 function modPlayers.onRequire()
-	Debugger:Warn("PlayersRotd onRequire.");
-	
 	shared.modEventService:OnInvoked("Generic_BindItemPickup", function(eventPacket: EventPacket, ...)
 		local interactable: InteractableInstance = ...;
 

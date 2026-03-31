@@ -601,7 +601,6 @@ function modItemSkinsLibrary.onRequire()
         Icon="rbxassetid://13846887623";
     
         Textures={
-            ["czevo3"]={Id="czevo3toygun"; Image="rbxassetid://5013618682"; Icon="rbxassetid://13810605651"; };
             ["desolatorheavy"]={Id="desolatorheavytoygun"; Image="rbxassetid://12929982078"; Icon="rbxassetid://13787997600"; };
             ["p250"]={Id="p250toygun"; Image="rbxassetid://94431954099834"; Icon="rbxassetid://94431954099834"; };
         };

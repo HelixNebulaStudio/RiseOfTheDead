@@ -32,6 +32,8 @@ function treePackage.HasEnemy(npcClass: NpcClass)
             if targetNpcClass.HumanoidType == npcClass.HumanoidType then
                 return false;
             end
+        else
+            return false;
         end
 
         local isAlive = targetEntityClass.HealthComp.IsDead ~= true;

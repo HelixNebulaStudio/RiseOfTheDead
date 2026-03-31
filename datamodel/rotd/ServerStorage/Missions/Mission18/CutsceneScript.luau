@@ -99,18 +99,18 @@ return function(CutsceneSequence)
 							local enemyTargetData = robertNpcClass:GetComponent("TargetHandler"):MatchFirstWieldTargettable();
 							if enemyTargetData then
 								local enemyHealthComp: HealthComp = enemyTargetData.HealthComp;
-								local enemyNpcClass: NpcClass = enemyHealthComp.CompOwner;
+								local enemyNpcClass: NpcClass = enemyHealthComp.CompOwner :: NpcClass;
 
 								if enemyNpcClass
 								and enemyHealthComp.IsDead ~= true
 								and enemyHealthComp:CanTakeDamageFrom(robertNpcClass) then
 									local equipmentClass: EquipmentClass? = robertNpcClass.WieldComp.EquipmentClass;
 									if equipmentClass then
-										if equipmentClass.Properties.Ammo <= 0 then
+										if (equipmentClass.Properties.Ammo :: number) <= 0 then
 											robertNpcClass.WieldComp:InvokeToolAction("ReloadRequest");
 
 										else
-											local shootDirection = (enemyNpcClass.RootPart.Position - robertNpcClass.RootPart.Position).Unit;
+											local shootDirection = (enemyNpcClass:GetCFrame().Position - robertNpcClass:GetCFrame().Position).Unit;
 											
 											robertNpcClass.Move:Face(enemyNpcClass.RootPart);
 											robertNpcClass.WieldComp:InvokeToolAction(
@@ -228,18 +228,18 @@ return function(CutsceneSequence)
 							local enemyTargetData = robertNpcClass:GetComponent("TargetHandler"):MatchFirstWieldTargettable();
 							if enemyTargetData then
 								local enemyHealthComp: HealthComp = enemyTargetData.HealthComp;
-								local enemyNpcClass: NpcClass = enemyHealthComp.CompOwner;
+								local enemyNpcClass: NpcClass = enemyHealthComp.CompOwner :: NpcClass;
 
 								if enemyNpcClass
 								and enemyHealthComp.IsDead ~= true
 								and enemyHealthComp:CanTakeDamageFrom(robertNpcClass) then
 									local equipmentClass: EquipmentClass? = robertNpcClass.WieldComp.EquipmentClass;
 									if equipmentClass then
-										if equipmentClass.Properties.Ammo <= 0 then
+										if (equipmentClass.Properties.Ammo :: number) <= 0 then
 											robertNpcClass.WieldComp:InvokeToolAction("ReloadRequest");
 
 										else
-											local shootDirection = (enemyNpcClass.RootPart.Position - robertNpcClass.RootPart.Position).Unit;
+											local shootDirection = (enemyNpcClass:GetCFrame().Position - robertNpcClass:GetCFrame().Position).Unit;
 											
 											robertNpcClass.Move:Face(enemyNpcClass.RootPart);
 											robertNpcClass.WieldComp:InvokeToolAction(
@@ -320,7 +320,7 @@ return function(CutsceneSequence)
 						end
 						
 						robertNpcClass.Move:Stop();
-						wait(1);
+						task.wait(1);
 						if mission.ProgressionPoint ~= 5 then return end;
 
 						robertNpcClass.Move:MoveTo(Vector3.new(-50.795, 8.232, 279.45));

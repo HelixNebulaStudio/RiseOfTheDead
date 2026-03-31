@@ -1,6 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local RunService = game:GetService("RunService");
+
 local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
+local modProjectileRicochet = shared.require(game.ReplicatedStorage.Library.Projectile.Mechanics.Ricochet);
 
 local modifierPackage = {
 	Name = "Bow Ricochet";
@@ -23,10 +26,19 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		MaxBounce = 1;
 		LifeTime = 3;
 		Velocity = 175;
-		Modifiers = {
-			Ricochet = true;
-		}
 	}
+	modifier.Properties.Radius = value;
+end
+
+if RunService:IsServer() then
+
+	function modifierPackage.Binds.WeaponShotProjectileNew(modifier: ItemModifierInstance, projectile: ProjectileInstance)
+		local scanRadius = modifier.Properties.Radius;
+		function projectile.BindArcStepped(projectile: ProjectileInstance, arcPoint: ArcPoint)
+			modProjectileRicochet.BindStepped(projectile, arcPoint, scanRadius);
+		end
+	end
+
 end
 
 return modifierPackage;

@@ -24,15 +24,15 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 			value = value + math.floor(tweakVal);
 		end
 
-		modifier.SumValues.AmmoCapacity = value;
+		modifier.SumValues.MaxAmmoLimit = value;
 
 	elseif layerInfo.UpgradeInfo.Scaling == 1 then
 		if tweakVal then
 			value = value + tweakVal;
 		end
 
-		local baseMagazineSize = configurations:GetBase("MagazineSize");
-		modifier.SumValues.AmmoCapacity = math.ceil(baseMagazineSize * value);
+		local baseAmmoLimit = configurations:GetBase("AmmoLimit");
+		modifier.SumValues.MaxAmmoLimit = math.ceil(baseAmmoLimit * value);
 
 	end
 

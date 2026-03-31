@@ -18,7 +18,6 @@ if RunService:IsServer() then
     local skillId = statusPackage.Id;
 
     function statusPackage.onRequire()
-        warn(`Resource Gatherers onRequire.`);
         shared.modEventService:OnInvoked("Generic_BindItemPickup", function(eventPacket: EventPacket, ...)
             local player: Player? = eventPacket.Player;
             if player == nil then return end;

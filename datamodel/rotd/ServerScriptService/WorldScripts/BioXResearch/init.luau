@@ -14,7 +14,7 @@ local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRo
 --==
 
 function WorldCore.onRequire()
-    Debugger:Warn(`BioXResearch core loaded.`);
+    Debugger:Print(`BioXResearch core loaded.`);
     if RunService:IsServer() then
 
         local team = modTeamsManager.newTeam(nil, "BioXResearch");

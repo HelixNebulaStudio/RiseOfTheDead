@@ -32,35 +32,17 @@ local npcPackage = {
         "Chat";
         "DropReward";
         "TargetHandler";
+        "DynamicLevel";
+    };
+
+    DynamicLevelScaling = {
+        WalkSpeed = 22;
+        MaxHealth = function(lvl) return 49999+(math.max(1000*lvl, 50)); end;
+        AttackDamage = function(lvl) return math.min(5+(lvl/2), 100); end;
     };
 };
 
-function npcPackage.LevelSet(npcClass: NpcClass)
-    local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
-    local healthComp: HealthComp = npcClass.HealthComp;
-
-    local level = math.max(properties.Level, 0);
-
-    configurations.BaseValues.WalkSpeed = 22;
-
-    local lvlHealth = math.max(50000 + 50*level, 50000)-1;
-    configurations.BaseValues.MaxHealth = lvlHealth;
-
-    local lvlAttackDamage = (level/2);
-    configurations.BaseValues.AttackDamage = lvlAttackDamage;
-    
-    if healthComp.LastDamagedBy == nil then
-        healthComp:Reset();
-    end
-end
-
 function npcPackage.Spawning(npcClass: NpcClass)
-    local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
-
-    npcPackage.LevelSet(npcClass);
-
     CollectionService:AddTag(npcClass.Character, "TargetableEntities");
     CollectionService:AddTag(npcClass.RootPart, "Enemies");
     CollectionService:AddTag(npcClass.Character, "Zombies");

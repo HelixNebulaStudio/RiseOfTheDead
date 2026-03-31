@@ -16,8 +16,6 @@ function UsablePreset:ClientUse(storageItem)
 		
 		storage.Name = "AutoTurret";
 		
-		modData.SetStorage(storage);
-		
 		modClientGuis.toggleWindow("AutoTurretWindow", true, storageItem);
 	else
 		Debugger:Warn("Storage does not exist.");

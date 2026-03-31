@@ -1721,9 +1721,6 @@ MissionLibrary.New{
 		"Make contact using the military radio in the Underbridge Community";
 		"Head to the radio station in The Residentials";
 		"Use the radio";
-		"Respond to the radio";
-		"Respond to the radio";
-
 		"Talk to Wilson";
 	};
 	SaveData={};
@@ -2418,10 +2415,10 @@ MissionLibrary.New{
 	Checkpoint={
 		{Text="Kill $Kills zombies with a $WeaponType";};
 	};
-	SaveData={
-		Kills=50;
-		WeaponType=function()
-			local list = {"Pistol"; "Rifle"; "Submachine gun"; "Shotgun"; "Sniper";};
+	SaveData = {
+		Kills = 50;
+		WeaponType = function()
+			local list = {"Pistol"; "Rifle"; "Submachine Gun"; "Shotgun"; "Sniper";};
 			return list[math.fmod(getDayNumber()*getHourNumber(), #list) +1];
 		end;
 	};

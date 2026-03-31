@@ -8,6 +8,11 @@ local treePackage = {
 }
 
 function treePackage.PreLogic(npcClass: NpcClass)
+    local processStatusesComp = npcClass:GetComponent("ProcessStatuses");
+    if processStatusesComp then
+        return processStatusesComp();
+    end
+    
     return false;
 end
 

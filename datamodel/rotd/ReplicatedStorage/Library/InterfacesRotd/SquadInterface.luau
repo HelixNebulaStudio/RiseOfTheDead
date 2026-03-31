@@ -45,6 +45,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
         local updatedMember = {};
 
+        local hideSquadMarkers = modData.Settings.HideSquadMarkers == 1;
+
         if squadData then
             for name, memberData in pairs(squadData.Members) do
                 local hudObjects = binds.HudObjects[name];
@@ -86,7 +88,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
                     radialHealthBarObj.Humanoid = squadPlayerClass.Humanoid;
                     if name ~= localPlayer.Name then
-                        modMarkers.SetMarker(name, name, name, modMarkers.MarkerTypes.Player);
+                        if hideSquadMarkers ~= true then
+                            modMarkers.SetMarker(name, name, name, modMarkers.MarkerTypes.Player);
+                        else
+                            modMarkers.ClearMarker(name);
+                        end
                     end
 
                 else
@@ -117,6 +123,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end)
     hudWindow:Open();
     
+    local lastSquadMarker = nil;
     interface.Scheduler.OnStepped:Connect(function(tickData: TickData)
         if tickData.ms100 ~= true then return end;
 
@@ -141,6 +148,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         if socialWindow then
             local moveQuickButton = hudWindow.Visible and binds.HasMembers;
             socialWindow.QuickButton.Parent = moveQuickButton and hudFrame or interface.QuickBarButtons;
+        end
+
+        if lastSquadMarker ~= modData.Settings.HideSquadMarkers then
+            lastSquadMarker = modData.Settings.HideSquadMarkers;
+            hudWindow:Update();
         end
 
         if tickData.s5 ~= true then return end;
