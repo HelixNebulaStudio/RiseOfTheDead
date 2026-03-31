@@ -26,7 +26,23 @@ local toolPackage = {
 };
 
 function toolPackage.onRequire()
+	shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
+		local player: Player? = eventPacket.Player;
+		if player == nil then return end;
 
+		local playerClass: PlayerClass = shared.modPlayers.get(player);
+		if playerClass == nil then return end;
+
+		if playerClass.WieldComp.ToolHandler == nil then return end;
+		if playerClass.WieldComp.ItemId ~= toolPackage.ItemId then return end;
+
+		local hitChar = playerClass.WieldComp.ToolHandler.Binds.HitCharacter;
+		if hitChar == nil then return end;
+
+		eventPacket.Returns.BindTeleport = function()
+			hitChar:PivotTo(playerClass:GetCFrame());
+		end
+	end)
 end
 
 function toolPackage.ClientPrimaryFire(handler)
@@ -84,7 +100,7 @@ function toolPackage.ClientPrimaryFire(handler)
 		modAudio.Play("Shock", prefab.PrimaryPart);	
 		if prefab:FindFirstChild("glow") then
 			prefab.glow.Material = Enum.Material.Plastic;
-			delay(handler.UseCooldown, function()
+			task.delay(handler.UseCooldown, function()
 				if prefab:FindFirstChild("glow") == nil then return end;
 				prefab.glow.Material = Enum.Material.Neon;
 			end)
@@ -94,218 +110,116 @@ function toolPackage.ClientPrimaryFire(handler)
 	return shotData;
 end
 
-function toolPackage.ActionEvent(handler, packet)
+function toolPackage.ServerUnequip(toolHandler: ToolHandlerInstance)
+	local weaponModel = toolHandler.MainToolModel;
+	weaponModel:SetAttribute("Leashed", nil);
+end
+
+function toolPackage.ActionEvent(toolHandler: ToolHandlerInstance, packet)
 	local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 	local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
-	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
 	if packet.ActionIndex ~= 1 then return end;
 
 	local shotdata = packet.ClientPacket;
 	if shotdata == nil then return end;
 	
-	local classPlayer = shared.modPlayers.get(handler.Player);
+	local playerClass: PlayerClass = toolHandler.CharacterClass :: PlayerClass;
+	if playerClass.ClassName ~= "PlayerClass" then return end;
+	local player: Player = playerClass:GetInstance();
 	
-	local weaponModel = handler.Prefabs[1];
+	local weaponModel = toolHandler.MainToolModel;
 	local hookPoints = weaponModel.points;
 	
+	if toolHandler.Binds.Cache == nil then
+		toolHandler.Binds.Cache = {};
+		toolHandler.Garbage:Tag(toolHandler.Binds.Cache);
+		toolHandler.Garbage:Tag(function()
+			toolHandler.Binds.HitCharacter = nil;
+		end)
+	end
+	local cacheBinds = toolHandler.Binds.Cache;
+
 	local function clear()
-		if handler.Cache == nil then handler.Cache = {}; end;
-		for _, obj in pairs(handler.Cache) do
+		for _, obj in pairs(cacheBinds) do
 			obj:Destroy();
 		end
-		table.clear(handler.Cache);
-		
+		table.clear(cacheBinds);
+		toolHandler.Binds.HitCharacter = nil;
+		weaponModel:SetAttribute("Leashed", nil);
+
 		for _, obj in pairs(weaponModel:GetChildren()) do
 			if obj.Name == "HookPoints" or obj.Name == "RopeConstraint" then
 				Debugger.Expire(obj, 0);
 			end
 		end
 		
-		if handler.NpcModule then
-			if handler.NpcModule.RootPart and handler.NpcModule.FakeBody and handler.NpcModule.FakeBody.PrimaryPart then
-				handler.NpcModule.RootPart.CFrame = handler.NpcModule.FakeBody:GetPrimaryPartCFrame();
-			end
-			
-			if handler.NpcModule.FakeBody then
-				Debugger.Expire(handler.NpcModule.FakeBody, 0);
-			end
-			if handler.NpcModule.Humanoid then
-				handler.NpcModule.Humanoid.PlatformStand = false;
-			end
-			handler.NpcModule.Disabled = nil;
-			handler.NpcModule = nil;
-		end
-		
-		modStatusEffects.Ragdoll(handler.Player, false, true);
+		modStatusEffects.Ragdoll(player, false, true);
 		RunService.Heartbeat:Wait();
-		if classPlayer.RootPart:CanSetNetworkOwnership() then
-			classPlayer.RootPart:SetNetworkOwner(handler.Player);
+		if playerClass.RootPart:CanSetNetworkOwnership() then
+			playerClass.RootPart:SetNetworkOwner(player);
 		end;
 	end
 	clear();
 	
-	if handler.ClearRagdollConn == nil then
-		handler.ClearRagdollConn = true;
-		local desConn;
-		desConn = weaponModel:GetPropertyChangedSignal("Parent"):Connect(function()
-			if weaponModel.Parent == workspace.Debris or weaponModel.Parent == nil then
-				clear();
-				handler.ClearRagdollConn = nil;
-				desConn:Disconnect();
-				handler.DoorEnterConn:Disconnect();
-				handler.DoorEnterConn = nil;
-			end
-		end)
-	end
-	if handler.DoorEnterConn == nil then
-		-- handler.DoorEnterConn = bindOnDoorEnter.Event:Connect(function(player, interactData)
-		-- 	local classPlayer = shared.modPlayers.get(player);
-			
-		-- 	if handler.NpcModule and not handler.NpcModule.IsDead then
-		-- 		handler.NpcModule.RootPart.CFrame = classPlayer.RootPart.CFrame;
-		-- 	end
-		-- end)
-	end
-	
 	if shotdata.Target then
 		local hitPart = shotdata.Target;
 		local model = hitPart.Parent;
+
 		local healthComp: HealthComp? = modHealthComponent.getByModel(model);
-	
-		if healthComp and not healthComp.IsDead and healthComp.CompOwner.ClassName == "NpcClass" then
-			local npcClass = healthComp.CompOwner :: NpcClass;
-			
-			if npcClass.Humanoid.Name == "Zombie" then
-				if npcClass.Properties.BasicEnemy then
-					handler.NpcModule = npcClass;
-					
-				else
-					Debugger:Log("Attempt to latch on to non-basic enemy")
-					
+		local canLatch = true;
+		if healthComp == nil
+		or healthComp.IsDead
+		or not healthComp:CanTakeDamageFrom(playerClass) then
+			canLatch = false;
+		end
+		if healthComp then
+			if healthComp.CompOwner.ClassName == "NpcClass" then
+				local npcClass = healthComp.CompOwner :: NpcClass;
+				if npcClass.Properties.BasicEnemy ~= true then
+					canLatch = false;
 				end
 			end
-		else
-			handler.NpcModule = nil;
+		end
+
+		if canLatch then
+			toolHandler.Binds.HitCharacter = model;
 		end
 	end
 	
 	if shotdata.Target then
-		if handler.NpcModule and handler.NpcModule.Humanoid and handler.NpcModule.Humanoid.Health > 0 then
-			local prefab: Model = handler.NpcModule.Prefab;
-			
-			local fakeBody: Model = prefab:Clone();
-			fakeBody:PivotTo(prefab:GetPivot());
-			fakeBody.Parent = workspace.Entities;
-			
-			Debugger.Expire(fakeBody, 300);
-			handler.NpcModule:TeleportHide();
-			
-			local fakeHumanoid = fakeBody:FindFirstChildWhichIsA("Humanoid");
-			if fakeHumanoid then
-				fakeHumanoid.PlatformStand = true;
-				
-				fakeHumanoid.Died:Connect(function()
-					clear()
-					if handler.NpcModule then
-						handler.NpcModule:Kill();
-					end
-				end)
-			end
-			
-			prefab.Destroying:Connect(function()
-				clear();
-				fakeBody:Destroy();
-			end)
-			
-			local fakeNpcInstance = fakeBody:FindFirstChild("NpcClassInstance");
-			if fakeNpcInstance then
-				fakeNpcInstance:Destroy();
-			end
-			
-			
-			local fakeRootPart = fakeBody:WaitForChild("HumanoidRootPart");
-			fakeRootPart.Massless = true;
+		if toolHandler.Binds.HitCharacter then
+			local targetHealthComp: HealthComp? = modHealthComponent.getByModel(toolHandler.Binds.HitCharacter);
 
-			for _, obj in pairs(fakeBody:GetDescendants()) do
-				if obj:IsA("Sound") then
-					obj:Destroy();
-				elseif obj:IsA("BasePart") then
-					obj.CustomPhysicalProperties = PhysicalProperties.new(0.0001, 0.5, 1, 0.3, 1);
+			if targetHealthComp then
+				toolHandler.Garbage:Tag(targetHealthComp.OnIsDeadChanged:Connect(function(isDead)
+					if isDead then
+						clear();
+					end
+				end))
+				if targetHealthComp.IsDead then
+					clear();
 				end
-			end
-			if fakeRootPart:CanSetNetworkOwnership() then
-				fakeRootPart:SetNetworkOwner(handler.Player);
-			end;
-			wait(0.1);
-			
-			for _, obj in pairs(game.StarterPlayer.StarterCharacter:GetChildren()) do
-				if obj:FindFirstChild("BallSocketConstraint") and fakeBody:FindFirstChild(obj.Name) then
-					local fBodyPart = fakeBody[obj.Name];
-					local oCon = obj.BallSocketConstraint;
-					
-					local attA = oCon.Attachment0;
-					local attB = oCon.Attachment1;
-					local attAParent = attA.Parent.Name;
-					local attBParent = attB.Parent.Name;
-					
-					if fakeBody:FindFirstChild(attAParent) and fakeBody:FindFirstChild(attBParent) then
-						local nAttA = attA:Clone();
-						nAttA.Parent = fakeBody[attAParent];
-						local nAttB = attB:Clone();
-						nAttB.Parent = fakeBody[attBParent];
-						
-						local nCon = obj.BallSocketConstraint:Clone();
-						nCon.Parent = fBodyPart;
-						
-						nCon.Attachment0 = nAttA;
-						nCon.Attachment1 = nAttB;
-						
-						local jointMotor = fBodyPart:FindFirstChildWhichIsA("Motor6D");
-						if jointMotor then
-							jointMotor.Enabled = false;
-						end
-						
-						nCon.Enabled = true;
+				local targetEntityClass: EntityClass = targetHealthComp.CompOwner :: EntityClass;
+	
+				local event: EventPacket = shared.modEventService:ServerInvoke("EntityLeash_OnLeash", {
+					ReplicateTo = player;
+				}, targetEntityClass);
+				if event.Cancelled ~= true then
+					if targetEntityClass.ClassName == "NpcClass" then
+						local npcClass = targetEntityClass :: NpcClass;
+						local statusComp: StatusComp = npcClass.StatusComp;
+
+						weaponModel:SetAttribute("Leashed", true);
+						statusComp:Apply("EntityLeash", {
+							ApplyBy = playerClass;
+							Values = {
+								WeaponModel = weaponModel;
+							};
+						});
 					end
 				end
 			end
-			
-			if handler.NpcModule.FakeBody then	Debugger.Expire(handler.NpcModule.FakeBody, 0); end
-			handler.NpcModule.FakeBody = fakeBody;
-			handler.NpcModule.Disabled = true;
-			handler.NpcModule.Humanoid.PlatformStand = true;
-			handler.NpcModule.Think:Fire();
-			
-			for _, obj in pairs(fakeBody:GetChildren()) do
-				if obj:IsA("BasePart") then
-					obj.Massless = true;
-					obj.CollisionGroup = "Characters";
-				end;
-			end
-			
-			for _, hook in pairs(hookPoints:GetChildren()) do
-				local targetAtt = fakeBody:FindFirstChild(hook.Name, true);
-				if targetAtt then
-					
-					local newRope = Instance.new("RopeConstraint");
-					newRope.Parent = weaponModel;
-					newRope.Visible = true;
-					newRope.Attachment0 = hook;
-					newRope.Attachment1 = targetAtt;
-					
-					newRope.Length = 4;
-					newRope.Color = BrickColor.new(Color3.fromRGB(0, 142, 170));
-					
-				end
-			end
-			fakeBody:SetAttribute("Leashed", handler.Player.Name);
-			
-			modMission:Progress(handler.Player, 53, function(mission)
-				if mission.ProgressionPoint == 5 then
-					mission.ProgressionPoint = 6;
-				end
-			end)
 			
 		else
 			-- Ragdoll on target;
@@ -315,7 +229,7 @@ function toolPackage.ActionEvent(handler, packet)
 				return;
 			end
 			
-			if classPlayer.Humanoid:GetAttribute("IsSwimming") == true then
+			if playerClass.Humanoid:GetAttribute("IsSwimming") == true then
 				return;
 			end
 			
@@ -326,14 +240,14 @@ function toolPackage.ActionEvent(handler, packet)
 			end
 			if not hitPart.Anchored then
 				Debugger:Log("Hooked server not anchored");
-				if classPlayer.RootPart:CanSetNetworkOwnership() then
-					classPlayer.RootPart:SetNetworkOwner();
+				if playerClass.RootPart:CanSetNetworkOwnership() then
+					playerClass.RootPart:SetNetworkOwner();
 				else
 					return;
 				end;
 			end
 			
-			modStatusEffects.Ragdoll(handler.Player, true, true);
+			modStatusEffects.Ragdoll(player, true, true);
 			for _, hook in pairs(hookPoints:GetChildren()) do
 				local pAtt = Instance.new("Attachment");
 				pAtt.Parent = hitPart;
@@ -348,8 +262,8 @@ function toolPackage.ActionEvent(handler, packet)
 				newRope.Length = (shotdata.RayPoint-hook.WorldPosition).Magnitude-0.5;
 				newRope.Color = BrickColor.new(Color3.fromRGB(0, 142, 170));
 				
-				table.insert(handler.Cache, pAtt);
-				table.insert(handler.Cache, newRope);
+				table.insert(cacheBinds, pAtt);
+				table.insert(cacheBinds, newRope);
 				
 				Debugger.Expire(pAtt, 300);
 				Debugger.Expire(newRope, 300);

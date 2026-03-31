@@ -32,6 +32,24 @@ if RunService:IsServer() then
 				end
 			end)
 		end)
+
+		shared.modEventService:OnInvoked("EntityLeash_OnLeash", function(event: EventPacket, ...)
+			local player: Player? = event.Player;
+			if player == nil then return end;
+
+			local targetEntityClass: EntityClass = ...;
+			if targetEntityClass.ClassName ~= "NpcClass" then return end;
+			
+			local npcClass: NpcClass = targetEntityClass :: NpcClass;
+			if npcClass.Name ~= "Zombie" then return end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.Type ~= 1 then return end;
+				if mission.ProgressionPoint <= 5 then
+					mission.ProgressionPoint = 6;
+				end
+			end)
+		end)
 	end
 
 else

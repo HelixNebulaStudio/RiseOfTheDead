@@ -32,11 +32,11 @@ function UsablePreset.UnlockPack(player, packType, packId)
         return true;
     end
 
-	if packType == "Color" and profile.ColorPacks[packId] == nil then
+	if packType == "ColorPacks" and profile.ColorPacks[packId] == nil then
         unlock("ColorPacks", packId);
         return true;
 
-	elseif packType == "Skin" and profile.SkinsPacks[packId] == nil then
+	elseif packType == "SkinsPacks" and profile.SkinsPacks[packId] == nil then
         unlock("SkinsPacks", packId);
         return true;
 

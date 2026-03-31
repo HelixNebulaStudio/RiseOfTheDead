@@ -20,7 +20,7 @@ return function(event: EventPacket, triggerId: string, interactable: Interactabl
 
 	elseif triggerId == "UnlockHalloweenPack" then
 		if profile.SkinsPacks.Halloween == nil then
-			modUnlockPack.UnlockPack(player, "Halloween", "Camo");
+			modUnlockPack.UnlockPack(player, "SkinsPacks", "Halloween");
 		end
 			
 	elseif triggerId == "RandomDisguise30" then
