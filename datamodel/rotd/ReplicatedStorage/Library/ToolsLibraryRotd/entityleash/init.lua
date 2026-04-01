@@ -7,6 +7,7 @@ local TweenService = game:GetService("TweenService");
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modWeaponsMechanics = shared.require(game.ReplicatedStorage.Library.WeaponsMechanics);
+local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 --==
 
 local toolPackage = {
@@ -116,7 +117,6 @@ function toolPackage.ServerUnequip(toolHandler: ToolHandlerInstance)
 end
 
 function toolPackage.ActionEvent(toolHandler: ToolHandlerInstance, packet)
-	local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 	local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
 	if packet.ActionIndex ~= 1 then return end;
@@ -161,6 +161,13 @@ function toolPackage.ActionEvent(toolHandler: ToolHandlerInstance, packet)
 		end;
 	end
 	clear();
+
+	toolHandler.Garbage:Tag(function()
+		modStatusEffects.Ragdoll(player, false, true);
+		if playerClass.RootPart:CanSetNetworkOwnership() then
+			playerClass.RootPart:SetNetworkOwner(player);
+		end;
+	end)
 	
 	if shotdata.Target then
 		local hitPart = shotdata.Target;
@@ -203,7 +210,7 @@ function toolPackage.ActionEvent(toolHandler: ToolHandlerInstance, packet)
 				local targetEntityClass: EntityClass = targetHealthComp.CompOwner :: EntityClass;
 	
 				local event: EventPacket = shared.modEventService:ServerInvoke("EntityLeash_OnLeash", {
-					ReplicateTo = player;
+					ReplicateTo = {player};
 				}, targetEntityClass);
 				if event.Cancelled ~= true then
 					if targetEntityClass.ClassName == "NpcClass" then
@@ -262,6 +269,8 @@ function toolPackage.ActionEvent(toolHandler: ToolHandlerInstance, packet)
 				newRope.Length = (shotdata.RayPoint-hook.WorldPosition).Magnitude-0.5;
 				newRope.Color = BrickColor.new(Color3.fromRGB(0, 142, 170));
 				
+				toolHandler.Garbage:Tag(pAtt);
+				toolHandler.Garbage:Tag(newRope);
 				table.insert(cacheBinds, pAtt);
 				table.insert(cacheBinds, newRope);
 				

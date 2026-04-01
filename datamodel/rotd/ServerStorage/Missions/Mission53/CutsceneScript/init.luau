@@ -1,13 +1,14 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
+--==
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
+
+local localPlayer = game.Players.LocalPlayer;
 
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
---== Variables;
+--==
 local MISSION_ID = 53;
 
 if RunService:IsServer() then
@@ -15,7 +16,7 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
-	if modBranchConfigurations.IsWorld("TheWarehouse") then
+	if modBranchConfigurations.IsWorld("TheWarehouse") or RunService:IsStudio() then
 		shared.modEventService:OnInvoked("Players_BindWieldEvent", function(event: EventPacket, ...) 
 			local action: string, toolHandler: ToolHandlerInstance = ...;
 
@@ -165,29 +166,29 @@ return function(CutsceneSequence)
 					TweenService:Create(heliCfTag, TweenInfo.new(1), {
 						Value=CFrame.new(665.327759, 122.156693, -65.71595, -0.949426413, 0.150374383, 0.275639594, 0.156434491, 0.987688363, -3.7252903e-09, -0.272246003, 0.0431195311, -0.961261153);
 					}):Play();
-					wait(0.9);
+					task.wait(0.9);
 					local anchors = cargoScene:WaitForChild("AttachAnchors"):GetChildren();
 					for _, obj in pairs(anchors) do
 						obj.Anchored = false;
 					end
-					wait(0.1);
+					task.wait(0.1);
 					TweenService:Create(heliCfTag, TweenInfo.new(2), {
 						Value=CFrame.new(699.652527, 151.303589, -55.8733864, -0.954096198, -0.117148288, 0.275639653, -0.121869311, 0.99254632, 0, -0.273585021, -0.0335920081, -0.961261332);
 					}):Play();
-					wait(1);
+					task.wait(1);
 					TweenService:Create(heliCfTag, TweenInfo.new(2), {
 						Value=CFrame.new(731.894287, 162.079498, -79.3726425, 0.437129796, 0.429375529, 0.790289998, 0.0211626887, 0.873532951, -0.486308515, -0.899151683, 0.229303777, 0.372760206);
 					}):Play();
-					wait(1)
+					task.wait(1)
 					TweenService:Create(heliCfTag, TweenInfo.new(2), {
 						Value=CFrame.new(773.394714, 167.538437, -45.7220879, 0.74985671, 0.496620655, -0.437130302, -0.560592473, 0.827821434, -0.0211625528, 0.35135603, 0.260920823, 0.899149239);
 					}):Play();
-					wait(1)
+					task.wait(1)
 					TweenService:Create(heliCfTag, TweenInfo.new(10), {
 						Value=CFrame.new(1160.98584, 184.275528, 143.103088, 0.74985671, 0.496620655, -0.437130302, -0.560592473, 0.827821434, -0.0211625528, 0.35135603, 0.260920823, 0.899149239);
 					}):Play();
 					Debugger.Expire(helicopterPrefab, 10);
-					wait(2)
+					task.wait(2)
 
 					TweenService:Create(cargoDoorATag, TweenInfo.new(2), {
 						Value=CFrame.new(654.471191, 97.3799973, -74.124527) * CFrame.Angles(0, math.rad(-125), 0);
@@ -195,28 +196,28 @@ return function(CutsceneSequence)
 					TweenService:Create(cargoDoorBTag, TweenInfo.new(2), {
 						Value=CFrame.new(651.385498, 97.3799973, -63.7809982) * CFrame.Angles(0, math.rad(125), 0);
 					}):Play();
-					wait(2)
+					task.wait(2)
 
 					walterNpcClass.Move:MoveTo(Vector3.new(648.141, 94.54, -73.628));
 					walterNpcClass.Move.OnMoveToEnded:Wait();
 					walterNpcClass:SetCFrame(CFrame.new(648.140991, 94.5396881, -73.6277466, 0, 0, 1, 0, 1, 0, -1, 0, 0));
 					wilsonNpcClass.Move:Face(walterNpcClass.RootPart.Position);
 					walterNpcClass.Chat(walterNpcClass.Player, "Why hello Wrighton Dale!");
-					wait(5);
+					task.wait(5);
 					walterNpcClass.Chat(walterNpcClass.Player, "What a mess it has became..");
-					wait(5);
+					task.wait(5);
 					wilsonNpcClass.Chat(wilsonNpcClass.Player, "Are you the only inspector they sent?");
-					wait(5);
+					task.wait(5);
 					walterNpcClass.Chat(walterNpcClass.Player, "Oh, err, yes. Can you verify that this location is secure?");
-					wait(5);
+					task.wait(5);
 					wilsonNpcClass.Chat(wilsonNpcClass.Player, "I can verify, we've set up station here for a while now..");
-					wait(5);
+					task.wait(5);
 					walterNpcClass.Chat(walterNpcClass.Player, "Very well, I can begin my tasks.");
-					wait(3);
+					task.wait(3);
 					walterNpcClass.Chat(walterNpcClass.Player, "Gas concentration readings.. looks acceptable to breath..");
-					wait(3);
+					task.wait(3);
 					walterNpcClass.PlayAnimation("TakeOffMask");
-					wait(0.5);
+					task.wait(0.5);
 					local weldSwap = script:WaitForChild("MaskWeld");
 					local nWeld = weldSwap:Clone();
 					local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
@@ -226,10 +227,10 @@ return function(CutsceneSequence)
 					nWeld.Part0 = nWeld.Parent;
 					nWeld.Part1 = walterNpcClass.Head;
 
-					wait(2);
+					task.wait(2);
 					walterNpcClass.Chat(walterNpcClass.Player, "Oh wow, it stinks..");
 					walterNpcClass:GetComponent("AvatarFace"):Set("Question");
-					wait(5);
+					task.wait(5);
 					walterNpcClass.Move:Face("Player");
 					walterNpcClass.Chat(walterNpcClass.Player, "You there, come here..");
 					walterNpcClass:GetComponent("AvatarFace"):Set("Confident");

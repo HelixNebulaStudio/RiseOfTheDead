@@ -115,7 +115,6 @@ if RunService:IsServer() then
 	-- !outline: Walter Handler
 	Dialogues.Walter.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-		local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 
 		if mission.Type == 1 then -- Active
 			local stage = mission.ProgressionPoint;
@@ -141,39 +140,29 @@ if RunService:IsServer() then
 				dialog:SetInitiate("What's stopping ya?");
 
 			elseif stage == 8 then
-				local npcModule;
+				local playerClass: PlayerClass = shared.modPlayers.get(player);
+				local wieldComp: WieldComp = playerClass.WieldComp;
+				local toolHandler: ToolHandlerInstance? = wieldComp.ToolHandler;
 
-				local character = player and player.Character;
-				if character and character:FindFirstChild("entityleash") then
-					local toolModel = character.entityleash;
-					local storageItemId = toolModel:GetAttribute("StorageItemId");
+				if toolHandler and wieldComp.ItemId == "entityleash" then
+					local hitChar = toolHandler.Binds.HitCharacter;
+					if hitChar then
+						dialog:AddChoice("qa2_caught", function(dialog)
+							Debugger.Expire(hitChar, 0);
+							modMission:Progress(player, MISSION_ID, function(mission)
+								if mission.ProgressionPoint == 8 then
+									mission.ProgressionPoint = 9;
+								end
+							end)
 
-					local profile = shared.modProfile:Get(player);
-					local storageItem = storageItemId and modStorage.FindIdFromStorages(storageItemId, player);
-					local handler = profile:GetToolHandler(storageItem);
+						end)
 
-					if handler and handler.NpcModule then
-						npcModule = handler.NpcModule;
+					else
+						dialog:AddChoice("qa2_caughtfail");
+
 					end
 				end
-
-				if npcModule then
-					dialog:AddChoice("qa2_caught", function(dialog)
-						Debugger.Expire(npcModule.Prefab, 0);
-						modMission:Progress(player, MISSION_ID, function(mission)
-							if mission.ProgressionPoint == 8 then
-								mission.ProgressionPoint = 9;
-							end
-						end)
-					end)
-
-				else
-					dialog:AddChoice("qa2_caughtfail");
-
-				end
-
 			end
-
 		end
 	end
 	
@@ -192,9 +181,7 @@ if RunService:IsServer() then
 					end)
 				end)
 
-
 			end
-
 		end
 	end
 end

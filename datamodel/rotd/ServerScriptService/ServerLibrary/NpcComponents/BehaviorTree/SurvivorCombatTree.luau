@@ -56,6 +56,8 @@ function treePackage.HasEnemy(npcClass: NpcClass)
     end;
 
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
+    if enemyNpcClass.ClassName ~= "NpcClass" then return false; end;
+     
     local enemyStatusComp: StatusComp = enemyNpcClass.StatusComp;
     if enemyStatusComp:GetOrDefault("Wounded") then return false end;
 

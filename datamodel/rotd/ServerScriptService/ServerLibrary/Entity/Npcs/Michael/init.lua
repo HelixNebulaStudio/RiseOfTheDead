@@ -6,6 +6,8 @@ local npcPackage = {
     
 	Configurations = {};
     Properties = {
+        PrimaryGunItemId = "ak47";
+        MeleeItemId = "fireaxe";
         Immortal = 1;
     };
 
@@ -14,6 +16,10 @@ local npcPackage = {
     AddComponents = {
         "TargetHandler";
         "Chat";
+        "AttractNpcs";
+    };
+    AddBehaviorTrees = {
+        "SurvivorCombatTree";
     };
 
     Voice = {
@@ -25,11 +31,12 @@ local npcPackage = {
 };
 
 function npcPackage.Spawning(npcClass: NpcClass)
-    
-    local triggerPart = Instance.new("Part");
-    triggerPart.Size = Vector3.new(49.2, 0.2, 18);
-    triggerPart.CFrame = CFrame.new(628.6, 55.3, 15.2);
-    
+    local attractNpcsComp = npcClass:GetComponent("AttractNpcs");
+    if attractNpcsComp then
+        attractNpcsComp.AttractHumanoidType = {"Zombie"};
+        attractNpcsComp.SelfAttractAlert = true;
+        attractNpcsComp:Activate();
+    end
 end
 
 return npcPackage;

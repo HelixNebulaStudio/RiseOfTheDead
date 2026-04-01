@@ -28,6 +28,18 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
     if applyBy == nil then return end;
     local player = applyBy:GetInstance();
 
+    local characterModel = characterClass.Character;
+    for _, obj in ipairs(characterModel:GetChildren()) do
+        if not obj:IsA("BasePart") then continue end;
+        obj.CollisionGroup = "Character";
+    end
+    statusClass.Garbage:Tag(function()
+        for _, obj in ipairs(characterModel:GetChildren()) do
+            if not obj:IsA("BasePart") then continue end;
+            obj.CollisionGroup = "Enemies";
+        end
+    end)
+
     local rootPart = characterClass.RootPart;
     rootPart.Massless = true;
 
