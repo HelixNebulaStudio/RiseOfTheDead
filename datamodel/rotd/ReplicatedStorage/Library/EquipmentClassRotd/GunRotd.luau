@@ -1,3 +1,5 @@
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
 local Gun = shared.require(game.ReplicatedStorage.Library.EquipmentClass.Gun);
 
 function Gun.new(equipmentClass: EquipmentClass)
@@ -13,9 +15,9 @@ function Gun.new(equipmentClass: EquipmentClass)
     return self;
 end
 
-function Gun:Update(equipmentClass: EquipmentClass)
+function Gun.Update(gunClass, equipmentClass: EquipmentClass)
     local storageItem: StorageItem = equipmentClass.StorageItem;
-    self:UpdatePotential(equipmentClass, storageItem.Values.L);
+    gunClass:UpdatePotential(equipmentClass, storageItem.Values.L);
 
     -- MARK: TODO CalculateDps()
     -- if class.CalculateDps then class:CalculateDps(); end
@@ -25,7 +27,7 @@ function Gun:Update(equipmentClass: EquipmentClass)
     -- if class.CalculatePower then class:CalculatePower(); end
 end
 
-function Gun:UpdatePotential(equipmentClass: EquipmentClass, weaponLevel: number)
+function Gun.UpdatePotential(gunClass, equipmentClass: EquipmentClass, weaponLevel: number)
     weaponLevel = weaponLevel or 0;
 	
     local configurations = equipmentClass.Configurations;
@@ -72,7 +74,7 @@ function Gun:UpdatePotential(equipmentClass: EquipmentClass, weaponLevel: number
     configurations:Calculate();
 end
 
-function Gun:RefillAmmo(equipmentClass: EquipmentClass, storageItem: StorageItem)
+function Gun.RefillAmmo(gunClass, equipmentClass: EquipmentClass, storageItem: StorageItem)
     local configurations = equipmentClass.Configurations;
     local properties = equipmentClass.Properties;
 
@@ -85,6 +87,29 @@ function Gun:RefillAmmo(equipmentClass: EquipmentClass, storageItem: StorageItem
 
         storageItem:Sync({"A", "MA"});
     end    
+end
+
+function Gun.BindOnSyncProperties(gunClass, equipmentClass: EquipmentClass, values: anydict)
+    if values == nil then return end;
+    local properties: PropertiesVariable<anydict> = equipmentClass.Properties;
+    
+    if values.Ammo then
+        if properties.Ammo == nil then
+            return;
+        end
+
+        local ammoDif = values.Ammo - properties.Ammo;
+        if properties.IsPrimaryFiring then
+            properties.Ammo += ammoDif;
+
+        else
+            properties.Ammo = values.Ammo;
+        end
+
+        return true;
+    end
+
+    return;
 end
 
 return Gun;

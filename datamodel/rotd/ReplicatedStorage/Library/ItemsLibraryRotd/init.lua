@@ -221,6 +221,7 @@ function modItemsLibrary.onRequire()
     new(clothingBase, {Id="tirearmor"; Name="Tire Armor"; Icon="rbxassetid://16791518600"; Tags={"Chest"}; Description="Tire armor, made with tires.\n\n<b>[Passive] Melee Dampening:</b> When equipping a melee, grants a chance to block damage from melee attacks. Reduced damage minimum capped at 1.";});
     new(clothingBase, {Id="apron"; Name="Apron"; Icon="rbxassetid://17381982100"; Tags={"Chest"}; Description="The butcher's apron.\n\n<b>[Passive] Splash Reflect:</b> Splash effects from enemies are reflected by 200%, Ticks' detonation does twice the damage and stun duration to surrounding enemies.";});
     new(clothingBase, {Id="ninjacloak"; Name="Ninja Cloak"; Icon="rbxassetid://134341247648095"; Tags={"Chest"}; Description="Light and resistent, feels a lot more flexible to move in.\n\n<b>[Passive] Ninja Agility:</b> Adds the ability to climb wall ledges and perform an air jump.";});
+    new(clothingBase, {Id="pouchvest"; Name="Pouch Vest"; Icon="rbxassetid://92390159961036"; Tags={"Chest"}; Description="Lightweight militant pouch vest.\n\n<b>[Passive] Bullet Recouper:</b> Hitscan shots that missed have a 50% chance to be recouped.";});
 
     -- Pants
     new(clothingBase, {Id="prisonpants"; Name="Prisoner's Pants"; Icon="rbxassetid://5627737032"; Tags={"Legs"}; Description="The Prisoner's Pants.";});
@@ -258,7 +259,6 @@ function modItemsLibrary.onRequire()
 
     new(storageBase, {Id="dufflebag"; Name="Duffle Bag"; StoragePresetId="dufflebag"; Icon="rbxassetid://8827967921";});
     new(storageBase, {Id="survivorsbackpack"; Name="Survivor's Backpack"; StoragePresetId="dufflebag"; Icon="rbxassetid://8948320931";});
-
 
     --MARK: CRATES
     --==========================================================[[ CRATES ]]==========================================================--
@@ -868,6 +868,9 @@ function modItemsLibrary.onRequire()
     -- plankarmor
     new(skinPermBase, {Id="plankarmormaple"; Icon="rbxassetid://6956453007"; SkinPerm="Maple"; TargetItemId="plankarmor"; });
     new(skinPermBase, {Id="plankarmorash"; Icon="rbxassetid://6956453176"; SkinPerm="Ash"; TargetItemId="plankarmor"; });
+
+    -- pouchvest
+    new(skinPermBase, {Id="pouchvestwhite"; Icon="rbxassetid://94523324088807"; SkinPerm="White"; TargetItemId="pouchvest"; });
 
     -- tirearmor
     new(skinPermBase, {Id="tirearmorred"; Icon="rbxassetid://16791569263"; SkinPerm="Red"; TargetItemId="tirearmor"; });

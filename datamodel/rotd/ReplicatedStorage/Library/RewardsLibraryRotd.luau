@@ -448,6 +448,7 @@ function library.onRequire()
 			-- 3
 			{ItemId = "dufflebagstreetart"; Quantity = 1; Chance = 1/4; Tier=3;};
 			{ItemId = "dufflebagarticscape"; Quantity = 1; Chance = 1/4; Tier=3;};
+			{ItemId = "pouchvestwhite"; Quantity = 1; Chance = 1/4; Tier=3;};
 
 			-- 4
 			{ItemId = "scraparmorbiox"; Quantity = 1; Chance = 1/8; Tier=4;};

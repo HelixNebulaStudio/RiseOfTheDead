@@ -1933,6 +1933,33 @@ function library.onRequire()
 			ColorMap="rbxassetid://15007537005";
 		};
 	};
+
+	--MARK: pouchvest
+
+	library:Add{
+		Id="pouchvest";
+		ItemId="pouchvest";
+		Name="Default";
+		DefaultPackage=true;
+		SurfaceAppearanceParent=script;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://83564229072947";
+		};
+	};
+
+	library:Add{
+		Id="pouchvestwhite";
+		ItemId="pouchvest";
+		Name="White";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://100046768465321";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
 end
 
 return library;
