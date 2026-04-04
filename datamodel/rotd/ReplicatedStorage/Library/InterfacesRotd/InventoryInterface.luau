@@ -111,6 +111,7 @@ function interfacePackage.onRequire()
 end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
+	local properties = interface.Properties;
 	local templateSlot = script:WaitForChild("SlotTemplate");
 
 	local remoteToggleDefaultAccessories = modRemotesManager:Get("ToggleDefaultAccessories");
@@ -207,17 +208,23 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     hotbarWindow.Layers = {"CharacterHud"; "CompactHidden"; "Hotbar"};
 	hotbarWindow.IgnoreHideAll = true;
 	hotbarWindow.ReleaseMouse = false;
-	hotbarWindow:Open();
 	interface:BindConfigKey("DisableHotbar", {hotbarWindow});
 
-	if modConfigurations.CompactInterface then
+	if modConfigurations.CompactInterface or UserInputService.TouchEnabled then
 		bodyEquipmentsFrame.Parent = invContainerFrame;
 		bodyEquipmentsFrame.LayoutOrder = 99;
 		
 		hotbarFrame.AnchorPoint = Vector2.new(0.5, 1);
-		hotbarFrame.Position = UDim2.new(0.5, 0, 1, -50);
+		if not modConfigurations.CompactInterface then
+			hotbarFrame.Position = UDim2.new(1, -200, 1, -85);
+			hotbarWindow:SetClosePosition(UDim2.new(1, -200, 2, -85), UDim2.new(1, -200, 1, -85));
+		else
+			hotbarFrame.Position = UDim2.new(0.75, 5, 1, -75);
+			hotbarWindow:SetClosePosition(UDim2.new(0.75, 5, 2, 0), UDim2.new(0.75, 5, 1, -75));
+		end
 		hotbarFrame.Size = UDim2.new(0, 50, 0, 0);
-		
+		Debugger.Expire(hotbarFrame:WaitForChild("UIListLayout"));
+
 		templateTClothingOption.Size = UDim2.new(1, 0, 0, 30);
 
 		local padding = Instance.new("UIPadding");
@@ -226,6 +233,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		padding.Parent = invContainerFrame;
 
 	else
+		hotbarWindow:Open();
 		interface.Garbage:Tag(armorTitleLabel.MouseEnter:Connect(function()
 			bodyEquipmentsFrame.Visible = true;
 		end))
@@ -269,7 +277,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			if not slotInterface.WarnLabel.Visible then
 				slotInterface.WarnLabel.Text = "Clothing Only!"
 				slotInterface.WarnLabel.Visible = true;
-				delay(1, function()
+				task.delay(1, function()
 					slotInterface.WarnLabel.Visible = false;
 				end)
 			end
@@ -536,8 +544,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 
 	--== Shared Context Options;
-	interface.Properties.ActiveHotbarKeys = 5;
-	interface.Properties.HotEquip = function(index)
+	properties.ActiveHotbarKeys = 5;
+	properties.HotEquip = function(index)
+		properties.IsHotbarToggled = false;
 		if playerClass.HealthComp.IsDead then return end;
 		if modData.GetStorage("Inventory") == nil then return end;
 		
@@ -557,12 +566,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end)
 
 	function hotbarWindow.Binds.UpdateHotbarSize()
-		interface.Properties.ActiveHotbarKeys = configurations.HotEquipSlots;
+		properties.ActiveHotbarKeys = configurations.HotEquipSlots;
 		
 		local updatedSlots = {};
 		
 		local hotbarSlots = {};
-		for a=1, math.clamp(interface.Properties.ActiveHotbarKeys, 1, 10) do
+		for a=1, math.clamp(properties.ActiveHotbarKeys, 1, 10) do
 			local new = hotbarFrame:FindFirstChild(a) or templateHotbarSlot:Clone();
 			
 			local label = new:WaitForChild("label");
@@ -571,8 +580,31 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			new:SetAttribute("Index", a);
 			updatedSlots[new] = true;
 			
-			if modConfigurations.CompactInterface then
-				new.Size = UDim2.new(0, hotbarFrame.Size.X.Offset, 0, hotbarFrame.Size.X.Offset);
+			if modConfigurations.CompactInterface or UserInputService.TouchEnabled then
+				new.Size = UDim2.new(0, 50, 0, 50);
+				new.AnchorPoint = Vector2.zero;
+
+				if a == 1 then
+					new.Position = UDim2.new(0, -100, 0, -35);
+				elseif a == 2 then
+					new.Position = UDim2.new(0, -90, 0, -90);
+				elseif a == 3 then
+					new.Position = UDim2.new(0, -35, 0, -90);
+
+				elseif a == 4 then
+					new.Position = UDim2.new(0, -25, 0, -145);
+				elseif a == 5 then
+					new.Position = UDim2.new(0, -155, 0, -35);
+				elseif a == 6 then
+					new.Position = UDim2.new(0, -145, 0, -90);
+					
+				elseif a == 7 then
+					new.Position = UDim2.new(0, -80, 0, -145);
+				elseif a == 8 then
+					new.Position = UDim2.new(0, -135, 0, -145);
+				elseif a == 9 then
+					new.Position = UDim2.new(0, -15, 0, -200);
+				end
 			end
 			new.Parent = hotbarFrame;
 			label.Text = a;
@@ -589,6 +621,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		-- overlapping glitch here
 		hotbarStorageInterface:Update();
 	end
+	properties.OnChanged:Connect(function(k)
+		if k ~= "IsHotbarToggled" then return end;
+		hotbarWindow:Toggle(properties.IsHotbarToggled == true);
+		hotbarWindow.Binds.UpdateHotbarSize();
+	end)
 	
 	local function listCharacterConfigurations()
 		local label = bodyEquipmentsFrame:WaitForChild("label");
@@ -626,7 +663,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local function updateWarmth()
 		local warmth = localPlayer:GetAttribute("Warmth") or 25;
-		temperatureLabel.Text = warmth.."°C";
+		temperatureLabel.Text = `{warmth}°C`;
 	end
 	
 	local weaponStatsWindow: InterfaceWindow;
@@ -717,7 +754,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end)
 		end
 	end)
-	hotbarStorageInterface.OnItemButton1Click = hotbarStorageInterface.UseItem;
+	hotbarStorageInterface.OnItemButton1Click = function(...)
+		properties.IsHotbarToggled = false;
+		hotbarStorageInterface.UseItem(...);
+	end;
 	hotbarWindow.Binds.UpdateHotbarSize();
 	
 	
@@ -749,7 +789,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		};
 		
 		modStorageInterface.QueueRefreshStorage({"Inventory"; "Clothing"});
-		-- hotbarWindow.Binds.UpdateHotbarSize();
 	end)
 	
 	

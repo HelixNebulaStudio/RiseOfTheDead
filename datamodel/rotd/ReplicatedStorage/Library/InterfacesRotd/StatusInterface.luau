@@ -49,9 +49,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local statusComp: StatusComp = playerClass.StatusComp;
 	
 	if modConfigurations.CompactInterface then
-		frame.Size = UDim2.new(0.5, 0, 0.05, 0);
+		local frameUIListLayout = frame:WaitForChild("UIListLayout");
+		frameUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left;
+		frame.Size = UDim2.new(0.5, 0, 0, 35);
+		frame.Position = UDim2.new(0.5, 0, 1, -40);
 		frame.AnchorPoint = Vector2.new(0.5, 1);
-		window:SetClosePosition(UDim2.new(0.5, 0, 1, 80), UDim2.new(0.5, 0, 1, -80));
+		window:SetClosePosition(UDim2.new(0.5, 0, 1, 80), UDim2.new(0.5, 0, 1, -40));
 	end
 	window:Open();
 	
