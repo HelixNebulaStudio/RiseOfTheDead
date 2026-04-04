@@ -494,13 +494,36 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	if modConfigurations.CompactInterface then
 		weaponStatsFrame.AnchorPoint = Vector2.new(0, 1);
 		weaponStatsFrame.Size = UDim2.new(0.5, 0, 0.5, 0);
-		weaponStatsFrame.Position = UDim2.new(0, 0, 1, 0);
+		weaponStatsFrame.Position = UDim2.new(0.5, 0, 1, 0);
 		weaponStatsWindow:SetClosePosition(UDim2.new(0, 0, 1.5, 0), UDim2.new(0, 0, 1, 0));
 		weaponStatsFrame:WaitForChild("UICorner").CornerRadius = UDim.new(0, 0);
 	else
 		weaponStatsWindow:SetClosePosition(UDim2.new(0.5, 0, 1.5, -145));
 	end
 	
+
+    weaponStatsWindow.Binds.SetStyle = function(styleId)
+        if styleId == nil then
+            styleId = "Default";
+        end
+        
+        if styleId == "QuadBottomLeft" then
+            weaponStatsFrame.AnchorPoint = Vector2.new(0, 1);
+            weaponStatsFrame.Size = UDim2.new(0.5, 0, 0.5, 0);
+            weaponStatsFrame.Position = UDim2.new(0, 0, 1, -24);
+		    weaponStatsWindow:SetClosePosition(UDim2.new(0, 0, 1.5, 0), UDim2.new(0, 0, 1, -24));
+
+        elseif styleId == "QuadBottomRight" then
+            weaponStatsFrame.AnchorPoint = Vector2.new(0, 1);
+            weaponStatsFrame.Size = UDim2.new(0.5, 0, 0.5, 0);
+            weaponStatsFrame.Position = UDim2.new(0.5, 0, 1, 0);
+		    weaponStatsWindow:SetClosePosition(UDim2.new(0.5, 0, 1.5, 0), UDim2.new(0.5, 0, 1, 0));
+
+        else
+
+        end
+    end
+
 	weaponStatsWindow.ReleaseMouse = false;
     --MARK: OnToggle
 	weaponStatsWindow.OnToggle:Connect(function(visible, storageItem)
@@ -515,10 +538,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local workbenchWindow: InterfaceWindow = interface:GetWindow("Workbench");
             local inspectWindow: InterfaceWindow = interface:GetWindow("ItemInspect");
             if workbenchWindow and workbenchWindow.Visible and inspectWindow then
+                weaponStatsWindow.Binds.SetStyle("QuadBottomLeft");
                 if visible then
                     inspectWindow.Binds.SetStyle("QuadTopLeft");
                 else
                     inspectWindow.Binds.SetStyle("LeftHalf");
+                end
+            else
+                if visible then
+                    weaponStatsWindow.Binds.SetStyle("QuadBottomRight");
                 end
             end
         end
@@ -588,6 +616,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         currentClass = classType;
 
         local statsTemplate = statTemplates[classType];
+        if statsTemplate == nil then
+            Debugger:Warn(`No stats for this item class.`);
+            weaponStatsWindow:Close();
+            return;
+        end
         local newShortHandLabel = graphStatTemplates[classType];
 
         local layoutOrder=1;
@@ -1088,6 +1121,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             configOwner = equipmentClass;
 
         else
+            if modConfigurations.CompactInterface then
+                if interface:GetWindow("Workbench").Visible then
+                    Debugger:Warn(`Workbench window is open for character stats.`);
+                    weaponStatsWindow:Close();
+                    return;
+                else
+
+                end
+            end
             playerClass.Configurations:Calculate();
             configOwner = playerClass;
             titleLabel.Text = `Character Stats`;

@@ -136,6 +136,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local invContainerFrame = inventoryFrame:WaitForChild("Container");
 	local containerUiLayout = invContainerFrame:WaitForChild("UIListLayout");
 
+	local toggleClothingButton = inventoryFrame:WaitForChild("ToggleClothing");
+	local clothingToggleMenu = toggleClothingButton:WaitForChild("Frame");
+
 	containerUiLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 		local contentSizeY = containerUiLayout.AbsoluteContentSize.Y;
 		invFrameSizeConstraint.MaxSize = Vector2.new(math.huge, contentSizeY+65);
@@ -165,6 +168,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		inventoryFrame.Size = UDim2.new(0.5, 0, 1, 0);
 		game.Debris:AddItem(inventoryFrame:FindFirstChild("UISizeConstraint"), 0);
 
+		toggleClothingButton.Position = UDim2.new(1, -100, 0, 28);
+		clothingToggleMenu.Position = UDim2.new(1, 100, 0, 0);
+
+		local titleFrame = inventoryFrame:WaitForChild("TitleFrame");
+		titleFrame.Active = true;
+		titleFrame.ZIndex = 3;
+		titleFrame.BackgroundTransparency = 0;
+		titleFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50);
+		toggleClothingButton.ZIndex = 3;
+
+		inventoryFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").Visible = true;
 		inventoryFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
 			inventoryWindow:Close();
 		end)
@@ -197,15 +211,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	interface:BindConfigKey("DisableHotbar", {hotbarWindow});
 
 	if modConfigurations.CompactInterface then
-		interface.Garbage:Tag(armorTitleLabel.InputBegan:Connect(function(inputObject)
-			if inputObject.UserInputType == Enum.UserInputType.MouseButton1 
-			or inputObject.UserInputType == Enum.UserInputType.Touch then
-
-				local yPos = armorTitleLabel.AbsolutePosition.Y-inventoryFrame.AbsolutePosition.Y;
-				bodyEquipmentsFrame.Position = UDim2.new(0, 0, 0, yPos);
-				bodyEquipmentsFrame.Visible = not bodyEquipmentsFrame.Visible;
-			end
-		end))
+		bodyEquipmentsFrame.Parent = invContainerFrame;
+		bodyEquipmentsFrame.LayoutOrder = 99;
 		
 		hotbarFrame.AnchorPoint = Vector2.new(0.5, 1);
 		hotbarFrame.Position = UDim2.new(0.5, 0, 1, -50);
@@ -228,8 +235,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		
 	end
 
-	local toggleClothingButton = inventoryFrame:WaitForChild("ToggleClothing");
-	local clothingToggleMenu = toggleClothingButton:WaitForChild("Frame");
 
 	local defaultSlots = {}; for _,value in pairs(invContainerFrame.MainList:GetChildren()) do if value:IsA("GuiObject") and value.LayoutOrder > 0 then value:SetAttribute("Index", value.LayoutOrder); table.insert(defaultSlots, value) end end;
 	local premiumSlots = {}; for _,value in pairs(invContainerFrame.PremiumList:GetChildren()) do if value:IsA("GuiObject") and value.LayoutOrder > 0 then value:SetAttribute("Index", value.LayoutOrder); table.insert(premiumSlots, value) end end;
@@ -589,6 +594,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local label = bodyEquipmentsFrame:WaitForChild("label");
 		local beStr = {};
 
+
 		configurations:Calculate();
 		for k, v in pairs(configurations:GetKeyPairs()) do
 			if k == "Warmth" and configurations.Warmth then
@@ -611,6 +617,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			beStr[a] = beStr[a].Text;
 		end
 
+		if modConfigurations.CompactInterface then
+			table.insert(beStr, 1, `<b><font size="16">Active Stats:</font></b>`);
+		end
 		label.Text = table.concat(beStr, "\n");
 	end
 
@@ -621,6 +630,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end
 	
 	local weaponStatsWindow: InterfaceWindow;
+	--MARK: OnToggle
 	inventoryWindow.OnToggle:Connect(function(visible)
 		if visible then
 			if modData.Storages["Inventory"] == nil or modData.Storages["Clothing"] == nil then
@@ -635,7 +645,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 			else
 				modData.RequestStorage{Action = "SyncStorages";};
-
+				
 			end
 			
 			modStorageInterface.UpdateStorages{
@@ -649,24 +659,39 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				weaponStatsWindow = interface:GetWindow("WeaponStats");
 				if weaponStatsWindow then
 					task.spawn(function()
-						armorTitleLabel.InputBegan:Connect(function(inputObject)
-							if inputObject.UserInputType == Enum.UserInputType.MouseButton1 
-							or inputObject.UserInputType == Enum.UserInputType.Touch
-							or inputObject.KeyCode == Enum.KeyCode.ButtonA then
-								interface:PlayButtonClick();
+						local charStatsButton = armorTitleLabel:WaitForChild("CharStatsWb");
+						charStatsButton.MouseMoved:Connect(function()
+							charStatsButton.ImageColor3 = interface.Colors.Branch;
+							charStatsButton.Frame.BackgroundColor3 = interface.Colors.Branch;
+						end)
+						charStatsButton.MouseLeave:Connect(function()
+							charStatsButton.ImageColor3 = interface.Colors.White;
+							charStatsButton.Frame.BackgroundColor3 = interface.Colors.White;
+						end)
+						charStatsButton.MouseButton1Click:Connect(function()
+							interface:PlayButtonClick();
 
-								local wbWindow = interface:GetWindow("Workbench");
-								if wbWindow and wbWindow.Visible and wbWindow.Binds.ClearSelection then
-									wbWindow.Binds.SelectedSlot = nil;
-									wbWindow.Binds.ClearSelection();
-								end
-
-								weaponStatsWindow:Open();
-								weaponStatsWindow:Update();
+							local wbWindow = interface:GetWindow("Workbench");
+							if wbWindow and wbWindow.Visible and wbWindow.Binds.ClearSelection then
+								wbWindow.Binds.SelectedSlot = nil;
+								wbWindow.Binds.ClearSelection();
+								return;
 							end
+
+							if not weaponStatsWindow.Visible then
+								if modConfigurations.CompactInterface then
+									weaponStatsWindow.Binds.SetStyle("QuadBottomRight");
+								end
+								weaponStatsWindow:Open();
+							end;
+							weaponStatsWindow:Update();
 						end)
 					end)
 				end
+			end
+			if modConfigurations.CompactInterface then
+				bodyEquipmentsFrame.Visible = true;
+				task.spawn(listCharacterConfigurations);
 			end
 
 		else
@@ -677,10 +702,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			modStorageInterface.CloseOptionMenus();
 
 			if not modConfigurations.CompactInterface then
-				-- or (Interface.modWorkbenchInterface and Interface.modWorkbenchInterface.SelectedSlot == nil) 
 				interface:ToggleWindow("Workbench", false);
-				interface:ToggleWindow("WeaponStats", false);
 			end
+			interface:ToggleWindow("WeaponStats", false);
 			interface:ToggleWindow("ExternalStorage", false);
 			interface:ToggleWindow("ResupplyStation", false);
 			interface:ToggleWindow("RatShopWindow", false);

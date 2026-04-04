@@ -30,12 +30,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local hudWindow: InterfaceWindow = interface:NewWindow("SquadHud", hudFrame);
     hudWindow.IgnoreHideAll = true;
     hudWindow.ReleaseMouse = false;
+    hudWindow.Layers = {"CharacterHud"; "CompactHidden";};
     
     interface:BindConfigKey("DisableSquadInterface", {hudWindow});
 
     local binds = hudWindow.Binds;
     binds.HudObjects = {};
     binds.HasMembers = false;
+
+    interface.QuickBarButtons:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+        hudFrame.Size = UDim2.new(0, 300, 0, interface.QuickBarButtons.AbsoluteSize.Y);
+    end)
 
     --MARK: OnUpdate
     hudWindow.OnUpdate:Connect(function()

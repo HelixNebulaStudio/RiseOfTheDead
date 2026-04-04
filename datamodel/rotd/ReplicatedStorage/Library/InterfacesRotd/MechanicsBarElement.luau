@@ -30,9 +30,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         frame.UIPadding.PaddingLeft = UDim.new(0, 0);
         frame.UIPadding.PaddingRight = UDim.new(0, 0);
         frame.UIPadding.PaddingTop = UDim.new(0, 0);
-        frame.AnchorPoint = Vector2.new(0, 1);
-        frame.Position = UDim2.new(0.5, 5, 1, -20);
-        frame.Size = UDim2.new(0.25, 0, 0, 18);
+        frame.AnchorPoint = Vector2.new(0.5, 1);
+        frame.Position = UDim2.new(0.5, 0, 1, 0);
+        frame.Size = UDim2.new(0.5, 0, 0, 16);
         barTextLabel.TextSize = 9;
         
 		frame.BackgroundTransparency = 0.5;

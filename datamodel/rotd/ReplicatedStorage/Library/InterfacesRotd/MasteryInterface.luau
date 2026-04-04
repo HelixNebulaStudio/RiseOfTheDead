@@ -46,6 +46,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     masteryFrame.Parent = interface.ScreenGui;
 
     local masteryList = masteryFrame:WaitForChild("MainFrame"):WaitForChild("List");
+    local masterUIGridLayout = masteryList:WaitForChild("UIGridLayout");
 
     local skillFrame = masteryFrame:WaitForChild("SkillFrame");
     local pageFrame = skillFrame:WaitForChild("pageInfo");
@@ -68,6 +69,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     interface:BindConfigKey("DisableMasteryMenu", {window});
 	
 	if modConfigurations.CompactInterface then
+        masterUIGridLayout.CellSize = UDim2.new(0, 100, 0, 80);
 		window:SetClosePosition(UDim2.new(0.5, 0, -1, 80), UDim2.new(0.5, 0, 0.5, 0));
 	else
 		window:SetClosePosition(UDim2.new(0.5, 0, -1, 80), UDim2.new(0.5, 0, 0.5, -35));

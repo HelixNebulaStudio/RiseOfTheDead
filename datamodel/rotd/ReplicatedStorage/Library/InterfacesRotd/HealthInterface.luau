@@ -50,28 +50,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end)
 
 	if modConfigurations.CompactInterface then
-        -- interface.Properties.OnChanged:Connect(function(k, v)
-        --     if k == "IsCompactFullscreen" then
-        --         if modConfigurations.DisableHealthbar then
-        --             hpFrame.Visible = false;
-        --         else
-        --             if v == true then
-        --                 hpFrame.Visible = false;
-        --             else
-        --                 hpFrame.Visible = true;
-        --             end
-        --         end
-        --     end
-        -- end)
-
 		hpFrame:WaitForChild("UIPadding").PaddingBottom = UDim.new(0, 0);
 		hpFrame.UIPadding.PaddingLeft = UDim.new(0, 0);
 		hpFrame.UIPadding.PaddingRight = UDim.new(0, 0);
 		hpFrame.UIPadding.PaddingTop = UDim.new(0, 0);
 
-		hpFrame.AnchorPoint = Vector2.new(1, 1);
-		hpFrame.Size = UDim2.new(0.25, 0, 0, 18);
-		window:SetClosePosition(UDim2.new(0.5, -5, 1, 20), UDim2.new(0.5, -5, 1, -20));
+		hpFrame.AnchorPoint = Vector2.new(0.5, 1);
+		hpFrame.Size = UDim2.new(0.5, 0, 0, 16);
+		window:SetClosePosition(UDim2.new(0.5, 0, 1, 20), UDim2.new(0.5, 0, 1, -16));
 		
 		hpFrame.BackgroundTransparency = 0.5;
 		hpFrame.ImageTransparency = 1;

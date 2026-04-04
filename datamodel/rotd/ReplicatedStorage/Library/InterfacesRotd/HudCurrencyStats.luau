@@ -31,15 +31,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 statsFrame.Position = window.OpenPoint;
                 statsFrame.AnchorPoint = Vector2.new(0, 1);
                 statsFrame.Size = UDim2.new(0.5, 0, 0, 24);
-                statsFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10);
-                statsFrame.BackgroundTransparency = 0.1;
+                statsFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50);
+                statsFrame.BackgroundTransparency = 0;
+                statsFrame.Active = true;
 
             else
                 statsFrame.BackgroundTransparency = 1;
                 statsFrame.AnchorPoint = Vector2.new(0.5, 0);
-                statsFrame.Size = UDim2.new(0.5, 0, 0, 25);
+                statsFrame.Size = UDim2.new(0.5, 0, 0, 14);
                 window.ClosePoint = UDim2.new(0.5, 0, 1, 70);
-                window.OpenPoint = UDim2.new(0.5, 0, 1, -70);
+                window.OpenPoint = UDim2.new(0.5, 0, 1, -15);
+                statsFrame.Active = false;
                 statsFrame.Position = window.OpenPoint;
 
             end
