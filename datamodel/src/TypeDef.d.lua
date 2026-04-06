@@ -1025,6 +1025,7 @@ export type Interface = {
         AltInputDown: boolean;
         TopbarInset: Rect;
         IsCompactFullscreen: boolean;
+        IsHotbarToggled: boolean;
     }>;
 
     Colors: {

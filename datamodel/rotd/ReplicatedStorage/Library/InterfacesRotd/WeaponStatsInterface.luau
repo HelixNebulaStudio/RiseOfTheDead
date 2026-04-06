@@ -452,14 +452,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local function refreshFrameSize()
         local xSize = math.clamp(workspace.CurrentCamera.ViewportSize.X-(350*2), 0, 580);
         if isExpanded then
-            if graphStatTemplates[currentClass] then
-                graphView.Visible = false;
-                statsList.Visible = true;
-                statsTabs.Visible = true;
-            end
+            graphView.Visible = false;
+            statsList.Visible = true;
+            statsTabs.Visible = true;
+
             refreshLabels();
             if modConfigurations.CompactInterface then
-                weaponStatsFrame:TweenSize(UDim2.new(0.5, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true);
+                weaponStatsFrame:TweenSize(UDim2.new(0.5, 0, 1, -24), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true);
             else
                 weaponStatsFrame:TweenSize(UDim2.new(0, xSize, 0, 300), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true);
             end
@@ -532,6 +531,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 			refreshFrameSize();
             weaponStatsWindow:Update(storageItem);
+        else
+            statPage = "Stats";
+            weaponStatsWindow.Binds.LastStorageItem = nil;
 		end
 
         if modConfigurations.CompactInterface then
@@ -750,6 +752,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 task.wait(0.1);
             end
             graphView.shortStatLabel.Text = newShortHandLabel;
+            if modConfigurations.CompactInterface then
+                graphView.shortStatLabel.TextScaled = true;
+            end
             
             local sizeRef = graphView.graphs.sizeRef.AbsoluteSize;
             graphView.graphs.nums:ClearAllChildren();
@@ -1051,7 +1056,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local modifyData = modifyList[a];
 
                 local modifyName = modifyData.Name;
-                if equipmentClass.Package.WeaponClass then
+                if equipmentClass and equipmentClass.Package.WeaponClass then
                     modifyName = modifyName:gsub(`{equipmentClass.Package.WeaponClass} `, "");
                 end
 
@@ -1160,7 +1165,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             modData.OnAmmoUpdate:Fire(storageItem.ID);
         end
         
-        refreshFrameSize();
 
         if weaponStatsWindow.Binds.StatPage ~= statPage then
             for _, obj in pairs(statsList:GetChildren()) do
@@ -1174,6 +1178,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             renderModifiers(configOwner, storageItem);
         end;
         
+        refreshFrameSize();
         statLayerButton.BackgroundColor3 = statPage == "Stats" and modBranchConfigurations.BranchColor or Color3.fromRGB(100,100,100);
         modifierLayerButton.BackgroundColor3 = statPage == "Modifiers" and modBranchConfigurations.BranchColor or Color3.fromRGB(100,100,100);
     end)

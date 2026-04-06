@@ -561,7 +561,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						modStorageInterface.UpdateStorages(success);
 						binds:PlayUpgradeSound();
 
-						local equipmentClass = shared.modPlayers.get(localPlayer).WieldComp:GetEquipmentClass(equipmentSiid); 
+						local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+						local equipmentClass = playerClass.WieldComp:GetEquipmentClass(equipmentSiid); 
 						if equipmentClass then
 							equipmentClass.Configurations:Calculate();
 						end

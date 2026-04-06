@@ -20,6 +20,8 @@ local attirePackage = {
 
 	Configurations = {};
 	Properties = {};
+
+	KeyIdControls = {["KeyTogglePat"]={Index=1};};
 };
 
 local turretArmPrefab = script:WaitForChild("turretArm");

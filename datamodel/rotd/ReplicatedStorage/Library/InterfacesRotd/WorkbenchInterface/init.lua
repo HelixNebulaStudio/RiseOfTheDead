@@ -69,6 +69,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	binds.ActiveWorkbenches = {};
 
 	if modConfigurations.CompactInterface then
+		workbenchWindow.BoolStringWhenActive = {String="!CharacterHud | CurrencyStats"; Priority=5;};
 		clearSelectionButton = workbenchFrame.TitleFrame:WaitForChild("clearSelectionButton");
 		workbenchWindow:SetClosePosition(UDim2.new(1, 0, 1, 0), UDim2.new(1, 0, 0, 0));
 		
@@ -100,6 +101,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	workbenchWindow:AddCloseButton(workbenchFrame);
 	
     
+	--MARK: OnToggle
 	workbenchWindow.OnToggle:Connect(function(visible, packet)
 		packet = packet or {};
 
@@ -133,13 +135,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             interface:ToggleWindow("Inventory", true);
 
             if not (modData.Profile ~= nil and modData.Profile.GamePass and modData.Profile.GamePass.PortableWorkbench) then
-                spawn(function()
+                task.spawn(function()
                     repeat until 
                         not workbenchWindow.Visible 
                         or binds.InteractPart == nil 
                         or not binds.InteractPart:IsDescendantOf(workspace) 
                         or localplayer:DistanceFromCharacter(binds.InteractPart.Position) >= 16 
-                        or not wait(0.5);
+                        or not task.wait(0.5);
                     interface:ToggleWindow("Inventory", false);
                 end)
             end
@@ -564,6 +566,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						obj.ImageColor3 = binds.ActivePage == obj.Name and branchColor or Color3.fromRGB(255, 255, 255);
 					end
 				end
+
+				if navName == "Upgrades" then
+					local weaponStatsWindow = interface:GetWindow("WeaponStats");
+					if not weaponStatsWindow.Visible then
+						weaponStatsWindow:Open(binds.SelectedSlot.Item);
+					end
+				end
 			end
 		end
 		binds.RefreshNavigations();
@@ -609,6 +618,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			onSelectionChange();
 			if modConfigurations.CompactInterface then
                 interface:ToggleWindow("Inventory", false);
+
+				local weaponStats: InterfaceWindow = interface:GetWindow("WeaponStats");
+				if weaponStats then
+					weaponStats:Open(binds.SelectedSlot.Item);
+				end
 			end
 		else
 			binds.ForceClear();

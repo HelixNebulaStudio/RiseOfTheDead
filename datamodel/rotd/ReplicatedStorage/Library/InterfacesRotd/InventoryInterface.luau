@@ -621,11 +621,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		-- overlapping glitch here
 		hotbarStorageInterface:Update();
 	end
-	properties.OnChanged:Connect(function(k)
-		if k ~= "IsHotbarToggled" then return end;
-		hotbarWindow:Toggle(properties.IsHotbarToggled == true);
-		hotbarWindow.Binds.UpdateHotbarSize();
-	end)
+	if UserInputService.TouchEnabled then
+		properties.OnChanged:Connect(function(k)
+			if k ~= "IsHotbarToggled" then return end;
+			hotbarWindow:Toggle(properties.IsHotbarToggled == true);
+			hotbarWindow.Binds.UpdateHotbarSize();
+			hotbarStorageInterface.OnItemButton1Click = function(...)
+				properties.IsHotbarToggled = false;
+				hotbarStorageInterface.UseItem(...);
+			end;
+		end)
+	end
 	
 	local function listCharacterConfigurations()
 		local label = bodyEquipmentsFrame:WaitForChild("label");
@@ -655,7 +661,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 
 		if modConfigurations.CompactInterface then
-			table.insert(beStr, 1, `<b><font size="16">Active Stats:</font></b>`);
+			table.insert((beStr :: any), 1, `<b><font size="16">Active Stats:</font></b>`);
 		end
 		label.Text = table.concat(beStr, "\n");
 	end
@@ -707,6 +713,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						end)
 						charStatsButton.MouseButton1Click:Connect(function()
 							interface:PlayButtonClick();
+							if weaponStatsWindow.Visible then
+								weaponStatsWindow:Close();
+								return;
+							end
 
 							local wbWindow = interface:GetWindow("Workbench");
 							if wbWindow and wbWindow.Visible and wbWindow.Binds.ClearSelection then
@@ -715,12 +725,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								return;
 							end
 
-							if not weaponStatsWindow.Visible then
-								if modConfigurations.CompactInterface then
-									weaponStatsWindow.Binds.SetStyle("QuadBottomRight");
-								end
-								weaponStatsWindow:Open();
-							end;
+							if modConfigurations.CompactInterface then
+								weaponStatsWindow.Binds.SetStyle("QuadBottomRight");
+							end
+							weaponStatsWindow:Open();
 							weaponStatsWindow:Update();
 						end)
 					end)
@@ -754,10 +762,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end)
 		end
 	end)
-	hotbarStorageInterface.OnItemButton1Click = function(...)
-		properties.IsHotbarToggled = false;
-		hotbarStorageInterface.UseItem(...);
-	end;
 	hotbarWindow.Binds.UpdateHotbarSize();
 	
 	
@@ -793,7 +797,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
 	
 	interface.Garbage:Tag(temperatureLabel.MouseMoved:Connect(function()
-		temperatureLabel.Text = "Env: "..(workspace:GetAttribute("GlobalTemperature") or 25).."°C"; 
+		temperatureLabel.Text = `Env: {workspace:GetAttribute("GlobalTemperature") or 25}°C`;
 	end));
 	interface.Garbage:Tag(temperatureLabel.MouseLeave:Connect(updateWarmth));
 	interface.Garbage:Tag(bodyEquipmentsFrame:GetPropertyChangedSignal("Visible"):Connect(listCharacterConfigurations));

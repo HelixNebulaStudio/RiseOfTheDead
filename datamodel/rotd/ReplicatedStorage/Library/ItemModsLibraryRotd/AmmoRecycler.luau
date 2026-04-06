@@ -80,7 +80,6 @@ function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierIns
 		newMaxAmmo = equipmentClass.Configurations.MaxAmmoLimit;
 	end
 
-	Debugger:StudioLog(`A`, equipmentClass.Properties.Ammo, `MA`, equipmentClass.Properties.MaxAmmo);
 	equipmentClass.Properties.MaxAmmo = newMaxAmmo;
 	storageItem:SetValues("MA", newMaxAmmo);
 

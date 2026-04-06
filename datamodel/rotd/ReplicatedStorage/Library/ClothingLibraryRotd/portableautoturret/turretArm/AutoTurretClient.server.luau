@@ -119,17 +119,17 @@ if isOwner then
 
 	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
-	UserInputService.InputBegan:connect(function(inputObject, inputEvent)
-		if UserInputService:GetFocusedTextBox() ~= nil then return end;
-		if not modKeyBindsHandler:Match(inputObject, "KeyTogglePat") then return end;
-		if turretArm.Parent == nil or turretArm.Parent.Parent ~= character then return end;
+	if modData.ControlInputsBindable then
+		modData.ControlInputsBindable.Event:Connect(function(keyId, inputState)
+			if keyId ~= "KeyTogglePat" or inputState ~= "Begin" then return end;
+			if turretArm.Parent == nil or turretArm.Parent.Parent ~= character then return end;
 
-		if tick()-debounce <= 1 then return end;
-		debounce = tick();
-				
-		local returnPacket = remoteAutoTurret:InvokeServer("toggleonline");
+			if tick()-debounce <= 1 then return end;
+			debounce = tick();
+					
+			local _returnPacket = remoteAutoTurret:InvokeServer("toggleonline");
 
-		debounce = tick()-0.5;
-	end)
-
+			debounce = tick()-0.5;
+		end)
+	end
 end
