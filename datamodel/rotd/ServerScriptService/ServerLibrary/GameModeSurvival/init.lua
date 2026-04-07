@@ -12,7 +12,6 @@ local EnumStatus = {Initialized=-1; Restarting=0; InProgress=1; Completed=2;};
 Survival.EnumStatus = EnumStatus;
 
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
@@ -733,6 +732,7 @@ function Survival:StartWave(wave)
 		
 		if self.StageLib.WavePassMode == true then
 			if (self.IsHard and self.StageLib.HardRewardId) or self.Wave >= 5 and self.Wave % 5 == 0 then
+				--Show reward options
 				self.WavePass.Active = true;
 
 				local rewardDroptableIds = {self.StageLib.RewardsId};
@@ -792,15 +792,35 @@ function Survival:StartWave(wave)
 
 				if #rewardsTable > 0 then
 					local pickRewardsList = {};
+					local dupCounter = {};
 					repeat
 						local rewardInfo = modDropRateCalculator.roll(rewardsTable);
+
+						-- clear reward if there's already 2 of the same.
+						if dupCounter[rewardInfo.ItemId] and dupCounter[rewardInfo.ItemId] >2 then
+							rewardInfo = nil;
+						end
+
+						-- clear reward if list is empty and reward is not in player required level
 						if rewardInfo and #pickRewardsList <= 0 and (rewardInfo.Level or 0) > lowestPlayerLevel then
 							rewardInfo = nil;
 						end
+						
+						-- clear reward if exist last round.
+						if self.LastRewardsList and rewardInfo then
+							for a=1, #self.LastRewardsList do
+								if self.LastRewardsList[a].ItemId == rewardInfo.ItemId then
+									rewardInfo = nil;
+									break;
+								end
+							end
+						end
+						
 						if rewardInfo then
 							table.insert(pickRewardsList, rewardInfo);
 						end
 					until #pickRewardsList >= math.min(3, #rewardsTable);
+					self.LastRewardsList = pickRewardsList;
 
 					self.WavePass.Rewards = pickRewardsList;
 					self.WavePass.TimeLeft = 30;
