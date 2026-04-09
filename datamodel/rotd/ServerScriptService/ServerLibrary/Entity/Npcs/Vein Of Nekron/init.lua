@@ -55,7 +55,7 @@ end
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
     local healthComp = npcClass.HealthComp;
     local rootPart = npcClass.RootPart;
 
@@ -256,6 +256,11 @@ function npcPackage.Spawning(npcClass: NpcClass)
                                 Damage = amount;
                                 TargetPart = newPlaque;
                             });
+							for a=#plaqueObjects, 1, -1 do
+								if plaqueObjects[a] == plaqueModel then
+									table.remove(plaqueObjects, a);
+								end
+							end
                         end)
                         
 						task.spawn(function()
@@ -305,7 +310,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
 				randomPlaquePart = randomPlaquePart.PrimaryPart;
 			end
 		end
-		if randomPlaquePart == nil then
+		if randomPlaquePart == nil or randomPlaquePart:IsA("Model") then
 			randomPlaquePart = npcClass.RootPart;
 		end
 

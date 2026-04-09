@@ -486,6 +486,7 @@ local WORLDS = {
             [LIVE_GAME_ID] = 0;
             [DEV_GAME_ID] = 10976260433;
         };
+        WorldType = WORLD_TYPES.General;
         
         WeatherCycle = false;
         LoadLeaderboard = true;
@@ -497,6 +498,7 @@ local WORLDS = {
             [LIVE_GAME_ID] = 0;
             [DEV_GAME_ID] = 54152100;
         };
+        WorldType = WORLD_TYPES.General;
         
         WeatherCycle = false;
         LoadLeaderboard = true;
@@ -508,6 +510,7 @@ local WORLDS = {
             [LIVE_GAME_ID] = 0;
             [DEV_GAME_ID] = 14504730660;
         };
+        WorldType = WORLD_TYPES.General;
 
         WeatherCycle = false;
         LoadLeaderboard = true;

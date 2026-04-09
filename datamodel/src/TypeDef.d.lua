@@ -148,7 +148,7 @@ export type EngineCore = {
 export type Class = {
     Script: LuaSourceContainer;
     ClassName: string;
-} & anydict;
+};
 
 --MARK: Debugger
 export type Debugger = {
@@ -625,8 +625,6 @@ export type CharacterClass = {
     WieldComp: WieldComp;
 
     -- @methods
-    DistanceFromCharacter: (CharacterClass, pos: Vector3) -> number;
-    
     GetCFrame: (CharacterClass) -> CFrame;
     SetCFrame: (CharacterClass, cframe: CFrame?, angle: CFrame?) -> nil;
 
@@ -823,7 +821,7 @@ export type NpcClass = CharacterClass & {
     TeleportHide: (NpcClass) -> nil;
     Respawn: (NpcClass, cframe: CFrame?) -> nil;
 
-    AddComponent: (NpcClass, component: string | ModuleScript) -> nil;
+    AddComponent: (NpcClass, component: string | ModuleScript) -> any;
     GetComponent: (NpcClass, componentName: string) -> any;
     ListComponents: (NpcClass) -> {any};
     
@@ -1490,6 +1488,8 @@ export type DestructibleInstance = {
     SetHealthbarEnabled: (DestructibleInstance, value: boolean) -> nil;
     Destroy: (DestructibleInstance) -> nil;
 
+    GetCFrame: (DestructibleInstance) -> CFrame;
+
     -- @signals
     OnDestroy: EventSignal<any>;
     OnEnabledChanged: EventSignal<boolean>;
@@ -1692,6 +1692,10 @@ export type EntityClass = {
     
     Character: Model?;
     Model: Model?;
+
+    -- @methods
+    GetCFrame: (EntityClass) -> CFrame;
+    DistanceFrom: (EntityClass, Vector3) -> number;
 };
 
 --MARK: DamageData

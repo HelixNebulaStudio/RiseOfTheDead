@@ -1,10 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-
---==
 local Hazard = {
-	Title = "Witherers";
-	Description = "They disintegrate armor";
+	Title = "Vex Spitters";
+	Description = "They spit volatile blob at you!";
 	Controller = nil;
 };
 Hazard.__index = Hazard;
@@ -23,7 +21,8 @@ end
 function Hazard:Begin()
 	self.Counter = 0;
 
-	self.OnZombieDeathDisconnect = self.Controller.OnNpcDeath:Connect(function(npcClass: NpcClass) 
+	local controller = self.Controller;
+	controller.StageGarbage:Tag(controller.OnSurvivalNpcDeath:Connect(function(npcClass: NpcClass) 
 		if npcClass == nil or npcClass.HumanoidType ~= "Zombie" then return end;
 		local rawProperties: anydict = npcClass.Properties.Values;
 		local deathPosition = rawProperties.DeathPosition;
@@ -31,18 +30,19 @@ function Hazard:Begin()
 
 		self.Counter = self.Counter+1;
 
-		if self.Counter >= 20 then
+		if self.Counter >= 5 then
 			self.Counter = 0;
+			if math.random(1, 2) ~= 1 then return end;
 
 			shared.modNpcs.spawn2{
-				Name = "Witherer";
+				Name = "Vex Spitter";
 				CFrame = CFrame.new(deathPosition);
 				BindSetup = function(npcClass: NpcClass)
 					npcClass.Properties.Level = rawProperties.Level;
 				end;
 			};
 		end
-	end)
+	end))
 end
 
 function Hazard:Tick()
@@ -50,10 +50,6 @@ function Hazard:Tick()
 end
 
 function Hazard:End()
-	if self.OnZombieDeathDisconnect then
-		Debugger:Warn("OnZombieDeathDisconnect")
-		self.OnZombieDeathDisconnect();
-	end
 end
 
 return Hazard;

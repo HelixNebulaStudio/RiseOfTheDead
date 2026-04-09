@@ -27,6 +27,32 @@ local interfacePackage = {
 };
 --==
 
+function interfacePackage.onRequire()
+	-- if RunService:IsStudio() then
+	-- 	shared.modCommandsLibrary.bind{
+	-- 		["gameroom"]={
+	-- 			Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+	-- 			Description = [[Game Room commands.
+	-- 			/gameroom printinsurance
+	-- 			]];
+
+	-- 			RequiredArgs = 0;
+	-- 			UsageInfo = "/gameroom action";
+	-- 			Function = function() end;
+	-- 			ClientFunction = function(player, args)
+    --                 local modData = shared.require(localPlayer:WaitForChild("DataModule"));
+
+	-- 				local interface = modClientGuis.ActiveInterface;
+	-- 				local window: InterfaceWindow = interface:GetWindow("GameRoom");
+    --                 local binds = window.Binds;
+
+	-- 				local action = args[1];
+                    
+    --             end
+    --         }
+    --     }
+    -- end
+end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
@@ -76,7 +102,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local itemToolTip = modItemInterface.newItemTooltip();
     itemToolTip.Frame.Name = `GameRoomItemToolTip`;
 
-    local window: InterfaceWindow = interface:NewWindow("GameRoom", gameRoomFrame)
+    local window: InterfaceWindow = interface:NewWindow("GameRoom", gameRoomFrame);
     window.UseTween = false;
     window.IgnoreHideAll = true;
     window.Layers = {"GameRoom"};

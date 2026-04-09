@@ -330,7 +330,6 @@ GameModeLibrary.GameModes={
 				LeaderboardDataKey = "Waves";
 				
 				HardModeEnabled = true;
-				WavePassMode = true;
 			};
 			["Prison"]={
 				WorldId="Prison";
@@ -349,7 +348,6 @@ GameModeLibrary.GameModes={
 				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
-				WavePassMode = true;
 			};
 			["Sector D"]={
 				WorldId="SectorD";
@@ -368,7 +366,6 @@ GameModeLibrary.GameModes={
 				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
-				WavePassMode = true;
 			};
 			["Swamplands"]={
 				WorldId = "Swamplands";
@@ -387,7 +384,6 @@ GameModeLibrary.GameModes={
 				LeaderboardDataKey = "Waves";
 
 				HardModeEnabled = true;
-				WavePassMode = true;
 				MapItemId="swamplandsmap";
 			};
 			["CommunityWaySide"]={
@@ -404,7 +400,6 @@ GameModeLibrary.GameModes={
 				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
-				WavePassMode = true;
 			};
 			["CommunityFissionBay"]={
 				WorldId="CommunityFissionBay";
@@ -420,7 +415,6 @@ GameModeLibrary.GameModes={
 				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
-				WavePassMode = true;
 			};
 			["CommunityRooftops"]={
 				WorldId="CommunityRooftops";
@@ -436,7 +430,6 @@ GameModeLibrary.GameModes={
 				LeaderboardDataKey="Waves";
 
 				HardModeEnabled=true;
-				WavePassMode = true;
 			};
 		};
 	};

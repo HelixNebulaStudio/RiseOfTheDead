@@ -203,10 +203,12 @@ return function(interface, window, frame)
 
 
 		-- MARK: Wave Pass Screen
-		if data.WavePass ~= false then
+		if data.WaveSelectPacket ~= false and data.WaveSelectPacket.TimeLeft > 0 then
+			local waveSelect = data.WaveSelectPacket;
+
 			local timerLabel = wavePassScreenFrame.timerLabel;
-			timerLabel.Text = `Lock In\n{data.WavePass.TimeLeft}`;
-			if data.WavePass.TimeLeft <= 5 and data.WavePass.TimeLeft % 2 == 0 then
+			timerLabel.Text = `Lock In\n{waveSelect.TimeLeft}`;
+			if waveSelect.TimeLeft <= 5 and waveSelect.TimeLeft % 2 == 0 then
 				timerLabel.TextColor3 = Color3.fromRGB(255, 60, 60);
 				modAudio.Play("ClockTick", wavePassScreenFrame);
 			else
@@ -217,7 +219,7 @@ return function(interface, window, frame)
 			local voteEndClaimButton = wavePassScreenFrame.VoteEndClaim;
 			local voteContinueButton = wavePassScreenFrame.VoteContinue;
 
-			local rewardInfoList = data.WavePass.Rewards;
+			local rewardOptionsList = waveSelect.Options;
 			if wavePassScreenElement.Init ~= true then
 				wavePassScreenElement.Init = true;
 
@@ -232,16 +234,17 @@ return function(interface, window, frame)
 					if not obj:IsA("GuiObject") then continue end;
 					game.Debris:AddItem(obj, 0);
 				end
-				for a, rewardInfo in ipairs(rewardInfoList) do
+				Debugger:StudioLog(`waveSelect`, waveSelect);
+				for a, rewardInfo in ipairs(rewardOptionsList) do
 					local itemId = rewardInfo.ItemId;
 					local itemLib = modItemsLibrary:Find(itemId);
 
 					local newOption = templateRewardOption:Clone();
 					newOption.Name = a;
 					newOption.LayoutOrder = a;
-					newOption.Size = UDim2.new(0, 150, 0, 150);
+					newOption.Size = UDim2.new(0, 130, 0, 150);
 					TweenService:Create(newOption, TweenInfo.new(0.3), {
-						Size = UDim2.new(0, 300, 0, 300);
+						Size = UDim2.new(0, 280, 0, 400);
 					}):Play();
 					newOption.Parent = rewardOptionsFrame;
 					if a==1 then
@@ -256,8 +259,29 @@ return function(interface, window, frame)
 					local chanceLabel = newOption:WaitForChild("chanceLabel");
 					chanceLabel.Text = `{math.max(math.floor(rewardInfo.WinChance*100),1)}%`;
 
+					local challengeLabel = newOption:WaitForChild("challengeLabel");
+					if rewardInfo.Objectives and rewardInfo.Hazards then
+						local ohStrList = {"Objectives:"};
+						for _, info in ipairs(rewardInfo.Objectives) do
+							table.insert(ohStrList, `• {info.Title} x{info.Amount}`);
+						end
+						table.insert(ohStrList, "\nHazards:");
+						local hasHazards = false;
+						for _, info in ipairs(rewardInfo.Hazards) do
+							table.insert(ohStrList, `• {info.Title} x{info.Amount}`);
+							hasHazards = true;
+						end
+						if not hasHazards then
+							table.insert(ohStrList, "• None");
+						end
+						challengeLabel.Text = table.concat(ohStrList, "\n");
+						challengeLabel.Visible = true;
+					else
+						challengeLabel.Visible = false;
+					end
+
 					local itemButtonObject = modItemInterface.newItemButton();
-					itemButtonObject:SetZIndex(1);
+					itemButtonObject:SetZIndex(0);
 					itemButtonObject:SetItemId(itemId);
 
 					local newItemButton: ImageButton = itemButtonObject.ImageButton;
@@ -270,9 +294,16 @@ return function(interface, window, frame)
                         itemToolTip:SetPosition(newOption);
                     end, 1);
 
+					local itemSlotFrame = newOption:WaitForChild("ItemSlot");
+					if challengeLabel.Visible == false then
+						itemSlotFrame.AnchorPoint = Vector2.new(0.5, 0.5);
+						itemSlotFrame.Position = UDim2.new(0.5, 0, 0.5, 0);
+						itemSlotFrame.Size = UDim2.new(0, 300, 0, 300);
+					end
+
 					newItemButton.Name = itemId;
 					newItemButton.Size = UDim2.new(1, 0, 1, 0);
-					newItemButton.Parent = newOption;
+					newItemButton.Parent = itemSlotFrame;
 					
 					itemButtonObject:Update();
 					newItemButton.Image = itemLib.Icon;
@@ -282,51 +313,54 @@ return function(interface, window, frame)
 						newItemButton.ImageColor3 = Color3.fromRGB(100, 100, 100);
 					end
 					newOption.MouseButton1Click:Connect(function()
-						if #rewardInfoList <= 1 then return end;
+						if #rewardOptionsList <= 1 then return end;
 						if playerLevel < rewardRequireLevel then
 							return;
 						end
 						interface:PlayButtonClick();
 						wavePassScreenElement.SelectionStroke.Parent = newOption;
-						window.Binds.FireServer("selectReward", a);
+						window.Binds.FireServer("selectoption", a);
 
-						data.WavePass.Players[tostring(localPlayer.UserId)].RewardPick = a;
+						waveSelect.Players[tostring(localPlayer.UserId)].OptionPick = a;
 						self:Update(data);
 					end)
 					
-					if #rewardInfoList <= 1 then
+					if #rewardOptionsList <= 1 then
 						newOption.UIPadding:Destroy();
 						newOption.PlayerVote.Visible = false;
-						newOption.BackgroundTransparency = 1;
-						wavePassScreenElement.SelectionStroke.Parent = script;
 						levelLabel.Text = ``;
 						chanceLabel.Text = ``;
 					end
 				end
 
-				if #rewardInfoList <= 1 then
+				if #rewardOptionsList <= 1 then
 					wavePassScreenFrame.descLabel.Text = `Your reward for passing this wave!`;
 				else
-					wavePassScreenFrame.descLabel.Text = `Pick a reward, then end to claim your rewards or continue.`;
+					wavePassScreenFrame.descLabel.Text = `Pick your next risk and reward! Stake your rewards!`;
 				end
 
+				if data.IsHard ~= true and (data.Wave % 15) == 0 then
+					voteContinueButton.Text = `Vote Continue & Claim Stakes`;
+				else
+					voteContinueButton.Text = `Vote Continue`;
+				end
 				voteContinueButton.MouseButton1Click:Connect(function() 
 					interface:PlayButtonClick();
 					window.Binds.FireServer("vote", 1);
 
-					data.WavePass.Players[tostring(localPlayer.UserId)].VotePick = 1;
+					waveSelect.Players[tostring(localPlayer.UserId)].VotePick = 1;
 					self:Update(data);
 				end)
 				voteEndClaimButton.MouseButton1Click:Connect(function() 
 					interface:PlayButtonClick();
 					window.Binds.FireServer("vote", 2);
 
-					data.WavePass.Players[tostring(localPlayer.UserId)].VotePick = 2;
+					waveSelect.Players[tostring(localPlayer.UserId)].VotePick = 2;
 					self:Update(data);
 				end)
 			end
 
-			local playerList = data.WavePass.Players;
+			local playerList = waveSelect.Players;
 			for userId, playerData in pairs(playerList) do
 				local hasVoted = playerData.HasVoted;
 				local votePick = playerData.VotePick;
@@ -361,7 +395,7 @@ return function(interface, window, frame)
 
 				end
 
-				local rewardPick = playerData.RewardPick;
+				local rewardPick = playerData.OptionPick;
 				for _, rewardOption in ipairs(rewardOptionsFrame:GetChildren()) do
 					if not rewardOption:IsA("GuiObject") then continue end;
 
@@ -399,13 +433,13 @@ return function(interface, window, frame)
 
 						itemToolTip:BindHoverOver(newItemButton, function()
 							itemToolTip.Frame.Parent = interface.ScreenGui;
-							itemToolTip:Update(storageItem);
+							itemToolTip:Update(storageItem.ItemId, storageItem);
 							itemToolTip:SetPosition(newItemButton);
 						end);
 					end
 
 					newItemButton.Name = siid;
-					newItemButton.Size = UDim2.new(0, 100, 0, 100);
+					newItemButton.Size = UDim2.new(0, 80, 0, 80);
 					newItemButton.LayoutOrder = storageItem.Index;
 					newItemButton.Parent = lootScrollFrame;
 					
@@ -454,18 +488,18 @@ return function(interface, window, frame)
 					end
 
 					newItemButton.Name = itemId;
-					newItemButton.Size = UDim2.new(0, 100, 0, 100);
+					newItemButton.Size = UDim2.new(0, 80, 0, 80);
 					newItemButton.Parent = nextRewardsScrollFrame;
 					
-					itemButtonObject:Update(itemId);
+					itemButtonObject:Update();
 				end
 
 				if #nextRewardInfoList > 0 then
 					local newXSize = (#nextRewardInfoList * 100) + 40;
-					wavePassScreenFrame.LootFrame.SurvivalRewards.Size = UDim2.new(1, -newXSize, 0, 120);
+					wavePassScreenFrame.LootFrame.SurvivalRewards.Size = UDim2.new(1, -newXSize, 0, 100);
 					wavePassScreenFrame.LootFrame.NextRewards.Visible = true;
 				else
-					wavePassScreenFrame.LootFrame.SurvivalRewards.Size = UDim2.new(1, 0, 0, 120);
+					wavePassScreenFrame.LootFrame.SurvivalRewards.Size = UDim2.new(1, 0, 0, 100);
 					wavePassScreenFrame.LootFrame.NextRewards.Visible = false;
 				end
 			end
@@ -565,6 +599,11 @@ return function(interface, window, frame)
 						if activeLeaderboard == nil then
 							activeLeaderboard = modLeaderboardInterface.new(keyTable);
 							activeLeaderboard:AddToggleButton();
+							activeLeaderboard.Garbage:Tag(interface.OnWindowToggle:Connect(function(window: InterfaceWindow)
+								if window.Visible == true then
+									activeLeaderboard:ToggleVisible(false);
+								end
+							end))
 						end
 						activeLeaderboard.Frame.AnchorPoint = Vector2.new(0, 1);
 						activeLeaderboard.Frame.Position = UDim2.new(0, 20, 1, -60);

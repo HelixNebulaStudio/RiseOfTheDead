@@ -39,7 +39,6 @@ function treePackage.Charge(npcClass: NpcClass)
     properties.ChargeCooldown = tick()+15;
     npcClass.Move:Stop();
 
-    Debugger:Warn(`{npcClass.Name} Charge`);
     task.wait(0.1);
     local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: CharacterClass = enemyTargetData.HealthComp.CompOwner :: CharacterClass;
@@ -58,7 +57,7 @@ function treePackage.Charge(npcClass: NpcClass)
     local targetDir = (targetPosition-npcClass.RootPart.Position).Unit;
     targetPosition = targetPosition + targetDir * 6;
 
-    local targetDistance = math.max(npcClass:DistanceFromCharacter(targetPosition), 16);
+    local targetDistance = math.max(npcClass:DistanceFrom(targetPosition), 16);
     local speed = isHard and 150 or 100;
     local duration = math.clamp(targetDistance/speed, 0.01, 3);
 
@@ -96,7 +95,7 @@ function treePackage.Charge(npcClass: NpcClass)
                     local targetCharClass: CharacterClass = targetCharClasses[a];
                     local targetRootPart = targetCharClass.RootPart;
 
-                    local distance = npcClass:DistanceFromCharacter(targetRootPart.Position);
+                    local distance = npcClass:DistanceFrom(targetRootPart.Position);
                     local relativeCframe = npcClass.RootPart.CFrame:ToObjectSpace(targetRootPart.CFrame);
                     local absAngle = math.abs(math.deg(math.atan2(relativeCframe.X, -relativeCframe.Z)));
 

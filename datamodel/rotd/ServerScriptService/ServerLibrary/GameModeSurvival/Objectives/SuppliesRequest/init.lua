@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local Objective = {};
 Objective.__index = Objective;
 
-Objective.Title = "Supplies Request";
+Objective.Title = "Resupply";
 Objective.Description = "Call in resupply";
 
 Objective.DifficultyModes = {Hard=false;};

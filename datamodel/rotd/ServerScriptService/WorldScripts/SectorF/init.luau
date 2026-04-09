@@ -31,10 +31,10 @@ function WorldCore.InitGameController()
 
     newGameController.BossConfig = {
         List={
+            {Name="The Prisoner"; Chance=100;};
             {Name="Tanker"; Chance=100;};
             {Name="Fumes"; Chance=100;};
             {Name="Corrosive"; Chance=100;};
-            {Name="The Prisoner"; Chance=100;};
         };
     };
 
@@ -43,24 +43,24 @@ function WorldCore.InitGameController()
     }
 
     newGameController.ObjectivesList = {
-        {Type="Eliminate"; Fmod=1;};
-        {Type="Boss"; Fmod=6;};
-        {Type="SuppliesRequest"; Fmod=9;};
-        {Type="ProtectObjTime"; Fmod=10;};
-        {Type="Oily"; Fmod=3;};
+        {Type="Eliminate"; Chance=1; Fmod=1;};
+        {Type="ProtectObjTime"; Chance=1/3; Fmod=10;};
+        {Type="Boss"; Chance=1/4; Fmod=6;};
+        {Type="Oily"; Chance=1/4; Fmod=3;};
+        {Type="SuppliesRequest"; Chance=1/9; Fmod=9;};
     };
 
     newGameController.HazardsList = {
-        {Type="Fog"; Fmod=4;};
-        {Type="Witherers"; Fmod=3;};
-        -- {Type="ToxicGas"; Fmod=6;};
+        {Type="Witherers"; Chance=1/4; Fmod=3;};
+        {Type="VexSpitter"; Chance=1/5; Fmod=3;};
+        {Type="Fog"; Chance=1/6; Fmod=4;};
     };
 
     newGameController.CorruptVision = {};
 
     newGameController.IntroMessage = "Sparks from exposed wiring sizzles the floor in Sector F";
 
-    function newGameController:OnEnemySpawn(npcClass: NpcClass)
+    function newGameController:BindWorldCoreEnemySpawn(npcClass: NpcClass)
         local npcChar = npcClass.Character;
         if npcChar.Name ~= "Zombie"
             and npcChar.Name ~= "Leaper Zombie"

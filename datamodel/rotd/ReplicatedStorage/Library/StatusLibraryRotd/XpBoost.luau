@@ -6,7 +6,7 @@ local statusPackage = {
     Name="Exp Boost";
     Description="Experience gain is doubled.";
     Buff=true;
-    PresistUntilExpire = {"Duration";};
+    PresistUntilExpire = {};
 };
 
 return modStatusClass.new(statusPackage);

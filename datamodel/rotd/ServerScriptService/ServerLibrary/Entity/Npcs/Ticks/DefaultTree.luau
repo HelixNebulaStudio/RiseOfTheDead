@@ -205,17 +205,17 @@ function treePackage.Detonate(npcClass: NpcClass)
         };
         
         newExplosionProcessPacket.OnHealthCompHit = function(healthComp: HealthComp, damage: number)
-            local characterClass: CharacterClass = healthComp.CompOwner :: CharacterClass;
-            if characterClass.Character == npcClass.Character then return true end;
+            local entityClass: EntityClass = healthComp.CompOwner :: EntityClass;
+            if entityClass.ClassName == "NpcClass" and (entityClass :: NpcClass).Character == npcClass.Character then return true end;
             if healthComp:CanTakeDamageFrom(npcClass) == false then return true end;
 
-            local dist = characterClass:DistanceFromCharacter(detonatePosition);
+            local dist = entityClass:DistanceFrom(detonatePosition);
             if dist >= 30 then return true end;
 
             local dmgMulti = (1-math.clamp(dist, 0, 30)/30);
 
-            if characterClass.ClassName == "NpcClass" then
-                local npcClass: NpcClass = characterClass :: NpcClass;
+            if entityClass.ClassName == "NpcClass" then
+                local npcClass: NpcClass = entityClass :: NpcClass;
                 
                 if npcClass.Properties.BasicEnemy then
                     damage = healthComp.MaxHealth * 0.2;
@@ -228,6 +228,7 @@ function treePackage.Detonate(npcClass: NpcClass)
                         if npcClass.Name ~= "Ticks" then return end;
 
                         task.wait(math.random(50, 250)/1000);
+                        if healthComp.IsDead then return end;
                         npcClass.BehaviorTree:RunTreeLeaf("TicksTree", "Detonate");
                     end)
 
@@ -235,8 +236,8 @@ function treePackage.Detonate(npcClass: NpcClass)
                     damage = healthComp.MaxHealth * 0.05;
                 end
                 
-            elseif characterClass.ClassName == "PlayerClass" then
-                local playerClass: PlayerClass = characterClass :: PlayerClass;
+            elseif entityClass.ClassName == "PlayerClass" then
+                local playerClass: PlayerClass = entityClass :: PlayerClass;
 
                 local conGasProtection = playerClass.Configurations.GasProtection;
                 if conGasProtection then
@@ -273,8 +274,8 @@ function treePackage.Detonate(npcClass: NpcClass)
             healthComp:TakeDamage(dmgData);
 
             task.spawn(function()
-                if characterClass.ClassName == "PlayerClass" then
-                    local player: Player = (characterClass :: PlayerClass):GetInstance();
+                if entityClass.ClassName == "PlayerClass" then
+                    local player: Player = (entityClass :: PlayerClass):GetInstance();
                     shared.modPlayers.cameraShakeAndZoom(player, 10 * math.clamp(dist/32, 0, 1), 0, 0.5, 0.01, false);
                 end
             end)

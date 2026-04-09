@@ -20,6 +20,7 @@ function interfacePackage.onRequire()
 				Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
 				Description = [[GameModeHud commands.
 				/gamemodehud test
+				/gamemodehud printinsurance
 				]];
 
 				RequiredArgs = 0;

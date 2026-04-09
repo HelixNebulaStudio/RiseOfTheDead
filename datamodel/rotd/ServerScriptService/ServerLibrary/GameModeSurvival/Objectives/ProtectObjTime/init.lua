@@ -10,7 +10,7 @@ local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructib
 
 local templatePrefab = script:WaitForChild("DestructibleGenerator");
 
-Objective.Title = "Protect Generator";
+Objective.Title = "Protect Generators";
 Objective.Description = "Protect the generators";
 
 Objective.Controller = nil;
@@ -99,8 +99,8 @@ function Objective:Begin()
 
 			shared.Notify(game.Players:GetPlayers(), "A generator has been destroyed!", "Negative");
 			
-			modAudio.Play("VechicleExplosion", self.Prefab.PrimaryPart.Position);
-			modAudio.Play("Explosion4", self.Prefab.PrimaryPart.Position);
+			modAudio.Play("VechicleExplosion", destroyPos);
+			modAudio.Play("Explosion4", destroyPos);
 
 			local ex = Instance.new("Explosion");
 			ex.BlastRadius = 16;

@@ -1080,12 +1080,12 @@ function library.onRequire()
 			{Index=1; ItemId="battery"; Level=0; Quantity=1; Chance=1;};
 			{Index=1; ItemId="wires"; Level=0; Quantity=1; Chance=1;};
 			
-			{Index=2; ItemId="toxiccontainer"; Recyclable=true; Quantity=1; Chance=0.4;};
-			{Index=2; ItemId="toxicbp"; Recyclable=true; Quantity=1; Chance=0.3;};
-			{Index=2; ItemId="brownbeltbp"; Recyclable=true; Quantity=1; Chance=0.3;};
-			{Index=2; ItemId="subskullcrackmod"; Recyclable=true; Quantity=1; Chance=0.3;};
+			{Index=2; ItemId="toxiccontainer"; Recyclable=true; Quantity=1; Chance=9/10;};
+			{Index=2; ItemId="toxicbp"; Recyclable=true; Quantity=1; Chance=8/10;};
+			{Index=2; ItemId="brownbeltbp"; Recyclable=true; Quantity=1; Chance=7/10;};
+			{Index=2; ItemId="subskullcrackmod"; Recyclable=true; Quantity=1; Chance=6/10;};
 
-			{Index=3; ItemId="ak47bp"; Recyclable=true; Quantity=1; Chance=weaponBpChance;};
+			{Index=3; ItemId="ak47bp"; Recyclable=true; Quantity=1; Chance=5/10;};
 		};
 	};
 
@@ -1095,12 +1095,12 @@ function library.onRequire()
 		Level=220;
 		Rewards={
 			{Index=1; ItemId="crowbar"; Level=0; Recyclable=true; Quantity=1; Chance=1;};
-			{Index=1; ItemId="subdmgcalibremod"; Level=30; Recyclable=true; Quantity=1; Chance=0.7;};
-			{Index=1; ItemId="militarybootsbp"; Level=50; Recyclable=true; Quantity=1; Chance=0.7;};
-			{Index=1; ItemId="gasmask"; Level=70; Recyclable=true; Quantity=1; Chance=0.7;};
-			{Index=1; ItemId="rifledmgcalibremod"; Level=90; Recyclable=true; Quantity=1; Chance=0.7;};
+			{Index=1; ItemId="subdmgcalibremod"; Level=30; Recyclable=true; Quantity=1; Chance=9/10;};
+			{Index=1; ItemId="militarybootsbp"; Level=50; Recyclable=true; Quantity=1; Chance=8/10;};
+			{Index=1; ItemId="gasmask"; Level=70; Recyclable=true; Quantity=1; Chance=7/10;};
+			{Index=1; ItemId="rifledmgcalibremod"; Level=90; Recyclable=true; Quantity=1; Chance=6/10;};
 
-			{Index=2; ItemId="czevo3bp"; Recyclable=true; Quantity=1; Chance=0.5;};
+			{Index=2; ItemId="czevo3bp"; Recyclable=true; Quantity=1; Chance=5/10;};
 		};
 	};
 	
@@ -1133,13 +1133,14 @@ function library.onRequire()
 		Level=140;
 		Rewards={
 			{Index=1; ItemId="advmedkit"; Level=0; Quantity=1; Chance=1;};
-			{Index=1; ItemId="bloxycola"; Level=0; Quantity=1; Chance=1/3;};
-			{Index=1; ItemId="disguisekit"; Level=0; Quantity=1; Chance=1/3;};
 
-			{Index=2; ItemId="matchbox"; Recyclable=true; Quantity=1; Chance=1/3;};
-			{Index=2; ItemId="molotov"; Recyclable=true; Quantity=1; Chance=0.4;};
+			{Index=1; ItemId="bloxycola"; Level=0; Quantity=1; Chance=9/10;};
+			{Index=1; ItemId="disguisekit"; Level=0; Quantity=1; Chance=8/10;};
 
-			{Index=3; ItemId="mariner590bp"; Recyclable=true; Quantity=1; Chance=weaponBpChance;};
+			{Index=2; ItemId="matchbox"; Recyclable=true; Quantity=1; Chance=7/10;};
+			{Index=2; ItemId="molotov"; Recyclable=true; Quantity=1; Chance=6/10;};
+
+			{Index=3; ItemId="mariner590bp"; Recyclable=true; Quantity=1; Chance=5/10;};
 		};
 	};
 
@@ -1150,11 +1151,11 @@ function library.onRequire()
 		Rewards={
 			{Index=1; ItemId="motor"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
 
-			{Index=2; ItemId="smgcritmultimod"; Recyclable=true; Quantity=1; Chance=1;};
-			{Index=2; ItemId="thornmod"; Recyclable=true; Quantity=1; Chance=1/3;};
-			{Index=2; ItemId="pyroeverlastmod"; Recyclable=true; Quantity=1; Chance=1/3;};
+			{Index=2; ItemId="smgcritmultimod"; Recyclable=true; Quantity=1; Chance=9/10;};
+			{Index=2; ItemId="thornmod"; Recyclable=true; Quantity=1; Chance=8/10;};
+			{Index=2; ItemId="pyroeverlastmod"; Recyclable=true; Quantity=1; Chance=7/10;};
 
-			{Index=3; ItemId="deaglebp"; Recyclable=true; Quantity=1; Chance=weaponBpChance;};
+			{Index=3; ItemId="deaglebp"; Recyclable=true; Quantity=1; Chance=6/10;};
 		};
 	};
 
@@ -1189,10 +1190,10 @@ function library.onRequire()
 			{Index=1; ItemId="cannedfish"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
 			{Index=1; ItemId="mk2grenade"; Level=0; Quantity=1; Chance=1;};
 			
-			{Index=2; ItemId="healthmod"; Level=30; Recyclable=true; Quantity=1; Chance=1;};
-			{Index=2; ItemId="vexling"; Level=50; Recyclable=true; Quantity={Min=1; Max=2}; Chance=1;};
-			{Index=2; ItemId="bluntknockoutmod"; Level=70; Recyclable=true; Quantity=1; Chance=1;};
-			{Index=2; ItemId="vexgloves"; Recyclable=true; Quantity=1; Chance=0.5;};
+			{Index=2; ItemId="healthmod"; Level=30; Recyclable=true; Quantity=1; Chance=9/10;};
+			{Index=2; ItemId="vexling"; Level=50; Recyclable=true; Quantity={Min=1; Max=2}; Chance=8/10;};
+			{Index=2; ItemId="bluntknockoutmod"; Level=70; Recyclable=true; Quantity=1; Chance=7/10;};
+			{Index=2; ItemId="vexgloves"; Recyclable=true; Quantity=1; Chance=5/10;};
 		};
 	};
 
@@ -1205,9 +1206,9 @@ function library.onRequire()
 			{Index=1; ItemId="wires"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
 			{Index=1; ItemId="sandwich"; Level=0; Quantity=1; Chance=1;};
 			
-			{Index=2; ItemId="armwraps"; Level=40; Recyclable=true; Quantity=1; Chance=1;};
-			{Index=2; ItemId="riflecritmultimod"; Level=100; Recyclable=true; Quantity=1; Chance=1;};
-			{Index=2; ItemId="sr308bp"; Level=200; Recyclable=true; Quantity=1; Chance=1;};
+			{Index=2; ItemId="armwraps"; Level=40; Recyclable=true; Quantity=1; Chance=9/10;};
+			{Index=2; ItemId="riflecritmultimod"; Level=100; Recyclable=true; Quantity=1; Chance=8/10;};
+			{Index=2; ItemId="sr308bp"; Level=200; Recyclable=true; Quantity=1; Chance=7/10;};
 			{Index=2; ItemId="hazmathood"; Recyclable=true; Quantity=1; Chance=1/100;};
 		};
 	};

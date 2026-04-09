@@ -71,8 +71,8 @@ function treePackage.HasEnemy(npcClass: NpcClass)
     elseif properties.CanForgetTargets ~= false then
         enemyTargetData = properties.EnemyTargetData;
         if enemyTargetData ~= nil then
-            local targetCharacterClass: CharacterClass = enemyTargetData.HealthComp.CompOwner;
-            if targetCharacterClass.HealthComp.IsDead then
+            local targetEntityClass: EntityClass = enemyTargetData.HealthComp.CompOwner;
+            if targetEntityClass.HealthComp.IsDead then
                 properties.LastEnemyLockOn = nil;
             end
         end
@@ -123,9 +123,9 @@ function treePackage.Attack(npcClass: NpcClass)
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
 
     local enemyHealthComp: HealthComp = enemyTargetData.HealthComp;
-    local enemyNpcClass: NpcClass = enemyHealthComp.CompOwner;
+    local enemyEntityClass: EntityClass = enemyHealthComp.CompOwner;
 
-    local targetPosition = enemyNpcClass.RootPart.Position;
+    local targetPosition = enemyEntityClass.RootPart.Position;
     local relativeCframe = npcClass.RootPart.CFrame:ToObjectSpace(CFrame.new(targetPosition));
     
     local dirAngle = math.deg(math.atan2(relativeCframe.X, -relativeCframe.Z));

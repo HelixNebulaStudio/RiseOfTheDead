@@ -54,7 +54,7 @@ end
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local level = math.max(properties.Level, 0);
     configurations.BaseValues.MaxHealth = math.clamp(1024 + 1024*(level-1), 1024, 10200);

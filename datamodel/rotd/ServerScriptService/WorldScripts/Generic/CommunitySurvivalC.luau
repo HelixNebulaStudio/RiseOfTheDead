@@ -56,16 +56,17 @@ function WorldCore.InitGameController()
     }
 
     newGameController.ObjectivesList = {
-        {Type="SurviveTime"; Fmod=1;};
-        {Type="ProtectObjTime"; Fmod=4;};
-        {Type="Boss"; Fmod=5;};
-        {Type="ExtremeBoss"; Fmod=10;};
-        {Type="SuppliesRequest"; Fmod=9;};
+        {Type="SurviveTime"; Chance=1; Fmod=1;};
+        {Type="ProtectObjTime"; Chance=1/4; Fmod=4;};
+        {Type="Boss"; Chance=1/3; Fmod=5;};
+        {Type="ExtremeBoss"; Chance=1/9; Fmod=10;};
+        {Type="SuppliesRequest"; Chance=1/9; Fmod=9;};
     };
 
     newGameController.HazardsList = {
-        {Type="Fog"; Fmod=5;};
-        {Type="Airstrikes"; Fmod=6;};
+        {Type="Fog"; Chance=1/5; Fmod=5;};
+        {Type="ShivShank"; Chance=1/4; Fmod=4;};
+        {Type="Airstrikes"; Chance=1/4; Fmod=6;};
     };
 
     newGameController.CorruptVision = {
@@ -74,7 +75,7 @@ function WorldCore.InitGameController()
 
     newGameController.IntroMessage = shared.gameConfig.IntroMessage;
 
-    function newGameController:OnEnemySpawn(npcClass: NpcClass)
+    function newGameController:BindWorldCoreEnemySpawn(npcClass: NpcClass)
         local charModel = npcClass.Character;
         
         task.spawn(function()

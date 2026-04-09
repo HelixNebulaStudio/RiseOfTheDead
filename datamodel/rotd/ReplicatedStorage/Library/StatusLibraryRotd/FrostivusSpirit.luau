@@ -10,7 +10,7 @@ local statusPackage = {
     Description = "Buff adds +$Amount bonus damage. For every kill you get, increases bonus damage by 20. You lose 20 damage every 3 seconds. (Max Stacks: 10'000 damage)";
     QuantityLabel = "Amount";
     Buff = true;
-    PresistUntilExpire = {"Duration"; "Amount"};
+    PresistUntilExpire = {"Amount"};
 };
 
 function statusPackage.init()
@@ -45,7 +45,7 @@ function statusPackage.init()
 end
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     if characterClass == nil then return end;
 
     local modifier: ItemModifierInstance = characterClass.Configurations:GetModifier(statusPackage.Id);

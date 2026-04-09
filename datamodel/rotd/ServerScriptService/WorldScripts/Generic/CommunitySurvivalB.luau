@@ -55,16 +55,18 @@ function WorldCore.InitGameController()
     }
 
     newGameController.ObjectivesList = {
-        {Type="SurviveTime"; Fmod=1;};
-        {Type="ProtectObjTime"; Fmod=4;};	
-        {Type="Boss"; Fmod=6;};
-        {Type="SuppliesRequest"; Fmod=9;};
-        {Type="ExtremeBoss"; Fmod=10;};
+        {Type="SurviveTime"; Chance=1; Fmod=1;};
+        {Type="ProtectObjTime"; Chance=1/3; Fmod=4;};	
+        {Type="Boss"; Chance=1/3; Fmod=6;};
+        {Type="SuppliesRequest"; Chance=1/8; Fmod=9;};
+        {Type="ExtremeBoss"; Chance=1/16; Fmod=10;};
     };
 
     newGameController.HazardsList = {
-        {Type="Fog"; Fmod=8;};
-        {Type="Witherers"; Fmod=6;};
+        {Type="Fog"; Chance=1/5; Fmod=8;};
+        {Type="VexSpitter"; Chance=1/5; Fmod=3;};
+        {Type="Witherers"; Chance=1/4; Fmod=6;};
+        {Type="HordeRush"; Chance=1/3; Fmod=4;};
     };
 
     newGameController.CorruptVision = {
@@ -73,7 +75,7 @@ function WorldCore.InitGameController()
 
     newGameController.IntroMessage = shared.gameConfig.IntroMessage;
 
-    function newGameController:OnEnemySpawn(npcClass: NpcClass)
+    function newGameController:BindWorldCoreEnemySpawn(npcClass: NpcClass)
         local charModel = npcClass.Character;
         if charModel.Name ~= "Zombie"
             and charModel.Name ~= "Leaper Zombie"

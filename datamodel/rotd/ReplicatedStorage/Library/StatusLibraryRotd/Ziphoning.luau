@@ -15,7 +15,7 @@ local statusPackage = {
     QuantityLabel="Pool";
     Buff=true;
     Cleansable=true;
-    PresistUntilExpire={"Duration";};
+    PresistUntilExpire={};
 };
 
 function statusPackage.init()

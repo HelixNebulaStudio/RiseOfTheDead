@@ -40,19 +40,21 @@ function WorldCore.InitGameController()
     }
 
     newGameController.ObjectivesList = {
-        {Type="Eliminate"; Fmod=1;};
-        {Type="Boss"; Fmod=6;};
-        {Type="SuppliesRequest"; Fmod=9;};
-        {Type="ProtectObjTime"; Fmod=10;};
+        {Type="Eliminate"; Chance=1; Fmod=1;};
+        {Type="Boss"; Chance=1/4; Fmod=6;};
+        {Type="SuppliesRequest"; Chance=1/9; Fmod=9;};
+        {Type="ProtectObjTime"; Chance=1/5; Fmod=10;};
     };
 
     newGameController.HazardsList = {
-        {Type="Fog"; Fmod=4;};
+        {Type="PotArmor"; Chance=1/2; Fmod=4;};
+        {Type="VexSpitter"; Chance=1/5; Fmod=3;};
+        {Type="Fog"; Chance=1/3; Fmod=4;};
     };
 
     newGameController.IntroMessage = "A low pitched humming vibrates the water in the Swamplands";
 
-    function newGameController:OnEnemySpawn(npcClass: NpcClass)
+    function newGameController:BindWorldCoreEnemySpawn(npcClass: NpcClass)
         local npcChar = npcClass.Character;
     end
 

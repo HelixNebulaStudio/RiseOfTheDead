@@ -6,7 +6,7 @@ local statusPackage = {
     Name="Crit Boost";
     Description="Boost crit chance by +$Amount%";
     Buff=true;
-    PresistUntilExpire={"Duration";};
+    PresistUntilExpire={"Amount";};
 };
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)

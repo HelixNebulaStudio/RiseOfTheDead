@@ -33,8 +33,8 @@ function WorldCore.InitGameController()
     newGameController.BossConfig = {
         List={
             {Name="The Prisoner"; Chance=100;};
-            {Name="Zpider"; Chance=100;};
-            {Name="Shadow"; Chance=100;};
+            {Name="Tanker"; Chance=100;};
+            {Name="Corrosive"; Chance=100;};
             {Name="Zomborg"; Chance=100;};
         };
     };
@@ -44,15 +44,18 @@ function WorldCore.InitGameController()
     }
 
     newGameController.ObjectivesList = {
-        {Type="Eliminate"; Fmod=1;};
-        {Type="Oily"; Fmod=2;};	
-        {Type="ProtectObjTime"; Fmod=4;};	
-        {Type="Boss"; Fmod=6;};
-        {Type="SuppliesRequest"; Fmod=9;};
+        {Type="Eliminate"; Chance=1; Fmod=1;};
+        {Type="Oily"; Chance=1/3; Fmod=2;};	
+        {Type="ProtectObjTime"; Chance=1/5; Fmod=4;};	
+        {Type="Boss"; Chance=1/6; Fmod=6;};
+        {Type="SuppliesRequest"; Chance=1/9; Fmod=9;};
     };
 
     newGameController.HazardsList = {
-	    {Type="Fog"; Fmod=4;};
+        {Type="HordeRush"; Chance=1/3; Fmod=4;};
+        {Type="ShivShank"; Chance=1/4; Fmod=4;};
+        {Type="VexSpitter"; Chance=1/5; Fmod=4;};
+	    {Type="Fog"; Chance=1/4; Fmod=4;};
     };
 
     newGameController.CorruptVision = {
@@ -61,7 +64,7 @@ function WorldCore.InitGameController()
 
     newGameController.IntroMessage = "Cell bars clinks in the Wrighton Dale Prison";
 
-    function newGameController:OnEnemySpawn(npcClass: NpcClass)
+    function newGameController:BindWorldCoreEnemySpawn(npcClass: NpcClass)
         local npcChar = npcClass.Character;
         if npcChar.Name ~= "Zombie"
             and npcChar.Name ~= "Leaper Zombie"

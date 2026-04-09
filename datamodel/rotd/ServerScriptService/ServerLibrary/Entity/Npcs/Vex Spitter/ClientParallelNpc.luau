@@ -11,16 +11,22 @@ local clientNpc = {};
 function clientNpc.init(localNpc)
     local character: Actor = localNpc.Character;
 	local humanoid: Humanoid = localNpc.Humanoid;
-	local rootPart = localNpc.RootPart;
+	local rootPart: BasePart = localNpc.RootPart;
 
 	local head: BasePart = character:WaitForChild("Head") :: BasePart;
-	local headMotor: Motor6D = rootPart:WaitForChild("Head");
+	local headMotor: Motor6D = rootPart:WaitForChild("Head") :: Motor6D;
 	local targetPartObj: ObjectValue = character:WaitForChild("TargetPart") :: ObjectValue;
 
 	local defaultC0 = headMotor:GetAttribute("DefaultC0") or headMotor.C0;
 	
 	local lagTick = tick();
-	RunService.Heartbeat:ConnectParallel(function()
+	local hbConn;
+	hbConn = RunService.Heartbeat:ConnectParallel(function()
+		if targetPartObj.Parent == nil then
+			rootPart:ClearAllChildren();
+			hbConn:Disconnect();
+			return;
+		end
 		local targetPart = targetPartObj.Value;
 		if targetPart == nil then
 			return;

@@ -13,7 +13,7 @@ local statusPackage = {
     Description="For every kill, you heal by +$Amount health.";
     Buff=true;
     Cleansable=true;
-    PresistUntilExpire = {"Duration"; "Amount"};
+    PresistUntilExpire = {"Amount"};
 };
 
 function statusPackage.init()

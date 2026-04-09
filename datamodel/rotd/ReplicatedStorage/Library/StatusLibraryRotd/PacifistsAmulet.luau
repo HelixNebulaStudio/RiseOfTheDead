@@ -2,7 +2,6 @@ local RunService = game:GetService("RunService");
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
-local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 --==
 local statusPackage = {
     Id = "PacifistsAmulet";
@@ -18,8 +17,8 @@ if RunService:IsServer() then
         if RunService:IsClient() then return end;
         if tickData.ms100 ~= true then return end;
 
-        local characterClass: CharacterClass = statusClass.StatusOwner;
-        if characterClass == nil then return end;
+        local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
+        if characterClass == nil or characterClass.ClassName ~= "PlayerClass" then return end;
 
         local configurations = characterClass.Configurations;
 
@@ -39,8 +38,8 @@ if RunService:IsServer() then
             return;
         end
 
-        local maxAddAp = modifierInstance.Values.AddAp;
-        local addAr = modifierInstance.Values.AddAr;
+        local maxAddAp = modifierInstance.Properties.AddAp;
+        local addAr = modifierInstance.Properties.AddAr;
 
         statusClass.Values.MaxArmorOverCharge = (statusClass.Values.MaxArmorOverCharge or 0);
 

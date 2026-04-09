@@ -163,8 +163,8 @@ function treePackage.Attack(npcClass: NpcClass)
     local targetHealthComp: HealthComp = targetData.HealthComp;
     local targetEntityClass: EntityClass = targetHealthComp.CompOwner;
 
-    if targetEntityClass.Model and targetEntityClass.ClassName == "PlayerClass" then
-        local targetPosition = targetEntityClass.Model:GetPivot().Position;
+    local targetPosition = targetEntityClass:GetCFrame().Position;
+    if targetEntityClass.ClassName == "PlayerClass" then
         local relativeCframe = npcClass.RootPart.CFrame:ToObjectSpace(CFrame.new(targetPosition));
         
         local dirAngle = math.deg(math.atan2(relativeCframe.X, -relativeCframe.Z));
@@ -177,7 +177,11 @@ function treePackage.Attack(npcClass: NpcClass)
     properties.AttackCooldown = tick() + (configurations.AttackSpeed * math.random(90, 110)/100);
     
     local attackComp = npcClass:GetComponent("ZombieBasicMeleeAttack");
-    if attackComp then
+    if npcClass.WieldComp.EquipmentClass and npcClass.WieldComp.EquipmentClass.Class == "Melee" then
+        npcClass.Move:LookAt(targetPosition);
+        npcClass.WieldComp:InvokeToolAction("PrimarySwingRequest");
+
+    elseif attackComp then
         attackComp(targetData.TargetPart);
     end
     

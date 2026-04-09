@@ -54,18 +54,20 @@ function WorldCore.InitGameController()
     }
 
     newGameController.ObjectivesList = {
-        {Type="SurviveTime"; Fmod=1;};
-        {Type="ProtectObjTime"; Fmod=4;};
-        {Type="Boss"; Fmod=5;};
-        {Type="ExtremeBoss"; Fmod=10;};
-        {Type="SuppliesRequest"; Fmod=9;};
+        {Type="SurviveTime"; Chance=1; Fmod=1;};
+        {Type="TicksGalore"; Chance=1/4; Fmod=4;};
+        {Type="ProtectObjTime"; Chance=1/4; Fmod=4;};
+        {Type="Boss"; Chance=1/8; Fmod=5;};
+        {Type="ExtremeBoss"; Chance=1/16; Fmod=10;};
+        {Type="SuppliesRequest"; Chance=1/9; Fmod=9;};
     };
 
     newGameController.HazardsList = {
-        {Type="HighSeas"; Fmod=4;};
-        {Type="HeavyRain"; Fmod=5;};
-        {Type="Airstrikes"; Fmod=6;};
-        {Type="TicksGalore"; Fmod=9;};
+        {Type="HighSeas"; Chance=1/6; Fmod=4;};
+        {Type="HeavyRain"; Chance=1/3; Fmod=5;};
+        {Type="PotArmor"; Chance=1/2; Fmod=4;};
+        {Type="Airstrikes"; Chance=1/4; Fmod=6;};
+        {Type="HordeRush"; Chance=1/3; Fmod=4;};
     };
 
     newGameController.CorruptVision = {
@@ -74,7 +76,7 @@ function WorldCore.InitGameController()
 
     newGameController.IntroMessage = shared.gameConfig.IntroMessage;
 
-    function newGameController:OnEnemySpawn(npcClass: NpcClass)
+    function newGameController:BindWorldCoreEnemySpawn(npcClass: NpcClass)
         local charModel = npcClass.Character;
         if charModel.Name ~= "Zombie"
             and charModel.Name ~= "Leaper Zombie"
