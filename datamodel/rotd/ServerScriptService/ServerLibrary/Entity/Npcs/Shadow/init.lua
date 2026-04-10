@@ -40,7 +40,7 @@ local npcPackage = {
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local level = math.max(properties.Level, 0);
 
@@ -115,6 +115,13 @@ function npcPackage.Spawned(npcClass: NpcClass)
     npcClass.HealthComp.OnIsDeadChanged:Connect(function()
         for a=1, #mistTable do
             mistTable[a].Part:Destroy();
+        end
+        for _, obj in pairs(npcClass.Character:GetChildren()) do
+            if not obj:IsA("BasePart") or obj.Name == "HumanoidRootPart" then continue end;
+
+            obj:ClearAllChildren();
+            obj.CanCollide = true;
+            obj.Transparency = 0.8;
         end
     end)
 

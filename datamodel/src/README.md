@@ -2,6 +2,7 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes to code in Engine codebase:
+- Fixed guns not auto reloading. [#1112]
 - Improved Melee input responsiveness. Throwable melees no longer can primary attack if holding down focus. [#1118] [#1139]
 - Fixed tools input handling.
 - Fixed set vanity option not opening Wardrobe properly.

@@ -22,7 +22,7 @@ end
 function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
 
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     if characterClass.ClassName ~= "PlayerClass" then return end;
 
     local playerClass: PlayerClass = characterClass :: PlayerClass;
@@ -89,7 +89,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     end
 
     if tickData.ms1000 ~= true then return end;
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     if characterClass.ClassName ~= "PlayerClass" then return end;
 
     local healthComp: HealthComp = characterClass.HealthComp;

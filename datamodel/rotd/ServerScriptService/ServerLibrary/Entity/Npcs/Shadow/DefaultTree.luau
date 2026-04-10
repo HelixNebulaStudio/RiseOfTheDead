@@ -25,8 +25,13 @@ end
 --MARK: BlinkTree
 function treePackage.CanBlink(npcClass: NpcClass)
     local properties = npcClass.Properties;
-    if properties.LastBlink and tick()-properties.LastBlink <= 5 then return false; end;
     if properties.IsStrangling then return false; end;
+    if properties.LastBlink and tick()-properties.LastBlink <= 4 then return false; end;
+
+    local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
+    local enemyCharacterClass: CharacterClass = enemyTargetData.HealthComp.CompOwner :: CharacterClass;
+    if enemyCharacterClass:DistanceFrom(npcClass:GetCFrame().Position) >= 24 then return true; end;
+
     return true;
 end
 
@@ -35,6 +40,9 @@ function treePackage.Blink(npcClass: NpcClass)
 
     local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
 
+    local bc = npcClass.Character:GetAttribute("BlinkCount") or 0;
+    npcClass.Character:SetAttribute("BlinkCount", bc +1);
+    
     local blinkComp = npcClass:GetComponent("BlinkTeleport");
     blinkComp(enemyTargetData.Model);
 end
@@ -43,23 +51,34 @@ end
 --MARK: StrangleTree
 function treePackage.CanStrangle(npcClass: NpcClass)
     local properties = npcClass.Properties;
-    if properties.LastStrangle and tick()-properties.LastStrangle <= 10 then return false; end;
+
+    local lastTargetStrangleTick = properties.LastStrangle;
+    if lastTargetStrangleTick and tick() <= lastTargetStrangleTick then 
+        return false;
+    end;
+
+    local enemyTargetData: NpcTargetData = properties.EnemyTargetData;
+    local enemyCharacterClass: CharacterClass = enemyTargetData.HealthComp.CompOwner :: CharacterClass;
+    local enemyStatusComp: StatusComp = enemyCharacterClass.StatusComp;
+
+    if enemyStatusComp:GetOrDefault("ShadowStrangle") then return false; end;
+
     return true;
 end
 
 function treePackage.Strangle(npcClass: NpcClass)
     local properties = npcClass.Properties;
     if properties.IsStrangling then return; end;
-
-    properties.LastStrangle = tick();
     properties.IsStrangling = true;
-
-    local enemyTargetData: NpcTargetData = properties.EnemyTargetData;
-    local enemyCharacterClass: CharacterClass = enemyTargetData.HealthComp.CompOwner;
-    local enemyStatusComp: StatusComp = enemyCharacterClass.StatusComp;
 
     local isHard = properties.HardMode;
     local strangleDuration = isHard and 30 or 10;
+    strangleDuration = math.random(strangleDuration-2, strangleDuration+2);
+    properties.LastStrangle = tick() + strangleDuration + 4;
+
+    local enemyTargetData: NpcTargetData = properties.EnemyTargetData;
+    local enemyCharacterClass: CharacterClass = enemyTargetData.HealthComp.CompOwner :: CharacterClass;
+    local enemyStatusComp: StatusComp = enemyCharacterClass.StatusComp;
 
     npcClass.PlayAnimation("Strangle");
 
