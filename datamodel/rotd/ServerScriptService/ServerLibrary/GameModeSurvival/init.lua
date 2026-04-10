@@ -1142,7 +1142,7 @@ function Survival:StartWave(wave)
 				task.wait(1);
 				self.WaveSelectPacket.TimeLeft = a;
 				self:Hud{
-					HeaderText = `Choose your waves!`;
+					HeaderText =`Choose your {self.IsHard and "rewards" or "waves"}!`;
 					Status = `Lock in {a}s..`;
 					WaveObjective = "";
 					ObjectiveDesc = "";

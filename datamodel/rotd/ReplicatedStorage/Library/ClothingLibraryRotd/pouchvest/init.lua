@@ -4,7 +4,7 @@ local attirePackage = {
 	ItemId = script.Name;
 	Class = "Clothing";
 	
-	GroupName = "MiscGroup";
+	GroupName = "ChestGroup";
 	
 	Configurations = {
 		ArmorPoints = 10;

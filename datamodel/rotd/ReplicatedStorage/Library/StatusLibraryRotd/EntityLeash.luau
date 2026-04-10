@@ -31,7 +31,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
     local characterModel = characterClass.Character;
     for _, obj in ipairs(characterModel:GetChildren()) do
         if not obj:IsA("BasePart") then continue end;
-        obj.CollisionGroup = "Character";
+        obj.CollisionGroup = "PlayersPhase";
     end
     statusClass.Garbage:Tag(function()
         for _, obj in ipairs(characterModel:GetChildren()) do

@@ -2,6 +2,8 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes to code in Engine codebase:
+- Improved Melee input responsiveness. Throwable melees no longer can primary attack if holding down focus. [#1118] [#1139]
+- Fixed tools input handling.
 - Fixed set vanity option not opening Wardrobe properly.
 - Fixed favorite item not syncing to client. [#990]
 - Fixed `snowsledge` not activating on slide. [#994]

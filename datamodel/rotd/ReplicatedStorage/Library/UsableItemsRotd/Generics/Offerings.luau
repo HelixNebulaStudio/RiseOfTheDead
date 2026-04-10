@@ -53,6 +53,32 @@ if RunService:IsServer() then
 
 	UsablePreset.RollRandom = nil;
 
+	--MARK: offeringssync
+	modShopSystem.RegisterActionHandler("offeringssync", function(player, ...)
+        local siid = ...;
+        local rPacket = {};
+
+        local storageItem: StorageItem?, storage: Storage? = shared.modStorage.FindIdFromStorages(siid, player);
+        if storage == nil then 
+            Debugger:Warn("OfferingsItemReq>> Missing storage");
+            rPacket.Fail = REQUEST_STATUS.MissingStorage;
+            return rPacket;
+        end;
+
+        if storageItem == nil then 
+            Debugger:Warn("OfferingsItemReq>> Missing storageItem");
+            rPacket.Fail = REQUEST_STATUS.MissingStorageItem;
+            return rPacket;
+        end;
+
+		storageItem:Sync();
+
+		rPacket.Values = storageItem.Values;
+		rPacket.Success = true;
+		
+		return rPacket;
+	end)
+
     --MARK: offeringsitemreq
     modShopSystem.RegisterActionHandler("offeringsitemreq", function(player, ...)
         local siid = ...;

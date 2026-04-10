@@ -11,14 +11,14 @@ local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 local WITHERING_SCREEN_EFFECT;
 --==
 local statusPackage = {
-	Id="Withering";
-	Icon="rbxassetid://15948741680";
-	Name="Withering";
-	Description="Withering because a Wither is nearby. Looking at them will start Withering and slowly drains armor over time.";
-	Buff=false;
+	Id = "Withering";
+	Icon = "rbxassetid://15948741680";
+	Name = "Withering";
+	Description = "Withering because a Wither is nearby. Looking at them will start Withering and slowly drains armor over time.";
+	Buff = false;
 	Tags = {"DOT";};
-	Cleansable=true;
-	ExpiresOnDeath=true;
+	Cleansable = true;
+	ExpiresOnDeath = true;
 };
 
 function statusPackage.onRequire()
@@ -28,9 +28,6 @@ end
 function statusPackage.BindApply(statusClass: StatusClassInstance)
 	if RunService:IsServer() then return end;
 	
-	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-	local modCharacter = modData:GetModCharacter();
-
 	local screenGui = modClientGuis.ActiveInterface.CameraScreenGui;
 	if screenGui:FindFirstChild(WITHERING_SCREEN_EFFECT.Name) == nil then
 		local new = WITHERING_SCREEN_EFFECT:Clone();
@@ -50,8 +47,8 @@ function statusPackage.BindExpire(statusClass: StatusClassInstance)
 end
 
 function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
-	local characterClass: CharacterClass = statusClass.StatusOwner;
-	if characterClass == nil then return end;
+	local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
+	if characterClass == nil or characterClass.ClassName ~= "PlayerClass" then return end;
 
 	if RunService:IsServer() then
 		if tickData.ms500 ~= true then return end;
@@ -74,7 +71,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
 
 		local screenGui = modClientGuis.ActiveInterface.CameraScreenGui;
 		local screenEffect = screenGui:FindFirstChild(WITHERING_SCREEN_EFFECT.Name);
-		if screenEffect == nil then
+		if screenEffect ~= nil then
 			local witherers = CollectionService:GetTagged("Witherer");
 
 			local minRad = math.pi;
@@ -119,10 +116,10 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
 			end
 
 			local ang = math.clamp(minRad/math.pi, 0, 1);
-			local isInWision = ang < 0.35;
+			local isInVision = ang < 0.35;
 
 			local alpha = screenEffect:GetAttribute("Alpha") or 0;
-			if isInWision then
+			if isInVision then
 				alpha = alpha + (1/4*tickData.Delta);
 
 			else
@@ -138,10 +135,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
 			alpha = math.clamp(alpha, 0, 2);
 			screenEffect:SetAttribute("Alpha", alpha);
 
-			statusClass.Values.Alpha = math.clamp(alpha, 0, 1);
-
 			if tickData.ms500 ~= true then return end;
-
 			alpha = screenEffect:GetAttribute("Alpha");
 
 			statusClass:Relay(alpha);
@@ -150,17 +144,15 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
 end
 
 function statusPackage.BindRelay(statusClass: StatusClassInstance, ...)
-	local characterClass: CharacterClass = statusClass.StatusOwner;
-	if characterClass == nil then return end;
+	local playerClass: PlayerClass = statusClass.StatusOwner :: PlayerClass;
+	if playerClass == nil or playerClass.ClassName ~= "PlayerClass" then return end;
 
 	local alpha = ...;
 
 	if alpha >= 1 then
-		local maxArmor = characterClass.Properties.MaxArmor;
+		local maxArmor = playerClass.HealthComp.MaxArmor;
 		statusClass.Values.Amount = math.round(maxArmor * 0.0333 * 100)/100;
 	end
-
-	statusClass.Values.Alpha = math.clamp(alpha, 0, 1);
 end
 
 return modStatusClass.new(statusPackage);

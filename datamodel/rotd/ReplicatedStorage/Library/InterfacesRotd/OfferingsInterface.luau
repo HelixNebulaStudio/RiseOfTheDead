@@ -56,7 +56,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local acceptButtonObj = modComponents.CreateHoldDownButton(interface, {
        Name = "AcceptButton";
-       Text = "Accept Offer";
+       Text = "Purchase Offer";
        Color = Color3.fromRGB(50, 100, 50);
     });
     local acceptButtonObjButton = acceptButtonObj.Button;
@@ -253,7 +253,19 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 TextTransparency = 0;
             }):Play();
 
-
+            task.spawn(function()
+                local refreshTick = tick();
+                local refreshCount = 1;
+                while binds.CurPriceLabel and binds.CurPriceLabel.Label.Text == `?` do
+                    task.wait(1);
+                    if refreshCount >= 5 then break; end;
+                    if tick()-refreshTick > (refreshCount^2) then
+                        refreshCount += 1;
+                        binds.RemoteInvoke("offeringssync", storageItem, storageItem.ID);
+                    end
+                end
+                Debugger:StudioLog(`EndRefresh loop`);
+            end)
         end)
         tween:Play();
         modAudio.Play("GrandOpen", windowFrame);
@@ -288,7 +300,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         acceptButtonObj.OnHoldDownConfirm = function()
             if storageItem.Values.R == nil or storageItem.Values.R.Price == nil then return end;
-            if binds.CurPriceLabel == nil or binds.CurPriceLabel.Label.Text == `?` then return end;
+            if binds.CurPriceLabel == nil or binds.CurPriceLabel.Label.Text == `?` then
+                binds.RemoteInvoke("offeringssync", storageItem, storageItem.ID);
+                return;
+            end;
             Debugger:Warn(`Accept offer`);
             clearItemOffer();
             denyButtonObjButton.Visible = false;
@@ -365,6 +380,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             modItemInterface.HookValueSync(storageItem.ID, "offeringPriceUpdate", function(storageItem, funcKey)
                 if interface.IsDestroyed then return end;
                 if binds.CurPriceLabel == nil or binds.CurPriceLabel.Siid ~= storageItem.ID then return end;
+                if storageItem.Values.R == nil or storageItem.Values.R.Price == nil then return end;
                 binds.CurPriceLabel.Label.Text = interface.beautifyNumber(storageItem.Values.R.Price);
             end)
             binds.LastHookSyncId = storageItem.ID;

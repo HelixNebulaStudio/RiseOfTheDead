@@ -4,6 +4,7 @@ local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.Equipmen
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modExplosionHandler = shared.require(game.ReplicatedStorage.Library.ExplosionHandler);
 --==
 
 local toolPackage = {
@@ -34,57 +35,75 @@ local toolPackage = {
 function toolPackage.BuildStructure(prefab: Model, optionalPacket)
 	optionalPacket = optionalPacket or {};
 
-    local player = nil;
+    local characterClass: CharacterClass;
     if optionalPacket.CharacterClass and optionalPacket.CharacterClass.ClassName == "PlayerClass" then
-        player = optionalPacket.CharacterClass:GetInstance();
+        characterClass = optionalPacket.CharacterClass;
     end;
 
     local base = prefab.PrimaryPart;
     
-    local textLabel = prefab:WaitForChild("Screen"):WaitForChild("SurfaceGui"):WaitForChild("timer");
+    local ledScreenSurfacecGui = prefab:WaitForChild("Screen"):WaitForChild("SurfaceGui");
+    local timerLabel = ledScreenSurfacecGui:WaitForChild("timer");
     
-    local startTime = modSyncTime.GetTime() + toolPackage.Configurations.Duration;
-    local clock;
-    clock = modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
-        textLabel.Text = math.clamp(math.floor(startTime-modSyncTime.GetTime()), 0, toolPackage.Configurations.Duration);
-        modAudio.Play("ClockTick", base);
-        
-        if modSyncTime.GetTime() <= startTime then return end;
-        
-        local lastPosition = base.Position;
-        
-        modAudio.Play("ClockTick", base);
-        modAudio.Play(math.random(1, 2) == 1 and "Explosion" or "Explosion2", base);
-        
-        local ex = Instance.new("Explosion");
-        ex.DestroyJointRadiusPercent = 0;
-        ex.BlastRadius = toolPackage.Configurations.Distance;
-        ex.BlastPressure = 0;
-        ex.Position = lastPosition;
-        ex.Parent = workspace;
-        
-        for _, obj in pairs(prefab:GetChildren()) do if obj ~= base then obj:Destroy() end; end
-        clock:Disconnect();
-        Debugger.Expire(prefab, 6);
-        
-        local modExplosionHandler = shared.require(game.ReplicatedStorage.Library.ExplosionHandler);
-        local hitLayers = modExplosionHandler:Cast(lastPosition, {
-            Radius = toolPackage.Configurations.Distance;
-        });
-        
-        modExplosionHandler:Process(lastPosition, hitLayers, {
-            Owner = player;
+    local duration = toolPackage.Configurations.Duration;
+    local explodeTime = workspace:GetServerTimeNow() + duration;
 
-            DamageRatio = 0.24;
-            MinDamage = 120;
-            MaxDamage = 100000;
-            ExplosionStun = 10;
-            TargetableEntities = modConfigurations.TargetableEntities;
+    task.spawn(function() 
+        ledScreenSurfacecGui.Enabled = true;
+        for t=duration, 0, -1 do
+            task.wait(1);
+            if not workspace:IsAncestorOf(prefab) then return end;
 
-            DamageOrigin = lastPosition;
-            OnPartHit = modExplosionHandler.GenericOnPartHit;
-        });
+            timerLabel.Text = math.clamp(
+                math.floor(explodeTime-workspace:GetServerTimeNow()), 
+                0, 
+                duration
+            );
+
+            modAudio.Play("ClockTick", base);
+            
+            if workspace:GetServerTimeNow() <= explodeTime then continue end;
+            local lastPosition = base.Position;
+            
+            modAudio.Play("ClockTick", base);
+            modAudio.Play(math.random(1, 2) == 1 and "Explosion" or "Explosion2", base);
+            
+            base:ClearAllChildren();
+            prefab.Parent = workspace.Debris;
+            Debugger.Expire(prefab, 6);
+
+            for _, part in pairs(prefab:GetChildren()) do
+                if not part:IsA("BasePart") or part == base then continue end;
+                part.CanCollide = true;
+
+                local rngVec = Vector3.new(
+                    math.random(-100, 100)/100, 
+                    math.random(0, 50)/100, 
+                    math.random(-100, 100)/100
+                ).Unit;
+                local dir = (part.Position-(lastPosition + rngVec)).Unit
+                part:ApplyImpulse(dir * part.AssemblyMass * 150);
+            end
+            
+            local hitLayers = modExplosionHandler:Cast(lastPosition, {
+                Radius = toolPackage.Configurations.Distance;
+            });
+            
+            modExplosionHandler:Process(lastPosition, hitLayers, {
+                ExplosionBy = characterClass;
+
+                DamageRatio = 0.24;
+                MinDamage = 120;
+                MaxDamage = 100000;
+                ExplosionStun = 10;
+                TargetableEntities = modConfigurations.TargetableEntities;
+
+                DamageOrigin = lastPosition;
+                OnPartHit = modExplosionHandler.GenericOnPartHit;
+            });
+        end
     end)
+
 end;
 
 function toolPackage.newClass()

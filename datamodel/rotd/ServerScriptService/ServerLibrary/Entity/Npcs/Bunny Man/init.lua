@@ -30,4 +30,20 @@ local npcPackage = {
 function npcPackage.Spawning(npcClass: NpcClass)
 end
 
+function npcPackage.Spawned(npcClass: NpcClass)
+    local npcChar = npcClass.Character;
+
+    task.spawn(function()
+        local modItemUnlockablesLibrary = shared.require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
+        local apronAccessories = {
+            npcChar:WaitForChild("UT");
+            npcChar:WaitForChild("LT");
+            npcChar:WaitForChild("LT2");
+        };
+        for _, accessory in ipairs(apronAccessories) do
+            modItemUnlockablesLibrary.UpdateSkin(accessory, "aproncarnage");
+        end
+    end)
+end
+
 return npcPackage;

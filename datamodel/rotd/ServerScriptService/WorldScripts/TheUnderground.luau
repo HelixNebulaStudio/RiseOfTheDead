@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 
 local GIFT_SPAWNCF = CFrame.new(-59.9, 36.3, 286.4, 0, 0, -1, 0, 1, 0, 1, 0, 0);
 
@@ -72,6 +73,25 @@ function WorldCore.onRequire()
 
         end
     end)
+
+    
+	shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
+		local npcClass: NpcClass = ...;
+		if npcClass == nil or npcClass.Name ~= "Zombie" then return end;
+        local rawProperties: anydict = npcClass.Properties.Values;
+		local deathPosition = rawProperties.DeathPosition;
+        if deathPosition == nil then return end;
+	
+        if math.random(1, 10) ~= 1 then return end;
+
+        shared.modNpcs.spawn2{
+            Name = "Witherer";
+            CFrame = CFrame.new(deathPosition);
+            BindSetup = function(npcClass: NpcClass)
+                npcClass.Properties.Level = rawProperties.Level or 1;
+            end
+        }
+	end)
 
 end
 
