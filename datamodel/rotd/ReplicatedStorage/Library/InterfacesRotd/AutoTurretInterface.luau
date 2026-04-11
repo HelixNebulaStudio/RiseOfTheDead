@@ -122,13 +122,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end
 	
-	local function updateStorageValues(storageValues)
-		if storageValues == nil then return end;
+	local function updateStorageProperties(properties)
+		if properties == nil then return end;
 		
 		local patStorage = modData.GetStorage(storageId);
 		if patStorage == nil then return end
 		
-		for k, v in pairs(storageValues) do
+		for k, v in pairs(properties) do
 			patStorage.Properties[k] = v;
 		end
 	end
@@ -137,13 +137,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local patStorage = modData.GetStorage(storageId);
 		if patStorage == nil then return end;
 		
-		local patStorageValues = patStorage.Properties;
+		local patProperties = patStorage.Properties;
 
-		local isOnline = patStorageValues.Online == true;
+		local isOnline = patProperties.Online == true;
 		activateButton.Text = isOnline and "Online" or "Offline";
 		activateButton.BackgroundColor3 = isOnline and Color3.fromRGB(50, 100, 50) or Color3.fromRGB(100, 50, 50);
 		
-		local configValues = patStorageValues.Config or {};
+		local configValues = patProperties.Config or {};
 		
 		for _, obj in pairs(configScrollFrame:GetChildren()) do
 			if obj:IsA("GuiObject") then
@@ -181,7 +181,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						Text=opText; 
 						LayoutOrder=a;
 						OnNewButton=function(optionInfo, newButton)
-							configValues = patStorageValues.Config or {};
+							configValues = patProperties.Config or {};
 							configIndex = configValues[configKey] or 1;
 							
 							newButton.Size = UDim2.new(1, 0, 0, 30);
@@ -211,8 +211,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					interface:PlayButtonClick();
 
 					local returnPacket = remoteAutoTurret:InvokeServer("config", {
-						ConfigKey=configKey;
-						OptionIndex=opIndex;
+						Siid = storageItem.ID;
+						ConfigKey = configKey;
+						OptionIndex = opIndex;
 					});
 					
 					if returnPacket and returnPacket.Success then
@@ -220,7 +221,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						
 						local opText = configInfo.Options[opIndex];
 						button.Text = opText;
-						updateStorageValues(returnPacket.StorageValues);
+						updateStorageProperties(returnPacket.StorageProperties);
 					end
 					
 					clearOptions();
@@ -258,6 +259,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						debounce = tick();
 						
 						local returnPacket = remoteAutoTurret:InvokeServer("config:UseHitlist", {
+							Siid = storageItem.ID;
 							HitlistTag = tag;
 							FlagValue = not flagVal;
 						});
@@ -265,7 +267,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							flagVal = returnPacket.FlagValue;
 							configHitlistBitString = configHitlistBitFlags:Set(configHitlistBitString, tag, flagVal);
 											
-							updateStorageValues(returnPacket.StorageValues);
+							updateStorageProperties(returnPacket.StorageProperties);
 						end
 						
 						flagVal = configHitlistBitFlags:Test(tag, configHitlistBitString);
@@ -284,10 +286,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		newResetButton.MouseButton1Click:Connect(function()
 			if tick()-debounce <= 1 then return end;
 			debounce = tick();
-			local returnPacket = remoteAutoTurret:InvokeServer("resetconfig");
+			local returnPacket = remoteAutoTurret:InvokeServer("resetconfig", {
+				Siid = storageItem.ID;
+			});
 
 			if returnPacket and returnPacket.Success then
-				updateStorageValues(returnPacket.StorageValues);
+				updateStorageProperties(returnPacket.StorageProperties);
 				binds.Refresh();
 			end
 
@@ -305,7 +309,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local returnPacket = remoteAutoTurret:InvokeServer("toggleonline");
 		
 		if returnPacket and returnPacket.Success then
-			updateStorageValues(returnPacket.StorageValues);
+			updateStorageProperties(returnPacket.StorageProperties);
 			binds.Refresh();
 		end
 		

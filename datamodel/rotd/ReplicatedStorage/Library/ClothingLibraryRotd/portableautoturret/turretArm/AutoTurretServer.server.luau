@@ -67,7 +67,7 @@ local activeWeaponModel: Model? = nil;
 local drainCost = 100;
 local drainRate = (60*60)/3
 
-local delta = 1/30;
+local delta = 1/1000;
 local canReactivate = tick();
 
 local lastSyncA, lastSyncMA;
@@ -196,7 +196,7 @@ function TurretRuntime(weaponStorageItem)
 	local chargeFocus = configValues.ChargeFocus or 1;
 	local shootToDebuffOnly = configValues.DebuffOnly or 1;
 	local crowdFireOnly = configValues.CrowdFire and (configValues.CrowdFire-1)*5 or 0;
-	local capFireRate = configValues.CapFireRate and configValues.CapFireRate > 1 and TurretConfigs.CapFireRate.OptionValues[configValues.CapFireRate] or 0;
+	local capFireRateRpm = configValues.CapFireRate and configValues.CapFireRate > 1 and TurretConfigs.CapFireRate.OptionValues[configValues.CapFireRate] or 0;
 	
 	local sortedTargets = {};
 	local canCrowdFire;
@@ -536,7 +536,7 @@ function TurretRuntime(weaponStorageItem)
 		end
 		canReactivate = tick();
 
-		local baseFr = 60/math.max(capFireRate, configurations.Rpm);
+		local baseFr = 60/configurations.Rpm;
 		local firerate = baseFr;
 
 		if configurations.RapidFire then
@@ -548,7 +548,9 @@ function TurretRuntime(weaponStorageItem)
 			end
 		end
 
-		firerate = math.clamp(firerate, configurations.RapidFireMax or delta, 999);
+		local capFireRate = capFireRateRpm ~= 0 and (1/capFireRateRpm) or 0;
+		local minFireRate = math.max(delta, capFireRate);
+		firerate = math.clamp(firerate, minFireRate, 2);
 		task.wait(firerate);
 		
 		if sortForToxicMod == 2 and checkForRecompute then
@@ -630,6 +632,11 @@ function Update()
 			Debugger:Warn(`Tool prefab for ({itemId}) does not exist for turret!`);
 			return;
 		end;
+		
+		for _, obj in pairs(turretArm:GetChildren()) do
+			if obj:GetAttribute("TurretWeapon") ~= true then continue end;
+			Debugger.Expire(obj, 0);
+		end
 
 		local weaponModel: Model = prefabTool:Clone();
 		weaponModel:SetAttribute("TurretWeapon", true);
@@ -722,6 +729,8 @@ end
 while patStorage == nil do
 	task.wait(0.1);
 	patStorage = shared.modStorage.Get("portableautoturret", player) :: Storage;
+	Debugger:StudioLog(`PatStorage.Values`, patStorage.Values,"PV:", patStorage.Properties.Values);
+	patStorage:SyncProperties();
 end
 
 local discOnEnemiesAttract;
