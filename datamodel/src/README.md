@@ -2,6 +2,7 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes to code in Engine codebase:
+- Fixed npc immunity not being factored into damage calculations. [#1141] [#1168] [#1142]
 - Fixed Hide Hud toggle. [#1169]
 - Fixed Pat reload breaking. [#1154]
 - Fixed guns not auto reloading. [#1112]
