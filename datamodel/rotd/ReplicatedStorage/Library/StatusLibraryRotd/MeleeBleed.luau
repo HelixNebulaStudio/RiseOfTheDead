@@ -6,11 +6,11 @@ local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 local statusPackage = {
-    Id="MeleeBleed";
-    Icon="";
-    Name="Melee Bleed";
-    Description="";
-    Buff=false;
+    Id = "MeleeBleed";
+    Icon = "";
+    Name = "Melee Bleed";
+    Description = "";
+    Buff = false;
 };
 --==
 
@@ -18,14 +18,16 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     if RunService:IsClient() then return end;
     if tickData.ms1000 == false then return end;
     
-    local characterClass: CharacterClass = statusClass.StatusOwner;
-    local healthComp: HealthComp? = characterClass.HealthComp;
+    local entityClass: EntityClass = statusClass.StatusOwner :: EntityClass;
+    if entityClass.ClassName == "Destructible" then return end;
+
+    local healthComp: HealthComp? = entityClass.HealthComp;
     if healthComp == nil or healthComp.IsDead then return end;
     
     local applyBy: CharacterClass? = statusClass.ApplyBy;
     if applyBy == nil or not healthComp:CanTakeDamageFrom(applyBy) then return end;
 
-    modDamageTag.Tag(characterClass.Character, applyBy.Character, {
+    modDamageTag.Tag(entityClass.Character, applyBy.Character, {
         WeaponItemId = statusClass.Values.WeaponSiid;
         IsHeadshot = false;
     });
@@ -33,6 +35,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     local bleedDamage = math.ceil(statusClass.Values.Damage * (statusClass.Values.DamagePercent or 0.05));
 
     local dmgData = DamageData.new{
+        DamageBy = applyBy;
         Damage = bleedDamage;
         DamageType = "Bleed";
     };

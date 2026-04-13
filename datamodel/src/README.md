@@ -2,6 +2,7 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes to code in Engine codebase:
+- Fixed Hide Hud toggle. [#1169]
 - Fixed Pat reload breaking. [#1154]
 - Fixed guns not auto reloading. [#1112]
 - Improved Melee input responsiveness. Throwable melees no longer can primary attack if holding down focus. [#1118] [#1139]
