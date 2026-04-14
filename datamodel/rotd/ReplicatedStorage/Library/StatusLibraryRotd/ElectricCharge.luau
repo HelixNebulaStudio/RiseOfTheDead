@@ -44,6 +44,7 @@ function statusPackage.StrikeTarget(applyBy: CharacterClass, statusValues: anydi
     if existingStatusClass then return end;
     
     statusComp:Apply(statusPackage.Id, {
+        ApplyBy = applyBy;
         Expires = workspace:GetServerTimeNow()+1; 
         Values = statusValues;
     });

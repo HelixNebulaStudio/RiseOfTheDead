@@ -13,6 +13,8 @@ local npcPackage = {
         AttackSpeed = 0.5;
 
         MaxHealth = 50;
+
+        LeapCooldownDuration = 10;
     };
     
     Properties = {
