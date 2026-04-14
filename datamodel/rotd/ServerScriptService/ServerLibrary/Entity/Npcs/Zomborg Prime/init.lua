@@ -29,6 +29,7 @@ local npcPackage = {
         MoneyReward = NumberRange.new(60, 80);
 
         KnockbackResistant = 1;
+        HasElectronics = true;
     };
 
     AddComponents = {
@@ -47,20 +48,20 @@ local npcPackage = {
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local level = math.max(properties.Level, 0);
 
     if properties.HardMode then
         configurations.BaseValues.MaxHealth = math.max(500000 + 10000*level, 100);
-        configurations.BaseValues.MaxArmor =  30000;
+        configurations.BaseValues.MaxArmor =  50000;
         configurations.BaseValues.AttackDamage = 80;
-        configurations.BaseValues.WalkSpeed = 10;
+        configurations.BaseValues.WalkSpeed = 12;
     else
-        configurations.BaseValues.MaxHealth = math.max(16000 + 3000*level, 100);
-        configurations.BaseValues.MaxArmor =  15000;
+        configurations.BaseValues.MaxHealth = math.max(32000 + 6000*level, 100);
+        configurations.BaseValues.MaxArmor =  25000;
         configurations.BaseValues.AttackDamage = 45;
-        configurations.BaseValues.WalkSpeed = 6;
+        configurations.BaseValues.WalkSpeed = 10;
     end
 end
 
@@ -121,7 +122,10 @@ function npcPackage.Spawned(npcClass: NpcClass)
         destructible.DebrisName = launcher:GetAttribute("DebrisName");
         destructible.HealthComp:SetMaxHealth(math.max(maxHealth*0.1, 50));
         destructible.HealthComp:Reset();
-        destructible:SetEnabled(false);
+        destructible.BindTakeDamage = function(destructible: DestructibleInstance, damageData: DamageData)
+            if powerSrcDestructible.HealthComp.IsDead then return end;
+            damageData.Damage = 0;
+        end
         
         destructible:SetupHealthbar{
             Size = UDim2.new(1.2, 0, 0.25, 0);
@@ -143,10 +147,6 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
             if powerSrcDestructible.HealthComp.IsDead then return end;
             npcClass:GetComponent("ArcExplosion")(launcherPoint.WorldPosition, 10, 32);
-        end)
-
-        powerSrcDestructible.OnDestroy:Connect(function()
-            destructible:SetEnabled(true);
         end)
     end
 

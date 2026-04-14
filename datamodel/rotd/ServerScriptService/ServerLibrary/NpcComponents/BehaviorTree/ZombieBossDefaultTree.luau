@@ -3,11 +3,20 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local treePackage = {
     LogicString = {
         AggroTree = "InMeleeRange & CanAttack & [Attack] | [FollowEnemy]";
-        Default = "HasEnemy & AggroTree | Idle";
+        Default = "PreLogic | HasEnemy & AggroTree | Idle";
     };
 };
 
 --==
+function treePackage.PreLogic(npcClass: NpcClass)
+    local processStatusesComp = npcClass:GetComponent("ProcessStatuses");
+    if processStatusesComp then
+        return processStatusesComp();
+    end
+
+    return false;
+end
+
 function treePackage.HasEnemy(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");

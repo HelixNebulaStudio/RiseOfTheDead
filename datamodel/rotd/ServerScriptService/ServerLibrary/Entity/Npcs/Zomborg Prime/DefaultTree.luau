@@ -15,7 +15,7 @@ local treePackage = {
     LogicString = {
         GroundPunchTree = "HasEnemy & CanGroundPunch & [GroundPunch]";
         RocketBarrageTree = "HasEnemy & CanRocketBarrage & [RocketBarrage]";
-        Default = "GroundPunchTree | RocketBarrageTree | ZombieBossDefaultTree";
+        Default = "IsRooted | GroundPunchTree | RocketBarrageTree | ZombieBossDefaultTree";
     };
 };
 --==
@@ -29,13 +29,46 @@ function treePackage.HasEnemy(npcClass: NpcClass)
     return enemyTargetData ~= nil;
 end
 
+--MARK: IsRooted
+function treePackage.IsRooted(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    local processStatusComp = npcClass:GetComponent("ProcessStatuses");
+
+    if processStatusComp then
+        if properties.CancelAbilities == true then
+            pcall(function()
+                local npcChar = npcClass.Character;
+                npcChar.PowerSource.PrimaryPart.StunEffect.Enabled = true;
+                npcChar.PowerSource.PrimaryPart.StunEffect2.Enabled = true;
+            end);
+            npcClass.PlayAnimation("Stun");
+
+        else
+            pcall(function()
+                local npcChar = npcClass.Character;
+                npcChar.PowerSource.PrimaryPart.StunEffect.Enabled = false;
+                npcChar.PowerSource.PrimaryPart.StunEffect2.Enabled = false;
+            end);
+            npcClass.StopAnimation("Stun");
+        end
+    end
+
+    return false;
+end
+
 
 --MARK: GroundPunchTree
 function treePackage.CanGroundPunch(npcClass: NpcClass)
     local properties = npcClass.Properties;
 
+    if properties.CancelAbilities then return false; end;
+
     local groundPunchInterval = 15;
     if properties.GroundPunchCooldown and tick()-properties.GroundPunchCooldown <= groundPunchInterval then return false; end;
+
+    local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
+    if enemyTargetData.Distance > 20 then return false; end;
+
     return true;
 end
 
@@ -52,6 +85,7 @@ function treePackage.GroundPunch(npcClass: NpcClass)
     npcClass.Move:SetMoveSpeed("set", "groundpunch", 0, npcClass.Move.MoveSpeedPriority.Action, 4);
 
     task.wait(0.5);
+    if properties.CancelAbilities then return; end;
     if npcClass.HealthComp.IsDead then return end;
 
     local groundCframe = modAoeHighlight:Ray(npcClass.RootPart.Position, Vector3.new(0, -8, 0));
@@ -68,6 +102,7 @@ function treePackage.GroundPunch(npcClass: NpcClass)
     TweenService:Create(new, GROUNDPUNCH_AOE_TWEEN, {Size = Vector3.new(groundPunchRange*2, groundPunchRange*2, 1)}):Play();
     
     task.wait(2);
+    if properties.CancelAbilities then return; end;
     if npcClass.HealthComp.IsDead then return end;
 
     local targetDataList = npcClass:GetComponent("TargetHandler"):MatchTargets(function(targetData: NpcTargetData)
@@ -77,7 +112,7 @@ function treePackage.GroundPunch(npcClass: NpcClass)
 
     for a=1, #targetDataList do
         local targetData: NpcTargetData = targetDataList[a];
-        local targetCharClass: CharacterClass = targetData.HealthComp.CompOwner;
+        local targetCharClass: CharacterClass = targetData.HealthComp.CompOwner :: CharacterClass;
         if targetCharClass == nil or targetCharClass.HealthComp.IsDead then continue end;
 
         local throwTargetComp = npcClass:GetComponent("ThrowTarget");
@@ -96,6 +131,8 @@ end
 --MARK: RocketBarrageTree
 function treePackage.CanRocketBarrage(npcClass: NpcClass)
     local properties = npcClass.Properties;
+
+    if properties.CancelAbilities then return false; end;
 
     local rocketBarrageInterval = 15.5;
     if properties.RocketBarrageCooldown and tick()-properties.RocketBarrageCooldown <= rocketBarrageInterval then return false; end;
@@ -127,6 +164,8 @@ function treePackage.RocketBarrage(npcClass: NpcClass)
 
     for t=1, rocketCount do
         if #launcherPoints <= 0 then break end;
+        if properties.CancelAbilities then break; end;
+
         local targetDataList = npcClass:GetComponent("TargetHandler"):MatchTargets(function(targetData: NpcTargetData)
             if targetData.HealthComp == nil or targetData.HealthComp.IsDead then return false; end;
             if not targetData.HealthComp:CanTakeDamageFrom(npcClass) then return false; end;
@@ -135,6 +174,8 @@ function treePackage.RocketBarrage(npcClass: NpcClass)
 
         for a=1, #targetDataList do
             if #launcherPoints <= 0 then break end;
+            if properties.CancelAbilities then break; end;
+
             local targetData: NpcTargetData = targetDataList[a];
 
             local targetCharClass = targetData.HealthComp.CompOwner;
