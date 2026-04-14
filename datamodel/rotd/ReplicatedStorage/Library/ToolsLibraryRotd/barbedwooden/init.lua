@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 local modTouchHandler = shared.require(game.ReplicatedStorage.Library.TouchHandler);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
@@ -12,17 +13,17 @@ local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 local touchHandler = modTouchHandler.new("BarbedFence", 1);
 
 local toolPackage = {
-	ItemId=script.Name;
-	Class="Tool";
-	HandlerType="StructureTool";
+	ItemId = script.Name;
+	Class = "Tool";
+	HandlerType = "StructureTool";
 
-	Animations={
+	Animations = {
 		Core={Id=4379418967;};
 		Placing={Id=4379471624};
 	};
-	Audio={};
+	Audio = {};
 
-	Configurations={
+	Configurations = {
 		WaistRotation = math.rad(0);
 		PlaceOffset = CFrame.Angles(0, math.rad(-90), 0);
 		
@@ -30,7 +31,7 @@ local toolPackage = {
 		BuildAvoidTags = {"TrapStructures"};
 	};
 
-	Properties={};
+	Properties = {};
 };
 
 function toolPackage.BuildStructure(prefab: Model, optionalPacket)
@@ -41,32 +42,33 @@ function toolPackage.BuildStructure(prefab: Model, optionalPacket)
 		Debugger.Expire(prefab, 300);
 	end
 	
-	local modDestructible = shared.require(prefab:WaitForChild("Destructible"));
 	modAudio.Play("Repair", prefab.PrimaryPart);
 	
 	local debris = prefab:WaitForChild("debris");
 	local hitbox = debris:WaitForChild("Hitbox");
 	hitbox.Anchored = true;
 	
-	debris.Parent = workspace.Entities;
+
+	local destructibleConfig = modDestructibles.createDestructible("Generic");
+	destructibleConfig:SetAttribute("MaxHealth", 10000);
+	destructibleConfig:SetAttribute("DebrisName", prefab.Name);
+	destructibleConfig.Parent = prefab;
+
+	local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
+	destructible.HealthComp:SetCanBeHurtBy("!PlayerClass");
+	destructible.HealthComp.OnIsDeadChanged:Connect(function(isDead)
+		if not isDead then return end;
+		Debugger.Expire(hitbox, 0);
+	end)
 
 	prefab.Destroying:Connect(function()
 		debris:Destroy();
 		Debugger.Expire(debris, 0);
 	end)
-	prefab:GetAttributeChangedSignal("Destroyed"):Connect(function()
-		if prefab:GetAttribute("Destroyed") ~= true then return end;
-
-		Debugger.Expire(hitbox, 0);
-		for _, obj in pairs(debris:GetChildren()) do
-			if not obj:IsA("BasePart") then continue end
-			obj.CanCollide = true;
-			obj.Anchored = false;
-		end
-
-	end)
 	touchHandler:AddObject(hitbox);
+	hitbox.CollisionGroup = "RaycastIgnore";
 	
+
 	function touchHandler:OnHumanoidTouch(humanoid, basePart, hitPart)
 		local targetModel = hitPart.Parent;
 		if targetModel == nil or not targetModel:IsA("Model") then return end;
@@ -89,11 +91,15 @@ function toolPackage.BuildStructure(prefab: Model, optionalPacket)
 		
 		statusComp:Apply("BarbWireSlow", {
 			Expires = workspace:GetServerTimeNow()+2;
-			SlowValue = 4;
+			Duration = 2;
+			Values = {
+				NewSpeed = 4;
+			}
 		});
 	
-		modDestructible:TakeDamage(DamageData.new{
-			Damage=30;
+		destructible.HealthComp:TakeDamage(DamageData.new{
+			DamageBy = healthComp.CompOwner;
+			Damage = 30;
 		});
 	end
 end;
