@@ -246,8 +246,9 @@ function TurretRuntime(weaponStorageItem)
 				Target = selectedTargets[a];
 				
 				NpcClass = npcClass;
-				ToxicMod = statusComp:GetOrDefault("ToxicMod");
-				FrostMod = statusComp:GetOrDefault("FrostMod");
+				ToxicMod = statusComp:GetOrDefault("ToxicBarrage");
+				FrostMod = statusComp:GetOrDefault("Frostbite");
+				FlameMod = statusComp:GetOrDefault("IncendiaryRounds");
 			});
 		end
 		
@@ -316,7 +317,7 @@ function TurretRuntime(weaponStorageItem)
 				end
 			end
 			if sortForFrostMod == 2 then
-				if sTarget.FrostMod and sTarget.FrostMod.CompleteTick then
+				if sTarget.FrostMod then
 					sTarget.Index = tieCount;
 				else
 					checkForRecompute = true;
@@ -324,7 +325,8 @@ function TurretRuntime(weaponStorageItem)
 			end
 			if shootToDebuffOnly == 2 then
 				if sTarget.ToxicMod	
-				or (sTarget.FrostMod and sTarget.FrostMod.CompleteTick) then
+				or sTarget.FrostMod
+				or sTarget.FlameMod then
 					table.remove(sortedTargets, a);
 				end
 			end
@@ -548,19 +550,19 @@ function TurretRuntime(weaponStorageItem)
 			end
 		end
 
-		local capFireRate = capFireRateRpm ~= 0 and (1/capFireRateRpm) or 0;
+		local capFireRate = capFireRateRpm ~= 0 and (60/capFireRateRpm) or 0;
 		local minFireRate = math.max(delta, capFireRate);
 		firerate = math.clamp(firerate, minFireRate, 2);
 		task.wait(firerate);
 		
 		if sortForToxicMod == 2 and checkForRecompute then
-			local toxicMod = statusComp:GetOrDefault("ToxicMod")
+			local toxicMod = statusComp:GetOrDefault("ToxicBarrage");
 			if toxicMod then
 				break;
 			end
 		end
 		if sortForFrostMod == 2 and checkForRecompute then
-			local frostMod = statusComp:GetOrDefault("FrostMod");
+			local frostMod = statusComp:GetOrDefault("Frostbite");
 			if frostMod and frostMod.CompleteTick then
 				break;
 			end
