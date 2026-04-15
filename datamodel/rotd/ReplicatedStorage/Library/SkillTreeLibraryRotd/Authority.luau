@@ -112,14 +112,16 @@ library:Add{
 	Name="Weak Point";
 	Link="ovehea";
 
-	Description="<b>Passive:</b> Shooting weak points deals an additional $Default% of base damage.\nUpgrading adds $Percent%.";
+	Description="You can identify weak points, shooting them deals an additional $Percent% of <b>PreModDamage</b>.";
 	Stats={
-		Percent={Default=15; Base=10; Max=40}; --{Default=100; Base=15; Max=90};
+		Percent={Base=10; Max=60};
 	};
 
 	Level=25;
 	UpgradeCost=20;
 	MaxLevel=5;
+
+	BaseModifierId = "WeakPointSense";
 };
 
 library:Add{

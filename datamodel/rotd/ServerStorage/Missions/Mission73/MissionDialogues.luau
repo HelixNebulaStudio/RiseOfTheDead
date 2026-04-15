@@ -47,7 +47,7 @@ Dialogues.Patrick.DialogueStrings = {
 if RunService:IsServer() then
 
 	-- MARK: Patrick Handler
-	if modBranchConfigurations.IsWorld("Safehome") then 
+	if modBranchConfigurations.IsWorld("Safehome") or modBranchConfigurations.IsWorld("BioXResearch") then 
 		Dialogues.Patrick.DialogueHandler = function(player, dialog, data, mission)
 			local modCoopMission = shared.require(game.ServerScriptService.ServerLibrary.CoopMission);
 			local modFactions = shared.require(game.ServerScriptService.ServerLibrary.Factions);
@@ -62,7 +62,7 @@ if RunService:IsServer() then
 			end
 
 			if safehomeClass.FactionTag == nil or safehomeClass.FactionTag ~= factionTag then
-				Debugger:Warn("Not faction headquarters");
+				Debugger:Warn("Not faction headquarters", safehomeClass.FactionTag, `~=`, factionTag);
 				
 				dialog:AddChoice("dps_goToHq", function(dialog)
 					modFactions.InvokeHandler(player, "travelhq");

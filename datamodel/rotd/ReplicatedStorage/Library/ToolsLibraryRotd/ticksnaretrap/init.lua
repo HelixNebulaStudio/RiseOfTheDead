@@ -8,16 +8,16 @@ local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configur
 --==
 
 local toolPackage = {
-	ItemId=script.Name;
-	Class="Tool";
-	HandlerType="StructureTool";
+	ItemId = script.Name;
+	Class = "Tool";
+	HandlerType = "StructureTool";
 
-	Animations={
+	Animations = {
 		Core={Id=16350759475;};
 		Placing={Id=10964648124};
 	};
-	Audio={};
-	Configurations={
+	Audio = {};
+	Configurations = {
 		PlaceOffset = CFrame.Angles(0, 0, 0);
 
 		Prefab = script:WaitForChild("TicksSnareTrap");
@@ -25,7 +25,7 @@ local toolPackage = {
 
 		BuildAvoidTags = {"TrapStructures"}
 	};
-	Properties={};
+	Properties = {};
 };
 
 function toolPackage.BuildStructure(prefab: Model, optionalPacket)
@@ -102,9 +102,10 @@ function toolPackage.BuildStructure(prefab: Model, optionalPacket)
 					table.remove(activeLeashes, a);
 				end
 			end
-			if #activeLeashes <= 0 then
-				game.Debris:AddItem(prefab, 1);
-			end
+			if useCount > 0 then return end;
+			if #activeLeashes > 0 then return end;
+			
+			game.Debris:AddItem(prefab, 1);
 		end)
 
 		repeat task.wait() until healthComp.IsDead;

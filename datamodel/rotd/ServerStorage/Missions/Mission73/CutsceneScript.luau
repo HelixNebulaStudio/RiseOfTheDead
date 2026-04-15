@@ -1,12 +1,10 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--==
 local RunService = game:GetService("RunService");
-local Configurations = require(ReplicatedStorage.Library.Configurations)
+
+local localPlayer = game.Players.LocalPlayer;
 
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 --== Variables;
 local MISSION_ID = 73;
@@ -83,7 +81,7 @@ return function(CutsceneSequence)
 		
 		local activeBossNpcClass: NpcClass = nil;
 
-		local function OnChanged(firstRun, coopMission)
+		local function OnChanged(coopMission, firstRun)
 			Debugger:Warn("coopMission OnChanged ", coopMission);
 			
 			local checkPoint = coopMission.CheckPoint;
@@ -127,6 +125,10 @@ return function(CutsceneSequence)
 					activeBossNpcClass = modNpcs.spawn2{
 						Name = pickBossName;
 						CFrame = bossSpawnCf;
+						AddComponents = {
+							"BlinkTeleport";
+							"CrateReward";
+						};
 						BindSetup = function(npcClass: NpcClass)
 							npcClass.Name = "Zenith ".. tostring(pickBossName);
 
@@ -144,9 +146,6 @@ return function(CutsceneSequence)
 							npcChar:SetAttribute("EntityHudHealth", true);
 
 							local maxHpVal = 5000000;
-							if RunService:IsStudio() then
-								maxHpVal = 100000;
-							end
 							npcClass.HealthComp:SetMaxHealth(maxHpVal);
 							npcClass.HealthComp:Reset();
 							
@@ -155,75 +154,60 @@ return function(CutsceneSequence)
 							end
 							properties.WeakenImmunity = 0.8;
 							properties.DisabledImmunity = 0.5;
-
-							if npcClass:GetComponent("BlinkTeleport") == nil then
-								npcClass:AddComponent("BlinkTeleport");
-							end
-
-							-- task.spawn(function()
-							-- 	npcModule.LastBlinkUse = tick();
-							-- 	npcModule.LastForceBlink = tick();
-							-- 	while true do
-							-- 		task.wait(1);
-							-- 		if not workspace:IsAncestorOf(npc) or npcModule.Humanoid.Health <= 0 then
-							-- 			break;
-							-- 		end
-									
-							-- 		if tick()-npcModule.LastForceBlink >= 10 then
-							-- 			npcModule.LastForceBlink = tick();
-							-- 			if npcModule.Enemy and npcModule.Enemy.Humanoid then
-							-- 				npcModule.Blink(npcModule.Enemy.Humanoid);
-							-- 			end
-										
-							-- 		elseif tick()-npcModule.LastDamageTaken >= 3 and tick()-npcModule.LastBlinkUse >= 3 then
-							-- 			npcModule.LastBlinkUse = tick();
-							-- 			if npcModule.Enemy and npcModule.Enemy.Humanoid then
-							-- 				npcModule.Blink(npcModule.Enemy.Humanoid);
-							-- 			end
-										
-							-- 		end
-							-- 	end
-								
-							-- end)
+							properties.LastForceBlink = tick();
+							properties.LastBlinkUse = tick();
 							
 							npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
 								if not isDead then return end;
-								if npcClass:GetComponent("CrateReward") == nil then return end;
+								local crateRewardComp = npcClass:GetComponent("CrateReward");
+								if crateRewardComp == nil then return end;
 								
 								local coopPlayers = coopMission:GetPlayers();
 								local selectCoopPlayer = coopPlayers[math.random(1, #coopPlayers)];
 								local playerClass: PlayerClass = shared.modPlayers.get(selectCoopPlayer);
 
-								local spawnCFrame;
-								if spawnCFrame == nil then
-									local _dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(Ray.new(properties.DeathPosition, Vector3.new(0, -32, 0)), {workspace.Environment; workspace.Terrain}, true);
-									spawnCFrame = CFrame.new(dropRayPos);
-								end
-
-								if playerClass and spawnCFrame == nil then
-									local _dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(Ray.new(playerClass:GetCFrame().Position, Vector3.new(0, -32, 0)), {workspace.Environment; workspace.Terrain}, true);
-									spawnCFrame = CFrame.new(dropRayPos);
-								end
-
+								local spawnCFrame = CFrame.new(playerClass:GetCFrame().Position);
 								spawnCFrame = spawnCFrame * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
 
-								local _cratePrefab, _crateInteractable = npcClass:GetComponent("CrateReward")(spawnCFrame, coopPlayers);
+								local _cratePrefab, _crateInteractable = crateRewardComp(
+									spawnCFrame, 
+									coopPlayers
+								);
 							end)
 						end
 					};
 
 					local targetHandlerComp = activeBossNpcClass:GetComponent("TargetHandler");
-					activeBossNpcClass:GetComponent("Blink")();
 					task.spawn(function()
+						local properties = activeBossNpcClass.Properties;
 						while true do
 							task.wait(3);
 							if activeBossNpcClass.HealthComp.IsDead then
 								break;
 							end
 							
-							for _, player in pairs(coopMission:GetPlayers()) do
-								if player.Character == nil then continue end;
-								targetHandlerComp:AddTarget(player.Character);
+							local coopPlayers = coopMission:GetPlayers();
+							local coopChars = {};
+							for _, player in pairs(coopPlayers) do
+								local char = player.Character;
+								if char == nil then continue end;
+								targetHandlerComp:AddTarget(char);
+								table.insert(coopChars, char);
+							end
+							local rngCoopChar = #coopChars > 0 and coopChars[math.random(1, #coopChars)] or nil;
+
+							if rngCoopChar then
+								local curTick = tick();
+								if curTick-properties.LastForceBlink >= 10 then
+									properties.LastForceBlink = curTick;
+									activeBossNpcClass:GetComponent("BlinkTeleport")(rngCoopChar);
+									
+								elseif workspace:GetServerTimeNow()-activeBossNpcClass.HealthComp.LastArmorDamageTaken >= 3 
+								and curTick-properties.LastBlinkUse >= 3 then
+									properties.LastBlinkUse = curTick;
+									activeBossNpcClass:GetComponent("BlinkTeleport")(rngCoopChar);
+									
+								end
 							end
 							
 							local configurations = activeBossNpcClass.Configurations;
@@ -242,7 +226,7 @@ return function(CutsceneSequence)
 					if activeBossNpcClass then
 						activeBossNpcClass:Destroy();
 						Debugger.Expire(activeBossNpcClass.Character, 0);
-						activeBossNpcClass = nil;
+						activeBossNpcClass = (nil :: any);
 					end
 				end)
 
@@ -250,7 +234,7 @@ return function(CutsceneSequence)
 			end
 		end
 		coopMission.OnChanged:Connect(OnChanged)
-		OnChanged(true, coopMission);
+		OnChanged(coopMission, true);
 		
 		coopMission.OnPlayerAdded:Connect(function(player)
 			modMission:Progress(player, MISSION_ID, function(mission)
