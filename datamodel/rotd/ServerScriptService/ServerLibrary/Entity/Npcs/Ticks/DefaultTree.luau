@@ -204,7 +204,7 @@ function treePackage.Detonate(npcClass: NpcClass)
             DamageOrigin = detonatePosition;
         };
         
-        newExplosionProcessPacket.OnHealthCompHit = function(healthComp: HealthComp, damage: number)
+        newExplosionProcessPacket.BindHealthCompHit = function(healthComp: HealthComp, damage: number)
             local entityClass: EntityClass = healthComp.CompOwner :: EntityClass;
             if entityClass.ClassName == "NpcClass" and (entityClass :: NpcClass).Character == npcClass.Character then return true end;
             if healthComp:CanTakeDamageFrom(npcClass) == false then return true end;

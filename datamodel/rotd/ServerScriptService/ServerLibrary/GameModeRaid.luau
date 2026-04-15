@@ -705,7 +705,7 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 			npcClass.SpawnCFrame = spawnCf;
 			self.EnemiesSpawned = self.EnemiesSpawned + 1;
 
-			local properties: PropertiesVariable<{}> = npcClass.Properties;
+			local properties: PropertiesVariable<anydict> = npcClass.Properties;
 			properties.Level = math.max(npcClass.Properties.Level + (self.Difficulty + (self.Wave-1)) + math.random(-2, 0), 1);
 			properties.TargetableDistance = 1024;
 			properties.NetworkOwners = self.Players;

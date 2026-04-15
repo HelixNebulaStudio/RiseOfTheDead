@@ -45,6 +45,9 @@ local statTemplates = {
 		{Key="HeavyAttackMultiplier"; Text="<b>Heavy Attack Multiplier:</b>    $stat%"; Type="percent";};
 		{Key="HeavyAttackSpeed"; Text="<b>Heavy Attack Speed:</b>    $stat"; Type="3dp";};
 
+		{Key="LungeSpeed"; Text="<b>Lunge Speed:</b>    $stat u/s"; Type="int"};
+		{Key="LungeDuration"; Text="<b>Lunge Duration:</b>    $stats"; Type="2dp"};
+
 		-- Blunt melee;
 		{Key="Knockback"; Text="<b>Knockback:</b>    $stat"; Type="2dp";};
 		{Key="KnockoutDuration"; Text="<b>Knockout Duration:</b>    $stats"; Type="2dp";};

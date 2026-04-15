@@ -14,7 +14,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
 
     local toxinTexture = game.ReplicatedStorage.Prefabs.Textures:WaitForChild("ToxinTexture");
 
-    local characterClass : CharacterClass = statusClass.StatusOwner;
+    local characterClass : CharacterClass = statusClass.StatusOwner :: CharacterClass;
     if characterClass.Character == nil then return end;
 
     local bodyParts = characterClass.Character:GetChildren();

@@ -330,7 +330,6 @@ function modStatusEffects.Withering(player: Player, duration: number)
 	statusComp:Apply("Withering", {
 		Expires = workspace:GetServerTimeNow() + duration;
 		Duration = duration;
-		Alpha = 0;
 	});
 end
 

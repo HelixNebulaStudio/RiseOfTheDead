@@ -149,7 +149,7 @@ function itemPackage.Init(itemLib)
 				modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
 			end
 			
-			rPacket.StorageValues = patStorage.Properties;
+			rPacket.StorageProperties = patStorage.Properties;
 			rPacket.Success = true;
 			
 			accessory:SetAttribute("Update", true);
@@ -159,9 +159,10 @@ function itemPackage.Init(itemLib)
 		elseif action == "resetconfig" then
 
 			patStorage.Properties.Config = {};
+			patStorage.Values.Config = {};
 			patStorage:SyncProperties();
 			
-			rPacket.StorageValues = patStorage.Properties;
+			rPacket.StorageProperties = patStorage.Properties;
 			rPacket.Success = true;
 
 			return rPacket;
@@ -183,9 +184,10 @@ function itemPackage.Init(itemLib)
 			end
 
 			patStorage.Properties.Config = configValues;
+			patStorage.Values.Config = configValues;
 			patStorage:SyncProperties();
 			
-			rPacket.StorageValues = patStorage.Properties;
+			rPacket.StorageProperties = patStorage.Properties;
 			rPacket.Success = true;
 
 			return rPacket;
@@ -207,11 +209,12 @@ function itemPackage.Init(itemLib)
 
 			configValues.Hitlist = configHitlistBitFlags:Set(userHitlistBitString, flagTag, flagVal);
 			patStorage.Properties.Config = configValues;
+			patStorage.Values.Config = configValues;
 			patStorage:SyncProperties();
 
 			rPacket.FlagVal = configHitlistBitFlags:Test(flagTag, userHitlistBitString);
 			
-			rPacket.StorageValues = patStorage.Properties;
+			rPacket.StorageProperties = patStorage.Properties;
 			rPacket.Success = true;
 
 			return rPacket;

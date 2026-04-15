@@ -57,7 +57,7 @@ end
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local level = math.max(properties.Level, 0);
     configurations.BaseValues.MaxHealth = math.clamp(1024 + 1024*(level-1), 1024, 102400);
@@ -79,37 +79,6 @@ function npcPackage.Spawned(npcClass: NpcClass)
     local eyeVisible = true;
 
     local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
-    local destructible: DestructibleInstance = bodyDestructiblesComp:Create("Eye", eye);
-
-    destructible:SetupHealthbar{
-        Size = UDim2.new(1.2, 0, 0.25, 0);
-        Distance = 64;
-        ShowLabel = false;
-    };
-
-    destructible.HealthComp.OnHealthChanged:Connect(function(newHealth, oldHealth, damageData)
-        if newHealth > oldHealth then return end;
-        if not eyeVisible then return; end
-        
-        local damageBy: PlayerClass? = damageData.DamageBy;
-        if damageBy == nil or damageBy.ClassName ~= "PlayerClass" then return end;
-        if damageBy:DistanceFromCharacter(eyeBase.Position) > 64 then return end;
-
-        destructible:SetEnabled(false);
-        destructible:SetHealthbarEnabled(false);
-
-        eyeVisible = false;
-        eyeAtt.CFrame = CFrame.identity;
-        task.delay(math.random(70, 110)/10, function()
-            eyeAtt.CFrame = defaultEyeCf;
-            eyeVisible = true;
-
-            destructible:SetEnabled(true);
-            destructible:SetHealthbarEnabled(true);
-        end)
-        
-        npcClass.HealthComp:TakeDamage(damageData);
-    end)
 
     --Pick Spawn
     local scanDist = 64;
@@ -190,6 +159,38 @@ function npcPackage.Spawned(npcClass: NpcClass)
         eyeBall:AddTag("Witherer");
         npcClass.Garbage:Tag(function()
             eyeBall:RemoveTag("Witherer");
+        end)
+        
+        local destructible: DestructibleInstance = bodyDestructiblesComp:Create("Eye", eye);
+
+        destructible:SetupHealthbar{
+            Size = UDim2.new(1.2, 0, 0.25, 0);
+            Distance = 64;
+            ShowLabel = false;
+        };
+
+        destructible.HealthComp.OnHealthChanged:Connect(function(newHealth, oldHealth, damageData)
+            if newHealth > oldHealth then return end;
+            if not eyeVisible then return; end
+            
+            local damageBy: PlayerClass? = damageData.DamageBy;
+            if damageBy == nil or damageBy.ClassName ~= "PlayerClass" then return end;
+            if damageBy:DistanceFrom(eyeBase.Position) > 64 then return end;
+
+            destructible:SetEnabled(false);
+            destructible:SetHealthbarEnabled(false);
+
+            eyeVisible = false;
+            eyeAtt.CFrame = CFrame.identity;
+            task.delay(math.random(70, 110)/10, function()
+                eyeAtt.CFrame = defaultEyeCf;
+                eyeVisible = true;
+
+                destructible:SetEnabled(true);
+                destructible:SetHealthbarEnabled(true);
+            end)
+            
+            npcClass.HealthComp:TakeDamage(damageData);
         end)
     end
 

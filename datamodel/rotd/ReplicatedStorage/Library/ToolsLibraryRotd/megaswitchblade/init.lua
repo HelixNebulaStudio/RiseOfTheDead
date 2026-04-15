@@ -45,6 +45,9 @@ local toolPackage = {
 		HeavyAttackSpeed=1.4;
 		HitRange=14;
 
+		LungeSpeed = 100;
+		LungeDuration = 0.2;
+
 		Knockback=80;
 
 		WaistRotation=math.rad(25);

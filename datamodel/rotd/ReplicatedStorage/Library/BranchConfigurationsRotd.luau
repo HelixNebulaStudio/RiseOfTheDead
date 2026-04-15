@@ -907,7 +907,7 @@ function modBranchConfigurations.onRequire()
         modConfigurations.Set("DisablePinnedMission", false);
         
         modConfigurations.Set("DisableExperiencebar", false);
-        modConfigurations.Set("RemoveForceFieldOnWeaponFire", true);
+        modConfigurations.Set("RemoveForceFieldOnAction", true);
         modConfigurations.Set("DisableGearMods", true);
         modConfigurations.Set("DisableHurtFlinch", false);
         
@@ -943,7 +943,7 @@ function modBranchConfigurations.onRequire()
         modConfigurations.Set("DisableInfoBubbles", false);
         
         modConfigurations.Set("DisableExperiencebar", false);
-        modConfigurations.Set("RemoveForceFieldOnWeaponFire", true);
+        modConfigurations.Set("RemoveForceFieldOnAction", true);
         modConfigurations.Set("DisableGearMods", true);
         
         modConfigurations.Set("PvpMode", true);

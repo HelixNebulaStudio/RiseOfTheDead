@@ -597,7 +597,7 @@ if RunService:IsClient() then -- MARK: Client
 
 				buildInteractProxy.CanInteract = true;
 				buildInteractProxy.Part = planModel.PrimaryPart;
-				buildInteractProxy.ProxyOffset = planModel:GetExtentsSize() * Vector3.new(0, 0.4, 0);
+				buildInteractProxy.PointOffset = planModel:GetExtentsSize() * Vector3.new(0, 0.4, 0);
 				characterProperties.ProxyInteractable = buildInteractProxy;
 				
 				function buildInteractProxy:OnInteracted(library)

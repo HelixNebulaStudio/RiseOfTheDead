@@ -5,13 +5,13 @@ local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibra
 local localPlayer = game.Players.LocalPlayer;
 --==
 local statusPackage = {
-    Id="Stun";
-    Icon="rbxassetid://4467439850";
-    Name="Stunned";
-    Description="Stunned";
-    Buff=false;
+    Id = "Stun";
+    Icon = "rbxassetid://4467439850";
+    Name = "Stunned";
+    Description = "Stunned";
+    Buff = false;
     Tags = {"Mobility"; "Stun";};
-    Cleansable=true;
+    Cleansable = true;
 };
 
 --MARK: TODO; Update Anim loading

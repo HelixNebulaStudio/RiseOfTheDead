@@ -36,7 +36,7 @@ library:Add{
 	MaxLevel=5;
 	
 	EventLogicTriggers = {"Players_BindWieldEvent"};
-	EventTriggerActionFunc = function(...)
+	EventTriggerActionFunc = function(data, ...)
 		local action: string, toolHandler: ToolHandlerInstance = ...;
 		if action == "Unequip" or toolHandler.ToolPackage.HandlerType ~= "HealTool" then
 			return "RemoveStatus";
@@ -62,7 +62,7 @@ library:Add{
 	MaxLevel=5;
 
 	EventLogicTriggers = {"Players_BindWieldEvent"};
-	EventTriggerActionFunc = function(...)
+	EventTriggerActionFunc = function(data, ...)
 		local action: string, toolHandler: ToolHandlerInstance = ...;
 		if action == "Unequip" or toolHandler.ToolPackage.HandlerType ~= "FoodTool" then
 			return "RemoveStatus";

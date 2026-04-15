@@ -77,7 +77,7 @@ function interactablePackage.init(super) -- Server/Client
         local clientData = info.ClientData;
         if clientData == nil then return end;
 
-        interactable.CanInteract = true;
+        interactable.CanInteract = false;
         interactable.Label = "Out of Service";
     end
 

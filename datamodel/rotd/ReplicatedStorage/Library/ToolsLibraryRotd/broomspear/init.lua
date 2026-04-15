@@ -39,6 +39,9 @@ local toolPackage = {
 		StaminaCost = 6;
 		StaminaDeficiencyPenalty = 0.6;
 
+		LungeSpeed = 50;
+		LungeDuration = 0.3;
+
 		-- Throwable
 		Throwable = true;
 		ThrowRange = 64;

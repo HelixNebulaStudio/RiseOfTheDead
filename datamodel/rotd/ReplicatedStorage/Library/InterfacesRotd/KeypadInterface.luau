@@ -1,17 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-
-local RunService = game:GetService("RunService");
-local TextService = game:GetService("TextService");
-
 local localPlayer = game.Players.LocalPlayer;
 
-local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
-local modStatusLibrary = shared.require(game.ReplicatedStorage.Library.StatusLibrary);
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
-
 
 local interfacePackage = {
     Type = "Character";
@@ -20,10 +11,8 @@ local interfacePackage = {
 
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
-    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
     local remoteKeypadInput = modRemotesManager:Get("KeypadInput");
 
-    local branchColor = modBranchConfigurations.BranchColor;
     local activeInput = "";
 
 	local menu = script:WaitForChild("Keypad"):Clone();
@@ -47,12 +36,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			activeInput = "";
             window:Update();
 
-			spawn(function()
+			task.spawn(function()
 				repeat until not window.Visible 
                     or binds.Interactable == nil or binds.Interactable.Part == nil
                     or not workspace:IsAncestorOf(binds.Interactable.Part)
                     or localPlayer:DistanceFromCharacter(binds.Interactable.Part.Position) >= 16 
-                    or not wait(0.5);
+                    or not task.wait(0.5);
 				window:Close();
 			end)
 		end
@@ -81,7 +70,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 window:Update();
 			end
 			interface:PlayButtonClick();
-			wait(0.1);
+			task.wait(0.1);
 			inputDebounce = false;
 		end)
 	end
@@ -97,7 +86,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         enterDebounce = true;
         interface:PlayButtonClick();
         remoteKeypadInput:FireServer(binds.Interactable and binds.Interactable.Config, activeInput);
-        wait(1);
+        task.wait(1);
         enterDebounce = false;
     end)
 
@@ -108,7 +97,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         interface:PlayButtonClick();
         activeInput = "";
         window:Update();
-        wait(0.2);
+        task.wait(0.2);
         clearDebounce = false;
     end)
 

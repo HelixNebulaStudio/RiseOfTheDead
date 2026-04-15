@@ -6,24 +6,24 @@ local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 --==
 
 local toolPackage = {
-	ItemId=script.Name;
-	Class="Tool";
-	HandlerType="StructureTool";
+	ItemId = script.Name;
+	Class = "Tool";
+	HandlerType = "StructureTool";
 
-	Animations={
+	Animations = {
 		Core={Id=10964629394;};
 		Placing={Id=10964648124};
 	};
-	Audio={};
+	Audio = {};
 
-	Configurations={
+	Configurations = {
 		WaistRotation = math.rad(0);
 		PlaceOffset = CFrame.Angles(0, 0, 0);
 		
 		BuildDuration = 1;
 	};
 
-	Properties={};
+	Properties = {};
 };
 
 function toolPackage.BuildStructure(prefab: Model, optionalPacket)

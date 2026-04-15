@@ -18,11 +18,11 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.ActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 	local isActive = packet.IsActive;
-	local prefab = handler.Prefabs[1];
+	local prefab = handler.MainToolModel;
 			
-	local light = prefab:FindFirstChild("_lightSource");
+	local light = prefab:FindFirstChild("Light", true);
 	if light then
 		light.Color = isActive and Color3.fromRGB(211, 190, 150) or Color3.fromRGB(100, 100, 100);
 		light.Material = isActive and Enum.Material.Neon or Enum.Material.SmoothPlastic;

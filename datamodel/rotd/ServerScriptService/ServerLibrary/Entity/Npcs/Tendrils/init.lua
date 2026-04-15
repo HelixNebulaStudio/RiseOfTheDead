@@ -1,8 +1,5 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
-
 local npcPackage = {
     Name = "Tendrils";
     HumanoidType = "Zombie";
@@ -13,8 +10,6 @@ local npcPackage = {
         AttackSpeed = 2;
 
         MaxHealth = 50;
-
-        MeleeImmunity = 1;
 
         GrappleRange = 16;
         GrappleCooldown = 5;
@@ -30,6 +25,8 @@ local npcPackage = {
         Level = 1;
         ExperiencePool = 45;
         DropRewardId = "tendrils";
+
+        MeleeImmunity = 1;
 
         JointsStrength = {
             RootStump = true; -- true = only breaks on lethal damage

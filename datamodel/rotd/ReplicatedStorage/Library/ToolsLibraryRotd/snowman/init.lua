@@ -6,24 +6,24 @@ local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructib
 --==
 
 local toolPackage = {
-	ItemId=script.Name;
-	Class="Tool";
-	HandlerType="StructureTool";
+	ItemId = script.Name;
+	Class = "Tool";
+	HandlerType = "StructureTool";
 
-	Animations={
+	Animations = {
 		Core={Id=4493584242;};
 		Placing={Id=4493588865};
 	};
-	Audio={};
+	Audio = {};
 
-	Configurations={
+	Configurations = {
 		WaistRotation = math.rad(0);
 		PlaceOffset = CFrame.Angles(0, math.rad(-90), 0);
 		
 		BuildDuration = 1;
 	};
 
-	Properties={};
+	Properties = {};
 };
 
 function toolPackage.BuildStructure(prefab: Model, optionalPacket)

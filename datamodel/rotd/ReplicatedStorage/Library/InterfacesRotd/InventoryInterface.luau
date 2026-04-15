@@ -210,7 +210,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	hotbarWindow.ReleaseMouse = false;
 	interface:BindConfigKey("DisableHotbar", {hotbarWindow});
 
-	if modConfigurations.CompactInterface or UserInputService.TouchEnabled then
+	if modConfigurations.CompactInterface and UserInputService.TouchEnabled then
 		bodyEquipmentsFrame.Parent = invContainerFrame;
 		bodyEquipmentsFrame.LayoutOrder = 99;
 		

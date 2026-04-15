@@ -36,7 +36,7 @@ library:Add{
 	MaxLevel=5;
 	
 	EventLogicTriggers = {"Players_BindWieldEvent"};
-	EventTriggerActionFunc = function(...)
+	EventTriggerActionFunc = function(data, ...)
 		local action: string, toolHandler: ToolHandlerInstance = ...;
 		if action == "Unequip" or toolHandler.ToolPackage.HandlerType ~= "GunTool" then
 			return "RemoveStatus";
@@ -80,7 +80,7 @@ library:Add{
 	MaxLevel=5;
 
 	EventLogicTriggers = {"Players_BindWieldEvent"};
-	EventTriggerActionFunc = function(...)
+	EventTriggerActionFunc = function(data, ...)
 		local action: string, toolHandler: ToolHandlerInstance = ...;
 		if action == "Unequip" or toolHandler.ToolPackage.HandlerType ~= "MeleeTool" then
 			return "RemoveStatus";
@@ -155,7 +155,12 @@ library:Add{
 	MaxLevel=5;
 
 	EventLogicTriggers = {"Npcs_BindDamaged"};
-	TriggerAction = "ApplyStatus";
+	EventTriggerActionFunc = function(data, damageData: DamageData)
+		if data.PlayerClass == nil then return; end;
+		if damageData == nil or damageData.Damage <= 0 then return; end
+		if data.PlayerClass ~= damageData.DamageBy then return; end;
+		return "ApplyStatus";
+	end;
 	TriggerStatusId = "seered";
 }
 

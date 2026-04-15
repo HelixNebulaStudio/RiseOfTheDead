@@ -49,6 +49,7 @@ function interactablePackage.init(super) -- Server/Client
             end;
 
             local interactable: InteractableInstance = super.getOrNew(interactConfig, player);
+            local id = interactable.Id or "nil";
             local interactPart = interactable.Part;
             
             local distanceFromTrigger = player:DistanceFromCharacter(interactPart.Position) or -1;
@@ -61,6 +62,7 @@ function interactablePackage.init(super) -- Server/Client
             shared.modEventService:ServerInvoke(
                 "Generic_BindTrigger", 
                 {ReplicateTo={player}}, 
+                id,
                 interactable, 
                 {InputCode = input;}
             );

@@ -2,23 +2,22 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modExplosionHandler = shared.require(game.ReplicatedStorage.Library.ExplosionHandler);
 --==
 
 local toolPackage = {
-    ItemId=script.Name;
-    Class="Tool";
-    HandlerType="StructureTool";
+    ItemId = script.Name;
+    Class = "Tool";
+    HandlerType = "StructureTool";
 
-    Animations={
+    Animations = {
 		Core={Id=4379418967;};
 		Placing={Id=4379471624};
     };
-    Audio={};
+    Audio = {};
 
-    Configurations={
+    Configurations = {
         WaistRotation = math.rad(0);
         PlaceOffset = CFrame.Angles(0, math.rad(-90), 0);
         
@@ -29,7 +28,7 @@ local toolPackage = {
         BlastForce = 100;
     };
 
-    Properties={};
+    Properties = {};
 };
 
 function toolPackage.BuildStructure(prefab: Model, optionalPacket)
