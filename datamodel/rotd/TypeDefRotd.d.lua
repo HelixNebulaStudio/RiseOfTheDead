@@ -3,6 +3,7 @@ export type GAME_EVENT_KEY_ROTD =
     | "Dialogue_BindMedicHeal"
     | "EventPass_BindLevelUp"
     | "EventPass_BindPuzzleInvoke"
+    | "Farming_BindWaterPlanter"
     | "GameModeManager_BindDisconnectPlayer"
     | "GameModeManager_BindGameModeStart"
     | "GameModeManager_BindGameModeComplete"

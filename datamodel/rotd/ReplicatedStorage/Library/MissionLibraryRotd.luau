@@ -1228,14 +1228,14 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Side;
 	Name = "Joseph's Lettuce";
 	From = "Joseph";
-	Description = "Help Joseph water his lettuce.";
+	Description = "Help Joseph water his planters.";
 	Persistent = true;
 	World = "TheResidentials";
 	Objectives = {
 		["wateringcan"]={Index=1; Description="Make a watering can";};
-		["jlLettuce1"]={Index=2; Description="Water the plants";};
-		["jlLettuce2"]={Index=3; Description="Water the plants";};
-		["jlLettuce3"]={Index=4; Description="Water the plants";};
+		["jlLettuce1"]={Index=2; Description="Water a planter";};
+		["jlLettuce2"]={Index=3; Description="Water a planter";};
+		["jlLettuce3"]={Index=4; Description="Water a planter";};
 	};
 	ObjectivesCompleteText = "Return to Joseph";
 	SaveData = {};
@@ -1250,9 +1250,9 @@ MissionLibrary.New{
 	};
 	Markers = {
 		["wateringcan"]={World="TheResidentials"; Label="Make Watering Can"; Target=Vector3.new(1146.179, 57.015, -93.945); Type=modMarkers.MarkerTypes.Waypoint;};
-		["jlLettuce1"]={World="TheResidentials"; Label="Water plants"; Target=Vector3.new(1242.081, 57.213, -71.899); Type=modMarkers.MarkerTypes.Waypoint;};
-		["jlLettuce2"]={World="TheResidentials"; Label="Water plants"; Target=Vector3.new(1242.231, 57.213, -56.169); Type=modMarkers.MarkerTypes.Waypoint;};
-		["jlLettuce3"]={World="TheResidentials"; Label="Water plants"; Target=Vector3.new(1235.111, 57.213, -56.169); Type=modMarkers.MarkerTypes.Waypoint;};
+		["jlLettuce1"]={World="TheResidentials"; Label="Planters"; Target=Vector3.new(1258.381, 54.393, -64.507); Type=modMarkers.MarkerTypes.Waypoint;};
+		["jlLettuce2"]={World="TheResidentials"; Label="Planters"; Target=Vector3.new(1258.381, 54.393, -64.507); Type=modMarkers.MarkerTypes.Waypoint;};
+		["jlLettuce3"]={World="TheResidentials"; Label="Planters"; Target=Vector3.new(1258.381, 54.393, -64.507); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
 };
 
