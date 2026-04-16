@@ -9,6 +9,7 @@ local modInteractables = shared.require(game.ReplicatedStorage.Library.Interacta
 
 --== Variables;
 local MISSION_ID = 22;
+local BACKUPPLAN_STORAGE_ID = "thebackupplan";
 
 if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
@@ -55,7 +56,10 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigurations.IsWorld("TheUnderground") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if not modBranchConfigurations.IsWorld("TheUnderground") then
+		Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); 
+		return;
+	end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
@@ -82,8 +86,7 @@ return function(CutsceneSequence)
 			end
 
 		end
-		local storageId = "thebackupplan";
-		local storage = modStorage.Get(storageId, player);
+		local storage = modStorage.Get(BACKUPPLAN_STORAGE_ID, player);
 		
 		local function OnChanged(firstRun)
 			if mission.Type == 1 then
@@ -99,16 +102,20 @@ return function(CutsceneSequence)
 						
 					end
 					
-					storage = modStorage.Get(storageId, player);
-					Debugger:Log("Storage exist "..storageId..":", storage ~= nil);
+					storage = modStorage.Get(BACKUPPLAN_STORAGE_ID, player);
+					Debugger:StudioLog(`Storage exist {BACKUPPLAN_STORAGE_ID}: {storage ~= nil}`);
 					if storage == nil then
-						Debugger:Log("Generating storage",storageId);
+						Debugger:Log("Generating storage",BACKUPPLAN_STORAGE_ID);
 						local profile = shared.modProfile:Get(player);
 						local activeSave = profile:GetActiveSave();
 						
-						if activeSave and activeSave.Storages[storageId] == nil then
-							activeSave.Storages[storageId] = modStorage.new(storageId, storageId, player);
-							storage = activeSave.Storages[storageId];
+						if activeSave and activeSave.Storages[BACKUPPLAN_STORAGE_ID] == nil then
+							activeSave.Storages[BACKUPPLAN_STORAGE_ID] = modStorage.new(
+								BACKUPPLAN_STORAGE_ID, 
+								BACKUPPLAN_STORAGE_ID, 
+								player
+							);
+							storage = activeSave.Storages[BACKUPPLAN_STORAGE_ID];
 							storage:Sync();
 						end
 					end
@@ -120,7 +127,6 @@ return function(CutsceneSequence)
 						end)
 						modEvents:NewEvent(player, {Id="backupplanPoint4"});
 					end
-					
 				end
 				
 			elseif mission.Type == 3 then
