@@ -44,10 +44,10 @@ function interactablePackage.init(super) -- Server/Client
         if info.Player == nil then return end;
         if info.Action ~= info.ActionSource.Client then return end;
 
-        local halloweenWindow: InterfaceWindow = modClientGuis.getWindow("SafehomeSoundSystem");
-        if halloweenWindow.Visible then return end;
+        local soundSystemWindow: InterfaceWindow = modClientGuis.getWindow("SafehomeSoundSystem");
+        if soundSystemWindow.Visible then return end;
 
-        halloweenWindow:Open(interactable, info);
+        soundSystemWindow:Open(interactable, info);
     end
     
     super.registerPackage(SafehomeSoundSystem);

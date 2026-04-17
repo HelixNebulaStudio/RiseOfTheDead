@@ -4,14 +4,13 @@ local SafehomeData = {};
 SafehomeData.__index = SafehomeData;
 
 --==
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService");
-local Server = require(ReplicatedStorage.Dependencies.BridgeNet2.src.Server)
 
 local audioModule = game.ReplicatedStorage.Library.Audio;
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
@@ -64,7 +63,6 @@ function SafehomeData.onRequire()
 			end
 			
 			return {ReplyCode=5;};
-			
 
 		elseif actionId == "purchaseSafehome" then
 			local safehomeId = packet.SafehomeId;
@@ -221,6 +219,8 @@ function SafehomeData.onRequire()
 		if not modBranchConfigurations.IsWorld("Safehome") then return end;
 		--== Safehome only functions;
 		
+
+
 		if actionId == "inspectSafehome" then
 			if safehomeClass == nil or safehomeClass.Owner ~= player or safehomeClass.FactionTag then
 				shared.Notify(player, "You are not at your safehome world.", "Negative");
@@ -239,12 +239,11 @@ function SafehomeData.onRequire()
 
 		elseif actionId == "playSound" and safehomeData.ActiveId ~= "default" then
 			local soundId = packet.SoundId;
-			local interactObject = packet.Object;
-			
+			local interactConfig = packet.InteractConfig;
+
 			if soundId == nil or #soundId <= 0 then
-				
 				local soundList = {};
-				for _, sound in pairs(audioModule:GetChildren()) do
+				for _, sound in pairs(audioModule.ServerAudio:GetChildren()) do
 					if sound.TimeLength > 59 then
 						table.insert(soundList, sound.SoundId);
 					end
@@ -254,83 +253,86 @@ function SafehomeData.onRequire()
 			end
 			
 			if soundId:match("rbxassetid") == nil then
-				soundId = "rbxassetid://"..soundId;
+				soundId = `rbxassetid://{soundId}`;
 			end
 			
-			local globalSound = workspace:FindFirstChild("GlobalSoundSystem");
-			if globalSound == nil then
-				globalSound = Instance.new("Sound");
+			local globalAudioPlayer: AudioPlayer = workspace:FindFirstChild("GlobalSoundSystem");
+			local audioReverb = globalAudioPlayer and globalAudioPlayer:FindFirstChild("AudioReverb");
+			if globalAudioPlayer == nil then
+				globalAudioPlayer = Instance.new("AudioPlayer");
+				audioReverb = Instance.new("AudioReverb");
+				audioReverb.Parent = globalAudioPlayer;
+				
+				local wire = Instance.new("Wire");
+				wire.Parent = globalAudioPlayer;
+				wire.SourceInstance = globalAudioPlayer;
+				wire.TargetInstance = audioReverb;
 			end
-			globalSound.Name = "GlobalSoundSystem";
-			globalSound.SoundGroup = game.SoundService:FindFirstChild("InstrumentMusic");
-			globalSound.Looped = true;
-			globalSound.Parent = workspace;
+			globalAudioPlayer.Name = "GlobalSoundSystem";
+			globalAudioPlayer.Looping = true;
+			globalAudioPlayer.Parent = workspace;
 			
-			isSoundPlaying = globalSound.Playing;
-			if interactObject then
-				globalSound.Volume = 0;
-				
-				if #soundSources <= 0 then
-					for _, obj in pairs(interactObject:GetDescendants()) do
-						if obj.Name == "_SoundSystem" then
-							local new = Instance.new("Sound");
-							new.Parent = obj;
-							new.SoundGroup = game.SoundService:FindFirstChild("InstrumentMusic");
-							new.RollOffMaxDistance = 64;
-							new.RollOffMinDistance = 1;
-							new.RollOffMode = Enum.RollOffMode.LinearSquare;
-							new.Looped = true;
-							
-							local newReverb = script:WaitForChild("ReverbSoundEffect"):Clone();
-							newReverb.Parent = new;
-							
-							table.insert(soundSources, new);
-						end
-					end
-				end
-				
-				for a=1, #soundSources do
-					soundSources[a].SoundId = soundId;
-				end
-				
-				if isSoundPlaying then
-					for a=1, #soundSources do
-						soundSources[a]:Stop();
-					end
-				else
-					for a=1, #soundSources do
-						soundSources[a]:Play();
-					end
-				end
-				
-			else
-				globalSound.Volume = 1;
-				
-				for a=1, #soundSources do
-					soundSources[a]:Stop();
-				end
-			end
-		
-			globalSound.SoundId = soundId;
-			if isSoundPlaying then
-				globalSound:Stop();
-			else
-				globalSound:Play();
+			if globalAudioPlayer.IsPlaying then
+				globalAudioPlayer:Stop();
+				return;
 			end
 			
+			local audioEmitters: {AudioEmitter} = {};
+
+			if packet.RadioPlay ~= true then
+				local mapAudioEmitters = workspace.Environment:FindFirstChild("AudioEmitters");
+				if mapAudioEmitters then
+					for _, obj in ipairs(mapAudioEmitters:GetDescendants()) do
+						if obj:IsA("BasePart") then
+							(obj::BasePart).AudioCanCollide = false;
+
+						elseif obj:IsA("AudioEmitter") then
+							(obj :: AudioEmitter):SetDistanceAttenuation(modAudio.newDistanceAttenuation("InverseTapered"));
+							table.insert(audioEmitters, obj);
+						end;
+					end
+				end
+			end
+
+			local radioAudioEmitterAtt = interactConfig:FindFirstChild("RadioAudioEmitterAtt");
+			local radioAudioEmitter = radioAudioEmitterAtt and radioAudioEmitterAtt:FindFirstChild("RadioAudioEmitter");
+			if radioAudioEmitter == nil then
+				radioAudioEmitterAtt = Instance.new("Attachment");
+				radioAudioEmitterAtt.Parent = interactConfig;
+				radioAudioEmitterAtt.CFrame = CFrame.new(-1, 0, 0);
+				
+				radioAudioEmitter = Instance.new("AudioEmitter");
+				radioAudioEmitter.Name = "RadioAudioEmitter";
+				radioAudioEmitter:SetDistanceAttenuation(modAudio.newDistanceAttenuation("InverseTapered", 14, 120));
+				radioAudioEmitter.Parent = radioAudioEmitterAtt;
+			end
+			table.insert(audioEmitters, radioAudioEmitter);
+
+			for _, audioEmitter in ipairs(audioEmitters) do
+				if audioEmitter:FindFirstChild("Wire") then continue end;
+
+				local wire = Instance.new("Wire");
+				wire.Parent = audioEmitter;
+				wire.SourceInstance = audioReverb;
+				wire.TargetInstance = audioEmitter;
+			end
+
+			globalAudioPlayer.Asset = soundId;
+			globalAudioPlayer:Play();
 
 		elseif actionId == "togglePartyLights" and safehomeData.ActiveId ~= "default" then
-			local interactObject = packet.Object;
-			if interactObject == nil then return end;
+			local interactConfig = packet.InteractConfig;
+			if interactConfig == nil then return end;
 			
 			if #lightSources <= 0 then
-				local objectTag = interactObject:WaitForChild("Safehouse");
-				local safehouse = objectTag.Value:GetDescendants();
+				local lightsGroup = workspace.Environment:FindFirstChild("Game") 
+								and workspace.Environment.Game:FindFirstChild("TogglableLights") or nil;
+				local safehouseLights = lightsGroup:GetDescendants();
 				
-				for a=1, #safehouse do
-					if safehouse[a].Name == "_lightSource" then
-						local lightTable = {Source=safehouse[a]; OriginalColor=safehouse[a].Color; LightObjects={}};
-						local lights = safehouse[a]:GetDescendants();
+				for a=1, #safehouseLights do
+					if safehouseLights[a].Name == "_lightSource" then
+						local lightTable = {Source=safehouseLights[a]; OriginalColor=safehouseLights[a].Color; LightObjects={}};
+						local lights = safehouseLights[a]:GetDescendants();
 						for b=1, #lights do
 							if lights[b]:IsA("Light") then
 								table.insert(lightTable.LightObjects, {Light=lights[b]; OriginalColor=lights[b].Color});
@@ -351,7 +353,7 @@ function SafehomeData.onRequire()
 				partyLightsDebounce = true;
 				workspace:SetAttribute("PartyLights", true);
 				
-				spawn(function()
+				task.spawn(function()
 					while workspace:GetAttribute("PartyLights") do
 						for a=1, #lightSources do
 							local newColor = randomColors[math.random(1, #randomColors)];
@@ -362,7 +364,7 @@ function SafehomeData.onRequire()
 							end
 							tween:Play();
 						end
-						wait(1);
+						task.wait(1);
 					end
 					local resetTime = 5;
 					for a=1, #lightSources do
