@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local RunService = game:GetService("RunService")
+local RunService = game:GetService("RunService");
 
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
@@ -53,7 +53,7 @@ local npcPackage = {
 function npcPackage.Spawning(npcClass: NpcClass)
     local character = npcClass.Character;
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
     local healthComp: HealthComp = npcClass.HealthComp;
 
     npcClass.Character:SetAttribute("EntityHudHealth", true);
@@ -233,6 +233,11 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
     local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
     local bodyParts = character:GetChildren();
+
+    local configurations: ConfigVariable = npcClass.Configurations;
+    local maxHealth = configurations.BaseValues.MaxHealth
+    local healthPerLimb = maxHealth / (#bodyParts - (isHard and 2 or 4));
+
     for a=1, #bodyParts do
         local bodyPart: BasePart = bodyParts[a];
         if not bodyParts[a]:IsA("BasePart") then continue end;
@@ -247,7 +252,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
             local destructible: DestructibleInstance = bodyDestructiblesComp:Create(newWormModel.Name, newWormModel);
             destructible.Properties.DestroyModel = false;
-            local newHealth = isHard and 50000 or 25000;
+            local newHealth = healthPerLimb;
             
             destructible:SetupHealthbar{
                 Size = UDim2.new(1.2, 0, 0.25, 0);
@@ -261,19 +266,20 @@ function npcPackage.Spawned(npcClass: NpcClass)
             limbHealthComp:SetMaxHealth(newHealth);
             limbHealthComp:Reset();
 
-            limbHealthComp.OnHealthChanged:Connect(function(newHealth, prevHealth, damageData)
+            limbHealthComp.OnHealthChanged:Connect(function(curHealth, prevHealth, damageData)
                 if limbHealthComp.IsDead then return end;
-                if newHealth == prevHealth then return end;
+                if curHealth >= prevHealth then return end;
                 if damageData.Damage == nil then return end;
 
-                healthComp:TakeDamage(damageData);
+                local newDamageData = damageData:Clone();
+                healthComp:TakeDamage(newDamageData);
             end)
 
             destructible.OnDestroy:Connect(function()
                 bodyPart.Color = Color3.fromRGB(50, 50, 50);
 
                 healthComp:TakeDamage(DamageData.new{
-                    Damage = isHard and 100000 or 7500;
+                    Damage = math.floor(maxHealth * 0.05);
                     DamageBy = limbHealthComp.LastDamagedBy;
                 });
 

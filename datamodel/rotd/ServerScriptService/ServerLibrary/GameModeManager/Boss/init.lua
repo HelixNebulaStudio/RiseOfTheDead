@@ -18,11 +18,14 @@ local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameMod
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+local modGarbageHandler = shared.require(game.ReplicatedStorage.Library.GarbageHandler);
 
 local modNpcs = shared.modNpcs;
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
+
+local BossArenaModules = script;
 
 local remoteGameModeUpdate = modRemotesManager:Get("GameModeUpdate");
 local remoteGameModeHud = modRemotesManager:Get("GameModeHud");
@@ -42,9 +45,9 @@ function GameMode:AnnounceReady()
 end
 
 function GameMode:Load(room)
-	local bossArena = room.LobbyPrefab;
+	local bossArenaModel = room.LobbyPrefab;
 	
-	local arenaInteractables = bossArena:WaitForChild("Interactables") and bossArena.Interactables:GetChildren();
+	local arenaInteractables = bossArenaModel:WaitForChild("Interactables") and bossArenaModel.Interactables:GetChildren();
 	
 	for a=1, #arenaInteractables do
 		if arenaInteractables[a]:IsA("BasePart") then
@@ -65,7 +68,7 @@ function GameMode:Load(room)
 		end
 	end
 	
-	local arenaClips = bossArena:FindFirstChild("Clips") and bossArena.Clips:GetChildren();
+	local arenaClips = bossArenaModel:FindFirstChild("Clips") and bossArenaModel.Clips:GetChildren();
 	if arenaClips then
 		for _, obj in pairs(arenaClips) do
 			if obj:IsA("BasePart") then
@@ -75,14 +78,16 @@ function GameMode:Load(room)
 	end
 
 	local roomMeta = getmetatable(room);
+	if roomMeta.Garbage == nil then
+		roomMeta.Garbage = modGarbageHandler.new();
+	end
 	
-	if bossArena:FindFirstChild("BossArena") then
-		roomMeta.ArenaModule = shared.require(bossArena.BossArena);
-		
-		if roomMeta.ArenaModule.Load then
-			task.spawn(function()
-				room.ArenaModule:Load();
-			end)
+	local bossArenaModule = BossArenaModules:FindFirstChild(bossArenaModel.Name);
+	if bossArenaModule then
+		local bossArenaHandler = shared.require(bossArenaModule);
+
+		if bossArenaHandler.BindLoad then
+			task.spawn(bossArenaHandler.BindLoad, room);
 		end
 	end
 end
@@ -94,8 +99,8 @@ function GameMode:Start(room)
 	
 	local died = false;
 					
-	local bossArena = room.LobbyPrefab;
-	local bossSpawnObject = bossArena:WaitForChild("BossSpawn");
+	local bossArenaModel = room.LobbyPrefab;
+	local bossSpawnObject = bossArenaModel:WaitForChild("BossSpawn");
 	local newSpawnPoint = modNpcs.GetCFrameFromPlatform(bossSpawnObject);
 	
 	local players = room:GetInstancePlayers();
@@ -158,7 +163,7 @@ function GameMode:Start(room)
 
 				properties.Level = math.max(bossLevel, 1);
 
-				properties.Arena = bossArena;
+				properties.Arena = bossArenaModel;
 				properties.HardMode = room.IsHard;
 				properties.CrateId = bossLib.CrateId;
 				properties.TargetableDistance = 4096;
@@ -246,11 +251,8 @@ function GameMode:Start(room)
 						task.spawn(function()
 							if #players < 0 then return end;
 							local crateRewardComp = npcClass:GetComponent("CrateReward");
-							if crateRewardComp == nil then
-								crateRewardComp = npcClass:AddComponent("CrateReward");
-							end
 							if crateRewardComp then
-								local crateSpawnPos = bossArena.PrimaryPart:FindFirstChild("CrateSpawn") and bossArena.PrimaryPart.CrateSpawn.WorldPosition;
+								local crateSpawnPos = bossArenaModel.PrimaryPart:FindFirstChild("CrateSpawn") and bossArenaModel.PrimaryPart.CrateSpawn.WorldPosition;
 								local spawnCFrame = crateSpawnPos and CFrame.new(crateSpawnPos) or nil;
 								if crateSpawnPos == nil then
 									local _dropRayHit, dropRayPos = workspace:FindPartOnRayWithWhitelist(
@@ -301,8 +303,8 @@ function GameMode:Start(room)
 	end)
 	
 	task.spawn(function()
-		local arenaCFrame = bossArena:GetPrimaryPartCFrame();
-		local arenaSize = arenaCFrame:vectorToWorldSpace(bossArena:GetExtentsSize());
+		local arenaCFrame = bossArenaModel:GetPrimaryPartCFrame();
+		local arenaSize = arenaCFrame:vectorToWorldSpace(bossArenaModel:GetExtentsSize());
 		arenaSize = Vector3.new(math.abs(arenaSize.X), math.abs(arenaSize.Y), math.abs(arenaSize.Z));
 
 		local arenaMin = Vector3.new(arenaCFrame.p.X - arenaSize.X/2, arenaCFrame.p.Y-2, arenaCFrame.p.Z - arenaSize.Z/2);
@@ -339,20 +341,18 @@ function GameMode:Start(room)
 		room.OnPlayersChanged:Fire();
 	end)
 	
-	if bossArena:FindFirstChild("BossArena") then
-		roomMeta.ArenaModule = shared.require(bossArena.BossArena);
-	end
-	if room.ArenaModule and room.ArenaModule.SetRoom then
-		room.ArenaModule:SetRoom(room);
-	end
-	if room.ArenaModule and room.ArenaModule.Start then
-		task.spawn(function()
-			room.ArenaModule:Start();
-		end)
+	local bossArenaModule = BossArenaModules:FindFirstChild(bossArenaModel.Name);
+	if bossArenaModule then
+		local bossArenaHandler = shared.require(bossArenaModule);
+
+		if bossArenaHandler.BindBegin then
+			task.spawn(bossArenaHandler.BindBegin, room);
+		end
 	end
 end
 
 function GameMode:End(room)
+	local bossArenaModel = room.LobbyPrefab;
 	if room.BossPrefabs then
 		for a=#room.BossPrefabs, 1, -1 do
 			if room.BossPrefabs[a] then
@@ -403,10 +403,18 @@ function GameMode:End(room)
 		room.NeonSign.Material = Enum.Material.Neon;
 		room.NeonSign.SpotLight.Enabled = true;
 	end
-	if room.ArenaModule and room.ArenaModule.End then
-		task.spawn(function()
-			room.ArenaModule:End();
-		end)
+	
+	local bossArenaModule = BossArenaModules:FindFirstChild(bossArenaModel.Name);
+	if bossArenaModule then
+		local bossArenaHandler = shared.require(bossArenaModule);
+
+		if bossArenaHandler.BindEnded then
+			task.spawn(bossArenaHandler.BindEnded, room);
+		end
+	end
+
+	if room.Garbage then
+		room.Garbage:Destruct();
 	end
 end
 
