@@ -152,7 +152,7 @@ return function(CutsceneSequence)
 						if stanNpcClass == nil then return end;
 
 						stanNpcClass.Chat(stanNpcClass.Player, "When you're ready.");
-						wait(0.1);
+						task.wait(0.1);
 
 						stanNpcClass.Move:Face("Player");
 						stanNpcClass:GetComponent("WaitForPlayer")(20);
@@ -224,6 +224,7 @@ return function(CutsceneSequence)
 
 
 			local playerClass: PlayerClass = shared.modPlayers.get(player);
+			playerClass.HealthComp:SetCanBeHurtBy("Zombie|Bandit|Rat|Cultist|Jason");
 			playerClass.OnIsDeadChanged:Connect(function(isDead)
 				if not isDead then return end;
 				modMission:Progress(player, MISSION_ID, function(mission)
@@ -260,6 +261,7 @@ return function(CutsceneSequence)
 					Player = player;
 				};
 				jasonNpcClass:ToggleInteractable(false);
+				jasonNpcClass.WieldComp.TargetableTags.Player = true;
 				jasonNpcClass.WieldComp:Equip{
 					ItemId="ak47";
 				};
@@ -315,7 +317,7 @@ return function(CutsceneSequence)
 						if mission.ProgressionPoint ~= 5 then return end;
 
 						stanNpcClass.Chat(player, "It's too quiet, something's not right..");
-						wait(3);
+						task.wait(3);
 						if mission.ProgressionPoint ~= 5 then return end;
 
 						waypoint = Vector3.new(-132.53479, 194.634567, -40.8270035);
@@ -325,7 +327,7 @@ return function(CutsceneSequence)
 						if mission.ProgressionPoint ~= 5 then return end;
 
 						stanNpcClass:UseInteractable("throneRoomDoor");
-						wait(1/60);
+						task.wait(1/60);
 						if mission.ProgressionPoint ~= 5 then return end;
 						stanNpcClass:SetCFrame(CFrame.new(-119.893661, 194.634567, -33.8498764, 0, 0, -1, 0, 1, 0, 1, 0, 0));
 
@@ -341,19 +343,19 @@ return function(CutsceneSequence)
 
 						loranNpcClass.Move:HeadTrack(stanNpcClass.Head);
 						jasonNpcClass.Move:HeadTrack(playerClass.Head);
-						wait(1);
+						task.wait(1);
 
 						zarkNpcClass.Move:MoveTo(Vector3.new(-79.5326004, 194.909668, -33.090416));
 						zarkNpcClass.Move.OnMoveToEnded:Wait(5);
-						wait(1);
+						task.wait(1);
 
 						CutsceneSequence:NextScene("walkToZark");
 						jasonNpcClass.Chat(player, "WALK!");
-						wait(0.2);
+						task.wait(0.2);
 
 						stanNpcClass.Move:SetMoveSpeed("set", "default", 10);
 						stanNpcClass.Move:MoveTo(Vector3.new(-95.599, 194.91, -27.702));
-						wait(0.2);
+						task.wait(0.2);
 
 						loranNpcClass.Move:SetMoveSpeed("set", "default", 10);
 						jasonNpcClass.Move:SetMoveSpeed("set", "default", 10);
@@ -362,8 +364,7 @@ return function(CutsceneSequence)
 						jasonNpcClass.Move.OnMoveToEnded:Wait(5);
 
 						modStatusEffects.Slowness(player, 10, 60);
-
-						spawn(function()
+						task.spawn(function()
 							local position = Vector3.new(-99.4085159, 194.909668, -36.03228);
 							local initMag = (playerClass.RootPart.Position-position).Magnitude;
 							local shoutCD = tick()-5;
@@ -377,9 +378,6 @@ return function(CutsceneSequence)
 
 								elseif dist >= (initMag + 5) then
 									if tick()- shoutCD >= 5 then
-										if jasonNpcClass.WieldComp.ToolHandler then
-											jasonNpcClass.WieldComp.ToolHandler.ToolAnimator:Play("Load");
-										end
 										shoutCD = tick();
 										count = count +1;
 										if count == 1 then
@@ -390,15 +388,26 @@ return function(CutsceneSequence)
 
 										elseif count == 3 then
 											jasonNpcClass.Chat(player, "LAST WARNING!!");
+											if jasonNpcClass.WieldComp.ToolHandler then
+												jasonNpcClass.WieldComp.ToolHandler.ToolAnimator:Play("Load");
+											end
 
 										elseif count > 3 then
-											jasonNpcClass.WieldComp.TargetableTags.Player = true;
 											jasonNpcClass.Move:Face(playerClass.RootPart.Position);
-											jasonNpcClass.WieldComp:InvokeToolAction(
-												"PrimaryFireRequest", 
-												(playerClass.RootPart.Position - jasonNpcClass.RootPart.Position).Unit, 
-												playerClass.Humanoid
-											);
+
+											if jasonNpcClass.WieldComp.EquipmentClass 
+											and jasonNpcClass.WieldComp.EquipmentClass.Properties 
+											and jasonNpcClass.WieldComp.EquipmentClass.Properties.Ammo <= 0 then
+												jasonNpcClass.WieldComp:InvokeToolAction("ReloadRequest");
+
+											else
+												jasonNpcClass.WieldComp:InvokeToolAction(
+													"PrimaryFireRequest", 
+													(playerClass:GetCFrame().Position - jasonNpcClass:GetCFrame().Position).Unit, 
+													playerClass.Humanoid
+												);
+
+											end
 										end
 									end
 								end 
@@ -468,7 +477,7 @@ return function(CutsceneSequence)
 
 						zarkNpcClass.WieldComp:InvokeToolAction(
 							"PrimaryFireRequest", 
-							(stanNpcClass.RootPart.Position - zarkNpcClass.RootPart.Position).Unit,
+							(stanNpcClass:GetCFrame().Position - zarkNpcClass:GetCFrame().Position).Unit,
 							stanNpcClass.Humanoid
 						);
 						stanNpcClass.Chat(player, "Ouhh..");
@@ -495,7 +504,7 @@ return function(CutsceneSequence)
 						
 						zarkNpcClass.WieldComp:InvokeToolAction(
 							"PrimaryFireRequest", 
-							(stanNpcClass.RootPart.Position - zarkNpcClass.RootPart.Position).Unit,
+							(stanNpcClass:GetCFrame().Position - zarkNpcClass:GetCFrame().Position).Unit,
 							stanNpcClass.Humanoid
 						);
 						task.wait(0.2);
@@ -512,7 +521,7 @@ return function(CutsceneSequence)
 
 					elseif mission.ProgressionPoint == 11 then
 						zarkNpcClass.Chat(player, ".. Yes, there was reports of that happening. But oh well.");
-						wait(3.5);
+						task.wait(3.5);
 
 						zarkNpcClass.Move:HeadTrack(stanNpcClass.RootPart);
 						zarkNpcClass.Move:Face(stanNpcClass.RootPart.Position);
@@ -520,14 +529,14 @@ return function(CutsceneSequence)
 						
 						zarkNpcClass.WieldComp:InvokeToolAction(
 							"PrimaryFireRequest", 
-							(stanNpcClass.RootPart.Position - zarkNpcClass.RootPart.Position).Unit,
+							(stanNpcClass:GetCFrame().Position - zarkNpcClass:GetCFrame().Position).Unit,
 							stanNpcClass.Humanoid
 						);
 						task.wait(0.2);
 
 						zarkNpcClass.WieldComp:InvokeToolAction(
 							"PrimaryFireRequest", 
-							(stanNpcClass.RootPart.Position - zarkNpcClass.RootPart.Position).Unit,
+							(stanNpcClass:GetCFrame().Position - zarkNpcClass:GetCFrame().Position).Unit,
 							stanNpcClass.Humanoid
 						);
 						task.wait(0.2);
@@ -537,7 +546,7 @@ return function(CutsceneSequence)
 				
 						zarkNpcClass.WieldComp:InvokeToolAction(
 							"PrimaryFireRequest", 
-							(stanNpcClass.RootPart.Position - zarkNpcClass.RootPart.Position).Unit,
+							(stanNpcClass:GetCFrame().Position - zarkNpcClass:GetCFrame().Position).Unit,
 							stanNpcClass.Humanoid
 						);
 						stanNpcClass.HealthComp:TakeDamage(DamageData.new{
@@ -571,7 +580,7 @@ return function(CutsceneSequence)
 						task.wait(7.5);
 						
 						jasonNpcClass.Chat(player, "Sure thing boss.");
-						spawn(function() 
+						task.spawn(function() 
 							jasonNpcClass.Move:MoveTo(Vector3.new(-124.898, 194.146, -40.23));
 							jasonNpcClass.Move.OnMoveToEnded:Wait(5);
 							jasonNpcClass:SetCFrame(CFrame.new(0.301, 194.146, -40.23));
@@ -686,6 +695,7 @@ return function(CutsceneSequence)
 		
 	--MARK: BanditOutpost
 	elseif modBranchConfigurations.IsWorld("BanditOutpost") then
+		local modGamemodeStronghold;
 		if RunService:IsServer() then
 			modGamemodeStronghold = shared.require(game.ServerScriptService.ServerLibrary.GameModeStronghold);
 		end
@@ -735,6 +745,7 @@ return function(CutsceneSequence)
 								Player = player;
 							};
 						end
+						patrickNpcClass.WieldComp.TargetableTags.Bandit = true;
 						patrickNpcClass.WieldComp:Equip{
 							ItemId = "ak47";
 							OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
@@ -750,7 +761,6 @@ return function(CutsceneSequence)
 								});
 							end;
 						};
-						patrickNpcClass.WieldComp.TargetableTags.Bandit = true;
 						-- patrickNpcClass.Wield.SetSkin({
 						-- 	Textures={
 						-- 		["Grip"]=102;
@@ -764,6 +774,7 @@ return function(CutsceneSequence)
 					end
 
 					if mission.ProgressionPoint == 13 then
+						playerClass:SetCFrame(hostageSpawn.CFrame);
 						CutsceneSequence:NextScene("closeBlinds");
 						CutsceneSequence:Pause(20);
 
