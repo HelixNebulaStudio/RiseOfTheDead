@@ -24,7 +24,6 @@ if RunService:IsServer() then
 			local data = ...;
 			
 			task.spawn(function()
-				Debugger:Warn(`Farming_BindWaterPlanter`, data);
 				if data.NewWater < 100 then return end;
 
 				local objKeys = {"jlLettuce1"; "jlLettuce2"; "jlLettuce3"};

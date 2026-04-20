@@ -11,7 +11,7 @@ function interactablePackage.init(super) -- Server/Client
         InteractableRange = 10;
     };
 
-    function Template.new(interactable: InteractableInstance, player: Player)
+    function Template.new(interactable: InteractableInstance)
         local config: Configuration = interactable.Config;
 		local npcName = config:GetAttribute("NpcName") :: string;
 

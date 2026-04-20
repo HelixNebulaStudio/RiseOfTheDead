@@ -42,6 +42,7 @@ function interactablePackage.init(super) -- Server/Client
             local interactPoint = Instance.new("Attachment");
             interactPoint.Name = `InteractPoint`;
             interactPoint.Parent = config;
+            interactPoint.CFrame = CFrame.new(-1, 0, 0);
 
             local sound = Instance.new("Sound");
             sound.Name = `Loop`;

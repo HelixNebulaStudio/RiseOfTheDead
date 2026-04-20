@@ -30,7 +30,7 @@ function interactablePackage.init(super) -- Server/Client
     end
 
     function VendingMachine.BindDestroy(interactable: InteractableInstance, player: Player)
-        Debugger:Warn(`destroying i`, interactable, `p`, player);
+        Debugger:StudioLog(`destroying i`, interactable, `p`, player);
     end
 
     function VendingMachine.BindInteract(interactable: InteractableInstance, info: InteractInfo)

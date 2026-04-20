@@ -1,15 +1,15 @@
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 --==
 local statusPackage = {
-    Id = "StrongRoot";
-    Icon = "rbxassetid://10368377851";
-    Name = "StrongRoot";
+    Id = "Leashed";
+    Icon = "";
+    Name = "Leashed";
     Description = "";
     Buff = false;
 };
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)
-    statusClass.Values.StrongRoot = statusClass.Duration;
+    --statusClass.Values.StrongRoot = statusClass.Duration;
 end
 
 return modStatusClass.new(statusPackage);

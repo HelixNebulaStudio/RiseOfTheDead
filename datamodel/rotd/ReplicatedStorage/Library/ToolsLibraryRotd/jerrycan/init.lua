@@ -36,7 +36,7 @@ function toolPackage.ActionEvent(toolHandler: ToolHandlerInstance, packet)
 
 	properties.IsActive = packet.IsActive == true;
 
-	local prefab = toolHandler.Prefabs[1];
+	local prefab = toolHandler.MainToolModel;
 	local emitter = prefab:FindFirstChild("gasolineParticle", true);
 
 	properties.Fuel = storageItem:GetValues("Fuel") or 100;
@@ -72,6 +72,7 @@ function toolPackage.ActionEvent(toolHandler: ToolHandlerInstance, packet)
 		end
 		emitter.Enabled = false;
 	end
+	properties.IsActive = false;
 end
 
 function toolPackage.newClass()

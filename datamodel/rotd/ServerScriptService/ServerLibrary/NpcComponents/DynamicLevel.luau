@@ -23,7 +23,7 @@ function Component:Setup()
 	function healthComp.TakeDamage(hc, damageData: DamageData)
 		if hc.IsDead then return end;
 
-		local damageBy: CharacterClass? = damageData.DamageBy;
+		local damageBy: CharacterClass? = damageData.DamageBy :: CharacterClass;
 		if damageBy and damageBy.ClassName == "PlayerClass" then 
 			self(damageBy);
 		end;
@@ -44,7 +44,7 @@ function Component:__call(callerCharacterClass: CharacterClass)
 	if dynamicLevelScaling == nil then return end;
 
 	local configurations: ConfigVariable = npcClass.Configurations;
-	local properties: PropertiesVariable<{}> = npcClass.Properties;
+	local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
 	local areaDifficulty = properties.AreaDifficulty or 1;
 	if properties.Level == nil and areaDifficulty == nil then

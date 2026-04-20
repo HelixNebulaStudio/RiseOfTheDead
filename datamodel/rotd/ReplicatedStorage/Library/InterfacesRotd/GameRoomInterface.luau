@@ -103,6 +103,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     itemToolTip.Frame.Name = `GameRoomItemToolTip`;
 
     local window: InterfaceWindow = interface:NewWindow("GameRoom", gameRoomFrame);
+    window.DisableInteractables = true;
     window.UseTween = false;
     window.IgnoreHideAll = true;
     window.Layers = {"GameRoom"};

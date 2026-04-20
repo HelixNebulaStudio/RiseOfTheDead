@@ -1368,6 +1368,7 @@ function library.onRequire()
 		SurfaceAppearanceParent=script;
 	};
 
+
 	--== MARK: snowsledge
 	library:Add{
 		Id="snowsledge";
@@ -1393,6 +1394,7 @@ function library.onRequire()
 		SurfaceAppearanceParent=script;
 	};
 	
+
 	--== MARK: militarygloves
 	library:Add{
 		Id="militarygloves";
@@ -1419,6 +1421,7 @@ function library.onRequire()
 		};
 		SurfaceAppearanceParent=script;
 	};
+
 
 	--== MARK: scraparmor
 	library:Add{
@@ -1487,6 +1490,7 @@ function library.onRequire()
 		};
 	};
 
+
 	--== MARK: greytshirt
 	library:Add{
 		Id="greytshirt";
@@ -1552,6 +1556,7 @@ function library.onRequire()
 		}
 	};
 
+
 	--== MARK: prisonshirt
 	library:Add{
 		Id="prisonshirt";
@@ -1578,6 +1583,7 @@ function library.onRequire()
 			["RUA"]="rbxassetid://6665638674";
 		};
 	};
+
 
 	--== MARK: prisonpants
 	library:Add{
@@ -1606,6 +1612,7 @@ function library.onRequire()
 		};
 	};
 
+
 	--== MARK: bunnymanhead
 	library:Add{
 		Id="bunnymanhead";
@@ -1626,6 +1633,7 @@ function library.onRequire()
 			["Handle"]="rbxassetid://6665865055";
 		};
 	};
+
 
 	--== MARK: plankarmor
 	library:Add{
@@ -1657,6 +1665,7 @@ function library.onRequire()
 		};
 	};
 
+
 	--== MARK: watch
 	library:Add{
 		Id="watch";
@@ -1677,6 +1686,7 @@ function library.onRequire()
 			["Handle"]="rbxassetid://13021453507";
 		};
 	};
+
 
 	--== MARK: inflatablebuoy
 	library:Add{
@@ -1748,6 +1758,7 @@ function library.onRequire()
 		};
 	};
 
+
 	--== MARK: clownmask
 	library:Add{
 		Id="clownmask";
@@ -1777,6 +1788,7 @@ function library.onRequire()
 			["Handle"]="rbxassetid://11269669005";
 		};
 	};
+
 
 	--== MARK: disguisekit
 	library:Add{
@@ -1808,6 +1820,7 @@ function library.onRequire()
 		};
 	};
 
+
 	--== MARK: zriceraskull
 	library:Add{
 		Id="zriceraskull";
@@ -1833,6 +1846,7 @@ function library.onRequire()
 			}
 		}
 	};
+
 
 	--== MARK: vexgloves
 	library:Add{
@@ -1894,6 +1908,7 @@ function library.onRequire()
 		};
 	};
 
+
 	--== MARK: cultisthood
 
 	library:Add{
@@ -1911,6 +1926,7 @@ function library.onRequire()
 		Name="Nekros";
 		BaseColor=Color3.fromRGB(89, 0, 1);
 	};
+
 
 	--== MARK: skullmask
 
@@ -1933,6 +1949,7 @@ function library.onRequire()
 			ColorMap="rbxassetid://15007537005";
 		};
 	};
+
 
 	--MARK: pouchvest
 
@@ -1958,6 +1975,61 @@ function library.onRequire()
 			ColorMap="rbxassetid://100046768465321";
 		};
 		SurfaceAppearanceParent=script;
+	};
+
+
+	--MARK: onyxhoodiehood
+
+	library:Add{
+		Id = "onyxhoodiehood";
+		ItemId = "onyxhoodiehood";
+		Name = "Default";
+		DefaultPackage = true;
+
+		SurfaceAppearance = {
+			ColorMap="rbxassetid://135484152610978";
+		};
+		SurfaceAppearanceParent = script;
+	};
+
+	library:Add{
+		Id = "onyxhoodiehoodlegacy";
+		ItemId = "onyxhoodiehood";
+		Name = "Legacy";
+		Icon = "rbxassetid://5644700762";
+		PackageId = "onyxhoodiehoodlegacy";
+		Unlocked = true;
+
+		Textures = {
+			["Handle"] = "rbxassetid://4769659026";
+		};
+	};
+	
+	
+	--MARK: onyxhoodie
+	library:Add{
+		Id = "onyxhoodie";
+		ItemId = "onyxhoodie";
+		Name = "Default";
+		DefaultPackage = true;
+
+		SurfaceAppearance = {
+			ColorMap="rbxassetid://135484152610978";
+		};
+		SurfaceAppearanceParent = script;
+	};
+
+	library:Add{
+		Id = "onyxhoodielegacy";
+		ItemId = "onyxhoodie";
+		Name = "Legacy";
+		Icon = "rbxassetid://5642499590";
+		PackageId = "onyxhoodielegacy";
+		Unlocked = true;
+
+		Textures = {
+			["Handle"] = "rbxassetid://4769659026";
+		};
 	};
 
 end

@@ -21,6 +21,10 @@ function Component.new(npcClass: NpcClass)
 	return self;
 end
 
+function Component:Destroy()
+	self.TendrilRoot = nil;
+end
+
 function Component:NewTendril(targetAtt: Attachment, isFake: boolean)
 	local npcClass = self.NpcClass;
 	if npcClass.RootPart:FindFirstChild("GrapplerHook"..targetAtt.Name) then

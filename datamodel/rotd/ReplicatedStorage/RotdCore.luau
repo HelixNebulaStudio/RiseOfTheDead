@@ -35,6 +35,7 @@ local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameMod
 local modEmotesCommsLibrary = shared.require(game.ReplicatedStorage.Library.EmoteCommsLibraryRotd);
 local modSkillTreeLibrary = shared.require(game.ReplicatedStorage.Library.SkillTreeLibraryRotd);
 local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
+local modFarmingSystem = shared.require(game.ReplicatedStorage.Library.FarmingSystem);
 
 if RunService:IsServer() then
     local modProfile = shared.require(game.ServerScriptService.ServerLibrary.ProfileRotd);

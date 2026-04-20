@@ -1688,6 +1688,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			local factionData = modData.FactionData;
 			if factionData == nil then return end;
 
+			infoSettingsFrame.TagLabel.Text = `<b>Server Tag:</b> {factionData.Tag}`;
 			infoSettingsFrame.TitleInput.Text = factionData.Title;
 			infoSettingsFrame.DescInput.Text = factionData.Description;
 			infoSettingsFrame.IconInput.Text = factionData.Icon;

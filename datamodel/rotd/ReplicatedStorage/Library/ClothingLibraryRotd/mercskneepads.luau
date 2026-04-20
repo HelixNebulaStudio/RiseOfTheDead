@@ -16,8 +16,6 @@ local attirePackage = {
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	equipmentClass:AddBaseModifier("TacticalHolsters");
-
 	return equipmentClass;
 end
 

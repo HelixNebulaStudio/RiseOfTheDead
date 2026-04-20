@@ -17,13 +17,17 @@ function Component.new(npcClass: NpcClass)
 	return self;
 end
 
+function Component:Destroy()
+	self.WeakPointTarget = nil;
+end
+
 function Component:__call(hitObject, targetHitFunc)
-	local npcClass = self.NpcClass;
+	local npcClass: NpcClass = self.NpcClass;
 
 	local healthComp: HealthComp = npcClass.HealthComp;
 	if healthComp.IsDead then return end;
 	
-	if npcClass.WeakPointHidden then return end;
+	if npcClass.Properties.WeakPointHidden == true then return end;
 
 	if self.WeakPointTarget == nil and math.random(1, 3) == 1 then
 		npcClass.Garbage:Loop(function(index, trash)
@@ -33,7 +37,7 @@ function Component:__call(hitObject, targetHitFunc)
 		end)
 		self.WeakPointTarget = nil;
 		
-		local prefabBodyParts = npcClass.Prefab:GetChildren();
+		local prefabBodyParts = npcClass.Character:GetChildren();
 		local count = 0;
 		
 		local targetPart = nil;

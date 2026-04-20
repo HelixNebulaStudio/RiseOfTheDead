@@ -120,6 +120,7 @@ declare shared: {
     modEngineCore: EngineCore;
 
     -- @world globals
+    WorldName: string;
     WorldCore: anydict;
     GameController: anydict;
 };
@@ -434,6 +435,7 @@ export type Storage = {
 
     Container: {[string]: StorageItem};
     LinkedStorages: anydict;
+    Values: anydict;
 
     StorageBitString: string;
     UsersBitString: {[string]: string};
@@ -620,7 +622,6 @@ export type CharacterClass = {
 
     Garbage: GarbageHandler;
 
-    HealthComp: HealthComp;
     StatusComp: StatusComp;
     WieldComp: WieldComp;
 
@@ -914,7 +915,9 @@ export type InteractableInstance = {
 
     Config: Configuration;
     Part: BasePart;
+    ProxyPart: BasePart;
     Point: Vector3;
+    PointOffset: Vector3;
 
     Variant: string;
 
@@ -1024,6 +1027,14 @@ export type Interface = {
         TopbarInset: Rect;
         IsCompactFullscreen: boolean;
         IsHotbarToggled: boolean;
+
+        MouseIconEnabled: boolean;
+        MouseBehavior: Enum.MouseBehavior;
+
+        AimPointerVisible: boolean;
+
+        IsSpectating: boolean;
+        IsDeathScreen: boolean;
     }>;
 
     Colors: {
@@ -1461,7 +1472,6 @@ export type DestructibleInstance = {
     Enabled: boolean;
     BroadcastHealth: boolean;
 
-    HealthComp: HealthComp;
     StatusComp: StatusComp;
     Garbage: GarbageHandler;
 
@@ -1493,6 +1503,9 @@ export type DestructibleInstance = {
     -- @signals
     OnDestroy: EventSignal<any>;
     OnEnabledChanged: EventSignal<boolean>;
+
+    -- @Binds
+    BindTakeDamage: anyfunc;
 } & EntityClass;
 
 --MARK: ArcTracer
@@ -1704,8 +1717,8 @@ type damageData = {
     TargetPart: BasePart;
 
     DamageType: DAMAGE_TYPE<string>?;
-    DamageBy: CharacterClass?; 
-    DamageTo: CharacterClass?;
+    DamageBy: EntityClass?; 
+    DamageTo: EntityClass?;
     TargetModel: Model?;
     DamageCate: string?;
     ToolHandler: ToolHandlerInstance?;

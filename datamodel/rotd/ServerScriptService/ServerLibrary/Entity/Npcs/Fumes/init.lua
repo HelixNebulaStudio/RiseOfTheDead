@@ -21,6 +21,9 @@ local npcPackage = {
         Level = 1;
         ExperiencePool = 40;
         MoneyReward = NumberRange.new(15, 20);
+
+        WeakPointHidden = true;
+        ThreatSenseHidden = true;
     };
 
     AddComponents = {
@@ -34,7 +37,7 @@ local npcPackage = {
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local level = math.max(properties.Level, 0);
 
@@ -55,8 +58,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
         properties.CloudSpawnDelay = tick()+5;
     end
 
-    properties.ThreatSenseHidden = true;
-    properties.WeakPointHidden = true;
     properties.Immunity = 2;
 
     properties.CloudState = 0;
