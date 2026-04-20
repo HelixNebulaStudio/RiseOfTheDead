@@ -1,0 +1,38 @@
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
+
+local treePackage = {
+    LogicString = {
+        Default = "(HasEnemy & MissionCheck) | SurvivorCombatTree | [Idle]";
+    };
+};
+
+function treePackage.HasEnemy(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    local enemyTargetData = properties.EnemyTargetData;
+
+    return enemyTargetData ~= nil;
+end
+
+function treePackage.MissionCheck(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    local enemyTargetData = properties.EnemyTargetData;
+
+    local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
+    local enemyStatusComp: StatusComp = enemyNpcClass.StatusComp;
+
+    return false;
+end
+
+function treePackage.SurvivorCombatTree(npcClass: NpcClass)
+    return npcClass.BehaviorTree:RunTree("SurvivorCombatTree", false);
+end
+
+function treePackage.Idle(npcClass: NpcClass)
+    local spawnPos = npcClass.SpawnCFrame.Position;
+    if not npcClass.Move:IsAtPosition(spawnPos) then
+        npcClass.Move:Follow(spawnPos);
+    end
+end
+
+return treePackage;

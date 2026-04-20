@@ -236,7 +236,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
 
     local attractNpcsComp = npcClass:GetComponent("AttractNpcs");
     if attractNpcsComp then
-        attractNpcsComp.AttractHumanoidType = {"Zombie"; "Human"; "Bandit"; "Rat"};
+        attractNpcsComp.AttractHumanoidType = {"Zombie"; "Bandit"; "Rat"};
         attractNpcsComp.SelfAttractAlert = true;
         attractNpcsComp:Activate();
     end
