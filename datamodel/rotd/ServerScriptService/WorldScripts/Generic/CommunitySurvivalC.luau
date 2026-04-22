@@ -59,6 +59,7 @@ function WorldCore.InitGameController()
         {Type="SurviveTime"; Chance=1; Fmod=1;};
         {Type="ProtectObjTime"; Chance=1/4; Fmod=4;};
         {Type="Boss"; Chance=1/3; Fmod=5;};
+        {Type="GrowlingArmy"; Chance=1/5; Fmod=6;};
         {Type="ExtremeBoss"; Chance=1/9; Fmod=10;};
         {Type="SuppliesRequest"; Chance=1/9; Fmod=9;};
     };
@@ -66,6 +67,7 @@ function WorldCore.InitGameController()
     newGameController.HazardsList = {
         {Type="Fog"; Chance=1/5; Fmod=5;};
         {Type="ShivShank"; Chance=1/4; Fmod=4;};
+        {Type="ContagiousTicks"; Chance=1/4; Fmod=4;};
         {Type="Airstrikes"; Chance=1/4; Fmod=6;};
     };
 

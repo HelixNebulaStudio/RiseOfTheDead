@@ -28,7 +28,7 @@ local toolPackage = {
 		PlaceOffset = CFrame.Angles(0, math.rad(-90), 0);
 
 		BuildDuration = 1;
-		BuildAvoidTags = {"TrapStructures"};
+		BuildAvoidTags = {"TrapStructures"; "BarricadeStructures"};
 	};
 
 	Properties = {};

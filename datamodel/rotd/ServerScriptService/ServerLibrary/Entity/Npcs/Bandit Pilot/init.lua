@@ -281,7 +281,7 @@ end
 --MARK: Spawning
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
     local healthComp = npcClass.HealthComp;
 
     local npcChar = npcClass.Character;
@@ -304,7 +304,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
     heliInstance.Model.Parent = npcChar;
 
     local helicopterTag = Instance.new("ObjectValue");
-    helicopterTag.Name = "Helicopter";
+    helicopterTag.Name = "HelicopterTag";
     helicopterTag.Value = heliModel;
     helicopterTag.Parent = npcClass.Character;
 

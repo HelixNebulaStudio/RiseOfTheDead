@@ -158,7 +158,11 @@ function Spawner:RequestSpawn()
         
         if #self.ActiveNpcs < spawnCount then
             for a=1, math.min(spawnCount - #self.ActiveNpcs, 3) do
-                if RunService:IsStudio() == false and #shared.modNpcs.ActiveNpcClasses > naturalSpawnLimit then break; end;
+                if RunService:IsStudio() == false 
+                and #shared.modNpcs.ActiveNpcClasses > naturalSpawnLimit
+                and #self.ActiveNpcs >= minCount then 
+                    break;
+                end;
 
                 local cframe = self:GetSpawnCFrame();
                 if cframe == nil then continue; end;
@@ -235,7 +239,7 @@ function Spawner:Spawn(cframe: CFrame, playerClasses: {PlayerClass})
                 for a=1, #playerClasses do
                     local playerClass: PlayerClass = playerClasses[a];
                     local profile: Profile = shared.modProfile:Get(playerClass:GetInstance());
-                    local gameSave: GameSave = profile:GetActiveSave();
+                    local gameSave: GameSave = profile and profile:GetActiveSave();
                     local playerLevel = gameSave and gameSave:GetStat("Level") or 1;
                     avgPlayerLevel = avgPlayerLevel and (avgPlayerLevel + playerLevel)/2 or playerLevel;
                 end

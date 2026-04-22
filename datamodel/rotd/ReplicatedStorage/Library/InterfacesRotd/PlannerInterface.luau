@@ -14,14 +14,8 @@ local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemIn
 
 local TIMER_RADIAL_CONFIG = '{"version":1,"size":128,"count":128,"columns":8,"rows":8,"images":["rbxassetid://10606346824","rbxassetid://10606347195"]}';
 
-local PlannerLibrary = {
-	["metalbarricade"]={Order=1; MaxCharges=3};
-	["barbedwooden"]={Order=2; MaxCharges=4};
-	["ticksnaretrap"]={Order=3; MaxCharges=5};
-	["scarecrow"]={Order=4; MaxCharges=2};
-	["gastankied"]={Order=5; MaxCharges=2};
-	["barbedmetal"]={Order=6; MaxCharges=1};
-};
+local modPlannerTool = shared.require(game.ReplicatedStorage.Library.ToolHandler.PlannerTool);
+local PlannerLibrary = modPlannerTool.PlannerLibrary;
 
 local interfacePackage = {
     Type = "Character";
@@ -60,18 +54,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			interface:HideAll{[window.Name]=true;};
             
             window:Update();
-			
-			task.spawn(function()
-				while windowFrame.Visible do
-					binds.RefreshLoop()
-					task.wait();
-				end
-			end)
-			
 		else
 		end
 	end)
 
+	interface.Scheduler.OnStepped:Connect(function(tickData)
+        if tickData.ms500 ~= true then return end;
+        if not window.Visible then return end;
+	
+		binds.RefreshLoop();
+	end)
 
 	windowFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
         window:Close();
@@ -127,7 +119,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local chargeValues = itemValues.Charges or {};
 		
 		for itemId, buttonInfo in pairs(itemButtons) do
-			
 			local structureButton = buttonInfo.StructureButton;
 
 			local chargesLabel = structureButton:WaitForChild("ChargesLabel");
@@ -139,7 +130,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			local lastChargeTime = chargeValues[itemId];
 			if lastChargeTime == nil then
-				chargesLabel.Text = "0/"..plannerInfo.MaxCharges;
+				chargesLabel.Text = `0/{plannerInfo.MaxCharges}`;
 				continue;
 			end
 			
@@ -193,7 +184,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		
 		Debugger:Warn("Interface.Update()", itemValues);
 		if itemValues == nil then
-            Debugger:Warn("Missing itemvalues"); return end;
+            Debugger:Warn("Missing itemvalues"); 
+			return;
+		end;
 		
 		for itemId, itemInfo in pairs(PlannerLibrary) do
 			local itemButtonObj;

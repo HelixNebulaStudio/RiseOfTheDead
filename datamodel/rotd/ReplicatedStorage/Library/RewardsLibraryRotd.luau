@@ -15,6 +15,16 @@ local quan2m4 = {Min=2; Max=4};
 
 function library.onRequire()
 	library:Add{
+		Id = "hordeattack_default";
+		Rewards={
+			{ItemId="scarecrowbp"; Quantity=1; Chance=1/10;};
+			{ItemId="gastankiedbp"; Quantity=1; Chance=1/10;};
+			{ItemId="metalbarricadebp"; Quantity=1; Chance=1/10;};
+			{ItemId="mk2grenade"; Quantity=1; Chance=1/32;};
+		};
+	};
+
+	library:Add{
 		Id="RegionDrop:Mall Street";
 		Rewards={
 			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; Values={WantedNpc="Kat";}; Chance=1/500;};

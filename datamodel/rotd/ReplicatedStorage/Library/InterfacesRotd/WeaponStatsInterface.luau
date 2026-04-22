@@ -851,7 +851,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local weakpointDmg = nil;
                 local _level, skillStats = modData:GetSkillTree("weapoi");
                 if skillStats and (a == ammoMag or math.fmod(a, 6) == 0) then
-                    local weapoiMulti = (skillStats.Percent.Default + skillStats.Percent.Value)/100
+                    local weapoiMulti = skillStats.Percent.Value/100;
                     
                     weakpointDmg = preModDamage * weapoiMulti;
                     

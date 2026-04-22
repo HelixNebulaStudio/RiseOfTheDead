@@ -3,8 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 --==
 local Hazard = {
-	Title = "Horde Rush";
-	Description = "Zombies sprint when they spawn!";
+	Title = "Contagious Ticks";
+	Description = "Dying enemies will cause a Tick Combustion.";
 	Controller = nil;
 };
 Hazard.__index = Hazard;
@@ -18,6 +18,7 @@ function Hazard.new()
 end
 
 function Hazard:Load()
+
 end
 
 function Hazard:Begin()
@@ -25,20 +26,20 @@ function Hazard:Begin()
 	controller.StageGarbage:Tag(controller.OnSurvivalNpcSpawn:Connect(function(npcClass: NpcClass)
         if npcClass.HumanoidType ~= "Zombie" then return end;
         if npcClass.Properties.BasicEnemy ~= true then return end;
+		if npcClass.Name == "Ticks" then return end;
 
-		local targetHandlerComp = npcClass:GetComponent("TargetHandler");
-		if targetHandlerComp == nil then return end;
+		local tickCombustionComp = npcClass:AddComponent("TickCombustion");
+		if tickCombustionComp == nil then return end;
 
-		targetHandlerComp.OnTargetUpdate:Once(function()
-			npcClass.Move:SetMoveSpeed("set", "sprint", 60, npcClass.Move.MoveSpeedPriority.Action, 5);
-		end)
     end))
 end
 
 function Hazard:Tick()
+
 end
 
 function Hazard:End()
+	
 end
 
 return Hazard;

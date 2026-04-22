@@ -35,7 +35,7 @@ local npcPackage = {
             Data = {
                 RestTimeInterval = NumberRange.new(90, 160);
                 RestingSeatName = "RussellSeat";
-                RestDuration = NumberRange.new(20, 29);
+                RestDuration = NumberRange.new(109, 129);
                 RestSay = {
                     "*Zzz... zzz.. zzz..*";
                     "*grumbles in sleep* Can't get any peace and quiet around here..";
@@ -51,7 +51,7 @@ local npcPackage = {
                     "If someone takes my stuff without asking again...";
                     "Can't believe I have to reorganize this mess. Again.";
                 };
-                Duration = NumberRange.new(20, 30);
+                Duration = NumberRange.new(50, 60);
             };
             warehouseWorkbench = {
                 Chance = 1;
@@ -63,7 +63,7 @@ local npcPackage = {
                     "This would go faster if people stopped interrupting me.";
                     "These parts aren't going to assemble themselves...";
                 };
-                Duration = NumberRange.new(34, 40);
+                Duration = NumberRange.new(54, 60);
             };
             warehouseShop = {
                 Chance = 0.5;
@@ -74,7 +74,7 @@ local npcPackage = {
                     "This better not be a waste of my time, Jesse.";
                     "*mutters* Why do I even bother coming here...";
                 };
-                Duration = NumberRange.new(30, 34);
+                Duration = NumberRange.new(50, 54);
             };
             warehouseVendingMachine = {
                 Chance = 0.5;

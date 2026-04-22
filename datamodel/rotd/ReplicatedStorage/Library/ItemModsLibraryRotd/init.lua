@@ -795,8 +795,8 @@ function library.onRequire()
 	library:Add{
 		Id = "pointguardbulwark";
 		Name = "Heavy Machine Gun Point-Guard Bulwark";
-		Desc = "[Beta] Additional <b>Armor Points</b> build up while in focus at the reduction of your <b>Focus Movespeed</b>.";
-		Icon = shared.Const.PlaceholderIcon;
+		Desc = "Additional 100 <b>Armor Points</b> build up while in focus at the reduction of your <b>Focus Movespeed</b>.";
+		Icon = "rbxassetid://120030019844899";
 		BaseTier = 2;
 		Tier = 2;
 		Stackable = true;

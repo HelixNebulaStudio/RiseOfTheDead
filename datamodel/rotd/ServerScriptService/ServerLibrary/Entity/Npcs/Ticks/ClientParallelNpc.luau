@@ -82,23 +82,6 @@ function clientNpc.init(localNpc)
 	end)
 
     local self = {};
-	
-	function self:OnRemoteEvent(action, packet)
-		if action == "detonate" then
-			local effectMesh = packet[1];
-			if not workspace:IsAncestorOf(effectMesh) then return end; -- Probably not streamed in.
-
-			local newEffect = effectMesh.Parent;
-			local speed = packet[2];
-			local range = packet[3];
-
-			Debugger.Expire(newEffect, speed);
-			local duration = speed +0.3;
-			TweenService:Create(effectMesh, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale = Vector3.new(range,range,range)}):Play();
-			TweenService:Create(newEffect, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Transparency = 0.8}):Play();
-		end
-	end
-
     localNpc[character.Name] = self;
 end
 

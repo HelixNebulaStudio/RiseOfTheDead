@@ -1,12 +1,12 @@
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 --==
 local statusPackage = {
-    Id="tickre";
-    Icon="rbxassetid://4978159755";
-    Name="Tick Protection";
-    Description="You recently got damaged by a tick, thus will not take damage from another one until this expires.";
-    Buff=true;
-    Cleansable=true;
+    Id = "tickre";
+    Icon = "rbxassetid://4978159755";
+    Name = "Tick Protection";
+    Description = "You recently got damaged by a tick, thus will not take damage from another one until this expires.";
+    Buff = true;
+    Cleansable = true;
 };
 
 function statusPackage.init()

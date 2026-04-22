@@ -46,7 +46,8 @@ function WorldCore.InitGameController()
     newGameController.ObjectivesList = {
         {Type="Eliminate"; Chance=1; Fmod=1;};
         {Type="Oily"; Chance=1/3; Fmod=2;};	
-        {Type="ProtectObjTime"; Chance=1/5; Fmod=4;};	
+        {Type="ProtectObjTime"; Chance=1/5; Fmod=4;};
+        {Type="GrowlingArmy"; Chance=1/5; Fmod=6;};
         {Type="Boss"; Chance=1/6; Fmod=6;};
         {Type="SuppliesRequest"; Chance=1/9; Fmod=9;};
     };
@@ -54,6 +55,7 @@ function WorldCore.InitGameController()
     newGameController.HazardsList = {
         {Type="HordeRush"; Chance=1/3; Fmod=4;};
         {Type="ShivShank"; Chance=1/4; Fmod=4;};
+        {Type="ContagiousTicks"; Chance=1/4; Fmod=4;};
         {Type="VexSpitter"; Chance=1/5; Fmod=4;};
 	    {Type="Fog"; Chance=1/4; Fmod=4;};
     };

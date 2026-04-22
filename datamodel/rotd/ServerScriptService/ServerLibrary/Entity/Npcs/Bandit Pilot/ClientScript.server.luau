@@ -12,7 +12,7 @@ repeat task.wait(0.1) until characterTag.Value ~= nil;
 local character = characterTag.Value;
 if not workspace:IsAncestorOf(character) then return end;
 
-local helicopterTag = character:WaitForChild("Helicopter");
+local helicopterTag = character:WaitForChild("HelicopterTag");
 repeat task.wait(0.1) until characterTag.Value ~= nil;
 
 local heliModel = helicopterTag.Value;
@@ -36,7 +36,7 @@ topRotorAnimation:Play();
 modAudio.Preload("HelicopterCore", 5);
 modAudio.Play("HelicopterCore", heliRoot);
 
-wait(0.5)
+task.wait(0.5)
 
 local function updateCollision(model)
 	if model:IsA("BasePart") then

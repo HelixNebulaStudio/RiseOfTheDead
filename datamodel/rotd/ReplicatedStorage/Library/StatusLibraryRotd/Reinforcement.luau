@@ -23,14 +23,14 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
         playerClass.Properties.ReinforcementBuff:Destroy();
     end
 
-    local npcName = namesList[math.random(1, #namesList)];
+    -- local npcName = namesList[math.random(1, #namesList)];
 
-    local npcModel = shared.modNpcs.spawn(npcName, playerClass.RootPart.CFrame, function(npc, npcModule)
-        npcModule.Humanoid.Name = "Pet";
-        npcModule.Player = playerClass:GetInstance();
-    end, shared.require(game.ServerStorage.Prefabs.CustomNpcModules.PetNpcModule));
+    -- local npcModel = shared.modNpcs.spawn(npcName, playerClass.RootPart.CFrame, function(npc, npcModule)
+    --     npcModule.Humanoid.Name = "Pet";
+    --     npcModule.Player = playerClass:GetInstance();
+    -- end);
 
-    playerClass.Properties.ReinforcementBuff = npcModel;
+    -- playerClass.Properties.ReinforcementBuff = npcModel;
 end
 
 function statusPackage.BindExpire(statusClass: StatusClassInstance)

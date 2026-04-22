@@ -20,6 +20,7 @@ local projectilePackage = {
 	};
 
 	Properties = {
+        Radius = 20;
 		Damage = 50;
 	};
 };

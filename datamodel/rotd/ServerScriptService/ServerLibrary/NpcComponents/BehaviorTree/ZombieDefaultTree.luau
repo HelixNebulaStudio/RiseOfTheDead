@@ -189,11 +189,22 @@ function treePackage.Attack(npcClass: NpcClass)
 end
 
 function treePackage.FollowEnemy(npcClass: NpcClass)
-    local targetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
+    local configurations = npcClass.Configurations;
+    local properties = npcClass.Properties;
+    local targetData: NpcTargetData = properties.EnemyTargetData;
 
     local targetPart = targetData.TargetPart or targetData.Model.PrimaryPart;
 
     npcClass.Move:Follow(targetPart);
+
+    if targetData.Distance > 67 
+    and (properties.NextFollowSprintTick == nil or tick()>properties.NextFollowSprintTick) then
+        properties.NextFollowSprintTick = tick() + math.random(7, 10);
+
+        local baseWs = configurations.BaseValues.WalkSpeed or 15;
+        npcClass.Move:SetMoveSpeed("set", "followsprint", baseWs+6, npcClass.Move.MoveSpeedPriority.Movement, math.random(4, 7));
+    end
+
     return true;
 end
 

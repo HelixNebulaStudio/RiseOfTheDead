@@ -33,11 +33,12 @@ local npcPackage = {
         "TargetHandler";
         "RandomClothing";
         "DynamicLevel";
+        "TickCombustion";
     };
     AddBehaviorTrees = {};
 
     DynamicLevelScaling = {
-        WalkSpeed = 35;
+        WalkSpeed = 40;
         MaxHealth = function(lvl) return 49+(math.max(50*lvl, 50)); end;
         AttackDamage = function(lvl) return math.min(35+(lvl), 200); end;
     };
@@ -68,6 +69,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
     end
 
     npcClass:GetComponent("RandomClothing")();
+    npcClass:GetComponent("TickCombustion").CombustOnDeath = false;
 end
 
 

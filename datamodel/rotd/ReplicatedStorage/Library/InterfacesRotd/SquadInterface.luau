@@ -2,7 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local localPlayer = game.Players.LocalPlayer;
 
-local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManager);
 local modMarkers = shared.require(game.ReplicatedStorage.Library.Markers);

@@ -57,6 +57,7 @@ function WorldCore.InitGameController()
         {Type="SurviveTime"; Chance=1; Fmod=1;};
         {Type="TicksGalore"; Chance=1/4; Fmod=4;};
         {Type="ProtectObjTime"; Chance=1/4; Fmod=4;};
+        {Type="GrowlingArmy"; Chance=1/5; Fmod=6;};
         {Type="Boss"; Chance=1/8; Fmod=5;};
         {Type="ExtremeBoss"; Chance=1/16; Fmod=10;};
         {Type="SuppliesRequest"; Chance=1/9; Fmod=9;};

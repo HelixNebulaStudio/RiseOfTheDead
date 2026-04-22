@@ -105,7 +105,7 @@ function treePackage.FumesCloud(npcClass: NpcClass)
         end
 
         if isHard then
-            local distFromCloud = npcClass:DistanceFromCharacter(properties.FumesCloudPoint);
+            local distFromCloud = npcClass:DistanceFrom(properties.FumesCloudPoint);
 
             if tick() > properties.WanderTick or distFromCloud > 45 then
                 properties.WanderTick = tick()+math.random(50,100)/10;

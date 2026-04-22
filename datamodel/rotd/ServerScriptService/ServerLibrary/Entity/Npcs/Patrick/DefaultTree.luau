@@ -31,7 +31,7 @@ end
 function treePackage.Idle(npcClass: NpcClass)
     local spawnPos = npcClass.SpawnCFrame.Position;
     if not npcClass.Move:IsAtPosition(spawnPos) then
-        npcClass.Move:Follow(spawnPos);
+        npcClass.Move:MoveTo(spawnPos);
     end
 end
 

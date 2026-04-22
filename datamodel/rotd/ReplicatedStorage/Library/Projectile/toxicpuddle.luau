@@ -70,8 +70,10 @@ function projectilePackage.onRequire()
                 shared.modPlayers.cameraShakeAndZoom(player, 5, 0, 0.3, 2, false);
             end
 
+            local damage = (projectile.Properties.Damage or 2);
             healthComp:TakeDamage(DamageData.new{
-                Damage = 2;
+                DamageBy = damageBy;
+                Damage = damage;
                 TargetPart = part;
             });
             modAudio.Play("AcidHit", part).PlaybackSpeed = math.random(90, 110)/100;

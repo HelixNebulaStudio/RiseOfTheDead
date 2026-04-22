@@ -394,7 +394,7 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 	if self.OnNpcSpawnHooked == nil then
 		self.OnNpcSpawnHooked = modNpcs.OnNpcSpawn:Connect(function(npcClass: NpcClass)
 			local humanoidType = npcClass.HumanoidType;
-			if modConfigurations.TargetableEntities[humanoidType] == nil then return end; -- Not enemy spawn;
+			if humanoidType ~= "Zombie" then return end;
 			
 			table.insert(self.EnemyNpcClasses, npcClass);
 			
@@ -502,6 +502,9 @@ function Survival:GetNextWaveInfo(wave)
 		Debugger:StudioLog("selected option GetNextWaveInfo", objectivesList, hazardsList);
 
 		local objPick = objectivesList[random:NextInteger(1, #objectivesList)];
+		if objPick == nil then
+			objPick = self.ObjectivesList[1];
+		end
 		local hazPick = hazardsList[random:NextInteger(1, #hazardsList)];
 
 		for a=1, #self.ObjectivesList do

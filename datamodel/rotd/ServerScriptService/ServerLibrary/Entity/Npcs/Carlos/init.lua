@@ -56,7 +56,7 @@ local npcPackage = {
                     "Maybe I should leave a note about where things go...";
                     "*arranges items gently* Like arranging notes on a staff...";
                 };
-                Duration = NumberRange.new(20, 30);
+                Duration = NumberRange.new(40, 50);
             };
             sundaysShop = {
                 Chance = 0.5;
@@ -65,7 +65,7 @@ local npcPackage = {
                     "*fidgets with flute* Do you... do you ever enjoy music, Frank? Hahah";
                     "*whispers* Maybe I could play something for the shop sometime...";
                 };
-                Duration = NumberRange.new(30, 34);
+                Duration = NumberRange.new(50, 54);
             };
             sundaysVendingMachine = {
                 Chance = 0.5;
@@ -82,7 +82,7 @@ local npcPackage = {
                     "*quietly* The machine gave me a $ItemId... how interesting...";
                 };
                 InteractTime = -4;
-                Duration = NumberRange.new(14, 20);
+                Duration = NumberRange.new(34, 40);
             };
         };
     };

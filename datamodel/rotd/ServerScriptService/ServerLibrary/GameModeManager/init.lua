@@ -905,6 +905,7 @@ function GameModeManager:Initialize(gameType, gameStage)
 				end
 			end
 			for b=1, #menuPlayers do
+				if not game.Players:IsAncestorOf(menuPlayers[b]) then continue end;
 				lobbyPrefab:AddPersistentPlayer(menuPlayers[b]);
 			end
 		end

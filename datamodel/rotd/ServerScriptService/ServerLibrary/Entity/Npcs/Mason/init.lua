@@ -39,7 +39,7 @@ local npcPackage = {
             Data = {
                 RestTimeInterval = NumberRange.new(70, 120);
                 RestPoint = CFrame.lookAt(Vector3.new(28.717, 57.651, 18.246), Vector3.new(15.417, 57.651, 18.246));
-                RestDuration = NumberRange.new(19, 29);
+                RestDuration = NumberRange.new(59, 69);
                 RestSay = {
                     "If anyone needs help, I will be pleased to help out.";
                     "Anyone in need of help?";
@@ -60,7 +60,7 @@ local npcPackage = {
                     "What on earth is this atom-looking thingamajig??";
                     "...How many times do I have to tell Russell that the wrench is not the sharpest tool in the shed..";
                 };
-                Duration = NumberRange.new(33, 43);
+                Duration = NumberRange.new(73, 83);
             };
             warehouseBrokenEngine = {
                 Chance = 1;
@@ -71,7 +71,7 @@ local npcPackage = {
                     "If only I had my repair manual with me..";
                     "*sighs* This is going to take a while to fix.";
                 };
-                Duration = NumberRange.new(33, 43);
+                Duration = NumberRange.new(73, 83);
             };
             warehouseSafehouseStorage = {
                 Chance = 0.7;
@@ -82,7 +82,7 @@ local npcPackage = {
                     "Where did I put that wrench again..?";
                     "I need to get rid of all these easter eggs..";
                 };
-                Duration = NumberRange.new(20, 30);
+                Duration = NumberRange.new(60, 70);
             };
             warehouseWorkbench = {
                 Chance = 0.5;
@@ -91,7 +91,7 @@ local npcPackage = {
                     "I hope Russell doesn't take my wrench again..";
                     "Ahh dagnabbit, I overtweaked my gun again..";
                 };
-                Duration = NumberRange.new(34, 40);
+                Duration = NumberRange.new(74, 80);
             };
             warehouseVendingMachine = {
                 Chance = 0.5;

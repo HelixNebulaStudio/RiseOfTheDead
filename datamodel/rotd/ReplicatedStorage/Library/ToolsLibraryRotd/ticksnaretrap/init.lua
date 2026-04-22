@@ -23,7 +23,7 @@ local toolPackage = {
 		Prefab = script:WaitForChild("TicksSnareTrap");
 		BuildDuration = 1;
 
-		BuildAvoidTags = {"TrapStructures"}
+		BuildAvoidTags = {"TrapStructures"; "BarricadeStructures"}
 	};
 	Properties = {};
 };

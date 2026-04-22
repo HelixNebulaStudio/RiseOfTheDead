@@ -253,7 +253,8 @@ export type EventService = {
         EventService, 
         key: GAME_EVENT_KEY<string>, 
         (event: EventPacket, ...any) -> nil, 
-        priority: number?
+        priority: number?,
+        script: Instance?
     ) -> (()->nil);
     GetOrNewHandler: (
         EventService,

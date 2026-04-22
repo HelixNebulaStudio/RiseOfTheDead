@@ -901,7 +901,6 @@ return function(CutsceneSequence)
 			if mollyNpcClass == nil then
 				mollyNpcClass = modNpcs.spawn2{
 					Name = "Molly";
-					CFrame = CFrame.new();
 					Player = player;
 					ReplicateOut = true;
 				};

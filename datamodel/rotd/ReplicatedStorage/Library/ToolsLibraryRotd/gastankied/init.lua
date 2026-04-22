@@ -95,7 +95,6 @@ function toolPackage.BuildStructure(prefab: Model, optionalPacket)
                 MinDamage = 120;
                 MaxDamage = 100000;
                 ExplosionStun = 10;
-                TargetableEntities = modConfigurations.TargetableEntities;
 
                 DamageOrigin = lastPosition;
                 OnPartHit = modExplosionHandler.GenericOnPartHit;

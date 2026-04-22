@@ -51,6 +51,7 @@ function WorldCore.InitGameController()
     };
 
     newGameController.HazardsList = {
+        {Type="PotArmor"; Chance=1/2; Fmod=4;};
         {Type="Witherers"; Chance=1/4; Fmod=3;};
         {Type="VexSpitter"; Chance=1/5; Fmod=3;};
         {Type="Fog"; Chance=1/6; Fmod=4;};

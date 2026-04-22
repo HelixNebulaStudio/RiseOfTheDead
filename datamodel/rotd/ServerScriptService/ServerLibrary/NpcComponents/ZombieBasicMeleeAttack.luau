@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 local modSfxService = shared.require(game.ReplicatedStorage.Library.SfxService);
+local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
 
 local NpcComponent = {};
 NpcComponent.ClassName = "NpcComponent";
@@ -79,10 +80,10 @@ function NpcComponent.new(npcClass: NpcClass)
 		local attackDamage = configurations.AttackDamage;
 
 		if targetEntityClass.ClassName == "NpcClass" then
-			attackDamage = attackDamage + (enemyHealthComp.MaxHealth * 0.1);
+			attackDamage = math.min(attackDamage + (enemyHealthComp.MaxHealth * 0.1), npcClass.HealthComp.MaxHealth);
 			
 		elseif targetEntityClass.ClassName == "Destructible" then
-			dmgRange = 1;
+			dmgRange = 1+math.abs(modMath.GaussianRandom());
 		
 		end
 

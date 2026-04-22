@@ -18,7 +18,7 @@ local toolPackage = {
 		EffectDuration = 30;
 		EffectType = "Status";
 
-		StatusId = {"ForceField"; "Reinforcement"; "Superspeed"; "Lifesteal"};
+		StatusId = {"FullHeal"}; -- "ForceField"; "Reinforcement"; "Superspeed"; "Lifesteal"
 		
 		UseDuration = 1;
 	};

@@ -23,6 +23,7 @@ local toolPackage = {
 		PlaceOffset = CFrame.Angles(0, math.rad(-90), 0);
 		
 		BuildDuration = 1;
+		BuildAvoidTags = {"BarricadeStructures"};
 	};
 
 	Properties = {};
@@ -31,6 +32,8 @@ local toolPackage = {
 function toolPackage.BuildStructure(prefab: Model, optionalPacket)
 	optionalPacket = optionalPacket or {};
 
+	prefab:AddTag("BarricadeStructures");
+	
 	if modConfigurations.ExpireDeployables == true then
 		Debugger.Expire(prefab, 300);
 	end

@@ -914,10 +914,6 @@ function modBranchConfigurations.onRequire()
         modConfigurations.Set("PvpMode", true);
         
         modConfigurations.Set("SpawnProtectionTimer", 5);
-        modConfigurations.Set("TargetableEntities", {
-            Humanoid=1;
-            Zombie=1;
-        });
         
         --== Server;
         modConfigurations.Set("DisableItemDrops", false);
@@ -949,10 +945,6 @@ function modBranchConfigurations.onRequire()
         modConfigurations.Set("PvpMode", true);
         
         modConfigurations.Set("SpawnProtectionTimer", 5);
-        modConfigurations.Set("TargetableEntities", {
-            Humanoid=1;
-            Zombie=1;
-        });
         
         --== Server;
         modConfigurations.Set("DisableItemDrops", false);

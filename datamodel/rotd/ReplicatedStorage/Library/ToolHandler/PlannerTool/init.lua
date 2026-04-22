@@ -16,12 +16,19 @@ local modToolsLibrary = shared.require(game.ReplicatedStorage.Library.ToolsLibra
 local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
-local plannerInterfacePackage = shared.require(game.ReplicatedStorage.Library.InterfacesRotd.PlannerInterface);
-local PLANNER_LIBRARY = plannerInterfacePackage.PlannerLibrary;
+local PLANNER_LIBRARY = {
+	["metalbarricade"]={Order=1; MaxCharges=3};
+	["barbedwooden"]={Order=2; MaxCharges=4};
+	["ticksnaretrap"]={Order=3; MaxCharges=5};
+	["scarecrow"]={Order=4; MaxCharges=2};
+	["gastankied"]={Order=5; MaxCharges=2};
+	["barbedmetal"]={Order=6; MaxCharges=1};
+};
 
 local COLOR_PLACEABLE, COLOR_INVALID = Color3.fromRGB(131, 255, 135), Color3.fromRGB(255, 90, 93);
 
-local toolHandler: ToolHandler = modToolHandler.new();
+local toolHandler: ToolHandler & {PlannerLibrary: anydict} = modToolHandler.new();
+toolHandler.PlannerLibrary = PLANNER_LIBRARY;
 --==
 
 function toolHandler.onRequire()
@@ -170,8 +177,8 @@ function toolHandler.onRequire()
 					end
 
 					local overlapParams = OverlapParams.new();
-					overlapParams.FilterType = Enum.RaycastFilterType.Include;
-					overlapParams.FilterDescendantsInstances = includeList;
+					overlapParams.IncludeInstances = includeList;
+					overlapParams.ExcludeInstances = CollectionService:GetTagged("StructureVisualModel");
 					overlapParams.MaxParts = 1;
 
 					local placeSpacing = placeableConfig.PlaceSpacing or Vector3.new(0.2, 4, 0.2);
@@ -217,7 +224,7 @@ function toolHandler.onRequire()
 					
 					
 				else
-					shared.Notify(player, "Could not place "..itemLib.Name..", try again.", "Negative");
+					shared.Notify(player, `Could not place {itemLib.Name}, try again.`, "Negative");
 				end
 				
 				
@@ -250,6 +257,7 @@ function toolHandler.onRequire()
 				storageItem:SetValues("Charges", charges);
 				storageItem:Sync({"Charges"});
 			
+
 			elseif action == "build" then
 				local planModel = ...;
 				Debugger:Warn("build planModel", planModel);
@@ -299,8 +307,8 @@ function toolHandler.onRequire()
 				end
 
 				local overlapParams = OverlapParams.new();
-				overlapParams.FilterType = Enum.RaycastFilterType.Include;
-				overlapParams.FilterDescendantsInstances = includeList;
+				overlapParams.IncludeInstances = includeList;
+				overlapParams.ExcludeInstances = CollectionService:GetTagged("StructureVisualModel");
 				overlapParams.MaxParts = 1;
 
 				local placeSpacing = placeableConfig.PlaceSpacing or Vector3.new(0.2, 4, 0.2);
@@ -352,7 +360,7 @@ end
 function toolHandler.Init(handler: ToolHandlerInstance)
 	local equipmentClass: EquipmentClass = handler.EquipmentClass;
 	local configurations: ConfigVariable = equipmentClass.Configurations;
-	local properties: PropertiesVariable<{}> = equipmentClass.Properties;
+	local properties: PropertiesVariable<anydict> = equipmentClass.Properties;
 		
 	properties.IsActive = false;
 
@@ -375,7 +383,7 @@ if RunService:IsClient() then -- MARK: Client
 
 		local equipmentClass: EquipmentClass = handler.EquipmentClass;
 		local configurations: ConfigVariable = equipmentClass.Configurations;
-		local properties: PropertiesVariable<{}> = equipmentClass.Properties;
+		local properties: PropertiesVariable<anydict> = equipmentClass.Properties;
 
 
 		local storageItem: StorageItem = handler.StorageItem;
@@ -662,8 +670,8 @@ if RunService:IsClient() then -- MARK: Client
 				end
 
 				local overlapParams = OverlapParams.new();
-				overlapParams.FilterType = Enum.RaycastFilterType.Include;
-				overlapParams.FilterDescendantsInstances = includeList;
+				overlapParams.IncludeInstances = includeList;
+				overlapParams.ExcludeInstances = CollectionService:GetTagged("StructureVisualModel");
 				overlapParams.MaxParts = 1;
 
 				local placeSpacing = placeableConfig.PlaceSpacing or Vector3.new(0.2, 4, 0.2);
@@ -692,7 +700,7 @@ if RunService:IsClient() then -- MARK: Client
 	function toolHandler.ClientUnequip(handler: ToolHandlerInstance)
 		local equipmentClass: EquipmentClass = handler.EquipmentClass;
 		local configurations: ConfigVariable = equipmentClass.Configurations;
-		local properties: PropertiesVariable<{}> = equipmentClass.Properties;
+		local properties: PropertiesVariable<anydict> = equipmentClass.Properties;
 
 		properties.IsActive = false;
 		properties.BuildSelectId = nil;

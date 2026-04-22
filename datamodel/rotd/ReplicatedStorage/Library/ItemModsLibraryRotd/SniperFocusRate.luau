@@ -22,6 +22,8 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	local configurations = modifier.EquipmentClass.Configurations;
 
 	local baseFocusTime = configurations:GetBase("FocusDuration");
+	if baseFocusTime == nil then return end;
+	
 	local focusTimeReduction = baseFocusTime * value;
 	local newFocusTime = baseFocusTime - focusTimeReduction;
 

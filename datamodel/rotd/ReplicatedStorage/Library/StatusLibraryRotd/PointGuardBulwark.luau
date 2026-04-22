@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService");
 
 local statusPackage = {
     Id = "PointGuardBulwark";
-    Icon = shared.Const.PlaceholderIcon;
+    Icon = "rbxassetid://120030019844899";
     Name = "Point-Guard Bulwark";
     Description = "Temporarily gaining additional armor points while in focus.";
     Buff = true;
@@ -14,7 +14,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     if RunService:IsClient() then return end;
     if tickData.ms100 == false then return end;
 
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     if characterClass == nil then return end;
 
     local isFocused = characterClass.Properties.IsFocused;

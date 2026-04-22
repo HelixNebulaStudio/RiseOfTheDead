@@ -11,7 +11,7 @@ local statusPackage = {
     Id="Ziphoning";
     Icon="rbxassetid://15936793820";
     Name="Ziphoning";
-    Description="Nekrosis heal from this pool of health. +$Amount hp/s";
+    Description="Nekrosis heal from this pool of damage dealt. +$Amount hp/s";
     QuantityLabel="Pool";
     Buff=true;
     Cleansable=true;
@@ -21,23 +21,21 @@ local statusPackage = {
 function statusPackage.init()
     if RunService:IsClient() then return end;
 
-    shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, damageData: DamageData)
-        local playerClass: CharacterClass? = damageData.DamageBy;
+    shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, ...)
+        local damageData: DamageData = ...;
+        local playerClass: PlayerClass? = damageData.DamageBy :: PlayerClass;
         if playerClass == nil or playerClass.ClassName ~= "PlayerClass" then return end;
         
         local statusId = statusPackage.Id;
 
-        local statusComp: StatusComp? = playerClass.StatusComp;
-        if statusComp == nil then return end;
-
-        local statusClass: StatusClassInstance? = statusComp:GetOrDefault(statusId);
+        local statusClass: StatusClassInstance? = playerClass.StatusComp:GetOrDefault(statusId);
         if statusClass == nil then return end;
 
-		local damageTo: CharacterClass? = damageData.DamageTo;
-		if damageTo == nil then return end;
+		local damageTo: CharacterClass? = damageData.DamageTo :: CharacterClass;
+		if damageTo == nil or damageTo.ClassName ~= "NpcClass" then return end;
 
 		local damage = damageData.Damage;
-        if damage > 0 then return end;
+        if damage <= 0 then return end;
         
         local healthComp: HealthComp? = playerClass.HealthComp;
         if healthComp == nil then return end;
@@ -63,7 +61,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
         if otherStatusClass.Buff == true then continue end;
 		if otherStatusClass.Cleansable ~= true then continue end;
 
-        otherStatusClass.Expires = workspace:GetServerTimeNow()+0.15;
+        otherStatusClass.IsExpired = true;
         otherStatusClass:Sync();
     end
 end
@@ -93,6 +91,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
         };
 
         healthComp:TakeDamage(dmgData);
+        statusClass:Sync();
     end
 
     return;

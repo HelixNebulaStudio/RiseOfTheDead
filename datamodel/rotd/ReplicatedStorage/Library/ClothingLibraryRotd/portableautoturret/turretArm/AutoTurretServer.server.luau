@@ -736,13 +736,19 @@ while patStorage == nil do
 end
 
 local discOnEnemiesAttract;
-discOnEnemiesAttract = shared.modEventService:OnInvoked("Npcs_BindEnemiesAttract", function(event: EventPacket, p: Player, characterModels: {Model})
-	if not workspace:IsAncestorOf(turretArm) then discOnEnemiesAttract(); end;
-	if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
-	if p ~= player then return end;
-	
-	selectedTargets = characterModels or {};
-end)
+discOnEnemiesAttract = shared.modEventService:OnInvoked("Npcs_BindEnemiesAttract", function(event: EventPacket, ...)
+	local p: Player, characterModels: {Model} = ...;
+
+	task.spawn(function()
+		if not workspace:IsAncestorOf(turretArm) then
+			discOnEnemiesAttract(); 
+		end;
+		if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
+		if p ~= player then return end;
+		
+		selectedTargets = characterModels or {};
+	end)
+end, nil, script);
 
 local patOnChangeCon;
 patOnChangeCon = patStorage.Properties.OnChanged:Connect(function(k, v, ov) 

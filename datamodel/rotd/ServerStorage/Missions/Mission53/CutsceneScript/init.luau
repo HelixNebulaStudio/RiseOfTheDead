@@ -143,7 +143,7 @@ return function(CutsceneSequence)
 					wilsonNpcClass.Move.OnMoveToEnded:Wait(5);
 					
 					wilsonNpcClass.Move:MoveTo(Vector3.new(620.380676, 90.7988586, -95.4239197));
-					wilsonNpcClass.Move.OnMoveToEnded:Wait(10);
+					wilsonNpcClass.Move.OnMoveToEnded:Wait(6);
 					
 					wilsonNpcClass:SetCFrame(CFrame.new(620.380676, 90.7988586, -95.4239197, 2.38419432e-07, 0, -1.00000334, 0, 0.999998569, 0, 1.00000608, 0, -2.38419403e-07));
 					

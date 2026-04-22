@@ -11,6 +11,7 @@ local treePackage = {
 };
 
 function treePackage.HasEnemy(npcClass: NpcClass)
+    local wieldComp = npcClass.WieldComp;
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
     if targetHandlerComp == nil then
         return false;
@@ -36,6 +37,10 @@ function treePackage.HasEnemy(npcClass: NpcClass)
         if targetNpcClass.Properties.Detectable == false then
             return false;
         end
+
+        if targetNpcClass.Properties.LeashedIgnore and targetNpcClass.StatusComp:GetOrDefault("EntityLeash") then
+            return false;
+        end
         
         if not npcClass:IsInVision(targetNpcClass.RootPart) then
             return false;
@@ -47,9 +52,16 @@ function treePackage.HasEnemy(npcClass: NpcClass)
     properties.EnemyTargetData = enemyTargetData;
     if enemyTargetData == nil then 
 
+        if npcClass.Properties.CutsceneEquip == wieldComp.ItemId then
+            wieldComp:InvokeToolAction("ToggleIdle", true);
+        end 
         if npcClass.Properties.IsProtectingPlayer then
-            npcClass.WieldComp:InvokeToolAction("ToggleIdle", true);
-            npcClass:GetComponent("FollowPlayer")();
+            wieldComp:InvokeToolAction("ToggleIdle", true);
+
+            local followPlayerComp = npcClass:GetComponent("FollowPlayer");
+            if followPlayerComp then
+                followPlayerComp();
+            end
         end
         
         return false;
@@ -129,6 +141,10 @@ function treePackage.InMeleeRange(npcClass: NpcClass)
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
 
+    if npcClass.Humanoid.WalkSpeed <= 0 and enemyTargetData.Distance > 4 then
+        return false;
+    end
+
     if enemyTargetData.Distance <= (npcClass.Properties.MeleeRange or 20) then
         npcClass.Move:SetMoveSpeed("set", "sprint", 18, npcClass.Move.MoveSpeedPriority.Movement, 5);
         npcClass.Move:Follow(enemyNpcClass.RootPart, 2);
@@ -155,6 +171,7 @@ function treePackage.HaveMeleeAndEquip(npcClass: NpcClass)
     wieldComp:Equip{
         ItemId = meleeItemId;
         OnSuccessFunc = npcClass.Binds.EquipSuccessFunc;
+        ItemCustomizations = npcClass.NpcPackage.ItemCustomizations;
     };
 
     return true;
@@ -182,6 +199,7 @@ function treePackage.HaveGunAndEquip(npcClass: NpcClass)
     wieldComp:Equip{
         ItemId = primaryGunItemId;
         OnSuccessFunc = npcClass.Binds.EquipSuccessFunc;
+        ItemCustomizations = npcClass.NpcPackage.ItemCustomizations;
     };
 
     return true;
@@ -238,6 +256,7 @@ function treePackage.UnequipWeapon(npcClass: NpcClass)
 
     if wieldComp.EquipmentClass == nil then return false; end;
     if npcClass.Properties.CutsceneEquip == wieldComp.ItemId then return false; end;
+    if npcClass.Properties.CutsceneEquip ~= nil then return false; end;
     
     if wieldComp.EquipmentClass.Class == "Gun" or wieldComp.EquipmentClass.Class == "Melee" then
         wieldComp:Unequip();
