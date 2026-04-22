@@ -47,6 +47,13 @@ local npcPackage = {
             {Say="Clean kill, if I do say so myself."};
             {Say="You picked the wrong bandit to mess with!"};
         };
+        HuntSpeech = {
+            {Say="I will find you!"};
+            {Say="C'mon out already!"};
+            {Say="You can't hide forever."};
+            {Say="I swear I heard something here.."};
+            {Say="I might be close.."};
+        };
         PatrolConverse = {
             {
                 Say="Hey, did you hear about the new safehouse?"; 
@@ -183,6 +190,8 @@ local npcPackage = {
         Speed = NumberRange.new(0.98, 1.02);
         PlaybackSpeed = NumberRange.new(0.98, 1.02);
     };
+
+    ThinkCycle = 1;
 };
 
 function npcPackage.Spawning(npcClass: NpcClass)
@@ -190,6 +199,9 @@ function npcPackage.Spawning(npcClass: NpcClass)
     local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local level = math.max(properties.Level, 0);
+    
+    properties.LastSeenMemDuration = 5 + (level/20) * math.random(0, 100)/100;
+    properties.LastPosMemDuration = 40 + (level/3) * math.random(0, 100)/100;
 
     local maxHealth = 400 + 200*(level-1);
     configurations.BaseValues.MaxHealth = maxHealth;

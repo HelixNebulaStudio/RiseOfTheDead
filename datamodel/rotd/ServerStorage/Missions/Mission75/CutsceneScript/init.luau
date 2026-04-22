@@ -21,33 +21,9 @@ if RunService:IsServer() then
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
-end
 
---==
-return function(CutsceneSequence)
-	--if not modBranchConfigurations.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
-	local modClothingLibrary = shared.require(game.ReplicatedStorage.Library.ClothingLibrary);
+	if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 
-	local gameFolder = workspace:WaitForChild("Environment"):WaitForChild("Game");
-
-	local patrolBandit: NpcClass;
-
-	if RunService:IsServer() then
-		modStorage.RegisterItemName("Stan's Blood Samples");
-		modStorage.RegisterItemName("Dr. Deniski's Report Insights");
-		modStorage.RegisterItemName("Stan's Blood Samples Report #1");
-		modStorage.RegisterItemName("Stan's Blood Samples Report #2");
-		modStorage.RegisterItemName("Stan's Blood Samples Report #3");
-		modStorage.RegisterItemName("Stan's Blood Samples Report #4");
-	end
-	
-	if RunService:IsServer() and modBranchConfigurations.IsWorld("MedicalBreakthrough") then
-		local jerCan = script:WaitForChild("JerryCan");
-		local pickupConfig = modInteractables.createInteractable("Pickupable");
-		pickupConfig:SetAttribute("ItemId", "jerrycan");
-		pickupConfig.Parent = jerCan;
-		jerCan.Parent = workspace.Interactables;
-		
 		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
 			local id: string, interactable: InteractableInstance = ...;
 
@@ -87,8 +63,8 @@ return function(CutsceneSequence)
 
 					task.spawn(function()
 						task.wait(1);
-						for a=1, 30 do
-							bloodMachineInteractable.Config:SetAttribute("_Label", `Scanning Sample ({math.round((a/30)*100)}%)`);
+						for a=1, 20 do
+							bloodMachineInteractable.Config:SetAttribute("_Label", `Scanning Sample ({math.round((a/20)*100)}%)`);
 							task.wait(1);
 						end
 						bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
@@ -332,6 +308,13 @@ return function(CutsceneSequence)
 				if missionData.Type ~= 1 then return end;
 				if missionData.ProgressionPoint ~= 9 then return end;
 				
+				local patrolBandit: NpcClass = shared.modNpcs.listNpcClasses(function(npcClass: NpcClass)
+					if npcClass.Properties.CutscenePatrolBandit then
+						return true;
+					end
+					return false;
+				end)[1];
+
 				if patrolBandit then
 					if patrolBandit.Properties.Allied then
 						patrolBandit.Chat(player, "What the!");
@@ -424,6 +407,33 @@ return function(CutsceneSequence)
 				end)
 			end
 		end)
+
+	end
+end
+
+--==
+return function(CutsceneSequence)
+	--if not modBranchConfigurations.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	local gameFolder = workspace:WaitForChild("Environment"):WaitForChild("Game");
+
+	local patrolBandit: NpcClass;
+
+	if RunService:IsServer() then
+		modStorage.RegisterItemName("Stan's Blood Samples");
+		modStorage.RegisterItemName("Dr. Deniski's Report Insights");
+		modStorage.RegisterItemName("Stan's Blood Samples Report #1");
+		modStorage.RegisterItemName("Stan's Blood Samples Report #2");
+		modStorage.RegisterItemName("Stan's Blood Samples Report #3");
+		modStorage.RegisterItemName("Stan's Blood Samples Report #4");
+	end
+	
+	if RunService:IsServer() and modBranchConfigurations.IsWorld("MedicalBreakthrough") then
+		local jerCan = script:WaitForChild("JerryCanPart"):Clone();
+		local pickupConfig = modInteractables.createInteractable("Pickupable");
+		pickupConfig:SetAttribute("ItemId", "jerrycan");
+		pickupConfig.Parent = jerCan;
+		jerCan.Parent = workspace.Interactables;
+		
 	end
 	
 	--MARK: Initialize
@@ -590,7 +600,7 @@ return function(CutsceneSequence)
 					local missionCache = modEvents:GetEvent(player, "MissionCache");
 					local banditsAllied = missionCache and missionCache.Value and missionCache.Value.BanditsAllied == true;
 					
-					task.wait(math.random(3, 4));
+					task.wait(1);
 
 					-- patrol bandit
 					local patrolBanditSpawn = CFrame.new(498.82, 136.42, -1134.768) * CFrame.Angles(0, math.rad(-165), 0);
@@ -598,6 +608,7 @@ return function(CutsceneSequence)
 						Name = "Bandit";
 						CFrame = patrolBanditSpawn;
 						Player = player;
+						Properties = {CutscenePatrolBandit=true;};
 						BindSetup = function(npcClass: NpcClass)
 							npcClass.Properties.Allied = banditsAllied;
 							npcClass.Properties.CutsceneActive = true;
@@ -618,6 +629,8 @@ return function(CutsceneSequence)
 										mission.ProgressionPoint = 10;
 									end
 								end);
+
+								patrolBandit.Chat(player, "You.. have no idea who you're messing with..");
 							end)
 						end
 					};
@@ -625,10 +638,10 @@ return function(CutsceneSequence)
 
 					Debugger:Warn("walking to point");
 					patrolBandit:ToggleInteractable(false);
-					task.wait(0.5);
+					task.wait();
 					patrolBandit.Move:MoveTo(Vector3.new(498.82, 136.42, -1119.558));
 
-					task.wait(3);
+					task.wait(1);
 					Debugger:Warn("walking to point2");
 					
 					patrolBandit:ToggleInteractable(true);
@@ -712,7 +725,7 @@ return function(CutsceneSequence)
 						local enemies = {};
 						
 						local function spawnEnemy(spawnPoint)
-							if #enemies >= 6 then return end;
+							if #enemies >= 3 then return end;
 							
 							Debugger:StudioLog(`Spawn Aggro Bandit`);
 							modNpcs.spawn2{
@@ -725,30 +738,11 @@ return function(CutsceneSequence)
 									local properties = npcClass.Properties;
 									properties.Level = properties.Level + 2;
 									properties.TargetableDistance = 4096;
+									properties.IsHostile = true;
+									properties.ThinkCycle = 0.1;
 									
-									local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
-									local banditarmorLib = modClothingLibrary:Find("banditarmor");
-									for _, accessory in pairs(banditarmorLib.Accessories) do
-										local newAccessory = accessory:Clone();
-										
-										local destructible: DestructibleInstance = bodyDestructiblesComp:Create("Bandit Armor", newAccessory);
-										destructible.HealthComp:SetMaxHealth(100);
-										destructible.HealthComp:Reset();
-										destructible.OnDestroy:Connect(function()
-											local handle = newAccessory:FindFirstChildWhichIsA("BasePart");
-											if handle then 
-												local cf = handle.CFrame;
-												handle.Parent = workspace.Debris;
-												handle.CanCollide = true;
-												handle.CFrame = cf;
-											end;
-											game.Debris:AddItem(handle, 10);
-											newAccessory:Destroy();
-										end)
-
-										newAccessory.Parent = npcChar;
-									end
-
+									local banditArmorComp = npcClass:AddComponent("BanditArmor");
+									banditArmorComp(1000);
 
 									npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
 										if not isDead then return end;
@@ -763,8 +757,16 @@ return function(CutsceneSequence)
 									local bandanaHandle = npcChar:WaitForChild("Bandana"):WaitForChild("Handle");
 									bandanaHandle.Color = Color3.fromRGB(85, 85, 85);
 
+									local lastKnownPos = playerClass:GetCFrame().Position;
+
 									local targetHandlerComp = npcClass:GetComponent("TargetHandler");
-									targetHandlerComp:AddTarget(playerClass.Character);
+									local targetData: NpcTargetData = targetHandlerComp:AddTarget(playerClass.Character);
+									targetData.LastKnownPosition = lastKnownPos;
+
+									npcClass.Move:MoveTo(lastKnownPos);
+									task.delay(5, function()
+										properties.ThinkCycle = 1;
+									end)
 								end
 							};
 						end
@@ -774,7 +776,6 @@ return function(CutsceneSequence)
 						while true do
 							task.wait(1);
 							if patrolBandit.HealthComp.IsDead then
-								patrolBandit.Chat(player, "You.. have no idea who you're messing with..");
 								break;
 							elseif playerClass.Humanoid.Health <= 0 then
 								patrolBandit.Chat(player, "Tragic, should've listen..");
