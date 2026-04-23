@@ -15,9 +15,9 @@ Component.Pool = nil;
 
 function Component.onRequire()
 	remoteNpcComponent = modRemotesManager:Get("NpcComponent");
-    explosionEffectPrefab = game.ReplicatedStorage.Prefabs.NpcAbilities:WaitForChild("TicksExplosionEffect");
     tickBlobsPrefab = game.ReplicatedStorage.Prefabs.NpcAbilities:WaitForChild("TickBlobs"):GetChildren();
 
+    local explosionEffectPrefab = game.ReplicatedStorage.Prefabs.NpcAbilities:WaitForChild("TicksExplosionEffect");
     Component.Pool = modObjectPool.new(explosionEffectPrefab, 4);
 end
 
@@ -37,6 +37,21 @@ function Component.new(npcClass: NpcClass)
         end
     end)
 
+	setmetatable(self, Component);
+
+    npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
+        if not isDead then return end;
+        if self.CombustOnDeath == false then return end;
+
+        local lvl = npcClass.Properties.Level;
+        self(math.max(lvl, 20), math.clamp(lvl*2, 40, 80), false);
+    end)
+
+	return self;
+end
+
+function Component:Setup()
+	local npcClass: NpcClass = self.NpcClass;
     local npcChar = npcClass.Character;
     task.spawn(function()
         if npcChar:FindFirstChild("ExplosiveTickBlobs") == nil then
@@ -78,18 +93,6 @@ function Component.new(npcClass: NpcClass)
             end
         end
     end)
-
-	setmetatable(self, Component);
-
-    npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
-        if not isDead then return end;
-        if self.CombustOnDeath == false then return end;
-
-        local lvl = npcClass.Properties.Level;
-        self(math.max(lvl, 20), math.clamp(lvl*2, 40, 80), false);
-    end)
-
-	return self;
 end
 
 function Component:__call(damage, range, isLethal)

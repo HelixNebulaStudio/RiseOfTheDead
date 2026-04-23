@@ -6,8 +6,8 @@ local TweenService = game:GetService("TweenService");
 
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modWeaponsMechanics = shared.require(game.ReplicatedStorage.Library.WeaponsMechanics);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
+local modRaycastUtil = shared.require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 --==
 
 local toolPackage = {
@@ -86,7 +86,7 @@ function toolPackage.ClientPrimaryFire(handler)
 		shotData.Target = basePart;
 	end
 
-	shotData.RayPoint = modWeaponsMechanics.CastHitscanRay{
+	shotData.RayPoint = modRaycastUtil.castHitscanRay{
 		Origin = mouseProperties.Focus.p;
 		Direction = mouseProperties.Direction;
 		IncludeList = rayWhitelist;

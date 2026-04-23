@@ -394,8 +394,7 @@ if RunService:IsServer() then
 	
 end
 
-if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
-	
+if shared.WorldName == "MedicalBreakthrough" then
 	Dialogues.Bandit = {};
 	--MARK: Bandit Handler
 	Dialogues.Bandit.DialogueHandler = function(player, dialog, data, mission)
@@ -405,12 +404,7 @@ if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 		local missionCache = modEvents:GetEvent(player, "MissionCache");
 		local banditsAllied = missionCache and missionCache.Value and missionCache.Value.BanditsAllied == true;
 
-		local patrolBanditNpcModule = dialog:GetNpcClass();
-		
-		--if RunService:IsStudio() then
-		--	Debugger:Warn("Set banditsAllied", false);
-		--	banditsAllied = false;
-		--end
+		local patrolBandit: NpcClass = dialog:GetNpcClass();
 		
 		if mission.Type == 1 and mission.ProgressionPoint == 9 then
 			local playerSave = shared.modProfile:Get(player):GetActiveSave();
@@ -427,14 +421,14 @@ if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 					}, function(dialog)
 						dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
 						
-						patrolBanditNpcModule:ToggleInteractable(false);
+						patrolBandit:ToggleInteractable(false);
 	
 						playerSave:AddStat("Money", -bribeCost);
 						
 						task.wait(4);
-						patrolBanditNpcModule.Movement:Move(Vector3.new(508.548, 136.42, -1184.096));
+						patrolBandit.Move:MoveTo(Vector3.new(508.548, 136.42, -1184.096));
 						task.wait(4);
-						patrolBanditNpcModule:TeleportHide();
+						patrolBandit:TeleportHide();
 	
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 11 then
@@ -451,12 +445,12 @@ if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 					}, function(dialog)
 						dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
 						
-						patrolBanditNpcModule:ToggleInteractable(false);
+						patrolBandit:ToggleInteractable(false);
 	
 						task.wait(4);
-						patrolBanditNpcModule.Movement:Move(Vector3.new(508.548, 136.42, -1184.096));
+						patrolBandit.Move:MoveTo(Vector3.new(508.548, 136.42, -1184.096));
 						task.wait(4);
-						patrolBanditNpcModule:TeleportHide();
+						patrolBandit:TeleportHide();
 	
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 11 then
@@ -511,11 +505,11 @@ if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 									Reply="It doesn't matter! *Loads weapon*\n*Clicks walkie talkie* \"I'll be needing backup here..\"\n\nYou have a count of 3!";
 									
 								}, function(dialog)
-									patrolBanditNpcModule.Wield.LoadRequest();
+									patrolBandit.WieldComp:InvokeToolAction("LoadGun");
 
 									task.wait(4);
 									for a=3, 1, -1 do
-										patrolBanditNpcModule.Chat(player, a..string.rep("!",3-a));
+										patrolBandit.Chat(player, a..string.rep("!",3-a));
 										task.wait(1);
 										if mission.ProgressionPoint == 10 then
 											break;
@@ -552,14 +546,17 @@ if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 								Say="Not sure, it's probably unimportant..";
 								Reply=".. Alright.. I'll leave you to it..";
 							}, function(dialog)
-								patrolBanditNpcModule:ToggleInteractable(false);
-								patrolBanditNpcModule.Movement:Move(Vector3.new(508.548, 136.42, -1184.096));
+								dialog:SetExpireTime(workspace:GetServerTimeNow()+3);
+
+								patrolBandit.Properties.CallingBackup = true;
+								patrolBandit:ToggleInteractable(false);
+								patrolBandit.Move:MoveTo(Vector3.new(508.548, 136.42, -1184.096));
 								task.wait(3);
 								
-								patrolBanditNpcModule.Chat(player, "*Clicks Walkie Talkie* Potential high value cargo, 1 hostile, go in 3..", nil, 128);
+								patrolBandit.Chat(player, "*Clicks Walkie Talkie* Potential high value cargo, 1 hostile, go in 3..");
 								task.wait(3);
 								
-								if not patrolBanditNpcModule.IsDead then
+								if not patrolBandit.HealthComp.IsDead then
 									modMission:Progress(player, MISSION_ID, function(mission)
 										if mission.ProgressionPoint == 9 then
 											mission.ProgressionPoint = 10;
@@ -584,12 +581,12 @@ if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 					dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
 					
 					local function leaveNow5Sec()
-						local patrolBanditNpcClass: NpcClass = dialog:GetNpcClass();
-						patrolBanditNpcClass.WieldComp:InvokeToolAction("LoadGun");
+						local patrolBandit: NpcClass = dialog:GetNpcClass();
+						patrolBandit.WieldComp:InvokeToolAction("LoadGun");
 
 						task.wait(2);
 						for a=5, 1, -1 do
-							patrolBanditNpcClass.Chat(player, a..string.rep("!",4-a));
+							patrolBandit.Chat(player, a..string.rep("!",4-a));
 							task.wait(1);
 							if mission.ProgressionPoint == 10 then
 								break;
@@ -626,21 +623,21 @@ if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
 								}, function(dialog)
 									playerSave:AddStat("Money", -bribeCost);
 	
-									local patrolBanditNpcModule = dialog:GetNpcClass();
-									patrolBanditNpcModule:ToggleInteractable(false);
+									local patrolBandit: NpcClass = dialog:GetNpcClass();
+									patrolBandit:ToggleInteractable(false);
 									
 									cache.SecondBribe = true;
 									task.wait(4);
-									patrolBanditNpcModule.Movement:Move(Vector3.new(508.548, 136.42, -1184.096));
+									patrolBandit.Move:MoveTo(Vector3.new(508.548, 136.42, -1184.096));
 									task.wait(4)
-									patrolBanditNpcModule.Chat(player, "Wait.. You know what..", nil, 128);
-									patrolBanditNpcModule.Movement:Move(Vector3.new(507.441, 136.42, -1112.584));
+									patrolBandit.Chat(player, "Wait.. You know what..");
+									patrolBandit.Move:MoveTo(Vector3.new(507.441, 136.42, -1112.584));
 									
 									task.wait(4);
-									patrolBanditNpcModule:ToggleInteractable(true);
+									patrolBandit:ToggleInteractable(true);
 									
 									modDialogueService:InvokeDialogue(player, "talk", {
-										NpcModel=patrolBanditNpcModule.Prefab;
+										NpcModel = patrolBandit.Character;
 									});
 								end);
 							end

@@ -4,7 +4,6 @@ local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
 
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
-local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 local modArcParticles = shared.require(game.ReplicatedStorage.Particles.ArcParticles);
 local modHealthComp = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
@@ -59,11 +58,6 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
     
     local applyTo: EntityClass = statusClass.StatusOwner;
     local applyBy: CharacterClass? = statusClass.ApplyBy;
-    if applyBy and applyBy.Character and applyTo.Character then
-        modDamageTag.Tag(applyTo.Character, applyBy.Character, {
-            WeaponItemId = statusClass.Values.WeaponSiid;
-        });
-    end
 
     local originAtt = statusClass.Values.OriginAtt;
     local hitPart = statusClass.Values.HitPart;

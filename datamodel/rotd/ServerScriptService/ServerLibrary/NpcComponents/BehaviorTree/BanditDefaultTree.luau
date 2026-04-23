@@ -185,14 +185,8 @@ function treePackage.MoveToLastKnownPosition(npcClass: NpcClass)
     local lastKnownPos = enemyTargetData.LastKnownPosition;
     local timeSinceLastAdd = tick()-enemyTargetData.LastAddedTick;
     
-    if npcClass.Move.IsMoving then
-        if properties.LastHuntMoveTick and tick() < properties.LastHuntMoveTick then 
-            return;
-        end;
-        properties.LastHuntMoveTick = tick() + math.random(6, 12);
-    end
-
     npcClass.Move:MoveTo(lastKnownPos);
+
     if timeSinceLastAdd <= 10 then
         npcClass.Move:SetMoveSpeed(
             "set", "sprint", properties.SprintSpeed or 18, npcClass.Move.MoveSpeedPriority.Movement, 5);

@@ -443,6 +443,8 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
 			
+		local generatorInteractable: InteractableInstance, bloodMachineInteractable: InteractableInstance;
+
 		local profile = shared.modProfile:Get(player);
 		local inventory = profile.ActiveInventory;
 		
@@ -480,8 +482,6 @@ return function(CutsceneSequence)
 				end
 			end
 		end)
-
-		local generatorInteractable: InteractableInstance, bloodMachineInteractable: InteractableInstance;
 
 		if modBranchConfigurations.IsWorld("TheMall") then
 			player:GetAttributeChangedSignal("Location"):Connect(function()
@@ -691,11 +691,13 @@ return function(CutsceneSequence)
 							lastTalkedToTick = tick();
 							task.delay(5, function()
 								if lastTalkedToTick == nil or tick()-lastTalkedToTick > 4 then
+									if patrolBandit.HealthComp.IsDead then return end;
 									patrolBandit.Chat(player, threatenMsgs[math.random(1, #threatenMsgs)]);
 								end
 							end)
 
 						elseif action == "dialogueclose" then
+							if patrolBandit.Properties.CallingBackup then return end;
 							patrolBandit.Chat(player, "Okay, you asked for this!");
 
 							modMission:Progress(player, MISSION_ID, function(mission)
@@ -822,6 +824,12 @@ return function(CutsceneSequence)
 			elseif mission.Type == 4 then -- OnFail
 				Debugger:Warn("On fail");
 				mission.ProgressionPoint = 1;
+				
+				if bloodMachineInteractable then
+					bloodMachineInteractable.Label = "You lost the blood samples..";
+					bloodMachineInteractable.CanInteract = false;
+					bloodMachineInteractable:Sync();
+				end
 
 				local profile = shared.modProfile:Get(player);
 				local playerSave = profile:GetActiveSave();

@@ -182,7 +182,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
             eyeVisible = false;
             eyeAtt.CFrame = CFrame.identity;
-            task.delay(math.random(70, 110)/10, function()
+            task.delay(math.random(70, 160)/100, function()
                 eyeAtt.CFrame = defaultEyeCf;
                 eyeVisible = true;
 
@@ -190,7 +190,9 @@ function npcPackage.Spawned(npcClass: NpcClass)
                 destructible:SetHealthbarEnabled(true);
             end)
             
-            npcClass.HealthComp:TakeDamage(damageData);
+            local newDmgData = damageData:Clone();
+            newDmgData.HideBubble = true;
+            npcClass.HealthComp:TakeDamage(newDmgData);
         end)
     end
 

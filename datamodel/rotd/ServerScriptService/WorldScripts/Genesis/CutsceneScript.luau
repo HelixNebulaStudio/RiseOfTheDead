@@ -432,7 +432,7 @@ return function(CutsceneSequence)
 				if playerTouch then
 					robertTrigger = true;
 
-					infectorNpcClass.Move:Face(Vector3.new(151.283, 5.397, -157.124))
+					infectorNpcClass.Move:Face(Vector3.new(151.283, 5.397, -157.124));
 					infectorNpcClass.Chat(game.Players:GetPlayers(), "You have no idea what you got yourself into.");
 
 					for _, player in pairs(players) do

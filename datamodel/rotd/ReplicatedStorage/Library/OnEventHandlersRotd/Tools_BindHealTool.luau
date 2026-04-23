@@ -39,7 +39,7 @@ return function(event: EventPacket, action: string, toolHandler: ToolHandlerInst
                 byHealthComp:TakeDamage(DamageData.new{
                     Damage = -healAmount;
                     DamageBy = byCharacterClass;
-                    ToolStorageItem = toolHandler.StorageItem;
+                    StorageItem = toolHandler.StorageItem;
                     DamageType = "Heal";
                 });
                 

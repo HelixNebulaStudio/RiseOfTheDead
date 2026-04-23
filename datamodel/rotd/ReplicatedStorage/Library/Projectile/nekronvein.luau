@@ -194,7 +194,7 @@ function projectilePackage.BindArcContact(projectile: ProjectileInstance, arcPoi
                         Damage = damage;
                         DamageBy = damageBy;
                         TargetPart = hitPart;
-                        ToolStorageItem = projectile.StorageItem;
+                        StorageItem = projectile.StorageItem;
                     });
                 end;
                 

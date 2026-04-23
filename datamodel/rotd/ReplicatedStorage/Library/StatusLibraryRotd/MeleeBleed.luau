@@ -1,7 +1,6 @@
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 --==
 local RunService = game:GetService("RunService");
-local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
@@ -26,11 +25,6 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     
     local applyBy: CharacterClass? = statusClass.ApplyBy;
     if applyBy == nil or not healthComp:CanTakeDamageFrom(applyBy) then return end;
-
-    modDamageTag.Tag(entityClass.Character, applyBy.Character, {
-        WeaponItemId = statusClass.Values.WeaponSiid;
-        IsHeadshot = false;
-    });
 
     local bleedDamage = math.ceil(statusClass.Values.Damage * (statusClass.Values.DamagePercent or 0.05));
 

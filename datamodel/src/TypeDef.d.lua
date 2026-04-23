@@ -1822,6 +1822,10 @@ export type NpcTargetData = {
     RemovedTick: number;
 
     TargetPart: BasePart;
+    
+    LastSeenTick: number;
+    IsInVision: boolean;
+    LastKnownPosition: Vector3;
 };
 
 --MARK: -- Components
@@ -1851,7 +1855,7 @@ export type HealthComp = {
 
     LastReset: number?;
     FirstDamageTaken: number?;
-    LastDamagedBy: CharacterClass?;
+    LastDamagedBy: EntityClass?;
     
     LastDamageTaken: number;
     LastArmorDamageTaken: number;

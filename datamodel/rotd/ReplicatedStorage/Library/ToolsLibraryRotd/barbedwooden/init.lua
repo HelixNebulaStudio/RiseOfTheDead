@@ -79,10 +79,10 @@ function toolPackage.BuildStructure(prefab: Model, optionalPacket)
 
 		local damage = math.clamp(healthComp.MaxHealth * 0.001, 10, math.huge);
 		local dmgData = DamageData.new{
-			Damage=damage;
-			DamageBy=characterClass;
-			ToolStorageItem=optionalPacket.StorageItem;
-			TargetPart=hitPart;
+			Damage = damage;
+			DamageBy = characterClass;
+			StorageItem = optionalPacket.StorageItem;
+			TargetPart = hitPart;
 		}
 		healthComp:TakeDamage(dmgData);
 	
