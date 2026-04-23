@@ -16,23 +16,28 @@ if RunService:IsServer() then
 	local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 	local modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
 	
-	local logicAssets = script.Parent:WaitForChild("LogicAssets");
+	cutsceneAssets = script.Parent:WaitForChild("CutsceneAssets");
 
-	if modBranchConfigurations.IsWorld("TheUnderground") then
-		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
-			local player: Player? = eventPacket.Player;
-			if player == nil then return end;
-			
-			local triggerId = interactData.TriggerTag;
+	if shared.WorldName == "TheUnderground" then
+        shared.modEventService:OnInvoked("Generic_BindTrigger", function(event: EventPacket, ...)
+            local player: Player? = event.Player;
+            if player == nil then return end;
 
-			if triggerId == "RatsRecruitment_SectorF" then
-				modServerManager:TeleportToPrivateServer(
-					"SectorF", 
-					modServerManager:CreatePrivateServer("SectorF"), 
-					{player}
-				);
-			end
+			local triggerId: string, interactable: InteractableInstance = ...;
+
+			task.spawn(function()
+				if triggerId == "RatsRecruitment_SectorF" then
+					modServerManager:TeleportToPrivateServer(
+						"SectorF", 
+						modServerManager:CreatePrivateServer("SectorF"), 
+						{player}
+					);
+				end
+			end)
 		end);
+
+	elseif shared.WorldName == "SectorF" then
+		researchPaper = workspace.Interactables:WaitForChild("researchPapers");
 	end
 	
 	function MissionLogic.Init(missionProfile, mission)
@@ -68,10 +73,6 @@ if RunService:IsServer() then
 				
 				if modBranchConfigurations.IsWorld("SectorF") and modGameModeManager.IsGameWorld ~= true then
 					if mission.ProgressionPoint >= 13 then
-						--game.Debris:AddItem(workspace.Interactables:FindFirstChild("gameExit"), 0);
-						
-						local researchPaper = workspace.Interactables:WaitForChild("researchPapers");
-						
 						researchPaper.Parent = game.ReplicatedStorage.Replicated;
 						
 						if mission.ProgressionPoint == 13 
@@ -98,29 +99,16 @@ if RunService:IsServer() then
 							modReplicationManager.ReplicateOut(player, newResearchPaper);
 						end
 						
-						if mission.ProgressionPoint == 15 then
-							local newExit = logicAssets:WaitForChild("Travel_TheUnderground"):Clone();
-
-							local interactConfig = modInteractables.createInteractable("Travel");
-							interactConfig:SetAttribute("_Label", "Exit to Underground");
-							interactConfig:SetAttribute("WorldName", "TheUnderground");
-							interactConfig:SetAttribute("SetSpawn", "CXsecF2");
-							interactConfig.Parent = newExit;
-
-							newExit.Parent = workspace.Interactables;
-							
-						end
 					end
 					
 				elseif modBranchConfigurations.IsWorld("TheUnderground") then
 					if mission.ProgressionPoint == 12 then
-						local secFEntrance = logicAssets:WaitForChild("sectorFEntrance"):Clone();
+						local secFEntrance = cutsceneAssets:WaitForChild("sectorFEntrance"):Clone();
 
 						local interactConfig = modInteractables.createInteractable("ButtonRotd");
 						interactConfig:SetAttribute("_Id", "RatsRecruitment_SectorF");
 						interactConfig:SetAttribute("_Label", "[Rats Recruitment] Enter Sector F");
-							-- Title="You are about to leave this world";
-							-- Description="Are you sure you want to travel to Sector F?";
+						interactConfig:SetAttribute("_InteractDuration", 1);
 						interactConfig.Parent = secFEntrance;
 
 						secFEntrance.Parent = workspace.Interactables;

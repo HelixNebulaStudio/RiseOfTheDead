@@ -5,10 +5,6 @@ local CollectionService = game:GetService("CollectionService");
 
 local modTouchHandler = shared.require(game.ReplicatedStorage.Library.TouchHandler);
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
-local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
-local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-
-local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 local clipTouchHandler = modTouchHandler.new("VexClips", 2);
 
@@ -23,45 +19,21 @@ WorldClip.Config = {
 
 function clipTouchHandler:OnHumanoidTouch(humanoid, basePart, touchPart)
 	local character = humanoid.Parent;
-	local rootPart = humanoid.RootPart;
+	local healthComp: HealthComp? = modHealthComponent.getByModel(character);
+	if healthComp == nil then return end;
 
-	local skipDmg = false;
-	local player = game.Players:GetPlayerFromCharacter(character);
-	if player then
-		local playerClass: PlayerClass = shared.modPlayers.get(player);
+	character = healthComp:GetModel();
 
-		modStatusEffects.VexBile(player, 5);
+	local entityClass: EntityClass = healthComp.CompOwner;
+	if entityClass.StatusComp == nil then return end;
 
-		local conGasMask = playerClass.Configurations.GasMask;
-		if conGasMask then
-			skipDmg = true;
-		end
-	end
-
-	if skipDmg then return end;
-
-	if rootPart then
-		local healthComp: HealthComp? = modHealthComponent.getByModel(character);
-		if healthComp then
-			-- Calculate damage
-			local val = healthComp.MaxHealth * WorldClip.Config.DamageRatio;
-			if WorldClip.Config.Damage then
-				val = WorldClip.Config.Damage;
-			end
-
-			-- Play audio effect
-			modAudio.Play("BurnTick"..math.random(1, 3), character.PrimaryPart).PlaybackSpeed = math.random(50,70)/100;
-
-			-- Apply damage
-			local dmgData = DamageData.new{
-				Damage=val;
-				DamageBy=nil;
-				TargetModel=character;
-				DamageType = "IgnoreArmor";
-			};
-			healthComp:TakeDamage(dmgData);
-		end
-	end
+	entityClass.StatusComp:Apply("VexBile", {
+		Expires = workspace:GetServerTimeNow() + 2.5;
+		Duration = 2.5;
+		Values = {
+			DamageRatio = WorldClip.Config.DamageRatio;
+		}
+	});
 end
 
 function WorldClip:Load(basePart)

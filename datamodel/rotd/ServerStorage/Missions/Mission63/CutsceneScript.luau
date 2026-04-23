@@ -43,7 +43,7 @@ return function(CutsceneSequence)
 			local gateBanditNpcClass: NpcClass;
 			local function spawnBandit()
 				gateBanditNpcClass = modNpcs.spawn2{
-					Name = "Bandit";
+					Name = "Jason";
 					CFrame = CFrame.new(798.55481, 162.668854, -728.297119, 0, 0, 1, 0, 1, 0, -1, 0, 0);
 					Player = player;
 					ReplicateOut = true;
@@ -55,11 +55,6 @@ return function(CutsceneSequence)
 				if modBranchConfigurations.IsWorld("BioXResearch") then
 					gateBanditNpcClass:SetCFrame(playerClass:GetCFrame());
 				end
-				
-				local dialogueInteractConfig = modInteractables.createInteractable("Dialogue");
-				dialogueInteractConfig:SetAttribute("NpcName", gateBanditNpcClass.Name);
-				dialogueInteractConfig.Parent = gateBanditNpcClass.Character;
-				gateBanditNpcClass.Interactable = dialogueInteractConfig;
 
 				gateBanditNpcClass.Move:SetMoveSpeed("set", "default", 8);
 				
@@ -349,7 +344,7 @@ return function(CutsceneSequence)
 						local angerCooldown = tick();
 						task.spawn(function()
 							while mission.ProgressionPoint == 3 do
-								local distFromC = playerClass:DistanceFromCharacter(strangerCNpcClass:GetCFrame().Position);
+								local distFromC = playerClass:DistanceFrom(strangerCNpcClass:GetCFrame().Position);
 								
 								Debugger:Log("distFromC", distFromC);
 								
@@ -773,7 +768,7 @@ return function(CutsceneSequence)
 
 						local distFromC = math.huge;
 						repeat
-							distFromC = playerClass:DistanceFromCharacter(strangerCNpcClass:GetCFrame().Position);
+							distFromC = playerClass:DistanceFrom(strangerCNpcClass:GetCFrame().Position);
 							Debugger:Log("distFromC", distFromC);
 							task.wait(1);
 						until distFromC <= 15;

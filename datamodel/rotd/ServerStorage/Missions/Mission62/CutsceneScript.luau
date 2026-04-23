@@ -20,6 +20,8 @@ if RunService:IsServer() then
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
 	
+	cutsceneAssets = script.Parent:WaitForChild("CutsceneAssets");
+
 else
 	modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
@@ -154,12 +156,11 @@ return function(CutsceneSequence)
 				end
 			end)
 
-			
-			local mechDoor3Clip = script.Parent:WaitForChild("_playerClip");
-			local terminalInteractable = script.Parent:WaitForChild("shutDownHeating");
+			local mechDoor3Clip = cutsceneAssets:WaitForChild("_playerClip");
+			local terminalInteractPart = cutsceneAssets:WaitForChild("shutDownHeating");
 			local shutDownConfig = modInteractables.createInteractable("NekronChamberTerminal01");
-			shutDownConfig.Parent = terminalInteractable;
-
+			shutDownConfig.Parent = terminalInteractPart;
+			
 			local function OnChanged(firstRun)
 				local rat1NpcClass: NpcClass = ratGoons.Name1.NpcClass;
 
@@ -242,7 +243,7 @@ return function(CutsceneSequence)
 						task.wait(2);
 						mechDoor3Clip.Parent = workspace.Clips;
 						
-						local playersInRegion = modRegion:GetPlayersWithin(script.Parent.ChamberRegion);
+						local playersInRegion = modRegion:GetPlayersWithin(cutsceneAssets.ChamberRegion);
 						local playerIsInRegion = false;
 						for a=1, #playersInRegion do
 							if playersInRegion[a] == player then
@@ -323,10 +324,10 @@ return function(CutsceneSequence)
 					elseif mission.ProgressionPoint == 7 then
 						
 					elseif mission.ProgressionPoint == 8 then
-						terminalInteractable.Parent = workspace.Interactables;
+						terminalInteractPart.Parent = workspace.Interactables;
 
 					elseif mission.ProgressionPoint == 9 then
-						terminalInteractable.Parent = script;
+						terminalInteractPart.Parent = script;
 
 					elseif mission.ProgressionPoint == 10 then
 						task.wait(4);
@@ -390,7 +391,7 @@ return function(CutsceneSequence)
 							local distFromPlayer = 128;
 							repeat
 								task.wait(1);
-								distFromPlayer = rat1NpcClass:DistanceFromCharacter(playerClass:GetCFrame().Position);
+								distFromPlayer = rat1NpcClass:DistanceFrom(playerClass:GetCFrame().Position);
 								Debugger:Log("distFromPlayer", distFromPlayer);
 							until distFromPlayer <= 8;
 
@@ -445,6 +446,12 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 				
+			local travelDoor = cutsceneAssets:WaitForChild("Travel_TheUnderground");
+			local travelConfig = modInteractables.createInteractable("Travel");
+			travelConfig:SetAttribute("WorldName", "TheUnderground");
+			travelConfig:SetAttribute("SetSpawn", "CXsecF2");
+			travelConfig.Parent = travelDoor;
+			travelDoor.Parent = workspace.Interactables;
 
 			local revasNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Revas");
 			if revasNpcClass == nil then
