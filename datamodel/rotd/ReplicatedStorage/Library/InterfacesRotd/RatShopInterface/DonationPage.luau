@@ -13,7 +13,7 @@ local modData = shared.require(localplayer:WaitForChild("DataModule"));
 
 local localplayer = game.Players.LocalPlayer;
 
-local modShopLibrary = shared.require(game.ReplicatedStorage.Library.RatShopLibrary);
+local modShopLibrary = shared.require(game.ReplicatedStorage.Library.GeneralShopLibrary);
 local modGoldShopLibrary = shared.require(game.ReplicatedStorage.Library.GoldShopLibrary);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);

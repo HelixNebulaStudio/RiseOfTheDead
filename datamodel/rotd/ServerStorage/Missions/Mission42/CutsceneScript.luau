@@ -293,7 +293,7 @@ return function(CutsceneSequence)
 									local distance = 100;
 									local timeout = 20;
 									repeat
-										distance = playerClass:DistanceFromCharacter(cutsceneElements.bridgeButton.Position);
+										distance = playerClass:DistanceFrom(cutsceneElements.bridgeButton.Position);
 										task.wait(1);
 										if mission.ProgressionPoint ~= 3 then return end;
 										timeout = timeout -1;
@@ -372,7 +372,7 @@ return function(CutsceneSequence)
 						local distance = 5;
 						repeat
 							victorNpcClass:GetComponent("WaitForPlayer")(distance);
-							distance = distance +2;
+							distance = distance +1;
 							pushed = true;
 							victorNpcClass.PlayAnimation("Push");
 							CutsceneSequence:NextScene("push");
@@ -393,7 +393,7 @@ return function(CutsceneSequence)
 									table.insert(zombies, npcClass);
 								end
 							};
-							wait(1);
+							task.wait(1);
 							if mission.ProgressionPoint ~= 4 then return end;
 						end
 						if mission.ProgressionPoint ~= 4 then return end;

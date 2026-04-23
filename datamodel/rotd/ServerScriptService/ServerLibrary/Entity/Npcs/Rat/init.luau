@@ -6,10 +6,10 @@ local npcPackage = {
     
 	Configurations = {};
     Properties = {
-        Level=1;
+        Level = 1;
         ResourceDropId = "rat";
-        MoneyReward={Min=2; Max=4};
-        ExperiencePool=40;
+        MoneyReward = NumberRange.new(2, 4);
+        ExperiencePool = 40;
         IsHostile = false;
     };
 

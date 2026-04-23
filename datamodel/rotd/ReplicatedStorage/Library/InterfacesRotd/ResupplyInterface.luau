@@ -8,7 +8,7 @@ local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("Global
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
-local modShopLibrary = shared.require(game.ReplicatedStorage.Library.RatShopLibrary);
+local modShopLibrary = shared.require(game.ReplicatedStorage.Library.GeneralShopLibrary);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local interfacePackage = {

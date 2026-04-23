@@ -34,7 +34,7 @@ local npcPackage = {
 
         Level = 1;
         ExperiencePool = 1000;
-        MoneyReward = {Min = 1500; Max = 1700};
+        MoneyReward = NumberRange.new(1500, 1700);
         DropRewardId = "heavy";
     };
 

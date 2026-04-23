@@ -7,7 +7,7 @@ local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 
 local statusPackage = {
-    Id = "Vex Bile";
+    Id = "VexBile";
     Icon = "rbxassetid://7109208351";
     Name = "Vex Bile";
     Description = "Your vision is blurred by the atmosphere of the bile. You are taking bile damage. Can be nullified by wearing a Gas Mask.";

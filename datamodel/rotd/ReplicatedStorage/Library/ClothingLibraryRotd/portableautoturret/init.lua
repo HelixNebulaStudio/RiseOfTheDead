@@ -79,7 +79,7 @@ function attirePackage.OnShopSelect(shopInterface, storageItem)
 		or (selectedItem.Values.MA and selectedItem.Values.MA < weaponClass.Configurations.MaxAmmoLimit)));
 	if hasAmmoData ~= true then return end;
 
-	local modShopLibrary = shared.require(game.ReplicatedStorage.Library.RatShopLibrary);
+	local modShopLibrary = shared.require(game.ReplicatedStorage.Library.GeneralShopLibrary);
 	local ammoCurrency = modShopLibrary.AmmunitionCurrency or "Money";
 
 	local localplayerStats = modData.GetStats();

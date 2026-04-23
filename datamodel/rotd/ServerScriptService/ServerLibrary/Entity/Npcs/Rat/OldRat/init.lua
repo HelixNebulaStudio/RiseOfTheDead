@@ -38,7 +38,6 @@ return function(npc, spawnPoint)
 		
 		Configuration = {
 			Level=1;
-			MoneyReward={Min=2; Max=4};
 			ExperiencePool=40;
 			Audio={Hurt=false;};
 			ResourceDrop=modRewardsLibrary:Find("bandit");

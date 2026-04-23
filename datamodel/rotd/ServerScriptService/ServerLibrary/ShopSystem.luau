@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
-local modShopLibrary = shared.require(game.ReplicatedStorage.Library.RatShopLibrary);
+local modShopLibrary = shared.require(game.ReplicatedStorage.Library.GeneralShopLibrary);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.BattlePassLibrary);

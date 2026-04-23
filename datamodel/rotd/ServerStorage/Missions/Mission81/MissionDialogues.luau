@@ -69,14 +69,8 @@ Dialogues.Joseph.DialogueHandler = function(player, dialog, data, mission)
 	if mission.Type == 2 then -- Available
 		dialog:SetInitiateTag("fotl_init");
 
-		dialog:AddChoice("fotl_prologue1", function(dialog)
-			dialog:AddChoice("fotl_prologue2", function(dialog)
-				dialog:AddChoice("fotl_prologue3", function(dialog)
-					dialog:AddChoice("fotl_prologue4", function(dialog)
-						modMission:StartMission(player, MISSION_ID);
-					end)
-				end)
-			end)
+		dialog:AddChoice({"fotl_prologue1"; "fotl_prologue2"; "fotl_prologue3"; "fotl_prologue4"}, function(dialog)
+			modMission:StartMission(player, MISSION_ID);
 		end)
 
 	elseif mission.Type == 1 then -- Active

@@ -182,17 +182,20 @@ function treePackage.RocketBarrage(npcClass: NpcClass)
             local rootpart = targetCharClass.RootPart;
 
             local positionRoundOff = Vector3.new(
-                math.floor(rootpart.Position.X/5)*5, 
-                rootpart.Position.Y, 
-                math.floor(rootpart.Position.Z/5)*5
+                math.round(rootpart.Position.X),
+                rootpart.Position.Y,
+                math.round(rootpart.Position.Z)
             );
 
-            local groundCframe = modAoeHighlight:Ray(positionRoundOff, Vector3.new(0, -8, 0));
-            if groundCframe then
+            local surfaceCf = modAoeHighlight:Ray(positionRoundOff, Vector3.new(0, -8, 0));
+            if surfaceCf == nil then
+                surfaceCf = modAoeHighlight:Ray(positionRoundOff, rootpart.CFrame.LookVector * 3);
+            end
+            if surfaceCf then
                 local travelTime = 1;
                 
                 local new = modAoeHighlight.newCylinder(travelTime);
-                new.CFrame = groundCframe
+                new.CFrame = surfaceCf
                 new.Size = Vector3.new(2, 2, 1);
                 new.Parent = workspace.Debris;
 
@@ -200,7 +203,7 @@ function treePackage.RocketBarrage(npcClass: NpcClass)
                 
                 local launcherPointAtt = launcherPoints[math.random(1,#launcherPoints)];
                 local originCf = launcherPointAtt.WorldCFrame;
-                local targetPoint = groundCframe.Position;
+                local targetPoint = surfaceCf.Position;
 
                 local projectileInstance: ProjectileInstance = modProjectile.fire("zomborgrocket", {
                     OriginCFrame = CFrame.lookAlong(originCf.Position, launcherPointAtt.CFrame.LookVector);

@@ -222,6 +222,7 @@ return function(CutsceneSequence)
 				PackageOverride = "Human";
 			};
 			banditPilotNpcClass:Sit(extractionHelicopter.PilotSeatModelR.PSeat);
+			banditPilotNpcClass.Character:SetAttribute("LookAtClient", false);
 			
 			for a=1, 2 do
 				local banditNpcClass: NpcClass = modNpcs.spawn2{
@@ -415,7 +416,8 @@ return function(CutsceneSequence)
 						Debugger:Log("ProgressionPoint 4");
 						modStatusEffects.SetWalkspeed(player, 0);
 
-						loranNpcClass.StopAnimation("CrossedArm");
+						loranNpcClass.Character:SetAttribute("LookAtClient", false);
+						loranNpcClass.StopAnimation("crossedarm");
 						loranNpcClass.Move:SetMoveSpeed("set", "default", 8);
 						loranNpcClass.Chat(player, "Alright, let's get moving..");
 						loranNpcClass.Move:MoveTo(Vector3.new(-2189.084, 122.808, 2141.123));
