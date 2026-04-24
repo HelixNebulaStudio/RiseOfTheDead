@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local treePackage = {
     LogicString = {
-        Default = "(HasEnemy & MissionCheck) | SurvivorCombatTree | [Idle]";
+        Default = "(HasEnemy & MissionCheck) | (!InCutscene & SurvivorCombatTree) | [Idle]";
     };
 };
 
@@ -12,6 +12,10 @@ function treePackage.HasEnemy(npcClass: NpcClass)
     local enemyTargetData = properties.EnemyTargetData;
 
     return enemyTargetData ~= nil;
+end
+
+function treePackage.InCutscene(npcClass: NpcClass)
+    return npcClass.Properties.CutsceneActive == true;
 end
 
 function treePackage.MissionCheck(npcClass: NpcClass)
@@ -30,8 +34,10 @@ end
 
 function treePackage.Idle(npcClass: NpcClass)
     local spawnPos = npcClass.SpawnCFrame.Position;
-    if not npcClass.Move:IsAtPosition(spawnPos) then
-        npcClass.Move:MoveTo(spawnPos);
+    if shared.WorldName == "TheMall" then
+        if not npcClass.Move:IsAtPosition(spawnPos) then
+            npcClass.Move:MoveTo(spawnPos);
+        end
     end
 end
 

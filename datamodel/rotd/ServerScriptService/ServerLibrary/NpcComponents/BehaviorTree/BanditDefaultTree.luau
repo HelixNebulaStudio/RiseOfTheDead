@@ -1,7 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local PathfindingService = game:GetService("PathfindingService");
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
+local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
 
 local TALK_ANIMATIONS = {"nodyes"; "nodno"; "shrug2"; "laugh"; "point"; "bored"; "PullLever"};
 
@@ -218,9 +220,9 @@ function treePackage.GuessEnemyLastPosition(npcClass: NpcClass)
         );
     else
         enemyPosition = npcClass:GetCFrame().Position + Vector3.new(
-            math.random(-1, 1) * math.random(20, 70), 
+            math.random(-1, 1) * math.random(40, 100), 
             0, 
-            math.random(-1, 1) * math.random(20, 70)
+            math.random(-1, 1) * math.random(40, 100)
         );
     end
 
@@ -236,7 +238,7 @@ end
 
 function treePackage.InMeleeRange(npcClass: NpcClass)
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
-    return enemyTargetData.Distance <= 10;
+    return enemyTargetData.Distance <= 6;
 end
 
 function treePackage.RunToMeleeRange(npcClass: NpcClass)
@@ -353,11 +355,74 @@ function treePackage.Patrol(npcClass: NpcClass)
 
     properties.LastAlertShout = nil;
     
-    if math.random(1, 100) == 1 
-    and not npcClass.Move:IsAtPosition(npcClass.SpawnCFrame.Position) and npcClass.Properties.SpokeByMeData == nil then
-        npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, npcClass.Move.MoveSpeedPriority.Movement, 2);
-        npcClass.Move:MoveTo(npcClass.SpawnCFrame.Position);
+    local patrolPositions = properties.PatrolPositions;
+    if patrolPositions == nil then
+        patrolPositions = {};
+        properties.PatrolPositions = patrolPositions;
+        properties.PatrolIndex = 1;
+        local curPos = npcClass:GetCFrame().Position;
 
+        local patrolRng = Random.new(curPos.X + curPos.Y + curPos.Z);
+
+        local path: Path = PathfindingService:CreatePath(npcClass.PathAgent);
+        for a=1, patrolRng:NextInteger(3, 6) do
+            local startPos = curPos;
+            local endPos = startPos + Vector3.new(
+                (patrolRng:NextInteger(1, 2) == 1 and 1 or -1) * patrolRng:NextInteger(25, 45),
+                0,
+                (patrolRng:NextInteger(1, 2) == 1 and 1 or -1) * patrolRng:NextInteger(25, 45)
+            );
+
+            local rayParams = RaycastParams.new();
+            rayParams.IncludeInstances = {workspace.Environment; workspace.Terrain};
+            rayParams.IgnoreWater = true;
+
+            local floorRayResult = workspace:Blockcast(CFrame.new(endPos + Vector3.new(0, 6, 0)), Vector3.one*2, Vector3.yAxis*-10, rayParams);
+            if floorRayResult == nil then Debugger:Warn("Patrol no floor"); continue end;
+            endPos = floorRayResult.Position + Vector3.new(0, 1.35, 0);
+
+            local pathS, pathE = pcall(function()
+                path:ComputeAsync(startPos, endPos)
+            end)
+            if not pathS then Debugger:Warn("Patrol pathE", pathE); continue end;
+            if path.Status ~= Enum.PathStatus.Success then Debugger:Warn("Patrol no path", path.Status); continue end;
+
+            local wayPoints = path:GetWaypoints();
+            for _, waypoint: PathWaypoint in pairs(wayPoints) do
+                if waypoint.Action ~= Enum.PathWaypointAction.Walk then Debugger:Warn("Patrol skip action", waypoint.Action);  continue end;
+
+                local waypointPos = waypoint.Position;
+                table.insert(patrolPositions, waypointPos);
+            end
+
+            break;
+        end
+    end
+
+    if npcClass.Properties.SpokeByMeData == nil then
+        if math.random(1, 100) == 1 
+        and #patrolPositions <= 0 
+        and not npcClass.Move:IsAtPosition(npcClass.SpawnCFrame.Position) then
+            -- Walk back to spawn;
+            npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, npcClass.Move.MoveSpeedPriority.Movement, 2);
+            npcClass.Move:MoveTo(npcClass.SpawnCFrame.Position);
+
+        elseif math.random(1, 60) == 1 and #patrolPositions > 0 then
+            -- Walk to random spot;
+            local patrolPos = patrolPositions[properties.PatrolIndex];
+            if not npcClass.Move:IsAtPosition(patrolPos) then
+                npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, npcClass.Move.MoveSpeedPriority.Movement, 5);
+                npcClass.Move:MoveTo(patrolPos);
+
+            else
+                properties.PatrolIndex +=1;
+                if properties.PatrolIndex > #patrolPositions then
+                    modTables.Reverse(patrolPositions);
+                    properties.PatrolIndex = 1;
+                end
+            end
+
+        end
     else
         npcClass.Move:Stop();
 
@@ -372,13 +437,13 @@ function treePackage.Patrol(npcClass: NpcClass)
             local patrolConverse = npcClass.NpcPackage.Chatter.PatrolConverse;
             local pickedDialogue = patrolConverse and patrolConverse[math.random(1, #patrolConverse)] or nil;
             if pickedDialogue then
-                local nearbyBanditTargetData: NpcTargetData? = npcClass:GetComponent("TargetHandler"):MatchFirstTarget(function(targetData: NpcTargetData)
+                local nearbyAllyTargetData: NpcTargetData? = npcClass:GetComponent("TargetHandler"):MatchFirstTarget(function(targetData: NpcTargetData)
                     if targetData.HealthComp == nil then return end;
                     local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner :: NpcClass;
                     if targetNpcClass == npcClass then return false; end;
                     if targetNpcClass.ClassName ~= "NpcClass" then return false; end;
 
-                    if targetNpcClass.HumanoidType ~= "Bandit" then return false; end;
+                    if targetNpcClass.HumanoidType ~= npcClass.HumanoidType then return false; end;
                     if targetNpcClass.HealthComp.IsDead then return false; end;
                     if targetNpcClass.Properties.EnemyTargetData then return false; end;
                     if targetNpcClass.Properties.SpokeByMeData then return false; end;
@@ -389,8 +454,8 @@ function treePackage.Patrol(npcClass: NpcClass)
                     return true;
                 end)
 
-                if nearbyBanditTargetData then
-                    local targetNpcClass: NpcClass = nearbyBanditTargetData.HealthComp.CompOwner :: NpcClass;
+                if nearbyAllyTargetData then
+                    local targetNpcClass: NpcClass = nearbyAllyTargetData.HealthComp.CompOwner :: NpcClass;
 
                     npcClass.Properties.SpokeByMeData = {
                         NpcClass = targetNpcClass;
@@ -398,7 +463,7 @@ function treePackage.Patrol(npcClass: NpcClass)
                         Dialogue = pickedDialogue;
                     };
 
-                    if nearbyBanditTargetData.Distance > 10 then
+                    if nearbyAllyTargetData.Distance > 10 then
                         npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, npcClass.Move.MoveSpeedPriority.Movement, 3);
 
                         local dir = (targetNpcClass:GetCFrame().Position - npcClass:GetCFrame().Position).Unit;
@@ -473,8 +538,8 @@ function treePackage.ShareIntel(npcClass: NpcClass)
             local isAlive = targetNpcClass.HealthComp.IsDead ~= true;
             if not isAlive then return false; end;
 
-            local isBandit = targetNpcClass.HumanoidType == "Bandit";
-            if not isBandit then return false; end;
+            local isAlly = targetNpcClass.HumanoidType == npcClass.HumanoidType;
+            if not isAlly then return false; end;
 
             local isMe = targetNpcClass == npcClass;
             if isMe then return false; end;

@@ -89,10 +89,13 @@ end
 
 function treePackage.CanCombat(npcClass: NpcClass)
     local properties = npcClass.Properties;
+    if npcClass.Humanoid.PlatformStand then return false; end;
     return properties.CanCombat ~= false;
 end
 
 function treePackage.Avoid(npcClass: NpcClass)
+    if npcClass.Humanoid.PlatformStand then return end;
+    
     local properties = npcClass.Properties;
     local cache = properties.Cache;
 

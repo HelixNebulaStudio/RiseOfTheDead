@@ -5,6 +5,7 @@ export type anyfunc = ((...any)->...any);
 export type GAME_EVENT_KEY<U> = U
     | "Crates_BindSpawn"
     | "Character_BindDismount"
+    | "Character_BindSitting"
     | "Doors_BindDoorToggle" -- Physical doors
     | "Destructibles_BindDestroyed"
     | "Dialogue_BindTalkedTo"

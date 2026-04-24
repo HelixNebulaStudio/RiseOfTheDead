@@ -9,38 +9,41 @@ local statusPackage = {
 };
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)
-    local playerClass = statusClass.StatusOwner :: PlayerClass;
-    if playerClass == nil then return end;
+    if statusClass.StatusOwner.ClassName == "PlayerClass" then
+        local playerClass = statusClass.StatusOwner :: PlayerClass;
+        if playerClass == nil then return end;
 
-    playerClass.Humanoid.PlatformStand = true;
-    playerClass.Properties.Ragdoll = 1;
+        playerClass.Humanoid.PlatformStand = true;
+        playerClass.Properties.Ragdoll = 1;
 
-    if RunService:IsClient() then
-		local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-		local modCharacter = modData:GetModCharacter();
+        if RunService:IsClient() then
+            local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+            local modCharacter = modData:GetModCharacter();
 
-		modCharacter.CharacterProperties.Ragdoll = true;
-		if statusClass.Values.CanAction ~= true then
-			modCharacter.CharacterProperties.CanAction = false;
-		end
+            modCharacter.CharacterProperties.Ragdoll = true;
+            if statusClass.Values.CanAction ~= true then
+                modCharacter.CharacterProperties.CanAction = false;
+            end
+        end
     end
 end
 
 function statusPackage.BindExpire(statusClass: StatusClassInstance)
-    local playerClass = statusClass.StatusOwner :: PlayerClass;
-    if playerClass == nil then return end;
+    if statusClass.StatusOwner.ClassName == "PlayerClass" then
+        local playerClass = statusClass.StatusOwner :: PlayerClass;
+        if playerClass == nil then return end;
 
-    playerClass.Humanoid.PlatformStand = false;
-    playerClass.Properties.Ragdoll = 0;
+        playerClass.Humanoid.PlatformStand = false;
+        playerClass.Properties.Ragdoll = 0;
 
-    if RunService:IsClient() then
-		local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-		local modCharacter = modData:GetModCharacter();
+        if RunService:IsClient() then
+            local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+            local modCharacter = modData:GetModCharacter();
 
-        modCharacter.CharacterProperties.Ragdoll = false;
-        modCharacter.CharacterProperties.CanAction = true;
+            modCharacter.CharacterProperties.Ragdoll = false;
+            modCharacter.CharacterProperties.CanAction = true;
+        end
     end
-
 end
 
 return modStatusClass.new(statusPackage);

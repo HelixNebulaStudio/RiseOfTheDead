@@ -62,7 +62,8 @@ if RunService:IsServer() then
 			local passengerChar = packet.PassengerCharacter;
 			local mountStyle = packet.MountStyle;
 
-			local player = game.Players:GetPlayerFromCharacter(mountChar);
+			local playerClass: PlayerClass = shared.modPlayers.getByModel(mountChar);
+			local player = playerClass and playerClass:GetInstance() or nil;
 			if player == nil then return end;
 
 			local patrickNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Patrick");
@@ -72,16 +73,9 @@ if RunService:IsServer() then
 			patrickNpcClass.PlayAnimation("injured2");
 			patrickNpcClass.Chat(player, "Arrgg.. Help..");
 
-			if patrickNpcClass.Properties.CarryInteractable == nil then
-				local newInteractable = modInteractables.createInteractable("Button");
-				newInteractable:SetAttribute("_Id", "mission58_RescuePatrick");
-				newInteractable:SetAttribute("_Label", "Carry Patrick");
-				newInteractable:SetAttribute("_Animation", "pickupcharacter");
-				newInteractable:SetAttribute("_InteractDuration", 2.95);
-
-				patrickNpcClass.Properties.CarryInteractable = newInteractable;
-				newInteractable.Parent = patrickNpcClass.Character;
-			end
+			modMission:Progress(player, MISSION_ID, function(mission)
+				mission.ProgressionPoint = 15;
+			end)
 		end)
 		
 		shared.modEventService:OnInvoked("Interactables_BindButtonInteract", function(eventPacket: EventPacket, ...)
@@ -134,7 +128,9 @@ if RunService:IsServer() then
 
 								modMission:Progress(player, MISSION_ID, function(mission)
 									mission.ProgressionPoint = 15;
-									modEvents:GetEvent(player, "mission58choice").ClosedGates = true;
+									local choiceEventData = modEvents:GetEvent(player, "mission58choice");
+									choiceEventData.ClosedGates = true;
+									modEvents:NewEvent(player, choiceEventData, true);
 								end)
 							end
 						end)
@@ -189,27 +185,22 @@ if RunService:IsServer() then
 			end)
 		end)
 
-		for _, obj in pairs(workspace.Environment:GetChildren()) do
-			if obj:IsA("Seat") and obj.Name == "DinghySeat" then
-				local dinghySeat = obj;
-				dinghySeat.Touched:Connect(function(hitPart)
-					local player = game.Players:GetPlayerFromCharacter(hitPart.Parent);
-					if player then
-						Debugger:Log("Sat on Dinghy ", player);
+		shared.modEventService:OnInvoked("Character_BindSitting", function(event: EventPacket, ...)
+			local interactable: InteractableInstance = ...;
+			local player: Player? = event.Player;
+			if player == nil then return end;
+			if interactable.Name ~= "Seat" or interactable.Values.SeatPart == nil then return end;
 
-						local classPlayer = shared.modPlayers.get(player);
-						dinghySeat:Sit(classPlayer.Humanoid);
-
-						modMission:Progress(player, MISSION_ID, function(mission)
-							if mission.ProgressionPoint == 16 then
-								mission.ProgressionPoint = 17;
-								modServerManager:Travel(player, "Safehome");
-							end
-						end)
+			task.spawn(function()
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint == 16 then
+						mission.ProgressionPoint = 17;
+						modServerManager:Travel(player, "Safehome");
 					end
 				end)
-			end
-		end
+			end)
+		end)
+
 	end
 	
 else
@@ -434,6 +425,7 @@ return function(CutsceneSequence)
 				CFrame = CFrame.new(4.555336, 3, 91.5086823, 0.358367682, 0, -0.933580518, 0, 1, 0, 0.933580518, 0, 0.358367682);
 			};
 			patrickNpcClass:TeleportHide();
+			patrickNpcClass.Properties.CutsceneActive = true;
 
 			local eugeneNpcClass: NpcClass = modNpcs.spawn2{
 				Name = "Eugene";
@@ -481,6 +473,18 @@ return function(CutsceneSequence)
 						npcClass.HealthComp.OnIsDeadChanged:Connect(function()
 							if not npcClass.HealthComp.IsDead then return end;
 						end)
+
+						task.spawn(function()
+							while not npcClass.HealthComp.IsDead do
+								if math.random(1, 5) == 1 then
+									local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+									if targetHandlerComp then
+										targetHandlerComp:AddTarget(playerClass.Character);
+									end
+								end
+								task.wait(5);
+							end
+						end)
 					end
 				};
 
@@ -490,11 +494,13 @@ return function(CutsceneSequence)
 			for a=1, #shipDoors do
 				local doorInteractConfig = shipDoors[a]:FindFirstChild("Interactable");
 				local doorInteractable = modInteractables.getOrNew(doorInteractConfig);
-				doorInteractable:SetPermissions("CanInteract", false);
+				doorInteractConfig:SetAttribute("Locked", true);
 			end
 
 			local ratGoons = {};
 			local banditGoons = {};
+			local donePoint15 = false;
+			local enemySpawned16 = false;
 
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
@@ -531,14 +537,12 @@ return function(CutsceneSequence)
 						task.wait(1);
 
 						revasNpcClass.Move:MoveTo(Vector3.new(20.126, 1.013, -42.771));
-
-						revasNpcClass.Move.OnMoveToEnded:Once(function()
-							revasNpcClass:TeleportHide();
-						end)
-						task.wait(3);
+						revasNpcClass.Move.OnMoveToEnded:Wait(6);
+						revasNpcClass:TeleportHide();
+						task.wait(1);
 
 						CutsceneSequence:NextScene("showBinds");
-						task.wait(6);
+						task.wait(4);
 						
 						shared.Notify(player, '<b><font size="16" color="#634335">Bandit</font></b>: Control room looks clear.. *walkie talkie clicks*', "Message");
 						task.wait(4);
@@ -655,7 +659,7 @@ return function(CutsceneSequence)
 							zarkNpcClass.Chat(player, "Well well well..");
 							task.wait(2);
 							if math.random(1, 2) == 1 then
-								revasNpcClass.Chat(player, "Oh? You’re approaching me?");
+								revasNpcClass.Chat(player, "Oh? You're approaching me?");
 							end
 							task.wait(2);
 							zarkNpcClass.Chat(player, "Revas, we finally meet. Hahah..");
@@ -663,16 +667,22 @@ return function(CutsceneSequence)
 
 						revasNpcClass.Move:HeadTrack(zarkNpcClass.Head);
 						patrickNpcClass.Move:HeadTrack(revasNpcClass.Head);
-						patrickNpcClass.Move:MoveTo(Vector3.new(-0.717552722, -10.0268211, 35.5515823));
+						patrickNpcClass.Move:MoveTo(Vector3.new(-0.717552722, -10.5268211, 35.5515823));
+						
 						task.spawn(function()
 							patrickNpcClass.Move.OnMoveToEnded:Wait(15);
 							task.wait(0.1);
 							patrickNpcClass.Move:Face(revasNpcClass.RootPart);
 						end)
+
+						local mainBanditGoon: NpcClass = banditGoons[1];	
+						local mainRatGoon: NpcClass = ratGoons[1];
+
 						task.spawn(function()
-							banditGoons[1].Move:MoveTo(Vector3.new(-16.5431557, -10.0268211, 25.0535679))
-							banditGoons[1].Move.OnMoveToEnded:Wait(10);
-							banditGoons[1].Move:Face(Vector3.new(8.09436226, -10.0268202, 19.3195877));
+							mainBanditGoon.Move:SetMoveSpeed("set", "walk", 8, 5, 15);
+							mainBanditGoon.Move:MoveTo(Vector3.new(-16.5431557, -10.0268211, 25.0535679))
+							mainBanditGoon.Move.OnMoveToEnded:Wait(10);
+							mainBanditGoon.Move:Face(Vector3.new(8.09436226, -10.0268202, 19.3195877));
 						end)
 						zarkNpcClass.Move:HeadTrack(revasNpcClass.Head);
 						zarkNpcClass.Move:MoveTo(Vector3.new(-10.8155708, -10.0268202, 30.3059406))
@@ -681,6 +691,8 @@ return function(CutsceneSequence)
 
 						task.wait(2);
 						revasNpcClass.Chat(player, "Zark..");
+						zarkNpcClass.Move:Face(revasNpcClass:GetCFrame().Position);
+						mainBanditGoon.Move:Face(mainRatGoon:GetCFrame().Position);
 
 						task.wait(4);
 						zarkNpcClass.Chat(player, "You made the right choice agreeing to the offer.");
@@ -837,6 +849,7 @@ return function(CutsceneSequence)
 						eugeneNpcClass.Move:Face(zarkNpcClass.RootPart.Position);
 
 						task.delay(math.random(10, 60)/100,function()
+							patrickNpcClass.Properties.CutsceneEquip = "ak47";
 							patrickNpcClass.WieldComp:Equip{
 								ItemId = "ak47";
 							};
@@ -959,10 +972,11 @@ return function(CutsceneSequence)
 								zarkNpcClass:TeleportHide();
 							end)
 
-							local mainRatGoon: NpcClass = ratGoons[1];
 							mainRatGoon.Move:SetMoveSpeed("set", "default", 16);
+							mainRatGoon.Move:SetMoveSpeed("set", "walk", 8, 5, 10);
 							mainRatGoon.Move:MoveTo(Vector3.new(-25.928, -10.738, -7.868));
-							mainRatGoon.Move.OnMoveToEnded:Once(function()
+							task.spawn(function()
+								task.wait(6);
 								mainRatGoon:TeleportHide();
 							end)
 							task.wait(0.2);
@@ -1088,7 +1102,6 @@ return function(CutsceneSequence)
 								end
 							end)
 
-							local mainBanditGoon: NpcClass = banditGoons[1];
 							mainBanditGoon.Move:SetMoveSpeed("set", "default", 12);
 							repeat
 								task.wait();
@@ -1148,12 +1161,14 @@ return function(CutsceneSequence)
 
 						if closedGates then
 							missionChoice.Rats = true;
+							playerClass.HealthComp:SetCanBeHurtBy("Zombie|Bandit|Cultist");
 						else
 							missionChoice.Bandits = true;
+							playerClass.HealthComp:SetCanBeHurtBy("Zombie|Rat|Cultist");
 						end
 
 						Debugger:Warn("missionChoice", missionChoice);
-
+						
 						patrickNpcClass.Character:SetAttribute("LookAtClient", false);
 						patrickNpcClass.Humanoid.PlatformStand = false;
 
@@ -1161,142 +1176,6 @@ return function(CutsceneSequence)
 						pathToInteract.Name = "PathToInteract";
 						pathToInteract.Parent = patrickNpcClass.RootPart;
 						pathToInteract.Position = Vector3.new(2.108, -0.03, 0.001);
-
-						if closedGates then -- Helped Rats
-							local fakeStanModel = workspace.Environment:WaitForChild("StansRejuvenation"):WaitForChild("Stan");
-
-							task.wait(3);
-							stanNpcClass:SetCFrame(fakeStanModel:GetPivot());
-							stanNpcClass:ToggleInteractable(false);
-							stanNpcClass.Move:Face(Vector3.new(-1.322, -0.012, 0.781));
-
-							game.Debris:AddItem(fakeStanModel, 0);
-							stanNpcClass:GetComponent("AvatarFace"):Set("Infector");
-							stanNpcClass.PlayAnimation("Scream");
-
-							local s = modAudio.Play("ZombieGroan", workspace);
-							s.Volume = 1;
-							local reverb = Instance.new("ReverbSoundEffect");
-							reverb.Parent = s;
-
-							stanNpcClass.Move:SetMoveSpeed("set", "default", 30);
-
-							task.spawn(function()
-								local targetGoon: NpcClass = banditGoons[1];
-
-								local function hunt(playScream)
-									repeat
-										stanNpcClass.Properties.AttackMode = true;
-
-										local targetPosition = targetGoon.RootPart.Position;
-										local targetDist = stanNpcClass:DistanceFromCharacter(targetPosition);
-
-										if targetDist <= 100 then
-											stanNpcClass.Move:MoveTo(targetGoon.RootPart.Position);
-										end
-										if targetDist <= 6 then
-											stanNpcClass.PlayAnimation("Attack");
-											modAudio.Play("Slice", workspace).PlaybackSpeed = 0.5;
-											modAudio.Play("Punch", workspace).PlaybackSpeed = 0.7;
-											task.wait(0.2);
-
-											targetGoon.HealthComp:SetIsDead(true);
-											modAudio.Play("HumanDeath", workspace);
-											task.wait(0.4);
-
-											if playScream then
-												stanNpcClass.PlayAnimation("Scream");
-												modAudio.Play("ZombieGroan", workspace);
-												task.wait(0.4);
-											end
-											task.wait(0.4);
-										end
-										task.wait();
-
-										if targetDist > 256 then
-											Debugger:Warn(`Target {targetGoon.Name}#{targetGoon.Character:GetAttribute("Cutscene")} too far!`);
-											break;
-										end
-									until targetGoon.HealthComp.IsDead == true;
-								end
-								hunt(true);
-
-								targetGoon = banditGoons[3];
-								hunt(false);
-
-								targetGoon = ratGoons[2];
-								hunt(true);
-
-								task.wait(2);
-								stanNpcClass.Move:MoveTo(Vector3.new(-18.351, 1.88, 110.928));
-								stanNpcClass.Move.OnMoveToEnded:Once(function() 
-									stanNpcClass:TeleportHide();
-								end)
-							end)
-
-							local lastDamaged = tick();
-							stanNpcClass.Properties.Immortal = 0.2;
-							stanNpcClass.HealthComp.OnHealthChanged:Connect(function()
-								stanNpcClass.Humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOn; lastDamaged = tick();
-								task.delay(2, function()
-									if tick()-lastDamaged > 2 and stanNpcClass.Humanoid then
-										stanNpcClass.Humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff;
-									end;
-								end);
-
-								task.wait();
-								local hurtSound = modAudio.Play("ZombieHurt", stanNpcClass.RootPart);
-								hurtSound.Volume = math.random(50, 60)/100;
-								hurtSound.PlaybackSpeed = math.random(110, 120)/100;
-							end)
-
-							local ratGoon3: NpcClass = ratGoons[3];
-							if not ratGoon3.HealthComp.IsDead then
-								ratGoon3.Move:SetMoveSpeed("set", "default", 12);
-								ratGoon3.Move:MoveTo(Vector3.new(-31.179, 5.066, -11.033));
-								ratGoon3.Move.OnMoveToEnded:Once(function()
-									ratGoon3:TeleportHide();
-								end)
-							end
-							for a=1, #banditGoons do
-								banditGoons[a].Properties.Immortal = nil;
-							end
-
-						else -- Helped Bandits;
-							for a=1, #ratGoons do
-								ratGoons[a].Properties.Immortal = nil;
-							end
-							stanNpcClass.Properties.AttackMode = true;
-
-							ratGoons[2].Move:SetMoveSpeed("set", "default", 12);
-							ratGoons[2].Move:MoveTo(Vector3.new(28.452, 5.066, -11));
-							ratGoons[2].Move.OnMoveToEnded:Once(function()
-								ratGoons[2]:TeleportHide();
-							end)
-
-							ratGoons[3].Move:SetMoveSpeed("set", "default", 12);
-							ratGoons[3].Move:MoveTo(Vector3.new(-31.179, 5.066, -11.033));
-							ratGoons[3].Move.OnMoveToEnded:Once(function()
-								ratGoons[3]:TeleportHide();
-							end)
-
-							banditGoons[3].Move:SetMoveSpeed("set", "default", 12);
-							banditGoons[3].Move:MoveTo(Vector3.new(-18.351, 1.88, 110.928));
-							banditGoons[3].Move.OnMoveToEnded:Once(function()
-								banditGoons[3]:TeleportHide();
-							end)
-
-						end
-
-						task.spawn(function()
-							local clientEffect = game.ServerScriptService.ServerLibrary.Entity.Npcs["Bandit Pilot"].HelicopterEffect:Clone();
-
-							local prefabTag = clientEffect:WaitForChild("Prefab");
-							prefabTag.Value = workspace.Environment.BanditHelicopterRig;
-
-							clientEffect.Parent = player.Character;
-						end)
-
 
 						patrickNpcClass:ToggleInteractable(false);
 
@@ -1311,75 +1190,213 @@ return function(CutsceneSequence)
 							newInteractable.Parent = patrickNpcClass.Character;
 						end
 
-						task.delay(5, function()
-							local shipDoors = workspace.Environment.CargoShip.ShipDoors:GetChildren();
-							for a=1, #shipDoors do
-								if shipDoors[a]:GetAttribute("DoubleCross") ~= "A" then continue end;
-								local doorConfig = shipDoors[a]:FindFirstChild("Door");
-								
-								local doorObj = modDoors.getOrNew(doorConfig);
-								doorObj:Toggle(true);
-							end
-							
-							for a=1, #shipDoors do
-								local doorInteractConfig = shipDoors[a]:FindFirstChild("Interactable");
-								local doorInteractable = modInteractables.getOrNew(doorInteractConfig);
-								doorInteractable:SetPermissions("CanInteract", true);
-							end
-						end)
+						if donePoint15 ~= true then
+							donePoint15 = true;
+						
+							if closedGates then -- Helped Rats
+								local fakeStanModel = workspace.Environment:WaitForChild("StansRejuvenation"):WaitForChild("Stan");
 
-						task.spawn(function()
-							local heliAnimationController = workspace.Environment.BanditHelicopterRig.AnimationController
-							local animator = heliAnimationController:WaitForChild("Animator");
+								task.wait(3);
+								stanNpcClass:SetCFrame(fakeStanModel:GetPivot());
+								stanNpcClass:ToggleInteractable(false);
+								stanNpcClass.Move:Face(Vector3.new(-1.322, -0.012, 0.781));
 
-							local heliLeavesAnimTrack = animator:LoadAnimation(script:WaitForChild("HeliLeavesAnim"));
-							heliLeavesAnimTrack:Play(nil, nil, 0);
+								game.Debris:AddItem(fakeStanModel, 0);
+								stanNpcClass:GetComponent("AvatarFace"):Set("Infector");
+								stanNpcClass.PlayAnimation("Scream");
 
-							local playerCf;
-							repeat
-								task.wait(0.2);
-								if playerClass.Character == nil then return end;
-								playerCf = playerClass:GetCFrame();
-							until playerCf.Y >= 12.5 and playerCf.Z >= 33;
+								local s = modAudio.Play("ZombieGroan", workspace);
+								s.Volume = 1;
+								local reverb = Instance.new("ReverbSoundEffect");
+								reverb.Parent = s;
 
-							Debugger:Log("Helicopter leaves");
+								stanNpcClass.Move:SetMoveSpeed("set", "default", 30);
 
-							TweenService:Create(heliLeavesAnimTrack, TweenInfo.new(10, Enum.EasingStyle.Linear), {
-								TimePosition=9.98;
-							}):Play();
-							task.wait(3);
-
-							for ct=18.2, 18.6, 0.008 do
-								game.Lighting.ClockTime = ct;
-								task.wait(0.1);
-							end
-						end)
-
-						for _, obj in pairs(gateLever.LeftGate:GetChildren()) do
-							if obj:IsA("BasePart") then 
-								obj.CanCollide = true;
-							end;
-						end
-						for _, obj in pairs(gateLever.RightGate:GetChildren()) do
-							if obj:IsA("BasePart") then 
-								obj.CanCollide = true;
-							end;
-						end
-
-						local enemySpawns = game.ServerStorage.EnemySpawns:GetChildren()
-						for a=1, #enemySpawns do
-							local spawnPart = enemySpawns[a];
-							local spawnCf = spawnPart.CFrame;
-
-							if spawnPart.Name == "SpawnA" then
 								task.spawn(function()
-									if mission.ProgressionPoint < 15 then return; end
+									local targetGoon: NpcClass = banditGoons[1];
 
-									spawnEnemy(closedGates and "Bandit" or "Rat", spawnCf);
+									local function hunt(playScream)
+										repeat
+											stanNpcClass.Properties.AttackMode = true;
+
+											local targetPosition = targetGoon.RootPart.Position;
+											local targetDist = stanNpcClass:DistanceFrom(targetPosition);
+
+											if targetDist <= 100 then
+												stanNpcClass.Move:MoveTo(targetGoon.RootPart.Position);
+											end
+											if targetDist <= 6 then
+												stanNpcClass.PlayAnimation("Attack");
+												modAudio.Play("Slice", workspace).PlaybackSpeed = 0.5;
+												modAudio.Play("Punch", workspace).PlaybackSpeed = 0.7;
+												task.wait(0.2);
+
+												targetGoon.HealthComp:SetIsDead(true);
+												modAudio.Play("HumanDeath", workspace);
+												task.wait(0.4);
+
+												if playScream then
+													stanNpcClass.PlayAnimation("Scream");
+													modAudio.Play("ZombieGroan", workspace);
+													task.wait(0.4);
+												end
+												task.wait(0.4);
+											end
+											task.wait();
+
+											if targetDist > 256 then
+												Debugger:Warn(`Target {targetGoon.Name}#{targetGoon.Character:GetAttribute("Cutscene")} too far!`);
+												break;
+											end
+										until targetGoon.HealthComp.IsDead == true;
+									end
+									hunt(true);
+
+									targetGoon = banditGoons[3];
+									hunt(false);
+
+									targetGoon = ratGoons[2];
+									hunt(true);
+
+									task.wait(2);
+									stanNpcClass.Move:MoveTo(Vector3.new(-18.351, 1.88, 110.928));
+									stanNpcClass.Move.OnMoveToEnded:Once(function() 
+										stanNpcClass:TeleportHide();
+									end)
 								end)
+
+								local lastDamaged = tick();
+								stanNpcClass.Properties.Immortal = 0.2;
+								stanNpcClass.HealthComp.OnHealthChanged:Connect(function()
+									stanNpcClass.Humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOn; lastDamaged = tick();
+									task.delay(2, function()
+										if tick()-lastDamaged > 2 and stanNpcClass.Humanoid then
+											stanNpcClass.Humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff;
+										end;
+									end);
+
+									task.wait();
+									local hurtSound = modAudio.Play("ZombieHurt", stanNpcClass.RootPart);
+									hurtSound.Volume = math.random(50, 60)/100;
+									hurtSound.PlaybackSpeed = math.random(110, 120)/100;
+								end)
+
+								local ratGoon3: NpcClass = ratGoons[3];
+								if not ratGoon3.HealthComp.IsDead then
+									ratGoon3.Move:SetMoveSpeed("set", "default", 12);
+									ratGoon3.Move:MoveTo(Vector3.new(-31.179, 5.066, -11.033));
+									ratGoon3.Move.OnMoveToEnded:Once(function()
+										ratGoon3:TeleportHide();
+									end)
+								end
+								for a=1, #banditGoons do
+									banditGoons[a].Properties.Immortal = nil;
+								end
+
+							else -- Helped Bandits;
+								for a=1, #ratGoons do
+									ratGoons[a].Properties.Immortal = nil;
+								end
+								stanNpcClass.Properties.AttackMode = true;
+
+								local ratGoon2 = ratGoons[2];
+								if ratGoon2.HealthComp and not ratGoon2.HealthComp.IsDead then
+									ratGoon2.Move:SetMoveSpeed("set", "default", 12);
+									ratGoon2.Move:MoveTo(Vector3.new(28.452, 5.066, -11));
+									ratGoon2.Move.OnMoveToEnded:Once(function()
+										ratGoon2:TeleportHide();
+									end)
+								end
+
+								local ratGoon3 = ratGoons[3];
+								if ratGoon3.HealthComp and not ratGoon3.HealthComp.IsDead then
+									ratGoon3.Move:SetMoveSpeed("set", "default", 12);
+									ratGoon3.Move:MoveTo(Vector3.new(-31.179, 5.066, -11.033));
+									ratGoon3.Move.OnMoveToEnded:Once(function()
+										ratGoon3:TeleportHide();
+									end)
+								end
+
+								local banditGoon3 = banditGoons[3];
+								if banditGoon3.HealthComp and not banditGoon3.HealthComp.IsDead then
+									banditGoon3.Move:SetMoveSpeed("set", "default", 12);
+									banditGoon3.Move:MoveTo(Vector3.new(-18.351, 1.88, 110.928));
+									banditGoon3.Move.OnMoveToEnded:Once(function()
+										banditGoon3:TeleportHide();
+									end)
+								end
 							end
+
+							task.delay(5, function()
+								local shipDoors = workspace.Environment.CargoShip.ShipDoors:GetChildren();
+								for a=1, #shipDoors do
+									if shipDoors[a]:GetAttribute("DoubleCross") ~= "A" then continue end;
+									local doorConfig = shipDoors[a]:FindFirstChild("Door");
+									
+									local doorObj = modDoors.getOrNew(doorConfig);
+									doorObj:Toggle(true);
+								end
+								
+								for a=1, #shipDoors do
+									local doorInteractConfig = shipDoors[a]:FindFirstChild("Interactable");
+									local doorInteractable = modInteractables.getOrNew(doorInteractConfig);
+									doorInteractConfig:SetAttribute("Locked", false);
+								end
+							end)
+
+							task.spawn(function()
+								local heliAnimationController = workspace.Environment.BanditHelicopterRig.AnimationController
+								local animator = heliAnimationController:WaitForChild("Animator");
+
+								local heliLeavesAnimTrack = animator:LoadAnimation(script:WaitForChild("HeliLeavesAnim"));
+								heliLeavesAnimTrack:Play(nil, nil, 0);
+
+								local playerCf;
+								repeat
+									task.wait(0.2);
+									if playerClass.Character == nil then return end;
+									playerCf = playerClass:GetCFrame();
+								until playerCf.Y >= 12.5 and playerCf.Z >= 33;
+
+								Debugger:Log("Helicopter leaves");
+
+								TweenService:Create(heliLeavesAnimTrack, TweenInfo.new(10, Enum.EasingStyle.Linear), {
+									TimePosition=9.98;
+								}):Play();
+								task.wait(3);
+
+								for ct=18.2, 18.6, 0.008 do
+									game.Lighting.ClockTime = ct;
+									task.wait(0.1);
+								end
+							end)
+
+							for _, obj in pairs(gateLever.LeftGate:GetChildren()) do
+								if obj:IsA("BasePart") then 
+									obj.CanCollide = true;
+								end;
+							end
+							for _, obj in pairs(gateLever.RightGate:GetChildren()) do
+								if obj:IsA("BasePart") then 
+									obj.CanCollide = true;
+								end;
+							end
+
+							local enemySpawns = game.ServerStorage.EnemySpawns:GetChildren()
+							for a=1, #enemySpawns do
+								local spawnPart = enemySpawns[a];
+								local spawnCf = spawnPart.CFrame;
+
+								if spawnPart.Name == "SpawnA" then
+									task.spawn(function()
+										if mission.ProgressionPoint < 15 then return; end
+
+										spawnEnemy(closedGates and "Bandit" or "Rat", spawnCf);
+									end)
+								end
+							end
+							CutsceneSequence:NextScene("endCutscene");
 						end
-						CutsceneSequence:NextScene("endCutscene");
 
 					elseif mission.ProgressionPoint == 16 then
 						local eventObj = modEvents:GetEvent(player, "mission58choice");
@@ -1394,17 +1411,21 @@ return function(CutsceneSequence)
 							doorObj:Toggle(true);
 						end
 
-						local enemySpawns = game.ServerStorage.EnemySpawns:GetChildren()
-						for a=1, #enemySpawns do
-							local spawnPart = enemySpawns[a];
-							local spawnCf = spawnPart.CFrame;
+						if enemySpawned16 ~= true then
+							enemySpawned16 = true;
 
-							if spawnPart.Name == "SpawnB" then
-								task.spawn(function()
-									if mission.ProgressionPoint < 15 then return; end
+							local enemySpawns = game.ServerStorage.EnemySpawns:GetChildren()
+							for a=1, #enemySpawns do
+								local spawnPart = enemySpawns[a];
+								local spawnCf = spawnPart.CFrame;
 
-									spawnEnemy(closedGates and "Bandit" or "Rat", spawnCf);
-								end)
+								if spawnPart.Name == "SpawnB" then
+									task.spawn(function()
+										if mission.ProgressionPoint < 15 then return; end
+
+										spawnEnemy(closedGates and "Bandit" or "Rat", spawnCf);
+									end)
+								end
 							end
 						end
 

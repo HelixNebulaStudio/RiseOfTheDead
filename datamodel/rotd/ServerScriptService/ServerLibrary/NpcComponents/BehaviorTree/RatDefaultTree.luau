@@ -1,14 +1,19 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local PathfindingService = game:GetService("PathfindingService");
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
+local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
 
 local TALK_ANIMATIONS = {"nodyes"; "nodno"; "shrug2"; "laugh"; "point"; "bored"; "PullLever"};
 
 local treePackage = {
     LogicString = {
         Default = "!InCutscene & DefaultTree | [DoNothing]";
-        DefaultTree = "HasEnemy & ShareIntel & EquipWeapon & AlertTree | IdleTree";
-        AlertTree = "IsUsingMelee & MeleeTree | RangeTree";
+        DefaultTree = "HasEnemy & AlertTree | IdleTree";
+        AlertTree = "EquipWeapon & IsInVision & (ShareIntel & IsUsingMelee & MeleeTree | RangeTree) | HuntTree";
+        HuntTree = "KnowEnemyLastPosition & (IsAtLastKnownPosition & [InvestigateArea] | [MoveToLastKnownPosition]) | SeekTree";
+        SeekTree = "[GuessEnemyLastPosition]";
         MeleeTree = "InMeleeRange & [SwingMelee] | [RunToMeleeRange]";
         RangeTree = "CanFireGun & (RunToFireRange & [FireGun]) | (RunToCover & [ReloadGun])";
         IdleTree = "SelfHealTree | PatrolTree";
@@ -23,51 +28,71 @@ function treePackage.InCutscene(npcClass: NpcClass)
 end
 
 function treePackage.HasEnemy(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
     if targetHandlerComp == nil then return false; end;
 
     if npcClass.HealthComp.LastDamagedBy then
-        npcClass.Properties.IsHostile = true;
+        properties.IsHostile = true;
     end
 
     local enemyTargetData: NpcTargetData? = targetHandlerComp:MatchFirstTarget(function(targetData: NpcTargetData)
         if targetData.HealthComp == nil then return end;
-        local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
+        local targetEntityClass: EntityClass = targetData.HealthComp.CompOwner :: EntityClass;
 
-        local isAlive = targetNpcClass.HealthComp.IsDead ~= true;
+        local isAlive = targetEntityClass.HealthComp.IsDead ~= true;
         if not isAlive then return false; end;
 
-		local canDamage = targetNpcClass.HealthComp:CanTakeDamageFrom(npcClass);
+		local canDamage = targetEntityClass.HealthComp:CanTakeDamageFrom(npcClass);
 		if not canDamage then return false; end;
         
-        local woundedStatus = targetNpcClass.StatusComp:GetOrDefault("Wounded");
-        if woundedStatus then return false; end;
+        if targetEntityClass.ClassName ~= "Destructible" then
+            local targetCharacterClass: CharacterClass = (targetEntityClass :: CharacterClass);
 
-        if npcClass.HealthComp.LastDamagedBy == targetNpcClass then return true; end;
+            local woundedStatus = targetCharacterClass.StatusComp:GetOrDefault("Wounded");
+            if woundedStatus then return false; end;
 
-        local isTargetPlayer = targetNpcClass.HumanoidType == "Player";
-        local isHostile = npcClass.Properties.IsHostile == true;
-        if isTargetPlayer and not isHostile then return false; end;
+            if npcClass.HealthComp.LastDamagedBy == targetCharacterClass then return true; end;
 
-        local visionTarget = targetNpcClass.Head;
-        if targetNpcClass.Properties.IsCrouching then
-            visionTarget = targetNpcClass.RootPart;
+            local isTargetPlayer = targetCharacterClass.HumanoidType == "Player";
+            local isHostile = properties.IsHostile == true;
+            if isTargetPlayer and not isHostile then return false; end;
+
+            local visionTarget = targetCharacterClass.Head;
+            if targetCharacterClass.Properties.IsCrouching then
+                visionTarget = targetCharacterClass.RootPart;
+            end
+
+            local isInVision = npcClass:IsInVision(visionTarget, 75);
+            targetData.IsInVision = isInVision;
+            if not isInVision then
+                if targetData.LastSeenTick and (tick()-targetData.LastSeenTick < properties.LastSeenMemDuration) then
+                    return true;
+                end
+                if targetData.LastKnownPosition and (tick()-targetData.LastAddedTick < properties.LastPosMemDuration) then
+                    return true;
+                end
+
+                return false;
+            end;
+
+            targetData.LastSeenTick = tick();
+            targetData.LastKnownPosition = targetCharacterClass:GetCFrame().Position;
         end
-
-        local isInVision = npcClass:IsInVision(visionTarget, 75);
-        if not isInVision then return false; end;
 
         return true;
     end);
 
-    if npcClass.Properties.EnemyTargetData then
-        local oldEnemyTargetData = npcClass.Properties.EnemyTargetData;
+    if properties.EnemyTargetData then
+        local oldEnemyTargetData = properties.EnemyTargetData;
         local oldEnemyHealthComp: HealthComp = oldEnemyTargetData.HealthComp
 
         if math.random(1, 4) == 1 
-        and oldEnemyHealthComp.IsDead and oldEnemyHealthComp.LastDamageTaken+2 < tick() then
+        and oldEnemyHealthComp.IsDead and oldEnemyHealthComp.LastDamageTaken+2 < tick()
+        and oldEnemyHealthComp.CompOwner.ClassName ~= "Destructible" then
             local killPhrases = npcClass.NpcPackage.Chatter.KillPhrases;
-            local enemyHumanoidType = oldEnemyHealthComp.CompOwner.HumanoidType;
+            local enemyHumanoidType = (oldEnemyHealthComp.CompOwner :: CharacterClass).HumanoidType;
 
             local filteredKillPhrases = {};
             for a=1, #killPhrases do
@@ -82,13 +107,21 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                 npcClass.Chat(nil, pickedPhrase.Say);
             end;
             
-            npcClass.Properties.EnemyTargetData = nil;
+            properties.EnemyTargetData = nil;
         end
         if oldEnemyTargetData ~= enemyTargetData then
-            npcClass.Properties.LastAlertShout = nil;
+            properties.LastAlertShout = nil;
         end
+
+    else
+        local wieldComp: WieldComp = npcClass.WieldComp;
+        local equipmentClass: EquipmentClass? = wieldComp.EquipmentClass;
+        if equipmentClass and (equipmentClass.Class == "Gun" or equipmentClass.Class == "Melee") then 
+            wieldComp:Unequip();
+        end
+
     end
-    npcClass.Properties.EnemyTargetData = enemyTargetData;
+    properties.EnemyTargetData = enemyTargetData;
     
     return enemyTargetData ~= nil;
 end
@@ -109,6 +142,94 @@ function treePackage.EquipWeapon(npcClass: NpcClass)
     return true;
 end
 
+--MARK: Investigate behavior
+function treePackage.IsInVision(npcClass: NpcClass)
+    local enemyTargetData = npcClass.Properties.EnemyTargetData;
+    return enemyTargetData and enemyTargetData.IsInVision == true or false;
+end
+
+function treePackage.KnowEnemyLastPosition(npcClass: NpcClass)
+    local enemyTargetData = npcClass.Properties.EnemyTargetData;
+    local lastKnownPos = enemyTargetData.LastKnownPosition;
+
+    if lastKnownPos == nil then return false; end;
+
+    return true;
+end
+
+function treePackage.IsAtLastKnownPosition(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    local enemyTargetData = npcClass.Properties.EnemyTargetData;
+    local lastKnownPos = enemyTargetData.LastKnownPosition;
+
+    local isAtLastKnowPos = modVector.DistanceSqrd(lastKnownPos, npcClass:GetCFrame().Position) < 36; --6 units
+    
+    if isAtLastKnowPos then
+        if properties.ArriveSeekPositionTick == nil or tick()-properties.ArriveSeekPositionTick > 40 then
+            properties.ArriveSeekPositionTick = tick();
+
+            npcClass.PlayAnimation("Idle");
+
+            local huntSpeech = npcClass.NpcPackage.Chatter.HuntSpeech;
+            local huntPhrase = huntSpeech and huntSpeech[math.random(1, #huntSpeech)] or nil;
+            if huntPhrase then
+                npcClass.Chat(nil, huntPhrase.Say);
+            end
+        end
+    end
+    
+    return isAtLastKnowPos;
+end
+
+function treePackage.MoveToLastKnownPosition(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    local enemyTargetData = npcClass.Properties.EnemyTargetData;
+    local lastKnownPos = enemyTargetData.LastKnownPosition;
+    local timeSinceLastAdd = tick()-enemyTargetData.LastAddedTick;
+    
+    npcClass.Move:MoveTo(lastKnownPos);
+
+    if timeSinceLastAdd <= 10 then
+        npcClass.Move:SetMoveSpeed(
+            "set", "sprint", properties.SprintSpeed or 18, npcClass.Move.MoveSpeedPriority.Movement, 5);
+    end
+end
+
+function treePackage.InvestigateArea(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    if properties.LastSeekTurnTick == nil or tick() > properties.LastSeekTurnTick then
+        properties.LastSeekTurnTick = tick() + math.random(1, 9);
+
+        local lookDir = modVector.RandomUnitVector(2);
+        lookDir = Vector3.new(lookDir.X, 0, lookDir.Y);
+
+        npcClass.Move:Face(npcClass:GetCFrame().Position + (lookDir * 100));
+    end
+end
+
+function treePackage.GuessEnemyLastPosition(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
+    local enemyPosition = enemyTargetData.Model and enemyTargetData.Model:GetPivot().Position or nil;
+
+    if enemyPosition then
+        enemyPosition = enemyPosition + Vector3.new(
+            math.random(-1, 1) * math.random(20, 40), 
+            0, 
+            math.random(-1, 1) * math.random(20, 40)
+        );
+    else
+        enemyPosition = npcClass:GetCFrame().Position + Vector3.new(
+            math.random(-1, 1) * math.random(40, 100), 
+            0, 
+            math.random(-1, 1) * math.random(40, 100)
+        );
+    end
+
+    enemyTargetData.LastKnownPosition = enemyPosition;
+end
+
+--MARK: Combat behavior
 function treePackage.IsUsingMelee(npcClass: NpcClass)
     local wieldComp: WieldComp = npcClass.WieldComp;
     if wieldComp.EquipmentClass and wieldComp.EquipmentClass.Class == "Melee" then return true end;
@@ -117,14 +238,15 @@ end
 
 function treePackage.InMeleeRange(npcClass: NpcClass)
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
-    return enemyTargetData.Distance <= 10;
+    return enemyTargetData.Distance <= 6;
 end
 
 function treePackage.RunToMeleeRange(npcClass: NpcClass)
+    local properties = npcClass.Properties;
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
 
-    npcClass.Move:SetMoveSpeed("set", "sprint", 18, npcClass.Move.MoveSpeedPriority.Movement, 5);
+    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 18, npcClass.Move.MoveSpeedPriority.Movement, 5);
     npcClass.Move:Follow(enemyNpcClass.RootPart, 2);
 end
 
@@ -149,10 +271,11 @@ function treePackage.CanFireGun(npcClass: NpcClass)
 end
 
 function treePackage.RunToFireRange(npcClass: NpcClass)
+    local properties = npcClass.Properties;
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
 
-    npcClass.Move:SetMoveSpeed("set", "sprint", 14, npcClass.Move.MoveSpeedPriority.Movement, 5);
+    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 14, npcClass.Move.MoveSpeedPriority.Movement, 5);
     npcClass.Move:Follow(enemyNpcClass.RootPart, 16, 24);
 
     return true;
@@ -164,7 +287,7 @@ function treePackage.FireGun(npcClass: NpcClass)
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
 
     local enemyHealthComp: HealthComp = enemyTargetData.HealthComp;
-    local enemyNpcClass: NpcClass = enemyHealthComp.CompOwner;
+    local enemyNpcClass: EntityClass = enemyHealthComp.CompOwner :: EntityClass;
 
     npcClass.Move:Face(enemyNpcClass.RootPart, nil, 0.5);
     npcClass.Move:HeadTrack(enemyNpcClass.Head, 2);
@@ -179,10 +302,11 @@ function treePackage.FireGun(npcClass: NpcClass)
 end
 
 function treePackage.RunToCover(npcClass: NpcClass)
+    local properties = npcClass.Properties;
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
     local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
 
-    npcClass.Move:SetMoveSpeed("set", "sprint", 18, npcClass.Move.MoveSpeedPriority.Movement, 5);
+    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 18, npcClass.Move.MoveSpeedPriority.Movement, 5);
     npcClass.Move:Follow(enemyNpcClass.RootPart, 24, 32);
 
     return true;
@@ -231,11 +355,74 @@ function treePackage.Patrol(npcClass: NpcClass)
 
     properties.LastAlertShout = nil;
     
-    if math.random(1, 100) == 1 
-    and not npcClass.Move:IsAtPosition(npcClass.SpawnCFrame.Position) and npcClass.Properties.SpokeByMeData == nil then
-        npcClass.Move:SetMoveSpeed("set", "walk", 8, npcClass.Move.MoveSpeedPriority.Movement, 2);
-        npcClass.Move:MoveTo(npcClass.SpawnCFrame.Position);
+    local patrolPositions = properties.PatrolPositions;
+    if patrolPositions == nil then
+        patrolPositions = {};
+        properties.PatrolPositions = patrolPositions;
+        properties.PatrolIndex = 1;
+        local curPos = npcClass:GetCFrame().Position;
 
+        local patrolRng = Random.new(curPos.X + curPos.Y + curPos.Z);
+
+        local path: Path = PathfindingService:CreatePath(npcClass.PathAgent);
+        for a=1, patrolRng:NextInteger(3, 6) do
+            local startPos = curPos;
+            local endPos = startPos + Vector3.new(
+                (patrolRng:NextInteger(1, 2) == 1 and 1 or -1) * patrolRng:NextInteger(25, 45),
+                0,
+                (patrolRng:NextInteger(1, 2) == 1 and 1 or -1) * patrolRng:NextInteger(25, 45)
+            );
+
+            local rayParams = RaycastParams.new();
+            rayParams.IncludeInstances = {workspace.Environment; workspace.Terrain};
+            rayParams.IgnoreWater = true;
+
+            local floorRayResult = workspace:Blockcast(CFrame.new(endPos + Vector3.new(0, 6, 0)), Vector3.one*2, Vector3.yAxis*-10, rayParams);
+            if floorRayResult == nil then Debugger:Warn("Patrol no floor"); continue end;
+            endPos = floorRayResult.Position + Vector3.new(0, 1.35, 0);
+
+            local pathS, pathE = pcall(function()
+                path:ComputeAsync(startPos, endPos)
+            end)
+            if not pathS then Debugger:Warn("Patrol pathE", pathE); continue end;
+            if path.Status ~= Enum.PathStatus.Success then Debugger:Warn("Patrol no path", path.Status); continue end;
+
+            local wayPoints = path:GetWaypoints();
+            for _, waypoint: PathWaypoint in pairs(wayPoints) do
+                if waypoint.Action ~= Enum.PathWaypointAction.Walk then Debugger:Warn("Patrol skip action", waypoint.Action);  continue end;
+
+                local waypointPos = waypoint.Position;
+                table.insert(patrolPositions, waypointPos);
+            end
+
+            break;
+        end
+    end
+
+    if npcClass.Properties.SpokeByMeData == nil then
+        if math.random(1, 100) == 1 
+        and #patrolPositions <= 0 
+        and not npcClass.Move:IsAtPosition(npcClass.SpawnCFrame.Position) then
+            -- Walk back to spawn;
+            npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, npcClass.Move.MoveSpeedPriority.Movement, 2);
+            npcClass.Move:MoveTo(npcClass.SpawnCFrame.Position);
+
+        elseif math.random(1, 60) == 1 and #patrolPositions > 0 then
+            -- Walk to random spot;
+            local patrolPos = patrolPositions[properties.PatrolIndex];
+            if not npcClass.Move:IsAtPosition(patrolPos) then
+                npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, npcClass.Move.MoveSpeedPriority.Movement, 5);
+                npcClass.Move:MoveTo(patrolPos);
+
+            else
+                properties.PatrolIndex +=1;
+                if properties.PatrolIndex > #patrolPositions then
+                    modTables.Reverse(patrolPositions);
+                    properties.PatrolIndex = 1;
+                end
+            end
+
+        end
     else
         npcClass.Move:Stop();
 
@@ -248,14 +435,15 @@ function treePackage.Patrol(npcClass: NpcClass)
             end
 
             local patrolConverse = npcClass.NpcPackage.Chatter.PatrolConverse;
-            local pickedDialogue = patrolConverse[math.random(1, #patrolConverse)];
+            local pickedDialogue = patrolConverse and patrolConverse[math.random(1, #patrolConverse)] or nil;
             if pickedDialogue then
-                local nearbyBanditTargetData: NpcTargetData? = npcClass:GetComponent("TargetHandler"):MatchFirstTarget(function(targetData: NpcTargetData)
+                local nearbyAllyTargetData: NpcTargetData? = npcClass:GetComponent("TargetHandler"):MatchFirstTarget(function(targetData: NpcTargetData)
                     if targetData.HealthComp == nil then return end;
-                    local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
+                    local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner :: NpcClass;
                     if targetNpcClass == npcClass then return false; end;
+                    if targetNpcClass.ClassName ~= "NpcClass" then return false; end;
 
-                    if targetNpcClass.HumanoidType ~= "Bandit" then return false; end;
+                    if targetNpcClass.HumanoidType ~= npcClass.HumanoidType then return false; end;
                     if targetNpcClass.HealthComp.IsDead then return false; end;
                     if targetNpcClass.Properties.EnemyTargetData then return false; end;
                     if targetNpcClass.Properties.SpokeByMeData then return false; end;
@@ -266,8 +454,8 @@ function treePackage.Patrol(npcClass: NpcClass)
                     return true;
                 end)
 
-                if nearbyBanditTargetData then
-                    local targetNpcClass: NpcClass = nearbyBanditTargetData.HealthComp.CompOwner;
+                if nearbyAllyTargetData then
+                    local targetNpcClass: NpcClass = nearbyAllyTargetData.HealthComp.CompOwner :: NpcClass;
 
                     npcClass.Properties.SpokeByMeData = {
                         NpcClass = targetNpcClass;
@@ -275,10 +463,10 @@ function treePackage.Patrol(npcClass: NpcClass)
                         Dialogue = pickedDialogue;
                     };
 
-                    if nearbyBanditTargetData.Distance > 10 then
-                        npcClass.Move:SetMoveSpeed("set", "walk", 8, npcClass.Move.MoveSpeedPriority.Movement, 3);
+                    if nearbyAllyTargetData.Distance > 10 then
+                        npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, npcClass.Move.MoveSpeedPriority.Movement, 3);
 
-                        local dir = (targetNpcClass.RootPart.Position - npcClass.RootPart.Position).Unit;
+                        local dir = (targetNpcClass:GetCFrame().Position - npcClass:GetCFrame().Position).Unit;
                         npcClass.Move:MoveTo(npcClass.RootPart.Position + (dir * 8));
                     end
                     npcClass.Move:HeadTrack(targetNpcClass.Head, 5);
@@ -306,12 +494,12 @@ end
 function treePackage.ShareIntel(npcClass: NpcClass)
     local properties = npcClass.Properties;
 
-    local enemyTargetData = npcClass.Properties.EnemyTargetData;
-    local enemyNpcClass: NpcClass = enemyTargetData and enemyTargetData.HealthComp.CompOwner or nil;
+    local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
+    local enemyEntityClass: EntityClass? = enemyTargetData and (enemyTargetData.HealthComp.CompOwner :: EntityClass) or nil;
 
-    if properties.SpokenToMeData and properties.SpokenToMeData.NpcClass and enemyNpcClass then
+    if properties.SpokenToMeData and properties.SpokenToMeData.NpcClass and enemyEntityClass then
         local allyNpcClass: NpcClass = properties.SpokenToMeData.NpcClass;
-        allyNpcClass.Move:Face(enemyNpcClass.RootPart);
+        allyNpcClass.Move:Face(enemyEntityClass.RootPart);
 
         properties.SpokenToMeData = nil;
     end
@@ -320,8 +508,8 @@ function treePackage.ShareIntel(npcClass: NpcClass)
         local targetNpcClass: NpcClass = properties.SpokeByMeData.NpcClass;
 
         if targetNpcClass.HealthComp.IsDead ~= true then
-            if targetNpcClass and enemyNpcClass then -- I have enemy
-                targetNpcClass.Move:Face(enemyNpcClass.RootPart);
+            if targetNpcClass and enemyEntityClass then -- I have enemy
+                targetNpcClass.Move:Face(enemyEntityClass.RootPart);
 
                 if targetNpcClass.RootPart then
                     npcClass.Move:Face(targetNpcClass.RootPart);
@@ -339,18 +527,19 @@ function treePackage.ShareIntel(npcClass: NpcClass)
     end
 
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
-    if enemyNpcClass and (properties.LastAlertShout == nil or tick()-properties.LastAlertShout > 20) then
+    if enemyEntityClass and (properties.LastAlertShout == nil or tick()-properties.LastAlertShout > 20) then
         npcClass.Properties.LastAlertShout = tick();
 
         local allies: {NpcTargetData} = targetHandlerComp:MatchTargets(function(targetData: NpcTargetData)
             if targetData.HealthComp == nil then return end;
-            local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
+            local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner :: NpcClass;
+            if targetNpcClass.ClassName ~= "NpcClass" then return end;
 
             local isAlive = targetNpcClass.HealthComp.IsDead ~= true;
             if not isAlive then return false; end;
 
-            local isBandit = targetNpcClass.HumanoidType == "Bandit";
-            if not isBandit then return false; end;
+            local isAlly = targetNpcClass.HumanoidType == npcClass.HumanoidType;
+            if not isAlly then return false; end;
 
             local isMe = targetNpcClass == npcClass;
             if isMe then return false; end;
@@ -362,14 +551,14 @@ function treePackage.ShareIntel(npcClass: NpcClass)
         if math.random(1, 3) == 1 then
             local alertPhrases = npcClass.NpcPackage.Chatter.AlertPhrases;
             local filteredAlertPhrases = {};
-            for a=1, #alertPhrases do
+            for a=1, #(alertPhrases or {}) do
                 local alertPhrase = alertPhrases[a];
-                if alertPhrase.HumanoidType == nil or alertPhrase.HumanoidType == enemyNpcClass.HumanoidType then
+                if alertPhrase.HumanoidType == nil or alertPhrase.HumanoidType == enemyEntityClass.HumanoidType then
                     table.insert(filteredAlertPhrases, alertPhrase);
                 end
             end
 
-            local alertPhrase = filteredAlertPhrases[math.random(1, #filteredAlertPhrases)];
+            local alertPhrase = #filteredAlertPhrases >0 and filteredAlertPhrases[math.random(1, #filteredAlertPhrases)] or nil;
             if alertPhrase then
                 npcClass.Chat(nil, alertPhrase.Say);
             end
@@ -377,10 +566,10 @@ function treePackage.ShareIntel(npcClass: NpcClass)
 
         for a=1, #allies do
             local targetData: NpcTargetData = allies[a];
-            local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
+            local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner :: NpcClass;
 
             if targetNpcClass.Properties.EnemyTargetData ~= nil then continue end;
-            targetNpcClass.Move:HeadTrack(enemyNpcClass.Head, 10);
+            targetNpcClass.Move:HeadTrack(enemyEntityClass.Head, 10);
         end
     end
 

@@ -13,7 +13,7 @@ function destructiblePackage.BindNew(destructible: DestructibleInstance)
     local healthComp: HealthComp = destructible.HealthComp;
 
     destructible.OnDestroy:Connect(function(reasonData)
-        local targetPart = reasonData.TargetPart;
+        local targetPart = reasonData.TargetPart or destructible.Model:FindFirstChildWhichIsA("BasePart");
         local targetPos = targetPart.Position;
         
         modAudio.Play("VechicleExplosion", targetPos);

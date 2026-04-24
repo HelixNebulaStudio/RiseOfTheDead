@@ -2019,6 +2019,7 @@ MissionLibrary.New{
 	Markers={
 		[1]={World="TheHarbor"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
 		[4]={World="TheHarbor"; Label="Revas's Office"; Target=Vector3.new(-290.606, 107.853, 243.741); Type=modMarkers.MarkerTypes.Waypoint;};
+		[19]={World="DoubleCross"; Label="Escape Dinghy"; Target=Vector3.new(-43.618, 12.253, -62.908); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
 	CanRedo={};
 	StorylineSplit={
