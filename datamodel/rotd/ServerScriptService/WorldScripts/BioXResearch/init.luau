@@ -102,6 +102,10 @@ function WorldCore.onRequire()
             modAudio.Play("PartyPopper", interactable.Part);
         end
     end)
+
+    if RunService:IsServer() then
+        shared.gameConfig.Config:SetAttribute("Test", "HelloWorld");
+    end
 end
 
 return WorldCore;

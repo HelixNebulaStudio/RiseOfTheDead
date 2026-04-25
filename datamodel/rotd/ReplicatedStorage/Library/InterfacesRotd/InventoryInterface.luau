@@ -313,14 +313,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	--== Shared Context Options;
 	local equipContextOption = {
 		Text=function(Table)
-			return Table.Item.Values.IsEquipped == nil and "Equip" or "Unequip";
+			return playerClass.WieldComp.Siid ~= Table.Item.ID and "Equip" or "Unequip";
 		end;
 		Check=function(Table)
 			return Table.Library.Equippable;
 		end;
 		Click=function(Table)
-			if Table.Item.Values.IsEquipped == nil then
+			if playerClass.WieldComp.Siid ~= Table.Item.ID then
 				modData.HandleTool("equip", {Siid=Table.ID; ItemId=Table.ItemId});
+				task.wait(0.2);
 				inventoryWindow:Close();
 				
 			else
@@ -874,6 +875,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 		end
 	end)
+
+	interface.Garbage:Tag(playerClass.WieldComp.OnWieldEvent:Connect(function(action, siid)
+		if action ~= "equip" and action ~= "unequip" then return end;
+		if siid == nil then return end;
+		
+		modStorageInterface.RefreshSiid(siid);
+	end))
+
+	interface.Garbage:Tag(interface.OnInterfaceEvent:Connect(function(action, siid)
+		if action ~= "ItemUpdate" then return end;
+		if siid == nil then return end;
+
+		modStorageInterface.RefreshSiid(siid);
+	end))
 end
 
 return interfacePackage;

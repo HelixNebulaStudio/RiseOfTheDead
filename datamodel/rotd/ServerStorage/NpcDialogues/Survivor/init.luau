@@ -121,8 +121,8 @@ return function(player, dialog, data)
 			
 		end
 
-	--== MARK: RAT	
-	elseif npcLib.Class == "RAT" then
+	--== MARK: Rat	
+	elseif npcLib.Class == "Rat" then
 		
 		if npcLevel == 1 then
 			dialog:SetInitiateTag("shelter_lvl1_init");

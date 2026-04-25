@@ -13,7 +13,7 @@ local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibra
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modBlueprintLibrary = shared.require(game.ReplicatedStorage.Library.BlueprintLibraryRotd);
 local modToolsLibrary = shared.require(game.ReplicatedStorage.Library.ToolsLibrary);
-local modRichFormatter = require(game.ReplicatedStorage.Library.UI.RichFormatter);
+local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local PLANNER_LIBRARY = {

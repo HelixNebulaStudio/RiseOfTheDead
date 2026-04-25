@@ -52,6 +52,7 @@ function Spawner.new(spawnConfig: Configuration)
         SpawningTick = tick();
 
         ActiveNpcs = {};
+        Properties = {};
     };
 
     setmetatable(self, Spawner);
@@ -62,6 +63,13 @@ function Spawner.new(spawnConfig: Configuration)
     spawnConfig:GetAttributeChangedSignal("Disabled"):Connect(function()
         self.Disabled = spawnConfig:GetAttribute("Disabled") == true;
     end)
+    self.Disabled = spawnConfig:GetAttribute("Disabled") == true;
+
+    for k,v in pairs(spawnConfig:GetAttributes()) do
+        if k:sub(1, 5) ~= "prop_" then continue end;
+        local key = k:gsub("prop_", "");
+        self.Properties[key] = v;
+    end
 
     local npcPrefab = shared.modNpcs.getNpcPrefab(self.SpawnNpcName);
 
@@ -133,7 +141,7 @@ function Spawner:RequestSpawn()
         local spawnMax = self.SpawnMax or spawnMaxBySpace;
 
         local minCount = math.max(spawnMin, math.floor(spawnMax * 0.2) or 0);
-        local maxCount = math.min(spawnMaxBySpace, spawnMax, minCount);
+        local maxCount = math.max(spawnMaxBySpace, spawnMax, minCount);
 
         local playerClasses, _distSqrd = shared.modPlayers.PositionsOctree:RadiusSearch(self.CFrame.Position, 100);
         local playerCount = #playerClasses;
@@ -184,6 +192,7 @@ function Spawner:Spawn(cframe: CFrame, playerClasses: {PlayerClass})
     shared.modNpcs.spawn2{
         Name = spawnNpcName;
         CFrame = cframe;
+        Properties = table.clone(self.Properties);
         BindSetup = function(npcClass: NpcClass)
             npcClass.Character:SetAttribute("NaturalSpawn", true);
             table.insert(self.ActiveNpcs, npcClass);

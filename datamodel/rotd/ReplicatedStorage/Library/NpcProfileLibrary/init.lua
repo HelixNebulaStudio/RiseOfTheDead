@@ -6,7 +6,7 @@ local library = modLibraryManager.new();
 library.ClassColors = {
 	Survivor=Color3.fromRGB(84, 141, 166);
 	Medic=Color3.fromRGB(73, 120, 69);
-	RAT=Color3.fromRGB(120, 71, 111);
+	Rat=Color3.fromRGB(120, 71, 111);
 	Bandit=Color3.fromRGB(99, 67, 53);
 	Military=Color3.fromRGB(157, 79, 59);
 	Enemy=Color3.fromRGB(200, 75, 75);
@@ -23,7 +23,7 @@ library.ClassColors = {
 
 library.ClassIcons = {
 	Survivor="rbxassetid://18930109253";
-	RAT="rbxassetid://18930113603";
+	Rat="rbxassetid://18930113603";
 	Bandit="rbxassetid://18930113293";
 	BioX="rbxassetid://18930113452";
 	Military="rbxassetid://18930527891";
@@ -31,6 +31,9 @@ library.ClassIcons = {
 }
 
 function library.onRequire()
+	library:Add{Id="Bandit"; Class="Bandit";};
+	library:Add{Id="Rat"; Class="Rat";};
+	
 	-- Blank Avatar: rbxassetid://15641359355
 	library:Add{Id="Tom Greyman"; Avatar="rbxassetid://15641359355";};
 	--==
@@ -63,7 +66,7 @@ function library.onRequire()
 			Clothing={"Green Shirt with Stains"; "Brown Belt"; "Dark Green Hat"};
 		};
 	};
-	library:Add{Id="Jesse"; Class="RAT"; World="TheWarehouse"; Avatar="rbxassetid://15641530418";};
+	library:Add{Id="Jesse"; Class="Rat"; World="TheWarehouse"; Avatar="rbxassetid://15641530418";};
 	library:Add{Id="Dr. Deniski"; Class="Medic"; HeadIcon="Heal"; World="TheWarehouse"; Avatar="rbxassetid://15641529113";};
 
 	library:Add{Id="Jefferson"; Class="Hidden"; World="TheWarehouse";};
@@ -92,7 +95,7 @@ function library.onRequire()
 			Clothing={"Desert Boots";};
 		};
 	};
-	library:Add{Id="Frank"; Class="RAT"; World="TheWarehouse";};
+	library:Add{Id="Frank"; Class="Rat"; World="TheWarehouse";};
 	library:Add{Id="Carlos"; Class="Medic"; HeadIcon="Heal"; World="TheWarehouse"; Avatar="rbxassetid://15641640711";};
 
 	library:Add{Id="Lennon"; Class="Medic"; HeadIcon="Heal"; World="TheUnderground"; Avatar="rbxassetid://15641639930";};
@@ -105,14 +108,14 @@ function library.onRequire()
 			Clothing={"Black Polo Shirt"; "Beige Basketball Shoes"};
 		};
 	};
-	library:Add{Id="Diana"; Class="RAT"; World="TheUnderground";};
+	library:Add{Id="Diana"; Class="Rat"; World="TheUnderground";};
 
 	library:Add{Id="Hilbert"; Class="BioX"; World="TheUnderground"; Avatar="rbxassetid://15641642353";};
 
 	library:Add{Id="Stan"; Class="Survivor"; World="TheUnderground"; Avatar="rbxassetid://15641420202";};
-	library:Add{Id="Vladimir"; Class="RAT"; World="TheUnderground";};
+	library:Add{Id="Vladimir"; Class="Rat"; World="TheUnderground";};
 
-	library:Add{Id="Maverick"; Class="RAT"; World="TheMall";};
+	library:Add{Id="Maverick"; Class="Rat"; World="TheMall";};
 	library:Add{Id="Danny"; Class="Medic"; HeadIcon="Heal"; World="TheMall"; Avatar="rbxassetid://15641531785";};
 
 	library:Add{Id="Patrick"; Class="Bandit"; World="TheMall"; Avatar="rbxassetid://15641420747";
@@ -122,7 +125,7 @@ function library.onRequire()
 			Clothing={"Bandana"; "Military Vest"; "Camo Pants"};
 		};
 	};
-	library:Add{Id="Alice"; Class="RAT"; World="TheMall";};
+	library:Add{Id="Alice"; Class="Rat"; World="TheMall";};
 	library:Add{Id="Molly"; Class="Medic"; HeadIcon="Heal"; World="TheMall";};
 	library:Add{Id="Mike"; Class="Survivor"; World="TheMall"; Avatar="rbxassetid://15641532613";
 		Descriptors={
@@ -131,7 +134,7 @@ function library.onRequire()
 		};
 	};
 
-	library:Add{Id="Larry"; Class="RAT"; World="TheResidentials";};
+	library:Add{Id="Larry"; Class="Rat"; World="TheResidentials";};
 	library:Add{Id="Joseph"; Class="Medic"; HeadIcon="Heal"; World="TheResidentials"; Avatar="rbxassetid://15641421273";};
 	library:Add{Id="Nate"; Class="Survivor"; World="TheResidentials"; Avatar="rbxassetid://79078550661090";
 		Descriptors={
@@ -161,10 +164,10 @@ function library.onRequire()
 		};
 	};
 
-	library:Add{Id="David"; Class="RAT"; World="TheHarbor"; Avatar="rbxassetid://15944948446";};
-	library:Add{Id="Cooper"; Class="RAT"; World="TheHarbor";};
-	library:Add{Id="Lewis"; Class="RAT"; World="TheHarbor"; Avatar="rbxassetid://15944933279";};
-	library:Add{Id="Greg"; Class="RAT"; World="TheHarbor";};
+	library:Add{Id="David"; Class="Rat"; World="TheHarbor"; Avatar="rbxassetid://15944948446";};
+	library:Add{Id="Cooper"; Class="Rat"; World="TheHarbor";};
+	library:Add{Id="Lewis"; Class="Rat"; World="TheHarbor"; Avatar="rbxassetid://15944933279";};
+	library:Add{Id="Greg"; Class="Rat"; World="TheHarbor";};
 	library:Add{Id="Caitlin"; Class="Medic"; HeadIcon="Heal"; World="TheHarbor";};
 
 	library:Add{Id="Zark"; Class="Bandit"; World="BanditCamp"; Avatar="rbxassetid://18932927518"; };
@@ -175,7 +178,6 @@ function library.onRequire()
 	library:Add{Id="Mysterious Engineer"; Class="Rouge"; World="SunkenShip"; Avatar="rbxassetid://16537592997";};
 
 
-	library:Add{Id="Bandit"; Class="Bandit";};
 
 
 	--== Safehome
@@ -185,9 +187,9 @@ function library.onRequire()
 	library:Add{Id="Jackson"; Class="Medic"; World="Safehome"; SafehomeNpc=true;};
 	library:Add{Id="Rachel"; Class="Medic"; World="TheUnderground"; Avatar="rbxassetid://15944916590"; SafehomeNpc=true;};
 
-	library:Add{Id="Zoey"; Class="RAT"; World="Safehome"; SafehomeNpc=true;};
-	library:Add{Id="Jackie"; Class="RAT"; World="Safehome"; SafehomeNpc=true;};
-	library:Add{Id="Berry"; Class="RAT"; World="Safehome"; SafehomeNpc=true;};
+	library:Add{Id="Zoey"; Class="Rat"; World="Safehome"; SafehomeNpc=true;};
+	library:Add{Id="Jackie"; Class="Rat"; World="Safehome"; SafehomeNpc=true;};
+	library:Add{Id="Berry"; Class="Rat"; World="Safehome"; SafehomeNpc=true;};
 
 	library:Add{Id="Scarlett"; Class="Recycler"; World="Safehome"; SafehomeNpc=true;};
 	library:Add{Id="Rafael"; Class="Recycler"; World="Safehome"; SafehomeNpc=true;};
@@ -199,7 +201,7 @@ function library.onRequire()
 	library:Add{Id="Icarus"; Class="Trader"; Avatar="rbxassetid://13192700114"};
 
 	--== Cutscene
-	library:Add{Id="Revas"; Class="RAT"; World="TheHarbor"; Avatar="rbxassetid://18932917905"; };
+	library:Add{Id="Revas"; Class="Rat"; World="TheHarbor"; Avatar="rbxassetid://18932917905"; };
 	library:Add{Id="Eugene"; Class="BioX"; World="SectorE"; };
 
 end

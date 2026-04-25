@@ -1,5 +1,4 @@
-local modApiRequestLibrary = require(game.ServerScriptService.ServerLibrary.ApiRequestLibrary);
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modApiRequestLibrary = shared.require(game.ServerScriptService.ServerLibrary.ApiRequestLibrary);
 
 --== Script;
 function modApiRequestLibrary.onRequire()

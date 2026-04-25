@@ -46,6 +46,7 @@ local npcPackage = {
             {Say="That's how we do business!"};
             {Say="Clean kill, if I do say so myself."};
             {Say="You picked the wrong bandit to mess with!"};
+            {Say="Tell Revas you need your diapers changed!"; HumanoidType="Rat";};
         };
         HuntSpeech = {
             {Say="I will find you!"};

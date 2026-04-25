@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
-local modAudio = require(game.ReplicatedStorage.Library.Audio);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 local gateTweenInfo = TweenInfo.new(6, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut);
 

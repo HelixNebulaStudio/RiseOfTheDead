@@ -777,7 +777,7 @@ function modBranchConfigurations.onRequire()
 	
 	modBranchConfigurations.Dev = {
 		Name = "Dev";
-		Color = Color3.fromRGB(27, 106, 23);
+		Color = Color3.fromRGB(40, 156, 34);
 	};
 
     local SpecialEvent = modConfigurations.SpecialEvent;

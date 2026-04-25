@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
-local modMath = require(game.ReplicatedStorage.Library.Util.Math);
+local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
 
 local songs = {
 	{Name="Rave"; Id="rbxassetid://1846368080", v=0.5, p=1};

@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local npcPackage = {
     Name = "Rat";
     HumanoidType = "Rat";
-    
+
 	Configurations = {};
     Properties = {
         Level = 1;
@@ -19,13 +19,18 @@ local npcPackage = {
             {Say="Hostiles!!";};
         };
         KillPhrases = {
-            {Say="Target eliminated!"};
-            {Say="Another one put back into the ground!"; HumanoidType="Zombie";};
-            {Say="Go back to starve bandits!"; HumanoidType="Bandit";};
+            {Say="Target down!"};
+            {Say="Another one back into the ground!"; HumanoidType="Zombie";};
+            {Say="Go home and starve bandits!"; HumanoidType="Bandit";};
+            {Say="Night night!"};
+            {Say="Ugh, this one splashed guts all over me!"; HumanoidType="Zombie";};
+            {Say="Go cry to Zark!"; HumanoidType="Bandit";};
         };
         HuntSpeech = {
             {Say="Come out, come out~!"};
             {Say="There's no use hiding!"};
+            {Say="I heard you.. C'mon out!"};
+            {Say="You're dead when I find you!"};
         };
         PatrolConverse = {
             {
@@ -38,6 +43,26 @@ local npcPackage = {
                 Say="Hey, hear this. Why did a Bandit leave his door open..? So he doesn't have to break into the place again.";
                 Reply="Haha, good one.";
                 ReplyAnimations = {"laugh";};
+            };
+            {
+                Say="Can't believe I have to patrol the sewers again.";
+                Reply="Yeah, we may be the Rats, but that doesn't mean we like the sewers..";
+            };
+            {
+                Say="Why don't we just steal from survivors like the bandits?";
+                Reply="What, you think there're unlimited survivors to steal from?";
+            };
+            {
+                Say="Any idea when's the next shipment coming in?";
+                Reply="Probably by the end of the week, at least that's what my friend in the navy rat told me.";
+            };
+            {
+                Say="It would be so nice to be a shop keeper one day..";
+                Reply="I hear someone sold 4 stacks of purple lemons to one of them for no reason.";
+            };
+            {
+                Say="I think we're running low on walkie talkies again.";
+                Reply="Yep, looks like the price is going up for a while.";
             };
         };
     };

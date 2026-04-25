@@ -1,8 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService");
-local StorageItem = require(ReplicatedStorage.Library.StorageItem)
 
 local localPlayer = game.Players.LocalPlayer;
 

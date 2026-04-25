@@ -166,7 +166,7 @@ return function(CutsceneSequence)
 		modCharacter.CharacterProperties.CanInteract = false;
 		modCharacter.CharacterProperties.CharacterCameraEnabled = false;
 
-		local modCameraGraphics = require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
+		local modCameraGraphics = shared.require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
 		local cameraKeyframes = modCameraGraphics:InitCameraTransitions(controllerBase, 8);
 		modCameraGraphics:PlayKeyframes(cameraKeyframes);
 		

@@ -2,17 +2,12 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modTouchHandler = shared.require(game.ReplicatedStorage.Library.TouchHandler);
-local modHealthComponents = shared.require(game.ReplicatedStorage.Components.HealthComponent);
-local modProjectile = require(game.ReplicatedStorage.Library.Projectile);
-
-local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
+local modProjectile = shared.require(game.ReplicatedStorage.Library.Projectile);
 
 if RunService:IsServer() then
     modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
     modGameModeCoop = shared.require(game.ServerScriptService.ServerLibrary.GameModeCoop);
-    modFlammable = require(game.ServerScriptService.ServerLibrary.Flammable);
+    modFlammable = shared.require(game.ServerScriptService.ServerLibrary.Flammable);
 
     modGameModeManager.GameWorld = true;
 end

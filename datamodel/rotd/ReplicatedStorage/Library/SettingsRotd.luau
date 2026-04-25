@@ -1,6 +1,6 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local modSettings = require(game.ReplicatedStorage.Library.Settings);
+local modSettings = shared.require(game.ReplicatedStorage.Library.Settings);
 --==
 
 function modSettings.onRequire()

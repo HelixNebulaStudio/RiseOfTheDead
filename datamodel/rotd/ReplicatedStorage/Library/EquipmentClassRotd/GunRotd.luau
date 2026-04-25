@@ -1,6 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local RunService = game:GetService("RunService");
+
 local Gun = shared.require(game.ReplicatedStorage.Library.EquipmentClass.Gun);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 function Gun.new(equipmentClass: EquipmentClass)
     local self = {};
@@ -8,8 +11,8 @@ function Gun.new(equipmentClass: EquipmentClass)
     local configurations = equipmentClass.Configurations;
     local properties = equipmentClass.Properties;
 
-	properties.Ammo = configurations.AmmoLimit;
-	properties.MaxAmmo = configurations.MaxAmmoLimit;
+	-- properties.Ammo = configurations.AmmoLimit;
+	-- properties.MaxAmmo = configurations.MaxAmmoLimit;
 
     setmetatable(self, Gun);
     return self;
@@ -86,7 +89,13 @@ function Gun.RefillAmmo(gunClass, equipmentClass: EquipmentClass, storageItem: S
         storageItem:SetValues("MA", nil);
 
         storageItem:Sync({"A", "MA"});
-    end    
+    end
+    
+    if RunService:IsServer() then return end;
+    task.spawn(function()
+        if storageItem == nil then return end;
+        modClientGuis.fireEvent("ItemUpdate", storageItem.ID);
+    end)
 end
 
 function Gun.BindOnSyncProperties(gunClass, equipmentClass: EquipmentClass, values: anydict)

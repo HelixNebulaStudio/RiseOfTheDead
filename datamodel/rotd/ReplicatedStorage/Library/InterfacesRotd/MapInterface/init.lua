@@ -770,7 +770,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 					local npcLib = modNpcProfileLibrary:Find(npcName);
 					if npcLib.Class ~= "Hidden" then
-						if npcLib.Class == "RAT" then
+						if npcLib.Class == "Rat" then
 							table.insert(rats, npcName);
 						end
 						if npcLib and npcRootPart then
