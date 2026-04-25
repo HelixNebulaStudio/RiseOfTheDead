@@ -33,10 +33,6 @@ function treePackage.HasEnemy(npcClass: NpcClass)
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
     if targetHandlerComp == nil then return false; end;
 
-    if npcClass.HealthComp.LastDamagedBy then
-        properties.IsHostile = true;
-    end
-
     local enemyTargetData: NpcTargetData? = targetHandlerComp:MatchFirstTarget(function(targetData: NpcTargetData)
         if targetData.HealthComp == nil then return end;
         local targetEntityClass: EntityClass = targetData.HealthComp.CompOwner :: EntityClass;
@@ -53,11 +49,16 @@ function treePackage.HasEnemy(npcClass: NpcClass)
             local woundedStatus = targetCharacterClass.StatusComp:GetOrDefault("Wounded");
             if woundedStatus then return false; end;
 
-            if npcClass.HealthComp.LastDamagedBy == targetCharacterClass then return true; end;
+            if npcClass.HealthComp.LastDamagedBy == targetCharacterClass then
+                targetData.IsInVision = true;
+                return true;
+            end;
 
             local isTargetPlayer = targetCharacterClass.HumanoidType == "Player";
             local isHostile = properties.IsHostile == true;
-            if isTargetPlayer and not isHostile then return false; end;
+            if isTargetPlayer and not isHostile and targetData.Damage <= 0 then 
+                return false;
+            end;
 
             local visionTarget = targetCharacterClass.Head;
             if targetCharacterClass.Properties.IsCrouching then
@@ -108,9 +109,6 @@ function treePackage.HasEnemy(npcClass: NpcClass)
             end;
             
             properties.EnemyTargetData = nil;
-        end
-        if oldEnemyTargetData ~= enemyTargetData then
-            properties.LastAlertShout = nil;
         end
 
     else
@@ -290,14 +288,14 @@ function treePackage.FireGun(npcClass: NpcClass)
     local enemyNpcClass: EntityClass = enemyHealthComp.CompOwner :: EntityClass;
 
     npcClass.Move:Face(enemyNpcClass.RootPart, nil, 0.5);
-    npcClass.Move:HeadTrack(enemyNpcClass.Head, 2);
+    npcClass.Move:HeadTrack((enemyNpcClass :: CharacterClass).Head, 2);
 
     local shootDirection = (enemyNpcClass.RootPart.Position - npcClass.RootPart.Position).Unit;
     
     wieldComp:InvokeToolAction(
         "PrimaryFireRequest", 
         shootDirection, 
-        enemyNpcClass.Humanoid
+        (enemyNpcClass :: CharacterClass).Humanoid
     );
 end
 
@@ -360,72 +358,83 @@ function treePackage.Patrol(npcClass: NpcClass)
         patrolPositions = {};
         properties.PatrolPositions = patrolPositions;
         properties.PatrolIndex = 1;
-        local curPos = npcClass:GetCFrame().Position;
 
-        local patrolRng = Random.new(curPos.X + curPos.Y + curPos.Z);
+        task.spawn(function() 
+            local curPos = npcClass:GetCFrame().Position;
 
-        local path: Path = PathfindingService:CreatePath(npcClass.PathAgent);
-        for a=1, patrolRng:NextInteger(3, 6) do
-            local startPos = curPos;
-            local endPos = startPos + Vector3.new(
-                (patrolRng:NextInteger(1, 2) == 1 and 1 or -1) * patrolRng:NextInteger(25, 45),
-                0,
-                (patrolRng:NextInteger(1, 2) == 1 and 1 or -1) * patrolRng:NextInteger(25, 45)
-            );
+            local patrolRng = Random.new(math.floor(curPos.X) + math.floor(curPos.Y) + math.floor(curPos.Z));
 
-            local rayParams = RaycastParams.new();
-            rayParams.IncludeInstances = {workspace.Environment; workspace.Terrain};
-            rayParams.IgnoreWater = true;
+            local path: Path = PathfindingService:CreatePath(npcClass.PathAgent);
+            for a=1, patrolRng:NextInteger(5, 9) do
+                local startPos = curPos;
+                local rngX = patrolRng:NextInteger(-1, 1);
+                local rngZ = patrolRng:NextInteger(-1, 1);
+                if rngX == 0 and rngZ == 0 then
+                    rngZ = 1;
+                end
+                local endPos = startPos + Vector3.new(
+                    rngX * patrolRng:NextInteger(12, 45),
+                    0,
+                    rngZ * patrolRng:NextInteger(12, 45)
+                );
 
-            local floorRayResult = workspace:Blockcast(CFrame.new(endPos + Vector3.new(0, 6, 0)), Vector3.one*2, Vector3.yAxis*-10, rayParams);
-            if floorRayResult == nil then Debugger:Warn("Patrol no floor"); continue end;
-            endPos = floorRayResult.Position + Vector3.new(0, 1.35, 0);
+                local rayParams = RaycastParams.new();
+                rayParams.IncludeInstances = {workspace.Environment; workspace.Terrain};
+                rayParams.IgnoreWater = true;
 
-            local pathS, pathE = pcall(function()
-                path:ComputeAsync(startPos, endPos)
-            end)
-            if not pathS then Debugger:Warn("Patrol pathE", pathE); continue end;
-            if path.Status ~= Enum.PathStatus.Success then Debugger:Warn("Patrol no path", path.Status); continue end;
+                local floorRayResult = workspace:Blockcast(CFrame.new(endPos + Vector3.new(0, 6, 0)), Vector3.one*2, Vector3.yAxis*-10, rayParams);
+                if floorRayResult == nil then Debugger:Warn("Patrol no floor"); continue end;
+                endPos = floorRayResult.Position + Vector3.new(0, 1.35, 0);
 
-            local wayPoints = path:GetWaypoints();
-            for _, waypoint: PathWaypoint in pairs(wayPoints) do
-                if waypoint.Action ~= Enum.PathWaypointAction.Walk then Debugger:Warn("Patrol skip action", waypoint.Action);  continue end;
+                local pathS, pathE = pcall(function()
+                    path:ComputeAsync(startPos, endPos)
+                end)
+                if not pathS then Debugger:Warn("Patrol pathE", pathE); continue end;
+                if path.Status ~= Enum.PathStatus.Success then Debugger:Warn("Patrol no path", path.Status); continue end;
 
-                local waypointPos = waypoint.Position;
-                table.insert(patrolPositions, waypointPos);
+                local wayPoints = path:GetWaypoints();
+                for _, waypoint: PathWaypoint in pairs(wayPoints) do
+                    if waypoint.Action ~= Enum.PathWaypointAction.Walk then continue end;
+
+                    local waypointPos = waypoint.Position;
+                    table.insert(patrolPositions, waypointPos);
+                end
+
+                break;
             end
-
-            break;
-        end
+        end)
     end
 
-    if npcClass.Properties.SpokeByMeData == nil then
-        if math.random(1, 100) == 1 
-        and #patrolPositions <= 0 
-        and not npcClass.Move:IsAtPosition(npcClass.SpawnCFrame.Position) then
-            -- Walk back to spawn;
-            npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, npcClass.Move.MoveSpeedPriority.Movement, 2);
-            npcClass.Move:MoveTo(npcClass.SpawnCFrame.Position);
+    local patrolFrequency = properties.IsHostile and 30 or 60;
+    if math.random(1, 100) == 1 
+    and npcClass.Properties.SpokeByMeData == nil
+    and #patrolPositions <= 0 
+    and not npcClass.Move:IsAtPosition(npcClass.SpawnCFrame.Position) then
+        -- Walk back to spawn;
+        npcClass.Move:MoveTo(npcClass.SpawnCFrame.Position);
 
-        elseif math.random(1, 60) == 1 and #patrolPositions > 0 then
-            -- Walk to random spot;
-            local patrolPos = patrolPositions[properties.PatrolIndex];
-            if not npcClass.Move:IsAtPosition(patrolPos) then
-                npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, npcClass.Move.MoveSpeedPriority.Movement, 5);
-                npcClass.Move:MoveTo(patrolPos);
+    elseif math.random(1, patrolFrequency) == 1 
+    and npcClass.Properties.SpokeByMeData == nil
+    and #patrolPositions > 0 then
+        -- Walk to random spot;
+        local patrolPos = patrolPositions[properties.PatrolIndex];
+        if not npcClass.Move:IsAtPosition(patrolPos) then
+            npcClass.Move:MoveTo(patrolPos);
 
-            else
-                properties.PatrolIndex +=1;
-                if properties.PatrolIndex > #patrolPositions then
-                    modTables.Reverse(patrolPositions);
-                    properties.PatrolIndex = 1;
-                end
+        else
+            properties.PatrolIndex +=1;
+            if properties.PatrolIndex > #patrolPositions then
+                modTables.Reverse(patrolPositions);
+                properties.PatrolIndex = 1;
             end
 
+            patrolPos = patrolPositions[properties.PatrolIndex];
+            npcClass.Move:MoveTo(patrolPos);
         end
+        
     else
-        npcClass.Move:Stop();
-
+        -- Converse
+        
         if math.random(1, 20) == 1 
         and npcClass.Properties.SpokeByMeData == nil 
         and (properties.PassiveTalkCooldown == nil or tick() > properties.PassiveTalkCooldown) then
@@ -455,6 +464,8 @@ function treePackage.Patrol(npcClass: NpcClass)
                 end)
 
                 if nearbyAllyTargetData then
+                    npcClass.Move:Stop();
+
                     local targetNpcClass: NpcClass = nearbyAllyTargetData.HealthComp.CompOwner :: NpcClass;
 
                     npcClass.Properties.SpokeByMeData = {
@@ -484,8 +495,12 @@ function treePackage.Patrol(npcClass: NpcClass)
                 end
             end
         end
-
     end
+
+    if npcClass.Move.IsMoving then
+        npcClass.Move:SetMoveSpeed("set", "walk", properties.WalkSpeed or 8, npcClass.Move.MoveSpeedPriority.Movement, 2);
+    end
+
 end
 
 --MARK: Social behavior
@@ -530,18 +545,18 @@ function treePackage.ShareIntel(npcClass: NpcClass)
     if enemyEntityClass and (properties.LastAlertShout == nil or tick()-properties.LastAlertShout > 20) then
         npcClass.Properties.LastAlertShout = tick();
 
-        local allies: {NpcTargetData} = targetHandlerComp:MatchTargets(function(targetData: NpcTargetData)
-            if targetData.HealthComp == nil then return end;
-            local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner :: NpcClass;
-            if targetNpcClass.ClassName ~= "NpcClass" then return end;
+        local allies: {NpcTargetData} = targetHandlerComp:MatchTargets(function(allyTargetData: NpcTargetData)
+            if allyTargetData.HealthComp == nil then return end;
+            local allyNpcClass: NpcClass = allyTargetData.HealthComp.CompOwner :: NpcClass;
+            if allyNpcClass.ClassName ~= "NpcClass" then return end;
 
-            local isAlive = targetNpcClass.HealthComp.IsDead ~= true;
+            local isAlive = allyNpcClass.HealthComp.IsDead ~= true;
             if not isAlive then return false; end;
 
-            local isAlly = targetNpcClass.HumanoidType == npcClass.HumanoidType;
+            local isAlly = allyNpcClass.HumanoidType == npcClass.HumanoidType;
             if not isAlly then return false; end;
 
-            local isMe = targetNpcClass == npcClass;
+            local isMe = allyNpcClass == npcClass;
             if isMe then return false; end;
 
             return true;
@@ -553,7 +568,8 @@ function treePackage.ShareIntel(npcClass: NpcClass)
             local filteredAlertPhrases = {};
             for a=1, #(alertPhrases or {}) do
                 local alertPhrase = alertPhrases[a];
-                if alertPhrase.HumanoidType == nil or alertPhrase.HumanoidType == enemyEntityClass.HumanoidType then
+                if alertPhrase.HumanoidType == nil 
+                or alertPhrase.HumanoidType == (enemyEntityClass :: CharacterClass).HumanoidType then
                     table.insert(filteredAlertPhrases, alertPhrase);
                 end
             end
@@ -565,11 +581,28 @@ function treePackage.ShareIntel(npcClass: NpcClass)
         end
 
         for a=1, #allies do
-            local targetData: NpcTargetData = allies[a];
-            local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner :: NpcClass;
+            local allyTargetData: NpcTargetData = allies[a];
+            local allyNpcClass: NpcClass = allyTargetData.HealthComp.CompOwner :: NpcClass;
+            if allyNpcClass.HealthComp.IsDead then continue end;
 
-            if targetNpcClass.Properties.EnemyTargetData ~= nil then continue end;
-            targetNpcClass.Move:HeadTrack(enemyEntityClass.Head, 10);
+            local allyActiveEnemyTargetData: NpcTargetData = allyNpcClass.Properties.EnemyTargetData;
+            if allyActiveEnemyTargetData == nil then
+                local allyTargetHandlerComp = allyNpcClass:GetComponent("TargetHandler");
+                if allyTargetHandlerComp then
+                    local targetData = allyTargetHandlerComp:AddTarget(enemyEntityClass.Character);
+                    if targetData then
+                        targetData.LastKnownPosition = enemyEntityClass:GetCFrame().Position;
+                    end
+                end
+
+            elseif allyActiveEnemyTargetData.HealthComp == enemyEntityClass.HealthComp then
+                allyActiveEnemyTargetData.LastKnownPosition = enemyTargetData.LastKnownPosition;
+                allyActiveEnemyTargetData.LastAddedTick = tick();
+                allyActiveEnemyTargetData.LastSeenTick = (tick()-3);
+
+            end
+
+            allyNpcClass.Move:Face(enemyEntityClass:GetCFrame().Position);
         end
     end
 

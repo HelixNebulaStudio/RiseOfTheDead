@@ -618,6 +618,9 @@ return function(CutsceneSequence)
 				gameController.Soundtrack.TimePosition = 243;
 				TweenService:Create(gameController.Soundtrack, TweenInfo.new(1), {Volume=1}):Play();
 
+				endExitInteractConfig:SetAttribute("Mode", "Coop");
+				endExitInteractConfig:SetAttribute("Stage", "Genesis");
+				endExitInteractConfig:SetAttribute("ClaimedRewards", true);
 				endExitInteractable.CanInteract = true;
 				endExitInteractable.Label = "Exit Genesis";
 				endExitInteractable:Sync();
@@ -638,7 +641,7 @@ return function(CutsceneSequence)
 		modCharacter.CharacterProperties.CanInteract = false;
 		modCharacter.CharacterProperties.CharacterCameraEnabled = false;
 
-		local modCameraGraphics = require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
+		local modCameraGraphics = shared.require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
 		local cameraKeyframes = modCameraGraphics:InitCameraTransitions(controllerBase, 8);
 		modCameraGraphics:PlayKeyframes(cameraKeyframes);
 		
