@@ -20,8 +20,12 @@ function attirePackage.newClass()
 
 	if not modBranchConfigurations.IsWorld("Slaughterfest") then
 		equipmentClass:AddBaseModifier("NinjaAgility", {
-			SetValues={
+			SetValues = {
+				NinjaAgility = true;
 				MaxAirJump = 1;
+			};
+			ArrayValues = {
+				PassiveModifiers = "NinjaAgility";
 			};
 		});
 	end

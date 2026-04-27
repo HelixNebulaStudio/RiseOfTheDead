@@ -22,13 +22,12 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	modItemModifierClass.AddTierDamage(modifier);
 	
 	local configurations = modifier.EquipmentClass.Configurations;
-	local baseInaccuracy = configurations.StandInaccuracy;
 	local baseMultishot = configurations:GetBase("Multishot");
 	local maxShots = baseMultishot and baseMultishot.Max or 1;
 
 	modifier.ProductValues.Damage = maxShots/3;
 	modifier.SetValues.Multishot = 3;
-	modifier.SetValues.Inaccuracy = baseInaccuracy*0.2;
+	modifier.SetValues.InaccuracyReduction = 0.2;
 
 	if math.floor(value) ~= 0 then
 		modifier.MaxValues.Piercing = math.floor(value);
