@@ -1232,6 +1232,9 @@ function Survival:StartWave(wave)
 					storage:Sync(storage.Player);
 				end
 
+				self:SpawnCrate();
+				shared.Notify(game.Players:GetPlayers(), "A Stake Crate has been discovered!", "Reward");
+
 				workspace:SetAttribute("GameModeComplete", true);
 				return;
 

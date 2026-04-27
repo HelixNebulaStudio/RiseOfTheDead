@@ -132,7 +132,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					if #modLib.Upgrades <= 0 then
 						desc = desc .."\n";
 					end
-					desc = desc ..`\n<font size="16"><b>Tier {modLib.BaseTier} Mod Damage:  </b></font>`;
+					desc = desc ..`\n<font size="16"><b>Tier {modLib.BaseTier} Damage:  </b></font>`;
 					desc = desc ..`+{math.round(scale*100)}%`;
 					desc = desc ..`    <b>≈</b>   +{math.round(additionalDmg*100)/100}`;
 				end

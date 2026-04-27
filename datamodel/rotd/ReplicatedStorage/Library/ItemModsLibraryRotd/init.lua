@@ -118,7 +118,7 @@ function library.onRequire()
 		Category="Rare Mods";
 		Layer=0;
 		Upgrades={
-			{DataTag="M"; Name="Magazine Size"; Syntax="Upgrade Magazine Size"; ValueType="Normal"; ValueDp=0; MaxLevel=9; BaseCost=3; MaxCost=30; BaseValue=1; MaxValue=10; TweakBonus=10; Scaling=library.ScalingStyle.Linear;};
+			{DataTag="M"; Name="Magazine Size"; Syntax="Upgrade Magazine Size"; ValueType="Normal"; ValueDp=0; MaxLevel=9; BaseCost=8; MaxCost=80; BaseValue=1; MaxValue=10; TweakBonus=10; Scaling=library.ScalingStyle.Linear;};
 		};
 	}
 

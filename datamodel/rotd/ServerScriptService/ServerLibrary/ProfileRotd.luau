@@ -119,7 +119,7 @@ function modProfile.onRequire()
 
 			local isGameOnline = false;
 			local s, e = pcall(function()
-				isGameOnline = game:GetService("DataStoreService"):GetDataStore("LiveConfig"):GetAsync("Online") ~= false
+				isGameOnline = game:GetService("ConfigService"):GetConfigAsync():GetValue("IsOnline") ~= false;
 			end)
 			if not s then
 				Debugger:Warn("LiveConfig>>  ", e);

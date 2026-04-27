@@ -706,10 +706,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						charStatsButton.MouseMoved:Connect(function()
 							charStatsButton.ImageColor3 = interface.Colors.Branch;
 							charStatsButton.Frame.BackgroundColor3 = interface.Colors.Branch;
+							charStatsButton.Frame.UIStroke.Color = interface.Colors.Branch;
 						end)
 						charStatsButton.MouseLeave:Connect(function()
 							charStatsButton.ImageColor3 = interface.Colors.White;
 							charStatsButton.Frame.BackgroundColor3 = interface.Colors.White;
+							charStatsButton.Frame.UIStroke.Color = interface.Colors.White;
 						end)
 						charStatsButton.MouseButton1Click:Connect(function()
 							interface:PlayButtonClick();

@@ -7,7 +7,7 @@ local HttpService = game:GetService("HttpService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurationsRotd);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modImageProgressBarUI = shared.require(game.ReplicatedStorage.Library.UI.ImageProgressBarUI);
 local modGuiObjectTween = shared.require(game.ReplicatedStorage.Library.UI.GuiObjectTween);
@@ -161,7 +161,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end)
     --== Credits Window
 
-
     --MARK: Main Menu;
     if not (modBranchConfigurations.IsWorld("MainMenu") or modBranchConfigurations.IsWorld("BioXResearch")) then return end;
 
@@ -176,6 +175,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     loadingBarObject.Color = interface.Colors.Branch;
 
     local frontPageFrame = frame:WaitForChild("FrontPage");
+    local menuTitleLogo = frontPageFrame:WaitForChild("MenuTitleLogo");
+    menuTitleLogo.ImageColor3 = interface.Colors.Branch;
     local playTestButton = frontPageFrame:WaitForChild("PlayTestFrame");
 
     local menuWindow: InterfaceWindow = interface:NewWindow("MainMenu", frame);

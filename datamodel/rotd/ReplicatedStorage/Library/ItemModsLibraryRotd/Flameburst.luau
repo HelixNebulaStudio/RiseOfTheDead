@@ -22,7 +22,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	modifier.SetValues.Flameburst = true;
 
 	modifier.SetValues.Inaccuracy = 16;
-	modifier.SetValues.ProjectileId = "gasFlame";
+	modifier.SetValues.ProjectileId = "gasflame";
 	modifier.SetValues.KnockbackForce = (value or 5);
 end
 

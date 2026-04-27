@@ -384,7 +384,7 @@ GameModeLibrary.GameModes={
 				LeaderboardDataKey = "Waves";
 
 				HardModeEnabled = true;
-				MapItemId="swamplandsmap";
+				MapItemId = "swamplandsmap";
 			};
 			["CommunityWaySide"]={
 				WorldId="CommunityWaySide";
