@@ -1824,6 +1824,7 @@ export type NpcTargetData = {
 
     TargetPart: BasePart;
     
+    Damage: number;
     LastSeenTick: number;
     IsInVision: boolean;
     LastKnownPosition: Vector3;
@@ -1952,6 +1953,9 @@ export type WieldComp = {
     Destroy: (WieldComp) -> nil;
 
     InvokeToolAction: (WieldComp, actionName: string, ...any) -> ...any;
+
+    -- @signal
+    OnWieldEvent: EventSignal<string>;
 }
 
 --MARK: ZScript

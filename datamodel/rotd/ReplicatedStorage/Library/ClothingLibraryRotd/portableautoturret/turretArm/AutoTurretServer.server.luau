@@ -628,7 +628,7 @@ function Update()
 	local toolLib = modWeaponsLibrary[itemId];
 	
 	if isWeaponChanged then
-		local _, toolItemId = next(toolLib.Welds);
+		local gripName, toolItemId = next(toolLib.Welds);
 		local prefabTool = prefabsItems:FindFirstChild(toolItemId);
 		if prefabTool == nil then
 			Debugger:Warn(`Tool prefab for ({itemId}) does not exist for turret!`);
@@ -643,7 +643,7 @@ function Update()
 		local weaponModel: Model = prefabTool:Clone();
 		weaponModel:SetAttribute("TurretWeapon", true);
 		weaponModel:SetAttribute("ItemId", itemId);
-		weaponModel:SetAttribute("Grip", "ToolGrip");
+		weaponModel:SetAttribute("Grip", gripName);
 		weaponModel:SetAttribute("StorageItemId", weaponSiid);
 		weaponModel:ScaleTo( customWeaponScale[itemId] or (weaponModel:GetScale()*0.8) );
 		

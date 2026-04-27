@@ -53,7 +53,7 @@ local npcPackage = {
 --==
 
 function npcPackage.Spawning(npcClass: NpcClass)
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local sporesModel = npcClass.Character:WaitForChild("Spores");
     local sporesParts = sporesModel:GetChildren();
@@ -82,6 +82,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
         if not npcClass.HealthComp.IsDead then return end;
 
         npcClass:GetComponent("DizzyCloud")(math.clamp(properties.Level, 10, 30));
+        modAudio.Play("BloaterDeath", npcClass:GetCFrame().Position);
     end)
 
     npcClass:GetComponent("RandomClothing"){

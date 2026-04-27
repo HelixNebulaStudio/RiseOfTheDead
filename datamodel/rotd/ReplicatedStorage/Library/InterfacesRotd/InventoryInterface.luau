@@ -321,7 +321,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		Click=function(Table)
 			if playerClass.WieldComp.Siid ~= Table.Item.ID then
 				modData.HandleTool("equip", {Siid=Table.ID; ItemId=Table.ItemId});
-				task.wait(0.2);
 				inventoryWindow:Close();
 				
 			else

@@ -34,7 +34,7 @@ function Objective:Tick()
     local activeEnemyCount = #self.Controller.EnemyNpcClasses;
     
 	local canSpawn = true;
-    if tick()-self.LastSpawnTick <= math.max(self.Controller.IsHard and 0.1 or 1, activeEnemyCount/20) then
+    if tick()-self.LastSpawnTick <= math.max(self.Controller.IsHard and 0.1 or 0.5, activeEnemyCount/20) then
         canSpawn = false;
     end
     if #self.Controller.EnemyNpcClasses > 100 then
@@ -64,15 +64,15 @@ function Objective:Tick()
 	
 	if self.SpawnPattern == 1 then
 		
-	elseif self.SpawnPattern == 2 then
-		if math.fmod(self.SpawnCount, 10) == 0 and self.PauseTick == nil then
-			self.PauseTick = tick()+2;
-		end
+	-- elseif self.SpawnPattern == 2 then
+	-- 	if math.fmod(self.SpawnCount, 10) == 0 and self.PauseTick == nil then
+	-- 		self.PauseTick = tick()+2;
+	-- 	end
 
-	elseif self.SpawnPattern == 3 then
-		if math.fmod(self.SpawnCount, 20) == 0 and self.PauseTick == nil then
-			self.PauseTick = tick()+4;
-		end
+	-- elseif self.SpawnPattern == 3 then
+	-- 	if math.fmod(self.SpawnCount, 20) == 0 and self.PauseTick == nil then
+	-- 		self.PauseTick = tick()+4;
+	-- 	end
 		
 	end
 

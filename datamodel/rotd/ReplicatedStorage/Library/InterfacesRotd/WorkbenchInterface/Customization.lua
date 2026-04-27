@@ -9,7 +9,6 @@ local modGarbageHandler = shared.require(game.ReplicatedStorage.Library.GarbageH
 local modCustomizationData = shared.require(game.ReplicatedStorage.Library.CustomizationData);
 local modColorsLibrary = shared.require(game.ReplicatedStorage.Library.ColorsLibrary);
 local modItemSkinsLibrary = shared.require(game.ReplicatedStorage.Library.ItemSkinsLibrary)
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemSkinWear = shared.require(game.ReplicatedStorage.Library.ItemSkinWear);
 
 local modDropdownList = shared.require(game.ReplicatedStorage.Library.UI.DropdownList);
@@ -188,21 +187,6 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			local activeGroupName = nil;
 			local activePartSelection = nil;
 
-			local colorPickerObj = modColorPicker.new(interface);
-			local colorFrame = colorPickerObj.Frame;
-			colorFrame.Size = UDim2.new(0, 310, 0, 300);
-			colorFrame.UIGradient:Destroy();
-			colorFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50);
-			colorFrame.Content.BackgroundTransparency = 1;
-			colorFrame.Content.Position = UDim2.new(0, 0, 0, 0);
-			colorFrame.Content.Size = UDim2.new(1, 0, 1, 0);
-			colorFrame.Content.Advance.Visible = false;
-			colorFrame.Content.ColorPalette.Size = UDim2.new(1, 0, 1, 0);
-			colorFrame.NameTag.Visible = false;
-			garbage:Tag(function()
-				colorFrame.Visible = false;
-			end);
-
 			local newDropDownList = modDropdownList.new();
 			local dropDownFrame: Frame = newDropDownList.Frame;
 			dropDownFrame.Size = UDim2.new(1, 0, 1, 0);
@@ -214,7 +198,6 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					newDropDownList.ScrollFrame.CanvasPosition = Vector2.zero;
 					return 
 				end;
-				colorFrame.Visible = false;
 			end)
 
 			local mainFrame = templateMainFrame:Clone();
@@ -928,6 +911,18 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						optionButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50);
 						optionButton.AutoButtonColor = false;
 						optionButton.AutomaticSize = Enum.AutomaticSize.Y;
+
+						local colorPickerObj = modColorPicker.new(interface);
+						local colorFrame = colorPickerObj.Frame;
+						colorFrame.Size = UDim2.new(0, 310, 0, 300);
+						colorFrame.UIGradient:Destroy();
+						colorFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50);
+						colorFrame.Content.BackgroundTransparency = 1;
+						colorFrame.Content.Position = UDim2.new(0, 0, 0, 0);
+						colorFrame.Content.Size = UDim2.new(1, 0, 1, 0);
+						colorFrame.Content.Advance.Visible = false;
+						colorFrame.Content.ColorPalette.Size = UDim2.new(1, 0, 1, 0);
+						colorFrame.NameTag.Visible = false;
 						colorFrame.Parent = optionButton;
 						
 						colorPickerObj:SetUnlocked(customColors and customColors.Unlocked);

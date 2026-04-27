@@ -14,6 +14,7 @@ local modGuiObjectTween = shared.require(game.ReplicatedStorage.Library.UI.GuiOb
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 local modCameraGraphics = shared.require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
+local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
 
 local HintList = {
 	"Tip: You can pin and unpin a mission by right clicking it from the missions menu.";
@@ -47,6 +48,8 @@ end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
 	local remoteProfileService = modRemotesManager:Get("ProfileService");
+    
+    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
     --== Credits Window
     local creditsFrame = script:WaitForChild("CreditsFrame"):Clone();
@@ -159,8 +162,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     --== Credits Window
 
 
+    --MARK: Main Menu;
     if not (modBranchConfigurations.IsWorld("MainMenu") or modBranchConfigurations.IsWorld("BioXResearch")) then return end;
-	local enteredCampaign = false;
 
     local frame = script:WaitForChild("MainMenu"):Clone();
     frame.Parent = interface.ScreenGui;
@@ -173,7 +176,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     loadingBarObject.Color = interface.Colors.Branch;
 
     local frontPageFrame = frame:WaitForChild("FrontPage");
-    
+    local playTestButton = frontPageFrame:WaitForChild("PlayTestFrame");
 
     local menuWindow: InterfaceWindow = interface:NewWindow("MainMenu", frame);
     menuWindow.IgnoreHideAll = true;
@@ -193,7 +196,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end)
             local sceneModel, focusPart, cameraBlur;
             local spinTick = tick()+3;
-            local lastBlur = 20;
+            
             modCameraGraphics:Bind("menucamera", {
                 RenderStepped=function(camera)
                     if menuWindow.Visible == false then
@@ -224,8 +227,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         interface.Garbage:Tag(cameraBlur);
                     end
                     cameraBlur.Parent = camera;
-                    cameraBlur.Size = 4;	
-                    lastBlur = cameraBlur.Size;
+                    cameraBlur.Size = 4;
                 end;
             }, 2);
 
@@ -304,6 +306,49 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     workspace:GetAttributeChangedSignal("IsGameOnline"):Connect(onIsGameOnlineUpdate);
     onIsGameOnlineUpdate();
     
+    if shared.gameConfig.BranchName == "Live" or RunService:IsStudio() then
+        if shared.gameConfig.BranchName == "Dev" then
+            Debugger:Warn(`Showing PlayTestButton in studio only. ({shared.gameConfig.BranchName})`);
+        end
+        playTestButton.Visible = true;
+        local function updatePlayTestButtonPos()
+            local viewport = workspace.CurrentCamera.ViewportSize;
+            local ratio = viewport.X/viewport.Y;
+            local xOffset = modMath.MapNum(ratio, 1.77, 2.16, 150, 250, true);
+            playTestButton.Position = UDim2.new(1, xOffset, 1, -50);
+        end
+        updatePlayTestButtonPos();
+        workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(updatePlayTestButtonPos);
+
+        local testButtonDebounce = false;
+        playTestButton.MouseButton1Click:Connect(function()
+            if testButtonDebounce then return end;
+            testButtonDebounce = true;
+
+            local mission1 = modData:GetMission(1);
+            if (mission1 == nil or mission1.Type ~= 3) 
+            and workspace:GetAttribute("IsGameOnline") ~= false then
+                modClientGuis.promptWarning(`You should at least complete the first mission before trying dev branch.`);
+                testButtonDebounce = false;
+                return;
+            end
+
+            modGuiObjectTween.FadeTween(frontPageFrame, modGuiObjectTween.FadeDirection.Out, TweenInfo.new(0.48));
+            loadLabel.Visible = true;
+            loadLabel.Text = "Joining Development Branch";
+            task.wait(0.5);
+            modGuiObjectTween.FadeTween(loadLabel, modGuiObjectTween.FadeDirection.In, TweenInfo.new(0.48));
+            
+            local rPacket = remoteProfileService:InvokeServer("menu/playtest");
+            if rPacket and rPacket.Success then
+            else
+
+            end
+            
+            testButtonDebounce = false;
+        end)
+    end
+
     local buttons = frontPageFrame.ButtonList:GetChildren();
     table.insert(buttons, frontPageFrame.MainCredits);
 
@@ -319,22 +364,32 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             if imageButton.Name == "MainCampaign" then
                 modGuiObjectTween.FadeTween(frontPageFrame, modGuiObjectTween.FadeDirection.Out, TweenInfo.new(0.48));
                 loadLabel.Visible = true;
-                loadLabel.Text = "Searching for server...";
-                wait(0.5);
+
+                if workspace:GetAttribute("IsGameOnline") == false then
+                    loadLabel.Text = "Checking early tester status...";
+                else
+                    loadLabel.Text = "Searching for server...";
+                end
+                task.wait(0.5);
                 modGuiObjectTween.FadeTween(loadLabel, modGuiObjectTween.FadeDirection.In, TweenInfo.new(0.48));
                 
                 local rPacket = remoteProfileService:InvokeServer("menu/solo");
                 if rPacket and rPacket.Success then
-                    if rPacket.Index == 3 then
+                    if rPacket.EarlyTester then
+                        loadLabel.Text = `Joining as early tester: {rPacket.EarlyTester}`;
+                    elseif rPacket.Index == 3 then
                         loadLabel.Text = "More bugs needs to be squashed...";
                     elseif rPacket.Index == 2 then
                         loadLabel.Text = "The survivors are gleeful of your return...";
                     else
                         loadLabel.Text = "You hear the sound of thunder...";
                     end
+                else
+                    modGuiObjectTween.FadeTween(loadLabel, modGuiObjectTween.FadeDirection.Out, TweenInfo.new(0.48));
+                    task.wait(0.5);
+                    loadLabel.Visible = false;
+                    modGuiObjectTween.FadeTween(frontPageFrame, modGuiObjectTween.FadeDirection.In, TweenInfo.new(0.48));
                 end
-                enteredCampaign = true;
-
 
             elseif imageButton.Name == "MainUpdates" then
                 local updateWindow: InterfaceWindow = interface:GetWindow("UpdateWindow");

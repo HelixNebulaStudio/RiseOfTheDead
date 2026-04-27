@@ -20,7 +20,7 @@ function Objective:Load()
 end
 
 function Objective:Begin()
-	self.RoundDuration = math.clamp(self.Controller.Wave * 2.5, 20, 100);
+	self.RoundDuration = math.clamp(self.Controller.Wave * 2.5, 20, 60);
 	self.EndTime = tick()+self.RoundDuration;
 	self.LastSpawn = tick();
 	self.StartLevel = self.Controller.Wave;

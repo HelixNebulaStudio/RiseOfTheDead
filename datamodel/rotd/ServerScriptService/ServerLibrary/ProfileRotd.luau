@@ -125,12 +125,13 @@ function modProfile.onRequire()
 				Debugger:Warn("LiveConfig>>  ", e);
 			end
 
+			local joinAsEarlyTester = nil;
 			if not isGameOnline then
 				if profile == nil or (profile.GroupRank or 0) < 100 then
-					profile:GuiAction("promptwarning", "Servers are currently under maintenance, please wait.", true);
+					profile:GuiAction("promptwarning", "Servers are currently under maintenance, join our group to be early tester or join dev branch!.", true);
 					return rPacket;
 				else
-					shared.Notify(player, "Joining maintenance servers as Rank:"..(profile.GroupRank or 0), "Inform");
+					joinAsEarlyTester = (profile.GroupRank or 0);
 				end
 			end
 			
@@ -153,10 +154,6 @@ function modProfile.onRequire()
 
 			local beginningMission = saveData.Missions:Get(1);
 			if beginningMission and beginningMission.Type == 3 then
-				-- if followName and followName ~= "/solo" then
-				-- 	local success = modServerManager:TravelToPlayer(player, followName);
-				-- 	if success then return end;
-				-- end
 				local spawnId = saveData.Spawn;
 				local worldId = modBranchConfigurations.GetWorldOfSpawn(spawnId);
 				
@@ -178,8 +175,34 @@ function modProfile.onRequire()
 				rPacket.Index = 1;
 			end
 
+			if joinAsEarlyTester then
+				rPacket.EarlyTester = 4;
+			end
 			rPacket.Success = true;
 			
+			return rPacket;
+
+		elseif action == "menu/playtest" then
+			local rPacket = {
+				Success = false;
+			};
+			
+			local profile = modProfile:Get(player);
+			if profile == nil then
+				modServerManager:TeleportToPrivateServer("MainMenu", modServerManager:CreatePrivateServer("MainMenu"), {player});
+				return rPacket;
+			end
+
+			local teleportData = modServerManager:CreateTeleportData();
+			teleportData.LoadProfileFromLive = true;
+
+			local teleportOptions = Instance.new("TeleportOptions");
+			teleportOptions:SetTeleportData(teleportData);
+
+			shared.Notify(player, "Traveling to DevBranch..", "Inform");
+			game:GetService("TeleportService"):TeleportAsync(54092940, {player}, teleportOptions);
+
+			rPacket.Success = true;
 			return rPacket;
 		end
 
