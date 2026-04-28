@@ -658,7 +658,10 @@ function Stronghold:Start()
 	end
 
 	self.Status = EnumStatus.InProgress;
-
+	shared.modEventService:ServerInvoke("GameModeManager_BindGameModeStart", {ReplicateTo=self.Players}, {
+		Room = self.RoomData;
+	});
+	
 	self.ObjectiveStatusText = `Eliminate {self.EliminateGoal} enemies`;
 	self:Hud({
 		Status=self.ObjectiveStatusText;

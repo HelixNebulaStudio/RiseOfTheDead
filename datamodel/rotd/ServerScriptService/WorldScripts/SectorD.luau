@@ -116,6 +116,7 @@ function WorldCore.onRequire()
 			repeat RunService.Heartbeat:Wait() until trainObject.Speed <= 0;
 			task.wait(1);
             monorailInteractConfig:SetAttribute(monorailInteractConfig:GetAttribute("_Toggle") :: string, false);
+            monorailInteractConfig:SetAttribute("_Uses", 1);
 		end
 	end)
 

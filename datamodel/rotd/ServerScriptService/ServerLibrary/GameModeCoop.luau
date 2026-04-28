@@ -851,6 +851,9 @@ function Coop:Start()
 	end
 
 	self.Status = EnumStatus.InProgress;
+	shared.modEventService:ServerInvoke("GameModeManager_BindGameModeStart", {ReplicateTo=self.Players}, {
+		Room = self.RoomData;
+	});
 	self.StartTime = workspace:GetServerTimeNow();
 
 	self.ObjectiveStatusText = ``;

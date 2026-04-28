@@ -61,7 +61,7 @@ function WorldCore.onRequire()
 
         elseif triggerId == "HarborGiftEntrance" then
             task.spawn(function()
-                if modEvents:GetEvent(player, "HarborGiftSand") then return end;
+                if modEvents:GetEvent(player, "HarborGiftSand") == nil then return end;
                         
                 local profile = shared.modProfile:Get(player);
                 local inventory = profile.ActiveInventory;
@@ -80,7 +80,7 @@ function WorldCore.onRequire()
                         
                         modAudio.Play("HeavySplash", interactable.Part).PlaybackSpeed = 2;
                     else
-                        shared.Notify(player, "Shovel has to be equipped!", "Negative");
+                        shared.Notify(player, "You do not have a cultist key!", "Negative");
                     end
                 else
                     profile:UnlockItemCodex("cultistkey1");

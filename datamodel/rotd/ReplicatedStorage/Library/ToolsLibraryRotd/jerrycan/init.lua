@@ -53,6 +53,7 @@ function toolPackage.ActionEvent(toolHandler: ToolHandlerInstance, packet)
 					local projectileInstance: ProjectileInstance = modProjectile.fire("gasoline", {
 						OriginCFrame = origin;
 						SpreadDirection = Vector3.new(0, -1, 0);
+						CharacterClass = toolHandler.CharacterClass;
 					});
 							
 					local spreadLookVec = modMath.CFrameSpread(-Vector3.yAxis, 90);

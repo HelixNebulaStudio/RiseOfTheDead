@@ -50,14 +50,16 @@ function Survival.onRequire()
 		local storage: Storage = ...;
 		if storage == nil then return end
 
-		Debugger:Warn("Survival rewards opened", player.Name, "storage.Id", storage.Id);
-		if storage.Id ~= "survivalrewards" then return end;
+		task.spawn(function()
+			Debugger:Warn("Survival rewards opened", player.Name, "storage.Id", storage.Id);
+			if storage.Id ~= "survivalrewards" then return end;
 
-		for config, interactable: InteractableInstance in pairs(modInteractables.InstanceList) do
-			if interactable.Name ~= "GameModeExit" then continue end;
+			for config, interactable: InteractableInstance in pairs(modInteractables.InstanceList) do
+				if interactable.Name ~= "GameModeExit" then continue end;
 
-			modReplicationManager:SetClientAttribute(player, config, "ClaimedRewards", true);
-		end
+				modReplicationManager:SetClientAttribute(player, config, "ClaimedRewards", true);
+			end
+		end)
 	end)
 
 	shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
@@ -486,6 +488,12 @@ function Survival:CompleteWave()
 	self:Hud{
 		PlayWaveEnd = true;
 	};
+
+	shared.modEventService:ServerInvoke(
+		"Survival_BindWaveReached", 
+		{ReplicateTo=game.Players:GetPlayers()},
+		self
+	);
 
 	task.wait(1);
 end
@@ -1302,7 +1310,12 @@ end
 function Survival:Start()
 	Debugger:Warn("start game");
 	self.SelectedOption = nil;
-	self.Status = EnumStatus.InProgress;
+	
+	self.Status = EnumStatus.InProgress;	
+	shared.modEventService:ServerInvoke("GameModeManager_BindGameModeStart", {ReplicateTo=self.Players}, {
+		Room = self.RoomData;
+	});
+
 	self.Wave = 1;
 	self.CompletedOnce = false;
 	workspace:SetAttribute("SurvivalWave", self.Wave);

@@ -11,8 +11,8 @@ local statusPackage = {
     Name="Burning";
     Description="You are on fire, you will lose $Amount Health per second.";
     Buff=false;
-    Tags = {"DOT";};
-    Cleansable=true;
+    Tags = {"DOT"; "Fire"};
+    Cleansable = true;
 };
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)

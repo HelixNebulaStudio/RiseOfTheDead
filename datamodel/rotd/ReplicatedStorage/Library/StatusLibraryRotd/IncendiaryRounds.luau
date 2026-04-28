@@ -5,11 +5,12 @@ local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 --==
 local statusPackage = {
-    Id="IncendiaryRounds";
-    Icon="";
-    Name="Incendiary Rounds Hit";
-    Description="Hit by incendiary rounds and taking fire damage over time.";
-    Buff=true;
+    Id = "IncendiaryRounds";
+    Icon = "";
+    Name = "Incendiary Rounds Hit";
+    Description = "Hit by incendiary rounds and taking fire damage over time.";
+    Buff = true;
+    Tags = {"Fire"};
 };
 
 

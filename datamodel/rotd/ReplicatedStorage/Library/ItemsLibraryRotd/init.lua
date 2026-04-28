@@ -486,23 +486,23 @@ function modItemsLibrary.onRequire()
         end;
     };
 
-    new(customizationPack, {Id="colorlively"; Icon="rbxassetid://4788857933"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Lively";};});
-    new(customizationPack, {Id="colorarctic"; Icon="rbxassetid://5065235473"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Arctic";};});
-    new(customizationPack, {Id="colorhellsfire"; Icon="rbxassetid://5180692180"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Hellsfire";};});
-    new(customizationPack, {Id="colorturquoiseshades"; Icon="rbxassetid://12163679259"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="TurquoiseShades";};});
-    new(customizationPack, {Id="colorsunset"; Icon="rbxassetid://12163681091"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Sunset";};});
-    new(customizationPack, {Id="colorabyss"; Icon="rbxassetid://18529603001"; Tags={"Color Pack"}; UnlockPack={Type="Color"; Id="Abyss";};});
+    new(customizationPack, {Id="colorlively"; Icon="rbxassetid://4788857933"; Tags={"Color Pack"}; UnlockPack={Type="ColorPacks"; Id="Lively";};});
+    new(customizationPack, {Id="colorarctic"; Icon="rbxassetid://5065235473"; Tags={"Color Pack"}; UnlockPack={Type="ColorPacks"; Id="Arctic";};});
+    new(customizationPack, {Id="colorhellsfire"; Icon="rbxassetid://5180692180"; Tags={"Color Pack"}; UnlockPack={Type="ColorPacks"; Id="Hellsfire";};});
+    new(customizationPack, {Id="colorturquoiseshades"; Icon="rbxassetid://12163679259"; Tags={"Color Pack"}; UnlockPack={Type="ColorPacks"; Id="TurquoiseShades";};});
+    new(customizationPack, {Id="colorsunset"; Icon="rbxassetid://12163681091"; Tags={"Color Pack"}; UnlockPack={Type="ColorPacks"; Id="Sunset";};});
+    new(customizationPack, {Id="colorabyss"; Icon="rbxassetid://18529603001"; Tags={"Color Pack"}; UnlockPack={Type="ColorPacks"; Id="Abyss";};});
 
-    new(customizationPack, {Id="skinstreetart"; Icon="rbxassetid://4788857679"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="StreetArt";};});
-    new(customizationPack, {Id="skinwireframe"; Icon="rbxassetid://5065159425"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Wireframe";};});
-    new(customizationPack, {Id="skinwraps"; Icon="rbxassetid://5065159623"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Wraps";};});
-    new(customizationPack, {Id="skinscaleplating"; Icon="rbxassetid://5180744566"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="ScalePlating";};});
-    new(customizationPack, {Id="skincarbonfiber"; Icon="rbxassetid://5635664589"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="CarbonFiber";};});
-    new(customizationPack, {Id="skinhexatiles"; Icon="rbxassetid://6534859112"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Hexatiles";};});
-    new(customizationPack, {Id="skinoffline"; Icon="rbxassetid://7866873305"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Offline";};});
-    new(customizationPack, {Id="skinice"; Icon="rbxassetid://8532443079"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Ice";};});
-    new(customizationPack, {Id="skinwindtrails"; Icon="rbxassetid://14250975612"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Windtrails";};});
-    new(customizationPack, {Id="skinfancy"; Icon="rbxassetid://17281999442"; Tags={"Skin Pack"}; UnlockPack={Type="Skin"; Id="Fancy";};});
+    new(customizationPack, {Id="skinstreetart"; Icon="rbxassetid://4788857679"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="StreetArt";};});
+    new(customizationPack, {Id="skinwireframe"; Icon="rbxassetid://5065159425"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="Wireframe";};});
+    new(customizationPack, {Id="skinwraps"; Icon="rbxassetid://5065159623"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="Wraps";};});
+    new(customizationPack, {Id="skinscaleplating"; Icon="rbxassetid://5180744566"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="ScalePlating";};});
+    new(customizationPack, {Id="skincarbonfiber"; Icon="rbxassetid://5635664589"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="CarbonFiber";};});
+    new(customizationPack, {Id="skinhexatiles"; Icon="rbxassetid://6534859112"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="Hexatiles";};});
+    new(customizationPack, {Id="skinoffline"; Icon="rbxassetid://7866873305"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="Offline";};});
+    new(customizationPack, {Id="skinice"; Icon="rbxassetid://8532443079"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="Ice";};});
+    new(customizationPack, {Id="skinwindtrails"; Icon="rbxassetid://14250975612"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="Windtrails";};});
+    new(customizationPack, {Id="skinfancy"; Icon="rbxassetid://17281999442"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="Fancy";};});
 
 
 
@@ -952,8 +952,8 @@ function modItemsLibrary.onRequire()
     -- Easter 2020
     new(crateBase, {Id="easteregg"; Name="Easter Egg 2020"; Icon="rbxassetid://4836173098"; Tags={"Easter"}; TradingTax=0; Stackable=20; Description="Happy Easter, open it and see what you get!";});
     new(toolBase, {Id="bunnyplush"; Name="Bunny Plush"; Icon="rbxassetid://4843264963"; Tags={"Easter"}; Description="*squuuuuish and cuddles*";});
-    new(customizationPack, {Id="coloreaster"; Name="Easter Colors Pack"; Icon="rbxassetid://4836170912"; Tags={"Color Pack"; "Easter"}; UnlockPack={Type="Color"; Id="EasterColors";};});
-    new(customizationPack, {Id="skineaster"; Name="Easter Skins Pack"; Icon="rbxassetid://4836171086"; Tags={"Skin Pack"; "Easter"}; UnlockPack={Type="Skin"; Id="EasterSkins";};});
+    new(customizationPack, {Id="coloreaster"; Name="Easter Colors Pack"; Icon="rbxassetid://4836170912"; Tags={"Color Pack"; "Easter"}; UnlockPack={Type="ColorPacks"; Id="EasterColors";};});
+    new(customizationPack, {Id="skineaster"; Name="Easter Skins Pack"; Icon="rbxassetid://4836171086"; Tags={"Skin Pack"; "Easter"}; UnlockPack={Type="SkinsPacks"; Id="EasterSkins";};});
 
     -- Easter 2021
     new(crateBase, {Id="easteregg2021"; Name="Easter Egg 2021"; Icon="rbxassetid://4836173098"; Tags={"Easter"}; TradingTax=0; Stackable=20; Description="Happy Easter, open it and see what you get!";});
@@ -972,11 +972,11 @@ function modItemsLibrary.onRequire()
 
     -- Halloween 2021
     new(resourceBase, {Id="halloweencandy"; Name="Halloween Candy"; Icon="rbxassetid://7558610870"; Stackable=999; Tags={"Slaughterfest";}; Description="A pile of haunted candies.."; Sources={"Obtained from <b>Slaughterfest</b> event";} });
-    new(customizationPack, {Id="skinhalloweenpixelart"; Name="Halloween Pixel Art Pack"; Icon="rbxassetid://7605179907"; Tags={"Skin Pack"; "Slaughterfest";}; UnlockPack={Type="Skin"; Id="HalloweenPixelArt";};});
+    new(customizationPack, {Id="skinhalloweenpixelart"; Name="Halloween Pixel Art Pack"; Icon="rbxassetid://7605179907"; Tags={"Skin Pack"; "Slaughterfest";}; UnlockPack={Type="SkinsPacks"; Id="HalloweenPixelArt";};});
 
 
     -- Halloween 2023
-    new(customizationPack, {Id="skincutebutscary"; Name="Cute But Scary Pack"; Icon="rbxassetid://15016488348"; Tags={"Skin Pack"; "Slaughterfest";}; UnlockPack={Type="Skin"; Id="CuteButScary";};});
+    new(customizationPack, {Id="skincutebutscary"; Name="Cute But Scary Pack"; Icon="rbxassetid://15016488348"; Tags={"Skin Pack"; "Slaughterfest";}; UnlockPack={Type="SkinsPacks"; Id="CuteButScary";};});
     new(skinPermBase, {Id="nekrostrenchhauntedpumpkin"; Icon="rbxassetid://14971117747"; SkinPerm="Haunted Pumpkin"; TargetItemId="nekrostrench"; Tags={"Slaughterfest";}; });
     new(skinPermBase, {Id="skullmaskgold"; Icon="rbxassetid://15007587410"; SkinPerm="Gold"; TargetItemId="skullmask"; Tags={"Slaughterfest";}; });
     new(skinPermBase, {Id="clothbagmaskcbsskulls"; Icon="rbxassetid://15016732739"; SkinPerm="Cute But Scary Skulls"; TargetItemId="clothbagmask"; Tags={"Slaughterfest";}; });
@@ -1045,7 +1045,7 @@ function modItemsLibrary.onRequire()
 
     -- Easter 2023
     new(crateBase, {Id="easteregg2023"; Name="Easter Egg 2023"; Icon="rbxassetid://12961679377"; Tags={"Easter"}; TradingTax=0; Description="Happy Easter, open it and see what you get!";});
-    new(customizationPack, {Id="skineaster2023"; Name="Easter Skins 2023 Pack"; Icon="rbxassetid://12963885465"; Tags={"Skin Pack"; "Easter"}; UnlockPack={Type="Skin"; Id="EasterSkins2023";};});
+    new(customizationPack, {Id="skineaster2023"; Name="Easter Skins 2023 Pack"; Icon="rbxassetid://12963885465"; Tags={"Skin Pack"; "Easter"}; UnlockPack={Type="SkinsPacks"; Id="EasterSkins2023";};});
     new(skinPermBase, {Id="hardhatcherryblossom"; Icon="rbxassetid://12963903837"; SkinPerm="Cherry Blossom"; TargetItemId="hardhat"; Tags={"Easter"};});
     new(skinPermBase, {Id="highvisjacketfallenleaves"; Icon="rbxassetid://12963945448"; SkinPerm="Fallen Leaves"; TargetItemId="highvisjacket"; Tags={"Easter"};});
     new(skinPermBase, {Id="scraparmorcherryblossom"; Icon="rbxassetid://12963959744"; SkinPerm="Cherry Blossom"; TargetItemId="scraparmor"; Tags={"Easter"};});

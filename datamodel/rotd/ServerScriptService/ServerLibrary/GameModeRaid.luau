@@ -475,8 +475,9 @@ function Raid:CompleteRaid()
 	end
 
 	shared.Notify(game.Players:GetPlayers(), `Raid Complete!{runTimeStr}`, "Positive");
+	self.StatusText = "Raid Complete!";
+	
 	self:Hud{
-		Status = "Raid Complete!";
 		PlayMusic = false;
 	};
 	modAudio.Play("GameCompletion", workspace);
@@ -998,6 +999,9 @@ function Raid:Start()
 	end
 
 	self.Status = EnumStatus.InProgress;
+	shared.modEventService:ServerInvoke("GameModeManager_BindGameModeStart", {ReplicateTo=self.Players}, {
+		Room = self.RoomData;
+	});
 
 	self.EliminateCount = 0;
 

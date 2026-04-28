@@ -9,7 +9,7 @@ local Descriptions={
 	AmmoCap="Increase Ammo Capacity by an additional $Ammo Capacity of the Magazine Size.";
 	AmmoMag="Increase Magazine size by $Magazine bullets.";
 	HyperDamage="Add an additional $Damage of premod damage and increase Fire Rate by an additional $Fire Rate Rpm.";
-	DamageRev="Damage revs up for every shot you have left in your magazine. The last bullet in the magazine will do an additional $Multiplier% damage.";
+	DamageRev="Damage revs up for every shot you have left in your magazine. The last bullet in the magazine will do an additional damage.";
 };
 
 local GenericDescs={

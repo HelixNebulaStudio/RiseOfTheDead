@@ -22,7 +22,10 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if modGameModeManager.GameWorld ~= true then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if modGameModeManager.GameWorld ~= true and not RunService:IsStudio() then
+		Debugger:Warn("Invalid place for cutscene ("..script.Name..")");
+		return; 
+	end;
 	
 	shared.modEventService:OnInvoked("GameModeManager_BindGameModeStart", function(eventPacket: EventPacket, packet)
 		local room = packet.Room;
@@ -35,9 +38,9 @@ return function(CutsceneSequence)
 			modMission:Progress(player, MISSION_ID, function(mission)
 				if mission.ProgressionPoint == 1 then
 					mission.ProgressionPoint = 2;
-					
-					mission.StartTime = os.time();
-					mission.Timer = 300;
+
+					local curTime = workspace:GetServerTimeNow();
+					mission.SaveData.StartTime = curTime;
 				end
 			end)
 
@@ -65,15 +68,22 @@ return function(CutsceneSequence)
 		local triggerPlayer: Player? = event.Player;
 		if triggerPlayer == nil then return end;
 
-		local interactable: InteractableInstance = ...;
+		local id: string, interactable: InteractableInstance = ...;
 
-		if interactable.Id == "mission35FoodScavenge" then
+		if id == "mission35FoodScavenge" then
 			for _, player in pairs(game.Players:GetPlayers()) do
 				shared.Notify(player, triggerPlayer.Name .." has successfully extracted the food package.", "Reward");
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint == 3 then
+						local curTime = workspace:GetServerTimeNow();
+
+						local timer = mission.SaveData.Timers.T1;
+						if timer == nil then
+							timer = {StartTime=curTime-299;};
+						end
+
 						mission.SaveData.FactionData = {
-							Timelapsed = os.time()-mission.StartTime;
+							Timelapsed = curTime - timer.StartTime;
 						}
 						modMission:CompleteMission(player, MISSION_ID);
 					end
@@ -90,13 +100,30 @@ return function(CutsceneSequence)
 		if mission == nil then return end;
 			
 		Debugger:Log("mission.SaveData", mission.SaveData);
-		if not modBranchConfigurations.IsWorld(mission.SaveData.Location) then Debugger:Log("Wrong world"); return end;
+		if shared.WorldName ~= mission.SaveData.Location and not RunService:IsStudio() then 
+			Debugger:Log("Wrong world");
+			return;
+		end;
 
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
 				
 			elseif mission.Type == 1 then -- OnActive
 				if mission.ProgressionPoint == 1 then
+
+				elseif mission.ProgressionPoint == 2 then
+					if mission.SaveData.Timers == nil then
+						mission.SaveData.Timers = {};
+					end
+					if mission.SaveData.Timers.T1 == nil then
+						mission.SaveData.Timers.T1 = {
+							FailOnTimeout = true;
+							Duration = 300;
+							StartTime = workspace:GetServerTimeNow();
+							DefaultText = "Time until air drop is stolen..";
+							TimeoutText = "Air drop has been stolen by another faction!";
+						};
+					end
 
 				elseif mission.ProgressionPoint == 3 then
 					local newCrate = game.ServerStorage.Prefabs.Objects.Crates.CratePallet:Clone();

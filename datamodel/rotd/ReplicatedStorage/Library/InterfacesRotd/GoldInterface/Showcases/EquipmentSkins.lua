@@ -9,7 +9,7 @@ local templateIcon = script:WaitForChild("ImageIcon");
 function ShowcaseObject.new(interface, parent, library)
 	if library == nil or library.PackType == nil or library.PackId == nil then return end;
 	
-	local listLibrary = library.PackType == "Colors" and modColorsLibrary or modSkinsLibrary;
+	local listLibrary = library.PackType == "ColorPacks" and modColorsLibrary or modSkinsLibrary;
 	local packLib = listLibrary.Packs[library.PackId];
 	if packLib == nil then return end;
 	
@@ -20,12 +20,12 @@ function ShowcaseObject.new(interface, parent, library)
 		local info = packLib.List[a];
 		local newOption = templateIcon:Clone();
 		
-		if library.PackType == "Colors" then
+		if library.PackType == "ColorPacks" then
 			newOption.Image = "";
 			newOption.BackgroundTransparency = 0;
 			newOption.BackgroundColor3 = info.Color;
 			
-		elseif library.PackType == "Skins" then
+		elseif library.PackType == "SkinsPacks" then
 			newOption.Image = info.Image;
 			newOption.ImageColor3 = info.Color;
 			

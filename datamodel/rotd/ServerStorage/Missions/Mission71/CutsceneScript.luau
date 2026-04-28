@@ -31,6 +31,11 @@ return function(CutsceneSequence)
 		local profile = shared.modProfile:Get(player);
 		local banditSpawned = {};
 
+		local frankNpcClass: NpcClass;
+		if shared.WorldName == "TheWarehouse" then
+			frankNpcClass = shared.modNpcs.getByModel(workspace.Entity:FindFirstChild("Frank")) :: NpcClass;
+		end
+
 		local function endMission()
 			local inventory = profile.ActiveInventory;
 			local total, itemList = inventory:ListQuantity("highvaluepackage", 1);
@@ -41,22 +46,26 @@ return function(CutsceneSequence)
 				end
 			end
 
-			for _, npc in pairs(banditSpawned) do
-				if workspace:IsAncestorOf(npc) then
-					npc:Destroy();
+			for _, npcChar in pairs(banditSpawned) do
+				if workspace:IsAncestorOf(npcChar) then
+					npcChar:Destroy();
 				end
+			end
+
+			local cutscenePlayersComp = frankNpcClass and frankNpcClass:GetComponent("CutscenePlayers");
+			if cutscenePlayersComp then
+				cutscenePlayersComp:RemovePlayer(player, MISSION_ID);
 			end
 		end
 
 		task.spawn(function()
-
 			while game.Players:IsAncestorOf(player) do
 				task.wait(1);
 			end
 
-			for _, npc in pairs(banditSpawned) do
-				if workspace:IsAncestorOf(npc) then
-					npc:Destroy();
+			for _, npcChar in pairs(banditSpawned) do
+				if workspace:IsAncestorOf(npcChar) then
+					npcChar:Destroy();
 				end
 			end
 		end)
@@ -90,7 +99,8 @@ return function(CutsceneSequence)
 
 								if #banditSpawned > 3 then continue end;
 								if not playerClass.HealthComp.IsDead and playerClass.Properties.InBossBattle == nil then
-									local lastDoorCf = spawnCfs[math.random(1, #spawnCfs)] or playerClass.Properties.LastDoorCFrame;
+									local lastDoorCf = spawnCfs[math.random(1, #spawnCfs)] 
+													or playerClass.Properties.LastDoorCFrame;
 
 									local banditNpcClass: NpcClass = modNpcs.spawn2{
 										Name = "Bandit";
@@ -98,7 +108,7 @@ return function(CutsceneSequence)
 										BindSetup = function(npcClass: NpcClass)
 											npcClass.Properties.TargetableDistance = 4096;
 											Debugger.Expire(npcClass.Character, 60);
-											table.insert(banditSpawned, npcClass);
+											table.insert(banditSpawned, npcClass.Character);
 										end;
 									};
 									banditNpcClass:GetComponent("TargetHandler"):AddTarget(playerClass.Character);
@@ -133,7 +143,7 @@ return function(CutsceneSequence)
 							dianaNpcClass.Move:MoveTo(Vector3.new(-137.6, 10.5, 275.6));
 							dianaNpcClass.Move.OnMoveToEnded:Wait(5);
 							
-							wait(0.3);
+							task.wait(0.3);
 							dianaNpcClass:SetCFrame(CFrame.new(-136.80545, 10.5228777, 268.696259, 0.866, 0, -0.500000954, 0, 1, 0, 0.500000954, 0, 0.866024852));
 							dianaNpcClass.Move:MoveTo(Vector3.new(-123.7, 10.5, 276.9));
 							dianaNpcClass.Move.OnMoveToEnded:Wait(5);
@@ -143,18 +153,20 @@ return function(CutsceneSequence)
 
 					elseif targetNpcName == "Frank" then
 						Debugger:Warn("Frank walk out");
-						player:SetAttribute("FrankStandsOutside", true);
+
+						local cutscenePlayersComp = frankNpcClass and frankNpcClass:GetComponent("CutscenePlayers");
+						if cutscenePlayersComp then
+							cutscenePlayersComp:AddPlayer(player, MISSION_ID);
+						end
 						
 					end
 
 				end
 
-			elseif mission.Type == 3 then -- OnComplete		
-				player:SetAttribute("FrankStandsOutside", nil);
+			elseif mission.Type == 3 then -- OnComplete
 				endMission();
 				
 			elseif mission.Type == 4 then -- OnFail/Abort
-				player:SetAttribute("FrankStandsOutside", nil);
 				endMission();
 
 			end

@@ -1030,6 +1030,7 @@ export type Interface = {
         IsCompactFullscreen: boolean;
         IsHotbarToggled: boolean;
 
+        MouseCaptured: boolean;
         MouseIconEnabled: boolean;
         MouseBehavior: Enum.MouseBehavior;
 
@@ -1910,6 +1911,8 @@ export type StatusComp = {
     Reset: (StatusComp) -> nil;
 
     Sync: (StatusComp, uid: string, players: any) -> nil;
+
+    ListStatusWithTags: (StatusComp, tags: {string}) -> {StatusClassInstance};
 
     -- @signals
     OnProcess: EventSignal<any>;

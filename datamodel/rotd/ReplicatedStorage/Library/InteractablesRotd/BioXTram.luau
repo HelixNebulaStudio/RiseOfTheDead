@@ -36,9 +36,9 @@ Please activate power levers to re-enabled BioX monorail.]];
 
         local isActive = interactable.Values.IsActive;
         if isActive then
-            config:SetAttribute("ActiveSpeed", 0);
-        else
             config:SetAttribute("ActiveSpeed", 15);
+        else
+            config:SetAttribute("ActiveSpeed", 0);
         end
     end
     
@@ -49,6 +49,11 @@ Please activate power levers to re-enabled BioX monorail.]];
         local clientData = info.ClientData;
         if clientData == nil then return end;
 
+        if interactable.Values.Uses <= 0 then
+            interactable.CanInteract = false;
+            interactable.Label = "Monorail is in motion..";
+            return;
+        end
         if interactable.Values.IsActive then
             interactable.Label = "Deactivate Monorail";
             return;

@@ -15,35 +15,6 @@ if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	local modFactions = shared.require(game.ServerScriptService.ServerLibrary.Factions);
 	
-	shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, interactData, packet)
-		local triggerPlayer: Player? = eventPacket.Player;
-		if triggerPlayer == nil then return end;
-		
-		if interactData.TriggerTag == "mission60RepairBanner" then
-			local interactObjectFactionTag = interactData.Object.Parent:GetAttribute("FactionTag");
-			
-			for _, player in pairs(game.Players:GetPlayers()) do
-				local profile = shared.modProfile:Get(player);
-				if profile == nil then continue end;
-				
-				local factionTag = tostring(profile.Faction.Tag);
-				
-				if factionTag == interactObjectFactionTag then
-					modMission:Progress(player, MISSION_ID, function(mission)
-						if mission.ProgressionPoint == 1 then
-							shared.Notify(player, triggerPlayer.Name .." has repaired the faction banner.", "Reward");
-							mission.ProgressionPoint = 2;
-
-							mission.StartTime = os.time();
-							mission.Timer = 300;
-							
-						end
-					end)
-				end
-			end
-		end
-	end)
-
 	shared.modEventService:OnInvoked("Generic_BindTrigger", function(event: EventPacket, ...)
 		local player: Player? = event.Player;
 		if player == nil then return end;
@@ -51,7 +22,32 @@ if RunService:IsServer() then
 		local id: string, interactable: InteractableInstance = ...;
 		if id == nil or interactable == nil then return end;
 
+		task.spawn(function()
+			if id == "mission60RepairBanner" then
+				local interactPart = interactable.Part;
+				local interactObjectFactionTag = interactPart.Parent:GetAttribute("FactionTag");
+				
+				for _, oPlayer in pairs(game.Players:GetPlayers()) do
+					local profile = shared.modProfile:Get(oPlayer);
+					if profile == nil then continue end;
+					
+					local factionTag = tostring(profile.Faction.Tag);
+					
+					if factionTag == interactObjectFactionTag then
+						modMission:Progress(oPlayer, MISSION_ID, function(mission)
+							if mission.ProgressionPoint == 1 then
+								shared.Notify(oPlayer, `{player.Name} has repaired the faction banner.`, "Reward");
+								mission.ProgressionPoint = 2;
+							end
+						end)
 
+						interactable.Config:SetAttribute("_Label", `Join: {interactable.Values.FactionTag}`);
+						interactable.CanInteract = false;
+						interactable:Sync();
+					end
+				end
+			end
+		end)
 	end)
 	
 	bannersFolder = Instance.new("Folder");
@@ -99,6 +95,7 @@ if RunService:IsServer() then
 					factionBannerInteractConfig.Parent = factionbannerPrefab;
 
 					local factionBannerInteractable: InteractableInstance = modInteractables.getOrNew(factionBannerInteractConfig);
+					factionBannerInteractable.Values.FactionTag = factionTag;
 
 					local saveData = mission.SaveData;
 					local itemLib = modItemLibrary:Find(saveData.RepairItemId);
@@ -134,11 +131,23 @@ if RunService:IsServer() then
 					factionbannerPrefab:SetAttribute("FactionTag", factionTag);
 					factionbannerPrefab.PrimaryPart = factionbannerPrefab:WaitForChild("root");
 					factionbannerPrefab.Parent = bannersFolder;
+
+					local destructibleConfig = modDestructibles.createDestructible("Generic");
+					destructibleConfig:SetAttribute("DebrisName", "factionbanner");
+					destructibleConfig.Parent = factionbannerPrefab;
+					local bannerDestructible: DestructibleInstance = modDestructibles.getOrNew(
+						destructibleConfig
+					);
+					bannerDestructible.HealthComp:SetMaxHealth(50000);
+					bannerDestructible.HealthComp:Reset();
+					bannerDestructible:SetEnabled(false);
 					
 					task.delay(300, function()
-						local bannerDestructible: DestructibleInstance = modDestructibles.getOrNew(factionbannerPrefab.Destructible);
+						local bannerDestructible: DestructibleInstance = modDestructibles.getOrNew(
+							factionbannerPrefab.Destructible
+						);
 						if bannerDestructible then
-							bannerDestructible.HealthComp:SetMaxHealth(10000);
+							bannerDestructible.HealthComp:SetMaxHealth(50000);
 							bannerDestructible.HealthComp:Reset();
 							bannerDestructible:SetEnabled(true);
 						end
@@ -149,10 +158,10 @@ if RunService:IsServer() then
 					if factionbannerPrefab then
 						factionbannerPrefab:SetAttribute("Repaired", true);
 						
-						local bannerDestructible: DestructibleInstance = modDestructibles.getOrNew(factionbannerPrefab.Destructible);
+						local bannerDestructible: DestructibleInstance = modDestructibles.getOrNew(
+							factionbannerPrefab:FindFirstChild("Destructible")
+						);
 						if bannerDestructible then
-							bannerDestructible.HealthComp:SetMaxHealth(10000);
-							bannerDestructible.HealthComp:Reset();
 							bannerDestructible:SetEnabled(true);
 						end
 					end
@@ -229,17 +238,22 @@ if RunService:IsServer() then
 					enemyBanner.Parent = workspace.Environment;
 					modReplicationManager.ReplicateOut({player}, enemyBanner);
 
+					local destructibleConfig = modDestructibles.createDestructible("Generic");
+					destructibleConfig:SetAttribute("DebrisName", "factionbanner");
+					destructibleConfig.Parent = enemyBanner;
 					
-					local bannerDestructible: DestructibleInstance = modDestructibles.getOrNew(factionbannerPrefab.Destructible);
+					local bannerDestructible: DestructibleInstance = modDestructibles.getOrNew(
+						destructibleConfig
+					);
 					if bannerDestructible then
 						bannerDestructible.NetworkOwners = {player};
 						bannerDestructible.HealthComp:SetMaxHealth(50000);
 						bannerDestructible.HealthComp:Reset();
-						bannerDestructible:SetEnabled(true);
+						bannerDestructible:SetEnabled(false);
 					end
 					
 					task.delay(300, function()
-						bannerDestructible.NetworkOwners = nil;
+						bannerDestructible.NetworkOwners = (nil :: any);
 						bannerDestructible:SetEnabled(true);
 					end)
 					

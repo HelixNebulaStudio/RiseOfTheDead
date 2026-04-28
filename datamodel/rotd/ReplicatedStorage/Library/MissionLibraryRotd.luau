@@ -1100,13 +1100,13 @@ MissionLibrary.New{
 
 -- MARK: 34 - Escort
 MissionLibrary.New{
-	MissionId=34;
+	MissionId = 34;
 	MissionType = MissionLibrary.MissionTypes.Board;
-	Name="Escort";
-	Description="Molly wants you to escort a stranger to a location. Protect them at all costs.";
-	Timer=BoardTimeLimit;
-	Persistent=true;
-	SaveData={
+	Name = "Escort";
+	Description = "Molly wants you to escort a stranger to a location. Protect them at all costs.";
+	Timer = BoardTimeLimit;
+	Persistent = true;
+	SaveData = {
 		Location=(function()
 			local list = {"Mall Safehouse", "Train Station Safehouse", "Community Safehouse"};
 			return list[math.fmod(getDayNumber(), #list) +1];
@@ -1115,60 +1115,60 @@ MissionLibrary.New{
 			return math.random(1, 100000);
 		end)
 	};
-	Progression={
+	Progression = {
 		"Talk to Molly in the Clinic Safehouse for escorting the stranger";
 		"Bring the stranger to, $Location";
 		"Return back to Molly";
 	};
-	LogEntry={
+	LogEntry = {
 	};
-	GuideText="Talk to Molly to start";
-	Tier="Hard";
-	Rewards={
+	GuideText = "Talk to Molly to start";
+	Tier = "Hard";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Hard};
 	};
-	AddRequirements={
+	AddRequirements = {
 		{Type="Level"; Value=60};
 	};
-	CanFastTravelWhenActive={2};
-	BoardPickFreq=5;
+	CanFastTravelWhenActive = {2};
+	BoardPickFreq = 5;
 	
 };
 
 
 -- MARK: 35 - Food Airdrop
 MissionLibrary.New{
-	MissionId=35;
+	MissionId = 35;
 	MissionType = MissionLibrary.MissionTypes.Faction;
 	ExpireTime = factionMissionExpireTime;
-	Name="Food Airdrop";
-	From="Faction";
-	Description="Collect food airdrop to increase to your faction's Food supply.";
-	Persistent=true;
-	SaveData={
+	Name = "Food Airdrop";
+	From = "Faction";
+	Description = "Collect food airdrop to increase to your faction's Food supply.";
+	Persistent = true;
+	SaveData = {
 		Location=function()
 			local list = {"Office"; "BanditOutpost"; "Tombs"; "Railways";};
 			return list[math.fmod(getDayNumber(), #list) +1];
 		end;
 	};
-	Checkpoint={
+	Checkpoint = {
 		{Text="Head to (Raid: $Location) to collect the food package";};
-		{Text="Other factions has been alerted about the airdrop, times ticking";};
+		{Text="Other factions has been alerted about the airdrop";};
 		{Text="Extract the food package";};
 	};
-	GuideText="Start by faction";
-	FactionCosts={
+	GuideText = "Start by faction";
+	FactionCosts = {
 		{Type="Resource"; Per="Player"; Id="Ammo"; Value=0.375;};
 	};
-	FactionRewards={
+	FactionRewards = {
 		{Type="Resource"; Id="Food"; Value=30;};
 		{Type="Score"; Value=1;};
 	};
-	FactionSuccessCriteria={
+	FactionSuccessCriteria = {
 		SuccessfulAgents=1;
 	};
-	QuotaLimit=16;
-	PrintNote=function(missionPacket)
+	QuotaLimit = 16;
+	PrintNote = function(missionPacket)
 		local noteText = "";
 
 		local shortestTime = math.huge;
@@ -2064,15 +2064,15 @@ MissionLibrary.New{
 
 -- MARK: 60 - Reconnaissance Duty
 MissionLibrary.New{
-	MissionId=60;
+	MissionId = 60;
 	MissionType = MissionLibrary.MissionTypes.Faction;
-	ExpireTime=factionMissionExpireTime;
-	Name="Reconnaissance Duty";
-	From="Faction";
-	Description="Keep your faction informed as to the on goings around and promote your faction to increase faction's Comfort level.";
-	Persistent=true;
-	SaveData={
-		Location=function(mission)
+	ExpireTime = factionMissionExpireTime;
+	Name = "Reconnaissance Duty";
+	From = "Faction";
+	Description = "Keep your faction informed as to the on goings around and promote your faction to increase faction's Comfort level.";
+	Persistent = true;
+	SaveData = {
+		Location = function(mission)
 			local list = {};
 
 			if RunService:IsStudio() then
@@ -2090,33 +2090,33 @@ MissionLibrary.New{
 			
 			return pickLib.Name;
 		end;
-		RepairItemId=function()
+		RepairItemId = function()
 			local list = {"metal"; "wood"; "cloth"};
 			return list[math.fmod(getDayNumber(), #list) +1];
 		end;
-		RepairCost=function()
+		RepairCost = function()
 			local list = {math.random(100, 150); math.random(20,35); math.random(150, 200);};
 			return list[math.fmod(getDayNumber(), #list) +1];
 		end;
 	};
-	Checkpoint={
+	Checkpoint = {
 		{Text="Check on your faction's banner located in $Location";};
-		{Text="An enemy faction banner was reported to be located somewhere in $WorldId, find and destroy it";};
+		{Text="An enemy faction banner is located somewhere in $WorldId, find and destroy it";};
 	};
-	GuideText="Start by faction";
-	FactionCosts={
+	GuideText = "Start by faction";
+	FactionCosts = {
 		{Type="Resource"; Per="Player"; Id="Food"; Value=0.2;};
 		{Type="Resource"; Per="Player"; Id="Material"; Value=0.2;};
 	};
-	FactionRewards={
+	FactionRewards = {
 		{Type="Resource"; Id="Comfort"; Value=60;};
 		{Type="Score"; Value=1;};
 	};
-	FactionSuccessCriteria={
+	FactionSuccessCriteria = {
 		SuccessfulAgents=1;
 	};
-	QuotaLimit=16;
-	CanFastTravelWhenActive={2};
+	QuotaLimit = 16;
+	CanFastTravelWhenActive = {2};
 	
 };
 
@@ -2302,23 +2302,23 @@ MissionLibrary.New{
 
 -- MARK: 65 - Eternal Inferno
 MissionLibrary.New{
-	MissionId=65;
+	MissionId = 65;
 	MissionType = MissionLibrary.MissionTypes.Board;
-	Name="Eternal Inferno";
-	Description="Joseph wants to see the effects of killing zombies with fire.";
-	Timer=BoardTimeLimit;
-	Persistent=true;
-	World="TheResidentials";
-	Checkpoint={
+	Name = "Eternal Inferno";
+	Description = "Joseph wants to see the effects of killing zombies with fire.";
+	Timer = BoardTimeLimit;
+	Persistent = true;
+	World = "TheResidentials";
+	Checkpoint = {
 		{Text="Kill $Kills zombies with Fire Damage";};
 	};
-	SaveData={Kills=100;};
-	GuideText="";
-	Tier="Normal";
-	Rewards={
+	SaveData = {Kills=100;};
+	GuideText = "";
+	Tier = "Normal";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Normal};
 	};
-	AddRequirements={
+	AddRequirements = {
 		{Type="Level"; Value=30};
 	};
 	
@@ -2437,27 +2437,26 @@ MissionLibrary.New{
 
 -- MARK: 70 - Anti Immunity
 MissionLibrary.New{
-	MissionId=70;
+	MissionId = 70;
 	MissionType = MissionLibrary.MissionTypes.Board;
-	Name="Anti Immunity";
-	Description="Kill zombies that have immunity with a melee weapon";
-	Timer=BoardTimeLimit;
-	Persistent=true;
-	Checkpoint={
+	Name = "Anti Immunity";
+	Description = "Kill zombies that have immunity with a melee weapon";
+	Timer = BoardTimeLimit;
+	Persistent = true;
+	Checkpoint = {
 		{Text="Kill $Kills immune zombies with melee";};
 	};
-	SaveData={
+	SaveData = {
 		Kills=10;
 	};
-	GuideText="";
-	Tier="Normal";
-	Rewards={
+	GuideText = "";
+	Tier = "Normal";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Normal};
 	};
-	AddRequirements={
+	AddRequirements = {
 		{Type="Level"; Value=30};
 	};
-	
 };
 
 

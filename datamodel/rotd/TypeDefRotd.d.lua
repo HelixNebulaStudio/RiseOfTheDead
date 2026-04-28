@@ -11,6 +11,7 @@ export type GAME_EVENT_KEY_ROTD =
     | "Skills_BindResourceGatherers"
     | "Shop_BindActionEvent"
     | "Survivor_BindInventoryChanged"
+    | "Survival_BindWaveReached"
     | "WorkbenchService_BindInterfaceToggle"
     | "WorkbenchService_BindItemSelect"
     | "WorkbenchService_BindModEquip"

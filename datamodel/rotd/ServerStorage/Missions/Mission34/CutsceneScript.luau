@@ -17,14 +17,21 @@ if RunService:IsServer() then
 		local player: Player? = eventPacket.Player;
 		if player == nil then return end;
 
-		local mission = modMission:GetMission(player, MISSION_ID);
-		if mission == nil then return end;
-		
-		local playerLocation = player:GetAttribute("Location");
-		if mission.SaveData.Location ~= playerLocation then return end;
+		task.spawn(function()
+			local mission = modMission:GetMission(player, MISSION_ID);
+			if mission == nil then return end;
+			
+			for a=0, 5, 0.5 do
+				task.wait(0.5);
+				local playerLocation = player:GetAttribute("Location");
+				if mission.SaveData.Location ~= playerLocation then continue end;
 
-		modMission:Progress(player, MISSION_ID, function(mission)
-			if mission.ProgressionPoint == 2 then mission.ProgressionPoint = 3; end;
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint == 2 then mission.ProgressionPoint = 3; end;
+				end)
+
+				break;
+			end
 		end)
 	end)
 	
@@ -72,10 +79,20 @@ return function(CutsceneSequence)
 							end;
 						};
 						if strangerNpcClass then
+							strangerNpcClass.HealthComp:SetMaxHealth(250);
+							strangerNpcClass.HealthComp:Reset();
+							
 							strangerNpcClass:GetComponent("FollowPlayer")(nil, function() 
 								return mission.ProgressionPoint == 2;
 							end);
 							strangerNpcClass.Character:SetAttribute("Player", player.Name);
+							
+							strangerNpcClass.Properties.Immortal = nil;
+							local attractNpcsComp = strangerNpcClass:GetComponent("AttractNpcs");
+							if attractNpcsComp then
+								attractNpcsComp.AttractHumanoidType = {"Zombie";};
+								attractNpcsComp:Activate();
+							end
 						end
 					end
 					

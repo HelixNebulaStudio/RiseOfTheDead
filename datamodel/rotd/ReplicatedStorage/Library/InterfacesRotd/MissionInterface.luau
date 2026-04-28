@@ -211,12 +211,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		HeaderText = ``;
 		TaskText = ``;
 
-		TimerTextColor = Color3.fromRGB(255, 255, 255);
-		TimerText = ``;
-		TimerVisible = false;
-
 		TaskList = nil;
-		TimerLabel = nil;
+		MissionData = nil;
 	};
 
 	function pinHudData.setActive(isActive)
@@ -243,28 +239,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		missionHudTask.Properties.HeaderText = pinHudData.HeaderText;
 		missionHudTask.Properties.DescText = pinHudData.TaskText;
 
-		if pinHudData.TimerVisible then
-			local timerLabel = pinHudData.TimerLabel;
-			if timerLabel == nil then
-				timerLabel = taskHudWindow.Binds.GenericLabel:Clone();
-				timerLabel.Name = "TimerLabel";
-				timerLabel.LayoutOrder = 4;
-				timerLabel.Parent = missionHudTask.Frame;
-				pinHudData.TimerLabel = timerLabel;
+		local missionData = pinHudData.MissionData;
+		if missionData.SaveData.Timers then
+			for k, v in pairs(missionData.SaveData.Timers) do
+				missionHudTask.Properties.Timers[k] = v;
 			end
-			
-			timerLabel.Text = pinHudData.TimerText;
-			timerLabel.TextColor3 = pinHudData.TimerTextColor;
-			timerLabel.Visible = true;
-
 		else
-			if pinHudData.TimerLabel then
-				pinHudData.TimerLabel:Destroy();
-				pinHudData.TimerLabel = nil;
-			end
-			
+			table.clear(missionHudTask.Properties.Timers);
 		end
-
+		
 		missionHudTask:Update();
 	end
 
@@ -1539,7 +1522,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     remoteMissionRemote:InvokeServer("MissionPin", missionData.Id);
                 end)
 
-				wait(modConfigurations.CompactInterface and 1 or 0.5);
+				task.wait(modConfigurations.CompactInterface and 1 or 0.5);
 				pinRequestDebounce = false;
 			end
 			
@@ -1581,7 +1564,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				newListing.MouseButton1Click:Connect(function()
 					newListing.Title.TextColor3 = Color3.new(branchColor.R*1.5, branchColor.G*1.5, branchColor.B*1.5);
 					binds.Select(missionData.Id);
-					delay(0.25, function()
+					task.delay(0.25, function()
 						newListing.Title.TextColor3 = titleLabels[key].Color;
 					end);
 				end)
@@ -1739,6 +1722,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end;
 			if missionHudTask == nil then return end;
 			
+			pinHudData.MissionData = missionData;
 			pinHudData.HeaderText = missionLib.Name;
 
 			if newPinNotification then
@@ -1776,26 +1760,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				local timeLapsed = os.time()-missionData.StartTime;
 
 				pinHudData.TitleText = (timeLapsed <= 10 and "New " or "")..missionTypeTitle.." Mission";
-
-				local missionTimer = missionLib.Timer or missionData.Timer;
-				if missionTimer then
-					local timeLeft = math.clamp(missionTimer-timeLapsed, 0, math.huge);
-					if timeLeft > 0 then
-						if timeLeft < 10 then
-							pinHudData.TimerTextColor = Color3.fromRGB(255, 128, 128);
-						else
-							pinHudData.TimerTextColor = Color3.fromRGB(255, 255, 255);
-						end
-						
-						pinHudData.TimerText = modSyncTime.ToString(timeLeft);
-						pinHudData.TimerVisible = true;
-					else
-						pinHudData.TimerText = "";
-						pinHudData.TimerVisible = false;
-					end 
-				else
-					pinHudData.TimerVisible = false;
-				end
 			end
 			binds.UpdatePinnedHud();
 
@@ -1919,7 +1883,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						local missionFunction = missionLogic["Checkpoint"..missionData.ProgressionPoint];
 						if missionFunction and logicCheckpointDebounce ~= missionLogicCheckpointDebounce then
 							missionLogicCheckpointDebounce = missionData.ProgressionPoint;
-							spawn(missionFunction);
+							task.spawn(missionFunction);
 						end;
 					end
 					
@@ -1958,7 +1922,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							activeMissionLogic[missionLib.Name] = missionLogic;
 						end;
 						local missionFunction = missionLogic["ProgressionPoint"..missionData.ProgressionPoint];
-						if missionFunction then spawn(missionFunction); end;
+						if missionFunction then task.spawn(missionFunction); end;
 					end
 
 					destroyTaskList();
@@ -2057,7 +2021,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					pcall(function()
 						newPinNotification:TweenPosition(UDim2.new(0.5, 0, 0.3, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 2, true);
 					end)
-					wait(5);
+					task.wait(5);
 					
 					pcall(function()
 						newPinNotification:TweenPosition(UDim2.new(0.85, 0, 0, 40), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 2, true);
@@ -2072,7 +2036,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					showInitNotify = false;
 				end
 				if pinHudData.Active and notifyPinnedMission and showInitNotify then
-					spawn(notifyPinnedMission);
+					task.spawn(notifyPinnedMission);
 				end
 			end
 
