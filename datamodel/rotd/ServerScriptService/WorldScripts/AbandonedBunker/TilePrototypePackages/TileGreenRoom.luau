@@ -2,6 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modDoors = shared.require(game.ReplicatedStorage.Entity.Doors);
 
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modTilePrototypeClass = shared.require(game.ReplicatedStorage.Library.WaveCollapseSystem.TilePrototypeClass);
 
 local TilePrototypePackage = {};
@@ -15,7 +16,7 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 	self.Controller = raidController;
 	self.WaveCollapseSystem = waveCollapseSystem;
 	
-	self.VoxelGates = waveCollapseSystem:GetGatesFromGroup(script.Parent.Parent);
+	self.VoxelGates = waveCollapseSystem:GetGatesFromGroup(self.Model);
 	for a=1, #self.VoxelGates do
 		local voxelPoint = self.VoxelGates[a].VoxelPoint;
 		local gateAxis = self.VoxelGates[a].Axis;
@@ -23,30 +24,41 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 		voxelPoint:SetTraversable(gateAxis, false);
 	end
 	
-	for _, child in pairs(script.Parent:GetChildren()) do
-		if child:FindFirstChild("Door") and child.Door:IsA("ModuleScript") then
-			local doorObject = modDoors:GetDoor(child);
-			table.insert(self.Doors, doorObject);
-			
-			doorObject.OnDoorToggle:Connect(function(player)
-				Debugger:Warn("OnDoorToggle", player);
-				
-				for a=1, #self.Doors do
-					local doorObj = self.Doors[a];
-					if doorObj.Prefab then
-						doorObj.Prefab:SetAttribute("KeyRequired", nil);
-					end
-				end
-				
-				if self.Active ~= true then
-					self.Active = true;
+	local layout = self.Model:WaitForChild("Layout");
 
-					shared.Notify(game.Players:GetPlayers(), player.Name .." has unlocked the Green Room.", "Positive");
-					self:Start(player);
+	local lockedDoors = {};
+	for _, child in pairs(layout:GetChildren()) do
+		if child.Name == "GreenDoor" then
+			local newInteractConfig = modInteractables.createInteractable("DoorRotd");
+			newInteractConfig:SetAttribute("Locked", true);
+			newInteractConfig:SetAttribute("KeyLocked", "abgreenkey");
+			newInteractConfig.Parent = child;
+
+			local interactable = modInteractables.getOrNew(newInteractConfig);
+			table.insert(lockedDoors, interactable);
+
+			interactable.Values.OnChanged:Connect(function(k, v)
+				if k == "Locked" and v == false then
+					for _, i: InteractableInstance in pairs(lockedDoors) do
+						i.Values.Locked = false;
+						i:Sync();
+					end
 				end
 			end)
 		end
 	end
+
+	modDoors.OnDoorToggle:Connect(function(doorInstance: DoorInstance, player: Player)
+		if not layout:IsAncestorOf(doorInstance.Model) then return end;
+		if not doorInstance.IsOpen then return end;
+
+		if self.Active ~= true then
+			self.Active = true;
+
+			shared.Notify(game.Players:GetPlayers(), `{player.Name} has unlocked the Green Room.`, "Positive");
+			self:Start(player);
+		end
+	end)
 end
 
 function TilePrototypePackage:Start(player)
@@ -57,7 +69,8 @@ function TilePrototypePackage:Start(player)
 		voxelPoint:SetTraversable(gateAxis, true);
 	end
 	
-	local specialSpawn = script.Parent.SpecialSpawn:WaitForChild("RewardSpawn");
+	local layout = self.Model:WaitForChild("Layout");
+	local specialSpawn = layout.SpecialSpawn:WaitForChild("RewardSpawn");
 	
 	local miniBossName = "Jaws";
 	local npcClass: NpcClass = shared.modNpcs.spawn2{

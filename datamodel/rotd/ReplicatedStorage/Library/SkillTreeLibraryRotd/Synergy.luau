@@ -38,7 +38,7 @@ library:Add{
 	Name="Resource Gatherers";
 	Link="reqback";
 
-	Description="When a squad mate picks up an item, they will also help you pick up the item and this goes into cooldown for $Cooldown seconds. (Usees your pick up settings)";
+	Description="When a squad mate picks up an item, they will also help you pick up the item and this goes into cooldown for $Cooldown seconds. (Uses your pick up settings)";
 	Stats={
 		Cooldown={Base=5; Max=1};
 	};

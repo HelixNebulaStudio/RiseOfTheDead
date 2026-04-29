@@ -59,7 +59,7 @@ function interactablePackage.init(super) -- Server/Client
                                 characterVars.CharacterProperties.CanMove = false;
                                 characterVars.CharacterProperties.CanInteract = false;
 
-                                interactable:InteractServer(info.Values);
+                                interactable:InteractServer("interact", info.Values);
                                 SoundService:SetListener(Enum.ListenerType.CFrame, CFrame.new(0, 1000, 0));
                             end;
                         };

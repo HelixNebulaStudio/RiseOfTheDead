@@ -227,7 +227,7 @@ function interactablePackage.init(super) -- Server/Client
 
         if info.Action == "Client" then 
             if info.Player == nil then return end;
-            interactable:InteractServer(info.Values);
+            interactable:InteractServer("interact", info.Values);
             return;
         end 
         if RunService:IsClient() then return end;

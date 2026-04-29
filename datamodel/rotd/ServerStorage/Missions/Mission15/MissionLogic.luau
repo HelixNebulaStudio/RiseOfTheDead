@@ -59,8 +59,8 @@ if RunService:IsServer() then
                         ItemId = "battery";
                         Quantity = 1;
                         SpawnCFrame = CFrame.new(-9.9, 72.5, -41.9);
-						CanInteractNames = {player.Name};
 						DespawnDuration = false;
+						Players = {player};
 					};
 					dropPrefab.PrimaryPart.Anchored = true;
 				end
@@ -69,8 +69,8 @@ if RunService:IsServer() then
                         ItemId = "wires";
                         Quantity = 1;
                         SpawnCFrame = CFrame.new(42.8, 63.3, 191.9);
-						CanInteractNames = {player.Name};
 						DespawnDuration = false;
+						Players = {player};
 					};
 					dropPrefab.PrimaryPart.Anchored = true;
 				end

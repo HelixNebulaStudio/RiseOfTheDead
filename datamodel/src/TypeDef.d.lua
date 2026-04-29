@@ -903,7 +903,8 @@ export type InteractableMeta = {
     Reset: (InteractableInstance) -> nil;
     InteractLogic: (InteractableInstance, processType: string, interactInfo: InteractInfo?) -> anydict;
 
-    InteractServer: (InteractableInstance, values: anydict) -> nil;
+    InteractServer: (InteractableInstance, action: string, ...any) -> nil;
+    InteractClient:  (InteractableInstance, players: Player | {Player}, action: string, ...any) -> nil;
 
     SetPermissions: (InteractableInstance, flagTag: string, value: boolean) -> nil;
     HasPermissions: (InteractableInstance, flagTag: string, name: string?) -> boolean;
@@ -931,6 +932,7 @@ export type InteractableInstance = {
     Sound: string?;
 
     -- @methods
+    Destroy: (InteractableInstance) -> nil;
     Sync: (InteractableInstance, players: {Player}?, data: anydict?) -> nil;
     SyncPerms: (InteractableInstance, player: Player) -> nil;
     Shrink: (InteractableInstance) -> anydict;
@@ -942,6 +944,7 @@ export type InteractableInstance = {
     BindPrompt: (interactable: InteractableInstance, info: InteractInfo) -> nil;
     BindEvent: (Interactable: InteractableInstance, info: InteractInfo, eventName: string) -> nil;
     BindSync: (interactable: InteractableInstance, data: anydict) -> nil;
+    BindAction: (interactable: InteractableInstance, ...any) -> nil;
     
 } & InteractableMeta;
 
@@ -1622,7 +1625,7 @@ export type DoorInstance = {
     Config: Configuration;
     Model: Model;
 
-    Open: boolean;
+    IsOpen: boolean;
     DoorType: "Normal" | "Sliding";
     WidthType: "Single" | "Double";
     Values: anydict;
@@ -1797,7 +1800,7 @@ export type ArcPoint = {
     Direction: Vector3;
     Point: Vector3;
     Displacement: number;
-    Normal: Vector3?;
+    Normal: Vector3;
     Material: Enum.Material?;
     TotalDelta: number;
     LastPoint: boolean;

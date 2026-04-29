@@ -32,8 +32,6 @@ function modWorldCoreClass.onRequire()
         if workspace:GetAttribute("DayOfYear") then onDayChanged(); end
         workspace:GetAttributeChangedSignal("DayOfYear"):Connect(onDayChanged);
 
-        modConfigurations.Set("UseOldItemDrop.Spawn", true);
-
         modItemDrops.DefaultGlowBrightness = 1;
         modItemDrops.DefaultRayBrightness = 10;
         modItemDrops.DefaultGlowColor = Color3.fromRGB(255, 255, 255);

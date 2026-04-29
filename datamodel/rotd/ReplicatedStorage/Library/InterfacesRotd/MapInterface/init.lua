@@ -557,7 +557,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In),
 			{Value=0}
 		):Play();
-		delay(10, function()
+		task.delay(10, function()
 			TweenService:Create(
 				transparencyTag, 
 				TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In),
@@ -642,6 +642,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					alphaData.Active = false;
 					alphaData.Object[alphaData.Property] = alphaData.GhostValue;
 					alphaData.Object.ZIndex = alphaData.ZIndex-1;
+				end
+
+				for _, mapObj in ipairs(lData.MapObjects) do
+					mapObj:Update();
 				end
 			end
 			locationLabel.Text = "Wrighton Dale, "..(modBranchConfigurations.GetWorldDisplayName(modBranchConfigurations.WorldName) or "");

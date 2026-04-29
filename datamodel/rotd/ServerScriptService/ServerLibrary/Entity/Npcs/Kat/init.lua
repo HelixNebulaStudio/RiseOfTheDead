@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local npcPackage = {
-    Name = "Vladimir";
+    Name = "Kat";
     HumanoidType = "Human";
     
 	Configurations = {};

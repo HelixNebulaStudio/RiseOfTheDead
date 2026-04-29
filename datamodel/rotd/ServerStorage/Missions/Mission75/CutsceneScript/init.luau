@@ -398,14 +398,16 @@ if RunService:IsServer() then
 			local player: Player? = event.Player;
 			if player == nil then return end;
 
-			if interactable.Values.ItemId == "jerrycan" then
-				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.Type ~= 1 then return end;
-					if mission.ProgressionPoint <= 4 then
-						mission.ProgressionPoint = 5;
-					end
-				end)
-			end
+			task.spawn(function()
+				if interactable.Values.ItemId == "jerrycan" then
+					modMission:Progress(player, MISSION_ID, function(mission)
+						if mission.Type ~= 1 then return end;
+						if mission.ProgressionPoint <= 4 then
+							mission.ProgressionPoint = 5;
+						end
+					end)
+				end
+			end)
 		end)
 
 	end

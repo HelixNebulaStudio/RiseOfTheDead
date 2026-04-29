@@ -17,7 +17,7 @@ local MAP_SEED = math.random(1, 9999);
 --==
 
 function WorldCore.InitGameController()
-    if RunService:IsStudio() and shared.gameConfig.MapSeed ~= 0 then
+    if RunService:IsStudio() and shared.gameConfig.MapSeed ~= nil then
         MAP_SEED = shared.gameConfig.MapSeed;
     end
     local newGameController = modGameModeRaid.new();
