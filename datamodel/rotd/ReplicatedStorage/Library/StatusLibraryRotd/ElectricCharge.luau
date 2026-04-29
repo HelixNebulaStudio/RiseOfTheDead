@@ -58,6 +58,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
     
     local applyTo: EntityClass = statusClass.StatusOwner;
     local applyBy: CharacterClass? = statusClass.ApplyBy;
+    local storageItemBy: StorageItem = statusClass.Values.StorageItemBy;
 
     local originAtt = statusClass.Values.OriginAtt;
     local hitPart = statusClass.Values.HitPart;
@@ -88,6 +89,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
         
         healthComp:TakeDamage(DamageData.new{
             DamageBy = applyBy;
+            StorageItem = storageItemBy;
             Damage = math.max(damage*dmgRatio, 1);
             DamageType = "Electric" :: DAMAGE_TYPE<DAMAGE_TYPE_ROTD>;
         });

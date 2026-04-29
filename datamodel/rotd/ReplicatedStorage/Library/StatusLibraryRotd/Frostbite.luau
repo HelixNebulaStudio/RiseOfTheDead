@@ -33,9 +33,11 @@ function statusPackage.IceBlast(applyBy: CharacterClass?, packet: anydict)
         Debugger:Warn("Target character is nil.", targetCharacterClass == nil or targetCharacterClass.ClassName);
         return;
     end
+
     local maxTargets: number = packet.Targets;
     local maxRadius: number = packet.Radius;
     local totalSplashDamage: number = packet.TotalSplashDamage;
+    local storageItemBy: StorageItem? = packet.StorageItem;
     
     local blastOrigin = targetCharacterClass.Character:GetPivot().Position;
 
@@ -108,6 +110,7 @@ function statusPackage.IceBlast(applyBy: CharacterClass?, packet: anydict)
             Values = {
                 DoIceBlast = false;
                 Damage = packet.Damage;
+                StorageItemBy = storageItemBy;
             };
         });
         table.insert(hitHealthComps, healthComp);
@@ -119,14 +122,13 @@ function statusPackage.IceBlast(applyBy: CharacterClass?, packet: anydict)
     for a=1, #hitHealthComps do
         local healthComp: HealthComp = hitHealthComps[a];
 
-        local damageData: DamageData = DamageData.new{ 
+        healthComp:TakeDamage(DamageData.new{ 
             DamageBy = applyBy;
+            StorageItem = storageItemBy;
             
             Damage = totalSplashDamage/#hitHealthComps;
             DamageType = "Frost";
-        };
-       
-        healthComp:TakeDamage(damageData);
+        });
     end
 end
 
@@ -241,9 +243,12 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     local healthComp: HealthComp? = characterClass.HealthComp;
     if healthComp == nil then return end;
 
+    local storageItemBy: StorageItem? = statusClass.Values.StorageItemBy;
+
     local damage = statusClass.Values.Damage or 1;
     healthComp:TakeDamage(DamageData.new{
         DamageBy = statusClass.ApplyBy;
+        StorageItem = storageItemBy;
         Damage = damage;
         DamageType = "Frost";
     });

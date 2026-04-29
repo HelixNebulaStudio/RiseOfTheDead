@@ -82,6 +82,7 @@ if RunService:IsServer() then
 			ApplyBy = characterClass;
 			Values = {
 				Damage = modifier.Properties.Damage;
+				StorageItemBy = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem;
 				TargetPart = targetPart;
 				Stacks = 0;
 				UseCurrHpDmg = true;

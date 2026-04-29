@@ -75,7 +75,7 @@ if RunService:IsServer() then
 		local maxTargets = modifier.Properties.Targets;
 		local damagePercent = modifier.Properties.DamagePercent;
 		local configurations = modifier.EquipmentClass and modifier.EquipmentClass.Configurations;
-		local weaponSiid = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem.ID;
+		local storageItemBy = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem;
 
 		local mainToolModel = modifier.WieldComp.ToolHandler and modifier.WieldComp.ToolHandler.MainToolModel or nil;
 		local originAtt = mainToolModel and mainToolModel.PrimaryPart and mainToolModel.PrimaryPart:FindFirstChild("BulletOrigin");
@@ -88,7 +88,7 @@ if RunService:IsServer() then
 				WeakRoot = 0.5;
 
 				MaxTargets = maxTargets;
-				WeaponSiid = weaponSiid;
+				StorageItemBy = storageItemBy;
 				
 				OriginAtt = originAtt;
 				HitPart = targetPart;

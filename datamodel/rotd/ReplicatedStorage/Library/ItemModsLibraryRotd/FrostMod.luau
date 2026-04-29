@@ -97,6 +97,7 @@ if RunService:IsServer() then
 				Damage = configurations.PreModDamage;
 				Radius = modifier.Properties.Radius;
 				Targets = modifier.Properties.Targets;
+				StorageItemBy = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem;
 			};
 		});
 	end

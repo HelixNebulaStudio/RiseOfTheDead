@@ -34,6 +34,8 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     local targetPart = statusClass.Values.TargetPart;
     local useCurrentHpDmg = statusClass.Values.UseCurrHpDmg;
 
+    local storageItemBy: StorageItem? = statusClass.Values.StorageItemBy;
+
     local stackedDamage = damage + damage * (stacks or 0);
 
     local npcClass: NpcClass = statusClass.StatusOwner :: NpcClass;
@@ -49,6 +51,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     
     local dmgData: DamageData = DamageData.new{
         DamageBy = statusClass.ApplyBy;
+        StorageItem = storageItemBy;
 
         Damage = finalDamage;
         DamageType = "Fire";
