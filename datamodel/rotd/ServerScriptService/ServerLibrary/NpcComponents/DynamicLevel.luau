@@ -69,8 +69,9 @@ function Component:__call(callerCharacterClass: CharacterClass)
 			if playerSave then 
 				playerLevel = playerSave:GetStat("Level") or 1;
 			end;
+			playerLevel = math.max(playerLevel, 1);
 
-			preLevel = math.round(playerLevel * (areaDifficulty/10));
+			preLevel = math.round(math.ceil(playerLevel/10) * (areaDifficulty/10));
 		else
 			preLevel = math.round((areaDifficulty/10) * math.ceil(modGlobalVars.MaxLevels/10));
 		end

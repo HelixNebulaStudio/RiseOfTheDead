@@ -225,6 +225,7 @@ return function(CutsceneSequence)
 				victorNpcClass = modNpcs.spawn2{
 					Name = "Victor";
 					Player = player;
+					ReplicateOut = true;
 				};
 			end
 			victorNpcClass.PlayAnimation("Sit");
