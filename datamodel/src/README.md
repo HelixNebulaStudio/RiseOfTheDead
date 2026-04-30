@@ -2,6 +2,7 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes to code in Engine codebase:
+- Fixed locked out Npcs (e.g. Frank & Jesse) from certain doors.
 - Fixed Instrument Interface. [#1135] [#1136]
 - Fixed April Fool's initial dialogue spam. [#1130] [#1111]
 - Fixed npc immunity not being factored into damage calculations. [#1141] [#1168] [#1142]
