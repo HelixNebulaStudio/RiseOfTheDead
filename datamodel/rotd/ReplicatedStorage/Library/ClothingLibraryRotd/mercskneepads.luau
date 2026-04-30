@@ -9,6 +9,7 @@ local attirePackage = {
 	Configurations={
 		HotEquipSlots = 1;
 		EquipTimeReduction = 0.4;
+		Warmth = 2;
 	};
 	Properties={};
 };

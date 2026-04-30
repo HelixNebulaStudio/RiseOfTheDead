@@ -269,6 +269,7 @@ export type EventService = {
 export type Profiles = {
     -- @static
     new: (player: Player) -> Profile;
+    getUserIdFromName: (userName: string) -> number?;
 
     -- @methods
     Get: (Profiles, player: Player) -> Profile;
@@ -278,6 +279,7 @@ export type Profiles = {
 
     -- @signals
     OnProfileLoad: EventSignal<Player, Profile>;
+    OnPlayerPacketRecieved: EventSignal<Profile>;
 };
 
 export type Profile = {
@@ -288,6 +290,7 @@ export type Profile = {
     LastOnline: number;
 
     Garbage: GarbageHandler;
+    ToastPackets: ToastPackets;
 
     GameSave: GameSave;
     ActiveGameSave: GameSave;
@@ -362,6 +365,16 @@ export type MissionsProfile = {
 
     -- @signal
     OnMissionChanged: EventSignal<Mission>;
+};
+
+export type ToastPackets = {
+    List: anydict;
+
+    -- @methods
+    Add: (ToastPackets, anydict) -> nil;
+    Remove: (ToastPackets, anydict) -> nil;
+    Refresh: (ToastPackets) -> nil;
+    GetById: (ToastPackets, id: string) -> anydict;
 };
 
 --MARK: Storage
@@ -920,6 +933,7 @@ export type InteractableInstance = {
     Part: BasePart;
     ProxyPart: BasePart;
     Point: Vector3;
+    PointAtt: Attachment;
     PointOffset: Vector3;
 
     Variant: string;
@@ -1643,6 +1657,7 @@ export type TeamsManager = {
 
     -- @methods
     getTeam: (guid: string) -> TeamClass?;
+    getTeamAsync: (guid: string) -> TeamClass?;
     getTeamByName: (name: string) -> TeamClass?;
     getTeamByPlayer: (player: Player, teamType: string) -> TeamClass?;
     getTeamByMemberName: (name: string, teamType: string) -> TeamClass?;
@@ -1661,6 +1676,7 @@ export type TeamClass = {
     Name: string;
     Type: string;
 
+    Global: boolean;
     MembersCount: number;
     Members: {[string]: {
         Index: number;
@@ -1677,9 +1693,13 @@ export type TeamClass = {
     DestroyOnZeroMembers: boolean;
 
     --@methods
+    GetMember: (TeamClass, name: string) -> TeamMate?;
     SetMember: (TeamClass, name: string, isSet: boolean, proxyTeammate: anydict?) -> nil;
+
     ClientLoad: (TeamClass, data: anydict) -> nil;
     GetTeamAsync: (TeamClass) -> nil;
+    Shrink: (TeamClass) -> anydict;
+    Unshrink: (TeamClass, anydict) -> nil;
     Sync: (TeamClass) -> nil;
     GetMemberCharacterClass: (TeamClass, name: string) -> CharacterClass?;
 };
@@ -1867,6 +1887,7 @@ export type HealthComp = {
     LastArmorDamageTaken: number;
     
     CanBeHurtByBoolString: string?;
+    DefaultCanBeHurtByBoolString: string?;
     
     -- @methods
     Reset: (HealthComp) -> nil;
@@ -1912,6 +1933,7 @@ export type StatusComp = {
 
     Process: (StatusComp, loopFunc: ((uid: string, statusClass: StatusClassInstance, processData: anydict)->nil)?, fireOnProcess: boolean?) -> nil;
     Reset: (StatusComp) -> nil;
+    Destroy: (StatusComp) -> nil;
 
     Sync: (StatusComp, uid: string, players: any) -> nil;
 

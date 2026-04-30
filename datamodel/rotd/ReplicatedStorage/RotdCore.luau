@@ -66,6 +66,7 @@ end
 
 function RotdCore.onRequire()
     Debugger:Print("RotdCore onRequire.");
+    
 end
 
 Debugger:Print("Init RotdCore.");

@@ -16,9 +16,6 @@ local interfacePackage = {
 --==
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
-    local remoteOnInvitationsUpdate = modRemotesManager:Get("OnInvitationsUpdate");
-    local remoteSquadSync = modRemotesManager:Get("SquadSync");
-
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
     local templateSquadMember = script:WaitForChild("SquadMember");
@@ -44,19 +41,19 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     --MARK: OnUpdate
     hudWindow.OnUpdate:Connect(function()
         local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
-        local activeSquadType = playerClass.Properties.ActiveTeamType or "Party";
-        local squadData: TeamClass = modTeamsManager.getTeamByPlayer(localPlayer, activeSquadType);
+        local activeSquadType = playerClass.Properties.ActiveTeamType or "Squad";
+        local squadTeam: TeamClass = modTeamsManager.getTeamByPlayer(localPlayer, activeSquadType);
 
         local updatedMember = {};
 
         local hideSquadMarkers = modData.Settings.HideSquadMarkers == 1;
 
-        if squadData then
-            for name, memberData in pairs(squadData.Members) do
+        if squadTeam then
+            for name, memberData in pairs(squadTeam.Members) do
                 local hudObjects = binds.HudObjects[name];
-                if hudObjects == nil or hudObjects.Guid ~= squadData.Guid then
+                if hudObjects == nil or hudObjects.Guid ~= squadTeam.Guid then
                     hudObjects = {
-                        Guid = squadData.Guid;
+                        Guid = squadTeam.Guid;
                     };
                     binds.HudObjects[name] = hudObjects;
                 end
@@ -69,7 +66,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     hudObjects.Frame = memberFrame;
                 end
                 updatedMember[name] = true;
-                memberFrame.LayoutOrder = squadData.MembersCount - memberData.Index;
+                memberFrame.LayoutOrder = squadTeam.MembersCount - memberData.Index;
                 
                 local radialBar = memberFrame:WaitForChild("radialBar");
                 local avatarButton = memberFrame:WaitForChild("AvatarButton");
@@ -167,7 +164,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end)
 
     interface:BindEvent("TeamUpdated", function(team: TeamClass)
-        if team.Type ~= "Party" then return end;
+        if team.Type ~= "Squad" then return end;
         hudWindow:Update();
     end)
 

@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService");
 local localPlayer = game.Players.LocalPlayer;
 
 local modCollectiblesLibrary = shared.require(game.ReplicatedStorage.Library.CollectiblesLibrary);
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManagerRotd);
 
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 --==
@@ -27,6 +28,8 @@ function modPlayers.onRequire()
 			profile:UnlockCollectible(collectibleId);
 		end)
 	end)
+	
+	task.spawn(InitDuelSystem);
 end
 
 shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
@@ -49,5 +52,35 @@ shared.coreBind(modPlayers.Player, "_character_added", function(playerClass: Pla
     local characterComp = playerClass.CharacterComp;
 
 end)
+
+function InitDuelSystem()
+	if RunService:IsClient() then return end;
+
+	local duelStatusPackage = shared.require(game.ReplicatedStorage.Library.StatusLibraryRotd.Duel);
+
+	local remoteDuelRequest = modRemotesManager:Get("DuelRequest");
+	remoteDuelRequest.OnServerEvent:Connect(function(player, requestType, targetName)
+		if requestType == "request" then
+			duelStatusPackage.sendAndHandleRequest(player, targetName, 1);
+		end
+	end)
+
+    shared.modCommandsLibrary.bind{
+		["pvp"]={
+			Permission = shared.modCommandsLibrary.PermissionLevel.All;
+			Description = [[Request a player to a duel.]];
+
+			RequiredArgs = 0;
+			UsageInfo = "/pvp playerName [damageMultiplier]";
+			Function = function(speaker: Player, args)
+				local player = speaker;
+				local targetName = args[1];
+				local dmgMulti = args[2] or 1;
+
+				duelStatusPackage.sendAndHandleRequest(player, targetName, dmgMulti);
+			end
+		};
+    };
+end
 
 return modPlayers;

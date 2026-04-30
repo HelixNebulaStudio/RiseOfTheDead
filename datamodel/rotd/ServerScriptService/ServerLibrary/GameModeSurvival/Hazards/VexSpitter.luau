@@ -1,5 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
+
 local Hazard = {
 	Title = "Vex Spitters";
 	Description = "They spit volatile blob at you!";
@@ -39,6 +41,16 @@ function Hazard:Begin()
 				CFrame = CFrame.new(deathPosition);
 				BindSetup = function(npcClass: NpcClass)
 					npcClass.Properties.Level = rawProperties.Level;
+
+					local healthComp: HealthComp = npcClass.HealthComp;
+					task.spawn(function()
+						while not healthComp.IsDead do
+							task.wait(1);
+							healthComp:TakeDamage(DamageData.new{
+								Damage = healthComp.MaxHealth * 0.05;
+							})
+						end
+					end)
 				end;
 			};
 		end

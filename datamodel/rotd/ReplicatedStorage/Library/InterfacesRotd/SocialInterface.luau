@@ -18,6 +18,7 @@ local modCollectiblesLibrary = shared.require(game.ReplicatedStorage.Library.Col
 local modPlayerTitlesLibrary = shared.require(game.ReplicatedStorage.Library.PlayerTitlesLibrary);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
+local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManager);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 
@@ -43,14 +44,13 @@ end
 function interfacePackage.newInstance(interface: InterfaceInstance)
     local remotes = game.ReplicatedStorage.Remotes;
     local remoteWorldTravelRequest = remotes.Interactable.WorldTravelRequest;
-    local remoteSquadService = modRemotesManager:Get("SquadService");
-    local remoteOnInvitationsUpdate = modRemotesManager:Get("OnInvitationsUpdate");
     local remoteRequestPublicProfile = modRemotesManager:Get("RequestPublicProfile");
     local remoteProgressMission = modRemotesManager:Get("ProgressMission");
     local remoteSetPlayerTitle = modRemotesManager:Get("SetPlayerTitle");
     local remoteDuelRequest = modRemotesManager:Get("DuelRequest");
     local remoteTradeRequest = modRemotesManager:Get("TradeRequest");
     local remotePlayerSearch = modRemotesManager:Get("PlayerSearch");
+    local remoteTeamsManager = modRemotesManager:Get("TeamsManager");
     
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
     local branchColor = modBranchConfigurations.BranchColor
@@ -230,28 +230,42 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
     end
 
-    local function getInvitationFrom(name)
-        for a=1, #invitationsList do
-            local invitation = invitationsList[a];
-            if invitation.Name == name and invitation.Type == "Squad" then
-                return invitation;
+    local function getInvitations(typeName)
+        local r = {};
+
+        for _, packet in pairs(modData.ToastPackets.List) do
+            if typeName and packet.Type ~= typeName then continue end;
+            if typeName == nil and string.match(packet.Type, "Invite") == nil then continue end;
+            if packet._hide == packet.AddTime then continue end;
+
+            table.insert(r, packet);
+        end
+
+        return r;
+    end
+    local function getInvitationFrom(typeName, name)
+        for _, packet in pairs(modData.ToastPackets.List) do
+            if packet.Type ~= typeName then continue end;
+            if packet._hide == packet.AddTime then continue end;
+
+            if packet.SenderName == name then
+                return packet;
             end
         end
         return;
     end
 
-    interface.Garbage:Tag(remoteOnInvitationsUpdate.OnClientEvent:Connect(function(invitations)
-        invitationsList = invitations or {};
-        for a=1, #invitationsList do
-            modData.SquadRequests[invitationsList[a].Name] = tick();
-        end
-    end));
+    interface.OnInterfaceEvent:Connect(function(action, toastPackets)
+        if action ~= "UpdateToast" then return end;
+
+        Debugger:StudioWarn("OnUpdateToast", toastPackets);
+    end)
 
     local function CacheAvatar(name, userId)
         if modGlobalVars.AvatarCache[name] then return modGlobalVars.AvatarCache[name]; end;
         if userId then
             if type(userId) == "number" then
-                spawn(function()
+                task.spawn(function()
                     pcall(function()
                         modGlobalVars.AvatarCache[name] = game.Players:GetUserThumbnailAsync(userId > 0 
                             and userId or modGlobalVars.UseRandomId(), THUMBNAIL_TYPE, THUMBNAIL_SIZE);
@@ -561,7 +575,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     badgeButtons[lib.Id] = new;
                     new.LayoutOrder = owned or order+a;
                     
-                    spawn(function()
+                    task.spawn(function()
                         if lib.BadgeInfo == nil then
                             pcall(function()
                                 lib.BadgeInfo = BadgeService:GetBadgeInfoAsync(lib.BadgeId);
@@ -584,7 +598,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     new.Parent = profileDisplayList.achievements.ScrollingFrame;
                 end
                 pcall(function()
-                    spawn(function()
+                    task.spawn(function()
                         profileDisplayList.achievements.Size = UDim2.new(1, 0, 0, profileDisplayList.achievements.ScrollingFrame.UIGridLayout.AbsoluteContentSize.Y+80);
     --				if profileDisplayList.achievements.ScrollingFrame.UIGridLayout.AbsoluteContentSize.Y > 79 then
     --					profileDisplayList.achievements.Size = UDim2.new(1, 0, 0, 240);
@@ -632,9 +646,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             profileDisplayList.focusLevels.Visible = false;
         end
         
-        selectionWorldName = modBranchConfigurations.WorldName;
-        if modData.Squad and modData.Squad.Members and modData.Squad.Members[playerName] then
-            selectionWorldName = (modData.Squad.Members[playerName].World or "Unknown");
+        selectionWorldName = shared.WorldName;
+
+        local squadTeam = modTeamsManager.getTeamByPlayer(localPlayer, "Squad");
+        if squadTeam and squadTeam.Members[playerName] then
+            selectionWorldName = (squadTeam.Members[playerName].Values.WorldName or "Unknown");
         elseif binds.FriendsList and binds.FriendsList[playerName] and binds.FriendsList[playerName].InUniverse then
             selectionWorldName = (modBranchConfigurations.GetWorldName(binds.FriendsList[playerName].PlaceId) or "Unknown");
         end
@@ -644,16 +660,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 
     local function UpdateListing(data)
-        local listing = binds.ActivePlayerListing[data.Name];
+        local curPlayerName = data.Name;
+        local listing = binds.ActivePlayerListing[curPlayerName];
         if listing == nil then
             listing = playerListingTemplate:Clone();
             listing.Parent = list;
-            binds.ActivePlayerListing[data.Name] = listing;
+            binds.ActivePlayerListing[curPlayerName] = listing;
             
             listing.MouseButton1Down:Connect(function()
                 interface:PlayButtonClick();
                 
-                if playerSelection == data.Name and activeOptionsFrame then
+                if playerSelection == curPlayerName and activeOptionsFrame then
                     activeOptionsFrame:Destroy();
                     activeOptionsFrame = nil;
                 else
@@ -684,7 +701,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         new.MouseButton1Click:Connect(function()
                             interface:PlayButtonClick();
                             if onClick then
-                                onClick();
+                                onClick(new);
                             end
                             if activeOptionsFrame then
                                 activeOptionsFrame:Destroy();
@@ -693,132 +710,139 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         end)
                     end
                     
-                    local targetName = data.Name;
-                    local isInGame = game.Players:FindFirstChild(targetName) ~= nil;
+                    local isInGame = game.Players:FindFirstChild(curPlayerName) ~= nil;
                     
                     newOptionButton(
-                        targetName ~= localPlayer.Name and isInGame,
+                        curPlayerName ~= localPlayer.Name and isInGame,
                         "Invite to Trade",
                         function()
-                            remoteTradeRequest:FireServer("request", targetName);
+                            remoteTradeRequest:FireServer("request", curPlayerName);
                     end)
                     newOptionButton(
-                        targetName ~= localPlayer.Name and isInGame 
-                        and modData.TradeRequests[targetName] and tick()-modData.TradeRequests[targetName] <= 30,
+                        curPlayerName ~= localPlayer.Name and isInGame 
+                        and getInvitationFrom("TradeInvite", curPlayerName),
                         "Accept Trade Request",
                         function()
-                            remoteTradeRequest:FireServer("request", targetName);
+                            local tradeInvitePacket = getInvitationFrom("TradeInvite", curPlayerName);
+                            tradeInvitePacket._hide = tradeInvitePacket.AddTime;
+                            remoteTradeRequest:FireServer("request", curPlayerName);
                     end)
+
+                    -- Duel options
                     newOptionButton(
-                        targetName ~= localPlayer.Name and isInGame,
+                        curPlayerName ~= localPlayer.Name and isInGame,
                         "Invite to Duel",
                         function()
-                            remoteDuelRequest:FireServer("request", targetName);
+                            remoteDuelRequest:FireServer("request", curPlayerName);
                     end)
                     newOptionButton(
-                        targetName ~= localPlayer.Name and isInGame 
-                        and modData.DuelRequests[targetName] and tick()-modData.DuelRequests[targetName] <= 30,
+                        curPlayerName ~= localPlayer.Name and isInGame 
+                        and getInvitationFrom("DuelInvite", curPlayerName) ~= nil,
                         "Accept Duel Request",
                         function()
-                            remoteDuelRequest:FireServer("request", targetName);
+                            local duelInvitePacket = getInvitationFrom("DuelInvite", curPlayerName);
+                            duelInvitePacket._hide = duelInvitePacket.AddTime;
+                            remoteDuelRequest:FireServer("request", curPlayerName);
                     end)
+
+                    --MARK: Squad Options
+                    local squadTeam = modTeamsManager.getTeamByPlayer(localPlayer, "Squad");
                     newOptionButton(
-                        targetName ~= localPlayer.Name and (modData.Squad == nil or modData.Squad:FindMember(targetName) == nil),
+                        curPlayerName ~= localPlayer.Name and (squadTeam == nil or squadTeam:GetMember(curPlayerName) == nil),
                         "Invite to Squad",
                         function()
-                            if inviteDebounce[targetName] then return end;
-                            inviteDebounce[targetName] = true;
-                            delay(5, function() inviteDebounce[targetName] = nil; end);
-                            remoteSquadService:FireServer("invite",targetName);
+                            if inviteDebounce[curPlayerName] then return end;
+                            inviteDebounce[curPlayerName] = true;
+                            task.delay(5, function() inviteDebounce[curPlayerName] = nil; end);
+                            
+                            local rPacket = remoteTeamsManager:InvokeServer("invitetosquad", curPlayerName);
                     end)
                     newOptionButton(
-                        targetName == localPlayer.Name and modData.Squad ~= nil,
+                        curPlayerName == localPlayer.Name and squadTeam,
                         "Leave Squad",
-                        function()
-                            remoteSquadService:FireServer("leave");
+                        function(button)
+                            local rPacket = remoteTeamsManager:InvokeServer("leavesquad");
                     end)
                     newOptionButton(
-                        getInvitationFrom(targetName) ~= nil,
+                        getInvitationFrom("SquadInvite", curPlayerName) ~= nil,
                         "Join Squad",
                         function()
-                            local invitation = getInvitationFrom(targetName);
-                            if invitation then
-                                for a=#invitationsList, 1, -1 do
-                                    invitation = invitationsList[a];
-                                    if invitation.Name == targetName and invitation.Type == "Squad" then
-                                        table.remove(invitationsList, a);
-                                    end
-                                end
-                                remoteSquadService:FireServer("join", targetName);
+                            local squadInvitePacket = getInvitationFrom("SquadInvite", curPlayerName);
+                            if squadInvitePacket then
+                                squadInvitePacket._hide = squadInvitePacket.AddTime;
+                                local teamGuid = squadInvitePacket.Id;
+                                local rPacket = remoteTeamsManager:InvokeServer("joinsquadguid", teamGuid);
                             end
                         end)
+
+
                     newOptionButton(
-                        targetName ~= localPlayer.Name and modData.MutePlayerNoise[targetName] == nil,
+                        curPlayerName ~= localPlayer.Name and modData.MutePlayerNoise[curPlayerName] == nil,
                         "Mute Noise",
                         function()
-                            modData.MutePlayerNoise[targetName] = true;
-                            modData.RefreshPlayerNoise(targetName);
+                            modData.MutePlayerNoise[curPlayerName] = true;
+                            modData.RefreshPlayerNoise(curPlayerName);
                         end)
                     newOptionButton(
-                        targetName ~= localPlayer.Name and modData.MutePlayerNoise[targetName] ~= nil,
+                        curPlayerName ~= localPlayer.Name and modData.MutePlayerNoise[curPlayerName] ~= nil,
                         "Unmute Noises",
                         function()
-                            modData.MutePlayerNoise[targetName] = nil;
-                            modData.RefreshPlayerNoise(targetName);
+                            modData.MutePlayerNoise[curPlayerName] = nil;
+                            modData.RefreshPlayerNoise(curPlayerName);
                         end)
                     
                     
-                    if modData.Squad and modData.Squad.Members and modData.Squad.Members[targetName] then
-                        selectionWorldName = (modData.Squad.Members[targetName].World or "Unknown");
-                    elseif binds.FriendsList and binds.FriendsList[targetName] and binds.FriendsList[targetName].InUniverse then
-                        selectionWorldName = (modBranchConfigurations.GetWorldName(binds.FriendsList[targetName].PlaceId) or "Unknown");
+                    if squadTeam and squadTeam.Members[curPlayerName] then
+                        selectionWorldName = (squadTeam.Members[curPlayerName].Values.WorldName or "Unknown");
+                    elseif binds.FriendsList and binds.FriendsList[curPlayerName] and binds.FriendsList[curPlayerName].InUniverse then
+                        selectionWorldName = (modBranchConfigurations.GetWorldName(binds.FriendsList[curPlayerName].PlaceId) or "Unknown");
                     end
                     
                     local travelDisabled = false;
-                    if selectionWorldName ~= modBranchConfigurations.WorldName or game.Players:FindFirstChild(targetName) == nil then
+                    if selectionWorldName ~= modBranchConfigurations.WorldName or game.Players:FindFirstChild(curPlayerName) == nil then
                         local worldInfo = modBranchConfigurations.Worlds[selectionWorldName];
-                        if worldInfo and worldInfo.CanTravelTo and binds.FriendsList[targetName] then
-                            if binds.FriendsList[targetName].SearchedPlayer then
+                        if worldInfo and worldInfo.CanTravelTo and binds.FriendsList[curPlayerName] then
+                            if binds.FriendsList[curPlayerName].SearchedPlayer then
                                 newOptionButton(
-                                    targetName ~= localPlayer.Name,
+                                    curPlayerName ~= localPlayer.Name,
                                     "Request to Travel",
                                     function()
                                         if mission1Data == nil or mission1Data.Type ~= 3 then
                                             modClientGuis.promptWarning("Please complete the first mission.");
                                             return;
                                         end
-                                        remoteWorldTravelRequest:InvokeServer("TravelRequest", targetName)
+                                        remoteWorldTravelRequest:InvokeServer("TravelRequest", curPlayerName)
                                     end
                                 )
                                 
-                            elseif binds.FriendsList[targetName].TravelRequest then
+                            elseif binds.FriendsList[curPlayerName].TravelRequest then
                                 newOptionButton(
-                                    targetName ~= localPlayer.Name,
+                                    curPlayerName ~= localPlayer.Name,
                                     "Accept Travel Request",
                                     function()
                                         if mission1Data == nil or mission1Data.Type ~= 3 then
                                             modClientGuis.promptWarning("Please complete the first mission.");
                                             return;
                                         end
-                                        remoteWorldTravelRequest:InvokeServer("AcceptTravel", targetName)
-                                        binds.FriendsList[targetName] = nil;
+                                        remoteWorldTravelRequest:InvokeServer("AcceptTravel", curPlayerName)
+                                        binds.FriendsList[curPlayerName] = nil;
                                 end)
                                 newOptionButton(
-                                    targetName ~= localPlayer.Name,
+                                    curPlayerName ~= localPlayer.Name,
                                     "Deny Travel Request",
                                     function()
                                         for a=#modData.TravelRequests, 1, -1 do
-                                            if modData.TravelRequests[a].UserName == targetName then
+                                            if modData.TravelRequests[a].UserName == curPlayerName then
                                                 table.remove(modData.TravelRequests, a);
                                             end
                                         end
-                                        binds.FriendsList[targetName] = nil;
+                                        binds.FriendsList[curPlayerName] = nil;
                                         window:Update();
                                 end)
                                 
                             else
                                 newOptionButton(
-                                    targetName ~= localPlayer.Name and game.Players:FindFirstChild(targetName) == nil,
+                                    curPlayerName ~= localPlayer.Name and game.Players:FindFirstChild(curPlayerName) == nil,
                                     "Travel to Player",
                                     function()
                                         if travelDisabled then return end;
@@ -835,7 +859,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                         YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
                                             interface:PlayButtonClick();
                                             promptWindow:Close();
-                                            if remoteWorldTravelRequest:InvokeServer("Social", targetName) == true then
+                                            if remoteWorldTravelRequest:InvokeServer("Social", curPlayerName) == true then
                                                 travelDisabled = true;
                                             end
                                             YesClickedSignal:Disconnect();
@@ -858,7 +882,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         activeOptionsFrame.Size = UDim2.new(1, 0, 0, 0);
                     end
                 end
-                binds.SelectPlayer(data.Name, true);
+                binds.SelectPlayer(curPlayerName, true);
             end)
         end
         local avatarLabel = listing:WaitForChild("Avatar");
@@ -874,31 +898,31 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         local squadRequestIcon = alertsFrame:WaitForChild("squadRequestIcon");
         local duelRequestIcon = alertsFrame:WaitForChild("duelRequestIcon");
         
-        if modData.TradeRequests[data.Name] and tick()-modData.TradeRequests[data.Name] <= 30 then
+        if getInvitationFrom("TradeInvite", curPlayerName) then
             tradeRequestIcon.Visible = true;
         else
             tradeRequestIcon.Visible = false;
         end
         
-        if modData.SquadRequests[data.Name] and tick()-modData.SquadRequests[data.Name] <= 20 then
+        if getInvitationFrom("SquadInvite", curPlayerName) then
             squadRequestIcon.Visible = true;
         else
             squadRequestIcon.Visible = false;
         end
         
-        if modData.DuelRequests[data.Name] and tick()-modData.DuelRequests[data.Name] <= 60 then
+        if getInvitationFrom("DuelInvite", curPlayerName) then
             duelRequestIcon.Visible = true;
         else
             duelRequestIcon.Visible = false;
         end
         
         local function update()
-            local playerData = modData.Players[data.Name];
+            local playerData = modData.Players[curPlayerName];
             
-            nameLabel.Text = data.Name;
+            nameLabel.Text = curPlayerName;
             avatarLabel.Image = data.Avatar or "";
             
-            local thatPlayer = game.Players:FindFirstChild(data.Name);
+            local thatPlayer = game.Players:FindFirstChild(curPlayerName);
             if thatPlayer then
                 --healthBarFrame.Visible = true;
                 locationLabel.Visible = false;
@@ -929,10 +953,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 --healthBarFrame.Visible = false;
                 locationLabel.Visible = true;
                 titleLabel.Visible = false;
-                local worldId = data.PlaceId and modBranchConfigurations.GetWorldName(data.PlaceId) or data.WorldId;
-                locationLabel.Text = modBranchConfigurations.GetWorldDisplayName(worldId) or "Unknown";
+                local worldName = data.PlaceId and modBranchConfigurations.GetWorldName(data.PlaceId) or data.WorldName;
+                locationLabel.Text = modBranchConfigurations.GetWorldDisplayName(worldName) or "Unknown";
             end
-            if modData.Players[data.Name] then
+            if modData.Players[curPlayerName] then
                 if playerData.Role then
                     if playerData.Role == "Founder" then
                         nameLabel.TextColor3 = Color3.fromRGB(231,186,115);
@@ -944,7 +968,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 else
                     nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
                 end
-                modData.Players[data.Name].Avatar = data.Avatar;
+                modData.Players[curPlayerName].Avatar = data.Avatar;
                 
                 if playerData.Stats and playerData.Stats.Level then
                     levelIcon.Visible = true;
@@ -1042,7 +1066,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
         
         --== Squads;
-        if modData.Squad then
+        local squadTeam = modTeamsManager.getTeamByPlayer(localPlayer, "Squad");
+        if squadTeam then
             local squadTab = list:FindFirstChild("SquadTab");
             if squadTab == nil then
                 local new = friendsTabTemplate:Clone();
@@ -1052,20 +1077,24 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 squadTab = new;
             end
             local socialTabLabel = squadTab.Labeltag;
-            for userName, memberData in pairs(modData.Squad.Members) do
+            local mCount = 0;
+            for mName, mData in pairs(squadTeam.Members) do
+                mCount += 1;
+                
                 local listing = UpdateListing{
-                    Name=userName;
-                    Avatar=CacheAvatar(userName, memberData.UserId);
-                    WorldId=memberData.World;
+                    Name = mName;
+                    Avatar = CacheAvatar(mName, mData.UserId);
+                    WorldId = mData.Values.WorldName;
                 };
-                if userName == localPlayer.Name then
+                if mName == localPlayer.Name then
                     listing.LayoutOrder = -9;
                 else
                     listing.LayoutOrder = -7;
                 end
-                updated[userName] = true;
+                updated[mName] = true;
             end
-            socialTabLabel.Text = "Squad ("..modData.Squad:LoopPlayers().."/6)";
+            
+            socialTabLabel.Text = `Squad ({mCount}/6)`;
         else
             for _, obj in pairs(list:GetChildren()) do
                 if obj:IsA("GuiObject") and obj.Name == "SquadTab" then
@@ -1093,7 +1122,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
         
         debounce = false;
-        spawn(function() binds.SelectPlayer(playerSelection, false); end);
+        task.spawn(function() binds.SelectPlayer(playerSelection, false); end);
     end)
 
 
@@ -1148,24 +1177,19 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
     end)
 
-	local amtLabel = quickButton:WaitForChild("AmtFrame"):WaitForChild("AmtLabel");
+    local amtFrame = quickButton:WaitForChild("AmtFrame");
+	local amtLabel = amtFrame:WaitForChild("AmtLabel");
     interface.Scheduler.OnStepped:Connect(function(tickData: TickData)
-        if tickData.s10 ~= true then return end;
+        if tickData.ms1000 ~= true then return end;
 
-        if menuFrame.Visible then
+        if menuFrame.Visible and tickData.s5 then
             UpdateApplicableFriends();
             window:Update();
         end
 
-        local onlineFriends = 0;
-        if binds.FriendsList then
-            for userName, friendData in pairs(binds.FriendsList) do
-                if friendData.InUniverse then 
-                    onlineFriends = onlineFriends +1;
-                end
-            end
-        end
-        amtLabel.Text = onlineFriends > 0 and onlineFriends or "";
+        local invCount = #getInvitations();
+        amtLabel.Text = invCount;
+        amtFrame.Visible = invCount > 0;
     end)
 	task.spawn(UpdateApplicableFriends);
 

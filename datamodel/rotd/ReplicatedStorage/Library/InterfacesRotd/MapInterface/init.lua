@@ -444,8 +444,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			if class == "Player" then
 				local uiStroke = new.Frame:FindFirstChild("UIStroke");
-				local activeSquadType = localPlayerClass.Properties.ActiveTeamType or "Party";
-				local localSquadData: TeamClass = modTeamsManager.getTeamByPlayer(localPlayer, activeSquadType);
+				local activeSquadType = localPlayerClass.Properties.ActiveTeamType or "Squad";
+				local squadTeam: TeamClass = modTeamsManager.getTeamByPlayer(localPlayer, activeSquadType);
 
 				local playerClass = shared.modPlayers.getByName(name);
 				if playerClass and (new.Object == nil or not game:IsAncestorOf(new.Object)) then
@@ -461,7 +461,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					new.Frame.Size = UDim2.new(0, 25, 0, 25);
 					new.Frame.ImageColor3 = Color3.fromRGB(255, 255, 255);
 					
-					local memberData = localSquadData.Members[name];
+					local memberData = squadTeam and squadTeam.Members[name] or nil;
 					if memberData and memberData.Values.Color then
 						if uiStroke then
 							uiStroke.Enabled = true;

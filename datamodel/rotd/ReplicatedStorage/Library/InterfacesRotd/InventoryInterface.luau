@@ -640,8 +640,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		configurations:Calculate();
 		for k, v in pairs(configurations:GetKeyPairs()) do
-			if k == "Warmth" and configurations.Warmth then
-				local warmth = localPlayer:GetAttribute("Warmth") or 25;
+			if k == "Warmth" then
+				local warmth = playerClass.Properties.Warmth or 25;
 				table.insert(beStr, {SortKey="Warmth"; Text=`<b>Warmth:</b> {warmth} °C`;});
 
 			elseif k == "PassiveModifiers" then
@@ -668,9 +668,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 
 	local function updateWarmth()
-		local warmth = localPlayer:GetAttribute("Warmth") or 25;
+		local warmth = playerClass.Properties.Warmth or 25;
 		temperatureLabel.Text = `{warmth}°C`;
 	end
+	interface.Garbage:Tag(playerClass.Properties.OnChanged:Connect(function(k)
+		if k ~= "Warmth" then return end;
+		updateWarmth(); 
+	end));
 	
 	local weaponStatsWindow: InterfaceWindow;
 	--MARK: OnToggle

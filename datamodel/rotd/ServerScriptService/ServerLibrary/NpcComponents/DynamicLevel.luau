@@ -72,7 +72,7 @@ function Component:__call(callerCharacterClass: CharacterClass)
 
 			preLevel = math.round(playerLevel * (areaDifficulty/10));
 		else
-			preLevel = math.round((areaDifficulty/10) * modGlobalVars.MaxLevels);
+			preLevel = math.round((areaDifficulty/10) * math.ceil(modGlobalVars.MaxLevels/10));
 		end
 		preLevel = math.max(preLevel, 0);
 			

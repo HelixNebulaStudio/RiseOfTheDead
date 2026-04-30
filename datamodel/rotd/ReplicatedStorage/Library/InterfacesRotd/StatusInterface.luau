@@ -164,7 +164,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end
 				descStr = descStr:gsub("$"..k, v);
 			end
-			
+
+			if statusClass.Values.SkillData then
+				local skillKeys = {"Percent"};
+
+				for _, k in ipairs(skillKeys) do
+					local v = statusClass.Values.SkillData.Stats[k];
+					if v == nil then continue end;
+					
+					if lib.DescProcess and lib.DescProcess[k] then
+						v = lib.DescProcess[k](v.Value);
+					end
+					descStr = descStr:gsub("$"..k, v.Value);
+				end
+			end
+
 			status.Info.Text = descStr;
 		end
 	end

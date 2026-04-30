@@ -130,7 +130,7 @@ function toolPackage.init()
 						if interactable == nil then continue end;
 
 						local interactPart = interactable.Part;
-						local interactPoint = interactable.Point;
+						local interactPoint = interactable.PointAtt.WorldPosition;
 
 						local blacklights = CollectionService:GetTagged("BlacklightLights");
 						for _, blacklightModel in pairs(blacklights) do

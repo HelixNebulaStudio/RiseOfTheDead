@@ -3,14 +3,14 @@ local RunService = game:GetService("RunService");
 local localPlayer = game.Players.LocalPlayer;
 --==
 local statusPackage = {
-    Id="Freezing";
-    Icon="rbxassetid://10371553364";
-    Name="Freezing";
-    Description="You are freezing, you will lose mobility and won't be able to perform actions.";
-    Buff=false;
+    Id = "Freezing";
+    Icon = "rbxassetid://10371553364";
+    Name = "Freezing";
+    Description = "You are freezing, you will lose mobility and won't be able to perform actions.";
+    Buff = false;
     Tags = {"Mobility"; "Slow";};
-    Cleansable=true;
-    ExpiresOnDeath=true;
+    Cleansable = true;
+    ExpiresOnDeath = true;
 };
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)

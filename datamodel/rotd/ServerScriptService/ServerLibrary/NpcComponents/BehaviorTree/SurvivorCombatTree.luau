@@ -150,7 +150,7 @@ function treePackage.InMeleeRange(npcClass: NpcClass)
 
     if enemyTargetData.Distance <= (npcClass.Properties.MeleeRange or 20) then
         npcClass.Move:SetMoveSpeed("set", "sprint", 18, npcClass.Move.MoveSpeedPriority.Movement, 5);
-        npcClass.Move:Follow(enemyNpcClass.RootPart, 2);
+        npcClass.Move:Follow(enemyNpcClass.RootPart, 3, 2);
         return true;
     end
 

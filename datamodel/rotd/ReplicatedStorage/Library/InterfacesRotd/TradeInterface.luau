@@ -168,7 +168,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			if not slotInterface.WarnLabel.Visible then
 				slotInterface.WarnLabel.Text = msg
 				slotInterface.WarnLabel.Visible = true;
-				delay(1, function()
+				task.delay(1, function()
 					slotInterface.WarnLabel.Visible = false;
 				end)
 			end
@@ -997,13 +997,7 @@ local function holdButton(button, label, onClick)
     end
 
 	interface.Garbage:Tag(remoteTradeRequest.OnClientEvent:Connect(function(requestType, ...)
-		if requestType == "request" then
-			local playerName = ...;
-			modData.TradeRequests[playerName] = tick();
-			
-			interface:FireEvent("UpdateSocialMenu");
-			
-		elseif requestType == "tradesession" then
+		if requestType == "tradesession" then
 			local tradeSessionData = ...;
 
             binds.updateTradeSessionData(tradeSessionData);

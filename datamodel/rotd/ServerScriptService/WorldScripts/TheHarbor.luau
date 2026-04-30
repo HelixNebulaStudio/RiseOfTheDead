@@ -54,9 +54,12 @@ function WorldCore.onRequire()
 
         if triggerId == "HarborGiftSand" then
             task.spawn(function()
-                if modEvents:GetEvent(player, "HarborGiftSand") then return end;
+                if modEvents:GetEvent(player, "HarborGiftSand") then 
+                    modReplicationManager.UnreplicateFrom(player, interactable.Config.Parent);
+                    return
+                end;
                 modEvents:NewEvent(player, {Id="HarborGiftSand"}, true);
-                modReplicationManager.UnreplicateFrom(player, interactable.Part.Parent);
+                modReplicationManager.UnreplicateFrom(player, interactable.Config.Parent);
             end)
 
         elseif triggerId == "HarborGiftEntrance" then

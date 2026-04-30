@@ -374,7 +374,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
         elseif groupName == "ScrapPlating" then
             newDestructInfo = {
                 Name = "ScrapPlating";
-                Health = isHard and 10000 or 5000;
+                Health = isHard and 100000 or 10000;
             };
         end
 
@@ -432,19 +432,44 @@ function npcPackage.Spawned(npcClass: NpcClass)
                 
                 destructible.HealthComp.OnHealthChanged:Connect(function(curHealth, oldHealth, damageData)
                     if curHealth > oldHealth then return end;
-                    healthComp:TakeDamage(DamageData.new{
-                        Damage = 1;
-                        DamageBy = damageData.DamageBy;
-                    });
 
-                    local total = #debrisParts;
-                    local alive = 0;
+                    local targetPart = damageData.TargetPart;
+                    if targetPart and destructibleModel:IsAncestorOf(targetPart) and targetPart.Transparency ~= 1 then
+                        local debrisPart = targetPart:Clone();
+                        debrisPart.Parent = workspace.Debris;
+                        game.Debris:AddItem(debrisPart, 5);
+                        targetPart.Transparency = 1;
+                    end
+
+                    local totalParts = #debrisParts;
+                    local hpRatio = curHealth/destructible.HealthComp.MaxHealth;
+                    local destroyedParts = math.ceil((1-hpRatio) * totalParts);
+
+                    local partsAlive = {};
                     for a=1, #debrisParts do
                         if debrisParts[a].Transparency == 1 then continue end;
-                        alive = alive +1;
+                        table.insert(partsAlive, debrisParts[a]);
                     end
-                    Debugger:Print(`Immunity update {alive}/{total}`);
-                    properties.Immunity = math.clamp(alive/total, 0.1, 1);
+                    for a=(totalParts-#partsAlive), destroyedParts do
+                        local destroyPart = table.remove(partsAlive, 1);
+                        local debrisPart = destroyPart:Clone();
+                        debrisPart.Parent = workspace.Debris;
+                        game.Debris:AddItem(debrisPart, 5);
+                        destroyPart.Transparency = 1;
+                    end
+
+                    properties.Immunity = math.clamp(#partsAlive/totalParts, 0.1, 1);
+                end)
+                destructible.OnDestroy:Connect(function()
+                    properties.Immunity = 0.1;
+                    for _, obj in pairs(debrisParts) do
+                        if obj.Transparency ~= 1 then
+                            local debrisPart = obj:Clone();
+                            debrisPart.Parent = workspace.Debris;
+                            game.Debris:AddItem(debrisPart, 5);
+                            obj.Transparency = 1;
+                        end
+                    end
                 end)
 
 

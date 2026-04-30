@@ -35,14 +35,12 @@ function Clothing:UpdateFlinch(equipmentClass: EquipmentClass)
 		local random = randomTemplate:Clone();
         local baseFlinchProtection = random:NextInteger(1, 99 * math.pow(random:NextNumber(), 3))/100;
 
-        local baseFlinchModifier: ItemModifierInstance = configurations:GetModifier("SeedFlinchProtection");
-        if baseFlinchModifier == nil then
-            baseFlinchModifier = configurations.newModifier("SeedFlinchProtection", 0);
-            configurations:AddModifier(baseFlinchModifier, false);
-        end
-
-        baseFlinchModifier.SumValues.FlinchProtection = baseFlinchProtection;
-        baseFlinchModifier.Tags.Base = true;
+        equipmentClass:AddBaseModifier("SeedFlinchProtection", {
+            Name = "FlinchProtection";
+            SumValues = {
+                FlinchProtection = baseFlinchProtection;
+            };
+        });
 	end
 end
 

@@ -42,7 +42,7 @@ local statTemplates = {
 
 		{Key="Dps"; Text="<b>DPS:</b>    $stat"; Type="3dp"; OrderOffset=99;};
 		-- Heavy attacks melee;
-		{Key="HeavyAttackMultiplier"; Text="<b>Heavy Attack Multiplier:</b>    $stat%"; Type="percent";};
+		{Key="HeavyAttackMultiplier"; Text="<b>Heavy Attack Multiplier:</b>    $stat"; Type="percent";};
 		{Key="HeavyAttackSpeed"; Text="<b>Heavy Attack Speed:</b>    $stat"; Type="3dp";};
 
 		{Key="LungeSpeed"; Text="<b>Lunge Speed:</b>    $stat u/s"; Type="int"};
@@ -53,15 +53,15 @@ local statTemplates = {
 		{Key="KnockoutDuration"; Text="<b>Knockout Duration:</b>    $stats"; Type="2dp";};
 
 		-- Throwing melee;
-		{Key="ThrowDamagePercent"; Text="<b>Throw Damage Percent:</b>    $stat%"; Type="percent";};
+		{Key="ThrowDamagePercent"; Text="<b>Throw Damage Percent:</b>    $stat"; Type="percent";};
 		{Key="ThrowStaminaCost"; Text="<b>Throwing Stamina Cost:</b>    $stat"; Type="2dp";};
 
 		{Key="Velocity"; Text="<b>Throw Velocity:</b>    $stat u/s"; Type="2dp";};
 		{Key="VelocityBonus"; Text="<b>Charge Velocity Bonus:</b>    $stat u/s"; Type="2dp";};
 		{Key="ChargeDuration"; Text="<b>Charge Time:</b>    $stats"; Type="2dp";};
 
-		{Key="BleedDamagePercent"; Text="<b>Bleed Damage Percent:</b>    $stat%"; Type="percent";};
-		{Key="BleedSlowPercent"; Text="<b>Bleed Slow Percent:</b>    $stat%"; Type="percent";};
+		{Key="BleedDamagePercent"; Text="<b>Bleed Damage Percent:</b>    $stat"; Type="percent";};
+		{Key="BleedSlowPercent"; Text="<b>Bleed Slow Percent:</b>    $stat"; Type="percent";};
 
 		{Key="ThrowRange"; Text="<b>Throwing Range:</b>    $stat u"; Type="2dp";};
 
@@ -69,23 +69,23 @@ local statTemplates = {
 	};
 	--MARK: Weapon stats;
 	Gun={
-		{Key="Potential"; Text="<b>Mastery:</b>    $stat%"; Type="percent2dp"};
+		{Key="Potential"; Text="<b>Mastery:</b>    $stat"; Type="percent2dp"};
 
 		{Key="PreModDamage"; Text="<b>PreModDamage:</b>    $stat"; Type="3dp"};
 		{Key="Damage"; Text="<b>Damage:</b>    $stat"; Type="3dp"};
-		{Key="CritMulti"; Text="<b>Crit Multiplier:</b>    $stat%"; Type="percent";
+		{Key="CritMulti"; Text="<b>Crit Multiplier:</b>    $stat"; Type="percent";
 			PostText=postTextFunc.PreModDamageAdd;
 		};
 		{Key="HeadshotMultiplier"; Text="<b>Headshot Multiplier:</b>    $stat%"; Type="percent"; OnlyExpand=true;
 			PostText=postTextFunc.PreModDamageAdd;
 		};
-		{Key="DamageRev"; Text="<b>Damage Rev:</b>    $stat%"; Type="percent";
+		{Key="DamageRev"; Text="<b>Damage Rev:</b>    $stat"; Type="percent";
 			PostText=postTextFunc.PreModDamageAdd;
 		};
 		--{Key="DamageCalibre"; Text="<b>Damage Calibre Shift:</b>    $stat"; Type="2dp"; OnlyExpand=true;
 		--	PostText=postTextFunc.PreModDamageAdd;
 		--};
-		{Key="CritChance"; Text="<b>Crit Chance:</b>    $stat%"; Type="percent2dp"};
+		{Key="CritChance"; Text="<b>Crit Chance:</b>    $stat"; Type="percent2dp"};
 		
 		{Key="Rpm"; Text="<b>Fire Rate:</b>    $stat RPM"; Type="1dp"};
 		{Key="ReloadTime"; Text="<b>Reload Time:</b>    $stats"; Type="3dp"};
@@ -99,8 +99,8 @@ local statTemplates = {
 		{Key="InaccDecaySpeed"; Text="<b>Inaccuracy Decay Speed:</b>    $stat"; Type="2dp"; OnlyExpand=true;};
 		
 		{Key="FocusDuration"; Text="<b>Focus Time:</b>    $stat"; Type="2dp"; OnlyExpand=true;};
-		{Key="FocusWalkSpeedReduction"; Text="<b>Focus Movespeed:</b>    $stat%"; Type="percent"; OnlyExpand=true;};
-		{Key="ChargeDamagePercent"; Text="<b>Focused Multiplier:</b>    $stat%"; Type="percent"; OnlyExpand=true;};
+		{Key="FocusWalkSpeedReduction"; Text="<b>Focus Movespeed:</b>    $stat"; Type="percent"; OnlyExpand=true;};
+		{Key="ChargeDamagePercent"; Text="<b>Focused Multiplier:</b>    $stat"; Type="percent"; OnlyExpand=true;};
 
 		
 		
@@ -137,8 +137,8 @@ local statTemplates = {
 	Clothing={
 		{Key="ArmorPoints"; Text="<b>Armor Points:</b>    $stat"; Type="int"};
 		{Key="HealthPoints"; Text="<b>Health Points:</b>    $stat"; Type="int"};
-		{Key="DamageReflection"; Text="<b>Damage Reflection:</b>    $stat%"; Type="percent"};
-		{Key="BulletProtection"; Text="<b>Bullet Protection:</b>    $stat%"; Type="percent"};
+		{Key="DamageReflection"; Text="<b>Damage Reflection:</b>    $stat"; Type="percent"};
+		{Key="BulletProtection"; Text="<b>Bullet Protection:</b>    $stat"; Type="percent"};
 		
 		{Key="HotEquipSlots"; Text="<b>Hotbar Slots:</b>    $stat"; Type="int"};
 
@@ -148,33 +148,29 @@ local statTemplates = {
 		
 		{Key="TickRepellent"; Text="<b>Ticks Protection:</b>    $stat"; Type="2dp"};
 		{Key="NekrosisHeal"; Text="<b>Nekrosis Heal:</b>    $stat hp/s"; Type="2dp"};
-		{Key="GasProtection"; Text="<b>Gas Protection:</b>    $stat%"; Type="percent"};
+		{Key="GasProtection"; Text="<b>Gas Protection:</b>    $stat"; Type="percent"};
 		
 		
-		{Key="UnderwaterVision"; Text="<b>Underwater Vision:</b>    $stat%"; Type="percent"};
-		{Key="OxygenDrainReduction"; Text="<b>Oxygen Drain Reduction:</b>    $stat%"; Type="percent"};
-		{Key="OxygenRecoveryIncrease"; Text="<b>Oxygen Recovery Increase:</b>    $stat%"; Type="percent"};
+		{Key="UnderwaterVision"; Text="<b>Underwater Vision:</b>    $stat"; Type="percent"};
+		{Key="OxygenDrainReduction"; Text="<b>Oxygen Drain Reduction:</b>    $stat"; Type="percent"};
+		{Key="OxygenRecoveryIncrease"; Text="<b>Oxygen Recovery Increase:</b>    $stat"; Type="percent"};
 		
 		
-		{Key="MoveImpairReduction"; Text="<b>Movement Impair Reduction:</b>    $stat%"; Type="percent"};
-		{Key="EquipTimeReduction"; Text="<b>Equip Time Reduction:</b>    $stat%"; Type="percent"};
+		{Key="MoveImpairReduction"; Text="<b>Movement Impair Reduction:</b>    $stat"; Type="percent"};
+		{Key="EquipTimeReduction"; Text="<b>Equip Time Reduction:</b>    $stat"; Type="percent"};
 		{Key="AdditionalStamina"; Text="<b>Stamina:</b>    +$stat"; Type="int"};
 		{Key="Warmth"; Text="<b>Warmth:</b>    $stat°C"; Type="int"};
 
-		{Key="FlinchProtection"; Text="<b>Flinch Protection:</b>    $stat%"; Type="percent"};
-		{Key="SplashReflection"; Text="<b>Splash Reflection:</b>    $stat%"; Type="percent"};
+		{Key="FlinchProtection"; Text="<b>Flinch Protection:</b>    $stat"; Type="percent"};
+		{Key="SplashReflection"; Text="<b>Splash Reflection:</b>    $stat"; Type="percent"};
 		
         {Key="EnemyDetectionRange"; Text="<b>Enemy Detection Range:</b>    $stat radius"; Type="int";};
 		{Key="PassiveModifiers"; Text="<b>Passives:</b>    $stat"; Type="string"; OnlyExpand=true;};
 
-		{Key="BlockChance"; Text="<b>[Melee Dampening] Chance:</b>    $stat%"; Type="percent";};
+		{Key="BlockChance"; Text="<b>[Melee Dampening] Chance:</b>    $stat"; Type="percent";};
         {Key="DamageBlock"; Text="<b>[Melee Dampening] Damage Block:</b>    $stat"; Type="2dp";};
 	}
 };
-
-local specialStatsTemplates = {
-	["IgnitionChance"] = {Text="<b>Ignition Chance:</b>    $stat%"; Type="percent"};
-}
 
 local mouseOverDescription = {
 	--MARK: Weapon desc;
@@ -580,8 +576,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     or valueType == "2dp" and modFormatNumber.Beautify(math.ceil(rawValue*100)/100, true)
                     or valueType == "1dp" and modFormatNumber.Beautify(math.ceil(rawValue*10)/10, true)
                     or valueType == "Rpm" and modFormatNumber.Beautify(math.ceil(60/rawValue*100)/100)
-                    or valueType == "percent" and math.floor(rawValue*100)
-                    or valueType == "percent2dp" and math.floor(rawValue*1000)/10
+                    or valueType == "percent" and `{math.floor(rawValue*100)}%`
+                    or valueType == "percent2dp" and `{math.floor(rawValue*1000)/10}%`
                     or valueType == "trigger" and triggerModes[rawValue]
                     or valueType == "bullet" and bulletTypes[rawValue]
                     or valueType == "bool" and tostring(rawValue)
@@ -650,6 +646,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local infoText = info.Text;
             local statString = formatValue(info.Type, statValue);
 
+            statString = statString:gsub("%%", "%%%%");
             infoText = string.gsub(infoText, "$stat", statString);
             if info.PostText then
                 infoText = info.PostText(configurations, info, infoText, statValue);

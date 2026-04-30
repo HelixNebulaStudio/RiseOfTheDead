@@ -42,7 +42,7 @@ function treePackage.GoTo(npcClass: NpcClass)
         if interactable == nil then
             npcClass.Properties.CutsceneWalkToInteract = nil;
         else
-            local newWalkTo = interactable.Point;
+            local newWalkTo = interactable.PointAtt.WorldPosition;
 
             local pathToInteractAtt = interactable.Part:FindFirstChild("PathToInteract");
             if pathToInteractAtt then

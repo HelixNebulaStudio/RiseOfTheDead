@@ -31,6 +31,7 @@ end
 
 shared.coreBind(modGameSave, "_new", function(gameSave: GameSaveRotd, profile: ProfileRotd)
 	local player = profile.Player;
+	local playerClass: PlayerClass = shared.modPlayers.get(player);
 	Debugger:Print("_new GameSave", player);
 
 	gameSave.Spawn = "warehouse";
@@ -118,6 +119,8 @@ shared.coreBind(modGameSave, "_new", function(gameSave: GameSaveRotd, profile: P
 			local linkStorageInfo = portableStorages[a];
 			table.insert(gameSave.Inventory.LinkedStorages, linkStorageInfo);
 		end
+
+		playerClass.Properties._UpdateWarmth = true;
 	end)
 
 end)

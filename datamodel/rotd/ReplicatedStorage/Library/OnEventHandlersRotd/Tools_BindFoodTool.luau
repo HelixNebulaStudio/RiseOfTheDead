@@ -17,7 +17,6 @@ return function(event: EventPacket, action: string, toolHandler: ToolHandlerInst
             effectDuration = effectDuration * ((skillStats.Percent.Value/100)+1);
         end
 
-        Debugger:Warn(`EffectDuration {effectDuration}`);
         changeRef.EffectDuration = effectDuration;
     end
 end;

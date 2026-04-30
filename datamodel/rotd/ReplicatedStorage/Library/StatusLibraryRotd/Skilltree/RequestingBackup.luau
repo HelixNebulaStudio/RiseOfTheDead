@@ -23,7 +23,7 @@ if RunService:IsServer() then
             if damageData.Damage == nil or damageData.Damage <= 0 then return end;
             if damageData.DamageType == "Heal" then return end;
 
-            local characterClass: CharacterClass? = damageData.DamageTo;
+            local characterClass: CharacterClass? = damageData.DamageTo :: CharacterClass;
             if characterClass == nil or characterClass.ClassName ~= "PlayerClass" then return end;
 
             local player = (characterClass :: PlayerClass):GetInstance();
@@ -40,7 +40,7 @@ if RunService:IsServer() then
             local newHealth = healthComp.CurHealth - damageData.Damage;
             if newHealth > healthComp.MaxHealth*0.35 then return end;
 
-            local teamType = characterClass.Properties.ActiveTeamType or "Party";
+            local teamType = characterClass.Properties.ActiveTeamType or "Squad";
             local team: TeamClass = modTeamsManager.getTeamByMemberName(characterClass.Name, teamType);
             if team == nil then return end;
 
@@ -86,13 +86,13 @@ if RunService:IsServer() then
     end
 
     function statusPackage.BindApply(statusClass: StatusClassInstance)
-        local characterClass: CharacterClass = statusClass.StatusOwner;
+        local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
         if characterClass == nil then 
             statusClass.IsExpired = true;
             return
         end;
 
-        local teamType = characterClass.Properties.ActiveTeamType or "Party";
+        local teamType = characterClass.Properties.ActiveTeamType or "Squad";
         local team: TeamClass = modTeamsManager.getTeamByMemberName(characterClass.Name, teamType);
         if team == nil then 
             statusClass.IsExpired = true;

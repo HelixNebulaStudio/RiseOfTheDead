@@ -193,6 +193,7 @@ function interactablePackage.init(super) -- Server/Client
 
 						else
 							interface:ToggleGameBlinds(true, 1);
+							--SoundService:SetListener(Enum.ListenerType.ObjectCFrame, characterVars.RootPart);
 							characterVars.CharacterProperties.CanMove = true;
 							characterVars.CharacterProperties.CanInteract = true;
 						end

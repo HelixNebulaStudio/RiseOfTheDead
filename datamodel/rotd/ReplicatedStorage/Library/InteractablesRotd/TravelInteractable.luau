@@ -90,7 +90,7 @@ function interactablePackage.init(super) -- Server/Client
             Debugger:Warn(`Travel config is not in valid dir.`, interactable);
             return;
         end
-        if player:DistanceFromCharacter(interactable.Point) > interactable.InteractableRange then 
+        if player:DistanceFromCharacter(interactable.PointAtt.WorldPosition) > interactable.InteractableRange then 
             shared.Notify(player, `Travel is out of range.`, "Negative");
             return 
         end;

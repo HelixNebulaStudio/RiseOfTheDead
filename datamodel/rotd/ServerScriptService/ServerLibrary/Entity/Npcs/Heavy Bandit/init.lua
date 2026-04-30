@@ -50,7 +50,7 @@ local npcPackage = {
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local level = math.max(properties.Level, 0);
 
@@ -58,6 +58,8 @@ function npcPackage.Spawning(npcClass: NpcClass)
     configurations.BaseValues.MaxHealth = maxHealth;
 
     properties.PrimaryWeaponItemId = "minigun";
+    properties.LastSeenMemDuration = 10 + (level/20) * math.random(0, 100)/100;
+    properties.LastPosMemDuration = 20 + (level/3) * math.random(0, 100)/100;
 
     local binds = npcClass.Binds;
     function binds.EquipSuccessFunc(toolHandler: ToolHandlerInstance)

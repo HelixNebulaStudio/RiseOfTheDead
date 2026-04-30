@@ -26,7 +26,7 @@ if RunService:IsServer() then
 
             local playerClass: PlayerClass = shared.modPlayers.get(player);
             
-            local teamType = playerClass.Properties.ActiveTeamType or "Party";
+            local teamType = playerClass.Properties.ActiveTeamType or "Squad";
             local team: TeamClass = modTeamsManager.getTeamByMemberName(playerClass.Name, teamType);
             if team == nil then return end;
             
